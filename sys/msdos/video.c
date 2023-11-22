@@ -136,9 +136,7 @@ int attrib_gr_intense;       /* graphics mode intense attribute */
 uint32 curframecolor = NO_COLOR;   /* current background text color */
 boolean traditional = FALSE; /* traditonal TTY character mode */
 boolean inmap = FALSE;       /* in the map window */
-#ifdef TEXTCOLOR
 char ttycolors[CLR_MAX]; /* also used/set in options.c */
-#endif                   /* TEXTCOLOR */
 
 void
 backsp(void)
@@ -233,11 +231,7 @@ int
 has_color(int color)
 {
     ++color; /* prevents compiler warning (unref. param) */
-#ifdef TEXTCOLOR
     return (monoflag) ? 0 : 1;
-#else
-    return 0;
-#endif
 }
 #endif
 
@@ -357,7 +351,6 @@ term_start_attr(int attr)
 void
 term_start_color(int color)
 {
-#ifdef TEXTCOLOR
     if (monoflag) {
         g_attribute = attrib_text_normal;
     } else {
@@ -368,19 +361,16 @@ term_start_color(int color)
                 g_attribute = ttycolors[color];
         }
     }
-#endif
 }
 
 void
 term_start_bgcolor(int bgcolor)
 {
     // pline("before bgcolor = %d, curframecolor = %d", bgcolor, curframecolor);
-#ifdef TEXTCOLOR
     if (!monoflag) {
         if (bgcolor >= 0 && bgcolor < CLR_MAX)
             curframecolor = bgcolor;
     }
-#endif
     // pline("after  bgcolor = %d, curframecolor = %d", bgcolor, curframecolor);
 }
 
@@ -466,9 +456,7 @@ tty_startup(int *wid, int *hgt)
         setclipped();
 #endif
 
-#ifdef TEXTCOLOR
     init_ttycolor();
-#endif
 
 #ifdef MONO_CHECK
     monoflag = txt_monoadapt_check();
@@ -704,7 +692,6 @@ HideCursor(void)
 
 #endif /* SIMULATE_CURSOR */
 
-#ifdef TEXTCOLOR
 /*
  * CLR_BLACK            0
  * CLR_RED              1
@@ -928,7 +915,6 @@ convert_uchars(char *bufp,  /* current pointer */
 }
 
 #endif /* VIDEOSHADES */
-#endif /* TEXTCOLOR */
 
 /*
  * Process defaults.nh OPTIONS=video:xxxx

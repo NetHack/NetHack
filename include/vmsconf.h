@@ -93,17 +93,6 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
 #define SELECTSAVED
 
 /*
- * You may define TEXTCOLOR if your system has any terminals that recognize
- * ANSI color sequences of the form ``<ESCAPE>[#;#m'', where the first # is
- * a number between 40 and 47 represented background color, and the second
- * # is a number between 30 and 37 representing the foreground color.
- * GIGI terminals and DECterm windows on color VAXstations support these
- * color escape sequences, as do some 3rd party terminals and many micro
- * computers.
- */
-/* #define TEXTCOLOR */
-
-/*
  * If you define USE_QIO_INPUT, then you'll get raw characters from the
  * keyboard, not unlike those of the unix version of Nethack.  This will
  * allow you to use the Escape key in normal gameplay, and the appropriate

@@ -932,7 +932,6 @@ struct amii_glyph_node {
 static struct amii_glyph_node amii_g_nodes[NUMBER_GLYPH_NODES];
 static char amii_glyph_buffer[GLYPH_BUFFER_SIZE];
 
-#ifdef TEXTCOLOR
 /*
  * Map our amiga-specific colormap into the colormap specified in color.h.
  * See winami.c for the amiga specific colormap.
@@ -962,7 +961,6 @@ int backg[AMII_MAXCOLORS] = {
 #define CLR_BRIGHT_CYAN 14
 #define CLR_WHITE 15
 #define CLR_MAX 16
-#endif
 #endif
 
 #ifndef TESTING
@@ -1062,13 +1060,8 @@ int color_index, glyph;
     curx = cw->curx;
     cury = cw->cury;
 
-#ifdef TEXTCOLOR
     fg_color = foreg[color_index];
     bg_color = backg[color_index];
-#else
-    fg_color = 1;
-    bg_color = 0;
-#endif /* TEXTCOLOR */
 
     /* See if we have enough character buffer space... */
     if (glyph_buffer_index >= GLYPH_BUFFER_SIZE)

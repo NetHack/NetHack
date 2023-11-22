@@ -14,12 +14,7 @@
 #ifdef C
 #undef C
 #endif
-
-#ifdef TEXTCOLOR
 #define C(n) n
-#else
-#define C(n)
-#endif
 
 /* Default object class symbols.  See objclass.h.
  * {symbol, name, explain}
@@ -70,11 +65,7 @@ const struct symdef defsyms[MAXPCHARS + 1] = {
 #define PCHAR_DRAWING
 #include "defsym.h"
 #undef PCHAR_DRAWING
-    { 0, NULL
-#ifdef TEXTCOLOR
-              , NO_COLOR
-#endif
-    }
+    { 0, NULL, NO_COLOR }
 };
 
 /* default rogue level symbols */

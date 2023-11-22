@@ -34,11 +34,7 @@
 #undef CLR
 #endif
 
-#ifdef TEXTCOLOR
 #define CLR(n) n
-#else
-#define CLR(n)
-#endif
 
 #if defined(PCHAR_S_ENUM) || defined(PCHAR_PARSE) \
     || defined(PCHAR_DRAWING) || defined(PCHAR_TILES)

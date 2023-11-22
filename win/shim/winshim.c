@@ -213,11 +213,7 @@ struct window_procs shim_procs = {
      | WC2_RESET_STATUS
 #endif
      | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_STATUSLINES),
-#ifdef TEXTCOLOR
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
-#else
-    {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
-#endif
     shim_init_nhwindows, shim_player_selection, shim_askname, shim_get_nh_event,
     shim_exit_nhwindows, shim_suspend_nhwindows, shim_resume_nhwindows,
     shim_create_nhwindow, shim_clear_nhwindow, shim_display_nhwindow,

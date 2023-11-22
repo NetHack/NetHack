@@ -358,11 +358,7 @@ ghack_map_print_glyph(GtkObject *win, guint x, guint y, GdkImlibImage *im,
     if (x == u.ux && y == u.uy)
         ghack_map_cliparound(NULL, x, y, NULL);
 
-    if (glyph_is_pet(glyph)
-#ifdef TEXTCOLOR
-        && iflags.hilite_pet
-#endif
-        ) {
+    if (glyph_is_pet(glyph) && iflags.hilite_pet) {
         gnome_canvas_item_raise_to_top(GNOME_CANVAS_ITEM(canvas_image));
         gnome_canvas_item_show(GNOME_CANVAS_ITEM(canvas_image));
     } else {

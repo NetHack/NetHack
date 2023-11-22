@@ -246,7 +246,6 @@
 #include <fcntl.h>
 
 #ifdef MSDOS
-#define TEXTCOLOR                /* */
 #define PORT_HELP "msdoshlp.txt" /* msdos port specific help file */
 #endif
 
@@ -288,9 +287,7 @@
 #endif
 #endif
 #define ASCIIGRAPH
-#ifdef TEXTCOLOR
 #define VIDEOSHADES
-#endif
 /* SCREEN_8514, SCREEN_VESA are only placeholders presently - sub VGA instead
  */
 #if defined(SCREEN_8514)

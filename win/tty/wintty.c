@@ -125,11 +125,7 @@ struct window_procs tty_procs = {
      | WC2_U_24BITCOLOR
 #endif
     ),
-#ifdef TEXTCOLOR
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
-#else
-    {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
-#endif
     tty_init_nhwindows, tty_player_selection, tty_askname, tty_get_nh_event,
     tty_exit_nhwindows, tty_suspend_nhwindows, tty_resume_nhwindows,
     tty_create_nhwindow, tty_clear_nhwindow, tty_display_nhwindow,
@@ -548,9 +544,7 @@ tty_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
     ttyDisplay->curx = ttyDisplay->cury = 0;
     ttyDisplay->inmore = ttyDisplay->inread = ttyDisplay->intr = 0;
     ttyDisplay->dismiss_more = 0;
-#ifdef TEXTCOLOR
     ttyDisplay->color = NO_COLOR;
-#endif
     ttyDisplay->attrs = 0;
     ttyDisplay->topl_utf8 = 0;
     ttyDisplay->mixed = 0;
@@ -1170,16 +1164,12 @@ set_item_state(
     HUPSKIP();
     tty_curs(window, 4, lineno);
     term_start_attr(item->attr);
-#ifdef TEXTCOLOR
     if (item->color != NO_COLOR)
         term_start_color(item->color);
-#endif
     (void) putchar(ch);
     ttyDisplay->curx++;
-#ifdef TEXTCOLOR
     if (item->color != NO_COLOR)
         term_end_color();
-#endif
     term_end_attr(item->attr);
 }
 
@@ -1306,21 +1296,13 @@ toggle_menu_attr(boolean on, int color, int attr)
 {
     if (on) {
         term_start_attr(attr);
-#ifdef TEXTCOLOR
         if (color != NO_COLOR)
             term_start_color(color);
-#endif
     } else {
-#ifdef TEXTCOLOR
         if (color != NO_COLOR)
             term_end_color();
-#endif
         term_end_attr(attr);
     }
-
-#ifndef TEXTCOLOR
-    nhUse(color);
-#endif
 }
 
 static void
@@ -3549,12 +3531,10 @@ end_glyphout(void)
         graph_off();
     }
 #endif
-#ifdef TEXTCOLOR
     if (ttyDisplay->color != NO_COLOR) {
         term_end_color();
         ttyDisplay->color = NO_COLOR;
     }
-#endif
 }
 
 #ifndef WIN32CON
@@ -3701,12 +3681,10 @@ tty_print_glyph(
     }
 #endif
     if (iflags.use_color) {
-#ifdef TEXTCOLOR
         if (color != ttyDisplay->color) {
             if (ttyDisplay->color != NO_COLOR)
                 term_end_color();
         }
-#endif
 #ifdef ENHANCED_SYMBOLS
         /* we don't link with termcap.o if NO_TERMS is defined */
         if ((tty_procs.wincap2 & WC2_U_24BITCOLOR) && SYMHANDLING(H_UTF8)
@@ -3720,13 +3698,11 @@ tty_print_glyph(
             colordone = TRUE;
         }
 #endif
-#ifdef TEXTCOLOR
         if (!colordone) {
             ttyDisplay->color = color;
             if (color != NO_COLOR)
                 term_start_color(color);
         }
-#endif /* TEXTCOLOR */
     }   /* iflags.use_color aka iflags.wc_color */
 
     /* must be after color check; term_end_color may turn off inverse too;
@@ -3735,10 +3711,8 @@ tty_print_glyph(
        to see although the Valkyrie quest ends up being hard on the eyes) */
     if (iflags.use_color
         && bkglyphinfo && bkglyphinfo->framecolor != NO_COLOR) {
-#ifdef TEXTCOLOR
         ttyDisplay->framecolor = bkglyphinfo->framecolor;
         term_start_bgcolor(bkglyphinfo->framecolor);
-#endif
     } else if ((((special & MG_PET) != 0 && iflags.hilite_pet)
                 || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
                 || ((special & MG_FEMALE) != 0 && wizard && iflags.wizmgender)
@@ -3770,7 +3744,6 @@ tty_print_glyph(
     if (inverse_on)
         term_end_attr(ATR_INVERSE);
     if (iflags.use_color) {
-#ifdef TEXTCOLOR
         /* turn off color as well, turning off ATR_INVERSE may have done
           this already and if so, we won't know the current state unless
           we do it explicitly */
@@ -3779,7 +3752,6 @@ tty_print_glyph(
             term_end_color();
             ttyDisplay->color = ttyDisplay->framecolor = NO_COLOR;
         }
-#endif
 #ifdef ENHANCED_SYMBOLS
         if (color24bit_on)
             term_end_24bitcolor();
@@ -4051,9 +4023,7 @@ extern boolean status_activefields[MAXBLSTATS];
 extern winid WIN_STATUS;
 
 #ifdef STATUS_HILITES
-#ifdef TEXTCOLOR
 static int condcolor(long, unsigned long *);
-#endif
 static int condattr(long, unsigned long *);
 static unsigned long *tty_colormasks;
 static long tty_condition_bits;
@@ -4290,9 +4260,6 @@ tty_status_update(
         /*FALLTHRU*/
     default:
         attrmask = (color >> 8) & 0x00FF;
-#ifndef TEXTCOLOR
-        color = NO_COLOR;
-#endif
         fmt = status_fieldfmt[fldidx];
         if (!fmt)
             fmt = "%s";
@@ -4688,7 +4655,6 @@ check_windowdata(void)
     return TRUE;
 }
 
-#ifdef TEXTCOLOR
 /*
  * Return what color this condition should
  * be displayed in based on user settings.
@@ -4705,13 +4671,6 @@ condcolor(long bm, unsigned long *bmarray)
         }
     return NO_COLOR;
 }
-#else
-/* might need something more elaborate if some compiler complains that
-   the condition where this gets used always has the same value */
-#define condcolor(bm,bmarray) NO_COLOR
-#define term_start_color(color) /*empty*/
-#define term_end_color() /*empty*/
-#endif /* TEXTCOLOR */
 
 static int
 condattr(long bm, unsigned long *bmarray)

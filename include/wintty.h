@@ -90,10 +90,8 @@ struct WinDesc {
 struct DisplayDesc {
     short rows, cols; /* width and height of tty display */
     short curx, cury; /* current cursor position on the screen */
-#ifdef TEXTCOLOR
     int color; /* current color */
     uint32 framecolor; /* current background color */
-#endif
     int attrs;         /* attributes in effect */
     int toplin;        /* flag for topl stuff */
     int rawprint;      /* number of raw_printed lines since synch */
@@ -187,11 +185,9 @@ extern void term_end_attr(int attr);
 extern void term_start_raw_bold(void);
 extern void term_end_raw_bold(void);
 
-#ifdef TEXTCOLOR
 extern void term_end_color(void);
 extern void term_start_color(int color);
 extern void term_start_bgcolor(int color);
-#endif /* TEXTCOLOR */
 #ifdef ENHANCED_SYMBOLS
 extern void term_start_24bitcolor(struct unicode_representation *);
 extern void term_end_24bitcolor(void); /* termcap.c, consoletty.c */

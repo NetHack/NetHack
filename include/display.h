@@ -1046,12 +1046,10 @@ typedef struct {
     glyph_info glyphinfo;
 } gbuf_entry;
 
-#ifdef TEXTCOLOR
 extern const int altarcolors[];
 extern const int zapcolors[];
 extern const int explodecolors[];
 extern int wallcolors[];
-#endif
 
 /* If TILES_IN_GLYPHMAP is defined during build, this is defined
  * in the generated tile.c, complete with appropriate tile references in

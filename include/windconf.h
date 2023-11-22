@@ -7,8 +7,6 @@
 
 /* #define SHELL */    /* nt use of pcsys routines caused a hang */
 
-#define TEXTCOLOR /* Color text */
-
 #define EXEPATH              /* Allow .exe location to be used as HACKDIR */
 #define TRADITIONAL_GLYPHMAP /* Store glyph mappings at level change time */
 

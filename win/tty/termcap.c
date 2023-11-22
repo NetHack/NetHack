@@ -20,12 +20,12 @@ void nocmov(int, int);
 void term_start_24bitcolor(struct unicode_representation *);
 void term_end_24bitcolor(void);
 
-#if defined(TEXTCOLOR) && defined(TERMLIB)
+#if defined(TERMLIB)
 #if (!defined(UNIX) || !defined(TERMINFO)) && !defined(TOS)
 static void analyze_seq(char *, int *, int *);
 #endif
 #endif
-#if defined(TEXTCOLOR) && (defined(TERMLIB) || defined(ANSI_DEFAULT))
+#if (defined(TERMLIB) || defined(ANSI_DEFAULT))
 static void init_hilite(void);
 static void kill_hilite(void);
 #endif
@@ -45,12 +45,10 @@ static char PC = '\0';
 static char tbuf[512];
 #endif /*TERMLIB*/
 
-#ifdef TEXTCOLOR
 #ifdef TOS
 const char *hilites[CLR_MAX]; /* terminal escapes for the various colors */
 #else
 char NEARDATA *hilites[CLR_MAX]; /* terminal escapes for the various colors */
-#endif
 #endif
 
 static char *KS = (char *) 0, *KE = (char *) 0; /* keypad sequences */
@@ -160,9 +158,7 @@ tty_startup(int *wid, int *hgt)
         AE = nhStr("\017");
 #endif
         TE = VS = VE = nullstr;
-#ifdef TEXTCOLOR
         init_hilite();
-#endif /* TEXTCOLOR */
         *wid = CO;
         *hgt = LI;
         CL = nhStr("\033[2J"); /* last thing set */
@@ -297,7 +293,6 @@ tty_startup(int *wid, int *hgt)
     AS = Tgetstr(nhStr("as")); /* alt charset start */
     AE = Tgetstr(nhStr("ae")); /* alt charset end */
     nh_CD = Tgetstr(nhStr("cd")); /* clear lines from cursor and down */
-#ifdef TEXTCOLOR
 #if defined(TOS) && defined(__GNUC__)
     if (!strcmp(term, "builtin") || !strcmp(term, "tw52")
         || !strcmp(term, "st52")) {
@@ -305,7 +300,6 @@ tty_startup(int *wid, int *hgt)
     }
 #else
     init_hilite();
-#endif
 #endif
     *wid = CO;
     *hgt = LI;
@@ -332,7 +326,7 @@ void
 tty_shutdown(void)
 {
     /* we only attempt to clean up a few individual termcap variables */
-#if defined(TEXTCOLOR) && (defined(TERMLIB) || defined(ANSI_DEFAULT))
+#if defined(TERMLIB) || defined(ANSI_DEFAULT)
     kill_hilite();
 #endif
 #ifdef TERMLIB
@@ -809,7 +803,7 @@ cl_eos(void) /* free after Robert Viduya */
     }
 }
 
-#if defined(TEXTCOLOR) && defined(TERMLIB)
+#if defined(TERMLIB)
 #if defined(UNIX) && defined(TERMINFO)
 /*
  * Sets up color highlighting, using terminfo(4) escape sequences.
@@ -1218,9 +1212,9 @@ kill_hilite(void)
     return;
 }
 #endif /* UNIX && TERMINFO */
-#endif /* TEXTCOLOR && TERMLIB */
+#endif /* TERMLIB */
 
-#if defined(TEXTCOLOR) && !defined(TERMLIB) && defined(ANSI_DEFAULT)
+#if !defined(TERMLIB) && defined(ANSI_DEFAULT)
 static char adef_nilstring[] = "";
 
 static void
@@ -1256,7 +1250,7 @@ init_hilite(void)
         }
     }
 
-    /* See TEXTCOLOR && TERMLIB && UNIX && TERMINFO code above. */
+    /* See TERMLIB && UNIX && TERMINFO code above. */
     if (iflags.wc2_darkgray) {
         /* Bright black is dark gray. */
         hilites[CLR_BLACK] = (char *) alloc(sizeof "\033[1;30m");
@@ -1293,7 +1287,7 @@ kill_hilite(void)
         hilites[CLR_BLACK] = 0;
     }
 }
-#endif /* TEXTCOLOR && !TERMLIB && ANSI_DEFAULT */
+#endif /* !TERMLIB && ANSI_DEFAULT */
 
 static char nulstr[] = "";
 
@@ -1426,8 +1420,6 @@ term_end_raw_bold(void)
         xputs(soOff);
 }
 
-#ifdef TEXTCOLOR
-
 void
 term_end_color(void)
 {
@@ -1448,7 +1440,6 @@ term_start_bgcolor(int color)
     Sprintf(tmp, "\033[%dm", ((color % 8) + 40));
     xputs(tmp);
 }
-#endif /* TEXTCOLOR */
 
 #ifdef ENHANCED_SYMBOLS
 

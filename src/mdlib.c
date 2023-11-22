@@ -279,9 +279,7 @@ make_version(void)
 #endif
 /* objects (10..14) */
 /* flag bits and/or other global variables (15..26) */
-#ifdef TEXTCOLOR
-                                           | (1L << 17)
-#endif
+ /* color support always*/                 | (1L << 17)
 #ifdef INSURANCE
                                            | (1L << 18)
 #endif
@@ -501,9 +499,7 @@ static const char *const build_opts[] = {
 #ifdef ANSI_DEFAULT
     "ANSI default terminal",
 #endif
-#ifdef TEXTCOLOR
     "color",
-#endif
 #ifdef TTY_GRAPHICS
 #ifdef TTY_TILES_ESCCODES
     "console escape codes for tile hinting",

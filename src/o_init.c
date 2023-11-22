@@ -120,12 +120,8 @@ init_objects(void)
 {
     int i, first, last, prevoclass;
     char oclass;
-#ifdef TEXTCOLOR
 #define COPY_OBJ_DESCR(o_dst, o_src) \
     o_dst.oc_descr_idx = o_src.oc_descr_idx, o_dst.oc_color = o_src.oc_color
-#else
-#define COPY_OBJ_DESCR(o_dst, o_src) o_dst.oc_descr_idx = o_src.oc_descr_idx
-#endif
 
     for (i = 0; i <= MAXOCLASSES; i++) {
         gb.bases[i] = 0;

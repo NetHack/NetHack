@@ -28,9 +28,7 @@ static char DOSgetch(void);
 static char BIOSgetch(void);
 static void init_aline(void);
 char *_a_line; /* for Line A variables */
-#ifdef TEXTCOLOR
 boolean colors_changed = FALSE;
-#endif
 
 int
 tgetch()
@@ -312,7 +310,6 @@ init_aline()
 #endif
 }
 
-#ifdef TEXTCOLOR
 /* used in termcap.c to decide how to set up the hilites */
 unsigned long tos_numcolors = 2;
 
@@ -343,7 +340,6 @@ restore_colors()
         nh_HE = plainHE;
     colors_changed = FALSE;
 }
-#endif /* TEXTCOLOR */
 
 #ifdef SUSPEND
 

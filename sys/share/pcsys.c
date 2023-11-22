@@ -273,10 +273,8 @@ msexit(void)
 #ifdef TOS
     if (run_from_desktop)
         getreturn("to continue"); /* so the user can read the score list */
-#ifdef TEXTCOLOR
     if (colors_changed)
         restore_colors();
-#endif
 #endif
     wait_synch();
     return;

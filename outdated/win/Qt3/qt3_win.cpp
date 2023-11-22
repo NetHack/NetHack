@@ -1623,7 +1623,6 @@ void NetHackQtMapWindow::mousePressEvent(QMouseEvent* event)
     qApp->exit_loop();
 }
 
-#ifdef TEXTCOLOR
 static
 const QPen& nhcolor_to_pen(int c)
 {
@@ -1651,7 +1650,6 @@ const QPen& nhcolor_to_pen(int c)
 
     return pen[c];
 }
-#endif
 
 void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 {
@@ -1710,9 +1708,7 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 		/* map glyph to character and color */
     		(void)mapglyph(g, &och, &color, &special, i, j, 0);
 		ch = (uchar)och;
-#ifdef TEXTCOLOR
 		painter.setPen( nhcolor_to_pen(color) );
-#endif
 		painter.drawText(
 		    i*qt_settings->glyphs().width(),
 		    j*qt_settings->glyphs().height(),
@@ -1722,10 +1718,7 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 		    (const char*)&ch, 1
 		);
 		if (glyph_is_pet(g)
-#ifdef TEXTCOLOR
-		    && ::iflags.hilite_pet
-#endif
-		) {
+		    && ::iflags.hilite_pet) {
 		    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
                                               j*qt_settings->glyphs().height()),
                                        pet_annotation);
@@ -1740,10 +1733,7 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 		unsigned short g=Glyph(i,j);
 		qt_settings->glyphs().drawCell(painter, g, i, j);
 		if (glyph_is_pet(g)
-#ifdef TEXTCOLOR
-		    && ::iflags.hilite_pet
-#endif
-		) {
+		    && ::iflags.hilite_pet) {
 		    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
                                               j*qt_settings->glyphs().height()),
                                        pet_annotation);
@@ -1754,11 +1744,7 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 
     if (garea.contains(cursor)) {
 	if (Is_rogue_level(&u.uz)) {
-#ifdef TEXTCOLOR
 	    painter.setPen( white );
-#else
-	    painter.setPen( green ); // REALLY primitive
-#endif
 	} else
 	{
 	    int hp100;

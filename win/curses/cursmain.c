@@ -211,7 +211,6 @@ curses_init_nhwindows(
 #else
     base_term = initscr();
 #endif
-#ifdef TEXTCOLOR
     if (has_colors()) {
         start_color();
         curses_init_nhcolors();
@@ -221,12 +220,6 @@ curses_init_nhwindows(
         iflags.wc2_guicolor = FALSE;
         set_wc2_option_mod_status(WC2_GUICOLOR, set_in_config);
     }
-#else
-    iflags.use_color = FALSE;
-    set_option_mod_status("color", set_in_config);
-    iflags.wc2_guicolor = FALSE;
-    set_wc2_option_mod_status(WC2_GUICOLOR, set_in_config);
-#endif
     noecho();
     raw();
     nonl(); /* don't force ^M into newline (^J); input accepts them both

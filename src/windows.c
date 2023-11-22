@@ -1361,12 +1361,10 @@ dump_redirect(boolean onoff_flag)
 }
 
 #ifdef TTY_GRAPHICS
-#ifdef TEXTCOLOR
 #ifdef TOS
 extern const char *hilites[CLR_MAX];
 #else
 extern NEARDATA char *hilites[CLR_MAX];
-#endif
 #endif
 #endif
 
@@ -1376,7 +1374,7 @@ has_color(int color)
     return (iflags.use_color && windowprocs.name
             && (windowprocs.wincap & WC_COLOR) && windowprocs.has_color[color]
 #ifdef TTY_GRAPHICS
-#if defined(TEXTCOLOR) && defined(TERMLIB) && !defined(NO_TERMS)
+#if defined(TERMLIB) && !defined(NO_TERMS)
              && (hilites[color] != 0)
 #endif
 #endif

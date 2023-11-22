@@ -61,10 +61,7 @@
 
 3.  Prior to beginning compilation, go to the [.include] subdirectory and
     edit vmsconf.h according to its comments.  You should set Local_WIZARD
-    and Local_HACKDIR to appropriate values, and you might want to define
-    TEXTCOLOR if you have any color VAXstations or color terminals which
-    handle ANSI-format escape sequences to set foreground and background
-    color for text characters.  (VT241/VT340 color graphics won't work.)
+    and Local_HACKDIR to appropriate values.
     Other things which may be of interest are SECURE if you intend to
     set up NetHack as an installed image which is granted privileges, and
     SHELL which should be disabled if you intend to allow captive accounts

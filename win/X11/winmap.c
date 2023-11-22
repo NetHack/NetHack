@@ -57,13 +57,11 @@ extern int total_tiles_used, Tile_corr;
 #define COL0_OFFSET 1 /* change to 0 to revert to displaying unused column 0 */
 
 static X11_map_symbol glyph_char(const glyph_info *glyphinfo);
-#ifdef TEXTCOLOR
 static GC X11_make_gc(struct xwindow *wp, struct text_map_info_t *text_map,
                       X11_color color, boolean inverted);
 #ifdef ENHANCED_SYMBOLS
 static void X11_free_gc(struct xwindow *wp, GC gc, X11_color color);
 #endif
-#endif /* TEXTCOLOR */
 #ifdef ENHANCED_SYMBOLS
 static void X11_set_map_font(struct xwindow *wp);
 #endif
@@ -129,10 +127,8 @@ X11_print_glyph(
         register X11_map_symbol *ch_ptr;
         X11_color color;
         unsigned special;
-#ifdef TEXTCOLOR
         int colordif;
         register X11_color *co_ptr;
-#endif
 
         color = glyphinfo->gm.sym.color;
         special = glyphinfo->gm.glyphflags;
@@ -150,7 +146,6 @@ X11_print_glyph(
             if (!map_info->is_tile)
                 update_bbox = TRUE;
         }
-#ifdef TEXTCOLOR
         co_ptr = &map_info->text_map.colors[y][x];
         colordif = (((special & MG_PET) != 0 && iflags.hilite_pet)
                     || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
@@ -177,7 +172,6 @@ X11_print_glyph(
             map_info->text_map.framecolors[y][x] = bkglyphinfo->framecolor;
             update_bbox = TRUE;
         }
-#endif
     }
 
     if (update_bbox) { /* update row bbox */
@@ -945,7 +939,6 @@ get_text_gc(struct xwindow *wp, Font font)
     XtSetArg(arg[0], XtNbackground, &bgpixel);
     XtGetValues(wp->w, arg, ONE);
 
-#ifdef TEXTCOLOR
 #define set_color_gc(nh_color, resource_name)       \
     set_gc(wp->w, font, resource_name, bgpixel,     \
            &map_info->text_map.color_gcs[nh_color], \
@@ -967,11 +960,6 @@ get_text_gc(struct xwindow *wp, Font font)
     set_color_gc(CLR_BRIGHT_MAGENTA, XtNbright_magenta);
     set_color_gc(CLR_BRIGHT_CYAN, XtNbright_cyan);
     set_color_gc(CLR_WHITE, XtNwhite);
-#else
-    set_gc(wp->w, font, XtNforeground, bgpixel,
-           &map_info->text_map.copy_gc,
-           &map_info->text_map.inv_copy_gc);
-#endif
 }
 
 /*
@@ -1071,10 +1059,8 @@ map_all_unexplored(struct map_info_t *map_info) /* [was map_all_stone()] */
             tile_map->glyphs[y][x].framecolor = NO_COLOR;
 
             text_map->text[y][x] = (uchar) (!x ? mgnothg : mgunexp);
-#ifdef TEXTCOLOR
             text_map->colors[y][x] = NO_COLOR;
             text_map->framecolors[y][x] = NO_COLOR;
-#endif
         }
 }
 
@@ -1446,7 +1432,6 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
                     XSetForeground(dpy, tile_map->black_gc,
                                    BlackPixelOfScreen(screen));
                 }
-#ifdef TEXTCOLOR
                 {
                     uint32_t fc = tile_map->glyphs[row][cur_col].framecolor;
 
@@ -1457,7 +1442,6 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
                                        tile_map->square_width - 1 ,
                                        tile_map->square_height - 1);
                 }
-#endif
             }
         }
 
@@ -1480,7 +1464,6 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
     } else {
         struct text_map_info_t *text_map = &map_info->text_map;
 
-#ifdef TEXTCOLOR
         {
             register X11_color *c_ptr;
             X11_map_symbol *t_ptr;
@@ -1520,38 +1503,9 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
                 } /* col loop */
             }     /* row loop */
         }
-#else   /* !TEXTCOLOR */
-        {
-            int win_row, win_xstart;
-            int win_start_row, win_start_col;
-
-            win_start_row = start_row;
-            win_start_col = start_col;
-
-            /* We always start at the same x window position and have
-               the same character count. */
-            win_xstart = text_map->square_lbearing
-                         + ((win_start_col - COL0_OFFSET)
-                            * text_map->square_width);
-            count = stop_col - start_col + 1;
-
-            for (row = start_row, win_row = win_start_row; row <= stop_row;
-                 row++, win_row++) {
-                X11_draw_image_string(XtDisplay(wp->w), XtWindow(wp->w),
-                                      inverted ? text_map->inv_copy_gc
-                                               : text_map->copy_gc,
-                                      win_xstart,
-                                      text_map->square_ascent
-                                         + (win_row * text_map->square_height),
-                                      &(text_map->text[row][start_col]),
-                                      count);
-            }
-        }
-#endif  /* ?TEXTCOLOR */
     }
 }
 
-#ifdef TEXTCOLOR
 static GC
 X11_make_gc(
     struct xwindow *wp UNUSED,
@@ -1621,7 +1575,6 @@ X11_free_gc(struct xwindow *wp, GC ggc, X11_color color)
     }
 }
 #endif
-#endif /* TEXTCOLOR */
 
 static void
 X11_draw_image_string(
@@ -1924,17 +1877,12 @@ destroy_map_window(struct xwindow *wp)
         struct text_map_info_t *text_map = &map_info->text_map;
 
 /* Free allocated GCs. */
-#ifdef TEXTCOLOR
         int i;
 
         for (i = 0; i < CLR_MAX; i++) {
             XtReleaseGC(wp->w, text_map->color_gcs[i]);
             XtReleaseGC(wp->w, text_map->inv_color_gcs[i]);
         }
-#else
-        XtReleaseGC(wp->w, text_map->copy_gc);
-        XtReleaseGC(wp->w, text_map->inv_copy_gc);
-#endif
 
         /* Free the font structure if we allocated one */
 #ifdef ENHANCED_SYMBOLS

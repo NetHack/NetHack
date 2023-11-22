@@ -47,12 +47,10 @@ extern struct tc_lcl_data { /* defined and set up in termcap.c */
 
 extern short ospeed; /* set up in termcap.c */
 
-#ifdef TEXTCOLOR
 #ifdef TOS
 extern const char *hilites[CLR_MAX];
 #else
 extern NEARDATA char *hilites[CLR_MAX];
-#endif
 #endif
 
 #endif /* TCAP_H */

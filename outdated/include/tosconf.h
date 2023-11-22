@@ -38,7 +38,6 @@
 #define RANDOM    /* improved random numbers	*/
 #define SHELL     /* allow spawning of shell	*/
 #define TERMLIB   /* use termcap			*/
-#define TEXTCOLOR /* allow color			*/
 #define MAIL      /* enable the fake maildemon */
 #ifdef MINT
 #define SUSPEND /* allow suspending the game	*/
@@ -75,9 +74,7 @@ extern int strncmpi(const char *, const char *, size_t);
 #include "pcconf.h" /* remainder of stuff is same as the PC */
 #endif
 
-#ifdef TEXTCOLOR
 extern boolean colors_changed; /* in tos.c */
-#endif
 
 #endif /* TOSCONF_H */
 #endif /* TOS */

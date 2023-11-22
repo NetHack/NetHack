@@ -861,8 +861,6 @@ void
 nhglyph2charcolor(short g, uchar *ch, int *color)
 {
     int offset;
-#ifdef TEXTCOLOR
-
 #define zap_color(n) *color = iflags.use_color ? zapcolors[n] : NO_COLOR
 #define cmap_color(n) *color = iflags.use_color ? defsyms[n].color : NO_COLOR
 #define obj_color(n) \
@@ -871,17 +869,6 @@ nhglyph2charcolor(short g, uchar *ch, int *color)
 #define pet_color(n) *color = iflags.use_color ? mons[n].mcolor : NO_COLOR
 #define warn_color(n) \
     *color = iflags.use_color ? def_warnsyms[n].color : NO_COLOR
-
-#else /* no text color */
-
-#define zap_color(n)
-#define cmap_color(n)
-#define obj_color(n)
-#define mon_color(n)
-#define pet_color(c)
-#define warn_color(c)
-    *color = CLR_WHITE;
-#endif
 
     if ((offset = (g - GLYPH_WARNING_OFF)) >= 0) { /* a warning flash */
         *ch = showsyms[offset + SYM_OFF_W];

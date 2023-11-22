@@ -2223,9 +2223,7 @@ bhito(struct obj *obj, struct obj *otmp)
         case WAN_CANCELLATION:
         case SPE_CANCELLATION:
             cancel_item(obj);
-#ifdef TEXTCOLOR
             newsym(obj->ox, obj->oy); /* might change color */
-#endif
             break;
         case SPE_DRAIN_LIFE:
             (void) drain_item(obj, TRUE);

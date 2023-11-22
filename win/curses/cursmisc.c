@@ -81,7 +81,6 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
     if (color == NO_COLOR)
         color = NONE;
 
-#ifdef TEXTCOLOR
     int curses_color;
 
     /* if color is disabled, just show attribute */
@@ -89,7 +88,6 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
                         /* statuswin is for #if STATUS_HILITES
                            but doesn't need to be conditional */
                         : !(iflags.wc2_guicolor || win == statuswin)) {
-#endif
         if (attr != NONE) {
             if (onoff == ON)
                 wattron(win, attr);
@@ -97,7 +95,6 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
                 wattroff(win, attr);
         }
         return;
-#ifdef TEXTCOLOR
     }
 
     if (color == 0) {           /* make black fg visible */
@@ -153,9 +150,6 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
             wattroff(win, attr);
         }
     }
-#else
-    nhUse(color);
-#endif /* TEXTCOLOR */
 }
 
 /* call curses_toggle_color_attr() with 'menucolors' instead of 'guicolor'

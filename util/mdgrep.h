@@ -160,11 +160,6 @@ static struct grep_var grep_vars[]={
 #else
 	{"SUSPEND", 0},
 #endif
-#if defined(TEXTCOLOR)
-	{"TEXTCOLOR", 1},
-#else
-	{"TEXTCOLOR", 0},
-#endif
 #if defined(TILES_IN_GLYPHMAP)
 	{"TILES_IN_GLYPHMAP", 1},
 #else

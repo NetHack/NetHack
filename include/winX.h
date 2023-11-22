@@ -49,7 +49,6 @@ typedef unsigned char X11_color;
 #endif
 struct text_map_info_t {
     X11_map_symbol text[ROWNO][COLNO];  /* Actual displayed screen. */
-#ifdef TEXTCOLOR
     X11_color colors[ROWNO][COLNO];     /* Color of each character. */
     X11_color framecolors[ROWNO][COLNO];  /* Color of background
                                                  behind text */
@@ -57,7 +56,8 @@ struct text_map_info_t {
         inv_color_gcs[CLR_MAX];         /* GC for each inverse color */
 #define copy_gc color_gcs[NO_COLOR]
 #define inv_copy_gc inv_color_gcs[NO_COLOR]
-#else
+#if 0
+    /* was else from old textcolor days */
     GC copy_gc,      /* Drawing GC */
         inv_copy_gc; /* Inverse drawing GC */
 #endif

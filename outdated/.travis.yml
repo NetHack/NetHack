@@ -113,7 +113,6 @@ matrix:
               sed -i '/^#define MAIL/d'           include/unixconf.h
               sed -i '/^#define SHELL/d'          include/unixconf.h
               sed -i '/^#define SUSPEND/d'        include/unixconf.h
-              sed -i 's/^#define TEXTCOLOR//'     include/unixconf.h
               make fetch-lua LUA_VERSION=$LUA_VERSION
               test -d "lib/lua-$LUA_VERSION/src" || exit 0
               make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 install

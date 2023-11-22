@@ -975,18 +975,10 @@ void buffer_write(cell_t * buffer, cell_t * cell, COORD pos)
 void
 gettty(void)
 {
-#ifndef TEXTCOLOR
-    int k;
-#endif
     erase_char = '\b';
     kill_char = 21; /* cntl-U */
     iflags.cbreak = TRUE;
-#ifdef TEXTCOLOR
     init_ttycolor();
-#else
-    for (k = 0; k < CLR_MAX; ++k)
-        ttycolors[k] = NO_COLOR;
-#endif
 }
 
 /* reset terminal to original state */
@@ -1636,7 +1628,6 @@ tty_delay_output(void)
 static void
 init_ttycolor(void)
 {
-#ifdef TEXTCOLOR
     ttycolors[CLR_BLACK]        = FOREGROUND_INTENSITY; /* fix by Quietust */
     ttycolors[CLR_RED]          = FOREGROUND_RED;
     ttycolors[CLR_GREEN]        = FOREGROUND_GREEN;
@@ -1673,15 +1664,6 @@ init_ttycolor(void)
     ttycolors_inv[CLR_BRIGHT_CYAN] = BACKGROUND_GREEN | BACKGROUND_BLUE | BACKGROUND_INTENSITY;
     ttycolors_inv[CLR_WHITE]       = BACKGROUND_GREEN | BACKGROUND_BLUE | BACKGROUND_RED
                                        | BACKGROUND_INTENSITY;
-#else
-    int k;
-    ttycolors[0] = FOREGROUND_INTENSITY;
-    ttycolors_inv[0] = BACKGROUND_INTENSITY;
-    for (k = 1; k < SIZE(ttycolors); ++k) {
-        ttycolors[k] = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED;
-        ttycolors_inv[k] = BACKGROUND_GREEN | BACKGROUND_BLUE | BACKGROUND_RED;
-    }
-#endif
     init_ttycolor_completed = TRUE;
 }
 
@@ -1765,31 +1747,27 @@ term_start_raw_bold(void)
 void
 term_start_color(int color)
 {
-#ifdef TEXTCOLOR
     if (color >= 0 && color < CLR_MAX) {
         console.current_nhcolor = color;
-    } else
-#endif
-    console.current_nhcolor = NO_COLOR;
+    } else {
+       console.current_nhcolor = NO_COLOR;
+    }
 }
 
 void
 term_start_bgcolor(int color)
 {
-#ifdef TEXTCOLOR
     if (color >= 0 && color < CLR_MAX) {
         console.current_nhbkcolor = color;
-    } else
-#endif
-    console.current_nhbkcolor = NO_COLOR;
+    } else {
+        console.current_nhbkcolor = NO_COLOR;
+    }
 }
 
 void
 term_end_color(void)
 {
-#ifdef TEXTCOLOR
     console.foreground = DEFTEXTCOLOR;
-#endif
 #ifndef VIRTUAL_TERMINAL_SEQUENCES
     console.attr = (console.foreground | console.background);
 #endif /* ! VIRTUAL_TERMINAL_SEQUENCES */

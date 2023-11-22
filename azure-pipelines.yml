@@ -213,7 +213,6 @@ steps:
     sed -i '/^#define MAIL/d'           include/unixconf.h
     sed -i '/^#define SHELL/d'          include/unixconf.h
     sed -i '/^#define SUSPEND/d'        include/unixconf.h
-    sed -i 's/^#define TEXTCOLOR//'     include/unixconf.h
     make fetch-lua
     make WANT_WIN_ALL=1 all
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildTarget, 'minimal'))

@@ -300,15 +300,11 @@ HiliteField(Widget label,
     struct xwindow *xw = xw_status_win;
     int colr, attr;
 
-#ifdef TEXTCOLOR
     if ((colrattr & 0x00ff) >= CLR_MAX)
-    /* for !TEXTCOLOR, the following line is unconditional */
-#endif
         colrattr = (colrattr & ~0x00ff) | NO_COLOR;
     colr = colrattr & 0x00ff; /* guaranteed to be >= 0 and < CLR_MAX */
     attr = (colrattr >> 8) & 0x00ff;
 
-    /* potentially used even for !TEXTCOLOR configuration */
     if (!grayPxl) {/* one-time init */
         grayPxl = get_nhcolor(xw, CLR_GRAY).pixel;
         blackPxl = get_nhcolor(xw, CLR_BLACK).pixel;
@@ -524,9 +520,7 @@ tt_reset_color(int fld, int cond, unsigned long *colormasks)
         if (iflags.hilite_delta != 0L && (X11_condition_bits & bm) != 0) {
             /* BL_RESET before first BL_CONDITION will have colormasks==Null
                but condcolor() and condattr() can cope with that */
-#ifdef TEXTCOLOR
             colrattr = condcolor(bm, colormasks);
-#endif
             colrattr |= (condattr(bm, colormasks) << 8);
         }
         label = X11_cond_labels[cond];
@@ -724,10 +718,6 @@ X11_status_update_tty(int fld, genericptr_t ptr, int chg UNUSED, int percent,
                for a field which isn't active */
             *status_vals[fld] = '\0';
         }
-#ifndef TEXTCOLOR
-        /* even without color, attribute(s) bits still apply */
-        color = (color & ~0x00ff) | NO_COLOR;
-#endif
 #ifdef STATUS_HILITES
         if (!iflags.hilite_delta)
             color = NO_COLOR;
@@ -895,10 +885,7 @@ X11_status_update_fancy(int fld, genericptr_t ptr, int chg UNUSED,
     } else {
         int colr, attr;
 
-#ifdef TEXTCOLOR
         if ((colrattr & 0x00ff) >= CLR_MAX)
-            /* for !TEXTCOLOR, the following line is unconditional */
-#endif
             colrattr = (colrattr & ~0x00ff) | NO_COLOR;
         colr = colrattr & 0x00ff; /* guaranteed to be >= 0 and < CLR_MAX */
         attr = (colrattr >> 8) & 0x00ff;

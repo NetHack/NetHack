@@ -14,6 +14,7 @@ blind          your character is permanently blind                [False]
 bones          allow loading bones files                           [True]
 clicklook      look at map by clicking right mouse button         [False]
 cmdassist      give help for errors on direction & other commands  [True]
+color          use different colors for objects on screen  [True for micros]
 confirm        ask before hitting tame or peaceful monsters        [True]
 dark_room      show floor not in sight in different color          [True]
 eight_bit_tty  send 8-bit characters straight to terminal         [False]
@@ -27,6 +28,8 @@ goldX          when filtering objects by bless/curse state,       [False]
 help           print all available info when using the / command   [True]
 herecmd_menu   show menu of some possible commands when clicking
                on yourself or next to you with mouse              [False]
+hilite_pet     display pets in a highlighted manner               [False]
+hilite_pile    display item piles in a highlighted manner         [False]
 ignintr        ignore interrupt signal, including breaks          [False]
 implicit_uncursed  omit "uncursed" from inventory, if possible     [True]
 legacy         print introductory message                          [True]
@@ -90,11 +93,6 @@ news           print any news from game administrator on startup   [True]
 
 Boolean option if SCORE_ON_BOTL was set at compile time:
 showscore      display your approximate accumulated score         [False]
-
-Boolean options if TEXTCOLOR was set at compile time:
-color          use different colors for objects on screen  [True for micros]
-hilite_pet     display pets in a highlighted manner               [False]
-hilite_pile    display item piles in a highlighted manner         [False]
 
 Boolean option if TIMED_DELAY was set at compile time (tty or curses only):
 timed_delay    on unix and VMS, use a timer instead of sending     [True]

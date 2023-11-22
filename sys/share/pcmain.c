@@ -279,7 +279,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     }
 #endif
 
-#if defined(TOS) && defined(TEXTCOLOR)
+#if defined(TOS)
     if (iflags.BIOS && iflags.use_color)
         set_colors();
 #endif

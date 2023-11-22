@@ -912,9 +912,7 @@ int glyph, bkglyph;
     if (mar_set_tile_mode(-1)) {
         mar_print_glyph(window, x, y, glyph2tile[glyph], glyph2tile[bkglyph]);
         if (
-#ifdef TEXTCOLOR
             iflags.hilite_pet &&
-#endif
             glyph_is_pet(glyph))
             mar_add_pet_sign(window, x, y);
     } else
@@ -936,11 +934,9 @@ int glyph;
     /* map glyph to character and color */
     (void) mapglyph(glyph, &ch, &color, &special, x, y, 0);
 
-#ifdef TEXTCOLOR
     /* Turn off color if rogue level. */
     if (Is_rogue_level(&u.uz))
         color = NO_COLOR;
-#endif /* TEXTCOLOR */
 
     mar_print_char(window, x, y, ch, color);
 }

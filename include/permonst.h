@@ -60,9 +60,7 @@ struct permonst {
         mflags2;                /* more boolean bitflags */
     unsigned short mflags3;     /* yet more boolean bitflags */
     uchar difficulty;           /* toughness (formerly from  makedefs -m) */
-#ifdef TEXTCOLOR
     uchar mcolor; /* color to use */
-#endif
 };
 
 extern NEARDATA struct permonst mons[]; /* the master list of monster types */

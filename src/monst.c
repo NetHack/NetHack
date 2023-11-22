@@ -11,12 +11,8 @@
 #ifdef C
 #undef C
 #endif
-#ifdef TEXTCOLOR
 #include "color.h"
 #define C(color) color
-#else
-#define C(color)
-#endif
 
 #define NO_ATTK    \
     {              \

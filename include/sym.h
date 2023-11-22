@@ -52,9 +52,7 @@ enum symset_handling_types {
 struct symdef {
     uchar sym;
     const char *explanation;
-#ifdef TEXTCOLOR
     uchar color;
-#endif
 };
 
 enum symparse_range {

@@ -3053,9 +3053,11 @@ cures_sliming(struct monst *mon, struct obj *obj)
             && obj->spe > 0);
 }
 
-/* TRUE if monster appears to be green; for active TEXTCOLOR, we go by
-   the display color, otherwise we just pick things that seem plausibly
-   green (which doesn't necessarily match the TEXTCOLOR categorization) */
+/* TRUE if monster appears to be green; we go by the display color.
+   The alternative was to just pick things that
+   seem plausibly green (which didn't necessarily match the categorization
+   by the color of the text).
+   iflags.use_color is not meant for game behavior decisions */
 static boolean
 green_mon(struct monst *mon)
 {
@@ -3063,34 +3065,37 @@ green_mon(struct monst *mon)
 
     if (Hallucination)
         return FALSE;
-#ifdef TEXTCOLOR
+    return (ptr->mcolor == CLR_GREEN || ptr->mcolor == CLR_BRIGHT_GREEN);
+#if 0
     if (iflags.use_color)
         return (ptr->mcolor == CLR_GREEN || ptr->mcolor == CLR_BRIGHT_GREEN);
-#endif
-    /* approximation */
-    if (strstri(ptr->pmnames[NEUTRAL], "green")
-        || (ptr->pmnames[MALE] && strstri(ptr->pmnames[MALE], "green"))
-        || (ptr->pmnames[FEMALE] && strstri(ptr->pmnames[FEMALE], "green")))
-        return TRUE;
-    switch (monsndx(ptr)) {
-    case PM_FOREST_CENTAUR:
-    case PM_GARTER_SNAKE:
-    case PM_GECKO:
-    case PM_GREMLIN:
-    case PM_HOMUNCULUS:
-    case PM_JUIBLEX:
-    case PM_LEPRECHAUN:
-    case PM_LICHEN:
-    case PM_LIZARD:
-    case PM_WOOD_NYMPH:
-        return TRUE;
-    default:
-        if (is_elf(ptr) && !is_prince(ptr) && !is_lord(ptr)
-            && ptr != &mons[PM_GREY_ELF])
+    else {
+        /* approximation */
+        if (strstri(ptr->pmnames[NEUTRAL], "green")
+            || (ptr->pmnames[MALE] && strstri(ptr->pmnames[MALE], "green"))
+            || (ptr->pmnames[FEMALE] && strstri(ptr->pmnames[FEMALE], "green")))
             return TRUE;
-        break;
+        switch (monsndx(ptr)) {
+        case PM_FOREST_CENTAUR:
+        case PM_GARTER_SNAKE:
+        case PM_GECKO:
+        case PM_GREMLIN:
+        case PM_HOMUNCULUS:
+        case PM_JUIBLEX:
+        case PM_LEPRECHAUN:
+        case PM_LICHEN:
+        case PM_LIZARD:
+        case PM_WOOD_NYMPH:
+            return TRUE;
+        default:
+            if (is_elf(ptr) && !is_prince(ptr) && !is_lord(ptr)
+                && ptr != &mons[PM_GREY_ELF])
+                return TRUE;
+            break;
+        }
     }
     return FALSE;
+#endif
 }
 
 /*muse.c*/

@@ -156,7 +156,6 @@ NetHackQtGlyphs::drawBorderedCell(
 
     drawGlyph(painter, glyph, tileidx, lox + 1, loy + 1, reversed);
 
-#ifdef TEXTCOLOR
     if (border != NO_BORDER) {
         // gray would be a better mid-point between red and cyan but it
         // doesn't show up well enough against the wall tile background
@@ -199,9 +198,6 @@ NetHackQtGlyphs::drawBorderedCell(
             }
         }
     }
-#else
-    nhUse(border);
-#endif
 }
 
 // mis-named routine to get the pixmap for a particular glyph

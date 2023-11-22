@@ -17,7 +17,6 @@
 #define tgetch getchar
 #define FCMASK 0666
 #define PORT_ID "BeOS"
-#define TEXTCOLOR
 #define POSIX_TYPES
 #define SIG_RET_TYPE __signal_func_ptr
 

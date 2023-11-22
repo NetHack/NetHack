@@ -55,11 +55,6 @@
                         * particular, it should NOT be defined for the UNIXPC
                         * unless you remove the use of the shared library in
                         * the Makefile */
-#define TEXTCOLOR      /* Use System V r3.2 terminfo color support
-                        * and/or ANSI color support on termcap systems
-                        * and/or X11 color.  Note:  if you get compiler
-                        * warnings about 'has_colors()' being implicitly
-                        * declared, uncomment NEED_HAS_COLORS_DECL below. */
 #define POSIX_JOB_CONTROL /* use System V / Solaris 2.x / POSIX job control
                            * (e.g., VSUSP) */
 #define POSIX_TYPES /* use POSIX types for system calls and termios */
@@ -365,7 +360,7 @@
 #endif
 #endif
 
-/* Relevant for some systems which enable TEXTCOLOR:  some older versions
+/* Relevant for some systems:  some older versions
    of curses (the run-time library optionally used by nethack's tty
    interface in addition to its curses interface) supply 'has_colors()'
    but corresponding <curses.h> doesn't declare it.  has_colors() is used

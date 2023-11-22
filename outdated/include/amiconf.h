@@ -147,7 +147,6 @@ extern char *gets(char *);
  *  (Possibly) configurable Amiga options:
  */
 
-#define TEXTCOLOR /* Use colored monsters and objects */
 #define HACKFONT  /* Use special hack.font */
 #ifndef CROSS_TO_AMIGA   /* issues with prototype and spawnl */
 #define SHELL  /* Have a shell escape command (!) */
@@ -164,13 +163,7 @@ extern char *gets(char *);
 #endif
 
 #define CHANGE_COLOR 1
-
-#ifdef TEXTCOLOR
 #define DEPTH 6 /* Maximum depth of the screen allowed */
-#else
-#define DEPTH 2 /* Four colors...sigh... */
-#endif
-
 #define AMII_MAXCOLORS (1L << DEPTH)
 typedef unsigned short AMII_COLOR_TYPE;
 

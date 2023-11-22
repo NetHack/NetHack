@@ -110,7 +110,7 @@ static struct allopt_t allopt[SIZE(allopt_init)];
 
 extern char configfile[]; /* for messages */
 extern const struct symparse loadsyms[];
-#if defined(TOS) && defined(TEXTCOLOR)
+#if defined(TOS)
 extern boolean colors_changed;  /* in tos.c */
 #endif
 #ifdef VIDEOSHADES
@@ -6755,9 +6755,7 @@ initoptions_init(void)
         if (!gs.symset[ROGUESET].explicitly)
             load_symset("RogueIBM", ROGUESET);
         switch_symbols(TRUE);
-#ifdef TEXTCOLOR
         iflags.use_color = TRUE;
-#endif
     }
 #endif /* UNIX && TTY_GRAPHICS */
 #if defined(UNIX) || defined(VMS)
