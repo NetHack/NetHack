@@ -1110,6 +1110,9 @@ timet_delta(time_t etim, time_t stim) /* end and start times */
 struct enum_dump monsdump[] = {
 #include "monsters.h"
     { NUMMONS, "NUMMONS" },
+    { NON_PM, "NON_PM" },
+    { LOW_PM, "LOW_PM" },
+    { SPECIAL_PM, "SPECIAL_PM" }
 };
 struct enum_dump objdump[] = {
 #include "objects.h"
@@ -1162,7 +1165,9 @@ dump_enums(void)
     for (i = 0; i < NUM_ENUM_DUMPS; ++ i) {
         raw_printf("enum %s = {", titles[i]);
         for (j = 0; j < szd[i]; ++j) {
-            nmprefix = (j == szd[i] - 1) ? "" : pfx[i]; /* "" or "PM_" */
+            int unprefixed_count = (i == monsters_enum) ? 4 : 1;
+            nmprefix = (j >= szd[i] - unprefixed_count)
+                           ? "" : pfx[i]; /* "" or "PM_" */
             nmwidth = 27 - (int) strlen(nmprefix); /* 27 or 24 */
             raw_printf("    %s%*s = %3d,",
                        nmprefix, -nmwidth, ed[i][j].nm, ed[i][j].val);

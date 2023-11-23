@@ -18,6 +18,18 @@
  *     for a blinding attack, they determine the amount of time blinded.
  */
 
+enum monnums {
+#define MONS_ENUM
+#include "monsters.h"
+#undef MONS_ENUM
+        NUMMONS,
+        NON_PM = -1,                    /* "not a monster */
+        LOW_PM = NON_PM + 1,            /* first monster in mons */
+        SPECIAL_PM = PM_LONG_WORM_TAIL  /* [normal] < ~ < [special] */
+                /* mons[SPECIAL_PM] through mons[NUMMONS-1], inclusive, are
+                   never generated randomly and cannot be polymorphed into */
+};
+
 struct attack {
     uchar aatyp;
     uchar adtyp, damn, damd;
@@ -42,6 +54,7 @@ struct attack {
 
 struct permonst {
     const char *pmnames[NUM_MGENDERS];
+    const enum monnums pmidx;   /* mons array index aka PM_ identifier */
     char mlet;                  /* symbol */
     schar mlevel,               /* base monster level */
         mmove,                  /* move speed */
@@ -60,29 +73,16 @@ struct permonst {
         mflags2;                /* more boolean bitflags */
     unsigned short mflags3;     /* yet more boolean bitflags */
     uchar difficulty;           /* toughness (formerly from  makedefs -m) */
-    uchar mcolor; /* color to use */
+    uchar mcolor;               /* color to use */
 };
 
-extern NEARDATA struct permonst mons[]; /* the master list of monster types */
-
-enum monnums {
-#define MONS_ENUM
-#include "monsters.h"
-#undef MONS_ENUM
-        NUMMONS
-};
+extern NEARDATA struct permonst mons[NUMMONS + 1]; /* the master list of monster types */
 
 #define VERY_SLOW 3
 #define SLOW_SPEED 9
 #define NORMAL_SPEED 12 /* movement rates */
 #define FAST_SPEED 15
 #define VERY_FAST 24
-
-#define NON_PM (-1)                  /* "not a monster" */
-#define LOW_PM (NON_PM + 1)          /* first monster in mons[] */
-#define SPECIAL_PM PM_LONG_WORM_TAIL /* [normal] < ~ < [special] */
-/* mons[SPECIAL_PM] through mons[NUMMONS-1], inclusive, are
-   never generated randomly and cannot be polymorphed into */
 
 #ifdef PMNAME_MACROS
 #define pmname(pm,g) ((((g) == MALE || (g) == FEMALE) && (pm)->pmnames[g]) \

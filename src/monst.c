@@ -23,13 +23,15 @@
             flg1, flg2, flg3, d, col, bn)           \
     {                                                                       \
         { (const char *) 0, (const char *) 0, nam },                        \
-            sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)  \
+        PM_##bn,                                                            \
+        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)      \
     }
 
 #define MON3(namm, namf, namn, sym, lvl, gen, atk, siz, mr1, mr2, \
              flg1, flg2, flg3, d, col, bn)                        \
     {                                                                       \
         { namm, namf, namn },                                               \
+        PM_##bn,                                                            \
         sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)      \
     }
 /* LVL() and SIZ() collect several fields to cut down on number of args
@@ -52,10 +54,21 @@ struct permonst mons_init[NUMMONS + 1] = {
     /*
      * array terminator
      */
+#undef MON
+#define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, \
+            flg1, flg2, flg3, d, col, bn)           \
+    {                                                                       \
+        { (const char *) 0, (const char *) 0, nam },                        \
+        NON_PM,                                                            \
+        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)      \
+    }
     MON("", 0, LVL(0, 0, 0, 0, 0), (0),
         A(NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(0, 0, 0, 0), 0, 0, 0L, 0L, 0, 0, 0, 0)
+        SIZ(0, 0, 0, 0), 0, 0, 0L, 0L, 0, 0, 0, 0),
 };
+
+#undef MON
+#undef MON3
 
 void monst_globals_init(void); /* in hack.h but we're using config.h */
 
@@ -76,8 +89,6 @@ const struct attack c_sa_no[NATTK] = SEDUCTION_ATTACKS_NO;
 #undef C
 #define C(c) (0x1f & (c)) /* global.h */
 #undef NO_ATTK
-#undef MON
-#undef MON3
 #undef LVL
 #undef SIZ
 #undef ATTK

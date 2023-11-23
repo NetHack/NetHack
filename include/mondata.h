@@ -5,6 +5,7 @@
 #ifndef MONDATA_H
 #define MONDATA_H
 
+#define monsndx(ptr) ((ptr)->pmidx)
 #define verysmall(ptr) ((ptr)->msize < MZ_SMALL)
 #define bigmonst(ptr) ((ptr)->msize >= MZ_LARGE)
 

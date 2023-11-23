@@ -1695,7 +1695,6 @@ extern struct attack *dmgtype_fromattack(struct permonst *, int, int);
 extern boolean dmgtype(struct permonst *, int);
 extern int max_passive_dmg(struct monst *, struct monst *);
 extern boolean same_race(struct permonst *, struct permonst *);
-extern int monsndx(struct permonst *);
 extern int name_to_mon(const char *, int *);
 extern int name_to_monplus(const char *, const char **, int *);
 extern int name_to_monclass(const char *, int *);
