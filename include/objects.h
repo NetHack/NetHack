@@ -1,4 +1,4 @@
-/* NetHack 3.7	objects.h	$NHDT-Date: 1596498192 2020/08/03 23:43:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.7	objects.h	$NHDT-Date: 1700725879 2023/11/23 07:51:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -35,7 +35,6 @@
 #define MARKER(tag,sn) /*empty*/
 
 #elif defined(OBJECTS_INIT)
-#define COLOR_FIELD(X) X,
 /* notes: 'sub' was once a bitfield but got changed to separate schar when
    it was overloaded to hold negative weapon skill indices; the first zero
    is padding for oc_prediscovered which has variable init at run-time;
@@ -44,7 +43,7 @@
     nmkn,mrg,uskn,0,mgc,chrg,uniq,nwsh,big,tuf,0,dir,mtrl,sub /*cpp fodder*/
 #define OBJECT(obj,bits,prp,sym,prob,dly,wt,        \
                cost,sdam,ldam,oc1,oc2,nut,color,sn) \
-  { 0, 0, (char *) 0, bits, prp, sym, dly, COLOR_FIELD(color) prob, wt, \
+  { 0, 0, (char *) 0, bits, prp, sym, dly, color, prob, wt, \
     cost, sdam, ldam, oc1, oc2, nut }
 #define MARKER(tag,sn) /*empty*/
 
@@ -1616,7 +1615,6 @@ OBJECT(OBJ(NoDes, NoDes),
        BITS(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, P_NONE, 0), 0,
        ILLOBJ_CLASS, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 #undef BITS
-#undef COLOR_FIELD
 #endif
 
 #undef OBJ

@@ -1,4 +1,4 @@
-/* NetHack 3.7	monsters.h	$NHDT-Date: 1691877846 2023/08/12 22:04:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.110 $ */
+/* NetHack 3.7	monsters.h	$NHDT-Date: 1700725870 2023/11/23 07:51:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.113 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -33,7 +33,7 @@
  *      sounds made (MS_* defines), physical size (MZ_* defines),
  *      resistances, resistances conferred (both MR_* defines),
  *      3 * flag bitmaps (M1_*, M2_*, and M3_* defines respectively),
- *      difficulty, symbol color (C(x) macro).
+ *      difficulty, symbol color.
  *
  *      The difficulty was generated in separate array monstr[] with
  *      values calculated by makedefs, but has been moved into mons[]
