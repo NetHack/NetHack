@@ -84,9 +84,4 @@ extern NEARDATA struct permonst mons[NUMMONS + 1]; /* the master list of monster
 #define FAST_SPEED 15
 #define VERY_FAST 24
 
-#ifdef PMNAME_MACROS
-#define pmname(pm,g) ((((g) == MALE || (g) == FEMALE) && (pm)->pmnames[g]) \
-                        ? (pm)->pmnames[g] : (pm)->pmnames[NEUTRAL])
-#endif
-
 #endif /* PERMONST_H */
