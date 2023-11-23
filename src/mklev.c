@@ -1724,9 +1724,11 @@ mktrap(
        nonlethal, even indirectly. We also exclude all of the
        later/fancier traps because they tend to have special
        considerations (e.g. webs, portals), often are indirectly
-       lethal, and tend not to generate on shallower levels anyway.
-       Finally, pits are excluded because it's weird to see an item
-       in a pit and yet not be able to identify that the pit is there. */
+       lethal, and tend not to generate on shallower levels anyway
+       (exception: magic traps can generate on dlvl 1 and be
+       immediately lethal). Finally, pits are excluded because it's
+       weird to see an item in a pit and yet not be able to identify
+       that the pit is there. */
     if (kind != NO_TRAP && !(mktrapflags & MKTRAP_NOVICTIM)
         && lvl <= (unsigned) rnd(4)
         && kind != SQKY_BOARD && kind != RUST_TRAP
@@ -1735,7 +1737,7 @@ mktrap(
            which case tx,ty==launch.x,y; no boulder => no dead predecessor */
         && !(kind == ROLLING_BOULDER_TRAP
              && t->launch.x == t->tx && t->launch.y == t->ty)
-        && !is_pit(kind) && kind < HOLE) {
+        && !is_pit(kind) && (kind < HOLE || kind == MAGIC_TRAP)) {
         mktrap_victim(t);
     }
 }
