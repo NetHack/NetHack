@@ -40,7 +40,9 @@ is_home_elemental(struct permonst *ptr)
             return Is_earthlevel(&u.uz);
         case PM_WATER_ELEMENTAL:
             return Is_waterlevel(&u.uz);
-        }
+        default:
+	    break;
+	}
     return FALSE;
 }
 
