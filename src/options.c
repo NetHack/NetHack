@@ -3148,8 +3148,8 @@ optfn_pickup_types(
             if (use_menu) {
                 if (wizard && !strchr(ocl, VENOM_SYM))
                     strkitten(ocl, VENOM_SYM);
-                (void) choose_classes_menu("Autopickup what?", 1, TRUE, ocl,
-                                           tbuf);
+                (void) choose_classes_menu("Autopickup what?",
+                                           1, TRUE, ocl, tbuf);
                 op = tbuf;
             }
         }
@@ -9715,12 +9715,12 @@ choose_classes_menu(const char *prompt,
     winid win;
     anything any;
     char buf[BUFSZ];
-    int i, n;
-    int ret;
-    int next_accelerator, accelerator;
+    const char *text = 0;
+    boolean selected;
+    int ret, i, n, next_accelerator, accelerator;
     int clr = NO_COLOR;
 
-    if (class_list == (char *) 0 || class_select == (char *) 0)
+    if (!class_list || !class_select)
         return 0;
     accelerator = 0;
     next_accelerator = 'a';
@@ -9728,10 +9728,6 @@ choose_classes_menu(const char *prompt,
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
     while (*class_list) {
-        const char *text;
-        boolean selected;
-
-        text = (char *) 0;
         selected = FALSE;
         switch (category) {
         case 0:
@@ -9745,7 +9741,8 @@ choose_classes_menu(const char *prompt,
             Sprintf(buf, "%c  %s", *class_list, text);
             break;
         default:
-            impossible("choose_classes_menu: invalid category %d", category);
+            panic("choose_classes_menu: invalid category %d", category);
+            /*NOTREACHED*/
         }
         if (way && *class_select) { /* Selections there already */
             if (strchr(class_select, *class_list)) {
@@ -9756,19 +9753,20 @@ choose_classes_menu(const char *prompt,
         add_menu(win, &nul_glyphinfo, &any, accelerator,
                  category ? *class_list : 0, ATR_NONE, clr, buf,
                  selected ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
-        ++class_list;
         if (category > 0) {
-            ++next_accelerator;
-            if (next_accelerator == ('z' + 1))
-                next_accelerator = 'A';
-            if (next_accelerator == ('Z' + 1))
+            if (next_accelerator == 'Z')
                 break;
+            else if (next_accelerator == 'z')
+                next_accelerator = 'A';
+            else
+                ++next_accelerator;
         }
+        ++class_list;
     }
     if (category == 1 && next_accelerator <= 'z') {
         /* for objects, add "A - ' '  all classes", after a separator */
-        any = cg.zeroany;
         add_menu_str(win, "");
+        any = cg.zeroany;
         any.a_int = (int) ' ';
         Sprintf(buf, "%c  %s", (char) any.a_int, "all classes of objects");
         /* we won't preselect this even if the incoming list is empty;
@@ -9776,6 +9774,18 @@ choose_classes_menu(const char *prompt,
            de-selected in order to select anything else */
         add_menu(win, &nul_glyphinfo, &any, 'A', 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
+        if (!strcmp(prompt, "Autopickup what?")) {
+            Sprintf(buf, "%4s%c  %s", "    ", ' ',
+                   "Note: when no choices are selected, \"all\" is implied.");
+            add_menu_str(win, buf);
+            if (flags.pickup) {
+                /* for 'O', "toggle" should be intuitive; for 'm O', it would
+                   probably be better to say "Set 'autopickup' to false..." */
+                Sprintf(buf, "%4s%c  %s", "    ", ' ',
+                        "Toggle off 'autopickup' to not pick up anything.");
+                add_menu_str(win, buf);
+            }
+        }
     }
     end_menu(win, prompt);
     n = select_menu(win, way ? PICK_ANY : PICK_ONE, &pick_list);
@@ -9797,8 +9807,9 @@ choose_classes_menu(const char *prompt,
     } else if (n == -1) {
         class_select = eos(class_select);
         ret = -1;
-    } else
+    } else {
         ret = 0;
+    }
     *class_select = '\0';
     return ret;
 }
