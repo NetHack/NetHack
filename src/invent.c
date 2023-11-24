@@ -5,9 +5,10 @@
 
 #include "hack.h"
 
-#define NOINVSYM '#'
+/* fake inventory letters, not 'a'..'z' or 'A'..'Z' */
+#define NOINVSYM '#'      /* overflow because all 52 letters are in use */
 #define CONTAINED_SYM '>' /* designator for inside a container */
-#define HANDS_SYM '-'
+#define HANDS_SYM '-'     /* hands|fingers|self depending on context */
 
 static char *loot_xname(struct obj *);
 static int invletter_value(char);
@@ -60,7 +61,8 @@ static boolean in_perm_invent_toggled;
  */
 static const char venom_inv[] = { VENOM_CLASS, 0 }; /* (constant) */
 
-/* sortloot() classification; called at most once [per sort] for each object */
+/* sortloot() classification; called at most once [per sort] for each object;
+   also called by '\' command if discoveries use sortloot order */
 void
 loot_classify(Loot *sort_item, struct obj *obj)
 {
@@ -336,7 +338,7 @@ sortloot_cmp(const genericptr vptr1, const genericptr vptr2)
         val1 = sli1->orderclass;
         val2 = sli2->orderclass;
         if (val1 != val2)
-            return (int) (val1 - val2);
+            return val1 - val2;
 
         /* skip sub-classes when ordering by sortpack+invlet */
         if ((gs.sortlootmode & SORTLOOT_INVLET) == 0) {
@@ -491,6 +493,7 @@ sortloot(
     boolean by_nexthere, /* T: traverse via obj->nexthere, F: via obj->nobj */
     boolean (*filterfunc)(struct obj *)) /* optional filter */
 {
+    static Loot zerosli;
     Loot *sliarray;
     struct obj *o;
     unsigned n, i;
@@ -513,16 +516,14 @@ sortloot(
             && (!augment_filter || o->otyp != CORPSE
                 || !touch_petrifies(&mons[o->corpsenm])))
             continue;
+        sliarray[i] = zerosli;
         sliarray[i].obj = o, sliarray[i].indx = (int) i;
-        sliarray[i].str = (char *) 0;
-        sliarray[i].orderclass = sliarray[i].subclass = sliarray[i].disco = 0;
         ++i;
     }
     n = i;
     /* add a terminator so that we don't have to pass 'n' back to caller */
-    sliarray[n].obj = (struct obj *) 0, sliarray[n].indx = -1;
-    sliarray[n].str = (char *) 0;
-    sliarray[n].orderclass = sliarray[n].subclass = sliarray[n].disco = 0;
+    sliarray[n] = zerosli;
+    sliarray[n].indx = -1;
 
     /* do the sort; if no sorting is requested, we'll just return
        a sortloot_item array reflecting the current ordering */
@@ -1396,7 +1397,8 @@ currency(long amount)
 }
 
 struct obj *
-u_carried_gloves(void) {
+u_carried_gloves(void)
+{
     struct obj *otmp, *gloves = (struct obj *) 0;
 
     if (uarmg) {
@@ -1897,7 +1899,7 @@ getobj(
         silly_thing(word, otmp);
         return (struct obj *) 0;
     }
-split_otmp:
+ split_otmp:
     if (cntgiven) {
         if (cnt == 0)
             return (struct obj *) 0;
@@ -2491,8 +2493,9 @@ learn_unseen_invent(void)
     for (otmp = gi.invent; otmp; otmp = otmp->nobj) {
         if (otmp->dknown && (otmp->bknown || !Role_if(PM_CLERIC)))
             continue; /* already seen */
-        /* set dknown, perhaps bknown (for priest[ess]) */
-        (void) xname(otmp);
+        /* xname() will set dknown, perhaps bknown (for priest[ess]);
+           result from xname() is immediately released for re-use */
+        maybereleaseobuf(xname(otmp));
         /*
          * If object->eknown gets implemented (see learnwand(zap.c)),
          * handle deferred discovery here.
@@ -3370,8 +3373,8 @@ display_pickinv(
      * an issue if empty checks are done before hand and the call
      * to here is short circuited away.
      *
-     * 2: our count here is only to distinguish between 0 and 1 and
-     * more than 1; for the last one, we don't need a precise number.
+     * 2: our count here is only to distinguish between 0 or 1 or
+     * more than 1; for the last case, we don't need a precise number.
      * For perm_invent update we force 'more than 1'.
      */
     n = (doing_perm_invent && !lets && !want_reply) ? 2
@@ -3625,7 +3628,8 @@ display_inventory(const char *lets, boolean want_reply)
             for (otmp = gi.invent; otmp; otmp = otmp->nobj)
                 if (otmp->invlet == cmdq->key
                     && (!lets || !*lets
-                        || strchr(lets, def_oc_syms[(int) otmp->oclass].sym))) {
+                        || strchr(lets,
+                                  def_oc_syms[(int) otmp->oclass].sym))) {
                     free(cmdq);
                     return otmp->invlet;
                 }
