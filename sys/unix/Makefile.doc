@@ -1,5 +1,5 @@
 #      NetHack Documentation Makefile.
-# NetHack 3.7  Makefile.doc    $NHDT-Date: 1596498290 2020/08/03 23:44:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $
+# NetHack 3.7  Makefile.doc    $NHDT-Date: 1700788000 2023/11/24 01:06:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.28 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -61,6 +61,7 @@ Guidebook	: $(GUIDEBOOK_MN) tmac.n tmac.nh $(NEEDMAKEDEFS)
 	$(GUIDECMD) > Guidebook
 
 # Fancier output for those with ditroff, psdit and a PostScript printer.
+# Could be converted to Guidebook.pdf if tool(s) for that are available.
 Guidebook.ps	: $(GUIDEBOOK_MN) tmac.n tmac.nh $(NEEDMAKEDEFS)
 	$(GUIDE_PREFORMAT) | $(PSCMD) > Guidebook.ps
 
@@ -113,7 +114,8 @@ Guidebook.dat	: Gbk-1pg-pfx.mn Gbk-1pg-sfx.mn $(GUIDEBOOK_MN) tmac.n tmac.nh \
 		  $(NEEDMAKEDEFS)
 	$(ONEPAGECMD) > $@
 
-MAN2TXT = $(NHGREP) | nroff -man - | $(COLCMD)
+# plain text output
+MAN2TXT = $(NHGREP) | nroff -man -c -Tascii - | $(COLCMD)
 nethack.txt	: nethack.6
 	cat nethack.6 | $(MAN2TXT) > nethack.txt
 recover.txt	: recover.6
