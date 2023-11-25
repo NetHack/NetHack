@@ -1178,6 +1178,7 @@ extern struct obj *o_on(unsigned int, struct obj *);
 extern boolean obj_here(struct obj *, coordxy, coordxy);
 extern boolean wearing_armor(void);
 extern boolean is_worn(struct obj *);
+extern boolean is_inuse(struct obj *);
 extern struct obj *g_at(coordxy, coordxy);
 extern boolean splittable(struct obj *);
 extern int any_obj_ok(struct obj *);

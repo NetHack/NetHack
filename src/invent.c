@@ -73,83 +73,78 @@ static const char *const inuse_headers[] = { /* [4] shown first, [1] last */
 static void
 inuse_classify(Loot *sort_item, struct obj *obj)
 {
-    /* in-use; only applicable to hero's inventory */
-    if (carried(obj) && (is_worn(obj) || tool_being_used(obj))) {
-        long w_mask = (obj->owornmask & (W_ACCESSORY | W_WEAPONS | W_ARMOR));
-        int rating = 0, altclass = 0;
+    long w_mask = (obj->owornmask & (W_ACCESSORY | W_WEAPONS | W_ARMOR));
+    int rating = 0, altclass = 0;
 
 #define USE_RATING(test) \
-        do {                                                    \
-            /* 'rating' advances for each USE_RATING() call */  \
-            ++rating;                                           \
-            if ((test) != 0)                                    \
-                goto assign_rating;                             \
-        } while (0)
+    do {                                                        \
+        /* 'rating' advances for each USE_RATING() call */      \
+        ++rating;                                               \
+        if ((test) != 0)                                        \
+            goto assign_rating;                                 \
+    } while (0)
 
-        /*
-         * In order of importance, least to most, somewhat arbitrarily.
-         *
-         * For instance, all accessories are grouped together even
-         * though they're usually less important than other stuff, so
-         * that they appear earlier within displayed list of used items.
-         * Amulet is rated as most important primarily because the
-         * default 'packorder' puts amulets first (possibly because one
-         * might be The Amulet).  Non-wielded alternate weapon and
-         * quiver are grouped with primary weapon.  Weapons are rated
-         * above armor because of default 'packorder'.
-         *
-         * These ratings don't match either subclasses or 'packorder'.
-         *
-         * USE_RATING() sets up 'rating' then jumps to 'assign_rating'
-         * if 'obj' warrants that.
-         */
-        /* "Miscellaneous" */
-        ++altclass; /* 1 */
-        /* lamp and leash might be used doubly, as a tool and also wielded
-           or readied-in-quiver; these tests for used-as-tool only pass
-           when owornmask is 0 so that used-as-weapon takes precedence */
-        USE_RATING(!w_mask && obj->otyp == LEASH && obj->leashmon);
-        USE_RATING(!w_mask && obj->oclass == TOOL_CLASS && obj->lamplit);
-        /* "Armor" */
-        ++altclass; /* 2 */
-        USE_RATING(w_mask & WORN_SHIRT);
-        USE_RATING(w_mask & WORN_BOOTS);
-        USE_RATING(w_mask & WORN_GLOVES);
-        USE_RATING(w_mask & WORN_HELMET);
-        USE_RATING(w_mask & WORN_SHIELD);
-        USE_RATING(w_mask & WORN_CLOAK);
-        USE_RATING(w_mask & WORN_ARMOR);
-        /* "Weapons" */
-        ++altclass; /* 3 */
-        /* could get more complicated:  if uswapwep is just alternate weapon
-           rather than wielded secondary, swap order with quiver (unless
-           quiver is ammo for uswapwep without also being ammo for uwep) */
-        USE_RATING(w_mask & W_QUIVER);
-        USE_RATING(w_mask & W_SWAPWEP);
-        USE_RATING(w_mask & W_WEP);
-        /* "Accessories" */
-        ++altclass; /* 4 */
-        USE_RATING(w_mask & WORN_BLINDF);
-        USE_RATING(w_mask & LEFT_RING);
-        USE_RATING(w_mask & RIGHT_RING);
-        USE_RATING(w_mask & WORN_AMUL);
-        /* if we get here, the USE_RATING() checks failed to find a match;
-           obj might have an owornmask of W_BALL or W_ART|W_ARTI; doprinuse()
-           doesn't list such items so give it a rating of 0 to suppress */
-        rating = 0;
-        altclass = -1; /* 'orderclass' must end up non-zero */
+    /*
+     * In order of importance, least to most, somewhat arbitrarily.
+     *
+     * For instance, all accessories are grouped together even
+     * though they're usually less important than other stuff, so
+     * that they appear earlier within displayed list of used items.
+     * Amulet is rated as most important primarily because the
+     * default 'packorder' puts amulets first (possibly because one
+     * might be The Amulet).  Non-wielded alternate weapon and
+     * quiver are grouped with primary weapon.  Weapons are rated
+     * above armor because of default 'packorder'.
+     *
+     * These ratings don't match either subclasses or 'packorder'.
+     *
+     * USE_RATING() sets up 'rating' then jumps to 'assign_rating'
+     * if 'obj' warrants that.
+     */
+    /* "Miscellaneous" */
+    ++altclass; /* 1 */
+    /* lamp and leash might be used doubly, as a tool and also wielded
+       or readied-in-quiver; these tests for used-as-tool only pass
+       when owornmask is 0 so that used-as-weapon takes precedence */
+    USE_RATING(!w_mask && obj->otyp == LEASH && obj->leashmon);
+    USE_RATING(!w_mask && obj->oclass == TOOL_CLASS && obj->lamplit);
+    /* "Armor" */
+    ++altclass; /* 2 */
+    USE_RATING(w_mask & WORN_SHIRT);
+    USE_RATING(w_mask & WORN_BOOTS);
+    USE_RATING(w_mask & WORN_GLOVES);
+    USE_RATING(w_mask & WORN_HELMET);
+    USE_RATING(w_mask & WORN_SHIELD);
+    USE_RATING(w_mask & WORN_CLOAK);
+    USE_RATING(w_mask & WORN_ARMOR);
+    /* "Weapons" */
+    ++altclass; /* 3 */
+    /* could get more complicated:  if uswapwep is just alternate weapon
+       rather than wielded secondary, swap order with quiver (unless
+       quiver is ammo for uswapwep without also being ammo for uwep) */
+    USE_RATING(w_mask & W_QUIVER);
+    USE_RATING(w_mask & W_SWAPWEP);
+    USE_RATING(w_mask & W_WEP);
+    /* "Accessories" */
+    ++altclass; /* 4 */
+    USE_RATING(w_mask & WORN_BLINDF);
+    USE_RATING(w_mask & LEFT_RING);
+    USE_RATING(w_mask & RIGHT_RING);
+    USE_RATING(w_mask & WORN_AMUL);
+
+    /* if we get here, the USE_RATING() checks failed to find a match */
+    rating = 0;
+    altclass = -1; /* 'orderclass' must end up non-zero */
+
  assign_rating:
-        sort_item->inuse = rating;
-        sort_item->orderclass = altclass; /* used for alternate headings */
+    sort_item->inuse = rating;
+    sort_item->orderclass = altclass; /* used for alternate headings */
 
-#undef USE_RATING
-    } else { /* 'obj' is not in use by hero */
-        sort_item->inuse = 0;
-        sort_item->orderclass = -1; /* non-zero => has been classified */
-    }
     /* not applicable for in-use */
     sort_item->subclass = 0;
     sort_item->disco = 0;
+
+#undef USE_RATING
 }
 
 /* sortloot() classification; called at most once [per sort] for each object;
@@ -2102,6 +2097,15 @@ is_worn(struct obj *otmp)
             : FALSE;
 }
 
+/* is 'obj' being used by the hero?  worn, wielded, active lamp or leash;
+   not to be confused with obj->in_use, which finishes using up an item
+   (destroys it) if restoring a save file finds that bit set */
+boolean
+is_inuse(struct obj *obj)
+{
+    return (carried(obj) && (is_worn(obj) || tool_being_used(obj)));
+}
+
 /* extra xprname() input that askchain() can't pass through safe_qbuf() */
 static struct xprnctx {
     char let;
@@ -3431,7 +3435,7 @@ display_pickinv(
         not_carrying_anything[] = "Not carrying anything",
         not_using_anything[] = "Not using any items",
         only_carrying_gold[] = "Only carrying gold";
-    struct obj *otmp, wizid_fakeobj;
+    struct obj *otmp, wizid_fakeobj, inuse_fakeobj;
     char ilet, ret, *formattedobj;
     const char *invlet = flags.inv_order;
     int n, classcount, inusecount = 0;
@@ -3441,6 +3445,8 @@ display_pickinv(
     unsigned sortflags;
     Loot *sortedinvent, *srtinv;
     int8_t prevorderclass;
+    boolean (*filter)(struct obj *) = (boolean (*)(OBJ_P)) 0;
+
     boolean wizid = (wizard && iflags.override_ID), gotsomething = FALSE;
     int clr = NO_COLOR, menu_behavior = MENU_BEHAVE_STANDARD;
     boolean show_gold = TRUE, inuse_only = FALSE, skipped_gold = FALSE,
@@ -3494,8 +3500,9 @@ display_pickinv(
         : lets ? (int) strlen(lets)
                : !gi.invent ? 0 : !gi.invent->nobj ? 1 : 2;
     /* for xtra_choice, there's another 'item' not included in initial 'n';
-       for !lets (full invent) and for override_ID (wizard mode identify),
-       skip message_menu handling of single item even if item count was 1 */
+       for !lets (full invent or inuse_only) and for override_ID (wizard
+       mode identify), skip message_menu handling of single item even if
+       item count was 1 */
     if (xtra_choice || (n == 1 && (!lets || wizid)))
         ++n;
 
@@ -3547,10 +3554,37 @@ display_pickinv(
     if (inuse_only) {
         flags.sortpack = FALSE;
         sortflags = SORTLOOT_INUSE; /* override */
+        filter = is_inuse;
+        if (!uwep) {
+            /*
+             * inuse_only and not wielding anything: insert "bare hands"
+             * into primary weapon slot.  Unlike adding an extra menu
+             * entry for 'xtra_choice' at top of menu, we need an object
+             * in invent for it to be sorted into desired position.
+             * It will need custom formatting below.
+             */
+            inuse_fakeobj = cg.zeroobj; /* STRANGE_OBJECT, ILLOBJ_CLASS */
+            inuse_fakeobj.invlet = HANDS_SYM; /* '-' */
+            inuse_fakeobj.owornmask = W_WEP;  /* inuse_classify needs this */
+            inuse_fakeobj.where = OBJ_INVENT; /* is_inuse filter needs this */
+            inuse_fakeobj.nobj = gi.invent;
+            gi.invent = &inuse_fakeobj;
+        }
     }
 
-    sortedinvent = sortloot(&gi.invent, sortflags, FALSE,
-                            (boolean (*)(OBJ_P)) 0);
+    sortedinvent = sortloot(&gi.invent, sortflags, FALSE, filter);
+    /* inuse_only: if we inserted bare hands as a fake weapon, remove them;
+       although the fake object will no longer be in invent, sortedinvent
+       will still contain a pointer to it */
+    if (gi.invent == &inuse_fakeobj) {
+        gi.invent = inuse_fakeobj.nobj;
+        inuse_fakeobj.nobj = (struct obj *) 0;
+        /* if inuse_fakeobj is the only thing present in sortedinvent, get
+           rid of it in order to produce "not using any items" */
+        if (sortedinvent[0].obj == &inuse_fakeobj && !sortedinvent[1].obj)
+            sortedinvent[0].obj = (struct obj *) 0;
+    }
+
     start_menu(win, menu_behavior);
     any = cg.zeroany;
     if (wizid) {
@@ -3601,10 +3635,6 @@ display_pickinv(
         int tmpglyph;
         glyph_info tmpglyphinfo = nul_glyphinfo;
 
-        /* for in-use-only, sorting puts all in-use items before any not-in-
-           use items, so once a not-in-use item is encountered, we're done */
-        if (inuse_only && srtinv->orderclass < 1)
-            break;
         /* for showing a set of specific letters, skip ones not in the set */
         if (lets && !strchr(lets, otmp->invlet))
             continue;
@@ -3623,10 +3653,9 @@ display_pickinv(
                     continue;
                 }
             }
-            any = cg.zeroany; /* all bits zero */
-            ilet = otmp->invlet;
-            if ((flags.sortpack && !classcount)
-                || (inuse_only && srtinv->orderclass != prevorderclass)) {
+            /* maybe insert a class header */
+            if (inuse_only ? (srtinv->orderclass != prevorderclass)
+                           : (flags.sortpack && !classcount)) {
                 boolean withsym = (want_reply && iflags.menu_head_objsym);
                 const char *class_header = inuse_only
                         ? inuse_headers[(int) srtinv->orderclass]
@@ -3636,16 +3665,33 @@ display_pickinv(
                 classcount++;
                 prevorderclass = srtinv->orderclass;
             }
+
+            ilet = otmp->invlet;
+            any = cg.zeroany; /* all bits zero */
             if (wizid)
                 any.a_obj = otmp;
             else
                 any.a_char = ilet;
-            tmpglyph = obj_to_glyph(otmp, rn2_on_display_rng);
-            map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);
-            formattedobj = doname(otmp);
-            add_menu(win, &tmpglyphinfo, &any, ilet,
-                     wizid ? def_oc_syms[(int) otmp->oclass].sym : 0,
-                     ATR_NONE, clr, formattedobj, MENU_ITEMFLAGS_NONE);
+
+            if (otmp == &inuse_fakeobj) {
+                /* fake item to format as "bare|gloved hands" */
+                char barehands[QBUFSZ];
+
+                /* like doname() below, makeplural() returns an obuf[] */
+                formattedobj = makeplural(body_part(HAND));
+                Sprintf(barehands, "%s %s (no weapon)",
+                        uarmg ? "gloved" : "bare", formattedobj);
+                add_menu(win, &nul_glyphinfo, &any, ilet, 0,
+                         ATR_NONE, clr, barehands, MENU_ITEMFLAGS_NONE);
+            } else {
+                /* normal inventory item */
+                tmpglyph = obj_to_glyph(otmp, rn2_on_display_rng);
+                map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);
+                formattedobj = doname(otmp);
+                add_menu(win, &tmpglyphinfo, &any, ilet,
+                         wizid ? def_oc_syms[(int) otmp->oclass].sym : 0,
+                         ATR_NONE, clr, formattedobj, MENU_ITEMFLAGS_NONE);
+            }
             /* doname() uses a static pool of obuf[] output buffers and
                we don't want inventory display to overwrite all of them,
                so when we've used one we release it for re-use */
@@ -4972,7 +5018,7 @@ doprinuse(void)
     char lets[52 + 1];
 
     for (otmp = gi.invent; otmp; otmp = otmp->nobj)
-        if (is_worn(otmp) || tool_being_used(otmp)) {
+        if (is_inuse(otmp)) {
             /* we could be carrying more than 52 items; theoretically they
                might all be lit candles so avoid potential lets[] overflow */
             if (ct >= (int) sizeof lets - 1)
@@ -4986,7 +5032,7 @@ doprinuse(void)
     /* no longer need to collect letters; sortloot() takes care of it, but
        still need to count far enough to know whether anything is in use */
     for (otmp = gi.invent; otmp; otmp = otmp->nobj)
-        if (is_worn(otmp) || tool_being_used(otmp)) {
+        if (is_inuse(otmp)) {
             ++ct;
             break;
         }
