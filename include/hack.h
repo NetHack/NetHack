@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.h	$NHDT-Date: 1693359531 2023/08/30 01:38:51 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.223 $ */
+/* NetHack 3.7	hack.h	$NHDT-Date: 1700869696 2023/11/24 23:48:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.238 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -799,11 +799,15 @@ struct sortloot_item {
     struct obj *obj;
     char *str; /* result of loot_xname(obj) in some cases, otherwise null */
     /* these need to be signed; 'indx' should be big enough to hold a count
-       of the largest pile of items, the others would fit within char */
-    int indx;       /* index into original list (used as tie-breaker) */
-    int orderclass; /* order rather than object class; 0 => not yet init'd */
-    int subclass;   /* subclass for some classes */
-    int disco;      /* discovery status */
+       of the largest pile of items, the others fit within char */
+    int indx;        /* index into original list (used as tie-breaker) */
+    int8 orderclass; /* order rather than object class; 0 => not yet init'd */
+    int8 subclass;   /* subclass for some classes */
+    int8 disco;      /* discovery status */
+    int8 inuse;      /* 0: not in-use or not sorting by inuse_only;
+                      * 1: lit candle/lamp or attached leash; 2: worn armor;
+                      * 3: wielded weapon (including uswapwep and uquiver);
+                      * 4: worn accessory (amulet, rings, blindfold). */
 };
 typedef struct sortloot_item Loot;
 
@@ -1250,6 +1254,7 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define SORTLOOT_PACK   0x01
 #define SORTLOOT_INVLET 0x02
 #define SORTLOOT_LOOT   0x04
+#define SORTLOOT_INUSE  0x08 /* for inventory, in-use items first */
 #define SORTLOOT_PETRIFY 0x20 /* override filter func for c-trice corpses */
 
 /* flags for xkilled() [note: meaning of first bit used to be reversed,

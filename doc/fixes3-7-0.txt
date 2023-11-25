@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1297 $ $NHDT-Date: 1700204638 2023/11/17 07:03:58 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1308 $ $NHDT-Date: 1700869710 2023/11/24 23:48:30 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -2343,6 +2343,12 @@ allow #dip potions into a sink to get a hint about what they are, similar to
 	so could be used to blank out scrolls and books
 when restoring, show current level's player-applied annotation if there is one
 have farlook of a grave report the engraving on the headstone if it's known
+the '*' command (list inventory items in use) now shows items in a specific
+	order: amulet, right ring, left ring, blindfold, wielded weapon,
+	secondary or alternate weapon, quiver, suit, cloak, shield, helmet,
+	gloves, boots, shirt, lit lamps and candles, leashes attached to pets
+	instead of by object class (sortpack) or inventory letter (!sortpack);
+	new perm_invent+perminv_mode==inuse does the same
 
 
 Platform- and/or Interface-Specific New Features
