@@ -3717,6 +3717,8 @@ bhit(
     boolean in_skip = FALSE, allow_skip = FALSE;
     boolean tethered_weapon = FALSE;
     int skiprange_start = 0, skiprange_end = 0, skipcount = 0;
+    struct obj *was_returning =
+        (iflags.returning_missile == obj) ? obj : (struct obj *) 0;
 
     if (weapon == KICKED_WEAPON) {
         /* object starts one square in front of player */
@@ -3806,6 +3808,8 @@ bhit(
                 ttmp->tseen = TRUE;
                 newsym(x, y);
             }
+            if (was_returning)
+                iflags.returning_missile = (genericptr_t) 0;
             break;
         }
 
@@ -3979,7 +3983,8 @@ bhit(
         point_blank = FALSE; /* affects passing through iron bars */
     }
 
-    if (weapon != ZAPPED_WAND && weapon != INVIS_BEAM && !tethered_weapon)
+    if ((weapon != ZAPPED_WAND && weapon != INVIS_BEAM && !tethered_weapon)
+        || (was_returning && was_returning != iflags.returning_missile))
         tmp_at(DISP_END, 0);
 
     if (shopdoor)

@@ -1750,6 +1750,8 @@ when using 'm #overview' to annotate a level other than current the one,
 	include level number, and dungeon branch if not current one, in the
 	prompt instead of generic "this level"
 when using 'm #overview' in the endgame, don't include non-endgame levels
+when a tethered aklys gets caught in a web, make sure it doesn't return
+	and that the display of the tether gets cleaned up
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
