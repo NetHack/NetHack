@@ -115,7 +115,8 @@ Guidebook.dat	: Gbk-1pg-pfx.mn Gbk-1pg-sfx.mn $(GUIDEBOOK_MN) tmac.n tmac.nh \
 	$(ONEPAGECMD) > $@
 
 # plain text output
-MAN2TXT = $(NHGREP) | nroff -man -c -Tascii - | $(COLCMD)
+#MAN2TXT = $(NHGREP) | nroff -man $(MORE_MAN2TXT_FLAGS) - | $(COLCMD)
+MAN2TXT = $(NHGREP) | nroff -man $(MORE_MAN2TXT_FLAGS) -
 nethack.txt	: nethack.6
 	cat nethack.6 | $(MAN2TXT) > nethack.txt
 recover.txt	: recover.6

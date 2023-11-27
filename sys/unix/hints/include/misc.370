@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
-# NetHack 3.7  multiw-3.370 $NHDT-Date: 1668359836 2022/11/13 17:17:16 $  $NHDT-Branch: NetHack-3.7 $
+# NetHack 3.7  misc.370 $NHDT-Date: 1668359836 2022/11/13 17:17:16 $  $NHDT-Branch: NetHack-3.7 $
 #
-# Further set-up  for multiple window ports (interfaces) that comes after compiler.370.
+# Further set-up  for miscellaneou odds and ends (after compiler.370)
 #
 # Included from:
 #           hints/linux.370
@@ -66,17 +66,24 @@ endif
 endif
 
 #detection of groff
-#NROFFISGROFF := $(shell echo `nroff --version | grep "GNU groff version"`)
+NROFFISGROFF := $(shell echo `nroff --version | grep "GNU groff version"`)
 #$(info NROFFISGROFF=$(NROFFISGROFF))
-#ifneq "$(NROFFISGROFF)" ""
+ifneq "$(NROFFISGROFF)" ""
+# --- version check is not currently needed ---
 # get the version of groff
 #GROFFGE123 := $(shell expr `echo $(NROFFISGROFF) | cut -f2 -d.` \>= 23)
 #$(info GROFFGE123=$(GROFFGE123))
 #ifeq "$(GROFFGE123)" "1"
 #NROFF_FLAGS = -W font
 #endif
-#endif  # NROFFISGROFF
+# ---
+endif  # NROFFISGROFF
 
-#end of hints/include/multiw-3.370
+ifneq "$(NROFFISGROFF)" ""   # It's groff
+# add the groff-specific plain text flags
+MORE_MAN2TXT_FLAGS += -Tascii -P -cbou
+endif
+
+#end of hints/include/misc.370
 #------------------------------------------------------------------------------
 

@@ -29,7 +29,7 @@ PRECHECK+=checkmakefiles
 # in HINTSINCLNAMES (without suffix and without a path)
 HINTSINCLNAMES := compiler cross-pre cross-post \
 		gbdates-pre gbdates-post \
-		multiw-1 multiw-2 multiw-3 \
+		multiw-1 multiw-2 misc \
 		multisnd1-pre multisnd2-pre multisnd-post
 HINTSINCLFILES := $(addsuffix .$(HINTSVERSION), $(HINTSINCLNAMES))
 endif
@@ -83,10 +83,10 @@ endif   # HAVE_MACPORTS
 endif   # QTDIR
 endif   # WANT_WIN_QT
 
-# multiw-3.370 must come after compiler.370
+# misc.370 must come after compiler.370
 # and after QTDIR is defined
 
-#-INCLUDE multiw-3.370
+#-INCLUDE misc.370
 
 ifeq "$(USE_ASAN)" "1"
 CFLAGS +=-fsanitize=address
