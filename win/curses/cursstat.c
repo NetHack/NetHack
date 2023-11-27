@@ -161,7 +161,6 @@ curses_status_update(
             curses_condition_bits = *condptr;
             curses_colormasks = colormasks;
         } else {
-            color_and_attr = (color_and_attr & ~0x00FF) | NO_COLOR;
             /*
              * status_vals[] are used for horizontal orientation
              *  (wide lines of multiple short values).
