@@ -75,14 +75,16 @@ endif  # NROFFISGROFF
 
 ifneq "$(NROFFISGROFF)" ""   # It's groff
 # add the -Tascii flag used by groff
-MORE_MAN2TXT_FLAGS += -Tascii
+MAN2TXTPRE += -Tascii
 ifneq "$(GROFFGE123)" ""   # It's groff 1.23 or greater
 #$(info GROFFGE123=$(GROFFGE123))
 # add the groff 1.23 specific plain text flag -P
-MORE_MAN2TXT_FLAGS += -P
+MAN2TXTPRE += -P -cbou
+MAN2TXTPOST=
+else
+MAN2TXTPRE += -c
+# groff less than 1.23
 endif
-# add more plain text flags used by groff
-MORE_MAN2TXT_FLAGS += -cbou
 endif  # end groff-specific
 
 #end of hints/include/misc.370

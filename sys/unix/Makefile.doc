@@ -115,11 +115,14 @@ Guidebook.dat	: Gbk-1pg-pfx.mn Gbk-1pg-sfx.mn $(GUIDEBOOK_MN) tmac.n tmac.nh \
 	$(ONEPAGECMD) > $@
 
 # plain text output
-# MORE_MAN2TXT_FLAGS is included so that a hints file can alter the options
-MAN2TXT = $(NHGREP) | nroff -man $(MORE_MAN2TXT_FLAGS)
+#
+# MAN2TXTPRE and MAN2TXTPOST are included so that a hints file can alter
+# both of them as required
+MAN2TXTPOST ?= | col -b
+MAN2TXT = $(NHGREP) | nroff -man $(MAN2TXTPRE) $(MAN2TXTPOST)
 # If you aren't using a hints file, you can uncomment the following
 # line if you have groff 1.23 or greater.
-#MAN2TXT = $(NHGREP) | nroff -man -Tascii -P -cbou
+#MAN2TXT = $(NHGREP) | groff -man -Tascii -P -cbou
 nethack.txt	: nethack.6
 	cat nethack.6 | $(MAN2TXT) > nethack.txt
 recover.txt	: recover.6
