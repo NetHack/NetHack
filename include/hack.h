@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.h	$NHDT-Date: 1700869696 2023/11/24 23:48:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.238 $ */
+/* NetHack 3.7	hack.h	$NHDT-Date: 1701132211 2023/11/28 00:43:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.240 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1013,32 +1013,41 @@ typedef struct {
 
 /* The UNDEFINED_ROLE macro is used to initialize Role variables */
 #define UNDEFINED_ROLE \
-    { {0}, { {0} },                \
-      /* strings */                \
-      NULL, NULL, NULL,            \
-      NULL, NULL, NULL,            \
-      /* indices */                \
-      0, 0, 0, 0, 0, 0, 0,         \
-      0, 0, 0,                     \
-      /* Bitmasks */               \
-      0,                           \
-      /* Attributes */             \
-      {0}, {0}, {0}, {0}, 0, 0,    \
-      /* spell statistics */       \
+    {                                           \
+      /* role name, set of rank names */        \
+      { NULL }, { { NULL } },                   \
+      /* strings: pantheon deity names */       \
+      NULL, NULL, NULL,                         \
+      /* file code, quest home+goal names */    \
+      NULL, NULL, NULL,                         \
+      /* indices: base mon type, pet */         \
+      NON_PM, NON_PM,                           \
+      /* quest leader, guardians, nemesis */    \
+      NON_PM, NON_PM, NON_PM,                   \
+      /* quest enemy types (index, symbol) */   \
+      NON_PM, NON_PM, '\0', '\0',               \
+      /* quest artifact object index */         \
+      STRANGE_OBJECT,                           \
+      /* Bitmasks */                            \
+      0,                                        \
+      /* Attributes */                          \
+      {0}, {0}, {0}, {0}, 0, 0,                 \
+      /* spell statistics */                    \
       0, 0, 0, 0, 0, 0, 0 }
 
 /* The UNDEFINED_RACE macro is used to initialize Race variables */
 #define UNDEFINED_RACE \
-    {                              \
-      /* strings */                \
-      NULL, NULL, NULL, NULL, {0}, \
-      /* Indices */                \
-      NON_PM, 0, 0,                \
-      /* Bitmasks */               \
-      0, 0, 0, 0,                  \
-      /* Attributes */             \
-      {0}, {0}, {0}, {0}           \
-      /* Properties */             \
+    {                                           \
+      /* strings */                             \
+      NULL, NULL, NULL, NULL, { NULL, NULL },   \
+      /* Indices: base race, mummy, zombie */   \
+      NON_PM, NON_PM, NON_PM,                   \
+      /* Bitmasks */                            \
+      0, 0, 0, 0,                               \
+      /* Characteristic limits */               \
+      {0}, {0},                                 \
+      /* Level change HP and Pw adjustments */  \
+      {0}, {0}                                  \
     }
 
 #define MATCH_WARN_OF_MON(mon) \

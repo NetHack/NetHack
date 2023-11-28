@@ -1,4 +1,4 @@
-/* NetHack 3.7	role.c	$NHDT-Date: 1596498206 2020/08/03 23:43:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.7	role.c	$NHDT-Date: 1701132222 2023/11/28 00:43:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.94 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1301,7 +1301,7 @@ gotrolefilter(void)
 
     if (gr.rfilter.mask)
         return TRUE;
-    for (i = 0; i < SIZE(roles); ++i)
+    for (i = 0; i < SIZE(roles) - 1; ++i)
         if (gr.rfilter.roles[i])
             return TRUE;
     return FALSE;
@@ -1317,25 +1317,25 @@ rolefilterstring(char *outbuf, int which)
     outbuf[0] = outbuf[1] = '\0';
     switch (which) {
     case RS_ROLE:
-        for (i = 0; i < SIZE(roles); ++i) {
+        for (i = 0; i < SIZE(roles) - 1; ++i) {
             if (gr.rfilter.roles[i])
                 Sprintf(eos(outbuf), " !%.3s", roles[i].name.m);
         }
         break;
     case RS_RACE:
-        for (i = 0; i < SIZE(races); ++i) {
+        for (i = 0; i < SIZE(races) - 1; ++i) {
             if ((gr.rfilter.mask & races[i].selfmask) != 0)
                 Sprintf(eos(outbuf), " !%s", races[i].noun);
         }
         break;
     case RS_GENDER:
-        for (i = 0; i < SIZE(genders); ++i) {
+        for (i = 0; i < SIZE(genders) - 1; ++i) {
             if ((gr.rfilter.mask & genders[i].allow) != 0)
                 Sprintf(eos(outbuf), " !%s", genders[i].adj);
         }
         break;
     case RS_ALGNMNT:
-        for (i = 0; i < SIZE(aligns); ++i) {
+        for (i = 0; i < SIZE(aligns) - 1; ++i) {
             if ((gr.rfilter.mask & aligns[i].allow) != 0)
                 Sprintf(eos(outbuf), " !%s", aligns[i].adj);
         }
@@ -1359,7 +1359,7 @@ clearrolefilter(int which)
         gr.rfilter.mask = 0; /* clear race, gender, and alignment filters */
         /*FALLTHRU*/
     case RS_ROLE:
-        for (i = 0; i < SIZE(roles); ++i)
+        for (i = 0; i < SIZE(roles) - 1; ++i)
             gr.rfilter.roles[i] = FALSE;
         break;
     case RS_RACE:
@@ -1822,10 +1822,10 @@ role_menu_extra(int which, winid where, boolean preselect)
     case RS_ROLE:
         what = "role";
         f = r;
-        for (i = 0; i < SIZE(roles); ++i)
+        for (i = 0; i < SIZE(roles) - 1; ++i)
             if (i != f && !gr.rfilter.roles[i])
                 break;
-        if (i == SIZE(roles)) {
+        if (i == SIZE(roles) - 1) {
             constrainer = "filter";
             forcedvalue = "role";
         }
@@ -2139,13 +2139,14 @@ Goodbye(void)
 }
 
 /* if pmindex is any player race (not necessarily the hero's),
-   return a pointer to the races[] entry for it */
+   return a pointer to the races[] entry for it; if pmindex is for some
+   other type of monster which isn't a player race, return Null */
 const struct Race *
 character_race(short pmindex)
 {
     const struct Race *r;
 
-    for (r = races; r->mnum >= LOW_PM; ++r)
+    for (r = races; r->noun != NULL; ++r)
         if (r->mnum == pmindex)
             return r;
     return (const struct Race *) NULL;
