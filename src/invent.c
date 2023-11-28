@@ -24,6 +24,7 @@ static char *cinv_ansimpleoname(struct obj *);
 static boolean only_here(struct obj *);
 static void compactify(char *);
 static boolean taking_off(const char *);
+static void mime_action(const char *);
 static int ckvalidcat(struct obj *);
 static int ckunpaid(struct obj *);
 static char *safeq_xprname(struct obj *);
@@ -44,7 +45,8 @@ static boolean item_naming_classification(struct obj *, char *, char *);
 static int item_reading_classification(struct obj *, char *);
 static void ia_addmenu(winid, int, char, const char *);
 static void itemactions_pushkeys(struct obj *, int);
-static void mime_action(const char *);
+static int itemactions(struct obj *);
+static int dispinv_with_action(char *, boolean, const char *);
 
 /* enum and structs are defined in wintype.h */
 static win_request_info wri_info;
@@ -62,8 +64,10 @@ static boolean in_perm_invent_toggled;
  */
 static const char venom_inv[] = { VENOM_CLASS, 0 }; /* (constant) */
 
-/* menu heading lines used instead of object classes when sorting by in-use */
-static const char *const inuse_headers[] = { /* [4] shown first, [1] last */
+/* menu heading lines used instead of object classes when sorting by in-use;
+   pointers aren't const because dispinv_with_action() might temporarily
+   change "Accessories" to "Rings" or "Amulet", then back again */
+static const char *inuse_headers[] = { /* [4] shown first, [1] last */
     "", "Miscellaneous", "Worn Armor",
     "Wielded/Readied Weapons", "Accessories",
 };
@@ -3362,13 +3366,40 @@ itemactions(struct obj *otmp)
     return ECMD_OK;
 }
 
-
-/* the #inventory command */
-int
-ddoinv(void)
+/* show some or all of inventory while allowing the picking of an item in
+   order to preform context-sensitive item action on it; always returns 'ok';
+   invent subsets specified by the ')', '[', '(', '=', '"', or '*' commands
+   when they're invoked with the 'm' prefix (or without it for '*') */
+static int
+dispinv_with_action(
+    char *lets,                 /* list of invlet values to include */
+    boolean use_inuse_ordering, /* affects sortloot() and header labels */
+    const char *alt_label)      /* alternate value for in-use "Accessories" */
 {
     struct obj *otmp;
-    char c = display_inventory((char *) 0, TRUE);
+    const char *save_accessories = 0;
+    char c, save_sortloot = 0;
+    unsigned len = lets ? (unsigned) strlen(lets) : 0U;
+    boolean menumode = (len != 1 || iflags.menu_requested) ? TRUE : FALSE,
+            save_force_invmenu = iflags.force_invmenu;
+
+    if (use_inuse_ordering) {
+        save_accessories = inuse_headers[4];
+        save_sortloot = flags.sortloot;
+
+        flags.sortloot = 'i'; /* checked by display_pickinv() */
+        if (alt_label)
+            inuse_headers[4] = alt_label;
+    }
+    iflags.force_invmenu = FALSE;
+
+    c = display_inventory(lets, menumode);
+
+    if (use_inuse_ordering) {
+        flags.sortloot = save_sortloot;
+        inuse_headers[4] = save_accessories;
+    }
+    iflags.force_invmenu = save_force_invmenu;
 
     if (c && c != '\033') {
         for (otmp = gi.invent; otmp; otmp = otmp->nobj)
@@ -3376,6 +3407,13 @@ ddoinv(void)
                 return itemactions(otmp);
     }
     return ECMD_OK;
+}
+
+/* the #inventory command (not much left...) */
+int
+ddoinv(void)
+{
+    return dispinv_with_action((char *) 0, FALSE, NULL);
 }
 
 /*
@@ -3515,7 +3553,7 @@ display_pickinv(
     if (!flags.invlet_constant)
         reassign();
 
-    if (n == 1 && !iflags.force_invmenu) {
+    if (n == 1 && !iflags.force_invmenu && !iflags.menu_requested) {
         /* when only one item of interest, use pline instead of menus;
            we actually use a fake message-line menu in order to allow
            the user to perform selection at the --More-- prompt for tty */
@@ -4860,6 +4898,14 @@ doprgold(void)
             You("have no money.");
     }
     shopper_financial_report();
+
+    if (umoney && iflags.menu_requested) {
+        char dollarsign[] = "$";
+
+        /* mustn't use TRUE or gold wouldn't show up unless it was quivered */
+        (void) dispinv_with_action(dollarsign, FALSE, NULL);
+    }
+
     return ECMD_OK;
 }
 
@@ -4869,10 +4915,24 @@ doprwep(void)
 {
     if (!uwep) {
         You("are %s.", empty_handed());
-    } else {
+    } else if (!iflags.menu_requested) {
         prinv((char *) 0, uwep, 0L);
         if (u.twoweap)
             prinv((char *) 0, uswapwep, 0L);
+    } else {
+        char lets[4]; /* 4: uwep, uswapwep, uquiver, terminator */
+        int ct = 0;
+
+        /* obj_to_let() will assign letters to all of invent if necessary
+           (for '!fixinv') so doesn't need to be repeated once called here */
+        lets[ct++] = obj_to_let(uwep);
+        if (uswapwep)
+            lets[ct++] = uswapwep->invlet;
+        if (uquiver)
+            lets[ct++] = uquiver->invlet;
+        lets[ct] = '\0';
+
+        (void) dispinv_with_action(lets, TRUE, NULL);
     }
     return ECMD_OK;
 }
@@ -4904,8 +4964,6 @@ noarmor(boolean report_uskin)
 int
 doprarm(void)
 {
-    char lets[8];
-    int ct = 0;
     /*
      * Note:  players sometimes get here by pressing a function key which
      * transmits ''ESC [ <something>'' rather than by pressing '[';
@@ -4915,22 +4973,30 @@ doprarm(void)
     if (!wearing_armor()) {
         noarmor(TRUE);
     } else {
-        if (uarmu)
-            lets[ct++] = obj_to_let(uarmu);
+        char lets[8]; /* 8: up to 7 pieces of armor plus terminator */
+        int ct = 0;
+
+        /* obj_to_let() will assign letters to all of invent if necessary
+           (for '!fixinv') so doesn't need to be repeated once called, but
+           each armor slot doesn't know whether any that precede have made
+           that call so just do it for each one; use SORTPACK_INUSE order */
         if (uarm)
             lets[ct++] = obj_to_let(uarm);
         if (uarmc)
             lets[ct++] = obj_to_let(uarmc);
-        if (uarmh)
-            lets[ct++] = obj_to_let(uarmh);
         if (uarms)
             lets[ct++] = obj_to_let(uarms);
+        if (uarmh)
+            lets[ct++] = obj_to_let(uarmh);
         if (uarmg)
             lets[ct++] = obj_to_let(uarmg);
         if (uarmf)
             lets[ct++] = obj_to_let(uarmf);
+        if (uarmu)
+            lets[ct++] = obj_to_let(uarmu);
         lets[ct] = 0;
-        (void) display_inventory(lets, FALSE);
+
+        (void) dispinv_with_action(lets, TRUE, NULL);
     }
     return ECMD_OK;
 }
@@ -4942,15 +5008,32 @@ doprring(void)
     if (!uleft && !uright) {
         You("are not wearing any rings.");
     } else {
-        char lets[3];
+        char lets[3]; /* 3: uright, uleft, terminator */
+        boolean use_inuse_mode = FALSE;
         int ct = 0;
 
-        if (uleft)
-            lets[ct++] = obj_to_let(uleft);
-        if (uright)
+        /* if either ring is a meat ring, switch to use_inuse_mode in order
+           to label it/them as "Rings" rather than "Comestibles" */
+        if (uright) {
             lets[ct++] = obj_to_let(uright);
-        lets[ct] = 0;
-        (void) display_inventory(lets, FALSE);
+            if (uright->oclass != RING_CLASS)
+                use_inuse_mode = TRUE;
+        }
+        if (uleft) {
+            lets[ct++] = obj_to_let(uleft);
+            if (uleft->oclass != RING_CLASS)
+                use_inuse_mode = TRUE;
+        }
+        lets[ct] = '\0';
+        /* also switch to use_inuse_mode if there are two rings or player
+           used the 'm' prefix */
+        if (ct > 1 || iflags.menu_requested)
+            use_inuse_mode = TRUE;
+
+        (void) dispinv_with_action(lets, use_inuse_mode,
+                                   /* note; alternate label will be ignored
+                                      if 'use_inuse_mode' is False */
+                                   (ct == 1) ? "Ring" : "Rings");
     }
     return ECMD_OK;
 }
@@ -4959,10 +5042,18 @@ doprring(void)
 int
 dopramulet(void)
 {
-    if (!uamul)
+    if (!uamul) {
         You("are not wearing an amulet.");
-    else
-        prinv((char *) 0, uamul, 0L);
+    } else {
+        char lets[2];
+
+        /* using display_inventory() instead of prinv() allows player
+           to use 'm "' to force and menu and be able to choose amulet
+           in order to perform a context-sensitve item action */
+        lets[0] = obj_to_let(uamul), lets[1] = '\0';
+
+        (void) dispinv_with_action(lets, TRUE, "Amulet");
+    }
     return ECMD_OK;
 }
 
@@ -5003,7 +5094,7 @@ doprtool(void)
     if (!ct)
         You("are not using any tools.");
     else
-        (void) display_inventory(lets, FALSE);
+        (void) dispinv_with_action(lets, TRUE, NULL);
     return ECMD_OK;
 }
 
@@ -5014,41 +5105,18 @@ doprinuse(void)
 {
     struct obj *otmp;
     int ct = 0;
-#if 0   /* old doprinuse() */
-    char lets[52 + 1];
 
-    for (otmp = gi.invent; otmp; otmp = otmp->nobj)
-        if (is_inuse(otmp)) {
-            /* we could be carrying more than 52 items; theoretically they
-               might all be lit candles so avoid potential lets[] overflow */
-            if (ct >= (int) sizeof lets - 1)
-                break;
-            lets[ct++] = obj_to_let(otmp);
-        }
-    lets[ct] = '\0';
-    if (ct)
-        (void) display_inventory(lets, FALSE);
-#else   /* new */
     /* no longer need to collect letters; sortloot() takes care of it, but
-       still need to count far enough to know whether anything is in use */
+       still want to count far enough to know whether anything is in use */
     for (otmp = gi.invent; otmp; otmp = otmp->nobj)
         if (is_inuse(otmp)) {
             ++ct;
             break;
         }
-    if (ct) {
-        char save_sortloot = flags.sortloot;
-
-        flags.sortloot = 'i';
-        /* bypass display_inventory() and go straight to display_pickinv() */
-        (void) display_pickinv((char *) 0, (char *) 0, (char *) 0,
-                        /* 'want_reply' forces window other than WIN_INVENT */
-                               TRUE, (long *) 0);
-        flags.sortloot = save_sortloot;
-    }
-#endif
-    else
+    if (!ct)
         You("are not wearing or wielding anything.");
+    else
+        (void) dispinv_with_action((char *) 0, TRUE, NULL);
     return ECMD_OK;
 }
 

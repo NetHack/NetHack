@@ -46,7 +46,7 @@
 .ds f0 \*(vr
 .ds f1 \" empty
 .\"DO NOT REMOVE NH_DATESUB .ds f2 DATE(%B %-d, %Y)
-.ds f2 "November 13, 2023
+.ds f2 "November 17, 2023
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -1576,21 +1576,44 @@ Default key is \(oqs\(cq.
 .lp "#seeall  "
 Show all equipment in use.
 Default key is \(oq*\(cq.
+.lp ""
+Will display in-use items in a menu even when there is only one.
 .lp #seeamulet
 Show the amulet currently worn.
 Default key is \(oq\(dq\(cq. \" double quote
+.lp ""
+Using the \(oq\f(CRm\fP\(cq prefix will force the display of a worn
+amulet in a menu rather than with just a message.
 .lp #seearmor
 Show the armor currently worn.
 Default key is \(oq[\(cq.
+.lp ""
+Will display worn armor in a menu even when there is only thing worn.
 .lp #seerings
 Show the ring(s) currently worn.
 Default key is \(oq=\(cq.
+.lp ""
+Will display worn rings in a menu if there are two (or there is
+just one and is a meat ring rather than a \(lqreal\(rq ring).
+Use the \(oq\f(CRm\fP\(cq prefix to force a menu for one ring.
 .lp #seetools
 Show the tools currently in use.
 Default key is \(oq(\(cq.
+.lp ""
+Will display the result in a message if there is one tool in use (worn
+blindfold or towel or lenses, lit lamp(s) and/or candle(s), leashes
+attached to pets).
+Will display a menu if there are more than one or if the command is
+preceded by the \(oq\f(CRm\fP\(cq prefix.
 .lp #seeweapon
 Show the weapon currently wielded.
 Default key is \(oq)\(cq.
+.lp ""
+If dual-wielding, a separate message about the secondary weapon will be
+given.
+Using the \(oq\f(CRm\fP\(cq prefix will force a menu and it will include
+primary weapon, alternate weapon even when not dual-wielding, and also
+whatever is currently assigned to the quiver slot.
 .lp "#shell   "
 Do a shell escape, switching from NetHack to a subprocess.
 Can be disabled at the time the program is built.

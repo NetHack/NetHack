@@ -46,7 +46,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7.0 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{DATE(%B %-d, %Y)}
-\date{November 13, 2023}
+\date{November 27, 2023}
 
 \maketitle
 
@@ -1697,21 +1697,47 @@ Search for traps and secret doors around you. Default key is `{\tt s}'.
 %.lp
 \item[\tb{\#seeall}]
 Show all equipment in use. Default key is `{\tt *}'.
+%.lp ""
+\\
+Will display in-use items in a menu even when there is only one.
 %.lp
 \item[\tb{\#seeamulet}]
 Show the amulet currently worn. Default key is `{\tt "}'.
+%.lp ""
+\\
+Using the `{\tt m}' prefix will force the display of a worn
+amulet in a menu rather than with just a message.
 %.lp
 \item[\tb{\#seearmor}]
 Show the armor currently worn. Default key is `{\tt [}'.
+%.lp ""
+\\
+Will display worn armor in a menu even when there is only thing worn.
 %.lp
 \item[\tb{\#seerings}]
 Show the ring(s) currently worn. Default key is `{\tt =}'.
+%.lp ""
+Will display worn rings in a menu if there are two (or there is
+just one and is a meat ring rather than a ``real'' ring).
+Use the `{\tt m}' prefix to force a menu for one ring.
 %.lp
 \item[\tb{\#seetools}]
 Show the tools currently in use. Default key is `{\tt (}'.
+%.lp ""
+Will display the result in a message if there is one tool in use (worn
+blindfold or towel or lenses, lit lamp(s) and/or candle(s), leashes
+attached to pets).
+Will display a menu if there are more than one or if the command is
+preceded by the `{\tt m}' prefix.
 %.lp
 \item[\tb{\#seeweapon}]
 Show the weapon currently wielded. Default key is `{\tt )}'.
+%.lp ""
+If dual-wielding, a separate message about the secondary weapon will be
+given.
+Using the `{\tt m}' prefix will force a menu and it will include
+primary weapon, alternate weapon even when not dual-wielding, and also
+whatever is currently assigned to the quiver slot.
 %.lp
 \item[\tb{\#shell}]
 Do a shell escape, switching from NetHack to a subprocess.

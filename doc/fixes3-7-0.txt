@@ -2351,6 +2351,10 @@ the '*' command (list inventory items in use) now shows items in a specific
 	gloves, boots, shirt, lit lamps and candles, leashes attached to pets
 	instead of by object class (sortpack) or inventory letter (!sortpack);
 	new perm_invent+perminv_mode==inuse does the same
+allow the ')', '[', '(', '=', '"', and '*' commands to be preceded by the 'm'
+	prefix to force a menu where the player can pick an item and choose
+	a context-sensitive item action for it; some give a menu even without
+	the prefix and for those, same item selection and action can be used
 
 
 Platform- and/or Interface-Specific New Features
