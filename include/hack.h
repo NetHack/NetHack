@@ -1033,7 +1033,7 @@ typedef struct {
       /* strings */                \
       NULL, NULL, NULL, NULL, {0}, \
       /* Indices */                \
-      0, 0, 0,                     \
+      NON_PM, 0, 0,                \
       /* Bitmasks */               \
       0, 0, 0, 0,                  \
       /* Attributes */             \
