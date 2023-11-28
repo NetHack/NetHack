@@ -1015,7 +1015,7 @@ typedef struct {
 #define UNDEFINED_ROLE \
     {                                           \
       /* role name, set of rank names */        \
-      { NULL }, { { NULL } },                   \
+      { NULL, NULL }, { { NULL, NULL } },       \
       /* strings: pantheon deity names */       \
       NULL, NULL, NULL,                         \
       /* file code, quest home+goal names */    \
