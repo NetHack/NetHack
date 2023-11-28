@@ -73,7 +73,7 @@ static int wield_ok(struct obj *);
    empty hands and two-handed weapons have to be handled separately */
 #define TWOWEAPOK(obj) \
     (((obj)->oclass == WEAPON_CLASS)                            \
-     ? !(is_launcher(obj) ||is_ammo(obj) || is_missile(obj))    \
+     ? !(is_launcher(obj) || is_ammo(obj) || is_missile(obj))   \
      : is_weptool(obj))
 
 static const char

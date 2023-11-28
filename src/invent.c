@@ -2827,6 +2827,7 @@ enum item_action_actions {
     IA_WIELD_OBJ,
     IA_WEAR_OBJ,
     IA_SWAPWEAPON,
+    IA_TWOWEAPON,
     IA_ZAP_OBJ,
     IA_WHATIS_OBJ, /* '/' specify inventory object */
 };
@@ -3043,6 +3044,9 @@ itemactions_pushkeys(struct obj *otmp, int act)
             break;
         case IA_SWAPWEAPON:
             cmdq_add_ec(CQ_CANNED, doswapweapon);
+            break;
+        case IA_TWOWEAPON:
+            cmdq_add_ec(CQ_CANNED, dotwoweapon);
             break;
         case IA_ZAP_OBJ:
             cmdq_add_ec(CQ_CANNED, dozap);
@@ -3338,6 +3342,30 @@ itemactions(struct obj *otmp)
                    "Ready this as an alternate weapon");
     else if (otmp == uswapwep)
         ia_addmenu(win, IA_SWAPWEAPON, 'x', "Swap this with your main weapon");
+
+    /* this is based on TWOWEAPOK() in wield.c; we don't call can_two_weapon()
+       because it is very verbose; attempting to two-weapon might be rejected
+       but we screen out most reasons for rejection before offering it as a
+       choice */
+#define MAYBETWOWEAPON(obj) \
+    ((((obj)->oclass == WEAPON_CLASS)                           \
+      ? !(is_launcher(obj) || is_ammo(obj) || is_missile(obj))  \
+      : is_weptool(obj))                                        \
+     && !bimanual(obj))
+
+    /* X: Toggle two-weapon mode on or off */
+    if ((otmp == uwep || otmp == uswapwep)
+        /* if already two-weaponing, no special checks needed to toggle off */
+        && (u.twoweap
+        /* but if not, try to filter most "you can't do that" here */
+            || (could_twoweap(gy.youmonst.data) && !uarms
+                && uwep && MAYBETWOWEAPON(uwep)
+                && uswapwep && MAYBETWOWEAPON(uswapwep)))) {
+        Sprintf(buf, "Toggle two-weapon combat %s", u.twoweap ? "off" : "on");
+        ia_addmenu(win, IA_TWOWEAPON, 'X', buf);
+    }
+
+#undef MAYBETWOWEAPON
 
     /* z: Zap wand */
     if (otmp->oclass == WAND_CLASS)
