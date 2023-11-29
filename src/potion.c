@@ -2778,9 +2778,14 @@ djinni_from_bottle(struct obj *obj)
         mongrantswish(&mtmp);
         break;
     case 1:
-        verbalize("Thank you for freeing me!");
-        (void) tamedog(mtmp, (struct obj *) 0);
-        break;
+        /* if the player is trying to play petless, make it safe
+           for them to rub lamps */
+        if (u.uconduct.pets) {
+            verbalize("Thank you for freeing me!");
+            (void) tamedog(mtmp, (struct obj *) 0);
+            break;
+        }
+        /* FALLTHRU */
     case 2:
         verbalize("You freed me!");
         mtmp->mpeaceful = TRUE;
