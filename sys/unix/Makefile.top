@@ -173,6 +173,9 @@ Guidebook.pdf:
 manpages:
 	( cd doc ; $(MAKE) manpages )
 
+distrib:
+	( cd doc ; $(MAKE) distrib )
+
 data: $(GAME)
 	( cd dat ; $(MAKE) data )
 

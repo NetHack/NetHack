@@ -81,7 +81,7 @@ $(MAKEDEFS)	: ../util/makedefs.c ../include/config.h ../src/mdlib.c \
 	( cd ../util ; make makedefs )
 
 GAME	= nethack
-MANDIR	= /usr/man/man6
+MANDIR	?= /usr/man/man6
 MANEXT	= 6
 
 # manual installation for most BSD-style systems

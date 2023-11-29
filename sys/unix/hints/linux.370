@@ -350,7 +350,9 @@ CHGRP=true
 VARDIRPERM = 0755
 VARFILEPERM = 0600
 GAMEPERM = 0755
-
+#
+# manpages directory
+MANDIR=/usr/share/man/man6
 #
 #-INCLUDE cross-pre.370
 #
