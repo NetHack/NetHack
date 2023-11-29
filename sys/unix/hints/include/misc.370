@@ -65,6 +65,11 @@ CPLUSPLUS_NEEDED = 1
 endif
 endif
 
+ifdef USE_MANDOC
+NROFF = mandoc
+MAN2TXTPRE=
+MAN2TXTPOST=
+else
 #detection of groff
 NROFFISGROFF := $(shell echo `nroff --version | grep "GNU groff version"`)
 #$(info NROFFISGROFF=$(NROFFISGROFF))
@@ -86,6 +91,7 @@ MAN2TXTPRE += -c
 # groff less than 1.23
 endif
 endif  # end groff-specific
+endif  # not USE_MANDOC
 
 #end of hints/include/misc.370
 #------------------------------------------------------------------------------

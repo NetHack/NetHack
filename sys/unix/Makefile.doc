@@ -83,6 +83,7 @@ $(MAKEDEFS)	: ../util/makedefs.c ../include/config.h ../src/mdlib.c \
 GAME	= nethack
 MANDIR	?= /usr/man/man6
 MANEXT	= 6
+NROFF ?= nroff
 
 # manual installation for most BSD-style systems
 GAMEMANCREATE = cat nethack.6 | $(NHGREP) >
@@ -119,7 +120,7 @@ Guidebook.dat	: Gbk-1pg-pfx.mn Gbk-1pg-sfx.mn $(GUIDEBOOK_MN) tmac.n tmac.nh \
 # MAN2TXTPRE and MAN2TXTPOST are included so that a hints file can alter
 # both of them as required
 MAN2TXTPOST ?= | col -b
-MAN2TXT = $(NHGREP) | nroff -man $(MAN2TXTPRE) $(MAN2TXTPOST)
+MAN2TXT = $(NHGREP) | $(NROFF) -man $(MAN2TXTPRE) $(MAN2TXTPOST)
 # If you aren't using a hints file, you can uncomment the following
 # line if you have groff 1.23 or greater.
 #MAN2TXT = $(NHGREP) | groff -man -Tascii -P -cbou
