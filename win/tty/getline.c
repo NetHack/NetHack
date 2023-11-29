@@ -1,4 +1,4 @@
-/* NetHack 3.7	getline.c	$NHDT-Date: 1700204638 2023/11/17 07:03:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.7	getline.c	$NHDT-Date: 1701285885 2023/11/29 19:24:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -99,7 +99,7 @@ hooked_tty_getlin(
             ttyDisplay->intr--;
             *bufp = 0;
         }
-        if (c == '\020') { /* ctrl-P, doesn't honor rebinding #prevmsg cmd */
+        if (c == C('p')) { /* ctrl-P, doesn't honor rebinding #prevmsg cmd */
             if (iflags.prevmsg_window != 's') {
                 int sav = ttyDisplay->inread;
 
