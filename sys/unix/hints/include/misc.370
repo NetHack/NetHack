@@ -67,8 +67,8 @@ endif
 
 ifdef USE_MANDOC
 NROFF = mandoc
-MAN2TXTPRE=
-MAN2TXTPOST=
+MAN2TXTPRE = -T ascii
+MAN2TXTPOST= | col -b
 else
 #detection of groff
 NROFFISGROFF := $(shell echo `nroff --version | grep "GNU groff version"`)
