@@ -1,4 +1,4 @@
-/* NetHack 3.7	wield.c	$NHDT-Date: 1695159631 2023/09/19 21:40:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
+/* NetHack 3.7	wield.c	$NHDT-Date: 1701279364 2023/11/29 17:36:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -789,15 +789,30 @@ can_twoweapon(void)
     return FALSE;
 }
 
+/* uswapwep has become cursed while in two-weapon combat mode or hero is
+   attempting to dual-wield when it is already cursed or hands are slippery */
 void
 drop_uswapwep(void)
 {
-    char str[BUFSZ];
+    char left_hand[QBUFSZ];
     struct obj *obj = uswapwep;
 
-    /* Avoid trashing makeplural's static buffer */
-    Strcpy(str, makeplural(body_part(HAND)));
-    pline("%s from your %s!", Yobjnam2(obj, "slip"), str);
+    /* this used to use makeplural(body_part(HAND)) but in order to be
+       dual-wielded, or to get this far attempting to achieve that,
+       uswapwep must be one-handed; since it's secondary, the hand must
+       be the left one */
+    Sprintf(left_hand, "left %s", body_part(HAND));
+    if (!obj->cursed)
+        /* attempting to two-weapon while Glib */
+        pline("%s from your %s!", Yobjnam2(obj, "slip"), left_hand);
+    else if (!u.twoweap)
+        /* attempting to two-weapon when uswapwep is cursed */
+        pline("%s your grasp and %s from your %s!",
+              Yobjnam2(obj, "evade"), otense(obj, "drop"), left_hand);
+    else
+        /* already two-weaponing but can't anymore because uswapwep has
+           become cursed */
+        Your("%s spasms and drops %s!", left_hand, yobjnam(obj, (char *) 0));
     dropx(obj);
 }
 
