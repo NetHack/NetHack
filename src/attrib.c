@@ -1259,9 +1259,11 @@ uchangealign(int newalign,
         /* putting on or taking off a helm of opposite alignment */
         u.ualign.type = (aligntyp) newalign;
         if (reason == 1) {
+            adjalign(-7); /* for abuse -- record will be cleared shortly */
             Your("mind oscillates %s.", Hallucination ? "wildly" : "briefly");
             make_confused(rn1(2, 3), FALSE);
-            summon_furies(Is_astralevel(&u.uz) ? 0 : 1);
+            if (Is_astralevel(&u.uz) || ((unsigned) rn2(50) < u.ualign.abuse))
+                summon_furies(Is_astralevel(&u.uz) ? 0 : 1);
             /* don't livelog taking it back off */
             livelog_printf(LL_ALIGNMENT, "used a helm to turn %s",
                            aligns[1 - newalign].adj);
