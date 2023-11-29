@@ -1286,6 +1286,10 @@ give missiles thrown or shot by monsters the same chance to get used up upon
 	hitting as when thrown or shot by the hero
 change menu_headings to also accept a color or color&attribute
 issue feedback for encumbrance more consistently during pickup up
+if hero destroys an altar by breaking a wand of digging or applying a drum of
+	earthquake, provoke divine wrath
+if hero destroys a shop wall by breaking a wand of digging or applying a drum
+	of earthquake, have shopkeeper demand payment
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
