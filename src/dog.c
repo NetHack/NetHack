@@ -733,7 +733,7 @@ keepdogs(
                unlike level change for steed, don't bother trying
                to achieve a normal trap escape first */
             mtmp->mtrapped = 0;
-            mtmp->meating = 0;
+            finish_meating(mtmp);
             mtmp->msleeping = 0;
             mtmp->mfrozen = 0;
             mtmp->mcanmove = 1;
