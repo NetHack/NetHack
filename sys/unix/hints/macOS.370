@@ -89,7 +89,7 @@ endif   # WANT_WIN_QT
 #-INCLUDE misc.370
 
 # manpages directory
-MANDIR=/usr/share/man/man6
+MANDIR=/usr/local/share/man/man6
 
 ifeq "$(USE_ASAN)" "1"
 CFLAGS +=-fsanitize=address
