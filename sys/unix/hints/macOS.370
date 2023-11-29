@@ -90,6 +90,7 @@ endif   # WANT_WIN_QT
 
 # manpages directory
 MANDIR=/usr/local/share/man/man6
+PREMANPAGES = checkmandir
 
 ifeq "$(USE_ASAN)" "1"
 CFLAGS +=-fsanitize=address
@@ -521,6 +522,11 @@ $(TARGETPFX)libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H)
 $(TARGETPFX)winshim.o : ../win/shim/winshim.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o$@ $<
 endif  # WANT_LIBNH
+
+ifdef MAKEFILE_DOC
+checkmandir:
+	@( if test -d $(MANDIR) ; then true ; else mkdir -p $(MANDIR) ; fi )
+endif  # MAKEFILE_DOC
 
 # -- bundle ---
 #
