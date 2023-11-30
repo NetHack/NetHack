@@ -347,7 +347,7 @@ priestname(
             ; /* polymorphed priest; use ``what'' as is */
         } else {
             if (high_priest)
-                Strcat(pname, "high ");
+                Strcat(pname, Hallucination ? "grand " : "high ");
             if (Hallucination)
                 what = "poohbah";
             else if (mon->female)
