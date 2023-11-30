@@ -437,7 +437,7 @@ Helmet_on(void)
         uchangealign((u.ualign.type != A_NEUTRAL)
                          ? -u.ualign.type
                          : (uarmh->o_id % 2) ? A_CHAOTIC : A_LAWFUL,
-                     1);
+                     A_CG_HELM_ON);
         /* makeknown(HELM_OF_OPPOSITE_ALIGNMENT); -- below, after Tobjnam() */
     /*FALLTHRU*/
     case DUNCE_CAP:
@@ -518,7 +518,7 @@ Helmet_off(void)
         /* changing alignment can toggle off active artifact
            properties, including levitation; uarmh could get
            dropped or destroyed here */
-        uchangealign(u.ualignbase[A_CURRENT], 2);
+        uchangealign(u.ualignbase[A_CURRENT], A_CG_HELM_OFF);
         break;
     default:
         impossible(unknown_type, c_helmet, uarmh->otyp);

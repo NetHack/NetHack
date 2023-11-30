@@ -1612,7 +1612,7 @@ offer_different_alignment_altar(
             consume_offering(otmp);
             pline("%s accepts your allegiance.", a_gname());
 
-            uchangealign(altaralign, 0);
+            uchangealign(altaralign, A_CG_CONVERT);
             /* Beware, Conversion is costly */
             change_luck(-3);
             u.ublesscnt += 300;

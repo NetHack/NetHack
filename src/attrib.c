@@ -1222,7 +1222,7 @@ adjalign(int n)
 /* change hero's alignment type, possibly losing use of artifacts */
 void
 uchangealign(int newalign,
-             int reason) /* 0==conversion, 1==helm-of-OA on, 2==helm-of-OA off */
+             int reason) /* A_CG_CONVERT, A_CG_HELM_ON, or A_CG_HELM_OFF */
 {
     aligntyp oldalign = u.ualign.type;
 
@@ -1230,7 +1230,7 @@ uchangealign(int newalign,
     /* You/Your/pline message with call flush_screen(), triggering bot(),
        so the actual data change needs to come before the message */
     gc.context.botl = TRUE; /* status line needs updating */
-    if (reason == 0) {
+    if (reason == A_CG_CONVERT) {
         /* conversion via altar */
         livelog_printf(LL_ALIGNMENT, "permanently converted to %s",
                        aligns[1 - newalign].adj);
@@ -1243,7 +1243,7 @@ uchangealign(int newalign,
     } else {
         /* putting on or taking off a helm of opposite alignment */
         u.ualign.type = (aligntyp) newalign;
-        if (reason == 1) {
+        if (reason == A_CG_HELM_ON) {
             adjalign(-7); /* for abuse -- record will be cleared shortly */
             Your("mind oscillates %s.", Hallucination ? "wildly" : "briefly");
             make_confused(rn1(2, 3), FALSE);
@@ -1252,7 +1252,7 @@ uchangealign(int newalign,
             /* don't livelog taking it back off */
             livelog_printf(LL_ALIGNMENT, "used a helm to turn %s",
                            aligns[1 - newalign].adj);
-        } else if (reason == 2) {
+        } else if (reason == A_CG_HELM_OFF) {
             Your("mind is %s.", Hallucination
                                     ? "much of a muchness"
                                     : "back in sync with your body");
