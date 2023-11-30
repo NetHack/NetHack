@@ -1678,23 +1678,20 @@ choose_classes_menu(const char *prompt,
         add_menu_str(win, "");
         any = cg.zeroany;
         any.a_int = (int) ' ';
-        Sprintf(buf, "%c  %s", (char) any.a_int, "all classes of objects");
+        Sprintf(buf, "%c  %s", (char) any.a_int, "All classes of objects");
         /* we won't preselect this even if the incoming list is empty;
            having it selected means that it would have to be explicitly
            de-selected in order to select anything else */
         add_menu(win, &nul_glyphinfo, &any, 'A', 0,
-                 ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
+                 ATR_NONE, clr, buf, MENU_ITEMFLAGS_SKIPINVERT);
         if (!strcmp(prompt, "Autopickup what?")) {
-            Sprintf(buf, "%4s%c  %s", "    ", ' ',
+            add_menu_str(win,
                    "Note: when no choices are selected, \"all\" is implied.");
-            add_menu_str(win, buf);
-            if (flags.pickup) {
-                /* for 'O', "toggle" should be intuitive; for 'm O', it would
-                   probably be better to say "Set 'autopickup' to false..." */
-                Sprintf(buf, "%4s%c  %s", "    ", ' ',
-                        "Toggle off 'autopickup' to not pick up anything.");
-                add_menu_str(win, buf);
-            }
+            /* for 'O', "toggle" should be intuitive; for 'm O', it would
+               probably be better to say "Set 'autopickup' to true|false" */
+            add_menu_str(win, flags.pickup
+                        ? "Toggle off 'autopickup' to not pick up anything."
+           : "Toggle on 'autopickup' to automatically pick these things up.");
         }
     }
     end_menu(win, prompt);
