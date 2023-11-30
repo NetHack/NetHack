@@ -758,118 +758,118 @@ do_play_instrument(struct obj* instr)
             goto nevermind;
     }
 
-    if (c == 'n') {
-        if (u.uevent.uheard_tune == 2)
-            c = ynq("Play the passtune?");
-        if (c == 'q') {
+    if (c != 'n')
+        return do_improvisation(instr) ? ECMD_TIME : ECMD_OK;
+
+    if (u.uevent.uheard_tune == 2)
+        c = ynq("Play the passtune?");
+    if (c == 'q') {
+        goto nevermind;
+    } else if (c == 'y') {
+        Strcpy(buf, gt.tune);
+    } else {
+        getlin("What tune are you playing? [5 notes, A-G]", buf);
+        (void) mungspaces(buf);
+        if (*buf == '\033')
             goto nevermind;
-        } else if (c == 'y') {
-            Strcpy(buf, gt.tune);
-        } else {
-            getlin("What tune are you playing? [5 notes, A-G]", buf);
-            (void) mungspaces(buf);
-            if (*buf == '\033')
-                goto nevermind;
 
-            /* convert to uppercase and change any "H" to the expected "B" */
-            for (s = buf; *s; s++) {
-                *s = highc(*s);
-                if (*s == 'H')
-                    *s = 'B';
-            }
+        /* convert to uppercase and change any "H" to the expected "B" */
+        for (s = buf; *s; s++) {
+            *s = highc(*s);
+            if (*s == 'H')
+                *s = 'B';
         }
+    }
 
-        You(!Deaf ? "extract a strange sound from %s!"
-                  : "can feel %s emitting vibrations.", the(xname(instr)));
-        Hero_playnotes(obj_to_instr(instr), buf, 50);
+    You(!Deaf ? "extract a strange sound from %s!"
+              : "can feel %s emitting vibrations.", the(xname(instr)));
+    Hero_playnotes(obj_to_instr(instr), buf, 50);
 
 
-        /* Check if there was the Stronghold drawbridge near
-         * and if the tune conforms to what we're waiting for.
-         */
-        if (Is_stronghold(&u.uz)) {
-            exercise(A_WIS, TRUE); /* just for trying */
-            if (!strcmp(buf, gt.tune)) {
-                /* Search for the drawbridge */
-                for (y = u.uy - 1; y <= u.uy + 1; y++)
-                    for (x = u.ux - 1; x <= u.ux + 1; x++) {
-                        if (!isok(x, y))
-                            continue;
-                        if (find_drawbridge(&x, &y)) {
-                            /* tune now fully known */
-                            u.uevent.uheard_tune = 2;
-                            record_achievement(ACH_TUNE);
-                            if (levl[x][y].typ == DRAWBRIDGE_DOWN)
-                                close_drawbridge(x, y);
-                            else
-                                open_drawbridge(x, y);
-                            return ECMD_TIME;
+    /* Check if there was the Stronghold drawbridge near
+     * and if the tune conforms to what we're waiting for.
+     */
+    if (Is_stronghold(&u.uz)) {
+        exercise(A_WIS, TRUE); /* just for trying */
+        if (!strcmp(buf, gt.tune)) {
+            /* Search for the drawbridge */
+            for (y = u.uy - 1; y <= u.uy + 1; y++)
+                for (x = u.ux - 1; x <= u.ux + 1; x++) {
+                    if (!isok(x, y))
+                        continue;
+                    if (find_drawbridge(&x, &y)) {
+                        /* tune now fully known */
+                        u.uevent.uheard_tune = 2;
+                        record_achievement(ACH_TUNE);
+                        if (levl[x][y].typ == DRAWBRIDGE_DOWN)
+                            close_drawbridge(x, y);
+                        else
+                            open_drawbridge(x, y);
+                        return ECMD_TIME;
+                    }
+                }
+        } else if (!Deaf) {
+            if (u.uevent.uheard_tune < 1)
+                u.uevent.uheard_tune = 1;
+            /* Okay, it wasn't the right tune, but perhaps
+             * we can give the player some hints like in the
+             * Mastermind game */
+            ok = FALSE;
+            for (y = u.uy - 1; y <= u.uy + 1 && !ok; y++)
+                for (x = u.ux - 1; x <= u.ux + 1 && !ok; x++)
+                    if (isok(x, y))
+                        if (IS_DRAWBRIDGE(levl[x][y].typ)
+                            || is_drawbridge_wall(x, y) >= 0)
+                            ok = TRUE;
+            if (ok) { /* There is a drawbridge near */
+                int tumblers, gears;
+                boolean matched[5];
+
+                tumblers = gears = 0;
+                for (x = 0; x < 5; x++)
+                    matched[x] = FALSE;
+
+                for (x = 0; x < (int) strlen(buf); x++)
+                    if (x < 5) {
+                        if (buf[x] == gt.tune[x]) {
+                            gears++;
+                            matched[x] = TRUE;
+                        } else {
+                            for (y = 0; y < 5; y++)
+                                if (!matched[y] && buf[x] == gt.tune[y]
+                                    && buf[y] != gt.tune[y]) {
+                                    tumblers++;
+                                    matched[y] = TRUE;
+                                    break;
+                                }
                         }
                     }
-            } else if (!Deaf) {
-                if (u.uevent.uheard_tune < 1)
-                    u.uevent.uheard_tune = 1;
-                /* Okay, it wasn't the right tune, but perhaps
-                 * we can give the player some hints like in the
-                 * Mastermind game */
-                ok = FALSE;
-                for (y = u.uy - 1; y <= u.uy + 1 && !ok; y++)
-                    for (x = u.ux - 1; x <= u.ux + 1 && !ok; x++)
-                        if (isok(x, y))
-                            if (IS_DRAWBRIDGE(levl[x][y].typ)
-                                || is_drawbridge_wall(x, y) >= 0)
-                                ok = TRUE;
-                if (ok) { /* There is a drawbridge near */
-                    int tumblers, gears;
-                    boolean matched[5];
-
-                    tumblers = gears = 0;
-                    for (x = 0; x < 5; x++)
-                        matched[x] = FALSE;
-
-                    for (x = 0; x < (int) strlen(buf); x++)
-                        if (x < 5) {
-                            if (buf[x] == gt.tune[x]) {
-                                gears++;
-                                matched[x] = TRUE;
-                            } else {
-                                for (y = 0; y < 5; y++)
-                                    if (!matched[y] && buf[x] == gt.tune[y]
-                                        && buf[y] != gt.tune[y]) {
-                                        tumblers++;
-                                        matched[y] = TRUE;
-                                        break;
-                                    }
-                            }
-                        }
-                    if (tumblers) {
-                        if (gears) {
-                            Soundeffect(se_tumbler_click, 50);
-                            Soundeffect(se_gear_turn, 50);
-                            You_hear("%d tumbler%s click and %d gear%s turn.",
-                                     tumblers, plur(tumblers), gears,
-                                     plur(gears));
-                        } else {
-                            Soundeffect(se_tumbler_click, 50);
-                            You_hear("%d tumbler%s click.", tumblers,
-                                     plur(tumblers));
-                        }
-                    } else if (gears) {
-                        You_hear("%d gear%s turn.", gears, plur(gears));
-                        /* could only get `gears == 5' by playing five
-                           correct notes followed by excess; otherwise,
-                           tune would have matched above */
-                        if (gears == 5) {
-                            u.uevent.uheard_tune = 2;
-                            record_achievement(ACH_TUNE);
-                        }
+                if (tumblers) {
+                    if (gears) {
+                        Soundeffect(se_tumbler_click, 50);
+                        Soundeffect(se_gear_turn, 50);
+                        You_hear("%d tumbler%s click and %d gear%s turn.",
+                                 tumblers, plur(tumblers), gears,
+                                 plur(gears));
+                    } else {
+                        Soundeffect(se_tumbler_click, 50);
+                        You_hear("%d tumbler%s click.", tumblers,
+                                 plur(tumblers));
+                    }
+                } else if (gears) {
+                    You_hear("%d gear%s turn.", gears, plur(gears));
+                    /* could only get `gears == 5' by playing five
+                       correct notes followed by excess; otherwise,
+                       tune would have matched above */
+                    if (gears == 5) {
+                        u.uevent.uheard_tune = 2;
+                        record_achievement(ACH_TUNE);
                     }
                 }
             }
         }
-        return ECMD_TIME;
-    } else
-        return do_improvisation(instr) ? ECMD_TIME : ECMD_OK;
+    }
+    return ECMD_TIME;
 
  nevermind:
     pline1(Never_mind);
