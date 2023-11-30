@@ -401,8 +401,8 @@ invletter_value(char c)
     return ('a' <= c && c <= 'z') ? (c - 'a' + 2)
            : ('A' <= c && c <= 'Z') ? (c - 'A' + 2 + 26)
              : (c == '$') ? 1
-               : (c == '#') ? 1 + 52 + 1
-                 : 1 + 52 + 1 + 1; /* none of the above (shouldn't happen) */
+               : (c == '#') ? 1 + invlet_basic + 1
+                 : 1 + invlet_basic + 1 + 1; /* none of the above (shouldn't happen) */
 }
 
 /* qsort comparison routine for sortloot() */
@@ -700,7 +700,7 @@ sortloot(
 void
 assigninvlet(struct obj *otmp)
 {
-    boolean inuse[52];
+    boolean inuse[invlet_basic];
     register int i;
     register struct obj *obj;
 
@@ -710,7 +710,7 @@ assigninvlet(struct obj *otmp)
         return;
     }
 
-    for (i = 0; i < 52; i++)
+    for (i = 0; i < invlet_basic; i++)
         inuse[i] = FALSE;
     for (obj = gi.invent; obj; obj = obj->nobj)
         if (obj != otmp) {
@@ -726,7 +726,7 @@ assigninvlet(struct obj *otmp)
         && (('a' <= i && i <= 'z') || ('A' <= i && i <= 'Z')))
         return;
     for (i = gl.lastinvnr + 1; i != gl.lastinvnr; i++) {
-        if (i == 52) {
+        if (i == invlet_basic) {
             i = -1;
             continue;
         }
@@ -1242,8 +1242,9 @@ hold_another_object(
             drop_arg = strcpy(buf, drop_arg);
 
         obj = addinv_core0(obj, (struct obj *) 0, FALSE);
-        if (inv_cnt(FALSE) > 52 || ((obj->otyp != LOADSTONE || !obj->cursed)
-                                    && near_capacity() > prev_encumbr)) {
+        if (inv_cnt(FALSE) > invlet_basic
+                || ((obj->otyp != LOADSTONE || !obj->cursed)
+                       && near_capacity() > prev_encumbr)) {
             /* undo any merge which took place */
             if (obj->quan > oquan)
                 obj = splitobj(obj, oquan);
@@ -5108,7 +5109,7 @@ doprtool(void)
 {
     struct obj *otmp;
     int ct = 0;
-    char lets[52 + 1];
+    char lets[invlet_basic + 1];
 
     for (otmp = gi.invent; otmp; otmp = otmp->nobj)
         if (tool_being_used(otmp)) {
@@ -5464,8 +5465,8 @@ doorganize_core(struct obj *obj)
     char let;
 #define GOLD_INDX   0
 #define GOLD_OFFSET 1
-#define OVRFLW_INDX (GOLD_OFFSET + 52) /* past gold and 2*26 letters */
-    char lets[1 + 52 + 1 + 1]; /* room for '$a-zA-Z#\0' */
+#define OVRFLW_INDX (GOLD_OFFSET + invlet_basic) /* past gold & 2*26 letters */
+    char lets[1 + invlet_basic + 1 + 1]; /* room for '$a-zA-Z#\0' */
     char qbuf[QBUFSZ];
     char *objname, *otmpname;
     const char *adj_type;
@@ -5498,7 +5499,7 @@ doorganize_core(struct obj *obj)
     lets[OVRFLW_INDX] = ' ';
     lets[sizeof lets - 1] = '\0';
     /* for floating inv letters, truncate list after the first open slot */
-    if (!flags.invlet_constant && (ix = inv_cnt(FALSE)) < 52)
+    if (!flags.invlet_constant && (ix = inv_cnt(FALSE)) < invlet_basic)
         lets[ix + (splitting ? 1 : 2)] = '\0';
 
     /* blank out all the letters currently in use in the inventory
@@ -5624,7 +5625,7 @@ doorganize_core(struct obj *obj)
                     adj_type = "Splitting and merging:";
                     obj = otmp;
                     extract_nobj(obj, &gi.invent);
-                } else if (inv_cnt(FALSE) >= 52) {
+                } else if (inv_cnt(FALSE) >= invlet_basic) {
                     (void) merged(&splitting, &obj); /* undo split */
                     /* "knapsack cannot accommodate any more items" */
                     Your("pack is too full.");

@@ -5636,7 +5636,7 @@ destroy_item(int osym, int dmgtyp)
     int i, deferral_indx = 0;
     /* 1+52+1: try to handle a full inventory; it doesn't matter if
       inventory actually has more, even if everything should be deferred */
-    unsigned short deferrals[1 + 52 + 1]; /* +1: gold, overflow */
+    unsigned short deferrals[invlet_gold + invlet_basic + invlet_overflow];
 
     (void) memset((genericptr_t) deferrals, 0, sizeof deferrals);
     /*

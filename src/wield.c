@@ -390,7 +390,8 @@ dowield(void)
         return doswapweapon();
     } else if (wep == uquiver) {
         /* offer to split stack if multiple are quivered */
-        if (uquiver->quan > 1L && inv_cnt(FALSE) < 52 && splittable(uquiver)) {
+        if (uquiver->quan > 1L && inv_cnt(FALSE) < invlet_basic
+                                    && splittable(uquiver)) {
             Sprintf(qbuf, "You have %ld %s readied.  Wield one?",
                     uquiver->quan, simpleonames(uquiver));
             switch (ynq(qbuf)) {
@@ -556,7 +557,8 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
             return weld_res ? ECMD_TIME : ECMD_OK;
         }
         /* offer to split stack if wielding more than 1 */
-        if (uwep->quan > 1L && inv_cnt(FALSE) < 52 && splittable(uwep)) {
+        if (uwep->quan > 1L && inv_cnt(FALSE) < invlet_basic
+                                    && splittable(uwep)) {
             Sprintf(qbuf, "You are wielding %ld %s.  Ready %ld of them?",
                     uwep->quan, simpleonames(uwep), uwep->quan - 1L);
             switch (ynq(qbuf)) {
@@ -590,7 +592,7 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
         untwoweapon();
         was_uwep = TRUE;
     } else if (newquiver == uswapwep) {
-        if (uswapwep->quan > 1L && inv_cnt(FALSE) < 52
+        if (uswapwep->quan > 1L && inv_cnt(FALSE) < invlet_basic
             && splittable(uswapwep)) {
             Sprintf(qbuf, "%s %ld %s.  Ready %ld of them?",
                     u.twoweap ? "You are dual wielding"

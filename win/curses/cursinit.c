@@ -683,7 +683,7 @@ int
 curses_character_dialog(const char **choices, const char *prompt)
 {
     int count, count2, ret, curletter;
-    char used_letters[52];
+    char used_letters[invlet_basic]; /* a..zA..Z */
     anything identifier;
     menu_item *selected = NULL;
     winid wid = curses_get_wid(NHW_MENU);

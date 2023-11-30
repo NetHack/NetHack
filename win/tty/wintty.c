@@ -261,8 +261,7 @@ static int bordercol[border_elements] = { 0, 0, 0 }; /* left, middle, right */
 static int ttyinvmode = InvNormal; /* enum is in wintype.h */
 static int inuse_only_start = 0; /* next slot to use for in-use-only mode */
 static boolean done_tty_perm_invent_init = FALSE;
-enum { tty_slots = 1 + 52 + 1 }; /* 54 [0..53]: for !show_gold a..zA..Z with
-                                  * 2 unused, or for 'show_gold' $a..zA..Z# */
+enum { tty_slots = invlet_basic + inv_special_slotcount }; /* 52 + 2 */
 static boolean slot_tracker[tty_slots];
 static long last_glyph_reset_when;
 #ifndef NOINVSYM /* invent.c */

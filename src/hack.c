@@ -499,7 +499,8 @@ moverock(void)
                                     pick up a boulder if you have a free
                                     slot or into the overflow ('#') slot
                                     unless already carrying at least one */
-                              && (inv_cnt(FALSE) < 52 || !carrying(BOULDER))),
+                              && (inv_cnt(FALSE) < invlet_basic
+                                     || !carrying(BOULDER))),
                     willpickup = (canpickup
                                   && (flags.pickup && !gc.context.nopick)
                                   && autopick_testobj(otmp, TRUE));

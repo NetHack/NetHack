@@ -548,6 +548,18 @@ enum hunger_state_types {
     STARVED    = 6
 };
 
+/* inventory counts (slots in tty parlance)
+ * a...zA..Z    invlet_basic (52)
+ * $a...zA..Z#  2 special additions
+ */
+enum inventory_counts {
+    invlet_basic = 52,
+    invlet_gold = 1,
+    invlet_overflow = 1,
+    invlet_max = invlet_basic + invlet_gold + invlet_overflow,
+    /* 2023/11/30 invlet_max is not yet used anywhere */
+};
+
 struct kinfo {
     struct kinfo *next; /* chain of delayed killers */
     int id;             /* uprop keys to ID a delayed killer */
