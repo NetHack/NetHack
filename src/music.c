@@ -36,7 +36,8 @@ static void charm_monsters(int);
 static void do_earthquake(int);
 static const char *generic_lvl_desc(void);
 static int do_improvisation(struct obj *);
-static char *improvised_notes(boolean *);
+static char *improvised_notes(struct obj *, boolean *);
+static boolean select_tune(struct obj *, char *);
 
 
 /*
@@ -566,7 +567,7 @@ do_improvisation(struct obj* instr)
 #undef PLAY_CONFUSED
 #undef PLAY_HALLU
 
-    improvisation = improvised_notes(&same_old_song);
+    improvisation = improvised_notes(instr, &same_old_song);
 
     switch (itmp.otyp) { /* note: itmp.otyp might differ from instr->otyp */
     case MAGIC_FLUTE: /* Make monster fall asleep */
@@ -708,10 +709,18 @@ do_improvisation(struct obj* instr)
     return 2; /* That takes time */
 }
 
+/* Bugles have a limited range compared to other instruments: because the
+   pitch is controlled only by the embouchure, they are restricted to a
+   natural harmonic series.  Whether tooled horns should behave the same way
+   depends on what exactly they are supposed to be... */
+static const char *const bugle_range = "CEG", *const full_range = "ABCDEFG";
+#define instr_range(o) ((o)->otyp == BUGLE ? bugle_range : full_range)
+
 static char *
-improvised_notes(boolean *same_as_last_time)
+improvised_notes(struct obj *instr, boolean *same_as_last_time)
 {
-    static const char notes[] = "ABCDEFG";
+    const char *const notes = instr_range(instr);
+    const int notes_available = strlen(notes);
     /* target buffer has to be in gc.context, otherwise saving game 
      * between improvised recitals would not be able to maintain
      * the same_as_last_time context. */
@@ -720,7 +729,7 @@ improvised_notes(boolean *same_as_last_time)
     if (!(Unchanging && gc.context.jingle[0] != '\0')) {
         int i, notecount = rnd(SIZE(gc.context.jingle) - 1); /* 1 - 5 */
         for (i = 0; i < notecount; ++i) {
-            gc.context.jingle[i] = notes[rn2(SIZE(notes) - 1)]; /* -1 to exclude '\0' */
+            gc.context.jingle[i] = notes[rn2(notes_available)];
         }
         gc.context.jingle[notecount] = '\0';
         *same_as_last_time = FALSE;
@@ -730,6 +739,45 @@ improvised_notes(boolean *same_as_last_time)
     return gc.context.jingle;
 }
 
+/* Get a series of notes to play on a tonal instrument, then limit them to
+   valid notes.  Return indicates whether invalid notes were removed. */
+static boolean
+select_tune(struct obj *instr, char *outbuf)
+{
+    const char *const range = instr_range(instr);
+    char qbuf[QBUFSZ], buftmp[BUFSZ];
+    char *si, *so;
+    boolean unplayable = FALSE;
+
+    /* we could compactify(invent.c) a copy of range here instead of listing
+       "CEG" and "A-G" explicitly, but that would be overkill when there are
+       just 2 possible ranges */
+    Sprintf(qbuf, "What tune are you playing? [5 notes, %s]",
+            instr->otyp == BUGLE ? "CEG" : "A-G");
+    getlin(qbuf, buftmp);
+    (void) mungspaces(buftmp);
+    if (*buftmp == '\033') {
+        *outbuf = '\033';
+        return unplayable;
+    }
+    /* convert to uppercase, change any "H" to the expected "B", and limit to
+       notes playable by the instrument. */
+    for (si = buftmp, so = outbuf; *si; si++) {
+        char c = highc(*si);
+
+        if (c == 'H')
+            c = 'B';
+        if (strchr(range, c))
+            *(so++) = c;
+        else
+            unplayable = TRUE; 
+    }
+    *so = '\0';
+    return unplayable;
+}
+
+#undef instr_range
+
 /*
  * So you want music...
  */
@@ -737,7 +785,6 @@ int
 do_play_instrument(struct obj* instr)
 {
     char buf[BUFSZ] = DUMMY, c = 'y';
-    char *s;
     coordxy x, y;
     boolean ok;
 
@@ -766,16 +813,15 @@ do_play_instrument(struct obj* instr)
         } else if (c == 'y') {
             Strcpy(buf, gt.tune);
         } else {
-            getlin("What tune are you playing? [5 notes, A-G]", buf);
-            (void) mungspaces(buf);
+            boolean unplayable = select_tune(instr, buf);
+
             if (*buf == '\033')
                 goto nevermind;
-
-            /* convert to uppercase and change any "H" to the expected "B" */
-            for (s = buf; *s; s++) {
-                *s = highc(*s);
-                if (*s == 'H')
-                    *s = 'B';
+            if (unplayable) {
+                You("can't play that on %s!", yname(instr));
+                if (!*buf)
+                    return ECMD_OK;
+                You("play %s instead.", buf);
             }
         }
 
