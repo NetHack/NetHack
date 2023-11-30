@@ -2047,7 +2047,7 @@ save_mtraits(struct obj *obj, struct monst *mtmp)
     if (!has_omonst(obj))
         newomonst(obj);
     if (has_omonst(obj)) {
-        int baselevel = mtmp->data->mlevel;
+        int baselevel = mtmp->data->mlevel; /* mtmp->data is valid ptr */
         struct monst *mtmp2 = OMONST(obj);
 
         *mtmp2 = *mtmp;
