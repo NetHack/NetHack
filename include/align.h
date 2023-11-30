@@ -60,4 +60,11 @@ typedef struct align { /* alignment & record */
 #define Msa2amask(x) (((x) == 3) ? 4 : (x))
 #define MSA_NONE    0  /* unaligned or multiple alignments */
 
+/* alignment change reasons for uchangealign(attrib.c) */
+enum uchangealign_reasons {
+    A_CG_CONVERT  = 0, /* permanently converted */
+    A_CG_HELM_ON  = 1, /* donned helm of opposite alignment */
+    A_CG_HELM_OFF = 2, /* doffed helm of opposite alignment */
+};
+
 #endif /* ALIGN_H */
