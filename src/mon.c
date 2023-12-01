@@ -268,7 +268,7 @@ mon_sanity_check(void)
         sanity_check_single_mon(mtmp, FALSE, "migr");
 
         if ((mtmp->mstate
-             & ~(MON_MIGRATING | MON_LIMBO | MON_ENDGAME_MIGR)) != 0L
+             & ~(MON_MIGRATING | MON_LIMBO | MON_ENDGAME_MIGR | MON_OFFMAP)) != 0L
             || !(mtmp->mstate & MON_MIGRATING))
             impossible("migrating mon (%s) with mstate set to 0x%08lx",
                        fmt_ptr((genericptr_t) mtmp), mtmp->mstate);
