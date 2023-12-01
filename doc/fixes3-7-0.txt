@@ -1290,6 +1290,9 @@ if hero destroys an altar by breaking a wand of digging or applying a drum of
 	earthquake, provoke divine wrath
 if hero destroys a shop wall by breaking a wand of digging or applying a drum
 	of earthquake, have shopkeeper demand payment
+mimics sometimes woke up and came out of hiding when they shouldn't have if
+	hero without protection from shape changers returned to a previously
+	visitied level (though they would usually rehide so it wasn't obvious)
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
