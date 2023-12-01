@@ -1757,6 +1757,8 @@ when using 'm #overview' in the endgame, don't include non-endgame levels
 when a tethered aklys gets caught in a web, make sure it doesn't return
 	and that the display of the tether gets cleaned up
 add 'X' as a potential context-sensitive item-action for uwep and uswapwep
+monsters weren't noticing hero's possession or lack of magic resistance when
+	hero getting zapped by a wand of striking was or wasn't resisted
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

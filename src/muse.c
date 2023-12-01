@@ -1468,7 +1468,8 @@ static int
 mbhitm(struct monst *mtmp, struct obj *otmp)
 {
     int tmp;
-    boolean reveal_invis = FALSE, hits_you = (mtmp == &gy.youmonst);
+    boolean reveal_invis = FALSE, learnit = FALSE,
+            hits_you = (mtmp == &gy.youmonst);
 
     if (!hits_you && otmp->otyp != WAN_UNDEAD_TURNING) {
         mtmp->msleeping = 0;
@@ -1480,34 +1481,39 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
         reveal_invis = TRUE;
         if (hits_you) {
             if (Antimagic) {
+                monstseesu(M_SEEN_MAGR); /* monsters notice hero resisting */
                 shieldeff(u.ux, u.uy);
                 Soundeffect(se_boing, 40);
                 pline("Boing!");
+                learnit = TRUE;
             } else if (rnd(20) < 10 + u.uac) {
+                monstunseesu(M_SEEN_MAGR); /* mons see hero not resisting */
                 pline_The("wand hits you!");
                 tmp = d(2, 12);
                 if (Half_spell_damage)
                     tmp = (tmp + 1) / 2;
                 losehp(tmp, "wand", KILLED_BY_AN);
-            } else
+                learnit = TRUE;
+            } else {
                 pline_The("wand misses you.");
+            }
             stop_occupation();
             nomul(0);
         } else if (resists_magm(mtmp)) {
             shieldeff(mtmp->mx, mtmp->my);
             Soundeffect(se_boing, 40);
             pline("Boing!");
+            learnit = TRUE;
         } else if (rnd(20) < 10 + find_mac(mtmp)) {
             tmp = d(2, 12);
             hit("wand", mtmp, exclam(tmp));
             (void) resist(mtmp, otmp->oclass, tmp, TELL);
-            if (cansee(mtmp->mx, mtmp->my) && gz.zap_oseen)
-                makeknown(WAN_STRIKING);
+            learnit = TRUE;
         } else {
             miss("wand", mtmp);
-            if (cansee(mtmp->mx, mtmp->my) && gz.zap_oseen)
-                makeknown(WAN_STRIKING);
         }
+        if (learnit && cansee(mtmp->mx, mtmp->my) && gz.zap_oseen)
+            makeknown(WAN_STRIKING);
         break;
     case WAN_TELEPORTATION:
         if (hits_you) {
@@ -1527,9 +1533,7 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
     case SPE_CANCELLATION:
         (void) cancel_monst(mtmp, otmp, FALSE, TRUE, FALSE);
         break;
-    case WAN_UNDEAD_TURNING: {
-        boolean learnit = FALSE;
-
+    case WAN_UNDEAD_TURNING:
         if (hits_you) {
             unturn_you();
             learnit = gz.zap_oseen;
@@ -1555,7 +1559,6 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
         if (learnit)
             makeknown(WAN_UNDEAD_TURNING);
         break;
-    }
     default:
         break;
     }
