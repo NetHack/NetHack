@@ -602,7 +602,7 @@ knows_class(char sym)
 void
 u_init(void)
 {
-    register int i;
+    int i;
     struct u_roleplay tmpuroleplay = u.uroleplay; /* set by rcfile options */
 
     flags.female = flags.initgend;
@@ -902,6 +902,9 @@ u_init(void)
     default: /* impossible */
         break;
     }
+
+    /* roughly based on distribution in human population */
+    u.uhandedness = rn2(10) ? RIGHT_HANDED : LEFT_HANDED;
 
     if (discover)
         ini_inv(Wishing);

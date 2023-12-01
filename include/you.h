@@ -421,6 +421,11 @@ struct you {
     Bitfield(uburied, 1);       /* you're buried */
     Bitfield(uedibility, 1);    /* blessed food detect; sense unsafe food */
     Bitfield(usaving_grace, 1); /* prevents death once */
+    Bitfield(uhandedness, 1); /* There is no advantage for either handedness.
+                                 The distinction is only for flavor variation
+                                 and for use in messages. */
+#define RIGHT_HANDED 0x00
+#define LEFT_HANDED  0x01
 
     unsigned udg_cnt;           /* how long you have been demigod */
     struct u_event uevent;      /* certain events have happened */
@@ -537,5 +542,10 @@ struct _hitmon_data {
 #define next2u(px,py) (distu((px),(py)) <= 2)
 /* hero at (x,y)? */
 #define u_at(x,y) ((x) == u.ux && (y) == u.uy)
+
+#define URIGHTY (u.uhandedness == RIGHT_HANDED)
+#define ULEFTY (u.uhandedness == LEFT_HANDED)
+#define RING_ON_PRIMARY (ULEFTY ? uleft : uright)
+#define RING_ON_SECONDARY (ULEFTY ? uright : uleft)
 
 #endif /* YOU_H */

@@ -2159,7 +2159,9 @@ accessory_or_armor_on(struct obj *obj)
             }
             if (uwep) {
                 res = !uwep->bknown; /* check this before calling welded() */
-                if ((mask == RIGHT_RING || bimanual(uwep)) && welded(uwep)) {
+                if (((mask == RIGHT_RING && URIGHTY)
+                     || (mask == LEFT_RING  && ULEFTY)
+                     || bimanual(uwep)) && welded(uwep)) {
                     const char *hand = body_part(HAND);
 
                     /* welded will set bknown */
@@ -2388,8 +2390,17 @@ glibr(void)
     const char *otherwep = 0, *thiswep, *which, *hand;
 
     leftfall = (uleft && !uleft->cursed
+                && (!uwep || !(welded(uwep) && ULEFTY)
+                    || !bimanual(uwep)));
+    rightfall = (uright && !uright->cursed
+                && (!uwep || !(welded(uwep) && URIGHTY)
+                    || !bimanual(uwep)));
+/*
+    leftfall = (uleft && !uleft->cursed
                 && (!uwep || !welded(uwep) || !bimanual(uwep)));
     rightfall = (uright && !uright->cursed && (!welded(uwep)));
+*/
+
     if (!uarmg && (leftfall || rightfall) && !nolimbs(gy.youmonst.data)) {
         /* changed so cursed rings don't fall off, GAN 10/30/86 */
         Your("%s off your %s.",
@@ -2422,7 +2433,7 @@ glibr(void)
         if (otmp->quan > 1L)
             otherwep = makeplural(otherwep);
         hand = body_part(HAND);
-        which = "left ";
+        which = URIGHTY ? "left " : "right ";  /* text for the off hand */
         Your("%s %s%s from your %s%s.", otherwep, xfl ? "also " : "",
              otense(otmp, "slip"), which, hand);
         xfl++;
@@ -2453,10 +2464,12 @@ glibr(void)
         }
         hand = body_part(HAND);
         which = "";
-        if (bimanual(otmp))
+        if (bimanual(otmp)) {
             hand = makeplural(hand);
-        else if (wastwoweap)
-            which = "right "; /* preceding msg was about left */
+        } else if (wastwoweap) {
+            /* preceding msg was about non-dominant hand */
+            which = URIGHTY ? "right " : "left ";
+	}
         pline("%s %s%s %s%s from your %s%s.",
               !strncmp(thiswep, "corpse", 6) ? "The" : "Your",
               otherwep ? "other " : "", thiswep, xfl ? "also " : "",
@@ -2511,7 +2524,7 @@ stuck_ring(struct obj *ring, int otyp)
         if (nolimbs(gy.youmonst.data) && uamul
             && uamul->otyp == AMULET_OF_UNCHANGING && uamul->cursed)
             return uamul;
-        if (welded(uwep) && (ring == uright || bimanual(uwep)))
+        if (welded(uwep) && ((ring == RING_ON_PRIMARY) || bimanual(uwep)))
             return uwep;
         if (uarmg && uarmg->cursed)
             return uarmg;
@@ -2556,7 +2569,7 @@ select_off(register struct obj *otmp)
         }
         glibdummy = cg.zeroobj;
         why = 0; /* the item which prevents ring removal */
-        if (welded(uwep) && (otmp == uright || bimanual(uwep))) {
+        if (welded(uwep) && ((otmp == RING_ON_PRIMARY) || bimanual(uwep))) {
             Sprintf(buf, "free a weapon %s", body_part(HAND));
             why = uwep;
         } else if (uarmg && (uarmg->cursed || Glib)) {

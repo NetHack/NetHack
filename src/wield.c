@@ -194,8 +194,10 @@ ready_weapon(struct obj *wep)
                 tmp = thestr;
             else
                 tmp = "";
-            pline("%s%s %s to your %s!", tmp, aobjnam(wep, "weld"),
+            pline("%s%s %s to your %s%s!", tmp, aobjnam(wep, "weld"),
                   (wep->quan == 1L) ? "itself" : "themselves", /* a3 */
+                  bimanual(wep) ? "" :
+                      (URIGHTY ? "dominant right " : "dominant left "),
                   bimanual(wep) ? (const char *) makeplural(body_part(HAND))
                                 : body_part(HAND));
             set_bknown(wep, 1);
