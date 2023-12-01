@@ -1652,12 +1652,14 @@ seffect_light(struct obj **sobjp)
             for (i = 0; i < numlights; ++i) {
                 mon = makemon(&mons[pm], u.ux, u.uy,
                               MM_EDOG | NO_MINVENT | MM_NOMSG);
-                initedog(mon);
-                mon->msleeping = 0;
-                mon->mcan = TRUE;
-                if (canspotmon(mon))
-                    sawlights = TRUE;
-                newsym(mon->mx, mon->my);
+                if (mon) {
+                    initedog(mon);
+                    mon->msleeping = 0;
+                    mon->mcan = TRUE;
+                    if (canspotmon(mon))
+                        sawlights = TRUE;
+                    newsym(mon->mx, mon->my);
+                }
             }
             if (sawlights) {
                 pline("Lights appear all around you!");
