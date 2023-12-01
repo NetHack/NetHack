@@ -1500,7 +1500,7 @@ u_on_newpos(coordxy x, coordxy y)
        stale values from previous level */
     if (!on_level(&u.uz, &u.uz0))
         u.ux0 = u.ux, u.uy0 = u.uy;
-    else if (!Blind && !Hallucination)
+    else if (!Blind && !Hallucination && !u.uswallow)
         /* still on same level; might have come close enough to
            generic object(s) to redisplay them as specific objects */
         see_nearby_objects();
