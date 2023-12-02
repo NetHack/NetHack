@@ -1299,7 +1299,7 @@ Wizards no longer have a bonus to writing unknown spellbooks, but now
 starting inventory: magic markers are more likely (guaranteed for
 	Wizards), but have fewer charges
 early dungeon (pre-Sokoban) generates extra useful survivability items
-
+potion of healing is much more common, and has a unique price
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
