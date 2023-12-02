@@ -2438,11 +2438,18 @@ potion_dip(struct obj *obj, struct obj *potion)
         magic = (mixture != STRANGE_OBJECT) ? objects[mixture].oc_magic
             : (objects[obj->otyp].oc_magic || objects[potion->otyp].oc_magic);
         Strcpy(qbuf, "The"); /* assume full stack */
-        if (amt > (magic ? 3 : 7)) {
-            /* trying to dip multiple potions will usually affect only a
+        if (amt > (obj->odiluted ? 2 : magic ? 3 : 7)) {
+            /* Trying to dip multiple potions will usually affect only a
                subset; pick an amount between 3 and 8, inclusive, for magic
-               potion result, between 7 and N for non-magic */
-            if (magic)
+               potion result, between 7 and N for non-magic. If diluted
+               potions are being dipped, only two are affected; this is a
+               balance fix to prevent cheap mass alchemy of the (very
+               common) potion of healing into the (very valuable) potion of
+               full healing, whilst permitting both healing->extra healing
+               and extra healing->full healing. */
+            if (obj->odiluted)
+                amt = 2;
+            else if (magic)
                 amt = rnd(min(amt, 8) - (3 - 1)) + (3 - 1); /* 1..6 + 2 */
             else
                 amt = rnd(amt - (7 - 1)) + (7 - 1); /* 1..(N-6) + 6 */
