@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1700012888 2023/11/15 01:48:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.675 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1701499956 2023/12/02 06:52:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.685 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4637,8 +4637,10 @@ optfn_windowcolors(int optidx, int req, boolean negated UNUSED,
 }
 
 static int
-optfn_windowtype(int optidx, int req, boolean negated UNUSED,
-                 char *opts, char *op)
+optfn_windowtype(
+    int optidx, int req,
+    boolean negated UNUSED,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -6662,21 +6664,25 @@ initoptions_init(void)
     determine_ambiguities();
 
     /* if windowtype has been specified on the command line, set it up
-       early so windowtype-specific options use it as their base; we will
-       set it again in initoptions_finish() so that NETHACKOPTIONS and
-       .nethrackrc can't override it (command line takes precedence) */
+       early so windowtype-specific options use it as their base */
     if (gc.cmdline_windowsys) {
         nmcpy(gc.chosen_windowtype, gc.cmdline_windowsys, WINTYPELEN);
         config_error_init(FALSE, "command line", FALSE);
         choose_windows(gc.cmdline_windowsys);
         config_error_done();
-        /* do not free gc.cmdline_windowsys yet unless it was rejected;
-           keeping it in that situation would complain about it twice */
-        if (!windowprocs.name
-            || strcmpi(windowprocs.name, gc.cmdline_windowsys) != 0) {
-            free((genericptr_t) gc.cmdline_windowsys),
+        /*
+         * FIXME?  This continues even if setting windowtype to player's
+         * specified value fails.  It doesn't lock the windowtype in
+         * that situation though, so the game will use whatever is in
+         * RC/NETHACKOPTIONS or resort to DEFAULT_WINDOW_SYS.
+         */
+        if (windowprocs.name
+            && !strcmpi(windowprocs.name, gc.cmdline_windowsys))
+            /* ignore any windowtype:foo in RC file or NETHACKOPTIONS */
+            iflags.windowtype_locked = TRUE;
+        /* should't need cmdline_windowsys beyond here */
+        free((genericptr_t) gc.cmdline_windowsys),
             gc.cmdline_windowsys = NULL;
-        }
     }
 
 #ifdef ENHANCED_SYMBOLS
@@ -6889,15 +6895,6 @@ initoptions_finish(void)
         config_error_init(FALSE, envname, FALSE);
         (void) parseoptions(xtraopts, TRUE, FALSE);
         config_error_done();
-    }
-
-    /* after .nethackrc and NETHACKOPTIONS so that cmdline takes precedence */
-    if (gc.cmdline_windowsys) {
-        go.opt_phase = cmdline_opt;
-        config_error_init(FALSE, "command line", FALSE);
-        choose_windows(gc.cmdline_windowsys);
-        config_error_done();
-        free((genericptr_t) gc.cmdline_windowsys), gc.cmdline_windowsys = NULL;
     }
 
     if (gc.cmdline_rcfile)
