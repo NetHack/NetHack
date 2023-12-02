@@ -167,6 +167,7 @@ static struct trobj Wizard[] = {
     { UNDEF_TYP, UNDEF_SPE, SCROLL_CLASS, 3, UNDEF_BLESS },
     { SPE_FORCE_BOLT, 0, SPBOOK_CLASS, 1, 1 },
     { UNDEF_TYP, UNDEF_SPE, SPBOOK_CLASS, 1, UNDEF_BLESS },
+    { MAGIC_MARKER, 19, TOOL_CLASS, 1, 0 }, /* actually spe = 18 + d4 */
     { 0, 0, 0, 0, 0 }
 };
 
@@ -176,8 +177,7 @@ static struct trobj Wizard[] = {
 
 static struct trobj Tinopener[] = { { TIN_OPENER, 0, TOOL_CLASS, 1, 0 },
                                     { 0, 0, 0, 0, 0 } };
-static struct trobj Magicmarker[] = { { MAGIC_MARKER, UNDEF_SPE, TOOL_CLASS,
-                                        1, 0 },
+static struct trobj Magicmarker[] = { { MAGIC_MARKER, 19, TOOL_CLASS, 1, 0 },
                                       { 0, 0, 0, 0, 0 } };
 static struct trobj Lamp[] = { { OIL_LAMP, 1, TOOL_CLASS, 1, 0 },
                                { 0, 0, 0, 0, 0 } };
@@ -695,7 +695,7 @@ u_init(void)
             ini_inv(Tinopener);
         else if (!rn2(4))
             ini_inv(Lamp);
-        else if (!rn2(10))
+        else if (!rn2(5))
             ini_inv(Magicmarker);
         knows_object(SACK);
         knows_object(TOUCHSTONE);
@@ -741,7 +741,7 @@ u_init(void)
 
         Monk[M_BOOK].trotyp = M_spell[rn2(90) / 30]; /* [0..2] */
         ini_inv(Monk);
-        if (!rn2(5))
+        if (!rn2(4))
             ini_inv(Magicmarker);
         else if (!rn2(10))
             ini_inv(Lamp);
@@ -753,7 +753,7 @@ u_init(void)
     }
     case PM_CLERIC: /* priest/priestess */
         ini_inv(Priest);
-        if (!rn2(10))
+        if (!rn2(5))
             ini_inv(Magicmarker);
         else if (!rn2(10))
             ini_inv(Lamp);
@@ -811,7 +811,7 @@ u_init(void)
             ini_inv(Leash);
         else if (!rn2(25))
             ini_inv(Towel);
-        else if (!rn2(25))
+        else if (!rn2(20))
             ini_inv(Magicmarker);
         skill_init(Skill_T);
         break;
@@ -825,8 +825,6 @@ u_init(void)
         break;
     case PM_WIZARD:
         ini_inv(Wizard);
-        if (!rn2(5))
-            ini_inv(Magicmarker);
         if (!rn2(5))
             ini_inv(Blindfold);
         skill_init(Skill_W);
@@ -1140,8 +1138,11 @@ ini_inv(struct trobj *trop)
                        && obj->otyp != FLINT) {
                 obj->quan = 1L;
             }
-            if (trop->trspe != UNDEF_SPE)
+            if (trop->trspe != UNDEF_SPE) {
                 obj->spe = trop->trspe;
+                if (trop->trotyp == MAGIC_MARKER && obj->spe < 96)
+                    obj->spe += rn2(4);
+            }
             if (trop->trbless != UNDEF_BLESS)
                 obj->blessed = trop->trbless;
         }
