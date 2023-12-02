@@ -831,6 +831,40 @@ spell_skilltype(int booktype)
     return objects[booktype].oc_skill;
 }
 
+/* Wizards learn what spellbooks look like based on their skill in the
+   spell's school */
+void
+skill_based_spellbook_id(void)
+{
+    if (!Role_if(PM_WIZARD))
+        return;
+
+    int booktype;
+    const uchar spbook_class = (uchar) SPBOOK_CLASS;
+
+    for (booktype = gb.bases[spbook_class];
+         booktype < gb.bases[spbook_class + 1];
+         booktype++) {
+        int skill = spell_skilltype(booktype);
+        if (skill == P_NONE) continue;
+
+        int known_up_to_level;
+        switch (P_SKILL(skill)) {
+        case P_BASIC:
+            known_up_to_level = 2; break;
+        case P_SKILLED:
+            known_up_to_level = 4; break;
+        case P_EXPERT: case P_MASTER: case P_GRAND_MASTER:
+            known_up_to_level = 7; break;
+        case P_UNSKILLED: default:
+                known_up_to_level = 0; break;
+        }
+
+        if (objects[booktype].oc_level <= known_up_to_level)
+            makeknown(booktype);
+    }
+}
+
 static void
 cast_protection(void)
 {

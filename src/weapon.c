@@ -1136,6 +1136,8 @@ skill_advance(int skill)
     You("are now %s skilled in %s.",
         P_SKILL(skill) >= P_MAX_SKILL(skill) ? "most" : "more",
         P_NAME(skill));
+
+    skill_based_spellbook_id();
 }
 
 static const struct skill_range {
@@ -1689,6 +1691,8 @@ skill_init(const struct def_skill *class_skill)
     /* each role has a special spell; allow at least basic for its type
        (despite the function name, this works for spell skills too) */
     unrestrict_weapon_skill(spell_skilltype(gu.urole.spelspec));
+
+    skill_based_spellbook_id();
 }
 
 void

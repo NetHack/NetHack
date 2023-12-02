@@ -313,8 +313,8 @@ dowrite(struct obj *pen)
     /*
      * Writing by name requires that the hero knows the scroll or
      * book type.  One has previously been read (and its effect
-     * was evident) or been ID'd via scroll/spell/throne and it
-     * will be on the discoveries list.
+     * was evident) or been ID'd via scroll/spell/throne (or skill
+     * for Wizards) and it will be on the discoveries list.
      * Unknown spellbooks can also be written by name if the hero
      * has fresh knowledge of the spell, or if the spell is almost
      * forgotten and the hero is Lucky (with a greater chance than
@@ -349,7 +349,8 @@ dowrite(struct obj *pen)
         /* else fresh knowledge of the spell works */
         && spell_knowledge != spe_Fresh
         /* and Luck might override after previous checks have failed */
-        && rnl((Role_if(PM_WIZARD) || spell_knowledge == spe_GoingStale)
+        && rnl(((Role_if(PM_WIZARD) && paper->oclass != SPBOOK_CLASS) ||
+                spell_knowledge == spe_GoingStale)
                ? 5 : 15)) {
         You("%s to write that.", by_descr ? "fail" : "don't know how");
         /* scrolls disappear, spellbooks don't */

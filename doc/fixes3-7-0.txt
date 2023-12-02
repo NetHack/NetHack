@@ -1292,7 +1292,10 @@ if hero destroys a shop wall by breaking a wand of digging or applying a drum
 	of earthquake, have shopkeeper demand payment
 mimics sometimes woke up and came out of hiding when they shouldn't have if
 	hero without protection from shape changers returned to a previously
-	visitied level (though they would usually rehide so it wasn't obvious)
+	visited level (though they would usually rehide so it wasn't obvious)
+Wizards no longer have a bonus to writing unknown spellbooks, but now
+	learn what spellbooks look like as they gain skill in their
+	spell schools (allowing a guaranteed write with enough skill)
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
