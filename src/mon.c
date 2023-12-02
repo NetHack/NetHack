@@ -3285,7 +3285,15 @@ xkilled(
             otmp = mkobj(RANDOM_CLASS, TRUE);
             /* don't create large objects from small monsters */
             otyp = otmp->otyp;
-            if (mdat->msize < MZ_HUMAN && otyp != FIGURINE
+            if (otmp->oclass == FOOD_CLASS && !(mdat->mflags2 & M2_COLLECT) &&
+                !otmp->oartifact) {
+                /* don't drop newly created permafood from kills, unless
+                   the monster collects food; it creates too much nutrition
+                   in the late game and encourages grinding in the early
+                   game; oartifact check is paranoia and will be redundant
+                   until an artifact comestible is added */
+                delobj(otmp);
+            } else if (mdat->msize < MZ_HUMAN && otyp != FIGURINE
                 /* oc_big is also oc_bimanual and oc_bulky */
                 && (otmp->owt > 30 || objects[otyp].oc_big)) {
                 if (otmp->oartifact) /* un-create */

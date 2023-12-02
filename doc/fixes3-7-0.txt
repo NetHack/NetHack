@@ -1302,6 +1302,9 @@ early dungeon (pre-Sokoban) generates extra useful survivability items
 potion of healing is much more common, and has a unique price
 alchemy may affect only a portion of the dipped potions if a large
 	stack is dipped (especially if that stack is diluted)
+monster kills can no longer deathdrop comestibles (other than the
+	monster's corpse) unless the monster collects food or
+	generates with food
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
