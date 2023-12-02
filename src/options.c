@@ -50,6 +50,8 @@ NEARDATA struct instance_flags iflags; /* provide linkage */
  *
  */
 
+#define OPTIONS_C
+
 #define NHOPT_PROTO
 #include "optlist.h"
 #undef NHOPT_PROTO
@@ -72,6 +74,7 @@ static struct allopt_t allopt_init[] = {
 };
 #undef NHOPT_PARSE
 
+#undef OPTIONS_C
 
 #define PILE_LIMIT_DFLT 5
 #define rolestring(val, array, field) \

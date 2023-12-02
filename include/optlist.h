@@ -4,6 +4,10 @@
 #ifndef OPTLIST_H
 #define OPTLIST_H
 
+#ifdef OPTIONS_C
+static int optfn_boolean(int, int, boolean, char *, char *);
+#endif
+
 /*
  *  NOTE:  If you add (or delete) an option, please review:
  *             doc/options.txt
@@ -12,7 +16,6 @@
  *         updates that should accompany your change.
  */
 
-static int optfn_boolean(int, int, boolean, char *, char *);
 enum OptType { BoolOpt, CompOpt, OthrOpt };
 enum Y_N { No, Yes };
 enum Off_On { Off, On };
