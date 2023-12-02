@@ -19,7 +19,7 @@ static void mkaltar(struct mkroom *);
 static void mkgrave(struct mkroom *);
 static void makevtele(void);
 void clear_level_structures(void);
-static void fill_ordinary_room(struct mkroom *);
+static void fill_ordinary_room(struct mkroom *, boolean);
 static void makelevel(void);
 static boolean bydoor(coordxy, coordxy);
 static void mktrap_victim(struct trap *);
@@ -830,16 +830,22 @@ clear_level_structures(void)
     }
 }
 
+#define ROOM_IS_FILLABLE(croom) \
+    ((croom->rtype == OROOM || croom->rtype == THEMEROOM) && croom->needfill == FILL_NORMAL)
+
 /* Fill a "random" room (i.e. a typical non-special room in the Dungeons of
- * Doom) with random monsters, objects, and dungeon features.
- */
+   Doom) with random monsters, objects, and dungeon features.
+
+   If bonus_items is TRUE, there may be an additional special item
+   generated, depending on depth. */
 static void
-fill_ordinary_room(struct mkroom *croom)
+fill_ordinary_room(struct mkroom *croom, boolean bonus_items)
 {
     int trycnt = 0;
     coord pos;
     struct monst *tmonst; /* always put a web with a spider */
     coordxy x, y;
+    boolean skip_chests = FALSE;
 
     if (croom->rtype != OROOM && croom->rtype != THEMEROOM)
         return;
@@ -848,7 +854,7 @@ fill_ordinary_room(struct mkroom *croom)
      * that's specified to be unfilled to block an inner subroom that's
      * specified to be filled. */
     for (x = 0; x < croom->nsubrooms; ++x) {
-        fill_ordinary_room(croom->sbrooms[x]);
+        fill_ordinary_room(croom->sbrooms[x], FALSE);
     }
 
     if (croom->needfill != FILL_NORMAL)
@@ -893,12 +899,123 @@ fill_ordinary_room(struct mkroom *croom)
         (void) mkcorpstat(STATUE, (struct monst *) 0,
                             (struct permonst *) 0, pos.x,
                             pos.y, CORPSTAT_INIT);
+
+    /*
+     * bonus_items means that this is the room where the bonus item
+     * should be placed, if there is one; but there might not be a
+     * bonus item on any given level.
+     *
+     * Bonus items are currently as follows:
+     * a) on the Mines branch level, 100% chance of a fairly filling
+     *    comestible;
+     * b) on other levels above the Oracle, 2/3 chance of a "supply
+     *    chest" that contains an early-game survivability item
+     *    (there are therefore more of these when Sokoban is deep,
+     *    which is intentional as those games are harder).
+     * This mechanism could be expanded in the future to place
+     * near-guaranteed items on particular levels (but, it is possible
+     * that no room will be given a bonus item if there is no suitable
+     * room to place it in, so it should not be used for plot-critical
+     * items).
+     */
+    if (bonus_items && somexyspace(croom, &pos)) {
+        branch *uz_branch = Is_branchlev(&u.uz);
+
+        if (uz_branch && u.uz.dnum != mines_dnum &&
+            (uz_branch->end1.dnum == mines_dnum ||
+             uz_branch->end2.dnum == mines_dnum)) {
+            (void) mksobj_at(
+                rn2(5) < 3 ? FOOD_RATION : rn2(2) ? CRAM_RATION : LEMBAS_WAFER,
+                pos.x, pos.y, TRUE, FALSE);
+        } else if (u.uz.dnum == oracle_level.dnum &&
+                   u.uz.dlevel < oracle_level.dlevel && rn2(3)) {
+            struct obj *otmp;
+            /* reverse probabilities compared to non-supply chests;
+               these are twice as likely to be chests than large
+               boxes, rather than vice versa */
+            struct obj *supply_chest = mksobj_at(
+                rn2(3) ? CHEST : LARGE_BOX, pos.x, pos.y, FALSE, FALSE);
+            supply_chest->olocked = !!(rn2(6));
+
+            int tryct = 0;
+            do {
+                int otyp;
+                /* 50% this is a potion of healing */
+                if (rn2(2))
+                    otyp = POT_HEALING;
+                else {
+                    static const int supply_items[] = {
+                        POT_EXTRA_HEALING,
+                        POT_SPEED,
+                        POT_GAIN_ENERGY,
+                        SCR_ENCHANT_WEAPON,
+                        SCR_ENCHANT_ARMOR,
+                        SCR_CONFUSE_MONSTER,
+                        SCR_SCARE_MONSTER,
+                        WAN_DIGGING,
+                        SPE_HEALING,
+                    };
+                    otyp = supply_items[rn2(SIZE(supply_items))];
+                }
+                otmp = mksobj(otyp, TRUE, FALSE);
+                if (otyp == POT_HEALING && rn2(2))
+                    otmp->quan = 2;
+                add_to_container(supply_chest, otmp);
+
+                ++tryct;
+                if (tryct == 50) {
+                    impossible("couldn't generate supply chest item");
+                    break;
+                }
+                /* guarantee at least one noncursed item, with a small
+                   probability of more; if we generate a cursed item, it's
+                   added to the supply chest but we reroll for a noncursed
+                   item and add that too */
+            } while (otmp->cursed || !rn2(5));
+
+            /* maybe put a random item into the supply chest, biased
+               slightly towards low-level spellbooks; avoid tools
+               because chests don't fit into other chests */
+            if (rn2(3)) {
+                static const int extra_classes[] = {
+                    FOOD_CLASS,
+                    WEAPON_CLASS,
+                    ARMOR_CLASS,
+                    GEM_CLASS,
+                    SCROLL_CLASS,
+                    POTION_CLASS,
+                    RING_CLASS,
+                    SPBOOK_no_NOVEL,
+                    SPBOOK_no_NOVEL,
+                    SPBOOK_no_NOVEL
+                };
+                int oclass = extra_classes[rn2(SIZE(extra_classes))];
+                otmp = mkobj(oclass, FALSE);
+                if (oclass == SPBOOK_no_NOVEL) {
+                    /* bias towards lower level by generating again
+                       and taking the lower-level book */
+                    struct obj *otmp2 = mkobj(oclass, FALSE);
+                    if (objects[otmp->otyp].oc_level <= objects[otmp2->otyp].oc_level) {
+                        dealloc_obj(otmp2);
+                    } else {
+                        dealloc_obj(otmp);
+                        otmp = otmp2;
+                    }
+                }
+                add_to_container(supply_chest, otmp);
+            }
+
+            skip_chests = TRUE; /* don't want a second chest in this room */
+        }
+    }
+
+
     /* put box/chest inside;
      *  40% chance for at least 1 box, regardless of number
      *  of rooms; about 5 - 7.5% for 2 boxes, least likely
      *  when few rooms; chance for 3 or more is negligible.
      */
-    if (!rn2(gn.nroom * 5 / 2) && somexyspace(croom, &pos))
+    if (!rn2(gn.nroom * 5 / 2) && somexyspace(croom, &pos) && !skip_chests)
         (void) mksobj_at((rn2(3)) ? LARGE_BOX : CHEST,
                             pos.x, pos.y, TRUE, FALSE);
 
@@ -1065,9 +1182,26 @@ makelevel(void)
         if (u.uz.dnum == 0 && u.uz.dlevel == 1 && gs.stairs != prevstairs)
             gs.stairs->u_traversed = TRUE;
 
+        /* some levels have specially generated items in ordinary
+           rooms (intended to be indistinguishable from the normally
+           generated items); work out which room these will be placed in */
+        int fillable_room_count = 0;
+        for (croom = gr.rooms; croom->hx > 0; croom++) {
+            if (ROOM_IS_FILLABLE(croom))
+                fillable_room_count++;
+        }
+        /* choose a random fillable room to be the one that gets the
+           bonus items, if there are any; if there aren't any we don't
+           generate the bonus items (but levels with no fillable rooms
+           typically don't have any bonus items to generate anyway) */
+        signed bonus_item_room_countdown =
+            fillable_room_count ? rn2(fillable_room_count) : -1;
+
         /* for each room: put things inside */
         for (croom = gr.rooms; croom->hx > 0; croom++) {
-            fill_ordinary_room(croom);
+            boolean fillable = ROOM_IS_FILLABLE(croom);
+            fill_ordinary_room(croom, fillable && bonus_item_room_countdown == 0);
+            if (fillable) --bonus_item_room_countdown;
         }
     }
     /* Fill all special rooms now, regardless of whether this is a special

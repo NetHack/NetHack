@@ -1296,8 +1296,10 @@ mimics sometimes woke up and came out of hiding when they shouldn't have if
 Wizards no longer have a bonus to writing unknown spellbooks, but now
 	learn what spellbooks look like as they gain skill in their
 	spell schools (allowing a guaranteed write with enough skill)
-Starting inventory: magic markers are more likely (guaranteed for
+starting inventory: magic markers are more likely (guaranteed for
 	Wizards), but have fewer charges
+early dungeon (pre-Sokoban) generates extra useful survivability items
+
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
