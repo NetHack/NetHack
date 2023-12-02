@@ -1,4 +1,4 @@
-/* NetHack 3.7	muse.c	$NHDT-Date: 1654972707 2022/06/11 18:38:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.164 $ */
+/* NetHack 3.7	muse.c	$NHDT-Date: 1701557157 2023/12/02 22:45:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -22,6 +22,7 @@ static void mquaffmsg(struct monst *, struct obj *);
 static boolean m_use_healing(struct monst *);
 static boolean m_sees_sleepy_soldier(struct monst *);
 static void m_tele(struct monst *, boolean, boolean, int);
+static void reveal_trap(struct trap *, boolean);
 static boolean linedup_chk_corpse(coordxy, coordxy);
 static void m_use_undead_turning(struct monst *, struct obj *);
 static boolean hero_behind_chokepoint(struct monst *);
@@ -382,9 +383,18 @@ m_tele(
         if (vismon)
             pline("%s seems disoriented for a moment.", Monnam(mtmp));
     } else {
-        if (oseen && how)
-            makeknown(how);
-        (void) rloc(mtmp, RLOC_MSG);
+        /* teleport monster 'mtmp' */
+        if (how) {
+            /* teleporation has been triggered by an object */
+            if (oseen)
+                makeknown(how);
+            (void) rloc(mtmp, RLOC_MSG);
+        } else {
+            /* monster is voluntarily entering a teleporation trap; use the
+               trap instead of rloc() in case it sends 'victim' to a vault */
+            mtmp->mx = gt.trapx, mtmp->my = gt.trapy;
+            (void) mintrap(mtmp, FORCETRAP);
+        }
     }
 }
 
@@ -699,6 +709,24 @@ find_defensive(struct monst *mtmp, boolean tryescape)
 #undef nomore
 }
 
+/* when a monster deliberately enters a trap, make sure the spot becomes
+   accessible (trap doors and teleporters inside niches are located at
+   secret corridor locations; convert such into normal corridor even if
+   hero doesn't see it happen) */
+static void
+reveal_trap(struct trap *t, boolean seeit)
+{
+    struct rm *lev = &levl[t->tx][t->ty];
+
+    if (lev->typ == SCORR) {
+        lev->typ = CORR, lev->flags = 0; /* set_levltyp(,,CORR) */
+        if (seeit)
+            unblock_point(t->tx, t->ty);
+    }
+    if (seeit)
+        seetrap(t);
+}
+
 /* Perform a defensive action for a monster.  Must be called immediately
  * after find_defensive().  Return values are 0: did something, 1: died,
  * 2: did something and can't attack again (i.e. teleported).
@@ -709,7 +737,7 @@ use_defensive(struct monst *mtmp)
     int i, fleetim;
     struct obj *otmp = gm.m.defensive;
     boolean vis, vismon, oseen;
-    const char *Mnam;
+    struct trap *t;
     stairway *stway;
 
     if ((i = precheck(mtmp, otmp)) != 0)
@@ -813,9 +841,7 @@ use_defensive(struct monst *mtmp)
         obfree(otmp, (struct obj *) 0);
         return 2;
     }
-    case MUSE_WAN_DIGGING: {
-        struct trap *ttmp;
-
+    case MUSE_WAN_DIGGING:
         m_flee(mtmp);
         mzapwand(mtmp, otmp, FALSE);
         if (oseen)
@@ -831,7 +857,7 @@ use_defensive(struct monst *mtmp)
             /* can't dig further if there's already a pit (or other trap)
                here, or if pit creation fails for some reason */
             if (t_at(mtmp->mx, mtmp->my)
-                || !(ttmp = maketrap(mtmp->mx, mtmp->my, PIT))) {
+                || !(t = maketrap(mtmp->mx, mtmp->my, PIT))) {
                 if (vismon) {
                     pline_The("%s here is too hard to dig in.",
                               surface(mtmp->mx, mtmp->my));
@@ -840,16 +866,16 @@ use_defensive(struct monst *mtmp)
             }
             /* pit creation succeeded */
             if (vis) {
-                seetrap(ttmp);
+                seetrap(t);
                 pline("%s has made a pit in the %s.", Monnam(mtmp),
                       surface(mtmp->mx, mtmp->my));
             }
             return (mintrap(mtmp, FORCEBUNGLE) == Trap_Killed_Mon) ? 1 : 2;
         }
-        ttmp = maketrap(mtmp->mx, mtmp->my, HOLE);
-        if (!ttmp)
+        t = maketrap(mtmp->mx, mtmp->my, HOLE);
+        if (!t)
             return 2;
-        seetrap(ttmp);
+        seetrap(t);
         if (vis) {
             pline("%s has made a hole in the %s.", Monnam(mtmp),
                   surface(mtmp->mx, mtmp->my));
@@ -864,7 +890,6 @@ use_defensive(struct monst *mtmp)
         migrate_to_level(mtmp, ledger_no(&u.uz) + 1, MIGR_RANDOM,
                          (coord *) 0);
         return 2;
-    }
     case MUSE_WAN_UNDEAD_TURNING:
         gz.zap_oseen = oseen;
         mzapwand(mtmp, otmp, FALSE);
@@ -932,19 +957,14 @@ use_defensive(struct monst *mtmp)
         if (Is_botlevel(&u.uz))
             return 0;
         m_flee(mtmp);
+        t = t_at(gt.trapx, gt.trapy);
         if (vis) {
-            struct trap *t = t_at(gt.trapx, gt.trapy);
-
-            Mnam = Monnam(mtmp);
-            pline("%s %s into a %s!", Mnam,
+            pline("%s %s into a %s!", Monnam(mtmp),
                   vtense(fakename[0], locomotion(mtmp->data, "jump")),
-                  (t->ttyp == TRAPDOOR) ? "trap door" : "hole");
-            if (levl[gt.trapx][gt.trapy].typ == SCORR) {
-                levl[gt.trapx][gt.trapy].typ = CORR;
-                unblock_point(gt.trapx, gt.trapy);
-            }
-            seetrap(t_at(gt.trapx, gt.trapy));
+                  trapname(t->ttyp, FALSE));
         }
+        /* if trap was in a concealed niche, it's no longer concealed */
+        reveal_trap(t, vis);
 
         /*  don't use rloc_to() because worm tails must "move" */
         remove_monster(mtmp->mx, mtmp->my);
@@ -1050,12 +1070,14 @@ use_defensive(struct monst *mtmp)
         return 2;
     case MUSE_TELEPORT_TRAP:
         m_flee(mtmp);
+        t = t_at(gt.trapx, gt.trapy);
         if (vis) {
-            Mnam = Monnam(mtmp);
-            pline("%s %s onto a teleport trap!", Mnam,
-                  vtense(fakename[0], locomotion(mtmp->data, "jump")));
-            seetrap(t_at(gt.trapx, gt.trapy));
+            pline("%s %s onto a %s!", Monnam(mtmp),
+                  vtense(fakename[0], locomotion(mtmp->data, "jump")),
+                  trapname(t->ttyp, FALSE));
         }
+        /* if trap was in a concealed niche, it's no longer concealed */
+        reveal_trap(t, vis);
         /*  don't use rloc_to() because worm tails must "move" */
         remove_monster(mtmp->mx, mtmp->my);
         newsym(mtmp->mx, mtmp->my); /* update old location */
@@ -2323,9 +2345,9 @@ use_misc(struct monst *mtmp)
         if (vis || vistrapspot)
             seetrap(t);
         if (vismon || vistrapspot) {
-            pline("%s deliberately %s onto a %s trap!", Some_Monnam(mtmp),
+            pline("%s deliberately %s onto a %s!", Some_Monnam(mtmp),
                   vtense(fakename[0], locomotion(mtmp->data, "jump")),
-                  t->tseen ? "polymorph" : "hidden");
+                  t->tseen ? trapname(t->ttyp, FALSE) : "hidden trap");
             /* note: if mtmp is unseen because it is invisible, its new
                shape will also be invisible and could produce "Its armor
                falls off" messages during the transformation; those make
