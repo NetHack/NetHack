@@ -1387,8 +1387,9 @@ postmov(
                     if (mb_trapped(mtmp, canseeit))
                         return MMOVE_DIED;
                 } else {
-                    if (!Deaf)
+                    if (!Deaf) {
                         Soundeffect(se_door_unlock_and_open, 50);
+                    }
                     if (flags.verbose) {
                         if (canseeit && canspotmon(mtmp)) {
                             pline("%s unlocks and opens a door.",
@@ -1406,8 +1407,9 @@ postmov(
                     if (mb_trapped(mtmp, canseeit))
                         return MMOVE_DIED;
                 } else {
-                    if (!Deaf)
+                    if (!Deaf) {
                         Soundeffect(se_door_open, 100);
+                    }
                     if (flags.verbose) {
                         if (canseeit && canspotmon(mtmp)) {
                             pline("%s opens a door.", Monnam(mtmp));
@@ -1431,8 +1433,9 @@ postmov(
                     if (mb_trapped(mtmp, canseeit))
                         return MMOVE_DIED;
                 } else {
-                    if (!Deaf)
+                    if (!Deaf) {
                         Soundeffect(se_door_crash_open, 50);
+                    }
                     if (flags.verbose) {
                         if (canseeit && canspotmon(mtmp)) {
                             pline("%s smashes down a door.", Monnam(mtmp));
