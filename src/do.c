@@ -310,7 +310,13 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
            30% for blessed potions; if you have handled the object
            (i.e. it is or was yours), these odds are adjusted by Luck
            (each Luck point affects them by 2%). Artifact potions
-           would not be affected, if any existed. */
+           would not be affected, if any existed.
+
+           Oil is not affected because its boiling point (and flash
+           point) are higher than that of water. For example, whale
+           oil, one of the substances traditionally used in oil lamps,
+           can survive over 100 degrees Centigrade more heat than
+           water can.*/
         if (cansee(x,y)) {
             /* unconditional "ground" is safe as this only runs for
                room and corridor tiles */
@@ -320,6 +326,7 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
 
         int survival_chance = obj->blessed ? 70 : 50;
         if (obj->invlet) survival_chance += Luck * 2;
+        if (obj->otyp == POT_OIL) survival_chance = 100;
 
         if (!obj_resists(obj, survival_chance, 100)) {
             if (cansee(x,y)) {
