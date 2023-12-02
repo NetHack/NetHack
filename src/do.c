@@ -303,6 +303,34 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
     } else if (gc.context.mon_moving && IS_ALTAR(levl[x][y].typ)
                && cansee(x,y)) {
         doaltarobj(obj);
+    } else if (obj->oclass == POTION_CLASS && gl.level.flags.temperature > 0 &&
+               (levl[x][y].typ == ROOM || levl[x][y].typ == CORR)) {
+        /* Potions are sometimes destroyed when landing on very hot
+           ground. The basic odds are 50% for nonblessed potions and
+           30% for blessed potions; if you have handled the object
+           (i.e. it is or was yours), these odds are adjusted by Luck
+           (each Luck point affects them by 2%). Artifact potions
+           would not be affected, if any existed. */
+        if (cansee(x,y)) {
+            /* unconditional "ground" is safe as this only runs for
+               room and corridor tiles */
+            pline("%s up as %s the hot ground.", Tobjnam(obj, "heat"),
+                  is_plural(obj) ? "they hit" : "it hits");
+        }
+
+        int survival_chance = obj->blessed ? 70 : 50;
+        if (obj->invlet) survival_chance += Luck * 2;
+
+        if (!obj_resists(obj, survival_chance, 100)) {
+            if (cansee(x,y)) {
+                pline("%s from the heat!",
+                      is_plural(obj) ? "They shatter" : "It shatters");
+            } else {
+                You_hear("a shattering noise.");
+            }
+            breakobj(obj, x, y, FALSE, FALSE);
+            res = TRUE;
+        }
     }
 
     gb.bhitpos = save_bhitpos;

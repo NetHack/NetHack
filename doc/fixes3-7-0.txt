@@ -2378,6 +2378,7 @@ allow the ')', '[', '(', '=', '"', and '*' commands to be preceded by the 'm'
 	prefix to force a menu where the player can pick an item and choose
 	a context-sensitive item action for it; some give a menu even without
 	the prefix and for those, same item selection and action can be used
+hot ground (Gehennom / Plane of Fire) often destroys dropped potions
 
 
 Platform- and/or Interface-Specific New Features
