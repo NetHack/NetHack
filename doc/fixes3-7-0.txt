@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1308 $ $NHDT-Date: 1700869710 2023/11/24 23:48:30 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1317 $ $NHDT-Date: 1701500708 2023/12/02 07:05:08 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1767,6 +1767,7 @@ when a tethered aklys gets caught in a web, make sure it doesn't return
 add 'X' as a potential context-sensitive item-action for uwep and uswapwep
 monsters weren't noticing hero's possession or lack of magic resistance when
 	hero getting zapped by a wand of striking was or wasn't resisted
+discard monsters' observations about hero's resistances when saving bones
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

@@ -1,4 +1,4 @@
-/* NetHack 3.7	bones.c	$NHDT-Date: 1654931350 2022/06/11 07:09:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.119 $ */
+/* NetHack 3.7	bones.c	$NHDT-Date: 1701500709 2023/12/02 07:05:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.129 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -453,7 +453,8 @@ savebones(int how, time_t when, struct obj *corpse)
         struct obj *otmp;
 
         /* embed your possessions in your statue */
-        otmp = mk_named_object(STATUE, &mons[u.umonnum], u.ux, u.uy, gp.plname);
+        otmp = mk_named_object(STATUE, &mons[u.umonnum], u.ux, u.uy,
+                               gp.plname);
 
         drop_upon_death((struct monst *) 0, otmp, u.ux, u.uy);
         if (!otmp)
@@ -507,6 +508,8 @@ savebones(int how, time_t when, struct obj *corpse)
         mtmp->mlstmv = 0L;
         if (mtmp->mtame)
             mtmp->mtame = mtmp->mpeaceful = 0;
+        /* observations about the current hero won't apply to future game */
+        mtmp->seen_resistance = M_SEEN_NOTHING;
     }
     for (ttmp = gf.ftrap; ttmp; ttmp = ttmp->ntrap) {
         ttmp->madeby_u = 0;
