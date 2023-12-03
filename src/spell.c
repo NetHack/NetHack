@@ -851,13 +851,13 @@ skill_based_spellbook_id(void)
         int known_up_to_level;
         switch (P_SKILL(skill)) {
         case P_BASIC:
-            known_up_to_level = 2; break;
+            known_up_to_level = 3; break;
         case P_SKILLED:
-            known_up_to_level = 4; break;
+            known_up_to_level = 5; break;
         case P_EXPERT: case P_MASTER: case P_GRAND_MASTER:
             known_up_to_level = 7; break;
         case P_UNSKILLED: default:
-                known_up_to_level = 0; break;
+                known_up_to_level = 1; break;
         }
 
         if (objects[booktype].oc_level <= known_up_to_level)
