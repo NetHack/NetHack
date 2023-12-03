@@ -938,6 +938,7 @@ fill_ordinary_room(struct mkroom *croom, boolean bonus_items)
             supply_chest->olocked = !!(rn2(6));
 
             int tryct = 0;
+            boolean cursed;
             do {
                 int otyp;
                 /* 50% this is a potion of healing */
@@ -960,6 +961,7 @@ fill_ordinary_room(struct mkroom *croom, boolean bonus_items)
                 otmp = mksobj(otyp, TRUE, FALSE);
                 if (otyp == POT_HEALING && rn2(2))
                     otmp->quan = 2;
+                cursed = otmp->cursed;
                 add_to_container(supply_chest, otmp);
 
                 ++tryct;
@@ -971,7 +973,7 @@ fill_ordinary_room(struct mkroom *croom, boolean bonus_items)
                    probability of more; if we generate a cursed item, it's
                    added to the supply chest but we reroll for a noncursed
                    item and add that too */
-            } while (otmp->cursed || !rn2(5));
+            } while (cursed || !rn2(5));
 
             /* maybe put a random item into the supply chest, biased
                slightly towards low-level spellbooks; avoid tools
