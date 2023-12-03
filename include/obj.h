@@ -137,15 +137,16 @@ struct obj {
                           * and for horn of plenty (when tipping) even though
                           * they have no locks */
     Bitfield(pickup_prev, 1); /* was picked up previously */
+    Bitfield(ghostly, 1); /* it just got placed into a bones file */
 #if 0
     /* not implemented */
     Bitfield(tknown, 1); /* trap status known for chests */
     Bitfield(eknown, 1); /* effect known for wands zapped or rings worn when
                           * not seen yet after being picked up while blind
                           * [maybe for remaining stack of used potion too] */
-    /* 1 free bit */
+    /* 0 free bits */
 #else
-    /* 3 free bits */
+    /* 2 free bits */
 #endif
 
     int corpsenm;         /* type of corpse is mons[corpsenm] */

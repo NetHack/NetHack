@@ -1790,6 +1790,8 @@ pickup_object(
     if (uwep && uwep == obj)
         gm.mrg_to_wielded = TRUE;
     pickup_prinv(obj, count, "lifting");
+    if (obj->ghostly)
+        fix_ghostly_obj(obj);
     gm.mrg_to_wielded = FALSE;
     return 1;
 }

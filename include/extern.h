@@ -174,6 +174,7 @@ extern boolean can_make_bones(void);
 extern void savebones(int, time_t, struct obj *);
 extern int getbones(void);
 extern boolean bones_include_name(const char *);
+extern void fix_ghostly_obj(struct obj *);
 
 /* ### botl.c ### */
 
