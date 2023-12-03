@@ -1614,7 +1614,8 @@ docrt_flags(int refresh_flags)
     coordxy x, y;
     register struct rm *lev;
     boolean maponly = (refresh_flags & docrtMapOnly) != 0,
-            redrawonly = (refresh_flags & docrtRefresh) != 0;
+            redrawonly = (refresh_flags & docrtRefresh) != 0,
+            nocls = (refresh_flags & docrtNocls) != 0;
 
     if (!u.ux || gp.program_state.in_docrt)
         return; /* display isn't ready yet */
@@ -1646,7 +1647,8 @@ docrt_flags(int refresh_flags)
      *      + fills the physical screen with the symbol for rock
      *      + clears the glyph buffer
      */
-    cls();
+    if (!nocls)
+        cls();
 
     /* display memory */
     for (x = 1; x < COLNO; x++) {

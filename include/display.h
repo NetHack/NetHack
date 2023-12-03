@@ -1039,6 +1039,7 @@ enum docrt_flags_bits {
     docrtRefresh = 1, /* redraw_map(), draw what we think the map shows */
     docrtMapOnly = 2, /* ORed with Recalc or Refresh; draw the map but not
                        * status or perminv */
+    docrtNocls = 4,
 };
 
 typedef struct {

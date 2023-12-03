@@ -8666,7 +8666,8 @@ doset_simple_menu(void)
 int
 doset_simple(void)
 {
-    int pickedone = 0;
+    int pickedone = 0,
+        opt_crt_flags = docrtNocls;
 
     if (iflags.menu_requested) {
         /* doset() checks for 'm' and calls doset_simple(); clear the
@@ -8690,14 +8691,18 @@ doset_simple(void)
         if (go.opt_need_redraw) {
             check_gold_symbol();
             reglyph_darkroom();
-            docrt();
+            docrt_flags(opt_crt_flags);
             flush_screen(1);
         }
         if (go.opt_need_promptstyle)
             adjust_menu_promptstyle(WIN_INVEN, &iflags.menu_headings);
+/*
+ *      I don't think the status window requires updating between
+ *      simplemenu iterations.
         if (gc.context.botl || gc.context.botlx) {
             bot();
         }
+  */
     } while (pickedone > 0);
     give_opt_msg = TRUE;
     return ECMD_OK;
