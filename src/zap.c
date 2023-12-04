@@ -153,7 +153,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
     boolean reveal_invis = FALSE, learn_it = FALSE;
     boolean dbldam = Role_if(PM_KNIGHT) && u.uhave.questart;
     boolean skilled_spell, helpful_gesture = FALSE;
-    int dmg, otyp = otmp->otyp;
+    int dmg, otyp = otmp->otyp; /* otmp is not NULL */
     const char *zap_type_text = "spell";
     struct obj *obj;
     boolean disguised_mimic = (mtmp->data->mlet == S_MIMIC
