@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.c	$NHDT-Date: 1700385095 2023/11/19 09:11:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.365 $ */
+/* NetHack 3.7	wintty.c	$NHDT-Date: 1701723543 2023/12/04 20:59:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.369 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -233,9 +233,9 @@ static const char *compress_str(const char *);
 #ifndef STATUS_HILITES
 static void tty_putsym(winid, int, int, char);
 #endif
-#ifdef STATUS_HILITES
 #define MAX_STATUS_ROWS 3
 #define StatusRows() ((iflags.wc2_statuslines <= 2) ? 2 : MAX_STATUS_ROWS)
+#ifdef STATUS_HILITES
 static boolean check_fields(boolean forcefields, int sz[MAX_STATUS_ROWS]);
 static void render_status(void);
 static void tty_putstatusfield(const char *, int, int);
@@ -516,7 +516,7 @@ tty_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
 
     /* options aren't processed yet so wc2_statuslines might be 0;
        make sure that it has a reasonable value during tty setup */
-    iflags.wc2_statuslines = (iflags.wc2_statuslines < 3) ? 2 : 3;
+    iflags.wc2_statuslines = StatusRows(); /* 2 or 3; 0 => 2 */
     /*
      *  Remember tty modes, to be restored on exit.
      *
@@ -596,7 +596,10 @@ tty_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
 void
 tty_preference_update(const char *pref)
 {
-    if (!strcmp(pref, "statuslines") && iflags.window_inited) {
+    boolean newstatuslines = (!strcmp(pref, "statuslines")
+                              && iflags.window_inited);
+
+    if (newstatuslines) {
         new_status_window();
         newclipping(u.ux, u.uy);
     }
@@ -616,6 +619,13 @@ tty_preference_update(const char *pref)
         && iflags.window_inited) {
         if (WIN_INVEN != WIN_ERR)
            tty_invent_box_glyph_init(wins[WIN_INVEN]);
+    }
+    /* if newstatuslines has been toggled between 2 and 3 or vice versa
+       then we want to reposition the perm_invent window to match */
+    if (newstatuslines && WIN_INVEN != WIN_ERR) {
+        perm_invent_toggled(TRUE);      /*TEMP?*/
+        tty_destroy_nhwindow(WIN_INVEN), WIN_INVEN = WIN_ERR;
+        perm_invent_toggled(FALSE);     /*TEMP?*/
     }
 #endif
     return;
@@ -2426,7 +2436,7 @@ tty_display_file(
 #endif
                 ) {
                 /* attempt to scroll text below map window if there's room */
-                wins[datawin]->offy = wins[WIN_STATUS]->offy + 3;
+                wins[datawin]->offy = wins[WIN_STATUS]->offy + StatusRows();
                 if ((int) wins[datawin]->offy + 12 > (int) ttyDisplay->rows)
                     wins[datawin]->offy = 0;
             }
@@ -2816,7 +2826,7 @@ tty_ctrl_nhwindow(winid window UNUSED, int request, win_request_info *wri)
         wri->tocore = zero_tocore;
         tty_ok = assesstty(ttyinvmode, &offx, &offy, &rows, &cols, &maxcol,
                            &minrow, &maxrow);
-        wri->tocore.needrows = (int) (minrow + 1 + ROWNO + 3);
+        wri->tocore.needrows = (int) (minrow + 1 + ROWNO + StatusRows());
         wri->tocore.needcols = (int) tty_perminv_mincol;
         wri->tocore.haverows = (int) ttyDisplay->rows;
         wri->tocore.havecols = (int) ttyDisplay->cols;
@@ -2890,7 +2900,7 @@ ttyinv_create_window(int newid, struct WinDesc *newwin)
         pline("%s.", "tty perm_invent could not be enabled");
         pline("tty perm_invent needs a terminal that is at least %dx%d, "
               "yours is %dx%d.",
-              (int) (minrow + 1 + ROWNO + 3), tty_perminv_mincol,
+              (int) (minrow + 1 + ROWNO + StatusRows()), tty_perminv_mincol,
               ttyDisplay->rows, ttyDisplay->cols);
         tty_wait_synch();
         set_option_mod_status("perm_invent", set_gameview);
@@ -2901,7 +2911,7 @@ ttyinv_create_window(int newid, struct WinDesc *newwin)
     /*
      * Terminal/window/screen is big enough.
      */
-    newwin->maxrow = minrow;
+    /*newwin->maxrow = minrow;*/
     newwin->maxcol = newwin->cols;
     /* establish the borders */
     bordercol[border_left] = 0;
@@ -2995,9 +3005,12 @@ ttyinv_add_menu(
     char invbuf[BUFSZ];
     const char *text;
     boolean show_gold = (ttyinvmode & InvShowGold) != 0,
+            inuse_only = (ttyinvmode & InvInUse) != 0,
             ignore = FALSE;
     int row, side, slot,
-        rows_per_side = (!show_gold ? 26 : 27);
+        rows_per_side = (inuse_only ? (cw->maxrow - 2)
+                         : !show_gold ? 26
+                           : 27);
 
     if (!gp.program_state.in_moveloop)
         return;
@@ -3210,27 +3223,32 @@ assesstty(
     short *offx, short *offy, long *rows, long *cols,
     long *maxcol, long *minrow, long *maxrow)
 {
-    boolean show_gold = (invmode & InvShowGold) != 0,
-            inuse_only = (invmode & InvInUse) != 0;
+    boolean inuse_only = (invmode & InvInUse) != 0,
+            show_gold = (invmode & InvShowGold) != 0 && !inuse_only;
 
     *offx = 0;
     /* topline + map rows + status lines */
-    *offy = 1 + ROWNO + 3; /* 3: + 2 + (iflags.wc2_statuslines > 2) */
-    *rows = (ttyDisplay->rows - (*offy));
+    *offy = 1 + ROWNO + StatusRows(); /* 1 + 21 + (2 or 3) */
+    *rows = (ttyDisplay->rows - *offy);
     *cols = ttyDisplay->cols;
     *minrow = tty_perminv_minrow;
     if (show_gold)
         *minrow += 1;
+#define SMALL_INUSE_WINDOW
+#ifdef SMALL_INUSE_WINDOW
+#undef SMALL_INUSE_WINDOW
+    /* simplify testing by not requiring a small font to have enough room */
+    if (inuse_only)
+        *minrow = 1 + 8 + 1;
+#else
     /* "normal" max for items in use would be 3 weapon + 7 armor + 4
-       accessories == 14, but being punished and picking up the ball will
-       add 1, and some quest artifacts have an an #invoke property that's
-       tracked via obj->owornmask so could add more; also, lit lamps/candles
-       and attached leashes are included; if hero ends up with more than
-       15 in-use items, some will be left out */
+       accessories == 14, but lit lamps/candles and attached leashes are
+       also included; if hero ends up with more than 15 in-use items,
+       some will be left out */
     if (inuse_only)
         *minrow = 1 + 15 + 1; /* top border + 15 lines + bottom border */
-    *maxrow = *minrow; /* FIXME: inuse_only should be able to use more
-                        * than the minimum if extra lines are available */
+#endif
+    *maxrow = *rows;
     *maxcol = *cols;
     return !(*rows < *minrow || *cols < tty_perminv_mincol);
 }
