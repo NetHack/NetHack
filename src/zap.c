@@ -163,7 +163,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
         reveal_invis = FALSE;
 
     gn.notonhead = (mtmp->mx != gb.bhitpos.x || mtmp->my != gb.bhitpos.y);
-    skilled_spell = (otmp && otmp->oclass == SPBOOK_CLASS && otmp->blessed);
+    skilled_spell = (otmp->oclass == SPBOOK_CLASS && otmp->blessed);
 
     switch (otyp) {
     case WAN_STRIKING:
