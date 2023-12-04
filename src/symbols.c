@@ -764,25 +764,43 @@ boolean
 parsesymbols(register char *opts, int which_set)
 {
     int val;
-    char *op, *symname, *strval;
+    unsigned i;
+    char *symname, *strval, *ch = opts,
+         *first_unquoted_comma = 0, *first_unquoted_colon = 0;
     const struct symparse *symp;
     boolean is_glyph = FALSE;
 
-    /*
-     * FIXME:
-     *  The parsing here (and next) yields incorrect results for
-     *  "S_sample=','" or "S_sample=':'".
-     */
+    /* are there any commas or colons that aren't quoted? */
+    for (i = 0; i < strlen(opts); ++i) {
+        char *prech, *postch;
 
-    if ((op = strchr(opts, ',')) != 0) {
-        *op++ = '\0';
-        if (!parsesymbols(op, which_set))
+        ch++; /* we never want to match on the first char, so this is ok */
+        prech = ch - 1;
+        postch = ch + 1;
+        if (*ch == ',') {
+            if (*prech == '\'' && *postch == '\'')
+                continue;
+            if (*prech == '\\')
+                continue;
+        }
+        if (*ch == ':') {
+            if (*prech == '\'' && *postch == '\'')
+                continue;
+        }
+        if (*ch == ',' && !first_unquoted_comma)
+            first_unquoted_comma = ch;
+        if (*ch == ':' && !first_unquoted_colon)
+            first_unquoted_colon = ch;
+    }
+    if (first_unquoted_comma != 0) {
+        *first_unquoted_comma++ = '\0';
+        if (!parsesymbols(first_unquoted_comma, which_set))
             return FALSE;
     }
 
     /* S_sample:string */
     symname = opts;
-    strval = strchr(opts, ':');
+    strval = first_unquoted_colon;
     if (!strval)
         strval = strchr(opts, '=');
     if (!strval)

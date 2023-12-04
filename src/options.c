@@ -6491,6 +6491,8 @@ escapes(const char *cp, /* might be 'tp', updating in place */
             case 'r':
                 cval = '\r';
                 break;
+            case ',':
+                cval = ',';
             default:
                 cval = *cp;
             }
