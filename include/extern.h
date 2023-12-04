@@ -2921,7 +2921,6 @@ extern void settrack(void);
 extern coord *gettrack(coordxy, coordxy);
 extern void save_track(NHFILE *);
 extern void rest_track(NHFILE *);
-extern void printtrack(void);
 
 /* ### trap.c ### */
 
