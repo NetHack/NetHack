@@ -6191,6 +6191,8 @@ lspo_region(lua_State *L)
             selection_do_grow(sel, W_ANY);
         selection_iterate(sel, sel_set_lit, (genericptr_t) &rlit);
 
+        selection_free(sel, TRUE);
+
         /* TODO: skip the rest of this function? */
         return 0;
     } else {
