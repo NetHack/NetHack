@@ -1406,7 +1406,7 @@ doname_base(
                     tethered ? "tethered " : "", /* aklys */
                     /* avoid "tethered wielded in right hand" for twoweapon */
                     (twoweap_primary && !tethered) ? "wielded" : "weapon",
-                    URIGHTY ? "right " : "left ",
+                    bimanual(obj) ? "" : URIGHTY ? "right " : "left ",
 /*
                     (twoweap_primary && URIGHTY)
                         ? "right "
