@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1683710630 2023/05/10 09:23:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1701677864 2023/12/04 08:17:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -442,7 +442,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
        to access hero's saved gender-as-human/elf/&c rather than current */
     innategend = (Upolyd ? u.mfemale : flags.female) ? 1 : 0;
     role_titl = (innategend && gu.urole.name.f) ? gu.urole.name.f
-                                               : gu.urole.name.m;
+                                                : gu.urole.name.m;
     rank_titl = rank_of(u.ulevel, Role_switch, innategend);
 
     enlght_out(""); /* separator after title */
@@ -554,6 +554,13 @@ background_enlightenment(int unused_mode UNUSED, int final)
                 difalgn ? align_str(u.ualignbase[A_ORIGINAL]) : "");
         enlght_out(buf);
     }
+
+    /* "You are left-handed." won't work well if polymorphed into something
+       without hands; use "You are normally left-handed." in that situation */
+    Sprintf(buf, "%s%s-handed",
+            !strcmp(body_part(HANDED), "handed") ? "" : "normally ",
+            URIGHTY ? "right" : "left");
+    you_are(buf, "");
 
     /* As of 3.6.2: dungeon level, so that ^X really has all status info as
        claimed by the comment below; this reveals more information than
