@@ -1309,6 +1309,8 @@ if a monster fled from hero by intentionally jumping into a vault teleporter,
 	it would teleport randomly instead of into the vault, and if the
 	teleport trap's niche wasn't mapped yet, the trap would become mapped
 	but the spot would remain a secret corridor and not become accessible
+spellbooks weight 50 units but Book of the Dead only 20, and novels only 1;
+	the Book of the Dead has been changed to 50 and novels to 10
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

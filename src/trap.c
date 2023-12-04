@@ -4475,25 +4475,22 @@ water_damage(
             update_inventory();
         return ER_DAMAGED;
     } else if (obj->oclass == SPBOOK_CLASS) {
-        if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
-            /*
-             * FIXME?
-             *  This might be given when hero can't see or feel it.
-             *  The book can't be inside a container but it could get
-             *  dunked away from hero if laying on ice which melts.
-             */
-            pline("Steam rises from %s.", the(xname(obj)));
+        int otyp = obj->otyp;
+
+        if (otyp == SPE_BOOK_OF_THE_DEAD) {
+            coordxy ox = 0, oy = 0;
+
+            /* note: The Book of the Dead can't be contained or buried */
+            if (get_obj_location(obj, &ox, &oy, CONTAINED_TOO | BURIED_TOO))
+                obj->ox = ox, obj->oy = oy;
+            if (isok(ox, oy) && cansee(ox, oy))
+                pline("Steam rises from %s.", the(xname(obj)));
             return 0;
-        } else if (obj->otyp == SPE_BLANK_PAPER) {
+        } else if (otyp == SPE_BLANK_PAPER) {
             return 0;
         }
         if (in_invent)
             Your("%s %s.", ostr, vtense(ostr, "fade"));
-
-        if (obj->otyp == SPE_NOVEL) {
-            obj->novelidx = 0;
-            free_oname(obj);
-        }
 
         obj->otyp = SPE_BLANK_PAPER;
         /* same re-init as over-reading or polymorph; matters if it gets
@@ -4502,6 +4499,17 @@ water_damage(
         if (obj->spestudied)
             obj->spestudied = rn2(obj->spestudied);
         obj->dknown = 0;
+        /* blanking a novel is more involved than blanking a spellbook */
+        if (otyp == SPE_NOVEL) { /* old type */
+            obj->novelidx = 0; /* overloads corpsenm, not used for splbooks */
+            free_oname(obj);
+            /* novels weigh less than spellbooks; apparently blanking them
+               magically makes them become heavier */
+            do {
+                obj->owt = weight(obj);
+                obj = (obj->where == OBJ_CONTAINED) ? obj->ocontainer : 0;
+            } while (obj);
+        }
         if (in_invent)
             update_inventory();
         return ER_DAMAGED;
