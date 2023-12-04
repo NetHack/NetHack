@@ -1,4 +1,4 @@
-/* NetHack 3.7	o_init.c	$NHDT-Date: 1672829455 2023/01/04 10:50:55 $  $NHDT-Branch: naming-overflow-fix $:$NHDT-Revision: 1.68 $ */
+/* NetHack 3.7	o_init.c	$NHDT-Date: 1701720461 2023/12/04 20:07:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.79 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -398,7 +398,7 @@ restnames(NHFILE* nhfp)
         mread(nhfp->fd, (genericptr_t) gb.bases, sizeof gb.bases);
         mread(nhfp->fd, (genericptr_t) gd.disco, sizeof gd.disco);
         mread(nhfp->fd, (genericptr_t) objects,
-                sizeof(struct objclass) * NUM_OBJECTS);
+              NUM_OBJECTS * sizeof (struct objclass));
     }
     for (i = 0; i < NUM_OBJECTS; i++) {
         if (objects[i].oc_uname) {
@@ -691,7 +691,7 @@ dodiscovered(void) /* free after Robert Viduya */
     lootsort = (flags.discosort == 's');
     sortindx = strchr(disco_order_let, flags.discosort) - disco_order_let;
 
-    tmpwin = create_nhwindow(NHW_MENU);
+    tmpwin = create_nhwindow(NHW_TEXT);
     Sprintf(buf, "Discoveries, %s", disco_orders_descr[sortindx]);
     putstr(tmpwin, 0, buf);
     putstr(tmpwin, 0, "");
@@ -702,7 +702,7 @@ dodiscovered(void) /* free after Robert Viduya */
     for (i = dis = 0; i < SIZE(uniq_objs); i++)
         if (objects[uniq_objs[i]].oc_name_known) {
             if (!dis++)
-                add_menu_heading(tmpwin, "Unique items");
+                putstr(tmpwin, iflags.menu_headings.attr, "Unique items");
             ++uniq_ct;
             Sprintf(buf, "  %s", OBJ_NAME(objects[uniq_objs[i]]));
             putstr(tmpwin, 0, buf);
@@ -742,8 +742,8 @@ dodiscovered(void) /* free after Robert Viduya */
                     }
                     if (!alphabetized || alphabyclass) {
                         /* header for new class */
-                        add_menu_heading(tmpwin,
-                                         let_to_name(oclass, FALSE, FALSE));
+                        putstr(tmpwin, iflags.menu_headings.attr,
+                               let_to_name(oclass, FALSE, FALSE));
                         prev_class = oclass;
                     }
                 }
@@ -768,7 +768,7 @@ dodiscovered(void) /* free after Robert Viduya */
                classes, we normally don't need a header; but it we showed
                any unique items or any artifacts then we do need one */
             if ((uniq_ct || arti_ct) && alphabetized && !alphabyclass)
-                add_menu_heading(tmpwin, "Discovered items");
+                putstr(tmpwin, iflags.menu_headings.attr, "Discovered items");
             qsort(sorted_lines, sorted_ct, sizeof (char *), discovered_cmp);
             for (j = 0; j < sorted_ct; ++j) {
                 p = sorted_lines[j];
@@ -938,11 +938,12 @@ doclassdisco(void)
     /*
      * show discoveries for object class c
      */
-    tmpwin = create_nhwindow(NHW_MENU);
+    tmpwin = create_nhwindow(NHW_TEXT);
     ct = 0;
     switch (c) {
     case 'u':
-        add_menu_heading(tmpwin, upstart(strcpy(buf, unique_items)));
+        putstr(tmpwin, iflags.menu_headings.attr,
+               upstart(strcpy(buf, unique_items)));
         for (i = 0; i < SIZE(uniq_objs); i++)
             if (objects[uniq_objs[i]].oc_name_known) {
                 ++ct;
