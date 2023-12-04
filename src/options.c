@@ -4886,7 +4886,9 @@ pfxfn_IBM_(int optidx UNUSED, int req, boolean negated UNUSED,
  */
 
 static int
-optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_boolean(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -5011,6 +5013,7 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
         case opt_fixinv:
         case opt_sortpack:
         case opt_implicit_uncursed:
+        case opt_wizweight:
             if (!flags.invlet_constant)
                 reassign();
             update_inventory();
@@ -5076,7 +5079,6 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
 #endif
             go.opt_need_redraw = TRUE;
             go.opt_need_glyph_reset = TRUE;
-            go.opt_need_promptstyle = TRUE;
             break;
         case opt_menucolors:
         case opt_guicolor:
