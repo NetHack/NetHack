@@ -1787,8 +1787,6 @@ goto_level(
     if ((mtmp = m_at(u.ux, u.uy)) != 0)
         u_collide_m(mtmp);
 
-    initrack();
-
     /* initial movement of bubbles just before vision_recalc */
     if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
         movebubbles();

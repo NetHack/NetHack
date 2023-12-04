@@ -77,6 +77,7 @@ moveloop_preamble(boolean resuming)
         /* give hero initial movement points; new game only--for restore,
            pending movement points were included in the save file */
         u.umovement = NORMAL_SPEED;
+        initrack();
     }
     gc.context.botlx = TRUE; /* for STATUS_HILITES */
     if (resuming) { /* restoring old game */
@@ -89,7 +90,6 @@ moveloop_preamble(boolean resuming)
         gd.defer_see_monsters = FALSE;
         see_monsters();
     }
-    initrack();
 
     u.uz0.dlevel = u.uz.dlevel;
     gc.context.move = 0;

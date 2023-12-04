@@ -502,7 +502,6 @@ teleds(coordxy nux, coordxy nuy, int teleds_flags)
     fill_pit(u.ux0, u.uy0);
     if (ball_active && uchain && uchain->where == OBJ_FREE)
         placebc(); /* put back the ball&chain if they were taken off map */
-    initrack(); /* teleports mess up tracking monsters without this */
     update_player_regions();
     /*
      *  Make sure the hero disappears from the old location.  This will

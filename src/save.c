@@ -554,6 +554,7 @@ savelev_core(NHFILE *nhfp, xint8 lev)
     save_regions(nhfp);
     save_bubbles(nhfp, lev); /* for water and air */
     save_exclusions(nhfp);
+    save_track(nhfp);
 
     if (nhfp->mode != FREEING) {
         if (nhfp->structlevel)

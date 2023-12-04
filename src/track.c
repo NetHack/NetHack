@@ -6,7 +6,7 @@
 
 #include "hack.h"
 
-#define UTSZ 50
+#define UTSZ 100
 
 static NEARDATA int utcnt, utpnt;
 static NEARDATA coord utrack[UTSZ];
@@ -15,6 +15,7 @@ void
 initrack(void)
 {
     utcnt = utpnt = 0;
+    (void) memset((genericptr_t) &utrack, 0, sizeof(utrack));
 }
 
 /* add to track */
@@ -30,6 +31,8 @@ settrack(void)
     utpnt++;
 }
 
+/* get a track coord on or next to x,y and last tracked by hero,
+   returns null if no such track */
 coord *
 gettrack(coordxy x, coordxy y)
 {
@@ -43,20 +46,48 @@ gettrack(coordxy x, coordxy y)
             tc--;
         ndist = distmin(x, y, tc->x, tc->y);
 
-        /* if far away, skip track entries til we're closer */
-        if (ndist > 2) {
-            ndist -= 2; /* be careful due to extra decrement at top of loop */
-            cnt -= ndist;
-            if (cnt <= 0)
-                return (coord *) 0; /* too far away, no matches possible */
-            if (tc < &utrack[ndist])
-                tc += (UTSZ - ndist);
-            else
-                tc -= ndist;
-        } else if (ndist <= 1)
+        if (ndist <= 1)
             return (ndist ? tc : 0);
     }
     return (coord *) 0;
+}
+
+/* save the hero tracking info */
+void
+save_track(NHFILE *nhfp)
+{
+    if (perform_bwrite(nhfp)) {
+        if (nhfp->structlevel) {
+            int i;
+
+            bwrite(nhfp->fd, (genericptr_t) &utcnt, sizeof utcnt);
+            bwrite(nhfp->fd, (genericptr_t) &utpnt, sizeof utpnt);
+            for (i = 0; i < utcnt; i++) {
+                bwrite(nhfp->fd, (genericptr_t) &utrack[i].x, sizeof utrack[i].x);
+                bwrite(nhfp->fd, (genericptr_t) &utrack[i].y, sizeof utrack[i].y);
+            }
+        }
+    }
+    if (release_data(nhfp))
+        initrack();
+}
+
+/* restore the hero tracking info */
+void
+rest_track(NHFILE *nhfp)
+{
+    if (nhfp->structlevel) {
+        int i;
+
+        mread(nhfp->fd, (genericptr_t) &utcnt, sizeof utcnt);
+        mread(nhfp->fd, (genericptr_t) &utpnt, sizeof utpnt);
+        if (utcnt > UTSZ || utpnt > UTSZ)
+            panic("rest_track: impossible pt counts");
+        for (i = 0; i < utcnt; i++) {
+            mread(nhfp->fd, (genericptr_t) &utrack[i].x, sizeof utrack[i].x);
+            mread(nhfp->fd, (genericptr_t) &utrack[i].y, sizeof utrack[i].y);
+        }
+    }
 }
 
 /*track.c*/

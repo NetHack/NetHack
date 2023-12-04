@@ -1311,6 +1311,7 @@ if a monster fled from hero by intentionally jumping into a vault teleporter,
 	but the spot would remain a secret corridor and not become accessible
 spellbooks weight 50 units but Book of the Dead only 20, and novels only 1;
 	the Book of the Dead has been changed to 50 and novels to 10
+save and restore hero tracks, increase track length
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
