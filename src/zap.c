@@ -4011,10 +4011,9 @@ boomhit(struct obj *obj, coordxy dx, coordxy dy)
     register int i, ct;
     int boom; /* showsym[] index  */
     struct monst *mtmp;
-    boolean counterclockwise = URIGHTY; /* URIGHTY = right-handed throw
-                                           else ULEFTY = left-handed throw */
+    boolean counterclockwise = URIGHTY; /* ULEFTY => clockwise */
 
-    /* counterclockwise traversal patterns:
+    /* counterclockwise traversal patterns, from @ to 1 then on through to 9
      *  ..........................54.................................
      *  ..................43.....6..3....765.........................
      *  ..........32.....5..2...7...2...8...4....87..................

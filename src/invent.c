@@ -132,8 +132,8 @@ inuse_classify(Loot *sort_item, struct obj *obj)
     /* "Accessories" */
     ++altclass; /* 4 */
     USE_RATING(w_mask & WORN_BLINDF);
-    USE_RATING(w_mask & LEFT_RING);
-    USE_RATING(w_mask & RIGHT_RING);
+    USE_RATING(w_mask & (ULEFTY ? RIGHT_RING : LEFT_RING)); /* off hand */
+    USE_RATING(w_mask & (URIGHTY ? RIGHT_RING : LEFT_RING)); /* main hand */
     USE_RATING(w_mask & WORN_AMUL);
 
     /* if we get here, the USE_RATING() checks failed to find a match */
