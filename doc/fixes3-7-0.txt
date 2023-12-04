@@ -1305,10 +1305,14 @@ alchemy may affect only a portion of the dipped potions if a large
 monster kills can no longer deathdrop comestibles (other than the
 	monster's corpse) unless the monster collects food or
 	generates with food
+about 10% of the heroes will now be left-handed; track the handedness of the
+	hero in the 'you' struct
 if a monster fled from hero by intentionally jumping into a vault teleporter,
 	it would teleport randomly instead of into the vault, and if the
 	teleport trap's niche wasn't mapped yet, the trap would become mapped
 	but the spot would remain a secret corridor and not become accessible
+boomerang travels in a clockwise arc when thrown by a left-handed hero and in
+	a counterclockwise arc when thrown by a right-handed hero
 spellbooks weight 50 units but Book of the Dead only 20, and novels only 1;
 	the Book of the Dead has been changed to 50 and novels to 10
 save and restore hero tracks, increase track length
