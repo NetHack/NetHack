@@ -2142,12 +2142,13 @@ static void
 slippery_ice_fumbling(void)
 {
     boolean on_ice = !Levitation && is_ice(u.ux, u.uy);
+    struct monst *iceskater = u.usteed ? u.usteed : &gy.youmonst;
 
     if (on_ice) {
         if ((uarmf && objdescr_is(uarmf, "snow boots"))
-            || resists_cold(&gy.youmonst) || Flying
-            || is_floater(gy.youmonst.data) || is_clinger(gy.youmonst.data)
-            || is_whirly(gy.youmonst.data)) {
+            || resists_cold(iceskater) || Flying
+            || is_floater(iceskater->data) || is_clinger(iceskater->data)
+            || is_whirly(iceskater->data)) {
             on_ice = FALSE;
         } else if (!rn2(Cold_resistance ? 3 : 2)) {
             HFumbling |= FROMOUTSIDE;
