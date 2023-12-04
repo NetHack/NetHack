@@ -764,19 +764,19 @@ boolean
 parsesymbols(register char *opts, int which_set)
 {
     int val;
-    unsigned i;
-    char *symname, *strval, *ch = opts,
+    char *symname, *strval, *ch,
          *first_unquoted_comma = 0, *first_unquoted_colon = 0;
     const struct symparse *symp;
     boolean is_glyph = FALSE;
 
     /* are there any commas or colons that aren't quoted? */
-    for (i = 0; i < strlen(opts); ++i) {
+    for (ch = opts + 1; *ch; ++ch) {
         char *prech, *postch;
 
-        ch++; /* we never want to match on the first char, so this is ok */
         prech = ch - 1;
         postch = ch + 1;
+        if (!*postch)
+            break;
         if (*ch == ',') {
             if (*prech == '\'' && *postch == '\'')
                 continue;
