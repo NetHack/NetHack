@@ -48,7 +48,7 @@ const char *const hallublasts[] = {
 const char *
 rnd_hallublast(void)
 {
-    return hallublasts[rn2(SIZE(hallublasts))];
+    return ROLL_FROM(hallublasts);
 }
 
 boolean

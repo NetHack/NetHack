@@ -1398,7 +1398,7 @@ godvoice(aligntyp g_align, const char *words)
         words = "";
 
     pline_The("voice of %s %s: %s%s%s", align_gname(g_align),
-              godvoices[rn2(SIZE(godvoices))], quot, words, quot);
+              ROLL_FROM(godvoices), quot, words, quot);
 }
 
 static void

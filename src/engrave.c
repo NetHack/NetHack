@@ -1549,7 +1549,7 @@ static const char blind_writing[][21] = {
 static const char *
 blengr(void)
 {
-    return blind_writing[rn2(SIZE(blind_writing))];
+    return ROLL_FROM(blind_writing);
 }
 
 /*engrave.c*/

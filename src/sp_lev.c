@@ -1125,7 +1125,7 @@ rnddoor(void)
 {
     static int state[] = { D_NODOOR, D_BROKEN, D_ISOPEN, D_CLOSED, D_LOCKED };
 
-    return state[rn2(SIZE(state))];
+    return ROLL_FROM(state);
 }
 
 /*
@@ -5789,7 +5789,7 @@ generate_way_out_method(
 
     /* generate one of the escape items */
     if (selection_rndcoord(ov2, &x, &y, FALSE)) {
-        mksobj_at(escapeitems[rn2(SIZE(escapeitems))], x, y, TRUE, FALSE);
+        mksobj_at(ROLL_FROM(escapeitems), x, y, TRUE, FALSE);
         goto gotitdone;
     }
 

@@ -1899,7 +1899,7 @@ static const char *const ghostnames[] = {
 const char *
 rndghostname(void)
 {
-    return rn2(7) ? ghostnames[rn2(SIZE(ghostnames))]
+    return rn2(7) ? ROLL_FROM(ghostnames)
                   : (const char *) gp.plname;
 }
 
@@ -2635,7 +2635,7 @@ rndorcname(char *s)
         for (i = 0; i < iend; ++i) {
             vstart = 1 - vstart;                /* 0 -> 1, 1 -> 0 */
             Sprintf(eos(s), "%s%s", (i > 0 && !rn2(30)) ? "-" : "",
-                    vstart ? v[rn2(SIZE(v))] : snd[rn2(SIZE(snd))]);
+                    vstart ? ROLL_FROM(v) : ROLL_FROM(snd));
         }
     }
     return s;

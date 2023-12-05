@@ -2317,7 +2317,7 @@ set_mimic_sym(register struct monst *mtmp)
             goto assign_sym;
         }
     } else {
-        s_sym = syms[rn2(SIZE(syms))];
+        s_sym = ROLL_FROM(syms);
  assign_sym:
         if (s_sym == MAXOCLASSES) {
             static const int furnsyms[] = {
@@ -2326,7 +2326,7 @@ set_mimic_sym(register struct monst *mtmp)
             };
 
             ap_type = M_AP_FURNITURE;
-            appear = furnsyms[rn2(SIZE(furnsyms))];
+            appear = ROLL_FROM(furnsyms);
         } else {
             ap_type = M_AP_OBJECT;
             if (s_sym == S_MIMIC_DEF) {

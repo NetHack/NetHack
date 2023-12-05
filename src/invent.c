@@ -1501,7 +1501,7 @@ currency(long amount)
 {
     const char *res;
 
-    res = Hallucination ? currencies[rn2(SIZE(currencies))] : "zorkmid";
+    res = Hallucination ? ROLL_FROM(currencies) : "zorkmid";
     if (amount != 1L)
         res = makeplural(res);
     return res;

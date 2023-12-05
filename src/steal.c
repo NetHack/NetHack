@@ -419,7 +419,7 @@ steal(struct monst* mtmp, char* objnambuf)
                                                "take" };
  cant_take:
             pline("%s tries to %s %s%s but gives up.", Monnam(mtmp),
-                  how[rn2(SIZE(how))],
+                  ROLL_FROM(how),
                   (otmp->owornmask & W_ARMOR) ? "your " : "",
                   (otmp->owornmask & W_ARMOR) ? equipname(otmp)
                                               : yname(otmp));

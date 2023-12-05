@@ -956,7 +956,7 @@ fill_ordinary_room(struct mkroom *croom, boolean bonus_items)
                         WAN_DIGGING,
                         SPE_HEALING,
                     };
-                    otyp = supply_items[rn2(SIZE(supply_items))];
+                    otyp = ROLL_FROM(supply_items);
                 }
                 otmp = mksobj(otyp, TRUE, FALSE);
                 if (otyp == POT_HEALING && rn2(2))
@@ -991,7 +991,7 @@ fill_ordinary_room(struct mkroom *croom, boolean bonus_items)
                     SPBOOK_no_NOVEL,
                     SPBOOK_no_NOVEL
                 };
-                int oclass = extra_classes[rn2(SIZE(extra_classes))];
+                int oclass = ROLL_FROM(extra_classes);
                 otmp = mkobj(oclass, FALSE);
                 if (oclass == SPBOOK_no_NOVEL) {
                     /* bias towards lower level by generating again

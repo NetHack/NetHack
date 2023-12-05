@@ -1404,6 +1404,9 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 /* monster shooting a wand; note: not -9 to -0 because -0 is ambiguous  */
 #define BZ_M_WAND(bztyp) (-30 - (bztyp))   /* -39..-30 */
 
+/* pick a random entry from array */
+#define ROLL_FROM(array) array[rn2(SIZE(array))]
+
 #define FEATURE_NOTICE_VER(major, minor, patch)                    \
     (((unsigned long) major << 24) | ((unsigned long) minor << 16) \
      | ((unsigned long) patch << 8) | ((unsigned long) 0))

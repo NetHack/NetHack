@@ -502,7 +502,7 @@ clonewiz(void)
         }
         if (!Protection_from_shape_changers) {
             mtmp2->m_ap_type = M_AP_MONSTER;
-            mtmp2->mappearance = wizapp[rn2(SIZE(wizapp))];
+            mtmp2->mappearance = ROLL_FROM(wizapp);
         }
         newsym(mtmp2->mx, mtmp2->my);
     }
@@ -513,7 +513,7 @@ int
 pick_nasty(
     int difcap) /* if non-zero, try to make difficulty be lower than this */
 {
-    int alt, res = nasties[rn2(SIZE(nasties))];
+    int alt, res = ROLL_FROM(nasties);
 
     /* To do?  Possibly should filter for appropriate forms when
      * in the elemental planes or surrounded by water or lava.
@@ -523,7 +523,7 @@ pick_nasty(
      */
     if (Is_rogue_level(&u.uz)
         && !('A' <= mons[res].mlet && mons[res].mlet <= 'Z'))
-        res = nasties[rn2(SIZE(nasties))];
+        res = ROLL_FROM(nasties);
 
     /* if genocided or too difficult or out of place, try a substitute
        when a suitable one exists
@@ -822,20 +822,20 @@ cuss(struct monst *mtmp)
         } else if (u.uhave.amulet && !rn2(SIZE(random_insult))) {
             SetVoice(mtmp, 0, 80, 0);
             verbalize("Relinquish the amulet, %s!",
-                      random_insult[rn2(SIZE(random_insult))]);
+                      ROLL_FROM(random_insult));
         } else if (u.uhp < 5 && !rn2(2)) { /* Panic */
             SetVoice(mtmp, 0, 80, 0);
             verbalize(rn2(2) ? "Even now thy life force ebbs, %s!"
                              : "Savor thy breath, %s, it be thy last!",
-                      random_insult[rn2(SIZE(random_insult))]);
+                      ROLL_FROM(random_insult));
         } else if (mtmp->mhp < 5 && !rn2(2)) { /* Parthian shot */
             SetVoice(mtmp, 0, 80, 0);
             verbalize(rn2(2) ? "I shall return." : "I'll be back.");
         } else {
             SetVoice(mtmp, 0, 80, 0);
             verbalize("%s %s!",
-                      random_malediction[rn2(SIZE(random_malediction))],
-                      random_insult[rn2(SIZE(random_insult))]);
+                      ROLL_FROM(random_malediction),
+                      ROLL_FROM(random_insult));
         }
     } else if (is_lminion(mtmp)
                && !(mtmp->isminion && EMIN(mtmp)->renegade)) {

@@ -109,7 +109,7 @@ msummon(struct monst *mon)
         if (!rn2(6)) {
             switch (atyp) { /* see summon_minion */
             case A_NEUTRAL:
-                dtype = elementals[rn2(SIZE(elementals))];
+                dtype = ROLL_FROM(elementals);
                 break;
             case A_CHAOTIC:
             case A_NONE:
@@ -204,7 +204,7 @@ summon_minion(aligntyp alignment, boolean talk)
         mnum = lminion();
         break;
     case A_NEUTRAL:
-        mnum = elementals[rn2(SIZE(elementals))];
+        mnum = ROLL_FROM(elementals);
         break;
     case A_CHAOTIC:
     case A_NONE:

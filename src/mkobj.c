@@ -1910,7 +1910,7 @@ static const int treefruits[] = {
 struct obj *
 rnd_treefruit_at(coordxy x, coordxy y)
 {
-    return mksobj_at(treefruits[rn2(SIZE(treefruits))], x, y, TRUE, FALSE);
+    return mksobj_at(ROLL_FROM(treefruits), x, y, TRUE, FALSE);
 }
 
 /* create a stack of N gold pieces; never returns Null */

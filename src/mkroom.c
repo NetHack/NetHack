@@ -819,7 +819,7 @@ squadmon(void)
             goto gotone;
         }
     }
-    mndx = squadprob[rn2(SIZE(squadprob))].pm;
+    mndx = ROLL_FROM(squadprob).pm;
  gotone:
     if (!(gm.mvitals[mndx].mvflags & G_GONE))
         return &mons[mndx];

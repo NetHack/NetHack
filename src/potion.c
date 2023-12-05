@@ -1468,9 +1468,9 @@ const char *
 bottlename(void)
 {
     if (Hallucination)
-        return hbottlenames[rn2(SIZE(hbottlenames))];
+        return ROLL_FROM(hbottlenames);
     else
-        return bottlenames[rn2(SIZE(bottlenames))];
+        return ROLL_FROM(bottlenames);
 }
 
 /* handle item dipped into water potion or steed saddle splashed by same */

@@ -697,7 +697,7 @@ u_entered_shop(char *enterstring)
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
         } else {
             pline("%s seems %s over your return to %s %s!",
-                  Shknam(shkp), angrytexts[rn2(SIZE(angrytexts))],
+                  Shknam(shkp), ROLL_FROM(angrytexts),
                   noit_mhis(shkp), shtypes[rt - SHOPBASE].name);
         }
     } else if (eshkp->surcharge) {
@@ -4613,7 +4613,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
                           dugwall ? "shop" : "door");
             } else {
                 pline("%s is %s that you decided to %s %s %s!",
-                      Shknam(shkp), angrytexts[rn2(SIZE(angrytexts))],
+                      Shknam(shkp), ROLL_FROM(angrytexts),
                       dmgstr, noit_mhis(shkp), dugwall ? "shop" : "door");
             }
         } else {
@@ -4624,7 +4624,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
                           dugwall ? "shop" : "door");
             } else {
                 pline("%s is %s that someone decided to %s %s %s!",
-                      Shknam(shkp), angrytexts[rn2(SIZE(angrytexts))],
+                      Shknam(shkp), ROLL_FROM(angrytexts),
                       dmgstr, noit_mhis(shkp), dugwall ? "shop" : "door");
             }
         }
@@ -4926,7 +4926,7 @@ shk_chat(struct monst* shkp)
               (!Deaf && !muteshk(shkp)) ? "says" : "indicates");
     } else if (is_izchak(shkp, FALSE)) {
         if (!Deaf && !muteshk(shkp))
-            pline(Izchak_speaks[rn2(SIZE(Izchak_speaks))], shkname(shkp));
+            pline(ROLL_FROM(Izchak_speaks), shkname(shkp));
     } else {
         if (!Deaf && !muteshk(shkp))
             pline("%s talks about the problem of shoplifters.", Shknam(shkp));
