@@ -4547,8 +4547,12 @@ selection_clone(struct selectionvar *sel)
 void
 selection_getbounds(struct selectionvar *sel, NhRect *b)
 {
-    if (!sel || !b)
+    nhassert(b);
+
+    if (!sel) {
+        memset(b, 0, sizeof(NhRect));
         return;
+    }
 
     selection_recalc_bounds(sel);
 
