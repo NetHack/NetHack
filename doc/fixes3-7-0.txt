@@ -616,6 +616,7 @@ yet another fix for display problems during restore:  if game is saved while
 	being obfuscated by hallucination, but when displaying the hero there
 	instead it would access steed pointer before that has been set up
 resistances gained from worn or wielded items also protect hero's inventory
+dwarvish cloaks somewhat protect hero's inventory from cold and fire
 non-metallic gloves protect worn rings from shock
 message "Oops!  food rations out of your grasp!" occurred due to perm_invent
 	in mid-operation overwriting all of xname's/doname's obufs; fixed by

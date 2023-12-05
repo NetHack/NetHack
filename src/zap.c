@@ -5392,7 +5392,7 @@ adtyp_to_prop(int dmgtyp)
 }
 
 /* Is hero wearing or wielding an object with resistance to attack
-   damage type? Returns the percentage protectoin that the object
+   damage type? Returns the percentage protection that the object
    gives. */
 int
 u_adtyp_resistance_obj(int dmgtyp)
@@ -5402,8 +5402,16 @@ u_adtyp_resistance_obj(int dmgtyp)
     if (!prop)
         return 0;
 
+    /* Items that give an extrinsic resistance give 99% protection to
+       your items */
     if ((u.uprops[prop].extrinsic & (W_ARMOR | W_ACCESSORY | W_WEP)) != 0)
-        return 99; /* 99% protected */
+        return 99;
+
+    /* Dwarvish cloaks give a 90% protection to items against heat and
+       cold */
+    if (uarmc && uarmc->otyp == DWARVISH_CLOAK &&
+        (dmgtyp == AD_COLD || dmgtyp == AD_FIRE))
+        return 90;
 
     return 0;
 }
