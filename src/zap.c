@@ -4317,7 +4317,7 @@ zhitu(
         break;
     case ZT_DEATH:
         if (abstyp == ZT_BREATH(ZT_DEATH)) {
-            boolean disn_prot = u_adtyp_resistance_obj(AD_DISN) && rn2(100);
+            boolean disn_prot = inventory_resistance_check(AD_DISN);
 
             if (Disint_resistance) {
                 You("are not disintegrated.");
@@ -5391,20 +5391,41 @@ adtyp_to_prop(int dmgtyp)
     return 0; /* prop_types start at 1 */
 }
 
-/* is hero wearing or wielding an object with resistance
-   to attack damage type */
-boolean
+/* Is hero wearing or wielding an object with resistance to attack
+   damage type? Returns the percentage protectoin that the object
+   gives. */
+int
 u_adtyp_resistance_obj(int dmgtyp)
 {
     int prop = adtyp_to_prop(dmgtyp);
 
     if (!prop)
-        return FALSE;
+        return 0;
 
     if ((u.uprops[prop].extrinsic & (W_ARMOR | W_ACCESSORY | W_WEP)) != 0)
-        return TRUE;
+        return 99; /* 99% protected */
 
-    return FALSE;
+    return 0;
+}
+
+/* Rolls to see whether an object in inventory resists damage from the
+   given damage type, due to an equipped item protecting it. Use
+   u_adtyp_resistance_obj to discover whether objects are protected in
+   general (e.g. for enlightenment) and this function to actually do
+   the roll to see whether a specific object is protected.
+
+   This function doesn't check for other reasons why an object might
+   be protected; you will usually need to do an obj_resists() call
+   too. */
+boolean
+inventory_resistance_check(int dmgtyp)
+{
+    int prob = u_adtyp_resistance_obj(dmgtyp);
+
+    if (!prob)
+        return FALSE;
+
+    return rn2(100) < prob;
 }
 
 /* for enlightenment; currently only useful in wizard mode; cf from_what() */
@@ -5491,7 +5512,7 @@ destroy_one_item(struct obj *obj, int osym, int dmgtyp)
     quan = 0L;
 
     /* external worn item protects inventory? */
-    if (u_adtyp_resistance_obj(dmgtyp) && rn2(100))
+    if (inventory_resistance_check(dmgtyp))
         return;
 
     switch (dmgtyp) {

@@ -2524,8 +2524,9 @@ breakobj(
 }
 
 /*
- * Check to see if obj is going to break, but don't actually break it.
- * Return 0 if the object isn't going to break, 1 if it is.
+ * Check to see if obj (which has just hit hard something at speed, e.g.
+ * thrown or dropped from height) is going to break, but don't actually
+ * break it. Return 0 if the object isn't going to break, 1 if it is.
  */
 boolean
 breaktest(struct obj *obj)
