@@ -3503,7 +3503,7 @@ tty_invent_box_glyph_init(struct WinDesc *cw)
                     cell->content.ttychar = ' ';
                     cell->text = 1;
                     cell->refresh = 1;
-                    cell->color = bordercolor;
+                    cell->color = bordercolor + 1; /* cell color is offset */
                 }
                 continue;
             }
@@ -3514,7 +3514,7 @@ tty_invent_box_glyph_init(struct WinDesc *cw)
                 cell->content.gi = (glyph_info *) alloc(sizeof (glyph_info));
                 *(cell->content.gi) = zerogi;
                 cell->glyph = 1, cell->text = 0;
-                cell->color = bordercolor;
+                cell->color = bordercolor + 1; /* cell color is offset */
             }
 
             /* to get here, cell->glyph is 1 and cell->content union has gi */
