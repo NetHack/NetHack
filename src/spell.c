@@ -41,6 +41,7 @@ static int percent_success(int);
 static char *spellretention(int, char *);
 static int throwspell(void);
 static void cast_protection(void);
+static void cast_chain_lightning(void);
 static void spell_backfire(int);
 static boolean spelleffects_check(int, int *, int *);
 static const char *spelltypemnemonic(int);
@@ -865,6 +866,178 @@ skill_based_spellbook_id(void)
     }
 }
 
+
+/* Limit the total area chain lightning can cover; this is both for
+   technical reasons (making it possible to limit the size of arrays
+   here and in the display code) and for gameplay balance reasons;
+   this value should be smaller than TMP_AT_MAX_GLYPHS (display.c) in
+   order for chain lightning to display properly */
+#define CHAIN_LIGHTNING_LIMIT 100
+/* Unlike most zaps, chain lightning can't hit solid terrain (it
+   doesn't have enough power), it only covers open space; this also
+   means that it can't hit monsters inside walls, which makes sense as
+   they would be earthed */
+#define CHAIN_LIGHTNING_TYP(typ) (IS_POOL(typ) || SPACE_POS(typ))
+#define CHAIN_LIGHTNING_POS(x, y)                                       \
+    (isok(x, y) && (CHAIN_LIGHTNING_TYP(levl[x][y].typ) ||              \
+                    (IS_DOOR(levl[x][y].typ) &&                         \
+                     !(levl[x][y].doormask & (D_CLOSED | D_LOCKED)))))
+
+struct chain_lightning_zap {
+    /* direction in which this zap is currently moving; this is an
+       enum movementdirs, clamped to the range 0 inclusive to N_DIRS
+       exclusive */
+    uchar dir;
+    /* current location of the zap */
+    coordxy x, y;
+    /* distance this zap can cover without chaining */
+    char strength;
+};
+
+struct chain_lightning_queue {
+    struct chain_lightning_zap q[CHAIN_LIGHTNING_LIMIT];
+    int head;
+    int tail;
+    int displayed_beam;
+};
+
+/* Given a potential chain lightning zap, moves it one square forward in
+   the given direction, then adds it to the queue unless it would hit an
+   invalid square or is out of power.
+
+   zap is passed by value, so the move-forward doesn't change the passed
+   argument. */
+static void
+propagate_chain_lightning(
+    struct chain_lightning_queue *clq,
+    struct chain_lightning_zap zap)
+{
+    struct monst *mon;
+
+    zap.x += xdir[zap.dir];
+    zap.y += ydir[zap.dir];
+
+    if (clq->tail >= CHAIN_LIGHTNING_LIMIT)
+        return;    /* zap has covered too many squares */
+    if (!CHAIN_LIGHTNING_POS(zap.x, zap.y))
+        return;    /* zap can't go to this square */
+
+    mon = m_at(zap.x, zap.y);
+    if (mon && mon->mpeaceful)
+        return;    /* chain lightning avoids peaceful and tame monsters */
+
+    /* When hitting a monster that isn't electricity-resistant, a
+       particular chain lightning zap regains all its power, allowing it to
+       chain to other monsters; upon hitting a shock-resistant monster it
+       can't continue any further, but we let it hit the monster to show
+       the shield effect */
+    if (mon && !resists_elec(mon) && !defended(mon, AD_ELEC))
+        zap.strength = 3;
+    else if (mon)
+        zap.strength = 0;
+
+    /* Unless it hits a monster, the last square of a zap isn't drawn on
+       screen and can't propagate further, so it may as well be discarded
+       now */
+    if (!mon && !zap.strength)
+        return;
+
+    /* The same square can't be chained to twice. */
+    for (int i = 0; i < clq->tail; i++) {
+        if (clq->q[i].x == zap.x && clq->q[i].y == zap.y)
+            return;
+    }
+
+    /* This array access must be inbounds due to the CHAIN_LIGHTNING_LIMIT
+       check earlier. */
+    clq->q[clq->tail++] = zap;
+
+    /* Draw it. */
+    tmp_at(DISP_CHANGE, zapdir_to_glyph(
+               xdir[zap.dir], ydir[zap.dir], clq->displayed_beam));
+    tmp_at(zap.x, zap.y);
+}
+
+static void
+cast_chain_lightning(void)
+{
+    struct chain_lightning_queue clq = {
+        {{0}}, 0, 0, Hallucination ? rn2_on_display_rng(6) : (AD_ELEC - 1)
+    };
+
+    if (u.uswallow) {
+        // TODO: damage the engulfer
+        return;
+    }
+
+    /* set the type of beam we're using; the direction here is arbitrary
+       because we change the beam direction just before drawing the beam
+       anyway */
+    tmp_at(DISP_BEAM, zapdir_to_glyph(0, 1, clq.displayed_beam));
+
+    /* start by propagating in all directions from the caster */
+    for (int dir = 0; dir < N_DIRS; dir++) {
+        struct chain_lightning_zap zap = { dir, u.ux, u.uy, 2 };
+        propagate_chain_lightning(&clq, zap);
+    }
+    nh_delay_output();
+
+    while (clq.head < clq.tail) {
+        int delay_tail = clq.tail;
+        while (clq.head < delay_tail) {
+            struct chain_lightning_zap zap = clq.q[clq.head++];
+
+            /* damage any monster that was hit */
+            struct monst *mon = m_at(zap.x, zap.y);
+            if (mon) {
+                struct obj *unused; /* AD_ELEC can't destroy armor */
+                int dmg = zhitm(
+                    mon, BZ_U_SPELL(AD_ELEC - 1), 2, &unused);
+
+                if (dmg) {
+                    /* mon has been damaged, but we haven't yet printed the
+                       messages or given kill credit; assume the hero can
+                       sense their spell hitting monsters, because they can
+                       steer it away from peacefuls */
+                    if (DEADMONSTER(mon))
+                        xkilled(mon, XKILL_GIVEMSG);
+                    else
+                        pline("You shock %s%s", mon_nam(mon), exclam(dmg));
+                } else if (canseemon(mon)) {
+                    pline("%s resists.", Monnam(mon));
+                }
+            }
+
+            /* each zap propagates forwards with 1 less strength, and
+               diagonally with 0 strength (thus the diagonal zaps aren't
+               drawn and don't spread unless they hit a monster);
+               exception: if the zap just hit a monster, the diagonals have
+               as much strength as the forwards zap */
+            if (!zap.strength)
+                continue; /* happens upon hitting a shock-resistant monster */
+            zap.strength--;
+
+            propagate_chain_lightning(&clq, zap);
+
+            if (zap.strength < 2)
+                zap.strength = 0;
+            else if (u.uen)
+                u.uen--; /* propagating past monsters increases Pw cost a bit */
+            zap.dir = DIR_LEFT(zap.dir);
+            propagate_chain_lightning(&clq, zap);
+
+            zap.dir = DIR_RIGHT2(zap.dir);
+            propagate_chain_lightning(&clq, zap);
+        }
+        nh_delay_output();
+    }
+    nh_delay_output();
+    nh_delay_output();
+
+    tmp_at(DISP_END, 0);
+}
+
+
 static void
 cast_protection(void)
 {
@@ -1335,6 +1508,9 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
     case SPE_JUMPING:
         if (!(jump(max(role_skill, 1)) & ECMD_TIME))
             pline1(nothing_happens);
+        break;
+    case SPE_CHAIN_LIGHTNING:
+        cast_chain_lightning();
         break;
     default:
         impossible("Unknown spell %d attempted.", spell);

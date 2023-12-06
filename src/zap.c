@@ -4198,10 +4198,12 @@ zhitm(
             /* can still blind the monster */
         } else
             tmp = d(nd, 6);
-        if (spellcaster)
+        if (spellcaster && tmp)
             tmp = spell_damage_bonus(tmp);
         if (!resists_blnd(mon)
-            && !(type > 0 && engulfing_u(mon))) {
+            && !(type > 0 && engulfing_u(mon))
+            && nd > 2) {
+            /* sufficiently powerful lightning blinds monsters */
             register unsigned rnd_tmp = rnd(50);
             mon->mcansee = 0;
             if ((mon->mblinded + rnd_tmp) > 127)
