@@ -283,7 +283,7 @@ static void tty_invent_box_glyph_init(struct WinDesc *cw);
 static boolean assesstty(enum inv_modes, short *, short *,
                          long *, long *, long *, long *, long *);
 static void ttyinv_populate_slot(struct WinDesc *, int, int,
-                                 const char *, int32_t);
+                                 const char *, int32_t, int);
 #endif /* TTY_PERM_INVENT */
 
 /*
@@ -3010,7 +3010,7 @@ ttyinv_add_menu(
     boolean show_gold = (ttyinvmode & InvShowGold) != 0,
             inuse_only = (ttyinvmode & InvInUse) != 0,
             ignore = FALSE;
-    int row, side, slot,
+    int row, side, slot, startcolor_at = 0,
         rows_per_side = (inuse_only ? (cw->maxrow - 2)
                          : !show_gold ? 26
                            : 27);
@@ -3056,10 +3056,11 @@ ttyinv_add_menu(
          */
         Snprintf(invbuf, sizeof invbuf, "%c - %s", ch, text);
         text = invbuf;
+        startcolor_at = sizeof ("a - ") - 1;
         row = (slot % rows_per_side) + 1; /* +1: top border */
         /* side: left side panel or right side panel, not a window column */
         side = slot / rows_per_side;
-        ttyinv_populate_slot(cw, row, side, text, clr);
+        ttyinv_populate_slot(cw, row, side, text, clr, startcolor_at);
     }
     return;
 }
@@ -3255,7 +3256,7 @@ ttyinv_render(winid window, struct WinDesc *cw)
         row = (slot % rows_per_side) + 1; /* +1: top border */
         /* side: left side panel or right side panel, not a window column */
         side = slot / rows_per_side;
-        ttyinv_populate_slot(cw, row, side, invbuf, 0);
+        ttyinv_populate_slot(cw, row, side, invbuf, NO_COLOR, 0);
     }
 
     /* inuse_only might switch from one panel to two or vice versa */
@@ -3286,19 +3287,19 @@ ttyinv_render(winid window, struct WinDesc *cw)
         for (col = 0; col < cw->maxcol; ++col) {
             cell = &cw->cells[row][col];
             if (cell->refresh || force_redraw) {
+                if (cell->color
+                    && (current_row_color != cell->color - 1)) {
+                    current_row_color = cell->color - 1;
+                    if (current_row_color == NO_COLOR)
+                        term_end_color();
+                    else
+                        term_start_color(current_row_color);
+                }
                 if (cell->glyph) {
                     tty_print_glyph(window, col + 1, row, cell->content.gi,
                                     &nul_glyphinfo);
                     end_glyphout();
                 } else {
-                    if (cell->color
-                        && (current_row_color != cell->color - 1)) {
-                        current_row_color = cell->color - 1;
-                        if (current_row_color == NO_COLOR)
-                            term_end_color();
-                        else
-                            term_start_color(current_row_color);
-                    }
                     if (col != cw->curx || row != cw->cury)
                         tty_curs(window, col + 1, row);
                     (void) putchar(cell->content.ttychar);
@@ -3318,45 +3319,6 @@ ttyinv_render(winid window, struct WinDesc *cw)
     return;
 }
 
-/*
- * returns TRUE if things are ok
- */
-static boolean
-assesstty(
-    enum inv_modes invmode,
-    short *offx, short *offy, long *rows, long *cols,
-    long *maxcol, long *minrow, long *maxrow)
-{
-    boolean inuse_only = (invmode & InvInUse) != 0,
-            show_gold = (invmode & InvShowGold) != 0 && !inuse_only;
-
-    *offx = 0;
-    /* topline + map rows + status lines */
-    *offy = 1 + ROWNO + StatusRows(); /* 1 + 21 + (2 or 3) */
-    *rows = (ttyDisplay->rows - *offy);
-    *cols = ttyDisplay->cols;
-    *minrow = tty_perminv_minrow;
-    if (show_gold)
-        *minrow += 1;
-#define SMALL_INUSE_WINDOW
-#ifdef SMALL_INUSE_WINDOW
-#undef SMALL_INUSE_WINDOW
-    /* simplify testing by not requiring a small font to have enough room */
-    if (inuse_only)
-        *minrow = 1 + 8 + 1;
-#else
-    /* "normal" max for items in use would be 3 weapon + 7 armor + 4
-       accessories == 14, but lit lamps/candles and attached leashes are
-       also included; if hero ends up with more than 15 in-use items,
-       some will be left out */
-    if (inuse_only)
-        *minrow = 1 + 15 + 1; /* top border + 15 lines + bottom border */
-#endif
-    *maxrow = *rows;
-    *maxcol = *cols;
-    return !(*rows < *minrow || *cols < tty_perminv_mincol);
-}
-
 /* put the formatted object description for one item into a particular row
    and left/right panel, truncating if long or padding with spaces if short */
 static void
@@ -3364,7 +3326,9 @@ ttyinv_populate_slot(
     struct WinDesc *cw,
     int row,  /* 'row' within the window, not within screen */
     int side, /* 'side'==0 is left panel or ==1 is right panel */
-    const char *text, int32_t color)
+    const char *text,
+    int32_t color,
+    int clroffset)
 {
     struct tty_perminvent_cell *cell;
     char c;
@@ -3393,12 +3357,17 @@ ttyinv_populate_slot(
             ++text;
         else
             c = ' ';
+
         if (cell->content.ttychar != c) {
             cell->content.ttychar = c;
             cell->refresh = 1;
         }
         if (cell->color != color + 1) {
-            cell->color = color + 1; /* offsets color by 1 so 0 isn't valid */
+            /* offset color by 1 so 0 is not valid */
+            if (ccnt >= (col + clroffset))
+                cell->color = color + 1; 
+            else
+                cell->color = NO_COLOR + 1;
             cell->refresh = 1;
         }
         cell->text = 1; /* cell->content.ttychar is current */
@@ -3503,7 +3472,6 @@ tty_invent_box_glyph_init(struct WinDesc *cw)
                     cell->content.ttychar = ' ';
                     cell->text = 1;
                     cell->refresh = 1;
-                    cell->color = bordercolor + 1; /* cell color is offset */
                 }
                 continue;
             }
@@ -3514,7 +3482,6 @@ tty_invent_box_glyph_init(struct WinDesc *cw)
                 cell->content.gi = (glyph_info *) alloc(sizeof (glyph_info));
                 *(cell->content.gi) = zerogi;
                 cell->glyph = 1, cell->text = 0;
-                cell->color = bordercolor + 1; /* cell color is offset */
             }
 
             /* to get here, cell->glyph is 1 and cell->content union has gi */
@@ -3529,9 +3496,50 @@ tty_invent_box_glyph_init(struct WinDesc *cw)
                because they were erased or overwritten by something so
                won't match the prior value anymore) so skip it */
             cell->refresh = 1;
+            cell->color = bordercolor + 1;
         }
     done_tty_perm_invent_init = TRUE;
 }
+
+/*
+ * returns TRUE if things are ok
+ */
+static boolean
+assesstty(
+    enum inv_modes invmode,
+    short *offx, short *offy, long *rows, long *cols,
+    long *maxcol, long *minrow, long *maxrow)
+{
+    boolean inuse_only = (invmode & InvInUse) != 0,
+            show_gold = (invmode & InvShowGold) != 0 && !inuse_only;
+
+    *offx = 0;
+    /* topline + map rows + status lines */
+    *offy = 1 + ROWNO + StatusRows(); /* 1 + 21 + (2 or 3) */
+    *rows = (ttyDisplay->rows - *offy);
+    *cols = ttyDisplay->cols;
+    *minrow = tty_perminv_minrow;
+    if (show_gold)
+        *minrow += 1;
+#define SMALL_INUSE_WINDOW
+#ifdef SMALL_INUSE_WINDOW
+#undef SMALL_INUSE_WINDOW
+    /* simplify testing by not requiring a small font to have enough room */
+    if (inuse_only)
+        *minrow = 1 + 8 + 1;
+#else
+    /* "normal" max for items in use would be 3 weapon + 7 armor + 4
+       accessories == 14, but lit lamps/candles and attached leashes are
+       also included; if hero ends up with more than 15 in-use items,
+       some will be left out */
+    if (inuse_only)
+        *minrow = 1 + 15 + 1; /* top border + 15 lines + bottom border */
+#endif
+    *maxrow = *rows;
+    *maxcol = *cols;
+    return !(*rows < *minrow || *cols < tty_perminv_mincol);
+}
+
 
 #endif  /* TTY_PERM_INVENT */
 
