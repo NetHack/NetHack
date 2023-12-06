@@ -3033,7 +3033,6 @@ ttyinv_add_menu(
             && ttyinv_slots_used == rows_per_side)
             ttyinv_inuse_twosides(cw, rows_per_side);
 
-        /* TODO: check for MENUCOLORS match */
         text = str; /* 'text' will switch to invbuf[] below */
         /* strip away "a"/"an"/"the" prefix to show a bit more of
             the interesting part of the object's description; this
