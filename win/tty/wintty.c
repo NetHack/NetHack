@@ -3002,7 +3002,7 @@ ttyinv_add_menu(
     winid window UNUSED,
     struct WinDesc *cw,
     char ch,
-    int attr UNUSED, int clr UNUSED,
+    int attr UNUSED, int clr,
     const char *str)
 {
     char invbuf[BUFSZ];
@@ -3060,7 +3060,7 @@ ttyinv_add_menu(
         row = (slot % rows_per_side) + 1; /* +1: top border */
         /* side: left side panel or right side panel, not a window column */
         side = slot / rows_per_side;
-        ttyinv_populate_slot(cw, row, side, text, 0);
+        ttyinv_populate_slot(cw, row, side, text, clr);
     }
     return;
 }
@@ -3213,7 +3213,8 @@ ttyinv_end_menu(int window, struct WinDesc *cw)
 static void
 ttyinv_render(winid window, struct WinDesc *cw)
 {
-    int row, col, slot, side, filled_count = 0, slot_limit;
+    int row, col, slot, side, filled_count = 0, slot_limit,
+                              current_row_color = NO_COLOR;
     struct tty_perminvent_cell *cell;
     char invbuf[BUFSZ];
     boolean force_redraw = gp.program_state.in_docrt ? TRUE : FALSE,
@@ -3282,7 +3283,7 @@ ttyinv_render(winid window, struct WinDesc *cw)
     }
     /* render to the display */
     calling_from_update_inventory = TRUE;
-    for (row = 0; row < cw->maxrow; ++row)
+    for (row = 0; row < cw->maxrow; ++row) {
         for (col = 0; col < cw->maxcol; ++col) {
             cell = &cw->cells[row][col];
             if (cell->refresh || force_redraw) {
@@ -3291,6 +3292,14 @@ ttyinv_render(winid window, struct WinDesc *cw)
                                     &nul_glyphinfo);
                     end_glyphout();
                 } else {
+                    if (cell->color
+                        && (current_row_color != cell->color - 1)) {
+                        current_row_color = cell->color - 1;
+                        if (current_row_color == NO_COLOR)
+                            term_end_color();
+                        else
+                            term_start_color(current_row_color);
+                    }
                     if (col != cw->curx || row != cw->cury)
                         tty_curs(window, col + 1, row);
                     (void) putchar(cell->content.ttychar);
@@ -3300,6 +3309,9 @@ ttyinv_render(winid window, struct WinDesc *cw)
                 cell->refresh = 0;
             }
         }
+        if (current_row_color != NO_COLOR)
+            term_end_color();
+    }
     tty_curs(window, 1, 0);
     for (slot = 0; slot < SIZE(slot_tracker); ++slot)
         slot_tracker[slot] = FALSE;
@@ -3369,9 +3381,6 @@ ttyinv_populate_slot(
     col = bordercol[side] + 1;
     endcol = bordercol[side + 1] - 1;
     cell = &cw->cells[row][col];
-    if (cell->color != color)
-        cell->refresh = 1;
-    cell->color = color;
     for (ccnt = col; ccnt <= endcol; ++ccnt, ++cell) {
         /* [don't expect this to happen] if there was a glyph here, release
            memory allocated for it; gi pointer and ttychar character overlay
@@ -3387,6 +3396,10 @@ ttyinv_populate_slot(
             c = ' ';
         if (cell->content.ttychar != c) {
             cell->content.ttychar = c;
+            cell->refresh = 1;
+        }
+        if (cell->color != color + 1) {
+            cell->color = color + 1; /* offsets color by 1 so 0 isn't valid */
             cell->refresh = 1;
         }
         cell->text = 1; /* cell->content.ttychar is current */
@@ -3438,7 +3451,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 static void
 tty_invent_box_glyph_init(struct WinDesc *cw)
 {
-    int row, col, glyph;
+    int row, col, glyph, bordercolor = NO_COLOR;
     uchar sym;
     struct tty_perminvent_cell *cell;
 
@@ -3491,6 +3504,7 @@ tty_invent_box_glyph_init(struct WinDesc *cw)
                     cell->content.ttychar = ' ';
                     cell->text = 1;
                     cell->refresh = 1;
+                    cell->color = bordercolor;
                 }
                 continue;
             }
@@ -3501,6 +3515,7 @@ tty_invent_box_glyph_init(struct WinDesc *cw)
                 cell->content.gi = (glyph_info *) alloc(sizeof (glyph_info));
                 *(cell->content.gi) = zerogi;
                 cell->glyph = 1, cell->text = 0;
+                cell->color = bordercolor;
             }
 
             /* to get here, cell->glyph is 1 and cell->content union has gi */
