@@ -89,6 +89,7 @@ static struct map_struct {
     unsigned special;
     short int tileidx;
     int framecolor;
+    int inverse;
 } map[ROWNO][COLNO]; /* track the glyphs */
 
 #define vesa_clearmap()                                         \
@@ -102,6 +103,7 @@ static struct map_struct {
                 map[y][x].attr = 0;                             \
                 map[y][x].special = 0;                          \
                 map[y][x].tileidx = Tile_unexplored;            \
+                map[y][x].inverse = 0;                          \
             }                                                   \
     }
 #define TOP_MAP_ROW 1
@@ -705,6 +707,7 @@ vesa_xputg(const glyph_info *glyphinfo, const glyph_info *bkglyphinfo UNUSED)
     map[ry][col].special = special;
     map[ry][col].tileidx = glyphinfo->gm.tileidx;
     map[ry][col].attr = attr;
+    map[ry][col].inverse = inversed;
 
     if (bkglyphinfo->framecolor != NO_COLOR) {
         map[ry][col].framecolor = bkglyphinfo->framecolor;
@@ -820,6 +823,8 @@ vesa_redrawmap(void)
             for (cx = clipx; cx <= (unsigned) clipxmax && cx < COLNO; ++cx) {
                 t_row[cx].chr = map[cy][cx].ch;
                 t_row[cx].colour = map[cy][cx].attr;
+                t_row[cx].bgcolour = BACKGROUND_VESA_COLOR;
+                t_row[cx].inverse = map[cy][cx].inverse;
             }
             vesa_WriteTextRow(0, y, t_row + clipx, cx - clipx);
             x = (cx - clipx) * vesa_char_width;
