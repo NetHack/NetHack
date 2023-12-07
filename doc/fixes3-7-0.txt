@@ -1317,6 +1317,7 @@ boomerang travels in a clockwise arc when thrown by a left-handed hero and in
 spellbooks weight 50 units but Book of the Dead only 20, and novels only 1;
 	the Book of the Dead has been changed to 50 and novels to 10
 save and restore hero tracks, increase track length
+change vrock and hezrou from red to green, adjust vrock tile to have green
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
