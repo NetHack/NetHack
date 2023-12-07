@@ -106,7 +106,7 @@ browse_map(unsigned ter_typ, const char *ter_explain)
 static void
 map_monst(struct monst *mtmp, boolean showtail)
 {
-    int glyph = (def_monsyms[(int) mtmp->data->mlet].sym == ' ')
+    int glyph = (monsym(mtmp->data) == ' ')
                 ? detected_mon_to_glyph(mtmp, newsym_rn2)
                 : mtmp->mtame
                   ? pet_to_glyph(mtmp, newsym_rn2)

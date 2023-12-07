@@ -4419,7 +4419,7 @@ pick_animal(void)
     /* rogue level should use monsters represented by uppercase letters
        only, but since chameleons aren't generated there (not uppercase!)
        we don't perform a lot of retries */
-    if (Is_rogue_level(&u.uz) && !isupper((uchar) mons[res].mlet))
+    if (Is_rogue_level(&u.uz) && !isupper(monsym(&mons[res])))
         res = ga.animal_list[rn2(ga.animal_list_count)];
     return res;
 }

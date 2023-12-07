@@ -1640,7 +1640,7 @@ rndmonst_adj(int minadj, int maxadj)
 
         if (montooweak(mndx, minmlev) || montoostrong(mndx, maxmlev))
             continue;
-        if (upper && !isupper((uchar) def_monsyms[(int) ptr->mlet].sym))
+        if (upper && !isupper(monsym(ptr)))
             continue;
         if (elemlevel && wrong_elem_type(ptr))
             continue;

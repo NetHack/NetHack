@@ -260,5 +260,6 @@
 #define pmname(ptr,g) ((((g) == MALE || (g) == FEMALE) && (ptr)->pmnames[g]) \
                         ? (ptr)->pmnames[g] : (ptr)->pmnames[NEUTRAL])
 #endif
+#define monsym(ptr) (def_monsyms[(int) (ptr)->mlet].sym)
 
 #endif /* MONDATA_H */

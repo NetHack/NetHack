@@ -3306,7 +3306,7 @@ lspo_monster(lua_State *L)
         tmpmons.coord = SP_COORD_PACK(mx, my);
 
     if (tmpmons.id != NON_PM && tmpmons.class == -1)
-        tmpmons.class = def_monsyms[(int) mons[tmpmons.id].mlet].sym;
+        tmpmons.class = monsym(&mons[tmpmons.id]);
 
     create_monster(&tmpmons, gc.coder->croom);
 
