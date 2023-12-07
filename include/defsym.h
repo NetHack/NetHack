@@ -28,10 +28,15 @@
     to #include defsym.h)
   - in win/share/tilemap.c for processing a tile file
     (define PCHAR_TILES prior to #include defsym.h).
+  - in src/allmain.c for setting up the dumping of several enums
+    (define DUMP_ENUMS_PCHAR, DUMP_ENUMS_MONSYS, DUMP_ENUMS_MONSYMS_DEFCHAR
+     DUMP_ENUMS_OBJCLASS_DEFCHARS, DUMP_ENUMS_OBJCLASS_DEFCHARS
+     DUMP_ENUMS_OBJCLASS_CLASSES, DUMP_ENUMS_OBJCLASS_SYMS)
 */
 
 #if defined(PCHAR_S_ENUM) || defined(PCHAR_PARSE) \
-    || defined(PCHAR_DRAWING) || defined(PCHAR_TILES)
+    || defined(PCHAR_DRAWING) || defined(PCHAR_TILES) \
+    || defined(DUMP_ENUMS_PCHAR)
 
 /*
    PCHAR(idx, ch, sym, desc, clr)
@@ -67,6 +72,13 @@
 /* win/share/tilemap.c */
 #define PCHAR(idx, ch, sym, desc, clr) { sym, desc, desc },
 #define PCHAR2(idx, ch, sym, tilenm, desc, clr) { sym, tilenm, desc },
+
+#elif defined(DUMP_ENUMS_PCHAR)
+/* allmain.c */
+#define PCHAR(idx, ch, sym, desc, clr) { sym, #sym },
+#ifndef PCHAR2
+#define PCHAR2(idx, ch, sym, tilenm, desc, clr) { sym, #sym },
+#endif
 #endif
 
 /* PCHAR with extra arg */
@@ -229,10 +241,12 @@
     PCHAR2(104, '/', S_expl_br, "explosion bottom right", "", CLR_ORANGE)
 #undef PCHAR
 #undef PCHAR2
-#endif /* PCHAR_S_ENUM || PCHAR_PARSE || PCHAR_DRAWING || PCHAR_TILES */
+#endif /* PCHAR_S_ENUM || PCHAR_PARSE || PCHAR_DRAWING || PCHAR_TILES
+        * || DUMP_ENUMS_PCHAR */
 
 #if defined(MONSYMS_S_ENUM) || defined(MONSYMS_DEFCHAR_ENUM) \
-        || defined(MONSYMS_PARSE) || defined(MONSYMS_DRAWING)
+        || defined(MONSYMS_PARSE) || defined(MONSYMS_DRAWING) \
+        || defined(DUMP_ENUMS_MONSYMS) || defined(DUMP_ENUMS_MONSYMS_DEFCHAR)
 
 /*
     MONSYM(idx, ch, sym desc)
@@ -258,6 +272,14 @@
 #elif defined(MONSYMS_DRAWING)
 /* drawing.c */
 #define MONSYM(idx, ch, basename, sym, desc) { DEF_##basename, "", desc },
+
+/* allmain.c */
+#elif defined(DUMP_ENUMS_MONSYMS)
+#define MONSYM(idx, ch, basename, sym, desc) { sym, #sym },
+
+#elif defined(DUMP_ENUMS_MONSYMS_DEFCHAR)
+#define MONSYM(idx, ch, basename, sym, desc) { DEF_##basename, "DEF_" #basename },
+
 #endif
 
     MONSYM( 1, 'a', ANT, S_ANT,   "ant or other insect")
@@ -335,11 +357,14 @@
 
 #undef MONSYM
 #endif /* MONSYMS_S_ENUM || MONSYMS_DEFCHAR_ENUM || MONSYMS_PARSE
-        * || MONSYMS_DRAWING */
+        * || MONSYMS_DRAWING || DUMP_ENUMS_MONSYMS)
+        * || DUMP_ENUMS_MONSYMS_DEFCHAR */
 
 #if defined(OBJCLASS_S_ENUM) || defined(OBJCLASS_DEFCHAR_ENUM) \
         || defined(OBJCLASS_CLASS_ENUM) || defined(OBJCLASS_PARSE) \
-        || defined (OBJCLASS_DRAWING)
+        || defined(OBJCLASS_DRAWING) || defined(DUMP_ENUMS_OBJCLASS_DEFCHARS) \
+        || defined(DUMP_ENUMS_OBJCLASS_CLASSES) \
+        || defined(DUMP_ENUMS_OBJCLASS_SYMS)
 
 /*
     OBJCLASS(idx, ch, basename, sym, name, explain)
@@ -387,6 +412,21 @@
 /* drawing.c */
 #define OBJCLASS(idx, ch, basename, sym, name, explain) \
     { basename##_SYM, name, explain },
+
+#elif defined(DUMP_ENUMS_OBJCLASS_DEFCHARS)
+/* allmain.c */
+#define OBJCLASS(idx, ch, basename, sym, name, explain) \
+    { basename##_SYM, #basename "_SYM" },
+
+#elif defined(DUMP_ENUMS_OBJCLASS_CLASSES)
+/* allmain.c */
+#define OBJCLASS(idx, ch, basename, sym, name, explain) \
+    { basename##_CLASS, #basename "_CLASS" },
+
+#elif defined(DUMP_ENUMS_OBJCLASS_SYMS)
+/* allmain.c */
+#define OBJCLASS(idx, ch, basename, sym, name, explain) \
+    { sym , #sym },
 #endif
 
 /* OBJCLASS with extra arg */
@@ -396,6 +436,15 @@
 #elif defined(OBJCLASS_DRAWING)
 #define OBJCLASS2(idx, ch, basename, sname, sym, name, explain) \
     { sname, name, explain },
+#elif defined(DUMP_ENUMS_OBJCLASS_DEFCHARS)
+#define OBJCLASS2(idx, ch, basename, sname, sym, name, explain) \
+    { sname, #sname },
+#elif defined(DUMP_ENUMS_OBJCLASS_CLASSES)
+#define OBJCLASS2(idx, ch, basename, sname, sym, name, explain) \
+    { basename##_CLASS, #basename "_CLASS" },
+#elif defined(DUMP_ENUMS_OBJCLASS_SYMS)
+#define OBJCLASS2(idx, ch, basename, sname, sym, name, explain) \
+    { sym , #sym },
 #else
 #define OBJCLASS2(idx, ch, basename, sname, sym, name, explain) \
     OBJCLASS(idx, ch, basename, sym, name, explain)
@@ -424,16 +473,24 @@
 #undef OBJCLASS
 #undef OBJCLASS2
 #endif /* OBJCLASS_S_ENUM || OBJCLASS_DEFCHAR_ENUM || OBJCLASS_CLASS_ENUM
-        * || OBJCLASS_PARSE || OBJCLASS_DRAWING */
+        * || OBJCLASS_PARSE || OBJCLASS_DRAWING
+        * || DUMP_ENUMS_OBJCLASS_DEFCHARS || DUMP_ENUMS_OBJCLASS_CLASSES
+        * || DUMP_ENUMS_OBJCLASS_SYMS */
 
 #ifdef DEBUG
 #if !defined(PCHAR_S_ENUM) && !defined(PCHAR_DRAWING) \
     && !defined(PCHAR_PARSE) && !defined(PCHAR_TILES) \
+    && !defined(DUMP_ENUMS_PCHAR) \
     && !defined(MONSYMS_S_ENUM) && !defined(MONSYMS_DEFCHAR_ENUM) \
     && !defined(MONSYMS_PARSE) && !defined(MONSYMS_DRAWING) \
+    && !defined(DUMP_ENUMS_MONSYMS) \
+    && !defined(DUMP_ENUMS_MONSYMS_DEFCHAR) \
     && !defined(OBJCLASS_S_ENUM) && !defined(OBJCLASS_DEFCHAR_ENUM) \
     && !defined(OBJCLASS_CLASS_ENUM) && !defined(OBJCLASS_PARSE) \
-    && !defined (OBJCLASS_DRAWING)
+    && !defined (OBJCLASS_DRAWING) \
+    && !defined(DUMP_ENUMS_OBJCLASS_DEFCHARS) \
+    && !defined(DUMP_ENUMS_OBJCLASS_CLASSES) \
+    && !defined(DUMP_ENUMS_OBJCLASS_SYMS)
 #error Non-productive inclusion of defsym.h
 #endif
 #endif /* DEBUG */
