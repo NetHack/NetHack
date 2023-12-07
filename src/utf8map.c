@@ -270,7 +270,7 @@ glyph_find_core(const char *id, struct find_struct *findwhat)
                     break;
                 case find_pm:
                     if (glyph_is_monster(glyph)
-                        && mons[glyph_to_mon(glyph)].mlet == findwhat->val)
+                        && monsym(&mons[glyph_to_mon(glyph)]) == findwhat->val)
                         do_callback = TRUE;
                     break;
                 case find_oc:
