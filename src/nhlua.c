@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1695159626 2023/09/19 21:40:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.115 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1701978168 2023/12/07 19:42:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.120 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2673,7 +2673,8 @@ nhl_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
     }
 
     if (nsize == 0) {
-        free(ptr);
+        if (ptr != NULL)
+            free(ptr);
         return NULL;
     }
 
