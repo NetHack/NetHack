@@ -1148,7 +1148,7 @@ curs_vert_status_vals(int win_width)
                 lbl = "experience";
                 break;
             case BL_LEVELDESC:
-                /* "dungeon-level" is redundant when value is "Dlvl-N" */
+                /* "dungeon-level" is redundant when value is "Doom-N" */
                 lbl = "location";
                 break;
             case BL_HD:

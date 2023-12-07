@@ -2663,7 +2663,7 @@ query_annotation(d_level *lev)
             (void) describe_level(lbuf, dflgs);
             u.uz = save_uz;
 
-            (void) strsubst(lbuf, "Dlvl:", "level ");
+            (void) strsubst(lbuf, "Doom:", "level ");
             /* even though we've told describe_level() not to append
                a trailing space (by not including '1' in dflgs), the
                level number is formatted with %-2d so single digit

@@ -450,8 +450,8 @@ describe_level(
     } else {
         /* ports with more room may expand this one */
         if (!addbranch)
-            Sprintf(buf, "%s:%-2d", /* "Dlvl:n" (grep fodder) */
-                    In_tutorial(&u.uz) ? "Tutorial" : "Dlvl", depth(&u.uz));
+            Sprintf(buf, "%s:%-2d", /* "Doom:n" (grep fodder) */
+                    In_tutorial(&u.uz) ? "Tutorial" : "Doom", depth(&u.uz));
         else
             Sprintf(buf, "level %d", depth(&u.uz));
         ret = 0;

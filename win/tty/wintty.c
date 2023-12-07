@@ -4124,7 +4124,7 @@ tty_putmixed(winid window, int attr, const char *str)
  *          ->check_fields()
  *          ->set_condition_length()  - update the width of conditions
  *          ->shrink_enc()      - shrink encumbrance message word
- *          ->shrink_dlvl()     - reduce the width of Dlvl:42
+ *          ->shrink_dlvl()     - reduce the width of Doom:42
  *
  *  check_fields
  *
@@ -4765,13 +4765,13 @@ shrink_enc(int lvl)
 static void
 shrink_dlvl(int lvl)
 {
-    /* try changing Dlvl: to Dl: */
+    /* try changing Doom: to Dm: */
     char buf[BUFSZ];
     char *levval = strchr(status_vals[BL_LEVELDESC], ':');
 
     if (levval) {
         dlvl_shrinklvl = lvl;
-        Strcpy(buf, (lvl == 0) ? "Dlvl" : "Dl");
+        Strcpy(buf, (lvl == 0) ? "Doom" : "Dm");
         Strcat(buf, levval);
         Strcpy(status_vals[BL_LEVELDESC], buf);
         tty_status[NOW][BL_LEVELDESC].lth = strlen(status_vals[BL_LEVELDESC]);
