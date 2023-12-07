@@ -93,8 +93,8 @@ static void opt_out_words(char *, int *);
 static void build_savebones_compat_string(void);
 
 static int idxopttext, done_runtime_opt_init_once = 0;
-#define MAXOPT 40
-static char *opttext[120] = { 0 };
+#define MAXOPT 60 /* 3.7: currently 40 lines get inserted into opttext[] */
+static char *opttext[MAXOPT] = { 0 };
 char optbuf[COLBUFSZ];
 static struct version_info version;
 static const char opt_indent[] = "    ";
@@ -736,7 +736,7 @@ opt_out_words(
             *word = '\0';
         if (*length_p + (int) strlen(str) > COLNO - 5) {
             opttext[idxopttext] = dupstr(optbuf);
-            if (idxopttext < (MAXOPT - 1))
+            if (idxopttext < MAXOPT)
                 idxopttext++;
             Sprintf(optbuf, "%s", opt_indent),
                 *length_p = (int) strlen(opt_indent);
@@ -763,7 +763,7 @@ build_options(void)
 #endif
     build_savebones_compat_string();
     opttext[idxopttext] = dupstr(optbuf);
-    if (idxopttext < (MAXOPT - 1))
+    if (idxopttext < MAXOPT)
         idxopttext++;
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
 #if (NH_DEVEL_STATUS == NH_STATUS_BETA)
@@ -777,11 +777,11 @@ build_options(void)
     Sprintf(optbuf, "%sNetHack version %d.%d.%d%s\n",
             opt_indent, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, STATUS_ARG);
     opttext[idxopttext] = dupstr(optbuf);
-    if (idxopttext < (MAXOPT - 1))
+    if (idxopttext < MAXOPT)
         idxopttext++;
     Sprintf(optbuf, "Options compiled into this edition:");
     opttext[idxopttext] = dupstr(optbuf);
-    if (idxopttext < (MAXOPT - 1))
+    if (idxopttext < MAXOPT)
         idxopttext++;
     optbuf[0] = '\0';
     length = COLNO + 1; /* force 1st item onto new line */
@@ -799,17 +799,17 @@ build_options(void)
         opt_out_words(buf, &length);
     }
     opttext[idxopttext] = dupstr(optbuf);
-    if (idxopttext < (MAXOPT - 1))
+    if (idxopttext < MAXOPT)
         idxopttext++;
     optbuf[0] = '\0';
     winsyscnt = count_and_validate_winopts();
     opttext[idxopttext] = dupstr(optbuf);
-    if (idxopttext < (MAXOPT - 1))
+    if (idxopttext < MAXOPT)
         idxopttext++;
     Sprintf(optbuf, "Supported windowing system%s:",
             (winsyscnt > 1) ? "s" : "");
     opttext[idxopttext] = dupstr(optbuf);
-    if (idxopttext < (MAXOPT - 1))
+    if (idxopttext < MAXOPT)
         idxopttext++;
     optbuf[0] = '\0';
     length = COLNO + 1; /* force 1st item onto new line */
@@ -843,17 +843,17 @@ build_options(void)
 #if !defined(MAKEDEFS_C)
     cnt = 0;
     opttext[idxopttext] = dupstr(optbuf);
-    if (idxopttext < (MAXOPT - 1))
+    if (idxopttext < MAXOPT)
         idxopttext++;
     optbuf[0] = '\0';
     soundlibcnt = count_and_validate_soundlibopts();
     opttext[idxopttext] = dupstr(optbuf);
-    if (idxopttext < (MAXOPT - 1))
+    if (idxopttext < MAXOPT)
         idxopttext++;
     Sprintf(optbuf, "Supported soundlib%s:",
             (soundlibcnt > 1) ? "s" : "");
     opttext[idxopttext] = dupstr(optbuf);
-    if (idxopttext < (MAXOPT - 1))
+    if (idxopttext < MAXOPT)
         idxopttext++;
     optbuf[0] = '\0';
     length = COLNO + 1; /* force 1st item onto new line */
@@ -893,7 +893,7 @@ build_options(void)
 #endif  /* !MAKEDEFS_C */
 
     opttext[idxopttext] = dupstr(optbuf);
-    if (idxopttext < (MAXOPT - 1))
+    if (idxopttext < MAXOPT)
         idxopttext++;
     optbuf[0] = '\0';
 
@@ -921,7 +921,7 @@ build_options(void)
            ":TAG:" substitutions are deferred to caller */
         for (i = 0; lua_info[i]; ++i) {
             opttext[idxopttext] = dupstr(lua_info[i]);
-            if (idxopttext < (MAXOPT - 1))
+            if (idxopttext < MAXOPT)
                 idxopttext++;
         }
     }
@@ -929,8 +929,9 @@ build_options(void)
 
     /* end with a blank line */
     opttext[idxopttext] = dupstr("");
-    if (idxopttext < (MAXOPT - 1))
+    if (idxopttext < MAXOPT)
         idxopttext++;
+    opttext[MAXOPT - 1] = NULL;
     return;
 }
 
@@ -974,7 +975,7 @@ do_runtime_info(int *rtcontext)
     if (!done_runtime_opt_init_once)
         runtime_info_init();
     if (idxopttext && rtcontext)
-        if (*rtcontext >= 0 && *rtcontext < (MAXOPT - 1)) {
+        if (*rtcontext >= 0 && *rtcontext < MAXOPT) {
             retval = opttext[*rtcontext];
             *rtcontext += 1;
         }
