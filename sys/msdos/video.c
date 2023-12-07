@@ -354,7 +354,10 @@ term_start_color(int color)
     if (monoflag) {
         g_attribute = attrib_text_normal;
     } else {
-        if (color >= 0 && color < CLR_MAX) {
+        if (color == NO_COLOR) { /* 3.7 behave like term_end_color() */
+            g_attribute = iflags.grmode ? attrib_gr_normal : attrib_text_normal;
+            curframecolor = NO_COLOR;
+        } else if (color >= 0 && color < CLR_MAX) {
             if (iflags.grmode)
                 g_attribute = color;
             else

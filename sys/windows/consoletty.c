@@ -1747,7 +1747,9 @@ term_start_raw_bold(void)
 void
 term_start_color(int color)
 {
-    if (color >= 0 && color < CLR_MAX) {
+    if (color == NO_COLOR) {
+        term_end_color();
+    } else if (color >= 0 && color < CLR_MAX) {
         console.current_nhcolor = color;
     } else {
        console.current_nhcolor = NO_COLOR;
@@ -1757,7 +1759,7 @@ term_start_color(int color)
 void
 term_start_bgcolor(int color)
 {
-    if (color >= 0 && color < CLR_MAX) {
+    if (color != NO_COLOR && (color >= 0 && color < CLR_MAX)) {
         console.current_nhbkcolor = color;
     } else {
         console.current_nhbkcolor = NO_COLOR;
