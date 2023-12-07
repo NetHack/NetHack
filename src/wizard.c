@@ -522,7 +522,7 @@ pick_nasty(
      * but we don't try very hard.
      */
     if (Is_rogue_level(&u.uz)
-        && !('A' <= mons[res].mlet && mons[res].mlet <= 'Z'))
+        && !('A' <= monsym(&mons[res]) && monsym(&mons[res]) <= 'Z'))
         res = ROLL_FROM(nasties);
 
     /* if genocided or too difficult or out of place, try a substitute
