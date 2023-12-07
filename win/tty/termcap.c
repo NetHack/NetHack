@@ -1,4 +1,4 @@
-/* NetHack 3.7	termcap.c	$NHDT-Date: 1609459769 2021/01/01 00:09:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.7	termcap.c	$NHDT-Date: 1701946349 2023/12/07 10:52:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1429,7 +1429,9 @@ term_end_color(void)
 void
 term_start_color(int color)
 {
-    if (color < CLR_MAX && hilites[color] && *hilites[color])
+    if (color == NO_COLOR)
+        xputs(nh_HE); /* inline term_end_color() */
+    else if (color < CLR_MAX && hilites[color] && *hilites[color])
         xputs(hilites[color]);
 }
 
