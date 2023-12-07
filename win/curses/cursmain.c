@@ -841,9 +841,11 @@ wait_synch()    -- Wait until all pending output is complete (*flush*() for
 void
 curses_wait_synch(void)
 {
-    if (curses_got_output())
-        (void) curses_more();
-    curses_mark_synch();
+    if (iflags.window_inited) {
+        if (curses_got_output())
+            (void) curses_more();
+        curses_mark_synch();
+    }
     /* [do we need 'if (counting) curses_count_window((char *)0);' here?] */
 }
 
