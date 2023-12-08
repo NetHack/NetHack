@@ -71,10 +71,10 @@ enum { MONSTER_SET, OBJECT_SET, OTHER_SET};
     [21] U = (205,205,205)    grayshade   maps to [20] or T for shade of gray
     [22] V = (104, 104, 104)  grayshade   maps to [27] or 0 for shade of gray
     [23] W = (131, 131, 131)  grayshade   maps to [22] or V for shade of gray
-    [24] X = (140, 140, 140)  grayshade   not mapped in graymappings
-    [25] Y = (149, 149, 149)  grayshade   not mapped in graymappings
-    [26] Z = (195, 195, 195)  grayshade   not mapped in graymappings
-    [27] 0 = (100, 100, 100)  grayshade   not mapped in graymappings
+    [24] X = (140, 140, 140)  grayshade   maps to [23] or W for shade of gray
+    [25] Y = (149, 149, 149)  grayshade   maps to [24] or X for shade of gray
+    [26] Z = (195, 195, 195)  grayshade   maps to [25] or Y for shade of gray
+    [27] 0 = (100, 100, 100)  grayshade   maps to [20] or T for shade of gray
     [28] 1 = (72, 108, 108)               not mapped in graymappings
 -----------------------------------------------------------------------------
 */
@@ -84,8 +84,8 @@ static int grayscale = 0;
 static const int graymappings[] = {
  /* .  A  B   C   D   E   F   G   H   I   J   K   L   M   N   O   P */
     0, 1, 17, 18, 19, 20, 27, 22, 23, 24, 25, 26, 21, 15, 13, 14, 14,
- /* Q  R   S   T   U   V   W */
-    1, 17, 18, 19, 20, 27, 22
+ /* Q  R   S   T   U   V   W   X   Y   Z   0 */
+    1, 17, 18, 19, 20, 27, 22, 23, 24, 25, 20
 };
 
 void
