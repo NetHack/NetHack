@@ -803,8 +803,9 @@ clear_level_structures(void)
     gl.level.flags.has_town = 0;
     gl.level.flags.wizard_bones = 0;
     gl.level.flags.corrmaze = 0;
-    gl.level.flags.rndmongen = 0;
-    gl.level.flags.deathdrops = 0;
+    gl.level.flags.temperature = In_hell(&u.uz) ? 1 : 0;
+    gl.level.flags.rndmongen = 1;
+    gl.level.flags.deathdrops = 1;
     gl.level.flags.noautosearch = 0;
     gl.level.flags.fumaroles = 0;
     gl.level.flags.stormy = 0;
