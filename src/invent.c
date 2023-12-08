@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1700869704 2023/11/24 23:48:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.476 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1702017603 2023/12/08 06:40:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.484 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2611,6 +2611,7 @@ void
 learn_unseen_invent(void)
 {
     struct obj *otmp;
+    boolean invupdated = FALSE;
 
     if (Blind)
         return; /* sanity check */
@@ -2618,6 +2619,7 @@ learn_unseen_invent(void)
     for (otmp = gi.invent; otmp; otmp = otmp->nobj) {
         if (otmp->dknown && (otmp->bknown || !Role_if(PM_CLERIC)))
             continue; /* already seen */
+        invupdated = TRUE;
         /* xname() will set dknown, perhaps bknown (for priest[ess]);
            result from xname() is immediately released for re-use */
         maybereleaseobuf(xname(otmp));
@@ -2626,7 +2628,8 @@ learn_unseen_invent(void)
          * handle deferred discovery here.
          */
     }
-    update_inventory();
+    if (invupdated)
+        update_inventory();
 }
 
 /* persistent inventory window is maintained by interface code;

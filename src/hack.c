@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1695932717 2023/09/28 20:25:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.410 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1702017600 2023/12/08 06:40:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.422 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3766,6 +3766,7 @@ unmul(const char *msg_override)
     gn.nomovemsg = 0;
     u.usleep = 0;
     gm.multi_reason = NULL, gm.multireasonbuf[0] = '\0';
+
     if (ga.afternmv) {
         int (*f)(void) = ga.afternmv;
 
@@ -3773,8 +3774,6 @@ unmul(const char *msg_override)
            encumbrance hack for levitation--see weight_cap()) */
         ga.afternmv = (int (*)(void)) 0;
         (void) (*f)();
-        /* for finishing Armor/Boots/&c_on() */
-        update_inventory();
     }
 }
 

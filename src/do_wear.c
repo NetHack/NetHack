@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_wear.c	$NHDT-Date: 1650875489 2022/04/25 08:31:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.156 $ */
+/* NetHack 3.7	do_wear.c	$NHDT-Date: 1702017586 2023/12/08 06:39:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.175 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -213,8 +213,11 @@ Boots_on(void)
     default:
         impossible(unknown_type, c_boots, uarmf->otyp);
     }
-    if (uarmf) /* could be Null here (levitation boots put on over a sink) */
+    /* uarmf could be Null here (levitation boots put on over a sink) */
+    if (uarmf && !uarmf->known) {
         uarmf->known = 1; /* boots' +/- evident because of status line AC */
+        update_inventory();
+    }
     return 0;
 }
 
@@ -332,8 +335,10 @@ Cloak_on(void)
     default:
         impossible(unknown_type, c_cloak, uarmc->otyp);
     }
-    if (uarmc) /* no known instance of !uarmc here but play it safe */
+    if (uarmc && !uarmc->known) { /* no known instance of !uarmc here */
         uarmc->known = 1; /* cloak's +/- evident because of status line AC */
+        update_inventory();
+    }
     return 0;
 }
 
@@ -461,8 +466,10 @@ Helmet_on(void)
         impossible(unknown_type, c_helmet, uarmh->otyp);
     }
     /* uarmh could be Null due to uchangealign() */
-    if (uarmh)
+    if (uarmh && !uarmh->known) {
         uarmh->known = 1; /* helmet's +/- evident because of status line AC */
+        update_inventory();
+    }
     return 0;
 }
 
@@ -544,8 +551,10 @@ Gloves_on(void)
     default:
         impossible(unknown_type, c_gloves, uarmg->otyp);
     }
-    if (uarmg) /* no known instance of !uarmg here but play it safe */
+    if (!uarmg->known) {
         uarmg->known = 1; /* gloves' +/- evident because of status line AC */
+        update_inventory();
+    }
     return 0;
 }
 
@@ -667,8 +676,10 @@ Shield_on(void)
     default:
         impossible(unknown_type, c_shield, uarms->otyp);
     }
-    if (uarms) /* no known instance of !uarms here but play it safe */
+    if (!uarms->known) {
         uarms->known = 1; /* shield's +/- evident because of status line AC */
+        update_inventory();
+    }
     return 0;
 }
 
@@ -708,8 +719,10 @@ Shirt_on(void)
     default:
         impossible(unknown_type, c_shirt, uarmu->otyp);
     }
-    if (uarmu) /* no known instances of !uarmu here but play it safe */
+    if (!uarmu->known) {
         uarmu->known = 1; /* shirt's +/- evident because of status line AC */
+        update_inventory();
+    }
     return 0;
 }
 
@@ -827,10 +840,12 @@ Armor_on(void)
 {
     if (!uarm) /* no known instances of !uarm here but play it safe */
         return 0;
-    uarm->known = 1; /* suit's +/- evident because of status line AC */
-
+    if (!uarm->known) {
+        uarm->known = 1; /* suit's +/- evident because of status line AC */
+        update_inventory();
+    }
     dragon_armor_handling(uarm, TRUE, TRUE);
-    /* gold DSM requires special handling since it emits light when worn;
+    /* gold DSM requires extra handling since it emits light when worn;
        do that after the special armor handling */
     if (artifact_light(uarm) && !uarm->lamplit) {
         begin_burn(uarm, FALSE);
@@ -1117,7 +1132,7 @@ adjust_attrib(struct obj *obj, int which, int val)
 }
 
 void
-Ring_on(register struct obj *obj)
+Ring_on(struct obj *obj)
 {
     long oldprop = u.uprops[objects[obj->otyp].oc_oprop].extrinsic;
     boolean observable;
@@ -1412,8 +1427,8 @@ Blindf_off(struct obj *otmp)
 /* called in moveloop()'s prologue to set side-effects of worn start-up items;
    also used by poly_obj() when a worn item gets transformed */
 void
-set_wear(struct obj *obj) /* if null, do all worn items;
-                           * otherwise just obj itself */
+set_wear(
+    struct obj *obj) /* if Null, do all worn items; otherwise just obj */
 {
     gi.initial_don = !obj;
 
