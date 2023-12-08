@@ -359,7 +359,7 @@ submit_web_report(const char *msg, char *why)
 /* // XXX header for wholetrace - what other info do we want? */
 /* // NB: prelines not tested against size of SWR_FRAMES. */
 #define SWR_HDR(line) \
-    do {
+    do {                                                                    \
         if (endp < &wholetrace[sizeof wholetrace]) {                        \
             endp += snprintf(endp, sizeof wholetrace - (endp - wholetrace), \
                              "%s\n", line);                                 \
