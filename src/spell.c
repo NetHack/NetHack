@@ -1,4 +1,4 @@
-/* NetHack 3.7	spell.c	$NHDT-Date: 1646838390 2022/03/09 15:06:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.7	spell.c	$NHDT-Date: 1702023273 2023/12/08 08:14:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.157 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -846,19 +846,28 @@ skill_based_spellbook_id(void)
     for (booktype = gb.bases[spbook_class];
          booktype < gb.bases[spbook_class + 1];
          booktype++) {
-        int skill = spell_skilltype(booktype);
-        if (skill == P_NONE) continue;
-
         int known_up_to_level;
+        int skill = spell_skilltype(booktype);
+
+        if (skill == P_NONE)
+            continue;
+
         switch (P_SKILL(skill)) {
         case P_BASIC:
-            known_up_to_level = 3; break;
+            known_up_to_level = 3;
+            break;
         case P_SKILLED:
-            known_up_to_level = 5; break;
-        case P_EXPERT: case P_MASTER: case P_GRAND_MASTER:
-            known_up_to_level = 7; break;
-        case P_UNSKILLED: default:
-                known_up_to_level = 1; break;
+            known_up_to_level = 5;
+            break;
+        case P_EXPERT:
+        case P_MASTER:
+        case P_GRAND_MASTER:
+            known_up_to_level = 7;
+            break;
+        case P_UNSKILLED:
+        default:
+            known_up_to_level = 1;
+            break;
         }
 
         if (objects[booktype].oc_level <= known_up_to_level)
@@ -978,21 +987,22 @@ cast_chain_lightning(void)
     /* start by propagating in all directions from the caster */
     for (int dir = 0; dir < N_DIRS; dir++) {
         struct chain_lightning_zap zap = { dir, u.ux, u.uy, 2 };
+
         propagate_chain_lightning(&clq, zap);
     }
     nh_delay_output();
 
     while (clq.head < clq.tail) {
         int delay_tail = clq.tail;
+
         while (clq.head < delay_tail) {
             struct chain_lightning_zap zap = clq.q[clq.head++];
-
             /* damage any monster that was hit */
             struct monst *mon = m_at(zap.x, zap.y);
+
             if (mon) {
                 struct obj *unused; /* AD_ELEC can't destroy armor */
-                int dmg = zhitm(
-                    mon, BZ_U_SPELL(AD_ELEC - 1), 2, &unused);
+                int dmg = zhitm(mon, BZ_U_SPELL(AD_ELEC - 1), 2, &unused);
 
                 if (dmg) {
                     /* mon has been damaged, but we haven't yet printed the
@@ -1021,8 +1031,8 @@ cast_chain_lightning(void)
 
             if (zap.strength < 2)
                 zap.strength = 0;
-            else if (u.uen)
-                u.uen--; /* propagating past monsters increases Pw cost a bit */
+            else if (u.uen > 0)
+                u.uen--; /* propagating past mons increases Pw cost a bit */
             zap.dir = DIR_LEFT(zap.dir);
             propagate_chain_lightning(&clq, zap);
 

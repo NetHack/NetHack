@@ -1,4 +1,4 @@
-/* NetHack 3.7	mklev.c	$NHDT-Date: 1702002703 2023/12/08 02:31:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.162 $ */
+/* NetHack 3.7	mklev.c	$NHDT-Date: 1702023271 2023/12/08 08:14:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.163 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -923,30 +923,31 @@ fill_ordinary_room(struct mkroom *croom, boolean bonus_items)
     if (bonus_items && somexyspace(croom, &pos)) {
         branch *uz_branch = Is_branchlev(&u.uz);
 
-        if (uz_branch && u.uz.dnum != mines_dnum &&
-            (uz_branch->end1.dnum == mines_dnum ||
-             uz_branch->end2.dnum == mines_dnum)) {
-            (void) mksobj_at(
-                rn2(5) < 3 ? FOOD_RATION : rn2(2) ? CRAM_RATION : LEMBAS_WAFER,
-                pos.x, pos.y, TRUE, FALSE);
-        } else if (u.uz.dnum == oracle_level.dnum &&
-                   u.uz.dlevel < oracle_level.dlevel && rn2(3)) {
+        if (uz_branch && u.uz.dnum != mines_dnum
+            && (uz_branch->end1.dnum == mines_dnum
+                || uz_branch->end2.dnum == mines_dnum)) {
+            (void) mksobj_at((rn2(5) < 3) ? FOOD_RATION
+                             : rn2(2) ? CRAM_RATION
+                               : LEMBAS_WAFER,
+                             pos.x, pos.y, TRUE, FALSE);
+        } else if (u.uz.dnum == oracle_level.dnum
+                   && u.uz.dlevel < oracle_level.dlevel && rn2(3)) {
             struct obj *otmp;
+            int otyp, tryct = 0;
+            boolean cursed;
             /* reverse probabilities compared to non-supply chests;
                these are twice as likely to be chests than large
                boxes, rather than vice versa */
-            struct obj *supply_chest = mksobj_at(
-                rn2(3) ? CHEST : LARGE_BOX, pos.x, pos.y, FALSE, FALSE);
+            struct obj *supply_chest = mksobj_at(rn2(3) ? CHEST : LARGE_BOX,
+                                                 pos.x, pos.y, FALSE, FALSE);
+
             supply_chest->olocked = !!(rn2(6));
 
-            int tryct = 0;
-            boolean cursed;
             do {
-                int otyp;
                 /* 50% this is a potion of healing */
-                if (rn2(2))
+                if (rn2(2)) {
                     otyp = POT_HEALING;
-                else {
+                } else {
                     static const int supply_items[] = {
                         POT_EXTRA_HEALING,
                         POT_SPEED,
@@ -958,6 +959,7 @@ fill_ordinary_room(struct mkroom *croom, boolean bonus_items)
                         WAN_DIGGING,
                         SPE_HEALING,
                     };
+
                     otyp = ROLL_FROM(supply_items);
                 }
                 otmp = mksobj(otyp, TRUE, FALSE);
@@ -994,12 +996,15 @@ fill_ordinary_room(struct mkroom *croom, boolean bonus_items)
                     SPBOOK_no_NOVEL
                 };
                 int oclass = ROLL_FROM(extra_classes);
+
                 otmp = mkobj(oclass, FALSE);
                 if (oclass == SPBOOK_no_NOVEL) {
                     /* bias towards lower level by generating again
                        and taking the lower-level book */
                     struct obj *otmp2 = mkobj(oclass, FALSE);
-                    if (objects[otmp->otyp].oc_level <= objects[otmp2->otyp].oc_level) {
+
+                    if (objects[otmp->otyp].oc_level
+                        <= objects[otmp2->otyp].oc_level) {
                         dealloc_obj(otmp2);
                     } else {
                         dealloc_obj(otmp);
@@ -1020,8 +1025,8 @@ fill_ordinary_room(struct mkroom *croom, boolean bonus_items)
      *  when few rooms; chance for 3 or more is negligible.
      */
     if (!rn2(gn.nroom * 5 / 2) && somexyspace(croom, &pos) && !skip_chests)
-        (void) mksobj_at((rn2(3)) ? LARGE_BOX : CHEST,
-                            pos.x, pos.y, TRUE, FALSE);
+        (void) mksobj_at(rn2(3) ? LARGE_BOX : CHEST,
+                         pos.x, pos.y, TRUE, FALSE);
 
     /* maybe make some graffiti */
     if (!rn2(27 + 3 * abs(depth(&u.uz)))) {

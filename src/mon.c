@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1693292534 2023/08/29 07:02:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.517 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1702023272 2023/12/08 08:14:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.532 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -157,13 +157,13 @@ sanity_check_single_mon(
         if (ceiling_hider(mptr)
             /* normally !accessible would be overridable with passes_walls,
                but not for hiding on the ceiling */
-            && (!has_ceiling(&u.uz) ||
-                !(levl[mx][my].typ == POOL
-                  || levl[mx][my].typ == MOAT
-                  || levl[mx][my].typ == WATER
-                  || levl[mx][my].typ == LAVAPOOL
-                  || levl[mx][my].typ == LAVAWALL
-                  || accessible(mx, my))))
+            && (!has_ceiling(&u.uz)
+                || !(levl[mx][my].typ == POOL
+                     || levl[mx][my].typ == MOAT
+                     || levl[mx][my].typ == WATER
+                     || levl[mx][my].typ == LAVAPOOL
+                     || levl[mx][my].typ == LAVAWALL
+                     || accessible(mx, my))))
             impossible("ceiling hider hiding %s (%s)",
                        !has_ceiling(&u.uz) ? "without ceiling"
                                            : "in solid stone",
@@ -3286,8 +3286,8 @@ xkilled(
             otmp = mkobj(RANDOM_CLASS, TRUE);
             /* don't create large objects from small monsters */
             otyp = otmp->otyp;
-            if (otmp->oclass == FOOD_CLASS && !(mdat->mflags2 & M2_COLLECT) &&
-                !otmp->oartifact) {
+            if (otmp->oclass == FOOD_CLASS && !(mdat->mflags2 & M2_COLLECT)
+                && !otmp->oartifact) {
                 /* don't drop newly created permafood from kills, unless
                    the monster collects food; it creates too much nutrition
                    in the late game and encourages grinding in the early

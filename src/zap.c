@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1698264791 2023/10/25 20:13:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.481 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1702023277 2023/12/08 08:14:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.498 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5394,8 +5394,7 @@ adtyp_to_prop(int dmgtyp)
 }
 
 /* Is hero wearing or wielding an object with resistance to attack
-   damage type? Returns the percentage protection that the object
-   gives. */
+   damage type? Returns the percentage protection that the object gives. */
 int
 u_adtyp_resistance_obj(int dmgtyp)
 {
@@ -5409,10 +5408,9 @@ u_adtyp_resistance_obj(int dmgtyp)
     if ((u.uprops[prop].extrinsic & (W_ARMOR | W_ACCESSORY | W_WEP)) != 0)
         return 99;
 
-    /* Dwarvish cloaks give a 90% protection to items against heat and
-       cold */
-    if (uarmc && uarmc->otyp == DWARVISH_CLOAK &&
-        (dmgtyp == AD_COLD || dmgtyp == AD_FIRE))
+    /* Dwarvish cloaks give a 90% protection to items against heat and cold */
+    if (uarmc && uarmc->otyp == DWARVISH_CLOAK
+        && (dmgtyp == AD_COLD || dmgtyp == AD_FIRE))
         return 90;
 
     return 0;

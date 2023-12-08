@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1701677864 2023/12/04 08:17:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1702023267 2023/12/08 08:14:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1430,11 +1430,16 @@ weapon_insight(int final)
 }
 
 static void
-item_resistance_message(int adtyp, const char *prot_message, int final)
+item_resistance_message(
+    int adtyp,
+    const char *prot_message,
+    int final)
 {
     int protection = u_adtyp_resistance_obj(adtyp);
+
     if (protection) {
         boolean somewhat = protection < 99;
+
         enl_msg("Your items ",
                 somewhat ? "are somewhat" : "are",
                 somewhat ? "were somewhat" : "were",
@@ -1444,7 +1449,9 @@ item_resistance_message(int adtyp, const char *prot_message, int final)
 
 /* attributes: intrinsics and the like, other non-obvious capabilities */
 static void
-attributes_enlightenment(int unused_mode UNUSED, int final)
+attributes_enlightenment(
+    int unused_mode UNUSED,
+    int final)
 {
     static NEARDATA const char
         if_surroundings_permitted[] = " if surroundings permitted";

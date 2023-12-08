@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1689629244 2023/07/17 21:27:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.358 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1702023250 2023/12/08 08:14:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.368 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -303,8 +303,8 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
     } else if (gc.context.mon_moving && IS_ALTAR(levl[x][y].typ)
                && cansee(x,y)) {
         doaltarobj(obj);
-    } else if (obj->oclass == POTION_CLASS && gl.level.flags.temperature > 0 &&
-               (levl[x][y].typ == ROOM || levl[x][y].typ == CORR)) {
+    } else if (obj->oclass == POTION_CLASS && gl.level.flags.temperature > 0
+               && (levl[x][y].typ == ROOM || levl[x][y].typ == CORR)) {
         /* Potions are sometimes destroyed when landing on very hot
            ground. The basic odds are 50% for nonblessed potions and
            30% for blessed potions; if you have handled the object

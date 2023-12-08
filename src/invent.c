@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1702017603 2023/12/08 06:40:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.484 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1702023269 2023/12/08 08:14:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.485 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -941,8 +941,8 @@ merged(struct obj **potmp, struct obj **pobj)
            information about the items (with the exception of thrown
            items, where this would be too spammy as such items get
            unidentified by monsters very frequently). */
-        if (discovered && otmp->where == OBJ_INVENT &&
-            !obj->was_thrown && !otmp->was_thrown) {
+        if (discovered && otmp->where == OBJ_INVENT
+            && !obj->was_thrown && !otmp->was_thrown) {
             pline("You learn more about your items by comparing them.");
         }
 

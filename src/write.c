@@ -1,4 +1,4 @@
-/* NetHack 3.7	write.c	$NHDT-Date: 1596498232 2020/08/03 23:43:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.7	write.c	$NHDT-Date: 1702023275 2023/12/08 08:14:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -349,8 +349,8 @@ dowrite(struct obj *pen)
         /* else fresh knowledge of the spell works */
         && spell_knowledge != spe_Fresh
         /* and Luck might override after previous checks have failed */
-        && rnl(((Role_if(PM_WIZARD) && paper->oclass != SPBOOK_CLASS) ||
-                spell_knowledge == spe_GoingStale)
+        && rnl(((Role_if(PM_WIZARD) && paper->oclass != SPBOOK_CLASS)
+                || spell_knowledge == spe_GoingStale)
                ? 5 : 15)) {
         You("%s to write that.", by_descr ? "fail" : "don't know how");
         /* scrolls disappear, spellbooks don't */
