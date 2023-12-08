@@ -17,7 +17,7 @@ static void fmod_exit_nhsound(const char *);
 static void fmod_achievement(schar, schar, int32_t);
 static void fmod_soundeffect(char *, int32_t, int32_t);
 static void fmod_hero_playnotes(int32_t instrument, const char *str, int32_t volume);
-static void fmod_play_usersound(const char *, int32_t, int32_t);
+static void fmod_play_usersound(char *, int32_t, int32_t);
 static void fmod_ambience(int32_t, int32_t, int32_t);
 static void fmod_verbal(char *, int32_t, int32_t, int32_t, int32_t);
 
@@ -72,7 +72,7 @@ static void fmod_hero_playnotes(int32_t instrument, const char *str, int32_t vol
 
 /* fulfill  SOUND_TRIGGER_USERSOUNDS */
 static void
-fmod_play_usersound(const char *filename, int32_t volume UNUSED, int32_t idx UNUSED)
+fmod_play_usersound(char *filename, int32_t volume UNUSED, int32_t idx UNUSED)
 {
     FMOD_System_CreateSound(systemvar, filename, FMOD_CREATESAMPLE, 0,
                             &soundvar);
