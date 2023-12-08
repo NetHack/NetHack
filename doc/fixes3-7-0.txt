@@ -1319,6 +1319,7 @@ spellbooks weight 50 units but Book of the Dead only 20, and novels only 1;
 save and restore hero tracks, increase track length
 change vrock and hezrou from red to green, adjust vrock tile to have green
 change wolf and werewolf to grey, warg to black
+change [master] mind flayer, the Wizard, and the riders to bright magenta
 walking into a shopkeeper tries to pay the bill
 
 

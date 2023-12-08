@@ -36,6 +36,7 @@
 /* color aliases used in monsters.h and display.c  */
 #define HI_DOMESTIC CLR_WHITE /* for player + pets */
 #define HI_LORD CLR_MAGENTA /* for high-end monsters */
+#define HI_OVERLORD CLR_BRIGHT_MAGENTA /* for few uniques */
 
 /* these can be configured */
 #define HI_OBJ CLR_MAGENTA
