@@ -22,11 +22,11 @@ static void savedamage(NHFILE *);
 static void save_bubbles(NHFILE *, xint8);
 static void save_stairs(NHFILE *);
 static void save_bc(NHFILE *);
-static void saveobj(NHFILE *,struct obj *);
-static void saveobjchn(NHFILE *,struct obj **);
-static void savemon(NHFILE *,struct monst *);
-static void savemonchn(NHFILE *,struct monst *);
-static void savetrapchn(NHFILE *,struct trap *);
+static void saveobj(NHFILE *, struct obj *);
+static void saveobjchn(NHFILE *, struct obj **);
+static void savemon(NHFILE *, struct monst *);
+static void savemonchn(NHFILE *, struct monst *);
+static void savetrapchn(NHFILE *, struct trap *);
 static void save_gamelog(NHFILE *);
 static void savegamestate(NHFILE *);
 static void savelev_core(NHFILE *, xint8);
@@ -344,7 +344,7 @@ savegamestate(NHFILE *nhfp)
 
 /* potentially called from goto_level(do.c) as well as savestateinlock() */
 boolean
-tricked_fileremoved(NHFILE* nhfp, char* whynot)
+tricked_fileremoved(NHFILE *nhfp, char *whynot)
 {
     if (!nhfp) {
         pline1(whynot);
@@ -571,7 +571,7 @@ savelev_core(NHFILE *nhfp, xint8 lev)
 }
 
 static void
-savelevl(NHFILE* nhfp, boolean rlecomp)
+savelevl(NHFILE *nhfp, boolean rlecomp)
 {
 #ifdef RLECOMP
     struct rm *prm, *rgrm;
@@ -654,7 +654,7 @@ save_bubbles(NHFILE *nhfp, xint8 lev)
 
 /* used when saving a level and also when saving dungeon overview data */
 void
-savecemetery(NHFILE* nhfp, struct cemetery** cemeteryaddr)
+savecemetery(NHFILE *nhfp, struct cemetery **cemeteryaddr)
 {
     struct cemetery *thisbones, *nextbones;
     int flag;
@@ -679,7 +679,7 @@ savecemetery(NHFILE* nhfp, struct cemetery** cemeteryaddr)
 }
 
 static void
-savedamage(NHFILE* nhfp)
+savedamage(NHFILE *nhfp)
 {
     register struct damage *damageptr, *tmp_dam;
     unsigned int xl = 0;
@@ -706,7 +706,7 @@ savedamage(NHFILE* nhfp)
 }
 
 static void
-save_stairs(NHFILE* nhfp)
+save_stairs(NHFILE *nhfp)
 {
     stairway *stway = gs.stairs;
     int buflen = (int) sizeof *stway;
@@ -815,7 +815,7 @@ saveobj(NHFILE *nhfp, struct obj *otmp)
 /* save an object chain; sets head of list to Null when done;
    handles release_data() for each object in the list */
 static void
-saveobjchn(NHFILE* nhfp, struct obj** obj_p)
+saveobjchn(NHFILE *nhfp, struct obj **obj_p)
 {
     register struct obj *otmp = *obj_p;
     struct obj *otmp2;
@@ -878,7 +878,7 @@ saveobjchn(NHFILE* nhfp, struct obj** obj_p)
 }
 
 static void
-savemon(NHFILE* nhfp, struct monst* mtmp)
+savemon(NHFILE *nhfp, struct monst *mtmp)
 {
     int buflen;
 
@@ -941,7 +941,7 @@ savemon(NHFILE* nhfp, struct monst* mtmp)
 }
 
 static void
-savemonchn(NHFILE* nhfp, register struct monst* mtmp)
+savemonchn(NHFILE *nhfp, register struct monst *mtmp)
 {
     register struct monst *mtmp2;
     int minusone = -1;
@@ -978,7 +978,7 @@ savemonchn(NHFILE* nhfp, register struct monst* mtmp)
 
 /* save traps; gf.ftrap is the only trap chain so the 2nd arg is superfluous */
 static void
-savetrapchn(NHFILE* nhfp, register struct trap* trap)
+savetrapchn(NHFILE *nhfp, register struct trap *trap)
 {
     static struct trap zerotrap;
     register struct trap *trap2;
@@ -1011,7 +1011,7 @@ savetrapchn(NHFILE* nhfp, register struct trap* trap)
  * level routine marks nonexistent fruits by making the fid negative.
  */
 void
-savefruitchn(NHFILE* nhfp)
+savefruitchn(NHFILE *nhfp)
 {
     static struct fruit zerofruit;
     register struct fruit *f2, *f1;
@@ -1035,10 +1035,8 @@ savefruitchn(NHFILE* nhfp)
         gf.ffruit = 0;
 }
 
-
-
 static void
-savelevchn(NHFILE* nhfp)
+savelevchn(NHFILE *nhfp)
 {
     s_level *tmplev, *tmplev2;
     int cnt = 0;
@@ -1110,7 +1108,7 @@ save_msghistory(NHFILE *nhfp)
 }
 
 void
-store_savefileinfo(NHFILE* nhfp)
+store_savefileinfo(NHFILE *nhfp)
 {
     /* sfcap (decl.c) describes the savefile feature capabilities
      * that are supported by this port/platform build.

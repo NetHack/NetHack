@@ -325,8 +325,10 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
         }
 
         int survival_chance = obj->blessed ? 70 : 50;
-        if (obj->invlet) survival_chance += Luck * 2;
-        if (obj->otyp == POT_OIL) survival_chance = 100;
+        if (obj->invlet)
+            survival_chance += Luck * 2;
+        if (obj->otyp == POT_OIL)
+            survival_chance = 100;
 
         if (!obj_resists(obj, survival_chance, 100)) {
             if (cansee(x,y)) {
