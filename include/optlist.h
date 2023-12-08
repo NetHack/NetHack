@@ -536,7 +536,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 "maximum burden picked up before prompt")
     NHOPTB(pickup_stolen, Behavior, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.pickup_stolen, Term_False,
-           "autopickup thrown items")
+           "autopickup stolen items")
     NHOPTB(pickup_thrown, Behavior, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.pickup_thrown, Term_False,
            "autopickup thrown items")
