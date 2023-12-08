@@ -1,4 +1,4 @@
-/* NetHack 3.7	mklev.c	$NHDT-Date: 1691877661 2023/08/12 22:01:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.155 $ */
+/* NetHack 3.7	mklev.c	$NHDT-Date: 1702002703 2023/12/08 02:31:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.162 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -814,9 +814,11 @@ clear_level_structures(void)
     gn.nsubroom = 0;
     gs.subrooms[0].hx = -1;
     gd.doorindex = 0;
-    gd.doors_alloc = 0;
-    free(gd.doors);
-    gd.doors = (coord *) 0;
+    if (gd.doors_alloc) {
+        free((genericptr_t) gd.doors);
+        gd.doors = (coord *) 0;
+        gd.doors_alloc = 0;
+    }
     init_rect();
     init_vault();
     stairway_free_all();
