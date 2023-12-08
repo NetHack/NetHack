@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1700012887 2023/11/15 01:48:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.282 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1702002966 2023/12/08 02:36:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.284 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1344,7 +1344,7 @@ done_object_cleanup(void)
        a normal popup one; avoids "Bad fruit #n" when saving bones */
     if (iflags.perm_invent) {
         iflags.perm_invent = FALSE;
-        update_inventory(); /* make interface notice the change */
+        perm_invent_toggled(TRUE); /* make interface notice the change */
     }
     return;
 }

@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.c	$NHDT-Date: 1701723543 2023/12/04 20:59:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.369 $ */
+/* NetHack 3.7	wintty.c	$NHDT-Date: 1702002970 2023/12/08 02:36:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.376 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -272,7 +272,7 @@ static long last_glyph_reset_when;
 #endif
 static boolean calling_from_update_inventory = FALSE;
 static int ttyinv_create_window(int, struct WinDesc *);
-static void ttyinv_remove_data(boolean);
+static void ttyinv_remove_data(struct WinDesc *, boolean);
 static void ttyinv_add_menu(winid, struct WinDesc *, char ch, int attr,
                             int clr, const char *str);
 static int selector_to_slot(char ch, const int invflags, boolean *ignore);
@@ -1087,17 +1087,20 @@ tty_clear_nhwindow(winid window)
         break;
     case NHW_MENU:
     case NHW_TEXT:
+#ifdef TTY_PERM_INVENT
+    case NHW_PERMINVENT:
+#endif
         if (!erasing_tty_screen) {
             if (cw->active)
                 erase_menu_or_text(window, cw, TRUE);
-            free_window_info(cw, FALSE);
+#ifdef TTY_PERM_INVENT
+            if (window == WIN_INVEN)
+                ttyinv_remove_data(cw, FALSE);
+            else
+#endif
+                free_window_info(cw, FALSE);
         }
         break;
-#ifdef TTY_PERM_INVENT
-    case NHW_PERMINVENT:
-        ttyinv_remove_data(FALSE);
-        break;
-#endif
     }
     cw->curx = cw->cury = 0;
     /* cw->blanked = TRUE; -- this isn't used */
@@ -1942,6 +1945,7 @@ tty_dismiss_nhwindow(winid window)
         break;
     case NHW_MENU:
     case NHW_TEXT:
+    case NHW_PERMINVENT:
         if (cw->active) {
             /* skip erasure if window_inited has been reset to 0 during
                final run-down in case this is the end-of-game window;
@@ -1985,8 +1989,8 @@ tty_destroy_nhwindow(winid window)
     if (cw->type == NHW_MAP)
         term_clear_screen();
 #ifdef TTY_PERM_INVENT
-    if (cw->type == NHW_PERMINVENT)
-        ttyinv_remove_data(TRUE);
+    if (cw->type == NHW_PERMINVENT || window == WIN_INVEN)
+        ttyinv_remove_data(cw, TRUE);
 #endif
     free_window_info(cw, TRUE);
     free((genericptr_t) cw);
@@ -2944,10 +2948,8 @@ ttyinv_create_window(int newid, struct WinDesc *newwin)
 
 /* discard perminvent window or erase it and set remembered data to spaces */
 static void
-ttyinv_remove_data(boolean destroy)
+ttyinv_remove_data(struct WinDesc *cw, boolean destroy)
 {
-    struct WinDesc *cw = (WIN_INVEN != WIN_ERR) ? wins[WIN_INVEN] : NULL;
-
     if (!cw) {
         impossible("Removing ttyinv data for nonexistent perm invent window?");
         return;
