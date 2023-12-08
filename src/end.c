@@ -413,7 +413,7 @@ submit_web_report(const char *msg, char *why)
         if (pid == 0) {
             char err[100];
 
-            (int) execve(CRASHREPORT, (char * const *) xargv, environ);
+            (void) execve(CRASHREPORT, (char * const *) xargv, environ);
             Sprintf(err, "Can't start " CRASHREPORT ": %s", strerror(errno));
             raw_print(err);
         } else {
