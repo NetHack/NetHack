@@ -479,7 +479,8 @@ do_attack(struct monst *mtmp)
                 char buf[BUFSZ];
 
                 if (!gc.context.travel && !gc.context.run)
-                    return ECMD_TIME | dopay();
+                    if (canspotmon(mtmp) && mtmp->isshk)
+                        return ECMD_TIME | dopay();
 
                 if (mtmp->mtame) /* see 'additional considerations' above */
                     monflee(mtmp, rnd(6), FALSE, FALSE);
