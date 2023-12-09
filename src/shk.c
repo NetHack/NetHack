@@ -1442,7 +1442,7 @@ dopay(void)
     struct monst *nxtm, *resident;
     long ltmp;
     long umoney;
-    int pass, tmp, sk = 0, seensk = 0;
+    int pass, tmp, sk = 0, seensk = 0, nexttosk = 0;
     boolean paid = FALSE, stashed_gold = (hidden_gold(TRUE) > 0L);
 
     gm.multi = 0;
@@ -1454,16 +1454,21 @@ dopay(void)
     for (shkp = next_shkp(fmon, FALSE); shkp;
          shkp = next_shkp(shkp->nmon, FALSE)) {
         sk++;
-        if (ANGRY(shkp) && next2u(shkp->mx, shkp->my))
+        if (next2u(shkp->mx, shkp->my)) {
+            /* next to an irate shopkeeper? prioritize that */
+            if (nxtm && ANGRY(nxtm))
+                continue;
+            nexttosk++;
             nxtm = shkp;
+        }
         if (canspotmon(shkp))
             seensk++;
         if (inhishop(shkp) && (*u.ushops == ESHK(shkp)->shoproom))
             resident = shkp;
     }
 
-    if (nxtm) {      /* Player should always appease an */
-        shkp = nxtm; /* irate shk standing next to them. */
+    if (nxtm && nexttosk == 1) {
+        shkp = nxtm;
         goto proceed;
     }
 

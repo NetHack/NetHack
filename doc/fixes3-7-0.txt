@@ -1322,6 +1322,7 @@ change wolf and werewolf to grey, warg to black
 change [master] mind flayer, the Wizard, and the riders to bright magenta
 walking into a shopkeeper tries to pay the bill
 show billed items in a menu when paying with non-traditional menustyle
+prioritize paying shopkeeper next to you even if multiple are detected
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
