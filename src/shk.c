@@ -1412,7 +1412,7 @@ menu_pick_pay_items(struct monst *shkp)
                making the partly-used-up code more complicated */
             if (bp->useup)
                 otmp->quan = bp->bquan;
-            Sprintf(buf, "%s%s",
+            Snprintf(buf, sizeof buf, "%s%s",
                     bp->useup ? "(used up) " : "",
                     doname(otmp));
             any.a_int = n + 1; /* +1: avoid 0 */
@@ -1421,7 +1421,7 @@ menu_pick_pay_items(struct monst *shkp)
         }
     }
 
-    end_menu(win, "Pay which items?");
+    end_menu(win, "Pay for which items?");
     n = select_menu(win, PICK_ANY, &pick_list);
     destroy_nhwindow(win);
 
@@ -1442,7 +1442,7 @@ dopay(void)
     struct monst *nxtm, *resident;
     long ltmp;
     long umoney;
-    int pass, tmp, sk = 0, seensk = 0, nexttosk = 0;
+    int pass, tmp, sk = 0, seensk = 0;
     boolean paid = FALSE, stashed_gold = (hidden_gold(TRUE) > 0L);
 
     gm.multi = 0;
@@ -1454,21 +1454,16 @@ dopay(void)
     for (shkp = next_shkp(fmon, FALSE); shkp;
          shkp = next_shkp(shkp->nmon, FALSE)) {
         sk++;
-        if (next2u(shkp->mx, shkp->my)) {
-            /* next to an irate shopkeeper? prioritize that */
-            if (nxtm && ANGRY(nxtm))
-                continue;
-            nexttosk++;
+        if (ANGRY(shkp) && next2u(shkp->mx, shkp->my))
             nxtm = shkp;
-        }
         if (canspotmon(shkp))
             seensk++;
         if (inhishop(shkp) && (*u.ushops == ESHK(shkp)->shoproom))
             resident = shkp;
     }
 
-    if (nxtm && nexttosk == 1) {
-        shkp = nxtm;
+    if (nxtm) {      /* Player should always appease an */
+        shkp = nxtm; /* irate shk standing next to them. */
         goto proceed;
     }
 
@@ -1691,7 +1686,7 @@ dopay(void)
     /* now check items on bill */
     if (eshkp->billct) {
         register boolean itemize;
-        boolean queuedpay = FALSE;
+        boolean queuedpay = FALSE, via_menu;
         int iprompt;
 
         umoney = money_cnt(gi.invent);
@@ -1708,19 +1703,35 @@ dopay(void)
             return ECMD_OK;
         }
 
-        if (flags.menu_style != MENU_TRADITIONAL && eshkp->billct > 1) {
-            if (!menu_pick_pay_items(shkp))
-                return ECMD_OK;
-            queuedpay = TRUE;
-            itemize = FALSE;
-        } else {
-            /* this isn't quite right; it itemizes without asking if the
-             * single item on the bill is partly used up and partly unpaid */
-            iprompt = (eshkp->billct > 1 ? ynq("Itemized billing?") : 'y');
-            itemize = (iprompt == 'y');
-            if (iprompt == 'q')
-                goto thanks;
-        }
+        via_menu = (flags.menu_style != MENU_TRADITIONAL);
+        /* allow 'm p' to request a menu for menustyle:traditional;
+           for other styles, it will do the opposite; that doesn't make
+           a whole lot of sense for a 'request-menu' prefix, but otherwise
+           it would simply be reduncant and there wouldn't be any way to
+           skip the menu when hero owes for multiple items */
+        if (iflags.menu_requested)
+            via_menu = !via_menu;
+        /* this will loop for a second iteration iff not initially using a
+           menu and player answers 'm' to custom ynq prompt */
+        do {
+            if (via_menu && eshkp->billct > 1) {
+                if (!menu_pick_pay_items(shkp))
+                    return ECMD_OK;
+                queuedpay = TRUE;
+                itemize = FALSE;
+                via_menu = FALSE; /* reset so that we don't loop */
+            } else {
+                /* this isn't quite right; it itemizes without asking if the
+                   single item on bill is partly used up and partly unpaid */
+                iprompt = (eshkp->billct < 2) ? 'y'
+                          : yn_function("Itemized billing?",
+                                        "ynq m", 'q', TRUE);
+                itemize = (iprompt == 'y');
+                if (iprompt == 'q')
+                    goto thanks;
+                via_menu = (iprompt == 'm');
+            }
+        } while (via_menu);
 
         for (pass = 0; pass <= 1; pass++) {
             tmp = 0;

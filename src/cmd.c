@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1684791777 2023/05/22 21:42:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.677 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1702123758 2023/12/09 12:09:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.694 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2645,7 +2645,7 @@ struct ext_func_tab extcmdlist[] = {
     { '\0',   "panic", "test panic routine (fatal to game)",
               wiz_panic, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { 'p',    "pay", "pay your shopping bill",
-              dopay, 0, NULL },
+              dopay, CMD_M_PREFIX, NULL },
     { '|',    "perminv", "scroll persistent inventory display",
               doperminv, IFBURIED | GENERALCMD | NOFUZZERCMD, NULL },
     { ',',    "pickup", "pick up things at the current location",
