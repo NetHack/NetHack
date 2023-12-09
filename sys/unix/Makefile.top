@@ -310,6 +310,13 @@ dofiles-nodlb:
 #
 # This is not part of the dependency build hierarchy.
 # It requires an explicit "make fetch-Lua".
+
+LUA_URL=www.lua.org/ftp
+
+fetch-lua-mirror: LUA_URL :=www.tecgraf.puc-rio.br/lua/mirror/ftp
+fetch-lua-mirror: fetch-Lua
+	@true
+
 fetch-lua: fetch-Lua
 	@true
 
@@ -321,7 +328,7 @@ fetch-Lua:
 	      shac="$$shac1 -a 256"; elif [ ! -z $$shac2 ]; then \
 	      shac=$$shac2; else echo "CAUTION: no way to check integrity"; \
 	  fi; \
-	  curl -R -O https://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz && \
+	  curl -R -O https://$(LUA_URL)/lua-$(LUA_VERSION).tar.gz && \
 	  if [ ! -z "$$shac" ]; then \
 	      echo Checking integrity with $$shac; \
 	      $$shac -w -c ../submodules/CHKSUMS < lua-$(LUA_VERSION).tar.gz; \
@@ -334,7 +341,7 @@ fetch-Lua:
 
 fetch-lua-http:
 	( mkdir -p lib && cd lib && \
-	  curl -R -O http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz && \
+	  curl -R -O http://$(LUA_URL)/lua-$(LUA_VERSION).tar.gz && \
 	  tar zxf lua-$(LUA_VERSION).tar.gz && \
 	  rm -f lua-$(LUA_VERSION).tar.gz )
 
