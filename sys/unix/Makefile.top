@@ -311,9 +311,10 @@ dofiles-nodlb:
 # This is not part of the dependency build hierarchy.
 # It requires an explicit "make fetch-Lua".
 
-LUA_URL=www.lua.org/ftp
+LUA_URL :=www.lua.org/ftp
+LUA_URL_MIRROR :=www.tecgraf.puc-rio.br/lua/mirror/ftp
 
-fetch-lua-mirror: LUA_URL :=www.tecgraf.puc-rio.br/lua/mirror/ftp
+fetch-lua-mirror: LUA_URL :=$(LUA_URL_MIRROR)
 fetch-lua-mirror: fetch-Lua
 	@true
 
