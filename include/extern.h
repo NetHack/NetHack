@@ -3410,6 +3410,10 @@ extern void choose_windows(const char *);
 void addto_windowchain(const char *s);
 void commit_windowchain(void);
 #endif
+#ifdef TTY_GRAPHICS
+extern boolean check_tty_wincap(unsigned long);
+extern boolean check_tty_wincap2(unsigned long);
+#endif
 extern boolean genl_can_suspend_no(void);
 extern boolean genl_can_suspend_yes(void);
 extern char genl_message_menu(char, int, const char *);

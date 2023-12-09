@@ -5155,9 +5155,16 @@ can_set_perm_invent(void)
      * and is about to be changed to True.
      */
     uchar old_perminv_mode = iflags.perminv_mode;
-
-    if (!(windowprocs.wincap & WC_PERM_INVENT))
-        return FALSE; /* should never happen */
+    if (!(windowprocs.wincap & WC_PERM_INVENT)) {
+#ifdef TTY_GRAPHICS
+#ifdef TTY_PERM_INVENT
+        /* check tty, not necessarily the active window port;
+           windows early startup can still be set to safeprocs */
+        if (!check_tty_wincap(WC_PERM_INVENT))
+#endif
+#endif
+            return FALSE; /* should never happen */
+    }
 
     if (iflags.perminv_mode == InvOptNone)
         iflags.perminv_mode = InvOptOn;

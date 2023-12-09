@@ -59,6 +59,10 @@ extern void trace_procs_init(int);
 extern void *trace_procs_chain(int, int, void *, void *, void *);
 #endif
 
+#if defined(WINCHAIN) || defined(TTY_GRAPHICS)
+static struct win_choices *win_choices_find(const char *s);
+#endif
+
 static void def_raw_print(const char *s);
 static void def_wait_synch(void);
 static boolean get_menu_coloring(const char *, int *, int *);
@@ -222,7 +226,29 @@ def_wait_synch(void)
      return;
 }
 
-#ifdef WINCHAIN
+#ifdef TTY_GRAPHICS
+boolean
+check_tty_wincap(unsigned long wincap)
+{
+    struct win_choices *wc = win_choices_find("tty");
+
+    if (wc)
+        return ((wc->procs->wincap & wincap) == wincap);
+    return FALSE;
+}
+
+boolean
+check_tty_wincap2(unsigned long wincap2)
+{
+    struct win_choices *wc = win_choices_find("tty");
+
+    if (wc)
+        return ((wc->procs->wincap2 & wincap2) == wincap2);
+    return FALSE;
+}
+#endif
+
+#if defined(WINCHAIN) || defined(TTY_GRAPHICS)
 static struct win_choices *
 win_choices_find(const char *s)
 {
