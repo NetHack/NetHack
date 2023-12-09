@@ -113,6 +113,7 @@ struct epri {
 struct bill_x {
     unsigned bo_id;
     boolean useup;
+    boolean queuedpay;
     long price; /* price per unit */
     long bquan; /* amount used up */
 };

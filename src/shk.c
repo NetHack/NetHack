@@ -45,6 +45,7 @@ static long set_cost(struct obj *, struct monst *);
 static const char *shk_embellish(struct obj *, long);
 static long cost_per_charge(struct monst *, struct obj *, boolean);
 static long cheapest_item(struct monst *);
+static int menu_pick_pay_items(struct monst *);
 static int dopayobj(struct monst *, struct bill_x *, struct obj **, int,
                     boolean);
 static long stolen_container(struct obj *, struct monst *, long, boolean);
@@ -1382,6 +1383,56 @@ cheapest_item(struct monst *shkp)
     return gmin;
 }
 
+/* show items on your bill in a menu, and ask which to pay.
+   returns the number of entries selected. */
+static int
+menu_pick_pay_items(struct monst *shkp)
+{
+    struct eshk *eshkp = ESHK(shkp);
+    winid win;
+    anything any;
+    menu_item *pick_list = (menu_item *) 0;
+    int i, j, n, clr = NO_COLOR;
+    char buf[BUFSZ];
+
+    any = cg.zeroany;
+    win = create_nhwindow(NHW_MENU);
+    start_menu(win, MENU_BEHAVE_STANDARD);
+
+    for (n = 0; n < eshkp->billct; n++) {
+        struct obj *otmp;
+        register struct bill_x *bp = &(eshkp->bill_p[n]);
+
+        bp->queuedpay = FALSE;
+
+        /* find the object on one of the lists */
+        if ((otmp = bp_to_obj(bp)) != 0) {
+            /* if completely used up, object quantity is stale;
+               restoring it to its original value here avoids
+               making the partly-used-up code more complicated */
+            if (bp->useup)
+                otmp->quan = bp->bquan;
+            Sprintf(buf, "%s%s",
+                    bp->useup ? "(used up) " : "",
+                    doname(otmp));
+            any.a_int = n + 1; /* +1: avoid 0 */
+            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
+                     MENU_ITEMFLAGS_NONE);
+        }
+    }
+
+    end_menu(win, "Pay which items?");
+    n = select_menu(win, PICK_ANY, &pick_list);
+    destroy_nhwindow(win);
+
+    for (j = 0; j < n; ++j) {
+        i = pick_list[j].item.a_int - 1; /* -1: reverse +1 above */
+        eshkp->bill_p[i].queuedpay = TRUE;
+    }
+    free(pick_list);
+    return n;
+}
+
 /* the #pay command */
 int
 dopay(void)
@@ -1635,6 +1686,7 @@ dopay(void)
     /* now check items on bill */
     if (eshkp->billct) {
         register boolean itemize;
+        boolean queuedpay = FALSE;
         int iprompt;
 
         umoney = money_cnt(gi.invent);
@@ -1651,18 +1703,30 @@ dopay(void)
             return ECMD_OK;
         }
 
-        /* this isn't quite right; it itemizes without asking if the
-         * single item on the bill is partly used up and partly unpaid */
-        iprompt = (eshkp->billct > 1 ? ynq("Itemized billing?") : 'y');
-        itemize = (iprompt == 'y');
-        if (iprompt == 'q')
-            goto thanks;
+        if (flags.menu_style != MENU_TRADITIONAL && eshkp->billct > 1) {
+            if (!menu_pick_pay_items(shkp))
+                return ECMD_OK;
+            queuedpay = TRUE;
+            itemize = FALSE;
+        } else {
+            /* this isn't quite right; it itemizes without asking if the
+             * single item on the bill is partly used up and partly unpaid */
+            iprompt = (eshkp->billct > 1 ? ynq("Itemized billing?") : 'y');
+            itemize = (iprompt == 'y');
+            if (iprompt == 'q')
+                goto thanks;
+        }
 
         for (pass = 0; pass <= 1; pass++) {
             tmp = 0;
             while (tmp < eshkp->billct) {
                 struct obj *otmp;
                 register struct bill_x *bp = &(eshkp->bill_p[tmp]);
+
+                if (queuedpay && !bp->queuedpay) {
+                    tmp++;
+                    continue;
+                }
 
                 /* find the object on one of the lists */
                 if ((otmp = bp_to_obj(bp)) != 0) {
