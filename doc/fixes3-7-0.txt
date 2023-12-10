@@ -1328,6 +1328,7 @@ avoid impossible "trapped without a trap (fmon)" from 'sanity_check' when a
 	caused adjacent pool/moat/lava to flood that spot; if a non-floater,
 	non-flyer monster survived that it got marked as trapped even though
 	flooding deleted the trap
+demons cannot be frightened by showing them their reflection
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

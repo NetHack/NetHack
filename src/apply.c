@@ -1144,6 +1144,7 @@ use_mirror(struct obj *obj)
         if (!tele_restrict(mtmp))
             (void) rloc(mtmp, RLOC_MSG);
     } else if (!is_unicorn(mtmp->data) && !humanoid(mtmp->data)
+               && !is_demon(mtmp->data)
                && (!mtmp->minvis || perceives(mtmp->data)) && rn2(5)) {
         boolean do_react = TRUE;
 
