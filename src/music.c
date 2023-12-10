@@ -1,4 +1,4 @@
-/* NetHack 3.7	music.c	$NHDT-Date: 1646688067 2022/03/07 21:21:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.7	music.c	$NHDT-Date: 1702206294 2023/12/10 11:04:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.101 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -337,8 +337,11 @@ do_earthquake(int force)
                    wand of digging if you alter this sequence. */
                 filltype = fillholetyp(x, y, FALSE);
                 if (filltype != ROOM) {
-                    levl[x][y].typ = filltype; /* flags set via doormask */
+                    set_levltyp(x, y, filltype); /* levl[x][y] = filltype; */
                     liquid_flow(x, y, filltype, chasm, (char *) 0);
+                    /* liquid_flow() deletes trap, might kill mtmp */
+                    if ((chasm = t_at(x, y)) == NULL)
+                        break; /* from switch, not loop */
                 }
 
                 mtmp = m_at(x, y); /* (redundant?) */
@@ -353,8 +356,8 @@ do_earthquake(int force)
                     break; /* from switch, not loop */
                 }
 
-                /* We have to check whether monsters or player
-                   falls in a chasm... */
+                /* We have to check whether monsters or hero falls into a
+                   new pit....  Note: if we get here, chasm is non-Null. */
                 if (mtmp) {
                     if (!is_flyer(mtmp->data) && !is_clinger(mtmp->data)) {
                         boolean m_already_trapped = mtmp->mtrapped;
@@ -427,7 +430,7 @@ do_earthquake(int force)
                             exercise(A_DEX, TRUE);
                         else
                             selftouch((Upolyd && (slithy(gy.youmonst.data)
-                                                  || nolimbs(gy.youmonst.data)))
+                                                || nolimbs(gy.youmonst.data)))
                                       ? "Shaken, you"
                                       : "Falling down, you");
                     }

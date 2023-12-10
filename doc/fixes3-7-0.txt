@@ -1323,6 +1323,11 @@ change [master] mind flayer, the Wizard, and the riders to bright magenta
 walking into a shopkeeper tries to pay the bill
 show billed items in a menu when paying with non-traditional menustyle
 prioritize paying shopkeeper next to you even if multiple are detected
+avoid impossible "trapped without a trap (fmon)" from 'sanity_check' when a
+	drum of earthquake made a pit at a monster's spot and pit creation
+	caused adjacent pool/moat/lava to flood that spot; if a non-floater,
+	non-flyer monster survived that it got marked as trapped even though
+	flooding deleted the trap
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
