@@ -2583,6 +2583,7 @@ add new options 'nopick_dropped' and 'pickup_stolen' options to avoid
 	auto-pickup of items dropped by hero and to auto-pickup things
 	previously stolen from hero if moved upon while autopickup is On; both
 	bypass pickup_types and autopickup_exceptions (pr #1140 by entrez)
+fix msg_window:combination and TTY getlin() ^P (pr #1155 by entrez)
 
 
 Code Cleanup and Reorganization
