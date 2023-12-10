@@ -239,7 +239,7 @@ get_table_mapchr_opt(lua_State *L, const char *name, schar defval)
     xint8 typ;
 
     ter = get_table_str_opt(L, name, emptystr);
-    if (name && ter && *ter) {
+    if (ter && *ter) {
         typ = (xint8) check_mapchr(ter);
         if (typ == INVALID_TYPE)
             nhl_error(L, "Erroneous map char");
