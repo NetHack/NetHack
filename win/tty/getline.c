@@ -48,7 +48,7 @@ hooked_tty_getlin(
     register char *obufp = bufp;
     register int c;
     struct WinDesc *cw = wins[WIN_MESSAGE];
-    boolean doprev = 0;
+    boolean doprev = FALSE;
 
     if (ttyDisplay->toplin == TOPLINE_NEED_MORE && !(cw->flags & WIN_STOP))
         more();
@@ -100,29 +100,36 @@ hooked_tty_getlin(
             *bufp = 0;
         }
         if (c == C('p')) { /* ctrl-P, doesn't honor rebinding #prevmsg cmd */
-            if (iflags.prevmsg_window != 's') {
-                int sav = ttyDisplay->inread;
+            int sav = ttyDisplay->inread;
 
-                ttyDisplay->inread = 0;
+            ttyDisplay->inread = 0;
+            if (iflags.prevmsg_window == 's'
+                || (iflags.prevmsg_window == 'c' && !doprev)) {
+                /* msg_window:single, or msg_window:combination while it's
+                   behaving like msg_window:single */
+                if (!doprev)
+                    (void) tty_doprev_message(); /* need two initially */
                 (void) tty_doprev_message();
                 ttyDisplay->inread = sav;
+                doprev = TRUE;
+                continue;
+            } else {
+                /* msg_window:full or reverse, or msg_window:combination while
+                   it's behaving like msg_window:full */
+                (void) tty_doprev_message();
+                ttyDisplay->inread = sav;
+                doprev = FALSE;
                 tty_clear_nhwindow(WIN_MESSAGE);
                 cw->maxcol = cw->maxrow;
                 addtopl(query);
                 addtopl(" ");
                 *bufp = 0;
                 addtopl(obufp);
-            } else {
-                if (!doprev)
-                    (void) tty_doprev_message(); /* need two initially */
-                (void) tty_doprev_message();
-                doprev = 1;
-                continue;
             }
-        } else if (doprev && iflags.prevmsg_window == 's') {
+        } else if (doprev) {
             tty_clear_nhwindow(WIN_MESSAGE);
             cw->maxcol = cw->maxrow;
-            doprev = 0;
+            doprev = FALSE;
             addtopl(query);
             addtopl(" ");
             *bufp = 0;
