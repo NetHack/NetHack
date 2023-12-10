@@ -41,6 +41,7 @@ static void explain_container_prompt(boolean);
 static int traditional_loot(boolean);
 static int menu_loot(int, boolean);
 static int tip_ok(struct obj *);
+static int choose_tip_container_menu(void);
 static struct obj *tipcontainer_gettarget(struct obj *, boolean *);
 static int tipcontainer_checks(struct obj *, struct obj *, boolean);
 static char in_or_out_menu(const char *, struct obj *, boolean, boolean,
@@ -3376,6 +3377,67 @@ tip_ok(struct obj *obj)
     return GETOBJ_DOWNPLAY;
 }
 
+/* show a menu of containers under hero,
+   and one extra entry for choosing an inventory.
+   returns ECMD_CANCEL if menu was canceled,
+   ECMD_TIME if a container was picked,
+   otherwise returns ECMD_OK. */
+static int
+choose_tip_container_menu(void)
+{
+    int n, i;
+    winid win;
+    anything any;
+    menu_item *pick_list = (menu_item *) 0;
+    struct obj dummyobj, *otmp;
+    int clr = NO_COLOR;
+
+    any = cg.zeroany;
+    win = create_nhwindow(NHW_MENU);
+    start_menu(win, MENU_BEHAVE_STANDARD);
+
+    for (otmp = gl.level.objects[u.ux][u.uy], i = 0; otmp;
+         otmp = otmp->nexthere)
+        if (Is_container(otmp)) {
+            ++i;
+            any.a_obj = otmp;
+            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                     clr, doname(otmp), MENU_ITEMFLAGS_NONE);
+        }
+    if (gi.invent) {
+        add_menu_str(win, "");
+        any.a_obj = &dummyobj;
+        /* use 'i' for inventory unless there are so many
+           containers that it's already being used */
+        i = (i <= 'i' - 'a' && !flags.lootabc) ? 'i' : 0;
+        add_menu(win, &nul_glyphinfo, &any, i, 0, ATR_NONE,
+                 clr, "tip something being carried",
+                 MENU_ITEMFLAGS_SELECTED);
+    }
+    end_menu(win, "Tip which container?");
+    n = select_menu(win, PICK_ONE, &pick_list);
+    destroy_nhwindow(win);
+    /*
+     * Deal with quirk of preselected item in pick-one menu:
+     * n ==  0 => picked preselected entry, toggling it off;
+     * n ==  1 => accepted preselected choice via SPACE or RETURN;
+     * n ==  2 => picked something other than preselected entry;
+     * n == -1 => cancelled via ESC;
+     */
+    otmp = (n <= 0) ? (struct obj *) 0 : pick_list[0].item.a_obj;
+    if (n > 1 && otmp == &dummyobj)
+        otmp = pick_list[1].item.a_obj;
+    if (pick_list)
+        free((genericptr_t) pick_list);
+    if (otmp && otmp != &dummyobj) {
+        tipcontainer(otmp);
+        return ECMD_TIME;
+    }
+    if (n == -1)
+        return ECMD_CANCEL;
+    return ECMD_OK;
+}
+
 /* #tip command -- empty container contents onto floor */
 int
 dotip(void)
@@ -3412,57 +3474,10 @@ dotip(void)
                 !flags.verbose ? "a container" : (boxes > 1) ? "one" : "it");
         if (!check_capacity(buf) && able_to_loot(cc.x, cc.y, FALSE)) {
             if (boxes > 1) {
-                /* use menu to pick a container to tip */
-                int n, i;
-                winid win;
-                anything any;
-                menu_item *pick_list = (menu_item *) 0;
-                struct obj dummyobj, *otmp;
-                int clr = NO_COLOR;
-
-                any = cg.zeroany;
-                win = create_nhwindow(NHW_MENU);
-                start_menu(win, MENU_BEHAVE_STANDARD);
-
-                for (cobj = gl.level.objects[cc.x][cc.y], i = 0; cobj;
-                     cobj = cobj->nexthere)
-                    if (Is_container(cobj)) {
-                        ++i;
-                        any.a_obj = cobj;
-                        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                                 clr, doname(cobj), MENU_ITEMFLAGS_NONE);
-                    }
-                if (gi.invent) {
-                    add_menu_str(win, "");
-                    any.a_obj = &dummyobj;
-                    /* use 'i' for inventory unless there are so many
-                       containers that it's already being used */
-                    i = (i <= 'i' - 'a' && !flags.lootabc) ? 'i' : 0;
-                    add_menu(win, &nul_glyphinfo, &any, i, 0, ATR_NONE,
-                             clr, "tip something being carried",
-                             MENU_ITEMFLAGS_SELECTED);
-                }
-                end_menu(win, "Tip which container?");
-                n = select_menu(win, PICK_ONE, &pick_list);
-                destroy_nhwindow(win);
-                /*
-                 * Deal with quirk of preselected item in pick-one menu:
-                 * n ==  0 => picked preselected entry, toggling it off;
-                 * n ==  1 => accepted preselected choice via SPACE or RETURN;
-                 * n ==  2 => picked something other than preselected entry;
-                 * n == -1 => cancelled via ESC;
-                 */
-                otmp = (n <= 0) ? (struct obj *) 0 : pick_list[0].item.a_obj;
-                if (n > 1 && otmp == &dummyobj)
-                    otmp = pick_list[1].item.a_obj;
-                if (pick_list)
-                    free((genericptr_t) pick_list);
-                if (otmp && otmp != &dummyobj) {
-                    tipcontainer(otmp);
-                    return ECMD_TIME;
-                }
-                if (n == -1)
-                    return ECMD_OK;
+                int res;
+                /* pick one container via menu or ... */
+                if ((res = choose_tip_container_menu()) != ECMD_OK)
+                    return res;
                 /* else pick-from-gi.invent below */
             } else {
                 for (cobj = gl.level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
