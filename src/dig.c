@@ -1,4 +1,4 @@
-/* NetHack 3.7	dig.c	$NHDT-Date: 1596498156 2020/08/03 23:42:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.142 $ */
+/* NetHack 3.7	dig.c	$NHDT-Date: 1702206282 2023/12/10 11:04:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.204 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -747,19 +747,32 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 /*
- * Called from dighole(), but also from do_break_wand()
- * in apply.c.
+ * Called from dighole(); also from do_break_wand() in apply.c
+ * and do_earthquake() in music.c.
  */
 void
-liquid_flow(coordxy x, coordxy y, schar typ, struct trap *ttmp,
-            const char *fillmsg)
+liquid_flow(
+    coordxy x, coordxy y,
+    schar typ,
+    struct trap *ttmp,
+    const char *fillmsg)
 {
     struct obj *objchain;
     struct monst *mon;
     boolean u_spot = u_at(x, y);
 
+    /* caller should have changed levl[x][y].typ to POOL, MOAT, or LAVA */
+    if (!is_pool_or_lava(x, y)) {
+        if (iflags.sanity_check) {
+            impossible("Insane liquid_flow(%d,%d,%s,%s).", x, y,
+                       ttmp ? trapname(ttmp->ttyp, TRUE) : "no trap",
+                       fillmsg ? fillmsg : "no mesg");
+        }
+        return;
+    }
+
     if (ttmp)
-        (void) delfloortrap(ttmp);
+        (void) delfloortrap(ttmp); /* will untrap monster is one is here */
     /* if any objects were frozen here, they're released now */
     unearth_objs(x, y);
 
