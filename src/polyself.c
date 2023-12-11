@@ -136,13 +136,19 @@ float_vs_flight(void)
 
     /* riding blocks stealth unless hero+steed fly, so a change in flying
        might cause a change in stealth */
-    if (u.usteed) {
-        if (!Flying && !Levitation)
-            BStealth |= FROMOUTSIDE;
-        else
-            BStealth &= ~FROMOUTSIDE;
-    }
+    steed_vs_stealth();
+
     gc.context.botl = TRUE;
+}
+
+/* riding blocks stealth unless hero+steed fly */
+void
+steed_vs_stealth(void)
+{
+    if (u.usteed && !Flying && !Levitation)
+        BStealth |= FROMOUTSIDE;
+    else
+        BStealth &= ~FROMOUTSIDE;
 }
 
 /* for changing into form that's immune to strangulation */

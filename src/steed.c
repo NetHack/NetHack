@@ -357,11 +357,11 @@ mount_steed(
     if (uwep && is_pole(uwep))
         gu.unweapon = FALSE;
     u.usteed = mtmp;
-    if (!Flying && !Levitation) {
+    {
         boolean was_stealthy = Stealth != 0;
 
-        BStealth |= FROMOUTSIDE;
-        if (was_stealthy)
+        steed_vs_stealth();
+        if (was_stealthy && !Stealth)
             You("aren't stealthy anymore.");
     }
     remove_monster(mtmp->mx, mtmp->my);
@@ -644,9 +644,11 @@ dismount_steed(
     /* Release the steed */
     u.usteed = (struct monst *) NULL;
     u.ugallop = 0L;
-    if (BStealth) {
-        BStealth &= ~FROMOUTSIDE;
-        if (Stealth)
+    {
+        boolean was_stealthy = Stealth != 0;
+
+        steed_vs_stealth();
+        if (Stealth && !was_stealthy)
             You("seem less noisy now.");
     }
 
@@ -839,9 +841,10 @@ poly_steed(
     struct permonst *oldshape)
 {
     if (!can_saddle(steed) || !can_ride(steed)) {
-        /* removing of no longer wearable saddle was handled during the
-           shape change (newcham -> mon_break_armor -> m_lose_armor) */
-        dismount_steed(DISMOUNT_POLY);
+        /* can't get here; newcham() -> mon_break_armor() -> m_lose_armor()
+           removes saddle and/or forces hero to dismount, if applicable,
+           before newcham() calls us */
+        dismount_steed(DISMOUNT_FELL);
     } else {
         char buf[BUFSZ];
 
@@ -852,10 +855,7 @@ poly_steed(
         You("adjust yourself in the saddle on %s.", buf);
 
         /* riding blocks stealth unless hero+steed fly */
-        if (!Flying && !Levitation)
-            BStealth |= FROMOUTSIDE;
-        else
-            BStealth &= ~FROMOUTSIDE;
+        steed_vs_stealth();
     }
 }
 
