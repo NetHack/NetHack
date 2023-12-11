@@ -605,24 +605,10 @@ regen_hp(int wtcap)
            once u.mh reached u.mhmax; that may have been convenient
            for the player, but it didn't make sense for gameplay...] */
         if (u.uhp < u.uhpmax && (encumbrance_ok || U_CAN_REGEN())) {
-            if (u.ulevel > 9) {
-                if (!(gm.moves % 3L)) {
-                    int Con = (int) ACURR(A_CON);
+            heal = (u.ulevel + (int)ACURR(A_CON)) > rn2(100);
 
-                    if (Con <= 12) {
-                        heal = 1;
-                    } else {
-                        heal = rnd(Con);
-                        if (heal > u.ulevel - 9)
-                            heal = u.ulevel - 9;
-                    }
-                }
-            } else { /* u.ulevel <= 9 */
-                if (!(gm.moves % (long) ((MAXULEV + 12) / (u.ulevel + 2) + 1)))
-                    heal = 1;
-            }
-            if (U_CAN_REGEN() && !heal)
-                heal = 1;
+            if (U_CAN_REGEN())
+                heal += 1;
             if (Sleepy && u.usleep)
                 heal++;
 
