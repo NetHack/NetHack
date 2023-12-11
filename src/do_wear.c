@@ -85,7 +85,9 @@ on_msg(struct obj *otmp)
 }
 
 /* putting on or taking off an item which confers stealth;
-   give feedback and discover it iff stealth state is changing */
+   give feedback and discover it iff stealth state is changing;
+   stealth is blocked by riding unless hero+steed fly (handled with
+   BStealth by mount and dismount routines) */
 static
 void
 toggle_stealth(
@@ -101,7 +103,7 @@ toggle_stealth(
         && !BStealth) { /* stealth blocked by something */
         if (obj->otyp == RIN_STEALTH)
             learnring(obj, TRUE);
-        else
+        else /* discover elven cloak or elven boots */
             makeknown(obj->otyp);
 
         if (on) {
@@ -112,7 +114,13 @@ toggle_stealth(
             else
                 You("walk very quietly.");
         } else {
-            You("sure are noisy.");
+            boolean riding = (u.usteed != NULL);
+
+            You("%s%s are noisy.", riding ? "and " : "sure",
+                riding ? x_monnam(u.usteed, ARTICLE_YOUR, (char *) NULL,
+                                  (SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION),
+                                  FALSE)
+                       : "");
         }
     }
 }
@@ -123,10 +131,11 @@ toggle_stealth(
    hero is able to see self (or sense monsters); for timed, 'obj' is Null
    and this is only called for the message */
 void
-toggle_displacement(struct obj *obj,
-                    long oldprop, /* prop[].extrinsic, with obj->owornmask
-                                     stripped by caller */
-                    boolean on)
+toggle_displacement(
+    struct obj *obj,
+    long oldprop, /* prop[].extrinsic, with obj->owornmask
+                     stripped by caller */
+    boolean on)
 {
     if (on ? gi.initial_don : gc.context.takeoff.cancelled_don)
         return;

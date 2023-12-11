@@ -1,4 +1,4 @@
-/* NetHack 3.7	steed.c	$NHDT-Date: 1671838909 2022/12/23 23:41:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.108 $ */
+/* NetHack 3.7	steed.c	$NHDT-Date: 1702274036 2023/12/11 05:53:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.115 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -226,8 +226,10 @@ mount_steed(
             return (FALSE);
     }
 
-    if (Upolyd && (!humanoid(gy.youmonst.data) || verysmall(gy.youmonst.data)
-                   || bigmonst(gy.youmonst.data) || slithy(gy.youmonst.data))) {
+    if (Upolyd && (!humanoid(gy.youmonst.data)
+                   || verysmall(gy.youmonst.data)
+                   || bigmonst(gy.youmonst.data)
+                   || slithy(gy.youmonst.data))) {
         You("won't fit on a saddle.");
         return (FALSE);
     }
@@ -269,6 +271,7 @@ mount_steed(
         pline("%s is not saddled.", Monnam(mtmp));
         return (FALSE);
     }
+
     ptr = mtmp->data;
     if (touch_petrifies(ptr) && !Stone_resistance) {
         char kbuf[BUFSZ];
@@ -354,6 +357,13 @@ mount_steed(
     if (uwep && is_pole(uwep))
         gu.unweapon = FALSE;
     u.usteed = mtmp;
+    if (!Flying && !Levitation) {
+        boolean was_stealthy = Stealth != 0;
+
+        BStealth |= FROMOUTSIDE;
+        if (was_stealthy)
+            You("aren't stealthy anymore.");
+    }
     remove_monster(mtmp->mx, mtmp->my);
     teleds(mtmp->mx, mtmp->my, TELEDS_ALLOW_DRAG);
     gc.context.botl = TRUE;
@@ -631,9 +641,14 @@ dismount_steed(
     if (repair_leg_damage)
         heal_legs(1);
 
-    /* Release the steed and saddle */
-    u.usteed = 0;
+    /* Release the steed */
+    u.usteed = (struct monst *) NULL;
     u.ugallop = 0L;
+    if (BStealth) {
+        BStealth &= ~FROMOUTSIDE;
+        if (Stealth)
+            You("seem less noisy now.");
+    }
 
     if (u.utraptype == TT_BEARTRAP
         || u.utraptype == TT_PIT
@@ -815,6 +830,33 @@ maybewakesteed(struct monst* steed)
         pline("%s wakes up.", Monnam(steed));
     /* regardless of waking, terminate any meal in progress */
     finish_meating(steed);
+}
+
+/* steed has taken on a new shape */
+void
+poly_steed(
+    struct monst *steed,
+    struct permonst *oldshape)
+{
+    if (!can_saddle(steed) || !can_ride(steed)) {
+        /* removing of no longer wearable saddle was handled during the
+           shape change (newcham -> mon_break_armor -> m_lose_armor) */
+        dismount_steed(DISMOUNT_POLY);
+    } else {
+        char buf[BUFSZ];
+
+        Strcpy(buf, x_monnam(steed, ARTICLE_YOUR, (char *) 0,
+                             SUPPRESS_SADDLE, FALSE));
+        if (oldshape != steed->data)
+            (void) strsubst(buf, "your ", "your new ");
+        You("adjust yourself in the saddle on %s.", buf);
+
+        /* riding blocks stealth unless hero+steed fly */
+        if (!Flying && !Levitation)
+            BStealth |= FROMOUTSIDE;
+        else
+            BStealth &= ~FROMOUTSIDE;
+    }
 }
 
 /* decide whether hero's steed is able to move;

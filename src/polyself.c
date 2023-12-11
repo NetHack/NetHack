@@ -1,4 +1,4 @@
-/* NetHack 3.7	polyself.c	$NHDT-Date: 1681429658 2023/04/13 23:47:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.197 $ */
+/* NetHack 3.7	polyself.c	$NHDT-Date: 1702274031 2023/12/11 05:53:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.204 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -133,6 +133,15 @@ float_vs_flight(void)
         BLevitation |= I_SPECIAL;
     else
         BLevitation &= ~I_SPECIAL;
+
+    /* riding blocks stealth unless hero+steed fly, so a change in flying
+       might cause a change in stealth */
+    if (u.usteed) {
+        if (!Flying && !Levitation)
+            BStealth |= FROMOUTSIDE;
+        else
+            BStealth &= ~FROMOUTSIDE;
+    }
     gc.context.botl = TRUE;
 }
 

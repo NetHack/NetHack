@@ -1326,10 +1326,11 @@ prioritize paying shopkeeper next to you even if multiple are detected
 avoid impossible "trapped without a trap (fmon)" from 'sanity_check' when a
 	drum of earthquake made a pit at a monster's spot and pit creation
 	caused adjacent pool/moat/lava to flood that spot; if a non-floater,
-	non-flyer monster survived that it got marked as trapped even though
+	non-flyer monster survived that, it got marked as trapped even though
 	flooding deleted the trap
 demons cannot be frightened by showing them their reflection
 HP regeneration formula has changed, primarily to be less fast in the endgame
+riding negates stealth unless the steed is flying
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

@@ -1,4 +1,4 @@
-/* NetHack 3.7	youprop.h	$NHDT-Date: 1596498577 2020/08/03 23:49:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.7	youprop.h	$NHDT-Date: 1702274029 2023/12/11 05:53:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) 1989 Mike Threepoint                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -200,6 +200,7 @@
 
 #define HStealth u.uprops[STEALTH].intrinsic
 #define EStealth u.uprops[STEALTH].extrinsic
+/* BStealth has FROMOUTSIDE set if mounted on non-flying steed */
 #define BStealth u.uprops[STEALTH].blocked
 #define Stealth ((HStealth || EStealth) && !BStealth)
 
@@ -383,6 +384,10 @@
 /*
  * Some pseudo-properties.
  */
+
+/* the code will needs lots of updating to use this so leave it commented
+#define Riding (u.usteed != NULL)
+*/
 
 /* unconscious() includes u.usleep but not is_fainted(); the multi test is
    redundant but allows the function calls to be skipped most of the time */

@@ -1455,7 +1455,7 @@ attributes_enlightenment(
 {
     static NEARDATA const char
         if_surroundings_permitted[] = " if surroundings permitted";
-    int ltmp, armpro;
+    int ltmp, armpro, warnspecies;
     char buf[BUFSZ];
 
     /*\
@@ -1566,9 +1566,10 @@ attributes_enlightenment(
                                             : "certain monsters");
         you_are(buf, "");
     }
-    if (Warn_of_mon && gc.context.warntype.speciesidx >= LOW_PM) {
+    warnspecies =  gc.context.warntype.speciesidx;
+    if (Warn_of_mon && warnspecies >= LOW_PM) {
         Sprintf(buf, "aware of the presence of %s",
-             makeplural(mons[gc.context.warntype.speciesidx].pmnames[NEUTRAL]));
+                makeplural(mons[warnspecies].pmnames[NEUTRAL]));
         you_are(buf, from_what(WARN_OF_MON));
     }
     if (Undead_warning)
@@ -1630,8 +1631,13 @@ attributes_enlightenment(
         you_are("visible", from_what(-INVIS));
     if (Displaced)
         you_are("displaced", from_what(DISPLACED));
-    if (Stealth)
+    if (Stealth) {
         you_are("stealthy", from_what(STEALTH));
+    } else if (BStealth && (HStealth || EStealth)) {
+        Sprintf(buf, " steathy%s",
+                (BStealth == FROMOUTSIDE) ? " if not mounted" : "");
+        enl_msg(You_, "would be", "would have been", buf, "");
+    }
     if (Aggravate_monster)
         enl_msg("You aggravate", "", "d", " monsters",
                 from_what(AGGRAVATE_MONSTER));

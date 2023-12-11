@@ -2792,6 +2792,7 @@ extern void exercise_steed(void);
 extern void kick_steed(void);
 extern void dismount_steed(int);
 extern void place_monster(struct monst *, coordxy, coordxy);
+extern void poly_steed(struct monst *, struct permonst *);
 extern boolean stucksteed(boolean);
 
 /* ### symbols.c ### */
