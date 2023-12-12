@@ -1,4 +1,4 @@
-/* NetHack 3.7	dbridge.c	$NHDT-Date: 1596498153 2020/08/03 23:42:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.7	dbridge.c	$NHDT-Date: 1702349063 2023/12/12 02:44:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -988,6 +988,7 @@ destroy_drawbridge(coordxy x, coordxy y)
         }
     }
     nokiller();
+    u.uevent.uheard_tune = 3; /* bridge is gone so tune is useless */
 }
 
 /*dbridge.c*/
