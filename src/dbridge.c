@@ -988,7 +988,8 @@ destroy_drawbridge(coordxy x, coordxy y)
         }
     }
     nokiller();
-    u.uevent.uheard_tune = 3; /* bridge is gone so tune is useless */
+    if (Is_stronghold(&u.uz))
+        u.uevent.uheard_tune = 3; /* bridge is gone so tune is now useless */
 }
 
 /*dbridge.c*/
