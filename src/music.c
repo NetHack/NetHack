@@ -718,7 +718,7 @@ do_improvisation(struct obj* instr)
 static char *
 improvised_notes(boolean *same_as_last_time)
 {
-    static char notes[7] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G' };
+    static const char notes[7] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G' };
     /* target buffer has to be in gc.context, otherwise saving game 
      * between improvised recitals would not be able to maintain
      * the same_as_last_time context. */
