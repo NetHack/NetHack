@@ -1,4 +1,4 @@
-/* NetHack 3.7	muse.c	$NHDT-Date: 1701557157 2023/12/02 22:45:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.7	muse.c	$NHDT-Date: 1702356860 2023/12/12 04:54:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.203 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -1598,16 +1598,16 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
  */
 static void
 mbhit(
-    struct monst *mon,  /* monster shooting the wand */
-    register int range, /* direction and range */
-    int (*fhitm)(MONST_P, OBJ_P),
-    int (*fhito)(OBJ_P, OBJ_P), /* fns called when mon/obj hit */
-    struct obj *obj)                     /* 2nd arg to fhitm/fhito */
+    struct monst *mon,            /* monster shooting the wand */
+    int range,                    /* direction and range */
+    int (*fhitm)(MONST_P, OBJ_P), /* must be non-Null */
+    int (*fhito)(OBJ_P, OBJ_P),   /* fns called when mon/obj hit */
+    struct obj *obj)              /* 2nd arg to fhitm/fhito */
 {
-    register struct monst *mtmp;
-    register struct obj *otmp;
-    register uchar typ;
-    int ddx, ddy;
+    struct monst *mtmp;
+    struct obj *otmp;
+    uchar ltyp;
+    int ddx, ddy, otyp = obj->otyp;
 
     gb.bhitpos.x = mon->mx;
     gb.bhitpos.y = mon->my;
@@ -1615,7 +1615,7 @@ mbhit(
     ddy = sgn(mon->muy - mon->my);
 
     while (range-- > 0) {
-        coordxy x, y;
+        coordxy x, y, dbx, dby;
 
         gb.bhitpos.x += ddx;
         gb.bhitpos.y += ddy;
@@ -1627,11 +1627,6 @@ mbhit(
             gb.bhitpos.y -= ddy;
             break;
         }
-        if (find_drawbridge(&x, &y))
-            switch (obj->otyp) {
-            case WAN_STRIKING:
-                destroy_drawbridge(x, y);
-            }
         if (u_at(gb.bhitpos.x, gb.bhitpos.y)) {
             (*fhitm)(&gy.youmonst, obj);
             range -= 3;
@@ -1644,7 +1639,7 @@ mbhit(
         /* modified by GAN to hit all objects */
         if (fhito) {
             int hitanything = 0;
-            register struct obj *next_obj;
+            struct obj *next_obj;
 
             for (otmp = gl.level.objects[gb.bhitpos.x][gb.bhitpos.y]; otmp;
                  otmp = next_obj) {
@@ -1655,9 +1650,32 @@ mbhit(
             if (hitanything)
                 range--;
         }
-        typ = levl[gb.bhitpos.x][gb.bhitpos.y].typ;
-        if (IS_DOOR(typ) || typ == SDOOR) {
-            switch (obj->otyp) {
+        ltyp = levl[gb.bhitpos.x][gb.bhitpos.y].typ;
+        dbx = x, dby = y;
+        if (otyp == WAN_STRIKING && find_drawbridge(&dbx, &dby)) {
+            /* this might kill mon and destroy obj; mon will remain
+               accessible even if dead but obj could be deleted */
+            destroy_drawbridge(dbx, dby);
+            for (otmp = mon->minvent; otmp; otmp = otmp->nobj)
+                if (otmp == obj)
+                    break;
+            if (!otmp) {
+                for (otmp = gl.level.objects[x][y]; otmp;
+                     otmp = otmp->nexthere)
+                    if (otmp == obj)
+                        break;
+            }
+            /* if otmp is Null, mon isn't carrying obj anymore and didn't
+               just drop it here; assume that it was destroyed and stop
+               the zap; not really correct behavior but we can't continue
+               without the responsible object because fhitm (mbhitm) and
+               fhito (bhito) will want it at forthcoming spots in zap path */
+            if (!otmp) {
+                obj = NULL;
+                break;
+            }
+        } else if (IS_DOOR(ltyp) || ltyp == SDOOR) {
+            switch (otyp) {
             /* note: monsters don't use opening or locking magic
                at present, but keep these as placeholders */
             case WAN_OPENING:
@@ -1665,7 +1683,7 @@ mbhit(
             case WAN_STRIKING:
                 if (doorlock(obj, gb.bhitpos.x, gb.bhitpos.y)) {
                     if (gz.zap_oseen)
-                        makeknown(obj->otyp);
+                        makeknown(otyp);
                     /* if a shop door gets broken, add it to
                        the shk's fix list (no cost to player) */
                     if (levl[gb.bhitpos.x][gb.bhitpos.y].doormask == D_BROKEN
@@ -1675,14 +1693,18 @@ mbhit(
                 break;
             }
         }
-        if (!ZAP_POS(typ)
-            || (IS_DOOR(typ) && (levl[gb.bhitpos.x][gb.bhitpos.y].doormask
-                                 & (D_LOCKED | D_CLOSED)))) {
+        if (!ZAP_POS(ltyp)
+            || (IS_DOOR(ltyp) && (levl[gb.bhitpos.x][gb.bhitpos.y].doormask
+                                  & (D_LOCKED | D_CLOSED)))) {
             gb.bhitpos.x -= ddx;
             gb.bhitpos.y -= ddy;
             break;
         }
     }
+    /* 'obj' was set of Null when it couldn't be found, but isn't used again;
+       however, someday that might change, so we want it set to Null; give it
+       a fake use to pacify potential "set but not used"-type warnings */
+    nhUse(obj);
 }
 
 /* Perform an offensive action for a monster.  Must be called immediately
@@ -1741,6 +1763,7 @@ use_offensive(struct monst *mtmp)
         mzapwand(mtmp, otmp, FALSE);
         gm.m_using = TRUE;
         mbhit(mtmp, rn1(8, 6), mbhitm, bhito, otmp);
+        /* note: 'otmp' might have been destroyed (drawbridge destruction) */
         gm.m_using = FALSE;
         return 2;
     case MUSE_SCR_EARTH: {
