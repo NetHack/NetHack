@@ -1,4 +1,4 @@
-/* NetHack 3.7	pager.c	$NHDT-Date: 1698264788 2023/10/25 20:13:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.252 $ */
+/* NetHack 3.7	pager.c	$NHDT-Date: 1702349268 2023/12/12 02:47:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -532,7 +532,7 @@ waterbody_name(coordxy x, coordxy y)
     return "water"; /* don't hallucinate this as some other liquid */
 }
 
-const char *
+char *
 ice_descr(coordxy x, coordxy y, char *outbuf)
 {
     static const char *const icetyp[] = {
