@@ -1315,7 +1315,6 @@ extern void readmail(struct obj *);
 
 /* ### makemon.c ### */
 
-extern void dealloc_monst(struct monst *);
 extern boolean is_home_elemental(struct permonst *);
 extern struct monst *clone_mon(struct monst *, coordxy, coordxy);
 extern int monhp_per_lvl(struct monst *);
@@ -1576,6 +1575,7 @@ extern int cmap_to_type(int);
 
 /* ### mon.c ### */
 
+extern void dealloc_monst(struct monst *);
 extern void mon_sanity_check(void);
 extern boolean zombie_maker(struct monst *);
 extern int zombie_form(struct permonst *);
