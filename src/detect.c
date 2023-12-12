@@ -21,7 +21,7 @@ static boolean check_map_spot(coordxy, coordxy, char, unsigned);
 static boolean clear_stale_map(char, unsigned);
 static void sense_trap(struct trap *, coordxy, coordxy, int);
 static int detect_obj_traps(struct obj *, boolean, int);
-static void display_trap_map(struct trap *, int);
+static void display_trap_map(int);
 static int furniture_detect(void);
 static void findone(coordxy, coordxy, genericptr_t);
 static void openone(coordxy, coordxy, genericptr_t);
@@ -920,9 +920,10 @@ detect_obj_traps(
 }
 
 static void
-display_trap_map(struct trap *ttmp, int cursed_src)
+display_trap_map(int cursed_src)
 {
     struct monst *mon;
+    struct trap *ttmp;
     int door, glyph, ter_typ = TER_DETECT | ( cursed_src ? TER_OBJ : TER_TRP );
     coord cc;
 
@@ -989,7 +990,7 @@ trap_detect(struct obj *sobj) /* null if crystal ball,
     /* floor/ceiling traps */
     for (ttmp = gf.ftrap; ttmp; ttmp = ttmp->ntrap) {
         if (ttmp->tx != u.ux || ttmp->ty != u.uy) {
-            display_trap_map(ttmp, cursed_src);
+            display_trap_map(cursed_src);
             return 0;
         } else
             found = TRUE;
@@ -997,7 +998,7 @@ trap_detect(struct obj *sobj) /* null if crystal ball,
     /* chest traps (might be buried or carried) */
     if ((tr = detect_obj_traps(fobj, FALSE, 0)) != OTRAP_NONE) {
         if (tr & OTRAP_THERE) {
-            display_trap_map(ttmp, cursed_src);
+            display_trap_map(cursed_src);
             return 0;
         } else
             found = TRUE;
@@ -1005,7 +1006,7 @@ trap_detect(struct obj *sobj) /* null if crystal ball,
     if ((tr = detect_obj_traps(gl.level.buriedobjlist, FALSE, 0))
         != OTRAP_NONE) {
         if (tr & OTRAP_THERE) {
-            display_trap_map(ttmp, cursed_src);
+            display_trap_map(cursed_src);
             return 0;
         } else
             found = TRUE;
@@ -1015,7 +1016,7 @@ trap_detect(struct obj *sobj) /* null if crystal ball,
             continue;
         if ((tr = detect_obj_traps(mon->minvent, FALSE, 0)) != OTRAP_NONE) {
             if (tr & OTRAP_THERE) {
-                display_trap_map(ttmp, cursed_src);
+                display_trap_map(cursed_src);
                 return 0;
             } else
                 found = TRUE;
@@ -1033,7 +1034,7 @@ trap_detect(struct obj *sobj) /* null if crystal ball,
             continue;
         if (levl[cc.x][cc.y].doormask & D_TRAPPED) {
             if (cc.x != u.ux || cc.y != u.uy) {
-                display_trap_map(ttmp, cursed_src);
+                display_trap_map(cursed_src);
                 return 0;
             } else
                 found = TRUE;
