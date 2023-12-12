@@ -424,6 +424,7 @@ extern void map_background(coordxy, coordxy, int);
 extern void map_trap(struct trap *, int);
 extern void map_object(struct obj *, int);
 extern void map_invisible(coordxy, coordxy);
+extern void map_engraving(struct engr *, int);
 extern boolean unmap_invisible(coordxy, coordxy);
 extern void unmap_object(coordxy, coordxy);
 extern void map_location(coordxy, coordxy, int);
@@ -859,7 +860,6 @@ extern void del_engr(struct engr *);
 extern void rloc_engr(struct engr *);
 extern void make_grave(coordxy, coordxy, const char *);
 extern void disturb_grave(coordxy, coordxy);
-extern void map_engraving(struct engr *, int);
 extern void see_engraving(struct engr *);
 extern void feel_engraving(struct engr *);
 
