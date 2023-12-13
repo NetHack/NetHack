@@ -469,17 +469,24 @@ static struct obj *oselect(struct monst *, int);
     } while (0)
 
 static struct obj *
-oselect(struct monst *mtmp, int x)
+oselect(struct monst *mtmp, int type)
 {
     struct obj *otmp;
 
     for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
-        if (otmp->otyp == x
-            /* never select non-cockatrice corpses */
-            && !((x == CORPSE || x == EGG)
-                 && !touch_petrifies(&mons[otmp->corpsenm]))
-            && (!otmp->oartifact || touch_artifact(otmp, mtmp)))
-            return otmp;
+        if (otmp->otyp != type)
+            continue;
+
+        /* never select non-cockatrice corpses */
+        if ((type == CORPSE || type == EGG)
+            && (otmp->corpsenm == NON_PM
+                || !touch_petrifies(&mons[otmp->corpsenm])))
+            continue;
+
+        if (!can_touch_safely(mtmp, otmp))
+            continue;
+
+        return otmp;
     }
     return (struct obj *) 0;
 }
