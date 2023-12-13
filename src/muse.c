@@ -2624,7 +2624,7 @@ searches_for_item(struct monst *mon, struct obj *obj)
             return (boolean) (mcould_eat_tin(mon)
                               && (!resists_ston(mon)
                                   && cures_stoning(mon, obj, TRUE)));
-        if (typ == EGG)
+        if (typ == EGG && obj->corpsenm >= LOW_PM)
             return (boolean) touch_petrifies(&mons[obj->corpsenm]);
         break;
     default:
