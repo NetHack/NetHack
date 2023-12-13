@@ -1156,7 +1156,8 @@ hmon_hitmon_misc_obj(
                 change_luck(-5);
         }
 
-        if (touch_petrifies(&mons[obj->corpsenm])) {
+        if (obj->corpsenm >= LOW_PM
+            && touch_petrifies(&mons[obj->corpsenm])) {
             /*learn_egg_type(obj->corpsenm);*/
             pline("Splat!  You hit %s with %s %s egg%s!",
                   mon_nam(mon),
