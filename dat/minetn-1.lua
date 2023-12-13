@@ -37,11 +37,11 @@ des.map([[
 
 -- Don't let the player fall into his likely death; used to explicitly exclude
 -- the town, but that meant that you couldn't teleport out as well as not in.
-des.teleport_region({ region={01,01,20,19}, region_islev=1 })
+des.teleport_region({ region={01,01,75,19}, exclude={01,00,35,21}, region_islev=1 })
 des.region(selection.area(01,01,35,17), "lit")
-des.levregion({ type="stair-up", region={01,03,20,19}, region_islev=1,
+des.levregion({ type="stair-up", region={01,03,21,19}, region_islev=1,
 		exclude={00,01,36,17} });
-des.levregion({ type="stair-down", region={61,03,75,19}, region_islev=1,
+des.levregion({ type="stair-down", region={57,03,75,19}, region_islev=1,
 		exclude={00,01,36,17} })
 
 -- shame we can't make polluted fountains
