@@ -57,7 +57,8 @@ static int tin_ok(struct obj *);
    they can be sacrificed regardless of age which implies that they never
    become rotten */
 #define nonrotting_corpse(mnum) \
-    ((mnum) == PM_LIZARD || (mnum) == PM_LICHEN || is_rider(&mons[mnum]) \
+    ((mnum) == PM_LIZARD || (mnum) == PM_LICHEN \
+     || ((mnum) >= LOW_PM && is_rider(&mons[mnum])) \
      || (mnum) == PM_ACID_BLOB)
 
 /* non-rotting non-corpses; unlike lizard corpses, these items will behave
