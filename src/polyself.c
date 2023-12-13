@@ -105,7 +105,12 @@ set_uasmon(void)
     PROPSET(BLINDED, !haseyes(mdat));
 #undef PROPSET
 
-    float_vs_flight(); /* maybe toggle (BFlying & I_SPECIAL) */
+    /* whether the player is flying/floating depends on their steed,
+       which won't be known during the restore process: but BFlying
+       and BStealth should be set correctly already in that case, so
+       there's nothing to do */
+    if (!gp.program_state.restoring)
+        float_vs_flight(); /* maybe toggle (BFlying & I_SPECIAL) */
     polysense();
 
 #ifdef STATUS_HILITES
