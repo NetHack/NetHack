@@ -333,18 +333,6 @@ do_earthquake(int force)
                     break; /* no pit if portal at that location */
                 chasm->tseen = 1;
 
-                /* Let liquid flow into the newly created chasm.
-                   Adjust corresponding code in apply.c for exploding
-                   wand of digging if you alter this sequence. */
-                filltype = fillholetyp(x, y, FALSE);
-                if (filltype != ROOM) {
-                    set_levltyp(x, y, filltype); /* levl[x][y] = filltype; */
-                    liquid_flow(x, y, filltype, chasm, (char *) 0);
-                    /* liquid_flow() deletes trap, might kill mtmp */
-                    if ((chasm = t_at(x, y)) == NULL)
-                        break; /* from switch, not loop */
-                }
-
                 mtmp = m_at(x, y); /* (redundant?) */
                 if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
                     if (cansee(x, y))
@@ -355,6 +343,18 @@ do_earthquake(int force)
                     obj_extract_self(otmp);
                     (void) flooreffects(otmp, x, y, "");
                     break; /* from switch, not loop */
+                }
+
+                /* Let liquid flow into the newly created chasm.
+                   Adjust corresponding code in apply.c for exploding
+                   wand of digging if you alter this sequence. */
+                filltype = fillholetyp(x, y, FALSE);
+                if (filltype != ROOM) {
+                    set_levltyp(x, y, filltype); /* levl[x][y] = filltype; */
+                    liquid_flow(x, y, filltype, chasm, (char *) 0);
+                    /* liquid_flow() deletes trap, might kill mtmp */
+                    if ((chasm = t_at(x, y)) == NULL)
+                        break; /* from switch, not loop */
                 }
 
                 /* We have to check whether monsters or hero falls into a
