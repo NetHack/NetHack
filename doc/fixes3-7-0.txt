@@ -1801,6 +1801,10 @@ add 'X' as a potential context-sensitive item-action for uwep and uswapwep
 monsters weren't noticing hero's possession or lack of magic resistance when
 	hero getting zapped by a wand of striking was or wasn't resisted
 discard monsters' observations about hero's resistances when saving bones
+autopickup while levitating shares code with 'mention_decor'; after being told
+	about ice covered by an object, moving over some other object later
+	when mention_decor is Off could give "you are back on solid ground"
+	long after leaving the ice
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

@@ -299,14 +299,16 @@ void
 force_decor(boolean via_probing)
 {
     /* we don't want describe_decor() to defer feedback if hero is fumbling
-       with 1 turn left, or for ice_descr() to skip thawing details if hero
-       is probing when levitating while blind (those will be skipped for
-       look_here() and farlook() or autodescribe); we can't control that by
-       temporarily tweaking properties because that could become noticeable
-       if status gets updated while decor feedback is being delivered */
+       with 1 turn left until next slip_or_trip(), or for ice_descr() to
+       omit thawing details if hero is probing when levitating while blind
+       (those will be skipped for look_here() and farlook() or autodescribe);
+       we can't control that by temporarily tweaking properties because that
+       could become noticeable if status gets updated while decor feedback
+       is being delivered */
     gd.decor_fumble_override = TRUE;
     gd.decor_levitate_override = via_probing;
-    /* force current terrain to be different from previous location */
+    /* force current terrain to be different from previous location, or
+       uninteresting if previous location was actually inside solid stone */
     iflags.prev_decor = STONE;
     (void) describe_decor();
     gd.decor_fumble_override = gd.decor_levitate_override = FALSE;
@@ -314,9 +316,12 @@ force_decor(boolean via_probing)
 }
 
 void
-deferred_decor(boolean setup) /* True: deferring, False: catching up */
+deferred_decor(
+    boolean setup) /* True: deferring, False: catching up */
 {
-    if (setup) {
+    if (!flags.mention_decor) {
+        iflags.defer_decor = FALSE;
+    } else if (setup) {
         iflags.defer_decor = TRUE;
     } else {
         (void) describe_decor();
@@ -334,14 +339,17 @@ describe_decor(void)
     const char *dfeature;
     int ltyp;
 
-    if ((HFumbling & TIMEOUT) == 1L && !iflags.defer_decor
+    if ((HFumbling & TIMEOUT) == 1L /* about to slip_or_trip */
+        && !iflags.defer_decor
         && !gd.decor_fumble_override) { /* probe_decor() */
         /*
-         * Work around a message sequencing issue:  avoid
+         * Work around a message sequencing issue if Fumbling's periodic
+         * timeout is about to kick in:  avoid the combination
          *  |You are back on floor.
          *  |You trip over <object>.  or  You flounder.
          * when the trip is being caused by moving on ice as hero
-         * steps off ice onto non-ice.
+         * steps off ice onto non-ice.  Defer the back-on-floor part if
+         * that is about to happen.
          */
         deferred_decor(TRUE);
         return FALSE;
@@ -378,7 +386,7 @@ describe_decor(void)
                 Strcpy(fbuf, dfeature);
             Sprintf(outbuf, "%s.", upstart(fbuf));
         }
-        if (ltyp == ICE)
+        if (ltyp == ICE && flags.mention_decor)
             Norep("%s", outbuf);
         else
             pline("%s", outbuf);
@@ -391,7 +399,11 @@ describe_decor(void)
             }
         }
     }
-    iflags.prev_decor = ltyp;
+    /* describe_decor() is normally called when moving onto a different
+       type of terrain, but it is also called by pickup() even when
+       mention_decor is Off if hero can't reach floor; only adapt the next
+       describe_decor() by what has just occurred in this one when it's On */
+    iflags.prev_decor = flags.mention_decor ? ltyp : STONE;
     return res;
 }
 

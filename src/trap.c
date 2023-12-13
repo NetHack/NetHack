@@ -4728,6 +4728,7 @@ back_on_ground(boolean rescued)
         you_are_back = flags.verbose ? "You are back" : "Back";
     }
     pline("%s %s %s.", you_are_back, preposit, surf);
+    iflags.last_msg = PLNMSG_BACK_ON_GROUND;
 }
 
 /* life-saving or divine rescue has attempted to get the hero out of hostile

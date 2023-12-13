@@ -1138,9 +1138,7 @@ slip_or_trip(void)
     struct obj *otmp = vobj_at(u.ux, u.uy), *otmp2;
     const char *what;
     char buf[BUFSZ];
-    boolean on_foot = TRUE;
-    if (u.usteed)
-        on_foot = FALSE;
+    boolean on_foot = !u.usteed;
 
     if (otmp && on_foot && !u.uinwater && is_pool(u.ux, u.uy))
         otmp = 0;
@@ -1179,11 +1177,14 @@ slip_or_trip(void)
         /* is fumbling from ice alone? */
         boolean ice_only = !(EFumbling || (HFumbling & ~FROMOUTSIDE));
 
-        pline("%s %s%s on the ice.",
+        pline("%s %s%s %s the ice.",
               u.usteed ? upstart(x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
                                           SUPPRESS_SADDLE, FALSE))
                        : "You",
-              rn2(2) ? "slip" : "slide", on_foot ? "" : "s");
+              rn2(2) ? "slip" : "slide", on_foot ? "" : "s",
+              /* sometimes slipping due to ice occurs during turn that hero
+                 has just moved off the ice; phrase things differently then */
+              is_ice(u.ux, u.uy) ? "on" : "off");
         /* fumbling outside of ice while mounted always causes the hero to
            fall from the saddle, so to avoid a counterintuitive effect where
            ice makes riding _less_ hazardous, unconditionally dismount if

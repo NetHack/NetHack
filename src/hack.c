@@ -2831,7 +2831,6 @@ pooleffects(
                 You("leave the %s...", hliquid("water")); /* oops! */
             } else {
                 back_on_ground(FALSE);
-                iflags.last_msg = PLNMSG_BACK_ON_GROUND;
             }
         } else if (Is_waterlevel(&u.uz)) {
             still_inwater = TRUE;
