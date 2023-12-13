@@ -11,6 +11,7 @@ static void sanity_check_single_mon(struct monst *, boolean, const char *);
 static struct obj *make_corpse(struct monst *, unsigned);
 static int minliquid_core(struct monst *);
 static void m_calcdistress(struct monst *);
+static boolean mstoning(const struct obj *obj);
 static boolean monlineu(struct monst *, int, int);
 static long mm_2way_aggression(struct monst *, struct monst *);
 static long mm_aggression(struct monst *, struct monst *);
@@ -1156,9 +1157,19 @@ meatbox(struct monst *mon, struct obj *otmp)
     }
 }
 
-#define mstoning(obj)                                       \
-    (ofood(obj) && (touch_petrifies(&mons[(obj)->corpsenm]) \
-                    || (obj)->corpsenm == PM_MEDUSA))
+static boolean
+mstoning(const struct obj *obj)
+{
+    const int nm = obj->corpsenm;
+
+    if (nm < LOW_PM)
+        return FALSE;
+
+    if (nm == PM_MEDUSA)
+        return TRUE;
+
+    return ofood(obj) && touch_petrifies(&mons[nm]);
+}
 
 /* monster consumes an object.
 
@@ -1417,8 +1428,6 @@ meatobj(struct monst* mtmp) /* for gelatinous cubes */
     }
     return (count > 0 || ecount > 0) ? 1 : 0;
 }
-
-#undef mstoning
 
 /* Monster eats a corpse off the ground.
  * Return value is 0 = nothing eaten, 1 = ate a corpse, 2 = died */
