@@ -931,14 +931,15 @@ dogfood(struct monst *mon, struct obj *obj)
         fx = (obj->otyp == CORPSE || obj->otyp == TIN || obj->otyp == EGG)
                 ? obj->corpsenm
                 : NUMMONS; /* valid mons[mndx] to pacify static analyzer */
-        fptr = &mons[fx];
+
+        fptr = fx >= LOW_PM ? &mons[fx] : NULL;
 
         if (obj->otyp == CORPSE && is_rider(fptr))
             return TABU;
         if ((obj->otyp == CORPSE || obj->otyp == EGG)
             /* Medusa's corpse doesn't pass the touch_petrifies() test
                but does cause petrification if eaten */
-            && (touch_petrifies(fptr) || obj->corpsenm == PM_MEDUSA)
+            && ((fptr && touch_petrifies(fptr)) || obj->corpsenm == PM_MEDUSA)
             && !resists_ston(mon))
             return POISON;
         if (obj->otyp == LUMP_OF_ROYAL_JELLY
