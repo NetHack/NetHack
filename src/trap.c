@@ -1671,7 +1671,6 @@ trapeffect_pit(
         boolean already_known = trap->tseen ? TRUE : FALSE;
         boolean deliberate = FALSE;
         int steed_article = ARTICLE_THE;
-        int oldumort;
 
         /* suppress article in various steed messages when using its
            name (which won't occur when hallucinating) */
@@ -1749,7 +1748,8 @@ trapeffect_pit(
         set_utrap((unsigned) rn1(6, 2), TT_PIT);
         if (!steedintrap(trap, (struct obj *) 0)) {
             if (ttype == SPIKED_PIT) {
-                oldumort = u.umortality;
+                int oldumort = u.umortality;
+
                 losehp(Maybe_Half_Phys(rnd(conj_pit ? 4 : adj_pit ? 6 : 10)),
                        /* note: these don't need locomotion() handling;
                           if fatal while poly'd and Unchanging, the
@@ -1792,13 +1792,10 @@ trapeffect_pit(
             exercise(A_DEX, FALSE);
         }
     } else {
-        int tt = trap->ttyp;
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
         boolean trapkilled = FALSE;
         boolean forcetrap = ((trflags & FORCETRAP) != 0);
-        boolean inescapable = (forcetrap
-                               || ((tt == HOLE || tt == PIT)
-                                   && Sokoban && !trap->madeby_u));
+        boolean inescapable = (forcetrap || (Sokoban && !trap->madeby_u));
         struct permonst *mptr = mtmp->data;
         const char *fallverb;
 
@@ -1813,7 +1810,7 @@ trapeffect_pit(
                 return Trap_Effect_Finished;
             }
             if (!inescapable)
-                return Trap_Effect_Finished;               /* avoids trap */
+                return Trap_Effect_Finished; /* avoids trap */
             fallverb = "is dragged"; /* sokoban pit */
         }
         if (!passes_walls(mptr))
@@ -1828,7 +1825,7 @@ trapeffect_pit(
         }
         mselftouch(mtmp, "Falling, ", FALSE);
         if (DEADMONSTER(mtmp) || thitm(0, mtmp, (struct obj *) 0,
-                                       rnd((tt == PIT) ? 6 : 10), FALSE))
+                                       rnd((ttype == PIT) ? 6 : 10), FALSE))
             trapkilled = TRUE;
 
         return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped
@@ -1856,9 +1853,7 @@ trapeffect_hole(
         struct permonst *mptr = mtmp->data;
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
         boolean forcetrap = ((trflags & FORCETRAP) != 0);
-        boolean inescapable = (forcetrap
-                               || ((tt == HOLE || tt == PIT)
-                                   && Sokoban && !trap->madeby_u));
+        boolean inescapable = (forcetrap || (Sokoban && !trap->madeby_u));
 
         if (!Can_fall_thru(&u.uz)) {
             impossible("mintrap: %ss cannot exist on this level.",
@@ -1927,11 +1922,8 @@ trapeffect_level_telep(
         int tt = trap->ttyp;
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
         boolean forcetrap = ((trflags & FORCETRAP) != 0);
-        boolean inescapable = (forcetrap
-                               || ((tt == HOLE || tt == PIT)
-                                   && Sokoban && !trap->madeby_u));
 
-        return mlevel_tele_trap(mtmp, trap, inescapable, in_sight);
+        return mlevel_tele_trap(mtmp, trap, forcetrap, in_sight);
     }
     return Trap_Effect_Finished;
 }
