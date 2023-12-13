@@ -1660,12 +1660,21 @@ mbhit(
             /* this might kill mon and destroy obj; mon will remain
                accessible even if dead but obj could be deleted */
             destroy_drawbridge(dbx, dby);
-            if (!get_obj_location(obj, &dbx, &dbx, /* reuse <dbx,dby> */
-                                  CONTAINED_TOO | BURIED_TOO)) {
-                /* couldn't find obj, so assume that it has been destroyed
-                   and end the zap; not really correct behavior but we can't
-                   continue without the wand because fhitm (mbhitm) and fhito
-                   (bhito) would want it at forthcoming spots in zap path */
+            for (otmp = mon->minvent; otmp; otmp = otmp->nobj)
+                if (otmp == obj)
+                    break;
+            if (!otmp) {
+                for (otmp = gl.level.objects[x][y]; otmp;
+                     otmp = otmp->nexthere)
+                    if (otmp == obj)
+                        break;
+            }
+            /* if otmp is Null, mon isn't carrying obj anymore and didn't
+               just drop it here; assume that it was destroyed and stop
+               the zap; not really correct behavior but we can't continue
+               without the responsible object because fhitm (mbhitm) and
+               fhito (bhito) will want it at forthcoming spots in zap path */
+            if (!otmp) {
                 /*obj = NULL;*/
                 break;
             }
