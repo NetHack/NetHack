@@ -1150,6 +1150,7 @@ struct const_globals {
     const struct obj zeroobj;      /* used to zero out a struct obj */
     const struct monst zeromonst;  /* used to zero out a struct monst */
     const anything zeroany;        /* used to zero out union any */
+    const NhRect zeroNhRect;       /* used to zero out NhRect */
 };
 
 extern const struct const_globals cg;

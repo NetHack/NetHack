@@ -203,7 +203,7 @@ l_selection_numpoints(lua_State *L)
     struct selectionvar *sel = l_selection_check(L, 1);
     coordxy x, y;
     int ret = 0;
-    NhRect rect;
+    NhRect rect = cg.zeroNhRect;
 
     selection_getbounds(sel, &rect);
 
@@ -281,7 +281,7 @@ l_selection_and(lua_State *L)
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
     struct selectionvar *selr = l_selection_push_new(L);
-    NhRect rect;
+    NhRect rect = cg.zeroNhRect;
 
     rect_bounds(sela->bounds, selb->bounds, &rect);
 
@@ -304,7 +304,7 @@ l_selection_or(lua_State *L)
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
     struct selectionvar *selr = l_selection_push_new(L);
-    NhRect rect;
+    NhRect rect = cg.zeroNhRect;
 
     rect_bounds(sela->bounds, selb->bounds, &rect);
 
@@ -328,7 +328,7 @@ l_selection_xor(lua_State *L)
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
     struct selectionvar *selr = l_selection_push_new(L);
-    NhRect rect;
+    NhRect rect = cg.zeroNhRect;
 
     rect_bounds(sela->bounds, selb->bounds, &rect);
 
@@ -355,7 +355,7 @@ l_selection_sub(lua_State *L)
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
     struct selectionvar *selr = l_selection_push_new(L);
-    NhRect rect;
+    NhRect rect = cg.zeroNhRect;
 
     rect_bounds(sela->bounds, selb->bounds, &rect);
 
@@ -445,7 +445,7 @@ static int
 l_selection_getbounds(lua_State *L)
 {
     struct selectionvar *sel = l_selection_check(L, 1);
-    NhRect rect;
+    NhRect rect = cg.zeroNhRect;
 
     selection_getbounds(sel, &rect);
     lua_settop(L, 0);
@@ -904,7 +904,7 @@ l_selection_iterate(lua_State *L)
     int argc = lua_gettop(L);
     struct selectionvar *sel = (struct selectionvar *) 0;
     int x, y;
-    NhRect rect;
+    NhRect rect = cg.zeroNhRect;
 
     if (argc == 2 && lua_type(L, 2) == LUA_TFUNCTION) {
         sel = l_selection_check(L, 1);
