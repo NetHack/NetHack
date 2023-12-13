@@ -1320,8 +1320,6 @@ extern struct monst *clone_mon(struct monst *, coordxy, coordxy);
 extern int monhp_per_lvl(struct monst *);
 extern void newmonhp(struct monst *, int);
 extern struct mextra *newmextra(void);
-extern void copy_mextra(struct monst *, struct monst *);
-extern void dealloc_mextra(struct monst *);
 extern struct monst *makemon(struct permonst *, coordxy, coordxy, mmflags_nht);
 extern struct monst *unmakemon(struct monst *, mmflags_nht);
 extern boolean create_critters(int, struct permonst *, boolean);
@@ -1344,7 +1342,6 @@ extern void mimic_hit_msg(struct monst *, short);
 extern void mkmonmoney(struct monst *, long);
 extern int bagotricks(struct obj *, boolean, int *);
 extern boolean propagate(int, boolean, boolean);
-extern boolean usmellmon(struct permonst *);
 
 /* ### mcastu.c ### */
 
@@ -1663,6 +1660,9 @@ extern void pacify_guards(void);
 extern void decide_to_shapeshift(struct monst *, int);
 extern boolean vamp_stone(struct monst *);
 extern void check_gear_next_turn(struct monst *);
+extern void copy_mextra(struct monst *, struct monst *);
+extern void dealloc_mextra(struct monst *);
+extern boolean usmellmon(struct permonst *);
 
 /* ### mondata.c ### */
 
