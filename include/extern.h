@@ -1338,7 +1338,6 @@ extern void newmcorpsenm(struct monst *);
 extern void freemcorpsenm(struct monst *);
 extern void set_mimic_sym(struct monst *);
 extern int mbirth_limit(int);
-extern void mimic_hit_msg(struct monst *, short);
 extern void mkmonmoney(struct monst *, long);
 extern int bagotricks(struct obj *, boolean, int *);
 extern boolean propagate(int, boolean, boolean);
@@ -1663,6 +1662,7 @@ extern void check_gear_next_turn(struct monst *);
 extern void copy_mextra(struct monst *, struct monst *);
 extern void dealloc_mextra(struct monst *);
 extern boolean usmellmon(struct permonst *);
+extern void mimic_hit_msg(struct monst *, short);
 
 /* ### mondata.c ### */
 
