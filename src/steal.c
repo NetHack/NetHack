@@ -1,4 +1,4 @@
-/* NetHack 3.7	steal.c	$NHDT-Date: 1646688070 2022/03/07 21:21:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.7	steal.c	$NHDT-Date: 1702529046 2023/12/14 04:44:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.114 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -573,17 +573,29 @@ mpickobj(struct monst *mtmp, struct obj *otmp)
             pline("%s out.", Tobjnam(otmp, "go"));
         snuff_otmp = TRUE;
     }
-    /* for hero owned object on shop floor, mtmp is taking possession
-       and if it's eventually dropped in a shop, shk will claim it */
-    if (!mtmp->mtame)
+    /* some object handling is only done if mtmp isn't a pet */
+    if (!mtmp->mtame) {
+        /* for hero owned object on shop floor, mtmp is taking possession
+           and if it's eventually dropped in a shop, shk will claim it */
         otmp->no_charge = 0;
-    /* if monster is unseen, info hero knows about this object becomes lost;
-       continual pickup and drop by pets makes this too annoying if it is
-       applied to them; when engulfed (where monster can't be seen because
-       vision is disabled), or when held (or poly'd and holding) while blind,
-       behave as if the monster can be 'seen' by touch */
-    if (!mtmp->mtame && !(canseemon(mtmp) || mtmp == u.ustuck))
-        unknow_object(otmp);
+        /* if monst is unseen, some info hero knows about this object becomes
+           lost; continual pickup and drop by pets makes this too annoying if
+           it is applied to them; when engulfed (where monster can't be seen
+           because vision is disabled), or when held (or poly'd and holding)
+           while blind, behave as if the monster can be 'seen' by touch */
+        if (!canseemon(mtmp) && mtmp != u.ustuck)
+            unknow_object(otmp);
+        /* if otmp has flags set for how it left hero's inventory, change
+           those flags; if thrown, now stolen and autopickup might override
+           pickup_types and autopickup exceptions based on 'pickup_stolen'
+           rather than 'pickup_thrown'; if previously stolen, stays stolen;
+           if previously dropped, now forgotten and autopickup will operate
+           normally regardless of the setting for 'dropped_nopick' */
+        if (otmp->how_lost == LOST_THROWN)
+            otmp->how_lost = LOST_STOLEN;
+        else if (otmp->how_lost == LOST_DROPPED)
+            otmp->how_lost = LOST_NONE;
+    }
     /* Must do carrying effects on object prior to add_to_minv() */
     carry_obj_effects(otmp);
     /* add_to_minv() might free otmp [if merged with something else],
