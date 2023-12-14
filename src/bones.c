@@ -575,7 +575,7 @@ savebones(int how, time_t when, struct obj *corpse)
     }
     c = (char) (strlen(bonesid) + 1);
 
-    nhfp->mode = WRITING | FREEING;
+    nhfp->mode = WRITING;
     store_version(nhfp);
     store_savefileinfo(nhfp);
     if (nhfp->structlevel) {
