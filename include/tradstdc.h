@@ -361,11 +361,39 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 #endif
 #if __GNUC__ >= 5
-#define NONNULL __attribute__((returns_nonnull))
+#ifndef NONNULLS_DEFINED
+#define DO_DEFINE_NONNULLS
+#endif  /* !NONNULLS_DEFINED */
 /* #pragma message is available */
 #define NH_PRAGMA_MESSAGE 1
 #endif
 #endif
+
+#if defined(__clang__) && !defined(DO_DEFINE_NONNULLS)
+#define DO_DEFINE_NONNULLS
+#endif
+
+#if defined(DO_DEFINE_NONNULLS) && !defined(NONNULLS_DEFINED)
+#define NONNULL __attribute__((returns_nonnull))
+#define NONNULLPTRS __attribute__((nonnull))
+#define NONNULLARG1 __attribute__((nonnull (1)))
+#define NONNULLARG2 __attribute__((nonnull (2)))
+#define NONNULLARG3 __attribute__((nonnull (3)))
+#define NONNULLARG4 __attribute__((nonnull (4)))
+#define NONNULLARG5 __attribute__((nonnull (5)))
+#define NONNULLARG7 __attribute__((nonnull (7))) /* for bhit() */
+#define NONNULLARG12 __attribute__((nonnull (1, 2)))
+#define NONNULLARG123 __attribute__((nonnull (1, 2, 3)))
+#define NONNULLARG13 __attribute__((nonnull (1, 3)))
+#define NONNULLARG14 __attribute__((nonnull (1, 4))) /* for query_category */
+#define NONNULLARG134 __attribute__((nonnull (1, 3, 4))) /* for do_stone_mon */
+#define NONNULLARG145 __attribute__((nonnull (1, 4, 5))) /* find_roll_to_hit */
+#define NONNULLARG17 __attribute__((nonnull (1, 7))) /* for askchain() */
+#define NONNULLARG24 __attribute__((nonnull (2, 4))) /* query_objlist() */
+#define NONNULLARG45 __attribute__((nonnull (4, 5))) /* do_screen_descri... */
+#define NONNULLS_DEFINED
+#undef DO_DEFINE_NONNULLS
+#endif  /* __clang__ && !NONNULLS_DEFINED */
 
 #ifdef _MSC_VER
 #ifndef ATTRNORETURN
@@ -390,9 +418,29 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #ifndef NORETURN
 #define NORETURN
 #endif
-#ifndef NONNULL
+#ifndef NONNULLS_DEFINED
 #define NONNULL
-#endif
+#define NONNULLPTRS
+#define NONNULLARG1
+#define NONNULLARG2
+#define NONNULLARG3
+#define NONNULLARG4
+#define NONNULLARG5
+#define NONNULLARG7
+#define NONNULLARG12
+#define NONNULLARG123
+#define NONNULLARG13
+#define NONNULLARG14
+#define NONNULLARG134
+#define NONNULLARG145
+#define NONNULLARG17
+#define NONNULLARG24
+#define NONNULLARG45
+#define NONNULLS_DEFINED
+#endif  /* NONNULLS_DEFINED */
+#ifndef NO_NONNULLS
+#define NO_NONNULLS
+#endif  /* NO_NONNULLS */
 
 /*
  * Allow gcc and clang to catch the use of non-C99 functions that

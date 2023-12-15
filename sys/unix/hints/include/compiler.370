@@ -63,6 +63,7 @@ CFLAGS+=-Wimplicit-int
 CFLAGS+=-Wmissing-prototypes
 CFLAGS+=-Wold-style-definition
 CFLAGS+=-Wstrict-prototypes
+CFLAGS+=-Wnonnull
 
 #detection of clang vs gcc
 CCISCLANG := $(shell echo `$(CC) --version` | grep clang)

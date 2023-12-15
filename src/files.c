@@ -219,13 +219,14 @@ static void cnf_parser_init(struct _cnf_parser_state *parser);
 static void cnf_parser_done(struct _cnf_parser_state *parser);
 static void parse_conf_buf(struct _cnf_parser_state *parser,
                            boolean (*proc)(char *arg));
+/* next one is in extern.h; why here too? */
 boolean parse_conf_str(const char *str, boolean (*proc)(char *arg));
 static boolean parse_conf_file(FILE *fp, boolean (*proc)(char *arg));
 static void parseformat(int *, char *);
 static FILE *fopen_wizkit_file(void);
 static void wizkit_addinv(struct obj *);
 boolean proc_wizkit_line(char *buf);
-void read_wizkit(void);
+void read_wizkit(void);  /* in extern.h; why here too? */
 static FILE *fopen_sym_file(void);
 
 #ifdef SELF_RECOVER
@@ -497,20 +498,18 @@ const int bei = 1;
 void
 zero_nhfile(NHFILE *nhfp)
 {
-    if (nhfp) {
-        nhfp->fd = -1;
-        nhfp->mode = COUNTING;
-        nhfp->structlevel = FALSE;
-        nhfp->fieldlevel = FALSE;
-        nhfp->addinfo = FALSE;
-        nhfp->bendian = IS_BIGENDIAN();
-        nhfp->fpdef = (FILE *) 0;
-        nhfp->fplog = (FILE *) 0;
-        nhfp->fpdebug = (FILE *) 0;
-        nhfp->count = 0;
-        nhfp->eof = FALSE;
-        nhfp->fnidx = 0;
-    }
+    nhfp->fd = -1;
+    nhfp->mode = COUNTING;
+    nhfp->structlevel = FALSE;
+    nhfp->fieldlevel = FALSE;
+    nhfp->addinfo = FALSE;
+    nhfp->bendian = IS_BIGENDIAN();
+    nhfp->fpdef = (FILE *) 0;
+    nhfp->fplog = (FILE *) 0;
+    nhfp->fpdebug = (FILE *) 0;
+    nhfp->count = 0;
+    nhfp->eof = FALSE;
+    nhfp->fnidx = 0;
 }
 
 static NHFILE *
@@ -534,12 +533,10 @@ free_nhfile(NHFILE *nhfp)
 void
 close_nhfile(NHFILE *nhfp)
 {
-    if (nhfp) {
-        if (nhfp->structlevel && nhfp->fd != -1)
-            (void) nhclose(nhfp->fd), nhfp->fd = -1;
-        zero_nhfile(nhfp);
-        free_nhfile(nhfp);
-    }
+    if (nhfp->structlevel && nhfp->fd != -1)
+        (void) nhclose(nhfp->fd), nhfp->fd = -1;
+    zero_nhfile(nhfp);
+    free_nhfile(nhfp);
 }
 
 void

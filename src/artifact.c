@@ -2523,4 +2523,13 @@ has_magic_key(struct monst *mon) /* if null, hero assumed */
     return (struct obj *) 0;
 }
 
+/* #define is_art(o,art) ((o) && (o)->oartifact == (art)) */
+boolean
+is_art(struct obj *obj, int art)
+{
+    if (obj && obj->oartifact == art)
+        return TRUE;
+    return FALSE;
+}
+
 /*artifact.c*/
