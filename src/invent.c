@@ -783,6 +783,7 @@ merge_choice(struct obj *objlist, struct obj *obj)
 {
     struct monst *shkp;
     int save_nocharge;
+    struct obj *objlist2;
 
     if (obj->otyp == SCR_SCARE_MONSTER) /* punt on these */
         return (struct obj *) 0;
@@ -804,13 +805,14 @@ merge_choice(struct obj *objlist, struct obj *obj)
         else if (inhishop(shkp))
             return (struct obj *) 0;
     }
-    while (objlist) {
-        if (mergable(objlist, obj))
+    objlist2 = objlist; /* allow objlist arg to be nonnull w/o a warning */
+    while (objlist2) {
+        if (mergable(objlist2, obj))
             break;
-        objlist = objlist->nobj;
+        objlist2 = objlist2->nobj;
     }
     obj->no_charge = save_nocharge;
-    return objlist;
+    return objlist2;
 }
 
 /* merge obj with otmp and delete obj if types agree */

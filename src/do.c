@@ -292,14 +292,17 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
             res = TRUE;
         }
     } else if (obj->globby) {
+        struct obj *globbyobj = obj;  /* allow obj to be nonnull arg */
+
         /* Globby things like puddings might stick together */
-        while (obj && (otmp = obj_nexto_xy(obj, x, y, TRUE)) != 0) {
-            pudding_merge_message(obj, otmp);
+        while (globbyobj
+               && (otmp = obj_nexto_xy(globbyobj, x, y, TRUE)) != 0) {
+            pudding_merge_message(globbyobj, otmp);
             /* intentionally not getting the melded object; obj_meld may set
              * obj to null. */
-            (void) obj_meld(&obj, &otmp);
+            (void) obj_meld(&globbyobj, &otmp);
         }
-        res = (boolean) !obj;
+        res = (boolean) !globbyobj;
     } else if (gc.context.mon_moving && IS_ALTAR(levl[x][y].typ)
                && cansee(x,y)) {
         doaltarobj(obj);

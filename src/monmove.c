@@ -2088,7 +2088,7 @@ undesirable_disp(
     coordxy x,
     coordxy y) /* spot 'mtmp' is considering moving to */
 {
-    boolean is_pet = (mtmp && mtmp->mtame && !mtmp->isminion);
+    boolean is_pet = (mtmp->mtame && !mtmp->isminion);
     struct trap *trap = t_at(x, y);
 
     if (is_pet) {

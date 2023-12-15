@@ -2092,8 +2092,10 @@ RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 void
 nhl_done(lua_State *L)
 {
-    if (L)
-        lua_close(L);
+    lua_State *L2 = L;  /* allow arg to be declared nonnull */
+
+    if (L2)
+        lua_close(L2);
     iflags.in_lua = FALSE;
 }
 

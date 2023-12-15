@@ -54,8 +54,10 @@ somegold(long lmoney)
  * Deals in gold only, as leprechauns don't care for lesser coins.
 */
 struct obj *
-findgold(register struct obj* chain)
+findgold(register struct obj* argchain)
 {
+    struct obj *chain = argchain; /* allow arg to be nonnull */
+
     while (chain && chain->otyp != GOLD_PIECE)
         chain = chain->nobj;
     return chain;

@@ -228,26 +228,27 @@ set_map_u(glyph_map *gmap, uint32 utf32ch, const uint8 *utf8str, long ucolor)
 {
     static uint32_t closecolor = 0;
     static int clridx = 0;
+    glyph_map *tmpgm = gmap;
 
-    if (gmap) {
-        if (gmap->u == 0) {
-            gmap->u = (struct unicode_representation *) alloc(sizeof *gmap->u);
-            gmap->u->utf8str = 0;
-        }
-        if (gmap->u->utf8str != 0) {
-            free(gmap->u->utf8str);
-            gmap->u->utf8str = 0;
-        }
-        gmap->u->utf8str = (uint8 *) dupstr((const char *) utf8str);
-        gmap->u->ucolor = ucolor;
-        if (closest_color(ucolor, &closecolor, &clridx))
-            gmap->u->u256coloridx = clridx;
-        else
-            gmap->u->u256coloridx = 0;
-        gmap->u->utf32ch = utf32ch;
-        return 1;
+    if (!tmpgm)
+        return 0;
+
+    if (gmap->u == 0) {
+        gmap->u = (struct unicode_representation *) alloc(sizeof *gmap->u);
+        gmap->u->utf8str = 0;
     }
-    return 0;
+    if (gmap->u->utf8str != 0) {
+        free(gmap->u->utf8str);
+        gmap->u->utf8str = 0;
+    }
+    gmap->u->utf8str = (uint8 *) dupstr((const char *) utf8str);
+    gmap->u->ucolor = ucolor;
+    if (closest_color(ucolor, &closecolor, &clridx))
+        gmap->u->u256coloridx = clridx;
+    else
+        gmap->u->u256coloridx = 0;
+    gmap->u->utf32ch = utf32ch;
+    return 1;
 }
 
 
