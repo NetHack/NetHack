@@ -1799,6 +1799,7 @@ unsigned long cvt_adtyp_to_mseenres(uchar);
 unsigned long cvt_prop_to_mseenres(uchar);
 extern void monstseesu(unsigned long);
 extern void monstunseesu(unsigned long);
+extern void give_u_to_m_resistances(struct monst *) NONNULLARG1;
 extern boolean resist_conflict(struct monst *) NONNULLARG1;
 extern boolean mon_knows_traps(struct monst *, int) NONNULLARG1;
 extern void mon_learns_traps(struct monst *, int) NONNULLARG1;

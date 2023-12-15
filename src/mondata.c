@@ -1480,6 +1480,19 @@ monstunseesu(unsigned long seenres)
             m_clearseenres(mtmp, seenres);
 }
 
+/* give monster mtmp the same intrinsics hero has */
+void
+give_u_to_m_resistances(struct monst *mtmp)
+{
+    const int u_intrins[] = { FIRE_RES, COLD_RES, SLEEP_RES, DISINT_RES, SHOCK_RES, POISON_RES, ACID_RES, STONE_RES };
+    const int m_intrins[] = { MR_FIRE,  MR_COLD,  MR_SLEEP,  MR_DISINT,  MR_ELEC,   MR_POISON,  MR_ACID,  MR_STONE };
+    int i;
+
+    for (i = 0; i < SIZE(u_intrins); i++)
+        if (u.uprops[u_intrins[i]].intrinsic & INTRINSIC)
+            mtmp->mintrinsics |= m_intrins[i];
+}
+
 /* Can monster resist conflict caused by hero?
 
    High-CHA heroes will be able to 'convince' monsters

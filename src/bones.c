@@ -486,6 +486,7 @@ savebones(int how, time_t when, struct obj *corpse)
             u.ugrave_arise = NON_PM; /* in case caller cares */
             return;
         }
+        give_u_to_m_resistances(mtmp);
         mtmp = christen_monst(mtmp, gp.plname);
         newsym(u.ux, u.uy);
         /* ["Your body rises from the dead as an <mname>..." used
