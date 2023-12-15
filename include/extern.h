@@ -1979,7 +1979,7 @@ extern void l_nhcore_done(void);
 extern void l_nhcore_call(int);
 extern lua_State * nhl_init(nhl_sandbox_info *) NONNULLARG1;
 /* nhl_done contains a test for NULL arg1, preventing NONNULLARG1 */
-extern void nhl_done(lua_State *) NONNULLARG1;
+extern void nhl_done(lua_State *) NO_NONNULLS;
 extern boolean nhl_loadlua(lua_State *, const char *) NONNULLARG12;
 extern char *get_nh_lua_variables(void);
 extern void save_luadata(NHFILE *) NONNULLARG1;
