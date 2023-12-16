@@ -682,7 +682,7 @@ inside_room(struct mkroom* croom, coordxy x, coordxy y)
    can return a non-accessible location, eg. inside a wall
    if a themed room is not irregular, but has some non-room terrain */
 boolean
-somexy(struct mkroom* croom,coord * c)
+somexy(struct mkroom *croom,coord *c)
 {
     int try_cnt = 0;
     int i;

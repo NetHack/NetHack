@@ -14,7 +14,7 @@ static boolean generate_stairs_room_good(struct mkroom *, int);
 static struct mkroom *generate_stairs_find_room(void);
 static void generate_stairs(void);
 static void mkfount(struct mkroom *);
-static boolean find_okay_roompos(struct mkroom *, coord *);
+static boolean find_okay_roompos(struct mkroom *, coord *) NONNULLARG12;
 static void mksink(struct mkroom *);
 static void mkaltar(struct mkroom *);
 static void mkgrave(struct mkroom *);
@@ -24,7 +24,7 @@ static void fill_ordinary_room(struct mkroom *, boolean);
 static void makelevel(void);
 static boolean bydoor(coordxy, coordxy);
 static void mktrap_victim(struct trap *);
-static struct mkroom *find_branch_room(coord *);
+static struct mkroom *find_branch_room(coord *) NONNULLARG1;
 static struct mkroom *pos_to_room(coordxy, coordxy);
 static boolean cardinal_nextto_room(struct mkroom *, coordxy, coordxy);
 static boolean place_niche(struct mkroom *, int *, coordxy *, coordxy *);
@@ -1456,7 +1456,7 @@ find_branch_room(coord *mp)
     } else {
         croom = generate_stairs_find_room();
 
-        if (!somexyspace(croom, mp))
+        if (croom && !somexyspace(croom, mp))
             impossible("Can't place branch!");
     }
     return croom;
@@ -1722,7 +1722,7 @@ mktrap(
     register int kind;
     struct trap *t;
     unsigned lvl = level_difficulty();
-    coord m;
+    coord m = { 0, 0 };
 
     /* no traps in pools */
     if (tm && is_pool(tm->x, tm->y))
@@ -1832,7 +1832,7 @@ mktrap(
                 return;
             if (mktrapflags & MKTRAP_MAZEFLAG)
                 mazexy(&m);
-            else if (!somexyspace(croom, &m))
+            else if (croom && !somexyspace(croom, &m))
                 return;
         } while (occupied(m.x, m.y)
                  || (avoid_boulder && sobj_at(BOULDER, m.x, m.y)));
