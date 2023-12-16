@@ -17,7 +17,8 @@
 static struct artifact *get_artifact(struct obj *) NONNULL; /* never returns null */
 
 /* #define get_artifact(o) \
-    (((o) && (o)->oartifact) ? &artilist[(int) (o)->oartifact] \
+    (((o) && ((o)->artifact > 0 && (o)->artifact < AFTER_LAST_ARTIFACT)) \
+                             ? &artilist[(int) (o)->oartifact] \
                              : &artilist[ART_NONARTIFACT]) */
 
 static boolean bane_applies(const struct artifact *, struct monst *) NONNULLARG12;
@@ -2545,7 +2546,8 @@ is_art(struct obj *obj, int art)
 }
 
 /* #define get_artifact(o) \
-    (((o) && (o)->oartifact) ? &artilist[(int) (o)->oartifact] \
+    (((o) && ((o)->artifact > 0 && (o)->artifact < AFTER_LAST_ARTIFACT)) \
+                             ? &artilist[(int) (o)->oartifact] \
                              : &artilist[ART_NONARTIFACT]) */
 
 static struct artifact *
