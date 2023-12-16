@@ -2077,6 +2077,8 @@ revive_corpse(struct obj *corpse)
                                chewed ? "bite-covered" : (const char *) 0,
                                CXN_SINGULAR));
     mcarry = (where == OBJ_MINVENT) ? corpse->ocarry : 0;
+    /* mcarry is NULL for (where == OBJ_BURIED and OBJ_CONTAINED) now */
+
     (void) get_obj_location(corpse, &corpsex, &corpsey,
                             CONTAINED_TOO | BURIED_TOO);
 
@@ -2125,7 +2127,7 @@ revive_corpse(struct obj *corpse)
 
         case OBJ_MINVENT: /* probably a nymph's */
             if (cansee(mtmp->mx, mtmp->my)) {
-                if (canseemon(mcarry))
+                if (mcarry && canseemon(mcarry))
                     pline("Startled, %s drops %s as it %s!",
                           mon_nam(mcarry), an(cname),
                           canspotmon(mtmp) ? "revives" : "disappears");
