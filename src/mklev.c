@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include <assert.h>
 
 /* for UNIX, Rand #def'd to (long)lrand48() or (long)random() */
 /* croom->lx etc are schar (width <= int), so % arith ensures that */
@@ -2296,6 +2297,9 @@ mk_knox_portal(coordxy x, coordxy y)
     schar u_depth;
 
     br = dungeon_branch("Fort Ludios");
+    /* dungeon_branch() panics (so never returns) if result would be Null */
+    assert(br != NULL);
+
     if (on_level(&knox_level, &br->end1)) {
         source = &br->end2;
     } else {

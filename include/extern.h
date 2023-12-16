@@ -801,7 +801,7 @@ extern const char *surface(coordxy, coordxy);
 extern const char *ceiling(coordxy, coordxy);
 extern boolean In_quest(d_level *) NONNULLARG1;
 extern boolean In_mines(d_level *) NONNULLARG1;
-extern branch *dungeon_branch(const char *) NONNULLARG1;
+extern branch *dungeon_branch(const char *) NONNULL NONNULLARG1;
 extern boolean at_dgn_entrance(const char *) NONNULLARG1;
 extern boolean In_hell(d_level *) NONNULLARG1;
 extern boolean In_V_tower(d_level *) NONNULLARG1;
