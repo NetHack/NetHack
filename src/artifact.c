@@ -2555,7 +2555,9 @@ get_artifact(struct obj *obj)
         int artidx = (int) obj->oartifact;
 
         /* skip 0, 1st artifact at 1 */
-        if (artidx > 0 && artidx < SIZE(artilist))
+        /* SIZE(artilist) would include the terminator,
+           so use AFTER_LAST_ARTIFACT instead */
+        if (artidx > 0 && artidx < AFTER_LAST_ARTIFACT)
             return &artilist[artidx];
     }
     return &artilist[ART_NONARTIFACT];
