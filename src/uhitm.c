@@ -1324,6 +1324,8 @@ hmon_hitmon_do_hit(
     if (!obj) { /* attack with bare hands */
         hmon_hitmon_barehands(hmd, mon);
     } else {
+        /* obj is not NULL here because of the !obj check in this if block,
+         , so no guard is needed ahead of stone_missile(obj) */
         /* stone missile does not hurt xorn or earth elemental, but doesn't
            pass all the way through and continue on to some further target */
         if ((hmd->thrown == HMON_THROWN

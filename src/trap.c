@@ -67,7 +67,7 @@ static void untrap_box(struct obj *, boolean, boolean);
 #if 0
 static void join_adjacent_pits(struct trap *);
 #endif
-static boolean thitm(int, struct monst *, struct obj *, int, boolean);
+static boolean thitm(int, struct monst *, struct obj *, int, boolean) NONNULLARG2;
 static void maybe_finish_sokoban(void);
 
 static const char *const a_your[2] = { "a", "your" };
@@ -6345,7 +6345,7 @@ thitm(
             pline("%s is almost hit by %s!", Monnam(mon), doname(obj));
     } else {
         int dam = 1;
-        boolean harmless = (stone_missile(obj) && passes_rocks(mon->data));
+        boolean harmless = (obj && stone_missile(obj) && passes_rocks(mon->data));
 
         if (obj && cansee(mon->mx, mon->my))
             pline("%s is hit by %s%s", Monnam(mon), doname(obj),

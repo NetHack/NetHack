@@ -120,7 +120,8 @@ thitu(
         if (is_acid && Acid_resistance) {
             pline("It doesn't seem to hurt you.");
             monstseesu(M_SEEN_ACID);
-        } else if (stone_missile(obj) && passes_rocks(gy.youmonst.data)) {
+        } else if (obj && stone_missile(obj) && passes_rocks(gy.youmonst.data)) {
+
             /* use 'named' as an approximation for "hitting from above";
                we avoid "passes through you" for horizontal flight path
                because missile stops and that wording would suggest that
@@ -323,6 +324,7 @@ ohitmon(
     boolean vis, ismimic, objgone;
     struct obj *mon_launcher = gm.marcher ? MON_WEP(gm.marcher) : NULL;
 
+    /* assert(otmp != NULL); */
     gn.notonhead = (gb.bhitpos.x != mtmp->mx || gb.bhitpos.y != mtmp->my);
     ismimic = M_AP_TYPE(mtmp) && M_AP_TYPE(mtmp) != M_AP_MONSTER;
     vis = cansee(gb.bhitpos.x, gb.bhitpos.y);

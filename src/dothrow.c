@@ -13,7 +13,7 @@ static int throw_ok(struct obj *);
 static void autoquiver(void);
 static struct obj *find_launcher(struct obj *);
 static int gem_accept(struct monst *, struct obj *);
-static boolean toss_up(struct obj *, boolean);
+static boolean toss_up(struct obj *, boolean) NONNULLARG1;
 static void sho_obj_return_to_u(struct obj * obj);
 static struct obj *return_throw_to_inv(struct obj *, long, boolean,
                                        struct obj *);
