@@ -55,7 +55,7 @@ static NEARDATA struct artifact artilist[] = {
 
     /*  dummy element #0, so that all interesting indices are non-zero */
     A("", STRANGE_OBJECT, 0, 0, 0, NO_ATTK, NO_DFNS, NO_CARY, 0, A_NONE,
-      NON_PM, NON_PM, 0L, NO_COLOR, PLACEHOLDER),
+      NON_PM, NON_PM, 0L, NO_COLOR, NONARTIFACT),
 
     A("Excalibur", LONG_SWORD, (SPFX_NOGEN | SPFX_RESTR | SPFX_SEEK
                                 | SPFX_DEFN | SPFX_INTEL | SPFX_SEARCH),

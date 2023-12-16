@@ -18,7 +18,7 @@ static struct artifact *get_artifact(struct obj *) NONNULL; /* never returns nul
 
 /* #define get_artifact(o) \
     (((o) && (o)->oartifact) ? &artilist[(int) (o)->oartifact] \
-                             : &nonartifact) */
+                             : &artilist[ART_NONARTIFACT]) */
 
 static boolean bane_applies(const struct artifact *, struct monst *) NONNULLARG12;
 static int spec_applies(const struct artifact *, struct monst *) NONNULLARG12;
@@ -67,8 +67,6 @@ static xint16 artidisco[NROFARTIFACTS];
  * and restored but that is done through this file so they can be local.
  */
 static const struct arti_info zero_artiexist = {0}; /* all bits zero */
-/* fields in nonartifact don't matter, just its distinct address */
-static struct artifact nonartifact = {0};
 
 static void hack_artifacts(void);
 static boolean attacks(int, struct obj *);
@@ -432,7 +430,8 @@ spec_ability(struct obj *otmp, unsigned long abil)
 {
     const struct artifact *arti = get_artifact(otmp);
 
-    return (boolean) (arti != &nonartifact && (arti->spfx & abil) != 0L);
+    return (boolean) (arti != &artilist[ART_NONARTIFACT]
+                      && (arti->spfx & abil) != 0L);
 }
 
 /* used so that callers don't need to known about SPFX_ codes */
@@ -452,7 +451,7 @@ arti_reflects(struct obj *obj)
 {
     const struct artifact *arti = get_artifact(obj);
 
-    if (arti != &nonartifact) {
+    if (arti != &artilist[ART_NONARTIFACT]) {
         /* while being worn */
         if ((obj->owornmask & ~W_ART) && (arti->spfx & SPFX_REFLECT))
             return TRUE;
@@ -475,7 +474,7 @@ shade_glare(struct obj *obj)
         return TRUE;
     /* non-silver artifacts with bonus against undead also are effective */
     arti = get_artifact(obj);
-    if (arti != &nonartifact && (arti->spfx & SPFX_DFLAG2)
+    if (arti != &artilist[ART_NONARTIFACT] && (arti->spfx & SPFX_DFLAG2)
                              && arti->mtype == M2_UNDEAD)
         return TRUE;
     /* [if there was anything with special bonus against noncorporeals,
@@ -541,7 +540,7 @@ attacks(int adtyp, struct obj *otmp)
 {
     const struct artifact *weap;
 
-    if ((weap = get_artifact(otmp)) != &nonartifact)
+    if ((weap = get_artifact(otmp)) != &artilist[ART_NONARTIFACT])
         return (boolean) (weap->attk.adtyp == adtyp);
     return FALSE;
 }
@@ -553,7 +552,7 @@ defends(int adtyp, struct obj *otmp)
 
     if (!otmp)
         return FALSE;
-    if ((weap = get_artifact(otmp)) != &nonartifact)
+    if ((weap = get_artifact(otmp)) != &artilist[ART_NONARTIFACT])
         return (boolean) (weap->defn.adtyp == adtyp);
     if (Is_dragon_armor(otmp)) {
         int otyp = otmp->otyp;
@@ -602,7 +601,7 @@ defends_when_carried(int adtyp, struct obj *otmp)
 {
     const struct artifact *weap;
 
-    if ((weap = get_artifact(otmp)) != &nonartifact)
+    if ((weap = get_artifact(otmp)) != &artilist[ART_NONARTIFACT])
         return (boolean) (weap->cary.adtyp == adtyp);
     return FALSE;
 }
@@ -616,7 +615,7 @@ protects(struct obj *otmp, boolean being_worn)
     if (being_worn && objects[otmp->otyp].oc_oprop == PROTECTION)
         return TRUE;
     arti = get_artifact(otmp);
-    if (arti == &nonartifact)
+    if (arti == &artilist[ART_NONARTIFACT])
         return FALSE;
     return (boolean) ((arti->cspfx & SPFX_PROTECT) != 0
                       || (being_worn && (arti->spfx & SPFX_PROTECT) != 0));
@@ -635,7 +634,7 @@ set_artifact_intrinsic(struct obj *otmp, boolean on, long wp_mask)
     register uchar dtyp;
     register long spfx;
 
-    if (oart == &nonartifact)
+    if (oart == &artilist[ART_NONARTIFACT])
         return;
 
     /* effects from the defn field */
@@ -662,7 +661,8 @@ set_artifact_intrinsic(struct obj *otmp, boolean on, long wp_mask)
         for (obj = gi.invent; obj; obj = obj->nobj) {
             if (obj != otmp && obj->oartifact) {
                 art = get_artifact(obj);
-                if (art != &nonartifact && art->cary.adtyp == dtyp) {
+                if (art != &artilist[ART_NONARTIFACT]
+                        && art->cary.adtyp == dtyp) {
                     mask = (long *) 0;
                     break;
                 }
@@ -683,7 +683,7 @@ set_artifact_intrinsic(struct obj *otmp, boolean on, long wp_mask)
         for (obj = gi.invent; obj; obj = obj->nobj)
             if (obj != otmp && obj->oartifact) {
                 art = get_artifact(obj);
-                if (art != &nonartifact)
+                if (art != &artilist[ART_NONARTIFACT])
                     spfx &= ~art->cspfx;
             }
     }
@@ -813,7 +813,7 @@ touch_artifact(struct obj *obj, struct monst *mon)
     boolean badclass, badalign, self_willed, yours;
 
     touch_blasted = FALSE;
-    if (oart == &nonartifact)
+    if (oart == &artilist[ART_NONARTIFACT])
         return 1;
 
     yours = (mon == &gy.youmonst);
@@ -882,7 +882,7 @@ arti_immune(struct obj *obj, int dtyp)
 {
     register const struct artifact *weap = get_artifact(obj);
 
-    if (weap == &nonartifact)
+    if (weap == &artilist[ART_NONARTIFACT])
         return FALSE;
     if (dtyp == AD_PHYS)
         return FALSE; /* nothing is immune to phys dmg */
@@ -896,7 +896,8 @@ bane_applies(const struct artifact *oart, struct monst *mon)
 {
     struct artifact atmp;
 
-    if (oart != &nonartifact && (oart->spfx & SPFX_DBONUS) != 0) {
+    if (oart != &artilist[ART_NONARTIFACT]
+            && (oart->spfx & SPFX_DBONUS) != 0) {
         atmp = *oart;
         atmp.spfx &= SPFX_DBONUS; /* clear other spfx fields */
         if (spec_applies(&atmp, mon))
@@ -967,7 +968,7 @@ spec_m2(struct obj *otmp)
 {
     const struct artifact *artifact = get_artifact(otmp);
 
-    if (artifact != &nonartifact)
+    if (artifact != &artilist[ART_NONARTIFACT])
         return artifact->mtype;
     return 0L;
 }
@@ -981,7 +982,8 @@ spec_abon(struct obj *otmp, struct monst *mon)
     /* no need for an extra check for `NO_ATTK' because this will
        always return 0 for any artifact which has that attribute */
 
-    if (weap != &nonartifact && weap->attk.damn && spec_applies(weap, mon))
+    if (weap != &artilist[ART_NONARTIFACT]
+            && weap->attk.damn && spec_applies(weap, mon))
         return rnd((int) weap->attk.damn);
     return 0;
 }
@@ -992,7 +994,7 @@ spec_dbon(struct obj *otmp, struct monst *mon, int tmp)
 {
     register const struct artifact *weap = get_artifact(otmp);
 
-    if ((weap == &nonartifact)
+    if ((weap == &artilist[ART_NONARTIFACT])
         || (weap->attk.adtyp == AD_PHYS /* check for `NO_ATTK' */
                   && weap->attk.damn == 0 && weap->attk.damd == 0))
         gs.spec_dbon_applies = FALSE;
@@ -1667,7 +1669,7 @@ arti_invoke(struct obj *obj)
         impossible("arti_invoke without obj");
         return ECMD_OK;
     }
-    if (oart == &nonartifact || !oart->inv_prop) {
+    if (oart == &artilist[ART_NONARTIFACT] || !oart->inv_prop) {
         if (obj->otyp == CRYSTAL_BALL)
             use_crystal_ball(&obj);
         else
@@ -1977,7 +1979,7 @@ finesse_ahriman(struct obj *obj)
 
     /* if we aren't levitating or this isn't an artifact which confers
        levitation via #invoke then freeinv() won't toggle levitation */
-    if (!Levitation || (oart = get_artifact(obj)) == &nonartifact
+    if (!Levitation || (oart = get_artifact(obj)) == &artilist[ART_NONARTIFACT]
         || oart->inv_prop != LEVITATION || !(ELevitation & W_ARTI))
         return FALSE;
 
@@ -2005,7 +2007,7 @@ artifact_light(struct obj *obj)
         && (obj->owornmask & W_ARM) != 0L)
         return TRUE;
 
-    return (boolean) ((get_artifact(obj) != &nonartifact)
+    return (boolean) ((get_artifact(obj) != &artilist[ART_NONARTIFACT])
                       && is_art(obj, ART_SUNSWORD));
 }
 
@@ -2018,7 +2020,7 @@ arti_speak(struct obj *obj)
     char buf[BUFSZ];
 
     /* Is this a speaking artifact? */
-    if (oart == &nonartifact || !(oart->spfx & SPFX_SPEAK))
+    if (oart == &artilist[ART_NONARTIFACT] || !(oart->spfx & SPFX_SPEAK))
         return ECMD_OK; /* nothing happened */
 
     line = getrumor(bcsign(obj), buf, TRUE);
@@ -2035,7 +2037,7 @@ artifact_has_invprop(struct obj *otmp, uchar inv_prop)
 {
     const struct artifact *arti = get_artifact(otmp);
 
-    return (boolean) ((arti != &nonartifact)
+    return (boolean) ((arti != &artilist[ART_NONARTIFACT])
                       && (arti->inv_prop == inv_prop));
 }
 
@@ -2130,7 +2132,7 @@ what_gives(long *abil)
             && (abil != &EWarn_of_mon || gc.context.warntype.obj)) {
             const struct artifact *art = get_artifact(obj);
 
-            if (art != &nonartifact) {
+            if (art != &artilist[ART_NONARTIFACT]) {
                 if (dtyp) {
                     if (art->cary.adtyp == dtyp /* carried */
                         || (art->defn.adtyp == dtyp /* defends while worn */
@@ -2341,7 +2343,7 @@ untouchable(
                              || (obj->otyp == LEASH && obj->leashmon)
                              || (Is_container(obj) && Has_contents(obj))))));
 
-    if ((art = get_artifact(obj)) != &nonartifact) {
+    if ((art = get_artifact(obj)) != &artilist[ART_NONARTIFACT]) {
         carryeffect = (art->cary.adtyp || art->cspfx);
         invoked = (art->inv_prop > 0 && art->inv_prop <= LAST_PROP
                    && (u.uprops[art->inv_prop].extrinsic & W_ARTI) != 0L);
@@ -2544,7 +2546,7 @@ is_art(struct obj *obj, int art)
 
 /* #define get_artifact(o) \
     (((o) && (o)->oartifact) ? &artilist[(int) (o)->oartifact] \
-                             : &nonartifact) */
+                             : &artilist[ART_NONARTIFACT]) */
 
 static struct artifact *
 get_artifact(struct obj *obj)
@@ -2556,6 +2558,6 @@ get_artifact(struct obj *obj)
         if (artidx > 0 && artidx < SIZE(artilist))
             return &artilist[artidx];
     }
-    return &nonartifact;
+    return &artilist[ART_NONARTIFACT];
 }
 /*artifact.c*/
