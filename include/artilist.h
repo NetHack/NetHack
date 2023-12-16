@@ -13,8 +13,13 @@ static const char *const artifact_names[] = {
 
 #elif defined(ARTI_ENUM)
 #define A(nam, typ, s1, s2, mt, atk, dfn, cry, inv, al, cl, rac, \
-          cost, clr, bn) \
+          cost, clr, bn)                                         \
     ART_##bn
+
+#elif defined(DUMP_ARTI_ENUM)
+#define A(nam, typ, s1, s2, mt, atk, dfn, cry, inv, al, cl, rac, \
+          cost, clr, bn)                                         \
+        { ART_##bn, "ART_" #bn }
 #else
 /* in artifact.c, set up the actual artifact list structure */
 
@@ -259,7 +264,7 @@ A("The Palantir of Westernesse",        CRYSTAL_BALL,
       NO_ATTK, DFNS(AD_MAGM), NO_CARY, CREATE_PORTAL, A_NEUTRAL, PM_WIZARD,
       NON_PM, 4000L, NO_COLOR, EYE_OF_THE_AETHIOPICA),
 
-#if !defined(ARTI_ENUM)
+#if !defined(ARTI_ENUM) && !defined(DUMP_ARTI_ENUM)
     /*
      *  terminator; otyp must be zero
      */

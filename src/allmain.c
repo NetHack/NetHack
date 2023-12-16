@@ -1143,7 +1143,15 @@ struct enum_dump objclass_syms_dump[] = {
 };
 #undef DUMP_ENUMS_OBJCLASS_SYMS
 
+#define DUMP_ARTI_ENUM
+struct enum_dump arti_enum_dump[] = {
+#include "artilist.h"
+    { AFTER_LAST_ARTIFACT, "AFTER_LAST_ARTIFACT" }
+};
+#undef DUMP_ARTI_ENUM
+
 #undef DUMP_ENUMS
+
 
 #ifndef NODUMPENUMS
 
@@ -1160,14 +1168,16 @@ dump_enums(void)
         objclass_defchars_enum,
         objclass_classes_enum,
         objclass_syms_enum,
+        arti_enum,
         NUM_ENUM_DUMPS
     };
     static const char *const titles[NUM_ENUM_DUMPS] = {
         "monnums", "objects_nums" , "misc_object_nums",
         "cmap_symbols", "mon_syms", "mon_defchars",
         "objclass_defchars", "objclass_classes",
-        "objclass_syms",
+        "objclass_syms", "artifacts_nums",
     };
+
 #define dump_om(om) { om, #om }
     static const struct enum_dump omdump[] = {
         dump_om(LAST_GENERIC),
@@ -1194,19 +1204,21 @@ dump_enums(void)
         objclass_defchars_dump,
         objclass_classes_dump,
         objclass_syms_dump,
+        arti_enum_dump,
     };
     static const char *const pfx[NUM_ENUM_DUMPS] = { "PM_", "", "",
                                                      "", "", "", "",
-                                                     "", "" };
+                                                     "", "", "" };
     /* 0 = dump numerically only, 1 = add 'char' comment */
-    static const int dumpflgs[NUM_ENUM_DUMPS] = { 0, 0, 0, 0, 0, 1, 1, 0, 0};
+    static const int dumpflgs[NUM_ENUM_DUMPS] = { 0, 0, 0, 0, 0, 1, 1, 0, 0, 0 };
     static int szd[NUM_ENUM_DUMPS] = { SIZE(monsdump), SIZE(objdump),
                                        SIZE(omdump), SIZE(defsym_cmap_dump),
                                        SIZE(defsym_mon_syms_dump),
                                        SIZE(defsym_mon_defchars_dump),
                                        SIZE(objclass_defchars_dump),
                                        SIZE(objclass_classes_dump),
-                                       SIZE(objclass_syms_dump)
+                                       SIZE(objclass_syms_dump),
+                                       SIZE(arti_enum_dump),
     };
     const char *nmprefix;
     int i, j, nmwidth;
