@@ -2833,7 +2833,7 @@ extern void selection_floodfill(struct selectionvar *, coordxy, coordxy,
                                 boolean);
 extern boolean pm_good_location(coordxy, coordxy, struct permonst *) NONNULLARG3;
 extern void get_location_coord(coordxy *, coordxy *, int, struct mkroom *,
-                               long) NONNULLPTRS;
+                               long) NONNULLARG12;
 extern void selection_setpoint(coordxy, coordxy, struct selectionvar *, int);
 extern struct selectionvar * selection_not(struct selectionvar *);
 extern struct selectionvar *selection_filter_percent(struct selectionvar *,
