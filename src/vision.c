@@ -2131,6 +2131,7 @@ howmonseen(struct monst *mon)
     int xraydist = (u.xray_range < 0) ? -1 : (u.xray_range * u.xray_range);
     unsigned how_seen = 0; /* result */
 
+    /* assert(mon != NULL) */
     /* normal vision;
        cansee is true for both normal and astral vision,
        but couldsee it not true for astral vision */
