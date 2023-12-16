@@ -157,7 +157,7 @@
  * definition here is convenient.  No longer limited to pets.
  */
 #define _is_safemon(mon) \
-    (flags.safe_dog && (mon) && (mon)->mpeaceful && canspotmon(mon)     \
+    (flags.safe_dog && (mon)->mpeaceful && canspotmon(mon)              \
      && !Confusion && !Hallucination && !Stunned)
 
 /*
