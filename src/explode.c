@@ -4,7 +4,7 @@
 
 #include "hack.h"
 
-static int explosionmask(struct monst *, uchar, char);
+static int explosionmask(struct monst *, uchar, char) NONNULLARG1;
 static void engulfer_explosion_msg(uchar, char);
 
 /* Note: Arrays are column first, while the screen is row first */

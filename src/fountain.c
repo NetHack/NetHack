@@ -9,9 +9,9 @@
 static void dowatersnakes(void);
 static void dowaterdemon(void);
 static void dowaternymph(void);
-static void gush(coordxy, coordxy, genericptr_t);
+static void gush(coordxy, coordxy, genericptr_t) NONNULLARG3;
 static void dofindgem(void);
-static boolean watchman_warn_fountain(struct monst *);
+static boolean watchman_warn_fountain(struct monst *) NONNULLARG1;
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 

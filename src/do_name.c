@@ -20,12 +20,12 @@ static void gloc_filter_done(void);
 static boolean gather_locs_interesting(coordxy, coordxy, int);
 static void gather_locs(coord **, int *, int);
 static void truncate_to_map(int *, int *, schar, schar);
-static void getpos_refresh(int *);
+static void getpos_refresh(int *) NONNULLARG1;
 static char *name_from_player(char *, const char *, const char *);
 static void do_mgivenname(void);
-static boolean alreadynamed(struct monst *, char *, char *);
-static void do_oname(struct obj *);
-static char *docall_xname(struct obj *);
+static boolean alreadynamed(struct monst *, char *, char *) NONNULLPTRS;
+static void do_oname(struct obj *) NONNULLARG1;
+static char *docall_xname(struct obj *) NONNULLARG1;
 static void namefloorobj(void);
 
 extern const char what_is_an_unknown_object[]; /* from pager.c */

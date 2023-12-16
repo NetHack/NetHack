@@ -15,7 +15,7 @@ static char *loot_xname(struct obj *);
 static int invletter_value(char);
 static int QSORTCALLBACK sortloot_cmp(const genericptr, const genericptr);
 static void reorder_invent(void);
-static struct obj *addinv_core0(struct obj *, struct obj *, boolean);
+static struct obj *addinv_core0(struct obj *, struct obj *, boolean) NONNULLARG1;
 static void noarmor(boolean);
 static void invdisp_nothing(const char *, const char *);
 static boolean worn_wield_only(struct obj *);

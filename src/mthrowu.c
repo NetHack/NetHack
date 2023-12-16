@@ -10,7 +10,7 @@ static void monshoot(struct monst *, struct obj *, struct obj *);
 static boolean ucatchgem(struct obj *, struct monst *);
 static const char* breathwep_name(int);
 static boolean drop_throw(struct obj *, boolean, coordxy, coordxy);
-static int m_lined_up(struct monst *, struct monst *);
+static int m_lined_up(struct monst *, struct monst *) NONNULLARG12;
 
 #define URETREATING(x, y) \
     (distmin(u.ux, u.uy, x, y) > distmin(u.ux0, u.uy0, x, y))

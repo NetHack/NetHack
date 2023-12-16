@@ -42,7 +42,8 @@
 #define LSF_SHOW 0x1        /* display the light source */
 #define LSF_NEEDS_FIXUP 0x2 /* need oid fixup */
 
-static light_source *new_light_core(coordxy, coordxy, int, int, anything *);
+static light_source *new_light_core(coordxy, coordxy,
+                                    int, int, anything *) NONNULLPTRS;
 static void discard_flashes(void);
 static void write_ls(NHFILE *, light_source *);
 static int maybe_write_ls(NHFILE *, int, boolean);

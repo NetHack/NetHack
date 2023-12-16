@@ -8,9 +8,9 @@
 static boolean no_bones_level(d_level *);
 static void goodfruit(int);
 static void resetobjs(struct obj *, boolean);
-static void give_to_nearby_mon(struct obj *, coordxy, coordxy);
-static boolean fixuporacle(struct monst *);
-static void remove_mon_from_bones(struct monst *);
+static void give_to_nearby_mon(struct obj *, coordxy, coordxy) NONNULLARG1;
+static boolean fixuporacle(struct monst *) NONNULLARG1;
+static void remove_mon_from_bones(struct monst *) NONNULLARG1;
 static void set_ghostly_objlist(struct obj *objchain);
 
 static boolean

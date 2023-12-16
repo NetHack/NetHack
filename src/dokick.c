@@ -14,16 +14,17 @@
 static void kickdmg(struct monst *, boolean);
 static boolean maybe_kick_monster(struct monst *, coordxy, coordxy);
 static void kick_monster(struct monst *, coordxy, coordxy);
-static int kick_object(coordxy, coordxy, char *);
+static int kick_object(coordxy, coordxy, char *) NONNULLARG3;
 static int really_kick_object(coordxy, coordxy);
-static char *kickstr(char *, const char *);
-static boolean watchman_thief_arrest(struct monst *);
-static boolean watchman_door_damage(struct monst *, coordxy, coordxy);
+static char *kickstr(char *, const char *) NONNULLPTRS;
+static boolean watchman_thief_arrest(struct monst *) NONNULLPTRS;
+static boolean watchman_door_damage(struct monst *,
+                                    coordxy, coordxy) NONNULLARG1;
 static void kick_dumb(coordxy, coordxy);
-static void kick_ouch(coordxy, coordxy, const char *);
+static void kick_ouch(coordxy, coordxy, const char *) NONNULLARG3;
 static void kick_door(coordxy, coordxy, int);
 static void otransit_msg(struct obj *, boolean, boolean, long);
-static void drop_to(coord *, schar, coordxy, coordxy);
+static void drop_to(coord *, schar, coordxy, coordxy) NONNULLARG1;
 
 static const char kick_passes_thru[] = "kick passes harmlessly through";
 

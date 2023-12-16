@@ -124,14 +124,15 @@
 #include "hack.h"
 
 static void show_mon_or_warn(coordxy, coordxy, int);
-static void display_monster(coordxy, coordxy, struct monst *, int, boolean);
+static void display_monster(coordxy, coordxy,
+                            struct monst *, int, boolean) NONNULLPTRS;
 static int swallow_to_glyph(int, int);
-static void display_warning(struct monst *);
+static void display_warning(struct monst *) NONNULLARG1;
 
 static int check_pos(coordxy, coordxy, int);
 static void get_bkglyph_and_framecolor(coordxy x, coordxy y, int *, uint32 *);
 static int tether_glyph(coordxy, coordxy);
-static void mimic_light_blocking(struct monst *);
+static void mimic_light_blocking(struct monst *) NONNULLARG1;
 #ifdef UNBUFFERED_GLYPHINFO
 static glyph_info *glyphinfo_at(coordxy, coordxy, int);
 #endif

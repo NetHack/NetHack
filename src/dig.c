@@ -10,8 +10,8 @@ static void mkcavepos(coordxy, coordxy, int, boolean, boolean);
 static void mkcavearea(boolean);
 static int dig(void);
 static void dig_up_grave(coord *);
-static boolean watchman_canseeu(struct monst *);
-static int adj_pit_checks(coord *, char *);
+static boolean watchman_canseeu(struct monst *) NONNULLARG1;
+static int adj_pit_checks(coord *, char *) NONNULLARG2;
 static void pit_flow(struct trap *, schar);
 static boolean furniture_handled(coordxy, coordxy, boolean);
 

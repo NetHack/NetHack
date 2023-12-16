@@ -20,7 +20,7 @@ static int find_friends(struct monst *, struct monst *, int);
 static struct monst *best_target(struct monst *);
 static long score_targ(struct monst *, struct monst *);
 static boolean can_reach_location(struct monst *, coordxy, coordxy, coordxy,
-                                  coordxy);
+                                  coordxy) NONNULLARG1;
 
 /* pick a carried item for pet to drop */
 struct obj *

@@ -7,7 +7,7 @@
 
 static int pet_type(void);
 static void set_mon_lastmove(struct monst *);
-static int mon_leave(struct monst *);
+static int mon_leave(struct monst *) NONNULLARG1;
 static boolean keep_mon_accessible(struct monst *);
 
 enum arrival {
