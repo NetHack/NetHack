@@ -104,7 +104,7 @@
  * canseemon() or canspotmon() which already check that.
  */
 #define _see_with_infrared(mon) \
-    (!Blind && Infravision && mon && infravisible(mon->data) \
+    (!Blind && Infravision && infravisible(mon->data) \
      && couldsee(mon->mx, mon->my))
 
 /*
@@ -157,7 +157,7 @@
  * definition here is convenient.  No longer limited to pets.
  */
 #define _is_safemon(mon) \
-    (flags.safe_dog && (mon) && (mon)->mpeaceful && canspotmon(mon)     \
+    (flags.safe_dog && (mon)->mpeaceful && canspotmon(mon)     \
      && !Confusion && !Hallucination && !Stunned)
 
 /*
