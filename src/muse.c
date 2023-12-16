@@ -1465,7 +1465,8 @@ find_offensive(struct monst *mtmp)
         }
         nomore(MUSE_CAMERA);
         if (obj->otyp == EXPENSIVE_CAMERA
-            && (!Blind || hates_light(gy.youmonst.data))
+            && ((!Blind && !resists_blnd(&gy.youmonst))
+                || hates_light(gy.youmonst.data))
             && dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 2
             && obj->spe > 0 && !rn2(6)) {
             gm.m.offensive = obj;
@@ -1817,12 +1818,12 @@ use_offensive(struct monst *mtmp)
         if (Hallucination) {
             SetVoice(mtmp, 0, 80, 0);
             verbalize("Say cheese!");
-        } else {
+        } else if (!Blind) {
             pline("%s takes a picture of you with %s!",
                   Monnam(mtmp), an(xname(otmp)));
         }
         gm.m_using = TRUE;
-        if (!Blind) {
+        if (!Blind && !resists_blnd(&gy.youmonst)) {
             You("are blinded by the flash of light!");
             make_blinded(BlindedTimeout + (long) rnd(1 + 50), FALSE);
         }
