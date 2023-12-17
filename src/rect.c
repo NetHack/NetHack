@@ -1,4 +1,4 @@
-/* NetHack 3.7	rect.c	$NHDT-Date: 1702839449 2023/12/17 18:57:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.19 $ */
+/* NetHack 3.7	rect.c	$NHDT-Date: 1596498203 2020/08/03 23:43:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) 1990 by Jean-Christophe Collet                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -102,7 +102,7 @@ get_rect(NhRect* r)
 NhRect *
 rnd_rect(void)
 {
-    return (rect_cnt > 0) ? &ROLL_FROM(rect) : (NhRect *) NULL;
+    return rect_cnt > 0 ? &rect[rn2(rect_cnt)] : 0;
 }
 
 /*
