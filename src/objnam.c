@@ -4576,7 +4576,7 @@ readobjnam_postparse3(struct _readobjnam_data *d)
 
 
 /*
- * Return something wished for.  Specifying a null pointer for
+ * Return something wished for.  Specifying &do_random_str for
  * the user request string results in a random object.  Otherwise,
  * if asking explicitly for "nothing" (or "nil") return no_wish;
  * if not an object return &hands_obj; if an error (no matching object),
@@ -4588,7 +4588,7 @@ readobjnam(char *bp, struct obj *no_wish)
     struct _readobjnam_data d;
 
     readobjnam_init(bp, &d);
-    if (!bp)
+    if (bp == &do_random_str)
         goto any;
 
     /* first, remove extra whitespace they may have typed */
