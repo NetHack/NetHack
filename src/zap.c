@@ -6024,7 +6024,7 @@ makewish(void)
         if (++tries < MAXWISHTRY)
             goto retry;
         pline1(thats_enough_tries);
-        otmp = readobjnam(&do_random_str, (struct obj *) 0);
+        otmp = readobjnam((char *) 0, (struct obj *) 0);
         if (!otmp)
             return; /* for safety; should never happen */
     } else if (otmp == &nothing) {

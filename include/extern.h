@@ -2125,7 +2125,10 @@ extern char *bare_artifactname(struct obj *) NONNULLARG1;
    that leads to impossible(), preventing NONNULLARG1 */
 extern char *makeplural(const char *) NO_NONNULLS;
 extern char *makesingular(const char *) NO_NONNULLS;
-extern struct obj *readobjnam(char *, struct obj *) NONNULLARG1;
+/* readobjnam() allows a NULL to trigger code path for random; if it
+   and its caller were modifed to look for/provide a particular address
+   to use as a trigger instead, it could be declared NONNULLARG1 */
+extern struct obj *readobjnam(char *, struct obj *) NO_NONNULLS;
 extern int rnd_class(int, int);
 /* discover_object() passes NULL arg2 to Japanese_item_name(),
  * preventing NONNULLARG2 */

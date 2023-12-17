@@ -1069,10 +1069,8 @@ decl_globals_init(void)
     gu.urace = urace_init_data;
 }
 
-/* fields in 'hands_obj' and contents of 'do_random_str' don't matter,
- * just their distinct addresses */
+/* fields in 'hands_obj' don't matter, just its distinct address */
 struct obj hands_obj = DUMMY;
-char do_random_str = '\0';
 
 /* gcc 12.2's static analyzer thinks that some fields of gc.context.victual
    are uninitialized when compiling 'bite(eat.c)' but that's impossible;
