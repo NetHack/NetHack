@@ -1,4 +1,4 @@
-/* NetHack 3.7	mklev.c	$NHDT-Date: 1702023271 2023/12/08 08:14:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.7	mklev.c	$NHDT-Date: 1702839454 2023/12/17 18:57:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.169 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -301,7 +301,7 @@ makerooms(void)
 
     /* make rooms until satisfied */
     /* rnd_rect() will returns 0 if no more rects are available... */
-    while (gn.nroom < (MAXNROFROOMS-1) && rnd_rect()) {
+    while (gn.nroom < (MAXNROFROOMS - 1) && rnd_rect()) {
         if (gn.nroom >= (MAXNROFROOMS / 6) && rn2(2) && !tried_vault) {
             tried_vault = TRUE;
             if (create_vault()) {
@@ -1114,8 +1114,10 @@ makelevel(void)
         if (Is_rogue_level(&u.uz)) {
             makeroguerooms();
             makerogueghost();
-        } else
+        } else {
             makerooms();
+        }
+        assert(gn.nroom > 0);
         sort_rooms();
 
         generate_stairs(); /* up and down stairs */
@@ -1995,10 +1997,17 @@ generate_stairs_find_room(void)
 static void
 generate_stairs(void)
 {
-    struct mkroom *croom = generate_stairs_find_room();
+    /* generate_stairs_find_room() returns Null if nroom == 0, but that
+       should never happen for a rooms+corridors style level */
+    static const char
+        gen_stairs_panic[] = "generate_stairs: failed to find a room! (%d)";
+    struct mkroom *croom;
     coord pos;
 
     if (!Is_botlevel(&u.uz)) {
+        if ((croom = generate_stairs_find_room()) == NULL)
+            panic(gen_stairs_panic, gn.nroom);
+
         if (!somexyspace(croom, &pos)) {
             pos.x = somex(croom);
             pos.y = somey(croom);
@@ -2006,10 +2015,12 @@ generate_stairs(void)
         mkstairs(pos.x, pos.y, 0, croom, FALSE); /* down */
     }
 
-    if (gn.nroom > 1)
-        croom = generate_stairs_find_room();
-
     if (u.uz.dlevel != 1) {
+        /* if there is only 1 room and we found it above, this will find
+           it again */
+        if ((croom = generate_stairs_find_room()) == NULL)
+            panic(gen_stairs_panic, gn.nroom);
+
         if (!somexyspace(croom, &pos)) {
             pos.x = somex(croom);
             pos.y = somey(croom);
