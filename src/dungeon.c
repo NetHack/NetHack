@@ -64,6 +64,7 @@ static mapseen *find_mapseen(d_level *);
 static mapseen *find_mapseen_by_str(const char *);
 static void print_mapseen(winid, mapseen *, int, int, boolean);
 static boolean interest_mapseen(mapseen *);
+static void update_lastseentyp(coordxy, coordxy);
 static void count_feat_lastseentyp(mapseen *, coordxy, coordxy);
 static void traverse_mapseenchn(int, winid, int, int, int *);
 static const char *seen_string(xint16, const char *);
@@ -3060,6 +3061,21 @@ interest_mapseen(mapseen *mptr)
                           == gd.dungeons[mptr->lev.dnum].dunlev_ureached));
 }
 
+/* update the lastseentyp at x,y */
+static void
+update_lastseentyp(coordxy x, coordxy y)
+{
+    struct monst *mtmp;
+    int ltyp = levl[x][y].typ;
+
+    if (ltyp == DRAWBRIDGE_UP)
+        ltyp = db_under_typ(levl[x][y].drawbridgemask);
+    if ((mtmp = m_at(x, y)) != 0
+        && M_AP_TYPE(mtmp) == M_AP_FURNITURE && canseemon(mtmp))
+        ltyp = cmap_to_type(mtmp->mappearance);
+    gl.lastseentyp[x][y] = ltyp;
+}
+
 /* count mapseen feature from lastseentyp at x,y */
 static void
 count_feat_lastseentyp(mapseen *mptr,
@@ -3187,7 +3203,7 @@ recalc_mapseen(void)
     struct cemetery *bp, **bonesaddr;
     struct trap *t;
     unsigned i, ridx;
-    int ltyp, count;
+    int count;
     coordxy x, y;
     char uroom;
 
@@ -3298,15 +3314,8 @@ recalc_mapseen(void)
      */
     for (x = 1; x < COLNO; x++) {
         for (y = 0; y < ROWNO; y++) {
-            if (cansee(x, y) || (u_at(x, y) && !Levitation)) {
-                ltyp = levl[x][y].typ;
-                if (ltyp == DRAWBRIDGE_UP)
-                    ltyp = db_under_typ(levl[x][y].drawbridgemask);
-                if ((mtmp = m_at(x, y)) != 0
-                    && M_AP_TYPE(mtmp) == M_AP_FURNITURE && canseemon(mtmp))
-                    ltyp = cmap_to_type(mtmp->mappearance);
-                gl.lastseentyp[x][y] = ltyp;
-            }
+            if (cansee(x, y) || (u_at(x, y) && !Levitation))
+                update_lastseentyp(x, y);
             count_feat_lastseentyp(mptr, x, y);
         }
     }
