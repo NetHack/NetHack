@@ -19,7 +19,6 @@ static void mksink(struct mkroom *);
 static void mkaltar(struct mkroom *);
 static void mkgrave(struct mkroom *);
 static void makevtele(void);
-void clear_level_structures(void);
 static void fill_ordinary_room(struct mkroom *, boolean) NONNULLARG1;
 static void makelevel(void);
 static boolean bydoor(coordxy, coordxy);
