@@ -64,6 +64,7 @@ static mapseen *find_mapseen(d_level *);
 static mapseen *find_mapseen_by_str(const char *);
 static void print_mapseen(winid, mapseen *, int, int, boolean);
 static boolean interest_mapseen(mapseen *);
+static void count_feat_lastseentyp(mapseen *, coordxy, coordxy);
 static void traverse_mapseenchn(int, winid, int, int, int *);
 static const char *seen_string(xint16, const char *);
 static const char *br_string2(branch *);
@@ -3059,6 +3060,124 @@ interest_mapseen(mapseen *mptr)
                           == gd.dungeons[mptr->lev.dnum].dunlev_ureached));
 }
 
+/* count mapseen feature from lastseentyp at x,y */
+static void
+count_feat_lastseentyp(mapseen *mptr,
+                       coordxy x, coordxy y)
+{
+    int count;
+    unsigned atmp;
+
+    switch (gl.lastseentyp[x][y]) {
+#if 0
+    case ICE:
+        count = mptr->feat.ice + 1;
+        if (count <= 3)
+            mptr->feat.ice = count;
+        break;
+    case POOL:
+    case MOAT:
+    case WATER:
+        count = mptr->feat.water + 1;
+        if (count <= 3)
+            mptr->feat.water = count;
+        break;
+    case LAVAPOOL:
+    case LAVAWALL:
+        count = mptr->feat.lava + 1;
+        if (count <= 3)
+            mptr->feat.lava = count;
+        break;
+#endif
+    case TREE:
+        count = mptr->feat.ntree + 1;
+        if (count <= 3)
+            mptr->feat.ntree = count;
+        break;
+    case FOUNTAIN:
+        count = mptr->feat.nfount + 1;
+        if (count <= 3)
+            mptr->feat.nfount = count;
+        break;
+    case THRONE:
+        count = mptr->feat.nthrone + 1;
+        if (count <= 3)
+            mptr->feat.nthrone = count;
+        break;
+    case SINK:
+        count = mptr->feat.nsink + 1;
+        if (count <= 3)
+            mptr->feat.nsink = count;
+        break;
+    case GRAVE:
+        count = mptr->feat.ngrave + 1;
+        if (count <= 3)
+            mptr->feat.ngrave = count;
+        break;
+    case ALTAR:
+        /* get the altarmask for this location; might be a mimic */
+        atmp = altarmask_at(x, y);
+        /* convert to index: 0..3 */
+        atmp = (Is_astralevel(&u.uz)
+                && (levl[x][y].seenv & SVALL) != SVALL)
+            ? MSA_NONE
+            : Amask2msa(atmp);
+        if (!mptr->feat.naltar)
+            mptr->feat.msalign = atmp;
+        else if (mptr->feat.msalign != atmp)
+            mptr->feat.msalign = MSA_NONE;
+        count = mptr->feat.naltar + 1;
+        if (count <= 3)
+            mptr->feat.naltar = count;
+        break;
+        /*  An automatic annotation is added to the Castle and
+         *  to Fort Ludios once their structure's main entrance
+         *  has been seen (in person or via magic mapping).
+         *  For the Fort, that entrance is just a secret door
+         *  which will be converted into a regular one when
+         *  located (or destroyed).
+         * DOOR: possibly a lowered drawbridge's open portcullis;
+         * DBWALL: a raised drawbridge's "closed door";
+         * DRAWBRIDGE_DOWN: the span provided by lowered bridge,
+         *  with moat or other terrain hidden underneath;
+         * DRAWBRIDGE_UP: moat in front of a raised drawbridge,
+         *  not recognizable as a bridge location unless/until
+         *  the adjacent DBWALL has been seen.
+         */
+    case DOOR:
+        if (Is_knox(&u.uz)) {
+            int ty, tx = x - 4;
+
+            /* Throne is four columns left, either directly in
+             * line or one row higher or lower, and doesn't have
+             * to have been seen yet.
+             *   ......|}}}.
+             *   ..\...S}...
+             *   ..\...S}...
+             *   ......|}}}.
+             * For 3.6.0 and earlier, it was always in direct line:
+             * both throne and door on the lower of the two rows.
+             */
+            for (ty = y - 1; ty <= y + 1; ++ty)
+                if (isok(tx, ty) && IS_THRONE(levl[tx][ty].typ)) {
+                    mptr->flags.ludios = 1;
+                    break;
+                }
+            break;
+        }
+        if (is_drawbridge_wall(x, y) < 0)
+            break;
+        /*FALLTHRU*/
+    case DBWALL:
+    case DRAWBRIDGE_DOWN:
+        if (Is_stronghold(&u.uz))
+            mptr->flags.castle = 1, mptr->flags.castletune = 1;
+        break;
+    default:
+        break;
+    }
+}
+
 /* recalculate mapseen for the current level */
 void
 recalc_mapseen(void)
@@ -3067,7 +3186,7 @@ recalc_mapseen(void)
     struct monst *mtmp;
     struct cemetery *bp, **bonesaddr;
     struct trap *t;
-    unsigned i, ridx, atmp;
+    unsigned i, ridx;
     int ltyp, count;
     coordxy x, y;
     char uroom;
@@ -3188,115 +3307,7 @@ recalc_mapseen(void)
                     ltyp = cmap_to_type(mtmp->mappearance);
                 gl.lastseentyp[x][y] = ltyp;
             }
-
-            switch (gl.lastseentyp[x][y]) {
-#if 0
-            case ICE:
-                count = mptr->feat.ice + 1;
-                if (count <= 3)
-                    mptr->feat.ice = count;
-                break;
-            case POOL:
-            case MOAT:
-            case WATER:
-                count = mptr->feat.water + 1;
-                if (count <= 3)
-                    mptr->feat.water = count;
-                break;
-            case LAVAPOOL:
-            case LAVAWALL:
-                count = mptr->feat.lava + 1;
-                if (count <= 3)
-                    mptr->feat.lava = count;
-                break;
-#endif
-            case TREE:
-                count = mptr->feat.ntree + 1;
-                if (count <= 3)
-                    mptr->feat.ntree = count;
-                break;
-            case FOUNTAIN:
-                count = mptr->feat.nfount + 1;
-                if (count <= 3)
-                    mptr->feat.nfount = count;
-                break;
-            case THRONE:
-                count = mptr->feat.nthrone + 1;
-                if (count <= 3)
-                    mptr->feat.nthrone = count;
-                break;
-            case SINK:
-                count = mptr->feat.nsink + 1;
-                if (count <= 3)
-                    mptr->feat.nsink = count;
-                break;
-            case GRAVE:
-                count = mptr->feat.ngrave + 1;
-                if (count <= 3)
-                    mptr->feat.ngrave = count;
-                break;
-            case ALTAR:
-                /* get the altarmask for this location; might be a mimic */
-                atmp = altarmask_at(x, y);
-                /* convert to index: 0..3 */
-                atmp = (Is_astralevel(&u.uz)
-                        && (levl[x][y].seenv & SVALL) != SVALL)
-                         ? MSA_NONE
-                         : Amask2msa(atmp);
-                if (!mptr->feat.naltar)
-                    mptr->feat.msalign = atmp;
-                else if (mptr->feat.msalign != atmp)
-                    mptr->feat.msalign = MSA_NONE;
-                count = mptr->feat.naltar + 1;
-                if (count <= 3)
-                    mptr->feat.naltar = count;
-                break;
-            /*  An automatic annotation is added to the Castle and
-             *  to Fort Ludios once their structure's main entrance
-             *  has been seen (in person or via magic mapping).
-             *  For the Fort, that entrance is just a secret door
-             *  which will be converted into a regular one when
-             *  located (or destroyed).
-             * DOOR: possibly a lowered drawbridge's open portcullis;
-             * DBWALL: a raised drawbridge's "closed door";
-             * DRAWBRIDGE_DOWN: the span provided by lowered bridge,
-             *  with moat or other terrain hidden underneath;
-             * DRAWBRIDGE_UP: moat in front of a raised drawbridge,
-             *  not recognizable as a bridge location unless/until
-             *  the adjacent DBWALL has been seen.
-             */
-            case DOOR:
-                if (Is_knox(&u.uz)) {
-                    int ty, tx = x - 4;
-
-                    /* Throne is four columns left, either directly in
-                     * line or one row higher or lower, and doesn't have
-                     * to have been seen yet.
-                     *   ......|}}}.
-                     *   ..\...S}...
-                     *   ..\...S}...
-                     *   ......|}}}.
-                     * For 3.6.0 and earlier, it was always in direct line:
-                     * both throne and door on the lower of the two rows.
-                     */
-                    for (ty = y - 1; ty <= y + 1; ++ty)
-                        if (isok(tx, ty) && IS_THRONE(levl[tx][ty].typ)) {
-                            mptr->flags.ludios = 1;
-                            break;
-                        }
-                    break;
-                }
-                if (is_drawbridge_wall(x, y) < 0)
-                    break;
-                /*FALLTHRU*/
-            case DBWALL:
-            case DRAWBRIDGE_DOWN:
-                if (Is_stronghold(&u.uz))
-                    mptr->flags.castle = 1, mptr->flags.castletune = 1;
-                break;
-            default:
-                break;
-            }
+            count_feat_lastseentyp(mptr, x, y);
         }
     }
 
