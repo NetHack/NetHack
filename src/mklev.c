@@ -20,7 +20,7 @@ static void mkaltar(struct mkroom *);
 static void mkgrave(struct mkroom *);
 static void makevtele(void);
 void clear_level_structures(void);
-static void fill_ordinary_room(struct mkroom *, boolean);
+static void fill_ordinary_room(struct mkroom *, boolean) NONNULLARG1;
 static void makelevel(void);
 static boolean bydoor(coordxy, coordxy);
 static void mktrap_victim(struct trap *);
@@ -835,7 +835,8 @@ clear_level_structures(void)
 }
 
 #define ROOM_IS_FILLABLE(croom) \
-    ((croom->rtype == OROOM || croom->rtype == THEMEROOM) && croom->needfill == FILL_NORMAL)
+    ((croom->rtype == OROOM || croom->rtype == THEMEROOM)       \
+     && croom->needfill == FILL_NORMAL)
 
 /* Fill a "random" room (i.e. a typical non-special room in the Dungeons of
    Doom) with random monsters, objects, and dungeon features.
@@ -843,7 +844,9 @@ clear_level_structures(void)
    If bonus_items is TRUE, there may be an additional special item
    generated, depending on depth. */
 static void
-fill_ordinary_room(struct mkroom *croom, boolean bonus_items)
+fill_ordinary_room(
+    struct mkroom *croom,
+    boolean bonus_items)
 {
     int trycnt = 0;
     coord pos;
@@ -858,7 +861,13 @@ fill_ordinary_room(struct mkroom *croom, boolean bonus_items)
      * that's specified to be unfilled to block an inner subroom that's
      * specified to be filled. */
     for (x = 0; x < croom->nsubrooms; ++x) {
-        fill_ordinary_room(croom->sbrooms[x], FALSE);
+        struct mkroom *subroom = croom->sbrooms[x];
+
+        if (!subroom) {
+            impossible("fill_ordinary_room: Null subroom");
+            return;
+        }
+        fill_ordinary_room(subroom, FALSE);
     }
 
     if (croom->needfill != FILL_NORMAL)
@@ -1037,7 +1046,7 @@ fill_ordinary_room(struct mkroom *croom, boolean bonus_items)
 
         if (mesg) {
             do {
-                somexyspace(croom, &pos);
+                (void) somexyspace(croom, &pos);
                 x = pos.x;
                 y = pos.y;
             } while (levl[x][y].typ != ROOM && !rn2(40));
@@ -1129,7 +1138,8 @@ makelevel(void)
             h = 1;
             if (check_room(&gv.vault_x, &w, &gv.vault_y, &h, TRUE)) {
  fill_vault:
-                add_room(gv.vault_x, gv.vault_y, gv.vault_x + w, gv.vault_y + h,
+                add_room(gv.vault_x, gv.vault_y,
+                         gv.vault_x + w, gv.vault_y + h,
                          TRUE, VAULT, FALSE);
                 gl.level.flags.has_vault = 1;
                 ++room_threshold;
@@ -1205,14 +1215,17 @@ makelevel(void)
            bonus items, if there are any; if there aren't any we don't
            generate the bonus items (but levels with no fillable rooms
            typically don't have any bonus items to generate anyway) */
-        signed bonus_item_room_countdown =
-            fillable_room_count ? rn2(fillable_room_count) : -1;
+        int bonus_item_room_countdown = fillable_room_count
+                                        ? rn2(fillable_room_count) : -1;
 
         /* for each room: put things inside */
         for (croom = gr.rooms; croom->hx > 0; croom++) {
             boolean fillable = ROOM_IS_FILLABLE(croom);
-            fill_ordinary_room(croom, fillable && bonus_item_room_countdown == 0);
-            if (fillable) --bonus_item_room_countdown;
+
+            fill_ordinary_room(croom,
+                               fillable && bonus_item_room_countdown == 0);
+            if (fillable)
+                --bonus_item_room_countdown;
         }
     }
     /* Fill all special rooms now, regardless of whether this is a special
@@ -1455,8 +1468,8 @@ find_branch_room(coord *mp)
         mazexy(mp); /* already verifies location */
     } else {
         croom = generate_stairs_find_room();
-
-        if (croom && !somexyspace(croom, mp))
+        assert(croom != NULL); /* Null iff nroom==0 which won't get here */
+        if (!somexyspace(croom, mp))
             impossible("Can't place branch!");
     }
     return croom;
