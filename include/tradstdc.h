@@ -373,6 +373,10 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #define DO_DEFINE_NONNULLS
 #endif
 
+#if defined(__DJGPP__) && defined(DO_DEFINE_NONNULLS)
+#undef DO_DEFINE_NONNULLS
+#endif
+
 #if defined(DO_DEFINE_NONNULLS) && !defined(NONNULLS_DEFINED)
 #define NONNULL __attribute__((returns_nonnull))
 #define NONNULLPTRS __attribute__((nonnull))
