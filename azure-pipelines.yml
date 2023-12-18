@@ -4,8 +4,8 @@ strategy:
       imageName: 'ubuntu-latest'
       toolchainName: gcc9
       buildTargetName: minimal
-    linux_lunar_clang_all:
-      imageName: 'ubuntu-23.04'
+    linux_jammy_clang_all:
+      imageName: 'ubuntu-22.04'
       toolchainName: clang
       buildTargetName: all
     linux_jammy_gcc9_all:
