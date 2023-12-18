@@ -152,7 +152,6 @@ static void set_seenv(struct rm *, coordxy, coordxy, coordxy, coordxy);
 static void t_warn(struct rm *);
 static int wall_angle(struct rm *);
 
-#define remember_topology(x, y) (gl.lastseentyp[x][y] = levl[x][y].typ)
 #define _glyph_at(x, y) gg.gbuf[y][x].glyphinfo.glyph
 
 /*
@@ -256,7 +255,7 @@ magic_map_background(coordxy x, coordxy y, int show)
     if (show)
         show_glyph(x, y, glyph);
 
-    remember_topology(x, y);
+    update_lastseentyp(x, y);
 }
 
 /*
@@ -461,7 +460,7 @@ unmap_object(register coordxy x, register coordxy y)
         else                                                                \
             map_background(x, y, show);                                     \
                                                                             \
-        remember_topology(x, y);                                            \
+        update_lastseentyp(x, y);                                           \
     }
 
 void
@@ -3670,7 +3669,6 @@ fn_cmap_to_glyph(int cmap)
 /* for 'onefile' processing where end of this file isn't necessarily the
    end of the source code seen by the compiler (there are lots of other
    macros defined above...) */
-#undef remember_topology
 #undef _glyph_at
 #undef DETECTED
 #undef PHYSICALLY_SEEN

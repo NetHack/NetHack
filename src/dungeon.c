@@ -64,7 +64,6 @@ static mapseen *find_mapseen(d_level *);
 static mapseen *find_mapseen_by_str(const char *);
 static void print_mapseen(winid, mapseen *, int, int, boolean);
 static boolean interest_mapseen(mapseen *);
-static void update_lastseentyp(coordxy, coordxy);
 static void count_feat_lastseentyp(mapseen *, coordxy, coordxy);
 static void traverse_mapseenchn(int, winid, int, int, int *);
 static const char *seen_string(xint16, const char *);
@@ -3062,7 +3061,7 @@ interest_mapseen(mapseen *mptr)
 }
 
 /* update the lastseentyp at x,y */
-static void
+void
 update_lastseentyp(coordxy x, coordxy y)
 {
     struct monst *mtmp;
@@ -3312,10 +3311,11 @@ recalc_mapseen(void)
      * the ability to have non-dungeon glyphs float above the last known
      * dungeon glyph (i.e. items on fountains).
      */
+    if (!Levitation)
+        update_lastseentyp(u.ux, u.uy);
+
     for (x = 1; x < COLNO; x++) {
         for (y = 0; y < ROWNO; y++) {
-            if (cansee(x, y) || (u_at(x, y) && !Levitation))
-                update_lastseentyp(x, y);
             count_feat_lastseentyp(mptr, x, y);
         }
     }

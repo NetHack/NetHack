@@ -828,6 +828,7 @@ extern int dooverview(void);
 extern void show_overview(int, int);
 extern void rm_mapseen(int);
 extern void init_mapseen(d_level *) NONNULLARG1;
+extern void update_lastseentyp(coordxy, coordxy);
 extern void recalc_mapseen(void);
 extern void mapseen_temple(struct monst *);
 extern void room_discovered(int);
