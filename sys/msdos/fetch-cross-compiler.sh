@@ -153,9 +153,9 @@ if [ ! -d djgpp/symify ]; then
     fi
     ls -l
     if [ $cmdstatus -eq 0 ]; then
-	    echo "fetch of symify was successful"
+	echo "fetch of symify was successful"
+	unzip -p djdev205.zip bin/symify.exe >./simify.exe
     fi
-    unzip -p djdev205.zip bin/symify.exe >./simify.exe
     cd ../../
 fi
 
