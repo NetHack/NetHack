@@ -65,6 +65,11 @@ dospkg: dodata dosfonts $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
 	cp $(DOSFONT)/ter-u28b.psf $(TARGETPFX)pkg/TER-U28B.PSF
 	cp $(DOSFONT)/ter-u32b.psf $(TARGETPFX)pkg/TER-U32B.PSF
 	cp  ../lib/djgpp/cwsdpmi/bin/CWSDPMI.EXE $(TARGETPFX)pkg/CWSDPMI.EXE
+	( if [ -f ../lib/djgpp/symify/simify.exe ]; then \
+	      cp  ../lib/djgpp/symify/simify.exe $(TARGETPFX)pkg/SYMIFY.EXE; \
+          else \
+              pwd; echo "../lib/djgpp/symify/symify.exe not found"; \
+	  fi; )
 	-touch $(TARGETPFX)pkg/RECORD
 	cd $(TARGETPFX)pkg ; zip -9 ../NH370DOS.ZIP * ; cd ../../..
 	@echo msdos package zip file $(TARGETPFX)NH370DOS.ZIP
