@@ -1,4 +1,4 @@
-/* NetHack 3.7  makedefs.c  $NHDT-Date: 1693083328 2023/08/26 20:55:28 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.226 $ */
+/* NetHack 3.7  makedefs.c  $NHDT-Date: 1702948590 2023/12/19 01:16:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.233 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -174,7 +174,10 @@ static void do_rnd_access_file(const char *, const char *, unsigned);
 static boolean d_filter(char *);
 static boolean h_filter(char *);
 static void opt_out_words(char *, int *);
-static char *fgetline(FILE*);
+static char *fgetline(FILE *);
+/* doesn't do much (counts lines) if MAKEDEFS_FILTER_NONASCII isn't enabled */
+static void filter_nonascii(char *);
+static void set_fgetline_context(const char *, boolean, boolean);
 
 #if defined(OLD_MAKEDEFS_OPTIONS)
 static char *tmpdup(const char *);
@@ -183,6 +186,15 @@ static void windowing_sanity(void);
 static boolean get_gitinfo(char *, char *);
 static boolean use_enum = TRUE;
 #endif
+
+/* for MAKEDEFS_FILTER_NONASCII, but not conditionalized;
+   extra input for fgetline(); not-needed for files that don't use that */
+struct ascii_filter {
+    const char *filename;
+    int linenum, warncnt;
+    boolean dofilter, tabok;
+};
+static struct ascii_filter ascii_ctx;
 
 /* input, output, tmp */
 static FILE *ifp, *ofp, *tfp;
@@ -1036,6 +1048,7 @@ read_rumors_file(
         perror(infile);
         return 0L;
     }
+    set_fgetline_context(infile, TRUE, FALSE);
 
     /* copy the rumors */
     while ((line = fgetline(ifp)) != 0) {
@@ -1104,6 +1117,8 @@ do_rnd_access_file(
 #else
     ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE, 0);
 #endif
+    set_fgetline_context(NULL, FALSE, FALSE);
+
     while ((line = fgetline(ifp)) != 0) {
         if (line[0] != '#' && line[0] != '\n') {
             (void) padline(line, padlength);
@@ -1162,9 +1177,10 @@ do_rumors(void)
     /* record the current position; true rumors will start here */
     true_rumor_offset = (unsigned long) ftell(tfp);
 
-    false_rumor_offset = (unsigned long) read_rumors_file(".tru", &true_rumor_count,
-                                             &true_rumor_size, true_rumor_offset,
-                                             MD_PAD_RUMORS);
+    false_rumor_offset
+        = (unsigned long) read_rumors_file(".tru", &true_rumor_count,
+                                           &true_rumor_size, true_rumor_offset,
+                                           MD_PAD_RUMORS);
     if (!false_rumor_offset)
         goto rumors_failure;
 
@@ -1188,6 +1204,8 @@ do_rumors(void)
     Fprintf(ofp, rumors_header, Dont_Edit_Data, true_rumor_count,
             true_rumor_size, true_rumor_offset, false_rumor_count,
             false_rumor_size, false_rumor_offset, eof_offset);
+
+    set_fgetline_context(NULL, FALSE, FALSE);
     /* skip the temp file's dummy header */
     if (!(line = fgetline(tfp))) { /* "Don't Edit" */
         perror(tempfile);
@@ -1265,6 +1283,7 @@ do_data(void)
     Fprintf(ofp, "%s%08lx\n", Dont_Edit_Data, 0L);
 
     entry_cnt = line_cnt = 0;
+    set_fgetline_context(infile, TRUE, TRUE);
     /* read through the input file and split it into two sections */
     while ((line = fgetline(ifp)) != 0) {
         if (d_filter(line)) {
@@ -1301,6 +1320,7 @@ do_data(void)
     if (rewind(tfp) != 0)
         goto dead_data;
     free((genericptr_t) line);
+    set_fgetline_context(NULL, FALSE, TRUE);
     /* copy all lines of text from the scratch file into the output file */
     while ((line = fgetline(tfp)) != 0) {
         (void) fputs(line, ofp);
@@ -1448,6 +1468,7 @@ do_oracles(void)
     Fprintf(ofp, "%05lx\n", offset); /* start pos of first oracle */
     in_oracle = FALSE;
 
+    set_fgetline_context(infile, TRUE, FALSE);
     while ((line = fgetline(ifp)) != 0) {
         SpinCursor(3);
 
@@ -1490,6 +1511,7 @@ do_oracles(void)
         goto dead_data;
     free((genericptr_t) line);
     /* copy all lines of text from the scratch file into the output file */
+    set_fgetline_context(tempfile, FALSE, FALSE);
     while ((line = fgetline(tfp)) != 0) {
         (void) fputs(line, ofp);
         free((genericptr_t) line);
@@ -1598,9 +1620,88 @@ fgetline(FILE *fd)
         (void) memcpy(cprime, c, len);
         free((genericptr_t) c);
         c = cprime;
+        *(c + len) = '\0';
         len = newlen;
     }
+
+    filter_nonascii(c);
     return c;
+}
+
+static void
+filter_nonascii(char *line)
+{
+#ifdef MAKEDEFS_FILTER_NONASCII
+    char warnbuf[BUFSZ];
+    unsigned char *p;
+    int warned = 0, prevreason = -1, reason;
+#endif
+
+    if (!line) /* end of file; uses 'line' for !MAKEDEFS_FILTER_NONASCII */
+        return;
+    ascii_ctx.linenum += 1;
+    if (!ascii_ctx.dofilter)
+        return;
+
+#ifdef MAKEDEFS_FILTER_NONASCII
+    for (p = (unsigned char *) line; *p; ++p) {
+        if (*p == '\n')
+            break;
+        if (*p == '\t' && ascii_ctx.tabok)
+            continue;
+        reason = (*p > 126) ? 3 : (*p == '\t') ? 2 : (*p < ' ');
+        if (reason != 0) {
+            if (!warned)
+                ascii_ctx.warncnt += 1; /* number of lines warned about */
+            if (++warned <= 3) { /* show up to 3 warnings for this line */
+                if (warned == 1) {
+                    /*assert(ascii_ctx.filename != NULL);*/
+                    Sprintf(warnbuf, "? %s:", ascii_ctx.filename);
+                } else {
+                    Strcpy(warnbuf, ",");
+                }
+                Sprintf(eos(warnbuf), " %d.%ld", ascii_ctx.linenum,
+                        (long) ((char *) p - line)); /* column */
+                if (reason != prevreason) {
+                    Strcat(warnbuf, (reason == 1) ? " non-printable"
+                                    : (reason == 3) ? " non-ascii"
+                                      : " <tab>"); /* (reason == 2) */
+                    prevreason = reason;
+                }
+                Fprintf(stderr, "%s '%03o'", warnbuf, *p);
+            } else if (warned == 3 + 1) { /* when more than 3  */
+                Fprintf(stderr, ", ..."); /* show an indicator */
+            }
+            *p = '#';
+        }
+    }
+    if (warned > 0)
+        Fprintf(stderr, "\n");
+#endif
+    return;
+}
+
+static void
+set_fgetline_context(
+    const char *current_filename,
+    boolean do_filtering,
+    boolean tabs_are_ok) /* moot for !do_filtering */
+{
+    static const char dummyname[] = "[makedefs input]";
+
+#ifndef MAKEDEFS_FILTER_NONASCII
+    do_filtering = FALSE;
+#endif
+    if (!current_filename)
+        current_filename = dummyname;
+    /* change from relative-to-dat to be relative-to-top, iff that's easy */
+    if (!strncmp(current_filename, "../", 3))
+        current_filename += 3;
+
+    ascii_ctx.filename = current_filename;
+    ascii_ctx.linenum = ascii_ctx.warncnt = 0;
+    ascii_ctx.tabok = tabs_are_ok;
+    ascii_ctx.dofilter = do_filtering;
 }
 
 #if defined(OLD_MAKEDEFS_OPTIONS)
@@ -1822,6 +1923,7 @@ get_gitinfo(char *githash, char *gitbranch)
         /* perror(infile); */
         return FALSE;
     }
+    set_fgetline_context(infile, TRUE, TRUE);
 
     /* read the gitinfo file */
     while ((line = fgetline(gifp)) != 0) {
@@ -1983,6 +2085,7 @@ do_dungeon(void)
 #else
     ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE, 0);
 #endif
+    set_fgetline_context(NULL, FALSE, TRUE);
     while ((line = fgetline(ifp)) != 0) {
         SpinCursor(3);
 
