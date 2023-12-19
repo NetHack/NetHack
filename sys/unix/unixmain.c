@@ -635,11 +635,9 @@ early_options(int *argc_p, char ***argv_p, char **hackdir_p)
         case 'd':
             if (argcheck(argc, argv, ARG_DEBUG) == 1) {
                 consume_arg(ndx, argc_p, argv_p), consumed = 1;
-#ifndef NODUMPENUMS
             } else if (argcheck(argc, argv, ARG_DUMPENUMS) == 2) {
                 opt_terminate();
                 /*NOTREACHED*/
-#endif
             } else {
 #ifdef CHDIR
                 oldargc = argc;

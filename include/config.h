@@ -302,19 +302,6 @@
 #endif
 
 /*
- *      NODUMPENUMS
- *      If there are memory constraints and you don't want to store information
- *      about the internal enum values for monsters and objects, this can be
- *      uncommented to define NODUMPENUMS. Doing so will disable the
- *          nethack --dumpenums
- *      command line option.
- *      Note:  the extra memory is also used when ENHANCED_SYMBOLS is
- *      defined, so defining both ENHANCED_SYMBOLS and NODUMPENUMS will limit
- *      the amount of memory and code reduction offered by the latter.
- */
-/* #define NODUMPENUMS */
-
-/*
  *      ENHANCED_SYMBOLS
  *      Support the enhanced display of symbols by utilizing utf8 and 24-bit
  *      color sequences. Enabled by default, but it can be disabled by
