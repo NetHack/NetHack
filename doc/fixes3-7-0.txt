@@ -1333,6 +1333,7 @@ HP regeneration formula has changed, primarily to be less fast in the endgame
 riding negates stealth unless the steed is flying
 previous hero rising as undead in bones retains intrinsics
 level temperature affects monster generation
+amulet of unchanging cannot be polymorphed
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
