@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1702349265 2023/12/12 02:47:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1328 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1703070179 2023/12/20 11:02:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1344 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -414,7 +414,7 @@ extern int food_detect(struct obj *);
 extern int object_detect(struct obj *, int);
 extern int monster_detect(struct obj *, int);
 extern int trap_detect(struct obj *);
-extern const char *level_distance(d_level *) NONNULLARG1;
+extern const char *level_distance(d_level *) NONNULL NONNULLARG1;
 extern void use_crystal_ball(struct obj **) NONNULLARG1;
 extern void show_map_spot(coordxy, coordxy, boolean);
 extern void do_mapping(void);
@@ -829,6 +829,7 @@ extern void show_overview(int, int);
 extern void rm_mapseen(int);
 extern void init_mapseen(d_level *) NONNULLARG1;
 extern void update_lastseentyp(coordxy, coordxy);
+extern int update_mapseen_for(coordxy, coordxy);
 extern void recalc_mapseen(void);
 extern void mapseen_temple(struct monst *);
 extern void room_discovered(int);

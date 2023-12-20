@@ -1,4 +1,4 @@
-/* NetHack 3.7	dungeon.c	$NHDT-Date: 1700012885 2023/11/15 01:48:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.197 $ */
+/* NetHack 3.7	dungeon.c	$NHDT-Date: 1703070190 2023/12/20 11:03:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.205 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1687,13 +1687,13 @@ u_on_dnstairs(void)
 boolean
 On_stairs(coordxy x, coordxy y)
 {
-    return (stairway_at(x,y) != NULL);
+    return (stairway_at(x, y) != NULL);
 }
 
 boolean
 On_ladder(coordxy x, coordxy y)
 {
-    stairway *stway = stairway_at(x,y);
+    stairway *stway = stairway_at(x, y);
 
     return (boolean) (stway && stway->isladder);
 }
@@ -1701,7 +1701,7 @@ On_ladder(coordxy x, coordxy y)
 boolean
 On_stairs_up(coordxy x, coordxy y)
 {
-    stairway *stway = stairway_at(x,y);
+    stairway *stway = stairway_at(x, y);
 
     return (boolean) (stway && stway->up);
 }
@@ -1709,7 +1709,7 @@ On_stairs_up(coordxy x, coordxy y)
 boolean
 On_stairs_dn(coordxy x, coordxy y)
 {
-    stairway *stway = stairway_at(x,y);
+    stairway *stway = stairway_at(x, y);
 
     return (boolean) (stway && !stway->up);
 }
@@ -3075,16 +3075,31 @@ update_lastseentyp(coordxy x, coordxy y)
     gl.lastseentyp[x][y] = ltyp;
 }
 
+/* for some cases where deferred update needs to be done immediately;
+   hide details from caller */
+int
+update_mapseen_for(coordxy x, coordxy y)
+{
+    recalc_mapseen(); /* whole level */
+    return gl.lastseentyp[x][y];
+}
+
 /* count mapseen feature from lastseentyp at x,y */
 static void
-count_feat_lastseentyp(mapseen *mptr,
-                       coordxy x, coordxy y)
+count_feat_lastseentyp(
+    mapseen *mptr, /* remembered data for a level; update feat.X counts */
+    coordxy x, coordxy y)
 {
     int count;
     unsigned atmp;
 
     switch (gl.lastseentyp[x][y]) {
-#if 0
+#if 0   /* levels that have these tend of have a lot of them */
+    /*
+     * FIXME?  due to theme rooms, lots of levels have an incresed
+     * chance of having these so automatic annotations for them may
+     * have become more worthwhile now.
+     */
     case ICE:
         count = mptr->feat.ice + 1;
         if (count <= 3)
@@ -3133,10 +3148,9 @@ count_feat_lastseentyp(mapseen *mptr,
         /* get the altarmask for this location; might be a mimic */
         atmp = altarmask_at(x, y);
         /* convert to index: 0..3 */
-        atmp = (Is_astralevel(&u.uz)
-                && (levl[x][y].seenv & SVALL) != SVALL)
-            ? MSA_NONE
-            : Amask2msa(atmp);
+        atmp = (Is_astralevel(&u.uz) && (levl[x][y].seenv & SVALL) != SVALL)
+               ? MSA_NONE
+               : Amask2msa(atmp);
         if (!mptr->feat.naltar)
             mptr->feat.msalign = atmp;
         else if (mptr->feat.msalign != atmp)
@@ -3163,7 +3177,7 @@ count_feat_lastseentyp(mapseen *mptr,
         if (Is_knox(&u.uz)) {
             int ty, tx = x - 4;
 
-            /* Throne is four columns left, either directly in
+            /* Throne is four columns to left, either directly in
              * line or one row higher or lower, and doesn't have
              * to have been seen yet.
              *   ......|}}}.

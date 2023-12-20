@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1702123758 2023/12/09 12:09:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.694 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1703070187 2023/12/20 11:03:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.695 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2158,6 +2158,10 @@ doterrain(void)
     int n;
     int which;
     int clr = NO_COLOR;
+
+    /* this used to be done each time vision was recalculated, so would
+       always be up to date (hopefully); now we do it on demand instead */
+    recalc_mapseen();
 
     /*
      * normal play: choose between known map without mons, obj, and traps

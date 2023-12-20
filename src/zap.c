@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1702023277 2023/12/08 08:14:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.498 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1703070194 2023/12/20 11:03:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.501 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3113,7 +3113,7 @@ zap_updown(struct obj *obj) /* wand or spell */
             You("probe towards the %s.", ceiling(x, y));
         } else { /* down */
             const char *surf;
-            schar ltyp, rememberedltyp = gl.lastseentyp[x][y];
+            schar ltyp, rememberedltyp = update_mapseen_for(x, y);
 
             ptmp += bhitpile(obj, bhito, x, y, u.dz);
             /* sequencing: zap_map() calls force_decor() for ice or furniture;

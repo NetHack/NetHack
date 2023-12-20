@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1702274034 2023/12/11 05:53:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.559 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1703070192 2023/12/20 11:03:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.562 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4774,7 +4774,8 @@ rescued_from_terrain(int how)
 
     iflags.last_msg = PLNMSG_BACK_ON_GROUND; /* for describe_decor() */
     /* feedback just disclosed this */
-    iflags.prev_decor = gl.lastseentyp[u.ux][u.uy] = lev->typ;
+    update_lastseentyp(u.ux, u.uy);
+    iflags.prev_decor = gl.lastseentyp[u.ux][u.uy];
 }
 
 /* return TRUE iff player relocated */
