@@ -1682,33 +1682,28 @@ mon_give_prop(struct monst *mtmp, int prop)
        control or whatever, ignore it. */
     switch (prop) {
     case FIRE_RES:
-        intrinsic = MR_FIRE;
         msg = "%s shivers slightly.";
         break;
     case COLD_RES:
-        intrinsic = MR_COLD;
         msg = "%s looks quite warm.";
         break;
     case SLEEP_RES:
-        intrinsic = MR_SLEEP;
         msg = "%s looks wide awake.";
         break;
     case DISINT_RES:
-        intrinsic = MR_DISINT;
         msg = "%s looks very firm.";
         break;
     case SHOCK_RES:
-        intrinsic = MR_ELEC;
         msg = "%s crackles with static electricity.";
         break;
     case POISON_RES:
-        intrinsic = MR_POISON;
         msg = "%s looks healthy.";
         break;
     default:
         return; /* can't give it */
         break;
     }
+    intrinsic = res_to_mr(prop);
 
     /* Don't give message if it already had this property intrinsically, but
        still do grant the intrinsic if it only had it from mresists.
