@@ -3503,8 +3503,8 @@ extern int weapon_type(struct obj *) NO_NONNULLS;
 extern int uwep_skill_type(void);
 /* find_roll_to_hit() calls weapon_hit_bonus() with a NULL argument,
    preventing NONNULLARG1 */
-extern int weapon_hit_bonus(struct obj *);
-extern int weapon_dam_bonus(struct obj *);
+extern int weapon_hit_bonus(struct obj *) NO_NONNULLS;
+extern int weapon_dam_bonus(struct obj *) NO_NONNULLS;
 extern void skill_init(const struct def_skill *) NONNULLARG1;
 extern void setmnotwielded(struct monst *, struct obj *) NONNULLARG1;
 
@@ -3663,9 +3663,10 @@ extern struct obj *which_armor(struct monst *, long) NONNULLARG1;
 extern void mon_break_armor(struct monst *, boolean) NONNULLARG1;
 extern void bypass_obj(struct obj *) NONNULLARG1;
 extern void clear_bypasses(void);
-extern void bypass_objlist(struct obj *, boolean) NONNULLARG1;
-extern struct obj *nxt_unbypassed_obj(struct obj *) NONNULLARG1;
-extern struct obj *nxt_unbypassed_loot(Loot *, struct obj *) NONNULLARG12;
+/* callers don't check gi.invent before passing to bypass_objlist */
+extern void bypass_objlist(struct obj *, boolean) NO_NONNULLS;
+extern struct obj *nxt_unbypassed_obj(struct obj *) NO_NONNULLS;
+extern struct obj *nxt_unbypassed_loot(Loot *, struct obj *) NONNULLARG1;
 extern int racial_exception(struct monst *, struct obj *) NONNULLARG12;
 extern void extract_from_minvent(struct monst *, struct obj *, boolean,
                                  boolean) NONNULLARG12;

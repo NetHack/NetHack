@@ -892,13 +892,11 @@ bypass_objlist(
     struct obj *objchain,
     boolean on) /* TRUE => set, FALSE => clear */
 {
-    struct obj *objchain2 = objchain;  /* allow objchain arg1 to be nonnull */
-
-    if (on && objchain2)
+    if (on && objchain)
         gc.context.bypasses = TRUE;
-    while (objchain2) {
-        objchain2->bypass = on ? 1 : 0;
-        objchain2 = objchain2->nobj;
+    while (objchain) {
+        objchain->bypass = on ? 1 : 0;
+        objchain = objchain->nobj;
     }
 }
 
@@ -907,16 +905,14 @@ bypass_objlist(
 struct obj *
 nxt_unbypassed_obj(struct obj *objchain)
 {
-    struct obj *objchain2 = objchain; /* allow objchain arg1 to be nonnull */
-
-    while (objchain2) {
-        if (!objchain2->bypass) {
-            bypass_obj(objchain2);
+    while (objchain) {
+        if (!objchain->bypass) {
+            bypass_obj(objchain);
             break;
         }
-        objchain2 = objchain2->nobj;
+        objchain = objchain->nobj;
     }
-    return objchain2;
+    return objchain;
 }
 
 /* like nxt_unbypassed_obj() but operates on sortloot_item array rather
