@@ -3801,7 +3801,7 @@ Popeye(int threat)
                           && (mndx == PM_LIZARD || acidic(&mons[mndx])));
     /* polymorph into a fiery monster */
     case SLIMED:
-        return (boolean) polyfodder(otin);
+        return (boolean) polyfood(otin);
     /* no tins can cure these (yet?) */
     case SICK:
     case VOMITING:
