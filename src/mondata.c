@@ -1484,20 +1484,14 @@ monstunseesu(unsigned long seenres)
 void
 give_u_to_m_resistances(struct monst *mtmp)
 {
-    const struct {
-        int u;
-        unsigned short m;
-    } u_to_m_res[] = {
-        { FIRE_RES, MR_FIRE }, { COLD_RES, MR_COLD },
-        { SLEEP_RES, MR_SLEEP }, { DISINT_RES, MR_DISINT },
-        { SHOCK_RES, MR_ELEC }, { POISON_RES, MR_POISON },
-        { ACID_RES, MR_ACID }, { STONE_RES, MR_STONE },
-    };
-    int i;
+    int intr;
 
-    for (i = 0; i < SIZE(u_to_m_res); i++) {
-        if ((u.uprops[u_to_m_res[i].u].intrinsic & INTRINSIC) != 0L) {
-            mtmp->mintrinsics |= u_to_m_res[i].m;
+    /* convert the hero's current set of intrinsics to their monster
+       equivalents -- FIRE_RES to MR_FIRE, COLD_RES to MR_COLD, etc -- and
+       add each to the mintrinsics field for the given monster */
+    for (intr = FIRE_RES; intr <= STONE_RES; intr++) {
+        if ((u.uprops[intr].intrinsic & INTRINSIC) != 0L) {
+            mtmp->mintrinsics |= (unsigned short) res_to_mr(intr);
         }
     }
 }

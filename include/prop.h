@@ -20,7 +20,10 @@ enum prop_types {
     POISON_RES        =  6,
     ACID_RES          =  7,
     STONE_RES         =  8,
-    /* note: for the first eight properties, MR_xxx == (1 << (xxx_RES - 1)) */
+    /* note: the first eight properties above are equivalent to MR_xxx bits
+     * MR_FIRE through MR_STONE, and can be directly converted to them: */
+#define res_to_mr(r) \
+    ((FIRE_RES <= (r) && (r) <= STONE_RES) ? (uchar) (1 << ((r) - 1)) : 0x00)
     DRAIN_RES         =  9,
     SICK_RES          = 10,
     INVULNERABLE      = 11,
