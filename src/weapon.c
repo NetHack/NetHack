@@ -1431,6 +1431,7 @@ uwep_skill_type(void)
 
 /*
  * Return hit bonus/penalty based on skill of weapon.
+ * weapon can be null, meaning bare-handed combat.
  * Treat restricted weapons as unskilled.
  */
 int
@@ -1525,6 +1526,7 @@ weapon_hit_bonus(struct obj *weapon)
 
 /*
  * Return damage bonus/penalty based on skill of weapon.
+ * weapon can be null, meaning bare-handed combat.
  * Treat restricted weapons as unskilled.
  */
 int
