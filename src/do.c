@@ -850,7 +850,7 @@ engulfer_digests_food(struct obj *obj)
 
         if (obj->otyp == CORPSE) {
             could_petrify = touch_petrifies(&mons[obj->corpsenm]);
-            could_poly = polyfodder(obj);
+            could_poly = polyfood(obj);
             could_grow = (obj->corpsenm == PM_WRAITH);
             could_heal = (obj->corpsenm == PM_NURSE);
         } else if (obj->otyp == GLOB_OF_GREEN_SLIME) {
