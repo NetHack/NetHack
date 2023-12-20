@@ -27,4 +27,5 @@ readtags
 heaputil
 heaputil.c
 tilemappings.lst
+clang_rt.asan*.dll
 
