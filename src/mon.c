@@ -32,7 +32,7 @@ static boolean isspecmon(struct monst *);
 static boolean validspecmon(struct monst *, int);
 static int wiz_force_cham_form(struct monst *);
 static struct permonst *accept_newcham_form(struct monst *, int);
-static void kill_eggs(struct obj *);
+static void kill_eggs(struct obj *) NO_NONNULLS;
 static void pacify_guard(struct monst *);
 
 extern const struct shclass shtypes[]; /* defined in shknam.c */

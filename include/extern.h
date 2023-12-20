@@ -1104,7 +1104,8 @@ extern int calc_capacity(int);
 extern int max_capacity(void);
 extern boolean check_capacity(const char *);
 extern int inv_cnt(boolean);
-extern long money_cnt(struct obj *);
+/* sometimes money_cnt(gi.invent) which can be null */
+extern long money_cnt(struct obj *) NO_NONNULLS;
 extern void spot_checks(coordxy, coordxy, schar);
 
 /* ### hacklib.c ### */
@@ -1237,7 +1238,8 @@ extern struct obj *addinv_before(struct obj *, struct obj *) NONNULLARG1;
 extern struct obj *addinv_nomerge(struct obj *) NONNULLARG1;
 extern struct obj *hold_another_object(struct obj *, const char *,
                                        const char *, const char *) NONNULLARG1;
-extern void useupall(struct obj *) NONNULLARG1;
+/* sometimes useupall(gi.invent) which can be null */
+extern void useupall(struct obj *) NO_NONNULLS;
 extern void useup(struct obj *) NONNULLARG1;
 extern void consume_obj_charge(struct obj *, boolean) NONNULLARG1;
 extern void freeinv_core(struct obj *) NONNULLARG1;
@@ -1266,7 +1268,7 @@ extern int askchain(struct obj **, const char *, int, int(*)(struct obj *),
 extern void set_cknown_lknown(struct obj *) NONNULLARG1;
 extern void fully_identify_obj(struct obj *) NONNULLARG1;
 extern int identify(struct obj *) NONNULLARG1;
-extern int count_unidentified(struct obj *);
+extern int count_unidentified(struct obj *) NO_NONNULLS;
 extern void identify_pack(int, boolean);
 extern void learn_unseen_invent(void);
 extern void update_inventory(void);
@@ -1301,7 +1303,8 @@ extern boolean check_invent_gold(const char *) NONNULLARG1;
 extern int doorganize(void);
 extern int adjust_split(void);
 extern void free_pickinv_cache(void);
-extern int count_unpaid(struct obj *);
+/* sometimes count_unpaid(gi.invent) which can be null */
+extern int count_unpaid(struct obj *) NO_NONNULLS;
 extern int count_buc(struct obj *, int, boolean(*)(struct obj *));
 extern void tally_BUCX(struct obj *, boolean, int *, int *, int *, int *,
                        int *, int *);
@@ -2294,9 +2297,13 @@ extern boolean allow_category(struct obj *) NONNULLARG1;
 extern boolean is_worn_by_type(struct obj *) NONNULLARG1;
 extern int ck_bag(struct obj *) NONNULLARG1;
 extern void removed_from_icebox(struct obj *) NONNULLARG1;
-extern void reset_justpicked(struct obj *) NONNULLARG1;
-extern int count_justpicked(struct obj *) NONNULLARG1;
-extern struct obj *find_justpicked(struct obj *) NONNULLARG1;
+/* reset_justpicked() is sometimes passed gi.invent
+ * which can be null */
+extern void reset_justpicked(struct obj *) NO_NONNULLS;
+/* sometimes count_justpicked(gi.invent) which can be null */
+extern int count_justpicked(struct obj *) NO_NONNULLS;
+/* sometimes find_justpicked(gi.invent) which can be null */
+extern struct obj *find_justpicked(struct obj *) NO_NONNULLS;
 extern int pickup(int);
 extern int pickup_object(struct obj *, long, boolean) NONNULLARG1;
 extern int query_category(const char *, struct obj *, int, menu_item **, int) NONNULLARG14;
@@ -2909,7 +2916,7 @@ extern void maybe_absorb_item(struct monst *, struct obj *, int, int) NONNULLARG
 extern void mdrop_obj(struct monst *, struct obj *, boolean) NONNULLARG12;
 extern void mdrop_special_objs(struct monst *) NONNULLARG1;
 extern void relobj(struct monst *, int, boolean) NONNULLARG1;
-extern struct obj *findgold(struct obj *) NONNULLARG1;
+extern struct obj *findgold(struct obj *) NO_NONNULLS;
 
 /* ### steed.c ### */
 

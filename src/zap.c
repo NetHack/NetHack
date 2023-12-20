@@ -13,7 +13,7 @@
 #define MAGIC_COOKIE 1000
 
 static int zaptype(int);
-static void probe_objchain(struct obj *);
+static void probe_objchain(struct obj *) NO_NONNULLS;
 static boolean zombie_can_dig(coordxy x, coordxy y);
 static void polyuse(struct obj *, int, int);
 static void create_polymon(struct obj *, int);
