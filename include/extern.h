@@ -26,7 +26,7 @@
  *
  * Description of the NONNULL macros:
  *
- *  NONULL          The function return value is never NULL.
+ *  NONNULL         The function return value is never NULL.
  *  NONNULLPTRS     Every pointer argument is declared nonnull.
  *  NONNULLARG1     The 1st argument is declared nonnull.
  *  NONNULLARG2     The 2nd argument is declared nonnull.
@@ -2106,66 +2106,65 @@ extern char *killer_xname(struct obj *) NONNULLARG1;
 extern char *short_oname(struct obj *, char *(*)(struct obj *),
                          char *(*)(struct obj *), unsigned) NONNULLARG12;
 extern const char *singular(struct obj *, char *(*)(struct obj *)) NONNULLPTRS;
-extern char *just_an(char *, const char *) NONNULLARG12;
+extern char *just_an(char *, const char *) NONNULL NONNULLARG12;
 /* an(), the() contain tests for NULL arg, preventing NONNULLARG1 */
-extern char *an(const char *) NO_NONNULLS;
-extern char *An(const char *) NO_NONNULLS;
-extern char *The(const char *) NO_NONNULLS;
-extern char *the(const char *) NO_NONNULLS;
-extern char *aobjnam(struct obj *, const char *) NONNULLARG1;
-extern char *yobjnam(struct obj *, const char *) NONNULLARG1;
-extern char *Yobjnam2(struct obj *, const char *) NONNULLARG1;
-extern char *Tobjnam(struct obj *, const char *) NONNULLARG1;
-extern char *otense(struct obj *, const char *) NONNULLARG12;
-extern char *vtense(const char *, const char *) NONNULLARG2;
-extern char *Doname2(struct obj *) NONNULLARG1;
-extern char *yname(struct obj *) NONNULLARG1;
-extern char *Yname2(struct obj *) NONNULLARG1;
-extern char *ysimple_name(struct obj *) NONNULLARG1;
-extern char *Ysimple_name2(struct obj *) NONNULLARG1;
-extern char *simpleonames(struct obj *) NONNULLARG1;
-extern char *ansimpleoname(struct obj *) NONNULLARG1;
-extern char *thesimpleoname(struct obj *) NONNULLARG1;
-extern char *actualoname(struct obj *) NONNULLARG1;
-extern char *bare_artifactname(struct obj *) NONNULLARG1;
-/* makeplural() and makesingular() have tests for NULL arg1, and code path
-   that leads to impossible(), preventing NONNULLARG1 */
-extern char *makeplural(const char *) NO_NONNULLS;
-extern char *makesingular(const char *) NO_NONNULLS;
-/* readobjnam() allows a NULL to trigger code path for random; if it
-   and its caller were modifed to look for/provide a particular address
-   to use as a trigger instead, it could be declared NONNULLARG1 */
+extern char *an(const char *) NONNULL NO_NONNULLS;
+extern char *An(const char *) NONNULL NO_NONNULLS;
+extern char *The(const char *) NONNULL NO_NONNULLS;
+extern char *the(const char *) NONNULL NO_NONNULLS;
+extern char *aobjnam(struct obj *, const char *) NONNULL NONNULLARG1;
+extern char *yobjnam(struct obj *, const char *) NONNULL NONNULLARG1;
+extern char *Yobjnam2(struct obj *, const char *) NONNULL NONNULLARG1;
+extern char *Tobjnam(struct obj *, const char *) NONNULL NONNULLARG1;
+extern char *otense(struct obj *, const char *) NONNULL NONNULLARG12;
+extern char *vtense(const char *, const char *) NONNULL NONNULLARG2;
+extern char *Doname2(struct obj *) NONNULL NONNULLARG1;
+extern char *yname(struct obj *) NONNULL NONNULLARG1;
+extern char *Yname2(struct obj *) NONNULL NONNULLARG1;
+extern char *ysimple_name(struct obj *) NONNULL NONNULLARG1;
+extern char *Ysimple_name2(struct obj *) NONNULL NONNULLARG1;
+extern char *simpleonames(struct obj *) NONNULL NONNULLARG1;
+extern char *ansimpleoname(struct obj *) NONNULL NONNULLARG1;
+extern char *thesimpleoname(struct obj *) NONNULL NONNULLARG1;
+extern char *actualoname(struct obj *) NONNULL NONNULLARG1;
+extern char *bare_artifactname(struct obj *) NONNULL NONNULLARG1;
+/* makeplural() and makesingular() never return NULL but have tests for NULL
+   arg1, and code path that leads to impossible(), preventing NONNULLARG1 */
+extern char *makeplural(const char *) NONNULL NO_NONNULLS;
+extern char *makesingular(const char *) NONNULL NO_NONNULLS;
+/* readobjnam() can return NULL and  allows a NULL to trigger code path for
+   random object */
 extern struct obj *readobjnam(char *, struct obj *) NO_NONNULLS;
 extern int rnd_class(int, int);
 /* discover_object() passes NULL arg2 to Japanese_item_name(),
  * preventing NONNULLARG2 */
 extern const char *Japanese_item_name(int, const char *) NO_NONNULLS;
-extern const char *armor_simple_name(struct obj *) NONNULLARG1;
+extern const char *armor_simple_name(struct obj *) NONNULL NONNULLARG1;
 /* suit_simple_name has its code in a NULL arg test
    conditional block, preventing NONNULLARG1 */
-extern const char *suit_simple_name(struct obj *) NO_NONNULLS;
+extern const char *suit_simple_name(struct obj *) NONNULL NO_NONNULLS;
 /* cloak_simple_name has its code in a NULL arg test
    conditional block, preventing NONNULLARG1 */
-extern const char *cloak_simple_name(struct obj *) NO_NONNULLS;
+extern const char *cloak_simple_name(struct obj *) NONNULL NO_NONNULLS;
 /* helm_simple_name always just returns hardcoded literals */
-extern const char *helm_simple_name(struct obj *) NO_NONNULLS;
+extern const char *helm_simple_name(struct obj *) NONNULL NO_NONNULLS;
 /* gloves_simple_name has its code in a NULL arg test
    conditional block, preventing NONNULLARG1 */
-extern const char *gloves_simple_name(struct obj *) NO_NONNULLS;
+extern const char *gloves_simple_name(struct obj *) NONNULL NO_NONNULLS;
 /* boots_simple_name has its code in a NULL arg test
    conditional block, preventing NONNULLARG1 */
-extern const char *boots_simple_name(struct obj *) NO_NONNULLS;
+extern const char *boots_simple_name(struct obj *) NONNULL NO_NONNULLS;
 /* shield_simple_name has its code in a NULL arg test
    conditional block, preventing NONNULLARG1 */
-extern const char *shield_simple_name(struct obj *) NO_NONNULLS;
+extern const char *shield_simple_name(struct obj *) NONNULL NO_NONNULLS;
 /* shirt_simple_name always just returns hardcoded "shirt" */
-extern const char *shirt_simple_name(struct obj *) NO_NONNULLS;
-extern const char *mimic_obj_name(struct monst *) NONNULLARG1;
+extern const char *shirt_simple_name(struct obj *) NONNULL NO_NONNULLS;
+extern const char *mimic_obj_name(struct monst *) NONNULL NONNULLARG1;
 /* safe_qbuf() contains tests for NULL arg2 and arg3, qprefix and qsuffix,
    preventing use of NONNULLPTRS. NONNULLARG14567 is not defined */
 extern char *safe_qbuf(char *, const char *, const char *, struct obj *,
-                       char *(*)(struct obj *), char *(*)(struct obj *),
-                       const char *) NO_NONNULLS;
+                       char * (*)(struct obj *), char * (*)(struct obj *),
+                       const char *) NONNULL NONNULLARG14;
 extern int shiny_obj(char);
 
 /* ### options.c ### */
@@ -2218,21 +2217,23 @@ extern void msgtype_free(void);
 
 /* ### pager.c ### */
 
-extern char *self_lookat(char *) NONNULLARG1;
-extern char *monhealthdescr(struct monst *mon, boolean, char *) NONNULLARG3;
+extern char *self_lookat(char *) NONNULL NONNULLARG1;
+extern char *monhealthdescr(struct monst *mon, boolean,
+                            char *) NONNULL NONNULLARG3;
 extern void mhidden_description(struct monst *, boolean, char *) NONNULLPTRS;
-extern boolean object_from_map(int, coordxy, coordxy, struct obj **) NONNULLPTRS;
-extern const char *waterbody_name(coordxy, coordxy);
-extern char *ice_descr(coordxy, coordxy, char *) NONNULLARG3;
+extern boolean object_from_map(int, coordxy, coordxy,
+                               struct obj **) NONNULLPTRS;
+extern const char *waterbody_name(coordxy, coordxy) NONNULL;
+extern char *ice_descr(coordxy, coordxy, char *) NONNULL NONNULLARG3;
 extern boolean ia_checkfile(struct obj *) NONNULLARG1;
 extern int do_screen_description(coord, boolean, int, char *, const char **,
-                             struct permonst **) NONNULLARG45;
+                                 struct permonst **) NONNULLARG45;
 extern int do_look(int, coord *);
 extern int dowhatis(void);
 extern int doquickwhatis(void);
 extern int doidtrap(void);
 extern int dowhatdoes(void);
-extern char *dowhatdoes_core(char, char *) NONNULLARG2;
+extern char *dowhatdoes_core(char, char *) NONNULLARG2; /*might return NULL*/
 extern int dohelp(void);
 extern int dohistory(void);
 
