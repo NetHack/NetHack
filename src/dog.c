@@ -1003,7 +1003,7 @@ dogfood(struct monst *mon, struct obj *obj)
                 return POISON;
             /* avoid polymorph unless starving or abused (in which case the
                pet will consider it for a chance to become more powerful) */
-            else if (is_shapeshifter(fptr) && mon->mtame > 1 && !starving)
+            else if (polyfood(obj) && mon->mtame > 1 && !starving)
                 return MANFOOD;
             else if (vegan(fptr))
                 return herbi ? CADAVER : MANFOOD;
