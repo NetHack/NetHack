@@ -2162,7 +2162,7 @@ extern const char *shield_simple_name(struct obj *) NONNULL NO_NONNULLS;
 extern const char *shirt_simple_name(struct obj *) NONNULL NO_NONNULLS;
 extern const char *mimic_obj_name(struct monst *) NONNULL NONNULLARG1;
 /* safe_qbuf() contains tests for NULL arg2 and arg3, qprefix and qsuffix,
-   preventing use of NONNULLPTRS. NONNULLARG14567 is not defined */
+   preventing use of NONNULLPTRS. */
 extern char *safe_qbuf(char *, const char *, const char *, struct obj *,
                        char * (*)(struct obj *), char * (*)(struct obj *),
                        const char *) NONNULL NONNULLARG14;
