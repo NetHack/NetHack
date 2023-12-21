@@ -7,6 +7,7 @@
 
 static void stoned_dialogue(void);
 static void vomiting_dialogue(void);
+static void sleep_dialogue(void);
 static void choke_dialogue(void);
 static void levitation_dialogue(void);
 static void slime_dialogue(void);
@@ -256,6 +257,15 @@ vomiting_dialogue(void)
     if (txt)
         You1(txt);
     exercise(A_CON, FALSE);
+}
+
+static void
+sleep_dialogue(void)
+{
+    long i = (HSleepy & TIMEOUT);
+
+    if (i == 4)
+        You("yawn.");
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL   /* RESTORE is after slime_dialogue */
@@ -590,6 +600,8 @@ nh_timeout(void)
         levitation_dialogue();
     if (HPasses_walls & TIMEOUT)
         phaze_dialogue();
+    if (HSleepy & TIMEOUT)
+        sleep_dialogue();
     if (u.mtimedone && !--u.mtimedone) {
         if (Unchanging)
             u.mtimedone = rnd(100 * gy.youmonst.data->mlevel + 1);

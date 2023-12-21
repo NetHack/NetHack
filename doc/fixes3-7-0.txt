@@ -324,6 +324,7 @@ hero poly'd into rust monster could implicitly eat bars when adjacent by
 	can explicitly eat them via 'e' after moving onto their spot
 monster hiding under an egg that hatched was kept hidden
 restful sleep regenerates hit points
+restful sleep gives a warning message few turns before you fall asleep
 attacking non-adjacent concealed mimic by applying a polearm would make the
 	hero be stuck to that mimic
 hero could break a wand ("raising the wand high over your head, you break it
