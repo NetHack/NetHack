@@ -322,20 +322,32 @@ fetch-lua: fetch-Lua
 	@true
 
 fetch-Lua:
-	( mkdir -p lib && cd lib && \
-	  shac1=`command -v shasum`; \
-	  shac2=`command -v sha256sum`; \
-	  if [ ! -z $$shac1 ]; then \
+	@( mkdir -p lib && cd lib && \
+	  n=0; \
+	  luaurl=https://$(LUA_URL)/lua-$(LUA_VERSION).tar.gz; \
+	  while [ $${n} -lt 2 ]; do \
+	    echo trying $$luaurl; \
+	    shac1=`command -v shasum`; \
+	    shac2=`command -v sha256sum`; \
+	    if [ ! -z $$shac1 ]; then \
 	      shac="$$shac1 -a 256"; elif [ ! -z $$shac2 ]; then \
 	      shac=$$shac2; else echo "CAUTION: no way to check integrity"; \
-	  fi; \
-	  curl -R -O https://$(LUA_URL)/lua-$(LUA_VERSION).tar.gz && \
-	  if [ ! -z "$$shac" ]; then \
-	      echo Checking integrity with $$shac; \
-	      $$shac -w -c ../submodules/CHKSUMS < lua-$(LUA_VERSION).tar.gz; \
-	  fi; \
-	  tar zxf lua-$(LUA_VERSION).tar.gz && \
-	  rm -f lua-$(LUA_VERSION).tar.gz )
+	    fi; \
+	    curl -R -O $$luaurl; \
+	    export curlstatus=$$?; \
+	    if [ $$curlstatus -eq 0 ]; then \
+	      if [ ! -z "$$shac" ]; then \
+	        echo Checking integrity with $$shac; \
+	        $$shac -w -c ../submodules/CHKSUMS < lua-$(LUA_VERSION).tar.gz; \
+	      fi; \
+	      tar zxf lua-$(LUA_VERSION).tar.gz && \
+	      rm -f lua-$(LUA_VERSION).tar.gz; \
+	    fi; \
+	    luaurl=https://$(LUA_URL_MIRROR)/lua-$(LUA_VERSION).tar.gz; \
+	    n=`expr $$n + 1`; \
+	  done; \
+	  true )
+
 # remove include/nhlua.h in case it was created for some other Lua version
 	@( if test -f include/nhlua.h ; then \
 	     rm -f include/nhlua.h && echo 'rm include/nhlua.h' ; fi )
