@@ -325,9 +325,14 @@ fetch-Lua:
 	@( mkdir -p lib && cd lib && \
 	  n=0; \
 	  export curlstatus=1; \
-	  luaurl=https://$(LUA_URL)/lua-$(LUA_VERSION).tar.gz; \
 	  while [ $${n} -lt 2 ]; do \
 	    if [ $$curlstatus -ne 0 ]; then \
+	      if [ $${n} -eq 0 ]; then \
+	          luaurl=https://$(LUA_URL)/lua-$(LUA_VERSION).tar.gz; \
+	      fi; \
+	      if [ $${n} -eq 1 ]; then \
+	          luaurl=https://$(LUA_URL_MIRROR)/lua-$(LUA_VERSION).tar.gz; \
+	      fi; \
 	      echo trying $$luaurl; \
 	      shac1=`command -v shasum`; \
 	      shac2=`command -v sha256sum`; \
@@ -345,7 +350,6 @@ fetch-Lua:
 	        tar zxf lua-$(LUA_VERSION).tar.gz && \
 	        rm -f lua-$(LUA_VERSION).tar.gz; \
 	      fi; \
-	      luaurl=https://$(LUA_URL_MIRROR)/lua-$(LUA_VERSION).tar.gz; \
 	    fi; \
 	    n=`expr $$n + 1`; \
 	  done; \
