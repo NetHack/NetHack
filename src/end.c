@@ -26,7 +26,7 @@ static void done_hangup(int);
 #endif
 #endif
 static void disclose(int, boolean);
-static void get_valuables(struct obj *) NO_NONNULLS;
+static void get_valuables(struct obj *) NO_NNARGS;
 static void sort_valuables(struct valuable_data *, int);
 static void artifact_score(struct obj *, boolean, winid);
 static boolean fuzzer_savelife(int);

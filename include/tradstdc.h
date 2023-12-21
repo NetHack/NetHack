@@ -438,9 +438,9 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #define NONNULLARG45
 #define NONNULLS_DEFINED
 #endif  /* NONNULLS_DEFINED */
-#ifndef NO_NONNULLS
-#define NO_NONNULLS
-#endif  /* NO_NONNULLS */
+#ifndef NO_NNARGS
+#define NO_NNARGS
+#endif  /* NO_NNARGS */
 
 /*
  * Allow gcc and clang to catch the use of non-C99 functions that

@@ -15,7 +15,7 @@
 
 static const char *intermed(void);
 /* sometimes find_qarti(gi.invent), and gi.invent can be null */
-static struct obj *find_qarti(struct obj *) NO_NONNULLS;
+static struct obj *find_qarti(struct obj *) NO_NNARGS;
 static const char *neminame(void);
 static const char *guardname(void);
 static const char *homebase(void);
