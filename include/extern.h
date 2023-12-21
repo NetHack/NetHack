@@ -3096,7 +3096,7 @@ extern void climb_pit(void);
 extern boolean fire_damage(struct obj *, boolean,
                            coordxy, coordxy) NONNULLARG1;
 extern int fire_damage_chain(struct obj *, boolean, boolean,
-                            coordxy, coordxy) NONNULLARG1;
+                            coordxy, coordxy) NO_NNARGS;
 extern boolean lava_damage(struct obj *, coordxy, coordxy) NONNULLARG1;
 /* acid_damage() has a test for NULL arg and early return if so,
    preventing NONNULLARG1 */
