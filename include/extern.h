@@ -1238,8 +1238,9 @@ extern struct obj *addinv_before(struct obj *, struct obj *) NONNULLARG1;
 extern struct obj *addinv_nomerge(struct obj *) NONNULLARG1;
 extern struct obj *hold_another_object(struct obj *, const char *,
                                        const char *, const char *) NONNULLARG1;
-/* sometimes useupall(gi.invent) which can be null */
-extern void useupall(struct obj *) NO_NONNULLS;
+/* nhlua.c calls useupall(gi.invent), but checks gi.invent against NULL
+ * before doing so. useupall() won't handle NULL*/
+extern void useupall(struct obj *) NONNULLARG1;
 extern void useup(struct obj *) NONNULLARG1;
 extern void consume_obj_charge(struct obj *, boolean) NONNULLARG1;
 extern void freeinv_core(struct obj *) NONNULLARG1;
