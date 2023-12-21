@@ -3,28 +3,34 @@
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* This file contains the command routines dowhatis() and dohelp() and */
-/* a few other help related facilities */
+/*
+ * This file contains the command routines dowhatis() and dohelp() and
+ * a few other help related facilities such as data.base lookup.
+ */
 
 #include "hack.h"
 #include "dlb.h"
 
 static boolean is_swallow_sym(int);
-static int append_str(char *, const char *);
-static void trap_description(char *, int, coordxy, coordxy);
-static void look_at_object(char *, coordxy, coordxy, int);
-static void look_at_monster(char *, char *, struct monst *, coordxy, coordxy);
-static struct permonst *lookat(coordxy, coordxy, char *, char *);
-static boolean checkfile(char *, struct permonst *, unsigned, char *);
+static int append_str(char *, const char *) NONNULLPTRS;
+static void trap_description(char *, int, coordxy, coordxy) NONNULLARG1;
+static void look_at_object(char *, coordxy, coordxy, int) NONNULLARG1;
+static void look_at_monster(char *, char *, struct monst *,
+                                               coordxy, coordxy) NONNULLARG13;
+/* lookat() can return Null */
+static struct permonst *lookat(coordxy, coordxy, char *, char *) NONNULLPTRS;
+static boolean checkfile(char *, struct permonst *, unsigned,
+                                                            char *) NO_NNARGS;
 static int add_cmap_descr(int, int, int, int, coord,
                           const char *, const char *,
-                          boolean *, const char **, char *);
+                          boolean *, const char **, char *) NONNULLPTRS;
 static void look_region_nearby(coordxy *, coordxy *, coordxy *, coordxy *,
-                               boolean);
+                               boolean) NONNULLPTRS;
 static void look_all(boolean, boolean);
 static void look_traps(boolean);
 static void look_engrs(boolean);
-static void do_supplemental_info(char *, struct permonst *, boolean);
+static void do_supplemental_info(char *, struct permonst *,
+                                                         boolean) NONNULLPTRS;
 static void whatdoes_help(void);
 static void docontact(void);
 static void dispfile_help(void);
@@ -43,8 +49,8 @@ static void domenucontrols(void);
 #ifdef PORT_HELP
 extern void port_help(void);
 #endif
-static char *setopt_cmd(char *);
-static boolean add_quoted_engraving(coordxy, coordxy, char *);
+static char *setopt_cmd(char *) NONNULL NONNULLARG1;
+static boolean add_quoted_engraving(coordxy, coordxy, char *) NONNULLARG3;
 
 enum checkfileflags {
     chkfilNone     = 0,
@@ -342,8 +348,7 @@ look_at_object(
 
 static void
 look_at_monster(
-    char *buf,
-    char *monbuf, /* buf: output, monbuf: optional output */
+    char *buf, char *monbuf, /* buf: output, monbuf: optional output */
     struct monst *mtmp,
     coordxy x, coordxy y)
 {
@@ -2112,14 +2117,17 @@ static const char *suptext2[] = {
 };
 
 static void
-do_supplemental_info(char *name, struct permonst *pm, boolean without_asking)
+do_supplemental_info(
+    char *name,
+    struct permonst *pm,
+    boolean without_asking)
 {
     const char **textp;
     winid datawin = WIN_ERR;
     char *entrytext = name, *bp = (char *) 0, *bp2 = (char *) 0;
     char question[QBUFSZ];
     boolean yes_to_moreinfo = FALSE;
-    boolean is_marauder = (name && pm && is_orc(pm));
+    boolean is_marauder = is_orc(pm);
 
     /*
      * Provide some info on some specific things
@@ -2138,7 +2146,7 @@ do_supplemental_info(char *name, struct permonst *pm, boolean without_asking)
                 Strcpy(question, "More info about \"");
                 /* +2 => length of "\"?" */
                 copynchars(eos(question), entrytext,
-                    (int) (sizeof question - 1 - (strlen(question) + 2)));
+                        (int) (sizeof question - 1 - (strlen(question) + 2)));
                 Strcat(question, "\"?");
                 if (y_n(question) == 'y')
                 yes_to_moreinfo = TRUE;

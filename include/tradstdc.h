@@ -439,7 +439,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #define NONNULLS_DEFINED
 #endif  /* NONNULLS_DEFINED */
 #ifndef NO_NNARGS
-#define NO_NNARGS
+#define NO_NNARGS /*empty*/
 #endif  /* NO_NNARGS */
 
 /*
