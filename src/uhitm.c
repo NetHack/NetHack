@@ -1169,10 +1169,11 @@ hmon_hitmon_misc_obj(
             return;
             /*return (boolean) (!DEADMONSTER(mon));*/
         } else { /* ordinary egg(s) */
-            const char *eggp = (obj->corpsenm != NON_PM
-                                && obj->known)
-                ? the(mons[obj->corpsenm].pmnames[NEUTRAL])
-                : (cnt > 1L) ? "some" : "an";
+            enum monnums mnum = obj->corpsenm;
+            const char *eggp =
+                (mnum >= LOW_PM && mnum < NUMMONS && obj->known)
+                    ? the(mons[mnum].pmnames[NEUTRAL])
+                    : (cnt > 1L) ? "some" : "an";
 
             You("hit %s with %s egg%s.", mon_nam(mon), eggp,
                 plur(cnt));
