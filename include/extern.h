@@ -3724,7 +3724,7 @@ extern void zapsetup(void);
 extern void zapwrapup(void);
 extern void weffects(struct obj *) NONNULLARG1;
 extern int spell_damage_bonus(int);
-extern const char *exclam(int force);
+extern const char *exclam(int force) NONNULL;
 extern void hit(const char *, struct monst *, const char *) NONNULLPTRS;
 extern void miss(const char *, struct monst *) NONNULLPTRS;
 extern struct monst *bhit(coordxy, coordxy, int, enum bhit_call_types,
@@ -3751,7 +3751,7 @@ extern void destroy_item(int, int);
 extern int destroy_mitem(struct monst *, int, int) NONNULLARG1;
 extern int resist(struct monst *, char, int, int) NONNULLARG1;
 extern void makewish(void);
-extern const char *flash_str(int, boolean);
+extern const char *flash_str(int, boolean) NONNULL;
 
 /* ### unixmain.c, windsys.c ### */
 
