@@ -5,10 +5,10 @@
 
 #include "hack.h"
 
-static void m_lose_armor(struct monst *, struct obj *, boolean);
-static void clear_bypass(struct obj *);
-static void m_dowear_type(struct monst *, long, boolean, boolean);
-static int extra_pref(struct monst *, struct obj *);
+static void m_lose_armor(struct monst *, struct obj *, boolean) NONNULLPTRS;
+static void clear_bypass(struct obj *) NO_NNARGS;
+static void m_dowear_type(struct monst *, long, boolean, boolean) NONNULLARG1;
+static int extra_pref(struct monst *, struct obj *) NONNULLARG1;
 
 const struct worn {
     long w_mask;
