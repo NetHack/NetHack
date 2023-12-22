@@ -125,8 +125,9 @@ static char empty_optstr[] = { '\0' };
 static boolean duplicate, using_alias;
 static boolean give_opt_msg = TRUE;
 
+enum roleopts { roleopt_role, roleopt_race, roleopt_gend, roleopt_algn, MAX_ROLEOPT };
 static boolean opt_set_in_config[OPTCOUNT];
-static char *roleoptvals[4][num_opt_phases]; /* 4: role,race,gend,algn */
+static char *roleoptvals[MAX_ROLEOPT][num_opt_phases]; /* 4: role,race,gend,algn */
 
 static NEARDATA const char *OptS_type[OptS_Advanced+1] = {
     "General", "Behavior", "Map", "Status", "Advanced"
@@ -708,7 +709,11 @@ getoptstr(int optidx, int ophase)
                 break;
             }
     }
-    return roleoptvals[roleoptindx][ophase];
+    if ((roleoptindx >= 0 && roleoptindx < MAX_ROLEOPT
+          && ophase >= 0 && ophase < num_opt_phases))
+        return roleoptvals[roleoptindx][ophase];
+    panic("bad index roleoptvals[%d][%d]", roleoptindx, ophase);
+    /*NOTREACHED*/
 }
 
 /* to track some unparsed option settings in case #saveoptions needs them */
