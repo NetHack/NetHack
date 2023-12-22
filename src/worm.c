@@ -14,12 +14,12 @@ struct wseg {
     coordxy wx, wy; /* the segment's position */
 };
 
-static void toss_wsegs(struct wseg *, boolean);
+static void toss_wsegs(struct wseg *, boolean) NO_NNARGS;
 static void shrink_worm(int);
 #if 0
 static void random_dir(int, int, int *, int *);
 #endif
-static struct wseg *create_worm_tail(int);
+static struct wseg *create_worm_tail(int); /* may return NULL */
 
 /*  Description of long worm implementation.
  *
