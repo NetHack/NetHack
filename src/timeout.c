@@ -2026,12 +2026,15 @@ timer_sanity_check(void)
             coordxy x = (coordxy) ((where >> 16) & 0xFFFF),
                   y = (coordxy) (where & 0xFFFF);
 
-            if (!isok(x, y)) {
+            /* instead of isok(x,y), so static analyzer follows along better */
+            if (x > 0 && x < COLNO && y >= 0 && y < ROWNO) {
+                if (curr->func_index == MELT_ICE_AWAY && !is_ice(x, y))
+                    impossible(
+                        "timer sanity: melt timer %lu on non-ice %d <%d,%d>",
+                         curr->tid, levl[x][y].typ, x, y);
+            } else {
                 impossible("timer sanity: spot timer %lu at <%d,%d>",
                            curr->tid, x, y);
-            } else if (curr->func_index == MELT_ICE_AWAY && !is_ice(x, y)) {
-                impossible("timer sanity: melt timer %lu on non-ice %d <%d,%d>",
-                           curr->tid, levl[x][y].typ, x, y);
             }
         }
     }
