@@ -181,7 +181,7 @@ mon_has_arti(struct monst *mtmp, short otyp)
 
 /*
  * Returns some monster other than mtmp that
- * has arifact, or NULL monst pointer.
+ * has artifact, or NULL monst pointer.
  */
 static struct monst *
 other_mon_has_arti(struct monst *mtmp, short otyp)
