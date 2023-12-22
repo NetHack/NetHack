@@ -15,24 +15,27 @@
 static int zaptype(int);
 static void probe_objchain(struct obj *) NO_NNARGS;
 static boolean zombie_can_dig(coordxy x, coordxy y);
-static void polyuse(struct obj *, int, int);
-static void create_polymon(struct obj *, int);
-static int stone_to_flesh_obj(struct obj *);
-static boolean zap_updown(struct obj *);
-static void zhitu(int, int, const char *, coordxy, coordxy);
-static void revive_egg(struct obj *);
-static boolean zap_steed(struct obj *);
-static void skiprange(int, int *, int *);
-static void maybe_explode_trap(struct trap *, struct obj *, boolean *);
-static void zap_map(coordxy, coordxy, struct obj *);
+static void polyuse(struct obj *, int, int) NO_NNARGS;
+static void create_polymon(struct obj *, int) NO_NNARGS;
+static int stone_to_flesh_obj(struct obj *) NONNULLARG1;
+static boolean zap_updown(struct obj *) NONNULLARG1;
+static void zhitu(int, int, const char *, coordxy, coordxy) NO_NNARGS;
+static void revive_egg(struct obj *) NONNULLARG1;
+static boolean zap_steed(struct obj *) NONNULLARG1;
+static void skiprange(int, int *, int *) NONNULLPTRS;
+static void maybe_explode_trap(struct trap *, struct obj *,
+                               boolean *) NONNULLARG3;
+static void zap_map(coordxy, coordxy, struct obj *) NONNULLARG3;
 static int zap_hit(int, int);
-static void disintegrate_mon(struct monst *, int, const char *);
+static void disintegrate_mon(struct monst *, int, const char *) NONNULLARG1;
 static int adtyp_to_prop(int);
-static void backfire(struct obj *);
-static int zap_ok(struct obj *);
-static void boxlock_invent(struct obj *);
+static void backfire(struct obj *) NONNULLARG1;
+static int zap_ok(struct obj *) NO_NNARGS;
+/* all callers of boxlock_invent() pass a NONNULL obj, and boxlock
+ * boxlock_invent() calls boxlock() which has nonnull arg. */
+static void boxlock_invent(struct obj *) NONNULLARG1;
 static int spell_hit_bonus(int);
-static void destroy_one_item(struct obj *, int, int);
+static void destroy_one_item(struct obj *, int, int) NONNULLARG1;
 static void wishcmdassist(int);
 
 #define ZT_MAGIC_MISSILE (AD_MAGM - 1)
@@ -1088,7 +1091,7 @@ revive(struct obj *corpse, boolean by_hero)
 }
 
 static void
-revive_egg(struct obj *obj)
+revive_egg(struct obj *obj) /* nonnull */
 {
     /*
      * Note: generic eggs with corpsenm set to NON_PM will never hatch.
@@ -1905,7 +1908,7 @@ poly_obj(struct obj *obj, int id)
 
 /* stone-to-flesh spell hits and maybe transforms or animates obj */
 static int
-stone_to_flesh_obj(struct obj *obj)
+stone_to_flesh_obj(struct obj *obj) /* nonnull */
 {
     struct permonst *ptr;
     struct monst *mon, *shkp;
@@ -3090,7 +3093,7 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
 
 /* you've zapped an immediate type wand up or down */
 static boolean
-zap_updown(struct obj *obj) /* wand or spell */
+zap_updown(struct obj *obj) /* wand or spell, nonnull */
 {
     boolean striking = FALSE, disclose = FALSE, map_zapped = FALSE;
     coordxy x, y, xx, yy;
