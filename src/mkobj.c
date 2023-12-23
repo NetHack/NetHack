@@ -416,6 +416,7 @@ copy_oextra(struct obj *obj2, struct obj *obj1)
     if (has_omonst(obj1)) {
         if (!OMONST(obj2))
             newomonst(obj2);
+        assert(has_omonst(obj2));
         (void) memcpy((genericptr_t) OMONST(obj2),
                       (genericptr_t) OMONST(obj1), sizeof (struct monst));
         OMONST(obj2)->mextra = (struct mextra *) 0;
