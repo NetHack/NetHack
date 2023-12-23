@@ -1406,6 +1406,15 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 
 /* pick a random entry from array */
 #define ROLL_FROM(array) array[rn2(SIZE(array))]
+/* array with terminator variation */
+/* #define ROLL_FROMT(array) array[rn2(SIZE(array) - 1)] */
+
+/* validate index of array */
+#define IndexOk(idx, array) \
+    ((idx) >= 0 && (idx) < SIZE(array))
+/* array with terminator variation */
+#define IndexOkT(idx, array) \
+    ((idx) >= 0 && (idx) < (SIZE(array) - 1))
 
 #define FEATURE_NOTICE_VER(major, minor, patch)                    \
     (((unsigned long) major << 24) | ((unsigned long) minor << 16) \

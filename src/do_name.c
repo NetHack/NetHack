@@ -2591,7 +2591,7 @@ hliquid(
         if (liquidpref && *liquidpref)
             ++count;
         indx = rn2_on_display_rng(count);
-        if (indx < SIZE(hliquids))
+        if (IndexOk(indx, hliquids))
             return hliquids[indx];
     }
     return liquidpref;
@@ -2742,7 +2742,7 @@ lookup_novel(const char *lookname, int *idx)
         }
     }
     /* name not found; if novelidx is already set, override the name */
-    if (idx && *idx >= 0 && *idx < SIZE(sir_Terry_novels))
+    if (idx && IndexOk(*idx, sir_Terry_novels))
         return sir_Terry_novels[*idx];
 
     return (const char *) 0;

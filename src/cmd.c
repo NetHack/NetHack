@@ -4141,7 +4141,7 @@ wiz_display_macros(void)
                  putstr(win, 0, buf);
             }
             /* check against defsyms array subscripts */
-            if (test < 0 || test >= SIZE(defsyms)) {
+            if (!IndexOk(test, defsyms)) {
                 if (!trouble++)
                     putstr(win, 0, display_issues);
                 Sprintf(buf, "glyph_to_cmap(glyph=%d) returns %d"

@@ -112,7 +112,7 @@ static const struct propname {
 const char *
 property_by_index(int idx, int *propertynum)
 {
-    if (!(idx >= 0 && idx < SIZE(propertynames) - 1))
+    if (!IndexOkT(idx, propertynames))
         idx = SIZE(propertynames) - 1;
 
     if (propertynum)
