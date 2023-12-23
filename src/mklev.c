@@ -120,7 +120,7 @@ void
 sort_rooms(void)
 {
     coordxy x, y;
-    unsigned i, ri[MAXNROFROOMS + 1], n = (unsigned) gn.nroom;
+    unsigned i, ri[MAXNROFROOMS + 1] = { 0U }, n = (unsigned) gn.nroom;
 
     qsort((genericptr_t) gr.rooms, n, sizeof (struct mkroom), mkroom_cmp);
 
