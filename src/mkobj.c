@@ -2208,6 +2208,7 @@ place_object(struct obj *otmp, coordxy x, coordxy y)
         panic("place_object: obj \"%s\" [%d] not free",
               safe_typename(otmp->otyp), otmp->where);
 
+    assert(x >= 0 && x < COLNO && y >= 0 && y < ROWNO);
     otmp2 = gl.level.objects[x][y];
 
     obj_no_longer_held(otmp);
