@@ -1765,7 +1765,7 @@ role_selection_prolog(int which, winid where)
                 : !*gp.plname ? not_yet : gp.plname);
     putstr(where, 0, buf);
     Sprintf(buf, "%12s ", "role:");
-    assert(r == RS_ROLE || r == ROLE_NONE || r == ROLE_RANDOM
+    assert(which == RS_ROLE || r == ROLE_NONE || r == ROLE_RANDOM
            || IndexOkT(r, roles));
     Strcat(buf, (which == RS_ROLE) ? choosing
                 : (r == ROLE_NONE) ? not_yet
