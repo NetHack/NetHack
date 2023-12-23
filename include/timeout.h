@@ -1,4 +1,4 @@
-/* NetHack 3.7	timeout.h	$NHDT-Date: 1596498564 2020/08/03 23:49:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $ */
+/* NetHack 3.7	timeout.h	$NHDT-Date: 1703294874 2023/12/23 01:27:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
 /* Copyright 1994, Dean Luick                                     */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -22,8 +22,14 @@ enum timer_type {
 #define RANGE_GLOBAL 1 /* save/restore timers following global play */
 
 /*
- * Timeout functions.  Add a define here, then put it in the table
+ * Timeout functions.  Add an enum here, then put it in the table
  * in timeout.c.  "One more level of indirection will fix everything."
+ *
+ * Note:  if any are inserted, removed, or reordered then EDITLEVEL
+ * needs to be incremented because timeout indices get written into save
+ * and bones files if any timers are present while saving.  (Adding new
+ * ones at the end isn't restricted this way since new indices won't be
+ * present in old data.)
  */
 enum timeout_types {
     ROT_ORGANIC = 0, /* for buried organics */
@@ -33,8 +39,8 @@ enum timeout_types {
     BURN_OBJECT,
     HATCH_EGG,
     FIG_TRANSFORM,
-    MELT_ICE_AWAY,
     SHRINK_GLOB,
+    MELT_ICE_AWAY,
 
     NUM_TIME_FUNCS
 };

@@ -1,4 +1,4 @@
-/* NetHack 3.7	timeout.c	$NHDT-Date: 1658390077 2022/07/21 07:54:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.142 $ */
+/* NetHack 3.7	timeout.c	$NHDT-Date: 1703294874 2023/12/23 01:27:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.167 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1872,8 +1872,11 @@ typedef struct {
 #endif
 } ttable;
 
-/* table of timeout functions */
+/*
+ * Table of timeout functions, listed in order of enum timeout_types:
+ */
 static const ttable timeout_funcs[NUM_TIME_FUNCS] = {
+    /* object timers */
     TTAB(rot_organic, (timeout_proc) 0, "rot_organic"),
     TTAB(rot_corpse, (timeout_proc) 0, "rot_corpse"),
     TTAB(revive_mon, (timeout_proc) 0, "revive_mon"),
@@ -1881,8 +1884,10 @@ static const ttable timeout_funcs[NUM_TIME_FUNCS] = {
     TTAB(burn_object, cleanup_burn, "burn_object"),
     TTAB(hatch_egg, (timeout_proc) 0, "hatch_egg"),
     TTAB(fig_transform, (timeout_proc) 0, "fig_transform"),
-    TTAB(melt_ice_away, (timeout_proc) 0, "melt_ice_away"),
     TTAB(shrink_glob, (timeout_proc) 0, "shrink_glob"),
+    /* level timers */
+    TTAB(melt_ice_away, (timeout_proc) 0, "melt_ice_away"),
+    /* currently no monster or global timers */
 };
 #undef TTAB
 
@@ -2011,31 +2016,73 @@ void
 timer_sanity_check(void)
 {
     timer_element *curr;
+    unsigned long t_id;
+    coordxy x, y;
 
-    /* this should be much more complete */
     for (curr = gt.timer_base; curr; curr = curr->next) {
-        if (curr->kind == TIMER_OBJECT) {
+        t_id = curr->tid;
+        switch (curr->kind) {
+        case TIMER_OBJECT: {
+            /* TODO? verify that the timer type is attached to applicable
+               object (egg for hatch, glob for shrink, and so forth) */
             struct obj *obj = curr->arg.a_obj;
+            char *obj_adr = fmt_ptr((genericptr_t) obj);
+            int owhere = obj->where;
 
             if (obj->timed == 0) {
-                impossible("timer sanity: untimed obj %s, timer %ld",
-                      fmt_ptr((genericptr_t) obj), curr->tid);
+                impossible("timer sanity: untimed obj %s, timer %lu",
+                           obj_adr, t_id);
             }
-        } else if (curr->kind == TIMER_LEVEL) {
-            long where = curr->arg.a_long;
-            coordxy x = (coordxy) ((where >> 16) & 0xFFFF),
-                  y = (coordxy) (where & 0xFFFF);
+            x = y = 0;
+            if (owhere == OBJ_MIGRATING
+                || (owhere == OBJ_MINVENT && !mon_is_local(obj->ocarry))) {
+                ; /* not able to validate location so skip checks */
+            } else if (!get_obj_location(obj, &x, &y,
+                                         CONTAINED_TOO | BURIED_TOO)) {
+                /* free? or on a shop's used-up bill? */
+                impossible(
+                    "timer sanity: can't locate obj %s [where=%d], timer %lu",
+                           obj_adr, owhere, t_id);
+            } else if (!isok(x, y)) {
+                impossible(
+              "timer sanity: obj %s [where=%d] located at <%d,%d>, timer %lu",
+                           obj_adr, owhere, x, y, t_id);
+            }
+            break;
+        }
+        case TIMER_MONSTER:
+            impossible("timer sanity: unexpected monster timer %lu", t_id);
+            break;
+        case TIMER_LEVEL: {
+            long lwhere = curr->arg.a_long;
 
-            /* instead of isok(x,y), so static analyzer follows along better */
-            if (x > 0 && x < COLNO && y >= 0 && y < ROWNO) {
+            x = (coordxy) ((lwhere >> 16) & 0xFFFF);
+            y = (coordxy) (lwhere & 0xFFFF);
+            if (isok(x, y)) {
+                /* replicate isok() in order to convince static analysis
+                   that the decoding via '& 0xFFFF' hasn't produced a value
+                   too big for levl[][] and that the cast to a narrower type
+                   hasn't intruded on the sign bit to yield a negative value;
+                   the analyzer isn't aware that isok() filters such things */
+                assert(x > 0 && x < COLNO && y >= 0 && y < ROWNO);
+
                 if (curr->func_index == MELT_ICE_AWAY && !is_ice(x, y))
                     impossible(
-                        "timer sanity: melt timer %lu on non-ice %d <%d,%d>",
-                         curr->tid, levl[x][y].typ, x, y);
+                         "timer sanity: melt timer %lu on non-ice %d <%d,%d>",
+                               t_id, levl[x][y].typ, x, y);
             } else {
                 impossible("timer sanity: spot timer %lu at <%d,%d>",
-                           curr->tid, x, y);
+                           t_id, x, y);
             }
+            break;
+        }
+        case TIMER_GLOBAL:
+            impossible("timer sanity: unexpected global timer %lu", t_id);
+            break;
+        default:
+            impossible("timer sanity: unknown timer %lu, type: %d",
+                       t_id, curr->kind);
+            break;
         }
     }
 }
