@@ -125,9 +125,9 @@ static char empty_optstr[] = { '\0' };
 static boolean duplicate, using_alias;
 static boolean give_opt_msg = TRUE;
 
-enum roleopts { roleopt_role, roleopt_race, roleopt_gend, roleopt_algn, MAX_ROLEOPT };
+enum { MAX_ROLEOPT = 4 };  /* 4: role,race,gend,algn */
 static boolean opt_set_in_config[OPTCOUNT];
-static char *roleoptvals[MAX_ROLEOPT][num_opt_phases]; /* 4: role,race,gend,algn */
+static char *roleoptvals[MAX_ROLEOPT][num_opt_phases];
 
 static NEARDATA const char *OptS_type[OptS_Advanced+1] = {
     "General", "Behavior", "Map", "Status", "Advanced"
