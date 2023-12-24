@@ -1586,6 +1586,7 @@ artifact_hit(
                 if (youattack) {
                     healup(drain, 0, FALSE, FALSE);
                 } else {
+                    assert(magr != 0);
                     magr->mhp += drain;
                     if (magr->mhp > magr->mhpmax)
                         magr->mhp = magr->mhpmax;
