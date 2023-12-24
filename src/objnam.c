@@ -1293,9 +1293,25 @@ doname_base(
             break;
         } else if (obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP
                    || obj->otyp == BRASS_LANTERN || Is_candle(obj)) {
-            if (Is_candle(obj)
-                && obj->age < 20L * (long) objects[obj->otyp].oc_cost)
-                Strcat(prefix, "partly used ");
+            if (Is_candle(obj)) {
+                anything timer;
+                long full_burn_time = 20L * (long) objects[obj->otyp].oc_cost,
+                     turns_left = obj->age;
+
+                if (obj->lamplit) {
+                    timer = cg.zeroany;
+                    timer.a_obj = obj;
+                    /* without this, wishing for "lit candle" yields
+                       "partly used candle (lit)" because the time it can
+                       burn gets adjusted when it becomes lit; matters for
+                       the message as it gets added to invent and also if it
+                       gets snuffed out immediately (where it will end up as
+                       not partly used after all) */
+                    turns_left += peek_timer(BURN_OBJECT, &timer) - gm.moves;
+                }
+                if (turns_left < full_burn_time)
+                    Strcat(prefix, "partly used ");
+            }
             if (obj->lamplit)
                 Strcat(bp, " (lit)");
             break;
