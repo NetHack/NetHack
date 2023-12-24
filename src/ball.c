@@ -44,7 +44,7 @@ ballfall(void)
 {
     boolean gets_hit;
 
-    if (uball && carried(uball) && welded(uball))
+    if (!uball || (uball && carried(uball) && welded(uball)))
         return;
 
     gets_hit = (((uball->ox != u.ux) || (uball->oy != u.uy))
