@@ -16,7 +16,6 @@ static void choke(struct obj *);
 static void recalc_wt(void);
 static struct obj *touchfood(struct obj *) NONNULL;
 static void do_reset_eat(void);
-static void maybe_extend_timed_resist(int);
 static void done_eating(boolean);
 static void cprefx(int);
 static boolean temp_givit(int, struct permonst *);
@@ -428,7 +427,7 @@ do_reset_eat(void)
 
 /* if 'prop' is only set because of a timed value (so not an intrinsic
    attribute or because of polymorph shape or worn or carried gear), return
-   its timeout, otherwise return 0 */
+   its timeout, otherwise return 0; used by enlightenment */
 long
 temp_resist(int prop)
 {
@@ -448,6 +447,33 @@ temp_resist(int prop)
     return 0L;
 }
 
+/* if temporary acid or stoning resistance is timing out while eating
+   something which that resistance is protecting against, caller will
+   extend resistance's duration so that it times out after meal finishes */
+boolean
+eating_dangerous_corpse(int res)
+{
+    struct obj *food;
+    int mnum;
+
+    if (go.occupation == eatfood
+        && (food = gc.context.victual.piece) != 0
+        && food->otyp == CORPSE
+        && (mnum = food->corpsenm) >= LOW_PM
+        && (carried(food) || obj_here(food, u.ux, u.uy))) {
+
+        if (res == ACID_RES && acidic(&mons[mnum]))
+            return TRUE;
+        /* flesh_petrifies() includes Medusa as well as touch_petrifies() */
+        if (res == STONE_RES && flesh_petrifies(&mons[mnum]))
+            return TRUE;
+    }
+    return FALSE;
+}
+
+#if 0   /* no longer used */
+static void maybe_extend_timed_resist(int);
+
 /* if temp resist against 'prop' is about to timeout, extend it slightly */
 static void
 maybe_extend_timed_resist(int prop)
@@ -465,6 +491,7 @@ maybe_extend_timed_resist(int prop)
         set_itimeout(&u.uprops[prop].intrinsic, 2L);
     }
 }
+#endif
 
 /* called each move during eating process */
 static int
@@ -481,25 +508,6 @@ eatfood(void)
     }
     if (!gc.context.victual.eating)
         return 0;
-
-    /*
-     * We don't want temporary acid resistance to timeout while eating
-     * an acidic corpse or temporary stoning resistance to do that while
-     * eating a cockatrice corpse.  Protection is checked at the start
-     * of the meal and having it go away mid-meal with a message about
-     * increased vulnerability but no consequences is too obviously wrong,
-     * but also too nit-picky to deal with.
-     *
-     * (Tins aren't handled by eatfood() and wouldn't need this anyway
-     * because they're finished in one turn once they've been opened.
-     * Come to think of it, eggs are probably eaten in one turn too.)
-     */
-    if ((food->otyp == CORPSE || food->otyp == EGG)
-        && food->corpsenm >= LOW_PM && acidic(&mons[food->corpsenm]))
-        maybe_extend_timed_resist(ACID_RES);
-    if ((food->otyp == CORPSE || food->otyp == EGG)
-        && food->corpsenm >= LOW_PM && touch_petrifies(&mons[food->corpsenm]))
-        maybe_extend_timed_resist(STONE_RES);
 
     if (++gc.context.victual.usedtime <= gc.context.victual.reqtime) {
         if (bite())

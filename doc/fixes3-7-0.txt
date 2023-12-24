@@ -1811,6 +1811,11 @@ autopickup while levitating shares code with 'mention_decor'; after being told
 	about ice covered by an object, moving over some other object later
 	when mention_decor is Off could give "you are back on solid ground"
 	long after leaving the ice
+duration of temporary stoning resistance would be extended while eating a
+	cockatrice corpse, as intended, but not while eating Medusa's corpse
+	so if it timed out during the meal, player got the message about hero
+	no longer being protected against stoning but was able to finish the
+	meal safely
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

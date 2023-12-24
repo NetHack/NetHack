@@ -775,15 +775,33 @@ nh_timeout(void)
                 }
                 break;
             case ACID_RES:
-                if (!Acid_resistance && !Unaware)
-                    You("no longer feel safe from acid.");
+                if (!Acid_resistance) {
+                    if (eating_dangerous_corpse(ACID_RES)) {
+                        /* extend temporary acid resistance if in midst
+                           of eating an acidic corpse; this will repeat
+                           until eating is finished or interrupted */
+                        set_itimeout(&u.uprops[ACID_RES].intrinsic, 1L);
+                        break;
+                    }
+                    if (!Unaware)
+                        You("no longer feel safe from acid.");
+                }
                 break;
             case STONE_RES:
                 if (!Stone_resistance) {
+                    if (eating_dangerous_corpse(STONE_RES)) {
+                        /* extend temporary stoning resistance if in midst
+                           of eating a stoning corpse; this will repeat
+                           until eating is finished or interrupted */
+                        set_itimeout(&u.uprops[STONE_RES].intrinsic, 1L);
+                        break;
+                    }
                     if (!Unaware)
                         You("no longer feel secure from petrification.");
                     /* no-op if not wielding a cockatrice corpse;
-                       uswapwep case is always a no-op (see Gloves_off()) */
+                       uswapwep case is always a no-op because two-weapon
+                       combat is only possible with two one-handed weapons
+                       or weapon tools, not corpses */
                     wielding_corpse(uwep, (struct obj *) 0, FALSE);
                     wielding_corpse(uswapwep, (struct obj *) 0, FALSE);
                 }

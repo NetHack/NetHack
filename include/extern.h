@@ -863,8 +863,10 @@ extern int eaten_stat(int, struct obj *) NONNULLARG2;
 extern void food_disappears(struct obj *) NONNULLARG1;
 extern void food_substitution(struct obj *, struct obj *) NONNULLPTRS;
 extern long temp_resist(int);
+extern boolean eating_dangerous_corpse(int);
 extern void eating_conducts(struct permonst *) NONNULLARG1;
-extern int eat_brains(struct monst *, struct monst *, boolean, int *) NONNULLARG12;
+extern int eat_brains(struct monst *, struct monst *, boolean,
+                                                          int *) NONNULLARG12;
 extern void fix_petrification(void);
 extern int intrinsic_possible(int, struct permonst *) NONNULLARG2;
 extern boolean should_givit(int, struct permonst *) NONNULLARG2;
