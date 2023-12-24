@@ -794,6 +794,7 @@ CapitalMon(
 
     if (!CapMons)
         init_CapMons();
+    assert(CapMons != 0);
 
     wln = (unsigned) strlen(word);
     for (i = 0; i < CapMonSiz - 1; ++i) {
