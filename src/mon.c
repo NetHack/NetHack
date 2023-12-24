@@ -2362,26 +2362,31 @@ copy_mextra(struct monst* mtmp2, struct monst* mtmp1)
     if (EGD(mtmp1)) {
         if (!EGD(mtmp2))
             newegd(mtmp2);
+        assert(has_egd(mtmp2));
         *EGD(mtmp2) = *EGD(mtmp1);
     }
     if (EPRI(mtmp1)) {
         if (!EPRI(mtmp2))
             newepri(mtmp2);
+        assert(has_epri(mtmp2));
         *EPRI(mtmp2) = *EPRI(mtmp1);
     }
     if (ESHK(mtmp1)) {
         if (!ESHK(mtmp2))
             neweshk(mtmp2);
+        assert(has_eshk(mtmp2));
         *ESHK(mtmp2) = *ESHK(mtmp1);
     }
     if (EMIN(mtmp1)) {
         if (!EMIN(mtmp2))
             newemin(mtmp2);
+        assert(has_emin(mtmp2));
         *EMIN(mtmp2) = *EMIN(mtmp1);
     }
     if (EDOG(mtmp1)) {
         if (!EDOG(mtmp2))
             newedog(mtmp2);
+        assert(has_edog(mtmp2));
         *EDOG(mtmp2) = *EDOG(mtmp1);
     }
     if (has_mcorpsenm(mtmp1))
@@ -4415,7 +4420,7 @@ pick_animal(void)
 
     if (!ga.animal_list)
         mon_animal_list(TRUE);
-
+    assert(ga.animal_list != 0);
     res = ga.animal_list[rn2(ga.animal_list_count)];
     /* rogue level should use monsters represented by uppercase letters
        only, but since chameleons aren't generated there (not uppercase!)
