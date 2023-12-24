@@ -1165,7 +1165,7 @@ attach_fig_transform_timeout(struct obj *figurine)
 static void
 slip_or_trip(void)
 {
-    struct obj *otmp = vobj_at(u.ux, u.uy), *otmp2;
+    struct obj *otmp = vobj_at(u.ux, u.uy), *otmp2, *saddle;
     const char *what;
     char buf[BUFSZ];
     boolean on_foot = !u.usteed;
@@ -1207,19 +1207,25 @@ slip_or_trip(void)
         /* is fumbling from ice alone? */
         boolean ice_only = !(EFumbling || (HFumbling & ~FROMOUTSIDE));
 
-        pline("%s %s%s %s the ice.",
+        pline("%s %s %s the ice.",
               u.usteed ? upstart(x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
                                           SUPPRESS_SADDLE, FALSE))
                        : "You",
-              rn2(2) ? "slip" : "slide", on_foot ? "" : "s",
+              /* "steed": arbitrary value that will use third person verb
+                 regardless of what u.usteed might be named, as opposed to
+                 "you" (second person, which won't have final 's' added) */
+              vtense(u.usteed ? "steed" : "you", rn2(2) ? "slip" : "slide"),
               /* sometimes slipping due to ice occurs during turn that hero
                  has just moved off the ice; phrase things differently then */
               is_ice(u.ux, u.uy) ? "on" : "off");
         /* fumbling outside of ice while mounted always causes the hero to
-           fall from the saddle, so to avoid a counterintuitive effect where
-           ice makes riding _less_ hazardous, unconditionally dismount if
-           fumbling is from a non-ice source */
-        if (!on_foot && (!ice_only || !rn2(3))) {
+           fall from the saddle (unless it is cursed), so to avoid a
+           counterintuitive effect where ice makes riding _less_ hazardous,
+           unconditionally dismount if fumbling is from a non-ice source */
+        if (!on_foot
+            && ((saddle = which_armor(u.usteed, W_SADDLE)) == 0
+                || !saddle->cursed)
+            && (!ice_only || !rn2(3))) {
             You("lose your balance.");
             dismount_steed(DISMOUNT_FELL);
         }
@@ -1241,7 +1247,11 @@ slip_or_trip(void)
                 You("stumble.");
                 break;
             }
-        } else {
+
+        /* mounted; saddle should never end up being Null here;
+           don't fall off when it happens to be cursed */
+        } else if ((saddle = which_armor(u.usteed, W_SADDLE)) == 0
+                   || !saddle->cursed) {
             switch (rn2(4)) {
             case 1:
                 Your("%s slip out of the stirrups.",
