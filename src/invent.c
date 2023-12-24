@@ -4880,7 +4880,7 @@ mergable(
     if ((objnamelth != otmpnamelth
          && ((objnamelth && otmpnamelth) || obj->otyp == CORPSE))
         || (objnamelth && otmpnamelth
-           /* safe_oname could have returned ptr to "", verify before deref */
+           /* verify pointers before deref for static analyzer */
             && has_oname(obj) && has_oname(otmp)
                && strncmp(ONAME(obj), ONAME(otmp), objnamelth)))
         return FALSE;
