@@ -232,7 +232,7 @@ ready_weapon(struct obj *wep)
         }
 
         /* KMH -- Talking artifacts are finally implemented */
-        if (wep && wep->oartifact) {
+        if (wep->oartifact) {
             res |= arti_speak(wep); /* sets ECMD_TIME bit if artifact speaks */
         }
 
