@@ -4880,7 +4880,9 @@ mergable(
     if ((objnamelth != otmpnamelth
          && ((objnamelth && otmpnamelth) || obj->otyp == CORPSE))
         || (objnamelth && otmpnamelth
-            && strncmp(ONAME(obj), ONAME(otmp), objnamelth)))
+           /* safe_oname could have returned ptr to "", verify before deref */
+            && has_oname(obj) && has_oname(otmp)
+               && strncmp(ONAME(obj), ONAME(otmp), objnamelth)))
         return FALSE;
 
     /* if one has an attached mail command, other must have same command */
