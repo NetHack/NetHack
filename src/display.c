@@ -133,9 +133,6 @@ static int check_pos(coordxy, coordxy, int);
 static void get_bkglyph_and_framecolor(coordxy x, coordxy y, int *, uint32 *);
 static int tether_glyph(coordxy, coordxy);
 static void mimic_light_blocking(struct monst *) NONNULLARG1;
-#ifdef UNBUFFERED_GLYPHINFO
-static glyph_info *glyphinfo_at(coordxy, coordxy, int);
-#endif
 
 /*#define WA_VERBOSE*/ /* give (x,y) locations for all "bad" spots */
 #ifdef WA_VERBOSE
@@ -1550,7 +1547,8 @@ static glyph_info no_ginfo = {
      : &gg.gbuf[(y)][(x)].glyphinfo)
 #else
 static glyph_info ginfo;
-#define Glyphinfo_at(x, y, glyph) glyphinfo_at(x, y, glyph)
+static glyph_info *glyphinfo_at(coordxy, coordxy, int);
+#define Glyphinfo_at(x, y, glyph) glyphinfo_at((x), (y), (glyph))
 #endif
 
 #ifdef TILES_IN_GLYPHMAP
@@ -1978,7 +1976,7 @@ clear_glyph_buffer(void)
                         != nul_gbuf.glyphinfo.gm.glyphflags
                      || giptr->gm.tileidx != nul_gbuf.glyphinfo.gm.tileidx)
 #else
-    nul_gbuf.gnew = (giptr->glyphinfo.ttychar != ' '
+    nul_gbuf.gnew = (giptr->ttychar != ' '
                      || giptr->gm.sym.color != NO_COLOR
                      || (giptr->gm.glyphflags & ~MG_UNEXPL) != 0)
 #endif
@@ -2098,7 +2096,7 @@ flush_screen(int cursor_on_u)
                     && bkglyphinfo.framecolor != NO_COLOR)) {
                 map_glyphinfo(x, y, bkglyph, 0, &bkglyphinfo); /* won't touch framecolor */
                 print_glyph(WIN_MAP, x, y,
-                            Glyphinfo_at(x, y, gptr->glyph), &bkglyphinfo);
+                            Glyphinfo_at(x, y, gptr->glyphinfo.glyph), &bkglyphinfo);
                 gptr->gnew = 0;
             }
         }
@@ -2327,7 +2325,7 @@ glyph_at(coordxy x, coordxy y)
 glyph_info *
 glyphinfo_at(coordxy x, coordxy y, int glyph)
 {
-    map_glyphinfo(x, y, glyph, 0, &ginfo);
+    map_glyphinfo(x, y, glyph, 0, &ginfo); /* ginfo declared at file scope */
     return &ginfo;
 }
 #endif
