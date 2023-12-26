@@ -2053,7 +2053,7 @@ timer_sanity_check(void)
         case TIMER_OBJECT: {
             /* TODO? verify that the timer type is attached to applicable
                object (egg for hatch, glob for shrink, and so forth) */
-            struct obj *obj = curr->arg.a_obj;
+            struct obj *obj = curr->arg.a_obj, *top;
             char *obj_adr = fmt_ptr((genericptr_t) obj);
             int owhere = obj->where;
 
@@ -2062,19 +2062,26 @@ timer_sanity_check(void)
                            obj_adr, t_id);
             }
             x = y = 0;
+            /* if obj is in a container, possibly a nested one, figure out
+               where the outermost container is */
+            for (top = obj; top; top = top->ocontainer)
+                if ((owhere = top->where) != OBJ_CONTAINED)
+                    break;
+            assert(top != NULL);
             if (owhere == OBJ_MIGRATING
-                || (owhere == OBJ_MINVENT && !mon_is_local(obj->ocarry))) {
+                || (owhere == OBJ_MINVENT && !mon_is_local(top->ocarry))) {
+                /* migrating directly or carried by migrating monster */
                 ; /* not able to validate location so skip checks */
             } else if (!get_obj_location(obj, &x, &y,
                                          CONTAINED_TOO | BURIED_TOO)) {
                 /* free? or on a shop's used-up bill? */
                 impossible(
                     "timer sanity: can't locate obj %s [where=%d], timer %lu",
-                           obj_adr, owhere, t_id);
+                           obj_adr, obj->where, t_id);
             } else if (!isok(x, y)) {
                 impossible(
               "timer sanity: obj %s [where=%d] located at <%d,%d>, timer %lu",
-                           obj_adr, owhere, x, y, t_id);
+                           obj_adr, obj->where, x, y, t_id);
             }
             break;
         }
