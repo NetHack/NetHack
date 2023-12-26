@@ -1542,6 +1542,9 @@ static glyph_info no_ginfo = {
     }
 };
 #ifndef UNBUFFERED_GLYPHINFO
+/* Note that the 'glyph' argument is not used in the expansion
+ * of this !UNBUFFERED_GLYPHINFO (default) variation, but is
+ * a requirement for the UNBUFFERED_GLYPHINFO variation */
 #define Glyphinfo_at(x, y, glyph) \
     (((x) < 0 || (y) < 0 || (x) >= COLNO || (y) >= ROWNO) ? &no_ginfo   \
      : &gg.gbuf[(y)][(x)].glyphinfo)
