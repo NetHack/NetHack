@@ -438,8 +438,10 @@ silver_sears(struct monst *magr UNUSED, struct monst *mdef,
         rtyp = ((uright && (silverhit & W_RINGR) != 0L)
                 ? uright->otyp : STRANGE_OBJECT);
     boolean both,
-        l_ag = (objects[ltyp].oc_material == SILVER && uleft->dknown),
-        r_ag = (objects[rtyp].oc_material == SILVER && uright->dknown);
+        l_dknown = (uleft && uleft->dknown),
+        r_dknown = (uright && uright->dknown),
+        l_ag = (objects[ltyp].oc_material == SILVER && l_dknown),
+        r_ag = (objects[rtyp].oc_material == SILVER && r_dknown);
 
     if ((silverhit & (W_RINGL | W_RINGR)) != 0L) {
         /* plural if both the same type (so not multi_claw and both rings
@@ -448,8 +450,7 @@ silver_sears(struct monst *magr UNUSED, struct monst *mdef,
            and both known; singular if multi_claw (where one of ltyp or
            rtyp will always be STRANGE_OBJECT) even if both rings are known
            silver [see hmonas(uhitm.c) for explanation of 'multi_claw'] */
-        both = ((ltyp == rtyp && uleft->dknown == uright->dknown)
-                || (l_ag && r_ag));
+        both = ((ltyp == rtyp && l_dknown == r_dknown) || (l_ag && r_ag));
         Sprintf(rings, "ring%s", both ? "s" : "");
         Your("%s%s %s %s!",
              (l_ag || r_ag) ? "silver "
