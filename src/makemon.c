@@ -904,6 +904,7 @@ clone_mon(struct monst *mon,
         int atyp;
 
         newemin(m2);
+        assert(has_emin(m2) && has_emin(mon));
         *EMIN(m2) = *EMIN(mon);
         /* renegade when same alignment as hero but not peaceful or
            when peaceful while being different alignment from hero */
@@ -915,7 +916,7 @@ clone_mon(struct monst *mon,
            must be made non-tame to get initialized properly. */
         m2->mtame = 0;
         if (tamedog(m2, (struct obj *) 0)) {
-            assert(has_edog(m2));
+            assert(has_edog(m2) && has_edog(mon));
             *EDOG(m2) = *EDOG(mon);
         }
         /* [TODO? some (most? all?) edog fields probably should be
