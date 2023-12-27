@@ -529,7 +529,8 @@ parse_sym_line(char *buf, int which_set)
                     tmpsp = lastsp; /* most recent symset */
                     for (i = 0; known_handling[i]; ++i)
                         if (!strcmpi(known_handling[i], bufp)) {
-                            tmpsp->handling = i;
+                            if (tmpsp)
+                                tmpsp->handling = i;
                             break; /* for loop */
                         }
                     break;
@@ -544,13 +545,15 @@ parse_sym_line(char *buf, int which_set)
                     tmpsp = lastsp; /* most recent symset */
                     for (i = 0; known_restrictions[i]; ++i) {
                         if (!strcmpi(known_restrictions[i], bufp)) {
-                            switch (i) {
-                            case 0:
-                                tmpsp->primary = 1;
-                                break;
-                            case 1:
-                                tmpsp->rogue = 1;
-                                break;
+                            if (tmpsp) {
+                                switch (i) {
+                                case 0:
+                                    tmpsp->primary = 1;
+                                    break;
+                                case 1:
+                                    tmpsp->rogue = 1;
+                                    break;
+                                }
                             }
                             break; /* while loop */
                         }
