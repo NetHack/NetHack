@@ -627,10 +627,14 @@ BOOL winos_font_support_cp437(HFONT hFont)
     if (size) {
         GLYPHSET *glyphSet = (GLYPHSET *) malloc((size_t) size);
         if (glyphSet != NULL) {
+#ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 6386 )
+#endif
             size = GetFontUnicodeRanges(hdc, glyphSet);
+#ifdef _MSC_VER
 #pragma warning( pop )
+#endif
             allFound = TRUE;
             for (int i = 0; i < 256 && allFound; i++) {
                 WCHAR wc = cp437[i];
