@@ -536,6 +536,7 @@ nameshk(struct monst* shk, const char* const* nlp)
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
                 if (DEADMONSTER(mtmp) || (mtmp == shk) || !mtmp->isshk)
                     continue;
+                assert(has_eshk(mtmp));
                 if (strcmp(ESHK(mtmp)->shknam, shname))
                     continue;
                 name_wanted = names_avail; /* try a random name */
