@@ -250,6 +250,7 @@ restobjchn(NHFILE *nhfp, boolean frozen)
             break;
 
         otmp = newobj();
+        assert(otmp != 0);
         restobj(nhfp, otmp);
         if (!first)
             first = otmp;
@@ -387,6 +388,7 @@ restmonchn(NHFILE *nhfp)
             break;
 
         mtmp = newmonst();
+        assert(mtmp != 0);
         restmon(nhfp, mtmp);
         if (!first)
             first = mtmp;
