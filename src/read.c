@@ -2878,15 +2878,19 @@ do_genocide(
 void
 punish(struct obj* sobj)
 {
+    /* angrygods() calls this with NULL sobj arg */
     struct obj *reuse_ball = (sobj && sobj->otyp == HEAVY_IRON_BALL)
                                 ? sobj : (struct obj *) 0;
+    /* analyzer doesn't know that the one caller that passes a NULL
+     * sobj (angrygods) checks !Punished first, so add a guard */
+    int cursed_levy = (sobj && sobj->cursed) ? 1 : 0;
 
     /* KMH -- Punishment is still okay when you are riding */
     if (!reuse_ball)
         You("are being punished for your misbehavior!");
     if (Punished) {
         Your("iron ball gets heavier.");
-        uball->owt += IRON_BALL_W_INCR * (1 + sobj->cursed);
+        uball->owt += IRON_BALL_W_INCR * (1 + cursed_levy);
         return;
     }
     if (amorphous(gy.youmonst.data) || is_whirly(gy.youmonst.data)
