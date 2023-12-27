@@ -862,6 +862,7 @@ angry_priest(void)
                 newemin(priest);
             priest->ispriest = 0; /* now a roaming minion */
             priest->isminion = 1;
+            assert(has_emin(priest));
             EMIN(priest)->min_align = eprip->shralign;
             EMIN(priest)->renegade = FALSE;
             /* discard priest's memory of his former shrine;
