@@ -77,6 +77,8 @@ static void __cdecl mswin_moveloop(void *);
 
 #define MAX_CMDLINE_PARAM 255
 
+#pragma warning( push )
+#pragma warning( disable : 28251)
 int APIENTRY
 WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
         int nCmdShow)
@@ -245,6 +247,8 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 #endif
     return 0;
 }
+
+#pragma warning( pop )
 
 PNHWinApp
 GetNHApp(void)

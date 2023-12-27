@@ -198,13 +198,20 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             text_size = strlen(msg_data->text) + 4;
             data->window_text =
                 (TCHAR *) malloc(text_size * sizeof(data->window_text[0]));
-            ZeroMemory(data->window_text,
-                       text_size * sizeof(data->window_text[0]));
+            if (data->window_text) {
+                ZeroMemory(data->window_text,
+                           text_size * sizeof(data->window_text[0]));
+            }
         } else {
+            TCHAR *was = data->window_text;
+
             text_size =
                 _tcslen(data->window_text) + strlen(msg_data->text) + 4;
             data->window_text = (TCHAR *) realloc(
                 data->window_text, text_size * sizeof(data->window_text[0]));
+            if (!data->window_text) {
+                free(was);
+            }
         }
         if (!data->window_text)
             break;

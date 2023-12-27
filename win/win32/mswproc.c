@@ -12,7 +12,7 @@
 #include "dlb.h"
 #include "func_tab.h" /* for extended commands */
 #include "winMS.h"
-#include <assert.h>
+
 #include <mmsystem.h>
 #include "mhmap.h"
 #include "mhstatus.h"
@@ -1031,11 +1031,17 @@ mswin_putstr_ex(winid wid, int attr, const char *text, int app)
         /* yield a bit so it gets done immediately */
         mswin_get_nh_event();
     } else {
+        char *was = GetNHApp()->saved_text;
+
         // build text to display later in message box
         GetNHApp()->saved_text =
             realloc(GetNHApp()->saved_text,
                     strlen(text) + strlen(GetNHApp()->saved_text) + 1);
-        strcat(GetNHApp()->saved_text, text);
+        if (!GetNHApp()->saved_text) {
+            free(was);
+        } else {
+            strcat(GetNHApp()->saved_text, text);
+        }
     }
 }
 
@@ -2109,15 +2115,17 @@ mswin_getmsghistory(boolean init)
     if (init) {
         text = (PMSNHMsgGetText) malloc(sizeof(MSNHMsgGetText)
                                         + TEXT_BUFFER_SIZE);
-        text->max_size =
-            TEXT_BUFFER_SIZE
-            - 1; /* make sure we always have 0 at the end of the buffer */
+        if (text) {
+            text->max_size =
+                TEXT_BUFFER_SIZE
+                - 1; /* make sure we always have 0 at the end of the buffer */
 
-        ZeroMemory(text->buffer, TEXT_BUFFER_SIZE);
-        SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_MSNH_COMMAND,
-                    (WPARAM) MSNH_MSG_GETTEXT, (LPARAM) text);
+            ZeroMemory(text->buffer, TEXT_BUFFER_SIZE);
+            SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_MSNH_COMMAND,
+                        (WPARAM) MSNH_MSG_GETTEXT, (LPARAM) text);
 
-        next_message = text->buffer;
+            next_message = text->buffer;
+        }
     }
 
     if (!(next_message && next_message[0])) {
@@ -2725,27 +2733,29 @@ mswin_color_from_string(char *colorstring, HBRUSH *brushptr,
                            - hexadecimals);
         ++colorstring;
         red_value *= 16;
-        red_value += (int) (strchr(hexadecimals, tolower((uchar) *colorstring))
-                            - hexadecimals);
+        red_value +=
+            (int) (strchr(hexadecimals, tolower((uchar) *colorstring))
+                   - hexadecimals);
         ++colorstring;
 
-        green_value = (int) (strchr(hexadecimals,
-                                   tolower((uchar) *colorstring))
-                             - hexadecimals);
+        green_value =
+            (int) (strchr(hexadecimals, tolower((uchar) *colorstring))
+                   - hexadecimals);
         ++colorstring;
         green_value *= 16;
-        green_value += (int) (strchr(hexadecimals,
-                                    tolower((uchar) *colorstring))
-                              - hexadecimals);
+        green_value +=
+            (int) (strchr(hexadecimals, tolower((uchar) *colorstring))
+                   - hexadecimals);
         ++colorstring;
 
-        blue_value = (int) (strchr(hexadecimals, tolower((uchar) *colorstring))
-                            - hexadecimals);
+        blue_value =
+            (int) (strchr(hexadecimals, tolower((uchar) *colorstring))
+                   - hexadecimals);
         ++colorstring;
         blue_value *= 16;
-        blue_value += (int) (strchr(hexadecimals,
-                                   tolower((uchar) *colorstring))
-                             - hexadecimals);
+        blue_value +=
+            (int) (strchr(hexadecimals, tolower((uchar) *colorstring))
+                   - hexadecimals);
         ++colorstring;
 
         *colorptr = RGB(red_value, green_value, blue_value);
@@ -2768,7 +2778,10 @@ mswin_color_from_string(char *colorstring, HBRUSH *brushptr,
     if (max_brush > TOTAL_BRUSHES)
         panic("Too many colors!");
     *brushptr = CreateSolidBrush(*colorptr);
-    brush_table[max_brush++] = *brushptr;
+    if (IndexOk(max_brush, brush_table)) {
+        brush_table[max_brush] = *brushptr;
+        max_brush++;
+    }
 }
 
 void

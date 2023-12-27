@@ -647,6 +647,7 @@ onPaint(HWND hWnd)
             strcpy(tmptext, data->window_text[i].text);
             strip_newline(tmptext);
             NH_A2W(tmptext, wbuf, sizeof(wbuf));
+            wbuf[SIZE(wbuf) - 1] = '\0';
             wlen = _tcslen(wbuf);
             setMsgTextColor(hdc, i < (MSG_LINES - data->lines_last_turn));
 #ifdef MSG_WRAP_TEXT
