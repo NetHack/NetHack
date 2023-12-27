@@ -1338,8 +1338,6 @@ amulet of unchanging cannot be polymorphed
 wishing for a "lit candle" provided one, but the feedback as it was added into
 	invent was "partly used candle (lit)" because of how 'lit' timer works
 don't fall off steed because of Fumbling if saddle is cursed
-using <space(s)> to remove an existing name given to a type of object was
-	accessing freed memory
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
