@@ -205,7 +205,7 @@ mhidden_description(
             Strcat(outbuf, (otmp && otmp->otyp != STRANGE_OBJECT)
                               ? ansimpleoname(otmp)
                               : an(obj_descr[STRANGE_OBJECT].oc_name));
-            if (fakeobj) {
+            if (fakeobj && otmp) {
                 otmp->where = OBJ_FREE; /* object_from_map set to OBJ_FLOOR */
                 dealloc_obj(otmp);
             }
