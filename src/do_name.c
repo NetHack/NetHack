@@ -1488,6 +1488,7 @@ do_oname(struct obj *obj)
            a valid artifact name */
         u.uconduct.literate++;
     } else if (obj->otyp == objtyp) {
+        assert(aname != 0);
         /* artifact_name() found a match and restrict_name() didn't reject
            it; since 'obj' is the right type, naming will change it into an
            artifact so use canonical capitalization (Sting or Orcrist) */
