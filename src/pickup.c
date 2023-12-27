@@ -3262,6 +3262,7 @@ menu_loot(int retry, boolean put_in)
             n_looted = n;
             for (i = 0; i < n; i++) {
                 otmp = pick_list[i].item.a_obj;
+                assert(otmp != 0);
                 count = pick_list[i].count;
                 if (count > 0 && count < otmp->quan) {
                     otmp = splitobj(otmp, count);
