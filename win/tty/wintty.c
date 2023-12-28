@@ -1094,7 +1094,7 @@ tty_clear_nhwindow(winid window)
             if (cw->active)
                 erase_menu_or_text(window, cw, TRUE);
 #ifdef TTY_PERM_INVENT
-            if (window == WIN_INVEN)
+            if (cw->type == NHW_MENU && cw->mbehavior == MENU_BEHAVE_PERMINV)
                 ttyinv_remove_data(cw, FALSE);
             else
 #endif
@@ -1989,7 +1989,7 @@ tty_destroy_nhwindow(winid window)
     if (cw->type == NHW_MAP)
         term_clear_screen();
 #ifdef TTY_PERM_INVENT
-    if (cw->type == NHW_PERMINVENT || window == WIN_INVEN)
+    if (cw->type == NHW_MENU && cw->mbehavior == MENU_BEHAVE_PERMINV)
         ttyinv_remove_data(cw, TRUE);
 #endif
     free_window_info(cw, TRUE);
