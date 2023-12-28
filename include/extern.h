@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1703070179 2023/12/20 11:02:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1344 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1703716146 2023/12/27 22:29:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1356 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -70,14 +70,14 @@
 
 #if 0
 /* routines in alloc.c depend on MONITOR_HEAP and are declared in global.h */
-extern long *alloc(unsigned int);
+extern long *alloc(unsigned int) NONNULL;
 #endif
 extern char *fmt_ptr(const void *) NONNULL;
 /* moved from hacklib.c to alloc.c so that utility programs have access */
 #define FITSint(x) FITSint_(x, __func__, __LINE__)
-extern int FITSint_(long long, const char *, int);
+extern int FITSint_(long long, const char *, int) NONNULLARG2;
 #define FITSuint(x) FITSuint_(x, __func__, __LINE__)
-extern unsigned FITSuint_(unsigned long long, const char *, int);
+extern unsigned FITSuint_(unsigned long long, const char *, int) NONNULLARG2;
 
 /* This next pre-processor directive covers almost the entire file,
  * interrupted only occasionally to pick up specific functions as needed. */
@@ -1404,7 +1404,7 @@ extern boolean is_home_elemental(struct permonst *) NONNULLARG1;
 extern struct monst *clone_mon(struct monst *, coordxy, coordxy) NONNULLARG1;
 extern int monhp_per_lvl(struct monst *) NONNULLARG1;
 extern void newmonhp(struct monst *, int) NONNULLARG1;
-extern struct mextra *newmextra(void);
+extern struct mextra *newmextra(void) NONNULL;
 extern struct monst *makemon(struct permonst *, coordxy, coordxy, mmflags_nht);
 extern struct monst *unmakemon(struct monst *, mmflags_nht) NONNULLARG1;
 extern boolean create_critters(int, struct permonst *, boolean);
@@ -1561,7 +1561,7 @@ extern void restore_waterlevel(NHFILE *) NONNULLARG1;
 
 /* ### mkobj.c ### */
 
-extern struct oextra *newoextra(void);
+extern struct oextra *newoextra(void) NONNULL;
 extern void copy_oextra(struct obj *, struct obj *);
 extern void dealloc_oextra(struct obj *) NONNULLARG1;
 extern void newomonst(struct obj *) NONNULLARG1;
