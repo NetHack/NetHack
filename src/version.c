@@ -10,10 +10,10 @@
 #define OPTIONS_AT_RUNTIME
 #endif
 
-extern char *mdlib_version_string(char *, const char *);
-static void insert_rtoption(char *);
+static void insert_rtoption(char *) NONNULLARG1;
 
-/* fill buffer with short version (so caller can avoid including date.h) */
+/* fill buffer with short version (so caller can avoid including date.h)
+ * buf cannot be NULL */
 char *
 version_string(char *buf, size_t bufsz)
 {

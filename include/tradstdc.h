@@ -383,6 +383,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #define NONNULLARG5 __attribute__((nonnull (5)))
 #define NONNULLARG7 __attribute__((nonnull (7))) /* for bhit() */
 #define NONNULLARG12 __attribute__((nonnull (1, 2)))
+#define NONNULLARG23 __attribute__((nonnull (2, 3)))
 #define NONNULLARG123 __attribute__((nonnull (1, 2, 3)))
 #define NONNULLARG13 __attribute__((nonnull (1, 3)))
 #define NONNULLARG14 __attribute__((nonnull (1, 4))) /* for query_category */
@@ -428,6 +429,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #define NONNULLARG5
 #define NONNULLARG7
 #define NONNULLARG12
+#define NONNULLARG23
 #define NONNULLARG123
 #define NONNULLARG13
 #define NONNULLARG14

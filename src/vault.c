@@ -5,18 +5,18 @@
 
 #include "hack.h"
 
-static boolean clear_fcorr(struct monst *, boolean);
+static boolean clear_fcorr(struct monst *, boolean) NONNULLARG1;
 static void blackout(coordxy, coordxy);
-static void restfakecorr(struct monst *);
-static void parkguard(struct monst *);
-static boolean in_fcorridor(struct monst *, coordxy, coordxy);
-static boolean find_guard_dest(struct monst *, coordxy *, coordxy *);
-static void move_gold(struct obj *, int);
-static void wallify_vault(struct monst *);
-static void gd_mv_monaway(struct monst *, int, int);
-static void gd_pick_corridor_gold(struct monst *, int, int);
-static int gd_move_cleanup(struct monst *, boolean, boolean);
-static void gd_letknow(struct monst *);
+static void restfakecorr(struct monst *) NONNULLARG1;
+static void parkguard(struct monst *) NONNULLARG1;
+static boolean in_fcorridor(struct monst *, coordxy, coordxy) NONNULLARG1;
+static boolean find_guard_dest(struct monst *, coordxy *, coordxy *) NONNULLARG23;
+static void move_gold(struct obj *, int) NONNULLARG1;
+static void wallify_vault(struct monst *) NONNULLARG1;
+static void gd_mv_monaway(struct monst *, int, int) NONNULLARG1;
+static void gd_pick_corridor_gold(struct monst *, int, int) NONNULLARG1;
+static int gd_move_cleanup(struct monst *, boolean, boolean) NONNULLARG1;
+static void gd_letknow(struct monst *) NONNULLARG1;
 
 void
 newegd(struct monst *mtmp)

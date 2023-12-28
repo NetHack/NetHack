@@ -11,14 +11,14 @@ static void sleep_dialogue(void);
 static void choke_dialogue(void);
 static void levitation_dialogue(void);
 static void slime_dialogue(void);
-static void slimed_to_death(struct kinfo *);
+static void slimed_to_death(struct kinfo *) NO_NNARGS;
 static void sickness_dialogue(void);
 static void phaze_dialogue(void);
 static void done_timeout(int, int);
 static void slip_or_trip(void);
-static void see_lamp_flicker(struct obj *, const char *);
-static void lantern_message(struct obj *);
-static void cleanup_burn(ANY_P *, long);
+static void see_lamp_flicker(struct obj *, const char *) NONNULLPTRS;
+static void lantern_message(struct obj *) NONNULLARG1;
+static void cleanup_burn(ANY_P *, long) NONNULLARG1;
 
 /* used by wizard mode #timeout and #wizintrinsic; order by 'interest'
    for timeout countdown, where most won't occur in normal play */

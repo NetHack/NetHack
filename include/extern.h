@@ -35,6 +35,7 @@
  *  NONNULLARG5     The 5th argument is declared nonnull.
  *  NONNULLARG7     The 7th argument is declared nonnull (bhit).
  *  NONNULLARG12    The 1st and 2nd arguments are declared nonnull.
+ *  NONNULLARG23    The 2nd and 3rd arguments are declared nonnull.
  *  NONNULLARG13    The 1st and 3rd arguments are declared nonnull.
  *  NONNULLARG123   The 1st, 2nd and 3rd arguments are declared nonnull.
  *  NONNULLARG14    The 1st and 4th arguments are declared nonnull.
@@ -378,7 +379,7 @@ extern void makemap_prepost(boolean, boolean);
 
 /* ### date.c ### */
 
-extern void populate_nomakedefs(struct version_info *);
+extern void populate_nomakedefs(struct version_info *) NONNULLARG1;
 extern void free_nomakedefs(void);
 
 /* ### dbridge.c ### */
@@ -1438,8 +1439,9 @@ extern int buzzmu(struct monst *, struct attack *) NONNULLARG12;
 /* ### mdlib.c ### */
 
 extern void runtime_info_init(void);
-extern const char *do_runtime_info(int *);
+extern const char *do_runtime_info(int *) NO_NNARGS;
 extern void release_runtime_info(void);
+extern char *mdlib_version_string(char *, const char *) NONNULL NONNULLPTRS;
 #ifdef ENHANCED_SYMBOLS
 extern void dump_glyphids(void);
 #endif
@@ -3349,8 +3351,8 @@ extern void vault_gd_watching(unsigned int);
 
 /* ### version.c ### */
 
-extern char *version_string(char *, size_t bufsz) NONNULLARG1;
-extern char *getversionstring(char *, size_t bufsz) NONNULLARG1;
+extern char *version_string(char *, size_t bufsz) NONNULL NONNULLARG1;
+extern char *getversionstring(char *, size_t bufsz) NONNULL NONNULLARG1;
 extern int doversion(void);
 extern int doextversion(void);
 #ifdef MICRO
@@ -3363,7 +3365,7 @@ extern void store_formatindicator(NHFILE *) NONNULLARG1;
 extern void store_version(NHFILE *) NONNULLARG1;
 extern unsigned long get_feature_notice_ver(char *) NO_NNARGS;
 extern unsigned long get_current_feature_ver(void);
-extern const char *copyright_banner_line(int);
+extern const char *copyright_banner_line(int) NONNULL;
 extern void early_version_info(boolean);
 
 /* ### video.c ### */

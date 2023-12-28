@@ -60,12 +60,12 @@ extern void *trace_procs_chain(int, int, void *, void *, void *);
 #endif
 
 #if defined(WINCHAIN) || defined(TTY_GRAPHICS)
-static struct win_choices *win_choices_find(const char *s);
+static struct win_choices *win_choices_find(const char *s) NONNULLARG1;
 #endif
 
-static void def_raw_print(const char *s);
+static void def_raw_print(const char *s) NONNULLARG1;
 static void def_wait_synch(void);
-static boolean get_menu_coloring(const char *, int *, int *);
+static boolean get_menu_coloring(const char *, int *, int *) NONNULLPTRS;
 
 #ifdef DUMPLOG
 static winid dump_create_nhwindow(int);
