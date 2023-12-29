@@ -947,8 +947,8 @@ mesg_add_line(const char *mline)
         ++num_messages;
     } else {
         /* at capacity; old head is being removed */
-        first_mesg = first_mesg->next_mesg; /* new head */
-        first_mesg->prev_mesg = NULL; /* head has no prev_mesg */
+        if ((first_mesg = first_mesg->next_mesg) != 0) /* new head */
+            first_mesg->prev_mesg = NULL; /* head has no prev_mesg */
     }
     /* since 'current_mesg' might be reusing 'first_mesg' and has now
        become 'last_mesg', this update must be after head replacement */
@@ -1056,7 +1056,8 @@ curses_putmsghistory(const char *msg, boolean restoring_msghist)
            however, we aren't only called when restoring history;
            core uses putmsghistory() for other stuff during play
            and those messages should have a normal turn value */
-        last_mesg->turn = restoring_msghist ? (1L << 3) : gh.hero_seq;
+        if (last_mesg) /* appease static analyzer */
+            last_mesg->turn = restoring_msghist ? (1L << 3) : gh.hero_seq;
 #ifdef DUMPLOG
         dumplogmsg(last_mesg->str);
 #endif
@@ -1072,18 +1073,20 @@ curses_putmsghistory(const char *msg, boolean restoring_msghist)
                stashed messages as newly occurring ones is much simpler;
                we ignore the backlinks because the list is destroyed as it
                gets processed hence there can't be any other traversals */
-            mesg = stash_head;
-            stash_head = mesg->next_mesg;
-            --stash_count;
-            mesg_turn = mesg->turn;
-            mesg_add_line(mesg->str);
-            /* added line became new tail */
-            last_mesg->turn = mesg_turn;
+            if ((mesg = stash_head) != 0) {
+                stash_head = mesg->next_mesg;
+                --stash_count;
+                mesg_turn = mesg->turn;
+                mesg_add_line(mesg->str);
+                /* added line became new tail */
+                if (last_mesg) /* appease static analyzer */
+                    last_mesg->turn = mesg_turn;
 #ifdef DUMPLOG
-            dumplogmsg(mesg->str);
+                dumplogmsg(mesg->str);
 #endif
-            free((genericptr_t) mesg->str);
-            free((genericptr_t) mesg);
+                free((genericptr_t) mesg->str);
+                free((genericptr_t) mesg);
+            }
         }
         initd = FALSE; /* reset */
     }

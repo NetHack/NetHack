@@ -1078,16 +1078,16 @@ menu_win_size(nhmenu *menu)
 
     /* Possibly reduce height if only 1 page */
     if (!menu_is_multipage(menu, maxwidth, maxheight)) {
-        menu_item_ptr = menu->entries;
+        if ((menu_item_ptr = menu->entries) != 0) {
+            while (menu_item_ptr->next_item != NULL) {
+                menu_item_ptr = menu_item_ptr->next_item;
+            }
 
-        while (menu_item_ptr->next_item != NULL) {
-            menu_item_ptr = menu_item_ptr->next_item;
-        }
+            lastline = (menu_item_ptr->line_num) + menu_item_ptr->num_lines;
 
-        lastline = (menu_item_ptr->line_num) + menu_item_ptr->num_lines;
-
-        if (lastline < maxheight) {
-            maxheight = lastline;
+            if (lastline < maxheight) {
+                maxheight = lastline;
+            }
         }
     }
 
