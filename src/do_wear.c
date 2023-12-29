@@ -49,6 +49,9 @@ static int puton_ok(struct obj *);
 static int remove_ok(struct obj *);
 static int wear_ok(struct obj *);
 static int takeoff_ok(struct obj *);
+/* maybe_destroy_armor() may return NULL */
+static struct obj *maybe_destroy_armor(struct obj *, struct obj *,
+                                       boolean *) NONNULLARG3;
 
 /* plural "fingers" or optionally "gloves" */
 const char *
@@ -3035,28 +3038,42 @@ wornarm_destroyed(struct obj *wornarm)
         }
 }
 
+/*
+ * returns impacted armor with its in_use bit set,
+ * or Null. *resisted is updated to reflect whether
+ * it resisted or not */
+static struct obj *
+maybe_destroy_armor(struct obj *armor, struct obj *atmp, boolean *resisted)
+{
+    if ((armor != 0) && (!atmp || atmp == armor)
+        && ((*resisted = obj_resists(armor, 0, 90)) == FALSE)) {
+        armor->in_use = 1;
+        return armor;
+    }
+    return (struct obj *) 0;
+}
+
 /* hit by destroy armor scroll/black dragon breath/monster spell */
 int
 destroy_arm(struct obj *atmp)
 {
-    struct obj *otmp;
-    boolean losing_gloves = FALSE;
+    struct obj *otmp = (struct obj *) 0;
+    boolean losing_gloves = FALSE, resisted = FALSE,
+            resistedc = FALSE, resistedsuit = FALSE;
     /*
-     * Note: if there were any artifact cloaks, the 90% chance of
-     * resistance here means that the cloak could survive and then
-     * the suit or shirt underneath could be destroyed.  Likewise for
-     * artifact suit over a shirt.  That would be a bug.  Since there
-     * aren't any, we'll just look the other way.
+     * Note: if the cloak resisted, then the suit or shirt underneath
+     *       wouldn't be impacted either. Likewise, if the suit resisted,
+     *       the shirt underneath wouldn't be impacted. Since there are
+     *       no artifact cloaks or suits right now, this is unlikely
+     *       to come into effect, but should it should behave appropriately.
      */
-#define DESTROY_ARM(o) \
-    (((otmp = (o)) != 0 && (!atmp || atmp == otmp)              \
-      && !obj_resists(otmp, 0, 90)) ? (otmp->in_use = 1) : 0)
 
-    if (DESTROY_ARM(uarmc)) {
+    if ((otmp = maybe_destroy_armor(uarmc, atmp, &resistedc)) != 0) {
         urgent_pline("Your %s crumbles and turns to dust!",
                      /* cloak/robe/apron/smock (ID'd apron)/wrapping */
                      cloak_simple_name(otmp));
-    } else if (DESTROY_ARM(uarm)) {
+    } else if (!resistedc
+             && (otmp = maybe_destroy_armor(uarm, atmp, &resistedsuit)) != 0) {
         const char *suit = suit_simple_name(otmp);
 
         /* for gold DSM, we don't want Armor_gone() to report that it
@@ -3067,24 +3084,23 @@ destroy_arm(struct obj *atmp)
                      /* suit might be "dragon scales" so vtense() is needed */
                      suit, vtense(suit, "turn"), vtense(suit, "fall"),
                      surface(u.ux, u.uy));
-    } else if (DESTROY_ARM(uarmu)) {
+    } else if (!resistedc && !resistedsuit
+             && (otmp = maybe_destroy_armor(uarmu, atmp, &resisted)) != 0) {
         urgent_pline("Your %s crumbles into tiny threads and falls apart!",
                      shirt_simple_name(otmp)); /* always "shirt" */
-    } else if (DESTROY_ARM(uarmh)) {
+    } else if ((otmp = maybe_destroy_armor(uarmh, atmp, &resisted)) != 0) {
         urgent_pline("Your %s turns to dust and is blown away!",
                      helm_simple_name(otmp)); /* "helm" or "hat" */
-    } else if (DESTROY_ARM(uarmg)) {
+    } else if ((otmp = maybe_destroy_armor(uarmg, atmp, &resisted)) != 0) {
         urgent_pline("Your %s vanish!", gloves_simple_name(otmp));
         losing_gloves = TRUE;
-    } else if (DESTROY_ARM(uarmf)) {
+    } else if ((otmp = maybe_destroy_armor(uarmf, atmp, &resisted)) != 0) {
         urgent_pline("Your %s disintegrate!", boots_simple_name(otmp));
-    } else if (DESTROY_ARM(uarms)) {
+    } else if ((otmp = maybe_destroy_armor(uarms, atmp, &resisted)) != 0) {
         urgent_pline("Your %s crumbles away!", shield_simple_name(otmp));
     } else {
         return 0; /* could not destroy anything */
     }
-
-#undef DESTROY_ARM
 
     /* cancel_don() if applicable, Cloak_off()/Armor_off()/&c, and useup() */
     wornarm_destroyed(otmp);
