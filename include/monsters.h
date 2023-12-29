@@ -1,4 +1,4 @@
-/* NetHack 3.7	monsters.h	$NHDT-Date: 1700725870 2023/11/23 07:51:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.113 $ */
+/* NetHack 3.7	monsters.h	$NHDT-Date: 1703845746 2023/12/29 10:29:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -417,12 +417,13 @@
           NO_ATTK),
         SIZ(500, 200, MS_HUMANOID, MZ_SMALL), 0, 0, M1_HUMANOID | M1_OMNIVORE,
         M2_COLLECT, M3_INFRAVISIBLE | M3_INFRAVISION, 2, CLR_GREEN, HOBBIT),
+    /* unlike plain human|elf|orc, plain "dwarf" is an ordinary monster */
     MON("dwarf", S_HUMANOID, LVL(2, 6, 10, 10, 4), (G_GENO | 3),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 8), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(900, 300, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_TUNNEL | M1_NEEDPICK | M1_HUMANOID | M1_OMNIVORE,
-        M2_NOPOLY | M2_DWARF | M2_STRONG | M2_GREEDY | M2_JEWELS | M2_COLLECT,
+        M2_DWARF | M2_STRONG | M2_GREEDY | M2_JEWELS | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 4, CLR_RED, DWARF),
     MON("bugbear", S_HUMANOID, LVL(3, 9, 5, 0, -6), (G_GENO | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 4),
@@ -630,10 +631,9 @@
         SIZ(1000, 200, MS_ORC, MZ_HUMAN), 0, 0, M1_HUMANOID | M1_OMNIVORE,
         M2_ORC | M2_STRONG | M2_COLLECT, M3_INFRAVISIBLE | M3_INFRAVISION,
         3, CLR_BROWN, HOBGOBLIN),
-    /* plain "orc" for zombie corpses only; not created at random;
-     * orcs (but not goblins and hobgoblins) are granted poison resistance;
-     * however, their corpses don't confer it
-     */
+    /* Plain "orc" for zombie and mummy corpses only; not created at random.
+     * Orcs (but not goblins and hobgoblins) are granted poison resistance;
+     * however, their corpses don't confer it. */
     MON("orc", S_ORC, LVL(1, 9, 10, 0, -3), (G_GENO | G_NOGEN | G_LGROUP),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 8),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
@@ -1417,12 +1417,13 @@
         M2_HOSTILE | M2_NEUTER, 0, 5, CLR_MAGENTA, VIOLET_FUNGUS),
     /*
      * Gnomes
+     *  Unlike plain human|elf|orc, plain "gnome" is an ordinary monster.
      */
     MON("gnome", S_GNOME, LVL(1, 6, 10, 4, 0), (G_GENO | G_SGROUP | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(650, 100, MS_ORC, MZ_SMALL), 0, 0, M1_HUMANOID | M1_OMNIVORE,
-        M2_NOPOLY | M2_GNOME | M2_COLLECT, M3_INFRAVISIBLE | M3_INFRAVISION,
+        M2_GNOME | M2_COLLECT, M3_INFRAVISIBLE | M3_INFRAVISION,
         3, CLR_BROWN, GNOME),
     MON3("gnome lord", "gnome lady", "gnome leader",
         S_GNOME, LVL(3, 8, 10, 4, 0), (G_GENO | 2),
@@ -2205,14 +2206,15 @@
     /*
      * humans, including elves and were-critters;
      *  the '@' class does not obey rule #2.
+     *  Plain "human" is a placeholder, not a normal monster.
      */
     MON("human", S_HUMAN, LVL(0, 12, 10, 0, 0), G_NOGEN, /* for corpses */
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_HUMANOID | M1_OMNIVORE,
-        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT, M3_INFRAVISIBLE,
-        2, HI_DOMESTIC, HUMAN),
+        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT,
+        M3_INFRAVISIBLE, 2, HI_DOMESTIC, HUMAN),
     MON("wererat", S_HUMAN, LVL(2, 12, 10, 10, -7), (1),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 4),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
@@ -2234,6 +2236,7 @@
         M1_HUMANOID | M1_POIS | M1_REGEN | M1_OMNIVORE,
         M2_NOPOLY | M2_WERE | M2_HOSTILE | M2_HUMAN | M2_COLLECT,
         M3_INFRAVISIBLE, 6, CLR_ORANGE, HUMAN_WEREWOLF),
+    /* plain "elf" is a placeholder, not a normal monster */
     MON("elf", S_HUMAN, LVL(0, 12, 10, 2, -3), G_NOGEN, /* for corpses */
         A(ATTK(AT_WEAP, AD_PHYS, 1, 8),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),

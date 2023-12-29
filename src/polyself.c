@@ -1,4 +1,4 @@
-/* NetHack 3.7	polyself.c	$NHDT-Date: 1702274031 2023/12/11 05:53:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.204 $ */
+/* NetHack 3.7	polyself.c	$NHDT-Date: 1703845752 2023/12/29 10:29:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.207 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -502,6 +502,7 @@ polyself(int psflags)
     if (controllable_poly || forcecontrol) {
         buf[0] = '\0';
         tryct = 5;
+
         do {
             mntmp = NON_PM;
             getlin("Become what kind of monster? [type the name]", buf);
@@ -528,7 +529,28 @@ polyself(int psflags)
                     mntmp = (draconian && class == S_DRAGON)
                             ? armor_to_dragon(uarm->otyp)
                             : mkclass_poly(class);
+
+            /* placeholder monsters are for corpses and all flagged
+               M2_NOPOLY but they are reasonable polymorph targets;
+               pick a suitable substitute (which might be geno'd) */
+            } else if (is_placeholder(&mons[mntmp])
+                       /* when your own race, fall to !polyok() case */
+                       && !your_race(&mons[mntmp])
+                       /* same for generic human, even if hero isn't human */
+                       && mntmp != PM_HUMAN) {
+                /* far less general than mkclass() */
+                if (mntmp == PM_ORC)
+                    mntmp = rn2(3) ? PM_HILL_ORC : PM_MORDOR_ORC;
+                else if (mntmp == PM_ELF)
+                    mntmp = rn2(3) ? PM_GREEN_ELF : PM_GREY_ELF;
+                else if (mntmp == PM_GIANT)
+                    mntmp = rn2(3) ? PM_STONE_GIANT : PM_HILL_GIANT;
+                /* note: PM_DWARF and PM_GNOME are ordinary monsters and
+                   no longer flagged no-poly so have no need for placeholder
+                   handling; PM_HUMAN is a placeholder without a suitable
+                   substitute so gets handled differently below */
             }
+
             if (mntmp < LOW_PM) {
                 if (!class)
                     pline("I've never heard of such monsters.");
@@ -581,6 +603,7 @@ polyself(int psflags)
             } else
                 break;
         } while (--tryct > 0);
+
         if (!tryct)
             pline1(thats_enough_tries);
         /* allow skin merging, even when polymorph is controlled */
