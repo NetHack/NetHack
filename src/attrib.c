@@ -917,7 +917,7 @@ from_what(int propidx) /* special cases can have negative values */
             else if (propidx == BLINDED && u.ucreamed
                      && BlindedTimeout == (long) u.ucreamed
                      && !EBlinded && !(HBlinded & ~TIMEOUT))
-                Sprintf(buf, "due to goop coverting your %s",
+                Sprintf(buf, "due to goop covering your %s",
                         body_part(FACE));
 
             /* remove some verbosity and/or redundancy */
