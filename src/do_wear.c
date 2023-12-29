@@ -3062,10 +3062,10 @@ destroy_arm(struct obj *atmp)
             resistedc = FALSE, resistedsuit = FALSE;
     /*
      * Note: if the cloak resisted, then the suit or shirt underneath
-     *       wouldn't be impacted either. Likewise, if the suit resisted,
-     *       the shirt underneath wouldn't be impacted. Since there are
-     *       no artifact cloaks or suits right now, this is unlikely
-     *       to come into effect, but should it should behave appropriately.
+     * wouldn't be impacted either. Likewise, if the suit resisted, the
+     * shirt underneath wouldn't be impacted. Since there are no artifact
+     * cloaks or suits right now, this is unlikely to come into effect,
+     * but it should behave appropriately if/when the situation changes.
      */
 
     if ((otmp = maybe_destroy_armor(uarmc, atmp, &resistedc)) != 0) {
