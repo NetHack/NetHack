@@ -2747,7 +2747,7 @@ zapyourself(struct obj *obj, boolean ordinary)
             if (ordinary)
                 pline_The("sleep ray hits you!");
             else
-                You("fall alseep!");
+                You("fall asleep!");
             monstunseesu(M_SEEN_SLEEP);
             fall_asleep(-rnd(50), TRUE);
         }
