@@ -1,4 +1,4 @@
-# NetHack 3.7 sysconf $NHDT-Date: 1596498305 2020/08/03 23:45:05 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $
+# NetHack 3.7 sysconf $NHDT-Date: 1704043695 2023/12/31 17:28:15 $ $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.7 $
 # Copyright (c) 2015 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -77,7 +77,7 @@ HIDEUSAGE=1
 
 # Use "Live logging" for important events (achievements, wishes, etc)
 # Only available if NetHack was compiled with LIVELOG.
-# Only really meaningful for public servers.
+# Only really meaningful for public servers or debugging.
 # See the log in-game with #chronicle -command.
 # Bitmask for kinds of things you want to log - combine the following values
 # as desired.
@@ -97,7 +97,7 @@ HIDEUSAGE=1
 # 0x1000 - Log 'minor' achievements - can be spammy
 # 0x2000 - Spoiler event; can include in livelog but hidden from #chronicle
 # 0x4000 - Include as 'major' event in dumplog; can be hidden from livelog
-# 0x8000 - Livelog debug msgs (currently only 'enter new level')
+# 0x8000 - Livelog debug msgs
 #LIVELOG=0x1FFF
 
 # Show debugging information originating from these source files.

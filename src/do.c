@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1702023250 2023/12/08 08:14:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.368 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.376 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1552,7 +1552,7 @@ goto_level(
     if (gl.luacore && nhcb_counts[NHCB_LVL_LEAVE]) {
         lua_getglobal(gl.luacore, "nh_callback_run");
         lua_pushstring(gl.luacore, nhcb_name[NHCB_LVL_LEAVE]);
-        nhl_pcall(gl.luacore, 1, 0);
+        nhl_pcall_handle(gl.luacore, 1, 0, "goto_level", NHLpa_panic);
     }
 
     /* tethered movement makes level change while trapped feasible */

@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1701978168 2023/12/07 19:42:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.120 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.126 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -76,7 +76,7 @@ static int traceback_handler(lua_State *);
 #ifdef NHL_SANDBOX
 static void nhlL_openlibs(lua_State *, uint32_t);
 #endif
-static lua_State *nhlL_newstate (nhl_sandbox_info *);
+static lua_State *nhlL_newstate (nhl_sandbox_info *, const char *);
 static void end_luapat(void);
 
 static const char *const nhcore_call_names[NUM_NHCORE_CALLS] = {
@@ -102,6 +102,12 @@ typedef struct nhl_user_data {
     uint32_t  steps;       /* current counter */
     uint32_t  osteps;      /* original steps value */
     uint32_t  perpcall;    /* per pcall steps value */
+
+        /* stats */
+    uint32_t  statctr;     /* stats step reload count */
+    uint32_t  sid;         /* id number (per state) */
+    const char *name;      /* for stats logging (per pcall) */
+
 #ifdef NHL_SANDBOX
     jmp_buf  jb;
 #endif
@@ -112,12 +118,8 @@ static lua_State *luapat;   /* instance for file pattern matching */
 void
 l_nhcore_init(void)
 {
-#if 1
-    nhl_sandbox_info sbi = {NHL_SB_SAFE, 0, 0, 0};
-#else
-    /* Sample sbi for getting resource usage information. */
-    nhl_sandbox_info sbi = {NHL_SB_SAFE|NHL_SB_REPORT2, 10000000, 10000000, 0};
-#endif
+    nhl_sandbox_info sbi = {NHL_SB_SAFE, 1*1024*1024, 0, 1*1024*1024};
+
     if ((gl.luacore = nhl_init(&sbi)) != 0) {
         if (!nhl_loadlua(gl.luacore, "nhcore.lua")) {
             gl.luacore = (lua_State *) 0;
@@ -163,9 +165,7 @@ l_nhcore_call(int callidx)
     if (ltyp == LUA_TFUNCTION) {
         lua_remove(gl.luacore, -2); /* nhcore_call_names[callidx] */
         lua_remove(gl.luacore, -2); /* nhcore */
-        if (nhl_pcall(gl.luacore, 0, 1)) {
-            impossible("Lua error: %s", lua_tostring(gl.luacore, -1));
-        }
+        nhl_pcall_handle(gl.luacore, 0, 1, "l_nhcore_call", NHLpa_panic);
     } else {
         /*impossible("nhcore.%s is not a lua function",
           nhcore_call_names[callidx]);*/
@@ -1127,9 +1127,9 @@ nhl_variable(lua_State *L)
         else if (typ == LUA_TTABLE) {
             lua_getglobal(gl.luacore, "nh_get_variables_string");
             lua_pushvalue(gl.luacore, -2);
-            nhl_pcall(gl.luacore, 1, 1);
+            nhl_pcall_handle(gl.luacore, 1, 1, "nhl_variable", NHLpa_panic);
             luaL_loadstring(L, lua_tostring(gl.luacore, -1));
-            nhl_pcall(L, 0, 1);
+            nhl_pcall_handle(L, 0, 1, "nhl_variable-1", NHLpa_panic);
         } else
             nhl_error(L, "Cannot get variable of that type");
         return 1;
@@ -1156,9 +1156,9 @@ nhl_variable(lua_State *L)
             lua_getglobal(L, "nh_set_variables_string");
             lua_pushstring(L, key);
             lua_pushvalue(L, -3); /* copy value to top */
-            nhl_pcall(L, 2, 1);
+            nhl_pcall_handle(L, 2, 1, "nhl_variable-2", NHLpa_panic);
             luaL_loadstring(gl.luacore, lua_tostring(L, -1));
-            nhl_pcall(gl.luacore, 0, 0);
+            nhl_pcall_handle(gl.luacore, 0, 0, "nhl_variable-3", NHLpa_panic);
         } else
             nhl_error(L, "Cannot set variable of that type");
         return 0;
@@ -1187,8 +1187,7 @@ get_nh_lua_variables(void)
 
     lua_getglobal(gl.luacore, "get_variables_string");
     if (lua_type(gl.luacore, -1) == LUA_TFUNCTION) {
-        if (nhl_pcall(gl.luacore, 0, 1)) {
-            impossible("Lua error: %s", lua_tostring(gl.luacore, -1));
+        if (nhl_pcall_handle(gl.luacore, 0, 1, "get_nh_lua_variables", NHLpa_impossible)) {
             return key;
         }
         key = dupstr(lua_tostring(gl.luacore, -1));
@@ -1229,7 +1228,7 @@ restore_luadata(NHFILE *nhfp)
         l_nhcore_init();
     luaL_loadstring(gl.luacore, lua_data);
     free(lua_data);
-    nhl_pcall(gl.luacore, 0, 0);
+    nhl_pcall_handle(gl.luacore, 0, 0, "restore_luadata", NHLpa_panic);
 }
 
 /* local stairs = stairways(); */
@@ -1545,7 +1544,7 @@ nhl_callback(lua_State *L)
         lua_getglobal(gl.luacore, rm ? "nh_callback_rm" : "nh_callback_set");
         lua_pushstring(gl.luacore, cb);
         lua_pushstring(gl.luacore, fn);
-        nhl_pcall(gl.luacore, 2, 0);
+        nhl_pcall_handle(gl.luacore, 2, 0, "nhl_callback", NHLpa_panic);
     }
     return 0;
 }
@@ -1867,10 +1866,11 @@ traceback_handler(lua_State *L)
     return 1;
 }
 
-/* lua_pcall with our traceback handler and instruction step limiting.
+/* lua_pcall with our traceback handler and memory and instruction step
+ * limiting.
  *  On error, traceback will be on top of stack */
 int
-nhl_pcall(lua_State *L, int nargs, int nresults)
+nhl_pcall(lua_State *L, int nargs, int nresults, const char *name)
 {
     struct nhl_user_data *nud;
     int rv;
@@ -1879,36 +1879,65 @@ nhl_pcall(lua_State *L, int nargs, int nresults)
     lua_insert(L, 1);
     (void) lua_getallocf(L, (void **) &nud);
 #ifdef NHL_SANDBOX
+    if(nud && name){
+        nud->name = name;
+    }
+    /* NB: We don't need to deal with nud->memlimit - Lua handles that. */
     if (nud && (nud->steps || nud->perpcall)) {
-        if (nud->perpcall)
+        if (nud->perpcall){
             nud->steps = nud->perpcall;
+            nud->statctr = 0;
+        }
         if (setjmp(nud->jb)) {
             /* panic, because we don't know if the game state is corrupt */
-            panic("time exceeded");
+	    /* XXX can we get a lua stack trace as well? */
+            panic("Lua time exceeded %d:%s",nud->sid,nud->name?nud->name:"(unknown)");
         }
     }
 #endif
 
     rv = lua_pcall(L, nargs, nresults, 1);
+
     lua_remove(L, 1); /* remove handler */
 
+
 #ifdef NHL_SANDBOX
-    if (nud && (nud->flags & (NHL_SB_REPORT | NHL_SB_REPORT2)) != 0
-        && (nud->memlimit || nud->osteps || nud->perpcall)) {
-        if (nud->flags & NHL_SB_REPORT2)
-            lua_gc(L, LUA_GCCOLLECT);
-        pline("Lua context=%p RAM: %lu STEPS:%lu", (void *) L,
-              (unsigned long) nud->inuse,
-              (unsigned long) (nud->perpcall
-                               ? (nud->perpcall - nud->steps)
-                               : (nud->osteps - nud->steps)));
+    if(nud && nud->perpcall && gl.loglua){
+        long ic = nud->statctr*NHL_SB_STEPSIZE; // an approximation
+        livelog_printf(LL_DEBUG, "LUASTATS PCAL %d:%s %ld",
+                nud->sid,nud->name,ic);
+    }
+    if(nud && nud->memlimit && gl.loglua){
+        lua_gc(L, LUA_GCCOLLECT);
+        livelog_printf(LL_DEBUG, "LUASTATS PMEM %d:%s %u",
+                nud->sid,nud->name,nud->inuse);
     }
 #endif
-
     return rv;
 }
 
-/* XXX impossible() should be swappable with pline or nothing via flag */
+int
+nhl_pcall_handle(lua_State *L, int nargs, int nresults, const char *name,
+	NHL_pcall_action npa
+){
+    int rv = nhl_pcall(L, nargs, nresults, name);
+    if(rv){
+	nhl_user_data *nud;
+	(void)lua_getallocf(L, (void**)&nud);
+	    /* XXX can we get a lua stack trace as well? */
+	switch(npa){
+	case NHLpa_panic:
+	    panic("time exceeded %d:%s %s", nud->sid,
+		    nud->name?nud->name:"(unknown)", lua_tostring(L, -1));
+	case NHLpa_impossible:
+	    impossible("Lua error: %d:%s %s", nud->sid,
+		    nud->name?nud->name:"(unknown)", lua_tostring(L, -1));
+	}
+    }
+    return rv;
+}
+
+/* XXX impossible() should be swappable with pline/nothing/panic via flag */
 /* read lua code/data from a dlb module or an external file
    into a string buffer and feed that to lua */
 boolean
@@ -2004,8 +2033,7 @@ nhl_loadlua(lua_State *L, const char *fname)
         ret = FALSE;
         goto give_up;
     } else {
-        if (nhl_pcall(L, 0, LUA_MULTRET)) {
-            impossible("Lua error: %s", lua_tostring(L, -1));
+        if (nhl_pcall_handle(L, 0, LUA_MULTRET, fname, NHLpa_impossible)) {
             ret = FALSE;
             goto give_up;
         }
@@ -2017,6 +2045,7 @@ nhl_loadlua(lua_State *L, const char *fname)
     if (buf)
         free((genericptr_t) buf);
     return ret;
+#undef LOADCHUNKSIZE
 }
 
 DISABLE_WARNING_CONDEXPR_IS_CONSTANT
@@ -2038,7 +2067,7 @@ nhl_init(nhl_sandbox_info *sbi)
     }
 #endif
 
-    lua_State *L = nhlL_newstate(sbi);
+    lua_State *L = nhlL_newstate(sbi,"nhl_init");
 
     iflags.in_lua = TRUE;
     /* Temporary for development XXX */
@@ -2092,8 +2121,23 @@ RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 void
 nhl_done(lua_State *L)
 {
-    if (L)
+    if (L) {
+        if(gl.loglua){
+            nhl_user_data *nud;
+            (void)lua_getallocf(L, (void**)&nud);
+            if(nud && nud->osteps){
+                long ic = nud->statctr*NHL_SB_STEPSIZE; // an approximation
+                livelog_printf(LL_DEBUG, "LUASTATS DONE %d:%s %ld",
+                        nud->sid, nud->name,ic);
+            }
+            if(nud && nud->memlimit && !nud->perpcall){
+                lua_gc(L, LUA_GCCOLLECT);
+                livelog_printf(LL_DEBUG, "LUASTATS DMEM %d:%s %u",
+                        nud->sid, nud->name,nud->inuse);
+            }
+        }
         lua_close(L);
+    }
     iflags.in_lua = FALSE;
 }
 
@@ -2124,7 +2168,7 @@ DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 const char *
 get_lua_version(void)
 {
-    nhl_sandbox_info sbi = {NHL_SB_VERSION, 0, 0, 0};
+    nhl_sandbox_info sbi = {NHL_SB_VERSION, 1*1024*1024, 0, 1*1024*1024};
 
     if (gl.lua_ver[0] == 0) {
         lua_State *L = nhl_init(&sbi);
@@ -2176,6 +2220,26 @@ RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 /***
  *** SANDBOX / HARDENING CODE
  ***/
+/*
+ * Tracing the sandbox:
+ * 1. Make sure CHRONICLE and LIVELOG are defined in config.h.
+ * 2. Rebuild the game.
+ * 3. Run the game and do whatever you want to check with lua.
+ * 4. Find the logged information in livelog.
+ *
+ * Logging format in livelog:
+ * <livelog leader>message=LUASTATS <TYPE> <SID>:<TAG> <DATA>
+ * where:
+ *  TYPE
+ *     DONE rough number of step taken during the life of the VM
+ *     DMEM memory in use at destruction of VM
+ *     PCAL rough number of steps during lua_pcall
+ *     PMEM memory in use after lua_pcall returns
+ *  SID     a small integer identifying the Lua VM instance
+ *  TAG     a string from the nhl_luapcall call
+ *  DATA    memory: rough number of bytes in use by the VM(see NHL_ALLOC_ADJUST)
+ *          steps: rough number of steps by the VM(see NHL_SB_STEPSIZE)
+ */
 #ifdef NHL_SANDBOX
 
 enum ewhen {NEVER, IFFLAG, EOT};
@@ -2669,7 +2733,7 @@ nhl_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
         NHL_ALLOC_ADJUST(delta);
         nud->inuse += delta;
         if (nud->inuse > nud->memlimit)
-            return 0;
+            return NULL;
     }
 
     if (nsize == 0) {
@@ -2731,15 +2795,16 @@ nhl_hookfn(lua_State *L, lua_Debug *ar UNUSED)
         longjmp(nud->jb, 1);
 
     nud->steps -= NHL_SB_STEPSIZE;
+    nud->statctr++;
 }
 #endif
 
 static lua_State *
-nhlL_newstate(nhl_sandbox_info *sbi)
+nhlL_newstate(nhl_sandbox_info *sbi, const char *name)
 {
     nhl_user_data *nud = 0;
 
-    if (sbi->memlimit || sbi->steps) {
+    if (sbi->memlimit || sbi->steps || sbi->perpcall) {
         nud = nhl_alloc(NULL, NULL, 0, sizeof (struct nhl_user_data));
         if (!nud)
             return 0;
@@ -2748,9 +2813,15 @@ nhlL_newstate(nhl_sandbox_info *sbi)
         nud->steps = 0;
         nud->osteps = 0;
         nud->flags = sbi->flags; /* save reporting flags */
+        nud->statctr = 0;
         uint32_t sz = sizeof (struct nhl_user_data);
         NHL_ALLOC_ADJUST(sz);
         nud->inuse = sz;
+
+        if(name){
+            nud->name = name;
+        }
+        nud->sid = ++gl.lua_sid;
     }
 
     lua_State *L = lua_newstate(nhl_alloc, nud);

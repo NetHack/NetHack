@@ -1,4 +1,4 @@
-/* NetHack 3.7	mklev.c	$NHDT-Date: 1702839454 2023/12/17 18:57:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.169 $ */
+/* NetHack 3.7	mklev.c	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.174 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -267,7 +267,7 @@ makerooms(void)
     boolean tried_vault = FALSE;
     int themeroom_tries = 0;
     char *fname;
-    nhl_sandbox_info sbi = {NHL_SB_SAFE, 0, 0, 0};
+    nhl_sandbox_info sbi = {NHL_SB_SAFE, 1*1024*1024, 0, 1*1024*1024};
     lua_State *themes = (lua_State *) gl.luathemes[u.uz.dnum];
 
     if (!themes && *(fname = gd.dungeons[u.uz.dnum].themerms)) {
@@ -292,9 +292,7 @@ makerooms(void)
         iflags.in_lua = gi.in_mk_themerooms = TRUE;
         gt.themeroom_failed = FALSE;
         lua_getglobal(themes, "pre_themerooms_generate");
-        if ( nhl_pcall(themes, 0, 0)){
-            impossible("Lua error: %s", lua_tostring(themes, -1));
-        }
+        nhl_pcall_handle(themes, 0, 0, "makerooms-1", NHLpa_impossible);
         iflags.in_lua = gi.in_mk_themerooms = FALSE;
     }
 
@@ -313,9 +311,7 @@ makerooms(void)
                 iflags.in_lua = gi.in_mk_themerooms = TRUE;
                 gt.themeroom_failed = FALSE;
                 lua_getglobal(themes, "themerooms_generate");
-                if (nhl_pcall(themes, 0, 0)) {
-                    impossible("Lua error: %s", lua_tostring(themes, -1));
-                }
+                nhl_pcall_handle(themes, 0, 0, "makerooms-2", NHLpa_panic);
                 iflags.in_lua = gi.in_mk_themerooms = FALSE;
                 if (gt.themeroom_failed
                     && ((themeroom_tries++ > 10)
@@ -332,9 +328,7 @@ makerooms(void)
         iflags.in_lua = gi.in_mk_themerooms = TRUE;
         gt.themeroom_failed = FALSE;
         lua_getglobal(themes, "post_themerooms_generate");
-        if ( nhl_pcall(themes, 0, 0)){
-            impossible("Lua error: %s", lua_tostring(themes, -1));
-        }
+        nhl_pcall_handle(themes, 0, 0, "makerooms-3", NHLpa_panic);
         iflags.in_lua = gi.in_mk_themerooms = FALSE;
 
         wallification(1, 0, COLNO - 1, ROWNO - 1);
@@ -1237,7 +1231,7 @@ makelevel(void)
     if (gl.luacore && nhcb_counts[NHCB_LVL_ENTER]) {
         lua_getglobal(gl.luacore, "nh_callback_run");
         lua_pushstring(gl.luacore, nhcb_name[NHCB_LVL_ENTER]);
-        nhl_pcall(gl.luacore, 1, 0);
+        nhl_pcall_handle(gl.luacore, 1, 0, "makelevel", NHLpa_panic);
     }
 }
 

@@ -1,4 +1,4 @@
-/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1695159628 2023/09/19 21:40:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.339 $ */
+/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.350 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3312,9 +3312,7 @@ lspo_monster(lua_State *L)
 
     if (tmpmons.has_invent && lua_type(L, -1) == LUA_TFUNCTION) {
         lua_remove(L, -2);
-        if (nhl_pcall(L, 0, 0)){
-            impossible("Lua error: %s", lua_tostring(L, -1));
-        }
+        nhl_pcall_handle(L, 0, 0, "lspo_monster", NHLpa_panic);
         spo_end_moninvent();
     } else
         lua_pop(L, 1);
@@ -3659,9 +3657,7 @@ lspo_object(lua_State *L)
     if (lua_type(L, -1) == LUA_TFUNCTION) {
         lua_remove(L, -2);
         nhl_push_obj(L, otmp);
-        if (nhl_pcall(L, 1, 0)){
-            impossible("Lua error: %s", lua_tostring(L, -1));
-        }
+        nhl_pcall_handle(L, 1, 0, "lspo_object", NHLpa_panic);
     } else
         lua_pop(L, 1);
 
@@ -4012,9 +4008,7 @@ lspo_room(lua_State *L)
                 if (lua_type(L, -1) == LUA_TFUNCTION) {
                     lua_remove(L, -2);
                     l_push_mkroom_table(L, tmpcr);
-                    if (nhl_pcall(L, 1, 0)){
-                        impossible("Lua error: %s", lua_tostring(L, -1));
-                    }
+                    nhl_pcall_handle(L, 1, 0, "lspo_room", NHLpa_panic);
                 } else
                     lua_pop(L, 1);
                 spo_endroom(gc.coder);
@@ -6268,9 +6262,7 @@ lspo_region(lua_State *L)
             if (lua_type(L, -1) == LUA_TFUNCTION) {
                 lua_remove(L, -2);
                 l_push_mkroom_table(L, troom);
-                if (nhl_pcall(L, 1, 0)){
-                    impossible("Lua error: %s", lua_tostring(L, -1));
-                }
+                nhl_pcall_handle(L, 1, 0, "lspo_region", NHLpa_panic);
             } else {
                 lua_pop(L, 1);
             }
@@ -6880,9 +6872,7 @@ TODO: gc.coder->croom needs to be updated
     }
     else if (has_contents) {
         l_push_wid_hei_table(L, gx.xsize, gy.ysize);
-        if (nhl_pcall(L, 1, 0)){
-            impossible("Lua error: %s", lua_tostring(L, -1));
-        }
+        nhl_pcall_handle(L, 1, 0, "lspo_map", NHLpa_panic);
         reset_xystart_size();
     }
 
@@ -7049,7 +7039,7 @@ boolean
 load_special(const char *name)
 {
     boolean result = FALSE;
-    nhl_sandbox_info sbi = {NHL_SB_SAFE, 0, 0, 0};
+    nhl_sandbox_info sbi = {NHL_SB_SAFE, 1*1024*1024, 0, 1*1024*1024};
 
     create_des_coder();
 

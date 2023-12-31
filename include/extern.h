@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1703070179 2023/12/20 11:02:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1344 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.1358 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1995,7 +1995,8 @@ extern boolean nhl_loadlua(lua_State *, const char *) NONNULLARG12;
 extern char *get_nh_lua_variables(void);
 extern void save_luadata(NHFILE *) NONNULLARG1;
 extern void restore_luadata(NHFILE *) NONNULLARG1;
-extern int nhl_pcall(lua_State *, int, int) NONNULLARG1;
+extern int nhl_pcall(lua_State *, int, int, const char *) NONNULLARG1;
+extern int nhl_pcall_handle(lua_State *, int, int, const char *, NHL_pcall_action) NONNULLARG1;
 extern boolean load_lua(const char *, nhl_sandbox_info *) NONNULLARG12;
 ATTRNORETURN extern void nhl_error(lua_State *, const char *) NORETURN NONNULLARG12;
 extern void lcheck_param_table(lua_State *) NONNULLARG1;

@@ -1,4 +1,4 @@
-/* NetHack 3.7	config.h	$NHDT-Date: 1702948586 2023/12/19 01:16:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.179 $ */
+/* NetHack 3.7	config.h	$NHDT-Date: 1704043695 2023/12/31 17:28:15 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.181 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -668,6 +668,13 @@ typedef unsigned char uchar;
 /* TEMPORARY - MAKE UNCONDITIONAL BEFORE RELEASE */
 /* undef this to check if sandbox breaks something */
 #define NHL_SANDBOX
+
+#ifdef NHL_SANDBOX
+#ifdef CHRONICLE
+    /* LIVELOG (and therefore CHRONICLE)  is needed for --loglua */
+#define LIVELOG
+#endif
+#endif
 
 /* End of Section 4 */
 

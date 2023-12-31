@@ -1,4 +1,4 @@
-/* NetHack 3.7	global.h	$NHDT-Date: 1657918090 2022/07/15 20:48:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.144 $ */
+/* NetHack 3.7	global.h	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -556,10 +556,6 @@ typedef struct nhl_sandbox_info {
 #define NHL_SB_VERSION     0x40000000
     /* Debugging library - mostly unsafe. */
 #define NHL_SB_DEBUGGING   0x08000000
-    /* Use with memlimit/steps/perpcall to get usage. */
-#define NHL_SB_REPORT      0x04000000
-    /* As above, but do full gc on each nhl_pcall. */
-#define NHL_SB_REPORT2     0x02000000
 
 /* Low level groups.  If you need these, you probably need to define
  * a new high level group instead. */
@@ -594,5 +590,11 @@ typedef struct nhl_sandbox_info {
 #define NHL_SBRV_DENY 1
 #define NHL_SBRV_ACCEPT 2
 #define NHL_SBRV_FAIL 3
+
+/* NHL_pcall_handle action values */
+typedef enum NHL_pcall_action {
+    NHLpa_panic,
+    NHLpa_impossible
+} NHL_pcall_action;
 
 #endif /* GLOBAL_H */
