@@ -463,8 +463,8 @@ struct you {
         uhppeak;             /* highest value of uhpmax so far */
     int uen, uenmax,         /* magical energy, aka spell power */
         uenpeak;             /* highest value of uenmax so far */
-    xint16 uhpinc[MAXULEV],  /* increases to uhpmax for each level gain */
-          ueninc[MAXULEV];   /* increases to uenmax for each level gain */
+    xint16 uhpinc[MAXULEV + 1],  /* increases to uhpmax for each level gain */
+          ueninc[MAXULEV + 1];   /* increases to uenmax for each level gain */
     int ugangr;              /* if the gods are angry at you */
     int ugifts;              /* number of artifacts bestowed */
     int ublessed, ublesscnt; /* blessing/duration from #pray */
