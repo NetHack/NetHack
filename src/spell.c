@@ -673,7 +673,7 @@ rejectcasting(void)
     } else if (!can_chant(&gy.youmonst)) {
         You("are unable to chant the incantation.");
         return TRUE;
-    } else if (!freehand()) {
+    } else if (!freehand() && !(uwep && uwep->otyp == QUARTERSTAFF)) {
         /* Note: !freehand() occurs when weapon and shield (or two-handed
          * weapon) are welded to hands, so "arms" probably doesn't need
          * to be makeplural(bodypart(ARM)).
