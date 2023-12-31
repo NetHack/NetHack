@@ -2082,6 +2082,9 @@ percent_success(int spell)
     if (uarms)
         splcaster += gu.urole.spelshld;
 
+    if (uwep && uwep->otyp == QUARTERSTAFF)
+        splcaster -= 3; /* Small bonus */
+
     if (!paladin_bonus) {
         if (uarmh && is_metallic(uarmh)) /* && otyp != HELM_OF_BRILLIANCE */
             splcaster += uarmhbon;

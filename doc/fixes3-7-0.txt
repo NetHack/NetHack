@@ -1339,6 +1339,7 @@ wishing for a "lit candle" provided one, but the feedback as it was added into
 	invent was "partly used candle (lit)" because of how 'lit' timer works
 don't fall off steed because of Fumbling if saddle is cursed
 cursed welded quarterstaff doesn't prevent spellcasting
+wielded quarterstaff gives a small spellcasting bonus
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
