@@ -147,6 +147,8 @@ struct instance_globals_a {
     int animal_list_count;
 
     /* pickup.c */
+    int A_first_hint; /* menustyle:Full plus 'A' response + !paranoid:A */
+    int A_second_hint; /* menustyle:Full plus 'A' response + paranoid:A */
     boolean abort_looting;
 
     /* shk.c */

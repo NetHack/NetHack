@@ -955,7 +955,7 @@ menu_drop(int retry)
     int n, i, n_dropped = 0;
     struct obj *otmp, *otmp2;
     menu_item *pick_list;
-    boolean all_categories = TRUE, autopick = FALSE;
+    boolean all_categories = TRUE, drop_everything = FALSE, autopick = FALSE;
     boolean drop_justpicked = FALSE;
     long justpicked_quan = 0;
 
@@ -968,19 +968,26 @@ menu_drop(int retry)
                             | BUC_BLESSED | BUC_CURSED | BUC_UNCURSED
                             | BUC_UNKNOWN | JUSTPICKED | INCLUDE_VENOM),
                            &pick_list, PICK_ANY);
-        if (!n || (n == 1 && pick_list[0].item.a_int == 'A'))
+            /* when paranoid_confirm:A is set, 'A' by itself implies
+               'A'+'a' which will be followed by a confirmation prompt;
+               when that option isn't set, 'A' by itself is rejected
+               by query_categorry() and result here will be n==0 */
+        if (!n)
             goto drop_done; /* no non-autopick category filters specified */
+
         for (i = 0; i < n; i++) {
             if (pick_list[i].item.a_int == ALL_TYPES_SELECTED) {
                 all_categories = TRUE;
             } else if (pick_list[i].item.a_int == 'A') {
-                autopick = TRUE;
+                drop_everything = autopick = TRUE;
             } else if (pick_list[i].item.a_int == 'P') {
                 justpicked_quan = max(0, pick_list[i].count);
                 drop_justpicked = TRUE;
+                drop_everything = FALSE;
                 add_valid_menu_class(pick_list[i].item.a_int);
             } else {
                 add_valid_menu_class(pick_list[i].item.a_int);
+                drop_everything = FALSE;
             }
         }
         free((genericptr_t) pick_list);
@@ -992,7 +999,7 @@ menu_drop(int retry)
         i = ggetobj("drop", drop, 0, TRUE, &ggoresults);
         if (i == -2)
             all_categories = TRUE;
-        if (ggoresults & ALL_FINISHED) {
+        if ((ggoresults & ALL_FINISHED) != 0) {
             n_dropped = i;
             goto drop_done;
         }
@@ -1019,7 +1026,7 @@ menu_drop(int retry)
          */
         bypass_objlist(gi.invent, FALSE); /* clear bypass bit for invent */
         while ((otmp = nxt_unbypassed_obj(gi.invent)) != 0) {
-            if (all_categories || allow_category(otmp))
+            if (drop_everything || all_categories || allow_category(otmp))
                 n_dropped += ((drop(otmp) & ECMD_TIME) != 0) ? 1 : 0;
         }
         /* we might not have dropped everything (worn armor, welded weapon,
@@ -1029,8 +1036,8 @@ menu_drop(int retry)
         /* drop the just picked item automatically, if only one stack */
         otmp = find_justpicked(gi.invent);
         if (otmp)
-            n_dropped += ((menudrop_split(otmp, justpicked_quan) & ECMD_TIME)
-                          != 0) ? 1 : 0;
+            n_dropped += ((menudrop_split(otmp, justpicked_quan)
+                           & ECMD_TIME) != 0) ? 1 : 0;
     } else {
         /* should coordinate with perm invent, maybe not show worn items */
         n = query_objlist("What would you like to drop?", &gi.invent,

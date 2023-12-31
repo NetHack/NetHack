@@ -504,9 +504,10 @@ allow_all(struct obj *obj UNUSED)
 boolean
 allow_category(struct obj *obj)
 {
-    /* If no filters are active, nothing will match. */
+    /* If no filters are active, nothing will match unless
+       paranoid_confirm:A is set. */
     if (!gc.class_filter && !gs.shop_filter && !gb.bucx_filter
-        && !gp.picked_filter)
+        && !gp.picked_filter && !ParanoidAutoAll)
         return FALSE;
 
     /* For coins, if any class filter is specified, accept if coins
@@ -1216,41 +1217,54 @@ query_category(
     char invlet;
     int ccount;
     boolean (*ofilter)(OBJ_P) = (boolean (*)(OBJ_P)) 0;
-    boolean do_unpaid = FALSE, do_blessed = FALSE, do_cursed = FALSE,
-            do_uncursed = FALSE, do_buc_unknown = FALSE, verify_All = FALSE;
+    boolean show_a,
+            do_unpaid = FALSE, do_usedup = FALSE,
+            do_blessed = FALSE, do_cursed = FALSE,
+            do_uncursed = FALSE, do_buc_unknown = FALSE,
+            do_worn = FALSE, verify_All = FALSE;
     int num_buc_types = 0, num_justpicked = 0, clr = NO_COLOR;
 
     *pick_list = (menu_item *) 0;
     if (!olist)
         return 0;
-    if ((qflags & UNPAID_TYPES) && count_unpaid(olist))
+    if ((qflags & UNPAID_TYPES) != 0 && count_unpaid(olist))
         do_unpaid = TRUE;
-    if (qflags & WORN_TYPES)
+    /* caller only passes BILLED_TYPES when there are some used up items
+       on shop's bill */
+    if ((qflags & BILLED_TYPES) != 0)
+        do_usedup = TRUE;
+    /* for the 'A' command to remove worn/wielded */
+    if ((qflags & WORN_TYPES) != 0) {
+        do_worn = TRUE;
         ofilter = is_worn;
-    if ((qflags & BUC_BLESSED) && count_buc(olist, BUC_BLESSED, ofilter)) {
+    }
+    if ((qflags & BUC_BLESSED) != 0
+        && count_buc(olist, BUC_BLESSED, ofilter)) {
         do_blessed = TRUE;
         num_buc_types++;
     }
-    if ((qflags & BUC_CURSED) && count_buc(olist, BUC_CURSED, ofilter)) {
+    if ((qflags & BUC_CURSED) != 0
+        && count_buc(olist, BUC_CURSED, ofilter)) {
         do_cursed = TRUE;
         num_buc_types++;
     }
-    if ((qflags & BUC_UNCURSED) && count_buc(olist, BUC_UNCURSED, ofilter)) {
+    if ((qflags & BUC_UNCURSED) != 0
+        && count_buc(olist, BUC_UNCURSED, ofilter)) {
         do_uncursed = TRUE;
         num_buc_types++;
     }
-    if ((qflags & BUC_UNKNOWN) && count_buc(olist, BUC_UNKNOWN, ofilter)) {
+    if ((qflags & BUC_UNKNOWN) != 0
+        && count_buc(olist, BUC_UNKNOWN, ofilter)) {
         do_buc_unknown = TRUE;
         num_buc_types++;
     }
-    if (qflags & JUSTPICKED) {
+    if ((qflags & JUSTPICKED) != 0) {
         num_justpicked = count_justpicked(olist);
     }
 
     ccount = count_categories(olist, qflags);
     /* no point in actually showing a menu for a single category */
-    if (ccount == 1 && !do_unpaid && num_buc_types <= 1
-        && !(qflags & BILLED_TYPES)) {
+    if (ccount == 1 && !do_unpaid && !do_usedup && num_buc_types <= 1) {
         for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
             if (ofilter && !(*ofilter)(curr))
                 continue;
@@ -1272,29 +1286,41 @@ query_category(
     start_menu(win, MENU_BEHAVE_STANDARD);
 
     pack = strcpy(packbuf, flags.inv_order);
-    if (qflags & INCLUDE_VENOM)
+    if ((qflags & INCLUDE_VENOM) != 0)
         (void) strkitten(pack, VENOM_CLASS); /* venom is not in inv_order */
 
-    if (qflags & CHOOSE_ALL) {
+    show_a = ((qflags & ALL_TYPES) != 0 && ccount > 1);
+
+    if ((qflags & CHOOSE_ALL) != 0) {
         invlet = 'A';
         any = cg.zeroany;
         any.a_int = 'A';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 (qflags & WORN_TYPES) ? "Auto-select every item being worn"
-                                       : "Auto-select every relevant item",
+                 /* note: menu_remarm() doesn't pass the CHOOSE_ALL flag,
+                    so do_worn handling here is moot */
+                 do_worn ? "Auto-select every item being worn or wielded"
+                         : "Auto-select every relevant item",
                  MENU_ITEMFLAGS_SKIPINVERT);
         verify_All = (how == PICK_ANY) && ParanoidAutoAll;
-
+        if (!verify_All) {
+            if (!ga.A_first_hint++ || iflags.cmdassist)
+                add_menu_str(win,
+                   "    (ignored unless some other choices are also picked)");
+        } else if (show_a) {
+            if (!ga.A_second_hint++ || iflags.cmdassist)
+                add_menu_str(win,
+                      "    (if no other choices are picked, 'a' is implied)");
+        }
         /* blank separator */
         add_menu_str(win, "");
     }
 
     invlet = 'a';
-    if ((qflags & ALL_TYPES) && (ccount > 1)) {
+    if (show_a) {
         any = cg.zeroany;
         any.a_int = ALL_TYPES_SELECTED;
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 (qflags & WORN_TYPES) ? "All worn types" : "All types",
+                 do_worn ? "All worn and wielded types" : "All types",
                  MENU_ITEMFLAGS_SKIPINVERT);
         ++invlet; /* invlet = 'b'; */
     }
@@ -1328,8 +1354,9 @@ query_category(
         }
     } while (*pack);
 
-    if (do_unpaid || (qflags & BILLED_TYPES) || do_blessed || do_cursed
-        || do_uncursed || do_buc_unknown || num_justpicked) {
+    if (do_unpaid || do_usedup
+        || do_blessed || do_cursed || do_uncursed || do_buc_unknown
+        || num_justpicked) {
         add_menu_str(win, "");
     }
 
@@ -1342,7 +1369,7 @@ query_category(
                  ATR_NONE, clr, "Unpaid items", MENU_ITEMFLAGS_SKIPINVERT);
     }
     /* billed items: checked by caller, so always include if BILLED_TYPES */
-    if (qflags & BILLED_TYPES) {
+    if (do_usedup) {
         invlet = 'x';
         any = cg.zeroany;
         any.a_int = 'x';
@@ -1398,6 +1425,9 @@ query_category(
     }
     end_menu(win, qstr);
     n = select_menu(win, how, pick_list);
+    if (n > 0) {
+        assert(*pick_list != NULL);
+    }
 
     /* handle ParanoidAutoAll by confirming 'A' choice if present */
     if (n > 0 && verify_All) {
@@ -1439,10 +1469,17 @@ query_category(
                 }
                 break; /* from for => goto query_done; */
             }
+    } else if (n == 1 && !verify_All && (*pick_list)[0].item.a_int == 'A') {
+        /* without paranoid_confirm:A, choosing 'A' by itself is rejected */
+        n = 0;
+        free((genericptr_t) *pick_list), *pick_list = 0;
+        /* the menu entry description is "Auto-select every relevant item"
+           [not sure whether issuing a message here is a good idea...] */
+        pline("No relevant items selected.");
     }
  query_done:
     destroy_nhwindow(win);
-    if (n < 0)
+    if (n < 0) /* closed menu with ESC */
         n = 0; /* callers don't expect -1 */
     return n;
 }
@@ -1454,15 +1491,15 @@ count_categories(struct obj *olist, int qflags)
     boolean counted_category;
     int ccount = 0;
     struct obj *curr;
+    boolean do_worn = (qflags & WORN_TYPES) != 0;
 
     pack = flags.inv_order;
     do {
         counted_category = FALSE;
         for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
             if (curr->oclass == *pack) {
-                if ((qflags & WORN_TYPES)
-                    && !(curr->owornmask & (W_ARMOR | W_ACCESSORY
-                                            | W_WEAPONS)))
+                if (do_worn && !(curr->owornmask
+                                 & (W_ARMOR | W_ACCESSORY | W_WEAPONS)))
                     continue;
                 if (!counted_category) {
                     ccount++;
@@ -3171,7 +3208,7 @@ static int
 menu_loot(int retry, boolean put_in)
 {
     int n, i, n_looted = 0;
-    boolean all_categories = TRUE, autopick = FALSE;
+    boolean all_categories = TRUE, loot_everything = FALSE, autopick = FALSE;
     char buf[BUFSZ];
     boolean loot_justpicked = FALSE;
     const char *action = put_in ? "Put in" : "Take out";
@@ -3192,19 +3229,26 @@ menu_loot(int retry, boolean put_in)
         n = query_category(buf,
                            put_in ? gi.invent : gc.current_container->cobj,
                            mflags, &pick_list, PICK_ANY);
-        if (!n || (n == 1 && pick_list[0].item.a_int == 'A'))
+            /* when paranoid_confirm:A is set, 'A' by itself implies
+               'A'+'a' which will be followed by a confirmation prompt;
+               when that option isn't set, 'A' by itself is rejected
+               by query_categorry() and result here will be n==0 */
+        if (!n)
             return ECMD_OK; /* no non-autopick category filters specified */
+
         for (i = 0; i < n; i++) {
             if (pick_list[i].item.a_int == 'A') {
-                autopick = TRUE;
+                loot_everything = autopick = TRUE;
             } else if (put_in && pick_list[i].item.a_int == 'P') {
                 loot_justpicked = TRUE;
                 count = max(0, pick_list[i].count);
                 add_valid_menu_class(pick_list[i].item.a_int);
+                loot_everything = FALSE;
             } else if (pick_list[i].item.a_int == ALL_TYPES_SELECTED) {
                 all_categories = TRUE;
             } else {
                 add_valid_menu_class(pick_list[i].item.a_int);
+                loot_everything = FALSE;
             }
         }
         free((genericptr_t) pick_list);
@@ -3231,7 +3275,7 @@ menu_loot(int retry, boolean put_in)
          */
         for (otmp = firstobj; otmp && gc.current_container; otmp = otmp2) {
             otmp2 = otmp->nobj;
-            if (all_categories || allow_category(otmp)) {
+            if (loot_everything || all_categories || allow_category(otmp)) {
                 res = (*inout_func)(otmp);
                 if (res < 0)
                     break;
