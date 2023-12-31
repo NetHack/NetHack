@@ -3489,10 +3489,6 @@ maybe_explode_trap(
         } else if (is_magical_trap(ttmp->ttyp)) {
             int seeit = cansee(x, y);
 
-            if (!Deaf) {
-                Soundeffect(se_kaboom, 80);
-                pline("Kaboom!");
-            }
             /* note: this explosion mustn't destroy otmp */
             explode(x, y, -WAN_CANCELLATION,
                     20 + d(3, 6), TRAP_EXPLODE, EXPL_MAGICAL);
