@@ -3339,10 +3339,18 @@ xkilled(
     newsym(x, y);
 
  cleanup:
-    /* punish bad behavior */
+    /*
+     * Punish bad behavior.
+     */
     if (is_human(mdat)
         && (!always_hostile(mdat) && mtmp->malign <= 0)
+        /* exclude role monsters */
         && (mndx < PM_ARCHEOLOGIST || mndx > PM_WIZARD)
+        /* exclude plain "human", which isn't flagged as always hostile;
+           it is rare and most likely to occur as the result of resurrecting
+           a corpse or animating a statue and usually will be hostile */
+        && mndx != PM_HUMAN
+        /* only applicable if hero is lawful or neutral */
         && u.ualign.type != A_CHAOTIC) {
         HTelepat &= ~INTRINSIC;
         change_luck(-2);
