@@ -3746,6 +3746,8 @@ applies only to new games.
 .\" Ones less that 8 should be enclosed within double quotes and padded with
 .\" trailing spaces.
 .
+.lp accessiblemsg
+Add location or direction information to messages (default is off).
 .lp acoustics
 Enable messages about what your character hears (default on).
 Note that this has nothing to do with your computer's audio capabilities.
@@ -5934,6 +5936,8 @@ option and use the traditional
 Rogue-like commands.
 .lp paranoid_confirmation:swim
 Prevent walking into water or lava.
+.lp accessiblemsg
+Adds direction or location information to messages.
 .lp autodescribe
 Automatically describe the terrain under the cursor when targeting.
 .lp mention_walls

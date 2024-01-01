@@ -4761,7 +4761,7 @@ dobuzz(
                 goto buzzmonst;
             } else if (zap_hit((int) u.uac, 0)) {
                 range -= 2;
-                pline("%s hits you!", The(flash_str(fltyp, FALSE)));
+                pline_dir(xytod(-dx,-dy), "%s hits you!", The(flash_str(fltyp, FALSE)));
                 if (Reflecting) {
                     if (!Blind) {
                         (void) ureflects("But %s reflects from your %s!",

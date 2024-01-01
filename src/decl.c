@@ -104,6 +104,7 @@ const schar dirs_ord[N_DIRS] =
 NEARDATA boolean has_strong_rngseed = FALSE;
 struct engr *head_engr;
 NEARDATA struct instance_flags iflags;
+NEARDATA struct accessibility_data a11y;
 /* NOTE: the order of these words exactly corresponds to the
    order of oc_material values #define'd in objclass.h. */
 const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
@@ -1057,6 +1058,7 @@ decl_globals_init(void)
 
     ZERO(flags);
     ZERO(iflags);
+    ZERO(a11y);
     ZERO(u);
     ZERO(ubirthday);
     ZERO(urealtime);

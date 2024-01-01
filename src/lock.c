@@ -860,6 +860,7 @@ doopen_indir(coordxy x, coordxy y)
             locked = TRUE;
             break;
         }
+        set_msg_xy(cc.x, cc.y);
         pline("This door%s.", mesg);
         if (locked && flags.autounlock) {
             struct obj *unlocktool;
@@ -887,6 +888,7 @@ doopen_indir(coordxy x, coordxy y)
 
     /* door is known to be CLOSED */
     if (rnl(20) < (ACURRSTR + ACURR(A_DEX) + ACURR(A_CON)) / 3) {
+        set_msg_xy(cc.x, cc.y);
         pline_The("door opens.");
         if (door->doormask & D_TRAPPED) {
             b_trapped("door", FINGER);
@@ -899,6 +901,7 @@ doopen_indir(coordxy x, coordxy y)
         unblock_point(cc.x, cc.y); /* vision: new see through there */
     } else {
         exercise(A_STR, TRUE);
+        set_msg_xy(cc.x, cc.y);
         pline_The("door resists!");
     }
 

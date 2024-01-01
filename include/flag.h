@@ -188,6 +188,11 @@ struct debug_flags {
 #endif
 };
 
+struct accessibility_data {
+    boolean accessiblemsg; /* use msg_loc for plined messages */
+    coord msg_loc;         /* accessiblemsg: location */
+};
+
 /*
  * Stuff that really isn't option or platform related and does not
  * get saved and restored.  They are set and cleared during the game
@@ -438,6 +443,7 @@ struct instance_flags {
 
 extern NEARDATA struct flag flags;
 extern NEARDATA struct instance_flags iflags;
+extern NEARDATA struct accessibility_data a11y;
 
 /* last_msg values
  * Usage:

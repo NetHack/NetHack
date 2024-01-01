@@ -1606,8 +1606,9 @@ mpickgold(register struct monst* mtmp)
         add_to_minv(mtmp, gold);
         if (cansee(mtmp->mx, mtmp->my)) {
             if (flags.verbose && !mtmp->isgd)
-                pline("%s picks up some %s.", Monnam(mtmp),
-                      mat_idx == GOLD ? "gold" : "money");
+                pline_xy(mtmp->mx, mtmp->my,
+                         "%s picks up some %s.", Monnam(mtmp),
+                         mat_idx == GOLD ? "gold" : "money");
             newsym(mtmp->mx, mtmp->my);
         }
     }
@@ -1666,7 +1667,8 @@ mpickstuff(struct monst *mtmp)
                 char *otmpname = distant_name(otmp, doname);
 
                 if (flags.verbose)
-                    pline("%s picks up %s.", Monnam(mtmp), otmpname);
+                    pline_xy(mtmp->mx, mtmp->my,
+                             "%s picks up %s.", Monnam(mtmp), otmpname);
             }
             obj_extract_self(otmp3);      /* remove from floor */
             (void) mpickobj(mtmp, otmp3); /* may merge and free otmp3 */

@@ -1023,7 +1023,7 @@ thrwmu(struct monst* mtmp)
 
         if (canseemon(mtmp)) {
             onm = xname(otmp);
-            pline("%s %s %s.", Monnam(mtmp),
+            pline_xy(mtmp->mx, mtmp->my, "%s %s %s.", Monnam(mtmp),
                   /* "thrusts" or "swings", or "bashes with" if adjacent */
                   mswings_verb(otmp, (rang <= 2) ? TRUE : FALSE),
                   obj_is_pname(otmp) ? the(onm) : an(onm));

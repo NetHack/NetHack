@@ -92,6 +92,47 @@ pline(const char *line, ...)
     va_end(the_args);
 }
 
+void
+pline_dir(int dir, const char *line, ...)
+{
+    va_list the_args;
+
+    set_msg_dir(dir);
+
+    va_start(the_args, line);
+    vpline(line, the_args);
+    va_end(the_args);
+}
+
+void
+pline_xy(coordxy x, coordxy y, const char *line, ...)
+{
+    va_list the_args;
+
+    set_msg_xy(x, y);
+
+    va_start(the_args, line);
+    vpline(line, the_args);
+    va_end(the_args);
+}
+
+/* set the direction where next message happens */
+void
+set_msg_dir(int dir)
+{
+    dtoxy(&a11y.msg_loc, dir);
+    a11y.msg_loc.x += u.ux;
+    a11y.msg_loc.y += u.uy;
+}
+
+/* set the coordinate where next message happens */
+void
+set_msg_xy(coordxy x, coordxy y)
+{
+    a11y.msg_loc.x = x;
+    a11y.msg_loc.y = y;
+}
+
 static void
 vpline(const char *line, va_list the_args)
 {
@@ -109,6 +150,24 @@ vpline(const char *line, va_list the_args)
 #endif
     if (gp.program_state.wizkit_wishing)
         return;
+
+    if (a11y.accessiblemsg && isok(a11y.msg_loc.x,a11y.msg_loc.y)) {
+        char *tmp;
+        char *dirstr;
+        static char dirstrbuf[BUFSZ];
+        int g = (iflags.getpos_coords == GPCOORDS_NONE)
+            ? GPCOORDS_COMFULL : iflags.getpos_coords;
+
+        dirstr = coord_desc(a11y.msg_loc.x, a11y.msg_loc.y, dirstrbuf, g);
+        a11y.msg_loc.x = a11y.msg_loc.y = 0;
+        tmp = (char *)alloc(strlen(line) + sizeof ": " + strlen(dirstr));
+        Strcpy(tmp, dirstr);
+        Strcat(tmp, ": ");
+        Strcat(tmp, line);
+        vpline(tmp, the_args);
+        free((genericptr_t) tmp);
+        return;
+    }
 
     if (!strchr(line, '%')) {
         /* format does not specify any substitutions; use it as-is */

@@ -1808,7 +1808,8 @@ trapeffect_pit(
                 /* openfallingtrap; not inescapable here */
                 if (in_sight) {
                     seetrap(trap);
-                    pline("%s doesn't fall into the pit.", Monnam(mtmp));
+                    pline_xy(mtmp->mx, mtmp->my,
+                             "%s doesn't fall into the pit.", Monnam(mtmp));
                 }
                 return Trap_Effect_Finished;
             }
@@ -1819,8 +1820,9 @@ trapeffect_pit(
         if (!passes_walls(mptr))
             mtmp->mtrapped = 1;
         if (in_sight) {
-            pline("%s %s into %s pit!", Monnam(mtmp), fallverb,
-                  a_your[trap->madeby_u]);
+            pline_xy(mtmp->mx, mtmp->my,
+                     "%s %s into %s pit!", Monnam(mtmp), fallverb,
+                     a_your[trap->madeby_u]);
             if (mptr == &mons[PM_PIT_VIPER]
                 || mptr == &mons[PM_PIT_FIEND])
                 pline("How pitiful.  Isn't that the pits?");
@@ -1872,18 +1874,20 @@ trapeffect_hole(
                 if (in_sight) {
                     seetrap(trap);
                     if (tt == TRAPDOOR)
-                        pline(
+                        pline_xy(mtmp->mx, mtmp->my,
                             "A trap door opens, but %s doesn't fall through.",
                               mon_nam(mtmp));
                     else /* (tt == HOLE) */
-                        pline("%s doesn't fall through the hole.",
-                              Monnam(mtmp));
+                        pline_xy(mtmp->mx, mtmp->my,
+                                 "%s doesn't fall through the hole.",
+                                 Monnam(mtmp));
                 }
                 return Trap_Effect_Finished; /* inescapable = FALSE; */
             }
             if (inescapable) { /* sokoban hole */
                 if (in_sight) {
-                    pline("%s seems to be yanked down!", Monnam(mtmp));
+                    pline_xy(mtmp->mx, mtmp->my,
+                             "%s seems to be yanked down!", Monnam(mtmp));
                     /* suppress message in mlevel_tele_trap() */
                     in_sight = FALSE;
                     seetrap(trap);

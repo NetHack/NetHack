@@ -63,7 +63,8 @@ cursetxt(struct monst *mtmp, boolean undirected)
         else
             point_msg = "at you, then curses";
 
-        pline("%s points %s.", Monnam(mtmp), point_msg);
+        pline_xy(mtmp->mx, mtmp->my,
+                 "%s points %s.", Monnam(mtmp), point_msg);
     } else if ((!(gm.moves % 4) || !rn2(4))) {
         if (!Deaf)
             Norep("You hear a mumbled curse.");   /* Deaf-aware */
@@ -238,7 +239,7 @@ castmu(
        penalizing mspec_used. */
     if (!foundyou && thinks_it_foundyou
         && !is_undirected_spell(mattk->adtyp, spellnum)) {
-        pline("%s casts a spell at %s!",
+        pline_xy(mtmp->mx, mtmp->my, "%s casts a spell at %s!",
               canseemon(mtmp) ? Monnam(mtmp) : "Something",
               is_waterwall(mtmp->mux,mtmp->muy) ? "empty water"
                                                 : "thin air");
@@ -248,12 +249,14 @@ castmu(
     nomul(0);
     if (rn2(ml * 10) < (mtmp->mconf ? 100 : 20)) { /* fumbled attack */
         Soundeffect(se_air_crackles, 60);
-        if (canseemon(mtmp) && !Deaf)
+        if (canseemon(mtmp) && !Deaf) {
+            set_msg_xy(mtmp->mx, mtmp->my);
             pline_The("air crackles around %s.", mon_nam(mtmp));
+        }
         return M_ATTK_MISS;
     }
     if (canspotmon(mtmp) || !is_undirected_spell(mattk->adtyp, spellnum)) {
-        pline("%s casts a spell%s!",
+        pline_xy(mtmp->mx, mtmp->my, "%s casts a spell%s!",
               canspotmon(mtmp) ? Monnam(mtmp) : "Something",
               is_undirected_spell(mattk->adtyp, spellnum)
                   ? ""

@@ -135,6 +135,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 "your starting alignment (lawful, neutral, or chaotic)")
     /* end of special ordering; remainder of entries are in alphabetical order
      */
+    NHOPTB(accessiblemsg, Advanced, 0, opt_out, set_in_game,
+           Off, Yes, No, No, NoAlias, &a11y.accessiblemsg, Term_False,
+           "add location information to messages")
     NHOPTB(acoustics, Advanced, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.acoustics, Term_False,
            "can your character hear anything")

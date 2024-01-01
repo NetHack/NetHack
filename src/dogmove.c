@@ -437,7 +437,7 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
                             char *otmpname = distant_name(otmp, doname);
 
                             if (flags.verbose)
-                                pline("%s picks up %s.",
+                                pline_xy(omx, omy, "%s picks up %s.",
                                       Monnam(mtmp), otmpname);
                         }
                         obj_extract_self(otmp);

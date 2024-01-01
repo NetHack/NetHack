@@ -976,7 +976,7 @@ test_move(
                         Sprintf(buf, "solid stone");
                     else
                         Sprintf(buf, "%s", an(firstmatch));
-                    pline("It's %s.", buf);
+                    pline_dir(xytod(dx, dy), "It's %s.", buf);
                 }
             }
             return FALSE;
@@ -1116,7 +1116,7 @@ test_move(
         if (mode != TEST_TRAV && gc.context.run >= 2
             && !(Blind || Hallucination) && !could_move_onto_boulder(x, y)) {
             if (mode == DO_MOVE && flags.mention_walls)
-                pline("A boulder blocks your path.");
+                pline_dir(xytod(dx,dy), "A boulder blocks your path.");
             return FALSE;
         }
         if (mode == DO_MOVE) {
@@ -2194,9 +2194,11 @@ avoid_moving_on_trap(coordxy x, coordxy y, boolean msg)
     struct trap *trap;
 
     if ((trap = t_at(x, y)) && trap->tseen) {
-        if (msg && flags.mention_walls)
+        if (msg && flags.mention_walls) {
+            set_msg_xy(x, y);
             You("stop in front of %s.",
                 an(trapname(trap->ttyp, FALSE)));
+        }
         return TRUE;
     }
     return FALSE;
@@ -2222,9 +2224,11 @@ avoid_moving_on_liquid(
            polyforms are allowed to move over water */
         return FALSE; /* liquid is safe to traverse */
     } else if (is_pool_or_lava(x, y) && levl[x][y].seenv) {
-        if (msg && flags.mention_walls)
+        if (msg && flags.mention_walls) {
+            set_msg_xy(x, y);
             You("stop at the edge of the %s.",
                 hliquid(is_pool(x,y) ? "water" : "lava"));
+        }
         return TRUE;
     }
     return FALSE;
@@ -3522,7 +3526,7 @@ lookaround(void)
                 if ((gc.context.run != 1 && !is_safemon(mtmp))
                     || (infront && !gc.context.travel)) {
                     if (flags.mention_walls)
-                        pline("%s blocks your path.",
+                        pline_xy(x, y, "%s blocks your path.",
                               upstart(a_monnam(mtmp)));
                     goto stop;
                 }
@@ -3553,8 +3557,10 @@ lookaround(void)
                 if (x != u.ux && y != u.uy)
                     continue;
                 if (gc.context.run != 1 && !gc.context.travel) {
-                    if (flags.mention_walls)
+                    if (flags.mention_walls) {
+                        set_msg_xy(x, y);
                         You("stop in front of the door.");
+                    }
                     goto stop;
                 }
                 /* we're orthogonal to a closed door, consider it a corridor */
