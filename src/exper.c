@@ -240,6 +240,8 @@ losexp(
         livelog_printf(LL_MINORAC, "lost all experience");
     }
 
+    assert(u.ulevel >= 0 && u.ulevel < MAXULEV);
+
     olduhpmax = u.uhpmax;
     uhpmin = minuhpmax(10); /* same minimum as is used by life-saving */
     num = (int) u.uhpinc[u.ulevel];
