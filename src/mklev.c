@@ -1078,6 +1078,8 @@ makelevel(void)
     oinit(); /* assign level dependent obj probabilities */
     clear_level_structures();
 
+    alloc_doors();
+
     /* check for special levels */
     if (slev && !Is_rogue_level(&u.uz)) {
         makemaz(slev->proto);
