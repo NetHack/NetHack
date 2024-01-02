@@ -1026,6 +1026,9 @@ adjabil(int oldlevel, int newlevel)
     }
 }
 
+/* called when gaining a level (before u.ulevel gets incremented);
+   also called with u.ulevel==0 during hero initialization or for
+   re-init if hero turns into a "new man/woman/elf/&c" */
 int
 newhp(void)
 {
@@ -1115,55 +1118,67 @@ setuhpmax(int newmax)
         u.uhp = u.uhpmax, gc.context.botl = TRUE;
 }
 
+/* return the current effective value of a specific characteristic
+   (the 'a' in 'acurr()' comes from outdated use of "attribute" for the
+   six Str/Dex/&c characteristics; likewise for u.abon, u.atemp, u.acurr) */
 schar
-acurr(int x)
+acurr(int chridx)
 {
-    register int tmp = (u.abon.a[x] + u.atemp.a[x] + u.acurr.a[x]);
+    int tmp, result = 0; /* 'result' will always be reset to positive value */
 
-    if (x == A_STR) {
-        if (tmp >= 125 || (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER))
-            return (schar) 125;
-        else
-#ifdef WIN32_BUG
-            return (x = ((tmp <= 3) ? 3 : tmp));
-#else
-            return (schar) ((tmp <= 3) ? 3 : tmp);
-#endif
-    } else if (x == A_CHA) {
-        if (tmp < 18
-            && (gy.youmonst.data->mlet == S_NYMPH
-                || u.umonnum == PM_AMOROUS_DEMON))
-            return (schar) 18;
-    } else if (x == A_CON) {
+    assert(chridx >= 0 && chridx < A_MAX);
+    tmp = u.abon.a[chridx] + u.atemp.a[chridx] + u.acurr.a[chridx];
+
+    /* for Strength:  3 <= result <= 125;
+       for all others:  3 <= result <= 25 */
+    if (chridx == A_STR) {
+        /* strength value is encoded:  3..18 normal, 19..118 for 18/xx (with
+           1 <= xx <= 100), and 119..125 for other characteristics' 19..25;
+           STR18(x) yields 18 + x (intended for 0 <= x <= 100; not used here);
+           STR19(y) yields 100 + y (intended for 19 <= y <= 25) */
+        if (tmp >= STR19(25) || (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER))
+            result = STR19(25); /* 125 */
+    } else if (chridx == A_CHA) {
+        if (tmp < 18 && (gy.youmonst.data->mlet == S_NYMPH
+                         || u.umonnum == PM_AMOROUS_DEMON))
+            result = 18;
+    } else if (chridx == A_CON) {
         if (u_wield_art(ART_OGRESMASHER))
-            return (schar) 25;
-    } else if (x == A_INT || x == A_WIS) {
-        /* yes, this may raise int/wis if player is sufficiently
-         * stupid.  there are lower levels of cognition than "dunce".
-         */
+            result = 25;
+    } else if (chridx == A_INT || chridx == A_WIS) {
+        /* Yes, this may raise Int and/or Wis if hero is sufficiently
+           stupid.  There are lower levels of cognition than "dunce". */
         if (uarmh && uarmh->otyp == DUNCE_CAP)
-            return (schar) 6;
+            result = 6;
+    } else if (chridx == A_DEX) {
+        ; /* there aren't any special cases for dexterity */
     }
-#ifdef WIN32_BUG
-    return (x = ((tmp >= 25) ? 25 : (tmp <= 3) ? 3 : tmp));
-#else
-    return (schar) ((tmp >= 25) ? 25 : (tmp <= 3) ? 3 : tmp);
-#endif
+
+    if (result == 0) /* none of the special cases applied */
+        result = (tmp >= 25) ? 25 : (tmp <= 3) ? 3 : tmp;
+
+    return (schar) result;
 }
 
-/* condense clumsy ACURR(A_STR) value into value that fits into game formulas
- */
+/* condense clumsy ACURR(A_STR) value into value that fits into formulas */
 schar
 acurrstr(void)
 {
-    register int str = ACURR(A_STR);
+    int str = ACURR(A_STR), /* 3..125 after massaging by acurr() */
+        result; /* 3..25 */
 
-    if (str <= 18)
-        return (schar) str;
-    if (str <= 121)
-        return (schar) (19 + str / 50); /* map to 19..21 */
-    else
-        return (schar) (min(str, 125) - 100); /* 22..25 */
+    if (str <= STR18(0)) /* <= 18; max(,3) here is redundant */
+        result = max(str, 3); /* 3..18 */
+    else if (str <= STR19(21)) /* <= 121 */
+        /* this converts
+           18/01..18/31 into 19,
+           18/32..18/81 into 20,
+           18/82..18/100 and 19..21 into 21 */
+        result = 19 + str / 50; /* map to 19..21 */
+    else /* convert 122..125; min(,125) here is redundant */
+        result = min(str, 125) - 100; /* 22..25 */
+
+    return (schar) result;
 }
 
 /* when wearing (or taking off) an unID'd item, this routine is used
