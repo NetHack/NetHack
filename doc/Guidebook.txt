@@ -15,7 +15,7 @@
                        Original version - Eric S. Raymond
      (Edited and expanded for NetHack 3.7.0 by Mike Stephenson and others)
 
-                               December 08, 2023
+                                January 02, 2024
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -192,7 +192,7 @@
      NetHack  continues  this  fine tradition.  Unlike text adventure games
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -324,7 +324,7 @@
           dealing with magic).  It affects your magical energy.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -390,7 +390,7 @@
           The  number  of  turns  elapsed so far, displayed if you have the
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -522,7 +522,7 @@
           vicious.  Sometimes, however, they can be helpful.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -588,7 +588,7 @@
           another location; `,'  will  explain  the  symbol  but  skip  any
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -654,7 +654,7 @@
           one  class  of  objects  present  (where there won't be any "what
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -720,7 +720,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -786,7 +786,7 @@
           and novelty (`P', recently picked up items; controlled by picking
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -852,7 +852,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -984,7 +984,7 @@
           not wielding a bow, you are throwing  it  by  hand  and  it  will
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -1050,7 +1050,7 @@
           switch  from  normal  play  to  "explore  mode",  also  known  as
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -1116,7 +1116,7 @@
      (R)UNIX is a registered trademark of The Open Group.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -1182,7 +1182,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -1248,7 +1248,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -1314,7 +1314,7 @@
           Engrave writing on the floor.  Default key is `E'.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -1446,7 +1446,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -1512,7 +1512,7 @@
           tion:quit option to require a response of yes instead.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -1578,7 +1578,7 @@
           Read a scroll, a spellbook, or something else.   Default  key  is
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -1644,7 +1644,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -1710,7 +1710,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -1776,7 +1776,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -1842,7 +1842,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -1908,7 +1908,7 @@
           bug mode only.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -1974,7 +1974,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -2040,7 +2040,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -2106,7 +2106,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -2172,7 +2172,7 @@
      will eliminate the trap but failure will set off the trap's explosion.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -2238,7 +2238,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -2304,7 +2304,7 @@
      tures  will  displace you during the climb.  When that occurs, the pet
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -2370,7 +2370,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -2436,7 +2436,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -2502,7 +2502,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -2568,7 +2568,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -2634,7 +2634,7 @@
      you'll either have to discard some of what you're carrying or collapse
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -2700,7 +2700,7 @@
      avoid cursed objects than other  character  roles.   Dropping  objects
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -2766,7 +2766,7 @@
      changes  your  primary  (the one being wielded) and alternate weapons.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -2832,7 +2832,7 @@
      quiver.  The fire command also has extra assistance, if fireassist  is
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -2898,7 +2898,7 @@
      the next skill level (unless you've already reached the limit for this
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -2964,7 +2964,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3030,7 +3030,7 @@
      "food."   Many,  but  not all, of these are edible; some also give you
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3096,7 +3096,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3162,7 +3162,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3228,7 +3228,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3294,7 +3294,7 @@
      (if you have a sling).  In the most desperate of cases, you can  still
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3360,7 +3360,7 @@
      the  unseen  monster actually took the object.  If the object is still
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3426,7 +3426,7 @@
      mind flayer, is considered eating an animal, although wax is  only  an
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3492,7 +3492,7 @@
      you to receive a luck penalty.  No message about that is given at  the
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3558,7 +3558,7 @@
      Tune       - Discovered the tune that can be used to  open  and  close
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3624,7 +3624,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3690,7 +3690,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3756,7 +3756,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3822,7 +3822,7 @@
        Override  one or more symbols in the symbol set used for all dungeon
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3888,7 +3888,7 @@
      fruit is set to "lime", you would enter the command
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3930,6 +3930,9 @@
      with the game.  Changing a persistent option in the configuration file
      applies only to new games.
 
+     accessiblemsg
+       Add location or direction information to messages (default is off).
+
      acoustics
        Enable messages about what your character hears (default on).   Note
        that this has nothing to do with your computer's audio capabilities.
@@ -3948,13 +3951,10 @@
        location  on  the  map (default true).  The whatis_coord option con-
        trols whether the description includes map coordinates.
 
-     autodig
-       Automatically dig if you are wielding a digging tool and moving into
-       a place that can be dug (default false).  Persistent.
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -3963,6 +3963,10 @@
      NetHack Guidebook                                                   61
 
 
+
+     autodig
+       Automatically dig if you are wielding a digging tool and moving into
+       a place that can be dug (default false).  Persistent.
 
      autoopen
        Walking into a closed door attempts to open it (default true).  Per-
@@ -4013,14 +4017,10 @@
        Omitting the value is treated as if autounlock:apply-key.  Preceding
        autounlock with `!' or "no" is treated as autounlock:none.
 
-       Applying a key might set off a trap if  the  door  or  container  is
-       trapped.   Successfully  kicking  a  door  will break it and wake up
-       nearby monsters.  Successfully forcing a container open  will  break
-       its  lock and might also destroy some of its contents or damage your
-       weapon or both.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -4029,6 +4029,12 @@
      NetHack Guidebook                                                   62
 
 
+
+       Applying a key might set off a trap if  the  door  or  container  is
+       trapped.   Successfully  kicking  a  door  will break it and wake up
+       nearby monsters.  Successfully forcing a container open  will  break
+       its  lock and might also destroy some of its contents or damage your
+       weapon or both.
 
        The default is Apply-Key.  Persistent.
 
@@ -4078,15 +4084,9 @@
        Controls what information the program reveals when  the  game  ends.
        Value is a space separated list of prompting/category pairs (default
        is "ni na nv ng nc no", prompt with default response of `n' for each
-       candidate).  Persistent.  The possibilities are:
 
 
-
-
-
-
-
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -4095,6 +4095,8 @@
      NetHack Guidebook                                                   63
 
 
+
+       candidate).  Persistent.  The possibilities are:
 
             i - disclose your inventory;
             a - disclose your attributes;
@@ -4148,11 +4150,9 @@
        terface  except  that it does not require that you hit Enter.  It is
        implemented for the tty interface (default off).
 
-       For the X11 interface, which always uses a menu for choosing an  ex-
-       tended  command,  it  controls  whether the menu shows all available
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -4162,6 +4162,8 @@
 
 
 
+       For the X11 interface, which always uses a menu for choosing an  ex-
+       tended  command,  it  controls  whether the menu shows all available
        commands (on) or just the subset of commands which  have  tradition-
        ally been considered extended ones (off).
 
@@ -4213,12 +4215,10 @@
        `/'  command,  ask if you want to see it (default on).  Turning help
        off makes just looking at things faster,  since  you  aren't  inter-
        rupted  with  the  "More  info?"  prompt, but it also means that you
-       might miss some interesting and/or important  information.   Persis-
-       tent.
+       might  miss   some   interesting   and/or   important   information.
 
 
-
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -4227,6 +4227,8 @@
      NetHack Guidebook                                                   65
 
 
+
+       Persistent.
 
      herecmd_menu
        When using a windowport that supports mouse and clicking on yourself
@@ -4282,9 +4284,7 @@
        and `b' (default off).  Persistent.
 
 
-
-
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -4350,7 +4350,7 @@
        all ports can actually display all types.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -4416,7 +4416,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -4482,7 +4482,7 @@
        -1 - by letters but use `z' to go northwest, `y' to zap wands
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -4548,7 +4548,7 @@
                      `y', set Confirm too);
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -4614,7 +4614,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -4680,7 +4680,7 @@
        empty  value  reverts to "all".)  If you want to avoid automatically
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -4746,7 +4746,7 @@
        role.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -4812,7 +4812,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -4878,7 +4878,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -4944,7 +4944,7 @@
        "symset:default" to explicitly select the default symbols.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -5010,7 +5010,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -5076,7 +5076,7 @@
      Not all window ports will adjust for all settings  listed  here.   You
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -5142,7 +5142,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -5208,7 +5208,7 @@
        If NetHack can, it should display a menu of existing saved games for
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -5274,7 +5274,7 @@
        Specify the preferred width of each tile in a tile capable port
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -5340,7 +5340,7 @@
      btntext,  captiontext,  graytext,  greytext, highlight, highlighttext,
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -5406,7 +5406,7 @@
        display  tiles,  using  the  full  capability  of  the VGA hardware.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -5472,7 +5472,7 @@
             > - never pickup an object that matches rest of pattern.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -5538,7 +5538,7 @@
        text", and if bound to same keys, only one of those commands will be
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -5604,7 +5604,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -5670,7 +5670,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -5736,7 +5736,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -5802,7 +5802,7 @@
      ports support the use of user sounds.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -5868,7 +5868,7 @@
      OPTION=hilite_status:wisdom/down/red/up/green
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -5934,7 +5934,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6000,7 +6000,7 @@
      tax for a configuration file.
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6066,7 +6066,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6132,7 +6132,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6198,7 +6198,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6264,7 +6264,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6330,7 +6330,7 @@
      representation  for  all  NetHack  glyphs  that  would  map  to   that
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6396,7 +6396,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6405,6 +6405,9 @@
      NetHack Guidebook                                                   98
 
 
+
+     accessiblemsg
+       Adds direction or location information to messages.
 
      autodescribe
        Automatically describe the terrain under the cursor when targeting.
@@ -6457,12 +6460,9 @@
        SAVEFORMAT = A list of up to two  save  file  formats  separated  by
        space.   The  first format in the list will written as well as read.
        The second format will be read only if no save  file  in  the  first
-       format exists.  Valid choices are "historical" for binary writing of
-       entire  structs,  "lendian" for binary writing of each field in lit-
-       tle-endian order, "ascii" for writing the save file content in ascii
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6472,6 +6472,9 @@
 
 
 
+       format exists.  Valid choices are "historical" for binary writing of
+       entire  structs,  "lendian" for binary writing of each field in lit-
+       tle-endian order, "ascii" for writing the save file content in ascii
        text.
 
        BONESFORMAT = A list of up to two bones file  formats  separated  by
@@ -6523,12 +6526,9 @@
 
        PORTABLE_DEVICE_PATHS = 0 or 1 Windows OS only, the game  will  look
        for  all of its external files, and write to all of its output files
-       in one place rather than at the standard locations.
 
 
-
-
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6537,6 +6537,8 @@
      NetHack Guidebook                                                  100
 
 
+
+       in one place rather than at the standard locations.
 
        DUMPLOGFILE = A filename where the  end-of-game  dumplog  is  saved.
        Not  defining  this  will  prevent dumplog from being created.  Only
@@ -6589,12 +6591,10 @@
      live,  or quit and stop with whatever you have.  If you quit, you keep
      all your gold, but if you swing and live, you might find more.
 
-          If you just want to see what the current top  players/games  list
-     is, you can type nethack -s all on most versions.
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6603,6 +6603,9 @@
      NetHack Guidebook                                                  101
 
 
+
+          If you just want to see what the current top  players/games  list
+     is, you can type nethack -s all on most versions.
 
      11.  Explore mode
 
@@ -6655,12 +6658,9 @@
           Andries Brouwer did a major re-write while at Stichting  Mathema-
      tisch  Centrum (now Centrum Wiskunde & Informatica), transforming Hack
      into a very different game.  He published the Hack source code for use
-     on UNIX systems by posting that to Usenet newsgroup net.sources (later
-     renamed comp.sources) releasing version 1.0 in December of 1984,  then
-     versions  1.0.1,  1.0.2,  and  finally  1.0.3 in July of 1985.  Usenet
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6670,6 +6670,9 @@
 
 
 
+     on UNIX systems by posting that to Usenet newsgroup net.sources (later
+     renamed comp.sources) releasing version 1.0 in December of 1984,  then
+     versions  1.0.1,  1.0.2,  and  finally  1.0.3 in July of 1985.  Usenet
      newsgroup net.games.hack (later renamed rec.games.hack, eventually re-
      placed by rec.games.roguelike.nethack) was created for discussing it.
 
@@ -6721,12 +6724,9 @@
      tured the game's design, and re-wrote major parts of the  code.   They
      added  multiple  dungeons, a new display, special individual character
      quests, a new endgame  and  many  other  new  features,  and  produced
-     NetHack 3.1.  Version 3.1.0 was released in January of 1993.
 
 
-
-
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6735,6 +6735,8 @@
      NetHack Guidebook                                                  103
 
 
+
+     NetHack 3.1.  Version 3.1.0 was released in January of 1993.
 
           Ken Lorber, Gregg Wonderly and Greg Olson, with help from Richard
      Addison,  Mike Passaretti, and Olaf Seibert, developed NetHack 3.1 for
@@ -6788,11 +6790,9 @@
      cancer and passed away.  That release of the game was dedicated to him
      by the development and porting teams.
 
-          Version 3.2 proved to be  more  stable  than  previous  versions.
-     Many  bugs  were fixed, abuses eliminated, and game features tuned for
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6802,6 +6802,8 @@
 
 
 
+          Version 3.2 proved to be  more  stable  than  previous  versions.
+     Many  bugs  were fixed, abuses eliminated, and game features tuned for
      better game play.
 
           During the lifespan of NetHack 3.1 and 3.2,  several  enthusiasts
@@ -6856,9 +6858,7 @@
      year and a half.
 
 
-
-
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6924,7 +6924,7 @@
      ment  Team's official nethack.org website to that effect, stating that
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -6990,7 +6990,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -7056,7 +7056,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
@@ -7122,7 +7122,7 @@
 
 
 
-     NetHack 3.7.0                                        December 08, 2023
+     NetHack 3.7.0                                         January 02, 2024
 
 
 
