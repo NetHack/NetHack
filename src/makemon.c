@@ -1466,13 +1466,15 @@ makemon(
                 mhidden_description(mtmp, FALSE, mbuf);
                 what = upstart(strsubst(mbuf, ", mimicking ", ""));
             }
-            if (what)
+            if (what) {
+                set_msg_xy(mtmp->mx, mtmp->my);
                 Norep("%s%s appears%s%c", what,
                       exclaim ? " suddenly" : "",
                       next2u(x, y) ? " next to you"
                       : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? " close by"
                         : "",
                       exclaim ? '!' : '.');
+            }
         }
         /* if discernable and a threat, stop fiddling while Rome burns */
         if (go.occupation)
