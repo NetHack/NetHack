@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkobj.c	$NHDT-Date: 1689180492 2023/07/12 16:48:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.272 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1704316444 2024/01/03 21:14:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.282 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1935,6 +1935,34 @@ mkgold(long amount, coordxy x, coordxy y)
     return gold;
 }
 
+/* potions of oil use their obj->age field differently from other potions
+   so changing potion type to or from oil needs to have that fixed up */
+void
+fixup_oil(
+    struct obj *potion, /* potion that just had its otyp changed */
+    struct obj *source) /* item used to create potion; might be Null */
+{
+    if (potion->otyp == POT_OIL) {
+        if (source && source->otyp == POT_OIL) {
+            /* potion of oil being used to set potion's otyp to oil;
+               source might be partly used */
+            potion->age = source->age;
+        } else {
+            /* non-oil is being turned into oil; change absolute age
+               (turn created) into relative age (amount remaining /
+               burn time available) */
+            potion->age = MAX_OIL_IN_FLASK;
+        }
+    } else if (source && source->otyp == POT_OIL) {
+        /* potion is no longer oil, being turned into non-oil */
+        if (potion->age == source->age)
+            potion->age = gm.moves;
+        /* when source is a partly used oil, mark potion as diluted */
+        if (source->age < MAX_OIL_IN_FLASK)
+            potion->odiluted = 1;
+    }
+}
+
 /* return TRUE if the corpse has special timing;
    lizards and lichen don't rot, trolls and Riders auto-revive */
 #define special_corpse(num) \
@@ -2700,10 +2728,14 @@ hornoplenty(
         consume_obj_charge(horn, !tipping);
         if (!rn2(13)) {
             obj = mkobj(POTION_CLASS, FALSE);
-            if (objects[obj->otyp].oc_magic)
+            if (objects[obj->otyp].oc_magic) {
                 do {
                     obj->otyp = rnd_class(POT_BOOZE, POT_WATER);
                 } while (obj->otyp == POT_SICKNESS);
+                /* oil uses obj->age field differently from other potions */
+                if (obj->otyp == POT_OIL)
+                    fixup_oil(obj, (struct obj *) NULL);
+            }
             what = (obj->quan > 1L) ? "Some potions" : "A potion";
         } else {
             obj = mkobj(FOOD_CLASS, FALSE);

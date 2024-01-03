@@ -1,4 +1,4 @@
-/* NetHack 3.7	potion.c	$NHDT-Date: 1699582924 2023/11/10 02:22:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.251 $ */
+/* NetHack 3.7	potion.c	$NHDT-Date: 1704316448 2024/01/03 21:14:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.256 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2504,6 +2504,9 @@ potion_dip(struct obj *obj, struct obj *potion)
             case 4:
                 otmp = mkobj(POTION_CLASS, FALSE);
                 obj->otyp = otmp->otyp;
+                /* oil uses obj->age field differently from other potions */
+                if (obj->otyp == POT_OIL || otmp->otyp == POT_OIL)
+                    fixup_oil(obj, otmp);
                 obfree(otmp, (struct obj *) 0);
                 break;
             default:

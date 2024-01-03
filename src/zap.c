@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1703070194 2023/12/20 11:03:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.501 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1704316449 2024/01/03 21:14:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.508 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1780,6 +1780,9 @@ poly_obj(struct obj *obj, int id)
     case POTION_CLASS:
         while (otmp->otyp == POT_POLYMORPH)
             otmp->otyp = rnd_class(POT_GAIN_ABILITY, POT_WATER);
+        /* potions of oil use obj->age field differently from other potions */
+        if (otmp->otyp == POT_OIL || obj->otyp == POT_OIL)
+            fixup_oil(otmp, obj);
         break;
 
     case SPBOOK_CLASS:

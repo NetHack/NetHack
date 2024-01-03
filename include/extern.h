@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1703716146 2023/12/27 22:29:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1356 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1704316439 2024/01/03 21:13:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1359 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1595,6 +1595,7 @@ extern struct obj *mksobj(int, boolean, boolean) NONNULL;
 extern int bcsign(struct obj *) NONNULLARG1;
 extern int weight(struct obj *) NONNULLARG1;
 extern struct obj *mkgold(long, coordxy, coordxy);
+extern void fixup_oil(struct obj *, struct obj *) NONNULLARG1;
 extern struct obj *mkcorpstat(int, struct monst *, struct permonst *,
                               coordxy, coordxy, unsigned);
 extern int corpse_revive_type(struct obj *) NONNULLARG1;
