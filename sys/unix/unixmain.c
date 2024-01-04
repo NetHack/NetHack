@@ -1,4 +1,4 @@
-/* NetHack 3.7	unixmain.c	$NHDT-Date: 1699233290 2023/11/06 01:14:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.7	unixmain.c	$NHDT-Date: 1704043695 2023/12/31 17:28:15 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -481,6 +481,14 @@ process_options(int argc, char *argv[])
             } else {
                 config_error_add("Unknown option: %.60s", origarg);
             }
+            break;
+        case 'l':
+#ifdef LIVELOG
+            if(!strncmp(arg, "-loglua", 7)){
+                gl.loglua = 1;
+            } else
+#endif
+                config_error_add("Unknown option: %.60s", origarg);
             break;
         case 'p': /* profession (role) */
             if (arg[2]) {

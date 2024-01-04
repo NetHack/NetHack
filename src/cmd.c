@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1703070187 2023/12/20 11:03:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.695 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.699 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -486,7 +486,7 @@ can_do_extcmd(const struct ext_func_tab *extcmd)
         lua_getglobal(gl.luacore, "nh_callback_run");
         lua_pushstring(gl.luacore, nhcb_name[NHCB_CMD_BEFORE]);
         lua_pushstring(gl.luacore, extcmd->ef_txt);
-        nhl_pcall(gl.luacore, 2, 1);
+        nhl_pcall_handle(gl.luacore, 2, 1, "can_do_extcmd", NHLpa_panic);
         if (!lua_toboolean(gl.luacore, -1))
             return FALSE;
     }
@@ -1389,7 +1389,10 @@ wiz_load_lua(void)
 {
     if (wizard) {
         char buf[BUFSZ];
-        nhl_sandbox_info sbi = {NHL_SB_SAFE | NHL_SB_DEBUGGING, 0, 0, 0};
+            /* Large but not unlimited memory and CPU so random bits of
+             * code can be tested by wizards. */
+        nhl_sandbox_info sbi = {NHL_SB_SAFE | NHL_SB_DEBUGGING,
+                16*1024*1024, 0, 16*1024*1024};
 
         buf[0] = '\0';
         getlin("Load which lua file?", buf);

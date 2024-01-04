@@ -1,4 +1,4 @@
-/* NetHack 3.7	decl.c	$NHDT-Date: 1701132220 2023/11/28 00:43:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.304 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1704043695 2023/12/31 17:28:15 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.309 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -505,6 +505,8 @@ const struct instance_globals_l g_init_l = {
     /* nhlua.c */
     UNDEFINED_VALUE, /* luacore */
     DUMMY, /* lua_warnbuf[] */
+    0, /* loglua */
+    0, /* lua_sid */
     /* options.c */
     FALSE, /* loot_reset_justpicked */
     /* save.c */
