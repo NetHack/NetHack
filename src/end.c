@@ -880,7 +880,7 @@ panic VA_DECL(const char *, str)
         if (soundprocs.sound_exit_nhsound)
             (*soundprocs.sound_exit_nhsound)("panic");
         exit_nhwindows((char *) 0);
-        iflags.window_inited = 0; /* they're gone; force raw_print()ing */
+        iflags.window_inited = FALSE; /* they're gone; force raw_print()ing */
     }
 
     raw_print(gp.program_state.gameover
@@ -1611,7 +1611,7 @@ really_done(int how)
         done_stopprint++;
 #endif
     /* render vision subsystem inoperative */
-    iflags.vision_inited = 0;
+    iflags.vision_inited = FALSE;
 
     /* maybe use up active invent item(s), place thrown/kicked missile,
        deal with ball and chain possibly being temporarily off the map */
@@ -1839,7 +1839,7 @@ really_done(int how)
         if (WIN_INVEN != WIN_ERR) {
             destroy_nhwindow(WIN_INVEN),  WIN_INVEN = WIN_ERR;
             /* precaution in case any late update_inventory() calls occur */
-            iflags.perm_invent = 0;
+            iflags.perm_invent = FALSE;
         }
         display_nhwindow(WIN_MESSAGE, TRUE);
         destroy_nhwindow(WIN_MAP),  WIN_MAP = WIN_ERR;

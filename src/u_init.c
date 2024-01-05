@@ -606,7 +606,7 @@ u_init(void)
     struct u_roleplay tmpuroleplay = u.uroleplay; /* set by rcfile options */
 
     flags.female = flags.initgend;
-    flags.beginner = 1;
+    flags.beginner = TRUE;
 
     /* zero u, including pointer values --
      * necessary when aborting from a failed restore */

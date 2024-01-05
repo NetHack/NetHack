@@ -255,7 +255,7 @@ vision_reset(void)
         }
     }
 
-    iflags.vision_inited = 1; /* vision is ready */
+    iflags.vision_inited = TRUE; /* vision is ready */
     gv.vision_full_recalc = 1;   /* we want to run vision_recalc() */
 }
 

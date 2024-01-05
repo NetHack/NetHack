@@ -199,7 +199,7 @@ more_experienced(register int exper, register int rexp)
 #endif
     }
     if (u.urexp >= (Role_if(PM_WIZARD) ? 1000 : 2000))
-        flags.beginner = 0;
+        flags.beginner = FALSE;
 }
 
 /* e.g., hit by drain life attack */

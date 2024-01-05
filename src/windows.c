@@ -652,7 +652,7 @@ hup_exit_nhwindows(const char *lastgasp)
         (*previnterface_exit_nhwindows)(lastgasp);
         previnterface_exit_nhwindows = 0;
     }
-    iflags.window_inited = 0;
+    iflags.window_inited = FALSE;
 }
 
 static int
@@ -691,7 +691,7 @@ hup_getlin(const char *prompt UNUSED, char *outbuf)
 static void
 hup_init_nhwindows(int *argc_p UNUSED, char **argv UNUSED)
 {
-    iflags.window_inited = 1;
+    iflags.window_inited = TRUE;
 }
 
 /*ARGUSED*/
