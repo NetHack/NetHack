@@ -96,7 +96,7 @@ make_confused(long xtime, boolean talk)
             You_feel("less %s now.", Hallucination ? "trippy" : "confused");
     }
     if ((xtime && !old) || (!xtime && old))
-        display.botl = TRUE;
+        disp.botl = TRUE;
 
     set_itimeout(&HConfusion, xtime);
 }
@@ -123,7 +123,7 @@ make_stunned(long xtime, boolean talk)
         }
     }
     if ((!xtime && old) || (xtime && !old))
-        display.botl = TRUE;
+        disp.botl = TRUE;
 
     set_itimeout(&HStun, xtime);
 }
@@ -157,7 +157,7 @@ make_sick(long xtime,
         }
         set_itimeout(&Sick, xtime);
         u.usick_type |= type;
-        display.botl = TRUE;
+        disp.botl = TRUE;
     } else if (old && (type & u.usick_type)) {
         /* was sick, now not */
         u.usick_type &= ~type;
@@ -170,7 +170,7 @@ make_sick(long xtime,
                 You_feel("cured.  What a relief!");
             Sick = 0L; /* set_itimeout(&Sick, 0L) */
         }
-        display.botl = TRUE;
+        disp.botl = TRUE;
     }
 
     kptr = find_delayed_killer(SICK);
@@ -200,7 +200,7 @@ make_slimed(long xtime, const char *msg)
 #endif
     set_itimeout(&Slimed, xtime);
     if ((xtime != 0L) ^ (old != 0L)) {
-        display.botl = TRUE;
+        disp.botl = TRUE;
         if (msg)
             pline("%s", msg);
     }
@@ -227,7 +227,7 @@ make_stoned(long xtime, const char *msg, int killedby, const char *killername)
 #endif
     set_itimeout(&Stoned, xtime);
     if ((xtime != 0L) ^ (old != 0L)) {
-        display.botl = TRUE;
+        disp.botl = TRUE;
         if (msg)
             pline("%s", msg);
     }
@@ -246,7 +246,7 @@ make_vomiting(long xtime, boolean talk)
         talk = FALSE;
 
     set_itimeout(&Vomiting, xtime);
-    display.botl = TRUE;
+    disp.botl = TRUE;
     if (!xtime && old)
         if (talk)
             You_feel("much less nauseated now.");
@@ -336,7 +336,7 @@ toggle_blindness(void)
     boolean Stinging = (uwep && (EWarn_of_mon & W_WEP) != 0L);
 
     /* blindness has just been toggled */
-    display.botl = TRUE; /* status conditions need update */
+    disp.botl = TRUE; /* status conditions need update */
     gv.vision_full_recalc = 1; /* vision has changed */
     /* this vision recalculation used to be deferred until moveloop(),
        but that made it possible for vision irregularities to occur
@@ -428,7 +428,7 @@ make_hallucinated(
         (eg. Qt windowport's equipped items display) */
         update_inventory();
 
-        display.botl = TRUE;
+        disp.botl = TRUE;
         if (talk)
             pline(message, verb);
     }
@@ -447,7 +447,7 @@ make_deaf(long xtime, boolean talk)
 
     set_itimeout(&HDeaf, xtime);
     if ((xtime != 0L) ^ (old != 0L)) {
-        display.botl = TRUE;
+        disp.botl = TRUE;
         if (talk)
             You(old && !Deaf ? "can hear again."
                              : "are unable to hear anything.");
@@ -458,7 +458,7 @@ make_deaf(long xtime, boolean talk)
 void
 make_glib(int xtime)
 {
-    display.botl |= (!Glib ^ !!xtime);
+    disp.botl |= (!Glib ^ !!xtime);
     set_itimeout(&Glib, xtime);
     /* may change "(being worn)" to "(being worn; slippery)" or vice versa */
     if (uarmg)
@@ -655,7 +655,7 @@ peffect_restore_ability(struct obj *otmp)
                WEAK or worse, but that's handled via ATEMP(A_STR) now */
             if (ABASE(i) < lim) {
                 ABASE(i) = lim;
-                display.botl = TRUE;
+                disp.botl = TRUE;
                 /* only first found if not blessed */
                 if (!otmp->blessed)
                     break;
@@ -1232,7 +1232,7 @@ peffect_gain_energy(struct obj *otmp)
         u.uen = u.uenmax;
     else if (u.uen <= 0)
         u.uen = 0;
-    display.botl = TRUE;
+    disp.botl = TRUE;
     exercise(A_WIS, TRUE);
 }
 
@@ -1433,7 +1433,7 @@ healup(int nhp, int nxtra, boolean curesick, boolean cureblind)
         make_vomiting(0L, TRUE);
         make_sick(0L, (char *) 0, TRUE, SICK_ALL);
     }
-    display.botl = TRUE;
+    disp.botl = TRUE;
     return;
 }
 
@@ -1936,7 +1936,7 @@ potionbreathe(struct obj *obj)
                     ABASE(i)++;
                     /* only first found if not blessed */
                     isdone = !(obj->blessed);
-                    display.botl = TRUE;
+                    disp.botl = TRUE;
                 }
                 if (++i >= A_MAX)
                     i = 0;
@@ -1945,24 +1945,24 @@ potionbreathe(struct obj *obj)
         break;
     case POT_FULL_HEALING:
         if (Upolyd && u.mh < u.mhmax)
-            u.mh++, display.botl = TRUE;
+            u.mh++, disp.botl = TRUE;
         if (u.uhp < u.uhpmax)
-            u.uhp++, display.botl = TRUE;
+            u.uhp++, disp.botl = TRUE;
         cureblind = TRUE;
         /*FALLTHRU*/
     case POT_EXTRA_HEALING:
         if (Upolyd && u.mh < u.mhmax)
-            u.mh++, display.botl = TRUE;
+            u.mh++, disp.botl = TRUE;
         if (u.uhp < u.uhpmax)
-            u.uhp++, display.botl = TRUE;
+            u.uhp++, disp.botl = TRUE;
         if (!obj->cursed)
             cureblind = TRUE;
         /*FALLTHRU*/
     case POT_HEALING:
         if (Upolyd && u.mh < u.mhmax)
-            u.mh++, display.botl = TRUE;
+            u.mh++, disp.botl = TRUE;
         if (u.uhp < u.uhpmax)
-            u.uhp++, display.botl = TRUE;
+            u.uhp++, disp.botl = TRUE;
         if (obj->blessed)
             cureblind = TRUE;
         if (cureblind) {
@@ -1984,7 +1984,7 @@ potionbreathe(struct obj *obj)
                 else
                     u.uhp -= 5;
             }
-            display.botl = TRUE;
+            disp.botl = TRUE;
             exercise(A_CON, FALSE);
         }
         break;
@@ -2831,7 +2831,7 @@ split_mon(
         if (mtmp2) {
             mtmp2->mhpmax = u.mhmax / 2;
             u.mhmax -= mtmp2->mhpmax;
-            display.botl = TRUE;
+            disp.botl = TRUE;
             You("multiply%s!", reason);
         }
     } else {

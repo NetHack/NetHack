@@ -1206,7 +1206,7 @@ savelife(int how)
 
     if (u.utrap && u.utraptype == TT_LAVA)
         reset_utrap(FALSE);
-    display.botl = TRUE;
+    disp.botl = TRUE;
     u.ugrave_arise = NON_PM;
     HUnchanging = 0L;
     curs_on_u();
@@ -1501,10 +1501,10 @@ done(int how)
         || (how == QUIT && done_stopprint)) {
         /* skip status update if panicking or disconnected
            or answer of 'q' to "Really quit?" */
-        display.botl = display.botlx = display.time_botl = FALSE;
+        disp.botl = disp.botlx = disp.time_botl = FALSE;
     } else {
         /* otherwise force full status update */
-        display.botlx = TRUE;
+        disp.botlx = TRUE;
         bot();
     }
 
@@ -1537,7 +1537,7 @@ done(int how)
                negative (-1 is used as a flag in some circumstances
                which don't apply when actually dying due to HP loss) */
             u.uhp = u.mh = 0;
-            display.botl = TRUE;
+            disp.botl = TRUE;
         }
     }
     if (Lifesaved && (how <= GENOCIDED)) {

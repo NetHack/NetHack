@@ -79,7 +79,7 @@ moveloop_preamble(boolean resuming)
         u.umovement = NORMAL_SPEED;
         initrack();
     }
-    display.botlx = TRUE; /* for STATUS_HILITES */
+    disp.botlx = TRUE; /* for STATUS_HILITES */
     if (resuming) { /* restoring old game */
         read_engr_at(u.ux, u.uy); /* subset of pickup() */
         fix_shop_damage();
@@ -233,7 +233,7 @@ moveloop_core(void)
                 gh.hero_seq = gm.moves << 3;
 
                 if (flags.time && !gc.context.run)
-                    display.time_botl = TRUE; /* 'moves' just changed */
+                    disp.time_botl = TRUE; /* 'moves' just changed */
 
                 /********************************/
                 /* once-per-turn things go here */
@@ -425,10 +425,10 @@ moveloop_core(void)
         if (gv.vision_full_recalc)
             vision_recalc(0); /* vision! */
     }
-    if (display.botl || display.botlx) {
+    if (disp.botl || disp.botlx) {
         bot();
         curs_on_u();
-    } else if (display.time_botl) {
+    } else if (disp.time_botl) {
         timebot();
         curs_on_u();
     }
@@ -503,7 +503,7 @@ moveloop_core(void)
         && (gm.multi && (!gc.context.travel ? !(gm.multi % 7)
                         : !(gm.moves % 7L)))) {
         if (flags.time && gc.context.run)
-            display.botl = TRUE;
+            disp.botl = TRUE;
         /* [should this be flush_screen() instead?] */
         display_nhwindow(WIN_MAP, FALSE);
     }
@@ -561,7 +561,7 @@ regen_pw(int wtcap)
         u.uen += rn1(upper, 1);
         if (u.uen > u.uenmax)
             u.uen = u.uenmax;
-        display.botl = TRUE;
+        disp.botl = TRUE;
         if (u.uen == u.uenmax)
             interrupt_multi("You feel full of energy.");
     }
@@ -593,7 +593,7 @@ regen_hp(int wtcap)
                 heal = 1;
         }
         if (heal) {
-            display.botl = TRUE;
+            disp.botl = TRUE;
             u.mh += heal;
             reached_full = (u.mh == u.mhmax);
         }
@@ -613,7 +613,7 @@ regen_hp(int wtcap)
                 heal++;
 
             if (heal) {
-                display.botl = TRUE;
+                disp.botl = TRUE;
                 u.uhp += heal;
                 if (u.uhp > u.uhpmax)
                     u.uhp = u.uhpmax;
@@ -636,7 +636,7 @@ stop_occupation(void)
         if (!maybe_finished_meal(TRUE))
             You("stop %s.", go.occtxt);
         go.occupation = (int (*)(void)) 0;
-        display.botl = TRUE; /* in case u.uhs changed */
+        disp.botl = TRUE; /* in case u.uhs changed */
         nomul(0);
     } else if (gm.multi >= 0) {
         nomul(0);
@@ -705,7 +705,7 @@ newgame(void)
 {
     int i;
 
-    display.botlx = TRUE;
+    disp.botlx = TRUE;
     gc.context.ident = 1;
     gc.context.warnlevel = 1;
     gc.context.next_attrib_check = 600L; /* arbitrary first setting */

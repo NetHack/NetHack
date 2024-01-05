@@ -1841,7 +1841,7 @@ pickup_object(
 
     /* Whats left of the special case for gold :-) */
     if (obj->oclass == COIN_CLASS)
-        display.botl = TRUE;
+        disp.botl = TRUE;
     if (obj->quan != count && obj->otyp != LOADSTONE)
         obj = splitobj(obj, count);
 
@@ -1960,7 +1960,7 @@ encumber_msg(void)
                 newcap == 4 ? "can barely" : "can't even");
             break;
         }
-        display.botl = TRUE;
+        disp.botl = TRUE;
     } else if (go.oldcap > newcap) {
         switch (newcap) {
         case 0:
@@ -1977,7 +1977,7 @@ encumber_msg(void)
                 stagger(gy.youmonst.data, "stagger"));
             break;
         }
-        display.botl = TRUE;
+        disp.botl = TRUE;
     }
 
     go.oldcap = newcap;

@@ -550,7 +550,7 @@ done_timeout(int how, int which)
 
     /* life-saved */
     *intrinsic_p &= ~I_SPECIAL;
-    display.botl = TRUE;
+    disp.botl = TRUE;
 }
 
 void
@@ -716,7 +716,7 @@ nh_timeout(void)
             case DEAF:
                 set_itimeout(&HDeaf, 1L);
                 make_deaf(0L, TRUE);
-                display.botl = TRUE;
+                disp.botl = TRUE;
                 if (!Deaf)
                     stop_occupation();
                 break;
@@ -769,7 +769,7 @@ nh_timeout(void)
             case FLYING:
                 /* timed Flying is via #wizintrinsic only */
                 if (was_flying && !Flying) {
-                    display.botl = TRUE;
+                    disp.botl = TRUE;
                     You("land.");
                     spoteffects(TRUE);
                 }
@@ -915,7 +915,7 @@ fall_asleep(int how_long, boolean wakeup_msg)
         /* 3.7: how_long is negative so wasn't actually incrementing the
            deafness timeout when it used to be passed as-is */
         incr_itimeout(&HDeaf, abs(how_long));
-        display.botl = TRUE;
+        disp.botl = TRUE;
         ga.afternmv = Hear_again; /* this won't give any messages */
     }
 #endif
@@ -1808,7 +1808,7 @@ do_storms(void)
         Soundeffect(se_kaboom_boom_boom, 80);
         pline("Kaboom!!!  Boom!!  Boom!!");
         incr_itimeout(&HDeaf, rn1(20, 30));
-        display.botl = TRUE;
+        disp.botl = TRUE;
         if (!u.uinvulnerable) {
             stop_occupation();
             nomul(-3);

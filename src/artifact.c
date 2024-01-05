@@ -1232,7 +1232,7 @@ Mb_hit(struct monst *magr, /* attacker */
                     u.uenmax--;
                     if (u.uen > 0)
                         u.uen--;
-                    display.botl = TRUE;
+                    disp.botl = TRUE;
                     You("lose magical energy!");
                 }
             } else {
@@ -1247,7 +1247,7 @@ Mb_hit(struct monst *magr, /* attacker */
                     if (u.uenmax > u.uenpeak)
                         u.uenpeak = u.uenmax;
                     u.uen++;
-                    display.botl = TRUE;
+                    disp.botl = TRUE;
                     You("absorb magical energy!");
                 }
             }
@@ -1731,7 +1731,7 @@ arti_invoke(struct obj *obj)
                 make_slimed(0L, (char *) 0);
             if (BlindedTimeout > creamed)
                 make_blinded(creamed, FALSE);
-            display.botl = TRUE;
+            disp.botl = TRUE;
             break;
         }
         case ENERGY_BOOST: {
@@ -1743,7 +1743,7 @@ arti_invoke(struct obj *obj)
                 epboost = u.uenmax - u.uen;
             if (epboost) {
                 u.uen += epboost;
-                display.botl = TRUE;
+                disp.botl = TRUE;
                 You_feel("re-energized.");
             } else
                 goto nothing_special;

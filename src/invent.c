@@ -970,7 +970,7 @@ void
 addinv_core1(struct obj *obj)
 {
     if (obj->oclass == COIN_CLASS) {
-        display.botl = TRUE;
+        disp.botl = TRUE;
     } else if (obj->otyp == AMULET_OF_YENDOR) {
         if (u.uhave.amulet)
             impossible("already have amulet?");
@@ -1330,7 +1330,7 @@ void
 freeinv_core(struct obj *obj)
 {
     if (obj->oclass == COIN_CLASS) {
-        display.botl = TRUE;
+        disp.botl = TRUE;
         return;
     } else if (obj->otyp == AMULET_OF_YENDOR) {
         if (!u.uhave.amulet)
@@ -1361,7 +1361,7 @@ freeinv_core(struct obj *obj)
         curse(obj);
     } else if (confers_luck(obj)) {
         set_moreluck();
-        display.botl = TRUE;
+        disp.botl = TRUE;
     } else if (obj->otyp == FIGURINE && obj->timed) {
         (void) stop_timer(FIG_TRANSFORM, obj_to_any(obj));
     }
@@ -1992,7 +1992,7 @@ getobj(
                 continue;
             }
         }
-        display.botl = TRUE; /* May have changed the amount of money */
+        disp.botl = TRUE; /* May have changed the amount of money */
         if (otmp && !gi.in_doagain) {
             if (cntgiven && cnt > 0)
                 cmdq_add_int(CQ_REPEAT, cnt);

@@ -1083,7 +1083,7 @@ dotele(
         } else {
             /* bypassing spelleffects(); apply energy cost directly */
             u.uen -= energy;
-            display.botl = TRUE;
+            disp.botl = TRUE;
         }
     }
 

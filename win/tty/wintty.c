@@ -1067,11 +1067,11 @@ tty_clear_nhwindow(winid window)
             cw->data[i][n - 1] = '\0';
             /*finalx[i][NOW] = finalx[i][BEFORE] = 0;*/
         }
-        display.botlx = TRUE;
+        disp.botlx = TRUE;
         break;
     case NHW_MAP:
         /* cheap -- clear the whole thing and tell nethack to redraw botl */
-        display.botlx = TRUE;
+        disp.botlx = TRUE;
         /*FALLTHRU*/
     case NHW_BASE:
         /* if erasing_tty_screen is True, calling sequence is
@@ -2259,7 +2259,7 @@ tty_putstr(winid window, int attr, const char *str)
 #ifndef STATUS_HILITES
     case NHW_STATUS:
         ob = &cw->data[cw->cury][j = cw->curx];
-        if (display.botlx)
+        if (disp.botlx)
             *ob = '\0';
         if (!cw->cury && (int) strlen(str) >= CO) {
             /* the characters before "St:" are unnecessary */
@@ -2270,7 +2270,7 @@ tty_putstr(winid window, int attr, const char *str)
         nb = str;
         for (i = cw->curx + 1, n0 = cw->cols; i < n0; i++, nb++) {
             if (!*nb) {
-                if (*ob || display.botlx) {
+                if (*ob || disp.botlx) {
                     /* last char printed may be in middle of line */
                     tty_curs(WIN_STATUS, i, cw->cury);
                     cl_end();
@@ -3653,7 +3653,7 @@ docorner(
     if (ymax >= (int) wins[WIN_STATUS]->offy
         && !ystart_between_menu_pages) {
         /* we have wrecked the bottom line */
-        display.botlx = TRUE;
+        disp.botlx = TRUE;
         bot();
     }
 }

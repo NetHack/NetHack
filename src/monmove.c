@@ -2010,7 +2010,7 @@ void
 set_apparxy(register struct monst *mtmp)
 {
     boolean notseen, notthere, gotu;
-    int disp;
+    int displ;
     coordxy mx = mtmp->mux, my = mtmp->muy;
     long umoney = money_cnt(gi.invent);
 
@@ -2030,17 +2030,17 @@ set_apparxy(register struct monst *mtmp)
     notthere = (Displaced && mtmp->data != &mons[PM_DISPLACER_BEAST]);
     /* add cases as required.  eg. Displacement ... */
     if (Underwater) {
-        disp = 1;
+        displ = 1;
     } else if (notseen) {
         /* Xorns can smell quantities of valuable metal
            like that in solid gold coins, treat as seen */
-        disp = (mtmp->data == &mons[PM_XORN] && umoney) ? 0 : 1;
+        displ = (mtmp->data == &mons[PM_XORN] && umoney) ? 0 : 1;
     } else if (notthere) {
-        disp = couldsee(mx, my) ? 2 : 1;
+        displ = couldsee(mx, my) ? 2 : 1;
     } else {
-        disp = 0;
+        displ = 0;
     }
-    if (!disp) {
+    if (!displ) {
         mtmp->mux = u.ux;
         mtmp->muy = u.uy;
         return;
@@ -2059,10 +2059,10 @@ set_apparxy(register struct monst *mtmp)
                 my = u.uy;
                 break; /* punt */
             }
-            mx = u.ux - disp + rn2(2 * disp + 1);
-            my = u.uy - disp + rn2(2 * disp + 1);
+            mx = u.ux - displ + rn2(2 * displ + 1);
+            my = u.uy - displ + rn2(2 * displ + 1);
         } while (!isok(mx, my)
-                 || (disp != 2 && mx == mtmp->mx && my == mtmp->my)
+                 || (displ != 2 && mx == mtmp->mx && my == mtmp->my)
                  || ((mx != u.ux || my != u.uy) && !passes_walls(mtmp->data)
                      && !(accessible(mx, my)
                           || (closed_door(mx, my)

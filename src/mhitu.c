@@ -261,7 +261,7 @@ expels(
     struct permonst *mdat, /* if mtmp is polymorphed, mdat != mtmp->data */
     boolean message)
 {
-    display.botl = TRUE;
+    disp.botl = TRUE;
     if (message) {
         if (digests(mdat)) {
             You("get regurgitated!");
@@ -858,7 +858,7 @@ mattacku(register struct monst *mtmp)
         default: /* no attack */
             break;
         }
-        if (display.botl)
+        if (disp.botl)
             bot();
         /* give player a chance of waking up before dying -kaa */
         if (sum[i] == M_ATTK_HIT) { /* successful attack */
@@ -1173,7 +1173,7 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
                 *hpmax_p = lowerlimit;
             /* else unlikely...
              * already at or below minimum threshold; do nothing */
-            display.botl = TRUE;
+            disp.botl = TRUE;
         }
 
         mdamageu(mtmp, mhm.damage);
@@ -1811,7 +1811,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
 void
 mdamageu(struct monst *mtmp, int n)
 {
-    display.botl = TRUE;
+    disp.botl = TRUE;
     if (Upolyd) {
         u.mh -= n;
         if (u.mh < 1)
@@ -2089,13 +2089,13 @@ doseduce(struct monst *mon)
             You("are down in the dumps.");
             (void) adjattrib(A_CON, -1, TRUE);
             exercise(A_CON, FALSE);
-            display.botl = TRUE;
+            disp.botl = TRUE;
             break;
         case 2:
             Your("senses are dulled.");
             (void) adjattrib(A_WIS, -1, TRUE);
             exercise(A_WIS, FALSE);
-            display.botl = TRUE;
+            disp.botl = TRUE;
             break;
         case 3:
             if (!resists_drli(&gy.youmonst)) {
@@ -2133,13 +2133,13 @@ doseduce(struct monst *mon)
             You_feel("good enough to do it again.");
             (void) adjattrib(A_CON, 1, TRUE);
             exercise(A_CON, TRUE);
-            display.botl = TRUE;
+            disp.botl = TRUE;
             break;
         case 2:
             You("will always remember %s...", noit_mon_nam(mon));
             (void) adjattrib(A_WIS, 1, TRUE);
             exercise(A_WIS, TRUE);
-            display.botl = TRUE;
+            disp.botl = TRUE;
             break;
         case 3:
             pline("That was a very educational experience.");
@@ -2152,7 +2152,7 @@ doseduce(struct monst *mon)
             if (Upolyd)
                 u.mh = u.mhmax;
             exercise(A_STR, TRUE);
-            display.botl = TRUE;
+            disp.botl = TRUE;
             break;
         }
     }
@@ -2186,7 +2186,7 @@ doseduce(struct monst *mon)
             pline("%s takes %ld %s for services rendered!", noit_Monnam(mon),
                   cost, currency(cost));
             money2mon(mon, cost);
-            display.botl = TRUE;
+            disp.botl = TRUE;
         }
     }
     if (!rn2(25))
@@ -2458,7 +2458,7 @@ cloneu(void)
     mon->mhpmax = u.mhmax;
     mon->mhp = u.mh / 2;
     u.mh -= mon->mhp;
-    display.botl = TRUE;
+    disp.botl = TRUE;
     return mon;
 }
 

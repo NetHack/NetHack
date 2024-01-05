@@ -4262,7 +4262,7 @@ readobjnam_postparse1(struct _readobjnam_data *d)
         d->otmp = mksobj(GOLD_PIECE, FALSE, FALSE);
         d->otmp->quan = (long) d->cnt;
         d->otmp->owt = weight(d->otmp);
-        display.botl = TRUE;
+        disp.botl = TRUE;
         return 3; /*return otmp;*/
     }
 

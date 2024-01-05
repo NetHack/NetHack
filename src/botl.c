@@ -260,7 +260,7 @@ bot(void)
             putmixed(WIN_STATUS, 0, do_statusline2());
         }
     }
-    display.botl = display.botlx = display.time_botl = FALSE;
+    disp.botl = disp.botlx = disp.time_botl = FALSE;
 }
 
 /* special purpose status update: move counter ('time' status) only */
@@ -269,8 +269,8 @@ timebot(void)
 {
     if (gb.bot_disabled)
         return;
-    /* we're called when display.time_botl is set and general display.botl
-       is clear; display.time_botl gets set whenever gm.moves changes value
+    /* we're called when disp.time_botl is set and general disp.botl
+       is clear; disp.time_botl gets set whenever gm.moves changes value
        so there's no benefit in tracking previous value to decide whether
        to skip update; suppress_map_output() handles program_state.restoring
        and program_state.done_hup (tty hangup => no further output at all)
@@ -283,7 +283,7 @@ timebot(void)
             bot();
         }
     }
-    display.time_botl = FALSE;
+    disp.time_botl = FALSE;
 }
 
 /* convert experience level (1..30) to rank index (0..8) */
@@ -1170,7 +1170,7 @@ cond_menu(void)
             if (condtests[i].enabled != condtests[i].choice) {
                 condtests[i].enabled = condtests[i].choice;
                 condtests[idx].test = FALSE;
-                display.botl = changed = TRUE;
+                disp.botl = changed = TRUE;
             }
     }
     return changed;
@@ -1368,9 +1368,9 @@ evaluate_and_notify_windowport(
      *     fields that have changed since the previous update.
      *
      * In both of those situations, we need to force updates to
-     * all of the fields when display.botlx is set. The tty port in
+     * all of the fields when disp.botlx is set. The tty port in
      * particular has a problem if that isn't done, since the core sets
-     * display.botlx when a menu or text display obliterates the status
+     * disp.botlx when a menu or text display obliterates the status
      * line.
      *
      * For those situations, to trigger the full update of every field
@@ -1382,15 +1382,15 @@ evaluate_and_notify_windowport(
      * the display, call status_update() with BL_FLUSH.
      *
      */
-    if (display.botlx && (windowprocs.wincap2 & WC2_RESET_STATUS) != 0L)
+    if (disp.botlx && (windowprocs.wincap2 & WC2_RESET_STATUS) != 0L)
         status_update(BL_RESET, (genericptr_t) 0, 0, 0,
                       NO_COLOR, (unsigned long *) 0);
-    else if ((updated || display.botlx)
+    else if ((updated || disp.botlx)
              && (windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)
         status_update(BL_FLUSH, (genericptr_t) 0, 0, 0,
                       NO_COLOR, (unsigned long *) 0);
 
-    display.botl = display.botlx = display.time_botl = FALSE;
+    disp.botl = disp.botlx = disp.time_botl = FALSE;
     gu.update_all = FALSE;
 }
 
@@ -1427,7 +1427,7 @@ status_initialize(
         status_enablefield(fld, fieldname, fieldfmt, fldenabl);
     }
     gu.update_all = TRUE;
-    display.botlx = TRUE;
+    disp.botlx = TRUE;
 }
 
 void
@@ -1805,7 +1805,7 @@ exp_percent_changing(void)
     struct istat_s *curr;
 
     /* if status update is already requested, skip this processing */
-    if (!display.botl) {
+    if (!disp.botl) {
         /*
          * Status update is warranted iff percent integer changes and the new
          * percentage results in a different highlighting rule being selected.
@@ -1824,7 +1824,7 @@ exp_percent_changing(void)
             rule = get_hilite(gn.now_or_before_idx, BL_XP,
                               (genericptr_t) &a, 0, pc, &color_dummy);
             if (rule != curr->hilite_rule)
-                return TRUE; /* caller should set 'display.botl' to True */
+                return TRUE; /* caller should set 'disp.botl' to True */
 #endif
         }
     }
@@ -1994,9 +1994,9 @@ status_eval_next_unhilite(void)
             prev->time = curr->time;
 
             curr->chg = prev->chg = FALSE;
-            display.botl = TRUE;
+            disp.botl = TRUE;
         }
-        if (display.botl)
+        if (disp.botl)
             continue; /* just process other gb.blstats[][].time and .chg */
 
         this_unhilite = curr->time;
@@ -2005,7 +2005,7 @@ status_eval_next_unhilite(void)
             && hilite_reset_needed(curr, this_unhilite + 1L)) {
             next_unhilite = this_unhilite;
             if (next_unhilite < gb.bl_hilite_moves)
-                display.botl = TRUE;
+                disp.botl = TRUE;
         }
     }
 }
@@ -2021,7 +2021,7 @@ reset_status_hilites(void)
             gb.blstats[0][i].time = gb.blstats[1][i].time = 0L;
         gu.update_all = TRUE;
     }
-    display.botlx = TRUE;
+    disp.botlx = TRUE;
 }
 
 /* test whether the text from a title rule matches the string for

@@ -120,7 +120,7 @@ struct display_hints {
     boolean botlx;           /* print an entirely new bottom line */
     boolean time_botl;       /* context.botl for 'time' (moves) only */
 };
-extern struct display_hints display;
+extern struct display_hints disp;
 
 /*
  * 'gX' -- instance_globals holds engine state that does not need to be

@@ -124,7 +124,7 @@ is_edible(register struct obj *obj)
 void
 init_uhunger(void)
 {
-    display.botl = (u.uhs != NOT_HUNGRY || ATEMP(A_STR) < 0);
+    disp.botl = (u.uhs != NOT_HUNGRY || ATEMP(A_STR) < 0);
     u.uhunger = 900;
     u.uhs = NOT_HUNGRY;
     if (ATEMP(A_STR) < 0) {
@@ -654,7 +654,7 @@ eat_brains(
                 ABASE(A_INT) += rnd(4);
                 if (ABASE(A_INT) > AMAX(A_INT))
                     ABASE(A_INT) = AMAX(A_INT);
-                display.botl = TRUE;
+                disp.botl = TRUE;
             }
             exercise(A_WIS, TRUE);
             *dmg_p += xtra_dmg;
@@ -1085,7 +1085,7 @@ eye_of_newt_buzz(void)
         }
         if (old_uen != u.uen) {
             You_feel("a mild buzz.");
-            display.botl = TRUE;
+            disp.botl = TRUE;
         }
     }
 }
@@ -1124,7 +1124,7 @@ cpostfx(int pm)
         else
             u.uhp = u.uhpmax;
         make_blinded(0L, !u.ucreamed);
-        display.botl = TRUE;
+        disp.botl = TRUE;
         check_intrinsics = TRUE; /* might also convey poison resistance */
         break;
     case PM_STALKER:
@@ -1441,7 +1441,7 @@ set_tin_variety(struct obj *obj, int forcetype)
 
 static int
 tin_variety(struct obj *obj,
-            boolean disp) /* we're just displaying so leave things alone */
+            boolean displ) /* we're just displaying so leave things alone */
 {
     register int r;
 
@@ -1455,7 +1455,7 @@ tin_variety(struct obj *obj,
     } else
         r = rn2(TTSZ - 1);
 
-    if (!disp && r == HOMEMADE_TIN && !obj->blessed && !rn2(7))
+    if (!displ && r == HOMEMADE_TIN && !obj->blessed && !rn2(7))
         r = ROTTEN_TIN; /* some homemade tins go bad */
 
     if (r == ROTTEN_TIN && nonrotting_corpse(obj->corpsenm))
@@ -1708,7 +1708,7 @@ Hear_again(void)
     /* Chance of deafness going away while fainted/sleeping/etc. */
     if (!rn2(2)) {
         make_deaf(0L, FALSE);
-        display.botl = TRUE;
+        disp.botl = TRUE;
     }
     return 0;
 }
@@ -1744,7 +1744,7 @@ rottenfood(struct obj *obj)
             where = (u.usteed) ? "saddle" : surface(u.ux, u.uy);
         pline_The("world spins and %s %s.", what, where);
         incr_itimeout(&HDeaf, duration);
-        display.botl = TRUE;
+        disp.botl = TRUE;
         nomul(-duration);
         gm.multi_reason = "unconscious from rotten food";
         gn.nomovemsg = "You are conscious again.";
@@ -2240,7 +2240,7 @@ eataccessory(struct obj *otmp)
                                           (typ == RIN_PROTECTION) ? otmp->spe
                                            : 2, /* fixed amount for amulet */
                                           typ);
-            display.botl = TRUE;
+            disp.botl = TRUE;
             break;
         case RIN_FREE_ACTION:
             /* Give sleep resistance instead */
@@ -2256,7 +2256,7 @@ eataccessory(struct obj *otmp)
             change_sex();
             You("are suddenly very %s!",
                 flags.female ? "feminine" : "masculine");
-            display.botl = TRUE;
+            disp.botl = TRUE;
             break;
         case AMULET_OF_UNCHANGING:
             /* un-change: it's a pun */
@@ -2418,7 +2418,7 @@ fpostfx(struct obj *otmp)
         /* This stuff seems to be VERY healthy! */
         gainstr(otmp, 1, TRUE);
         if (Upolyd) {
-            u.mh += otmp->cursed ? -rnd(20) : rnd(20), display.botl = TRUE;
+            u.mh += otmp->cursed ? -rnd(20) : rnd(20), disp.botl = TRUE;
             if (u.mh > u.mhmax) {
                 if (!rn2(17))
                     u.mhmax++;
@@ -2427,7 +2427,7 @@ fpostfx(struct obj *otmp)
                 rehumanize();
             }
         } else {
-            u.uhp += otmp->cursed ? -rnd(20) : rnd(20), display.botl = TRUE;
+            u.uhp += otmp->cursed ? -rnd(20) : rnd(20), disp.botl = TRUE;
             if (u.uhp > u.uhpmax) {
                 if (!rn2(17))
                     setuhpmax(u.uhpmax + 1);
@@ -3204,7 +3204,7 @@ unfaint(void)
     if (u.uhs > FAINTING)
         u.uhs = FAINTING;
     stop_occupation();
-    display.botl = TRUE;
+    disp.botl = TRUE;
     return 0;
 }
 
@@ -3286,7 +3286,7 @@ newuhs(boolean incr)
                 stop_occupation();
                 You("faint from lack of food.");
                 incr_itimeout(&HDeaf, duration);
-                display.botl = TRUE;
+                disp.botl = TRUE;
                 nomul(-duration);
                 gm.multi_reason = "fainted from lack of food";
                 gn.nomovemsg = "You regain consciousness.";
@@ -3301,7 +3301,7 @@ newuhs(boolean incr)
            now uhunger becomes more negative at a slower rate */
         } else if (u.uhunger < -(100 + 10 * (int) ACURR(A_CON))) {
             u.uhs = STARVED;
-            display.botl = TRUE;
+            disp.botl = TRUE;
             bot();
             You("die from starvation.");
             gk.killer.format = KILLED_BY;
@@ -3365,7 +3365,7 @@ newuhs(boolean incr)
             break;
         }
         u.uhs = newhs;
-        display.botl = TRUE;
+        disp.botl = TRUE;
         bot();
         if ((Upolyd ? u.mh : u.uhp) < 1) {
             You("die from hunger and exhaustion.");

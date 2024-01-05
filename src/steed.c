@@ -366,7 +366,7 @@ mount_steed(
     }
     remove_monster(mtmp->mx, mtmp->my);
     teleds(mtmp->mx, mtmp->my, TELEDS_ALLOW_DRAG);
-    display.botl = TRUE;
+    disp.botl = TRUE;
     return TRUE;
 }
 
@@ -797,11 +797,11 @@ dismount_steed(
         gi.in_steed_dismounting = TRUE;
         (void) float_down(0L, W_SADDLE);
         gi.in_steed_dismounting = FALSE;
-        display.botl = TRUE;
+        disp.botl = TRUE;
         (void) encumber_msg();
         gv.vision_full_recalc = 1;
     } else
-        display.botl = TRUE;
+        disp.botl = TRUE;
     /* polearms behave differently when not mounted */
     if (uwep && is_pole(uwep))
         gu.unweapon = TRUE;
