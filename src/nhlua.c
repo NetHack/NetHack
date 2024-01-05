@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1704493569 2024/01/05 22:26:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.125 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1704497031 2024/01/05 23:23:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.126 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -106,7 +106,7 @@ typedef struct nhl_user_data {
 
         /* stats */
     uint32_t  statctr;     /* stats step reload count */
-    uint32_t  sid;         /* id number (per state) */
+    int       sid;         /* id number (per state) */
     const char *name;      /* for stats logging (per pcall) */
 
 #ifdef NHL_SANDBOX
@@ -1910,8 +1910,8 @@ nhl_pcall(lua_State *L, int nargs, int nresults, const char *name)
     }
     if(nud && nud->memlimit && gl.loglua){
         lua_gc(L, LUA_GCCOLLECT);
-        livelog_printf(LL_DEBUG, "LUASTATS PMEM %d:%s %u",
-                nud->sid,nud->name,nud->inuse);
+        livelog_printf(LL_DEBUG, "LUASTATS PMEM %d:%s %lu",
+                nud->sid,nud->name,(long unsigned)nud->inuse);
     }
 #endif
     return rv;
@@ -2133,8 +2133,8 @@ nhl_done(lua_State *L)
             }
             if(nud && nud->memlimit && !nud->perpcall){
                 lua_gc(L, LUA_GCCOLLECT);
-                livelog_printf(LL_DEBUG, "LUASTATS DMEM %d:%s %u",
-                        nud->sid, nud->name,nud->inuse);
+                livelog_printf(LL_DEBUG, "LUASTATS DMEM %d:%s %lu",
+                        nud->sid, nud->name,(long unsigned)nud->inuse);
             }
         }
 	if(nud)
