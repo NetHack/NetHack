@@ -175,16 +175,17 @@ steps:
 - bash: |
     sudo apt-get -qq -y update
     sudo apt-get -qq -y install libncurses-dev
-    sudo apt-get -qq -y install libx11-dev libxaw7-dev xfonts-utils qt6-base-dev qt6-multimedia-dev qt6-base-dev-tools
-  condition: eq( variables['Agent.OS'], 'Linux' )
+    sudo apt-get -qq -y install libx11-dev libxaw7-dev xfonts-utils qtbase5-dev qtmultimedia5-dev qtbase5-dev-tools
+  condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildTarget, 'all'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
   displayName: 'Getting linux build dependencies'
 
 - bash: |
-    sh sys/unix/setup.sh sys/unix/hints/linux.370
-    pkg-config --list-all
+    cd sys/unix
+    sh setup.sh hints/linux.370
+    cd ../..
     make fetch-lua
-    make WANT_WIN_ALL=1 WANT_WIN_QT6=1 QT_SELECT=6 MOC=moc all
+    make WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc all
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildTarget, 'all'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
   displayName: 'Building linux full build'
