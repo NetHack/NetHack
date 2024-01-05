@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.126 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1704493569 2024/01/05 22:26:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.125 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -76,6 +76,7 @@ static int traceback_handler(lua_State *);
 #ifdef NHL_SANDBOX
 static void nhlL_openlibs(lua_State *, uint32_t);
 #endif
+static void *nhl_alloc(void *, void *, size_t, size_t);
 static lua_State *nhlL_newstate (nhl_sandbox_info *, const char *);
 static void end_luapat(void);
 
@@ -2122,9 +2123,9 @@ void
 nhl_done(lua_State *L)
 {
     if (L) {
+	nhl_user_data *nud = 0;
+	(void)lua_getallocf(L, (void**)&nud);
         if(gl.loglua){
-            nhl_user_data *nud;
-            (void)lua_getallocf(L, (void**)&nud);
             if(nud && nud->osteps){
                 long ic = nud->statctr*NHL_SB_STEPSIZE; // an approximation
                 livelog_printf(LL_DEBUG, "LUASTATS DONE %d:%s %ld",
@@ -2136,6 +2137,8 @@ nhl_done(lua_State *L)
                         nud->sid, nud->name,nud->inuse);
             }
         }
+	if(nud)
+	    nhl_alloc(NULL, nud, 0, 0);	// free nud
         lua_close(L);
     }
     iflags.in_lua = FALSE;
@@ -2727,6 +2730,12 @@ nhl_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
 {
     nhl_user_data *nud = ud;
 
+    if (nsize == 0) {
+        if (ptr != NULL)
+            free(ptr);
+        return NULL;
+    }
+
     if (nud && nud->memlimit) { /* this state is size limited */
         uint32_t delta = !ptr ? nsize : nsize - osize;
 
@@ -2734,12 +2743,6 @@ nhl_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
         nud->inuse += delta;
         if (nud->inuse > nud->memlimit)
             return NULL;
-    }
-
-    if (nsize == 0) {
-        if (ptr != NULL)
-            free(ptr);
-        return NULL;
     }
 
     return re_alloc(ptr, nsize);
