@@ -2528,7 +2528,7 @@ domove_core(void)
         boolean moved = trapmove(x, y, trap);
 
         if (!u.utrap) {
-            gc.context.botl = TRUE;
+            display.botl = TRUE;
             reset_utrap(TRUE); /* might resume levitation or flight */
         }
         /* might not have escaped, or did escape but remain in same spot */
@@ -2693,7 +2693,7 @@ runmode_delay_output(void)
            display after every step */
         if (flags.runmode != RUN_LEAP || !(gm.moves % 7L)) {
             /* moveloop() suppresses time_botl when running */
-            iflags.time_botl = flags.time;
+            display.time_botl = flags.time;
             curs_on_u();
             nh_delay_output();
             if (flags.runmode == RUN_CRAWL) {
@@ -2728,7 +2728,7 @@ overexert_hp(void)
 
     if (*hp > 1) {
         *hp -= 1;
-        gc.context.botl = TRUE;
+        display.botl = TRUE;
     } else {
         You("pass out from exertion!");
         exercise(A_CON, FALSE);
@@ -2813,7 +2813,7 @@ switch_terrain(void)
             You("start flying.");
     }
     if ((!!Levitation ^ was_levitating) || (!!Flying ^ was_flying))
-        gc.context.botl = TRUE; /* update Lev/Fly status condition */
+        display.botl = TRUE; /* update Lev/Fly status condition */
 }
 
 /* set or clear u.uinwater */
@@ -3724,7 +3724,7 @@ end_running(boolean and_travel)
     /* moveloop() suppresses time_botl when context.run is non-zero; when
        running stops, update 'time' even if other botl status is unchanged */
     if (flags.time && gc.context.run)
-        iflags.time_botl = TRUE;
+        display.time_botl = TRUE;
     gc.context.run = 0;
     /* 'context.mv' isn't travel but callers who want to end travel
        all clear it too */
@@ -3744,7 +3744,7 @@ nomul(int nval)
 {
     if (gm.multi < nval)
         return;              /* This is a bug fix by ab@unido */
-    gc.context.botl |= (gm.multi >= 0);
+    display.botl |= (gm.multi >= 0);
     u.uinvulnerable = FALSE; /* Kludge to avoid ctrl-C bug -dlc */
     u.usleep = 0;
     gm.multi = nval;
@@ -3758,7 +3758,7 @@ nomul(int nval)
 void
 unmul(const char *msg_override)
 {
-    gc.context.botl = TRUE;
+    display.botl = TRUE;
     gm.multi = 0; /* caller will usually have done this already */
     if (msg_override)
         gn.nomovemsg = msg_override;
@@ -3852,7 +3852,7 @@ losehp(int n, const char *knam, schar k_format)
         return;
     }
 #endif
-    gc.context.botl = TRUE; /* u.uhp or u.mh is changing */
+    display.botl = TRUE; /* u.uhp or u.mh is changing */
     end_running(TRUE);
     if (Upolyd) {
         u.mh -= n;

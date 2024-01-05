@@ -3126,7 +3126,7 @@ set_ustuck(struct monst *mtmp)
                        mon_nam(mtmp), mdistu(mtmp));
     }
 
-    gc.context.botl = 1;
+    display.botl = 1;
     u.ustuck = mtmp;
     if (!u.ustuck) {
         u.uswallow = 0;

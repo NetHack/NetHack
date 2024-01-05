@@ -1197,19 +1197,19 @@ cancel_item(struct obj *obj)
         case RIN_GAIN_STRENGTH:
             if ((obj->owornmask & W_RING) != 0L) {
                 ABON(A_STR) -= obj->spe;
-                gc.context.botl = TRUE;
+                display.botl = TRUE;
             }
             break;
         case RIN_GAIN_CONSTITUTION:
             if ((obj->owornmask & W_RING) != 0L) {
                 ABON(A_CON) -= obj->spe;
-                gc.context.botl = TRUE;
+                display.botl = TRUE;
             }
             break;
         case RIN_ADORNMENT:
             if ((obj->owornmask & W_RING) != 0L) {
                 ABON(A_CHA) -= obj->spe;
-                gc.context.botl = TRUE;
+                display.botl = TRUE;
             }
             break;
         case RIN_INCREASE_ACCURACY:
@@ -1222,24 +1222,24 @@ cancel_item(struct obj *obj)
             break;
         case RIN_PROTECTION:
             if ((obj->owornmask & W_RING) != 0L)
-                gc.context.botl = TRUE;
+                display.botl = TRUE;
             break;
         case GAUNTLETS_OF_DEXTERITY:
             if ((obj->owornmask & W_ARMG) != 0L) {
                 ABON(A_DEX) -= obj->spe;
-                gc.context.botl = TRUE;
+                display.botl = TRUE;
             }
             break;
         case HELM_OF_BRILLIANCE:
             if ((obj->owornmask & W_ARMH) != 0L) {
                 ABON(A_INT) -= obj->spe;
                 ABON(A_WIS) -= obj->spe;
-                gc.context.botl = TRUE;
+                display.botl = TRUE;
             }
             break;
         default:
             if ((obj->owornmask & W_ARMOR) != 0L) /* AC */
-                gc.context.botl = TRUE;
+                display.botl = TRUE;
             break;
         }
     }
@@ -1337,19 +1337,19 @@ drain_item(struct obj *obj, boolean by_you)
     case RIN_GAIN_STRENGTH:
         if ((obj->owornmask & W_RING) && u_ring) {
             ABON(A_STR)--;
-            gc.context.botl = 1;
+            display.botl = 1;
         }
         break;
     case RIN_GAIN_CONSTITUTION:
         if ((obj->owornmask & W_RING) && u_ring) {
             ABON(A_CON)--;
-            gc.context.botl = 1;
+            display.botl = 1;
         }
         break;
     case RIN_ADORNMENT:
         if ((obj->owornmask & W_RING) && u_ring) {
             ABON(A_CHA)--;
-            gc.context.botl = 1;
+            display.botl = 1;
         }
         break;
     case RIN_INCREASE_ACCURACY:
@@ -1362,25 +1362,25 @@ drain_item(struct obj *obj, boolean by_you)
         break;
     case RIN_PROTECTION:
         if (u_ring)
-            gc.context.botl = 1; /* bot() will recalc u.uac */
+            display.botl = 1; /* bot() will recalc u.uac */
         break;
     case HELM_OF_BRILLIANCE:
         if ((obj->owornmask & W_ARMH) && (obj == uarmh)) {
             ABON(A_INT)--;
             ABON(A_WIS)--;
-            gc.context.botl = 1;
+            display.botl = 1;
         }
         break;
     case GAUNTLETS_OF_DEXTERITY:
         if ((obj->owornmask & W_ARMG) && (obj == uarmg)) {
             ABON(A_DEX)--;
-            gc.context.botl = 1;
+            display.botl = 1;
         }
         break;
     default:
         break;
     }
-    if (gc.context.botl)
+    if (display.botl)
         bot();
     if (carried(obj))
         update_inventory();
@@ -3047,7 +3047,7 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
             cancel_item(otmp);
 
         if (youdefend) {
-            gc.context.botl = 1; /* potential AC change */
+            display.botl = 1; /* potential AC change */
             find_ac();
             /* update_inventory(); -- handled by caller */
         }

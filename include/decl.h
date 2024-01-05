@@ -115,6 +115,13 @@ extern struct tc_gbl_data {   /* also declared in tcap.h */
 extern const char *ARGV0;
 #endif
 
+struct display_hints {
+    boolean botl;            /* partially redo status line */
+    boolean botlx;           /* print an entirely new bottom line */
+    boolean time_botl;       /* context.botl for 'time' (moves) only */
+};
+extern struct display_hints display;
+
 /*
  * 'gX' -- instance_globals holds engine state that does not need to be
  * persisted upon game exit.  The initialization state is well defined

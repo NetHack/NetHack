@@ -382,7 +382,7 @@ fix_worst_trouble(int trouble)
         }
         You("can breathe again.");
         Strangled = 0;
-        gc.context.botl = 1;
+        display.botl = 1;
         break;
     case TROUBLE_LAVA:
         /* teleport should always succeed, but if not, just untrap them */
@@ -397,7 +397,7 @@ fix_worst_trouble(int trouble)
     case TROUBLE_HUNGRY:
         Your("%s feels content.", body_part(STOMACH));
         init_uhunger();
-        gc.context.botl = 1;
+        display.botl = 1;
         break;
     case TROUBLE_SICK:
         You_feel("better.");
@@ -425,14 +425,14 @@ fix_worst_trouble(int trouble)
         if (u.uhpmax > u.uhppeak)
             u.uhppeak = u.uhpmax;
         u.uhp = u.uhpmax;
-        gc.context.botl = 1;
+        display.botl = 1;
         break;
     case TROUBLE_COLLAPSING:
         /* override Fixed_abil; uncurse that if feasible */
         You_feel("%sstronger.",
                  (AMAX(A_STR) - ABASE(A_STR) > 6) ? "much " : "");
         ABASE(A_STR) = AMAX(A_STR);
-        gc.context.botl = 1;
+        display.botl = 1;
         if (Fixed_abil) {
             if ((otmp = stuck_ring(uleft, RIN_SUSTAIN_ABILITY)) != 0) {
                 if (otmp == uleft)
@@ -536,7 +536,7 @@ fix_worst_trouble(int trouble)
         for (i = 0; i < A_MAX; i++) {
             if (ABASE(i) < AMAX(i)) {
                 ABASE(i) = AMAX(i);
-                gc.context.botl = 1;
+                display.botl = 1;
             }
         }
         (void) encumber_msg();
@@ -1241,7 +1241,7 @@ pleased(aligntyp g_align)
                 u.mh = u.mhmax;
             if (ABASE(A_STR) < AMAX(A_STR)) {
                 ABASE(A_STR) = AMAX(A_STR);
-                gc.context.botl = 1; /* before potential message */
+                display.botl = 1; /* before potential message */
                 (void) encumber_msg();
             }
             if (u.uhunger < 900)
@@ -1256,7 +1256,7 @@ pleased(aligntyp g_align)
                rather than issuing a pat-on-head */
             u.ucreamed = 0;
             make_blinded(0L, TRUE);
-            gc.context.botl = 1;
+            display.botl = 1;
             break;
         case 4: {
             register struct obj *otmp;

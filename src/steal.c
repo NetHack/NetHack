@@ -123,7 +123,7 @@ stealgold(register struct monst* mtmp)
         if (!tele_restrict(mtmp))
             (void) rloc(mtmp, RLOC_MSG);
         monflee(mtmp, 0, FALSE, FALSE);
-        gc.context.botl = 1;
+        display.botl = 1;
     }
 }
 

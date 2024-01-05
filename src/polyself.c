@@ -143,7 +143,7 @@ float_vs_flight(void)
        might cause a change in stealth */
     steed_vs_stealth();
 
-    gc.context.botl = TRUE;
+    display.botl = TRUE;
 }
 
 /* riding blocks stealth unless hero+steed fly */
@@ -169,7 +169,7 @@ check_strangling(boolean on)
         if (uamul && uamul->otyp == AMULET_OF_STRANGULATION
             && can_be_strangled(&gy.youmonst)) {
             Strangled = 6L;
-            gc.context.botl = TRUE;
+            display.botl = TRUE;
             Your("%s %s your %s!", simpleonames(uamul),
                  was_strangled ? "still constricts" : "begins constricting",
                  body_part(NECK)); /* "throat" */
@@ -180,7 +180,7 @@ check_strangling(boolean on)
     } else {
         if (Strangled && !can_be_strangled(&gy.youmonst)) {
             Strangled = 0L;
-            gc.context.botl = TRUE;
+            display.botl = TRUE;
             You("are no longer being strangled.");
         }
     }
@@ -445,7 +445,7 @@ newman(void)
         make_slimed(10L, (const char *) 0);
     }
 
-    gc.context.botl = 1;
+    display.botl = 1;
     see_monsters();
     (void) encumber_msg();
 
@@ -640,7 +640,7 @@ polyself(int psflags)
                        of evaporation due to over enchanting */
                     uarm->otyp += GRAY_DRAGON_SCALES - GRAY_DRAGON_SCALE_MAIL;
                     uarm->dknown = 1;
-                    gc.context.botl = 1; /* AC is changing */
+                    display.botl = 1; /* AC is changing */
                 }
                 uskin = uarm;
                 uarm = (struct obj *) 0;
@@ -1002,7 +1002,7 @@ polymon(int mntmp)
     }
     check_strangling(TRUE); /* maybe start strangling */
 
-    gc.context.botl = 1;
+    display.botl = 1;
     gv.vision_full_recalc = 1;
     see_monsters();
     (void) encumber_msg();
@@ -1380,7 +1380,7 @@ rehumanize(void)
     }
     nomul(0);
 
-    gc.context.botl = 1;
+    display.botl = 1;
     gv.vision_full_recalc = 1;
     (void) encumber_msg();
     if (was_flying && !Flying && u.usteed)
@@ -1405,7 +1405,7 @@ dobreathe(void)
         return ECMD_OK;
     }
     u.uen -= 15;
-    gc.context.botl = 1;
+    display.botl = 1;
 
     if (!getdir((char *) 0))
         return ECMD_CANCEL;
@@ -1602,7 +1602,7 @@ dosummon(void)
         return ECMD_OK;
     }
     u.uen -= 10;
-    gc.context.botl = 1;
+    display.botl = 1;
 
     You("call upon your brethren for help!");
     exercise(A_WIS, TRUE);
@@ -1643,7 +1643,7 @@ dogaze(void)
         return ECMD_OK;
     }
     u.uen -= 15;
-    gc.context.botl = 1;
+    display.botl = 1;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
@@ -1878,7 +1878,7 @@ domindblast(void)
         return ECMD_OK;
     }
     u.uen -= 10;
-    gc.context.botl = 1;
+    display.botl = 1;
 
     You("concentrate.");
     pline("A wave of psychic energy pours out.");
@@ -2158,7 +2158,7 @@ ugolemeffects(int damtype, int dam)
         u.mh += heal;
         if (u.mh > u.mhmax)
             u.mh = u.mhmax;
-        gc.context.botl = 1;
+        display.botl = 1;
         pline("Strangely, you feel better than before.");
         exercise(A_STR, TRUE);
     }

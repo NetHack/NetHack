@@ -1670,7 +1670,7 @@ docrt_flags(int refresh_flags)
         /* perm_invent */
         update_inventory();
         /* status */
-        gc.context.botlx = 1; /* force a redraw of the bottom lines */
+        display.botlx = 1; /* force a redraw of the bottom lines */
         /* note: caller needs to call bot() to actually redraw status */
     }
     gp.program_state.in_docrt = FALSE;
@@ -2045,7 +2045,7 @@ cls(void)
         return;
     in_cls = TRUE;
     display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
-    gc.context.botlx = 1;                 /* force update of botl window */
+    display.botlx = 1;                 /* force update of botl window */
     clear_nhwindow(WIN_MAP);              /* clear physical screen */
 
     clear_glyph_buffer(); /* force gbuf[][].glyph to unexplored */
@@ -2084,9 +2084,9 @@ flush_screen(int cursor_on_u)
 #endif
 
     /* get this done now, before we place the cursor on the hero */
-    if (gc.context.botl || gc.context.botlx)
+    if (display.botl || display.botlx)
         bot();
-    else if (iflags.time_botl)
+    else if (display.time_botl)
         timebot();
 
     for (y = 0; y < ROWNO; y++) {

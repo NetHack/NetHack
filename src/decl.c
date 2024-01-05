@@ -189,6 +189,7 @@ const struct Race urace_init_data = {
     { 1, 0, 2, 0, 2, 0 }  /* Energy */
 };
 
+struct display_hints display = { 0 };
 
 const struct instance_globals_a g_init_a = {
     /* artifact.c */
@@ -1061,6 +1062,7 @@ decl_globals_init(void)
     ZERO(flags);
     ZERO(iflags);
     ZERO(a11y);
+    ZERO(display);
     ZERO(u);
     ZERO(ubirthday);
     ZERO(urealtime);

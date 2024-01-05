@@ -213,7 +213,7 @@ Boots_on(void)
                                * so uarmf could be Null below; status line
                                * gets updated during brief interval they're
                                * worn so hero and player learn enchantment */
-            gc.context.botl = 1; /* status hilites might mark AC changed */
+            display.botl = 1; /* status hilites might mark AC changed */
             makeknown(uarmf->otyp);
             float_up();
             if (Levitation)
@@ -428,7 +428,7 @@ Helmet_on(void)
            but it takes trained arrogance to pull it off, and the actual
            enchantment of the hat is irrelevant */
         ABON(A_CHA) += (Role_if(PM_WIZARD) ? 1 : -1);
-        gc.context.botl = 1;
+        display.botl = 1;
         makeknown(uarmh->otyp);
         break;
     case HELM_OF_OPPOSITE_ALIGNMENT:
@@ -460,7 +460,7 @@ Helmet_on(void)
             else if (uarmh->bknown)
                 update_inventory(); /* keep bknown as-is; display the curse */
         }
-        gc.context.botl = 1; /* reveal new alignment or INT & WIS */
+        display.botl = 1; /* reveal new alignment or INT & WIS */
         if (Hallucination) {
             pline("My brain hurts!"); /* Monty Python's Flying Circus */
         } else if (uarmh && uarmh->otyp == DUNCE_CAP) {
@@ -499,12 +499,12 @@ Helmet_off(void)
     case ORCISH_HELM:
         break;
     case DUNCE_CAP:
-        gc.context.botl = 1;
+        display.botl = 1;
         break;
     case CORNUTHAUM:
         if (!gc.context.takeoff.cancelled_don) {
             ABON(A_CHA) += (Role_if(PM_WIZARD) ? -1 : 1);
-            gc.context.botl = 1;
+            display.botl = 1;
         }
         break;
     case HELM_OF_TELEPATHY:
@@ -555,7 +555,7 @@ Gloves_on(void)
         break;
     case GAUNTLETS_OF_POWER:
         makeknown(uarmg->otyp);
-        gc.context.botl = 1; /* taken care of in attrib.c */
+        display.botl = 1; /* taken care of in attrib.c */
         break;
     case GAUNTLETS_OF_DEXTERITY:
         adj_abon(uarmg, uarmg->spe);
@@ -629,7 +629,7 @@ Gloves_off(void)
         break;
     case GAUNTLETS_OF_POWER:
         makeknown(uarmg->otyp);
-        gc.context.botl = 1; /* taken care of in attrib.c */
+        display.botl = 1; /* taken care of in attrib.c */
         break;
     case GAUNTLETS_OF_DEXTERITY:
         if (!gc.context.takeoff.cancelled_don)
@@ -664,7 +664,7 @@ Gloves_off(void)
         wielding_corpse(uswapwep, gloves, on_purpose);
 
     if (condtests[bl_bareh].enabled)
-        gc.context.botl = 1;
+        display.botl = 1;
 
     return 0;
 }
@@ -959,7 +959,7 @@ Amulet_on(void)
             makeknown(AMULET_OF_CHANGE);
             You("are suddenly very %s!",
                 flags.female ? "feminine" : "masculine");
-            gc.context.botl = 1;
+            display.botl = 1;
             newsym(u.ux, u.uy); /* glyphmon flag and tile may have gone
                                  * from male to female or vice versa */
         } else {
@@ -978,7 +978,7 @@ Amulet_on(void)
         if (can_be_strangled(&gy.youmonst)) {
             makeknown(AMULET_OF_STRANGULATION);
             Strangled = 6L;
-            gc.context.botl = TRUE;
+            display.botl = TRUE;
             pline("It constricts your throat!");
         }
         break;
@@ -1005,7 +1005,7 @@ Amulet_on(void)
 
             if (!already_flying) {
                 makeknown(AMULET_OF_FLYING);
-                gc.context.botl = TRUE; /* status: 'Fly' On */
+                display.botl = TRUE; /* status: 'Fly' On */
                 You("are now in flight.");
             }
         }
@@ -1053,7 +1053,7 @@ Amulet_off(void)
     case AMULET_OF_STRANGULATION:
         if (Strangled) {
             Strangled = 0L;
-            gc.context.botl = TRUE;
+            display.botl = TRUE;
             if (Breathless)
                 Your("%s is no longer constricted!", body_part(NECK));
             else
@@ -1074,7 +1074,7 @@ Amulet_off(void)
         float_vs_flight(); /* probably not needed here */
         if (was_flying && !Flying) {
             makeknown(AMULET_OF_FLYING);
-            gc.context.botl = TRUE; /* status: 'Fly' Off */
+            display.botl = TRUE; /* status: 'Fly' Off */
             You("%s.", (is_pool_or_lava(u.ux, u.uy)
                         || Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
                           ? "stop flying"
@@ -1140,7 +1140,7 @@ adjust_attrib(struct obj *obj, int which, int val)
         already discovered, both handled by learnring()] */
     if (observable || !extremeattr(which))
         learnring(obj, observable);
-    gc.context.botl = 1;
+    display.botl = 1;
 }
 
 void
@@ -2118,7 +2118,7 @@ accessory_or_armor_on(struct obj *obj)
                 You("are suddenly overcome with shame and change your mind.");
             u.ublessed = 0; /* lose your god's protection */
             makeknown(obj->otyp);
-            gc.context.botl = 1; /* for AC after zeroing u.ublessed */
+            display.botl = 1; /* for AC after zeroing u.ublessed */
             return ECMD_TIME;
         }
     } else {
@@ -2391,7 +2391,7 @@ find_ac(void)
 
     if (uac != u.uac) {
         u.uac = uac;
-        gc.context.botl = 1;
+        display.botl = 1;
 #if 0
         /* these could conceivably be achieved out of order (by being near
            threshold and putting on +N dragon scale mail from bones, for
@@ -3120,7 +3120,7 @@ adj_abon(register struct obj *otmp, register schar delta)
             makeknown(uarmg->otyp);
             ABON(A_DEX) += (delta);
         }
-        gc.context.botl = 1;
+        display.botl = 1;
     }
     if (uarmh && uarmh == otmp && otmp->otyp == HELM_OF_BRILLIANCE) {
         if (delta) {
@@ -3128,7 +3128,7 @@ adj_abon(register struct obj *otmp, register schar delta)
             ABON(A_INT) += (delta);
             ABON(A_WIS) += (delta);
         }
-        gc.context.botl = 1;
+        display.botl = 1;
     }
 }
 

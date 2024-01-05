@@ -989,7 +989,7 @@ set_utrap(unsigned int tim, unsigned int typ)
        have already set u.utrap to 0 so this check won't be sufficient
        in that situation; caller will need to set context.botl itself */
     if (!u.utrap ^ !tim)
-        gc.context.botl = TRUE;
+        display.botl = TRUE;
 
     u.utrap = tim;
     u.utraptype = tim ? typ : TT_NONE;
@@ -3662,7 +3662,7 @@ mselftouch(
 void
 float_up(void)
 {
-    gc.context.botl = TRUE;
+    display.botl = TRUE;
     if (u.utrap) {
         if (u.utraptype == TT_PIT) {
             reset_utrap(FALSE);
@@ -3775,7 +3775,7 @@ float_down(
         (void) encumber_msg(); /* carrying capacity might have changed */
         return 0;
     }
-    gc.context.botl = TRUE;
+    display.botl = TRUE;
     nomul(0); /* stop running or resting */
     if (BFlying) {
         /* controlled flight no longer overridden by levitation */
@@ -4000,24 +4000,24 @@ dofiretrap(
         if (alt > num)
             num = alt;
         if (u.mhmax > mons[u.umonnum].mlevel)
-            u.mhmax -= rn2(min(u.mhmax, num + 1)), gc.context.botl = TRUE;
+            u.mhmax -= rn2(min(u.mhmax, num + 1)), display.botl = TRUE;
         if (u.mh > u.mhmax)
-            u.mh = u.mhmax, gc.context.botl = TRUE;
+            u.mh = u.mhmax, display.botl = TRUE;
         monstunseesu(M_SEEN_FIRE);
     } else {
         int uhpmin = minuhpmax(1), olduhpmax = u.uhpmax;
 
         num = d(2, 4);
         if (u.uhpmax > uhpmin) {
-            u.uhpmax -= rn2(min(u.uhpmax, num + 1)), gc.context.botl = TRUE;
+            u.uhpmax -= rn2(min(u.uhpmax, num + 1)), display.botl = TRUE;
         } /* note: no 'else' here */
         if (u.uhpmax < uhpmin) {
-            setuhpmax(min(olduhpmax, uhpmin)); /* sets gc.context.botl */
+            setuhpmax(min(olduhpmax, uhpmin)); /* sets display.botl */
             if (!Drain_resistance)
                 losexp(NULL); /* never fatal when 'drainer' is Null */
         }
         if (u.uhp > u.uhpmax)
-            u.uhp = u.uhpmax, gc.context.botl = TRUE;
+            u.uhp = u.uhpmax, display.botl = TRUE;
         monstunseesu(M_SEEN_FIRE);
     }
     if (!num)
@@ -4064,12 +4064,12 @@ domagictrap(void)
             Soundeffect(se_deafening_roar_atmospheric, 100);
             You_hear("a deafening roar!");
             incr_itimeout(&HDeaf, rn1(20, 30));
-            gc.context.botl = TRUE;
+            display.botl = TRUE;
         } else {
             /* magic vibrations still hit you */
             You_feel("rankled.");
             incr_itimeout(&HDeaf, rn1(5, 15));
-            gc.context.botl = TRUE;
+            display.botl = TRUE;
         }
         while (cnt--)
             (void) makemon((struct permonst *) 0, u.ux, u.uy, NO_MM_FLAGS);
@@ -4938,7 +4938,7 @@ drain_en(int n, boolean max_already_drained)
         /* energy is completely gone */
         if (u.uen || u.uenmax) { /* paranoia */
             u.uen = u.uenmax = 0;
-            gc.context.botl = TRUE;
+            display.botl = TRUE;
         }
         mesg = "momentarily lethargic";
     } else {
@@ -4961,7 +4961,7 @@ drain_en(int n, boolean max_already_drained)
                and then we throttled the loss being applied to current */
             u.uen = u.uenmax;
         }
-        gc.context.botl = TRUE;
+        display.botl = TRUE;
     }
     /* after manipulating u.uen,uenmax and setting context.botl, so
        that You_feel() -> pline() will update status before the message */

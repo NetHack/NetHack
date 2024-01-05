@@ -184,7 +184,7 @@ adjattrib(
         return FALSE;
     }
 
-    gc.context.botl = TRUE;
+    display.botl = TRUE;
     if (msgflg <= 0)
         You_feel("%s%s!", (incr > 1 || incr < -1) ? "very " : "", attrstr);
     if (gp.program_state.in_moveloop && (ndx == A_STR || ndx == A_CON))
@@ -246,7 +246,7 @@ losestr(int num, const char *knam, schar k_format)
             if (u.uhpmax > uhpmin)
                 setuhpmax(max(u.uhpmax - dmg, uhpmin));
         }
-        gc.context.botl = TRUE;
+        display.botl = TRUE;
     }
 #if 0   /* only possible if uhpmax was already less than uhpmin */
     if (!Upolyd && u.uhpmax < uhpmin) {
@@ -354,7 +354,7 @@ poisoned(
         loss = 6 + d(4, 6);
         if (u.uhp <= loss) {
             u.uhp = -1;
-            gc.context.botl = TRUE;
+            display.botl = TRUE;
             pline_The("poison was deadly...");
         } else {
             /* survived, but with severe reaction */
@@ -457,13 +457,13 @@ restore_attrib(void)
         if (ATEMP(i) != equilibrium && ATIME(i) != 0) {
             if (!(--(ATIME(i)))) { /* countdown for change */
                 ATEMP(i) += (ATEMP(i) > 0) ? -1 : 1;
-                gc.context.botl = TRUE;
+                display.botl = TRUE;
                 if (ATEMP(i)) /* reset timer */
                     ATIME(i) = 100 / ACURR(A_CON);
             }
         }
     }
-    if (gc.context.botl)
+    if (display.botl)
         (void) encumber_msg();
 }
 
@@ -1112,10 +1112,10 @@ setuhpmax(int newmax)
         u.uhpmax = newmax;
         if (u.uhpmax > u.uhppeak)
             u.uhppeak = u.uhpmax;
-        gc.context.botl = TRUE;
+        display.botl = TRUE;
     }
     if (u.uhp > u.uhpmax)
-        u.uhp = u.uhpmax, gc.context.botl = TRUE;
+        u.uhp = u.uhpmax, display.botl = TRUE;
 }
 
 /* return the current effective value of a specific characteristic
@@ -1238,7 +1238,7 @@ uchangealign(int newalign,
     u.ublessed = 0; /* lose divine protection */
     /* You/Your/pline message with call flush_screen(), triggering bot(),
        so the actual data change needs to come before the message */
-    gc.context.botl = TRUE; /* status line needs updating */
+    display.botl = TRUE; /* status line needs updating */
     if (reason == 0) {
         /* conversion via altar */
         livelog_printf(LL_ALIGNMENT, "permanently converted to %s",
