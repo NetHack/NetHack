@@ -185,7 +185,7 @@ steps:
     sh setup.sh hints/linux.370
     cd ../..
     make fetch-lua
-    make WANT_WIN_ALL=1 QT_SELECT=6 MOC=moc all
+    make WANT_WIN_ALL=1 WANT_WIN_QT6=1 QT_SELECT=6 MOC=moc all
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildTarget, 'all'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
   displayName: 'Building linux full build'
