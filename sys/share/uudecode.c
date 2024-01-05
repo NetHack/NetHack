@@ -128,7 +128,7 @@ main(int argc, char **argv)
     }
     (void) sscanf(buf, "begin %o %s", &mode, dest);
 
-#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32) && !defined(__APPLE__)
+#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32) && !defined(__APPLE__) && !defined(__linux__)
     /* handle ~user/file format */
     if (dest[0] == '~') {
         char *sl;
@@ -237,7 +237,7 @@ outdec(char *p, FILE *f, int n)
         putc(c3, f);
 }
 
-#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32) && !defined(__APPLE__)
+#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32) && !defined(__APPLE__) && !defined(__linux__)
 
 /*
  * Return the ptr in sp at which the character c appears;
