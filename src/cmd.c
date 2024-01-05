@@ -2122,7 +2122,7 @@ wiz_intrinsic(void)
  def_feedback:
                 if (p != GLIB)
                     incr_itimeout(&u.uprops[p].intrinsic, amt);
-                display.botl = 1; /* have pline() do a status update */
+                display.botl = TRUE; /* have pline() do a status update */
                 pline("Timeout for %s %s %d.", propname,
                       oldtimeout ? "increased by" : "set to", amt);
                 break;

@@ -1670,7 +1670,7 @@ docrt_flags(int refresh_flags)
         /* perm_invent */
         update_inventory();
         /* status */
-        display.botlx = 1; /* force a redraw of the bottom lines */
+        display.botlx = TRUE; /* force a redraw of the bottom lines */
         /* note: caller needs to call bot() to actually redraw status */
     }
     gp.program_state.in_docrt = FALSE;
@@ -2045,7 +2045,7 @@ cls(void)
         return;
     in_cls = TRUE;
     display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
-    display.botlx = 1;                 /* force update of botl window */
+    display.botlx = TRUE;                 /* force update of botl window */
     clear_nhwindow(WIN_MAP);              /* clear physical screen */
 
     clear_glyph_buffer(); /* force gbuf[][].glyph to unexplored */

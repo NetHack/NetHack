@@ -445,7 +445,7 @@ newman(void)
         make_slimed(10L, (const char *) 0);
     }
 
-    display.botl = 1;
+    display.botl = TRUE;
     see_monsters();
     (void) encumber_msg();
 
@@ -640,7 +640,7 @@ polyself(int psflags)
                        of evaporation due to over enchanting */
                     uarm->otyp += GRAY_DRAGON_SCALES - GRAY_DRAGON_SCALE_MAIL;
                     uarm->dknown = 1;
-                    display.botl = 1; /* AC is changing */
+                    display.botl = TRUE; /* AC is changing */
                 }
                 uskin = uarm;
                 uarm = (struct obj *) 0;
@@ -1002,7 +1002,7 @@ polymon(int mntmp)
     }
     check_strangling(TRUE); /* maybe start strangling */
 
-    display.botl = 1;
+    display.botl = TRUE;
     gv.vision_full_recalc = 1;
     see_monsters();
     (void) encumber_msg();
@@ -1380,7 +1380,7 @@ rehumanize(void)
     }
     nomul(0);
 
-    display.botl = 1;
+    display.botl = TRUE;
     gv.vision_full_recalc = 1;
     (void) encumber_msg();
     if (was_flying && !Flying && u.usteed)
@@ -1405,7 +1405,7 @@ dobreathe(void)
         return ECMD_OK;
     }
     u.uen -= 15;
-    display.botl = 1;
+    display.botl = TRUE;
 
     if (!getdir((char *) 0))
         return ECMD_CANCEL;
@@ -1602,7 +1602,7 @@ dosummon(void)
         return ECMD_OK;
     }
     u.uen -= 10;
-    display.botl = 1;
+    display.botl = TRUE;
 
     You("call upon your brethren for help!");
     exercise(A_WIS, TRUE);
@@ -1643,7 +1643,7 @@ dogaze(void)
         return ECMD_OK;
     }
     u.uen -= 15;
-    display.botl = 1;
+    display.botl = TRUE;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
@@ -1878,7 +1878,7 @@ domindblast(void)
         return ECMD_OK;
     }
     u.uen -= 10;
-    display.botl = 1;
+    display.botl = TRUE;
 
     You("concentrate.");
     pline("A wave of psychic energy pours out.");
@@ -2158,7 +2158,7 @@ ugolemeffects(int damtype, int dam)
         u.mh += heal;
         if (u.mh > u.mhmax)
             u.mh = u.mhmax;
-        display.botl = 1;
+        display.botl = TRUE;
         pline("Strangely, you feel better than before.");
         exercise(A_STR, TRUE);
     }

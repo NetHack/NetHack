@@ -1537,7 +1537,7 @@ done(int how)
                negative (-1 is used as a flag in some circumstances
                which don't apply when actually dying due to HP loss) */
             u.uhp = u.mh = 0;
-            display.botl = 1;
+            display.botl = TRUE;
         }
     }
     if (Lifesaved && (how <= GENOCIDED)) {

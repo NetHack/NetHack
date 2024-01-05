@@ -769,7 +769,7 @@ nh_timeout(void)
             case FLYING:
                 /* timed Flying is via #wizintrinsic only */
                 if (was_flying && !Flying) {
-                    display.botl = 1;
+                    display.botl = TRUE;
                     You("land.");
                     spoteffects(TRUE);
                 }

@@ -3988,7 +3988,7 @@ mhitm_ad_phys(
                         exercise(A_STR, FALSE);
                     /* inflict damage now; we know it can't be fatal */
                     u.mh -= tmp;
-                    display.botl = 1;
+                    display.botl = TRUE;
                     mhm->damage = 0; /* don't inflict more damage below */
                     if (cloneu())
                         You("divide as %s hits you!", mon_nam(magr));
@@ -4218,7 +4218,7 @@ mhitm_ad_heal(
                 exercise(A_CON, TRUE);
             if (Sick)
                 make_sick(0L, (char *) 0, FALSE, SICK_ALL);
-            display.botl = 1;
+            display.botl = TRUE;
             if (goaway) {
                 mongone(magr);
                 mhm->done = TRUE;

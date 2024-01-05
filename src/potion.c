@@ -655,7 +655,7 @@ peffect_restore_ability(struct obj *otmp)
                WEAK or worse, but that's handled via ATEMP(A_STR) now */
             if (ABASE(i) < lim) {
                 ABASE(i) = lim;
-                display.botl = 1;
+                display.botl = TRUE;
                 /* only first found if not blessed */
                 if (!otmp->blessed)
                     break;
@@ -1232,7 +1232,7 @@ peffect_gain_energy(struct obj *otmp)
         u.uen = u.uenmax;
     else if (u.uen <= 0)
         u.uen = 0;
-    display.botl = 1;
+    display.botl = TRUE;
     exercise(A_WIS, TRUE);
 }
 
@@ -1433,7 +1433,7 @@ healup(int nhp, int nxtra, boolean curesick, boolean cureblind)
         make_vomiting(0L, TRUE);
         make_sick(0L, (char *) 0, TRUE, SICK_ALL);
     }
-    display.botl = 1;
+    display.botl = TRUE;
     return;
 }
 
@@ -1936,7 +1936,7 @@ potionbreathe(struct obj *obj)
                     ABASE(i)++;
                     /* only first found if not blessed */
                     isdone = !(obj->blessed);
-                    display.botl = 1;
+                    display.botl = TRUE;
                 }
                 if (++i >= A_MAX)
                     i = 0;
@@ -1945,24 +1945,24 @@ potionbreathe(struct obj *obj)
         break;
     case POT_FULL_HEALING:
         if (Upolyd && u.mh < u.mhmax)
-            u.mh++, display.botl = 1;
+            u.mh++, display.botl = TRUE;
         if (u.uhp < u.uhpmax)
-            u.uhp++, display.botl = 1;
+            u.uhp++, display.botl = TRUE;
         cureblind = TRUE;
         /*FALLTHRU*/
     case POT_EXTRA_HEALING:
         if (Upolyd && u.mh < u.mhmax)
-            u.mh++, display.botl = 1;
+            u.mh++, display.botl = TRUE;
         if (u.uhp < u.uhpmax)
-            u.uhp++, display.botl = 1;
+            u.uhp++, display.botl = TRUE;
         if (!obj->cursed)
             cureblind = TRUE;
         /*FALLTHRU*/
     case POT_HEALING:
         if (Upolyd && u.mh < u.mhmax)
-            u.mh++, display.botl = 1;
+            u.mh++, display.botl = TRUE;
         if (u.uhp < u.uhpmax)
-            u.uhp++, display.botl = 1;
+            u.uhp++, display.botl = TRUE;
         if (obj->blessed)
             cureblind = TRUE;
         if (cureblind) {
@@ -1984,7 +1984,7 @@ potionbreathe(struct obj *obj)
                 else
                     u.uhp -= 5;
             }
-            display.botl = 1;
+            display.botl = TRUE;
             exercise(A_CON, FALSE);
         }
         break;
@@ -2831,7 +2831,7 @@ split_mon(
         if (mtmp2) {
             mtmp2->mhpmax = u.mhmax / 2;
             u.mhmax -= mtmp2->mhpmax;
-            display.botl = 1;
+            display.botl = TRUE;
             You("multiply%s!", reason);
         }
     } else {

@@ -2377,7 +2377,7 @@ set_wounded_legs(long side, int timex)
      * You still call this function, but don't lose hp.
      * Caller is also responsible for adjusting messages.
      */
-    display.botl = 1;
+    display.botl = TRUE;
     if (!Wounded_legs)
         ATEMP(A_DEX)--;
 
@@ -2397,7 +2397,7 @@ heal_legs(
     int how) /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
 {
     if (Wounded_legs) {
-        display.botl = 1;
+        display.botl = TRUE;
         if (ATEMP(A_DEX) < 0)
             ATEMP(A_DEX)++;
 

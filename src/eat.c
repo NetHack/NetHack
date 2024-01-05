@@ -654,7 +654,7 @@ eat_brains(
                 ABASE(A_INT) += rnd(4);
                 if (ABASE(A_INT) > AMAX(A_INT))
                     ABASE(A_INT) = AMAX(A_INT);
-                display.botl = 1;
+                display.botl = TRUE;
             }
             exercise(A_WIS, TRUE);
             *dmg_p += xtra_dmg;
@@ -1085,7 +1085,7 @@ eye_of_newt_buzz(void)
         }
         if (old_uen != u.uen) {
             You_feel("a mild buzz.");
-            display.botl = 1;
+            display.botl = TRUE;
         }
     }
 }
@@ -1124,7 +1124,7 @@ cpostfx(int pm)
         else
             u.uhp = u.uhpmax;
         make_blinded(0L, !u.ucreamed);
-        display.botl = 1;
+        display.botl = TRUE;
         check_intrinsics = TRUE; /* might also convey poison resistance */
         break;
     case PM_STALKER:
@@ -2240,7 +2240,7 @@ eataccessory(struct obj *otmp)
                                           (typ == RIN_PROTECTION) ? otmp->spe
                                            : 2, /* fixed amount for amulet */
                                           typ);
-            display.botl = 1;
+            display.botl = TRUE;
             break;
         case RIN_FREE_ACTION:
             /* Give sleep resistance instead */
@@ -2256,7 +2256,7 @@ eataccessory(struct obj *otmp)
             change_sex();
             You("are suddenly very %s!",
                 flags.female ? "feminine" : "masculine");
-            display.botl = 1;
+            display.botl = TRUE;
             break;
         case AMULET_OF_UNCHANGING:
             /* un-change: it's a pun */
@@ -3204,7 +3204,7 @@ unfaint(void)
     if (u.uhs > FAINTING)
         u.uhs = FAINTING;
     stop_occupation();
-    display.botl = 1;
+    display.botl = TRUE;
     return 0;
 }
 
@@ -3301,7 +3301,7 @@ newuhs(boolean incr)
            now uhunger becomes more negative at a slower rate */
         } else if (u.uhunger < -(100 + 10 * (int) ACURR(A_CON))) {
             u.uhs = STARVED;
-            display.botl = 1;
+            display.botl = TRUE;
             bot();
             You("die from starvation.");
             gk.killer.format = KILLED_BY;
@@ -3365,7 +3365,7 @@ newuhs(boolean incr)
             break;
         }
         u.uhs = newhs;
-        display.botl = 1;
+        display.botl = TRUE;
         bot();
         if ((Upolyd ? u.mh : u.uhp) < 1) {
             You("die from hunger and exhaustion.");

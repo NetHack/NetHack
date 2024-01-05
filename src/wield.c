@@ -114,7 +114,7 @@ setuwep(struct obj *obj)
     if (uwep == obj
         && (u_wield_art(ART_OGRESMASHER)
             || is_art(olduwep, ART_OGRESMASHER)))
-        display.botl = 1;
+        display.botl = TRUE;
     /* Note: Explicitly wielding a pick-axe will not give a "bashing"
      * message.  Wielding one via 'a'pplying it will.
      * 3.2.2:  Wielding arbitrary objects will give bashing message too.
@@ -262,7 +262,7 @@ ready_weapon(struct obj *wep)
         }
     }
     if ((had_wep != (uwep != 0)) && condtests[bl_bareh].enabled)
-        display.botl = 1;
+        display.botl = TRUE;
     return res;
 }
 

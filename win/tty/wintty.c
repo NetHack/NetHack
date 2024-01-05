@@ -1067,11 +1067,11 @@ tty_clear_nhwindow(winid window)
             cw->data[i][n - 1] = '\0';
             /*finalx[i][NOW] = finalx[i][BEFORE] = 0;*/
         }
-        display.botlx = 1;
+        display.botlx = TRUE;
         break;
     case NHW_MAP:
         /* cheap -- clear the whole thing and tell nethack to redraw botl */
-        display.botlx = 1;
+        display.botlx = TRUE;
         /*FALLTHRU*/
     case NHW_BASE:
         /* if erasing_tty_screen is True, calling sequence is
@@ -3653,7 +3653,7 @@ docorner(
     if (ymax >= (int) wins[WIN_STATUS]->offy
         && !ystart_between_menu_pages) {
         /* we have wrecked the bottom line */
-        display.botlx = 1;
+        display.botlx = TRUE;
         bot();
     }
 }

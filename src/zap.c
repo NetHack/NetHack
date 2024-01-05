@@ -1337,19 +1337,19 @@ drain_item(struct obj *obj, boolean by_you)
     case RIN_GAIN_STRENGTH:
         if ((obj->owornmask & W_RING) && u_ring) {
             ABON(A_STR)--;
-            display.botl = 1;
+            display.botl = TRUE;
         }
         break;
     case RIN_GAIN_CONSTITUTION:
         if ((obj->owornmask & W_RING) && u_ring) {
             ABON(A_CON)--;
-            display.botl = 1;
+            display.botl = TRUE;
         }
         break;
     case RIN_ADORNMENT:
         if ((obj->owornmask & W_RING) && u_ring) {
             ABON(A_CHA)--;
-            display.botl = 1;
+            display.botl = TRUE;
         }
         break;
     case RIN_INCREASE_ACCURACY:
@@ -1362,19 +1362,19 @@ drain_item(struct obj *obj, boolean by_you)
         break;
     case RIN_PROTECTION:
         if (u_ring)
-            display.botl = 1; /* bot() will recalc u.uac */
+            display.botl = TRUE; /* bot() will recalc u.uac */
         break;
     case HELM_OF_BRILLIANCE:
         if ((obj->owornmask & W_ARMH) && (obj == uarmh)) {
             ABON(A_INT)--;
             ABON(A_WIS)--;
-            display.botl = 1;
+            display.botl = TRUE;
         }
         break;
     case GAUNTLETS_OF_DEXTERITY:
         if ((obj->owornmask & W_ARMG) && (obj == uarmg)) {
             ABON(A_DEX)--;
-            display.botl = 1;
+            display.botl = TRUE;
         }
         break;
     default:
@@ -3047,7 +3047,7 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
             cancel_item(otmp);
 
         if (youdefend) {
-            display.botl = 1; /* potential AC change */
+            display.botl = TRUE; /* potential AC change */
             find_ac();
             /* update_inventory(); -- handled by caller */
         }
