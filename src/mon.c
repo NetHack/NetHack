@@ -1873,7 +1873,11 @@ mon_allowflags(struct monst* mtmp)
         allowflags |= OPENDOOR;
     if (can_unlock)
         allowflags |= UNLOCKDOOR;
-    if (passes_bars(mtmp->data))
+    if (passes_bars(mtmp->data)
+        /* restrict engulfer or holder who might try to pass iron bars while
+           carrying hero; accept small subset for poly'd hero passes_bars() */
+        && (mtmp != u.ustuck || (unsolid(gy.youmonst.data)
+                                 || verysmall(gy.youmonst.data))))
         allowflags |= ALLOW_BARS;
 #if 0   /* can't do this here; leave it for mfndpos() */
     if (is_displacer(mtmp->data))

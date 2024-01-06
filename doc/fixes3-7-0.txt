@@ -1346,6 +1346,8 @@ if polymorphing a potion turned it into oil, dipping potions produced oil
 	set of the original potion's age (turn it was created) and could burn
 	for an arbitrarily long time if applied; conversely, polymophing oil
 	into non-oil kept its relative age (no noticeable effect though)
+an engulfer capable of passing through iron bars could do so even when hero
+	was engulfed
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
