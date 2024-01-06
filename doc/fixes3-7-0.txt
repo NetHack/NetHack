@@ -1348,6 +1348,7 @@ if polymorphing a potion turned it into oil, dipping potions produced oil
 	into non-oil kept its relative age (no noticeable effect though)
 an engulfer capable of passing through iron bars could do so even when hero
 	was engulfed
+some uses of mons[obj->corpsenm] weren't excluding obj->corpsenm==NON_PM (-1)
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

@@ -48,9 +48,6 @@ static int tin_ok(struct obj *);
 /* also used to see if you're allowed to eat cats and dogs */
 #define CANNIBAL_ALLOWED() (Role_if(PM_CAVE_DWELLER) || Race_if(PM_ORC))
 
-/* monster types that cause hero to be turned into stone if eaten */
-#define flesh_petrifies(pm) (touch_petrifies(pm) || (pm) == &mons[PM_MEDUSA])
-
 /* Rider corpses are treated as non-rotting so that attempting to eat one
    will be sure to reach the stage of eating where that meal is fatal;
    acid blob corpses eventually rot away to nothing but before that happens
@@ -58,7 +55,7 @@ static int tin_ok(struct obj *);
    become rotten */
 #define nonrotting_corpse(mnum) \
     ((mnum) == PM_LIZARD || (mnum) == PM_LICHEN \
-     || ((mnum) >= LOW_PM && is_rider(&mons[mnum])) \
+     || is_rider(&mons[mnum])                   \
      || (mnum) == PM_ACID_BLOB)
 
 /* non-rotting non-corpses; unlike lizard corpses, these items will behave
@@ -1415,12 +1412,12 @@ tin_details(struct obj *obj, int mnum, char *buf)
 void
 set_tin_variety(struct obj *obj, int forcetype)
 {
-    register int r;
+    int r, mnum = obj->corpsenm;
 
     if (forcetype == SPINACH_TIN
         || (forcetype == HEALTHY_TIN
-            && (obj->corpsenm == NON_PM /* empty or already spinach */
-                || !vegetarian(&mons[obj->corpsenm])))) { /* replace meat */
+            && (mnum == NON_PM /* empty or already spinach */
+                || !vegetarian(&mons[mnum])))) { /* replace meat */
         obj->corpsenm = NON_PM; /* not based on any monster */
         obj->spe = 1;           /* spinach */
         return;
@@ -1434,17 +1431,18 @@ set_tin_variety(struct obj *obj, int forcetype)
         r = forcetype;
     } else {               /* RANDOM_TIN */
         r = rn2(TTSZ - 1); /* take your pick */
-        if (r == ROTTEN_TIN && nonrotting_corpse(obj->corpsenm))
+        if (r == ROTTEN_TIN && (mnum >= LOW_PM && nonrotting_corpse(mnum)))
             r = HOMEMADE_TIN; /* lizards don't rot */
     }
     obj->spe = -(r + 1); /* offset by 1 to allow index 0 */
 }
 
 static int
-tin_variety(struct obj *obj,
-            boolean displ) /* we're just displaying so leave things alone */
+tin_variety(
+    struct obj *obj,
+    boolean displ) /* we're just displaying so leave things alone */
 {
-    register int r;
+    int r, mnum = obj->corpsenm;
 
     if (obj->spe == 1) {
         r = SPINACH_TIN;
@@ -1453,13 +1451,14 @@ tin_variety(struct obj *obj,
     } else if (obj->spe < 0) {
         r = -(obj->spe);
         --r; /* get rid of the offset */
-    } else
+    } else {
         r = rn2(TTSZ - 1);
+    }
 
     if (!displ && r == HOMEMADE_TIN && !obj->blessed && !rn2(7))
         r = ROTTEN_TIN; /* some homemade tins go bad */
 
-    if (r == ROTTEN_TIN && nonrotting_corpse(obj->corpsenm))
+    if (r == ROTTEN_TIN && (mnum >= LOW_PM && nonrotting_corpse(mnum)))
         r = HOMEMADE_TIN; /* lizards don't rot */
     return r;
 }
@@ -1762,11 +1761,14 @@ eatcorpse(struct obj *otmp)
     int retcode = 0, tp = 0, mnum = otmp->corpsenm;
     long rotted = 0L;
     int ll_conduct = 0;
-    boolean stoneable = (flesh_petrifies(&mons[mnum]) && !Stone_resistance
-                         && !poly_when_stoned(gy.youmonst.data)),
+    boolean stoneable,
             slimeable = (mnum == PM_GREEN_SLIME && !Slimed && !Unchanging
                          && !slimeproof(gy.youmonst.data)),
             glob = otmp->globby ? TRUE : FALSE;
+
+    assert(mnum >= LOW_PM);
+    stoneable = (flesh_petrifies(&mons[mnum]) && !Stone_resistance
+                 && !poly_when_stoned(gy.youmonst.data));
 
     /* KMH, conduct */
     if (!vegan(&mons[mnum]))

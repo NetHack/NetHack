@@ -929,17 +929,16 @@ dogfood(struct monst *mon, struct obj *obj)
     switch (obj->oclass) {
     case FOOD_CLASS:
         fx = (obj->otyp == CORPSE || obj->otyp == TIN || obj->otyp == EGG)
+                /* corpsenm might be NON_PM (special tin, unhatachable egg) */
                 ? obj->corpsenm
-                : NUMMONS; /* valid mons[mndx] to pacify static analyzer */
-
-        fptr = fx >= LOW_PM ? &mons[fx] : NULL;
+                : NON_PM;
+        /* mons[NUMMONS] is valid; predicate tests against it will fail */
+        fptr = &mons[(fx >= LOW_PM) ? fx : NUMMONS];
 
         if (obj->otyp == CORPSE && is_rider(fptr))
             return TABU;
         if ((obj->otyp == CORPSE || obj->otyp == EGG)
-            /* Medusa's corpse doesn't pass the touch_petrifies() test
-               but does cause petrification if eaten */
-            && ((fptr && touch_petrifies(fptr)) || obj->corpsenm == PM_MEDUSA)
+            && flesh_petrifies(fptr) /* c*ckatrice or Medusa */
             && !resists_ston(mon))
             return POISON;
         if (obj->otyp == LUMP_OF_ROYAL_JELLY
