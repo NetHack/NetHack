@@ -412,12 +412,12 @@ extern struct nomakedefs_s nomakedefs;
 
 #define MAXNROFROOMS 40 /* max number of rooms per level */
 #define MAX_SUBROOMS 24 /* max # of subrooms in a given room */
-#define DOORINC 120     /* number of doors per level, increment */
+#define DOORINC      20 /* number of doors per level, increment */
 
 #define BUFSZ 256  /* for getlin buffers */
 #define QBUFSZ 128 /* for building question text */
-#define TBUFSZ 300 /* gt.toplines[] buffer max msg: 3 81char names */
-/* plus longest prefix plus a few extra words */
+#define TBUFSZ 300 /* gt.toplines[] buffer max msg: 3 81-char names
+                    * plus longest prefix plus a few extra words */
 
 /* COLBUFSZ is the larger of BUFSZ and COLNO */
 #if BUFSZ > COLNO
