@@ -533,7 +533,11 @@ savelev_core(NHFILE *nhfp, xint8 lev)
         bwrite(nhfp->fd, (genericptr_t) &gd.dndest, sizeof (dest_area));
         bwrite(nhfp->fd, (genericptr_t) &gl.level.flags, sizeof gl.level.flags);
         bwrite(nhfp->fd, (genericptr_t) &gd.doors_alloc, sizeof gd.doors_alloc);
-        bwrite(nhfp->fd, (genericptr_t) gd.doors, gd.doors_alloc * sizeof (coord));
+        /* don't rely on underlying write() behavior to write
+         *  nothing if count arg is 0, just skip it */
+        if (gd.doors_alloc)
+            bwrite(nhfp->fd, (genericptr_t) gd.doors,
+                   gd.doors_alloc * sizeof (coord));
     }
     save_rooms(nhfp); /* no dynamic memory to reclaim */
 
