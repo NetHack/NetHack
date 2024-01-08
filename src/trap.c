@@ -3452,8 +3452,10 @@ isclearpath(
     while (distance-- > 0) {
         x += dx;
         y += dy;
+        if (!isok(x, y))
+            return FALSE;
         typ = levl[x][y].typ;
-        if (!isok(x, y) || !ZAP_POS(typ) || closed_door(x, y))
+        if (!ZAP_POS(typ) || closed_door(x, y))
             return FALSE;
         if ((t = t_at(x, y)) != 0
             && (is_pit(t->ttyp) || is_hole(t->ttyp) || is_xport(t->ttyp)))
