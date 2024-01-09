@@ -17,6 +17,9 @@ static boolean find_okay_roompos(struct mkroom *, coord *) NONNULLARG12;
 static void mksink(struct mkroom *);
 static void mkaltar(struct mkroom *);
 static void mkgrave(struct mkroom *);
+static void mkinvpos(coordxy, coordxy, int);
+static int mkinvk_check_wall(coordxy x, coordxy y);
+static void mk_knox_portal(coordxy, coordxy);
 static void makevtele(void);
 static void fill_ordinary_room(struct mkroom *, boolean) NONNULLARG1;
 static void makelevel(void);
@@ -38,8 +41,6 @@ static void do_room_or_subroom(struct mkroom *,
 static void makerooms(void);
 static boolean door_into_nonjoined(coordxy, coordxy);
 static boolean finddpos(coord *, coordxy, coordxy, coordxy, coordxy);
-static void mkinvpos(coordxy, coordxy, int);
-static void mk_knox_portal(coordxy, coordxy);
 
 #define create_vault() create_room(-1, -1, 2, 2, -1, -1, VAULT, TRUE)
 #define init_vault() gv.vault_x = -1
@@ -2171,19 +2172,50 @@ mkgrave(struct mkroom *croom)
 void
 mkinvokearea(void)
 {
-    int dist;
-    coordxy xmin = gi.inv_pos.x, xmax = gi.inv_pos.x,
-          ymin = gi.inv_pos.y, ymax = gi.inv_pos.y;
+    int dist, wallct;
+    coordxy xmin, xmax, ymin, ymax;
     register coordxy i;
 
     /* slightly odd if levitating, but not wrong */
     pline_The("floor shakes violently under you!");
-    /*
-     * TODO:
-     *  Suppress this message if player has dug out all the walls
-     *  that would otherwise be affected.
-     */
-    pline_The("walls around you begin to bend and crumble!");
+    /* decide whether to issue the crumbling walls message */
+    {
+        xmin = xmax = gi.inv_pos.x;
+        ymin = ymax = gi.inv_pos.y;
+        wallct = mkinvk_check_wall(xmin, ymin);
+        /* this replicates the somewhat convoluted loop below, working
+           out from the stair position, except for stopping early when
+           walls are found */
+        for (dist = 1; !wallct && dist < 7; ++dist) {
+            xmin--, xmax++;
+            /* top and bottom */
+            if (dist != 3) { /* the area is wider that it is high */
+                ymin--, ymax++;
+                for (i = xmin + 1; i < xmax; i++) {
+                    if (mkinvk_check_wall(i, ymin))
+                        ++wallct; /* we could break after finding first wall
+                                   * but it isn't a significant optimization
+                                   * for code which only executes once */
+                    if (mkinvk_check_wall(i, ymax))
+                        ++wallct;
+                }
+            }
+            /* left and right */
+            if (!wallct) { /* skip y loop if x loop found any walls */
+                for (i = ymin; i <= ymax; i++) {
+                    if (mkinvk_check_wall(xmin, i))
+                        ++wallct;
+                    if (mkinvk_check_wall(xmax, i))
+                        ++wallct;
+                }
+            }
+        }
+        /* message won't appear if the maze 'walls' on this level are lava
+           or if all the walls within range have been dug away; when it does
+           appear, it will describe iron bars as "walls" (which is ok) */
+        if (wallct)
+            pline_The("walls around you begin to bend and crumble!");
+    }
     display_nhwindow(WIN_MESSAGE, TRUE);
 
     /* any trap hero is stuck in will be going away now */
@@ -2192,6 +2224,9 @@ mkinvokearea(void)
             buried_ball_to_punishment();
         reset_utrap(FALSE);
     }
+
+    xmin = xmax = gi.inv_pos.x; /* reset after the check for walls */
+    ymin = ymax = gi.inv_pos.y;
     mkinvpos(xmin, ymin, 0); /* middle, before placing stairs */
 
     for (dist = 1; dist < 7; dist++) {
@@ -2312,6 +2347,21 @@ mkinvpos(coordxy x, coordxy y, int dist)
 
     /* display new value of position; could have a monster/object on it */
     newsym(x, y);
+}
+
+/* reduces clutter in mkinvokearea() while avoiding potential static analyzer
+   confusion about using isok(x,y) to control access to levl[x][y] */
+static int
+mkinvk_check_wall(coordxy x, coordxy y)
+{
+    unsigned ltyp;
+
+    if (!isok(x, y))
+        return 0;
+    assert(x > 0 && x < COLNO);
+    assert(y >= 0 && y < ROWNO);
+    ltyp = levl[x][y].typ;
+    return (IS_STWALL(ltyp) || ltyp == IRONBARS) ? 1 : 0;
 }
 
 /*
