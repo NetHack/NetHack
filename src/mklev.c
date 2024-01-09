@@ -1,4 +1,4 @@
-/* NetHack 3.7	mklev.c	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.174 $ */
+/* NetHack 3.7	mklev.c	$NHDT-Date: 1704830831 2024/01/09 20:07:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.175 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2155,10 +2155,6 @@ mkgrave(struct mkroom *croom)
     return;
 }
 
-/* maze levels have slightly different constraints from normal levels */
-#define x_maze_min 2
-#define y_maze_min 2
-
 /*
  * Major level transmutation:  add a set of stairs (to the Sanctum) after
  * an earthquake that leaves behind a new topology, centered at inv_pos.
@@ -2270,13 +2266,22 @@ mkinvpos(coordxy x, coordxy y, int dist)
     boolean make_rocks;
     register struct rm *lev = &levl[x][y];
     struct monst *mon;
+    /* maze levels have slightly different constraints from normal levels;
+       these are also defined in mkmaze.c and may not be appropriate for
+       mazes with corridors wider than 1 or for cavernous levels */
+#define x_maze_min 2
+#define y_maze_min 2
 
     /* clip at existing map borders if necessary */
-    if (!within_bounded_area(x, y, x_maze_min + 1, y_maze_min + 1,
-                             gx.x_maze_max - 1, gy.y_maze_max - 1)) {
+    if (!within_bounded_area(x, y, x_maze_min, y_maze_min,
+                             gx.x_maze_max, gy.y_maze_max)) {
         /* outermost 2 columns and/or rows may be truncated due to edge */
-        if (dist < (7 - 2))
-            panic("mkinvpos: <%d,%d> (%d) off map edge!", x, y, dist);
+        if (dist < (7 - 2)) { /* panic() or impossible() */
+            void (*errfunc)(const char *, ...) PRINTF_F(1, 2);
+
+            errfunc = !isok(x, y) ? panic : impossible;
+            (*errfunc)("mkinvpos: <%d,%d> (%d) off map edge!", x, y, dist);
+        }
         return;
     }
 
@@ -2347,6 +2352,8 @@ mkinvpos(coordxy x, coordxy y, int dist)
 
     /* display new value of position; could have a monster/object on it */
     newsym(x, y);
+#undef x_maze_min
+#undef y_maze_min
 }
 
 /* reduces clutter in mkinvokearea() while avoiding potential static analyzer
