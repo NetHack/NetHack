@@ -410,7 +410,7 @@ extern boolean trapped_chest_at(int, coordxy, coordxy);
 extern boolean trapped_door_at(int, coordxy, coordxy);
 extern struct obj *o_in(struct obj *, char) NONNULLARG1;
 extern struct obj *o_material(struct obj *, unsigned) NONNULLARG1;
-extern int gold_detect(struct obj *);
+extern int gold_detect(struct obj *) NONNULLARG1;
 extern int food_detect(struct obj *);
 extern int object_detect(struct obj *, int);
 extern int monster_detect(struct obj *, int);

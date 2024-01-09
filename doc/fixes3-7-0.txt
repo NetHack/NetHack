@@ -2614,6 +2614,9 @@ add new options 'nopick_dropped' and 'pickup_stolen' options to avoid
 	previously stolen from hero if moved upon while autopickup is On; both
 	bypass pickup_types and autopickup_exceptions (pr #1140 by entrez)
 fix msg_window:combination and TTY getlin() ^P (pr #1155 by entrez)
+remove a null sobj check from gold_detect that was situated after
+	dereferences had already been done (pr #1173 by argrath) and
+	adjust prototype in extern.h
 
 
 Code Cleanup and Reorganization
