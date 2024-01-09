@@ -1,4 +1,4 @@
-/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.350 $ */
+/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1704787190 2024/01/09 07:59:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.349 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -337,7 +337,7 @@ map_cleanup(void)
         for (y = 0; y < ROWNO; y++) {
             schar typ = levl[x][y].typ;
 
-            if (typ == LAVAPOOL || typ == LAVAWALL || IS_POOL(typ)) {
+            if (IS_LAVA(typ) || IS_POOL(typ)) {
                 /* in case any boulders are on liquid, delete them */
                 while ((otmp = sobj_at(BOULDER, x, y)) != 0) {
                     obj_extract_self(otmp);
@@ -2800,8 +2800,7 @@ light_region(region *tmpregion)
     for (x = lowx; x <= hix; x++) {
         lev = &levl[x][lowy];
         for (y = lowy; y <= hiy; y++) {
-            if (lev->typ != LAVAPOOL) /* this overrides normal lighting */
-                lev->lit = litstate;
+            lev->lit = IS_LAVA(lev->typ) ? 1 : litstate;
             lev++;
         }
     }
@@ -6108,7 +6107,7 @@ sel_set_lit(coordxy x, coordxy y, genericptr_t arg)
 {
      int lit = *(int *) arg;
 
-     levl[x][y].lit = (levl[x][y].typ == LAVAPOOL) ? 1 : lit;
+     levl[x][y].lit = (IS_LAVA(levl[x][y].typ) || lit) ? 1 : 0;
 }
 
 /* Add to the room any doors within/bordering it */
