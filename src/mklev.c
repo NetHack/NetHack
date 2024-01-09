@@ -724,7 +724,7 @@ makevtele(void)
     makeniche(TELEP_TRAP);
 }
 
-/* count the different features (sinks, fountains) in the level */
+/* count the tracked features (sinks, fountains) present on the level */
 void
 count_level_features(void)
 {
@@ -1717,19 +1717,36 @@ mktrap_victim(struct trap *ttmp)
         otmp->age -= (TAINT_AGE + 1); /* died too long ago to eat */
 }
 
-/* make a trap somewhere (in croom if mazeflag = 0 && !tm) */
-/* if tm != null, make trap at that location */
+/* mktrap(): select trap type and location, then use maketrap() to create it;
+   make it at location 'tm' when that isn't Null, otherwise in 'croom'
+   if mktrapflags doesn't have MKTRAP_MAZEFLAG set, else in maze corridor */
 void
 mktrap(
-    int num,
-    int mktrapflags,
-    struct mkroom *croom,
-    coord *tm)
+    int num,              /* if non-zero, specific type of trap to make */
+    int mktrapflags,      /* MKTRAP_NOSPIDERWEB, WKTRAP_MAZEFLAG */
+    struct mkroom *croom, /* room to hold trap */
+    coord *tm)            /* specific location for trap */
 {
-    register int kind;
+    static int mktrap_err = 0; /* move to struct g? */
     struct trap *t;
+    coord m;
+    int kind;
     unsigned lvl = level_difficulty();
-    coord m = { 0, 0 };
+
+    if (!tm && !croom && !(mktrapflags & MKTRAP_MAZEFLAG)) {
+        /* complain when the combination of arguments will never set 'm' */
+        if (!mktrap_err++) {
+            char errbuf[BUFSZ];
+
+            Snprintf(errbuf, sizeof errbuf,
+                     "args (%d,%d,%s,%s) are invalid",
+                     num, mktrapflags, croom ? "[room]" : "null room",
+                     tm ? "<x,y>" : "null location");
+            paniclog("mktrap", errbuf);
+        }
+        return;
+    }
+    m.x = m.y = 0;
 
     /* no traps in pools */
     if (tm && is_pool(tm->x, tm->y))
@@ -1837,7 +1854,7 @@ mktrap(
         do {
             if (++tryct > 200)
                 return;
-            if (mktrapflags & MKTRAP_MAZEFLAG)
+            if ((mktrapflags & MKTRAP_MAZEFLAG) != 0)
                 mazexy(&m);
             else if (croom && !somexyspace(croom, &m))
                 return;
