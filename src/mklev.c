@@ -1741,8 +1741,7 @@ mktrap(
 
             Snprintf(errbuf, sizeof errbuf,
                      "args (%d,%d,%s,%s) are invalid",
-                     num, mktrapflags, croom ? "[room]" : "null room",
-                     tm ? "<x,y>" : "null location");
+                     num, mktrapflags, "null room", "null location");
             paniclog("mktrap", errbuf);
         }
         return;
