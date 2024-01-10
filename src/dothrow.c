@@ -1263,6 +1263,7 @@ toss_up(struct obj *obj, boolean hitsroof)
     const char *action;
     int otyp = obj->otyp;
     boolean petrifier = ((otyp == EGG || otyp == CORPSE)
+                         && obj->corpsenm >= LOW_PM
                          && touch_petrifies(&mons[obj->corpsenm]));
     /* note: obj->quan == 1 */
 
