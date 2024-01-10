@@ -1833,6 +1833,8 @@ domove_fight_web(coordxy x, coordxy y)
 
     if (gc.context.forcefight && trap && trap->ttyp == WEB
         && trap->tseen && uwep) {
+        int wtype = uwep_skill_type();
+
         if (u_wield_art(ART_STING)) {
             /* guaranteed success */
             pline("%s cuts through the web!",
@@ -1840,12 +1842,13 @@ domove_fight_web(coordxy x, coordxy y)
         } else if (!is_blade(uwep)) {
             You_cant("cut a web with %s!", an(xname(uwep)));
             return TRUE;
-        } else if (rn2(20) > ACURR(A_STR) + uwep->spe) {
+        } else if (rn2(20) > ACURR(A_STR) + uwep->spe + P_SKILL(wtype)) {
             /* TODO: add failures, maybe make an occupation? */
             You("hack ineffectually at some of the strands.");
             return TRUE;
         } else {
             You("cut through the web.");
+            use_skill(wtype, 1);
         }
         deltrap(trap);
         newsym(x, y);
