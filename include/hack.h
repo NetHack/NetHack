@@ -1341,11 +1341,11 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define TELEDS_TELEPORT   2
 
 /* flags for mktrap() */
-#define MKTRAP_NOFLAGS       0x0
-#define MKTRAP_MAZEFLAG      0x1 /* trap placed on coords as if in maze */
-#define MKTRAP_NOSPIDERONWEB 0x2 /* web will not generate a spider */
-#define MKTRAP_SEEN          0x4 /* trap is seen */
-#define MKTRAP_NOVICTIM      0x8 /* no victim corpse or items on it */
+#define MKTRAP_NOFLAGS       0x0U
+#define MKTRAP_SEEN          0x1U /* trap is seen */
+#define MKTRAP_MAZEFLAG      0x2U /* choose random coords instead of room */
+#define MKTRAP_NOSPIDERONWEB 0x4U /* web will not generate a spider */
+#define MKTRAP_NOVICTIM      0x8U /* no victim corpse or items on it */
 
 #define MON_POLE_DIST 5 /* How far monsters can use pole-weapons */
 #define PET_MISSILE_RANGE2 36 /* Square of distance within which pets shoot */

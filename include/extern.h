@@ -1522,7 +1522,7 @@ extern void place_branch(branch *, coordxy, coordxy) NO_NNARGS;
 extern boolean occupied(coordxy, coordxy);
 extern int okdoor(coordxy, coordxy);
 extern void dodoor(coordxy, coordxy, struct mkroom *) NONNULLARG3;
-extern void mktrap(int, int, struct mkroom *, coord *) NO_NNARGS;
+extern void mktrap(int, unsigned, struct mkroom *, coord *) NO_NNARGS;
 extern void mkstairs(coordxy, coordxy, char, struct mkroom *, boolean);
 extern void mkinvokearea(void);
 extern void mineralize(int, int, int, int, boolean);

@@ -1724,7 +1724,7 @@ mktrap_victim(struct trap *ttmp)
 void
 mktrap(
     int num,              /* if non-zero, specific type of trap to make */
-    int mktrapflags,      /* MKTRAP_NOSPIDERWEB, WKTRAP_MAZEFLAG */
+    unsigned mktrapflags, /* MKTRAP_{SEEN,MAZEFLAG,NOSPIDERONWEB,NOVICTIM} */
     struct mkroom *croom, /* room to hold trap */
     coord *tm)            /* specific location for trap */
 {

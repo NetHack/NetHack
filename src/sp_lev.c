@@ -1788,7 +1788,7 @@ create_trap(spltrap *t, struct mkroom *croom)
 {
     coordxy x = -1, y = -1;
     coord tm;
-    int mktrap_flags = MKTRAP_MAZEFLAG;
+    unsigned mktrap_flags = MKTRAP_MAZEFLAG;
 
     if (t->type == VIBRATING_SQUARE) {
         pick_vibrasquare_location();
