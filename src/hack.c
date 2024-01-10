@@ -1831,23 +1831,32 @@ domove_fight_web(coordxy x, coordxy y)
 {
     struct trap *trap = t_at(x, y);
 
-    if (gc.context.forcefight && trap && trap->ttyp == WEB
-        && trap->tseen && uwep) {
-        int wtype = uwep_skill_type();
+    if (gc.context.forcefight && trap && trap->ttyp == WEB && trap->tseen) {
+        int wtype = uwep_skill_type(),
+            /* minus_2: restricted or unskilled: -1, basic: 0, skilled: 1,
+               expert: 2, master: 3, grandmaster: 4 */
+            wskill_minus_2 = max(P_SKILL(wtype), P_UNSKILLED) - 2,
+            /* higher value is worse for player; for weaponless, adjust the
+               chance to succeed rather than maybe make two tries */
+            roll = rn2(uwep ? 20 : (45 - 5 * wskill_minus_2));
 
-        if (u_wield_art(ART_STING)) {
+        if (uwep && u_wield_art(ART_STING)) {
             /* guaranteed success */
             pline("%s cuts through the web!",
                   bare_artifactname(uwep));
-        } else if (!is_blade(uwep)) {
+        } else if (uwep && !is_blade(uwep)) {
             You_cant("cut a web with %s!", an(xname(uwep)));
             return TRUE;
-        } else if (rn2(20) > ACURR(A_STR) + uwep->spe + P_SKILL(wtype)) {
+        } else if (roll > (acurrstr() - 2 /* 1..19 */
+                           /* for weaponless, 'roll' was adjusted above */
+                           + (uwep ? uwep->spe + wskill_minus_2 : 0))) {
             /* TODO: add failures, maybe make an occupation? */
-            You("hack ineffectually at some of the strands.");
+            You("%s ineffectually at some of the strands.",
+                uwep ? "hack" : "thrash");
             return TRUE;
         } else {
-            You("cut through the web.");
+            You("%s through the web.", uwep ? "cut" : "punch");
+            /* doesn't break "never hit with a wielded weapon" conduct */
             use_skill(wtype, 1);
         }
         deltrap(trap);
