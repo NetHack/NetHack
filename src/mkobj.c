@@ -1840,7 +1840,7 @@ weight(struct obj *obj)
         struct obj *contents;
         int cwt;
 
-        if (obj->otyp == STATUE && obj->corpsenm >= LOW_PM) {
+        if (obj->otyp == STATUE && ismnum(obj->corpsenm)) {
             int msize = (int) mons[obj->corpsenm].msize, /* 0..7 */
                 minwt = (msize + msize + 1) * 100;
 
@@ -1882,7 +1882,7 @@ weight(struct obj *obj)
 
         return wt + cwt;
     }
-    if (obj->otyp == CORPSE && obj->corpsenm >= LOW_PM) {
+    if (obj->otyp == CORPSE && ismnum(obj->corpsenm)) {
         long long_wt = obj->quan * (long) mons[obj->corpsenm].cwt;
 
         wt = (long_wt > LARGEST_INT) ? LARGEST_INT : (int) long_wt;

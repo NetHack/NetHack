@@ -745,7 +745,7 @@ maybe_cannibal(int pm, boolean allowmsg)
            about cannibalism--hero's innate traits aren't altered) */
         && (your_race(fptr)
             || (Upolyd && same_race(gy.youmonst.data, fptr))
-            || (u.ulycn >= LOW_PM && were_beastie(pm) == u.ulycn))) {
+            || (ismnum(u.ulycn) && were_beastie(pm) == u.ulycn))) {
         if (allowmsg) {
             if (Upolyd && your_race(fptr))
                 You("have a bad feeling deep inside.");
@@ -1272,7 +1272,7 @@ cpostfx(int pm)
             givit(tmp, ptr);
     } /* check_intrinsics */
 
-    if (catch_lycanthropy >= LOW_PM) {
+    if (ismnum(catch_lycanthropy)) {
         set_ulycn(catch_lycanthropy);
         retouch_equipment(2);
     }
@@ -1431,7 +1431,7 @@ set_tin_variety(struct obj *obj, int forcetype)
         r = forcetype;
     } else {               /* RANDOM_TIN */
         r = rn2(TTSZ - 1); /* take your pick */
-        if (r == ROTTEN_TIN && (mnum >= LOW_PM && nonrotting_corpse(mnum)))
+        if (r == ROTTEN_TIN && (ismnum(mnum) && nonrotting_corpse(mnum)))
             r = HOMEMADE_TIN; /* lizards don't rot */
     }
     obj->spe = -(r + 1); /* offset by 1 to allow index 0 */
@@ -1458,7 +1458,7 @@ tin_variety(
     if (!displ && r == HOMEMADE_TIN && !obj->blessed && !rn2(7))
         r = ROTTEN_TIN; /* some homemade tins go bad */
 
-    if (r == ROTTEN_TIN && (mnum >= LOW_PM && nonrotting_corpse(mnum)))
+    if (r == ROTTEN_TIN && (ismnum(mnum) && nonrotting_corpse(mnum)))
         r = HOMEMADE_TIN; /* lizards don't rot */
     return r;
 }
@@ -1766,7 +1766,7 @@ eatcorpse(struct obj *otmp)
                          && !slimeproof(gy.youmonst.data)),
             glob = otmp->globby ? TRUE : FALSE;
 
-    assert(mnum >= LOW_PM);
+    assert(ismnum(mnum));
     stoneable = (flesh_petrifies(&mons[mnum]) && !Stone_resistance
                  && !poly_when_stoned(gy.youmonst.data));
 
@@ -2398,7 +2398,7 @@ fpostfx(struct obj *otmp)
 {
     switch (otmp->otyp) {
     case SPRIG_OF_WOLFSBANE:
-        if (u.ulycn >= LOW_PM || is_were(gy.youmonst.data))
+        if (ismnum(u.ulycn) || is_were(gy.youmonst.data))
             you_unwere(TRUE);
         break;
     case CARROT:
@@ -2445,7 +2445,7 @@ fpostfx(struct obj *otmp)
             heal_legs(0);
         break;
     case EGG:
-        if (otmp->corpsenm >= LOW_PM
+        if (ismnum(otmp->corpsenm)
             && flesh_petrifies(&mons[otmp->corpsenm])) {
             if (!Stone_resistance
                 && !(poly_when_stoned(gy.youmonst.data)
@@ -2529,7 +2529,7 @@ edibility_prompts(struct obj *otmp)
     if (cadaver || otmp->otyp == EGG || otmp->otyp == TIN
         || otmp->otyp == GLOB_OF_GREEN_SLIME) {
         /* These checks must match those in eatcorpse() */
-        stoneorslime = (mnum >= LOW_PM
+        stoneorslime = (ismnum(mnum)
                         && flesh_petrifies(&mons[mnum])
                         && !Stone_resistance
                         && !poly_when_stoned(gy.youmonst.data));
@@ -3808,7 +3808,7 @@ Popeye(int threat)
         return (boolean) (mndx != NON_PM || otin->spe == 1);
     /* flesh from lizards and acidic critters stops petrification */
     case STONED:
-        return (boolean) (mndx >= LOW_PM
+        return (boolean) (ismnum(mndx)
                           && (mndx == PM_LIZARD || acidic(&mons[mndx])));
     /* polymorph into a fiery monster */
     case SLIMED:

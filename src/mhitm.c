@@ -1084,7 +1084,7 @@ mdamagem(
         if (mattk->adtyp == AD_DGST) {
             /* various checks similar to dog_eat and meatobj.
              * after monkilled() to provide better message ordering */
-            if (mdef->cham >= LOW_PM) {
+            if (ismnum(mdef->cham)) {
                 (void) newcham(magr, (struct permonst *) 0, NC_SHOW_MSG);
             } else if (pd == &mons[PM_GREEN_SLIME] && !slimeproof(pa)) {
                 (void) newcham(magr, &mons[PM_GREEN_SLIME], NC_SHOW_MSG);

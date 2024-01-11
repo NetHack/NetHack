@@ -933,7 +933,7 @@ dogfood(struct monst *mon, struct obj *obj)
                 ? obj->corpsenm
                 : NON_PM;
         /* mons[NUMMONS] is valid; predicate tests against it will fail */
-        fptr = &mons[(fx >= LOW_PM) ? fx : NUMMONS];
+        fptr = &mons[(ismnum(fx)) ? fx : NUMMONS];
 
         if (obj->otyp == CORPSE && is_rider(fptr))
             return TABU;
@@ -1103,7 +1103,7 @@ tamedog(struct monst *mtmp, struct obj *obj)
             /* pet will "catch" and eat this thrown food */
             if (canseemon(mtmp)) {
                 boolean big_corpse =
-                    (obj->otyp == CORPSE && obj->corpsenm >= LOW_PM
+                    (obj->otyp == CORPSE && ismnum(obj->corpsenm)
                      && mons[obj->corpsenm].msize > mtmp->data->msize);
                 pline("%s catches %s%s", Monnam(mtmp), the(xname(obj)),
                       !big_corpse ? "." : ", or vice versa!");

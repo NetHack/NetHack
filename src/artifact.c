@@ -930,7 +930,7 @@ spec_applies(const struct artifact *weap, struct monst *mtmp)
         return ((ptr->mflags2 & weap->mtype)
                 || (yours
                     && ((!Upolyd && (gu.urace.selfmask & weap->mtype))
-                        || ((weap->mtype & M2_WERE) && u.ulycn >= LOW_PM))));
+                        || ((weap->mtype & M2_WERE) && ismnum(u.ulycn)))));
     } else if (weap->spfx & SPFX_DALIGN) {
         return yours ? (u.ualign.type != weap->alignment)
                      : (ptr->maligntyp == A_NONE

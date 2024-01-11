@@ -464,7 +464,7 @@ polyself(int psflags)
             monsterpoly = ((psflags & POLY_MONSTER) != 0),
             formrevert = ((psflags & POLY_REVERT) != 0),
             draconian = (uarm && Is_dragon_armor(uarm)),
-            iswere = (u.ulycn >= LOW_PM),
+            iswere = (ismnum(u.ulycn)),
             isvamp = (is_vampire(gy.youmonst.data)
                       || is_vampshifter(&gy.youmonst)),
             controllable_poly = Polymorph_control && !(Stunned || Unaware);
@@ -663,7 +663,7 @@ polyself(int psflags)
                          && !rn2(10)) ? PM_WOLF
                                       : !rn2(4) ? PM_FOG_CLOUD
                                                 : PM_VAMPIRE_BAT;
-                if (gy.youmonst.cham >= LOW_PM
+                if (ismnum(gy.youmonst.cham)
                     && !is_vampire(gy.youmonst.data) && !rn2(2))
                     mntmp = gy.youmonst.cham;
             }
@@ -2230,7 +2230,7 @@ polysense(void)
         HWarn_of_mon |= FROMRACE;
         return;
     }
-    if (warnidx >= LOW_PM) {
+    if (ismnum(warnidx)) {
         gc.context.warntype.speciesidx = warnidx;
         gc.context.warntype.species = &mons[warnidx];
         HWarn_of_mon |= FROMRACE;

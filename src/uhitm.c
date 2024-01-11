@@ -1127,7 +1127,7 @@ hmon_hitmon_misc_obj(
             ; /* maybe turn the corpse into a statue? */
 #endif
         }
-        hmd->dmg = (obj->corpsenm >= LOW_PM ? mons[obj->corpsenm].msize
+        hmd->dmg = (ismnum(obj->corpsenm) ? mons[obj->corpsenm].msize
                     : 0) + 1;
         break;
 
@@ -1149,14 +1149,14 @@ hmon_hitmon_misc_obj(
            hand-to-hand attack should yield a "bashing" mesg */
         if (obj == uwep)
             gu.unweapon = TRUE;
-        if (obj->spe && obj->corpsenm >= LOW_PM) {
+        if (obj->spe && ismnum(obj->corpsenm)) {
             if (obj->quan < 5L)
                 change_luck((schar) - (obj->quan));
             else
                 change_luck(-5);
         }
 
-        if (obj->corpsenm >= LOW_PM
+        if (ismnum(obj->corpsenm)
             && touch_petrifies(&mons[obj->corpsenm])) {
             /*learn_egg_type(obj->corpsenm);*/
             pline("Splat!  You hit %s with %s %s egg%s!",
@@ -1178,7 +1178,7 @@ hmon_hitmon_misc_obj(
         } else { /* ordinary egg(s) */
             enum monnums mnum = obj->corpsenm;
             const char *eggp =
-                (mnum >= LOW_PM && mnum < NUMMONS && obj->known)
+                (ismnum(mnum) && obj->known)
                     ? the(mons[mnum].pmnames[NEUTRAL])
                     : (cnt > 1L) ? "some" : "an";
 

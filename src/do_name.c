@@ -2419,12 +2419,12 @@ obj_pmname(struct obj *obj)
         struct monst *m = OMONST(obj);
 
         /* obj->oextra->omonst->data is Null but ...->mnum is set */
-        if (m->mnum >= LOW_PM)
+        if (ismnum(m->mnum))
             return pmname(&mons[m->mnum], m->female ? FEMALE : MALE);
     }
 #endif
     if ((obj->otyp == CORPSE || obj->otyp == STATUE || obj->otyp == FIGURINE)
-        && obj->corpsenm >= LOW_PM) {
+        && ismnum(obj->corpsenm)) {
         int cgend = (obj->spe & CORPSTAT_GENDER),
             mgend = ((cgend == CORPSTAT_MALE) ? MALE
                      : (cgend == CORPSTAT_FEMALE) ? FEMALE

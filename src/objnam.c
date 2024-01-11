@@ -1362,7 +1362,7 @@ doname_base(
             if (known && stale_egg(obj))
                 Strcat(prefix, "stale ");
 #endif
-            if (omndx >= LOW_PM
+            if (ismnum(omndx)
                 && (known || (gm.mvitals[omndx].mvflags & MV_KNOWS_EGG))) {
                 Strcat(prefix, mons[omndx].pmnames[NEUTRAL]);
                 Strcat(prefix, " ");
@@ -4838,7 +4838,7 @@ readobjnam(char *bp, struct obj *no_wish)
     case STATUE: /* otmp->cobj already done in mksobj() */
     case FIGURINE:
     case CORPSE: {
-        struct permonst *P = (d.mntmp >= LOW_PM) ? &mons[d.mntmp] : 0;
+        struct permonst *P = (ismnum(d.mntmp)) ? &mons[d.mntmp] : 0;
 
         d.otmp->spe = !P ? CORPSTAT_RANDOM
                       /* if neuter, force neuter regardless of wish request */
@@ -4878,7 +4878,7 @@ readobjnam(char *bp, struct obj *no_wish)
     }
 
     /* set otmp->corpsenm or dragon scale [mail] */
-    if (d.mntmp >= LOW_PM) {
+    if (ismnum(d.mntmp)) {
         int humanwere;
 
         if (d.mntmp == PM_LONG_WORM_TAIL)

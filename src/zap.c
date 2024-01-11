@@ -283,7 +283,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
                            /* if shapechange failed because there aren't
                               enough eligible candidates (most likely for
                               vampshifter), try reverting to original form */
-                           || (mtmp->cham >= LOW_PM
+                           || (ismnum(mtmp->cham)
                                && newcham(mtmp, &mons[mtmp->cham],
                                           ncflags) != 0)) {
                     if (give_msg && (canspotmon(mtmp)
@@ -5719,7 +5719,7 @@ destroy_item(int osym, int dmgtyp)
                      || objects[obj->otyp].oc_oprop == FLYING))
                 /* destroyed wands and potions of polymorph don't trigger
                    polymorph so don't need to be deferred */
-                || (obj->otyp == POT_WATER && u.ulycn >= LOW_PM
+                || (obj->otyp == POT_WATER && ismnum(u.ulycn)
                     && (Upolyd ? obj->blessed : obj->cursed)))) {
             deferrals[deferral_indx++] = obj->o_id;
             continue;

@@ -297,7 +297,7 @@ moveloop_core(void)
                         mvl_change = 0;
                     if (Polymorph && !rn2(100))
                         mvl_change = 1;
-                    else if (u.ulycn >= LOW_PM && !Upolyd
+                    else if (ismnum(u.ulycn) && !Upolyd
                              && !rn2(80 - (20 * night())))
                         mvl_change = 2;
                     if (mvl_change && !Unchanging) {

@@ -741,7 +741,7 @@ animate_statue(
             mon = makemon(&mons[PM_DOPPELGANGER], x, y, mmflags);
             /* if hero has protection from shape changers, cham field will
                be NON_PM; otherwise, set form to match the statue */
-            if (mon && mon->cham >= LOW_PM)
+            if (mon && ismnum(mon->cham))
                 (void) newcham(mon, mptr, NO_NC_FLAGS);
         } else {
             if (cause == ANIMATE_SPELL)

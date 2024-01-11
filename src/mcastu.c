@@ -393,7 +393,7 @@ death_inflicted_by(
     Strcpy(outbuf, deathreason);
     if (mtmp) {
         struct permonst *mptr = mtmp->data,
-            *champtr = (mtmp->cham >= LOW_PM) ? &mons[mtmp->cham] : mptr;
+            *champtr = (ismnum(mtmp->cham)) ? &mons[mtmp->cham] : mptr;
         const char *realnm = pmname(champtr, Mgender(mtmp)),
             *fakenm = pmname(mptr, Mgender(mtmp));
 

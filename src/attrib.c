@@ -338,7 +338,7 @@ poisoned(
 
     /* suppress killer prefix if it already has one */
     i = name_to_mon(pkiller, (int *) 0);
-    if (i >= LOW_PM && (mons[i].geno & G_UNIQ)) {
+    if (ismnum(i) && (mons[i].geno & G_UNIQ)) {
         kprefix = KILLED_BY;
         if (!type_is_pname(&mons[i]))
             pkiller = the(pkiller);
@@ -837,7 +837,7 @@ is_innate(int propidx)
     int innateness;
 
     /* innately() would report FROM_FORM for this; caller wants specificity */
-    if (propidx == DRAIN_RES && u.ulycn >= LOW_PM)
+    if (propidx == DRAIN_RES && ismnum(u.ulycn))
         return FROM_LYCN;
     if (propidx == FAST && Very_fast)
         return FROM_NONE; /* can't become very fast innately */

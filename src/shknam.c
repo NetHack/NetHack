@@ -395,8 +395,7 @@ veggy_item(struct obj* obj, int otyp /* used iff obj is null */)
         if (otyp == TIN && corpsenm == NON_PM) /* implies obj is non-null */
             return (boolean) (obj->spe == 1); /* 0 = empty, 1 = spinach */
         if (otyp == TIN || otyp == CORPSE)
-            return (boolean) (corpsenm >= LOW_PM
-                              && vegetarian(&mons[corpsenm]));
+            return (boolean) (ismnum(corpsenm) && vegetarian(&mons[corpsenm]));
     }
     return FALSE;
 }

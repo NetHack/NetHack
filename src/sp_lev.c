@@ -1977,7 +1977,7 @@ create_monster(monster *m, struct mkroom *croom)
         if (m->appear_as.str
             && ((mtmp->data->mlet == S_MIMIC)
                 /* shapechanger (chameleons, et al, and vampires) */
-                || (mtmp->cham >= LOW_PM && m->appear == M_AP_MONSTER))
+                || (ismnum(mtmp->cham) && m->appear == M_AP_MONSTER))
             && !Protection_from_shape_changers) {
             int i;
 

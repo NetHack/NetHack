@@ -8220,13 +8220,13 @@ fruitadd(char *str, struct fruit *replace_fruit)
             || !strncmp(gp.pl_fruit, "partly eaten ", 13)
             || (!strncmp(gp.pl_fruit, "tin of ", 7)
                 && (!strcmp(gp.pl_fruit + 7, "spinach")
-                    || name_to_mon(gp.pl_fruit + 7, (int *) 0) >= LOW_PM))
+                    || ismnum(name_to_mon(gp.pl_fruit + 7, (int *) 0))))
             || !strcmp(gp.pl_fruit, "empty tin")
             || (!strcmp(gp.pl_fruit, "glob")
                 || (globpfx > 0 && !strcmp("glob", &gp.pl_fruit[globpfx])))
             || ((str_end_is(gp.pl_fruit, " corpse")
                  || str_end_is(gp.pl_fruit, " egg"))
-                && name_to_mon(gp.pl_fruit, (int *) 0) >= LOW_PM)) {
+                && ismnum(name_to_mon(gp.pl_fruit, (int *) 0)))) {
             Strcpy(buf, gp.pl_fruit);
             Strcpy(gp.pl_fruit, "candied ");
             nmcpy(gp.pl_fruit + 8, buf, PL_FSIZ - 8);

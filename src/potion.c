@@ -713,7 +713,7 @@ peffect_water(struct obj *otmp)
         if (otmp->blessed) {
             pline("This burns like %s!", hliquid("acid"));
             exercise(A_CON, FALSE);
-            if (u.ulycn >= LOW_PM) {
+            if (ismnum(u.ulycn)) {
                 Your("affinity to %s disappears!",
                      makeplural(mons[u.ulycn].pmnames[NEUTRAL]));
                 if (gy.youmonst.data == &mons[u.ulycn])
@@ -725,7 +725,7 @@ peffect_water(struct obj *otmp)
         } else if (otmp->cursed) {
             You_feel("quite proud of yourself.");
             healup(d(2, 6), 0, 0, 0);
-            if (u.ulycn >= LOW_PM && !Upolyd)
+            if (ismnum(u.ulycn) && !Upolyd)
                 you_were();
             exercise(A_CON, TRUE);
         }
@@ -735,7 +735,7 @@ peffect_water(struct obj *otmp)
             make_sick(0L, (char *) 0, TRUE, SICK_ALL);
             exercise(A_WIS, TRUE);
             exercise(A_CON, TRUE);
-            if (u.ulycn >= LOW_PM)
+            if (ismnum(u.ulycn))
                 you_unwere(TRUE); /* "Purified" */
             /* make_confused(0L, TRUE); */
         } else {
@@ -745,7 +745,7 @@ peffect_water(struct obj *otmp)
                        KILLED_BY_AN);
             } else
                 You_feel("full of dread.");
-            if (u.ulycn >= LOW_PM && !Upolyd)
+            if (ismnum(u.ulycn) && !Upolyd)
                 you_were();
             exercise(A_CON, FALSE);
         }
@@ -2047,7 +2047,7 @@ potionbreathe(struct obj *obj)
     case POT_WATER:
         if (u.umonnum == PM_GREMLIN) {
             (void) split_mon(&gy.youmonst, (struct monst *) 0);
-        } else if (u.ulycn >= LOW_PM) {
+        } else if (ismnum(u.ulycn)) {
             /* vapor from [un]holy water will trigger
                transformation but won't cure lycanthropy */
             if (obj->blessed && gy.youmonst.data == &mons[u.ulycn])

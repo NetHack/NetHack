@@ -60,7 +60,7 @@ sanity_check_single_mon(
     struct permonst *mptr = mtmp->data;
     coordxy mx = mtmp->mx, my = mtmp->my;
 
-    if (!mptr || mptr < &mons[LOW_PM] || mptr >= &mons[NUMMONS]) {
+    if (!mptr || mptr < &mons[LOW_PM] || mptr > &mons[HIGH_PM]) {
         /* most sanity checks issue warnings if they detect a problem,
            but this would be too extreme to keep going */
         panic("illegal mon data %s; mnum=%d (%s)",
@@ -466,7 +466,7 @@ genus(int mndx, int mode)
         mndx = mode ? PM_VALKYRIE : PM_HUMAN;
         break;
     default:
-        if (mndx >= LOW_PM && mndx < NUMMONS) {
+        if (ismnum(mndx)) {
             struct permonst *ptr = &mons[mndx];
 
             if (is_human(ptr))
@@ -495,7 +495,7 @@ pm_to_cham(int mndx)
      * As of 3.6.0 we just check M2_SHAPESHIFTER instead of having a
      * big switch statement with hardcoded shapeshifter types here.
      */
-    if (mndx >= LOW_PM && is_shapeshifter(&mons[mndx]))
+    if (ismnum(mndx) && is_shapeshifter(&mons[mndx]))
         mcham = mndx;
     return mcham;
 }
@@ -961,7 +961,7 @@ m_calcdistress(struct monst *mtmp)
     mon_regen(mtmp, FALSE);
 
     /* possibly polymorph shapechangers and lycanthropes */
-    if (mtmp->cham >= LOW_PM)
+    if (ismnum(mtmp->cham))
         decide_to_shapeshift(mtmp, (canspotmon(mtmp)
                                     || engulfing_u(mtmp))
                                     ? SHIFT_MSG : 0);
@@ -1157,7 +1157,7 @@ meatbox(struct monst *mon, struct obj *otmp)
 }
 
 #define mstoning(obj) \
-    (ofood(obj) && obj->corpsenm >= LOW_PM      \
+    (ofood(obj) && ismnum(obj->corpsenm)      \
      && flesh_petrifies(&mons[obj->corpsenm]))
 
 /* Monster mtmp consumes an object.
@@ -2641,7 +2641,7 @@ vamprises(struct monst *mtmp)
 {
     int mndx = mtmp->cham;
 
-    if (mndx >= LOW_PM && mndx != monsndx(mtmp->data)
+    if (ismnum(mndx) && mndx != monsndx(mtmp->data)
         && !(gm.mvitals[mndx].mvflags & G_GENOD)) {
         coord new_xy;
         char buf[BUFSZ];
@@ -2823,7 +2823,7 @@ mondead(struct monst *mtmp)
 
     mptr = mtmp->data; /* save this for m_detach() */
     /* restore chameleon, lycanthropes to true form at death */
-    if (mtmp->cham >= LOW_PM) {
+    if (ismnum(mtmp->cham)) {
         set_mon_data(mtmp, &mons[mtmp->cham]);
         mtmp->cham = NON_PM;
     } else if (mtmp->data == &mons[PM_WEREJACKAL])
@@ -3499,7 +3499,7 @@ vamp_stone(struct monst *mtmp)
             newsym(mtmp->mx, mtmp->my);
             return FALSE;   /* didn't petrify */
         }
-    } else if (mtmp->cham >= LOW_PM
+    } else if (ismnum(mtmp->cham)
                && (mons[mtmp->cham].mresists & MR_STONE)) {
         /* sandestins are stoning-immune so if hit by stoning damage
            they revert to innate shape rather than become a statue */
@@ -4090,7 +4090,7 @@ normal_shape(struct monst *mon)
 {
     int mcham = (int) mon->cham;
 
-    if (mcham >= LOW_PM) {
+    if (ismnum(mcham)) {
         unsigned mcan = mon->mcan;
 
         (void) newcham(mon, &mons[mcham], NC_SHOW_MSG);
@@ -4469,7 +4469,7 @@ decide_to_shapeshift(struct monst *mon, int shiftflags)
          */
         if (mon->data->mlet != S_VAMPIRE) {
             if ((mon->mhp <= (mon->mhpmax + 5) / 6) && rn2(4)
-                && mon->cham >= LOW_PM) {
+                && ismnum(mon->cham)) {
                 ptr = &mons[mon->cham];
                 dochng = TRUE;
             } else if (mon->data == &mons[PM_FOG_CLOUD]
@@ -4481,7 +4481,7 @@ decide_to_shapeshift(struct monst *mon, int shiftflags)
                    tame--and then switch back to vampire; they'll also
                    switch to fog cloud if they encounter a closed door */
                 mndx = pickvampshape(mon);
-                if (mndx >= LOW_PM) {
+                if (ismnum(mndx)) {
                     ptr = &mons[mndx];
                     dochng = (ptr != mon->data);
                 }
@@ -4605,7 +4605,7 @@ validvamp(struct monst* mon, int* mndx_p, int monclass)
         *mndx_p = PM_VLAD_THE_IMPALER;
         return TRUE;
     }
-    if (*mndx_p >= LOW_PM && is_shapeshifter(&mons[*mndx_p])) {
+    if (ismnum(*mndx_p) && is_shapeshifter(&mons[*mndx_p])) {
         /* player picked some type of shapeshifter; use mon's self
            (vampire or chameleon) */
         *mndx_p = mon->cham;
@@ -4693,7 +4693,7 @@ wiz_force_cham_form(struct monst *mon)
             if (monclass && mndx == NON_PM)
                 mndx = mkclass_poly(monclass);
         }
-        if (mndx >= LOW_PM) {
+        if (ismnum(mndx)) {
             /* got a specific type of monster; use it if we can */
             if (validvamp(mon, &mndx, monclass))
                 break;
@@ -4745,6 +4745,7 @@ select_newcham_form(struct monst* mon)
             tryct = 5;
             do {
                 mndx = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
+                /* assert(ismnum(mndx)); */
                 if (humanoid(&mons[mndx]) && polyok(&mons[mndx]))
                     break;
             } while (--tryct > 0);
@@ -4782,6 +4783,7 @@ select_newcham_form(struct monst* mon)
         tryct = 50;
         do {
             mndx = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
+            /* assert(ismnum(mndx); */
         } while (--tryct > 0 && !validspecmon(mon, mndx)
                  /* try harder to select uppercase monster on rogue level */
                  && (tryct > 40 && Is_rogue_level(&u.uz)
@@ -4811,7 +4813,7 @@ accept_newcham_form(struct monst *mon, int mndx)
     /* shapeshifters are rejected by polyok() but allow a shapeshifter
        to take on its 'natural' form */
     if (is_shapeshifter(mdat)
-        && mon->cham >= LOW_PM && mdat == &mons[mon->cham])
+        && ismnum(mon->cham) && mdat == &mons[mon->cham])
         return mdat;
     /* polyok() rules out M2_PNAME, M2_WERE, and all humans except Kops */
     return polyok(mdat) ? mdat : 0;
@@ -5142,6 +5144,7 @@ dead_species(int m_idx, boolean egg)
      * fortunately, none of them have eggs.  Species extinction due to
      * overpopulation does not kill eggs.
      */
+    /* assert(ismnum(m_idx)); */
     alt_idx = egg ? big_to_little(m_idx) : m_idx;
     return (boolean) ((gm.mvitals[m_idx].mvflags & G_GENOD) != 0
                       || (gm.mvitals[alt_idx].mvflags & G_GENOD) != 0);
@@ -5201,10 +5204,10 @@ kill_genocided_monsters(void)
         if (DEADMONSTER(mtmp))
             continue;
         mndx = monsndx(mtmp->data);
-        kill_cham = (mtmp->cham >= LOW_PM
+        kill_cham = (ismnum(mtmp->cham)
                      && (gm.mvitals[mtmp->cham].mvflags & G_GENOD));
         if ((gm.mvitals[mndx].mvflags & G_GENOD) || kill_cham) {
-            if (mtmp->cham >= LOW_PM && !kill_cham)
+            if (ismnum(mtmp->cham) && !kill_cham)
                 (void) newcham(mtmp, (struct permonst *) 0, NC_SHOW_MSG);
             else
                 mondead(mtmp);

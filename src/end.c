@@ -671,8 +671,8 @@ done_in_by(struct monst *mtmp, int how)
 {
     char buf[BUFSZ];
     struct permonst *mptr = mtmp->data,
-                    *champtr = (mtmp->cham >= LOW_PM) ? &mons[mtmp->cham]
-                                                      : mptr;
+                    *champtr = ismnum(mtmp->cham) ? &mons[mtmp->cham]
+                                                  : mptr;
     boolean distorted = (boolean) (Hallucination && canspotmon(mtmp)),
             mimicker = (M_AP_TYPE(mtmp) == M_AP_MONSTER),
             imitator = (mptr != champtr || mimicker);
@@ -1438,7 +1438,7 @@ fuzzer_savelife(int how)
 
             /* get rid of temporary potion with obfree() rather than useup()
                because it doesn't get entered into inventory */
-            if (u.ulycn >= LOW_PM && !rn2(3)) {
+            if (ismnum(u.ulycn) && !rn2(3)) {
                 potion = mksobj(POT_WATER, TRUE, FALSE);
                 bless(potion);
                 (void) peffects(potion);
@@ -1671,7 +1671,7 @@ really_done(int how)
     else if (how == BURNING || how == DISSOLVED) /* corpse burns up too */
         u.ugrave_arise = (NON_PM - 2); /* leave no corpse */
     else if (how == STONING)
-        u.ugrave_arise = (NON_PM - 1); /* statue instead of corpse */
+        u.ugrave_arise = LEAVESTATUE; /* statue instead of corpse */
     else if (how == TURNED_SLIME
              /* it's possible to turn into slime even though green slimes
                 have been genocided:  genocide could occur after hero is
@@ -1808,7 +1808,7 @@ really_done(int how)
         }
     }
 
-    if (u.ugrave_arise >= LOW_PM && !done_stopprint) {
+    if (ismnum(u.ugrave_arise) && !done_stopprint) {
         /* give this feedback even if bones aren't going to be created,
            so that its presence or absence doesn't tip off the player to
            new bones or their lack; it might be a lie if makemon fails */

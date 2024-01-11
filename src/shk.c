@@ -3706,7 +3706,7 @@ corpsenm_price_adj(struct obj *obj)
     long val = 0L;
 
     if ((obj->otyp == TIN || obj->otyp == EGG || obj->otyp == CORPSE)
-        && obj->corpsenm >= LOW_PM) {
+        && ismnum(obj->corpsenm)) {
         int i;
         long tmp = 1L;
         struct permonst *ptr = &mons[obj->corpsenm];
@@ -5279,7 +5279,7 @@ block_entry(register coordxy x, register coordxy y)
 char *
 shk_your(char *buf, struct obj *obj)
 {
-    boolean chk_pm = obj->otyp == CORPSE && obj->corpsenm >= LOW_PM;
+    boolean chk_pm = obj->otyp == CORPSE && ismnum(obj->corpsenm);
 
     buf[0] = '\0';
     if (chk_pm && type_is_pname(&mons[obj->corpsenm]))

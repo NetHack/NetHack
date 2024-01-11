@@ -3086,11 +3086,11 @@ create_particular_parse(
     } else {  /* no explicit gender term was specified */
         d->fem = gender_name_var;
     }
-    if (d->which >= LOW_PM)
+    if (ismnum(d->which))
         return TRUE; /* got one */
     d->monclass = name_to_monclass(bufp, &d->which);
 
-    if (d->which >= LOW_PM) {
+    if (ismnum(d->which)) {
         d->monclass = MAXMCLASSES; /* matters below */
         return TRUE;
     } else if (d->monclass == S_invisible) { /* not an actual monster class */
