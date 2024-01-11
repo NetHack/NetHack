@@ -932,7 +932,8 @@ dogfood(struct monst *mon, struct obj *obj)
                 /* corpsenm might be NON_PM (special tin, unhatachable egg) */
                 ? obj->corpsenm
                 : NON_PM;
-        /* mons[NUMMONS] is valid; predicate tests against it will fail */
+        /* mons[NUMMONS] is a valid array entry, though not a valid monster;
+         * predicate tests against it will fail */
         fptr = &mons[(ismnum(fx)) ? fx : NUMMONS];
 
         if (obj->otyp == CORPSE && is_rider(fptr))
