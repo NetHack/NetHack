@@ -399,7 +399,10 @@ m_tele(
     }
 }
 
-/* return TRUE if monster mtmp has another monster next to it */
+/* return TRUE if monster mtmp has another monster next to it.
+ * Called from find_defensive() where it is limited to Is_knox()
+ * only, otherwise you could trap two monsters next to each other
+ * in a boulder fort, and they would be happy to stay in there. */
 static boolean
 m_next2m(struct monst *mtmp)
 {
