@@ -1,4 +1,4 @@
-/* NetHack 3.7	timeout.h	$NHDT-Date: 1703294874 2023/12/23 01:27:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.7	timeout.h	$NHDT-Date: 1705087443 2024/01/12 19:24:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.23 $ */
 /* Copyright 1994, Dean Luick                                     */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -24,6 +24,8 @@ enum timer_type {
 /*
  * Timeout functions.  Add an enum here, then put it in the table
  * in timeout.c.  "One more level of indirection will fix everything."
+ * Also add it to timerstr[] in nhl_get_timertype(nhlua.c); the entries
+ * there match these but are spelled diffently.
  *
  * Note:  if any are inserted, removed, or reordered then EDITLEVEL
  * needs to be incremented because timeout indices get written into save

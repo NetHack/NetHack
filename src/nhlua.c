@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1704497031 2024/01/05 23:23:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.126 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1705087450 2024/01/12 19:24:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.129 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -255,10 +255,12 @@ get_table_mapchr_opt(lua_State *L, const char *name, schar defval)
 short
 nhl_get_timertype(lua_State *L, int idx)
 {
+    /* these are in the same order as enum timeout_types in timeout.h and
+       ttable timeout_funcs[] in timeout.c, although not spelled the same */
     static const char *const timerstr[NUM_TIME_FUNCS + 1] = {
         "rot-organic", "rot-corpse", "revive-mon",    "zombify-mon",
-        "burn-obj",    "hatch-egg",  "fig-transform", "melt-ice",
-        "shrink-glob", NULL
+        "burn-obj",    "hatch-egg",  "fig-transform", "shrink-glob",
+        "melt-ice",    NULL
     };
     short ret = luaL_checkoption(L, idx, NULL, timerstr);
 
