@@ -1928,7 +1928,7 @@ nhl_pcall_handle(lua_State *L, int nargs, int nresults, const char *name,
 	    /* XXX can we get a lua stack trace as well? */
 	switch(npa){
 	case NHLpa_panic:
-	    panic("time exceeded %d:%s %s", nud->sid,
+	    panic("Lua error %d:%s %s", nud->sid,
 		    nud->name?nud->name:"(unknown)", lua_tostring(L, -1));
 	case NHLpa_impossible:
 	    impossible("Lua error: %d:%s %s", nud->sid,
@@ -2828,6 +2828,7 @@ nhlL_newstate(nhl_sandbox_info *sbi, const char *name)
     }
 
     lua_State *L = lua_newstate(nhl_alloc, nud);
+    if(!L)panic("NULL lua_newstate");
 
     lua_atpanic(L, nhl_panic);
 #if LUA_VERSION_NUM == 504
