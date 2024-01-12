@@ -1664,15 +1664,24 @@ choose_classes_menu(const char *prompt,
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
     while (*class_list) {
+        int idx;
         selected = FALSE;
         switch (category) {
         case 0:
-            text = def_monsyms[def_char_to_monclass(*class_list)].explain;
+            if ((idx = def_char_to_monclass(*class_list)) == MAXMCLASSES) {
+                panic("choose_classes_menu: invalid monclass '%c'", *class_list);
+                /*NOTREACHED*/
+            }
+            text = def_monsyms[idx].explain;
             accelerator = *class_list;
             Sprintf(buf, "%s", text);
             break;
         case 1:
-            text = def_oc_syms[def_char_to_objclass(*class_list)].explain;
+            if ((idx = def_char_to_objclass(*class_list)) == MAXOCLASSES) {
+                panic("choose_classes_menu: invalid objclass '%c'", *class_list);
+                /*NOTREACHED*/
+            }
+            text = def_oc_syms[idx].explain;
             accelerator = next_accelerator;
             Sprintf(buf, "%c  %s", *class_list, text);
             break;
