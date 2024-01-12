@@ -25,7 +25,7 @@ enum timer_type {
  * Timeout functions.  Add an enum here, then put it in the table
  * in timeout.c.  "One more level of indirection will fix everything."
  * Also add it to timerstr[] in nhl_get_timertype(nhlua.c); the entries
- * there match these but are spelled diffently.
+ * there match these but are spelled differently.
  *
  * Note:  if any are inserted, removed, or reordered then EDITLEVEL
  * needs to be incremented because timeout indices get written into save
