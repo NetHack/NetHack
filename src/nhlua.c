@@ -95,22 +95,22 @@ static boolean nhcore_call_available[NUM_NHCORE_CALLS];
  * Note that we use it for both memory use tracking and instruction counting.
  */
 typedef struct nhl_user_data {
-    uint32_t  flags;       /* from nhl_sandbox_info */
+    uint32_t flags;     /* from nhl_sandbox_info */
 
-    uint32_t  inuse;
-    uint32_t  memlimit;
+    uint32_t inuse;
+    uint32_t memlimit;
 
-    uint32_t  steps;       /* current counter */
-    uint32_t  osteps;      /* original steps value */
-    uint32_t  perpcall;    /* per pcall steps value */
+    uint32_t steps;     /* current counter */
+    uint32_t osteps;    /* original steps value */
+    uint32_t perpcall;  /* per pcall steps value */
 
-        /* stats */
-    uint32_t  statctr;     /* stats step reload count */
-    int       sid;         /* id number (per state) */
-    const char *name;      /* for stats logging (per pcall) */
+    /* stats */
+    uint32_t statctr;   /* stats step reload count */
+    int sid;            /* id number (per state) */
+    const char *name;   /* for stats logging (per pcall) */
 
 #ifdef NHL_SANDBOX
-    jmp_buf  jb;
+    jmp_buf jb;
 #endif
 } nhl_user_data;
 
@@ -119,7 +119,8 @@ static lua_State *luapat;   /* instance for file pattern matching */
 void
 l_nhcore_init(void)
 {
-    nhl_sandbox_info sbi = {NHL_SB_SAFE, 1*1024*1024, 0, 1*1024*1024};
+    nhl_sandbox_info sbi = { NHL_SB_SAFE, 1 * 1024 * 1024, 0,
+                             1 * 1024 * 1024 };
 
     if ((gl.luacore = nhl_init(&sbi)) != 0) {
         if (!nhl_loadlua(gl.luacore, "nhcore.lua")) {
@@ -149,8 +150,8 @@ l_nhcore_call(int callidx)
 {
     int ltyp;
 
-    if (callidx < 0 || callidx >= NUM_NHCORE_CALLS
-        || !gl.luacore || !nhcore_call_available[callidx])
+    if (callidx < 0 || callidx >= NUM_NHCORE_CALLS || !gl.luacore
+        || !nhcore_call_available[callidx])
         return;
 
     lua_getglobal(gl.luacore, "nhcore");
@@ -180,7 +181,7 @@ ATTRNORETURN void
 nhl_error(lua_State *L, const char *msg)
 {
     lua_Debug ar;
-    char buf[BUFSZ*2];
+    char buf[BUFSZ * 2];
 
     lua_getstack(L, 1, &ar);
     lua_getinfo(L, "lS", &ar);
@@ -254,10 +255,10 @@ get_table_mapchr_opt(lua_State *L, const char *name, schar defval)
 short
 nhl_get_timertype(lua_State *L, int idx)
 {
-    static const char *const timerstr[NUM_TIME_FUNCS+1] = {
-        "rot-organic", "rot-corpse", "revive-mon", "zombify-mon",
-        "burn-obj", "hatch-egg", "fig-transform", "melt-ice", "shrink-glob",
-        NULL
+    static const char *const timerstr[NUM_TIME_FUNCS + 1] = {
+        "rot-organic", "rot-corpse", "revive-mon",    "zombify-mon",
+        "burn-obj",    "hatch-egg",  "fig-transform", "melt-ice",
+        "shrink-glob", NULL
     };
     short ret = luaL_checkoption(L, idx, NULL, timerstr);
 
@@ -302,8 +303,8 @@ nhl_add_table_entry_bool(lua_State *L, const char *name, boolean value)
 }
 
 void
-nhl_add_table_entry_region(lua_State *L, const char *name,
-                           coordxy x1, coordxy y1, coordxy x2, coordxy y2)
+nhl_add_table_entry_region(lua_State *L, const char *name, coordxy x1,
+                           coordxy y1, coordxy x2, coordxy y2)
 {
     lua_pushstring(L, name);
     lua_newtable(L);
@@ -407,38 +408,40 @@ nhl_gettrap(lua_State *L)
     cvt_to_abscoord(&x, &y);
 
     if (isok(x, y)) {
-            struct trap *ttmp = t_at(x,y);
+        struct trap *ttmp = t_at(x, y);
 
-            if (ttmp) {
-                lua_newtable(L);
+        if (ttmp) {
+            lua_newtable(L);
 
-                nhl_add_table_entry_int(L, "tx", ttmp->tx);
-                nhl_add_table_entry_int(L, "ty", ttmp->ty);
-                nhl_add_table_entry_int(L, "ttyp", ttmp->ttyp);
-                nhl_add_table_entry_str(L, "ttyp_name",
-                                        get_trapname_bytype(ttmp->ttyp));
-                nhl_add_table_entry_bool(L, "tseen", ttmp->tseen);
-                nhl_add_table_entry_bool(L, "madeby_u", ttmp->madeby_u);
-                switch (ttmp->ttyp) {
-                case SQKY_BOARD:
-                    nhl_add_table_entry_int(L, "tnote", ttmp->tnote);
-                    break;
-                case ROLLING_BOULDER_TRAP:
-                    nhl_add_table_entry_int(L, "launchx", ttmp->launch.x);
-                    nhl_add_table_entry_int(L, "launchy", ttmp->launch.y);
-                    nhl_add_table_entry_int(L, "launch2x", ttmp->launch2.x);
-                    nhl_add_table_entry_int(L, "launch2y", ttmp->launch2.y);
-                    break;
-                case PIT:
-                case SPIKED_PIT:
-                    nhl_add_table_entry_int(L, "conjoined", ttmp->conjoined);
-                    break;
-                }
-                return 1;
-            } else
-                nhl_error(L, "No trap at location");
-        } else
-            nhl_error(L, "Coordinates out of range");
+            nhl_add_table_entry_int(L, "tx", ttmp->tx);
+            nhl_add_table_entry_int(L, "ty", ttmp->ty);
+            nhl_add_table_entry_int(L, "ttyp", ttmp->ttyp);
+            nhl_add_table_entry_str(L, "ttyp_name",
+                                    get_trapname_bytype(ttmp->ttyp));
+            nhl_add_table_entry_bool(L, "tseen", ttmp->tseen);
+            nhl_add_table_entry_bool(L, "madeby_u", ttmp->madeby_u);
+            switch (ttmp->ttyp) {
+            case SQKY_BOARD:
+                nhl_add_table_entry_int(L, "tnote", ttmp->tnote);
+                break;
+            case ROLLING_BOULDER_TRAP:
+                nhl_add_table_entry_int(L, "launchx", ttmp->launch.x);
+                nhl_add_table_entry_int(L, "launchy", ttmp->launch.y);
+                nhl_add_table_entry_int(L, "launch2x", ttmp->launch2.x);
+                nhl_add_table_entry_int(L, "launch2y", ttmp->launch2.y);
+                break;
+            case PIT:
+            case SPIKED_PIT:
+                nhl_add_table_entry_int(L, "conjoined", ttmp->conjoined);
+                break;
+            }
+            return 1;
+        } else {
+            nhl_error(L, "No trap at location");
+        }
+    } else {
+        nhl_error(L, "Coordinates out of range");
+    }
     return 0;
 }
 
@@ -459,7 +462,7 @@ nhl_deltrap(lua_State *L)
     cvt_to_abscoord(&x, &y);
 
     if (isok(x, y)) {
-        struct trap *ttmp = t_at(x,y);
+        struct trap *ttmp = t_at(x, y);
 
         if (ttmp)
             deltrap(ttmp);
@@ -517,74 +520,73 @@ nhl_getmap(lua_State *L)
     cvt_to_abscoord(&x, &y);
 
     if (isok(x, y)) {
-            char buf[BUFSZ];
-            lua_newtable(L);
+        char buf[BUFSZ];
+        lua_newtable(L);
 
-            /* FIXME: some should be boolean values */
-            nhl_add_table_entry_int(L, "glyph", levl[x][y].glyph);
-            nhl_add_table_entry_int(L, "typ", levl[x][y].typ);
-            nhl_add_table_entry_str(L, "typ_name",
-                                    levltyp_to_name(levl[x][y].typ));
-            Sprintf(buf, "%c", splev_typ2chr(levl[x][y].typ));
-            nhl_add_table_entry_str(L, "mapchr", buf);
-            nhl_add_table_entry_int(L, "seenv", levl[x][y].seenv);
-            nhl_add_table_entry_bool(L, "horizontal", levl[x][y].horizontal);
-            nhl_add_table_entry_bool(L, "lit", levl[x][y].lit);
-            nhl_add_table_entry_bool(L, "waslit", levl[x][y].waslit);
-            nhl_add_table_entry_int(L, "roomno", levl[x][y].roomno);
-            nhl_add_table_entry_bool(L, "edge", levl[x][y].edge);
-            nhl_add_table_entry_bool(L, "candig", levl[x][y].candig);
+        /* FIXME: some should be boolean values */
+        nhl_add_table_entry_int(L, "glyph", levl[x][y].glyph);
+        nhl_add_table_entry_int(L, "typ", levl[x][y].typ);
+        nhl_add_table_entry_str(L, "typ_name",
+                                levltyp_to_name(levl[x][y].typ));
+        Sprintf(buf, "%c", splev_typ2chr(levl[x][y].typ));
+        nhl_add_table_entry_str(L, "mapchr", buf);
+        nhl_add_table_entry_int(L, "seenv", levl[x][y].seenv);
+        nhl_add_table_entry_bool(L, "horizontal", levl[x][y].horizontal);
+        nhl_add_table_entry_bool(L, "lit", levl[x][y].lit);
+        nhl_add_table_entry_bool(L, "waslit", levl[x][y].waslit);
+        nhl_add_table_entry_int(L, "roomno", levl[x][y].roomno);
+        nhl_add_table_entry_bool(L, "edge", levl[x][y].edge);
+        nhl_add_table_entry_bool(L, "candig", levl[x][y].candig);
 
-            nhl_add_table_entry_bool(L, "has_trap", t_at(x,y) ? 1 : 0);
+        nhl_add_table_entry_bool(L, "has_trap", t_at(x, y) ? 1 : 0);
 
-            /* TODO: FIXME: levl[x][y].flags */
+        /* TODO: FIXME: levl[x][y].flags */
 
-            lua_pushliteral(L, "flags");
-            lua_newtable(L);
+        lua_pushliteral(L, "flags");
+        lua_newtable(L);
 
-            if (IS_DOOR(levl[x][y].typ)) {
-                nhl_add_table_entry_bool(L, "nodoor",
-                                         (levl[x][y].flags == D_NODOOR));
-                nhl_add_table_entry_bool(L, "broken",
-                                         (levl[x][y].flags & D_BROKEN));
-                nhl_add_table_entry_bool(L, "isopen",
-                                         (levl[x][y].flags & D_ISOPEN));
-                nhl_add_table_entry_bool(L, "closed",
-                                         (levl[x][y].flags & D_CLOSED));
-                nhl_add_table_entry_bool(L, "locked",
-                                         (levl[x][y].flags & D_LOCKED));
-                nhl_add_table_entry_bool(L, "trapped",
-                                         (levl[x][y].flags & D_TRAPPED));
-            } else if (IS_ALTAR(levl[x][y].typ)) {
-                /* TODO: bits 0, 1, 2 */
-                nhl_add_table_entry_bool(L, "shrine",
-                                         (levl[x][y].flags & AM_SHRINE));
-            } else if (IS_THRONE(levl[x][y].typ)) {
-                nhl_add_table_entry_bool(L, "looted",
-                                         (levl[x][y].flags & T_LOOTED));
-            } else if (levl[x][y].typ == TREE) {
-                nhl_add_table_entry_bool(L, "looted",
-                                         (levl[x][y].flags & TREE_LOOTED));
-                nhl_add_table_entry_bool(L, "swarm",
-                                         (levl[x][y].flags & TREE_SWARM));
-            } else if (IS_FOUNTAIN(levl[x][y].typ)) {
-                nhl_add_table_entry_bool(L, "looted",
-                                         (levl[x][y].flags & F_LOOTED));
-                nhl_add_table_entry_bool(L, "warned",
-                                         (levl[x][y].flags & F_WARNED));
-            } else if (IS_SINK(levl[x][y].typ)) {
-                nhl_add_table_entry_bool(L, "pudding",
-                                         (levl[x][y].flags & S_LPUDDING));
-                nhl_add_table_entry_bool(L, "dishwasher",
-                                         (levl[x][y].flags & S_LDWASHER));
-                nhl_add_table_entry_bool(L, "ring",
-                                         (levl[x][y].flags & S_LRING));
-            }
-            /* TODO: drawbridges, walls, ladders, room=>ICED_xxx */
+        if (IS_DOOR(levl[x][y].typ)) {
+            nhl_add_table_entry_bool(L, "nodoor",
+                                     (levl[x][y].flags == D_NODOOR));
+            nhl_add_table_entry_bool(L, "broken",
+                                     (levl[x][y].flags & D_BROKEN));
+            nhl_add_table_entry_bool(L, "isopen",
+                                     (levl[x][y].flags & D_ISOPEN));
+            nhl_add_table_entry_bool(L, "closed",
+                                     (levl[x][y].flags & D_CLOSED));
+            nhl_add_table_entry_bool(L, "locked",
+                                     (levl[x][y].flags & D_LOCKED));
+            nhl_add_table_entry_bool(L, "trapped",
+                                     (levl[x][y].flags & D_TRAPPED));
+        } else if (IS_ALTAR(levl[x][y].typ)) {
+            /* TODO: bits 0, 1, 2 */
+            nhl_add_table_entry_bool(L, "shrine",
+                                     (levl[x][y].flags & AM_SHRINE));
+        } else if (IS_THRONE(levl[x][y].typ)) {
+            nhl_add_table_entry_bool(L, "looted",
+                                     (levl[x][y].flags & T_LOOTED));
+        } else if (levl[x][y].typ == TREE) {
+            nhl_add_table_entry_bool(L, "looted",
+                                     (levl[x][y].flags & TREE_LOOTED));
+            nhl_add_table_entry_bool(L, "swarm",
+                                     (levl[x][y].flags & TREE_SWARM));
+        } else if (IS_FOUNTAIN(levl[x][y].typ)) {
+            nhl_add_table_entry_bool(L, "looted",
+                                     (levl[x][y].flags & F_LOOTED));
+            nhl_add_table_entry_bool(L, "warned",
+                                     (levl[x][y].flags & F_WARNED));
+        } else if (IS_SINK(levl[x][y].typ)) {
+            nhl_add_table_entry_bool(L, "pudding",
+                                     (levl[x][y].flags & S_LPUDDING));
+            nhl_add_table_entry_bool(L, "dishwasher",
+                                     (levl[x][y].flags & S_LDWASHER));
+            nhl_add_table_entry_bool(L, "ring", (levl[x][y].flags & S_LRING));
+        }
+        /* TODO: drawbridges, walls, ladders, room=>ICED_xxx */
 
-            lua_settable(L, -3);
+        lua_settable(L, -3);
 
-            return 1;
+        return 1;
     } else {
         /* TODO: return zerorm instead? */
         nhl_error(L, "Coordinates out of range");
@@ -696,7 +698,7 @@ nhl_getlin(lua_State *L)
 static int
 nhl_menu(lua_State *L)
 {
-    static const char *const pickX[] = {"none", "one", "any"}; /* PICK_x */
+    static const char *const pickX[] = { "none", "one", "any" }; /* PICK_x */
     int argc = lua_gettop(L);
     const char *prompt;
     const char *defval = "";
@@ -750,7 +752,8 @@ nhl_menu(lua_State *L)
             any.a_char = key[0];
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, str,
                  (*defval && *key && defval[0] == key[0])
-                    ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                     ? MENU_ITEMFLAGS_SELECTED
+                     : MENU_ITEMFLAGS_NONE);
 
         lua_pop(L, 1); /* removes 'value'; keeps 'key' for next iteration */
     }
@@ -763,8 +766,8 @@ nhl_menu(lua_State *L)
         char buf[2];
         buf[0] = picks[0].item.a_char;
 
-        if (pick == PICK_ONE && pick_cnt > 1
-            && *defval && defval[0] == picks[0].item.a_char)
+        if (pick == PICK_ONE && pick_cnt > 1 && *defval
+            && defval[0] == picks[0].item.a_char)
             buf[0] = picks[1].item.a_char;
 
         buf[1] = '\0';
@@ -919,7 +922,8 @@ nhl_random(lua_State *L)
     if (argc == 1)
         lua_pushinteger(L, rn2((int) luaL_checkinteger(L, 1)));
     else if (argc == 2)
-        lua_pushinteger(L, luaL_checkinteger(L, 1) + rn2((int) luaL_checkinteger(L, 2)));
+        lua_pushinteger(L, luaL_checkinteger(L, 1)
+                               + rn2((int) luaL_checkinteger(L, 2)));
     else
         nhl_error(L, "Wrong args");
 
@@ -933,8 +937,7 @@ nhl_level_difficulty(lua_State *L)
     int argc = lua_gettop(L);
     if (argc == 0) {
         lua_pushinteger(L, level_difficulty());
-    }
-    else {
+    } else {
         nhl_error(L, "level_difficulty should not have any args");
     }
     return 1;
@@ -1015,7 +1018,7 @@ get_table_boolean(lua_State *L, const char *name)
         ret = lua_toboolean(L, -1);
     } else if (ltyp == LUA_TNUMBER) {
         ret = (int) luaL_checkinteger(L, -1);
-        if ( ret < 0 || ret > 1)
+        if (ret < 0 || ret > 1)
             ret = -1;
     }
     lua_pop(L, 1);
@@ -1188,7 +1191,8 @@ get_nh_lua_variables(void)
 
     lua_getglobal(gl.luacore, "get_variables_string");
     if (lua_type(gl.luacore, -1) == LUA_TFUNCTION) {
-        if (nhl_pcall_handle(gl.luacore, 0, 1, "get_nh_lua_variables", NHLpa_impossible)) {
+        if (nhl_pcall_handle(gl.luacore, 0, 1, "get_nh_lua_variables",
+                             NHLpa_impossible)) {
             return key;
         }
         key = dupstr(lua_tostring(gl.luacore, -1));
@@ -1242,7 +1246,6 @@ nhl_stairways(lua_State *L)
     lua_newtable(L);
 
     while (tmp) {
-
         lua_pushinteger(L, i);
         lua_newtable(L);
 
@@ -1630,53 +1633,53 @@ tutorial(boolean entering)
 }
 
 static const struct luaL_Reg nhl_functions[] = {
-    {"test", nhl_test},
+    { "test", nhl_test },
 
-    {"getmap", nhl_getmap},
+    { "getmap", nhl_getmap },
 #if 0
-    {"setmap", nhl_setmap},
+    { "setmap", nhl_setmap },
 #endif
-    {"gettrap", nhl_gettrap},
-    {"deltrap", nhl_deltrap},
+    { "gettrap", nhl_gettrap },
+    { "deltrap", nhl_deltrap },
 
-    {"has_timer_at", nhl_timer_has_at},
-    {"peek_timer_at", nhl_timer_peek_at},
-    {"stop_timer_at", nhl_timer_stop_at},
-    {"start_timer_at", nhl_timer_start_at},
+    { "has_timer_at", nhl_timer_has_at },
+    { "peek_timer_at", nhl_timer_peek_at },
+    { "stop_timer_at", nhl_timer_stop_at },
+    { "start_timer_at", nhl_timer_start_at },
 
-    {"abscoord", nhl_abs_coord},
+    { "abscoord", nhl_abs_coord },
 
-    {"impossible", nhl_impossible},
-    {"pline", nhl_pline},
-    {"verbalize", nhl_verbalize},
-    {"menu", nhl_menu},
-    {"text", nhl_text},
-    {"getlin", nhl_getlin},
-    {"eckey", nhl_get_cmd_key},
-    {"callback", nhl_callback},
-    {"gamestate", nhl_gamestate},
+    { "impossible", nhl_impossible },
+    { "pline", nhl_pline },
+    { "verbalize", nhl_verbalize },
+    { "menu", nhl_menu },
+    { "text", nhl_text },
+    { "getlin", nhl_getlin },
+    { "eckey", nhl_get_cmd_key },
+    { "callback", nhl_callback },
+    { "gamestate", nhl_gamestate },
 
-    {"makeplural", nhl_makeplural},
-    {"makesingular", nhl_makesingular},
-    {"s_suffix", nhl_s_suffix},
-    {"ing_suffix", nhl_ing_suffix},
-    {"an", nhl_an},
-    {"rn2", nhl_rn2},
-    {"random", nhl_random},
-    {"level_difficulty", nhl_level_difficulty},
-    {"parse_config", nhl_parse_config},
-    {"get_config", nhl_get_config},
-    {"get_config_errors", l_get_config_errors},
+    { "makeplural", nhl_makeplural },
+    { "makesingular", nhl_makesingular },
+    { "s_suffix", nhl_s_suffix },
+    { "ing_suffix", nhl_ing_suffix },
+    { "an", nhl_an },
+    { "rn2", nhl_rn2 },
+    { "random", nhl_random },
+    { "level_difficulty", nhl_level_difficulty },
+    { "parse_config", nhl_parse_config },
+    { "get_config", nhl_get_config },
+    { "get_config_errors", l_get_config_errors },
 #ifdef DUMPLOG
-    {"dump_fmtstr", nhl_dump_fmtstr},
+    { "dump_fmtstr", nhl_dump_fmtstr },
 #endif /* DUMPLOG */
-    {"dnum_name", nhl_dnum_name},
-    {"variable", nhl_variable},
-    {"stairways", nhl_stairways},
-    {"pushkey", nhl_pushkey},
-    {"doturn", nhl_doturn},
-    {"debug_flags", nhl_debug_flags},
-    {NULL, NULL}
+    { "dnum_name", nhl_dnum_name },
+    { "variable", nhl_variable },
+    { "stairways", nhl_stairways },
+    { "pushkey", nhl_pushkey },
+    { "doturn", nhl_doturn },
+    { "debug_flags", nhl_debug_flags },
+    { NULL, NULL }
 };
 
 static const struct {
@@ -1686,9 +1689,9 @@ static const struct {
     { "COLNO",  COLNO },
     { "ROWNO",  ROWNO },
 #ifdef DLB
-    { "DLB", 1},
+    { "DLB", 1 },
 #else
-    { "DLB", 0},
+    { "DLB", 0 },
 #endif /* DLB */
     { NULL, 0 },
 };
@@ -1716,13 +1719,16 @@ nhl_push_anything(lua_State *L, int anytype, void *src)
     anything any = cg.zeroany;
 
     switch (anytype) {
-    case ANY_INT: any.a_int = *(int *) src;
+    case ANY_INT:
+        any.a_int = *(int *) src;
         lua_pushinteger(L, any.a_int);
         break;
-    case ANY_UCHAR: any.a_uchar = *(uchar *) src;
+    case ANY_UCHAR:
+        any.a_uchar = *(uchar *) src;
         lua_pushinteger(L, any.a_uchar);
         break;
-    case ANY_SCHAR: any.a_schar = *(schar *) src;
+    case ANY_SCHAR:
+        any.a_schar = *(schar *) src;
         lua_pushinteger(L, any.a_schar);
         break;
     }
@@ -1757,7 +1763,7 @@ nhl_meta_u_index(lua_State *L)
         { "mhmax", &(u.mhmax), ANY_INT },
         { "mtimedone", &(u.mtimedone), ANY_INT },
         { "dlevel", &(u.uz.dlevel), ANY_SCHAR }, /* actually coordxy */
-        { "dnum", &(u.uz.dnum), ANY_SCHAR }, /* actually coordxy */
+        { "dnum", &(u.uz.dnum), ANY_SCHAR },     /* actually coordxy */
         { "uluck", &(u.uluck), ANY_SCHAR },
         { "uhp", &(u.uhp), ANY_INT },
         { "uhpmax", &(u.uhpmax), ANY_INT },
@@ -1880,19 +1886,20 @@ nhl_pcall(lua_State *L, int nargs, int nresults, const char *name)
     lua_insert(L, 1);
     (void) lua_getallocf(L, (void **) &nud);
 #ifdef NHL_SANDBOX
-    if(nud && name){
+    if (nud && name) {
         nud->name = name;
     }
     /* NB: We don't need to deal with nud->memlimit - Lua handles that. */
     if (nud && (nud->steps || nud->perpcall)) {
-        if (nud->perpcall){
+        if (nud->perpcall) {
             nud->steps = nud->perpcall;
             nud->statctr = 0;
         }
         if (setjmp(nud->jb)) {
             /* panic, because we don't know if the game state is corrupt */
-	    /* XXX can we get a lua stack trace as well? */
-            panic("Lua time exceeded %d:%s",nud->sid,nud->name?nud->name:"(unknown)");
+            /* XXX can we get a lua stack trace as well? */
+            panic("Lua time exceeded %d:%s", nud->sid,
+                  nud->name ? nud->name : "(unknown)");
         }
     }
 #endif
@@ -1901,17 +1908,16 @@ nhl_pcall(lua_State *L, int nargs, int nresults, const char *name)
 
     lua_remove(L, 1); /* remove handler */
 
-
 #ifdef NHL_SANDBOX
-    if(nud && nud->perpcall && gl.loglua){
-        long ic = nud->statctr*NHL_SB_STEPSIZE; // an approximation
-        livelog_printf(LL_DEBUG, "LUASTATS PCAL %d:%s %ld",
-                nud->sid,nud->name,ic);
+    if (nud && nud->perpcall && gl.loglua) {
+        long ic = nud->statctr * NHL_SB_STEPSIZE; // an approximation
+        livelog_printf(LL_DEBUG, "LUASTATS PCAL %d:%s %ld", nud->sid,
+                       nud->name, ic);
     }
-    if(nud && nud->memlimit && gl.loglua){
+    if (nud && nud->memlimit && gl.loglua) {
         lua_gc(L, LUA_GCCOLLECT);
-        livelog_printf(LL_DEBUG, "LUASTATS PMEM %d:%s %lu",
-                nud->sid,nud->name,(long unsigned)nud->inuse);
+        livelog_printf(LL_DEBUG, "LUASTATS PMEM %d:%s %lu", nud->sid,
+                       nud->name, (long unsigned) nud->inuse);
     }
 #endif
     return rv;
@@ -1919,21 +1925,22 @@ nhl_pcall(lua_State *L, int nargs, int nresults, const char *name)
 
 int
 nhl_pcall_handle(lua_State *L, int nargs, int nresults, const char *name,
-	NHL_pcall_action npa
-){
+                 NHL_pcall_action npa)
+{
     int rv = nhl_pcall(L, nargs, nresults, name);
-    if(rv){
-	nhl_user_data *nud;
-	(void)lua_getallocf(L, (void**)&nud);
-	    /* XXX can we get a lua stack trace as well? */
-	switch(npa){
-	case NHLpa_panic:
-	    panic("Lua error %d:%s %s", nud->sid,
-		    nud->name?nud->name:"(unknown)", lua_tostring(L, -1));
-	case NHLpa_impossible:
-	    impossible("Lua error: %d:%s %s", nud->sid,
-		    nud->name?nud->name:"(unknown)", lua_tostring(L, -1));
-	}
+    if (rv) {
+        nhl_user_data *nud;
+        (void) lua_getallocf(L, (void **) &nud);
+        /* XXX can we get a lua stack trace as well? */
+        switch (npa) {
+        case NHLpa_panic:
+            panic("Lua error %d:%s %s", nud->sid,
+                  nud->name ? nud->name : "(unknown)", lua_tostring(L, -1));
+        case NHLpa_impossible:
+            impossible("Lua error: %d:%s %s", nud->sid,
+                       nud->name ? nud->name : "(unknown)",
+                       lua_tostring(L, -1));
+        }
     }
     return rv;
 }
@@ -2029,8 +2036,8 @@ nhl_loadlua(lua_State *L, const char *fname)
 
     llret = luaL_loadbuffer(L, buf, strlen(buf), altfname);
     if (llret != LUA_OK) {
-        impossible("luaL_loadbuffer: Error loading %s: %s",
-                   altfname, lua_tostring(L, -1));
+        impossible("luaL_loadbuffer: Error loading %s: %s", altfname,
+                   lua_tostring(L, -1));
         ret = FALSE;
         goto give_up;
     } else {
@@ -2063,12 +2070,12 @@ nhl_init(nhl_sandbox_info *sbi)
 #ifdef NHL_SANDBOX
     if (NHL_VERSION_EXPECTED != LUA_VERSION_RELEASE_NUM) {
         panic(
-             "sandbox doesn't know this Lua version: this=%d != expected=%d ",
-              LUA_VERSION_RELEASE_NUM, NHL_VERSION_EXPECTED);
+            "sandbox doesn't know this Lua version: this=%d != expected=%d ",
+            LUA_VERSION_RELEASE_NUM, NHL_VERSION_EXPECTED);
     }
 #endif
 
-    lua_State *L = nhlL_newstate(sbi,"nhl_init");
+    lua_State *L = nhlL_newstate(sbi, "nhl_init");
 
     iflags.in_lua = TRUE;
     /* Temporary for development XXX */
@@ -2123,22 +2130,22 @@ void
 nhl_done(lua_State *L)
 {
     if (L) {
-	nhl_user_data *nud = 0;
-	(void)lua_getallocf(L, (void**)&nud);
-        if(gl.loglua){
-            if(nud && nud->osteps){
-                long ic = nud->statctr*NHL_SB_STEPSIZE; // an approximation
-                livelog_printf(LL_DEBUG, "LUASTATS DONE %d:%s %ld",
-                        nud->sid, nud->name,ic);
+        nhl_user_data *nud = 0;
+        (void) lua_getallocf(L, (void **) &nud);
+        if (gl.loglua) {
+            if (nud && nud->osteps) {
+                long ic = nud->statctr * NHL_SB_STEPSIZE; // an approximation
+                livelog_printf(LL_DEBUG, "LUASTATS DONE %d:%s %ld", nud->sid,
+                               nud->name, ic);
             }
-            if(nud && nud->memlimit && !nud->perpcall){
+            if (nud && nud->memlimit && !nud->perpcall) {
                 lua_gc(L, LUA_GCCOLLECT);
-                livelog_printf(LL_DEBUG, "LUASTATS DMEM %d:%s %lu",
-                        nud->sid, nud->name,(long unsigned)nud->inuse);
+                livelog_printf(LL_DEBUG, "LUASTATS DMEM %d:%s %lu", nud->sid,
+                               nud->name, (long unsigned) nud->inuse);
             }
         }
-	if(nud)
-	    nhl_alloc(NULL, nud, 0, 0);	// free nud
+        if (nud)
+            nhl_alloc(NULL, nud, 0, 0); // free nud
         lua_close(L);
     }
     iflags.in_lua = FALSE;
@@ -2171,7 +2178,8 @@ DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 const char *
 get_lua_version(void)
 {
-    nhl_sandbox_info sbi = {NHL_SB_VERSION, 1*1024*1024, 0, 1*1024*1024};
+    nhl_sandbox_info sbi = { NHL_SB_VERSION, 1 * 1024 * 1024, 0,
+                             1 * 1024 * 1024 };
 
     if (gl.lua_ver[0] == 0) {
         lua_State *L = nhl_init(&sbi);
@@ -2186,7 +2194,7 @@ get_lua_version(void)
                get set up as a lua global */
             lua_getglobal(L, "_RELEASE");
             if (lua_isstring(L, -1))
-                vs = lua_tolstring (L, -1, &len);
+                vs = lua_tolstring(L, -1, &len);
 #ifdef LUA_RELEASE
             else
                 vs = LUA_RELEASE, len = strlen(vs);
@@ -2194,7 +2202,7 @@ get_lua_version(void)
             if (!vs) {
                 lua_getglobal(L, "_VERSION");
                 if (lua_isstring(L, -1))
-                    vs = lua_tolstring (L, -1, &len);
+                    vs = lua_tolstring(L, -1, &len);
 #ifdef LUA_VERSION
                 else
                     vs = LUA_VERSION, len = strlen(vs);
@@ -2253,52 +2261,52 @@ struct e {
 
 /* NHL_BASE_BASE - safe things */
 static struct e ct_base_base[] = {
-    {IFFLAG, "ipairs"},
-    {IFFLAG, "next"},
-    {IFFLAG, "pairs"},
-    {IFFLAG, "pcall"},
-    {IFFLAG, "select"},
-    {IFFLAG, "tonumber"},
-    {IFFLAG, "tostring"},
-    {IFFLAG, "type"},
-    {IFFLAG, "xpcall"},
-    {EOT, NULL}
+    { IFFLAG, "ipairs" },
+    { IFFLAG, "next" },
+    { IFFLAG, "pairs" },
+    { IFFLAG, "pcall" },
+    { IFFLAG, "select" },
+    { IFFLAG, "tonumber" },
+    { IFFLAG, "tostring" },
+    { IFFLAG, "type" },
+    { IFFLAG, "xpcall" },
+    { EOT, NULL }
 };
 
 /* NHL_BASE_ERROR - not really safe - might not want Lua to kill the process */
 static struct e ct_base_error[] = {
-    {IFFLAG, "assert"},   /* ok, calls error */
-    {IFFLAG, "error"},    /* ok, calls G->panic */
-    {NEVER, "print"}, /*not ok - calls lua_writestring/lua_writeline -> stdout*/
-    {NEVER, "warn"}, /*not ok - calls lua_writestringerror -> stderr*/
-    {EOT, NULL}
+    { IFFLAG, "assert" },   /* ok, calls error */
+    { IFFLAG, "error" },    /* ok, calls G->panic */
+    { NEVER, "print" }, /*not ok - calls lua_writestring/lua_writeline -> stdout*/
+    { NEVER, "warn" }, /*not ok - calls lua_writestringerror -> stderr*/
+    { EOT, NULL }
 };
 
 /* NHL_BASE_META - metatable access */
 static struct e ct_base_meta[] = {
-    {IFFLAG, "getmetatable"},
-    {IFFLAG, "rawequal"},
-    {IFFLAG, "rawget"},
-    {IFFLAG, "rawlen"},
-    {IFFLAG, "rawset"},
-    {IFFLAG, "setmetatable"},
-    {EOT, NULL}
+    { IFFLAG, "getmetatable" },
+    { IFFLAG, "rawequal" },
+    { IFFLAG, "rawget" },
+    { IFFLAG, "rawlen" },
+    { IFFLAG, "rawset" },
+    { IFFLAG, "setmetatable" },
+    { EOT, NULL }
 };
 
 /* NHL_BASE_GC - questionable safety */
 static struct e ct_base_iffy[] = {
-    {IFFLAG, "collectgarbage"},
-    {EOT, NULL}
+    { IFFLAG, "collectgarbage" },
+    { EOT, NULL }
 };
 
 /* NHL_BASE_UNSAFE - include only if required */
 /* TODO: if NHL_BASE_UNSAFE is ever used, we need to wrap lua_load with
  * something to forbid mode=="b" */
 static struct e ct_base_unsafe[] = {
-    {IFFLAG, "dofile"},
-    {IFFLAG, "loadfile"},
-    {IFFLAG, "load"},
-    {EOT, NULL}
+    { IFFLAG, "dofile" },
+    { IFFLAG, "loadfile" },
+    { IFFLAG, "load" },
+    { EOT, NULL }
 };
 
 /* no ct_co_ tables; all fns at same level of concern */
@@ -2310,47 +2318,47 @@ static struct e ct_base_unsafe[] = {
 
 /* possible ct_debug tables - likely to need changes */
 static struct e ct_debug_debug[] = {
-    {NEVER,  "debug"},          /* uses normal I/O so needs re-write */
-    {IFFLAG, "getuservalue"},
-    {NEVER,  "gethook"},        /* see sethook */
-    {IFFLAG, "getinfo"},
-    {IFFLAG, "getlocal"},
-    {IFFLAG, "getregistry"},
-    {IFFLAG, "getmetatable"},
-    {IFFLAG, "getupvalue"},
-    {IFFLAG, "upvaluejoin"},
-    {IFFLAG, "upvalueid"},
-    {IFFLAG, "setuservalue"},
-    {NEVER,  "sethook"},        /* used for memory and step limits */
-    {IFFLAG, "setlocal"},
-    {IFFLAG, "setmetatable"},
-    {IFFLAG, "setupvalue"},
-    {IFFLAG, "setcstacklimit"},
-    {EOT, NULL}
+    { NEVER,  "debug" },          /* uses normal I/O so needs re-write */
+    { IFFLAG, "getuservalue" },
+    { NEVER,  "gethook" },        /* see sethook */
+    { IFFLAG, "getinfo" },
+    { IFFLAG, "getlocal" },
+    { IFFLAG, "getregistry" },
+    { IFFLAG, "getmetatable" },
+    { IFFLAG, "getupvalue" },
+    { IFFLAG, "upvaluejoin" },
+    { IFFLAG, "upvalueid" },
+    { IFFLAG, "setuservalue" },
+    { NEVER,  "sethook" },        /* used for memory and step limits */
+    { IFFLAG, "setlocal" },
+    { IFFLAG, "setmetatable" },
+    { IFFLAG, "setupvalue" },
+    { IFFLAG, "setcstacklimit" },
+    { EOT, NULL }
 };
 static struct e ct_debug_safe[] = {
-    {IFFLAG, "traceback"},
-    {EOT, NULL}
+    { IFFLAG, "traceback" },
+    { EOT, NULL }
 };
 
 /* possible ct_os_ tables */
 static struct e ct_os_time[] = {
-    {IFFLAG, "clock"},          /* is this portable? XXX */
-    {IFFLAG, "date"},
-    {IFFLAG, "difftime"},
-    {IFFLAG, "time"},
-    {EOT, NULL}
+    { IFFLAG, "clock" },          /* is this portable? XXX */
+    { IFFLAG, "date" },
+    { IFFLAG, "difftime" },
+    { IFFLAG, "time" },
+    { EOT, NULL }
 };
 
 static struct e ct_os_files[] = {
-    {NEVER, "execute"},         /* not portable */
-    {NEVER, "exit"},
-    {NEVER, "getenv"},
-    {IFFLAG, "remove"},
-    {IFFLAG, "rename"},
-    {NEVER, "setlocale"},
-    {NEVER, "tmpname"},
-    {EOT, NULL}
+    { NEVER, "execute" },         /* not portable */
+    { NEVER, "exit" },
+    { NEVER, "getenv" },
+    { IFFLAG, "remove" },
+    { IFFLAG, "rename" },
+    { NEVER, "setlocale" },
+    { NEVER, "tmpname" },
+    { EOT, NULL }
 };
 
 
@@ -2412,17 +2420,18 @@ static boolean
 start_luapat(void)
 {
     int rv;
-/* XXX set memory and step limits */
-    nhl_sandbox_info sbi = {NHL_SB_STRING, 0, 0, 0};
+    /* XXX set memory and step limits */
+    nhl_sandbox_info sbi = { NHL_SB_STRING, 0, 0, 0 };
 
     if ((luapat = nhl_init(&sbi)) == NULL)
         return FALSE;
 
     /* load a pattern matching function */
-    rv = luaL_loadstring(luapat,
-                "function matches(s,p) return not not stringm.match(s,p) end");
+    rv = luaL_loadstring(
+                         luapat,
+              "function matches(s,p) return not not stringm.match(s,p) end");
     if (rv != LUA_OK) {
-        panic("start_luapat: %d",rv);
+        panic("start_luapat: %d", rv);
     }
     return TRUE;
 }
@@ -2556,7 +2565,7 @@ hooked_open(lua_State *L)
         return NHL_SBRV_DENY; /* default to "no" */
 
  doopen:
-    lua_settop(L, params+1);
+    lua_settop(L, params + 1);
     return (*io_open)(L);
 }
 
@@ -2821,14 +2830,15 @@ nhlL_newstate(nhl_sandbox_info *sbi, const char *name)
         NHL_ALLOC_ADJUST(sz);
         nud->inuse = sz;
 
-        if(name){
+        if (name) {
             nud->name = name;
         }
         nud->sid = ++gl.lua_sid;
     }
 
     lua_State *L = lua_newstate(nhl_alloc, nud);
-    if(!L)panic("NULL lua_newstate");
+    if (!L)
+        panic("NULL lua_newstate");
 
     lua_atpanic(L, nhl_panic);
 #if LUA_VERSION_NUM == 504
