@@ -187,7 +187,7 @@ mhidden_description(
     struct obj *otmp;
     boolean fakeobj, isyou = (mon == &gy.youmonst);
     coordxy x = isyou ? u.ux : mon->mx, y = isyou ? u.uy : mon->my;
-    int glyph = (gl.level.flags.hero_memory && !isyou) ? levl[x][y].glyph
+    int glyph = (gl.level.flags.hero_memory && !isyou) ? loc(x, y)->glyph
                                                       : glyph_at(x, y);
 
     *outbuf = '\0';
@@ -333,9 +333,9 @@ look_at_object(
 
     if (otmp && otmp->where == OBJ_BURIED)
         Strcat(buf, " (buried)");
-    else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
+    else if (loc(x, y)->typ == STONE || loc(x, y)->typ == SCORR)
         Strcat(buf, " embedded in stone");
-    else if (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR)
+    else if (IS_WALL(loc(x, y)->typ) || loc(x, y)->typ == SDOOR)
         Strcat(buf, " embedded in a wall");
     else if (closed_door(x, y))
         Strcat(buf, " embedded in a door");
@@ -554,7 +554,7 @@ ice_descr(coordxy x, coordxy y, char *outbuf)
 
     iflags.ice_rating = -1; /* secondary output, for 'mention_decor' */
     if (SURFACE_AT(x, y) != ICE) {
-        Sprintf(outbuf, "[ice:%d?]", (int) levl[x][y].typ);
+        Sprintf(outbuf, "[ice:%d?]", (int) loc(x, y)->typ);
     } else if ((distu(x, y) > neardist
                 || (!cansee(x, y) && (!u_at(x, y) || Levitation)))
                && !gd.decor_levitate_override) { /* probe_decor(pickup.c) */
@@ -685,7 +685,7 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
         case S_ndoor:
             if (is_drawbridge_wall(x, y) >= 0)
                 Strcpy(buf, "open drawbridge portcullis");
-            else if ((levl[x][y].doormask & ~D_TRAPPED) == D_BROKEN)
+            else if ((loc(x, y)->doormask & ~D_TRAPPED) == D_BROKEN)
                 Strcpy(buf, "broken door");
             else
                 Strcpy(buf, "doorway");
@@ -705,7 +705,7 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
             Strcpy(buf, "engraving");
             break;
         case S_stone:
-            if (!levl[x][y].seenv) {
+            if (!loc(x, y)->seenv) {
                 Strcpy(buf, "unexplored");
                 break;
             } else if (Underwater && !Is_waterlevel(&u.uz)) {
@@ -713,7 +713,7 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
                    submerged; better terminology appreciated... */
                 Strcpy(buf, (next2u(x, y)) ? "land" : "unknown");
                 break;
-            } else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR) {
+            } else if (loc(x, y)->typ == STONE || loc(x, y)->typ == SCORR) {
                 Strcpy(buf, "stone");
                 break;
             }
@@ -1086,7 +1086,7 @@ add_cmap_descr(
     } else if (absidx == S_pool || idx == S_water
                || idx == S_lava || idx == S_ice) {
         /* replace some descriptions (x_str) with waterbody_name() */
-        schar save_ltyp = levl[cc.x][cc.y].typ;
+        schar save_ltyp = loc(cc.x, cc.y)->typ;
         long save_prop = EHalluc_resistance;
 
         /* grab a scratch buffer we can safely return (via *firstmatch
@@ -1094,21 +1094,21 @@ add_cmap_descr(
         mbuf = mon_nam(&gy.youmonst);
 
         if (absidx == S_pool) {
-            levl[cc.x][cc.y].typ = (idx == S_pool) ? POOL : MOAT;
+            loc(cc.x, cc.y)->typ = (idx == S_pool) ? POOL : MOAT;
             idx = S_pool; /* force fake negative moat value to be positive */
         } else {
             /* we might be examining a pool location but trying to match
                water or lava; override the terrain with what we're matching
                because that's what waterbody_name() bases its result on;
                it's not pool so must be one of water/lava/ice to get here */
-            levl[cc.x][cc.y].typ = (idx == S_water) ? WATER
+            loc(cc.x, cc.y)->typ = (idx == S_water) ? WATER
                                    : (idx == S_lava) ? LAVAPOOL
                                      : ICE;
         }
         EHalluc_resistance = 1;
         Strcpy(mbuf, waterbody_name(cc.x, cc.y));
         EHalluc_resistance = save_prop;
-        levl[cc.x][cc.y].typ = save_ltyp;
+        loc(cc.x, cc.y)->typ = save_ltyp;
 
         /* shorten the feedback for farlook/quicklook: "a pool or ..." */
         if (!strcmp(mbuf, "pool of water"))
@@ -2032,9 +2032,9 @@ look_engrs(boolean nearby)
             if (!e)
                 continue;
             glyph = glyph_at(x, y);
-            sym = ((levl[x][y].typ == GRAVE || gl.lastseentyp[x][y] == GRAVE)
+            sym = ((loc(x, y)->typ == GRAVE || gl.lastseentyp[x][y] == GRAVE)
                    ? S_grave
-                   : (levl[x][y].typ == CORR) ? S_engrcorr
+                   : (loc(x, y)->typ == CORR) ? S_engrcorr
                      : S_engroom);
             is_headstone = (sym == S_grave);
             Sprintf(lookbuf, "(%s", is_headstone ? "grave" : "engraving");

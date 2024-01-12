@@ -19,7 +19,7 @@ static int mon_in_room(struct monst *, int);
 static int
 mon_in_room(struct monst *mon, int rmtyp)
 {
-    int rno = levl[mon->mx][mon->my].roomno;
+    int rno = loc(mon->mx, mon->my)->roomno;
     if (rno >= ROOMOFFSET)
         return gr.rooms[rno - ROOMOFFSET].rtype == rmtyp;
     return FALSE;
@@ -1333,7 +1333,7 @@ dochat(void)
                           Hallucination ? rndmonnam((char *) 0) : "statue");
             return ECMD_OK;
         }
-        if (!Deaf && (IS_WALL(levl[tx][ty].typ) || levl[tx][ty].typ == SDOOR)) {
+        if (!Deaf && (IS_WALL(loc(tx, ty)->typ) || loc(tx, ty)->typ == SDOOR)) {
             /* Talking to a wall; secret door remains hidden by behaving
                like a wall; IS_WALL() test excludes solid rock even when
                that serves as a wall bordering a corridor */
@@ -1481,7 +1481,7 @@ tiphat(void)
                 && !is_silent(mtmp->data))
             /* we check accessible() after m_at() in case there's a
                visible monster phazing through a wall here */
-            || !(accessible(x, y) || levl[x][y].typ == IRONBARS))
+            || !(accessible(x, y) || loc(x, y)->typ == IRONBARS))
             break;
     }
 

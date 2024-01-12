@@ -233,7 +233,7 @@ void
 magic_map_background(coordxy x, coordxy y, int show)
 {
     int glyph = back_to_glyph(x, y); /* assumes hero can see x,y */
-    struct rm *lev = &levl[x][y];
+    struct rm *lev = loc(x, y);
 
     /*
      * Correct for out of sight lit corridors and rooms that the hero
@@ -280,7 +280,7 @@ map_background(coordxy x, coordxy y, int show)
     int glyph = back_to_glyph(x, y);
 
     if (gl.level.flags.hero_memory)
-        levl[x][y].glyph = glyph;
+        loc(x, y)->glyph = glyph;
     if (show)
         show_glyph(x, y, glyph);
 }
@@ -298,7 +298,7 @@ map_trap(struct trap *trap, int show)
     int glyph = trap_to_glyph(trap);
 
     if (gl.level.flags.hero_memory)
-        levl[x][y].glyph = glyph;
+        loc(x, y)->glyph = glyph;
     if (show)
         show_glyph(x, y, glyph);
 }
@@ -315,7 +315,7 @@ map_engraving(struct engr *ep, int show)
     int glyph = engraving_to_glyph(ep);
 
     if (gl.level.flags.hero_memory)
-        levl[x][y].glyph = glyph;
+        loc(x, y)->glyph = glyph;
     if (show)
         show_glyph(x, y, glyph);
 }
@@ -355,9 +355,9 @@ map_object(struct obj *obj, int show)
         /*       but remembered as random objects.                        */
 
         if (Hallucination && obj->otyp == STATUE) {
-            levl[x][y].glyph = random_obj_to_glyph(newsym_rn2);
+            loc(x, y)->glyph = random_obj_to_glyph(newsym_rn2);
         } else {
-            levl[x][y].glyph = glyph;
+            loc(x, y)->glyph = glyph;
         }
     }
     if (show)
@@ -378,7 +378,7 @@ map_invisible(coordxy x, coordxy y)
 {
     if (x != u.ux || y != u.uy) { /* don't display I at hero's location */
         if (gl.level.flags.hero_memory)
-            levl[x][y].glyph = GLYPH_INVISIBLE;
+            loc(x, y)->glyph = GLYPH_INVISIBLE;
         show_glyph(x, y, GLYPH_INVISIBLE);
     }
 }
@@ -386,7 +386,7 @@ map_invisible(coordxy x, coordxy y)
 boolean
 unmap_invisible(coordxy x, coordxy y)
 {
-    if (isok(x,y) && glyph_is_invisible(levl[x][y].glyph)) {
+    if (isok(x,y) && glyph_is_invisible(loc(x, y)->glyph)) {
         unmap_object(x, y);
         newsym(x, y);
         return TRUE;
@@ -415,8 +415,8 @@ unmap_object(coordxy x, coordxy y)
 
     if ((trap = t_at(x, y)) != 0 && trap->tseen && !covers_traps(x, y)) {
         map_trap(trap, 0);
-    } else if (levl[x][y].seenv) {
-        struct rm *lev = &levl[x][y];
+    } else if (loc(x, y)->seenv) {
+        struct rm *lev = loc(x, y);
 
         if (spot_shows_engravings(x, y)
                && (ep = engr_at(x, y)) != 0 && !covers_traps(x, y))
@@ -429,7 +429,7 @@ unmap_object(coordxy x, coordxy y)
             && lev->typ == ROOM)
             lev->glyph = cmap_to_glyph(S_stone);
     } else {
-        levl[x][y].glyph = cmap_to_glyph(S_stone); /* default val */
+        loc(x, y)->glyph = cmap_to_glyph(S_stone); /* default val */
     }
 }
 
@@ -476,7 +476,7 @@ show_mon_or_warn(coordxy x, coordxy y, int monglyph)
     /* "remembered, unseen monster" is tracked by object layer so if we're
        putting something on monster layer at same spot, stop remembering
        that; if an object is in view there, start remembering it instead */
-    if (glyph_is_invisible(levl[x][y].glyph)) {
+    if (glyph_is_invisible(loc(x, y)->glyph)) {
         unmap_object(x, y);
         if (cansee(x, y) && (o = vobj_at(x, y)) != 0)
             map_object(o, FALSE);
@@ -541,7 +541,7 @@ display_monster(
              */
             int sym = mon->mappearance, glyph = cmap_to_glyph(sym);
 
-            levl[x][y].glyph = glyph;
+            loc(x, y)->glyph = glyph;
             if (!sensed) {
                 show_glyph(x, y, glyph);
                 /* override real topology with mimic's fake one */
@@ -723,7 +723,7 @@ feel_location(coordxy x, coordxy y)
 
     if (!isok(x, y))
         return;
-    lev = &(levl[x][y]);
+    lev = loc(x, y);
     /* If hero's memory of an invisible monster is accurate, we want to keep
      * him from detecting the same monster over and over again on each turn.
      * We must return (so we don't erase the monster).  (We must also, in the
@@ -884,7 +884,7 @@ newsym(coordxy x, coordxy y)
     struct monst *mon;
     int see_it;
     boolean worm_tail;
-    struct rm *lev = &(levl[x][y]);
+    struct rm * const lev = loc(x, y);
 
     /* don't try to produce map output when level is in a state of flux */
     if (suppress_map_output())
@@ -1255,7 +1255,7 @@ flash_glyph_at(coordxy x, coordxy y, int tg, int rpt)
 
     rpt *= 2; /* two loop iterations per 'count' */
     glyph[0] = tg;
-    glyph[1] = (gl.level.flags.hero_memory) ? levl[x][y].glyph
+    glyph[1] = (gl.level.flags.hero_memory) ? loc(x, y)->glyph
                                          : back_to_glyph(x, y);
     /* even iteration count (guaranteed) ends with glyph[1] showing;
        caller might want to override that, but no newsym() calls here
@@ -1543,7 +1543,7 @@ see_nearby_objects(void)
 
             obj->dknown = 1; /* near enough to see it */
             /* operate on remembered glyph rather than current one */
-            glyph = levl[ix][iy].glyph;
+            glyph = loc(ix, iy)->glyph;
             if (glyph_is_generic_object(glyph))
                 newsym_force(ix, iy);
         }
@@ -1686,7 +1686,7 @@ docrt_flags(int refresh_flags)
 
     /* display memory */
     for (x = 1; x < COLNO; x++) {
-        lev = &levl[x][0];
+        lev = loc(x, 0);
         for (y = 0; y < ROWNO; y++, lev++)
             show_glyph(x, y, lev->glyph);
     }
@@ -1736,7 +1736,7 @@ redraw_map(boolean cursor_on_u)
      */
     for (y = 0; y < ROWNO; ++y)
         for (x = 1; x < COLNO; ++x) {
-            glyph = _glyph_at(x, y); /* not levl[x][y].glyph */
+            glyph = _glyph_at(x, y); /* not loc(x, y)->glyph */
             get_bkglyph_and_framecolor(x, y, &bkglyphinfo.glyph,
                                        &bkglyphinfo.framecolor);
             print_glyph(WIN_MAP, x, y,
@@ -1758,7 +1758,7 @@ reglyph_darkroom(void)
 
     for (x = 1; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++) {
-            struct rm *lev = &levl[x][y];
+            struct rm *lev = loc(x, y);
 
             if (!flags.dark_room) {
                 if (lev->glyph == cmap_to_glyph(S_corr)
@@ -2168,7 +2168,7 @@ int
 back_to_glyph(coordxy x, coordxy y)
 {
     int idx, bypass_glyph = NO_GLYPH;
-    struct rm *ptr = &(levl[x][y]);
+    struct rm *ptr = loc(x, y);
     struct stairway *sway;
 
     switch (ptr->typ) {
@@ -2385,7 +2385,7 @@ get_bkglyph_and_framecolor(
     uint32 *framecolor)
 {
     int idx, tmp_bkglyph = GLYPH_UNEXPLORED;
-    struct rm *lev = &levl[x][y];
+    struct rm *lev = loc(x, y);
 
     if (iflags.use_background_glyph && lev->seenv != 0
         && (gg.gbuf[y][x].glyphinfo.glyph != GLYPH_UNEXPLORED)) {
@@ -2995,9 +2995,9 @@ static void
 error4(coordxy x, coordxy y, int a, int b, int c, int dd)
 {
     pline("set_wall_state: %s @ (%d,%d) %s%s%s%s",
-          type_to_name(levl[x][y].typ), x, y,
+          type_to_name(loc(x, y)->typ), x, y,
           a ? "1" : "", b ? "2" : "", c ? "3" : "", dd ? "4" : "");
-    bad_count[levl[x][y].typ]++;
+    bad_count[loc(x, y)->typ]++;
 }
 #endif /* WA_VERBOSE */
 
@@ -3014,7 +3014,7 @@ check_pos(coordxy x, coordxy y, int which)
 
     if (!isok(x, y))
         return which;
-    type = levl[x][y].typ;
+    type = loc(x, y)->typ;
     if (IS_ROCK(type) || type == CORR || type == SCORR)
         return which;
     return 0;
@@ -3150,7 +3150,7 @@ void
 xy_set_wall_state(coordxy x, coordxy y)
 {
     coordxy wmode;
-    struct rm *lev = &levl[x][y];
+    struct rm *lev = loc(x, y);
 
     switch (lev->typ) {
     case SDOOR:
@@ -3256,7 +3256,7 @@ set_seenv(
    turning spot <x0,y0> back into stone; <x1,y1> is an adjacent spot. */
 void
 unset_seenv(
-    struct rm *lev,         /* &levl[x1][y1] */
+    struct rm *lev,         /* loc(x1, y1) */
     coordxy x0, coordxy y0, /* from */
     coordxy x1, coordxy y1) /*  to; abs(x1-x0)==1 && abs(y0-y1)==1 */
 

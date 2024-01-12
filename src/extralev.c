@@ -60,10 +60,10 @@ roguecorr(coordxy x, coordxy y, int dir)
             fromy = gr.r[x][y].rly + gr.r[x][y].dy;
             fromx += 1 + 26 * x;
             fromy += 7 * y;
-            if (!IS_WALL(levl[fromx][fromy].typ))
+            if (!IS_WALL(loc(fromx, fromy)->typ))
                 impossible("down: no wall at %d,%d?", fromx, fromy);
             dodoor(fromx, fromy, &gr.rooms[gr.r[x][y].nroom]);
-            levl[fromx][fromy].doormask = D_NODOOR;
+            loc(fromx, fromy)->doormask = D_NODOOR;
             fromy++;
         }
         if (y >= 2) {
@@ -82,10 +82,10 @@ roguecorr(coordxy x, coordxy y, int dir)
             toy = gr.r[x][y].rly - 1;
             tox += 1 + 26 * x;
             toy += 7 * y;
-            if (!IS_WALL(levl[tox][toy].typ))
+            if (!IS_WALL(loc(tox, toy)->typ))
                 impossible("up: no wall at %d,%d?", tox, toy);
             dodoor(tox, toy, &gr.rooms[gr.r[x][y].nroom]);
-            levl[tox][toy].doormask = D_NODOOR;
+            loc(tox, toy)->doormask = D_NODOOR;
             toy--;
         }
         roguejoin(fromx, fromy, tox, toy, FALSE);
@@ -102,10 +102,10 @@ roguecorr(coordxy x, coordxy y, int dir)
             fromy = gr.r[x][y].rly + rn2(gr.r[x][y].dy);
             fromx += 1 + 26 * x;
             fromy += 7 * y;
-            if (!IS_WALL(levl[fromx][fromy].typ))
+            if (!IS_WALL(loc(fromx, fromy)->typ))
                 impossible("down: no wall at %d,%d?", fromx, fromy);
             dodoor(fromx, fromy, &gr.rooms[gr.r[x][y].nroom]);
-            levl[fromx][fromy].doormask = D_NODOOR;
+            loc(fromx, fromy)->doormask = D_NODOOR;
             fromx++;
         }
         if (x >= 2) {
@@ -124,10 +124,10 @@ roguecorr(coordxy x, coordxy y, int dir)
             toy = gr.r[x][y].rly + rn2(gr.r[x][y].dy);
             tox += 1 + 26 * x;
             toy += 7 * y;
-            if (!IS_WALL(levl[tox][toy].typ))
+            if (!IS_WALL(loc(tox, toy)->typ))
                 impossible("left: no wall at %d,%d?", tox, toy);
             dodoor(tox, toy, &gr.rooms[gr.r[x][y].nroom]);
-            levl[tox][toy].doormask = D_NODOOR;
+            loc(tox, toy)->doormask = D_NODOOR;
             tox--;
         }
         roguejoin(fromx, fromy, tox, toy, TRUE);
@@ -281,9 +281,9 @@ void
 corr(coordxy x, coordxy y)
 {
     if (rn2(50)) {
-        levl[x][y].typ = CORR;
+        loc(x, y)->typ = CORR;
     } else {
-        levl[x][y].typ = SCORR;
+        loc(x, y)->typ = SCORR;
     }
 }
 

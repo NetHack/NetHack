@@ -316,7 +316,7 @@ fixuporacle(struct monst *oracle)
         return FALSE;
 
     oracle->mpeaceful = 1; /* for behavior toward next character */
-    o_ridx = levl[oracle->mx][oracle->my].roomno - ROOMOFFSET;
+    o_ridx = loc(oracle->mx, oracle->my)->roomno - ROOMOFFSET;
     if (o_ridx >= 0 && gr.rooms[o_ridx].rtype == DELPHI)
         return TRUE; /* no fixup needed */
 
@@ -338,7 +338,7 @@ fixuporacle(struct monst *oracle)
         cc.y = (gr.rooms[ridx].ly + gr.rooms[ridx].hy) / 2;
         if (enexto(&cc, cc.x, cc.y, oracle->data)) {
             rloc_to(oracle, cc.x, cc.y);
-            o_ridx = levl[oracle->mx][oracle->my].roomno - ROOMOFFSET;
+            o_ridx = loc(oracle->mx, oracle->my)->roomno - ROOMOFFSET;
         }
         /* [if her room is already full, she might end up outside;
            that's ok, next hero just won't get any welcome message,
@@ -531,9 +531,9 @@ savebones(int how, time_t when, struct obj *corpse)
     /* Clear all memory from the level. */
     for (x = 1; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++) {
-            levl[x][y].seenv = 0;
-            levl[x][y].waslit = 0;
-            levl[x][y].glyph = GLYPH_UNEXPLORED;
+            loc(x, y)->seenv = 0;
+            loc(x, y)->waslit = 0;
+            loc(x, y)->glyph = GLYPH_UNEXPLORED;
             gl.lastseentyp[x][y] = 0;
         }
 

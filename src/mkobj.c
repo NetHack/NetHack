@@ -2768,8 +2768,8 @@ hornoplenty(
                                         ? "Oops!  %s out of your reach!"
                                         : (Is_airlevel(&u.uz)
                                            || Is_waterlevel(&u.uz)
-                                           || levl[u.ux][u.uy].typ < IRONBARS
-                                           || levl[u.ux][u.uy].typ >= ICE)
+                                           || loc(u.ux, u.uy)->typ < IRONBARS
+                                           || loc(u.ux, u.uy)->typ >= ICE)
                                           ? "Oops!  %s away from you!"
                                           : "Oops!  %s to the floor!",
                                       The(aobjnam(obj, "slip")), (char *) 0);
@@ -2789,7 +2789,7 @@ hornoplenty(
             if (!can_reach_floor(TRUE)) {
                 hitfloor(obj, TRUE); /* does altar check, message, drop */
             } else {
-                if (IS_ALTAR(levl[u.ux][u.uy].typ))
+                if (IS_ALTAR(loc(u.ux, u.uy)->typ))
                     doaltarobj(obj); /* does its own drop message */
                 else
                     pline("%s %s to the %s.", Doname2(obj),

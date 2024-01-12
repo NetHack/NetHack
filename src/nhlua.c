@@ -527,63 +527,63 @@ nhl_getmap(lua_State *L)
         lua_newtable(L);
 
         /* FIXME: some should be boolean values */
-        nhl_add_table_entry_int(L, "glyph", levl[x][y].glyph);
-        nhl_add_table_entry_int(L, "typ", levl[x][y].typ);
+        nhl_add_table_entry_int(L, "glyph", loc(x, y)->glyph);
+        nhl_add_table_entry_int(L, "typ", loc(x, y)->typ);
         nhl_add_table_entry_str(L, "typ_name",
-                                levltyp_to_name(levl[x][y].typ));
-        Sprintf(buf, "%c", splev_typ2chr(levl[x][y].typ));
+                                levltyp_to_name(loc(x, y)->typ));
+        Sprintf(buf, "%c", splev_typ2chr(loc(x, y)->typ));
         nhl_add_table_entry_str(L, "mapchr", buf);
-        nhl_add_table_entry_int(L, "seenv", levl[x][y].seenv);
-        nhl_add_table_entry_bool(L, "horizontal", levl[x][y].horizontal);
-        nhl_add_table_entry_bool(L, "lit", levl[x][y].lit);
-        nhl_add_table_entry_bool(L, "waslit", levl[x][y].waslit);
-        nhl_add_table_entry_int(L, "roomno", levl[x][y].roomno);
-        nhl_add_table_entry_bool(L, "edge", levl[x][y].edge);
-        nhl_add_table_entry_bool(L, "candig", levl[x][y].candig);
+        nhl_add_table_entry_int(L, "seenv", loc(x, y)->seenv);
+        nhl_add_table_entry_bool(L, "horizontal", loc(x, y)->horizontal);
+        nhl_add_table_entry_bool(L, "lit", loc(x, y)->lit);
+        nhl_add_table_entry_bool(L, "waslit", loc(x, y)->waslit);
+        nhl_add_table_entry_int(L, "roomno", loc(x, y)->roomno);
+        nhl_add_table_entry_bool(L, "edge", loc(x, y)->edge);
+        nhl_add_table_entry_bool(L, "candig", loc(x, y)->candig);
 
         nhl_add_table_entry_bool(L, "has_trap", t_at(x, y) ? 1 : 0);
 
-        /* TODO: FIXME: levl[x][y].flags */
+        /* TODO: FIXME: loc(x, y)->flags */
 
         lua_pushliteral(L, "flags");
         lua_newtable(L);
 
-        if (IS_DOOR(levl[x][y].typ)) {
+        if (IS_DOOR(loc(x, y)->typ)) {
             nhl_add_table_entry_bool(L, "nodoor",
-                                     (levl[x][y].flags == D_NODOOR));
+                                     (loc(x, y)->flags == D_NODOOR));
             nhl_add_table_entry_bool(L, "broken",
-                                     (levl[x][y].flags & D_BROKEN));
+                                     (loc(x, y)->flags & D_BROKEN));
             nhl_add_table_entry_bool(L, "isopen",
-                                     (levl[x][y].flags & D_ISOPEN));
+                                     (loc(x, y)->flags & D_ISOPEN));
             nhl_add_table_entry_bool(L, "closed",
-                                     (levl[x][y].flags & D_CLOSED));
+                                     (loc(x, y)->flags & D_CLOSED));
             nhl_add_table_entry_bool(L, "locked",
-                                     (levl[x][y].flags & D_LOCKED));
+                                     (loc(x, y)->flags & D_LOCKED));
             nhl_add_table_entry_bool(L, "trapped",
-                                     (levl[x][y].flags & D_TRAPPED));
-        } else if (IS_ALTAR(levl[x][y].typ)) {
+                                     (loc(x, y)->flags & D_TRAPPED));
+        } else if (IS_ALTAR(loc(x, y)->typ)) {
             /* TODO: bits 0, 1, 2 */
             nhl_add_table_entry_bool(L, "shrine",
-                                     (levl[x][y].flags & AM_SHRINE));
-        } else if (IS_THRONE(levl[x][y].typ)) {
+                                     (loc(x, y)->flags & AM_SHRINE));
+        } else if (IS_THRONE(loc(x, y)->typ)) {
             nhl_add_table_entry_bool(L, "looted",
-                                     (levl[x][y].flags & T_LOOTED));
-        } else if (levl[x][y].typ == TREE) {
+                                     (loc(x, y)->flags & T_LOOTED));
+        } else if (loc(x, y)->typ == TREE) {
             nhl_add_table_entry_bool(L, "looted",
-                                     (levl[x][y].flags & TREE_LOOTED));
+                                     (loc(x, y)->flags & TREE_LOOTED));
             nhl_add_table_entry_bool(L, "swarm",
-                                     (levl[x][y].flags & TREE_SWARM));
-        } else if (IS_FOUNTAIN(levl[x][y].typ)) {
+                                     (loc(x, y)->flags & TREE_SWARM));
+        } else if (IS_FOUNTAIN(loc(x, y)->typ)) {
             nhl_add_table_entry_bool(L, "looted",
-                                     (levl[x][y].flags & F_LOOTED));
+                                     (loc(x, y)->flags & F_LOOTED));
             nhl_add_table_entry_bool(L, "warned",
-                                     (levl[x][y].flags & F_WARNED));
-        } else if (IS_SINK(levl[x][y].typ)) {
+                                     (loc(x, y)->flags & F_WARNED));
+        } else if (IS_SINK(loc(x, y)->typ)) {
             nhl_add_table_entry_bool(L, "pudding",
-                                     (levl[x][y].flags & S_LPUDDING));
+                                     (loc(x, y)->flags & S_LPUDDING));
             nhl_add_table_entry_bool(L, "dishwasher",
-                                     (levl[x][y].flags & S_LDWASHER));
-            nhl_add_table_entry_bool(L, "ring", (levl[x][y].flags & S_LRING));
+                                     (loc(x, y)->flags & S_LDWASHER));
+            nhl_add_table_entry_bool(L, "ring", (loc(x, y)->flags & S_LRING));
         }
         /* TODO: drawbridges, walls, ladders, room=>ICED_xxx */
 

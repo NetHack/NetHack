@@ -851,7 +851,7 @@ do_positionbar(void)
     for (stway = gs.stairs; stway; stway = stway->next) {
         x = stway->sx;
         y = stway->sy;
-        glyph = levl[x][y].glyph;
+        glyph = loc(x, y)->glyph;
         symbol = glyph_to_cmap(glyph);
 
         if (is_cmap_stairs(symbol)) {

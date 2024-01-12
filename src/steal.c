@@ -841,7 +841,7 @@ mdrop_obj(
     if (unwornmask && mon->mtame && (unwornmask & W_SADDLE) != 0L
         && !obj->unpaid && costly_spot(omx, omy)
         /* being at costly_spot guarantees lev->roomno is not 0 */
-        && strchr(in_rooms(u.ux, u.uy, SHOPBASE), levl[omx][omy].roomno)) {
+        && strchr(in_rooms(u.ux, u.uy, SHOPBASE), loc(omx, omy)->roomno)) {
         obj->no_charge = 1;
     }
     /* obj_no_longer_held(obj); -- done by place_object */

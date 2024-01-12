@@ -164,15 +164,15 @@ watch_on_duty(struct monst *mtmp)
 
     if (mtmp->mpeaceful && in_town(u.ux + u.dx, u.uy + u.dy)
         && mtmp->mcansee && m_canseeu(mtmp) && !rn2(3)) {
-        if (picking_lock(&x, &y) && IS_DOOR(levl[x][y].typ)
-            && (levl[x][y].doormask & D_LOCKED)) {
+        if (picking_lock(&x, &y) && IS_DOOR(loc(x, y)->typ)
+            && (loc(x, y)->doormask & D_LOCKED)) {
             if (couldsee(mtmp->mx, mtmp->my)) {
-                if (levl[x][y].looted & D_WARNED) {
+                if (loc(x, y)->looted & D_WARNED) {
                     mon_yells(mtmp, "Halt, thief!  You're under arrest!");
                     (void) angry_guards(!!Deaf);
                 } else {
                     mon_yells(mtmp, "Hey, stop picking that lock!");
-                    levl[x][y].looted |= D_WARNED;
+                    loc(x, y)->looted |= D_WARNED;
                 }
                 stop_occupation();
             }
@@ -245,7 +245,7 @@ onscary(coordxy x, coordxy y, struct monst *mtmp)
         return TRUE;
 
     /* should this still be true for defiled/molochian altars? */
-    if (IS_ALTAR(levl[x][y].typ)
+    if (IS_ALTAR(loc(x, y)->typ)
         && (mtmp->data->mlet == S_VAMPIRE || is_vampshifter(mtmp)))
         return TRUE;
 
@@ -1037,10 +1037,10 @@ m_digweapon_check(
         if (closed_door(nix, niy)) {
             if (!mw_tmp || !is_pick(mw_tmp) || !is_axe(mw_tmp))
                 mtmp->weapon_check = NEED_PICK_OR_AXE;
-        } else if (IS_TREE(levl[nix][niy].typ)) {
+        } else if (IS_TREE(loc(nix, niy)->typ)) {
             if (!mw_tmp || !is_axe(mw_tmp))
                 mtmp->weapon_check = NEED_AXE;
-        } else if (IS_STWALL(levl[nix][niy].typ)) {
+        } else if (IS_STWALL(loc(nix, niy)->typ)) {
             if (!mw_tmp || !is_pick(mw_tmp))
                 mtmp->weapon_check = NEED_PICK_AXE;
         }
@@ -1075,7 +1075,7 @@ leppie_stash(struct monst *mtmp)
         && !DEADMONSTER(mtmp)
         && !m_canseeu(mtmp)
         && !*in_rooms(mtmp->mx, mtmp->my, SHOPBASE)
-        && levl[mtmp->mx][mtmp->my].typ == ROOM
+        && loc(mtmp->mx, mtmp->my)->typ == ROOM
         && !t_at(mtmp->mx, mtmp->my)
         && rn2(4)
         && (gold = findgold(mtmp->minvent)) != 0) {
@@ -1120,10 +1120,10 @@ holds_up_web(coordxy x, coordxy y)
     stairway *sway;
 
     if (!isok(x, y)
-        || IS_ROCK(levl[x][y].typ)
-        || ((levl[x][y].typ == STAIRS || levl[x][y].typ == LADDER)
+        || IS_ROCK(loc(x, y)->typ)
+        || ((loc(x, y)->typ == STAIRS || loc(x, y)->typ == LADDER)
             && (sway = stairway_at(x, y)) != 0 && sway->up)
-        || levl[x][y].typ == IRONBARS)
+        || loc(x, y)->typ == IRONBARS)
         return TRUE;
 
     return FALSE;
@@ -1344,8 +1344,8 @@ postmov(
            [if we did the shift sooner, before moving the monster,
            we would need to duplicate it in dog_move()...] */
         if (is_vampshifter(mtmp) && !amorphous(mtmp->data)
-            && IS_DOOR(levl[nix][niy].typ)
-            && ((levl[nix][niy].doormask & (D_LOCKED | D_CLOSED)) != 0)
+            && IS_DOOR(loc(nix, niy)->typ)
+            && ((loc(nix, niy)->doormask & (D_LOCKED | D_CLOSED)) != 0)
             && can_fog(mtmp)) {
             if (sawmon) {
                 remove_monster(nix, niy);
@@ -1372,10 +1372,10 @@ postmov(
         ptr = mtmp->data; /* in case mintrap() caused polymorph */
 
         /* open a door, or crash through it, if 'mtmp' can */
-        if (IS_DOOR(levl[mtmp->mx][mtmp->my].typ)
+        if (IS_DOOR(loc(mtmp->mx, mtmp->my)->typ)
             && !passes_walls(ptr) /* doesn't need to open doors */
             && !can_tunnel) {     /* taken care of below */
-            struct rm *here = &levl[mtmp->mx][mtmp->my];
+            struct rm *here = loc(mtmp->mx, mtmp->my);
             boolean btrapped = (here->doormask & D_TRAPPED) != 0;
 
     /* used after monster 'who' has been moved to closed door spot 'where'
@@ -1475,11 +1475,11 @@ postmov(
             }
 #undef UnblockDoor
 
-        } else if (levl[mtmp->mx][mtmp->my].typ == IRONBARS) {
+        } else if (loc(mtmp->mx, mtmp->my)->typ == IRONBARS) {
             /* 3.6.2: was using may_dig() but that doesn't handle bars;
                AD_RUST catches rust monsters but metallivorous() is
                    needed for xorns and rock moles */
-            if (!(levl[mtmp->mx][mtmp->my].wall_info & W_NONDIGGABLE)
+            if (!(loc(mtmp->mx, mtmp->my)->wall_info & W_NONDIGGABLE)
                 && (dmgtype(ptr, AD_RUST) || dmgtype(ptr, AD_CORR)
                     || metallivorous(ptr))) {
                 if (canseemon(mtmp))
@@ -1707,7 +1707,7 @@ m_move(struct monst *mtmp, int after)
         appr = 0;
     } else {
         boolean should_see = (couldsee(omx, omy)
-                              && (levl[ggx][ggy].lit || !levl[omx][omy].lit)
+                              && (loc(ggx, ggy)->lit || !loc(omx, omy)->lit)
                               && (dist2(omx, omy, ggx, ggy) <= 36));
 
         if (!mtmp->mcansee
@@ -2009,9 +2009,9 @@ can_hide_under_obj(struct obj *obj)
 void
 dissolve_bars(coordxy x, coordxy y)
 {
-    levl[x][y].typ = (levl[x][y].edge == 1) ? DOOR
+    loc(x, y)->typ = (loc(x, y)->edge == 1) ? DOOR
         : (Is_special(&u.uz) || *in_rooms(x, y, 0)) ? ROOM : CORR;
-    levl[x][y].flags = 0; /* doormask = D_NODOOR */
+    loc(x, y)->flags = 0; /* doormask = D_NODOOR */
     newsym(x, y);
     if (u_at(x, y))
         switch_terrain();
@@ -2020,8 +2020,8 @@ dissolve_bars(coordxy x, coordxy y)
 boolean
 closed_door(coordxy x, coordxy y)
 {
-    return (boolean) (IS_DOOR(levl[x][y].typ)
-                      && (levl[x][y].doormask & (D_LOCKED | D_CLOSED)));
+    return (boolean) (IS_DOOR(loc(x, y)->typ)
+                      && (loc(x, y)->doormask & (D_LOCKED | D_CLOSED)));
 }
 
 boolean

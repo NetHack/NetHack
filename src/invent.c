@@ -3242,7 +3242,7 @@ itemactions(struct obj *otmp)
                    "Adjust inventory by splitting this stack");
 
     /* O: offer sacrifice */
-    if (IS_ALTAR(levl[u.ux][u.uy].typ) && !u.uswallow) {
+    if (IS_ALTAR(loc(u.ux, u.uy)->typ) && !u.uswallow) {
         /* FIXME: this doesn't match #offer's likely candidates, which don't
            include corpses on Astral and don't include amulets off Astral */
         if (otmp->otyp == CORPSE)
@@ -4478,7 +4478,7 @@ dotypeinv(void)
 const char *
 dfeature_at(coordxy x, coordxy y, char *buf)
 {
-    struct rm *lev = &levl[x][y];
+    struct rm *lev = loc(x, y);
     int ltyp = lev->typ, cmap = -1;
     const char *dfeature = 0;
     static char altbuf[BUFSZ];

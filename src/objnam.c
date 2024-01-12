@@ -3458,7 +3458,7 @@ wizterrainwish(struct _readobjnam_data *d)
 
     /* furniture and terrain (use at your own risk; can clobber stairs
        or place furniture on existing traps which shouldn't be allowed) */
-    lev = &levl[x][y];
+    lev = loc(x, y);
     oldtyp = lev->typ;
     is_dbridge = (oldtyp == DRAWBRIDGE_DOWN || oldtyp == DRAWBRIDGE_UP);
     didblock = does_block(x, y, lev);
@@ -3698,8 +3698,8 @@ wizterrainwish(struct _readobjnam_data *d)
                          && (bp == p - 4 || p[-4] == ' ')) {
         schar wall = HWALL;
 
-        if ((isok(u.ux, u.uy-1) && IS_WALL(levl[u.ux][u.uy-1].typ))
-            || (isok(u.ux, u.uy+1) && IS_WALL(levl[u.ux][u.uy+1].typ)))
+        if ((isok(u.ux, u.uy-1) && IS_WALL(loc(u.ux, u.uy-1)->typ))
+            || (isok(u.ux, u.uy+1) && IS_WALL(loc(u.ux, u.uy+1)->typ)))
             wall = VWALL;
         madeterrain = TRUE;
         lev->typ = wall;
@@ -3802,7 +3802,7 @@ dbterrainmesg(
     coordxy x, coordxy y)
 {
     pline("%s %s the drawbridge.", newtype,
-          (levl[x][y].typ == DRAWBRIDGE_UP) ? "in front of" : "under");
+          (loc(x, y)->typ == DRAWBRIDGE_UP) ? "in front of" : "under");
 }
 
 #define TIN_UNDEFINED 0

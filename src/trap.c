@@ -455,7 +455,7 @@ maketrap(coordxy x, coordxy y, int typ)
     static union vlaunchinfo zero_vl;
     boolean oldplace;
     struct trap *ttmp;
-    struct rm *lev = &levl[x][y];
+    struct rm *lev = loc(x, y);
 
     if (typ == TRAPPED_DOOR || typ == TRAPPED_CHEST)
         return (struct trap *) 0;
@@ -599,7 +599,7 @@ fall_through(
     if (Sokoban && Can_fall_thru(&u.uz)) {
         ; /* KMH -- You can't escape the Sokoban level traps */
     } else if (Levitation || u.ustuck
-             || (!Can_fall_thru(&u.uz) && !levl[u.ux][u.uy].candig)
+             || (!Can_fall_thru(&u.uz) && !loc(u.ux, u.uy)->candig)
              || ((Flying || is_clinger(gy.youmonst.data)
                   || (ceiling_hider(gy.youmonst.data) && u.uundetected))
                  && !(ftflags & TOOKPLUNGE))) {
@@ -3028,7 +3028,7 @@ void
 blow_up_landmine(struct trap *trap)
 {
     coordxy x = trap->tx, y = trap->ty, dbx, dby;
-    struct rm *lev = &levl[x][y];
+    struct rm *lev = loc(x, y);
     schar old_typ, typ;
 
     old_typ = lev->typ;
@@ -3340,7 +3340,8 @@ launch_obj(
                 const char *bmsg = " as one boulder sets another in motion";
                 coordxy fx = x + dx, fy = y + dy;
 
-                if (!isok(fx, fy) || !dist || IS_ROCK(levl[fx][fy].typ))
+
+                if (!isok(fx, fy) || !dist || IS_ROCK(loc(fx, fy)->typ))
                     bmsg = " as one boulder hits another";
 
                 Soundeffect(se_loud_crash, 80);
@@ -3358,20 +3359,22 @@ launch_obj(
         if (otyp == BOULDER && closed_door(x, y)) {
             if (cansee(x, y))
                 pline_The("boulder crashes through a door.");
-            levl[x][y].doormask = D_BROKEN;
+            
+            loc(x, y)->doormask = D_BROKEN;
+
             if (dist)
                 unblock_point(x, y);
         }
 
         /* if about to hit something, do so now */
+
         if (dist > 0 && isok(x + dx, y + dy)) {
             coordxy fx = x + dx, fy = y + dy;
-            uchar typ = levl[fx][fy].typ;
+            uchar typ = loc(fx, fy)->typ;
 
             if (typ == IRONBARS) {
                 x2 = x, y2 = y; /* object stops here */
-                if (hits_bars(&singleobj, x2, y2, fx, fy, !rn2(20), 0)) {
-                    if (!singleobj) {
+                if (hits_bars(&singleobj, x2, y2, fx, fy, !rn2(20), 0)) {                    if (!singleobj) {
                         used_up = TRUE;
                         launch_drop_spot((struct obj *) 0, 0, 0);
                     }
@@ -3531,7 +3534,7 @@ isclearpath(
         y += dy;
         if (!isok(x, y))
             return FALSE;
-        typ = levl[x][y].typ;
+        typ = loc(x, y)->typ;
         if (!ZAP_POS(typ) || closed_door(x, y))
             return FALSE;
         if ((t = t_at(x, y)) != 0
@@ -3763,7 +3766,7 @@ float_up(void)
                above that floor but not from enhancing carrying capacity */
             You("feel lighter, but your %s is still chained to the %s.",
                 body_part(LEG),
-                IS_ROOM(levl[cc.x][cc.y].typ) ? "floor" : "ground");
+                IS_ROOM(loc(cc.x, cc.y)->typ) ? "floor" : "ground");
         } else if (u.utraptype == WEB) {
             You("float up slightly, but you are still stuck in the %s.",
                 trapname(WEB, FALSE));
@@ -4805,7 +4808,7 @@ void
 rescued_from_terrain(int how)
 {
     static const char find_yourself[] = "find yourself";
-    struct rm *lev = &levl[u.ux][u.uy];
+    struct rm *lev = loc(u.ux, u.uy);
     boolean mesggiven = FALSE;
 
     switch (how) {
@@ -5625,7 +5628,7 @@ untrap(
             untrap_box(container, force, confused);
             return 1;
         }
-        /* levl[rx][ry] is a locked or trapped door */
+        /* loc(rx, ry)->is a locked or trapped door */
         x = rx, y = ry;
         autounlock_door = TRUE;
     }
@@ -5780,13 +5783,13 @@ untrap(
      * No floor trap would be present and any containers would be
      * ignored because they're only checked when direction is '.'/'>'.
      */
-    if (!IS_DOOR(levl[x][y].typ)) {
+    if (!IS_DOOR(loc(x, y)->typ)) {
         if (!trap_skipped)
             You("know of no traps there.");
         return 0;
     }
 
-    switch (levl[x][y].doormask) {
+    switch (loc(x, y)->doormask) {
     case D_NODOOR:
         You("%s no door there.", Blind ? "feel" : "see");
         return 0;
@@ -5798,21 +5801,21 @@ untrap(
         return 0;
     }
 
-    if (((levl[x][y].doormask & D_TRAPPED) != 0
+    if (((loc(x, y)->doormask & D_TRAPPED) != 0
          && (force || (!confused && rn2(MAXULEV - u.ulevel + 11) < 10)))
         || (!force && confused && !rn2(3))) {
         You("find a trap on the door!");
         exercise(A_WIS, TRUE);
         if (ynq("Disarm it?") != 'y')
             return 1;
-        if (levl[x][y].doormask & D_TRAPPED) {
+        if (loc(x, y)->doormask & D_TRAPPED) {
             ch = 15 + (Role_if(PM_ROGUE) ? u.ulevel * 3 : u.ulevel);
             exercise(A_DEX, TRUE);
             if (!force && (confused || Fumbling
                            || rnd(75 + level_difficulty() / 2) > ch)) {
                 You("set it off!");
                 b_trapped("door", FINGER);
-                levl[x][y].doormask = D_NODOOR;
+                loc(x, y)->doormask = D_NODOOR;
                 unblock_point(x, y);
                 newsym(x, y);
                 /* (probably ought to charge for this damage...) */
@@ -5820,7 +5823,7 @@ untrap(
                     add_damage(x, y, 0L);
             } else {
                 You("disarm it!");
-                levl[x][y].doormask &= ~D_TRAPPED;
+                loc(x, y)->doormask &= ~D_TRAPPED;
             }
         } else
             pline("This door was not trapped.");

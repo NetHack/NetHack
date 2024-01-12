@@ -1051,7 +1051,7 @@ valid_cloud_pos(coordxy x, coordxy y)
 {
     if (!isok(x,y))
         return FALSE;
-    return ACCESSIBLE(levl[x][y].typ) || is_pool(x, y) || is_lava(x, y);
+    return ACCESSIBLE(loc(x, y)->typ) || is_pool(x, y) || is_lava(x, y);
 }
 
 /* Callback for getpos_sethilite, also used in determining whether a scroll
@@ -1847,8 +1847,8 @@ seffect_earth(struct obj **sobjp)
                 for (y = u.uy - 1; y <= u.uy + 1; y++) {
                     /* Is this a suitable spot? */
                     if (isok(x, y) && !closed_door(x, y)
-                        && !IS_ROCK(levl[x][y].typ)
-                        && !IS_AIR(levl[x][y].typ)
+                        && !IS_ROCK(loc(x, y)->typ)
+                        && !IS_AIR(loc(x, y)->typ)
                         && (x != u.ux || y != u.uy)) {
                         nboulders +=
                             drop_boulder_on_monster(x, y, confused, TRUE);
@@ -2014,8 +2014,8 @@ seffect_magic_mapping(struct obj **sobjp)
 
             for (x = 1; x < COLNO; x++)
                 for (y = 0; y < ROWNO; y++)
-                    if (levl[x][y].typ == SDOOR)
-                        cvt_sdoor_to_door(&levl[x][y]);
+                    if (loc(x, y)->typ == SDOOR)
+                        cvt_sdoor_to_door(loc(x, y));
             /* do_mapping() already reveals secret passages */
         }
         gk.known = TRUE;
@@ -2359,7 +2359,7 @@ set_lit(coordxy x, coordxy y, genericptr_t val)
     struct litmon *gremlin;
 
     if (val) {
-        levl[x][y].lit = 1;
+        loc(x, y)->lit = 1;
         if ((mtmp = m_at(x, y)) != 0 && mtmp->data == &mons[PM_GREMLIN]) {
             gremlin = (struct litmon *) alloc(sizeof *gremlin);
             gremlin->mon = mtmp;
@@ -2367,7 +2367,7 @@ set_lit(coordxy x, coordxy y, genericptr_t val)
             gremlins = gremlin;
         }
     } else {
-        levl[x][y].lit = 0;
+        loc(x, y)->lit = 0;
         snuff_light_source(x, y);
     }
 }
@@ -2460,7 +2460,7 @@ litroom(
     if (Is_rogue_level(&u.uz)) {
         /* Can't use do_clear_area because MAX_RADIUS is too small */
         /* rogue lighting must light the entire room */
-        int rnum = levl[u.ux][u.uy].roomno - ROOMOFFSET;
+        int rnum = loc(u.ux, u.uy)->roomno - ROOMOFFSET;
         int rx, ry;
 
         if (rnum >= 0) {

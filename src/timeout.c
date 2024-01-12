@@ -353,7 +353,7 @@ levitation_dialogue(void)
     if (ELevitation)
         return;
 
-    if (!ACCESSIBLE(levl[u.ux][u.uy].typ)
+    if (!ACCESSIBLE(loc(u.ux, u.uy)->typ)
         && !is_pool_or_lava(u.ux,u.uy))
         return;
 
@@ -1796,7 +1796,7 @@ do_storms(void)
         do {
             x = rnd(COLNO - 1);
             y = rn2(ROWNO);
-        } while (++count < 100 && levl[x][y].typ != CLOUD);
+        } while (++count < 100 && loc(x, y)->typ != CLOUD);
 
         if (count < 100) {
             dirx = rn2(3) - 1;
@@ -1809,7 +1809,7 @@ do_storms(void)
         }
     }
 
-    if (levl[u.ux][u.uy].typ == CLOUD) {
+    if (loc(u.ux, u.uy)->typ == CLOUD) {
         /* Inside a cloud during a thunder storm is deafening. */
         /* Even if already deaf, we sense the thunder's vibrations. */
         Soundeffect(se_kaboom_boom_boom, 80);
@@ -2103,7 +2103,7 @@ timer_sanity_check(void)
             if (isok(x, y)) {
                 /* replicate isok() in order to convince static analysis
                    that the decoding via '& 0xFFFF' hasn't produced a value
-                   too big for levl[][] and that the cast to a narrower type
+                   too big for loc(, )->and that the cast to a narrower type
                    hasn't intruded on the sign bit to yield a negative value;
                    the analyzer isn't aware that isok() filters such things */
                 assert(x > 0 && x < COLNO && y >= 0 && y < ROWNO);
@@ -2111,7 +2111,7 @@ timer_sanity_check(void)
                 if (curr->func_index == MELT_ICE_AWAY && !is_ice(x, y))
                     impossible(
                          "timer sanity: melt timer %lu on non-ice %d <%d,%d>",
-                               t_id, levl[x][y].typ, x, y);
+                               t_id, loc(x, y)->typ, x, y);
             } else {
                 impossible("timer sanity: spot timer %lu at <%d,%d>",
                            t_id, x, y);

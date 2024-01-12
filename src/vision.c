@@ -194,7 +194,7 @@ does_block(int x, int y, struct rm *lev)
 /*
  * vision_reset()
  *
- * This must be called *after* the levl[][] structure is set with the new
+ * This must be called *after* the loc(, )->structure is set with the new
  * level and the level monsters and objects are in place.
  */
 void
@@ -218,7 +218,7 @@ vision_reset(void)
     for (y = 0; y < ROWNO; y++) {
         dig_left = 0;
         block = TRUE; /* location (0,y) is always stone; it's !isok() */
-        lev = &levl[1][y];
+        lev = loc(1, y);
         for (x = 1; x < COLNO; x++, lev += ROWNO)
             if (block != (IS_ROCK(lev->typ) || does_block(x, y, lev))) {
                 if (block) {
@@ -303,7 +303,7 @@ get_unused_cs(seenV ***rows, coordxy **rmin, coordxy **rmax)
 static void
 rogue_vision(seenV **next, coordxy *rmin, coordxy *rmax)
 {
-    int rnum = levl[u.ux][u.uy].roomno - ROOMOFFSET; /* no SHARED... */
+    int rnum = loc(u.ux, u.uy)->roomno - ROOMOFFSET; /* no SHARED... */
     int start, stop, in_door, xhi, xlo, yhi, ylo;
     int zx, zy;
 
@@ -317,14 +317,14 @@ rogue_vision(seenV **next, coordxy *rmin, coordxy *rmax)
             for (zx = start; zx <= stop; zx++) {
                 if (gr.rooms[rnum].rlit) {
                     next[zy][zx] = COULD_SEE | IN_SIGHT;
-                    levl[zx][zy].seenv = SVALL; /* see the walls */
+                    loc(zx, zy)->seenv = SVALL; /* see the walls */
                 } else
                     next[zy][zx] = COULD_SEE;
             }
         }
     }
 
-    in_door = levl[u.ux][u.uy].typ == DOOR;
+    in_door = loc(u.ux, u.uy)->typ == DOOR;
 
     /* Can always see adjacent. */
     ylo = max(u.uy - 1, 0);
@@ -638,8 +638,8 @@ vision_recalc(int control)
                         char old_row_val = next_row[col];
 
                         next_row[col] |= IN_SIGHT;
-                        oldseenv = levl[col][row].seenv;
-                        levl[col][row].seenv = SVALL; /* see all! */
+                        oldseenv = loc(col, row)->seenv;
+                        loc(col, row)->seenv = SVALL; /* see all! */
                         /* Update if previously not in sight or new angle. */
                         if (!(old_row_val & IN_SIGHT) || oldseenv != SVALL)
                             newsym(col, row);
@@ -651,7 +651,7 @@ vision_recalc(int control)
 
             } else { /* range is 0 */
                 next_array[u.uy][u.ux] |= IN_SIGHT;
-                levl[u.ux][u.uy].seenv = SVALL;
+                loc(u.ux, u.uy)->seenv = SVALL;
                 next_rmin[u.uy] = min(u.ux, next_rmin[u.uy]);
                 next_rmax[u.uy] = max(u.ux, next_rmax[u.uy]);
             }
@@ -660,7 +660,7 @@ vision_recalc(int control)
         if (has_night_vision && u.xray_range < u.nv_range) {
             if (!u.nv_range) { /* range is 0 */
                 next_array[u.uy][u.ux] |= IN_SIGHT;
-                levl[u.ux][u.uy].seenv = SVALL;
+                loc(u.ux, u.uy)->seenv = SVALL;
                 next_rmin[u.uy] = min(u.ux, next_rmin[u.uy]);
                 next_rmax[u.uy] = max(u.ux, next_rmax[u.uy]);
             } else if (u.nv_range > 0) {
@@ -724,7 +724,7 @@ vision_recalc(int control)
         /* Find the min and max positions on the row. */
         start = min(gv.viz_rmin[row], next_rmin[row]);
         stop = max(gv.viz_rmax[row], next_rmax[row]);
-        lev = &levl[start][row];
+        lev = loc(start, row);
 
         sv = &seenv_matrix[dy + 1][start < u.ux ? 0 : (start > u.ux ? 2 : 1)];
 
@@ -758,7 +758,7 @@ vision_recalc(int control)
                      */
                     dx = u.ux - col;
                     dx = sign(dx);
-                    flev = &(levl[col + dx][row + dy]);
+                    flev = loc(col + dx, row + dy);
                     if (flev->lit
                         || next_array[row + dy][col + dx] & TEMP_LIT) {
                         next_row[col] |= IN_SIGHT; /* we see it */
@@ -850,7 +850,7 @@ block_point(int x, int y)
         gs.seethru = (wizard && explicitdebug("seethru")) ? 1 : -1;
     }
     if (gs.seethru == 1) {
-        if (!does_block(x, y, &levl[x][y]))
+        if (!does_block(x, y, loc(x, y)))
             return;
     }
 #endif

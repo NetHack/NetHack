@@ -960,7 +960,7 @@ rest_levl(
         while (i < ROWNO) {
             while (j < COLNO) {
                 if (len > 0) {
-                    levl[j][i] = r;
+                    *loc(j, i) = r;
                     len -= 1;
                     j += 1;
                 } else {
@@ -977,7 +977,7 @@ rest_levl(
     }
 #endif /* RLECOMP */
     if (nhfp->structlevel) {
-        Mread(nhfp->fd, levl, sizeof levl);
+        Mread(nhfp->fd, gl.level.locations, sizeof gl.level.locations);
     }
 }
 
@@ -1181,7 +1181,7 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
 
             mazexy(&cc);
             stairway_add(cc.x, cc.y, FALSE, FALSE, &dest);
-            levl[cc.x][cc.y].typ = STAIRS;
+            loc(cc.x, cc.y)->typ = STAIRS;
         }
 
         br = Is_branchlev(&u.uz);

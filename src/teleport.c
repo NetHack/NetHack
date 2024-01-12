@@ -53,7 +53,7 @@ goodpos_onscary(
         || is_rider(mptr) || unique_corpstat(mptr))
         return FALSE;
     /* onscary() checks for vampshifted vampire bats/fog clouds/wolves too */
-    if (IS_ALTAR(levl[x][y].typ) && mptr->mlet == S_VAMPIRE)
+    if (IS_ALTAR(loc(x, y)->typ) && mptr->mlet == S_VAMPIRE)
         return TRUE;
     /* scare monster scroll doesn't have any of the below restrictions,
        being its own source of power */
@@ -524,7 +524,7 @@ teleds(coordxy nux, coordxy nuy, int teleds_flags)
     /* if terrain type changes, levitation or flying might become blocked
        or unblocked; might issue message, so do this after map+vision has
        been updated for new location instead of right after u_on_newpos() */
-    if (levl[u.ux][u.uy].typ != levl[u.ux0][u.uy0].typ)
+    if (loc(u.ux, u.uy)->typ != loc(u.ux0, u.uy0)->typ)
         switch_terrain();
     /* sequencing issue:  we want guard's alarm, if any, to occur before
        room entry message, if any, so need to check for vault exit prior
@@ -660,7 +660,7 @@ collect_coords(
                 if ((skip_mons && m_at(x, y))
                     /* note: !ACCESSIBLE() would reject water and lava;
                        !ZAP_POS() accepts them; caller needs to handle such */
-                    || (skip_inaccessible && !ZAP_POS(levl[x][y].typ)))
+                    || (skip_inaccessible && !ZAP_POS(loc(x, y)->typ)))
                     continue; /* quick filters */
                 if (filter && !(*filter)(x, y))
                     continue;
@@ -1530,10 +1530,10 @@ rloc_pos_ok(
            sent out of his room (caller might resort to goodpos() if
            we report failure here, so this isn't full prevention) */
         if (mtmp->isshk && inhishop(mtmp)) {
-            if (levl[x][y].roomno != (unsigned char) ESHK(mtmp)->shoproom)
+            if (loc(x, y)->roomno != (unsigned char) ESHK(mtmp)->shoproom)
                 return FALSE;
         } else if (mtmp->ispriest && inhistemple(mtmp)) {
-            if (levl[x][y].roomno !=  (unsigned char) EPRI(mtmp)->shroom)
+            if (loc(x, y)->roomno !=  (unsigned char) EPRI(mtmp)->shroom)
                 return FALSE;
         }
         /* current location is <xx,yy> */

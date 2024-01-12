@@ -1975,14 +1975,14 @@ really_done(int how)
         /* Base corpse on race when not poly'd since original u.umonnum
            is based on role, and all role monsters are human. */
         int mnum = !Upolyd ? gu.urace.mnum : u.umonnum,
-            was_already_grave = IS_GRAVE(levl[u.ux][u.uy].typ);
+            was_already_grave = IS_GRAVE(loc(u.ux, u.uy)->typ);
 
         corpse = mk_named_object(CORPSE, &mons[mnum], u.ux, u.uy, gp.plname);
         Sprintf(pbuf, "%s, ", gp.plname);
         formatkiller(eos(pbuf), sizeof pbuf - Strlen(pbuf), how, TRUE);
         make_grave(u.ux, u.uy, pbuf);
-        if (IS_GRAVE(levl[u.ux][u.uy].typ) && !was_already_grave)
-            levl[u.ux][u.uy].emptygrave = 1; /* corpse isn't buried */
+        if (IS_GRAVE(loc(u.ux, u.uy)->typ) && !was_already_grave)
+            loc(u.ux, u.uy)->emptygrave = 1; /* corpse isn't buried */
     }
     pbuf[0] = '\0'; /* clear grave text; also lint suppression */
 

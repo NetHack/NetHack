@@ -596,11 +596,11 @@ hitfloor(
     struct obj *obj,
     boolean verbosely) /* usually True; False if caller has given drop mesg */
 {
-    if (IS_SOFT(levl[u.ux][u.uy].typ) || u.uinwater || u.uswallow) {
+    if (IS_SOFT(loc(u.ux, u.uy)->typ) || u.uinwater || u.uswallow) {
         dropy(obj);
         return;
     }
-    if (IS_ALTAR(levl[u.ux][u.uy].typ)) {
+    if (IS_ALTAR(loc(u.ux, u.uy)->typ)) {
         doaltarobj(obj);
     } else if (verbosely) {
         const char *surf = surface(u.ux, u.uy);
@@ -779,19 +779,19 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
     stopping_short = (via_jumping && *range < 2);
 
     if (!Passes_walls || !(may_pass = may_passwall(x, y))) {
-        boolean odoor_diag = (IS_DOOR(levl[x][y].typ)
-                              && (levl[x][y].doormask & D_ISOPEN)
+        boolean odoor_diag = (IS_DOOR(loc(x, y)->typ)
+                              && (loc(x, y)->doormask & D_ISOPEN)
                               && (u.ux - x) && (u.uy - y));
 
-        if (IS_ROCK(levl[x][y].typ) || closed_door(x, y) || odoor_diag) {
+        if (IS_ROCK(loc(x, y)->typ) || closed_door(x, y) || odoor_diag) {
             const char *s;
 
             if (odoor_diag)
                 You("hit the door edge!");
             pline("Ouch!");
-            if (IS_TREE(levl[x][y].typ))
+            if (IS_TREE(loc(x, y)->typ))
                 s = "bumping into a tree";
-            else if (IS_ROCK(levl[x][y].typ))
+            else if (IS_ROCK(loc(x, y)->typ))
                 s = "bumping into a wall";
             else
                 s = "bumping into a door";
@@ -800,7 +800,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
             wake_nearto(x,y, 10);
             return FALSE;
         }
-        if (levl[x][y].typ == IRONBARS) {
+        if (loc(x, y)->typ == IRONBARS) {
             You("crash into some iron bars.  Ouch!");
             dmg = rnd(2 + *range);
             losehp(Maybe_Half_Phys(dmg), "crashing into iron bars",
@@ -916,7 +916,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
     /* if terrain type changes, levitation or flying might become blocked
        or unblocked; might issue message, so do this after map+vision has
        been updated for new location instead of right after u_on_newpos() */
-    if (levl[u.ux][u.uy].typ != levl[ox][oy].typ)
+    if (loc(u.ux, u.uy)->typ != loc(ox, oy)->typ)
         switch_terrain();
 
     /* might be entering a special room (treasure zoo, thrown room, &c) that
@@ -1734,7 +1734,7 @@ throwit(struct obj *obj,
             }
         }
 
-        if ((!IS_SOFT(levl[gb.bhitpos.x][gb.bhitpos.y].typ) && breaktest(obj))
+        if ((!IS_SOFT(loc(gb.bhitpos.x, gb.bhitpos.y)->typ) && breaktest(obj))
             /* venom [via #monster to spit while poly'd] fails breaktest()
                but we want to force breakage even when location IS_SOFT() */
             || obj->oclass == VENOM_CLASS) {
@@ -1780,7 +1780,7 @@ throwit(struct obj *obj,
         /* container contents might break;
            do so before turning ownership of gt.thrownobj over to shk
            (container_impact_dmg handles item already owned by shop) */
-        if (!IS_SOFT(levl[gb.bhitpos.x][gb.bhitpos.y].typ)) {
+        if (!IS_SOFT(loc(gb.bhitpos.x, gb.bhitpos.y)->typ)) {
             /* <x,y> is spot where you initiated throw, not gb.bhitpos */
             container_impact_dmg(obj, u.ux, u.uy);
             impact_disturbs_zombies(obj, TRUE);
@@ -2647,7 +2647,7 @@ throw_gold(struct obj *obj)
         /* see if the gold has a place to move into */
         odx = u.ux + u.dx;
         ody = u.uy + u.dy;
-        if (!ZAP_POS(levl[odx][ody].typ) || closed_door(odx, ody)) {
+        if (!ZAP_POS(loc(odx, ody)->typ) || closed_door(odx, ody)) {
             gb.bhitpos.x = u.ux;
             gb.bhitpos.y = u.uy;
         } else {

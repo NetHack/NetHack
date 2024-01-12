@@ -798,7 +798,7 @@ m_initinv(struct monst *mtmp)
             otmp = mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE, TRUE, FALSE);
             otmp->quan = 1;
             otmp->owt = weight(otmp);
-            if (!mpickobj(mtmp, otmp) && !levl[mtmp->mx][mtmp->my].lit)
+            if (!mpickobj(mtmp, otmp) && !loc(mtmp->mx, mtmp->my)->lit)
                 begin_burn(otmp, FALSE);
         }
         break;
@@ -2254,9 +2254,9 @@ set_mimic_sym(struct monst *mtmp)
         return;
     mx = mtmp->mx;
     my = mtmp->my;
-    typ = levl[mx][my].typ;
+    typ = loc(mx, my)->typ;
     /* only valid for INSIDE of room */
-    roomno = levl[mx][my].roomno - ROOMOFFSET;
+    roomno = loc(mx, my)->roomno - ROOMOFFSET;
     if (roomno >= 0)
         rt = gr.rooms[roomno].rtype;
 #ifdef SPECIALIZATION
@@ -2278,13 +2278,13 @@ set_mimic_sym(struct monst *mtmp)
          *  Since rogue has no closed doors, mimic a wall there
          *  (yes, mimics can end up on this level by various means).
          */
-        if (mx != 0 && (levl[mx - 1][my].typ == HWALL
-                        || levl[mx - 1][my].typ == TLCORNER
-                        || levl[mx - 1][my].typ == TRWALL
-                        || levl[mx - 1][my].typ == BLCORNER
-                        || levl[mx - 1][my].typ == TDWALL
-                        || levl[mx - 1][my].typ == CROSSWALL
-                        || levl[mx - 1][my].typ == TUWALL))
+        if (mx != 0 && (loc(mx - 1, my)->typ == HWALL
+                        || loc(mx - 1, my)->typ == TLCORNER
+                        || loc(mx - 1, my)->typ == TRWALL
+                        || loc(mx - 1, my)->typ == BLCORNER
+                        || loc(mx - 1, my)->typ == TDWALL
+                        || loc(mx - 1, my)->typ == CROSSWALL
+                        || loc(mx - 1, my)->typ == TUWALL))
             appear = Is_rogue_level(&u.uz) ? S_hwall : S_hcdoor;
         else
             appear = Is_rogue_level(&u.uz) ? S_vwall : S_vcdoor;
@@ -2397,7 +2397,7 @@ set_mimic_sym(struct monst *mtmp)
         MCORPSENM(mtmp) = NON_PM;
     }
 
-    if (does_block(mx, my, &levl[mx][my]))
+    if (does_block(mx, my, loc(mx, my)))
         block_point(mx, my);
 }
 

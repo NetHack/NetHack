@@ -113,7 +113,7 @@ int
 def_char_is_furniture(char ch)
 {
     /* note: these refer to defsyms[] order which is much different from
-       levl[][].typ order but both keep furniture in a contiguous block */
+       loc(, )->typ order but both keep furniture in a contiguous block */
     static const char first_furniture[] = "stair", /* "staircase up" */
                       last_furniture[] = "fountain";
     int i;

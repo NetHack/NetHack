@@ -436,7 +436,7 @@ use_stethoscope(struct obj *obj)
     if (unmap_invisible(rx,ry))
         pline_The("invisible monster must have moved.");
 
-    lev = &levl[rx][ry];
+    lev = loc(rx, ry);
     switch (lev->typ) {
     case SDOOR:
         Soundeffect(se_hollow_sound, 100);
@@ -799,7 +799,7 @@ use_leash(struct obj *obj)
     spotmon = canspotmon(mtmp);
  got_target:
 
-    if (!spotmon && !glyph_is_invisible(levl[cc.x][cc.y].glyph)) {
+    if (!spotmon && !glyph_is_invisible(loc(cc.x, cc.y)->glyph)) {
         /* for the unleash case, we don't verify whether this unseen
            monster is the creature attached to the current leash */
         You("fail to %sleash something.", obj->leashmon ? "un" : "");
@@ -1833,7 +1833,7 @@ static boolean
 check_jump(genericptr arg, coordxy x, coordxy y)
 {
     int traj = *(int *) arg;
-    struct rm *lev = &levl[x][y];
+    struct rm *lev = loc(x, y);
 
     if (Passes_walls)
         return TRUE;
@@ -1884,7 +1884,7 @@ is_valid_jump_pos(coordxy x, coordxy y, int magic, boolean showmsg)
         return FALSE;
     } else {
         coord uc, tc;
-        struct rm *lev = &levl[u.ux][u.uy];
+        struct rm *lev = loc(u.ux, u.uy);
         /* we want to categorize trajectory for use in determining
            passage through doorways: horizonal, vertical, or diagonal;
            since knight's jump and other irregular directions are
@@ -1930,7 +1930,7 @@ static boolean
 get_valid_jump_position(coordxy x, coordxy y)
 {
     return (isok(x, y)
-            && (ACCESSIBLE(levl[x][y].typ) || Passes_walls)
+            && (ACCESSIBLE(loc(x, y)->typ) || Passes_walls)
             && is_valid_jump_pos(x, y, gj.jumping_is_magic, FALSE));
 }
 
@@ -2495,11 +2495,11 @@ figurine_location_checks(struct obj *obj, coord *cc, boolean quietly)
             You("cannot put the figurine there.");
         return FALSE;
     }
-    if (IS_ROCK(levl[x][y].typ)
+    if (IS_ROCK(loc(x, y)->typ)
         && !(passes_walls(&mons[obj->corpsenm]) && may_passwall(x, y))) {
         if (!quietly)
             You("cannot place a figurine in %s!",
-                IS_TREE(levl[x][y].typ) ? "a tree" : "solid rock");
+                IS_TREE(loc(x, y)->typ) ? "a tree" : "solid rock");
         return FALSE;
     }
     if (sobj_at(BOULDER, x, y) && !passes_walls(&mons[obj->corpsenm])
@@ -2792,7 +2792,7 @@ use_trap(struct obj *otmp)
     int ttyp, tmp;
     const char *what = (char *) 0;
     char buf[BUFSZ];
-    int levtyp = levl[u.ux][u.uy].typ;
+    int levtyp = loc(u.ux, u.uy)->typ;
     const char *occutext = "setting the trap";
 
     if (nohands(gy.youmonst.data))
@@ -2979,10 +2979,10 @@ use_whip(struct obj *obj)
     } else if (u.dz < 0) {
         You("flick a bug off of the %s.", ceiling(u.ux, u.uy));
 
-    } else if (!u.dz && (IS_WATERWALL(levl[rx][ry].typ)
-                         || levl[rx][ry].typ == LAVAWALL)) {
+    } else if (!u.dz && (IS_WATERWALL(loc(rx, ry)->typ)
+                         || loc(rx, ry)->typ == LAVAWALL)) {
         You("cause a small splash.");
-        if (levl[rx][ry].typ == LAVAWALL)
+        if (loc(rx, ry)->typ == LAVAWALL)
             (void) fire_damage(uwep, FALSE, rx, ry);
         return ECMD_TIME;
     } else if ((!u.dx && !u.dy) || (u.dz > 0)) {
@@ -2995,8 +2995,8 @@ use_whip(struct obj *obj)
             return ECMD_TIME;
         }
         if (is_pool_or_lava(u.ux, u.uy)
-            || IS_WATERWALL(levl[rx][ry].typ)
-            || levl[rx][ry].typ == LAVAWALL) {
+            || IS_WATERWALL(loc(rx, ry)->typ)
+            || loc(rx, ry)->typ == LAVAWALL) {
             You("cause a small splash.");
             if (is_lava(u.ux, u.uy))
                 (void) fire_damage(uwep, FALSE, u.ux, u.uy);
@@ -3055,7 +3055,7 @@ use_whip(struct obj *obj)
          *    - you only end up hitting.
          */
         const char *wrapped_what = sobj_at(BOULDER, rx, ry) ? "a boulder"
-                                   : IS_FURNITURE(levl[rx][ry].typ)
+                                   : IS_FURNITURE(loc(rx, ry)->typ)
                                      ? something : (char *) 0;
 
         if (mtmp) {
@@ -3103,7 +3103,7 @@ use_whip(struct obj *obj)
                brought out of hiding has exposed it (might not if hero is
                blind or formerly hidden monster is also invisible) */
             spotitnow = canspotmon(mtmp);
-            if (spotitnow || !glyph_is_invisible(levl[rx][ry].glyph)) {
+            if (spotitnow || !glyph_is_invisible(loc(rx, ry)->glyph)) {
                 pline("%s is there that you %s.",
                       !spotitnow ? "A monster" : Amonnam(mtmp),
                       !Blind ? "couldn't see" : "hadn't noticed");
@@ -3450,12 +3450,12 @@ use_pole(struct obj *obj, boolean autohit)
             pline(thump, "boulder");
             wake_nearto(gb.bhitpos.x, gb.bhitpos.y, 25);
         } else if (!accessible(gb.bhitpos.x, gb.bhitpos.y)
-                   || IS_FURNITURE(levl[gb.bhitpos.x][gb.bhitpos.y].typ)) {
+                   || IS_FURNITURE(loc(gb.bhitpos.x, gb.bhitpos.y)->typ)) {
             /* similar to 'F'orcefight with a melee weapon; we know that
                the spot can be seen or we wouldn't have gotten this far */
             You("uselessly attack %s.",
-                (levl[gb.bhitpos.x][gb.bhitpos.y].typ == STONE
-                 || levl[gb.bhitpos.x][gb.bhitpos.y].typ == SCORR)
+                (loc(gb.bhitpos.x, gb.bhitpos.y)->typ == STONE
+                 || loc(gb.bhitpos.x, gb.bhitpos.y)->typ == SCORR)
                 ? "stone"
                 : glyph_is_cmap(glyph)
                   ? the(defsyms[glyph_to_cmap(glyph)].explanation)
@@ -3756,7 +3756,7 @@ use_grapple(struct obj *obj)
         }
     /*FALLTHRU*/
     case 3: /* Surface */
-        if (IS_AIR(levl[cc.x][cc.y].typ) || is_pool(cc.x, cc.y))
+        if (IS_AIR(loc(cc.x, cc.y)->typ) || is_pool(cc.x, cc.y))
             pline_The("hook slices through the %s.", surface(cc.x, cc.y));
         else {
             You("are yanked toward the %s!", surface(cc.x, cc.y));
@@ -3934,7 +3934,7 @@ do_break_wand(struct obj *obj)
             schar typ;
 
             if (dig_check(BY_OBJECT, FALSE, x, y)) {
-                if (IS_WALL(levl[x][y].typ) || IS_DOOR(levl[x][y].typ)) {
+                if (IS_WALL(loc(x, y)->typ) || IS_DOOR(loc(x, y)->typ)) {
                     /* normally, pits and holes don't anger guards, but they
                      * do if it's a wall or door that's being dug */
                     watch_dig((struct monst *) 0, x, y, TRUE);
@@ -3948,7 +3948,8 @@ do_break_wand(struct obj *obj)
                  */
                 typ = fillholetyp(x, y, FALSE);
                 if (typ != ROOM) {
-                    levl[x][y].typ = typ, levl[x][y].flags = 0;
+                    loc(x, y)->typ = typ;
+                    loc(x, y)->flags = 0;
                     liquid_flow(x, y, typ, t_at(x, y),
                                 fillmsg
                                   ? (char *) 0
@@ -3958,7 +3959,7 @@ do_break_wand(struct obj *obj)
                     digactualhole(x, y, BY_OBJECT,
                                   (rn2(obj->spe) < 3
                                    || (!Can_dig_down(&u.uz)
-                                       && !levl[x][y].candig)) ? PIT : HOLE);
+                                       && !loc(x, y)->candig)) ? PIT : HOLE);
                 }
             }
             continue;

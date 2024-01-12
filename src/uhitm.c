@@ -203,7 +203,7 @@ attack_checks(
          * not stay there, so the player will have suddenly forgotten
          * the square's contents for no apparent reason.
         if (!canspotmon(mtmp)
-            && !glyph_is_invisible(levl[gb.bhitpos.x][gb.bhitpos.y].glyph))
+            && !glyph_is_invisible(loc(gb.bhitpos.x, gb.bhitpos.y)->glyph))
             map_invisible(gb.bhitpos.x, gb.bhitpos.y);
          */
         return FALSE;
@@ -468,7 +468,7 @@ do_attack(struct monst *mtmp)
              */
             boolean foo = (Punished || !rn2(7)
                            || (is_longworm(mtmp->data) && mtmp->wormno)
-                           || (IS_ROCK(levl[u.ux][u.uy].typ)
+                           || (IS_ROCK(loc(u.ux, u.uy)->typ)
                                && !passes_walls(mtmp->data))),
                     inshop = FALSE;
             char *p;
@@ -570,7 +570,7 @@ do_attack(struct monst *mtmp)
      * evade.
      */
     if (gc.context.forcefight && !DEADMONSTER(mtmp) && !canspotmon(mtmp)
-        && !glyph_is_invisible(levl[u.ux + u.dx][u.uy + u.dy].glyph)
+        && !glyph_is_invisible(loc(u.ux + u.dx, u.uy + u.dy)->glyph)
         && !engulfing_u(mtmp))
         map_invisible(u.ux + u.dx, u.uy + u.dy);
 
@@ -693,7 +693,7 @@ hitum_cleave(
             continue;
         mtmp = m_at(tx, ty);
         if (!mtmp) {
-            if (glyph_is_invisible(levl[tx][ty].glyph))
+            if (glyph_is_invisible(loc(tx, ty)->glyph))
                 (void) unmap_invisible(tx, ty);
             continue;
         }
@@ -3279,7 +3279,7 @@ mhitm_ad_wrap(
             } else if (u.ustuck == magr) {
                 if (is_pool(magr->mx, magr->my) && !Swimming && !Amphibious
                     && !Breathless) {
-                    boolean moat = (levl[magr->mx][magr->my].typ != POOL)
+                    boolean moat = (loc(magr->mx, magr->my)->typ != POOL)
                                    && !is_waterwall(magr->mx, magr->my)
                                    && !Is_medusa_level(&u.uz)
                                    && !Is_waterlevel(&u.uz);
@@ -6022,7 +6022,7 @@ stumble_onto_mimic(struct monst *mtmp)
         else if (M_AP_TYPE(mtmp) == M_AP_MONSTER)
             what = a_monnam(mtmp); /* differs from what was sensed */
     } else {
-        int glyph = levl[u.ux + u.dx][u.uy + u.dy].glyph;
+        int glyph = loc(u.ux + u.dx, u.uy + u.dy)->glyph;
 
         if (glyph_is_cmap(glyph) && (glyph_to_cmap(glyph) == S_hcdoor
                                      || glyph_to_cmap(glyph) == S_vcdoor))
@@ -6044,7 +6044,7 @@ stumble_onto_mimic(struct monst *mtmp)
     /* if hero is blind, wakeup() won't display the monster even though
        it's no longer concealed */
     if (!canspotmon(mtmp)
-        && !glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
+        && !glyph_is_invisible(loc(mtmp->mx, mtmp->my)->glyph))
         map_invisible(mtmp->mx, mtmp->my);
 }
 
@@ -6085,7 +6085,7 @@ flash_hits_mon(struct monst *mtmp,
 
     if (gn.notonhead)
         return 0;
-    lev = &levl[mtmp->mx][mtmp->my];
+    lev = loc(mtmp->mx, mtmp->my);
     useeit = canseemon(mtmp);
 
     if (mtmp->msleeping && haseyes(mtmp->data)) {

@@ -1538,7 +1538,7 @@ mons_see_trap(struct trap *ttmp)
 {
     struct monst *mtmp;
     coordxy tx = ttmp->tx, ty = ttmp->ty;
-    int maxdist = levl[tx][ty].lit ? 7*7 : 2;
+    int maxdist = loc(tx, ty)->lit ? 7*7 : 2;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (is_animal(mtmp->data) || mindless(mtmp->data)

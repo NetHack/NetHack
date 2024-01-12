@@ -81,7 +81,7 @@ clear_fcorr(struct monst *grd, boolean forceshow)
                     m_into_limbo(mtmp);
             }
         }
-        lev = &levl[fcx][fcy];
+        lev = loc(fcx, fcy);
         if (lev->typ == CORR && cansee(fcx, fcy))
             sawcorridor = TRUE;
         lev->typ = egrd->fakecorr[fcbeg].ftyp;
@@ -108,7 +108,7 @@ clear_fcorr(struct monst *grd, boolean forceshow)
     /* only give encased message if hero is still alive (might get here
        via paygd() -> mongone() -> grddead() when game is over;
        died: no message, quit: message) */
-    if (IS_ROCK(levl[u.ux][u.uy].typ) && (Upolyd ? u.mh : u.uhp) > 0
+    if (IS_ROCK(loc(u.ux, u.uy)->typ) && (Upolyd ? u.mh : u.uhp) > 0
         && !silently)
         You("are encased in rock.");
     return TRUE;
@@ -128,7 +128,7 @@ blackout(coordxy x, coordxy y)
         for (j = y - 1; j <= y + 1; ++j) {
             if (!isok(i, j))
                 continue;
-            lev = &levl[i][j];
+            lev = loc(i, j);
             /* [possible bug: when (i != x || j != y), perhaps we ought
                to check whether the spot on the far side is lit instead
                of doing a blanket blackout of adjacent locations] */
@@ -293,10 +293,10 @@ find_guard_dest(struct monst *guard, coordxy *rx, coordxy *ry)
                 if (guard && ((x == guard->mx && y == guard->my)
                               || (guard->isgd && in_fcorridor(guard, x, y))))
                     continue;
-                if (levl[x][y].typ == CORR) {
+                if (loc(x, y)->typ == CORR) {
                     lx = (x < u.ux) ? x + 1 : (x > u.ux) ? x - 1 : x;
                     ly = (y < u.uy) ? y + 1 : (y > u.uy) ? y - 1 : y;
-                    if (levl[lx][ly].typ != STONE && levl[lx][ly].typ != CORR)
+                    if (loc(lx, ly)->typ != STONE && loc(lx, ly)->typ != CORR)
                         goto incr_radius;
                     *rx = x;
                     *ry = y;
@@ -346,30 +346,30 @@ invault(void)
         /* next find a good place for a door in the wall */
         x = u.ux;
         y = u.uy;
-        if (levl[x][y].typ != ROOM) { /* player dug a door and is in it */
-            if (levl[x + 1][y].typ == ROOM) {
+        if (loc(x, y)->typ != ROOM) { /* player dug a door and is in it */
+            if (loc(x + 1, y)->typ == ROOM) {
                 x = x + 1;
-            } else if (levl[x][y + 1].typ == ROOM) {
+            } else if (loc(x, y + 1)->typ == ROOM) {
                 y = y + 1;
-            } else if (levl[x - 1][y].typ == ROOM) {
+            } else if (loc(x - 1, y)->typ == ROOM) {
                 x = x - 1;
-            } else if (levl[x][y - 1].typ == ROOM) {
+            } else if (loc(x, y - 1)->typ == ROOM) {
                 y = y - 1;
-            } else if (levl[x + 1][y + 1].typ == ROOM) {
+            } else if (loc(x + 1, y + 1)->typ == ROOM) {
                 x = x + 1;
                 y = y + 1;
-            } else if (levl[x - 1][y - 1].typ == ROOM) {
+            } else if (loc(x - 1, y - 1)->typ == ROOM) {
                 x = x - 1;
                 y = y - 1;
-            } else if (levl[x + 1][y - 1].typ == ROOM) {
+            } else if (loc(x + 1, y - 1)->typ == ROOM) {
                 x = x + 1;
                 y = y - 1;
-            } else if (levl[x - 1][y + 1].typ == ROOM) {
+            } else if (loc(x - 1, y + 1)->typ == ROOM) {
                 x = x - 1;
                 y = y + 1;
             }
         }
-        while (levl[x][y].typ == ROOM) {
+        while (loc(x, y)->typ == ROOM) {
             int dx, dy;
 
             dx = (gdx > x) ? 1 : (gdx < x) ? -1 : 0;
@@ -380,16 +380,16 @@ invault(void)
                 y += dy;
         }
         if (u_at(x, y)) {
-            if (levl[x + 1][y].typ == HWALL || levl[x + 1][y].typ == DOOR)
+            if (loc(x + 1, y)->typ == HWALL || loc(x + 1, y)->typ == DOOR)
                 x = x + 1;
-            else if (levl[x - 1][y].typ == HWALL
-                     || levl[x - 1][y].typ == DOOR)
+            else if (loc(x - 1, y)->typ == HWALL
+                     || loc(x - 1, y)->typ == DOOR)
                 x = x - 1;
-            else if (levl[x][y + 1].typ == VWALL
-                     || levl[x][y + 1].typ == DOOR)
+            else if (loc(x, y + 1)->typ == VWALL
+                     || loc(x, y + 1)->typ == DOOR)
                 y = y + 1;
-            else if (levl[x][y - 1].typ == VWALL
-                     || levl[x][y - 1].typ == DOOR)
+            else if (loc(x, y - 1)->typ == VWALL
+                     || loc(x, y - 1)->typ == DOOR)
                 y = y - 1;
             else
                 return;
@@ -576,7 +576,7 @@ invault(void)
         EGD(guard)->fcbeg = 0;
         EGD(guard)->fakecorr[0].fx = x;
         EGD(guard)->fakecorr[0].fy = y;
-        typ = levl[x][y].typ;
+        typ = loc(x, y)->typ;
         if (!IS_WALL(typ)) {
             /* guard arriving at non-wall implies a door; vault wall was
                dug into an empty doorway (which could subsequently have
@@ -600,15 +600,15 @@ invault(void)
 
             /* we lack access to the original wall_info bit mask for this
                former wall location so recreate it */
-            levl[x][y].typ = typ; /* wall; will be changed to door below */
-            levl[x][y].wall_info = 0; /* will be reset too via doormask */
+            loc(x, y)->typ = typ; /* wall; will be changed to door below */
+            loc(x, y)->wall_info = 0; /* will be reset too via doormask */
             xy_set_wall_state(x, y); /* set WA_MASK bits in .wall_info */
         }
         EGD(guard)->fakecorr[0].ftyp = typ;
-        EGD(guard)->fakecorr[0].flags = levl[x][y].flags;
+        EGD(guard)->fakecorr[0].flags = loc(x, y)->flags;
         /* guard's entry point where confrontation with hero takes place */
-        levl[x][y].typ = DOOR;
-        levl[x][y].doormask = D_NODOOR;
+        loc(x, y)->typ = DOOR;
+        loc(x, y)->doormask = D_NODOOR;
         unblock_point(x, y); /* empty doorway doesn't block light */
         EGD(guard)->fcend = 1;
         EGD(guard)->warncnt = 1;
@@ -650,7 +650,7 @@ wallify_vault(struct monst *grd)
             if (x != lox && x != hix && y != loy && y != hiy)
                 continue;
 
-            if ((!IS_WALL(levl[x][y].typ) || g_at(x, y)
+            if ((!IS_WALL(loc(x, y)->typ) || g_at(x, y)
                  || sobj_at(ROCK, x, y) || sobj_at(BOULDER, x, y))
                 && !in_fcorridor(grd, x, y)) {
                 if ((mon = m_at(x, y)) != 0 && mon != grd) {
@@ -687,8 +687,8 @@ wallify_vault(struct monst *grd)
                 else /* not left or right side, must be top or bottom */
                     typ = HWALL;
 
-                levl[x][y].typ = typ;
-                levl[x][y].wall_info = 0;
+                loc(x, y)->typ = typ;
+                loc(x, y)->wall_info = 0;
                 xy_set_wall_state(x, y); /* set WA_MASK bits in .wall_info */
                 del_engr_at(x, y);
                 /*
@@ -954,8 +954,8 @@ gd_move(struct monst *grd)
                 }
                 grd->mpeaceful = 0;
                 mnexto(grd, RLOC_NOMSG);
-                levl[m][n].typ = egrd->fakecorr[0].ftyp;
-                levl[m][n].flags = egrd->fakecorr[0].flags;
+                loc(m, n)->typ = egrd->fakecorr[0].ftyp;
+                loc(m, n)->flags = egrd->fakecorr[0].flags;
                 del_engr_at(m, n);
                 newsym(m, n);
                 return -1;
@@ -971,8 +971,8 @@ gd_move(struct monst *grd)
                 m = grd->mx;
                 n = grd->my;
                 (void) rloc(grd, RLOC_MSG);
-                levl[m][n].typ = egrd->fakecorr[0].ftyp;
-                levl[m][n].flags = egrd->fakecorr[0].flags;
+                loc(m, n)->typ = egrd->fakecorr[0].ftyp;
+                loc(m, n)->flags = egrd->fakecorr[0].flags;
                 del_engr_at(m, n);
                 newsym(m, n);
                 grd->mpeaceful = 0;
@@ -992,7 +992,7 @@ gd_move(struct monst *grd)
     if (egrd->fcend > 1) {
         if (egrd->fcend > 2 && in_fcorridor(grd, grd->mx, grd->my)
             && !egrd->gddone && !in_fcorridor(grd, u.ux, u.uy)
-            && (levl[egrd->fakecorr[0].fx][egrd->fakecorr[0].fy].typ
+            && (loc(egrd->fakecorr[0].fx, egrd->fakecorr[0].fy)->typ
                 == egrd->fakecorr[0].ftyp)) {
             pline("%s, confused, disappears.", noit_Monnam(grd));
             return gd_move_cleanup(grd, semi_dead, TRUE);
@@ -1065,7 +1065,7 @@ gd_move(struct monst *grd)
         for (ny = y - 1; ny <= y + 1; ny++) {
             if ((nx == x || ny == y) && (nx != x || ny != y)
                 && isok(nx, ny)) {
-                crm = &levl[nx][ny];
+                crm = loc(nx, ny);
                 typ = crm->typ;
                 if (!IS_STWALL(typ) && !IS_POOL(typ)) {
                     if (in_fcorridor(grd, nx, ny))
@@ -1102,12 +1102,12 @@ gd_move(struct monst *grd)
     else
         ny += dy;
 
-    while ((typ = (crm = &levl[nx][ny])->typ) != STONE) {
+    while ((typ = (crm = loc(nx, ny))->typ) != STONE) {
         ex = nx + nx - x;
         ey = ny + ny - y;
         /* in view of the above we must have IS_WALL(typ) or typ == POOL */
         /* must be a wall here */
-        if (isok(ex, ey) && IS_ROOM(levl[ex][ey].typ)) {
+        if (isok(ex, ey) && IS_ROOM(loc(ex, ey)->typ)) {
             crm->typ = DOOR;
             crm->doormask = D_NODOOR;
             del_engr_at(ex, ey);

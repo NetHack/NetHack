@@ -544,7 +544,7 @@ find_defensive(struct monst *mtmp, boolean tryescape)
 
     if (stuck || immobile || mtmp->mtrapped) {
         ; /* fleeing by stairs or traps is not possible */
-    } else if (levl[x][y].typ == STAIRS) {
+    } else if (loc(x, y)->typ == STAIRS) {
         stway = stairway_at(x,y);
         if (stway && !stway->up && stway->tolev.dnum == u.uz.dnum) {
             if (!is_floater(mtmp->data))
@@ -555,7 +555,7 @@ find_defensive(struct monst *mtmp, boolean tryescape)
             if (stway->up || !is_floater(mtmp->data))
                 gm.m.has_defense = MUSE_SSTAIRS;
         }
-    } else if (levl[x][y].typ == LADDER) {
+    } else if (loc(x, y)->typ == LADDER) {
         stway = stairway_at(x,y);
         if (stway && stway->up && stway->tolev.dnum == u.uz.dnum) {
             gm.m.has_defense = MUSE_UP_LADDER;
@@ -655,7 +655,7 @@ find_defensive(struct monst *mtmp, boolean tryescape)
             /* monsters digging in Sokoban can ruin things */
             && !Sokoban
             /* digging wouldn't be effective; assume they know that */
-            && !(levl[x][y].wall_info & W_NONDIGGABLE)
+            && !(loc(x, y)->wall_info & W_NONDIGGABLE)
             && !(Is_botlevel(&u.uz) || In_endgame(&u.uz))
             && !(is_ice(x, y) || is_pool(x, y) || is_lava(x, y))
             && !(is_Vlad(mtmp) && In_V_tower(&u.uz))) {
@@ -743,7 +743,7 @@ find_defensive(struct monst *mtmp, boolean tryescape)
 static void
 reveal_trap(struct trap *t, boolean seeit)
 {
-    struct rm *lev = &levl[t->tx][t->ty];
+    struct rm *lev = loc(t->tx, t->ty);
 
     if (lev->typ == SCORR) {
         lev->typ = CORR, lev->flags = 0; /* set_levltyp(,,CORR) */
@@ -873,14 +873,14 @@ use_defensive(struct monst *mtmp)
         mzapwand(mtmp, otmp, FALSE);
         if (oseen)
             makeknown(WAN_DIGGING);
-        if (IS_FURNITURE(levl[mtmp->mx][mtmp->my].typ)
-            || IS_DRAWBRIDGE(levl[mtmp->mx][mtmp->my].typ)
+        if (IS_FURNITURE(loc(mtmp->mx, mtmp->my)->typ)
+            || IS_DRAWBRIDGE(loc(mtmp->mx, mtmp->my)->typ)
             || (is_drawbridge_wall(mtmp->mx, mtmp->my) >= 0)
             || stairway_at(mtmp->mx, mtmp->my)) {
             pline_The("digging ray is ineffective.");
             return 2;
         }
-        if (!Can_dig_down(&u.uz) && !levl[mtmp->mx][mtmp->my].candig) {
+        if (!Can_dig_down(&u.uz) && !loc(mtmp->mx, mtmp->my)->candig) {
             /* can't dig further if there's already a pit (or other trap)
                here, or if pit creation fails for some reason */
             if (t_at(mtmp->mx, mtmp->my)
@@ -1678,10 +1678,10 @@ mbhit(
             if (hitanything)
                 range--;
         }
-        ltyp = levl[gb.bhitpos.x][gb.bhitpos.y].typ;
+        ltyp = loc(gb.bhitpos.x, gb.bhitpos.y)->typ;
         dbx = x, dby = y;
         if (otyp == WAN_STRIKING
-            /* if levl[x][y].typ is DRAWBRIDGE_UP then the zap is passing
+            /* if loc(x, y)->typ is DRAWBRIDGE_UP then the zap is passing
                over the moat in front of a closed drawbridge and doesn't
                hit any part of the bridge's mechanism */
             && ltyp != DRAWBRIDGE_UP && find_drawbridge(&dbx, &dby)) {
@@ -1718,7 +1718,7 @@ mbhit(
                         makeknown(otyp);
                     /* if a shop door gets broken, add it to
                        the shk's fix list (no cost to player) */
-                    if (levl[gb.bhitpos.x][gb.bhitpos.y].doormask == D_BROKEN
+                    if (loc(gb.bhitpos.x, gb.bhitpos.y)->doormask == D_BROKEN
                         && *in_rooms(gb.bhitpos.x, gb.bhitpos.y, SHOPBASE))
                         add_damage(gb.bhitpos.x, gb.bhitpos.y, 0L);
                 }
@@ -1726,7 +1726,7 @@ mbhit(
             }
         }
         if (!ZAP_POS(ltyp)
-            || (IS_DOOR(ltyp) && (levl[gb.bhitpos.x][gb.bhitpos.y].doormask
+            || (IS_DOOR(ltyp) && (loc(gb.bhitpos.x, gb.bhitpos.y)->doormask
                                   & (D_LOCKED | D_CLOSED)))) {
             gb.bhitpos.x -= ddx;
             gb.bhitpos.y -= ddy;
@@ -1827,7 +1827,7 @@ use_offensive(struct monst *mtmp)
             for (y = mmy - 1; y <= mmy + 1; y++) {
                 /* Is this a suitable spot? */
                 if (isok(x, y) && !closed_door(x, y)
-                    && !IS_ROCK(levl[x][y].typ) && !IS_AIR(levl[x][y].typ)
+                    && !IS_ROCK(loc(x, y)->typ) && !IS_AIR(loc(x, y)->typ)
                     && (((x == mmx) && (y == mmy)) ? !is_blessed : !is_cursed)
                     && (x != u.ux || y != u.uy)) {
                     (void) drop_boulder_on_monster(x, y, confused, FALSE);

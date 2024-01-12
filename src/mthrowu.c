@@ -528,19 +528,19 @@ ucatchgem(
     (/* missile hits edge of screen */                                 \
      !isok(gb.bhitpos.x + dx, gb.bhitpos.y + dy)                       \
      /* missile hits the wall */                                       \
-     || IS_ROCK(levl[gb.bhitpos.x + dx][gb.bhitpos.y + dy].typ)        \
+     || IS_ROCK(loc(gb.bhitpos.x + dx, gb.bhitpos.y + dy)->typ)        \
      /* missile hit closed door */                                     \
      || closed_door(gb.bhitpos.x + dx, gb.bhitpos.y + dy)              \
      /* missile might hit iron bars */                                 \
      /* the random chance for small objects hitting bars is */         \
      /* skipped when reaching them at point blank range */             \
-     || (levl[gb.bhitpos.x + dx][gb.bhitpos.y + dy].typ == IRONBARS    \
+     || (loc(gb.bhitpos.x + dx, gb.bhitpos.y + dy)->typ == IRONBARS    \
          && hits_bars(&singleobj,                                      \
                       gb.bhitpos.x, gb.bhitpos.y,                      \
                       gb.bhitpos.x + dx, gb.bhitpos.y + dy,            \
                       ((pre) ? 0 : forcehit), 0))                      \
      /* Thrown objects "sink" */                                       \
-     || (!(pre) && IS_SINK(levl[gb.bhitpos.x][gb.bhitpos.y].typ))      \
+     || (!(pre) && IS_SINK(loc(gb.bhitpos.x, gb.bhitpos.y)->typ))      \
      )
 
 void
@@ -739,7 +739,7 @@ m_throw(
                 /* note: pline(The(missile)) rather than pline_The(missile)
                    in order to get "Grimtooth" rather than "The Grimtooth" */
                 if (range && cansee(gb.bhitpos.x, gb.bhitpos.y)
-                    && IS_SINK(levl[gb.bhitpos.x][gb.bhitpos.y].typ))
+                    && IS_SINK(loc(gb.bhitpos.x, gb.bhitpos.y)->typ))
                     pline("%s %s onto the sink.", The(mshot_xname(singleobj)),
                           otense(singleobj, Hallucination ? "plop" : "drop"));
                 else if (gm.m_shot.n > 1
@@ -1081,8 +1081,8 @@ breamu(struct monst *mtmp, struct attack *mattk)
 static boolean
 blocking_terrain(coordxy x, coordxy y)
 {
-    if (!isok(x, y) || IS_ROCK(levl[x][y].typ) || closed_door(x, y)
-        || is_waterwall(x, y) || levl[x][y].typ == LAVAWALL)
+    if (!isok(x, y) || IS_ROCK(loc(x, y)->typ) || closed_door(x, y)
+        || is_waterwall(x, y) || loc(x, y)->typ == LAVAWALL)
         return TRUE;
     return FALSE;
 }
@@ -1222,7 +1222,7 @@ hit_bars(
 {
     struct obj *otmp = *objp;
     int obj_type = otmp->otyp;
-    boolean nodissolve = (levl[barsx][barsy].wall_info & W_NONDIGGABLE) != 0,
+    boolean nodissolve = (loc(barsx, barsy)->wall_info & W_NONDIGGABLE) != 0,
             your_fault = (breakflags & BRK_BY_HERO) != 0,
             melee_attk = (breakflags & BRK_MELEE) != 0;
     int noise = 0;

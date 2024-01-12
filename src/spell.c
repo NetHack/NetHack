@@ -889,9 +889,9 @@ skill_based_spellbook_id(void)
    they would be earthed */
 #define CHAIN_LIGHTNING_TYP(typ) (IS_POOL(typ) || SPACE_POS(typ))
 #define CHAIN_LIGHTNING_POS(x, y)                                       \
-    (isok(x, y) && (CHAIN_LIGHTNING_TYP(levl[x][y].typ) ||              \
-                    (IS_DOOR(levl[x][y].typ) &&                         \
-                     !(levl[x][y].doormask & (D_CLOSED | D_LOCKED)))))
+    (isok(x, y) && (CHAIN_LIGHTNING_TYP(loc(x, y)->typ) ||              \
+                    (IS_DOOR(loc(x, y)->typ) &&                         \
+                     !(loc(x, y)->doormask & (D_CLOSED | D_LOCKED)))))
 
 struct chain_lightning_zap {
     /* direction in which this zap is currently moving; this is an
@@ -1098,7 +1098,7 @@ cast_protection(void)
             } else {
                 struct permonst *pm = u.ustuck ? u.ustuck->data : 0;
 
-                rmtyp = levl[u.ux][u.uy].typ;
+                rmtyp = loc(u.ux, u.uy)->typ;
                 atmosphere = (pm && u.uswallow)
                                 ? ((pm == &mons[PM_FOG_CLOUD]) ? "mist"
                                    : is_whirly(pm) ? "maelstrom"
@@ -1391,7 +1391,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
                     u.dx = cc.x + rnd(3) - 2;
                     u.dy = cc.y + rnd(3) - 2;
                     if (!isok(u.dx, u.dy) || !cansee(u.dx, u.dy)
-                        || IS_STWALL(levl[u.dx][u.dy].typ) || u.uswallow) {
+                        || IS_STWALL(loc(u.dx, u.dy)->typ) || u.uswallow) {
                         /* Spell is reflected back to center */
                         u.dx = cc.x;
                         u.dy = cc.y;
@@ -1542,8 +1542,8 @@ spell_aim_step(genericptr_t arg UNUSED, coordxy x, coordxy y)
 {
     if (!isok(x,y))
         return FALSE;
-    if (!ZAP_POS(levl[x][y].typ)
-        && !(IS_DOOR(levl[x][y].typ) && (levl[x][y].doormask & D_ISOPEN)))
+    if (!ZAP_POS(loc(x, y)->typ)
+        && !(IS_DOOR(loc(x, y)->typ) && (loc(x, y)->doormask & D_ISOPEN)))
         return FALSE;
     return TRUE;
 }
@@ -1554,7 +1554,7 @@ can_center_spell_location(coordxy x, coordxy y)
 {
     if (distmin(u.ux, u.uy, x, y) > 10)
         return FALSE;
-    return (isok(x, y) && cansee(x, y) && !(IS_STWALL(levl[x][y].typ)));
+    return (isok(x, y) && cansee(x, y) && !(IS_STWALL(loc(x, y)->typ)));
 }
 
 static void
@@ -1620,7 +1620,7 @@ throwspell(void)
         return 1;
     } else if (((cc.x != u.ux || cc.y != u.uy) && !cansee(cc.x, cc.y)
                 && (!(mtmp = m_at(cc.x, cc.y)) || !canspotmon(mtmp)))
-               || IS_STWALL(levl[cc.x][cc.y].typ)) {
+               || IS_STWALL(loc(cc.x, cc.y)->typ)) {
         Your("mind fails to lock onto that location!");
         return 0;
     }

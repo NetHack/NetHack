@@ -98,9 +98,9 @@ static const char *const godvoices[] = {
 
 
 #define ugod_is_angry() (u.ualign.record < 0)
-#define on_altar() IS_ALTAR(levl[u.ux][u.uy].typ)
-#define on_shrine() ((levl[u.ux][u.uy].altarmask & AM_SHRINE) != 0)
-#define a_align(x, y) ((aligntyp) Amask2align(levl[x][y].altarmask & AM_MASK))
+#define on_altar() IS_ALTAR(loc(u.ux, u.uy)->typ)
+#define on_shrine() ((loc(u.ux, u.uy)->altarmask & AM_SHRINE) != 0)
+#define a_align(x, y) ((aligntyp) Amask2align(loc(x, y)->altarmask & AM_MASK))
 
 /* used by turn undead iteration function; always reinitialized
    before iterating that, so don't need to be globals */
@@ -167,8 +167,8 @@ stuck_in_wall(void)
                 continue;
             y = u.uy + j;
             if (!isok(x, y)
-                || (IS_ROCK(levl[x][y].typ)
-                    && (levl[x][y].typ != SDOOR && levl[x][y].typ != SCORR))
+                || (IS_ROCK(loc(x, y)->typ)
+                    && (loc(x, y)->typ != SDOOR && loc(x, y)->typ != SCORR))
                 || (blocked_boulder(i, j) && !throws_rocks(gy.youmonst.data)))
                 ++count;
         }
@@ -1643,9 +1643,9 @@ offer_different_alignment_altar(
             exercise(A_WIS, TRUE);
             change_luck(1);
             shrine = on_shrine();
-            levl[u.ux][u.uy].altarmask = Align2amask(u.ualign.type);
+            loc(u.ux, u.uy)->altarmask = Align2amask(u.ualign.type);
             if (shrine)
-                levl[u.ux][u.uy].altarmask |= AM_SHRINE;
+                loc(u.ux, u.uy)->altarmask |= AM_SHRINE;
             newsym(u.ux, u.uy); /* in case Invisible to self */
             if (!Blind)
                 pline_The("altar glows %s.",
@@ -1694,7 +1694,7 @@ sacrifice_your_race(
     } else if (altaralign != A_CHAOTIC && altaralign != A_NONE) {
         /* curse the lawful/neutral altar */
         pline_The("altar is stained with %s blood.", gu.urace.adj);
-        levl[u.ux][u.uy].altarmask = AM_CHAOTIC;
+        loc(u.ux, u.uy)->altarmask = AM_CHAOTIC;
         newsym(u.ux, u.uy); /* in case Invisible to self */
         angry_priest();
     } else {
@@ -1707,8 +1707,8 @@ sacrifice_your_race(
             pline(
             "The blood floods the altar, which vanishes in %s cloud!",
                     an(hcolor(NH_BLACK)));
-            levl[u.ux][u.uy].typ = ROOM;
-            levl[u.ux][u.uy].altarmask = 0;
+            loc(u.ux, u.uy)->typ = ROOM;
+            loc(u.ux, u.uy)->altarmask = 0;
             newsym(u.ux, u.uy);
             angry_priest();
             demonless_msg = "cloud dissipates";
@@ -1820,7 +1820,7 @@ dosacrifice(void)
         You("are too impaired to perform the rite.");
         return ECMD_OK;
     }
-    highaltar = (levl[u.ux][u.uy].altarmask & AM_SANCTUM);
+    highaltar = (loc(u.ux, u.uy)->altarmask & AM_SANCTUM);
 
     otmp = floorfood("sacrifice", 1);
     if (!otmp)
@@ -2402,8 +2402,8 @@ altarmask_at(coordxy x, coordxy y)
         if (mon && M_AP_TYPE(mon) == M_AP_FURNITURE
             && mon->mappearance == S_altar)
             res = has_mcorpsenm(mon) ? MCORPSENM(mon) : 0;
-        else if (IS_ALTAR(levl[x][y].typ))
-            res = levl[x][y].altarmask;
+        else if (IS_ALTAR(loc(x, y)->typ))
+            res = loc(x, y)->altarmask;
     }
     return res;
 }
@@ -2418,7 +2418,7 @@ a_gname(void)
 const char *
 a_gname_at(coordxy x, coordxy y)
 {
-    if (!IS_ALTAR(levl[x][y].typ))
+    if (!IS_ALTAR(loc(x, y)->typ))
         return (char *) 0;
 
     return align_gname(a_align(x, y));
@@ -2614,7 +2614,7 @@ blocked_boulder(int dx, int dy)
         return TRUE;
     if (!isok(nx, ny))
         return TRUE;
-    if (IS_ROCK(levl[nx][ny].typ))
+    if (IS_ROCK(loc(nx, ny)->typ))
         return TRUE;
     if (sobj_at(BOULDER, nx, ny))
         return TRUE;

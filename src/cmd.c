@@ -933,7 +933,7 @@ domonability(void)
     else if (is_mind_flayer(uptr))
         return domindblast();
     else if (u.umonnum == PM_GREMLIN) {
-        if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)) {
+        if (IS_FOUNTAIN(loc(u.ux, u.uy)->typ)) {
             if (split_mon(&gy.youmonst, (struct monst *) 0))
                 dryup(u.ux, u.uy, TRUE);
         } else
@@ -1624,7 +1624,7 @@ wiz_show_seenv(void)
             if (u_at(x, y)) {
                 row[curx] = row[curx + 1] = '@';
             } else {
-                v = levl[x][y].seenv & 0xff;
+                v = loc(x, y)->seenv & 0xff;
                 if (v == 0)
                     row[curx] = row[curx + 1] = ' ';
                 else
@@ -1695,7 +1695,7 @@ wiz_show_wmodes(void)
         putstr(win, 0, ""); /* tty only: blank top line */
     for (y = 0; y < ROWNO; y++) {
         for (x = 0; x < COLNO; x++) {
-            lev = &levl[x][y];
+            lev = loc(x, y);
             if (u_at(x, y))
                 row[x] = '@';
             else if (IS_WALL(lev->typ) || lev->typ == SDOOR)
@@ -1708,7 +1708,7 @@ wiz_show_wmodes(void)
                 row[x] = 'x';
         }
         row[COLNO] = '\0';
-        /* map column 0, levl[0][], is off the left edge of the screen */
+        /* map column 0, loc(0, )-> is off the left edge of the screen */
         putstr(win, 0, &row[1]);
     }
     display_nhwindow(win, TRUE);
@@ -1716,7 +1716,7 @@ wiz_show_wmodes(void)
     return ECMD_OK;
 }
 
-/* wizard mode variant of #terrain; internal levl[][].typ values in base-36 */
+/* wizard mode variant of #terrain; internal loc(, )->typ values in base-36 */
 static void
 wiz_map_levltyp(void)
 {
@@ -1727,14 +1727,14 @@ wiz_map_levltyp(void)
     boolean istty = !strcmp(windowprocs.name, "tty");
 
     win = create_nhwindow(NHW_TEXT);
-    /* map row 0, levl[][0], is drawn on the second line of tty screen */
+    /* map row 0, loc(, 0)-> is drawn on the second line of tty screen */
     if (istty)
         putstr(win, 0, ""); /* tty only: blank top line */
     for (y = 0; y < ROWNO; y++) {
-        /* map column 0, levl[0][], is off the left edge of the screen;
+        /* map column 0, loc(0, )-> is off the left edge of the screen;
            it should always have terrain type "undiggable stone" */
         for (x = 1; x < COLNO; x++) {
-            terrain = levl[x][y].typ;
+            terrain = loc(x, y)->typ;
             /* assumes there aren't more than 10+26+26 terrain types */
             row[x - 1] = (char) ((terrain == STONE && !may_dig(x, y))
                                     ? '*'
@@ -1745,7 +1745,7 @@ wiz_map_levltyp(void)
                                           : 'A' + terrain - 36);
         }
         x--;
-        if (levl[0][y].typ != STONE || may_dig(0, y))
+        if (loc(0, y)->typ != STONE || may_dig(0, y))
             row[x++] = '!';
         row[x] = '\0';
         putstr(win, 0, row);
@@ -2176,8 +2176,8 @@ doterrain(void)
      *  known map without mons (to see objects under monsters);
      * explore mode: normal choices plus full map (w/o mons, objs, traps);
      * wizard mode: normal and explore choices plus
-     *  a dump of the internal levl[][].typ codes w/ level flags, or
-     *  a legend for the levl[][].typ codes dump
+     *  a dump of the internal loc(, )->typ codes w/ level flags, or
+     *  a legend for the loc(, )->typ codes dump
      */
     men = create_nhwindow(NHW_MENU);
     start_menu(men, MENU_BEHAVE_STANDARD);
@@ -2202,11 +2202,11 @@ doterrain(void)
         if (wizard) {
             any.a_int = 5;
             add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                     clr, "internal levl[][].typ codes in base-36",
+                     clr, "internal loc(, )->typ codes in base-36",
                      MENU_ITEMFLAGS_NONE);
             any.a_int = 6;
             add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                     clr, "legend of base-36 levl[][].typ codes",
+                     clr, "legend of base-36 loc(, )->typ codes",
                      MENU_ITEMFLAGS_NONE);
         }
     }
@@ -5662,7 +5662,7 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
 {
     int K = 0;
     char buf[BUFSZ];
-    schar typ = levl[x][y].typ;
+    schar typ = loc(x, y)->typ;
     stairway *stway = stairway_at(x, y);
     struct trap *ttmp;
 
@@ -5755,7 +5755,7 @@ there_cmd_menu_next2u(
 {
     int K = 0;
     char buf[BUFSZ];
-    schar typ = levl[x][y].typ;
+    schar typ = loc(x, y)->typ;
     struct trap *ttmp;
     struct monst *mtmp;
 
@@ -5764,7 +5764,7 @@ there_cmd_menu_next2u(
 
     if (IS_DOOR(typ)) {
         boolean key_or_pick, card;
-        int dm = levl[x][y].doormask;
+        int dm = loc(x, y)->doormask;
 
         if ((dm & (D_CLOSED | D_LOCKED))) {
             mcmd_addmenu(win, MCMD_OPEN_DOOR, "Open the door"), ++K;
@@ -5799,7 +5799,7 @@ there_cmd_menu_next2u(
         mcmd_addmenu(win, MCMD_MOVE_DIR, "Move on the trap"), ++K;
     }
 
-    if (levl[x][y].glyph == objnum_to_glyph(BOULDER))
+    if (loc(x, y)->glyph == objnum_to_glyph(BOULDER))
         mcmd_addmenu(win, MCMD_MOVE_DIR, "Push the boulder"), ++K;
 
     mtmp = m_at(x, y);
@@ -6160,11 +6160,11 @@ domouseaction(void)
 
         if (x == 0 && y == 0) {
             /* here */
-            if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)
-                || IS_SINK(levl[u.ux][u.uy].typ)) {
+            if (IS_FOUNTAIN(loc(u.ux, u.uy)->typ)
+                || IS_SINK(loc(u.ux, u.uy)->typ)) {
                 cmdq_add_ec(CQ_CANNED, dodrink);
                 return ECMD_OK;
-            } else if (IS_THRONE(levl[u.ux][u.uy].typ)) {
+            } else if (IS_THRONE(loc(u.ux, u.uy)->typ)) {
                 cmdq_add_ec(CQ_CANNED, dosit);
                 return ECMD_OK;
             } else if (On_stairs_up(u.ux, u.uy)) {
@@ -6187,18 +6187,18 @@ domouseaction(void)
         dir = xytod(x, y);
         if (!m_at(u.ux + x, u.uy + y)
             && !test_move(u.ux, u.uy, x, y, TEST_MOVE)) {
-            if (IS_DOOR(levl[u.ux + x][u.uy + y].typ)) {
+            if (IS_DOOR(loc(u.ux + x, u.uy + y)->typ)) {
                 /* slight assistance to player: choose kick/open for them */
-                if (levl[u.ux + x][u.uy + y].doormask & D_LOCKED) {
+                if (loc(u.ux + x, u.uy + y)->doormask & D_LOCKED) {
                     cmdq_add_ec(CQ_CANNED, dokick);
                     return ECMD_OK;
                 }
-                if (levl[u.ux + x][u.uy + y].doormask & D_CLOSED) {
+                if (loc(u.ux + x, u.uy + y)->doormask & D_CLOSED) {
                     cmdq_add_ec(CQ_CANNED, doopen);
                     return ECMD_OK;
                 }
             }
-            if (levl[u.ux + x][u.uy + y].typ <= SCORR) {
+            if (loc(u.ux + x, u.uy + y)->typ <= SCORR) {
                 cmdq_add_ec(CQ_CANNED, dosearch);
                 return ECMD_OK;
             }

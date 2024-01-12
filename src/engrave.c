@@ -638,7 +638,7 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
                ? "You hear drilling!"    /* Deaf-aware */
                : Blind
                   ? "You feel tremors."
-                  : IS_GRAVE(levl[u.ux][u.uy].typ)
+                  : IS_GRAVE(loc(u.ux, u.uy)->typ)
                      ? "Chips fly out from the headstone."
                      : de->frosted
                         ? "Ice chips fly up from the ice surface!"
@@ -938,19 +938,19 @@ doengrave(void)
         cant_reach_floor(u.ux, u.uy, FALSE, TRUE);
         goto doengr_exit;
     }
-    if (IS_ALTAR(levl[u.ux][u.uy].typ)) {
+    if (IS_ALTAR(loc(u.ux, u.uy)->typ)) {                                                                      
         You("make a motion towards the altar with %s.", de->writer);
         altar_wrath(u.ux, u.uy);
         goto doengr_exit;
     }
-    if (IS_GRAVE(levl[u.ux][u.uy].typ)) {
+    if (IS_GRAVE(loc(u.ux, u.uy)->typ)) {
         if (de->otmp == &hands_obj) { /* using only finger */
             You("would only make a small smudge on the %s.",
                 surface(u.ux, u.uy));
             goto doengr_exit;
-        } else if (!levl[u.ux][u.uy].disturbed) {
+        } else if (!loc(u.ux, u.uy)->disturbed) {
             /* disturb the grave: summon a ghoul, same as sometimes
-               happens when kicking; sets levl[ux][uy]->disturbed so
+               happens when kicking; sets loc(ux, uy)->>disturbed so
                that it'll only happen once */
             disturb_grave(u.ux, u.uy);
             goto doengr_exit;
@@ -961,7 +961,7 @@ doengrave(void)
     if (!doengrave_sfx_item(de))
         goto doengr_exit;
 
-    if (IS_GRAVE(levl[u.ux][u.uy].typ)) {
+    if (IS_GRAVE(loc(u.ux, u.uy)->typ)) {
         if (de->type == ENGRAVE || de->type == 0) {
             de->type = HEADSTONE;
         } else {
@@ -1012,7 +1012,7 @@ doengrave(void)
     if (de->zapwand && (de->otmp->spe < 0)) {
         pline("%s %sturns to dust.", The(xname(de->otmp)),
               Blind ? "" : "glows violently, then ");
-        if (!IS_GRAVE(levl[u.ux][u.uy].typ))
+        if (!IS_GRAVE(loc(u.ux, u.uy)->typ))
             You(
     "are not going to get anywhere trying to write in the %s with your dust.",
                 de->frosted ? "frost" : "dust");
@@ -1551,7 +1551,7 @@ make_grave(coordxy x, coordxy y, const char *str)
     char buf[BUFSZ];
 
     /* Can we put a grave here? */
-    if ((levl[x][y].typ != ROOM && levl[x][y].typ != GRAVE) || t_at(x, y))
+    if ((loc(x, y)->typ != ROOM && loc(x, y)->typ != GRAVE) || t_at(x, y))
         return;
     /* Make the grave */
     if (!set_levltyp(x, y, GRAVE))
@@ -1568,7 +1568,7 @@ make_grave(coordxy x, coordxy y, const char *str)
 void
 disturb_grave(coordxy x, coordxy y)
 {
-    struct rm *lev = &levl[x][y];
+    struct rm *lev = loc(x, y);
 
     if (!IS_GRAVE(lev->typ)) {
         impossible("Disturing grave that isn't a grave? (%d)", lev->typ);

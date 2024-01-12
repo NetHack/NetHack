@@ -955,7 +955,7 @@ bot_via_windowport(void)
     condtests[bl_submerged].test = (Underwater) ? TRUE : FALSE;
     test_if_enabled(bl_elf_iron) = (FALSE);
     test_if_enabled(bl_bareh)    = (!uarmg && !uwep);
-    test_if_enabled(bl_icy)      = (levl[u.ux][u.uy].typ == ICE);
+    test_if_enabled(bl_icy)      = (loc(u.ux, u.uy)->typ == ICE);
     test_if_enabled(bl_slippery) = (Glib) ? TRUE : FALSE;
     test_if_enabled(bl_woundedl) = (Wounded_legs) ? TRUE : FALSE;
 

@@ -365,7 +365,7 @@ remove_region(NhRegion *reg)
                 for (y = reg->bounding_box.ly; y <= reg->bounding_box.hy; y++)
                     if (isok(x, y) && inside_region(reg, x, y)) {
                         if (pass == 1) {
-                            if (!does_block(x, y, &levl[x][y]))
+                            if (!does_block(x, y, loc(x, y)))
                                 unblock_point(x, y);
                         } else { /* pass==2 */
                             if (cansee(x, y))
@@ -1019,7 +1019,7 @@ expire_gas_cloud(genericptr_t p1, genericptr_t p2 UNUSED)
             for (y = reg->bounding_box.ly; y <= reg->bounding_box.hy; y++) {
                 if (inside_region(reg, x, y)) {
                     if (pass == 1) {
-                        if (!does_block(x, y, &levl[x][y]))
+                        if (!does_block(x, y, loc(x, y)))
                             unblock_point(x, y);
                         if (u_at(x, y))
                             gg.gas_cloud_diss_within = TRUE;

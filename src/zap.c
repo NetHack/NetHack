@@ -817,7 +817,7 @@ static boolean
 zombie_can_dig(coordxy x, coordxy y)
 {
     if (isok(x, y)) {
-        schar typ = levl[x][y].typ;
+        schar typ = loc(x, y)->typ;
         struct trap *ttmp;
 
         if ((ttmp = t_at(x, y)) != 0)
@@ -919,7 +919,7 @@ revive(struct obj *corpse, boolean by_hero)
     }
 
     if (corpse->norevive
-        || (mons[montype].mlet == S_EEL && !IS_POOL(levl[x][y].typ))) {
+        || (mons[montype].mlet == S_EEL && !IS_POOL(loc(x, y)->typ))) {
         if (cansee(x, y))
             pline("%s twitches feebly.",
                 upstart(corpse_xname(corpse, (const char *) 0, CXN_PFX_THE)));
@@ -1874,13 +1874,13 @@ poly_obj(struct obj *obj, int id)
         } /* old_wornmask */
     } else if (obj_location == OBJ_FLOOR) {
         if (obj->otyp == BOULDER && otmp->otyp != BOULDER) {
-            if (!does_block(ox, oy, &levl[ox][oy]))
+            if (!does_block(ox, oy, loc(ox, oy)))
                 unblock_point(ox, oy);
         } else if (obj->otyp != BOULDER && otmp->otyp == BOULDER) {
             /* leaving boulder in liquid would trigger sanity_check warning */
             if (is_pool_or_lava(ox, oy))
                 fracture_rock(otmp);
-            if (does_block(ox, oy, &levl[ox][oy]))
+            if (does_block(ox, oy, loc(ox, oy)))
                 block_point(ox, oy);
         }
     }
@@ -3175,7 +3175,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
     case WAN_LOCKING:
     case SPE_WIZARD_LOCK:
         /* down at open bridge or up or down at open portcullis */
-        if (((levl[x][y].typ == DRAWBRIDGE_DOWN)
+        if (((loc(x, y)->typ == DRAWBRIDGE_DOWN)
                  ? (u.dz > 0)
                  : (is_drawbridge_wall(x, y) >= 0 && !is_db_wall(x, y)))
             && find_drawbridge(&xx, &yy)) {
@@ -3564,7 +3564,7 @@ zap_map(
         }
 
     } else if (!u.dz) {
-        int ltyp = levl[x][y].typ;
+        int ltyp = loc(x, y)->typ;
 
         if (find_drawbridge(&dbx, &dby)) {
             switch (obj->otyp) {
@@ -3581,7 +3581,7 @@ zap_map(
             case SPE_WIZARD_LOCK:
                 /* drawbridge_down: span of lowered drawbridge */
                 if ((cansee(dbx, dby) || cansee(x, y))
-                    && levl[dbx][dby].typ == DRAWBRIDGE_DOWN)
+                    && loc(dbx, dby)->typ == DRAWBRIDGE_DOWN)
                     learn_it = TRUE;
                 close_drawbridge(dbx, dby);
                 break;
@@ -3617,7 +3617,7 @@ zap_map(
         ltyp = SURFACE_AT(x, y);
         /* secret door gets revealed, converted into regular door */
         if (ltyp == SDOOR) {
-            cvt_sdoor_to_door(&levl[x][y]); /* .typ = DOOR */
+            cvt_sdoor_to_door(loc(x, y)); /* .typ = DOOR */
             newsym(x, y);
             if (cansee(x, y)) {
                 pline("Probing reveals a secret door.");
@@ -3630,7 +3630,7 @@ zap_map(
            still be secret; for the !cansee(x,y) case, show_map_spot()
            above has already converted the spot to regular corridor */
         } else if (ltyp == SCORR) {
-            levl[x][y].typ = CORR;
+            loc(x, y)->typ = CORR;
             unblock_point(x, y);
             newsym(x, y);
             pline("Probing exposes a secret corridor.");
@@ -3768,7 +3768,7 @@ bhit(
             goto bhit_done;
         }
 
-        typ = levl[x][y].typ;
+        typ = loc(x, y)->typ;
 
         /* WATER aka "wall of water" stops items */
         if (IS_WATERWALL(typ) || typ == LAVAWALL) {
@@ -3798,7 +3798,7 @@ bhit(
             /* cancellation/opening/locking/striking/probing */
             zap_map(x, y, obj);
             /* terrain might have changed (exposed secret door|corridor) */
-            typ = levl[x][y].typ;
+            typ = loc(x, y)->typ;
         }
 
         mtmp = m_at(x, y);
@@ -3900,7 +3900,7 @@ bhit(
             }
         } else {
             if (weapon == ZAPPED_WAND && obj->otyp == WAN_PROBING
-                && glyph_is_invisible(levl[x][y].glyph)) {
+                && glyph_is_invisible(loc(x, y)->glyph)) {
                 unmap_object(x, y);
                 newsym(x, y);
             }
@@ -3927,7 +3927,7 @@ bhit(
                 if (doorlock(obj, x, y)) {
                     if (cansee(x, y) || (obj->otyp == WAN_STRIKING && !Deaf))
                         learnwand(obj);
-                    if (levl[x][y].doormask == D_BROKEN
+                    if (loc(x, y)->doormask == D_BROKEN
                         && *in_rooms(x, y, SHOPBASE)) {
                         shopdoor = TRUE;
                         add_damage(x, y, SHOP_DOOR_COST);
@@ -3944,7 +3944,7 @@ bhit(
         if (weapon != ZAPPED_WAND && weapon != INVIS_BEAM) {
             /* 'I' present but no monster: erase */
             /* do this before the tmp_at() */
-            if (glyph_is_invisible(levl[x][y].glyph) && cansee(x, y)) {
+            if (glyph_is_invisible(loc(x, y)->glyph) && cansee(x, y)) {
                 unmap_object(x, y);
                 newsym(x, y);
             }
@@ -4047,7 +4047,7 @@ boomhit(struct obj *obj, coordxy dx, coordxy dy)
             tmp_at(DISP_END, 0);
             return mtmp;
         }
-        if (!ZAP_POS(levl[gb.bhitpos.x][gb.bhitpos.y].typ)
+        if (!ZAP_POS(loc(gb.bhitpos.x, gb.bhitpos.y)->typ)
             || closed_door(gb.bhitpos.x, gb.bhitpos.y)) {
             gb.bhitpos.x -= dx;
             gb.bhitpos.y -= dy;
@@ -4068,7 +4068,7 @@ boomhit(struct obj *obj, coordxy dx, coordxy dy)
         }
         tmp_at(gb.bhitpos.x, gb.bhitpos.y);
         nh_delay_output();
-        if (IS_SINK(levl[gb.bhitpos.x][gb.bhitpos.y].typ)) {
+        if (IS_SINK(loc(gb.bhitpos.x, gb.bhitpos.y)->typ)) {
             Soundeffect(se_boomerang_klonk, 75);
             if (!Deaf)
                 pline("Klonk!");
@@ -4636,7 +4636,7 @@ dobuzz(
         sx += dx;
         lsy = sy;
         sy += dy;
-        if (!isok(sx, sy) || levl[sx][sy].typ == STONE)
+        if (!isok(sx, sy) || loc(sx, sy)->typ == STONE)
             goto make_bounce;
 
         mon = m_at(sx, sy);
@@ -4646,7 +4646,7 @@ dobuzz(
                 map_invisible(sx, sy);
             else if (!mon)
                 (void) unmap_invisible(sx, sy);
-            if (ZAP_POS(levl[sx][sy].typ)
+            if (ZAP_POS(loc(sx, sy)->typ)
                 || (isok(lsx, lsy) && cansee(lsx, lsy)))
                 tmp_at(sx, sy);
             nh_delay_output(); /* wait a little */
@@ -4799,14 +4799,14 @@ dobuzz(
         if (gas_hit)
             (void) zap_over_floor(sx, sy, type, &shopdamage, TRUE, 0);
 
-        if (!ZAP_POS(levl[sx][sy].typ)
+        if (!ZAP_POS(loc(sx, sy)->typ)
             || (closed_door(sx, sy) && range >= 0)) {
             int bounce, bchance;
             uchar rmn;
 
  make_bounce:
-            bchance = (!isok(sx, sy) || levl[sx][sy].typ == STONE) ? 10
-                      : (In_mines(&u.uz) && IS_WALL(levl[sx][sy].typ)) ? 20
+            bchance = (!isok(sx, sy) || loc(sx, sy)->typ == STONE) ? 10
+                      : (In_mines(&u.uz) && IS_WALL(loc(sx, sy)->typ)) ? 20
                         : 75;
             bounce = 0;
             if ((--range > 0 && isok(lsx, lsy) && cansee(lsx, lsy))
@@ -4828,15 +4828,15 @@ dobuzz(
                 dx = -dx;
                 dy = -dy;
             } else {
-                if (isok(sx, lsy) && ZAP_POS(rmn = levl[sx][lsy].typ)
+                if (isok(sx, lsy) && ZAP_POS(rmn = loc(sx, lsy)->typ)
                     && !closed_door(sx, lsy)
                     && (IS_ROOM(rmn) || (isok(sx + dx, lsy)
-                                         && ZAP_POS(levl[sx + dx][lsy].typ))))
+                                         && ZAP_POS(loc(sx + dx, lsy)->typ))))
                     bounce = 1;
-                if (isok(lsx, sy) && ZAP_POS(rmn = levl[lsx][sy].typ)
+                if (isok(lsx, sy) && ZAP_POS(rmn = loc(lsx, sy)->typ)
                     && !closed_door(lsx, sy)
                     && (IS_ROOM(rmn) || (isok(lsx, sy + dy)
-                                         && ZAP_POS(levl[lsx][sy + dy].typ))))
+                                         && ZAP_POS(loc(lsx, sy + dy)->typ))))
                     if (!bounce || rn2(2))
                         bounce = 2;
 
@@ -4872,7 +4872,7 @@ dobuzz(
 void
 melt_ice(coordxy x, coordxy y, const char *msg)
 {
-    struct rm *lev = &levl[x][y];
+    struct rm *lev = loc(x, y);
     struct obj *otmp;
     struct monst *mtmp;
 
@@ -4982,7 +4982,7 @@ zap_over_floor(
     const char *zapverb;
     struct monst *mon;
     struct trap *t;
-    struct rm *lev = &levl[x][y];
+    struct rm *lev = loc(x, y);
     boolean see_it = cansee(x, y), yourzap;
     int rangemod = 0, damgtype = zaptype(type) % 10;
     boolean lavawall = (lev->typ == LAVAWALL);
@@ -5082,8 +5082,8 @@ zap_over_floor(
                                          : (lev->typ == POOL) ? ICED_POOL
                                                               : ICED_MOAT;
                     if (lavawall) {
-                        if ((isok(x, y-1) && IS_WALL(levl[x][y-1].typ))
-                            || (isok(x, y+1) && IS_WALL(levl[x][y+1].typ)))
+                        if ((isok(x, y-1) && IS_WALL(loc(x, y-1)->typ))
+                            || (isok(x, y+1) && IS_WALL(loc(x, y+1)->typ)))
                             lev->typ = VWALL;
                         else
                             lev->typ = HWALL;
@@ -5210,8 +5210,8 @@ zap_over_floor(
     }
 
     /* secret door gets revealed, converted into regular door */
-    if (levl[x][y].typ == SDOOR) {
-        cvt_sdoor_to_door(&levl[x][y]); /* .typ = DOOR */
+    if (loc(x, y)->typ == SDOOR) {
+        cvt_sdoor_to_door(loc(x, y)); /* .typ = DOOR */
         /* target spot will now pass closed_door() test below
            (except on rogue level) */
         newsym(x, y);
@@ -5380,7 +5380,7 @@ fracture_rock(struct obj *obj) /* no texts here! */
     if (obj->where == OBJ_FLOOR) {
         obj_extract_self(obj); /* move rocks back on top */
         place_object(obj, obj->ox, obj->oy);
-        if (!does_block(obj->ox, obj->oy, &levl[obj->ox][obj->oy])) {
+        if (!does_block(obj->ox, obj->oy, loc(obj->ox, obj->oy))) {
             unblock_point(obj->ox, obj->oy);
             /* need immediate update in case this is a striking/force bolt
                zap that is about hit more things */
@@ -6102,8 +6102,8 @@ makewish(void)
                *oops_msg = (u.uswallow
                             ? "Oops!  %s out of your reach!"
                             : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
-                               || levl[u.ux][u.uy].typ < IRONBARS
-                               || levl[u.ux][u.uy].typ >= ICE)
+                               || loc(u.ux, u.uy)->typ < IRONBARS
+                               || loc(u.ux, u.uy)->typ >= ICE)
                                ? "Oops!  %s away from you!"
                                : "Oops!  %s to the floor!");
 
