@@ -1665,10 +1665,12 @@ choose_classes_menu(const char *prompt,
     start_menu(win, MENU_BEHAVE_STANDARD);
     while (*class_list) {
         int idx;
+
         selected = FALSE;
         switch (category) {
         case 0:
-            if ((idx = def_char_to_monclass(*class_list)) == MAXMCLASSES) {
+            idx = def_char_to_monclass(*class_list);
+            if (!IndexOk(idx, def_monsyms)) {
                 panic("choose_classes_menu: invalid monclass '%c'", *class_list);
                 /*NOTREACHED*/
             }
@@ -1677,7 +1679,8 @@ choose_classes_menu(const char *prompt,
             Sprintf(buf, "%s", text);
             break;
         case 1:
-            if ((idx = def_char_to_objclass(*class_list)) == MAXOCLASSES) {
+            idx = def_char_to_objclass(*class_list);
+            if (!IndexOk(idx, def_oc_syms)) {
                 panic("choose_classes_menu: invalid objclass '%c'", *class_list);
                 /*NOTREACHED*/
             }

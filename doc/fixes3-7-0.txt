@@ -2619,6 +2619,8 @@ fix msg_window:combination and TTY getlin() ^P (pr #1155 by entrez)
 remove a null sobj check from gold_detect that was situated after
 	dereferences had already been done (pr #1173 by argrath) and
 	adjust prototype in extern.h
+check for valid indexes of def_monsyms[] and def_oc_syms[] in
+	choose_classes_menu() (pr #1179 by argrath)
 
 
 Code Cleanup and Reorganization
