@@ -1,4 +1,4 @@
-/* NetHack 3.7	monsters.h	$NHDT-Date: 1703845746 2023/12/29 10:29:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.117 $ */
+/* NetHack 3.7	monsters.h	$NHDT-Date: 1705092146 2024/01/12 20:42:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3350,6 +3350,12 @@
         M1_HUMANOID | M1_OMNIVORE, M2_NOPOLY | M2_HUMAN | M2_PEACEFUL
                                        | M2_STRONG | M2_COLLECT | M2_MAGIC,
         M3_INFRAVISIBLE, 8, HI_DOMESTIC, APPRENTICE),
+
+    /*
+     * mons_init() in monst.c adds a terminator here, mons[NUMMONS].
+     * It is part of the mons[] array without introducing another type
+     * of monster.
+     */
 
 #if defined(MONS_ENUM) || defined(DUMP_ENUMS)
 #undef MON
