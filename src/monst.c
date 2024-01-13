@@ -15,27 +15,20 @@
 /* monster type with single name */
 #define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, \
             flg1, flg2, flg3, d, col, bn)           \
-    {                                                                       \
-        { (const char *) 0, (const char *) 0, nam },                        \
-        PM_##bn,                                                            \
-        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, col         \
-    }
-
-/* monster type with distinct male, female, neuter names */
-#define MON3(namm, namf, namn, sym, lvl, gen, atk, siz, mr1, mr2, \
-             flg1, flg2, flg3, d, col, bn)                        \
-    {                                                                       \
-        { namm, namf, namn },                                               \
-        PM_##bn,                                                            \
-        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, col         \
+    {                                                                   \
+        nam, PM_##bn,                                                   \
+        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, col     \
     }
 
 /* LVL() and SIZ() collect several fields to cut down on number of args
- * for MON()/MON3().
+ * for MON().  Using more than 15 would fail to conform to the C Standard.
+ * ATTK() and A() are to avoid braces and commas within args to MON().
+ * NAM() and NAMS() are used for both reasons.
  */
+#define NAM(name) { (const char *) 0, (const char *) 0, name }
+#define NAMS(namm, namf, namn) { namm, namf, namn }
 #define LVL(lvl, mov, ac, mr, aln) lvl, mov, ac, mr, aln
 #define SIZ(wt, nut, snd, siz) wt, nut, snd, siz
-/* ATTK() and A() are to avoid braces and commas within args to MON() */
 #define ATTK(at, ad, n, d) { at, ad, n, d }
 #define A(a1, a2, a3, a4, a5, a6) { a1, a2, a3, a4, a5, a6 }
 
@@ -51,13 +44,12 @@ struct permonst mons_init[NUMMONS + 1] = {
 #undef MON
 #define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, \
             flg1, flg2, flg3, d, col, bn)           \
-    {                                                                       \
-        { (const char *) 0, (const char *) 0, nam },                        \
-        NON_PM,                                                             \
-        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, col         \
+    {                                                                   \
+        nam, NON_PM,                                                    \
+        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, col     \
     }
-    MON("", 0, LVL(0, 0, 0, 0, 0),
-        G_NOGEN | G_NOCORPSE,
+    MON(NAM(""), 0,
+        LVL(0, 0, 0, 0, 0), G_NOGEN | G_NOCORPSE,
         A(NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(0, 0, 0, 0), 0, 0,
         0L,  M2_NOPOLY, 0,
@@ -65,7 +57,8 @@ struct permonst mons_init[NUMMONS + 1] = {
 };
 
 #undef MON
-#undef MON3
+#undef NAM
+#undef NAMS
 
 void monst_globals_init(void); /* in hack.h but we're using config.h */
 
