@@ -160,6 +160,8 @@ struct monst {
     Bitfield(mtemplit, 1);  /* temporarily seen; only valid during bhit() */
     Bitfield(meverseen, 1); /* mon has been seen at some point */
 
+    Bitfield(mspotted, 1);  /* mon is currently seen by hero */
+
 #define MAX_NUM_WORMS 32    /* should be 2^(wormno bitfield size) */
 
     unsigned long mstrategy; /* for monsters with mflag3: current strategy */

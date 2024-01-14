@@ -4650,6 +4650,8 @@ Allow sounds to be emitted from an integrated sound library (default on).
 Display a sparkly effect when a monster (including yourself) is hit by an
 attack to which it is resistant (default on).
 Persistent.
+.lp spot_monsters
+Show a message when hero notices a monster (default is off).
 .lp standout
 Boldface monsters and \(lq\fB\-\-More\-\-\fP\(rq (default off).
 Persistent.
@@ -5938,6 +5940,8 @@ Rogue-like commands.
 Prevent walking into water or lava.
 .lp accessiblemsg
 Adds direction or location information to messages.
+.lp spot_monsters
+Shows a message when hero notices a monster; combine with accessiblemsg.
 .lp autodescribe
 Automatically describe the terrain under the cursor when targeting.
 .lp mention_walls

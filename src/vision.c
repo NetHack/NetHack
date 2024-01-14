@@ -837,6 +837,8 @@ vision_recalc(int control)
     /* Set the new min and max pointers. */
     gv.viz_rmin = next_rmin;
     gv.viz_rmax = next_rmax;
+
+    notice_all_mons(TRUE);
 }
 
 /*

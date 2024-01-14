@@ -191,7 +191,19 @@ struct debug_flags {
 struct accessibility_data {
     boolean accessiblemsg; /* use msg_loc for plined messages */
     coord msg_loc;         /* accessiblemsg: location */
+    boolean mon_notices;   /* msg when hero notices a monster */
+    int mon_notices_blocked; /* temp disable mon_notices */
 };
+
+/* Use notice_mon_off() / notice_mon_on() to temporarily disable
+   noticing the monsters in the vision code - perhaps the game
+   needs to output some other messages in between.
+   Call notice_all_mons() afterwards to catch up. */
+#define notice_mon_off() do { a11y.mon_notices_blocked++; } while(0)
+#define notice_mon_on()  do { if (--a11y.mon_notices_blocked < 0) { \
+            impossible("mon_notices_blocked<0");                    \
+            a11y.mon_notices_blocked = 0;                           \
+        } } while(0)
 
 /*
  * Stuff that really isn't option or platform related and does not

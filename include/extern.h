@@ -1074,6 +1074,8 @@ extern boolean test_move(coordxy, coordxy, coordxy, coordxy, int);
 extern int wiz_debug_cmd_traveldisplay(void);
 #endif
 extern boolean u_rooted(void);
+extern void notice_mon(struct monst *) NONNULLARG1;
+extern void notice_all_mons(boolean);
 extern void impact_disturbs_zombies(struct obj *, boolean) NONNULLARG1;
 extern void disturb_buried_zombies(coordxy, coordxy);
 extern boolean u_maybe_impaired(void);

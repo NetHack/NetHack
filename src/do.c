@@ -1807,6 +1807,7 @@ goto_level(
     /* Reset the screen. */
     vision_reset(); /* reset the blockages */
     reset_glyphmap(gm_levelchange);
+    notice_mon_off(); /* not noticing monsters yet! */
     docrt(); /* does a full vision recalc */
     flush_screen(-1);
 
@@ -1923,6 +1924,8 @@ goto_level(
 #ifdef INSURANCE
     save_currentstate();
 #endif
+    notice_mon_on();
+    notice_all_mons(TRUE);
 
     print_level_annotation();
     /* give room entrance message, if any */

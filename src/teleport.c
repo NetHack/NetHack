@@ -513,6 +513,7 @@ teleds(coordxy nux, coordxy nuy, int teleds_flags)
     see_monsters();
     gv.vision_full_recalc = 1;
     nomul(0);
+    notice_mon_off();
     vision_recalc(0); /* vision before effects */
 
     /* this used to take place sooner, but if a --More-- prompt was issued
@@ -542,6 +543,8 @@ teleds(coordxy nux, coordxy nuy, int teleds_flags)
     /* possible shop entry message comes after guard's shrill whistle */
     spoteffects(TRUE);
     invocation_message();
+    notice_mon_on();
+    notice_all_mons(TRUE);
     return;
 }
 

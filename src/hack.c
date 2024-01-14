@@ -12,6 +12,7 @@ static int moverock(void);
 static void dosinkfall(void);
 static boolean findtravelpath(int);
 static boolean trapmove(coordxy, coordxy, struct trap *);
+static int QSORTCALLBACK notice_mons_cmp(const genericptr, const genericptr);
 static schar u_simple_floortyp(coordxy, coordxy);
 static boolean swim_move_danger(coordxy, coordxy);
 static boolean domove_bump_mon(struct monst *, int) NONNULLARG1;
@@ -1599,6 +1600,80 @@ u_rooted(void)
         return TRUE;
     }
     return FALSE;
+}
+
+void
+notice_mon(struct monst *mtmp)
+{
+    if (a11y.mon_notices && !a11y.mon_notices_blocked) {
+        boolean spot = canspotmon(mtmp)
+            && !(is_hider(mtmp->data)
+                 && (mtmp->mundetected
+                     || M_AP_TYPE(mtmp) == M_AP_FURNITURE
+                     || M_AP_TYPE(mtmp) == M_AP_OBJECT));
+
+        if (spot && !mtmp->mspotted && !DEADMONSTER(mtmp)) {
+            mtmp->mspotted = TRUE;
+            set_msg_xy(mtmp->mx, mtmp->my);
+            You("%s %s.", canseemon(mtmp) ? "see" : "notice",
+                x_monnam(mtmp,
+                     mtmp->mtame ? ARTICLE_YOUR
+                     : (!has_mgivenname(mtmp)
+                        && !type_is_pname(mtmp->data)) ? ARTICLE_A
+                     : ARTICLE_NONE,
+                     (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
+                     has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
+        } else if (!spot) {
+            mtmp->mspotted = FALSE;
+        }
+    }
+}
+
+static int QSORTCALLBACK
+notice_mons_cmp(const genericptr ptr1, const genericptr ptr2)
+{
+    const struct monst *m1 = *(const struct monst **) ptr1,
+        *m2 = *(const struct monst **) ptr2;
+
+    return (distu(m1->mx, m1->my) - distu(m2->mx, m2->my));
+}
+
+void
+notice_all_mons(boolean reset)
+{
+    if (a11y.mon_notices && !a11y.mon_notices_blocked) {
+        struct monst *mtmp;
+        struct monst **arr = NULL;
+        int i = 0, cnt = 0;
+
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+            if (canspotmon(mtmp))
+                cnt++;
+            else if (reset)
+                mtmp->mspotted = FALSE;
+
+        if (!cnt)
+            return;
+
+        arr = (struct monst **) alloc(cnt * sizeof(struct monst *));
+
+
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (!canspotmon(mtmp))
+                mtmp->mspotted = FALSE;
+            else if (!DEADMONSTER(mtmp) && i < cnt)
+                arr[i++] = mtmp;
+        }
+
+        if (i) {
+            qsort((genericptr_t) arr, (size_t) i, sizeof *arr, notice_mons_cmp);
+
+            for (i = 0; i < cnt; i++)
+                notice_mon(arr[i]);
+        }
+
+        free(arr);
+    }
 }
 
 /* maybe disturb buried zombies when an object is dropped or thrown nearby */

@@ -705,6 +705,8 @@ newgame(void)
 {
     int i;
 
+    /* make sure welcome messages are given before noticing monsters */
+    notice_mon_off();
     disp.botlx = TRUE;
     gc.context.ident = 1;
     gc.context.warnlevel = 1;
@@ -765,6 +767,8 @@ newgame(void)
 
     /* Success! */
     welcome(TRUE);
+    notice_mon_on(); /* now we can notice monsters */
+    notice_all_mons(TRUE);
     return;
 }
 

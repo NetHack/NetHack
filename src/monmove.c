@@ -1307,6 +1307,8 @@ postmov(
     boolean canseeit = cansee(mtmp->mx, mtmp->my),
             didseeit = canseeit;
 
+    notice_mon(mtmp);
+
     if (mmoved == MMOVE_MOVED) {
         nix = mtmp->mx, niy = mtmp->my;
         /* sequencing issue:  when monster movement decides that a
