@@ -11,11 +11,6 @@
 
 /* Relevant header information in rm.h, objclass.h, sym.h, defsym.h. */
 
-#ifdef C
-#undef C
-#endif
-#define C(n) n
-
 /* Default object class symbols.  See objclass.h.
  * {symbol, name, explain}
  *     name:    used in object_detect().
@@ -38,17 +33,17 @@ const struct class_sym def_monsyms[MAXMCLASSES] = {
 
 const struct symdef def_warnsyms[WARNCOUNT] = {
     /* white warning  */
-    { '0', "unknown creature causing you worry",    C(CLR_WHITE) },
+    { '0', "unknown creature causing you worry",    CLR_WHITE },
     /* pink warning   */
-    { '1', "unknown creature causing you concern",  C(CLR_RED) },
+    { '1', "unknown creature causing you concern",  CLR_RED },
     /* red warning    */
-    { '2', "unknown creature causing you anxiety",  C(CLR_RED) },
+    { '2', "unknown creature causing you anxiety",  CLR_RED },
     /* ruby warning   */
-    { '3', "unknown creature causing you disquiet", C(CLR_RED) },
+    { '3', "unknown creature causing you disquiet", CLR_RED },
     /* purple warning */
-    { '4', "unknown creature causing you alarm",    C(CLR_MAGENTA) },
+    { '4', "unknown creature causing you alarm",    CLR_MAGENTA },
     /* black warning  */
-    { '5', "unknown creature causing you dread",    C(CLR_BRIGHT_MAGENTA) },
+    { '5', "unknown creature causing you dread",    CLR_BRIGHT_MAGENTA },
 };
 
 /*
