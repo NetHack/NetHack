@@ -8,9 +8,10 @@
 
 /* Global declarations */
 
-void curses_line_input_dialog(const char *prompt, char *answer, int buffer);
+void curses_line_input_dialog(const char *prompt, char *answer,
+                                                      int buffer) NONNULLPTRS;
 int curses_character_input_dialog(const char *prompt, const char *choices,
-                                  char def);
+                                                        char def) NONNULLARG1;
 int curses_ext_cmd(void);
 void curses_create_nhmenu(winid wid, unsigned long);
 void curses_add_nhmenu_item(winid wid, const glyph_info *glyphinfo,
@@ -24,6 +25,7 @@ boolean curses_menu_exists(winid wid);
 void curses_del_menu(winid, boolean);
 boolean curs_nonselect_menu_action(WINDOW *win, void *menu, int how,
                                    int curletter, int *curpage_p,
-                                   char selectors[256], int *num_selected_p);
+                                   char selectors[256], int *num_selected_p)
+                                                                  NONNULLPTRS;
 
 #endif /* CURSDIAL_H */

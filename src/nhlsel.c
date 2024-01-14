@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1582675449 2020/02/26 00:04:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.61 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -917,8 +917,7 @@ l_selection_iterate(lua_State *L)
                     lua_pushvalue(L, 2);
                     lua_pushinteger(L, tmpx);
                     lua_pushinteger(L, tmpy);
-                    if (nhl_pcall(L, 2, 0)) {
-                        impossible("Lua error: %s", lua_tostring(L, -1));
+                    if (nhl_pcall_handle(L, 2, 0, "l_selection_iterate", NHLpa_impossible)) {
                         /* abort the loops to prevent possible error cascade */
                         goto out;
                     }

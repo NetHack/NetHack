@@ -630,7 +630,7 @@ explode(
                 u.mh -= damu;
             else
                 u.uhp -= damu;
-            gc.context.botl = 1;
+            disp.botl = TRUE;
         }
 
         /* You resisted the damage, lets not keep that to ourselves */

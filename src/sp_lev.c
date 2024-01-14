@@ -1,4 +1,4 @@
-/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1695159628 2023/09/19 21:40:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.339 $ */
+/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1704787190 2024/01/09 07:59:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.349 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -337,7 +337,7 @@ map_cleanup(void)
         for (y = 0; y < ROWNO; y++) {
             schar typ = levl[x][y].typ;
 
-            if (typ == LAVAPOOL || typ == LAVAWALL || IS_POOL(typ)) {
+            if (IS_LAVA(typ) || IS_POOL(typ)) {
                 /* in case any boulders are on liquid, delete them */
                 while ((otmp = sobj_at(BOULDER, x, y)) != 0) {
                     obj_extract_self(otmp);
@@ -1788,7 +1788,7 @@ create_trap(spltrap *t, struct mkroom *croom)
 {
     coordxy x = -1, y = -1;
     coord tm;
-    int mktrap_flags = MKTRAP_MAZEFLAG;
+    unsigned mktrap_flags = MKTRAP_MAZEFLAG;
 
     if (t->type == VIBRATING_SQUARE) {
         pick_vibrasquare_location();
@@ -1977,7 +1977,7 @@ create_monster(monster *m, struct mkroom *croom)
         if (m->appear_as.str
             && ((mtmp->data->mlet == S_MIMIC)
                 /* shapechanger (chameleons, et al, and vampires) */
-                || (mtmp->cham >= LOW_PM && m->appear == M_AP_MONSTER))
+                || (ismnum(mtmp->cham) && m->appear == M_AP_MONSTER))
             && !Protection_from_shape_changers) {
             int i;
 
@@ -2800,8 +2800,7 @@ light_region(region *tmpregion)
     for (x = lowx; x <= hix; x++) {
         lev = &levl[x][lowy];
         for (y = lowy; y <= hiy; y++) {
-            if (lev->typ != LAVAPOOL) /* this overrides normal lighting */
-                lev->lit = litstate;
+            lev->lit = IS_LAVA(lev->typ) ? 1 : litstate;
             lev++;
         }
     }
@@ -3312,9 +3311,7 @@ lspo_monster(lua_State *L)
 
     if (tmpmons.has_invent && lua_type(L, -1) == LUA_TFUNCTION) {
         lua_remove(L, -2);
-        if (nhl_pcall(L, 0, 0)){
-            impossible("Lua error: %s", lua_tostring(L, -1));
-        }
+        nhl_pcall_handle(L, 0, 0, "lspo_monster", NHLpa_panic);
         spo_end_moninvent();
     } else
         lua_pop(L, 1);
@@ -3659,9 +3656,7 @@ lspo_object(lua_State *L)
     if (lua_type(L, -1) == LUA_TFUNCTION) {
         lua_remove(L, -2);
         nhl_push_obj(L, otmp);
-        if (nhl_pcall(L, 1, 0)){
-            impossible("Lua error: %s", lua_tostring(L, -1));
-        }
+        nhl_pcall_handle(L, 1, 0, "lspo_object", NHLpa_panic);
     } else
         lua_pop(L, 1);
 
@@ -4012,9 +4007,7 @@ lspo_room(lua_State *L)
                 if (lua_type(L, -1) == LUA_TFUNCTION) {
                     lua_remove(L, -2);
                     l_push_mkroom_table(L, tmpcr);
-                    if (nhl_pcall(L, 1, 0)){
-                        impossible("Lua error: %s", lua_tostring(L, -1));
-                    }
+                    nhl_pcall_handle(L, 1, 0, "lspo_room", NHLpa_panic);
                 } else
                     lua_pop(L, 1);
                 spo_endroom(gc.coder);
@@ -6114,7 +6107,7 @@ sel_set_lit(coordxy x, coordxy y, genericptr_t arg)
 {
      int lit = *(int *) arg;
 
-     levl[x][y].lit = (levl[x][y].typ == LAVAPOOL) ? 1 : lit;
+     levl[x][y].lit = (IS_LAVA(levl[x][y].typ) || lit) ? 1 : 0;
 }
 
 /* Add to the room any doors within/bordering it */
@@ -6268,9 +6261,7 @@ lspo_region(lua_State *L)
             if (lua_type(L, -1) == LUA_TFUNCTION) {
                 lua_remove(L, -2);
                 l_push_mkroom_table(L, troom);
-                if (nhl_pcall(L, 1, 0)){
-                    impossible("Lua error: %s", lua_tostring(L, -1));
-                }
+                nhl_pcall_handle(L, 1, 0, "lspo_region", NHLpa_panic);
             } else {
                 lua_pop(L, 1);
             }
@@ -6880,9 +6871,7 @@ TODO: gc.coder->croom needs to be updated
     }
     else if (has_contents) {
         l_push_wid_hei_table(L, gx.xsize, gy.ysize);
-        if (nhl_pcall(L, 1, 0)){
-            impossible("Lua error: %s", lua_tostring(L, -1));
-        }
+        nhl_pcall_handle(L, 1, 0, "lspo_map", NHLpa_panic);
         reset_xystart_size();
     }
 
@@ -7049,7 +7038,7 @@ boolean
 load_special(const char *name)
 {
     boolean result = FALSE;
-    nhl_sandbox_info sbi = {NHL_SB_SAFE, 0, 0, 0};
+    nhl_sandbox_info sbi = {NHL_SB_SAFE, 1*1024*1024, 0, 1*1024*1024};
 
     create_des_coder();
 

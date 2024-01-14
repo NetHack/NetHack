@@ -1567,7 +1567,7 @@ attributes_enlightenment(
         you_are(buf, "");
     }
     warnspecies =  gc.context.warntype.speciesidx;
-    if (Warn_of_mon && warnspecies >= LOW_PM) {
+    if (Warn_of_mon && ismnum(warnspecies)) {
         Sprintf(buf, "aware of the presence of %s",
                 makeplural(mons[warnspecies].pmnames[NEUTRAL]));
         you_are(buf, from_what(WARN_OF_MON));
@@ -1791,7 +1791,7 @@ attributes_enlightenment(
         /* blocked shape changes */
         if (Polymorph)
             what = !final ? "polymorph" : "have polymorphed";
-        else if (u.ulycn >= LOW_PM)
+        else if (ismnum(u.ulycn))
             what = !final ? "change shape" : "have changed shape";
         if (what) {
             Sprintf(buf, "would %s periodically", what);
@@ -1826,7 +1826,7 @@ attributes_enlightenment(
     }
     if (lays_eggs(gy.youmonst.data) && flags.female) /* Upolyd */
         you_can("lay eggs", "");
-    if (u.ulycn >= LOW_PM) {
+    if (ismnum(u.ulycn)) {
         /* "you are a werecreature [in beast form]" */
         Strcpy(buf, an(pmname(&mons[u.ulycn],
                flags.female ? FEMALE : MALE)));
@@ -3215,7 +3215,7 @@ mstatusline(struct monst *mtmp)
                     segndx, ordin(segndx), nsegs);
         }
     }
-    if (mtmp->cham >= LOW_PM && mtmp->data != &mons[mtmp->cham])
+    if (ismnum(mtmp->cham) && mtmp->data != &mons[mtmp->cham])
         /* don't reveal the innate form (chameleon, vampire, &c),
            just expose the fact that this current form isn't it */
         Strcat(info, ", shapechanger");

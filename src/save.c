@@ -23,10 +23,10 @@ static void save_bubbles(NHFILE *, xint8);
 static void save_stairs(NHFILE *);
 static void save_bc(NHFILE *);
 static void saveobj(NHFILE *, struct obj *);
-static void saveobjchn(NHFILE *, struct obj **);
+static void saveobjchn(NHFILE *, struct obj **) NO_NNARGS;
 static void savemon(NHFILE *, struct monst *);
-static void savemonchn(NHFILE *, struct monst *);
-static void savetrapchn(NHFILE *, struct trap *);
+static void savemonchn(NHFILE *, struct monst *) NO_NNARGS;
+static void savetrapchn(NHFILE *, struct trap *) NO_NNARGS;
 static void save_gamelog(NHFILE *);
 static void savegamestate(NHFILE *);
 static void savelev_core(NHFILE *, xint8);
@@ -533,7 +533,11 @@ savelev_core(NHFILE *nhfp, xint8 lev)
         bwrite(nhfp->fd, (genericptr_t) &gd.dndest, sizeof (dest_area));
         bwrite(nhfp->fd, (genericptr_t) &gl.level.flags, sizeof gl.level.flags);
         bwrite(nhfp->fd, (genericptr_t) &gd.doors_alloc, sizeof gd.doors_alloc);
-        bwrite(nhfp->fd, (genericptr_t) gd.doors, gd.doors_alloc * sizeof (coord));
+        /* don't rely on underlying write() behavior to write
+         *  nothing if count arg is 0, just skip it */
+        if (gd.doors_alloc)
+            bwrite(nhfp->fd, (genericptr_t) gd.doors,
+                   gd.doors_alloc * sizeof (coord));
     }
     save_rooms(nhfp); /* no dynamic memory to reclaim */
 

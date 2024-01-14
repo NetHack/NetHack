@@ -136,6 +136,7 @@ GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND: {
         TCHAR wbuf2[BUFSZ];
 
+        wbuf2[BUFSZ - 1] = '\0';
         switch (LOWORD(wParam)) {
         /* OK button was pressed */
         case IDOK:

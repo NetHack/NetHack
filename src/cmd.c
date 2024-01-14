@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1702123758 2023/12/09 12:09:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.694 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.699 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -486,7 +486,7 @@ can_do_extcmd(const struct ext_func_tab *extcmd)
         lua_getglobal(gl.luacore, "nh_callback_run");
         lua_pushstring(gl.luacore, nhcb_name[NHCB_CMD_BEFORE]);
         lua_pushstring(gl.luacore, extcmd->ef_txt);
-        nhl_pcall(gl.luacore, 2, 1);
+        nhl_pcall_handle(gl.luacore, 2, 1, "can_do_extcmd", NHLpa_panic);
         if (!lua_toboolean(gl.luacore, -1))
             return FALSE;
     }
@@ -802,7 +802,7 @@ extcmd_via_menu(void)
       "Exceeded %d extended commands in doextcmd() menu; 'extmenu' disabled.",
                                MAX_EXT_CMD);
 #endif /* NH_DEVEL_STATUS != NH_STATUS_RELEASED */
-                    iflags.extmenu = 0;
+                    iflags.extmenu = FALSE;
                     return -1;
                 }
             }
@@ -1389,7 +1389,10 @@ wiz_load_lua(void)
 {
     if (wizard) {
         char buf[BUFSZ];
-        nhl_sandbox_info sbi = {NHL_SB_SAFE | NHL_SB_DEBUGGING, 0, 0, 0};
+            /* Large but not unlimited memory and CPU so random bits of
+             * code can be tested by wizards. */
+        nhl_sandbox_info sbi = {NHL_SB_SAFE | NHL_SB_DEBUGGING,
+                16*1024*1024, 0, 16*1024*1024};
 
         buf[0] = '\0';
         getlin("Load which lua file?", buf);
@@ -2119,7 +2122,7 @@ wiz_intrinsic(void)
  def_feedback:
                 if (p != GLIB)
                     incr_itimeout(&u.uprops[p].intrinsic, amt);
-                gc.context.botl = 1; /* have pline() do a status update */
+                disp.botl = TRUE; /* have pline() do a status update */
                 pline("Timeout for %s %s %d.", propname,
                       oldtimeout ? "increased by" : "set to", amt);
                 break;
@@ -2158,6 +2161,10 @@ doterrain(void)
     int n;
     int which;
     int clr = NO_COLOR;
+
+    /* this used to be done each time vision was recalculated, so would
+       always be up to date (hopefully); now we do it on demand instead */
+    recalc_mapseen();
 
     /*
      * normal play: choose between known map without mons, obj, and traps
@@ -4137,7 +4144,7 @@ wiz_display_macros(void)
                  putstr(win, 0, buf);
             }
             /* check against defsyms array subscripts */
-            if (test < 0 || test >= SIZE(defsyms)) {
+            if (!IndexOk(test, defsyms)) {
                 if (!trouble++)
                     putstr(win, 0, display_issues);
                 Sprintf(buf, "glyph_to_cmap(glyph=%d) returns %d"

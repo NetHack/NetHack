@@ -673,7 +673,7 @@ rejectcasting(void)
     } else if (!can_chant(&gy.youmonst)) {
         You("are unable to chant the incantation.");
         return TRUE;
-    } else if (!freehand()) {
+    } else if (!freehand() && !(uwep && uwep->otyp == QUARTERSTAFF)) {
         /* Note: !freehand() occurs when weapon and shield (or two-handed
          * weapon) are welded to hands, so "arms" probably doesn't need
          * to be makeplural(bodypart(ARM)).
@@ -1203,7 +1203,7 @@ spelleffects_check(int spell, int *res, int *energy)
         u.uen -= rnd(*energy);
         if (u.uen < 0)
             u.uen = 0;
-        gc.context.botl = 1;
+        disp.botl = TRUE;
         *res = ECMD_TIME;
         return TRUE;
     } else if (spellknow(spell) <= KEEN / 200) { /* 100 turns left */
@@ -1246,7 +1246,7 @@ spelleffects_check(int spell, int *res, int *energy)
         u.uen -= rnd(2 * *energy);
         if (u.uen < 0)
             u.uen = 0;
-        gc.context.botl = 1;
+        disp.botl = TRUE;
         *res = ECMD_TIME; /* time is used even if spell doesn't get cast */
     }
 
@@ -1320,7 +1320,7 @@ spelleffects_check(int spell, int *res, int *energy)
     if (confused || (rnd(100) > chance)) {
         You("fail to cast the spell correctly.");
         u.uen -= *energy / 2;
-        gc.context.botl = 1;
+        disp.botl = TRUE;
         *res = ECMD_TIME;
         return TRUE;
     }
@@ -1343,7 +1343,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
         return res;
 
     u.uen -= energy;
-    gc.context.botl = 1;
+    disp.botl = TRUE;
     exercise(A_WIS, TRUE);
     /* pseudo is a temporary "false" object containing the spell stats */
     pseudo = mksobj(force ? spell : spellid(spell), FALSE, FALSE);
@@ -2081,6 +2081,9 @@ percent_success(int spell)
         splcaster -= gu.urole.spelarmr;
     if (uarms)
         splcaster += gu.urole.spelshld;
+
+    if (uwep && uwep->otyp == QUARTERSTAFF)
+        splcaster -= 3; /* Small bonus */
 
     if (!paladin_bonus) {
         if (uarmh && is_metallic(uarmh)) /* && otyp != HELM_OF_BRILLIANCE */

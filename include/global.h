@@ -1,4 +1,4 @@
-/* NetHack 3.7	global.h	$NHDT-Date: 1657918090 2022/07/15 20:48:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.144 $ */
+/* NetHack 3.7	global.h	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -319,9 +319,10 @@ typedef uchar nhsym;
    if nethack is built with MONITOR_HEAP enabled and they aren't; this
    declaration has been moved out of the '#else' below to avoid getting
    a complaint from -Wmissing-prototypes when building with MONITOR_HEAP */
-extern char *dupstr(const char *) NONNULL;
-/* same, but return strlen(string) */
-extern char *dupstr_n(const char *string, unsigned int *lenout) NONNULL;
+extern char *dupstr(const char *) NONNULL NONNULLARG1;
+/* same, but return strlen(string) in extra argument */
+extern char *dupstr_n(const char *string,
+                      unsigned *lenout) NONNULL NONNULLPTRS;
 
 /*
  * MONITOR_HEAP is conditionally used for primitive memory leak debugging.
@@ -333,20 +334,15 @@ extern char *dupstr_n(const char *string, unsigned int *lenout) NONNULL;
  */
 #ifdef MONITOR_HEAP
 /* plain alloc() is not declared except in alloc.c */
-extern long *nhalloc(unsigned int, const char *, int) NONNULL;
-extern long *nhrealloc(long *, unsigned int, const char *, int) NONNULL;
-extern void nhfree(genericptr_t, const char *, int);
-extern char *nhdupstr(const char *, const char *, int) NONNULL;
+extern long *nhalloc(unsigned int, const char *, int) NONNULL NONNULLARG2;
+extern long *nhrealloc(long *, unsigned int, const char *,
+                       int) NONNULL NONNULLARG3;
+extern void nhfree(genericptr_t, const char *, int) NONNULLARG2;
+extern char *nhdupstr(const char *, const char *, int) NONNULL NONNULLPTRS;
 /* this predates C99's __func__; that is trickier to use conditionally
    because it is not implemented as a preprocessor macro; MONITOR_HEAP
    wouldn't gain much benefit from it anyway so continue to live without it;
    if func's caller were accessible, that would be a very different issue */
-#ifndef __FILE__
-#define __FILE__ ""
-#endif
-#ifndef __LINE__
-#define __LINE__ 0
-#endif
 #define alloc(a) nhalloc(a, __FILE__, (int) __LINE__)
 #define re_alloc(a,n) nhrealloc(a, n, __FILE__, (int) __LINE__)
 #define free(a) nhfree(a, __FILE__, (int) __LINE__)
@@ -416,12 +412,12 @@ extern struct nomakedefs_s nomakedefs;
 
 #define MAXNROFROOMS 40 /* max number of rooms per level */
 #define MAX_SUBROOMS 24 /* max # of subrooms in a given room */
-#define DOORINC 120     /* number of doors per level, increment */
+#define DOORINC      20 /* number of doors per level, increment */
 
 #define BUFSZ 256  /* for getlin buffers */
 #define QBUFSZ 128 /* for building question text */
-#define TBUFSZ 300 /* gt.toplines[] buffer max msg: 3 81char names */
-/* plus longest prefix plus a few extra words */
+#define TBUFSZ 300 /* gt.toplines[] buffer max msg: 3 81-char names
+                    * plus longest prefix plus a few extra words */
 
 /* COLBUFSZ is the larger of BUFSZ and COLNO */
 #if BUFSZ > COLNO
@@ -556,10 +552,6 @@ typedef struct nhl_sandbox_info {
 #define NHL_SB_VERSION     0x40000000
     /* Debugging library - mostly unsafe. */
 #define NHL_SB_DEBUGGING   0x08000000
-    /* Use with memlimit/steps/perpcall to get usage. */
-#define NHL_SB_REPORT      0x04000000
-    /* As above, but do full gc on each nhl_pcall. */
-#define NHL_SB_REPORT2     0x02000000
 
 /* Low level groups.  If you need these, you probably need to define
  * a new high level group instead. */
@@ -594,5 +586,11 @@ typedef struct nhl_sandbox_info {
 #define NHL_SBRV_DENY 1
 #define NHL_SBRV_ACCEPT 2
 #define NHL_SBRV_FAIL 3
+
+/* NHL_pcall_handle action values */
+typedef enum NHL_pcall_action {
+    NHLpa_panic,
+    NHLpa_impossible
+} NHL_pcall_action;
 
 #endif /* GLOBAL_H */

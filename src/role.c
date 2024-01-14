@@ -707,7 +707,7 @@ static char NEARDATA randomstr[] = "random";
 boolean
 validrole(int rolenum)
 {
-    return (boolean) (rolenum >= 0 && rolenum < SIZE(roles) - 1);
+    return (boolean) (IndexOkT(rolenum, roles));
 }
 
 int
@@ -773,7 +773,7 @@ boolean
 validrace(int rolenum, int racenum)
 {
     /* Assumes validrole */
-    return (boolean) (racenum >= 0 && racenum < SIZE(races) - 1
+    return (boolean) (IndexOkT(racenum, races)
                       && (roles[rolenum].allow & races[racenum].allow
                           & ROLE_RACEMASK));
 }
@@ -968,11 +968,11 @@ ok_role(int rolenum, int racenum, int gendnum, int alignnum)
     int i;
     short allow;
 
-    if (rolenum >= 0 && rolenum < SIZE(roles) - 1) {
+    if (IndexOkT(rolenum, roles)) {
         if (gr.rfilter.roles[rolenum])
             return FALSE;
         allow = roles[rolenum].allow;
-        if (racenum >= 0 && racenum < SIZE(races) - 1
+        if (IndexOkT(racenum, races)
             && !(allow & races[racenum].allow & ROLE_RACEMASK))
             return FALSE;
         if (gendnum >= 0 && gendnum < ROLE_GENDERS
@@ -988,7 +988,7 @@ ok_role(int rolenum, int racenum, int gendnum, int alignnum)
             if (gr.rfilter.roles[i])
                 continue;
             allow = roles[i].allow;
-            if (racenum >= 0 && racenum < SIZE(races) - 1
+            if (IndexOkT(racenum, races)
                 && !(allow & races[racenum].allow & ROLE_RACEMASK))
                 continue;
             if (gendnum >= 0 && gendnum < ROLE_GENDERS
@@ -1034,11 +1034,11 @@ ok_race(int rolenum, int racenum, int gendnum, int alignnum)
     int i;
     short allow;
 
-    if (racenum >= 0 && racenum < SIZE(races) - 1) {
+    if (IndexOkT(racenum, races)) {
         if (gr.rfilter.mask & races[racenum].selfmask)
             return FALSE;
         allow = races[racenum].allow;
-        if (rolenum >= 0 && rolenum < SIZE(roles) - 1
+        if (IndexOkT(rolenum, roles)
             && !(allow & roles[rolenum].allow & ROLE_RACEMASK))
             return FALSE;
         if (gendnum >= 0 && gendnum < ROLE_GENDERS
@@ -1054,7 +1054,7 @@ ok_race(int rolenum, int racenum, int gendnum, int alignnum)
             if (gr.rfilter.mask & races[i].selfmask)
                 continue;
             allow = races[i].allow;
-            if (rolenum >= 0 && rolenum < SIZE(roles) - 1
+            if (IndexOkT(rolenum, roles)
                 && !(allow & roles[rolenum].allow & ROLE_RACEMASK))
                 continue;
             if (gendnum >= 0 && gendnum < ROLE_GENDERS
@@ -1108,10 +1108,10 @@ ok_gend(int rolenum, int racenum, int gendnum, int alignnum UNUSED)
         if (gr.rfilter.mask & genders[gendnum].allow)
             return FALSE;
         allow = genders[gendnum].allow;
-        if (rolenum >= 0 && rolenum < SIZE(roles) - 1
+        if (IndexOkT(rolenum, roles)
             && !(allow & roles[rolenum].allow & ROLE_GENDMASK))
             return FALSE;
-        if (racenum >= 0 && racenum < SIZE(races) - 1
+        if (IndexOkT(racenum, races)
             && !(allow & races[racenum].allow & ROLE_GENDMASK))
             return FALSE;
         return TRUE;
@@ -1121,10 +1121,10 @@ ok_gend(int rolenum, int racenum, int gendnum, int alignnum UNUSED)
             if (gr.rfilter.mask & genders[i].allow)
                 continue;
             allow = genders[i].allow;
-            if (rolenum >= 0 && rolenum < SIZE(roles) - 1
+            if (IndexOkT(rolenum, roles)
                 && !(allow & roles[rolenum].allow & ROLE_GENDMASK))
                 continue;
-            if (racenum >= 0 && racenum < SIZE(races) - 1
+            if (IndexOkT(racenum, races)
                 && !(allow & races[racenum].allow & ROLE_GENDMASK))
                 continue;
             return TRUE;
@@ -1173,10 +1173,10 @@ ok_align(int rolenum, int racenum, int gendnum UNUSED, int alignnum)
         if (gr.rfilter.mask & aligns[alignnum].allow)
             return FALSE;
         allow = aligns[alignnum].allow;
-        if (rolenum >= 0 && rolenum < SIZE(roles) - 1
+        if (IndexOkT(rolenum, roles)
             && !(allow & roles[rolenum].allow & ROLE_ALIGNMASK))
             return FALSE;
-        if (racenum >= 0 && racenum < SIZE(races) - 1
+        if (IndexOkT(racenum, races)
             && !(allow & races[racenum].allow & ROLE_ALIGNMASK))
             return FALSE;
         return TRUE;
@@ -1186,10 +1186,10 @@ ok_align(int rolenum, int racenum, int gendnum UNUSED, int alignnum)
             if (gr.rfilter.mask & aligns[i].allow)
                 continue;
             allow = aligns[i].allow;
-            if (rolenum >= 0 && rolenum < SIZE(roles) - 1
+            if (IndexOkT(rolenum, roles)
                 && !(allow & roles[rolenum].allow & ROLE_ALIGNMASK))
                 continue;
-            if (racenum >= 0 && racenum < SIZE(races) - 1
+            if (IndexOkT(racenum, races)
                 && !(allow & races[racenum].allow & ROLE_ALIGNMASK))
                 continue;
             return TRUE;
@@ -1534,6 +1534,7 @@ root_plselection_prompt(
     /* <your lawful female gnomish> || <your lawful female gnome> */
 
     if (validrole(rolenum)) {
+        assert(IndexOkT(rolenum, roles));
         if (donefirst)
             Strcat(buf, " ");
         if (gendnum != ROLE_NONE) {
@@ -1728,10 +1729,11 @@ role_selection_prolog(int which, winid where)
     gend = flags.initgend;
     a = flags.initalign;
     if (r >= 0) {
+        assert(IndexOkT(r, roles));
         allowmask = roles[r].allow;
         if ((allowmask & ROLE_RACEMASK) == MH_HUMAN)
             c = 0; /* races[human] */
-        else if (c >= 0 && !(allowmask & ROLE_RACEMASK & races[c].allow))
+        else if (IndexOkT(c, races) && !(allowmask & ROLE_RACEMASK & races[c].allow))
             c = ROLE_RANDOM;
         if ((allowmask & ROLE_GENDMASK) == ROLE_MALE)
             gend = 0; /* role forces male (hypothetical) */
@@ -1745,6 +1747,7 @@ role_selection_prolog(int which, winid where)
             a = 2; /* alings[chaotic] */
     }
     if (c >= 0) {
+        assert(IndexOkT(c, races));
         allowmask = races[c].allow;
         if ((allowmask & ROLE_ALIGNMASK) == AM_LAWFUL)
             a = 0; /* aligns[lawful] */
@@ -1762,6 +1765,8 @@ role_selection_prolog(int which, winid where)
                 : !*gp.plname ? not_yet : gp.plname);
     putstr(where, 0, buf);
     Sprintf(buf, "%12s ", "role:");
+    assert(which == RS_ROLE || r == ROLE_NONE || r == ROLE_RANDOM
+           || IndexOkT(r, roles));
     Strcat(buf, (which == RS_ROLE) ? choosing
                 : (r == ROLE_NONE) ? not_yet
                   : (r == ROLE_RANDOM) ? rand_choice
@@ -1777,6 +1782,8 @@ role_selection_prolog(int which, winid where)
     }
     putstr(where, 0, buf);
     Sprintf(buf, "%12s ", "race:");
+    assert(which == RS_RACE || c == ROLE_NONE || c == ROLE_RANDOM
+           || IndexOkT(c, races));
     Strcat(buf, (which == RS_RACE) ? choosing
                 : (c == ROLE_NONE) ? not_yet
                   : (c == ROLE_RANDOM) ? rand_choice

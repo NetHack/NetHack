@@ -157,11 +157,12 @@ enum ambiences {
 
 enum voice_moreinfo {
     voice_nothing_special,
-    voice_talking_artifact = 0x0001,
-    voice_deity            = 0x0002,
-    voice_oracle           = 0x0004,
-    voice_throne           = 0x0008,
-    voice_death            = 0x0010
+    voice_audioassistant   = 0x0001,  /* accessibility */
+    voice_talking_artifact = 0x0002,
+    voice_deity            = 0x0004,
+    voice_oracle           = 0x0008,
+    voice_throne           = 0x0010,
+    voice_death            = 0x0020
 };
 
 enum achievements_arg2 {

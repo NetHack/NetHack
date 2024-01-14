@@ -5,6 +5,7 @@
 #include "hack.h"
 
 static int prayer_done(void);
+static void maybe_turn_mon_iter(struct monst *);
 static struct obj *worst_cursed_item(void);
 static int in_trouble(void);
 static void fix_curse_trouble(struct obj *, const char *);
@@ -100,6 +101,11 @@ static const char *const godvoices[] = {
 #define on_altar() IS_ALTAR(levl[u.ux][u.uy].typ)
 #define on_shrine() ((levl[u.ux][u.uy].altarmask & AM_SHRINE) != 0)
 #define a_align(x, y) ((aligntyp) Amask2align(levl[x][y].altarmask & AM_MASK))
+
+/* used by turn undead iteration function; always reinitialized
+   before iterating that, so don't need to be globals */
+static int turn_undead_range;
+static int turn_undead_msg_cnt;
 
 /* critically low hit points if hp <= 5 or hp <= maxhp/N for some N */
 boolean
@@ -209,7 +215,7 @@ in_trouble(void)
         return TROUBLE_REGION;
     if (critically_low_hp(FALSE))
         return TROUBLE_HIT;
-    if (u.ulycn >= LOW_PM)
+    if (ismnum(u.ulycn))
         return TROUBLE_LYCANTHROPE;
     if (near_capacity() >= EXT_ENCUMBER && AMAX(A_STR) - ABASE(A_STR) > 3)
         return TROUBLE_COLLAPSING;
@@ -382,7 +388,7 @@ fix_worst_trouble(int trouble)
         }
         You("can breathe again.");
         Strangled = 0;
-        gc.context.botl = 1;
+        disp.botl = TRUE;
         break;
     case TROUBLE_LAVA:
         /* teleport should always succeed, but if not, just untrap them */
@@ -397,7 +403,7 @@ fix_worst_trouble(int trouble)
     case TROUBLE_HUNGRY:
         Your("%s feels content.", body_part(STOMACH));
         init_uhunger();
-        gc.context.botl = 1;
+        disp.botl = TRUE;
         break;
     case TROUBLE_SICK:
         You_feel("better.");
@@ -425,14 +431,14 @@ fix_worst_trouble(int trouble)
         if (u.uhpmax > u.uhppeak)
             u.uhppeak = u.uhpmax;
         u.uhp = u.uhpmax;
-        gc.context.botl = 1;
+        disp.botl = TRUE;
         break;
     case TROUBLE_COLLAPSING:
         /* override Fixed_abil; uncurse that if feasible */
         You_feel("%sstronger.",
                  (AMAX(A_STR) - ABASE(A_STR) > 6) ? "much " : "");
         ABASE(A_STR) = AMAX(A_STR);
-        gc.context.botl = 1;
+        disp.botl = TRUE;
         if (Fixed_abil) {
             if ((otmp = stuck_ring(uleft, RIN_SUSTAIN_ABILITY)) != 0) {
                 if (otmp == uleft)
@@ -536,7 +542,7 @@ fix_worst_trouble(int trouble)
         for (i = 0; i < A_MAX; i++) {
             if (ABASE(i) < AMAX(i)) {
                 ABASE(i) = AMAX(i);
-                gc.context.botl = 1;
+                disp.botl = TRUE;
             }
         }
         (void) encumber_msg();
@@ -1241,7 +1247,7 @@ pleased(aligntyp g_align)
                 u.mh = u.mhmax;
             if (ABASE(A_STR) < AMAX(A_STR)) {
                 ABASE(A_STR) = AMAX(A_STR);
-                gc.context.botl = 1; /* before potential message */
+                disp.botl = TRUE; /* before potential message */
                 (void) encumber_msg();
             }
             if (u.uhunger < 900)
@@ -1256,7 +1262,7 @@ pleased(aligntyp g_align)
                rather than issuing a pat-on-head */
             u.ucreamed = 0;
             make_blinded(0L, TRUE);
-            gc.context.botl = 1;
+            disp.botl = TRUE;
             break;
         case 4: {
             register struct obj *otmp;
@@ -1612,7 +1618,7 @@ offer_different_alignment_altar(
             consume_offering(otmp);
             pline("%s accepts your allegiance.", a_gname());
 
-            uchangealign(altaralign, 0);
+            uchangealign(altaralign, A_CG_CONVERT);
             /* Beware, Conversion is costly */
             change_luck(-3);
             u.ublesscnt += 300;
@@ -1809,6 +1815,9 @@ dosacrifice(void)
 
     if (!on_altar() || u.uswallow) {
         You("are not standing on an altar.");
+        return ECMD_OK;
+    } else if (Confusion || Stunned || Hallucination) {
+        You("are too impaired to perform the rite.");
         return ECMD_OK;
     }
     highaltar = (levl[u.ux][u.uy].altarmask & AM_SANCTUM);
@@ -2244,14 +2253,73 @@ prayer_done(void) /* M. Stephenson (1.0.3b) */
     return 1;
 }
 
+/* iterable for undead turning by priest/knight */
+static void
+maybe_turn_mon_iter(struct monst *mtmp)
+{
+    /* 3.6.3: used to use cansee() here but the purpose is to prevent
+       #turn operating through walls, not to require that the hero be
+       able to see the target location */
+    if (!couldsee(mtmp->mx, mtmp->my)
+        || mdistu(mtmp) > turn_undead_range)
+        return;
+
+    if (!mtmp->mpeaceful
+        && (is_undead(mtmp->data) || is_vampshifter(mtmp)
+            || (is_demon(mtmp->data) && (u.ulevel > (MAXULEV / 2))))) {
+        mtmp->msleeping = 0;
+        if (Confusion) {
+            if (!turn_undead_msg_cnt++)
+                pline("Unfortunately, your voice falters.");
+            mtmp->mflee = 0;
+            mtmp->mfrozen = 0;
+            mtmp->mcanmove = 1;
+        } else if (!resist(mtmp, '\0', 0, TELL)) {
+            int xlev = 6;
+
+            switch (mtmp->data->mlet) {
+                /* this is intentional, lichs are tougher
+                   than zombies. */
+            case S_LICH:
+                xlev += 2;
+                /*FALLTHRU*/
+            case S_GHOST:
+                xlev += 2;
+                /*FALLTHRU*/
+            case S_VAMPIRE:
+                xlev += 2;
+                /*FALLTHRU*/
+            case S_WRAITH:
+                xlev += 2;
+                /*FALLTHRU*/
+            case S_MUMMY:
+                xlev += 2;
+                /*FALLTHRU*/
+            case S_ZOMBIE:
+                if (u.ulevel >= xlev && !resist(mtmp, '\0', 0, NOTELL)) {
+                    if (u.ualign.type == A_CHAOTIC) {
+                        mtmp->mpeaceful = 1;
+                        set_malign(mtmp);
+                    } else { /* damn them */
+                        killed(mtmp);
+                    }
+                    break;
+                } /* else flee */
+                /*FALLTHRU*/
+            default:
+                monflee(mtmp, 0, FALSE, TRUE);
+                break;
+            }
+        }
+    }
+}
+
 /* #turn command */
 int
 doturn(void)
 {
     /* Knights & Priest(esse)s only please */
-    struct monst *mtmp, *mtmp2;
     const char *Gname;
-    int once, range, xlev;
 
     if (!Role_if(PM_CLERIC) && !Role_if(PM_KNIGHT)) {
         /* Try to use the "turn undead" spell. */
@@ -2296,68 +2364,11 @@ doturn(void)
     exercise(A_WIS, TRUE);
 
     /* note: does not perform unturn_dead() on victims' inventories */
-    range = BOLT_LIM + (u.ulevel / 5); /* 8 to 14 */
-    range *= range;
-    once = 0;
-    for (mtmp = fmon; mtmp; mtmp = mtmp2) {
-        mtmp2 = mtmp->nmon;
-        if (DEADMONSTER(mtmp))
-            continue;
-        /* 3.6.3: used to use cansee() here but the purpose is to prevent
-           #turn operating through walls, not to require that the hero be
-           able to see the target location */
-        if (!couldsee(mtmp->mx, mtmp->my)
-            || mdistu(mtmp) > range)
-            continue;
+    turn_undead_range = BOLT_LIM + (u.ulevel / 5); /* 8 to 14 */
+    turn_undead_range *= turn_undead_range;
+    turn_undead_msg_cnt = 0;
 
-        if (!mtmp->mpeaceful
-            && (is_undead(mtmp->data) || is_vampshifter(mtmp)
-                || (is_demon(mtmp->data) && (u.ulevel > (MAXULEV / 2))))) {
-            mtmp->msleeping = 0;
-            if (Confusion) {
-                if (!once++)
-                    pline("Unfortunately, your voice falters.");
-                mtmp->mflee = 0;
-                mtmp->mfrozen = 0;
-                mtmp->mcanmove = 1;
-            } else if (!resist(mtmp, '\0', 0, TELL)) {
-                xlev = 6;
-                switch (mtmp->data->mlet) {
-                /* this is intentional, lichs are tougher
-                   than zombies. */
-                case S_LICH:
-                    xlev += 2;
-                    /*FALLTHRU*/
-                case S_GHOST:
-                    xlev += 2;
-                    /*FALLTHRU*/
-                case S_VAMPIRE:
-                    xlev += 2;
-                    /*FALLTHRU*/
-                case S_WRAITH:
-                    xlev += 2;
-                    /*FALLTHRU*/
-                case S_MUMMY:
-                    xlev += 2;
-                    /*FALLTHRU*/
-                case S_ZOMBIE:
-                    if (u.ulevel >= xlev && !resist(mtmp, '\0', 0, NOTELL)) {
-                        if (u.ualign.type == A_CHAOTIC) {
-                            mtmp->mpeaceful = 1;
-                            set_malign(mtmp);
-                        } else { /* damn them */
-                            killed(mtmp);
-                        }
-                        break;
-                    } /* else flee */
-                /*FALLTHRU*/
-                default:
-                    monflee(mtmp, 0, FALSE, TRUE);
-                    break;
-                }
-            }
-        }
-    }
+    iter_mons(maybe_turn_mon_iter);
 
     /*
      *  There is no detrimental effect on self for successful #turn

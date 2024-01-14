@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1702023277 2023/12/08 08:14:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.498 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1704316449 2024/01/03 21:14:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.508 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -13,26 +13,29 @@
 #define MAGIC_COOKIE 1000
 
 static int zaptype(int);
-static void probe_objchain(struct obj *);
+static void probe_objchain(struct obj *) NO_NNARGS;
 static boolean zombie_can_dig(coordxy x, coordxy y);
-static void polyuse(struct obj *, int, int);
-static void create_polymon(struct obj *, int);
-static int stone_to_flesh_obj(struct obj *);
-static boolean zap_updown(struct obj *);
-static void zhitu(int, int, const char *, coordxy, coordxy);
-static void revive_egg(struct obj *);
-static boolean zap_steed(struct obj *);
-static void skiprange(int, int *, int *);
-static void maybe_explode_trap(struct trap *, struct obj *, boolean *);
-static void zap_map(coordxy, coordxy, struct obj *);
+static void polyuse(struct obj *, int, int) NO_NNARGS;
+static void create_polymon(struct obj *, int) NO_NNARGS;
+static int stone_to_flesh_obj(struct obj *) NONNULLARG1;
+static boolean zap_updown(struct obj *) NONNULLARG1;
+static void zhitu(int, int, const char *, coordxy, coordxy) NO_NNARGS;
+static void revive_egg(struct obj *) NONNULLARG1;
+static boolean zap_steed(struct obj *) NONNULLARG1;
+static void skiprange(int, int *, int *) NONNULLPTRS;
+static void maybe_explode_trap(struct trap *, struct obj *,
+                               boolean *) NONNULLARG3;
+static void zap_map(coordxy, coordxy, struct obj *) NONNULLARG3;
 static int zap_hit(int, int);
-static void disintegrate_mon(struct monst *, int, const char *);
+static void disintegrate_mon(struct monst *, int, const char *) NONNULLARG1;
 static int adtyp_to_prop(int);
-static void backfire(struct obj *);
-static int zap_ok(struct obj *);
-static void boxlock_invent(struct obj *);
+static void backfire(struct obj *) NONNULLARG1;
+static int zap_ok(struct obj *) NO_NNARGS;
+/* all callers of boxlock_invent() pass a NONNULL obj, and boxlock
+ * boxlock_invent() calls boxlock() which has nonnull arg. */
+static void boxlock_invent(struct obj *) NONNULLARG1;
 static int spell_hit_bonus(int);
-static void destroy_one_item(struct obj *, int, int);
+static void destroy_one_item(struct obj *, int, int) NONNULLARG1;
 static void wishcmdassist(int);
 
 #define ZT_MAGIC_MISSILE (AD_MAGM - 1)
@@ -280,7 +283,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
                            /* if shapechange failed because there aren't
                               enough eligible candidates (most likely for
                               vampshifter), try reverting to original form */
-                           || (mtmp->cham >= LOW_PM
+                           || (ismnum(mtmp->cham)
                                && newcham(mtmp, &mons[mtmp->cham],
                                           ncflags) != 0)) {
                     if (give_msg && (canspotmon(mtmp)
@@ -1088,7 +1091,7 @@ revive(struct obj *corpse, boolean by_hero)
 }
 
 static void
-revive_egg(struct obj *obj)
+revive_egg(struct obj *obj) /* nonnull */
 {
     /*
      * Note: generic eggs with corpsenm set to NON_PM will never hatch.
@@ -1194,19 +1197,19 @@ cancel_item(struct obj *obj)
         case RIN_GAIN_STRENGTH:
             if ((obj->owornmask & W_RING) != 0L) {
                 ABON(A_STR) -= obj->spe;
-                gc.context.botl = TRUE;
+                disp.botl = TRUE;
             }
             break;
         case RIN_GAIN_CONSTITUTION:
             if ((obj->owornmask & W_RING) != 0L) {
                 ABON(A_CON) -= obj->spe;
-                gc.context.botl = TRUE;
+                disp.botl = TRUE;
             }
             break;
         case RIN_ADORNMENT:
             if ((obj->owornmask & W_RING) != 0L) {
                 ABON(A_CHA) -= obj->spe;
-                gc.context.botl = TRUE;
+                disp.botl = TRUE;
             }
             break;
         case RIN_INCREASE_ACCURACY:
@@ -1219,24 +1222,24 @@ cancel_item(struct obj *obj)
             break;
         case RIN_PROTECTION:
             if ((obj->owornmask & W_RING) != 0L)
-                gc.context.botl = TRUE;
+                disp.botl = TRUE;
             break;
         case GAUNTLETS_OF_DEXTERITY:
             if ((obj->owornmask & W_ARMG) != 0L) {
                 ABON(A_DEX) -= obj->spe;
-                gc.context.botl = TRUE;
+                disp.botl = TRUE;
             }
             break;
         case HELM_OF_BRILLIANCE:
             if ((obj->owornmask & W_ARMH) != 0L) {
                 ABON(A_INT) -= obj->spe;
                 ABON(A_WIS) -= obj->spe;
-                gc.context.botl = TRUE;
+                disp.botl = TRUE;
             }
             break;
         default:
             if ((obj->owornmask & W_ARMOR) != 0L) /* AC */
-                gc.context.botl = TRUE;
+                disp.botl = TRUE;
             break;
         }
     }
@@ -1334,19 +1337,19 @@ drain_item(struct obj *obj, boolean by_you)
     case RIN_GAIN_STRENGTH:
         if ((obj->owornmask & W_RING) && u_ring) {
             ABON(A_STR)--;
-            gc.context.botl = 1;
+            disp.botl = TRUE;
         }
         break;
     case RIN_GAIN_CONSTITUTION:
         if ((obj->owornmask & W_RING) && u_ring) {
             ABON(A_CON)--;
-            gc.context.botl = 1;
+            disp.botl = TRUE;
         }
         break;
     case RIN_ADORNMENT:
         if ((obj->owornmask & W_RING) && u_ring) {
             ABON(A_CHA)--;
-            gc.context.botl = 1;
+            disp.botl = TRUE;
         }
         break;
     case RIN_INCREASE_ACCURACY:
@@ -1359,25 +1362,25 @@ drain_item(struct obj *obj, boolean by_you)
         break;
     case RIN_PROTECTION:
         if (u_ring)
-            gc.context.botl = 1; /* bot() will recalc u.uac */
+            disp.botl = TRUE; /* bot() will recalc u.uac */
         break;
     case HELM_OF_BRILLIANCE:
         if ((obj->owornmask & W_ARMH) && (obj == uarmh)) {
             ABON(A_INT)--;
             ABON(A_WIS)--;
-            gc.context.botl = 1;
+            disp.botl = TRUE;
         }
         break;
     case GAUNTLETS_OF_DEXTERITY:
         if ((obj->owornmask & W_ARMG) && (obj == uarmg)) {
             ABON(A_DEX)--;
-            gc.context.botl = 1;
+            disp.botl = TRUE;
         }
         break;
     default:
         break;
     }
-    if (gc.context.botl)
+    if (disp.botl)
         bot();
     if (carried(obj))
         update_inventory();
@@ -1777,6 +1780,9 @@ poly_obj(struct obj *obj, int id)
     case POTION_CLASS:
         while (otmp->otyp == POT_POLYMORPH)
             otmp->otyp = rnd_class(POT_GAIN_ABILITY, POT_WATER);
+        /* potions of oil use obj->age field differently from other potions */
+        if (otmp->otyp == POT_OIL || obj->otyp == POT_OIL)
+            fixup_oil(otmp, obj);
         break;
 
     case SPBOOK_CLASS:
@@ -1905,7 +1911,7 @@ poly_obj(struct obj *obj, int id)
 
 /* stone-to-flesh spell hits and maybe transforms or animates obj */
 static int
-stone_to_flesh_obj(struct obj *obj)
+stone_to_flesh_obj(struct obj *obj) /* nonnull */
 {
     struct permonst *ptr;
     struct monst *mon, *shkp;
@@ -2744,7 +2750,7 @@ zapyourself(struct obj *obj, boolean ordinary)
             if (ordinary)
                 pline_The("sleep ray hits you!");
             else
-                You("fall alseep!");
+                You("fall asleep!");
             monstunseesu(M_SEEN_SLEEP);
             fall_asleep(-rnd(50), TRUE);
         }
@@ -3041,7 +3047,7 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
             cancel_item(otmp);
 
         if (youdefend) {
-            gc.context.botl = 1; /* potential AC change */
+            disp.botl = TRUE; /* potential AC change */
             find_ac();
             /* update_inventory(); -- handled by caller */
         }
@@ -3090,7 +3096,7 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
 
 /* you've zapped an immediate type wand up or down */
 static boolean
-zap_updown(struct obj *obj) /* wand or spell */
+zap_updown(struct obj *obj) /* wand or spell, nonnull */
 {
     boolean striking = FALSE, disclose = FALSE, map_zapped = FALSE;
     coordxy x, y, xx, yy;
@@ -3113,7 +3119,7 @@ zap_updown(struct obj *obj) /* wand or spell */
             You("probe towards the %s.", ceiling(x, y));
         } else { /* down */
             const char *surf;
-            schar ltyp, rememberedltyp = gl.lastseentyp[x][y];
+            schar ltyp, rememberedltyp = update_mapseen_for(x, y);
 
             ptmp += bhitpile(obj, bhito, x, y, u.dz);
             /* sequencing: zap_map() calls force_decor() for ice or furniture;
@@ -3486,10 +3492,6 @@ maybe_explode_trap(
         } else if (is_magical_trap(ttmp->ttyp)) {
             int seeit = cansee(x, y);
 
-            if (!Deaf) {
-                Soundeffect(se_kaboom, 80);
-                pline("Kaboom!");
-            }
             /* note: this explosion mustn't destroy otmp */
             explode(x, y, -WAN_CANCELLATION,
                     20 + d(3, 6), TRAP_EXPLODE, EXPL_MAGICAL);
@@ -4762,7 +4764,7 @@ dobuzz(
                 goto buzzmonst;
             } else if (zap_hit((int) u.uac, 0)) {
                 range -= 2;
-                pline("%s hits you!", The(flash_str(fltyp, FALSE)));
+                pline_dir(xytod(-dx,-dy), "%s hits you!", The(flash_str(fltyp, FALSE)));
                 if (Reflecting) {
                     if (!Blind) {
                         (void) ureflects("But %s reflects from your %s!",
@@ -5717,7 +5719,7 @@ destroy_item(int osym, int dmgtyp)
                      || objects[obj->otyp].oc_oprop == FLYING))
                 /* destroyed wands and potions of polymorph don't trigger
                    polymorph so don't need to be deferred */
-                || (obj->otyp == POT_WATER && u.ulycn >= LOW_PM
+                || (obj->otyp == POT_WATER && ismnum(u.ulycn)
                     && (Upolyd ? obj->blessed : obj->cursed)))) {
             deferrals[deferral_indx++] = obj->o_id;
             continue;

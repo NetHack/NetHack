@@ -413,7 +413,8 @@ struct obj {
 
 #define unpolyable(o) ((o)->otyp == WAN_POLYMORPH \
                        || (o)->otyp == SPE_POLYMORPH \
-                       || (o)->otyp == POT_POLYMORPH)
+                       || (o)->otyp == POT_POLYMORPH \
+                       || (o)->otyp == AMULET_OF_UNCHANGING)
 
 /* achievement tracking; 3.6.x did this differently */
 #define is_mines_prize(o) ((o)->o_id == gc.context.achieveo.mines_prize_oid)

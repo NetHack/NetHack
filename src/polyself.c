@@ -1,4 +1,4 @@
-/* NetHack 3.7	polyself.c	$NHDT-Date: 1702274031 2023/12/11 05:53:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.204 $ */
+/* NetHack 3.7	polyself.c	$NHDT-Date: 1703845752 2023/12/29 10:29:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.207 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -143,7 +143,7 @@ float_vs_flight(void)
        might cause a change in stealth */
     steed_vs_stealth();
 
-    gc.context.botl = TRUE;
+    disp.botl = TRUE;
 }
 
 /* riding blocks stealth unless hero+steed fly */
@@ -169,7 +169,7 @@ check_strangling(boolean on)
         if (uamul && uamul->otyp == AMULET_OF_STRANGULATION
             && can_be_strangled(&gy.youmonst)) {
             Strangled = 6L;
-            gc.context.botl = TRUE;
+            disp.botl = TRUE;
             Your("%s %s your %s!", simpleonames(uamul),
                  was_strangled ? "still constricts" : "begins constricting",
                  body_part(NECK)); /* "throat" */
@@ -180,7 +180,7 @@ check_strangling(boolean on)
     } else {
         if (Strangled && !can_be_strangled(&gy.youmonst)) {
             Strangled = 0L;
-            gc.context.botl = TRUE;
+            disp.botl = TRUE;
             You("are no longer being strangled.");
         }
     }
@@ -445,7 +445,7 @@ newman(void)
         make_slimed(10L, (const char *) 0);
     }
 
-    gc.context.botl = 1;
+    disp.botl = TRUE;
     see_monsters();
     (void) encumber_msg();
 
@@ -464,7 +464,7 @@ polyself(int psflags)
             monsterpoly = ((psflags & POLY_MONSTER) != 0),
             formrevert = ((psflags & POLY_REVERT) != 0),
             draconian = (uarm && Is_dragon_armor(uarm)),
-            iswere = (u.ulycn >= LOW_PM),
+            iswere = (ismnum(u.ulycn)),
             isvamp = (is_vampire(gy.youmonst.data)
                       || is_vampshifter(&gy.youmonst)),
             controllable_poly = Polymorph_control && !(Stunned || Unaware);
@@ -502,6 +502,7 @@ polyself(int psflags)
     if (controllable_poly || forcecontrol) {
         buf[0] = '\0';
         tryct = 5;
+
         do {
             mntmp = NON_PM;
             getlin("Become what kind of monster? [type the name]", buf);
@@ -528,7 +529,28 @@ polyself(int psflags)
                     mntmp = (draconian && class == S_DRAGON)
                             ? armor_to_dragon(uarm->otyp)
                             : mkclass_poly(class);
+
+            /* placeholder monsters are for corpses and all flagged
+               M2_NOPOLY but they are reasonable polymorph targets;
+               pick a suitable substitute (which might be geno'd) */
+            } else if (is_placeholder(&mons[mntmp])
+                       /* when your own race, fall to !polyok() case */
+                       && !your_race(&mons[mntmp])
+                       /* same for generic human, even if hero isn't human */
+                       && mntmp != PM_HUMAN) {
+                /* far less general than mkclass() */
+                if (mntmp == PM_ORC)
+                    mntmp = rn2(3) ? PM_HILL_ORC : PM_MORDOR_ORC;
+                else if (mntmp == PM_ELF)
+                    mntmp = rn2(3) ? PM_GREEN_ELF : PM_GREY_ELF;
+                else if (mntmp == PM_GIANT)
+                    mntmp = rn2(3) ? PM_STONE_GIANT : PM_HILL_GIANT;
+                /* note: PM_DWARF and PM_GNOME are ordinary monsters and
+                   no longer flagged no-poly so have no need for placeholder
+                   handling; PM_HUMAN is a placeholder without a suitable
+                   substitute so gets handled differently below */
             }
+
             if (mntmp < LOW_PM) {
                 if (!class)
                     pline("I've never heard of such monsters.");
@@ -581,6 +603,7 @@ polyself(int psflags)
             } else
                 break;
         } while (--tryct > 0);
+
         if (!tryct)
             pline1(thats_enough_tries);
         /* allow skin merging, even when polymorph is controlled */
@@ -617,7 +640,7 @@ polyself(int psflags)
                        of evaporation due to over enchanting */
                     uarm->otyp += GRAY_DRAGON_SCALES - GRAY_DRAGON_SCALE_MAIL;
                     uarm->dknown = 1;
-                    gc.context.botl = 1; /* AC is changing */
+                    disp.botl = TRUE; /* AC is changing */
                 }
                 uskin = uarm;
                 uarm = (struct obj *) 0;
@@ -640,7 +663,7 @@ polyself(int psflags)
                          && !rn2(10)) ? PM_WOLF
                                       : !rn2(4) ? PM_FOG_CLOUD
                                                 : PM_VAMPIRE_BAT;
-                if (gy.youmonst.cham >= LOW_PM
+                if (ismnum(gy.youmonst.cham)
                     && !is_vampire(gy.youmonst.data) && !rn2(2))
                     mntmp = gy.youmonst.cham;
             }
@@ -979,7 +1002,7 @@ polymon(int mntmp)
     }
     check_strangling(TRUE); /* maybe start strangling */
 
-    gc.context.botl = 1;
+    disp.botl = TRUE;
     gv.vision_full_recalc = 1;
     see_monsters();
     (void) encumber_msg();
@@ -1357,7 +1380,7 @@ rehumanize(void)
     }
     nomul(0);
 
-    gc.context.botl = 1;
+    disp.botl = TRUE;
     gv.vision_full_recalc = 1;
     (void) encumber_msg();
     if (was_flying && !Flying && u.usteed)
@@ -1382,7 +1405,7 @@ dobreathe(void)
         return ECMD_OK;
     }
     u.uen -= 15;
-    gc.context.botl = 1;
+    disp.botl = TRUE;
 
     if (!getdir((char *) 0))
         return ECMD_CANCEL;
@@ -1579,7 +1602,7 @@ dosummon(void)
         return ECMD_OK;
     }
     u.uen -= 10;
-    gc.context.botl = 1;
+    disp.botl = TRUE;
 
     You("call upon your brethren for help!");
     exercise(A_WIS, TRUE);
@@ -1620,7 +1643,7 @@ dogaze(void)
         return ECMD_OK;
     }
     u.uen -= 15;
-    gc.context.botl = 1;
+    disp.botl = TRUE;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
@@ -1855,7 +1878,7 @@ domindblast(void)
         return ECMD_OK;
     }
     u.uen -= 10;
-    gc.context.botl = 1;
+    disp.botl = TRUE;
 
     You("concentrate.");
     pline("A wave of psychic energy pours out.");
@@ -2135,7 +2158,7 @@ ugolemeffects(int damtype, int dam)
         u.mh += heal;
         if (u.mh > u.mhmax)
             u.mh = u.mhmax;
-        gc.context.botl = 1;
+        disp.botl = TRUE;
         pline("Strangely, you feel better than before.");
         exercise(A_STR, TRUE);
     }
@@ -2207,7 +2230,7 @@ polysense(void)
         HWarn_of_mon |= FROMRACE;
         return;
     }
-    if (warnidx >= LOW_PM) {
+    if (ismnum(warnidx)) {
         gc.context.warntype.speciesidx = warnidx;
         gc.context.warntype.species = &mons[warnidx];
         HWarn_of_mon |= FROMRACE;

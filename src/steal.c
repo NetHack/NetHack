@@ -123,7 +123,7 @@ stealgold(register struct monst* mtmp)
         if (!tele_restrict(mtmp))
             (void) rloc(mtmp, RLOC_MSG);
         monflee(mtmp, 0, FALSE, FALSE);
-        gc.context.botl = 1;
+        disp.botl = TRUE;
     }
 }
 
@@ -758,7 +758,7 @@ mdrop_obj(
     }
     /* obj_no_longer_held(obj); -- done by place_object */
     if (verbosely && cansee(omx, omy))
-        pline("%s drops %s.", Monnam(mon), obj_name);
+        pline_xy(mon->mx, mon->my, "%s drops %s.", Monnam(mon), obj_name);
     if (!flooreffects(obj, omx, omy, "fall")) {
         place_object(obj, omx, omy);
         stackobj(obj);

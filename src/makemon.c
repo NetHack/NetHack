@@ -904,6 +904,7 @@ clone_mon(struct monst *mon,
         int atyp;
 
         newemin(m2);
+        assert(has_emin(m2) && has_emin(mon));
         *EMIN(m2) = *EMIN(mon);
         /* renegade when same alignment as hero but not peaceful or
            when peaceful while being different alignment from hero */
@@ -914,8 +915,10 @@ clone_mon(struct monst *mon,
            However, tamedog() will not re-tame a tame dog, so m2
            must be made non-tame to get initialized properly. */
         m2->mtame = 0;
-        if (tamedog(m2, (struct obj *) 0))
+        if (tamedog(m2, (struct obj *) 0)) {
+            assert(has_edog(m2) && has_edog(mon));
             *EDOG(m2) = *EDOG(mon);
+        }
         /* [TODO? some (most? all?) edog fields probably should be
            reinitialized rather that retain the 'parent's values] */
     }
@@ -1463,13 +1466,15 @@ makemon(
                 mhidden_description(mtmp, FALSE, mbuf);
                 what = upstart(strsubst(mbuf, ", mimicking ", ""));
             }
-            if (what)
+            if (what) {
+                set_msg_xy(mtmp->mx, mtmp->my);
                 Norep("%s%s appears%s%c", what,
                       exclaim ? " suddenly" : "",
                       next2u(x, y) ? " next to you"
                       : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? " close by"
                         : "",
                       exclaim ? '!' : '.');
+            }
         }
         /* if discernable and a threat, stop fiddling while Rome burns */
         if (go.occupation)
@@ -2124,6 +2129,8 @@ peace_minded(register struct permonst *ptr)
         return TRUE;
     if (ptr->msound == MS_NEMESIS)
         return FALSE;
+    if (ptr == &mons[PM_ERINYS])
+        return !u.ualign.abuse;
 
     if (race_peaceful(ptr))
         return TRUE;
@@ -2443,6 +2450,17 @@ bagotricks(
         }
     }
     return moncount;
+}
+
+/* create some or all remaining erinyes around the player */
+void
+summon_furies(int limit) /* number to create, or 0 to create until extinct */
+{
+    int i = 0;
+    while (mk_gen_ok(PM_ERINYS, G_GONE, 0U) && (i < limit || !limit)) {
+        makemon(&mons[PM_ERINYS], u.ux, u.uy, MM_ADJACENTOK | MM_NOWAIT);
+        i++;
+    }
 }
 
 /*makemon.c*/

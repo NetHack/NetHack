@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1702274034 2023/12/11 05:53:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.559 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1703070192 2023/12/20 11:03:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.562 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -741,7 +741,7 @@ animate_statue(
             mon = makemon(&mons[PM_DOPPELGANGER], x, y, mmflags);
             /* if hero has protection from shape changers, cham field will
                be NON_PM; otherwise, set form to match the statue */
-            if (mon && mon->cham >= LOW_PM)
+            if (mon && ismnum(mon->cham))
                 (void) newcham(mon, mptr, NO_NC_FLAGS);
         } else {
             if (cause == ANIMATE_SPELL)
@@ -989,7 +989,7 @@ set_utrap(unsigned int tim, unsigned int typ)
        have already set u.utrap to 0 so this check won't be sufficient
        in that situation; caller will need to set context.botl itself */
     if (!u.utrap ^ !tim)
-        gc.context.botl = TRUE;
+        disp.botl = TRUE;
 
     u.utrap = tim;
     u.utraptype = tim ? typ : TT_NONE;
@@ -1283,7 +1283,7 @@ trapeffect_sqky_board(
             }
         } else {
             seetrap(trap);
-            if (trap->tnote >= 0 && trap->tnote < SIZE(tsnds)) {
+            if (IndexOk(trap->tnote, tsnds)) {
                 Soundeffect(tsnds[trap->tnote], 50);
             }
             pline("A board beneath you %s%s%s.",
@@ -1300,7 +1300,7 @@ trapeffect_sqky_board(
         /* stepped on a squeaky board */
         if (in_sight) {
             if (!Deaf) {
-                if (trap->tnote >= 0 && trap->tnote < SIZE(tsnds)) {
+                if (IndexOk(trap->tnote, tsnds)) {
                     Soundeffect(tsnds[trap->tnote], 50);
                 }
                 pline("A board beneath %s squeaks %s loudly.",
@@ -1315,7 +1315,7 @@ trapeffect_sqky_board(
             int range = couldsee(mtmp->mx, mtmp->my) /* 9 or 5 */
                 ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
-            if (trap->tnote >= 0 && trap->tnote < SIZE(tsnds)) {
+            if (IndexOk(trap->tnote, tsnds)) {
                 Soundeffect(tsnds[trap->tnote],
                              ((mdistu(mtmp) <= range * range)
                                 ? 40 : 20));
@@ -1808,7 +1808,8 @@ trapeffect_pit(
                 /* openfallingtrap; not inescapable here */
                 if (in_sight) {
                     seetrap(trap);
-                    pline("%s doesn't fall into the pit.", Monnam(mtmp));
+                    pline_xy(mtmp->mx, mtmp->my,
+                             "%s doesn't fall into the pit.", Monnam(mtmp));
                 }
                 return Trap_Effect_Finished;
             }
@@ -1819,8 +1820,9 @@ trapeffect_pit(
         if (!passes_walls(mptr))
             mtmp->mtrapped = 1;
         if (in_sight) {
-            pline("%s %s into %s pit!", Monnam(mtmp), fallverb,
-                  a_your[trap->madeby_u]);
+            pline_xy(mtmp->mx, mtmp->my,
+                     "%s %s into %s pit!", Monnam(mtmp), fallverb,
+                     a_your[trap->madeby_u]);
             if (mptr == &mons[PM_PIT_VIPER]
                 || mptr == &mons[PM_PIT_FIEND])
                 pline("How pitiful.  Isn't that the pits?");
@@ -1872,18 +1874,20 @@ trapeffect_hole(
                 if (in_sight) {
                     seetrap(trap);
                     if (tt == TRAPDOOR)
-                        pline(
+                        pline_xy(mtmp->mx, mtmp->my,
                             "A trap door opens, but %s doesn't fall through.",
                               mon_nam(mtmp));
                     else /* (tt == HOLE) */
-                        pline("%s doesn't fall through the hole.",
-                              Monnam(mtmp));
+                        pline_xy(mtmp->mx, mtmp->my,
+                                 "%s doesn't fall through the hole.",
+                                 Monnam(mtmp));
                 }
                 return Trap_Effect_Finished; /* inescapable = FALSE; */
             }
             if (inescapable) { /* sokoban hole */
                 if (in_sight) {
-                    pline("%s seems to be yanked down!", Monnam(mtmp));
+                    pline_xy(mtmp->mx, mtmp->my,
+                             "%s seems to be yanked down!", Monnam(mtmp));
                     /* suppress message in mlevel_tele_trap() */
                     in_sight = FALSE;
                     seetrap(trap);
@@ -3448,8 +3452,10 @@ isclearpath(
     while (distance-- > 0) {
         x += dx;
         y += dy;
+        if (!isok(x, y))
+            return FALSE;
         typ = levl[x][y].typ;
-        if (!isok(x, y) || !ZAP_POS(typ) || closed_door(x, y))
+        if (!ZAP_POS(typ) || closed_door(x, y))
             return FALSE;
         if ((t = t_at(x, y)) != 0
             && (is_pit(t->ttyp) || is_hole(t->ttyp) || is_xport(t->ttyp)))
@@ -3658,7 +3664,7 @@ mselftouch(
 void
 float_up(void)
 {
-    gc.context.botl = TRUE;
+    disp.botl = TRUE;
     if (u.utrap) {
         if (u.utraptype == TT_PIT) {
             reset_utrap(FALSE);
@@ -3771,7 +3777,7 @@ float_down(
         (void) encumber_msg(); /* carrying capacity might have changed */
         return 0;
     }
-    gc.context.botl = TRUE;
+    disp.botl = TRUE;
     nomul(0); /* stop running or resting */
     if (BFlying) {
         /* controlled flight no longer overridden by levitation */
@@ -3996,24 +4002,24 @@ dofiretrap(
         if (alt > num)
             num = alt;
         if (u.mhmax > mons[u.umonnum].mlevel)
-            u.mhmax -= rn2(min(u.mhmax, num + 1)), gc.context.botl = TRUE;
+            u.mhmax -= rn2(min(u.mhmax, num + 1)), disp.botl = TRUE;
         if (u.mh > u.mhmax)
-            u.mh = u.mhmax, gc.context.botl = TRUE;
+            u.mh = u.mhmax, disp.botl = TRUE;
         monstunseesu(M_SEEN_FIRE);
     } else {
         int uhpmin = minuhpmax(1), olduhpmax = u.uhpmax;
 
         num = d(2, 4);
         if (u.uhpmax > uhpmin) {
-            u.uhpmax -= rn2(min(u.uhpmax, num + 1)), gc.context.botl = TRUE;
+            u.uhpmax -= rn2(min(u.uhpmax, num + 1)), disp.botl = TRUE;
         } /* note: no 'else' here */
         if (u.uhpmax < uhpmin) {
-            setuhpmax(min(olduhpmax, uhpmin)); /* sets gc.context.botl */
+            setuhpmax(min(olduhpmax, uhpmin)); /* sets disp.botl */
             if (!Drain_resistance)
                 losexp(NULL); /* never fatal when 'drainer' is Null */
         }
         if (u.uhp > u.uhpmax)
-            u.uhp = u.uhpmax, gc.context.botl = TRUE;
+            u.uhp = u.uhpmax, disp.botl = TRUE;
         monstunseesu(M_SEEN_FIRE);
     }
     if (!num)
@@ -4060,12 +4066,12 @@ domagictrap(void)
             Soundeffect(se_deafening_roar_atmospheric, 100);
             You_hear("a deafening roar!");
             incr_itimeout(&HDeaf, rn1(20, 30));
-            gc.context.botl = TRUE;
+            disp.botl = TRUE;
         } else {
             /* magic vibrations still hit you */
             You_feel("rankled.");
             incr_itimeout(&HDeaf, rn1(5, 15));
-            gc.context.botl = TRUE;
+            disp.botl = TRUE;
         }
         while (cnt--)
             (void) makemon((struct permonst *) 0, u.ux, u.uy, NO_MM_FLAGS);
@@ -4774,7 +4780,8 @@ rescued_from_terrain(int how)
 
     iflags.last_msg = PLNMSG_BACK_ON_GROUND; /* for describe_decor() */
     /* feedback just disclosed this */
-    iflags.prev_decor = gl.lastseentyp[u.ux][u.uy] = lev->typ;
+    update_lastseentyp(u.ux, u.uy);
+    iflags.prev_decor = gl.lastseentyp[u.ux][u.uy];
 }
 
 /* return TRUE iff player relocated */
@@ -4933,7 +4940,7 @@ drain_en(int n, boolean max_already_drained)
         /* energy is completely gone */
         if (u.uen || u.uenmax) { /* paranoia */
             u.uen = u.uenmax = 0;
-            gc.context.botl = TRUE;
+            disp.botl = TRUE;
         }
         mesg = "momentarily lethargic";
     } else {
@@ -4956,7 +4963,7 @@ drain_en(int n, boolean max_already_drained)
                and then we throttled the loss being applied to current */
             u.uen = u.uenmax;
         }
-        gc.context.botl = TRUE;
+        disp.botl = TRUE;
     }
     /* after manipulating u.uen,uenmax and setting context.botl, so
        that You_feel() -> pline() will update status before the message */
@@ -5790,6 +5797,7 @@ openholdingtrap(
     if (!which)
         which = t->tseen ? the_your[t->madeby_u]
                          : strchr(vowels, *trapdescr) ? "an" : "a";
+    assert(which != 0);
     if (*which)
         which = strcat(strcpy(whichbuf, which), " ");
 

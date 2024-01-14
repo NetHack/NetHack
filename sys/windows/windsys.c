@@ -161,7 +161,7 @@ chdrive(char* str)
     char drive;
     if ((ptr = strchr(str, ':')) != (char *) 0) {
         drive = toupper((uchar) *(ptr - 1));
-        _chdrive((drive - 'A') + 1);
+        (void) _chdrive((drive - 'A') + 1);
     }
 }
 
@@ -388,18 +388,21 @@ void port_insert_pastebuf(char *buf)
     /* Housekeeping need: +GlobalUnlock(hglbCopy), GlobalFree(hglbCopy),
                             CloseClipboard(), free(w) */
 
-    memcpy(lpwstrCopy, w, abytes);
-    GlobalUnlock(hglbCopy);
-    /* Housekeeping need: GlobalFree(hglbCopy), CloseClipboard(), free(w) */
+    if (lpwstrCopy) {
+        memcpy(lpwstrCopy, w, abytes);
+        GlobalUnlock(hglbCopy);
+        /* Housekeeping need: GlobalFree(hglbCopy), CloseClipboard(), free(w)
+         */
 
-    /* put it on the clipboard */
-    hresult = SetClipboardData(CF_UNICODETEXT, hglbCopy);
-    if (!hresult) {
-        raw_printf("Error copying to clipboard.\n");
-        GlobalFree(hglbCopy); /* only needed if clipboard didn't accept data */
+        /* put it on the clipboard */
+        hresult = SetClipboardData(CF_UNICODETEXT, hglbCopy);
+        if (!hresult) {
+            raw_printf("Error copying to clipboard.\n");
+            GlobalFree(
+                hglbCopy); /* only needed if clipboard didn't accept data */
+        }
+        /* Housekeeping need: CloseClipboard(), free(w) */
     }
-    /* Housekeeping need: CloseClipboard(), free(w) */
-
     CloseClipboard();
     free(w);
     return;
@@ -619,30 +622,37 @@ BOOL winos_font_support_cp437(HFONT hFont)
     HDC hdc = GetDC(NULL);
     HFONT oldFont = SelectObject(hdc, hFont);
 
-    DWORD size = GetFontUnicodeRanges(hdc, NULL);
-    GLYPHSET *glyphSet = (GLYPHSET *) malloc(size);
 
-    if (glyphSet != NULL) {
-        GetFontUnicodeRanges(hdc, glyphSet);
+    DWORD size = (size_t) GetFontUnicodeRanges(hdc, NULL);
+    if (size) {
+        GLYPHSET *glyphSet = (GLYPHSET *) malloc((size_t) size);
+        if (glyphSet != NULL) {
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 6386 )
+#endif
+            size = GetFontUnicodeRanges(hdc, glyphSet);
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
+            allFound = TRUE;
+            for (int i = 0; i < 256 && allFound; i++) {
+                WCHAR wc = cp437[i];
+                BOOL found = FALSE;
+                for (DWORD j = 0; j < glyphSet->cRanges && !found; j++) {
+                    WCHAR first = glyphSet->ranges[j].wcLow;
+                    WCHAR last = first + glyphSet->ranges[j].cGlyphs - 1;
 
-        allFound = TRUE;
-        for (int i = 0; i < 256 && allFound; i++) {
-            WCHAR wc = cp437[i];
-            BOOL found = FALSE;
-            for (DWORD j = 0; j < glyphSet->cRanges && !found; j++) {
-                WCHAR first = glyphSet->ranges[j].wcLow;
-                WCHAR last = first + glyphSet->ranges[j].cGlyphs - 1;
-
-                if (wc >= first && wc <= last)
-                    found = TRUE;
+                    if (wc >= first && wc <= last)
+                        found = TRUE;
+                }
+                if (!found)
+                    allFound = FALSE;
             }
-            if (!found)
-                allFound = FALSE;
+
+            free(glyphSet);
         }
-
-        free(glyphSet);
     }
-
     SelectObject(hdc, oldFont);
     ReleaseDC(NULL, hdc);
 

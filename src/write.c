@@ -3,10 +3,10 @@
 
 #include "hack.h"
 
-static int cost(struct obj *);
-static boolean label_known(int, struct obj *);
-static int write_ok(struct obj *);
-static char *new_book_description(int, char *);
+static int cost(struct obj *) NONNULLARG1;
+static boolean label_known(int, struct obj *) NO_NNARGS;
+static int write_ok(struct obj *) NO_NNARGS;
+static char *new_book_description(int, char *) NONNULL NONNULLPTRS;
 
 /*
  * returns basecost of a scroll or a spellbook

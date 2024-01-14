@@ -139,7 +139,7 @@ resetobjs(struct obj *ochain, boolean restore)
                 otmp->spe = 0; /* not "laid by you" in next game */
             } else if (otmp->otyp == TIN) {
                 /* make tins of unique monster's meat be empty */
-                if (otmp->corpsenm >= LOW_PM
+                if (ismnum(otmp->corpsenm)
                     && unique_corpstat(&mons[otmp->corpsenm]))
                     otmp->corpsenm = NON_PM;
             } else if (otmp->otyp == CORPSE || otmp->otyp == STATUE) {
@@ -451,32 +451,7 @@ savebones(int how, time_t when, struct obj *corpse)
 
     set_ghostly_objlist(gi.invent);
     /* dispose of your possessions, usually cursed */
-    if (u.ugrave_arise == (NON_PM - 1)) {
-        struct obj *otmp;
-
-        /* embed your possessions in your statue */
-        otmp = mk_named_object(STATUE, &mons[u.umonnum], u.ux, u.uy,
-                               gp.plname);
-
-        drop_upon_death((struct monst *) 0, otmp, u.ux, u.uy);
-        if (!otmp)
-            return; /* couldn't make statue */
-        mtmp = (struct monst *) 0;
-    } else if (u.ugrave_arise < LOW_PM) {
-        /* drop everything */
-        drop_upon_death((struct monst *) 0, (struct obj *) 0, u.ux, u.uy);
-        /* trick makemon() into allowing monster creation
-         * on your location
-         */
-        gi.in_mklev = TRUE;
-        mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, MM_NONAME);
-        gi.in_mklev = FALSE;
-        if (!mtmp)
-            return;
-        mtmp = christen_monst(mtmp, gp.plname);
-        if (corpse)
-            (void) obj_attach_mid(corpse, mtmp->m_id);
-    } else {
+    if (ismnum(u.ugrave_arise)) {
         /* give your possessions to the monster you become */
         gi.in_mklev = TRUE; /* use <u.ux,u.uy> as-is */
         mtmp = makemon(&mons[u.ugrave_arise], u.ux, u.uy, NO_MINVENT);
@@ -498,6 +473,31 @@ savebones(int how, time_t when, struct obj *corpse)
         if (mtmp->data->mlet == S_MUMMY && !m_carrying(mtmp, MUMMY_WRAPPING))
             (void) mongets(mtmp, MUMMY_WRAPPING);
         m_dowear(mtmp, TRUE);
+    } else if (u.ugrave_arise == LEAVESTATUE) {
+        struct obj *otmp;
+
+        /* embed your possessions in your statue */
+        otmp = mk_named_object(STATUE, &mons[u.umonnum], u.ux, u.uy,
+                               gp.plname);
+
+        drop_upon_death((struct monst *) 0, otmp, u.ux, u.uy);
+        if (!otmp)
+            return; /* couldn't make statue */
+        mtmp = (struct monst *) 0;
+    } else { /* u.ugrave_arise < LEAVESTATUE */
+        /* drop everything */
+        drop_upon_death((struct monst *) 0, (struct obj *) 0, u.ux, u.uy);
+        /* trick makemon() into allowing monster creation
+         * on your location
+         */
+        gi.in_mklev = TRUE;
+        mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, MM_NONAME);
+        gi.in_mklev = FALSE;
+        if (!mtmp)
+            return;
+        mtmp = christen_monst(mtmp, gp.plname);
+        if (corpse)
+            (void) obj_attach_mid(corpse, mtmp->m_id);
     }
     if (mtmp) {
         mtmp->m_lev = (u.ulevel ? u.ulevel : 1);
@@ -598,7 +598,8 @@ getbones(void)
 {
     int ok;
     NHFILE *nhfp = (NHFILE *) 0;
-    char c = 0, *bonesid, oldbonesid[40]; /* was [10]; more should be safer */
+    char c = 0, *bonesid,
+         oldbonesid[40] = { 0 }; /* was [10]; more should be safer */
 
     if (discover) /* save bones files for real games */
         return 0;
@@ -640,8 +641,18 @@ getbones(void)
                string and wasn't recorded in the file */
             mread(nhfp->fd, (genericptr_t) &c,
                   sizeof c); /* length including terminating '\0' */
-            mread(nhfp->fd, (genericptr_t) oldbonesid,
-                  (unsigned) c); /* DD.nn or Qrrr.n for role rrr */
+            if ((unsigned) c <= sizeof oldbonesid) {
+                mread(nhfp->fd, (genericptr_t) oldbonesid,
+                      (unsigned) c); /* DD.nn or Qrrr.n for role rrr */
+            } else {
+                if (wizard)
+                    debugpline2("Abandoning bones , %u > %u.",
+                                (unsigned) c, (unsigned) sizeof oldbonesid);
+                close_nhfile(nhfp);
+                compress_bonesfile();
+                /* ToDo: maybe unlink these problematic bones? */
+                return 0;
+            }
         }
         if (strcmp(bonesid, oldbonesid) != 0) {
             char errbuf[BUFSZ];

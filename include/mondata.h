@@ -1,4 +1,4 @@
-/* NetHack 3.7	mondata.h	$NHDT-Date: 1606473485 2020/11/27 10:38:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.45 $ */
+/* NetHack 3.7	mondata.h	$NHDT-Date: 1703845738 2023/12/29 10:28:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.63 $ */
 /* Copyright (c) 1989 Mike Threepoint                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -161,6 +161,8 @@
 #define is_rider(ptr)                                      \
     ((ptr) == &mons[PM_DEATH] || (ptr) == &mons[PM_FAMINE] \
      || (ptr) == &mons[PM_PESTILENCE])
+/* note: placeholder monsters are used for corposes of zombies and mummies;
+   PM_DWARF and PM_GNOME are normal monsters, not placeholders */
 #define is_placeholder(ptr)                             \
     ((ptr) == &mons[PM_ORC] || (ptr) == &mons[PM_GIANT] \
      || (ptr) == &mons[PM_ELF] || (ptr) == &mons[PM_HUMAN])
@@ -197,6 +199,8 @@
 
 #define touch_petrifies(ptr) \
     ((ptr) == &mons[PM_COCKATRICE] || (ptr) == &mons[PM_CHICKATRICE])
+/* Medusa doesn't pass touch_petrifies() but does petrify if eaten */
+#define flesh_petrifies(pm) (touch_petrifies(pm) || (pm) == &mons[PM_MEDUSA])
 
 /* missiles made of rocks don't harm these: xorns and earth elementals
    (but not ghosts and shades because that would impact all missile use

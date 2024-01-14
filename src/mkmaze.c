@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkmaze.c	$NHDT-Date: 1648064596 2022/03/23 19:43:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.133 $ */
+/* NetHack 3.7	mkmaze.c	$NHDT-Date: 1704830842 2024/01/09 20:07:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.158 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1013,18 +1013,21 @@ pick_vibrasquare_location(void)
     coordxy x, y;
     stairway *stway;
     int trycnt = 0;
+    /* these are also defined in mklev.c and they may not be appropriate
+       for mazes with corridors wider than 1 or for cavernous levels */
 #define x_maze_min 2
 #define y_maze_min 2
-/*
- * Pick a position where the stairs down to Moloch's Sanctum
- * level will ultimately be created.  At that time, an area
- * will be altered:  walls removed, moat and traps generated,
- * boulders destroyed.  The position picked here must ensure
- * that that invocation area won't extend off the map.
- *
- * We actually allow up to 2 squares around the usual edge of
- * the area to get truncated; see mkinvokearea(mklev.c).
- */
+
+    /*
+     * Pick a position where the stairs down to Moloch's Sanctum
+     * level will ultimately be created.  At that time, an area
+     * will be altered:  walls removed, moat and traps generated,
+     * boulders destroyed.  The position picked here must ensure
+     * that that invocation area won't extend off the map.
+     *
+     * We actually allow up to 2 squares around the usual edge of
+     * the area to get truncated; see mkinvokearea(mklev.c).
+     */
 #define INVPOS_X_MARGIN (6 - 2)
 #define INVPOS_Y_MARGIN (5 - 2)
 #define INVPOS_DISTANCE 11

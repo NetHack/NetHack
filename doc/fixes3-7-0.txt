@@ -1,4 +1,4 @@
-$NHDT-Branch: (unknown) $:$NHDT-Revision: 1.1339 $ $NHDT-Date: 1702264272 2023/12/11 03:11:12 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1353 $ $NHDT-Date: 1704316439 2024/01/03 21:13:59 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -324,6 +324,7 @@ hero poly'd into rust monster could implicitly eat bars when adjacent by
 	can explicitly eat them via 'e' after moving onto their spot
 monster hiding under an egg that hatched was kept hidden
 restful sleep regenerates hit points
+restful sleep gives a warning message few turns before you fall asleep
 attacking non-adjacent concealed mimic by applying a polearm would make the
 	hero be stuck to that mimic
 hero could break a wand ("raising the wand high over your head, you break it
@@ -1333,6 +1334,21 @@ HP regeneration formula has changed, primarily to be less fast in the endgame
 riding negates stealth unless the steed is flying
 previous hero rising as undead in bones retains intrinsics
 level temperature affects monster generation
+amulet of unchanging cannot be polymorphed
+wishing for a "lit candle" provided one, but the feedback as it was added into
+	invent was "partly used candle (lit)" because of how 'lit' timer works
+don't fall off steed because of Fumbling if saddle is cursed
+cursed welded quarterstaff doesn't prevent spellcasting
+wielded quarterstaff gives a small spellcasting bonus
+if polymorphing a potion turned it into oil, dipping potions produced oil
+	randomly, or a horn of plenty produced a magic potion and converted
+	it into oil, the resulting potion of oil had its age (amount left)
+	set of the original potion's age (turn it was created) and could burn
+	for an arbitrarily long time if applied; conversely, polymophing oil
+	into non-oil kept its relative age (no noticeable effect though)
+an engulfer capable of passing through iron bars could do so even when hero
+	was engulfed
+some uses of mons[obj->corpsenm] weren't excluding obj->corpsenm==NON_PM (-1)
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
@@ -1807,6 +1823,11 @@ autopickup while levitating shares code with 'mention_decor'; after being told
 	about ice covered by an object, moving over some other object later
 	when mention_decor is Off could give "you are back on solid ground"
 	long after leaving the ice
+duration of temporary stoning resistance would be extended while eating a
+	cockatrice corpse, as intended, but not while eating Medusa's corpse
+	so if it timed out during the meal, player got the message about hero
+	no longer being protected against stoning but was able to finish the
+	meal safely
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
@@ -2412,6 +2433,8 @@ allow the ')', '[', '(', '=', '"', and '*' commands to be preceded by the 'm'
 	a context-sensitive item action for it; some give a menu even without
 	the prefix and for those, same item selection and action can be used
 hot ground (Gehennom / Plane of Fire) often destroys dropped potions
+erinyes overhaul; they now attempt to punish heroes who have violated their
+	alignment and get stronger with greater alignment abuse
 
 
 Platform- and/or Interface-Specific New Features
@@ -2593,6 +2616,11 @@ add new options 'nopick_dropped' and 'pickup_stolen' options to avoid
 	previously stolen from hero if moved upon while autopickup is On; both
 	bypass pickup_types and autopickup_exceptions (pr #1140 by entrez)
 fix msg_window:combination and TTY getlin() ^P (pr #1155 by entrez)
+remove a null sobj check from gold_detect that was situated after
+	dereferences had already been done (pr #1173 by argrath) and
+	adjust prototype in extern.h
+check for valid indexes of def_monsyms[] and def_oc_syms[] in
+	choose_classes_menu() (pr #1179 by argrath)
 
 
 Code Cleanup and Reorganization

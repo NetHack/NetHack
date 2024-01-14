@@ -1,4 +1,4 @@
-/* NetHack 3.7	alloc.c	$NHDT-Date: 1687343500 2023/06/21 10:31:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.31 $ */
+/* NetHack 3.7	alloc.c	$NHDT-Date: 1703716159 2023/12/27 22:29:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -15,9 +15,9 @@
 #endif
 
 /*#define FITSint(x) FITSint_(x, __func__, (int) __LINE__)*/
-extern int FITSint_(LUA_INTEGER, const char *, int);
+extern int FITSint_(LUA_INTEGER, const char *, int) NONNULLARG2;
 /*#define FITSuint(x) FITSuint_(x, __func__, (int) __LINE__)*/
-extern unsigned FITSuint_(unsigned long long, const char *, int);
+extern unsigned FITSuint_(unsigned long long, const char *, int) NONNULLARG2;
 
 char *fmt_ptr(const genericptr) NONNULL;
 

@@ -60,12 +60,12 @@ extern void *trace_procs_chain(int, int, void *, void *, void *);
 #endif
 
 #if defined(WINCHAIN) || defined(TTY_GRAPHICS)
-static struct win_choices *win_choices_find(const char *s);
+static struct win_choices *win_choices_find(const char *s) NONNULLARG1;
 #endif
 
-static void def_raw_print(const char *s);
+static void def_raw_print(const char *s) NONNULLARG1;
 static void def_wait_synch(void);
-static boolean get_menu_coloring(const char *, int *, int *);
+static boolean get_menu_coloring(const char *, int *, int *) NONNULLPTRS;
 
 #ifdef DUMPLOG
 static winid dump_create_nhwindow(int);
@@ -652,7 +652,7 @@ hup_exit_nhwindows(const char *lastgasp)
         (*previnterface_exit_nhwindows)(lastgasp);
         previnterface_exit_nhwindows = 0;
     }
-    iflags.window_inited = 0;
+    iflags.window_inited = FALSE;
 }
 
 static int
@@ -691,7 +691,7 @@ hup_getlin(const char *prompt UNUSED, char *outbuf)
 static void
 hup_init_nhwindows(int *argc_p UNUSED, char **argv UNUSED)
 {
-    iflags.window_inited = 1;
+    iflags.window_inited = TRUE;
 }
 
 /*ARGUSED*/
@@ -1664,15 +1664,27 @@ choose_classes_menu(const char *prompt,
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
     while (*class_list) {
+        int idx;
+
         selected = FALSE;
         switch (category) {
         case 0:
-            text = def_monsyms[def_char_to_monclass(*class_list)].explain;
+            idx = def_char_to_monclass(*class_list);
+            if (!IndexOk(idx, def_monsyms)) {
+                panic("choose_classes_menu: invalid monclass '%c'", *class_list);
+                /*NOTREACHED*/
+            }
+            text = def_monsyms[idx].explain;
             accelerator = *class_list;
             Sprintf(buf, "%s", text);
             break;
         case 1:
-            text = def_oc_syms[def_char_to_objclass(*class_list)].explain;
+            idx = def_char_to_objclass(*class_list);
+            if (!IndexOk(idx, def_oc_syms)) {
+                panic("choose_classes_menu: invalid objclass '%c'", *class_list);
+                /*NOTREACHED*/
+            }
+            text = def_oc_syms[idx].explain;
             accelerator = next_accelerator;
             Sprintf(buf, "%c  %s", *class_list, text);
             break;

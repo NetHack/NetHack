@@ -929,16 +929,17 @@ dogfood(struct monst *mon, struct obj *obj)
     switch (obj->oclass) {
     case FOOD_CLASS:
         fx = (obj->otyp == CORPSE || obj->otyp == TIN || obj->otyp == EGG)
+                /* corpsenm might be NON_PM (special tin, unhatachable egg) */
                 ? obj->corpsenm
-                : NUMMONS; /* valid mons[mndx] to pacify static analyzer */
-        fptr = &mons[fx];
+                : NON_PM;
+        /* mons[NUMMONS] is a valid array entry, though not a valid monster;
+         * predicate tests against it will fail */
+        fptr = &mons[(ismnum(fx)) ? fx : NUMMONS];
 
         if (obj->otyp == CORPSE && is_rider(fptr))
             return TABU;
         if ((obj->otyp == CORPSE || obj->otyp == EGG)
-            /* Medusa's corpse doesn't pass the touch_petrifies() test
-               but does cause petrification if eaten */
-            && (touch_petrifies(fptr) || obj->corpsenm == PM_MEDUSA)
+            && flesh_petrifies(fptr) /* c*ckatrice or Medusa */
             && !resists_ston(mon))
             return POISON;
         if (obj->otyp == LUMP_OF_ROYAL_JELLY
@@ -1103,7 +1104,7 @@ tamedog(struct monst *mtmp, struct obj *obj)
             /* pet will "catch" and eat this thrown food */
             if (canseemon(mtmp)) {
                 boolean big_corpse =
-                    (obj->otyp == CORPSE && obj->corpsenm >= LOW_PM
+                    (obj->otyp == CORPSE && ismnum(obj->corpsenm)
                      && mons[obj->corpsenm].msize > mtmp->data->msize);
                 pline("%s catches %s%s", Monnam(mtmp), the(xname(obj)),
                       !big_corpse ? "." : ", or vice versa!");

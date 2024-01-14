@@ -1,4 +1,4 @@
-/* NetHack 3.7	timeout.c	$NHDT-Date: 1658390077 2022/07/21 07:54:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.142 $ */
+/* NetHack 3.7	timeout.c	$NHDT-Date: 1703294874 2023/12/23 01:27:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.167 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -7,17 +7,18 @@
 
 static void stoned_dialogue(void);
 static void vomiting_dialogue(void);
+static void sleep_dialogue(void);
 static void choke_dialogue(void);
 static void levitation_dialogue(void);
 static void slime_dialogue(void);
-static void slimed_to_death(struct kinfo *);
+static void slimed_to_death(struct kinfo *) NO_NNARGS;
 static void sickness_dialogue(void);
 static void phaze_dialogue(void);
 static void done_timeout(int, int);
 static void slip_or_trip(void);
-static void see_lamp_flicker(struct obj *, const char *);
-static void lantern_message(struct obj *);
-static void cleanup_burn(ANY_P *, long);
+static void see_lamp_flicker(struct obj *, const char *) NONNULLPTRS;
+static void lantern_message(struct obj *) NONNULLARG1;
+static void cleanup_burn(ANY_P *, long) NONNULLARG1;
 
 /* used by wizard mode #timeout and #wizintrinsic; order by 'interest'
    for timeout countdown, where most won't occur in normal play */
@@ -111,7 +112,7 @@ static const struct propname {
 const char *
 property_by_index(int idx, int *propertynum)
 {
-    if (!(idx >= 0 && idx < SIZE(propertynames) - 1))
+    if (!IndexOkT(idx, propertynames))
         idx = SIZE(propertynames) - 1;
 
     if (propertynum)
@@ -256,6 +257,15 @@ vomiting_dialogue(void)
     if (txt)
         You1(txt);
     exercise(A_CON, FALSE);
+}
+
+static void
+sleep_dialogue(void)
+{
+    long i = (HSleepy & TIMEOUT);
+
+    if (i == 4)
+        You("yawn.");
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL   /* RESTORE is after slime_dialogue */
@@ -540,7 +550,7 @@ done_timeout(int how, int which)
 
     /* life-saved */
     *intrinsic_p &= ~I_SPECIAL;
-    gc.context.botl = TRUE;
+    disp.botl = TRUE;
 }
 
 void
@@ -590,6 +600,8 @@ nh_timeout(void)
         levitation_dialogue();
     if (HPasses_walls & TIMEOUT)
         phaze_dialogue();
+    if (HSleepy & TIMEOUT)
+        sleep_dialogue();
     if (u.mtimedone && !--u.mtimedone) {
         if (Unchanging)
             u.mtimedone = rnd(100 * gy.youmonst.data->mlevel + 1);
@@ -704,7 +716,7 @@ nh_timeout(void)
             case DEAF:
                 set_itimeout(&HDeaf, 1L);
                 make_deaf(0L, TRUE);
-                gc.context.botl = TRUE;
+                disp.botl = TRUE;
                 if (!Deaf)
                     stop_occupation();
                 break;
@@ -757,21 +769,39 @@ nh_timeout(void)
             case FLYING:
                 /* timed Flying is via #wizintrinsic only */
                 if (was_flying && !Flying) {
-                    gc.context.botl = 1;
+                    disp.botl = TRUE;
                     You("land.");
                     spoteffects(TRUE);
                 }
                 break;
             case ACID_RES:
-                if (!Acid_resistance && !Unaware)
-                    You("no longer feel safe from acid.");
+                if (!Acid_resistance) {
+                    if (eating_dangerous_corpse(ACID_RES)) {
+                        /* extend temporary acid resistance if in midst
+                           of eating an acidic corpse; this will repeat
+                           until eating is finished or interrupted */
+                        set_itimeout(&u.uprops[ACID_RES].intrinsic, 1L);
+                        break;
+                    }
+                    if (!Unaware)
+                        You("no longer feel safe from acid.");
+                }
                 break;
             case STONE_RES:
                 if (!Stone_resistance) {
+                    if (eating_dangerous_corpse(STONE_RES)) {
+                        /* extend temporary stoning resistance if in midst
+                           of eating a stoning corpse; this will repeat
+                           until eating is finished or interrupted */
+                        set_itimeout(&u.uprops[STONE_RES].intrinsic, 1L);
+                        break;
+                    }
                     if (!Unaware)
                         You("no longer feel secure from petrification.");
                     /* no-op if not wielding a cockatrice corpse;
-                       uswapwep case is always a no-op (see Gloves_off()) */
+                       uswapwep case is always a no-op because two-weapon
+                       combat is only possible with two one-handed weapons
+                       or weapon tools, not corpses */
                     wielding_corpse(uwep, (struct obj *) 0, FALSE);
                     wielding_corpse(uswapwep, (struct obj *) 0, FALSE);
                 }
@@ -885,7 +915,7 @@ fall_asleep(int how_long, boolean wakeup_msg)
         /* 3.7: how_long is negative so wasn't actually incrementing the
            deafness timeout when it used to be passed as-is */
         incr_itimeout(&HDeaf, abs(how_long));
-        gc.context.botl = TRUE;
+        disp.botl = TRUE;
         ga.afternmv = Hear_again; /* this won't give any messages */
     }
 #endif
@@ -1135,7 +1165,7 @@ attach_fig_transform_timeout(struct obj *figurine)
 static void
 slip_or_trip(void)
 {
-    struct obj *otmp = vobj_at(u.ux, u.uy), *otmp2;
+    struct obj *otmp = vobj_at(u.ux, u.uy), *otmp2, *saddle;
     const char *what;
     char buf[BUFSZ];
     boolean on_foot = !u.usteed;
@@ -1177,19 +1207,25 @@ slip_or_trip(void)
         /* is fumbling from ice alone? */
         boolean ice_only = !(EFumbling || (HFumbling & ~FROMOUTSIDE));
 
-        pline("%s %s%s %s the ice.",
+        pline("%s %s %s the ice.",
               u.usteed ? upstart(x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
                                           SUPPRESS_SADDLE, FALSE))
                        : "You",
-              rn2(2) ? "slip" : "slide", on_foot ? "" : "s",
+              /* "steed": arbitrary value that will use third person verb
+                 regardless of what u.usteed might be named, as opposed to
+                 "you" (second person, which won't have final 's' added) */
+              vtense(u.usteed ? "steed" : "you", rn2(2) ? "slip" : "slide"),
               /* sometimes slipping due to ice occurs during turn that hero
                  has just moved off the ice; phrase things differently then */
               is_ice(u.ux, u.uy) ? "on" : "off");
         /* fumbling outside of ice while mounted always causes the hero to
-           fall from the saddle, so to avoid a counterintuitive effect where
-           ice makes riding _less_ hazardous, unconditionally dismount if
-           fumbling is from a non-ice source */
-        if (!on_foot && (!ice_only || !rn2(3))) {
+           fall from the saddle (unless it is cursed), so to avoid a
+           counterintuitive effect where ice makes riding _less_ hazardous,
+           unconditionally dismount if fumbling is from a non-ice source */
+        if (!on_foot
+            && ((saddle = which_armor(u.usteed, W_SADDLE)) == 0
+                || !saddle->cursed)
+            && (!ice_only || !rn2(3))) {
             You("lose your balance.");
             dismount_steed(DISMOUNT_FELL);
         }
@@ -1211,7 +1247,11 @@ slip_or_trip(void)
                 You("stumble.");
                 break;
             }
-        } else {
+
+        /* mounted; saddle should never end up being Null here;
+           don't fall off when it happens to be cursed */
+        } else if ((saddle = which_armor(u.usteed, W_SADDLE)) == 0
+                   || !saddle->cursed) {
             switch (rn2(4)) {
             case 1:
                 Your("%s slip out of the stirrups.",
@@ -1768,7 +1808,7 @@ do_storms(void)
         Soundeffect(se_kaboom_boom_boom, 80);
         pline("Kaboom!!!  Boom!!  Boom!!");
         incr_itimeout(&HDeaf, rn1(20, 30));
-        gc.context.botl = TRUE;
+        disp.botl = TRUE;
         if (!u.uinvulnerable) {
             stop_occupation();
             nomul(-3);
@@ -1860,8 +1900,11 @@ typedef struct {
 #endif
 } ttable;
 
-/* table of timeout functions */
+/*
+ * Table of timeout functions, listed in order of enum timeout_types:
+ */
 static const ttable timeout_funcs[NUM_TIME_FUNCS] = {
+    /* object timers */
     TTAB(rot_organic, (timeout_proc) 0, "rot_organic"),
     TTAB(rot_corpse, (timeout_proc) 0, "rot_corpse"),
     TTAB(revive_mon, (timeout_proc) 0, "revive_mon"),
@@ -1869,8 +1912,10 @@ static const ttable timeout_funcs[NUM_TIME_FUNCS] = {
     TTAB(burn_object, cleanup_burn, "burn_object"),
     TTAB(hatch_egg, (timeout_proc) 0, "hatch_egg"),
     TTAB(fig_transform, (timeout_proc) 0, "fig_transform"),
-    TTAB(melt_ice_away, (timeout_proc) 0, "melt_ice_away"),
     TTAB(shrink_glob, (timeout_proc) 0, "shrink_glob"),
+    /* level timers */
+    TTAB(melt_ice_away, (timeout_proc) 0, "melt_ice_away"),
+    /* currently no monster or global timers */
 };
 #undef TTAB
 
@@ -1999,28 +2044,80 @@ void
 timer_sanity_check(void)
 {
     timer_element *curr;
+    unsigned long t_id;
+    coordxy x, y;
 
-    /* this should be much more complete */
     for (curr = gt.timer_base; curr; curr = curr->next) {
-        if (curr->kind == TIMER_OBJECT) {
-            struct obj *obj = curr->arg.a_obj;
+        t_id = curr->tid;
+        switch (curr->kind) {
+        case TIMER_OBJECT: {
+            /* TODO? verify that the timer type is attached to applicable
+               object (egg for hatch, glob for shrink, and so forth) */
+            struct obj *obj = curr->arg.a_obj, *top;
+            char *obj_adr = fmt_ptr((genericptr_t) obj);
+            int owhere = obj->where;
 
             if (obj->timed == 0) {
-                impossible("timer sanity: untimed obj %s, timer %ld",
-                      fmt_ptr((genericptr_t) obj), curr->tid);
+                impossible("timer sanity: untimed obj %s, timer %lu",
+                           obj_adr, t_id);
             }
-        } else if (curr->kind == TIMER_LEVEL) {
-            long where = curr->arg.a_long;
-            coordxy x = (coordxy) ((where >> 16) & 0xFFFF),
-                  y = (coordxy) (where & 0xFFFF);
+            x = y = 0;
+            /* if obj is in a container, possibly a nested one, figure out
+               where the outermost container is */
+            for (top = obj; top; top = top->ocontainer)
+                if ((owhere = top->where) != OBJ_CONTAINED)
+                    break;
+            assert(top != NULL);
+            if (owhere == OBJ_MIGRATING
+                || (owhere == OBJ_MINVENT && !mon_is_local(top->ocarry))) {
+                /* migrating directly or carried by migrating monster */
+                ; /* not able to validate location so skip checks */
+            } else if (!get_obj_location(obj, &x, &y,
+                                         CONTAINED_TOO | BURIED_TOO)) {
+                /* free? or on a shop's used-up bill? */
+                impossible(
+                    "timer sanity: can't locate obj %s [where=%d], timer %lu",
+                           obj_adr, obj->where, t_id);
+            } else if (!isok(x, y)) {
+                impossible(
+              "timer sanity: obj %s [where=%d] located at <%d,%d>, timer %lu",
+                           obj_adr, obj->where, x, y, t_id);
+            }
+            break;
+        }
+        case TIMER_MONSTER:
+            impossible("timer sanity: unexpected monster timer %lu", t_id);
+            break;
+        case TIMER_LEVEL: {
+            long lwhere = curr->arg.a_long;
 
-            if (!isok(x, y)) {
+            x = (coordxy) ((lwhere >> 16) & 0xFFFF);
+            y = (coordxy) (lwhere & 0xFFFF);
+            if (isok(x, y)) {
+                /* replicate isok() in order to convince static analysis
+                   that the decoding via '& 0xFFFF' hasn't produced a value
+                   too big for levl[][] and that the cast to a narrower type
+                   hasn't intruded on the sign bit to yield a negative value;
+                   the analyzer isn't aware that isok() filters such things */
+                assert(x > 0 && x < COLNO && y >= 0 && y < ROWNO);
+
+                if (curr->func_index == MELT_ICE_AWAY && !is_ice(x, y))
+                    impossible(
+                         "timer sanity: melt timer %lu on non-ice %d <%d,%d>",
+                               t_id, levl[x][y].typ, x, y);
+            } else {
                 impossible("timer sanity: spot timer %lu at <%d,%d>",
-                           curr->tid, x, y);
-            } else if (curr->func_index == MELT_ICE_AWAY && !is_ice(x, y)) {
-                impossible("timer sanity: melt timer %lu on non-ice %d <%d,%d>",
-                           curr->tid, levl[x][y].typ, x, y);
+                           t_id, x, y);
             }
+            break;
+        }
+        case TIMER_GLOBAL:
+            impossible("timer sanity: unexpected global timer %lu", t_id);
+            break;
+        default:
+            impossible("timer sanity: unknown timer %lu, type: %d",
+                       t_id, curr->kind);
+            break;
         }
     }
 }

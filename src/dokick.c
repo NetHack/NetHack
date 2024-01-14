@@ -440,7 +440,7 @@ container_impact_dmg(
 
             /* eggs laid by you.  penalty is -1 per egg, max 5,
              * but it's always exactly 1 that breaks */
-            if (otmp->otyp == EGG && otmp->spe && otmp->corpsenm >= LOW_PM)
+            if (otmp->otyp == EGG && otmp->spe && ismnum(otmp->corpsenm))
                 change_luck(-1);
             if (otmp->otyp == EGG) {
                 Soundeffect(se_egg_cracking, 25);
@@ -1699,7 +1699,7 @@ ship_object(struct obj *otmp, coordxy x, coordxy y, boolean shop_floor_obj)
             result = "crash";
         } else {
             /* penalty for breaking eggs laid by you */
-            if (otmp->otyp == EGG && otmp->spe && otmp->corpsenm >= LOW_PM)
+            if (otmp->otyp == EGG && otmp->spe && ismnum(otmp->corpsenm))
                 change_luck((schar) -min(otmp->quan, 5L));
             result = "splat";
         }

@@ -397,6 +397,7 @@ curses_str_remainder(const char *str, int width, int line_num)
         if (last_space == 0) {  /* No spaces found */
             last_space = count - 1;
         }
+        assert(IndexOk(last_space, substr));
         if (substr[last_space] == '\0') {
             break;
         }

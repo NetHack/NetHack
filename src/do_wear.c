@@ -49,6 +49,9 @@ static int puton_ok(struct obj *);
 static int remove_ok(struct obj *);
 static int wear_ok(struct obj *);
 static int takeoff_ok(struct obj *);
+/* maybe_destroy_armor() may return NULL */
+static struct obj *maybe_destroy_armor(struct obj *, struct obj *,
+                                       boolean *) NONNULLARG3;
 
 /* plural "fingers" or optionally "gloves" */
 const char *
@@ -210,7 +213,7 @@ Boots_on(void)
                                * so uarmf could be Null below; status line
                                * gets updated during brief interval they're
                                * worn so hero and player learn enchantment */
-            gc.context.botl = 1; /* status hilites might mark AC changed */
+            disp.botl = TRUE; /* status hilites might mark AC changed */
             makeknown(uarmf->otyp);
             float_up();
             if (Levitation)
@@ -425,7 +428,7 @@ Helmet_on(void)
            but it takes trained arrogance to pull it off, and the actual
            enchantment of the hat is irrelevant */
         ABON(A_CHA) += (Role_if(PM_WIZARD) ? 1 : -1);
-        gc.context.botl = 1;
+        disp.botl = TRUE;
         makeknown(uarmh->otyp);
         break;
     case HELM_OF_OPPOSITE_ALIGNMENT:
@@ -437,7 +440,7 @@ Helmet_on(void)
         uchangealign((u.ualign.type != A_NEUTRAL)
                          ? -u.ualign.type
                          : (uarmh->o_id % 2) ? A_CHAOTIC : A_LAWFUL,
-                     1);
+                     A_CG_HELM_ON);
         /* makeknown(HELM_OF_OPPOSITE_ALIGNMENT); -- below, after Tobjnam() */
     /*FALLTHRU*/
     case DUNCE_CAP:
@@ -457,7 +460,7 @@ Helmet_on(void)
             else if (uarmh->bknown)
                 update_inventory(); /* keep bknown as-is; display the curse */
         }
-        gc.context.botl = 1; /* reveal new alignment or INT & WIS */
+        disp.botl = TRUE; /* reveal new alignment or INT & WIS */
         if (Hallucination) {
             pline("My brain hurts!"); /* Monty Python's Flying Circus */
         } else if (uarmh && uarmh->otyp == DUNCE_CAP) {
@@ -496,12 +499,12 @@ Helmet_off(void)
     case ORCISH_HELM:
         break;
     case DUNCE_CAP:
-        gc.context.botl = 1;
+        disp.botl = TRUE;
         break;
     case CORNUTHAUM:
         if (!gc.context.takeoff.cancelled_don) {
             ABON(A_CHA) += (Role_if(PM_WIZARD) ? -1 : 1);
-            gc.context.botl = 1;
+            disp.botl = TRUE;
         }
         break;
     case HELM_OF_TELEPATHY:
@@ -518,7 +521,7 @@ Helmet_off(void)
         /* changing alignment can toggle off active artifact
            properties, including levitation; uarmh could get
            dropped or destroyed here */
-        uchangealign(u.ualignbase[A_CURRENT], 2);
+        uchangealign(u.ualignbase[A_CURRENT], A_CG_HELM_OFF);
         break;
     default:
         impossible(unknown_type, c_helmet, uarmh->otyp);
@@ -552,7 +555,7 @@ Gloves_on(void)
         break;
     case GAUNTLETS_OF_POWER:
         makeknown(uarmg->otyp);
-        gc.context.botl = 1; /* taken care of in attrib.c */
+        disp.botl = TRUE; /* taken care of in attrib.c */
         break;
     case GAUNTLETS_OF_DEXTERITY:
         adj_abon(uarmg, uarmg->spe);
@@ -626,7 +629,7 @@ Gloves_off(void)
         break;
     case GAUNTLETS_OF_POWER:
         makeknown(uarmg->otyp);
-        gc.context.botl = 1; /* taken care of in attrib.c */
+        disp.botl = TRUE; /* taken care of in attrib.c */
         break;
     case GAUNTLETS_OF_DEXTERITY:
         if (!gc.context.takeoff.cancelled_don)
@@ -661,7 +664,7 @@ Gloves_off(void)
         wielding_corpse(uswapwep, gloves, on_purpose);
 
     if (condtests[bl_bareh].enabled)
-        gc.context.botl = 1;
+        disp.botl = TRUE;
 
     return 0;
 }
@@ -956,7 +959,7 @@ Amulet_on(void)
             makeknown(AMULET_OF_CHANGE);
             You("are suddenly very %s!",
                 flags.female ? "feminine" : "masculine");
-            gc.context.botl = 1;
+            disp.botl = TRUE;
             newsym(u.ux, u.uy); /* glyphmon flag and tile may have gone
                                  * from male to female or vice versa */
         } else {
@@ -975,7 +978,7 @@ Amulet_on(void)
         if (can_be_strangled(&gy.youmonst)) {
             makeknown(AMULET_OF_STRANGULATION);
             Strangled = 6L;
-            gc.context.botl = TRUE;
+            disp.botl = TRUE;
             pline("It constricts your throat!");
         }
         break;
@@ -1002,7 +1005,7 @@ Amulet_on(void)
 
             if (!already_flying) {
                 makeknown(AMULET_OF_FLYING);
-                gc.context.botl = TRUE; /* status: 'Fly' On */
+                disp.botl = TRUE; /* status: 'Fly' On */
                 You("are now in flight.");
             }
         }
@@ -1050,7 +1053,7 @@ Amulet_off(void)
     case AMULET_OF_STRANGULATION:
         if (Strangled) {
             Strangled = 0L;
-            gc.context.botl = TRUE;
+            disp.botl = TRUE;
             if (Breathless)
                 Your("%s is no longer constricted!", body_part(NECK));
             else
@@ -1071,7 +1074,7 @@ Amulet_off(void)
         float_vs_flight(); /* probably not needed here */
         if (was_flying && !Flying) {
             makeknown(AMULET_OF_FLYING);
-            gc.context.botl = TRUE; /* status: 'Fly' Off */
+            disp.botl = TRUE; /* status: 'Fly' Off */
             You("%s.", (is_pool_or_lava(u.ux, u.uy)
                         || Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
                           ? "stop flying"
@@ -1137,7 +1140,7 @@ adjust_attrib(struct obj *obj, int which, int val)
         already discovered, both handled by learnring()] */
     if (observable || !extremeattr(which))
         learnring(obj, observable);
-    gc.context.botl = 1;
+    disp.botl = TRUE;
 }
 
 void
@@ -2115,7 +2118,7 @@ accessory_or_armor_on(struct obj *obj)
                 You("are suddenly overcome with shame and change your mind.");
             u.ublessed = 0; /* lose your god's protection */
             makeknown(obj->otyp);
-            gc.context.botl = 1; /* for AC after zeroing u.ublessed */
+            disp.botl = TRUE; /* for AC after zeroing u.ublessed */
             return ECMD_TIME;
         }
     } else {
@@ -2388,7 +2391,7 @@ find_ac(void)
 
     if (uac != u.uac) {
         u.uac = uac;
-        gc.context.botl = 1;
+        disp.botl = TRUE;
 #if 0
         /* these could conceivably be achieved out of order (by being near
            threshold and putting on +N dragon scale mail from bones, for
@@ -3035,28 +3038,42 @@ wornarm_destroyed(struct obj *wornarm)
         }
 }
 
+/*
+ * returns impacted armor with its in_use bit set,
+ * or Null. *resisted is updated to reflect whether
+ * it resisted or not */
+static struct obj *
+maybe_destroy_armor(struct obj *armor, struct obj *atmp, boolean *resisted)
+{
+    if ((armor != 0) && (!atmp || atmp == armor)
+        && ((*resisted = obj_resists(armor, 0, 90)) == FALSE)) {
+        armor->in_use = 1;
+        return armor;
+    }
+    return (struct obj *) 0;
+}
+
 /* hit by destroy armor scroll/black dragon breath/monster spell */
 int
 destroy_arm(struct obj *atmp)
 {
-    struct obj *otmp;
-    boolean losing_gloves = FALSE;
+    struct obj *otmp = (struct obj *) 0;
+    boolean losing_gloves = FALSE, resisted = FALSE,
+            resistedc = FALSE, resistedsuit = FALSE;
     /*
-     * Note: if there were any artifact cloaks, the 90% chance of
-     * resistance here means that the cloak could survive and then
-     * the suit or shirt underneath could be destroyed.  Likewise for
-     * artifact suit over a shirt.  That would be a bug.  Since there
-     * aren't any, we'll just look the other way.
+     * Note: if the cloak resisted, then the suit or shirt underneath
+     * wouldn't be impacted either. Likewise, if the suit resisted, the
+     * shirt underneath wouldn't be impacted. Since there are no artifact
+     * cloaks or suits right now, this is unlikely to come into effect,
+     * but it should behave appropriately if/when the situation changes.
      */
-#define DESTROY_ARM(o) \
-    (((otmp = (o)) != 0 && (!atmp || atmp == otmp)              \
-      && !obj_resists(otmp, 0, 90)) ? (otmp->in_use = 1) : 0)
 
-    if (DESTROY_ARM(uarmc)) {
+    if ((otmp = maybe_destroy_armor(uarmc, atmp, &resistedc)) != 0) {
         urgent_pline("Your %s crumbles and turns to dust!",
                      /* cloak/robe/apron/smock (ID'd apron)/wrapping */
                      cloak_simple_name(otmp));
-    } else if (DESTROY_ARM(uarm)) {
+    } else if (!resistedc
+             && (otmp = maybe_destroy_armor(uarm, atmp, &resistedsuit)) != 0) {
         const char *suit = suit_simple_name(otmp);
 
         /* for gold DSM, we don't want Armor_gone() to report that it
@@ -3067,24 +3084,23 @@ destroy_arm(struct obj *atmp)
                      /* suit might be "dragon scales" so vtense() is needed */
                      suit, vtense(suit, "turn"), vtense(suit, "fall"),
                      surface(u.ux, u.uy));
-    } else if (DESTROY_ARM(uarmu)) {
+    } else if (!resistedc && !resistedsuit
+             && (otmp = maybe_destroy_armor(uarmu, atmp, &resisted)) != 0) {
         urgent_pline("Your %s crumbles into tiny threads and falls apart!",
                      shirt_simple_name(otmp)); /* always "shirt" */
-    } else if (DESTROY_ARM(uarmh)) {
+    } else if ((otmp = maybe_destroy_armor(uarmh, atmp, &resisted)) != 0) {
         urgent_pline("Your %s turns to dust and is blown away!",
                      helm_simple_name(otmp)); /* "helm" or "hat" */
-    } else if (DESTROY_ARM(uarmg)) {
+    } else if ((otmp = maybe_destroy_armor(uarmg, atmp, &resisted)) != 0) {
         urgent_pline("Your %s vanish!", gloves_simple_name(otmp));
         losing_gloves = TRUE;
-    } else if (DESTROY_ARM(uarmf)) {
+    } else if ((otmp = maybe_destroy_armor(uarmf, atmp, &resisted)) != 0) {
         urgent_pline("Your %s disintegrate!", boots_simple_name(otmp));
-    } else if (DESTROY_ARM(uarms)) {
+    } else if ((otmp = maybe_destroy_armor(uarms, atmp, &resisted)) != 0) {
         urgent_pline("Your %s crumbles away!", shield_simple_name(otmp));
     } else {
         return 0; /* could not destroy anything */
     }
-
-#undef DESTROY_ARM
 
     /* cancel_don() if applicable, Cloak_off()/Armor_off()/&c, and useup() */
     wornarm_destroyed(otmp);
@@ -3104,7 +3120,7 @@ adj_abon(register struct obj *otmp, register schar delta)
             makeknown(uarmg->otyp);
             ABON(A_DEX) += (delta);
         }
-        gc.context.botl = 1;
+        disp.botl = TRUE;
     }
     if (uarmh && uarmh == otmp && otmp->otyp == HELM_OF_BRILLIANCE) {
         if (delta) {
@@ -3112,7 +3128,7 @@ adj_abon(register struct obj *otmp, register schar delta)
             ABON(A_INT) += (delta);
             ABON(A_WIS) += (delta);
         }
-        gc.context.botl = 1;
+        disp.botl = TRUE;
     }
 }
 

@@ -55,14 +55,12 @@
 static boolean date_via_env = FALSE;
 
 extern unsigned long md_ignored_features(void);
-char *mdlib_version_string(char *, const char *);
-char *version_id_string(char *, size_t, const char *);
-char *bannerc_string(char *, size_t, const char *);
-int case_insensitive_comp(const char *, const char *);
+char *version_id_string(char *, size_t, const char *) NONNULL NONNULLPTRS;
+char *bannerc_string(char *, size_t, const char *) NONNULL NONNULLPTRS;
+int case_insensitive_comp(const char *, const char *) NONNULLPTRS;
 
 static void make_version(void);
-static char *eos(char *);
-int mstrength(struct permonst *);
+static char *eos(char *) NONNULL NONNULLARG1;
 
 #if 0
 static char *mdlib_strsubst(char *, const char *, const char *);
@@ -81,15 +79,16 @@ extern int GUILaunched;
 #endif
 
 /* these are in extern.h but we don't include hack.h */
-void runtime_info_init(void);
-const char *do_runtime_info(int *);
-void release_runtime_info(void);
-void populate_nomakedefs(struct version_info *);
+extern void populate_nomakedefs(struct version_info *) NONNULLARG1; /* date.c */
 extern void free_nomakedefs(void); /* date.c */
+void runtime_info_init(void);
+const char *do_runtime_info(int *) NO_NNARGS;
+void release_runtime_info(void);
+char *mdlib_version_string(char *, const char *) NONNULL NONNULLPTRS;
 
-void build_options(void);
+static void build_options(void);
 static int count_and_validate_winopts(void);
-static void opt_out_words(char *, int *);
+static void opt_out_words(char *, int *) NONNULLPTRS;
 static void build_savebones_compat_string(void);
 
 static int idxopttext, done_runtime_opt_init_once = 0;
@@ -750,7 +749,7 @@ opt_out_words(
     }
 }
 
-void
+static void
 build_options(void)
 {
     char buf[COLBUFSZ];

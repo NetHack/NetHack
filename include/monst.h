@@ -285,4 +285,7 @@ struct monst {
 #define is_lminion(mon) \
     (is_minion((mon)->data) && mon_aligntyp(mon) == A_LAWFUL)
 
+/* x is a valid index into mons[] array */
+#define ismnum(x) ((x) >= LOW_PM && (x) < NUMMONS)
+
 #endif /* MONST_H */

@@ -4396,12 +4396,14 @@ boolean
 copy_bytes(int ifd, int ofd)
 {
     char buf[BUFSIZ];
-    int nfrom, nto;
+    int nfrom, nto = 0;
 
     do {
         nfrom = read(ifd, buf, BUFSIZ);
-        nto = write(ofd, buf, nfrom);
-        if (nto != nfrom)
+        /* read can return -1 */
+        if (nfrom >= 0 && nfrom <= BUFSIZ)
+            nto = write(ofd, buf, nfrom);
+        if (nto != nfrom || nfrom < 0)
             return FALSE;
     } while (nfrom == BUFSIZ);
     return TRUE;

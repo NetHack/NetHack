@@ -2320,7 +2320,7 @@ use_unicorn_horn(struct obj **optr)
     }
 
     if (did_prop)
-        gc.context.botl = TRUE;
+        disp.botl = TRUE;
     else
         pline("%s", nothing_seems_to_happen);
 
@@ -3917,11 +3917,11 @@ do_break_wand(struct obj *obj)
              */
             if ((mon = m_at(x, y)) != 0) {
                 (void) bhitm(mon, obj);
-                /* if (gc.context.botl) bot(); */
+                /* if (disp.botl) bot(); */
             }
             if (affects_objects && gl.level.objects[x][y]) {
                 (void) bhitpile(obj, bhito, x, y, 0);
-                if (gc.context.botl)
+                if (disp.botl)
                     bot(); /* potion effects */
             }
         } else {
@@ -3939,7 +3939,7 @@ do_break_wand(struct obj *obj)
              */
             if (affects_objects && gl.level.objects[x][y]) {
                 (void) bhitpile(obj, bhito, x, y, 0);
-                if (gc.context.botl)
+                if (disp.botl)
                     bot(); /* potion effects */
             }
             damage = zapyourself(obj, FALSE);
@@ -3947,7 +3947,7 @@ do_break_wand(struct obj *obj)
                 Sprintf(buf, "killed %sself by breaking a wand", uhim());
                 losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
             }
-            if (gc.context.botl)
+            if (disp.botl)
                 bot(); /* blindness */
         }
     }

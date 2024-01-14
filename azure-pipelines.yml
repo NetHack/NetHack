@@ -174,9 +174,9 @@ steps:
 
 - bash: |
     sudo apt-get -qq -y update
-    sudo apt-get -qq -y install libncurses5-dev
+    sudo apt-get -qq -y install libncurses-dev
     sudo apt-get -qq -y install libx11-dev libxaw7-dev xfonts-utils qtbase5-dev qtmultimedia5-dev qtbase5-dev-tools
-  condition: eq( variables['Agent.OS'], 'Linux' )
+  condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildTarget, 'all'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
   displayName: 'Getting linux build dependencies'
 

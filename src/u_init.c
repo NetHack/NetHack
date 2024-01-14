@@ -13,7 +13,7 @@ struct trobj {
     Bitfield(trbless, 2);
 };
 
-static void ini_inv(struct trobj *);
+static void ini_inv(struct trobj *) NONNULLARG1;
 static void knows_object(int);
 static void knows_class(char);
 static boolean restricted_spell_discipline(int);
@@ -606,7 +606,7 @@ u_init(void)
     struct u_roleplay tmpuroleplay = u.uroleplay; /* set by rcfile options */
 
     flags.female = flags.initgend;
-    flags.beginner = 1;
+    flags.beginner = TRUE;
 
     /* zero u, including pointer values --
      * necessary when aborting from a failed restore */

@@ -184,7 +184,7 @@ adjattrib(
         return FALSE;
     }
 
-    gc.context.botl = TRUE;
+    disp.botl = TRUE;
     if (msgflg <= 0)
         You_feel("%s%s!", (incr > 1 || incr < -1) ? "very " : "", attrstr);
     if (gp.program_state.in_moveloop && (ndx == A_STR || ndx == A_CON))
@@ -246,7 +246,7 @@ losestr(int num, const char *knam, schar k_format)
             if (u.uhpmax > uhpmin)
                 setuhpmax(max(u.uhpmax - dmg, uhpmin));
         }
-        gc.context.botl = TRUE;
+        disp.botl = TRUE;
     }
 #if 0   /* only possible if uhpmax was already less than uhpmin */
     if (!Upolyd && u.uhpmax < uhpmin) {
@@ -338,7 +338,7 @@ poisoned(
 
     /* suppress killer prefix if it already has one */
     i = name_to_mon(pkiller, (int *) 0);
-    if (i >= LOW_PM && (mons[i].geno & G_UNIQ)) {
+    if (ismnum(i) && (mons[i].geno & G_UNIQ)) {
         kprefix = KILLED_BY;
         if (!type_is_pname(&mons[i]))
             pkiller = the(pkiller);
@@ -354,7 +354,7 @@ poisoned(
         loss = 6 + d(4, 6);
         if (u.uhp <= loss) {
             u.uhp = -1;
-            gc.context.botl = TRUE;
+            disp.botl = TRUE;
             pline_The("poison was deadly...");
         } else {
             /* survived, but with severe reaction */
@@ -457,13 +457,13 @@ restore_attrib(void)
         if (ATEMP(i) != equilibrium && ATIME(i) != 0) {
             if (!(--(ATIME(i)))) { /* countdown for change */
                 ATEMP(i) += (ATEMP(i) > 0) ? -1 : 1;
-                gc.context.botl = TRUE;
+                disp.botl = TRUE;
                 if (ATEMP(i)) /* reset timer */
                     ATIME(i) = 100 / ACURR(A_CON);
             }
         }
     }
-    if (gc.context.botl)
+    if (disp.botl)
         (void) encumber_msg();
 }
 
@@ -837,7 +837,7 @@ is_innate(int propidx)
     int innateness;
 
     /* innately() would report FROM_FORM for this; caller wants specificity */
-    if (propidx == DRAIN_RES && u.ulycn >= LOW_PM)
+    if (propidx == DRAIN_RES && ismnum(u.ulycn))
         return FROM_LYCN;
     if (propidx == FAST && Very_fast)
         return FROM_NONE; /* can't become very fast innately */
@@ -917,7 +917,7 @@ from_what(int propidx) /* special cases can have negative values */
             else if (propidx == BLINDED && u.ucreamed
                      && BlindedTimeout == (long) u.ucreamed
                      && !EBlinded && !(HBlinded & ~TIMEOUT))
-                Sprintf(buf, "due to goop coverting your %s",
+                Sprintf(buf, "due to goop covering your %s",
                         body_part(FACE));
 
             /* remove some verbosity and/or redundancy */
@@ -1026,6 +1026,9 @@ adjabil(int oldlevel, int newlevel)
     }
 }
 
+/* called when gaining a level (before u.ulevel gets incremented);
+   also called with u.ulevel==0 during hero initialization or for
+   re-init if hero turns into a "new man/woman/elf/&c" */
 int
 newhp(void)
 {
@@ -1109,61 +1112,73 @@ setuhpmax(int newmax)
         u.uhpmax = newmax;
         if (u.uhpmax > u.uhppeak)
             u.uhppeak = u.uhpmax;
-        gc.context.botl = TRUE;
+        disp.botl = TRUE;
     }
     if (u.uhp > u.uhpmax)
-        u.uhp = u.uhpmax, gc.context.botl = TRUE;
+        u.uhp = u.uhpmax, disp.botl = TRUE;
 }
 
+/* return the current effective value of a specific characteristic
+   (the 'a' in 'acurr()' comes from outdated use of "attribute" for the
+   six Str/Dex/&c characteristics; likewise for u.abon, u.atemp, u.acurr) */
 schar
-acurr(int x)
+acurr(int chridx)
 {
-    register int tmp = (u.abon.a[x] + u.atemp.a[x] + u.acurr.a[x]);
+    int tmp, result = 0; /* 'result' will always be reset to positive value */
 
-    if (x == A_STR) {
-        if (tmp >= 125 || (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER))
-            return (schar) 125;
-        else
-#ifdef WIN32_BUG
-            return (x = ((tmp <= 3) ? 3 : tmp));
-#else
-            return (schar) ((tmp <= 3) ? 3 : tmp);
-#endif
-    } else if (x == A_CHA) {
-        if (tmp < 18
-            && (gy.youmonst.data->mlet == S_NYMPH
-                || u.umonnum == PM_AMOROUS_DEMON))
-            return (schar) 18;
-    } else if (x == A_CON) {
+    assert(chridx >= 0 && chridx < A_MAX);
+    tmp = u.abon.a[chridx] + u.atemp.a[chridx] + u.acurr.a[chridx];
+
+    /* for Strength:  3 <= result <= 125;
+       for all others:  3 <= result <= 25 */
+    if (chridx == A_STR) {
+        /* strength value is encoded:  3..18 normal, 19..118 for 18/xx (with
+           1 <= xx <= 100), and 119..125 for other characteristics' 19..25;
+           STR18(x) yields 18 + x (intended for 0 <= x <= 100; not used here);
+           STR19(y) yields 100 + y (intended for 19 <= y <= 25) */
+        if (tmp >= STR19(25) || (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER))
+            result = STR19(25); /* 125 */
+    } else if (chridx == A_CHA) {
+        if (tmp < 18 && (gy.youmonst.data->mlet == S_NYMPH
+                         || u.umonnum == PM_AMOROUS_DEMON))
+            result = 18;
+    } else if (chridx == A_CON) {
         if (u_wield_art(ART_OGRESMASHER))
-            return (schar) 25;
-    } else if (x == A_INT || x == A_WIS) {
-        /* yes, this may raise int/wis if player is sufficiently
-         * stupid.  there are lower levels of cognition than "dunce".
-         */
+            result = 25;
+    } else if (chridx == A_INT || chridx == A_WIS) {
+        /* Yes, this may raise Int and/or Wis if hero is sufficiently
+           stupid.  There are lower levels of cognition than "dunce". */
         if (uarmh && uarmh->otyp == DUNCE_CAP)
-            return (schar) 6;
+            result = 6;
+    } else if (chridx == A_DEX) {
+        ; /* there aren't any special cases for dexterity */
     }
-#ifdef WIN32_BUG
-    return (x = ((tmp >= 25) ? 25 : (tmp <= 3) ? 3 : tmp));
-#else
-    return (schar) ((tmp >= 25) ? 25 : (tmp <= 3) ? 3 : tmp);
-#endif
+
+    if (result == 0) /* none of the special cases applied */
+        result = (tmp >= 25) ? 25 : (tmp <= 3) ? 3 : tmp;
+
+    return (schar) result;
 }
 
-/* condense clumsy ACURR(A_STR) value into value that fits into game formulas
- */
+/* condense clumsy ACURR(A_STR) value into value that fits into formulas */
 schar
 acurrstr(void)
 {
-    register int str = ACURR(A_STR);
+    int str = ACURR(A_STR), /* 3..125 after massaging by acurr() */
+        result; /* 3..25 */
 
-    if (str <= 18)
-        return (schar) str;
-    if (str <= 121)
-        return (schar) (19 + str / 50); /* map to 19..21 */
-    else
-        return (schar) (min(str, 125) - 100); /* 22..25 */
+    if (str <= STR18(0)) /* <= 18; max(,3) here is redundant */
+        result = max(str, 3); /* 3..18 */
+    else if (str <= STR19(21)) /* <= 121 */
+        /* this converts
+           18/01..18/31 into 19,
+           18/32..18/81 into 20,
+           18/82..18/100 and 19..21 into 21 */
+        result = 19 + str / 50; /* map to 19..21 */
+    else /* convert 122..125; min(,125) here is redundant */
+        result = min(str, 125) - 100; /* 22..25 */
+
+    return (schar) result;
 }
 
 /* when wearing (or taking off) an unID'd item, this routine is used
@@ -1204,8 +1219,14 @@ adjalign(int n)
     int newalign = u.ualign.record + n;
 
     if (n < 0) {
+        unsigned newabuse = u.ualign.abuse - n;
+
         if (newalign < u.ualign.record)
             u.ualign.record = newalign;
+        if (newabuse > u.ualign.abuse) {
+            u.ualign.abuse = newabuse;
+            adj_erinys(newabuse);
+        }
     } else if (newalign > u.ualign.record) {
         u.ualign.record = newalign;
         if (u.ualign.record > ALIGNLIM)
@@ -1216,15 +1237,15 @@ adjalign(int n)
 /* change hero's alignment type, possibly losing use of artifacts */
 void
 uchangealign(int newalign,
-             int reason) /* 0==conversion, 1==helm-of-OA on, 2==helm-of-OA off */
+             int reason) /* A_CG_CONVERT, A_CG_HELM_ON, or A_CG_HELM_OFF */
 {
     aligntyp oldalign = u.ualign.type;
 
     u.ublessed = 0; /* lose divine protection */
     /* You/Your/pline message with call flush_screen(), triggering bot(),
        so the actual data change needs to come before the message */
-    gc.context.botl = TRUE; /* status line needs updating */
-    if (reason == 0) {
+    disp.botl = TRUE; /* status line needs updating */
+    if (reason == A_CG_CONVERT) {
         /* conversion via altar */
         livelog_printf(LL_ALIGNMENT, "permanently converted to %s",
                        aligns[1 - newalign].adj);
@@ -1236,18 +1257,21 @@ uchangealign(int newalign,
             (u.ualign.type != oldalign) ? "sudden " : "");
     } else {
         /* putting on or taking off a helm of opposite alignment */
-        if (reason == 1) {
+        u.ualign.type = (aligntyp) newalign;
+        if (reason == A_CG_HELM_ON) {
+            adjalign(-7); /* for abuse -- record will be cleared shortly */
+            Your("mind oscillates %s.", Hallucination ? "wildly" : "briefly");
+            make_confused(rn1(2, 3), FALSE);
+            if (Is_astralevel(&u.uz) || ((unsigned) rn2(50) < u.ualign.abuse))
+                summon_furies(Is_astralevel(&u.uz) ? 0 : 1);
             /* don't livelog taking it back off */
             livelog_printf(LL_ALIGNMENT, "used a helm to turn %s",
                            aligns[1 - newalign].adj);
-        }
-        u.ualign.type = (aligntyp) newalign;
-        if (reason == 1)
-            Your("mind oscillates %s.", Hallucination ? "wildly" : "briefly");
-        else if (reason == 2)
+        } else if (reason == A_CG_HELM_OFF) {
             Your("mind is %s.", Hallucination
                                     ? "much of a muchness"
                                     : "back in sync with your body");
+        }
     }
     if (u.ualign.type != oldalign) {
         u.ualign.record = 0; /* slate is wiped clean */

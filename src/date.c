@@ -5,7 +5,7 @@
 #include "config.h"
 
 /* these are in extern.h but we don't include hack.h */
-void populate_nomakedefs(struct version_info *);
+void populate_nomakedefs(struct version_info *) NONNULLARG1;
 void free_nomakedefs(void);
 
 #define Snprintf(str, size, ...) \

@@ -976,7 +976,7 @@ test_move(
                         Sprintf(buf, "solid stone");
                     else
                         Sprintf(buf, "%s", an(firstmatch));
-                    pline("It's %s.", buf);
+                    pline_dir(xytod(dx, dy), "It's %s.", buf);
                 }
             }
             return FALSE;
@@ -1116,7 +1116,7 @@ test_move(
         if (mode != TEST_TRAV && gc.context.run >= 2
             && !(Blind || Hallucination) && !could_move_onto_boulder(x, y)) {
             if (mode == DO_MOVE && flags.mention_walls)
-                pline("A boulder blocks your path.");
+                pline_dir(xytod(dx,dy), "A boulder blocks your path.");
             return FALSE;
         }
         if (mode == DO_MOVE) {
@@ -1831,21 +1831,33 @@ domove_fight_web(coordxy x, coordxy y)
 {
     struct trap *trap = t_at(x, y);
 
-    if (gc.context.forcefight && trap && trap->ttyp == WEB
-        && trap->tseen && uwep) {
-        if (u_wield_art(ART_STING)) {
+    if (gc.context.forcefight && trap && trap->ttyp == WEB && trap->tseen) {
+        int wtype = uwep_skill_type(),
+            /* minus_2: restricted or unskilled: -1, basic: 0, skilled: 1,
+               expert: 2, master: 3, grandmaster: 4 */
+            wskill_minus_2 = max(P_SKILL(wtype), P_UNSKILLED) - 2,
+            /* higher value is worse for player; for weaponless, adjust the
+               chance to succeed rather than maybe make two tries */
+            roll = rn2(uwep ? 20 : (45 - 5 * wskill_minus_2));
+
+        if (uwep && u_wield_art(ART_STING)) {
             /* guaranteed success */
             pline("%s cuts through the web!",
                   bare_artifactname(uwep));
-        } else if (!is_blade(uwep)) {
+        } else if (uwep && !is_blade(uwep)) {
             You_cant("cut a web with %s!", an(xname(uwep)));
             return TRUE;
-        } else if (rn2(20) > ACURR(A_STR) + uwep->spe) {
+        } else if (roll > (acurrstr() - 2 /* 1..19 */
+                           /* for weaponless, 'roll' was adjusted above */
+                           + (uwep ? uwep->spe + wskill_minus_2 : 0))) {
             /* TODO: add failures, maybe make an occupation? */
-            You("hack ineffectually at some of the strands.");
+            You("%s ineffectually at some of the strands.",
+                uwep ? "hack" : "thrash");
             return TRUE;
         } else {
-            You("cut through the web.");
+            You("%s through the web.", uwep ? "cut" : "punch");
+            /* doesn't break "never hit with a wielded weapon" conduct */
+            use_skill(wtype, 1);
         }
         deltrap(trap);
         newsym(x, y);
@@ -2194,9 +2206,11 @@ avoid_moving_on_trap(coordxy x, coordxy y, boolean msg)
     struct trap *trap;
 
     if ((trap = t_at(x, y)) && trap->tseen) {
-        if (msg && flags.mention_walls)
+        if (msg && flags.mention_walls) {
+            set_msg_xy(x, y);
             You("stop in front of %s.",
                 an(trapname(trap->ttyp, FALSE)));
+        }
         return TRUE;
     }
     return FALSE;
@@ -2222,9 +2236,11 @@ avoid_moving_on_liquid(
            polyforms are allowed to move over water */
         return FALSE; /* liquid is safe to traverse */
     } else if (is_pool_or_lava(x, y) && levl[x][y].seenv) {
-        if (msg && flags.mention_walls)
+        if (msg && flags.mention_walls) {
+            set_msg_xy(x, y);
             You("stop at the edge of the %s.",
                 hliquid(is_pool(x,y) ? "water" : "lava"));
+        }
         return TRUE;
     }
     return FALSE;
@@ -2524,7 +2540,7 @@ domove_core(void)
         boolean moved = trapmove(x, y, trap);
 
         if (!u.utrap) {
-            gc.context.botl = TRUE;
+            disp.botl = TRUE;
             reset_utrap(TRUE); /* might resume levitation or flight */
         }
         /* might not have escaped, or did escape but remain in same spot */
@@ -2689,7 +2705,7 @@ runmode_delay_output(void)
            display after every step */
         if (flags.runmode != RUN_LEAP || !(gm.moves % 7L)) {
             /* moveloop() suppresses time_botl when running */
-            iflags.time_botl = flags.time;
+            disp.time_botl = flags.time;
             curs_on_u();
             nh_delay_output();
             if (flags.runmode == RUN_CRAWL) {
@@ -2724,7 +2740,7 @@ overexert_hp(void)
 
     if (*hp > 1) {
         *hp -= 1;
-        gc.context.botl = TRUE;
+        disp.botl = TRUE;
     } else {
         You("pass out from exertion!");
         exercise(A_CON, FALSE);
@@ -2809,7 +2825,7 @@ switch_terrain(void)
             You("start flying.");
     }
     if ((!!Levitation ^ was_levitating) || (!!Flying ^ was_flying))
-        gc.context.botl = TRUE; /* update Lev/Fly status condition */
+        disp.botl = TRUE; /* update Lev/Fly status condition */
 }
 
 /* set or clear u.uinwater */
@@ -3522,7 +3538,7 @@ lookaround(void)
                 if ((gc.context.run != 1 && !is_safemon(mtmp))
                     || (infront && !gc.context.travel)) {
                     if (flags.mention_walls)
-                        pline("%s blocks your path.",
+                        pline_xy(x, y, "%s blocks your path.",
                               upstart(a_monnam(mtmp)));
                     goto stop;
                 }
@@ -3553,8 +3569,10 @@ lookaround(void)
                 if (x != u.ux && y != u.uy)
                     continue;
                 if (gc.context.run != 1 && !gc.context.travel) {
-                    if (flags.mention_walls)
+                    if (flags.mention_walls) {
+                        set_msg_xy(x, y);
                         You("stop in front of the door.");
+                    }
                     goto stop;
                 }
                 /* we're orthogonal to a closed door, consider it a corridor */
@@ -3718,7 +3736,7 @@ end_running(boolean and_travel)
     /* moveloop() suppresses time_botl when context.run is non-zero; when
        running stops, update 'time' even if other botl status is unchanged */
     if (flags.time && gc.context.run)
-        iflags.time_botl = TRUE;
+        disp.time_botl = TRUE;
     gc.context.run = 0;
     /* 'context.mv' isn't travel but callers who want to end travel
        all clear it too */
@@ -3738,7 +3756,7 @@ nomul(int nval)
 {
     if (gm.multi < nval)
         return;              /* This is a bug fix by ab@unido */
-    gc.context.botl |= (gm.multi >= 0);
+    disp.botl |= (gm.multi >= 0);
     u.uinvulnerable = FALSE; /* Kludge to avoid ctrl-C bug -dlc */
     u.usleep = 0;
     gm.multi = nval;
@@ -3752,7 +3770,7 @@ nomul(int nval)
 void
 unmul(const char *msg_override)
 {
-    gc.context.botl = TRUE;
+    disp.botl = TRUE;
     gm.multi = 0; /* caller will usually have done this already */
     if (msg_override)
         gn.nomovemsg = msg_override;
@@ -3846,7 +3864,7 @@ losehp(int n, const char *knam, schar k_format)
         return;
     }
 #endif
-    gc.context.botl = TRUE; /* u.uhp or u.mh is changing */
+    disp.botl = TRUE; /* u.uhp or u.mh is changing */
     end_running(TRUE);
     if (Upolyd) {
         u.mh -= n;

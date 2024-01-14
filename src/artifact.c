@@ -930,7 +930,7 @@ spec_applies(const struct artifact *weap, struct monst *mtmp)
         return ((ptr->mflags2 & weap->mtype)
                 || (yours
                     && ((!Upolyd && (gu.urace.selfmask & weap->mtype))
-                        || ((weap->mtype & M2_WERE) && u.ulycn >= LOW_PM))));
+                        || ((weap->mtype & M2_WERE) && ismnum(u.ulycn)))));
     } else if (weap->spfx & SPFX_DALIGN) {
         return yours ? (u.ualign.type != weap->alignment)
                      : (ptr->maligntyp == A_NONE
@@ -1232,7 +1232,7 @@ Mb_hit(struct monst *magr, /* attacker */
                     u.uenmax--;
                     if (u.uen > 0)
                         u.uen--;
-                    gc.context.botl = TRUE;
+                    disp.botl = TRUE;
                     You("lose magical energy!");
                 }
             } else {
@@ -1247,7 +1247,7 @@ Mb_hit(struct monst *magr, /* attacker */
                     if (u.uenmax > u.uenpeak)
                         u.uenpeak = u.uenmax;
                     u.uen++;
-                    gc.context.botl = TRUE;
+                    disp.botl = TRUE;
                     You("absorb magical energy!");
                 }
             }
@@ -1586,6 +1586,7 @@ artifact_hit(
                 if (youattack) {
                     healup(drain, 0, FALSE, FALSE);
                 } else {
+                    assert(magr != 0);
                     magr->mhp += drain;
                     if (magr->mhp > magr->mhpmax)
                         magr->mhp = magr->mhpmax;
@@ -1730,7 +1731,7 @@ arti_invoke(struct obj *obj)
                 make_slimed(0L, (char *) 0);
             if (BlindedTimeout > creamed)
                 make_blinded(creamed, FALSE);
-            gc.context.botl = TRUE;
+            disp.botl = TRUE;
             break;
         }
         case ENERGY_BOOST: {
@@ -1742,7 +1743,7 @@ arti_invoke(struct obj *obj)
                 epboost = u.uenmax - u.uen;
             if (epboost) {
                 u.uen += epboost;
-                gc.context.botl = TRUE;
+                disp.botl = TRUE;
                 You_feel("re-energized.");
             } else
                 goto nothing_special;

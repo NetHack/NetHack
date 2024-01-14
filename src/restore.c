@@ -250,6 +250,7 @@ restobjchn(NHFILE *nhfp, boolean frozen)
             break;
 
         otmp = newobj();
+        assert(otmp != 0);
         restobj(nhfp, otmp);
         if (!first)
             first = otmp;
@@ -387,6 +388,7 @@ restmonchn(NHFILE *nhfp)
             break;
 
         mtmp = newmonst();
+        assert(mtmp != 0);
         restmon(nhfp, mtmp);
         if (!first)
             first = mtmp;
@@ -529,7 +531,7 @@ restgamestate(NHFILE *nhfp)
     newgamecontext = gc.context; /* copy statically init'd context */
     if (nhfp->structlevel)
         Mread(nhfp->fd, &gc.context, sizeof gc.context);
-    gc.context.warntype.species = (gc.context.warntype.speciesidx >= LOW_PM)
+    gc.context.warntype.species = (ismnum(gc.context.warntype.speciesidx))
                                   ? &mons[gc.context.warntype.speciesidx]
                                   : (struct permonst *) 0;
     /* gc.context.victual.piece, .tin.tin, .spellbook.book, and .polearm.hitmon
@@ -690,6 +692,7 @@ restgamestate(NHFILE *nhfp)
     /* must come after all mons & objs are restored */
     relink_timers(FALSE);
     relink_light_sources(FALSE);
+    adj_erinys(u.ualign.abuse);
     /* inventory display is now viable */
     iflags.perm_invent = defer_perm_invent;
     return TRUE;
@@ -1055,11 +1058,15 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
         Mread(nhfp->fd, &gu.updest, sizeof gu.updest);
         Mread(nhfp->fd, &gd.dndest, sizeof gd.dndest);
         Mread(nhfp->fd, &gl.level.flags, sizeof gl.level.flags);
-        if (gd.doors)
+        if (gd.doors) {
             free(gd.doors);
+            gd.doors = 0;
+        }
         Mread(nhfp->fd, &gd.doors_alloc, sizeof gd.doors_alloc);
-        gd.doors = (coord *) alloc(gd.doors_alloc * sizeof (coord));
-        Mread(nhfp->fd, gd.doors, gd.doors_alloc * sizeof (coord));
+        if (gd.doors_alloc) { /* avoid pointless alloc(0) */
+            gd.doors = (coord *) alloc(gd.doors_alloc * sizeof (coord));
+            Mread(nhfp->fd, gd.doors, gd.doors_alloc * sizeof (coord));
+        }
     }
     rest_rooms(nhfp); /* No joke :-) */
     if (gn.nroom)

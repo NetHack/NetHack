@@ -22,6 +22,7 @@ static void mquaffmsg(struct monst *, struct obj *);
 static boolean m_use_healing(struct monst *);
 static boolean m_sees_sleepy_soldier(struct monst *);
 static void m_tele(struct monst *, boolean, boolean, int);
+static boolean m_next2m(struct monst *);
 static void reveal_trap(struct trap *, boolean);
 static boolean linedup_chk_corpse(coordxy, coordxy);
 static void m_use_undead_turning(struct monst *, struct obj *);
@@ -398,6 +399,29 @@ m_tele(
     }
 }
 
+/* return TRUE if monster mtmp has another monster next to it.
+ * Called from find_defensive() where it is limited to Is_knox()
+ * only, otherwise you could trap two monsters next to each other
+ * in a boulder fort, and they would be happy to stay in there. */
+static boolean
+m_next2m(struct monst *mtmp)
+{
+    coordxy x, y;
+    struct monst *m2;
+
+    if (DEADMONSTER(mtmp) || mon_offmap(mtmp))
+        return FALSE;
+
+    for (x = mtmp->mx - 1; x <= mtmp->mx + 1; x++)
+        for (y = mtmp->my - 1; y <= mtmp->my + 1; y++) {
+            if (!isok(x,y))
+                continue;
+            if ((m2 = m_at(x, y)) && m2 != mtmp)
+                return TRUE;
+        }
+    return FALSE;
+}
+
 /* Select a defensive item/action for a monster.  Returns TRUE iff one is
    found. */
 boolean
@@ -417,6 +441,9 @@ find_defensive(struct monst *mtmp, boolean tryescape)
     if (is_animal(mtmp->data) || mindless(mtmp->data))
         return FALSE;
     if (!tryescape && dist2(x, y, mtmp->mux, mtmp->muy) > 25)
+        return FALSE;
+    if (tryescape && Is_knox(&u.uz)
+        && !next2u(mtmp->mx, mtmp->my) && m_next2m(mtmp))
         return FALSE;
     if (u.uswallow && stuck)
         return FALSE;
@@ -2624,7 +2651,7 @@ searches_for_item(struct monst *mon, struct obj *obj)
             return (boolean) (mcould_eat_tin(mon)
                               && (!resists_ston(mon)
                                   && cures_stoning(mon, obj, TRUE)));
-        if (typ == EGG)
+        if (typ == EGG && ismnum(obj->corpsenm))
             return (boolean) touch_petrifies(&mons[obj->corpsenm]);
         break;
     default:

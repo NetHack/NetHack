@@ -125,8 +125,9 @@ static char empty_optstr[] = { '\0' };
 static boolean duplicate, using_alias;
 static boolean give_opt_msg = TRUE;
 
+enum { MAX_ROLEOPT = 4 };  /* 4: role,race,gend,algn */
 static boolean opt_set_in_config[OPTCOUNT];
-static char *roleoptvals[4][num_opt_phases]; /* 4: role,race,gend,algn */
+static char *roleoptvals[MAX_ROLEOPT][num_opt_phases];
 
 static NEARDATA const char *OptS_type[OptS_Advanced+1] = {
     "General", "Behavior", "Map", "Status", "Advanced"
@@ -708,7 +709,11 @@ getoptstr(int optidx, int ophase)
                 break;
             }
     }
-    return roleoptvals[roleoptindx][ophase];
+    if ((roleoptindx >= 0 && roleoptindx < MAX_ROLEOPT
+          && ophase >= 0 && ophase < num_opt_phases))
+        return roleoptvals[roleoptindx][ophase];
+    panic("bad index roleoptvals[%d][%d]", roleoptindx, ophase);
+    /*NOTREACHED*/
 }
 
 /* to track some unparsed option settings in case #saveoptions needs them */
@@ -5008,7 +5013,7 @@ optfn_boolean(
         case opt_showexp:
             if (VIA_WINDOWPORT())
                 status_initialize(REASSESS_ONLY);
-            gc.context.botl = TRUE;
+            disp.botl = TRUE;
             break;
         case opt_fixinv:
         case opt_sortpack:
@@ -5064,7 +5069,7 @@ optfn_boolean(
             } else if (WINDOWPORT(Qt)) {
                 /* Qt doesn't support HILITE_STATUS or FLUSH_STATUS so fails
                    VIA_WINDOWPORT(), but it does support WC2_HITPOINTBAR */
-                gc.context.botlx = TRUE;
+                disp.botlx = TRUE;
 #endif
             }
             break;
@@ -8215,13 +8220,13 @@ fruitadd(char *str, struct fruit *replace_fruit)
             || !strncmp(gp.pl_fruit, "partly eaten ", 13)
             || (!strncmp(gp.pl_fruit, "tin of ", 7)
                 && (!strcmp(gp.pl_fruit + 7, "spinach")
-                    || name_to_mon(gp.pl_fruit + 7, (int *) 0) >= LOW_PM))
+                    || ismnum(name_to_mon(gp.pl_fruit + 7, (int *) 0))))
             || !strcmp(gp.pl_fruit, "empty tin")
             || (!strcmp(gp.pl_fruit, "glob")
                 || (globpfx > 0 && !strcmp("glob", &gp.pl_fruit[globpfx])))
             || ((str_end_is(gp.pl_fruit, " corpse")
                  || str_end_is(gp.pl_fruit, " egg"))
-                && name_to_mon(gp.pl_fruit, (int *) 0) >= LOW_PM)) {
+                && ismnum(name_to_mon(gp.pl_fruit, (int *) 0)))) {
             Strcpy(buf, gp.pl_fruit);
             Strcpy(gp.pl_fruit, "candied ");
             nmcpy(gp.pl_fruit + 8, buf, PL_FSIZ - 8);
@@ -8710,7 +8715,7 @@ doset_simple(void)
 /*
  *      I don't think the status window requires updating between
  *      simplemenu iterations.
-        if (gc.context.botl || gc.context.botlx) {
+        if (disp.botl || disp.botlx) {
             bot();
         }
   */
@@ -8965,7 +8970,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
     if (go.opt_need_promptstyle) {
         adjust_menu_promptstyle(WIN_INVEN, &iflags.menu_headings);
     }
-    if (gc.context.botl || gc.context.botlx) {
+    if (disp.botl || disp.botlx) {
         bot();
     }
     return ECMD_OK;

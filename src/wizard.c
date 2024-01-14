@@ -11,12 +11,15 @@
 #include "hack.h"
 
 static short which_arti(int);
-static boolean mon_has_arti(struct monst *, short);
-static struct monst *other_mon_has_arti(struct monst *, short);
-static struct obj *on_ground(short);
+static boolean mon_has_arti(struct monst *, short) NONNULLARG1;
+/* other_mon_has_arti() won't blow up if passed a NULL monst,
+ * but its caller target_on() passes it a nonnull monst;
+ * it may return a NULL monst pointer */
+static struct monst *other_mon_has_arti(struct monst *, short) NONNULLARG1;
+static struct obj *on_ground(short);  /* might return NULL obj pointer */
 static boolean you_have(int);
-static unsigned long target_on(int, struct monst *);
-static unsigned long strategy(struct monst *);
+static unsigned long target_on(int, struct monst *) NONNULLARG2;
+static unsigned long strategy(struct monst *) NONNULLARG1;
 
 /* adding more neutral creatures will tend to reduce the number of monsters
    summoned by nasty(); adding more lawful creatures will reduce the number
@@ -176,6 +179,10 @@ mon_has_arti(struct monst *mtmp, short otyp)
     return 0;
 }
 
+/*
+ * Returns some monster other than mtmp that
+ * has artifact, or NULL monst pointer.
+ */
 static struct monst *
 other_mon_has_arti(struct monst *mtmp, short otyp)
 {
@@ -190,6 +197,10 @@ other_mon_has_arti(struct monst *mtmp, short otyp)
     return (struct monst *) 0;
 }
 
+/*
+ * Returns obj of type specified if there is one
+ * on the ground, otherwise returns NULL obj pointer.
+ */
 static struct obj *
 on_ground(short otyp)
 {

@@ -52,10 +52,10 @@
  * No item may be in more than one of these slots.
  */
 
-static boolean cant_wield_corpse(struct obj *);
-static int ready_weapon(struct obj *);
-static int ready_ok(struct obj *);
-static int wield_ok(struct obj *);
+static boolean cant_wield_corpse(struct obj *) NONNULLARG1;
+static int ready_weapon(struct obj *) NO_NNARGS;
+static int ready_ok(struct obj *) NO_NNARGS;
+static int wield_ok(struct obj *) NO_NNARGS;
 
 /* used by will_weld() */
 /* probably should be renamed */
@@ -114,7 +114,7 @@ setuwep(struct obj *obj)
     if (uwep == obj
         && (u_wield_art(ART_OGRESMASHER)
             || is_art(olduwep, ART_OGRESMASHER)))
-        gc.context.botl = 1;
+        disp.botl = TRUE;
     /* Note: Explicitly wielding a pick-axe will not give a "bashing"
      * message.  Wielding one via 'a'pplying it will.
      * 3.2.2:  Wielding arbitrary objects will give bashing message too.
@@ -232,7 +232,7 @@ ready_weapon(struct obj *wep)
         }
 
         /* KMH -- Talking artifacts are finally implemented */
-        if (wep && wep->oartifact) {
+        if (wep->oartifact) {
             res |= arti_speak(wep); /* sets ECMD_TIME bit if artifact speaks */
         }
 
@@ -262,7 +262,7 @@ ready_weapon(struct obj *wep)
         }
     }
     if ((had_wep != (uwep != 0)) && condtests[bl_bareh].enabled)
-        gc.context.botl = 1;
+        disp.botl = TRUE;
     return res;
 }
 
@@ -676,7 +676,7 @@ wield_tool(struct obj *obj,
     const char *what;
     boolean more_than_1;
 
-    if (obj == uwep)
+    if (uwep && obj == uwep)
         return TRUE; /* nothing to do if already wielding it */
 
     if (!verb)
@@ -690,7 +690,7 @@ wield_tool(struct obj *obj,
                  more_than_1 ? "them" : "it");
         return FALSE;
     }
-    if (welded(uwep)) {
+    if (uwep && welded(uwep)) {
         if (flags.verbose) {
             const char *hand = body_part(HAND);
 
@@ -737,7 +737,7 @@ wield_tool(struct obj *obj,
         if (flags.pushweapon && oldwep && uwep != oldwep)
             setuswapwep(oldwep);
     }
-    if (uwep != obj)
+    if (uwep && uwep != obj)
         return FALSE; /* rewielded old object after dying */
     /* applying weapon or tool that gets wielded ends two-weapon combat */
     if (u.twoweap)

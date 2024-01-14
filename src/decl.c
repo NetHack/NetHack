@@ -1,4 +1,4 @@
-/* NetHack 3.7	decl.c	$NHDT-Date: 1701132220 2023/11/28 00:43:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.304 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1704043695 2023/12/31 17:28:15 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.309 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -104,6 +104,7 @@ const schar dirs_ord[N_DIRS] =
 NEARDATA boolean has_strong_rngseed = FALSE;
 struct engr *head_engr;
 NEARDATA struct instance_flags iflags;
+NEARDATA struct accessibility_data a11y;
 /* NOTE: the order of these words exactly corresponds to the
    order of oc_material values #define'd in objclass.h. */
 const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
@@ -188,6 +189,7 @@ const struct Race urace_init_data = {
     { 1, 0, 2, 0, 2, 0 }  /* Energy */
 };
 
+struct display_hints disp = { 0 };
 
 const struct instance_globals_a g_init_a = {
     /* artifact.c */
@@ -205,6 +207,8 @@ const struct instance_globals_a g_init_a = {
     UNDEFINED_PTR, /* animal_list */
     UNDEFINED_VALUE, /* animal_list_count */
     /* pickup.c */
+    0, /* A_first_hint */
+    0, /* A_second_hint */
     UNDEFINED_VALUE, /* abort_looting */
     /* shk.c */
     FALSE, /* auto_credit */
@@ -502,6 +506,8 @@ const struct instance_globals_l g_init_l = {
     /* nhlua.c */
     UNDEFINED_VALUE, /* luacore */
     DUMMY, /* lua_warnbuf[] */
+    0, /* loglua */
+    0, /* lua_sid */
     /* options.c */
     FALSE, /* loot_reset_justpicked */
     /* save.c */
@@ -1055,6 +1061,8 @@ decl_globals_init(void)
 
     ZERO(flags);
     ZERO(iflags);
+    ZERO(a11y);
+    ZERO(disp);
     ZERO(u);
     ZERO(ubirthday);
     ZERO(urealtime);

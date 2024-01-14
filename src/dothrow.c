@@ -1263,6 +1263,7 @@ toss_up(struct obj *obj, boolean hitsroof)
     const char *action;
     int otyp = obj->otyp;
     boolean petrifier = ((otyp == EGG || otyp == CORPSE)
+                         && ismnum(obj->corpsenm)
                          && touch_petrifies(&mons[obj->corpsenm]));
     /* note: obj->quan == 1 */
 
@@ -2478,7 +2479,7 @@ breakobj(
         break;
     case EGG:
         /* breaking your own eggs is bad luck */
-        if (hero_caused && obj->spe && obj->corpsenm >= LOW_PM)
+        if (hero_caused && obj->spe && ismnum(obj->corpsenm))
             change_luck((schar) -min(obj->quan, 5L));
         break;
     case BOULDER:

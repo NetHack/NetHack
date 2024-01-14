@@ -1,4 +1,4 @@
-/* NetHack 3.7	patchlevel.h	$NHDT-Date: 1702079342 2023/12/08 23:49:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.247 $ */
+/* NetHack 3.7	patchlevel.h	$NHDT-Date: 1703294869 2023/12/23 01:27:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.249 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -17,7 +17,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL 94
+#define EDITLEVEL 96
 
 /*
  * Development status possibilities.
@@ -36,7 +36,7 @@
 #define DEBUG
 #endif
 
-#define COPYRIGHT_BANNER_A "NetHack, Copyright 1985-2023"
+#define COPYRIGHT_BANNER_A "NetHack, Copyright 1985-2024"
 #define COPYRIGHT_BANNER_B \
     "         By Stichting Mathematisch Centrum and M. Stephenson."
 /* nomakedefs.copyright_banner_c is generated at runtime */

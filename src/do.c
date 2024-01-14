@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1702023250 2023/12/08 08:14:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.368 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.376 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -968,8 +968,13 @@ menu_drop(int retry)
                             | BUC_BLESSED | BUC_CURSED | BUC_UNCURSED
                             | BUC_UNKNOWN | JUSTPICKED | INCLUDE_VENOM),
                            &pick_list, PICK_ANY);
+            /* when paranoid_confirm:A is set, 'A' by itself implies
+               'A'+'a' which will be followed by a confirmation prompt;
+               when that option isn't set, 'A' by itself is rejected
+               by query_categorry() and result here will be n==0 */
         if (!n)
-            goto drop_done;
+            goto drop_done; /* no non-autopick category filters specified */
+
         for (i = 0; i < n; i++) {
             if (pick_list[i].item.a_int == ALL_TYPES_SELECTED) {
                 all_categories = TRUE;
@@ -994,7 +999,7 @@ menu_drop(int retry)
         i = ggetobj("drop", drop, 0, TRUE, &ggoresults);
         if (i == -2)
             all_categories = TRUE;
-        if (ggoresults & ALL_FINISHED) {
+        if ((ggoresults & ALL_FINISHED) != 0) {
             n_dropped = i;
             goto drop_done;
         }
@@ -1031,8 +1036,8 @@ menu_drop(int retry)
         /* drop the just picked item automatically, if only one stack */
         otmp = find_justpicked(gi.invent);
         if (otmp)
-            n_dropped += ((menudrop_split(otmp, justpicked_quan) & ECMD_TIME)
-                          != 0) ? 1 : 0;
+            n_dropped += ((menudrop_split(otmp, justpicked_quan)
+                           & ECMD_TIME) != 0) ? 1 : 0;
     } else {
         /* should coordinate with perm invent, maybe not show worn items */
         n = query_objlist("What would you like to drop?", &gi.invent,
@@ -1043,7 +1048,7 @@ menu_drop(int retry)
             /*
              * picklist[] contains a set of pointers into inventory, but
              * as soon as something gets dropped, they might become stale
-             * (see the drop_everything code above for an explanation).
+             * (see the autopick code above for an explanation).
              * Just checking to see whether one is still in the gi.invent
              * chain is not sufficient validation since destroyed items
              * will be freed and items we've split here might have already
@@ -1552,7 +1557,7 @@ goto_level(
     if (gl.luacore && nhcb_counts[NHCB_LVL_LEAVE]) {
         lua_getglobal(gl.luacore, "nh_callback_run");
         lua_pushstring(gl.luacore, nhcb_name[NHCB_LVL_LEAVE]);
-        nhl_pcall(gl.luacore, 1, 0);
+        nhl_pcall_handle(gl.luacore, 1, 0, "goto_level", NHLpa_panic);
     }
 
     /* tethered movement makes level change while trapped feasible */
@@ -2372,7 +2377,7 @@ set_wounded_legs(long side, int timex)
      * You still call this function, but don't lose hp.
      * Caller is also responsible for adjusting messages.
      */
-    gc.context.botl = 1;
+    disp.botl = TRUE;
     if (!Wounded_legs)
         ATEMP(A_DEX)--;
 
@@ -2392,7 +2397,7 @@ heal_legs(
     int how) /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
 {
     if (Wounded_legs) {
-        gc.context.botl = 1;
+        disp.botl = TRUE;
         if (ATEMP(A_DEX) < 0)
             ATEMP(A_DEX)++;
 

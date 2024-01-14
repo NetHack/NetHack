@@ -41,6 +41,8 @@
  * Modified 08 July 2006 to cast strlen() result to int to suppress a
  * warning on platforms where size_t > sizeof(int).
  *
+ * Modified 05 Jan 2024 to avoid K&R function declarations, marked KR_PROTO.
+ *
  * $NHDT-Date: 1432512787 2015/05/25 00:13:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $
  */
 
@@ -132,9 +134,12 @@ main(int argc, char **argv)
     /* handle ~user/file format */
     if (dest[0] == '~') {
         char *sl;
-        struct passwd *getpwnam();
         struct passwd *user;
-        char dnbuf[100], *strchr(), *strcat(), *strcpy();
+        char dnbuf[100];
+#ifdef KR_PROTO
+        struct passwd *getpwnam();
+        char *strchr(), *strcat(), *strcpy();
+#endif
 
         sl = strchr(dest, '/');
         if (sl == NULL) {
@@ -237,8 +242,7 @@ outdec(char *p, FILE *f, int n)
         putc(c3, f);
 }
 
-#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32) && !defined(__APPLE__)
-
+#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32) && !defined(__APPLE__) && !defined(__linux__)
 /*
  * Return the ptr in sp at which the character c appears;
  * NULL if not found

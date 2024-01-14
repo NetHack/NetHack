@@ -733,7 +733,7 @@ doconsult(struct monst *oracl)
         break;
     }
     money2mon(oracl, (long) u_pay);
-    gc.context.botl = 1;
+    disp.botl = TRUE;
     if (!u.uevent.major_oracle && !u.uevent.minor_oracle)
         record_achievement(ACH_ORCL);
     add_xpts = 0; /* first oracle of each type gives experience points */
@@ -794,6 +794,7 @@ CapitalMon(
 
     if (!CapMons)
         init_CapMons();
+    assert(CapMons != 0);
 
     wln = (unsigned) strlen(word);
     for (i = 0; i < CapMonSiz - 1; ++i) {

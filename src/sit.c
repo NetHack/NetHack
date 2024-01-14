@@ -28,7 +28,7 @@ take_gold(void)
         You_feel("a strange sensation.");
     } else {
         You("notice you have no gold!");
-        gc.context.botl = 1;
+        disp.botl = TRUE;
     }
 }
 
@@ -69,7 +69,7 @@ throne_sit_effect(void)
             make_blinded(0L, TRUE);
             make_sick(0L, (char *) 0, FALSE, SICK_ALL);
             heal_legs(0);
-            gc.context.botl = 1;
+            disp.botl = TRUE;
             break;
         case 5:
             take_gold();

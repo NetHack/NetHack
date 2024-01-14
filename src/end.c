@@ -26,7 +26,7 @@ static void done_hangup(int);
 #endif
 #endif
 static void disclose(int, boolean);
-static void get_valuables(struct obj *);
+static void get_valuables(struct obj *) NO_NNARGS;
 static void sort_valuables(struct valuable_data *, int);
 static void artifact_score(struct obj *, boolean, winid);
 static boolean fuzzer_savelife(int);
@@ -671,8 +671,8 @@ done_in_by(struct monst *mtmp, int how)
 {
     char buf[BUFSZ];
     struct permonst *mptr = mtmp->data,
-                    *champtr = (mtmp->cham >= LOW_PM) ? &mons[mtmp->cham]
-                                                      : mptr;
+                    *champtr = ismnum(mtmp->cham) ? &mons[mtmp->cham]
+                                                  : mptr;
     boolean distorted = (boolean) (Hallucination && canspotmon(mtmp)),
             mimicker = (M_AP_TYPE(mtmp) == M_AP_MONSTER),
             imitator = (mptr != champtr || mimicker);
@@ -880,7 +880,7 @@ panic VA_DECL(const char *, str)
         if (soundprocs.sound_exit_nhsound)
             (*soundprocs.sound_exit_nhsound)("panic");
         exit_nhwindows((char *) 0);
-        iflags.window_inited = 0; /* they're gone; force raw_print()ing */
+        iflags.window_inited = FALSE; /* they're gone; force raw_print()ing */
     }
 
     raw_print(gp.program_state.gameover
@@ -1206,7 +1206,7 @@ savelife(int how)
 
     if (u.utrap && u.utraptype == TT_LAVA)
         reset_utrap(FALSE);
-    gc.context.botl = TRUE;
+    disp.botl = TRUE;
     u.ugrave_arise = NON_PM;
     HUnchanging = 0L;
     curs_on_u();
@@ -1438,7 +1438,7 @@ fuzzer_savelife(int how)
 
             /* get rid of temporary potion with obfree() rather than useup()
                because it doesn't get entered into inventory */
-            if (u.ulycn >= LOW_PM && !rn2(3)) {
+            if (ismnum(u.ulycn) && !rn2(3)) {
                 potion = mksobj(POT_WATER, TRUE, FALSE);
                 bless(potion);
                 (void) peffects(potion);
@@ -1501,10 +1501,10 @@ done(int how)
         || (how == QUIT && done_stopprint)) {
         /* skip status update if panicking or disconnected
            or answer of 'q' to "Really quit?" */
-        gc.context.botl = gc.context.botlx = iflags.time_botl = FALSE;
+        disp.botl = disp.botlx = disp.time_botl = FALSE;
     } else {
         /* otherwise force full status update */
-        gc.context.botlx = TRUE;
+        disp.botlx = TRUE;
         bot();
     }
 
@@ -1537,7 +1537,7 @@ done(int how)
                negative (-1 is used as a flag in some circumstances
                which don't apply when actually dying due to HP loss) */
             u.uhp = u.mh = 0;
-            gc.context.botl = 1;
+            disp.botl = TRUE;
         }
     }
     if (Lifesaved && (how <= GENOCIDED)) {
@@ -1611,7 +1611,7 @@ really_done(int how)
         done_stopprint++;
 #endif
     /* render vision subsystem inoperative */
-    iflags.vision_inited = 0;
+    iflags.vision_inited = FALSE;
 
     /* maybe use up active invent item(s), place thrown/kicked missile,
        deal with ball and chain possibly being temporarily off the map */
@@ -1671,7 +1671,7 @@ really_done(int how)
     else if (how == BURNING || how == DISSOLVED) /* corpse burns up too */
         u.ugrave_arise = (NON_PM - 2); /* leave no corpse */
     else if (how == STONING)
-        u.ugrave_arise = (NON_PM - 1); /* statue instead of corpse */
+        u.ugrave_arise = LEAVESTATUE; /* statue instead of corpse */
     else if (how == TURNED_SLIME
              /* it's possible to turn into slime even though green slimes
                 have been genocided:  genocide could occur after hero is
@@ -1808,7 +1808,7 @@ really_done(int how)
         }
     }
 
-    if (u.ugrave_arise >= LOW_PM && !done_stopprint) {
+    if (ismnum(u.ugrave_arise) && !done_stopprint) {
         /* give this feedback even if bones aren't going to be created,
            so that its presence or absence doesn't tip off the player to
            new bones or their lack; it might be a lie if makemon fails */
@@ -1839,7 +1839,7 @@ really_done(int how)
         if (WIN_INVEN != WIN_ERR) {
             destroy_nhwindow(WIN_INVEN),  WIN_INVEN = WIN_ERR;
             /* precaution in case any late update_inventory() calls occur */
-            iflags.perm_invent = 0;
+            iflags.perm_invent = FALSE;
         }
         display_nhwindow(WIN_MESSAGE, TRUE);
         destroy_nhwindow(WIN_MAP),  WIN_MAP = WIN_ERR;

@@ -133,9 +133,6 @@ static int check_pos(coordxy, coordxy, int);
 static void get_bkglyph_and_framecolor(coordxy x, coordxy y, int *, uint32 *);
 static int tether_glyph(coordxy, coordxy);
 static void mimic_light_blocking(struct monst *) NONNULLARG1;
-#ifdef UNBUFFERED_GLYPHINFO
-static glyph_info *glyphinfo_at(coordxy, coordxy, int);
-#endif
 
 /*#define WA_VERBOSE*/ /* give (x,y) locations for all "bad" spots */
 #ifdef WA_VERBOSE
@@ -1545,12 +1542,16 @@ static glyph_info no_ginfo = {
     }
 };
 #ifndef UNBUFFERED_GLYPHINFO
+/* Note that the 'glyph' argument is not used in the expansion
+ * of this !UNBUFFERED_GLYPHINFO (default) variation, but is
+ * a requirement for the UNBUFFERED_GLYPHINFO variation */
 #define Glyphinfo_at(x, y, glyph) \
     (((x) < 0 || (y) < 0 || (x) >= COLNO || (y) >= ROWNO) ? &no_ginfo   \
      : &gg.gbuf[(y)][(x)].glyphinfo)
 #else
 static glyph_info ginfo;
-#define Glyphinfo_at(x, y, glyph) glyphinfo_at(x, y, glyph)
+static glyph_info *glyphinfo_at(coordxy, coordxy, int);
+#define Glyphinfo_at(x, y, glyph) glyphinfo_at((x), (y), (glyph))
 #endif
 
 #ifdef TILES_IN_GLYPHMAP
@@ -1669,7 +1670,7 @@ docrt_flags(int refresh_flags)
         /* perm_invent */
         update_inventory();
         /* status */
-        gc.context.botlx = 1; /* force a redraw of the bottom lines */
+        disp.botlx = TRUE; /* force a redraw of the bottom lines */
         /* note: caller needs to call bot() to actually redraw status */
     }
     gp.program_state.in_docrt = FALSE;
@@ -1978,7 +1979,7 @@ clear_glyph_buffer(void)
                         != nul_gbuf.glyphinfo.gm.glyphflags
                      || giptr->gm.tileidx != nul_gbuf.glyphinfo.gm.tileidx)
 #else
-    nul_gbuf.gnew = (giptr->glyphinfo.ttychar != ' '
+    nul_gbuf.gnew = (giptr->ttychar != ' '
                      || giptr->gm.sym.color != NO_COLOR
                      || (giptr->gm.glyphflags & ~MG_UNEXPL) != 0)
 #endif
@@ -2044,7 +2045,7 @@ cls(void)
         return;
     in_cls = TRUE;
     display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
-    gc.context.botlx = 1;                 /* force update of botl window */
+    disp.botlx = TRUE;                 /* force update of botl window */
     clear_nhwindow(WIN_MAP);              /* clear physical screen */
 
     clear_glyph_buffer(); /* force gbuf[][].glyph to unexplored */
@@ -2083,9 +2084,9 @@ flush_screen(int cursor_on_u)
 #endif
 
     /* get this done now, before we place the cursor on the hero */
-    if (gc.context.botl || gc.context.botlx)
+    if (disp.botl || disp.botlx)
         bot();
-    else if (iflags.time_botl)
+    else if (disp.time_botl)
         timebot();
 
     for (y = 0; y < ROWNO; y++) {
@@ -2098,7 +2099,7 @@ flush_screen(int cursor_on_u)
                     && bkglyphinfo.framecolor != NO_COLOR)) {
                 map_glyphinfo(x, y, bkglyph, 0, &bkglyphinfo); /* won't touch framecolor */
                 print_glyph(WIN_MAP, x, y,
-                            Glyphinfo_at(x, y, gptr->glyph), &bkglyphinfo);
+                            Glyphinfo_at(x, y, gptr->glyphinfo.glyph), &bkglyphinfo);
                 gptr->gnew = 0;
             }
         }
@@ -2327,7 +2328,7 @@ glyph_at(coordxy x, coordxy y)
 glyph_info *
 glyphinfo_at(coordxy x, coordxy y, int glyph)
 {
-    map_glyphinfo(x, y, glyph, 0, &ginfo);
+    map_glyphinfo(x, y, glyph, 0, &ginfo); /* ginfo declared at file scope */
     return &ginfo;
 }
 #endif
@@ -3405,22 +3406,6 @@ wall_angle(struct rm *lev)
             }
             break;
         case WM_T_BL:
-#if 0  /* older method, fixed */
-            if (only(seenv, SV4 | SV5)) {
-                col = T_tlcorn;
-            } else if ((seenv & (SV0 | SV1 | SV2))
-                       && only(seenv, SV0 | SV1 | SV2 | SV6 | SV7)) {
-                col = T_hwall;
-            } else if ((seenv & SV3)
-                       || ((seenv & (SV0 | SV1 | SV2))
-                           && (seenv & (SV4 | SV5)))) {
-                col = T_tdwall;
-            } else {
-                if (seenv != SV6)
-                    t_warn(lev);
-                col = T_stone;
-            }
-#endif /* 0 */
             if (only(seenv, SV4 | SV5))
                 col = T_tlcorn;
             else if ((seenv & (SV0 | SV1 | SV2 | SV7))
@@ -3432,22 +3417,6 @@ wall_angle(struct rm *lev)
                 col = T_tdwall;
             break;
         case WM_T_BR:
-#if 0  /* older method, fixed */
-            if (only(seenv, SV5 | SV6)) {
-                col = T_trcorn;
-            } else if ((seenv & (SV0 | SV1 | SV2))
-                       && only(seenv, SV0 | SV1 | SV2 | SV3 | SV4)) {
-                col = T_hwall;
-            } else if ((seenv & SV7)
-                       || ((seenv & (SV0 | SV1 | SV2))
-                           && (seenv & (SV5 | SV6)))) {
-                col = T_tdwall;
-            } else {
-                if (seenv != SV4)
-                    t_warn(lev);
-                col = T_stone;
-            }
-#endif /* 0 */
             if (only(seenv, SV5 | SV6))
                 col = T_trcorn;
             else if ((seenv & (SV0 | SV1 | SV2 | SV3))
