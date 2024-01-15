@@ -1717,7 +1717,8 @@ Hear_again(void)
 static int
 rottenfood(struct obj *obj)
 {
-    pline("Blecch!  Rotten %s!", foodword(obj));
+    pline("Blecch!  %s %s!",
+          is_metallic(obj) ? "Awful" : "Rotten", foodword(obj));
     if (!rn2(4)) {
         if (Hallucination)
             You_feel("rather trippy.");
