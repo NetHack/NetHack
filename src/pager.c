@@ -1528,35 +1528,38 @@ do_screen_description(
     return found;
 }
 
+/* when farlook is reporting on an engraving, include its text */
 static boolean
 add_quoted_engraving(coordxy x, coordxy y, char *buf)
 {
     char temp_buf[BUFSZ];
     struct engr *ep = engr_at(x, y);
+    boolean floorengr = !strcmp(buf, " (engraving"),
+            headstone = !strcmp(buf, " (grave");
 
-    if (ep) {
-#define GRAVESTONE "(grave"
-        /* is a grave's headstone if buf ends with "(grave";
-           caller will add closing ")" after we return;
-           -1: sizeof for a literal string includes the terminating '\0' */
-        boolean is_headstone = (IS_GRAVE(levl[x][y].typ)
-                                && strlen(buf) >= (sizeof GRAVESTONE - 1)
-                                && !strcmp(eos(buf) - (sizeof GRAVESTONE - 1),
-                                           GRAVESTONE));
+    /*
+     * If there is no engraving here, there's nothing to do; just return.
+     *
+     * When buf[] is " (engraving" or " (grave" then we're looking at an
+     * engraving and we'll add its text.  Caller supplies the closing paren.
+     *
+     * If buf[] contains anything else, we're looking at something (monster
+     * or object) that happens to be on top of an engraving, so we won't
+     * append the engraving text.
+     */
+    if (!ep || (!floorengr && !headstone))
+        return FALSE;
 
-        if (ep->eread)
-            Snprintf(temp_buf, sizeof temp_buf, " with %s: \"%s\"",
-                     is_headstone ? "headstone reading" : "remembered text",
-                     ep->engr_txt[remembered_text]);
-        else
-            Snprintf(temp_buf, sizeof temp_buf, " %s you haven't read",
-                     is_headstone ? "whose headstone" : "that");
+    if (ep->eread)
+        Snprintf(temp_buf, sizeof temp_buf, " with %s: \"%s\"",
+                 headstone ? "headstone reading" : "remembered text",
+                 ep->engr_txt[remembered_text]);
+    else
+        Snprintf(temp_buf, sizeof temp_buf, " %s you haven't read",
+                 headstone ? "whose headstone" : "that");
 
-        (void) strncat(buf, temp_buf, BUFSZ - strlen(buf) - 1);
-        return TRUE;
-#undef ENGRVG
-    }
-    return FALSE;
+    (void) strncat(buf, temp_buf, BUFSZ - strlen(buf) - 1);
+    return TRUE;
 }
 
 /* also used by getpos hack in do_name.c */

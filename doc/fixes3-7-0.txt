@@ -1828,6 +1828,8 @@ duration of temporary stoning resistance would be extended while eating a
 	so if it timed out during the meal, player got the message about hero
 	no longer being protected against stoning but was able to finish the
 	meal safely
+farlook at something that was on top of an engraving or grave would report
+	the engraving text or headstone epitaph along with the 'something'
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
