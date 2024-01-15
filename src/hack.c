@@ -1644,7 +1644,7 @@ notice_all_mons(boolean reset)
     if (a11y.mon_notices && !a11y.mon_notices_blocked) {
         struct monst *mtmp;
         struct monst **arr = NULL;
-        int i = 0, cnt = 0;
+        int j, i = 0, cnt = 0;
 
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
             if (canspotmon(mtmp))
@@ -1668,8 +1668,8 @@ notice_all_mons(boolean reset)
         if (i) {
             qsort((genericptr_t) arr, (size_t) i, sizeof *arr, notice_mons_cmp);
 
-            for (i = 0; i < cnt; i++)
-                notice_mon(arr[i]);
+            for (j = 0; j < i; j++)
+                notice_mon(arr[j]);
         }
 
         free(arr);
