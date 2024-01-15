@@ -2435,6 +2435,8 @@ allow the ')', '[', '(', '=', '"', and '*' commands to be preceded by the 'm'
 hot ground (Gehennom / Plane of Fire) often destroys dropped potions
 erinyes overhaul; they now attempt to punish heroes who have violated their
 	alignment and get stronger with greater alignment abuse
+accessibility options to tell where on map a message happened (accessiblemsg)
+	and to notify when a monster is spotted (spot_monsters)
 
 
 Platform- and/or Interface-Specific New Features
