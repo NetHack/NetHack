@@ -1919,9 +1919,41 @@ domove_fight_web(coordxy x, coordxy y)
             /* guaranteed success */
             pline("%s cuts through the web!",
                   bare_artifactname(uwep));
-        } else if (uwep && !is_blade(uwep)) {
-            You_cant("cut a web with %s!", an(xname(uwep)));
+
+        /* is_blade() includes daggers (which are classified as PIERCE)
+           but doesn't include axes and slashing polearms */
+        } else if (uwep && !is_blade(uwep)
+                   && (!u.twoweap || !is_blade(uswapwep))) {
+            char *uwepstr = 0, *scndstr = 0, uwepbuf[BUFSZ], scndbuf[BUFSZ];
+            boolean onewep;
+
+            /* when dual wielding, second weapon will only be mentioned
+               if it has a different type description from primary */
+            Strcpy(uwepbuf, weapon_descr(uwep));
+            Strcpy(scndbuf, u.twoweap ? weapon_descr(uswapwep) : "");
+            onewep = !*scndbuf || !strcmp(uwepbuf, scndbuf);
+            if (!strcmpi(uwepbuf, "armor") || !strcmpi(uwepbuf, "food")
+                || !strcmpi(uwepbuf, "venom")) { /* as-is */
+                /* non-weapon item wielded, of a type where an() would
+                   result in weird phrasing; dual wield not possible */
+                uwepstr = uwepbuf;
+            } else if (uwep->quan == 1L /* singular */
+                       /* unless secondary is suppressed due to same type */
+                       && !(u.twoweap && onewep)) {
+                uwepstr = an(uwepbuf);
+            } else { /* plural */
+                uwepstr = makeplural(uwepbuf);
+            }
+            if (!onewep) {
+                assert(uswapwep != NULL);
+                scndstr = (uswapwep->quan == 1L) ? an(scndbuf)
+                                                 : makeplural(scndbuf);
+            }
+            You_cant("cut a web with %s%s%s!", uwepstr,
+                     !onewep ? " or " : "", !onewep ? scndstr : "");
             return TRUE;
+
+        /* weapon is ok; check whether hit is successful */
         } else if (roll > (acurrstr() - 2 /* 1..19 */
                            /* for weaponless, 'roll' was adjusted above */
                            + (uwep ? uwep->spe + wskill_minus_2 : 0))) {
@@ -1929,11 +1961,14 @@ domove_fight_web(coordxy x, coordxy y)
             You("%s ineffectually at some of the strands.",
                 uwep ? "hack" : "thrash");
             return TRUE;
+
+        /* hit has succeeded */
         } else {
             You("%s through the web.", uwep ? "cut" : "punch");
             /* doesn't break "never hit with a wielded weapon" conduct */
             use_skill(wtype, 1);
         }
+
         deltrap(trap);
         newsym(x, y);
         return TRUE;
