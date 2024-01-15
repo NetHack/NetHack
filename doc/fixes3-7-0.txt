@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1353 $ $NHDT-Date: 1704316439 2024/01/03 21:13:59 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1361 $ $NHDT-Date: 1705357506 2024/01/15 22:25:06 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1349,6 +1349,9 @@ if polymorphing a potion turned it into oil, dipping potions produced oil
 an engulfer capable of passing through iron bars could do so even when hero
 	was engulfed
 some uses of mons[obj->corpsenm] weren't excluding obj->corpsenm==NON_PM (-1)
+if a covetous monster tried to teleport next to the hero but the level was
+	completely full, it would be booted off the level (set to migrate
+	back if the hero left and returned) instead of just staying put
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
