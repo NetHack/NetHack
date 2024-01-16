@@ -1,4 +1,4 @@
-/* NetHack 3.7	mcastu.c	$NHDT-Date: 1596498177 2020/08/03 23:42:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.68 $ */
+/* NetHack 3.7	mcastu.c	$NHDT-Date: 1705428596 2024/01/16 18:09:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -229,9 +229,8 @@ castmu(
     }
 
     if (mattk->adtyp == AD_SPEL || mattk->adtyp == AD_CLRC) {
-        mtmp->mspec_used = 10 - mtmp->m_lev;
-        if (mtmp->mspec_used < 2)
-            mtmp->mspec_used = 2;
+        /* monst->m_lev is unsigned (uchar), permonst->mspec_used is int */
+        mtmp->mspec_used = (int) ((mtmp->m_lev < 8) ? (10 - mtmp->m_lev) : 2);
     }
 
     /* monster can cast spells, but is casting a directed spell at the
