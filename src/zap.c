@@ -5302,6 +5302,42 @@ zap_over_floor(
     return rangemod;
 }
 
+/* monster has cast flames or frost at target on <x,y>; called by mcastu() */
+void
+mon_spell_hits_spot(
+    struct monst *caster UNUSED,
+    int adtyp, /* canonical damage type */
+    coordxy x, coordxy y) /* so far, only used for targeting <u.ux,u.uy> */
+{
+    /* "shower of missiles" or [hypothetical] "acid rain" attack:
+       thoroughly clobber an engraving (unless its type makes it be
+       scuff-protected); zap_over_floor() doesn't handle this */
+    if (adtyp == AD_MAGM || adtyp == AD_ACID) {
+        struct engr *ep = engr_at(x, y);
+        char *etext = ep ? ep->engr_txt[actual_text] : NULL;
+
+        if (etext)
+            wipe_engr_at(x, y, (int) strlen(etext) + d(6, 6), TRUE);
+        /* hero and player will still remember prior text until the spot
+           is re-examined (lookhere or move off and back on) */
+    }
+
+    /* hit items and/or terrain; only matters for AD_FIRE and AD_COLD but
+       accept any basic damage type that zap_over_floor() might handle */
+    if (adtyp >= AD_MAGM && adtyp <= AD_ACID) {
+        boolean shopdummy = FALSE; /* zap_over_floor() requires this even
+                                    * though it's only used when zapdmgtyp
+                                    * is non-negative (hero's fault) */
+        int zt_typ = adtyp - 1,            /* convert AD_xxxx to ZT_xxxx */
+            zapdmgtyp = -ZT_SPELL(zt_typ); /* damage is from monster spell */
+
+        (void) zap_over_floor(x, y, zapdmgtyp, &shopdummy, TRUE, 0);
+    } else {
+        impossible("Unsupported damage type (%d) for mon_spell_hits_spot.",
+                   adtyp);
+    }
+}
+
 /* fractured by pick-axe or wand of striking or by vault guard */
 void
 fracture_rock(struct obj *obj) /* no texts here! */
