@@ -2146,9 +2146,9 @@ nhl_done(lua_State *L)
                                nud->name, (long unsigned) nud->inuse);
             }
         }
+        lua_close(L);
         if (nud)
             nhl_alloc(NULL, nud, 0, 0); // free nud
-        lua_close(L);
     }
     iflags.in_lua = FALSE;
 }
@@ -2250,7 +2250,7 @@ RESTORE_WARNING_CONDEXPR_IS_CONSTANT
  *     PMEM memory in use after lua_pcall returns
  *  SID     a small integer identifying the Lua VM instance
  *  TAG     a string from the nhl_luapcall call
- *  DATA    memory: rough number of bytes in use by the VM(see NHL_ALLOC_ADJUST)
+ *  DATA    memory: rough number of bytes in use by the VM
  *          steps: rough number of steps by the VM(see NHL_SB_STEPSIZE)
  */
 #ifdef NHL_SANDBOX
@@ -2726,37 +2726,32 @@ UNSAFEIO:
 
 RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 
-/*
- * All we can do is approximate the amount of storage used.  Every allocator
- * has different overhead and uses that overhead differently.  Since we're
- * really just trying to prevent egregious use, we default to a minimum
- * allocation size of 16 and if you know better about your allocator (and
- * it's worth the processing time), it can be overridden.
- */
-#ifndef NHL_ALLOC_ADJUST
-#define NHL_ALLOC_ADJUST(d) d = (((d) + 15) & ~15)
-#endif
 static void *
 nhl_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
 {
     nhl_user_data *nud = ud;
 
     if (nsize == 0) {
-        if (ptr != NULL)
+        if (ptr != NULL) {
+            if (nud && nud->memlimit)
+                nud->inuse -= osize;
             free(ptr);
+        }
         return NULL;
     }
 
     if (nud && nud->memlimit) { /* this state is size limited */
         uint32_t delta = !ptr ? nsize : nsize - osize;
 
-        NHL_ALLOC_ADJUST(delta);
         nud->inuse += delta;
         if (nud->inuse > nud->memlimit)
             return NULL;
     }
 
-    return re_alloc(ptr, nsize);
+    if (ptr && nsize)
+        return re_alloc(ptr, nsize);
+    /* NOTE: (!ptr && nsize && osize) is valid as per lua docs */
+    return alloc(nsize);
 }
 
 DISABLE_WARNING_UNREACHABLE_CODE
@@ -2829,7 +2824,6 @@ nhlL_newstate(nhl_sandbox_info *sbi, const char *name)
         nud->flags = sbi->flags; /* save reporting flags */
         nud->statctr = 0;
         uint32_t sz = sizeof (struct nhl_user_data);
-        NHL_ALLOC_ADJUST(sz);
         nud->inuse = sz;
 
         if (name) {

@@ -335,6 +335,7 @@ makerooms(void)
         wallification(1, 0, COLNO - 1, ROWNO - 1);
         free(gc.coder);
         gc.coder = NULL;
+        lua_gc(themes, LUA_GCCOLLECT);
     }
 }
 
