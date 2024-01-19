@@ -3368,8 +3368,11 @@ When the contents of a container are known, that container will be
 described as something like ``a sack containing 3 items''.
 In this example, the 3 refers to number of {\it stacks\/} of compatible
 items, not to the total number of individual items.
-So a sack holding 2 blue potions, 7 arrows, and 350 gold pieces would be
+So a sack holding 2 sky blue potions, 7 arrows, and 350 gold pieces would be
 described as having 3 items rather than 10 or 359.
+And you would need to have 3 unused inventory slots available in order
+to take everything out (for the case where the items you remove don't
+combine into bigger stacks with things you're already carrying).
 
 %.pg
 If a chest or large box is described as ``broken'', that means that it
@@ -3382,8 +3385,8 @@ If you want to take everything out of a container, you can use the
 ``{\tt \#tip}'' command to pour the contents onto the floor.
 This may be your only way to get things out if your hands are stuck
 to a cursed two-handed weapon.
-When your hands aren't stuck, you have another option of pouring the
-conteints into another container.
+When your hands aren't stuck, you have the potential to pour the
+contents into another container.
 (As of this writing, the other container must be carried rather than on
 the floor.)
 
