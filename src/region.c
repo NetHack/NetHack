@@ -1196,7 +1196,7 @@ create_gas_cloud_selection(struct selectionvar *sel, int damage)
     NhRegion *cloud;
     NhRect tmprect;
     coordxy x, y;
-    NhRect r;
+    NhRect r = cg.zeroNhRect;
     boolean inside_cloud = is_hero_inside_gas_cloud();
 
     selection_getbounds(sel, &r);
