@@ -540,6 +540,8 @@ struct _hitmon_data {
 
 /* point px,py is adjacent to (or same location as) hero */
 #define next2u(px,py) (distu((px),(py)) <= 2)
+/* is monster on top of or next to hero? */
+#define m_next2u(m) (distu((m)->mx,(m)->my) <= 2)
 /* hero at (x,y)? */
 #define u_at(x,y) ((x) == u.ux && (y) == u.uy)
 

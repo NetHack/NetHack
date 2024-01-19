@@ -443,7 +443,7 @@ find_defensive(struct monst *mtmp, boolean tryescape)
     if (!tryescape && dist2(x, y, mtmp->mux, mtmp->muy) > 25)
         return FALSE;
     if (tryescape && Is_knox(&u.uz)
-        && !next2u(mtmp->mx, mtmp->my) && m_next2m(mtmp))
+        && !m_next2u(mtmp) && m_next2m(mtmp))
         return FALSE;
     if (u.uswallow && stuck)
         return FALSE;
@@ -2084,7 +2084,7 @@ find_misc(struct monst *mtmp)
             && uwep && !rn2(5) && obj == MON_WEP(mtmp)
             /* hero's location must be known and adjacent */
             && u_at(mtmp->mux, mtmp->muy)
-            && next2u(mtmp->mx, mtmp->my)
+            && m_next2u(mtmp)
             /* don't bother if it can't work (this doesn't
                prevent cursed weapons from being targeted) */
             && !u.uswallow

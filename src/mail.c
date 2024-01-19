@@ -416,7 +416,7 @@ newmail(struct mail_info *info)
         if (info->response_cmd)
             new_omailcmd(obj, info->response_cmd);
 
-        if (!next2u(md->mx, md->my)) {
+        if (!m_next2u(md)) {
             SetVoice(md, 0, 80, 0);
             verbalize("Catch!");
         }

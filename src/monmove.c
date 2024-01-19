@@ -827,7 +827,7 @@ dochug(register struct monst* mtmp)
             break;
         case MMOVE_MOVED: /* monster moved */
             /* if confused grabber has wandered off, let go */
-            if (mtmp == u.ustuck && !next2u(mtmp->mx, mtmp->my))
+            if (mtmp == u.ustuck && !m_next2u(mtmp))
                 unstuck(mtmp);
             if (grounded(mdat))
                 disturb_buried_zombies(mtmp->mx, mtmp->my);

@@ -1068,7 +1068,7 @@ movemon_singlemon(struct monst *mtmp)
         if (mtmp->mundetected)
             return FALSE;
     } else if (mtmp->data->mlet == S_EEL && !mtmp->mundetected
-               && (mtmp->mflee || !next2u(mtmp->mx, mtmp->my))
+               && (mtmp->mflee || !m_next2u(mtmp))
                && !canseemon(mtmp) && !rn2(4)) {
         /* some eels end up stuck in isolated pools, where they
            can't--or at least won't--move, so they never reach
@@ -3124,7 +3124,7 @@ void
 set_ustuck(struct monst *mtmp)
 {
     if (iflags.sanity_check || iflags.debug_fuzzer) {
-        if (mtmp && !next2u(mtmp->mx, mtmp->my))
+        if (mtmp && !m_next2u(mtmp))
             impossible("Sticking to %s at distu %d?",
                        mon_nam(mtmp), mdistu(mtmp));
     }
@@ -4257,7 +4257,7 @@ restrap(struct monst *mtmp)
         /* can't hide on ceiling if there isn't one */
         || (ceiling_hider(mtmp->data) && !has_ceiling(&u.uz))
         /* won't hide when adjacent to hero */
-        || (sensemon(mtmp) && next2u(mtmp->mx, mtmp->my)))
+        || (sensemon(mtmp) && m_next2u(mtmp)))
         return FALSE;
 
     if (mtmp->data->mlet == S_MIMIC) {
@@ -5268,7 +5268,7 @@ angry_guards(boolean silent)
         if (is_watch(mtmp->data) && mtmp->mpeaceful) {
             ct++;
             if (canspotmon(mtmp) && mtmp->mcanmove) {
-                if (next2u(mtmp->mx, mtmp->my))
+                if (m_next2u(mtmp))
                     nct++;
                 else
                     sct++;

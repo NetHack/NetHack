@@ -475,7 +475,7 @@ mattacku(register struct monst *mtmp)
             /* Your steed won't attack you */
             return 0;
         /* Orcs like to steal and eat horses and the like */
-        if (!rn2(is_orc(mtmp->data) ? 2 : 4) && next2u(mtmp->mx, mtmp->my)) {
+        if (!rn2(is_orc(mtmp->data) ? 2 : 4) && m_next2u(mtmp)) {
             /* attack your steed instead; 'bhitpos' and 'notonhead' are
                already set from tagetting hero */
             i = mattackm(mtmp, u.usteed);
@@ -483,7 +483,7 @@ mattacku(register struct monst *mtmp)
                 return 1;
             /* make sure steed is still alive and within range */
             if ((i & M_ATTK_DEF_DIED) != 0 || !u.usteed
-                || !next2u(mtmp->mx, mtmp->my))
+                || !m_next2u(mtmp))
                 return 0;
             /* Let your steed retaliate */
             gb.bhitpos.x = mtmp->mx, gb.bhitpos.y = mtmp->my;
@@ -828,7 +828,7 @@ mattacku(register struct monst *mtmp)
                     mon_currwep = MON_WEP(mtmp);
                     if (mon_currwep) {
                         boolean bash = (is_pole(mon_currwep)
-                                        && next2u(mtmp->mx, mtmp->my));
+                                        && m_next2u(mtmp));
 
                         hittmp = hitval(mon_currwep, &gy.youmonst);
                         tmp += hittmp;
@@ -1989,7 +1989,7 @@ doseduce(struct monst *mon)
                 Ring_gone(uright);
                 /* ring removal might cause loss of levitation which could
                    drop hero onto trap that transports hero somewhere else */
-                if (u.utotype || !next2u(mon->mx, mon->my))
+                if (u.utotype || !m_next2u(mon))
                     return 1;
                 setworn(ring, RIGHT_RING);
             } else if (uleft && uleft->otyp != RIN_ADORNMENT) {
@@ -1997,7 +1997,7 @@ doseduce(struct monst *mon)
                 pline("%s replaces %s with %s.",
                       Who, yname(uleft), yname(ring));
                 Ring_gone(uleft);
-                if (u.utotype || !next2u(mon->mx, mon->my))
+                if (u.utotype || !m_next2u(mon))
                     return 1;
                 setworn(ring, LEFT_RING);
             } else
@@ -2030,7 +2030,7 @@ doseduce(struct monst *mon)
        and changing location, so hero might not be adjacent to seducer
        any more (mayberem() has its own adjacency test so we don't need
        to check after each potential removal) */
-    if (u.utotype || !next2u(mon->mx, mon->my))
+    if (u.utotype || !m_next2u(mon))
         return 1;
 
     if (uarm || uarmc) {
@@ -2208,7 +2208,7 @@ mayberem(struct monst *mon,
         return;
     /* removal of a previous item might have sent the hero elsewhere
        (loss of levitation that leads to landing on a transport trap) */
-    if (u.utotype || !next2u(mon->mx, mon->my))
+    if (u.utotype || !m_next2u(mon))
         return;
 
     /* being deaf overrides confirmation prompt for high charisma */

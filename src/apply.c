@@ -870,9 +870,9 @@ static boolean
 mleashed_next2u(struct monst *mtmp)
 {
     if (mtmp->mleashed) {
-        if (!next2u(mtmp->mx, mtmp->my))
+        if (!m_next2u(mtmp))
             mnexto(mtmp, RLOC_NOMSG);
-        if (!next2u(mtmp->mx, mtmp->my)) {
+        if (!m_next2u(mtmp)) {
             struct obj *otmp = get_mleash(mtmp);
 
             if (!otmp) {

@@ -2267,7 +2267,7 @@ distant_monnam(
        unless you're adjacent (overridden for hallucination which does
        its own obfuscation) */
     if (mon->data == &mons[PM_HIGH_CLERIC] && !Hallucination
-        && Is_astralevel(&u.uz) && !next2u(mon->mx, mon->my)) {
+        && Is_astralevel(&u.uz) && !m_next2u(mon)) {
         Strcpy(outbuf, article == ARTICLE_THE ? "the " : "");
         Strcat(outbuf, mon->female ? "high priestess" : "high priest");
     } else {

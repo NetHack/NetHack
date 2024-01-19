@@ -2435,7 +2435,7 @@ escape_from_sticky_mon(coordxy x, coordxy y)
     if (u.ustuck && (x != u.ustuck->mx || y != u.ustuck->my)) {
         struct monst *mtmp;
 
-        if (!next2u(u.ustuck->mx, u.ustuck->my)) {
+        if (!m_next2u(u.ustuck)) {
             /* perhaps it fled (or was teleported or ... ) */
             set_ustuck((struct monst *) 0);
         } else if (sticks(gy.youmonst.data)) {

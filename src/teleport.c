@@ -1603,7 +1603,7 @@ rloc_to_core(
         if (u.uswallow) {
             u_on_newpos(mtmp->mx, mtmp->my);
             docrt();
-        } else if (!next2u(mtmp->mx, mtmp->my)) {
+        } else if (!m_next2u(mtmp)) {
            unstuck(mtmp);
         }
     }

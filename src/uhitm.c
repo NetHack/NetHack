@@ -234,7 +234,7 @@ attack_checks(
         if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers) {
             if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK)
                 /* applied pole-arm attack is too far to get stuck */
-                && next2u(mtmp->mx, mtmp->my))
+                && m_next2u(mtmp))
                 set_ustuck(mtmp);
         }
         /* #H7329 - if hero is on engraved "Elbereth", this will end up
@@ -1940,7 +1940,7 @@ shade_miss(
 
     if (verbose
         && ((youdef || cansee(mdef->mx, mdef->my) || sensemon(mdef))
-            || (magr == &gy.youmonst && next2u(mdef->mx, mdef->my)))) {
+            || (magr == &gy.youmonst && m_next2u(mdef)))) {
         static const char harmlessly_thru[] = " harmlessly through ";
 
         what = (!obj || shade_aware(obj)) ? "attack" : cxname(obj);
@@ -3215,7 +3215,7 @@ mhitm_ad_stck(
 
     if (magr == &gy.youmonst) {
         /* uhitm */
-        if (!negated && !sticks(pd) && next2u(mdef->mx, mdef->my)) {
+        if (!negated && !sticks(pd) && m_next2u(mdef)) {
             set_ustuck(mdef); /* it's now stuck to you */
             if (barbs)
                 Your("barbs stick to %s!", y_monnam(mdef));
@@ -5266,7 +5266,7 @@ hmonas(struct monst *mon)
     boolean monster_survived;
 
     /* not used here but umpteen mhitm_ad_xxxx() need this */
-    gv.vis = (canseemon(mon) || next2u(mon->mx, mon->my));
+    gv.vis = (canseemon(mon) || m_next2u(mon));
 
     /* with just one touch/claw/weapon attack, both rings matter;
        with more than one, alternate right and left when checking
@@ -6024,7 +6024,7 @@ stumble_onto_mimic(struct monst *mtmp)
 
     if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK)
         /* must be adjacent; attack via polearm could be from farther away */
-        && next2u(mtmp->mx, mtmp->my))
+        && m_next2u(mtmp))
         set_ustuck(mtmp);
 
     if (Blind) {

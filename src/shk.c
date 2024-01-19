@@ -1454,7 +1454,7 @@ dopay(void)
     for (shkp = next_shkp(fmon, FALSE); shkp;
          shkp = next_shkp(shkp->nmon, FALSE)) {
         sk++;
-        if (next2u(shkp->mx, shkp->my)) {
+        if (m_next2u(shkp)) {
             /* next to an irate shopkeeper? prioritize that */
             if (nxtm && ANGRY(nxtm))
                 continue;
@@ -1495,7 +1495,7 @@ dopay(void)
              shkp = next_shkp(shkp->nmon, FALSE))
             if (canspotmon(shkp))
                 break;
-        if (shkp != resident && !next2u(shkp->mx, shkp->my)) {
+        if (shkp != resident && !m_next2u(shkp)) {
             pline("%s is not near enough to receive your payment.",
                   Shknam(shkp));
             return ECMD_OK;
@@ -1533,7 +1533,7 @@ dopay(void)
             pline("%s is not interested in your payment.", Monnam(mtmp));
             return ECMD_OK;
         }
-        if (mtmp != resident && !next2u(mtmp->mx, mtmp->my)) {
+        if (mtmp != resident && !m_next2u(mtmp)) {
             pline("%s is too far to receive your payment.", Shknam(mtmp));
             return ECMD_OK;
         }
@@ -2088,7 +2088,7 @@ inherits(
         takes[0] = '\0';
         if (helpless(shkp))
             Strcat(takes, "wakes up and ");
-        if (!next2u(shkp->mx, shkp->my))
+        if (!m_next2u(shkp))
             Strcat(takes, "comes and ");
         Strcat(takes, "takes");
 
@@ -4505,10 +4505,10 @@ shopdig(int fall)
             return;
 #endif
         }
-        if (!next2u(shkp->mx, shkp->my)) {
+        if (!m_next2u(shkp)) {
             mnexto(shkp, RLOC_MSG);
             /* for some reason the shopkeeper can't come next to you */
-            if (!next2u(shkp->mx, shkp->my)) {
+            if (!m_next2u(shkp)) {
                 if (lang == 2)
                     pline("%s curses you in anger and frustration!",
                           Shknam(shkp));
