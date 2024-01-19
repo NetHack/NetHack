@@ -569,6 +569,21 @@ Example:
  des.finalize_level();
 
 
+=== gas_cloud
+
+Create a gas cloud.
+The `damage` and `ttl` fields are optional.
+Defaults to non-poisonous and infinite lifetime.
+
+Example:
+
+ des.gas_cloud({ x = XX, y = YY });
+ des.gas_cloud({ coord = { XX, YY } });
+ des.gas_cloud({ selection = SEL });
+ des.gas_cloud({ selection = SEL, damage = 5 });
+ des.gas_cloud({ selection = SEL, damage = 5, ttl = 200 });
+
+
 === gold
 
 Create a pile of gold.

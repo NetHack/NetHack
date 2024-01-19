@@ -2560,6 +2560,7 @@ extern void save_regions(NHFILE *) NONNULLARG1;
 extern void rest_regions(NHFILE *) NONNULLARG1;
 extern void region_stats(const char *, char *, long *, long *) NONNULLPTRS;
 extern NhRegion *create_gas_cloud(coordxy, coordxy, int, int);
+extern NhRegion *create_gas_cloud_selection(struct selectionvar *, int);
 extern boolean region_danger(void);
 extern void region_safety(void);
 

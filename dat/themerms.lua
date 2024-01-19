@@ -43,10 +43,10 @@ themeroom_fills = {
    -- Cloud room
    function(rm)
       local fog = selection.room();
-      des.terrain(fog, "C");
       for i = 1, (fog:numpoints() / 4) do
          des.monster({ id = "fog cloud", asleep = true });
       end
+      des.gas_cloud({ selection = fog });
    end,
 
    -- Boulder room

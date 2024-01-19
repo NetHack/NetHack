@@ -1189,6 +1189,44 @@ create_gas_cloud(coordxy x, coordxy y, int cloudsize, int damage)
     return cloud;
 }
 
+/* create a single gas cloud from selection */
+NhRegion *
+create_gas_cloud_selection(struct selectionvar *sel, int damage)
+{
+    NhRegion *cloud;
+    NhRect tmprect;
+    coordxy x, y;
+    NhRect r;
+    boolean inside_cloud = is_hero_inside_gas_cloud();
+
+    selection_getbounds(sel, &r);
+
+    cloud = create_region((NhRect *) 0, 0);
+    for (x = r.lx; x <= r.hx; x++)
+        for (y = r.ly; y <= r.hy; y++)
+            if (selection_getpoint(x, y, sel)) {
+                tmprect.lx = tmprect.hx = x;
+                tmprect.ly = tmprect.hy = y;
+                add_rect_to_reg(cloud, &tmprect);
+            }
+
+    if (!gi.in_mklev && !gc.context.mon_moving)
+        set_heros_fault(cloud); /* assume player has created it */
+    cloud->inside_f = INSIDE_GAS_CLOUD;
+    cloud->expire_f = EXPIRE_GAS_CLOUD;
+    cloud->arg = cg.zeroany;
+    cloud->arg.a_int = damage;
+    cloud->visible = TRUE;
+    cloud->glyph = cmap_to_glyph(damage ? S_poisoncloud : S_cloud);
+    add_region(cloud);
+
+    if (!gi.in_mklev && !inside_cloud && is_hero_inside_gas_cloud())
+        You("are enveloped in a cloud of %s!",
+            damage ? "noxious gas" : "steam");
+    return cloud;
+}
+
+
 /* for checking troubles during prayer; is hero at risk? */
 boolean
 region_danger(void)

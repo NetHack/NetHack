@@ -159,6 +159,7 @@ int lspo_finalize_level(lua_State *);
 int lspo_room(lua_State *);
 int lspo_stair(lua_State *);
 int lspo_teleport_region(lua_State *);
+int lspo_gas_cloud(lua_State *);
 int lspo_terrain(lua_State *);
 int lspo_trap(lua_State *);
 int lspo_wall_property(lua_State *);
@@ -5545,6 +5546,49 @@ lspo_feature(lua_State *L)
     return 0;
 }
 
+/* gas_cloud({ selection=SELECTION }); */
+/* gas_cloud({ selection=SELECTION, damage=N }); */
+/* gas_cloud({ selection=SELECTION, damage=N, ttl=N }); */
+int
+lspo_gas_cloud(lua_State *L)
+{
+    coordxy x = 0, y = 0;
+    struct selectionvar *sel = NULL;
+    int argc = lua_gettop(L);
+    int damage = 0;
+    int ttl = -2;
+
+    create_des_coder();
+
+    if (argc == 1 && lua_type(L, 1) == LUA_TTABLE) {
+        lua_Integer tx, ty;
+        NhRegion *reg;
+
+        lcheck_param_table(L);
+
+        get_table_xy_or_coord(L, &tx, &ty);
+        x = tx, y = ty;
+        if (tx == -1 && ty == -1) {
+            lua_getfield(L, 1, "selection");
+            sel = l_selection_check(L, -1);
+            lua_pop(L, 1);
+        }
+        damage = get_table_int_opt(L, "damage", 0);
+        ttl = get_table_int_opt(L, "ttl", -2);
+        if (!sel) {
+            reg = create_gas_cloud(x, y, 1, damage);
+        } else
+            reg = create_gas_cloud_selection(sel, damage);
+        if (ttl > -2)
+            reg->ttl = ttl;
+    } else {
+        nhl_error(L, "wrong parameters");
+    }
+
+    return 0;
+}
+
+
 /*
  * [lit_state: 1 On, 0 Off, -1 random, -2 leave as-is]
  * terrain({ x=NN, y=NN, typ=MAPCHAR, lit=lit_state });
@@ -6995,6 +7039,7 @@ static const struct luaL_Reg nhl_functions[] = {
     { "teleport_region", lspo_teleport_region },
     { "reset_level", lspo_reset_level },
     { "finalize_level", lspo_finalize_level },
+    { "gas_cloud", lspo_gas_cloud },
     /* TODO: { "branch", lspo_branch }, */
     /* TODO: { "portal", lspo_portal }, */
     { NULL, NULL }

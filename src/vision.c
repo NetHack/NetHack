@@ -141,7 +141,6 @@ does_block(int x, int y, struct rm *lev)
 {
     struct obj *obj;
     struct monst *mon;
-    int i;
 
 #ifdef DEBUG
     /* set DEBUGFILES=seethru in environment to see through bubbles */
@@ -181,14 +180,8 @@ does_block(int x, int y, struct rm *lev)
     if (gs.seethru != 1) {
 #endif
     /* Clouds (poisonous or not) block light. */
-    for (i = 0; i < gn.n_regions; i++) {
-        /* Ignore regions with ttl == 0 - expire_gas_cloud must unblock its
-         * points prior to being removed itself. */
-        if (gr.regions[i]->ttl > 0 && gr.regions[i]->visible
-            && inside_region(gr.regions[i], x, y)) {
-            return 1;
-        }
-    }
+    if (visible_region_at(x, y))
+        return 1;
 #ifdef DEBUG
     } /* gs.seethru */
 #endif
