@@ -46,7 +46,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7.0 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{DATE(%B %-d, %Y)}
-\date{January 02, 2024}
+\date{January 18, 2024}
 
 \maketitle
 
@@ -3362,6 +3362,30 @@ extended command.
 Some chests are trapped, causing nasty things to happen when you
 unlock or open them.  You can check for and try to deactivate traps
 with the ``{\tt \#untrap}'' extended command.
+
+%.pg
+When the contents of a container are known, that container will be
+described as something like ``a sack containing 3 items''.
+In this example, the 3 refers to number of {\it stacks\/} of compatible
+items, not to the total number of individual items.
+So a sack holding 2 blue potions, 7 arrows, and 350 gold pieces would be
+described as having 3 items rather than 10 or 359.
+
+%.pg
+If a chest or large box is described as ``broken'', that means that it
+can't be locked rather than that it no longer functions as a container.
+
+%.pg
+The {\it apply\/} and {\it loot\/} commands allow you to take out and/or
+put in an arbitrary number of items in a single operation.
+If you want to take everything out of a container, you can use the
+``\{\tt \#tip}'' command to pour the contents onto the floor.
+This may be your only way to get things out if your hands are stuck
+to a cursed two-handed weapon.
+When your hands aren't stuck, you have another option of pouring the
+conteints into another container.
+(As of this writing, the other container must be carried rather than on
+the floor.)
 
 %.hn 2
 \subsection*{Amulets (`{\tt "}')}

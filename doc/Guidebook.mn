@@ -46,7 +46,7 @@
 .ds f0 \*(vr
 .ds f1 \" empty
 .\"DO NOT REMOVE NH_DATESUB .ds f2 DATE(%B %-d, %Y)
-.ds f2 January 02, 2024
+.ds f2 January 18, 2024
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -3074,6 +3074,27 @@ Some chests are trapped, causing nasty things to happen when you
 unlock or open them.
 You can check for and try to deactivate traps
 with the \(lq#untrap\(rq extended command.
+.pg
+When the contents of a container are known, that container will be
+described as something like \(lqa sack containing 3 items\(rq.
+In this example, the 3 refers to number of \fIstacks\fP of compatible
+items, not to the total number of individual items.
+So a sack holding 2 blue potions, 7 arrows, and 350 gold pieces would be
+described as having 3 items rather than 10 or 359.
+.pg
+If a chest or large box is described as \(lqbroken\(rq, that means that it
+can't be locked rather than that it no longer functions as a container.
+.pg
+The \fIapply\fP and \fIloot\fP commands allow you to take out and/or
+put in an arbitrary number of items in a single operation.
+If you want to take everything out of a container, you can use the
+\(lq#tip\(rq command to pour the contents onto the floor.
+This may be your only way to get things out if your hands are stuck
+to a cursed two-handed weapon.
+When your hands aren't stuck, you have another option of pouring the
+conteints into another container.
+(As of this writing, the other container must be carried rather than on
+the floor.)
 .hn 2
 Amulets (\(oq"\(cq)
 .pg
