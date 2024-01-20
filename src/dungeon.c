@@ -51,6 +51,7 @@ static int get_dgn_flags(lua_State *);
 static int get_dgn_align(lua_State *);
 static void init_dungeon_levels(lua_State *, struct proto_dungeon *, int);
 static void init_dungeon_branches(lua_State *, struct proto_dungeon *, int);
+static void init_dungeon_set_entry(struct proto_dungeon *, int);
 static boolean unplaced_floater(struct dungeon *);
 static boolean unreachable_level(d_level *, boolean);
 static void tport_menu(winid, char *, struct lchoice *, d_level *, boolean);
@@ -924,6 +925,33 @@ init_dungeon_branches(
         panic("init_dungeon: too many branches");
 }
 
+static void
+init_dungeon_set_entry(struct proto_dungeon *pd, int dngidx)
+{
+    int dgn_entry = pd->tmpdungeon[dngidx].entry_lev;
+    /*
+     * Set the entry level for this dungeon.  The entry value means:
+     *              < 0     from bottom (-1 == bottom level)
+     *                0     default (top)
+     *              > 0     actual level (1 = top)
+     *
+     * Note that the entry_lev field in the dungeon structure is
+     * redundant.  It is used only here and in print_dungeon().
+     */
+    if (dgn_entry < 0) {
+        gd.dungeons[dngidx].entry_lev =
+            gd.dungeons[dngidx].num_dunlevs + dgn_entry + 1;
+        if (gd.dungeons[dngidx].entry_lev <= 0)
+            gd.dungeons[dngidx].entry_lev = 1;
+    } else if (dgn_entry > 0) {
+        gd.dungeons[dngidx].entry_lev = dgn_entry;
+        if (gd.dungeons[dngidx].entry_lev > gd.dungeons[dngidx].num_dunlevs)
+            gd.dungeons[dngidx].entry_lev = gd.dungeons[dngidx].num_dunlevs;
+    } else { /* default */
+        gd.dungeons[dngidx].entry_lev = 1; /* defaults to top level */
+    }
+}
+
 /* initialize the "dungeon" structs */
 void
 init_dungeons(void)
@@ -1095,27 +1123,7 @@ init_dungeons(void)
         gd.dungeons[i].flags.align = dgn_align;
         gd.dungeons[i].flags.unconnected = !!(dgn_flags & UNCONNECTED);
 
-        /*
-         * Set the entry level for this dungeon.  The entry value means:
-         *              < 0     from bottom (-1 == bottom level)
-         *                0     default (top)
-         *              > 0     actual level (1 = top)
-         *
-         * Note that the entry_lev field in the dungeon structure is
-         * redundant.  It is used only here and in print_dungeon().
-         */
-        if (dgn_entry < 0) {
-            gd.dungeons[i].entry_lev =
-                gd.dungeons[i].num_dunlevs + dgn_entry + 1;
-            if (gd.dungeons[i].entry_lev <= 0)
-                gd.dungeons[i].entry_lev = 1;
-        } else if (dgn_entry > 0) {
-            gd.dungeons[i].entry_lev = dgn_entry;
-            if (gd.dungeons[i].entry_lev > gd.dungeons[i].num_dunlevs)
-                gd.dungeons[i].entry_lev = gd.dungeons[i].num_dunlevs;
-        } else {                       /* default */
-            gd.dungeons[i].entry_lev = 1; /* defaults to top level */
-        }
+        init_dungeon_set_entry(&pd, i);
 
         if (gd.dungeons[i].flags.unconnected) {
             gd.dungeons[i].depth_start = 1;
