@@ -50,6 +50,7 @@ static boolean place_level(int, struct proto_dungeon *);
 static int get_dgn_flags(lua_State *);
 static int get_dgn_align(lua_State *);
 static void init_dungeon_levels(lua_State *, struct proto_dungeon *, int);
+static void init_dungeon_branches(lua_State *, struct proto_dungeon *, int);
 static boolean unplaced_floater(struct dungeon *);
 static boolean unreachable_level(d_level *, boolean);
 static void tport_menu(winid, char *, struct lchoice *, d_level *, boolean);
@@ -857,6 +858,72 @@ init_dungeon_levels(
         panic("init_dungeon: too many special levels");
 }
 
+static void
+init_dungeon_branches(
+    lua_State *L,
+    struct proto_dungeon *pd,
+    int dngidx)
+{
+    static const char *const brdirstr[] = { "up", "down", 0 };
+    static const int brdirstr2i[] = { TRUE, FALSE, FALSE };
+    static const char *const brtypes[] = {
+        "stair", "portal", "no_down", "no_up", 0
+    };
+    static const int brtypes2i[] = {
+        TBR_STAIR, TBR_PORTAL, TBR_NO_DOWN, TBR_NO_UP, TBR_STAIR
+    };
+    char *br_name, *br_chain;
+    int br_base, br_range, br_type, br_up;
+    struct tmpbranch *tmpb;
+    int bi, f, nbranches;
+
+    lua_len(L, -1);
+    nbranches = (int) lua_tointeger(L, -1);
+    pd->tmpdungeon[dngidx].branches = nbranches;
+    lua_pop(L, 1);
+    for (f = 0; f < nbranches; f++) {
+        lua_pushinteger(L, f + 1);
+        lua_gettable(L, -2);
+        if (lua_type(L, -1) == LUA_TTABLE) {
+            br_name = get_table_str(L, "name");
+            br_chain = get_table_str_opt(L, "chainlevel", NULL);
+            br_base = get_table_int(L, "base");
+            br_range = get_table_int_opt(L, "range", 0);
+            br_type = brtypes2i[get_table_option(L, "branchtype",
+                                                 "stair", brtypes)];
+            br_up = brdirstr2i[get_table_option(L, "direction",
+                                                "down", brdirstr)];
+            tmpb = &(pd->tmpbranch[pd->n_brs + f]);
+
+            debugpline4("BRANCH[%i]:%s,(%i,%i)",
+                        f, br_name, br_base, br_range);
+            tmpb->name = br_name;
+            tmpb->lev.base = br_base;
+            tmpb->lev.rand = br_range;
+            tmpb->type = br_type;
+            tmpb->up = br_up;
+            tmpb->chain = -1;
+            if (br_chain) {
+                debugpline1("CHAINBRANCH:%s", br_chain);
+                for (bi = 0; bi < pd->n_levs + f - 1; bi++)
+                    if (!strcmp(pd->tmplevel[bi].name, br_chain)) {
+                        tmpb->chain = bi;
+                        break;
+                    }
+                if (tmpb->chain == -1)
+                    panic("Could not chain branch %s to level %s",
+                          br_name, br_chain);
+                free(br_chain);
+            }
+        } else
+            panic("dungeon[%i].branches[%i] is not a hash", dngidx, f);
+        lua_pop(L, 1);
+    }
+    pd->n_brs += nbranches;
+    if (pd->n_brs > BRANCH_LIMIT)
+        panic("init_dungeon: too many branches");
+}
+
 /* initialize the "dungeon" structs */
 void
 init_dungeons(void)
@@ -981,64 +1048,7 @@ init_dungeons(void)
         /* branches begin */
         lua_getfield(L, -1, "branches");
         if (lua_type(L, -1) == LUA_TTABLE) {
-            static const char *const brdirstr[] = { "up", "down", 0 };
-            static const int brdirstr2i[] = { TRUE, FALSE, FALSE };
-            static const char *const brtypes[] = {
-                "stair", "portal", "no_down", "no_up", 0
-            };
-            static const int brtypes2i[] = {
-                TBR_STAIR, TBR_PORTAL, TBR_NO_DOWN, TBR_NO_UP, TBR_STAIR
-            };
-            char *br_name, *br_chain;
-            int br_base, br_range, br_type, br_up;
-            struct tmpbranch *tmpb;
-            int bi, f, nbranches;
-
-            lua_len(L, -1);
-            nbranches = (int) lua_tointeger(L, -1);
-            pd.tmpdungeon[i].branches = nbranches;
-            lua_pop(L, 1);
-            for (f = 0; f < nbranches; f++) {
-                lua_pushinteger(L, f + 1);
-                lua_gettable(L, -2);
-                if (lua_type(L, -1) == LUA_TTABLE) {
-                    br_name = get_table_str(L, "name");
-                    br_chain = get_table_str_opt(L, "chainlevel", NULL);
-                    br_base = get_table_int(L, "base");
-                    br_range = get_table_int_opt(L, "range", 0);
-                    br_type = brtypes2i[get_table_option(L, "branchtype",
-                                                         "stair", brtypes)];
-                    br_up = brdirstr2i[get_table_option(L, "direction",
-                                                        "down", brdirstr)];
-                    tmpb = &pd.tmpbranch[pd.n_brs + f];
-
-                    debugpline4("BRANCH[%i]:%s,(%i,%i)",
-                                f, br_name, br_base, br_range);
-                    tmpb->name = br_name;
-                    tmpb->lev.base = br_base;
-                    tmpb->lev.rand = br_range;
-                    tmpb->type = br_type;
-                    tmpb->up = br_up;
-                    tmpb->chain = -1;
-                    if (br_chain) {
-                        debugpline1("CHAINBRANCH:%s", br_chain);
-                        for (bi = 0; bi < pd.n_levs + f - 1; bi++)
-                            if (!strcmp(pd.tmplevel[bi].name, br_chain)) {
-                                tmpb->chain = bi;
-                                break;
-                            }
-                        if (tmpb->chain == -1)
-                            panic("Could not chain branch %s to level %s",
-                                  br_name, br_chain);
-                        free(br_chain);
-                    }
-                } else
-                    panic("dungeon[%i].branches[%i] is not a hash", i, f);
-                lua_pop(L, 1);
-            }
-            pd.n_brs += nbranches;
-            if (pd.n_brs > BRANCH_LIMIT)
-                panic("init_dungeon: too many branches");
+            init_dungeon_branches(L, &pd, i);
         } else if (lua_type(L, -1) != LUA_TNIL)
             panic("dungeon[%i].branches is not an array of hashes", i);
         lua_pop(L, 1);
