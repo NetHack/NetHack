@@ -52,6 +52,7 @@ static int get_dgn_align(lua_State *);
 static void init_dungeon_levels(lua_State *, struct proto_dungeon *, int);
 static void init_dungeon_branches(lua_State *, struct proto_dungeon *, int);
 static void init_dungeon_set_entry(struct proto_dungeon *, int);
+static void init_dungeon_set_depth(struct proto_dungeon *, int);
 static boolean unplaced_floater(struct dungeon *);
 static boolean unreachable_level(d_level *, boolean);
 static void tport_menu(winid, char *, struct lchoice *, d_level *, boolean);
@@ -952,6 +953,43 @@ init_dungeon_set_entry(struct proto_dungeon *pd, int dngidx)
     }
 }
 
+static void
+init_dungeon_set_depth(struct proto_dungeon *pd, int dngidx)
+{
+    branch *br;
+    schar from_depth;
+    boolean from_up;
+
+    br = add_branch(dngidx, gd.dungeons[dngidx].entry_lev, pd);
+
+    /* Get the depth of the connecting end. */
+    if (br->end1.dnum == dngidx) {
+        from_depth = depth(&br->end2);
+        from_up = !br->end1_up;
+    } else {
+        from_depth = depth(&br->end1);
+        from_up = br->end1_up;
+    }
+
+    /*
+     * Calculate the depth of the top of the dungeon via
+     * its branch.  First, the depth of the entry point:
+     *
+     *  depth of branch from "parent" dungeon
+     *  + -1 or 1 depending on an up or down stair or
+     *    0 if portal
+     *
+     * Followed by the depth of the top of the dungeon:
+     *
+     *  - (entry depth - 1)
+     *
+     * We'll say that portals stay on the same depth.
+     */
+    gd.dungeons[dngidx].depth_start =
+        from_depth + (br->type == BR_PORTAL ? 0 : (from_up ? -1 : 1))
+        - (gd.dungeons[dngidx].entry_lev - 1);
+}
+
 /* initialize the "dungeon" structs */
 void
 init_dungeons(void)
@@ -1128,38 +1166,7 @@ init_dungeons(void)
         if (gd.dungeons[i].flags.unconnected) {
             gd.dungeons[i].depth_start = 1;
         } else if (i) { /* set depth */
-            branch *br;
-            schar from_depth;
-            boolean from_up;
-
-            br = add_branch(i, gd.dungeons[i].entry_lev, &pd);
-
-            /* Get the depth of the connecting end. */
-            if (br->end1.dnum == i) {
-                from_depth = depth(&br->end2);
-                from_up = !br->end1_up;
-            } else {
-                from_depth = depth(&br->end1);
-                from_up = br->end1_up;
-            }
-
-            /*
-             * Calculate the depth of the top of the dungeon via
-             * its branch.  First, the depth of the entry point:
-             *
-             *  depth of branch from "parent" dungeon
-             *  + -1 or 1 depending on an up or down stair or
-             *    0 if portal
-             *
-             * Followed by the depth of the top of the dungeon:
-             *
-             *  - (entry depth - 1)
-             *
-             * We'll say that portals stay on the same depth.
-             */
-            gd.dungeons[i].depth_start =
-                from_depth + (br->type == BR_PORTAL ? 0 : (from_up ? -1 : 1))
-                - (gd.dungeons[i].entry_lev - 1);
+            init_dungeon_set_depth(&pd, i);
         }
 
         if (gd.dungeons[i].num_dunlevs > MAXLEVEL)
