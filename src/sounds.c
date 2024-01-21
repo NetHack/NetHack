@@ -1555,6 +1555,9 @@ add_sound_mapping(const char* mapping)
     int volume, idx = -1;
 
     msgtyp[0] = '\0';
+    filename[sizeof filename - 1] = '\0';
+    filespec[sizeof filespec - 1] = '\0';
+    text[sizeof text - 1] = '\0';
     if (sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d %d",
                text, filename, &volume, &idx) == 4
         || sscanf(mapping, "MESG %10[^\"] \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d %d",
