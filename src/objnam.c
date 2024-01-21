@@ -1442,7 +1442,7 @@ doname_base(
         if (obj->owornmask & W_RING) /* either left or right */
             ConcatF1(bp, 0,"%s)", body_part(HAND));
         if (known && objects[obj->otyp].oc_charged) {
-            Sprintf(prefix, "%+d", obj->spe); /* sitoa(obj->spe)+" " */
+            Sprintf(prefix, "%+d ", obj->spe); /* sitoa(obj->spe)+" " */
         }
         break;
     case FOOD_CLASS:
