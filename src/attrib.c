@@ -104,6 +104,8 @@ static const struct innate {
   hum_abil[] = { { 0, 0, 0, 0 } };
 
 static void exerper(void);
+static int rnd_attr(void);
+static int init_attr_role_redist(int, boolean);
 static void postadjabil(long *);
 static const struct innate *role_abil(int);
 static const struct innate *check_innate_abil(long *, long);
@@ -660,11 +662,51 @@ exerchk(void)
     }
 }
 
+/* return random hero attribute (by role's attr distribution).
+   returns A_MAX if failed. */
+static int
+rnd_attr(void)
+{
+    int i, x = rn2(100);
+
+    /* 3.7: the x -= ... calculation used to have an off by 1 error that
+       resulted in the values being biased toward Str and away from Cha */
+    for (i = 0; i < A_MAX; ++i)
+        if ((x -= gu.urole.attrdist[i]) < 0)
+            break;
+    return i;
+}
+
+/* add or subtract np points from random attributes,
+   adjusting the base and maximum values of the attributes.
+   if subtracting, np must be negative.
+   returns the left over points. */
+static int
+init_attr_role_redist(int np, boolean addition)
+{
+    int tryct = 0;
+    int adj = addition ? 1 : -1;
+
+    while ((addition ? (np > 0) : (np < 0)) && tryct < 100) {
+        int i = rnd_attr();
+
+        if (i >= A_MAX || ABASE(i) >= ATTRMAX(i)) {
+            tryct++;
+            continue;
+        }
+        tryct = 0;
+        ABASE(i) += adj;
+        AMAX(i) += adj;
+        np -= adj;
+    }
+    return np;
+}
+
 /* allocate hero's initial characteristics */
 void
 init_attr(int np)
 {
-    register int i, x, tryct;
+    register int i;
 
     for (i = 0; i < A_MAX; i++) {
         ABASE(i) = AMAX(i) = gu.urole.attrbase[i];
@@ -672,39 +714,10 @@ init_attr(int np)
         np -= gu.urole.attrbase[i];
     }
 
-    /* 3.7: the x -= ... calculation used to have an off by 1 error that
-       resulted in the values being biased toward Str and away from Cha */
-    tryct = 0;
-    while (np > 0 && tryct < 100) {
-        x = rn2(100);
-        for (i = 0; i < A_MAX; ++i)
-            if ((x -= gu.urole.attrdist[i]) < 0)
-                break;
-        if (i >= A_MAX || ABASE(i) >= ATTRMAX(i)) {
-            tryct++;
-            continue;
-        }
-        tryct = 0;
-        ABASE(i)++;
-        AMAX(i)++;
-        np--;
-    }
-
-    tryct = 0;
-    while (np < 0 && tryct < 100) { /* for redistribution */
-        x = rn2(100);
-        for (i = 0; i < A_MAX; ++i)
-            if ((x -= gu.urole.attrdist[i]) < 0)
-                break;
-        if (i >= A_MAX || ABASE(i) <= ATTRMIN(i)) {
-            tryct++;
-            continue;
-        }
-        tryct = 0;
-        ABASE(i)--;
-        AMAX(i)--;
-        np++;
-    }
+    /* distribute leftover points */
+    np = init_attr_role_redist(np, TRUE);
+    /* if we went over, remove points */
+    np = init_attr_role_redist(np, FALSE);
 }
 
 void
