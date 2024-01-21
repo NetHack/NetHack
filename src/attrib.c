@@ -743,6 +743,22 @@ redist_attr(void)
     /* (void) encumber_msg(); -- caller needs to do this */
 }
 
+/* apply minor variation to attributes */
+void
+vary_init_attr(void)
+{
+    int i;
+
+    for (i = 0; i < A_MAX; i++)
+        if (!rn2(20)) {
+            register int xd = rn2(7) - 2; /* biased variation */
+
+            (void) adjattrib(i, xd, TRUE);
+            if (ABASE(i) < AMAX(i))
+                AMAX(i) = ABASE(i);
+        }
+}
+
 static
 void
 postadjabil(long *ability)

@@ -933,18 +933,8 @@ u_init(void)
 
     find_ac();     /* get initial ac value */
     init_attr(75); /* init attribute values */
+    vary_init_attr(); /* minor variation to attrs */
     max_rank_sz(); /* set max str size for class ranks */
-    /*
-     *  Do we really need this?
-     */
-    for (i = 0; i < A_MAX; i++)
-        if (!rn2(20)) {
-            register int xd = rn2(7) - 2; /* biased variation */
-
-            (void) adjattrib(i, xd, TRUE);
-            if (ABASE(i) < AMAX(i))
-                AMAX(i) = ABASE(i);
-        }
 
     /* make sure you can carry all you have - especially for Tourists */
     while (inv_weight() > 0) {
