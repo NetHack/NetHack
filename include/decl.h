@@ -1085,6 +1085,12 @@ struct instance_globals_x {
     /* mkmaze.c */
     int xmin, xmax; /* level boundaries x */
 
+    /* objnam.c */
+    char *xnamep; /* obuf[] returned by xname(), for use in doname() for
+                   * bounds checking; differs from xname() return value
+                   * due to reserving PREFIX bytes at start and possibly
+                   * skipping leading "the " after constructing result */
+
     /* sp_lev.c */
     coordxy xstart, xsize;
 

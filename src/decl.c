@@ -882,9 +882,8 @@ const struct instance_globals_w g_init_w = {
     UNDEFINED_PTR, /* wportal */
     /* new */
     { wdmode_traditional, NO_COLOR },       /* wsettings */
-
     TRUE, /* havestate*/
-    IVMAGIC  /* w_magic used to validate that structure layout has been preserved */
+    IVMAGIC  /* w_magic to validate that structure layout has been preserved */
 };
 
 const struct instance_globals_x g_init_x = {
@@ -895,6 +894,8 @@ const struct instance_globals_x g_init_x = {
     /* mkmaze.c */
     UNDEFINED_VALUE, /* xmin */
     UNDEFINED_VALUE, /* xmax */
+    /* objnam.c */
+    NULL, /* xnamep */
     /* sp_lev.c */
     UNDEFINED_VALUE, /* xstart */
     UNDEFINED_VALUE, /* xsize */
