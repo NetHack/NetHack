@@ -14,6 +14,7 @@ struct trobj {
 };
 
 static struct obj *ini_inv_mkobj_filter(int, boolean);
+static short ini_inv_obj_substitution(struct trobj *, struct obj *);
 static void ini_inv(struct trobj *) NONNULLARG1;
 static void knows_object(int);
 static void knows_class(char);
@@ -1077,11 +1078,37 @@ ini_inv_mkobj_filter(int oclass, boolean got_sp1)
     return obj;
 }
 
+/* substitute object with something else based on race.
+   only changes otyp, and returns it. */
+static short
+ini_inv_obj_substitution(struct trobj *trop, struct obj *obj)
+{
+    if (gu.urace.mnum != PM_HUMAN) {
+        int i;
+
+        /* substitute race-specific items; this used to be in
+           the 'if (otyp != UNDEF_TYP) { }' block above, but then
+           substitutions didn't occur for randomly generated items
+           (particularly food) which have racial substitutes */
+        for (i = 0; inv_subs[i].race_pm != NON_PM; ++i)
+            if (inv_subs[i].race_pm == gu.urace.mnum
+                && obj->otyp == inv_subs[i].item_otyp) {
+                debugpline3("ini_inv: substituting %s for %s%s",
+                            OBJ_NAME(objects[inv_subs[i].subs_otyp]),
+                            (trop->trotyp == UNDEF_TYP) ? "random " : "",
+                            OBJ_NAME(objects[obj->otyp]));
+                obj->otyp = inv_subs[i].subs_otyp;
+                break;
+            }
+    }
+    return obj->otyp;
+}
+
 static void
 ini_inv(struct trobj *trop)
 {
     struct obj *obj;
-    int otyp, i;
+    int otyp;
     boolean got_sp1 = FALSE; /* got a level 1 spellbook? */
 
     while (trop->trclass) {
@@ -1120,22 +1147,7 @@ ini_inv(struct trobj *trop)
             && obj->spe <= 0)
             obj->spe = rne(3);
 
-        if (gu.urace.mnum != PM_HUMAN) {
-            /* substitute race-specific items; this used to be in
-               the 'if (otyp != UNDEF_TYP) { }' block above, but then
-               substitutions didn't occur for randomly generated items
-               (particularly food) which have racial substitutes */
-            for (i = 0; inv_subs[i].race_pm != NON_PM; ++i)
-                if (inv_subs[i].race_pm == gu.urace.mnum
-                    && otyp == inv_subs[i].item_otyp) {
-                    debugpline3("ini_inv: substituting %s for %s%s",
-                                OBJ_NAME(objects[inv_subs[i].subs_otyp]),
-                                (trop->trotyp == UNDEF_TYP) ? "random " : "",
-                                OBJ_NAME(objects[otyp]));
-                    otyp = obj->otyp = inv_subs[i].subs_otyp;
-                    break;
-                }
-        }
+        otyp = ini_inv_obj_substitution(trop, obj);
 
         /* nudist gets no armor */
         if (u.uroleplay.nudist && obj->oclass == ARMOR_CLASS) {
