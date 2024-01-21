@@ -2083,6 +2083,7 @@ nhl_init(nhl_sandbox_info *sbi)
 #endif
 
     lua_State *L = nhlL_newstate(sbi, "nhl_init");
+    if(!L) return 0;
 
     iflags.in_lua = TRUE;
     /* Temporary for development XXX */
