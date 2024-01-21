@@ -15,6 +15,7 @@ struct trobj {
 
 static struct obj *ini_inv_mkobj_filter(int, boolean);
 static short ini_inv_obj_substitution(struct trobj *, struct obj *);
+static void ini_inv_adjust_obj(struct trobj *, struct obj *);
 static void ini_inv(struct trobj *) NONNULLARG1;
 static void knows_object(int);
 static void knows_class(char);
@@ -1105,6 +1106,48 @@ ini_inv_obj_substitution(struct trobj *trop, struct obj *obj)
 }
 
 static void
+ini_inv_adjust_obj(struct trobj *trop, struct obj *obj)
+{
+    if (trop->trclass == COIN_CLASS) {
+        /* no "blessed" or "identified" money */
+        obj->quan = u.umoney0;
+    } else {
+        if (objects[obj->otyp].oc_uses_known)
+            obj->known = 1;
+        obj->dknown = obj->bknown = obj->rknown = 1;
+        if (Is_container(obj) || obj->otyp == STATUE) {
+            obj->cknown = obj->lknown = 1;
+            obj->otrapped = 0;
+        }
+        obj->cursed = 0;
+        if (obj->opoisoned && u.ualign.type != A_CHAOTIC)
+            obj->opoisoned = 0;
+        if (obj->oclass == WEAPON_CLASS || obj->oclass == TOOL_CLASS) {
+            obj->quan = (long) trop->trquan;
+            trop->trquan = 1;
+        } else if (obj->oclass == GEM_CLASS && is_graystone(obj)
+                   && obj->otyp != FLINT) {
+            obj->quan = 1L;
+        }
+        if (trop->trspe != UNDEF_SPE) {
+            obj->spe = trop->trspe;
+            if (trop->trotyp == MAGIC_MARKER && obj->spe < 96)
+                obj->spe += rn2(4);
+        } else {
+            /* Don't start with +0 or negative rings */
+            if (objects[obj->otyp].oc_class == RING_CLASS
+                && objects[obj->otyp].oc_charged && obj->spe <= 0)
+                obj->spe = rne(3);
+        }
+        if (trop->trbless != UNDEF_BLESS)
+            obj->blessed = trop->trbless;
+
+    }
+    /* defined after setting otyp+quan + blessedness */
+    obj->owt = weight(obj);
+}
+
+static void
 ini_inv(struct trobj *trop)
 {
     struct obj *obj;
@@ -1142,11 +1185,6 @@ ini_inv(struct trobj *trop)
         /* Put post-creation object adjustments that don't depend on whether it
          * was UNDEF_TYP or not after this. */
 
-        /* Don't start with +0 or negative rings */
-        if (objects[otyp].oc_class == RING_CLASS && objects[otyp].oc_charged
-            && obj->spe <= 0)
-            obj->spe = rne(3);
-
         otyp = ini_inv_obj_substitution(trop, obj);
 
         /* nudist gets no armor */
@@ -1156,37 +1194,7 @@ ini_inv(struct trobj *trop)
             continue;
         }
 
-        if (trop->trclass == COIN_CLASS) {
-            /* no "blessed" or "identified" money */
-            obj->quan = u.umoney0;
-        } else {
-            if (objects[otyp].oc_uses_known)
-                obj->known = 1;
-            obj->dknown = obj->bknown = obj->rknown = 1;
-            if (Is_container(obj) || obj->otyp == STATUE) {
-                obj->cknown = obj->lknown = 1;
-                obj->otrapped = 0;
-            }
-            obj->cursed = 0;
-            if (obj->opoisoned && u.ualign.type != A_CHAOTIC)
-                obj->opoisoned = 0;
-            if (obj->oclass == WEAPON_CLASS || obj->oclass == TOOL_CLASS) {
-                obj->quan = (long) trop->trquan;
-                trop->trquan = 1;
-            } else if (obj->oclass == GEM_CLASS && is_graystone(obj)
-                       && obj->otyp != FLINT) {
-                obj->quan = 1L;
-            }
-            if (trop->trspe != UNDEF_SPE) {
-                obj->spe = trop->trspe;
-                if (trop->trotyp == MAGIC_MARKER && obj->spe < 96)
-                    obj->spe += rn2(4);
-            }
-            if (trop->trbless != UNDEF_BLESS)
-                obj->blessed = trop->trbless;
-        }
-        /* defined after setting otyp+quan + blessedness */
-        obj->owt = weight(obj);
+        ini_inv_adjust_obj(trop, obj);
         obj = addinv(obj);
 
         /* Make the type known if necessary */
