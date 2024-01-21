@@ -14,9 +14,11 @@ struct trobj {
 };
 
 static struct obj *ini_inv_mkobj_filter(int, boolean);
-static short ini_inv_obj_substitution(struct trobj *, struct obj *);
-static void ini_inv_adjust_obj(struct trobj *, struct obj *);
-static void ini_inv_use_obj(struct obj *);
+static short ini_inv_obj_substitution(struct trobj *,
+                                      struct obj *) NONNULLPTRS;
+static void ini_inv_adjust_obj(struct trobj *,
+                               struct obj *) NONNULLPTRS;
+static void ini_inv_use_obj(struct obj *) NONNULLARG1;
 static void ini_inv(struct trobj *) NONNULLARG1;
 static void knows_object(int);
 static void knows_class(char);
@@ -1027,7 +1029,7 @@ restricted_spell_discipline(int otyp)
 
 /* create random object of certain class, filtering out too powerful items */
 static struct obj *
-ini_inv_mkobj_filter(int oclass, boolean got_sp1)
+ini_inv_mkobj_filter(int oclass, boolean got_level1_spellbook)
 {
     struct obj *obj;
     int otyp, trycnt = 0;
@@ -1068,7 +1070,7 @@ ini_inv_mkobj_filter(int oclass, boolean got_sp1)
               low level players or unbalancing; also
               spells in restricted skill categories */
            || (obj->oclass == SPBOOK_CLASS
-               && (objects[otyp].oc_level > (got_sp1 ? 3 : 1)
+               && (objects[otyp].oc_level > (got_level1_spellbook ? 3 : 1)
                    || restricted_spell_discipline(otyp)))
            || otyp == SPE_NOVEL) {
         dealloc_obj(obj);
