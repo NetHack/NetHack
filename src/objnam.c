@@ -910,8 +910,9 @@ xname_flags(
     if (buf_eos > buf_end) {
         /* PREFIX is bigger than 6 so there will always be room within the
            obuf[] in front of buf to insert "buf[]="; strncpy(,,N) doesn't
-           add '\0' terminator unless fewer than N chars are copied */
-        paniclog("xname", strncpy(buf - 6, "buf[]=", 6));
+           add '\0' terminator unless fewer than N chars are copied, which
+           is what we want, but gcc complains about that so use memcpy() */
+        paniclog("xname", (char *) memcpy(buf - 6, "buf[]=", 6));
         panic("xname: buffer overflow before appending name.");
         /*NOTREACHED*/
     }
@@ -979,7 +980,7 @@ xname_flags(
            anticipated; since we aren't panicking here, this could happen
            repeatedly and we don't want to spam the paniclog file */
         if (!xname_full++) {
-            paniclog("xname", strncpy(buf - 6, "buf[]=", 6));
+            paniclog("xname", (char *) memcpy(buf - 6, "buf[]=", 6));
             /* 'PREFIX' ought to be 'PREFIX+4' if we stripped leading "the" */
             paniclog("xname", "used up entire obuf[PREFIX..BUFSX-1]");
         }
