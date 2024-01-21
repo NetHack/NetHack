@@ -16,6 +16,7 @@ struct trobj {
 static void ini_inv(struct trobj *) NONNULLARG1;
 static void knows_object(int);
 static void knows_class(char);
+static void u_init_role(void);
 static boolean restricted_spell_discipline(int);
 
 #define UNDEF_TYP 0
@@ -599,91 +600,12 @@ knows_class(char sym)
     }
 }
 
-void
-u_init(void)
+/* role-specific initializations */
+static void
+u_init_role(void)
 {
     int i;
-    struct u_roleplay tmpuroleplay = u.uroleplay; /* set by rcfile options */
 
-    flags.female = flags.initgend;
-    flags.beginner = TRUE;
-
-    /* zero u, including pointer values --
-     * necessary when aborting from a failed restore */
-    (void) memset((genericptr_t) &u, 0, sizeof(u));
-    u.ustuck = (struct monst *) 0;
-    (void) memset((genericptr_t) &ubirthday, 0, sizeof(ubirthday));
-    (void) memset((genericptr_t) &urealtime, 0, sizeof(urealtime));
-
-    u.uroleplay = tmpuroleplay; /* restore options set via rcfile */
-
-#if 0  /* documentation of more zero values as desirable */
-    u.usick_cause[0] = 0;
-    u.uluck  = u.moreluck = 0;
-    uarmu = 0;
-    uarm = uarmc = uarmh = uarms = uarmg = uarmf = 0;
-    uwep = uball = uchain = uleft = uright = 0;
-    uswapwep = uquiver = 0;
-    u.twoweap = FALSE; /* bypass set_twoweap() */
-    u.ublessed = 0;                     /* not worthy yet */
-    u.ugangr   = 0;                     /* gods not angry */
-    u.ugifts   = 0;                     /* no divine gifts bestowed */
-    u.uevent.uhand_of_elbereth = 0;
-    u.uevent.uheard_tune = 0;
-    u.uevent.uopened_dbridge = 0;
-    u.uevent.udemigod = 0;              /* not a demi-god yet... */
-    u.udg_cnt = 0;
-    u.mh = u.mhmax = u.mtimedone = 0;
-    u.uz.dnum = u.uz0.dnum = 0;
-    u.utotype = UTOTYPE_NONE;
-#endif /* 0 */
-
-    u.uz.dlevel = 1;
-    u.uz0.dlevel = 0;
-    u.utolev = u.uz;
-
-    u.umoved = FALSE;
-    u.umortality = 0;
-    u.ugrave_arise = NON_PM;
-
-    u.umonnum = u.umonster = gu.urole.mnum;
-    u.ulycn = NON_PM;
-    set_uasmon();
-
-    u.ulevel = 0; /* set up some of the initial attributes */
-    u.uhp = u.uhpmax = u.uhppeak = newhp();
-    u.uen = u.uenmax = u.uenpeak = newpw();
-    u.uspellprot = 0;
-    adjabil(0, 1);
-    u.ulevel = u.ulevelmax = 1;
-
-    init_uhunger();
-    for (i = 0; i <= MAXSPELL; i++)
-        gs.spl_book[i].sp_id = NO_SPELL;
-    u.ublesscnt = 300; /* no prayers just yet */
-    u.ualignbase[A_CURRENT] = u.ualignbase[A_ORIGINAL] = u.ualign.type =
-        aligns[flags.initalign].value;
-
-#if defined(BSD) && !defined(POSIX_TYPES)
-    (void) time((long *) &ubirthday);
-#else
-    (void) time(&ubirthday);
-#endif
-
-    /*
-     *  For now, everyone starts out with a night vision range of 1 and
-     *  their xray range disabled.
-     */
-    u.nv_range = 1;
-    u.xray_range = -1;
-    /* OPTIONS:blind results in permanent blindness (unless overridden
-       by the Eyes of the Overworld, which will clear 'u.uroleplay.blind'
-       to void the conduct, but will leave the PermaBlind bit set so that
-       blindness resumes when the Eyes are removed). */
-    if (u.uroleplay.blind)
-        HBlinded |= FROMOUTSIDE; /* set PermaBlind */
-
-    /*** Role-specific initializations ***/
     switch (Role_switch) {
     /* rn2(100) > 50 necessary for some choices because some
      * random number generators are bad enough to seriously
@@ -833,6 +755,93 @@ u_init(void)
     default: /* impossible */
         break;
     }
+}
+
+void
+u_init(void)
+{
+    int i;
+    struct u_roleplay tmpuroleplay = u.uroleplay; /* set by rcfile options */
+
+    flags.female = flags.initgend;
+    flags.beginner = TRUE;
+
+    /* zero u, including pointer values --
+     * necessary when aborting from a failed restore */
+    (void) memset((genericptr_t) &u, 0, sizeof(u));
+    u.ustuck = (struct monst *) 0;
+    (void) memset((genericptr_t) &ubirthday, 0, sizeof(ubirthday));
+    (void) memset((genericptr_t) &urealtime, 0, sizeof(urealtime));
+
+    u.uroleplay = tmpuroleplay; /* restore options set via rcfile */
+
+#if 0  /* documentation of more zero values as desirable */
+    u.usick_cause[0] = 0;
+    u.uluck  = u.moreluck = 0;
+    uarmu = 0;
+    uarm = uarmc = uarmh = uarms = uarmg = uarmf = 0;
+    uwep = uball = uchain = uleft = uright = 0;
+    uswapwep = uquiver = 0;
+    u.twoweap = FALSE; /* bypass set_twoweap() */
+    u.ublessed = 0;                     /* not worthy yet */
+    u.ugangr   = 0;                     /* gods not angry */
+    u.ugifts   = 0;                     /* no divine gifts bestowed */
+    u.uevent.uhand_of_elbereth = 0;
+    u.uevent.uheard_tune = 0;
+    u.uevent.uopened_dbridge = 0;
+    u.uevent.udemigod = 0;              /* not a demi-god yet... */
+    u.udg_cnt = 0;
+    u.mh = u.mhmax = u.mtimedone = 0;
+    u.uz.dnum = u.uz0.dnum = 0;
+    u.utotype = UTOTYPE_NONE;
+#endif /* 0 */
+
+    u.uz.dlevel = 1;
+    u.uz0.dlevel = 0;
+    u.utolev = u.uz;
+
+    u.umoved = FALSE;
+    u.umortality = 0;
+    u.ugrave_arise = NON_PM;
+
+    u.umonnum = u.umonster = gu.urole.mnum;
+    u.ulycn = NON_PM;
+    set_uasmon();
+
+    u.ulevel = 0; /* set up some of the initial attributes */
+    u.uhp = u.uhpmax = u.uhppeak = newhp();
+    u.uen = u.uenmax = u.uenpeak = newpw();
+    u.uspellprot = 0;
+    adjabil(0, 1);
+    u.ulevel = u.ulevelmax = 1;
+
+    init_uhunger();
+    for (i = 0; i <= MAXSPELL; i++)
+        gs.spl_book[i].sp_id = NO_SPELL;
+    u.ublesscnt = 300; /* no prayers just yet */
+    u.ualignbase[A_CURRENT] = u.ualignbase[A_ORIGINAL] = u.ualign.type =
+        aligns[flags.initalign].value;
+
+#if defined(BSD) && !defined(POSIX_TYPES)
+    (void) time((long *) &ubirthday);
+#else
+    (void) time(&ubirthday);
+#endif
+
+    /*
+     *  For now, everyone starts out with a night vision range of 1 and
+     *  their xray range disabled.
+     */
+    u.nv_range = 1;
+    u.xray_range = -1;
+    /* OPTIONS:blind results in permanent blindness (unless overridden
+       by the Eyes of the Overworld, which will clear 'u.uroleplay.blind'
+       to void the conduct, but will leave the PermaBlind bit set so that
+       blindness resumes when the Eyes are removed). */
+    if (u.uroleplay.blind)
+        HBlinded |= FROMOUTSIDE; /* set PermaBlind */
+
+    u_init_role();
 
     /*** Race-specific initializations ***/
     switch (Race_switch) {
