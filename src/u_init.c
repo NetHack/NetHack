@@ -16,6 +16,7 @@ struct trobj {
 static struct obj *ini_inv_mkobj_filter(int, boolean);
 static short ini_inv_obj_substitution(struct trobj *, struct obj *);
 static void ini_inv_adjust_obj(struct trobj *, struct obj *);
+static void ini_inv_use_obj(struct obj *);
 static void ini_inv(struct trobj *) NONNULLARG1;
 static void knows_object(int);
 static void knows_class(char);
@@ -1147,6 +1148,54 @@ ini_inv_adjust_obj(struct trobj *trop, struct obj *obj)
     obj->owt = weight(obj);
 }
 
+/* initial inventory: wear, wield, learn the spell/obj */
+static void
+ini_inv_use_obj(struct obj *obj)
+{
+    /* Make the type known if necessary */
+    if (OBJ_DESCR(objects[obj->otyp]) && obj->known)
+        discover_object(obj->otyp, TRUE, FALSE);
+    if (obj->otyp == OIL_LAMP)
+        discover_object(POT_OIL, TRUE, FALSE);
+
+    if (obj->oclass == ARMOR_CLASS) {
+        if (is_shield(obj) && !uarms && !(uwep && bimanual(uwep))) {
+            setworn(obj, W_ARMS);
+            /* Prior to 3.6.2 this used to unset uswapwep if it was set,
+               but wearing a shield doesn't prevent having an alternate
+               weapon ready to swap with the primary; just make sure we
+               aren't two-weaponing (academic; no one starts that way) */
+            set_twoweap(FALSE); /* u.twoweap = FALSE */
+        } else if (is_helmet(obj) && !uarmh)
+            setworn(obj, W_ARMH);
+        else if (is_gloves(obj) && !uarmg)
+            setworn(obj, W_ARMG);
+        else if (is_shirt(obj) && !uarmu)
+            setworn(obj, W_ARMU);
+        else if (is_cloak(obj) && !uarmc)
+            setworn(obj, W_ARMC);
+        else if (is_boots(obj) && !uarmf)
+            setworn(obj, W_ARMF);
+        else if (is_suit(obj) && !uarm)
+            setworn(obj, W_ARM);
+    }
+
+    if (obj->oclass == WEAPON_CLASS || is_weptool(obj)
+        || obj->otyp == TIN_OPENER
+        || obj->otyp == FLINT || obj->otyp == ROCK) {
+        if (is_ammo(obj) || is_missile(obj)) {
+            if (!uquiver)
+                setuqwep(obj);
+        } else if (!uwep && (!uarms || !bimanual(obj))) {
+            setuwep(obj);
+        } else if (!uswapwep) {
+            setuswapwep(obj);
+        }
+    }
+    if (obj->oclass == SPBOOK_CLASS && obj->otyp != SPE_BLANK_PAPER)
+        initialspell(obj);
+}
+
 static void
 ini_inv(struct trobj *trop)
 {
@@ -1197,47 +1246,7 @@ ini_inv(struct trobj *trop)
         ini_inv_adjust_obj(trop, obj);
         obj = addinv(obj);
 
-        /* Make the type known if necessary */
-        if (OBJ_DESCR(objects[otyp]) && obj->known)
-            discover_object(otyp, TRUE, FALSE);
-        if (otyp == OIL_LAMP)
-            discover_object(POT_OIL, TRUE, FALSE);
-
-        if (obj->oclass == ARMOR_CLASS) {
-            if (is_shield(obj) && !uarms && !(uwep && bimanual(uwep))) {
-                setworn(obj, W_ARMS);
-                /* Prior to 3.6.2 this used to unset uswapwep if it was set,
-                   but wearing a shield doesn't prevent having an alternate
-                   weapon ready to swap with the primary; just make sure we
-                   aren't two-weaponing (academic; no one starts that way) */
-                set_twoweap(FALSE); /* u.twoweap = FALSE */
-            } else if (is_helmet(obj) && !uarmh)
-                setworn(obj, W_ARMH);
-            else if (is_gloves(obj) && !uarmg)
-                setworn(obj, W_ARMG);
-            else if (is_shirt(obj) && !uarmu)
-                setworn(obj, W_ARMU);
-            else if (is_cloak(obj) && !uarmc)
-                setworn(obj, W_ARMC);
-            else if (is_boots(obj) && !uarmf)
-                setworn(obj, W_ARMF);
-            else if (is_suit(obj) && !uarm)
-                setworn(obj, W_ARM);
-        }
-
-        if (obj->oclass == WEAPON_CLASS || is_weptool(obj)
-            || otyp == TIN_OPENER || otyp == FLINT || otyp == ROCK) {
-            if (is_ammo(obj) || is_missile(obj)) {
-                if (!uquiver)
-                    setuqwep(obj);
-            } else if (!uwep && (!uarms || !bimanual(obj))) {
-                setuwep(obj);
-            } else if (!uswapwep) {
-                setuswapwep(obj);
-            }
-        }
-        if (obj->oclass == SPBOOK_CLASS && obj->otyp != SPE_BLANK_PAPER)
-            initialspell(obj);
+        ini_inv_use_obj(obj);
 
         /* First spellbook should be level 1 - did we get it? */
         if (obj->oclass == SPBOOK_CLASS && objects[obj->otyp].oc_level == 1)
