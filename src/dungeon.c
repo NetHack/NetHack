@@ -54,6 +54,7 @@ static void init_dungeon_branches(lua_State *, struct proto_dungeon *, int);
 static void init_dungeon_set_entry(struct proto_dungeon *, int);
 static void init_dungeon_set_depth(struct proto_dungeon *, int);
 static void init_castle_tune(void);
+static void fixup_level_locations(void);
 static boolean init_dungeon_dungeons(lua_State *, struct proto_dungeon *, int);
 static boolean unplaced_floater(struct dungeon *);
 static boolean unreachable_level(d_level *, boolean);
@@ -1112,15 +1113,76 @@ init_castle_tune(void)
     gt.tune[5] = 0;
 }
 
+/* fix up the special level names and locations for quick access */
+static void
+fixup_level_locations(void)
+{
+    int i;
+    s_level *x;
+    struct level_map *lev_map;
+
+    /*
+     * Find most of the special levels and dungeons so we can access their
+     * locations quickly.
+     */
+    for (lev_map = level_map; lev_map->lev_name[0]; lev_map++) {
+        x = find_level(lev_map->lev_name);
+        if (x) {
+            assign_level(lev_map->lev_spec, &x->dlevel);
+            if (!strncmp(lev_map->lev_name, "x-", 2)) {
+                /* This is where the name substitution on the
+                 * levels of the quest dungeon occur.
+                 */
+                Sprintf(x->proto, "%s%s", gu.urole.filecode,
+                        &lev_map->lev_name[1]);
+            } else if (lev_map->lev_spec == &knox_level) {
+                branch *br;
+                /*
+                 * Kludge to allow floating Knox entrance.  We
+                 * specify a floating entrance by the fact that its
+                 * entrance (end1) has a bogus dnum, namely n_dgns.
+                 */
+                for (br = gb.branches; br; br = br->next)
+                    if (on_level(&br->end2, &knox_level))
+                        break;
+
+                if (br)
+                    br->end1.dnum = gn.n_dgns;
+                /* adjust the branch's position on the list */
+                insert_branch(br, TRUE);
+            }
+        }
+    }
+    /*
+     *  I hate hardwiring these names. :-(
+     */
+    quest_dnum = dname_to_dnum("The Quest");
+    sokoban_dnum = dname_to_dnum("Sokoban");
+    mines_dnum = dname_to_dnum("The Gnomish Mines");
+    tower_dnum = dname_to_dnum("Vlad's Tower");
+    tutorial_dnum = dname_to_dnum("The Tutorial");
+
+    /* one special fixup for dummy surface level */
+    if ((x = find_level("dummy")) != 0) {
+        i = x->dlevel.dnum;
+        /* the code above puts earth one level above dungeon level #1,
+           making the dummy level overlay level 1; but the whole reason
+           for having the dummy level is to make earth have depth -1
+           instead of 0, so adjust the start point to shift endgame up */
+        if (dunlevs_in_dungeon(&x->dlevel) > 1 - gd.dungeons[i].depth_start)
+            gd.dungeons[i].depth_start -= 1;
+        /* TODO: strip "dummy" out all the way here,
+           so that it's hidden from '#wizwhere' feedback. */
+    }
+}
+
 /* initialize the "dungeon" structs */
 void
 init_dungeons(void)
 {
     lua_State *L;
     register int i, cl = 0;
-    register s_level *x;
     struct proto_dungeon pd;
-    struct level_map *lev_map;
     int tidx;
     nhl_sandbox_info sbi = {NHL_SB_SAFE, 1*1024*1024, 0, 1*1024*1024};
 
@@ -1225,59 +1287,7 @@ init_dungeons(void)
 
     init_castle_tune();
 
-    /*
-     * Find most of the special levels and dungeons so we can access their
-     * locations quickly.
-     */
-    for (lev_map = level_map; lev_map->lev_name[0]; lev_map++) {
-        x = find_level(lev_map->lev_name);
-        if (x) {
-            assign_level(lev_map->lev_spec, &x->dlevel);
-            if (!strncmp(lev_map->lev_name, "x-", 2)) {
-                /* This is where the name substitution on the
-                 * levels of the quest dungeon occur.
-                 */
-                Sprintf(x->proto, "%s%s", gu.urole.filecode,
-                        &lev_map->lev_name[1]);
-            } else if (lev_map->lev_spec == &knox_level) {
-                branch *br;
-                /*
-                 * Kludge to allow floating Knox entrance.  We
-                 * specify a floating entrance by the fact that its
-                 * entrance (end1) has a bogus dnum, namely n_dgns.
-                 */
-                for (br = gb.branches; br; br = br->next)
-                    if (on_level(&br->end2, &knox_level))
-                        break;
-
-                if (br)
-                    br->end1.dnum = gn.n_dgns;
-                /* adjust the branch's position on the list */
-                insert_branch(br, TRUE);
-            }
-        }
-    }
-    /*
-     *  I hate hardwiring these names. :-(
-     */
-    quest_dnum = dname_to_dnum("The Quest");
-    sokoban_dnum = dname_to_dnum("Sokoban");
-    mines_dnum = dname_to_dnum("The Gnomish Mines");
-    tower_dnum = dname_to_dnum("Vlad's Tower");
-    tutorial_dnum = dname_to_dnum("The Tutorial");
-
-    /* one special fixup for dummy surface level */
-    if ((x = find_level("dummy")) != 0) {
-        i = x->dlevel.dnum;
-        /* the code above puts earth one level above dungeon level #1,
-           making the dummy level overlay level 1; but the whole reason
-           for having the dummy level is to make earth have depth -1
-           instead of 0, so adjust the start point to shift endgame up */
-        if (dunlevs_in_dungeon(&x->dlevel) > 1 - gd.dungeons[i].depth_start)
-            gd.dungeons[i].depth_start -= 1;
-        /* TODO: strip "dummy" out all the way here,
-           so that it's hidden from '#wizwhere' feedback. */
-    }
+    fixup_level_locations();
 
     nhl_done(L);
 
