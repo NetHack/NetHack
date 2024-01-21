@@ -5010,7 +5010,8 @@ could_untrap(boolean verbosely, boolean check_floor)
     return 1;
 }
 
-/* Probability of disabling a trap.  Helge Hafting */
+/* Probability of disabling a trap.  Helge Hafting;
+   Returns 0 for success, non-0 for failure. */
 static int
 untrap_prob(
     struct trap *ttmp) /* must not be Null */
@@ -5018,8 +5019,25 @@ untrap_prob(
     int chance = 3;
 
     /* non-spiders are less adept at dealing with webs */
-    if (ttmp->ttyp == WEB && !webmaker(gy.youmonst.data))
-        chance = 7; /* 3.7: used to be 30 */
+    if (ttmp->ttyp == WEB) {
+        /* this assumes that all fiery artifacts are blades; no need to
+           make it more complicated unless/until that changes */
+        struct obj *wep = (uwep && is_blade(uwep)) ? uwep
+                          : (uswapwep && u.twoweap && is_blade(uswapwep))
+                            ? uswapwep : NULL;
+
+        /* FIXME? Forcefight of adjacent web works with bare-handed and
+           martial arts but #untrap of same resorts to !webmaker() chance */
+        if (wep && !m_at(ttmp->tx, ttmp->ty)) {
+            /* primary or secondary weapon is a blade (which includes
+               daggers but not axes or bladed polearms) */
+            if (u_wield_art(ART_STING) || attacks(AD_FIRE, wep))
+                chance = 1;
+            /* else chance stays 3 */
+        } else if (!webmaker(gy.youmonst.data)) {
+            chance = 7; /* 3.7: used to be 30 */
+        }
+    }
     if (Confusion || Hallucination)
         chance++;
     if (Blind)
@@ -5040,6 +5058,8 @@ untrap_prob(
             chance--;
     } else if (Role_if(PM_RANGER) && chance > 1)
         chance--;
+    if (chance < 1)
+        chance = 1;
     return rn2(chance);
 }
 
@@ -5230,10 +5250,13 @@ reward_untrap(struct trap* ttmp, struct monst* mtmp)
     }
 }
 
+/* Help a monster out of a bear trap or web, or if no monster is
+   present, disarm a bear trap or destroy a web.  Helge Hafting */
 static int
-disarm_holdingtrap(struct trap* ttmp) /* Helge Hafting */
+disarm_holdingtrap(struct trap *ttmp)
 {
     struct monst *mtmp;
+    const char *which = the_your[ttmp->madeby_u];
     int fails = try_disarm(ttmp, FALSE);
 
     if (fails < 2)
@@ -5245,18 +5268,26 @@ disarm_holdingtrap(struct trap* ttmp) /* Helge Hafting */
        There's no need for a cockatrice test, only the trap is touched */
     if ((mtmp = m_at(ttmp->tx, ttmp->ty)) != 0) {
         mtmp->mtrapped = 0;
-        You("remove %s %s from %s.", the_your[ttmp->madeby_u],
-            (ttmp->ttyp == BEAR_TRAP) ? "bear trap" : "webbing",
-            mon_nam(mtmp));
+        You("extract %s from %s %s.", mon_nam(mtmp),
+            which, (ttmp->ttyp == BEAR_TRAP) ? "bear trap" : "web");
         reward_untrap(ttmp, mtmp);
-    } else {
-        if (ttmp->ttyp == BEAR_TRAP) {
-            You("disarm %s bear trap.", the_your[ttmp->madeby_u]);
-            cnv_trap_obj(BEARTRAP, 1, ttmp, FALSE);
-        } else /* if (ttmp->ttyp == WEB) */ {
-            You("succeed in removing %s web.", the_your[ttmp->madeby_u]);
-            deltrap(ttmp);
-        }
+    } else if (ttmp->ttyp == BEAR_TRAP) {
+        You("disarm %s bear trap.", which);
+        cnv_trap_obj(BEARTRAP, 1, ttmp, FALSE);
+    } else if (ttmp->ttyp == WEB) {
+        struct obj *wep = (uwep && is_blade(uwep)) ? uwep
+                          : (uswapwep && u.twoweap && is_blade(uswapwep))
+                            ? uswapwep : NULL;
+
+        if (wep && wep->oartifact
+            && (u_wield_art(ART_STING) || attacks(AD_FIRE, wep)))
+            pline("%s %s through %s web!", bare_artifactname(uwep),
+                  u_wield_art(ART_STING) ? "cuts" : "burns", which);
+        else if (wep)
+            You("cut through %s web.", which);
+        else
+            You("succeed in removing %s web.", which);
+        deltrap(ttmp);
     }
     newsym(u.ux + u.dx, u.uy + u.dy);
     return 1;
@@ -5395,7 +5426,7 @@ help_monster_out(
         return 1;
 
     /* Will our hero succeed? */
-    if ((uprob = untrap_prob(ttmp)) && !helpless(mtmp)) {
+    if ((uprob = untrap_prob(ttmp)) != 0 && !helpless(mtmp)) {
         You("try to reach out your %s, but %s backs away skeptically.",
             makeplural(body_part(ARM)), mon_nam(mtmp));
         return 1;

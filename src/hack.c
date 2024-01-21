@@ -1915,10 +1915,11 @@ domove_fight_web(coordxy x, coordxy y)
                chance to succeed rather than maybe make two tries */
             roll = rn2(uwep ? 20 : (45 - 5 * wskill_minus_2));
 
-        if (uwep && u_wield_art(ART_STING)) {
+        if (uwep && (u_wield_art(ART_STING)
+                     || (uwep->oartifact && attacks(AD_FIRE, uwep)))) {
             /* guaranteed success */
-            pline("%s cuts through the web!",
-                  bare_artifactname(uwep));
+            pline("%s %s through the web!", bare_artifactname(uwep),
+                  u_wield_art(ART_STING) ? "cuts" : "burns");
 
         /* is_blade() includes daggers (which are classified as PIERCE)
            but doesn't include axes and slashing polearms */

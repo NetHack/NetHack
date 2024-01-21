@@ -144,6 +144,7 @@ extern boolean confers_luck(struct obj *) NONNULLPTRS;
 extern boolean arti_reflects(struct obj *);
 extern boolean shade_glare(struct obj *) NONNULLPTRS;
 extern boolean restrict_name(struct obj *, const char *) NONNULLPTRS;
+extern boolean attacks(int, struct obj *);
 extern boolean defends(int, struct obj *);
 extern boolean defends_when_carried(int, struct obj *);
 extern boolean protects(struct obj *, boolean);

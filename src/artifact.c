@@ -70,7 +70,6 @@ static xint16 artidisco[NROFARTIFACTS];
 static const struct arti_info zero_artiexist = {0}; /* all bits zero */
 
 static void hack_artifacts(void);
-static boolean attacks(int, struct obj *);
 
 /* handle some special cases; must be called after u_init() */
 static void
@@ -536,7 +535,7 @@ restrict_name(struct obj *otmp, const char *name)
     return FALSE;
 }
 
-static boolean
+boolean
 attacks(int adtyp, struct obj *otmp)
 {
     const struct artifact *weap;
@@ -549,7 +548,7 @@ attacks(int adtyp, struct obj *otmp)
 boolean
 defends(int adtyp, struct obj *otmp)
 {
-    struct artifact *weap;
+    const struct artifact *weap;
 
     if (!otmp)
         return FALSE;
