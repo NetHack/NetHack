@@ -53,6 +53,7 @@ static void init_dungeon_levels(lua_State *, struct proto_dungeon *, int);
 static void init_dungeon_branches(lua_State *, struct proto_dungeon *, int);
 static void init_dungeon_set_entry(struct proto_dungeon *, int);
 static void init_dungeon_set_depth(struct proto_dungeon *, int);
+static void init_castle_tune(void);
 static boolean init_dungeon_dungeons(lua_State *, struct proto_dungeon *, int);
 static boolean unplaced_floater(struct dungeon *);
 static boolean unreachable_level(d_level *, boolean);
@@ -1100,6 +1101,17 @@ init_dungeon_dungeons(
     return TRUE;
 }
 
+/* initialize the Castle drawbridge tune */
+static void
+init_castle_tune(void)
+{
+    int i;
+
+    for (i = 0; i < 5; i++)
+        gt.tune[i] = 'A' + rn2(7);
+    gt.tune[5] = 0;
+}
+
 /* initialize the "dungeon" structs */
 void
 init_dungeons(void)
@@ -1211,9 +1223,7 @@ init_dungeons(void)
     debugpline2("init_dungeon lua DONE (n_levs=%i, n_brs=%i)",
                 pd.n_levs, pd.n_brs);
 
-    for (i = 0; i < 5; i++)
-        gt.tune[i] = 'A' + rn2(7);
-    gt.tune[5] = 0;
+    init_castle_tune();
 
     /*
      * Find most of the special levels and dungeons so we can access their
