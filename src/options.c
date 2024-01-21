@@ -3683,16 +3683,7 @@ optfn_sortdiscoveries(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        extern const char *const disco_orders_descr[]; /* o_init.c */
-        extern const char disco_order_let[];
-        const char *p = strchr(disco_order_let, flags.discosort);
-
-        if (!p)
-            flags.discosort = 'o', p = disco_order_let;
-        if (req == get_cnf_val)
-            Sprintf(opts, "%c", flags.discosort);
-        else
-            Strcpy(opts, disco_orders_descr[p - disco_order_let]);
+        get_sortdisco(opts, (req == get_cnf_val) ? TRUE : FALSE);
         return optn_ok;
     }
     if (req == do_handler) {

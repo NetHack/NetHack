@@ -2085,6 +2085,7 @@ extern int choose_disco_sort(int);
 extern int dodiscovered(void);
 extern int doclassdisco(void);
 extern void rename_disco(void);
+extern void get_sortdisco(char *opts, boolean cnf) NONNULLARG1;
 
 /* ### objects.c ### */
 

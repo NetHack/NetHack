@@ -1089,4 +1089,16 @@ rename_disco(void)
     return;
 }
 
+void
+get_sortdisco(char *opts, boolean cnf)
+{
+    const char *p = strchr(disco_order_let, flags.discosort);
+
+    if (!p)
+        flags.discosort = 'o', p = disco_order_let;
+    if (cnf)
+        Sprintf(opts, "%c", flags.discosort);
+    else
+        Strcpy(opts, disco_orders_descr[p - disco_order_let]);
+}
 /*o_init.c*/
