@@ -55,6 +55,7 @@ static void init_dungeon_set_entry(struct proto_dungeon *, int);
 static void init_dungeon_set_depth(struct proto_dungeon *, int);
 static void init_castle_tune(void);
 static void fixup_level_locations(void);
+static void free_proto_dungeon(struct proto_dungeon *);
 static boolean init_dungeon_dungeons(lua_State *, struct proto_dungeon *, int);
 static boolean unplaced_floater(struct dungeon *);
 static boolean unreachable_level(d_level *, boolean);
@@ -1176,6 +1177,25 @@ fixup_level_locations(void)
     }
 }
 
+static void
+free_proto_dungeon(struct proto_dungeon *pd)
+{
+    int i;
+
+    for (i = 0; i < pd->n_brs; i++) {
+        free((genericptr_t) pd->tmpbranch[i].name);
+    }
+    for (i = 0; i < pd->n_levs; i++) {
+        free((genericptr_t) pd->tmplevel[i].name);
+        if (pd->tmplevel[i].chainlvl)
+            free((genericptr_t) pd->tmplevel[i].chainlvl);
+    }
+    for (i = 0; i < gn.n_dgns; i++) {
+        free((genericptr_t) pd->tmpdungeon[i].name);
+        free((genericptr_t) pd->tmpdungeon[i].protoname);
+    }
+}
+
 /* initialize the "dungeon" structs */
 void
 init_dungeons(void)
@@ -1286,24 +1306,9 @@ init_dungeons(void)
                 pd.n_levs, pd.n_brs);
 
     init_castle_tune();
-
     fixup_level_locations();
-
     nhl_done(L);
-
-    for (i = 0; i < pd.n_brs; i++) {
-        free((genericptr_t) pd.tmpbranch[i].name);
-    }
-    for (i = 0; i < pd.n_levs; i++) {
-        free((genericptr_t) pd.tmplevel[i].name);
-        if (pd.tmplevel[i].chainlvl)
-            free((genericptr_t) pd.tmplevel[i].chainlvl);
-    }
-    for (i = 0; i < gn.n_dgns; i++) {
-        free((genericptr_t) pd.tmpdungeon[i].name);
-        free((genericptr_t) pd.tmpdungeon[i].protoname);
-    }
-
+    free_proto_dungeon(&pd);
 #ifdef DEBUG
     dumpit();
 #endif
