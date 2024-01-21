@@ -76,8 +76,6 @@ const uchar def_r_oc_syms[MAXOCLASSES] = {
 /*15*/ BALL_SYM, CHAIN_SYM, VENOM_SYM
 };
 
-#undef C
-
 /*
  * Convert the given character to an object class.  If the character is not
  * recognized, then MAXOCLASSES is returned.  Used in detect.c, invent.c,
