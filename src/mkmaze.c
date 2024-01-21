@@ -25,6 +25,7 @@ static void shiny_orc_stuff(struct monst *);
 static void stolen_booty(void);
 static boolean maze_inbounds(coordxy, coordxy);
 static void maze_remove_deadends(xint16);
+static void populate_maze(void);
 
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
@@ -1061,10 +1062,40 @@ pick_vibrasquare_location(void)
 #undef y_maze_min
 }
 
+/* add objects and monsters to random maze */
+static void
+populate_maze(void)
+{
+    int i;
+    coord mm;
+
+    for (i = rn1(8, 11); i; i--) {
+        mazexy(&mm);
+        (void) mkobj_at(rn2(2) ? GEM_CLASS : RANDOM_CLASS, mm.x, mm.y, TRUE);
+    }
+    for (i = rn1(10, 2); i; i--) {
+        mazexy(&mm);
+        (void) mksobj_at(BOULDER, mm.x, mm.y, TRUE, FALSE);
+    }
+    for (i = rn2(3); i; i--) {
+        mazexy(&mm);
+        (void) makemon(&mons[PM_MINOTAUR], mm.x, mm.y, NO_MM_FLAGS);
+    }
+    for (i = rn1(5, 7); i; i--) {
+        mazexy(&mm);
+        (void) makemon((struct permonst *) 0, mm.x, mm.y, NO_MM_FLAGS);
+    }
+    for (i = rn1(6, 7); i; i--) {
+        mazexy(&mm);
+        (void) mkgold(0L, mm.x, mm.y);
+    }
+    for (i = rn1(6, 7); i; i--)
+        mktrap(0, MKTRAP_MAZEFLAG, (struct mkroom *) 0, (coord *) 0);
+}
+
 void
 makemaz(const char *s)
 {
-    coordxy x;
     char protofile[20];
     s_level *sp = Is_special(&u.uz);
     coord mm;
@@ -1158,28 +1189,7 @@ makemaz(const char *s)
     /* place branch stair or portal */
     place_branch(Is_branchlev(&u.uz), 0, 0);
 
-    for (x = rn1(8, 11); x; x--) {
-        mazexy(&mm);
-        (void) mkobj_at(rn2(2) ? GEM_CLASS : RANDOM_CLASS, mm.x, mm.y, TRUE);
-    }
-    for (x = rn1(10, 2); x; x--) {
-        mazexy(&mm);
-        (void) mksobj_at(BOULDER, mm.x, mm.y, TRUE, FALSE);
-    }
-    for (x = rn2(3); x; x--) {
-        mazexy(&mm);
-        (void) makemon(&mons[PM_MINOTAUR], mm.x, mm.y, NO_MM_FLAGS);
-    }
-    for (x = rn1(5, 7); x; x--) {
-        mazexy(&mm);
-        (void) makemon((struct permonst *) 0, mm.x, mm.y, NO_MM_FLAGS);
-    }
-    for (x = rn1(6, 7); x; x--) {
-        mazexy(&mm);
-        (void) mkgold(0L, mm.x, mm.y);
-    }
-    for (x = rn1(6, 7); x; x--)
-        mktrap(0, MKTRAP_MAZEFLAG, (struct mkroom *) 0, (coord *) 0);
+    populate_maze();
 }
 
 #ifdef MICRO
