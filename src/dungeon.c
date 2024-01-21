@@ -53,6 +53,7 @@ static void init_dungeon_levels(lua_State *, struct proto_dungeon *, int);
 static void init_dungeon_branches(lua_State *, struct proto_dungeon *, int);
 static void init_dungeon_set_entry(struct proto_dungeon *, int);
 static void init_dungeon_set_depth(struct proto_dungeon *, int);
+static boolean init_dungeon_dungeons(lua_State *, struct proto_dungeon *, int);
 static boolean unplaced_floater(struct dungeon *);
 static boolean unreachable_level(d_level *, boolean);
 static void tport_menu(winid, char *, struct lchoice *, d_level *, boolean);
@@ -990,6 +991,115 @@ init_dungeon_set_depth(struct proto_dungeon *pd, int dngidx)
         - (gd.dungeons[dngidx].entry_lev - 1);
 }
 
+static boolean
+init_dungeon_dungeons(
+   lua_State *L,
+   struct proto_dungeon *pd,
+   int dngidx)
+{
+    char *dgn_name, *dgn_bonetag, *dgn_protoname, *dgn_fill;
+    char *dgn_themerms;
+    int dgn_base, dgn_range, dgn_align, dgn_entry, dgn_chance, dgn_flags;
+
+    dgn_name = get_table_str(L, "name");
+    dgn_bonetag = get_table_str_opt(L, "bonetag", emptystr); /* TODO: single char or "none" */
+    dgn_protoname = get_table_str_opt(L, "protofile", emptystr);
+    dgn_base = get_table_int(L, "base");
+    dgn_range = get_table_int_opt(L, "range", 0);
+    dgn_align = get_dgn_align(L);
+    dgn_entry = get_table_int_opt(L, "entry", 0);
+    dgn_chance = get_table_int_opt(L, "chance", 100);
+    dgn_flags = get_dgn_flags(L);
+    dgn_fill = get_table_str_opt(L, "lvlfill", emptystr);
+    dgn_themerms = get_table_str_opt(L, "themerooms", emptystr);
+
+    debugpline4("DUNGEON[%i]: %s, base=(%i,%i)",
+                dngidx, dgn_name, dgn_base, dgn_range);
+
+    if (!wizard && dgn_chance && (dgn_chance <= rn2(100))) {
+        debugpline1("IGNORING %s", dgn_name);
+        gn.n_dgns--;
+        free((genericptr_t) dgn_name);
+        free((genericptr_t) dgn_bonetag);
+        free((genericptr_t) dgn_protoname);
+        free((genericptr_t) dgn_fill);
+        free((genericptr_t) dgn_themerms);
+        return FALSE;
+    }
+
+    /* levels begin */
+    lua_getfield(L, -1, "levels");
+    if (lua_type(L, -1) == LUA_TTABLE) {
+        init_dungeon_levels(L, pd, dngidx);
+    } else if (lua_type(L, -1) != LUA_TNIL)
+        panic("dungeon[%i].levels is not an array of hashes", dngidx);
+    lua_pop(L, 1);
+    /* levels end */
+
+    /* branches begin */
+    lua_getfield(L, -1, "branches");
+    if (lua_type(L, -1) == LUA_TTABLE) {
+        init_dungeon_branches(L, pd, dngidx);
+    } else if (lua_type(L, -1) != LUA_TNIL)
+        panic("dungeon[%i].branches is not an array of hashes", dngidx);
+    lua_pop(L, 1);
+    /* branches end */
+
+    pd->tmpdungeon[dngidx].name = dgn_name;
+    pd->tmpdungeon[dngidx].protoname = dgn_protoname;
+    pd->tmpdungeon[dngidx].boneschar = *dgn_bonetag ? *dgn_bonetag : 0;
+    pd->tmpdungeon[dngidx].lev.base = dgn_base;
+    pd->tmpdungeon[dngidx].lev.rand = dgn_range;
+    pd->tmpdungeon[dngidx].flags = dgn_flags;
+    pd->tmpdungeon[dngidx].align = dgn_align;
+    pd->tmpdungeon[dngidx].chance = dgn_chance;
+    pd->tmpdungeon[dngidx].entry_lev = dgn_entry;
+
+    Strcpy(gd.dungeons[dngidx].fill_lvl, dgn_fill); /* FIXME: fill_lvl len */
+    Strcpy(gd.dungeons[dngidx].dname, dgn_name); /* FIXME: dname length */
+    Strcpy(gd.dungeons[dngidx].proto, dgn_protoname); /* FIXME: proto length */
+    Strcpy(gd.dungeons[dngidx].themerms, dgn_themerms); /* FIXME: length */
+    gd.dungeons[dngidx].boneid = *dgn_bonetag ? *dgn_bonetag : 0;
+    free((genericptr) dgn_fill);
+    /* free((genericptr) dgn_protoname); -- stored in pd.tmpdungeon[] */
+    free((genericptr) dgn_bonetag);
+    free((genericptr) dgn_themerms);
+
+    if (dgn_range)
+        gd.dungeons[dngidx].num_dunlevs = (xint16) rn1(dgn_range, dgn_base);
+    else
+        gd.dungeons[dngidx].num_dunlevs = (xint16) dgn_base;
+
+    if (!dngidx) {
+        gd.dungeons[dngidx].ledger_start = 0;
+        gd.dungeons[dngidx].depth_start = 1;
+        gd.dungeons[dngidx].dunlev_ureached = 1;
+    } else {
+        gd.dungeons[dngidx].ledger_start = gd.dungeons[dngidx - 1].ledger_start
+            + gd.dungeons[dngidx - 1].num_dunlevs;
+        gd.dungeons[dngidx].dunlev_ureached = 0;
+    }
+
+    gd.dungeons[dngidx].flags.hellish = !!(dgn_flags & HELLISH);
+    gd.dungeons[dngidx].flags.maze_like = !!(dgn_flags & MAZELIKE);
+    gd.dungeons[dngidx].flags.rogue_like = !!(dgn_flags & ROGUELIKE);
+    gd.dungeons[dngidx].flags.align = dgn_align;
+    gd.dungeons[dngidx].flags.unconnected = !!(dgn_flags & UNCONNECTED);
+
+    init_dungeon_set_entry(pd, dngidx);
+
+    if (gd.dungeons[dngidx].flags.unconnected) {
+        gd.dungeons[dngidx].depth_start = 1;
+    } else if (dngidx) { /* set depth */
+        init_dungeon_set_depth(pd, dngidx);
+    }
+
+    if (gd.dungeons[dngidx].num_dunlevs > MAXLEVEL)
+        gd.dungeons[dngidx].num_dunlevs = MAXLEVEL;
+
+    return TRUE;
+}
+
 /* initialize the "dungeon" structs */
 void
 init_dungeons(void)
@@ -1068,135 +1178,33 @@ init_dungeons(void)
     lua_pushnil(L); /* first key */
     i = 0;
     while (lua_next(L, tidx) != 0) {
-        char *dgn_name, *dgn_bonetag, *dgn_protoname, *dgn_fill;
-        char *dgn_themerms;
-        int dgn_base, dgn_range, dgn_align, dgn_entry, dgn_chance, dgn_flags;
 
         if (!lua_istable(L, -1))
             panic("dungeon[%i] is not a lua table", i);
 
-        dgn_name = get_table_str(L, "name");
-        dgn_bonetag = get_table_str_opt(L, "bonetag", emptystr); /* TODO: single char or "none" */
-        dgn_protoname = get_table_str_opt(L, "protofile", emptystr);
-        dgn_base = get_table_int(L, "base");
-        dgn_range = get_table_int_opt(L, "range", 0);
-        dgn_align = get_dgn_align(L);
-        dgn_entry = get_table_int_opt(L, "entry", 0);
-        dgn_chance = get_table_int_opt(L, "chance", 100);
-        dgn_flags = get_dgn_flags(L);
-        dgn_fill = get_table_str_opt(L, "lvlfill", emptystr);
-        dgn_themerms = get_table_str_opt(L, "themerooms", emptystr);
-
-        debugpline4("DUNGEON[%i]: %s, base=(%i,%i)",
-                    i, dgn_name, dgn_base, dgn_range);
-
-        if (!wizard && dgn_chance && (dgn_chance <= rn2(100))) {
-            debugpline1("IGNORING %s", dgn_name);
-            gn.n_dgns--;
-            lua_pop(L, 1); /* pop the dungeon table */
-            free((genericptr_t) dgn_name);
-            free((genericptr_t) dgn_bonetag);
-            free((genericptr_t) dgn_protoname);
-            free((genericptr_t) dgn_fill);
-            free((genericptr_t) dgn_themerms);
-            continue;
-        }
-
-        /* levels begin */
-        lua_getfield(L, -1, "levels");
-        if (lua_type(L, -1) == LUA_TTABLE) {
-            init_dungeon_levels(L, &pd, i);
-        } else if (lua_type(L, -1) != LUA_TNIL)
-            panic("dungeon[%i].levels is not an array of hashes", i);
-        lua_pop(L, 1);
-        /* levels end */
-
-        /* branches begin */
-        lua_getfield(L, -1, "branches");
-        if (lua_type(L, -1) == LUA_TTABLE) {
-            init_dungeon_branches(L, &pd, i);
-        } else if (lua_type(L, -1) != LUA_TNIL)
-            panic("dungeon[%i].branches is not an array of hashes", i);
-        lua_pop(L, 1);
-        /* branches end */
-
-        pd.tmpdungeon[i].name = dgn_name;
-        pd.tmpdungeon[i].protoname = dgn_protoname;
-        pd.tmpdungeon[i].boneschar = *dgn_bonetag ? *dgn_bonetag : 0;
-        pd.tmpdungeon[i].lev.base = dgn_base;
-        pd.tmpdungeon[i].lev.rand = dgn_range;
-        pd.tmpdungeon[i].flags = dgn_flags;
-        pd.tmpdungeon[i].align = dgn_align;
-        pd.tmpdungeon[i].chance = dgn_chance;
-        pd.tmpdungeon[i].entry_lev = dgn_entry;
-
-        Strcpy(gd.dungeons[i].fill_lvl, dgn_fill); /* FIXME: fill_lvl len */
-        Strcpy(gd.dungeons[i].dname, dgn_name); /* FIXME: dname length */
-        Strcpy(gd.dungeons[i].proto, dgn_protoname); /* FIXME: proto length */
-        Strcpy(gd.dungeons[i].themerms, dgn_themerms); /* FIXME: length */
-        gd.dungeons[i].boneid = *dgn_bonetag ? *dgn_bonetag : 0;
-        free((genericptr) dgn_fill);
-        /* free((genericptr) dgn_protoname); -- stored in pd.tmpdungeon[] */
-        free((genericptr) dgn_bonetag);
-        free((genericptr) dgn_themerms);
-
-        if (dgn_range)
-            gd.dungeons[i].num_dunlevs = (xint16) rn1(dgn_range, dgn_base);
-        else
-            gd.dungeons[i].num_dunlevs = (xint16) dgn_base;
-
-        if (!i) {
-            gd.dungeons[i].ledger_start = 0;
-            gd.dungeons[i].depth_start = 1;
-            gd.dungeons[i].dunlev_ureached = 1;
-        } else {
-            gd.dungeons[i].ledger_start = gd.dungeons[i - 1].ledger_start
-                                         + gd.dungeons[i - 1].num_dunlevs;
-            gd.dungeons[i].dunlev_ureached = 0;
-        }
-
-        gd.dungeons[i].flags.hellish = !!(dgn_flags & HELLISH);
-        gd.dungeons[i].flags.maze_like = !!(dgn_flags & MAZELIKE);
-        gd.dungeons[i].flags.rogue_like = !!(dgn_flags & ROGUELIKE);
-        gd.dungeons[i].flags.align = dgn_align;
-        gd.dungeons[i].flags.unconnected = !!(dgn_flags & UNCONNECTED);
-
-        init_dungeon_set_entry(&pd, i);
-
-        if (gd.dungeons[i].flags.unconnected) {
-            gd.dungeons[i].depth_start = 1;
-        } else if (i) { /* set depth */
-            init_dungeon_set_depth(&pd, i);
-        }
-
-        if (gd.dungeons[i].num_dunlevs > MAXLEVEL)
-            gd.dungeons[i].num_dunlevs = MAXLEVEL;
-
-
-       for (; cl < pd.n_levs; cl++) {
-            init_level(i, cl, &pd);
-        }
-
-        /*
-         * Recursively place the generated levels for this dungeon.  This
-         * routine will attempt all possible combinations before giving
-         * up.
-         */
-        if (!place_level(pd.start, &pd))
-            panic("init_dungeon:  couldn't place levels");
+        if (init_dungeon_dungeons(L, &pd, i)) {
+            for (; cl < pd.n_levs; cl++) {
+                init_level(i, cl, &pd);
+            }
+            /*
+             * Recursively place the generated levels for this dungeon.  This
+             * routine will attempt all possible combinations before giving
+             * up.
+             */
+            if (!place_level(pd.start, &pd))
+                panic("init_dungeon:  couldn't place levels");
 #ifdef DDEBUG
-        fprintf(stderr, "--- end of dungeon %d ---\n", i);
-        fflush(stderr);
-        getchar();
+            fprintf(stderr, "--- end of dungeon %d ---\n", i);
+            fflush(stderr);
+            getchar();
 #endif
-
-        for (; pd.start < pd.n_levs; pd.start++)
-            if (pd.final_lev[pd.start])
-                add_level(pd.final_lev[pd.start]);
-        /* levels handling end */
-
+            for (; pd.start < pd.n_levs; pd.start++)
+                if (pd.final_lev[pd.start])
+                    add_level(pd.final_lev[pd.start]);
+            /* levels handling end */
+            i++;
+        }
         lua_pop(L, 1); /* pop the dungeon table */
-        i++;
     }
 
     lua_pop(L, 1); /* get rid of the dungeon global */
