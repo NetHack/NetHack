@@ -13,6 +13,7 @@ struct trobj {
     Bitfield(trbless, 2);
 };
 
+static struct obj *ini_inv_mkobj_filter(int, boolean);
 static void ini_inv(struct trobj *) NONNULLARG1;
 static void knows_object(int);
 static void knows_class(char);
@@ -1021,6 +1022,61 @@ restricted_spell_discipline(int otyp)
     return TRUE;
 }
 
+/* create random object of certain class, filtering out too powerful items */
+static struct obj *
+ini_inv_mkobj_filter(int oclass, boolean got_sp1)
+{
+    struct obj *obj;
+    int otyp, trycnt = 0;
+
+    /*
+     * For random objects, do not create certain overly powerful
+     * items: wand of wishing, ring of levitation, or the
+     * polymorph/polymorph control combination.  Specific objects,
+     * i.e. the discovery wishing, are still OK.
+     * Also, don't get a couple of really useless items.  (Note:
+     * punishment isn't "useless".  Some players who start out with
+     * one will immediately read it and use the iron ball as a
+     * weapon.)
+     */
+    obj = mkobj(oclass, FALSE);
+    otyp = obj->otyp;
+
+    while (otyp == WAN_WISHING || otyp == gn.nocreate
+           || otyp == gn.nocreate2 || otyp == gn.nocreate3
+           || otyp == gn.nocreate4 || otyp == RIN_LEVITATION
+           /* 'useless' items */
+           || otyp == POT_HALLUCINATION
+           || otyp == POT_ACID
+           || otyp == SCR_AMNESIA
+           || otyp == SCR_FIRE
+           || otyp == SCR_BLANK_PAPER
+           || otyp == SPE_BLANK_PAPER
+           || otyp == RIN_AGGRAVATE_MONSTER
+           || otyp == RIN_HUNGER
+           || otyp == WAN_NOTHING
+           /* orcs start with poison resistance */
+           || (otyp == RIN_POISON_RESISTANCE && Race_if(PM_ORC))
+           /* Monks don't use weapons */
+           || (otyp == SCR_ENCHANT_WEAPON && Role_if(PM_MONK))
+           /* wizard patch -- they already have one */
+           || (otyp == SPE_FORCE_BOLT && Role_if(PM_WIZARD))
+           /* powerful spells are either useless to
+              low level players or unbalancing; also
+              spells in restricted skill categories */
+           || (obj->oclass == SPBOOK_CLASS
+               && (objects[otyp].oc_level > (got_sp1 ? 3 : 1)
+                   || restricted_spell_discipline(otyp)))
+           || otyp == SPE_NOVEL) {
+        dealloc_obj(obj);
+        obj = mkobj(oclass, FALSE);
+        otyp = obj->otyp;
+        if (++trycnt > 1000)
+            break;
+    }
+    return obj;
+}
+
 static void
 ini_inv(struct trobj *trop)
 {
@@ -1033,52 +1089,8 @@ ini_inv(struct trobj *trop)
         if (otyp != UNDEF_TYP) {
             obj = mksobj(otyp, TRUE, FALSE);
         } else { /* UNDEF_TYP */
-            int trycnt = 0;
-            /*
-             * For random objects, do not create certain overly powerful
-             * items: wand of wishing, ring of levitation, or the
-             * polymorph/polymorph control combination.  Specific objects,
-             * i.e. the discovery wishing, are still OK.
-             * Also, don't get a couple of really useless items.  (Note:
-             * punishment isn't "useless".  Some players who start out with
-             * one will immediately read it and use the iron ball as a
-             * weapon.)
-             */
-            obj = mkobj(trop->trclass, FALSE);
+            obj = ini_inv_mkobj_filter(trop->trclass, got_sp1);
             otyp = obj->otyp;
-            while (otyp == WAN_WISHING || otyp == gn.nocreate
-                   || otyp == gn.nocreate2 || otyp == gn.nocreate3
-                   || otyp == gn.nocreate4 || otyp == RIN_LEVITATION
-                   /* 'useless' items */
-                   || otyp == POT_HALLUCINATION
-                   || otyp == POT_ACID
-                   || otyp == SCR_AMNESIA
-                   || otyp == SCR_FIRE
-                   || otyp == SCR_BLANK_PAPER
-                   || otyp == SPE_BLANK_PAPER
-                   || otyp == RIN_AGGRAVATE_MONSTER
-                   || otyp == RIN_HUNGER
-                   || otyp == WAN_NOTHING
-                   /* orcs start with poison resistance */
-                   || (otyp == RIN_POISON_RESISTANCE && Race_if(PM_ORC))
-                   /* Monks don't use weapons */
-                   || (otyp == SCR_ENCHANT_WEAPON && Role_if(PM_MONK))
-                   /* wizard patch -- they already have one */
-                   || (otyp == SPE_FORCE_BOLT && Role_if(PM_WIZARD))
-                   /* powerful spells are either useless to
-                      low level players or unbalancing; also
-                      spells in restricted skill categories */
-                   || (obj->oclass == SPBOOK_CLASS
-                       && (objects[otyp].oc_level > (got_sp1 ? 3 : 1)
-                           || restricted_spell_discipline(otyp)))
-                   || otyp == SPE_NOVEL) {
-                dealloc_obj(obj);
-                obj = mkobj(trop->trclass, FALSE);
-                otyp = obj->otyp;
-                if (++trycnt > 1000)
-                    break;
-            }
-
             /* Heavily relies on the fact that 1) we create wands
              * before rings, 2) that we create rings before
              * spellbooks, and that 3) not more than 1 object of a
