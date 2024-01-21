@@ -1833,6 +1833,8 @@ duration of temporary stoning resistance would be extended while eating a
 	meal safely
 farlook at something that was on top of an engraving or grave would report
 	the engraving text or headstone epitaph along with the 'something'
+when carrying 52 items (excluding gold), hero couldn't pick up a thrown,
+	stolen, or dropped item which was split off from a still-carried stack
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

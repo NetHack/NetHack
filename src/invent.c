@@ -15,7 +15,8 @@ static char *loot_xname(struct obj *);
 static int invletter_value(char);
 static int QSORTCALLBACK sortloot_cmp(const genericptr, const genericptr);
 static void reorder_invent(void);
-static struct obj *addinv_core0(struct obj *, struct obj *, boolean) NONNULLARG1;
+static struct obj *addinv_core0(struct obj *, struct obj *,
+                                                         boolean) NONNULLARG1;
 static void noarmor(boolean);
 static void invdisp_nothing(const char *, const char *);
 static boolean worn_wield_only(struct obj *);
@@ -782,8 +783,7 @@ struct obj *
 merge_choice(struct obj *objlist, struct obj *obj)
 {
     struct monst *shkp;
-    int save_nocharge;
-    struct obj *objlist2;
+    unsigned save_nocharge;
 
     if (obj->otyp == SCR_SCARE_MONSTER) /* punt on these */
         return (struct obj *) 0;
@@ -805,14 +805,14 @@ merge_choice(struct obj *objlist, struct obj *obj)
         else if (inhishop(shkp))
             return (struct obj *) 0;
     }
-    objlist2 = objlist; /* allow objlist arg to be nonnull w/o a warning */
-    while (objlist2) {
-        if (mergable(objlist2, obj))
+    do {
+        /*assert(objlist != NULL);*/
+        if (mergable(objlist, obj))
             break;
-        objlist2 = objlist2->nobj;
-    }
+        objlist = objlist->nobj;
+    } while (objlist);
     obj->no_charge = save_nocharge;
-    return objlist2;
+    return objlist;
 }
 
 /* merge obj with otmp and delete obj if types agree */
@@ -866,20 +866,18 @@ merged(struct obj **potmp, struct obj **pobj)
            identification states don't match, one of them must have
            previously been identified */
         if (obj->known != otmp->known) {
-            otmp->known = TRUE;
+            otmp->known = 1;
             discovered = TRUE;
         }
         if (obj->rknown != otmp->rknown) {
-            otmp->rknown = TRUE;
-            if (otmp->oerodeproof) {
+            otmp->rknown = 1;
+            if (otmp->oerodeproof)
                 discovered = TRUE;
-            }
         }
         if (obj->bknown != otmp->bknown) {
-            otmp->bknown = TRUE;
-            if (!Role_if(PM_CLERIC)) {
+            otmp->bknown = 1;
+            if (!Role_if(PM_CLERIC))
                 discovered = TRUE;
-            }
         }
 
         /* fixup for `#adjust' merging wielded darts, daggers, &c */
@@ -894,13 +892,13 @@ merged(struct obj **potmp, struct obj **pobj)
                (Prior to 3.3.0, it was not possible for the two
                stacks to be worn in different slots and `obj'
                didn't need to be unworn when merging.) */
-            if (wmask & W_WEP)
+            if ((wmask & W_WEP) != 0L) {
                 wmask = W_WEP;
-            else if (wmask & W_SWAPWEP)
+            } else if ((wmask & W_SWAPWEP) != 0L) {
                 wmask = W_SWAPWEP;
-            else if (wmask & W_QUIVER)
+            } else if ((wmask & W_QUIVER) != 0L) {
                 wmask = W_QUIVER;
-            else {
+            } else {
                 impossible("merging strangely worn items (%lx)", wmask);
                 wmask = otmp->owornmask;
             }

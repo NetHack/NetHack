@@ -1716,7 +1716,7 @@ lift_object(
                /* [exception for gold coins will have to change
                    if silver/copper ones ever get implemented] */
                && inv_cnt(FALSE) >= invlet_basic
-                        && !merge_choice(gi.invent, obj)) {
+               && !merge_choice(gi.invent, obj)) {
         /* if there is some gold here (and we haven't already skipped it),
            we aren't limited by the 52 item limit for it, but caller and
            "grandcaller" aren't prepared to skip stuff and then pickup
@@ -1780,6 +1780,7 @@ pickup_object(
     long count, /* if non-zero, pick up a subset of this amount */
     boolean telekinesis) /* not picking it up directly by hand */
 {
+    unsigned save_how_lost;
     int res;
 
     if (obj->quan < count) {
@@ -1836,7 +1837,17 @@ pickup_object(
         }
     }
 
-    if ((res = lift_object(obj, (struct obj *) 0, &count, telekinesis)) <= 0)
+    save_how_lost = obj->how_lost;
+    /* obj has either already passed autopick_testobj or we are explicitly
+       picking it off the floor, so override obj->how_lost; otherwise we
+       couldn't pick up a thrown, stolen, or dropped item that was split
+       off from a carried stack even while still carrying the rest of the
+       stack unless we have at least one free slot available */
+    obj->how_lost = LOST_NONE; /* affects merge_choice() */
+    res = lift_object(obj, (struct obj *) 0, &count, telekinesis);
+    obj->how_lost = save_how_lost; /* even when res > 0,
+                                    * in case we call splitobj() below */
+    if (res <= 0)
         return res;
 
     /* Whats left of the special case for gold :-) */
@@ -1845,6 +1856,7 @@ pickup_object(
     if (obj->quan != count && obj->otyp != LOADSTONE)
         obj = splitobj(obj, count);
 
+    obj->how_lost = LOST_NONE;
     obj = pick_obj(obj);
 
     if (uwep && uwep == obj)
