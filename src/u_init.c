@@ -18,6 +18,7 @@ static void knows_object(int);
 static void knows_class(char);
 static void u_init_role(void);
 static void u_init_race(void);
+static void u_init_carry_attr_boost(void);
 static boolean restricted_spell_discipline(int);
 
 #define UNDEF_TYP 0
@@ -831,6 +832,21 @@ u_init_race(void)
     }
 }
 
+/* boost STR and CON until hero can carry inventory */
+static void
+u_init_carry_attr_boost(void)
+{
+    /* make sure you can carry all you have - especially for Tourists */
+    while (inv_weight() > 0) {
+        if (adjattrib(A_STR, 1, TRUE))
+            continue;
+        if (adjattrib(A_CON, 1, TRUE))
+            continue;
+        /* only get here when didn't boost strength or constitution */
+        break;
+    }
+}
+
 void
 u_init(void)
 {
@@ -934,17 +950,8 @@ u_init(void)
     find_ac();     /* get initial ac value */
     init_attr(75); /* init attribute values */
     vary_init_attr(); /* minor variation to attrs */
+    u_init_carry_attr_boost();
     max_rank_sz(); /* set max str size for class ranks */
-
-    /* make sure you can carry all you have - especially for Tourists */
-    while (inv_weight() > 0) {
-        if (adjattrib(A_STR, 1, TRUE))
-            continue;
-        if (adjattrib(A_CON, 1, TRUE))
-            continue;
-        /* only get here when didn't boost strength or constitution */
-        break;
-    }
 
     /* If we have at least one spell, force starting Pw to be enough,
        so hero can cast the level 1 spell they should have */
