@@ -17,6 +17,7 @@ static void ini_inv(struct trobj *) NONNULLARG1;
 static void knows_object(int);
 static void knows_class(char);
 static void u_init_role(void);
+static void u_init_race(void);
 static boolean restricted_spell_discipline(int);
 
 #define UNDEF_TYP 0
@@ -757,6 +758,79 @@ u_init_role(void)
     }
 }
 
+/* race-specific initializations */
+static void
+u_init_race(void)
+{
+    switch (Race_switch) {
+    case PM_HUMAN:
+        /* Nothing special */
+        break;
+
+    case PM_ELF:
+        /*
+         * Elves are people of music and song, or they are warriors.
+         * Non-warriors get an instrument.  We use a kludge to
+         * get only non-magic instruments.
+         */
+        if (Role_if(PM_CLERIC) || Role_if(PM_WIZARD)) {
+            static int trotyp[] = { WOODEN_FLUTE, TOOLED_HORN, WOODEN_HARP,
+                                    BELL,         BUGLE,       LEATHER_DRUM };
+            Instrument[0].trotyp = ROLL_FROM(trotyp);
+            ini_inv(Instrument);
+        }
+
+        /* Elves can recognize all elvish objects */
+        knows_object(ELVEN_SHORT_SWORD);
+        knows_object(ELVEN_ARROW);
+        knows_object(ELVEN_BOW);
+        knows_object(ELVEN_SPEAR);
+        knows_object(ELVEN_DAGGER);
+        knows_object(ELVEN_BROADSWORD);
+        knows_object(ELVEN_MITHRIL_COAT);
+        knows_object(ELVEN_LEATHER_HELM);
+        knows_object(ELVEN_SHIELD);
+        knows_object(ELVEN_BOOTS);
+        knows_object(ELVEN_CLOAK);
+        break;
+
+    case PM_DWARF:
+        /* Dwarves can recognize all dwarvish objects */
+        knows_object(DWARVISH_SPEAR);
+        knows_object(DWARVISH_SHORT_SWORD);
+        knows_object(DWARVISH_MATTOCK);
+        knows_object(DWARVISH_IRON_HELM);
+        knows_object(DWARVISH_MITHRIL_COAT);
+        knows_object(DWARVISH_CLOAK);
+        knows_object(DWARVISH_ROUNDSHIELD);
+        break;
+
+    case PM_GNOME:
+        break;
+
+    case PM_ORC:
+        /* compensate for generally inferior equipment */
+        if (!Role_if(PM_WIZARD))
+            ini_inv(Xtra_food);
+        /* Orcs can recognize all orcish objects */
+        knows_object(ORCISH_SHORT_SWORD);
+        knows_object(ORCISH_ARROW);
+        knows_object(ORCISH_BOW);
+        knows_object(ORCISH_SPEAR);
+        knows_object(ORCISH_DAGGER);
+        knows_object(ORCISH_CHAIN_MAIL);
+        knows_object(ORCISH_RING_MAIL);
+        knows_object(ORCISH_HELM);
+        knows_object(ORCISH_SHIELD);
+        knows_object(URUK_HAI_SHIELD);
+        knows_object(ORCISH_CLOAK);
+        break;
+
+    default: /* impossible */
+        break;
+    }
+}
+
 void
 u_init(void)
 {
@@ -842,75 +916,7 @@ u_init(void)
         HBlinded |= FROMOUTSIDE; /* set PermaBlind */
 
     u_init_role();
-
-    /*** Race-specific initializations ***/
-    switch (Race_switch) {
-    case PM_HUMAN:
-        /* Nothing special */
-        break;
-
-    case PM_ELF:
-        /*
-         * Elves are people of music and song, or they are warriors.
-         * Non-warriors get an instrument.  We use a kludge to
-         * get only non-magic instruments.
-         */
-        if (Role_if(PM_CLERIC) || Role_if(PM_WIZARD)) {
-            static int trotyp[] = { WOODEN_FLUTE, TOOLED_HORN, WOODEN_HARP,
-                                    BELL,         BUGLE,       LEATHER_DRUM };
-            Instrument[0].trotyp = ROLL_FROM(trotyp);
-            ini_inv(Instrument);
-        }
-
-        /* Elves can recognize all elvish objects */
-        knows_object(ELVEN_SHORT_SWORD);
-        knows_object(ELVEN_ARROW);
-        knows_object(ELVEN_BOW);
-        knows_object(ELVEN_SPEAR);
-        knows_object(ELVEN_DAGGER);
-        knows_object(ELVEN_BROADSWORD);
-        knows_object(ELVEN_MITHRIL_COAT);
-        knows_object(ELVEN_LEATHER_HELM);
-        knows_object(ELVEN_SHIELD);
-        knows_object(ELVEN_BOOTS);
-        knows_object(ELVEN_CLOAK);
-        break;
-
-    case PM_DWARF:
-        /* Dwarves can recognize all dwarvish objects */
-        knows_object(DWARVISH_SPEAR);
-        knows_object(DWARVISH_SHORT_SWORD);
-        knows_object(DWARVISH_MATTOCK);
-        knows_object(DWARVISH_IRON_HELM);
-        knows_object(DWARVISH_MITHRIL_COAT);
-        knows_object(DWARVISH_CLOAK);
-        knows_object(DWARVISH_ROUNDSHIELD);
-        break;
-
-    case PM_GNOME:
-        break;
-
-    case PM_ORC:
-        /* compensate for generally inferior equipment */
-        if (!Role_if(PM_WIZARD))
-            ini_inv(Xtra_food);
-        /* Orcs can recognize all orcish objects */
-        knows_object(ORCISH_SHORT_SWORD);
-        knows_object(ORCISH_ARROW);
-        knows_object(ORCISH_BOW);
-        knows_object(ORCISH_SPEAR);
-        knows_object(ORCISH_DAGGER);
-        knows_object(ORCISH_CHAIN_MAIL);
-        knows_object(ORCISH_RING_MAIL);
-        knows_object(ORCISH_HELM);
-        knows_object(ORCISH_SHIELD);
-        knows_object(URUK_HAI_SHIELD);
-        knows_object(ORCISH_CLOAK);
-        break;
-
-    default: /* impossible */
-        break;
-    }
+    u_init_race();
 
     /* roughly based on distribution in human population */
     u.uhandedness = rn2(10) ? RIGHT_HANDED : LEFT_HANDED;
