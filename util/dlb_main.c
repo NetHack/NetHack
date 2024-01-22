@@ -556,7 +556,7 @@ xexit(int retcd)
 unsigned
 Strlen_(const char *str, const char *file, int line)
 {
-    size_t len = strlen(str, LARGEST_INT);
+    size_t len = strlen(str);
 
     if (len >= LARGEST_INT) {
         panic("%s:%d string too long", file, line);
