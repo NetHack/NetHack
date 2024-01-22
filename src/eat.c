@@ -1718,7 +1718,7 @@ static int
 rottenfood(struct obj *obj)
 {
     pline("Blecch!  %s %s!",
-          is_metallic(obj) ? "Awful" : "Rotten", foodword(obj));
+          is_rottable(obj) ? "Rotten" : "Awful", foodword(obj));
     if (!rn2(4)) {
         if (Hallucination)
             You_feel("rather trippy.");
