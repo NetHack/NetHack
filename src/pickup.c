@@ -1702,9 +1702,12 @@ lift_object(
             || merge_choice(gi.invent, obj))
             return 1; /* lift regardless of current situation */
         /* if we reach here, we're out of slots and already have at least
-           one of these, so treat this one more like a normal item */
+           one of these, so treat this one more like a normal item
+           [this was using simpleonames(obj) for shortest description, but
+           that's suboptimal for loadstones because it omits user-assigned
+           type name which is something of interest for gray stones] */
         You("are carrying too much stuff to pick up %s %s.",
-            (obj->quan == 1L) ? "another" : "more", simpleonames(obj));
+            (obj->quan == 1L) ? "another" : "more", xname(obj));
         return -1;
     }
 

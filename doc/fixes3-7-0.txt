@@ -1352,6 +1352,9 @@ some uses of mons[obj->corpsenm] weren't excluding obj->corpsenm==NON_PM (-1)
 if a covetous monster tried to teleport next to the hero but the level was
 	completely full, it would be booted off the level (set to migrate
 	back if the hero left and returned) instead of just staying put
+if loadstone was unIDed but had been assigned a type name and you failed to
+	pick one up, the message referred to it as "gray stone" rather than
+	"stone called <assigned name>"
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
