@@ -19,7 +19,7 @@ static void gloc_filter_init(void);
 static void gloc_filter_done(void);
 static boolean gather_locs_interesting(coordxy, coordxy, int);
 static void gather_locs(coord **, int *, int);
-static void truncate_to_map(int *, int *, schar, schar);
+static void truncate_to_map(coordxy *, coordxy *, schar, schar);
 static void getpos_refresh(int *) NONNULLARG1;
 static char *name_from_player(char *, const char *, const char *);
 static void do_mgivenname(void);
@@ -698,7 +698,7 @@ getpos_menu(coord *ccp, int gloc)
 
 /* add dx,dy to cx,cy, truncating at map edges */
 static void
-truncate_to_map(int *cx, int *cy, schar dx, schar dy)
+truncate_to_map(coordxy *cx, coordxy *cy, schar dx, schar dy)
 {
     /* diagonal moves complicate this... */
     if (*cx + dx < 1) {
@@ -779,8 +779,9 @@ getpos(coord *ccp, boolean force, const char *goal)
     char pick_chars[6];
     char mMoOdDxX[13];
     int result = 0;
-    int cx, cy, i, c;
+    int i, c;
     int sidx;
+    coordxy cx, cy;
     coordxy tx = u.ux, ty = u.uy, vx = 0, vy = 0;
     boolean msg_given = TRUE; /* clear message window by default */
     boolean show_goal_msg = FALSE;
@@ -1042,7 +1043,8 @@ getpos(coord *ccp, boolean force, const char *goal)
         } else {
             if (!strchr(quitchars, c)) {
                 char matching[MAXPCHARS];
-                int pass, lo_x, lo_y, hi_x, hi_y, k = 0;
+                int pass, k = 0;
+                coordxy lo_x, lo_y, hi_x, hi_y;
 
                 (void) memset((genericptr_t) matching, 0, sizeof matching);
                 for (sidx = 0; sidx < MAXPCHARS; sidx++) {
