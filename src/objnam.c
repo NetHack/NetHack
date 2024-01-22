@@ -89,7 +89,7 @@ struct Jitem {
         ConcUpdate(base);                                               \
     } while (0)
 #define ConcUpdate(base) \
-    base ## _eos = eos(base ## _eos),                                   \
+    base ## _eos = eos(base),                                           \
     /* convert signed ptrdiff_t to unsigned size_t */                   \
     base ## spaceleft = (size_t) (base ## _end - base ## _eos)
 
@@ -573,8 +573,8 @@ xname_flags(
        aside for use by doname() */
     buf = gx.xnamep + PREFIX; /* leave room for "17 -3 " */
     buf_end = gx.xnamep + BUFSZ - 1; /* last byte within the obuf[] */
-    buf[0] = '\0', buf_eos = buf; /* eos(buf) for empty buf[] */
-    ConcUpdate(buf); /* update buf_eos (redundantly) and bufspaceleft */
+    buf[0] = '\0';
+    ConcUpdate(buf); /* set buf_eos and bufspaceleft */
 
     if (Role_if(PM_SAMURAI)) {
         actualn = Japanese_item_name(typ, actualn);
@@ -922,8 +922,8 @@ xname_flags(
        it could make buf[] become shorter */
     if (pluralize) {
         obufp = makeplural(buf);
-        buf[0] = '\0', buf_eos = buf; /* replace the whole string */
-        ConcUpdate(buf);
+        buf[0] = '\0'; /* replace the whole string */
+        ConcUpdate(buf); /* reset buf_eos and bufspaceleft */
         Concat(buf, 0, obufp);
         releaseobuf(obufp);
     }
@@ -1345,7 +1345,7 @@ doname_base(
                    : doffing(obj) ? " (being doffed)"
                      : donning(obj) ? " (being donned)"
                        : " (being worn)");
-            /* we just added a parenthesized pharse, but the right paren
+            /* we just added a parenthesized phrase, but the right paren
                might be absent if the appended string got truncated */
             if (bp_eos[-1] == ')') {
                 /* slippery fingers is an intrinsic condition of the hero
@@ -1631,7 +1631,9 @@ doname_base(
         else
             ConcatF1(bp, 0, " (%u aum)", obj->owt);
 
-        /* ConcatF1(bp) updates bp_eos + bpspaceleft; we're done with them */
+        /* ConcatF1(bp) updates bp_eos and bpspaceleft but we're done
+           with them now; add a fake use so compiler won't complain
+           about a variable assignment that won't be subsequently used */
         nhUse(bp_eos);
         nhUse(bpspaceleft);
     }
@@ -1639,19 +1641,41 @@ doname_base(
     bp = strprepend(bp, prefix);
 
     /*
+     * Last gasp bounds check.
+     *
      * If caller intends this to be for a menu entry, make sure that
      * there is some room to combine with menu selector prefix without
      * exceeding BUFSZ-1.
      *
-     * 4: width of menu entry selector text: "c - " for tty.  For
-     * curses, that wastes a space since it only needs 3: "c) ".
+     * offsetbp=4: width of menu entry selector text: "c - " for tty.
+     * For curses, that wastes a char since it only needs 3: "c) ".
      *
      * Reaching full BUFSZ-1 length can't happen unless both doname
      * (BUFSZ-PREFIX) and strprepend (PREFIX) use up all available
-     * space.
+     * space or one of them overflows without being detected.
      */
-    if (for_menu && strlen(bp) + 4 > BUFSZ - 1)
-        bp[BUFSZ - 1 - 4] = '\0';
+    if (strlen(bp) > BUFSZ - 1) {
+        paniclog("doname", bp);
+        /* ideally this will never happen; if xnamep is any obuf[]
+           other than the last, overflow here would be relatively
+           benign and we could probably keep going */
+        panic("doname: long object description overflow.");
+        /*NOTREACHED*/
+    } else {
+        static int doname_full = 0;
+        int offsetbp = for_menu ? 4 : 0;
+
+        if (strlen(bp) + offsetbp >= BUFSZ - 1) {
+            /* for !offsetbp, we'll only get here if strlen(bp)==BUFSZ-1 */
+            if (!doname_full++) {
+                paniclog("doname", bp);
+                Sprintf(tmpbuf, "long object description%s.",
+                        offsetbp ? " truncated for menu use" : "");
+                paniclog("doname", tmpbuf);
+            }
+            bp[BUFSZ - 1 - offsetbp] = '\0';
+        }
+    }
 
     return bp;
 }
