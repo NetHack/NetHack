@@ -1,4 +1,4 @@
-/* NetHack 3.7	dlb_main.c	$NHDT-Date: 1687547434 2023/06/23 19:10:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.7	dlb_main.c	$NHDT-Date: 1705957188 2024/01/22 20:59:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.25 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -556,12 +556,13 @@ xexit(int retcd)
 unsigned
 Strlen_(const char *str, const char *file, int line)
 {
-    size_t len = strnlen(str, LARGEST_INT);
+    size_t len = strlen(str, LARGEST_INT);
 
-    if (len == LARGEST_INT) {
+    if (len >= LARGEST_INT) {
         panic("%s:%d string too long", file, line);
         /*NOTREACHED*/
     }
     return (unsigned) len;
 }
+
 /*dlb_main.c*/

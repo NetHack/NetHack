@@ -1,4 +1,4 @@
-/* NetHack 3.7	hacklib.c	$NHDT-Date: 1596498172 2020/08/03 23:42:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.85 $ */
+/* NetHack 3.7	hacklib.c	$NHDT-Date: 1705957184 2024/01/22 20:59:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.115 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
@@ -235,10 +235,14 @@ c_eos(const char *s)
 
 /* like strlen(3) but returns unsigned and panics if string is unreasonably long */
 unsigned
-Strlen_(const char *str, const char *file, int line){
-    size_t len = strnlen(str, LARGEST_INT);
+Strlen_(
+    const char *str,
+    const char *file,
+    int line)
+{
+    size_t len = strlen(str);
 
-    if (len == LARGEST_INT)
+    if (len >= LARGEST_INT)
         panic("%s:%d string too long", file, line);
     return (unsigned) len;
 }
@@ -246,7 +250,10 @@ Strlen_(const char *str, const char *file, int line){
 /* determine whether 'str' starts with 'chkstr', possibly ignoring case;
  * panics on huge strings */
 boolean
-str_start_is(const char *str, const char *chkstr, boolean caseblind)
+str_start_is(
+    const char *str,
+    const char *chkstr,
+    boolean caseblind)
 {
     int n = LARGEST_INT;
 
