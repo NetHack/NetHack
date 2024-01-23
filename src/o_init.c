@@ -6,6 +6,7 @@
 #include "hack.h"
 
 static void setgemprobs(d_level *);
+static void randomize_gem_colors(void);
 static void shuffle(int, int, boolean);
 static void shuffle_all(void);
 static int QSORTCALLBACK discovered_cmp(const genericptr, const genericptr);
@@ -76,6 +77,34 @@ setgemprobs(d_level* dlev)
     go.oclass_prob_totals[GEM_CLASS] = sum;
 }
 
+/* some gems can have different colors */
+static void
+randomize_gem_colors(void)
+{
+#define COPY_OBJ_DESCR(o_dst, o_src) \
+    o_dst.oc_descr_idx = o_src.oc_descr_idx, o_dst.oc_color = o_src.oc_color
+    if (rn2(2)) { /* change turquoise from green to blue? */
+        COPY_OBJ_DESCR(objects[TURQUOISE], objects[SAPPHIRE]);
+    }
+    if (rn2(2)) { /* change aquamarine from green to blue? */
+        COPY_OBJ_DESCR(objects[AQUAMARINE], objects[SAPPHIRE]);
+    }
+    switch (rn2(4)) { /* change fluorite from violet? */
+    case 0:
+        break;
+    case 1: /* blue */
+        COPY_OBJ_DESCR(objects[FLUORITE], objects[SAPPHIRE]);
+        break;
+    case 2: /* white */
+        COPY_OBJ_DESCR(objects[FLUORITE], objects[DIAMOND]);
+        break;
+    case 3: /* green */
+        COPY_OBJ_DESCR(objects[FLUORITE], objects[EMERALD]);
+        break;
+    }
+#undef COPY_OBJ_DESCR
+}
+
 /* shuffle descriptions on objects o_low to o_high */
 static void
 shuffle(int o_low, int o_high, boolean domaterial)
@@ -120,8 +149,6 @@ init_objects(void)
 {
     int i, first, last, prevoclass;
     char oclass;
-#define COPY_OBJ_DESCR(o_dst, o_src) \
-    o_dst.oc_descr_idx = o_src.oc_descr_idx, o_dst.oc_color = o_src.oc_color
 
     for (i = 0; i <= MAXOCLASSES; i++) {
         gb.bases[i] = 0;
@@ -156,26 +183,7 @@ init_objects(void)
 
         if (oclass == GEM_CLASS) {
             setgemprobs((d_level *) 0);
-
-            if (rn2(2)) { /* change turquoise from green to blue? */
-                COPY_OBJ_DESCR(objects[TURQUOISE], objects[SAPPHIRE]);
-            }
-            if (rn2(2)) { /* change aquamarine from green to blue? */
-                COPY_OBJ_DESCR(objects[AQUAMARINE], objects[SAPPHIRE]);
-            }
-            switch (rn2(4)) { /* change fluorite from violet? */
-            case 0:
-                break;
-            case 1: /* blue */
-                COPY_OBJ_DESCR(objects[FLUORITE], objects[SAPPHIRE]);
-                break;
-            case 2: /* white */
-                COPY_OBJ_DESCR(objects[FLUORITE], objects[DIAMOND]);
-                break;
-            case 3: /* green */
-                COPY_OBJ_DESCR(objects[FLUORITE], objects[EMERALD]);
-                break;
-            }
+            randomize_gem_colors();
         }
         first = last;
         prevoclass = (int) oclass;
