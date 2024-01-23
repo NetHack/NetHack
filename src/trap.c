@@ -1923,7 +1923,6 @@ trapeffect_level_telep(
         seetrap(trap);
         level_tele_trap(trap, trflags);
     } else {
-        int tt = trap->ttyp;
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
         boolean forcetrap = ((trflags & FORCETRAP) != 0);
 
