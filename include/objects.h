@@ -1402,7 +1402,7 @@ SPELL("blank paper", "plain", P_NONE, 18, 0, 0, 0, 0, HI_PAPER,
    even if hero learns every spell, spl_book[] will have at least one
    unused slot at end; an unused slot is needed for use as terminator */
 MARKER(LAST_SPELL, SPE_BLANK_PAPER)
-/* tribute book for 3.6 */
+/* tribute book added in 3.6 */
 OBJECT(OBJ("novel", "paperback"),
        BITS(0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, P_NONE, PAPER),
        0, SPBOOK_CLASS, 1, 0, 10, 20, 0, 0, 0, 1, 20, CLR_BRIGHT_BLUE,
