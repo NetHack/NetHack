@@ -10,6 +10,7 @@ static void monshoot(struct monst *, struct obj *, struct obj *);
 static boolean ucatchgem(struct obj *, struct monst *);
 static const char* breathwep_name(int);
 static boolean drop_throw(struct obj *, boolean, coordxy, coordxy);
+static boolean blocking_terrain(coordxy, coordxy);
 static int m_lined_up(struct monst *, struct monst *) NONNULLARG12;
 
 #define URETREATING(x, y) \
@@ -1076,6 +1077,16 @@ breamu(struct monst* mtmp, struct attack* mattk)
     return breamm(mtmp, mattk, &gy.youmonst);
 }
 
+/* return TRUE if terrain at x,y blocks linedup checks */
+static boolean
+blocking_terrain(coordxy x, coordxy y)
+{
+    if (!isok(x, y) || IS_ROCK(levl[x][y].typ) || closed_door(x, y)
+        || is_waterwall(x, y) || levl[x][y].typ == LAVAWALL)
+        return TRUE;
+    return FALSE;
+}
+
 /* Move from (ax,ay) to (bx,by), but only if distance is up to BOLT_LIM
    and only in straight line or diagonal, calling fnc for each step.
    Stops if fnc return TRUE, or if step was blocked by wall or closed door.
@@ -1106,10 +1117,7 @@ linedup_callback(
         do {
             /* <bx,by> is guaranteed to eventually converge with <ax,ay> */
             bx += dx, by += dy;
-            if (!isok(bx, by))
-                return FALSE;
-            if (IS_ROCK(levl[bx][by].typ) || closed_door(bx, by)
-                || is_waterwall(bx, by))
+            if (blocking_terrain(bx, by))
                 return FALSE;
             if ((*fnc)(bx, by))
                 return TRUE;
@@ -1152,8 +1160,7 @@ linedup(
         do {
             /* <bx,by> is guaranteed to eventually converge with <ax,ay> */
             bx += dx, by += dy;
-            if (IS_ROCK(levl[bx][by].typ) || closed_door(bx, by)
-                || is_waterwall(bx, by))
+            if (blocking_terrain(bx, by))
                 return FALSE;
             if (sobj_at(BOULDER, bx, by))
                 ++boulderspots;
