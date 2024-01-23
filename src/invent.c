@@ -1670,7 +1670,7 @@ any_obj_ok(struct obj *obj)
     return GETOBJ_EXCLUDE;
 }
 
-/* return string describing you hands based on action. */
+/* return string describing your hands based on action. */
 static char *
 getobj_hands_txt(const char *action)
 {
