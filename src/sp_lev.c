@@ -95,6 +95,8 @@ static void l_table_getset_feature_flag(lua_State *, int, int, const char *,
 static void l_get_lregion(lua_State *, lev_region *);
 static void sel_set_lit(coordxy, coordxy, genericptr_t);
 static void add_doors_to_room(struct mkroom *);
+static void get_table_coords_or_region(lua_State *,
+                             coordxy *, coordxy *, coordxy *, coordxy *);
 static void selection_iterate(struct selectionvar *, select_iter_func,
                               genericptr_t);
 static void sel_set_ter(coordxy, coordxy, genericptr_t);
@@ -6171,6 +6173,26 @@ add_doors_to_room(struct mkroom *croom)
 
 DISABLE_WARNING_UNREACHABLE_CODE
 
+/* inside a lua table, get fields x1,y1,x2,y2 or region table */
+static void
+get_table_coords_or_region(lua_State *L,
+                           coordxy *dx1, coordxy *dy1,
+                           coordxy *dx2, coordxy *dy2)
+{
+    *dx1 = get_table_int_opt(L, "x1", -1);
+    *dy1 = get_table_int_opt(L, "y1", -1);
+    *dx2 = get_table_int_opt(L, "x2", -1);
+    *dy2 = get_table_int_opt(L, "y2", -1);
+
+    if (*dx1 == -1 && *dy1 == -1 && *dx2 == -1 && *dy2 == -1) {
+        lua_Integer rx1, ry1, rx2, ry2;
+
+        get_table_region(L, "region", &rx1, &ry1, &rx2, &ry2, FALSE);
+        *dx1 = rx1; *dy1 = ry1;
+        *dx2 = rx2; *dy2 = ry2;
+    }
+}
+
 /* region(selection, lit); */
 /* region({ x1=NN, y1=NN, x2=NN, y2=NN, lit=BOOL, type=ROOMTYPE, joined=BOOL,
  *          irregular=BOOL, filled=NN [ , contents = FUNCTION ] }); */
@@ -6198,17 +6220,9 @@ lspo_region(lua_State *L)
         do_arrival_room = get_table_boolean_opt(L, "arrival_room", 0);
         rtype = get_table_roomtype_opt(L, "type", OROOM);
         rlit = get_table_int_opt(L, "lit", -1);
-        dx1 = get_table_int_opt(L, "x1", -1); /* TODO: area */
-        dy1 = get_table_int_opt(L, "y1", -1);
-        dx2 = get_table_int_opt(L, "x2", -1);
-        dy2 = get_table_int_opt(L, "y2", -1);
 
-        if (dx1 == -1 && dy1 == -1 && dx2 == -1 && dy2 == -1) {
-            lua_Integer rx1, ry1, rx2, ry2;
-            get_table_region(L, "region", &rx1, &ry1, &rx2, &ry2, FALSE);
-            dx1 = rx1; dy1 = ry1;
-            dx2 = rx2; dy2 = ry2;
-        }
+        get_table_coords_or_region(L, &dx1, &dy1, &dx2, &dy2);
+
         if (dx1 == -1 && dy1 == -1 && dx2 == -1 && dy2 == -1) {
             nhl_error(L, "region needs region");
         }
@@ -6489,17 +6503,7 @@ lspo_wall_property(lua_State *L)
 
     lcheck_param_table(L);
 
-    dx1 = get_table_int_opt(L, "x1", -1);
-    dy1 = get_table_int_opt(L, "y1", -1);
-    dx2 = get_table_int_opt(L, "x2", -1);
-    dy2 = get_table_int_opt(L, "y2", -1);
-
-    if (dx1 == -1 && dy1 == -1 && dx2 == -1 && dy2 == -1) {
-        lua_Integer rx1, ry1, rx2, ry2;
-        get_table_region(L, "region", &rx1, &ry1, &rx2, &ry2, FALSE);
-        dx1 = rx1; dy1 = ry1;
-        dx2 = rx2; dy2 = ry2;
-    }
+    get_table_coords_or_region(L, &dx1, &dy1, &dx2, &dy2);
 
     wprop = wprop2i[get_table_option(L, "property", "nondiggable", wprops)];
 
