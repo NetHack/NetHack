@@ -26,7 +26,7 @@ static boolean only_here(struct obj *);
 static void compactify(char *);
 static boolean taking_off(const char *);
 static void mime_action(const char *);
-static char *getobj_hands_txt(const char *);
+static char *getobj_hands_txt(const char *, char *);
 static int ckvalidcat(struct obj *);
 static int ckunpaid(struct obj *);
 static char *safeq_xprname(struct obj *);
@@ -1672,10 +1672,8 @@ any_obj_ok(struct obj *obj)
 
 /* return string describing your hands based on action. */
 static char *
-getobj_hands_txt(const char *action)
+getobj_hands_txt(const char *action, char *qbuf)
 {
-    static char qbuf[QBUFSZ];
-
     if (!strcmp(action, "grease")) {
         Sprintf(qbuf, "your %s", fingers_or_gloves(FALSE));
     } else if (!strcmp(action, "write with")) {
@@ -1931,7 +1929,7 @@ getobj(
                 Sprintf(menuquery, "What do you want to %s?", word);
             if (!allowed_choices || *allowed_choices == HANDS_SYM
                 || *buf == HANDS_SYM)
-                handsbuf = getobj_hands_txt(word);
+                handsbuf = getobj_hands_txt(word, qbuf);
             ilet = display_pickinv(allowed_choices, handsbuf,
                                    menuquery, allownone, TRUE,
                                    allowcnt ? &ctmp : (long *) 0);
