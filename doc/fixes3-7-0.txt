@@ -1838,6 +1838,13 @@ farlook at something that was on top of an engraving or grave would report
 	the engraving text or headstone epitaph along with the 'something'
 when carrying 52 items (excluding gold), hero couldn't pick up a thrown,
 	stolen, or dropped item which was split off from a still-carried stack
+supply chests on early levels weighed the same as empty chests until something
+	was added or removed
+stacked pair of potions of healing in supply chest weighed same as one potion;
+	drinking one of the two gave a healing message, then both had their
+	weight updated as their stack was split; if close to an encumbrance
+	threshold, new weight would trigger an encumbrance increase message,
+	immediately followed a decrease message when the potion got used up
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

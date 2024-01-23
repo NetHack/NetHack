@@ -220,6 +220,8 @@ mkobj_erosions(struct obj *otmp)
     }
 }
 
+/* make a random object of class 'let' at a specific location;
+   'let' might be random class; place_object() will validate <x,y> */
 struct obj *
 mkobj_at(char let, coordxy x, coordxy y, boolean artif)
 {
@@ -230,8 +232,12 @@ mkobj_at(char let, coordxy x, coordxy y, boolean artif)
     return otmp;
 }
 
+/* make a specific object at a specific location */
 struct obj *
-mksobj_at(int otyp, coordxy x, coordxy y, boolean init, boolean artif)
+mksobj_at(
+    int otyp,
+    coordxy x, coordxy y,
+    boolean init, boolean artif)
 {
     struct obj *otmp;
 
@@ -240,12 +246,13 @@ mksobj_at(int otyp, coordxy x, coordxy y, boolean init, boolean artif)
     return otmp;
 }
 
+
+/* used for extra orctown loot */
 struct obj *
 mksobj_migr_to_species(
     int otyp,
-    unsigned int mflags2,
-    boolean init,
-    boolean artif)
+    unsigned mflags2,
+    boolean init, boolean artif)
 {
     struct obj *otmp;
 
@@ -371,6 +378,7 @@ mkbox_cnts(struct obj *box)
         }
         (void) add_to_container(box, otmp);
     }
+    /* caller will update box->owt */
 }
 
 /* select a random, common monster type */
@@ -848,8 +856,7 @@ unknow_object(struct obj *obj)
     obj->known = objects[obj->otyp].oc_uses_known ? 0 : 1;
 }
 
-/* do some initialization to a newly created object.
-   object otyp must be set. */
+/* do some initialization to newly created object; otyp must already be set */
 static void
 mksobj_init(struct obj *otmp, boolean artif)
 {
@@ -1124,7 +1131,7 @@ mksobj_init(struct obj *otmp, boolean artif)
             otmp->corpsenm = rndmonnum();
             if (!verysmall(&mons[otmp->corpsenm])
                 && rn2(level_difficulty() / 2 + 10) > 10)
-                (void) add_to_container(otmp,
+                (void) add_to_container(otmp, /* callber will update owt */
                                         mkobj(SPBOOK_no_NOVEL, FALSE));
         }
         /* boulder init'd below in the 'regardless of !init' code */
@@ -2578,6 +2585,10 @@ add_to_minv(struct monst *mon, struct obj *obj)
 /*
  * Add obj to container, make sure obj is "free".  Returns (merged) obj.
  * The input obj may be deleted in the process.
+ *
+ * Caveat:  this does not update the container's weight [possibly to
+ * prevent that from being recalculated repeatedly when adding multiple
+ * items].
  */
 struct obj *
 add_to_container(struct obj *container, struct obj *obj)
