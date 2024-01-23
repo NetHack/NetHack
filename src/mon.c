@@ -2128,24 +2128,7 @@ mfndpos(
                                    ttmp->ttyp);
                             continue;
                     }
-                    if ((ttmp->ttyp != RUST_TRAP
-                         || mdat == &mons[PM_IRON_GOLEM])
-                        && ttmp->ttyp != STATUE_TRAP
-                        && ttmp->ttyp != VIBRATING_SQUARE
-                        && ((!is_pit(ttmp->ttyp) && !is_hole(ttmp->ttyp))
-                            || (!is_flyer(mdat) && !is_floater(mdat)
-                                && !is_clinger(mdat)) || Sokoban)
-                        && (ttmp->ttyp != SLP_GAS_TRAP || !resists_sleep(mon))
-                        && (ttmp->ttyp != BEAR_TRAP
-                            || (mdat->msize > MZ_SMALL && !amorphous(mdat)
-                                && !is_flyer(mdat) && !is_floater(mdat)
-                                && !is_whirly(mdat) && !unsolid(mdat)))
-                        && (ttmp->ttyp != FIRE_TRAP || !resists_fire(mon))
-                        && (ttmp->ttyp != SQKY_BOARD || !is_flyer(mdat))
-                        && (ttmp->ttyp != WEB
-                            || (!amorphous(mdat) && !webmaker(mdat)
-                                && !is_whirly(mdat) && !unsolid(mdat)))
-                        && (ttmp->ttyp != ANTI_MAGIC || !resists_magm(mon))) {
+                    if (!m_harmless_trap(mon, ttmp)) {
                         if (!(flag & ALLOW_TRAPS)) {
                             if (mon_knows_traps(mon, ttmp->ttyp))
                                 continue;

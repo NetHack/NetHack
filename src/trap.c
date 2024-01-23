@@ -1049,6 +1049,88 @@ check_in_air(struct monst *mtmp, unsigned trflags)
             || ((is_you ? Flying : is_flyer(mtmp->data)) && !plunged));
 }
 
+/* is trap ttmp harmless to monster mtmp? */
+boolean
+m_harmless_trap(struct monst *mtmp, struct trap *ttmp)
+{
+    struct permonst *mdat = mtmp->data;
+
+    /* this handles most of the traps, but those are still included
+       in the switch case below for completeness */
+    if (!Sokoban && floor_trigger(ttmp->ttyp) && check_in_air(mtmp, 0L))
+        return TRUE;
+
+    switch (ttmp->ttyp) {
+    case ARROW_TRAP:
+        break;
+    case DART_TRAP:
+        break;
+    case ROCKTRAP:
+        break;
+    case SQKY_BOARD:
+        break;
+    case BEAR_TRAP:
+        if (mdat->msize <= MZ_SMALL || amorphous(mdat)
+            || is_whirly(mdat) || unsolid(mdat))
+            return TRUE;
+        break;
+    case LANDMINE:
+        break;
+    case ROLLING_BOULDER_TRAP:
+        break;
+    case SLP_GAS_TRAP:
+        if (resists_sleep(mtmp) || defended(mtmp, AD_SLEE))
+            return TRUE;
+        break;
+    case RUST_TRAP:
+        if (mdat != &mons[PM_IRON_GOLEM])
+            return TRUE;
+        break;
+    case FIRE_TRAP:
+        if (resists_fire(mtmp) || defended(mtmp, AD_FIRE))
+            return TRUE;
+        break;
+    case PIT:
+        /*FALLTHRU*/
+    case SPIKED_PIT:
+        /*FALLTHRU*/
+    case HOLE:
+        /*FALLTHRU*/
+    case TRAPDOOR:
+        if (is_clinger(mdat) && !Sokoban)
+            return TRUE;
+        break;
+    case TELEP_TRAP:
+        break;
+    case LEVEL_TELEP:
+        break;
+    case MAGIC_PORTAL:
+        break;
+    case WEB:
+        if (amorphous(mdat) || webmaker(mdat)
+            || is_whirly(mdat) || unsolid(mdat))
+            return TRUE;
+        break;
+    case STATUE_TRAP:
+        return TRUE;
+    case MAGIC_TRAP:
+        return TRUE; /* usually */
+    case ANTI_MAGIC:
+        if (resists_magm(mtmp) || defended(mtmp, AD_MAGM))
+            return TRUE;
+        break;
+    case POLY_TRAP:
+        break;
+    case VIBRATING_SQUARE:
+        return TRUE;
+    default:
+        impossible("m_harmless_trap: unknown trap %i", ttmp->ttyp);
+        break;
+    }
+
+    return FALSE;
+}
+
 static int
 trapeffect_arrow_trap(
     struct monst *mtmp,

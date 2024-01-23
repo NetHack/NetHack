@@ -3099,6 +3099,7 @@ extern struct monst *activate_statue_trap(struct trap *, coordxy, coordxy,
 extern int immune_to_trap(struct monst *, unsigned) NO_NNARGS; /* revisit */
 extern void set_utrap(unsigned, unsigned);
 extern void reset_utrap(boolean);
+extern boolean m_harmless_trap(struct monst *, struct trap *);
 extern void dotrap(struct trap *, unsigned) NONNULLARG1;
 extern void seetrap(struct trap *) NONNULLARG1;
 extern void feeltrap(struct trap *) NONNULLARG1;
