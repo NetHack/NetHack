@@ -26,6 +26,7 @@ static boolean only_here(struct obj *);
 static void compactify(char *);
 static boolean taking_off(const char *);
 static void mime_action(const char *);
+static char *getobj_hands_txt(const char *);
 static int ckvalidcat(struct obj *);
 static int ckunpaid(struct obj *);
 static char *safeq_xprname(struct obj *);
@@ -1669,6 +1670,29 @@ any_obj_ok(struct obj *obj)
     return GETOBJ_EXCLUDE;
 }
 
+/* return string describing you hands based on action. */
+static char *
+getobj_hands_txt(const char *action)
+{
+    static char qbuf[QBUFSZ];
+
+    if (!strcmp(action, "grease")) {
+        Sprintf(qbuf, "your %s", fingers_or_gloves(FALSE));
+    } else if (!strcmp(action, "write with")) {
+        Sprintf(qbuf, "your %s", body_part(FINGERTIP));
+    } else if (!strcmp(action, "wield")) {
+        Sprintf(qbuf, "your %s %s%s", uarmg ? "gloved" : "bare",
+                makeplural(body_part(HAND)),
+                !uwep ? " (wielded)" : "");
+    } else if (!strcmp(action, "ready")) {
+        Sprintf(qbuf, "empty quiver%s",
+                !uquiver ? " (nothing readied)" : "");
+    } else {
+        Sprintf(qbuf, "your %s", makeplural(body_part(HAND)));
+    }
+    return qbuf;
+}
+
 /*
  * getobj returns:
  *      struct obj *xxx:        object to do something with.
@@ -1897,6 +1921,7 @@ getobj(
             char *allowed_choices = (ilet == '?') ? lets : (char *) 0;
             long ctmp = 0;
             char menuquery[QBUFSZ];
+            char *handsbuf = (char *) 0;
 
             if (ilet == '?' && !*lets && *altlets)
                 allowed_choices = altlets;
@@ -1904,23 +1929,10 @@ getobj(
             menuquery[0] = qbuf[0] = '\0';
             if (iflags.force_invmenu)
                 Sprintf(menuquery, "What do you want to %s?", word);
-            if (!allowed_choices || *allowed_choices == '-' || *buf == '-') {
-                if (!strcmp(word, "grease")) {
-                    Sprintf(qbuf, "your %s", fingers_or_gloves(FALSE));
-                } else if (!strcmp(word, "write with")) {
-                    Sprintf(qbuf, "your %s", body_part(FINGERTIP));
-                } else if (!strcmp(word, "wield")) {
-                    Sprintf(qbuf, "your %s %s%s", uarmg ? "gloved" : "bare",
-                            makeplural(body_part(HAND)),
-                            !uwep ? " (wielded)" : "");
-                } else if (!strcmp(word, "ready")) {
-                    Sprintf(qbuf, "empty quiver%s",
-                            !uquiver ? " (nothing readied)" : "");
-                } else {
-                    Sprintf(qbuf, "your %s", makeplural(body_part(HAND)));
-                }
-            }
-            ilet = display_pickinv(allowed_choices, *qbuf ? qbuf : (char *) 0,
+            if (!allowed_choices || *allowed_choices == HANDS_SYM
+                || *buf == HANDS_SYM)
+                handsbuf = getobj_hands_txt(word);
+            ilet = display_pickinv(allowed_choices, handsbuf,
                                    menuquery, allownone, TRUE,
                                    allowcnt ? &ctmp : (long *) 0);
             if (!ilet) {
