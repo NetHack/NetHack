@@ -4138,7 +4138,7 @@ iter_mons_safe(boolean (*bfunc)(struct monst *))
 }
 
 
-/* iterate all living monsters on current level, calling func for each. */
+/* iterate all living monsters on current level, calling vfunc for each. */
 void
 iter_mons(void (*vfunc)(struct monst *))
 {
@@ -4154,8 +4154,8 @@ iter_mons(void (*vfunc)(struct monst *))
 }
 
 
-/* iterate all living monsters on current level, calling func for each.
-   if func returns TRUE, stop and return that monster. */
+/* iterate all living monsters on current level, calling bfunc for each.
+   if bfunc returns TRUE, stop and return that monster. */
 struct monst *
 get_iter_mons(boolean (*bfunc)(struct monst *))
 {
@@ -4171,9 +4171,9 @@ get_iter_mons(boolean (*bfunc)(struct monst *))
     return mtmp;
 }
 
-/* iterate all living monsters on current level, calling func for each,
+/* iterate all living monsters on current level, calling bfunc for each,
    passing x,y to the function.
-   if func returns TRUE, stop and return that monster. */
+   if bfunc returns TRUE, stop and return that monster. */
 struct monst *
 get_iter_mons_xy(
     boolean (*bfunc)(struct monst *, coordxy, coordxy),
