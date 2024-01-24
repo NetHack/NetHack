@@ -683,6 +683,7 @@ dochug(register struct monst* mtmp)
         /* tactics -> mnexto -> deal_with_overcrowding */
         if (mtmp->mstate)
             return 0;
+        set_apparxy(mtmp);
     }
 
     /* check distance and scariness of attacks */
