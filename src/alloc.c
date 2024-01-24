@@ -1,4 +1,4 @@
-/* NetHack 3.7	alloc.c	$NHDT-Date: 1703716159 2023/12/27 22:29:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.7	alloc.c	$NHDT-Date: 1706082987 2024/01/24 07:56:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -41,11 +41,13 @@ static boolean tried_heaplog = FALSE;
  * recognizes that the following manipulation overcomes that via
  * rounding the requested length up to the next long.  NetHack doesn't
  * make a lot of tiny allocations, so this shouldn't waste much memory
- * regardless of whether malloc() does something similar.
+ * regardless of whether malloc() does something similar.  NetHack
+ * isn't expected to call alloc(0), but if that happens treat it as
+ * alloc(sizeof (long)) instead.
  */
 #define ForceAlignedLength(LTH) \
     do {                                                        \
-        if ((LTH) % sizeof (long) != 0)                         \
+        if (!(LTH) || (LTH) % sizeof (long) != 0)               \
             (LTH) += sizeof (long) - (LTH) % sizeof (long);     \
     } while (0)
 
