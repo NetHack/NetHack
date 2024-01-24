@@ -1,4 +1,4 @@
-/* NetHack 3.7  decl.h  $NHDT-Date: 1704043695 2023/12/31 17:28:15 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.351 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1706079834 2024/01/24 07:03:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.355 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -472,6 +472,10 @@ struct instance_globals_i {
     char *invbuf;
     unsigned invbufsiz;
     int in_sync_perminvent;
+
+    /* mon.c */
+    struct monst **itermonarr; /* temporary array of all N monsters
+                                * on the current level */
 
     /* restore.c */
     struct bucket *id_map;

@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1702023272 2023/12/08 08:14:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.532 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1706079843 2024/01/24 07:04:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.549 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4102,38 +4102,45 @@ normal_shape(struct monst *mon)
     }
 }
 
-/* iterate all monsters on the level, even dead or off-map ones,
-   calling func for each monster. if func returns TRUE, stop iterating.
-   safe for list deletions and insertions, and guarantees
-   calling func once per monster in the list. */
-void
-iter_mons_safe(boolean (*func)(struct monst *))
-{
-    struct monst **monarr;
-    int i = 0, nmons = 0;
-    struct monst *mtmp;
-    boolean stopiter = FALSE;
+/* Iterate all monsters on the level, even dead or off-map ones, calling
+   bfunc() for each monster.  If bfunc() returns TRUE, stop iterating.
+   If the game ends during the call to bfunc(), then freedynamicdata()
+   will need to free 'monarr' for us so we make a copy of it in struct g.
 
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+   Safe for list deletions and insertions, and guarantees calling bfunc()
+   once per monster in fmon unless it returns TRUE (or game ends). */
+void
+iter_mons_safe(boolean (*bfunc)(struct monst *))
+{
+    struct monst **monarr, *mtmp;
+    int i, nmons;
+
+    for (nmons = 0, mtmp = fmon; mtmp; mtmp = mtmp->nmon)
         nmons++;
 
-    monarr = (struct monst **) alloc(nmons * sizeof(struct monst *));
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-        monarr[i++] = mtmp;
+    if (nmons) {
+        monarr = (struct monst **) alloc(nmons * sizeof (struct monst *));
+        gi.itermonarr = monarr; /* accessible to freedynamicdata() */
 
-    for (i = 0; i < nmons && !stopiter; i++) {
-        mtmp = monarr[i];
-        if (func(mtmp))
-            stopiter = TRUE;
+        for (i = 0, mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+            monarr[i++] = mtmp;
+
+        for (i = 0; i < nmons; i++) {
+            mtmp = monarr[i];
+            if ((*bfunc)(mtmp))
+                break;
+        }
+
+        free(monarr);
+        gi.itermonarr = NULL;
     }
-
-    free(monarr);
+    return;
 }
 
 
 /* iterate all living monsters on current level, calling func for each. */
 void
-iter_mons(void (*func)(struct monst *))
+iter_mons(void (*vfunc)(struct monst *))
 {
     struct monst *mtmp, *mtmp2;
 
@@ -4141,15 +4148,16 @@ iter_mons(void (*func)(struct monst *))
         mtmp2 = mtmp->nmon;
         if (DEADMONSTER(mtmp) || mon_offmap(mtmp))
             continue;
-        func(mtmp);
+        (*vfunc)(mtmp);
     }
+    return;
 }
 
 
 /* iterate all living monsters on current level, calling func for each.
    if func returns TRUE, stop and return that monster. */
 struct monst *
-get_iter_mons(boolean (*func)(struct monst *))
+get_iter_mons(boolean (*bfunc)(struct monst *))
 {
     struct monst *mtmp, *mtmp2;
 
@@ -4157,18 +4165,19 @@ get_iter_mons(boolean (*func)(struct monst *))
         mtmp2 = mtmp->nmon;
         if (DEADMONSTER(mtmp) || mon_offmap(mtmp))
             continue;
-        if (func(mtmp))
-            return mtmp;
+        if ((*bfunc)(mtmp))
+            break;
     }
-    return (struct monst *) 0;
+    return mtmp;
 }
 
 /* iterate all living monsters on current level, calling func for each,
    passing x,y to the function.
    if func returns TRUE, stop and return that monster. */
 struct monst *
-get_iter_mons_xy(boolean (*func)(struct monst *, coordxy, coordxy),
-                coordxy x, coordxy y)
+get_iter_mons_xy(
+    boolean (*bfunc)(struct monst *, coordxy, coordxy),
+    coordxy x, coordxy y)
 {
     struct monst *mtmp, *mtmp2;
 
@@ -4176,10 +4185,10 @@ get_iter_mons_xy(boolean (*func)(struct monst *, coordxy, coordxy),
         mtmp2 = mtmp->nmon;
         if (DEADMONSTER(mtmp) || mon_offmap(mtmp))
             continue;
-        if (func(mtmp, x, y))
-            return mtmp;
+        if ((*bfunc)(mtmp, x, y))
+            break;
     }
-    return (struct monst *) 0;
+    return mtmp;
 }
 
 

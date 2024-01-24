@@ -1,4 +1,4 @@
-/* NetHack 3.7	decl.c	$NHDT-Date: 1704043695 2023/12/31 17:28:15 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.309 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1706079841 2024/01/24 07:04:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.314 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -445,6 +445,8 @@ const struct instance_globals_i g_init_i = {
     NULL, /* invbuf */
     0U, /* invbufsize */
     0,       /* in_sync_perminvent */
+    /* mon.c */
+    NULL, /* itermonarr */
     /* restore.c */
     UNDEFINED_PTR, /* id_map */
     /* sp_lev.c */

@@ -1,4 +1,4 @@
-/* NetHack 3.7	save.c	$NHDT-Date: 1689629246 2023/07/17 21:27:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.207 $ */
+/* NetHack 3.7	save.c	$NHDT-Date: 1706079844 2024/01/24 07:04:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.214 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1184,6 +1184,8 @@ freedynamicdata(void)
 
     /* move-specific data */
     dmonsfree(); /* release dead monsters */
+    if (gi.itermonarr)
+        free((genericptr_t) gi.itermonarr), gi.itermonarr = NULL;
 
     /* level-specific data */
     done_object_cleanup(); /* maybe force some OBJ_FREE items onto map */
