@@ -1036,7 +1036,7 @@ fill_ordinary_room(
      *  when few rooms; chance for 3 or more is negligible.
      */
     /*assert(gn.nroom > 0); // must be true because we're filling a room*/
-    if (!skip_chests && rn2(gn.nroom * 5 / 2) && somexyspace(croom, &pos))
+    if (!skip_chests && !rn2(gn.nroom * 5 / 2) && somexyspace(croom, &pos))
         (void) mksobj_at(rn2(3) ? LARGE_BOX : CHEST,
                          pos.x, pos.y, TRUE, FALSE);
 
