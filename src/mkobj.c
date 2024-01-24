@@ -1131,7 +1131,7 @@ mksobj_init(struct obj *otmp, boolean artif)
             otmp->corpsenm = rndmonnum();
             if (!verysmall(&mons[otmp->corpsenm])
                 && rn2(level_difficulty() / 2 + 10) > 10)
-                (void) add_to_container(otmp, /* callber will update owt */
+                (void) add_to_container(otmp, /* caller will update owt */
                                         mkobj(SPBOOK_no_NOVEL, FALSE));
         }
         /* boulder init'd below in the 'regardless of !init' code */
