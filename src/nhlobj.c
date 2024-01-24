@@ -129,6 +129,7 @@ l_obj_add_to_container(lua_State *L)
         lo->obj = otmp;
         lo->obj->lua_ref_cnt += refs;
     }
+    lobox->obj->owt = weight(lobox->obj);
 
     return 0;
 }

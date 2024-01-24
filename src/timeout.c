@@ -1118,6 +1118,7 @@ hatch_egg(anything *arg, long timeout)
             /* still some eggs left */
             /* Instead of ordinary egg timeout use a short one */
             attach_egg_hatch_timeout(egg, (long) rnd(12));
+            egg->owt = weight(egg);
         } else if (carried(egg)) {
             useup(egg);
         } else {

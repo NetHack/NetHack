@@ -411,7 +411,7 @@ container_impact_dmg(
     struct monst *shkp;
     struct obj *otmp, *otmp2;
     long loss = 0L;
-    boolean costly, insider, frominv;
+    boolean costly, insider, frominv, wchange = FALSE;
 
     /* only consider normal containers */
     if (!Is_container(obj) || !Has_contents(obj) || Is_mbag(obj))
@@ -462,8 +462,11 @@ container_impact_dmg(
             }
             /* contents of this container are no longer known */
             obj->cknown = 0;
+            wchange = TRUE;
         }
     }
+    if (wchange)
+        obj->owt = weight(obj);
     if (costly && loss) {
         if (!insider) {
             You("caused %ld %s worth of damage!", loss, currency(loss));

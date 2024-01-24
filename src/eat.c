@@ -2950,6 +2950,8 @@ doeat(void)
 
     if (!dont_start)
         start_eating(otmp, already_partly_eaten);
+    else
+        otmp->owt = weight(otmp);
     return ECMD_TIME;
 }
 
