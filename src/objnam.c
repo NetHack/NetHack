@@ -1435,7 +1435,7 @@ doname_base(
             Concat(bp, 0, " (lit)");
         break;
     case RING_CLASS:
- ring:
+ ring:  /* normal rings reach here 'naturally'; meat ring jumps here */
         if (obj->owornmask & W_RINGR)
             Concat(bp, 0, " (on right ");
         if (obj->owornmask & W_RINGL)
@@ -1443,7 +1443,7 @@ doname_base(
         if (obj->owornmask & W_RING) /* either left or right */
             ConcatF1(bp, 0,"%s)", body_part(HAND));
         if (known && objects[obj->otyp].oc_charged) {
-            Sprintf(prefix, "%+d ", obj->spe); /* sitoa(obj->spe)+" " */
+            Sprintf(eos(prefix), "%+d ", obj->spe); /* sitoa(obj->spe)+" " */
         }
         break;
     case FOOD_CLASS:
@@ -1455,11 +1455,17 @@ doname_base(
                "corpse" is already in the buffer returned by xname() */
             unsigned cxarg = (((obj->quan != 1L) ? 0 : CXN_ARTICLE)
                               | CXN_NOCORPSE);
-            char *cxstr = corpse_xname(obj, prefix, cxarg);
+            char *cxstr, *save_xnamep;
 
+            /* corpse_xname() sets xnamep; callers other than doname_base()
+               itself shouldn't care about xnamep (pointer to start of
+               current obuf[]) but keep it accurate anyway */
+            save_xnamep = gx.xnamep;
+            cxstr = corpse_xname(obj, prefix, cxarg);
             Sprintf(prefix, "%s ", cxstr);
             /* avoid having doname(corpse) consume an extra obuf */
             releaseobuf(cxstr);
+            gx.xnamep = save_xnamep;
         } else if (obj->otyp == EGG) {
 #if 0 /* corpses don't tell if they're stale either */
             if (known && stale_egg(obj))
@@ -1472,9 +1478,9 @@ doname_base(
                 if (obj->spe == 1)
                     Concat(bp, 0, " (laid by you)");
             }
-        }
-        if (obj->otyp == MEAT_RING)
+        } else if (obj->otyp == MEAT_RING) {
             goto ring;
+        }
         break;
     case BALL_CLASS:
     case CHAIN_CLASS:

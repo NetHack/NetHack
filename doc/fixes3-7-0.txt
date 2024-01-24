@@ -1845,6 +1845,8 @@ stacked pair of potions of healing in supply chest weighed same as one potion;
 	weight updated as their stack was split; if close to an encumbrance
 	threshold, new weight would trigger an encumbrance increase message,
 	immediately followed a decrease message when the potion got used up
+bounds checking for object name formatting inadvertently introduced a change
+	that hid BUC prefix for charged rings
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
