@@ -1,4 +1,4 @@
-/* NetHack 3.7	exper.c	$NHDT-Date: 1621380393 2021/05/18 23:26:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
+/* NetHack 3.7	exper.c	$NHDT-Date: 1706133782 2024/01/24 22:03:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -222,13 +222,14 @@ losexp(
        in that situation */
     if (u.ulevel > 1 || drainer)
         pline("%s level %d.", Goodbye(), u.ulevel);
+
     if (u.ulevel > 1) {
         u.ulevel -= 1;
         /* remove intrinsic abilities */
         adjabil(u.ulevel + 1, u.ulevel);
         livelog_printf(LL_MINORAC, "lost experience level %d", u.ulevel + 1);
         SoundAchievement(0, sa2_xpleveldown, 0);
-    } else {
+    } else { /* u.ulevel==1 */
         if (drainer) {
             gk.killer.format = KILLED_BY;
             if (gk.killer.name != drainer)
@@ -236,11 +237,14 @@ losexp(
             done(DIED);
         }
         /* no drainer or lifesaved */
+        if (u.ulevel > 1)
+            /* can happen during debug fuzzing if fuzzer_savelife() uses
+               a blessed potion of restore ability to restore lost levels */
+            return;
         u.uexp = 0;
         livelog_printf(LL_MINORAC, "lost all experience");
     }
-
-    assert(u.ulevel >= 0 && u.ulevel < MAXULEV);
+    assert(u.ulevel >= 0 && u.ulevel < MAXULEV); /* valid array index */
 
     olduhpmax = u.uhpmax;
     uhpmin = minuhpmax(10); /* same minimum as is used by life-saving */
