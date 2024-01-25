@@ -49,6 +49,7 @@ static int glyph_find_core(const char *id, struct find_struct *findwhat);
 static char *fix_glyphname(char *str);
 static int32_t rgbstr_to_int32(const char *rgbstr);
 boolean closest_color(uint32_t lcolor, uint32_t *closecolor, int *clridx);
+static const long nonzero_black = 0x1000000;
 
 static void
 to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
@@ -130,8 +131,7 @@ glyphrep_to_custom_map_entries(const char *op, int *glyphptr)
                implements the color switch, needs to either check that bit
                or appropriately mask colors with 0xFFFFFF. */
             to_custom_symbol_find.color = (rgb == -1 || !c_rgb) ? 0L
-                                          : (rgb == 0L) ? (0 & 0x1000000)
-                                            : rgb;
+                                          : (rgb == 0L) ? nonzero_black : rgb;
             to_custom_symbol_find.extraval = glyphptr;
             to_custom_symbol_find.callback = to_custom_symset_entry_callback;
             reslt = glyph_find_core(c_glyphid, &to_custom_symbol_find);
@@ -207,13 +207,13 @@ static int
 unicode_val(const char *cp)
 {
     const char *dp;
-    int cval = 0, dcount, unicode = 0;
+    int cval = 0, dcount;
     static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
 
     if (cp && *cp) {
         cval = dcount = 0;
-        if ((unicode = ((*cp == 'U' || *cp == 'u') && cp[1] == '+')) && cp[2]
-            && (dp = strchr(hex, cp[2])) != 0) {
+        if ((*cp == 'U' || *cp == 'u')
+            && cp[1] == '+' && cp[2] && (dp = strchr(hex, cp[2])) != 0) {
             cp += 2; /* move past the 'U' and '+' */
             do {
                 cval = (cval * 16) + ((int) (dp - hex) / 2);
@@ -1212,7 +1212,7 @@ glyphs_to_unicode(const char *id, const char *unicode_val, long clr)
        simple checking for 0 to detect "not set". The window port that
        implements the color switch, needs to either check that bit
        or appropriately mask colors with 0xFFFFFF. */
-    to_unicode.color = (clr == -1) ? 0L : (clr == 0L) ? (0 & 0x1000000) : clr;
+    to_unicode.color = (clr == -1) ? 0L : (clr == 0L) ? nonzero_black : clr;
     return glyph_find_core(id, &to_unicode);
 }
 
