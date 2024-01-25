@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.1358 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1706213788 2024/01/25 20:16:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1373 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -78,6 +78,9 @@ extern char *fmt_ptr(const void *) NONNULL;
 extern int FITSint_(long long, const char *, int) NONNULLARG2;
 #define FITSuint(x) FITSuint_(x, __func__, __LINE__)
 extern unsigned FITSuint_(unsigned long long, const char *, int) NONNULLARG2;
+/* for Strlen() which returns unsigned instead of size_t and panics for
+   strings of length INT_MAX (32K - 1) or longer */
+extern unsigned Strlen_(const char *, const char *, int) NONNULLPTRS;
 
 /* This next pre-processor directive covers almost the entire file,
  * interrupted only occasionally to pick up specific functions as needed. */

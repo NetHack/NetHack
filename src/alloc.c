@@ -1,9 +1,8 @@
-/* NetHack 3.7	alloc.c	$NHDT-Date: 1706082987 2024/01/24 07:56:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.7	alloc.c	$NHDT-Date: 1706213795 2024/01/25 20:16:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.34 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* to get the malloc() prototype from system.h */
 #define ALLOC_C /* comment line for pre-compiled headers */
 /* since this file is also used in auxiliary programs, don't include all the
    function declarations for all of nethack */
@@ -14,10 +13,17 @@
 #include "nhlua.h"
 #endif
 
-/*#define FITSint(x) FITSint_(x, __func__, (int) __LINE__)*/
+/*
+ * Some stuff that isn't allocation related but included is this file
+ * so that utility programs can access it more easily since they link
+ * with alloc.{o,obj}.
+ */
+/*#define FITSint(x) FITSint_(x, __func__, __LINE__)*/
 extern int FITSint_(LUA_INTEGER, const char *, int) NONNULLARG2;
-/*#define FITSuint(x) FITSuint_(x, __func__, (int) __LINE__)*/
+/*#define FITSuint(x) FITSuint_(x, __func__, __LINE__)*/
 extern unsigned FITSuint_(unsigned long long, const char *, int) NONNULLARG2;
+/*#define Strlen(s) Strlen_(s, __func__, __LINE__)*/
+extern unsigned Strlen_(const char *, const char *, int) NONNULLPTRS;
 
 char *fmt_ptr(const genericptr) NONNULL;
 
@@ -269,6 +275,27 @@ FITSuint_(unsigned long long ull, const char *file, int line)
     if (uret != ull)
         panic("Overflow at %s:%d", file, line);
     return uret;
+}
+
+/* strlen() but returns unsigned and panics if string is unreasonably long;
+   used by dlb as well as by nethack */
+unsigned
+Strlen_(
+    const char *str,
+    const char *file,
+    int line)
+{
+    const char *p;
+    size_t len;
+
+    /* strnlen(str, LARGEST_INT) w/o requiring posix.1 headers or libraries */
+    for (p = str, len = 0; len < LARGEST_INT; ++len)
+        if (*p++ == '\0')
+            break;
+
+    if (len == LARGEST_INT)
+        panic("%s:%d string too long", file, line);
+    return (unsigned) len;
 }
 
 /*alloc.c*/

@@ -1,4 +1,4 @@
-/* NetHack 3.7	hacklib.c	$NHDT-Date: 1705957184 2024/01/22 20:59:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.115 $ */
+/* NetHack 3.7	hacklib.c	$NHDT-Date: 1706213796 2024/01/25 20:16:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
@@ -24,7 +24,6 @@
         char *          strip_newline   (char *)
         char *          stripchars      (char *, const char *, const char *)
         char *          stripdigits     (char *)
-        unsigned        Strlen_         (const char *str, const char *, int)
         char *          eos             (char *)
         const char *    c_eos           (const char *)
         boolean         str_start_is    (const char *, const char *, boolean)
@@ -233,20 +232,6 @@ c_eos(const char *s)
     return s;
 }
 
-/* like strlen(3) but returns unsigned and panics if string is unreasonably long */
-unsigned
-Strlen_(
-    const char *str,
-    const char *file,
-    int line)
-{
-    size_t len = strlen(str);
-
-    if (len >= LARGEST_INT)
-        panic("%s:%d string too long", file, line);
-    return (unsigned) len;
-}
-
 /* determine whether 'str' starts with 'chkstr', possibly ignoring case;
  * panics on huge strings */
 boolean
@@ -255,10 +240,10 @@ str_start_is(
     const char *chkstr,
     boolean caseblind)
 {
+    char t1, t2;
     int n = LARGEST_INT;
 
-    while (n--) {
-        char t1, t2;
+    while (--n) {
         if (!*str)
             return (*chkstr == 0); /* chkstr >= str */
         else if (!*chkstr)
