@@ -1167,6 +1167,11 @@ acurr(int chridx)
            STR19(y) yields 100 + y (intended for 19 <= y <= 25) */
         if (tmp >= STR19(25) || (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER))
             result = STR19(25); /* 125 */
+        else
+            /* need non-zero here to avoid 'if(result==0)' below because
+               that doesn't deal with Str encoding; the cap of 25 applied
+               there would limit Str to 18/07 [18 + 7] */
+            result = max(tmp, 3);
     } else if (chridx == A_CHA) {
         if (tmp < 18 && (gy.youmonst.data->mlet == S_NYMPH
                          || u.umonnum == PM_AMOROUS_DEMON))
