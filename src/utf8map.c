@@ -741,7 +741,7 @@ parse_id(const char *id, struct find_struct *findwhat)
                 } else if (glyph_is_body(glyph)) {
                     /* buf2 will hold the distinguishing prefix */
                     /* buf3 will hold the base name */
-                    buf2 = ""; /* superflous */
+                    buf2 = ""; /* superfluous */
                     buf3 = monsdump[glyph_to_body_corpsenm(glyph)].nm;
                     if (glyph_is_body_piletop(glyph)) {
                         buf2 = "piletop_body_";
