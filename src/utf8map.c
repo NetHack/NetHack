@@ -129,9 +129,9 @@ glyphrep_to_custom_map_entries(const char *op, int *glyphptr)
                simple checking for 0 to detect "not set". The window port that
                implements the color switch, needs to either check that bit
                or appropriately mask colors with 0xFFFFFF. */
-            to_custom_symbol_find.color = (rgb == -1 || !c_rgb)   ? 0L
+            to_custom_symbol_find.color = (rgb == -1 || !c_rgb) ? 0L
                                           : (rgb == 0L) ? (0 & 0x1000000)
-                                                        : rgb;
+                                            : rgb;
             to_custom_symbol_find.extraval = glyphptr;
             to_custom_symbol_find.callback = to_custom_symset_entry_callback;
             reslt = glyph_find_core(c_glyphid, &to_custom_symbol_find);
@@ -145,7 +145,7 @@ static int32_t
 rgbstr_to_int32(const char *rgbstr)
 {
     int r, g, b, milestone = 0;
-    char *cp, *c_r,*c_g,*c_b;
+    char *cp, *c_r, *c_g, *c_b;
     int32_t rgb = 0;
     char buf[BUFSZ];
     boolean dash = FALSE;
@@ -175,9 +175,9 @@ rgbstr_to_int32(const char *rgbstr)
     }
     /* sanity checks */
     if (c_r && c_g && c_b
-            && (strlen(c_r) > 0 && strlen(c_r) < 4)
-            && (strlen(c_g) > 0 && strlen(c_g) < 4)
-            && (strlen(c_b) > 0 && strlen(c_b) < 4)) {
+        && (strlen(c_r) > 0 && strlen(c_r) < 4)
+        && (strlen(c_g) > 0 && strlen(c_g) < 4)
+        && (strlen(c_b) > 0 && strlen(c_b) < 4)) {
         r = atoi(c_r);
         g = atoi(c_g);
         b = atoi(c_b);
@@ -260,7 +260,7 @@ glyph_find_core(const char *id, struct find_struct *findwhat)
 
     if (parse_id(id, findwhat)) {
         if (findwhat->findtype == find_glyph) {
-            (findwhat->callback)(findwhat->val, findwhat);
+            (*findwhat->callback)(findwhat->val, findwhat);
         } else {
             for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
                 do_callback = FALSE;
@@ -362,7 +362,7 @@ init_glyph_cache(void)
     }
 
     glyphid_cache = (struct glyphid_cache_t *) alloc(
-        glyphid_cache_size * sizeof(struct glyphid_cache_t));
+                        glyphid_cache_size * sizeof (struct glyphid_cache_t));
     for (glyph = 0; glyph < glyphid_cache_size; ++glyph) {
         glyphid_cache[glyph].glyphnum = 0;
         glyphid_cache[glyph].id = (char *) 0;
@@ -570,6 +570,7 @@ int
 glyphrep(const char *op)
 {
     int reslt = 0, glyph = NO_GLYPH;
+
     if (!glyphid_cache)
         reslt = 1;      /* for debugger use only; no cache available */
     reslt = glyphrep_to_custom_map_entries(op, &glyph);
@@ -621,7 +622,7 @@ add_custom_urep_entry(
     }
     /* create new details entry */
     newdetails = (struct customization_detail *) alloc(
-        sizeof(struct customization_detail));
+                                        sizeof (struct customization_detail));
     newdetails->content.urep.glyphidx = glyphidx;
     newdetails->content.urep.u.utf8str =
         (uint8 *) dupstr((const char *) utf8str);
@@ -646,7 +647,8 @@ static int
 parse_id(const char *id, struct find_struct *findwhat)
 {
     FILE *fp = (FILE *) 0;
-    int i = 0, j, mnum, glyph, pm_offset = 0, oc_offset = 0, cmap_offset = 0,
+    int i = 0, j, mnum, glyph,
+        pm_offset = 0, oc_offset = 0, cmap_offset = 0,
         pm_count = 0, oc_count = 0, cmap_count = 0;
     boolean skip_base = FALSE, skip_this_one, dump_ids = FALSE,
             filling_cache = FALSE, is_S = FALSE, is_G = FALSE;
@@ -703,6 +705,8 @@ parse_id(const char *id, struct find_struct *findwhat)
                 return 0;
             }
         } else {
+            const char *buf2, *buf3, *buf4;
+
             /* individual matching glyph entries */
             for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
                 skip_base = FALSE;
@@ -711,8 +715,9 @@ parse_id(const char *id, struct find_struct *findwhat)
                 if (glyph_is_monster(glyph)) {
                     /* buf2 will hold the distinguishing prefix */
                     /* buf3 will hold the base name */
-                    const char *buf2 = "";
-                    const char *buf3 = monsdump[glyph_to_mon(glyph)].nm;
+                    buf2 = "";
+                    buf3 = monsdump[glyph_to_mon(glyph)].nm;
+
                     if (glyph_is_normal_male_monster(glyph)) {
                         buf2 = "male_";
                     } else if (glyph_is_normal_female_monster(glyph)) {
@@ -736,8 +741,8 @@ parse_id(const char *id, struct find_struct *findwhat)
                 } else if (glyph_is_body(glyph)) {
                     /* buf2 will hold the distinguishing prefix */
                     /* buf3 will hold the base name */
-                    const char *buf2 = "";
-                    const char *buf3 = monsdump[glyph_to_body_corpsenm(glyph)].nm;
+                    buf2 = ""; /* superflous */
+                    buf3 = monsdump[glyph_to_body_corpsenm(glyph)].nm;
                     if (glyph_is_body_piletop(glyph)) {
                         buf2 = "piletop_body_";
                     } else {
@@ -749,8 +754,8 @@ parse_id(const char *id, struct find_struct *findwhat)
                 } else if (glyph_is_statue(glyph)) {
                     /* buf2 will hold the distinguishing prefix */
                     /* buf3 will hold the base name */
-                    const char *buf2 = "";
-                    const char *buf3 = monsdump[glyph_to_statue_corpsenm(glyph)].nm;
+                    buf2 = "";
+                    buf3 = monsdump[glyph_to_statue_corpsenm(glyph)].nm;
                     if (glyph_is_fem_statue_piletop(glyph)) {
                         buf2 = "piletop_statue_of_female_";
                     } else if (glyph_is_fem_statue(glyph)) {
@@ -767,8 +772,8 @@ parse_id(const char *id, struct find_struct *findwhat)
                     i = glyph_to_obj(glyph);
                     /* buf2 will hold the distinguishing prefix */
                     /* buf3 will hold the base name */
-                    const char *buf2 = "";
-                    const char *buf3 = "";
+                    buf2 = "";
+                    buf3 = "";
                     if (((i > SCR_STINKING_CLOUD) && (i < SCR_MAIL))
                         || ((i > WAN_LIGHTNING) && (i < GOLD_PIECE)))
                         skip_this_one = TRUE;
@@ -808,9 +813,9 @@ parse_id(const char *id, struct find_struct *findwhat)
                     /* buf2 will hold the distinguishing prefix */
                     /* buf3 will hold the base name */
                     /* buf4 will hold the distinguishing suffix */
-                    const char *buf2 = "";
-                    const char *buf3 = "";
-                    const char *buf4 = "";
+                    buf2 = "";
+                    buf3 = "";
+                    buf4 = "";
                     if (glyph == GLYPH_CMAP_OFF) {
                         cmap = S_stone;
                         buf3 = "stone substrate";
@@ -833,10 +838,11 @@ parse_id(const char *id, struct find_struct *findwhat)
                     } else if (glyph_is_cmap_a(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_A_OFF) + S_ndoor;
                     } else if (glyph_is_cmap_altar(glyph)) {
-                        const char *altar_text[] = {
+                        static const char *const altar_text[] = {
                             "unaligned", "chaotic", "neutral",
                             "lawful",    "other",
                         };
+
                         j = (glyph - GLYPH_ALTAR_OFF);
                         cmap = S_altar;
                         if (j != altar_other) {
@@ -850,10 +856,11 @@ parse_id(const char *id, struct find_struct *findwhat)
                     } else if (glyph_is_cmap_b(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_B_OFF) + S_grave;
                     } else if (glyph_is_cmap_zap(glyph)) {
-                        static const char *zap_texts[] = {
+                        static const char *const zap_texts[] = {
                             "missile", "fire",      "frost",      "sleep",
                             "death",   "lightning", "poison gas", "acid"
                         };
+
                         j = (glyph - GLYPH_ZAP_OFF);
                         cmap = (j % 4) + S_vbeam;
                         Snprintf(buf[2], sizeof buf[2], "%s",
@@ -866,11 +873,12 @@ parse_id(const char *id, struct find_struct *findwhat)
                     } else if (glyph_is_cmap_c(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_C_OFF) + S_digbeam;
                     } else if (glyph_is_swallow(glyph)) {
-                        static const char *swallow_texts[] = {
+                        static const char *const swallow_texts[] = {
                             "top left",      "top center",   "top right",
                             "middle left",   "middle right", "bottom left",
                             "bottom center", "bottom right",
                         };
+
                         j = glyph - GLYPH_SWALLOW_OFF;
                         cmap = glyph_to_swallow(glyph);
                         mnum = j / ((S_sw_br - S_sw_tl) + 1);
@@ -882,20 +890,20 @@ parse_id(const char *id, struct find_struct *findwhat)
                         buf3 = buf[3];
                         skip_base = TRUE;
                     } else if (glyph_is_explosion(glyph)) {
-                        int expl;
-                        static const char *expl_type_texts[] = {
+                        static const char *const expl_type_texts[] = {
                             "dark",    "noxious", "muddy",  "wet",
                             "magical", "fiery",   "frosty",
                         };
-                        static const char *expl_texts[] = {
+                        static const char *const expl_texts[] = {
                             "tl", "tc", "tr", "ml", "mc",
                             "mr", "bl", "bc", "br",
                         };
+                        int expl;
 
                         j = glyph - GLYPH_EXPLODE_OFF;
                         expl = j / ((S_expl_br - S_expl_tl) + 1);
-                        cmap =
-                            (j % ((S_expl_br - S_expl_tl) + 1)) + S_expl_tl;
+                        cmap = (j % ((S_expl_br - S_expl_tl) + 1))
+                               + S_expl_tl;
                         i = cmap - S_expl_tl;
                         Snprintf(buf[2], sizeof buf[2], "%s ",
                                  expl_type_texts[expl]);
@@ -1078,17 +1086,17 @@ color_distance(uint32_t rgb1, uint32_t rgb2)
 {
     int r1 = (rgb1 >> 16) & 0xFF;
     int g1 = (rgb1 >> 8) & 0xFF;
-    int b1 = (rgb1) &0xFF;
+    int b1 = (rgb1) & 0xFF;
     int r2 = (rgb2 >> 16) & 0xFF;
     int g2 = (rgb2 >> 8) & 0xFF;
-    int b2 = (rgb2) &0xFF;
+    int b2 = (rgb2) & 0xFF;
 
     int rmean = (r1 + r2) / 2;
     int r = r1 - r2;
     int g = g1 - g2;
     int b = b1 - b2;
     return ((((512 + rmean) * r * r) >> 8) + 4 * g * g
-                 + (((767 - rmean) * b * b) >> 8));
+            + (((767 - rmean) * b * b) >> 8));
 }
 
 boolean
