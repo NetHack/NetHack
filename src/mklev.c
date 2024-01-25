@@ -1693,7 +1693,7 @@ mktrap_victim(struct trap *ttmp)
            we're on dlvl 2 (1 is impossible) and b) we pass a coin
            flip */
         if (kind == SLP_GAS_TRAP && !(lvl <= 2 && rn2(2)))
-            victim_mnum = PM_HUMAN;
+            goto human;
         break;
     case 1: case 2:
         victim_mnum = PM_DWARF;
@@ -1706,8 +1706,7 @@ mktrap_victim(struct trap *ttmp)
         victim_mnum = PM_GNOME;
         /* 10% chance of a candle too */
         if (!rn2(10)) {
-            otmp = mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE,
-                          TRUE, FALSE);
+            otmp = mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE, TRUE, FALSE);
             otmp->quan = 1;
             curse(otmp);
             otmp->owt = weight(otmp);
@@ -1715,22 +1714,20 @@ mktrap_victim(struct trap *ttmp)
         }
         break;
     default:
-        /* the most common race */
-        victim_mnum = PM_HUMAN;
-        /*
-         * FIXME:
-         *  If resurrected, this corpse will produce a plain human.
-         *  PM_HUMAN is used as a placeholder for zombie/mummy/vampire
-         *  corpses and doesn't ordinarily occur as a living monster.
-         *  Maybe we should generate and attach montraits for a very low
-         *  level fake player?
-         */
+ human:
+        /* human, can be any role; all fake player monsters are human;
+           we probably ought to generate and attach montraits for fake
+           players that force them to be low level in case they get
+           resurrected; PM_HUMAN is a placeholder monster primarily
+           used for zombie, mummy, and vampire corpses */
+        victim_mnum = !rn2(25) ? PM_HUMAN : rn1(PM_WIZARD - PM_ARCHEOLOGIST,
+                                                PM_ARCHEOLOGIST);
+        /* no role-specific equipment provided */
         break;
     }
-    otmp = mkcorpstat(CORPSE, NULL, &mons[victim_mnum], x, y,
-                      CORPSTAT_INIT);
+    otmp = mkcorpstat(CORPSE, NULL, &mons[victim_mnum], x, y, CORPSTAT_INIT);
     if (otmp)
-        otmp->age -= (TAINT_AGE + 1); /* died too long ago to eat */
+        otmp->age -= (TAINT_AGE + 1); /* died too long ago to safely eat */
 }
 
 /* mktrap(): select trap type and location, then use maketrap() to create it;
