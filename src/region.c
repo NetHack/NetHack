@@ -1,4 +1,4 @@
-/* NetHack 3.7	region.c	$NHDT-Date: 1683832331 2023/05/11 19:12:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.81 $ */
+/* NetHack 3.7	region.c	$NHDT-Date: 1706272460 2024/01/26 12:34:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.88 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -332,22 +332,32 @@ remove_region(NhRegion *reg)
 
     /* Update screen if necessary */
     reg->ttl = -2L; /* for visible_region_at */
-    if (reg->visible)
-        for (x = reg->bounding_box.lx; x <= reg->bounding_box.hx; x++)
-            for (y = reg->bounding_box.ly; y <= reg->bounding_box.hy; y++)
-                if (isok(x, y) && inside_region(reg, x, y)) {
-                    /*if (!sobj_at(BOULDER, x, y))
-                          unblock_point(x, y);*/
-                    if (cansee(x, y))
-                        newsym(x, y);
-                }
+    if (reg->visible) {
+        int pass;
 
+        /* need to process the region's spots twice, first unblocking all
+           locations which no longer block line-of-sight, then redrawing
+           spots within revised line-of-sight; skip second pass if blind */
+        for (pass = 1; pass <= (Blind ? 1 : 2); ++pass) {
+            for (x = reg->bounding_box.lx; x <= reg->bounding_box.hx; x++)
+                for (y = reg->bounding_box.ly; y <= reg->bounding_box.hy; y++)
+                    if (isok(x, y) && inside_region(reg, x, y)) {
+                        if (pass == 1) {
+                            if (!does_block(x, y, &levl[x][y]))
+                                unblock_point(x, y);
+                        } else { /* pass==2 */
+                            if (cansee(x, y))
+                                newsym(x, y);
+                        }
+                    }
+        }
+    }
     free_region(reg);
 }
 
 /*
- * Remove all regions and clear all related data (This must be down
- * when changing level, for instance).
+ * Remove all regions and clear all related data.  This must be done
+ * when changing level, for instance.
  */
 void
 clear_regions(void)
@@ -965,7 +975,7 @@ boolean
 expire_gas_cloud(genericptr_t p1, genericptr_t p2 UNUSED)
 {
     NhRegion *reg;
-    int damage;
+    int damage, pass;
     coordxy x, y;
 
     reg = (NhRegion *) p1;
@@ -980,16 +990,22 @@ expire_gas_cloud(genericptr_t p1, genericptr_t p2 UNUSED)
         return FALSE;  /* THEN return FALSE, means "still there" */
     }
 
-    /* The cloud no longer blocks vision. */
-    for (x = reg->bounding_box.lx; x <= reg->bounding_box.hx; x++) {
-        for (y = reg->bounding_box.ly; y <= reg->bounding_box.hy; y++) {
-            if (inside_region(reg, x, y)) {
-                if (!does_block(x, y, &levl[x][y]))
-                    unblock_point(x, y);
-                if (u_at(x, y))
-                    gg.gas_cloud_diss_within = TRUE;
-                if (cansee(x, y))
-                    gg.gas_cloud_diss_seen++;
+    /* The cloud no longer blocks vision.  cansee() checks shouldn't be made
+       until all blocked spots have been unblocked, so we need two passes */
+    for (pass = 1; pass <= (Blind ? 1 : 2); ++pass) {
+        for (x = reg->bounding_box.lx; x <= reg->bounding_box.hx; x++) {
+            for (y = reg->bounding_box.ly; y <= reg->bounding_box.hy; y++) {
+                if (inside_region(reg, x, y)) {
+                    if (pass == 1) {
+                        if (!does_block(x, y, &levl[x][y]))
+                            unblock_point(x, y);
+                        if (u_at(x, y))
+                            gg.gas_cloud_diss_within = TRUE;
+                    } else { /* pass==2 */
+                        if (cansee(x, y))
+                            gg.gas_cloud_diss_seen++;
+                    }
+                }
             }
         }
     }
@@ -1077,7 +1093,8 @@ is_hero_inside_gas_cloud(void)
     int i;
 
     for (i = 0; i < gn.n_regions; i++)
-        if (hero_inside(gr.regions[i]) && gr.regions[i]->inside_f == INSIDE_GAS_CLOUD)
+        if (hero_inside(gr.regions[i])
+            && gr.regions[i]->inside_f == INSIDE_GAS_CLOUD)
             return TRUE;
     return FALSE;
 }

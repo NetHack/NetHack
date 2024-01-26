@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1361 $ $NHDT-Date: 1705357506 2024/01/15 22:25:06 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1368 $ $NHDT-Date: 1706272459 2024/01/26 12:34:19 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1355,6 +1355,8 @@ if a covetous monster tried to teleport next to the hero but the level was
 if loadstone was unIDed but had been assigned a type name and you failed to
 	pick one up, the message referred to it as "gray stone" rather than
 	"stone called <assigned name>"
+when a vision blocking gas cloud dissipated, the screen didn't necessarily
+	get updated to show newly visible locations in a timely fashion
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
