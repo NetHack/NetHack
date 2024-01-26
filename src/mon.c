@@ -4112,7 +4112,7 @@ void
 alloc_itermonarr(unsigned count)
 {
     /* if count is 0 or bigger than itermonsiz or much smaller than
-       itermonsiz, release itermonarr (add reset itermonsiz to 0) */
+       itermonsiz, release itermonarr (and reset itermonsiz to 0) */
     if (!count || count > itermonsiz || count + 40 < itermonsiz) {
         if (itermonarr)
             free((genericptr_t) itermonarr), itermonarr = NULL;
