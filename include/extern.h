@@ -1605,7 +1605,7 @@ extern int weight(struct obj *) NONNULLARG1;
 extern struct obj *mkgold(long, coordxy, coordxy);
 extern void fixup_oil(struct obj *, struct obj *) NONNULLARG1;
 extern struct obj *mkcorpstat(int, struct monst *, struct permonst *,
-                              coordxy, coordxy, unsigned);
+                              coordxy, coordxy, unsigned) NONNULL;
 extern int corpse_revive_type(struct obj *) NONNULLARG1;
 extern struct obj *obj_attach_mid(struct obj *, unsigned);
 extern struct monst *get_mtraits(struct obj *, boolean) NONNULLARG1;
