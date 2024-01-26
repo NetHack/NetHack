@@ -4111,8 +4111,8 @@ static unsigned itermonsiz = 0; /* size in 'monst *' pointers */
 void
 alloc_itermonarr(unsigned count)
 {
-    /* if count is 0 or bigger than itemarrsiz or much smaller than
-       itemarrsiz, release itermonarr (add reset itermarrsiz to 0) */
+    /* if count is 0 or bigger than itermonsiz or much smaller than
+       itermonsiz, release itermonarr (add reset itermonsiz to 0) */
     if (!count || count > itermonsiz || count + 40 < itermonsiz) {
         if (itermonarr)
             free((genericptr_t) itermonarr), itermonarr = NULL;
@@ -4133,7 +4133,7 @@ alloc_itermonarr(unsigned count)
 /* Iterate all monsters on the level, even dead or off-map ones, calling
    bfunc() for each monster.  If bfunc() returns TRUE, stop iterating.
    If the game ends during the call to bfunc(), then freedynamicdata()
-   will need to free 'monarr' for us so we make a copy of it in struct g.
+   will free 'itermonarr'.
 
    Safe for list deletions and insertions, and guarantees calling bfunc()
    once per monster in fmon unless it returns TRUE (or game ends). */
