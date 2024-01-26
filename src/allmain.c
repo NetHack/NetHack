@@ -485,13 +485,13 @@ moveloop_core(void)
         } else {
             --gm.multi;
             nhassert(gc.command_count != 0);
-            rhack(gc.command_line);
+            rhack(gc.cmd_key);
         }
     } else if (gm.multi == 0) {
 #ifdef MAIL
         ckmailstatus();
 #endif
-        rhack((char *) 0);
+        rhack(0);
     }
     if (u.utotype)       /* change dungeon level */
         deferred_goto(); /* after rhack() */

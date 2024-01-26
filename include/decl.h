@@ -236,7 +236,7 @@ struct instance_globals_c {
     coord clicklook_cc;
     /* decl.c */
     char chosen_windowtype[WINTYPELEN];
-    char command_line[COLNO];
+    int cmd_key; /* parse() / rhack() */
     cmdcount_nht command_count;
     /* some objects need special handling during destruction or placement */
     struct obj *current_wand;  /* wand currently zapped/applied */

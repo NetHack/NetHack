@@ -269,7 +269,7 @@ const struct instance_globals_c g_init_c = {
     { 0, 0 }, /* clicklook_cc */
     /* decl.c */
     UNDEFINED_VALUES, /* chosen_windowtype */
-    UNDEFINED_VALUES, /* command_line */
+    0, /* cmd_key */
     0L, /* command_count */
     UNDEFINED_PTR, /* current_wand */
 #ifdef DEF_PAGER

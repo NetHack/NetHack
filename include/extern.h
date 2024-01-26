@@ -350,7 +350,7 @@ extern void parseautocomplete(char *, boolean);
 extern void lock_mouse_buttons(boolean);
 extern void reset_commands(boolean);
 extern void update_rest_on_space(void);
-extern void rhack(char *);
+extern void rhack(int);
 extern int doextlist(void);
 extern int extcmd_via_menu(void);
 extern int enter_explore_mode(void);
