@@ -1184,8 +1184,7 @@ freedynamicdata(void)
 
     /* move-specific data */
     dmonsfree(); /* release dead monsters */
-    if (gi.itermonarr)
-        free((genericptr_t) gi.itermonarr), gi.itermonarr = NULL;
+    alloc_itermonarr(0U); /* a request of 0 releases existing allocation */
 
     /* level-specific data */
     done_object_cleanup(); /* maybe force some OBJ_FREE items onto map */

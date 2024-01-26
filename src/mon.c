@@ -4102,6 +4102,34 @@ normal_shape(struct monst *mon)
     }
 }
 
+/* freed by freedynamicdata() when game ends; doesn't need to be struct g */
+static struct monst **itermonarr = NULL;
+static unsigned itermonsiz = 0; /* size in 'monst *' pointers */
+
+/* manage itermonarr; it used to be allocated and freed every time the
+   monster movement loop ran; now, keep it around most of the time */
+void
+alloc_itermonarr(unsigned count)
+{
+    /* if count is 0 or bigger than itemarrsiz or much smaller than
+       itemarrsiz, release itermonarr (add reset itermarrsiz to 0) */
+    if (!count || count > itermonsiz || count + 40 < itermonsiz) {
+        if (itermonarr)
+            free((genericptr_t) itermonarr), itermonarr = NULL;
+        itermonsiz = 0;
+    }
+    /* when count is more than itermonsiz (including when that just
+       got reset to 0), allocate a new instance of itermonarr;
+       implies that count is greater than 0 */
+    if (count > itermonsiz) {
+        /* overallocate to reduce free/alloc-again thrashing when the
+           number of monsters varies from turn to turn */
+        itermonsiz = count + 20;
+        itermonarr = (struct monst **) alloc(
+                                        itermonsiz * sizeof (struct monst *));
+    }
+}
+
 /* Iterate all monsters on the level, even dead or off-map ones, calling
    bfunc() for each monster.  If bfunc() returns TRUE, stop iterating.
    If the game ends during the call to bfunc(), then freedynamicdata()
@@ -4112,27 +4140,24 @@ normal_shape(struct monst *mon)
 void
 iter_mons_safe(boolean (*bfunc)(struct monst *))
 {
-    struct monst **monarr, *mtmp;
-    int i, nmons;
+    struct monst *mtmp;
+    unsigned i, nmons;
 
     for (nmons = 0, mtmp = fmon; mtmp; mtmp = mtmp->nmon)
         nmons++;
 
-    if (nmons) {
-        monarr = (struct monst **) alloc(nmons * sizeof (struct monst *));
-        gi.itermonarr = monarr; /* accessible to freedynamicdata() */
+    /* make sure itermonarr[] is big enough to hold nmons entries */
+    alloc_itermonarr(nmons);
 
+    if (nmons) {
         for (i = 0, mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-            monarr[i++] = mtmp;
+            itermonarr[i++] = mtmp;
 
         for (i = 0; i < nmons; i++) {
-            mtmp = monarr[i];
+            mtmp = itermonarr[i];
             if ((*bfunc)(mtmp))
                 break;
         }
-
-        free(monarr);
-        gi.itermonarr = NULL;
     }
     return;
 }

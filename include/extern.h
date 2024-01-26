@@ -1736,6 +1736,7 @@ extern void wake_nearby(void);
 extern void wake_nearto(coordxy, coordxy, int);
 extern void seemimic(struct monst *) NONNULLARG1;
 extern void normal_shape(struct monst *) NONNULLARG1;
+extern void alloc_itermonarr(unsigned);
 extern void iter_mons_safe(boolean (*)(struct monst *));
 extern void iter_mons(void (*)(struct monst *));
 extern struct monst *get_iter_mons(boolean (*)(struct monst *));
