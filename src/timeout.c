@@ -986,7 +986,9 @@ hatch_egg(anything *arg, long timeout)
     yours = (egg->spe || (!flags.female && carried(egg) && !rn2(2)));
     silent = (timeout != gm.moves); /* hatched while away */
 
-    /* only can hatch when in INVENT, FLOOR, MINVENT */
+    /* only can hatch when in INVENT, FLOOR, MINVENT;
+       get_obj_location() will fail for MIGRATING, also for CONTAINED
+       and BURIED when the flags for those aren't included in the call */
     if (get_obj_location(egg, &x, &y, 0)) {
         hatchcount = rnd((int) egg->quan);
         cansee_hatchspot = cansee(x, y) && !silent;
@@ -995,7 +997,7 @@ hatch_egg(anything *arg, long timeout)
             for (i = hatchcount; i > 0; i--) {
                 if (!enexto(&cc, x, y, &mons[mnum])
                     || !(mon = makemon(&mons[mnum], cc.x, cc.y,
-                                       NO_MINVENT|MM_NOMSG)))
+                                       NO_MINVENT | MM_NOMSG)))
                     break;
                 /* tame if your own egg hatches while you're on the
                    same dungeon level, or any dragon egg which hatches
@@ -1115,10 +1117,14 @@ hatch_egg(anything *arg, long timeout)
             learn_egg_type(mnum);
 
         if (egg->quan > 0) {
-            /* still some eggs left */
-            /* Instead of ordinary egg timeout use a short one */
+            /* still some eggs left; we didn't split the stack, just
+               subtracted from quantity so weight needs to be updated;
+               for remainder of stack, add a new, short hatch timer */
             attach_egg_hatch_timeout(egg, (long) rnd(12));
-            egg->owt = weight(egg);
+            /* container_weight(arg) updates arg->owt, and if contained,
+               its enclosing container arg->ocontainer (recursively)
+               [egg won't be contained due to conditions imposed above] */
+            container_weight(egg);
         } else if (carried(egg)) {
             useup(egg);
         } else {

@@ -1639,6 +1639,7 @@ extern int add_to_minv(struct monst *, struct obj *) NONNULLARG12;
 extern struct obj *add_to_container(struct obj *, struct obj *) NONNULLARG12;
 extern void add_to_migration(struct obj *) NONNULLARG1;
 extern void add_to_buried(struct obj *) NONNULLARG1;
+extern void container_weight(struct obj *) NONNULLARG1;
 extern void dealloc_obj(struct obj *) NONNULLARG1;
 extern void obj_ice_effects(coordxy, coordxy, boolean);
 extern long peek_at_iced_corpse_age(struct obj *) NONNULLARG1;

@@ -13,7 +13,6 @@ static void mksobj_init(struct obj *, boolean);
 static int item_on_ice(struct obj *);
 static void shrinking_glob_gone(struct obj *);
 static void obj_timer_checks(struct obj *, coordxy, coordxy, int);
-static void container_weight(struct obj *) NONNULLARG1;
 static struct obj *save_mtraits(struct obj *, struct monst *);
 static void objlist_sanity(struct obj *, int, const char *);
 static void shop_obj_sanity(struct obj *, const char *);
@@ -2645,17 +2644,14 @@ add_to_buried(struct obj *obj)
     gl.level.buriedobjlist = obj;
 }
 
-/* Recalculate the weight of this container and all of _its_ containers. */
-static void
-container_weight(struct obj *container)
+/* recalculate weight of object, which doesn't have to be a container
+   itself; if it is contained, recursively handle _its_ container(s) */
+void
+container_weight(struct obj *object)
 {
-    container->owt = weight(container);
-    if (container->where == OBJ_CONTAINED)
-        container_weight(container->ocontainer);
-    /*
-        else if (container->where == OBJ_INVENT)
-        recalculate load delay here ???
-    */
+    object->owt = weight(object);
+    if (object->where == OBJ_CONTAINED)
+        container_weight(object->ocontainer);
 }
 
 /*

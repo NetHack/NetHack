@@ -1069,6 +1069,7 @@ revive(struct obj *corpse, boolean by_hero)
         m_useup(corpse->ocarry, corpse);
         break;
     case OBJ_CONTAINED:
+        /* obj_extract_self() will update corpse->ocontainer->owt */
         obj_extract_self(corpse);
         obfree(corpse, (struct obj *) 0);
         break;
