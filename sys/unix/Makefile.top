@@ -104,6 +104,21 @@ DATNODLB = $(VARDATND) license symbols
 DATDLB = $(DATHELP) dungeon.lua tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
 DAT = $(DATNODLB) $(DATDLB)
 
+# These get set only if they weren't already set above or in a hints file
+#CHOWN ?= true
+#CHGRP ?= true
+#SYSCONFCREATE ?= cp sys/unix/sysconf $(INSTDIR)/sysconf
+#SYSCONFINSTALL ?= $(SYSCONFCREATE) && \
+#	 $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf && \
+#	 $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf && \
+#	 chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+#SYSCONFENSURE ?= (if ! test -f $(INSTDIR)/sysconf ; then \
+#	 $(SYSCONFCREATE) && \
+#	 $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf && \
+#	 $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf && \
+#	 chmod $(VARFILEPERM) $(INSTDIR)/sysconf; fi );
+
+# Lua
 LUAHEADERS = lib/lua-$(LUA_VERSION)/src
 LUATESTTARGET = $(LUAHEADERS)/lua.h
 LUATOP = $(LUAHEADERS)
@@ -368,7 +383,7 @@ fetch-lua-http:
 # 'make update' can be used to install a revised version after making
 # customizations or such.  Unlike 'make install', it doesn't delete everything
 # from the target directory to have a clean start.
-update: $(PRECHECK) $(GAME) recover $(VARDAT) spec_levs
+update: $(PRECHECK) $(GAME) recover $(VARDAT) spec_levs sys/unix/sysconf
 #	(don't yank the old version out from under people who're playing it)
 	-mv $(INSTDIR)/$(GAME) $(INSTDIR)/$(GAME).old
 	-mv $(INSTDIR)/nhdat $(INSTDIR)/nhdat.old
@@ -376,13 +391,15 @@ update: $(PRECHECK) $(GAME) recover $(VARDAT) spec_levs
 	( $(MAKE) dofiles )
 # should already be present, but make sure
 	touch $(VARDIR)/perm $(VARDIR)/record
+# sysconf, but only if it does not exist
+	true; $(SYSCONFENSURE)
 # and a reminder
 	@echo You may also want to install the man pages via the doc Makefile.
 
 rootcheck:
 	@true; $(ROOTCHECK)
 
-install: rootcheck $(PRECHECK) $(GAME) recover $(VARDAT) spec_levs
+install: rootcheck $(PRECHECK) $(GAME) recover $(VARDAT) spec_levs sys/unix/sysconf
 	true; $(PREINSTALL)
 # set up the directories
 # not all mkdirs have -p; those that don't will create a -p directory
@@ -404,6 +421,9 @@ install: rootcheck $(PRECHECK) $(GAME) recover $(VARDAT) spec_levs
 	-( cd $(VARDIR) ; $(CHOWN) $(GAMEUID) perm record logfile xlogfile livelog ; \
 			$(CHGRP) $(GAMEGRP) perm record logfile xlogfile livelog ; \
 			chmod $(VARFILEPERM) perm record logfile xlogfile livelog )
+# sysconf
+	true; $(SYSCONFINSTALL)
+# other steps from hints file
 	true; $(POSTINSTALL)
 # and a reminder
 	@echo You may also want to reinstall the man pages via the doc Makefile.

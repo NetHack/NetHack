@@ -295,6 +295,17 @@ override GAME=
 MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) $(TARGETPFX)libnh.a )
 endif  # WANT_LIBNH
 
+SYSCONFCREATE = cp sys/unix/sysconf $(INSTDIR)/sysconf
+SYSCONFINSTALL = $(SYSCONFCREATE) && \
+	 $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf && \
+	 $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf && \
+	 chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+SYSCONFENSURE = (if ! test -f $(INSTDIR)/sysconf ; then \
+	 $(SYSCONFCREATE) && \
+	 $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf && \
+	 $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf && \
+	 chmod $(VARFILEPERM) $(INSTDIR)/sysconf; fi );
+
 ifdef WANT_SOURCE_INSTALL
 PREFIX=$(abspath $(NHSROOT))
 #SHELLDIR=
@@ -317,14 +328,10 @@ endif #?WANT_SOURCE_INSTALL
 INSTDIR=$(HACKDIR)
 VARDIR = $(HACKDIR)
 
-POSTINSTALL+= cp -n sys/unix/sysconf $(INSTDIR)/sysconf; \
-	$(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; \
-	$(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; \
-	chmod $(VARFILEPERM) $(INSTDIR)/sysconf; \
-	( util/makedefs --grep-defined CRASHREPORT && \
+POSTINSTALL+= ( util/makedefs --grep-defined CRASHREPORT && \
 	  ( cp win/share/nhcrashreport.lua $(INSTDIR) ; \
 	  chmod 555 $(INSTDIR)/nhcrashreport.lua ; \
-	  cp $(LUATOP)/lua $(INSTDIR)/nhlua); true);
+	  cp $(LUATOP)/lua $(INSTDIR)/nhlua); true );
 
 ifneq "$(CCISCLANG)" ""
 # gdb may not be installed if clang is chosen compiler so the game

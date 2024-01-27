@@ -350,11 +350,7 @@ ROOTCHECK= [[ `id -u` == 0 ]] || ( echo "Must run install with sudo."; exit 1)
 PREINSTALL= . sys/unix/hints/macosx.sh user2 $(GAMEUID); \
 		. sys/unix/hints/macosx.sh group2 $(GAMEGRP); \
 		(mkdir $(SHELLDIR) || true); chown $(GAMEUID) $(SHELLDIR)
-POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; \
-		$(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; \
-		$(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; \
-		chmod $(VARFILEPERM) $(HACKDIR)/sysconf; \
-		util/makedefs --grep-defined CRASHREPORT && \
+POSTINSTALL+= util/makedefs --grep-defined CRASHREPORT && \
 		 ( cp win/macosx/NetHackCrashReport.JavaScript $(HACKDIR) && \
 		 chmod 0500 $(HACKDIR)/NetHackCrashReport.JavaScript )
 
@@ -414,6 +410,16 @@ endif   # !WANT_SHARE_INSTALL
 INSTDIR=$(HACKDIR)
 VARDIR=$(HACKDIR)
 
+SYSCONFCREATE = sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf
+SYSCONFINSTALL = $(SYSCONFCREATE) && \
+	 $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf && \
+	 $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf && \
+	 chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+SYSCONFENSURE = (if ! test -f $(INSTDIR)/sysconf ; then \
+	 $(SYSCONFCREATE) && \
+	 $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf && \
+	 $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf && \
+	 chmod $(VARFILEPERM) $(INSTDIR)/sysconf; fi );
 
 # ~/Library/Preferences/NetHack Defaults
 # OPTIONS=name:player,number_pad,menustyle:partial,!time,showexp
