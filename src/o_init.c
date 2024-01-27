@@ -13,6 +13,7 @@ static int QSORTCALLBACK discovered_cmp(const genericptr, const genericptr);
 static char *sortloot_descr(int, char *);
 static char *disco_typename(int);
 static void disco_append_typename(char *, int);
+static void disco_output_sorted(winid, char **, int, boolean);
 static char *oclass_to_name(char, char *);
 
 #ifdef TILES_IN_GLYPHMAP
@@ -675,6 +676,27 @@ disco_append_typename(char *buf, int dis)
     }
 }
 
+/* sort and output sorted_lines to window and free the lines */
+static void
+disco_output_sorted(winid tmpwin,
+                    char **sorted_lines, int sorted_ct,
+                    boolean lootsort)
+{
+    char *p;
+    int j;
+
+    qsort(sorted_lines, sorted_ct, sizeof (char *), discovered_cmp);
+    for (j = 0; j < sorted_ct; ++j) {
+        p = sorted_lines[j];
+        if (lootsort) {
+            p[6] = p[0]; /* '*' or ' ' */
+            p += 6;
+        }
+        putstr(tmpwin, 0, p);
+        free(sorted_lines[j]), sorted_lines[j] = 0;
+    }
+}
+
 /* the #known command - show discovered object types */
 int
 dodiscovered(void) /* free after Robert Viduya */
@@ -683,7 +705,7 @@ dodiscovered(void) /* free after Robert Viduya */
     char *s, *p, oclass, prev_class,
          classes[MAXOCLASSES], buf[BUFSZ],
          *sorted_lines[NUM_OBJECTS]; /* overkill */
-    int i, j, dis, ct, uniq_ct, arti_ct, sorted_ct;
+    int i, dis, ct, uniq_ct, arti_ct, sorted_ct;
     long sortindx;  // should be ptrdiff_t, but we don't require that exists
     boolean alphabetized, alphabyclass, lootsort;
 
@@ -735,17 +757,7 @@ dodiscovered(void) /* free after Robert Viduya */
                 if (oclass != prev_class) {
                     if ((alphabyclass || lootsort) && sorted_ct) {
                         /* output previous class */
-                        qsort(sorted_lines, sorted_ct, sizeof (char *),
-                              discovered_cmp);
-                        for (j = 0; j < sorted_ct; ++j) {
-                            p = sorted_lines[j];
-                            if (lootsort) {
-                                p[6] = p[0]; /* '*' or ' ' */
-                                p += 6;
-                            }
-                            putstr(tmpwin, 0, p);
-                            free(sorted_lines[j]), sorted_lines[j] = 0;
-                        }
+                        disco_output_sorted(tmpwin, sorted_lines, sorted_ct, lootsort);
                         sorted_ct = 0;
                     }
                     if (!alphabetized || alphabyclass) {
@@ -777,16 +789,7 @@ dodiscovered(void) /* free after Robert Viduya */
                any unique items or any artifacts then we do need one */
             if ((uniq_ct || arti_ct) && alphabetized && !alphabyclass)
                 putstr(tmpwin, iflags.menu_headings.attr, "Discovered items");
-            qsort(sorted_lines, sorted_ct, sizeof (char *), discovered_cmp);
-            for (j = 0; j < sorted_ct; ++j) {
-                p = sorted_lines[j];
-                if (lootsort) {
-                    p[6] = p[0]; /* '*' or ' ' */
-                    p += 6;
-                }
-                putstr(tmpwin, 0, p);
-                free(sorted_lines[j]), sorted_lines[j] = 0;
-            }
+            disco_output_sorted(tmpwin, sorted_lines, sorted_ct, lootsort);
         }
         display_nhwindow(tmpwin, TRUE);
     }
