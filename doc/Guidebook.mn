@@ -4384,7 +4384,7 @@ Effectively a superset of the
 .op hilite_pet
 boolean option.
 Curses or tty interface only; value is one of
-none, bold, dim, underline, blink, and inverse.
+none, bold, dim, underline, italic, blink, and inverse.
 Some of those choices might not work,
 depending upon terminal hardware or terminal emulation software.
 .lp ""
