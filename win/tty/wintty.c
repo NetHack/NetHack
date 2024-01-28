@@ -120,7 +120,7 @@ struct window_procs tty_procs = {
      | WC2_RESET_STATUS
 #endif
      | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_STATUSLINES
-     | WC2_U_UTF8STR
+     | WC2_U_UTF8STR | WC2_PETATTR
 #if !defined(NO_TERMS) || defined(WIN32CON)
      | WC2_U_24BITCOLOR
 #endif
@@ -3786,6 +3786,7 @@ tty_print_glyph(
     const glyph_info *bkglyphinfo)
 {
     boolean inverse_on = FALSE, colordone = FALSE, glyphdone = FALSE;
+    boolean petattr = FALSE;
     int ch, color;
     unsigned special;
 #ifdef ENHANCED_SYMBOLS
@@ -3850,8 +3851,10 @@ tty_print_glyph(
         && bkglyphinfo && bkglyphinfo->framecolor != NO_COLOR) {
         ttyDisplay->framecolor = bkglyphinfo->framecolor;
         term_start_bgcolor(bkglyphinfo->framecolor);
-    } else if ((((special & MG_PET) != 0 && iflags.hilite_pet)
-                || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
+    } else if ((special & MG_PET) != 0 && iflags.hilite_pet) {
+        term_start_attr(iflags.wc2_petattr);
+        petattr = TRUE;
+    } else if ((((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
                 || ((special & MG_FEMALE) != 0 && wizard && iflags.wizmgender)
                 || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE
                                 | MG_BW_SINK | MG_BW_ENGR)) != 0))
@@ -3880,6 +3883,8 @@ tty_print_glyph(
 
     if (inverse_on)
         term_end_attr(ATR_INVERSE);
+    else if (petattr)
+        term_end_attr(iflags.wc2_petattr);
     if (iflags.use_color) {
         /* turn off color as well, turning off ATR_INVERSE may have done
           this already and if so, we won't know the current state unless

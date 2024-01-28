@@ -2000,6 +2000,7 @@ curses: if user's terminal was set to 'application keypad mode' (DEC VTxxx
 	nomenclature; set via 2 char "ESC =") and the terminfo or termcap
 	entry told the terminal to send 8-bit escape sequences (via 3 char
 	"ESC SPC G"), nethack wasn't recognizing number pad keys
+curses: change petattr attributes, dropping support for curses-only ones
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project
@@ -2139,6 +2140,7 @@ tty: have <return> dismiss pick-none menus instead of acting like '>' (not
 	only wouldn't dismiss when not on last page, wouldn't dismiss at all)
 tty: menu search via ':' would clobber part of the menu with a status line
 	refresh if the menu was tall enough to cover that
+tty: add support for petattr
 Unix: when user name is used as default character name, keep hyphenated value
 	intact instead stripping off dash and whatever follows as if that
 	specified role/race/&c (worked once upon a time; broken since 3.3.0)

@@ -4039,7 +4039,7 @@ The behavior of this option depends on the type of windowing you use.
 In text windowing, text highlighting or inverse video is often used;
 with tiles, generally displays a heart symbol near pets.
 .lp ""
-With the curses interface, the
+With the tty or curses interface, the
 .op petattr
 option controls how to highlight pets and setting it will turn the
 .op hilite_pet
@@ -4383,21 +4383,9 @@ pets on the map.
 Effectively a superset of the
 .op hilite_pet
 boolean option.
-Curses interface only; value is one or more of the following letters.
-.sd
-.si
-.CC n "Normal text (no highlighting)"
-.CC i "Inverse video (default)"
-.CC b "Bold text"
-.CC u "Underlined text"
-.CC k "blinKing text"
-.CC d "Dim text"
-.CC t "iTalic text"
-.CC l "Left line indicator"
-.CC r "Right line indicator"
-.ei
-.ed
-Some of those choices might not work, particularly the final three,
+Curses or tty interface only; value is one of
+none, bold, dim, underline, blink, and inverse.
+Some of those choices might not work,
 depending upon terminal hardware or terminal emulation software.
 .lp ""
 Currently multiple highlight-style letters can be combined by simply

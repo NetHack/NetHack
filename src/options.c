@@ -376,6 +376,7 @@ static int handler_perminv_mode(void);
 static int handler_pickup_burden(void);
 static int handler_pickup_types(void);
 static int handler_runmode(void);
+static int handler_petattr(void);
 static int handler_sortloot(void);
 static int handler_symset(int);
 static int handler_whatis_coord(void);
@@ -395,10 +396,6 @@ static void wc_set_font_name(int, char *);
 static int wc_set_window_colors(char *);
 static boolean illegal_menu_cmd_key(uchar);
 static const char *term_for_boolean(int, boolean *);
-#ifdef CURSES_GRAPHICS
-extern int curses_read_attrs(const char *attrs);
-extern char *curses_fmt_attrs(char *);
-#endif
 
 /* ask user if they want a tutorial, except if tutorial boolean option has
    been set in config - either on or off - in which case just obey that
@@ -2950,8 +2947,8 @@ optfn_petattr(
             bad_negation(allopt[optidx].name, TRUE);
             retval = optn_err;
         } else if (op != empty_optstr) {
-#ifdef CURSES_GRAPHICS
-            int itmp = curses_read_attrs(op);
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
+            int itmp = match_str2attr(op, FALSE);
 
             if (itmp == -1) {
                 config_error_add("Unknown %s parameter '%s'",
@@ -2960,9 +2957,6 @@ optfn_petattr(
             } else
                 iflags.wc2_petattr = itmp;
 #else
-            /* non-curses windowports will not use this flag anyway
-             * but the above will not compile if we don't have curses.
-             * Just set it to a sensible default: */
             iflags.wc2_petattr = ATR_INVERSE;
 #endif
         } else if (negated) {
@@ -2976,11 +2970,9 @@ optfn_petattr(
         return retval;
     }
     if (req == get_val || req == get_cnf_val) {
-#ifdef CURSES_GRAPHICS
-        if (WINDOWPORT(curses)) {
-            char tmpbuf[QBUFSZ];
-
-            Strcpy(opts, curses_fmt_attrs(tmpbuf));
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
+        if (WINDOWPORT(tty) || WINDOWPORT(curses)) {
+            Strcpy(opts, attr2attrname(iflags.wc2_petattr));
         } else
 #endif
         if (iflags.wc2_petattr != 0)
@@ -2989,6 +2981,9 @@ optfn_petattr(
             opts[0] = '\0';
         else
             Strcpy(opts, defopt);
+    }
+    if (req == do_handler) {
+        return handler_petattr();
     }
     return optn_ok;
 }
@@ -4987,6 +4982,19 @@ optfn_boolean(
         case opt_tiled_map:
             iflags.wc_ascii_map = negated;
             break;
+        case opt_hilite_pet:
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
+            if (WINDOWPORT(tty) || WINDOWPORT(curses)) {
+                /* if we're enabling hilite_pet and petattr isn't set,
+                   set it to Inverse; if we're disabling, leave petattr
+                   alone so that re-enabling will get current value back
+                 */
+                if (iflags.hilite_pet && !iflags.wc2_petattr)
+                    iflags.wc2_petattr = ATR_INVERSE;
+            }
+#endif
+            go.opt_need_redraw = TRUE;
+            break;
         default:
             break;
         }
@@ -5037,19 +5045,6 @@ optfn_boolean(
         case opt_tiled_map:
             go.opt_need_redraw = TRUE;
             go.opt_need_glyph_reset = TRUE;
-            break;
-        case opt_hilite_pet:
-#ifdef CURSES_GRAPHICS
-            if (WINDOWPORT(curses)) {
-                /* if we're enabling hilite_pet and petattr isn't set,
-                   set it to Inverse; if we're disabling, leave petattr
-                   alone so that re-enabling will get current value back
-                 */
-                if (iflags.hilite_pet && !iflags.wc2_petattr)
-                    iflags.wc2_petattr = curses_read_attrs("I");
-            }
-#endif
-            go.opt_need_redraw = TRUE;
             break;
         case opt_hitpointbar:
             if (VIA_WINDOWPORT()) {
@@ -5749,6 +5744,20 @@ handler_runmode(void)
         free((genericptr_t) mode_pick);
     }
     destroy_nhwindow(tmpwin);
+    return optn_ok;
+}
+
+static int
+handler_petattr(void)
+{
+    int tmp = query_attr("Select pet highlight attribute", iflags.wc2_petattr);
+
+    if (tmp != -1) {
+        iflags.wc2_petattr = tmp;
+        iflags.hilite_pet = (iflags.wc2_petattr != ATR_NONE);
+        if (!go.opt_initial)
+            go.opt_need_redraw = TRUE;
+    }
     return optn_ok;
 }
 

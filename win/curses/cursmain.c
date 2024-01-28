@@ -909,7 +909,7 @@ curses_print_glyph(
     ch = glyphinfo->ttychar;
     color = glyphinfo->gm.sym.color;
     if ((special & MG_PET) && iflags.hilite_pet) {
-        attr = iflags.wc2_petattr;
+        attr = curses_convert_attr(iflags.wc2_petattr);
     }
     if ((special & MG_DETECT) && iflags.use_inverse) {
         attr = A_REVERSE;
