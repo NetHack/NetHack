@@ -1179,5 +1179,3 @@ extern const struct const_globals cg;
 extern struct obj hands_obj;
 
 #endif /* DECL_H */
-
-

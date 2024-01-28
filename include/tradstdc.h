@@ -381,6 +381,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #define NONNULLARG3 __attribute__((nonnull (3)))
 #define NONNULLARG4 __attribute__((nonnull (4)))
 #define NONNULLARG5 __attribute__((nonnull (5)))
+#define NONNULLARG6 __attribute__((nonnull (6)))
 #define NONNULLARG7 __attribute__((nonnull (7))) /* for bhit() */
 #define NONNULLARG12 __attribute__((nonnull (1, 2)))
 #define NONNULLARG23 __attribute__((nonnull (2, 3)))
@@ -427,6 +428,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #define NONNULLARG3
 #define NONNULLARG4
 #define NONNULLARG5
+#define NONNULLARG6
 #define NONNULLARG7
 #define NONNULLARG12
 #define NONNULLARG23
