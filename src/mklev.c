@@ -25,6 +25,8 @@ static void fill_ordinary_room(struct mkroom *, boolean) NONNULLARG1;
 static void makelevel(void);
 static boolean bydoor(coordxy, coordxy);
 static void mktrap_victim(struct trap *);
+static int traptype_rnd(unsigned);
+static int traptype_roguelvl(void);
 static struct mkroom *find_branch_room(coord *) NONNULLARG1;
 static struct mkroom *pos_to_room(coordxy, coordxy);
 static boolean cardinal_nextto_room(struct mkroom *, coordxy, coordxy);
@@ -1730,6 +1732,102 @@ mktrap_victim(struct trap *ttmp)
     otmp->age -= (TAINT_AGE + 1); /* died too long ago to safely eat */
 }
 
+/* pick a random trap type, return NO_TRAP if "too hard" */
+static int
+traptype_rnd(unsigned mktrapflags)
+{
+    unsigned lvl = level_difficulty();
+    int kind = rnd(TRAPNUM - 1);
+
+    switch (kind) {
+        /* these are controlled by the feature or object they guard,
+           not by the map so mustn't be created on it */
+    case TRAPPED_DOOR:
+    case TRAPPED_CHEST:
+        kind = NO_TRAP;
+        break;
+        /* these can have a random location but can't be generated
+           randomly */
+    case MAGIC_PORTAL:
+    case VIBRATING_SQUARE:
+        kind = NO_TRAP;
+        break;
+    case ROLLING_BOULDER_TRAP:
+    case SLP_GAS_TRAP:
+        if (lvl < 2)
+            kind = NO_TRAP;
+        break;
+    case LEVEL_TELEP:
+        if (lvl < 5 || gl.level.flags.noteleport
+            || single_level_branch(&u.uz))
+            kind = NO_TRAP;
+        break;
+    case SPIKED_PIT:
+        if (lvl < 5)
+            kind = NO_TRAP;
+        break;
+    case LANDMINE:
+        if (lvl < 6)
+            kind = NO_TRAP;
+        break;
+    case WEB:
+        if (lvl < 7 && !(mktrapflags & MKTRAP_NOSPIDERONWEB))
+            kind = NO_TRAP;
+        break;
+    case STATUE_TRAP:
+    case POLY_TRAP:
+        if (lvl < 8)
+            kind = NO_TRAP;
+        break;
+    case FIRE_TRAP:
+        if (!Inhell)
+            kind = NO_TRAP;
+        break;
+    case TELEP_TRAP:
+        if (gl.level.flags.noteleport)
+            kind = NO_TRAP;
+        break;
+    case HOLE:
+        /* make these much less often than other traps */
+        if (rn2(7))
+            kind = NO_TRAP;
+        break;
+    }
+    return kind;
+}
+
+/* random trap type for the Rogue level */
+static int
+traptype_roguelvl(void)
+{
+    int kind;
+
+    switch (rn2(7)) {
+    default:
+        kind = BEAR_TRAP;
+        break; /* 0 */
+    case 1:
+        kind = ARROW_TRAP;
+        break;
+    case 2:
+        kind = DART_TRAP;
+        break;
+    case 3:
+        kind = TRAPDOOR;
+        break;
+    case 4:
+        kind = PIT;
+        break;
+    case 5:
+        kind = SLP_GAS_TRAP;
+        break;
+    case 6:
+        kind = RUST_TRAP;
+        break;
+    }
+    return kind;
+}
+
 /* mktrap(): select trap type and location, then use maketrap() to create it;
    make it at location 'tm' when that isn't Null, otherwise in 'croom'
    if mktrapflags doesn't have MKTRAP_MAZEFLAG set, else in maze corridor */
@@ -1767,90 +1865,13 @@ mktrap(
     if (num > NO_TRAP && num < TRAPNUM) {
         kind = num;
     } else if (Is_rogue_level(&u.uz)) {
-        switch (rn2(7)) {
-        default:
-            kind = BEAR_TRAP;
-            break; /* 0 */
-        case 1:
-            kind = ARROW_TRAP;
-            break;
-        case 2:
-            kind = DART_TRAP;
-            break;
-        case 3:
-            kind = TRAPDOOR;
-            break;
-        case 4:
-            kind = PIT;
-            break;
-        case 5:
-            kind = SLP_GAS_TRAP;
-            break;
-        case 6:
-            kind = RUST_TRAP;
-            break;
-        }
+        kind = traptype_roguelvl();
     } else if (Inhell && !rn2(5)) {
         /* bias the frequency of fire traps in Gehennom */
         kind = FIRE_TRAP;
     } else {
         do {
-            kind = rnd(TRAPNUM - 1);
-            /* reject "too hard" traps */
-            switch (kind) {
-            /* these are controlled by the feature or object they guard,
-               not by the map so mustn't be created on it */
-            case TRAPPED_DOOR:
-            case TRAPPED_CHEST:
-                kind = NO_TRAP;
-                break;
-            /* these can have a random location but can't be generated
-               randomly */
-            case MAGIC_PORTAL:
-            case VIBRATING_SQUARE:
-                kind = NO_TRAP;
-                break;
-            case ROLLING_BOULDER_TRAP:
-            case SLP_GAS_TRAP:
-                if (lvl < 2)
-                    kind = NO_TRAP;
-                break;
-            case LEVEL_TELEP:
-                if (lvl < 5 || gl.level.flags.noteleport
-                    || single_level_branch(&u.uz))
-                    kind = NO_TRAP;
-                break;
-            case SPIKED_PIT:
-                if (lvl < 5)
-                    kind = NO_TRAP;
-                break;
-            case LANDMINE:
-                if (lvl < 6)
-                    kind = NO_TRAP;
-                break;
-            case WEB:
-                if (lvl < 7 && !(mktrapflags & MKTRAP_NOSPIDERONWEB))
-                    kind = NO_TRAP;
-                break;
-            case STATUE_TRAP:
-            case POLY_TRAP:
-                if (lvl < 8)
-                    kind = NO_TRAP;
-                break;
-            case FIRE_TRAP:
-                if (!Inhell)
-                    kind = NO_TRAP;
-                break;
-            case TELEP_TRAP:
-                if (gl.level.flags.noteleport)
-                    kind = NO_TRAP;
-                break;
-            case HOLE:
-                /* make these much less often than other traps */
-                if (rn2(7))
-                    kind = NO_TRAP;
-                break;
-            }
+            kind = traptype_rnd(mktrapflags);
         } while (kind == NO_TRAP);
     }
 
