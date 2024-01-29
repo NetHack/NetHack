@@ -5474,7 +5474,7 @@ orange, light-green, yellow, light-blue, light-magenta, light-cyan, and white.
 And \(lqno-color\(rq, the default foreground color on the display, which
 is not necessarily the same as black or white or any of the other colors.
 .pg
-Allowed attributes are none, bold, dim, underline, blink, and inverse.
+Allowed attributes are none, bold, dim, underline, italic, blink, and inverse.
 \(lqNormal\(rq is a synonym for \(lqnone\(rq; they should not be used in
 combination with any of the other attributes.
 .pg
