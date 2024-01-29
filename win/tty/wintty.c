@@ -4821,7 +4821,7 @@ condattr(long bm, unsigned long *bmarray)
     int i;
 
     if (bm && bmarray) {
-        for (i = HL_ATTCLR_DIM; i < BL_ATTCLR_MAX; ++i) {
+        for (i = HL_ATTCLR_BOLD; i < BL_ATTCLR_MAX; ++i) {
             if ((bm & bmarray[i]) != 0) {
                 switch (i) {
                 case HL_ATTCLR_BOLD:
