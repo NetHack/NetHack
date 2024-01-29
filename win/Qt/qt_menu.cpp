@@ -623,6 +623,10 @@ void NetHackQtMenuWindow::AddRow(int row, const MenuItem& mi)
             itemfont.setWeight(QFont::Bold);
             twi->setFont(itemfont);
             break;
+        case ATR_ITALIC:
+            itemfont.setItalic(true);
+            twi->setFont(itemfont);
+            break;
         case ATR_DIM:
             twi->setFlags(Qt::NoItemFlags);
             break;
