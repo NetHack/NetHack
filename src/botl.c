@@ -2734,16 +2734,18 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
         for (i = 0; i < sf; ++i) {
             int a = match_str2attr(subfields[i], FALSE);
 
-            if (a == ATR_DIM)
+            if (a == ATR_BOLD)
+                disp_attrib |= HL_BOLD;
+            else if (a == ATR_DIM)
                 disp_attrib |= HL_DIM;
-            else if (a == ATR_BLINK)
-                disp_attrib |= HL_BLINK;
+            else if (a == ATR_ITALIC)
+                disp_attrib |= HL_ITALIC;
             else if (a == ATR_ULINE)
                 disp_attrib |= HL_ULINE;
+            else if (a == ATR_BLINK)
+                disp_attrib |= HL_BLINK;
             else if (a == ATR_INVERSE)
                 disp_attrib |= HL_INVERSE;
-            else if (a == ATR_BOLD)
-                disp_attrib |= HL_BOLD;
             else if (a == ATR_NONE)
                 disp_attrib = HL_NONE;
             else {
@@ -2967,7 +2969,7 @@ parse_condition(char (*s)[QBUFSZ], int sidx)
          * bitmasks indexed by the color chosen
          *        (0 to (CLR_MAX - 1))
          * and/or attributes chosen
-         *        (HL_ATTCLR_DIM to (BL_ATTCLR_MAX - 1))
+         *        (HL_ATTCLR_NONE to (BL_ATTCLR_MAX - 1))
          * We still have to parse the colors and attributes out.
          */
 
@@ -2993,34 +2995,31 @@ parse_condition(char (*s)[QBUFSZ], int sidx)
          * We have the following additional array offsets to
          * use for storing the attributes beyond the end of
          * the color indexes, all of which are less than CLR_MAX.
-         * HL_ATTCLR_DIM        = CLR_MAX
-         * HL_ATTCLR_BLINK      = CLR_MAX + 1
-         * HL_ATTCLR_ULINE      = CLR_MAX + 2
-         * HL_ATTCLR_INVERSE    = CLR_MAX + 3
-         * HL_ATTCLR_BOLD       = CLR_MAX + 4
-         * HL_ATTCLR_MAX        = CLR_MAX + 5 (this is past array boundary)
          *
          */
 
         for (i = 0; i < sf; ++i) {
             int a = match_str2attr(subfields[i], FALSE);
 
-            if (a == ATR_DIM)
+            if (a == ATR_BOLD)
+                gc.cond_hilites[HL_ATTCLR_BOLD] |= conditions_bitmask;
+            else if (a == ATR_DIM)
                 gc.cond_hilites[HL_ATTCLR_DIM] |= conditions_bitmask;
-            else if (a == ATR_BLINK)
-                gc.cond_hilites[HL_ATTCLR_BLINK] |= conditions_bitmask;
+            else if (a == ATR_ITALIC)
+                gc.cond_hilites[HL_ATTCLR_ITALIC] |= conditions_bitmask;
             else if (a == ATR_ULINE)
                 gc.cond_hilites[HL_ATTCLR_ULINE] |= conditions_bitmask;
+            else if (a == ATR_BLINK)
+                gc.cond_hilites[HL_ATTCLR_BLINK] |= conditions_bitmask;
             else if (a == ATR_INVERSE)
                 gc.cond_hilites[HL_ATTCLR_INVERSE] |= conditions_bitmask;
-            else if (a == ATR_BOLD)
-                gc.cond_hilites[HL_ATTCLR_BOLD] |= conditions_bitmask;
             else if (a == ATR_NONE) {
-                gc.cond_hilites[HL_ATTCLR_DIM] &= ~conditions_bitmask;
-                gc.cond_hilites[HL_ATTCLR_BLINK] &= ~conditions_bitmask;
-                gc.cond_hilites[HL_ATTCLR_ULINE] &= ~conditions_bitmask;
-                gc.cond_hilites[HL_ATTCLR_INVERSE] &= ~conditions_bitmask;
                 gc.cond_hilites[HL_ATTCLR_BOLD] &= ~conditions_bitmask;
+                gc.cond_hilites[HL_ATTCLR_DIM] &= ~conditions_bitmask;
+                gc.cond_hilites[HL_ATTCLR_ITALIC] &= ~conditions_bitmask;
+                gc.cond_hilites[HL_ATTCLR_ULINE] &= ~conditions_bitmask;
+                gc.cond_hilites[HL_ATTCLR_BLINK] &= ~conditions_bitmask;
+                gc.cond_hilites[HL_ATTCLR_INVERSE] &= ~conditions_bitmask;
             } else {
                 int k = match_str2clr(subfields[i]);
 
@@ -3075,14 +3074,16 @@ hlattr2attrname(int attrib, char *buf, size_t bufsz)
 
         if (attrib & HL_BOLD)
             Strcat(attbuf, first++ ? "+bold" : "bold");
-        if (attrib & HL_INVERSE)
-            Strcat(attbuf, first++ ? "+inverse" : "inverse");
+        if (attrib & HL_DIM)
+            Strcat(attbuf, first++ ? "+dim" : "dim");
+        if (attrib & HL_ITALIC)
+            Strcat(attbuf, first++ ? "+italic" : "italic");
         if (attrib & HL_ULINE)
             Strcat(attbuf, first++ ? "+underline" : "underline");
         if (attrib & HL_BLINK)
             Strcat(attbuf, first++ ? "+blink" : "blink");
-        if (attrib & HL_DIM)
-            Strcat(attbuf, first++ ? "+dim" : "dim");
+        if (attrib & HL_INVERSE)
+            Strcat(attbuf, first++ ? "+inverse" : "inverse");
 
         k = strlen(attbuf);
         if (k < (size_t)(bufsz - 1))
@@ -3198,14 +3199,16 @@ status_hilite_linestr_gather_conditions(void)
                 clr = j;
                 break;
             }
-        if (gc.cond_hilites[HL_ATTCLR_DIM] & conditions[i].mask)
-            atr |= HL_DIM;
         if (gc.cond_hilites[HL_ATTCLR_BOLD] & conditions[i].mask)
             atr |= HL_BOLD;
-        if (gc.cond_hilites[HL_ATTCLR_BLINK] & conditions[i].mask)
-            atr |= HL_BLINK;
+        if (gc.cond_hilites[HL_ATTCLR_DIM] & conditions[i].mask)
+            atr |= HL_DIM;
+        if (gc.cond_hilites[HL_ATTCLR_ITALIC] & conditions[i].mask)
+            atr |= HL_ITALIC;
         if (gc.cond_hilites[HL_ATTCLR_ULINE] & conditions[i].mask)
             atr |= HL_ULINE;
+        if (gc.cond_hilites[HL_ATTCLR_BLINK] & conditions[i].mask)
+            atr |= HL_BLINK;
         if (gc.cond_hilites[HL_ATTCLR_INVERSE] & conditions[i].mask)
             atr |= HL_INVERSE;
         if (atr != HL_NONE)
@@ -3931,22 +3934,25 @@ status_hilite_menu_add(int origfld)
         char attrbuf[BUFSZ];
         char *tmpattr;
 
-        if (atr & HL_DIM)
-            gc.cond_hilites[HL_ATTCLR_DIM] |= cond;
-        if (atr & HL_BLINK)
-            gc.cond_hilites[HL_ATTCLR_BLINK] |= cond;
-        if (atr & HL_ULINE)
-            gc.cond_hilites[HL_ATTCLR_ULINE] |= cond;
-        if (atr & HL_INVERSE)
-            gc.cond_hilites[HL_ATTCLR_INVERSE] |= cond;
         if (atr & HL_BOLD)
             gc.cond_hilites[HL_ATTCLR_BOLD] |= cond;
+        if (atr & HL_DIM)
+            gc.cond_hilites[HL_ATTCLR_DIM] |= cond;
+        if (atr & HL_ITALIC)
+            gc.cond_hilites[HL_ATTCLR_ITALIC] |= cond;
+        if (atr & HL_ULINE)
+            gc.cond_hilites[HL_ATTCLR_ULINE] |= cond;
+        if (atr & HL_BLINK)
+            gc.cond_hilites[HL_ATTCLR_BLINK] |= cond;
+        if (atr & HL_INVERSE)
+            gc.cond_hilites[HL_ATTCLR_INVERSE] |= cond;
         if (atr == HL_NONE) {
-            gc.cond_hilites[HL_ATTCLR_DIM] &= ~cond;
-            gc.cond_hilites[HL_ATTCLR_BLINK] &= ~cond;
-            gc.cond_hilites[HL_ATTCLR_ULINE] &= ~cond;
-            gc.cond_hilites[HL_ATTCLR_INVERSE] &= ~cond;
             gc.cond_hilites[HL_ATTCLR_BOLD] &= ~cond;
+            gc.cond_hilites[HL_ATTCLR_DIM] &= ~cond;
+            gc.cond_hilites[HL_ATTCLR_ITALIC] &= ~cond;
+            gc.cond_hilites[HL_ATTCLR_ULINE] &= ~cond;
+            gc.cond_hilites[HL_ATTCLR_BLINK] &= ~cond;
+            gc.cond_hilites[HL_ATTCLR_INVERSE] &= ~cond;
         }
         gc.cond_hilites[clr] |= cond;
         (void) strNsubst(strcpy(clrbuf, clr2colorname(clr)), " ", "-", 0);
@@ -3999,10 +4005,11 @@ status_hilite_remove(int id)
 
         for (i = 0; i < CLR_MAX; i++)
             gc.cond_hilites[i] &= ~hlstr->mask;
-        gc.cond_hilites[HL_ATTCLR_DIM] &= ~hlstr->mask;
         gc.cond_hilites[HL_ATTCLR_BOLD] &= ~hlstr->mask;
-        gc.cond_hilites[HL_ATTCLR_BLINK] &= ~hlstr->mask;
+        gc.cond_hilites[HL_ATTCLR_DIM] &= ~hlstr->mask;
+        gc.cond_hilites[HL_ATTCLR_ITALIC] &= ~hlstr->mask;
         gc.cond_hilites[HL_ATTCLR_ULINE] &= ~hlstr->mask;
+        gc.cond_hilites[HL_ATTCLR_BLINK] &= ~hlstr->mask;
         gc.cond_hilites[HL_ATTCLR_INVERSE] &= ~hlstr->mask;
         return TRUE;
     } else {

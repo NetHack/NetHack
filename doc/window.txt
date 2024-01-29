@@ -124,10 +124,13 @@ putstr(window, attr, str)
 		   Multiple putstr()s are output on separate lines.  Attributes
 		   can be one of
 			ATR_NONE (or 0)
-			ATR_ULINE
 			ATR_BOLD
+			ATR_DIM
+			ATR_ITALIC
+			ATR_ULINE
 			ATR_BLINK
 			ATR_INVERSE
+
 		   If a window-port does not support all of these, it may map
 		   unsupported attributes to a supported one (e.g. map them
 		   all to ATR_INVERSE).  putstr() may compress spaces out of
@@ -158,10 +161,13 @@ putmixed(window, attr, str)
 		   Multiple putmixed()s are output on separate lines.
 		   Attributes can be one of
 			ATR_NONE (or 0)
-			ATR_ULINE
 			ATR_BOLD
+			ATR_DIM
+			ATR_ITALIC
+			ATR_ULINE
 			ATR_BLINK
 			ATR_INVERSE
+
 		   If a window-port does not support all of these, it may map
 		   unsupported attributes to a supported one (e.g. map them
 		   all to ATR_INVERSE).  putmixed() may compress spaces out of
@@ -374,10 +380,13 @@ add_menu(windid window, glyphinfo, const anything identifier, char accelerator,
 		   with the default object class symbols.
                 -- attr attributes can be one of
 			ATR_NONE (or 0)
-			ATR_ULINE
 			ATR_BOLD
+			ATR_DIM
+			ATR_ITALIC
+			ATR_ULINE
 			ATR_BLINK
 			ATR_INVERSE
+
 		   If a window-port does not support all of these, it may map
 		   unsupported attributes to a supported one (e.g. map them
 		   all to ATR_INVERSE).
@@ -575,17 +584,24 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage, \
                    +------+----------------------+--------------------+
                    |  15  |   CLR_WHITE          |                    |
                    +------+----------------------+--------------------+
-                   |  16  |   HL_ATTCLR_DIM      |                    | CLR_MAX
+                   |  16  |   HL_ATTCLR_UNDEF    |                    | CLR_MAX
                    +------+----------------------+--------------------+
-                   |  17  |   HL_ATTCLR_BLINK    |                    |
+                   |  17  |   HL_ATTCLR_NONE     |                    | CLR_MAX + 1
                    +------+----------------------+--------------------+
-                   |  18  |   HL_ATTCLR_ULINE    |                    |
+                   |  18  |   HL_ATTCLR_BOLD     |                    | CLR_MAX + 2
                    +------+----------------------+--------------------+
-                   |  19  |   HL_ATTCLR_INVERSE  |   00010110         |
+                   |  19  |   HL_ATTCLR_DIM      |                    | CLR_MAX + 3
                    +------+----------------------+--------------------+
-                   |  20  |   HL_ATTCLR_BOLD     |                    |
+                   |  20  |   HL_ATTCLR_ITALIC   |                    | CLR_MAX + 4
                    +------+----------------------+--------------------+
-                   |  21  | beyond array boundary|              | BL_ATTCLR_MAX
+                   |  21  |   HL_ATTCLR_ULINE    |                    | CLR_MAX + 5
+                   +------+----------------------+--------------------+
+                   |  22  |   HL_ATTCLR_BLINK    |                    | CLR_MAX + 6
+                   +------+----------------------+--------------------+
+                   |  23  |   HL_ATTCLR_INVERSE  |                    | CLR_MAX + 7
+                   +------+----------------------+--------------------+
+                   |  24  | beyond array boundary|                    | BL_ATTCLR_MAX
+
 
                    The window port can AND (&) the bits passed in the
                    ptr argument to status_update() with any non-zero

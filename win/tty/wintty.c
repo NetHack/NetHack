@@ -4824,20 +4824,23 @@ condattr(long bm, unsigned long *bmarray)
         for (i = HL_ATTCLR_DIM; i < BL_ATTCLR_MAX; ++i) {
             if ((bm & bmarray[i]) != 0) {
                 switch (i) {
+                case HL_ATTCLR_BOLD:
+                    attr |= HL_BOLD;
+                    break;
                 case HL_ATTCLR_DIM:
                     attr |= HL_DIM;
                     break;
-                case HL_ATTCLR_BLINK:
-                    attr |= HL_BLINK;
+                case HL_ATTCLR_ITALIC:
+                    attr |= HL_ITALIC;
                     break;
                 case HL_ATTCLR_ULINE:
                     attr |= HL_ULINE;
                     break;
+                case HL_ATTCLR_BLINK:
+                    attr |= HL_BLINK;
+                    break;
                 case HL_ATTCLR_INVERSE:
                     attr |= HL_INVERSE;
-                    break;
-                case HL_ATTCLR_BOLD:
-                    attr |= HL_BOLD;
                     break;
                 }
             }
@@ -4851,28 +4854,32 @@ condattr(long bm, unsigned long *bmarray)
         if (m) {                                \
             if ((m) & HL_BOLD)                  \
                 term_start_attr(ATR_BOLD);      \
-            if ((m) & HL_INVERSE)               \
-                term_start_attr(ATR_INVERSE);   \
+            if ((m) & HL_DIM)                   \
+                term_start_attr(ATR_DIM);       \
+            if ((m) & HL_ITALIC)                \
+                term_start_attr(ATR_ITALIC);    \
             if ((m) & HL_ULINE)                 \
                 term_start_attr(ATR_ULINE);     \
             if ((m) & HL_BLINK)                 \
                 term_start_attr(ATR_BLINK);     \
-            if ((m) & HL_DIM)                   \
-                term_start_attr(ATR_DIM);       \
+            if ((m) & HL_INVERSE)               \
+                term_start_attr(ATR_INVERSE);   \
         }                                       \
     } while (0)
 
 #define End_Attr(m) \
     do {                                        \
         if (m) {                                \
-            if ((m) & HL_DIM)                   \
-                term_end_attr(ATR_DIM);         \
+            if ((m) & HL_INVERSE)               \
+                term_end_attr(ATR_INVERSE);     \
             if ((m) & HL_BLINK)                 \
                 term_end_attr(ATR_BLINK);       \
             if ((m) & HL_ULINE)                 \
                 term_end_attr(ATR_ULINE);       \
-            if ((m) & HL_INVERSE)               \
-                term_end_attr(ATR_INVERSE);     \
+            if ((m) & HL_ITALIC)                \
+                term_end_attr(ATR_ITALIC);      \
+            if ((m) & HL_DIM)                   \
+                term_end_attr(ATR_DIM);         \
             if ((m) & HL_BOLD)                  \
                 term_end_attr(ATR_BOLD);        \
         }                                       \

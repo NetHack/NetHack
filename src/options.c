@@ -7476,23 +7476,26 @@ query_attr(const char *prompt, int dflt_attr)
                 j = picks[i].item.a_int - 1;
                 if (attrnames[j].attr != ATR_NONE || pick_cnt == 1) {
                     switch (attrnames[j].attr) {
-                    case ATR_DIM:
-                        k |= HL_DIM;
-                        break;
-                    case ATR_BLINK:
-                        k |= HL_BLINK;
-                        break;
-                    case ATR_ULINE:
-                        k |= HL_ULINE;
-                        break;
-                    case ATR_INVERSE:
-                        k |= HL_INVERSE;
+                    case ATR_NONE:
+                        k = HL_NONE;
                         break;
                     case ATR_BOLD:
                         k |= HL_BOLD;
                         break;
-                    case ATR_NONE:
-                        k = HL_NONE;
+                    case ATR_DIM:
+                        k |= HL_DIM;
+                        break;
+                    case ATR_ITALIC:
+                        k |= HL_ITALIC;
+                        break;
+                    case ATR_ULINE:
+                        k |= HL_ULINE;
+                        break;
+                    case ATR_BLINK:
+                        k |= HL_BLINK;
+                        break;
+                    case ATR_INVERSE:
+                        k |= HL_INVERSE;
                         break;
                     }
                 }

@@ -3068,11 +3068,12 @@ static int
 mswin_condattr(long bm, unsigned long *bmarray)
 {
     if (bm && bmarray) {
-        if (bm & bmarray[HL_ATTCLR_DIM]) return HL_DIM;
-        if (bm & bmarray[HL_ATTCLR_BLINK]) return HL_BLINK;
-        if (bm & bmarray[HL_ATTCLR_ULINE]) return HL_ULINE;
+        if (bm & bmarray[HL_ATTCLR_BOLD])    return HL_BOLD;
+        if (bm & bmarray[HL_ATTCLR_DIM])     return HL_DIM;
+        if (bm & bmarray[HL_ATTCLR_ITALIC])  return HL_ITALIC;
+        if (bm & bmarray[HL_ATTCLR_ULINE])   return HL_ULINE;
+        if (bm & bmarray[HL_ATTCLR_BLINK])   return HL_BLINK;
         if (bm & bmarray[HL_ATTCLR_INVERSE]) return HL_INVERSE;
-        if (bm & bmarray[HL_ATTCLR_BOLD]) return HL_BOLD;
     }
 
     return HL_NONE;
