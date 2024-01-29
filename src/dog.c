@@ -84,6 +84,7 @@ pick_familiar_pm(struct obj *otmp, boolean quietly)
     if (otmp) { /* figurine; otherwise spell */
         int mndx = otmp->corpsenm;
 
+        assert(ismnum(mndx));
         pm = &mons[mndx];
         /* activating a figurine provides one way to exceed the
            maximum number of the target critter created--unless
