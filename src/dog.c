@@ -6,6 +6,7 @@
 #include "hack.h"
 
 static int pet_type(void);
+static struct permonst * pick_familiar_pm(struct obj *, boolean);
 static void set_mon_lastmove(struct monst *);
 static int mon_leave(struct monst *) NONNULLARG1;
 static boolean keep_mon_accessible(struct monst *);
@@ -75,6 +76,36 @@ pet_type(void)
         return  rn2(2) ? PM_KITTEN : PM_LITTLE_DOG;
 }
 
+static struct permonst *
+pick_familiar_pm(struct obj *otmp, boolean quietly)
+{
+    struct permonst *pm = (struct permonst *) 0;
+
+    if (otmp) { /* figurine; otherwise spell */
+        int mndx = otmp->corpsenm;
+
+        pm = &mons[mndx];
+        /* activating a figurine provides one way to exceed the
+           maximum number of the target critter created--unless
+           it has a special limit (erinys, Nazgul) */
+        if ((gm.mvitals[mndx].mvflags & G_EXTINCT)
+            && mbirth_limit(mndx) != MAXMONNO) {
+            if (!quietly)
+                /* have just been given "You <do something with>
+                   the figurine and it transforms." message */
+                pline("... into a pile of dust.");
+            return (struct permonst *) 0;
+        }
+    } else if (!rn2(3)) {
+        pm = &mons[pet_type()];
+    } else {
+        pm = rndmonst();
+        if (!pm && !quietly)
+            There("seems to be nothing available for a familiar.");
+    }
+    return pm;
+}
+
 struct monst *
 make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
 {
@@ -84,32 +115,10 @@ make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
 
     do {
         mmflags_nht mmflags;
-        int cgend, mndx;
+        int cgend;
 
-        if (otmp) { /* figurine; otherwise spell */
-            mndx = otmp->corpsenm;
-            pm = &mons[mndx];
-            /* activating a figurine provides one way to exceed the
-               maximum number of the target critter created--unless
-               it has a special limit (erinys, Nazgul) */
-            if ((gm.mvitals[mndx].mvflags & G_EXTINCT)
-                && mbirth_limit(mndx) != MAXMONNO) {
-                if (!quietly)
-                    /* have just been given "You <do something with>
-                       the figurine and it transforms." message */
-                    pline("... into a pile of dust.");
-                break; /* mtmp is null */
-            }
-        } else if (!rn2(3)) {
-            pm = &mons[pet_type()];
-        } else {
-            pm = rndmonst();
-            if (!pm) {
-                if (!quietly)
-                    There("seems to be nothing available for a familiar.");
-                break;
-            }
-        }
+        if (!(pm = pick_familiar_pm(otmp, quietly)))
+            break;
 
         mmflags = MM_EDOG | MM_IGNOREWATER | NO_MINVENT | MM_NOMSG;
         cgend = otmp ? (otmp->spe & CORPSTAT_GENDER) : 0;
