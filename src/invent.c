@@ -781,10 +781,11 @@ reorder_invent(void)
    one of them; used in pickup.c when all 52 inventory slots are in use,
    to figure out whether another object could still be picked up */
 struct obj *
-merge_choice(struct obj *objlist, struct obj *obj)
+merge_choice(struct obj **objlist, struct obj *obj)
 {
     struct monst *shkp;
     unsigned save_nocharge;
+    struct obj *olist = *objlist;
 
     if (obj->otyp == SCR_SCARE_MONSTER) /* punt on these */
         return (struct obj *) 0;
@@ -792,28 +793,29 @@ merge_choice(struct obj *objlist, struct obj *obj)
        have when carried are different from what they are now; prevent
        that from eliciting an incorrect result from mergable() */
     save_nocharge = obj->no_charge;
-    if (objlist == gi.invent && obj->where == OBJ_FLOOR
-        && (shkp = shop_keeper(inside_shop(obj->ox, obj->oy))) != 0) {
-        if (obj->no_charge)
-            obj->no_charge = 0;
-        /* A billable object won't have its `unpaid' bit set, so would
-           erroneously seem to be a candidate to merge with a similar
-           ordinary object.  That's no good, because once it's really
-           picked up, it won't merge after all.  It might merge with
-           another unpaid object, but we can't check that here (depends
-           too much upon shk's bill) and if it doesn't merge it would
-           end up in the '#' overflow inventory slot, so reject it now. */
-        else if (inhishop(shkp))
-            return (struct obj *) 0;
+    if (olist) {
+        if (olist == gi.invent && obj->where == OBJ_FLOOR
+            && (shkp = shop_keeper(inside_shop(obj->ox, obj->oy))) != 0) {
+            if (obj->no_charge)
+                obj->no_charge = 0;
+            /* A billable object won't have its `unpaid' bit set, so would
+               erroneously seem to be a candidate to merge with a similar
+               ordinary object.  That's no good, because once it's really
+               picked up, it won't merge after all.  It might merge with
+               another unpaid object, but we can't check that here (depends
+               too much upon shk's bill) and if it doesn't merge it would
+               end up in the '#' overflow inventory slot, so reject it now. */
+            else if (inhishop(shkp))
+                return (struct obj *) 0;
+        }
+        do {
+            if (mergable(olist, obj))
+                break;
+            olist = olist->nobj;
+        } while (olist);
     }
-    do {
-        /*assert(objlist != NULL);*/
-        if (mergable(objlist, obj))
-            break;
-        objlist = objlist->nobj;
-    } while (objlist);
     obj->no_charge = save_nocharge;
-    return objlist;
+    return olist;
 }
 
 /* merge obj with otmp and delete obj if types agree */
