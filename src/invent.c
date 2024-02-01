@@ -786,6 +786,8 @@ merge_choice(struct obj *objlist, struct obj *obj)
     struct monst *shkp;
     unsigned save_nocharge;
 
+    if (!objlist) /* might be checking 'obj' against empty inventory */
+        return (struct obj *) 0;
     if (obj->otyp == SCR_SCARE_MONSTER) /* punt on these */
         return (struct obj *) 0;
     /* if this is an item on the shop floor, the attributes it will
