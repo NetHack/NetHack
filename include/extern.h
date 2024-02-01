@@ -1239,7 +1239,7 @@ extern Loot *sortloot(struct obj **, unsigned, boolean,
                       boolean(*)(struct obj *)) NONNULLARG1;
 extern void unsortloot(Loot **) NONNULLARG1;
 extern void assigninvlet(struct obj *) NONNULLARG1;
-extern struct obj *merge_choice(struct obj **, struct obj *) NONNULLPTRS;
+extern struct obj *merge_choice(struct obj *, struct obj *) NONNULLPTRS;
 extern int merged(struct obj **, struct obj **) NONNULLPTRS;
 extern void addinv_core1(struct obj *) NONNULLARG1;
 extern void addinv_core2(struct obj *) NONNULLARG1;

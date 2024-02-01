@@ -1699,7 +1699,7 @@ lift_object(
     if (obj->otyp == LOADSTONE
         || (obj->otyp == BOULDER && throws_rocks(gy.youmonst.data))) {
         if (inv_cnt(FALSE) < invlet_basic || !carrying(obj->otyp)
-            || merge_choice(&gi.invent, obj))
+            || merge_choice(gi.invent, obj))
             return 1; /* lift regardless of current situation */
         /* if we reach here, we're out of slots and already have at least
            one of these, so treat this one more like a normal item
@@ -1719,7 +1719,7 @@ lift_object(
                /* [exception for gold coins will have to change
                    if silver/copper ones ever get implemented] */
                && inv_cnt(FALSE) >= invlet_basic
-               && !merge_choice(&gi.invent, obj)) {
+               && !merge_choice(gi.invent, obj)) {
         /* if there is some gold here (and we haven't already skipped it),
            we aren't limited by the 52 item limit for it, but caller and
            "grandcaller" aren't prepared to skip stuff and then pickup
