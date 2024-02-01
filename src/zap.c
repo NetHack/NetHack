@@ -4494,9 +4494,10 @@ burn_floor_objects(
                 /* useupf(), which charges, only if hero caused damage */
                 if (u_caused)
                     useupf(obj, delquan);
-                else if (delquan < scrquan)
+                else if (delquan < scrquan) {
                     obj->quan -= delquan;
-                else
+                    obj->owt = weight(obj);
+                } else
                     delobj(obj);
                 cnt += delquan;
                 if (give_feedback) {
