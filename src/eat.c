@@ -1,4 +1,4 @@
-/* NetHack 3.7	eat.c	$NHDT-Date: 1695159623 2023/09/19 21:40:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.310 $ */
+/* NetHack 3.7	eat.c	$NHDT-Date: 1706915814 2024/02/02 23:16:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.329 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -14,6 +14,7 @@ static int unfaint(void);
 static const char *food_xname(struct obj *, boolean);
 static void choke(struct obj *);
 static void recalc_wt(void);
+static int adj_victual_nutrition(void);
 static struct obj *touchfood(struct obj *) NONNULL;
 static void do_reset_eat(void);
 static void done_eating(boolean);
@@ -284,7 +285,7 @@ choke(struct obj *food)
     }
 }
 
-/* modify object wt. depending on time spent consuming it */
+/* modify victual.piece->owt depending on time spent consuming it */
 static void
 recalc_wt(void)
 {
@@ -315,7 +316,9 @@ reset_eat(void)
     return;
 }
 
-/* base nutrition of a food-class object */
+/* base nutrition of a food-class object; this used to include a variation
+   of the code that is now in adj_victual_nutrition() and was moved due to
+   its affect on weight() */
 unsigned
 obj_nutrition(struct obj *otmp)
 {
@@ -323,20 +326,30 @@ obj_nutrition(struct obj *otmp)
                       : otmp->globby ? otmp->owt
                          : (unsigned) objects[otmp->otyp].oc_nutrition;
 
-    if (otmp->otyp == LEMBAS_WAFER) {
+    return nut;
+}
+
+/* nutrition increment for next byte; this used to be factored into
+   victual.piece->oeaten but that produced weight change if hero
+   polymorphed to or from one of the races which has nutrition adjusted */
+static int
+adj_victual_nutrition(void)
+{
+    int otyp = gc.context.victual.piece->otyp;
+    /* note: adj_victual_nutrition() is only called when 'nmod' is negative */
+    int nut = -gc.context.victual.nmod; /* convert 'nmod' to positive */
+
+    assert(nut > 0);
+    if (otyp == LEMBAS_WAFER) {
         if (maybe_polyd(is_elf(gy.youmonst.data), Race_if(PM_ELF)))
-            nut += nut / 4; /* 800 -> 1000 */
+            nut += (nut + 2) / 4; /* 800 -> 1000 */
         else if (maybe_polyd(is_orc(gy.youmonst.data), Race_if(PM_ORC)))
-            nut -= nut / 4; /* 800 -> 600 */
-        /* prevent polymorph making a partly eaten wafer
-           become more nutritious than an untouched one */
-        if (otmp->oeaten >= nut)
-            otmp->oeaten = (otmp->oeaten < objects[LEMBAS_WAFER].oc_nutrition)
-                              ? (nut - 1) : nut;
-    } else if (otmp->otyp == CRAM_RATION) {
+            nut -= (nut + 2) / 4; /* 800 -> 600 */
+    } else if (otyp == CRAM_RATION) {
         if (maybe_polyd(is_dwarf(gy.youmonst.data), Race_if(PM_DWARF)))
-            nut += nut / 6; /* 600 -> 700 */
+            nut += (nut + 3) / 6; /* 600 -> 700 */
     }
+    nut = max(nut, 1);
     return nut;
 }
 
@@ -2943,7 +2956,7 @@ doeat(void)
         gc.context.victual.nmod = 0;
     else if ((int) otmp->oeaten >= gc.context.victual.reqtime)
         gc.context.victual.nmod = -((int) otmp->oeaten
-                                 / gc.context.victual.reqtime);
+                                    / gc.context.victual.reqtime);
     else
         gc.context.victual.nmod = gc.context.victual.reqtime % otmp->oeaten;
     gc.context.victual.canchoke = (u.uhs == SATIATED);
@@ -3017,7 +3030,7 @@ bite(void)
     }
     gf.force_save_hs = TRUE;
     if (gc.context.victual.nmod < 0) {
-        lesshungry(-gc.context.victual.nmod);
+        lesshungry(adj_victual_nutrition(/*-gc.context.victual.nmod*/));
         consume_oeaten(gc.context.victual.piece,
                        gc.context.victual.nmod); /* -= -nmod */
     } else if (gc.context.victual.nmod > 0
@@ -3170,9 +3183,10 @@ lesshungry(int num)
             if (iseating) {
                 choke(gc.context.victual.piece);
                 reset_eat();
-            } else
+            } else {
                 choke((go.occupation == opentin) ? gc.context.tin.tin : 0);
-            /* no reset_eat() */
+                /* no reset_eat() */
+            }
         }
     } else {
         /* Have lesshungry() report when you're nearly full so all eating
