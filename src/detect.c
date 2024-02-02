@@ -2092,7 +2092,7 @@ reveal_terrain_getglyph(
                      */
                     save_spot = levl[x][y];
                     levl[x][y].typ = gl.lastseentyp[x][y];
-                    if (IS_WALL(levl[x][y].typ))
+                    if (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR)
                         xy_set_wall_state(x, y); /* levl[x][y].wall_info */
                     glyph = back_to_glyph(x, y);
                     levl[x][y] = save_spot;
