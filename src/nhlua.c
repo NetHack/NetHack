@@ -73,6 +73,7 @@ static void init_u_data(lua_State *);
 static int nhl_set_package_path(lua_State *, const char *);
 #endif
 static int traceback_handler(lua_State *);
+static uint32_t nhl_getmeminuse(lua_State *);
 #ifdef NHL_SANDBOX
 static void nhlL_openlibs(lua_State *, uint32_t);
 #endif
@@ -1876,7 +1877,8 @@ traceback_handler(lua_State *L)
 }
 
 static uint32_t
-nhl_getmeminuse(lua_State *L){
+nhl_getmeminuse(lua_State *L)
+{
     return lua_gc(L, LUA_GCCOUNT) * 1024 + lua_gc(L, LUA_GCCOUNTB);
 }
 
