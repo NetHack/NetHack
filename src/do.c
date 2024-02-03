@@ -1558,6 +1558,7 @@ goto_level(
         lua_getglobal(gl.luacore, "nh_callback_run");
         lua_pushstring(gl.luacore, nhcb_name[NHCB_LVL_LEAVE]);
         nhl_pcall_handle(gl.luacore, 1, 0, "goto_level", NHLpa_panic);
+        lua_settop(gl.luacore, 0);
     }
 
     /* tethered movement makes level change while trapped feasible */

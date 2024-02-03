@@ -512,6 +512,7 @@ moveloop_core(void)
         lua_getglobal(gl.luacore, "nh_callback_run");
         lua_pushstring(gl.luacore, nhcb_name[NHCB_END_TURN]);
         nhl_pcall_handle(gl.luacore, 1, 0, "moveloop_core", NHLpa_panic);
+        lua_settop(gl.luacore, 0);
     }
 }
 

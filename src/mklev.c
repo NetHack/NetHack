@@ -1243,6 +1243,7 @@ makelevel(void)
         lua_getglobal(gl.luacore, "nh_callback_run");
         lua_pushstring(gl.luacore, nhcb_name[NHCB_LVL_ENTER]);
         nhl_pcall_handle(gl.luacore, 1, 0, "makelevel", NHLpa_panic);
+        lua_settop(gl.luacore, 0);
     }
 }
 

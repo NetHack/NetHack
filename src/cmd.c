@@ -487,8 +487,11 @@ can_do_extcmd(const struct ext_func_tab *extcmd)
         lua_pushstring(gl.luacore, nhcb_name[NHCB_CMD_BEFORE]);
         lua_pushstring(gl.luacore, extcmd->ef_txt);
         nhl_pcall_handle(gl.luacore, 2, 1, "can_do_extcmd", NHLpa_panic);
-        if (!lua_toboolean(gl.luacore, -1))
+        if (!lua_toboolean(gl.luacore, -1)) {
+            lua_settop(gl.luacore, 0);
             return FALSE;
+        }
+        lua_settop(gl.luacore, 0);
     }
 
     if (!wizard && (ecflags & WIZMODECMD)) {
