@@ -1854,6 +1854,10 @@ debug fuzzer was triggering out of bounds array access in loseexp() if
 	levels and restored those all the way to level 30; introducing an
 	assert(u.ulevel < MAXULEV) changed bounds issue to assertion failure
 strength less than 25 was unintentionally being capped at 18/07
+if an amulet of flying gets stolen while hero is over lava without other
+	protection against lava, it will be destroyed even though it isn't
+	flammable, then attempting to format it for messages will trigger an
+	impossible warning about "glorkum", then a crash occurs
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
