@@ -2225,6 +2225,16 @@ tty_putstr(winid window, int attr, const char *str)
         int suppress_history = (attr & ATR_NOHISTORY),
             urgent_message = (attr & ATR_URGENT);
 
+#if defined(ASCIIGRAPH) && !defined(NO_TERMS)
+        /* if ^C occurs, player is prompted with "Really quit?" and that
+           prompt is issued via tty_putstr(WIN_MESSAGE); if ^C happens
+           while writing DECgraphics chars, the prompt text would be
+           rendered as VT line-drawing characters unless we do this */
+        if (GFlag) {
+            graph_off();
+            GFlag = FALSE;
+        }
+#endif
         /* if message is designated 'urgent' don't suppress it if user has
            typed ESC at --More-- prompt when dismissing an earlier message;
            besides turning off WIN_STOP, we need to prevent current message

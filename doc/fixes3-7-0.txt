@@ -2141,6 +2141,9 @@ tty: have <return> dismiss pick-none menus instead of acting like '>' (not
 tty: menu search via ':' would clobber part of the menu with a status line
 	refresh if the menu was tall enough to cover that
 tty: add support for petattr
+tty: if a ^C interrupt occurred while DECgraphics characters were being drawn
+	on the map, the "Really quit?" prompt would be illegible due to being
+	rendered with VT line drawing characters
 Unix: when user name is used as default character name, keep hyphenated value
 	intact instead stripping off dash and whatever follows as if that
 	specified role/race/&c (worked once upon a time; broken since 3.3.0)
