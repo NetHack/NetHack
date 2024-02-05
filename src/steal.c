@@ -1,16 +1,17 @@
-/* NetHack 3.7	steal.c	$NHDT-Date: 1702529046 2023/12/14 04:44:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.114 $ */
+/* NetHack 3.7	steal.c	$NHDT-Date: 1707122967 2024/02/05 08:49:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-static int stealarm(void);
-static int unstolenarm(void);
 static const char *equipname(struct obj *);
+static int unstolenarm(void);
+static int stealarm(void);
+static void worn_item_removal(struct monst *, struct obj *);
 
 static const char *
-equipname(register struct obj* otmp)
+equipname(struct obj *otmp)
 {
     return ((otmp == uarmu) ? shirt_simple_name(otmp)
             : (otmp == uarmf) ? boots_simple_name(otmp)
@@ -172,6 +173,7 @@ unstolenarm(void)
     return 0;
 }
 
+/* finish stealing an item of armor which takes multiple turns to take off */
 static int
 stealarm(void)
 {
@@ -185,10 +187,17 @@ stealarm(void)
         if (otmp->o_id == gs.stealoid) {
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
                 if (mtmp->m_id == gs.stealmid) {
-                    if (DEADMONSTER(mtmp))
+                    if (DEADMONSTER(mtmp)) {
                         impossible("stealarm(): dead monster stealing");
-                    if (!dmgtype(mtmp->data, AD_SITM)) /* polymorphed */
-                        goto botm;
+                        goto botm; /* (could just use 'break' here) */
+                    }
+                    /* maybe the thief polymorphed into something without a
+                       steal attack, or perhaps while stealing hero's suit
+                       the thief took away other items causing hero to fall
+                       into water or lava and then teleport to safety */
+                    if (!dmgtype(mtmp->data, AD_SITM)
+                        || distu(mtmp->mx, mtmp->my) > 2)
+                        goto botm; /* (could just use 'break' here) */
                     if (otmp->unpaid)
                         subfrombill(otmp, shop_keeper(*u.ushops));
                     freeinv(otmp);
@@ -303,10 +312,45 @@ remove_worn_item(
     obj->in_use = oldinuse;
 }
 
+/* during theft of a worn item: remove_worn_item(), prefaced by a message */
+static void
+worn_item_removal(
+    struct monst *mon,
+    struct obj *obj)
+{
+    char objbuf[BUFSZ], article[20], *p;
+    int strip_art;
+
+    Strcpy(objbuf, doname(obj));
+    /* massage the object description */
+    strip_art = !strncmp(objbuf, "the ", 4) ? 4
+                : !strncmp(objbuf, "an ", 3) ? 3
+                  : !strncmp(objbuf, "a ", 2) ? 2
+                    : 0;
+    if (strip_art) { /* convert "a/an/the <object>" to "your object" */
+        copynchars(article, objbuf, strip_art);
+        (void) strsubst(objbuf, article, "your ");
+    }
+    /* these ought to be guarded against matching user-supplied name */
+    (void) strsubst(objbuf, " (being worn)", "");
+    (void) strsubst(objbuf, " (alternate weapon; not wielded)", "");
+    /* convert "ring (on left hand)" to "ring (from left hand)" */
+    if ((p = strstri(objbuf, " (on "))
+        && (!strncmp(p + 5, "left ", 5) || !strncmp(p + 5, "right ", 6)))
+        (void) strsubst(p + 2, "on", "from");
+
+    pline("%s takes off %s.", Monnam(mon), objbuf);
+    iflags.last_msg = PLNMSG_MON_TAKES_OFF_ITEM;
+    /* removal might trigger more messages (due to loss of Lev|Fly;
+       descending happens before the theft in progress finishes) */
+    remove_worn_item(obj, TRUE);
+}
+
 /* Returns 1 when something was stolen (or at least, when N should flee now),
  * returns -1 if the monster died in the attempt.
  * Avoid stealing the object 'stealoid'.
- * Nymphs and monkeys won't steal coins.
+ * Nymphs and monkeys won't steal coins (so that their "steal item" attack
+ * doesn't become a superset of leprechaun's "steal gold" attack).
  */
 int
 steal(struct monst* mtmp, char* objnambuf)
@@ -362,6 +406,20 @@ steal(struct monst* mtmp, char* objnambuf)
         if ((!uarm || otmp != uarmc) && otmp != uskin
             && otmp->oclass != COIN_CLASS)
             tmp += (otmp->owornmask & (W_ARMOR | W_ACCESSORY)) ? 5 : 1;
+    /*
+     * TODO?
+     *  When inventory is empty and hero is Punished but not carrying
+     *  uball (obviously, or invent wouldn't be empty), behave as if
+     *  carrying uchain (at least when the thief is a nymph rather
+     *  than a monkey)?  Probably too complicated to bother with.
+     *
+     *  (Simplest thing would be to move uchain to invent but that
+     *  would be fraught with peril because every place that cares
+     *  about uchain assumes that it is on the floor.  Next simplest
+     *  would be to move uball into invent and use that for otmp, but
+     *  what about undesirable encumbrance feedback or being tethered
+     *  to buried ball?)
+     */
     if (!tmp)
         goto nothing_to_steal;
     tmp = rn2(tmp);
@@ -459,7 +517,7 @@ steal(struct monst* mtmp, char* objnambuf)
         case AMULET_CLASS:
         case RING_CLASS:
         case FOOD_CLASS: /* meat ring */
-            remove_worn_item(otmp, TRUE);
+            worn_item_removal(mtmp, otmp);
             break;
         case ARMOR_CLASS:
             armordelay = objects[otmp->otyp].oc_delay;
@@ -471,7 +529,7 @@ steal(struct monst* mtmp, char* objnambuf)
                    hero can't be charmed into taking off his own armor */
                 if (armordelay >= 1 && !olddelay && rn2(10))
                     goto cant_take;
-                remove_worn_item(otmp, TRUE);
+                worn_item_removal(mtmp, otmp);
                 break;
             } else {
                 int curssv = otmp->cursed;
@@ -516,7 +574,11 @@ steal(struct monst* mtmp, char* objnambuf)
                        otmp->oclass);
         }
     } else if (otmp->owornmask) { /* weapon or ball&chain */
-        remove_worn_item(otmp, TRUE);
+        struct obj *item = otmp;
+
+        if (otmp == uball && uchain != NULL)
+            item = uchain; /* yields a more accurate 'takes off' message */
+        worn_item_removal(mtmp, item);
     }
 
     /* do this before removing it from inventory */
@@ -531,6 +593,12 @@ steal(struct monst* mtmp, char* objnambuf)
         subfrombill(otmp, shop_keeper(*u.ushops));
     freeinv(otmp);
     /* if attached ball was taken, uball and uchain are now Null */
+
+    /* if we just gave a message about removing a worn item and there have
+       been no intervening messages, shorten '<mon> stole <item>' message */
+    if (iflags.last_msg == PLNMSG_MON_TAKES_OFF_ITEM
+        && mtmp->data->mlet == S_NYMPH)
+        ++named;
     urgent_pline("%s%s stole %s.", named ? "She" : Monnambuf,
                  (was_punished && !Punished) ? " removed your chain and" : "",
                  doname(otmp));

@@ -1,4 +1,4 @@
-/* NetHack 3.7	flag.h	$NHDT-Date: 1698264779 2023/10/25 20:12:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.224 $ */
+/* NetHack 3.7	flag.h	$NHDT-Date: 1707122958 2024/02/05 08:49:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.236 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -475,6 +475,7 @@ enum plnmsg_types {
     PLNMSG_BACK_ON_GROUND,      /* leaving water */
     PLNMSG_GROWL,               /* growl() gave some message */
     PLNMSG_HIDE_UNDER,          /* hero saw a monster hide under something */
+    PLNMSG_MON_TAKES_OFF_ITEM,  /* thief (nymph, monkey) taking worn item */
     PLNMSG_enum /* 'none of the above' */
 };
 
