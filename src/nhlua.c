@@ -165,16 +165,15 @@ l_nhcore_call(int callidx)
 
     lua_getfield(gl.luacore, -1, nhcore_call_names[callidx]);
     ltyp = lua_type(gl.luacore, -1);
+    lua_remove(gl.luacore, -2); /* nhcore_call_names[callidx] */
+    lua_remove(gl.luacore, -2); /* nhcore */
     if (ltyp == LUA_TFUNCTION) {
-        lua_remove(gl.luacore, -2); /* nhcore_call_names[callidx] */
-        lua_remove(gl.luacore, -2); /* nhcore */
         nhl_pcall_handle(gl.luacore, 0, 1, "l_nhcore_call", NHLpa_panic);
     } else {
         /*impossible("nhcore.%s is not a lua function",
           nhcore_call_names[callidx]);*/
         nhcore_call_available[callidx] = FALSE;
     }
-    lua_settop(gl.luacore, 0);
 }
 
 DISABLE_WARNING_UNREACHABLE_CODE
@@ -1108,7 +1107,7 @@ nhl_variable(lua_State *L)
     const char *key;
 
     if (!gl.luacore) {
-        nhl_error(L, "nh luacore not inited");
+        panic("nh luacore not inited");
         /*NOTREACHED*/
         return 0;
     }
@@ -1116,7 +1115,6 @@ nhl_variable(lua_State *L)
     lua_getglobal(gl.luacore, "nh_lua_variables");
     if (!lua_istable(gl.luacore, -1)) {
         impossible("nh_lua_variables is not a lua table");
-        lua_settop(gl.luacore, 0);
         return 0;
     }
 
@@ -1141,7 +1139,6 @@ nhl_variable(lua_State *L)
             nhl_pcall_handle(L, 0, 1, "nhl_variable-1", NHLpa_panic);
         } else
             nhl_error(L, "Cannot get variable of that type");
-        lua_settop(gl.luacore, 0);
         return 1;
     } else if (argc == 2) {
         /* set nh_lua_variables[key] = value;
@@ -1171,7 +1168,6 @@ nhl_variable(lua_State *L)
             nhl_pcall_handle(gl.luacore, 0, 0, "nhl_variable-3", NHLpa_panic);
         } else
             nhl_error(L, "Cannot set variable of that type");
-        lua_settop(gl.luacore, 0);
         return 0;
     } else
         nhl_error(L, "Wrong number of arguments");
@@ -1185,28 +1181,19 @@ get_nh_lua_variables(void)
     char *key = NULL;
 
     if (!gl.luacore) {
-        nhl_error(gl.luacore, "nh luacore not inited");
+        panic("nh luacore not inited");
         /*NOTREACHED*/
         return key;
     }
-
-    lua_getglobal(gl.luacore, "nh_lua_variables");
-    if (!lua_istable(gl.luacore, -1)) {
-        impossible("nh_lua_variables is not a lua table");
-        lua_settop(gl.luacore, 0);
-        return key;
-    }
-
     lua_getglobal(gl.luacore, "get_variables_string");
     if (lua_type(gl.luacore, -1) == LUA_TFUNCTION) {
         if (nhl_pcall_handle(gl.luacore, 0, 1, "get_nh_lua_variables",
                              NHLpa_impossible)) {
-            lua_settop(gl.luacore, 0);
             return key;
         }
         key = dupstr(lua_tostring(gl.luacore, -1));
     }
-    lua_settop(gl.luacore, 0);
+    lua_pop(gl.luacore, 1);
     return key;
 }
 
@@ -1244,7 +1231,6 @@ restore_luadata(NHFILE *nhfp)
     luaL_loadstring(gl.luacore, lua_data);
     free(lua_data);
     nhl_pcall_handle(gl.luacore, 0, 0, "restore_luadata", NHLpa_panic);
-    lua_settop(gl.luacore, 0);
 }
 
 /* local stairs = stairways(); */
@@ -1527,11 +1513,10 @@ nhl_callback(lua_State *L)
     const char *fn, *cb;
 
     if (!gl.luacore) {
-        nhl_error(L, "nh luacore not inited");
+        panic("nh luacore not inited");
         /*NOTREACHED*/
         return 0;
     }
-
     if (argc == 2 || argc == 3) {
         if (argc == 2) {
             rm = FALSE;
@@ -1560,7 +1545,6 @@ nhl_callback(lua_State *L)
         lua_pushstring(gl.luacore, cb);
         lua_pushstring(gl.luacore, fn);
         nhl_pcall_handle(gl.luacore, 2, 0, "nhl_callback", NHLpa_panic);
-        lua_settop(gl.luacore, 0);
     }
     return 0;
 }
@@ -1933,7 +1917,6 @@ nhl_pcall(lua_State *L, int nargs, int nresults, const char *name)
                        nud->name, ic);
     }
     if (nud && nud->memlimit && gl.loglua) {
-        lua_gc(L, LUA_GCCOLLECT);
         livelog_printf(LL_DEBUG, "LUASTATS PMEM %d:%s %lu", nud->sid,
                        nud->name, (long unsigned) nhl_getmeminuse(L));
     }
@@ -1958,10 +1941,10 @@ nhl_pcall_handle(lua_State *L, int nargs, int nresults, const char *name,
             impossible("Lua error: %d:%s %s", nud->sid,
                        nud->name ? nud->name : "(unknown)",
                        lua_tostring(L, -1));
+                /* Drop the error.  If the caller cares, use nhl_pcall(). */
+	    lua_pop(L, 1);
         }
     }
-    if (L == gl.luacore)
-        lua_gc(L, LUA_GCCOLLECT);
     return rv;
 }
 
@@ -2160,7 +2143,6 @@ nhl_done(lua_State *L)
                                nud->name, ic);
             }
             if (nud && nud->memlimit && !nud->perpcall) {
-                lua_gc(L, LUA_GCCOLLECT);
                 livelog_printf(LL_DEBUG, "LUASTATS DMEM %d:%s %lu", nud->sid,
                                nud->name, (long unsigned) nhl_getmeminuse(L));
             }
