@@ -329,7 +329,10 @@ worn_item_removal(
                     : 0;
     if (strip_art) { /* convert "a/an/the <object>" to "your object" */
         copynchars(article, objbuf, strip_art);
-        (void) strsubst(objbuf, article, "your ");
+        /* when removing attached iron ball, caller passes 'uchain';
+           when formatted, it will be "an iron chain (attached to you)";
+           change "an" to "the" rather than to "your" in that situation */
+        (void) strsubst(objbuf, article, (obj == uchain) ? "the " : "your ");
     }
     /* these ought to be guarded against matching user-supplied name */
     (void) strsubst(objbuf, " (being worn)", "");
@@ -579,6 +582,14 @@ steal(struct monst* mtmp, char* objnambuf)
         if (otmp == uball && uchain != NULL)
             item = uchain; /* yields a more accurate 'takes off' message */
         worn_item_removal(mtmp, item);
+        /* if we switched from uball to uchain for the preface message,
+           then unpunish() took place and both those pointers are now Null,
+           with 'item' a stale pointer to freed chain; the ball is still
+           present though and 'otmp' is still valid; if uball was also
+           wielded or quivered, the corresponding weapon pointer hasn't
+           been cleared yet; do that, with no preface message this time */
+        if ((otmp->owornmask & W_WEAPONS) != 0L)
+            remove_worn_item(otmp, FALSE);
     }
 
     /* do this before removing it from inventory */
@@ -599,9 +610,7 @@ steal(struct monst* mtmp, char* objnambuf)
     if (iflags.last_msg == PLNMSG_MON_TAKES_OFF_ITEM
         && mtmp->data->mlet == S_NYMPH)
         ++named;
-    urgent_pline("%s%s stole %s.", named ? "She" : Monnambuf,
-                 (was_punished && !Punished) ? " removed your chain and" : "",
-                 doname(otmp));
+    urgent_pline("%s stole %s.", named ? "She" : Monnambuf, doname(otmp));
     (void) encumber_msg();
     could_petrify = (otmp->otyp == CORPSE
                      && touch_petrifies(&mons[otmp->corpsenm]));
