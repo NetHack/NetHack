@@ -482,12 +482,14 @@ steal(struct monst* mtmp, char* objnambuf)
             ostuck = ((otmp->cursed && otmp->owornmask)
                       /* nymphs can steal rings from under
                          cursed weapon but animals can't */
-                      || (otmp == uright && welded(uwep))
-                      || (otmp == uleft && welded(uwep) && bimanual(uwep)));
+                      || (otmp == RING_ON_PRIMARY && welded(uwep))
+                      || (otmp == RING_ON_SECONDARY && welded(uwep)
+                          && bimanual(uwep)));
 
         if (ostuck || can_carry(mtmp, otmp) == 0) {
-            static const char *const how[] = { "steal", "snatch", "grab",
-                                               "take" };
+            static const char *const how[] = {
+                "steal", "snatch", "grab", "take"
+            };
  cant_take:
             pline("%s tries to %s %s%s but gives up.", Monnambuf,
                   ROLL_FROM(how),
