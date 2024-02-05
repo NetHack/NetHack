@@ -454,7 +454,7 @@ struct enum_dump {
 /*
  * This is the way the game ends.  If these are rearranged, the arrays
  * in end.c and topten.c will need to be changed.  Some parts of the
- * code assume that PANIC separates the deaths from the non-deaths.
+ * code assume that PANICKED separates the deaths from the non-deaths.
  */
 enum game_end_types {
     DIED         =  0,
