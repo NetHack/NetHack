@@ -312,6 +312,7 @@ int
 steal(struct monst* mtmp, char* objnambuf)
 {
     struct obj *otmp;
+    char Monnambuf[BUFSZ];
     int tmp, could_petrify, armordelay, olddelay, icnt,
         named = 0, retrycnt = 0;
     boolean monkey_business, /* true iff an animal is doing the thievery */
@@ -394,6 +395,13 @@ steal(struct monst* mtmp, char* objnambuf)
     if (otmp->o_id == gs.stealoid)
         return 0;
 
+    /* stealing a worn item might drop hero into water or lava where
+       teleporting to safety could result in a previously visible thief
+       no longer being visible; remember the name in order to avoid "It"
+       in the eventual "<Monnam> stole <item>" message; (the name might
+       already be "It"; if so, that's ok) */
+    Strcpy(Monnambuf, Monnam(mtmp));
+
     if (otmp->otyp == BOULDER && !throws_rocks(mtmp->data)) {
         if (!retrycnt++)
             goto retry;
@@ -420,7 +428,7 @@ steal(struct monst* mtmp, char* objnambuf)
             static const char *const how[] = { "steal", "snatch", "grab",
                                                "take" };
  cant_take:
-            pline("%s tries to %s %s%s but gives up.", Monnam(mtmp),
+            pline("%s tries to %s %s%s but gives up.", Monnambuf,
                   ROLL_FROM(how),
                   (otmp->owornmask & W_ARMOR) ? "your " : "",
                   (otmp->owornmask & W_ARMOR) ? equipname(otmp)
@@ -474,7 +482,7 @@ steal(struct monst* mtmp, char* objnambuf)
                 slowly = (armordelay >= 1 || gm.multi < 0);
                 if (flags.female)
                     urgent_pline("%s charms you.  You gladly %s your %s.",
-                                 !seen ? "She" : Monnam(mtmp),
+                                 !seen ? "She" : Monnambuf,
                                  curssv ? "let her take"
                                  : !slowly ? "hand over"
                                    : was_doffing ? "continue removing"
@@ -523,7 +531,7 @@ steal(struct monst* mtmp, char* objnambuf)
         subfrombill(otmp, shop_keeper(*u.ushops));
     freeinv(otmp);
     /* if attached ball was taken, uball and uchain are now Null */
-    urgent_pline("%s%s stole %s.", named ? "She" : Monnam(mtmp),
+    urgent_pline("%s%s stole %s.", named ? "She" : Monnambuf,
                  (was_punished && !Punished) ? " removed your chain and" : "",
                  doname(otmp));
     (void) encumber_msg();
