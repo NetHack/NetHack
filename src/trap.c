@@ -6516,6 +6516,7 @@ lava_effects(void)
 {
     register struct obj *obj, *obj2;
     boolean usurvive, boil_away;
+    unsigned protect_oid = 0;
     int burncount = 0, burnmesgcount = 0;
     int dmg = d(6, 6); /* only applicable for water walking */
 
@@ -6539,14 +6540,34 @@ lava_effects(void)
      * that player causing hangup at --More-- won't get an
      * emergency save file created before item destruction.
      */
-    if (!usurvive)
-        for (obj = gi.invent; obj; obj = obj->nobj)
+    if (!usurvive) {
+        for (obj = gi.invent; obj; obj = obj->nobj) {
+            if (obj->in_use) { /* remove_worn_item() sets in_use */
+                /* one item can be protected from burning up [accommodates
+                   steal(AMULET_OF_FLYING) -> remove_worn_item() -> drop
+                   into lava (which happens before item is transferred
+                   from invent to thief->minvent)]; item will still be in
+                   inventory when we return to caller or save bones (or
+                   perform hangup save if that occurs) */
+                if (!protect_oid) {
+                    protect_oid = obj->o_id;
+                    obj->in_use = 0;
+                } else {
+                    impossible(
+                     "lava_effects: '%s' (#%u) is already in use; so is #%u.",
+                               simpleonames(obj), obj->o_id, protect_oid);
+                }
+                continue;
+            }
+            /* set obj->in_use for items which will be destroyed below */
             if ((is_organic(obj) || obj->oclass == POTION_CLASS)
                 && !obj->oerodeproof
                 && objects[obj->otyp].oc_oprop != FIRE_RES
                 && obj->otyp != SCR_FIRE && obj->otyp != SPE_FIREBALL
                 && !obj_resists(obj, 0, 0)) /* for invocation items */
                 obj->in_use = 1;
+        }
+    }
 
     /* Check whether we should burn away boots *first* so we know whether to
      * make the player sink into the lava. Assumption: water walking only
@@ -6554,7 +6575,7 @@ lava_effects(void)
      * (3.7: that assumption is no longer true, but having boots be the first
      * thing to come into contact with lava makes sense.)
      */
-    if (uarmf && is_organic(uarmf) && !uarmf->oerodeproof) {
+    if (uarmf && uarmf->in_use) {
         obj = uarmf;
         pline("%s into flame!", Yobjnam2(obj, "burst"));
         ++burnmesgcount;
@@ -6589,7 +6610,9 @@ lava_effects(void)
         for (obj = gi.invent; obj; obj = obj2) {
             obj2 = obj->nobj;
             /* above, we set in_use for objects which are to be destroyed */
-            if (obj->otyp == SPE_BOOK_OF_THE_DEAD && !Blind) {
+            if (obj->o_id == protect_oid) {
+                ; /* skip protected item; caller expects to retain access */
+            } else if (obj->otyp == SPE_BOOK_OF_THE_DEAD && !Blind) {
                 if (usurvive)
                     pline("%s glows a strange %s, but remains intact.",
                           The(xname(obj)), hcolor("dark red"));
