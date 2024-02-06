@@ -323,7 +323,8 @@ curses_character_input_dialog(
             }
             break;
         } else if ((answer == '\n') || (answer == '\r') || (answer == ' ')) {
-            if ((choices != NULL) && (def != '\0')) {
+            if ((choices != NULL)
+                && ((def != '\0') || !strchr(choices, answer))) {
                 answer = def;
             }
             break;

@@ -5232,7 +5232,7 @@ let_to_name(char let, boolean unpaid, boolean showsym)
     else if ((pos = strchr(oth_symbols, let)) != 0)
         class_name = oth_names[pos - oth_symbols];
     else
-        class_name = names[0];
+        class_name = names[ILLOBJ_CLASS];
 
     len = Strlen(class_name) + (unpaid ? sizeof "unpaid_" : sizeof "")
           + (oclass ? (Strlen(ocsymfmt) + invbuf_sympadding) : 0);
