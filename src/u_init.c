@@ -1075,7 +1075,12 @@ ini_inv_mkobj_filter(int oclass, boolean got_level1_spellbook)
            || otyp == SPE_NOVEL) {
         dealloc_obj(obj);
         if (++trycnt > 1000) {
-            /* not expected to be reached */
+            /* This lonely pancake's potential will never be realized.
+             * It will exist only as a thought, of something that could have
+             * been, but never will be. It will never experience maple syrup
+             * oozing into its nooks, or see the delightful expression on
+             * someone's face as they are about to let it dance across their
+             * taste buds. */
             obj = mksobj(PANCAKE, TRUE, FALSE);
             break;
         }
