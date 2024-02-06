@@ -1074,10 +1074,13 @@ ini_inv_mkobj_filter(int oclass, boolean got_level1_spellbook)
                    || restricted_spell_discipline(otyp)))
            || otyp == SPE_NOVEL) {
         dealloc_obj(obj);
+        if (++trycnt > 1000) {
+            /* not expected to be reached */
+            obj = mksobj(PANCAKE, TRUE, FALSE);
+            break;
+        }
         obj = mkobj(oclass, FALSE);
         otyp = obj->otyp;
-        if (++trycnt > 1000)
-            break;
     }
     return obj;
 }
