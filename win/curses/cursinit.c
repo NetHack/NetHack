@@ -779,17 +779,6 @@ curses_init_options(void)
     /* FIXME: this overrides explicit OPTIONS=!use_inverse */
     iflags.wc_inverse = TRUE; /* aka iflags.use_inverse; default is False */
 
-    /* fix up pet highlighting */
-    if (iflags.wc2_petattr == -1) /* shouldn't happen */
-        iflags.wc2_petattr = A_NORMAL;
-    if (iflags.wc2_petattr != A_NORMAL) {
-        /* Pet attribute specified, so hilite_pet should be true */
-        iflags.hilite_pet = TRUE;
-    } else if (iflags.hilite_pet) {
-        /* pet highlighting specified, so don't leave petattr at A_NORMAL */
-        iflags.wc2_petattr = A_REVERSE;
-    }
-
     /* curses doesn't support 's' (single message at a time; successive
        ^P's go back to earlier messages) and 'c' (combination; single
        on first and second of consecutive ^P's, full on third) */
