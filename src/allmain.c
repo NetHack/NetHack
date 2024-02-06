@@ -1103,6 +1103,7 @@ struct enum_dump monsdump[] = {
     { NUMMONS, "NUMMONS" },
     { NON_PM, "NON_PM" },
     { LOW_PM, "LOW_PM" },
+    { HIGH_PM, "HIGH_PM" },
     { SPECIAL_PM, "SPECIAL_PM" }
 };
 struct enum_dump objdump[] = {
