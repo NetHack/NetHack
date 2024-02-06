@@ -4736,6 +4736,9 @@ reveal_paths(void)
 #endif  /* ?UNIX */
 
     raw_print("");
+#if defined(WIN32) && !defined(WIN32CON)
+    wait_synch();
+#endif
 }
 
 /* ----------  BEGIN TRIBUTE ----------- */

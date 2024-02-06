@@ -151,6 +151,7 @@ main(int argc, char *argv[])
     check_linux_console();
 #endif
 
+    initoptions_init();
     initoptions();
 #ifdef PANICTRACE
     ARGV0 = gh.hname; /* save for possible stack trace */
@@ -766,6 +767,7 @@ opt_showpaths(const char *dir)
     nhUse(dir);
 #endif
     iflags.initoptions_noterminate = TRUE;
+    initoptions_init();
     initoptions();
     iflags.initoptions_noterminate = FALSE;
     reveal_paths();

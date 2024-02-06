@@ -418,7 +418,7 @@ enum earlyarg {
 #ifdef WIN32
     , ARG_WINDOWS
 #endif
-#ifdef CRASHREPORT
+#if defined(CRASHREPORT)
     , ARG_BIDSHOW
 #endif
 };

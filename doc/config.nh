@@ -530,3 +530,12 @@
 # Use highlighting in the status lines when it changes?
 #OPTIONS=hilite_status:hitpoints/30%/bright-magenta/normal
 
+### Crash reports
+# CRASHREPORTURL must be set in syscf to enable these options.
+# These identify you in crash reports
+#OPTIONS=crash_name:Your Name
+#OPTIONS=crash_email:user@example.com
+# This limits the size of the URL generated for a crash report.  Only
+# use this if your browser can't handle very long URLs.  It should be as
+# large as possible.
+#OPTIONS=crash_maxurl:4000.

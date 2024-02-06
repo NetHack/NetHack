@@ -26,6 +26,8 @@
 
 \newcommand{\elist}{\end{list}}
 
+\hyphenation{CRASHREPORTURL}
+
 % this will make \tt underscores look better, but requires that
 % math subscripts will never be used in this document
 \catcode`\_=12
@@ -1331,6 +1333,12 @@ Show your attributes. Default key is `{\tt \^{}X}'.
 %.lp
 \item[\tb{\#autopickup}]
 Toggle the {\it autopickup\/} option. Default key is `{\tt @}'.
+%.lp
+\item[\tb{\#bugreport}]
+Bring up a browser window to submit a report to the {\it NetHack Development
+Team}.
+Can be disabled at the time the program is built; when enabled,
+CRASHREPORTURL must be set in the system configuration file.
 %.lp
 \item[\tb{\#call}]
 Call (name) a monster, or an object in inventory, on the floor,
@@ -5421,6 +5429,31 @@ in the visible area of the window.
 \elist
 
 %.hn 2
+\subsection*{Crash Report Options}
+%.pg
+
+Please note that NetHack does not send {\textbf any} information off your
+computer unless you manually click submit on a form.
+%.si
+\blist{}
+%.lp
+\item[OPTION=crash_email:{\it email_address}]
+%.lp
+\item[OPTION=crash_name:{\it your_name}]
+%.ei
+\elist
+These options are used only to save you some typing on the crash
+report and \#bugreport forms.  
+%.si
+\blist{}
+%.lp
+\item[OPTION=crash_urlmax:{\it bytes}]
+%.ei
+\elist
+This option is used to limit the length of the URLs generated and is only
+needed if your browser cannot handle arbitrarily long URLs.
+
+%.hn 2
 \subsection*{Platform-specific Customization options}
 
 %.pg
@@ -6616,10 +6649,11 @@ large unless it is actively maintained.
 %.lp
 \item[\ib{CRASHREPORTURL}]
 If set to
-{\tt https://www.nethack.org/common/contact.html}
+{\tt https://www.nethack.org/links/cr-37BETA.html}
 and support is compiled in, brings up a browser window populated with
 the information needed to report a problem if the game panics or ends
-up in an internally inconsistent state.
+up in an internally inconsistent state, or if the \#bugreport command is
+invoked.
 \elist
 
 %.hn 1

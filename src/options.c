@@ -522,7 +522,7 @@ parseoptions(
          *     determine_ambiguities()
          * figured out exactly how many characters are required to
          * unambiguously differentiate one option from all others, and it
-         * placed that number into each option's alloption[n].minmatch.
+         * placed that number into each option's allopt[n].minmatch.
          *
          */
         if (!got_match)
@@ -1200,6 +1200,80 @@ optfn_catname(
             Sprintf(opts, "%s", gc.catname);
         else
             opts[0] = '\0';
+        return optn_ok;
+    }
+    return optn_ok;
+}
+
+static int
+optfn_crash_email(int optidx UNUSED, int req, boolean negated UNUSED, char *opts, char *op)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+        if ((op = string_for_opt(opts, FALSE))
+            != empty_optstr) {
+            gc.crash_email = dupstr(op);
+        } else
+            return optn_err;
+        return optn_ok;
+    }
+    if (req == get_val || req == get_cnf_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, "%s", gc.crash_email);
+        return optn_ok;
+    }
+    return optn_ok;
+}
+
+static int
+optfn_crash_name(int optidx UNUSED, int req, boolean negated UNUSED, char *opts, char *op)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+        if ((op = string_for_opt(opts, FALSE))
+            != empty_optstr) {
+            gc.crash_name = dupstr(op);
+        } else
+            return optn_err;
+        return optn_ok;
+    }
+    if (req == get_val || req == get_cnf_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, "%s", gc.crash_name);
+        return optn_ok;
+    }
+    return optn_ok;
+}
+
+static int
+optfn_crash_urlmax(int optidx UNUSED, int req, boolean negated UNUSED, char *opts, char *op)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+        if ((op = string_for_opt(opts, FALSE))
+            != empty_optstr) {
+            int temp = atoi(op);
+            if(temp < 75){
+                config_error_add("Invalid value %d for crash_urlmax.  Minimum value is 75.",temp);
+                return optn_err;
+            }
+            gc.crash_urlmax = temp;
+        } else
+            return optn_err;
+        return optn_ok;
+    }
+    if (req == get_val || req == get_cnf_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, "%d", gc.crash_urlmax);
         return optn_ok;
     }
     return optn_ok;
@@ -6694,8 +6768,6 @@ initoptions(void)
 {
     int i;
 
-    go.opt_phase = builtin_opt;
-    initoptions_init();
     /*
      * Call each option function with an init flag and give it a chance
      * to make any preparations that it might require.  We do this
@@ -6740,6 +6812,7 @@ initoptions_init(void)
 #endif
     int i;
 
+    go.opt_phase = builtin_opt;		// Did I need to move this here?
     memcpy(allopt, allopt_init, sizeof(allopt));
     determine_ambiguities();
 

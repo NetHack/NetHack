@@ -819,10 +819,12 @@ extern struct kinfo *find_delayed_killer(int);
 extern void dealloc_killer(struct kinfo *);
 extern void save_killers(NHFILE *);
 extern void restore_killers(NHFILE *);
-#ifdef CRASHREPORT
-extern boolean submit_web_report(const char *, char *);
+#if defined(CRASHREPORT)
+extern boolean submit_web_report(int, const char *, const char *);
 extern void crashreport_init(int, char *[]);
 extern void crashreport_bidshow(void);
+extern boolean swr_add_uricoded(const char *, char **, int *, char *);
+extern int dobugreport(void);
 #endif
 extern char *build_english_list(char *);
 #if defined(PANICTRACE) && !defined(NO_SIGNAL)
@@ -1804,6 +1806,13 @@ extern int dosuspend(void);
 extern void nt_regularize(char *);
 extern int(*nt_kbhit)(void);
 extern void Delay(int);
+# ifdef CRASHREPORT
+struct CRctxt;
+extern struct CRctxt *ctxp;
+extern int win32_cr_helper(char, struct CRctxt *, void *, int);
+extern int win32_cr_gettrace(int, char *, int);
+extern int *win32_cr_shellexecute(const char *);
+# endif
 #endif /* WIN32 */
 
 #endif /* MICRO || WIN32 */
@@ -2661,7 +2670,7 @@ extern char *get_sound_effect_filename(int32_t seidint,
                                        char *buf, size_t bufsz, int32_t);
 #endif
 extern char *base_soundname_to_filename(char *, char *, size_t, int32_t);
-extern void set_voice(struct monst *, int32_t, int32_t, int32_t); 
+extern void set_voice(struct monst *, int32_t, int32_t, int32_t);
 extern void sound_speak(const char *);
 
 /* ### sp_lev.c ### */

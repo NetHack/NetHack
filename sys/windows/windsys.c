@@ -24,7 +24,10 @@
 #ifdef TTY_GRAPHICS
 #include "wintty.h"
 #endif
+#include <inttypes.h>
+
 #ifdef WIN32
+#include <VersionHelpers.h>
 
 /*
  * The following WIN32 API routines are used in this file.
@@ -757,6 +760,281 @@ nt_assert_failed(const char *expression, const char *filepath, int line)
     impossible("nhassert(%s) failed in file '%s' at line %d",
                 expression, filename, line);
 }
+
+/* Windows helpers for CRASHREPORT etc */
+#ifdef CRASHREPORT
+struct CRctxt {
+    BCRYPT_ALG_HANDLE bah;
+    BCRYPT_HASH_HANDLE bhh;
+    PBYTE pbhashobj;
+    DWORD cbhashobj; /* temp */
+    DWORD cbhash;    /* hash length */
+    DWORD cbdata;    /* temp */
+    PBYTE pbhash;    /* binary hash */
+    NTSTATUS st;
+} ctxp_ = { NULL, NULL, NULL, 0, 0, 0, NULL, 0 };
+struct CRctxt *ctxp = &ctxp_;    // XXX should this now be in gc.* ?
+
+#define win32err(fn) errname = fn; goto error
+
+int
+win32_cr_helper(char cmd, struct CRctxt *ctxp, void *p, int d){
+    char *errname = "unknown";
+    switch (cmd) {
+    default:
+        /* Not panic - we don't want to upgrade an impossible to a
+         * panic due to a bug in the CRASHREPORT code. */
+        impossible("win_cr_helper bad cmd %d", cmd);
+        return 1;
+    case 'D': {
+        char *bidstr = (char *) p;
+        wchar_t lbidstr[40];        // sizeof(bid), but const
+        swprintf_s(lbidstr, 40, L"%S", bidstr);
+            // XXX TODO: need something that will allow copy of just the bid
+        return MessageBoxW(NULL, lbidstr, L"bidshow", MB_SETFOREGROUND);
+    }
+        break;
+    case 'i': /* HASH_INIT(ctxp) */
+        if (!IsWindowsVistaOrGreater())
+            return 1; // CNG not available.
+        ctxp->bah = NULL;
+        ctxp->bhh = NULL;
+        ctxp->pbhashobj = NULL;
+        ctxp->cbhashobj = 0;
+        ctxp->cbhash = 0;
+        ctxp->cbdata = 0;
+        ctxp->pbhash = NULL;
+        ctxp->st = 0;
+        // win32err("test");        // TESTING - FAKE AN ERROR
+        if (0 > (ctxp->st = BCryptOpenAlgorithmProvider(
+                     &ctxp->bah, BCRYPT_MD4_ALGORITHM, NULL, 0))) {
+            win32err("BCryptOpenAlgorithmProvider");
+        };
+        if (0 > (ctxp->st =
+                     BCryptGetProperty(ctxp->bah, BCRYPT_OBJECT_LENGTH,
+                                       (unsigned char *) &ctxp->cbhashobj,
+                                       sizeof(DWORD), &ctxp->cbdata, 0))) {
+            win32err("BCryptGetProperty1");
+        };
+        if (0
+            == (ctxp->pbhashobj =
+                    HeapAlloc(GetProcessHeap(), 0, ctxp->cbhashobj))) {
+            win32err("HeapAlloc1");
+        };
+        if (0 > (ctxp->st = BCryptGetProperty(
+                     ctxp->bah, BCRYPT_HASH_LENGTH, (PBYTE) &ctxp->cbhash,
+                     sizeof(DWORD), &ctxp->cbdata, 0))) {
+            win32err("BCryptGetProperty2");
+        }
+        if (0
+            == (ctxp->pbhash =
+                    HeapAlloc(GetProcessHeap(), 0, ctxp->cbhash))) {
+
+            win32err("HeapAlloc2\n");
+        }
+        if (0 > BCryptCreateHash(ctxp->bah, &ctxp->bhh, ctxp->pbhashobj,
+                                 ctxp->cbhashobj, NULL, 0, 0)) {
+            win32err("BCryptCreateHash");
+        }
+        break;
+    case 'u':        /* HASH_UPDATE(ctxp, ptr, len) */
+        if (0 > (ctxp->st = BCryptHashData(ctxp->bhh, p, d, 0))) {
+            win32err("BCryptHashData");
+        }
+        break;
+    case 'f':        /* HASH_FINISH(ctxp) */
+        if (0 > BCryptFinishHash(ctxp->bhh, ctxp->pbhash, ctxp->cbhash, 0)) {
+            win32err("BCryptFinishHash");
+        }
+        break;
+    case 'c':        /* HASH_CLEANUP(ctxp) */
+        if (ctxp->bah) {
+            BCryptCloseAlgorithmProvider(ctxp->bah, 0);
+        }
+        if (ctxp->bhh) {
+            BCryptDestroyHash(ctxp->bhh);
+        }
+        if (ctxp->pbhashobj) {
+            HeapFree(GetProcessHeap(), 0, ctxp->pbhashobj);
+        }
+        if (ctxp->pbhash) {
+            HeapFree(GetProcessHeap(), 0, ctxp->pbhash);
+        }
+        break;
+    case 's':        /* HASH_RESULT_SIZE(ctxp) */
+        return ctxp->cbhash;
+    case 'r':        /* HASH_RESULT(ctxp, resp) */
+        *(unsigned char **)p = ctxp->pbhash;
+        break;
+    case 'b':        /* HASH_BINFILE(NULL,&binfile,0) */
+            // XXX This buffer should be allocated, not static (and freed in
+            //   HASH_CLEANUP).
+            // NB: assumes !longPathAware in manifest (Win10+)
+        {
+            static char binfile[MAX_PATH];
+            DWORD rv = GetModuleFileNameA(NULL, binfile, sizeof(binfile));
+            if (rv == 0 || rv == sizeof(binfile))
+                return 1;
+#ifdef BETA
+            printf("FILE '%s'\n", binfile);
+#endif
+            *(unsigned char **) p = (unsigned char *) binfile;
+            return 0;
+        }
+    }
+    return 0;        /* ok */
+error:
+    raw_printf("WIN32 function %s failed: status=%" PRIx64 "\n",
+            errname, (uint64)ctxp->st);
+    return 1;        /* fail */
+}
+#undef win32err
+
+
+#include <shellapi.h>
+#define MAX_SYM_SIZE 100
+#ifdef __GNUC__
+        // gcc can't generate .pdb files.  llvm can almost do it.
+        // For these platforms, use github/ianlancetaylor/libbacktrace.
+// XXX this doesn't work yet - we get correct addresses but no symbol info
+// XXX so still needs cleanup
+// XXX no mark (overflow held to last valid segment) handling yet
+#include <backtrace.h>
+
+struct userstate {
+    int error_count;
+    int good_count;
+    char *out;
+    int outsize;
+    int maxframes;
+} userstate;
+
+//backtrace_full_callback
+static int
+btfcb_fn(void *us0, uintptr_t pc, const char *filename,
+                int lineno, const char *fnname){
+    struct userstate *us = us0;
+        //XXX generate a stack frame line
+printf("C: pc=%llx f=%s line=%d fn=%s\n",pc,filename,lineno,fnname);
+    us->good_count++;
+    return 0;
+}
+
+//backtrace_error_callback
+static void
+btecb_fn(void *us0, const char *msg, int errnum){
+    struct userstate *us = us0;
+    us->error_count++;
+    if(errnum < 0){
+printf("E1: M=%s e=%d\n",msg,errnum);
+        // XXX save error message
+    } else {
+printf("E2: M=%s e=%d\n",msg,errnum);
+        // errnum is an errno
+    //XXX save error message with strerror
+    }
+}
+
+int
+win32_cr_gettrace(int maxframes, char *out, int outsize){
+    userstate.error_count = 0;
+    userstate.good_count = 0;
+    userstate.out = out;
+    userstate.outsize = outsize;
+    userstate.maxframes = maxframes;
+    static char binfile[MAX_PATH];// assumes !longPathAware in manifest (Win10+)
+        DWORD rv = GetModuleFileNameA(NULL, binfile, sizeof(binfile));
+    struct backtrace_state *state
+        = backtrace_create_state(binfile, 0, btecb_fn, &userstate);
+    if(!state) return userstate.error_count + userstate.good_count;
+    rv=backtrace_full(state, 0, btfcb_fn, btecb_fn, &userstate);
+printf("rv=%d\n",rv);
+    // XXX rv not checked
+    // XXX this API leaks its memory; there is no free function
+    return userstate.error_count + userstate.good_count;
+}
+#else
+// Use win32 API with Visual Studio (and probably MSVC).
+#include <dbghelp.h>
+
+int
+win32_cr_gettrace(int maxframes, char *out, int outsize){
+    char *mark = out;
+    void *frames[200];  // XXX why does VS fail var array?  wrong C std?
+    int x;
+    int tmp;
+#define BSIZE (MAX_SYM_SIZE+50)
+    char buf[BSIZE];
+    HANDLE me = GetCurrentProcess();
+    SetLastError(0);
+        // XXX may need to pass the binary's dir
+        //XXX check for different flags
+    if(!SymInitialize(me, NULL, TRUE)){
+        snprintf(buf, BSIZE, "no stack trace: SymInitialize: %d\n",
+                GetLastError());
+        return 1;
+    }
+    int fcount = CaptureStackBackTrace(0, maxframes,frames,NULL);
+    if(!fcount)goto finish;
+    char symbol_info_space[sizeof(SYMBOL_INFO)+MAX_SYM_SIZE];
+    SYMBOL_INFO *si = (SYMBOL_INFO *)symbol_info_space;
+    si->MaxNameLen = MAX_SYM_SIZE;
+    si->SizeOfStruct = sizeof(SYMBOL_INFO);
+
+    for(x=0;x<fcount;x++){
+        DWORD64 disp64 =0 ;
+        DWORD64 adr = (DWORD64)(frames[x]);
+        if(!adr) break;
+        if(SymFromAddr(me, adr, &disp64, si)){
+//printf("A %x\n",GetLastError());fflush(stdout);
+            tmp = snprintf(buf, BSIZE, "%d %p %s+%lld\n",
+                        x, frames[x], &si->Name[0], (long long int)disp64);
+            if(swr_add_uricoded(buf, &out, &outsize, mark))
+                goto finish;
+
+#if 1
+// XXX does this block do anything useful?
+            DWORD disp = (DWORD) disp64;
+            IMAGEHLP_LINE ihl;
+            ihl.SizeOfStruct = sizeof(IMAGEHLP_LINE);
+            if (SymGetLineFromAddr(me, adr, &disp, &ihl)) {
+                printf("L=%d\n", ihl.LineNumber);
+            } else {
+// 7e/1e7 - no info.  May need to call SymLoadModule if we need those addrs
+// BUT probably system code, so we don't care - experiment
+//                printf("SGLFA failed: $%08x\n", GetLastError());
+            }
+//XXXnow format the line
+#endif
+        } else {
+            // Error 487 (invalid address) seems to mean
+            // "I can't find any info for this address".
+            tmp = snprintf(buf, BSIZE, "%d %p (error %d)\n",
+                        x, frames[x], GetLastError());
+            if(swr_add_uricoded(buf, &out, &outsize, mark))
+                goto finish;
+        }
+        if(tmp < 0 || tmp >= outsize){   // XXX is test now wrong?
+//printf("FAIL tmp=%d\n",tmp);
+                fcount = x+1;
+                goto finish;
+        }
+        mark = out;
+    }
+finish:
+    SymCleanup(me);
+    return fcount;            // XXX if output truncated, fcount could be wrong
+}
+#endif
+
+int *
+win32_cr_shellexecute(const char *url){
+//XXX Docs say to do this, but has so many caveats I'm going to try skipping it.
+//CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+    int *rv = (int*)ShellExecuteA(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);
+    return rv;
+}
+#endif /* CRASHREPORT */
 
 #endif /* WIN32 */
 

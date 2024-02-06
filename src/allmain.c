@@ -30,7 +30,7 @@ static void dump_enums(void);
 void
 early_init(int argc UNUSED, char *argv[] UNUSED)
 {
-#ifdef CRASHREPORT
+#if defined(CRASHREPORT)
 	// Do this as early as possible, but let ports do other things first.
     crashreport_init(argc, argv);
 #endif
@@ -911,7 +911,7 @@ static const struct early_opt earlyopts[] = {
 #ifdef WIN32
     { ARG_WINDOWS, "windows", 4, TRUE },
 #endif
-#ifdef CRASHREPORT
+#if defined(CRASHREPORT)
     { ARG_BIDSHOW, "bidshow", 7, FALSE },
 #endif
 };
@@ -935,11 +935,13 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
     const char *dashdash = "";
 
     for (idx = 0; idx < SIZE(earlyopts); idx++) {
-        if (earlyopts[idx].e == e_arg)
+        if (earlyopts[idx].e == e_arg){
             break;
+	}
     }
-    if (idx >= SIZE(earlyopts) || argc < 1)
+    if (idx >= SIZE(earlyopts) || argc < 1){
         return FALSE;
+    }
 
     for (i = 0; i < argc; ++i) {
         if (argv[i][0] != '-')
@@ -1002,10 +1004,12 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
             dump_glyphids();
             return 2;
 #endif
-#ifdef CRASHREPORT
+#if defined(CRASHREPORT)
 	case ARG_BIDSHOW:
 	    crashreport_bidshow();
 	    return 2;
+#else
+#warning "CRASHREPORT CODE NOT INCLUDED"
 #endif
 #ifdef WIN32
         case ARG_WINDOWS:

@@ -537,7 +537,7 @@ impossible(const char *s, ...)
 	boolean report = ('y' == yn_function("Report now?","yn",'n',FALSE));
 	raw_print("");  // prove to the user the character was accepted
 	if(report){
-	    submit_web_report("Impossible", pbuf);
+	    submit_web_report(1,"Impossible", pbuf);
 	}
     }
 #endif

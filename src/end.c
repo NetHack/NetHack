@@ -21,9 +21,9 @@
 
 #ifndef NO_SIGNAL
 static void done_intr(int);
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
+# if defined(UNIX) || defined(VMS) || defined(__EMX__)
 static void done_hangup(int);
-#endif
+# endif
 #endif
 static void disclose(int, boolean);
 static void get_valuables(struct obj *);
@@ -37,6 +37,9 @@ static boolean should_query_disclose_option(int, char *);
 static void dump_plines(void);
 #endif
 static void dump_everything(int, time_t);
+#ifdef CRASHREPORT
+static const char *get_saved_pline(int);
+#endif
 
 #if defined(__BEOS__) || defined(MICRO) || defined(OS2) || defined(WIN32)
 ATTRNORETURN extern void nethack_exit(int) NORETURN;
@@ -46,9 +49,10 @@ ATTRNORETURN extern void nethack_exit(int) NORETURN;
 
 #define done_stopprint gp.program_state.stopprint
 
-#ifndef PANICTRACE
-#define NH_abort(x) NH_abort_
-#endif
+// XXX is there a configuration that still needs this?
+//#ifndef PANICTRACE
+//#define NH_abort(x) NH_abort_
+//#endif
 
 #ifdef AMIGA
 #define NH_abort_ Abort(0)
@@ -64,7 +68,8 @@ ATTRNORETURN extern void nethack_exit(int) NORETURN;
 #endif /* !SYSV */
 #endif /* !AMIGA */
 
-#ifdef PANICTRACE
+/* NB: CRASHREPORT implies PANICTRACE */
+#if defined(PANICTRACE)
 #include <errno.h>
 #ifdef PANICTRACE_LIBC
 #include <execinfo.h>
@@ -79,32 +84,30 @@ ATTRNORETURN extern void nethack_exit(int) NORETURN;
  *        -requires -g, which may preclude -O on some compilers
  *
  * And the UI: if sysopt.crashreporturl, and defined(CRASHREPORT)
- * we gather the stacktrace (etc) and launch a helper to submit a bug report
+ * we gather the stacktrace (etc) and launch a browser to submit a bug report
  * otherwise we just use stdout.  Requires libc for now.
  */
 #ifdef SYSCF
-#define SYSOPT_PANICTRACE_GDB sysopt.panictrace_gdb
-#ifdef PANICTRACE_LIBC
-#define SYSOPT_PANICTRACE_LIBC sysopt.panictrace_libc
+# define SYSOPT_PANICTRACE_GDB sysopt.panictrace_gdb
+# ifdef PANICTRACE_LIBC
+#  define SYSOPT_PANICTRACE_LIBC sysopt.panictrace_libc
+# else
+#  define SYSOPT_PANICTRACE_LIBC 0
+# endif
 #else
-#define SYSOPT_PANICTRACE_LIBC 0
-#endif
-#else
-#define SYSOPT_PANICTRACE_GDB (nh_getenv("NETHACK_USE_GDB") == 0 ? 0 : 2)
-#ifdef PANICTRACE_LIBC
-#define SYSOPT_PANICTRACE_LIBC 1
-#else
-#define SYSOPT_PANICTRACE_LIBC 0
-#endif
+# define SYSOPT_PANICTRACE_GDB (nh_getenv("NETHACK_USE_GDB") == 0 ? 0 : 2)
+# ifdef PANICTRACE_LIBC
+#  define SYSOPT_PANICTRACE_LIBC 1
+# else
+#  define SYSOPT_PANICTRACE_LIBC 0
+# endif
 #endif
 
-#ifdef PANICTRACE
 static void NH_abort(char *);
-#endif
 #ifndef NO_SIGNAL
 static void panictrace_handler(int);
 #endif
-static boolean NH_panictrace_libc(char *);
+static boolean NH_panictrace_libc(void);
 static boolean NH_panictrace_gdb(void);
 
 #ifndef NO_SIGNAL
@@ -171,7 +174,6 @@ panictrace_setsignals(boolean set)
 }
 #endif /* NO_SIGNAL */
 
-#ifdef PANICTRACE
 static void
 NH_abort(char *why)
 {
@@ -185,215 +187,394 @@ NH_abort(char *why)
         return;
     aborting = TRUE;
 
+#ifdef CRASHREPORT
+    if(!submit_web_report(1, "Panic", why))
+#endif
+    {
 #ifndef VMS
-    if (gdb_prio == libc_prio && gdb_prio > 0)
-        gdb_prio++;
+	if (gdb_prio == libc_prio && gdb_prio > 0)
+	    gdb_prio++;
 
-    if (gdb_prio > libc_prio) {
-        (void) (NH_panictrace_gdb() || (libc_prio && NH_panictrace_libc(why)));
-    } else {
-        (void) (NH_panictrace_libc(why) || (gdb_prio && NH_panictrace_gdb()));
-    }
+	if (gdb_prio > libc_prio) {
+	    (void) (NH_panictrace_gdb() || (libc_prio && NH_panictrace_libc()));
+	} else {
+	    (void) (NH_panictrace_libc() || (gdb_prio && NH_panictrace_gdb()));
+	}
 
 #else /* VMS */
-    /* overload otherwise unused priority for debug mode: 1 = show
-       traceback and exit; 2 = show traceback and stay in debugger */
-    /* if (wizard && gdb_prio == 1) gdb_prio = 2; */
-    vms_traceback(gdb_prio);
-    nhUse(libc_prio);
+	/* overload otherwise unused priority for debug mode: 1 = show
+	   traceback and exit; 2 = show traceback and stay in debugger */
+	/* if (wizard && gdb_prio == 1) gdb_prio = 2; */
+	vms_traceback(gdb_prio);
+	nhUse(libc_prio);
 
 #endif /* ?VMS */
+    }
 
 #ifndef NO_SIGNAL
     panictrace_setsignals(FALSE);
 #endif
     NH_abort_;
 }
-#endif
-
-/* Build a URL with a query string and try to launch a new browser window
- * to report from panic() or impossible().  Requires libc support for
- * the stacktrace.  Uses memory on the stack to avoid memory allocation
- * (but libc can still do anything it wants). */
-
-/* size of argument list for execve(2) */
-#define SWR_LINES 20
-/* max stack frames and header lines (details field) */
-#define SWR_FRAMES 20
-#define SWR_ADD(line) {if(xargc<(SWR_LINES-1)) xargv[xargc++] = line;}
 
 #ifdef CRASHREPORT
 # include <fcntl.h>
-# define HASH_PRAGMA_START \
+# ifdef WIN32
+#  define HASH_PRAGMA_START
+#  define HASH_PRAGMA_END
+# else
+#  define HASH_PRAGMA_START           \
     _Pragma("GCC diagnostic push"); \
     _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
-# define HASH_PRAGMA_END   _Pragma("GCC diagnostic pop");
+#  define HASH_PRAGMA_END _Pragma("GCC diagnostic pop");
+# endif
 # ifdef MACOS
 #  include <CommonCrypto/CommonDigest.h>
-#  define HASH_CONTEXT CC_MD4_CTX
-#  define HASH_INIT(ctx) CC_MD4_Init(ctx)
-#  define HASH_UPDATE(ctx, ptr, len) CC_MD4_Update(ctx, ptr, len)
-#  define HASH_FINISH(ctx, out) CC_MD4_Final(out, ctx)
-#  define HASH_RESULT_SIZE CC_MD4_DIGEST_LENGTH
+#  define HASH_CONTEXTPTR(CTXP) \
+    unsigned char tmp[CC_MD4_DIGEST_LENGTH]; \
+    CC_MD4_CTX CTXP ## _; \
+    CC_MD4_CTX *CTXP = &CTXP ## _
+#  define HASH_INIT(ctxp) !CC_MD4_Init(ctxp)
+#  define HASH_UPDATE(ctx, ptr, len) !CC_MD4_Update(ctx, ptr, len)
+#  define HASH_FINISH(ctxp) !CC_MD4_Final(tmp, ctxp)
+#  define HASH_RESULT_SIZE(ctxp) CC_MD4_DIGEST_LENGTH
+#  define HASH_RESULT(ctx, inp) *inp = (unsigned char *)ctx
+#  define HASH_CLEANUP(ctxp)
+#  define HASH_OFLAGS O_RDONLY
+#  define HASH_BINFILE_DECL char *binfile = argv[0];
+#  ifdef BETA
+#   define HASH_BINFILE \
+      if (!binfile || !*binfile) { \
+                /* If this triggers, investigate CFBundleGetMainBundle */ \
+                /* or CFBundleCopyExecutableURL. */ \
+        raw_print("BETA warning: crashreport_init called without useful info"); \
+        goto skip; \
+    }
+#  else
+#   define HASH_BINFILE() \
+      if (!binfile || !*binfile) { \
+        goto skip; \
+     }
+#  endif
 # endif
 # ifdef __linux__
 #  include <openssl/md4.h>
-#  define HASH_CONTEXT MD4_CTX
-#  define HASH_INIT(ctx) MD4_Init(ctx)
-#  define HASH_UPDATE(ctx, ptr, len) MD4_Update(ctx, ptr, len)
-#  define HASH_FINISH(ctx, out) MD4_Final(out, ctx)
-#  define HASH_RESULT_SIZE MD4_DIGEST_LENGTH
-# endif
+#  define HASH_CONTEXTPTR(CTXP) \
+     unsigned char tmp[MD4_DIGEST_LENGTH]; \
+     MD4_CTX CTXP ## _; \
+     MD4_CTX *CTXP = &CTXP ## _
+#  define HASH_INIT(ctxp) !MD4_Init(ctxp)
+#  define HASH_UPDATE(ctx, ptr, len) !MD4_Update(ctx, ptr, len)
+#  define HASH_FINISH(ctxp) !MD4_Final(tmp, ctxp)
+#  define HASH_RESULT_SIZE(ctxp) MD4_DIGEST_LENGTH
+#  define HASH_RESULT(ctx, inp) *inp = (unsigned char *)ctx
+#  define HASH_CLEANUP(ctxp)
+#  define HASH_OFLAGS O_RDONLY
+#  define HASH_BINFILE_DECL char binfile[PATH_MAX+1];
+#  define HASH_BINFILE() \
+     int len = readlink("/proc/self/exe", binfile, sizeof(binfile)-1); \
+     if (len>0) { \
+        binfile[len] = '\0'; \
+     } else { \
+        goto skip; \
+     }
+# endif // __linux__
+# ifdef WIN32
+/* WIN32 takes too much code and is dependent on OS includes we can't
+ * pull in here, so we call out to code in sys/windows/windsys.c */
+#  define HASH_CONTEXTPTR(CTXP)
+#  define HASH_INIT(ctxp) win32_cr_helper('i',ctxp, NULL, 0)
+#  define HASH_UPDATE(ctxp, ptr, len) win32_cr_helper('u',ctxp, ptr, len)
+#  define HASH_FINISH(ctxp) win32_cr_helper('f',ctxp,NULL,0)
+#  define HASH_CLEANUP(ctxp) win32_cr_helper('c',ctxp, NULL, 0)
+#  define HASH_RESULT_SIZE(ctxp) win32_cr_helper('s',ctxp,NULL,0)
+#  define HASH_RESULT(ctxp, inp) win32_cr_helper('r',ctxp,inp,0)
+#  define HASH_OFLAGS _O_RDONLY | _O_BINARY
+#  define HASH_BINFILE_DECL char *binfile;
+#  define HASH_BINFILE() \
+     if(win32_cr_helper('b',NULL,&binfile,0)){ \
+        goto skip; \
+     }
+# endif // WIN32
 // Binary ID - Use only as a hint to contact.html for recognizing our own
 // binaries.  This is easily spoofed!
-static char bid[(2*HASH_RESULT_SIZE)+1];
+static char bid[40];
 
 /* ARGSUSED */
 void
 crashreport_init(int argc UNUSED, char *argv[] UNUSED){
-    unsigned char tmp[HASH_RESULT_SIZE];
+    static int once=0; if(once++) return;    // NetHackW.exe calls us twice
+    HASH_BINFILE_DECL;
     HASH_PRAGMA_START
-    HASH_CONTEXT ctx;
-    HASH_INIT(&ctx);
-#ifdef MACOS
-    char *binfile = argv[0];
-    if (!binfile || !*binfile) {
-# ifdef BETA
-                // If this triggers, investigate CFBundleGetMainBundle
-                // or CFBundleCopyExecutableURL.
-        raw_print("BETA warning: crashreport_init called without useful info");
-# endif
-        goto skip;
-    }
-#endif
-#ifdef __linux__
-    char binfile[PATH_MAX+1];
-    int len = readlink("/proc/self/exe", binfile, sizeof(binfile)-1);
-    if (len>0) {
-        binfile[len] = '\0';
-    } else {
-        goto skip;
-    }
-#endif
-    int fd = open(binfile, O_RDONLY, 0);
+    HASH_CONTEXTPTR(ctxp);
+    if(HASH_INIT(ctxp)) goto skip;
+    HASH_BINFILE();    // Does "goto skip" on error.
+
+    int fd = open(binfile, HASH_OFLAGS, 0);
     if (fd == -1) {
 # ifdef BETA
         raw_printf("open e=%s",strerror(errno));
 # endif
         goto skip;
     }
+
     int segsize;
-    char segment[4096];
+    unsigned char segment[4096];
     while (0 < (segsize = read(fd, segment,sizeof(segment)))) {
-        HASH_UPDATE(&ctx, segment, segsize);
+        if(HASH_UPDATE(ctxp, segment, segsize)) goto skip;
     }
-    HASH_FINISH(&ctx, tmp);
+    if(segsize < 0) {
+        close(fd);
+        goto skip;
+    }
+    if(HASH_FINISH(ctxp)) goto skip;
     close(fd);
 
     char *p = bid;
-    unsigned char *in = &tmp[0];
-    char cnt=HASH_RESULT_SIZE;
+    unsigned char *in;
+    HASH_RESULT(ctxp,&in);
+        /* Just in case, make sure not to overflow the bid buffer. */
+    char cnt=min(HASH_RESULT_SIZE(ctxp), (sizeof(bid)-1));
     while (cnt--) {
-        p += snprintf(p, HASH_RESULT_SIZE-(p-bid), "%02x",*(in++));
+        p += snprintf(p, HASH_RESULT_SIZE(ctxp) - (p - bid), "%02x", *(in++));
     }
     *p = '\0';
     return;
 skip:
     strncpy((char *)bid,"unknown",sizeof(bid)-1);
+    HASH_CLEANUP(ctxp);
     HASH_PRAGMA_END
 }
-#undef HASH_CONTEXT
+#undef HASH_CONTEXTPTR
 #undef HASH_INIT
 #undef HASH_UPDATE
 #undef HASH_FINISH
+#undef HASH_CLEANUP
+#undef HASH_RESULT
 #undef HASH_RESULT_SIZE
 #undef HASH_PRAGMA_START
 #undef HASH_PRAGMA_END
+#undef HASH_BINFILE_DECL
+#undef HASH_BINFILE
 
 void
 crashreport_bidshow(void){
-    raw_print(bid);
+#if defined(WIN32) && !defined(WIN32CON)
+    if(0==win32_cr_helper('D', ctxp, bid, 0))
+#endif
+    {
+        raw_print(bid);
+#ifdef WIN32notyet
+        wait_synch();
+#endif
+    }
 }
 
+/* Build a URL with a query string and try to launch a new browser window
+ * to report from panic() or impossible().  Requires libc support for
+ * the stacktrace.  Uses memory on the stack to avoid memory allocation
+ * (on most platforms) (but libc can still do anything it wants). */
+
+// No theoretial limit for URL length but reality is messy.
+// This should work on all modern platforms.
+#ifndef MAX_URL
+# define MAX_URL 8192
+#endif
+#ifndef SWR_FRAMES
+# define SWR_FRAMES 20
+#endif
+
+// mark holds the initial eos; if we can't get the value in
+// then we can remove the whole item if desired.  For other
+// semantics, caller can handle mark.
+#define SWR_ADD(str) \
+    utmp = strlen(str); \
+    mark = uend; \
+    if(utmp >= urem) goto full; \
+    strncpy(uend, str, utmp); \
+    uend += utmp; urem -= utmp; \
+    *uend = '\0';
+
+// NB: on overflow this rolls us back to mark, so if we don't
+//     want to roll back to the last SWR_ADD, update mark before
+//     calling this macro.
+#define SWR_ADD_URIcoded(str) \
+    if(swr_add_uricoded(str, &uend, &urem, mark))goto full;
+
+// On overflow, truncate to markp (but only if markp != NULL).
 boolean
-submit_web_report(const char *msg, char *why){
-    if (sysopt.crashreporturl) {
-        const char *xargv[SWR_LINES];
-        char version[100];
-        char versionstring[200];        // used twice as a temp
-        int  xargc = 0;
-        char wholetrace[SWR_LINES*80];  // XXX roughly 71 on MacOS, plus buffer
-        int  prelines = 0;              // count of lines in trace header
-        char nbuf[6];                   // number buffer
-        extern char **environ;
-        pid_t pid;
-
-        SWR_ADD(CRASHREPORT);
-        SWR_ADD(sysopt.crashreporturl);
-                // then pairs of key value
-                // subject, generate something useful
-        SWR_ADD("subject");
-        snprintf(version, sizeof(version), "%s report for NetHack %s",
-            msg, version_string(versionstring, sizeof(versionstring)));
-        SWR_ADD(version);
-                // name:  someday, this might be stored in nethackcnf
-                // email: someday, this might be stored in nethackcnf
-                // gitver, pull from version.c
-        SWR_ADD("gitver");
-        SWR_ADD(getversionstring(versionstring, sizeof(versionstring)));
-                // hardware: leave for user
-                // software: leave for user
-                // comments: leave for user
-                // details: stack trace
-        SWR_ADD("details");
-
-// XXX header for wholetrace - what other info do we want?
-// NB: prelines not tested against size of SWR_FRAMES.
-#define SWR_HDR(line) \
-  if (endp<&wholetrace[sizeof(wholetrace)]) { \
-    endp+=snprintf(endp, sizeof(wholetrace)-(endp-wholetrace), "%s\n",line); \
-    prelines++; \
-  }
-#define SWR_HDRnonl(line) \
-  if (endp<&wholetrace[sizeof(wholetrace)]) { \
-    endp+=snprintf(endp, sizeof(wholetrace)-(endp-wholetrace), "%s",line); \
-  }
-        char *endp = wholetrace;
-        wholetrace[0] = 0;
-        if (why) {
-            SWR_HDR(why);
+swr_add_uricoded(const char *in, char **out, int *remaining, char *markp){
+    while(*in){
+        if(
+            isalnum(*in) ||
+            *in == '_' ||
+            *in == '-' ||
+            *in == '.' ||
+            *in == '~'  // ||
+        ){
+            **out = *in;
+            (*out)++;
+            (*remaining)--;
+        } else if(*in == ' '){
+            **out = '+';
+            (*out)++;
+            (*remaining)--;
+        } else {
+            if(*remaining <= 3){
+                if(markp) *out = markp, *remaining = 0;
+                **out = '\0';
+                return TRUE;
+            }
+            int x = snprintf(*out, *remaining, "%%%02X", *in);
+            *out += x;
+            *remaining -= x;
         }
+        in++;
+        if(! *remaining){
+            if(markp) *out = markp, *remaining = 0;
+            **out = '\0';
+            return TRUE;
+        }
+        **out = '\0';
+    }
+    return FALSE;   // normal return
+}
 
-        SWR_HDRnonl("bid: ");
-        SWR_HDR(bid);
+static char url[MAX_URL];   // XXX too bad this isn't allocated as needed
+static int urem = MAX_URL;  // adjusted for gc.crash_urlmax below
+static char *uend = url;
+static int utmp;            // used inside macros
+static char *mark;          // holds previous terminator (generally)
 
+boolean
+submit_web_report(int cos, const char *msg, const char *why){
+    urem = (gc.crash_urlmax < 0 || gc.crash_urlmax > MAX_URL)
+           ? MAX_URL : min(MAX_URL,gc.crash_urlmax);
+    char temp[200];
+    char temp2[200];
+    int countpp=0;     // pre and post traceback lines
+//  URL loaded for creating reports to the NetHack DevTeam
+// CRASHREPORTURL=https://nethack.org/links/cr-37BETA.html
+    if(!sysopt.crashreporturl) return FALSE;
+    SWR_ADD(sysopt.crashreporturl);
+        /* cos - operation, v - version */
+    snprintf(temp, sizeof(temp), "?cos=%d&v=1",cos);
+    SWR_ADD(temp);
+
+	/* msg==NULL for #bugreport */
+    if(msg){
+	SWR_ADD("&subject=");
+	snprintf(temp, sizeof(temp), "%s report for NetHack %s",
+		msg, version_string(temp2, sizeof(temp2)));
+	SWR_ADD_URIcoded(temp);
+    }
+
+    SWR_ADD("&gitver=");
+    SWR_ADD_URIcoded(getversionstring(temp2, sizeof(temp2)));
+
+    if(gc.crash_name){
+        SWR_ADD("&name=");
+        SWR_ADD_URIcoded(gc.crash_name);
+    }
+
+    if(gc.crash_email){
+        SWR_ADD("&email=");
+        SWR_ADD_URIcoded(gc.crash_email);
+    }
+            // hardware: leave for user
+            // software: leave for user
+            // comments: leave for user
+
+    SWR_ADD("&details=");
+    if (why) {
+        SWR_ADD_URIcoded(why);
+        SWR_ADD_URIcoded("\n");
+        mark=uend;
+        countpp++;
+    }
+
+    SWR_ADD_URIcoded("bid: ");
+    SWR_ADD_URIcoded(bid);
+    SWR_ADD_URIcoded("\n");
+    mark=uend;
+    countpp++;
+
+    int count = 0;
+    if(cos==1){
+#ifdef WIN32
+        count=win32_cr_gettrace(SWR_FRAMES,uend, MAX_URL-(uend-url));
+        uend=eos(url);
+#else
         void *bt[SWR_FRAMES];
-        int count, x;
-        char **info, buf[BUFSZ];
+        int x;
+        char **info;
 
         count = backtrace(bt, SIZE(bt));
         info = backtrace_symbols(bt, count);
         for (x = 0; x < count; x++) {
-            copynchars(buf, info[x], (int) sizeof buf - 1);
+            copynchars(temp, info[x], (int) sizeof temp - 1 - 1);   // \n\0
                 /* try to remove up to 16 blank spaces by removing 8 twice */
-            (void) strsubst(buf, "        ", "");
-            (void) strsubst(buf, "        ", "");
-            snprintf(endp, SWR_FRAMES*80-(endp-wholetrace), "[%02lu] %s\n",
-                (unsigned long) x, buf);
-            endp = eos(endp);
+            (void) strsubst(temp, "        ", "");
+            (void) strsubst(temp, "        ", "");
+            strncat(temp, "\n", sizeof temp - 1);
+# if 0 // __linux__
+// not needed for MacOS
+// XXX is it actually needed for linux?  TBD
+            snprintf(temp2, sizeof(temp2), "[%02lu]\n", (unsigned long) x);
+            uend--;    // remove the \n we added above
+            SWR_ADD_URIcoded(temp2);
+# endif // linux
+        SWR_ADD_URIcoded(temp);
+        mark=uend;
         }
-        *(endp-1) = '\0';   // remove last newline
-        SWR_ADD(wholetrace);
+#endif  // !WIN32
+    }
 
-                // detailrows min(actual,50)  Guess since we can't know the
+#ifdef DUMPLOG
+        // config.h turns this on, but make it easy to turn off if needed
+    if(cos==1) {
+        int k;
+        SWR_ADD_URIcoded("Latest messages:\n");
+        mark=uend;
+        countpp++;
+        for(k=0;k<5;k++){
+            const char *line = get_saved_pline(k);
+            if(!line) break;
+            SWR_ADD_URIcoded(line);
+            SWR_ADD_URIcoded("\n");
+            countpp++;
+            mark=uend;
+        }
+    }
+#endif
+
+                // detailrows: Guess since we can't know the
                 //     width of the window.
-        SWR_ADD("detailrows");
-        (void)snprintf(nbuf,sizeof(nbuf),"%d",count+prelines);
-        SWR_ADD(nbuf);
-        xargv[xargc++] = 0; // terminate array
+        SWR_ADD("&detailrows=");
+        (void)snprintf(temp,sizeof(temp),"%d",min(count+countpp,30));
+        SWR_ADD_URIcoded(temp);
 
-        pid = fork();
+full:	;
+//printf("URL=%ld '%s'\n",strlen(url),url);
+#ifdef WIN32
+        int *rv = win32_cr_shellexecute(url);
+// XXX TESTING
+printf("ShellExecute returned: %p\n",rv);   // >32 is ok
+#else
+        const char *xargv[] = {
+            CRASHREPORT,
+            url,
+            NULL
+        };
+        int pid = fork();
+        extern char **environ;
         if (pid == 0) {
+#ifdef CRASHREPORT_EXEC_NOSTDERR
+                /* Keep the output clean - firefox spews useless errors on
+                 * my system. */
+            (void)close(2);
+            (void)open("/dev/null", O_WRONLY);
+#endif
             execve(CRASHREPORT, (char * const *)xargv, environ);
             char err[100];
             sprintf(err, "Can't start " CRASHREPORT ": %s", strerror(errno));
@@ -401,36 +582,45 @@ submit_web_report(const char *msg, char *why){
         } else {
             int status;
             errno=0;
-                    // XXX do we _really_ know this is the right pid?
             (void)waitpid(pid, &status, 0);
             if (status) {         // XXX check could be more precise
-#if 0
+#ifdef BETA
                     // Not useful at the moment. XXX
                 char err[100];
-                sprintf(err, "pid=%d e=%d status=%0x",wpid,errno,status);
+                sprintf(err, "pid=%d e=%d status=%0x",pid,errno,status);
                 raw_print(err);
 #endif
                 return FALSE;
             }
         }
         /* free(info);   -- Don't risk it. */
+#endif
         return TRUE;
-    }
-    return FALSE;
 }
+
+int
+dobugreport(void){
+    if(!submit_web_report(2, NULL, "#bugreport command")){
+        pline("Unable to send bug report.  Please visit %s instead.",
+              sysopt.crashreporturl
+              ? sysopt.crashreporturl
+              : "https://www.nethack.org"
+        );
+    }
+    return ECMD_OK;
+}
+
 #endif  /* CRASHREPORT */
 #undef SWR_ADD
+#undef SWR_ADD_URIcoded
 #undef SWR_FRAMES
 #undef SWR_HDR
 #undef SWR_LINES
 
 /*ARGSUSED*/
 static boolean
-NH_panictrace_libc(char *why UNUSED)
+NH_panictrace_libc(void)
 {
-#ifdef CRASHREPORT
-    if(submit_web_report("Panic",why)) return TRUE;
-#endif
 
 #ifdef PANICTRACE_LIBC
     void *bt[20];
@@ -459,13 +649,13 @@ NH_panictrace_libc(char *why UNUSED)
  *   fooVAR   (possibly const) variable containing fooPATH
  */
 #ifdef PANICTRACE_GDB
-#ifdef SYSCF
-#define GDBVAR sysopt.gdbpath
-#define GREPVAR sysopt.greppath
-#else /* SYSCF */
-#define GDBVAR GDBPATH
-#define GREPVAR GREPPATH
-#endif /* SYSCF */
+# ifdef SYSCF
+#  define GDBVAR sysopt.gdbpath
+#  define GREPVAR sysopt.greppath
+# else /* SYSCF */
+#  define GDBVAR GDBPATH
+#  define GREPVAR GREPPATH
+# endif /* SYSCF */
 #endif /* PANICTRACE_GDB */
 
 static boolean
@@ -878,7 +1068,7 @@ panic VA_DECL(const char *, str)
                                      ? "."
                                      : "\nand it may be possible to rebuild.";
 
-// XXX this is probably wrong if defined(CRASHREPORT)
+// XXX this may need an update if defined(CRASHREPORT) TBD
         if (sysopt.support)
             raw_printf("To report this error, %s%s", sysopt.support,
                        maybe_rebuild);
@@ -983,6 +1173,27 @@ dump_plines(void)
 #endif
         }
     }
+}
+
+// lineno==0 gives the most recent message (e.g. "Do you want to call panic..."
+//   if called from #panic)
+static const char *
+get_saved_pline(int lineno){
+    int p;
+    int limit = DUMPLOG_MSG_COUNT;
+    if(lineno >= DUMPLOG_MSG_COUNT) return NULL;
+    p = (gs.saved_pline_index-1) % DUMPLOG_MSG_COUNT;
+
+    while(limit--){
+        if(gs.saved_plines[p]){ // valid line
+            if(lineno--){
+                p = (p-1+DUMPLOG_MSG_COUNT) % DUMPLOG_MSG_COUNT;
+            } else {
+                return gs.saved_plines[p];
+            }
+        }
+    }
+    return NULL;
 }
 #endif
 

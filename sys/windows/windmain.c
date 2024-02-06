@@ -545,7 +545,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (getcwd(orgdir, sizeof orgdir) == (char *) 0)
         error("NetHack: current directory path too long");
 #endif
-
+    initoptions_init();	// This allows OPTIONS in syscf on Windows.
     set_default_prefix_locations(argv[0]);
 
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
@@ -637,6 +637,9 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #ifdef WIN32CON
     if (WINDOWPORT(tty))
         consoletty_open(1);
+#endif
+#ifdef WINCHAIN
+    commit_windowchain();
 #endif
 
     init_nhwindows(&argc, argv);
@@ -812,6 +815,11 @@ process_options(int argc, char * argv[])
             argc--;
             argv++;
         }
+#if defined(CRASHREPORT)
+      	if (argcheck(argc, argv, ARG_BIDSHOW) == 2) {
+		nethack_exit(EXIT_SUCCESS);
+	}
+#endif
         if (argc > 1 && !strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
             /* avoid matching "-dec" for DECgraphics; since the man page
              * says -d directory, hope nobody's using -desomething_else

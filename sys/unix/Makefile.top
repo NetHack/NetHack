@@ -112,7 +112,7 @@ LUA2NHTOP = ../../..
 LUABASELIB = liblua-$(LUA_VERSION).a
 TOPLUALIB = lib/lua/$(LUABASELIB)
 
-ALLDEP = $(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb check-nhlua
+ALLDEP = $(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb
 
 # first target is also the default target for 'make' without any arguments
 all:    $(ALLDEP)
@@ -147,10 +147,6 @@ lib/lua-$(LUA_VERSION)/src/lua.h:
 luabin:
 	( cd $(LUATOP) \
 	  && make $(LUAMAKEFILES) all && cd $(LUA2NHTOP) )
-
-check-nhlua:
-	( util/makedefs --grep-defined CRASHREPORT && ( \
-	  cd $(LUATOP) && make $(LUAMAKEFLAGS) ); true )
 
 # hints file could set LUATESTTARGET to this if GITSUBMODULES is defined
 submodules/lua/lua.h:

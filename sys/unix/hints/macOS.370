@@ -31,6 +31,8 @@ ifndef LIBXPM
 LIBXPM= -L/opt/X11/lib -lXpm
 endif
 
+#WANT_WIN_CHAIN=1
+
 # 4. Other
 
 #-----------------------------------------------------------------------------
@@ -98,7 +100,7 @@ NHCFLAGS+=-DNOMAIL
 #NHCFLAGS+=-DNO_CHRONICLE
 #NHCFLAGS+=-DLIVELOG
 # not NHCFLAGS - needed for makedefs
-CFLAGS+=-DCRASHREPORT=\"NetHackCrashReport.JavaScript\"
+CFLAGS+=-DCRASHREPORT=\"/usr/bin/open\"
 
 ifdef MAKEFILE_SRC
 # default
@@ -334,10 +336,7 @@ PREINSTALL= . sys/unix/hints/macosx.sh user2 $(GAMEUID); \
 POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; \
 		$(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; \
 		$(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; \
-		chmod $(VARFILEPERM) $(HACKDIR)/sysconf; \
-		util/makedefs --grep-defined CRASHREPORT && \
-		 ( cp win/macosx/NetHackCrashReport.JavaScript $(HACKDIR) && \
-		 chmod 0500 $(HACKDIR)/NetHackCrashReport.JavaScript )
+		chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
 
 else ifdef WANT_SOURCE_INSTALL
 
@@ -353,10 +352,7 @@ CHGRP=/usr/bin/true
 GAMEPERM = 0700
 VARFILEPERM = 0600
 VARDIRPERM = 0700
-POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; \
-		util/makedefs --grep-defined CRASHREPORT && \
-		    ( cp win/macosx/NetHackCrashReport.JavaScript $(HACKDIR) && \
-		    chmod 0500 $(HACKDIR)/NetHackCrashReport.JavaScript )
+POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf;
 
 # We can use "make all" to build the whole thing - but it misses some things:
 MOREALL=$(MAKE) install
@@ -385,10 +381,7 @@ PREINSTALL+= (mkdir $(SHELLDIR) || true);
 POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; \
 		$(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; \
 		$(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; \
-		chmod $(VARFILEPERM) $(HACKDIR)/sysconf; \
-		util/makedefs --grep-defined CRASHREPORT && \
-		  ( cp win/macosx/NetHackCrashReport.JavaScript $(HACKDIR) && \
-		  chmod 0500 $(HACKDIR)/NetHackCrashReport.JavaScript )
+		chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
 
 endif   # !WANT_SHARE_INSTALL
 
@@ -731,7 +724,6 @@ build_package_root:
 	install -p doc/recover.6 $(PKGROOT_UG)/man/man6
 	install -p doc/Guidebook $(PKGROOT_UG)/doc
 	install -p dat/nhdat $(PKGROOT_UGLN)
-#XXX no code to package NetHackCrashReport.JavaScript
 	sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(PKGROOT_UGLN)/sysconf
 	cd dat; install -p $(DATNODLB) ../$(PKGROOT_UGLN)
 # XXX these files should be somewhere else for good Mac form

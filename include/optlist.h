@@ -226,6 +226,17 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(confirm, Advanced, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.confirm, Term_False,
            "ask before hitting tame or peaceful monsters")
+#ifdef CRASHREPORT
+    NHOPTC(crash_email, Advanced, PL_NSIZ, opt_in, set_in_game,
+                No, Yes, No, No, NoAlias,
+		"email address for reporting")
+    NHOPTC(crash_name, Advanced, PL_NSIZ, opt_in, set_in_game,
+                No, Yes, No, No, NoAlias,
+		"your name for reporting")
+    NHOPTC(crash_urlmax, Advanced, PL_NSIZ, opt_in, set_in_game,
+                No, Yes, No, No, NoAlias,
+		"length of longest url we can generate")
+#endif
 #ifdef CURSES_GRAPHICS
     NHOPTC(cursesgraphics, Advanced, 70, opt_in, set_in_config,
                 No, Yes, No, No, NoAlias,

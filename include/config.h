@@ -241,12 +241,33 @@
 
 #ifndef CRASHREPORT
 # ifdef MACOS
-    /* NB: This needs to be a full path unless it's in the playground. */
-//#define CRASHREPORT "NetHackCrashReport.JavaScript"
+#  define CRASHREPORT "/usr/bin/open"
 # endif
 # ifdef __linux__
-    /* NB: This expects to find the nhlua binary as "./nhlua" */
-//#define CRASHREPORT "nhcrashreport.lua"
+#  define CRASHREPORT "/usr/bin/xdg-open"
+       /* Define this if the terminal is filled with useless error messages
+        * when the browser launches. */
+#  define CRASHREPORT_EXEC_NOSTDERR
+# endif
+# ifdef WIN32
+#  define CRASHREPORT /* builtin helper */
+# endif
+#endif
+
+#ifdef CRASHREPORT
+# ifndef DUMPLOG
+#  define DUMPLOG	    // required to get ^P info
+# endif
+# ifdef MACOS
+#  define PANICTRACE
+# endif
+# ifdef __linux__
+ # define PANICTRACE
+# endif
+// This test isn't quite right: CNG is only available from Windows 2000 on.
+// But we'll check that at runtime.
+# ifdef WIN32
+# define PANICTRACE
 # endif
 #endif
 

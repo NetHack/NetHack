@@ -2558,6 +2558,10 @@ struct ext_func_tab extcmdlist[] = {
               doattributes, IFBURIED, NULL },
     { '@',    "autopickup", "toggle the 'autopickup' option on/off",
               dotogglepickup, IFBURIED, NULL },
+#ifdef CRASHREPORT
+    { '\0',   "bugreport", "file a bug report",
+              dobugreport, GENERALCMD | NOFUZZERCMD, NULL },
+#endif
     { 'C',    "call", "name a monster, specific object, or type of object",
               docallcmd, IFBURIED, NULL },
     { 'Z',    "cast", "zap (cast) a spell",
