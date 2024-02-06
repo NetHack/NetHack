@@ -458,7 +458,9 @@ steal(struct monst* mtmp, char* objnambuf)
 
     /* stealing a worn item might drop hero into water or lava where
        teleporting to safety could result in a previously visible thief
-       no longer being visible; remember the name in order to avoid "It"
+       no longer being visible; it could also be a case of a blinded
+       hero being able to see via wearing the Eyes of the Overworld and
+       having those stolen; remember the name in order to avoid "It"
        in the eventual "<Monnam> stole <item>" message; (the name might
        already be "It"; if so, that's ok) */
     Strcpy(Monnambuf, Monnam(mtmp));
@@ -605,7 +607,6 @@ steal(struct monst* mtmp, char* objnambuf)
     if (otmp->unpaid)
         subfrombill(otmp, shop_keeper(*u.ushops));
     freeinv(otmp);
-    /* if attached ball was taken, uball and uchain are now Null */
 
     /* if we just gave a message about removing a worn item and there have
        been no intervening messages, shorten '<mon> stole <item>' message */
