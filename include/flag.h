@@ -193,6 +193,7 @@ struct accessibility_data {
     coord msg_loc;         /* accessiblemsg: location */
     boolean mon_notices;   /* msg when hero notices a monster */
     int mon_notices_blocked; /* temp disable mon_notices */
+    boolean mon_movement;  /* msg when hero sees monster move */
 };
 
 /* Use notice_mon_off() / notice_mon_on() to temporarily disable

@@ -4179,6 +4179,8 @@ Default \(oq}\(cq.
 ." Format menu entries using TAB to separate columns (default off).
 ." Only applicable to some menus, and only useful to some interfaces.
 ." Debug mode only.
+.lp mon_movement
+Show a message when hero notices a monster movement (default is off).
 .lp monpolycontrol
 Prompt for new form whenever any monster changes shape (default off).
 Debug mode only.
@@ -5947,6 +5949,9 @@ Prevent walking into water or lava.
 Adds direction or location information to messages.
 .lp spot_monsters
 Shows a message when hero notices a monster; combine with accessiblemsg.
+.lp mon_movement
+Shows a message when hero notices a monster movement;
+combine with spot_monsters and accessiblemsg.
 .lp autodescribe
 Automatically describe the terrain under the cursor when targeting.
 .lp mention_walls

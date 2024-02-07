@@ -7,6 +7,7 @@
 #include "mfndpos.h"
 #include "artifact.h"
 
+static void msg_mon_movement(struct monst *, coordxy, coordxy) NONNULLARG1;
 static void watch_on_duty(struct monst *);
 static int disturb(struct monst *);
 static void release_hero(struct monst *);
@@ -25,6 +26,25 @@ static void leppie_stash(struct monst *);
 static boolean m_balks_at_approaching(struct monst *);
 static boolean stuff_prevents_passage(struct monst *);
 static int vamp_shift(struct monst *, struct permonst *, boolean);
+
+/* a11y: give a message when monster moved */
+static void
+msg_mon_movement(struct monst *mtmp, coordxy omx, coordxy omy)
+{
+    if (a11y.mon_movement && canspotmon(mtmp) && mtmp->mspotted) {
+        coordxy nix = mtmp->mx, niy = mtmp->my;
+        boolean n2u = next2u(nix, niy),
+            close = !n2u && (distu(nix, niy) <= (BOLT_LIM * BOLT_LIM)),
+            closer = !n2u && (distu(nix, niy) <= distu(omx, omy));
+
+        pline_xy(nix, niy, "%s %s%s.", Monnam(mtmp),
+                 vtense((char *) 0, locomotion(mtmp->data, "move")),
+                 n2u ? " next to you"
+                 : (close && closer) ? " closer"
+                 : (close && !closer) ? " further away"
+                 : " in the distance");
+    }
+}
 
 /* monster has triggered trapped door lock or was present when it got
    triggered remotely (at door spot, door hit by zap);
@@ -1870,6 +1890,7 @@ m_move(register struct monst *mtmp, int after)
            place_monster() only manipulate the head; they leave tail as-is */
         remove_monster(omx, omy);
         place_monster(mtmp, nix, niy);
+        msg_mon_movement(mtmp, omx, omy);
         /* for a long worm, insert a new segment to reconnect the head
            with the tail; worm_move() keeps the end of the tail if worm
            is scheduled to grow, removes that for move-without-growing */

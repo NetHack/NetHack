@@ -460,6 +460,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTO("message types", Advanced, o_message_types, BUFSZ,
                 opt_in, set_in_game,
                 No, Yes, No, NoAlias, "edit message types")
+    NHOPTB(mon_movement, Advanced, 0, opt_in, set_in_game,
+           Off, Yes, No, No, NoAlias, &a11y.mon_movement, Term_False,
+           "message when hero sees monster movement")
     NHOPTB(monpolycontrol, Advanced, 0, opt_in, set_wizonly,
            Off, Yes, No, No, NoAlias, &iflags.mon_polycontrol, Term_False,
            "control monster polymorphs")
