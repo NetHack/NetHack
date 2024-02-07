@@ -4602,7 +4602,9 @@ dobuzz(
     register coordxy lsx, lsy;
     struct monst *mon;
     coord save_bhitpos;
-    boolean shopdamage = FALSE;
+    boolean shopdamage = FALSE,
+            fireball = (type == ZT_SPELL(ZT_FIRE)), /* set once */
+            gas_hit = FALSE; /* will be set during each iteration */
     struct obj *otmp;
     int spell_type;
     int hdmgtype = Hallucination ? rn2(6) : damgtype;
@@ -4660,8 +4662,12 @@ dobuzz(
 
         /* hit() and miss() need gb.bhitpos to match the target */
         gb.bhitpos.x = sx, gb.bhitpos.y = sy;
-        /* Fireballs only damage when they explode */
-        if (type != ZT_SPELL(ZT_FIRE)) {
+        gas_hit = (damgtype == ZT_POISON_GAS);
+        /* fireballs only damage when they explode; poison gas leaves
+           a trail of 1x1 clouds via zap_over_floor(), but that gets
+           skipped for a hit that is reflected so is deferred until we
+           know whether reflection is happening */
+        if (!fireball && !gas_hit) {
             range += zap_over_floor(sx, sy, type, &shopdamage, TRUE, 0);
             /* zap with fire -> melt ice -> drown monster, so monster
                found and cached above might not be here any more */
@@ -4669,7 +4675,7 @@ dobuzz(
         }
 
         if (mon) {
-            if (type == ZT_SPELL(ZT_FIRE))
+            if (fireball)
                 break;
             if (type >= 0)
                 mon->mstrategy &= ~STRAT_WAITMASK;
@@ -4683,6 +4689,7 @@ dobuzz(
                         shieldeff(mon->mx, mon->my);
                         (void) mon_reflects(mon,
                                             "But it reflects from %s %s!");
+                        gas_hit = FALSE;
                     }
                     dx = -dx;
                     dy = -dy;
@@ -4729,7 +4736,7 @@ dobuzz(
                                if it's fire, highly flammable monsters leave
                                no corpse; don't bother reporting that they
                                "burn completely" -- unnecessary verbosity */
-                            if ((type % 10 == ZT_FIRE)
+                            if (damgtype == ZT_FIRE
                                 /* paper golem or straw golem */
                                 && completelyburns(mon->data))
                                 xkflags |= XKILL_NOCORPSE;
@@ -4766,7 +4773,8 @@ dobuzz(
                 goto buzzmonst;
             } else if (zap_hit((int) u.uac, 0)) {
                 range -= 2;
-                pline_dir(xytod(-dx,-dy), "%s hits you!", The(flash_str(fltyp, FALSE)));
+                pline_dir(xytod(-dx, -dy), "%s hits you!",
+                          The(flash_str(fltyp, FALSE)));
                 if (Reflecting) {
                     if (!Blind) {
                         (void) ureflects("But %s reflects from your %s!",
@@ -4777,6 +4785,7 @@ dobuzz(
                     dx = -dx;
                     dy = -dy;
                     shieldeff(sx, sy);
+                    gas_hit = FALSE;
                 } else {
                     /* flash_str here only used for killer; suppress
                      * hallucination */
@@ -4793,19 +4802,21 @@ dobuzz(
             stop_occupation();
             nomul(0);
         }
+        /* gas that missed or that hit without being reflected will leave
+           a 1x1 cloud here; the earlier zap_over_floor() was deferred */
+        if (gas_hit)
+            (void) zap_over_floor(sx, sy, type, &shopdamage, TRUE, 0);
 
         if (!ZAP_POS(levl[sx][sy].typ)
             || (closed_door(sx, sy) && range >= 0)) {
             int bounce, bchance;
             uchar rmn;
-            boolean fireball;
 
  make_bounce:
             bchance = (!isok(sx, sy) || levl[sx][sy].typ == STONE) ? 10
                       : (In_mines(&u.uz) && IS_WALL(levl[sx][sy].typ)) ? 20
                         : 75;
             bounce = 0;
-            fireball = (type == ZT_SPELL(ZT_FIRE));
             if ((--range > 0 && isok(lsx, lsy) && cansee(lsx, lsy))
                 || fireball) {
                 if (Is_airlevel(&u.uz)) { /* nothing to bounce off of */
@@ -4853,7 +4864,7 @@ dobuzz(
         }
     }
     tmp_at(DISP_END, 0);
-    if (type == ZT_SPELL(ZT_FIRE))
+    if (fireball)
         explode(sx, sy, type, d(12, 6), 0, EXPL_FIERY);
     if (shopdamage)
         pay_for_damage(damgtype == ZT_FIRE ? "burn away"
@@ -4964,11 +4975,12 @@ melt_ice_away(anything *arg, long timeout UNUSED)
 /* Burn floor scrolls, evaporate pools, etc... in a single square.
  * Used both for normal bolts of fire, cold, etc... and for fireballs.
  * Sets shopdamage to TRUE if a shop door is destroyed, and returns the
- * amount by which range is reduced (the latter is just ignored by fireballs)
+ * amount by which range is reduced (value is negative and will be added
+ * to remaining range by caller; ignored by fireballs and poison gas).
  */
 int
 zap_over_floor(
-    coordxy x, coordxy y,         /* location */
+    coordxy x, coordxy y,     /* location */
     int type,                 /* damage type plus {wand|spell|breath} info */
     boolean *shopdamage,      /* extra output if shop door is destroyed */
     boolean ignoremon,        /* ignore any monster here */
@@ -5149,6 +5161,8 @@ zap_over_floor(
         break; /* ZT_COLD */
 
     case ZT_POISON_GAS:
+        /* poison gas with range 1: green dragon/iron golem breath (AD_DRST);
+           caller is placing a series of 1x1 clouds along the zap's path */
         (void) create_gas_cloud(x, y, 1, 8);
         break;
 
