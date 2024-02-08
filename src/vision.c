@@ -1,4 +1,4 @@
-/* NetHack 3.7	vision.c	$NHDT-Date: 1657918095 2022/07/15 20:48:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.7	vision.c	$NHDT-Date: 1707424350 2024/02/08 20:32:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990. */
 /* NetHack may be freely redistributed.  See license for details.       */
 
@@ -136,7 +136,7 @@ vision_init(void)
  *
  * Returns 0 if nothing at (x,y) blocks sight, 1 if anything other than
  * an opaque region (gas cloud rather than CLOUD terrain) blocks sight,
- * or 2 if an opaque region potions sight.  [At present, the rest of the
+ * or 2 if an opaque region blocks sight.  [At present, the rest of the
  * code makes no distinction between 1 and 2, just between 0 and non-0.]
  */
 int
