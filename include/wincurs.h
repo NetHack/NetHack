@@ -46,6 +46,9 @@ extern WINDOW *activemenu;         /* curses window for menu requesting a
 #if !defined(A_RIGHTLINE) && defined(A_RIGHT)
 #define A_RIGHTLINE A_RIGHT
 #endif
+#ifndef A_ITALIC
+#define A_ITALIC A_UNDERLINE
+#endif
 
 typedef enum orient_type
 {
