@@ -134,7 +134,10 @@ vision_init(void)
 /*
  * does_block()
  *
- * Returns true if something at (x,y) blocks sight.
+ * Returns 0 if nothing at (x,y) blocks sight, 1 if anything other than
+ * an opaque region (gas cloud rather than CLOUD terrain) blocks sight,
+ * or 2 if an opaque region potions sight.  [At present, the rest of the
+ * code makes no distinction between 1 and 2, just between 0 and non-0.]
  */
 int
 does_block(int x, int y, struct rm *lev)
@@ -158,8 +161,7 @@ does_block(int x, int y, struct rm *lev)
 #ifdef DEBUG
     if (gs.seethru != 1) {
 #endif
-    if (lev->typ == CLOUD || IS_WATERWALL(lev->typ)
-        || lev->typ == LAVAWALL
+    if (lev->typ == CLOUD || IS_WATERWALL(lev->typ) || lev->typ == LAVAWALL
         || (Underwater && is_moat(x, y)))
         return 1;
 #ifdef DEBUG
@@ -181,7 +183,7 @@ does_block(int x, int y, struct rm *lev)
 #endif
     /* Clouds (poisonous or not) block light. */
     if (visible_region_at(x, y))
-        return 1;
+        return 2;
 #ifdef DEBUG
     } /* gs.seethru */
 #endif
@@ -929,7 +931,7 @@ unblock_point(int x, int y)
  * + If you are a blocked spot, then your right will point to the
  *   right-most blocked spot to your right that is connected to you.
  *   This means that a right-edge (a blocked spot that has an open
- *    spot on its right) will point to itself.
+ *   spot on its right) will point to itself.
  */
 static void
 dig_point(int row, int col)

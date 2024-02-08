@@ -1861,6 +1861,11 @@ if an amulet of flying gets stolen while hero is over lava without other
 poison gas breath from green dragon or iron golem that hit and was reflected
 	left target enveloped in a gas cloud (reflection now takes precedence;
 	somewhat odd though: gas that misses still leaves target enveloped)
+Warning didn't show nearby monsters who were inside poison gas/steam/smoke
+	regions
+map didn't show adjacent monsters if they were inside a gas region unless
+	they were seen via telepathy or extended monster detection, but they
+	were described as if visible in messages (combat, for instance)
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
