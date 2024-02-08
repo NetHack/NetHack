@@ -102,8 +102,10 @@ eraseoldlocks(void)
 void
 getlock(void)
 {
+#ifndef SELF_RECOVER
     static const char destroy_old_game_prompt[] =
     "There is already a game in progress under your name.  Destroy old game?";
+#endif
     int i = 0, fd, c, too_old;
     const char *fq_lock;
 
@@ -176,10 +178,27 @@ getlock(void)
         if (too_old && eraseoldlocks())
             goto gotlock;
 
+        /* drop the "perm" lock while the user decides */
+        unlock_file(HLOCK);
         if (iflags.window_inited) {
+#ifdef SELF_RECOVER
+            c = yn_function("Old game in progress. Destroy [y], Recover [r], or Cancel [n]?", "ynr", 'n', FALSE);
+#else
             /* this is a candidate for paranoid_confirmation */
             c = y_n(destroy_old_game_prompt);
+#endif
         } else {
+#ifdef SELF_RECOVER
+            (void) raw_printf("\nThere is already a game in progress under your name. Do what?\n");
+            (void) raw_printf("\n  y - Destroy old game");
+            (void) raw_printf("\n  r - Try to recover it");
+            (void) raw_printf("\n  n - Cancel");
+            (void) raw_printf("\n\n  => ");
+            (void) fflush(stdout);
+            do {
+                c = getchar();
+            } while (!strchr("rRyYnN", c) && c != -1);
+#else
             (void) raw_printf("\n%s [yn] ", destroy_old_game_prompt);
             (void) fflush(stdout);
             if ((c = getchar()) != EOF) {
@@ -190,7 +209,20 @@ getlock(void)
                 while ((tmp = getchar()) != '\n' && tmp != EOF)
                     ; /* eat rest of line and newline */
             }
+#endif
         }
+#ifdef SELF_RECOVER
+        if (c == 'r' || c == 'R') {
+            if (recover_savefile() && gp.program_state.in_self_recover) {
+                set_levelfile_name(gl.lock, 0);
+                fq_lock = fqname(gl.lock, LEVELPREFIX, 0);
+                goto gotlock;
+            } else {
+                unlock_file(HLOCK);
+                error("Couldn't recover old game.");
+            }
+        } else
+#endif
         if (c == 'y' || c == 'Y') {
             if (eraseoldlocks()) {
                 goto gotlock;

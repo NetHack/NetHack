@@ -276,6 +276,9 @@ main(int argc, char *argv[])
                 }
             }
         }
+        if (gp.program_state.in_self_recover) {
+            gp.program_state.in_self_recover = FALSE;
+        }
     }
 
     if (!resuming) {

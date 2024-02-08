@@ -2211,6 +2211,7 @@ sound: add 'qtsound' soundlib implementation for use on any platform
 documentation: when building plain text Guidebook.txt from Guidebook.mn, avoid
 	attempting to use CR font; change doesn't affect building Guidebook.ps
 	which utilizes CR to get various instances of fixed-width text
+Unix: implement SELF_RECOVER compile-time option, on by default on linux
 
 
 General New Features
