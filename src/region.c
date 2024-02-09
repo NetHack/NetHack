@@ -1,4 +1,4 @@
-/* NetHack 3.7	region.c	$NHDT-Date: 1706272460 2024/01/26 12:34:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.88 $ */
+/* NetHack 3.7	region.c	$NHDT-Date: 1707462965 2024/02/09 07:16:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.89 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -161,6 +161,14 @@ add_mon_to_reg(NhRegion *reg, struct monst *mon)
     int i;
     unsigned *tmp_m;
 
+    /* if this is a long worm, it might already be present in the region;
+       only include it once no matter how segments the region contains */
+    if (mon_in_region(reg, mon)) {
+        if (mon->data != &mons[PM_LONG_WORM])
+            impossible("add_mon_to_reg: %s [#%u] already in region.",
+                       m_monnam(mon), mon->m_id);
+        return;
+    }
     if (reg->max_monst <= reg->n_monst) {
         tmp_m = (unsigned *) alloc(sizeof (unsigned)
                                    * (reg->max_monst + MONST_INC));
@@ -290,13 +298,27 @@ add_region(NhRegion *reg)
     /* Check for monsters inside the region */
     for (i = reg->bounding_box.lx; i <= reg->bounding_box.hx; i++)
         for (j = reg->bounding_box.ly; j <= reg->bounding_box.hy; j++) {
-            boolean is_inside = inside_region(reg, i, j);
+            struct monst *mtmp;
+            boolean is_inside = FALSE;
 
             /* Some regions can cross the level boundaries */
             if (!isok(i, j))
                 continue;
-            if (is_inside && MON_AT(i, j))
-                add_mon_to_reg(reg, gl.level.monsters[i][j]);
+            if (inside_region(reg, i, j)) {
+                is_inside = TRUE;
+                /* if there's a monster here, add it to the region */
+                if ((mtmp = m_at(i, j)) != 0
+#if 0
+                    /* leave this bit (to exclude long worm tails) out;
+                       assume that worms use "cutaneous respiration" (they
+                       breath through their skin rather than nose/gills/&c)
+                       so their tails are susceptible to poison gas */
+                    && mtmp->mx == i && mtmp->my == j
+#endif
+                    ) {
+                    add_mon_to_reg(reg, mtmp);
+                }
+            }
             if (reg->visible) {
                 if (is_inside)
                     block_point(i, j);

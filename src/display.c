@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.c	$NHDT-Date: 1682758082 2023/04/29 08:48:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.216 $ */
+/* NetHack 3.7	display.c	$NHDT-Date: 1707462961 2024/02/09 07:16:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.231 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -128,7 +128,7 @@ static void display_monster(coordxy, coordxy,
                             struct monst *, int, boolean) NONNULLPTRS;
 static int swallow_to_glyph(int, int);
 static void display_warning(struct monst *) NONNULLARG1;
-static boolean next_to_gas(struct monst *) NONNULLARG1;
+static boolean next_to_gas(struct monst *, coordxy, coordxy) NONNULLARG1;
 
 static int check_pos(coordxy, coordxy, int);
 static void get_bkglyph_and_framecolor(coordxy x, coordxy y, int *, uint32 *);
@@ -654,13 +654,18 @@ warning_of(struct monst *mon)
 /* returns True if mon is adjacent and would be seen if vision wasn't
    blocked by being in a gas cloud (implicit; caller has already checked) */
 static boolean
-next_to_gas(struct monst *mon)
+next_to_gas(
+    struct monst *mon,
+    coordxy mx, coordxy my) /* won't match mon->mx,my if long worm's tail */
 {
-    int r = (u.xray_range > 1) ? (u.xray_range + 1) : 2;
+    int r = (u.xray_range > 1) ? u.xray_range : 1;
 
-    if (distu(mon->mx, mon->my) > r * (r - 1))
+    if (distu(mx, my) > r * (r + 1))
         return FALSE;
-    if (!_mon_visible(mon) && !_see_with_infrared(mon))
+    /* decide whether monster at <mx,my> could be seen without couldsee()
+       because the gas cloud inhibits that (don't need to check infravision
+       when monster is adjacent) */
+    if (Blind || !_mon_visible(mon))
         return FALSE;
     return TRUE;
 }
@@ -938,10 +943,8 @@ newsym(coordxy x, coordxy y)
          */
         if (reg && (ACCESSIBLE(lev->typ)
                     || (reg->visible && is_pool_or_lava(x, y)))) {
-            if (mon && !worm_tail && (sensemon(mon) || mon_warning(mon)
-                                      || next_to_gas(mon))) {
-                ; /* skip region; the 'if' is more comphrehensible this way */
-            } else {
+            if (!(mon && (((sensemon(mon) || mon_warning(mon)) && !worm_tail)
+                          || next_to_gas(mon, x, y)))) { /* even if tail */
                 show_region(reg, x, y);
                 return;
             }
