@@ -1,5 +1,5 @@
 # NetHack 3.7 Makefile.nmake
-#       Copyright (c) NetHack Development Team 1993-2023
+#       Copyright (c) NetHack Development Team 1993-2024
 #
 #==============================================================================
 # Build Tools Environment
@@ -69,6 +69,13 @@ CURSES_GRAPHICAL = Y
 #
 
 DEBUGINFO = Y
+
+#
+#------------------------------------------------------------------------------
+# Do you want to include the address sanitizer?
+#
+
+#WANT_ASAN = Y
 
 #------------------------------------------------------------------------------
 #
@@ -1046,7 +1053,7 @@ CL_RECENT=-sdl
 ! ENDIF
 !ENDIF
 
-!IF ($(VSVER) >= 2019)
+!IF ($(VSVER) >= 2019) && ("$(WANT_ASAN)"=="Y")
 ASAN=/fsanitize=address
 !ELSE
 ASAN=
@@ -1387,7 +1394,7 @@ CURLLUASRC=http://www.lua.org/ftp/lua-5.4.6.tar.gz
 CURLLUADST=lua-5.4.6.tar.gz
 
 #CURLPDCSRC=https://github.com/wmcbrine/PDCurses/archive/refs/tags/3.9.zip
-CURLPDCSRC=https://github.com/Bill-Gray/PDCursesMod/archive/refs/tags/v4.3.5.zip
+CURLPDCSRC=https://github.com/Bill-Gray/PDCursesMod/archive/refs/tags/v4.4.0.zip
 CURLPDCDST=pdcurses.zip
 
 $(LUASRC)\lua.h:
