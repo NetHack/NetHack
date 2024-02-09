@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1368 $ $NHDT-Date: 1706272459 2024/01/26 12:34:19 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1376 $ $NHDT-Date: 1707521382 2024/02/09 23:29:42 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1357,6 +1357,9 @@ if loadstone was unIDed but had been assigned a type name and you failed to
 	"stone called <assigned name>"
 when a vision blocking gas cloud dissipated, the screen didn't necessarily
 	get updated to show newly visible locations in a timely fashion
+if confused #loot while on a throne moved whole stack of quivered gold into
+	'coffers' chest, the gold wasn't unworn from quiver slot, potentially
+	leading to crash when quiver was subsequently accessed
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

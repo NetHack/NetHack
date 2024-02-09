@@ -1,4 +1,4 @@
-/* NetHack 3.7	pickup.c	$NHDT-Date: 1700012890 2023/11/15 01:48:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.348 $ */
+/* NetHack 3.7	pickup.c	$NHDT-Date: 1707521383 2024/02/09 23:29:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.370 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2334,8 +2334,7 @@ reverse_loot(void)
     int n, x = u.ux, y = u.uy;
 
     if (!rn2(3)) {
-        /* n objects: 1/(n+1) chance per object plus 1/(n+1) to fall off end
-         */
+        /* n objects: 1/(n+1) chance per object, 1/(n+1) to fall off end */
         for (n = inv_cnt(TRUE), otmp = gi.invent; otmp; --n, otmp = otmp->nobj)
             if (!rn2(n + 1)) {
                 prinv("You find old loot:", otmp, 0L);
@@ -2355,6 +2354,10 @@ reverse_loot(void)
     if (!goldob)
         return FALSE;
 
+    /* gold might be quivered; dropping would un-wear it, but freeinv()
+       expects caller to do that; do so now */
+    remove_worn_item(goldob, FALSE);
+
     if (!IS_THRONE(levl[x][y].typ)) {
         dropx(goldob);
         /* the dropped gold might have fallen to lower level */
@@ -2367,9 +2370,8 @@ reverse_loot(void)
             if (coffers->otyp == CHEST) {
                 if (coffers->spe == 2)
                     break; /* a throne room chest */
-                if (!otmp
-                    || (distu(coffers->ox, coffers->oy)
-                        < distu(otmp->ox, otmp->oy)))
+                if (!otmp || (distu(coffers->ox, coffers->oy)
+                              < distu(otmp->ox, otmp->oy)))
                     otmp = coffers; /* remember closest ordinary chest */
             }
         if (!coffers)
