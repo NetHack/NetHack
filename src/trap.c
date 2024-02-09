@@ -6609,11 +6609,11 @@ lava_effects(void)
 
         for (obj = gi.invent; obj; obj = obj2) {
             obj2 = obj->nobj;
-            /* above, we set in_use for objects which are to be destroyed */
             if (obj->o_id == protect_oid) {
-                ; /* skip protected item; caller expects to retain access */
-            } else if (obj->otyp == SPE_BOOK_OF_THE_DEAD && !Blind) {
-                if (usurvive)
+                /* skip protected item; caller expects to retain access */
+                obj->in_use = 1; /* was cleared when setting protect_oid */
+            } else if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
+                if (usurvive && !Blind)
                     pline("%s glows a strange %s, but remains intact.",
                           The(xname(obj)), hcolor("dark red"));
             } else if (obj->in_use) {

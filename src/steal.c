@@ -236,9 +236,9 @@ remove_worn_item(
     /*
      * Losing worn gear might drop hero into water or lava or onto a
      * location-changing trap or take away the ability to breathe in water.
-     * Marking it 'in_use' prevents emergency_disrobe() from dropping it.
-     * in_lava() appears to be ok; other cases impacting object location
-     * (or destruction) might still have issues.
+     * Marking it 'in_use' prevents emergency_disrobe() from dropping it
+     * and lava_effects() from destroying it; other cases impacting object
+     * location (or destruction) might still have issues.
      *
      * Note:  if a hangup save occurs when 'in_use' is set, the item will
      * be destroyed via useup() during restore.  Maybe remove_worn_item()
