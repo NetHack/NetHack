@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.699 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1707547723 2024/02/10 06:48:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.704 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4255,6 +4255,7 @@ you_sanity_check(void)
             impossible("sanity_check: you over monster");
     }
 
+    check_wornmask_slots();
     (void) check_invent_gold("invent");
 }
 

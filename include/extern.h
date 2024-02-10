@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1706213788 2024/01/25 20:16:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1373 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1707547708 2024/02/10 06:48:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1381 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3686,6 +3686,7 @@ extern void setnotworn(struct obj *) NO_NNARGS; /* has tests for obj */
 extern void allunworn(void);
 extern struct obj *wearmask_to_obj(long);
 extern long wearslot(struct obj *) NONNULLARG1;
+extern void check_wornmask_slots(void);
 extern void mon_set_minvis(struct monst *) NONNULLARG1;
 extern void mon_adjust_speed(struct monst *, int, struct obj *) NONNULLARG1;
 extern void update_mon_extrinsics(struct monst *, struct obj *, boolean,
