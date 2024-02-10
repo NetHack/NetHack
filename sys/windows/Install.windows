@@ -220,7 +220,7 @@ Compiling
 
     If you want to see where NetHack expects to find the other files it
     utilizes, you can issue the following command:
-        nethack --showfiles
+        nethack --showpaths
 
 Play NetHack.
 
