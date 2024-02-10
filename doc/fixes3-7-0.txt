@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1376 $ $NHDT-Date: 1707521382 2024/02/09 23:29:42 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1377 $ $NHDT-Date: 1707525192 2024/02/10 00:33:12 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1360,6 +1360,8 @@ when a vision blocking gas cloud dissipated, the screen didn't necessarily
 if confused #loot while on a throne moved whole stack of quivered gold into
 	'coffers' chest, the gold wasn't unworn from quiver slot, potentially
 	leading to crash when quiver was subsequently accessed
+when filling quiver slot, don't bother asking "what do you want to ready?" if
+	invent is empty
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

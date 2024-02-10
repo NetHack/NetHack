@@ -1,4 +1,4 @@
-/* NetHack 3.7	wield.c	$NHDT-Date: 1701279364 2023/11/29 17:36:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ */
+/* NetHack 3.7	wield.c	$NHDT-Date: 1707525193 2024/02/10 00:33:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -287,8 +287,8 @@ setuswapwep(struct obj *obj)
 static int
 ready_ok(struct obj *obj)
 {
-    if (!obj)
-        return GETOBJ_SUGGEST; /* '-', will empty quiver slot if chosen */
+    if (!obj) /* '-', will empty quiver slot if chosen */
+        return uquiver ? GETOBJ_SUGGEST : GETOBJ_DOWNPLAY;
 
     /* downplay when wielded, unless more than one */
     if (obj == uwep || (obj == uswapwep && u.twoweap))
@@ -351,6 +351,9 @@ dowield(void)
         pline("Don't be ridiculous!");
         return ECMD_FAIL;
     }
+    /* Keep going even if inventory is completely empty, since wielding '-'
+       to wield nothing can be construed as a positive act even when done
+       so redundantly. */
 
     /* Prompt for a new weapon */
     clear_splitobjs();
@@ -507,12 +510,18 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
     boolean finish_splitting = FALSE,
             was_uwep = FALSE, was_twoweap = u.twoweap;
 
-    /* Since the quiver isn't in your hands, don't check cantwield(), */
-    /* will_weld(), touch_petrifies(), etc. */
+    /* Since the quiver isn't in your hands, don't check cantwield(),
+       will_weld(), touch_petrifies(), etc. */
     gm.multi = 0;
+    if (!gi.invent) {
+        /* could accept '-' to empty quiver, but there's no point since
+           inventory is empty so uquiver is already Null */
+        You("have nothing to ready for firing.");
+        return ECMD_OK;
+    }
+
     /* forget last splitobj() before calling getobj() with GETOBJ_ALLOWCNT */
     clear_splitobjs();
-
     /* Prompt for a new quiver: "What do you want to {ready|fire}?" */
     newquiver = getobj(verb, ready_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
 
