@@ -28,4 +28,5 @@ objutil/*
 objlua/*
 objpdc/*
 bundle/*
-
+Makefile.mingw32
+Makefile.mingw32.depend

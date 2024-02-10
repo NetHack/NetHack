@@ -1,9 +1,9 @@
-         Copyright (c) NetHack Development Team 1990-2023
+         Copyright (c) NetHack Development Team 1990-2024
          NetHack may be freely redistributed.  See license for details.
          ==============================================================
                   Instructions for compiling and installing
                        NetHack 3.7 on a Windows system
-                     (Windows 7/8.x/10/11 or later only)
+                     (Windows 8.x/10/11 or later only)
          ==============================================================
           Last revision: $NHDT-Date: 1594155895 2020/07/07 21:04:55 $
 
@@ -20,7 +20,7 @@ of the tty and graphical windows versions of NetHack 3.7.0.
 
 The build Makefiles and procedures produce two executables:
     a. A TTY and curses version of NetHack in nethack.exe
-    b. A Windows Graphical version in nethackw.exe.
+    b. A Windows and curses graphical version in nethackw.exe.
 
 You can use one of the following build environments:
   o A copy of Microsoft Visual Studio 2017 Community Edition or
@@ -49,95 +49,53 @@ You can use one of the following build environments:
           subfolder containing gcc.exe to your PATH.
 
 /---------------------------------------------\
-|    Directories for a Win32 NetHack build    |
+|    Directories for a Windows NetHack build  |
 \---------------------------------------------/
 
 
                (NetHack-top)
                      |
-  +-----+-----+------+------+-----+-------------+------~------+
-  |     |     |      |      |     |             |             |
- util  dat   doc  include  src   sys           win        submodules
-                                  |           |               |
-                              +------+      +------+    +-----------+
-                              |      |      |      |    |           |
-                            share windows tty   win32  lua       pdcurses
-                                     |
-                                    vs
+  +-----+-----+------+-----+---+---------------+-----------+-----~-----+
+  |     |     |      |     |   |               |           |           |
+ util  dat   doc  include lib src             sys         win     submodules
+                           |                   |           |           |
+                     +----------+          +------+      +----+     +----+
+                     |          |          |      |      |    |     |    |
+                     |          |          |      |      |    |     |    |
+                 lua-5.4.6  pdcursesmod  share windows  tty  win32 lua pdcurses
+                                                  |
+                                                 vs
+                                                  |
+    +----------+-------+--------+--------+-----------+-------+-----+------+
+    |          |       |        |        |           |       |     |      |
+ makedefs NetHack NetHackW PDCurses PDCursesGui tile2bmp tilemap tiles uudecode
+
 
 /-----------------------------------------------------------------------\
 | Required components that are not bundled in the NetHack repository     |
 \-----------------------------------------------------------------------/
 
-NetHack 3.7 for Windows requires some 3rd party sources that are not
-directly distributed within the NetHack repository, but they are configured
-as submodules if you are online and have git, or you can obtain them
-yourself.
+NetHack 3.7 for Windows requires at least one mandatory 3rd party source that
+is not directly distributed within the NetHack repository, and an additional
+optional 3rd party source if you want to build curses interface support into
+your binaries.
 
-Via git (recommended)
+The mandatory 3rd party source that is needed for NetHack 3.7 is Lua.
 
-    If you obtained your NetHack sources by cloning from a git repository such
-    as https://github.com/NetHack/NetHack and you have git installed and
-    available and you are online, you simply need to execute the following
-    command from the top level NetHack folder to populate source code into the
-    submodules/lua and submodules/pdcurses folders:
+The optional 3rd party source that can be used is pdcursesmod, which is
+needed if you are building in support for the curses interface.
 
-    git submodule init
-    git submodule update
-
-
-Via zip download
-
-    If you obtained your NetHack sources from a zip file or source other than
-    via git, you'll have to obtain Lua and pdcurses from their respective
-    locations (at the time of this writing).
-    Windows 10 or newer is assumed below, because wget and tar started to be
-    included in that version.
-
-    o obtain Lua
-        cd lib
-        wget http://www.lua.org/ftp/lua-5.4.6.tar.gz
-        tar -xvf lua-5.4.6.tar.gz
-        cd ..
-
-    o obtain pdcursesmod
-        cd lib
-        wget --no-check-certificate ^
-             https://github.com/Bill-Gray/PDCursesMod/archive/refs/tags/v4.3.7.tar.gz ^
-             --output-document=pdcursesmod.tar.gz
-        tar -xvf pdcursesmod.tar.gz
-        ren PDCursesMod-4.3.7 pdcursesmod
-        cd ..
-
-    o update your Makefiles to reflect:
-
-      In sys/windows/Makefile.mingw32
-        change from
-            PDCURSES_TOP = ../submodules/pdcurses
-        to
-            PDCURSES_TOP = ../lib/pdcurses
-
-        change from
-            LUATOP = ../submodules/lua
-        to
-            LUATOP = ../lib/lua-5.4.6
-
-      In sys/windows/Makefile.nmake
-        change from
-            PDCURSES_TOP = ..\submodules\pdcursesmod
-        to
-            PDCURSES_TOP = ..\lib\pdcursesmod
-
-        change from
-            LUATOP = ..\submodules\lua
-        to
-            LUATOP = ..\lib\lua-5.4.6
+The Makefiles distributed for building under Windows have features to
+make obtaining the 3rd party sources easier, but you can obtain them
+manually if you wish. See "Manually obtaining mandatory and optional
+3rd party sources" later in this document if you wish to obtain them
+yourself, without relying on features of the distributed Makefiles.
 
 /-----------------------------------------------------------\
 | Building And Running Using Visual Studio 2017, 2019, 2022  |
 \-----------------------------------------------------------/
 
-If you are NOT using Visual Studio IDE, or you prefer to build
+If you are NOT using the Visual Studio IDE, or you prefer to build
 using a Make utility and a Makefile proceed to "Building Using Make".
 
 When using either Visual Studio 2017, 2019, or 2022, you simply need to
@@ -147,81 +105,38 @@ of NetHack you wish to run.
 The Visual Studio NetHack solution file can be found here:
     sys\windows\vs\NetHack.sln
 
-Before executing the steps to build listed in the next paragraph,
-decide if you want to include optional curses window-port. See
-the note just below entitled "Optional curses window-port support."
-
-So the steps are:
+The steps are:
     1. Launch the IDE.
-    2. Open the appropriate solution file.
+    2. Open the appropriate solution file in sys\windows\vs\NetHack.sln.
     3. Select the build configuration you wish to use (Release, Debug, etc.).
     4. From the build menu, select build solution.
     5. Type F5 to start debugging.
-
- * Optional curses window-port support *
-
-Since 3.6.2, the community patch for a window-port that uses curses has been
-incorporated into the NetHack source code tree. That window-port, which
-evolved from work originally done by Karl Garrison, has been used in several
-NetHack variants and on nethack.alt.org and on www.hardfought.org/nethack/.
-
-If you want to include the curses window-port support in your Visual Studio
-build, you will have to first obtain the PDCurses sources from
-https://github.com/wmcbrine/PDCurses
-and have them available prior to building NetHack. There are two ways to
-enable curses window-port support during the VS build: Either set the
-environment variable PDCURSES to a folder containing a PDCurses
-repository/source-tree
-    OR
-Place the PDCurses folder alongside the NetHack source repository prior
-to proceeding with steps 1 through 5 above.
 
 
 /-------------------------------------------\
 | Building From the Command Line Using Make |
 \-------------------------------------------/
 
---------------------------------------------------------------------------
--- Beginning of prerequisite step --
-
-The first step in building either version of NetHack via Makefile is to
-execute sys\windows\nhsetup.bat to move some files to their required locations.
-
-From the command prompt:
-        cd sys\windows
-        nhsetup
-
-From a Windows explorer window:
-        double-click on nhsetup.bat
-
-If you wish to build from the command line, proceed to "BUILDING FROM
-THE COMMAND LINE."
-
--- end of prerequisite step --
---------------------------------------------------------------------------
-
 Two different versions of NetHack will be built for Windows from the
 command line using the Makefile approach:
-    A tty port utilizing the Win32 Console I/O subsystem, Console
-        NetHack;
-    A Win32 native port built on the Windows API, Graphical NetHack or
-        NetHackW.
+    A tty port utilizing the Win32 Console I/O subsystem Console,
+    and a curses interface in an executabled called NetHack.exe.
+        NetHack
+    A Win32 native port built on the Windows API Graphical NetHack,
+    and graphical curses in an executable called NetHackW.exe.
 
-The executable for Console NetHack will be named NetHack.exe. The
-executable for Graphical NetHack will be named NetHackW.exe. The
-Makefile configuration will build both; NetHackW.exe and NetHack.exe
-will be able to use the same datafiles, save files and bones files.
+The Makefile configurations will build both; NetHack.exe and NetHackW.exe
+and will be able to use the same datafiles, save files and bones files.
 
 Since the last official release of NetHack, compilers and computer
 architectures have evolved and you can now choose whether to build
 a 32-bit x86 version, or a 64-bit x64 version.  The default Makefile
 is set up for a 32-bit x86 version, but that's only because it will
-run on the most number of existing Windows environments.
-
-NetHack's save files and bones files in the 3.7.0 release have not yet
-evolved enough to allow them to interchange between the 32-bit version
-and the 64-bit version (or between different platforms). Hopefully
-that will change in an upcoming release.
+run on the most number of existing Windows environments. Change it if you
+want. Be aware that NetHack's save files and bones files in the 3.7.0
+release have not yet evolved enough to allow them to interchange between
+the 32-bit version and the 64-bit version (or between different platforms).
+That may change in future.
 
 I. Dispelling the Myths:
 
@@ -232,15 +147,14 @@ I. Dispelling the Myths:
     We have provided a Makefile for each of the following compilers:
 
         o Microsoft Visual Studio 2017 or 2019 or 2022 C++ Compiler
-          The Community Editions are fine and available at no cost
-        o MinGW-w64
+          The Community Editions are fine and available at no cost,
+          although registration with the vendor is required.
+          sys/windows/Makefile.nmake is provided for use with
+          Microsoft's nmake.
 
-    The Microsoft Visual Studio makefile was created for use
-    with MS NMAKE which is provided with the Microsoft compiler.
-    The supplied Makefile may work with earlier versions of the Microsoft
-    compiler, but that has not been tested.
-
-    The GCC Makefile was created for use with GNU Make.
+        o MinGW-w64 gcc compiler environment and GNU make.
+          sys/windows/Makefile.mingw and sys/windows/Makefile.mingw.depend
+          are provided for use with GNU make provided with mingw-w64.
 
 II. To compile your copy of NetHack on a Windows machine:
 
@@ -249,35 +163,23 @@ Setting Up
 1.  It almost goes without saying that you should make sure that your
     tools are set up and running correctly.  That includes ensuring that
     all the necessary environment variables for the compiler environment
-    are set correctly.
+    are set correctly and that they will be found when searching your PATH.
 
     Change your current directory to the src subfolder of the nethack
-    source tree.
+    source tree, if you are at the top of the NetHack source tree.
         cd src
 
-2.  Since 3.6.2, the community patch for an optional curses window-port
-    has been incorporated into the NetHack source code tree. That
-    window-port, which evolved from work originally done by Karl Garrison,
-    has been used in several NetHack variants and on nethack.alt.org and
-    on www.hardfought.org/nethack/. The optional curses window-port is
-    available for Windows, macOS, and Unix (and also DOS).
+2.  Change your current directory to the sys\windows subfolder of the nethack
+    source tree and execute nhsetup.bat, to place copies of the Makefiles in
+    the src subfolder.
 
-    The Makefiles are configured by default to include the curses
-    window-port support in your command line Makefile build.
+    From the command prompt:
+        cd sys\windows
+        .\nhsetup.bat
 
-3.  Make sure all the necessary files are in the appropriate directory
-    structure.  You should have a main NetHack top directory with
-    subdirectories dat, doc, include, src, sys\share, sys\windows,
-    win\tty, util.
-
-    (You can check the file "Files" in your top level directory for a
-     more complete listing of what file is in which directory.)
-
-    If you downloaded or ftp'd the sources from a UNIX system, the lines
-    will probably end in UNIX-style newlines, instead of the carriage
-    return and line feed pairs used by Windows.  Some programs have
-    trouble with them, so you may need to convert them. The compiler
-    should not have any problems with them however.
+3.  From the sys\windows subfolder, change your current directory to the
+    src subfolder of the nethack source tree:
+        cd ..\..\src
 
 4.  Edit your Makefile if you wish, but it is not required unless
     you are altering the build options.
@@ -288,44 +190,53 @@ Compiling
 
     Change your current directory to the NetHack src directory.
 
-    For the Visual Studio compiler:
-	Issue these commands:
-            copy ..\sys\windows\Makefile.nmake Makefile
-	    nmake install
+    For the Visual Studio compiler, issue these commands:
+	    nmake INTERNET_AVAILABLE=Y install
 
     For GCC:
 	Issue these commands:
-            cp ../sys/windows/Makefile.mingw32* .
-            mingw32-make -f Makefile.mingw32 clean
-            mingw32-make -f Makefile.mingw32 depend
-            mingw32-make -f Makefile.mingw32
+            make -f Makefile.mingw32 INTERNET_AVAILABLE=Y clean
+            make -f Makefile.mingw32 INTERNET_AVAILABLE=Y depend
+            make -f Makefile.mingw32 INTERNET_AVAILABLE=Y
+
+        (some older versions of mingw may require mingw32-make in
+         place of plain make in the commands above)
 
     If you get any errors along the way then something has not been set
-    up correctly. The time it takes to compile depends on your
-    particular machine of course, but you should be able to go for lunch
-    and return to find everything finished.  The less memory, and slower
-    your machine, the longer the lunch you may take. :-)
+    up correctly or you mistyped the commands shown above.
 
-    In any case, it is likely that the command prompt window where you
-    are doing the compiling will be occupied for a while.  If all goes
-    well, you will get an NetHack executable.
+    The time it takes to compile depends on your particular machine of course.
+    On a slower machine, you might take the opportunity to grab a beverage.
+
+    If all goes well, you will get NetHack executables with all of the
+    required support files in the binary subfolder of the NetHack tree.
+    NetHack.exe is the tty plus curses version. NetHackW.exe is the windows
+    graphical plus graphical curses version.
+
+    Your personal config file will be created from a template file the
+    first time you fire up NetHack. If you want to edit it you can use
+    the following filename to do so:
+        %USERPROFILE%\nethack\.nethackrc
+
+    If you want to see where NetHack expects to find the other files it
+    utilizes, you can issue the following command:
+        nethack --showfiles
+
+Play NetHack.
 
 Notes:
 
-1.  To install an update of NetHack after changing something, change
-    your current directory to src and issue the appropriate command for
-    your compiler:
+1.  To rebuild NetHack after changing something, change your current directory
+    to src and issue the appropriate command for your compiler:
 
     For Microsoft compiler:
         nmake
 
     For GCC:
-        mingw32-make -f Makefile.mingw32
+        make -f Makefile.mingw32
 
-    If you add, delete, or reorder monsters or objects, or you change
-    the format of saved level files, delete any save and bones files.
-    (Trying to use such files sometimes produces amusing confusions on
-    the game's part, but usually crashes.)
+        (some older versions of mingw may require mingw32-make in
+         place of plain make in the command above)
 
 2.  Depending on the build and compiler and tools used above, the
     executable produced by the TTY build is either:
@@ -335,22 +246,64 @@ Notes:
       - a 64-bit (x64) .exe file,
         which should run on any 64-bit Windows O/S.
 
-    **Note**: saved games are NOT compatible between the 32-bit and the
-    64-bit versions at this time. 
+    **Note**: saved games and bones files are NOT compatible between the
+    32-bit and the 64-bit versions at this time. 
 
-NetHack.exe is the tty plus curses version. NetHackW.exe is the windows
-graphical version.
 
-Play NetHack.
+/--------------------------------------------------------------\
+| Manually obtaining mandatory and optional 3rd party sources. |
+\--------------------------------------------------------------/
 
-PROBLEMS
+
+Via git (recommended)
+
+    If you obtained your NetHack sources by cloning from a git repository such
+    as https://github.com/NetHack/NetHack and you have git installed and
+    available and you are online, you simply need to execute the following
+    command from the top level NetHack folder to populate source code into the
+    submodules/lua and submodules/pdcursesmod folders:
+
+    git submodule init
+    git submodule update
+
+
+Via zip download
+
+    If you obtained your NetHack sources from a zip file or git is not available
+    to you, you'll have to obtain Lua and pdcurses from their respective
+    locations (at the time of this writing).
+    Windows 10 or newer is assumed below, because wget and tar were included with
+    Windows in that version and beyond.
+
+    o obtain Lua
+        cd lib
+        wget http://www.lua.org/ftp/lua-5.4.6.tar.gz
+        tar -xvf lua-5.4.6.tar.gz
+        cd ..
+
+    o obtain pdcursesmod
+        cd lib
+        wget --no-check-certificate ^
+             https://github.com/Bill-Gray/PDCursesMod/archive/refs/tags/v4.4.0.tar.gz ^
+             --output-document=pdcursesmod.tar.gz
+        tar -xvf pdcursesmod.tar.gz
+        ren PDCursesMod-4.4.0 pdcursesmod
+        cd ..
+
+/--------------------------------------------------------------\
+|                   If you experience a problem                |
+\--------------------------------------------------------------/
 
     If you discover a bug and wish to report it, or if you have comments
     or suggestions we recommend using our "Contact Us" web page at:
-        http://www.nethack.org/common/contact.html
+        https://www.nethack.org/common/contact.html
 
     If you don't have access to the web, or you want to send us a patch
     to the NetHack source code feel free to drop us a line c/o:
         DevTeam (at) nethack.org
 
-    Happy NetHacking!
+    The development team also monitors the NetHack issues page on GitHub:
+        https://github.com/NetHack/NetHack/issues
+
+
+ Happy NetHacking!
