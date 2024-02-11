@@ -78,13 +78,12 @@ DEBUGINFO = Y
 #WANT_ASAN = Y
 
 #------------------------------------------------------------------------------
-#
-#
 # Do you have a connection to the internet available that you want
-# to utilize for obtaining prerequisite Lua source code and pdcurses source code?
-#
+# to utilize for obtaining prerequisite Lua source code and
+# pdcursesmod source code?
+# Default is now Y. Set it to N if that won't work for you.
 
-INTERNET_AVAILABLE = N
+INTERNET_AVAILABLE = Y
 
 #------------------------------------------------------------------------------
 #
@@ -174,7 +173,7 @@ SUBM    = ..\submodules  # NetHack git submodules
 SndWavDir = ..\sound\wav # sound files that get integrated
 
 #==============================================================================
-# Sanity checks for prerequisite Lua and pdcurses
+# Sanity checks for prerequisite Lua and pdcursesmod
 #
 LUA_MAY_PROCEED=N
 ADD_CURSES=N
@@ -223,7 +222,7 @@ LUA_MAY_PROCEED=Y
 !ERROR Stopping because NetHack 3.7 requires Lua for its build.
 !ENDIF  # LUA_MAY_PROCEED
 
-# Now, pdcurses
+# Now, pdcursesmod
 !IF "$(CURSES_CONSOLE)" == "Y"
 WANT_CURSES=Y
 !ENDIF
@@ -231,7 +230,7 @@ WANT_CURSES=Y
 WANT_CURSES=Y
 !ENDIF
 
-# Now, pdcurses
+# Now, pdcursesmod
 !IF "$(WANT_CURSES)" == "Y"
 PDCDIST=pdcursesmod
 !IF "$(INTERNET_AVAILABLE)" == "Y"
@@ -254,10 +253,10 @@ ADD_CURSES=Y
 !ELSEIF EXIST("$(LIBDIR)\$(PDCDIST)\curses.h")
 PDCURSES_TOP=$(LIBDIR)\$(PDCDIST)
 ADD_CURSES=Y
-!ENDIF  # pdcurses sources available somewhere
+!ENDIF  # pdcursesmod sources available somewhere
 !IF "$(ADD_CURSES)" == "Y"
 !MESSAGE Your Makefile settings do not allow $(PDCDIST) to be
-!MESSAGE obtained by git or by download, but a copy of pdcurses was
+!MESSAGE obtained by git or by download, but a copy of pdcursesmod was
 !MESSAGE found in $(PDCURSES_TOP),
 !MESSAGE so that will be used.
 !ENDIF  # ADD_CURSES == Y
@@ -344,12 +343,16 @@ OBJGUI_B    = objgui
 OBJUTIL_B   = objutil
 OBJLUA_B    = objlua
 OBJPDC_B    = objpdc
+OBJPDCC_B   = objpdcc
+OBJPDCG_B   = objpdcg
 
 OBJTTY      = $(OBJTTY_B)\$(TARGET_CPU)
 OBJGUI      = $(OBJGUI_B)\$(TARGET_CPU)
 OBJUTIL     = $(OBJUTIL_B)\$(TARGET_CPU)
 OBJLUA      = $(OBJLUA_B)\$(TARGET_CPU)
 OBJPDC      = $(OBJPDC_B)\$(TARGET_CPU)
+OBJPDCC     = $(OBJPDCC_B)\$(TARGET_CPU)
+OBJPDCG     = $(OBJPDCG_B)\$(TARGET_CPU)
 
 #
 # Shorten up the location for some files
@@ -360,6 +363,8 @@ OGUI   = $(OBJGUI)^\
 OUTL   = $(OBJUTIL)^\
 OLUA   = $(OBJLUA)^\
 OPDC   = $(OBJPDC)^\
+OPDCC  = $(OBJPDCC)^\
+OPDCG  = $(OBJPDCG)^\
 
 U  = $(UTIL)^\
 
@@ -435,12 +440,13 @@ LUAOBJFILES =   $(LUAOBJFILES) $(OLUA)lbitlib.o
 #        and removes lbitlib.c
 !ENDIF
 #===============-=================================================
-# PDCurses build macros
+# PDCursesmod build macros
+# Source for the NetHack repository submodule in
+#        ../submodules/pdcursesmod
+# is https://github.com/Bill-Gray/PDCursesMod
 # Source for the NetHack repository submodule in
 #        ../submodules/pdcurses
 # is https://github.com/wmcbrine/PDCurses.git
-#        ../submodules/pdcursesmod
-# is https://github.com/Bill-Gray/PDCursesMod
 #=================================================================
 
 !IF "$(ADD_CURSES)" == "Y"
@@ -463,26 +469,16 @@ PDCCOMMONOBJS = $(OPDC)addch.o $(OPDC)addchstr.o $(OPDC)addstr.o $(OPDC)attr.o $
 	$(OPDC)scroll.o $(OPDC)slk.o $(OPDC)termattr.o $(OPDC)touch.o \
 	$(OPDC)util.o $(OPDC)window.o
 
-#PDCOBJS = $(OPDC)pdcclip.o $(OPDC)pdcdisp.o $(OPDC)pdcgetsc.o $(OPDC)pdckbd.o $(OPDC)pdcscrn.o \
-#	$(OPDC)pdcsetsc.o $(OPDC)pdcutil.o
+PDCWINCONOBJS = $(OPDCC)pdcclip.o $(OPDCC)pdcdisp.o $(OPDCC)pdcgetsc.o \
+	$(OPDCC)pdckbd.o $(OPDCC)pdcscrn.o $(OPDCC)pdcsetsc.o $(OPDCC)pdcutil.o
 
-PDCWINCONOBJS = $(OPDC)pdcclip_wincon.o $(OPDC)pdcdisp_wincon.o \
-	$(OPDC)pdcgetsc_wincon.o $(OPDC)pdckbd_wincon.o \
-	$(OPDC)pdcscrn_wincon.o $(OPDC)pdcsetsc_wincon.o \
-	$(OPDC)pdcutil_wincon.o
-
-PDCWINGUIOBJS = $(OPDC)pdcclip_wingui.o $(OPDC)pdcdisp_wingui.o \
-	$(OPDC)pdcgetsc_wingui.o $(OPDC)pdckbd_wingui.o \
-	$(OPDC)pdcscrn_wingui.o $(OPDC)pdcsetsc_wingui.o \
-	$(OPDC)pdcutil_wingui.o
-
-PDCLIB = $(LIBDIR)\$(PDCDIST)-$(TARGET_CPU).lib
+PDCWINGUIOBJS = $(OPDCG)pdcclip.o $(OPDCG)pdcdisp.o $(OPDCG)pdcgetsc.o \
+	$(OPDCG)pdckbd.o $(OPDCG)pdcscrn.o $(OPDCG)pdcsetsc.o $(OPDCG)pdcutil.o
 
 PDCINCL = /I$(PDCURSES_TOP) /I$(PDCSRC)
 PDCINCLGUI = /I$(PDCWINCON)
 PDCINCLCON = /I$(PDCWINGUI)
 !ELSE
-PDCLIB =
 PDCDEP =
 !ENDIF
 
@@ -612,14 +608,14 @@ CURSESOBJ= $(OTTY)cursdial.o $(OTTY)cursinit.o $(OTTY)cursinvt.o \
 	$(OTTY)cursstat.o $(OTTY)curswins.o
 !IF "$(CURSES_CONSOLE)" == "Y"
 CURSESWINCONOBJS = $(CURSESOBJ)
-PDCWINCONLIB = $(PDCLIB)
+PDCWINCONLIB = $(LIBDIR)\$(PDCDIST)-wincon-$(TARGET_CPU)-static.lib
 CURSESDEF1=-D"CURSES_GRAPHICS" -DPDC_NCMOUSE
 #CURSESDEF2=-D"CURSES_BRIEF_INCLUDE" -DCHTYPE_32
 CURSESDEF2=-DCURSES_UNICODE $(PDCURSESFLAGS)
 !ENDIF
 !IF "$(CURSES_GRAPHICAL)" == "Y"
 CURSESWINGUIOBJS = $(CURSESOBJ) $(OGUI)guitty.o
-PDCWINGUILIB = $(PDCLIB)
+PDCWINGUILIB = $(LIBDIR)\$(PDCDIST)-wingui-$(TARGET_CPU)-static.lib
 CURSESDEF1=-D"CURSES_GRAPHICS" -DPDC_NCMOUSE
 #CURSESDEF2=-D"CURSES_BRIEF_INCLUDE" -DCHTYPE_32
 CURSESDEF2=-DCURSES_UNICODE $(PDCURSESFLAGS)
@@ -1312,10 +1308,10 @@ DLB =
 {$(PDCSRC)}.c{$(OBJPDC)}.o:
 	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS:-w44774= ) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
-{$(PDCWINCON)}.c{$(OBJPDC)}.o:
+{$(PDCWINCON)}.c{$(OBJPDCC)}.o:
 	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(PDCINCLCON) $(CFLAGS) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
-{$(PDCWINGUI)}.c{$(OBJPDC)}.o:
+{$(PDCWINGUI)}.c{$(OBJPDCG)}.o:
 	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(PDCINCLGUI) $(CFLAGS) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
@@ -1369,6 +1365,7 @@ all :	install
 install:  envchk.tag libdir.tag ottydir$(TARGET_CPU).tag \
 		outldir$(TARGET_CPU).tag oguidir$(TARGET_CPU).tag \
 		oluadir$(TARGET_CPU).tag opdcdir$(TARGET_CPU).tag \
+		opdccdir$(TARGET_CPU).tag opdcgdir$(TARGET_CPU).tag \
 		$(LUASRC)\lua.h $(PDCDEP) \
 		$(INCL)\nhlua.h $(OUTL)utility.tag \
 		$(DAT)\data $(DAT)\rumors $(DAT)\oracles $(DAT)\engrave \
@@ -1395,14 +1392,16 @@ CURLLUADST=lua-5.4.6.tar.gz
 
 #CURLPDCSRC=https://github.com/wmcbrine/PDCurses/archive/refs/tags/3.9.zip
 CURLPDCSRC=https://github.com/Bill-Gray/PDCursesMod/archive/refs/tags/v4.4.0.zip
-CURLPDCDST=pdcurses.zip
+CURLPDCDST=$(PDCDIST).zip
 
 $(LUASRC)\lua.h:
+	@if not exist $(LIBDIR)\*.* mkdir $(LIBDIR)
 	cd $(LIBDIR)
 	curl -L $(CURLLUASRC) -o $(CURLLUADST)
 	tar -xvf $(CURLLUADST)
 	cd ..\src
 $(PDCURSES_TOP)\curses.h:
+	@if not exist $(LIBDIR)\*.* mkdir $(LIBDIR)
 	cd $(LIBDIR)
 	curl -L $(CURLPDCSRC) -o $(CURLPDCDST)
 	if not exist $(PDCDIST)\*.* mkdir $(PDCDIST)
@@ -1725,6 +1724,16 @@ opdcdir$(TARGET_CPU).tag:
 	@if not exist $(OBJPDC)\*.* mkdir $(OBJPDC)
 	@echo directory created >$@
 
+opdccdir$(TARGET_CPU).tag:
+	@if not exist $(OBJPDCC)\*.* echo creating directory $(OBJPDCC:\=/)
+	@if not exist $(OBJPDCC)\*.* mkdir $(OBJPDCC)
+	@echo directory created >$@
+
+opdcgdir$(TARGET_CPU).tag:
+	@if not exist $(OBJPDCG)\*.* echo creating directory $(OBJPDCG:\=/)
+	@if not exist $(OBJPDCG)\*.* mkdir $(OBJPDCG)
+	@echo directory created >$@
+
 libdir.tag:
 	@if not exist $(LIBDIR)\*.* echo creating directory $(LIB:\=/)
 	@if not exist $(LIBDIR)\*.* mkdir $(LIBDIR)
@@ -1991,45 +2000,14 @@ $(SRC)\x11tiles: $(U)tile2x11.exe $(WSHR)\monsters.txt $(WSHR)\objects.txt \
 # PDCurses
 #===============================================================================
 
-$(LIBDIR)\$(PDCDIST)-$(TARGET_CPU).lib : $(PDCCOMMONOBJS)
+$(PDCWINCONLIB) : $(PDCCOMMONOBJS) $(PDCWINCONOBJS)
 	@echo Building library $@ from $**
-	@$(librarian) -nologo /out:$@ $(PDCCOMMONOBJS)
-
-$(OPDC)pdcclip_wincon.o: $(PDCWINCON)\pdcclip.c
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINCON)\pdcclip.c
-$(OPDC)pdcdisp_wincon.o: $(PDCWINCON)\pdcdisp.c
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINCON)\pdcdisp.c
-$(OPDC)pdcgetsc_wincon.o: $(PDCWINCON)\pdcgetsc.c
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINCON)\pdcgetsc.c
-$(OPDC)pdckbd_wincon.o: $(PDCWINCON)\pdckbd.c
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINCON)\pdckbd.c
-$(OPDC)pdcscrn_wincon.o: $(PDCWINCON)\pdcscrn.c
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINCON)\pdcscrn.c
-$(OPDC)pdcsetsc_wincon.o: $(PDCWINCON)\pdcsetsc.c
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINCON)\pdcsetsc.c
-$(OPDC)pdcutil_wincon.o: $(PDCWINCON)\pdcutil.c
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINCON)\pdcutil.c
-
-$(OPDC)pdcclip_wingui.o: $(PDCWINGUI)\pdcclip.c
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINGUI)\pdcclip.c
-$(OPDC)pdcdisp_wingui.o: $(PDCWINGUI)\pdcdisp.c
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINGUI)\pdcdisp.c
-$(OPDC)pdcgetsc_wingui.o: $(PDCWINGUI)\pdcgetsc.c
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINGUI)\pdcgetsc.c
-$(OPDC)pdckbd_wingui.o: $(PDCWINGUI)\pdckbd.c
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINGUI)\pdckbd.c
-$(OPDC)pdcscrn_wingui.o: $(PDCWINGUI)\pdcscrn.c
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINGUI)\pdcscrn.c
-$(OPDC)pdcsetsc_wingui.o: $(PDCWINGUI)\pdcsetsc.c
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINGUI)\pdcsetsc.c
-$(OPDC)pdcutil_wingui.o: $(PDCWINGUI)\pdcutil.c
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINGUI)\pdcutil.c
+	@$(librarian) -nologo /out:$@ $(PDCCOMMONOBJS) $(PDCWINCONOBJS)
+$(PDCWINGUILIB) : $(PDCCOMMONOBJS) $(PDCWINGUIOBJS)
+	@echo Building library $@ from $**
+	@$(librarian) -nologo /out:$@ $(PDCCOMMONOBJS) $(PDCWINGUIOBJS)
 
 $(OGUI)guitty.o: $(MSWSYS)\guitty.c $(WINDHDR) $(HACK_H) $(TILE_H)
-
-#$(OPDC)pdcscrn.o : $(PDCURSES_HEADERS) $(PDCWINCON)\pdcscrn.c
-#	$(Q)$(CC) $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -wd4996 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) \
-#		-Fo$@ $(PDCWINCON)\pdcscrn.c
 
 #===============================================================================
 # LUA
@@ -2318,6 +2296,8 @@ spotless: clean
 	if exist oguidirx86.tag         del oguidirx86.tag
 	if exist oluadirx86.tag         del oluadirx86.tag
 	if exist opdcdirx86.tag         del opdcdirx86.tag
+	if exist opdccdirx86.tag        del opdccdirx86.tag
+	if exist opdcgdirx86.tag        del opdcgdirx86.tag
 	if exist outldirx64.tag         del outldirx64.tag
 	if exist ottydirx64.tag         del ottydirx64.tag
 	if exist oguidirx64.tag         del oguidirx64.tag
@@ -2340,7 +2320,8 @@ spotless: clean
 	if exist $(U)uudecode.exe       del $(U)uudecode.exe
 	if exist $(U)dlb.exe            del $(U)dlb.exe
 !IF "$(ADD_CURSES)" == "Y"
-	if exist $(PDCLIB)              del $(PDCLIB)
+	if exist $(LIBDIR)\$(PDCDIST)-wincon-$(TARGET_CPU)-static.lib del $(LIBDIR)\$(PDCDIST)-wincon-$(TARGET_CPU)-static.lib
+	if exist $(LIBDIR)\$(PDCDIST)-wingui-$(TARGET_CPU)-static.lib del $(LIBDIR)\$(PDCDIST)-wingui-$(TARGET_CPU)-static.lib
 !ENDIF
         if exist $(LUALIB)              del $(LUALIB)
 	if exist $(DAT)\oracles		del $(DAT)\oracles
@@ -2356,11 +2337,15 @@ spotless: clean
 	if exist $(OBJUTIL)\*           rmdir $(OBJUTIL) /s /Q
 	if exist $(OBJLUA)\*            rmdir $(OBJLUA) /s /Q
 	if exist $(OBJPDC)\*            rmdir $(OBJPDC) /s /Q
+	if exist $(OBJPDCC)\*           rmdir $(OBJPDCC) /s /Q
+	if exist $(OBJPDCG)\*           rmdir $(OBJPDCG) /s /Q
 	if exist $(OBJTTY_B)\*          rmdir $(OBJTTY_B) /s /Q
 	if exist $(OBJGUI_B)\*          rmdir $(OBJGUI_B) /s /Q
 	if exist $(OBJUTIL_B)\*         rmdir $(OBJUTIL_B) /s /Q
 	if exist $(OBJLUA_B)\*          rmdir $(OBJLUA_B) /s /Q
 	if exist $(OBJPDC_B)\*          rmdir $(OBJPDC_B) /s /Q
+	if exist $(OBJPDCC_B)\*         rmdir $(OBJPDCC_B) /s /Q
+	if exist $(OBJPDCG_B)\*         rmdir $(OBJPDCG_B) /s /Q
 
 clean:
 	if exist install.tag            del install.tag
@@ -2384,11 +2369,15 @@ clean:
 	if exist $(OGUI)*.o             del $(OGUI)*.o
 	if exist $(OLUA)*.o             del $(OLUA)*.o
 	if exist $(OPDC)*.o             del $(OPDC)*.o
+	if exist $(OPDCC)*.o            del $(OPDCC)*.o
+	if exist $(OPDCG)*.o            del $(OPDCG)*.o
 	if exist $(OUTL)*.PDB           del $(OUTL)*.PDB
 	if exist $(OTTY)*.PDB           del $(OTTY)*.PDB
 	if exist $(OGUI)*.PDB           del $(OGUI)*.PDB
 	if exist $(OLUA)*.PDB           del $(OLUA)*.PDB
 	if exist $(OPDC)*.PDB           del $(OPDC)*.PDB
+	if exist $(OPDCC)*.PDB          del $(OPDCC)*.PDB
+	if exist $(OPDCG)*.PDB          del $(OPDCG)*.PDB
 	if exist $(OUTL)*.MAP           del $(OUTL)*.MAP
 	if exist $(OTTY)*.MAP           del $(OTTY)*.MAP
 	if exist $(OGUI)*.MAP           del $(OGUI)*.MAP
@@ -2399,11 +2388,15 @@ clean:
 	if exist $(OGUI)*.LIB           del $(OGUI)*.LIB
 	if exist $(OLUA)*.LIB           del $(OLUA)*.LIB
 	if exist $(OPDC)*.LIB           del $(OPDC)*.LIB
+	if exist $(OPDCC)*.LIB          del $(OPDCC)*.LIB
+	if exist $(OPDCG)*.LIB          del $(OPDCG)*.LIB
 	if exist $(OUTL)*.EXP           del $(OUTL)*.EXP
 	if exist $(OTTY)*.EXP           del $(OTTY)*.EXP
 	if exist $(OGUI)*.EXP           del $(OGUI)*.EXP
 	if exist $(OLUA)*.EXP           del $(OLUA)*.EXP
 	if exist $(OPDC)*.EXP           del $(OPDC)*.EXP
+	if exist $(OPDCC)*.EXP          del $(OPDCC)*.EXP
+	if exist $(OPDCG)*.EXP          del $(OPDCG)*.EXP
 	if exist $(SRC)\tiles.bmp       del $(SRC)\tiles.bmp
 	if exist $(OTTY)console.res     del $(OTTY)console.res
 	if exist $(OTTY)NetHack.res     del $(OTTY)NetHack.res

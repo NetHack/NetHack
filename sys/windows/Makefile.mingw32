@@ -60,9 +60,9 @@ DEBUGINFO = N
 #---------------------------------------------------------------
 # Do you have a connection to the internet available that you want
 # to utilize for obtaining prerequisite Lua source code and pdcurses source code
-#
+# Default to Y.
 
-INTERNET_AVAILABLE = N
+INTERNET_AVAILABLE = Y
 
 #
 #---------------------------------------------------------------

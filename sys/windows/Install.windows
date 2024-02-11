@@ -36,7 +36,7 @@ You can use one of the following build environments:
     There are a few packaged distributions of MinGW-w64. We've tried
     out these ones, but there are likely others that will work:
 
-        MSYS2 
+        MSYS2
         - https://www.msys2.org/
         - Download the installer, and start the appropriate bash shell.
 
@@ -177,8 +177,9 @@ Setting Up
         cd sys\windows
         .\nhsetup.bat
 
-3.  From the sys\windows subfolder, change your current directory to the
-    src subfolder of the nethack source tree:
+3.  Change your current directory to the src subfolder of the nethack
+    source tree. This assumes you are still in the sys\windows folder
+    from step #2:
         cd ..\..\src
 
 4.  Edit your Makefile if you wish, but it is not required unless
@@ -191,19 +192,19 @@ Compiling
     Change your current directory to the NetHack src directory.
 
     For the Visual Studio compiler, issue these commands:
-	    nmake INTERNET_AVAILABLE=Y install
+	    nmake install
 
-    For GCC:
+    For mingw GCC:
 	Issue these commands:
-            make -f Makefile.mingw32 INTERNET_AVAILABLE=Y clean
-            make -f Makefile.mingw32 INTERNET_AVAILABLE=Y depend
-            make -f Makefile.mingw32 INTERNET_AVAILABLE=Y
+            make -f Makefile.mingw32 clean
+            make -f Makefile.mingw32 depend
+            make -f Makefile.mingw32
 
         (some older versions of mingw may require mingw32-make in
          place of plain make in the commands above)
 
     If you get any errors along the way then something has not been set
-    up correctly or you mistyped the commands shown above.
+    up correctly or perhaps you mistyped the commands shown above.
 
     The time it takes to compile depends on your particular machine of course.
     On a slower machine, you might take the opportunity to grab a beverage.
@@ -247,7 +248,7 @@ Notes:
         which should run on any 64-bit Windows O/S.
 
     **Note**: saved games and bones files are NOT compatible between the
-    32-bit and the 64-bit versions at this time. 
+    32-bit and the 64-bit versions at this time.
 
 
 /--------------------------------------------------------------\
