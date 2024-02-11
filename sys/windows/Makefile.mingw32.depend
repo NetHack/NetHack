@@ -78,6 +78,9 @@ $(ONHW)/%.d: $(MSWIN)/%.c $(NHLUAH) | $(ONHW)
 $(ONHW)/%.d: $(WSHR)/%.c $(NHLUAH) | $(ONHW)
 	$(cce) $(CFLAGSW) $< -o$@
 
+$(ONHW)/%.d: $(WCURSES)/%.c $(NHLUAH) | $(ONHW)
+	$(cce) $(CFLAGSNH) $(PDCINCL) $< -o$@
+
 $(ONH)/%.d: $(SRC)/%.c $(NHLUAH) | $(ONH)
 	$(cce) $(CFLAGSNH) $< -o$@
 

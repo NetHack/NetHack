@@ -59,8 +59,8 @@ DEBUGINFO = N
 #
 #---------------------------------------------------------------
 # Do you have a connection to the internet available that you want
-# to utilize for obtaining prerequisite Lua source code and pdcurses source code
-# Default to Y.
+# to utilize for obtaining prerequisite Lua source code and pdcursesmod
+# source code. Defaults to Y.
 
 INTERNET_AVAILABLE = Y
 
@@ -111,13 +111,7 @@ INTERNET_AVAILABLE=Y
 GIT_AVAILABLE=Y
 endif
 
-# if WANT_GUICURSES=1 is passed, use the Bill Gray pdcursesmod and enable
-# curses in NetHackW
-ifeq "$(WANT_GUICURSES)" "1"
 PDCURSES=pdcursesmod
-else
-PDCURSES=pdcurses
-endif
 PDCURSESFLAGS = -DPDC_WIDE
 
 #
@@ -183,7 +177,7 @@ PDCURSES_TOP=../lib/$(PDCURSES)
 ADD_CURSES=Y
 endif  # GIT_AVAILABLE
 else   # INTERNET_AVAILABLE is not Y below
-# Your Makefile settings to not allow pdcurses to be obtained by
+# Your Makefile settings to not allow $(PDCURSES) to be obtained by
 # git or by download). Check to see if it is available at one of
 # the expected locations already, with precedence given to ../submodules,
 # then ../lib.
@@ -194,11 +188,11 @@ ADD_CURSES=Y
 else ifneq ("$(wildcard ../lib/$(PDCURSES)/curses.h)", "")
 PDCURSES_TOP=../lib/$(PDCURSES)
 ADD_CURSES=Y
-endif  # pdcurses sources available somewhere
+endif  # $(PDCURSES) sources available somewhere
 
 ifeq "$(ADD_CURSES)" "Y"
-$(info Your Makefile settings do not allow pdcurses to be obtained by)
-$(info git or by download, but a copy of pdcurses was found in $(PDCURSES_TOP),)
+$(info Your Makefile settings do not allow $(PDCURSES) to be obtained by)
+$(info git or by download, but a copy of $(PDCURSES) was found in $(PDCURSES_TOP),)
 $(info so that will be used.)
 endif  # ADD_CURSES == Y
 endif  # INTERNET_AVAILABLE
@@ -507,22 +501,23 @@ CLEAN_FILE += $(RTARGETS) $(ROBJS)
 # PDCurses
 #==========================================
 ifeq "$(ADD_CURSES)" "Y"
-OP = $(O)pdcurses
-PDCCOMMONOBJS = $(addprefix $(OP)/, \
-        addch.o addchstr.o addstr.o attr.o beep.o bkgd.o border.o clear.o \
-        color.o debug.o delch.o deleteln.o getch.o getstr.o getyx.o inch.o \
-        inchstr.o initscr.o inopts.o insch.o insstr.o kernel.o keyname.o \
-        mouse.o move.o outopts.o overlay.o pad.o panel.o printw.o refresh.o \
-        scanw.o scr_dump.o scroll.o slk.o termattr.o touch.o util.o window.o)
-PDCOBJS = $(PDCCOMMONOBJS) $(addprefix $(OP)/, \
+PDCCOMMONSRC = addch addchstr addstr attr beep bkgd border clear \
+	color debug delch deleteln getch getstr getyx inch \
+	inchstr initscr inopts insch insstr kernel keyname \
+	mouse move outopts overlay pad panel printw refresh \
+	scanw scr_dump scroll slk termattr touch util window
+PDCCOMMONOBJS = $(addsuffix .o, $(PDCCOMMONSRC))
+
+OP = $(O)$(PDCURSES)
+PDCOBJS = $(addprefix $(OP)/, $(PDCCOMMONOBJS) \
 	  pdcclip.o pdcdisp.o pdcgetsc.o pdckbd.o pdcscrn.o pdcsetsc.o pdcutil.o)
 PDCSRC = $(PDCURSES_TOP)/pdcurses
 PDCWINCON = $(PDCURSES_TOP)/wincon
 PDCINCL = -I$(PDCURSES_TOP) -I$(PDCSRC)
-PDCLIB = $(O)pdcurses.a
+PDCLIB = $(O)$(PDCURSES).a
 PDCDEP = $(PDCURSES_TOP)/curses.h
 
-pdcurses: $(PDCLIB)
+$(PDCURSES): $(PDCLIB)
 
 $(PDCLIB): $(PDCOBJS)
 	ar rcs $@ $^
@@ -540,17 +535,20 @@ CLEAN_DIR += $(OP)
 CLEAN_FILE += $(PDCLIB) $(PDCOBJS)
 
 ifneq ("$(wildcard $(PDCURSES_TOP)/wingui/pdcwin.h)", "")
-# pdcursesmod in use; enable Curses graphics on NetHackW
-OPW = $(O)pdcursesw
-PDCWOBJS = $(PDCCOMMONOBJS) $(addprefix $(OPW)/, \
+# $(PDCURSES) in use; enable Curses graphics on NetHackW
+OPW = $(O)$(PDCURSES)w
+PDCWOBJS = $(addprefix $(OPW)/, $(PDCCOMMONOBJS) \
 	  pdcclip.o pdcdisp.o pdcgetsc.o pdckbd.o pdcscrn.o pdcsetsc.o pdcutil.o)
 PDCWINGUI = $(PDCURSES_TOP)/wingui
-PDCWLIB = $(O)pdcursesw.a
+PDCWLIB = $(O)$(PDCURSES)w.a
 
-pdcursesw: $(PDCWLIB)
+$(PDCURSES)w: $(PDCWLIB)
 
 $(PDCWLIB): $(PDCWOBJS)
 	ar rcs $@ $^
+
+$(OPW)/%.o: $(PDCSRC)/%.c | $(OPW)
+	$(cc) $(CFLAGS) $(PDCURSESFLAGS) $(PDCINCL) -D_LIB $< -o$@
 
 $(OPW)/%.o: $(PDCWINGUI)/%.c | $(OPW)
 	$(cc) $(CFLAGS) $(PDCURSESFLAGS) $(PDCINCL) -I$(PDCWINGUI) -D_LIB $< -o$@
@@ -796,7 +794,7 @@ CURLLUASRC=http://www.lua.org/ftp/lua-5.4.6.tar.gz
 CURLLUADST=lua-5.4.6.tar.gz
 
 CURLPDCSRC=https://github.com/Bill-Gray/PDCursesMod/archive/refs/tags/v4.4.0.zip
-CURLPDCDST=pdcurses.zip
+CURLPDCDST=$(PDCURSES).zip
 
 fetchlua:
 	@if [ ! -f $(LUASRC)/lua.h ] ; then \
@@ -811,8 +809,8 @@ fetchpdcurses:
 	@if [ ! -f $(PDCURSES_TOP)/curses.h ] ; then \
 	cd ../lib ; \
 	curl -L $(CURLPDCSRC) -o $(CURLPDCDST) ; \
-	mkdir -p pdcurses ; \
-	/c/Windows/System32/tar -C pdcurses --strip-components=1 -xvf $(CURLPDCDST) ; \
+	mkdir -p $(PDCURSES) ; \
+	/c/Windows/System32/tar -C $(PDCURSES) --strip-components=1 -xvf $(CURLPDCDST) ; \
 	cd ../src ; \
 	fi
 endif  # GIT_AVAILABLE
@@ -1137,7 +1135,7 @@ CLEAN_FILE += $(NHTARGET) $(NHOBJS) $(NHRES)
 #=============== TARGETS ==================
 #==========================================
 
-.PHONY: all clean default install lua makedefs recover pdcurses pdcursesw \
+.PHONY: all clean default install lua makedefs recover $(PDCURSES) $(PDCURSES)w \
 	tile2bmp tilemap uudecode dlb nethackw nethack tileutil \
 	fetchlua fetchpdcurses
 
