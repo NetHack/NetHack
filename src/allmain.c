@@ -1140,6 +1140,7 @@ struct enum_dump objclass_defchars_dump[] = {
 #define DUMP_ENUMS_OBJCLASS_CLASSES
 struct enum_dump objclass_classes_dump[] = {
 #include "defsym.h"
+    { MAXOCLASSES, "MAXOCLASSES" },
 };
 #undef DUMP_ENUMS_OBJCLASS_CLASSES
 
