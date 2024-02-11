@@ -256,8 +256,7 @@ wearslot(struct obj *obj)
 void
 check_wornmask_slots(void)
 {
-    /* we'll skip ball and chain here--they warrant separate sanity check;
-       at present, we also skip 'uskin' because it isn't included in worn[] */
+    /* we'll skip ball and chain here--they warrant separate sanity check */
 #define IGNORE_SLOTS (W_ART | W_ARTI | W_SADDLE | W_BALL| W_CHAIN)
     char whybuf[BUFSZ];
     const struct worn *wp;
@@ -265,9 +264,6 @@ check_wornmask_slots(void)
     long m;
 
     for (wp = worn; wp->w_mask; wp++) {
-        o = *wp->w_obj;
-        if (!o)
-            continue;
         m = wp->w_mask;
         if ((m & IGNORE_SLOTS) != 0L && (m & ~IGNORE_SLOTS) == 0L)
             continue;
@@ -296,13 +292,48 @@ check_wornmask_slots(void)
            'o' is Null or not; [sanity_check_worn(mkobj.c) for object by
            object checking will most likely have already caught this] */
         for (otmp = gi.invent; otmp; otmp = otmp->nobj) {
-            if (otmp != o && (otmp->owornmask & wp->w_mask) != 0L) {
-                Sprintf(whybuf, "%s has owornmask 0x%08lx [0x%08lx bit set]",
-                        wp->w_what, otmp->owornmask, m);
+            if (otmp != o && (otmp->owornmask & m) != 0L
+                /* embedded scales owornmask is W_ARM|I_SPECIAL so whould
+                   give a false complaint about item other than uarm having
+                   W_ARM bit set if we didn't screen it out here */
+                && (m != W_ARM || otmp != uskin
+                    || (otmp->owornmask & I_SPECIAL) == 0L)) {
+                Sprintf(whybuf, "%s [0x%08lx] has %s mask 0x%08lx bit set",
+                        simpleonames(otmp), otmp->owornmask, wp->w_what, m);
                 impossible("Worn-slot insanity: %s.", whybuf);
             }
         }
-    }
+    } /* for wp in worn[] */
+
+#ifdef EXTRA_SANITY_CHECKS
+    if (uskin) {
+        const char *what = "embedded scales";
+
+        o = uskin;
+        m = W_ARM | I_SPECIAL;
+        whybuf[0] = '\0';
+        for (otmp = gi.invent; otmp; otmp = otmp->nobj)
+            if (otmp == o)
+                break;
+        if (!otmp)
+            Sprintf(whybuf, "%s (%s) not found in invent",
+                    what, fmt_ptr(o));
+        else if ((o->owornmask & m) != m)
+            Sprintf(whybuf, "%s bits not set in owornmask [0x%08lx]",
+                    what, o->owornmask);
+        else if ((o->owornmask & ~(m | IGNORE_SLOTS)) != 0L)
+            Sprintf(whybuf, "%s wrong bit set in owornmask [0x%08lx]",
+                    what, o->owornmask);
+        else if (!Is_dragon_scales(o))
+            Sprintf(whybuf, "%s (%s) %s not dragon scales",
+                    what, simpleonames(o), otense(o, "are"));
+        else if (Dragon_scales_to_pm(o) != &mons[u.umonnum])
+            Sprintf(whybuf, "%s, hero is not %s",
+                    what, an(mons[u.umonnum].pmnames[NEUTRAL]));
+        if (whybuf[0])
+            impossible("Worn-slot insanity: %s.", whybuf);
+    } /* uskin */
+#endif /* EXTRA_SANITY_CHECKS */
 
 #ifdef EXTRA_SANITY_CHECKS
     /* dual wielding: not a slot but lots of things to verify */
