@@ -30,7 +30,7 @@ const struct worn {
              { W_TOOL, &ublindf, "facewear" }, /* blindfold|towel|lenses */
              { W_BALL, &uball, "chained ball" },
              { W_CHAIN, &uchain, "attached chain" },
-             { 0, 0 }
+             { 0, 0, (char *) 0 }
 };
 
 /* This only allows for one blocking item per property */
