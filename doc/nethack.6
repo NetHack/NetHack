@@ -123,8 +123,10 @@ Also
 [
 .BR \-\-showpaths
 ]
+.\" force line wrap now rather than have that happen after the opening brace
+.br
 [
-.BR \-\-version [ :copy ]
+.BR \-\-version [ :copy | :dump | :show ]
 ]
 .ad
 .hy 14
@@ -367,17 +369,27 @@ that many top scores.
 Combining names with role or race or both will report entries which match
 any of those rather than just the ones which match all.
 .PP
-.B \-\-version
-can be used to cause NetHack to show the version information it
-was compiled with, then exit.
-That will include the
-.I git
-commit hash if the information was available when the game was compiled.
-On some platforms, such as Windows and macOS, a variation
-.B \-\-version:copy
+.\" avoid hyphenating "version" in this paragraph (and beyond; don't care)
+.hw version
+.BR \-\-version " or " \-\-version:show
+can be used to cause NetHack to show the version number, the date and
+time that the program was built from its source code, and possibly
+some auxiliary information about that source code, then exit.
+The optional auxiliary information is \fIgit\fP
+commit hash (reflecting the source code's most recent modification when
+extracted from the \fIgit\fP version control system, if that is in use)
+if available when the program was built.
+On some platforms such as Windows and macOS, a variation,
+.BR \-\-version:copy ,
 can be used to cause NetHack to show the version information, then exit,
-while also leaving a copy of the version information in the paste buffer
+while also leaving a copy of that information in the paste buffer
 or clipboard for potential insertion into things like bug reports.
+On any platform,
+.B \-\-version:dump
+can be used to show most of the data used when checking whether a save
+file or bones file is compatible with the program.
+The program will display a line containing five numbers expressed in
+hexadecimal, then exit.
 .PP
 .B \-\-showpaths
 can be used to cause NetHack to show where it is expecting

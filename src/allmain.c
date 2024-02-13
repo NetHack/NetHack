@@ -936,7 +936,7 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
             break;
     }
     if (idx >= SIZE(earlyopts) || argc < 1)
-        return FALSE;
+        return 0;
 
     for (i = 0; i < argc; ++i) {
         if (argv[i][0] != '-')
@@ -975,13 +975,21 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
                        than  next major version */
                 if (match_optname(extended_opt, "paste", 5, FALSE)) {
                     insert_into_pastebuf = TRUE;
-                } else if(match_optname(extended_opt, "copy", 4, FALSE)) {
+                } else if (match_optname(extended_opt, "copy", 4, FALSE)) {
                     insert_into_pastebuf = TRUE;
-                } else {
-                    raw_printf(
-                   "-%sversion can only be extended with -%sversion:copy.\n",
+                } else if (match_optname(extended_opt, "dump", 4, FALSE)) {
+                    /* version number plus enabled features and sanity
+                       values that the program compares against the same
+                       thing recorded in save and bones files to check
+                       whether they're being used compatibly */
+                    dump_version_info();
+                    return 2; /* done */
+                } else if (!match_optname(extended_opt, "show", 4, FALSE)) {
+                    raw_printf("-%sversion can only be extended with"
+                               " -%sversion:copy or :dump or :show.\n",
                                dashdash, dashdash);
-                    return TRUE;
+                    /* exit after we've reported bad command line argument */
+                    return 2;
                 }
             }
             early_version_info(insert_into_pastebuf);
@@ -1016,7 +1024,7 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
             break;
         }
     };
-    return FALSE;
+    return 0;
 }
 
 /*

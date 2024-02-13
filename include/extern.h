@@ -3387,6 +3387,7 @@ extern unsigned long get_feature_notice_ver(char *) NO_NNARGS;
 extern unsigned long get_current_feature_ver(void);
 extern const char *copyright_banner_line(int) NONNULL;
 extern void early_version_info(boolean);
+extern void dump_version_info(void);
 
 /* ### video.c ### */
 
@@ -3791,3 +3792,5 @@ extern void port_insert_pastebuf(char *);
 #endif /* !MAKEDEFS_C && !MDLIB_C */
 
 #endif /* EXTERN_H */
+
+/*extern.h*/

@@ -485,4 +485,26 @@ copyright_banner_line(int indx)
     return "";
 }
 
+/* called by argcheck(allmain.c) from early_options(sys/xxx/xxxmain.c) */
+void
+dump_version_info(void)
+{
+    char buf[BUFSZ];
+    const char *hname = gh.hname ? gh.hname : "nethack";
+
+    if (strlen(hname) > 33)
+        hname = eos(nhStr(hname)) - 33; /* discard const for eos() */
+    runtime_info_init();
+    Snprintf(buf, sizeof buf, "%-12.33s %08lx %08lx %08lx %08lx %08lx",
+             hname,
+             nomakedefs.version_number,
+             (nomakedefs.version_features & ~nomakedefs.ignored_features),
+             nomakedefs.version_sanity1,
+             nomakedefs.version_sanity2,
+             nomakedefs.version_sanity3);
+    raw_print(buf);
+    release_runtime_info();
+    return;
+}
+
 /*version.c*/

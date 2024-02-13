@@ -61,8 +61,10 @@ nethack --windowtype:Iii
   designation itself may be any case; variations '--windowtype Iii' and
   '-w Iii' work too.
 
-  On Windows, nethack.exe might support both tty and curses; nethackW.exe
-  supports mswin only.  MS-DOS is tty only.
+  On Windows, nethack.exe supports tty or curses or both depending on
+  settings at the time the program is built from source; nethackW.exe
+  supports mswin (also referred to as Win GUI) and optionally curses.
+  For MS-DOS, the program supports tty or curses or both.
 
 nethack -n
   don't show the 'news' file if one is present in nethack's directory.
@@ -110,13 +112,15 @@ nethack -dDir -s
 nethack --directory:Dir -s
   as above; alternate directory, if specified, should come first.
 
-nethack --version
-nethack --version:copy
-  '--version' display the program's version number and exit;
+nethack --version or --version:copy or --version:dump or --version:show
+  '--version' display the program's version number plus the date and
+  time it was built from source code, then exit;
   '--version:copy' display version number and also copy it into system
   pasteboard (should work on macOS and Windows; might not work on other
   systems) so that it could be pasted from there into a subsequent email
-  or web contact form, then exit.
+  or web contact form, then exit;
+  '--version:dump' display several internal values, then exit;
+  '--version:show' same as '--version'.
 
 nethack --showpaths
   list expected locations for various files and directories, then exit;
