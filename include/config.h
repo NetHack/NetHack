@@ -240,7 +240,7 @@
 #define GREPPATH "/bin/grep"
 #endif
 
-#ifdef NOCRASHREPORT
+#ifndef NOCRASHREPORT
 # ifndef CRASHREPORT
 #  ifdef MACOS
 #   define CRASHREPORT "/usr/bin/open"
@@ -254,6 +254,10 @@
 #  ifdef WIN32
 #   define CRASHREPORT /* builtin helper */
 #  endif
+# endif
+#else
+# ifdef CRASHREPORT
+#  undef CRASHREPORT
 # endif
 #endif
 
