@@ -52,10 +52,10 @@ SOUND_LIBRARIES = windsound
 #
 #---------------------------------------------------------------
 # Do you want debug information in the executable?
-# Required for CRASHREPORT.
+# Required for CRASHREPORT (but doesn't work yet, so off).
 #
 
-DEBUGINFO = Y
+DEBUGINFO = N
 
 #
 #---------------------------------------------------------------
