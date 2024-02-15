@@ -240,22 +240,21 @@
 #define GREPPATH "/bin/grep"
 #endif
 
-#ifndef CRASHREPORT
-# ifdef MACOS
-#  define CRASHREPORT "/usr/bin/open"
-# endif
-# ifdef __linux__
-#  define CRASHREPORT "/usr/bin/xdg-open"
+#ifdef NOCRASHREPORT
+# ifndef CRASHREPORT
+#  ifdef MACOS
+#   define CRASHREPORT "/usr/bin/open"
+#  endif
+#  ifdef __linux__
+#   define CRASHREPORT "/usr/bin/xdg-open"
        /* Define this if the terminal is filled with useless error messages
         * when the browser launches. */
-#  define CRASHREPORT_EXEC_NOSTDERR
+#   define CRASHREPORT_EXEC_NOSTDERR
+#  endif
+#  ifdef WIN32
+#   define CRASHREPORT /* builtin helper */
+#  endif
 # endif
-# ifdef WIN32
-#  define CRASHREPORT /* builtin helper */
-# endif
-#endif
-#ifdef MSDOS
-# undef CRASHREPORT
 #endif
 
 #ifdef CRASHREPORT
