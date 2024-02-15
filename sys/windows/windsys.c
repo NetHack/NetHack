@@ -909,6 +909,9 @@ error:
 // XXX this doesn't work yet - we get correct addresses but no symbol info
 // XXX so still needs cleanup
 // XXX no mark (overflow held to last valid segment) handling yet
+// XXX libbacktrace isn't available by default, so don't try until it works
+//#define USE_BACKTRACE
+#ifdef USE_BACKTRACE
 #include <backtrace.h>
 
 struct userstate {
@@ -944,9 +947,11 @@ printf("E2: M=%s e=%d\n",msg,errnum);
     //XXX save error message with strerror
     }
 }
+#endif
 
 int
 win32_cr_gettrace(int maxframes, char *out, int outsize){
+#ifdef USE_BACKTRACE
     userstate.error_count = 0;
     userstate.good_count = 0;
     userstate.out = out;
@@ -962,6 +967,9 @@ printf("rv=%d\n",rv);
     // XXX rv not checked
     // XXX this API leaks its memory; there is no free function
     return userstate.error_count + userstate.good_count;
+#else
+    return 0;
+#endif
 }
 #else
 // Use win32 API with Visual Studio (and probably MSVC).

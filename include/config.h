@@ -254,6 +254,9 @@
 #  define CRASHREPORT /* builtin helper */
 # endif
 #endif
+#ifdef MSDOS
+# undef CRASHREPORT
+#endif
 
 #ifdef CRASHREPORT
 # ifndef DUMPLOG
