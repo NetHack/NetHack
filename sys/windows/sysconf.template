@@ -121,3 +121,6 @@ HIDEUSAGE=1
 #
 # The location that file synchronization locks are stored (writeable)
 #LOCKDIR=c:\ProgramData\NetHack\3.7
+
+# URL loaded for creating reports to the NetHack DevTeam
+#CRASHREPORTURL=https://nethack.org/links/cr-37BETA.html

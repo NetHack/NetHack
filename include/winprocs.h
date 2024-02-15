@@ -14,8 +14,9 @@ enum wp_ids { wp_tty = 1, wp_X11, wp_Qt, wp_mswin, wp_curses,
               wp_chainin, wp_chainout, wp_safestartup, wp_shim,
               wp_hup, wp_guistubs, wp_ttystubs,
 #ifdef OUTDATED_STUFF
-              , wp_mac, wp_Gem, wp_Gnome, wp_amii, wp_amiv
+              wp_mac, wp_Gem, wp_Gnome, wp_amii, wp_amiv,
 #endif
+	      wp_trace	// XXX do we need this?  should chainin/out get an id? TBD
 };
 
 /* NB: this MUST match chain_procs below */
@@ -107,6 +108,7 @@ extern
 /*
  * If you wish to only support one window system and not use procedure
  * pointers, add the appropriate #ifdef below.
+ * XXX which is what?
  */
 
 #define init_nhwindows (*windowprocs.win_init_nhwindows)
@@ -370,7 +372,6 @@ struct chain_procs {
     void (*win_end_menu)(CARGS, winid, const char *);
     int (*win_select_menu)(CARGS, winid, int, MENU_ITEM_P **);
     char (*win_message_menu)(CARGS, char, int, const char *);
-    void (*win_update_inventory)(CARGS, int);
     void (*win_mark_synch)(CARGS);
     void (*win_wait_synch)(CARGS);
 #ifdef CLIPPING
@@ -418,6 +419,8 @@ struct chain_procs {
     void (*win_status_update)(CARGS, int, genericptr_t, int, int, int,
                               unsigned long *);
     boolean (*win_can_suspend)(CARGS);
+    void (*win_update_inventory)(CARGS, int);
+    win_request_info *(*win_ctrl_nhwindow)(CARGS, winid, int, win_request_info *);
 };
 #endif /* WINCHAIN */
 

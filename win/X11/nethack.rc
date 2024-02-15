@@ -84,3 +84,8 @@ OPTIONS=catname:Ghisteslwchlohm
 #	   048 035 064 042			   \
 #	   047 045 092 124 124 092 045 047         \
 #	   047 064 092 064 064 064 092 064 047
+
+# CRASHREPORTURL must be set in syscf to enable these options.
+# These identify you in crash reports
+#OPTIONS=crash_name:Your Name
+#OPTIONS=crash_email:user@example.com

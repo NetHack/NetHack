@@ -233,3 +233,7 @@ OPTIONS=hilite_status:gold/up/yellow/down/brown
 # St, Dx, Co, In, Wi, Ch
 OPTIONS=hilite_status:characteristics/up/green/down/red
 
+# CRASHREPORTURL must be set in syscf to enable these options.
+# These identify you in crash reports
+#OPTIONS=crash_name:Your Name
+#OPTIONS=crash_email:user@example.com

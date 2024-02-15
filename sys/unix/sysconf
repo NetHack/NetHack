@@ -159,6 +159,9 @@ GREPPATH=/bin/grep
 PANICTRACE_GDB=1
 PANICTRACE_LIBC=2
 
+# URL loaded for creating reports to the NetHack DevTeam
+#CRASHREPORTURL=https://nethack.org/links/cr-37BETA.html
+
 # 'portable_device_paths' is only supported for Windows.  Starting with
 # 3.6.3, nethack on Windows treats the folder containing nethack.exe and
 # nethackW.exe as read-only and puts data files which are generated or

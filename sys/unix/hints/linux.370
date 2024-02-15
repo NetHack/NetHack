@@ -329,10 +329,12 @@ endif #?WANT_SOURCE_INSTALL
 INSTDIR=$(HACKDIR)
 VARDIR = $(HACKDIR)
 
-POSTINSTALL+= ( util/makedefs --grep-defined CRASHREPORT && \
-	  ( cp win/share/nhcrashreport.lua $(INSTDIR) ; \
-	  chmod 555 $(INSTDIR)/nhcrashreport.lua ; \
-	  cp $(LUATOP)/lua $(INSTDIR)/nhlua); true );
+#======= XXX can this go away?
+#POSTINSTALL+= cp -n sys/unix/sysconf $(INSTDIR)/sysconf; \
+#	$(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; \
+#	$(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; \
+#	chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+#>>>>>>> keni-wincw2
 
 ifneq "$(CCISCLANG)" ""
 # gdb may not be installed if clang is chosen compiler so the game

@@ -52,9 +52,10 @@ SOUND_LIBRARIES = windsound
 #
 #---------------------------------------------------------------
 # Do you want debug information in the executable?
+# Required for CRASHREPORT.
 #
 
-DEBUGINFO = N
+DEBUGINFO = Y
 
 #
 #---------------------------------------------------------------
@@ -237,6 +238,7 @@ NHV=$(subst ",,$(NHV1))
 # TTY     - window port files (tty)
 # MSWIN   - window port files (win32)
 # WCURSES - window port files (curses)
+# WCHAIN  - window port files (chain)
 # WSHR    - Tile support files
 # SNDSYS  - sound suppport files for win32
 # QT      - QT window support files
@@ -251,6 +253,7 @@ SNDSYS  =../sound/windsound
 MSWSYS  =../sys/windows
 TTY     =../win/tty
 MSWIN   =../win/win32
+WCHAIN  =../win/chain
 WCURSES =../win/curses
 WSHR    =../win/share
 QT      =../win/Qt
@@ -351,7 +354,7 @@ $(OBJ):
 
 CLEAN_DIR = $(GAMEDIR) $(OBJ)
 
-#===============-=================================================
+#=================================================================
 # LUA library
 # Source from http://www.lua.org/ftp/lua-5.4.6.tar.gz
 #=================================================================
@@ -985,6 +988,15 @@ CFLAGSW += $(NHCURSESFLAGS)
 NHWONLY += $(addsuffix .o, cursdial cursinit cursinvt cursmain cursmesg cursmisc cursstat curswins guitty)
 endif
 
+# uncomment for WINCHAIN
+#COREOBJS += $(addsuffix .o, wc_chainin wc_chainout wc_trace)
+
+# XXX mess for testing libbacktrace
+ifeq "$(DEBUGINFO)" "Y"
+CFLAGS += -I/mingw64/include -g -static -gdwarf
+LIBS += -L/mingw64/lib -lbacktrace
+endif
+
 nethackw: $(NHWTARGETS)
 
 $(GAMEDIR)/NetHackW.exe: $(NHWOBJS) $(NHWRES) $(DATEW_O) $(LUALIB) $(PDCWLIB) | $(GAMEDIR)
@@ -1024,6 +1036,9 @@ $(ONHW)/%.o: $(MSWSYS)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
 
 $(ONHW)/%.o: $(MSWIN)/%.c $(NHLUAH) | $(ONHW)
+	$(cc) $(CFLAGSW) $< -o$@
+
+$(ONHW)/%.o: $(WCHAIN)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
 
 $(ONHW)/%.o: $(WSHR)/%.c $(NHLUAH) | $(ONHW)
@@ -1066,6 +1081,7 @@ NHCURSESFLAGS = -DCURSES_GRAPHICS -DCURSES_UNICODE $(PDCURSESFLAGS) -DPDC_NCMOUS
 CFLAGSNH += $(NHCURSESFLAGS)
 NHONLY += $(addsuffix .o, cursdial cursinit cursinvt cursmain cursmesg cursmisc cursstat curswins)
 endif
+
 DATE_O  = $(addsuffix .o, $(addprefix $(ONH)/, date))
 
 NHOBJS = $(addprefix $(ONH)/, $(COREOBJS) $(NHONLY))
@@ -1111,6 +1127,9 @@ $(ONH)/%.o: $(MSWSYS)/%.c $(NHLUAH) | $(ONH)
 	$(cc) $(CFLAGSNH) $< -o$@
 
 $(ONH)/%.o: $(MSWIN)/%.c $(NHLUAH) | $(ONH)
+	$(cc) $(CFLAGSNH) $< -o$@
+
+$(ONH)/%.o: $(WCHAIN)/%.c $(NHLUAH) | $(ONH)
 	$(cc) $(CFLAGSNH) $< -o$@
 
 $(ONH)/%.o: $(WSHR)/%.c $(NHLUAH) | $(ONH)

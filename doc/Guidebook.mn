@@ -1228,6 +1228,10 @@ Toggle the
 .op autopickup
 option on/off.
 Default key is \(oq@\(cq.
+.lp "#bugreport"
+Bring up a browser window to submit a report to the NetHack Development Team.
+Can be disabled at the time the program is built; when enabled,
+CRASHREPORTURL must be set in the system configuration file.
 .lp "#call    "
 Call (name) a monster, or an object in inventory, on the floor,
 or in the discoveries list, or add an annotation for the
@@ -4995,6 +4999,22 @@ window, windowframe, windowtext).
 If NetHack can, it should wrap long lines of text if they don't fit in
 the visible area of the window.
 .hn 2
+Crash Report Options
+.pg
+Please note that NetHack does not send \fBany\fP information off your
+computer unless you manually click submit on a form.
+.si
+.lp "OPTION=crash_email:\fIemail_address\fP
+.lp "OPTION=crash_name:\fIyour_name\fP
+.ei
+These options are used only to save you some typing on the crash
+report and #bugreport forms.
+.si
+.lp "OPTION=crash_urlmax:\fIbytes\fP
+.ei
+This option is used to limit the length of the URLs generated and is only
+needed if your browser cannot handle arbitrarily long URLs.
+.hn 2
 Platform-specific Customization options
 .pg
 Here are explanations of options that are used by specific platforms or ports
@@ -6100,10 +6120,11 @@ large unless it is actively maintained.
 .
 .lp
 CRASHREPORTURL\ =\ If set to
-\f(CRhttps://www.nethack.org/common/contact.html\fP
-and support is compiled in, brings up a browser window populated with
+\f(CRhttps://www.nethack.org/links/cr-37BETA.html\fP
+and support is compiled in, brings up a browser window pre-populated with
 the information needed to report a problem if the game panics or ends
-up in an internally inconsistent state.
+up in an internally inconsistent state, or if the #bugreport command is
+invoked.
 .hn 1
 Scoring
 .pg

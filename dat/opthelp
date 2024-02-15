@@ -163,6 +163,9 @@ autounlock    when attempting to open a locked door or loot     [Apply-Key]
               omitted or skipped and Apply-Key is omitted or you aren't
               carrying an unlocking tool or you decline to use one
 boulder       override the default boulder symbol                       [`]
+crash_email   email address to use when filling in crash reports         []
+crash_name    name to use when filling in crash reports                  []
+crash_urlmax  length of longest url we can generate for a crash report   []
 disclose      the types of information you want         [ni na nv ng nc no]
               offered at the end of the game
               (space separated list of two-character values;

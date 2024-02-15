@@ -678,6 +678,12 @@ static const char *const build_opts[] = {
 #ifdef SYSCF
     "system configuration at run-time",
 #endif
+#ifdef PANICTRACE
+    "show stack trace on error",
+#endif
+#ifdef CRASHREPORT
+    "launch browser to report issues",
+#endif
     save_bones_compat_buf,
     "and basic NetHack features"
 };

@@ -702,12 +702,13 @@ chainout_can_suspend(void *vp)
 
 win_request_info *
 chainout_ctrl_nhwindow(
+    void *vp,
     winid window,
     int request,
     win_request_info *wri)
 {
     struct chainout_data *tdp = vp;
-    boolean rv;
+    win_request_info *rv;
 
     rv = (*tdp->nprocs->win_ctrl_nhwindow)(window,
                                            request, wri);
@@ -733,7 +734,8 @@ struct chain_procs chainout_procs = {
     chainout_destroy_nhwindow, chainout_curs, chainout_putstr,
     chainout_putmixed, chainout_display_file, chainout_start_menu,
     chainout_add_menu, chainout_end_menu, chainout_select_menu,
-    chainout_message_menu, chainout_update_inventory, chainout_mark_synch,
+    chainout_message_menu,
+    chainout_mark_synch,
     chainout_wait_synch,
 #ifdef CLIPPING
     chainout_cliparound,

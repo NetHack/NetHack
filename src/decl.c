@@ -278,6 +278,10 @@ const struct instance_globals_c g_init_c = {
     DUMMY, /* context */
     /* dog.c */
     DUMMY, /* catname */
+    /* end.c */
+    NULL, /* crash_email */
+    NULL, /* crash_name */
+    -1, /* crash_urlmax */
     /* symbols.c */
     0,     /* currentgraphics */
     /* files.c */

@@ -248,6 +248,11 @@ struct instance_globals_c {
     /* dog.c */
     char catname[PL_PSIZ];
 
+    /* end.c */
+    char *crash_email;  // email for crash reports
+    char *crash_name;   // human name for crash reports
+    int crash_urlmax;   // maximum length for the url of a crash report
+
     /* symbols.c */
     int currentgraphics;
 
