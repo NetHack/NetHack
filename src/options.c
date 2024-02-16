@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1701499956 2023/12/02 06:52:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.685 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1708124177 2024/02/16 22:56:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.707 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -7042,6 +7042,12 @@ initoptions_finish(void)
     else if (iflags.wc_ascii_map && !wc_supported("ascii_map")
              && wc_supported("tiled_map"))
         iflags.wc_ascii_map = FALSE, iflags.wc_tiled_map = TRUE;
+
+    if (iflags.wc_tiled_map && !opt_set_in_config[opt_color])
+        iflags.wc_color = TRUE;
+    if (iflags.wc_ascii_map && !iflags.wc_color
+        && !opt_set_in_config[opt_bgcolors])
+        iflags.bgcolors = FALSE;
 
 #ifdef ENHANCED_SYMBOLS
     if (glyphid_cache_status())

@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_name.c	$NHDT-Date: 1693292527 2023/08/29 07:02:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.289 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1708124164 2024/02/16 22:56:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.306 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,6 +6,7 @@
 #include "hack.h"
 
 static char *nextmbuf(void);
+static void getpos_toggle_hilite_state(void);
 static void getpos_getvalids_selection(struct selectionvar *,
                                        boolean (*)(coordxy, coordxy));
 static void selection_force_newsyms(struct selectionvar *);
@@ -20,7 +21,7 @@ static void gloc_filter_done(void);
 static boolean gather_locs_interesting(coordxy, coordxy, int);
 static void gather_locs(coord **, int *, int);
 static void truncate_to_map(coordxy *, coordxy *, schar, schar);
-static void getpos_refresh(int *) NONNULLARG1;
+static void getpos_refresh(void);
 static char *name_from_player(char *, const char *, const char *);
 static void do_mgivenname(void);
 static boolean alreadynamed(struct monst *, char *, char *) NONNULLPTRS;
@@ -47,26 +48,69 @@ nextmbuf(void)
  * parameter value 0 = initialize, 1 = highlight, 2 = done
  */
 static void (*getpos_hilitefunc)(int) = (void (*)(int)) 0;
-static boolean
-    (*getpos_getvalid)(coordxy, coordxy) = (boolean (*)(coordxy, coordxy)) 0;
+static boolean (*getpos_getvalid)(coordxy, coordxy)
+                                          = (boolean (*)(coordxy, coordxy)) 0;
+enum getposHiliteState {
+    HiliteNormalMap = 0,
+    HiliteGoodposSymbol = 1,
+    HiliteBackground = 2,
+};
+static enum getposHiliteState
+    getpos_hilite_state = HiliteNormalMap,
+    defaultHiliteState = HiliteNormalMap;
 
 void
 getpos_sethilite(
     void (*gp_hilitef)(int),
     boolean (*gp_getvalidf)(coordxy, coordxy))
 {
-    boolean was_valid = (getpos_getvalid != NULL);
+    boolean (*old_getvalid)(coordxy, coordxy) = getpos_getvalid;
+    uint32 old_map_frame_color = gw.wsettings.map_frame_color;
     struct selectionvar *sel = selection_new();
+
+    defaultHiliteState = iflags.bgcolors ? HiliteBackground : HiliteNormalMap;
+    if (gp_getvalidf != old_getvalid)
+        getpos_hilite_state = defaultHiliteState;
 
     getpos_getvalids_selection(sel, getpos_getvalid);
     getpos_hilitefunc = gp_hilitef;
     getpos_getvalid = gp_getvalidf;
     getpos_getvalids_selection(sel, getpos_getvalid);
-    gw.wsettings.map_frame_color = (getpos_getvalid != NULL) ? CLR_BLUE
-                                                             : NO_COLOR;
-    if ((boolean) (getpos_getvalid != NULL) != was_valid)
+    gw.wsettings.map_frame_color = (getpos_hilite_state == HiliteBackground)
+                                   ? HI_ZAP : NO_COLOR;
+
+    if (getpos_getvalid != old_getvalid
+        || gw.wsettings.map_frame_color != old_map_frame_color)
         selection_force_newsyms(sel);
     selection_free(sel, TRUE);
+}
+
+/* cycle 'getpos_hilite_state' to its next state;
+   when 'bgcolors' is Off, it will alternate between not showing valid
+   positions and showing them via temporary S_goodpos symbol;
+   when 'bgcolors' is On, there are three states and showing them via
+   setting background color becomes the default */
+static void
+getpos_toggle_hilite_state(void)
+{
+    /* getpos_hilitefunc isn't Null */
+    if (getpos_hilite_state == HiliteGoodposSymbol) {
+        /* currently on, finish */
+        (*getpos_hilitefunc)(2); /* tmp_at(DISP_END) */
+    }
+
+    getpos_hilite_state = (getpos_hilite_state + 1)
+                          % (iflags.bgcolors ? 3 : 2);
+    /* resetting the callback functions to their current values will draw
+       valid-spots with background color if that is the new state and turn
+       off that color if it was the previous state */
+    getpos_sethilite(getpos_hilitefunc, getpos_getvalid);
+
+    if (getpos_hilite_state == HiliteGoodposSymbol) {
+        /* now on, begin */
+        (*getpos_hilitefunc)(0); /* tmp_at(DISP_start) */
+        (*getpos_hilitefunc)(1); /* update appropriate spots w/ S_goodpos */
+    }
 }
 
 boolean
@@ -719,32 +763,22 @@ truncate_to_map(coordxy *cx, coordxy *cy, schar dx, schar dy)
     *cy += dy;
 }
 
-enum hilite_states {
-    Hilite_Inactive = 0,  /* no highlighting of valid target spots */
-    Hilite_Active = 1,    /* '$' has just highlighted valid target spots */
-    Hilite_Passive = 2,   /* second '$' will unhighlight */
-};
-
-/* called when ^R typed or for SHOWVALID if second '$' typed to explicitly
-   reverse previous '$' for highlighting valid target spots */
+/* called when ^R typed; if '$' is being shown for valid spots, remove that;
+   if alternate background color is being show for that, redraw it */
 static void
-getpos_refresh(int *hilite_statep)
+getpos_refresh(void)
 {
-    int redrawflags = docrtRefresh;
-
-    if (*hilite_statep == Hilite_Active) {
-        /* removing SHOWVALID markers; just redraw the map */
+    if (getpos_hilitefunc && getpos_hilite_state == HiliteGoodposSymbol) {
         (*getpos_hilitefunc)(2); /* tmp_at(DISP_END) */
-        redrawflags |= docrtMapOnly;
-    } else {
-        /* ^R: player requested that the screen be redrawn; maybe something
-         * outside of nethack has clobbered it; clear it, redisplay what we
-         * think the map already shows rather than recalculate that, do a
-         * full status update, and show perminv, if applicable */
-        ; /* just docrtRefresh */
+        getpos_hilite_state = defaultHiliteState;
     }
-    docrt_flags(redrawflags);
-    *hilite_statep = Hilite_Inactive;
+
+    docrt_flags(docrtRefresh);
+
+    if (getpos_hilitefunc && getpos_hilite_state == HiliteBackground) {
+        /* resetting to current values will draw valid-spots highlighting */
+        getpos_sethilite(getpos_hilitefunc, getpos_getvalid);
+    }
 }
 
 /* have the player use movement keystrokes to position the cursor at a
@@ -782,10 +816,9 @@ getpos(coord *ccp, boolean force, const char *goal)
     int i, c;
     int sidx;
     coordxy cx, cy;
-    coordxy tx = u.ux, ty = u.uy, vx = 0, vy = 0;
+    coordxy tx = u.ux, ty = u.uy;
     boolean msg_given = TRUE; /* clear message window by default */
     boolean show_goal_msg = FALSE;
-    int hilite_state = Hilite_Inactive;
     coord *garr[NUM_GLOCS] = DUMMY;
     int gcount[NUM_GLOCS] = DUMMY;
     int gidx[NUM_GLOCS] = DUMMY;
@@ -868,15 +901,6 @@ getpos(coord *ccp, boolean force, const char *goal)
                 cmdq_add_key(CQ_REPEAT, c);
         }
 
-        /* update SHOWVALID if it is in use */
-        if (hilite_state == Hilite_Active) {
-            /* 'valid spot' glyph gets reset to whatever it was covering */
-            (*getpos_hilitefunc)(2); /* tmp_at(DISP_END) */
-            hilite_state = Hilite_Passive;
-            curs(WIN_MAP, cx, cy);
-            flush_screen(0);
-        }
-
         if (iflags.autodescribe)
             msg_given = FALSE;
 
@@ -938,27 +962,14 @@ getpos(coord *ccp, boolean force, const char *goal)
                after showing the help text, then to reset highlighting */
             if (c == gc.Cmd.spkeys[NHKF_GETPOS_HELP])
                 getpos_help(force, goal);
-            /* ^R: docrt(), hilite_state = Hilite_Inactive */
-            getpos_refresh(&hilite_state);
+            /* ^R: docrt(), hilite_state = default */
+            getpos_refresh();
             curs(WIN_MAP, cx, cy);
             /* update message window to reflect that we're still targeting */
             show_goal_msg = TRUE;
         } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]) {
             if (getpos_hilitefunc) {
-                if (hilite_state == Hilite_Inactive
-                    || (hilite_state == Hilite_Passive
-                        && (cx != vx || cy != vy))) {
-                    /* toggling 'showvalid' on */
-                    (*getpos_hilitefunc)(0); /* tmp_at(DISP_start) */
-                    (*getpos_hilitefunc)(1); /* update appropriate spots */
-                    hilite_state = Hilite_Active;
-                    vx = cx, vy = cy;
-                } else {
-                    /* 'showvalid' was on, toggle it off:
-                       docrt(), hilite_state = Hilite_Inactive */
-                    getpos_refresh(&hilite_state);
-                    vx = vy = 0;
-                }
+                getpos_toggle_hilite_state();
                 curs(WIN_MAP, cx, cy);
             }
             show_goal_msg = TRUE; /* we're still targeting */
