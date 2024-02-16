@@ -194,25 +194,25 @@ steps:
     cd sys/unix
     sh setup.sh hints/linux-minimal
     cd ../..
-    sed -i '/^#define CLIPPING/d'       include/config.h
-    sed -i '/^#define COMPRESS/d'       include/config.h
-    #sed -i '/^#define DOAGAIN/d'        include/config.h
-    sed -i '/^#define DUMPLOG/d'        include/config.h
-    #sed -i '/^#define GDBPATH/d'        include/config.h
-    #sed -i '/^#define GREPPATH/d'       include/config.h
-    sed -i '/^#define INSURANCE/d'      include/config.h
-    sed -i '/^#define ENHANCED_SYMBOLS/d' include/config.h
-    sed -i '/^#define LOGFILE/d'        include/config.h
-    sed -i '/^#define NEWS/d'           include/config.h
-    sed -i '/^#define PANICLOG/d'       include/config.h
-    #sed -i '/^#define STATUS_HILITES/d' include/config.h
-    sed -i '/^#define SYSCF/d'          include/config.h
-    sed -i '/^#define USER_SOUNDS/d'    include/config.h
-    sed -i '/^#define XLOGFILE/d'       include/config.h
-    sed -i '/^#define HANGUPHANDLING/d' include/global.h
-    sed -i '/^#define MAIL/d'           include/unixconf.h
-    sed -i '/^#define SHELL/d'          include/unixconf.h
-    sed -i '/^#define SUSPEND/d'        include/unixconf.h
+    sed -i '/^#[ 	]*define CLIPPING/d'       include/config.h
+    sed -i '/^#[ 	]*define COMPRESS/d'       include/config.h
+    #sed -i '/^#[ 	]*define DOAGAIN/d'        include/config.h
+    sed -i '/^#[ 	]*define DUMPLOG/d'        include/config.h
+    #sed -i '/^#[ 	]*define GDBPATH/d'        include/config.h
+    #sed -i '/^#[ 	]*define GREPPATH/d'       include/config.h
+    sed -i '/^#[ 	]*define INSURANCE/d'      include/config.h
+    sed -i '/^#[ 	]*define ENHANCED_SYMBOLS/d' include/config.h
+    sed -i '/^#[ 	]*define LOGFILE/d'        include/config.h
+    sed -i '/^#[ 	]*define NEWS/d'           include/config.h
+    sed -i '/^#[ 	]*define PANICLOG/d'       include/config.h
+    #sed -i '/^#[ 	]*define STATUS_HILITES/d' include/config.h
+    sed -i '/^#[ 	]*define SYSCF/d'          include/config.h
+    sed -i '/^#[ 	]*define USER_SOUNDS/d'    include/config.h
+    sed -i '/^#[ 	]*define XLOGFILE/d'       include/config.h
+    sed -i '/^#[ 	]*define HANGUPHANDLING/d' include/global.h
+    sed -i '/^#[ 	]*define MAIL/d'           include/unixconf.h
+    sed -i '/^#[ 	]*define SHELL/d'          include/unixconf.h
+    sed -i '/^#[ 	]*define SUSPEND/d'        include/unixconf.h
     make fetch-lua
     make WANT_WIN_ALL=1 all
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildTarget, 'minimal'))
