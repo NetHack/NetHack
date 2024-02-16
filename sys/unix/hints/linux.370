@@ -111,8 +111,9 @@ endif      #MAKEFILE_SRC
 endif      #USE_CURSESLIB
 
 # autodetect missing openssl header needed for CRASHREPORT
-CROK=$(shell ls /usr/include/openssl/md4.h 2>/dev/null | wc -l )
-ifeq "$(CROK)" "1"
+CRI=$(shell ls /usr/include/openssl/md4.h 2>/dev/null | wc -l )
+CRC=$(shell (../util/makedefs --grep-defined CROSSCOMPILE && echo 1 ) || echo 0)
+ifeq "$(CRI)$(CRC)" "10"
 AUTOLIBS=$(shell (../util/makedefs --grep-defined CRASHREPORT && echo "-lcrypto" ) || true )
 else
 NHCFLAGS+=-DNOCRASHREPORT

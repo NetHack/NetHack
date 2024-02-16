@@ -27,7 +27,7 @@
 /;
 
 # Miscellaneous
-@misc = qw/BETA/;
+@misc = qw/BETA CROSSCOMPILE/;
 
 # Meta
 @meta = qw/ALLDOCS/;	# convention: use --grep-define ALLDOCS to notate
