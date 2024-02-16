@@ -221,6 +221,7 @@ NH_abort(char *why USED_FOR_CRASHREPORT)
 #endif
     NH_abort_;
 }
+#undef USED_FOR_CRASHREPORT
 
 #ifdef CRASHREPORT
 # include <fcntl.h>
