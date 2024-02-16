@@ -49,10 +49,9 @@ ATTRNORETURN extern void nethack_exit(int) NORETURN;
 
 #define done_stopprint gp.program_state.stopprint
 
-// XXX is there a configuration that still needs this?
-//#ifndef PANICTRACE
-//#define NH_abort(x) NH_abort_
-//#endif
+#ifndef PANICTRACE
+# define NH_abort(x) NH_abort_
+#endif
 
 #ifdef AMIGA
 #define NH_abort_ Abort(0)
