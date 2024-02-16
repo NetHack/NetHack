@@ -1213,6 +1213,7 @@ optfn_catname(
     return petname_optfn(optidx, req, negated, opts, op);
 }
 
+#ifdef CRASHREPORT
 static int
 optfn_crash_email(int optidx UNUSED, int req, boolean negated UNUSED, char *opts, char *op)
 {
@@ -1286,6 +1287,7 @@ optfn_crash_urlmax(int optidx UNUSED, int req, boolean negated UNUSED, char *opt
     }
     return optn_ok;
 }
+#endif /* CRASHREPORT */
 
 #ifdef CURSES_GRAPHICS
 static int

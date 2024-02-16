@@ -173,8 +173,14 @@ panictrace_setsignals(boolean set)
 }
 #endif /* NO_SIGNAL */
 
+#ifdef CRASHREPORT
+#define USED_FOR_CRASHREPORT
+#else
+#define USED_FOR_CRASHREPORT UNUSED
+#endif
+
 static void
-NH_abort(char *why)
+NH_abort(char *why USED_FOR_CRASHREPORT)
 {
     int gdb_prio = SYSOPT_PANICTRACE_GDB;
     int libc_prio = SYSOPT_PANICTRACE_LIBC;
@@ -1185,6 +1191,7 @@ dump_plines(void)
     }
 }
 
+#ifdef CRASHREPORT
 // lineno==0 gives the most recent message (e.g. "Do you want to call panic..."
 //   if called from #panic)
 static const char *
@@ -1205,7 +1212,8 @@ get_saved_pline(int lineno){
     }
     return NULL;
 }
-#endif
+#endif  /* CRASHREPORT */
+#endif  /* DUMPLOG */
 
 /*ARGSUSED*/
 static void
