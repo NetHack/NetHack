@@ -1,4 +1,4 @@
-/* NetHack 3.7	spell.c	$NHDT-Date: 1702023273 2023/12/08 08:14:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.157 $ */
+/* NetHack 3.7	spell.c	$NHDT-Date: 1708126538 2024/02/16 23:35:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.163 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -46,6 +46,7 @@ static void spell_backfire(int);
 static boolean spelleffects_check(int, int *, int *);
 static const char *spelltypemnemonic(int);
 static boolean can_center_spell_location(coordxy, coordxy);
+static void display_spell_target_positions(boolean);
 static boolean spell_aim_step(genericptr_t, coordxy, coordxy);
 
 /* The roles[] table lists the role-specific values for tuning
@@ -1556,6 +1557,33 @@ can_center_spell_location(coordxy x, coordxy y)
     return (isok(x, y) && cansee(x, y) && !(IS_STWALL(levl[x][y].typ)));
 }
 
+static void
+display_spell_target_positions(boolean on_off)
+{
+    coordxy x, y, dx, dy;
+    int dist = 10;
+
+    if (on_off) {
+        /* on */
+        tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
+        for (dx = -dist; dx <= dist; dx++)
+            for (dy = -dist; dy <= dist; dy++) {
+                x = u.ux + dx;
+                y = u.uy + dy;
+                /* hero's location is allowed but highlighting the hero's
+                   spot makes map harder to read (if using '$' rather than
+                   by changing background color) */
+                if (u_at(x, y))
+                    continue;
+                if (can_center_spell_location(x, y))
+                    tmp_at(x, y);
+            }
+    } else {
+        /* off */
+        tmp_at(DISP_END, 0);
+    }
+}
+
 /* Choose location where spell takes effect. */
 static int
 throwspell(void)
@@ -1574,7 +1602,8 @@ throwspell(void)
     pline("Where do you want to cast the spell?");
     cc.x = u.ux;
     cc.y = u.uy;
-    getpos_sethilite(NULL, can_center_spell_location);
+    getpos_sethilite(display_spell_target_positions,
+                     can_center_spell_location);
     if (getpos(&cc, TRUE, "the desired position") < 0)
         return 0; /* user pressed ESC */
     clear_nhwindow(WIN_MESSAGE); /* discard any autodescribe feedback */

@@ -1,4 +1,4 @@
-/* NetHack 3.7	read.c	$NHDT-Date: 1654931501 2022/06/11 07:11:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.257 $ */
+/* NetHack 3.7	read.c	$NHDT-Date: 1708126537 2024/02/16 23:35:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.300 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,7 +19,7 @@ static void p_glow2(struct obj *, const char *);
 static void forget(int);
 static int maybe_tame(struct monst *, struct obj *);
 static boolean can_center_cloud(coordxy, coordxy);
-static void display_stinking_cloud_positions(int);
+static void display_stinking_cloud_positions(boolean);
 static void seffect_enchant_armor(struct obj **);
 static void seffect_destroy_armor(struct obj **);
 static void seffect_confuse_monster(struct obj **);
@@ -1066,22 +1066,28 @@ can_center_cloud(coordxy x, coordxy y)
 }
 
 static void
-display_stinking_cloud_positions(int state)
+display_stinking_cloud_positions(boolean on_off)
 {
-    if (state == 0) {
-        tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
-    } else if (state == 1) {
-        coordxy x, y, dx, dy;
-        int dist = 6;
+    coordxy x, y, dx, dy;
+    int dist = 6;
 
+    if (on_off) {
+        /* on */
+        tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
         for (dx = -dist; dx <= dist; dx++)
             for (dy = -dist; dy <= dist; dy++) {
                 x = u.ux + dx;
                 y = u.uy + dy;
-                if (can_center_cloud(x,y))
+                /* hero's location is allowed but highlighting the hero's
+                   spot makes map harder to read (if using '$' rather than
+                   by changing background color) */
+                if (u_at(x, y))
+                    continue;
+                if (can_center_cloud(x, y))
                     tmp_at(x, y);
             }
     } else {
+        /* off */
         tmp_at(DISP_END, 0);
     }
 }

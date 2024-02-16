@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1707547708 2024/02/10 06:48:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1381 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1708126520 2024/02/16 23:35:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1384 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -577,7 +577,7 @@ extern char *coord_desc(coordxy, coordxy, char *, char) NONNULLARG3;
 extern void auto_describe(coordxy, coordxy);
 extern boolean getpos_menu(coord *, int) NONNULLARG1;
 extern int getpos(coord *, boolean, const char *) NONNULLARG1;
-extern void getpos_sethilite(void(*f)(int), boolean(*d)(coordxy,coordxy));
+extern void getpos_sethilite(void(*f)(boolean), boolean(*d)(coordxy,coordxy));
 extern void new_mgivenname(struct monst *, int) NONNULLARG1;
 extern void free_mgivenname(struct monst *) NONNULLARG1;
 extern void new_oname(struct obj *, int) NONNULLARG1;

@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1695159606 2023/09/19 21:40:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.422 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1708126533 2024/02/16 23:35:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.437 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -21,7 +21,7 @@ static void use_candle(struct obj **);
 static void use_lamp(struct obj *);
 static void light_cocktail(struct obj **);
 static int rub_ok(struct obj *);
-static void display_jump_positions(int);
+static void display_jump_positions(boolean);
 static void use_tinning_kit(struct obj *);
 static int use_figurine(struct obj **);
 static int grease_ok(struct obj *);
@@ -30,12 +30,13 @@ static void use_trap(struct obj *);
 static int touchstone_ok(struct obj *);
 static int use_stone(struct obj *);
 static int set_trap(void); /* occupation callback */
-static void display_polearm_positions(int);
+static void display_polearm_positions(boolean);
 static int use_cream_pie(struct obj *);
 static int jelly_ok(struct obj *);
 static int use_royal_jelly(struct obj **);
 static int grapple_range(void);
 static boolean can_grapple_location(coordxy, coordxy);
+static void display_grapple_positions(boolean);
 static int use_grapple(struct obj *);
 static void discard_broken_wand(void);
 static void broken_wand_explode(struct obj *, int, int);
@@ -1934,21 +1935,22 @@ get_valid_jump_position(coordxy x, coordxy y)
 }
 
 static void
-display_jump_positions(int state)
+display_jump_positions(boolean on_off)
 {
-    if (state == 0) {
-        tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
-    } else if (state == 1) {
-        coordxy x, y, dx, dy;
+    coordxy x, y, dx, dy;
 
+    if (on_off) {
+        /* on */
+        tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
         for (dx = -4; dx <= 4; dx++)
             for (dy = -4; dy <= 4; dy++) {
                 x = dx + (coordxy) u.ux;
                 y = dy + (coordxy) u.uy;
-                if (get_valid_jump_position(x, y))
+                if (get_valid_jump_position(x, y) && !u_at(x, y))
                     tmp_at(x, y);
             }
     } else {
+        /* off */
         tmp_at(DISP_END, 0);
     }
 }
@@ -2033,21 +2035,26 @@ jump(int magic) /* 0=Physical, otherwise skill level */
         return ECMD_CANCEL; /* user pressed ESC */
     if (!is_valid_jump_pos(cc.x, cc.y, magic, TRUE)) {
         return ECMD_FAIL;
+    } else if (u.usteed && u_at(cc.x, cc.y)) {
+        pline("%s isn't capable of jumping in place.",
+              upstart(y_monnam(u.usteed)));
+        return ECMD_FAIL;
     } else {
         coord uc;
+        long side;
         int range, temp;
+        boolean wastrapped = FALSE;
 
-        if (u.utrap)
+        if (u.utrap) {
+            wastrapped = TRUE;
             switch (u.utraptype) {
-            case TT_BEARTRAP: {
-                long side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
-
+            case TT_BEARTRAP:
+                side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
                 You("rip yourself free of the bear trap!  Ouch!");
                 losehp(Maybe_Half_Phys(rnd(10)), "jumping out of a bear trap",
                        KILLED_BY);
                 set_wounded_legs(side, rn1(1000, 500));
                 break;
-            }
             case TT_PIT:
                 You("leap from the pit!");
                 break;
@@ -2057,8 +2064,8 @@ jump(int magic) /* 0=Physical, otherwise skill level */
                 break;
             case TT_LAVA:
                 You("pull yourself above the %s!", hliquid("lava"));
-                reset_utrap(TRUE);
-                return ECMD_TIME;
+                cc.x = u.ux, cc.y = u.uy; /* take u_at() 'if' below */
+                break;
             case TT_BURIEDBALL:
             case TT_INFLOOR:
                 You("strain your %s, but you're still %s.",
@@ -2069,7 +2076,34 @@ jump(int magic) /* 0=Physical, otherwise skill level */
                 set_wounded_legs(LEFT_SIDE, rn1(10, 11));
                 set_wounded_legs(RIGHT_SIDE, rn1(10, 11));
                 return ECMD_TIME;
+            default:
+                impossible("Jumping out of strange trap (%d)?", u.utraptype);
+                break;
             }
+            /* if we reach here, hero is no longer trapped */
+            reset_utrap(TRUE);
+        }
+        /* jumping on hero's same spot doesn't use walk_path() and isn't
+           allowed when riding (handled above) */
+        if (u_at(cc.x, cc.y)) {
+            struct trap *t;
+
+            /* escaping from a trap takes precedence over jumping in place */
+            if (wastrapped) {
+                morehungry(rnd(10));
+                return ECMD_TIME;
+            }
+            /* jumping in place on a trap will trigger it */
+            if ((t = t_at(cc.x, cc.y)) != 0) {
+                You("jump up and %s back down.", !Flying ? "come" : "fly");
+                dotrap(t, FORCETRAP | TOOKPLUNGE);
+                return ECMD_TIME;
+            }
+            /* jumping in place takes no time and doesn't exercise anything */
+            You("%s.", Hallucination ? "hop up and down a bit"
+                                     : "decide not to jump after all");
+            return ECMD_OK;
+        }
 
         /*
          * Check the path from uc to cc, calling hurtle_step at each
@@ -3262,15 +3296,15 @@ get_valid_polearm_position(coordxy x, coordxy y)
 }
 
 static void
-display_polearm_positions(int state)
+display_polearm_positions(boolean on_off)
 {
-    if (state == 0) {
-        tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
-    } else if (state == 1) {
-        coordxy x, y, dx, dy;
+    coordxy x, y, dx, dy;
 
-        for (dx = -4; dx <= 4; dx++)
-            for (dy = -4; dy <= 4; dy++) {
+    if (on_off) {
+        /* on */
+        tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
+        for (dx = -3; dx <= 3; dx++)
+            for (dy = -3; dy <= 3; dy++) {
                 x = dx + (int) u.ux;
                 y = dy + (int) u.uy;
                 if (get_valid_polearm_position(x, y)) {
@@ -3278,6 +3312,7 @@ display_polearm_positions(int state)
                 }
             }
     } else {
+        /* off */
         tmp_at(DISP_END, 0);
     }
 }
@@ -3571,6 +3606,28 @@ can_grapple_location(coordxy x, coordxy y)
     return (isok(x, y) && cansee(x, y) && distu(x, y) <= grapple_range());
 }
 
+static void
+display_grapple_positions(boolean on_off)
+{
+    coordxy x, y, dx, dy;
+
+    if (on_off) {
+        /* on */
+        tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
+        for (dx = -3; dx <= 3; dx++)
+            for (dy = -3; dy <= 3; dy++) {
+                x = dx + (int) u.ux;
+                y = dy + (int) u.uy;
+                if (can_grapple_location(x, y) && !u_at(x, y)) {
+                    tmp_at(x, y);
+                }
+            }
+    } else {
+        /* off */
+        tmp_at(DISP_END, 0);
+    }
+}
+
 static int
 use_grapple(struct obj *obj)
 {
@@ -3586,6 +3643,7 @@ use_grapple(struct obj *obj)
         return ECMD_OK;
     }
     if (obj != uwep) {
+        /* "cast": grappling hook evolved from slash'em's fishing pole */
         if (wield_tool(obj, "cast")) {
             cmdq_add_ec(CQ_CANNED, doapply);
             cmdq_add_key(CQ_CANNED, obj->invlet);
@@ -3599,7 +3657,7 @@ use_grapple(struct obj *obj)
     pline(where_to_hit);
     cc.x = u.ux;
     cc.y = u.uy;
-    getpos_sethilite(NULL, can_grapple_location);
+    getpos_sethilite(display_grapple_positions, can_grapple_location);
     if (getpos(&cc, TRUE, "the spot to hit") < 0)
         /* ESC; uses turn iff grapnel became wielded */
         return (res | ECMD_CANCEL);

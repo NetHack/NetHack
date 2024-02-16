@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_name.c	$NHDT-Date: 1708124164 2024/02/16 22:56:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.306 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1708126536 2024/02/16 23:35:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.307 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -47,7 +47,7 @@ nextmbuf(void)
 /* function for getpos() to highlight desired map locations.
  * parameter value 0 = initialize, 1 = highlight, 2 = done
  */
-static void (*getpos_hilitefunc)(int) = (void (*)(int)) 0;
+static void (*getpos_hilitefunc)(boolean) = (void (*)(boolean)) 0;
 static boolean (*getpos_getvalid)(coordxy, coordxy)
                                           = (boolean (*)(coordxy, coordxy)) 0;
 enum getposHiliteState {
@@ -61,7 +61,7 @@ static enum getposHiliteState
 
 void
 getpos_sethilite(
-    void (*gp_hilitef)(int),
+    void (*gp_hilitef)(boolean),
     boolean (*gp_getvalidf)(coordxy, coordxy))
 {
     boolean (*old_getvalid)(coordxy, coordxy) = getpos_getvalid;
@@ -96,7 +96,7 @@ getpos_toggle_hilite_state(void)
     /* getpos_hilitefunc isn't Null */
     if (getpos_hilite_state == HiliteGoodposSymbol) {
         /* currently on, finish */
-        (*getpos_hilitefunc)(2); /* tmp_at(DISP_END) */
+        (*getpos_hilitefunc)(FALSE); /* tmp_at(DISP_END) */
     }
 
     getpos_hilite_state = (getpos_hilite_state + 1)
@@ -108,8 +108,7 @@ getpos_toggle_hilite_state(void)
 
     if (getpos_hilite_state == HiliteGoodposSymbol) {
         /* now on, begin */
-        (*getpos_hilitefunc)(0); /* tmp_at(DISP_start) */
-        (*getpos_hilitefunc)(1); /* update appropriate spots w/ S_goodpos */
+        (*getpos_hilitefunc)(TRUE);
     }
 }
 
@@ -769,7 +768,7 @@ static void
 getpos_refresh(void)
 {
     if (getpos_hilitefunc && getpos_hilite_state == HiliteGoodposSymbol) {
-        (*getpos_hilitefunc)(2); /* tmp_at(DISP_END) */
+        (*getpos_hilitefunc)(FALSE); /* tmp_at(DISP_END) */
         getpos_hilite_state = defaultHiliteState;
     }
 
