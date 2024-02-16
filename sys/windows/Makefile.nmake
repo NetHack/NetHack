@@ -1138,7 +1138,7 @@ guilflags = $(lflags) -subsystem:windows,$(EXEVER)
 
 # basic subsystem specific libraries, less the C Run-Time
 baselibs    = kernel32.lib $(optlibs) $(winsocklibs) advapi32.lib gdi32.lib \
-		ole32.lib Shell32.lib
+		ole32.lib Shell32.lib dbghelp.lib
 winlibs     = $(baselibs) user32.lib comdlg32.lib winspool.lib
 
 # for Windows applications that use the C Run-Time libraries

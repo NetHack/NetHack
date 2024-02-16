@@ -989,7 +989,7 @@ win32_cr_gettrace(int maxframes, char *out, int outsize){
         //XXX check for different flags
     if(!SymInitialize(me, NULL, TRUE)){
         snprintf(buf, BSIZE, "no stack trace: SymInitialize: %d\n",
-                GetLastError());
+                (int) GetLastError());
         return 1;
     }
     int fcount = CaptureStackBackTrace(0, maxframes,frames,NULL);
@@ -1016,7 +1016,7 @@ win32_cr_gettrace(int maxframes, char *out, int outsize){
             IMAGEHLP_LINE ihl;
             ihl.SizeOfStruct = sizeof(IMAGEHLP_LINE);
             if (SymGetLineFromAddr(me, adr, &disp, &ihl)) {
-                printf("L=%d\n", ihl.LineNumber);
+                printf("L=%d\n", (int) ihl.LineNumber);
             } else {
 // 7e/1e7 - no info.  May need to call SymLoadModule if we need those addrs
 // BUT probably system code, so we don't care - experiment
@@ -1028,7 +1028,7 @@ win32_cr_gettrace(int maxframes, char *out, int outsize){
             // Error 487 (invalid address) seems to mean
             // "I can't find any info for this address".
             tmp = snprintf(buf, BSIZE, "%d %p (error %d)\n",
-                        x, frames[x], GetLastError());
+                        x, frames[x], (int) GetLastError());
             if(swr_add_uricoded(buf, &out, &outsize, mark))
                 goto finish;
         }
