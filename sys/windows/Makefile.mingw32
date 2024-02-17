@@ -52,10 +52,15 @@ SOUND_LIBRARIES = windsound
 #
 #---------------------------------------------------------------
 # Do you want debug information in the executable?
-# Required for CRASHREPORT (but doesn't work yet, so off).
 #
 
-DEBUGINFO = N
+DEBUGINFO = Y
+
+#
+#---------------------------------------------------------------
+# Required for CRASHREPORT (but doesn't work yet, so off).
+
+CRASHREPORT = N
 
 #
 #---------------------------------------------------------------
@@ -992,7 +997,7 @@ endif
 #COREOBJS += $(addsuffix .o, wc_chainin wc_chainout wc_trace)
 
 # XXX mess for testing libbacktrace
-ifeq "$(DEBUGINFO)" "Y"
+ifeq "$(CRASHREPORT)" "Y"
 CFLAGS += -I/mingw64/include -g -static -gdwarf
 LIBS += -L/mingw64/lib -lbacktrace
 endif
