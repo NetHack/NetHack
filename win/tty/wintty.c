@@ -3710,6 +3710,18 @@ g_putch(int in_ch)
         }
         (void) putchar((ch ^ 0x80)); /* Strip 8th bit */
     } else {
+        /*
+         * TODO?
+         *  for DECgraphics, we only need to switch back from the
+         *  line drawing character set to the normal one if 'ch' is
+         *  a lowercase letter or one of a handful of punctuation
+         *  characters (the range is contiguous but somewhat odd):
+         *    if (GFlag && ch >= 0x5f && ch <= 0x7e).
+         *  Leaving it on for other characters might result in only
+         *  deferring this graph_off(), but it could possibly skip
+         *  both this graph_off() and the need for next graph_on()
+         *  depending on whatever follows 'ch'.
+         */
         if (GFlag) {
             graph_off();
             GFlag = FALSE;
