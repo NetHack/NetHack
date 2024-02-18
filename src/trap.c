@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1703070192 2023/12/20 11:03:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.562 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1708283914 2024/02/18 19:18:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.577 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5909,13 +5909,19 @@ openholdingtrap(
         if (!u.utrap)
             return FALSE;
         *noticed = TRUE;
-        if (u.usteed)
-            Sprintf(buf, "%s is", noit_Monnam(u.usteed));
-        else
+        if (!u.usteed)
             Strcpy(buf, "You are");
-        reset_utrap(TRUE);
-        gv.vision_full_recalc = 1; /* vision limits can change (pit escape) */
+        else if (u.utraptype == TT_BURIEDBALL)
+            Sprintf(buf, "You and %s are", y_monnam(u.usteed));
+        else
+            Sprintf(buf, "%s is", noit_Monnam(u.usteed));
+        /* give release message before untrap in case it triggers a message */
         pline("%s released from %s%s.", buf, which, trapdescr);
+        /* might float up if Levitation is being unblocked */
+        gv.vision_full_recalc = 1; /* vision limits can change (pit escape) */
+        reset_utrap(TRUE);
+        if (gv.vision_full_recalc)
+            vision_recalc(0);
     } else {
         if (!mon->mtrapped)
             return FALSE;
