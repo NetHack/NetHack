@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.c	$NHDT-Date: 1702002970 2023/12/08 02:36:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.376 $ */
+/* NetHack 3.7	wintty.c	$NHDT-Date: 1708290310 2024/02/18 21:05:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.386 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2229,11 +2229,9 @@ tty_putstr(winid window, int attr, const char *str)
         /* if ^C occurs, player is prompted with "Really quit?" and that
            prompt is issued via tty_putstr(WIN_MESSAGE); if ^C happens
            while writing DECgraphics chars, the prompt text would be
-           rendered as VT line-drawing characters unless we do this */
-        if (GFlag) {
-            graph_off();
-            GFlag = FALSE;
-        }
+           rendered as VT line-drawing characters unless we do this;
+           also, if color was in progress it wouldn't be switched off */
+        end_glyphout();
 #endif
         /* if message is designated 'urgent' don't suppress it if user has
            typed ESC at --More-- prompt when dismissing an earlier message;
@@ -3710,19 +3708,12 @@ g_putch(int in_ch)
         }
         (void) putchar((ch ^ 0x80)); /* Strip 8th bit */
     } else {
-        /*
-         * TODO?
-         *  for DECgraphics, we only need to switch back from the
-         *  line drawing character set to the normal one if 'ch' is
-         *  a lowercase letter or one of a handful of punctuation
-         *  characters (the range is contiguous but somewhat odd):
-         *    if (GFlag && ch >= 0x5f && ch <= 0x7e).
-         *  Leaving it on for other characters might result in only
-         *  deferring this graph_off(), but it could possibly skip
-         *  both this graph_off() and the need for next graph_on()
-         *  depending on whatever follows 'ch'.
-         */
-        if (GFlag) {
+        /* for DECgraphics, we only need to switch back from the line
+           drawing character set to the normal one if 'ch' is a lowercase
+           letter or one of a handful of punctuation characters (the
+           range is contiguous but somewhat odd); deferring graph_off()
+           now might allow skipping both it and next potential graph_on() */
+        if (GFlag && ch >= 0x5f && ch <= 0x7e) {
             graph_off();
             GFlag = FALSE;
         }

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1377 $ $NHDT-Date: 1707525192 2024/02/10 00:33:12 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1380 $ $NHDT-Date: 1708290308 2024/02/18 21:05:08 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -2542,6 +2542,11 @@ tiles: male and female variations in monsters.txt; tested only with tile2bmp
 tty: use bright colors directly on supporting terminals
 tty: if a message is marked urgent, override message suppression initiated
 	by user having typed ESC at previous --More-- prompt
+tty+DECgraphics: when ready to print a normal character after having printed
+	a line-drawing character, don't switch back to normal character set
+	unless current char is one that gets rendered differently as a line
+	drawing char (mainly lowercase letters) so that we might be able to
+	avoid the need to switch to line drawing for next char that uses that
 Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
 	unixconf.h from enabling SUSPEND without need to modify unixconf.h
 Unix: support --nethackrc=filename on the command line; same effect as

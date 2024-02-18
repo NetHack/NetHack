@@ -399,6 +399,13 @@ tty_decgraphics_termcap_fixup(void)
 #if defined(ASCIIGRAPH) && !defined(NO_TERMS)
     /* some termcaps suffer from the bizarre notion that resetting
        video attributes should also reset the chosen character set */
+    if (dynamic_HIHE) {
+        (void) strsubst(nh_HE, AE, "");
+        (void) strsubst(nh_HE, ctrlO, "");
+    }
+    /* if AE has prefixing, substituting empty string for it probably
+       didn't work; however, if that _did_ work, we'll be able to
+       avoid HE_resets_AS and the degraded performance it causes */
     {
         const char *nh_he = nh_HE, *ae = AE;
         int he_limit, ae_length;
@@ -425,6 +432,16 @@ tty_decgraphics_termcap_fixup(void)
             }
             ++nh_he, --he_limit;
         }
+    }
+    /* some termcaps have AS load the line-drawing character set as
+       primary instead of having initialization load it as secondary
+       (we've already done that init) and then having AS simply switch
+       to secondary (change to do that now); they also have AE load
+       the US character set, which we avoid by not touching primary
+       [this speedup won't happen if they have delay prefixing though] */
+    if (!strcmp(AS, "\033(0") && !strcmp(AE, "\033(B")) {
+        AS = ctrlN;
+        AE = ctrlO;
     }
 #endif
 }
