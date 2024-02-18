@@ -1531,6 +1531,7 @@ extern void topologize(struct mkroom *) NONNULLARG1;
 extern void place_branch(branch *, coordxy, coordxy) NO_NNARGS;
 extern boolean occupied(coordxy, coordxy);
 extern int okdoor(coordxy, coordxy);
+extern boolean maybe_sdoor(int);
 extern void dodoor(coordxy, coordxy, struct mkroom *) NONNULLARG3;
 extern void mktrap(int, unsigned, struct mkroom *, coord *) NO_NNARGS;
 extern void mkstairs(coordxy, coordxy, char, struct mkroom *, boolean);

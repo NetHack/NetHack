@@ -2498,7 +2498,9 @@ search_door(
 }
 
 /*
- * Dig a corridor between two points.
+ * Dig a corridor between two points, using terrain ftyp.
+ * if nxcor is TRUE, he corridor may be blocked by a boulder,
+ * or just end without reaching the destination.
  */
 boolean
 dig_corridor(
@@ -2545,12 +2547,12 @@ dig_corridor(
 
         crm = &levl[xx][yy];
         if (crm->typ == btyp) {
-            if (ftyp != CORR || rn2(100)) {
+            if (ftyp == CORR && maybe_sdoor(100)) {
+                crm->typ = SCORR;
+            } else {
                 crm->typ = ftyp;
                 if (nxcor && !rn2(50))
                     (void) mksobj_at(BOULDER, xx, yy, TRUE, FALSE);
-            } else {
-                crm->typ = SCORR;
             }
         } else if (crm->typ != ftyp && crm->typ != SCORR) {
             /* strange ... */

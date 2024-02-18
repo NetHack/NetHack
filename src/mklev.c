@@ -425,6 +425,7 @@ join(register int a, register int b, boolean nxcor)
         gs.smeq[a] = gs.smeq[b];
 }
 
+/* create random corridors between rooms */
 void
 makecorridors(void)
 {
@@ -447,6 +448,7 @@ makecorridors(void)
                 any = TRUE;
             }
     }
+    /* add some extra corridors which may be blocked off */
     if (gn.nroom > 2)
         for (i = rn2(gn.nroom) + 4; i; i--) {
             a = rn2(gn.nroom);
@@ -1599,10 +1601,18 @@ okdoor(coordxy x, coordxy y)
             && !near_door);
 }
 
+/* do we want a secret door/corridor? */
+boolean
+maybe_sdoor(int chance)
+{
+    return (depth(&u.uz) > 2) && !rn2(max(2, chance));
+}
+
+/* create a door at x,y in room aroom */
 void
 dodoor(coordxy x, coordxy y, struct mkroom *aroom)
 {
-    dosdoor(x, y, aroom, rn2(8) ? DOOR : SDOOR);
+    dosdoor(x, y, aroom, maybe_sdoor(8) ? SDOOR : DOOR);
 }
 
 boolean
