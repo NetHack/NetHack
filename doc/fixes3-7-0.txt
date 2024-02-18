@@ -2488,6 +2488,9 @@ erinyes overhaul; they now attempt to punish heroes who have violated their
 accessibility options to tell where on map a message happened (accessiblemsg),
 	to notify when a monster is spotted (spot_monsters), and when
 	a monster moved (mon_movement)
+if hero is punished or tethered to a buried iron ball and has no inventory (or
+	only carries gold or embedded dragon scales or both), a nymph might
+	remove the chain when finding nothing else to steal
 
 
 Platform- and/or Interface-Specific New Features
