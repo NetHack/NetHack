@@ -128,6 +128,7 @@ private:
 	bool isSelected(int row);
         long count(int row);
 
+        void SetTwiAttr(QTableWidgetItem *twi, int color, int attr);
 	void AddRow(int row, const MenuItem& mi);
 	void WidenColumn(int column, int width);
         void PadMenuColumns(bool split_descr);
