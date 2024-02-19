@@ -3007,7 +3007,10 @@ use_whip(struct obj *obj)
                can reach the floor so could just pick an item up, but
                allow snagging by whip too. */
             otmp = gl.level.objects[u.ux][u.uy];
-            if (otmp && otmp->otyp == CORPSE && otmp->corpsenm == PM_HORSE) {
+            if (otmp && otmp->otyp == CORPSE
+                && (otmp->corpsenm == PM_HORSE
+                    || otmp->corpsenm == little_to_big(PM_HORSE) /* warhorse */
+                    || otmp->corpsenm == big_to_little(PM_HORSE))) { /* pony */
                 pline("Why beat a dead horse?");
                 return ECMD_TIME;
             }
