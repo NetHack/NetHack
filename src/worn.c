@@ -293,7 +293,7 @@ check_wornmask_slots(void)
            object checking will most likely have already caught this] */
         for (otmp = gi.invent; otmp; otmp = otmp->nobj) {
             if (otmp != o && (otmp->owornmask & m) != 0L
-                /* embedded scales owornmask is W_ARM|I_SPECIAL so whould
+                /* embedded scales owornmask is W_ARM|I_SPECIAL so would
                    give a false complaint about item other than uarm having
                    W_ARM bit set if we didn't screen it out here */
                 && (m != W_ARM || otmp != uskin
