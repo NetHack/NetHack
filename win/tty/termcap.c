@@ -391,24 +391,34 @@ tty_decgraphics_termcap_fixup(void)
      * reasonably be using the UK character set.
      */
     if (SYMHANDLING(H_DEC))
-        xputs("\033)0");
+        xputs("\033)0"); /* "\e)0" load line drawing chars as secondary set */
 #ifdef PC9800
     init_hilite();
 #endif
+    if (nh_HE && *nh_HE)
+        xputs(nh_HE); /* turn off any active highlighting (before maybe
+                       * changing HE or AE) */
 
 #if defined(ASCIIGRAPH) && !defined(NO_TERMS)
     /* some termcaps suffer from the bizarre notion that resetting
        video attributes should also reset the chosen character set */
     if (dynamic_HIHE) {
+        assert(nh_HE != NULL);
         (void) strsubst(nh_HE, AE, "");
         (void) strsubst(nh_HE, ctrlO, "");
+        /* if AE has prefixing, substituting an empty string for it in HE
+           would only work if it is a leading prefix of HE; remove the
+           magic sequences that loads US set ("\e(B") or UK set ("\e(A")
+           into the primary character set since we don't want HE to do that */
+        (void) strsubst(nh_HE, "\033(B", "");
+        (void) strsubst(nh_HE, "\033(A", "");
     }
-    /* if AE has prefixing, substituting empty string for it probably
-       didn't work; however, if that _did_ work, we'll be able to
-       avoid HE_resets_AS and the degraded performance it causes */
-    {
-        const char *nh_he = nh_HE, *ae = AE;
-        int he_limit, ae_length;
+
+    /* if AE is still present in HE, set a flag so that glyph writing
+       code will know that AS needs to be refreshed for consecutive
+       line drawing characters */
+    if (nh_HE && *nh_HE) {
+        const char *ae = AE;
 
         if (digit(*ae)) { /* skip over delay prefix, if any */
             do
@@ -422,28 +432,26 @@ tty_decgraphics_termcap_fixup(void)
             if (*ae == '*')
                 ++ae;
         }
-        /* can't use nethack's case-insensitive strstri() here, and some old
-           systems don't have strstr(), so use brute force substring search */
-        ae_length = strlen(ae), he_limit = strlen(nh_he);
-        while (he_limit >= ae_length) {
-            if (strncmp(nh_he, ae, ae_length) == 0) {
-                HE_resets_AS = TRUE;
-                break;
-            }
-            ++nh_he, --he_limit;
-        }
+        if (strstr(nh_HE, ae)) /* stdc strstr(), not nethack's strstri() */
+            HE_resets_AS = TRUE;
     }
+
     /* some termcaps have AS load the line-drawing character set as
        primary instead of having initialization load it as secondary
        (we've already done that init) and then having AS simply switch
        to secondary (change to do that now); they also have AE load
-       the US character set, which we avoid by not touching primary
-       [this speedup won't happen if they have delay prefixing though] */
-    if (!strcmp(AS, "\033(0") && !strcmp(AE, "\033(B")) {
+       the US character set, which we avoid by not touching primary;
+       if HE_resets_AS, we can't simplify AS/AE due to the risk that
+       HE is changing the primary set rather than just toggling to it */
+    if (!HE_resets_AS && !strcmp(AS, "\033(0") && !strcmp(AE, "\033(B")) {
+        /* first output old AE to make sure we aren't about to leave
+           primary set with line drawing chars */
+        xputs(AE);
         AS = ctrlN;
         AE = ctrlO;
     }
 #endif
+    xputs(AE);
 }
 #endif /* TERMLIB */
 
