@@ -1390,14 +1390,12 @@ artifact_hit(
                                 ? "vaporizes part of"
                                 : "burns",
                       hittee, !gs.spec_dbon_applies ? '.' : '!');
-        if (!rn2(4))
-            (void) destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
-        if (!rn2(4))
-            (void) destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
-        if (!rn2(7))
-            (void) destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
-        if (!rn2(4))
+        if (!rn2(4)) {
+            int itemdmg = destroy_items(mdef, AD_FIRE, *dmgptr);
+            if (!youdefend)
+                *dmgptr += itemdmg; /* item destruction dmg */
             ignite_items(mdef->minvent);
+        }
         if (youdefend && Slimed)
             burn_away_slime();
         return realizes_damage;
@@ -1407,8 +1405,11 @@ artifact_hit(
             pline_The("ice-cold blade %s %s%c",
                       !gs.spec_dbon_applies ? "hits" : "freezes", hittee,
                       !gs.spec_dbon_applies ? '.' : '!');
-        if (!rn2(4))
-            (void) destroy_mitem(mdef, POTION_CLASS, AD_COLD);
+        if (!rn2(4)) {
+            int itemdmg = destroy_items(mdef, AD_COLD, *dmgptr);
+            if (!youdefend)
+                *dmgptr += itemdmg; /* item destruction dmg */
+        }
         return realizes_damage;
     }
     if (attacks(AD_ELEC, otmp)) {
@@ -1418,10 +1419,11 @@ artifact_hit(
                       hittee, !gs.spec_dbon_applies ? '.' : '!');
         if (gs.spec_dbon_applies)
             wake_nearto(mdef->mx, mdef->my, 4 * 4);
-        if (!rn2(5))
-            (void) destroy_mitem(mdef, RING_CLASS, AD_ELEC);
-        if (!rn2(5))
-            (void) destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
+        if (!rn2(5)) {
+            int itemdmg = destroy_items(mdef, AD_ELEC, *dmgptr);
+            if (!youdefend)
+                *dmgptr += itemdmg; /* item destruction dmg */
+        }
         return realizes_damage;
     }
     if (attacks(AD_MAGM, otmp)) {
