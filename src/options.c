@@ -461,7 +461,7 @@ ask_do_tutorial(void)
  */
 boolean
 parseoptions(
-    register char *opts,
+    char *opts,
     boolean tinitial,
     boolean tfrom_file)
 {
@@ -1449,7 +1449,7 @@ optfn_disclose(int optidx, int req, boolean negated, char *opts, char *op)
                                              DISCLOSE_NO_WITHOUT_PROMPT,
                                              DISCLOSE_SPECIAL_WITHOUT_PROMPT,
                                              '\0' };
-            register char c, *dop;
+            char c, *dop;
 
             c = lowc(*op);
             if (c == 'k')
@@ -8248,8 +8248,8 @@ collect_menu_keys(
 int
 fruitadd(char *str, struct fruit *replace_fruit)
 {
-    register int i;
-    register struct fruit *f;
+    int i;
+    struct fruit *f;
     int highest_fruit_id = 0, globpfx;
     char buf[PL_FSIZ], altname[PL_FSIZ];
     boolean user_specified = (str == gp.pl_fruit);
@@ -9490,7 +9490,7 @@ option_help(void)
 {
     char buf[BUFSZ], buf2[BUFSZ];
     const char *optname;
-    register int i;
+    int i;
     winid datawin;
 
     datawin = create_nhwindow(NHW_TEXT);

@@ -105,7 +105,7 @@ amulet(void)
 int
 mon_has_amulet(struct monst *mtmp)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
         if (otmp->otyp == AMULET_OF_YENDOR)
@@ -116,7 +116,7 @@ mon_has_amulet(struct monst *mtmp)
 int
 mon_has_special(struct monst *mtmp)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
         if (otmp->otyp == AMULET_OF_YENDOR
@@ -167,7 +167,7 @@ which_arti(int mask)
 static boolean
 mon_has_arti(struct monst *mtmp, short otyp)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
         if (otyp) {
@@ -186,7 +186,7 @@ mon_has_arti(struct monst *mtmp, short otyp)
 static struct monst *
 other_mon_has_arti(struct monst *mtmp, short otyp)
 {
-    register struct monst *mtmp2;
+    struct monst *mtmp2;
 
     for (mtmp2 = fmon; mtmp2; mtmp2 = mtmp2->nmon)
         /* no need for !DEADMONSTER check here since they have no inventory */
@@ -204,7 +204,7 @@ other_mon_has_arti(struct monst *mtmp, short otyp)
 static struct obj *
 on_ground(short otyp)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     for (otmp = fobj; otmp; otmp = otmp->nobj)
         if (otyp) {
@@ -238,9 +238,9 @@ you_have(int mask)
 static unsigned long
 target_on(int mask, struct monst *mtmp)
 {
-    register short otyp;
-    register struct obj *otmp;
-    register struct monst *mtmp2;
+    short otyp;
+    struct obj *otmp;
+    struct monst *mtmp2;
 
     if (!M_Wants(mask))
         return (unsigned long) STRAT_NONE;
@@ -481,7 +481,7 @@ has_aggravatables(struct monst *mon)
 void
 aggravate(void)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
     boolean in_w_tower = In_W_tower(u.ux, u.uy, &u.uz);
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -504,7 +504,7 @@ aggravate(void)
 void
 clonewiz(void)
 {
-    register struct monst *mtmp2;
+    struct monst *mtmp2;
 
     if ((mtmp2 = makemon(&mons[PM_WIZARD_OF_YENDOR], u.ux, u.uy, MM_NOWAIT))
         != 0) {

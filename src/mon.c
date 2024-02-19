@@ -518,7 +518,7 @@ pm_to_cham(int mndx)
 static struct obj *
 make_corpse(struct monst *mtmp, unsigned int corpseflags)
 {
-    register struct permonst *mdat = mtmp->data;
+    struct permonst *mdat = mtmp->data;
     int num;
     struct obj *obj = (struct obj *) 0;
     struct obj *otmp = (struct obj *) 0;
@@ -1594,9 +1594,9 @@ mon_givit(struct monst *mtmp, struct permonst *ptr)
 }
 
 void
-mpickgold(register struct monst* mtmp)
+mpickgold(struct monst* mtmp)
 {
-    register struct obj *gold;
+    struct obj *gold;
     int mat_idx;
 
     if ((gold = g_at(mtmp->mx, mtmp->my)) != 0) {
@@ -1617,7 +1617,7 @@ mpickgold(register struct monst* mtmp)
 boolean
 mpickstuff(struct monst *mtmp)
 {
-    register struct obj *otmp, *otmp2, *otmp3;
+    struct obj *otmp, *otmp2, *otmp3;
     int carryamt = 0;
 
     /* prevent shopkeepers from leaving the door of their shop */
@@ -1915,7 +1915,7 @@ mfndpos(
     long flag)
 {
     struct permonst *mdat = mon->data;
-    register struct trap *ttmp;
+    struct trap *ttmp;
     coordxy x, y, nx, ny;
     int cnt = 0;
     uchar ntyp;
@@ -2936,7 +2936,7 @@ corpse_chance(
 
 /* drop (perhaps) a cadaver and remove monster */
 void
-mondied(register struct monst* mdef)
+mondied(struct monst* mdef)
 {
     mondead(mdef);
     if (!DEADMONSTER(mdef))
@@ -3697,7 +3697,7 @@ maybe_mnexto(struct monst *mtmp)
  */
 int
 mnearto(
-    register struct monst *mtmp,
+    struct monst *mtmp,
     coordxy x,
     coordxy y,
     boolean move_other, /* make sure mtmp gets to x, y! so move m_at(x, y) */
@@ -3775,7 +3775,7 @@ m_respond(struct monst* mtmp)
         aggravate();
     }
     if (mtmp->data == &mons[PM_MEDUSA]) {
-        register int i;
+        int i;
 
         for (i = 0; i < NATTK; i++)
             if (mtmp->data->mattk[i].aatyp == AT_GAZE) {
@@ -4047,7 +4047,7 @@ wake_nearto(coordxy x, coordxy y, int distance)
 
 /* NOTE: we must check for mimicry before calling this routine */
 void
-seemimic(register struct monst* mtmp)
+seemimic(struct monst* mtmp)
 {
     boolean is_blocker_appear = (is_lightblocker_mappear(mtmp));
 
@@ -5072,7 +5072,7 @@ newcham(
      */
     /* former giants can't continue carrying boulders */
     if (mtmp->minvent && !throws_rocks(mdat)) {
-        register struct obj *otmp, *otmp2;
+        struct obj *otmp, *otmp2;
 
         /* DEADMONSTER(): it is possible for flooreffects() to kill mtmp;
            the rest of its inventory would be dropped making otmp2 stale */
@@ -5240,7 +5240,7 @@ kill_genocided_monsters(void)
 }
 
 void
-golemeffects(register struct monst* mon, int damtype, int dam)
+golemeffects(struct monst* mon, int damtype, int dam)
 {
     int heal = 0, slow = 0;
 

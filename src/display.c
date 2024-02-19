@@ -275,9 +275,9 @@ magic_map_background(coordxy x, coordxy y, int show)
  * the hero can physically see the location.  Update the screen if directed.
  */
 void
-map_background(register coordxy x, register coordxy y, register int show)
+map_background(coordxy x, coordxy y, int show)
 {
-    register int glyph = back_to_glyph(x, y);
+    int glyph = back_to_glyph(x, y);
 
     if (gl.level.flags.hero_memory)
         levl[x][y].glyph = glyph;
@@ -292,10 +292,10 @@ map_background(register coordxy x, register coordxy y, register int show)
  * hero can physically see the location.
  */
 void
-map_trap(register struct trap *trap, register int show)
+map_trap(struct trap *trap, int show)
 {
-    register coordxy x = trap->tx, y = trap->ty;
-    register int glyph = trap_to_glyph(trap);
+    coordxy x = trap->tx, y = trap->ty;
+    int glyph = trap_to_glyph(trap);
 
     if (gl.level.flags.hero_memory)
         levl[x][y].glyph = glyph;
@@ -309,7 +309,7 @@ map_trap(register struct trap *trap, register int show)
  * Map the engraving and print it out if directed.
  */
 void
-map_engraving(struct engr *ep, register int show)
+map_engraving(struct engr *ep, int show)
 {
     coordxy x = ep->engr_x, y = ep->engr_y;
     int glyph = engraving_to_glyph(ep);
@@ -329,10 +329,10 @@ map_engraving(struct engr *ep, register int show)
  * the claim here that the hero can see obj's <ox,oy>.]
  */
 void
-map_object(register struct obj *obj, int show)
+map_object(struct obj *obj, int show)
 {
-    register coordxy x = obj->ox, y = obj->oy;
-    register int glyph = obj_to_glyph(obj, newsym_rn2);
+    coordxy x = obj->ox, y = obj->oy;
+    int glyph = obj_to_glyph(obj, newsym_rn2);
 
     /* if this object is already displayed as a generic object, it might
        become a specific one now */
@@ -374,7 +374,7 @@ map_object(register struct obj *obj, int show)
  * by newsym() if necessary.
  */
 void
-map_invisible(register coordxy x, register coordxy y)
+map_invisible(coordxy x, coordxy y)
 {
     if (x != u.ux || y != u.uy) { /* don't display I at hero's location */
         if (gl.level.flags.hero_memory)
@@ -405,9 +405,9 @@ unmap_invisible(coordxy x, coordxy y)
  * invisible monster notation, we might have to call newsym().
  */
 void
-unmap_object(register coordxy x, register coordxy y)
+unmap_object(coordxy x, coordxy y)
 {
-    register struct trap *trap;
+    struct trap *trap;
     struct engr *ep;
 
     if (!gl.level.flags.hero_memory)
@@ -443,8 +443,8 @@ unmap_object(register coordxy x, register coordxy y)
  */
 #define _map_location(x, y, show) \
     {                                                                       \
-        register struct obj *obj;                                           \
-        register struct trap *trap;                                         \
+        struct obj *obj;                                           \
+        struct trap *trap;                                         \
         struct engr *ep;                                                    \
                                                                             \
         if ((obj = vobj_at(x, y)) && !covers_objects(x, y))                 \
@@ -715,7 +715,7 @@ feel_location(coordxy x, coordxy y)
 {
     struct rm *lev;
     struct obj *boulder;
-    register struct monst *mon;
+    struct monst *mon;
 
     /* replicate safeguards used by newsym(); might not be required here */
     if (suppress_map_output())
@@ -884,7 +884,7 @@ newsym(coordxy x, coordxy y)
     struct monst *mon;
     int see_it;
     boolean worm_tail;
-    register struct rm *lev = &(levl[x][y]);
+    struct rm *lev = &(levl[x][y]);
 
     /* don't try to produce map output when level is in a state of flux */
     if (suppress_map_output())
@@ -1058,7 +1058,7 @@ newsym(coordxy x, coordxy y)
 void
 shieldeff(coordxy x, coordxy y)
 {
-    register int i;
+    int i;
 
     if (!flags.sparkle)
         return;
@@ -1164,7 +1164,7 @@ tmp_at(coordxy x, coordxy y)
 
         case DISP_END:
             if (tglyph->style == DISP_BEAM || tglyph->style == DISP_ALL) {
-                register int i;
+                int i;
 
                 /* Erase (reset) from source to end */
                 for (i = 0; i < tglyph->sidx; i++)
@@ -1433,7 +1433,7 @@ under_ground(int mode)
 void
 see_monsters(void)
 {
-    register struct monst *mon;
+    struct monst *mon;
     int new_warn_obj_cnt = 0;
 
     if (gd.defer_see_monsters)
@@ -1502,7 +1502,7 @@ set_mimic_blocking(void)
 void
 see_objects(void)
 {
-    register struct obj *obj;
+    struct obj *obj;
 
     for (obj = fobj; obj; obj = obj->nobj)
         if (vobj_at(obj->ox, obj->oy) == obj)
@@ -1646,7 +1646,7 @@ void
 docrt_flags(int refresh_flags)
 {
     coordxy x, y;
-    register struct rm *lev;
+    struct rm *lev;
     boolean maponly = (refresh_flags & docrtMapOnly) != 0,
             redrawonly = (refresh_flags & docrtRefresh) != 0,
             nocls = (refresh_flags & docrtNocls) != 0;
@@ -1995,7 +1995,7 @@ static gbuf_entry nul_gbuf = {
 void
 clear_glyph_buffer(void)
 {
-    register coordxy x, y;
+    coordxy x, y;
     gbuf_entry *gptr = &gg.gbuf[0][0];
     glyph_info *giptr =
 #ifndef UNBUFFERED_GLYPHINFO
@@ -2032,9 +2032,9 @@ clear_glyph_buffer(void)
 void
 row_refresh(coordxy start, coordxy stop, coordxy y)
 {
-    register coordxy x;
+    coordxy x;
     int glyph;
-    register boolean force;
+    boolean force;
     gbuf_entry *gptr = &gg.gbuf[0][0];
     glyph_info bkglyphinfo = nul_glyphinfo;
     glyph_info *giptr =
@@ -2096,7 +2096,7 @@ flush_screen(int cursor_on_u)
      */
     static int flushing = 0;
     static int delay_flushing = 0;
-    register coordxy x, y;
+    coordxy x, y;
     glyph_info bkglyphinfo = nul_glyphinfo;
     int bkglyph;
 
@@ -2123,7 +2123,7 @@ flush_screen(int cursor_on_u)
         timebot();
 
     for (y = 0; y < ROWNO; y++) {
-        register gbuf_entry *gptr = &gg.gbuf[y][x = gg.gbuf_start[y]];
+        gbuf_entry *gptr = &gg.gbuf[y][x = gg.gbuf_start[y]];
 
         for (; x <= gg.gbuf_stop[y]; gptr++, x++) {
             get_bkglyph_and_framecolor(x, y, &bkglyph, &bkglyphinfo.framecolor);
@@ -2620,7 +2620,7 @@ void
 reset_glyphmap(enum glyphmap_change_triggers trigger)
 {
     int glyph;
-    register int offset;
+    int offset;
     int color = NO_COLOR;
 
     /* condense multiple tests in macro version down to single */
@@ -3386,7 +3386,7 @@ t_warn(struct rm *lev)
 static int
 wall_angle(struct rm *lev)
 {
-    register unsigned int seenv = lev->seenv & 0xff;
+    unsigned int seenv = lev->seenv & 0xff;
     const int *row;
     int col, idx;
 

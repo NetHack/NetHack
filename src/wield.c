@@ -453,7 +453,7 @@ dowield(void)
 int
 doswapweapon(void)
 {
-    register struct obj *oldwep, *oldswap;
+    struct obj *oldwep, *oldswap;
     int result = 0;
 
     /* May we attempt this? */

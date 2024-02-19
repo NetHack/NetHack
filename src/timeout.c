@@ -556,7 +556,7 @@ done_timeout(int how, int which)
 void
 nh_timeout(void)
 {
-    register struct prop *upp;
+    struct prop *upp;
     struct kinfo *kptr;
     boolean was_flying;
     int sleeptime;
@@ -576,7 +576,7 @@ nh_timeout(void)
          * neither is stopped if you don't have a luckstone.
          * Luck is based at 0 usually, +1 if a full moon and -1 on Friday 13th
          */
-        register int time_luck = stone_luck(FALSE);
+        int time_luck = stone_luck(FALSE);
         boolean nostone = !carrying(LUCKSTONE) && !stone_luck(TRUE);
 
         if (u.uluck > baseluck && (nostone || time_luck < 0))
@@ -1782,7 +1782,7 @@ void
 do_storms(void)
 {
     int nstrike;
-    register int x, y;
+    int x, y;
     int dirx, diry;
     int count;
 

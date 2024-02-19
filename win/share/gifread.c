@@ -338,7 +338,7 @@ LWZReadByte(FILE *fd, int flag) /*, int input_code_size)*/
     static int clear_code, end_code;
     static int table[2][(1 << MAX_LWZ_BITS)];
     static int stack[(1 << (MAX_LWZ_BITS)) * 2], *sp;
-    register int i;
+    int i;
 
     if (flag) {
         set_code_size = input_code_size;

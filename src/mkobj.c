@@ -301,8 +301,8 @@ mkobj(int oclass, boolean artif)
 static void
 mkbox_cnts(struct obj *box)
 {
-    register int n;
-    register struct obj *otmp;
+    int n;
+    struct obj *otmp;
 
     box->cobj = (struct obj *) 0;
 
@@ -345,7 +345,7 @@ mkbox_cnts(struct obj *box)
                 (void) stop_timer(SHRINK_GLOB, obj_to_any(otmp));
             }
         } else {
-            register int tprob;
+            int tprob;
             const struct icp *iprobs = boxiprobs;
 
             for (tprob = rnd(100); (tprob -= iprobs->iprob) > 0; iprobs++)
@@ -391,8 +391,8 @@ rndmonnum(void)
 int
 rndmonnum_adj(int minadj, int maxadj)
 {
-    register struct permonst *ptr;
-    register int i;
+    struct permonst *ptr;
+    int i;
     unsigned short excludeflags;
 
     /* Plan A: get a level-appropriate common monster */
@@ -705,7 +705,7 @@ unknwn_contnr_contents(struct obj *obj)
 void
 bill_dummy_object(struct obj *otmp)
 {
-    register struct obj *dummy;
+    struct obj *dummy;
     long cost = 0L;
 
     if (otmp->unpaid) {
@@ -2223,7 +2223,7 @@ is_rottable(struct obj *otmp)
 void
 place_object(struct obj *otmp, coordxy x, coordxy y)
 {
-    register struct obj *otmp2;
+    struct obj *otmp2;
 
     if (!isok(x, y)) { /* validate location */
         void (*func)(const char *, ...) PRINTF_F_PTR(1, 2);

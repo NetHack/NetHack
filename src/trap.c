@@ -166,7 +166,7 @@ burnarmor(struct monst *victim)
  */
 int
 erode_obj(
-    register struct obj *otmp,
+    struct obj *otmp,
     const char *ostr,
     int type,
     int ef_flags)
@@ -355,7 +355,7 @@ erode_obj(
  */
 boolean
 grease_protect(
-    register struct obj *otmp,
+    struct obj *otmp,
     const char *ostr,
     struct monst *victim)
 {
@@ -3414,7 +3414,7 @@ feeltrap(struct trap *trap)
 static boolean
 find_random_launch_coord(struct trap *ttmp, coord *cc)
 {
-    register int tmp;
+    int tmp;
     boolean success = FALSE;
     coord bcc = UNDEFINED_VALUES;
     int distance;
@@ -3592,7 +3592,7 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
         }
         trap_result = mtmp->mtrapped ? Trap_Caught_Mon : Trap_Effect_Finished;
     } else {
-        register int tt = trap->ttyp;
+        int tt = trap->ttyp;
         boolean forcetrap = ((mintrapflags & FORCETRAP) != 0);
         boolean forcebungle = (mintrapflags & FORCEBUNGLE) != 0;
         /* monster has seen such a trap before */
@@ -3821,7 +3821,7 @@ float_down(
     long hmask,
     long emask) /* might cancel timeout */
 {
-    register struct trap *trap = (struct trap *) 0;
+    struct trap *trap = (struct trap *) 0;
     d_level current_dungeon_level;
     boolean no_msg = FALSE;
 
@@ -4113,7 +4113,7 @@ dofiretrap(
 static void
 domagictrap(void)
 {
-    register int fate = rnd(20);
+    int fate = rnd(20);
 
     /* What happened to the poor sucker? */
 
@@ -4687,8 +4687,8 @@ emergency_disrobe(boolean *lostsome)
     int invc = inv_cnt(TRUE);
 
     while (near_capacity() > (Punished ? UNENCUMBERED : SLT_ENCUMBER)) {
-        register struct obj *obj, *otmp = (struct obj *) 0;
-        register int i;
+        struct obj *obj, *otmp = (struct obj *) 0;
+        int i;
 
         /* Pick a random object */
         if (invc > 0) {
@@ -5592,7 +5592,7 @@ untrap(
     coordxy rx, coordxy ry,
     struct obj *container)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     coordxy x, y;
     int ch;
     struct trap *ttmp;
@@ -6014,11 +6014,11 @@ openfallingtrap(
 /* only called when the player is doing something to the chest directly */
 boolean
 chest_trap(
-    register struct obj *obj,
-    register int bodypart,
+    struct obj *obj,
+    int bodypart,
     boolean disarm)
 {
-    register struct obj *otmp = obj, *otmp2;
+    struct obj *otmp = obj, *otmp2;
     char buf[80];
     const char *msg;
     coord cc;
@@ -6215,7 +6215,7 @@ chest_trap(
 struct trap *
 t_at(coordxy x, coordxy y)
 {
-    register struct trap *trap = gf.ftrap;
+    struct trap *trap = gf.ftrap;
 
     while (trap) {
         if (trap->tx == x && trap->ty == y)
@@ -6388,7 +6388,7 @@ delfloortrap(struct trap *ttmp)
                  || (ttmp->ttyp == TELEP_TRAP) || (ttmp->ttyp == LEVEL_TELEP)
                  || (ttmp->ttyp == WEB) || (ttmp->ttyp == MAGIC_TRAP)
                  || (ttmp->ttyp == ANTI_MAGIC))) {
-        register struct monst *mtmp;
+        struct monst *mtmp;
 
         if (u_at(ttmp->tx, ttmp->ty)) {
             if (u.utraptype != TT_BURIEDBALL)
@@ -6504,7 +6504,7 @@ static const char lava_killer[] = "molten lava";
 boolean
 lava_effects(void)
 {
-    register struct obj *obj, *obj2;
+    struct obj *obj, *obj2;
     boolean usurvive, boil_away;
     unsigned protect_oid = 0;
     int burncount = 0, burnmesgcount = 0;

@@ -42,8 +42,8 @@ move_special(struct monst *mtmp, boolean in_his_shop, schar appr,
              boolean uondoor, boolean avoid,
              coordxy omx, coordxy omy, coordxy ggx, coordxy ggy)
 {
-    register coordxy nx, ny, nix, niy;
-    register schar i;
+    coordxy nx, ny, nix, niy;
+    schar i;
     schar chcnt, cnt;
     coord poss[9];
     long info[9];
@@ -140,7 +140,7 @@ move_special(struct monst *mtmp, boolean in_his_shop, schar appr,
 char
 temple_occupied(char *array)
 {
-    register char *ptr;
+    char *ptr;
 
     for (ptr = array; *ptr; ptr++)
         if (gr.rooms[*ptr - ROOMOFFSET].rtype == TEMPLE)
@@ -396,7 +396,7 @@ has_shrine(struct monst *pri)
 struct monst *
 findpriest(char roomno)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
@@ -687,8 +687,8 @@ struct monst *
 mk_roamer(struct permonst *ptr, aligntyp alignment, coordxy x, coordxy y,
           boolean peaceful)
 {
-    register struct monst *roamer;
-    register boolean coaligned = (u.ualign.type == alignment);
+    struct monst *roamer;
+    boolean coaligned = (u.ualign.type == alignment);
 
 #if 0 /* this was due to permonst's pxlth field which is now gone */
     if (ptr != &mons[PM_ALIGNED_CLERIC] && ptr != &mons[PM_ANGEL])
@@ -735,8 +735,8 @@ in_your_sanctuary(
     struct monst *mon, /* if non-null, <mx,my> overrides <x,y> */
     coordxy x, coordxy y)
 {
-    register char roomno;
-    register struct monst *priest;
+    char roomno;
+    struct monst *priest;
 
     if (mon) {
         if (is_minion(mon->data) || is_rider(mon->data))
@@ -839,7 +839,7 @@ ghod_hitsu(struct monst *priest)
 void
 angry_priest(void)
 {
-    register struct monst *priest;
+    struct monst *priest;
     struct rm *lev;
 
     if ((priest = findpriest(temple_occupied(u.urooms))) != 0) {

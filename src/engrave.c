@@ -266,7 +266,7 @@ u_wipe_engr(int cnt)
 void
 wipe_engr_at(coordxy x, coordxy y, xint16 cnt, boolean magical)
 {
-    register struct engr *ep = engr_at(x, y);
+    struct engr *ep = engr_at(x, y);
 
     /* Headstones and some specially marked engravings are indelible */
     if (ep && ep->engr_type != HEADSTONE && !ep->nowipeout) {

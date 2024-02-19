@@ -33,7 +33,7 @@ extern char erase_char, kill_char; /* from appropriate tty.c file */
  * However, if there is no text yet (or anymore) then "\033" is returned.
  */
 void
-tty_getlin(const char *query, register char *bufp)
+tty_getlin(const char *query, char *bufp)
 {
     suppress_history = FALSE;
     hooked_tty_getlin(query, bufp, (getlin_hook_proc) 0);
@@ -42,11 +42,11 @@ tty_getlin(const char *query, register char *bufp)
 static void
 hooked_tty_getlin(
     const char *query,
-    register char *bufp,
+    char *bufp,
     getlin_hook_proc hook)
 {
-    register char *obufp = bufp;
-    register int c;
+    char *obufp = bufp;
+    int c;
     struct WinDesc *cw = wins[WIN_MESSAGE];
     boolean doprev = FALSE;
 
@@ -223,9 +223,9 @@ hooked_tty_getlin(
 }
 
 void
-xwaitforspace(register const char *s) /* chars allowed besides return */
+xwaitforspace(const char *s) /* chars allowed besides return */
 {
-    register int c, x = ttyDisplay ? (int) ttyDisplay->dismiss_more : '\n';
+    int c, x = ttyDisplay ? (int) ttyDisplay->dismiss_more : '\n';
 
     morc = 0;
     while (

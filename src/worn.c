@@ -48,9 +48,9 @@ const struct worn {
 void
 setworn(struct obj *obj, long mask)
 {
-    register const struct worn *wp;
-    register struct obj *oobj;
-    register int p;
+    const struct worn *wp;
+    struct obj *oobj;
+    int p;
 
     if ((mask & (W_ARM | I_SPECIAL)) == (W_ARM | I_SPECIAL)) {
         /* restoring saved game; no properties are conferred via skin */
@@ -121,8 +121,8 @@ setworn(struct obj *obj, long mask)
 void
 setnotworn(struct obj *obj)
 {
-    register const struct worn *wp;
-    register int p;
+    const struct worn *wp;
+    int p;
 
     if (!obj)
         return;
@@ -619,7 +619,7 @@ update_mon_extrinsics(
 int
 find_mac(struct monst *mon)
 {
-    register struct obj *obj;
+    struct obj *obj;
     int base = mon->data->ac;
     long mwflags = mon->misc_worn_check;
 
@@ -912,7 +912,7 @@ which_armor(struct monst *mon, long flag)
             return 0;
         }
     } else {
-        register struct obj *obj;
+        struct obj *obj;
 
         for (obj = mon->minvent; obj; obj = obj->nobj)
             if (obj->owornmask & flag)
@@ -1061,7 +1061,7 @@ nxt_unbypassed_loot(Loot *lootarray, struct obj *listhead)
 void
 mon_break_armor(struct monst *mon, boolean polyspot)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     struct permonst *mdat = mon->data;
     boolean vis = cansee(mon->mx, mon->my),
             handless_or_tiny = (nohands(mdat) || verysmall(mdat)),

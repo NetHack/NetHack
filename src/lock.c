@@ -667,8 +667,8 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 int
 doforce(void)
 {
-    register struct obj *otmp;
-    register int c, picktyp;
+    struct obj *otmp;
+    int c, picktyp;
     char qbuf[QBUFSZ];
 
     /*
@@ -769,7 +769,7 @@ int
 doopen_indir(coordxy x, coordxy y)
 {
     coord cc;
-    register struct rm *door;
+    struct rm *door;
     boolean portcullis;
     const char *dirprompt;
     int res = ECMD_OK;
@@ -942,8 +942,8 @@ obstructed(coordxy x, coordxy y, boolean quietly)
 int
 doclose(void)
 {
-    register coordxy x, y;
-    register struct rm *door;
+    coordxy x, y;
+    struct rm *door;
     boolean portcullis;
     int res = ECMD_OK;
 
@@ -1087,7 +1087,7 @@ boxlock(struct obj *obj, struct obj *otmp) /* obj *is* a box */
 boolean
 doorlock(struct obj *otmp, coordxy x, coordxy y)
 {
-    register struct rm *door = &levl[x][y];
+    struct rm *door = &levl[x][y];
     boolean res = TRUE;
     int loudness = 0;
     const char *msg = (const char *) 0;

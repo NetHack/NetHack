@@ -489,8 +489,8 @@ tputs(const char *string, /* characters to output */
       int (*output_func)(int)) /* actual output routine;
                                   * return value ignored */
 {
-    register int c, num = 0;
-    register const char *p = string;
+    int c, num = 0;
+    const char *p = string;
 
     if (!p || !*p)
         return;

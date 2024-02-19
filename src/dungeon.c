@@ -1201,7 +1201,7 @@ void
 init_dungeons(void)
 {
     lua_State *L;
-    register int i, cl = 0;
+    int i, cl = 0;
     struct proto_dungeon pd;
     int tidx;
     nhl_sandbox_info sbi = {NHL_SB_SAFE, 1*1024*1024, 0, 1*1024*1024};
@@ -1349,7 +1349,7 @@ deepest_lev_reached(boolean noquest)
      * calculation.  _However_ the Quest is a difficult dungeon, so we
      * include it in the factor of difficulty calculations.
      */
-    register int i;
+    int i;
     d_level tmp;
     xint16 ret = 0;
 

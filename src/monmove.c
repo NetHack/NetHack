@@ -158,7 +158,7 @@ m_break_boulder(struct monst *mtmp, coordxy x, coordxy y)
 }
 
 static void
-watch_on_duty(register struct monst* mtmp)
+watch_on_duty(struct monst* mtmp)
 {
     coordxy x, y;
 
@@ -187,7 +187,7 @@ watch_on_duty(register struct monst* mtmp)
 /* move a monster; if a threat to busy hero, stop doing whatever it is */
 int
 dochugw(
-    register struct monst *mtmp,
+    struct monst *mtmp,
     boolean chug) /* True: monster is moving;
                    * False: monster was just created or has teleported
                    * so perform stop-what-you're-doing-if-close-enough-
@@ -299,7 +299,7 @@ mon_regen(struct monst *mon, boolean digest_meal)
  * jolted awake.
  */
 static int
-disturb(register struct monst *mtmp)
+disturb(struct monst *mtmp)
 {
     /*
      * + Ettins are hard to surprise.
@@ -528,7 +528,7 @@ m_arrival(struct monst* mon)
 
 /* a mind flayer unleashes a mind blast  */
 static void
-mind_blast(register struct monst* mtmp)
+mind_blast(struct monst* mtmp)
 {
     struct monst *m2, *nmon = (struct monst *) 0;
 
@@ -597,10 +597,10 @@ mind_blast(register struct monst* mtmp)
  * code. --KAA
  */
 int
-dochug(register struct monst* mtmp)
+dochug(struct monst* mtmp)
 {
-    register struct permonst *mdat;
-    register int status = MMOVE_NOTHING;
+    struct permonst *mdat;
+    int status = MMOVE_NOTHING;
     int inrange, nearby, scared, res;
     struct obj *otmp;
     boolean panicattk = FALSE;
@@ -964,7 +964,7 @@ mon_would_consume_item(struct monst *mtmp, struct obj *otmp)
 }
 
 boolean
-itsstuck(register struct monst* mtmp)
+itsstuck(struct monst* mtmp)
 {
     if (sticks(gy.youmonst.data) && mtmp == u.ustuck && !u.uswallow) {
         pline("%s cannot escape from you!", Monnam(mtmp));
@@ -992,7 +992,7 @@ should_displace(
     int shortest_with_displacing = -1;
     int shortest_without_displacing = -1;
     int count_without_displacing = 0;
-    register int i, nx, ny;
+    int i, nx, ny;
     int ndist;
 
     for (i = 0; i < cnt; i++) {
@@ -1194,9 +1194,9 @@ m_search_items(
     int *mmoved,
     int *appr)
 {
-    register int minr = SQSRCHRADIUS; /* not too far away */
-    register struct obj *otmp;
-    register coordxy xx, yy;
+    int minr = SQSRCHRADIUS; /* not too far away */
+    struct obj *otmp;
+    coordxy xx, yy;
     coordxy hmx, hmy, lmx, lmy;
     struct trap *ttmp;
     coordxy omx = mtmp->mx, omy = mtmp->my;
@@ -1565,7 +1565,7 @@ postmov(
  * 3: did not move, and can't do anything else either.
  */
 int
-m_move(register struct monst *mtmp, int after)
+m_move(struct monst *mtmp, int after)
 {
     int appr;
     coordxy ggx, ggy, nix, niy;
@@ -1727,7 +1727,7 @@ m_move(register struct monst *mtmp, int after)
             appr = -1;
 
         if (!should_see && can_track(ptr)) {
-            register coord *cp;
+            coord *cp;
 
             cp = gettrack(omx, omy);
             if (cp) {
@@ -2035,7 +2035,7 @@ accessible(coordxy x, coordxy y)
 
 /* decide where the monster thinks you are standing */
 void
-set_apparxy(register struct monst *mtmp)
+set_apparxy(struct monst *mtmp)
 {
     boolean notseen, notthere, gotu;
     int displ;
@@ -2079,7 +2079,7 @@ set_apparxy(register struct monst *mtmp)
     gotu = notseen ? !rn2(3) : notthere ? !rn2(4) : FALSE;
 
     if (!gotu) {
-        register int try_cnt = 0;
+        int try_cnt = 0;
 
         do {
             if (++try_cnt > 200) {

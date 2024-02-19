@@ -79,7 +79,7 @@ veryold(int fd)
 static int
 eraseoldlocks(void)
 {
-    register int i;
+    int i;
 
 #if defined(HANGUPHANDLING)
     gp.program_state.preserve_locks = 0; /* not required but shows intent */
@@ -256,7 +256,7 @@ getlock(void)
 void
 regularize(char *s)
 {
-    register char *lp;
+    char *lp;
 
     while ((lp = strchr(s, '.')) != 0 || (lp = strchr(s, '/')) != 0
            || (lp = strchr(s, ' ')) != 0)
@@ -329,7 +329,7 @@ dosh(void)
 int
 child(int wt)
 {
-    register int f;
+    int f;
 
     suspend_nhwindows((char *) 0); /* also calls end_screen() */
 #ifdef _M_UNIX

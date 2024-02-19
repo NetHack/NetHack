@@ -1438,8 +1438,8 @@ savelife(int how)
 static void
 get_valuables(struct obj *list) /* inventory or container contents */
 {
-    register struct obj *obj;
-    register int i;
+    struct obj *obj;
+    int i;
 
     /* find amulets and gems, ignoring all artifacts */
     for (obj = list; obj; obj = obj->nobj)
@@ -1475,7 +1475,7 @@ sort_valuables(
     struct valuable_data list[],
     int size) /* max value is less than 20 */
 {
-    register int i, j;
+    int i, j;
     struct valuable_data ltmp;
 
     /* move greater quantities to the front of the list */
@@ -2094,8 +2094,8 @@ really_done(int how)
     if (how == ESCAPED || how == ASCENDED) {
         struct monst *mtmp;
         struct obj *otmp;
-        register struct val_list *val;
-        register int i;
+        struct val_list *val;
+        int i;
 
         for (val = gv.valuables; val->list; val++)
             for (i = 0; i < val->size; i++) {
@@ -2263,7 +2263,7 @@ container_contents(
     boolean all_containers,
     boolean reportempty)
 {
-    register struct obj *box, *obj;
+    struct obj *box, *obj;
     char buf[BUFSZ];
     boolean cat, dumping = iflags.in_dumplog;
 

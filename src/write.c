@@ -102,9 +102,9 @@ write_ok(struct obj *obj)
 int
 dowrite(struct obj *pen)
 {
-    register struct obj *paper;
+    struct obj *paper;
     char namebuf[BUFSZ] = DUMMY, *nm, *bp;
-    register struct obj *new_obj;
+    struct obj *new_obj;
     int basecost, actualcost;
     int curseval;
     char qbuf[QBUFSZ];

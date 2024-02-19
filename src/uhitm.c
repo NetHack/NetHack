@@ -4757,7 +4757,7 @@ damageum(
 int
 explum(struct monst *mdef, struct attack *mattk)
 {
-    register int tmp = d((int) mattk->damn, (int) mattk->damd);
+    int tmp = d((int) mattk->damn, (int) mattk->damd);
 
     switch (mattk->adtyp) {
     case AD_BLND:
@@ -4825,8 +4825,8 @@ static int
 gulpum(struct monst *mdef, struct attack *mattk)
 {
     static char msgbuf[BUFSZ]; /* for gn.nomovemsg */
-    register int tmp;
-    register int dam = d((int) mattk->damn, (int) mattk->damd);
+    int tmp;
+    int dam = d((int) mattk->damn, (int) mattk->damd);
     boolean fatal_gulp,
             u_digest = digests(gy.youmonst.data),
             u_enfold = enfolds(gy.youmonst.data);

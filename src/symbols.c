@@ -97,7 +97,7 @@ init_symbols(void)
 void
 init_showsyms(void)
 {
-    register int i;
+    int i;
 
     for (i = 0; i < MAXPCHARS; i++)
         gs.showsyms[i + SYM_OFF_P] = defsyms[i].sym;
@@ -115,7 +115,7 @@ init_showsyms(void)
 void
 init_ov_rogue_symbols(void)
 {
-    register int i;
+    int i;
 
     for (i = 0; i < SYM_MAX; i++)
         go.ov_rogue_syms[i] = (nhsym) 0;
@@ -124,7 +124,7 @@ init_ov_rogue_symbols(void)
 void
 init_ov_primary_symbols(void)
 {
-    register int i;
+    int i;
 
     for (i = 0; i < SYM_MAX; i++)
         go.ov_primary_syms[i] = (nhsym) 0;
@@ -169,7 +169,7 @@ get_othersym(int idx, int which_set)
 void
 init_primary_symbols(void)
 {
-    register int i;
+    int i;
 
     for (i = 0; i < MAXPCHARS; i++)
         gp.primary_syms[i + SYM_OFF_P] = defsyms[i].sym;
@@ -189,7 +189,7 @@ init_primary_symbols(void)
 void
 init_rogue_symbols(void)
 {
-    register int i;
+    int i;
 
     /* These are defaults that can get overwritten
        later by the roguesymbols option */
@@ -219,7 +219,7 @@ init_rogue_symbols(void)
 void
 assign_graphics(int whichset)
 {
-    register int i;
+    int i;
 
     switch (whichset) {
     case ROGUESET:
@@ -255,7 +255,7 @@ assign_graphics(int whichset)
 void
 switch_symbols(int nondefault)
 {
-    register int i;
+    int i;
 
     if (nondefault) {
         for (i = 0; i < SYM_MAX; i++)
@@ -764,7 +764,7 @@ savedsym_strbuf(strbuf_t *sbuf)
 
 /* Parse the value of a SYMBOLS line from a config file */
 boolean
-parsesymbols(register char *opts, int which_set)
+parsesymbols(char *opts, int which_set)
 {
     int val;
     char *symname, *strval, *ch,

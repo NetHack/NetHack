@@ -88,7 +88,7 @@ boolean
 pcmain(int argc, char *argv[])
 {
     NHFILE *nhfp;
-    register char *dir;
+    char *dir;
 #if defined(MSDOS)
     char *envp = NULL;
     char *sptr = NULL;

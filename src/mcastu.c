@@ -174,8 +174,8 @@ choose_clerical_spell(int spellnum)
  */
 int
 castmu(
-    register struct monst *mtmp,   /* caster */
-    register struct attack *mattk, /* caster's current attack */
+    struct monst *mtmp,   /* caster */
+    struct attack *mattk, /* caster's current attack */
     boolean thinks_it_foundyou,    /* might be mistaken if displaced */
     boolean foundyou)              /* knows hero's precise location */
 {

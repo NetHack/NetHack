@@ -979,9 +979,9 @@ static char *
 xcrypt(const char* str)
 { /* duplicated in src/hacklib.c */
     static char buf[BUFSZ];
-    register const char *p;
-    register char *q;
-    register int bitmask;
+    const char *p;
+    char *q;
+    int bitmask;
 
     for (bitmask = 1, p = str, q = buf; *p; q++) {
         *q = *p++;
@@ -1418,7 +1418,7 @@ do_oracles(void)
     long fpos;
     unsigned long txt_offset, offset;
     int oracle_cnt;
-    register int i;
+    int i;
     char *line;
 
     Sprintf(tempfile, DATA_TEMPLATE, "oracles.tmp");

@@ -260,7 +260,7 @@ static boolean
 cause_known(
     int propindx) /* index of a property which can be conveyed by worn item */
 {
-    register struct obj *o;
+    struct obj *o;
     long mask = W_ARMOR | W_AMUL | W_RING | W_TOOL;
 
     /* simpler than from_what()/what_gives(); we don't attempt to
@@ -2720,7 +2720,7 @@ dovanquished(void)
 void
 list_vanquished(char defquery, boolean ask)
 {
-    register int i;
+    int i;
     int pfx, nkilled;
     unsigned ntypes, ni;
     long total_killed = 0L;
@@ -2918,7 +2918,7 @@ num_gone(int mvflags, int *mindx)
 void
 list_genocided(char defquery, boolean ask)
 {
-    register int i, mndx;
+    int i, mndx;
     int ngenocided, nextinct, ngone, mvflags, mindx[NUMMONS];
     char c;
     winid klwin;

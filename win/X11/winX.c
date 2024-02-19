@@ -422,8 +422,8 @@ nhApproxColor(
     long cdiff = 16777216; /* 2^24; hopefully our map is smaller */
     XColor tmp;
     static XColor *table = 0;
-    register int i, j;
-    register long tdiff;
+    int i, j;
+    long tdiff;
 
     /* if the screen doesn't have a big colormap, don't waste our time
        or if it's huge, and _some_ match should have been possible */

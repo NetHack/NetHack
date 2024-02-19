@@ -2205,7 +2205,7 @@ doquickwhatis(void)
 int
 doidtrap(void)
 {
-    register struct trap *trap;
+    struct trap *trap;
     int tt, glyph;
     coordxy x, y;
 

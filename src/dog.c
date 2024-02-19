@@ -189,8 +189,8 @@ make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
 struct monst *
 makedog(void)
 {
-    register struct monst *mtmp;
-    register struct obj *otmp;
+    struct monst *mtmp;
+    struct obj *otmp;
     const char *petname;
     int pettype;
 
@@ -255,7 +255,7 @@ static struct monst *failed_arrivals = 0;
 void
 losedogs(void)
 {
-    register struct monst *mtmp, **mprev;
+    struct monst *mtmp, **mprev;
     int dismissKops = 0, xyloc;
 
     failed_arrivals = 0;
@@ -731,7 +731,7 @@ void
 keepdogs(
     boolean pets_only) /* true for ascension or final escape */
 {
-    register struct monst *mtmp, *mtmp2;
+    struct monst *mtmp, *mtmp2;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp2) {
         mtmp2 = mtmp->nmon;

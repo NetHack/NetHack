@@ -748,7 +748,7 @@ nokiller(void)
 void
 close_drawbridge(coordxy x, coordxy y)
 {
-    register struct rm *lev1, *lev2;
+    struct rm *lev1, *lev2;
     struct trap *t;
     coordxy x2, y2;
 
@@ -813,7 +813,7 @@ close_drawbridge(coordxy x, coordxy y)
 void
 open_drawbridge(coordxy x, coordxy y)
 {
-    register struct rm *lev1, *lev2;
+    struct rm *lev1, *lev2;
     struct trap *t;
     coordxy x2, y2;
 
@@ -861,7 +861,7 @@ open_drawbridge(coordxy x, coordxy y)
 void
 destroy_drawbridge(coordxy x, coordxy y)
 {
-    register struct rm *lev1, *lev2;
+    struct rm *lev1, *lev2;
     struct trap *t;
     struct obj *otmp;
     coordxy x2, y2;

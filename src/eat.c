@@ -86,7 +86,7 @@ static int getobj_else = 0;
  * polymorphed character.  Not used for monster checks.
  */
 boolean
-is_edible(register struct obj *obj)
+is_edible(struct obj *obj)
 {
     /* protect invocation tools but not Rider corpses (handled elsewhere)*/
     /* if (obj->oclass != FOOD_CLASS && obj_resists(obj, 0, 0)) */
@@ -772,7 +772,7 @@ maybe_cannibal(int pm, boolean allowmsg)
 }
 
 static void
-cprefx(register int pm)
+cprefx(int pm)
 {
     (void) maybe_cannibal(pm, TRUE);
     if (flesh_petrifies(&mons[pm])) {
@@ -979,7 +979,7 @@ temp_givit(int type, struct permonst *ptr)
  * and what type of intrinsic it is trying to give you.
  */
 static void
-givit(int type, register struct permonst *ptr)
+givit(int type, struct permonst *ptr)
 {
     debugpline1("Attempting to give intrinsic %d", type);
 
@@ -1642,7 +1642,7 @@ static void
 start_tin(struct obj *otmp)
 {
     const char *mesg = 0;
-    register int tmp;
+    int tmp;
 
     if (metallivorous(gy.youmonst.data)) {
         mesg = "You bite right into the metal tin...";
@@ -3465,7 +3465,7 @@ floorfood(
     const char *verb,
     int corpsecheck) /* 0, no check, 1, corpses, 2, tinnable corpses */
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     char qbuf[QBUFSZ];
     char c;
     struct permonst *uptr = gy.youmonst.data;

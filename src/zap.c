@@ -1438,7 +1438,7 @@ obj_shudders(struct obj *obj)
 static void
 polyuse(struct obj *objhdr, int mat, int minwt)
 {
-    register struct obj *otmp, *otmp2;
+    struct obj *otmp, *otmp2;
 
     for (otmp = objhdr; minwt > 0 && otmp; otmp = otmp2) {
         otmp2 = otmp->nexthere;
@@ -2348,7 +2348,7 @@ bhitpile(
     coordxy tx, coordxy ty,     /* target location */
     schar zz)                   /* direction for up/down zaps */
 {
-    register struct obj *otmp, *next_obj;
+    struct obj *otmp, *next_obj;
     boolean hidingunder, first;
     int prevotyp, hitanything = 0;
 
@@ -4011,7 +4011,7 @@ bhit(
 struct monst *
 boomhit(struct obj *obj, coordxy dx, coordxy dy)
 {
-    register int i, ct;
+    int i, ct;
     int boom; /* showsym[] index  */
     struct monst *mtmp;
     boolean counterclockwise = URIGHTY; /* ULEFTY => clockwise */
@@ -4207,7 +4207,7 @@ zhitm(
             && !(type > 0 && engulfing_u(mon))
             && nd > 2) {
             /* sufficiently powerful lightning blinds monsters */
-            register unsigned rnd_tmp = rnd(50);
+            unsigned rnd_tmp = rnd(50);
             mon->mcansee = 0;
             if ((mon->mblinded + rnd_tmp) > 127)
                 mon->mblinded = 127;
@@ -4599,7 +4599,7 @@ dobuzz(
     boolean say)    /* announce out of sight hit/miss events if true */
 {
     int range, fltyp = zaptype(type), damgtype = fltyp % 10;
-    register coordxy lsx, lsy;
+    coordxy lsx, lsy;
     struct monst *mon;
     coord save_bhitpos;
     boolean shopdamage = FALSE,
@@ -4613,7 +4613,7 @@ dobuzz(
     spell_type = is_hero_spell(type) ? SPE_MAGIC_MISSILE + damgtype : 0;
 
     if (u.uswallow) {
-        register int tmp;
+        int tmp;
 
         if (type < 0)
             return;
@@ -5715,7 +5715,7 @@ destroy_one_item(struct obj *obj, int osym, int dmgtyp)
 void
 destroy_item(int osym, int dmgtyp)
 {
-    register struct obj *obj;
+    struct obj *obj;
     int i, deferral_indx = 0;
     /* 1+52+1: try to handle a full inventory; it doesn't matter if
       inventory actually has more, even if everything should be deferred */

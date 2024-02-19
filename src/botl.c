@@ -50,8 +50,8 @@ char *
 do_statusline1(void)
 {
     static char newbot1[BUFSZ];
-    register char *nb;
-    register int i, j;
+    char *nb;
+    int i, j;
 
     if (suppress_map_output())
         return strcpy(newbot1, "");
@@ -107,7 +107,7 @@ do_statusline2(void)
             experience (HD if poly'd, else Exp level and maybe Exp points),
             time (in moves), varying number of status conditions */
          dloc[QBUFSZ], hlth[QBUFSZ], expr[QBUFSZ], tmmv[QBUFSZ], cond[QBUFSZ];
-    register char *nb;
+    char *nb;
     size_t dln, dx, hln, xln, tln, cln;
     int hp, hpmax, cap;
     long money;
@@ -324,8 +324,8 @@ rank_to_xlev(int rank)
 const char *
 rank_of(int lev, short monnum, boolean female)
 {
-    register const struct Role *role;
-    register int i;
+    const struct Role *role;
+    int i;
 
     /* Find the role */
     for (role = roles; role->name.m; role++)
@@ -727,7 +727,7 @@ bot_via_windowport(void)
 {
     char buf[BUFSZ];
     const char *titl;
-    register char *nb;
+    char *nb;
     int i, idx, cap;
     long money;
 

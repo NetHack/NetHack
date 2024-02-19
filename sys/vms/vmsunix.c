@@ -57,7 +57,7 @@ static void hack_resume(boolean);
 static int
 veryold(int fd)
 {
-    register int i;
+    int i;
     time_t date;
     struct stat buf;
 
@@ -99,7 +99,7 @@ veryold(int fd)
 void
 getlock(void)
 {
-    register int i = 0, fd;
+    int i = 0, fd;
 
     /* idea from rpick%ucqais@uccba.uc.edu
      * prevent automated rerolling of characters
@@ -165,9 +165,9 @@ getlock(void)
 }
 
 /* normalize file name */
-void regularize(register char *s)
+void regularize(char *s)
 {
-    register char *lp;
+    char *lp;
 
     for (lp = s; *lp; lp++) /* note: '-' becomes '_' */
         if (!(isalpha(*lp) || isdigit(*lp) || *lp == '$'))
@@ -308,7 +308,7 @@ verify_term(void)
 
         if (devtype && vms_ok(smg$init_term_table_by_type(&devtype, &termtab,
                                                           &smgdsc))) {
-            register char *p = &smgdevtyp[smgdsc.dsc$w_length];
+            char *p = &smgdevtyp[smgdsc.dsc$w_length];
             /* strip trailing blanks */
             while (p > smgdevtyp && *--p == ' ')
                 *p = '\0';

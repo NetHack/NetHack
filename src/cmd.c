@@ -462,7 +462,7 @@ cmdq_clear(int q)
 char
 pgetchar(void) /* courtesy of aeb@cwi.nl */
 {
-    register int ch = '\0';
+    int ch = '\0';
 
     if (iflags.debug_fuzzer)
         return randomkey();
@@ -579,7 +579,7 @@ doc_extcmd_flagstr(
 int
 doextlist(void)
 {
-    register const struct ext_func_tab *efp = (struct ext_func_tab *) 0;
+    const struct ext_func_tab *efp = (struct ext_func_tab *) 0;
     char buf[BUFSZ], searchbuf[BUFSZ], descbuf[BUFSZ], promptbuf[QBUFSZ];
     const char *cmd_desc;
     winid menuwin;
@@ -4552,7 +4552,7 @@ void
 parseautocomplete(char *autocomplete, boolean condition)
 {
     struct ext_func_tab *efp;
-    register char *autoc;
+    char *autoc;
 
     /* break off first autocomplete from the rest; parse the rest */
     if ((autoc = strchr(autocomplete, ',')) != 0
@@ -4932,7 +4932,7 @@ rhack(int key)
     /* handle most movement commands */
     gc.context.travel = gc.context.travel1 = 0;
     {
-        register const struct ext_func_tab *tlist;
+        const struct ext_func_tab *tlist;
         int res, (*func)(void);
 
  do_cmdq_extcmd:
@@ -5097,7 +5097,7 @@ rhack(int key)
 coordxy
 xytod(coordxy x, coordxy y)
 {
-    register int dd;
+    int dd;
 
     for (dd = 0; dd < N_DIRS; dd++)
         if (x == xdir[dd] && y == ydir[dd])
@@ -5549,7 +5549,7 @@ directionname(int dir)
 }
 
 int
-isok(register coordxy x, register coordxy y)
+isok(coordxy x, coordxy y)
 {
     /* x corresponds to curx, so x==1 is the first column. Ach. %% */
     return x >= 1 && x <= COLNO - 1 && y >= 0 && y <= ROWNO - 1;
@@ -6316,7 +6316,7 @@ get_count(
 static int
 parse(void)
 {
-    register int foo;
+    int foo;
 
     iflags.in_parse = TRUE;
     gc.command_count = 0;
@@ -6420,7 +6420,7 @@ end_of_input(void)
 static char
 readchar_core(coordxy *x, coordxy *y, int *mod)
 {
-    register int sym;
+    int sym;
 
     if (iflags.debug_fuzzer) {
         sym = randomkey();
@@ -6435,7 +6435,7 @@ readchar_core(coordxy *x, coordxy *y, int *mod)
 
 #ifdef NR_OF_EOFS
     if (sym == EOF) {
-        register int cnt = NR_OF_EOFS;
+        int cnt = NR_OF_EOFS;
         /*
          * Some SYSV systems seem to return EOFs for various reasons
          * (?like when one hits break or for interrupted systemcalls?),

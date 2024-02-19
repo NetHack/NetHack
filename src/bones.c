@@ -353,7 +353,7 @@ fixuporacle(struct monst *oracle)
 boolean
 can_make_bones(void)
 {
-    register struct trap *ttmp;
+    struct trap *ttmp;
 
     if (!flags.bones)
         return FALSE;
@@ -665,7 +665,7 @@ getbones(void)
             }
             trickery(errbuf);
         } else {
-            register struct monst *mtmp;
+            struct monst *mtmp;
 
             getlev(nhfp, 0, 0);
 

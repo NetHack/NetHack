@@ -2186,7 +2186,7 @@ some_mon_nam(struct monst *mtmp)
 char *
 Monnam(struct monst *mtmp)
 {
-    register char *bp = mon_nam(mtmp);
+    char *bp = mon_nam(mtmp);
 
     *bp = highc(*bp);
     return  bp;
@@ -2195,7 +2195,7 @@ Monnam(struct monst *mtmp)
 char *
 noit_Monnam(struct monst *mtmp)
 {
-    register char *bp = noit_mon_nam(mtmp);
+    char *bp = noit_mon_nam(mtmp);
 
     *bp = highc(*bp);
     return  bp;

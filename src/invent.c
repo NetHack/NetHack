@@ -703,8 +703,8 @@ void
 assigninvlet(struct obj *otmp)
 {
     boolean inuse[invlet_basic];
-    register int i;
-    register struct obj *obj;
+    int i;
+    struct obj *obj;
 
     /* there should be at most one of these in inventory... */
     if (otmp->oclass == COIN_CLASS) {
@@ -822,7 +822,7 @@ merge_choice(struct obj *objlist, struct obj *obj)
 int
 merged(struct obj **potmp, struct obj **pobj)
 {
-    register struct obj *otmp = *potmp, *obj = *pobj;
+    struct obj *otmp = *potmp, *obj = *pobj;
     boolean discovered = FALSE;
 
     if (mergable(otmp, obj)) {
@@ -1435,7 +1435,7 @@ delobj_core(
 struct obj *
 sobj_at(int otyp, coordxy x, coordxy y)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     for (otmp = gl.level.objects[x][y]; otmp; otmp = otmp->nexthere)
         if (otmp->otyp == otyp)
@@ -1448,7 +1448,7 @@ sobj_at(int otyp, coordxy x, coordxy y)
 struct obj *
 nxtobj(struct obj *obj, int type, boolean by_nexthere)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     otmp = obj; /* start with the object after this one */
     do {
@@ -1464,7 +1464,7 @@ nxtobj(struct obj *obj, int type, boolean by_nexthere)
 struct obj *
 carrying(int type)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     /* this could be replaced by 'return m_carrying(&gy.youmonst, type);' */
     for (otmp = gi.invent; otmp; otmp = otmp->nobj)
@@ -1533,7 +1533,7 @@ u_carried_gloves(void)
 struct obj *
 u_have_novel(void)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     for (otmp = gi.invent; otmp; otmp = otmp->nobj)
         if (otmp->otyp == SPE_NOVEL)
@@ -1559,7 +1559,7 @@ o_on(unsigned int id, struct obj *objchn)
 boolean
 obj_here(struct obj *obj, coordxy x, coordxy y)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     for (otmp = gl.level.objects[x][y]; otmp; otmp = otmp->nexthere)
         if (obj == otmp)
@@ -1570,7 +1570,7 @@ obj_here(struct obj *obj, coordxy x, coordxy y)
 struct obj *
 g_at(coordxy x, coordxy y)
 {
-    register struct obj *obj = gl.level.objects[x][y];
+    struct obj *obj = gl.level.objects[x][y];
 
     while (obj) {
         if (obj->oclass == COIN_CLASS)
@@ -1584,8 +1584,8 @@ g_at(coordxy x, coordxy y)
 static void
 compactify(char *buf)
 {
-    register int i1 = 1, i2 = 1;
-    register char ilet, ilet1, ilet2;
+    int i1 = 1, i2 = 1;
+    char ilet, ilet1, ilet2;
 
     ilet2 = buf[0];
     ilet1 = buf[1];
@@ -1712,12 +1712,12 @@ getobj(
     int (*obj_ok)(OBJ_P),   /* callback to classify an object's suitability */
     unsigned int ctrlflags) /* some control to fine-tune the behavior */
 {
-    register struct obj *otmp;
-    register char ilet = 0;
+    struct obj *otmp;
+    char ilet = 0;
     char buf[BUFSZ], qbuf[QBUFSZ];
     char lets[BUFSZ], altlets[BUFSZ];
-    register int suggested = 0;
-    register char *bp = buf, *ap = altlets;
+    int suggested = 0;
+    char *bp = buf, *ap = altlets;
     boolean allowcnt = (ctrlflags & GETOBJ_ALLOWCNT),
             forceprompt = (ctrlflags & GETOBJ_PROMPT),
             allownone = FALSE;
@@ -4803,8 +4803,8 @@ stackobj(struct obj *obj)
 /* returns TRUE if obj & otmp can be merged; used in invent.c and mkobj.c */
 boolean
 mergable(
-    register struct obj *otmp, /* potential 'into' stack */
-    register struct obj *obj)  /* 'combine' stack */
+    struct obj *otmp, /* potential 'into' stack */
+    struct obj *obj)  /* 'combine' stack */
 {
     size_t objnamelth = 0, otmpnamelth = 0;
 

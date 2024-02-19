@@ -115,7 +115,7 @@ lowc(char c)
 char *
 lcase(char *s)
 {
-    register char *p;
+    char *p;
 
     for (p = s; *p; p++)
         if ('A' <= *p && *p <= 'Z')
@@ -127,7 +127,7 @@ lcase(char *s)
 char *
 ucase(char *s)
 {
-    register char *p;
+    char *p;
 
     for (p = s; *p; p++)
         if ('a' <= *p && *p <= 'z')
@@ -167,7 +167,7 @@ upwords(char *s)
 char *
 mungspaces(char *bp)
 {
-    register char c, *p, *p2;
+    char c, *p, *p2;
     boolean was_space = TRUE;
 
     for (p = p2 = bp; (c = *p) != '\0'; p++) {
@@ -217,7 +217,7 @@ strip_newline(char *str)
 
 /* return the end of a string (pointing at '\0') */
 char *
-eos(register char *s)
+eos(char *s)
 {
     while (*s)
         s++; /* s += strlen(s); */
@@ -422,9 +422,9 @@ ing_suffix(const char *s)
 char *
 xcrypt(const char *str, char *buf)
 {
-    register const char *p;
-    register char *q;
-    register int bitmask;
+    const char *p;
+    char *q;
+    int bitmask;
 
     for (bitmask = 1, p = str, q = buf; *p; q++) {
         *q = *p++;
@@ -455,8 +455,8 @@ tabexpand(
                  * will be truncated */
 {
     char buf[BUFSZ + 10];
-    register char *bp, *s = sbuf;
-    register int idx;
+    char *bp, *s = sbuf;
+    int idx;
 
     if (!*s)
         return sbuf;
@@ -493,7 +493,7 @@ visctrl(char c)
 {
     static char visctrl_bufs[VISCTRL_NBUF][5];
     static int nbuf = 0;
-    register int i = 0;
+    int i = 0;
     char *ccc = visctrl_bufs[nbuf];
     nbuf = (nbuf + 1) % VISCTRL_NBUF;
 
@@ -645,7 +645,7 @@ findword(
 const char *
 ordin(int n)               /* note: should be non-negative */
 {
-    register int dd = n % 10;
+    int dd = n % 10;
 
     return (dd == 0 || dd > 3 || (n % 100) / 10 == 1) ? "th"
                : (dd == 1) ? "st" : (dd == 2) ? "nd" : "rd";
@@ -828,10 +828,10 @@ pmatchz(const char *patrn, const char *strng)
 /* case insensitive counted string comparison */
 /*{ aka strncasecmp }*/
 int
-strncmpi(register const char *s1, register const char *s2,
-         register int n) /*(should probably be size_t, which is unsigned)*/
+strncmpi(const char *s1, const char *s2,
+         int n) /*(should probably be size_t, which is unsigned)*/
 {
-    register char t1, t2;
+    char t1, t2;
 
     while (n--) {
         if (!*s2)
@@ -852,8 +852,8 @@ strncmpi(register const char *s1, register const char *s2,
 char *
 strstri(const char *str, const char *sub)
 {
-    register const char *s1, *s2;
-    register int i, k;
+    const char *s1, *s2;
+    int i, k;
 #define TABSIZ 0x20                  /* 0x40 would be case-sensitive */
     char tstr[TABSIZ], tsub[TABSIZ]; /* nibble count tables */
 #if 0
@@ -898,7 +898,7 @@ boolean
 fuzzymatch(const char *s1, const char *s2, const char *ignore_chars,
            boolean caseblind)
 {
-    register char c1, c2;
+    char c1, c2;
 
     do {
         while ((c1 = *s1++) != '\0' && strchr(ignore_chars, c1) != 0)
@@ -1183,8 +1183,8 @@ time_from_yyyymmddhhmmss(char *buf)
 int
 phase_of_the_moon(void) /* 0-7, with 0: new, 4: full */
 {
-    register struct tm *lt = getlt();
-    register int epact, diy, goldn;
+    struct tm *lt = getlt();
+    int epact, diy, goldn;
 
     diy = lt->tm_yday;
     goldn = (lt->tm_year % 19) + 1;
@@ -1198,7 +1198,7 @@ phase_of_the_moon(void) /* 0-7, with 0: new, 4: full */
 boolean
 friday_13th(void)
 {
-    register struct tm *lt = getlt();
+    struct tm *lt = getlt();
 
     /* tm_wday (day of week; 0==Sunday) == 5 => Friday */
     return (boolean) (lt->tm_wday == 5 && lt->tm_mday == 13);
@@ -1207,7 +1207,7 @@ friday_13th(void)
 int
 night(void)
 {
-    register int hour = getlt()->tm_hour;
+    int hour = getlt()->tm_hour;
 
     return (hour < 6 || hour > 21);
 }

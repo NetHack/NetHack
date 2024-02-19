@@ -36,8 +36,8 @@ settrack(void)
 coord *
 gettrack(coordxy x, coordxy y)
 {
-    register int cnt, ndist;
-    register coord *tc;
+    int cnt, ndist;
+    coord *tc;
     cnt = utcnt;
     for (tc = &utrack[utpnt]; cnt--;) {
         if (tc == utrack)

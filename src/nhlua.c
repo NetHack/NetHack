@@ -1337,7 +1337,7 @@ nhl_debug_flags(lua_State *L)
     if (val != -1) {
         iflags.debug_mongen = !(boolean) val; /* value in lua is negated */
         if (iflags.debug_mongen) {
-            register struct monst *mtmp, *mtmp2;
+            struct monst *mtmp, *mtmp2;
 
             for (mtmp = fmon; mtmp; mtmp = mtmp2) {
                 mtmp2 = mtmp->nmon;

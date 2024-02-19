@@ -759,7 +759,7 @@ vault_tele(void)
 }
 
 boolean
-teleport_pet(register struct monst* mtmp, boolean force_it)
+teleport_pet(struct monst* mtmp, boolean force_it)
 {
     struct obj *otmp;
 
@@ -1109,7 +1109,7 @@ void
 level_tele(void)
 {
     static const char get_there_from[] = "get there from %s.";
-    register int newlev;
+    int newlev;
     d_level newlevel;
     const char *escape_by_flying = 0; /* when surviving dest of -N */
     char buf[BUFSZ];

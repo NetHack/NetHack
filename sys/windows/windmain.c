@@ -1250,7 +1250,7 @@ windows_getlin(const char* prompt UNUSED, char* outbuf)
 static int
 eraseoldlocks(void)
 {
-    register int i;
+    int i;
 
     /* cannot use maxledgerno() here, because we need to find a lock name
      * before starting everything (including the dungeon initialization
@@ -1454,7 +1454,7 @@ file_newer(const char* a_path, const char* b_path)
 int
 tty_self_recover_prompt(void)
 {
-    register int c, ci, ct, pl, retval = 0;
+    int c, ci, ct, pl, retval = 0;
     /* for saving/replacing functions, if needed */
     struct window_procs saved_procs = {0};
 
@@ -1522,7 +1522,7 @@ tty_self_recover_prompt(void)
 int
 other_self_recover_prompt(void)
 {
-    register int c, ci, ct, pl, retval = 0;
+    int c, ci, ct, pl, retval = 0;
     boolean ismswin = WINDOWPORT(mswin),
             iscurses = WINDOWPORT(curses);
 

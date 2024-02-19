@@ -73,7 +73,7 @@ ATTRNORETURN extern void panic(const char *, ...) PRINTF_F(1, 2) NORETURN;
 long *
 alloc(unsigned int lth)
 {
-    register genericptr_t ptr;
+    genericptr_t ptr;
 
     ForceAlignedLength(lth);
     ptr = malloc(lth);

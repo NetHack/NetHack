@@ -692,7 +692,7 @@ number_leashed(void)
 void
 o_unleash(struct obj *otmp)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
         if (mtmp->m_id == (unsigned) otmp->leashmon) {
@@ -707,7 +707,7 @@ o_unleash(struct obj *otmp)
 void
 m_unleash(struct monst *mtmp, boolean feedback)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     if (feedback) {
         if (canseemon(mtmp))
@@ -726,8 +726,8 @@ m_unleash(struct monst *mtmp, boolean feedback)
 void
 unleash_all(void)
 {
-    register struct obj *otmp;
-    register struct monst *mtmp;
+    struct obj *otmp;
+    struct monst *mtmp;
 
     for (otmp = gi.invent; otmp; otmp = otmp->nobj)
         if (otmp->otyp == LEASH)
@@ -910,8 +910,8 @@ next_to_u(void)
 void
 check_leash(coordxy x, coordxy y)
 {
-    register struct obj *otmp;
-    register struct monst *mtmp;
+    struct obj *otmp;
+    struct monst *mtmp;
 
     for (otmp = gi.invent; otmp; otmp = otmp->nobj) {
         if (otmp->otyp != LEASH || otmp->leashmon == 0)
@@ -1180,7 +1180,7 @@ use_mirror(struct obj *obj)
 static void
 use_bell(struct obj **optr)
 {
-    register struct obj *obj = *optr;
+    struct obj *obj = *optr;
     struct monst *mtmp;
     boolean wakem = FALSE, learno = FALSE,
             ordinary = (obj->otyp != BELL_OF_OPENING || !obj->spe),
@@ -1365,8 +1365,8 @@ use_candelabrum(struct obj *obj)
 static void
 use_candle(struct obj **optr)
 {
-    register struct obj *obj = *optr;
-    register struct obj *otmp;
+    struct obj *obj = *optr;
+    struct obj *otmp;
     const char *s = (obj->quan != 1) ? "candles" : "candle";
     char qbuf[QBUFSZ], qsfx[QBUFSZ], *q;
     boolean was_lamplit;
@@ -2514,7 +2514,7 @@ figurine_location_checks(struct obj *obj, coord *cc, boolean quietly)
 static int
 use_figurine(struct obj **optr)
 {
-    register struct obj *obj = *optr;
+    struct obj *obj = *optr;
     coordxy x, y;
     coord cc;
 
@@ -3803,9 +3803,9 @@ do_break_wand(struct obj *obj)
 {
 #define BY_OBJECT ((struct monst *) 0)
     static const char nothing_else_happens[] = "But nothing else happens...";
-    register int i;
+    int i;
     coordxy x, y;
-    register struct monst *mon;
+    struct monst *mon;
     int dmg, damage;
     boolean affects_objects;
     boolean shop_damage = FALSE;
@@ -4095,7 +4095,7 @@ int
 doapply(void)
 {
     struct obj *obj;
-    register int res = ECMD_TIME;
+    int res = ECMD_TIME;
 
     if (nohands(gy.youmonst.data)) {
         You("aren't able to use or apply tools in your current form.");

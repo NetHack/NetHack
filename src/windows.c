@@ -252,7 +252,7 @@ check_tty_wincap2(unsigned long wincap2)
 static struct win_choices *
 win_choices_find(const char *s)
 {
-    register int i;
+    int i;
 
     for (i = 0; winchoices[i].procs; i++) {
         if (!strcmpi(s, winchoices[i].procs->name)) {
@@ -341,7 +341,7 @@ choose_windows(const char *s)
 void
 addto_windowchain(const char *s)
 {
-    register int i;
+    int i;
 
     for (i = 0; winchoices[i].procs; i++) {
         if ('+' != winchoices[i].procs->name[0])
@@ -944,7 +944,7 @@ genl_status_update(
 {
     char newbot1[MAXCO], newbot2[MAXCO];
     long cond, *condptr = (long *) ptr;
-    register int i;
+    int i;
     unsigned pass, lndelta;
     enum statusfields idx1, idx2, *fieldlist;
     char *nb, *text = (char *) ptr;
@@ -1857,7 +1857,7 @@ int select_menu(winid window, int how, menu_item **menu_list)
 }
 
 void
-getlin(const char *query, register char *bufp)
+getlin(const char *query, char *bufp)
 {
     boolean old_bot_disabled = gb.bot_disabled;
 

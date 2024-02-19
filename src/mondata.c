@@ -404,8 +404,8 @@ mstrength(struct permonst *ptr)
 static boolean
 mstrength_ranged_attk(struct permonst *ptr)
 {
-    register int i, j;
-    register int atk_mask = (1 << AT_BREA) | (1 << AT_SPIT) | (1 << AT_GAZE);
+    int i, j;
+    int atk_mask = (1 << AT_BREA) | (1 << AT_SPIT) | (1 << AT_GAZE);
 
     for (i = 0; i < NATTK; i++) {
         if ((j = ptr->mattk[i].aatyp) >= AT_WEAP
@@ -555,7 +555,7 @@ breakarm(struct permonst *ptr)
 
 /* creature sticks other creatures it hits */
 boolean
-sticks(register struct permonst *ptr)
+sticks(struct permonst *ptr)
 {
     return (boolean) (dmgtype(ptr, AD_STCK)
                       || (dmgtype(ptr, AD_WRAP) && !attacktype(ptr, AT_ENGL))
@@ -618,7 +618,7 @@ dmgtype(struct permonst *ptr, int dtyp)
 /* returns the maximum damage a defender can do to the attacker via
    a passive defense */
 int
-max_passive_dmg(register struct monst *mdef, register struct monst *magr)
+max_passive_dmg(struct monst *mdef, struct monst *magr)
 {
     int i, dmg, multi2 = 0;
     uchar adtyp;
@@ -808,9 +808,9 @@ name_to_monplus(
      * This also permits plurals created by adding suffixes such as 's'
      * or 'es'.  Other plurals must still be handled explicitly.
      */
-    register int i;
-    register int mntmp = NON_PM;
-    register char *s, *str, *term;
+    int i;
+    int mntmp = NON_PM;
+    char *s, *str, *term;
     char buf[BUFSZ];
     int len, mgend, matchgend = -1;
     size_t slen;
@@ -918,7 +918,7 @@ name_to_monplus(
             /* end of list */
             { 0, NON_PM, NEUTRAL }
         };
-        register const struct alt_spl *namep;
+        const struct alt_spl *namep;
 
         for (namep = names; namep->name; namep++) {
             len = (int) strlen(namep->name);
@@ -1076,7 +1076,7 @@ name_to_monclass(const char *in_str, int * mndx_p)
 
 /* returns 3 values (0=male, 1=female, 2=none) */
 int
-gender(register struct monst *mtmp)
+gender(struct monst *mtmp)
 {
     if (is_neuter(mtmp->data))
         return 2;
@@ -1088,7 +1088,7 @@ gender(register struct monst *mtmp)
    yield "they".  This is the one we want to use when printing messages. */
 int
 pronoun_gender(
-    register struct monst *mtmp,
+    struct monst *mtmp,
     unsigned pg_flags) /* flags&1: 'no it' unless neuter,
                         * flags&2: random if hallucinating */
 {
@@ -1201,7 +1201,7 @@ static const short grownups[][2] = {
 int
 little_to_big(int montype)
 {
-    register int i;
+    int i;
 
     for (i = 0; grownups[i][0] >= LOW_PM; i++)
         if (montype == grownups[i][0]) {
@@ -1214,7 +1214,7 @@ little_to_big(int montype)
 int
 big_to_little(int montype)
 {
-    register int i;
+    int i;
 
     for (i = 0; grownups[i][0] >= LOW_PM; i++)
         if (montype == grownups[i][1]) {

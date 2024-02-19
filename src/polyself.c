@@ -1136,7 +1136,7 @@ dropp(struct obj *obj)
 static void
 break_armor(void)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     struct permonst *uptr = gy.youmonst.data;
 
     if (breakarm(uptr)) {
@@ -1614,7 +1614,7 @@ dosummon(void)
 int
 dogaze(void)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
     int looked = 0;
     char qbuf[QBUFSZ];
     int i;

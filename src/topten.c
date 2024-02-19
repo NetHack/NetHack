@@ -619,7 +619,7 @@ free_ttlist(struct toptenentry *tt)
 void
 topten(int how, time_t when)
 {
-    register struct toptenentry *t0, *tprev;
+    struct toptenentry *t0, *tprev;
     struct toptenentry *t1;
     FILE *rfile;
 #ifdef LOGFILE
@@ -921,7 +921,7 @@ static void
 outheader(void)
 {
     char linebuf[BUFSZ];
-    register char *bp;
+    char *bp;
 
     Strcpy(linebuf, " No  Points     Name");
     bp = eos(linebuf);
@@ -1187,7 +1187,7 @@ prscore(int argc, char **argv)
 {
     const char **players, *player0;
     int i, playerct, rank;
-    register struct toptenentry *t1;
+    struct toptenentry *t1;
     FILE *rfile;
     char pbuf[BUFSZ], *p;
     unsigned ln;
@@ -1374,7 +1374,7 @@ get_rnd_toptenentry(void)
 {
     int rank, i;
     FILE *rfile;
-    register struct toptenentry *tt;
+    struct toptenentry *tt;
     static struct toptenentry tt_buf;
 
     rfile = fopen_datafile(RECORD, "r", SCOREPREFIX);

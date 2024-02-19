@@ -104,9 +104,9 @@ missmm(
  */
  /* have monsters fight each other */
 int
-fightm(register struct monst *mtmp)
+fightm(struct monst *mtmp)
 {
-    register struct monst *mon, *nmon;
+    struct monst *mon, *nmon;
     int result, has_u_swallowed;
     /* perhaps the monster will resist Conflict */
     if (resist_conflict(mtmp))
@@ -289,8 +289,8 @@ mdisplacem(
  */
 int
 mattackm(
-    register struct monst *magr,
-    register struct monst *mdef)
+    struct monst *magr,
+    struct monst *mdef)
 {
     int i,          /* loop counter */
         tmp,        /* armor class difference */

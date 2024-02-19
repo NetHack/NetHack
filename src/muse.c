@@ -1349,7 +1349,7 @@ mon_has_friends(struct monst *mtmp)
 boolean
 find_offensive(struct monst *mtmp)
 {
-    register struct obj *obj;
+    struct obj *obj;
     boolean reflection_skip = m_seenres(mtmp, M_SEEN_REFL) != 0
         || monnear(mtmp, mtmp->mux, mtmp->muy);
     struct obj *helmet = which_armor(mtmp, W_ARMH);
@@ -1998,7 +1998,7 @@ rnd_offensive_item(struct monst *mtmp)
 boolean
 find_misc(struct monst *mtmp)
 {
-    register struct obj *obj;
+    struct obj *obj;
     struct permonst *mdat = mtmp->data;
     coordxy x = mtmp->mx, y = mtmp->my;
     struct trap *t;
@@ -2299,7 +2299,7 @@ use_misc(struct monst *mtmp)
         mquaffmsg(mtmp, otmp);
         if (otmp->cursed) {
             if (Can_rise_up(mtmp->mx, mtmp->my, &u.uz)) {
-                register int tolev = depth(&u.uz) - 1;
+                int tolev = depth(&u.uz) - 1;
                 d_level tolevel;
 
                 get_level(&tolevel, tolev);

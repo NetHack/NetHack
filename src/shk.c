@@ -163,7 +163,7 @@ money2u(struct monst* mon, long amount)
 }
 
 static struct monst *
-next_shkp(register struct monst *shkp, boolean withbill)
+next_shkp(struct monst *shkp, boolean withbill)
 {
     for (; shkp; shkp = shkp->nmon) {
         if (DEADMONSTER(shkp))
@@ -337,10 +337,10 @@ clear_no_charge(struct monst *shkp, struct obj *list)
 
 /* either you paid or left the shop or the shopkeeper died */
 void
-setpaid(register struct monst *shkp)
+setpaid(struct monst *shkp)
 {
-    register struct obj *obj;
-    register struct monst *mtmp;
+    struct obj *obj;
+    struct monst *mtmp;
 
     clear_unpaid(shkp, gi.invent);
     clear_unpaid(shkp, fobj);
@@ -835,7 +835,7 @@ pick_pick(struct obj* obj)
 boolean
 same_price(struct obj* obj1, struct obj* obj2)
 {
-    register struct monst *shkp1, *shkp2;
+    struct monst *shkp1, *shkp2;
     struct bill_x *bp1 = 0, *bp2 = 0;
     boolean are_mergable = FALSE;
 
@@ -1043,9 +1043,9 @@ is_unpaid(struct obj* obj)
 
 /* Delete the contents of the given object. */
 void
-delete_contents(register struct obj* obj)
+delete_contents(struct obj* obj)
 {
-    register struct obj *curr;
+    struct obj *curr;
 
     while ((curr = obj->cobj) != 0) {
         obj_extract_self(curr);
@@ -1055,11 +1055,11 @@ delete_contents(register struct obj* obj)
 
 /* called with two args on merge */
 void
-obfree(register struct obj* obj, register struct obj* merge)
+obfree(struct obj* obj, struct obj* merge)
 {
-    register struct bill_x *bp;
-    register struct bill_x *bpm;
-    register struct monst *shkp;
+    struct bill_x *bp;
+    struct bill_x *bpm;
+    struct monst *shkp;
 
     if (obj->otyp == LEASH && obj->leashmon)
         o_unleash(obj);
@@ -1151,7 +1151,7 @@ obfree(register struct obj* obj, register struct obj* merge)
 }
 
 static long
-check_credit(long  tmp, register struct monst* shkp)
+check_credit(long  tmp, struct monst* shkp)
 {
     long credit = ESHK(shkp)->credit;
 
@@ -1170,7 +1170,7 @@ check_credit(long  tmp, register struct monst* shkp)
 }
 
 static void
-pay(long tmp, register struct monst* shkp)
+pay(long tmp, struct monst* shkp)
 {
     long robbed = ESHK(shkp)->robbed;
     long balance = ((tmp <= 0L) ? tmp : check_credit(tmp, shkp));
@@ -1206,7 +1206,7 @@ home_shk(struct monst *shkp, boolean killkops)
 static boolean
 angry_shk_exists(void)
 {
-    register struct monst *shkp;
+    struct monst *shkp;
 
     for (shkp = next_shkp(fmon, FALSE); shkp;
          shkp = next_shkp(shkp->nmon, FALSE))
@@ -1221,12 +1221,12 @@ pacify_shk(struct monst *shkp, boolean clear_surcharge)
 {
     NOTANGRY(shkp) = TRUE; /* make peaceful */
     if (clear_surcharge && ESHK(shkp)->surcharge) {
-        register struct bill_x *bp = ESHK(shkp)->bill_p;
-        register int ct = ESHK(shkp)->billct;
+        struct bill_x *bp = ESHK(shkp)->bill_p;
+        int ct = ESHK(shkp)->billct;
 
         ESHK(shkp)->surcharge = FALSE;
         while (ct-- > 0) {
-            register long reduction = (bp->price + 3L) / 4L;
+            long reduction = (bp->price + 3L) / 4L;
             bp->price -= reduction; /* undo 33% increase */
             bp++;
         }
@@ -1239,9 +1239,9 @@ rile_shk(struct monst *shkp)
 {
     NOTANGRY(shkp) = FALSE; /* make angry */
     if (!ESHK(shkp)->surcharge) {
-        register long surcharge;
-        register struct bill_x *bp = ESHK(shkp)->bill_p;
-        register int ct = ESHK(shkp)->billct;
+        long surcharge;
+        struct bill_x *bp = ESHK(shkp)->bill_p;
+        int ct = ESHK(shkp)->billct;
 
         ESHK(shkp)->surcharge = TRUE;
         while (ct-- > 0) {
@@ -1371,9 +1371,9 @@ static const char
 static long
 cheapest_item(struct monst *shkp)
 {
-    register int ct = ESHK(shkp)->billct;
-    register struct bill_x *bp = ESHK(shkp)->bill_p;
-    register long gmin = (bp->price * bp->bquan);
+    int ct = ESHK(shkp)->billct;
+    struct bill_x *bp = ESHK(shkp)->bill_p;
+    long gmin = (bp->price * bp->bquan);
 
     while (ct--) {
         if (bp->price * bp->bquan < gmin)
@@ -1401,7 +1401,7 @@ menu_pick_pay_items(struct monst *shkp)
 
     for (n = 0; n < eshkp->billct; n++) {
         struct obj *otmp;
-        register struct bill_x *bp = &(eshkp->bill_p[n]);
+        struct bill_x *bp = &(eshkp->bill_p[n]);
 
         bp->queuedpay = FALSE;
 
@@ -1437,8 +1437,8 @@ menu_pick_pay_items(struct monst *shkp)
 int
 dopay(void)
 {
-    register struct eshk *eshkp;
-    register struct monst *shkp;
+    struct eshk *eshkp;
+    struct monst *shkp;
     struct monst *nxtm, *resident;
     long ltmp;
     long umoney;
@@ -1690,7 +1690,7 @@ dopay(void)
     }
     /* now check items on bill */
     if (eshkp->billct) {
-        register boolean itemize;
+        boolean itemize;
         boolean queuedpay = FALSE, via_menu;
         int iprompt;
 
@@ -1742,7 +1742,7 @@ dopay(void)
             tmp = 0;
             while (tmp < eshkp->billct) {
                 struct obj *otmp;
-                register struct bill_x *bp = &(eshkp->bill_p[tmp]);
+                struct bill_x *bp = &(eshkp->bill_p[tmp]);
 
                 if (queuedpay && !bp->queuedpay) {
                     tmp++;
@@ -1821,14 +1821,14 @@ dopay(void)
  */
 static int
 dopayobj(
-    register struct monst* shkp,
-    register struct bill_x* bp,
+    struct monst* shkp,
+    struct bill_x* bp,
     struct obj** obj_p,
     int which /* 0 => used-up item, 1 => other (unpaid or lost) */,
     boolean itemize)
 
 {
-    register struct obj *obj = *obj_p;
+    struct obj *obj = *obj_p;
     long ltmp, quan, save_quan;
     long umoney = money_cnt(gi.invent);
     int buy;
@@ -2209,10 +2209,10 @@ finish_paybill(void)
 
 /* find obj on one of the lists */
 static struct obj *
-bp_to_obj(register struct bill_x *bp)
+bp_to_obj(struct bill_x *bp)
 {
-    register struct obj *obj;
-    register unsigned int id = bp->bo_id;
+    struct obj *obj;
+    unsigned int id = bp->bo_id;
 
     if (bp->useup)
         obj = o_on(id, gb.billobjs);
@@ -2328,8 +2328,8 @@ oid_price_adjustment(struct obj* obj, unsigned int oid)
 /* calculate the value that the shk will charge for [one of] an object */
 static long
 get_cost(
-    register struct obj* obj,
-    register struct monst* shkp) /* if angry, impose a surcharge */
+    struct obj* obj,
+    struct monst* shkp) /* if angry, impose a surcharge */
 {
     long tmp = getprice(obj, FALSE),
          /* used to perform a single calculation even when multiple
@@ -2445,7 +2445,7 @@ contained_cost(
     boolean usell,
     boolean unpaid_only)
 {
-    register struct obj *otmp, *top;
+    struct obj *otmp, *top;
     coordxy x, y;
     boolean on_floor, freespot;
 
@@ -2493,8 +2493,8 @@ contained_gold(
     struct obj *obj,
     boolean even_if_unknown) /* T: all gold; F: limit to known contents */
 {
-    register struct obj *otmp;
-    register long value = 0L;
+    struct obj *otmp;
+    long value = 0L;
 
     /* accumulate contained gold */
     for (otmp = obj->cobj; otmp; otmp = otmp->nobj)
@@ -2508,11 +2508,11 @@ contained_gold(
 
 static void
 dropped_container(
-    register struct obj *obj,
-    register struct monst *shkp,
-    register boolean sale)
+    struct obj *obj,
+    struct monst *shkp,
+    boolean sale)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     /* the "top" container is treated in the calling fn */
     for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
@@ -2528,9 +2528,9 @@ dropped_container(
 }
 
 void
-picked_container(register struct obj* obj)
+picked_container(struct obj* obj)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     /* the "top" container is treated in the calling fn */
     for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
@@ -2591,7 +2591,7 @@ special_stock(
 
 /* calculate how much the shk will pay when buying [all of] an object */
 static long
-set_cost(register struct obj* obj, register struct monst* shkp)
+set_cost(struct obj* obj, struct monst* shkp)
 {
     long tmp, unit_price = getprice(obj, TRUE), multiplier = 1L, divisor = 1L;
 
@@ -2816,12 +2816,12 @@ add_to_billobjs(struct obj* obj)
 /* recursive billing of objects within containers. */
 static void
 bill_box_content(
-    register struct obj *obj,
-    register boolean ininv,
-    register boolean dummy,
-    register struct monst *shkp)
+    struct obj *obj,
+    boolean ininv,
+    boolean dummy,
+    struct monst *shkp)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     if (SchroedingersBox(obj))
         return;
@@ -3086,12 +3086,12 @@ splitbill(struct obj *obj, struct obj *otmp)
 }
 
 static void
-sub_one_frombill(register struct obj* obj, register struct monst* shkp)
+sub_one_frombill(struct obj* obj, struct monst* shkp)
 {
-    register struct bill_x *bp;
+    struct bill_x *bp;
 
     if ((bp = onbill(obj, shkp, FALSE)) != 0) {
-        register struct obj *otmp;
+        struct obj *otmp;
 
         obj->unpaid = 0;
         if (bp->bquan > obj->quan) {
@@ -3126,9 +3126,9 @@ sub_one_frombill(register struct obj* obj, register struct monst* shkp)
 
 /* recursive check of unpaid objects within nested containers. */
 void
-subfrombill(register struct obj* obj, register struct monst* shkp)
+subfrombill(struct obj* obj, struct monst* shkp)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     sub_one_frombill(obj, shkp);
 
@@ -3361,8 +3361,8 @@ sellobj(
     struct obj *obj,
     coordxy x, coordxy y)
 {
-    register struct monst *shkp;
-    register struct eshk *eshkp;
+    struct monst *shkp;
+    struct eshk *eshkp;
     long ltmp = 0L, cltmp = 0L, gltmp = 0L, offer, shkmoney;
     boolean saleitem, cgold = FALSE, container = Has_contents(obj);
     boolean isgold = (obj->oclass == COIN_CLASS);
@@ -3745,9 +3745,9 @@ corpsenm_price_adj(struct obj *obj)
 }
 
 static long
-getprice(register struct obj* obj, boolean shk_buying)
+getprice(struct obj* obj, boolean shk_buying)
 {
-    register long tmp = (long) objects[obj->otyp].oc_cost;
+    long tmp = (long) objects[obj->otyp].oc_cost;
 
     if (obj->oartifact) {
         tmp = arti_cost(obj);
@@ -3826,8 +3826,8 @@ shkcatch(
 
 void
 add_damage(
-    register coordxy x,
-    register coordxy y,
+    coordxy x,
+    coordxy y,
     long cost)
 {
     struct damage *tmp_dam;
@@ -4490,7 +4490,7 @@ shopdig(int fall)
     } else if (!um_dist(shkp->mx, shkp->my, 5)
                && !helpless(shkp)
                && (ESHK(shkp)->billct || ESHK(shkp)->debit)) {
-        register struct obj *obj, *obj2;
+        struct obj *obj, *obj2;
 
         if (nolimbs(shkp->data)) {
             grabs = "knocks off";
@@ -4566,7 +4566,7 @@ makekops(coord* mm)
 void
 pay_for_damage(const char *dmgstr, boolean cant_mollify)
 {
-    register struct monst *shkp = (struct monst *) 0;
+    struct monst *shkp = (struct monst *) 0;
     char shops_affected[5];
     boolean uinshp = (*u.ushops != '\0');
     char qbuf[80];
@@ -4801,10 +4801,10 @@ costly_adjacent(
 /* called by dotalk(sounds.c) when #chatting; returns obj if location
    contains shop goods and shopkeeper is willing & able to speak */
 struct obj *
-shop_object(register coordxy x, register coordxy y)
+shop_object(coordxy x, coordxy y)
 {
-    register struct obj *otmp;
-    register struct monst *shkp;
+    struct obj *otmp;
+    struct monst *shkp;
 
     shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
     if (!shkp || !inhishop(shkp))
@@ -4883,10 +4883,10 @@ price_quote(struct obj *first_obj)
 }
 
 static const char *
-shk_embellish(register struct obj* itm, long cost)
+shk_embellish(struct obj* itm, long cost)
 {
     if (!rn2(3)) {
-        register int o, choice = rn2(5);
+        int o, choice = rn2(5);
 
         if (choice == 0)
             choice = (cost < 100L ? 1 : cost < 500L ? 2 : 3);
@@ -4979,7 +4979,7 @@ shk_chat(struct monst* shkp)
             }
         }
     } else if (eshk->billct) {
-        register long total = addupbill(shkp) + eshk->debit;
+        long total = addupbill(shkp) + eshk->debit;
 
         pline("%s %s that your bill comes to %ld %s.",
               Shknam(shkp),
@@ -5206,10 +5206,10 @@ costly_gold(
 /* used in domove to block diagonal shop-exit */
 /* x,y should always be a door */
 boolean
-block_door(register coordxy x, register coordxy y)
+block_door(coordxy x, coordxy y)
 {
-    register int roomno = *in_rooms(x, y, SHOPBASE);
-    register struct monst *shkp;
+    int roomno = *in_rooms(x, y, SHOPBASE);
+    struct monst *shkp;
 
     if (roomno < 0 || !IS_SHOP(roomno))
         return FALSE;
@@ -5241,11 +5241,11 @@ block_door(register coordxy x, register coordxy y)
 /* used in domove to block diagonal shop-entry;
    u.ux, u.uy should always be a door */
 boolean
-block_entry(register coordxy x, register coordxy y)
+block_entry(coordxy x, coordxy y)
 {
-    register coordxy sx, sy;
-    register int roomno;
-    register struct monst *shkp;
+    coordxy sx, sy;
+    int roomno;
+    struct monst *shkp;
 
     if (!(IS_DOOR(levl[u.ux][u.uy].typ)
           && levl[u.ux][u.uy].doormask == D_BROKEN))

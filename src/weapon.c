@@ -510,7 +510,7 @@ static NEARDATA const int pwep[] = { HALBERD,       BARDICHE, SPETUM,
 struct obj *
 select_rwep(struct monst *mtmp)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     struct obj *mwep;
     boolean mweponly;
     int i;
@@ -655,8 +655,8 @@ static const NEARDATA short hwep[] = {
 struct obj *
 select_hwep(struct monst *mtmp)
 {
-    register struct obj *otmp;
-    register int i;
+    struct obj *otmp;
+    int i;
     boolean strong = strongmonst(mtmp->data);
     boolean wearing_shield = (mtmp->misc_worn_check & W_ARMS) != 0;
 

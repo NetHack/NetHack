@@ -121,7 +121,7 @@ static const struct Jitem Japanese_items[] = {
 static char *
 strprepend(char *s, const char *pref)
 {
-    register int i = (int) strlen(pref);
+    int i = (int) strlen(pref);
 
     if (i > PREFIX) {
         impossible("PREFIX too short (for %d).", i);
@@ -553,10 +553,10 @@ xname(struct obj *obj)
 
 static char *
 xname_flags(
-    register struct obj *obj,
+    struct obj *obj,
     unsigned cxn_flags) /* bitmask of CXN_xxx values */
 {
-    register char *buf;
+    char *buf;
     char *obufp, *buf_end, *buf_eos;
     size_t bufspaceleft;
     int typ = obj->otyp;
@@ -1194,7 +1194,7 @@ doname_base(
                               * end (Strcat is used on the end) */
     const char *aname = 0;
     int omndx = obj->corpsenm;
-    register char *bp;
+    char *bp;
     char *bp_eos, *bp_end;
     size_t bpspaceleft;
 
@@ -2130,7 +2130,7 @@ the(const char* str)
         insert_the = TRUE;
     } else {
         /* Probably a proper name, might not need an article */
-        register char *tmp, *named, *called;
+        char *tmp, *named, *called;
         int l;
 
         /* some objects have capitalized adjectives in their names */
@@ -2213,7 +2213,7 @@ yobjnam(struct obj *obj, const char *verb)
 char *
 Yobjnam2(struct obj *obj, const char *verb)
 {
-    register char *s = yobjnam(obj, verb);
+    char *s = yobjnam(obj, verb);
 
     *s = highc(*s);
     return s;
@@ -2727,7 +2727,7 @@ singplur_compound(char *str)
 char *
 makeplural(const char* oldstr)
 {
-    register char *spot;
+    char *spot;
     char lo_c, *str = nextobuf();
     const char *excess = (char *) 0;
     int len, i;
@@ -2928,7 +2928,7 @@ makeplural(const char* oldstr)
 char *
 makesingular(const char* oldstr)
 {
-    register char *p, *bp;
+    char *p, *bp;
     const char *excess = 0;
     char *str = nextobuf();
 
@@ -3350,7 +3350,7 @@ rnd_otyp_by_namedesc(
 {
     int i, n = 0;
     short validobjs[NUM_OBJECTS];
-    register const char *zn, *of;
+    const char *zn, *of;
     boolean check_of;
     int lo, hi, minglob, maxglob, prob, maxprob = 0;
 
@@ -3849,7 +3849,7 @@ readobjnam_preparse(struct _readobjnam_data *d)
     int more_l = 0, res = 1;
 
     for (;;) {
-        register int l;
+        int l;
 
         if (!d->bp || !*d->bp)
             break;
@@ -4445,7 +4445,7 @@ readobjnam_postparse1(struct _readobjnam_data *d)
         && strncmpi(d->bp, "food ration", 11)
         && strncmpi(d->bp, "meat ring", 9))
         for (i = 0; i < (int) (sizeof wrpsym); i++) {
-            register int j = Strlen(wrp[i]);
+            int j = Strlen(wrp[i]);
 
             /* check for "<class> [ of ] something" */
             if (!strncmpi(d->bp, wrp[i], j)) {
@@ -4550,7 +4550,7 @@ readobjnam_postparse2(struct _readobjnam_data *d)
         ; /* avoid false hit on "* glass" */
     } else if (!BSTRCMPI(d->bp, d->p - 6, " glass")
                || !strcmpi(d->bp, "glass")) {
-        register char *s = d->bp;
+        char *s = d->bp;
 
         /* treat "broken glass" as a non-existent item; since "broken" is
            also a chest/box prefix it might have been stripped off above */
@@ -4597,7 +4597,7 @@ readobjnam_postparse3(struct _readobjnam_data *d)
     /* check real names of gems first */
     if (!d->oclass && d->actualn) {
         for (i = gb.bases[GEM_CLASS]; i <= LAST_REAL_GEM; i++) {
-            register const char *zn;
+            const char *zn;
 
             if ((zn = OBJ_NAME(objects[i])) != 0 && !strcmpi(d->actualn, zn)) {
                 d->typ = i;

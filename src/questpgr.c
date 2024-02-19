@@ -235,7 +235,7 @@ qtext_pronoun(
 static void
 convert_arg(char c)
 {
-    register const char *str;
+    const char *str;
 
     switch (c) {
     case 'p':

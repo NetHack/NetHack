@@ -55,7 +55,7 @@ somegold(long lmoney)
  * Deals in gold only, as leprechauns don't care for lesser coins.
 */
 struct obj *
-findgold(register struct obj* argchain)
+findgold(struct obj* argchain)
 {
     struct obj *chain = argchain; /* allow arg to be nonnull */
 
@@ -68,11 +68,11 @@ findgold(register struct obj* argchain)
  * Steal gold coins only.  Leprechauns don't care for lesser coins.
 */
 void
-stealgold(register struct monst* mtmp)
+stealgold(struct monst* mtmp)
 {
-    register struct obj *fgold = g_at(u.ux, u.uy);
-    register struct obj *ygold;
-    register long tmp;
+    struct obj *fgold = g_at(u.ux, u.uy);
+    struct obj *ygold;
+    long tmp;
     struct monst *who;
     const char *whose, *what;
 
@@ -177,8 +177,8 @@ unstolenarm(void)
 static int
 stealarm(void)
 {
-    register struct monst *mtmp;
-    register struct obj *otmp;
+    struct monst *mtmp;
+    struct obj *otmp;
 
     if (!gs.stealoid || !gs.stealmid)
         goto botm;

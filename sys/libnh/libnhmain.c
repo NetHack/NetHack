@@ -67,7 +67,7 @@ nhmain(int argc, char *argv[])
 #endif /* __EMSCRIPTEN__ */
 {
 #ifdef CHDIR
-    register char *dir;
+    char *dir;
 #endif
     NHFILE *nhfp;
     boolean exact_username;
@@ -535,7 +535,7 @@ whoami(void)
      * somebody else's name.
      */
     if (!*gp.plname) {
-        register const char *s;
+        const char *s;
 
         s = nh_getenv("USER");
         if (!s || !*s)

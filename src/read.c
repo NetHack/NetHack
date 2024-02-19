@@ -327,7 +327,7 @@ int
 doread(void)
 {
     static const char find_any_braille[] = "feel any Braille writing.";
-    register struct obj *scroll;
+    struct obj *scroll;
     boolean confused, nodisappear;
     int otyp;
 
@@ -644,7 +644,7 @@ doread(void)
 RESTORE_WARNING_FORMAT_NONLITERAL
 
 static void
-stripspe(register struct obj* obj)
+stripspe(struct obj* obj)
 {
     if (obj->blessed || obj->spe <= 0) {
         pline1(nothing_happens);
@@ -659,13 +659,13 @@ stripspe(register struct obj* obj)
 }
 
 static void
-p_glow1(register struct obj* otmp)
+p_glow1(struct obj* otmp)
 {
     pline("%s briefly.", Yobjnam2(otmp, Blind ? "vibrate" : "glow"));
 }
 
 static void
-p_glow2(register struct obj* otmp, register const char* color)
+p_glow2(struct obj* otmp, const char* color)
 {
     pline("%s%s%s for a moment.", Yobjnam2(otmp, Blind ? "vibrate" : "glow"),
           Blind ? "" : " ", Blind ? "" : hcolor(color));
@@ -715,7 +715,7 @@ charge_ok(struct obj* obj)
 void
 recharge(struct obj* obj, int curse_bless)
 {
-    register int n;
+    int n;
     boolean is_cursed, is_blessed;
 
     is_cursed = curse_bless < 0;
@@ -1096,7 +1096,7 @@ static void
 seffect_enchant_armor(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
-    register schar s;
+    schar s;
     boolean special_armor;
     boolean same_color;
     struct obj *otmp = some_armor(&gy.youmonst);
@@ -1352,8 +1352,8 @@ seffect_scare_monster(struct obj **sobjp)
     int otyp = sobj->otyp;
     boolean scursed = sobj->cursed;
     boolean confused = (Confusion != 0);
-    register int ct = 0;
-    register struct monst *mtmp;
+    int ct = 0;
+    struct monst *mtmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
@@ -1388,7 +1388,7 @@ seffect_remove_curse(struct obj **sobjp)
     boolean sblessed = sobj->blessed;
     boolean scursed = sobj->cursed;
     boolean confused = (Confusion != 0);
-    register struct obj *obj, *nxto;
+    struct obj *obj, *nxto;
     long wornmask;
 
     You_feel(!Hallucination
@@ -2225,8 +2225,8 @@ drop_boulder_on_player(
 boolean
 drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
 {
-    register struct obj *otmp2;
-    register struct monst *mtmp;
+    struct obj *otmp2;
+    struct monst *mtmp;
 
     /* Make the object(s) */
     otmp2 = mksobj(confused ? ROCK : BOULDER, FALSE, FALSE);
@@ -2577,7 +2577,7 @@ do_class_genocide(void)
             else if (immunecnt || class == S_invisible)
                 You("aren't permitted to genocide such monsters.");
             else if (wizard && buf[0] == '*') {
-                register struct monst *mtmp, *mtmp2;
+                struct monst *mtmp, *mtmp2;
 
                 gonecnt = 0;
                 for (mtmp = fmon; mtmp; mtmp = mtmp2) {

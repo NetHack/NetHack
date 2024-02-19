@@ -433,7 +433,7 @@ calc_mattacku_vars(
  *              take care of it...
  */
 int
-mattacku(register struct monst *mtmp)
+mattacku(struct monst *mtmp)
 {
     struct attack *mattk, alt_attk;
     int i, j = 0, tmp, sum[NATTK];
@@ -1063,7 +1063,7 @@ magic_negation(struct monst *mon)
  * returns MM_ flags
 */
 static int
-hitmu(register struct monst *mtmp, register struct attack *mattk)
+hitmu(struct monst *mtmp, struct attack *mattk)
 {
     struct permonst *mdat = mtmp->data;
     struct permonst *olduasmon = gy.youmonst.data;

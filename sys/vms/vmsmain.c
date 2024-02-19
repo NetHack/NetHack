@@ -40,7 +40,7 @@ main(int argc, char *argv[])
 {
     NHFILE *nhfp;
 #ifdef CHDIR
-    register char *dir;
+    char *dir;
 #endif
     boolean resuming = FALSE; /* assume new game */
 
@@ -388,7 +388,7 @@ whoami(void)
      * Note that we trust the user here; it is possible to play under
      * somebody else's name.
      */
-    register char *s;
+    char *s;
 
     if (!*gp.plname && (s = nh_getenv("USER")))
         (void) lcase(strncpy(gp.plname, s, sizeof(gp.plname) - 1));

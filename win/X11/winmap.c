@@ -124,11 +124,11 @@ X11_print_glyph(
     }
     {
         X11_map_symbol ch;
-        register X11_map_symbol *ch_ptr;
+        X11_map_symbol *ch_ptr;
         X11_color color;
         unsigned special;
         int colordif;
-        register X11_color *co_ptr;
+        X11_color *co_ptr;
 
         color = glyphinfo->gm.sym.color;
         special = glyphinfo->gm.glyphflags;
@@ -979,7 +979,7 @@ display_cursor(struct xwindow *wp)
 void
 display_map_window(struct xwindow *wp)
 {
-    register int row;
+    int row;
     struct map_info_t *map_info = wp->map_information;
 
     if ((Is_rogue_level(&u.uz) ? map_info->is_tile
@@ -998,7 +998,7 @@ display_map_window(struct xwindow *wp)
         check_cursor_visibility(wp);
         highlight_yn(TRUE); /* change fg/bg to match map */
     } else if (wp->prevx != wp->cursx || wp->prevy != wp->cursy) {
-        register coordxy x = wp->prevx, y = wp->prevy;
+        coordxy x = wp->prevx, y = wp->prevy;
 
         /*
          * Previous cursor position is not the same as the current
@@ -1355,7 +1355,7 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
 {
     struct map_info_t *map_info = wp->map_information;
     int row;
-    register int count;
+    int count;
 
     if (start_row < 0 || stop_row >= ROWNO) {
         impossible("map_update:  bad row range %d-%d\n", start_row, stop_row);
@@ -1465,7 +1465,7 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
         struct text_map_info_t *text_map = &map_info->text_map;
 
         {
-            register X11_color *c_ptr;
+            X11_color *c_ptr;
             X11_map_symbol *t_ptr;
             int cur_col, win_ystart;
             X11_color color;

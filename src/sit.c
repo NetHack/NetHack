@@ -239,8 +239,8 @@ int
 dosit(void)
 {
     static const char sit_message[] = "sit on the %s.";
-    register struct trap *trap = t_at(u.ux, u.uy);
-    register int typ = levl[u.ux][u.uy].typ;
+    struct trap *trap = t_at(u.ux, u.uy);
+    int typ = levl[u.ux][u.uy].typ;
 
     if (u.usteed) {
         You("are already sitting on %s.", mon_nam(u.usteed));
@@ -272,7 +272,7 @@ dosit(void)
     if (OBJ_AT(u.ux, u.uy)
         /* ensure we're not standing on the precipice */
         && !(uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
-        register struct obj *obj;
+        struct obj *obj;
 
         obj = gl.level.objects[u.ux][u.uy];
         if (gy.youmonst.data->mlet == S_DRAGON && obj->oclass == COIN_CLASS) {

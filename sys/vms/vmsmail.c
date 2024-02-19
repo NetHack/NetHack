@@ -125,7 +125,7 @@ parse_brdcst(char *buf) /* called by parse_next_broadcast() */
     char *txt;
     const char *nam, *cmd;
 #ifdef SHELL /* only parse if spawned commands are enabled */
-    register char *p, *q;
+    char *p, *q;
     boolean is_jnet_send;
     char user[127 + 1], node[127 + 1], sentinel;
 
@@ -305,10 +305,10 @@ parse_brdcst(char *buf) /* called by parse_next_broadcast() */
 
 /* filter out non-printable characters and redundant noise
 */
-static void filter_brdcst(register char *buf) /* called by parse_next_broadcast() */
+static void filter_brdcst(char *buf) /* called by parse_next_broadcast() */
                                         /* in: original text; out: filtered text */
 {
-    register char c, *p, *buf_p;
+    char c, *p, *buf_p;
 
     /* filter the text; restrict consecutive spaces or dots to just two */
     for (p = buf_p = buf; *buf_p; buf_p++) {

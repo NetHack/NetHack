@@ -258,7 +258,7 @@ md_ignored_features(void)
 static void
 make_version(void)
 {
-    register int i;
+    int i;
 
     /*
      * integer version number

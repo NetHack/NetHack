@@ -101,8 +101,8 @@ int
 collect_obj_classes(char ilets[], struct obj *otmp, boolean here,
                     boolean (*filter)(OBJ_P), int *itemcount)
 {
-    register int iletct = 0;
-    register char c;
+    int iletct = 0;
+    char c;
 
     *itemcount = 0;
     ilets[iletct] = '\0'; /* terminate ilets so that strchr() will work */
@@ -411,8 +411,8 @@ describe_decor(void)
 static void
 check_here(boolean picked_some)
 {
-    register struct obj *obj;
-    register int ct = 0;
+    struct obj *obj;
+    int ct = 0;
     unsigned lhflags = picked_some ? LOOKHERE_PICKED_SOME : LOOKHERE_NOFLAGS;
 
     if (flags.mention_decor) {
@@ -2157,7 +2157,7 @@ static int
 doloot_core(void)
 {
     struct obj *cobj, *nobj;
-    register int c = -1;
+    int c = -1;
     int timepassed = 0;
     coord cc;
     boolean underfoot = TRUE;

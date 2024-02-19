@@ -1247,7 +1247,7 @@ Ring_on(struct obj *obj)
 }
 
 static void
-Ring_off_or_gone(register struct obj *obj, boolean gone)
+Ring_off_or_gone(struct obj *obj, boolean gone)
 {
     long mask = (obj->owornmask & W_RING);
     boolean observable;
@@ -2411,7 +2411,7 @@ find_ac(void)
 void
 glibr(void)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     int xfl = 0;
     boolean leftfall, rightfall, wastwoweap = FALSE;
     const char *otherwep = 0, *thiswep, *which, *hand;
@@ -2513,7 +2513,7 @@ glibr(void)
 struct obj *
 some_armor(struct monst *victim)
 {
-    register struct obj *otmph, *otmp;
+    struct obj *otmph, *otmp;
 
     otmph = (victim == &gy.youmonst) ? uarmc : which_armor(victim, W_ARMC);
     if (!otmph)
@@ -2577,7 +2577,7 @@ unchanger(void)
 
 static
 int
-select_off(register struct obj *otmp)
+select_off(struct obj *otmp)
 {
     struct obj *why;
     char buf[BUFSZ];
@@ -2781,8 +2781,8 @@ do_takeoff(void)
 static int
 take_off(void)
 {
-    register int i;
-    register struct obj *otmp;
+    int i;
+    struct obj *otmp;
     struct takeoff_info *doff = &gc.context.takeoff;
 
     if (doff->what) {
@@ -3113,7 +3113,7 @@ destroy_arm(struct obj *atmp)
 }
 
 void
-adj_abon(register struct obj *otmp, register schar delta)
+adj_abon(struct obj *otmp, schar delta)
 {
     if (uarmg && uarmg == otmp && otmp->otyp == GAUNTLETS_OF_DEXTERITY) {
         if (delta) {

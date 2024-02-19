@@ -249,7 +249,7 @@ same_dir(const char *d1, const char *d2)
 int
 c__translate(int code)
 {
-    register int trans;
+    int trans;
 
 /* clang-format off */
 /* *INDENT-OFF* */
@@ -309,7 +309,7 @@ vms_basename(const char *name, boolean keep_suffix)
 {
     unsigned len;
     char *base, *base_p, *xtra_p;
-    register const char *name_p;
+    const char *name_p;
 
     /* skip directory/path */
     if ((name_p = strrchr(name, ']')) != 0)

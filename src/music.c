@@ -65,8 +65,8 @@ awaken_scare(struct monst *mtmp, boolean scary)
 static void
 awaken_monsters(int distance)
 {
-    register struct monst *mtmp;
-    register int distm;
+    struct monst *mtmp;
+    int distm;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
@@ -83,7 +83,7 @@ awaken_monsters(int distance)
 static void
 put_monsters_to_sleep(int distance)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
@@ -103,7 +103,7 @@ put_monsters_to_sleep(int distance)
 static void
 charm_snakes(int distance)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
     int could_see_mon, was_peaceful;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -137,7 +137,7 @@ charm_snakes(int distance)
 static void
 calm_nymphs(int distance)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
@@ -160,7 +160,7 @@ calm_nymphs(int distance)
 void
 awaken_soldiers(struct monst* bugler  /* monster that played instrument */)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
     int distance, distm;
 
     /* distance of affected non-soldier monsters to bugler */
@@ -222,7 +222,7 @@ static void
 do_earthquake(int force)
 {
     static const char into_a_chasm[] = " into a chasm";
-    register coordxy x, y;
+    coordxy x, y;
     struct monst *mtmp;
     struct obj *otmp;
     struct trap *chasm, *trap_at_u = t_at(u.ux, u.uy);

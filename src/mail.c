@@ -285,10 +285,10 @@ static NEARDATA const char *mail_text[] = { "Gangway!", "Look out!",
  */
 static boolean
 md_rush(struct monst *md,
-        register int tx, register int ty) /* destination of mail daemon */
+        int tx, int ty) /* destination of mail daemon */
 {
     struct monst *mon;            /* displaced monster */
-    register int dx, dy;          /* direction counters */
+    int dx, dy;          /* direction counters */
     int fx = md->mx, fy = md->my; /* current location */
     int nfx = fx, nfy = fy,       /* new location */
         d1, d2;                   /* shortest distances */
@@ -684,7 +684,7 @@ void
 readmail(struct obj *otmp UNUSED)
 {
 #ifdef DEF_MAILREADER /* This implies that UNIX is defined */
-    register const char *mr = 0;
+    const char *mr = 0;
 #endif /* DEF_MAILREADER */
 #ifdef SIMPLE_MAIL
     read_simplemail(mailbox, FALSE);

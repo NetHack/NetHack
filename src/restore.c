@@ -71,8 +71,8 @@ extern int amii_numcolors;
 static void
 find_lev_obj(void)
 {
-    register struct obj *fobjtmp = (struct obj *) 0;
-    register struct obj *otmp;
+    struct obj *fobjtmp = (struct obj *) 0;
+    struct obj *otmp;
     int x, y;
 
     for (x = 0; x < COLNO; x++)
@@ -113,7 +113,7 @@ find_lev_obj(void)
 void
 inven_inuse(boolean quietly)
 {
-    register struct obj *otmp, *otmp2;
+    struct obj *otmp, *otmp2;
 
     for (otmp = gi.invent; otmp; otmp = otmp2) {
         otmp2 = otmp->nobj;
@@ -237,8 +237,8 @@ restobj(NHFILE *nhfp, struct obj *otmp)
 static struct obj *
 restobjchn(NHFILE *nhfp, boolean frozen)
 {
-    register struct obj *otmp, *otmp2 = 0;
-    register struct obj *first = (struct obj *) 0;
+    struct obj *otmp, *otmp2 = 0;
+    struct obj *first = (struct obj *) 0;
     int buflen = 0;
     boolean ghostly = (nhfp->ftype == NHF_BONESFILE);
 
@@ -376,8 +376,8 @@ restmon(NHFILE *nhfp, struct monst *mtmp)
 static struct monst *
 restmonchn(NHFILE *nhfp)
 {
-    register struct monst *mtmp, *mtmp2 = 0;
-    register struct monst *first = (struct monst *) 0;
+    struct monst *mtmp, *mtmp2 = 0;
+    struct monst *first = (struct monst *) 0;
     int offset, buflen = 0;
     boolean ghostly = (nhfp->ftype == NHF_BONESFILE);
 
@@ -454,7 +454,7 @@ restmonchn(NHFILE *nhfp)
 static struct fruit *
 loadfruitchn(NHFILE *nhfp)
 {
-    register struct fruit *flist, *fnext;
+    struct fruit *flist, *fnext;
 
     flist = 0;
     for (;;) {
@@ -472,9 +472,9 @@ loadfruitchn(NHFILE *nhfp)
 }
 
 static void
-freefruitchn(register struct fruit *flist)
+freefruitchn(struct fruit *flist)
 {
-    register struct fruit *fnext;
+    struct fruit *fnext;
 
     while (flist) {
         fnext = flist->nextf;
@@ -484,9 +484,9 @@ freefruitchn(register struct fruit *flist)
 }
 
 static void
-ghostfruit(register struct obj *otmp)
+ghostfruit(struct obj *otmp)
 {
-    register struct fruit *oldf;
+    struct fruit *oldf;
 
     for (oldf = go.oldfruit; oldf; oldf = oldf->nextf)
         if (oldf->fid == otmp->spe)
@@ -994,8 +994,8 @@ trickery(char *reason)
 void
 getlev(NHFILE *nhfp, int pid, xint8 lev)
 {
-    register struct trap *trap;
-    register struct monst *mtmp;
+    struct trap *trap;
+    struct monst *mtmp;
     long elapsed;
     branch *br;
     int hpid = 0;

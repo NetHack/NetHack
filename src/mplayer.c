@@ -43,9 +43,9 @@ static const char *const developers[] = {
 static const char *
 dev_name(void)
 {
-    register int i, m = 0, n = SIZE(developers);
-    register struct monst *mtmp;
-    register boolean match;
+    int i, m = 0, n = SIZE(developers);
+    struct monst *mtmp;
+    boolean match;
 
     do {
         match = FALSE;
@@ -69,7 +69,7 @@ dev_name(void)
 }
 
 static void
-get_mplname(register struct monst* mtmp, char *nam)
+get_mplname(struct monst* mtmp, char *nam)
 {
     boolean fmlkind = is_female(mtmp->data);
     const char *devnam;
@@ -322,7 +322,7 @@ mk_mplayer(struct permonst *ptr, coordxy x, coordxy y, boolean special)
  * fill up the overflow.
  */
 void
-create_mplayers(register int num, boolean special)
+create_mplayers(int num, boolean special)
 {
     int pm, x, y;
     struct monst fakemon;
@@ -351,7 +351,7 @@ create_mplayers(register int num, boolean special)
 }
 
 void
-mplayer_talk(register struct monst* mtmp)
+mplayer_talk(struct monst* mtmp)
 {
     static const char
         *same_class_msg[3] = {

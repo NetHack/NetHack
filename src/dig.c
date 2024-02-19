@@ -28,7 +28,7 @@ enum dig_types {
 static boolean
 rm_waslit(void)
 {
-    register coordxy x, y;
+    coordxy x, y;
 
     if (levl[u.ux][u.uy].typ == ROOM && levl[u.ux][u.uy].waslit)
         return TRUE;
@@ -46,14 +46,14 @@ rm_waslit(void)
 static void
 mkcavepos(coordxy x, coordxy y, int dist, boolean waslit, boolean rockit)
 {
-    register struct rm *lev;
+    struct rm *lev;
 
     if (!isok(x, y))
         return;
     lev = &levl[x][y];
 
     if (rockit) {
-        register struct monst *mtmp;
+        struct monst *mtmp;
 
         if (IS_ROCK(lev->typ))
             return;
@@ -89,8 +89,8 @@ mkcavearea(boolean rockit)
     int dist;
     coordxy xmin = u.ux, xmax = u.ux;
     coordxy ymin = u.uy, ymax = u.uy;
-    register coordxy i;
-    register boolean waslit = rm_waslit();
+    coordxy i;
+    boolean waslit = rm_waslit();
 
     if (rockit) {
         Soundeffect(se_crashing_rock, 100);
@@ -438,7 +438,7 @@ dig(void)
             pay_for_damage(dmgtxt, FALSE);
 
         if (Is_earthlevel(&u.uz) && !rn2(3)) {
-            register struct monst *mtmp;
+            struct monst *mtmp;
 
             switch (rn2(2)) {
             case 0:
@@ -799,7 +799,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 boolean
 dighole(boolean pit_only, boolean by_magic, coord *cc)
 {
-    register struct trap *ttmp;
+    struct trap *ttmp;
     struct rm *lev;
     struct obj *boulder_here;
     schar typ, old_typ;
@@ -1071,7 +1071,7 @@ int
 use_pick_axe2(struct obj *obj)
 {
     coordxy rx, ry;
-    register struct rm *lev;
+    struct rm *lev;
     struct trap *trap, *trap_with_u;
     int dig_target;
     boolean ispick = is_pick(obj);
@@ -1306,7 +1306,7 @@ watch_dig(struct monst *mtmp, coordxy x, coordxy y, boolean zap)
 boolean
 mdig_tunnel(struct monst *mtmp)
 {
-    register struct rm *here;
+    struct rm *here;
     boolean sawit, seeit, trapped;
     int pile = rnd(12);
 

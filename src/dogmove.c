@@ -217,7 +217,7 @@ dog_eat(struct monst *mtmp,
         coordxy y,       /* might be different from current */
         boolean devour)
 {
-    register struct edog *edog = EDOG(mtmp);
+    struct edog *edog = EDOG(mtmp);
     int nutrit, res;
     long oprice;
     char objnambuf[BUFSZ], *obj_name;
@@ -461,13 +461,13 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
    returns -1/0/1 (dog's desire to approach player) or -2 (abort move) */
 static int
 dog_goal(
-    register struct monst *mtmp,
+    struct monst *mtmp,
     struct edog *edog,
     int after, int udist, int whappr)
 {
-    register coordxy omx, omy;
+    coordxy omx, omy;
     boolean in_masters_sight, dog_has_minvent;
-    register struct obj *obj;
+    struct obj *obj;
     xint16 otyp;
     int appr;
 
@@ -589,7 +589,7 @@ dog_goal(
 
 #define FARAWAY (COLNO + 2) /* position outside screen */
     if (u_at(gg.gx, gg.gy) && !in_masters_sight) {
-        register coord *cp;
+        coord *cp;
 
         cp = gettrack(omx, omy);
         if (cp) {
@@ -628,7 +628,7 @@ dog_goal(
 
 static struct monst *
 find_targ(
-    register struct monst *mtmp,
+    struct monst *mtmp,
     int dx, int dy,
     int maxdist)
 {
@@ -1079,7 +1079,7 @@ dog_move(
 
         if ((info[i] & ALLOW_M) && MON_AT(nx, ny)) {
             int mstatus;
-            register struct monst *mtmp2 = m_at(nx, ny);
+            struct monst *mtmp2 = m_at(nx, ny);
             /* weight the audacity of the pet to attack a differently-leveled
              * foe based on its fraction of max HP:
              *       100%: up to level + 2
@@ -1137,7 +1137,7 @@ dog_move(
         if ((info[i] & ALLOW_MDISP) && MON_AT(nx, ny)
             && better_with_displacing && !undesirable_disp(mtmp, nx, ny)) {
             int mstatus;
-            register struct monst *mtmp2 = m_at(nx, ny);
+            struct monst *mtmp2 = m_at(nx, ny);
 
             mstatus = mdisplacem(mtmp, mtmp2, FALSE); /* displace monster */
             if (mstatus & M_ATTK_DEF_DIED)

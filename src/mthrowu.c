@@ -158,7 +158,7 @@ thitu(
  */
 static boolean
 drop_throw(
-    register struct obj *obj,
+    struct obj *obj,
     boolean ohit,
     coordxy x,
     coordxy y)
@@ -779,7 +779,7 @@ int
 thrwmm(struct monst* mtmp, struct monst* mtarg)
 {
     struct obj *otmp, *mwep;
-    register coordxy x, y;
+    coordxy x, y;
     boolean ispole;
 
     /* Polearms won't be applied by monsters against other monsters */
@@ -1128,10 +1128,10 @@ linedup_callback(
 
 boolean
 linedup(
-    register coordxy ax,
-    register coordxy ay,
-    register coordxy bx,
-    register coordxy by,
+    coordxy ax,
+    coordxy ay,
+    coordxy bx,
+    coordxy by,
     int boulderhandling) /* 0=block, 1=ignore, 2=conditionally block */
 {
     int dx, dy, boulderspots;
@@ -1195,7 +1195,7 @@ m_lined_up(struct monst* mtarg, struct monst* mtmp)
 
 /* is mtmp in position to use ranged attack on hero? */
 boolean
-lined_up(register struct monst* mtmp)
+lined_up(struct monst* mtmp)
 {
     return m_lined_up(&gy.youmonst, mtmp) ? TRUE : FALSE;
 }
@@ -1204,7 +1204,7 @@ lined_up(register struct monst* mtmp)
 struct obj *
 m_carrying(struct monst *mtmp, int type)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     for (otmp = (mtmp == &gy.youmonst) ? gi.invent : mtmp->minvent; otmp;
          otmp = otmp->nobj)

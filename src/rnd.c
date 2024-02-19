@@ -65,7 +65,7 @@ RND(int x)
    used in cases where the answer doesn't affect gameplay and we don't
    want to give users easy control over the main RNG sequence. */
 int
-rn2_on_display_rng(register int x)
+rn2_on_display_rng(int x)
 {
     return (isaac64_next_uint64(&rnglist[DISP].rng_state) % x);
 }
@@ -80,7 +80,7 @@ rn2_on_display_rng(register int x)
 #define RND(x) ((int) ((Rand() >> 3) % (x)))
 #endif
 int
-rn2_on_display_rng(register int x)
+rn2_on_display_rng(int x)
 {
     static unsigned seed = 1;
     seed *= 2739110765;
@@ -90,7 +90,7 @@ rn2_on_display_rng(register int x)
 
 /* 0 <= rn2(x) < x */
 int
-rn2(register int x)
+rn2(int x)
 {
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
     if (x <= 0) {
@@ -107,9 +107,9 @@ rn2(register int x)
 /* 0 <= rnl(x) < x; sometimes subtracting Luck;
    good luck approaches 0, bad luck approaches (x-1) */
 int
-rnl(register int x)
+rnl(int x)
 {
-    register int i, adjustment;
+    int i, adjustment;
 
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
     if (x <= 0) {
@@ -150,7 +150,7 @@ rnl(register int x)
 
 /* 1 <= rnd(x) <= x */
 int
-rnd(register int x)
+rnd(int x)
 {
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
     if (x <= 0) {
@@ -163,16 +163,16 @@ rnd(register int x)
 }
 
 int
-rnd_on_display_rng(register int x)
+rnd_on_display_rng(int x)
 {
     return rn2_on_display_rng(x) + 1;
 }
 
 /* d(N,X) == NdX == dX+dX+...+dX N times; n <= d(n,x) <= (n*x) */
 int
-d(register int n, register int x)
+d(int n, int x)
 {
-    register int tmp = n;
+    int tmp = n;
 
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
     if (x < 0 || n < 0 || (x == 0 && n != 0)) {
@@ -187,9 +187,9 @@ d(register int n, register int x)
 
 /* 1 <= rne(x) <= max(u.ulevel/3,5) */
 int
-rne(register int x)
+rne(int x)
 {
-    register int tmp, utmp;
+    int tmp, utmp;
 
     utmp = (u.ulevel < 15) ? 5 : u.ulevel / 3;
     tmp = 1;
@@ -211,8 +211,8 @@ rne(register int x)
 int
 rnz(int i)
 {
-    register long x = (long) i;
-    register long tmp = 1000L;
+    long x = (long) i;
+    long tmp = 1000L;
 
     tmp += rn2(1000);
     tmp *= rne(4);

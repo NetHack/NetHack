@@ -19,7 +19,7 @@ static void free_msghistory_snapshot(boolean);
 int
 tty_doprev_message(void)
 {
-    register struct WinDesc *cw = wins[WIN_MESSAGE];
+    struct WinDesc *cw = wins[WIN_MESSAGE];
     winid prevmsg_win;
     int i;
 
@@ -169,7 +169,7 @@ show_topl(const char *str)
 void
 remember_topl(void)
 {
-    register struct WinDesc *cw = wins[WIN_MESSAGE];
+    struct WinDesc *cw = wins[WIN_MESSAGE];
     int idx = cw->maxrow;
     unsigned len = strlen(gt.toplines) + 1;
 
@@ -248,10 +248,10 @@ more(void)
 }
 
 void
-update_topl(register const char *bp)
+update_topl(const char *bp)
 {
-    register char *tl, *otl;
-    register int n0;
+    char *tl, *otl;
+    int n0;
     int notdied = 1;
     struct WinDesc *cw = wins[WIN_MESSAGE];
     boolean skip = (cw->flags & (WIN_STOP | WIN_NOSTOP)) == WIN_STOP;
@@ -304,7 +304,7 @@ update_topl(register const char *bp)
 static void
 topl_putsym(char c)
 {
-    register struct WinDesc *cw = wins[WIN_MESSAGE];
+    struct WinDesc *cw = wins[WIN_MESSAGE];
 
     if (cw == (struct WinDesc *) 0)
         panic("Putsym window MESSAGE nonexistent");
@@ -351,7 +351,7 @@ putsyms(const char *str)
 }
 
 static void
-removetopl(register int n)
+removetopl(int n)
 {
     /* assume addtopl() has been done, so ttyDisplay->toplin is already set */
     while (n-- > 0)
@@ -379,7 +379,7 @@ tty_yn_function(
      * are allowed).  If it includes an <esc>, anything beyond that won't
      * be shown in the prompt to the user but will be acceptable as input.
      */
-    register char q;
+    char q;
     char rtmp[40];
     boolean digit_ok, allow_num, preserve_case = FALSE;
     struct WinDesc *cw = wins[WIN_MESSAGE];

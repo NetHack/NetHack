@@ -345,7 +345,7 @@ throw_ok(struct obj *obj)
 int
 dothrow(void)
 {
-    register struct obj *obj;
+    struct obj *obj;
     int shotlimit;
 
     /*
@@ -1460,7 +1460,7 @@ throwit(struct obj *obj,
                           * wielded weapon returns */
     struct obj *oldslot) /* for thrown-and-return used with !fixinv */
 {
-    register struct monst *mon;
+    struct monst *mon;
     int range, urange;
     boolean crossbowing, clear_thrownobj = FALSE,
             impaired = (Confusion || Stunned || Blind
@@ -1969,8 +1969,8 @@ thitmonst(
     struct monst *mon,
     struct obj *obj) /* gt.thrownobj or gk.kickedobj or uwep */
 {
-    register int tmp;     /* Base chance to hit */
-    register int disttmp; /* distance modifier */
+    int tmp;     /* Base chance to hit */
+    int disttmp; /* distance modifier */
     int otyp = obj->otyp, hmode;
     boolean guaranteed_hit = engulfing_u(mon);
     int dieroll;
@@ -2262,7 +2262,7 @@ thitmonst(
 #undef special_obj_hits_leader
 
 static int
-gem_accept(register struct monst *mon, register struct obj *obj)
+gem_accept(struct monst *mon, struct obj *obj)
 {
     static NEARDATA const char
         nogood[]     = " is not interested in your junk.",
@@ -2605,7 +2605,7 @@ static int
 throw_gold(struct obj *obj)
 {
     int range, odx, ody;
-    register struct monst *mon;
+    struct monst *mon;
 
     if (!u.dx && !u.dy && !u.dz) {
         You("cannot throw gold at yourself.");

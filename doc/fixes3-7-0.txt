@@ -2813,4 +2813,5 @@ remove the window port get_menu_coloring() calls from all the existing window
 remove TEXTCOLOR build option
 relocate general-purpose function choose_classes_menu(), from
 	options.c to windows.c
+remove register from variable declarations
 

@@ -201,8 +201,8 @@ void
 vision_reset(void)
 {
     int y;
-    register int x, i, dig_left, block;
-    register struct rm *lev;
+    int x, i, dig_left, block;
+    struct rm *lev;
 
     /* Start out with cs0 as our current array */
     gv.viz_array = cs_rows0;
@@ -263,8 +263,8 @@ vision_reset(void)
 static void
 get_unused_cs(seenV ***rows, coordxy **rmin, coordxy **rmax)
 {
-    register int row;
-    register coordxy *nrmin, *nrmax;
+    int row;
+    coordxy *nrmin, *nrmax;
 
     if (gv.viz_array == cs_rows0) {
         *rows = cs_rows1;
@@ -305,7 +305,7 @@ rogue_vision(seenV **next, coordxy *rmin, coordxy *rmax)
 {
     int rnum = levl[u.ux][u.uy].roomno - ROOMOFFSET; /* no SHARED... */
     int start, stop, in_door, xhi, xlo, yhi, ylo;
-    register int zx, zy;
+    int zx, zy;
 
     /* If in a lit room, we are able to see to its boundaries. */
     /* If dark, set COULD_SEE so various spells work -dlc */
@@ -403,7 +403,7 @@ static int new_angle(struct rm *, unsigned char *, int, int);
 static int
 new_angle(struct rm *lev, unsigned char *sv, int row, int col)
 {
-    register int res = *sv;
+    int res = *sv;
 
     /*
      * Do extra checks for crosswalls and T walls if we see them from
@@ -513,8 +513,8 @@ vision_recalc(int control)
     int row = 0;       /* row counter (outer loop)  */
     int start, stop;   /* inner loop starting/stopping index */
     int dx, dy;        /* one step from a lit door or lit wall (see below) */
-    register int col;  /* inner loop counter */
-    register struct rm *lev; /* pointer to current pos */
+    int col;  /* inner loop counter */
+    struct rm *lev; /* pointer to current pos */
     struct rm *flev;   /* pointer to position in "front" of current pos */
     const seenV *sv;   /* ptr to seen angle bits */
     int oldseenv;      /* previous seenv value */
@@ -1182,7 +1182,7 @@ static genericptr_t varg;
 #define q1_path(srow, scol, y2, x2, label)           \
     {                                                \
         int dx, dy;                                  \
-        register int k, err, x, y, dxs, dys;         \
+        int k, err, x, y, dxs, dys;                  \
                                                      \
         x = (scol);                                  \
         y = (srow);                                  \
@@ -1230,7 +1230,7 @@ static genericptr_t varg;
 #define q4_path(srow, scol, y2, x2, label)           \
     {                                                \
         int dx, dy;                                  \
-        register int k, err, x, y, dxs, dys;         \
+        int k, err, x, y, dxs, dys;                  \
                                                      \
         x = (scol);                                  \
         y = (srow);                                  \
@@ -1279,7 +1279,7 @@ static genericptr_t varg;
 #define q2_path(srow, scol, y2, x2, label)           \
     {                                                \
         int dx, dy;                                  \
-        register int k, err, x, y, dxs, dys;         \
+        int k, err, x, y, dxs, dys;                  \
                                                      \
         x = (scol);                                  \
         y = (srow);                                  \
@@ -1327,7 +1327,7 @@ static genericptr_t varg;
 #define q3_path(srow, scol, y2, x2, label)           \
     {                                                \
         int dx, dy;                                  \
-        register int k, err, x, y, dxs, dys;         \
+        int k, err, x, y, dxs, dys;                  \
                                                      \
         x = (scol);                                  \
         y = (srow);                                  \
@@ -1389,7 +1389,7 @@ static int
 _q1_path(int scol, int srow, int y2, int x2)
 {
     int dx, dy;
-    register int k, err, x, y, dxs, dys;
+    int k, err, x, y, dxs, dys;
 
     x = scol;
     y = srow;
@@ -1436,7 +1436,7 @@ static int
 _q4_path(int scol, int srow, int y2, int x2)
 {
     int dx, dy;
-    register int k, err, x, y, dxs, dys;
+    int k, err, x, y, dxs, dys;
 
     x = scol;
     y = srow;
@@ -1483,7 +1483,7 @@ static int
 _q2_path(int scol, int srow, int y2, int x2)
 {
     int dx, dy;
-    register int k, err, x, y, dxs, dys;
+    int k, err, x, y, dxs, dys;
 
     x = scol;
     y = srow;
@@ -1530,7 +1530,7 @@ static int
 _q3_path(int scol, int srow, int y2, int x2)
 {
     int dx, dy;
-    register int k, err, x, y, dxs, dys;
+    int k, err, x, y, dxs, dys;
 
     x = scol;
     y = srow;
@@ -1644,8 +1644,8 @@ right_side(
     int nrow;                   /* new row (calculate once) */
     int deeper;                 /* if TRUE, call self as needed */
     int result;                 /* set by q?_path() */
-    register int i;             /* loop counter */
-    register seenV *rowp = NULL; /* row optimization */
+    int i;             /* loop counter */
+    seenV *rowp = NULL; /* row optimization */
     coordxy *row_min = NULL;     /* left most  [used by macro set_min()] */
     coordxy *row_max = NULL;     /* right most [used by macro set_max()] */
     int lim_max;                /* right most limit of circle */
@@ -1832,8 +1832,8 @@ left_side(
     const coordxy *limits)
 {
     int left, left_edge, nrow, deeper, result;
-    register int i;
-    register seenV *rowp = NULL;
+    int i;
+    seenV *rowp = NULL;
     coordxy *row_min = NULL;
     coordxy *row_max = NULL;
     int lim_min;
@@ -1977,7 +1977,7 @@ view_from(
     void (*func)(coordxy, coordxy, genericptr_t),
     genericptr_t arg)
 {
-    register int i; /* loop counter */
+    int i; /* loop counter */
     seenV *rowp;    /* optimization for setting could_see */
     int nrow;       /* the next row */
     int left;       /* the left-most visible column */
@@ -2085,7 +2085,7 @@ do_clear_area(
         view_from(srow, scol, (seenV **) 0, (coordxy *) 0, (coordxy *) 0,
                   range, func, arg);
     } else {
-        register int x;
+        int x;
         int y, min_x, max_x, max_y, offset;
         const coordxy *limits;
         boolean override_vision;

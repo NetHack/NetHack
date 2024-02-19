@@ -658,7 +658,7 @@ void
 tty_askname(void)
 {
     static const char who_are_you[] = "Who are you? ";
-    register int c, ct, tryct = 0;
+    int c, ct, tryct = 0;
 
 #ifdef SELECTSAVED
     if (iflags.wc2_selectsaved && !iflags.renameinprogress)
@@ -1032,7 +1032,7 @@ void
 tty_clear_nhwindow(winid window)
 {
     int i, j, m, n;
-    register struct WinDesc *cw = 0;
+    struct WinDesc *cw = 0;
 
     HUPSKIP();
     if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
@@ -1741,7 +1741,7 @@ process_text_window(winid window, struct WinDesc *cw)
 {
     int i, n, attr;
     boolean linestart;
-    register char *cp;
+    char *cp;
 
     for (n = 0, i = 0; i < cw->maxrow; i++) {
         HUPSKIP();
@@ -1825,7 +1825,7 @@ tty_display_nhwindow(
     winid window,
     boolean blocking) /* with ttys, all windows are blocking */
 {
-    register struct WinDesc *cw = 0;
+    struct WinDesc *cw = 0;
     short s_maxcol;
 
     HUPSKIP();
@@ -1919,7 +1919,7 @@ tty_display_nhwindow(
 void
 tty_dismiss_nhwindow(winid window)
 {
-    register struct WinDesc *cw = 0;
+    struct WinDesc *cw = 0;
 
     HUPSKIP();
     if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
@@ -1974,7 +1974,7 @@ tty_dismiss_nhwindow(winid window)
 void
 tty_destroy_nhwindow(winid window)
 {
-    register struct WinDesc *cw = 0;
+    struct WinDesc *cw = 0;
 
     if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0) {
         if (window == WIN_INVEN) /* Null wins[WIN_INVEN] is tolerated */
@@ -2023,7 +2023,7 @@ erase_tty_screen(void)
 void
 tty_curs(
     winid window,
-    register int x, register int y) /* not xchar: perhaps xchar is unsigned
+    int x, int y) /* not xchar: perhaps xchar is unsigned
                                      * then curx-x would be unsigned too */
 {
     struct WinDesc *cw = 0;
@@ -2125,7 +2125,7 @@ tty_curs(
 static void
 tty_putsym(winid window, int x, int y, char ch)
 {
-    register struct WinDesc *cw = 0;
+    struct WinDesc *cw = 0;
 
     HUPSKIP();
     if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
@@ -2189,12 +2189,12 @@ compress_str(const char *str)
 void
 tty_putstr(winid window, int attr, const char *str)
 {
-    register struct WinDesc *cw = 0;
-    register char *ob;
-    register long i, n0;
+    struct WinDesc *cw = 0;
+    char *ob;
+    long i, n0;
 #ifndef STATUS_HILITES
-    register const char *nb;
-    register long j;
+    const char *nb;
+    long j;
 #endif
 
     HUPSKIP();
@@ -2533,7 +2533,7 @@ tty_add_menu(
     unsigned int itemflags) /* itemflags such as MENU_ITEMFLAGS_SELECTED */
 {
     boolean preselected = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
-    register struct WinDesc *cw = 0;
+    struct WinDesc *cw = 0;
     tty_menu_item *item;
     const char *newstr;
     char buf[4 + BUFSZ];
@@ -2737,7 +2737,7 @@ tty_end_menu(
 int
 tty_select_menu(winid window, int how, menu_item **menu_list)
 {
-    register struct WinDesc *cw = 0;
+    struct WinDesc *cw = 0;
     tty_menu_item *curr;
     menu_item *mi;
     int n, cancelled;
@@ -3594,11 +3594,11 @@ tty_wait_synch(void)
 
 void
 docorner(
-    register int xmin, register int ymax,
+    int xmin, int ymax,
     int ystart_between_menu_pages)
 {
-    register int y;
-    register struct WinDesc *cw = wins[WIN_MAP];
+    int y;
+    struct WinDesc *cw = wins[WIN_MAP];
     int ystart = 0;
 #ifdef TTY_PERM_INVENT
     struct WinDesc *icw = 0;
@@ -3686,7 +3686,7 @@ end_glyphout(void)
 void
 g_putch(int in_ch)
 {
-    register char ch = (char) in_ch;
+    char ch = (char) in_ch;
 
     HUPSKIP();
 

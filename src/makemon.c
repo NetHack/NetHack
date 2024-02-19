@@ -77,7 +77,7 @@ static void
 m_initgrp(struct monst *mtmp, coordxy x, coordxy y, int n, mmflags_nht mmflags)
 {
     coord mm;
-    register int cnt = rnd(n);
+    int cnt = rnd(n);
     struct monst *mon;
 #if defined(__GNUC__) && (defined(HPUX) || defined(DGUX))
     /* There is an unresolved problem with several people finding that
@@ -143,7 +143,7 @@ static
 void
 m_initthrow(struct monst *mtmp, int otyp, int oquan)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     otmp = mksobj(otyp, TRUE, FALSE);
     otmp->quan = (long) rn1(oquan, 3);
@@ -154,10 +154,10 @@ m_initthrow(struct monst *mtmp, int otyp, int oquan)
 }
 
 static void
-m_initweap(register struct monst *mtmp)
+m_initweap(struct monst *mtmp)
 {
-    register struct permonst *ptr = mtmp->data;
-    register int mm = monsndx(ptr);
+    struct permonst *ptr = mtmp->data;
+    int mm = monsndx(ptr);
     struct obj *otmp;
     int bias, w1, w2;
 
@@ -576,11 +576,11 @@ mkmonmoney(struct monst *mtmp, long amount)
 }
 
 static void
-m_initinv(register struct monst *mtmp)
+m_initinv(struct monst *mtmp)
 {
-    register int cnt;
-    register struct obj *otmp;
-    register struct permonst *ptr = mtmp->data;
+    int cnt;
+    struct obj *otmp;
+    struct permonst *ptr = mtmp->data;
 
     if (Is_rogue_level(&u.uz))
         return;
@@ -591,7 +591,7 @@ m_initinv(register struct monst *mtmp)
     switch (ptr->mlet) {
     case S_HUMAN:
         if (is_mercenary(ptr)) {
-            register int mac;
+            int mac;
 
             switch (monsndx(ptr)) {
             case PM_GUARD:
@@ -1133,7 +1133,7 @@ makemon(
     coordxy x, coordxy y,
     mmflags_nht mmflags)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
     struct monst fakemon;
     coord cc;
     int mndx, mcham, ct, mitem;
@@ -1584,11 +1584,11 @@ uncommon(int mndx)
  *      return an integer in the range of 0-5.
  */
 static int
-align_shift(register struct permonst *ptr)
+align_shift(struct permonst *ptr)
 {
     static NEARDATA long oldmoves = 0L; /* != 1, starting value of moves */
     static NEARDATA s_level *lev;
-    register int alshift;
+    int alshift;
 
     if (oldmoves != gm.moves) {
         lev = Is_special(&u.uz);
@@ -1634,8 +1634,8 @@ rndmonst(void)
 struct permonst *
 rndmonst_adj(int minadj, int maxadj)
 {
-    register struct permonst *ptr;
-    register int mndx;
+    struct permonst *ptr;
+    int mndx;
     int weight, totalweight, selected_mndx, zlevel, minmlev, maxmlev;
     boolean elemlevel, upper;
 
@@ -1742,7 +1742,7 @@ struct permonst *
 mkclass_aligned(char class, int spc, /* special mons[].geno handling */
                 aligntyp atyp)
 {
-    register int first, last, num = 0;
+    int first, last, num = 0;
     int k, nums[SPECIAL_PM + 1]; /* +1: insurance for final return value */
     int maxmlev, gehennom = Inhell != 0;
     unsigned mv_mask, gn_mask;
@@ -1834,7 +1834,7 @@ mkclass_aligned(char class, int spc, /* special mons[].geno handling */
 int
 mkclass_poly(int class)
 {
-    register int first, last, num = 0;
+    int first, last, num = 0;
     unsigned gmask;
 
     for (first = LOW_PM; first < SPECIAL_PM; first++)
@@ -1865,7 +1865,7 @@ mkclass_poly(int class)
 
 /* adjust strength of monsters based on u.uz and u.ulevel */
 int
-adj_lev(register struct permonst *ptr)
+adj_lev(struct permonst *ptr)
 {
     int tmp, tmp2;
 
@@ -2030,9 +2030,9 @@ grow_up(struct monst *mtmp, struct monst *victim)
 }
 
 struct obj *
-mongets(register struct monst *mtmp, int otyp)
+mongets(struct monst *mtmp, int otyp)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     if (!otyp)
         return (struct obj *) 0;
@@ -2117,7 +2117,7 @@ golemhp(int type)
  *      (Some "animal" types are co-aligned, but also hungry.)
  */
 boolean
-peace_minded(register struct permonst *ptr)
+peace_minded(struct permonst *ptr)
 {
     aligntyp mal = ptr->maligntyp, ual = u.ualign.type;
 
@@ -2242,7 +2242,7 @@ static const NEARDATA char syms[] = {
 };
 
 void
-set_mimic_sym(register struct monst *mtmp)
+set_mimic_sym(struct monst *mtmp)
 {
     int typ, roomno, rt;
     unsigned appear, ap_type;
