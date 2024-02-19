@@ -797,7 +797,6 @@ process_options(int argc, char * argv[])
             reveal_paths();
             nethack_exit(EXIT_SUCCESS);
         }
-#ifndef NODUMPENUMS
         if (argcheck(argc, argv, ARG_DUMPENUMS) == 2) {
             nethack_exit(EXIT_SUCCESS);
         }
@@ -805,7 +804,6 @@ process_options(int argc, char * argv[])
         if (argcheck(argc, argv, ARG_DUMPGLYPHIDS) == 2) {
             nethack_exit(EXIT_SUCCESS);
         }
-#endif
 #endif
         if (argcheck(argc, argv, ARG_DEBUG) == 1) {
             argc--;

@@ -1,6 +1,6 @@
 /* NetHack 3.7	allmain.c	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.238 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
-/*-Copyright (c) Robert Patrick Rankin, 2012. */
+/* Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* various code that was replicated in *main.c */
@@ -22,9 +22,7 @@ static void regen_pw(int);
 static void regen_hp(int);
 static void interrupt_multi(const char *);
 static void debug_fields(const char *);
-#ifndef NODUMPENUMS
 static void dump_enums(void);
-#endif
 
 /*ARGSUSED*/
 void
@@ -899,9 +897,7 @@ static const struct early_opt earlyopts[] = {
     { ARG_DEBUG, "debug", 5, TRUE },
     { ARG_VERSION, "version", 4, TRUE },
     { ARG_SHOWPATHS, "showpaths", 8, FALSE },
-#ifndef NODUMPENUMS
     { ARG_DUMPENUMS, "dumpenums", 9, FALSE },
-#endif
 #ifdef ENHANCED_SYMBOLS
     { ARG_DUMPGLYPHIDS, "dumpglyphids", 12, FALSE },
 #endif
@@ -998,11 +994,9 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
         }
         case ARG_SHOWPATHS:
             return 2;
-#ifndef NODUMPENUMS
         case ARG_DUMPENUMS:
             dump_enums();
             return 2;
-#endif
 #ifdef ENHANCED_SYMBOLS
         case ARG_DUMPGLYPHIDS:
             dump_glyphids();
@@ -1104,7 +1098,7 @@ timet_delta(time_t etim, time_t stim) /* end and start times */
     return (long) difftime(etim, stim);
 }
 
-#if !defined(NODUMPENUMS) || defined(ENHANCED_SYMBOLS)
+#if defined(ENHANCED_SYMBOLS)
 /* monsdump[] and objdump[] are also used in utf8map.c */
 #define DUMP_ENUMS
 struct enum_dump monsdump[] = {
@@ -1167,9 +1161,6 @@ struct enum_dump arti_enum_dump[] = {
 #undef DUMP_ARTI_ENUM
 
 #undef DUMP_ENUMS
-
-
-#ifndef NODUMPENUMS
 
 static void
 dump_enums(void)
@@ -1265,15 +1256,12 @@ dump_enums(void)
     }
     raw_print("");
 }
-#endif /* NODUMPENUMS */
 
-#ifdef ENHANCED_SYMBOLS
 void
 dump_glyphids(void)
 {
     dump_all_glyphids(stdout);
 }
 #endif /* ENHANCED_SYMBOLS */
-#endif /* !NODUMPENUMS || ENHANCED_SYMBOLS */
 
 /*allmain.c*/
