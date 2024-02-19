@@ -34,7 +34,7 @@ static boolean invalid_shop_shape(struct mkroom *sroom);
 extern const struct shclass shtypes[]; /* defined in shknam.c */
 
 static boolean
-isbig(struct mkroom* sroom)
+isbig(struct mkroom *sroom)
 {
     int area = (sroom->hx - sroom->lx + 1)
                         * (sroom->hy - sroom->ly + 1);
@@ -268,7 +268,7 @@ mk_zoo_thronemon(coordxy x, coordxy y)
 }
 
 void
-fill_zoo(struct mkroom* sroom)
+fill_zoo(struct mkroom *sroom)
 {
     struct monst *mon;
     int sx, sy, i;
@@ -628,7 +628,7 @@ nexttodoor(int sx, int sy)
 }
 
 boolean
-has_dnstairs(struct mkroom* sroom)
+has_dnstairs(struct mkroom *sroom)
 {
     stairway *stway = gs.stairs;
 
@@ -641,7 +641,7 @@ has_dnstairs(struct mkroom* sroom)
 }
 
 boolean
-has_upstairs(struct mkroom* sroom)
+has_upstairs(struct mkroom *sroom)
 {
     stairway *stway = gs.stairs;
 
@@ -654,19 +654,19 @@ has_upstairs(struct mkroom* sroom)
 }
 
 int
-somex(struct mkroom* croom)
+somex(struct mkroom *croom)
 {
     return rn1(croom->hx - croom->lx + 1, croom->lx);
 }
 
 int
-somey(struct mkroom* croom)
+somey(struct mkroom *croom)
 {
     return rn1(croom->hy - croom->ly + 1, croom->ly);
 }
 
 boolean
-inside_room(struct mkroom* croom, coordxy x, coordxy y)
+inside_room(struct mkroom *croom, coordxy x, coordxy y)
 {
     if (croom->irregular) {
         int i = (int) ((croom - gr.rooms) + ROOMOFFSET);
@@ -682,7 +682,7 @@ inside_room(struct mkroom* croom, coordxy x, coordxy y)
    can return a non-accessible location, eg. inside a wall
    if a themed room is not irregular, but has some non-room terrain */
 boolean
-somexy(struct mkroom *croom,coord *c)
+somexy(struct mkroom *croom, coord *c)
 {
     int try_cnt = 0;
     int i;
@@ -832,7 +832,7 @@ squadmon(void)
  * (if any).
  */
 static void
-save_room(NHFILE* nhfp, struct mkroom* r)
+save_room(NHFILE *nhfp, struct mkroom *r)
 {
     short i;
 
@@ -852,7 +852,7 @@ save_room(NHFILE* nhfp, struct mkroom* r)
  * save_rooms : Save all the rooms on disk!
  */
 void
-save_rooms(NHFILE* nhfp)
+save_rooms(NHFILE *nhfp)
 {
     short i;
 
@@ -864,7 +864,7 @@ save_rooms(NHFILE* nhfp)
 }
 
 static void
-rest_room(NHFILE* nhfp, struct mkroom* r)
+rest_room(NHFILE *nhfp, struct mkroom *r)
 {
     short i;
 
@@ -883,7 +883,7 @@ rest_room(NHFILE* nhfp, struct mkroom* r)
  * the disk.
  */
 void
-rest_rooms(NHFILE* nhfp)
+rest_rooms(NHFILE *nhfp)
 {
     short i;
 

@@ -295,25 +295,25 @@ switch_symbols(int nondefault)
 }
 
 void
-update_ov_primary_symset(const struct symparse* symp, int val)
+update_ov_primary_symset(const struct symparse *symp, int val)
 {
     go.ov_primary_syms[symp->idx] = val;
 }
 
 void
-update_ov_rogue_symset(const struct symparse* symp, int val)
+update_ov_rogue_symset(const struct symparse *symp, int val)
 {
     go.ov_rogue_syms[symp->idx] = val;
 }
 
 void
-update_primary_symset(const struct symparse* symp, int val)
+update_primary_symset(const struct symparse *symp, int val)
 {
     gp.primary_syms[symp->idx] = val;
 }
 
 void
-update_rogue_symset(const struct symparse* symp, int val)
+update_rogue_symset(const struct symparse *symp, int val)
 {
     gr.rogue_syms[symp->idx] = val;
 }

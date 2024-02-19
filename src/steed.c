@@ -23,7 +23,7 @@ rider_cant_reach(void)
 
 /* Can this monster wear a saddle? */
 boolean
-can_saddle(struct monst* mtmp)
+can_saddle(struct monst *mtmp)
 {
     struct permonst *ptr = mtmp->data;
 
@@ -33,7 +33,7 @@ can_saddle(struct monst* mtmp)
 }
 
 int
-use_saddle(struct obj* otmp)
+use_saddle(struct obj *otmp)
 {
     struct monst *mtmp;
     struct permonst *ptr;
@@ -138,7 +138,7 @@ use_saddle(struct obj* otmp)
 }
 
 void
-put_saddle_on_mon(struct obj* saddle, struct monst* mtmp)
+put_saddle_on_mon(struct obj *saddle, struct monst *mtmp)
 {
     if (!can_saddle(mtmp) || which_armor(mtmp, W_SADDLE))
         return;
@@ -154,7 +154,7 @@ put_saddle_on_mon(struct obj* saddle, struct monst* mtmp)
 
 /* Can we ride this monster?  Caller should also check can_saddle() */
 boolean
-can_ride(struct monst* mtmp)
+can_ride(struct monst *mtmp)
 {
     return (mtmp->mtame && humanoid(gy.youmonst.data)
             && !verysmall(gy.youmonst.data) && !bigmonst(gy.youmonst.data)
@@ -811,7 +811,7 @@ dismount_steed(
 /* when attempting to saddle or mount a sleeping steed, try to wake it up
    (for the saddling case, it won't be u.usteed yet) */
 static void
-maybewakesteed(struct monst* steed)
+maybewakesteed(struct monst *steed)
 {
     int frozen = (int) steed->mfrozen;
     boolean wasimmobile = helpless(steed);
@@ -882,7 +882,7 @@ stucksteed(boolean checkfeeding)
 }
 
 void
-place_monster(struct monst* mon, coordxy x, coordxy y)
+place_monster(struct monst *mon, coordxy x, coordxy y)
 {
     struct monst *othermon;
     const char *monnm, *othnm;

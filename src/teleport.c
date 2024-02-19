@@ -26,7 +26,7 @@ m_blocks_teleporting(struct monst *mtmp)
 
 /* teleporting is prevented on this level for this monster? */
 boolean
-noteleport_level(struct monst* mon)
+noteleport_level(struct monst *mon)
 {
     /* demon court in Gehennom prevent others from teleporting */
     if (In_hell(&u.uz) && !(is_dlord(mon->data) || is_dprince(mon->data)))
@@ -759,7 +759,7 @@ vault_tele(void)
 }
 
 boolean
-teleport_pet(struct monst* mtmp, boolean force_it)
+teleport_pet(struct monst *mtmp, boolean force_it)
 {
     struct obj *otmp;
 
@@ -794,7 +794,7 @@ tele(void)
 
 /* teleport the hero; usually discover scroll of teleportation if via scroll */
 void
-scrolltele(struct obj* scroll)
+scrolltele(struct obj *scroll)
 {
     coord cc;
 
@@ -1836,7 +1836,7 @@ control_mon_tele(
 }
 
 static void
-mvault_tele(struct monst* mtmp)
+mvault_tele(struct monst *mtmp)
 {
     struct mkroom *croom = search_special(VAULT);
     coord c;
@@ -1849,7 +1849,7 @@ mvault_tele(struct monst* mtmp)
 }
 
 boolean
-tele_restrict(struct monst* mon)
+tele_restrict(struct monst *mon)
 {
     if (noteleport_level(mon)) {
         if (canseemon(mon))
@@ -1861,7 +1861,7 @@ tele_restrict(struct monst* mon)
 }
 
 void
-mtele_trap(struct monst* mtmp, struct trap* trap, int in_sight)
+mtele_trap(struct monst *mtmp, struct trap *trap, int in_sight)
 {
     char *monname;
 
@@ -2141,7 +2141,7 @@ random_teleport_level(void)
 /* you teleport a monster (via wand, spell, or poly'd q.mechanic attack);
    return false iff the attempt fails */
 boolean
-u_teleport_mon(struct monst* mtmp, boolean give_feedback)
+u_teleport_mon(struct monst *mtmp, boolean give_feedback)
 {
     coord cc;
 

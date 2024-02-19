@@ -447,7 +447,7 @@ mkveggy_at(int sx, int sy)
 
 /* make an object of the appropriate type for a shop square */
 static void
-mkshobj_at(const struct shclass* shp, int sx, int sy, boolean mkspecl)
+mkshobj_at(const struct shclass *shp, int sx, int sy, boolean mkspecl)
 {
     struct monst *mtmp;
     struct permonst *ptr;
@@ -480,7 +480,7 @@ mkshobj_at(const struct shclass* shp, int sx, int sy, boolean mkspecl)
 
 /* extract a shopkeeper name for the given shop type */
 static void
-nameshk(struct monst* shk, const char* const* nlp)
+nameshk(struct monst *shk, const char *const *nlp)
 {
     int i, trycnt, names_avail;
     const char *shname = 0;
@@ -550,7 +550,7 @@ nameshk(struct monst* shk, const char* const* nlp)
 }
 
 void
-neweshk(struct monst* mtmp)
+neweshk(struct monst *mtmp)
 {
     if (!mtmp->mextra)
         mtmp->mextra = newmextra();
@@ -561,7 +561,7 @@ neweshk(struct monst* mtmp)
 }
 
 void
-free_eshk(struct monst* mtmp)
+free_eshk(struct monst *mtmp)
 {
     if (mtmp->mextra && ESHK(mtmp)) {
         free((genericptr_t) ESHK(mtmp));
@@ -620,7 +620,7 @@ good_shopdoor(struct mkroom *sroom, coordxy *sx, coordxy *sy)
 
 /* create a new shopkeeper in the given room */
 static int
-shkinit(const struct shclass* shp, struct mkroom* sroom)
+shkinit(const struct shclass *shp, struct mkroom *sroom)
 {
     int sh;
     coordxy sx, sy;
@@ -683,7 +683,7 @@ shkinit(const struct shclass* shp, struct mkroom* sroom)
 }
 
 static boolean
-stock_room_goodpos(struct mkroom* sroom, int rmno, int sh, int sx, int sy)
+stock_room_goodpos(struct mkroom *sroom, int rmno, int sh, int sx, int sy)
 {
     if (sroom->irregular) {
         if (levl[sx][sy].edge
@@ -706,7 +706,7 @@ stock_room_goodpos(struct mkroom* sroom, int rmno, int sh, int sx, int sy)
 
 /* stock a newly-created room with objects */
 void
-stock_room(int shp_indx, struct mkroom* sroom)
+stock_room(int shp_indx, struct mkroom *sroom)
 {
     /*
      * Someday soon we'll dispatch on the shdist field of shclass to do
@@ -793,7 +793,7 @@ stock_room(int shp_indx, struct mkroom* sroom)
 
 /* does shkp's shop stock this item type? */
 boolean
-saleable(struct monst* shkp, struct obj* obj)
+saleable(struct monst *shkp, struct obj *obj)
 {
     int i, shp_indx = ESHK(shkp)->shoptype - SHOPBASE;
     const struct shclass *shp = &shtypes[shp_indx];
@@ -831,7 +831,7 @@ get_shop_item(int type)
 
 /* version of shkname() for beginning of sentence */
 char *
-Shknam(struct monst* mtmp)
+Shknam(struct monst *mtmp)
 {
     char *nam = shkname(mtmp);
 
@@ -844,7 +844,7 @@ Shknam(struct monst* mtmp)
    will yield some other shopkeeper's name (not necessarily one residing
    in the current game's dungeon, or who keeps same type of shop) */
 char *
-shkname(struct monst* mtmp)
+shkname(struct monst *mtmp)
 {
     char *nam;
     unsigned save_isshk = mtmp->isshk;
@@ -888,7 +888,7 @@ shkname(struct monst* mtmp)
 }
 
 boolean
-shkname_is_pname(struct monst* mtmp)
+shkname_is_pname(struct monst *mtmp)
 {
     const char *shknm = ESHK(mtmp)->shknam;
 
@@ -896,7 +896,7 @@ shkname_is_pname(struct monst* mtmp)
 }
 
 boolean
-is_izchak(struct monst* shkp, boolean override_hallucination)
+is_izchak(struct monst *shkp, boolean override_hallucination)
 {
     const char *shknm;
 

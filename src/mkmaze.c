@@ -715,7 +715,7 @@ migrate_orc(struct monst *mtmp, unsigned long mflags)
 }
 
 static void
-shiny_orc_stuff(struct monst* mtmp)
+shiny_orc_stuff(struct monst *mtmp)
 {
     int gemprob, goldprob, otyp;
     struct obj *otmp;
@@ -747,7 +747,7 @@ shiny_orc_stuff(struct monst* mtmp)
 }
 
 static void
-migr_booty_item(int otyp, const char* gang)
+migr_booty_item(int otyp, const char *gang)
 {
     struct obj *otmp;
 
@@ -1672,7 +1672,7 @@ water_friction(void)
 }
 
 void
-save_waterlevel(NHFILE* nhfp)
+save_waterlevel(NHFILE *nhfp)
 {
     struct bubble *b;
 
@@ -1882,7 +1882,7 @@ mk_bubble(coordxy x, coordxy y, int n)
  * This property also makes leaving a bubble slightly difficult.
  */
 static void
-mv_bubble(struct bubble* b, coordxy dx, coordxy dy, boolean ini)
+mv_bubble(struct bubble *b, coordxy dx, coordxy dy, boolean ini)
 {
     int i, j, colli = 0;
     coordxy x, y;

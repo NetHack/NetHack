@@ -49,7 +49,7 @@ shuffle_tiles(void)
 #endif /* TILES_IN_GLYPHMAP */
 
 static void
-setgemprobs(d_level* dlev)
+setgemprobs(d_level *dlev)
 {
     int j, first, lev, sum = 0;
 
@@ -365,7 +365,7 @@ oinit(void)
 }
 
 void
-savenames(NHFILE* nhfp)
+savenames(NHFILE *nhfp)
 {
     int i;
     unsigned int len;
@@ -398,7 +398,7 @@ savenames(NHFILE* nhfp)
 }
 
 void
-restnames(NHFILE* nhfp)
+restnames(NHFILE *nhfp)
 {
     int i;
     unsigned int len = 0;

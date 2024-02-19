@@ -17,7 +17,7 @@ static int mon_in_room(struct monst *, int);
 
 /* this easily could be a macro, but it might overtax dumb compilers */
 static int
-mon_in_room(struct monst* mon, int rmtyp)
+mon_in_room(struct monst *mon, int rmtyp)
 {
     int rno = levl[mon->mx][mon->my].roomno;
     if (rno >= ROOMOFFSET)
@@ -346,7 +346,7 @@ static const char *const h_sounds[] = {
 };
 
 const char *
-growl_sound(struct monst* mtmp)
+growl_sound(struct monst *mtmp)
 {
     const char *ret;
 
@@ -397,7 +397,7 @@ growl_sound(struct monst* mtmp)
 
 /* the sounds of a seriously abused pet, including player attacking it */
 void
-growl(struct monst* mtmp)
+growl(struct monst *mtmp)
 {
     const char *growl_verb = 0;
 
@@ -422,7 +422,7 @@ growl(struct monst* mtmp)
 
 /* the sounds of mistreated pets */
 void
-yelp(struct monst* mtmp)
+yelp(struct monst *mtmp)
 {
     const char *yelp_verb = 0;
     enum sound_effect_entries se = se_yelp;
@@ -474,7 +474,7 @@ yelp(struct monst* mtmp)
 
 /* the sounds of distressed pets */
 void
-whimper(struct monst* mtmp)
+whimper(struct monst *mtmp)
 {
     const char *whimper_verb = 0;
     enum sound_effect_entries se = se_canine_whine;
@@ -514,7 +514,7 @@ whimper(struct monst* mtmp)
 
 /* pet makes "I'm hungry" noises */
 void
-beg(struct monst* mtmp)
+beg(struct monst *mtmp)
 {
     if (helpless(mtmp)
         || !(carnivorous(mtmp->data) || herbivorous(mtmp->data)))
@@ -541,7 +541,7 @@ beg(struct monst* mtmp)
 
 /* hero has attacked a peaceful monster within 'mon's view */
 const char *
-maybe_gasp(struct monst* mon)
+maybe_gasp(struct monst *mon)
 {
     static const char *const Exclam[] = {
         "Gasp!", "Uh-oh.", "Oh my!", "What?", "Why?",
@@ -675,7 +675,7 @@ mon_is_gecko(struct monst *mon)
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 static int /* check calls to this */
-domonnoise(struct monst* mtmp)
+domonnoise(struct monst *mtmp)
 {
     char verbuf[BUFSZ];
     const char *pline_msg = 0, /* Monnam(mtmp) will be prepended */
@@ -1546,7 +1546,7 @@ char *sounddir = 0; /* set in files.c */
 
 /* adds a sound file mapping, returns 0 on failure, 1 on success */
 int
-add_sound_mapping(const char* mapping)
+add_sound_mapping(const char *mapping)
 {
     char text[256];
     char filename[256];
@@ -1616,7 +1616,7 @@ add_sound_mapping(const char* mapping)
 }
 
 static audio_mapping *
-sound_matches_message(const char* msg)
+sound_matches_message(const char *msg)
 {
     audio_mapping *snd = soundmap;
 
@@ -1629,7 +1629,7 @@ sound_matches_message(const char* msg)
 }
 
 void
-play_sound_for_message(const char* msg)
+play_sound_for_message(const char *msg)
 {
     audio_mapping *snd;
 
@@ -1646,7 +1646,7 @@ play_sound_for_message(const char* msg)
 }
 
 void
-maybe_play_sound(const char* msg)
+maybe_play_sound(const char *msg)
 {
     audio_mapping *snd;
 

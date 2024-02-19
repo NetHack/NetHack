@@ -56,7 +56,7 @@ free_rect(void)
  */
 
 int
-get_rect_ind(NhRect* r)
+get_rect_ind(NhRect *r)
 {
     NhRect *rectp;
     int lx, ly, hx, hy;
@@ -78,7 +78,7 @@ get_rect_ind(NhRect* r)
  */
 
 NhRect *
-get_rect(NhRect* r)
+get_rect(NhRect *r)
 {
     NhRect *rectp;
     int lx, ly, hx, hy;
@@ -112,7 +112,7 @@ rnd_rect(void)
  */
 
 static boolean
-intersect(NhRect* r1, NhRect* r2, NhRect* r3)
+intersect(NhRect *r1, NhRect *r2, NhRect *r3)
 {
     if (r2->lx > r1->hx || r2->ly > r1->hy || r2->hx < r1->lx
         || r2->hy < r1->ly)
@@ -143,7 +143,7 @@ rect_bounds(NhRect r1, NhRect r2, NhRect *r3)
  */
 
 void
-remove_rect(NhRect* r)
+remove_rect(NhRect *r)
 {
     int ind;
 
@@ -157,7 +157,7 @@ remove_rect(NhRect* r)
  */
 
 void
-add_rect(NhRect* r)
+add_rect(NhRect *r)
 {
     if (rect_cnt >= n_rects) {
         impossible("n_rects may be too small.");
@@ -178,7 +178,7 @@ add_rect(NhRect* r)
  */
 
 void
-split_rects(NhRect* r1, NhRect* r2)
+split_rects(NhRect *r1, NhRect *r2)
 {
     NhRect r, old_r;
     int i;

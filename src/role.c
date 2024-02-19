@@ -2106,7 +2106,7 @@ role_init(void)
 }
 
 const char *
-Hello(struct monst* mtmp)
+Hello(struct monst *mtmp)
 {
     switch (Role_switch) {
     case PM_KNIGHT:

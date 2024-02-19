@@ -568,7 +568,7 @@ ckmailstatus(void)
 void
 read_simplemail(const char *mbox, boolean adminmsg)
 {
-    FILE* mb = fopen(mbox, "r");
+    FILE *mb = fopen(mbox, "r");
     char curline[128], *msg;
     boolean seen_one_already = FALSE;
 #ifdef SIMPLE_MAIL

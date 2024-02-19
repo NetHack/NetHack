@@ -481,7 +481,7 @@ const char *beats[] = {
  * The player is trying to extract something from his/her instrument.
  */
 static int
-do_improvisation(struct obj* instr)
+do_improvisation(struct obj *instr)
 {
     int damage, mode, do_spec = !(Stunned || Confusion);
     struct obj itmp;
@@ -736,7 +736,7 @@ improvised_notes(boolean *same_as_last_time)
  * So you want music...
  */
 int
-do_play_instrument(struct obj* instr)
+do_play_instrument(struct obj *instr)
 {
     char buf[BUFSZ] = DUMMY, c = 'y';
     char *s;

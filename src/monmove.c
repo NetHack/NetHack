@@ -102,7 +102,7 @@ monhaskey(
 }
 
 void
-mon_yells(struct monst* mon, const char* shout)
+mon_yells(struct monst *mon, const char *shout)
 {
     if (Deaf) {
         if (canspotmon(mon))
@@ -158,7 +158,7 @@ m_break_boulder(struct monst *mtmp, coordxy x, coordxy y)
 }
 
 static void
-watch_on_duty(struct monst* mtmp)
+watch_on_duty(struct monst *mtmp)
 {
     coordxy x, y;
 
@@ -366,7 +366,7 @@ find_pmmonst(int pm)
    will eat it if there is no queen bee on the level; return 1: mon died,
    0: mon ate jelly and lived; -1: mon didn't eat jelly to use its move */
 int
-bee_eat_jelly(struct monst* mon, struct obj* obj)
+bee_eat_jelly(struct monst *mon, struct obj *obj)
 {
     int m_delay;
     struct monst *mtmp = find_pmmonst(PM_QUEEN_BEE);
@@ -519,7 +519,7 @@ distfleeck(
 /* perform a special one-time action for a monster; returns -1 if nothing
    special happened, 0 if monster uses up its turn, 1 if monster is killed */
 static int
-m_arrival(struct monst* mon)
+m_arrival(struct monst *mon)
 {
     mon->mstrategy &= ~STRAT_ARRIVE; /* always reset */
 
@@ -528,7 +528,7 @@ m_arrival(struct monst* mon)
 
 /* a mind flayer unleashes a mind blast  */
 static void
-mind_blast(struct monst* mtmp)
+mind_blast(struct monst *mtmp)
 {
     struct monst *m2, *nmon = (struct monst *) 0;
 
@@ -597,7 +597,7 @@ mind_blast(struct monst* mtmp)
  * code. --KAA
  */
 int
-dochug(struct monst* mtmp)
+dochug(struct monst *mtmp)
 {
     struct permonst *mdat;
     int status = MMOVE_NOTHING;
@@ -964,7 +964,7 @@ mon_would_consume_item(struct monst *mtmp, struct obj *otmp)
 }
 
 boolean
-itsstuck(struct monst* mtmp)
+itsstuck(struct monst *mtmp)
 {
     if (sticks(gy.youmonst.data) && mtmp == u.ustuck && !u.uswallow) {
         pline("%s cannot escape from you!", Monnam(mtmp));
@@ -1088,7 +1088,7 @@ leppie_stash(struct monst *mtmp)
 
 /* does monster want to avoid you? */
 static boolean
-m_balks_at_approaching(struct monst* mtmp)
+m_balks_at_approaching(struct monst *mtmp)
 {
     /* peaceful, far away, or can't see you */
     if (mtmp->mpeaceful
@@ -2156,7 +2156,7 @@ undesirable_disp(
  * Used by can_ooze() and can_fog().
  */
 static boolean
-stuff_prevents_passage(struct monst* mtmp)
+stuff_prevents_passage(struct monst *mtmp)
 {
     struct obj *chain, *obj;
 
@@ -2193,7 +2193,7 @@ stuff_prevents_passage(struct monst* mtmp)
 }
 
 boolean
-can_ooze(struct monst* mtmp)
+can_ooze(struct monst *mtmp)
 {
     if (!amorphous(mtmp->data) || stuff_prevents_passage(mtmp))
         return FALSE;
@@ -2202,7 +2202,7 @@ can_ooze(struct monst* mtmp)
 
 /* monster can change form into a fog if necessary */
 boolean
-can_fog(struct monst* mtmp)
+can_fog(struct monst *mtmp)
 {
     if (!(gm.mvitals[PM_FOG_CLOUD].mvflags & G_GENOD) && is_vampshifter(mtmp)
         && !Protection_from_shape_changers && !stuff_prevents_passage(mtmp))

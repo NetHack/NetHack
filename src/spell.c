@@ -121,7 +121,7 @@ spell_let_to_idx(char ilet)
 
 /* TRUE: book should be destroyed by caller */
 static boolean
-cursed_book(struct obj* bp)
+cursed_book(struct obj *bp)
 {
     boolean was_in_use;
     int lev = objects[bp->otyp].oc_level;
@@ -180,7 +180,7 @@ cursed_book(struct obj* bp)
 
 /* study while confused: returns TRUE if the book is destroyed */
 static boolean
-confused_book(struct obj* spellbook)
+confused_book(struct obj *spellbook)
 {
     boolean gone = FALSE;
 
@@ -222,7 +222,7 @@ deadbook_pacify_undead(struct monst *mtmp)
 /* special effects for The Book of the Dead; reading it while blind is
    allowed so that needs to be taken into account too */
 static void
-deadbook(struct obj* book2)
+deadbook(struct obj *book2)
 {
     struct monst *mtmp;
     coord mm;
@@ -448,7 +448,7 @@ learn(void)
 RESTORE_WARNING_FORMAT_NONLITERAL
 
 int
-study_book(struct obj* spellbook)
+study_book(struct obj *spellbook)
 {
     int booktype = spellbook->otyp, i;
     boolean confused = (Confusion != 0);
@@ -624,7 +624,7 @@ study_book(struct obj* spellbook)
 /* a spellbook has been destroyed or the character has changed levels;
    the stored address for the current book is no longer valid */
 void
-book_disappears(struct obj* obj)
+book_disappears(struct obj *obj)
 {
     if (obj == gc.context.spbook.book) {
         gc.context.spbook.book = (struct obj *) 0;
@@ -636,7 +636,7 @@ book_disappears(struct obj* obj)
    so the sequence start reading, get interrupted, name the book, resume
    reading would read the "new" book from scratch */
 void
-book_substitution(struct obj* old_obj, struct obj* new_obj)
+book_substitution(struct obj *old_obj, struct obj *new_obj)
 {
     if (old_obj == gc.context.spbook.book) {
         gc.context.spbook.book = new_obj;
@@ -693,7 +693,7 @@ rejectcasting(void)
  * parameter.  Otherwise return FALSE.
  */
 static boolean
-getspell(int* spell_no)
+getspell(int *spell_no)
 {
     int nspells, idx;
     char ilet, lets[BUFSZ], qbuf[QBUFSZ];
@@ -2252,7 +2252,7 @@ spellretention(int idx, char * outbuf)
 
 /* Learn a spell during creation of the initial inventory */
 void
-initialspell(struct obj* obj)
+initialspell(struct obj *obj)
 {
     int i, otyp = obj->otyp;
 

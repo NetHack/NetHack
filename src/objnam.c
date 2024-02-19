@@ -321,7 +321,7 @@ safe_typename(int otyp)
 }
 
 boolean
-obj_is_pname(struct obj* obj)
+obj_is_pname(struct obj *obj)
 {
     if (!obj->oartifact || !has_oname(obj))
         return FALSE;
@@ -1687,21 +1687,21 @@ doname_base(
 }
 
 char *
-doname(struct obj* obj)
+doname(struct obj *obj)
 {
     return doname_base(obj, (unsigned) 0);
 }
 
 /* Name of object including price. */
 char *
-doname_with_price(struct obj* obj)
+doname_with_price(struct obj *obj)
 {
     return doname_base(obj, DONAME_WITH_PRICE);
 }
 
 /* "some" instead of precise quantity if obj->dknown not set */
 char *
-doname_vague_quan(struct obj* obj)
+doname_vague_quan(struct obj *obj)
 {
     /* Used by farlook.
      * If it hasn't been seen up close and quantity is more than one,
@@ -1720,7 +1720,7 @@ doname_vague_quan(struct obj* obj)
 
 /* used from invent.c */
 boolean
-not_fully_identified(struct obj* otmp)
+not_fully_identified(struct obj *otmp)
 {
     /* gold doesn't have any interesting attributes [yet?] */
     if (otmp->oclass == COIN_CLASS)
@@ -1857,7 +1857,7 @@ corpse_xname(
 
 /* xname doesn't include monster type for "corpse"; cxname does */
 char *
-cxname(struct obj* obj)
+cxname(struct obj *obj)
 {
     if (obj->otyp == CORPSE)
         return corpse_xname(obj, (const char *) 0, CXN_NORMAL);
@@ -1866,7 +1866,7 @@ cxname(struct obj* obj)
 
 /* like cxname, but ignores quantity */
 char *
-cxname_singular(struct obj* obj)
+cxname_singular(struct obj *obj)
 {
     if (obj->otyp == CORPSE)
         return corpse_xname(obj, (const char *) 0, CXN_SINGULAR);
@@ -1875,7 +1875,7 @@ cxname_singular(struct obj* obj)
 
 /* treat an object as fully ID'd when it might be used as reason for death */
 char *
-killer_xname(struct obj* obj)
+killer_xname(struct obj *obj)
 {
     struct obj save_obj;
     unsigned save_ocknown;
@@ -2023,7 +2023,7 @@ short_oname(
  * Used if only one of a collection of objects is named (e.g. in eat.c).
  */
 const char *
-singular(struct obj* otmp, char* (*func)(OBJ_P))
+singular(struct obj *otmp, char *(*func)(OBJ_P))
 {
     long savequan;
     char *nam;
@@ -2103,7 +2103,7 @@ An(const char *str)
  * Use type_is_pname() for monster names, not the().  the() is idempotent.
  */
 char *
-the(const char* str)
+the(const char *str)
 {
     const char *aname;
     char *buf = nextobuf();
@@ -2725,7 +2725,7 @@ singplur_compound(char *str)
  * 3.6.0: made case-insensitive.
  */
 char *
-makeplural(const char* oldstr)
+makeplural(const char *oldstr)
 {
     char *spot;
     char lo_c, *str = nextobuf();
@@ -2926,7 +2926,7 @@ makeplural(const char* oldstr)
  * 3.6.0: made case-insensitive.
  */
 char *
-makesingular(const char* oldstr)
+makesingular(const char *oldstr)
 {
     char *p, *bp;
     const char *excess = 0;

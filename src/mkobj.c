@@ -3571,7 +3571,7 @@ obj_absorb(struct obj **obj1, struct obj **obj2)
  * cleanly (since we don't know which we want to stay around)
  */
 struct obj *
-obj_meld(struct obj** obj1, struct obj** obj2)
+obj_meld(struct obj **obj1, struct obj **obj2)
 {
     struct obj *otmp1, *otmp2, *result = 0;
     int ox, oy;

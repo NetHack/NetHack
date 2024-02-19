@@ -55,7 +55,7 @@ somegold(long lmoney)
  * Deals in gold only, as leprechauns don't care for lesser coins.
 */
 struct obj *
-findgold(struct obj* argchain)
+findgold(struct obj *argchain)
 {
     struct obj *chain = argchain; /* allow arg to be nonnull */
 
@@ -68,7 +68,7 @@ findgold(struct obj* argchain)
  * Steal gold coins only.  Leprechauns don't care for lesser coins.
 */
 void
-stealgold(struct monst* mtmp)
+stealgold(struct monst *mtmp)
 {
     struct obj *fgold = g_at(u.ux, u.uy);
     struct obj *ygold;
@@ -356,7 +356,7 @@ worn_item_removal(
  * doesn't become a superset of leprechaun's "steal gold" attack).
  */
 int
-steal(struct monst* mtmp, char* objnambuf)
+steal(struct monst *mtmp, char *objnambuf)
 {
     struct obj *otmp;
     char Monnambuf[BUFSZ];
@@ -699,7 +699,7 @@ mpickobj(struct monst *mtmp, struct obj *otmp)
 
 /* called for AD_SAMU (the Wizard and quest nemeses) */
 void
-stealamulet(struct monst* mtmp)
+stealamulet(struct monst *mtmp)
 {
     char buf[BUFSZ];
     struct obj *otmp = 0, *obj = 0;

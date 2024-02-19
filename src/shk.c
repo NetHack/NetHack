@@ -105,7 +105,7 @@ static const char *const angrytexts[] = {
  *  if the monster kept the change.
  */
 long
-money2mon(struct monst* mon, long amount)
+money2mon(struct monst *mon, long amount)
 {
     struct obj *ygold = findgold(gi.invent);
 
@@ -134,7 +134,7 @@ money2mon(struct monst* mon, long amount)
  *  the priest gives you money for an ale.
  */
 void
-money2u(struct monst* mon, long amount)
+money2u(struct monst *mon, long amount)
 {
     struct obj *mongold = findgold(mon->minvent);
 
@@ -565,7 +565,7 @@ remote_burglary(coordxy x, coordxy y)
 /* shop merchandise has been taken; pay for it with any credit available;
    return false if the debt is fully covered by credit, true otherwise */
 static boolean
-rob_shop(struct monst* shkp)
+rob_shop(struct monst *shkp)
 {
     struct eshk *eshkp;
     long total;
@@ -601,7 +601,7 @@ rob_shop(struct monst* shkp)
 
 /* give a message when entering an untended shop (caller has verified that) */
 static void
-deserted_shop(/*const*/ char* enterstring)
+deserted_shop(/*const*/ char *enterstring)
 {
     struct monst *mtmp;
     struct mkroom *r = &gr.rooms[(int) *enterstring - ROOMOFFSET];
@@ -799,7 +799,7 @@ u_entered_shop(char *enterstring)
 
 /* called when removing a pick-axe or mattock from a container */
 void
-pick_pick(struct obj* obj)
+pick_pick(struct obj *obj)
 {
     struct monst *shkp;
 
@@ -833,7 +833,7 @@ pick_pick(struct obj* obj)
    quoted by the shopkeeper and also that they both belong to the same shk.
  */
 boolean
-same_price(struct obj* obj1, struct obj* obj2)
+same_price(struct obj *obj1, struct obj *obj2)
 {
     struct monst *shkp1, *shkp2;
     struct bill_x *bp1 = 0, *bp2 = 0;
@@ -868,7 +868,7 @@ same_price(struct obj* obj1, struct obj* obj2)
  * level is bones data which has a shk on the warpath.
  */
 static long
-shop_debt(struct eshk* eshkp)
+shop_debt(struct eshk *eshkp)
 {
     struct bill_x *bp;
     int ct;
@@ -1035,7 +1035,7 @@ onshopbill(struct obj *obj, struct monst *shkp, boolean silent)
 
 /* check whether an object or any of its contents belongs to a shop */
 boolean
-is_unpaid(struct obj* obj)
+is_unpaid(struct obj *obj)
 {
     return (boolean) (obj->unpaid
                       || (Has_contents(obj) && count_unpaid(obj->cobj)));
@@ -1043,7 +1043,7 @@ is_unpaid(struct obj* obj)
 
 /* Delete the contents of the given object. */
 void
-delete_contents(struct obj* obj)
+delete_contents(struct obj *obj)
 {
     struct obj *curr;
 
@@ -1055,7 +1055,7 @@ delete_contents(struct obj* obj)
 
 /* called with two args on merge */
 void
-obfree(struct obj* obj, struct obj* merge)
+obfree(struct obj *obj, struct obj *merge)
 {
     struct bill_x *bp;
     struct bill_x *bpm;
@@ -1151,7 +1151,7 @@ obfree(struct obj* obj, struct obj* merge)
 }
 
 static long
-check_credit(long  tmp, struct monst* shkp)
+check_credit(long  tmp, struct monst *shkp)
 {
     long credit = ESHK(shkp)->credit;
 
@@ -1170,7 +1170,7 @@ check_credit(long  tmp, struct monst* shkp)
 }
 
 static void
-pay(long tmp, struct monst* shkp)
+pay(long tmp, struct monst *shkp)
 {
     long robbed = ESHK(shkp)->robbed;
     long balance = ((tmp <= 0L) ? tmp : check_credit(tmp, shkp));
@@ -2296,7 +2296,7 @@ get_cost_of_shop_item(
 }
 
 static long
-get_pricing_units(struct obj* obj)
+get_pricing_units(struct obj *obj)
 {
     long units = obj->quan;
 
@@ -2314,7 +2314,7 @@ get_pricing_units(struct obj* obj)
 /* decide whether to apply a surcharge (or hypothetically, a discount) to obj
    if it had ID number 'oid'; returns 1: increase, 0: normal, -1: decrease */
 int
-oid_price_adjustment(struct obj* obj, unsigned int oid)
+oid_price_adjustment(struct obj *obj, unsigned int oid)
 {
     int res = 0, otyp = obj->otyp;
 
@@ -2528,7 +2528,7 @@ dropped_container(
 }
 
 void
-picked_container(struct obj* obj)
+picked_container(struct obj *obj)
 {
     struct obj *otmp;
 
@@ -2591,7 +2591,7 @@ special_stock(
 
 /* calculate how much the shk will pay when buying [all of] an object */
 static long
-set_cost(struct obj* obj, struct monst* shkp)
+set_cost(struct obj *obj, struct monst *shkp)
 {
     long tmp, unit_price = getprice(obj, TRUE), multiplier = 1L, divisor = 1L;
 
@@ -2794,7 +2794,7 @@ add_one_tobill(struct obj *obj, boolean dummy, struct monst *shkp)
 }
 
 static void
-add_to_billobjs(struct obj* obj)
+add_to_billobjs(struct obj *obj)
 {
     if (obj->where != OBJ_FREE)
         panic("add_to_billobjs: obj not free");
@@ -3126,7 +3126,7 @@ sub_one_frombill(struct obj* obj, struct monst* shkp)
 
 /* recursive check of unpaid objects within nested containers. */
 void
-subfrombill(struct obj* obj, struct monst* shkp)
+subfrombill(struct obj *obj, struct monst *shkp)
 {
     struct obj *otmp;
 
@@ -3745,7 +3745,7 @@ corpsenm_price_adj(struct obj *obj)
 }
 
 static long
-getprice(struct obj* obj, boolean shk_buying)
+getprice(struct obj *obj, boolean shk_buying)
 {
     long tmp = (long) objects[obj->otyp].oc_cost;
 
@@ -4539,7 +4539,7 @@ shopdig(int fall)
 }
 
 static void
-makekops(coord* mm)
+makekops(coord *mm)
 {
     static const short k_mndx[4] = { PM_KEYSTONE_KOP, PM_KOP_SERGEANT,
                                      PM_KOP_LIEUTENANT, PM_KOP_KAPTAIN };
@@ -4883,7 +4883,7 @@ price_quote(struct obj *first_obj)
 }
 
 static const char *
-shk_embellish(struct obj* itm, long cost)
+shk_embellish(struct obj *itm, long cost)
 {
     if (!rn2(3)) {
         int o, choice = rn2(5);
@@ -4936,7 +4936,7 @@ const char *Izchak_speaks[] = {
 };
 
 void
-shk_chat(struct monst* shkp)
+shk_chat(struct monst *shkp)
 {
     struct eshk *eshk;
     long shkmoney;
@@ -5103,7 +5103,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
  * when an object is completely used.
  */
 void
-check_unpaid_usage(struct obj* otmp, boolean altusage)
+check_unpaid_usage(struct obj *otmp, boolean altusage)
 {
     struct monst *shkp;
     const char *fmt, *arg1, *arg2;
@@ -5391,7 +5391,7 @@ sasc_bug(struct obj *op, unsigned x)
  *     4. player_owned glob merging into player_owned glob
  */
 void
-globby_bill_fixup(struct obj* obj_absorber, struct obj* obj_absorbed)
+globby_bill_fixup(struct obj *obj_absorber, struct obj *obj_absorbed)
 {
     int x = 0, y = 0;
     struct bill_x *bp, *bp_absorber = (struct bill_x *) 0;

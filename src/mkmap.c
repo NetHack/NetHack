@@ -449,7 +449,7 @@ litstate_rnd(int litstate)
 }
 
 void
-mkmap(lev_init* init_lev)
+mkmap(lev_init *init_lev)
 {
     schar bg_typ = init_lev->bg, fg_typ = init_lev->fg;
     boolean smooth = init_lev->smoothed, join = init_lev->joined;

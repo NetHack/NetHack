@@ -92,7 +92,7 @@ get_mplname(struct monst* mtmp, char *nam)
 }
 
 static void
-mk_mplayer_armor(struct monst* mon, short typ)
+mk_mplayer_armor(struct monst *mon, short typ)
 {
     struct obj *obj;
 
@@ -351,7 +351,7 @@ create_mplayers(int num, boolean special)
 }
 
 void
-mplayer_talk(struct monst* mtmp)
+mplayer_talk(struct monst *mtmp)
 {
     static const char
         *same_class_msg[3] = {
