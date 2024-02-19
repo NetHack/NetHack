@@ -3,18 +3,9 @@
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifdef OPTION_LISTS_ONLY /* (AMIGA) external program for opt lists */
-#include "config.h"
-#include "objclass.h"
-#include "flag.h"
-NEARDATA struct flag flags; /* provide linkage */
-NEARDATA struct instance_flags iflags; /* provide linkage */
-#define static
-#else
 #include "hack.h"
 #include "tcap.h"
 #include <ctype.h>
-#endif
 
 #define BACKWARD_COMPAT
 #define COMPLAIN_ABOUT_PRAYCONFIRM
@@ -106,8 +97,6 @@ enum option_phases {
 };
 
 static struct allopt_t allopt[SIZE(allopt_init)];
-
-#ifndef OPTION_LISTS_ONLY
 
 /* use rest of file */
 
@@ -10154,8 +10143,6 @@ enhance_menu_text(
 
 #undef OPTIONS_HEADING
 #undef CONFIG_SLOT
-
-#endif /* OPTION_LISTS_ONLY */
 
 #undef BACKWARD_COMPAT
 #undef COMPLAIN_ABOUT_PRAYCONFIRM
