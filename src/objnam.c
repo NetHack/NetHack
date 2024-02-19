@@ -5130,8 +5130,7 @@ readobjnam(char *bp, struct obj *no_wish)
          * armor modified by confused reading of cursed destroy armor)
          * so don't prevent player from wishing for such a combination.
          */
-        if (d.erodeproof
-            && (is_damageable(d.otmp) || d.otmp->otyp == CRYSKNIFE))
+        if (d.erodeproof && (is_damageable(d.otmp) || d.otmp->otyp == CRYSKNIFE))
             d.otmp->oerodeproof = (Luck >= 0 || wizard);
     }
 

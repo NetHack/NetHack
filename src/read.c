@@ -1528,8 +1528,8 @@ seffect_enchant_weapon(struct obj **sobjp)
     /* [What about twoweapon mode?  Proofing/repairing/enchanting both
        would be too powerful, but shouldn't we choose randomly between
        primary and secondary instead of always acting on primary?] */
-    if (confused && uwep
-        && erosion_matters(uwep) && uwep->oclass != ARMOR_CLASS) {
+    if (confused && uwep && (erosion_matters(uwep))
+        && uwep->oclass != ARMOR_CLASS) {
         old_erodeproof = (uwep->oerodeproof != 0);
         new_erodeproof = !scursed;
         uwep->oerodeproof = 0; /* for messages */

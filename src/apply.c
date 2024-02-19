@@ -3779,7 +3779,7 @@ discard_broken_wand(void)
 {
     struct obj *obj;
 
-    obj = gc.current_wand; /* [see dozap() and destroy_item()] */
+    obj = gc.current_wand; /* [see dozap() and destroy_items()] */
     gc.current_wand = 0;
     if (obj)
         delobj(obj);
@@ -3837,8 +3837,8 @@ do_break_wand(struct obj *obj)
         costly_alteration(obj, COST_DSTROY);
     }
 
-    gc.current_wand = obj; /* destroy_item might reset this */
-    freeinv(obj);       /* hide it from destroy_item instead... */
+    gc.current_wand = obj; /* destroy_items might reset this */
+    freeinv(obj);       /* hide it from destroy_items instead... */
     setnotworn(obj);    /* so we need to do this ourselves */
 
     if (!zappable(obj)) {

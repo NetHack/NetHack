@@ -35,7 +35,8 @@ static int zap_ok(struct obj *) NO_NNARGS;
  * boxlock_invent() calls boxlock() which has nonnull arg. */
 static void boxlock_invent(struct obj *) NONNULLARG1;
 static int spell_hit_bonus(int);
-static void destroy_one_item(struct obj *, int, int) NONNULLARG1;
+static int maybe_destroy_item(struct monst *, struct obj *, int) NONNULLPTRS;
+
 static void wishcmdassist(int);
 
 #define ZT_MAGIC_MISSILE (AD_MAGM - 1)
@@ -2071,10 +2072,9 @@ bhito(struct obj *obj, struct obj *otmp)
          * menu_drop(), askchain() - inventory traversal where multiple
          *             Drop can alter the invent chain while traversal
          *             is in progress (bhito isn't involved).
-         * destroy_item(), destroy_mitem() - inventory traversal where
-         *             item destruction can trigger drop or destruction of
-         *             other item(s) and alter the invent or mon->minvent
-         *             chain, possibly recursively.
+         * destroy_items() - inventory traversal where item destruction can
+         *             trigger drop or destruction of other item(s) and alter
+         *             the invent or mon->minvent chain, possibly recursively.
          *
          * The bypass bit on all objects is reset each turn, whenever
          * gc.context.bypasses is set.
@@ -2560,7 +2560,7 @@ dozap(void)
         /*      Are we having fun yet?
          * weffects -> buzz(obj->otyp) -> zhitm (temple priest) ->
          * attack -> hitum -> known_hitum -> ghod_hitsu ->
-         * buzz(AD_ELEC) -> destroy_item(WAND_CLASS) ->
+         * buzz(AD_ELEC) -> destroy_items(AD_ELEC) ->
          * useup -> obfree -> dealloc_obj -> free(obj)
          */
         gc.current_wand = obj;
@@ -2598,6 +2598,7 @@ zapyourself(struct obj *obj, boolean ordinary)
 {
     boolean learn_it = FALSE;
     int damage = 0;
+    int orig_dmg = 0; /* for passing to destroy_items() */
 
     switch (obj->otyp) {
     case WAN_STRIKING:
@@ -2620,19 +2621,19 @@ zapyourself(struct obj *obj, boolean ordinary)
 
     case WAN_LIGHTNING:
         learn_it = TRUE;
+        orig_dmg = d(12, 6);
         if (!Shock_resistance) {
             You("shock yourself!");
-            damage = d(12, 6);
+            damage = orig_dmg;
             exercise(A_CON, FALSE);
             monstunseesu(M_SEEN_ELEC);
         } else {
             shieldeff(u.ux, u.uy);
             You("zap yourself, but seem unharmed.");
             monstseesu(M_SEEN_ELEC);
-            ugolemeffects(AD_ELEC, d(12, 6));
+            ugolemeffects(AD_ELEC, orig_dmg);
         }
-        destroy_item(WAND_CLASS, AD_ELEC);
-        destroy_item(RING_CLASS, AD_ELEC);
+        (void) destroy_items(&gy.youmonst, AD_ELEC, orig_dmg);
         (void) flashburn((long) rnd(100));
         break;
 
@@ -2643,22 +2644,20 @@ zapyourself(struct obj *obj, boolean ordinary)
     case WAN_FIRE:
     case FIRE_HORN:
         learn_it = TRUE;
+        orig_dmg = d(12, 6);
         if (Fire_resistance) {
             shieldeff(u.ux, u.uy);
             You_feel("rather warm.");
             monstseesu(M_SEEN_FIRE);
-            ugolemeffects(AD_FIRE, d(12, 6));
+            ugolemeffects(AD_FIRE, orig_dmg);
         } else {
             pline("You've set yourself afire!");
-            damage = d(12, 6);
+            damage = orig_dmg;
             monstunseesu(M_SEEN_FIRE);
         }
         burn_away_slime();
         (void) burnarmor(&gy.youmonst);
-        destroy_item(SCROLL_CLASS, AD_FIRE);
-        destroy_item(POTION_CLASS, AD_FIRE);
-        destroy_item(SPBOOK_CLASS, AD_FIRE);
-        destroy_item(FOOD_CLASS, AD_FIRE); /* only slime for now */
+        (void) destroy_items(&gy.youmonst, AD_FIRE, orig_dmg);
         ignite_items(gi.invent);
         break;
 
@@ -2666,17 +2665,18 @@ zapyourself(struct obj *obj, boolean ordinary)
     case SPE_CONE_OF_COLD:
     case FROST_HORN:
         learn_it = TRUE;
+        orig_dmg = d(12, 6);
         if (Cold_resistance) {
             shieldeff(u.ux, u.uy);
             You_feel("a little chill.");
             monstseesu(M_SEEN_COLD);
-            ugolemeffects(AD_COLD, d(12, 6));
+            ugolemeffects(AD_COLD, orig_dmg);
         } else {
             You("imitate a popsicle!");
-            damage = d(12, 6);
+            damage = orig_dmg;
             monstunseesu(M_SEEN_COLD);
         }
-        destroy_item(POTION_CLASS, AD_COLD);
+        (void) destroy_items(&gy.youmonst, AD_COLD, orig_dmg);
         break;
 
     case WAN_MAGIC_MISSILE:
@@ -4093,7 +4093,7 @@ zhitm(
     int nd,             /* number of hit dice to use */
     struct obj **ootmp) /* to return worn armor for caller to disintegrate */
 {
-    int tmp = 0; /* damage amount */
+    register int tmp = 0, orig_dmg = 0; /* damage amount */
     int damgtype = zaptype(type) % 10;
     boolean sho_shieldeff = FALSE;
     boolean spellcaster = is_hero_spell(type); /* maybe get a bonus! */
@@ -4115,20 +4115,16 @@ zhitm(
             break;
         }
         tmp = d(nd, 6);
-        if (resists_cold(mon))
-            tmp += 7;
         if (spellcaster)
             tmp = spell_damage_bonus(tmp);
+        orig_dmg = tmp; /* includes spell bonus but not monster vuln to fire */
+        if (resists_cold(mon))
+            tmp += 7;
         if (burnarmor(mon)) {
-            if (!rn2(3))
-                (void) destroy_mitem(mon, POTION_CLASS, AD_FIRE);
-            if (!rn2(3))
-                (void) destroy_mitem(mon, SCROLL_CLASS, AD_FIRE);
-            if (!rn2(5))
-                (void) destroy_mitem(mon, SPBOOK_CLASS, AD_FIRE);
-            if (!rn2(3))
+            if (!rn2(3)) {
+                tmp += destroy_items(mon, AD_FIRE, orig_dmg);
                 ignite_items(mon->minvent);
-            destroy_mitem(mon, FOOD_CLASS, AD_FIRE); /* carried slime */
+            }
         }
         break;
     case ZT_COLD:
@@ -4137,12 +4133,13 @@ zhitm(
             break;
         }
         tmp = d(nd, 6);
-        if (resists_fire(mon))
-            tmp += d(nd, 3);
         if (spellcaster)
             tmp = spell_damage_bonus(tmp);
+        orig_dmg = tmp; /* includes spell bonus but not monster vuln to cold */
+        if (resists_fire(mon))
+            tmp += d(nd, 3);
         if (!rn2(3))
-            (void) destroy_mitem(mon, POTION_CLASS, AD_COLD);
+            tmp += destroy_items(mon, AD_COLD, orig_dmg);
         break;
     case ZT_SLEEP:
         /* possibly resistance and shield effect handled by sleep_monst() */
@@ -4195,14 +4192,15 @@ zhitm(
         tmp = mon->mhp + 1;
         break;
     case ZT_LIGHTNING:
+        tmp = d(nd, 6);
+        if (spellcaster)
+            tmp = spell_damage_bonus(tmp);
+        orig_dmg = tmp;
         if (resists_elec(mon) || defended(mon, AD_ELEC)) {
             sho_shieldeff = TRUE;
             tmp = 0;
             /* can still blind the monster */
-        } else
-            tmp = d(nd, 6);
-        if (spellcaster && tmp)
-            tmp = spell_damage_bonus(tmp);
+        }
         if (!resists_blnd(mon)
             && !(type > 0 && engulfing_u(mon))
             && nd > 2) {
@@ -4215,10 +4213,7 @@ zhitm(
                 mon->mblinded += rnd_tmp;
         }
         if (!rn2(3))
-            (void) destroy_mitem(mon, WAND_CLASS, AD_ELEC);
-        /* not actually possible yet */
-        if (!rn2(3))
-            (void) destroy_mitem(mon, RING_CLASS, AD_ELEC);
+            tmp += destroy_items(mon, AD_ELEC, orig_dmg);
         break;
     case ZT_POISON_GAS:
         if (resists_poison(mon) || defended(mon, AD_DRST)) {
@@ -4261,6 +4256,7 @@ zhitu(
     coordxy sx, coordxy sy)
 {
     int dam = 0, abstyp = zaptype(type);
+    int orig_dam = 0;
 
     switch (abstyp % 10) {
     case ZT_MAGIC_MISSILE:
@@ -4275,40 +4271,38 @@ zhitu(
         }
         break;
     case ZT_FIRE:
+        orig_dam = d(nd, 6);
         if (Fire_resistance) {
             shieldeff(sx, sy);
             You("don't feel hot!");
             monstseesu(M_SEEN_FIRE);
-            ugolemeffects(AD_FIRE, d(nd, 6));
+            ugolemeffects(AD_FIRE, orig_dam);
         } else {
-            dam = d(nd, 6);
+            dam = orig_dam;
             monstunseesu(M_SEEN_FIRE);
         }
         burn_away_slime();
         if (burnarmor(&gy.youmonst)) { /* "body hit" */
             if (!rn2(3))
-                destroy_item(POTION_CLASS, AD_FIRE);
-            if (!rn2(3))
-                destroy_item(SCROLL_CLASS, AD_FIRE);
-            if (!rn2(5))
-                destroy_item(SPBOOK_CLASS, AD_FIRE);
+                (void) destroy_items(&gy.youmonst, AD_FIRE, orig_dam);
+            
             if (!rn2(3))
                 ignite_items(gi.invent);
-            destroy_item(FOOD_CLASS, AD_FIRE);
         }
         break;
     case ZT_COLD:
+        orig_dam = d(nd, 6);
         if (Cold_resistance) {
             shieldeff(sx, sy);
             You("don't feel cold.");
             monstseesu(M_SEEN_COLD);
-            ugolemeffects(AD_COLD, d(nd, 6));
+            ugolemeffects(AD_COLD, orig_dam);
         } else {
-            dam = d(nd, 6);
+            dam = orig_dam;
             monstunseesu(M_SEEN_COLD);
         }
         if (!rn2(3))
-            destroy_item(POTION_CLASS, AD_COLD);
+            (void) destroy_items(&gy.youmonst, AD_COLD, orig_dam);
         break;
     case ZT_SLEEP:
         if (Sleep_resistance) {
@@ -4367,20 +4361,19 @@ zhitu(
         done(DIED);
         return; /* lifesaved */
     case ZT_LIGHTNING:
+        orig_dam = d(nd, 6);
         if (Shock_resistance) {
             shieldeff(sx, sy);
             You("aren't affected.");
             monstseesu(M_SEEN_ELEC);
-            ugolemeffects(AD_ELEC, d(nd, 6));
+            ugolemeffects(AD_ELEC, orig_dam);
         } else {
-            dam = d(nd, 6);
+            dam = orig_dam;
             exercise(A_CON, FALSE);
             monstunseesu(M_SEEN_ELEC);
         }
         if (!rn2(3))
-            destroy_item(WAND_CLASS, AD_ELEC);
-        if (!rn2(3))
-            destroy_item(RING_CLASS, AD_ELEC);
+            (void) destroy_items(&gy.youmonst, AD_ELEC, orig_dam);
         break;
     case ZT_POISON_GAS:
         poisoned("blast", A_DEX, "poisoned blast", 15, FALSE);
@@ -5426,6 +5419,53 @@ break_statue(struct obj *obj)
     return TRUE;
 }
 
+/* Return TRUE if obj is eligible to pass to maybe_destroy_item given the type of
+ * elemental damage it's being subjected to.
+ * Note that things like the Book of the Dead are eligible even though they
+ * won't get destroyed, because it will attempt to be destroyed but print a
+ * special message instead. */
+static boolean
+destroyable(struct obj *obj, int adtyp)
+{
+    if (obj->oartifact) {
+        /* don't destroy artifacts */
+        return FALSE;
+    }
+    if (obj->in_use && obj->quan == 1L) {
+        /* not available for destroying */
+        return FALSE;
+    }
+    if (adtyp == AD_FIRE) {
+        /* fire-magic items are immune */
+        if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL) {
+            return FALSE;
+        }
+        if (obj->otyp == GLOB_OF_GREEN_SLIME || obj->oclass == POTION_CLASS
+            || obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS) {
+            return TRUE;
+        }
+    }
+    else if (adtyp == AD_COLD) {
+        /* non-water potions don't freeze and shatter */
+        if (obj->oclass == POTION_CLASS && obj->otyp != POT_OIL) {
+            return TRUE;
+        }
+    }
+    else if (adtyp == AD_ELEC) {
+        if (obj->oclass != RING_CLASS && obj->oclass != WAND_CLASS) {
+            return FALSE;
+        }
+        /* electric-magic items are immune */
+        if (obj->otyp != RIN_SHOCK_RESISTANCE && obj->otyp != WAN_LIGHTNING) {
+            return TRUE;
+        }
+        /* There used to be a commented out bit of code that would exclude
+         * gc.current_wand, but it wasn't used, so it wasn't moved into this
+         * function. */
+    }
+    return FALSE;
+}
+
 /* convert attack damage AD_foo to property resistance */
 static int
 adtyp_to_prop(int dmgtyp)
@@ -5558,47 +5598,57 @@ const char *const destroy_strings[][3] = {
     { "breaks apart and explodes", "", "exploding wand" },
 };
 
-/* guts of destroy_item(), which ought to be called maybe_destroy_items();
-   caller must decide whether obj is eligible */
-static void
-destroy_one_item(struct obj *obj, int osym, int dmgtyp)
+/* guts of destroy_items();
+   caller must decide whether obj is eligible, though there's one case (Book of
+   the Dead) in which an eligible item shouldn't be destroyed (it prints a
+   special message instead).
+   Returns the amount of damage done, but this is used differently depending on
+   whether it's the player or a monster having an item destroyed: players lose
+   the HP and possibly die in this function, and the return value is unused,
+   whereas monsters return the damage to their caller to be taken off later */
+static int
+maybe_destroy_item(
+    struct monst *carrier,
+    struct obj *obj,
+    int dmgtyp)
 {
     long i, cnt, quan;
     int dmg, xresist, skip, dindx;
     const char *mult;
+    boolean u_carry = (carrier == &gy.youmonst);
+    boolean vis = !u_carry && canseemon(carrier);
     boolean chargeit = FALSE;
 
     xresist = skip = 0;
     /* lint suppression */
     dmg = dindx = 0;
     quan = 0L;
-
+    
     /* external worn item protects inventory? */
     if (inventory_resistance_check(dmgtyp))
-        return;
+        return 0;
 
     switch (dmgtyp) {
     case AD_COLD:
-        if (osym == POTION_CLASS && obj->otyp != POT_OIL) {
-            quan = obj->quan;
-            dindx = 0;
-            dmg = rnd(4);
-        } else
-            skip++;
+        quan = obj->quan;
+        dindx = 0;
+        dmg = rnd(4);
         break;
     case AD_FIRE:
-        xresist = (Fire_resistance && obj->oclass != POTION_CLASS
-                   && obj->otyp != GLOB_OF_GREEN_SLIME);
-        if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL)
-            skip++;
+        xresist = (obj->oclass != POTION_CLASS
+                   && obj->otyp != GLOB_OF_GREEN_SLIME
+                   && (u_carry ? Fire_resistance : resists_fire(carrier)));
         if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
-            skip++;
-            if (!Blind)
+            skip = 1;
+            if (u_carry ? !Blind : vis) {
                 pline("%s glows a strange %s, but remains intact.",
-                      The(xname(obj)), hcolor("dark red"));
+                      The(u_carry ? xname(obj) : distant_name(obj, xname)),
+                      hcolor("dark red"));
+            }
+            break;
         }
         quan = obj->quan;
-        switch (osym) {
+        switch (obj->oclass) {
         case POTION_CLASS:
             dindx = (obj->otyp != POT_OIL) ? 1 : 2;
             dmg = rnd(6);
@@ -5611,23 +5661,17 @@ destroy_one_item(struct obj *obj, int osym, int dmgtyp)
             dindx = 4;
             dmg = 1;
             break;
-        case FOOD_CLASS:
-            if (obj->otyp == GLOB_OF_GREEN_SLIME) {
-                dindx = 1; /* boil and explode */
-                dmg = (obj->owt + 19) / 20;
-            } else {
-                skip++;
-            }
-            break;
-        default:
-            skip++;
+        case FOOD_CLASS: /* only GLOB_OF_GREEN_SLIME */
+            dindx = 1; /* boil and explode */
+            dmg = (obj->owt + 19) / 20;
             break;
         }
         break;
     case AD_ELEC:
-        xresist = (Shock_resistance && obj->oclass != RING_CLASS);
+        xresist = (obj->oclass != RING_CLASS
+                   && (u_carry ? Shock_resistance : resists_elec(carrier)));
         quan = obj->quan;
-        switch (osym) {
+        switch (obj->oclass) {
         case RING_CLASS:
             if (((obj->owornmask & W_RING) && uarmg && !is_metallic(uarmg))
                 || obj->otyp == RIN_SHOCK_RESISTANCE) {
@@ -5641,29 +5685,22 @@ destroy_one_item(struct obj *obj, int osym, int dmgtyp)
             dmg = 0;
             break;
         case WAND_CLASS:
-            if (obj->otyp == WAN_LIGHTNING) {
-                skip++;
-                break;
-            }
-#if 0
-            if (obj == gc.current_wand) {  skip++;  break;  }
-#endif
             dindx = 6;
             dmg = rnd(10);
-            break;
-        default:
-            skip++;
             break;
         }
         break;
     default:
-        skip++;
+        skip = 1; /* just in case ineligible damage type gets through... */
+        impossible("maybe_destroy_item with unexpected dmgtyp %d", dmgtyp);
         break;
     }
 
     if (chargeit) {
         recharge(obj, 0);
     } else if (!skip) {
+        char osym = obj->oclass; /* for checking glob of slime after it's
+                                       destroyed */
         if (obj->in_use)
             --quan; /* one will be used up elsewhere */
         for (i = cnt = 0L; i < quan; i++)
@@ -5671,30 +5708,44 @@ destroy_one_item(struct obj *obj, int osym, int dmgtyp)
                 cnt++;
 
         if (!cnt)
-            return;
-        mult = (cnt == 1L)
-                ? ((quan == 1L) ? "Your"                         /* 1 of 1 */
-                                : "One of your")                 /* 1 of N */
-                : ((cnt < quan) ? "Some of your"                 /* n of N */
-                                : (quan == 2L) ? "Both of your"  /* 2 of 2 */
-                                               : "All of your"); /* N of N */
-        pline("%s %s %s!", mult, xname(obj),
-              destroy_strings[dindx][(cnt > 1L)]);
-        if (osym == POTION_CLASS && dmgtyp != AD_COLD) {
-            if (!breathless(gy.youmonst.data) || haseyes(gy.youmonst.data))
+            return 0;
+        
+        if (u_carry || vis) {
+            mult = (cnt == 1L)
+                       ? ((quan == 1L) ? ""                         /* 1 of 1 */
+                                       : "One of ")                 /* 1 of N */
+                       : ((cnt < quan) ? "Some of "                 /* n of N */
+                          : (quan == 2L) ? "Both of "  /* 2 of 2 */
+                                         : "All of "); /* N of N */
+            pline("%s%s %s!", mult,
+                  (cnt == 1L && quan == 1L) ? Yname2(obj) : yname(obj),
+                  destroy_strings[dindx][(cnt > 1L)]);
+        }
+        if (u_carry) { /* effects that happen only to the player */
+            if (osym == POTION_CLASS && dmgtyp != AD_COLD
+                && (!breathless(gy.youmonst.data) || haseyes(gy.youmonst.data))) {
                 potionbreathe(obj);
+            }
+            if (obj->owornmask) { /* m_useup handles these for monster */
+                if (obj->owornmask & W_RING) /* ring being worn */
+                    Ring_gone(obj);
+                else
+                    setnotworn(obj);
+            }
+            if (obj == gc.current_wand) {
+                gc.current_wand = 0; /* destroyed */
+            }
         }
-        if (obj->owornmask) {
-            if (obj->owornmask & W_RING) /* ring being worn */
-                Ring_gone(obj);
+        for (i = 0; i < cnt; i++) {
+            if (u_carry)
+                useup(obj);
             else
-                setnotworn(obj);
+                m_useup(carrier, obj);
         }
-        if (obj == gc.current_wand)
-            gc.current_wand = 0; /* destroyed */
-        for (i = 0; i < cnt; i++)
-            useup(obj);
         if (dmg) {
+            if (!u_carry) {
+                return xresist ? 0 : dmg;
+            }
             if (xresist) {
                 You("aren't hurt!");
             } else {
@@ -5709,26 +5760,66 @@ destroy_one_item(struct obj *obj, int osym, int dmgtyp)
             }
         }
     }
+    return dmg;
 }
 
-/* target items of specified class for possible destruction */
-void
-destroy_item(int osym, int dmgtyp)
+/* scaling factor; dmg/5 stacks of items will be subjected to destroy_items() */
+#define DMG_DESTROY_SCALE 5
+/* largest amount of stacks that will be destroyed in a single call */
+#define MAX_ITEMS_DESTROYED 20
+    
+    /* target items of specified class in mon's inventory for possible destruction
+ * return total amount of damage inflicted, though this is unused if mon is the
+ * player */
+    int
+destroy_items(
+    struct monst *mon, /* monster whose invent is being subjected to
+                        * destruction */
+    int dmgtyp,         /* AD_**** - currently only cold, fire, elec */
+    int dmg_in)         /* the amount of HP damage the attack dealt */
 {
     register struct obj *obj;
-    int i, deferral_indx = 0;
-    /* 1+52+1: try to handle a full inventory; it doesn't matter if
-      inventory actually has more, even if everything should be deferred */
-    unsigned short deferrals[invlet_gold + invlet_basic + invlet_overflow];
+    int i, defer;
+    int limit; /* max amount of item stacks destroyed, based on damage */
+    struct {
+        unsigned oid;
+        boolean deferred;
+    } items_to_destroy[MAX_ITEMS_DESTROYED];
+    int elig_stacks = 0; /* number of destroyable objects found so far */
+    boolean u_carry = (mon == &gy.youmonst);
+    /* this is a struct obj** because we might destroy the first item in it */
+    struct obj **objchn = u_carry ? &gi.invent : &mon->minvent;
+    int dmg_out = 0; /* damage caused by items getting destroyed */
 
-    (void) memset((genericptr_t) deferrals, 0, sizeof deferrals);
-    /*
-     * Sometimes destroying an item can change inventory aside from
+    /* initialize items_to_destroy */
+    for (i = 0; i < MAX_ITEMS_DESTROYED; ++i) {
+        /* 0 should not be a valid o_id for anything */
+        items_to_destroy[i].oid = 0;
+        items_to_destroy[i].deferred = FALSE;
+    }
+
+    /* Don't straight up destroy all items with an equal chance; limit it based
+     * on the amount of damage being dealt by the source of the item
+     * destruction. */
+    limit = dmg_in / DMG_DESTROY_SCALE;
+    if (dmg_in % DMG_DESTROY_SCALE > rn2(DMG_DESTROY_SCALE)) {
+        limit++; /* dmg = 9: 20% chance of limit=1, 80% of limit=2, etc */
+    }
+    if (limit > MAX_ITEMS_DESTROYED) {
+        /* in case of incredibly high damage, prevent from overflowing
+         * items_to_destroy */
+        limit = MAX_ITEMS_DESTROYED;
+    }
+    if (limit < 1) {
+        return 0; /* nothing destroyed */
+    }
+
+    /* Sometimes destroying an item can change inventory aside from
      * the item itself (cited case was a potion of unholy water; when
      * boiled, potionbreathe() caused hero to transform into were-beast
      * form and that resulted in dropping or destroying some worn armor).
      *
-     * Unlike other uses of the object bybass mechanism, destroy_item()
+     * Unlike other uses of the object bypass mechanism, destroy_items()
      * can be called multiple times for the same event.  So we have to
      * explicitly clear it before each use and hope no other section of
      * code expects it to retain previous value.
@@ -5751,21 +5842,27 @@ destroy_item(int osym, int dmgtyp)
      * of o_id and quantity of what is targeted for destruction,
      * second pass to handle the destruction.]
      */
-    bypass_objlist(gi.invent, FALSE); /* clear bypass bit for invent */
+    bypass_objlist(*objchn, FALSE); /* clear bypass bit for invent */
+                                    
+    while ((obj = nxt_unbypassed_obj(*objchn)) != 0) {
+        if (!destroyable(obj, dmgtyp))
+            continue; /* this dmg type can't destroy this obj */
 
-    while ((obj = nxt_unbypassed_obj(gi.invent)) != 0) {
-        if (obj->oclass != osym)
-            continue; /* test only objs of type osym */
-        if (obj->oartifact)
-            continue; /* don't destroy artifacts */
-        if (obj->in_use && obj->quan == 1L)
-            continue; /* not available */
+        /* obj is eligible; maybe add it to items_to_destroy */
+        i = (elig_stacks < limit) ? elig_stacks : rn2(elig_stacks);
+        /* do this afterwards to avoid not filling items_to_destroy[0] */
+        elig_stacks++;
+        if (i >= limit) {
+            /* random index was too high */
+            continue;
+        }
+        items_to_destroy[i].oid = obj->o_id;
 
         /* if loss of this item might dump us onto a trap, hold off
-           until later because potential recursive destroy_item() will
+           until later because potential recursive destroy_items() will
            result in setting bypass bits on whole chain--we would skip
            the rest as already processed once control returns here */
-        if (deferral_indx < SIZE(deferrals)
+        if (u_carry
             && ((obj->owornmask != 0L
                  && (objects[obj->otyp].oc_oprop == LEVITATION
                      || objects[obj->otyp].oc_oprop == FLYING))
@@ -5773,142 +5870,35 @@ destroy_item(int osym, int dmgtyp)
                    polymorph so don't need to be deferred */
                 || (obj->otyp == POT_WATER && ismnum(u.ulycn)
                     && (Upolyd ? obj->blessed : obj->cursed)))) {
-            deferrals[deferral_indx++] = obj->o_id;
-            continue;
+            items_to_destroy[i].deferred = TRUE;
         }
-        /* obj is eligible; maybe destroy it */
-        destroy_one_item(obj, osym, dmgtyp);
+        else {
+            items_to_destroy[i].deferred = FALSE;
+        }
     }
-    /* if we saved some items for later (most likely just a worn ring
-       of levitation) and they're still in inventory, handle them now */
-    for (i = 0; i < deferral_indx; ++i) {
-        /* note: obj->nobj is only referenced when obj is skipped;
-           having obj be dropped or destroyed won't affect traversal */
-        for (obj = gi.invent; obj; obj = obj->nobj)
-            if (obj->o_id == deferrals[i]) {
-                destroy_one_item(obj, osym, dmgtyp);
-                break;
-            }
+    if (elig_stacks > limit) {
+        elig_stacks = limit; /* so we can loop up to elig_stacks */
     }
-    return;
-}
-
-int
-destroy_mitem(struct monst *mtmp, int osym, int dmgtyp)
-{
-    struct obj *obj;
-    int skip, tmp = 0;
-    long i, cnt, quan;
-    int dindx;
-    boolean vis;
-
-    if (mtmp == &gy.youmonst) { /* this simplifies artifact_hit() */
-        destroy_item(osym, dmgtyp);
-        return 0; /* arbitrary; value doesn't matter to artifact_hit() */
-    }
-
-    vis = canseemon(mtmp);
-
-    /* see destroy_item(); object destruction could disrupt inventory list */
-    bypass_objlist(mtmp->minvent, FALSE); /* clear bypass bit for minvent */
-
-    while ((obj = nxt_unbypassed_obj(mtmp->minvent)) != 0) {
-        if (obj->oclass != osym)
-            continue; /* test only objs of type osym */
-        skip = 0;
-        quan = 0L;
-        dindx = 0;
-
-        switch (dmgtyp) {
-        case AD_COLD:
-            if (osym == POTION_CLASS && obj->otyp != POT_OIL) {
-                quan = obj->quan;
-                dindx = 0;
-                tmp++;
-            } else
-                skip++;
-            break;
-        case AD_FIRE:
-            if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL)
-                skip++;
-            if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
-                skip++;
-                if (vis)
-                    pline("%s glows a strange %s, but remains intact.",
-                          The(distant_name(obj, xname)), hcolor("dark red"));
-            }
-            quan = obj->quan;
-            switch (osym) {
-            case POTION_CLASS:
-                dindx = (obj->otyp != POT_OIL) ? 1 : 2;
-                tmp++;
-                break;
-            case SCROLL_CLASS:
-                dindx = 3;
-                tmp++;
-                break;
-            case SPBOOK_CLASS:
-                dindx = 4;
-                tmp++;
-                break;
-            case FOOD_CLASS:
-                if (obj->otyp == GLOB_OF_GREEN_SLIME) {
-                    dindx = 1; /* boil and explode */
-                    tmp += (obj->owt + 19) / 20;
-                } else {
-                    skip++;
-                }
-                break;
-            default:
-                skip++;
-                break;
-            }
-            break;
-        case AD_ELEC:
-            quan = obj->quan;
-            switch (osym) {
-            case RING_CLASS:
-                if (obj->otyp == RIN_SHOCK_RESISTANCE) {
-                    skip++;
+    for (defer = 0; defer <= 1; ++defer) {
+        /* if we saved some items for later (most likely just a worn ring
+           of levitation) and they're still in inventory, handle them on the
+           second iteration of the loop */
+        struct obj *nobj;
+        for (obj = *objchn; obj; obj = nobj) {
+            nobj = obj->nobj;
+            for (i = 0; i < elig_stacks; ++i) {
+                if (obj->o_id == items_to_destroy[i].oid
+                    && (items_to_destroy[i].deferred == (defer == 1))) {
+                    dmg_out += maybe_destroy_item(mon, obj, dmgtyp);
                     break;
                 }
-                dindx = 5;
-                break;
-            case WAND_CLASS:
-                if (obj->otyp == WAN_LIGHTNING) {
-                    skip++;
-                    break;
-                }
-                dindx = 6;
-                tmp++;
-                break;
-            default:
-                skip++;
-                break;
             }
-            break;
-        default:
-            skip++;
-            break;
-        }
-        if (!skip) {
-            for (i = cnt = 0L; i < quan; i++)
-                if (!rn2(3))
-                    cnt++;
-
-            if (!cnt)
-                continue;
-            if (vis)
-                pline("%s%s %s!",
-                      (cnt == obj->quan) ? "" : (cnt > 1L) ? "Some of "
-                                                           : "One of ",
-                      (cnt == obj->quan) ? Yname2(obj) : yname(obj),
-                      destroy_strings[dindx][(cnt > 1L)]);
-            for (i = 0; i < cnt; i++)
-                m_useup(mtmp, obj);
         }
     }
-    return tmp;
+    /* almost certainly not everything was destroyed; remove bypass bit after it
+     * was set earlier */
+    bypass_objlist(*objchn, FALSE);
+    return dmg_out;
 }
 
 int

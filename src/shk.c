@@ -2809,7 +2809,7 @@ add_to_billobjs(struct obj* obj)
        in_use by dodrink/dopotion but isn't being used up yet because
        it stays on the bill; only object sanity checking actually cares */
     obj->in_use = 0;
-    /* ... same for bypass by destroy_item */
+    /* ... same for bypass by destroy_items */
     obj->bypass = 0;
 }
 

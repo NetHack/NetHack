@@ -1685,21 +1685,17 @@ dogaze(void)
                               Monnam(mtmp));
                     mtmp->mconf = 1;
                 } else if (adtyp == AD_FIRE) {
-                    int dmg = d(2, 6), lev = (int) u.ulevel;
+                    int dmg = d(2, 6), orig_dmg = dmg, lev = (int) u.ulevel;
 
                     You("attack %s with a fiery gaze!", mon_nam(mtmp));
                     if (resists_fire(mtmp)) {
                         pline_The("fire doesn't burn %s!", mon_nam(mtmp));
                         dmg = 0;
                     }
-                    if (lev > rn2(20))
-                        (void) destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
-                    if (lev > rn2(20))
-                        (void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
-                    if (lev > rn2(25))
-                        (void) destroy_mitem(mtmp, SPBOOK_CLASS, AD_FIRE);
-                    if (lev > rn2(20))
+                    if (lev > rn2(20)) {
+                        dmg += destroy_items(mtmp, AD_FIRE, orig_dmg);
                         ignite_items(mtmp->minvent);
+                    }
                     if (dmg)
                         mtmp->mhp -= dmg;
                     if (DEADMONSTER(mtmp))

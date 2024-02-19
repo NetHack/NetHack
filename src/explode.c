@@ -209,7 +209,6 @@ explode(
     boolean visible, any_shield;
     int uhurt = 0; /* 0=unhurt, 1=items damaged, 2=you and items damaged */
     const char *str = (const char *) 0;
-    int idamres, idamnonres;
     struct monst *mtmp, *mdef = 0;
     uchar adtyp;
     int explmask[3][3]; /* 0=normal explosion, 1=do shieldeff, 2=do nothing */
@@ -457,6 +456,8 @@ explode(
     if (dam) {
         for (i = 0; i < 3; i++) {
             for (j = 0; j < 3; j++) {
+                int itemdmg = 0;
+
                 if (explmask[i][j] == EXPL_SKIP)
                     continue;
                 xx = x + i - 1;
@@ -473,7 +474,7 @@ explode(
                     /* for inside_engulfer, only <u.ux,u.uy> is affected */
                     continue;
                 }
-                idamres = idamnonres = 0;
+                
                 /* Affect the floor unless the player caused the explosion
                  * from inside their engulfer. */
                 if (!(u.uswallow && !gc.context.mon_moving))
@@ -507,19 +508,22 @@ explode(
                     pline("%s is caught in the %s!", Monnam(mtmp), str);
                 }
 
+                itemdmg = destroy_items(mtmp, (int) adtyp, dam);
                 if (adtyp == AD_FIRE) {
                     (void) burnarmor(mtmp);
                     ignite_items(mtmp->minvent);
                 }
-                idamres += destroy_mitem(mtmp, SCROLL_CLASS, (int) adtyp);
-                idamres += destroy_mitem(mtmp, SPBOOK_CLASS, (int) adtyp);
-                idamnonres += destroy_mitem(mtmp, POTION_CLASS, (int) adtyp);
-                idamnonres += destroy_mitem(mtmp, RING_CLASS, (int) adtyp);
-                idamnonres += destroy_mitem(mtmp, WAND_CLASS, (int) adtyp);
-
+                
                 if ((explmask[i][j] & EXPL_MON) != 0) {
-                    golemeffects(mtmp, (int) adtyp, dam + idamres);
-                    mtmp->mhp -= idamnonres;
+                    /* damage from ring/wand explosion isn't itself
+                     * electrical in nature, nor is damage from freezing potion
+                     * really cold in nature, nor is damage from boiling potion
+                     * or exploding oil; only burning items damage is the "same
+                     * type" as the explosion. Because this is imperfect and
+                     * marginal (burning items only deal 1 damage), ignore it
+                     * for golemeffects(). */
+                    golemeffects(mtmp, (int) adtyp, dam);
+                    mtmp->mhp -= itemdmg; /* item destruction dmg */
                 } else {
                     /* call resist with 0 and do damage manually so 1) we can
                      * get out the message before doing the damage, and 2) we
@@ -546,8 +550,7 @@ explode(
                         mdam *= 2;
                     else if (resists_fire(mtmp) && adtyp == AD_COLD)
                         mdam *= 2;
-                    mtmp->mhp -= mdam;
-                    mtmp->mhp -= (idamres + idamnonres);
+                    mtmp->mhp -= mdam + itemdmg;
                 }
                 if (DEADMONSTER(mtmp)) {
                     int xkflg = ((adtyp == AD_FIRE
@@ -611,11 +614,7 @@ explode(
             (void) burnarmor(&gy.youmonst);
             ignite_items(gi.invent);
         }
-        destroy_item(SCROLL_CLASS, (int) adtyp);
-        destroy_item(SPBOOK_CLASS, (int) adtyp);
-        destroy_item(POTION_CLASS, (int) adtyp);
-        destroy_item(RING_CLASS, (int) adtyp);
-        destroy_item(WAND_CLASS, (int) adtyp);
+        (void) destroy_items(&gy.youmonst, (int) adtyp, dam);
 
         ugolemeffects((int) adtyp, damu);
         if (uhurt == 2) {
