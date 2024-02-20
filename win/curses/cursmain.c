@@ -157,7 +157,7 @@ color_attr curses_menu_promptstyle = { NO_COLOR, ATR_NONE };
 static int inv_update = 0;
 
 /*
-init_nhwindows(int* argcp, char** argv)
+init_nhwindows(int *argcp, char **argv)
                 -- Initialize the windows used by NetHack.  This can also
                    create the standard windows listed at the top, but does
                    not display them.

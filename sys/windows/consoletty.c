@@ -961,7 +961,7 @@ gettty(void)
 
 /* reset terminal to original state */
 void
-settty(const char* s)
+settty(const char *s)
 {
     cmov(ttyDisplay->curx, ttyDisplay->cury);
     end_screen();
@@ -1227,7 +1227,7 @@ nocmov(int x, int y)
 }
 
 void
-xputs(const char* s)
+xputs(const char *s)
 {
     int k;
     int slen = (int) strlen(s);
@@ -1837,7 +1837,7 @@ toggle_mouse_support(void)
 
 /* handle tty options updates here */
 void
-consoletty_preference_update(const char* pref)
+consoletty_preference_update(const char *pref)
 {
     if (stricmp(pref, "mouse_support") == 0) {
 #ifndef NO_MOUSE_ALLOWED
@@ -1989,7 +1989,7 @@ win32con_toggle_cursor_info(void)
 #endif
 
 void
-map_subkeyvalue(char* op)
+map_subkeyvalue(char *op)
 {
     char digits[] = "0123456789";
     int length, i, idx, val;
@@ -2862,8 +2862,8 @@ set_keyhandling_via_option(void)
 int
 default_processkeystroke(
     HANDLE hConIn,
-    INPUT_RECORD* ir,
-    boolean* valid,
+    INPUT_RECORD *ir,
+    boolean *valid,
     boolean numberpad,
     int portdebug)
 {
@@ -3030,7 +3030,7 @@ int
 default_checkinput(
     HANDLE hConIn,
     INPUT_RECORD *ir,
-    DWORD* count,
+    DWORD *count,
     boolean numpad,
     int mode,
     int *mod,

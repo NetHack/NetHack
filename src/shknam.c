@@ -784,7 +784,7 @@ stock_room(int shp_indx, struct mkroom *sroom)
 
     /* Hack for Orcus's level: it's a ghost town, get rid of shopkeepers */
     if (on_level(&u.uz, &orcus_level)) {
-        struct monst* mtmp = shop_keeper(rmno);
+        struct monst *mtmp = shop_keeper(rmno);
         mongone(mtmp);
     }
 

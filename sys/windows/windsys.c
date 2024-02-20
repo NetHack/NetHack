@@ -102,7 +102,7 @@ switchar(void)
 }
 
 long
-freediskspace(char* path)
+freediskspace(char *path)
 {
     char tmppath[4];
     DWORD SectorsPerCluster = 0;
@@ -123,7 +123,7 @@ freediskspace(char* path)
  * Functions to get filenames using wildcards
  */
 int
-findfirst(char* path)
+findfirst(char *path)
 {
     if (ffhandle) {
         FindClose(ffhandle);
@@ -146,7 +146,7 @@ foundfile_buffer(void)
 }
 
 long
-filesize(char* file)
+filesize(char *file)
 {
     if (findfirst(file)) {
         return ((long) ffd.nFileSizeLow);
@@ -158,7 +158,7 @@ filesize(char* file)
  * Chdrive() changes the default drive.
  */
 void
-chdrive(char* str)
+chdrive(char *str)
 {
     char *ptr;
     char drive;

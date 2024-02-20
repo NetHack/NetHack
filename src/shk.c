@@ -1821,9 +1821,9 @@ dopay(void)
  */
 static int
 dopayobj(
-    struct monst* shkp,
-    struct bill_x* bp,
-    struct obj** obj_p,
+    struct monst *shkp,
+    struct bill_x *bp,
+    struct obj **obj_p,
     int which /* 0 => used-up item, 1 => other (unpaid or lost) */,
     boolean itemize)
 
@@ -2328,8 +2328,8 @@ oid_price_adjustment(struct obj *obj, unsigned int oid)
 /* calculate the value that the shk will charge for [one of] an object */
 static long
 get_cost(
-    struct obj* obj,
-    struct monst* shkp) /* if angry, impose a surcharge */
+    struct obj *obj,
+    struct monst *shkp) /* if angry, impose a surcharge */
 {
     long tmp = getprice(obj, FALSE),
          /* used to perform a single calculation even when multiple
@@ -2681,7 +2681,7 @@ gem_learned(int oindx)
    [if the new price drops for some reason, keep the old one in place] */
 void
 alter_cost(
-    struct obj* obj,
+    struct obj *obj,
     long amt) /* if 0, use regular shop pricing, otherwise force amount;
                  if negative, use abs(amt) even if it's less than old cost */
 {
@@ -3086,7 +3086,7 @@ splitbill(struct obj *obj, struct obj *otmp)
 }
 
 static void
-sub_one_frombill(struct obj* obj, struct monst* shkp)
+sub_one_frombill(struct obj *obj, struct monst *shkp)
 {
     struct bill_x *bp;
 
@@ -3881,7 +3881,7 @@ static boolean
 repairable_damage(struct damage *dam, struct monst *shkp)
 {
     coordxy x, y;
-    struct trap* ttmp;
+    struct trap *ttmp;
     struct monst *mtmp;
 
     if (!dam || shk_impaired(shkp))

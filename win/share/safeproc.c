@@ -430,7 +430,7 @@ safe_outrip(winid tmpwin UNUSED, int how UNUSED, time_t when UNUSED)
 
 /*ARGSUSED*/
 void
-safe_preference_update(const char* pref UNUSED)
+safe_preference_update(const char *pref UNUSED)
 {
     return;
 }
@@ -518,7 +518,7 @@ stdio_wait_synch(void)
 
 /* Add to your code: windowprocs.win_raw_print = stdio_raw_print; */
 void
-stdio_raw_print(const char* str)
+stdio_raw_print(const char *str)
 {
     if (str)
         fprintf(stdout, "%s\n", str);
@@ -528,7 +528,7 @@ stdio_raw_print(const char* str)
 /* no newline variation, add to your code:
     windowprocs.win_raw_print = stdio_nonl_raw_print;  */
 void
-stdio_nonl_raw_print(const char* str)
+stdio_nonl_raw_print(const char *str)
 {
     if (str)
         fprintf(stdout, "%s", str);
@@ -537,7 +537,7 @@ stdio_nonl_raw_print(const char* str)
 
 /* Add to your code: windowprocs.win_raw_print_bold = stdio_raw_print_bold; */
 void
-stdio_raw_print_bold(const char* str)
+stdio_raw_print_bold(const char *str)
 {
     stdio_raw_print(str);
     return;

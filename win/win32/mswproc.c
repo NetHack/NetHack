@@ -35,7 +35,7 @@
 
 #ifdef DEBUG
 # ifdef _DEBUG
-static FILE* _s_debugfp = NULL;
+static FILE *_s_debugfp = NULL;
 extern void logDebug(const char *fmt, ...);
 # endif
 #endif
@@ -128,7 +128,7 @@ struct window_procs mswin_procs = {
 };
 
 /*
-init_nhwindows(int* argcp, char** argv)
+init_nhwindows(int *argcp, char **argv)
                 -- Initialize the windows used by NetHack.  This can also
                    create the standard windows listed at the top, but does
                    not display them.

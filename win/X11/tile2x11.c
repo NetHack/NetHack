@@ -139,7 +139,7 @@ xpm_write(FILE *fp)
     }
 
     Fprintf(fp, "/* XPM */\n");
-    Fprintf(fp, "static char* nhtiles[] = {\n");
+    Fprintf(fp, "static char *nhtiles[] = {\n");
     Fprintf(fp, "\"%lu %lu %lu %d\",\n", header.tile_width * header.per_row,
             (header.tile_height * header.ntiles) / header.per_row,
             header.ncolors, 1 /* char per color */);
