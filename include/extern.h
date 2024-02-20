@@ -33,6 +33,7 @@
  *  NONNULLARG3     The 3rd argument is declared nonnull.
  *  NONNULLARG4     The 4th argument is declared nonnull (not used).
  *  NONNULLARG5     The 5th argument is declared nonnull.
+ *  NONNULLARG6     The 6th argument is declared nonnull.
  *  NONNULLARG7     The 7th argument is declared nonnull (bhit).
  *  NONNULLARG12    The 1st and 2nd arguments are declared nonnull.
  *  NONNULLARG23    The 2nd and 3rd arguments are declared nonnull.
