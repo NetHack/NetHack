@@ -140,9 +140,7 @@ $(GAME): lua_support
 lua_support: include/nhlua.h
 	@true
 $(LUATOP)/liblua.a: $(LUAHEADERS)/lua.h
-	( cd $(LUATOP) && make $(LUAMAKEFLAGS) a ) && \
-	( util/makedefs --grep-defined CRASHREPORT && ( \
-	  cd $(LUATOP) && make $(LUAMAKEFLAGS) ); true )
+	( cd $(LUATOP) && make $(LUAMAKEFLAGS) a )
 $(TOPLUALIB): $(LUATOP)/liblua.a
 	@( if test -d lib/lua ; then true ; else mkdir -p lib/lua ; fi )
 	cp $(LUATOP)/liblua.a $@
