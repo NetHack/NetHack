@@ -4093,7 +4093,7 @@ zhitm(
     int nd,             /* number of hit dice to use */
     struct obj **ootmp) /* to return worn armor for caller to disintegrate */
 {
-    register int tmp = 0, orig_dmg = 0; /* damage amount */
+    int tmp = 0, orig_dmg = 0; /* damage amount */
     int damgtype = zaptype(type) % 10;
     boolean sho_shieldeff = FALSE;
     boolean spellcaster = is_hero_spell(type); /* maybe get a bonus! */
