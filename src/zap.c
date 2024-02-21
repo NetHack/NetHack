@@ -5622,7 +5622,7 @@ maybe_destroy_item(
     quan = 0L;
 
     /* external worn item protects inventory? */
-    if (inventory_resistance_check(dmgtyp))
+    if (u_carry && inventory_resistance_check(dmgtyp))
         return 0;
 
     switch (dmgtyp) {
