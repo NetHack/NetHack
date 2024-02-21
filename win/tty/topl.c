@@ -534,7 +534,7 @@ tty_yn_function(
         (void) key2txt(q, rtmp);
     /* addtopl(rtmp); -- rewrite gt.toplines instead */
     Sprintf(gt.toplines, "%s%s", prompt, rtmp);
-#ifdef DUMPLOG
+#ifdef DUMPLOG_CORE
     dumplogmsg(gt.toplines);
 #endif
     ttyDisplay->inread--;
@@ -684,7 +684,7 @@ tty_putmsghistory(const char *msg, boolean restoring_msghist)
            restored ones are being put into place */
         msghistory_snapshot(TRUE);
         initd = TRUE;
-#ifdef DUMPLOG
+#ifdef DUMPLOG_CORE
         /* this suffices; there's no need to scrub saved_pline[] pointers */
         gs.saved_pline_index = 0;
 #endif
@@ -701,7 +701,7 @@ tty_putmsghistory(const char *msg, boolean restoring_msghist)
         /* move most recent message to history, make this become most recent */
         remember_topl();
         Strcpy(gt.toplines, msg);
-#ifdef DUMPLOG
+#ifdef DUMPLOG_CORE
         dumplogmsg(gt.toplines);
 #endif
     } else if (snapshot_mesgs) {
@@ -712,7 +712,7 @@ tty_putmsghistory(const char *msg, boolean restoring_msghist)
         for (idx = 0; snapshot_mesgs[idx]; ++idx) {
             remember_topl();
             Strcpy(gt.toplines, snapshot_mesgs[idx]);
-#ifdef DUMPLOG
+#ifdef DUMPLOG_CORE
             dumplogmsg(gt.toplines);
 #endif
         }

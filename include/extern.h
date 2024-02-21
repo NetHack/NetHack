@@ -2356,7 +2356,7 @@ extern boolean autopick_testobj(struct obj *, boolean) NONNULLARG1;
 
 /* ### pline.c ### */
 
-#ifdef DUMPLOG
+#ifdef DUMPLOG_CORE
 extern void dumplogmsg(const char *);
 extern void dumplogfreemessages(void);
 #endif

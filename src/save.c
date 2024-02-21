@@ -1233,7 +1233,7 @@ freedynamicdata(void)
 #ifdef USER_SOUNDS
     release_sound_mappings();
 #endif
-#ifdef DUMPLOG
+#ifdef DUMPLOG_CORE
     dumplogfreemessages();
 #endif
     discard_gamelog();

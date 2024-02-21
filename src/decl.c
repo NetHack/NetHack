@@ -775,7 +775,7 @@ const struct instance_globals_s g_init_s = {
     /* pickup.c */
     FALSE, /* shop_filter */
     /* pline.c */
-#ifdef DUMPLOG
+#ifdef DUMPLOG_CORE
     0U, /* saved_pline_index */
     { NULL }, /* saved_plines */
 #endif

@@ -1044,7 +1044,7 @@ curses_putmsghistory(const char *msg, boolean restoring_msghist)
         stash_head = first_mesg, first_mesg = (nhprev_mesg *) 0;
         last_mesg = (nhprev_mesg *) 0; /* no need to remember the tail */
         initd = TRUE;
-#ifdef DUMPLOG
+#ifdef DUMPLOG_CORE
         /* this suffices; there's no need to scrub g.saved_pline[] pointers */
         gs.saved_pline_index = 0;
 #endif
@@ -1058,7 +1058,7 @@ curses_putmsghistory(const char *msg, boolean restoring_msghist)
            and those messages should have a normal turn value */
         if (last_mesg) /* appease static analyzer */
             last_mesg->turn = restoring_msghist ? (1L << 3) : gh.hero_seq;
-#ifdef DUMPLOG
+#ifdef DUMPLOG_CORE
         dumplogmsg(last_mesg->str);
 #endif
     } else if (stash_count) {
@@ -1081,7 +1081,7 @@ curses_putmsghistory(const char *msg, boolean restoring_msghist)
                 /* added line became new tail */
                 if (last_mesg) /* appease static analyzer */
                     last_mesg->turn = mesg_turn;
-#ifdef DUMPLOG
+#ifdef DUMPLOG_CORE
                 dumplogmsg(mesg->str);
 #endif
                 free((genericptr_t) mesg->str);
