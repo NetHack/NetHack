@@ -1364,6 +1364,7 @@ when filling quiver slot, don't bother asking "what do you want to ready?" if
 	invent is empty
 no secret doors or corridors on the first two dungeon levels
 the number of items destroyed by elemental effects is based on the damage
+randomize the spellbook in the second level of vlad's tower
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

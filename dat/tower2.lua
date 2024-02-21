@@ -44,7 +44,19 @@ des.object({ id = "chest", coord = place[6],
 });
 des.object("water walking boots",place[7])
 des.object("crystal plate mail",place[8])
-des.object("spellbook of invisibility",place[9])
+
+local spbooks = {
+   "spellbook of invisibility",
+   "spellbook of cone of cold",
+   "spellbook of create familiar",
+   "spellbook of clairvoyance",
+   "spellbook of charm monster",
+   "spellbook of stone to flesh",
+   "spellbook of polymorph"
+}
+shuffle(spbooks);
+des.object(spbooks[1],place[9])
+
 -- Walls in the tower are non diggable
 des.non_diggable(selection.area(00,00,14,10))
 
