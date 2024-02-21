@@ -267,8 +267,8 @@ mk_mplayer(struct permonst *ptr, coordxy x, coordxy y, boolean special)
             if (objects[otmp->otyp].oc_merge && !otmp->oartifact
                 && monmightthrowwep(otmp))
                 otmp->quan += (long) rn2(is_spear(otmp) ? 4 : 8);
-            /* mplayers knew better than to overenchant Magicbane */
             otmp->owt = weight(otmp);
+            /* mplayers knew better than to overenchant Magicbane */
             if (is_art(otmp, ART_MAGICBANE))
                 otmp->spe = rnd(4);
             (void) mpickobj(mtmp, otmp);
