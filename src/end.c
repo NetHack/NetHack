@@ -264,16 +264,16 @@ NH_abort(char *why USED_FOR_CRASHREPORT)
 #  endif
 # endif
 # ifdef __linux__
-#  include <openssl/md4.h>
+#  include "nhmd4.h"
 #  define HASH_CONTEXTPTR(CTXP) \
-     unsigned char tmp[MD4_DIGEST_LENGTH]; \
-     MD4_CTX CTXP ## _; \
-     MD4_CTX *CTXP = &CTXP ## _
-#  define HASH_INIT(ctxp) !MD4_Init(ctxp)
-#  define HASH_UPDATE(ctx, ptr, len) !MD4_Update(ctx, ptr, len)
-#  define HASH_FINISH(ctxp) !MD4_Final(tmp, ctxp)
-#  define HASH_RESULT_SIZE(ctxp) MD4_DIGEST_LENGTH
-#  define HASH_RESULT(ctx, inp) *inp = (unsigned char *)ctx
+     unsigned char tmp[NHMD4_DIGEST_LENGTH]; \
+     NHMD4_CTX CTXP ## _; \
+     NHMD4_CTX *CTXP = &CTXP ## _
+#  define HASH_INIT(ctxp) (nhmd4_init(ctxp),0)
+#  define HASH_UPDATE(ctx, ptr, len) (nhmd4_update(ctx, ptr, len),0)
+#  define HASH_FINISH(ctxp) (nhmd4_final(ctxp, tmp),0)
+#  define HASH_RESULT_SIZE(ctxp) NHMD4_RESULTLEN
+#  define HASH_RESULT(ctx, inp) *inp = tmp
 #  define HASH_CLEANUP(ctxp)
 #  define HASH_OFLAGS O_RDONLY
 #  define HASH_BINFILE_DECL char binfile[PATH_MAX+1];
