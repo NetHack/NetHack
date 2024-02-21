@@ -262,8 +262,8 @@
 #endif
 
 #ifdef CRASHREPORT
-# ifndef DUMPLOG
-#  define DUMPLOG	    // required to get ^P info
+# ifndef DUMPLOG_CORE
+#  define DUMPLOG_CORE	    // required to get ^P info
 # endif
 # ifdef MACOS
 #  define PANICTRACE
@@ -726,9 +726,7 @@ typedef unsigned char uchar;
 #endif /* LIVELOG */
 
 #ifdef DUMPLOG
-#ifndef DUMPLOG_MSG_COUNT
-#define DUMPLOG_MSG_COUNT   50
-#endif /* DUMPLOG_MSG_COUNT */
+#define DUMPLOG_CORE
 #ifndef DUMPLOG_FILE
 #define DUMPLOG_FILE        "/tmp/nethack.%n.%d.log"
 /* DUMPLOG_FILE allows following placeholders:
@@ -745,5 +743,10 @@ typedef unsigned char uchar;
 */
 #endif /* DUMPLOG_FILE */
 #endif /* DUMPLOG */
+#ifdef DUMPLOG_CORE
+#ifndef DUMPLOG_MSG_COUNT
+#define DUMPLOG_MSG_COUNT   50
+#endif /* DUMPLOG_MSG_COUNT */
+#endif
 
 #endif /* CONFIG_H */

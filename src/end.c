@@ -537,7 +537,7 @@ submit_web_report(int cos, const char *msg, const char *why){
 #endif  // !WIN32
     }
 
-#ifdef DUMPLOG
+#ifdef DUMPLOG_CORE
         // config.h turns this on, but make it easy to turn off if needed
     if(cos==1) {
         int k;
@@ -1191,6 +1191,7 @@ dump_plines(void)
         }
     }
 }
+#endif  /* DUMPLOG */
 
 #ifdef CRASHREPORT
 // lineno==0 gives the most recent message (e.g. "Do you want to call panic..."
@@ -1214,7 +1215,6 @@ get_saved_pline(int lineno){
     return NULL;
 }
 #endif  /* CRASHREPORT */
-#endif  /* DUMPLOG */
 
 /*ARGSUSED*/
 static void

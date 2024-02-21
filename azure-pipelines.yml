@@ -199,6 +199,7 @@ steps:
     sed -i '/^#[ 	]*define CRASHREPORT/d'    include/config.h
     #sed -i '/^#[ 	]*define DOAGAIN/d'        include/config.h
     sed -i '/^#[ 	]*define DUMPLOG/d'        include/config.h
+    sed -i '/^#[ 	]*define DUMPLOG_CORE/d'   include/config.h
     #sed -i '/^#[ 	]*define GDBPATH/d'        include/config.h
     #sed -i '/^#[ 	]*define GREPPATH/d'       include/config.h
     sed -i '/^#[ 	]*define INSURANCE/d'      include/config.h

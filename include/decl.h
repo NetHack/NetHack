@@ -917,7 +917,7 @@ struct instance_globals_s {
     boolean shop_filter;
 
     /* pline.c */
-#ifdef DUMPLOG
+#ifdef DUMPLOG_CORE
     unsigned saved_pline_index;  /* slot in saved_plines[] to use next */
     char *saved_plines[DUMPLOG_MSG_COUNT];
 #endif

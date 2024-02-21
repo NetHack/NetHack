@@ -214,7 +214,7 @@ hooked_tty_getlin(
         /* prevent next message from pushing current query+answer into
            tty message history */
         *gt.toplines = '\0';
-#ifdef DUMPLOG
+#ifdef DUMPLOG_CORE
     } else {
         /* needed because we've bypassed pline() */
         dumplogmsg(gt.toplines);
