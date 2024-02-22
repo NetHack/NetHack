@@ -763,7 +763,7 @@ truncate_to_map(coordxy *cx, coordxy *cy, schar dx, schar dy)
 }
 
 /* called when ^R typed; if '$' is being shown for valid spots, remove that;
-   if alternate background color is being show for that, redraw it */
+   if alternate background color is being shown for that, redraw it */
 static void
 getpos_refresh(void)
 {
