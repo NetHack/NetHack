@@ -3344,15 +3344,15 @@ launch_obj(
                     bmsg = " as one boulder hits another";
 
                 Soundeffect(se_loud_crash, 80);
-                You_hear("a loud crash%s!", cansee(fx, fy) ? bmsg : "");
+                You_hear("a loud crash%s!", cansee(x, y) ? bmsg : "");
                 obj_extract_self(otmp2);
                 /* pass off the otrapped flag to the next boulder */
                 otmp2->otrapped = singleobj->otrapped;
                 singleobj->otrapped = 0;
-                place_object(singleobj, fx, fy);
+                place_object(singleobj, x, y);
                 singleobj = otmp2;
                 otmp2 = (struct obj *) 0;
-                wake_nearto(fx, fy, 10 * 10);
+                wake_nearto(x, y, 10 * 10);
             }
         }
         if (otyp == BOULDER && closed_door(x, y)) {
