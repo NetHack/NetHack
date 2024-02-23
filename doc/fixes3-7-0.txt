@@ -1965,10 +1965,10 @@ Windows: when VIRTUAL_TERMINAL_SEQUENCES was not defined, the preprocessing
 Windows: original fix for GLYPH_UNEXPLORED background tile merging resulted
 	in a new issue where the map wasn't being cleared on level changes
 Windows: don't dupstr the return value of setlocale if it is NULL
-Windows: nethackw.exe was vertically spacing out menu items based on
+Windows: nethackw.exe calculated vertical spacing for menu items based on
 	the height of the tileset in use, even though the tiles in the
 	menu were drawn at the default height of 16 anyway; get rid of
-	the extraneous vertical spacing between the menu rows
+	the extraneous vertical spacing between menu rows
 X11: fix build failure if STATUS_HILITES is disabled
 X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
