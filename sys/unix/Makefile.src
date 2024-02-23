@@ -501,7 +501,7 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   lock.c mail.c makemon.c mcastu.c mdlib.c mhitm.c \
 	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
 	   mondata.c monmove.c monst.c mplayer.c mthrowu.c muse.c music.c \
-	   nhlua.c nhlsel.c nhlobj.c o_init.c objects.c objnam.c \
+	   nhlua.c nhlsel.c nhlobj.c nhmd4.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
 	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c \
 	   rip.c rnd.c role.c rumors.c save.c sfstruct.c \
@@ -550,7 +550,7 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	display.h dlb.h dungeon.h engrave.h extern.h flag.h fnamesiz.h \
 	func_tab.h global.h warnings.h hack.h lint.h mextra.h mfndpos.h \
 	micro.h mkroom.h monattk.h mondata.h monflag.h monst.h monsters.h \
-	obj.h objects.h objclass.h optlist.h patchlevel.h pcconf.h \
+	nhmd4.h obj.h objects.h objclass.h optlist.h patchlevel.h pcconf.h \
 	permonst.h prop.h rect.h region.h sym.h defsym.h rm.h sp_lev.h \
 	spell.h sndprocs.h seffects.h sys.h tcap.h timeout.h \
 	tradstdc.h trap.h unixconf.h vision.h vmsconf.h wintty.h wincurs.h \
@@ -586,7 +586,8 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)mondata.o $(TARGETPFX)monmove.o $(TARGETPFX)monst.o \
 	$(TARGETPFX)mplayer.o $(TARGETPFX)mthrowu.o $(TARGETPFX)muse.o \
 	$(TARGETPFX)music.o $(TARGETPFX)nhlua.o $(TARGETPFX)nhlsel.o \
-	$(TARGETPFX)nhlobj.o $(TARGETPFX)objects.o $(TARGETPFX)o_init.o \
+	$(TARGETPFX)nhlobj.o $(TARGETPFX)nhmd4.o \
+	$(TARGETPFX)objects.o $(TARGETPFX)o_init.o \
 	$(TARGETPFX)objnam.o $(TARGETPFX)options.o $(TARGETPFX)pager.o \
 	$(TARGETPFX)pickup.o $(TARGETPFX)pline.o $(TARGETPFX)polyself.o \
 	$(TARGETPFX)potion.o $(TARGETPFX)pray.o $(TARGETPFX)priest.o \
