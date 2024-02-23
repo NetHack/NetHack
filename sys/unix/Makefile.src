@@ -817,8 +817,8 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/color.h \
 		../include/defsym.h ../include/objects.h ../include/wintype.h \
 		../include/flag.h ../include/rect.h ../include/sym.h \
 		../include/trap.h ../include/youprop.h ../include/prop.h \
-		../include/permonst.h ../include/monattk.h \
-		../include/monflag.h ../include/monsters.h \
+		../include/permonst.h ../include/monsters.h \
+		../include/monattk.h ../include/monflag.h \
 		../include/mondata.h ../include/display.h ../include/vision.h \
 		../include/botl.h ../include/context.h ../include/engrave.h \
 		../include/mkroom.h ../include/obj.h ../include/quest.h \
@@ -1105,7 +1105,7 @@ $(TARGETPFX)drawing.o: drawing.c $(CONFIG_H) ../include/color.h \
 $(TARGETPFX)dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h \
 		../include/dlb.h
 $(TARGETPFX)eat.o: eat.c $(HACK_H)
-$(TARGETPFX)end.o: end.c $(HACK_H) ../include/dlb.h
+$(TARGETPFX)end.o: end.c $(HACK_H) ../include/dlb.h ../include/nhmd4.h
 $(TARGETPFX)engrave.o: engrave.c $(HACK_H)
 $(TARGETPFX)exper.o: exper.c $(HACK_H)
 $(TARGETPFX)explode.o: explode.c $(HACK_H)
@@ -1124,8 +1124,8 @@ $(TARGETPFX)mail.o: mail.c $(HACK_H) ../include/mail.h
 $(TARGETPFX)makemon.o: makemon.c $(HACK_H)
 $(TARGETPFX)mcastu.o: mcastu.c $(HACK_H)
 $(TARGETPFX)mdlib.o: mdlib.c $(CONFIG_H) ../include/permonst.h \
-		../include/align.h ../include/monattk.h ../include/monflag.h \
-		../include/monsters.h ../include/objclass.h \
+		../include/monsters.h ../include/align.h ../include/monattk.h \
+		../include/monflag.h ../include/objclass.h \
 		../include/defsym.h ../include/objects.h ../include/wintype.h \
 		../include/sym.h ../include/artilist.h ../include/dungeon.h \
 		../include/sndprocs.h ../include/seffects.h ../include/obj.h \
@@ -1145,8 +1145,8 @@ $(TARGETPFX)mondata.o: mondata.c $(HACK_H)
 $(TARGETPFX)monmove.o: monmove.c $(HACK_H) ../include/mfndpos.h \
 		../include/artifact.h
 $(TARGETPFX)monst.o: monst.c $(CONFIG_H) ../include/permonst.h \
-		../include/align.h ../include/monattk.h ../include/monflag.h \
-		../include/monsters.h ../include/wintype.h ../include/sym.h \
+		../include/monsters.h ../include/align.h ../include/monattk.h \
+		../include/monflag.h ../include/wintype.h ../include/sym.h \
 		../include/defsym.h ../include/color.h
 $(TARGETPFX)mplayer.o: mplayer.c $(HACK_H)
 $(TARGETPFX)mthrowu.o: mthrowu.c $(HACK_H)
@@ -1155,6 +1155,7 @@ $(TARGETPFX)music.o: music.c $(HACK_H)
 $(TARGETPFX)nhlua.o: nhlua.c $(HACK_H) ../include/dlb.h
 $(TARGETPFX)nhlsel.o: nhlsel.c $(HACK_H) ../include/sp_lev.h
 $(TARGETPFX)nhlobj.o: nhlobj.c $(HACK_H) ../include/sp_lev.h
+$(TARGETPFX)nhmd4.o: nhmd4.c $(HACK_H) ../include/nhmd4.h
 $(TARGETPFX)o_init.o: o_init.c $(HACK_H)
 $(TARGETPFX)objects.o: objects.c $(CONFIG_H) ../include/obj.h \
 		../include/prop.h ../include/skills.h ../include/color.h \
