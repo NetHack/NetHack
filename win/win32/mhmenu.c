@@ -972,14 +972,18 @@ onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     /* Set the height of the list box items to max height of the individual
      * items */
     for (i = 0; i < data->menui.menu.size; i++) {
+/*      int map_y = GetNHApp()->mapTile_Y; */
+        int map_y = 16;  /* leave it at the default size, unless
+                           * we are actually showing the larger
+                           * icons in the menu */
         if (NHMENU_HAS_GLYPH(data->menui.menu.items[i])
             && !IS_MAP_ASCII(iflags.wc_map_mode)) {
             lpmis->itemHeight =
                 max(lpmis->itemHeight,
-                    (UINT) max(tm.tmHeight, GetNHApp()->mapTile_Y) + 2);
+                    (UINT) max(tm.tmHeight, map_y) + 2);
         } else {
             lpmis->itemHeight =
-                max(lpmis->itemHeight, (UINT) max(tm.tmHeight, TILE_Y) + 2);
+                max(lpmis->itemHeight, (UINT) max(tm.tmHeight, map_y) + 2);
         }
     }
 
