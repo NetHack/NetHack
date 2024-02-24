@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1708124177 2024/02/16 22:56:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.707 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1708737173 2024/02/24 01:12:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.709 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -96,7 +96,7 @@ enum requests {
 };
 /* these aren't the same as set_xxx in optlist.h */
 enum option_phases {
-    builtin_opt,  /* compiled-in default value of an option */
+    builtin_opt=1,/* compiled-in default value of an option */
     syscf_opt,    /* sysconf setting of an option, overrides builtin */
     rc_file_opt,  /* player's run-time config file setting, overrides syscf */
     environ_opt,  /* player's environment NETHACKOPTIONS, overrides rc_file */
@@ -6706,6 +6706,15 @@ void
 initoptions(void)
 {
     int i;
+
+    /*
+     * Most places that call initoptions_init()/initoptions() would
+     * have the calls next to each other, so instead of adding
+     * initoptions_init() everywhere, just add it where it's needed in
+     * a non-adjacent place and call it here for all the other cases.
+     */
+    if(go.opt_phase != builtin_opt)
+         initoptions_init();
 
     /*
      * Call each option function with an init flag and give it a chance

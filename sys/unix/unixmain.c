@@ -1,4 +1,4 @@
-/* NetHack 3.7	unixmain.c	$NHDT-Date: 1704043695 2023/12/31 17:28:15 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.124 $ */
+/* NetHack 3.7	unixmain.c	$NHDT-Date: 1708737183 2024/02/24 01:13:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -150,7 +150,6 @@ main(int argc, char *argv[])
     check_linux_console();
 #endif
 
-    initoptions_init();
     initoptions();
 #ifdef PANICTRACE
     ARGV0 = gh.hname; /* save for possible stack trace */
@@ -786,7 +785,6 @@ opt_showpaths(const char *dir)
     nhUse(dir);
 #endif
     iflags.initoptions_noterminate = TRUE;
-    initoptions_init();
     initoptions();
     iflags.initoptions_noterminate = FALSE;
     reveal_paths();
