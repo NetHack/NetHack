@@ -224,6 +224,7 @@ eos(char *s)
     return s;
 }
 
+/* version of eos() which takes a const* arg and returns that result */
 const char *
 c_eos(const char *s)
 {
@@ -519,22 +520,23 @@ visctrl(char c)
 /* caller is responsible for ensuring that bp is a
    valid pointer to a BUFSZ buffer */
 char *
-stripchars(char *bp, const char *stuff_to_strip, const char *orig)
+stripchars(
+    char *bp,
+    const char *stuff_to_strip,
+    const char *orig)
 {
     int i = 0;
     char *s = bp;
 
-    if (s) {
-        while (*orig && i < (BUFSZ - 1)) {
-            if (!strchr(stuff_to_strip, *orig)) {
-                *s++ = *orig;
-                i++;
-            }
-            orig++;
+    while (*orig && i < (BUFSZ - 1)) {
+        if (!strchr(stuff_to_strip, *orig)) {
+            *s++ = *orig;
+            i++;
         }
-        *s = '\0';
-    } else
-        impossible("no output buf in stripchars");
+        orig++;
+    }
+    *s = '\0';
+
     return bp;
 }
 
@@ -552,21 +554,22 @@ stripdigits(char *s)
     return s;
 }
 
-/* substitute a word or phrase in a string (in place) */
-/* caller is responsible for ensuring that bp points to big enough buffer */
+/* substitute a word or phrase in a string (in place);
+   caller is responsible for ensuring that bp points to big enough buffer */
 char *
-strsubst(char *bp, const char *orig, const char *replacement)
+strsubst(
+    char *bp,
+    const char *orig,
+    const char *replacement)
 {
     char *found, buf[BUFSZ];
+    /* [this could be replaced by strNsubst(bp, orig, replacement, 1)] */
 
-    if (bp) {
-        /* [this could be replaced by strNsubst(bp, orig, replacement, 1)] */
-        found = strstr(bp, orig);
-        if (found) {
-            Strcpy(buf, found + strlen(orig));
-            Strcpy(found, replacement);
-            Strcat(bp, buf);
-        }
+    found = strstr(bp, orig);
+    if (found) {
+        Strcpy(buf, found + strlen(orig));
+        Strcpy(found, replacement);
+        Strcat(bp, buf);
     }
     return bp;
 }
@@ -828,8 +831,9 @@ pmatchz(const char *patrn, const char *strng)
 /* case insensitive counted string comparison */
 /*{ aka strncasecmp }*/
 int
-strncmpi(const char *s1, const char *s2,
-         int n) /*(should probably be size_t, which is unsigned)*/
+strncmpi(
+    const char *s1, const char *s2,
+    int n) /*(should probably be size_t, which is unsigned)*/
 {
     char t1, t2;
 
@@ -895,8 +899,10 @@ strstri(const char *str, const char *sub)
 /* compare two strings for equality, ignoring the presence of specified
    characters (typically whitespace) and possibly ignoring case */
 boolean
-fuzzymatch(const char *s1, const char *s2, const char *ignore_chars,
-           boolean caseblind)
+fuzzymatch(
+    const char *s1, const char *s2,
+    const char *ignore_chars,
+    boolean caseblind)
 {
     char c1, c2;
 
@@ -1158,13 +1164,13 @@ time_from_yyyymmddhhmmss(char *buf)
             t.tm_sec = atoi(s);
             timeresult = mktime(&t);
         }
-        if (timeresult == (time_t) -1)
+        if (timeresult == (time_t) -1) {
             debugpline1("time_from_yyyymmddhhmmss(%s) would have returned -1",
                         buf ? buf : "");
-        else
-            return timeresult;
+            timeresult = (time_t) 0;
+        }
     }
-    return (time_t) 0;
+    return timeresult;
 }
 
 /*
