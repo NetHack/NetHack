@@ -3965,6 +3965,16 @@ saving_grace(int dmg)
     return dmg;
 }
 
+/* show a message how much damage you received */
+void
+showdamage(int dmg)
+{
+    if (!iflags.showdamage)
+        return;
+
+    pline("[HP %i, %i left]", -dmg, Upolyd ? u.mh : u.uhp);
+}
+
 void
 losehp(int n, const char *knam, schar k_format)
 {
@@ -3979,6 +3989,7 @@ losehp(int n, const char *knam, schar k_format)
     end_running(TRUE);
     if (Upolyd) {
         u.mh -= n;
+        showdamage(n);
         if (u.mhmax < u.mh)
             u.mhmax = u.mh;
         if (u.mh < 1)
@@ -3990,6 +4001,7 @@ losehp(int n, const char *knam, schar k_format)
 
     n = saving_grace(n);
     u.uhp -= n;
+    showdamage(n);
     if (u.uhp > u.uhpmax)
         u.uhpmax = u.uhp; /* perhaps n was negative */
     if (u.uhp < 1) {

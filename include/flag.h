@@ -213,6 +213,7 @@ struct accessibility_data {
  * and probably warrant a structure of their own elsewhere some day.
  */
 struct instance_flags {
+    boolean showdamage;
     boolean debug_fuzzer;  /* fuzz testing */
     boolean defer_plname;  /* X11 hack: askname() might not set gp.plname */
     boolean herecmd_menu;  /* use menu when mouseclick on yourself */

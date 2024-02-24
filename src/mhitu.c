@@ -1810,11 +1810,13 @@ mdamageu(struct monst *mtmp, int n)
     disp.botl = TRUE;
     if (Upolyd) {
         u.mh -= n;
+        showdamage(n);
         if (u.mh < 1)
             rehumanize();
     } else {
         n = saving_grace(n);
         u.uhp -= n;
+        showdamage(n);
         if (u.uhp < 1)
             done_in_by(mtmp, DIED);
     }
