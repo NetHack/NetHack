@@ -44,8 +44,8 @@ nextmbuf(void)
     return bufs[bufidx];
 }
 
-/* function for getpos() to highlight desired map locations.
- * parameter value 0 = initialize, 1 = highlight, 2 = done
+/* Callback function for getpos() to highlight desired map locations.
+ * Parameter TRUE: initialize and highlight, FALSE: done (remove highlights).
  */
 static void (*getpos_hilitefunc)(boolean) = (void (*)(boolean)) 0;
 static boolean (*getpos_getvalid)(coordxy, coordxy)
