@@ -40,11 +40,14 @@ static const unsigned char *body(struct nhmd4_context *,
 #define H(x, y, z)      ((x) ^ (y) ^ (z))
 
 /*
- * The MD4 transformation for all four rounds.
+ * STEP: the MD4 transformation used for all four rounds.
+ * (Joining two expressions with the comma operator provides a sequence
+ * point.  C89/C90 and later guarantee that the first will be fully complete
+ * before the second starts, making both assignments to 'a' be well defined.)
  */
 #define STEP(f, a, b, c, d, x, s) \
-    (a) += f((b), (c), (d)) + (x);              \
-    (a) = ((a) << (s)) | ((a) >> (32 - (s)))
+    (((a) += f((b), (c), (d)) + (x)),                   \
+     ((a) = ((a) << (s)) | ((a) >> (32 - (s)))))
 
 /*
  * SET reads 4 input bytes in little-endian byte order and stores them
@@ -55,17 +58,16 @@ static const unsigned char *body(struct nhmd4_context *,
  * doesn't work.
  */
 #if defined(__i386__) || defined(__x86_64__)
-#define SET(n) (*(const quint32 *)&ptr[(n) * 4])
+#define SET(n) (*(const quint32 *) &ptr[(n) * 4])
 #define GET(n) SET(n)
 #else
 #define SET(n) \
     (ctx->block[(n)] = \
-     (quint32)ptr[(n) * 4] |                    \
-     ((quint32)ptr[(n) * 4 + 1] << 8) |         \
-     ((quint32)ptr[(n) * 4 + 2] << 16) |        \
-     ((quint32)ptr[(n) * 4 + 3] << 24))
-#define GET(n) \
-    (ctx->block[(n)])
+     ((quint32) ptr[(n) * 4]                          \
+      | ((quint32) ptr[(n) * 4 + 1] << 8)             \
+      | ((quint32) ptr[(n) * 4 + 2] << 16)            \
+      | ((quint32) ptr[(n) * 4 + 3] << 24)))
+#define GET(n) (ctx->block[(n)])
 #endif
 
 /*
