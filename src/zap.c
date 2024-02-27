@@ -1789,9 +1789,12 @@ poly_obj(struct obj *obj, int id)
 
     case SPBOOK_CLASS:
         while (otmp->otyp == SPE_POLYMORPH)
-            otmp->otyp = rnd_class(SPE_DIG, SPE_BLANK_PAPER);
-        /* reduce spellbook abuse; non-blank books degrade */
-        if (otmp->otyp != SPE_BLANK_PAPER) {
+            otmp->otyp = rnd_class(gb.bases[SPBOOK_CLASS], SPE_BLANK_PAPER);
+        /* reduce spellbook abuse; non-blank books degrade;
+           3.7: novels don't use spestudied so shouldn't degrade to blank
+           (but don't force spestudied to zero for them since a non-zero
+           value could get passed along to a future polymorph) */
+        if (otmp->otyp != SPE_BLANK_PAPER && otmp->otyp != SPE_NOVEL) {
             otmp->spestudied = obj->spestudied + 1;
             if (otmp->spestudied > MAX_SPELL_STUDY) {
                 otmp->otyp = SPE_BLANK_PAPER;
