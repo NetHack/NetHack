@@ -1067,6 +1067,7 @@ makemon_rnd_goodpos(
     coordxy nx, ny;
     boolean good;
 
+    gpflags |= GP_AVOID_MONPOS;
     do {
         nx = rn1(COLNO - 3, 2);
         ny = rn2(ROWNO);
@@ -1144,7 +1145,7 @@ makemon(
             countbirth = ((mmflags & MM_NOCOUNTBIRTH) == 0),
             allowtail = ((mmflags & MM_NOTAIL) == 0);
     mmflags_nht gpflags = (((mmflags & MM_IGNOREWATER) ? MM_IGNOREWATER : 0)
-                           | GP_CHECKSCARY);
+                           | GP_CHECKSCARY | GP_AVOID_MONPOS);
 
     fakemon = cg.zeromonst;
     cc.x = cc.y = 0;

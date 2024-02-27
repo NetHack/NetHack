@@ -86,7 +86,8 @@ goodpos(
     boolean ignorewater = ((gpflags & MM_IGNOREWATER) != 0),
             ignorelava = ((gpflags & MM_IGNORELAVA) != 0),
             checkscary = ((gpflags & GP_CHECKSCARY) != 0),
-            allow_u = ((gpflags & GP_ALLOW_U) != 0);
+            allow_u = ((gpflags & GP_ALLOW_U) != 0),
+            avoid_monpos = ((gpflags & GP_AVOID_MONPOS) != 0);
 
     if (!isok(x, y))
         return FALSE;
@@ -103,6 +104,9 @@ goodpos(
             && (!u.usteed || mtmp != u.usteed))
             return FALSE;
     }
+
+    if (MON_AT(x, y) && avoid_monpos)
+        return FALSE;
 
     if (mtmp) {
         struct monst *mtmp2 = m_at(x, y);
