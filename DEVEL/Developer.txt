@@ -66,10 +66,16 @@ A. If you have never set up git on this machine before:
 		git config --global user.email USER@EXAMPLE.COM
    You probably want to set up a credential cache.
 	macOS (10 - 12):
-		git config --global credential.helper osxkeychain
+	    git config --global credential.helper osxkeychain
 	Windows:
-		git config --global credential.helper store
-XXX linux
+	    git config --global credential.helper store
+	Linux:
+	    (This may vary by distribution.)
+	    cd /usr/share/doc/git/contrib/credentail/libsecret
+	    sudo apt-get install libglib-2.0-dev libsecret-1-dev
+	    sudo make
+	    git config --global credential.helper `pwd`/git-credential-libsecret
+
 B. Specify the prefix for variable substitution:
    (This assumes you are not a member of DevTeam or any variant's development
    team.  If you are, this may be wrong.  Look for more specific documentation.
