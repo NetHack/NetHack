@@ -2031,7 +2031,9 @@ seffect_magic_mapping(struct obj **sobjp)
     cval = (scursed && !confused);
     if (cval)
         HConfusion = 1; /* to screw up map */
+    notice_mon_off();
     do_mapping();
+    notice_mon_on();
     if (cval) {
         HConfusion = 0; /* restore */
         pline("Unfortunately, you can't grasp the details.");

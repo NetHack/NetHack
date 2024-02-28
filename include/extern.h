@@ -324,6 +324,7 @@ extern char *cmd_from_ecname(const char *);
 extern const char *cmdname_from_func(int(*)(void), char *, boolean);
 extern boolean redraw_cmd(char);
 extern const char *levltyp_to_name(int);
+extern int dolookaround(void);
 extern void reset_occupations(void);
 extern void set_occupation(int(*)(void), const char *, cmdcount_nht);
 extern void cmdq_add_ec(int, int(*)(void));
@@ -634,6 +635,7 @@ extern const char *pmname(struct permonst *, int) NONNULLARG1;
 extern const char *mon_pmname(struct monst *) NONNULLARG1;
 extern const char *obj_pmname(struct obj *) NONNULLARG1;
 extern boolean mapxy_valid(coordxy, coordxy);
+extern boolean gather_locs_interesting(coordxy, coordxy, int);
 
 /* ### do_wear.c ### */
 

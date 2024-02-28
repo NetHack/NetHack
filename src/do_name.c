@@ -18,7 +18,6 @@ static int gloc_filter_floodfill_matcharea(coordxy, coordxy);
 static void gloc_filter_floodfill(coordxy, coordxy);
 static void gloc_filter_init(void);
 static void gloc_filter_done(void);
-static boolean gather_locs_interesting(coordxy, coordxy, int);
 static void gather_locs(coord **, int *, int);
 static void truncate_to_map(coordxy *, coordxy *, schar, schar);
 static void getpos_refresh(void);
@@ -453,7 +452,7 @@ gloc_filter_done(void)
 
 DISABLE_WARNING_UNREACHABLE_CODE
 
-static boolean
+boolean
 gather_locs_interesting(coordxy x, coordxy y, int gloc)
 {
     int glyph, sym;

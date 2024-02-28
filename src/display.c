@@ -1816,6 +1816,8 @@ show_glyph(coordxy x, coordxy y, int glyph)
 #ifndef UNBUFFERED_GLYPHINFO
     glyph_info glyphinfo;
 #endif
+    boolean show_glyph_change = FALSE;
+    int oldglyph;
 
     /*
      * Check for bad positions and glyphs.
@@ -1935,6 +1937,24 @@ show_glyph(coordxy x, coordxy y, int glyph)
     map_glyphinfo(x, y, glyph, 0, &glyphinfo);
 #endif
 
+    oldglyph = gg.gbuf[y][x].glyphinfo.glyph;
+
+    if (a11y.glyph_updates && !a11y.mon_notices_blocked
+        && (oldglyph != glyph || gg.gbuf[y][x].gnew)) {
+        int c = glyph_to_cmap(glyph);
+        if ((glyph_is_nothing(oldglyph) || glyph_is_unexplored(oldglyph)
+             || is_cmap_furniture(c))
+            && !is_cmap_wall(c) && !is_cmap_room(c)) {
+            if ((a11y.mon_notices && glyph_is_monster(glyph))
+                || (glyph_is_monster(oldglyph))
+                || u_at(x, y)) {
+                /* nothing */
+            } else {
+                show_glyph_change = TRUE;
+            }
+        }
+    }
+
     if (gg.gbuf[y][x].glyphinfo.glyph != glyph
 #ifndef UNBUFFERED_GLYPHINFO
         /* flags might change (single object vs pile, monster tamed or pet
@@ -1960,6 +1980,17 @@ show_glyph(coordxy x, coordxy y, int glyph)
             gg.gbuf_start[y] = x;
         if (gg.gbuf_stop[y] < x)
             gg.gbuf_stop[y] = x;
+    }
+
+    if (show_glyph_change) {
+        char buf[BUFSZ];
+        coord cc;
+        int sym = 0;
+        const char *firstmatch = 0;
+
+        cc.x = x, cc.y = y;
+        do_screen_description(cc, TRUE, sym, buf, &firstmatch, NULL);
+        pline_xy(x, y, "%s.", firstmatch);
     }
 }
 
