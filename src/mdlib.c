@@ -306,11 +306,9 @@ make_version(void)
     for (i = 1; artifact_names[i]; i++)
         continue;
     version.entity_count = (unsigned long) (i - 1);
-    for (i = 1; objects[i].oc_class != ILLOBJ_CLASS; i++)
-        continue;
+    i = NUM_OBJECTS;
     version.entity_count = (version.entity_count << 12) | (unsigned long) i;
-    for (i = 0; mons[i].mlet; i++)
-        continue;
+    i = NUMMONS;
     version.entity_count = (version.entity_count << 12) | (unsigned long) i;
     /*
      * Value used for compiler (word size/field alignment/padding) check.
