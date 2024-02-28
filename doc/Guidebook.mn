@@ -1390,6 +1390,8 @@ Debug mode only.
 .lp "#look    "
 Look at what is here, under you.
 Default key is \(oq:\(cq.
+.lp #lookaround
+Describe what you can see, or remember, of your surroundings.
 .lp "#loot    "
 Loot a box or bag on the floor beneath you, or the saddle
 from a steed standing next to you.
@@ -4091,6 +4093,8 @@ fountains, or altars which are ordinarily only described when covered
 by one or more objects (default off).
 Cannot be set with the \(oq\f(CRO\fP\(cq command.
 Persistent.
+.lp mention_map
+Give feedback when interesting map locations change (default off).
 .lp mention_walls
 Give feedback when walking against a wall (default off).
 Persistent.
@@ -5977,6 +5981,8 @@ Shows a message when hero notices a monster movement;
 combine with spot_monsters and accessiblemsg.
 .lp autodescribe
 Automatically describe the terrain under the cursor when targeting.
+.lp mention_map
+Give feedback messages when interesting map locations change.
 .lp mention_walls
 Give feedback messages when walking towards a wall or when travel command
 was interrupted.

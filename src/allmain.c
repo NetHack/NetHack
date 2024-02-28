@@ -769,7 +769,10 @@ newgame(void)
     /* Success! */
     welcome(TRUE);
     notice_mon_on(); /* now we can notice monsters */
-    notice_all_mons(TRUE);
+    if (a11y.glyph_updates)
+        (void) dolookaround();
+    else
+        notice_all_mons(TRUE);
     return;
 }
 

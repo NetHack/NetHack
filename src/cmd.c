@@ -111,6 +111,13 @@ static int dotravel_target(void);
 static int doclicklook(void);
 static int domouseaction(void);
 static int doterrain(void);
+static boolean u_have_seen_whole_selection(struct selectionvar *);
+static boolean u_have_seen_bounds_selection(struct selectionvar *);
+static boolean u_can_see_whole_selection(struct selectionvar *);
+static boolean selection_is_irregular(struct selectionvar *);
+static char *selection_size_description(struct selectionvar *, char *);
+static int dolookaround_floodfill_findroom(coordxy, coordxy);
+static void lookaround_known_room(coordxy, coordxy);
 static int wiz_wish(void);
 static int wiz_identify(void);
 static int wiz_map(void);
@@ -1224,6 +1231,7 @@ wiz_map(void)
         struct engr *ep;
         long save_Hconf = HConfusion, save_Hhallu = HHallucination;
 
+        notice_mon_off();
         HConfusion = HHallucination = 0L;
         for (t = gf.ftrap; t != 0; t = t->ntrap) {
             t->tseen = 1;
@@ -1233,6 +1241,7 @@ wiz_map(void)
             map_engraving(ep, TRUE);
         }
         do_mapping();
+        notice_mon_on();
         HConfusion = save_Hconf;
         HHallucination = save_Hhallu;
     } else
@@ -2251,6 +2260,210 @@ doterrain(void)
     return ECMD_OK; /* no time elapses */
 }
 
+/* has hero seen all locations in selection? */
+static boolean
+u_have_seen_whole_selection(struct selectionvar *sel)
+{
+    coordxy x, y;
+    NhRect rect = cg.zeroNhRect;
+
+    selection_getbounds(sel, &rect);
+
+    for (x = rect.lx; x <= rect.hx; x++)
+        for (y = rect.ly; y <= rect.hy; y++)
+            if (isok(x,y) && selection_getpoint(x, y, sel)
+                && glyph_at(x, y) == GLYPH_UNEXPLORED)
+                return FALSE;
+
+    return TRUE;
+}
+
+/* has hero seen all location of the rectangular outline in the selection */
+static boolean
+u_have_seen_bounds_selection(struct selectionvar *sel)
+{
+    coordxy x, y;
+    NhRect rect = cg.zeroNhRect;
+
+    selection_getbounds(sel, &rect);
+
+    for (x = rect.lx; x <= rect.hx; x++) {
+        y = rect.ly;
+        if (isok(x,y) && selection_getpoint(x, y, sel)
+            && glyph_at(x, y) == GLYPH_UNEXPLORED)
+            return FALSE;
+        y = rect.hy;
+        if (isok(x,y) && selection_getpoint(x, y, sel)
+            && glyph_at(x, y) == GLYPH_UNEXPLORED)
+            return FALSE;
+    }
+    for (y = rect.ly; y <= rect.hy; y++) {
+        x = rect.lx;
+        if (isok(x,y) && selection_getpoint(x, y, sel)
+            && glyph_at(x, y) == GLYPH_UNEXPLORED)
+            return FALSE;
+        x = rect.hx;
+        if (isok(x,y) && selection_getpoint(x, y, sel)
+            && glyph_at(x, y) == GLYPH_UNEXPLORED)
+            return FALSE;
+    }
+
+    return TRUE;
+}
+
+/* can hero currently see all locations in the selection */
+static boolean
+u_can_see_whole_selection(struct selectionvar *sel)
+{
+    coordxy x, y;
+    NhRect rect = cg.zeroNhRect;
+
+    selection_getbounds(sel, &rect);
+
+    for (x = rect.lx; x <= rect.hx; x++)
+        for (y = rect.ly; y <= rect.hy; y++)
+            if (isok(x,y) && selection_getpoint(x, y, sel) && !cansee(x, y))
+                return FALSE;
+
+    return TRUE;
+}
+
+/* selection is not rectangular, or has holes in it */
+static boolean
+selection_is_irregular(struct selectionvar *sel)
+{
+    coordxy x, y;
+    NhRect rect = cg.zeroNhRect;
+
+    selection_getbounds(sel, &rect);
+
+    for (x = rect.lx; x <= rect.hx; x++)
+        for (y = rect.ly; y <= rect.hy; y++)
+            if (isok(x,y) && !selection_getpoint(x, y, sel))
+                return TRUE;
+
+    return FALSE;
+}
+
+/* return a description of the selection size */
+static char *
+selection_size_description(struct selectionvar *sel, char *buf)
+{
+    NhRect rect = cg.zeroNhRect;
+    coordxy dx, dy;
+
+    selection_getbounds(sel, &rect);
+    dx = rect.hx - rect.lx + 1;
+    dy = rect.hy - rect.ly + 1;
+    Sprintf(buf, "%s %i by %i", selection_is_irregular(sel) ? "irregularly shaped"
+            : (dx == dy) ? "square"
+            : "rectangular",
+            dx, dy);
+    return buf;
+}
+
+/* selection_floofill callback to get all locations in a room */
+static int
+dolookaround_floodfill_findroom(coordxy x, coordxy y)
+{
+    schar typ = levl[x][y].typ;
+
+    if (IS_STWALL(typ) || IS_DOOR(typ) || IS_TREE(typ)
+        || IS_WATERWALL(typ) || typ == LAVAWALL || typ == IRONBARS
+        || typ == SCORR || typ == SDOOR || typ == DRAWBRIDGE_UP)
+        return FALSE;
+    return TRUE;
+}
+
+/* describe the room at x,y */
+static void
+lookaround_known_room(coordxy x, coordxy y)
+{
+    struct selectionvar *sel = selection_new();
+    int rmno = u.urooms[0] - ROOMOFFSET;
+    char qbuf[QBUFSZ];
+
+    set_selection_floodfillchk(dolookaround_floodfill_findroom);
+    selection_floodfill(sel, x, y, TRUE);
+
+    if (!u_at(x, y))
+        set_msg_xy(x, y);
+
+    if (u_have_seen_whole_selection(sel)) {
+        boolean u_in = (boolean) selection_getpoint(x, y, sel);
+
+        You("%s %s %s.",
+            u_at(x, y) && u_in && u_can_see_whole_selection(sel) ? "are in"
+            : (u_at(x, y)) ? "remember this as" : "remember that as",
+            an(selection_size_description(sel, qbuf)),
+            rmno >= 0 ? "room" : "area");
+    } else if (u_have_seen_bounds_selection(sel)) {
+        You("guess %s to be %s %s.",
+            u_at(x, y) ? "this" : "that",
+            an(selection_size_description(sel, qbuf)),
+            rmno >= 0 ? "room" : "area");
+    } else {
+        You("can't guess the size of %s area.",
+            u_at(x, y) ? "this" : "that");
+    }
+    selection_free(sel, TRUE);
+}
+
+/* #lookaround - describe what the hero can see, in text */
+int
+dolookaround(void)
+{
+    coordxy x, y;
+    int tmp_getloc_filter = iflags.getloc_filter;
+    boolean tmp_accessiblemsg = a11y.accessiblemsg;
+    boolean corr_next2u = FALSE;
+
+    a11y.accessiblemsg = TRUE;
+    if (levl[u.ux][u.uy].typ == CORR) {
+        /* In a corridor, mention corridors next to you. */
+        corr_next2u = TRUE;
+        /* TODO: if we know, describe where the corridor goes,
+           perhaps by describing the rooms? */
+    } else if (IS_DOOR(levl[u.ux][u.uy].typ)) {
+        /* In a doorway, describe the rooms next to you */
+        int i;
+
+        for (i = DIR_W; i < N_DIRS; i += 2) {
+            x = u.ux + xdir[i];
+            y = u.uy + ydir[i];
+            if (isok(x, y) && IS_ROOM(levl[x][y].typ))
+                lookaround_known_room(x, y);
+        }
+        corr_next2u = TRUE;
+    } else {
+        lookaround_known_room(u.ux, u.uy);
+    }
+
+    /* TODO: maybe describe stuff outside the current room differently? */
+
+    iflags.getloc_filter = GFILTER_VIEW;
+    for (y = 0; y < ROWNO; y++)
+        for (x = 1; x < COLNO; x++)
+            if (!u_at(x, y)
+                && (gather_locs_interesting(x, y, GLOC_INTERESTING) ||
+                    (corr_next2u && (glyph_at(x,y) == cmap_to_glyph(S_corr)
+                                     || glyph_at(x,y) == cmap_to_glyph(S_litcorr))))) {
+                char buf[BUFSZ];
+                coord cc;
+                int sym = 0;
+                const char *firstmatch = 0;
+
+                cc.x = x, cc.y = y;
+                do_screen_description(cc, TRUE, sym, buf, &firstmatch, NULL);
+                pline_xy(x, y, "%s.", firstmatch);
+            }
+
+    iflags.getloc_filter = tmp_getloc_filter;
+    a11y.accessiblemsg = tmp_accessiblemsg;
+
+    return ECMD_OK;
+}
+
 void
 set_move_cmd(int dir, int run)
 {
@@ -2625,6 +2838,8 @@ struct ext_func_tab extcmdlist[] = {
               wiz_light_sources, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { ':',    "look", "look at what is here",
               dolook, IFBURIED, NULL },
+    { '\0',   "lookaround", "describe what you can see",
+              dolookaround, IFBURIED | GENERALCMD, NULL },
     { M('l'), "loot", "loot a box on the floor",
               doloot, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
     { '\0',   "migratemons",

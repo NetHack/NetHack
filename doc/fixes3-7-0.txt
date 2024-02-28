@@ -2498,7 +2498,9 @@ erinyes overhaul; they now attempt to punish heroes who have violated their
 	alignment and get stronger with greater alignment abuse
 accessibility options to tell where on map a message happened (accessiblemsg),
 	to notify when a monster is spotted (spot_monsters), and when
-	a monster moved (mon_movement), when hero takes damage (showdamage)
+	a monster moved (mon_movement), when hero takes damage (showdamage),
+        when interesting map locations change (mention_map)
+accessibility command #lookaround which will describe what hero can see
 if hero is punished or tethered to a buried iron ball and has no inventory (or
 	only carries gold or embedded dragon scales or both), a nymph might
 	remove the chain when finding nothing else to steal

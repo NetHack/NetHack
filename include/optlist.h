@@ -408,6 +408,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(mention_decor, Advanced, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &flags.mention_decor, Term_False,
            "give feedback when walking over interesting features")
+    NHOPTB(mention_map, Advanced, 0, opt_in, set_in_game,
+           Off, Yes, No, No, NoAlias, &a11y.glyph_updates, Term_False,
+           "give feedback when interesting map locations change")
     NHOPTB(mention_walls, Advanced, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &flags.mention_walls, Term_False,
            "give feedback when walking into walls")
