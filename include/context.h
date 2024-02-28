@@ -159,8 +159,6 @@ struct context_info {
     boolean move;
     boolean mv;
     boolean bypasses;    /* bypass flag is set on at least one fobj */
-    boolean placeholder1;
-    boolean placeholder2;
     boolean door_opened; /* set to true if door was opened during test_move */
     boolean tips[NUM_TIPS];
     struct dig_info digging;
