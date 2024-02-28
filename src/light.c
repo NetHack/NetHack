@@ -473,6 +473,14 @@ relink_light_sources(boolean ghostly)
     for (ls = gl.light_base; ls; ls = ls->next) {
         if (ls->flags & LSF_NEEDS_FIXUP) {
             if (ls->type == LS_OBJECT || ls->type == LS_MONSTER) {
+                if (!ls->id.a_uint) {
+                    /* it was possible to get stuck in this loop on bad
+                     * savefile data load and repeatedly prompt the player
+                     * for a key press after displaying an impossible message.
+                     * Consider this bad data from a savefile and panic() */
+                     panic("relink_light_sources: id = 0, type = %d",
+                           (int) ls->type);
+                }
                 if (ghostly) {
                     if (!lookup_id_mapping(ls->id.a_uint, &nid))
                         impossible("relink_light_sources: no id mapping");
