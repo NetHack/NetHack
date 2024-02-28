@@ -4580,11 +4580,23 @@ Show your accumulated experience points on bottom line (default off).
 Persistent.
 .lp showrace
 Display yourself as the glyph for your race, rather than the glyph
-for your role (default off).  Note that this setting affects only
+for your role (default off).
+Note that this setting affects only
 the appearance of the display, not the way the game treats you.
 Persistent.
 .lp showscore
 Show your approximate accumulated score on bottom line (default off).
+By default, this feature is suppressed when building the program.
+Persistent.
+.lp showvers
+Include the game's version number on the status lines (default off).
+Potentially useful if you switch between different versions or variants,
+or you are making screenshots or streaming video.
+Using the
+.op statuslines:3
+option is recommended so that there will be more room available for
+status information, unless you're using nethack's \fIQt\fP interface
+or your terminal emulator window displays fewer than 25 lines.
 Persistent.
 .lp "silent  "
 Suppress terminal beeps (default on).

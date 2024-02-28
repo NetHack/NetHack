@@ -86,6 +86,7 @@ NetHackQtSettings::NetHackQtSettings() :
     normalfixed("courier"),
 #endif
     large("times"),
+    small("times"),
     theglyphs(0)
 {
     int default_fontsize;
@@ -324,6 +325,13 @@ const QFont& NetHackQtSettings::largeFont()
     static int size[]={ 24, 18, 14, 12, 10 };
     large.setPointSize(size[fontsize.currentIndex()]);
     return large;
+}
+
+const QFont& NetHackQtSettings::smallFont()
+{
+    static int size[]={ 14, 12, 10, 8, 8 };
+    small.setPointSize(size[fontsize.currentIndex()]);
+    return small;
 }
 
 bool NetHackQtSettings::ynInMessages()

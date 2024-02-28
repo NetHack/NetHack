@@ -106,9 +106,10 @@ do_statusline2(void)
          /* dungeon location (and gold), hero health (HP, PW, AC),
             experience (HD if poly'd, else Exp level and maybe Exp points),
             time (in moves), varying number of status conditions */
-         dloc[QBUFSZ], hlth[QBUFSZ], expr[QBUFSZ], tmmv[QBUFSZ], cond[QBUFSZ];
+         dloc[QBUFSZ], hlth[QBUFSZ], expr[QBUFSZ],
+         tmmv[QBUFSZ], cond[QBUFSZ], vers[QBUFSZ];
     char *nb;
-    size_t dln, dx, hln, xln, tln, cln;
+    size_t dln, dx, hln, xln, tln, cln, vrn;
     int hp, hpmax, cap;
     long money;
 
@@ -206,6 +207,13 @@ do_statusline2(void)
         Strcpy(nb = eos(nb), " Ride");
     cln = strlen(cond);
 
+    /* version on status line, with leading space */
+    if (flags.showvers)
+        (void) status_version(vers, sizeof vers, TRUE);
+    else
+        vers[0] = '\0';
+    vrn = strlen(vers);
+
     /*
      * Put the pieces together.  If they all fit, keep the traditional
      * sequence.  Otherwise, move least important parts to the end in
@@ -218,23 +226,24 @@ do_statusline2(void)
      * wider displays can still show wider status than the map if the
      * interface supports that.
      */
-    if ((dln - dx) + 1 + hln + 1 + xln + 1 + tln + 1 + cln <= COLNO) {
-        Snprintf(newbot2, sizeof newbot2, "%s %s %s %s %s", dloc, hlth, expr,
-                 tmmv, cond);
+    if ((dln - dx) + 1 + hln + 1 + xln + 1 + tln + 1 + cln + vrn <= COLNO) {
+        Snprintf(newbot2, sizeof newbot2, "%s %s %s %s %s%s", dloc, hlth,
+                 expr, tmmv, cond, vers);
     } else {
-        if (dln + 1 + hln + 1 + xln + 1 + tln + 1 + cln + 1 > MAXCO) {
+        if (dln + 1 + hln + 1 + xln + 1 + tln + 1 + cln + vrn > MAXCO) {
             panic("bot2: second status line exceeds MAXCO (%u > %d)",
-                  (unsigned)(dln + 1 + hln + 1 + xln + 1 + tln + 1 + cln + 1),
+                  (unsigned) (dln + 1 + hln + 1 + xln + 1 + tln + 1 + cln
+                              + vrn),
                   MAXCO);
         } else if ((dln - dx) + 1 + hln + 1 + xln + 1 + cln <= COLNO) {
-            Snprintf(newbot2, sizeof newbot2, "%s %s %s %s %s", dloc, hlth,
-                     expr, cond, tmmv);
+            Snprintf(newbot2, sizeof newbot2, "%s %s %s %s %s%s", dloc, hlth,
+                     expr, cond, tmmv, vers);
         } else if ((dln - dx) + 1 + hln + 1 + cln <= COLNO) {
-            Snprintf(newbot2, sizeof newbot2, "%s %s %s %s %s", dloc, hlth,
-                     cond, expr, tmmv);
+            Snprintf(newbot2, sizeof newbot2, "%s %s %s %s %s%s", dloc, hlth,
+                     cond, expr, tmmv, vers);
         } else {
-            Snprintf(newbot2, sizeof newbot2, "%s %s %s %s %s", hlth, cond,
-                     dloc, expr, tmmv);
+            Snprintf(newbot2, sizeof newbot2, "%s %s %s %s %s%s", hlth, cond,
+                     dloc, expr, tmmv, vers);
         }
         /* only two or three consecutive spaces available to squeeze out */
         mungspaces(newbot2);
@@ -567,7 +576,12 @@ static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("hitpoints-max", "(%s)", ANY_INT, 10, BL_HPMAX),
     INIT_BLSTAT("dungeon-level", "%s", ANY_STR, MAXVALWIDTH, BL_LEVELDESC),
     INIT_BLSTATP("experience", "/%s", ANY_LONG, 20, BL_EXP, BL_EXP),
-    INIT_BLSTAT("condition", "%s", ANY_MASK32, 0, BL_CONDITION)
+    INIT_BLSTAT("condition", "%s", ANY_MASK32, 0, BL_CONDITION),
+    /* optional; once set it doesn't change unless 'showvers' option is
+       toggled or player modifies the 'versinfo' option;
+       available mostly for screenshots or someone looking over shoulder;
+       blstat[][BL_VERS] is actually an int copy of flags.versinfo (0...7) */
+    INIT_BLSTAT("version", " %s", ANY_STR, MAXVALWIDTH, BL_VERS),
 };
 
 #undef INIT_BLSTATP
@@ -872,6 +886,18 @@ bot_via_windowport(void)
     Strcpy(gb.blstats[idx][BL_CAP].val,
            (cap > UNENCUMBERED) ? enc_stat[cap] : "");
     gv.valset[BL_CAP] = TRUE;
+
+    /* Version; unchanging unless player toggles 'showvers' option or
+       modifies 'versinfo' option; toggling showvers off will clear it */
+    if (gb.blstats[idx][BL_VERS].a.a_int != (int) flags.versinfo) {
+        gb.blstats[idx][BL_VERS].a.a_int = (int) flags.versinfo;
+        gv.valset[BL_VERS] = FALSE;
+    }
+    if (!gv.valset[BL_VERS]) {
+        (void) status_version(gb.blstats[idx][BL_VERS].val,
+                              gb.blstats[idx][BL_VERS].valwidth, FALSE);
+        gv.valset[BL_VERS] = TRUE;
+    }
 
     /* Conditions */
 
@@ -1342,21 +1368,24 @@ evaluate_and_notify_windowport(
     boolean *valsetlist,
     int idx)
 {
-    int i, updated = 0, notpresent UNUSED = 0;
+    int i, fld, updated = 0, notpresent UNUSED = 0;
 
     /*
      *  Now pass the changed values to window port.
      */
     for (i = 0; i < MAXBLSTATS; i++) {
-        if (((i == BL_SCORE) && !flags.showscore)
-            || ((i == BL_EXP) && !flags.showexp)
-            || ((i == BL_TIME) && !flags.time)
-            || ((i == BL_HD) && !Upolyd)
-            || ((i == BL_XP || i == BL_EXP) && Upolyd)) {
+        fld = initblstats[i].fld;
+        if (((fld == BL_SCORE) && !flags.showscore)
+            || ((fld == BL_EXP) && !flags.showexp)
+            || ((fld == BL_TIME) && !flags.time)
+            || ((fld == BL_HD) && !Upolyd)
+            || ((fld == BL_XP || i == BL_EXP) && Upolyd)
+            || ((fld == BL_VERS) && !flags.showvers)
+            ) {
             notpresent++;
             continue;
         }
-        if (eval_notify_windowport_field(i, valsetlist, idx))
+        if (eval_notify_windowport_field(fld, valsetlist, idx))
             updated++;
     }
     /*
@@ -1419,7 +1448,8 @@ status_initialize(
                      : (fld == BL_EXP) ? (boolean) (flags.showexp && !Upolyd)
                        : (fld == BL_XP) ? (boolean) !Upolyd
                          : (fld == BL_HD) ? (boolean) Upolyd
-                           : TRUE;
+                           : (fld == BL_VERS) ? flags.showvers
+                             : TRUE;
 
         fieldname = initblstats[i].fldname;
         fieldfmt = (fld == BL_TITLE && iflags.wc2_hitpointbar) ? "%-30.30s"
@@ -3433,7 +3463,7 @@ status_hilite_menu_choose_behavior(int fld)
         nopts++;
     }
 
-    if (fld != BL_CONDITION) {
+    if (fld != BL_CONDITION && fld != BL_VERS) {
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_UPDOWN;
         Sprintf(buf, "%s value changes", initblstats[fld].fldname);

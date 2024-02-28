@@ -36,6 +36,7 @@ public:
 	const QFont& normalFont();
 	const QFont& normalFixedFont();
 	const QFont& largeFont();
+        const QFont& smallFont();
 
 	bool ynInMessages();
 
@@ -71,7 +72,7 @@ private:
 
 	QComboBox fontsize;
 
-	QFont normal, normalfixed, large;
+        QFont normal, normalfixed, large, small;
 
 	NetHackQtGlyphs* theglyphs;
 #if 0

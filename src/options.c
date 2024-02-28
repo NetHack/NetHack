@@ -379,6 +379,7 @@ static int handler_runmode(void);
 static int handler_petattr(void);
 static int handler_sortloot(void);
 static int handler_symset(int);
+static int handler_versinfo(void);
 static int handler_whatis_coord(void);
 static int handler_whatis_filter(void);
 /* next few are not allopt[] entries, so will only be called
@@ -4324,6 +4325,71 @@ optfn_vary_msgcount(
     return optn_ok;
 }
 
+static int
+optfn_versinfo(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
+{
+    const char *optname = allopt[optidx].name;
+    unsigned vi = flags.versinfo;
+
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+        /* versinfo: what to include when 'showvers' displays version
+           on status lines; bitmask with up to three bits:
+           (1) x.y.z number, (2) program name, (4) git branch if available.
+           If branch is requested but unavailable, status_version will
+           treat 4 as 1.
+         */
+        boolean have_branch = (nomakedefs.git_branch
+                               && *nomakedefs.git_branch);
+        int val, dflt = have_branch ? VI_BRANCH : VI_NUMBER;
+
+        if (negated) {
+            bad_negation(allopt[optidx].name, TRUE);
+            return optn_silenterr;
+        }
+        op = string_for_opt(opts, FALSE);
+        if (op == empty_optstr) {
+            config_error_add("'%s' requires a value; defaulting to %d",
+                             optname, dflt);
+            return optn_silenterr;
+        }
+        val = atoi(op);
+        if (!val || (val & ~7) != 0) {
+            config_error_add("'%s' must be one of 1, 2, 4, or"
+                             " the sum of two or all three of those",
+                             optname);
+            return optn_silenterr;
+        }
+        flags.versinfo = (unsigned) val;
+    } else if (req == do_handler) {
+        /* return handler_versinfo(); */
+        (void) handler_versinfo();
+        pline("'%s' %s %u.", optname,
+              (flags.versinfo == vi) ? "not changed, still" : "changed to",
+              flags.versinfo);
+    } else if (req == get_val) {
+        char vbuf[QBUFSZ];
+        boolean g = (vi & VI_NAME) != 0,
+                b = (vi & VI_BRANCH) != 0,
+                n = (vi & VI_NUMBER) != 0;
+
+        Sprintf(opts, "%u: %s%s%s%s%s (%.99s)", flags.versinfo,
+                g ? "name" : "", (b && g) ? "+" : "", b ? "branch" : "",
+                (n && (b || g)) ? "+" : "", n ? "number" : "",
+                status_version(vbuf, sizeof vbuf, FALSE));
+    } else if (req == get_cnf_val) {
+        Sprintf(opts, "%u", flags.versinfo);
+    }
+    if (flags.versinfo != vi && !go.opt_initial)
+        go.opt_need_redraw = TRUE; /* context.botlx = TRUE ought to suffice
+                                    * but doesn't for X11 fancy status */
+    return optn_ok;
+}
+
 #ifdef VIDEOSHADES
 static int
 optfn_videocolors(int optidx, int req, boolean negated UNUSED,
@@ -5085,6 +5151,7 @@ optfn_boolean(
 #ifdef SCORE_ON_BOTL
         case opt_showscore:
 #endif
+        case opt_showvers:
         case opt_showexp:
             if (VIA_WINDOWPORT())
                 status_initialize(REASSESS_ONLY);
@@ -6245,6 +6312,53 @@ handler_msgtype(void)
 
 
 static int
+handler_versinfo(void)
+{
+    winid tmpwin;
+    anything any;
+    menu_item *vi_pick = (menu_item *) 0;
+    boolean have_branch = (nomakedefs.git_branch && *nomakedefs.git_branch);
+    int n, vi = (int) flags.versinfo;
+
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    any = cg.zeroany;
+
+    any.a_int = n = VI_NUMBER; /* 1 */
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'n', n + '0', ATR_NONE, NO_COLOR,
+             "version number",
+             (vi & n) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    any.a_int = n = VI_NAME; /* 2 */
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'g', n + '0', ATR_NONE, NO_COLOR,
+             "game name",
+             (vi & n) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    any.a_int = n = VI_BRANCH; /* 4 */
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'b', n + '0', ATR_NONE, NO_COLOR,
+             (have_branch ? "development branch"
+#if (NH_DEVEL_STATUS == NH_STATUS_RELEASED)
+                          : "(not applicable)"
+#else
+                          : "(not available)"
+#endif
+              ), (vi & n) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+
+    end_menu(tmpwin, "Select version information flags:");
+    n = select_menu(tmpwin, PICK_ANY, &vi_pick);
+    if (n > 0) {
+        int i, newval = 0;
+
+        for (i = 0; i < n; ++i)
+            newval |= vi_pick[i].item.a_int;
+        newval &= 7;
+        if (newval)
+            flags.versinfo = (unsigned) newval;
+        free((genericptr_t) vi_pick);
+    }
+    destroy_nhwindow(tmpwin);
+    return optn_ok;
+}
+
+static int
 handler_windowborders(void)
 {
     winid tmpwin;
@@ -6759,6 +6873,7 @@ initoptions_init(void)
     char *opts;
 #endif
     int i;
+    boolean have_branch = (nomakedefs.git_branch && *nomakedefs.git_branch);
 
     go.opt_phase = builtin_opt;		// Did I need to move this here?
     memcpy(allopt, allopt_init, sizeof(allopt));
@@ -6809,6 +6924,7 @@ initoptions_init(void)
     flags.end_top = 3;
     flags.end_around = 2;
     flags.paranoia_bits = PARANOID_PRAY | PARANOID_SWIM;
+    flags.versinfo = have_branch ? 4 : 1;
     flags.pile_limit = PILE_LIMIT_DFLT;  /* 5 */
     flags.runmode = RUN_LEAP;
     iflags.msg_history = 20;

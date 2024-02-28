@@ -64,6 +64,7 @@ safe_wait      require use of 'm' prefix before '.' or 's' to      [True]
 sanity_check   perform data sanity checks                         [False]
 showexp        display your accumulated experience points         [False]
 showrace       show yourself by your race rather than by role     [False]
+showvers       show version number on status lines                [False]
 silent         don't use your terminal's bell sound                [True]
 sortpack       group similar kinds of objects in inventory         [True]
 sparkle        display sparkly effect for resisted magical         [True]
@@ -289,6 +290,8 @@ suppress_alert disable various version-specific warnings about changes   []
               for the 'Q' command that quitting is now done via #quit
               (e.g., use suppress_alert:3.3.1 to stop that and any other
               notifications added in that version or earlier)
+versinfo      selects what information is displayed when showvers  [1 or 4]
+              is true (default depends on program development status)
 whatis_coord  controls whether to include map coordinates when          [n]
               autodescribe is active for the '/' and ';' commands.
               Value is the first letter of one of

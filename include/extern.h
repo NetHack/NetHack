@@ -3390,6 +3390,7 @@ extern void vault_gd_watching(unsigned int);
 
 extern char *version_string(char *, size_t bufsz) NONNULL NONNULLARG1;
 extern char *getversionstring(char *, size_t bufsz) NONNULL NONNULLARG1;
+extern char *status_version(char *, size_t, boolean) NONNULL NONNULLARG1;
 extern int doversion(void);
 extern int doextversion(void);
 #ifdef MICRO

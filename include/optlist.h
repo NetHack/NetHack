@@ -641,6 +641,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
            Off, Yes, No, No, NoAlias, (boolean *) 0, Term_False,
            (char *)0)
 #endif
+    NHOPTB(showvers, Status, 0, opt_in, set_in_game,
+           Off, Yes, No, No, NoAlias, &flags.showvers, Term_False,
+           "show version info on status line")
     NHOPTB(silent, Advanced, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.silent, Term_False,
            "don't use terminal bell")
@@ -779,6 +782,8 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(verbose, Advanced, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.verbose, Term_False,
            (char *)0)
+    NHOPTC(versinfo, Advanced, 80, opt_out, set_in_game,
+           No, Yes, No, Yes, NoAlias, "extra information for 'showvers'")
 #ifdef MSDOS
     NHOPTC(video, Advanced, 20, opt_in, set_in_config,
                 No, Yes, No, No, NoAlias, "method of video updating")

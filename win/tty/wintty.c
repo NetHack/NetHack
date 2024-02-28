@@ -4192,28 +4192,28 @@ static const char *const encvals[3][6] = {
     { "", "Brd",      "Strs",     "Strn",     "Ovtx",      "Ovld"       }
 };
 #define blPAD BL_FLUSH
-#define MAX_PER_ROW 15
+#define MAX_PER_ROW 16
 /* 2 or 3 status lines */
 static const enum statusfields
     twolineorder[3][MAX_PER_ROW] = {
     { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
-      BL_SCORE, BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD },
+      BL_SCORE, BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD },
     { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
       BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
-      BL_CAP, BL_CONDITION, BL_FLUSH },
+      BL_CAP, BL_CONDITION, BL_VERS, BL_FLUSH },
     /* third row of array isn't used for twolineorder */
     { BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD,
-      blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD }
+      blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD }
 },
-    /* Align moved from 1 to 2, Leveldesc+Time+Condition moved from 2 to 3 */
+    /* Align moved from 1 to 2, Leveldesc+Time+Cond+Vers moved from 2 to 3 */
     threelineorder[3][MAX_PER_ROW] = {
     { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,
-      BL_SCORE, BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD },
+      BL_SCORE, BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD },
     { BL_ALIGN, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
       BL_AC, BL_XP, BL_EXP, BL_HD, BL_HUNGER,
-      BL_CAP, BL_FLUSH, blPAD, blPAD },
-    { BL_LEVELDESC, BL_TIME, BL_CONDITION, BL_FLUSH, blPAD, blPAD,
-      blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD }
+      BL_CAP, BL_FLUSH, blPAD, blPAD, blPAD },
+    { BL_LEVELDESC, BL_TIME, BL_CONDITION, BL_VERS, BL_FLUSH, blPAD,
+      blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD }
 };
 static const enum statusfields (*fieldorder)[MAX_PER_ROW];
 #undef MAX_PER_ROW
@@ -4299,7 +4299,7 @@ tty_status_enablefield(
  *         BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,
  *         BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX,
  *         BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,
- *         BL_LEVELDESC, BL_EXP, BL_CONDITION
+ *         BL_LEVELDESC, BL_EXP, BL_CONDITION, BL_VERS
  *      -- fldindex could also be BL_FLUSH (-1), which is not really
  *         a field index, but is a special trigger to tell the
  *         windowport that it should output all changes received
@@ -4664,6 +4664,7 @@ status_sanity_check(void)
         "BL_ENE", "BL_ENEMAX", "BL_XP", "BL_AC", "BL_HD",         /* 11..15 */
         "BL_TIME", "BL_HUNGER", "BL_HP", "BL_HPMAX",              /* 16..19 */
         "BL_LEVELDESC", "BL_EXP", "BL_CONDITION",                 /* 20..22 */
+        "BL_VERS",                                                /*   23   */
     };
     static boolean in_sanity_check = FALSE;
     int i;
@@ -4902,7 +4903,8 @@ static void
 render_status(void)
 {
     long mask, bits;
-    int i, x, y, idx, c, ci, row, tlth, num_rows, coloridx = 0, attrmask = 0;
+    int i, x, y, idx, c, ci, row, tlth, num_rows,
+        coloridx = 0, attrmask = 0;
     char *text;
     struct WinDesc *cw = 0;
 
@@ -4935,13 +4937,24 @@ render_status(void)
                      * +-----------------+
                      */
                     bits = tty_condition_bits;
-                    /* if no bits are set, we can fall through condition
-                       rendering code to finalx[] handling (and subsequent
-                       rest-of-line erasure if line is shorter than before) */
-                    if (num_rows == MAX_STATUS_ROWS && bits != 0L) {
-                        int k;
+                    /*
+                     * If no bits are set, we can fall through condition
+                     * rendering code to finalx[] handling (and subsequent
+                     * rest-of-line erasure if line is shorter than before).
+                     *
+                     * First, when conditions are on 3rd row, they might
+                     * be indented to line up with a position on 2nd row.
+                     */
+                    if (row == MAX_STATUS_ROWS - 1 && bits != 0L) {
+                        int cstart, last_col = cw->cols;
                         char *dat = &cw->data[y][0];
 
+                        /* 'version' might follow conditions; if so, adjust
+                           expectations for where conditions should end;
+                           only matters when conditions are being indented */
+                        if (status_activefields[BL_VERS]
+                            && fieldorder[row][i + 1] == BL_VERS)
+                            last_col -= (int) tty_status[NOW][BL_VERS].lth;
                         /* line up with hunger (or where it would have
                            been when currently omitted); if there isn't
                            enough room for that, right justify; or place
@@ -4951,20 +4964,23 @@ render_status(void)
                         if (tty_status[BEFORE][BL_HUNGER].y < row
                             && x < tty_status[BEFORE][BL_HUNGER].x
                             && (tty_status[BEFORE][BL_HUNGER].x + tlth
-                                < cw->cols - 1))
-                            k = tty_status[BEFORE][BL_HUNGER].x;
+                                < last_col - 1))
+                            cstart = tty_status[BEFORE][BL_HUNGER].x;
                         else if (x + tlth < cw->cols - 1)
-                            k = cw->cols - tlth;
+                            cstart = last_col - tlth;
                         else
-                            k = x;
-                        while (x < k) {
-                            if (dat[x - 1] != ' ')
-                                tty_putstatusfield(" ", x, y);
-                            ++x;
+                            cstart = x;
+                        /* indent conditions to line them up with 2nd row */
+                        if (x < cstart) {
+                            do {
+                                if (dat[x - 1] != ' ')
+                                    tty_putstatusfield(" ", x, y);
+                            } while (++x < cstart);
+                            tty_status[NOW][BL_CONDITION].x = x;
+                            tty_curs(WIN_STATUS, x, y);
                         }
-                        tty_status[NOW][BL_CONDITION].x = x;
-                        tty_curs(WIN_STATUS, x, y);
                     }
+                    /* actually draw condition words */
                     for (c = 0; c < SIZE(conditions) && bits != 0L; ++c) {
                         ci = cond_idx[c];
                         mask = conditions[ci].mask;
@@ -5067,6 +5083,34 @@ render_status(void)
                      * |   in a special case above   |
                      * +-----------------------------+
                      */
+                    if (idx == BL_VERS
+                        /* if 'version' is the last field in its row, right
+                           justify it (otherwise just treat it as ordinary) */
+                        && fieldorder[row][i + 1] == BL_FLUSH) {
+                        int vstart;
+                        char *dat = &cw->data[y][0];
+                        /* FIXME:  there's something fishy going on here;
+                           'x' ends up out of synch when conditions have
+                           3rd row indentation and the indenting of version
+                           overwrites them with spaces; this hides that */
+                        int vx = tty_status[BEFORE][BL_CONDITION].x
+                                 + tty_status[BEFORE][BL_CONDITION].lth;
+
+                        if (i > 0 && fieldorder[row][i - 1] == BL_CONDITION
+                            && x != vx) {
+                            x = vx;
+                            tty_curs(WIN_STATUS, x, y);
+                        }
+                        /* indent version to right justify it */
+                        vstart = cw->cols - (int) tty_status[NOW][idx].lth;
+                        if (x < vstart) {
+                            do {
+                                if (dat[x - 1] != ' ')
+                                    tty_putstatusfield(" ", x, y);
+                            } while (++x < vstart);
+                            tty_status[NOW][BL_VERS].x = x;
+                        }
+                    }
                     if (iflags.hilite_delta) {
                         while (*text == ' ') {
                             tty_putstatusfield(" ", x++, y);
@@ -5104,7 +5148,7 @@ render_status(void)
              * - Copy the entire tty_status struct.
              */
             tty_status[BEFORE][idx] = tty_status[NOW][idx];
-        }
+        } /* for i=..., idx=fieldorder[][i] */
         x = finalx[row][NOW];
         if ((x < finalx[row][BEFORE] || !finalx[row][BEFORE])
             && x + 1 < cw->cols) {
@@ -5116,7 +5160,7 @@ render_status(void)
          * - Copy the last written column number on the row.
          */
         finalx[row][BEFORE] = finalx[row][NOW];
-    }
+    } /* for row=... */
     return;
 }
 

@@ -65,6 +65,7 @@ private:
 	QPixmap p_lev;
 	QPixmap p_fly;
 	QPixmap p_ride;
+        QPixmap p_vers; // version, when shown, is like a pseudo-condition
 
         /*
          *  Status fields, in display order (the three separator lines
@@ -127,6 +128,8 @@ private:
 	NetHackQtLabelledIcon lev;
 	NetHackQtLabelledIcon fly;
 	NetHackQtLabelledIcon ride;
+        /* to right of conditions, right justified */
+        NetHackQtLabelledIcon vers;   // version
 
         QFrame hline1; // between dlevel and characteristics
         QFrame hline2; // between characteristics and regular status fields
@@ -143,6 +146,7 @@ private:
         bool was_polyd;
         bool had_exp;
         bool had_score;
+        unsigned prev_versinfo;
 
         QHBoxLayout *InitHitpointBar();
         void HitpointBar();

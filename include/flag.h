@@ -58,6 +58,7 @@ struct flag {
     boolean safe_wait;       /* prevent wait or search next to hostile */
     boolean showexp;         /* show experience points */
     boolean showscore;       /* show score */
+    boolean showvers;        /* show version on status lines */
     boolean silent;          /* whether the bell rings or not */
     boolean sortpack;        /* sorted inventory */
     boolean sparkle;         /* show "resisting" special FX (Scott Bigham) */
@@ -89,6 +90,12 @@ struct flag {
 #define PARANOID_SWIM       0x0400
 #define PARANOID_TRAP       0x0800
 #define PARANOID_AUTOALL    0x1000
+    unsigned versinfo; /* flag mask for 'showvers' option */
+    /* mask bits for 'versinfo'; numeric order does not match display order
+       which is "name branch number" */
+#define VI_NUMBER 1 /* x.y.z */
+#define VI_NAME   2 /* game's name (ie, "nethack") */
+#define VI_BRANCH 4 /* development branch (from git, via Makefile -CFLAGS) */
     int pickup_burden; /* maximum burden before prompt */
     int pile_limit;    /* controls feedback when walking over objects */
     char discosort;    /* order of dodiscovery/doclassdisco output: o,s,c,a */
