@@ -246,7 +246,7 @@ remove_worn_item(
      * but that would need a lot more cooperation by callers.  It's a
      * tradeoff between protecting the player against unintentional hangup
      * and defending the game against deliberate hangup when player sees a
-     * message about something undesireable followed by --More--.
+     * message about something undesirable followed by --More--.
      */
     oldinuse = obj->in_use;
     obj->in_use = 1;

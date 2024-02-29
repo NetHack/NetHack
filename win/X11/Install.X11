@@ -96,7 +96,7 @@ aren't familiar, talk to your local X11 guru and read the man pages.
 
 nethack.sh automatically adds HACKDIR to your font search path.  If
 you (assuming you are a system administrator) can install the fonts in your
-standard X11 font directory the relevent lines in nethack.sh can be removed.
+standard X11 font directory the relevant lines in nethack.sh can be removed.
 Alternatively, all persons playing nethack must add that "xset fp+"
 command to their .xinitrc file, or whatever file they execute when starting
 X11.  See the note below for the alternative installation procedure

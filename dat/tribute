@@ -1817,7 +1817,7 @@ yards away rather than the innocent bystander at whom it was aimed.
 %e passage
 # p. 26 (first and second paragraphs are actually end of one section,
 #        start of next one; first 'Thunder rolled...' had three dot
-#        ellipsis, second has four, elipsis plus final period--
+#        ellipsis, second has four, ellipsis plus final period--
 #        first changed to four here so that they match)
 %passage 3
 Thunder rolled....
@@ -4198,7 +4198,7 @@ Cheese with Chunky Pickle, I think."
 
 THEY DO SUCH MARVELOUS THINGS WITH SANDWICHES THESE DAYS.
 
-"Oh... and Bacon Surpise."
+"Oh... and Bacon Surprise."
 
 REALLY?  WHAT IS SO SURPRISING ABOUT BACON?
 
@@ -5789,7 +5789,7 @@ saw what happened to the others!  /You/ got your fingers burned!."
 #
 # 4 new passages added for 3.7
 #
-# p. 24 (elipsis occurs at start of paragraph; Quite Reverend Oats has opened
+# p. 24 (ellipsis occurs at start of paragraph; Quite Reverend Oats has opened
 #        /The Book of Om/ at random and is reading the passage found there)
 %passage 9
 "... silence is an answer that begs three more questions.  Seek and you will
@@ -6934,7 +6934,7 @@ merely didn't know where everything else was.
 
   [The Amazing Maurice and His Educated Rodents, by Terry Pratchett]
 %e passage
-# pp. 298-300 (Keith has challanged the professional rat piper and offered
+# pp. 298-300 (Keith has challenged the professional rat piper and offered
 #              to rid the town of rats for a much lower price; Sardines is
 #              one of the Educated Rodents, known for dancing all the time;
 #              "hwun/two/three/four/" is run-together "one /two/ three /four/";
@@ -7512,7 +7512,7 @@ very thought of written-down things.
 
 "They think written words are even more powerful," whispered the toad.
 "They think all writing is magic.  Words worry them.  See their swords?
-They glow in the presense of lawyers."
+They glow in the presence of lawyers."
 
 "All /right/," said Tiffany.  "We're getting somewhere.  I promise not
 to write his name down.  [...]"
@@ -7788,7 +7788,7 @@ Cradle and the House and the Flock and the Three Old Ladies, One With a
 Squint, Carrying the Bucket of Fish to Market When They Meet the Donkey,
 although you need two people for that one, and I only ever did it once,
 and Betsy Tupper scratched her nose at the wrong moment and I had to get
-some scissors to to cut her loose..."
+some scissors to cut her loose..."
 
   [A Hat Full of Sky, by Terry Pratchett]
 %e passage

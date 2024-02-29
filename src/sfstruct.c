@@ -46,7 +46,7 @@ static FILE *bw_FILE[MAXFD] = {0,0,0,0,0};
  * Once buffered IO (stdio) has been enabled on the file
  * associated with a descriptor via fdopen():
  *
- *    1. If you use bufoff and bufon to try and toggle the
+ *    1. If you use bufoff and bufon to try to toggle the
  *       use of write vs fwrite; the code just tracks which
  *       routine is to be called through the tracking
  *       variables and acts accordingly.

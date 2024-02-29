@@ -240,11 +240,11 @@ losestr(int num, const char *knam, schar k_format)
         losehp(dmg, knam, k_format);
 
         if (Upolyd) {
-            /* if still polymorhed, reduce you-as-monst maxHP; never below 1 */
+            /* if still polymorphed, reduce you-as-monst maxHP; never below 1 */
             u.mhmax -= min(dmg, u.mhmax - 1);
         } else if (!waspolyd) {
             /* not polymorphed now and didn't rehumanize when taking damage;
-               reduce max HP, but not below below uhpmin */
+               reduce max HP, but not below uhpmin */
             if (u.uhpmax > uhpmin)
                 setuhpmax(max(u.uhpmax - dmg, uhpmin));
         }

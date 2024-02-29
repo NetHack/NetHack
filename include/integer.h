@@ -5,7 +5,7 @@
 /* integer.h -- provide sized integer types
  *
  * We try to sort out a way to provide sized integer types
- * in here. The strong preference is to try and let a
+ * in here. The strong preference is to try to let a
  * compiler-supplied header file set up the types.
  *
  * If your compiler is C99 conforming and sets a value of

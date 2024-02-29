@@ -294,7 +294,7 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
                     int okkey = 0;
                     char tmptext[MAXWINDOWTEXT + 1];
 
-                    // @@@ Ok respnses
+                    // @@@ Ok responses
 
                     /* save original text */
                     strcpy(tmptext, data->window_text[MSG_LINES - 1].text);
@@ -795,7 +795,7 @@ can_append_text(HWND hWnd, int attr, const char *text)
     if (data->lines_not_seen == 0)
         return FALSE;
 
-    /* cannot append text with different attrbutes */
+    /* cannot append text with different attributes */
     if (data->window_text[MSG_LINES - 1].attr != attr)
         return FALSE;
 
@@ -803,7 +803,7 @@ can_append_text(HWND hWnd, int attr, const char *text)
     if (str_end_is(data->window_text[MSG_LINES - 1].text, "\n"))
         return FALSE;
 
-    /* check if the maximum string langth will be exceeded */
+    /* check if the maximum string length will be exceeded */
     if (strlen(data->window_text[MSG_LINES - 1].text) + 2
             + /* space characters */
             strlen(text) + strlen(MORE)

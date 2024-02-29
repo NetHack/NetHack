@@ -1,6 +1,6 @@
 // qt_xpms.h - static xpm arrays for use in status display
 //
-// In alhpabetical order by array name.  Probably not the best ordering...
+// In alphabetical order by array name.  Probably not the best ordering...
 
 /* clang-format off */
 

@@ -634,7 +634,7 @@ drag_ball(coordxy x, coordxy y, int *bc_control,
             already_in_rock = FALSE;
 
         switch (dist2(x, y, uball->ox, uball->oy)) {
-        /* two spaces diagonal from ball, move chain inbetween */
+        /* two spaces diagonal from ball, move chain in-between */
         case 8:
             *chainx = (uball->ox + x) / 2;
             *chainy = (uball->oy + y) / 2;

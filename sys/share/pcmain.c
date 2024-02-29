@@ -209,7 +209,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                 }
             }
 
-            /* okay so we have the overriding and definitive locaton
+            /* okay so we have the overriding and definitive location
             for sysconf, but only in the event that there is not a 
             sysconf file there (for whatever reason), check a secondary
             location rather than abort. */

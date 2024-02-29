@@ -96,7 +96,7 @@
 /* #define DEF_PAGER "/usr/bin/less" */
 
 /*
- * Define PORT_HELP to be the name of the port-specfic help file.
+ * Define PORT_HELP to be the name of the port-specific help file.
  * This file is found in HACKDIR.
  * Normally, you shouldn't need to change this.
  * There is currently no port-specific help for Unix systems.

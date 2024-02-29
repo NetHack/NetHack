@@ -36,7 +36,7 @@ DISPLAY
  * Animation effects do not display properly - this could probably be
  fixed with a correct implementation of the curses_delay_output function.
 
- * Support option to set forground and background colors for individual
+ * Support option to set foreground and background colors for individual
  windows
 
 
@@ -45,7 +45,7 @@ MENUS
 
 (cursdial.c)
 
- * Menus need to be able to accept a count as input, e.g. to specifiy
+ * Menus need to be able to accept a count as input, e.g. to specify
  how many items to drop.
  
  * Currently the "preselected" flag for an individual menu item is
@@ -79,7 +79,7 @@ MAP WINDOW
 
  * The map window would probably benefit from a total redesign.  Right
  now, it uses a pad instead of a regular curses window, which causes a
- number of special cases in the code to account for it, and a seperate
+ number of special cases in the code to account for it, and a separate
  window behind it just to draw the border.  It feels kludgy and
  annoying!
 
@@ -95,7 +95,7 @@ STATUS WINDOW
  Gnomish Mines) and perhaps show thermometer bars for hit points and
  magical power.
  
- * Conversely, if we have a narrower dislay, compress some of the
+ * Conversely, if we have a narrower display, compress some of the
  labels to save space, and do not display some items that never or
  rarely change (e.g. name, level and title, and alignment).  Perhaps
  display changes to these fields in the message window if they do
@@ -132,7 +132,7 @@ MISC
  * Update documentation and in-game help to describe the newly-added
  options: cursesgraphics, term_rows, term_cols, and windowborders.
 
- * Recognize "Alt" key in a platform-independant way to allow its use
+ * Recognize "Alt" key in a platform-independent way to allow its use
  to select extended commands.  Currently this works for PDCurses.  For
  Ncurses, the Alt key works in an xterm or rxvt if the -meta8 flag is
  passed, but I'd like to see a general way of detecting it.

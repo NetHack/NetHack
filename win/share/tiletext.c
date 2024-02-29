@@ -380,7 +380,7 @@ fopen_text_file(const char *filename, const char *type)
     int i;
 
     if (tile_file != (FILE *) 0) {
-        Fprintf(stderr, "can only open one text file at at time\n");
+        Fprintf(stderr, "can only open one text file at a time\n");
         return FALSE;
     }
 

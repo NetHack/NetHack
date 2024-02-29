@@ -71,7 +71,7 @@ int GUILaunched = TRUE;     /* We tell shared startup code in windmain.c
 #define _strdup(s1) strdup(s1)
 #endif
 
-// Foward declarations of functions included in this code module:
+// Forward declarations of functions included in this code module:
 extern boolean main(int, char **);
 static void __cdecl mswin_moveloop(void *);
 
@@ -170,7 +170,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     _nethack_app.bNoSounds = FALSE;
 
-#if 0  /* GdiTransparentBlt does not render spash bitmap for whatever reason */
+#if 0  /* GdiTransparentBlt does not render splash bitmap for whatever reason */
     /* use system-provided TransparentBlt for Win2k+ */
     ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -206,7 +206,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     /* get command line parameters */
     p = _get_cmd_arg(GetCommandLine());
-    p = _get_cmd_arg(NULL); /* skip first paramter - command name */
+    p = _get_cmd_arg(NULL); /* skip first parameter - command name */
     for (argc = 1; p && argc < MAX_CMDLINE_PARAM; argc++) {
         len = _tcslen(p);
         if (len > 0) {
@@ -420,7 +420,7 @@ _nhapply_image_transparent(HDC hDC, int x, int y, int width, int height,
     /* Mask out the transparent colored pixels on the source image. */
     BitBlt(hdcSave, 0, 0, width, height, hdcBack, 0, 0, SRCAND);
 
-    /* XOR the source image with the beckground. */
+    /* XOR the source image with the background. */
     BitBlt(hdcMem, 0, 0, width, height, hdcSave, 0, 0, SRCPAINT);
 
     /* blt resulting image to the screen */

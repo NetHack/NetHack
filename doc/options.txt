@@ -100,7 +100,7 @@ and the optfn_xxxx() function is expected to react and set the option
 based on the string values that parseoptions() passes to it.
 
 req get_val is passed a buffer from its caller that the optfn_xxxx() is
-expected to fill with the current value of the opton.
+expected to fill with the current value of the option.
 
 req do_handler is called during doset() operations processing in response
 to player selections, most likely from the 'O' option-setting menu. The

@@ -221,7 +221,7 @@ NetHackQtGlyphs& NetHackQtSettings::glyphs()
 {
     // Caveat:
     //  'theglyphs' will be Null if the tiles file couldn't be loaded;
-    //  the game can still procede with an ascii map in that situation.
+    //  the game can still proceed with an ascii map in that situation.
     return *theglyphs;
 }
 

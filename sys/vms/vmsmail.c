@@ -5,7 +5,7 @@
 #include "config.h"
 #include "mail.h"
 
-/* lint supression due to lack of extern.h */
+/* lint suppression due to lack of extern.h */
 unsigned long init_broadcast_trapping(void);
 unsigned long enable_broadcast_trapping(void);
 unsigned long disable_broadcast_trapping(void);
@@ -71,7 +71,7 @@ static long pasteboard_id = 0; /* SMG's magic cookie */
  * Unrecognized broadcasts result in the mail-daemon
  * arriving and announcing the display text, but no scroll being created.
  * If SHELL is undefined, then all broadcasts are treated as 'other'; since
- * no subproceses are allowed, there'd be no way to respond to the scroll.
+ * no subprocesses are allowed, there'd be no way to respond to the scroll.
  *
  *      When a scroll of mail is read by the character, readmail() extracts
  * the command string and uses it for the default when prompting the
@@ -99,7 +99,7 @@ static long pasteboard_id = 0; /* SMG's magic cookie */
  * Anything else results in just the message text being passed along, no
  * scroll of mail so consequently no command to execute when scroll read.
  * The user can set up ``$ XYZZY :== SEND'' prior to invoking NetHack if
- * vanilla JNET responses to Bitnet messages are prefered.
+ * vanilla JNET responses to Bitnet messages are preferred.
  *
  *      Static return buffers are used because only one broadcast gets
  * processed at a time, and the essential information in each one is

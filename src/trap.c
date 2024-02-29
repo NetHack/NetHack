@@ -4994,7 +4994,7 @@ drain_en(int n, boolean max_already_drained)
 
     /*
      * FIXME?
-     *  u.uenmax should probably have a higher mininum than 0;
+     *  u.uenmax should probably have a higher minimum than 0;
      *  perhaps u.ulevel or (u.ulevel + 1) / 2
      */
     if (u.uenmax < 1) {

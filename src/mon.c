@@ -1671,7 +1671,7 @@ mpickstuff(struct monst *mtmp)
             }
             obj_extract_self(otmp3);      /* remove from floor */
             (void) mpickobj(mtmp, otmp3); /* may merge and free otmp3 */
-            /* let them try and equip it on the next turn */
+            /* let them try to equip it on the next turn */
             check_gear_next_turn(mtmp);
             newsym(mtmp->mx, mtmp->my);
             return TRUE; /* pick only one object */
@@ -4316,7 +4316,7 @@ maybe_unhide_at(coordxy x, coordxy y)
 }
 
 /* monster/hero tries to hide under something at the current location;
-   if used by monster creation, should only happen during during level
+   if used by monster creation, should only happen during level
    creation, otherwise there will be message sequencing issues */
 boolean
 hideunder(struct monst *mtmp)
@@ -4875,7 +4875,7 @@ newcham(
         if (is_rider(olddata))
             return 0;
         /* make Nazgul and erinyes immune too, to reduce chance of
-           anomalous extinction feedback during final disclsoure */
+           anomalous extinction feedback during final disclosure */
         if (mbirth_limit(monsndx(olddata)) < MAXMONNO)
             return 0;
         /* cancelled shapechangers become uncancelled prior
@@ -5309,7 +5309,7 @@ angry_guards(boolean silent)
             if (nct) { /* seen/sensed adjacent guard(s) */
                 Sprintf(buf, "guard%s", plur(nct));
                 pline_The("%s %s angry!", buf, vtense(buf, "get"));
-            } else if (sct) { /* seen/sensed non-adjcent guard(s) */
+            } else if (sct) { /* seen/sensed non-adjacent guard(s) */
                 Sprintf(buf, "guard%s", plur(sct));
                 pline("%s %s %s approaching!",
                       (sct == 1) ? "An angry" : "Angry",

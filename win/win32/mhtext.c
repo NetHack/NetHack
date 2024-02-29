@@ -36,7 +36,7 @@ mswin_init_text_window(void)
         mswin_get_window_placement(NHW_TEXT, &rt);
     }
 
-    /* create text widnow object */
+    /* create text window object */
     ret = CreateDialog(GetNHApp()->hApp, MAKEINTRESOURCE(IDD_NHTEXT),
                        GetNHApp()->hMainWnd, NHTextWndProc);
     if (!ret)

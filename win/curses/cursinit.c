@@ -207,7 +207,7 @@ curses_create_main_windows(void)
         boolean msg_vertical = (message_orientation == ALIGN_LEFT
                                 || message_orientation == ALIGN_RIGHT);
 
-        /* Vertical windows have priority. Otherwise, priotity is:
+        /* Vertical windows have priority. Otherwise, priority is:
            status > inv > msg */
         if (status_vertical)
             set_window_position(&status_x, &status_y,
@@ -752,7 +752,7 @@ curses_init_options(void)
 
 #ifdef PDCURSES
     /* PDCurses for SDL, win32 and OS/2 has the ability to set the
-       terminal size programatically.  If the user does not specify a
+       terminal size programmatically.  If the user does not specify a
        size in the config file, we will set it to a nice big 32x110 to
        take advantage of some of the nice features of this windowport. */
     if (iflags.wc2_term_cols == 0)

@@ -706,7 +706,7 @@ check_cursor_visibility(struct xwindow *wp)
 /* All values are relative to currently visible area */
 
 #define V_BORDER 0.25 /* if this far from vert edge, shift */
-#define H_BORDER 0.25 /* if this from from horiz edge, shift */
+#define H_BORDER 0.25 /* if this far from horiz edge, shift */
 
 #define H_DELTA 0.25 /* distance of horiz shift */
 #define V_DELTA 0.25 /* distance of vert shift */
@@ -857,7 +857,7 @@ map_check_size_change(struct xwindow *wp)
     if (new_width < map_info->viewport_width
         || new_height < map_info->viewport_height) {
         /* [ALI] If the viewport was larger than the map (and so the map
-         * widget was contrained to be larger than the actual map) then we
+         * widget was constrained to be larger than the actual map) then we
          * may be able to shrink the map widget as the viewport shrinks.
          */
         if (map_info->is_tile) {
@@ -890,7 +890,7 @@ map_check_size_change(struct xwindow *wp)
 
 /*
  * Fill in parameters "regular" and "inverse" with newly created GCs.
- * Using the given background pixel and the foreground pixel optained
+ * Using the given background pixel and the foreground pixel obtained
  * by querying the widget with the resource name.
  */
 static void
@@ -1089,7 +1089,7 @@ clear_map_window(struct xwindow *wp)
 }
 
 /*
- * Retreive the font associated with the map window and save attributes
+ * Retrieve the font associated with the map window and save attributes
  * that are used when updating it.
  */
 static void

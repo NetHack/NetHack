@@ -55,7 +55,7 @@ main(int argc, char *argv[])
     atexit(byebye);
     /* vms_basename(,FALSE) strips device, directory, suffix, and version;
        the result is returned in a static buffer so we make a copy that
-       isn't at risk of gettting clobbered by core's handling of DEBUGFILES */
+       isn't at risk of getting clobbered by core's handling of DEBUGFILES */
     progname = dupstr(vms_basename(argv[0], FALSE));
     gh.hname = progname;
     gh.hackpid = getpid();

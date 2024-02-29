@@ -525,7 +525,7 @@ void NetHackQtMapViewport::Clear()
 {
     for (int j = 0; j < ROWNO; ++j) {
         //
-        // FIXME:  map column 0 should be surpressed from being displayed
+        // FIXME:  map column 0 should be suppressed from being displayed
         //
         Glyph(0, j) = GLYPH_NOTHING;
         Glyphttychar(0, j) = ' ';

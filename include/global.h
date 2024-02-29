@@ -517,7 +517,7 @@ typedef struct color_and_attr {
 #define LL_DIVINEGIFT 0x0008L /* Sacrifice gifts, crowning */
 #define LL_LIFESAVE   0x0010L /* Use up amulet of lifesaving */
 #define LL_CONDUCT    0x0020L /* Break conduct - not reported early-game */
-#define LL_ARTIFACT   0x0040L /* bestowed, found, or manifactured */
+#define LL_ARTIFACT   0x0040L /* bestowed, found, or manufactured */
 #define LL_GENOCIDE   0x0080L /* Logging of genocides */
 #define LL_KILLEDPET  0x0100L /* Killed a tame monster */
 #define LL_ALIGNMENT  0x0200L /* changed alignment, temporary or permanent */

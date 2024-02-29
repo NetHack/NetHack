@@ -61,7 +61,7 @@
 /* bitmask flags for corpse_xname();
    PFX_THE takes precedence over ARTICLE, NO_PFX takes precedence over both */
 #define CXN_NORMAL 0    /* no special handling */
-#define CXN_SINGULAR 1  /* override quantity if greather than 1 */
+#define CXN_SINGULAR 1  /* override quantity if greater than 1 */
 #define CXN_NO_PFX 2    /* suppress "the" from "the Unique Monst */
 #define CXN_PFX_THE 4   /* prefix with "the " (unless pname) */
 #define CXN_ARTICLE 8   /* include a/an/the prefix */
@@ -682,7 +682,7 @@ enum optset_restrictions {
     set_viaprog    = 2, /* may be set via extern program, not seen in game */
     set_gameview   = 3, /* may be set via extern program, displayed in game */
     set_in_game    = 4, /* may be set via extern program or set in the game */
-    set_wizonly    = 5, /* may be set set in the game if wizmode */
+    set_wizonly    = 5, /* may be set in the game if wizmode */
     set_wiznofuz   = 6, /* wizard-mode only, but not by fuzzer */
     set_hidden     = 7  /* placeholder for prefixed entries, never show it  */
 };
@@ -769,9 +769,9 @@ struct sinfo {
     int saving;                 /* creating a save file */
     int restoring;              /* reloading a save file */
     int in_moveloop;            /* normal gameplay in progress */
-    int in_impossible;          /* reportig a warning */
+    int in_impossible;          /* reporting a warning */
     int in_docrt;               /* in docrt(): redrawing the whole screen */
-    int in_self_recover;        /* processsing orphaned level files */
+    int in_self_recover;        /* processing orphaned level files */
     int in_checkpoint;          /* saving insurance checkpoint */
     int in_parseoptions;        /* in parseoptions */
     int in_role_selection;      /* role/race/&c selection menus in progress */
@@ -786,7 +786,7 @@ struct sinfo {
        used in the curses interface to avoid arrow keys when user is doing
        something other than entering a command or direction and in the Qt
        interface to suppress menu commands in similar conditions;
-       readchar() alrways resets it to 'otherInp' prior to returning */
+       readchar() always resets it to 'otherInp' prior to returning */
     int input_state; /* whether next key pressed will be entering a command */
 #ifdef TTY_GRAPHICS
     /* resize_pending only matters when handling a SIGWINCH signal for tty;
@@ -926,7 +926,7 @@ typedef struct {
     long count;           /* holds current line count for default style file,
                              field count for binary style */
     boolean structlevel;  /* traditional structure binary saves */
-    boolean fieldlevel;   /* fieldlevel saves saves each field individually */
+    boolean fieldlevel;   /* fieldlevel saves each field individually */
     boolean addinfo;      /* if set, some additional context info from core */
     boolean eof;          /* place to mark eof reached */
     boolean bendian;      /* set to true if executing on big-endian machine */
@@ -1204,7 +1204,7 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define ONAME_RANDOM     0x0080U /* something created an artifact randomly
                                   * with mk_artifact() (mksboj or mk_player)
                                   * or m_initweap() (lawful Angel) */
-/* flag congrolling potential livelog event of finding an artifact */
+/* flag controlling potential livelog event of finding an artifact */
 #define ONAME_KNOW_ARTI  0x0100U /* hero is already aware of this artifact */
 /* flag for suppressing perm_invent update when name gets assigned */
 #define ONAME_SKIP_INVUPD 0x0200U /* don't call update_inventory() */

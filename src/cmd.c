@@ -669,9 +669,9 @@ doextlist(void)
                     continue;
                 if (!onelist && pass != wizc)
                     continue;
-                /* command descripton might get modified on the fly */
+                /* command description might get modified on the fly */
                 cmd_desc = efp->ef_desc;
-                /* suppress part of the descripton for #genocided if it
+                /* suppress part of the description for #genocided if it
                    doesn't apply during the current game */
                 if (!wizard && !discover
                     && (efp->flags & GENERALCMD) != 0 /* minor optimization */
@@ -1457,7 +1457,7 @@ static int
 wiz_flip_level(void)
 {
     static const char choices[] = "0123",
-        prmpt[] = "Flip 0=randomly, 1=vertically, 2=horizonally, 3=both:";
+        prmpt[] = "Flip 0=randomly, 1=vertically, 2=horizontally, 3=both:";
 
     /*
      * Does not handle
@@ -4447,7 +4447,7 @@ wiz_mon_diff(void)
         }
     }
     if (!trouble)
-        putstr(win, 0, "No monster difficulty discrepencies were detected.");
+        putstr(win, 0, "No monster difficulty discrepancies were detected.");
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
     return ECMD_OK;

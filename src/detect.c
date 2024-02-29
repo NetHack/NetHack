@@ -1301,7 +1301,7 @@ use_crystal_ball(struct obj **optr)
         if (ch == DEF_MIMIC_DEF)
             ch = DEF_MIMIC;
 
-        /* checking furnture before objects allows '_' to find altars
+        /* checking furniture before objects allows '_' to find altars
            (along with other furniture) instead of finding iron chains */
         if (def_char_is_furniture(ch) >= 0) {
             ret = furniture_detect();
@@ -2121,7 +2121,7 @@ dump_map(void)
     boolean blankrow, toprow;
 
     /*
-     * Squeeze out excess vertial space when dumping the map.
+     * Squeeze out excess vertical space when dumping the map.
      * If there are any blank map rows at the top, suppress them
      * (our caller has already printed a separator).  If there is
      * more than one blank map row at the bottom, keep just one.

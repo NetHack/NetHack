@@ -55,7 +55,7 @@ if percent(50) then
    end
 end
 
--- uncontroled arrival (via trap door, level teleport) will be in the central
+-- uncontrolled arrival (via trap door, level teleport) will be in the central
 -- portion of level to prevent ending up stuck in the treasure area, whether
 -- arriving from above or below (despite this being bottom of Mines branch,
 -- hero might arrive from below by invoking Wiz role's Eye of the Aethiopica)

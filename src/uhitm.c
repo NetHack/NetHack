@@ -837,7 +837,7 @@ hmon_hitmon_barehands(struct _hitmon_data *hmd, struct monst *mon)
     if (hmd->mdat == &mons[PM_SHADE]) {
         hmd->dmg = 0;
     } else {
-        /* note: 1..2 or 1..4 can be substantiallly increased by
+        /* note: 1..2 or 1..4 can be substantially increased by
            strength bonus or skill bonus, usually both... */
         hmd->dmg = rnd(!martial_bonus() ? 2 : 4);
         hmd->use_weapon_skill = TRUE;
@@ -1393,8 +1393,8 @@ hmon_hitmon_dmg_recalc(struct _hitmon_data *hmd, struct obj *obj)
            for dual attacks, 3/4 of the strength bonus is used; when
            both attacks hit, overall bonus is 3/2 rather than doubled;
            melee hit with two-handed weapon uses 3/2 strength bonus to
-           appoximately match double hit with two-weapon ('approximate'
-           becase udaminc skews in favor of two-weapon); the 3/2 factor
+           approximately match double hit with two-weapon ('approximate'
+           because udaminc skews in favor of two-weapon); the 3/2 factor
            for two-handed strength does not apply to polearms unless
            hero is simply bashing with one of those and does not apply
            to jousting because lances are one-handed */
@@ -2813,7 +2813,7 @@ mhitm_ad_tlpt(
                 if (Half_physical_damage)
                     mhm->damage *= 2; /* doesn't actually increase damage;
                                        * we only get here if half the
-                                       * original damage would would have
+                                       * original damage would have
                                        * been fatal, so double reduced
                                        * damage will be less than original */
                 if (mhm->damage < 1) { /* implies (tmphp <= 1) */
@@ -5308,7 +5308,7 @@ hmonas(struct monst *mon)
                be Null, and we want to track that for passive() */
             originalweapon = (altwep && uswapwep) ? &uswapwep : &uwep;
             if (uswapwep /* set up 'altwep' flag for next iteration */
-                /* only consider seconary when wielding one-handed primary */
+                /* only consider secondary when wielding one-handed primary */
                 && uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))
                 && !bimanual(uwep)
                 /* only switch if not wearing shield and not at artifact;

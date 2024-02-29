@@ -306,7 +306,7 @@ nhgitset.pl installs NetHack-specific setup after a C<git clone> (or after
 changes to the desired configuration, which are installed by re-running
 nhgitset.pl).
 
-The follwing options are available:
+The following options are available:
 
 B<-f>	Force.  Do not use this unless the program requests it.
 

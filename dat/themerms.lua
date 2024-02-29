@@ -348,7 +348,7 @@ themerooms = {
       });
    end,
 
-   -- Random dungeon feature in the middle of a odd-sized room
+   -- Random dungeon feature in the middle of an odd-sized room
    function()
       local wid = 3 + (nh.rn2(3) * 2);
       local hei = 3 + (nh.rn2(3) * 2);

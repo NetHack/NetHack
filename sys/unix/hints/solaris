@@ -8,7 +8,7 @@
 # This hints file provides a single-user x11 build for Solaris, specifically
 # for Solaris 10 and 11, but should work just fine on older versions
 
-# Build using using included gcc and gmake, optional flex and bison come from csw for solaris 10 and included 
+# Build using included gcc and gmake, optional flex and bison come from csw for solaris 10 and included 
 # with Solaris 11
 
 # Build NetHack off your home directory

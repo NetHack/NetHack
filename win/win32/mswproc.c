@@ -161,10 +161,10 @@ mswin_init_nhwindows(int *argc, char **argv)
     mswin_nh_input_init();
 
     /* set it to WIN_ERR so we can detect attempts to
-       use this ID before it is inialized */
+       use this ID before it is initialized */
     WIN_MAP = WIN_ERR;
 
-    /* Read Windows settings from the reqistry */
+    /* Read Windows settings from the registry */
     /* First set safe defaults */
     GetNHApp()->regMainMinX = CW_USEDEFAULT;
     mswin_read_reg();
@@ -3050,7 +3050,7 @@ mswin_status_enablefield(int fieldidx, const char *nm, const char *fmt,
     }
 }
 
-/* TODO: turn this into a commmon helper; multiple identical implementations */
+/* TODO: turn this into a common helper; multiple identical implementations */
 static int
 mswin_condcolor(long bm, unsigned long *bmarray)
 {
@@ -3095,7 +3095,7 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percent, int color, u
                    windowport that it should output all changes received
                    to this point. It marks the end of a bot() cycle.
                 -- fldindex could also be BL_RESET, which is not really
-                   a field index, but is a special advisory to to tell the 
+                   a field index, but is a special advisory to tell the 
                    windowport that it should redisplay all its status fields,
                    even if no changes have been presented to it.
                 -- ptr is usually a "char *", unless fldindex is BL_CONDITION.
@@ -3122,7 +3122,7 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percent, int color, u
                    use to display the text.
                 -- condmasks is a pointer to a set of BL_ATTCLR_MAX unsigned
                    longs telling which conditions should be displayed in each
-                   color and attriubte.
+                   color and attribute.
 */
 
 DISABLE_WARNING_FORMAT_NONLITERAL

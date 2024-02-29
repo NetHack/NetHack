@@ -43,7 +43,7 @@ extern unsigned long smg$init_term_table_by_type(), smg$del_term_table();
 #define vms_ok(sts) ((sts) & 1) /* odd => success */
 
 /* this could be static; it's only used within this file;
-   it won't be used at all if C_LIB$INTIALIZE gets commented out below,
+   it won't be used at all if C_LIB$INITIALIZE gets commented out below,
    so make it global so that compiler won't complain that it's not used */
 int vmsexeini(const void *, const void *, const unsigned char *);
 
@@ -845,11 +845,11 @@ vmsexeini(const void *inirtn_unused, const void *clirtn_unused,
  * are appended rather than overwriting each other).
  *
  * VAX C made global variables become named program sections, to be
- * compatable with Fortran COMMON blocks, simplifying mixed-language
- * programs.  GNU C for VAX/VMS did the same, to be compatable with
+ * compatible with Fortran COMMON blocks, simplifying mixed-language
+ * programs.  GNU C for VAX/VMS did the same, to be compatible with
  * VAX C.  By default, DEC C makes global variables be global symbols
  * instead, with its /Extern_Model=Relaxed_Ref_Def mode, but can be
- * told to be VAX C compatable by using /Extern_Model=Common_Block.
+ * told to be VAX C compatible by using /Extern_Model=Common_Block.
  *
  * We don't want to force that for the whole program; occasional use
  * of /Extern_Model=Strict_Ref_Def to find mistakes is too useful.
@@ -866,7 +866,7 @@ vmsexeini(const void *inirtn_unused, const void *clirtn_unused,
  * So, we switch modes for this hack only.  Besides, psect attributes
  * for lib$initialize are different from the ones used for ordinary
  * variables, so we'd need to resort to some linker magic anyway.
- * (With assembly language, in addtion to having full control of the
+ * (With assembly language, in addition to having full control of the
  * psect attributes in the source code, Macro32 would include enough
  * information in its object file such that linker wouldn't need any
  * extra instructions from us to make this work.)  [If anyone links

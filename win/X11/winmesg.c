@@ -383,7 +383,7 @@ split(char *s,
 }
 
 /*
- * Add a line of text to the window.  The first line in the curcular list
+ * Add a line of text to the window.  The first line in the circular list
  * becomes the last.  So all we have to do is copy the new line over the
  * old one.  If the line buffer is too small, then allocate a new, larger
  * one.
@@ -410,7 +410,7 @@ add_line(struct mesg_info_t *mesg_info, const char *s)
 }
 
 /*
- * Save a position in the text buffer so we can draw a line to seperate
+ * Save a position in the text buffer so we can draw a line to separate
  * text from the last time this function was called.
  *
  * Save the head position, since it is the line "after" the last displayed
@@ -455,7 +455,7 @@ redraw_message_window(struct xwindow *wp)
      * Do this the cheap and easy way.  Clear the window and just redraw
      * the whole thing.
      *
-     * This could be done more effecently with one call to XDrawText() instead
+     * This could be done more efficiently with one call to XDrawText() instead
      * of many calls to XDrawString().  Maybe later.
      *
      * Only need to clear if window has new text.
@@ -567,7 +567,7 @@ get_gc(Widget w, struct mesg_info_t *mesg_info)
 
 /*
  * Handle resizes on a message window.  Correct saved pixel height and width.
- * Adjust circle buffer to accomidate the new size.
+ * Adjust circle buffer to accommodate the new size.
  *
  * Problem:  If the resize decreases the width of the window such that
  * some lines are now longer than the window, they will be cut off by

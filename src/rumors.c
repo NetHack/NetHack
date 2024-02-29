@@ -170,7 +170,7 @@ getrumor(
         (void) dlb_fclose(rumors);
         if (count >= 50)
             impossible("Can't find non-cookie rumor?");
-        else if (!gi.in_mklev) /* avoid exercizing wisdom for graffiti */
+        else if (!gi.in_mklev) /* avoid exercising wisdom for graffiti */
             exercise(A_WIS, (adjtruth > 0));
     } else {
         couldnt_open_file(RUMORFILE);
@@ -444,7 +444,7 @@ get_rnd_line(
         return buf;
     /* 'rumors' is about 3/4 of the way to the limit on a 16-bit config
        for the whole, roughly 3/8 of the way for either half; all active
-       configuations these days are at least 32-bits anyway */
+       configurations these days are at least 32-bits anyway */
     nhassert(filechunksize <= INT_MAX); /* essential for rn2() */
 
     /*
@@ -836,7 +836,7 @@ init_CapMons(void)
         unsigned mndx, mgend;
 
         /* the first CapMonstCnt entries come from mons[].pmnames[] and
-           the next CapBogonCnt entries from from the 'bogusmons' file;
+           the next CapBogonCnt entries from the 'bogusmons' file;
            there is an extra entry for Null at the end, but that is only
            useful to force non-zero array size in case both mons[] and
            bogusmons get modified to have no applicable monster names */

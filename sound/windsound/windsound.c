@@ -301,7 +301,7 @@ maybe_preinsert_directory(int32_t findsound_approach, char *exedir, char *buf, s
     int largest_basename = 35;
 
     /* findsound_approach = sff_havdir_append_rest means a directory name will be
-     * inserted into the begining of buf and the remaining parts of the
+     * inserted into the beginning of buf and the remaining parts of the
      * resource/file name will be appended by
      * get_sound_effect_filename(seid, buf, sizeof buf, findsound_approach)
      * when it sees the sff_havedir_append_rest indicator.

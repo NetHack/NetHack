@@ -9,9 +9,9 @@
 
 # Nethack will install suid games, and will expect to read a users .nethackrc file from
 # their home directory which may be a problem on secure systems with read restricted home
-# directories,  not that you would problably run NetHack on such a system anyway.  :)
+# directories,  not that you would probably run NetHack on such a system anyway.  :)
 
-# Build using using included gcc and gmake, optional flex and bison come from csw for solaris 10 
+# Build using included gcc and gmake, optional flex and bison come from csw for solaris 10 
 # and included on Solaris 11
 
 

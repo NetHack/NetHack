@@ -31,7 +31,7 @@ echo Directories look ok.
 
 :movemakes
 echo Moving Makefiles into ..\..\src for those not using Visual Studio
-REM Some file movemet for those that still want to use MAKE or NMAKE and a Makefile
+REM Some file movement for those that still want to use MAKE or NMAKE and a Makefile
 :do_tty
 if NOT exist %BINPATH%\*.* mkdir %BINPATH%
 if NOT exist %BINPATH%\license copy ..\..\dat\license %BINPATH%\license >nul

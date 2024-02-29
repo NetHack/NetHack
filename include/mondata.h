@@ -161,7 +161,7 @@
 #define is_rider(ptr)                                      \
     ((ptr) == &mons[PM_DEATH] || (ptr) == &mons[PM_FAMINE] \
      || (ptr) == &mons[PM_PESTILENCE])
-/* note: placeholder monsters are used for corposes of zombies and mummies;
+/* note: placeholder monsters are used for corpses of zombies and mummies;
    PM_DWARF and PM_GNOME are normal monsters, not placeholders */
 #define is_placeholder(ptr)                             \
     ((ptr) == &mons[PM_ORC] || (ptr) == &mons[PM_GIANT] \

@@ -66,7 +66,7 @@ II. There once was a time when people built NetHack right on their DOS machine.
         CROSS_TO_MSDOS=1
     on your make command line.
 
-    Note: Both the fetch-cross-compiler.sh script and and the msdos
+    Note: Both the fetch-cross-compiler.sh script and the msdos
     cross-compile and package procedures require unzip and zip to be available
     on your host build system.
 

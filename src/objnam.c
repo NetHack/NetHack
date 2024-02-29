@@ -423,7 +423,7 @@ fruit_from_name(
     char *altfname;
     unsigned k;
     /*
-     * note: named fruits are case-senstive...
+     * note: named fruits are case-sensitive...
      */
 
     if (highest_fid)
@@ -663,7 +663,7 @@ xname_flags(
     case VENOM_CLASS:
     case TOOL_CLASS:
         /* note: lenses or towel prefix would overwrite poisoned weapon
-           prefix if both were simultaneously posssible, but they aren't */
+           prefix if both were simultaneously possible, but they aren't */
         if (typ == LENSES)
             Strcpy(buf, "pair of ");
         else if (is_wet_towel(obj))
@@ -1539,7 +1539,7 @@ doname_base(
                        : "weapon in",
                      hand_s);
 
-            /* we just added a parenthesized pharse, but the right paren
+            /* we just added a parenthesized phrase, but the right paren
                might be absent if the appended string got truncated */
             if (!Blind && bpspaceleft && bp_eos[-1] == ')') {
                 if (gw.warn_obj_cnt && obj == uwep
@@ -3995,7 +3995,7 @@ readobjnam_preparse(struct _readobjnam_data *d)
                and less than 15 (owt < 300) */
             d->gsize = 2;
         } else if (!strncmpi(d->bp, "large ", l = 6)) {
-            /* "large" might be part of monster name (dog, cat, koboold,
+            /* "large" might be part of monster name (dog, cat, kobold,
                mimic) or object name (box, round shield) rather than
                prefix for glob size */
             if (strncmpi(d->bp + l, "glob", 4) && !strstri(d->bp + l, " glob"))
@@ -4198,7 +4198,7 @@ readobjnam_postparse1(struct _readobjnam_data *d)
      * referred to as a "pair of".  E.g. We should double if the player
      * types "pair of spears", but not if the player types "pair of
      * lenses".  Luckily (?) all objects that are referred to as pairs
-     * -- boots, gloves, and lenses -- are also not mergable, so cnt is
+     * -- boots, gloves, and lenses -- are also not mergeable, so cnt is
      * ignored anyway.
      */
     if (!strncmpi(d->bp, "pair of ", 8)) {
@@ -5440,7 +5440,7 @@ shield_simple_name(struct obj *shield)
     return "shield";
 }
 
-/* for completness */
+/* for completeness */
 const char *
 shirt_simple_name(struct obj *shirt UNUSED)
 {

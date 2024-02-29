@@ -68,7 +68,7 @@ NetHack*rip*foreground: black
 ! questions is _not_ used.  Single-character prompts appear in a fixed
 ! position between the top of the map and the bottom of the messages.
 ! If False, popups appear near where the pointer is positioned so tend to
-! meander around the screen depending upon where the last click ocurred.
+! meander around the screen depending upon where the last click occurred.
 ! (The name 'slow' is misleading; this feature was originally necessitated
 ! by window managers which were slow putting up popup windows, but the
 ! fixed-position prompting can be just as useful for quick popups.)
@@ -89,7 +89,7 @@ NetHack*highlight_prompt: False
 ! The number of lines the message window will show without scrolling.
 !NetHack*message_lines: 12
 
-! If True, the message window has a line that seperates old and new messages.
+! If True, the message window has a line that separates old and new messages.
 !NetHack*message_line: True
 
 ! If True, the default, use a "fancy" style status area below the map.

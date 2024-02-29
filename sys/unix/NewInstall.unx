@@ -56,7 +56,7 @@ If you are using the traditional configuration system, see Install.unx.
 NetHack can support multiple user interfaces within the same binary on many
 platforms. The various interface options can be specified by defining specific
 variables, either on the make command line, or by setting environment variables
-prior to the "make all" and "make install" steps. If you dont specify any
+prior to the "make all" and "make install" steps. If you don't specify any
 WANT_WIN_* customization, the build will only include traditional tty support.
 
 As an example, to build a binary with tty + curses + X11 support, you can use

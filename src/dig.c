@@ -2004,7 +2004,7 @@ unearth_objs(int x, int y)
 
 /*
  * The organic material has rotted away while buried.  As an expansion,
- * we could add add partial damage.  A damage count is kept in the object
+ * we could add partial damage.  A damage count is kept in the object
  * and every time we are called we increment the count and reschedule another
  * timeout.  Eventually the object rots away.
  *

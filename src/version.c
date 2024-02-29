@@ -407,7 +407,7 @@ check_version(
     return TRUE;
 }
 
-/* this used to be based on file date and somewhat OS-dependant,
+/* this used to be based on file date and somewhat OS-dependent,
    but now examines the initial part of the file's contents */
 boolean
 uptodate(NHFILE *nhfp, const char *name, unsigned long utdflags)

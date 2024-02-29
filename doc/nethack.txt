@@ -162,7 +162,7 @@ DESCRIPTION
        --showpaths  can be used to cause NetHack to show where it is expecting
        to find various files.  Among other things it shows  the  path  to  and
        name  for  the  player's run-time configuration file, a text file which
-       can be editted to customize aspects of how the game operates.
+       can be edited to customize aspects of how the game operates.
 
        --usage or --help will display information similar to this manual page,
        then exit.  Use `nethack --usage | more' to read it a page at a time.

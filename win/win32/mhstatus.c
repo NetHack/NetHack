@@ -73,7 +73,7 @@ typedef struct mswin_nethack_status_window {
     mswin_status_lines * status_lines;
     back_buffer_t back_buffer;
     boolean blink_state; /* true = invert blink text */
-    boolean has_blink_fields; /* true if one or more has blink attriubte */
+    boolean has_blink_fields; /* true if one or more has blink attribute */
 } NHStatusWindow, *PNHStatusWindow;
 
 

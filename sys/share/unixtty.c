@@ -309,7 +309,7 @@ setftty(void)
     start_screen();
 }
 
-void intron(void) /* enable kbd interupts if enabled when game started */
+void intron(void) /* enable kbd interrupts if enabled when game started */
 {
 #ifdef TTY_GRAPHICS
     /* Ugly hack to keep from changing tty modes for non-tty games -dlc */

@@ -514,10 +514,10 @@ display_monster(
         mgendercode = mon->female ? FEMALE : MALE;
 
     /*
-     * We must do the mimic check first.  If the mimic is mimicing something,
+     * We must do the mimic check first.  If the mimic is mimicking something,
      * and the location is in sight, we have to change the hero's memory
      * so that when the position is out of sight, the hero remembers what
-     * the mimic was mimicing.
+     * the mimic was mimicking.
      */
     if (mon_mimic && (sightflags == PHYSICALLY_SEEN)) {
         switch (M_AP_TYPE(mon)) {
@@ -558,7 +558,7 @@ display_monster(
             obj.ox = x;
             obj.oy = y;
             obj.otyp = mon->mappearance;
-            /* might be mimicing a corpse or statue */
+            /* might be mimicking a corpse or statue */
             obj.corpsenm = has_mcorpsenm(mon) ? MCORPSENM(mon) : PM_TENGU;
             map_object(&obj, !sensed);
             break;
@@ -573,7 +573,7 @@ display_monster(
         } /* switch M_AP_TYPE() */
     }
 
-    /* If mimic is unsuccessfully mimicing something, display the monster. */
+    /* If mimic is unsuccessfully mimicking something, display the monster. */
     if (!mon_mimic || sensed) {
         int num;
 
@@ -1485,7 +1485,7 @@ mimic_light_blocking(struct monst *mtmp)
 }
 
 /*
- * Block/unblock light depending on what a mimic is mimicing and if it's
+ * Block/unblock light depending on what a mimic is mimicking and if it's
  * invisible or not.  Should be called only when the state of See_invisible
  * changes.
  */

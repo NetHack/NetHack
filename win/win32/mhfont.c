@@ -55,7 +55,7 @@ mswin_font_supports_unicode(HFONT hFont)
     return FALSE;
 }
 
-/* create font based on window type, charater attributes and
+/* create font based on window type, character attributes and
    window device context */
 cached_font *
 mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)

@@ -4305,7 +4305,7 @@ tty_status_enablefield(
  *         windowport that it should output all changes received
  *         to this point. It marks the end of a bot() cycle.
  *      -- fldindex could also be BL_RESET (-3), which is not really
- *         a field index, but is a special advisory to to tell the
+ *         a field index, but is a special advisory to tell the
  *         windowport that it should redisplay all its status fields,
  *         even if no changes have been presented to it.
  *      -- ptr is usually a "char *", unless fldindex is BL_CONDITION.
@@ -4437,7 +4437,7 @@ tty_status_update(
     }
 
     /* The core botl engine sends a single blank to the window port
-       for carrying-capacity when its unused. Let's suppress that */
+       for carrying-capacity when it's unused. Let's suppress that */
     if (fldidx >= 0 && fldidx < MAXBLSTATS
         && tty_status[NOW][fldidx].lth == 1
         && status_vals[fldidx][0] == ' ') {

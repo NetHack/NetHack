@@ -1113,7 +1113,7 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-// Mesage handler for about box.
+// Message handler for about box.
 LRESULT CALLBACK
 About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -1213,7 +1213,7 @@ mswin_select_map_mode(int mode)
     iflags.wc_map_mode = mode;
 
     /*
-    ** first, check if WIN_MAP has been inialized.
+    ** first, check if WIN_MAP has been initialized.
     ** If not - attempt to retrieve it by type, then check it again
     */
     if (map_id == WIN_ERR)

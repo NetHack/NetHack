@@ -588,7 +588,7 @@ strNsubst(
     const char *rp;
     unsigned len = (unsigned) strlen(orig);
     int ocount = 0, /* number of times 'orig' has been matched */
-        rcount = 0; /* number of subsitutions made */
+        rcount = 0; /* number of substitutions made */
 
     for (bp = inoutbuf, op = workbuf; *bp && op < &workbuf[BUFSZ - 1]; ) {
         if ((!len || !strncmp(bp, orig, len)) && (++ocount == n || n == 0)) {
@@ -1273,7 +1273,7 @@ strbuf_empty(strbuf_t *strbuf)
     strbuf_init(strbuf);
 }
 
-/* strbuf_nl_to_crlf() converts all occurences of \n to \r\n */
+/* strbuf_nl_to_crlf() converts all occurrences of \n to \r\n */
 void
 strbuf_nl_to_crlf(strbuf_t *strbuf)
 {

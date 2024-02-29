@@ -36,7 +36,7 @@
 //   used to select the shorter while still providing opportunity to type
 //   more of the longer command; (there are several such cases:
 //   "#drop[type]", "#known[class]", "#takeoff[all]", "#version[short]");
-//   button is left justitied (prior to addition of the filter/layout/reset
+//   button is left justified (prior to addition of the filter/layout/reset
 //   buttons, [Cancel] stretched all the way across the top of the widget);
 // [Filter] toggles between normal and autocomplete when playing in normal
 //   or explore mode, cycles through "all", "normal", "autocomplete", and

@@ -677,7 +677,7 @@ ifdef MAKEFILE_TOP
 # Installer certificate.  Set DEVELOPER_CERT to the name of the certificate
 # if you wish for your package to be signed for distribution.
 #
-# If building a package for signing, you must use sudo approriately.
+# If building a package for signing, you must use sudo appropriately.
 # the binaries and package using sudo but you DO NOT use sudo to sign the
 # package.  If you use sudo to sign the package, it will fail.
 #

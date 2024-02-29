@@ -811,7 +811,7 @@ engulf_target(struct monst *magr, struct monst *mdef)
         return FALSE;
 
     /* if attacker is phasing in solid rock and defender can't move there,
-       or vice versa, don't allow engulf to succeeed; otherwise expelling
+       or vice versa, don't allow engulf to succeed; otherwise expelling
        might not be able to place attacker and defender both back on map;
        when defender is the hero, a sanity_check complaint about placing
        the hero on top of a monster can occur */
@@ -886,7 +886,7 @@ gulpmm(
     dx = mdef->mx;
     dy = mdef->my;
     /*
-     *  Leave the defender in the monster chain at it's current position,
+     *  Leave the defender in the monster chain at its current position,
      *  but don't leave it on the screen.  Move the aggressor to the
      *  defender's position.
      */

@@ -22,7 +22,7 @@
 // and also because this is my first major application of Qt.  
 // 
 // The problem of NetHack's getkey requirement is solved by intercepting
-// key events by overiding QApplication::notify(...), and putting them in
+// key events by overriding QApplication::notify(...), and putting them in
 // a buffer.  Mouse clicks on the map window are treated with a similar
 // buffer.  When the NetHack engine calls for a key, one is taken from
 // the buffer, or if that is empty, QApplication::exec() is called.

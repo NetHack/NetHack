@@ -207,7 +207,7 @@ Others are more elaborate:
      * This is
      * another comment.
      */
-This style is usually used with sentence punctation, particularly if they
+This style is usually used with sentence punctuation, particularly if they
 contain more than one sentence.
 
 End-of-line comments which need to span lines

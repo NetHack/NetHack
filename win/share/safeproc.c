@@ -326,7 +326,7 @@ safe_nhgetch(void)
 
 /*
  * return a key, or 0, in which case a mouse button was pressed
- * mouse events should be returned as character postitions in the map window.
+ * mouse events should be returned as character positions in the map window.
  * Since normal tty's don't have mice, just return a key.
  */
 /*ARGSUSED*/

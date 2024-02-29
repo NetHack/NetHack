@@ -917,7 +917,7 @@ vga_FontPtrs(void)
 }
 
 /*
- * This will verify the existance of a VGA adapter on the machine.
+ * This will verify the existence of a VGA adapter on the machine.
  * Video function call 0x1a returns 0x1a in AL if successful, and
  * returns the following values in BL for the active display:
  *

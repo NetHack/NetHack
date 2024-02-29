@@ -3,7 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
- * This header file is used to clear up some discrepencies with Visual C
+ * This header file is used to clear up some discrepancies with Visual C
  * header files & NetHack before including windows.h, so all NetHack
  * files should include "win32api.h" rather than <windows.h>.
  */

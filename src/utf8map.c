@@ -314,7 +314,7 @@ glyph_find_core(const char *id, struct find_struct *findwhat)
  actual comparison part by generating them once, ahead of the
  bulk of the potential parsings. We can later free up
  all the memory those names consumed once the bulk parsing is
- overwith.
+ over with.
 */
 
 

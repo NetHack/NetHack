@@ -418,7 +418,7 @@ main(int argc UNUSED_if_no_DLB, char **argv UNUSED_if_no_DLB)
             xexit(EXIT_FAILURE);
         }
 
-        /* caculate directory size */
+        /* calculate directory size */
         dir_size = 40                    /* header line (see below) */
                    + ((nfiles + 1) * 11) /* handling+file offset+SP+newline */
                    + slen + (long) strlen(DLB_DIRECTORY); /* file names */

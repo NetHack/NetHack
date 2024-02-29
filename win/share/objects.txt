@@ -1,4 +1,4 @@
-# objects.txt - tile defintions for objects
+# objects.txt - tile definitions for objects
 #  Note: lines beginning with '# tile ' are not comments; other
 #  lines beginning with '#' are.
 . = (71, 108, 108)

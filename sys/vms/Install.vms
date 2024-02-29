@@ -8,7 +8,7 @@
 1.  NetHack 3.7 was built and tested on OpenVMS on both the Integrity
     and Alpha platform using the HP C V7.3 for OpenVMS compiler.  While
     not tested, older versions of DEC C will most likely work as compatibility
-    with older systems is a goal of the VMS porting team.   Unfortunatly,
+    with older systems is a goal of the VMS porting team.   Unfortunately,
     ancient VAX C probably will no longer work.  The set of Makefiles provided
     are known to be out of date; use vmsbuild.com instead.
 

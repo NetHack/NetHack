@@ -1383,7 +1383,7 @@ static const struct qmchoices {
     int mndx;             /* type of pet, 0 means any  */
     char mlet;            /* symbol of pet, 0 means any */
     unsigned mappearance; /* mimic this */
-    uchar m_ap_type;      /* what is the thing it is mimicing? */
+    uchar m_ap_type;      /* what is the thing it is mimicking? */
 } qm[] = {
     /* Things that some pets might be thinking about at the time */
     { PM_LITTLE_DOG, 0, PM_KITTEN, M_AP_MONSTER },

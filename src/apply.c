@@ -1886,7 +1886,7 @@ is_valid_jump_pos(coordxy x, coordxy y, int magic, boolean showmsg)
         coord uc, tc;
         struct rm *lev = &levl[u.ux][u.uy];
         /* we want to categorize trajectory for use in determining
-           passage through doorways: horizonal, vertical, or diagonal;
+           passage through doorways: horizontal, vertical, or diagonal;
            since knight's jump and other irregular directions are
            possible, we flatten those out to simplify door checks */
         int diag, traj;

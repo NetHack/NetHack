@@ -12,14 +12,14 @@
  * from this software without specific prior written permission.
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 /*
  * Modified 12 April 1990 by Mark Adler for use on MSDOS systems with
  * Microsoft C and Turbo C.
  *
- * Modifed 13 February 1991 by Greg Roelofs for use on VMS systems.  As
+ * Modified 13 February 1991 by Greg Roelofs for use on VMS systems.  As
  * with the MS-DOS version, the setting of the file mode has been disabled.
  * Compile and link normally (but note that the shared-image link option
  * produces a binary only 6 blocks long, as opposed to the 137-block one

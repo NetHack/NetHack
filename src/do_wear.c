@@ -531,7 +531,7 @@ Helmet_off(void)
     return 0;
 }
 
-/* hard helms provide better protection against against falling rocks */
+/* hard helms provide better protection against falling rocks */
 boolean
 hard_helmet(struct obj *obj)
 {
@@ -992,7 +992,7 @@ Amulet_on(void)
         break;
     }
     case AMULET_OF_FLYING:
-        /* setworn() has already set extrinisic flying */
+        /* setworn() has already set extrinsic flying */
         float_vs_flight(); /* block flying if levitating */
         if (Flying) {
             boolean already_flying;
@@ -1099,7 +1099,7 @@ learnring(struct obj *ring, boolean observed)
 {
     int ringtype = ring->otyp;
 
-    /* if effect was observeable then we usually discover the type */
+    /* if effect was observable then we usually discover the type */
     if (observed) {
         /* if we already know the ring type which accomplishes this
            effect (assumes there is at most one type for each effect),

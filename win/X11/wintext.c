@@ -78,7 +78,7 @@ delete_text(Widget w, XEvent *event, String *params, Cardinal *num_params)
 }
 
 /*
- * Callback used for all text windows.  The window is poped down on any key
+ * Callback used for all text windows.  The window is popped down on any key
  * or button down event.  It is destroyed if the main nethack code is done
  * with it.
  */

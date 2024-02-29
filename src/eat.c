@@ -156,7 +156,7 @@ static const struct {
                 { "", 0, 0, 0 } };
 #define TTSZ SIZE(tintxts)
 
-/* called after mimicing is over */
+/* called after mimicking is over */
 static int
 eatmdone(void)
 {

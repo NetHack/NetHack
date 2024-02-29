@@ -1776,7 +1776,7 @@ adjust_menu_promptstyle(winid window, color_attr *style)
 }
 
 /*
- *   Common code point leading into the interface-specifc
+ *   Common code point leading into the interface-specific
  *   add_menu() to allow single-spot adjustments to the parameters,
  *   such as those done by menu_colors.
  */

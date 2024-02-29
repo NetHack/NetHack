@@ -1,4 +1,4 @@
-# other.txt - tile defintions for 'other' (walls, furniture, explosions)
+# other.txt - tile definitions for 'other' (walls, furniture, explosions)
 #  Note: lines beginning with '# tile ' are not comments; other
 #  lines beginning with '#' are.
 . = (71, 108, 108)

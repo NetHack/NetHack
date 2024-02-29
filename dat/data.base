@@ -21,7 +21,7 @@
 # prevents "orc mummy" and "orc zombie" from matching.
 #
 # A citation of "[]" indicates arbitrary text written by developers or
-# contributers.  Falling off the end of an entry without any citation
+# contributors.  Falling off the end of an entry without any citation
 # implies "[]".
 #
 # Some entries include blank lines to separate paragraphs but many don't.
@@ -5300,7 +5300,7 @@ statue*
 # but players are unlikely to picture anything like that when they find one
 stethoscope
 	Tool used to listen closely to adjacent sound, typically by
-	a medical practioner to listen to a patient's heart, lungs,
+	a medical practitioner to listen to a patient's heart, lungs,
 	or pulse.
 # joke suggested by stethoscope; a zillion things could be added but these
 # ought to suffice

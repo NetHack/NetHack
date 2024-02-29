@@ -4119,7 +4119,7 @@
      dropped_nopick
        If  this  option  is on, items you dropped will not be automatically
        picked  up,  even  if  autopickup  is  also  on  and  they  are   in
-       pickup_types  or match a positive autopickup exception (defualt on).
+       pickup_types  or match a positive autopickup exception (default on).
        Persistent.
 
      disclose
@@ -4603,7 +4603,7 @@
        tack  Remove.  To remove an entry that has been previously set with-
        out removing others, precede the first entry in the list with a  mi-
        nus sign, paranoid_confirmation:-swim.  To both add some new entries
-       and remove some old ones, you can use mulitple paranoid_confirmation
+       and remove some old ones, you can use multiple paranoid_confirmation
        option  settings, or you can use the `+' form and list entries to be
        added by their name and entries to be removed by `!' and name.   The
        positive (no `!') and negative (with `!') entries can be intermixed.
@@ -5182,7 +5182,7 @@
        If NetHack can, it should use this size font for text windows.
 
      fullscreen
-       If  NetHack  can,  it  should  try  and display on the entire screen
+       If  NetHack  can,  it  should  try  to display on the entire screen
        rather than in a window.
 
      guicolor

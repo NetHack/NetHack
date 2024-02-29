@@ -94,7 +94,7 @@ def_char_to_objclass(char ch)
 
 /*
  * Convert a character into a monster class.  This returns the _first_
- * match made.  If there are are no matches, return MAXMCLASSES.
+ * match made.  If there are no matches, return MAXMCLASSES.
  * Used in detect.c, options.c, read.c, sp_lev.c, and lev_main.c
  */
 int

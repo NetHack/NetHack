@@ -242,13 +242,13 @@ interpreter during game execution.
 
 	There is no longer a build-time level compiler. Instead, the level
 descriptions have been converted to Lua and are inserted into the game package
-for processing by the embeded Lua interpreter during game execution.
+for processing by the embedded Lua interpreter during game execution.
 
      5.3  Dungeon Compiler
 
 	There is no longer a build-time dungeon compiler. Instead, the dungeon
 description has been converted to Lua and is inserted into the game package for
-processing by the embeded Lua interpreter during game execution.
+processing by the embedded Lua interpreter during game execution.
 
 
      5.4  Run-time Options

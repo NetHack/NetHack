@@ -1853,7 +1853,7 @@ pickup_object(
     if (res <= 0)
         return res;
 
-    /* Whats left of the special case for gold :-) */
+    /* What's left of the special case for gold :-) */
     if (obj->oclass == COIN_CLASS)
         disp.botl = TRUE;
     if (obj->quan != count && obj->otyp != LOADSTONE)

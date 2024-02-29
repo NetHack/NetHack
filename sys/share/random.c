@@ -12,7 +12,7 @@
  * from this software without specific prior written permission.
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 /* Several minor changes were made for the NetHack distribution to satisfy
@@ -56,7 +56,7 @@ static char sccsid[] = "@(#)random.c 5.5 (Berkeley) 7/6/88";
  * initialized to contain information for random number generation with that
  * much state information.  Good sizes for the amount of state information are
  * 32, 64, 128, and 256 bytes.  The state can be switched by calling the
- * setstate() routine with the same array as was initiallized with
+ * setstate() routine with the same array as was initialized with
  * initstate().
  * By default, the package runs with 128 bytes of state information and
  * generates far better random numbers than a linear congruential generator.
@@ -348,7 +348,7 @@ char *arg_state;
  * random:
  * If we are using the trivial TYPE_0 R.N.G., just do the old linear
  * congruential bit.  Otherwise, we do our fancy trinomial stuff, which is the
- * same in all ther other cases due to all the global variables that have been
+ * same in all the other cases due to all the global variables that have been
  * set up.  The basic operation is to add the number at the rear pointer into
  * the one at the front pointer.  Then both pointers are advanced to the next
  * location cyclically in the table.  The value returned is the sum generated,

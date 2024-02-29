@@ -902,7 +902,7 @@ with good conscience.
          "\"I will impale your head on my caduceus for all to see.\"",
          "\"There is no materia medica in your sack which will cure you of me!\"",
          "\"Do not fight too hard, I want your soul strong, not weakened!\"",
-         "\"You should have stopped studying at vetenary.\"",
+         "\"You should have stopped studying at veterinary.\"",
       },
       encourage = {
          "\"Remember, %p, to always wash your hands before operating.\"",
@@ -2568,7 +2568,7 @@ the handiwork of %ns henchlings everywhere.]],
 %o from me!
 
 "It only proves how desperate he has become that he sends %ra to
-try and defeat me.  When this day is over, I will have you enslaved
+try to defeat me.  When this day is over, I will have you enslaved
 in the mines where you will rue the day that you ever entered
 %i."]],
       },

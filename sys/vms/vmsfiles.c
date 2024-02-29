@@ -16,7 +16,7 @@
 #include <starlet.h>
 #endif
 
-/* lint supression due to lack of extern.h */
+/* lint suppression due to lack of extern.h */
 int vms_link(const char *, const char *);
 int vms_unlink(const char *);
 int vms_creat(const char *, unsigned int);

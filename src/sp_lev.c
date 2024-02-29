@@ -3491,7 +3491,7 @@ lspo_object(lua_State *L)
             0,       /* buried */
             0,       /* lit */
             0, 0, 0, 0, /* eroded, locked, trapped, recharged */
-            0, 0, 0, 0, /* invis, greased, broken, achievment */
+            0, 0, 0, 0, /* invis, greased, broken, achievement */
     };
 #if 0
     int nparams = 0;
@@ -7062,7 +7062,7 @@ static const struct luaL_Reg nhl_functions[] = {
  - automatically add shuffle(array)
  - automatically add align = { "law", "neutral", "chaos" } and shuffle it.
    (remove from lua files)
- - grab the header comments from des-files and add add them to the lua files
+ - grab the header comments from des-files and add them to the lua files
 
 */
 

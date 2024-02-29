@@ -610,7 +610,7 @@ nasty(struct monst *summoner)
              * and 20 are neutral.  [These numbers are up date for
              * 3.7.0; the ones in the next paragraph are not....]
              *
-             * Neutral caster, used for late-game harrassment,
+             * Neutral caster, used for late-game harassment,
              * has 18/42 chance to stop the inner loop on each
              * critter, 24/42 chance for another iteration.
              * Lawful caster has 28/42 chance to stop unless the

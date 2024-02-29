@@ -100,9 +100,9 @@ GIT_AVAILABLE = N
 #
 #------------------------------------------------------------------------------
 # This Makefile will attempt to auto-detect your selected target architecture
-# based on Visual Studio command prompt configuration settins etc.
+# based on Visual Studio command prompt configuration settings etc.
 # However, if you want to manually override generation of a
-# 32-bit or 64-bit build target, you can uncomment the apppropriate
+# 32-bit or 64-bit build target, you can uncomment the appropriate
 # TARGET_CPU line below.
 #
 
@@ -1436,7 +1436,7 @@ $(PDCURSES_TOP)\curses.h:
 #                       occurrence of string1 with string2 in the
 #                       macro mymacro.  Special ascii key codes may be
 #                       used in the substitution text by preceding it
-#                       with ^ as we have done below.  Every occurence
+#                       with ^ as we have done below.  Every occurrence
 #                       of a <tab> in $(ALLOBJ) is replaced by
 #                       <+><return><tab>.
 

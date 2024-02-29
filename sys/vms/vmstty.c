@@ -517,7 +517,7 @@ setftty(void)
     settty_needed = TRUE;
 }
 
-/* enable kbd interupts if enabled when game started */
+/* enable kbd interrupts if enabled when game started */
 void
 intron(void)
 {

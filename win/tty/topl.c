@@ -582,7 +582,7 @@ msghistory_snapshot(
         if (mesg && *mesg) {
             snapshot_mesgs[outidx++] = mesg;
             if (purge) {
-                /* we're taking this pointer away; subsequest history
+                /* we're taking this pointer away; subsequent history
                    updates will eventually allocate a new one to replace it */
                 cw->data[inidx] = (char *) 0;
                 cw->datlen[inidx] = 0;

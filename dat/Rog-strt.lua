@@ -43,7 +43,7 @@ des.map([[
 local streets = selection.floodfill(0,12)
 
 -- The down stairs is at one of the 4 "exits".  The others are mimics,
--- mimicing stairwells.
+-- mimicking stairwells.
 local place = { {33,0}, {0,12}, {25,20}, {75,05} }
 shuffle(place)
 

@@ -196,7 +196,7 @@ char NetHackQtYnDialog::Exec()
             QString button_name = QString(visctrl((char) ch[i].cell()));
             if (is_yn || is_ynq || is_ynaq || is_lr) {
                 // FIXME: a better way to recognize which labels should
-                // use alterate text is needed
+                // use alternate text is needed
                 switch (ch[i].cell()) {
                 case 'y':
                     button_name = "Yes";

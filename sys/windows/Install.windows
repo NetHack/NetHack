@@ -15,7 +15,7 @@ Windows" or NetHackW) goes to Alex Kompel who initially developed and
 contributed the port.
 
 Alex Kompel, Dion Nicolaas, Yitzhak Sapir, Derek S. Ray, Michael Allison,
-Pasi Kallinen, Bart House, and Janet Walz contributed to the maintainance
+Pasi Kallinen, Bart House, and Janet Walz contributed to the maintenance
 of the tty and graphical windows versions of NetHack 3.7.0.
 
 The build Makefiles and procedures produce two executables:

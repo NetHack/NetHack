@@ -815,7 +815,7 @@ nh_timeout(void)
                     Your("temporary ability to survive burning has ended.");
                 break;
             case WWALKING:
-                /* [see fire reeistance] */
+                /* [see fire resistance] */
                 if (!Wwalking)
                     Your("temporary ability to walk on liquid has ended.");
                 break;
@@ -1315,7 +1315,7 @@ lantern_message(struct obj *obj)
 }
 
 /*
- * Timeout callback for for objects that are burning. E.g. lamps, candles.
+ * Timeout callback for objects that are burning. E.g. lamps, candles.
  * See begin_burn() for meanings of obj->age and obj->spe.
  */
 void
@@ -2016,7 +2016,7 @@ wiz_timeout_queue(void)
             intrinsic = u.uprops[p].intrinsic;
             if (intrinsic & TIMEOUT) {
                 if (specindx > 0 && i >= specindx) {
-                    putstr(win, 0, " -- settable via #wizinstrinc only --");
+                    putstr(win, 0, " -- settable via #wizintrinsic only --");
                     specindx = 0;
                 }
                 /* timeout value can be up to 16777215 (0x00ffffff) but

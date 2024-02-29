@@ -657,7 +657,7 @@ do_improvisation(struct obj *instr)
                   (do_spec && same_old_song)
                   ? "produces a familiar, lilting melody"
                   : (do_spec) ? "produces a lilting melody"
-                    : (same_old_song) ? "twangs a familar tune"
+                    : (same_old_song) ? "twangs a familiar tune"
                       : "twangs");
         else
             You_feel("soothing vibrations.");

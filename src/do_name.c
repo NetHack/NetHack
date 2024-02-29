@@ -1985,7 +1985,7 @@ x_monnam(
          * This monster has become important, for the moment anyway.
          * As the hero's consumer, it is worthy of ARTICLE_THE.
          * Also, suppress invisible as that particular characteristic
-         * is unimportant now and you can see it's interior anyway.
+         * is unimportant now and you can see its interior anyway.
          */
         article = ARTICLE_THE;
         suppress |= SUPPRESS_INVISIBLE;

@@ -299,7 +299,7 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             data->is_active = FALSE;
             SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) data);
         }
-        /* set font for the text cotrol */
+        /* set font for the text control */
         cached_font * font = mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE);
         SendMessage(control, WM_SETFONT,
                     (WPARAM) font->hFont,

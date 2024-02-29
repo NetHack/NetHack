@@ -550,7 +550,7 @@ restgamestate(NHFILE *nhfp)
        of unpaid items before shopkeeper's bill is available is a no-no;
        named fruit names aren't accessible yet either
        [3.6.2: moved perm_invent from flags to iflags to keep it out of
-       save files; retaining the override here is simpler than trying to
+       save files; retaining the override here is simpler than trying
        to figure out where it really belongs now] */
     defer_perm_invent = iflags.perm_invent;
     iflags.perm_invent = FALSE;

@@ -269,7 +269,7 @@ struct rm {
 
 /*
  * Add wall angle viewing by defining "modes" for each wall type.  Each
- * mode describes which parts of a wall are finished (seen as as wall)
+ * mode describes which parts of a wall are finished (seen as wall)
  * and which are unfinished (seen as rock).
  *
  * We use the bottom 3 bits of the flags field for the mode.  This comes
@@ -356,7 +356,7 @@ struct rm {
 #define looted     flags /* used for throne, tree, fountain, sink, door */
 #define icedpool   flags /* used for ice (in case it melts) */
 #define emptygrave flags /* no corpse in grave */
-/* horizonal applies to walls, doors (including sdoor); also to iron bars
+/* horizontal applies to walls, doors (including sdoor); also to iron bars
    even though they don't have separate symbols for horizontal and vertical */
 #define blessedftn horizontal /* a fountain that grants attribs */
 #define disturbed  horizontal /* kicking or engraving on a grave's headstone

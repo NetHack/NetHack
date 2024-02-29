@@ -1461,7 +1461,7 @@ tiphat(void)
     for (range = 1; range <= BOLT_LIM + 1; ++range) {
         x += u.dx, y += u.dy;
         if (!isok(x, y) || (range > 1 && !couldsee(x, y))) {
-            /* switch back to coordinates for previous interation's 'mtmp' */
+            /* switch back to coordinates for previous iteration's 'mtmp' */
             x -= u.dx, y -= u.dy;
             break;
         }

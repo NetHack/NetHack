@@ -14,7 +14,7 @@ ifdef MAKEFILE_SRC
 ifdef WANT_WIN_QT
 # when switching from Qt5 to Qt6 or vice versa, any old .moc files will be
 # incompatible; get rid of them in case user hasn't run 'make spotless';
-# object files are incompatable with Qt library, so get rid of them too;
+# object files are incompatible with Qt library, so get rid of them too;
 # Qt*.h-t are empty timestamp files and at most one should exist
 QTany_H = Qt*.h-t
 ifdef WANT_WIN_QT6

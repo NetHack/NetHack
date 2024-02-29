@@ -3651,7 +3651,7 @@ See the \(lqConfiguring Menu Colors\(rq section.
 Change the way messages are shown in the top status line.
 See the \(lqConfiguring Message Types\(rq section.
 .lp ROGUESYMBOLS
-Custom symbols for for the rogue level's symbol set.
+Custom symbols for the rogue level's symbol set.
 See \fISYMBOLS\fP below.
 .lp SOUND
 Define a sound mapping.
@@ -3906,7 +3906,7 @@ picked up, even if
 .op autopickup
 is also on and they are in
 .op pickup_types
-or match a positive autopickup exception (defualt on).  Persistent.
+or match a positive autopickup exception (default on).  Persistent.
 .lp disclose
 Controls what information the program reveals when the game ends.
 Value is a space separated list of prompting/category pairs
@@ -4344,7 +4344,7 @@ To remove an entry that has been previously set without removing others,
 precede the first entry in the list with a minus sign,
 \f(CRparanoid_confirmation:-swim\fP.
 To both add some new entries and remove some old ones, you can use
-mulitple \fIparanoid_confirmation\fP option settings, or you can
+multiple \fIparanoid_confirmation\fP option settings, or you can
 use the \(oq\f(CR+\fP\(cq form and list entries to be added by their name
 and entries to be removed by \(oq\f(CR!\fP\(cq and name.
 The positive (no \(oq!\(cq) and negative (with \(oq!\(cq) entries
@@ -4866,7 +4866,7 @@ If NetHack can, it should use this size font for the status window.
 .lp font_size_text
 If NetHack can, it should use this size font for text windows.
 .lp fullscreen
-If NetHack can, it should try and display on the entire screen rather than
+If NetHack can, it should try to display on the entire screen rather than
 in a window.
 .lp "guicolor "
 Use color text and/or highlighting attributes when displaying some

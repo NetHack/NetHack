@@ -5,7 +5,7 @@
 #ifndef MSWINMainWindow_h
 #define MSWINMainWindow_h
 
-/* this is a main appliation window */
+/* this is a main application window */
 
 #include "winMS.h"
 

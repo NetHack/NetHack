@@ -48,7 +48,7 @@
 //   with a separator between Cha:NN and it.  Time, when active, is
 //   placed after Gold.  Score, if enabled and active, is shown in the
 //   filler slot before Gold.  When there are no Conditions to display,
-//   there is an an invisible fake one (blank icon over blank text)
+//   there is an invisible fake one (blank icon over blank text)
 //   rendered in order to preserve the vertical space they need.
 //
 // FIXME:
@@ -60,7 +60,7 @@
 //  There are separate icons for Satiated and Hungry, but Weak, Fainting,
 //    and Fainted all share the Hungry one.  Weak should have its own,
 //    Fainting+Fainted should have another.  The current two depict
-//    plates with cutlery which is a bit of an anachronism.  Statiated
+//    plates with cutlery which is a bit of an anachronism.  Satiated
 //    could be replaced by a figure in profile with a bulging belly,
 //    Hungry similar but with a slightly concave belly, Weak either a
 //    collapsing figure or a much larger concavity or both, Fainting/
@@ -315,7 +315,7 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
             statbox->addWidget(&time);
         }
     vbox->addLayout(statbox);
-    vbox->addWidget(&hline3); // separtor before Time+Score or Conditions
+    vbox->addWidget(&hline3); // separator before Time+Score or Conditions
     if (spreadout) {
         // when not condensed, put Time and Score on an extra row; since
         // they're both optionally displayed, their row might be empty

@@ -1249,7 +1249,7 @@ curs_vert_status_vals(int win_width)
                     Sprintf(status_vals_long[BL_VERS],
                             "%*s%s", win_width - txtlen, " ", text);
             } else if ((fldidx == BL_HUNGER || fldidx == BL_CAP) && *text) {
-                /* hunger and enbumbrance are shown side-by-side in
+                /* hunger and encumbrance are shown side-by-side in
                    a 26 character or wider window; if leading space is
                    present, get rid of it, then add one we're sure about */
                 if (*text == ' ')
@@ -1783,7 +1783,7 @@ draw_bar(boolean is_hp, int cur, int max, const char *title)
 }
 
 /* Update the status win - this is called when NetHack would normally
-   write to the status window, so we know somwthing has changed.  We
+   write to the status window, so we know something has changed.  We
    override the write and update what needs to be updated ourselves. */
 void
 curses_update_stats(void)
@@ -2105,7 +2105,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
     wmove(win, y++, x);
     wprintw(win, "%s", dungeons[u.uz.dnum].dname);
 
-    y++; /* Blank line inbetween */
+    y++; /* Blank line in-between */
     wmove(win, y++, x);
 
     /* Attributes. Old  vertical order is preserved */

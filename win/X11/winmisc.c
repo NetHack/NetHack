@@ -1704,7 +1704,7 @@ ec_scroll_to_view(int ec_indx) /* might be greater than extended_cmd_selected */
      * If the extended command menu needs to be scrolled in order to move
      * either the highlighted entry (extended_cmd_selected) or the target
      * entry (ec_indx) into view, we want to make both end up visible.
-     * [Highligthed one is the first matching entry when the user types
+     * [Highlighted one is the first matching entry when the user types
      * something, such as "adjust" after typing 'a', and will be chosen
      * by pressing <return>.  Target entry is one past the last matching
      * entry (or last matching entry itself if at end of command list),
@@ -1886,7 +1886,7 @@ ec_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
                     swap_fg_bg(extended_commands[extended_cmd_selected]);
                 }
                 /* advance to one past last matching entry, so that all
-                   ambiguous choices, plus one to show thare aren't any
+                   ambiguous choices, plus one to show there aren't any
                    more such, will scroll into view */
                 do {
                     if (!command_list[i + 1])

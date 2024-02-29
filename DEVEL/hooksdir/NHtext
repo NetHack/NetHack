@@ -55,7 +55,7 @@ if($ARGV[0] eq "--clean"){
 }
 
 # XXX for now, there isn't any - if we get called, we subst.  No options for now.
-# get relevent config info
+# get relevant config info
 #XXX
 #git check-attr -a $ARGV[1]
 

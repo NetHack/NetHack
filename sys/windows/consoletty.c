@@ -2297,7 +2297,7 @@ void set_cp_map(void)
 }
 
 #if 0
-/* early_raw_print() is used during early game intialization prior to the
+/* early_raw_print() is used during early game initialization prior to the
  * setting up of the windowing system.  This allows early errors and panics
  * to have there messages displayed.
  *

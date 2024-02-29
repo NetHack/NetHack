@@ -557,7 +557,7 @@ teleds(coordxy nux, coordxy nuy, int teleds_flags)
 int
 collect_coords(
     coord *ccc, /* pointer to array of at least size ROWNO*(COLNO-1) */
-    coordxy cx, coordxy cy, /* center point, not necessarly <u.ux,u.uy> */
+    coordxy cx, coordxy cy, /* center point, not necessarily <u.ux,u.uy> */
     int maxradius,          /* how far from center to go collecting spots;
                              * 0 means collect entire map */
     unsigned cc_flags,      /* incl_center: put <cx,cy> in output list
@@ -621,7 +621,7 @@ collect_coords(
      * (unshown) 4's will be mixed together, and so forth.
      *
      * If caller processes the output list in order, the closest viable
-     * spot will be chosen.  If a compeletely random spot is preferred,
+     * spot will be chosen.  If a completely random spot is preferred,
      * the list can be requested to be unscrambled and then the caller
      * can shuffle it, overriding the collection rings.  A filter function
      * could be used to skip everything after the first acceptable spot.

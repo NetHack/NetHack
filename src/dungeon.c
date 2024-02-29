@@ -3154,7 +3154,7 @@ count_feat_lastseentyp(
     switch (gl.lastseentyp[x][y]) {
 #if 0   /* levels that have these tend of have a lot of them */
     /*
-     * FIXME?  due to theme rooms, lots of levels have an incresed
+     * FIXME?  due to theme rooms, lots of levels have an increased
      * chance of having these so automatic annotations for them may
      * have become more worthwhile now.
      */

@@ -477,7 +477,7 @@ mattacku(struct monst *mtmp)
         /* Orcs like to steal and eat horses and the like */
         if (!rn2(is_orc(mtmp->data) ? 2 : 4) && m_next2u(mtmp)) {
             /* attack your steed instead; 'bhitpos' and 'notonhead' are
-               already set from tagetting hero */
+               already set from targeting hero */
             i = mattackm(mtmp, u.usteed);
             if ((i & M_ATTK_AGR_DIED) != 0)
                 return 1;

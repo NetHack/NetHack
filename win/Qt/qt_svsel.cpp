@@ -28,14 +28,14 @@
 //  be able to sort by role or by game start date or by save date.
 //  The core fetches character names from inside the files; it could
 //  obtain the information needed for alternate sorting.  Simpler
-//  enchancement:  instead of just showing the character name, show
+//  enhancement:  instead of just showing the character name, show
 //  "name-role-race-gender-alignment".
 //
 // Note:
 //  The code in this file is not used if the program is built without
 //  having SELECTSAVED defined or if the run-time option 'selectsaved'
 //  is False.  SELECTSAVED used to be forced for Qt but isn't any more.
-//  Howver, we include this code unconditionally.
+//  However, we include this code unconditionally.
 //
 
 extern "C" {

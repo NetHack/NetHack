@@ -245,7 +245,7 @@ NHV=$(subst ",,$(NHV1))
 # WCURSES - window port files (curses)
 # WCHAIN  - window port files (chain)
 # WSHR    - Tile support files
-# SNDSYS  - sound suppport files for win32
+# SNDSYS  - sound support files for win32
 # QT      - QT window support files
 
 INCL    =../include

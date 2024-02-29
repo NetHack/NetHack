@@ -44,7 +44,7 @@
  *    + Include nethack's lint.h to get nhStr() macro.
  *    + Use nhStr() on string literals (or macros from <X11/StringDefs.h>
  *      that hide string literals) to cast away implicit 'const' in order
- *      to suppress "warning: assignment discards qualifers from pointer
+ *      to suppress "warning: assignment discards qualifiers from pointer
  *      target type" issued by 'gcc -Wwrite-strings' as used by nethack.
  *      (For this file, always the second parameter to XtSetArg().)
  *
@@ -82,7 +82,7 @@
 #undef X11_BUILD
 
 #include "lint.h"   /* for nethack's nhStr() macro */
-#include "winX.h"   /* to make sure protoypes match corresponding functions */
+#include "winX.h"   /* to make sure prototypes match corresponding functions */
 
 /* ":" added to both translations below to allow limited redefining of
  * keysyms before testing for keysym values -- dlc */
@@ -257,7 +257,7 @@ GetDialogResponse(Widget w)
     return XtNewString(s);
 }
 
-/* set the default reponse */
+/* set the default response */
 void
 SetDialogResponse(Widget w, String s, unsigned ln)
 {

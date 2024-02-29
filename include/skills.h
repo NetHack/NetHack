@@ -82,7 +82,7 @@ enum p_skills {
 
 /*
  * These are the standard weapon skill levels.  It is important that
- * the lowest "valid" skill be be 1.  The code calculates the
+ * the lowest "valid" skill be 1.  The code calculates the
  * previous amount to practice by calling  practice_needed_to_advance()
  * with the current skill-1.  To work out for the UNSKILLED case,
  * a value of 0 needed.

@@ -97,7 +97,7 @@ const char *fqn_prefix_names[PREFIX_COUNT] = {
 const schar xdir[N_DIRS_Z] = { -1, -1,  0,  1,  1,  1,  0, -1, 0,  0 };
 const schar ydir[N_DIRS_Z] = {  0, -1, -1, -1,  0,  1,  1,  1, 0,  0 };
 const schar zdir[N_DIRS_Z] = {  0,  0,  0,  0,  0,  0,  0,  0, 1, -1 };
-/* redordered directions, cardinals first */
+/* reordered directions, cardinals first */
 const schar dirs_ord[N_DIRS] =
     { DIR_W, DIR_N, DIR_E, DIR_S, DIR_NW, DIR_NE, DIR_SE, DIR_SW };
 

@@ -282,7 +282,7 @@ gc.chosen_soundlib
 ga.active_soundlib
 a usersound mappings reference
 
-iflags.sounds is the master on/off swith to control whether any audio
+iflags.sounds is the master on/off switch to control whether any audio
 is produced by the soundlib interface
 
 iflags.voice is the master on/off switch for voices produced by

@@ -508,7 +508,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             if (mtmp->isshk && !*u.ushops)
                 hot_pursuit(mtmp);
         } else if (M_AP_TYPE(mtmp))
-            seemimic(mtmp); /* might unblock if mimicing a boulder/door */
+            seemimic(mtmp); /* might unblock if mimicking a boulder/door */
     }
     /* note: gb.bhitpos won't be set if swallowed, but that's okay since
      * reveal_invis will be false.  We can't use mtmp->mx, my since it
@@ -4604,7 +4604,7 @@ dobuzz(
     int spell_type;
     int hdmgtype = Hallucination ? rn2(6) : damgtype;
 
-    /* if its a Hero Spell then get its SPE_TYPE */
+    /* if it's a Hero Spell then get its SPE_TYPE */
     spell_type = is_hero_spell(type) ? SPE_MAGIC_MISSILE + damgtype : 0;
 
     if (u.uswallow) {
@@ -6098,7 +6098,7 @@ makewish(void)
                        "made %s first artifact wish - %s", uhis(), wish);
     else
         livelog_printf((LL_WISH | maybe_LL_arti), "wished for %s", wish);
-    /* TODO? maybe generate a second event decribing what was received since
+    /* TODO? maybe generate a second event describing what was received since
        those just echo player's request rather than show actual result */
 
     const char *verb = ((Is_airlevel(&u.uz) || u.uinwater) ? "slip" : "drop"),

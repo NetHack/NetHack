@@ -50,11 +50,11 @@ differences are primarily visual.  This windowport supports dymanic
 resizing of the terminal window, so you can play with it to see how it
 looks best to you during a game.  Also, the align_status and
 align_message options may be set during the game, so you can experiment
-to see what arraingement looks best to you.
+to see what arrangement looks best to you.
 
 For menus, in addition to the normal configurable keybindings for menu
 navigation descrived in the Guidebook, you can use the right and left
-arrows to to forward or backward one page, respectively, and the home
+arrows to forward or backward one page, respectively, and the home
 and end keys to go to the first and last pages, respectively.
 
 Some configuration options that are specific to or relevant to the
@@ -105,7 +105,7 @@ CONTACT
 
 Please send any bug reports, suggestions, patches, or miscellaneous
 feedback to me (Karl Garrison) at: kgarrison@pobox.com.  Note that as
-of this writing, I only have sporatic Internet access, so I may not get
+of this writing, I only have sporadic Internet access, so I may not get
 back to you right away.
 
 Happy Hacking!

@@ -4,7 +4,7 @@ General Fixes and Modified Features
 -----------------------------------
 
 
-Fixes to Post-X.X.X Problems that Were Exposed Via git Respository
+Fixes to Post-X.X.X Problems that Were Exposed Via git Repository
 ------------------------------------------------------------------
 
 

@@ -38,7 +38,7 @@ mswin_getlin_window(const char *question, char *result, size_t result_size)
     INT_PTR ret;
     struct getlin_data data;
 
-    /* initilize dialog data */
+    /* initialize dialog data */
     ZeroMemory(&data, sizeof(data));
     data.question = question;
     data.result = result;
@@ -402,7 +402,7 @@ calculate_player_selector_layout(plsel_data_t * data)
     name_box->size.cy = (int) (24 * scale);
 
     control_t * role_list = &data->controls[psc_role_list];
-    /* NOTE: we dont' scale the list view reported height as it appears these
+    /* NOTE: we don't scale the list view reported height as it appears these
              values are the actual size the control will be drawn at using the
              existing DPI value */
     role_list->size.cy = list_view_height(role_list->hWnd, data->role_count);

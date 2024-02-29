@@ -25,7 +25,7 @@
  * sensemon()
  *
  * Returns true if the hero can sense the given monster.  This includes
- * monsters that are hiding or mimicing other monsters.
+ * monsters that are hiding or mimicking other monsters.
  *
  * [3.7] Note: the map doesn't display any monsters when hero is swallowed
  * (or display non-adjacent, non-submerged ones when hero is underwater),
@@ -656,7 +656,7 @@ enum glyph_offsets {
                     (Ugender))
 
 /*
- * Change the given glyph into it's given type.  Note:
+ * Change the given glyph into its given type.  Note:
  *      1) Pets, detected, and ridden monsters are animals and are converted
  *         to the proper monster number.
  *      2) Bodies are all mapped into the generic CORPSE object

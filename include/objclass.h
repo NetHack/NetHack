@@ -66,7 +66,7 @@ struct objclass {
     Bitfield(oc_tough, 1); /* hard gems/rings */
 
     Bitfield(oc_spare1, 6);         /* padding to align oc_dir + oc_material;
-                                     * can be canabalized for other use;
+                                     * can be cannibalized for other use;
                                      * aka 6 free bits */
 
     Bitfield(oc_dir, 3);

@@ -173,7 +173,7 @@ does_block(int x, int y, struct rm *lev)
         if (obj->otyp == BOULDER)
             return 1;
 
-    /* Mimics mimicing a door or boulder or ... block light. */
+    /* Mimics mimicking a door or boulder or ... block light. */
     if ((mon = m_at(x, y)) && (!mon->minvis || See_invisible)
         && is_lightblocker_mappear(mon))
         return 1;
@@ -797,7 +797,7 @@ vision_recalc(int control)
 
             /*
              * At this point we know that the row position is *not* in normal
-             * sight.  That is, the position is could be seen, but is dark
+             * sight.  That is, the position could be seen, but is dark
              * or LOS is just plain blocked.
              *
              * Update the position if:
@@ -805,7 +805,7 @@ vision_recalc(int control)
              *   the glyph -- E.g. darken room spot, etc.
              * o If we now could see the location (yet the location is not
              *   lit), but previously we couldn't see the location, or vice
-             *   versa.  Update the spot because there there may be an
+             *   versa.  Update the spot because there may be an
              *   infrared monster there.
              */
             } else {

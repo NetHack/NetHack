@@ -1340,7 +1340,7 @@ vesa_FontPtrs(void)
 }
 
 /*
- * This will verify the existance of a VGA adapter on the machine.
+ * This will verify the existence of a VGA adapter on the machine.
  * Video function call 0x4F00 returns 0x004F in AX if successful, and
  * returns a VbeInfoBlock describing the features of the VESA BIOS.
  */
@@ -1628,7 +1628,7 @@ vesa_WriteCharXY(uint32 chr, int pixx, int pixy, uint32 colour)
 
 /*
  * Draw a character with a transparent background
- * Don't bother cacheing; only the position bar and the cursor use this
+ * Don't bother caching; only the position bar and the cursor use this
  */
 static void
 vesa_WriteCharTransparent(int chr, int pixx, int pixy, int colour)

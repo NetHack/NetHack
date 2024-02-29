@@ -158,7 +158,7 @@ NetHackQtBind::qt_Splash()
         capt->repaint();
         qApp->processEvents();
     } else {
-        splash = 0; // caller has alrady done this...
+        splash = 0; // caller has already done this...
     }
 }
 
@@ -591,7 +591,7 @@ int NetHackQtBind::qt_nhgetch()
          * On OSX (possibly elsewhere), this prevents an infinite
          * loop repeatedly issuing the complaint:
 QCoreApplication::exec: The event loop is already running
-         * to stderr if you syncronously start nethack from a terminal
+         * to stderr if you synchronously start nethack from a terminal
          * then switch focus back to that terminal and type ^C.
          *  SIGINT -> done1() -> done2() -> yn_function("Really quit?")
          * in the core asks for another keystroke.
@@ -766,7 +766,7 @@ char NetHackQtBind::qt_yn_function(const char *question_,
         char cbuf[20];
         cbuf[0] = '\0';
 
-        // add the prompt to the messsage window
+        // add the prompt to the message window
 	NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
 
 	while (result < 0) {
@@ -848,7 +848,7 @@ void NetHackQtBind::qt_getlin(const char *prompt, char *line)
         keybuffer.Drain();
     }
 
-    // add the prompt with appended response to the messsage window
+    // add the prompt with appended response to the message window
     char buf[BUFSZ + 20], *q; /* +20: plenty of extra room for visctrl() */
     copynchars(buf, prompt, BUFSZ - 1);
     q = eos(buf);

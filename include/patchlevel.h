@@ -85,7 +85,7 @@
  *      defined to force it back into effect
  *  update_inventory() after leash goes slack
  *  player assigned name for monsters, specific objects, or object types could be
-        longer than what was intented to be allowed; for 'curses', much longer
+        longer than what was intended to be allowed; for 'curses', much longer
  *  windows: added winflexbison to travis-ci configuration to permit full build of
  *      levcomp and dgncomp
  *  windows: a bad chdir specified in win/win32/dgnstuff.mak caused full build to
@@ -155,7 +155,7 @@
  *  Fixed stale 'thrownobj' pointer for returning thrown aklys while engulfed
  *  Fixed uarmh null pointer dereference if a helm of opposite alignment came
  *     off due to being polymorphed
- *  Fixed 'object lost' panic when attempting to crawl of of the water during
+ *  Fixed 'object lost' panic when attempting to crawl out of the water during
  *     emergency disrobing/dropping
  *  Running now stops when moving over engravings so you can tell where they are
  *  Fixed detection of unseen/secret doors which failed to find monsters hiding

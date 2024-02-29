@@ -796,7 +796,7 @@ new_resource_macro(
         ++q; /* skip whitespace between name and value */
     for (p = eos(q); --p > q && (*p == ' ' || *p == '\t'); )
         continue; /* discard trailing whitespace */
-    *++p = '\0'; /* q..p containes macro value */
+    *++p = '\0'; /* q..p contains macro value */
     def_rsrc_valu[numdefs] = dupstr(q);
     return TRUE;
 }
@@ -2120,7 +2120,7 @@ static const char *yn_choices; /* string of acceptable input */
 static char yn_def;
 static char yn_return;           /* return value */
 static char yn_esc_map;          /* ESC maps to this char. */
-static Widget yn_popup;          /* popup for the yn fuction (created once) */
+static Widget yn_popup;          /* popup for the yn function (created once) */
 static Widget yn_label;          /* label for yn function (created once) */
 static boolean yn_getting_num;   /* TRUE if accepting digits */
 static boolean yn_preserve_case; /* default is to force yn to lower case */
@@ -2146,7 +2146,7 @@ key_event_to_char(XKeyEvent *key)
     nbytes = XLookupString(key, keystring, MAX_KEY_STRING, (KeySym *) 0,
                            (XComposeStatus *) 0);
 
-    /* Modifier keys return a zero lengh string when pressed. */
+    /* Modifier keys return a zero length string when pressed. */
     if (nbytes == 0)
         return '\0';
 
@@ -2547,7 +2547,7 @@ highlight_yn(boolean init)
     if (!appResources.slow || !appResources.highlight_prompt)
         return;
 
-    /* first time through, WIN_MAP isn't fully initiialized yet */
+    /* first time through, WIN_MAP isn't fully initialized yet */
     xmap = ((map_win != WIN_ERR) ? &window_list[map_win]
                : (WIN_MAP != WIN_ERR) ? &window_list[WIN_MAP] : 0);
 
@@ -2679,7 +2679,7 @@ init_standard_windows(void)
     XtSetValues(status, args, num_args);
 
     /*
-     * Realize the popup so that the status widget knows it's size.
+     * Realize the popup so that the status widget knows its size.
      *
      * If we unset MappedWhenManaged then the DECwindow driver doesn't
      * attach the nethack toplevel to the highest virtual root window.
@@ -2810,7 +2810,7 @@ void
 find_scrollbars(
     Widget w,      /* widget of interest; scroll bars are probably attached
                       to its parent or grandparent */
-    Widget last_w, /* if non-zero, don't search ancestory beyond this point */
+    Widget last_w, /* if non-zero, don't search ancestry beyond this point */
     Widget *horiz, /* output: horizontal scrollbar */
     Widget *vert)  /* output: vertical scrollbar */
 {

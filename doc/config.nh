@@ -123,7 +123,7 @@
 # Objects will try to keep their inventory letters
 #OPTIONS=fixinv
 
-# Try and display on the entire screen rather than in a window.
+# Try to display on the entire screen rather than in a window.
 #OPTIONS=fullscreen
 
 # If more information is available for an object looked at with

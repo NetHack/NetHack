@@ -828,7 +828,7 @@ pick_pick(struct obj *obj)
 }
 
 /*
-   Decide whether two unpaid items are mergable; caller is responsible for
+   Decide whether two unpaid items are mergeable; caller is responsible for
    making sure they're unpaid and the same type of object; we check the price
    quoted by the shopkeeper and also that they both belong to the same shk.
  */
@@ -1094,7 +1094,7 @@ obfree(struct obj *obj, struct obj *merge)
         if (!merge) {
             bp->useup = 1;
             obj->unpaid = 0; /* only for doinvbill */
-            /* for used up glob, put back origial weight in case it gets
+            /* for used up glob, put back original weight in case it gets
                formatted ('I x' or itemized billing) with 'wizweight' On */
             if (obj->globby && !obj->owt && has_omid(obj))
                 obj->owt = OMID(obj);
@@ -1712,7 +1712,7 @@ dopay(void)
         /* allow 'm p' to request a menu for menustyle:traditional;
            for other styles, it will do the opposite; that doesn't make
            a whole lot of sense for a 'request-menu' prefix, but otherwise
-           it would simply be reduncant and there wouldn't be any way to
+           it would simply be redundant and there wouldn't be any way to
            skip the menu when hero owes for multiple items */
         if (iflags.menu_requested)
             via_menu = !via_menu;

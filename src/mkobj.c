@@ -628,7 +628,7 @@ clear_splitobjs(void)
  * the caller to provide a valid context for the swap.  When done, obj will
  * still exist, but not on any chain.
  *
- * Note:  Don't use use obj_extract_self() -- we are doing an in-place swap,
+ * Note:  Don't use obj_extract_self() -- we are doing an in-place swap,
  * not actually moving something.
  */
 void
@@ -1508,7 +1508,7 @@ shrink_glob(
 
     /* format "Your/Shk's/The [partly eaten] glob of <goo>" into
        globnambuf[] before shrinking the glob; Yname2() calls yname()
-       which calls xname() which ordinarly leaves "partly eaten" to
+       which calls xname() which ordinarily leaves "partly eaten" to
        doname() rather than inserting that itself; ask xname() to add
        that when appropriate */
     iflags.partly_eaten_hack = TRUE;

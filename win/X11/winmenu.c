@@ -648,7 +648,7 @@ menu_scrollmask(struct xwindow *wp)
     return scrlmask;
 }
 
-/* if a menu is scrolled vertically and/horizontallty, return it to the top
+/* if a menu is scrolled vertically and/horizontally, return it to the top
    and far left */
 static void
 menu_unscroll(struct xwindow *wp)
@@ -715,7 +715,7 @@ x11_scroll_perminv(int arg UNUSED) /* arg is always 1 */
          * We accept some extra characters that menus usually ignore:
          * ^C will be treated like <escape>, leaving menu positioned as-is
          * and returning to play; <delete> or <backspace> will be treated
-         * like <return> and <space>, reseting the menu to its top and
+         * like <return> and <space>, resetting the menu to its top and
          * returning to play; other characters will either be rejected by
          * yn_function or stay here for scrolling.
          */
@@ -779,7 +779,7 @@ X11_start_menu(winid window, unsigned long mbehavior UNUSED)
     wp = &window_list[window];
 
     if (wp->menu_information->is_menu) {
-        /* make sure we'ere starting with a clean slate */
+        /* make sure we're starting with a clean slate */
         free_menu(&wp->menu_information->new_menu);
     } else {
         wp->menu_information->is_menu = TRUE;

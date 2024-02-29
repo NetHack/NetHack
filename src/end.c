@@ -74,7 +74,7 @@ ATTRNORETURN extern void nethack_exit(int) NORETURN;
 #include <execinfo.h>
 #endif
 
-/* What do we try and in what order?  Tradeoffs:
+/* What do we try to in what order?  Tradeoffs:
  * libc: +no external programs required
  *        -requires newish libc/glibc
  *        -requires -rdynamic
@@ -1660,7 +1660,7 @@ fuzzer_savelife(int how)
                 ++remedies;
             }
             if (!rn2(3 + 3 * remedies)) {
-                /* confer temporary resistances for first 8 properities:
+                /* confer temporary resistances for first 8 properties:
                    fire, cold, sleep, disint, shock, poison, acid, stone */
                 for (propidx = 1; propidx <= 8; ++propidx) {
                     if (!u.uprops[propidx].intrinsic

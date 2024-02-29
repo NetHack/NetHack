@@ -965,7 +965,7 @@ merged(struct obj **potmp, struct obj **pobj)
  * addinv) or when an object in the hero's inventory has been polymorphed
  * in-place.
  *
- * It may be valid to merge this code with with addinv_core2().
+ * It may be valid to merge this code with addinv_core2().
  */
 void
 addinv_core1(struct obj *obj)
@@ -1210,7 +1210,7 @@ hold_another_object(
             dropy(obj);            /* now put it back again :-) */
             return obj;
         } else if (wasUpolyd && !Upolyd) {
-            /* loose your grip if you revert your form */
+            /* lose your grip if you revert your form */
             if (drop_fmt)
                 pline(drop_fmt, drop_arg);
             obj_extract_self(obj);
@@ -1412,7 +1412,7 @@ delobj_core(
     boolean update_map;
 
     /* obj_resists(obj,0,0) protects the Amulet, the invocation tools,
-       and Rider corspes */
+       and Rider corpses */
     if (!force && obj_resists(obj, 0, 0)) {
         /* player might be doing something stupid, but we
          * can't guarantee that.  assume special artifacts
@@ -1793,7 +1793,7 @@ getobj(
         *bp++ = HANDS_SYM;
         *bp++ = ' '; /* put a space after the '-' in the prompt */
         break;
-    case GETOBJ_DOWNPLAY: /* acceptable but not shown as likely chioce */
+    case GETOBJ_DOWNPLAY: /* acceptable but not shown as likely choice */
     case GETOBJ_EXCLUDE_INACCESS:   /* nothing currently gives this for '-' but
                                      * theoretically could if wearing gloves */
     case GETOBJ_EXCLUDE_SELECTABLE: /* ditto, I think... */
@@ -5106,7 +5106,7 @@ dopramulet(void)
 
         /* using display_inventory() instead of prinv() allows player
            to use 'm "' to force and menu and be able to choose amulet
-           in order to perform a context-sensitve item action */
+           in order to perform a context-sensitive item action */
         lets[0] = obj_to_let(uamul), lets[1] = '\0';
 
         (void) dispinv_with_action(lets, TRUE, "Amulet");

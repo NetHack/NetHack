@@ -372,7 +372,7 @@ curses_uncurse_terminal(void)
 {
    /* also called by panictrace_handler(), a signal handler, so somewhat
       iffy in that situation; but without this, newlines behave as raw
-      line feeds so subseqent backtrace gets scrawled all over the screen
+      line feeds so subsequent backtrace gets scrawled all over the screen
       and is nearly useless */
     curses_cleanup();
     curs_set(orig_cursor);

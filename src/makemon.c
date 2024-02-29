@@ -188,7 +188,7 @@ m_initweap(struct monst *mtmp)
                 if (!rn2(3)) {
                     /* lance and dwarvish mattock used to be in midst of
                        the polearms but use different skills from polearms
-                       and aren't appropriates choices for human soliders */
+                       and aren't appropriates choices for human soldiers */
                     do {
                         w1 = rn1(BEC_DE_CORBIN - PARTISAN + 1, PARTISAN);
                     } while (objects[w1].oc_skill != P_POLEARMS);

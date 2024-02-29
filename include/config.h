@@ -690,7 +690,7 @@ typedef unsigned char uchar;
 
 /* #define DUMPLOG */  /* End-of-game dump logs */
 
-#define USE_ISAAC64 /* Use cross-plattform, bundled RNG */
+#define USE_ISAAC64 /* Use cross-platform, bundled RNG */
 
 /* TEMPORARY - MAKE UNCONDITIONAL BEFORE RELEASE */
 /* undef this to check if sandbox breaks something */
@@ -716,7 +716,7 @@ typedef unsigned char uchar;
 #include "global.h" /* Define everything else according to choices above */
 
 /* Place the following after #include [platform]conf.h in global.h so that
-   overrides are possible in there, for things like unix-specfic file
+   overrides are possible in there, for things like unix-specific file
    paths. */
 
 #ifdef LIVELOG

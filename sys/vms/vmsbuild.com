@@ -13,7 +13,7 @@ $ !     compiler-option :  either "VSIC", "VAXC", "DECC",
 $ !                        "GNUC" or "" or "fetchlua" !default in 3.7 is VSIC
 $ !	link-option	:  either "SHARE[able]" or "LIB[rary]"	!default SHARE
 $ !	cc-switches	:  optional qualifiers for CC (such as "/noOpt/Debug")
-$ !     linker-switches :  optional qualifers for LINK (/Debug or /noTraceback)
+$ !     linker-switches :  optional qualifiers for LINK (/Debug or /noTraceback)
 $ !     interface	:  "TTY" or "CURSES" or "TTY+CURSES" or "CURSES+TTY"
 $ ! notes:
 $ !	If the symbol "CC" is defined, compiler-option is not used (unless it
@@ -77,7 +77,7 @@ $	copy sys$input: sys$error:	!p1 usage
    or  "GNUC"      -- use GNU C to compile everything
    or  "LINK"      -- skip compilation, just relink nethack.exe
    or  "SPEC[IAL]" -- just compile and link dlb.exe and recover.exe
-   or  "FETCHLUA"  -- skip compilaton, just fetch lua from lua.org
+   or  "FETCHLUA"  -- skip compilation, just fetch lua from lua.org
    or  "BUILDLUA"  -- build [-.lib.lua]lua'LUAVER'.olb
    or  ""          -- carry out default operation (VAXC unless 'CC' is defined)
 

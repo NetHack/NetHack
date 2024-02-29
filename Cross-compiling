@@ -479,7 +479,7 @@ Cross-compiler pre-built binary downloads:
         CROSS_TO_MSDOS=1
     on your make command line.
 
-    Note: Both the fetch-cross-compiler.sh script and and the msdos
+    Note: Both the fetch-cross-compiler.sh script and the msdos
     cross-compile and package procedures require unzip and zip to be available
     on your host build system.
 
@@ -554,7 +554,7 @@ Cross-compiler url:      https://github.com/bebbo/amiga-gcc
             make update
 
            [Note that you may have to take ownership of the files in the bebbo
-            repo via chown before succesfully carrying out the next steps]
+            repo via chown before successfully carrying out the next steps]
 
             make clean
             make clean-prefix

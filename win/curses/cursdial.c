@@ -1097,7 +1097,7 @@ menu_win_size(nhmenu *menu)
     }
 
     /* avoid a tiny popup window; when it's shown over the endings of
-       old messsages rather than over the map, it is fairly easy for
+       old messages rather than over the map, it is fairly easy for
        the player to overlook it, particularly when walking around and
        stepping on a pile of 2 items; also, multi-page menus need enough
        room for "(Page M of N) => " even if all entries are narrower
@@ -1669,7 +1669,7 @@ menu_select_deselect(
 
 
 /* Perform the selected operation (select, unselect, invert selection)
-on the given menu page.  If menu_page is 0, then perform opetation on
+on the given menu page.  If menu_page is 0, then perform operation on
 all pages in menu.  Returns last page displayed.  */
 
 static int

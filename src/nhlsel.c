@@ -868,7 +868,7 @@ l_selection_gradient(lua_State *L)
         cvt_to_abscoord(&x, &y);
         cvt_to_abscoord(&x2, &y2);
         /* maxdist is required because there's no obvious default value for it,
-         * whereas mindist has an obvious defalt of 0 */
+         * whereas mindist has an obvious default of 0 */
         maxdist = get_table_int(L, "maxdist");
         mindist = get_table_int_opt(L, "mindist", 0);
 

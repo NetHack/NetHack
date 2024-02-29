@@ -325,7 +325,7 @@ mswin_map_layout(HWND hWnd, LPSIZE map_size)
     data->xFrontTile = max(data->xFrontTile, 1);
     data->yFrontTile = max(data->yFrontTile, 1);
 
-    /* calcuate ASCII cursor height */
+    /* calculate ASCII cursor height */
     data->yBlinkCursor = (int) ((double) CURSOR_HEIGHT * data->backScale);
     data->yNoBlinkCursor = data->yBackTile;
 
@@ -586,7 +586,7 @@ MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             size.cx = LOWORD(lParam);
             size.cy = HIWORD(lParam);
         } else {
-            /* mapping factor is unchaged we just need to adjust scroll bars
+            /* mapping factor is unchanged we just need to adjust scroll bars
              */
             size.cx = data->xFrontTile * COLNO;
             size.cy = data->yFrontTile * ROWNO;

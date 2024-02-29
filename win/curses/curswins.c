@@ -21,7 +21,7 @@ typedef struct nhw {
     int width;                  /* Usable width not counting border */
     int height;                 /* Usable height not counting border */
     int x;                      /* start of window on terminal (left) */
-    int y;                      /* start of window on termial (top) */
+    int y;                      /* start of window on terminal (top) */
     int orientation;            /* Placement of window relative to map */
     boolean border;             /* Whether window has a visible border */
 } nethack_window;
