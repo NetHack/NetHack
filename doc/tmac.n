@@ -50,7 +50,7 @@
 .\" Version 1.6		March 15, 1989		Matt.Bishop@dartmouth.edu
 .\"						..!bear.dartmouth.edu!bishop
 .\"	Fixed a bug in footnote handling (again, sigh ...)  This one
-.\"	occurred when the "fo" trap position was reset just beneath
+.\"	occurred when the the "fo" trap position was reset just beneath
 .\"	the current line; the footnote overflow trap would kick in and
 .\"	never be closed.
 .\"
