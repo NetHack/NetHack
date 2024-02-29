@@ -1,4 +1,4 @@
-NETHACK(6)                                                          NETHACK(6)
+NETHACK(6)                       Games Manual                       NETHACK(6)
 
 
 
@@ -16,7 +16,8 @@ SYNOPSIS
        nethack [ -d|--directory directory ] -s|--scores [ -v ]
        [ -p profession ] [ -r race ] [ playernames ]
 
-       nethack [ --usage | --help ] [ --showpaths ] [ --version[:copy] ]
+       nethack [ --usage | --help ] [ --showpaths ]
+       [ --version[:copy|:dump|:show] ]
 
 DESCRIPTION
        NetHack is a display oriented Dungeons & Dragons(tm) - like game.   The
@@ -32,8 +33,8 @@ DESCRIPTION
        To win the game (as opposed to merely playing to  beat  other  people's
        high  scores)  you  must locate the Amulet of Yendor which is somewhere
        below the 20th level of the dungeon and get it out.  Few people achieve
-       this;  most never do.  Those who have done so go down in history as he-
-       roes among heroes -- and then they find ways of making  the  game  even
+       this;  most  never  do.   Those  who have done so go down in history as
+       heroes among heroes -- and then they find ways of making the game  even
        harder.   See  the Guidebook section on Conduct if this game has gotten
        too easy for you.
 
@@ -42,8 +43,8 @@ DESCRIPTION
        ers.  The scoring is based on many aspects  of  your  behavior,  but  a
        rough estimate is obtained by taking the amount of gold you've found in
        the cave plus four times your (real) experience.  Precious  stones  may
-       be  worth  a  lot  of  gold  when  brought to the exit.  There is a 10%
-       penalty for getting yourself killed.
+       be  worth  a lot of gold when brought to the exit.  There is a 10% pen-
+       alty for getting yourself killed.
 
        The environment variable NETHACKOPTIONS can be used to initialize  many
        run-time  options.   The  ?  command  provides  a  description of these
@@ -134,64 +135,70 @@ DESCRIPTION
        --no-nethackrc option can be used to skip  any  run-time  configuration
        file.
 
-
        Some options provide feedback and then exit rather than play the game:
 
        The  -s or --scores option alone will print out the list of your scores
        on the current version.  An immediately following  -v  reports  on  all
-       versions present in the score file.  `-s|-s -v' may also be followed by
+       versions present in the score file.  '-s|-s -v' may also be followed by
        arguments -p profession and -r race to print the scores  of  particular
        roles  and  races  only.   Either  can  be  specified multiple times to
        include more than one role or more than one race.  When both are speci-
        fied,  score  entries which match either the role or the race (or both)
-       are printed rather than just entries which match both.  `-s|-s -v'  may
+       are printed rather than just entries which match both.  '-s|-s -v'  may
        be  followed  by  one  or  more player names to print the scores of the
        players mentioned, by 'all' to print out all scores, or by a number  to
        print  that many top scores.  Combining names with role or race or both
        will report entries which match any of those rather than just the  ones
        which match all.
 
-       --version  can be used to cause NetHack to show the version information
-       it was compiled with, then exit.  That will include the git commit hash
-       if  the  information was available when the game was compiled.  On some
-       platforms, such as Windows and macOS, a variation --version:copy can be
-       used to cause NetHack to show the version information, then exit, while
-       also leaving a copy of the version information in the paste  buffer  or
-       clipboard for potential insertion into things like bug reports.
+       --version  or  --version:show  can be used to cause NetHack to show the
+       version number, the date and time that the program was built  from  its
+       source  code, and possibly some auxiliary information about that source
+       code, then exit.  The optional auxiliary information is git commit hash
+       (reflecting  the  source code's most recent modification when extracted
+       from the git version control system, if that is in  use)  if  available
+       when  the  program  was  built.   On some platforms such as Windows and
+       macOS, a variation, --version:copy, can be used  to  cause  NetHack  to
+       show  the  version information, then exit, while also leaving a copy of
+       that information in the paste buffer or clipboard for potential  inser-
+       tion into things like bug reports.  On any platform, --version:dump can
+       be used to show most of the data used when checking whether a save file
+       or bones file is compatible with the program.  The program will display
+       a line containing five numbers expressed in hexadecimal, then exit.
 
-       --showpaths  can be used to cause NetHack to show where it is expecting
-       to find various files.  Among other things it shows  the  path  to  and
-       name  for  the  player's run-time configuration file, a text file which
+       --showpaths can be used to cause NetHack to show where it is  expecting
+       to  find  various  files.   Among other things it shows the path to and
+       name for the player's run-time configuration file, a  text  file  which
        can be edited to customize aspects of how the game operates.
 
        --usage or --help will display information similar to this manual page,
-       then exit.  Use `nethack --usage | more' to read it a page at a time.
+       then exit.  Use 'nethack --usage | more' to read it a page at a time.
 
 AUTHORS
-       Jay  Fenlason  (+  Kenny  Woodland, Mike Thome and Jon Payne) wrote the
+       Jay Fenlason (+ Kenny Woodland, Mike Thome and  Jon  Payne)  wrote  the
        original hack, very much like rogue (but full of bugs).
 
-       Andries Brouwer continuously deformed their sources  into  an  entirely
+       Andries  Brouwer  continuously  deformed their sources into an entirely
        different game.
 
        Mike Stephenson has continued the perversion of sources, adding various
-       warped character classes and sadistic  traps  with  the  help  of  many
-       strange  people who reside in that place between the worlds, the Usenet
-       Zone.  A number of these miscreants are immortalized in the  historical
+       warped  character  classes  and  sadistic  traps  with the help of many
+       strange people who reside in that place between the worlds, the  Usenet
+       Zone.   A number of these miscreants are immortalized in the historical
        roll of dishonor and various other places.
 
-       The  resulting mess is now called NetHack, to denote its development by
+       The resulting mess is now called NetHack, to denote its development  by
        the Usenet.  Andries Brouwer has made this request for the distinction,
        as he may eventually release a new version of his own.
 
 FILES
-       Run-time  configuration options were discussed above and use a platform
-       specific name for a file in a platform specific  location.   For  Unix,
+       Run-time configuration options were discussed above and use a  platform
+       specific  name  for  a file in a platform specific location.  For Unix,
        the name is '.nethackrc' in the user's home directory.
 
-       All   other   files   are   in   the   playground  directory,  normally
-       /usr/games/lib/nethackdir.  If DLB was defined during the compile,  the
-       data  files  and  special levels will be inside a larger file, normally
+       All  other  files   are   in   the   playground   directory,   normally
+       /usr/games/lib/nethackdir.   If DLB was defined during the compile, the
+       data files and special levels will be inside a  larger  file,  normally
        nhdat, instead of being separate files.
 
        nethack                     The program itself.
@@ -204,7 +211,7 @@ FILES
                                    map features.
        options                     Data file containing a description of the
                                    build-time option settings.
-       help, hh, cmdhelp           Help data files.  ('cmdhelp' is  obsolete.)
+       help, hh, cmdhelp           Help data files.  ('cmdhelp' is obsolete.)
        opthelp, optmenu, wizhelp   More help data files.
        keyhelp, usagehlp           Even more help data files.
        *.lua                       Predefined special levels, dungeon control
@@ -271,7 +278,7 @@ BUGS
        Probably infinite.
 
 COPYRIGHT
-       This  file  is  Copyright  (C)  Robert Patrick Rankin, 2022 for version
+       This  file  is  Copyright  (C)  Robert Patrick Rankin, 2024 for version
        NetHack-3.7:1.31.  NetHack may be freely  redistributed.   See  license
        for details.
 
@@ -279,4 +286,4 @@ COPYRIGHT
 
 
 
-NETHACK                        21 February 2022                     NETHACK(6)
+NETHACK                        28 February 2024                     NETHACK(6)
