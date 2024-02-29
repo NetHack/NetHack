@@ -23,6 +23,8 @@
 
 /*  */
 
+struct e;
+
 /* lua_CFunction prototypes */
 #ifdef DUMPLOG
 static int nhl_dump_fmtstr(lua_State *);
@@ -80,6 +82,13 @@ static void nhlL_openlibs(lua_State *, uint32_t);
 static void *nhl_alloc(void *, void *, size_t, size_t);
 static lua_State *nhlL_newstate (nhl_sandbox_info *, const char *);
 static void end_luapat(void);
+static int nhl_get_config(lua_State *);
+static int nhl_variable(lua_State *);
+static void nhl_clearfromtable(lua_State *, int, int, struct e *);
+static void nhl_warn(void *, const char *, int);
+static void nhl_clearfromtable(lua_State *, int, int, struct e *);
+static int nhl_panic(lua_State *);
+static void nhl_hookfn(lua_State *, lua_Debug *);
 
 static const char *const nhcore_call_names[NUM_NHCORE_CALLS] = {
     "start_new_game",

@@ -26,6 +26,7 @@ static void leppie_stash(struct monst *);
 static boolean m_balks_at_approaching(struct monst *);
 static boolean stuff_prevents_passage(struct monst *);
 static int vamp_shift(struct monst *, struct permonst *, boolean);
+static void maybe_spin_web(struct monst *);
 
 /* a11y: give a message when monster moved */
 static void

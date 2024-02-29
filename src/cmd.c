@@ -19,6 +19,8 @@
 static int wiz_display_macros(void);
 static int wiz_mon_diff(void);
 #endif
+static int wiz_load_splua(void);
+static int wiz_telekinesis(void);
 
 #ifdef DUMB /* stuff commented out in extern.h, but needed here */
 extern int doapply(void);            /**/

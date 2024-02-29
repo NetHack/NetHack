@@ -8,6 +8,7 @@
 #include "isaac64.h"
 
 static int whichrng(int (*fn)(int));
+static int RND(int);
 
 #if 0
 static isaac64_ctx rng_state;

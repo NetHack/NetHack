@@ -30,6 +30,11 @@
 #define inline /*empty*/
 #endif
 
+static inline uint32_t lower_bits(uint64_t);
+static inline uint32_t upper_bits(uint64_t);
+static void isaac64_update(isaac64_ctx *);
+static void isaac64_mix(uint64_t[8]);
+
 /* Extract ISAAC64_SZ_LOG bits (starting at bit 3). */
 static inline uint32_t lower_bits(uint64_t x)
 {

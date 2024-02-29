@@ -40,6 +40,7 @@ static void move_update(boolean);
 static int pickup_checks(void);
 static boolean doorless_door(coordxy, coordxy);
 static void maybe_wail(void);
+static boolean water_turbulence(coordxy *, coordxy *);
 
 #define IS_SHOP(x) (gr.rooms[x].rtype >= SHOPBASE)
 

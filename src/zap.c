@@ -36,6 +36,7 @@ static int zap_ok(struct obj *) NO_NNARGS;
 static void boxlock_invent(struct obj *) NONNULLARG1;
 static int spell_hit_bonus(int);
 static int maybe_destroy_item(struct monst *, struct obj *, int) NONNULLPTRS;
+static boolean destroyable(struct obj *, int);
 
 static void wishcmdassist(int);
 

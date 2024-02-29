@@ -26,6 +26,9 @@ NEARDATA struct instance_flags iflags; /* provide linkage */
 #define PREV_MSGS 0
 #endif
 
+static char *color_attr_to_str(color_attr *);
+static boolean color_attr_parse_str(color_attr *, char *);
+
 /*
  *  NOTE:  If you add (or delete) an option, please review the following:
  *             doc/options.txt

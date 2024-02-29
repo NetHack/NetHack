@@ -25,6 +25,9 @@
 #define spellet(spell) \
     ((char) ((spell < 26) ? ('a' + spell) : ('A' + spell - 26)))
 
+struct chain_lightning_queue;
+struct chain_lightning_zap;
+
 static int spell_let_to_idx(char);
 static boolean cursed_book(struct obj * bp);
 static boolean confused_book(struct obj *);
@@ -48,6 +51,8 @@ static const char *spelltypemnemonic(int);
 static boolean can_center_spell_location(coordxy, coordxy);
 static void display_spell_target_positions(boolean);
 static boolean spell_aim_step(genericptr_t, coordxy, coordxy);
+static void propagate_chain_lightning(struct chain_lightning_queue *,
+            struct chain_lightning_zap);
 
 /* The roles[] table lists the role-specific values for tuning
  * percent_success().

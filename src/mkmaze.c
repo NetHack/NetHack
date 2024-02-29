@@ -26,6 +26,7 @@ static void stolen_booty(void);
 static boolean maze_inbounds(coordxy, coordxy);
 static void maze_remove_deadends(xint16);
 static void populate_maze(void);
+static boolean is_exclusion_zone(xint16, coordxy, coordxy);
 
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \

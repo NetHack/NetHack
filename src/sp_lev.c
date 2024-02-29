@@ -67,6 +67,10 @@ static void fill_empty_maze(void);
 static void splev_initlev(lev_init *);
 static boolean generate_way_out_method(coordxy nx, coordxy ny,
                                        struct selectionvar *ov);
+static void l_push_wid_hei_table(lua_State *, int, int);
+static boolean good_stair_loc(coordxy, coordxy);
+static void ensure_way_out(void);
+
 #if 0
 /* macosx complains that these are unused */
 static long sp_code_jmpaddr(long, long);

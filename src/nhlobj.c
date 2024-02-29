@@ -27,6 +27,7 @@ static int l_obj_timer_peek(lua_State *);
 static int l_obj_timer_stop(lua_State *);
 static int l_obj_timer_start(lua_State *);
 static int l_obj_bury(lua_State *);
+static struct _lua_obj *l_obj_push(lua_State *, struct obj *);
 
 #define lobj_is_ok(lo) ((lo) && (lo)->obj && (lo)->obj->where != OBJ_LUAFREE)
 

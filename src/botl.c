@@ -18,6 +18,7 @@ const char *const enc_stat[] = {
 static const char *rank(void);
 static void bot_via_windowport(void);
 static void stat_update_time(void);
+static char *get_strength_str(void);
 
 static char *
 get_strength_str(void)

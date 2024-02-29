@@ -35,6 +35,7 @@ static int QSORTCALLBACK vanqsort_cmp(const genericptr, const genericptr);
 static int num_extinct(void);
 static int num_gone(int, int *);
 static char *size_str(int);
+static void item_resistance_message(int, const char *, int);
 
 extern const char *const hu_stat[];  /* hunger status from eat.c */
 extern const char *const enc_stat[]; /* encumbrance status from botl.c */

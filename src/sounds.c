@@ -14,6 +14,7 @@ static int domonnoise(struct monst *);
 static int dochat(void);
 static struct monst *responsive_mon_at(int, int);
 static int mon_in_room(struct monst *, int);
+static boolean oracle_sound(struct monst *);
 
 /* this easily could be a macro, but it might overtax dumb compilers */
 static int

@@ -25,6 +25,7 @@ static void insane_object(struct obj *, const char *, const char *,
 static void check_contained(struct obj *, const char *);
 static void check_glob(struct obj *, const char *);
 static void sanity_check_worn(struct obj *);
+static void init_oextra(struct oextra *);
 
 struct icp {
     int iprob;   /* probability of an item type */

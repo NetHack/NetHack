@@ -24,6 +24,7 @@ static void m_initthrow(struct monst *, int, int);
 static void m_initweap(struct monst *);
 static void m_initinv(struct monst *);
 static boolean makemon_rnd_goodpos(struct monst *, mmflags_nht, coord *);
+static void init_mextra(struct mextra *);
 
 #define m_initsgrp(mtmp, x, y, mmf) m_initgrp(mtmp, x, y, 3, mmf)
 #define m_initlgrp(mtmp, x, y, mmf) m_initgrp(mtmp, x, y, 10, mmf)

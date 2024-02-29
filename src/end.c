@@ -40,6 +40,9 @@ static void dump_everything(int, time_t);
 #ifdef CRASHREPORT
 static const char *get_saved_pline(int);
 #endif
+static void fixup_death(int);
+static int wordcount(char *);
+static void bel_copy1(char **, char *);
 
 #if defined(__BEOS__) || defined(MICRO) || defined(OS2) || defined(WIN32)
 ATTRNORETURN extern void nethack_exit(int) NORETURN;

@@ -948,6 +948,7 @@ static struct tm *getlt(void);
 
 /* Sets the seed for the random number generator */
 #ifdef USE_ISAAC64
+static void set_random(unsigned long seed, int (*)(int));
 
 static void
 set_random(unsigned long seed,

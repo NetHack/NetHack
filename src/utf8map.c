@@ -50,6 +50,7 @@ static char *fix_glyphname(char *str);
 static int32_t rgbstr_to_int32(const char *rgbstr);
 boolean closest_color(uint32_t lcolor, uint32_t *closecolor, int *clridx);
 static const long nonzero_black = 0x1000000;
+static int color_distance(uint32_t, uint32_t);
 
 static void
 to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
