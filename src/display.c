@@ -1940,6 +1940,7 @@ show_glyph(coordxy x, coordxy y, int glyph)
     oldglyph = gg.gbuf[y][x].glyphinfo.glyph;
 
     if (a11y.glyph_updates && !a11y.mon_notices_blocked
+        && !gp.program_state.in_docrt
         && (oldglyph != glyph || gg.gbuf[y][x].gnew)) {
         int c = glyph_to_cmap(glyph);
         if ((glyph_is_nothing(oldglyph) || glyph_is_unexplored(oldglyph)
@@ -1987,10 +1988,13 @@ show_glyph(coordxy x, coordxy y, int glyph)
         coord cc;
         int sym = 0;
         const char *firstmatch = 0;
+        boolean tmp_accessiblemsg = a11y.accessiblemsg;
 
+        a11y.accessiblemsg = TRUE;
         cc.x = x, cc.y = y;
         do_screen_description(cc, TRUE, sym, buf, &firstmatch, NULL);
         pline_xy(x, y, "%s.", firstmatch);
+        a11y.accessiblemsg = tmp_accessiblemsg;
     }
 }
 
