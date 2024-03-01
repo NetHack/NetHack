@@ -346,7 +346,7 @@ crashreport_init(int argc UNUSED, char *argv[] UNUSED){
         /* Just in case, make sure not to overflow the bid buffer. */
     char cnt=min(HASH_RESULT_SIZE(ctxp), (sizeof(bid)-1));
     while (cnt--) {
-        p += snprintf(p, HASH_RESULT_SIZE(ctxp) - (p - bid), "%02x", *(in++));
+        p += snprintf(p, HASH_RESULT_SIZE(ctxp) * 2 - (p - bid), "%02x", *(in++));
     }
     *p = '\0';
     return;
