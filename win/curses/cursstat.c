@@ -429,7 +429,6 @@ draw_horizontal(boolean border)
                 spacing[fld] = (cap_and_hunger == 0);
                 break;
             case BL_VERS:
-                 spacing[fld] = 1;
             case BL_STR:
             case BL_HP:
             case BL_ENE:
