@@ -32,6 +32,11 @@
 static const unsigned char *body(struct nhmd4_context *,
                                  const unsigned char *, size_t);
 
+/* Avoid a conflict from a Lua header */
+#ifdef G
+#undef G
+#endif
+
 /*
  * The basic MD4 functions.
  */
