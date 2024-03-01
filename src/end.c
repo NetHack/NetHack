@@ -348,7 +348,6 @@ crashreport_init(int argc UNUSED, char *argv[] UNUSED){
     while (cnt--) {
         p += snprintf(p, HASH_RESULT_SIZE(ctxp) * 2 - (p - bid), "%02x", *(in++));
     }
-    *p = '\0';
     return;
 skip:
     strncpy((char *)bid,"unknown",sizeof(bid)-1);
