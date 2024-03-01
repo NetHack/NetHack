@@ -29,7 +29,7 @@
 
 #include "nhmd4.h"
 
-static const unsigned char *body(struct nhmd4_context *,
+static const unsigned char *nhmd4_body(struct nhmd4_context *,
                                  const unsigned char *, size_t);
 
 /* Avoid a conflict from a Lua header */
@@ -80,7 +80,7 @@ static const unsigned char *body(struct nhmd4_context *,
  * the bit counters.  There're no alignment requirements.
  */
 static const unsigned char *
-body(
+nhmd4_body(
     struct nhmd4_context *ctx,
     const unsigned char *data,
     size_t size)
@@ -220,11 +220,11 @@ nhmd4_update(
         memcpy(&ctx->buffer[used], data, free);
         data = (const unsigned char *) data + free;
         size -= free;
-        body(ctx, ctx->buffer, 64);
+        nhmd4_body(ctx, ctx->buffer, 64);
     }
 
     if (size >= 64) {
-        data = body(ctx, data, size & ~0x3fUL);
+        data = nhmd4_body(ctx, data, size & ~0x3fUL);
         size &= 0x3fUL;
     }
 
@@ -247,7 +247,7 @@ nhmd4_final(
 
     if (free < 8) {
         memset(&ctx->buffer[used], 0, free);
-        body(ctx, ctx->buffer, 64);
+        nhmd4_body(ctx, ctx->buffer, 64);
         used = 0;
         free = 64;
     }
@@ -264,7 +264,7 @@ nhmd4_final(
     ctx->buffer[62] = ctx->hi >> 16;
     ctx->buffer[63] = ctx->hi >> 24;
 
-    body(ctx, ctx->buffer, 64);
+    nhmd4_body(ctx, ctx->buffer, 64);
 
     result[0] = ctx->a;
     result[1] = ctx->a >> 8;
