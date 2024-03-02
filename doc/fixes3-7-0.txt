@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1380 $ $NHDT-Date: 1708290308 2024/02/18 21:05:08 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1393 $ $NHDT-Date: 1709388534 2024/03/02 14:08:54 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1881,6 +1881,9 @@ map didn't show adjacent monsters if they were inside a gas region unless
 	were described as if visible in messages (combat, for instance)
 OPTIONS=symset:blank and symset:plain didn't load the specified symbols if
 	used from the RC file or NETHACKOPTIONS
+for OPTIONS=symset:blank, S_engroom (engraving on a room floor spot) and
+	S_engrcorr (engraving on a corridor spot) retained their default
+	symbols ('`' and '#', respectively) instead of switching to space
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

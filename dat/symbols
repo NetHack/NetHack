@@ -1,4 +1,4 @@
-# NetHack 3.7  symbols       $NHDT-Date: 1596498253 2020/08/03 23:44:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $
+# NetHack 3.7  symbols       $NHDT-Date: 1709388512 2024/03/02 14:08:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $
 # Copyright (c) 2006 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -33,6 +33,10 @@
 # NetHack ttychar symbol as usual. That is true even when the UTF-8
 # handler is in effect.
 #
+# \xnn specifies a hexadecimal value for nn.
+# \0nn specifies a decimal value for nn, not octal as leading 0 indicates
+# in C and programming languages influenced by it.
+
 # plain looks decent for room+corridor levels where there aren't a lot
 # of wall corners and ones present tend to be spread out, but it looks
 # awful for wallified mazes
@@ -91,6 +95,8 @@ start: Blank
         S_dragon: \032
         S_eel: \032
         S_elemental: \032
+        S_engroom: \032
+        S_engrcorr: \032
         S_expl_tl: \032
         S_expl_tc: \032
         S_expl_tr: \032
