@@ -5698,7 +5698,9 @@ maybe_destroy_item(
     }
 
     if (chargeit) {
-        recharge(obj, 0);
+        /* FIXME: recharge only handles items in hero's inventory */
+        if (u_carry)
+            recharge(obj, 0);
     } else if (!skip) {
         char osym = obj->oclass; /* for checking glob of slime after it's
                                        destroyed */
