@@ -1879,6 +1879,8 @@ Warning didn't show nearby monsters who were inside poison gas/steam/smoke
 map didn't show adjacent monsters if they were inside a gas region unless
 	they were seen via telepathy or extended monster detection, but they
 	were described as if visible in messages (combat, for instance)
+OPTIONS=symset:blank and symset:plain didn't load the specified symbols if
+	used from the RC file or NETHACKOPTIONS
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

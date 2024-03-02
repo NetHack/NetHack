@@ -4058,9 +4058,9 @@ optfn_symset(
                         load_symset("default", PRIMARYSET);
                     }
 #endif
-                    switch_symbols(gs.symset[PRIMARYSET].name != (char *) 0);
-                    go.opt_need_redraw = go.opt_need_glyph_reset = TRUE;
                 }
+                switch_symbols(gs.symset[PRIMARYSET].name != (char *) 0);
+                go.opt_need_redraw = go.opt_need_glyph_reset = TRUE;
             }
         } else
             return optn_err;
