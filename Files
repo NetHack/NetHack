@@ -59,8 +59,8 @@ oracles.txt   orcus.lua     quest.lua     rumors.fal    rumors.tru
 sanctum.lua   soko1-1.lua   soko1-2.lua   soko2-1.lua   soko2-2.lua
 soko3-1.lua   soko3-2.lua   soko4-1.lua   soko4-2.lua   symbols
 themerms.lua  tower1.lua    tower2.lua    tower3.lua    tribute
-usagehlp      valley.lua    water.lua     wizard1.lua   wizard2.lua
-wizard3.lua   wizhelp
+tut-1.lua     tut-2.lua     usagehlp      valley.lua    water.lua
+wizard1.lua   wizard2.lua   wizard3.lua   wizhelp
 
 doc:
 (files for all versions)
@@ -93,14 +93,14 @@ dlb.h         dungeon.h     engrave.h     extern.h      flag.h
 fnamesiz.h    func_tab.h    global.h      hack.h        integer.h
 isaac64.h     lint.h        mail.h        mextra.h      mfndpos.h
 micro.h       mkroom.h      monattk.h     mondata.h     monflag.h
-monst.h       monsters.h    obj.h         objclass.h    objects.h
-optlist.h     patchlevel.h  pcconf.h      permonst.h    prop.h
-quest.h       rect.h        region.h      rm.h          seffects.h
-skills.h      sndprocs.h    sp_lev.h      spell.h       sym.h
-sys.h         tcap.h        tileset.h     timeout.h     tradstdc.h
-trap.h        unixconf.h    vision.h      vmsconf.h     warnings.h
-winami.h      wincurs.h     windconf.h    winprocs.h    wintype.h
-you.h         youprop.h
+monst.h       monsters.h    nhmd4.h       obj.h         objclass.h
+objects.h     optlist.h     patchlevel.h  pcconf.h      permonst.h
+prop.h        quest.h       rect.h        region.h      rm.h
+seffects.h    skills.h      sndprocs.h    sp_lev.h      spell.h
+sym.h         sys.h         tcap.h        tileset.h     timeout.h
+tradstdc.h    trap.h        unixconf.h    vision.h      vmsconf.h
+warnings.h    winami.h      wincurs.h     windconf.h    winprocs.h
+wintype.h     you.h         youprop.h
 
 (file for tty versions)
 wintty.h
@@ -290,29 +290,29 @@ windsound.c
 src:
 (files for all versions)
 allmain.c   alloc.c     apply.c     artifact.c  attrib.c    ball.c
-bones.c     botl.c      cmd.c       date.c      dbridge.c   decl.c
-detect.c    dig.c       display.c   dlb.c       do.c        do_name.c
-do_wear.c   dog.c       dogmove.c   dokick.c    dothrow.c   drawing.c
-dungeon.c   eat.c       end.c       engrave.c   exper.c     explode.c
-extralev.c  files.c     fountain.c  hack.c      hacklib.c   insight.c
-invent.c    isaac64.c   light.c     lock.c      mail.c      makemon.c
-mcastu.c    mdlib.c     mhitm.c     mhitu.c     minion.c    mklev.c
-mkmap.c     mkmaze.c    mkobj.c     mkroom.c    mon.c       mondata.c
-monmove.c   monst.c     mplayer.c   mthrowu.c   muse.c      music.c
-nhlobj.c    nhlsel.c    nhlua.c     o_init.c    objects.c   objnam.c
-options.c   pager.c     pickup.c    pline.c     polyself.c  potion.c
-pray.c      priest.c    quest.c     questpgr.c  read.c      rect.c
-region.c    restore.c   rip.c       rnd.c       role.c      rumors.c
-save.c      sfstruct.c  shk.c       shknam.c    sit.c       sounds.c
-sp_lev.c    spell.c     steal.c     steed.c     symbols.c   sys.c
-teleport.c  timeout.c   topten.c    track.c     trap.c      u_init.c
-uhitm.c     utf8map.c   vault.c     version.c   vision.c    weapon.c
-were.c      wield.c     windows.c   wizard.c    worm.c      worn.c
-write.c     zap.c
+bones.c     botl.c      cmd.c       coloratt.c  date.c      dbridge.c
+decl.c      detect.c    dig.c       display.c   dlb.c       do.c
+do_name.c   do_wear.c   dog.c       dogmove.c   dokick.c    dothrow.c
+drawing.c   dungeon.c   eat.c       end.c       engrave.c   exper.c
+explode.c   extralev.c  files.c     fountain.c  hack.c      hacklib.c
+insight.c   invent.c    isaac64.c   light.c     lock.c      mail.c
+makemon.c   mcastu.c    mdlib.c     mhitm.c     mhitu.c     minion.c
+mklev.c     mkmap.c     mkmaze.c    mkobj.c     mkroom.c    mon.c
+mondata.c   monmove.c   monst.c     mplayer.c   mthrowu.c   muse.c
+music.c     nhlobj.c    nhlsel.c    nhlua.c     nhmd4.c     o_init.c
+objects.c   objnam.c    options.c   pager.c     pickup.c    pline.c
+polyself.c  potion.c    pray.c      priest.c    quest.c     questpgr.c
+read.c      rect.c      region.c    restore.c   rip.c       rnd.c
+role.c      rumors.c    save.c      sfstruct.c  shk.c       shknam.c
+sit.c       sounds.c    sp_lev.c    spell.c     steal.c     steed.c
+symbols.c   sys.c       teleport.c  timeout.c   topten.c    track.c
+trap.c      u_init.c    uhitm.c     utf8map.c   vault.c     version.c
+vision.c    weapon.c    were.c      wield.c     windows.c   wizard.c
+worm.c      worn.c      write.c     zap.c
 
 submodules:
 (files in top directory)
-lua          pdcurses     pdcursesmod
+CHKSUMS      lua          pdcurses     pdcursesmod
 
 sys/libnh:
 (files in top directory)
