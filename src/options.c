@@ -1235,7 +1235,8 @@ optfn_crash_email(int optidx UNUSED, int req, boolean negated UNUSED, char *opts
     if (req == get_val || req == get_cnf_val) {
         if (!opts)
             return optn_err;
-        Sprintf(opts, "%s", gc.crash_email);
+        if (gc.crash_email)
+            Sprintf(opts, "%s", gc.crash_email);
         return optn_ok;
     }
     return optn_ok;
@@ -1258,7 +1259,8 @@ optfn_crash_name(int optidx UNUSED, int req, boolean negated UNUSED, char *opts,
     if (req == get_val || req == get_cnf_val) {
         if (!opts)
             return optn_err;
-        Sprintf(opts, "%s", gc.crash_name);
+        if (gc.crash_name)
+            Sprintf(opts, "%s", gc.crash_name);
         return optn_ok;
     }
     return optn_ok;
