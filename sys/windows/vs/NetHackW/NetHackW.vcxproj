@@ -87,6 +87,7 @@
     <ClCompile Include="$(SrcDir)ball.c" />
     <ClCompile Include="$(SrcDir)bones.c" />
     <ClCompile Include="$(SrcDir)botl.c" />
+    <ClCompile Include="$(SrcDir)coloratt.c" />
     <ClCompile Include="$(SrcDir)cmd.c" />
     <ClCompile Include="$(SrcDir)date.c" />
     <ClCompile Include="$(SrcDir)dbridge.c" />
