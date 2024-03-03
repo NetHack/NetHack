@@ -281,6 +281,26 @@ extern void all_options_statushilites(strbuf_t *);
 extern boolean status_hilite_menu(void);
 #endif /* STATUS_HILITES */
 
+/* ### coloratt.c ### */
+
+extern char *color_attr_to_str(color_attr *);
+extern boolean color_attr_parse_str(color_attr *, char *);
+extern int32 colortable_to_int32(struct nethack_color *);
+extern int query_color(const char *, int) NO_NNARGS;
+extern int query_attr(const char *, int) NO_NNARGS;
+extern boolean query_color_attr(color_attr *, const char *) NONNULLARG1;
+extern const char *attr2attrname(int);
+extern void basic_menu_colors(boolean);
+extern boolean add_menu_coloring_parsed(const char *, int, int);
+extern const char *clr2colorname(int);
+extern int match_str2clr(char *) NONNULLARG1;
+extern int match_str2attr(const char *, boolean) NONNULLARG1;
+extern boolean add_menu_coloring(char *) NONNULLARG1;
+extern void free_one_menu_coloring(int);
+extern void free_menu_coloring(void);
+extern int count_menucolors(void);
+extern int32 check_enhanced_colors(const char *) NONNULLARG1;
+
 /* ### cmd.c ### */
 
 extern void set_move_cmd(int, int);
@@ -2238,14 +2258,6 @@ extern int add_autopickup_exception(const char *) NONNULLARG1;
 extern void free_autopickup_exceptions(void);
 extern void set_playmode(void);
 extern int sym_val(const char *) NONNULLARG1;
-extern int query_color(const char *, int) NO_NNARGS;
-extern int query_attr(const char *, int) NO_NNARGS;
-extern boolean query_color_attr(color_attr *, const char *) NONNULLARG1;
-extern const char *clr2colorname(int);
-extern int match_str2clr(char *) NONNULLARG1;
-extern int match_str2attr(const char *, boolean) NONNULLARG1;
-extern boolean add_menu_coloring(char *) NONNULLARG1;
-extern void free_menu_coloring(void);
 extern boolean msgtype_parse_add(char *) NONNULLARG1;
 extern int msgtype_type(const char *, boolean) NONNULLARG1;
 extern void hide_unhide_msgtypes(boolean, int);

@@ -493,7 +493,8 @@ HACK_H	= ../src/hack.h-t
 # all .c that are part of the main NetHack program and are not operating- or
 # windowing-system specific. Do not include date.c in this list.
 HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
-	   botl.c cmd.c dbridge.c decl.c detect.c dig.c display.c dlb.c do.c \
+	   botl.c coloratt.c cmd.c dbridge.c decl.c detect.c dig.c display.c \
+	   dlb.c do.c \
 	   do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c drawing.c \
 	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
 	   files.c fountain.c hack.c hacklib.c \
@@ -568,6 +569,7 @@ HOSTOBJ = $(FIRSTOBJ) alloc.o drawing.o
 HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)apply.o $(TARGETPFX)artifact.o $(TARGETPFX)attrib.o \
 	$(TARGETPFX)ball.o $(TARGETPFX)bones.o $(TARGETPFX)botl.o \
+        $(TARGETPFX)coloratt.o \
 	$(TARGETPFX)cmd.o $(TARGETPFX)dbridge.o $(TARGETPFX)decl.o \
 	$(TARGETPFX)detect.o $(TARGETPFX)dig.o $(TARGETPFX)display.o \
 	$(TARGETPFX)dlb.o $(TARGETPFX)do.o $(TARGETPFX)do_name.o \

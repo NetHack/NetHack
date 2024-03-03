@@ -11,7 +11,6 @@
 #endif
 #include "lint.h"
 
-#include "color.h"
 #include "align.h"
 #include "dungeon.h"
 #include "objclass.h"

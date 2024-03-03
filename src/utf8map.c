@@ -51,6 +51,7 @@ static int32_t rgbstr_to_int32(const char *rgbstr);
 boolean closest_color(uint32_t lcolor, uint32_t *closecolor, int *clridx);
 static const long nonzero_black = 0x1000000;
 static int color_distance(uint32_t, uint32_t);
+static boolean onlyhexdigits(const char *buf);
 
 static void
 to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
@@ -142,6 +143,20 @@ glyphrep_to_custom_map_entries(const char *op, int *glyphptr)
     return 0;
 }
 
+static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
+
+static boolean
+onlyhexdigits(const char *buf)
+{
+    const char *dp = buf;
+
+    for (dp = buf; *dp; ++dp) {
+        if (!(strchr(hex, *dp) || *dp == '-'))
+            return FALSE;
+    }
+    return TRUE;
+}
+
 static int32_t
 rgbstr_to_int32(const char *rgbstr)
 {
@@ -151,41 +166,51 @@ rgbstr_to_int32(const char *rgbstr)
     char buf[BUFSZ];
     boolean dash = FALSE;
 
-    r = g = b = 0;
-    c_g = c_b = (char *) 0;
-    Snprintf(buf, sizeof buf, "%s", rgbstr);
-    c_r = cp = buf;
-    while (*cp) {
-        if (digit(*cp) || *cp == '-') {
-            if (*cp == '-') {
-                *cp = '\0';
-                milestone++;
-                dash = TRUE;
+
+    Snprintf(buf, sizeof buf, "%s",
+             rgbstr ? rgbstr : "");
+
+    if (*buf && onlyhexdigits(buf)) {
+        r = g = b = 0;
+        c_g = c_b = (char *) 0;
+        c_r = cp = buf;
+        while (*cp) {
+            if (digit(*cp) || *cp == '-') {
+                if (*cp == '-') {
+                    *cp = '\0';
+                    milestone++;
+                    dash = TRUE;
+                }
+                cp++;
+                if (dash) {
+                    if (milestone < 2)
+                        c_g = cp;
+                    else
+                        c_b = cp;
+                    dash = FALSE;
+                }
+            } else {
+                return -1L;
             }
-            cp++;
-            if (dash) {
-                if (milestone < 2)
-                    c_g = cp;
-                else
-                    c_b = cp;
-                dash = FALSE;
-            }
-        } else {
-            return -1L;
+        }
+        /* sanity checks */
+        if (c_r && c_g && c_b
+            && (strlen(c_r) > 0 && strlen(c_r) < 4)
+            && (strlen(c_g) > 0 && strlen(c_g) < 4)
+            && (strlen(c_b) > 0 && strlen(c_b) < 4)) {
+            r = atoi(c_r);
+            g = atoi(c_g);
+            b = atoi(c_b);
+            rgb = (r << 16) | (g << 8) | (b << 0);
+            return rgb;
+        }
+    } else if (*buf) {
+        /* perhaps an enhanced color name was used instead of rgb value? */
+        if ((rgb = check_enhanced_colors(buf)) != -1) {
+            return rgb;
         }
     }
-    /* sanity checks */
-    if (c_r && c_g && c_b
-        && (strlen(c_r) > 0 && strlen(c_r) < 4)
-        && (strlen(c_g) > 0 && strlen(c_g) < 4)
-        && (strlen(c_b) > 0 && strlen(c_b) < 4)) {
-        r = atoi(c_r);
-        g = atoi(c_g);
-        b = atoi(c_b);
-        rgb = (r << 16) | (g << 8) | (b << 0);
-        return rgb;
-    }
-    return -1L;
+    return -1;
 }
 
 static char *
@@ -209,7 +234,6 @@ unicode_val(const char *cp)
 {
     const char *dp;
     int cval = 0, dcount;
-    static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
 
     if (cp && *cp) {
         cval = dcount = 0;

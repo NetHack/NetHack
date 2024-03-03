@@ -445,9 +445,7 @@ extern struct nomakedefs_s nomakedefs;
 #define MAX_MSG_HISTORY 128 /* max # of lines in msg_history */
 #endif
 
-typedef struct color_and_attr {
-           int color, attr;
-} color_attr;
+#include "color.h"
 
 /*
  * Version 3.7.x has aspirations of portable file formats. We
