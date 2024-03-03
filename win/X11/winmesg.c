@@ -92,8 +92,8 @@ create_message_window(struct xwindow *wp, /* window pointer */
 
     if (iflags.msg_history < (unsigned) appResources.message_lines)
         iflags.msg_history = (unsigned) appResources.message_lines;
-    if (iflags.msg_history > MAX_HISTORY) /* a sanity check */
-        iflags.msg_history = MAX_HISTORY;
+    if (iflags.msg_history > MAX_MSG_HISTORY) /* a sanity check */
+        iflags.msg_history = MAX_MSG_HISTORY;
 
     set_circle_buf(mesg_info, (int) iflags.msg_history);
 

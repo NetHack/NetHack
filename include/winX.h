@@ -267,7 +267,6 @@ struct xwindow {
                           /* event into a character(s)             */
 
 #define DEFAULT_LINES_DISPLAYED 12 /* # of lines displayed message window */
-#define MAX_HISTORY 60             /* max history saved on message window */
 
 /* flags for X11_yn_function_core() */
 #define YN_NORMAL     0U /* no flags */

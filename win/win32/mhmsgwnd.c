@@ -10,8 +10,7 @@
 #define MSG_WRAP_TEXT
 
 #define MSG_VISIBLE_LINES max(iflags.wc_vary_msgcount, 1)
-#define MAX_MSG_LINES 128
-#define MSG_LINES (int) min(iflags.msg_history, MAX_MSG_LINES)
+#define MSG_LINES (int) min(iflags.msg_history, MAX_MSG_HISTORY)
 #define MAXWINDOWTEXT TBUFSZ
 
 #define DEFAULT_COLOR_BG_MSG COLOR_WINDOW
@@ -26,7 +25,7 @@ struct window_line {
 
 typedef struct mswin_nethack_message_window {
     size_t max_text;
-    struct window_line window_text[MAX_MSG_LINES];
+    struct window_line window_text[MAX_MSG_HISTORY];
     int lines_last_turn; /* lines added during the last turn */
     int lines_not_seen;  /* lines not yet seen by user after last turn or
                             --More-- */

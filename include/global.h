@@ -441,6 +441,10 @@ extern struct nomakedefs_s nomakedefs;
 #define MAXMONNO 120 /* extinct monst after this number created */
 #define MHPMAX 500   /* maximum monster hp */
 
+#ifndef MAX_MSG_HISTORY
+#define MAX_MSG_HISTORY 128 /* max # of lines in msg_history */
+#endif
+
 typedef struct color_and_attr {
            int color, attr;
 } color_attr;

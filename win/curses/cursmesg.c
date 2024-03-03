@@ -453,8 +453,8 @@ curses_init_mesg_history(void)
         max_messages = 1;
     }
 
-    if (max_messages > MESG_HISTORY_MAX) {
-        max_messages = MESG_HISTORY_MAX;
+    if (max_messages > MAX_MSG_HISTORY) {
+        max_messages = MAX_MSG_HISTORY;
     }
 }
 

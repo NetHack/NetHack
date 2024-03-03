@@ -886,8 +886,8 @@ tty_create_nhwindow(int type)
         /* sanity check */
         if (iflags.msg_history < 20)
             iflags.msg_history = 20;
-        else if (iflags.msg_history > 60)
-            iflags.msg_history = 60;
+        else if (iflags.msg_history > MAX_MSG_HISTORY)
+            iflags.msg_history = MAX_MSG_HISTORY;
         newwin->maxrow = newwin->rows = iflags.msg_history;
         newwin->maxcol = newwin->cols = 0;
         break;
