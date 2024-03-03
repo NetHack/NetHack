@@ -506,10 +506,10 @@ HACKINCL = $(INCL)\align.h $(INCL)\artifact.h $(INCL)\artilist.h \
 # all .c that are part of the main NetHack program and are not operating- or
 # windowing-system specific
 HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
-	   botl.c cmd.c dbridge.c decl.c detect.c dig.c display.c dlb.c do.c \
-	   do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c drawing.c \
-	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
-	   files.c fountain.c hack.c hacklib.c \
+	   botl.c coloratt.c cmd.c dbridge.c decl.c detect.c dig.c display.c \
+	   dlb.c do.c do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c \
+	   drawing.c dungeon.c eat.c end.c engrave.c exper.c explode.c \
+	   extralev.c files.c fountain.c hack.c hacklib.c \
 	   insight.c invent.c isaac64.c light.c \
 	   lock.c mail.c makemon.c mcastu.c mdlib.c mhitm.c \
 	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
@@ -650,7 +650,7 @@ TTYOBJ = $(OTTY)topl.o $(OTTY)getline.o  $(OTTY)wintty.o
 
 VTTYOBJ01 = $(OTTY)allmain.o  $(OTTY)alloc.o    $(OTTY)apply.o    $(OTTY)artifact.o
 VTTYOBJ02 = $(OTTY)attrib.o   $(OTTY)ball.o     $(OTTY)bones.o    $(OTTY)botl.o
-VTTYOBJ03 = $(OTTY)cmd.o      $(OTTY)dbridge.o  $(OTTY)decl.o     $(OTTY)detect.o
+VTTYOBJ03 = $(OTTY)coloratt.o $(OTTY)cmd.o      $(OTTY)dbridge.o  $(OTTY)decl.o     $(OTTY)detect.o
 VTTYOBJ04 = $(OTTY)dig.o      $(OTTY)display.o  $(OTTY)do.o       $(OTTY)do_name.o
 VTTYOBJ05 = $(OTTY)do_wear.o  $(OTTY)dog.o      $(OTTY)dogmove.o  $(OTTY)dokick.o
 VTTYOBJ06 = $(OTTY)dothrow.o  $(OTTY)drawing.o  $(OTTY)dungeon.o  $(OTTY)eat.o
@@ -717,7 +717,7 @@ GUIOBJ	= $(OGUI)mhaskyn.o $(OGUI)mhdlg.o \
 
 VGUIOBJ01 = $(OGUI)allmain.o  $(OGUI)alloc.o    $(OGUI)apply.o    $(OGUI)artifact.o
 VGUIOBJ02 = $(OGUI)attrib.o   $(OGUI)ball.o     $(OGUI)bones.o    $(OGUI)botl.o
-VGUIOBJ03 = $(OGUI)cmd.o      $(OGUI)dbridge.o  $(OGUI)decl.o     $(OGUI)detect.o
+VGUIOBJ03 = $(OGUI)coloratt.o $(OGUI)cmd.o      $(OGUI)dbridge.o  $(OGUI)decl.o     $(OGUI)detect.o
 VGUIOBJ04 = $(OGUI)dig.o      $(OGUI)display.o  $(OGUI)do.o       $(OGUI)do_name.o
 VGUIOBJ05 = $(OGUI)do_wear.o  $(OGUI)dog.o      $(OGUI)dogmove.o  $(OGUI)dokick.o
 VGUIOBJ06 = $(OGUI)dothrow.o  $(OGUI)drawing.o  $(OGUI)dungeon.o  $(OGUI)eat.o
