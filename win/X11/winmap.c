@@ -133,6 +133,12 @@ X11_print_glyph(
         color = glyphinfo->gm.sym.color;
         special = glyphinfo->gm.glyphflags;
         ch = glyph_char(glyphinfo);
+#ifdef ENHANCED_SYMBOLS
+        if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u != NULL
+            && glyphinfo->gm.u->ucolor != 0
+            && (glyphinfo->gm.u->ucolor & NH_BASIC_COLOR) != 0)
+            color = glyphinfo->gm.u->ucolor & ~NH_BASIC_COLOR;
+#endif
 
         if (special != map_info->tile_map.glyphs[y][x].glyphflags) {
             map_info->tile_map.glyphs[y][x].glyphflags = special;
@@ -156,11 +162,12 @@ X11_print_glyph(
         color += colordif;
 #ifdef ENHANCED_SYMBOLS
         if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u != NULL
-            && glyphinfo->gm.u->ucolor != 0) {
-            color = glyphinfo->gm.u->ucolor | 0x80000000;
-            if (colordif != 0) {
-                color |= 0x40000000;
-            }
+            && glyphinfo->gm.u->ucolor != 0
+            && (glyphinfo->gm.u->ucolor & NH_BASIC_COLOR) == 0) {
+                color = glyphinfo->gm.u->ucolor | 0x80000000;
+                if (colordif != 0) {
+                    color |= 0x40000000;
+                }
         }
 #endif
         if (*co_ptr != color) {

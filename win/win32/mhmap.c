@@ -978,10 +978,15 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
             && glyphinfo->gm.u->utf8str) {
             ch = glyphinfo->gm.u->utf32ch;
             if (glyphinfo->gm.u->ucolor != 0) {
-                rgbcolor = RGB(
-                        (glyphinfo->gm.u->ucolor >> 16) & 0xFF,
-                        (glyphinfo->gm.u->ucolor >>  8) & 0xFF,
-                        (glyphinfo->gm.u->ucolor >>  0) & 0xFF);
+                if ((glyphinfo->gm.u->ucolor & NH_BASIC_COLOR) == 0) {
+                    rgbcolor = RGB(
+                                 (glyphinfo->gm.u->ucolor >> 16) & 0xFF,
+                                 (glyphinfo->gm.u->ucolor >>  8) & 0xFF,
+                                 (glyphinfo->gm.u->ucolor >>  0) & 0xFF);
+                } else {
+                    color = (int) (glyphinfo->gm.u->ucolor & ~NH_BASIC_COLOR);
+                    rgbcolor = nhcolor_to_RGB(color);
+                }
             }
         }
 #endif

@@ -587,7 +587,12 @@ void NetHackQtMapViewport::PrintGlyph(int x, int y,
         && glyphinfo->gm.u->utf8str) {
         Glyphttychar(x, y) = glyphinfo->gm.u->utf32ch;
         if (glyphinfo->gm.u->ucolor != 0) {
-            Glyphcolor(x, y) = glyphinfo->gm.u->ucolor | 0x80000000;
+            if ((glyphinfo->gm.u->ucolor & NH_BASIC_COLOR) == 0) {
+                Glyphcolor(x, y) = glyphinfo->gm.u->ucolor | 0x80000000;
+            } else {
+                Glyphcolor(x, y) =
+                            (uint32) glyphinfo->gm.u->ucolor & ~NH_BASIC_COLOR;
+            }
         }
     }
 #endif

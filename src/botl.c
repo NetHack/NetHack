@@ -2780,7 +2780,7 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
             else if (a == ATR_NONE)
                 disp_attrib = HL_NONE;
             else {
-                int c = match_str2clr(subfields[i]);
+                int c = match_str2clr(subfields[i], FALSE);
 
                 if (c >= CLR_MAX || coloridx != -1) {
                     config_error_add("bad color '%d %d'", c, coloridx);
@@ -3052,7 +3052,7 @@ parse_condition(char (*s)[QBUFSZ], int sidx)
                 gc.cond_hilites[HL_ATTCLR_BLINK] &= ~conditions_bitmask;
                 gc.cond_hilites[HL_ATTCLR_INVERSE] &= ~conditions_bitmask;
             } else {
-                int k = match_str2clr(subfields[i]);
+                int k = match_str2clr(subfields[i], FALSE);
 
                 if (k >= CLR_MAX) {
                     config_error_add("bad color %d", k);

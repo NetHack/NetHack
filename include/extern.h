@@ -293,13 +293,13 @@ extern const char *attr2attrname(int);
 extern void basic_menu_colors(boolean);
 extern boolean add_menu_coloring_parsed(const char *, int, int);
 extern const char *clr2colorname(int);
-extern int match_str2clr(char *) NONNULLARG1;
+extern int match_str2clr(char *, boolean) NONNULLARG1;
 extern int match_str2attr(const char *, boolean) NONNULLARG1;
 extern boolean add_menu_coloring(char *) NONNULLARG1;
 extern void free_one_menu_coloring(int);
 extern void free_menu_coloring(void);
 extern int count_menucolors(void);
-extern int32 check_enhanced_colors(const char *) NONNULLARG1;
+extern int32 check_enhanced_colors(char *) NONNULLARG1;
 
 /* ### cmd.c ### */
 

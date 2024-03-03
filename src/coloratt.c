@@ -62,22 +62,22 @@ static const struct attr_names attrnames[] = {
 /* { colortyp, tableindex, rgbindx, name, hexval, r, g, b }, */
 
 static struct nethack_color colortable[] = {
-  { nh_color,    0,   0, "black",                   "#000000",   0,   0,   0 },
-  { nh_color,    1,   0, "red",                     "#FF0000", 255,   0,   0 },
-  { nh_color,    2,   0, "green",                   "#228B22",  34, 139,  34 },
-  { nh_color,    3,   0, "brown",                   "#A52A2A", 165,  42,  42 },
-  { nh_color,    4,   0, "blue",                    "#0000FF",   0,   0, 255 },
-  { nh_color,    5,   0, "magenta",                 "#FF00FF", 255,   0, 255 },
-  { nh_color,    6,   0, "cyan",                    "#00FFFF",   0, 255, 255 },
-  { nh_color,    7,   0, "gray",                    "#808080", 128, 128, 128 },
-  { no_color,    8,   0, "nocolor",                 "#000000",   0,   0,   0 },
-  { nh_color,    9,   0, "orange",                  "#FFA500", 255, 165,   0 },
-  { nh_color,   10,   0, "bright-green",            "#008000",   0, 128,   0 },
-  { nh_color,   11,   0, "yellow",                  "#FFFF00", 255, 255,   0 },
-  { nh_color,   12,   0, "bright-blue",             "#ADD8E6", 173, 216, 230 },
-  { nh_color,   13,   0, "bright-magenta",          "#9370DB", 147, 112, 219 },
-  { nh_color,   14,   0, "light-cyan",              "#E0FFFF", 224, 255, 255 },
-  { nh_color,   15,   0, "white",                   "#FFFFFF", 255, 255, 255 },
+  { nh_color,    0,   0, "black",                   "",   0,   0,   0 },
+  { nh_color,    1,   0, "red",                     "", 255,   0,   0 },
+  { nh_color,    2,   0, "green",                   "",  34, 139,  34 },
+  { nh_color,    3,   0, "brown",                   "", 165,  42,  42 },
+  { nh_color,    4,   0, "blue",                    "",   0,   0, 255 },
+  { nh_color,    5,   0, "magenta",                 "", 255,   0, 255 },
+  { nh_color,    6,   0, "cyan",                    "",   0, 255, 255 },
+  { nh_color,    7,   0, "gray",                    "", 128, 128, 128 },
+  { no_color,    8,   0, "nocolor",                 "",   0,   0,   0 },
+  { nh_color,    9,   0, "orange",                  "", 255, 165,   0 },
+  { nh_color,   10,   0, "bright-green",            "",   0, 128,   0 },
+  { nh_color,   11,   0, "yellow",                  "", 255, 255,   0 },
+  { nh_color,   12,   0, "bright-blue",             "", 173, 216, 230 },
+  { nh_color,   13,   0, "bright-magenta",          "", 147, 112, 219 },
+  { nh_color,   14,   0, "light-cyan",              "", 224, 255, 255 },
+  { nh_color,   15,   0, "white",                   "", 255, 255, 255 },
   { rgb_color,  16,   0, "maroon",                  "#800000", 128,   0,   0 },
   { rgb_color,  17,   1, "dark-red",                "#8B0000", 139,   0,   0 },
   { rgb_color,  18,   2, "brown",                   "#A52A2A", 165,  42,  42 },
@@ -222,7 +222,12 @@ static struct nethack_color colortable[] = {
 int32
 colortable_to_int32(struct nethack_color *cte)
 {
-    int32 clr = (cte->r << 16) | (cte->g << 8) | cte->b;
+    int32 clr = NO_COLOR | NH_BASIC_COLOR;
+
+    if (cte->colortyp == rgb_color)
+        clr = (cte->r << 16) | (cte->g << 8) | cte->b;
+    else if (cte->colortyp == nh_color)
+        clr = cte->tableindex | NH_BASIC_COLOR;
     return clr;
 }
 
@@ -253,13 +258,13 @@ color_attr_parse_str(color_attr *ca, char *str)
 
     if (amp) {
         amp++;
-        c = match_str2clr(buf);
+        c = match_str2clr(buf, FALSE);
         a = match_str2attr(amp, TRUE);
         /* FIXME: match_str2clr & match_str2attr give config_error_add(),
            so this is useless */
         if (c >= CLR_MAX && a == -1) {
             /* try other way around */
-            c = match_str2clr(amp);
+            c = match_str2clr(amp, FALSE);
             a = match_str2attr(buf, TRUE);
         }
         if (c >= CLR_MAX || a == -1)
@@ -268,7 +273,7 @@ color_attr_parse_str(color_attr *ca, char *str)
         /* one param only */
         tmp = match_str2attr(buf, FALSE);
         if (tmp == -1) {
-            tmp = match_str2clr(buf);
+            tmp = match_str2clr(buf, FALSE);
             if (tmp >= CLR_MAX)
                 return FALSE;
             c = tmp;
@@ -327,7 +332,7 @@ clr2colorname(int clr)
 }
 
 int
-match_str2clr(char *str)
+match_str2clr(char *str, boolean suppress_msg)
 {
     int i, c = CLR_MAX;
 
@@ -344,7 +349,8 @@ match_str2clr(char *str)
         c = atoi(str);
 
     if (c < 0 || c >= CLR_MAX) {
-        config_error_add("Unknown color '%.60s'", str);
+        if (!suppress_msg)
+            config_error_add("Unknown color '%.60s'", str);
         c = CLR_MAX; /* "none of the above" */
     }
     return c;
@@ -608,7 +614,7 @@ add_menu_coloring(char *tmpstr) /* never Null but could be empty */
     if ((amp = strchr(tmps, '&')) != 0)
         *amp = '\0';
 
-    c = match_str2clr(tmps);
+    c = match_str2clr(tmps, FALSE);
     if (c >= CLR_MAX)
         return FALSE;
 
@@ -695,15 +701,19 @@ count_menucolors(void)
  * buf is NONNULLARG1
  */
 int32
-check_enhanced_colors(const char *buf)
+check_enhanced_colors(char *buf)
 {
-    int c;
+    int32 retcolor = -1, color;
 
-    for (c = 0; c < SIZE(colortable); ++c) {
-        if (!strcmpi(buf, colortable[c].name))
-            return colortable_to_int32(&colortable[c]);
+    if ((color = match_str2clr(buf, TRUE)) != CLR_MAX)  {
+        retcolor = color | NH_BASIC_COLOR;
+    } else {
+        for (color = 0; color < SIZE(colortable); ++color) {
+            if (!strcmpi(buf, colortable[color].name))
+                retcolor = colortable_to_int32(&colortable[color]);
+        }
     }
-    return -1;
+    return retcolor;
 }
 
 
