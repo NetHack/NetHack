@@ -2145,6 +2145,7 @@ Qt: {maybe just Qt+macOS:} when viewing a text window ('V' to look at 'history'
 	window got pushed underneath the main window so seemed to go away
 Qt: use idPressed signal instead of buttonPressed and mappedString instead
 	of mapped for recent Qt (pr #913 by chasonr)
+Qt: make all NetHack menu and text windows modal
 Qt: support Unicode supplementary characters (pr #1047 by chasonr)
 Qt: qt_tilewidth and qt_tileheight are allocated with alloc() and need to be
 	freed with free(); don't use qt_tilewidth and qt_tileheight after

@@ -220,6 +220,7 @@ NetHackQtMenuWindow::NetHackQtMenuWindow(QWidget *parent) :
             this, SLOT(TableCellClicked(int,int)));
 
     setLayout(grid);
+    setModal(true);
 }
 
 NetHackQtMenuWindow::~NetHackQtMenuWindow()
@@ -1013,6 +1014,7 @@ NetHackQtTextWindow::NetHackQtTextWindow(QWidget *parent) :
     setFocusPolicy(Qt::StrongFocus);
     // needed so that keystrokes get sent to our keyPressEvent()
     lines->setFocusPolicy(Qt::NoFocus);
+    setModal(true);
 }
 
 void NetHackQtTextWindow::doUpdate()
