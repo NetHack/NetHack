@@ -1,4 +1,4 @@
-/* NetHack 3.7	color.c	$NHDT-Date: 1682205020 2023/04/22 23:10:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.18 $ */
+/* NetHack 3.7	coloratt.c	$NHDT-Date: 1709559438 2024/03/04 13:37:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1 $ */
 /* Copyright (c) Pasi Kallinen, 2024 */
 /* NetHack may be freely redistributed.  See license for details. */
 
