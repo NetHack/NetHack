@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1702023265 2023/12/08 08:14:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.285 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1709597568 2024/03/05 00:12:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.305 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -200,21 +200,21 @@ NH_abort(char *why USED_FOR_CRASHREPORT)
 #endif
     {
 #ifndef VMS
-	if (gdb_prio == libc_prio && gdb_prio > 0)
-	    gdb_prio++;
+        if (gdb_prio == libc_prio && gdb_prio > 0)
+            gdb_prio++;
 
-	if (gdb_prio > libc_prio) {
-	    (void) (NH_panictrace_gdb() || (libc_prio && NH_panictrace_libc()));
-	} else {
-	    (void) (NH_panictrace_libc() || (gdb_prio && NH_panictrace_gdb()));
-	}
+        if (gdb_prio > libc_prio) {
+            (void) (NH_panictrace_gdb() || (libc_prio && NH_panictrace_libc()));
+        } else {
+            (void) (NH_panictrace_libc() || (gdb_prio && NH_panictrace_gdb()));
+        }
 
 #else /* VMS */
-	/* overload otherwise unused priority for debug mode: 1 = show
-	   traceback and exit; 2 = show traceback and stay in debugger */
-	/* if (wizard && gdb_prio == 1) gdb_prio = 2; */
-	vms_traceback(gdb_prio);
-	nhUse(libc_prio);
+        /* overload otherwise unused priority for debug mode: 1 = show
+           traceback and exit; 2 = show traceback and stay in debugger */
+        /* if (wizard && gdb_prio == 1) gdb_prio = 2; */
+        vms_traceback(gdb_prio);
+        nhUse(libc_prio);
 
 #endif /* ?VMS */
     }
@@ -241,83 +241,89 @@ NH_abort(char *why USED_FOR_CRASHREPORT)
 #  include <CommonCrypto/CommonDigest.h>
 #  define HASH_CONTEXTPTR(CTXP) \
     unsigned char tmp[CC_MD4_DIGEST_LENGTH]; \
-    CC_MD4_CTX CTXP ## _; \
+    CC_MD4_CTX CTXP ## _;                    \
     CC_MD4_CTX *CTXP = &CTXP ## _
 #  define HASH_INIT(ctxp) !CC_MD4_Init(ctxp)
 #  define HASH_UPDATE(ctx, ptr, len) !CC_MD4_Update(ctx, ptr, len)
 #  define HASH_FINISH(ctxp) !CC_MD4_Final(tmp, ctxp)
 #  define HASH_RESULT_SIZE(ctxp) CC_MD4_DIGEST_LENGTH
-#  define HASH_RESULT(ctx, inp) *inp = (unsigned char *)ctx
+#  define HASH_RESULT(ctx, inp) *inp = (unsigned char *) ctx
 #  define HASH_CLEANUP(ctxp)
 #  define HASH_OFLAGS O_RDONLY
 #  define HASH_BINFILE_DECL char *binfile = argv[0];
 #  ifdef BETA
 #   define HASH_BINFILE \
-      if (!binfile || !*binfile) { \
-                /* If this triggers, investigate CFBundleGetMainBundle */ \
-                /* or CFBundleCopyExecutableURL. */ \
-        raw_print("BETA warning: crashreport_init called without useful info"); \
-        goto skip; \
+    if (!binfile || !*binfile) {                                        \
+        /* If this triggers, investigate CFBundleGetMainBundle */       \
+        /* or CFBundleCopyExecutableURL. */                             \
+        raw_print(                                                      \
+          "BETA warning: crashreport_init called without useful info"); \
+        goto skip;                                                      \
     }
 #  else
 #   define HASH_BINFILE() \
-      if (!binfile || !*binfile) { \
-        goto skip; \
-     }
+    if (!binfile || !*binfile) {                \
+        goto skip;                              \
+    }
 #  endif
 # endif
 # ifdef __linux__
 #  include "nhmd4.h"
 #  define HASH_CONTEXTPTR(CTXP) \
-     unsigned char tmp[NHMD4_DIGEST_LENGTH]; \
-     NHMD4_CTX CTXP ## _; \
-     NHMD4_CTX *CTXP = &CTXP ## _
-#  define HASH_INIT(ctxp) (nhmd4_init(ctxp),0)
-#  define HASH_UPDATE(ctx, ptr, len) (nhmd4_update(ctx, ptr, len),0)
-#  define HASH_FINISH(ctxp) (nhmd4_final(ctxp, tmp),0)
+    unsigned char tmp[NHMD4_DIGEST_LENGTH];     \
+    NHMD4_CTX CTXP ## _;                        \
+    NHMD4_CTX *CTXP = &CTXP ## _
+#  define HASH_INIT(ctxp) (nhmd4_init(ctxp), 0)
+#  define HASH_UPDATE(ctx, ptr, len) (nhmd4_update(ctx, ptr, len), 0)
+#  define HASH_FINISH(ctxp) (nhmd4_final(ctxp, tmp), 0)
 #  define HASH_RESULT_SIZE(ctxp) NHMD4_RESULTLEN
 #  define HASH_RESULT(ctx, inp) *inp = tmp
 #  define HASH_CLEANUP(ctxp)
 #  define HASH_OFLAGS O_RDONLY
 #  define HASH_BINFILE_DECL char binfile[PATH_MAX+1];
 #  define HASH_BINFILE() \
-     int len = readlink("/proc/self/exe", binfile, sizeof(binfile)-1); \
-     if (len>0) { \
-        binfile[len] = '\0'; \
-     } else { \
-        goto skip; \
-     }
+    int len = readlink("/proc/self/exe", binfile, sizeof binfile - 1);  \
+    if (len > 0) {                                                      \
+        binfile[len] = '\0';                                            \
+    } else {                                                            \
+        goto skip;                                                      \
+    }
 # endif // __linux__
 # ifdef WIN32
 /* WIN32 takes too much code and is dependent on OS includes we can't
  * pull in here, so we call out to code in sys/windows/windsys.c */
 #  define HASH_CONTEXTPTR(CTXP)
-#  define HASH_INIT(ctxp) win32_cr_helper('i',ctxp, NULL, 0)
-#  define HASH_UPDATE(ctxp, ptr, len) win32_cr_helper('u',ctxp, ptr, len)
-#  define HASH_FINISH(ctxp) win32_cr_helper('f',ctxp,NULL,0)
-#  define HASH_CLEANUP(ctxp) win32_cr_helper('c',ctxp, NULL, 0)
-#  define HASH_RESULT_SIZE(ctxp) win32_cr_helper('s',ctxp,NULL,0)
-#  define HASH_RESULT(ctxp, inp) win32_cr_helper('r',ctxp,inp,0)
+#  define HASH_INIT(ctxp) win32_cr_helper('i', ctxp, NULL, 0)
+#  define HASH_UPDATE(ctxp, ptr, len) win32_cr_helper('u', ctxp, ptr, len)
+#  define HASH_FINISH(ctxp) win32_cr_helper('f', ctxp, NULL, 0)
+#  define HASH_CLEANUP(ctxp) win32_cr_helper('c', ctxp, NULL, 0)
+#  define HASH_RESULT_SIZE(ctxp) win32_cr_helper('s', ctxp, NULL, 0)
+#  define HASH_RESULT(ctxp, inp) win32_cr_helper('r', ctxp, inp, 0)
 #  define HASH_OFLAGS _O_RDONLY | _O_BINARY
 #  define HASH_BINFILE_DECL char *binfile;
 #  define HASH_BINFILE() \
-     if(win32_cr_helper('b',NULL,&binfile,0)){ \
-        goto skip; \
-     }
+    if (win32_cr_helper('b', NULL, &binfile, 0)) {      \
+        goto skip;                                      \
+    }
 # endif // WIN32
-// Binary ID - Use only as a hint to contact.html for recognizing our own
-// binaries.  This is easily spoofed!
+
+/* Binary ID - Use only as a hint to contact.html for recognizing our own
+   binaries.  This is easily spoofed! */
 static char bid[40];
 
 /* ARGSUSED */
 void
-crashreport_init(int argc UNUSED, char *argv[] UNUSED){
-    static int once=0; if(once++) return;    // NetHackW.exe calls us twice
+crashreport_init(int argc UNUSED, char *argv[] UNUSED)
+{
+    static int once = 0;
+    if (once++) /* NetHackW.exe calls us twice */
+        return;
     HASH_BINFILE_DECL;
     HASH_PRAGMA_START
     HASH_CONTEXTPTR(ctxp);
-    if(HASH_INIT(ctxp)) goto skip;
-    HASH_BINFILE();    // Does "goto skip" on error.
+    if (HASH_INIT(ctxp))
+        goto skip;
+    HASH_BINFILE(); /* Does "goto skip" on error. */
 
     int fd = open(binfile, HASH_OFLAGS, 0);
     if (fd == -1) {
@@ -330,28 +336,39 @@ crashreport_init(int argc UNUSED, char *argv[] UNUSED){
     int segsize;
     unsigned char segment[4096];
 
-    while (0 < (segsize = read(fd, segment,sizeof(segment)))) {
-        if(HASH_UPDATE(ctxp, segment, segsize)) goto skip;
+    while (0 < (segsize = read(fd, segment, sizeof segment))) {
+        if (HASH_UPDATE(ctxp, segment, segsize))
+            goto skip;
     }
-    if(segsize < 0) {
+    if (segsize < 0) {
         close(fd);
         goto skip;
     }
-    if(HASH_FINISH(ctxp)) goto skip;
+    if (HASH_FINISH(ctxp))
+        goto skip;
     close(fd);
 
+    static const char hex[] = "0123456789abcdef";
     char *p = bid;
     unsigned char *in;
-    HASH_RESULT(ctxp,&in);
-        /* Just in case, make sure not to overflow the bid buffer. */
-    char cnt=min(HASH_RESULT_SIZE(ctxp), (sizeof(bid)-1));
-    while (cnt--) {
-        p += snprintf(p, HASH_RESULT_SIZE(ctxp) - (p - bid), "%02x", *(in++));
+    HASH_RESULT(ctxp, &in);
+    uint8 cnt = (uint8) HASH_RESULT_SIZE(ctxp);
+    /* Just in case, make sure not to overflow the bid buffer.
+       Divide size by 2 because each octet in the hash uses two slots
+       in bid[] when formatted as a pair of hexadecimal digits. */
+    if (cnt >= (uint8) sizeof bid / 2)
+        cnt = (uint8) sizeof bid / 2 - 1;
+    while (cnt) {
+        /* sprintf(p, "%02x", *in++), p += 2; */
+        *p++ = hex[(*in >> 4) & 0x0f];
+        *p++ = hex[*in++ & 0x0f];
+        --cnt;
     }
     *p = '\0';
     return;
-skip:
-    strncpy((char *)bid,"unknown",sizeof(bid)-1);
+
+ skip:
+    Strcpy(bid, "unknown");
     HASH_CLEANUP(ctxp);
     HASH_PRAGMA_END
 }
@@ -368,9 +385,10 @@ skip:
 #undef HASH_BINFILE
 
 void
-crashreport_bidshow(void){
+crashreport_bidshow(void)
+{
 #if defined(WIN32) && !defined(WIN32CON)
-    if(0==win32_cr_helper('D', ctxp, bid, 0))
+    if (0 == win32_cr_helper('D', ctxp, bid, 0))
 #endif
     {
         raw_print(bid);
@@ -398,40 +416,42 @@ crashreport_bidshow(void){
 // then we can remove the whole item if desired.  For other
 // semantics, caller can handle mark.
 #define SWR_ADD(str) \
-    utmp = strlen(str); \
-    mark = uend; \
-    if(utmp >= urem) goto full; \
-    strncpy(uend, str, utmp); \
-    uend += utmp; urem -= utmp; \
+    utmp = strlen(str);                         \
+    mark = uend;                                \
+    if (utmp >= urem)                           \
+        goto full;                              \
+    strncpy(uend, str, utmp);                   \
+    uend += utmp; urem -= utmp;                 \
     *uend = '\0';
 
 // NB: on overflow this rolls us back to mark, so if we don't
 //     want to roll back to the last SWR_ADD, update mark before
 //     calling this macro.
 #define SWR_ADD_URIcoded(str) \
-    if(swr_add_uricoded(str, &uend, &urem, mark))goto full;
+    if (swr_add_uricoded(str, &uend, &urem, mark))      \
+        goto full;
 
-// On overflow, truncate to markp (but only if markp != NULL).
+/* On overflow, truncate to markp (but only if markp != NULL). */
 boolean
-swr_add_uricoded(const char *in, char **out, int *remaining, char *markp){
-    while(*in){
-        if(
-            isalnum(*in) ||
-            *in == '_' ||
-            *in == '-' ||
-            *in == '.' ||
-            *in == '~'  // ||
-        ){
+swr_add_uricoded(
+    const char *in,
+    char **out,
+    int *remaining,
+    char *markp)
+{
+    while (*in) {
+        if (isalnum(*in) || strchr("_-.~", *in)) {
             **out = *in;
             (*out)++;
             (*remaining)--;
-        } else if(*in == ' '){
+        } else if (*in == ' ') {
             **out = '+';
             (*out)++;
             (*remaining)--;
         } else {
-            if(*remaining <= 3){
-                if(markp) *out = markp, *remaining = 0;
+            if (*remaining <= 3) {
+                if (markp)
+                    *out = markp, *remaining = 0;
                 **out = '\0';
                 return TRUE;
             }
@@ -440,14 +460,15 @@ swr_add_uricoded(const char *in, char **out, int *remaining, char *markp){
             *remaining -= x;
         }
         in++;
-        if(! *remaining){
-            if(markp) *out = markp, *remaining = 0;
+        if (!*remaining) {
+            if (markp)
+                *out = markp, *remaining = 0;
             **out = '\0';
             return TRUE;
         }
         **out = '\0';
     }
-    return FALSE;   // normal return
+    return FALSE; /* normal return */
 }
 
 static char url[MAX_URL];   // XXX too bad this isn't allocated as needed
@@ -457,37 +478,39 @@ static int utmp;            // used inside macros
 static char *mark;          // holds previous terminator (generally)
 
 boolean
-submit_web_report(int cos, const char *msg, const char *why){
+submit_web_report(int cos, const char *msg, const char *why)
+{
     urem = (gc.crash_urlmax < 0 || gc.crash_urlmax > MAX_URL)
            ? MAX_URL : min(MAX_URL,gc.crash_urlmax);
     char temp[200];
     char temp2[200];
-    int countpp=0;     // pre and post traceback lines
+    int countpp = 0; /* pre and post traceback lines */
 //  URL loaded for creating reports to the NetHack DevTeam
 // CRASHREPORTURL=https://nethack.org/links/cr-37BETA.html
-    if(!sysopt.crashreporturl) return FALSE;
+    if (!sysopt.crashreporturl)
+        return FALSE;
     SWR_ADD(sysopt.crashreporturl);
         /* cos - operation, v - version */
-    snprintf(temp, sizeof(temp), "?cos=%d&v=1",cos);
+    Snprintf(temp, sizeof temp, "?cos=%d&v=1", cos);
     SWR_ADD(temp);
 
-	/* msg==NULL for #bugreport */
-    if(msg){
-	SWR_ADD("&subject=");
-	snprintf(temp, sizeof(temp), "%s report for NetHack %s",
-		msg, version_string(temp2, sizeof(temp2)));
-	SWR_ADD_URIcoded(temp);
+        /* msg==NULL for #bugreport */
+    if (msg) {
+        SWR_ADD("&subject=");
+        Snprintf(temp, sizeof temp, "%s report for NetHack %s",
+                 msg, version_string(temp2, sizeof temp2 ));
+        SWR_ADD_URIcoded(temp);
     }
 
     SWR_ADD("&gitver=");
-    SWR_ADD_URIcoded(getversionstring(temp2, sizeof(temp2)));
+    SWR_ADD_URIcoded(getversionstring(temp2, sizeof temp2));
 
-    if(gc.crash_name){
+    if (gc.crash_name) {
         SWR_ADD("&name=");
         SWR_ADD_URIcoded(gc.crash_name);
     }
 
-    if(gc.crash_email){
+    if(gc.crash_email) {
         SWR_ADD("&email=");
         SWR_ADD_URIcoded(gc.crash_email);
     }
@@ -499,21 +522,21 @@ submit_web_report(int cos, const char *msg, const char *why){
     if (why) {
         SWR_ADD_URIcoded(why);
         SWR_ADD_URIcoded("\n");
-        mark=uend;
+        mark = uend;
         countpp++;
     }
 
     SWR_ADD_URIcoded("bid: ");
     SWR_ADD_URIcoded(bid);
     SWR_ADD_URIcoded("\n");
-    mark=uend;
+    mark = uend;
     countpp++;
 
     int count = 0;
-    if(cos==1){
+    if (cos == 1) {
 #ifdef WIN32
-        count=win32_cr_gettrace(SWR_FRAMES,uend, MAX_URL-(uend-url));
-        uend=eos(url);
+        count = win32_cr_gettrace(SWR_FRAMES, uend, MAX_URL - (uend - url));
+        uend = eos(url);
 #else
         void *bt[SWR_FRAMES];
         int x;
@@ -522,38 +545,39 @@ submit_web_report(int cos, const char *msg, const char *why){
         count = backtrace(bt, SIZE(bt));
         info = backtrace_symbols(bt, count);
         for (x = 0; x < count; x++) {
-            copynchars(temp, info[x], (int) sizeof temp - 1 - 1);   // \n\0
-                /* try to remove up to 16 blank spaces by removing 8 twice */
+            copynchars(temp, info[x], (int) sizeof temp - 1 - 1); /* \n\0 */
+            /* try to remove up to 16 blank spaces by removing 8 twice */
             (void) strsubst(temp, "        ", "");
             (void) strsubst(temp, "        ", "");
-            strncat(temp, "\n", sizeof temp - 1);
+            (void) strncat(temp, "\n", sizeof temp - 1);
 # if 0 // __linux__
 // not needed for MacOS
 // XXX is it actually needed for linux?  TBD
-            snprintf(temp2, sizeof(temp2), "[%02lu]\n", (unsigned long) x);
+            Snprintf(temp2, sizeof temp2, "[%02lu]\n", (unsigned long) x);
             uend--;    // remove the \n we added above
             SWR_ADD_URIcoded(temp2);
 # endif // linux
-        SWR_ADD_URIcoded(temp);
-        mark=uend;
+            SWR_ADD_URIcoded(temp);
+            mark = uend;
         }
 #endif  // !WIN32
     }
 
 #ifdef DUMPLOG_CORE
         // config.h turns this on, but make it easy to turn off if needed
-    if(cos==1) {
+    if (cos == 1) {
         int k;
         SWR_ADD_URIcoded("Latest messages:\n");
         mark=uend;
         countpp++;
-        for(k=0;k<5;k++){
+        for (k = 0; k < 5; k++) {
             const char *line = get_saved_pline(k);
-            if(!line) break;
+            if (!line)
+                break;
             SWR_ADD_URIcoded(line);
             SWR_ADD_URIcoded("\n");
             countpp++;
-            mark=uend;
+            mark = uend;
         }
     }
 #endif
@@ -561,10 +585,11 @@ submit_web_report(int cos, const char *msg, const char *why){
                 // detailrows: Guess since we can't know the
                 //     width of the window.
         SWR_ADD("&detailrows=");
-        (void)snprintf(temp,sizeof(temp),"%d",min(count+countpp,30));
+        Snprintf(temp, sizeof temp, "%d", min(count + countpp, 30));
         SWR_ADD_URIcoded(temp);
 
-full:	;
+ full:
+        ;
 //printf("URL=%ld '%s'\n",strlen(url),url);
 #ifdef WIN32
         int *rv = win32_cr_shellexecute(url);
@@ -583,8 +608,8 @@ printf("ShellExecute returned: %p\n",rv);   // >32 is ok
 #ifdef CRASHREPORT_EXEC_NOSTDERR
                 /* Keep the output clean - firefox spews useless errors on
                  * my system. */
-            (void)close(2);
-            (void)open("/dev/null", O_WRONLY);
+            (void) close(2);
+            (void) open("/dev/null", O_WRONLY);
 #endif
 
             (void) execve(CRASHREPORT, (char * const *) xargv, environ);
@@ -592,7 +617,7 @@ printf("ShellExecute returned: %p\n",rv);   // >32 is ok
             raw_print(err);
         } else {
             int status;
-            errno=0;
+            errno = 0;
             (void) waitpid(pid, &status, 0);
             if (status) {         /* XXX check could be more precise */
 #ifdef BETA
@@ -611,10 +636,11 @@ printf("ShellExecute returned: %p\n",rv);   // >32 is ok
 }
 
 int
-dobugreport(void){
-    if(!submit_web_report(2, NULL, "#bugreport command")){
+dobugreport(void)
+{
+    if (!submit_web_report(2, NULL, "#bugreport command")) {
         pline("Unable to send bug report.  Please visit %s instead.",
-              sysopt.crashreporturl
+              (sysopt.crashreporturl && *sysopt.crashreporturl)
               ? sysopt.crashreporturl
               : "https://www.nethack.org"
         );
@@ -633,7 +659,7 @@ dobugreport(void){
 static boolean
 NH_panictrace_libc(void)
 {
-#if 0	    /* XXX how did this get left here? */
+#if 0       /* XXX how did this get left here? */
 #ifdef CRASHREPORT
     if (submit_web_report("Panic", why))
         return TRUE;
@@ -1197,19 +1223,21 @@ dump_plines(void)
 #endif  /* DUMPLOG */
 
 #ifdef CRASHREPORT
-// lineno==0 gives the most recent message (e.g. "Do you want to call panic..."
-//   if called from #panic)
+/* lineno==0 gives the most recent message (e.g.
+   "Do you want to call panic..." if called from #panic) */
 static const char *
-get_saved_pline(int lineno){
+get_saved_pline(int lineno)
+{
     int p;
     int limit = DUMPLOG_MSG_COUNT;
-    if(lineno >= DUMPLOG_MSG_COUNT) return NULL;
-    p = (gs.saved_pline_index-1) % DUMPLOG_MSG_COUNT;
+    if (lineno >= DUMPLOG_MSG_COUNT)
+        return NULL;
+    p = (gs.saved_pline_index - 1) % DUMPLOG_MSG_COUNT;
 
-    while(limit--){
-        if(gs.saved_plines[p]){ // valid line
-            if(lineno--){
-                p = (p-1+DUMPLOG_MSG_COUNT) % DUMPLOG_MSG_COUNT;
+    while (limit--) {
+        if (gs.saved_plines[p]) { /* valid line */
+            if (lineno--) {
+                p = (p - 1 + DUMPLOG_MSG_COUNT) % DUMPLOG_MSG_COUNT;
             } else {
                 return gs.saved_plines[p];
             }
