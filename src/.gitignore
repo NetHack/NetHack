@@ -30,3 +30,4 @@ objpdc/*
 bundle/*
 Makefile.mingw32
 Makefile.mingw32.depend
+.*.c

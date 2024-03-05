@@ -43,6 +43,11 @@ endif
 GAMEUID  = $(USER)
 GAMEGRP  = games
 
+# This gives better backtraces by making all core functions global; this
+# works around a limitation in glibc's backtrace(3) function.
+# Recommended with CRASHREPORT.
+#NOSTATICCORE = 1
+
 #-----------------------------------------------------------------------------
 # You shouldn't need to change anything below here (in the hints file; if
 # you're reading this in Makefile augmented by hints, that may not be true).
