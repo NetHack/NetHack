@@ -520,6 +520,10 @@ sys/windows/vs/dlb:
 (files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 afterdlb.proj  dlb.vcxproj
 
+sys/windows/vs/hacklib:
+(file for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+hacklib.vcxproj
+
 sys/windows/vs/makedefs:
 (files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 aftermakedefs.proj  makedefs.vcxproj
