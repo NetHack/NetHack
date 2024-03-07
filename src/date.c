@@ -3,20 +3,21 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"
+#include "hacklib.h"
+#ifdef Snprintf
+#undef Snprintf
+#endif
+#define Snprintf(str, size, ...) \
+    nh_snprintf(__func__, __LINE__, str, size, __VA_ARGS__)
 
 /* these are in extern.h but we don't include hack.h */
 void populate_nomakedefs(struct version_info *) NONNULLARG1;
 void free_nomakedefs(void);
 
-#define Snprintf(str, size, ...) \
-    nh_snprintf(__func__, __LINE__, str, size, __VA_ARGS__)
-extern void nh_snprintf(const char *func, int line, char *str, size_t size,
-                        const char *fmt, ...);
 extern unsigned long md_ignored_features(void);
 extern char *mdlib_version_string(char *, const char *);
 extern char *version_id_string(char *, size_t, const char *);
 extern char *bannerc_string(char *, size_t, const char *);
-extern int case_insensitive_comp(const char *, const char *);
 
 /* nomakedefs_populated: flag for whether 'nomakedefs' should be freed */
 static int nomakedefs_populated = 0;

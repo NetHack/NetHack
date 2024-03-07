@@ -420,10 +420,10 @@ $ c_list = "decl,version,[-.sys.vms]vmsunix" -
 $ gosub compile_list
 $ c_list = interface !ttysrc or cursessrc or both
 $ gosub compile_list
-$ c_list = "allmain,apply,artifact,attrib,ball,bones,botl,cmd,dbridge" -
-	+ ",dothrow,drawing,detect,dig,display,do,do_name,do_wear,dog" -
-	+ ",dogmove,dokick,dungeon,eat,end,engrave,exper,explode" -
-	+ ",extralev,files,fountain"
+$ c_list = "allmain,apply,artifact,attrib,ball,bones,botl,calendar,cmd" -
+	+ ",coloratt,dbridge,dothrow,drawing,detect,dig,display,do,do_name" -
+	+ ",do_wear,dog,dogmove,dokick,dungeon,eat,end,engrave,exper,explode" -
+	+ ",extralev,files,fountain,getpos"
 $ gosub compile_list
 $ c_list = "hack,hacklib,insight,invent,light,lock,mail,makemon" -
 	+ ",mcastu,mdlib,mhitm,mhitu,minion,mklev,mkmap,mkmaze" -
@@ -437,12 +437,13 @@ $ c_list = "nhlua,nhlobj,nhlsel"
 $ gosub compile_list
 $ c_list = "o_init,objnam,options,pager,pickup" -
 	+ ",pline,polyself,potion,pray,priest,quest,questpgr,read" -
-	+ ",rect,region,restore,rip,rnd,role,rumors,save,sfstruct,shk" -
-	+ ",shknam,sit,sounds,sp_lev,spell,steal,steed,symbols" -
-	+ ",sys,teleport,timeout,topten,track,trap,utf8map,u_init"
+	+ ",rect,region,report,restore,rip,rnd,role,rumors,save,selvar" -
+	+ ",sfstruct,shk,shknam,sit,sounds,sp_lev,spell,stairs,steal" -
+	+ ",steed,strutil,symbols,sys,teleport,timeout,topten,track" -
+	+ ",trap,u_init,utf8map"
 $ gosub compile_list
 $ c_list = "uhitm,vault,vision,weapon,were,wield,windows" -
-	+ ",wizard,worm,worn,write,zap"
+	+ ",wizard,wizcmds,worm,worn,write,zap"
 $ gosub compile_list
 $!
 $link:

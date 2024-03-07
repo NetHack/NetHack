@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "extern.h"
 
 /* #define DEBUG */ /* uncomment for debugging */
 
@@ -4184,4 +4185,31 @@ spot_checks(coordxy x, coordxy y, schar old_typ)
         break;
     }
 }
+
+/* calculate x/y, rounding as appropriate */
+int
+rounddiv(long x, int y)
+{
+    int r, m;
+    int divsgn = 1;
+
+    if (y == 0)
+        panic("division by zero in rounddiv");
+    else if (y < 0) {
+        divsgn = -divsgn;
+        y = -y;
+    }
+    if (x < 0) {
+        divsgn = -divsgn;
+        x = -x;
+    }
+    r = (int) (x / y);
+    m = x % y;
+    if (2 * m >= y)
+        r++;
+
+    return divsgn * r;
+}
+
+
 /*hack.c*/

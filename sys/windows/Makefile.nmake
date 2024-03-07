@@ -495,8 +495,8 @@ HACKINCL = $(INCL)\align.h $(INCL)\artifact.h $(INCL)\artilist.h \
 	$(INCL)\monsters.h $(INCL)\obj.h $(INCL)\objects.h $(INCL)\objclass.h \
 	$(INCL)\optlist.h $(INCL)\patchlevel.h $(INCL)\pcconf.h \
 	$(INCL)\permonst.h $(INCL)\prop.h $(INCL)\rect.h $(INCL)\region.h \
-	$(INCL)\sym.h $(INCL)\defsym.h $(INCL)\rm.h $(INCL)\sp_lev.h \
-	$(INCL)\spell.h $(INCL)\sys.h $(INCL)\cstd.h $(INCL)\tcap.h \
+	$(INCL)\sym.h $(INCL)\defsym.h $(INCL)\rm.h $(INCL)\selvar.h $(INCL)\sp_lev.h \
+	$(INCL)\spell.h $(INCL)\stairs.h $(INCL)\sys.h $(INCL)\cstd.h $(INCL)\tcap.h \
 	$(INCL)\timeout.h $(INCL)\tradstdc.h $(INCL)\trap.h \
 	$(INCL)\unixconf.h $(INCL)\vision.h $(INCL)\vmsconf.h \
 	$(INCL)\wintty.h $(INCL)\wincurs.h $(INCL)\winX.h \
@@ -506,10 +506,10 @@ HACKINCL = $(INCL)\align.h $(INCL)\artifact.h $(INCL)\artilist.h \
 # all .c that are part of the main NetHack program and are not operating- or
 # windowing-system specific
 HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
-	   botl.c coloratt.c cmd.c dbridge.c decl.c detect.c dig.c display.c \
+	   botl.c calendar.c cmd.c coloratt.c dbridge.c decl.c detect.c dig.c display.c \
 	   dlb.c do.c do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c \
 	   drawing.c dungeon.c eat.c end.c engrave.c exper.c explode.c \
-	   extralev.c files.c fountain.c hack.c hacklib.c \
+	   files.c fountain.c hack.c \
 	   insight.c invent.c isaac64.c light.c \
 	   lock.c mail.c makemon.c mcastu.c mdlib.c mhitm.c \
 	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
@@ -630,6 +630,14 @@ CURSESDEF2=-DCURSES_UNICODE $(PDCURSESFLAGS)
 !UNDEF PDCWINGUILIB
 !ENDIF
 
+OUTLHACKLIBOBJS = $(OUTL)hacklib.o
+OTTYHACKLIBOBJS = $(OTTY)hacklib.o
+OGUIHACKLIBOBJS = $(OGUI)hacklib.o
+OUTLHACKLIB = $(OUTL)hacklib-$(TARGET_CPU)-static.lib
+OTTYHACKLIB = $(OTTY)hacklib-$(TARGET_CPU)-static.lib
+OGUIHACKLIB = $(OGUI)hacklib-$(TARGET_CPU)-static.lib
+
+
 #
 # - TTY
 #
@@ -650,32 +658,33 @@ TTYOBJ = $(OTTY)topl.o $(OTTY)getline.o  $(OTTY)wintty.o
 
 VTTYOBJ01 = $(OTTY)allmain.o  $(OTTY)alloc.o    $(OTTY)apply.o    $(OTTY)artifact.o
 VTTYOBJ02 = $(OTTY)attrib.o   $(OTTY)ball.o     $(OTTY)bones.o    $(OTTY)botl.o
-VTTYOBJ03 = $(OTTY)coloratt.o $(OTTY)cmd.o      $(OTTY)dbridge.o  $(OTTY)decl.o     $(OTTY)detect.o
-VTTYOBJ04 = $(OTTY)dig.o      $(OTTY)display.o  $(OTTY)do.o       $(OTTY)do_name.o
-VTTYOBJ05 = $(OTTY)do_wear.o  $(OTTY)dog.o      $(OTTY)dogmove.o  $(OTTY)dokick.o
+VTTYOBJ03 = $(OTTY)calendar.o $(OTTY)cmd.o      $(OTTY)coloratt.o $(OTTY)dbridge.o
+VTTYOBJ04 = $(OTTY)decl.o     $(OTTY)detect.o   $(OTTY)dig.o      $(OTTY)display.o  $(OTTY)do.o
+VTTYOBJ05 = $(OTTY)do_name.o  $(OTTY)do_wear.o  $(OTTY)dog.o      $(OTTY)dogmove.o  $(OTTY)dokick.o
 VTTYOBJ06 = $(OTTY)dothrow.o  $(OTTY)drawing.o  $(OTTY)dungeon.o  $(OTTY)eat.o
 VTTYOBJ07 = $(OTTY)end.o      $(OTTY)engrave.o  $(OTTY)exper.o    $(OTTY)explode.o
-VTTYOBJ08 = $(OTTY)extralev.o $(OTTY)files.o    $(OTTY)fountain.o $(OTTY)hack.o
-VTTYOBJ09 = $(OTTY)hacklib.o  $(OTTY)insight.o  $(OTTY)invent.o   $(OTTY)isaac64.o
-VTTYOBJ10 = $(OTTY)light.o    $(OTTY)lock.o     $(OTTY)mail.o     $(OTTY)makemon.o
-VTTYOBJ11 = $(OTTY)mcastu.o   $(OTTY)mhitm.o    $(OTTY)mhitu.o    $(OTTY)minion.o
-VTTYOBJ12 = $(OTTY)mklev.o    $(OTTY)mkmap.o    $(OTTY)mkmaze.o   $(OTTY)mkobj.o
-VTTYOBJ13 = $(OTTY)mkroom.o   $(OTTY)mon.o      $(OTTY)mondata.o  $(OTTY)monmove.o
-VTTYOBJ14 = $(OTTY)monst.o    $(OTTY)mplayer.o  $(OTTY)mthrowu.o  $(OTTY)muse.o
-VTTYOBJ15 = $(OTTY)music.o    $(OTTY)o_init.o   $(OTTY)objects.o  $(OTTY)objnam.o
-VTTYOBJ16 = $(OTTY)options.o  $(OTTY)pager.o    $(OTTY)pickup.o   $(OTTY)pline.o
-VTTYOBJ17 = $(OTTY)polyself.o $(OTTY)potion.o   $(OTTY)pray.o     $(OTTY)priest.o
-VTTYOBJ18 = $(OTTY)quest.o    $(OTTY)questpgr.o $(RANDOM)      $(OTTY)read.o
-VTTYOBJ19 = $(OTTY)rect.o     $(OTTY)region.o   $(OTTY)restore.o  $(OTTY)rip.o
-VTTYOBJ20 = $(OTTY)rnd.o      $(OTTY)role.o     $(OTTY)rumors.o   $(OTTY)save.o
-VTTYOBJ21 = $(OTTY)sfstruct.o $(OTTY)shk.o      $(OTTY)shknam.o   $(OTTY)sit.o
-VTTYOBJ22 = $(OTTY)sounds.o   $(OTTY)sp_lev.o   $(OTTY)spell.o    $(OTTY)steal.o
-VTTYOBJ23 = $(OTTY)steed.o    $(OTTY)symbols.o  $(OTTY)sys.o      $(OTTY)teleport.o
-VTTYOBJ24 = $(OTTY)timeout.o  $(OTTY)topten.o   $(OTTY)track.o    $(OTTY)trap.o
-VTTYOBJ25 = $(OTTY)u_init.o   $(OTTY)uhitm.o    $(OTTY)utf8map.o  $(OTTY)vault.o
-VTTYOBJ26 = $(OTTY)vision.o   $(OTTY)weapon.o   $(OTTY)were.o     $(OTTY)wield.o
-VTTYOBJ27 = $(OTTY)windows.o  $(OTTY)wizard.o   $(OTTY)worm.o     $(OTTY)worn.o
-VTTYOBJ28 = $(OTTY)write.o    $(OTTY)zap.o
+VTTYOBJ08 = $(OTTY)extralev.o $(OTTY)files.o    $(OTTY)fountain.o $(OTTY)getpos.o
+VTTYOBJ09 = $(OTTY)hack.o     $(OTTY)insight.o  $(OTTY)invent.o
+VTTYOBJ10 = $(OTTY)isaac64.o  $(OTTY)light.o    $(OTTY)lock.o     $(OTTY)mail.o
+VTTYOBJ11 = $(OTTY)makemon.o  $(OTTY)mcastu.o   $(OTTY)mhitm.o    $(OTTY)mhitu.o
+VTTYOBJ12 = $(OTTY)minion.o   $(OTTY)mklev.o    $(OTTY)mkmap.o    $(OTTY)mkmaze.o
+VTTYOBJ13 = $(OTTY)mkobj.o    $(OTTY)mkroom.o   $(OTTY)mon.o      $(OTTY)mondata.o
+VTTYOBJ14 = $(OTTY)monmove.o  $(OTTY)monst.o    $(OTTY)mplayer.o  $(OTTY)mthrowu.o
+VTTYOBJ15 = $(OTTY)muse.o     $(OTTY)music.o    $(OTTY)o_init.o   $(OTTY)objects.o
+VTTYOBJ16 = $(OTTY)objnam.o   $(OTTY)options.o  $(OTTY)pager.o    $(OTTY)pickup.o
+VTTYOBJ17 = $(OTTY)pline.o    $(OTTY)polyself.o $(OTTY)potion.o   $(OTTY)pray.o
+VTTYOBJ18 = $(OTTY)priest.o   $(OTTY)quest.o    $(OTTY)questpgr.o $(RANDOM)
+VTTYOBJ19 = $(OTTY)read.o     $(OTTY)rect.o     $(OTTY)region.o   $(OTTY)report.o $(OTTY)restore.o
+VTTYOBJ20 = $(OTTY)rip.o      $(OTTY)rnd.o      $(OTTY)role.o     $(OTTY)rumors.o
+VTTYOBJ21 = $(OTTY)save.o     $(OTTY)selvar.o   $(OTTY)sfstruct.o $(OTTY)shk.o
+VTTYOBJ22 = $(OTTY)shknam.o   $(OTTY)sit.o      $(OTTY)sounds.o   $(OTTY)sp_lev.o
+VTTYOBJ23 = $(OTTY)spell.o    $(OTTY)stairs.o   $(OTTY)steal.o    $(OTTY)steed.o
+VTTYOBJ24 = $(OTTY)strutil.o $(OTTY)symbols.o  $(OTTY)sys.o      $(OTTY)teleport.o $(OTTY)timeout.o
+VTTYOBJ25 = $(OTTY)topten.o   $(OTTY)track.o    $(OTTY)trap.o     $(OTTY)u_init.o
+VTTYOBJ26 = $(OTTY)uhitm.o    $(OTTY)utf8map.o  $(OTTY)vault.o    $(OTTY)vision.o
+VTTYOBJ27 = $(OTTY)weapon.o   $(OTTY)were.o     $(OTTY)wield.o    $(OTTY)windows.o
+VTTYOBJ28 = $(OTTY)wizard.o   $(OTTY)wizcmds.o   $(OTTY)worm.o     $(OTTY)worn.o
+VTTYOBJ29 = $(OTTY)write.o    $(OTTY)zap.o
 
 OBJSTTY   = $(MDLIBTTY) \
 	$(VTTYOBJ01) $(VTTYOBJ02) $(VTTYOBJ03) $(VTTYOBJ04) $(VTTYOBJ05) \
@@ -717,32 +726,33 @@ GUIOBJ	= $(OGUI)mhaskyn.o $(OGUI)mhdlg.o \
 
 VGUIOBJ01 = $(OGUI)allmain.o  $(OGUI)alloc.o    $(OGUI)apply.o    $(OGUI)artifact.o
 VGUIOBJ02 = $(OGUI)attrib.o   $(OGUI)ball.o     $(OGUI)bones.o    $(OGUI)botl.o
-VGUIOBJ03 = $(OGUI)coloratt.o $(OGUI)cmd.o      $(OGUI)dbridge.o  $(OGUI)decl.o     $(OGUI)detect.o
-VGUIOBJ04 = $(OGUI)dig.o      $(OGUI)display.o  $(OGUI)do.o       $(OGUI)do_name.o
+VGUIOBJ03 = $(OGUI)calendar.o $(OGUI)cmd.o      $(OGUI)coloratt.o $(OGUI)dbridge.o  $(OGUI)decl.o
+VGUIOBJ04 = $(OGUI)detect.o   $(OGUI)dig.o      $(OGUI)display.o  $(OGUI)do.o       $(OGUI)do_name.o
 VGUIOBJ05 = $(OGUI)do_wear.o  $(OGUI)dog.o      $(OGUI)dogmove.o  $(OGUI)dokick.o
 VGUIOBJ06 = $(OGUI)dothrow.o  $(OGUI)drawing.o  $(OGUI)dungeon.o  $(OGUI)eat.o
 VGUIOBJ07 = $(OGUI)end.o      $(OGUI)engrave.o  $(OGUI)exper.o    $(OGUI)explode.o
-VGUIOBJ08 = $(OGUI)extralev.o $(OGUI)files.o    $(OGUI)fountain.o $(OGUI)hack.o
-VGUIOBJ09 = $(OGUI)hacklib.o  $(OGUI)insight.o  $(OGUI)invent.o   $(OGUI)isaac64.o
-VGUIOBJ10 = $(OGUI)light.o    $(OGUI)lock.o     $(OGUI)mail.o     $(OGUI)makemon.o
-VGUIOBJ11 = $(OGUI)mcastu.o   $(OGUI)mhitm.o    $(OGUI)mhitu.o    $(OGUI)minion.o
-VGUIOBJ12 = $(OGUI)mklev.o    $(OGUI)mkmap.o    $(OGUI)mkmaze.o   $(OGUI)mkobj.o
-VGUIOBJ13 = $(OGUI)mkroom.o   $(OGUI)mon.o      $(OGUI)mondata.o  $(OGUI)monmove.o
-VGUIOBJ14 = $(OGUI)monst.o    $(OGUI)mplayer.o  $(OGUI)mthrowu.o  $(OGUI)muse.o
-VGUIOBJ15 = $(OGUI)music.o    $(OGUI)o_init.o   $(OGUI)objects.o  $(OGUI)objnam.o
-VGUIOBJ16 = $(OGUI)options.o  $(OGUI)pager.o    $(OGUI)pickup.o   $(OGUI)pline.o
-VGUIOBJ17 = $(OGUI)polyself.o $(OGUI)potion.o   $(OGUI)pray.o     $(OGUI)priest.o
-VGUIOBJ18 = $(OGUI)quest.o    $(OGUI)questpgr.o $(RANDOMGUI)      $(OGUI)read.o
-VGUIOBJ19 = $(OGUI)rect.o     $(OGUI)region.o   $(OGUI)restore.o  $(OGUI)rip.o
-VGUIOBJ20 = $(OGUI)rnd.o      $(OGUI)role.o     $(OGUI)rumors.o   $(OGUI)save.o
-VGUIOBJ21 = $(OGUI)sfstruct.o $(OGUI)shk.o      $(OGUI)shknam.o   $(OGUI)sit.o
-VGUIOBJ22 = $(OGUI)sounds.o   $(OGUI)sp_lev.o   $(OGUI)spell.o    $(OGUI)steal.o
-VGUIOBJ23 = $(OGUI)steed.o    $(OGUI)symbols.o  $(OGUI)sys.o      $(OGUI)teleport.o
-VGUIOBJ24 = $(OGUI)timeout.o  $(OGUI)topten.o   $(OGUI)track.o    $(OGUI)trap.o
-VGUIOBJ25 = $(OGUI)u_init.o   $(OGUI)uhitm.o    $(OGUI)utf8map.o  $(OGUI)vault.o
-VGUIOBJ26 = $(OGUI)vision.o   $(OGUI)weapon.o   $(OGUI)were.o     $(OGUI)wield.o
-VGUIOBJ27 = $(OGUI)windows.o  $(OGUI)wizard.o   $(OGUI)worm.o     $(OGUI)worn.o
-VGUIOBJ28 = $(OGUI)write.o    $(OGUI)zap.o
+VGUIOBJ08 = $(OGUI)extralev.o $(OGUI)files.o    $(OGUI)fountain.o $(OGUI)getpos.o
+VGUIOBJ09 = $(OGUI)hack.o     $(OGUI)insight.o  $(OGUI)invent.o
+VGUIOBJ10 = $(OGUI)isaac64.o  $(OGUI)light.o    $(OGUI)lock.o     $(OGUI)mail.o
+VGUIOBJ11 = $(OGUI)makemon.o  $(OGUI)mcastu.o   $(OGUI)mhitm.o    $(OGUI)mhitu.o
+VGUIOBJ12 = $(OGUI)minion.o   $(OGUI)mklev.o    $(OGUI)mkmap.o    $(OGUI)mkmaze.o
+VGUIOBJ13 = $(OGUI)mkobj.o    $(OGUI)mkroom.o   $(OGUI)mon.o      $(OGUI)mondata.o
+VGUIOBJ14 = $(OGUI)monmove.o  $(OGUI)monst.o    $(OGUI)mplayer.o  $(OGUI)mthrowu.o
+VGUIOBJ15 = $(OGUI)muse.o     $(OGUI)music.o    $(OGUI)o_init.o   $(OGUI)objects.o
+VGUIOBJ16 = $(OGUI)objnam.o   $(OGUI)options.o  $(OGUI)pager.o    $(OGUI)pickup.o
+VGUIOBJ17 = $(OGUI)pline.o    $(OGUI)polyself.o $(OGUI)potion.o   $(OGUI)pray.o
+VGUIOBJ18 = $(OGUI)priest.o   $(OGUI)quest.o    $(OGUI)questpgr.o $(RANDOMGUI)
+VGUIOBJ19 = $(OGUI)read.o     $(OGUI)rect.o     $(OGUI)region.o   $(OGUI)report.o $(OGUI)restore.o
+VGUIOBJ20 = $(OGUI)rip.o      $(OGUI)rnd.o      $(OGUI)role.o     $(OGUI)rumors.o
+VGUIOBJ21 = $(OGUI)save.o     $(OGUI)selvar.o   $(OGUI)sfstruct.o $(OGUI)shk.o
+VGUIOBJ22 = $(OGUI)shknam.o   $(OGUI)sit.o      $(OGUI)sounds.o   $(OGUI)sp_lev.o
+VGUIOBJ23 = $(OGUI)spell.o    $(OGUI)stairs.o   $(OGUI)steal.o    $(OGUI)steed.o
+VGUIOBJ24 = $(OGUI)strutil.o $(OGUI)symbols.o  $(OGUI)sys.o      $(OGUI)teleport.o $(OGUI)timeout.o
+VGUIOBJ25 = $(OGUI)topten.o   $(OGUI)track.o    $(OGUI)trap.o     $(OGUI)u_init.o
+VGUIOBJ26 = $(OGUI)uhitm.o    $(OGUI)utf8map.o  $(OGUI)vault.o    $(OGUI)vision.o
+VGUIOBJ27 = $(OGUI)weapon.o   $(OGUI)were.o     $(OGUI)wield.o    $(OGUI)windows.o
+VGUIOBJ28 = $(OGUI)wizard.o   $(OGUI)wizcmds.o   $(OGUI)worm.o     $(OGUI)worn.o
+VGUIOBJ29 = $(OGUI)write.o    $(OGUI)zap.o
 
 OBJSGUI   = $(MDLIBGUI) \
 	$(VGUIOBJ01) $(VGUIOBJ02) $(VGUIOBJ03) $(VGUIOBJ04) $(VGUIOBJ05) \
@@ -1456,11 +1466,11 @@ GAMEOBJ=$(GAMEOBJ:^ =^
 $(GAMEDIR)\NetHack.exe : gamedir.tag $(OTTY)consoletty.o \
 			$(ALLOBJTTY) $(CURSESWINCONOBJS) \
 			$(TTYSOUNDOBJS) $(OTTY)date.o $(OTTY)console.res \
-			$(LUALIB) $(TTYOBJ) $(PDCWINCONLIB) $(PDCWINCONOBJS)
+			$(LUALIB) $(TTYOBJ) $(PDCWINCONLIB) $(PDCWINCONOBJS) $(OTTYHACKLIB)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking $(@:\=/)
 	$(link) $(LFLAGS) $(conlflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB /MAP:$(OTTY)$(@B).MAP \
-		$(LIBS) $(PDCWINCONLIB) $(LUALIB) $(TTYSOUNDLIBS) \
+		$(LIBS) $(PDCWINCONLIB) $(LUALIB) $(TTYSOUNDLIBS) $(OTTYHACKLIB) \
 		$(conlibs) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJTTY)
 		$(ALLOBJTTY)
@@ -1480,12 +1490,12 @@ $(GAMEDIR)\NetHackW.exe : gamedir.tag $(OGUI)tile.o \
 			$(ALLOBJGUI) $(GAMEOBJGUI) $(GUIOBJ) $(GUISOUNDOBJS) \
 			$(CURSESWINGUIOBJS) $(OGUI)date.o \
 			$(OGUI)NetHackW.res \
-			$(LUALIB) $(PDCWINGUILIB) $(PDCWINGUIOBJS)
+			$(LUALIB) $(PDCWINGUILIB) $(PDCWINGUIOBJS) $(OGUIHACKLIB)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo   Linking $(@:\=/)
 	$(link) $(LFLAGS) $(guilflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB \
 		/MAP:$(OGUI)$(@B).MAP $(LIBS) $(PDCWINGUILIB) $(LUALIB) \
-		$(GUISOUNDLIBS) \
+		$(GUISOUNDLIBS) $(OGUIHACKLIB) \
 		$(guilibs) $(COMCTRL) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJGUI)
 		$(ALLOBJGUI)
@@ -1547,7 +1557,7 @@ recover: $(U)recover.exe
 	if exist $(U)recover.exe copy $(U)recover.exe  $(GAMEDIR)
 	if exist $(DOC)\recover.txt copy $(DOC)\recover.txt $(GAMEDIR)\recover.txt
 
-$(OUTL)utility.tag: $(INCL)\nhlua.h outldir$(TARGET_CPU).tag $(U)tile2bmp.exe $(U)makedefs.exe
+$(OUTL)utility.tag: $(INCL)\nhlua.h outldir$(TARGET_CPU).tag $(OUTLHACKLIB) $(U)tile2bmp.exe $(U)makedefs.exe
 	     @echo utilities made >$@
 	     @echo utilities made.
 
@@ -1587,9 +1597,9 @@ $(U)nhsizes3.exe: $(OUTL)nhsizes3.o
 $(OUTL)nhsizes3.o: $(CONFIG_H) nhsizes3.c
 	$(Q)$(CC) $(CFLAGS) $(CROSSCOMPILE) -Fo$@ nhsizes3.c
 
-$(U)makedefs.exe:	$(MAKEDEFSOBJS)
+$(U)makedefs.exe: $(OUTLHACKLIB) $(MAKEDEFSOBJS)
 	@echo Linking $(@:\=/)
-	@$(link) $(LFLAGS) /PDB:"$(OUTL)$(@B).PDB" /MAP:"$(OUTL)$(@B).MAP" -out:$@ $(MAKEDEFSOBJS)
+	@$(link) $(LFLAGS) /PDB:"$(OUTL)$(@B).PDB" /MAP:"$(OUTL)$(@B).MAP" -out:$@ $(MAKEDEFSOBJS) $(OUTLHACKLIB)
 
 $(OUTL)makedefs.o: $(U)makedefs.c $(SRC)\mdlib.c $(CONFIG_H) $(INCL)\permonst.h \
 		$(INCL)\objclass.h $(INCL)\sym.h $(INCL)\defsym.h \
@@ -1662,6 +1672,23 @@ $(INCL)\onames.h : $(U)makedefs.exe
 
 $(INCL)\pm.h : $(U)makedefs.exe
 	$(U)makedefs -p
+
+
+#==========================================
+# HACKLIB
+#==========================================
+
+$(OUTLHACKLIB): $(OUTLHACKLIBOBJS)
+	@echo Building library $@ from $**
+	@$(librarian) /OUT:$@ $(OUTLHACKLIBOBJS)
+
+$(OTTYHACKLIB): $(OTTYHACKLIBOBJS)
+	@echo Building library $@ from $**
+	@$(librarian) /OUT:$@ $(OTTYHACKLIBOBJS)
+
+$(OGUIHACKLIB): $(OGUIHACKLIBOBJS)
+	@echo Building library $@ from $**
+	@$(librarian) /OUT:$@ $(OGUIHACKLIBOBJS)
 
 #==========================================
 # uudecode utility and uuencoded targets
@@ -1802,9 +1829,9 @@ fetch-pdcurses:
 # DLB utility and nhdatNNN file creation
 #==========================================
 
-$(U)dlb.exe: $(DLBOBJ_HOST) $(OUTL)dlb$(HOST).o
+$(U)dlb.exe: $(DLBOBJ_HOST) $(OUTL)dlb$(HOST).o $(OUTLHACKLIB)
 	@echo Linking $(@:\=/)
-	@$(link) $(LFLAGS) /PDB:"$(OUTL)$(@B).PDB" /MAP:"$(OUTL)$(@B).MAP" -out:$@ @<<$(@B).lnk
+	@$(link) $(LFLAGS) /PDB:"$(OUTL)$(@B).PDB" /MAP:"$(OUTL)$(@B).MAP" $(OUTLHACKLIB) -out:$@ @<<$(@B).lnk
 		$(OUTL)dlb_main$(HOST).o
 		$(OUTL)dlb$(HOST).o
 		$(OUTL)alloc$(HOST).o
@@ -1886,10 +1913,10 @@ tile.c: $(U)tilemap.exe
 	@$(U)tilemap
 	@echo A new $(@:\=/) has been created
 
-$(U)tilemap.exe: $(OUTL)tilemap.o $(OUTL)monst.o $(OUTL)objects.o $(OUTL)drawing.o
+$(U)tilemap.exe: $(OUTL)tilemap.o $(OUTL)monst.o $(OUTL)objects.o $(OUTL)drawing.o $(OUTLHACKLIB)
 	@echo Linking $(@:\=/)
-	@$(link) $(LFLAGS) /PDB:"$(OUTL)$(@B).PDB" /MAP:"$(OUTL)$(@B).MAP" -out:$@ \
-		$(OUTL)tilemap.o $(OUTL)monst.o $(OUTL)objects.o $(OUTL)drawing.o
+	@$(link) $(LFLAGS) /PDB:"$(OUTL)$(@B).PDB" /MAP:"$(OUTL)$(@B).MAP" $(HACKLIB) -out:$@ \
+		$(OUTL)tilemap.o $(OUTL)monst.o $(OUTL)objects.o $(OUTL)drawing.o $(OUTLHACKLIB)
 
 $(OUTL)tilemap.o: $(WSHR)\tilemap.c $(HACK_H)
 	$(Q)$(CC) $(CFLAGS) $(CROSSCOMPILE) -Fo$@ $(WSHR)\tilemap.c
@@ -1952,7 +1979,7 @@ $(SRC)\tiles.bmp: $(U)tile2bmp.exe $(TILEFILES)
 
 $(U)tile2bmp.exe: $(OUTL)tile2bmp.o $(TEXT_IO)
 	@echo Linking $(@:\=/)
-	@$(link) $(LFLAGS) /PDB:"$(OUTL)$(@B).PDB" /MAP:"$(OUTL)$(@B).MAP" -out:$@ @<<$(@B).lnk
+	@$(link) $(LFLAGS) /PDB:"$(OUTL)$(@B).PDB" /MAP:"$(OUTL)$(@B).MAP" $(OUTLHACKLIB) -out:$@ @<<$(@B).lnk
 		$(OUTL)tile2bmp.o
 		$(TEXT_IO:^  =^
 		)
@@ -1960,7 +1987,7 @@ $(U)tile2bmp.exe: $(OUTL)tile2bmp.o $(TEXT_IO)
 
 $(U)til2bm32.exe: $(OUTL)til2bm32.o $(TEXT_IO32)
 	@echo Linking $(@:\=/)
-	@$(link) $(LFLAGS) /PDB:"$(OUTL)$(@B).PDB" /MAP:"$(OUTL)$(@B).MAP" -out:$@ @<<$(@B).lnk
+	@$(link) $(LFLAGS) /PDB:"$(OUTL)$(@B).PDB" /MAP:"$(OUTL)$(@B).MAP" $(OUTLHACKLIB) -out:$@ @<<$(@B).lnk
 		$(OUTL)til2bm32.o
 		$(TEXT_IO32:^  =^
 		)

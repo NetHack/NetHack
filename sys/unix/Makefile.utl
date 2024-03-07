@@ -189,7 +189,12 @@ CALLOC = ../src/alloc.c panic.c
 OALLOC = $(OBJDIR)/alloc.o panic.o
 # build time info
 CDATE = ../src/date.c
-ODATE = $(OBJDIR)/date.o
+ODATE = $(OBJDIR)/date.o 
+
+# hacklib utility routines
+HACKLIB = $(OBJDIR)/hacklib.a
+HACKLIBSRC = ../src/hacklib.c
+HACKLIBOBJ = $(OBJDIR)/hacklib.o panic.o
 
 # object files for makedefs
 MAKEOBJS = makedefs.o $(OMONOBJ) $(ODATE) $(OALLOC)
@@ -213,11 +218,12 @@ TARGET_CLINK = $(CLINK)
 TARGET_LFLAGS = $(LFLAGS)
 TARGET_CXX = $(CXX)
 TARGET_CXXFLAGS = $(CXXFLAGS)
+TARGET_AR = $(AR)
 
 #	dependencies for makedefs
 #
-makedefs:	$(MAKEOBJS) mdgrep.h
-	$(CLINK) $(LFLAGS) -o makedefs $(MAKEOBJS)
+makedefs:	$(HACKLIB) $(MAKEOBJS) mdgrep.h
+	$(CLINK) $(LFLAGS) -o makedefs $(MAKEOBJS) $(HACKLIB)
 
 
 # note: the headers listed here are maintained manually rather than via
@@ -232,6 +238,8 @@ makedefs.o: makedefs.c ../src/mdlib.c $(CONFIG_H) \
 		../include/you.h ../include/context.h ../include/flag.h \
 		../include/dlb.h ../include/patchlevel.h mdgrep.h
 	$(CC) $(CFLAGS) $(CSTD) -c makedefs.c -o $@
+
+$(OBJDIR)/hacklib.o: $(HACKLIBSRC)
 
 # Don't require perl to build; that is why mdgrep.h is spelled wrong below.
 mdgreph: mdgrep.pl
@@ -251,6 +259,9 @@ lintdefs:
 # the main src and include files date.h is a timestamp for
 ../include/date.h::
 	@( cd ../src ; $(MAKE) ../include/date.h )
+
+$(HACKLIB): $(CONFIG_H) $(HACKLIBSRC) panic.o
+	@( cd ../src ; $(MAKE) hacklib.a )
 
 # support code used by several of the utility programs (but not makedefs)
 panic.o:     panic.c $(CONFIG_H)
@@ -275,8 +286,8 @@ $(TARGETPFX)recover.o: recover.c $(CONFIG_H)
 
 #	dependencies for dlb
 #
-dlb:	$(DLBOBJS)
-	$(CLINK) $(LFLAGS) -o dlb $(DLBOBJS) $(LIBS)
+dlb:	$(DLBOBJS) $(HACKLIB)
+	$(CLINK) $(LFLAGS) -o dlb $(DLBOBJS) $(HACKLIB) $(LIBS)
 
 dlb_main.o: dlb_main.c $(CONFIG_H) ../include/dlb.h
 	$(CC) $(CFLAGS) $(CSTD) -c dlb_main.c -o $@
@@ -295,30 +306,34 @@ gif2txt: $(GIFREADERS) $(TEXT_IO)
 txt2ppm: $(PPMWRITERS) $(TEXT_IO)
 	$(CLINK) $(LFLAGS) -o txt2ppm $(PPMWRITERS) $(TEXT_IO) $(LIBS)
 
-tile2x11: tile2x11.o $(TEXT_IO)
-	$(CLINK) $(LFLAGS) -o tile2x11 tile2x11.o $(TEXT_IO) $(LIBS)
+tile2x11: tile2x11.o $(TEXT_IO) $(HACKLIB)
+	$(CLINK) $(LFLAGS) -o tile2x11 tile2x11.o $(TEXT_IO) \
+		$(HACKLIB) $(LIBS)
 
 tile2img.ttp: tile2img.o bitmfile.o $(TEXT_IO)
 	$(CLINK) $(LFLAGS) -o tile2img.ttp tile2img.o bitmfile.o \
 		$(TEXT_IO) $(LIBS)
 
-tile2bmp: tile2bmp.o $(TEXT_IO)
-	$(CLINK) $(LFLAGS) -o tile2bmp tile2bmp.o $(TEXT_IO)
+tile2bmp: tile2bmp.o $(TEXT_IO) $(HACKLIB)
+	$(CLINK) $(LFLAGS) -o tile2bmp tile2bmp.o $(TEXT_IO) $(HACKLIB)
 
 xpm2img.ttp: xpm2img.o bitmfile.o
 	$(CLINK) $(LFLAGS) -o xpm2img.ttp xpm2img.o bitmfile.o $(LIBS)
 
-tile2beos: tile2beos.o $(TEXT_IO)
-	$(CXXLINK) $(LFLAGS) -o tile2beos tile2beos.o $(TEXT_IO) -lbe
+tile2beos: tile2beos.o $(TEXT_IO) $(HACKLIB)
+	$(CXXLINK) $(LFLAGS) -o tile2beos tile2beos.o \
+		$(TEXT_IO) $(HACKLIB) -lbe
 
 #--compiling and linking in one step leaves extra debugging files (in their
 #  own subdirectories!) on OSX; compile and link separately to suppress
 #  that without mucking about with extra OS-specific CFLAGS and/or LFLAGS
 #tilemap: ../win/share/tilemap.c $(HACK_H)
 #	$(CC) $(CFLAGS) $(LFLAGS) -o tilemap ../win/share/tilemap.c $(LIBS)
-tilemap: tilemap.o $(OBJDIR)/objects.o $(OBJDIR)/monst.o $(OBJDIR)/drawing.o
+tilemap: tilemap.o $(OBJDIR)/objects.o $(OBJDIR)/monst.o $(OBJDIR)/drawing.o \
+	$(HACKLIB)
 	$(CLINK) $(LFLAGS) -o tilemap tilemap.o $(OBJDIR)/objects.o  \
-		$(OBJDIR)/monst.o  $(OBJDIR)/drawing.o $(LIBS)
+		$(OBJDIR)/monst.o  $(OBJDIR)/drawing.o $(HACKLIB) \
+		$(LIBS)
 ../src/tile.c: tilemap
 	./tilemap
 
@@ -426,6 +441,6 @@ clean: clean-fixup
 	-rm -f *.o
 
 spotless: clean
-	-rm -f makedefs recover dlb
+	-rm -f makedefs recover dlb $(HACKLIB)
 	-rm -f gif2txt txt2ppm tile2x11 tile2img.ttp xpm2img.ttp \
 		tilemap tileedit tile2bmp uudecode

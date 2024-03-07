@@ -27,7 +27,7 @@ ifeq ($(MAKELEVEL),0)
 PRECHECK+=checkmakefiles
 # all files included from this hints file get listed
 # in HINTSINCLNAMES (without suffix and without a path)
-HINTSINCLNAMES := compiler cross-pre cross-post \
+HINTSINCLNAMES := compiler cross-pre1 cross-pre2 cross-post \
 		gbdates-pre gbdates-post \
 		multiw-1 multiw-2 misc \
 		multisnd1-pre multisnd2-pre multisnd-post
@@ -54,6 +54,8 @@ endif
 # You shouldn't need to change anything below here (in the hints file; if
 # you're reading this in Makefile augmented by hints, that may not be true).
 #
+
+#-INCLUDE cross-pre1.370
 
 #-INCLUDE multiw-2.370
 
@@ -427,7 +429,7 @@ SYSCONFENSURE = (if ! test -f $(INSTDIR)/sysconf ; then \
 # Install.Qt mentions a patch for macos - it's not there (it seems to be in the Qt binary
 # package under the docs directory).
 #
-#-INCLUDE cross-pre.370
+#-INCLUDE cross-pre2.370
 #
 #
 #-INCLUDE gbdates-pre.370

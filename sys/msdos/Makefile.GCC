@@ -1,5 +1,5 @@
 # NetHack 3.7	Makefile.GCC	$NHDT-Date: 1596498268 2020/08/03 23:44:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.53 $
-#	Copyright (c) NetHack PC Development Team 1996-2022.
+#	Copyright (c) NetHack PC Development Team 1996-2024.
 #	PC NetHack 3.7 Makefile for djgpp V2
 #
 #	Gnu gcc compiler for msdos (djgpp)
@@ -163,6 +163,9 @@ else
 DLBFLG =
 endif
 
+#
+HACKLIB = $(O)hacklib.a
+
 TERMLIB =
 # Build NetHack suitable for blind players
 
@@ -269,29 +272,31 @@ DLBOBJ = $(O)dlb.o
 
 
 VOBJ01 = $(O)allmain.o  $(O)alloc.o    $(O)apply.o    $(O)artifact.o $(O)attrib.o
-VOBJ02 = $(O)ball.o     $(O)bones.o    $(O)botl.o     $(O)cmd.o      $(O)date.o    $(O)dbridge.o
-VOBJ03 = $(O)decl.o     $(O)detect.o   $(O)dig.o      $(O)display.o  $(O)do.o
-VOBJ04 = $(O)do_name.o  $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o  $(O)dokick.o
-VOBJ05 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o      $(O)end.o
-VOBJ06 = $(O)engrave.o  $(O)exper.o    $(O)explode.o  $(O)extralev.o $(O)files.o
-VOBJ07 = $(O)fountain.o $(O)getline.o  $(O)hack.o     $(O)hacklib.o  $(O)insight.o $(O)invent.o
-VOBJ08 = $(O)isaac64.o  $(O)lock.o     $(O)mail.o     $(O)main.o     $(O)makemon.o
-VOBJ09 = $(O)mcastu.o   $(O)mdlib.o    $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mkmap.o
-VOBJ10 = $(O)mklev.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o   $(O)mon.o
-VOBJ11 = $(O)mondata.o  $(O)monmove.o  $(O)monst.o    $(O)mplayer.o  $(O)mthrowu.o
-VOBJ12 = $(O)muse.o     $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o
-VOBJ13 = $(O)options.o  $(O)pickup.o   $(O)pline.o    $(O)polyself.o $(O)potion.o
-VOBJ14 = $(O)quest.o    $(O)questpgr.o $(O)pager.o    $(O)pray.o     $(O)priest.o
-VOBJ15 = $(O)read.o     $(O)rect.o     $(O)region.o   $(O)restore.o  $(O)rip.o
-VOBJ16 = $(O)rnd.o      $(O)role.o     $(O)rumors.o   $(O)save.o     $(O)sfstruct.o
-VOBJ17 = $(O)shk.o      $(O)shknam.o   $(O)sit.o      $(O)sounds.o   $(O)sp_lev.o
-VOBJ18 = $(O)spell.o    $(O)steal.o    $(O)steed.o    $(O)symbols.o  $(O)sys.o
-VOBJ19 = $(O)teleport.o $(O)termcap.o  $(O)timeout.o  $(O)topl.o     $(O)topten.o
-VOBJ20 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o    $(O)utf8map.o  $(O)vault.o
-VOBJ21 = $(O)vision.o   $(O)weapon.o   $(O)were.o     $(O)wield.o    $(O)windows.o
-VOBJ22 = $(O)wintty.o   $(O)wizard.o   $(O)worm.o     $(O)worn.o     $(O)write.o
-VOBJ23 = $(O)zap.o      $(O)light.o    $(O)dlb.o
-VOBJ24 = $(REGEX)         
+VOBJ02 = $(O)ball.o     $(O)bones.o    $(O)botl.o     $(O)calendar.o $(O)cmd.o
+VOBJ03 = $(O)coloratt.o $(O)date.o     $(O)dbridge.o  $(O)decl.o     $(O)detect.o
+VOBJ04 = $(O)dig.o      $(O)display.o  $(O)do.o       $(O)do_name.o  $(O)do_wear.o
+VOBJ05 = $(O)dog.o      $(O)dogmove.o  $(O)dokick.o   $(O)dothrow.o  $(O)drawing.o
+VOBJ06 = $(O)dungeon.o  $(O)eat.o      $(O)end.o      $(O)engrave.o  $(O)exper.o
+VOBJ07 = $(O)explode.o  $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)getpos.o
+VOBJ08 = $(O)getline.o  $(O)hack.o     $(O)hacklib.o  $(O)insight.o  $(O)invent.o
+VOBJ09 = $(O)isaac64.o  $(O)lock.o     $(O)mail.o     $(O)main.o     $(O)makemon.o
+VOBJ10 = $(O)mcastu.o   $(O)mdlib.o    $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o
+VOBJ11 = $(O)mkmap.o    $(O)mklev.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o
+VOBJ12 = $(O)mon.o      $(O)mondata.o  $(O)monmove.o  $(O)monst.o    $(O)mplayer.o
+VOBJ13 = $(O)mthrowu.o  $(O)muse.o     $(O)music.o    $(O)o_init.o   $(O)objects.o
+VOBJ14 = $(O)objnam.o   $(O)options.o  $(O)pickup.o   $(O)pline.o    $(O)polyself.o
+VOBJ15 = $(O)potion.o   $(O)quest.o    $(O)questpgr.o $(O)pager.o    $(O)pray.o
+VOBJ16 = $(O)priest.o   $(O)read.o     $(O)rect.o     $(O)region.o   $(O)report.o
+VOBJ17 = $(O)restore.o  $(O)rip.o      $(O)rnd.o      $(O)role.o     $(O)rumors.o
+VOBJ18 = $(O)save.o     $(O)selvar.o   $(O)sfstruct.o $(O)shk.o      $(O)shknam.o
+VOBJ19 = $(O)sit.o      $(O)sounds.o   $(O)sp_lev.o   $(O)spell.o    $(O)stairs.o
+VOBJ20 = $(O)steal.o    $(O)steed.o    $(O)symbols.o  $(O)sys.o      $(O)teleport.o
+VOBJ21 = $(O)strutil.o  $(O)termcap.o  $(O)timeout.o  $(O)topl.o     $(O)topten.o
+VOBJ22 = $(O)trap.o     $(O)u_init.o   $(O)uhitm.o    $(O)utf8map.o  $(O)vault.o
+VOBJ23 = $(O)track.o    $(O)vision.o   $(O)weapon.o   $(O)were.o     $(O)wield.o
+VOBJ24 = $(O)windows.o  $(O)wintty.o   $(O)wizard.o   $(O)wizcmds.o  $(O)worm.o
+VOBJ25 = $(O)worn.o     $(O)write.o    $(O)zap.o      $(O)light.o    $(O)dlb.o
+VOBJ26 = $(REGEX)
 
 SOBJ   = $(O)msdos.o    $(O)pcsys.o    $(O)tty.o	    $(O)unix.o \
 	 $(O)video.o    $(O)vidtxt.o  $(O)pckeys.o
@@ -313,7 +318,7 @@ VOBJ  = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 	$(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
 	$(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
 	$(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
-	$(CURSESOBJ) $(LUAOBJ)
+	$(VOBJ26) $(CURSESOBJ) $(LUAOBJ)
 
 ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
 
@@ -609,7 +614,7 @@ endif
 #==========================================
 
 $(GAMEFILE): $(O)obj.tag $(PATCHLEV_H) $(PDCLIB) $(LUATARGETS) \
-	$(O)utility.tag $(ALLOBJ)
+	$(O)utility.tag $(ALLOBJ) $(O)hacklib.a
 	 @if exist temp.a del temp.a
 	 @ar ruS temp.a $(VOBJ01)
 	 @ar ruS temp.a $(VOBJ02)
@@ -636,6 +641,7 @@ $(GAMEFILE): $(O)obj.tag $(PATCHLEV_H) $(PDCLIB) $(LUATARGETS) \
 	 @ar ruS temp.a $(VOBJ23)
 	 @ar ruS temp.a $(VOBJ24)
 	 @ar ruS temp.a $(VOBJ25)
+	 @ar ruS temp.a $(VOBJ26)
 	 @ar ruS temp.a $(SOBJ)
 	 @ar ruS temp.a $(TILOBJ)
 	 @ar ruS temp.a $(TILOBJ2)
@@ -674,11 +680,23 @@ $(INCL)/pm.h: $(U)makedefs.exe
 #  Makedefs Stuff
 #==========================================
 
-$(U)makedefs.exe:  $(MAKEDEFSOBJS)
-	$(LINK) $(LFLAGS) -o$@ $(MAKEDEFSOBJS)
+$(U)makedefs.exe:  $(MAKEDEFSOBJS) $(HACKLIB)
+	$(LINK) $(LFLAGS) -o$@ $(MAKEDEFSOBJS) $(HACKLIB)
 
 $(O)makedefs.o:  $(CONFIG_H)	$(PERMONST_H)	   $(INCL)/objclass.h \
 		$(INCL)/sym.h   $(INCL)/defsym.h $(U)makedefs.c
+
+#==========================================
+#  hacklib.a static library
+#==========================================
+
+$(O)hacklib.a:  $(O)hacklibu.o
+	@ar rcs $@ $(O)hacklibu.o
+#	@ranlib $@
+
+$(O)hacklibu.o:  $(CONFIG_H) $(SRC)/hacklib.c
+	$(CC) $(cflags) -I$(SRC) -I$(MSYS) \
+		-o$@ $(SRC)/hacklib.c
 
 #==========================================
 #  Recover Utility
@@ -707,8 +725,8 @@ $(SRC)/tile.c: $(U)tilemap.exe
 
 TILEMAPOBJS = $(O)tilemap.o $(O)monst.o $(O)objects.o $(O)drawing.o
 
-$(U)tilemap.exe: $(TILEMAPOBJS)
-	$(LINK) $(LFLAGS) -o$@ $(TILEMAPOBJS)
+$(U)tilemap.exe: $(TILEMAPOBJS) $(HACKLIB)
+	$(LINK) $(LFLAGS) -o$@ $(TILEMAPOBJS) $(HACKLIB)
 
 $(O)tilemap.o: $(WSHR)/tilemap.c $(HACK_H) $(TILE_H)
 	$(CC) $(cflags) -I$(WSHR) -I$(MSYS) -o$@ $(WSHR)/tilemap.c
@@ -726,23 +744,23 @@ $(DAT)/nhtiles.bmp: $(TILEFILES) $(U)tile2bmp.exe
 	@$(subst /,\,$(U)tile2bmp.exe $@)
 	@$(subst /,\,chdir $(SRC))
 
-$(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXTIO)
+$(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXTIO) $(HACKLIB)
 	-rm -f temp.a
 	@ar ru temp.a $(TEXTIO)
-	$(LINK) $(LFLAGS) -o$@ $(O)tile2bmp.o temp.a
+	$(LINK) $(LFLAGS) -o$@ $(O)tile2bmp.o temp.a $(HACKLIB)
 
-$(U)tile2bin.exe: $(O)tile2bin.o $(TEXTIO)
+$(U)tile2bin.exe: $(O)tile2bin.o $(TEXTIO) $(HACKLIB)
 	-rm -f temp.a
 	@ar ru temp.a $(TEXTIO)
-	$(LINK) $(LFLAGS) -o$@ $(O)tile2bin.o temp.a
+	$(LINK) $(LFLAGS) -o$@ $(O)tile2bin.o temp.a $(HACKLIB)
 
-$(U)til2bin2.exe: $(O)til2bin2.o $(TEXTIO2)
+$(U)til2bin2.exe: $(O)til2bin2.o $(TEXTIO2) $(HACKLIB)
 	-rm -f temp.a
 	@ar ru temp.a $(TEXTIO2)
-	$(LINK) $(LFLAGS) -o$@ $(O)til2bin2.o temp.a
+	$(LINK) $(LFLAGS) -o$@ $(O)til2bin2.o temp.a $(HACKLIB)
 
-$(U)thintile.exe: $(O)thintile.o 
-	$(LINK) $(LFLAGS) -o$@ $(O)thintile.o
+$(U)thintile.exe: $(O)thintile.o $(HACKLIB)
+	$(LINK) $(LFLAGS) -o$@ $(O)thintile.o $(HACKLIB)
 
 $(O)thintile.o:  $(HACK_H) $(WSHR)/tile.h $(WSHR)/thintile.c
 	$(CC) $(cflags) -o$@ $(WSHR)/thintile.c
@@ -895,8 +913,8 @@ $(DAT)/nhdat:	$(U)dlb_main.exe $(DAT)/data $(DAT)/rumors \
 	@$(subst /,\,$(U)dlb_main cvIf dlb.lst nhdat)
 	@$(subst /,\,cd $(SRC))
 
-$(U)dlb_main.exe: $(DLBOBJS)
-	$(LINK) $(LFLAGS) -o$@ $(DLBOBJS)
+$(U)dlb_main.exe: $(DLBOBJS) $(HACKLIB)
+	$(LINK) $(LFLAGS) -o$@ $(DLBOBJS) $(HACKLIB)
 
 $(O)dlb_main.o: $(U)dlb_main.c $(INCL)/config.h $(DLB_H)
 	$(CC) $(cflags) -o$@ $(U)dlb_main.c
@@ -981,6 +999,7 @@ endif
 	$(subst /,\,if exist $(WSHR)/monthin.txt del $(WSHR)/monthin.txt)
 	$(subst /,\,if exist $(WSHR)/objthin.txt del $(WSHR)/objthin.txt)
 	$(subst /,\,if exist $(WSHR)/oththin.txt del $(WSHR)/oththin.txt)
+	$(subst /,\,if exist $(O)hacklib.a del $(O)hacklib.a)
 
 #==========================================
 # Create directory for holding object files

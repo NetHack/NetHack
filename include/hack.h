@@ -13,6 +13,7 @@
 
 #include "align.h"
 #include "dungeon.h"
+#include "stairs.h"
 #include "objclass.h"
 #include "wintype.h"
 #include "flag.h"
@@ -24,7 +25,6 @@
 
 #include "botl.h"
 #include "context.h"
-#include "dungeon.h"
 #include "engrave.h"
 #include "mkroom.h"
 #include "obj.h"
@@ -32,6 +32,7 @@
 #include "rect.h"
 #include "region.h"
 #include "rm.h"
+#include "selvar.h"
 #include "sndprocs.h"
 #include "spell.h"
 #include "sym.h"

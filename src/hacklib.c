@@ -49,39 +49,15 @@
         int             distmin         (int, int, int, int)
         int             dist2           (int, int, int, int)
         boolean         online2         (int, int)
-        boolean         pmatch          (const char *, const char *)
-        boolean         pmatchi         (const char *, const char *)
-        boolean         pmatchz         (const char *, const char *)
         int             strncmpi        (const char *, const char *, int)
         char *          strstri         (const char *, const char *)
         boolean         fuzzymatch      (const char *, const char *,
                                          const char *, boolean)
         void            setrandom       (void)
-        void            init_random     (fn)
-        void            reseed_random   (fn)
-        time_t          getnow          (void)
-        int             getyear         (void)
-        char *          yymmdd          (time_t)
-        long            yyyymmdd        (time_t)
-        long            hhmmss          (time_t)
-        char *          yyyymmddhhmmss  (time_t)
-        time_t          time_from_yyyymmddhhmmss (char *)
-        int             phase_of_the_moon (void)
-        boolean         friday_13th     (void)
-        int             night           (void)
-        int             midnight        (void)
-        void            strbuf_init     (strbuf *, const char *)
-        void            strbuf_append   (strbuf *, const char *)
-        void            strbuf_reserve  (strbuf *, int)
-        void            strbuf_empty    (strbuf *)
-        void            strbuf_nl_to_crlf (strbuf_t *)
         int             swapbits        (int, int, int)
-        void            shuffle_int_array (int *, int)
         void            nh_snprintf     (const char *, int, char *, size_t,
                                          const char *, ...)
 =*/
-static boolean pmatch_internal(const char *, const char *, boolean,
-                               const char *);
 
 /* is 'c' a digit? */
 boolean
@@ -255,8 +231,10 @@ str_start_is(
         if (t1 != t2)
             return FALSE;
     }
+#if 0
     if (n == 0)
         panic("string too long");
+#endif
     return TRUE;
 }
 
@@ -676,6 +654,7 @@ sgn(int n)
     return (n < 0) ? -1 : (n != 0);
 }
 
+#if 0
 /* calculate x/y, rounding as appropriate */
 int
 rounddiv(long x, int y)
@@ -700,6 +679,7 @@ rounddiv(long x, int y)
 
     return divsgn * r;
 }
+#endif
 
 /* distance between two points, in moves */
 int
@@ -758,74 +738,6 @@ online2(coordxy x0, coordxy y0, coordxy x1, coordxy y1)
      */
     return (boolean) (!dy || !dx || dy == dx || dy == -dx);
 }
-
-/* guts of pmatch(), pmatchi(), and pmatchz();
-   match a string against a pattern */
-static boolean
-pmatch_internal(const char *patrn, const char *strng,
-                boolean ci,     /* True => case-insensitive,
-                                   False => case-sensitive */
-                const char *sk) /* set of characters to skip */
-{
-    char s, p;
-    /*
-     *  Simple pattern matcher:  '*' matches 0 or more characters, '?' matches
-     *  any single character.  Returns TRUE if 'strng' matches 'patrn'.
-     */
- pmatch_top:
-    if (!sk) {
-        s = *strng++;
-        p = *patrn++; /* get next chars and pre-advance */
-    } else {
-        /* fuzzy match variant of pmatch; particular characters are ignored */
-        do {
-            s = *strng++;
-        } while (strchr(sk, s));
-        do {
-            p = *patrn++;
-        } while (strchr(sk, p));
-    }
-    if (!p)                           /* end of pattern */
-        return (boolean) (s == '\0'); /* matches iff end of string too */
-    else if (p == '*')                /* wildcard reached */
-        return (boolean) ((!*patrn
-                           || pmatch_internal(patrn, strng - 1, ci, sk))
-                          ? TRUE
-                          : s ? pmatch_internal(patrn - 1, strng, ci, sk)
-                              : FALSE);
-    else if ((ci ? lowc(p) != lowc(s) : p != s) /* check single character */
-             && (p != '?' || !s))               /* & single-char wildcard */
-        return FALSE;                           /* doesn't match */
-    else                 /* return pmatch_internal(patrn, strng, ci, sk); */
-        goto pmatch_top; /* optimize tail recursion */
-}
-
-/* case-sensitive wildcard match */
-boolean
-pmatch(const char *patrn, const char *strng)
-{
-    return pmatch_internal(patrn, strng, FALSE, (const char *) 0);
-}
-
-/* case-insensitive wildcard match */
-boolean
-pmatchi(const char *patrn, const char *strng)
-{
-    return pmatch_internal(patrn, strng, TRUE, (const char *) 0);
-}
-
-#if 0
-/* case-insensitive wildcard fuzzymatch;
-   NEVER WORKED AS INTENDED but fortunately isn't needed */
-boolean
-pmatchz(const char *patrn, const char *strng)
-{
-    /* ignore spaces, tabs (just in case), dashes, and underscores */
-    static const char fuzzychars[] = " \t-_";
-
-    return pmatch_internal(patrn, strng, TRUE, fuzzychars);
-}
-#endif
 
 #ifndef STRNCMPI
 /* case insensitive counted string comparison */
@@ -944,359 +856,6 @@ fuzzymatch(
 #define LOCALTIME_type time_t *
 #endif
 
-static struct tm *getlt(void);
-
-/* Sets the seed for the random number generator */
-#ifdef USE_ISAAC64
-static void set_random(unsigned long seed, int (*)(int));
-
-static void
-set_random(unsigned long seed,
-           int (*fn)(int))
-{
-    init_isaac64(seed, fn);
-}
-
-#else /* USE_ISAAC64 */
-
-/*ARGSUSED*/
-static void
-set_random(unsigned long seed,
-           int (*fn)(int) UNUSED)
-{
-    /*
-     * The types are different enough here that sweeping the different
-     * routine names into one via #defines is even more confusing.
-     */
-# ifdef RANDOM /* srandom() from sys/share/random.c */
-    srandom((unsigned int) seed);
-# else
-#  if defined(__APPLE__) || defined(BSD) || defined(LINUX) \
-    || defined(ULTRIX) || defined(CYGWIN32) /* system srandom() */
-#   if defined(BSD) && !defined(POSIX_TYPES) && defined(SUNOS4)
-    (void)
-#   endif
-        srandom((int) seed);
-#  else
-#   ifdef UNIX /* system srand48() */
-    srand48((long) seed);
-#   else       /* poor quality system routine */
-    srand((int) seed);
-#   endif
-#  endif
-# endif
-}
-
-#endif /* USE_ISAAC64 */
-
-/* An appropriate version of this must always be provided in
-   port-specific code somewhere. It returns a number suitable
-   as seed for the random number generator */
-extern unsigned long sys_random_seed(void);
-
-/*
- * Initializes the random number generator.
- * Only call once.
- */
-void
-init_random(int (*fn)(int))
-{
-    set_random(sys_random_seed(), fn);
-}
-
-/* Reshuffles the random number generator. */
-void
-reseed_random(int (*fn)(int))
-{
-   /* only reseed if we are certain that the seed generation is unguessable
-    * by the players. */
-    if (has_strong_rngseed)
-        init_random(fn);
-}
-
-time_t
-getnow(void)
-{
-    time_t datetime = 0;
-
-    (void) time((TIME_type) &datetime);
-    return datetime;
-}
-
-static struct tm *
-getlt(void)
-{
-    time_t date = getnow();
-
-    return localtime((LOCALTIME_type) &date);
-}
-
-int
-getyear(void)
-{
-    return (1900 + getlt()->tm_year);
-}
-
-#if 0
-/* This routine is no longer used since in 20YY it yields "1YYmmdd". */
-char *
-yymmdd(time_t date)
-{
-    static char datestr[10];
-    struct tm *lt;
-
-    if (date == 0)
-        lt = getlt();
-    else
-        lt = localtime((LOCALTIME_type) &date);
-
-    Sprintf(datestr, "%02d%02d%02d",
-            lt->tm_year, lt->tm_mon + 1, lt->tm_mday);
-    return datestr;
-}
-#endif
-
-long
-yyyymmdd(time_t date)
-{
-    long datenum;
-    struct tm *lt;
-
-    if (date == 0)
-        lt = getlt();
-    else
-        lt = localtime((LOCALTIME_type) &date);
-
-    /* just in case somebody's localtime supplies (year % 100)
-       rather than the expected (year - 1900) */
-    if (lt->tm_year < 70)
-        datenum = (long) lt->tm_year + 2000L;
-    else
-        datenum = (long) lt->tm_year + 1900L;
-    /* yyyy --> yyyymm */
-    datenum = datenum * 100L + (long) (lt->tm_mon + 1);
-    /* yyyymm --> yyyymmdd */
-    datenum = datenum * 100L + (long) lt->tm_mday;
-    return datenum;
-}
-
-long
-hhmmss(time_t date)
-{
-    long timenum;
-    struct tm *lt;
-
-    if (date == 0)
-        lt = getlt();
-    else
-        lt = localtime((LOCALTIME_type) &date);
-
-    timenum = lt->tm_hour * 10000L + lt->tm_min * 100L + lt->tm_sec;
-    return timenum;
-}
-
-char *
-yyyymmddhhmmss(time_t date)
-{
-    long datenum;
-    static char datestr[15];
-    struct tm *lt;
-
-    if (date == 0)
-        lt = getlt();
-    else
-        lt = localtime((LOCALTIME_type) &date);
-
-    /* just in case somebody's localtime supplies (year % 100)
-       rather than the expected (year - 1900) */
-    if (lt->tm_year < 70)
-        datenum = (long) lt->tm_year + 2000L;
-    else
-        datenum = (long) lt->tm_year + 1900L;
-    Snprintf(datestr, sizeof datestr, "%04ld%02d%02d%02d%02d%02d",
-             datenum, lt->tm_mon + 1,
-             lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
-    debugpline1("yyyymmddhhmmss() produced date string %s", datestr);
-    return datestr;
-}
-
-time_t
-time_from_yyyymmddhhmmss(char *buf)
-{
-    int k;
-    time_t timeresult = (time_t) 0;
-    struct tm t, *lt;
-    char *d, *p, y[5], mo[3], md[3], h[3], mi[3], s[3];
-
-    if (buf && strlen(buf) == 14) {
-        d = buf;
-        p = y; /* year */
-        for (k = 0; k < 4; ++k)
-            *p++ = *d++;
-        *p = '\0';
-        p = mo; /* month */
-        for (k = 0; k < 2; ++k)
-            *p++ = *d++;
-        *p = '\0';
-        p = md; /* day */
-        for (k = 0; k < 2; ++k)
-            *p++ = *d++;
-        *p = '\0';
-        p = h; /* hour */
-        for (k = 0; k < 2; ++k)
-            *p++ = *d++;
-        *p = '\0';
-        p = mi; /* minutes */
-        for (k = 0; k < 2; ++k)
-            *p++ = *d++;
-        *p = '\0';
-        p = s; /* seconds */
-        for (k = 0; k < 2; ++k)
-            *p++ = *d++;
-        *p = '\0';
-        lt = getlt();
-        if (lt) {
-            t = *lt;
-            t.tm_year = atoi(y) - 1900;
-            t.tm_mon = atoi(mo) - 1;
-            t.tm_mday = atoi(md);
-            t.tm_hour = atoi(h);
-            t.tm_min = atoi(mi);
-            t.tm_sec = atoi(s);
-            timeresult = mktime(&t);
-        }
-        if (timeresult == (time_t) -1) {
-            debugpline1("time_from_yyyymmddhhmmss(%s) would have returned -1",
-                        buf ? buf : "");
-            timeresult = (time_t) 0;
-        }
-    }
-    return timeresult;
-}
-
-/*
- * moon period = 29.53058 days ~= 30, year = 365.2422 days
- * days moon phase advances on first day of year compared to preceding year
- *      = 365.2422 - 12*29.53058 ~= 11
- * years in Metonic cycle (time until same phases fall on the same days of
- *      the month) = 18.6 ~= 19
- * moon phase on first day of year (epact) ~= (11*(year%19) + 29) % 30
- *      (29 as initial condition)
- * current phase in days = first day phase + days elapsed in year
- * 6 moons ~= 177 days
- * 177 ~= 8 reported phases * 22
- * + 11/22 for rounding
- */
-int
-phase_of_the_moon(void) /* 0-7, with 0: new, 4: full */
-{
-    struct tm *lt = getlt();
-    int epact, diy, goldn;
-
-    diy = lt->tm_yday;
-    goldn = (lt->tm_year % 19) + 1;
-    epact = (11 * goldn + 18) % 30;
-    if ((epact == 25 && goldn > 11) || epact == 24)
-        epact++;
-
-    return ((((((diy + epact) * 6) + 11) % 177) / 22) & 7);
-}
-
-boolean
-friday_13th(void)
-{
-    struct tm *lt = getlt();
-
-    /* tm_wday (day of week; 0==Sunday) == 5 => Friday */
-    return (boolean) (lt->tm_wday == 5 && lt->tm_mday == 13);
-}
-
-int
-night(void)
-{
-    int hour = getlt()->tm_hour;
-
-    return (hour < 6 || hour > 21);
-}
-
-int
-midnight(void)
-{
-    return (getlt()->tm_hour == 0);
-}
-
-/* strbuf_init() initializes strbuf state for use */
-void
-strbuf_init(strbuf_t *strbuf)
-{
-    strbuf->str = NULL;
-    strbuf->len = 0;
-}
-
-/* strbuf_append() appends given str to strbuf->str */
-void
-strbuf_append(strbuf_t *strbuf, const char *str)
-{
-    int len = (int) strlen(str) + 1;
-
-    strbuf_reserve(strbuf,
-                   len + (strbuf->str ? (int) strlen(strbuf->str) : 0));
-    Strcat(strbuf->str, str);
-}
-
-/* strbuf_reserve() ensure strbuf->str has storage for len characters */
-void
-strbuf_reserve(strbuf_t *strbuf, int len)
-{
-    if (strbuf->str == NULL) {
-        strbuf->str = strbuf->buf;
-        strbuf->str[0] = '\0';
-        strbuf->len = (int) sizeof strbuf->buf;
-    }
-
-    if (len > strbuf->len) {
-        char *oldbuf = strbuf->str;
-
-        strbuf->len = len + (int) sizeof strbuf->buf;
-        strbuf->str = (char *) alloc(strbuf->len);
-        Strcpy(strbuf->str, oldbuf);
-        if (oldbuf != strbuf->buf)
-            free((genericptr_t) oldbuf);
-    }
-}
-
-/* strbuf_empty() frees allocated memory and set strbuf to initial state */
-void
-strbuf_empty(strbuf_t *strbuf)
-{
-    if (strbuf->str != NULL && strbuf->str != strbuf->buf)
-        free((genericptr_t) strbuf->str);
-    strbuf_init(strbuf);
-}
-
-/* strbuf_nl_to_crlf() converts all occurrences of \n to \r\n */
-void
-strbuf_nl_to_crlf(strbuf_t *strbuf)
-{
-    if (strbuf->str) {
-        int len = (int) strlen(strbuf->str);
-        int count = 0;
-        char *cp = strbuf->str;
-
-        while (*cp)
-            if (*cp++ == '\n')
-                count++;
-        if (count) {
-            strbuf_reserve(strbuf, len + count + 1);
-            for (cp = strbuf->str + len + count; count; --cp)
-                if ((*cp = cp[-count]) == '\n') {
-                    *--cp = '\r';
-                    --count;
-                }
-        }
-    }
-}
-
 /* swapbits(val, bita, bitb) swaps bit a with bit b in val */
 int
 swapbits(int val, int bita, int bitb)
@@ -1304,21 +863,6 @@ swapbits(int val, int bita, int bitb)
     int tmp = ((val >> bita) & 1) ^ ((val >> bitb) & 1);
 
     return (val ^ ((tmp << bita) | (tmp << bitb)));
-}
-
-/* randomize the given list of numbers  0 <= i < count */
-void
-shuffle_int_array(int *indices, int count)
-{
-    int i, iswap, temp;
-
-    for (i = count - 1; i > 0; i--) {
-        if ((iswap = rn2(i + 1)) == i)
-            continue;
-        temp = indices[i];
-        indices[i] = indices[iswap];
-        indices[iswap] = temp;
-    }
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL
@@ -1337,7 +881,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
  */
 void
 nh_snprintf(
-    const char *func, int line,
+    const char *func UNUSED, int line UNUSED,
     char *str, size_t size,
     const char *fmt, ...)
 {
@@ -1348,16 +892,18 @@ nh_snprintf(
     n = vsnprintf(str, size, fmt, ap);
     va_end(ap);
     if (n < 0 || (size_t) n >= size) { /* is there a problem? */
+#if 0
+TODO: add set_impossible(), impossible -> func pointer,
+ test funcpointer before call
         impossible("snprintf %s: func %s, file line %d",
                    (n < 0) ? "format error" : "overflow",
                    func, line);
+#endif
         str[size - 1] = '\0'; /* make sure it is nul terminated */
     }
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
-
-#ifdef ENHANCED_SYMBOLS
 
 /* Unicode routines */
 
@@ -1400,6 +946,5 @@ unicodeval_to_utf8str(int uval, uint8 *buffer, size_t bufsz)
     *b = '\0'; /* NUL terminate */
     return 1;
 }
-#endif /* ENHANCED_SYMBOLS */
 
 /*hacklib.c*/

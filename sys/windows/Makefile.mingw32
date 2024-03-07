@@ -459,6 +459,29 @@ LUALIST = air Arc-fila Arc-filb Arc-goal Arc-loca Arc-strt \
 LUAFILES = $(addprefix $(DAT)/, $(addsuffix .lua, $(LUALIST)))
 
 #==========================================
+# Hacklib
+#==========================================
+HACKLIBLIST = hacklib
+HACKLIBSRC = $(addprefix ../src/,$(addsuffix .c, $(HACKLIBLIST)))
+HL = $(O)hacklib
+HLHACKLIB = $(HL)/hacklib.a
+HLHACKLIBOBJS = $(addprefix $(HL)/, $(addsuffix .o, $(HACKLIBLIST)))
+HLTARGETS = $(HLHACKLIB) $(HLHACKLIBOBJS)
+
+$(HL)/hacklib.a: $(HLHACKLIBOBJS)
+	ar rcs $@ $^
+
+$(HL)/hacklib.o: $(HACKLIBSRC) | $(HL)	
+
+$(HL)/%.o: $(SRC)/%.c | $(HL)
+	$(cc) $(CFLAGSU) $< -o$@
+$(HL):
+	@mkdir -p $@
+
+CLEAN_DIR += $(HL)
+CLEAN_FILE += $(HLTARGETS)
+
+#==========================================
 # Makedefs
 #==========================================
 OM = $(O)makedefs
@@ -467,7 +490,7 @@ MTARGETS = $(U)makedefs.exe
 
 makedefs: $(MTARGETS)
 
-$(U)makedefs.exe: $(MOBJS)
+$(U)makedefs.exe: $(MOBJS) $(HLHACKLIB)
 	$(ld) $(LDFLAGS) $^ -o$@
 
 $(OM)/%.o: $(SRC)/%.c $(NHLUAH) | $(OM)
@@ -579,8 +602,8 @@ TTARGETS = $(U)tile2bmp.exe
 
 tile2bmp: $(TTARGETS)
 
-$(U)tile2bmp.exe: $(TOBJS)
-	$(ld) $(LDFLAGS) $^ -o$@
+$(U)tile2bmp.exe: $(TOBJS) $(HLHACKLIB)
+	$(ld) $(LDFLAGS) $(HLHACKLIB) $^ -o$@
 
 $(OT)/tiletxt.o: $(WSHR)/tilemap.c $(NHLUAH) | $(OT)
 	$(cc) $(CFLAGSU) -DTILETEXT $< -o$@
@@ -662,8 +685,8 @@ tilemap: $(SRC)/tile.c
 $(SRC)/tile.c: $(U)tilemap.exe
 	$<
 
-$(U)tilemap.exe: $(TMOBJS)
-	$(ld) $(LDFLAGS) $^ -o$@
+$(U)tilemap.exe: $(TMOBJS) $(HLHACKLIB)
+	$(ld) $(LDFLAGS) $(HLHACKLIB) $^ -o$@
 
 $(OTM)/tilemap.o: $(WSHR)/tilemap.c $(NHLUAH) | $(OTM)
 	$(cc) $(CFLAGSU) $< -o$@
@@ -716,8 +739,8 @@ DTARGETS = $(U)dlb.exe $(DAT_CLEAN) $(DLBLST) $(DLB)
 
 dlb: $(DTARGETS)
 
-$(U)dlb.exe: $(DLBOBJS)
-	$(ld) $(LDFLAGS) $^ -o$@
+$(U)dlb.exe: $(DLBOBJS) $(HLHACKLIB)
+	$(ld) $(LDFLAGS) $(HLHACKLIB) $^ -o$@
 
 $(ODLB)/%.o: $(SRC)/%.c $(NHLUAH) | $(ODLB)
 	$(cc) $(CFLAGSU) $< -o$@
@@ -961,17 +984,18 @@ endif   # HAVE_SOUNDLIB
 # nethackw
 #==========================================
 COREOBJS = $(addsuffix .o, allmain alloc apply artifact attrib ball bones botl \
-	   coloratt cmd cppregex \
+	   calendar coloratt cmd cppregex \
 	   dbridge decl detect dig display dlb do do_name do_wear \
 	   dog dogmove dokick dothrow drawing dungeon \
 	   eat end engrave exper explode extralev files fountain \
-	   hack hacklib insight invent isaac64 light lock \
+	   getpos hack insight invent isaac64 light lock \
 	   mail makemon mcastu mdlib mhitm mhitu minion mklev mkmap mkmaze mkobj mkroom \
 	   mon mondata monmove monst mplayer mthrowu muse music \
 	   nhlobj nhlsel nhlua windsound o_init objects objnam options \
 	   pager pickup pline polyself potion pray priest quest questpgr \
-	   random read rect region restore rip rnd role rumors \
-	   safeproc save sfstruct shk shknam sit sounds sp_lev spell steal steed \
+	   random read rect region report restore rip rnd role rumors \
+	   safeproc save sfstruct shk shknam sit selvar sounds sp_lev \
+	   spell stairs steal steed strutil \
 	   symbols sys teleport timeout topten track trap u_init uhitm utf8map \
 	   vault version vision weapon were wield windmain windows windsys wizard \
 	   worm worn write zap $(SOUNDLIBOBJS))
@@ -1006,7 +1030,8 @@ endif
 nethackw: $(NHWTARGETS)
 
 $(GAMEDIR)/NetHackW.exe: $(NHWOBJS) $(NHWRES) $(DATEW_O) $(LUALIB) $(PDCWLIB) | $(GAMEDIR)
-	$(ld) $(LDFLAGS) -mwindows $^ $(LIBS) -static -lstdc++ $(SOUNDLIBLIBS) -o$@
+	$(ld) $(LDFLAGS) -mwindows $^ $(HLHACKLIB) $(LIBS) -static -lstdc++ \
+		$(SOUNDLIBLIBS) -o$@
 
 $(ONHW)/%.o: $(SRC)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
@@ -1096,8 +1121,9 @@ NHTARGET = $(GAMEDIR)/NetHack.exe
 
 nethack: $(NHTARGET)
 
-$(GAMEDIR)/NetHack.exe: $(NHOBJS) $(NHRES) $(DATE_O) $(LUALIB) $(PDCLIB) $(SOUNDLIBLIBS) | $(GAMEDIR)
-	$(ld) $(LDFLAGS) -mconsole $^ $(LIBS) -static -lstdc++ -o$@
+$(GAMEDIR)/NetHack.exe: $(NHOBJS) $(NHRES) $(DATE_O) $(LUALIB) $(PDCLIB) \
+	$(SOUNDLIBLIBS) | $(GAMEDIR)
+	$(ld) $(LDFLAGS) -mconsole $^ $(HLHACKLIB) $(LIBS) -static -lstdc++ -o$@
 
 $(ONH)/%.o: $(SRC)/%.c $(NHLUAH) | $(ONH)
 	$(cc) $(CFLAGSNH) $< -o$@

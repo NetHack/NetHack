@@ -147,23 +147,22 @@ HACK_H	= $(SRC)hack.h-t
 # all .c that are part of the main NetHack program and are not operating- or
 # windowing-system specific
 HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
-	   botl.c cmd.c dbridge.c decl.c detect.c dig.c display.c dlb.c do.c \
-	   do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c drawing.c \
-	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
-	   files.c fountain.c hack.c hacklib.c \
+	   botl.c calendar.c cmd.c coloratt.c dbridge.c decl.c detect.c dig.c \
+	   display.c dlb.c do.c do_name.c do_wear.c dog.c dogmove.c dokick.c \
+	   dothrow.c drawing.c dungeon.c eat.c end.c engrave.c exper.c \
+	   explode.c extralev.c files.c fountain.c getpos.c hack.c hacklib.c \
 	   insight.c invent.c light.c lock.c \
 	   mail.c makemon.c mcastu.c mhitm.c mhitu.c minion.c \
-	   mklev.c mkmap.c \
-	   mkmaze.c mkobj.c mkroom.c mon.c mondata.c monmove.c monst.c \
-	   mplayer.c mthrowu.c muse.c music.c o_init.c objects.c objnam.c \
-	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
-	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c \
-	   rip.c rnd.c role.c \
-	   rumors.c save.c shk.c shknam.c sit.c sounds.c sp_lev.c spell.c \
-	   steal.c steed.c sys.c teleport.c timeout.c topten.c track.c \
-	   trap.c u_init.c \
-	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
-	   windows.c wizard.c worm.c worn.c write.c zap.c
+	   mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c mondata.c \
+	   monmove.c monst.c mplayer.c mthrowu.c muse.c music.c o_init.c \
+	   objects.c objnam.c options.c pager.c pickup.c pline.c polyself.c \
+	   potion.c pray.c priest.c quest.c questpgr.c read.c rect.c \
+	   region.c report.c restore.c rip.c rnd.c role.c rumors.c save.c \
+	   selvar.c sfstruct.c shk.c shknam.c sit.c sounds.c sp_lev.c \
+	   spell.c stairs.c steal.c steed.c strutil.c sys.c teleport.c \
+	   timeout.c topten.c track.c trap.c u_init.c uhitm.c vault.c \
+	   version.c vision.c weapon.c were.c wield.c windows.c wizard.c \
+	   wizcmds.c worm.c worn.c write.c zap.c
 
 #-# generated source files (vis_tab.c is gone; tile.c is handled separately
 #-# via WINxxxSRC)
@@ -178,7 +177,7 @@ VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(RANDSRC) $(GENCSRC)
 HACKINCL = align.h artifact.h artilist.h attrib.h color.h \
 	   config.h config1.h context.h coord.h decl.h defsym.h display.h \
 	   dlb.h dungeon.h engrave.h extern.h flag.h func_tab.h global.h \
-	   hack.h mextra.h mfndpos.h micro.h mkroom.h \
+	   hack.h hacklib.h mextra.h mfndpos.h micro.h mkroom.h \
 	   monattk.h mondata.h monflag.h monst.h sym.h obj.h objclass.h \
 	   patchlevel.h pcconf.h permonst.h prop.h rect.h \
 	   region.h sym.h defsym.h rm.h sp_lev.h spell.h sys.h system.h \
@@ -192,11 +191,12 @@ FIRSTOBJ = vmsmisc.obj,vmsfiles.obj,monst.obj,objects.obj
 
 # split up long list so that we can write pieces of it into nethack.opt
 HOBJ1 = allmain.obj,alloc.obj,apply.obj,artifact.obj,attrib.obj, \
-	ball.obj,bones.obj,botl.obj,cmd.obj,dbridge.obj,decl.obj, \
-	detect.obj,dig.obj,display.obj,dlb.obj,do.obj,do_name.obj,do_wear.obj
+	ball.obj,bones.obj,botl.obj,calendar.obj,cmd.obj,coloratt.obj, \
+	dbridge.obj,decl.obj,detect.obj,dig.obj,display.obj,dlb.obj, \
+	do.obj,do_name.obj,do_wear.obj
 HOBJ2 = dog.obj,dogmove.obj,dokick.obj,dothrow.obj,drawing.obj, \
 	dungeon.obj,eat.obj,end.obj,engrave.obj,exper.obj,explode.obj, \
-	extralev.obj,files.obj,fountain.obj,hack.obj,hacklib.obj, \
+	extralev.obj,files.obj,fountain.obj,getpos.obj,hack.obj,hacklib.obj, \
 	insight.obj,invent.obj
 HOBJ3 = light.obj,lock.obj,mail.obj,makemon.obj,mcastu.obj, \
 	mhitm.obj,mhitu.obj,minion.obj,mklev.obj,mkmap.obj,mkmaze.obj, \
@@ -205,11 +205,11 @@ HOBJ4 = mplayer.obj,mthrowu.obj,muse.obj,music.obj,o_init.obj,objnam.obj, \
 	options.obj,pager.obj,pickup.obj,pline.obj,polyself.obj, \
 	potion.obj,pray.obj,priest.obj,quest.obj,questpgr.obj,read.obj
 HOBJ5 = rect.obj,region.obj,restore.obj,rip.obj,rnd.obj,role.obj, \
-	rumors.obj,save.obj,sfstruct.obj,shk.obj,shknam.obj,sit.obj, \
-	sounds.obj,sp_lev.obj,spell.obj,steal.obj,steed.obj,sys.obj, \
+	rumors.obj,save.obj,selvar.obj,sfstruct.obj,shk.obj,shknam.obj,sit.obj, \
+	sounds.obj,sp_lev.obj,spell.obj,stairs.obj,steal.obj,steed.obj,sys.obj, \
 	teleport.obj,timeout.obj,topten.obj, track.obj,trap.obj
-HOBJ6 = u_init.obj,uhitm.obj,vault.obj,vision.obj,weapon.obj, \
-	were.obj,wield.obj,windows.obj,wizard.obj,worm.obj,worn.obj, \
+HOBJ6 = u_init.obj,uhitm.obj,utf8map.obj,vault.obj,vision.obj,weapon.obj, \
+	were.obj,wield.obj,windows.obj,wizard.obj,wizcmds.obj,worm.obj,worn.obj, \
 	write.obj,zap.obj,version.obj
 HOBJ  = $(FIRSTOBJ) $(SYSOBJ) $(WINOBJ) $(RANDOBJ) \
 	$(HOBJ1) $(HOBJ2) $(HOBJ3) $(HOBJ4) $(HOBJ5) $(HOBJ6)

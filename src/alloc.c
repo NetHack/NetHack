@@ -13,17 +13,11 @@
 #include "nhlua.h"
 #endif
 
-/*
- * Some stuff that isn't allocation related but included is this file
- * so that utility programs can access it more easily since they link
- * with alloc.{o,obj}.
- */
+
 /*#define FITSint(x) FITSint_(x, __func__, __LINE__)*/
 extern int FITSint_(LUA_INTEGER, const char *, int) NONNULLARG2;
 /*#define FITSuint(x) FITSuint_(x, __func__, __LINE__)*/
 extern unsigned FITSuint_(unsigned long long, const char *, int) NONNULLARG2;
-/*#define Strlen(s) Strlen_(s, __func__, __LINE__)*/
-extern unsigned Strlen_(const char *, const char *, int) NONNULLPTRS;
 
 char *fmt_ptr(const genericptr) NONNULL;
 
@@ -256,6 +250,7 @@ dupstr_n(const char *string, unsigned int *lenout)
     return strcpy((char *) alloc(len + 1), string);
 }
 
+
 /* cast to int or panic on overflow; use via macro */
 int
 FITSint_(LUA_INTEGER i, const char *file, int line)
@@ -275,27 +270,6 @@ FITSuint_(unsigned long long ull, const char *file, int line)
     if (uret != ull)
         panic("Overflow at %s:%d", file, line);
     return uret;
-}
-
-/* strlen() but returns unsigned and panics if string is unreasonably long;
-   used by dlb as well as by nethack */
-unsigned
-Strlen_(
-    const char *str,
-    const char *file,
-    int line)
-{
-    const char *p;
-    size_t len;
-
-    /* strnlen(str, LARGEST_INT) w/o requiring posix.1 headers or libraries */
-    for (p = str, len = 0; len < LARGEST_INT; ++len)
-        if (*p++ == '\0')
-            break;
-
-    if (len == LARGEST_INT)
-        panic("%s:%d string too long", file, line);
-    return (unsigned) len;
 }
 
 /*alloc.c*/

@@ -27,6 +27,7 @@
 #include "context.h"
 #include "flag.h"
 #include "dlb.h"
+#include "hacklib.h"
 #include <ctype.h>
 /* version information */
 #ifdef SHORT_FILENAMES
@@ -60,7 +61,9 @@ char *bannerc_string(char *, size_t, const char *) NONNULL NONNULLPTRS;
 int case_insensitive_comp(const char *, const char *) NONNULLPTRS;
 
 static void make_version(void);
+#if 0
 static char *eos(char *) NONNULL NONNULLARG1;
+#endif
 
 #if 0
 static char *mdlib_strsubst(char *, const char *, const char *);
@@ -79,6 +82,7 @@ extern int GUILaunched;
 #endif
 
 /* these are in extern.h but we don't include hack.h */
+/* XXX move to new file mdlib.h? */
 extern void populate_nomakedefs(struct version_info *) NONNULLARG1; /* date.c */
 extern void free_nomakedefs(void); /* date.c */
 void runtime_info_init(void);
@@ -341,29 +345,6 @@ mdlib_version_string(char *outbuf, const char *delim)
 extern void nh_snprintf(const char *func, int line, char *str, size_t size,
                         const char *fmt, ...);
 
-#ifdef MAKEDEFS_C
-DISABLE_WARNING_FORMAT_NONLITERAL
-
-void
-nh_snprintf(const char *func UNUSED, int line UNUSED, char *str, size_t size,
-            const char *fmt, ...)
-{
-    va_list ap;
-    int n;
-
-    va_start(ap, fmt);
-    n = vsnprintf(str, size, fmt, ap);
-    va_end(ap);
-
-    if (n < 0 || (size_t) n >= size) { /* is there a problem? */
-        str[size-1] = 0; /* make sure it is nul terminated */
-    }
-
-}
-
-RESTORE_WARNING_FORMAT_NONLITERAL
-#endif  /* MAKEDEFS_C */
-
 char *
 version_id_string(char *outbuf, size_t bufsz, const char *build_date)
 {
@@ -439,6 +420,7 @@ mkstemp(char *template)
 #endif /* HAS_NO_MKSTEMP */
 #endif /* MAKEDEFS_C || FOR_RUNTIME */
 
+#if 0
 static char *
 eos(char *str)
 {
@@ -446,6 +428,7 @@ eos(char *str)
         str++;
     return str;
 }
+#endif
 
 #if 0
 static char *

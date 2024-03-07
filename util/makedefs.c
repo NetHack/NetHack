@@ -21,6 +21,7 @@
 #include "context.h"
 #include "flag.h"
 #include "dlb.h"
+#include "hacklib.h"
 
 #include <ctype.h>
 #ifdef MAC
@@ -166,7 +167,9 @@ extern void objects_globals_init(void); /* objects.c */
 static char *name_file(const char *, const char *);
 static FILE *getfp(const char *, const char *, const char *, int);
 static void do_ext_makedefs(int, char **);
+#if 0
 static char *xcrypt(const char *);
+#endif
 static char *padline(char *, unsigned);
 static unsigned long read_rumors_file(const char *, int *,
                                       long *, unsigned long, unsigned);
@@ -974,10 +977,11 @@ grep0(FILE *inputfp0, FILE* outputfp0, int flg)
     return;
 }
 
+#if 0
 /* trivial text encryption routine which can't be broken with `tr' */
 static char *
 xcrypt(const char *str)
-{ /* duplicated in src/hacklib.c */
+{ /* slightly different version in src/hacklib.c */
     static char buf[BUFSZ];
     const char *p;
     char *q;
@@ -993,6 +997,7 @@ xcrypt(const char *str)
     *q = '\0';
     return buf;
 }
+#endif
 
 static char *
 padline(char *line, unsigned padlength)
@@ -1038,7 +1043,7 @@ read_rumors_file(
     unsigned long old_rumor_offset,
     unsigned padlength)
 {
-    char infile[MAXFNAMELEN];
+    char infile[MAXFNAMELEN], xbuf[BUFSZ];
     char *line;
     unsigned long rumor_offset;
 
@@ -1059,7 +1064,7 @@ read_rumors_file(
         /*[if we forced binary output, this would be sufficient]*/
         *rumor_size += strlen(line); /* includes newline */
 #endif
-        (void) fputs(xcrypt(line), tfp);
+        (void) fputs(xcrypt(line, xbuf), tfp);
         free((genericptr_t) line);
     }
     /* record the current position; next rumors section will start here */
@@ -1081,7 +1086,7 @@ do_rnd_access_file(
     const char *deflt_content,
     unsigned padlength)
 {
-    char *line, buf[BUFSZ];
+    char *line, buf[BUFSZ], xbuf[BUFSZ];
 
     Sprintf(filename, DATA_IN_TEMPLATE, fname);
     Strcat(filename, ".txt");
@@ -1108,7 +1113,7 @@ do_rnd_access_file(
     Strcpy(buf, deflt_content);
     if (!strchr(buf, '\n')) /* lines from the file include trailing newline +*/
         Strcat(buf, "\n"); /* so make sure that the default one does too    */
-    (void) fputs(xcrypt(padline(buf, padlength)), ofp);
+    (void) fputs(xcrypt(padline(buf, padlength), xbuf), ofp);
 
     tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE, FLG_TEMPFILE);
     grep0(ifp, tfp, FLG_TEMPFILE);
@@ -1122,7 +1127,7 @@ do_rnd_access_file(
     while ((line = fgetline(ifp)) != 0) {
         if (line[0] != '#' && line[0] != '\n') {
             (void) padline(line, padlength);
-            (void) fputs(xcrypt(line), ofp);
+            (void) fputs(xcrypt(line, xbuf), ofp);
         }
         free((genericptr_t) line);
     }
@@ -1413,7 +1418,7 @@ static const char *special_oracle[] = {
 void
 do_oracles(void)
 {
-    char infile[60], tempfile[60];
+    char infile[60], tempfile[60], xbuf[BUFSZ];
     boolean in_oracle, ok;
     long fpos;
     unsigned long txt_offset, offset;
@@ -1457,7 +1462,7 @@ do_oracles(void)
     offset = (unsigned long) ftell(tfp);
     Fprintf(ofp, "%05lx\n", offset); /* start pos of special oracle */
     for (i = 0; i < SIZE(special_oracle); i++) {
-        (void) fputs(xcrypt(special_oracle[i]), tfp);
+        (void) fputs(xcrypt(special_oracle[i], xbuf), tfp);
         (void) fputc('\n', tfp);
     }
     SpinCursor(3);
@@ -1488,7 +1493,7 @@ do_oracles(void)
             Fprintf(ofp, "%05lx\n", offset); /* start pos of this oracle */
         } else {
             in_oracle = TRUE;
-            (void) fputs(xcrypt(line), tfp);
+            (void) fputs(xcrypt(line, xbuf), tfp);
         }
         free((genericptr_t) line);
     }

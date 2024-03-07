@@ -27,7 +27,7 @@ ifeq ($(MAKELEVEL),0)
 PRECHECK+=checkmakefiles
 # all files included from this hints file get listed
 # in HINTSINCLNAMES (without suffix and without a path)
-HINTSINCLNAMES := compiler cross-pre cross-post \
+HINTSINCLNAMES := compiler cross-pre1 cross-pre2 cross-post \
 		gbdates-pre gbdates-post \
 		multiw-1 multiw-2 misc \
 		multisnd1-pre multisnd2-pre multisnd-post
@@ -42,6 +42,10 @@ endif
 #4. Other
 GAMEUID  = $(USER)
 GAMEGRP  = games
+
+#-----------------------------------------------------------------------------
+#-INCLUDE cross-pre1.370
+
 
 #-----------------------------------------------------------------------------
 # You shouldn't need to change anything below here (in the hints file; if
@@ -366,7 +370,7 @@ CHGRP=true
 # manpages directory
 MANDIR=/usr/share/man/man6
 #
-#-INCLUDE cross-pre.370
+#-INCLUDE cross-pre2.370
 #
 
 #

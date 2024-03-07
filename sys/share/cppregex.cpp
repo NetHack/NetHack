@@ -10,7 +10,7 @@
 extern "C" {
 #include "config.h"
 #define CPPREGEX_C
-#include "extern.h"
+//#include "extern.h"
 } // extern "C"
 
 

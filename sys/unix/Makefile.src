@@ -188,6 +188,9 @@ SYSOBJ = $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
 #CFLAGS = -O -I../include
 #LFLAGS =
 
+AR = ar
+ARFLAGS = rcs
+
 # The Qt and Be window systems are written in C++, while the rest of
 # NetHack is standard C.  If using Qt, uncomment the LINK line here to get
 # the C++ libraries linked in.
@@ -210,6 +213,8 @@ TARGET_LFLAGS = $(LFLAGS)
 TARGET_CXX = $(CXX)
 TARGET_CXXFLAGS = $(CXXFLAGS)
 TARGET_LIBS = $(LIBS)
+TARGET_AR = $(AR)
+TARGET_ARFLAGS = $(ARFLAGS)
 
 # we specify C preprocessor flags via CFLAGS; files built with default rules
 # might include $(CPPFLAGS) which could get a value from user's environment;
@@ -478,6 +483,10 @@ AT = $(AT_V$(QUIETCC))
 PREGAME=@true
 PACKAGE=@true
 
+HACKLIBSRC = hacklib.c
+HACKLIBOBJS = hacklib.o
+HACKLIB = hacklib.a
+
 MAKEDEFS = ../util/makedefs
 
 # -lm required by lua
@@ -493,24 +502,23 @@ HACK_H	= ../src/hack.h-t
 # all .c that are part of the main NetHack program and are not operating- or
 # windowing-system specific. Do not include date.c in this list.
 HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
-	   botl.c coloratt.c cmd.c dbridge.c decl.c detect.c dig.c display.c \
-	   dlb.c do.c \
-	   do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c drawing.c \
-	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
-	   files.c fountain.c hack.c hacklib.c \
-	   insight.c invent.c isaac64.c light.c \
+	   botl.c calendar.c cmd.c coloratt.c dbridge.c decl.c detect.c dig.c display.c \
+	   dlb.c do.c do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c \
+	   drawing.c dungeon.c eat.c end.c engrave.c exper.c explode.c \
+	   extralev.c files.c fountain.c hack.c hacklib.c \
+	   getpos.c insight.c invent.c isaac64.c light.c \
 	   lock.c mail.c makemon.c mcastu.c mdlib.c mhitm.c \
 	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
 	   mondata.c monmove.c monst.c mplayer.c mthrowu.c muse.c music.c \
 	   nhlua.c nhlsel.c nhlobj.c nhmd4.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
-	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c \
-	   rip.c rnd.c role.c rumors.c save.c sfstruct.c \
-	   shk.c shknam.c sit.c sounds.c \
-	   sp_lev.c spell.c steal.c steed.c symbols.c sys.c teleport.c \
+	   priest.c quest.c questpgr.c read.c rect.c region.c report.c restore.c \
+	   rip.c rnd.c role.c rumors.c save.c selvar.c sfstruct.c \
+	   shk.c shknam.c sit.c sounds.c sp_lev.c spell.c stairs.c steal.c steed.c \
+	   strutil.c symbols.c sys.c teleport.c \
 	   timeout.c topten.c track.c trap.c u_init.c utf8map.c \
 	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
-	   windows.c wizard.c worm.c worn.c write.c zap.c
+	   windows.c wizard.c wizcmds.c worm.c worn.c write.c zap.c
 
 # all operating-system-dependent .c (for dependencies and such)
 SYSCSRC = ../sys/share/pcmain.c ../sys/share/pcsys.c \
@@ -536,10 +544,10 @@ CHAINOBJ = $(TARGETPFX)wc_chainin.o $(TARGETPFX)wc_chainout.o \
 	$(TARGETPFX)wc_trace.o
 
 # .c files for this version (for date.h)
-VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(CHAINSRC) $(GENCSRC)
+VERSOURCES = $(HACKCSRC) $(HACKLIBSRC) $(SYSSRC) $(WINSRC) $(CHAINSRC) $(GENCSRC)
 
 # .c files for all versions using this Makefile (for lint and tags)
-CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
+CSOURCES = $(HACKCSRC) $(HACKLIBSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 
 
 # all .h files except date.h, which would
@@ -552,8 +560,8 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	func_tab.h global.h warnings.h hack.h lint.h mextra.h mfndpos.h \
 	micro.h mkroom.h monattk.h mondata.h monflag.h monst.h monsters.h \
 	nhmd4.h obj.h objects.h objclass.h optlist.h patchlevel.h pcconf.h \
-	permonst.h prop.h rect.h region.h sym.h defsym.h rm.h sp_lev.h \
-	spell.h sndprocs.h seffects.h sys.h tcap.h timeout.h \
+	permonst.h prop.h rect.h region.h selvar.h sym.h defsym.h rm.h sp_lev.h \
+	spell.h sndprocs.h seffects.h stairs.h sys.h tcap.h timeout.h \
 	tradstdc.h trap.h unixconf.h vision.h vmsconf.h wintty.h wincurs.h \
 	winX.h winprocs.h wintype.h you.h youprop.h cstd.h
 
@@ -569,8 +577,8 @@ HOSTOBJ = $(FIRSTOBJ) alloc.o drawing.o
 HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)apply.o $(TARGETPFX)artifact.o $(TARGETPFX)attrib.o \
 	$(TARGETPFX)ball.o $(TARGETPFX)bones.o $(TARGETPFX)botl.o \
-        $(TARGETPFX)coloratt.o \
-	$(TARGETPFX)cmd.o $(TARGETPFX)dbridge.o $(TARGETPFX)decl.o \
+	$(TARGETPFX)calendar.o \
+	$(TARGETPFX)cmd.o $(TARGETPFX)coloratt.o $(TARGETPFX)dbridge.o $(TARGETPFX)decl.o \
 	$(TARGETPFX)detect.o $(TARGETPFX)dig.o $(TARGETPFX)display.o \
 	$(TARGETPFX)dlb.o $(TARGETPFX)do.o $(TARGETPFX)do_name.o \
 	$(TARGETPFX)do_wear.o $(TARGETPFX)dog.o $(TARGETPFX)dogmove.o \
@@ -578,7 +586,7 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)dungeon.o $(TARGETPFX)eat.o $(TARGETPFX)end.o \
 	$(TARGETPFX)engrave.o $(TARGETPFX)exper.o $(TARGETPFX)explode.o \
 	$(TARGETPFX)extralev.o $(TARGETPFX)files.o $(TARGETPFX)fountain.o \
-	$(TARGETPFX)hack.o $(TARGETPFX)hacklib.o $(TARGETPFX)insight.o \
+	$(TARGETPFX)getpos.o $(TARGETPFX)hack.o $(TARGETPFX)insight.o \
 	$(TARGETPFX)invent.o $(TARGETPFX)isaac64.o $(TARGETPFX)light.o \
 	$(TARGETPFX)lock.o $(TARGETPFX)mail.o $(TARGETPFX)makemon.o \
 	$(TARGETPFX)mcastu.o $(TARGETPFX)mdlib.o \
@@ -594,22 +602,23 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)pickup.o $(TARGETPFX)pline.o $(TARGETPFX)polyself.o \
 	$(TARGETPFX)potion.o $(TARGETPFX)pray.o $(TARGETPFX)priest.o \
 	$(TARGETPFX)quest.o $(TARGETPFX)questpgr.o $(TARGETPFX)read.o \
-	$(TARGETPFX)rect.o $(TARGETPFX)region.o $(TARGETPFX)restore.o \
-	$(TARGETPFX)rip.o $(TARGETPFX)rnd.o $(TARGETPFX)role.o \
-	$(TARGETPFX)rumors.o $(TARGETPFX)save.o $(TARGETPFX)sfstruct.o \
+	$(TARGETPFX)rect.o $(TARGETPFX)region.o $(TARGETPFX)report.o \
+	$(TARGETPFX)restore.o $(TARGETPFX)rip.o $(TARGETPFX)rnd.o \
+	$(TARGETPFX)role.o $(TARGETPFX)rumors.o $(TARGETPFX)save.o \
+	$(TARGETPFX)selvar.o $(TARGETPFX)sfstruct.o \
 	$(TARGETPFX)shk.o $(TARGETPFX)shknam.o $(TARGETPFX)sit.o \
-	$(TARGETPFX)sounds.o $(TARGETPFX)sp_lev.o $(TARGETPFX)spell.o \
+	$(TARGETPFX)sounds.o $(TARGETPFX)sp_lev.o $(TARGETPFX)spell.o $(TARGETPFX)stairs.o \
 	$(TARGETPFX)symbols.o $(TARGETPFX)sys.o $(TARGETPFX)steal.o \
-	$(TARGETPFX)steed.o $(TARGETPFX)teleport.o $(TARGETPFX)timeout.o \
-	$(TARGETPFX)topten.o $(TARGETPFX)track.o $(TARGETPFX)trap.o \
+	$(TARGETPFX)steed.o $(TARGETPFX)strutil.o $(TARGETPFX)teleport.o \
+	$(TARGETPFX)timeout.o $(TARGETPFX)topten.o $(TARGETPFX)track.o $(TARGETPFX)trap.o \
 	$(TARGETPFX)u_init.o $(TARGETPFX)uhitm.o $(TARGETPFX)utf8map.o \
 	$(TARGETPFX)vault.o $(TARGETPFX)vision.o $(TARGETPFX)weapon.o \
 	$(TARGETPFX)were.o $(TARGETPFX)wield.o $(TARGETPFX)windows.o \
-	$(TARGETPFX)wizard.o $(TARGETPFX)worm.o $(TARGETPFX)worn.o \
+	$(TARGETPFX)wizard.o $(TARGETPFX)wizcmds.o $(TARGETPFX)worm.o $(TARGETPFX)worn.o \
 	$(TARGETPFX)write.o $(TARGETPFX)zap.o \
 	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) $(HINTOBJ) $(SNDLIBOBJ) \
 	$(TARGETPFX)version.o
-#
+
 DATE_O = $(TARGETPFX)date.o
 
 # the .o files from the HACKCSRC, SYSSRC, and WINSRC lists
@@ -624,41 +633,46 @@ pregame:
 $(GAME):	pregame $(MAKEDEFS) $(LUALIB) $(WAVS) $(SYSTEM)
 	@echo "$(GAME) is up to date."
 
-Sysunix:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
+Sysunix: $(HOSTOBJ) $(HOBJ) $(TARGETPFX)$(HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(DATE_O) $(WINLIB) $(TARGET_LIBS) $(LUALIBS) \
-		$(AUTOLIBS)
+		$(HOBJ) $(DATE_O) $(TARGETPFX)$(HACKLIB) $(WINLIB) \
+		$(TARGET_LIBS) $(LUALIBS) $(AUTOLIBS)
 	@touch Sysunix
 
-Sys3B2:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
+Sys3B2:	$(HOSTOBJ) $(HOBJ) $(TARGETPFX)$(HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(DATE_O) $(WINLIB) $(LUALIBS) -lmalloc
+		$(HOBJ) $(DATE_O) $(TARGETPFX)$(HACKLIB) $(WINLIB) \
+		$(LUALIBS) -lmalloc
 	@touch Sys3B2
 
-Sysatt:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
+Sysatt:	$(HOSTOBJ) $(HOBJ) $(TARGETPFX)$(HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Loading $(GAME)."
 	$(AT)$(LD) $(TARGET_LFLAGS) /lib/crt0s.o /lib/shlib.ifile \
-		-o $(GAMEBIN) $(HOSTOBJ) $(HOBJ) $(DATE_O) $(LUALIBS)
+		-o $(GAMEBIN) $(HOSTOBJ) $(HOBJ) $(DATE_O) $(TARGETPFX)$(HACKLIB) \
+		$(LUALIBS)
 	@touch Sysatt
 
-Systos:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
+Systos:	$(HOSTOBJ) $(HOBJ) $(TARGETPFX)$(HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(DATE_O) $(WINLIB) $(LUALIBS)
+		$(HOBJ) $(DATE_O) $(TARGETPFX)$(HACKLIB) \
+		$(WINLIB) $(LUALIBS)
 	@touch Systos
 
-SysV-AT:	DUMB.Setup $(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
+SysV-AT:	DUMB.Setup $(HOSTOBJ) $(HOBJ) $(TARGETPFX)$(HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(DATE_O) $(WINLIB) $(LUALIBS)
+		$(HOBJ) $(DATE_O) $(TARGETPFX)$(HACKLIB) \
+		$(WINLIB) $(LUALIBS)
 	@touch SysV-AT
 
-SysBe: $(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
+SysBe: $(HOSTOBJ) $(HOBJ) $(TARGETPFX)$(HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAME) \
-		$(HOBJ) $(DATE_O) $(WINLIB) $(TARGET_LIBS) $(LUALIBS)
+		$(HOBJ) $(DATE_O) $(TARGETPFX)$(HACKLIB) \
+		$(WINLIB) $(TARGET_LIBS) $(LUALIBS)
 	@xres -o $(GAME) ../win/BeOS/nethack.rsrc
 	@mimeset -f $(GAME)
 	@touch SysBe
@@ -730,6 +744,12 @@ $(MAKEDEFS): $(FIRSTOBJ) \
 tile.c: ../win/share/tilemap.c $(HACK_H)
 	@( cd ../util ; $(MAKE) ../src/tile.c )
 
+#
+# hacklib (a library of utility routines)
+#
+
+hacklib.a: hacklib.o
+	$(AR) $(ARFLAGS) $@ hacklib.o
 
 ../win/gnome/gn_rip.h: ../win/X11/rip.xpm
 	cp ../win/X11/rip.xpm ../win/gnome/gn_rip.h
@@ -738,7 +758,7 @@ $(TARGETPFX)sfstruct.o: sfstruct.c $(HACK_H)
 
 #	date.c should be recompiled any time any of the source or include code
 #	is modified.
-$(TARGETPFX)date.o: date.c $(HACK_H) $(HACKCSRC) $(HOBJ)
+$(TARGETPFX)date.o: date.c $(HACK_H) $(HACKCSRC)  $(HOBJ) $(TARGETPFX)$(HACKLIB)
 	$(TARGET_CC) $(TARGET_CFLAGS) $(GITHASH) $(GITBRANCH) -c -o $@ date.c
 
 #	date.h should be remade any time any of the source or include code
@@ -774,7 +794,7 @@ clean:
 	true; $(CLEANMORE)
 
 spotless: clean
-	-rm -f a.out core $(GAMEBIN) Sys*
+	-rm -f a.out core $(HACKLIB) $(GAMEBIN) Sys* 
 	-rm -f ../include/nhlua.h
 	-rm -f ../include/date.h #created but no longer used, at least by core
 	-rm -f ../include/onames.h ../include/pm.h #obsolete generated files

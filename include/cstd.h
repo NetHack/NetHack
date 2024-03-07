@@ -55,6 +55,7 @@
 #include <string.h>
 #include <signal.h>
 #include <assert.h>
+#include <stdarg.h>
 
 #endif /* !__cplusplus */
 #endif /* CSTD_H */

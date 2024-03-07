@@ -18,9 +18,13 @@
 #include "rm.h"
 #else
 #include "hack.h"
-#include "display.h"
-#include <stdarg.h>
 #endif
+
+#ifdef Snprintf
+#undef Snprintf
+#endif
+#define Snprintf(str, size, ...) \
+    nh_snprintf(__func__, __LINE__, str, size, __VA_ARGS__)
 
 #ifdef MONITOR_HEAP
 /* with heap monitoring enabled, free(ptr) is a macro which expands to
@@ -30,10 +34,6 @@
 #endif
 
 #define Fprintf (void) fprintf
-#define Snprintf(str, size, ...) \
-    nh_snprintf(__func__, __LINE__, str, size, __VA_ARGS__)
-void nh_snprintf(const char *func, int line, char *str, size_t size,
-                 const char *fmt, ...);
 
 /*
  * Defining OBTAIN_TILEMAP to get a listing of the tile-mappings
@@ -118,14 +118,14 @@ struct tilemap_t {
 #endif
 } tilemap[MAX_GLYPH];
 
-#define MAX_TILENAM 30
+#define MAX_TILENAM 256
     /* List of tiles encountered and their usage */
 struct tiles_used {
     int tilenum;
     enum tilesrc src;
     int file_entry;
     char tilenam[MAX_TILENAM];
-    char references[120];
+    char references[1024];
 };
 struct tiles_used *tilelist[2500] = { 0 };
 
@@ -1484,7 +1484,8 @@ precheck(int offset, const char *glyphtype)
                 glyphtype);
 }
 
-void add_tileref(
+void
+add_tileref(
     int n,
     int glyphref,
     enum tilesrc src,
@@ -1547,29 +1548,5 @@ free_tilerefs(void)
 }
 
 #endif
-
-DISABLE_WARNING_FORMAT_NONLITERAL
-
-void
-nh_snprintf(
-    const char *func UNUSED,
-    int line UNUSED,
-    char *str, size_t size,
-    const char *fmt, ...)
-{
-    va_list ap;
-    int n;
-
-    va_start(ap, fmt);
-    n = vsnprintf(str, size, fmt, ap);
-    va_end(ap);
-
-    if (n < 0 || (size_t) n >= size) { /* is there a problem? */
-        str[size - 1] = 0;             /* make sure it is nul terminated */
-    }
-}
-
-RESTORE_WARNING_FORMAT_NONLITERAL
-
 
 /*tilemap.c*/

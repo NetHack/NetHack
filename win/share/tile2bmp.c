@@ -15,6 +15,8 @@
 #endif
 
 #include "config.h"
+#include "hacklib.h"
+
 #include "tile.h"
 extern void monst_globals_init(void);
 extern void objects_globals_init(void);

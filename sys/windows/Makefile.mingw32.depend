@@ -9,6 +9,9 @@ cce = gcc -E -MM -MT "$(@:d=o) $@"
 # Run
 # 	mingw32-make depend
 
+$(HL)/%.d: $(SRC)/%.c | $(HL)
+	$(cce) $(CFLAGSU) $< -o$@
+
 $(OM)/%.d: $(SRC)/%.c $(NHLUAH) | $(OM)
 	$(cce) $(CFLAGSU) -DENUM_PM $< -o$@
 
@@ -108,7 +111,7 @@ $(ONH)/%.d: $(TTY)/%.c $(NHLUAH) | $(ONH)
 $(ONH)/%.d: $(WCURSES)/%.c $(NHLUAH) | $(ONH)
 	$(cce) $(CFLAGSNH) $(PDCINCL) $< -o$@
 
-OBJS4DEP = $(MOBJS) $(ROBJS) \
+OBJS4DEP = $(MOBJS) $(ROBJS) $(HLHACKLIBOBJS) \
 	   $(TOBJS) $(GIFOBJ) $(GIF32OBJ) $(PPMOBJ) $(BMP32OBJ) $(T32OBJS) $(TUCOMMON) \
 	   $(TMOBJS) $(UOBJS) $(DLBOBJS) $(NHWOBJS) $(NHOBJS)
 DEP_TARGETS = $(OBJS4DEP:o=d)

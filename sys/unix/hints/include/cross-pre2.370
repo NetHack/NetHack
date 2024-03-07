@@ -1,49 +1,8 @@
 #===============-=================================================
-# NetHack 3.7  include/cross-pre $NHDT-Date: 1597332785 2020/08/13 15:33:05 $  $NHDT-Branch: NetHack-3.7 $
+# NetHack 3.7  include/cross-pre2 $NHDT-Date: 1597332785 2020/08/13 15:33:05 $  $NHDT-Branch: NetHack-3.7 $
 #
-# Cross-compiling -PRE section
+# Cross-compiling -PRE section 2
 #
-
-ifdef CROSS_TO_MSDOS
-CROSS=1
-BUILD_TARGET_LUA=1
-BUILD_PDCURSES=1
-CROSS_SHARED=1
-override TARGET = msdos
-override TARGETDIR=../targets/$(TARGET)
-override TARGETPFX = $(TARGETDIR)/
-override TARGET_LIBS=
-endif
-
-ifdef CROSS_TO_WASM
-CROSS=1
-BUILD_TARGET_LUA=1
-HACKDIR=/
-PREFIX=
-override TARGET = wasm
-override TARGETDIR=../targets/$(TARGET)
-override TARGETPFX = $(TARGETDIR)/
-override TARGET_LIBS=
-endif
-
-ifdef CROSS_TO_MIPS
-CROSS=1
-BUILD_TARGET_LUA=1
-BUILD_TARGET_NCURSES=1
-HACKDIR=/
-PREFIX=
-override TARGET = mips
-override TARGETDIR=../targets/$(TARGET)
-override TARGETPFX = $(TARGETDIR)/
-override TARGET_LIBS=
-endif
-
-ifdef CROSS
-override PREGAME=
-override BUILDMORE=
-override CLEANMORE=
-override PACKAGE=
-endif
 
 ifdef BUILD_TARGET_LUA
 #===============-=================================================
