@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<Import Project="../config.props" />
-	<Import Project="../dirs.props" />
-	<Import Project="$(vsDir)console.props" />
-	<Import Project="$(vsDir)common.props" />
-	<Import Project="$(vsDir)files.props" />
-	<Import Project="$(vsDir)NetHackProperties.props" />
-	<ItemGroup Label="ProjectConfigurations">
+  <Import Project="../config.props" />
+  <Import Project="../dirs.props" />
+  <Import Project="$(vsDir)console.props" />
+  <Import Project="$(vsDir)common.props" />
+  <Import Project="$(vsDir)files.props" />
+  <Import Project="$(vsDir)NetHackProperties.props" />
+  <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -27,6 +27,21 @@
   <ItemGroup>
     <ClCompile Include="$(RootDir)util\panic.c" />
     <ClCompile Include="$(RootDir)src\hacklib.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\include\config.h" />
+    <ClInclude Include="..\..\..\..\include\config1.h" />
+    <ClInclude Include="..\..\..\..\include\context.h" />
+    <ClInclude Include="..\..\..\..\include\coord.h" />
+    <ClInclude Include="..\..\..\..\include\defsym.h" />
+    <ClInclude Include="..\..\..\..\include\global.h" />
+    <ClInclude Include="..\..\..\..\include\monattk.h" />
+    <ClInclude Include="..\..\..\..\include\monflag.h" />
+    <ClInclude Include="..\..\..\..\include\objclass.h" />
+    <ClInclude Include="..\..\..\..\include\patchlevel.h" />
+    <ClInclude Include="..\..\..\..\include\sym.h" />
+    <ClInclude Include="..\..\..\..\include\tradstdc.h" />
+    <ClInclude Include="..\..\..\..\include\windconf.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
