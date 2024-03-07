@@ -2522,22 +2522,24 @@ extern void region_safety(void);
 /* ### report.c ### */
 
 #ifdef CRASHREPORT
-extern const char *get_saved_pline(int);
 extern boolean submit_web_report(int, const char *, const char *);
 extern boolean submit_web_report(int, const char *, const char *);
 extern void crashreport_init(int, char *[]);
 extern void crashreport_bidshow(void);
 extern boolean swr_add_uricoded(const char *, char **, int *, char *);
 extern int dobugreport(void);
+#endif /* CRASHREPORT */
 # ifndef NO_SIGNAL
 extern void panictrace_handler(int);
 # endif
+#ifdef PANICTRACE
+extern const char *get_saved_pline(int);
 extern boolean NH_panictrace_libc(void);
 extern boolean NH_panictrace_gdb(void);
-#endif
 #if defined(PANICTRACE) && !defined(NO_SIGNAL)
 extern void panictrace_setsignals(boolean);
 #endif
+#endif /* PANICTRACE */
 
 /* ### restore.c ### */
 

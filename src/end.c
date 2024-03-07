@@ -1898,10 +1898,8 @@ build_english_list(char *in)
 void
 NH_abort(char *why USED_FOR_CRASHREPORT)
 {
-#ifdef PANICTRACE
     int gdb_prio = SYSOPT_PANICTRACE_GDB;
     int libc_prio = SYSOPT_PANICTRACE_LIBC;
-#endif
     static volatile boolean aborting = FALSE;
 
     /* don't execute this code recursively if a second abort is requested
@@ -1910,7 +1908,6 @@ NH_abort(char *why USED_FOR_CRASHREPORT)
         return;
     aborting = TRUE;
 
-#ifdef PANICTRACE
 #ifdef CRASHREPORT
     if(!submit_web_report(1, "Panic", why))
 #endif
@@ -1938,7 +1935,6 @@ NH_abort(char *why USED_FOR_CRASHREPORT)
 #ifndef NO_SIGNAL
     panictrace_setsignals(FALSE);
 #endif
-#endif /* PANICTRACE */
     NH_abort_;
 }
 #undef USED_FOR_CRASHREPORT

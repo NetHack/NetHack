@@ -6,8 +6,6 @@
 
 /* NB: CRASHREPORT implies PANICTRACE */
 
-#ifdef CRASHREPORT
-
 # ifndef NO_SIGNAL
 #include <signal.h>
 # endif
@@ -23,70 +21,7 @@
 #include <execinfo.h>
 # endif
 
-# ifndef NO_SIGNAL
-/* called as signal() handler, so sent at least one arg */
-/*ARGUSED*/
-void
-panictrace_handler(int sig_unused UNUSED)
-{
-#define SIG_MSG "\nSignal received.\n"
-    int f2;
-
-#  ifdef CURSES_GRAPHICS
-    if (iflags.window_inited && WINDOWPORT(curses)) {
-        extern void curses_uncurse_terminal(void); /* wincurs.h */
-
-        /* it is risky calling this during a program-terminating signal,
-           but without it the subsequent backtrace is useless because
-           that ends up being scrawled all over the screen; call is
-           here rather than in NH_abort() because panic() calls both
-           exit_nhwindows(), which makes this same call under curses,
-           then NH_abort() and we don't want to call this twice */
-        curses_uncurse_terminal();
-    }
-#  endif
-
-    f2 = (int) write(2, SIG_MSG, sizeof SIG_MSG - 1);
-    nhUse(f2);  /* what could we do if write to fd#2 (stderr) fails  */
-    NH_abort(NULL); /* ... and we're already in the process of quitting? */
-}
-
-void
-panictrace_setsignals(boolean set)
-{
-#define SETSIGNAL(sig) \
-    (void) signal(sig, set ? (SIG_RET_TYPE) panictrace_handler : SIG_DFL);
-# ifdef SIGILL
-    SETSIGNAL(SIGILL);
-# endif
-# ifdef SIGTRAP
-    SETSIGNAL(SIGTRAP);
-# endif
-# ifdef SIGIOT
-    SETSIGNAL(SIGIOT);
-# endif
-# ifdef SIGBUS
-    SETSIGNAL(SIGBUS);
-# endif
-# ifdef SIGFPE
-    SETSIGNAL(SIGFPE);
-# endif
-# ifdef SIGSEGV
-    SETSIGNAL(SIGSEGV);
-# endif
-# ifdef SIGSTKFLT
-    SETSIGNAL(SIGSTKFLT);
-# endif
-# ifdef SIGSYS
-    SETSIGNAL(SIGSYS);
-# endif
-# ifdef SIGEMT
-    SETSIGNAL(SIGEMT);
-# endif
-#undef SETSIGNAL
-}
-# endif /* NO_SIGNAL */
-
+#ifdef CRASHREPORT
 # ifdef WIN32
 #  define HASH_PRAGMA_START
 #  define HASH_PRAGMA_END
@@ -516,6 +451,10 @@ dobugreport(void)
 #undef SWR_HDR
 #undef SWR_LINES
 
+#endif /* CRASHREPORT */
+
+#ifdef PANICTRACE
+
 /*ARGSUSED*/
 boolean
 NH_panictrace_libc(void)
@@ -618,6 +557,69 @@ get_saved_pline(int lineno)
     return NULL;
 }
 
-#endif /* CRASHREPORT */
+# ifndef NO_SIGNAL
+/* called as signal() handler, so sent at least one arg */
+/*ARGUSED*/
+void
+panictrace_handler(int sig_unused UNUSED)
+{
+#define SIG_MSG "\nSignal received.\n"
+    int f2;
 
- /*report.c*/
+#  ifdef CURSES_GRAPHICS
+    if (iflags.window_inited && WINDOWPORT(curses)) {
+        extern void curses_uncurse_terminal(void); /* wincurs.h */
+
+        /* it is risky calling this during a program-terminating signal,
+           but without it the subsequent backtrace is useless because
+           that ends up being scrawled all over the screen; call is
+           here rather than in NH_abort() because panic() calls both
+           exit_nhwindows(), which makes this same call under curses,
+           then NH_abort() and we don't want to call this twice */
+        curses_uncurse_terminal();
+    }
+#  endif
+
+    f2 = (int) write(2, SIG_MSG, sizeof SIG_MSG - 1);
+    nhUse(f2);  /* what could we do if write to fd#2 (stderr) fails  */
+    NH_abort(NULL); /* ... and we're already in the process of quitting? */
+}
+
+void
+panictrace_setsignals(boolean set)
+{
+#define SETSIGNAL(sig) \
+    (void) signal(sig, set ? (SIG_RET_TYPE) panictrace_handler : SIG_DFL);
+# ifdef SIGILL
+    SETSIGNAL(SIGILL);
+# endif
+# ifdef SIGTRAP
+    SETSIGNAL(SIGTRAP);
+# endif
+# ifdef SIGIOT
+    SETSIGNAL(SIGIOT);
+# endif
+# ifdef SIGBUS
+    SETSIGNAL(SIGBUS);
+# endif
+# ifdef SIGFPE
+    SETSIGNAL(SIGFPE);
+# endif
+# ifdef SIGSEGV
+    SETSIGNAL(SIGSEGV);
+# endif
+# ifdef SIGSTKFLT
+    SETSIGNAL(SIGSTKFLT);
+# endif
+# ifdef SIGSYS
+    SETSIGNAL(SIGSYS);
+# endif
+# ifdef SIGEMT
+    SETSIGNAL(SIGEMT);
+# endif
+#undef SETSIGNAL
+}
+# endif /* NO_SIGNAL */
+#endif /* PANICTRACE */
+
+/*report.c*/
