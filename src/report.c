@@ -5,6 +5,10 @@
 #include "hack.h"
 
 /* NB: CRASHREPORT implies PANICTRACE */
+#ifndef PANICTRACE
+#undef CRASHREPORT
+#endif
+
 #ifdef CRASHREPORT
 
 # ifndef NO_SIGNAL
