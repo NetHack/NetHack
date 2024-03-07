@@ -460,11 +460,11 @@ extern struct nomakedefs_s nomakedefs;
 #ifdef UNIX
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
 /* see end.c */
-#if !defined(CROSS_TO_WASM)
+#if !defined(CROSS_TO_WASM) && !defined(CROSS_TO_MSDOS)
 #ifndef PANICTRACE
 #define PANICTRACE
 #endif  /* PANICTRACE */
-#endif  /* CROSS_TO_WASM */
+#endif  /* CROSS_TO_WASM |  CROSS_TO_MSDOS */
 #endif  /* NH_DEVEL_STATUS != NH_STATUS_RELEASED */
 #endif  /* UNIX */
 

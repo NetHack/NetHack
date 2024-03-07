@@ -259,6 +259,9 @@
 # ifdef CRASHREPORT
 #  undef CRASHREPORT
 # endif
+# ifdef MSDOS
+#  undef PANICTRACE
+# endif
 #endif
 
 #ifdef CRASHREPORT
