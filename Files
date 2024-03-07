@@ -90,17 +90,18 @@ align.h       artifact.h    artilist.h    attrib.h      botl.h
 color.h       config.h      config1.h     context.h     coord.h
 cstd.h        decl.h        defsym.h      dgn_file.h    display.h
 dlb.h         dungeon.h     engrave.h     extern.h      flag.h
-fnamesiz.h    func_tab.h    global.h      hack.h        integer.h
-isaac64.h     lint.h        mail.h        mextra.h      mfndpos.h
-micro.h       mkroom.h      monattk.h     mondata.h     monflag.h
-monst.h       monsters.h    nhmd4.h       obj.h         objclass.h
-objects.h     optlist.h     patchlevel.h  pcconf.h      permonst.h
-prop.h        quest.h       rect.h        region.h      rm.h
-seffects.h    skills.h      sndprocs.h    sp_lev.h      spell.h
-sym.h         sys.h         tcap.h        tileset.h     timeout.h
-tradstdc.h    trap.h        unixconf.h    vision.h      vmsconf.h
-warnings.h    winami.h      wincurs.h     windconf.h    winprocs.h
-wintype.h     you.h         youprop.h
+fnamesiz.h    func_tab.h    global.h      hack.h        hacklib.h
+integer.h     isaac64.h     lint.h        mail.h        mextra.h
+mfndpos.h     micro.h       mkroom.h      monattk.h     mondata.h
+monflag.h     monst.h       monsters.h    nhmd4.h       obj.h
+objclass.h    objects.h     optlist.h     patchlevel.h  pcconf.h
+permonst.h    prop.h        quest.h       rect.h        region.h
+rm.h          seffects.h    selvar.h      skills.h      sndprocs.h
+sp_lev.h      spell.h       stairs.h      sym.h         sys.h
+tcap.h        tileset.h     timeout.h     tradstdc.h    trap.h
+unixconf.h    vision.h      vmsconf.h     warnings.h    winami.h
+wincurs.h     windconf.h    winprocs.h    wintype.h     you.h
+youprop.h
 
 (file for tty versions)
 wintty.h
@@ -290,25 +291,26 @@ windsound.c
 src:
 (files for all versions)
 allmain.c   alloc.c     apply.c     artifact.c  attrib.c    ball.c
-bones.c     botl.c      cmd.c       coloratt.c  date.c      dbridge.c
-decl.c      detect.c    dig.c       display.c   dlb.c       do.c
-do_name.c   do_wear.c   dog.c       dogmove.c   dokick.c    dothrow.c
-drawing.c   dungeon.c   eat.c       end.c       engrave.c   exper.c
-explode.c   extralev.c  files.c     fountain.c  hack.c      hacklib.c
-insight.c   invent.c    isaac64.c   light.c     lock.c      mail.c
-makemon.c   mcastu.c    mdlib.c     mhitm.c     mhitu.c     minion.c
-mklev.c     mkmap.c     mkmaze.c    mkobj.c     mkroom.c    mon.c
-mondata.c   monmove.c   monst.c     mplayer.c   mthrowu.c   muse.c
-music.c     nhlobj.c    nhlsel.c    nhlua.c     nhmd4.c     o_init.c
-objects.c   objnam.c    options.c   pager.c     pickup.c    pline.c
-polyself.c  potion.c    pray.c      priest.c    quest.c     questpgr.c
-read.c      rect.c      region.c    restore.c   rip.c       rnd.c
-role.c      rumors.c    save.c      sfstruct.c  shk.c       shknam.c
-sit.c       sounds.c    sp_lev.c    spell.c     steal.c     steed.c
+bones.c     botl.c      calendar.c  cmd.c       coloratt.c  date.c
+dbridge.c   decl.c      detect.c    dig.c       display.c   dlb.c
+do.c        do_name.c   do_wear.c   dog.c       dogmove.c   dokick.c
+dothrow.c   drawing.c   dungeon.c   eat.c       end.c       engrave.c
+exper.c     explode.c   extralev.c  files.c     fountain.c  getpos.c
+hack.c      hacklib.c   insight.c   invent.c    isaac64.c   light.c
+lock.c      mail.c      makemon.c   mcastu.c    mdlib.c     mhitm.c
+mhitu.c     minion.c    mklev.c     mkmap.c     mkmaze.c    mkobj.c
+mkroom.c    mon.c       mondata.c   monmove.c   monst.c     mplayer.c
+mthrowu.c   muse.c      music.c     nhlobj.c    nhlsel.c    nhlua.c
+nhmd4.c     o_init.c    objects.c   objnam.c    options.c   pager.c
+pickup.c    pline.c     polyself.c  potion.c    pray.c      priest.c
+quest.c     questpgr.c  read.c      rect.c      region.c    report.c
+restore.c   rip.c       rnd.c       role.c      rumors.c    save.c
+selvar.c    sfstruct.c  shk.c       shknam.c    sit.c       sounds.c
+sp_lev.c    spell.c     stairs.c    steal.c     steed.c     strutil.c
 symbols.c   sys.c       teleport.c  timeout.c   topten.c    track.c
 trap.c      u_init.c    uhitm.c     utf8map.c   vault.c     version.c
 vision.c    weapon.c    were.c      wield.c     windows.c   wizard.c
-worm.c      worn.c      write.c     zap.c
+wizcmds.c   worm.c      worn.c      write.c     zap.c
 
 submodules:
 (files in top directory)
@@ -410,9 +412,9 @@ unix
 
 sys/unix/hints/include:
 (files for configuring UNIX NetHack versions)
-compiler.370       cross-post.370     cross-pre.370      gbdates-post.370
-gbdates-pre.370    misc.370           multisnd-post.370  multisnd1-pre.370
-multisnd2-pre.370  multiw-1.370       multiw-2.370
+compiler.370       cross-post.370     cross-pre1.370     cross-pre2.370
+gbdates-post.370   gbdates-pre.370    misc.370           multisnd-post.370
+multisnd1-pre.370  multisnd2-pre.370  multiw-1.370       multiw-2.370
 
 sys/vms:
 (files for VMS version)
