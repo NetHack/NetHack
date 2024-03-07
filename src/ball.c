@@ -137,7 +137,7 @@ placebc_core(void)
 
     place_object(uchain, u.ux, u.uy);
 
-    u.bglyph = u.cglyph = levl[u.ux][u.uy].glyph; /* pick up glyph */
+    u.bglyph = u.cglyph = loc(u.ux, u.uy)->glyph; /* pick up glyph */
 
     newsym(u.ux, u.uy);
     bcrestriction = 0;
@@ -163,13 +163,13 @@ unplacebc_core(void)
     if (!carried(uball)) {
         obj_extract_self(uball);
         if (Blind && (u.bc_felt & BC_BALL)) /* drop glyph */
-            levl[uball->ox][uball->oy].glyph = u.bglyph;
+            loc(uball->ox, uball->oy)->glyph = u.bglyph;
         maybe_unhide_at(uball->ox, uball->oy);
         newsym(uball->ox, uball->oy);
     }
     obj_extract_self(uchain);
     if (Blind && (u.bc_felt & BC_CHAIN)) /* drop glyph */
-        levl[uchain->ox][uchain->oy].glyph = u.cglyph;
+        loc(uchain->ox, uchain->oy)->glyph = u.cglyph;
     maybe_unhide_at(uchain->ox, uchain->oy);
 
     newsym(uchain->ox, uchain->oy);
@@ -385,7 +385,7 @@ set_bc(int already_blind)
     u.bc_felt = ball_on_floor ? BC_BALL | BC_CHAIN : BC_CHAIN; /* felt */
 
     if (already_blind || u.uswallow) {
-        u.cglyph = u.bglyph = levl[u.ux][u.uy].glyph;
+        u.cglyph = u.bglyph = loc(u.ux, u.uy)->glyph;
         return;
     }
 
@@ -399,14 +399,14 @@ set_bc(int already_blind)
         remove_object(uball);
 
     newsym(uchain->ox, uchain->oy);
-    u.cglyph = levl[uchain->ox][uchain->oy].glyph;
+    u.cglyph = loc(uchain->ox, uchain->oy)->glyph;
 
     if (u.bc_order == BCPOS_DIFFER) { /* different locations */
         place_object(uchain, uchain->ox, uchain->oy);
         newsym(uchain->ox, uchain->oy);
         if (ball_on_floor) {
             newsym(uball->ox, uball->oy); /* see under ball */
-            u.bglyph = levl[uball->ox][uball->oy].glyph;
+            u.bglyph = loc(uball->ox, uball->oy)->glyph;
             place_object(uball, uball->ox, uball->oy);
             newsym(uball->ox, uball->oy); /* restore ball */
         }
@@ -454,26 +454,26 @@ move_bc(int before, int control, coordxy ballx, coordxy bally,
                  *  Both ball and chain moved.  If felt, drop glyph.
                  */
                 if (u.bc_felt & BC_BALL)
-                    levl[uball->ox][uball->oy].glyph = u.bglyph;
+                    loc(uball->ox, uball->oy)->glyph = u.bglyph;
                 if (u.bc_felt & BC_CHAIN)
-                    levl[uchain->ox][uchain->oy].glyph = u.cglyph;
+                    loc(uchain->ox, uchain->oy)->glyph = u.cglyph;
                 u.bc_felt = 0;
 
                 /* Pick up glyph at new location. */
-                u.bglyph = levl[ballx][bally].glyph;
-                u.cglyph = levl[chainx][chainy].glyph;
+                u.bglyph = loc(ballx, bally)->glyph;
+                u.cglyph = loc(chainx, chainy)->glyph;
 
                 movobj(uball, ballx, bally);
                 movobj(uchain, chainx, chainy);
             } else if (control & BC_BALL) {
                 if (u.bc_felt & BC_BALL) {
                     if (u.bc_order == BCPOS_DIFFER) { /* ball by itself */
-                        levl[uball->ox][uball->oy].glyph = u.bglyph;
+                        loc(uball->ox, uball->oy)->glyph = u.bglyph;
                     } else if (u.bc_order == BCPOS_BALL) {
                         if (u.bc_felt & BC_CHAIN) { /* know chain is there */
                             map_object(uchain, 0);
                         } else {
-                            levl[uball->ox][uball->oy].glyph = u.bglyph;
+                            loc(uball->ox, uball->oy)->glyph = u.bglyph;
                         }
                     }
                     u.bc_felt &= ~BC_BALL; /* no longer feel the ball */
@@ -481,26 +481,26 @@ move_bc(int before, int control, coordxy ballx, coordxy bally,
 
                 /* Pick up glyph at new position. */
                 u.bglyph = (ballx != chainx || bally != chainy)
-                               ? levl[ballx][bally].glyph
+                               ? loc(ballx, bally)->glyph
                                : u.cglyph;
 
                 movobj(uball, ballx, bally);
             } else if (control & BC_CHAIN) {
                 if (u.bc_felt & BC_CHAIN) {
                     if (u.bc_order == BCPOS_DIFFER) {
-                        levl[uchain->ox][uchain->oy].glyph = u.cglyph;
+                        loc(uchain->ox, uchain->oy)->glyph = u.cglyph;
                     } else if (u.bc_order == BCPOS_CHAIN) {
                         if (u.bc_felt & BC_BALL) {
                             map_object(uball, 0);
                         } else {
-                            levl[uchain->ox][uchain->oy].glyph = u.cglyph;
+                            loc(uchain->ox, uchain->oy)->glyph = u.cglyph;
                         }
                     }
                     u.bc_felt &= ~BC_CHAIN;
                 }
                 /* Pick up glyph at new position. */
                 u.cglyph = (ballx != chainx || bally != chainy)
-                               ? levl[chainx][chainy].glyph
+                               ? loc(chainx, chainy)->glyph
                                : u.bglyph;
 
                 movobj(uchain, chainx, chainy);
@@ -609,9 +609,9 @@ drag_ball(coordxy x, coordxy y, int *bc_control,
     (distmin(x, y, chx, chy) <= 1 \
      && distmin(chx, chy, uball->ox, uball->oy) <= 1)
 #define IS_CHAIN_ROCK(x, y)      \
-    (IS_ROCK(levl[x][y].typ)     \
-     || (IS_DOOR(levl[x][y].typ) \
-         && (levl[x][y].doormask & (D_CLOSED | D_LOCKED))))
+    (IS_ROCK(loc(x, y)->typ)     \
+     || (IS_DOOR(loc(x, y)->typ) \
+         && (loc(x, y)->doormask & (D_CLOSED | D_LOCKED))))
     /*
      * Don't ever move the chain into solid rock.  If we have to, then
      * instead undo the move_bc() and jump to the drag ball code.  Note
@@ -781,9 +781,9 @@ drag_ball(coordxy x, coordxy y, int *bc_control,
 
     if ((is_pool(uchain->ox, uchain->oy)
          /* water not mere continuation of previous water */
-         && (levl[uchain->ox][uchain->oy].typ == POOL
+         && (loc(uchain->ox, uchain->oy)->typ == POOL
              || !is_pool(uball->ox, uball->oy)
-             || levl[uball->ox][uball->oy].typ == POOL))
+             || loc(uball->ox, uball->oy)->typ == POOL))
         || ((t = t_at(uchain->ox, uchain->oy))
             && (is_pit(t->ttyp) || is_hole(t->ttyp)))) {
         if (Levitation) {
@@ -886,7 +886,7 @@ drop_ball(coordxy x, coordxy y)
         /* get the order */
         u.bc_order = bc_order();
         /* pick up glyph */
-        u.bglyph = (u.bc_order) ? u.cglyph : levl[x][y].glyph;
+        u.bglyph = (u.bc_order) ? u.cglyph : loc(x, y)->glyph;
     }
 
     if (x != u.ux || y != u.uy) {
@@ -945,10 +945,10 @@ drop_ball(coordxy x, coordxy y)
         if (Blind) {
             /* drop glyph under the chain */
             if (u.bc_felt & BC_CHAIN)
-                levl[uchain->ox][uchain->oy].glyph = u.cglyph;
+                loc(uchain->ox, uchain->oy)->glyph = u.cglyph;
             u.bc_felt = 0; /* feel nothing */
             /* pick up new glyph */
-            u.cglyph = (u.bc_order) ? u.bglyph : levl[u.ux][u.uy].glyph;
+            u.cglyph = (u.bc_order) ? u.bglyph : loc(u.ux, u.uy)->glyph;
         }
         movobj(uchain, u.ux, u.uy); /* has a newsym */
         if (Blind) {

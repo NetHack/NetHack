@@ -817,7 +817,7 @@ engulf_target(struct monst *magr, struct monst *mdef)
        the hero on top of a monster can occur */
     dx = (mdef == &gy.youmonst) ? u.ux : mdef->mx;
     dy = (mdef == &gy.youmonst) ? u.uy : mdef->my;
-    lev = &levl[dx][dy];
+    lev = loc(dx, dy);
     if (!(udef ? Passes_walls : passes_walls(mdef->data))
           && (IS_ROCK(lev->typ) || closed_door(dx, dy) || IS_TREE(lev->typ)
               /* not passes_bars(); engulfer isn't squeezing through */
@@ -825,7 +825,7 @@ engulf_target(struct monst *magr, struct monst *mdef)
         return FALSE;
     ax = (magr == &gy.youmonst) ? u.ux : magr->mx;
     ay = (magr == &gy.youmonst) ? u.uy : magr->my;
-    lev = &levl[ax][ay];
+    lev = loc(ax, ay);
     if (!(uatk ? Passes_walls : passes_walls(magr->data))
         && (IS_ROCK(lev->typ) || closed_door(ax, ay) || IS_TREE(lev->typ)
             || (lev->typ == IRONBARS && !is_whirly(mdef->data))))

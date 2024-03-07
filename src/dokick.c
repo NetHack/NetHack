@@ -590,7 +590,7 @@ really_kick_object(coordxy x, coordxy y)
         range = 1;
 
     /* see if the object has a place to move into */
-    if (!ZAP_POS(levl[x + u.dx][y + u.dy].typ)
+    if (!ZAP_POS(loc(x + u.dx, y + u.dy)->typ)
         || closed_door(x + u.dx, y + u.dy))
         range = 1;
 
@@ -605,9 +605,9 @@ really_kick_object(coordxy x, coordxy y)
     Norep("You kick %s.",
           !isgold ? singular(gk.kickedobj, doname) : doname(gk.kickedobj));
 
-    if (IS_ROCK(levl[x][y].typ) || closed_door(x, y)) {
+    if (IS_ROCK(loc(x, y)->typ) || closed_door(x, y)) {
         if ((!martial() && rn2(20) > ACURR(A_DEX))
-            || IS_ROCK(levl[u.ux][u.uy].typ) || closed_door(u.ux, u.uy)) {
+            || IS_ROCK(loc(u.ux, u.uy)->typ) || closed_door(u.ux, u.uy)) {
             if (Blind)
                 pline("It doesn't come loose.");
             else
@@ -840,13 +840,13 @@ watchman_door_damage(struct monst *mtmp, coordxy x, coordxy y)
 {
     if (is_watch(mtmp->data) && mtmp->mpeaceful
         && couldsee(mtmp->mx, mtmp->my)) {
-        if (levl[x][y].looted & D_WARNED) {
+        if (loc(x, y)->looted & D_WARNED) {
             mon_yells(mtmp,
                       "Halt, vandal!  You're under arrest!");
             (void) angry_guards(FALSE);
         } else {
             mon_yells(mtmp, "Hey, stop damaging that door!");
-            levl[x][y].looted |= D_WARNED;
+            loc(x, y)->looted |= D_WARNED;
         }
         return TRUE;
     }
@@ -886,7 +886,7 @@ kick_ouch(coordxy x, coordxy y, const char *kickobjnam)
             pline_The("drawbridge is unaffected.");
             /* update maploc to refer to the drawbridge */
             (void) find_drawbridge(&x, &y);
-            gm.maploc = &levl[x][y];
+            gm.maploc = loc(x, y);
         }
         wake_nearto(x, y, 5 * 5);
     }
@@ -1347,8 +1347,8 @@ dokick(void)
          * reachable for bracing purposes
          * Possible extension: allow bracing against stuff on the side?
          */
-        if (isok(xx, yy) && !IS_ROCK(levl[xx][yy].typ)
-            && !IS_DOOR(levl[xx][yy].typ)
+        if (isok(xx, yy) && !IS_ROCK(loc(xx, yy)->typ)
+            && !IS_DOOR(loc(xx, yy)->typ)
             && (!Is_airlevel(&u.uz) || !OBJ_AT(xx, yy))) {
             You("have nothing to brace yourself against.");
             return ECMD_OK;
@@ -1374,7 +1374,7 @@ dokick(void)
         kick_ouch(x, y, "");
         return ECMD_TIME;
     }
-    gm.maploc = &levl[x][y];
+    gm.maploc = loc(x, y);
 
     /*
      * The next five tests should stay in their present order:
@@ -1807,7 +1807,7 @@ obj_delivery(boolean near_hero)
         otmp->omigr_from_dlevel = 0;
         if (nx > 0) {
             place_object(otmp, nx, ny);
-            if (!nobreak && !IS_SOFT(levl[nx][ny].typ)) {
+            if (!nobreak && !IS_SOFT(loc(nx, ny)->typ)) {
                 if (where == MIGR_WITH_HERO) {
                     if (breaks(otmp, nx, ny))
                         continue;

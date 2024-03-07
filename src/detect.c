@@ -172,7 +172,7 @@ trapped_door_at(int ttyp, coordxy x, coordxy y)
         return FALSE;
     if (ttyp != TRAPPED_DOOR || (Hallucination && rn2(20)))
         return FALSE;
-    lev = &levl[x][y];
+    lev = loc(x, y);
     if (!IS_DOOR(lev->typ))
         return FALSE;
     if ((lev->doormask & (D_NODOOR | D_BROKEN | D_ISOPEN)) != 0
@@ -946,9 +946,9 @@ display_trap_map(int cursed_src)
     dummytrap.ttyp = TRAPPED_DOOR;
     for (door = 0; door < gd.doorindex; door++) {
         cc = gd.doors[door];
-        if (levl[cc.x][cc.y].typ == SDOOR) /* see above */
+        if (loc(cc.x, cc.y)->typ == SDOOR) /* see above */
             continue;
-        if (levl[cc.x][cc.y].doormask & D_TRAPPED) {
+        if (loc(cc.x, cc.y)->doormask & D_TRAPPED) {
             dummytrap.tx = cc.x, dummytrap.ty = cc.y;
             sense_trap(&dummytrap, cc.x, cc.y, cursed_src);
         }
@@ -1026,12 +1026,12 @@ trap_detect(
     /* door traps */
     for (door = 0; door < gd.doorindex; door++) {
         cc = gd.doors[door];
-        /* levl[][].doormask and .wall_info both overlay levl[][].flags;
+        /* loc()->doormask and ->wall_info both overlay loc()->flags;
            the bit in doormask for D_TRAPPED is also a bit in wall_info;
            secret doors use wall_info so can't be marked as trapped */
-        if (levl[cc.x][cc.y].typ == SDOOR)
+        if (loc(cc.x, cc.y)->typ == SDOOR)
             continue;
-        if (levl[cc.x][cc.y].doormask & D_TRAPPED) {
+        if (loc(cc.x, cc.y)->doormask & D_TRAPPED) {
             if (cc.x != u.ux || cc.y != u.uy) {
                 display_trap_map(cursed_src);
                 return 0;
@@ -1064,7 +1064,7 @@ furniture_detect(void)
         for (x = 1; x < COLNO; ++x) {
             glyph = glyph_at(x, y);
             sym = glyph_to_cmap(glyph);
-            if (IS_FURNITURE(levl[x][y].typ)) {
+            if (IS_FURNITURE(loc(x, y)->typ)) {
                 ++found;
                 magic_map_background(x, y, 1);
             } else if (is_cmap_furniture(sym)) {
@@ -1341,7 +1341,7 @@ show_map_spot(coordxy x, coordxy y, boolean cnf)
 
     if (cnf && rn2(7))
         return;
-    lev = &levl[x][y];
+    lev = loc(x, y);
 
     lev->seenv = SVALL;
 
@@ -1577,13 +1577,13 @@ findone(coordxy zx, coordxy zy, genericptr_t whatfound)
      * monster to be hiding at the location of an unseen trap.
      */
 
-    if (levl[zx][zy].typ == SDOOR) {
-        cvt_sdoor_to_door(&levl[zx][zy]); /* .typ = DOOR */
+    if (loc(zx, zy)->typ == SDOOR) {
+        cvt_sdoor_to_door(loc(zx, zy)); /* .typ = DOOR */
         magic_map_background(zx, zy, 0);
         newsym(zx, zy);
         found_p->num_sdoors++;
-    } else if (levl[zx][zy].typ == SCORR) {
-        levl[zx][zy].typ = CORR;
+    } else if (loc(zx, zy)->typ == SCORR) {
+        loc(zx, zy)->typ = CORR;
         unblock_point(zx, zy);
         magic_map_background(zx, zy, 0);
         newsym(zx, zy);
@@ -1611,7 +1611,7 @@ findone(coordxy zx, coordxy zy, genericptr_t whatfound)
             newsym(zx, zy);
             found_p->num_mons++;
         }
-        if (!glyph_is_invisible(levl[zx][zy].glyph)) {
+        if (!glyph_is_invisible(loc(zx, zy)->glyph)) {
             if (!canspotmon(mtmp)) {
                 map_invisible(zx, zy);
                 found_p->num_invis++;
@@ -1640,14 +1640,14 @@ openone(coordxy zx, coordxy zy, genericptr_t num)
         }
         /* let it fall to the next cases. could be on trap. */
     }
-    /* note: secret doors can't be trapped; they use levl[][].wall_info;
+    /* note: secret doors can't be trapped; they use loc(, )->wall_info;
        see rm.h for the troublesome overlay of doormask and wall_info */
-    if (levl[zx][zy].typ == SDOOR
-        || (levl[zx][zy].typ == DOOR
-            && (levl[zx][zy].doormask & (D_CLOSED | D_LOCKED)))) {
-        if (levl[zx][zy].typ == SDOOR)
-            cvt_sdoor_to_door(&levl[zx][zy]); /* .typ = DOOR */
-        if (levl[zx][zy].doormask & D_TRAPPED) {
+    if (loc(zx, zy)->typ == SDOOR
+        || (loc(zx, zy)->typ == DOOR
+            && (loc(zx, zy)->doormask & (D_CLOSED | D_LOCKED)))) {
+        if (loc(zx, zy)->typ == SDOOR)
+            cvt_sdoor_to_door(loc(zx, zy)); /* .typ = DOOR */
+        if (loc(zx, zy)->doormask & D_TRAPPED) {
             if (distu(zx, zy) < 3)
                 b_trapped("door", NO_PART);
             else
@@ -1655,14 +1655,14 @@ openone(coordxy zx, coordxy zy, genericptr_t num)
                       cansee(zx, zy) ? "see" : (!Deaf ? "hear"
                                                       : "feel the shock of"));
             wake_nearto(zx, zy, 11 * 11);
-            levl[zx][zy].doormask = D_NODOOR;
+            loc(zx, zy)->doormask = D_NODOOR;
         } else
-            levl[zx][zy].doormask = D_ISOPEN;
+            loc(zx, zy)->doormask = D_ISOPEN;
         unblock_point(zx, zy);
         newsym(zx, zy);
         (*num_p)++;
-    } else if (levl[zx][zy].typ == SCORR) {
-        levl[zx][zy].typ = CORR;
+    } else if (loc(zx, zy)->typ == SCORR) {
+        loc(zx, zy)->typ = CORR;
         unblock_point(zx, zy);
         newsym(zx, zy);
         (*num_p)++;
@@ -1814,7 +1814,7 @@ find_trap(struct trap *trap)
        behavior might need a rework in the hallucination case
        (e.g. to not prompt if any trap glyph appears on the square). */
     if (Hallucination ||
-        levl[trap->tx][trap->ty].glyph != trap_to_glyph(trap)) {
+        loc(trap->tx, trap->ty)->glyph != trap_to_glyph(trap)) {
         /* There's too much clutter to see your find otherwise */
         cls();
         map_trap(trap, 1);
@@ -1863,7 +1863,7 @@ mfind0(struct monst *mtmp, boolean via_warning)
     }
 
     if (found_something) {
-        if (!canspotmon(mtmp) && glyph_is_invisible(levl[x][y].glyph))
+        if (!canspotmon(mtmp) && glyph_is_invisible(loc(x, y)->glyph))
             return -1; /* Found invisible monster in square which already has
                         * 'I' in it.  Logically, this should still take time
                         * and lead to `return 1', but if we did that the hero
@@ -1909,19 +1909,19 @@ dosearch0(int aflag) /* intrinsic autosearch vs explicit searching */
 
                 if (Blind && !aflag)
                     feel_location(x, y);
-                if (levl[x][y].typ == SDOOR) {
+                if (loc(x, y)->typ == SDOOR) {
                     if (rnl(7 - fund))
                         continue;
-                    cvt_sdoor_to_door(&levl[x][y]); /* .typ = DOOR */
+                    cvt_sdoor_to_door(loc(x, y)); /* .typ = DOOR */
                     exercise(A_WIS, TRUE);
                     nomul(0);
                     feel_location(x, y); /* make sure it shows up */
                     set_msg_xy(x, y);
                     You("find a hidden door.");
-                } else if (levl[x][y].typ == SCORR) {
+                } else if (loc(x, y)->typ == SCORR) {
                     if (rnl(7 - fund))
                         continue;
-                    levl[x][y].typ = CORR;
+                    loc(x, y)->typ = CORR;
                     unblock_point(x, y); /* vision */
                     exercise(A_WIS, TRUE);
                     nomul(0);
@@ -1999,10 +1999,10 @@ premap_detect(void)
     /* Map the background and boulders */
     for (x = 1; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++) {
-            levl[x][y].seenv = SVALL;
-            levl[x][y].waslit = TRUE;
-            if (levl[x][y].typ == SDOOR)
-                levl[x][y].wall_info = 0; /* see rm.h for explanation */
+            loc(x, y)->seenv = SVALL;
+            loc(x, y)->waslit = TRUE;
+            if (loc(x, y)->typ == SDOOR)
+                loc(x, y)->wall_info = 0; /* see rm.h for explanation */
             map_background(x, y, 1);
             if ((obj = sobj_at(BOULDER, x, y)) != 0)
                 map_object(obj, 1);
@@ -2035,17 +2035,17 @@ reveal_terrain_getglyph(
        otherwise what the hero remembers for seen locations with
        monsters, objects, and/or traps removed as caller dictates */
     seenv = (full || gl.level.flags.hero_memory)
-              ? levl[x][y].seenv : cansee(x, y) ? SVALL : 0;
+              ? loc(x, y)->seenv : cansee(x, y) ? SVALL : 0;
     if (full) {
-        levl[x][y].seenv = SVALL;
+        loc(x, y)->seenv = SVALL;
         glyph = back_to_glyph(x, y);
-        levl[x][y].seenv = seenv;
+        loc(x, y)->seenv = seenv;
     } else {
-        levl_glyph = gl.level.flags.hero_memory ? levl[x][y].glyph
+        levl_glyph = gl.level.flags.hero_memory ? loc(x, y)->glyph
                      : seenv ? back_to_glyph(x, y)
                        : default_glyph;
         /* glyph_at() returns the displayed glyph, which might
-           be a monster.  levl[][].glyph contains the remembered
+           be a monster.  loc(, )->glyph contains the remembered
            glyph, which will never be a monster (unless it is
            the invisible monster glyph, which is handled like
            an object, replacing any object or trap at its spot) */
@@ -2067,7 +2067,7 @@ reveal_terrain_getglyph(
             || glyph_is_invisible(glyph)) {
             if (!seenv) {
                 glyph = default_glyph;
-            } else if (gl.lastseentyp[x][y] == levl[x][y].typ) {
+            } else if (gl.lastseentyp[x][y] == loc(x, y)->typ) {
                 glyph = back_to_glyph(x, y);
             } else {
                 /* look for a mimic here posing as furniture;
@@ -2077,11 +2077,11 @@ reveal_terrain_getglyph(
                     glyph = cmap_to_glyph(mtmp->mappearance);
                 } else {
                     struct rm save_spot;
-
+                    struct rm *lvl;
                     /*
                      * We have a topology type but we want a screen symbol
                      * in order to derive a glyph.  Some screen symbols need
-                     * the flags field of levl[][] in addition to the type
+                     * the flags field of loc(, )->in addition to the type
                      * (to disambiguate STAIRS to S_upstair or S_dnstair,
                      * for example).  Current flags might not be intended
                      * for remembered type, but we've got no other choice.
@@ -2090,12 +2090,13 @@ reveal_terrain_getglyph(
                      * might issue an impossible() for it if it is currently
                      * doormask==D_OPEN for an open door remembered as a wall.
                      */
-                    save_spot = levl[x][y];
-                    levl[x][y].typ = gl.lastseentyp[x][y];
-                    if (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR)
-                        xy_set_wall_state(x, y); /* levl[x][y].wall_info */
+                    lvl = loc(x, y);
+                    save_spot = *lvl;
+                    lvl->typ = gl.lastseentyp[x][y];
+                    if (IS_WALL(lvl->typ) || lvl->typ == SDOOR)
+                        xy_set_wall_state(x, y); /* loc(x, y)->wall_info */
                     glyph = back_to_glyph(x, y);
-                    levl[x][y] = save_spot;
+                    *lvl = save_spot;
                 }
             }
         }

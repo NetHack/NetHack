@@ -234,7 +234,7 @@ show_transient_light(struct obj *obj, coordxy x, coordxy y)
     /* Null object indicates camera flash */
     if (!obj) {
         /* no need to temporarily light an already lit spot */
-        if (levl[x][y].lit)
+        if (loc(x, y)->lit)
             return;
 
         cameraflash = cg.zeroany;

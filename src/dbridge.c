@@ -37,7 +37,7 @@ static void nokiller(void);
 boolean
 is_waterwall(coordxy x, coordxy y)
 {
-    if (isok(x, y) && IS_WATERWALL(levl[x][y].typ))
+    if (isok(x, y) && IS_WATERWALL(loc(x, y)->typ))
         return TRUE;
     return FALSE;
 }
@@ -49,7 +49,7 @@ is_pool(coordxy x, coordxy y)
 
     if (!isok(x, y))
         return FALSE;
-    ltyp = levl[x][y].typ;
+    ltyp = loc(x, y)->typ;
     /* The ltyp == MOAT is not redundant with is_moat, because the
      * Juiblex level does not have moats, although it has MOATs. There
      * is probably a better way to express this. */
@@ -65,10 +65,10 @@ is_lava(coordxy x, coordxy y)
 
     if (!isok(x, y))
         return FALSE;
-    ltyp = levl[x][y].typ;
+    ltyp = loc(x, y)->typ;
     if (ltyp == LAVAPOOL || ltyp == LAVAWALL
         || (ltyp == DRAWBRIDGE_UP
-            && (levl[x][y].drawbridgemask & DB_UNDER) == DB_LAVA))
+            && (loc(x, y)->drawbridgemask & DB_UNDER) == DB_LAVA))
         return TRUE;
     return FALSE;
 }
@@ -89,9 +89,9 @@ is_ice(coordxy x, coordxy y)
 
     if (!isok(x, y))
         return FALSE;
-    ltyp = levl[x][y].typ;
+    ltyp = loc(x, y)->typ;
     if (ltyp == ICE || (ltyp == DRAWBRIDGE_UP
-                        && (levl[x][y].drawbridgemask & DB_UNDER) == DB_ICE))
+                        && (loc(x, y)->drawbridgemask & DB_UNDER) == DB_ICE))
         return TRUE;
     return FALSE;
 }
@@ -103,11 +103,11 @@ is_moat(coordxy x, coordxy y)
 
     if (!isok(x, y))
         return FALSE;
-    ltyp = levl[x][y].typ;
+    ltyp = loc(x, y)->typ;
     if (!Is_juiblex_level(&u.uz)
         && (ltyp == MOAT
             || (ltyp == DRAWBRIDGE_UP
-                && (levl[x][y].drawbridgemask & DB_UNDER) == DB_MOAT)))
+                && (loc(x, y)->drawbridgemask & DB_UNDER) == DB_MOAT)))
         return TRUE;
     return FALSE;
 }
@@ -139,21 +139,21 @@ is_drawbridge_wall(coordxy x, coordxy y)
 {
     struct rm *lev;
 
-    lev = &levl[x][y];
+    lev = loc(x, y);
     if (lev->typ != DOOR && lev->typ != DBWALL)
         return -1;
 
-    if (IS_DRAWBRIDGE(levl[x + 1][y].typ)
-        && (levl[x + 1][y].drawbridgemask & DB_DIR) == DB_WEST)
+    if (IS_DRAWBRIDGE(loc(x + 1, y)->typ)
+        && (loc(x + 1, y)->drawbridgemask & DB_DIR) == DB_WEST)
         return DB_WEST;
-    if (IS_DRAWBRIDGE(levl[x - 1][y].typ)
-        && (levl[x - 1][y].drawbridgemask & DB_DIR) == DB_EAST)
+    if (IS_DRAWBRIDGE(loc(x - 1, y)->typ)
+        && (loc(x - 1, y)->drawbridgemask & DB_DIR) == DB_EAST)
         return DB_EAST;
-    if (IS_DRAWBRIDGE(levl[x][y - 1].typ)
-        && (levl[x][y - 1].drawbridgemask & DB_DIR) == DB_SOUTH)
+    if (IS_DRAWBRIDGE(loc(x, y - 1)->typ)
+        && (loc(x, y - 1)->drawbridgemask & DB_DIR) == DB_SOUTH)
         return DB_SOUTH;
-    if (IS_DRAWBRIDGE(levl[x][y + 1].typ)
-        && (levl[x][y + 1].drawbridgemask & DB_DIR) == DB_NORTH)
+    if (IS_DRAWBRIDGE(loc(x, y + 1)->typ)
+        && (loc(x, y + 1)->drawbridgemask & DB_DIR) == DB_NORTH)
         return DB_NORTH;
 
     return -1;
@@ -167,7 +167,7 @@ is_drawbridge_wall(coordxy x, coordxy y)
 boolean
 is_db_wall(coordxy x, coordxy y)
 {
-    return (boolean) (levl[x][y].typ == DBWALL);
+    return (boolean) (loc(x, y)->typ == DBWALL);
 }
 
 /*
@@ -179,7 +179,7 @@ find_drawbridge(coordxy *x, coordxy *y)
 {
     int dir;
 
-    if (IS_DRAWBRIDGE(levl[*x][*y].typ))
+    if (IS_DRAWBRIDGE(loc(*x, *y)->typ))
         return TRUE;
     dir = is_drawbridge_wall(*x, *y);
     if (dir >= 0) {
@@ -208,7 +208,7 @@ find_drawbridge(coordxy *x, coordxy *y)
 static void
 get_wall_for_db(coordxy *x, coordxy *y)
 {
-    switch (levl[*x][*y].drawbridgemask & DB_DIR) {
+    switch (loc(*x, *y)->drawbridgemask & DB_DIR) {
     case DB_NORTH:
         (*y)--;
         break;
@@ -234,7 +234,7 @@ create_drawbridge(coordxy x, coordxy y, int dir, boolean flag)
 {
     coordxy x2, y2;
     boolean horiz;
-    boolean lava = levl[x][y].typ == LAVAPOOL; /* assume initialized map */
+    boolean lava = loc(x, y)->typ == LAVAPOOL; /* assume initialized map */
 
     x2 = x;
     y2 = y;
@@ -259,23 +259,23 @@ create_drawbridge(coordxy x, coordxy y, int dir, boolean flag)
         x2--;
         break;
     }
-    if (!IS_WALL(levl[x2][y2].typ))
+    if (!IS_WALL(loc(x2, y2)->typ))
         return FALSE;
     if (flag) { /* We want the bridge open */
-        levl[x][y].typ = DRAWBRIDGE_DOWN;
-        levl[x2][y2].typ = DOOR;
-        levl[x2][y2].doormask = D_NODOOR;
+        loc(x, y)->typ = DRAWBRIDGE_DOWN;
+        loc(x2, y2)->typ = DOOR;
+        loc(x2, y2)->doormask = D_NODOOR;
     } else {
-        levl[x][y].typ = DRAWBRIDGE_UP;
-        levl[x2][y2].typ = DBWALL;
+        loc(x, y)->typ = DRAWBRIDGE_UP;
+        loc(x2, y2)->typ = DBWALL;
         /* Drawbridges are non-diggable. */
-        levl[x2][y2].wall_info = W_NONDIGGABLE;
+        loc(x2, y2)->wall_info = W_NONDIGGABLE;
     }
-    levl[x][y].horizontal = !horiz;
-    levl[x2][y2].horizontal = horiz;
-    levl[x][y].drawbridgemask = dir;
+    loc(x, y)->horizontal = !horiz;
+    loc(x2, y2)->horizontal = horiz;
+    loc(x, y)->drawbridgemask = dir;
     if (lava)
-        levl[x][y].drawbridgemask |= DB_LAVA;
+        loc(x, y)->drawbridgemask |= DB_LAVA;
     return  TRUE;
 }
 
@@ -539,7 +539,7 @@ do_entity(struct entity *etmp)
     oldx = etmp->ex;
     oldy = etmp->ey;
     at_portcullis = is_db_wall(oldx, oldy);
-    crm = &levl[oldx][oldy];
+    crm = loc(oldx, oldy);
 
     if (automiss(etmp) && e_survives_at(etmp, oldx, oldy)) {
         if (e_inview && (at_portcullis || IS_DRAWBRIDGE(crm->typ)))
@@ -752,7 +752,7 @@ close_drawbridge(coordxy x, coordxy y)
     struct trap *t;
     coordxy x2, y2;
 
-    lev1 = &levl[x][y];
+    lev1 = loc(x, y);
     if (lev1->typ != DRAWBRIDGE_DOWN)
         return;
     x2 = x;
@@ -769,7 +769,7 @@ close_drawbridge(coordxy x, coordxy y)
         You_hear("chains rattling and gears turning.");
     }
     lev1->typ = DRAWBRIDGE_UP;
-    lev2 = &levl[x2][y2];
+    lev2 = loc(x2, y2);
     lev2->typ = DBWALL;
     switch (lev1->drawbridgemask & DB_DIR) {
     case DB_NORTH:
@@ -817,7 +817,7 @@ open_drawbridge(coordxy x, coordxy y)
     struct trap *t;
     coordxy x2, y2;
 
-    lev1 = &levl[x][y];
+    lev1 = loc(x, y);
     if (lev1->typ != DRAWBRIDGE_UP)
         return;
     x2 = x;
@@ -831,7 +831,7 @@ open_drawbridge(coordxy x, coordxy y)
         You_hear("gears turning and chains rattling.");
     }
     lev1->typ = DRAWBRIDGE_DOWN;
-    lev2 = &levl[x2][y2];
+    lev2 = loc(x2, y2);
     lev2->typ = DOOR;
     lev2->doormask = D_NODOOR;
     set_entity(x, y, &(go.occupants[0]));
@@ -869,13 +869,13 @@ destroy_drawbridge(coordxy x, coordxy y)
     boolean e_inview;
     struct entity *etmp1 = &(go.occupants[0]), *etmp2 = &(go.occupants[1]);
 
-    lev1 = &levl[x][y];
+    lev1 = loc(x, y);
     if (!IS_DRAWBRIDGE(lev1->typ))
         return;
     x2 = x;
     y2 = y;
     get_wall_for_db(&x2, &y2);
-    lev2 = &levl[x2][y2];
+    lev2 = loc(x2, y2);
     if ((lev1->drawbridgemask & DB_UNDER) == DB_MOAT
         || (lev1->drawbridgemask & DB_UNDER) == DB_LAVA) {
         struct obj *otmp2;
@@ -983,7 +983,7 @@ destroy_drawbridge(coordxy x, coordxy y)
             e_died(etmp1,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                    CRUSHING); /*no corpse*/
-            if (levl[etmp1->ex][etmp1->ey].typ == MOAT)
+            if (loc(etmp1->ex, etmp1->ey)->typ == MOAT)
                 do_entity(etmp1);
         }
     }

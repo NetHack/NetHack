@@ -585,12 +585,12 @@ savelevl(NHFILE *nhfp, boolean rlecomp)
     if (rlecomp) {
         /* perform run-length encoding of rm structs */
 
-        rgrm = &levl[0][0]; /* start matching at first rm */
+        rgrm = &loc(0, 0)-> /* start matching at first rm */
         match = 0;
 
         for (y = 0; y < ROWNO; y++) {
             for (x = 0; x < COLNO; x++) {
-                prm = &levl[x][y];
+                prm = &loc(x, y)->
                 if (prm->glyph == rgrm->glyph && prm->typ == rgrm->typ
                     && prm->seenv == rgrm->seenv
                     && prm->horizontal == rgrm->horizontal
@@ -629,7 +629,7 @@ savelevl(NHFILE *nhfp, boolean rlecomp)
     nhUse(rlecomp);
 #endif /* ?RLECOMP */
     if (nhfp->structlevel) {
-        bwrite(nhfp->fd, (genericptr_t) levl, sizeof levl);
+        bwrite(nhfp->fd, (genericptr_t) gl.level.locations, sizeof gl.level.locations);
     }
     return;
 }

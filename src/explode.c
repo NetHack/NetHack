@@ -840,7 +840,7 @@ scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
                 gt.thrownobj = stmp->obj; /* mainly in case it kills hero */
                 gb.bhitpos.x = stmp->ox + stmp->dx;
                 gb.bhitpos.y = stmp->oy + stmp->dy;
-                typ = levl[gb.bhitpos.x][gb.bhitpos.y].typ;
+                typ = loc(gb.bhitpos.x, gb.bhitpos.y)->typ;
                 if (!isok(gb.bhitpos.x, gb.bhitpos.y)) {
                     gb.bhitpos.x -= stmp->dx;
                     gb.bhitpos.y -= stmp->dy;
@@ -884,7 +884,7 @@ scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
                 }
                 stmp->ox = gb.bhitpos.x;
                 stmp->oy = gb.bhitpos.y;
-                if (IS_SINK(levl[stmp->ox][stmp->oy].typ))
+                if (IS_SINK(loc(stmp->ox, stmp->oy)->typ))
                     stmp->stopped = TRUE;
                 gt.thrownobj = (struct obj *) 0;
             }

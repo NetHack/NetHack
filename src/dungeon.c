@@ -1846,7 +1846,7 @@ avoid_ceiling(d_level *lev)
 const char *
 ceiling(coordxy x, coordxy y)
 {
-    struct rm *lev = &levl[x][y];
+    struct rm *lev = loc(x, y);
     const char *what;
 
     /* other room types will no longer exist when we're interested --
@@ -1882,7 +1882,7 @@ ceiling(coordxy x, coordxy y)
 const char *
 surface(coordxy x, coordxy y)
 {
-    struct rm *lev = &levl[x][y];
+    struct rm *lev = loc(x, y);
     int levtyp = SURFACE_AT(x, y);
 
     if (u_at(x, y) && u.uswallow && is_animal(u.ustuck->data))
@@ -3123,10 +3123,10 @@ void
 update_lastseentyp(coordxy x, coordxy y)
 {
     struct monst *mtmp;
-    int ltyp = levl[x][y].typ;
+    int ltyp = loc(x, y)->typ;
 
     if (ltyp == DRAWBRIDGE_UP)
-        ltyp = db_under_typ(levl[x][y].drawbridgemask);
+        ltyp = db_under_typ(loc(x, y)->drawbridgemask);
     if ((mtmp = m_at(x, y)) != 0
         && M_AP_TYPE(mtmp) == M_AP_FURNITURE && canseemon(mtmp))
         ltyp = cmap_to_type(mtmp->mappearance);
@@ -3206,7 +3206,7 @@ count_feat_lastseentyp(
         /* get the altarmask for this location; might be a mimic */
         atmp = altarmask_at(x, y);
         /* convert to index: 0..3 */
-        atmp = (Is_astralevel(&u.uz) && (levl[x][y].seenv & SVALL) != SVALL)
+        atmp = (Is_astralevel(&u.uz) && (loc(x, y)->seenv & SVALL) != SVALL)
                ? MSA_NONE
                : Amask2msa(atmp);
         if (!mptr->feat.naltar)
@@ -3246,7 +3246,7 @@ count_feat_lastseentyp(
              * both throne and door on the lower of the two rows.
              */
             for (ty = y - 1; ty <= y + 1; ++ty)
-                if (isok(tx, ty) && IS_THRONE(levl[tx][ty].typ)) {
+                if (isok(tx, ty) && IS_THRONE(loc(tx, ty)->typ)) {
                     mptr->flags.ludios = 1;
                     break;
                 }

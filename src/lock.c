@@ -29,7 +29,7 @@ picking_lock(coordxy *x, coordxy *y)
 boolean
 picking_at(coordxy x, coordxy y)
 {
-    return (boolean) (go.occupation == picklock && gx.xlock.door == &levl[x][y]);
+    return (boolean) (go.occupation == picklock && gx.xlock.door == loc(x, y));
 }
 
 /* produce an occupation string appropriate for the current activity */
@@ -72,7 +72,7 @@ picklock(void)
             return ((gx.xlock.usedtime = 0)); /* you or it moved */
         }
     } else { /* door */
-        if (gx.xlock.door != &(levl[u.ux + u.dx][u.uy + u.dy])) {
+        if (gx.xlock.door != loc(u.ux + u.dx, u.uy + u.dy)) {
             return ((gx.xlock.usedtime = 0)); /* you moved */
         }
         switch (gx.xlock.door->doormask) {
@@ -547,7 +547,7 @@ pick_lock(
             return PICKLOCK_DID_NOTHING;
         }
 
-        door = &levl[cc.x][cc.y];
+        door = loc(cc.x, cc.y);
         mtmp = m_at(cc.x, cc.y);
         if (mtmp && canseemon(mtmp) && M_AP_TYPE(mtmp) != M_AP_FURNITURE
             && M_AP_TYPE(mtmp) != M_AP_OBJECT) {
@@ -814,7 +814,7 @@ doopen_indir(coordxy x, coordxy y)
     if (Confusion || Stunned)
         res = ECMD_TIME;
 
-    door = &levl[cc.x][cc.y];
+    door = loc(cc.x, cc.y);
     portcullis = (is_drawbridge_wall(cc.x, cc.y) >= 0);
     /* this used to be 'if (Blind)' but using a key skips that so we do too */
     {
@@ -978,7 +978,7 @@ doclose(void)
     if (Confusion || Stunned)
         res = ECMD_TIME;
 
-    door = &levl[x][y];
+    door = loc(x, y);
     portcullis = (is_drawbridge_wall(x, y) >= 0);
     if (Blind) {
         int oldglyph = door->glyph;
@@ -1087,7 +1087,7 @@ boxlock(struct obj *obj, struct obj *otmp) /* obj *is* a box */
 boolean
 doorlock(struct obj *otmp, coordxy x, coordxy y)
 {
-    struct rm *door = &levl[x][y];
+    struct rm * const door = loc(x, y);
     boolean res = TRUE;
     int loudness = 0;
     const char *msg = (const char *) 0;

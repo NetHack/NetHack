@@ -529,7 +529,7 @@ dog_goal(
                     }
                 } else if (gg.gtyp == UNDEF && in_masters_sight
                            && !dog_has_minvent
-                           && (!levl[omx][omy].lit || levl[u.ux][u.uy].lit)
+                           && (!loc(omx, omy)->lit || loc(u.ux, u.uy)->lit)
                            && (otyp == MANFOOD || m_cansee(mtmp, nx, ny))
                            && edog->apport > rn2(8)
                            && can_carry(mtmp, obj) > 0) {
@@ -552,7 +552,7 @@ dog_goal(
             return -2;
         appr = (udist >= 9) ? 1 : (mtmp->mflee) ? -1 : 0;
         if (udist > 1) {
-            if (!IS_ROOM(levl[u.ux][u.uy].typ) || !rn2(4) || whappr
+            if (!IS_ROOM(loc(u.ux, u.uy)->typ) || !rn2(4) || whappr
                 || (dog_has_minvent && rn2(edog->apport)))
                 appr = 1;
         }
@@ -1259,7 +1259,7 @@ dog_move(
                don't use glyph_at() here--it would return the pet but we want
                to know whether an object is remembered at this map location */
             struct obj *o = (!Hallucination && gl.level.flags.hero_memory
-                             && glyph_is_object(levl[nix][niy].glyph))
+                             && glyph_is_object(loc(nix, niy)->glyph))
                                ? vobj_at(nix, niy) : 0;
             const char *what = o ? distant_name(o, doname) : something;
 
@@ -1349,13 +1349,13 @@ can_reach_location(struct monst *mon, coordxy mx, coordxy my, coordxy fx, coordx
                 continue;
             if (dist2(i, j, fx, fy) >= dist)
                 continue;
-            if (IS_ROCK(levl[i][j].typ) && !passes_walls(mon->data)
+            if (IS_ROCK(loc(i, j)->typ) && !passes_walls(mon->data)
                 && (!may_dig(i, j) || !tunnels(mon->data)
                     /* tunnelling monsters can't do that on the rogue level */
                     || Is_rogue_level(&u.uz)))
                 continue;
-            if (IS_DOOR(levl[i][j].typ)
-                && (levl[i][j].doormask & (D_CLOSED | D_LOCKED)))
+            if (IS_DOOR(loc(i, j)->typ)
+                && (loc(i, j)->doormask & (D_CLOSED | D_LOCKED)))
                 continue;
             if (!could_reach_item(mon, i, j))
                 continue;

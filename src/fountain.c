@@ -137,7 +137,7 @@ gush(coordxy x, coordxy y, genericptr_t poolcnt)
     struct trap *ttmp;
 
     if (((x + y) % 2) || u_at(x, y)
-        || (rn2(1 + distmin(u.ux, u.uy, x, y))) || (levl[x][y].typ != ROOM)
+        || (rn2(1 + distmin(u.ux, u.uy, x, y))) || (loc(x, y)->typ != ROOM)
         || (sobj_at(BOULDER, x, y)) || nexttodoor(x, y))
         return;
 
@@ -149,7 +149,7 @@ gush(coordxy x, coordxy y, genericptr_t poolcnt)
 
     /* Put a pool at x, y */
     set_levltyp(x, y, POOL);
-    levl[x][y].flags = 0;
+    loc(x, y)->flags = 0;
     /* No kelp! */
     del_engr_at(x, y);
     water_damage_chain(gl.level.objects[x][y], TRUE);
@@ -200,7 +200,7 @@ watchman_warn_fountain(struct monst *mtmp)
 void
 dryup(coordxy x, coordxy y, boolean isyou)
 {
-    if (IS_FOUNTAIN(levl[x][y].typ)
+    if (IS_FOUNTAIN(loc(x, y)->typ)
         && (!rn2(3) || FOUNTAIN_IS_WARNED(x, y))) {
         if (isyou && in_town(x, y) && !FOUNTAIN_IS_WARNED(x, y)) {
             struct monst *mtmp;
@@ -228,8 +228,8 @@ dryup(coordxy x, coordxy y, boolean isyou)
         }
         /* replace the fountain with ordinary floor */
         set_levltyp(x, y, ROOM); /* updates level.flags.nfountains */
-        levl[x][y].flags = 0;
-        levl[x][y].blessedftn = 0;
+        loc(x, y)->flags = 0;
+        loc(x, y)->blessedftn = 0;
         /* The location is seen if the hero/monster is invisible
            or felt if the hero is blind. */
         newsym(x, y);
@@ -243,7 +243,7 @@ void
 drinkfountain(void)
 {
     /* What happens when you drink from a fountain? */
-    boolean mgkftn = (levl[u.ux][u.uy].blessedftn == 1);
+    const boolean mgkftn = (loc(u.ux, u.uy)->blessedftn == 1);
     int fate = rnd(30);
 
     if (Levitation) {
@@ -272,7 +272,7 @@ drinkfountain(void)
         display_nhwindow(WIN_MESSAGE, FALSE);
         pline("A wisp of vapor escapes the fountain...");
         exercise(A_WIS, TRUE);
-        levl[u.ux][u.uy].blessedftn = 0;
+        loc(u.ux, u.uy)->blessedftn = 0;
         return;
     }
 
@@ -435,7 +435,7 @@ dipfountain(struct obj *obj)
         }
         update_inventory();
         set_levltyp(u.ux, u.uy, ROOM); /* updates level.flags.nfountains */
-        levl[u.ux][u.uy].flags = 0;
+        loc(u.ux, u.uy)->flags = 0;
         newsym(u.ux, u.uy);
         if (in_town(u.ux, u.uy))
             (void) angry_guards(FALSE);
@@ -576,8 +576,8 @@ breaksink(coordxy x, coordxy y)
         pline_The("pipes break!  Water spurts out!");
     /* updates level.flags.nsinks and level.flags.nfountains */
     set_levltyp(x, y, FOUNTAIN);
-    levl[x][y].looted = 0;
-    levl[x][y].blessedftn = 0;
+    loc(x, y)->looted = 0;
+    loc(x, y)->blessedftn = 0;
     SET_FOUNTAIN_LOOTED(x, y);
     newsym(x, y);
 }
@@ -640,10 +640,10 @@ drinksink(void)
         obfree(otmp, (struct obj *) 0);
         break;
     case 5:
-        if (!(levl[u.ux][u.uy].looted & S_LRING)) {
+        if (!(loc(u.ux, u.uy)->looted & S_LRING)) {
             You("find a ring in the sink!");
             (void) mkobj_at(RING_CLASS, u.ux, u.uy, TRUE);
-            levl[u.ux][u.uy].looted |= S_LRING;
+            loc(u.ux, u.uy)->looted |= S_LRING;
             exercise(A_WIS, TRUE);
             newsym(u.ux, u.uy);
         } else
@@ -706,7 +706,7 @@ void
 dipsink(struct obj *obj)
 {
     boolean try_call = FALSE,
-            not_looted_yet = (levl[u.ux][u.uy].looted & S_LRING) == 0,
+            not_looted_yet = (loc(u.ux, u.uy)->looted & S_LRING) == 0,
             is_hands = (obj == &hands_obj || (uarmg && obj == uarmg));
 
     if (!rn2(not_looted_yet ? 25 : 15)) {
@@ -759,7 +759,7 @@ dipsink(struct obj *obj)
         try_call = TRUE;
         break;
     case POT_OBJECT_DETECTION:
-        if (!(levl[u.ux][u.uy].looted & S_LRING)) {
+        if (!(loc(u.ux, u.uy)->looted & S_LRING)) {
             You("sense a ring lost down the drain.");
             try_call = TRUE;
             break;
@@ -803,14 +803,14 @@ sink_backs_up(coordxy x, coordxy y)
         Sprintf(buf, "Something splashes you in the %s", body_part(FACE));
     pline("%s%s.", !Deaf ? "Flupp!  " : "", buf);
 
-    if (!(levl[x][y].looted & S_LRING)) { /* once per sink */
+    if (!(loc(x, y)->looted & S_LRING)) { /* once per sink */
         if (!Blind)
             You_see("a ring shining in its midst.");
         (void) mkobj_at(RING_CLASS, x, y, TRUE);
         newsym(x, y);
         exercise(A_DEX, TRUE);
         exercise(A_WIS, TRUE); /* a discovery! */
-        levl[x][y].looted |= S_LRING;
+        loc(x, y)->looted |= S_LRING;
     }
 }
 

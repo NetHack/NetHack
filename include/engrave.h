@@ -42,12 +42,12 @@ struct engr {
 #define dealloc_engr(engr) free((genericptr_t) (engr))
 
 #define engraving_to_defsym(ep) \
-    ((levl[(ep)->engr_x][(ep)->engr_y].typ == CORR) ? S_engrcorr : S_engroom)
+    ((loc((ep)->engr_x, (ep)->engr_y)->typ == CORR) ? S_engrcorr : S_engroom)
 
 #define spot_shows_engravings(x,y) \
-    (levl[(x)][(y)].typ == CORR         \
-     || levl[(x)][(y)].typ == SCORR     \
-     || levl[(x)][(y)].typ == ICE       \
-     || levl[(x)][(y)].typ == ROOM )
+    (loc(x, y)->typ == CORR             \
+     || loc(x, y)->typ == SCORR         \
+     || loc(x, y)->typ == ICE           \
+     || loc(x, y)->typ == ROOM )
 
 #endif /* ENGRAVE_H */

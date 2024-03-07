@@ -312,7 +312,7 @@ force_decor(boolean via_probing)
     iflags.prev_decor = STONE;
     (void) describe_decor();
     gd.decor_fumble_override = gd.decor_levitate_override = FALSE;
-    gl.lastseentyp[u.ux][u.uy] = levl[u.ux][u.uy].typ;
+    gl.lastseentyp[u.ux][u.uy] = loc(u.ux, u.uy)->typ;
 }
 
 void
@@ -2264,7 +2264,7 @@ doloot_core(void)
             if (anyfound)
                 c = 'y';
         }
-    } else if (IS_GRAVE(levl[cc.x][cc.y].typ)) {
+    } else if (IS_GRAVE(loc(cc.x, cc.y)->typ)) {
         You("need to dig up the grave to effectively loot it...");
     }
 
@@ -2358,7 +2358,7 @@ reverse_loot(void)
        expects caller to do that; do so now */
     remove_worn_item(goldob, FALSE);
 
-    if (!IS_THRONE(levl[x][y].typ)) {
+    if (!IS_THRONE(loc(x, y)->typ)) {
         dropx(goldob);
         /* the dropped gold might have fallen to lower level */
         if (g_at(x, y))
@@ -2388,13 +2388,13 @@ reverse_loot(void)
                 boxdummy = cg.zeroobj, boxdummy.otyp = SPE_WIZARD_LOCK;
                 (void) boxlock(coffers, &boxdummy);
             }
-        } else if (levl[x][y].looted != T_LOOTED
+        } else if (loc(x, y)->looted != T_LOOTED
                    && (mon = makemon(courtmon(), x, y, NO_MM_FLAGS)) != 0) {
             freeinv(goldob);
             add_to_minv(mon, goldob);
             pline("The exchequer accepts your contribution.");
             if (!rn2(10))
-                levl[x][y].looted = T_LOOTED;
+                loc(x, y)->looted = T_LOOTED;
         } else {
             You("drop %s.", doname(goldob));
             dropx(goldob);
@@ -3686,7 +3686,7 @@ tipcontainer(struct obj *box) /* or bag */
     {
         struct obj *otmp, *nobj;
         boolean terse, highdrop = !can_reach_floor(TRUE),
-                altarizing = IS_ALTAR(levl[ox][oy].typ),
+                altarizing = IS_ALTAR(loc(ox, oy)->typ),
                 cursed_mbag = (Is_mbag(box) && box->cursed);
         long loss = 0L;
 

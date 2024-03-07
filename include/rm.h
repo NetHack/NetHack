@@ -130,9 +130,9 @@ enum levl_typ_types {
    current surface at that spot; caveat: this evaluates its arguments more
    than once and might make a function call */
 #define SURFACE_AT(x,y) \
-    ((levl[x][y].typ == DRAWBRIDGE_UP)            \
-     ? db_under_typ(levl[x][y].drawbridgemask)    \
-     : levl[x][y].typ)
+    ((loc(x, y)->typ == DRAWBRIDGE_UP)               \
+     ? db_under_typ(loc(x, y)->drawbridgemask)       \
+     : loc(x, y)->typ)
 
 /*
  *      Note:  secret doors (SDOOR) want to use both rm.doormask and
@@ -180,12 +180,12 @@ enum levl_typ_types {
  */
 #define F_LOOTED 1
 #define F_WARNED 2
-#define FOUNTAIN_IS_WARNED(x, y) (levl[x][y].looted & F_WARNED)
-#define FOUNTAIN_IS_LOOTED(x, y) (levl[x][y].looted & F_LOOTED)
-#define SET_FOUNTAIN_WARNED(x, y) levl[x][y].looted |= F_WARNED;
-#define SET_FOUNTAIN_LOOTED(x, y) levl[x][y].looted |= F_LOOTED;
-#define CLEAR_FOUNTAIN_WARNED(x, y) levl[x][y].looted &= ~F_WARNED;
-#define CLEAR_FOUNTAIN_LOOTED(x, y) levl[x][y].looted &= ~F_LOOTED;
+#define FOUNTAIN_IS_WARNED(x, y) (loc(x, y)->looted & F_WARNED)
+#define FOUNTAIN_IS_LOOTED(x, y) (loc(x, y)->looted & F_LOOTED)
+#define SET_FOUNTAIN_WARNED(x, y) loc(x, y)->looted |= F_WARNED;
+#define SET_FOUNTAIN_LOOTED(x, y) loc(x, y)->looted |= F_LOOTED;
+#define CLEAR_FOUNTAIN_WARNED(x, y) loc(x, y)->looted &= ~F_WARNED;
+#define CLEAR_FOUNTAIN_LOOTED(x, y) loc(x, y)->looted &= ~F_LOOTED;
 
 /*
  * doors are even worse :-) The special warning has a side effect
@@ -441,9 +441,28 @@ typedef struct {
 /*
  * Macros for compatibility with old code. Someday these will go away.
  */
-#define levl gl.level.locations
 #define fobj gl.level.objlist
 #define fmon gl.level.monlist
+
+#ifdef DEBUG
+#define assert_level_location(x, y) { \
+    assert (x >= 0); \
+    assert (x < COLNO); \
+    assert (y >= 0); \
+    assert (y < ROWNO); \
+    }
+#else
+#define assert_level_location(x, y) { }
+#endif
+
+static inline struct rm *
+_level_locations(dlevel_t * const level, const coordxy x, const coordxy y)
+{
+    assert_level_location(x, y);
+    return &level->locations[x][y];
+}
+
+#define loc(x, y) _level_locations(&gl.level, (x), (y))
 
 /*
  * Covert a trap number into the defsym graphics array.

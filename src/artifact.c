@@ -2314,7 +2314,7 @@ retouch_object(
         } else {
             /* dropx gives a message if a dropped item lands on an altar;
                we provide one for other terrain */
-            if (!IS_ALTAR(levl[u.ux][u.uy].typ))
+            if (!IS_ALTAR(loc(u.ux, u.uy)->typ))
                 pline("%s to the %s.", Tobjnam(obj, "fall"),
                       surface(u.ux, u.uy));
             dropx(obj);
@@ -2463,7 +2463,7 @@ count_surround_traps(coordxy x, coordxy y)
                 ++ret;
                 continue;
             }
-            levp = &levl[dx][dy];
+            levp = loc(dx, dy);
             if (IS_DOOR(levp->typ) && (levp->doormask & D_TRAPPED) != 0) {
                 ++ret;
                 continue;

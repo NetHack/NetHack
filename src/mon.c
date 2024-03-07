@@ -158,11 +158,11 @@ sanity_check_single_mon(
             /* normally !accessible would be overridable with passes_walls,
                but not for hiding on the ceiling */
             && (!has_ceiling(&u.uz)
-                || !(levl[mx][my].typ == POOL
-                     || levl[mx][my].typ == MOAT
-                     || levl[mx][my].typ == WATER
-                     || levl[mx][my].typ == LAVAPOOL
-                     || levl[mx][my].typ == LAVAWALL
+                || !(loc(mx, my)->typ == POOL
+                     || loc(mx, my)->typ == MOAT
+                     || loc(mx, my)->typ == WATER
+                     || loc(mx, my)->typ == LAVAPOOL
+                     || loc(mx, my)->typ == LAVAWALL
                      || accessible(mx, my))))
             impossible("ceiling hider hiding %s (%s)",
                        !has_ceiling(&u.uz) ? "without ceiling"
@@ -197,10 +197,10 @@ sanity_check_single_mon(
 #if 0   /* mimics who end up in strange locations do still hide while there */
         if (!(accessible(mx, my) || passes_walls(mptr))) {
             char buf[BUFSZ];
-            const char *typnam = levltyp_to_name(levl[mx][my].typ);
+            const char *typnam = levltyp_to_name(loc(mx, my)->typ);
 
             if (!typnam) {
-                Sprintf(buf, "[%d]", levl[mx][my].typ);
+                Sprintf(buf, "[%d]", loc(mx, my)->typ);
                 typnam = buf;
             }
             impossible("mimic%s concealed in inaccessible location: %s (%s)",
@@ -759,7 +759,7 @@ minliquid_core(struct monst *mtmp)
                   || Is_waterlevel(&u.uz)));
     inlava = (is_lava(mtmp->mx, mtmp->my)
               && !(is_flyer(mtmp->data) || is_floater(mtmp->data)));
-    infountain = IS_FOUNTAIN(levl[mtmp->mx][mtmp->my].typ);
+    infountain = IS_FOUNTAIN(loc(mtmp->mx, mtmp->my)->typ);
 
     /* Flying and levitation keeps our steed out of the liquid
        (but not water-walking or swimming; note: if hero is in a
@@ -1929,7 +1929,7 @@ mfndpos(
 
     x = mon->mx;
     y = mon->my;
-    nowtyp = levl[x][y].typ;
+    nowtyp = loc(x, y)->typ;
 
     nodiag = NODIAG(mdat - mons);
     wantpool = (mdat->mlet == S_EEL);
@@ -1980,7 +1980,7 @@ mfndpos(
         for (ny = max(0, y - 1); ny <= maxy; ny++) {
             if (nx == x && ny == y)
                 continue;
-            ntyp = levl[nx][ny].typ;
+            ntyp = loc(nx, ny)->typ;
             if (IS_ROCK(ntyp)
                 && !((flag & ALLOW_WALL) && may_passwall(nx, ny))
                 && !((IS_TREE(ntyp) ? treeok : rockok) && may_dig(nx, ny)))
@@ -1996,7 +1996,7 @@ mfndpos(
             /* KMH -- Added iron bars */
             if (ntyp == IRONBARS
                 && (!(flag & ALLOW_BARS)
-                    || ((levl[nx][ny].wall_info & W_NONDIGGABLE)
+                    || ((loc(nx, ny)->wall_info & W_NONDIGGABLE)
                         && (dmgtype(mdat, AD_RUST)
                             || dmgtype(mdat, AD_CORR)))))
                 continue;
@@ -2005,8 +2005,8 @@ mfndpos(
                    closed door if it doesn't currently have hero engulfed */
                 && !((amorphous(mdat) || can_fog(mon))
                      && (mon != u.ustuck || !u.uswallow))
-                && (((levl[nx][ny].doormask & D_CLOSED) && !(flag & OPENDOOR))
-                    || ((levl[nx][ny].doormask & D_LOCKED)
+                && (((loc(nx, ny)->doormask & D_CLOSED) && !(flag & OPENDOOR))
+                    || ((loc(nx, ny)->doormask & D_LOCKED)
                         && !(flag & UNLOCKDOOR))) && !thrudoor)
                 continue;
             /* avoid poison gas? */
@@ -2017,8 +2017,8 @@ mfndpos(
             /* first diagonal checks (tight squeezes handled below) */
             if (nx != x && ny != y
                 && (nodiag
-                    || (IS_DOOR(nowtyp) && (levl[x][y].doormask & ~D_BROKEN))
-                    || (IS_DOOR(ntyp) && (levl[nx][ny].doormask & ~D_BROKEN))
+                    || (IS_DOOR(nowtyp) && (loc(x, y)->doormask & ~D_BROKEN))
+                    || (IS_DOOR(ntyp) && (loc(nx, ny)->doormask & ~D_BROKEN))
                     || ((IS_DOOR(nowtyp) || IS_DOOR(ntyp))
                         && Is_rogue_level(&u.uz))
                     /* mustn't pass between adjacent long worm segments,
@@ -2861,7 +2861,7 @@ mondead(struct monst *mtmp)
     /* achievement and/or livelog */
     logdeadmon(mtmp, mndx);
 
-    if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
+    if (glyph_is_invisible(loc(mtmp->mx, mtmp->my)->glyph))
         unmap_object(mtmp->mx, mtmp->my);
 
     /* remove 'mtmp' from play; it will stay on the fmon list until end of
@@ -3041,7 +3041,7 @@ monstone(struct monst *mdef)
 
     stackobj(otmp);
     /* mondead() already does this, but we must do it before the newsym */
-    if (glyph_is_invisible(levl[x][y].glyph))
+    if (glyph_is_invisible(loc(x, y)->glyph))
         unmap_object(x, y);
     if (cansee(x, y))
         newsym(x, y);
@@ -4061,7 +4061,7 @@ seemimic(struct monst *mtmp)
      *  Discovered mimics don't block light.
      */
     if (is_blocker_appear
-        && !does_block(mtmp->mx, mtmp->my, &levl[mtmp->mx][mtmp->my]))
+        && !does_block(mtmp->mx, mtmp->my, loc(mtmp->mx, mtmp->my)))
         unblock_point(mtmp->mx, mtmp->my);
 
     newsym(mtmp->mx, mtmp->my);
@@ -4280,7 +4280,7 @@ restrap(struct monst *mtmp)
     if (mtmp->data->mlet == S_MIMIC) {
         set_mimic_sym(mtmp);
         return TRUE;
-    } else if (levl[mtmp->mx][mtmp->my].typ == ROOM) {
+    } else if (loc(mtmp->mx, mtmp->my)->typ == ROOM) {
         mtmp->mundetected = 1;
         return TRUE;
     }

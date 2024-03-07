@@ -537,7 +537,7 @@ dodrink(void)
        context-sensitive inventory item action 'quaff' */
     if (!iflags.menu_requested) {
         /* Is there a fountain to drink from here? */
-        if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)
+        if (IS_FOUNTAIN(loc(u.ux, u.uy)->typ)
             /* not as low as floor level but similar restrictions apply */
             && can_reach_floor(FALSE)) {
             if (y_n("Drink from the fountain?") == 'y') {
@@ -547,7 +547,7 @@ dodrink(void)
             ++drink_ok_extra;
         }
         /* Or a kitchen sink? */
-        if (IS_SINK(levl[u.ux][u.uy].typ)
+        if (IS_SINK(loc(u.ux, u.uy)->typ)
             /* not as low as floor level but similar restrictions apply */
             && can_reach_floor(FALSE)) {
             if (y_n("Drink from the sink?") == 'y') {
@@ -909,7 +909,7 @@ peffect_monster_detection(struct obj *otmp)
         incr_itimeout(&HDetect_monsters, i);
         for (x = 1; x < COLNO; x++) {
             for (y = 0; y < ROWNO; y++) {
-                if (levl[x][y].glyph == GLYPH_INVISIBLE) {
+                if (loc(x, y)->glyph == GLYPH_INVISIBLE) {
                     unmap_object(x, y);
                     newsym(x, y);
                 }
@@ -1194,7 +1194,7 @@ peffect_levitation(struct obj *otmp)
     } else /* timeout is already at least 1 */
         incr_itimeout(&HLevitation, rn1(140, 10));
 
-    if (Levitation && IS_SINK(levl[u.ux][u.uy].typ))
+    if (Levitation && IS_SINK(loc(u.ux, u.uy)->typ))
         spoteffects(FALSE);
     /* levitating blocks flying */
     float_vs_flight();
@@ -2234,7 +2234,7 @@ dodip(void)
     struct obj *potion, *obj;
     char qbuf[QBUFSZ], obuf[QBUFSZ];
     const char *shortestname; /* last resort obj name for prompt */
-    uchar here = levl[u.ux][u.uy].typ;
+    uchar here = loc(u.ux, u.uy)->typ;
     boolean is_hands, at_pool = is_pool(u.ux, u.uy),
             at_fountain = IS_FOUNTAIN(here), at_sink = IS_SINK(here),
             at_here = (!iflags.menu_requested

@@ -285,7 +285,7 @@ do_earthquake(int force)
         *   move the pit code to after the switch.
         */
 
-            switch (levl[x][y].typ) {
+            switch (loc(x, y)->typ) {
             case FOUNTAIN: /* make the fountain disappear */
                 if (cansee(x, y))
                     pline_The("fountain falls%s.", into_a_chasm);
@@ -314,7 +314,7 @@ do_earthquake(int force)
                     pline_The("throne falls%s.", into_a_chasm);
                 goto do_pit;
             case SCORR:
-                levl[x][y].typ = CORR;
+                loc(x, y)->typ = CORR;
                 unblock_point(x, y);
                 if (cansee(x, y))
                     pline("A secret corridor is revealed.");
@@ -344,7 +344,7 @@ do_earthquake(int force)
                    wand of digging if you alter this sequence. */
                 filltype = fillholetyp(x, y, FALSE);
                 if (filltype != ROOM) {
-                    set_levltyp(x, y, filltype); /* levl[x][y] = filltype; */
+                    set_levltyp(x, y, filltype); /* loc(x, y) = filltype; */
                     liquid_flow(x, y, filltype, chasm, (char *) 0);
                     /* liquid_flow() deletes trap, might kill mtmp */
                     if ((chasm = t_at(x, y)) == NULL)
@@ -434,16 +434,16 @@ do_earthquake(int force)
                 }
                 break;
             case SDOOR:
-                cvt_sdoor_to_door(&levl[x][y]); /* .typ = DOOR */
+                cvt_sdoor_to_door(loc(x, y)); /* .typ = DOOR */
                 if (cansee(x, y))
                     pline("A secret door is revealed.");
                 /*FALLTHRU*/
             case DOOR: /* make the door collapse */
                 /* if already doorless, treat like room or corridor */
-                if (levl[x][y].doormask == D_NODOOR)
+                if (loc(x, y)->doormask == D_NODOOR)
                     goto do_pit;
                 /* wasn't doorless, now it will be */
-                levl[x][y].doormask = D_NODOOR;
+                loc(x, y)->doormask = D_NODOOR;
                 unblock_point(x, y);
                 newsym(x, y); /* before pline */
                 if (cansee(x, y))
@@ -803,7 +803,7 @@ do_play_instrument(struct obj *instr)
                         /* tune now fully known */
                         u.uevent.uheard_tune = 2;
                         record_achievement(ACH_TUNE);
-                        if (levl[x][y].typ == DRAWBRIDGE_DOWN)
+                        if (loc(x, y)->typ == DRAWBRIDGE_DOWN)
                             close_drawbridge(x, y);
                         else
                             open_drawbridge(x, y);
@@ -820,7 +820,7 @@ do_play_instrument(struct obj *instr)
             for (y = u.uy - 1; y <= u.uy + 1 && !ok; y++)
                 for (x = u.ux - 1; x <= u.ux + 1 && !ok; x++)
                     if (isok(x, y))
-                        if (IS_DRAWBRIDGE(levl[x][y].typ)
+                        if (IS_DRAWBRIDGE(loc(x, y)->typ)
                             || is_drawbridge_wall(x, y) >= 0)
                             ok = TRUE;
             if (ok) { /* There is a drawbridge near */

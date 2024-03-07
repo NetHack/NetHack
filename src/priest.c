@@ -78,7 +78,7 @@ move_special(struct monst *mtmp, boolean in_his_shop, schar appr,
     for (i = 0; i < cnt; i++) {
         nx = poss[i].x;
         ny = poss[i].y;
-        if (IS_ROOM(levl[nx][ny].typ)
+        if (IS_ROOM(loc(nx, ny)->typ)
             || (mtmp->isshk && (!in_his_shop || ESHK(mtmp)->following))) {
             if (avoid && (info[i] & NOTONL) && !(info[i] & ALLOW_M))
                 continue;
@@ -244,7 +244,7 @@ priestini(
     priest = makemon(prim, px, py, MM_EPRI);
     if (priest) {
         EPRI(priest)->shroom = (schar) ((sroom - gr.rooms) + ROOMOFFSET);
-        EPRI(priest)->shralign = Amask2align(levl[sx][sy].altarmask);
+        EPRI(priest)->shralign = Amask2align(loc(sx, sy)->altarmask);
         EPRI(priest)->shrpos.x = sx;
         EPRI(priest)->shrpos.y = sy;
         assign_level(&(EPRI(priest)->shrlevel), lvl);
@@ -386,7 +386,7 @@ has_shrine(struct monst *pri)
     if (!pri || !pri->ispriest)
         return FALSE;
     epri_p = EPRI(pri);
-    lev = &levl[epri_p->shrpos.x][epri_p->shrpos.y];
+    lev = loc(epri_p->shrpos.x, epri_p->shrpos.y);
     if (!IS_ALTAR(lev->typ) || !(lev->altarmask & AM_SHRINE))
         return FALSE;
     return (boolean) (epri_p->shralign
@@ -772,7 +772,7 @@ ghod_hitsu(struct monst *priest)
     troom = &gr.rooms[roomno - ROOMOFFSET];
 
     if (u_at(x, y) || !linedup(u.ux, u.uy, x, y, 1)) {
-        if (IS_DOOR(levl[u.ux][u.uy].typ)) {
+        if (IS_DOOR(loc(u.ux, u.uy)->typ)) {
             if (u.ux == troom->lx - 1) {
                 x = troom->hx;
                 y = u.uy;
@@ -854,7 +854,7 @@ angry_priest(void)
          * a fresh corpse nearby, the priest ought to have an
          * opportunity to try converting it back; maybe someday...)
          */
-        lev = &levl[eprip->shrpos.x][eprip->shrpos.y];
+        lev = loc(eprip->shrpos.x, eprip->shrpos.y);
         if (!IS_ALTAR(lev->typ)
             || ((aligntyp) Amask2align(lev->altarmask & AM_MASK)
                 != eprip->shralign)) {

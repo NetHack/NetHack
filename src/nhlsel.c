@@ -727,7 +727,7 @@ l_selection_flood(lua_State *L)
                        gc.coder ? gc.coder->croom : NULL, SP_COORD_PACK(x, y));
 
     if (isok(x, y)) {
-        set_floodfillchk_match_under(levl[x][y].typ);
+        set_floodfillchk_match_under(loc(x, y)->typ);
         selection_floodfill(sel, x, y, diagonals);
     }
     return 1;

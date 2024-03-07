@@ -588,17 +588,17 @@ good_shopdoor(struct mkroom *sroom, coordxy *sx, coordxy *sy)
         if (sroom->irregular) {
             int rmno = (int) ((sroom - gr.rooms) + ROOMOFFSET);
 
-            if (isok(*sx - 1, *sy) && !levl[*sx - 1][*sy].edge
-                && (int) levl[*sx - 1][*sy].roomno == rmno)
+            if (isok(*sx - 1, *sy) && !loc(*sx - 1, *sy)->edge
+                && (int) loc(*sx - 1, *sy)->roomno == rmno)
                 (*sx)--;
-            else if (isok(*sx + 1, *sy) && !levl[*sx + 1][*sy].edge
-                     && (int) levl[*sx + 1][*sy].roomno == rmno)
+            else if (isok(*sx + 1, *sy) && !loc(*sx + 1, *sy)->edge
+                     && (int) loc(*sx + 1, *sy)->roomno == rmno)
                 (*sx)++;
-            else if (isok(*sx, *sy - 1) && !levl[*sx][*sy - 1].edge
-                     && (int) levl[*sx][*sy - 1].roomno == rmno)
+            else if (isok(*sx, *sy - 1) && !loc(*sx, *sy - 1)->edge
+                     && (int) loc(*sx, *sy - 1)->roomno == rmno)
                 (*sy)--;
-            else if (isok(*sx, *sy + 1) && !levl[*sx][*sy + 1].edge
-                     && (int) levl[*sx][*sy + 1].roomno == rmno)
+            else if (isok(*sx, *sy + 1) && !loc(*sx, *sy + 1)->edge
+                     && (int) loc(*sx, *sy + 1)->roomno == rmno)
                 (*sy)++;
             else
                 continue;
@@ -686,8 +686,8 @@ static boolean
 stock_room_goodpos(struct mkroom *sroom, int rmno, int sh, int sx, int sy)
 {
     if (sroom->irregular) {
-        if (levl[sx][sy].edge
-            || (int) levl[sx][sy].roomno != rmno
+        if (loc(sx, sy)->edge
+            || (int) loc(sx, sy)->roomno != rmno
             || distmin(sx, sy, gd.doors[sh].x, gd.doors[sh].y) <= 1)
             return FALSE;
     } else if ((sx == sroom->lx && gd.doors[sh].x == sx - 1)
@@ -697,7 +697,7 @@ stock_room_goodpos(struct mkroom *sroom, int rmno, int sh, int sx, int sy)
         return FALSE;
 
     /* only generate items on solid floor squares */
-    if (!IS_ROOM(levl[sx][sy].typ)) {
+    if (!IS_ROOM(loc(sx, sy)->typ)) {
         return FALSE;
     }
 
@@ -727,18 +727,18 @@ stock_room(int shp_indx, struct mkroom *sroom)
     /* make sure no doorways without doors, and no trapped doors, in shops */
     sx = gd.doors[sroom->fdoor].x;
     sy = gd.doors[sroom->fdoor].y;
-    if (levl[sx][sy].doormask == D_NODOOR) {
-        levl[sx][sy].doormask = D_ISOPEN;
+    if (loc(sx, sy)->doormask == D_NODOOR) {
+        loc(sx, sy)->doormask = D_ISOPEN;
         newsym(sx, sy);
     }
-    if (levl[sx][sy].typ == SDOOR) {
-        cvt_sdoor_to_door(&levl[sx][sy]); /* .typ = DOOR */
+    if (loc(sx, sy)->typ == SDOOR) {
+        cvt_sdoor_to_door(loc(sx, sy)); /* .typ = DOOR */
         newsym(sx, sy);
     }
-    if (levl[sx][sy].doormask & D_TRAPPED)
-        levl[sx][sy].doormask = D_LOCKED;
+    if (loc(sx, sy)->doormask & D_TRAPPED)
+        loc(sx, sy)->doormask = D_LOCKED;
 
-    if (levl[sx][sy].doormask == D_LOCKED) {
+    if (loc(sx, sy)->doormask == D_LOCKED) {
         int m = sx, n = sy;
 
         if (inside_shop(sx + 1, sy))
@@ -751,8 +751,8 @@ stock_room(int shp_indx, struct mkroom *sroom)
             n++;
         Sprintf(buf, "Closed for inventory");
         make_engr_at(m, n, buf, 0L, DUST);
-        if (levl[m][n].typ != CORR && levl[m][n].typ != ROOM)
-            levl[m][n].typ = (Is_special(&u.uz)
+        if (loc(m, n)->typ != CORR && loc(m, n)->typ != ROOM)
+            loc(m, n)->typ = (Is_special(&u.uz)
                               || *in_rooms(m, n, 0)) ? ROOM : CORR;
     }
 

@@ -185,9 +185,10 @@ throne_sit_effect(void)
             You_feel("somehow out of place...");
     }
 
-    if (!rn2(3) && IS_THRONE(levl[u.ux][u.uy].typ)) {
+    if (!rn2(3) && IS_THRONE(loc(u.ux, u.uy)->typ)) {
         /* may have teleported */
-        levl[u.ux][u.uy].typ = ROOM, levl[u.ux][u.uy].flags = 0;
+        loc(u.ux, u.uy)->typ = ROOM;
+        loc(u.ux, u.uy)->flags = 0;
         pline_The("throne vanishes in a puff of logic.");
         newsym(u.ux, u.uy);
     }
@@ -240,7 +241,7 @@ dosit(void)
 {
     static const char sit_message[] = "sit on the %s.";
     struct trap *trap = t_at(u.ux, u.uy);
-    int typ = levl[u.ux][u.uy].typ;
+    const int typ = loc(u.ux, u.uy)->typ;
 
     if (u.usteed) {
         You("are already sitting on %s.", mon_nam(u.usteed));

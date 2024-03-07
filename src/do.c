@@ -56,7 +56,7 @@ boulder_hits_pool(
     } else if (is_pool_or_lava(rx, ry)) {
         boolean lava = is_lava(rx, ry), fills_up;
         const char *what = waterbody_name(rx, ry);
-        schar ltyp = levl[rx][ry].typ;
+        schar ltyp = loc(rx, ry)->typ;
         int chance = rn2(10); /* water: 90%; lava: 10% */
         struct monst *mtmp;
 
@@ -70,10 +70,11 @@ boulder_hits_pool(
             struct trap *ttmp = t_at(rx, ry);
 
             if (ltyp == DRAWBRIDGE_UP) {
-                levl[rx][ry].drawbridgemask &= ~DB_UNDER; /* clear lava */
-                levl[rx][ry].drawbridgemask |= DB_FLOOR;
+                loc(rx, ry)->drawbridgemask &= ~DB_UNDER; /* clear lava */
+                loc(rx, ry)->drawbridgemask |= DB_FLOOR;
             } else {
-                levl[rx][ry].typ = ROOM, levl[rx][ry].flags = 0;
+                loc(rx, ry)->typ = ROOM;
+                loc(rx, ry)->flags = 0;
             }
             /* 3.7: normally DEADMONSTER() is used when traversing the fmon
                list--dead monsters usually aren't still at specific map
@@ -303,11 +304,11 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
             (void) obj_meld(&globbyobj, &otmp);
         }
         res = (boolean) !globbyobj;
-    } else if (gc.context.mon_moving && IS_ALTAR(levl[x][y].typ)
+    } else if (gc.context.mon_moving && IS_ALTAR(loc(x, y)->typ)
                && cansee(x,y)) {
         doaltarobj(obj);
     } else if (obj->oclass == POTION_CLASS && gl.level.flags.temperature > 0
-               && (levl[x][y].typ == ROOM || levl[x][y].typ == CORR)) {
+               && (loc(x, y)->typ == ROOM || loc(x, y)->typ == CORR)) {
         /* Potions are sometimes destroyed when landing on very hot
            ground. The basic odds are 50% for nonblessed potions and
            30% for blessed potions; if you have handled the object
@@ -398,18 +399,18 @@ polymorph_sink(void)
     boolean sinklooted;
     int algn;
 
-    if (levl[u.ux][u.uy].typ != SINK)
+    if (loc(u.ux, u.uy)->typ != SINK)
         return;
 
-    sinklooted = levl[u.ux][u.uy].looted != 0;
+    sinklooted = loc(u.ux, u.uy)->looted != 0;
     /* gl.level.flags.nsinks--; // set_levltyp() will update this */
-    levl[u.ux][u.uy].flags = 0;
+    loc(u.ux, u.uy)->flags = 0;
     switch (rn2(4)) {
     default:
     case 0:
         sym = S_fountain;
         set_levltyp(u.ux, u.uy, FOUNTAIN); /* updates level.flags.nfountains */
-        levl[u.ux][u.uy].blessedftn = 0;
+        loc(u.ux, u.uy)->blessedftn = 0;
         if (sinklooted)
             SET_FOUNTAIN_LOOTED(u.ux, u.uy);
         break;
@@ -417,7 +418,7 @@ polymorph_sink(void)
         sym = S_throne;
         set_levltyp(u.ux, u.uy, THRONE);
         if (sinklooted)
-            levl[u.ux][u.uy].looted = T_LOOTED;
+            loc(u.ux, u.uy)->looted = T_LOOTED;
         break;
     case 2:
         sym = S_altar;
@@ -425,20 +426,20 @@ polymorph_sink(void)
         /* 3.6.3: this used to pass 'rn2(A_LAWFUL + 2) - 1' to
            Align2amask() but that evaluates its argument more than once */
         algn = rn2(3) - 1; /* -1 (A_Cha) or 0 (A_Neu) or +1 (A_Law) */
-        levl[u.ux][u.uy].altarmask = ((Inhell && rn2(3)) ? AM_NONE
+        loc(u.ux, u.uy)->altarmask = ((Inhell && rn2(3)) ? AM_NONE
                                       : Align2amask(algn));
         break;
     case 3:
         sym = S_room;
         set_levltyp(u.ux, u.uy, ROOM);
         make_grave(u.ux, u.uy, (char *) 0);
-        if (levl[u.ux][u.uy].typ == GRAVE)
+        if (loc(u.ux, u.uy)->typ == GRAVE)
             sym = S_grave;
         break;
     }
     /* give message even if blind; we know we're not levitating,
        so can feel the outcome even if we can't directly see it */
-    if (levl[u.ux][u.uy].typ != ROOM)
+    if (loc(u.ux, u.uy)->typ != ROOM)
         pline_The("sink transforms into %s!", an(defsyms[sym].explanation));
     else
         pline_The("sink vanishes.");
@@ -463,19 +464,19 @@ teleport_sink(void)
         cx = 1 + rnd((COLNO - 1) - 2); /* 2..COLNO-2 */
         cy = 1 + rn2(ROWNO - 2);       /* 1..ROWNO-2 */
 #endif
-        if (levl[cx][cy].typ == ROOM
+        if (loc(cx, cy)->typ == ROOM
             && !t_at(cx, cy) && !engr_at(cx, cy)
             && (!cansee(cx, cy) || distu(cx, cy) > 3 * 3)) {
             /* this ends up having set_levltyp() count all sinks and
                fountains on the level twice but that is not a problem */
-            alreadylooted = levl[u.ux][u.uy].looted;
+            alreadylooted = loc(u.ux, u.uy)->looted;
             /* remove old sink */
             set_levltyp(u.ux, u.uy, ROOM); /* was SINK so updates nsinks */
-            levl[u.ux][u.uy].looted = 0;
+            loc(u.ux, u.uy)->looted = 0;
             newsym(u.ux, u.uy);
             /* create sink at new position */
             set_levltyp(cx, cy, SINK); /* now SINK so also updates nsinks */
-            levl[cx][cy].looted = alreadylooted ? 1 : 0;
+            loc(cx, cy)->looted = alreadylooted ? 1 : 0;
             newsym(cx, cy);
             return TRUE;
         }
@@ -574,7 +575,7 @@ dosinkring(struct obj *obj)
         polymorph_sink();
         nosink = TRUE;
         /* for S_room case, same message as for teleportation is given */
-        ideed = (levl[u.ux][u.uy].typ != ROOM);
+        ideed = (loc(u.ux, u.uy)->typ != ROOM);
         break;
     default:
         ideed = FALSE;
@@ -740,7 +741,7 @@ drop(struct obj *obj)
         }
     } else {
         if ((obj->oclass == RING_CLASS || obj->otyp == MEAT_RING)
-            && IS_SINK(levl[u.ux][u.uy].typ)) {
+            && IS_SINK(loc(u.ux, u.uy)->typ)) {
             dosinkring(obj);
             return ECMD_TIME;
         }
@@ -760,7 +761,7 @@ drop(struct obj *obj)
                 float_down(I_SPECIAL | TIMEOUT, W_ARTI | W_ART);
             return ECMD_TIME;
         }
-        if (!IS_ALTAR(levl[u.ux][u.uy].typ) && flags.verbose)
+        if (!IS_ALTAR(loc(u.ux, u.uy)->typ) && flags.verbose)
             You("drop %s.", doname(obj));
     }
     obj->how_lost = LOST_DROPPED;
@@ -778,7 +779,7 @@ dropx(struct obj *obj)
     if (!u.uswallow) {
         if (ship_object(obj, u.ux, u.uy, FALSE))
             return;
-        if (IS_ALTAR(levl[u.ux][u.uy].typ))
+        if (IS_ALTAR(loc(u.ux, u.uy)->typ))
             doaltarobj(obj); /* set bknown */
     }
     dropy(obj);
@@ -1150,7 +1151,7 @@ dodown(void)
         } else if (Blind) {
             /* glyph_to_cmap() is a macro which expands its argument many
                times; use this to do part of its work just once */
-            int glyph_at_uxuy = levl[u.ux][u.uy].glyph;
+            int glyph_at_uxuy = loc(u.ux, u.uy)->glyph;
 
             /* Avoid alerting player to an unknown stair or ladder.
              * Changes the message for a covered, known staircase
@@ -1257,7 +1258,7 @@ dodown(void)
         (void) clamp_hole_destination(&tdst);
         goto_level(&tdst, FALSE, FALSE, FALSE);
     } else {
-        ga.at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
+        ga.at_ladder = (boolean) (loc(u.ux, u.uy)->typ == LADDER);
         next_level(!trap);
         ga.at_ladder = FALSE;
     }
@@ -1295,7 +1296,7 @@ doup(void)
     if (near_capacity() > SLT_ENCUMBER) {
         /* No levitation check; inv_weight() already allows for it */
         Your("load is too heavy to climb the %s.",
-             levl[u.ux][u.uy].typ == STAIRS ? "stairs" : "ladder");
+             loc(u.ux, u.uy)->typ == STAIRS ? "stairs" : "ladder");
         return ECMD_TIME;
     }
     if (ledger_no(&u.uz) == 1) {
@@ -1308,7 +1309,7 @@ doup(void)
         You("are held back by your pet!");
         return ECMD_OK;
     }
-    ga.at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
+    ga.at_ladder = (boolean) (loc(u.ux, u.uy)->typ == LADDER);
     prev_level(TRUE);
     ga.at_ladder = FALSE;
     return ECMD_TIME;
@@ -1370,9 +1371,9 @@ save_currentstate(void)
 static boolean
 badspot(coordxy x, coordxy y)
 {
-    return (boolean) ((levl[x][y].typ != ROOM
-                       && levl[x][y].typ != AIR
-                       && levl[x][y].typ != CORR)
+    return (boolean) ((loc(x, y)->typ != ROOM
+                       && loc(x, y)->typ != AIR
+                       && loc(x, y)->typ != CORR)
                       || MON_AT(x, y));
 }
 */

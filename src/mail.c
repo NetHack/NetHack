@@ -312,7 +312,7 @@ md_rush(struct monst *md,
         for (dx = -1; dx <= 1; dx++)
             for (dy = -1; dy <= 1; dy++)
                 if ((dx || dy) && isok(fx + dx, fy + dy)
-                    && !IS_STWALL(levl[fx + dx][fy + dy].typ)) {
+                    && !IS_STWALL(loc(fx + dx, fy + dy)->typ)) {
                     d2 = dist2(fx + dx, fy + dy, tx, ty);
                     if (d2 < d1) {
                         d1 = d2;

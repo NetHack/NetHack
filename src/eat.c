@@ -2749,7 +2749,7 @@ doeat(void)
         /* hero in metallivore form is eating [diggable] iron bars
            at current location so skip the other assorted checks;
            operates as if digging rather than via the eat occupation */
-        if (still_chewing(u.ux, u.uy) && levl[u.ux][u.uy].typ == IRONBARS) {
+        if (still_chewing(u.ux, u.uy) && loc(u.ux, u.uy)->typ == IRONBARS) {
             /* this is verbose, but player will see the hero rather than the
                bars so wouldn't know that more turns of eating are required */
             You("pause to swallow.");
@@ -3516,9 +3516,9 @@ floorfood(
             }
             ++getobj_else;
         }
-        if (levl[u.ux][u.uy].typ == IRONBARS) {
+        if (loc(u.ux, u.uy)->typ == IRONBARS) {
             /* already verified that hero is metallivorous above */
-            boolean nodig = (levl[u.ux][u.uy].wall_info & W_NONDIGGABLE) != 0;
+            boolean nodig = (loc(u.ux, u.uy)->wall_info & W_NONDIGGABLE) != 0;
 
             c = 'n';
             Strcpy(qbuf, "There are iron bars here");
@@ -3657,7 +3657,7 @@ vomit(void) /* A good idea from David Neves */
             ubreatheu(mattk);
         }
         /* vomiting on an altar is, all things considered, rather impolite */
-        if (IS_ALTAR(levl[u.ux][u.uy].typ))
+        if (IS_ALTAR(loc(u.ux, u.uy)->typ))
             altar_wrath(u.ux, u.uy);
         /* if poly'd into acidic form, stomach acid is stronger than normal */
         if (acidic(gy.youmonst.data)) {

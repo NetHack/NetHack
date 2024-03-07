@@ -315,7 +315,7 @@ clear_no_charge_obj(
                 && otmp->where != OBJ_BURIED)
             || !get_obj_location(otmp, &x, &y, OBJ_CONTAINED | OBJ_BURIED)
             || !isok(x, y)
-            || (rno = levl[x][y].roomno) < ROOMOFFSET
+            || (rno = loc(x, y)->roomno) < ROOMOFFSET
             || !IS_SHOP(rno - ROOMOFFSET)
             || (rm_shkp = gr.rooms[rno - ROOMOFFSET].resident) == 0
             || rm_shkp == shkp)
@@ -450,8 +450,8 @@ inside_shop(coordxy x, coordxy y)
 {
     char rno;
 
-    rno = levl[x][y].roomno;
-    if ((rno < ROOMOFFSET) || levl[x][y].edge || !IS_SHOP(rno - ROOMOFFSET))
+    rno = loc(x, y)->roomno;
+    if ((rno < ROOMOFFSET) || loc(x, y)->edge || !IS_SHOP(rno - ROOMOFFSET))
         rno = NO_ROOM;
     return rno;
 }
@@ -469,7 +469,7 @@ u_left_shop(char *leavestring, boolean newlev)
      *   (he wasn't strictly-inside last turn anyway)))
      * THEN (there's nothing to do, so just return)
      */
-    if (!*leavestring && (!levl[u.ux][u.uy].edge || levl[u.ux0][u.uy0].edge))
+    if (!*leavestring && (!loc(u.ux, u.uy)->edge || loc(u.ux0, u.uy0)->edge))
         return;
 
     shkp = shop_keeper(*leavestring ? *leavestring : *u.ushops0);
@@ -501,7 +501,7 @@ u_left_shop(char *leavestring, boolean newlev)
     }
 
     if (rob_shop(shkp)) {
-        call_kops(shkp, (!newlev && levl[u.ux0][u.uy0].edge));
+        call_kops(shkp, (!newlev && loc(u.ux0, u.uy0)->edge));
     }
 }
 
@@ -3833,7 +3833,7 @@ add_damage(
     struct damage *tmp_dam;
     char *shops;
 
-    if (IS_DOOR(levl[x][y].typ)) {
+    if (IS_DOOR(loc(x, y)->typ)) {
         struct monst *mtmp;
 
         /* Don't schedule for repair unless it's a real shop entrance */
@@ -3856,13 +3856,13 @@ add_damage(
     tmp_dam->place.x = x;
     tmp_dam->place.y = y;
     tmp_dam->cost = cost;
-    tmp_dam->typ = levl[x][y].typ;
-    tmp_dam->flags = levl[x][y].flags;
+    tmp_dam->typ = loc(x, y)->typ;
+    tmp_dam->flags = loc(x, y)->flags;
     tmp_dam->next = gl.level.damagelist;
     gl.level.damagelist = tmp_dam;
     /* If player saw damage, display walls post-repair as walls, not stone */
     if (cansee(x, y))
-        levl[x][y].seenv = SVALL;
+        loc(x, y)->seenv = SVALL;
 }
 
 /* is shopkeeper impaired, so they cannot act? */
@@ -4028,11 +4028,11 @@ litter_getpos(
 
     (void) memset((genericptr_t) litter, 0, 9 * sizeof *litter);
 
-    if (gl.level.objects[x][y] && !IS_ROOM(levl[x][y].typ)) {
+    if (gl.level.objects[x][y] && !IS_ROOM(loc(x, y)->typ)) {
         for (i = 0; i < 9; i++) {
             ix = x + horiz(i);
             iy = y + vert(i);
-            if (i == 4 || !isok(ix, iy) || !ZAP_POS(levl[ix][iy].typ))
+            if (i == 4 || !isok(ix, iy) || !ZAP_POS(loc(ix, iy)->typ))
                 continue;
             litter[i] = LITTER_OPEN;
             if (inside_shop(ix, iy) == ESHK(shkp)->shoproom) {
@@ -4215,8 +4215,8 @@ repair_damage(
             disposition = 3;
     }
     if (IS_ROOM(tmp_dam->typ)
-        || (tmp_dam->typ == levl[x][y].typ
-            && (!IS_DOOR(tmp_dam->typ) || levl[x][y].doormask > D_BROKEN)))
+        || (tmp_dam->typ == loc(x, y)->typ
+            && (!IS_DOOR(tmp_dam->typ) || loc(x, y)->doormask > D_BROKEN)))
         /* no terrain fix necessary (trap removal or manually repaired) */
         return disposition;
 
@@ -4227,11 +4227,11 @@ repair_damage(
        restore original terrain type and move any items away;
        rm.doormask and rm.wall_info are both overlaid on rm.flags
        so the new flags value needs to match the restored typ */
-    levl[x][y].typ = tmp_dam->typ;
+    loc(x, y)->typ = tmp_dam->typ;
     if (IS_DOOR(tmp_dam->typ))
-        levl[x][y].doormask = D_CLOSED; /* arbitrary */
+        loc(x, y)->doormask = D_CLOSED; /* arbitrary */
     else /* not a door; set rm.wall_info or whatever old flags are relevant */
-        levl[x][y].flags = tmp_dam->flags;
+        loc(x, y)->flags = tmp_dam->flags;
 
     if (litter_getpos(litter, x, y, shkp))
         litter_scatter(litter, x, y, shkp);
@@ -4251,7 +4251,7 @@ repair_damage(
     if (seeit) {
         if (IS_WALL(tmp_dam->typ)) {
             /* player sees actual repair process, so KNOWS it's a wall */
-            levl[x][y].seenv = SVALL;
+            loc(x, y)->seenv = SVALL;
             pline("Suddenly, a section of the wall closes up!");
         } else if (IS_DOOR(tmp_dam->typ)) {
             pline("Suddenly, the shop door reappears!");
@@ -4795,7 +4795,7 @@ costly_adjacent(
     eshkp = ESHK(shkp);
     /* adjacent if <x,y> is a shop wall spot, including door;
        also treat "free spot" one step inside the door as adjacent */
-    return (levl[x][y].edge || (x == eshkp->shk.x && y == eshkp->shk.y));
+    return (loc(x, y)->edge || (x == eshkp->shk.x && y == eshkp->shk.y));
 }
 
 /* called by dotalk(sounds.c) when #chatting; returns obj if location
@@ -5213,7 +5213,7 @@ block_door(coordxy x, coordxy y)
 
     if (roomno < 0 || !IS_SHOP(roomno))
         return FALSE;
-    if (!IS_DOOR(levl[x][y].typ))
+    if (!IS_DOOR(loc(x, y)->typ))
         return FALSE;
     if (roomno != *u.ushops)
         return FALSE;
@@ -5247,8 +5247,8 @@ block_entry(coordxy x, coordxy y)
     int roomno;
     struct monst *shkp;
 
-    if (!(IS_DOOR(levl[u.ux][u.uy].typ)
-          && levl[u.ux][u.uy].doormask == D_BROKEN))
+    if (!(IS_DOOR(loc(u.ux, u.uy)->typ)
+          && loc(u.ux, u.uy)->doormask == D_BROKEN))
         return FALSE;
 
     roomno = *in_rooms(x, y, SHOPBASE);
