@@ -1370,6 +1370,7 @@ monsters weren't randomly generating if exactly one square was outside LOS,
 when a spellbook was polymorphed into a novel and then incrementing spestudied
 	field turned it into a blank spellbook, the novel's title would stick:
 	"{spellbook of blank paper|plain spellbook} named <Discworld title>"
+walking on ice can make you slide in a random direction
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

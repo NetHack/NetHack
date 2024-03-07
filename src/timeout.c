@@ -1235,6 +1235,10 @@ slip_or_trip(void)
             && (!ice_only || !rn2(3))) {
             You("lose your balance.");
             dismount_steed(DISMOUNT_FELL);
+        } else if (!rn2(10 + ACURR(A_DEX))) {
+            int dir = rn2(N_DIRS);
+
+            hurtle(xdir[dir], ydir[dir], 1, FALSE);
         }
     } else {
         if (on_foot) {
