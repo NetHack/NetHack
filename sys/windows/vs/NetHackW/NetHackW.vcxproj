@@ -43,7 +43,8 @@
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <EnableMicrosoftCodeAnalysis>false</EnableMicrosoftCodeAnalysis>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -65,7 +66,7 @@
     </ResourceCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>dbghelp.lib;comctl32.lib;winmm.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>hacklib.lib;dbghelp.lib;comctl32.lib;winmm.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>$(WinWin32Dir)NethackW.exe.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -87,8 +88,9 @@
     <ClCompile Include="$(SrcDir)ball.c" />
     <ClCompile Include="$(SrcDir)bones.c" />
     <ClCompile Include="$(SrcDir)botl.c" />
-    <ClCompile Include="$(SrcDir)coloratt.c" />
+    <ClCompile Include="$(SrcDir)calendar.c" />
     <ClCompile Include="$(SrcDir)cmd.c" />
+    <ClCompile Include="$(SrcDir)coloratt.c" />
     <ClCompile Include="$(SrcDir)date.c" />
     <ClCompile Include="$(SrcDir)dbridge.c" />
     <ClCompile Include="$(SrcDir)decl.c" />
@@ -113,8 +115,8 @@
     <ClCompile Include="$(SrcDir)extralev.c" />
     <ClCompile Include="$(SrcDir)files.c" />
     <ClCompile Include="$(SrcDir)fountain.c" />
+    <ClCompile Include="$(SrcDir)getpos.c" />
     <ClCompile Include="$(SrcDir)hack.c" />
-    <ClCompile Include="$(SrcDir)hacklib.c" />
     <ClCompile Include="$(SrcDir)invent.c" />
     <ClCompile Include="$(SrcDir)insight.c" />
     <ClCompile Include="$(SrcDir)isaac64.c" />
@@ -164,12 +166,14 @@
     <ClCompile Include="$(SrcDir)read.c" />
     <ClCompile Include="$(SrcDir)rect.c" />
     <ClCompile Include="$(SrcDir)region.c" />
+    <ClCompile Include="$(SrcDir)report.c" />
     <ClCompile Include="$(SrcDir)restore.c" />
     <ClCompile Include="$(SrcDir)rip.c" />
     <ClCompile Include="$(SrcDir)rnd.c" />
     <ClCompile Include="$(SrcDir)role.c" />
     <ClCompile Include="$(SrcDir)rumors.c" />
     <ClCompile Include="$(SrcDir)save.c" />
+    <ClCompile Include="$(SrcDir)selvar.c" />
     <ClCompile Include="$(SrcDir)sfstruct.c" />
     <ClCompile Include="$(SrcDir)shk.c" />
     <ClCompile Include="$(SrcDir)shknam.c" />
@@ -177,8 +181,10 @@
     <ClCompile Include="$(SrcDir)sounds.c" />
     <ClCompile Include="$(SrcDir)spell.c" />
     <ClCompile Include="$(SrcDir)sp_lev.c" />
+    <ClCompile Include="$(SrcDir)stairs.c" />
     <ClCompile Include="$(SrcDir)steal.c" />
     <ClCompile Include="$(SrcDir)steed.c" />
+    <ClCompile Include="$(SrcDir)strutil.c" />
     <ClCompile Include="$(SrcDir)symbols.c" />
     <ClCompile Include="$(SrcDir)sys.c" />
     <ClCompile Include="$(SrcDir)teleport.c" />
@@ -200,6 +206,7 @@
     <ClCompile Include="$(SrcDir)wield.c" />
     <ClCompile Include="$(SrcDir)windows.c" />
     <ClCompile Include="$(SrcDir)wizard.c" />
+    <ClCompile Include="$(SrcDir)wizcmds.c" />
     <ClCompile Include="$(SrcDir)worm.c" />
     <ClCompile Include="$(SrcDir)worn.c" />
     <ClCompile Include="$(SrcDir)write.c" />
@@ -283,6 +290,7 @@
     <ClInclude Include="$(IncDir)fnamesiz.h" />
     <ClInclude Include="$(IncDir)func_tab.h" />
     <ClInclude Include="$(IncDir)global.h" />
+    <ClInclude Include="$(IncDir)hacklib.h" />
     <ClInclude Include="$(IncDir)hack.h" />
     <ClInclude Include="$(IncDir)integer.h" />
     <ClInclude Include="$(IncDir)isaac64.h" />
@@ -315,8 +323,10 @@
     <ClInclude Include="$(IncDir)skills.h" />
     <ClInclude Include="$(IncDir)sndprocs.h" />
     <ClInclude Include="$(IncDir)seffects.h" />
+    <ClInclude Include="$(IncDir)selvar.h" />
     <ClInclude Include="$(IncDir)spell.h" />
     <ClInclude Include="$(IncDir)sp_lev.h" />
+    <ClInclude Include="$(IncDir)stairs.h" />
     <ClInclude Include="$(IncDir)sym.h" />
     <ClInclude Include="$(IncDir)sys.h" />
     <ClInclude Include="$(IncDir)tcap.h" />
