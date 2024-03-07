@@ -207,7 +207,6 @@ steps:
     sed -i '/^#[ 	]*define LOGFILE/d'        include/config.h
     sed -i '/^#[ 	]*define NEWS/d'           include/config.h
     sed -i '/^#[ 	]*define PANICLOG/d'       include/config.h
-    sed -i '/^#[ 	]*define PANICTRACE/d'     include/config.h
     #sed -i '/^#[ 	]*define STATUS_HILITES/d' include/config.h
     sed -i '/^#[ 	]*define SYSCF/d'          include/config.h
     sed -i '/^#[ 	]*define USER_SOUNDS/d'    include/config.h
@@ -217,7 +216,7 @@ steps:
     sed -i '/^#[ 	]*define SHELL/d'          include/unixconf.h
     sed -i '/^#[ 	]*define SUSPEND/d'        include/unixconf.h
     make fetch-lua
-    make WANT_WIN_ALL=1 all
+    make WANT_WIN_ALL=1 NOCRASHREPORT=1 all
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildTarget, 'minimal'))
   displayName: 'Building linux minimal build'
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
