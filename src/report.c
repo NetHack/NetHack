@@ -539,6 +539,7 @@ NH_panictrace_gdb(void)
 const char *
 get_saved_pline(int lineno)
 {
+#ifdef DUMPLOG_CORE
     int p;
     int limit = DUMPLOG_MSG_COUNT;
     if (lineno >= DUMPLOG_MSG_COUNT)
@@ -554,6 +555,7 @@ get_saved_pline(int lineno)
             }
         }
     }
+#endif /* DUMPLOG_CORE */
     return NULL;
 }
 
