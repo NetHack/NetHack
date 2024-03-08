@@ -1136,7 +1136,7 @@ count_obj(struct obj *chain, long *total_count, long *total_size,
     *total_size += size;
 }
 
-DISABLE_WARNING_FORMAT_NONLITERAL  /* RESTORE_WARNING follows show_wiz_stats */
+DISABLE_WARNING_FORMAT_NONLITERAL  /* RESTORE_WARNING follows wiz_show_stats */
 
 static void
 obj_chain(
