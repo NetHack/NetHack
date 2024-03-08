@@ -1,4 +1,4 @@
-/* NetHack 3.7	report.c	$NHDT-Date: 1709571806 2024/03/04 17:03:26 $  $NHDT-Branch: keni-mdlib-followup $:$NHDT-Revision: 1.306 $ */
+/* NetHack 3.7	report.c	$NHDT-Date: 1709907875 2024/03/08 14:24:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2024 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -403,15 +403,20 @@ printf("ShellExecute returned: %p\n",rv);   // >32 is ok
         if (pid == 0) {
             char err[100];
 #  ifdef CRASHREPORT_EXEC_NOSTDERR
+	    int devnull;
                 /* Keep the output clean - firefox spews useless errors on
                  * my system. */
             (void) close(2);
-            (void) open("/dev/null", O_WRONLY);
+            devnull =  open("/dev/null", O_WRONLY);
 #  endif
 
             (void) execve(CRASHREPORT, (char * const *) xargv, environ);
             Sprintf(err, "Can't start " CRASHREPORT ": %s", strerror(errno));
             raw_print(err);
+#  ifdef CRASHREPORT_EXEC_NOSTDERR
+	    (void) close(devnull);
+#  endif
+	    exit(1);
         } else {
             int status;
             errno = 0;
