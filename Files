@@ -418,10 +418,13 @@ multisnd1-pre.370  multisnd2-pre.370  multiw-1.370       multiw-2.370
 
 sys/vms:
 (files for VMS version)
-Install.vms   Makefile.dat  Makefile.doc  Makefile.src  Makefile.top
-Makefile.utl  install.com   nethack.com   oldcrtl.c     spec_lev.com
-sysconf       vmsbuild.com  vmsfiles.c    vmsmail.c     vmsmain.c
-vmsmisc.c     vmstty.c      vmsunix.c
+Install.vms       Install370.vms    Makefile.dat      Makefile.doc
+Makefile.src      Makefile.top      Makefile.utl      Makefile_dat.vms
+Makefile_doc.vms  Makefile_src.vms  Makefile_top.vms  Makefile_utl.vms
+install.com       nethack.com       oldcrtl.c         spec_lev.com
+sysconf           vmsbuild.com      vmsfiles.c        vmsmail.c
+vmsmain.c         vmsmisc.c         vmssetup.com      vmstty.c
+vmsunix.c
 
 sys/windows:
 (files for Windows 7/8.x/10/11 version)
