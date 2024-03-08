@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1393 $ $NHDT-Date: 1709388534 2024/03/02 14:08:54 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1396 $ $NHDT-Date: 1709928001 2024/03/08 20:00:01 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1371,6 +1371,8 @@ when a spellbook was polymorphed into a novel and then incrementing spestudied
 	field turned it into a blank spellbook, the novel's title would stick:
 	"{spellbook of blank paper|plain spellbook} named <Discworld title>"
 walking on ice can make you slide in a random direction
+if an adjacent statue was a in a pit, you could break it with a pick-axe even
+	though you're conceptually at the wrong elevation to reach it
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

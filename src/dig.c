@@ -1,4 +1,4 @@
-/* NetHack 3.7	dig.c	$NHDT-Date: 1702206282 2023/12/10 11:04:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.204 $ */
+/* NetHack 3.7	dig.c	$NHDT-Date: 1709928001 2024/03/08 20:00:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.211 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8,6 +8,7 @@
 static boolean rm_waslit(void);
 static void mkcavepos(coordxy, coordxy, int, boolean, boolean);
 static void mkcavearea(boolean);
+static boolean pick_can_reach(struct obj *, coordxy, coordxy) NONNULLARG1;
 static int dig(void);
 static void dig_up_grave(coord *);
 static boolean watchman_canseeu(struct monst *) NONNULLARG1;
@@ -135,6 +136,34 @@ mkcavearea(boolean rockit)
     gv.vision_full_recalc = 1; /* everything changed */
 }
 
+/* called when attempting to break a statue or boulder with a pick */
+static boolean
+pick_can_reach(struct obj *pick, coordxy x, coordxy y)
+{
+    struct trap *t = t_at(x, y);
+    /* tseen: pit only affects item positioning when it is known */
+    boolean target_in_pit = t && is_pit(t->ttyp) && t->tseen;
+
+    /* if hero is in a pit, pick can only reach if the statue is too and
+       the two pits are conjoined or the statue isn't and pick is two-handed;
+       this applies to hero in pit trying to reach an adjcacent boulder too */
+    if (u.utrap && u.utraptype == TT_PIT) {
+        if (target_in_pit)
+            return conjoined_pits(t, t_at(u.ux, u.uy), FALSE);
+        return bimanual(pick);
+    }
+
+    /* when hero isn't in a pit, a mattock or flying hero w/ pick can reach
+       whether or not the statue is in a pit */
+    if (bimanual(pick) || Flying)
+        return TRUE;
+    /* one-handed pick-axe can reach if statue isn't in a pit */
+    if (!target_in_pit)
+        return TRUE;
+
+    return FALSE;
+}
+
 /* When digging into location <x,y>, what are you actually digging into? */
 int
 dig_typ(struct obj *otmp, coordxy x, coordxy y)
@@ -147,9 +176,11 @@ dig_typ(struct obj *otmp, coordxy x, coordxy y)
     if (!ispick && !is_axe(otmp))
         return DIGTYP_UNDIGGABLE;
 
-    return ((ispick && sobj_at(STATUE, x, y))
+    return ((ispick && sobj_at(STATUE, x, y)
+             && pick_can_reach(otmp, x, y))
                ? DIGTYP_STATUE
-               : (ispick && sobj_at(BOULDER, x, y))
+               : (ispick && sobj_at(BOULDER, x, y)
+                  && pick_can_reach(otmp, x, y))
                   ? DIGTYP_BOULDER
                   : closed_door(x, y)
                      ? DIGTYP_DOOR
@@ -1112,6 +1143,8 @@ use_pick_axe2(struct obj *obj)
             return ECMD_TIME;
         dig_target = dig_typ(obj, rx, ry);
         if (dig_target == DIGTYP_UNDIGGABLE) {
+            struct obj *boulder;
+
             /* ACCESSIBLE or POOL */
             trap = t_at(rx, ry);
             if (trap && trap->ttyp == WEB) {
@@ -1137,17 +1170,28 @@ use_pick_axe2(struct obj *obj)
                 You("need an axe to cut down a tree.");
             } else if (IS_ROCK(lev->typ)) {
                 You("need a pick to dig rock.");
-            } else if (!ispick && (sobj_at(STATUE, rx, ry)
-                                   || sobj_at(BOULDER, rx, ry))) {
-                boolean vibrate = !rn2(3);
+            } else if ((boulder = sobj_at(BOULDER, rx, ry)) != 0
+                       || sobj_at(STATUE, rx, ry)) {
+                /* if both boulders and statues are present, the topmost
+                   boulder will be shown on the map so treat it as target */
+                const char *what = boulder ? "boulder" : "statue";
 
-                pline("Sparks fly as you whack the %s.%s",
-                      sobj_at(STATUE, rx, ry) ? "statue" : "boulder",
-                      vibrate ? " The axe-handle vibrates violently!" : "");
-                if (vibrate)
-                    losehp(Maybe_Half_Phys(2), "axing a hard object",
-                           KILLED_BY);
-                wake_nearby();
+                if (!ispick) {
+                    boolean vibrate = !rn2(3);
+
+                    pline("Sparks fly as you whack the %s.%s", what,
+                          vibrate ? "  The axe-handle vibrates violently!"
+                                  : "");
+                    if (vibrate)
+                        losehp(Maybe_Half_Phys(2), "axing a hard object",
+                               KILLED_BY);
+                    wake_nearby();
+                } else {
+                    /* using a pick but dig_target is DIGTYPE_UNDIGGABLE
+                       and there is at least one boulder or statue or both
+                       present; pick_can_reach() returned false */
+                    You_cant("reach the %s.", what);
+                }
             } else if (u.utrap && u.utraptype == TT_PIT && trap
                        && (trap_with_u = t_at(u.ux, u.uy))
                        && is_pit(trap->ttyp)
@@ -1177,7 +1221,8 @@ use_pick_axe2(struct obj *obj)
 
             gd.did_dig_msg = FALSE;
             gc.context.digging.quiet = FALSE;
-            if (gc.context.digging.pos.x != rx || gc.context.digging.pos.y != ry
+            if (gc.context.digging.pos.x != rx
+                || gc.context.digging.pos.y != ry
                 || !on_level(&gc.context.digging.level, &u.uz)
                 || gc.context.digging.down) {
                 if (flags.autodig && dig_target == DIGTYP_ROCK
