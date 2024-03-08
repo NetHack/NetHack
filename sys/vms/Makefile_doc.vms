@@ -1,0 +1,202 @@
+#      NetHack Documentation Makefile.
+# NetHack 3.7  Makefile.doc    $NHDT-Date: 1596498290 2020/08/03 23:44:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $
+# Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
+# NetHack may be freely redistributed.  See license for details.
+
+# Root of source tree:
+NHSROOT=[-]
+
+# relative directories from src
+DOC=[-.doc]
+DAT=[-.dat]
+INCL=[-.include]
+SRC=[-.src]
+UTIL=[-.util]
+SYSVMS=[-.sys.vms]
+SYSSHR=[-.sys.share]
+SYSUNIX=[-.sys.unix]
+WINTTY=[-.win.tty]
+WINSHR=[-.win.share]
+WINTTY=[-.win.tty]
+WINCURS=[-.win.curses]
+WINX11=[-.win.X11]
+WINQT=[-.win.Qt]
+WINSHIM=[-.win.shim]
+WINCHAIN=[-.win.chain]
+
+# Lua location relative to src
+LUAVER=546
+LUADOTVER=5.4.6
+LUAUNDERVER=5_4_6
+LUAINC=[-.lib.lua.lua$(LUAVER).src]
+LUALIB=[-.lib.lua]lua$(LUAVER).olb
+LUASRCDIR =[-.lib.lua.lua$(LUAVER).src]
+LUASRCINCDIR=$(LUASRCDIR)
+#LUASRCINCDIR=SYS$COMMON:[LUA.INCLUDE]
+
+#
+# If your compiler needs an appropriate switch to accept C99 code.
+# VSI C defaults to /STANDARD=relaxed which allows several C
+# dialects including C99.
+#
+# CSTD=/STANDARD=C99
+#
+
+# Compiler flags
+CFLAGS :=/INCLUDE=($(INCL),$(LUAINC)) /NAMES=(AS_IS) $(CSTD)
+CXXFLAGS = /INCLUDE_DIR=($(INCL),$(LUAINC)) /NAMES=(AS_IS)
+
+# Link flags
+LFLAGS =
+
+# external programs
+# MAKE = make
+CC = CC
+#touch :=SET FILE/TRUNCATE
+touch = append/New _NLA0:
+LINK = link
+RM = delete
+#TRUE uses an actual helper true.exe
+TRUE = true
+#FALSE uses an actual helper false.exe
+FALSE = false
+#ECHO uses an actual helper echo.exe
+ECHO = echo
+CXX ?= CXX
+MOC ?= moc
+MOCPATH ?= $(QTDIR)/bin/$(MOC)
+# The default is for the TARGET_* variables to match the defaults.
+# If we're cross-compiling these will get overridden elsewhere, likely via
+
+MAKEDEFS = $(UTIL)makedefs
+
+# Which version do we want to build?  (XXX These are not used anywhere.)
+GUIDEBOOK = Guidebook		# regular ASCII file
+#GUIDEBOOK = Guidebook.ps	# PostScript file
+#GUIDEBOOK = Guidebook.dvi	# TeX device-independent file
+
+# Some versions of col need -x to keep them from converting spaces to tabs;
+# some versions of col don't do the conversion by default and don't
+# recognize the option.  Sigh.
+COLCMD = col -bx
+#COLCMD = col -b
+
+# The command to use to generate a PostScript file
+# PSCMD = ditroff | psdit
+PSCMD = groff
+
+# Use the "cat" GUIDECMD if nroff and/or tbl and/or col are not installed
+# Not appropriate for creating Guidebook.txt.
+# GUIDECMD = cat Guidebook.txt
+#
+# Single page. Might need adjustment to .pl value
+# GUIDECMD= $(GUIDE_PREFORMAT) | perl -pe 's/^(.mt)$$/.pl 4720v\n.in 0\n.po 8\n.ll 64m\n$$1/' | nroff -c -Tascii | $(COLCMD)
+#
+GUIDECMD = $(GUIDE_PREFORMAT) | nroff -c -Tascii | $(COLCMD)
+ONEPAGECMD = $(ONEPAGE_PREFORMAT) | nroff -c -Tascii | $(COLCMD) \
+	| sed -e '/EOF--EOF/,12345D'
+
+# Only generate output for the current configuration:
+NHGREP = mcr $(MAKEDEFS) --grep --input - --output -
+NEEDMAKEDEFS = $(MAKEDEFS)
+# Generate output for all configurations:
+#NHGREP = mcr $(MAKEDEFS) --grep --input - --output - --grep-define ALLDOCS
+#NEEDMAKEDEFS = $(MAKEDEFS)
+# Fallback:
+#NHGREP = cat
+#NEEDMAKEDEFS =
+
+GUIDEBOOK_MN_SRC = Guidebook.mn
+GUIDEBOOK_MN = $(GUIDEBOOK_MN_SRC)
+GUIDEBOOK_TEX_SRC = Guidebook.tex
+GUIDEBOOK_TEX = $(GUIDEBOOK_TEX_SRC)
+
+GUIDE_PREFORMAT = cat $(GUIDEBOOK_MN) | $(NHGREP) | tbl tmac.n -
+# for Guidebook.dat, unpaginated version of Guidebook.txt
+ONEPAGE_PREFORMAT = cat Gbk-1pg-pfx.mn $(GUIDEBOOK_MN) Gbk-1pg-sfx.mn \
+	| $(NHGREP) | tbl tmac.n -
+
+# the basic guidebook
+Guidebook	: $(GUIDEBOOK_MN) tmac.n tmac.nh $(NEEDMAKEDEFS)
+	@echo disabled $@ on vms
+#	$(GUIDECMD) > Guidebook
+
+# Fancier output for those with ditroff, psdit and a PostScript printer.
+Guidebook.ps	: $(GUIDEBOOK_MN) tmac.n tmac.nh $(NEEDMAKEDEFS)
+	@echo disabled $@ on vms
+#	$(GUIDE_PREFORMAT) | $(PSCMD) > Guidebook.ps
+
+# Guidebook.tex is the same as Guidebook.mn but formatted with LaTeX.
+# - The invocation command for LaTeX may vary in different installations.
+# - To print Guidebook.dvi you need to use a suitable dvi-driver.
+# - LaTeX needs to be run twice; second pass uses Guidebook.aux made by first.
+Guidebook.dvi	: $(GUIDEBOOK_TEX)
+	@echo disabled $@ on vms
+#	latex $(GUIDEBOOK_TEX)
+#	latex $(GUIDEBOOK_TEX)
+
+# makedefs has more dependencies than these; this is mainly to cope with the
+# case where it hasn't been built yet since it is usually needed for $(NHGREP)
+# (note: 'make makedefs', not 'make $(MAKEDEFS)')
+$(MAKEDEFS)	: ../util/makedefs.c ../include/config.h ../src/mdlib.c \
+		  ../util/mdgrep.h
+	pipe set def $(UTIL) &&  make makedefs && set def [-.doc]
+
+GAME	= nethack
+MANDIR	= /usr/man/man6
+MANEXT	= 6
+
+# manual installation for most BSD-style systems
+GAMEMANCREATE = cat nethack.6 | $(NHGREP) >
+RCVRMANCREATE = cat recover.6 | $(NHGREP) >
+DLBMANCREATE = cat dlb.6 | $(NHGREP) >
+MDMANCREATE = cat makedefs.6 | $(NHGREP) >
+# manual installation for most SYSV-style systems
+# GAMEMANCREATE = cat nethack.6 | $(NHGREP) | nroff -man - >
+# RCVRMANCREATE = cat recover.6 | $(NHGREP) | nroff -man - >
+# DLBMANCREATE = cat dlb.6 | $(NHGREP) | nroff -man - >
+# MDMANCREATE = cat makedefs.6 | $(NHGREP) | nroff -man - >
+
+manpages:
+	echo $@ disabled on VMS
+#	-$(GAMEMANCREATE) $(MANDIR)/$(GAME).$(MANEXT)
+#	-$(RCVRMANCREATE) $(MANDIR)/recover.$(MANEXT)
+#	-$(DLBMANCREATE) $(MANDIR)/dlb.$(MANEXT)
+#	-$(MDMANCREATE) $(MANDIR)/makedefs.$(MANEXT)
+
+# manual creation for distribution
+DISTRIB = Guidebook.txt nethack.txt recover.txt \
+	dlb.txt makedefs.txt
+
+distrib: $(DISTRIB)
+	echo $@ disabled on VMS
+#	@echo "Plain text documentation is up to date."
+
+Guidebook.txt	: $(GUIDEBOOK_MN) tmac.n tmac.nh $(NEEDMAKEDEFS)
+	echo $@ disabled on VMS
+#	$(GUIDECMD) > $@
+Guidebook.dat	: Gbk-1pg-pfx.mn Gbk-1pg-sfx.mn $(GUIDEBOOK_MN) tmac.n tmac.nh \
+		  $(NEEDMAKEDEFS)
+	echo $@ disabled on VMS
+#	$(ONEPAGECMD) > $@
+
+MAN2TXT = $(NHGREP) | nroff -man - | $(COLCMD)
+nethack.txt	: nethack.6
+	echo $@ disabled on VMS
+#	cat nethack.6 | $(MAN2TXT) > nethack.txt
+recover.txt	: recover.6
+	echo $@ disabled on VMS
+#	cat recover.6 | $(MAN2TXT) > recover.txt
+dlb.txt		: dlb.6
+	echo $@ disabled on VMS
+#	cat dlb.6 | $(MAN2TXT) > dlb.txt
+makedefs.txt		: makedefs.6
+	echo $@ disabled on VMS
+#	cat makedefs.6 | $(MAN2TXT) > makedefs.txt
+
+clean:
+	-delete/log Guidebook.aux;*, Guidebook.log;*
+
+spotless: clean
+	-delete/log Guidebook.;*, Guidebook.dat;*, Guidebook.ps;*, \
+		Guidebook.dvi;*

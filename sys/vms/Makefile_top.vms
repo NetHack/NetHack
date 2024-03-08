@@ -1,0 +1,438 @@
+#      NetHack Top-level Makefile.
+# NetHack 3.7  Makefile.vms    $NHDT-Date: 1642630921 2022/01/19 22:22:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.72 $
+# Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
+# NetHack may be freely redistributed.  See license for details.
+
+#	Root of source tree:  (Note: dot is after setup.sh has been used
+#	to create the active Makefiles from sys/unix/Makefile.*.
+#	It isn't sys/unix/ where you might happen to be reading this.)
+NHSROOT=[]
+
+#	Newer makes predefine $(MAKE) to 'make' and do smarter processing
+#	of recursive make calls if $(MAKE) is used.
+#	These makes allow $(MAKE) to be overridden by the environment if
+#	someone wants to (or has to) use something other than the standard
+#	make, so we do not want to unconditionally set $(MAKE) here.
+#
+#	Unfortunately, some older makes do not predefine $(MAKE); if you
+#	have one of these, uncomment the following line.
+#	(You will know that you have one if you get complaints about unable
+#	to execute things like 'data' and 'rumors'.)
+# MAKE = make
+
+
+# NetHack 3.7 Makefile.vms $NHDT-Date: 1654287121 2022/06/03 20:12:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.145 $
+# Copyright (c) 2023 by Michael Allison
+# NetHack may be freely redistributed.  See license for details.
+#
+# OpenVMS GNU Makefile for OpenVMS 9.x and VSI C
+# with GNU Make V4.1 (or greater).
+#
+# Tested on x86_64 version of OpenVMS V9.2-1.
+#
+
+# Root of source tree:
+NHSROOT=
+
+# relative directories from top
+DOC=[.doc]
+DAT=[.dat]
+INCL=[.include]
+SRC=[.src]
+UTIL=[.util]
+LIB=[.lib]
+SYSVMS=[.sys.vms]
+SYSSHR=[.sys.share]
+SYSUNIX=[.sys.unix]
+WINTTY=[.win.tty]
+WINSHR=[.win.share]
+WINTTY=[.win.tty]
+WINCURS=[.win.curses]
+WINX11=[.win.X11]
+WINQT=[.win.Qt]
+WINSHIM=[.win.shim]
+WINCHAIN=[.win.chain]
+
+# Lua macros
+LUAVER=546
+LUADOTVER=5.4.6
+LUAUNDERVER=5_4_6
+LUAINC=[.lib.lua.lua$(LUAVER).src]
+LUALIB=[.lib.lua]lua$(LUAVER).olb
+LUASRCDIR =[.lib.lua.lua$(LUAVER).src]
+LUASRCINCDIR=$(LUASRCDIR)
+LUATESTTARGET = $(LUAINC)lua.h
+LUABASELIB = liblua-$(LUADOTVER).olb
+
+#	make NetHack (as opposite to variants or such)
+#PREFIX	 = /usr
+GAME     = nethack
+# GAME     = nethack.exe
+# GAME     = nethack.prg
+#GAMEUID  = games
+#GAMEGRP  = bin
+
+#	Permissions - some places use setgid instead of setuid, for instance.
+#	See also the option "SECURE" in include/config.h.
+#GAMEPERM = 04755
+FILEPERM = 0644
+# VARFILEPERM = 0644
+EXEPERM  = 0755
+DIRPERM  = 0755
+# VARDIRPERM = 0755
+
+#	VARDIR may also appear in unixconf.h as "VAR_PLAYGROUND" else HACKDIR
+#
+#	Note well!  'make install' believes in creating a nice tidy HACKDIR
+#	for installation, free of debris from previous NetHack versions --
+#	therefore there should not be anything in HACKDIR that you want to
+#	keep (if there is, you'll have to do the installation by hand or
+#	modify the install commands below).
+#HACKDIR  = $(PREFIX)/games/lib/$(GAME)dir
+#VARDIR  = $(HACKDIR)
+#	Where nethack.sh is installed (as 'nethack').
+#	If this is not defined, the shell wrapper script is not used.
+#SHELLDIR = $(PREFIX)/games
+
+#	Extra data files depending upon the interface(s) built into nethack.
+# per discussion in Install.X11 and Install.Qt
+# Qt prefers nhtiles.bmp but can use x11tiles, and it ignores NetHack.ad.
+# X11 uses those last two.
+# Both can display a convential text map instead of tiles.
+#	tty and/or curses (no extra data files outside of the dlb container):
+#VARDATND =
+#	All X11 and/or Qt variations may also include tty or curses or both):
+#	X11 without Qt:
+# VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
+#	X11 with GRAPHIC_TOMBSTONE (requires 'xpm'):
+# VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm rip.xpm
+#	both X11 and Qt:
+# VARDATND = x11tiles nhtiles.bmp NetHack.ad pet_mark.xbm pilemark.xbm rip.xpm
+#	Qt without X11; assumes GRAPHIC_TOMBSTONE:
+# VARDATND = nhtiles.bmp pet_mark.xbm pilemark.xbm rip.xpm
+
+VARDATD = bogusmon data engrave epitaph oracles options quest.lua rumors
+VARDAT = $(VARDATD) $(VARDATND)
+
+#	Some versions of make use the SHELL environment variable as the
+#	shell for running commands.  We need this to be a Bourne shell.
+# SHELL = /bin/sh
+# for Atari (obsolete)
+# SHELL=E:/GEMINI2/MUPFEL.TTP
+
+# Commands for setting the owner and group on files during installation.
+# Some systems fail with one or the other when installing over NFS or for
+# other permission-related reasons.  If that happens, you may want to set the
+# command to "true", which is a no-op.  Note that disabling chown or chgrp
+# will only work if setuid (or setgid) behavior is not desired or required.
+#CHOWN = chown
+#CHGRP = chgrp
+
+#
+# end of configuration
+#
+
+DATHELP = help hh cmdhelp keyhelp history opthelp optmenu usagehlp wizhelp
+
+SPEC_LEVS = asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua \
+	juiblex.lua knox.lua medusa-?.lua minend-?.lua minefill.lua \
+	minetn-?.lua oracle.lua orcus.lua sanctum.lua soko?-?.lua \
+	tower?.lua valley.lua wizard?.lua nhcore.lua nhlib.lua themerms.lua \
+	astral.lua air.lua earth.lua fire.lua water.lua hellfill.lua tut-?.lua
+QUEST_LEVS = ???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua
+
+DATNODLB = $(VARDATND) license symbols
+DATDLB = $(DATHELP) dungeon.lua tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
+DODAT = $(DATNODLB) $(DATDLB)
+
+ALLDEP = $(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb
+
+# first target is also the default target for 'make' without any arguments
+all:    $(ALLDEP)
+	pipe true
+	@echo "Done."
+
+$(GAME): lua_support
+	pipe set default $(SRC) && $(MAKE) LUA_VERSION=$(LUADOTVER) $(GAME) \
+		&& set def [-]
+
+lua_support: [.include]nhlua.h
+	@true
+
+# Note: many of the dependencies below are here to allow parallel make
+# to generate valid output
+
+Guidebook:
+	pipe set def $(DOC) && $(MAKE) Guidebook && set def [-]
+
+Guidebook.txt:
+	pipe set def $(DOC) && $(MAKE) Guidebook.txt && set def [-]
+
+Guidebook.pdf:
+	pipe set def $(DOC) && $(MAKE) Guidebook.pdf && set def [-]
+
+manpages:
+	pipe set def $(DOC) && $(MAKE) manpages && set def [-]
+
+data: $(GAME)
+	pipe set def $(DAT) && $(MAKE) data && set def [-]
+
+engrave: $(GAME)
+	pipe set def $(DAT) && $(MAKE) engrave && set def [-]
+
+bogusmon: $(GAME)
+	pipe set def $(DAT) && $(MAKE) bogusmon  && set def [-]
+
+epitaph: $(GAME)
+	pipe set def $(DAT) && $(MAKE) epitaph && set def [-]
+
+rumors: $(GAME)
+	pipe set def $(DAT) && $(MAKE) rumors && set def [-]
+
+oracles: $(GAME)
+	pipe set def $(DAT) && $(MAKE) oracles && set def [-]
+
+#	Note: options should have already been made with make, but...
+options: $(GAME)
+	pipe set def $(DAT) && $(MAKE) options && set def [-]
+
+quest.lua: $(GAME)
+
+spec_levs:
+	pipe set def $(DAT) && $(MAKE) spec_levs && set def [-]
+	pipe set def $(DAT) && $(MAKE) quest_levs && set def [-]
+
+nhtiles.bmp: $(GAME)
+	pipe set def $(UTIL) && $(MAKE) tile2bmp && set def [-]
+	pipe set def $(DAT) && $(MAKE) nhtiles.bmp && set def [-]
+
+x11tiles: $(GAME)
+	pipe set def $(UTIL) && $(MAKE) tile2x11 && set def [-]
+	pipe set def $(DAT) && $(MAKE) x11tiles && set def [-]
+
+NetHack.ad: $(GAME)
+	pipe set def $(DAT) && $(MAKE) NetHack.ad && set def [-]
+
+pet_mark.xbm:
+	pipe set def $(DAT) && $(MAKE) pet_mark.xbm && set def [-]
+
+pilemark.xbm:
+	pipe set def $(DAT) && $(MAKE) pilemark.xbm && set def [-]
+
+rip.xpm:
+	pipe set def $(DAT) && $(MAKE) rip.xpm && set def [-]
+
+mapbg.xpm:
+	pipe set def $(DAT) && $(MAKE) mapbg.xpm && set def [-]
+
+nhsplash.xpm:
+	pipe set def $(DAT) && $(MAKE) nhsplash.xpm && set def [-]
+
+nh16.img: $(GAME)
+	pipe set def $(UTIL) && $(MAKE) tile2img.ttp && set def [-]
+	pipe set def $(DAT) && $(MAKE) nh16.img && set def [-]
+
+rip.img:
+	pip set def $(UTIL) && $(MAKE) xpm2img.ttp && set def [-]
+	pipe set def $(DAT) && $(MAKE) rip.img && set def [-]
+GEM_RSC.RSC:
+	pipe set def $(DAT) && $(MAKE) GEM_RSC.RSC && set def [-]
+
+title.img:
+	pipe set def $(DAT) && $(MAKE) title.img && set def [-]
+
+check-dlb: options
+	echo disabled $@
+#	@if egrep -s librarian dat/options ; then $(MAKE) dlb ; else true ; fi
+
+dlb:
+	pipe set def $(UTIL) && $(MAKE) dlb && set def [-]
+	pipe set def $(DAT) && LC_ALL=C && mcr [-.util]dlb cf nhdat $(DATDLB) \
+		&& set def [-]
+
+wasm:
+	pipe set def $(SRC) && \
+	$(MAKE) CROSS_TO_WASM=1 [-.targets.wasm]nethack.js && \
+	set def [-]
+
+package: $(GAME) recover $(VARDAT) spec_levs
+	pipe set def $(SRC) && $(MAKE) $(PACKAGE) && set def [-]
+
+# recover can be used when INSURANCE is defined in include/config.h
+# and the checkpoint option is true
+recover: $(GAME)
+	pipe set def $(UTIL) && $(MAKE) recover && set def [-]
+
+dofiles:
+	echo disabled $@
+#	target=`sed -n					\
+#		-e '/librarian/{' 			\
+#		-e	's/.*/dlb/p' 			\
+#		-e	'q' 				\
+#		-e '}' 					\
+#	  	-e '$$s/.*/nodlb/p' < dat/options` ;	\
+#	$(MAKE) dofiles-$${target-nodlb}
+#	cp src/$(GAME) $(INSTDIR)
+#	cp util/recover $(INSTDIR)
+#	-if test -n '$(SHELLDIR)'; then rm -f $(SHELLDIR)/$(GAME); fi
+#	if test -n '$(SHELLDIR)'; then \
+#		sed -e 's;/usr/games/lib/nethackdir;$(HACKDIR);' \
+#		-e 's;HACKDIR/nethack;HACKDIR/$(GAME);' \
+#		< sys/unix/nethack.sh \
+#		> $(SHELLDIR)/$(GAME) ; fi
+# set up their permissions
+#	-( cd $(INSTDIR) ; $(CHOWN) $(GAMEUID) $(GAME) recover ; \
+#			$(CHGRP) $(GAMEGRP) $(GAME) recover )
+#	chmod $(GAMEPERM) $(INSTDIR)/$(GAME)
+#	chmod $(EXEPERM) $(INSTDIR)/recover
+#	-if test -n '$(SHELLDIR)'; then \
+#		$(CHOWN) $(GAMEUID) $(SHELLDIR)/$(GAME); fi
+#	if test -n '$(SHELLDIR)'; then \
+#		$(CHGRP) $(GAMEGRP) $(SHELLDIR)/$(GAME); \
+#		chmod $(EXEPERM) $(SHELLDIR)/$(GAME); fi
+
+dofiles-dlb: check-dlb
+	pipe set def $(DAT) && copy nhdat $(DATNODLB) $(INSTDIR) && \
+	set def [-]
+# set up their permissions
+#	-( cd $(INSTDIR) ; $(CHOWN) $(GAMEUID) nhdat $(DATNODLB) ; \
+#			$(CHGRP) $(GAMEGRP) nhdat $(DATNODLB) ; \
+#			chmod $(FILEPERM) nhdat $(DATNODLB) )
+
+dofiles-nodlb:
+# copy over the game files
+	pipe set def $(DAT) && copy $(DAT) $(INSTDIR) && \
+	set def [-]
+# set up their permissions
+#	-( cd $(INSTDIR) ; $(CHOWN) $(GAMEUID) $(DAT) ; \
+#			$(CHGRP) $(GAMEGRP) $(DAT) ; \
+#			chmod $(FILEPERM) $(DAT) )
+#
+# This is not part of the dependency build hierarchy.
+# It requires an explicit "make fetch-Lua".
+
+$(INCL)nhlua.h:
+	echo "/* nhlua.h - generated by top-level Makefile.vms */" > $@
+	@echo \#"include ""lua.h""" >> $@
+	@echo "LUA_API int (lua_error) (lua_State *L) NORETURN;" >>$@
+	@echo \#"include ""lualib.h""" >> $@
+	@echo \#"include ""lauxlib.h""" >> $@
+	@echo "/*nhlua.h*/" >> $@
+
+[.lib]lua.dir:
+	create/directory [.lib.lua]
+
+[]lib.dir:
+	create/directory [.lib]
+
+[.lib.lua]lua$(LUAVER).dir:
+	@echo You need to make fetch-lua
+	false
+
+fetch-lua: []lib.dir [.lib]lua.dir
+	if f$$search("[.lib.lua]lua$(LUAVER).tgz").eqs."" then \
+	curl http://www.lua.org/ftp/lua-$(LUADOTVER).tar.gz \
+		--output [.lib.lua]lua$(LUAVER).tgz
+	if f$$search("[.lib.lua]lua$(LUAVER).tgz").nes."" then \
+		gzip --force -d [.lib.lua]lua$(LUAVER).tgz
+	if f$$search("[.lib.lua]lua$(LUAVER).tar").nes."" then \
+		pipe set def [.lib.lua] && \
+		     tar -xf lua$(LUAVER).tar && \
+		     set def [--]
+	if (f$$search("[.lib.lua]lua-$(LUAUNDERVER).DIR;1").nes."" \
+		.AND. f$$search("[.lib.lua]lua$(LUAVER).dir;1").eqs."") then \
+	  rename [.lib.lua]lua-$(LUAUNDERVER).DIR;1 \
+		 [.lib.lua]lua$(LUAVER).dir;1
+# remove [.include]nhlua.h in case it was created for some other Lua version
+	@pipe if f$$search("[.include]nhlua.h").nes."" then \
+	 delete [.include]nhlua.h;* && echo 'delete [.include]nhlua.h;*'
+
+# 'make update' can be used to install a revised version after making
+# customizations or such.  Unlike 'make install', it doesn't delete everything
+# from the target directory to have a clean start.
+update: $(GAME) recover $(VARDAT) spec_levs
+	echo disabled $@
+#	(don't yank the old version out from under people who're playing it)
+#	-mv $(INSTDIR)/$(GAME) $(INSTDIR)/$(GAME).old
+#	-mv $(INSTDIR)/nhdat $(INSTDIR)/nhdat.old
+# set up new versions of the game files
+#	( $(MAKE) dofiles )
+# should already be present, but make sure
+#	touch $(VARDIR)/perm $(VARDIR)/record
+# and a reminder
+#	@echo You may also want to install the man pages via the doc Makefile.
+
+rootcheck:
+	@true; $(ROOTCHECK)
+
+install: rootcheck $(GAME) recover $(VARDAT) spec_levs
+	true; $(PREINSTALL)
+	echo disabled $@
+# set up the directories
+# not all mkdirs have -p; those that don't will create a -p directory
+#	-if test -n '$(SHELLDIR)'; then \
+#		mkdir -p $(SHELLDIR); fi
+#	rm -rf $(INSTDIR) $(VARDIR)
+#	-mkdir -p $(INSTDIR) $(VARDIR) $(VARDIR)/save
+#	if test -d ./-p; then rmdir ./-p; fi
+#	-$(CHOWN) $(GAMEUID) $(INSTDIR) $(VARDIR) $(VARDIR)/save
+#	$(CHGRP) $(GAMEGRP) $(INSTDIR) $(VARDIR) $(VARDIR)/save
+# order counts here:
+#	chmod $(DIRPERM) $(INSTDIR)
+#	chmod $(VARDIRPERM) $(VARDIR) $(VARDIR)/save
+# set up the game files
+#	( $(MAKE) dofiles )
+# set up some additional files
+#	touch $(VARDIR)/perm $(VARDIR)/record $(VARDIR)/logfile $(VARDIR)/xlogfile \
+#        $(VARDIR)/livelog
+#	-( cd $(VARDIR) ; $(CHOWN) $(GAMEUID) perm record logfile xlogfile livelog ; \
+#			$(CHGRP) $(GAMEGRP) perm record logfile xlogfile livelog ; \
+#			chmod $(VARFILEPERM) perm record logfile xlogfile livelog )
+#	true; $(POSTINSTALL)
+# and a reminder
+#	@echo You may also want to reinstall the man pages via the doc Makefile.
+
+
+# 'make clean' removes all the .o files, but leaves around all the executables
+# and compiled data files
+#clean: clean-lib clean-keep-lib
+#	@true
+
+clean-lib:
+#	-pipe set def $(LUASRCDIR) && $(MAKE) clean && set def [--.util]
+
+clean-keep-lib:
+#	( cd src ; $(MAKE) clean )
+#	( cd util ; $(MAKE) clean )
+#	pipe set def $(DAT)  $(MAKE) clean && set def [-.util]
+#	( cd doc ; $(MAKE) clean )
+
+spotless-lib:: clean-lib
+	-( cd lib/lua && rm $(LUABASELIB) )
+
+spotless-keep-lib: clean-keep-lib
+#	( cd src ; $(MAKE) spotless )
+#	( cd util ; $(MAKE) spotless )
+#	pipe set def $(DAT) && $(MAKE) spotless && set def [-]
+#	( cd doc ; $(MAKE) spotless )
+spotless-clean-submodule:
+	@( if test -f submodules/lua/lua.h ; then \
+	    git submodule deinit submodules/lua ; fi )
+
+clean:
+	pipe set def $(DAT) && $(MAKE) clean && set def [-]
+	pipe set def $(SRC) && $(MAKE) clean && set def [-]
+	pipe set def $(UTIL) && $(MAKE) clean && set def [-]
+	pipe set def $(DOC) && $(MAKE) clean && set def [-]
+
+#	-delete/log $(CLEANFILES)
+
+spotless: clean
+	pipe set def $(DAT) && $(MAKE) spotless && set def [-]
+	pipe set def $(SRC) && $(MAKE) spotless && set def [-]
+	pipe set def $(UTIL) && $(MAKE) spotless && set def [-]
+	pipe set def $(DOC) && $(MAKE) spotless && set def [-]
+	-delete/log $(SPOTLESSFILES) $(INCL)nhlua.h;*
+
+#	pipe set def $(DAT) && $(MAKE) spotless && set def [-]
+#	-$(RM) $(GAMEBIN);*

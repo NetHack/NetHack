@@ -1,0 +1,832 @@
+# NetHack 3.7 Makefile.src $NHDT-Date: 1654287121 2022/06/03 20:12:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.145 $
+# Copyright (c) 2024 by Michael Allison
+# NetHack may be freely redistributed.  See license for details.
+#
+# OpenVMS GNU Makefile for OpenVMS 9.x and VSI C
+# with GNU Make V4.1 (or greater).
+#
+# Tested on x86_64 version of OpenVMS V9.2-1.
+#
+
+# Root of source tree:
+NHSROOT=..
+
+# If we're cross-compiling, a hints file will override this
+# to a unique target directory, but otherwise the obj files just go
+# into [-.src]
+TARGETPFX=
+
+# relative directories from src
+DOC=[-.doc]
+DAT=[-.dat]
+INCL=[-.include]
+SRC=[-.src]
+UTIL=[-.util]
+SYSVMS=[-.sys.vms]
+SYSSHR=[-.sys.share]
+SYSUNIX=[-.sys.unix]
+WINTTY=[-.win.tty]
+WINSHR=[-.win.share]
+WINTTY=[-.win.tty]
+WINCURS=[-.win.curses]
+WINX11=[-.win.X11]
+WINQT=[-.win.Qt]
+WINSHIM=[-.win.shim]
+WINCHAIN=[-.win.chain]
+
+# Lua
+LUAVER=546
+LUADOTVER=5.4.6
+LUAUNDERVER=5_4_6
+# Lua location relative to src
+LUAINC=[-.lib.lua.lua$(LUAVER).src]
+LUALIB=[-.lib.lua]lua$(LUAVER).olb
+LUASRCDIR =[-.lib.lua.lua$(LUAVER).src]
+LUASRCINCDIR=$(LUASRCDIR)
+
+#
+# If your compiler needs an appropriate switch to accept C99 code.
+# VSI C defaults to /STANDARD=relaxed which allows several C
+# dialects including C99.
+#
+# CSTD=/STANDARD=C99
+#
+
+# Compiler flags
+CFLAGS :=/INCLUDE=($(INCL),$(LUAINC)) /NAMES=(AS_IS) $(CSTD)
+CXXFLAGS = /INCLUDE_DIR=($(INCL),$(LUAINC)) /NAMES=(AS_IS)
+
+# Link flags
+LFLAGS =
+
+# external programs
+# MAKE = make
+CC = CC
+#touch :=SET FILE/TRUNCATE
+touch = append/New _NLA0:
+LINK = link
+RM = delete
+#TRUE uses an actual helper true.exe
+TRUE = true
+#FALSE uses an actual helper false.exe
+FALSE = false
+#ECHO uses an actual helper echo.exe
+ECHO = echo
+CXX ?= CXX
+MOC ?= moc
+MOCPATH ?= $(QTDIR)/bin/$(MOC)
+# The default is for the TARGET_* variables to match the defaults.
+# If we're cross-compiling these will get overridden elsewhere, likely via
+# a hints file. TARGETPFX was set above earlier.
+TARGET_CC = $(CC)
+TARGET_CFLAGS = $(CFLAGS)
+TARGET_LINK = $(LINK)
+TARGET_LFLAGS = $(LFLAGS)
+TARGET_CXX = $(CXX)
+TARGET_CXXFLAGS = $(CXXFLAGS)
+TARGET_LIBS = $(LIBS)
+
+HACKLIB=hacklib.olb
+HACKLIBOBJLIST=hacklib.obj,[-.util]panic.obj
+
+# Set SYSTEM target
+SYSTEM = SysVMS
+
+comma:=,
+
+# all .h files
+CONFIGBASEH := color config config1 patchlevel tradstdc hacklib integer \
+		global coord vmsconf cstd nhlua unixconf \
+		pcconf micro windconf warnings fnamesiz
+
+HACKBASEH := hack lint align dungeon wintype sym defsym \
+		mkroom artilist objclass objects youprop \
+		prop permonst monattk monflag monsters \
+		mondata context rm botl rect region trap \
+		display vision seffects selvar sndprocs stairs decl \
+		quest spell obj engrave you attrib monst \
+		mextra skills timeout flag winprocs sys
+
+CONFIG_H = $(addsuffix .h, $(addprefix $(INCL), $(CONFIGBASEH)))
+HACK_H = $(addsuffix .h, $(addprefix $(INCL), $(CONFIGBASEH) $(HACKBASEH)))
+
+#QTn_H =
+# all .c that are part of the main NetHack program and are not
+# operating-system or windowing-system specific.
+# Do not include date.c in this list.
+HACKFILES := allmain alloc apply artifact attrib ball bones \
+	   botl calendar cmd coloratt dbridge decl detect dig display dlb do \
+	   do_name do_wear dog dogmove dokick dothrow drawing \
+	   dungeon eat end engrave exper explode extralev \
+	   files fountain getpos hack hacklib insight invent isaac64 light \
+	   lock mail makemon mcastu mdlib mhitm mhitu minion mklev \
+	   mkmap mkmaze mkobj mkroom mon \
+	   mondata monmove monst mplayer mthrowu muse music \
+	   nhlua nhlsel nhlobj objnam o_init objects \
+	   options pager pickup pline polyself potion pray \
+	   priest quest questpgr read rect region report restore \
+	   rip rnd role rumors save selvar sfstruct \
+	   shk shknam sit sounds \
+	   sp_lev spell stairs steal steed strutil symbols sys teleport \
+	   timeout topten track trap u_init utf8map \
+	   uhitm vault version vision weapon were wield \
+	   windows wizard wizcmds worm worn write zap
+
+# the date file
+DATEFILES = date
+
+# ---------------
+# platforms / OS
+# ---------------
+
+# Files for sys.vms
+OPENVMSFILES = vmsfiles vmsmail vmsmisc vmstty vmsunix
+OPENVMSMAIN = vmsmain
+
+# ---------------
+# window ports
+# ---------------
+
+# files for a straight tty interface
+WINTTYFILES = getline termcap topl wintty
+
+# Files for curses interface
+WINCURSESFILES = cursmain curswins cursmisc cursdial cursstat cursinit \
+	cursmesg cursinvt
+
+# Files for X11 interface
+WINX11FILES = Window dialogs winX winmap winmenu winmesg winmisc \
+		winstat wintext winval
+
+# Files for Qt interface
+WINQTFILES = qt_bind qt_click qt_clust qt_delay qt_glyph qt_icon qt_inv \
+	qt_key qt_line qt_main qt_map qt_menu qt_msg qt_plsel qt_rip qt_set \
+	qt_stat qt_str qt_streq qt_svsel qt_win qt_xcmd qt_yndlg
+
+# shared win files
+#WINSHAREFILES = ioctl
+
+#
+# Files for a Qt 4, Qt 5, or Qt 6 interface
+#
+# generated source files made by Qt's 'moc' program from $(WINQT)qt_*.h;
+# appended to WINQTSRC for use by 'make depend'
+# WINQTMOC = qt_kde0.moc qt_main.moc qt_map.moc qt_menu.moc qt_msg.moc \
+# 	qt_plsel.moc qt_set.moc qt_stat.moc qt_xcmd.moc qt_yndlg.moc
+# WINQTSRC = $(WINQT)qt_bind.cpp $(WINQT)qt_click.cpp \
+# 	$(WINQT)qt_clust.cpp $(WINQT)qt_delay.cpp \
+# 	$(WINQT)qt_glyph.cpp $(WINQT)qt_icon.cpp $(WINQT)qt_inv.cpp \
+# 	$(WINQT)qt_key.cpp $(WINQT)qt_line.cpp $(WINQT)qt_main.cpp \
+# 	$(WINQT)qt_map.cpp $(WINQT)qt_menu.cpp $(WINQT)qt_msg.cpp \
+# 	$(WINQT)qt_plsel.cpp $(WINQT)qt_rip.cpp $(WINQT)qt_set.cpp \
+# 	$(WINQT)qt_stat.cpp $(WINQT)qt_str.cpp $(WINQT)qt_streq.cpp \
+# 	$(WINQT)qt_svsel.cpp $(WINQT)qt_win.cpp $(WINQT)qt_xcmd.cpp \
+# 	$(WINQT)qt_yndlg.cpp $(WINQTMOC) tile.c
+# WINQTOBJ = $(TARGETPFX)qt_bind.o $(TARGETPFX)qt_click.o \
+# 	$(TARGETPFX)qt_clust.o $(TARGETPFX)qt_delay.o \
+# 	$(TARGETPFX)qt_glyph.o $(TARGETPFX)qt_icon.o \
+# 	$(TARGETPFX)qt_inv.o $(TARGETPFX)qt_key.o $(TARGETPFX)qt_line.o \
+# 	$(TARGETPFX)qt_main.o $(TARGETPFX)qt_map.o $(TARGETPFX)qt_menu.o \
+# 	$(TARGETPFX)qt_msg.o $(TARGETPFX)qt_plsel.o $(TARGETPFX)qt_rip.o \
+# 	$(TARGETPFX)qt_set.o $(TARGETPFX)qt_stat.o $(TARGETPFX)qt_str.o \
+# 	$(TARGETPFX)qt_streq.o $(TARGETPFX)qt_svsel.o $(TARGETPFX)qt_win.o \
+# 	$(TARGETPFX)qt_xcmd.o $(TARGETPFX)qt_yndlg.o #$(TARGETPFX)tile.o
+#
+
+# -----------------
+# derived variables
+# -----------------
+
+HACKSRC       = $(addsuffix .c, $(addprefix $(SRC), $(HACKFILES)))
+DATESRC       = $(addsuffix .c, $(addprefix $(SRC), $(DATEFILES)))
+VMSSRC        = $(addsuffix .c, $(addprefix $(SYSVMS), $(OPENVMSFILES)))
+WINTTYSRC     = $(addsuffix .c, $(addprefix $(WINTTY), $(WINTTYFILES)))
+WINCURSESSRC  = $(addsuffix .c, $(addprefix $(WINCURS), $(WINCURSESFILES)))
+WINX11SRC     = $(addsuffix .c, $(addprefix $(WINX11), $(WINX11FILES)))
+WINQTSRC      = $(addsuffix .cpp, $(addprefix $(WINQT), $(WINQTFILES)))
+#WINSHARESRC   = $(addsuffix .c, $(addprefix $(WINSHR), $(WINSHAREFILES)))
+MAINSRC       = $(addsuffix .c, $(addprefix $(SYSVMS), $(OPENVMSMAIN)))
+
+HACKOBJS      = $(addsuffix .obj, $(HACKFILES))
+DATEOBJ       = $(addsuffix .obj, $(DATEFILES))
+VMSOBJS       = $(addsuffix .obj, $(OPENVMSFILES))
+WINTTYOBJS    = $(addsuffix .obj, $(WINTTYFILES))
+#WINCURSESOBJS = $(addsuffix .obj, $(WINCURSESFILES))
+#WINX11OBJS    = $(addsuffix .obj, $(WINX11FILES))
+#WINQTOBJS     = $(addsuffix .obj, $(WINQTFILES))
+#WINSHAREOBJS   = $(addsuffix .obj, $(WINSHAREFILES))
+MAINOBJ        = $(addsuffix .obj, $(OPENVMSMAIN))
+
+# file for regular expression matching
+#REGEXFILE  ?= posixregex
+#REGEXOBJ   ?= pmatchregex
+REGEXFILE  ?= cppregex
+ifeq "$(REGEXFILE)" "cppregex"
+REGEXSRC   = $(addsuffix .cpp, $(addprefix $(SYSSHR), $(REGEXFILE)))
+else
+REGEXSRC   = $(addsuffix .c, $(addprefix $(SYSSHR), $(REGEXFILE)))
+endif
+REGEXOBJ  = $(addsuffix .obj, $(REGEXFILE))
+
+# file for termcap
+TERMCAPFILE ?= tclib
+TERMCAPSRC   = $(addsuffix .c, $(addprefix $(SYSSHR), $(TERMCAPFILE)))
+TERMCAPOBJ   = $(addsuffix .obj, $(TERMCAPFILE))
+
+# if you defined RANDOM in unixconf.h since your system did not come
+# with a reasonable random number generator
+# RANDOBJ = $(TARGETPFX)random.obj
+#RANDOBJ =
+
+LUABASESRC = lapi lauxlib lbaselib lcode lcorolib lctype ldblib \
+		ldebug ldo ldump lfunc lgc linit liolib llex \
+		lmathlib lmem loadlib lobject lopcodes loslib \
+		lparser lstate lstring lstrlib ltable ltablib \
+		ltm lundump lutf8lib lvm lzio
+#LUASRC = $(addsuffix .c, $(addprefix $(LUASRCDIR), $(LUABASESRC)))
+LUAOBJS = $(addsuffix .obj, $(LUABASESRC))
+LUALIBOBJS = $(addsuffix .obj$(comma), $(LUABASESRC))
+LUASPOTLESSOBJS = $(addsuffix .obj;*$(comma), $(LUABASESRC))
+
+ALLSRC = $(HACKSRC) $(VMSSRC) $(WINTTYSRC) $(WINCURSESSRC) \
+		$(WINX11SRC) $(WINQTSRC) $(WINSHARESRC) \
+		$(REGEXSRC) $(TERMCAPSRC)
+#
+# $(TARGETPFX)date.o is not included in this list
+ALLOBJS = $(HACKOBJS) $(VMSOBJS) $(WINTTYOBJS)  $(RANDOBJ) \
+		$(WINCURSESOBJS) $(WINX11OBJS) $(WINQTOBJS) \
+		$(WINSHAREOBJS) $(REGEXOBJ) $(TERMCAPOBJ)
+
+GAME     = nethack
+# GAME     = nethack.prg
+GAMEBIN = $(GAME).exe
+
+LINKOBJLIST   = $(addsuffix $(comma), $(ALLOBJS))
+CLEANFILES    = $(addsuffix ;*$(comma), $(ALLOBJS) $(MAINOBJ) \
+		$(GAMEBIN)) \
+		$(DATEOBJ);*
+SPOTLESSFILES    = $(addsuffix ;*$(comma), $(LUASPOTLESSOBJS) \
+			luaplaceholder.obj)
+
+# rules
+%.obj: $(SRC)%.c
+	$(CC) $(CFLAGS) $< /OBJECT=$@
+
+%.obj: $(SYSVMS)%.c
+	$(CC) $(CFLAGS) $< /OBJECT=$@
+
+%.obj: $(SYSSHR)%.c
+	$(CC) $(CFLAGS) $< /OBJECT=$@
+
+%.obj: $(SYSSHR)%.cpp
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+%.obj: $(LUASRCDIR)%.c
+	$(CC) $(CFLAGS) /define=(LUA_USE_C89) $< /OBJECT=$@
+
+# targets
+.PHONY: SysVMS all pregame $(GAME) clean spotless package
+.PHONY: tell-fetch-lua fetch-lua
+
+# first target is also the default target for 'make' without any arguments
+all:	$(GAME)
+	@echo ""
+
+pregame:
+	$(PREGAME)
+
+$(GAME):	pregame $(HACKLIB) $(MAKEDEFS) $(LUALIB) $(WAVS) $(GAMEBIN)
+	@echo "$(GAME) is up to date."
+
+$(GAMEBIN):	$(LUALIB) $(MAINOBJ) $(ALLOBJS) $(DATEOBJ)
+	@echo "Linking $(GAME)."
+#	@echo $(TARGET_LINK) $(TARGET_LFLAGS) $(MAINOBJ), \
+#		$(LINKOBJLIST) $(DATEOBJ) \
+#		 /EXECUTABLE=$@ \
+#		 +sys$$common:[lua.lib]liblua.olb/library
+	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) $(MAINOBJ), \
+		$(LINKOBJLIST) $(DATEOBJ) \
+		 /EXECUTABLE=$@\
+		 +$(LUALIB)/library
+
+hacklib.olb: $(HACKLIBOBJLIST)
+	if f$$search("hacklib.olb").eqs."" then -
+		library/create hacklib.olb/object
+	library/insert/replace hacklib.olb $(HACKLIBOBJLIST)
+
+#$(WINLIB) $(TARGET_LIBS) $(LUALIB)
+
+$(INCL)nhlua.h:
+	echo "/* nhlua.h - generated by Makefile.vms */" > $@
+	@echo \#"include ""$(LUASRCINCDIR)lua.h""" >> $@
+	@echo "LUA_API int (lua_error) (lua_State *L) NORETURN;" >>$@
+	@echo \#"include ""$(LUASRCINCDIR)lualib.h""" >> $@
+	@echo \#"include ""$(LUASRCINCDIR)lauxlib.h""" >> $@
+	@echo "/*nhlua.h*/" >> $@
+
+#$(INCL)nhlua.h:
+#	echo "/* nhlua.h - generated by -vms9 */" > $@
+#	@echo \#"include ""sys$$common:[lua.include]lua.h""" >> $@
+#	@echo "LUA_API int (lua_error) (lua_State *L) NORETURN;" >>$@
+#	@echo \#"include ""sys$$common:[lua.include]lualib.h""" >> $@
+#	@echo \#"include ""sys$$common:[lua.include]lauxlib.h""" >> $@
+#	@echo "/*nhlua.h*/" >> $@
+
+$(LUALIB): [-.lib.lua]lua$(LUAVER).dir $(LUAOBJS) luaplaceholder.obj
+	if f$$search("$(LUALIB)").eqs."" then library/create/obj $(LUALIB)
+	library/insert/replace $(LUALIB) $(LUALIBOBJS) luaplaceholder.obj
+
+
+lapi.obj: 	$(LUASRCDIR)lapi.c
+lauxlib.obj:    $(LUASRCDIR)lauxlib.c
+lbaselib.obj: 	$(LUASRCDIR)lbaselib.c
+lcode.obj: 	$(LUASRCDIR)lcode.c
+lcorolib.obj: 	$(LUASRCDIR)lcorolib.c
+lctype.obj: 	$(LUASRCDIR)lctype.c
+ldblib.obj:	$(LUASRCDIR)ldblib.c
+ldebug.obj: 	$(LUASRCDIR)ldebug.c
+ldo.obj:	$(LUASRCDIR)ldo.c
+ldump.obj: 	$(LUASRCDIR)ldump.c
+lfunc.obj:	$(LUASRCDIR)lfunc.c
+lgc.obj: 	$(LUASRCDIR)lgc.c
+linit.obj:	$(LUASRCDIR)linit.c
+liolib.obj: 	$(LUASRCDIR)liolib.c
+llex.obj:	$(LUASRCDIR)llex.c
+lmathlib.obj: 	$(LUASRCDIR)lmathlib.c
+lmem.obj:	$(LUASRCDIR)lmem.c
+loadlib.obj: 	$(LUASRCDIR)loadlib.c
+lobject.obj:	$(LUASRCDIR)lobject.c
+lopcodes.obj: 	$(LUASRCDIR)lopcodes.c
+loslib.obj:	$(LUASRCDIR)loslib.c
+lparser.obj: 	$(LUASRCDIR)lparser.c
+lstate.obj:	$(LUASRCDIR)lstate.c
+lstring.obj: 	$(LUASRCDIR)lstring.c
+lstrlib.obj:	$(LUASRCDIR)lstrlib.c
+ltable.obj: 	$(LUASRCDIR)ltable.c
+ltablib.obj:	$(LUASRCDIR)ltablib.c
+ltm.obj: 	$(LUASRCDIR)ltm.c
+lundump.obj:	$(LUASRCDIR)lundump.c
+lutf8lib.obj: 	$(LUASRCDIR)lutf8lib.c
+lvm.obj:	$(LUASRCDIR)lvm.c
+lzio.obj: 	$(LUASRCDIR)lzio.c
+
+#LUABASESRC = lapi lauxlib lbaselib lcode lcorolib lctype ldblib \
+#		ldebug ldo ldump lfunc lgc linit liolib llex \
+#		lmathlib lmem loadlib lobject lopcodes loslib \
+#		lparser lstate lstring lstrlib ltable ltablib \
+#		ltm lundump lutf8lib lvm lzio
+
+
+luaplaceholder.obj: luaplaceholder.c
+	$(CC) $(CFLAGS) luaplaceholder.c /OBJECT=$@
+luaplaceholder.c:
+	@echo int placeholder = 1; >luaplaceholder.c
+
+[-.lib]lua.dir:
+	create/directory [-.lib.lua]
+
+[-]lib.dir:
+	create/directory [-.lib]
+
+[-.lib.lua]lua$(LUAVER).dir:
+	@echo You need to make fetch-lua
+	false
+
+fetch-lua: [-]lib.dir [-.lib]lua.dir
+	if f$$search("[-.lib.lua]lua$(LUAVER).tgz").eqs."" then \
+	curl http://www.lua.org/ftp/lua-$(LUADOTVER).tar.gz \
+		--output [-.lib.lua]lua$(LUAVER).tgz
+	if f$$search("[-.lib.lua]lua$(LUAVER).tgz").nes."" then \
+		gzip --force -d [-.lib.lua]lua$(LUAVER).tgz
+	if f$$search("[-.lib.lua]lua$(LUAVER).tar").nes."" then \
+		pipe set def [-.lib.lua] && \
+		     tar -xf lua$(LUAVER).tar && \
+		     set def [--.src]
+	if (f$$search("[-.lib.lua]lua-$(LUAUNDERVER).DIR;1").nes."" \
+		.AND. f$$search("[-.lib.lua]lua$(LUAVER).dir;1").eqs."") then \
+	  rename [-.lib.lua]lua-$(LUAUNDERVER).DIR;1 \
+		 [-.lib.lua]lua$(LUAVER).dir;1
+
+tile.c: $(WINSHR)tilemap.c $(HACK_H)
+	@( cd $(UTIL) ; $(MAKE) $(SRC)tile.c )
+
+#	date.c should be recompiled any time any of the source or include code
+#	is modified.
+$(DATEOBJ): $(DATESRC) $(HACK_H) $(HACKCSRC) $(ALLOBJS)
+	$(TARGET_CC) $(TARGET_CFLAGS) $(GITHASH) $(GITBRANCH) \
+		/OBJECT=$@ $(DATESRC)
+
+tags: $(CSOURCES)
+	@echo ctags -tw ...
+	@ctags -tw $(CSOURCES)
+	@( cd $(INCL) ; ctags -tw $(HSOURCES) )
+	@( cd $(UTIL) ; $(MAKE) tags )
+
+clean:
+	-delete/log $(CLEANFILES)
+
+spotless: clean
+	-delete/log $(SPOTLESSFILES) $(INCL)nhlua.h;*
+#	-$(RM) $(GAMEBIN);*
+
+package:
+	@echo packaging complete (nothing to do).
+
+# VMS-specific code
+vmsmain.obj:  $(SYSVMS)vmsmain.c $(HACK_H) $(INCL)dlb.h
+vmstty.obj:   $(SYSVMS)vmstty.c $(HACK_H) $(INCL)wintty.h \
+		$(INCL)tcap.h
+vmsunix.obj:  $(SYSVMS)vmsunix.c $(HACK_H)
+vmsmisc.obj:  $(SYSVMS)vmsmisc.c $(SYSVMS)oldcrtl.c $(CONFIG_H)
+vmsfiles.obj: $(SYSVMS)vmsfiles.c $(CONFIG_H)
+vmsmail.obj:  $(SYSVMS)vmsmail.c $(CONFIG_H) $(INCL)mail.h \
+		$(INCL)wintype.h $(INCL)winprocs.h $(INCL)color.h
+
+# DO NOT DELETE THIS LINE OR CHANGE ANYTHING BEYOND IT
+#
+$(TARGETPFX)pcmain.obj: $(SYSSHR)pcmain.c $(HACK_H) $(INCL)dlb.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(SYSSHR)pcmain.c
+$(TARGETPFX)pcsys.obj: $(SYSSHR)pcsys.c $(HACK_H) $(INCL)wintty.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(SYSSHR)pcsys.c
+$(TARGETPFX)pctty.obj: $(SYSSHR)pctty.c $(HACK_H) $(INCL)wintty.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(SYSSHR)pctty.c
+$(TARGETPFX)pcunix.obj: $(SYSSHR)pcunix.c $(HACK_H) $(INCL)wintty.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(SYSSHR)pcunix.c
+$(TARGETPFX)pmatchregex.obj: $(SYSSHR)pmatchregex.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(SYSSHR)pmatchregex.c
+$(TARGETPFX)posixregex.obj: $(SYSSHR)posixregex.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(SYSSHR)posixregex.c
+$(TARGETPFX)random.obj: $(SYSSHR)random.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(SYSSHR)random.c
+$(TARGETPFX)ioctl.obj: $(SYSSHR)ioctl.c $(HACK_H) $(INCL)tcap.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(SYSSHR)ioctl.c
+$(TARGETPFX)unixtty.obj: $(SYSSHR)unixtty.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(SYSSHR)unixtty.c
+$(TARGETPFX)unixmain.obj: $(SYSUNIX)unixmain.c $(HACK_H) $(INCL)dlb.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(SYSUNIX)unixmain.c
+$(TARGETPFX)unixunix.obj: $(SYSUNIX)unixunix.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(SYSUNIX)unixunix.c
+$(TARGETPFX)unixres.obj: $(SYSUNIX)unixres.c $(CONFIG_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(SYSUNIX)unixres.c
+$(TARGETPFX)getline.obj: $(WINTTY)getline.c $(HACK_H) $(INCL)wintty.h \
+		$(INCL)func_tab.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINTTY)getline.c
+$(TARGETPFX)termcap.obj: $(WINTTY)termcap.c $(HACK_H) $(INCL)wintty.h \
+		$(INCL)tcap.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINTTY)termcap.c
+$(TARGETPFX)topl.obj: $(WINTTY)topl.c $(HACK_H) $(INCL)tcap.h \
+		$(INCL)wintty.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINTTY)topl.c
+$(TARGETPFX)wintty.obj: $(WINTTY)wintty.c $(HACK_H) $(INCL)dlb.h \
+		$(INCL)tcap.h $(INCL)wintty.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINTTY)wintty.c
+$(TARGETPFX)cursmain.obj: $(WINCURS)cursmain.c $(HACK_H) $(INCL)wincurs.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINCURS)cursmain.c
+$(TARGETPFX)curswins.obj: $(WINCURS)curswins.c $(HACK_H) \
+		$(INCL)wincurs.h $(WINCURS)curswins.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINCURS)curswins.c
+$(TARGETPFX)cursmisc.obj: $(WINCURS)cursmisc.c $(HACK_H) \
+		$(INCL)wincurs.h $(WINCURS)cursmisc.h \
+		$(INCL)func_tab.h $(INCL)dlb.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINCURS)cursmisc.c
+$(TARGETPFX)cursdial.obj: $(WINCURS)cursdial.c $(HACK_H) \
+		$(INCL)wincurs.h $(WINCURS)cursdial.h \
+		$(INCL)func_tab.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINCURS)cursdial.c
+$(TARGETPFX)cursstat.obj: $(WINCURS)cursstat.c $(HACK_H) \
+		$(INCL)wincurs.h $(WINCURS)cursstat.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINCURS)cursstat.c
+$(TARGETPFX)cursinit.obj: $(WINCURS)cursinit.c $(HACK_H) \
+		$(INCL)wincurs.h $(WINCURS)cursinit.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINCURS)cursinit.c
+$(TARGETPFX)cursmesg.obj: $(WINCURS)cursmesg.c $(HACK_H) \
+		$(INCL)wincurs.h $(WINCURS)cursmesg.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINCURS)cursmesg.c
+$(TARGETPFX)cursinvt.obj: $(WINCURS)cursinvt.c $(HACK_H) \
+		$(INCL)wincurs.h $(WINCURS)cursinvt.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINCURS)cursinvt.c
+$(TARGETPFX)Window.obj: $(WINX11)Window.c $(INCL)xwindowp.h \
+		$(INCL)xwindow.h $(CONFIG_H) $(INCL)lint.h \
+		$(INCL)winX.h $(INCL)color.h $(INCL)wintype.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) /OBJECT=$@ $(WINX11)Window.c
+$(TARGETPFX)dialogs.obj: $(WINX11)dialogs.c $(CONFIG_H) $(INCL)lint.h \
+		$(INCL)winX.h $(INCL)color.h $(INCL)wintype.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) /OBJECT=$@ $(WINX11)dialogs.c
+$(TARGETPFX)winX.obj: $(WINX11)winX.c $(HACK_H) $(INCL)winX.h \
+		$(INCL)dlb.h $(INCL)xwindow.h $(WINX11)nh72icon \
+		$(WINX11)nh56icon $(WINX11)nh32icon
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) /OBJECT=$@ $(WINX11)winX.c
+$(TARGETPFX)winmap.obj: $(WINX11)winmap.c $(INCL)xwindow.h $(HACK_H) \
+		$(INCL)dlb.h $(INCL)winX.h $(INCL)tile2x11.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) /OBJECT=$@ $(WINX11)winmap.c
+$(TARGETPFX)winmenu.obj: $(WINX11)winmenu.c $(HACK_H) $(INCL)winX.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) /OBJECT=$@ $(WINX11)winmenu.c
+$(TARGETPFX)winmesg.obj: $(WINX11)winmesg.c $(INCL)xwindow.h $(HACK_H) \
+		$(INCL)winX.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) /OBJECT=$@ $(WINX11)winmesg.c
+$(TARGETPFX)winmisc.obj: $(WINX11)winmisc.c $(HACK_H) $(INCL)func_tab.h \
+		$(INCL)winX.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) /OBJECT=$@ $(WINX11)winmisc.c
+$(TARGETPFX)winstat.obj: $(WINX11)winstat.c $(HACK_H) $(INCL)winX.h \
+		$(INCL)xwindow.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) /OBJECT=$@ $(WINX11)winstat.c
+$(TARGETPFX)wintext.obj: $(WINX11)wintext.c $(HACK_H) $(INCL)winX.h \
+		$(INCL)xwindow.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) /OBJECT=$@ $(WINX11)wintext.c
+$(TARGETPFX)winval.obj: $(WINX11)winval.c $(HACK_H) $(INCL)winX.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) /OBJECT=$@ $(WINX11)winval.c
+$(TARGETPFX)tile.obj: tile.c $(HACK_H)
+$(TARGETPFX)winshim.obj: $(WINSHIM)winshim.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINSHIM)winshim.c
+$(TARGETPFX)cppregex.obj: $(SYSSHR)cppregex.cpp $(CONFIG_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(SYSSHR)cppregex.cpp
+$(TARGETPFX)qt_bind.obj: $(WINQT)qt_bind.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_bind.h $(WINQT)qt_main.h \
+		$(WINQT)qt_kde0.h $(WINQT)qt_click.h $(WINQT)qt_delay.h \
+		$(WINQT)qt_xcmd.h $(WINQT)qt_key.h $(WINQT)qt_map.h \
+		$(WINQT)qt_win.h $(WINQT)qt_clust.h $(WINQT)qt_menu.h \
+		$(WINQT)qt_rip.h $(WINQT)qt_msg.h $(WINQT)qt_plsel.h \
+		$(WINQT)qt_svsel.h $(WINQT)qt_set.h $(WINQT)qt_stat.h \
+		$(WINQT)qt_icon.h $(WINQT)qt_streq.h $(WINQT)qt_line.h \
+		$(WINQT)qt_yndlg.h $(WINQT)qt_str.h $(INCL)dlb.h \
+		$(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_bind.cpp
+$(TARGETPFX)qt_click.obj: $(WINQT)qt_click.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_click.h $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_click.cpp
+$(TARGETPFX)qt_clust.obj: $(WINQT)qt_clust.cpp $(WINQT)qt_clust.h $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_clust.cpp
+$(TARGETPFX)qt_delay.obj: $(WINQT)qt_delay.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_delay.h $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_delay.cpp
+$(TARGETPFX)qt_glyph.obj: $(WINQT)qt_glyph.cpp $(HACK_H) \
+		$(INCL)tile2x11.h $(WINQT)qt_pre.h $(WINQT)qt_post.h \
+		$(WINQT)qt_glyph.h $(WINQT)qt_bind.h $(WINQT)qt_main.h \
+		$(WINQT)qt_kde0.h $(WINQT)qt_set.h $(WINQT)qt_inv.h \
+		$(WINQT)qt_map.h $(WINQT)qt_win.h $(WINQT)qt_clust.h \
+		$(WINQT)qt_str.h $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_glyph.cpp
+$(TARGETPFX)qt_icon.obj: $(WINQT)qt_icon.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_icon.h $(WINQT)qt_str.h \
+		$(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_icon.cpp
+$(TARGETPFX)qt_inv.obj: $(WINQT)qt_inv.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_inv.h $(WINQT)qt_glyph.h \
+		$(WINQT)qt_main.h $(WINQT)qt_kde0.h $(WINQT)qt_set.h \
+		$(WINQT)qt_bind.h $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_inv.cpp
+$(TARGETPFX)qt_key.obj: $(WINQT)qt_key.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_key.h $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_key.cpp
+$(TARGETPFX)qt_line.obj: $(WINQT)qt_line.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_line.h $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_line.cpp
+$(TARGETPFX)qt_main.obj: $(WINQT)qt_main.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_main.h $(WINQT)qt_kde0.h \
+		qt_main.moc $(WINQT)qt_bind.h $(WINQT)qt_glyph.h \
+		$(WINQT)qt_inv.h $(WINQT)qt_key.h $(WINQT)qt_map.h \
+		$(WINQT)qt_win.h $(WINQT)qt_clust.h $(WINQT)qt_msg.h \
+		$(WINQT)qt_set.h $(WINQT)qt_stat.h $(WINQT)qt_icon.h \
+		$(WINQT)qt_str.h qt_kde0.moc $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_main.cpp
+$(TARGETPFX)qt_map.obj: $(WINQT)qt_map.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_map.h $(WINQT)qt_win.h \
+		$(WINQT)qt_clust.h qt_map.moc $(WINQT)qt_click.h \
+		$(WINQT)qt_glyph.h $(WINQT)qt_set.h $(WINQT)qt_bind.h \
+		$(WINQT)qt_main.h $(WINQT)qt_kde0.h $(WINQT)qt_str.h \
+		$(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_map.cpp
+$(TARGETPFX)qt_menu.obj: $(WINQT)qt_menu.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_menu.h $(WINQT)qt_win.h \
+		$(WINQT)qt_rip.h qt_menu.moc $(WINQT)qt_key.h \
+		$(WINQT)qt_glyph.h $(WINQT)qt_set.h $(WINQT)qt_bind.h \
+		$(WINQT)qt_main.h $(WINQT)qt_kde0.h $(WINQT)qt_streq.h \
+		$(WINQT)qt_line.h $(WINQT)qt_str.h $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_menu.cpp
+$(TARGETPFX)qt_msg.obj: $(WINQT)qt_msg.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_msg.h $(WINQT)qt_win.h \
+		qt_msg.moc $(WINQT)qt_map.h $(WINQT)qt_clust.h \
+		$(WINQT)qt_set.h $(WINQT)qt_bind.h $(WINQT)qt_main.h \
+		$(WINQT)qt_kde0.h $(WINQT)qt_str.h $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_msg.cpp
+$(TARGETPFX)qt_plsel.obj: $(WINQT)qt_plsel.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_plsel.h qt_plsel.moc \
+		$(WINQT)qt_bind.h $(WINQT)qt_main.h $(WINQT)qt_kde0.h \
+		$(WINQT)qt_glyph.h $(WINQT)qt_set.h $(WINQT)qt_str.h \
+		$(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_plsel.cpp
+$(TARGETPFX)qt_rip.obj: $(WINQT)qt_rip.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_rip.h $(WINQT)qt_bind.h \
+		$(WINQT)qt_main.h $(WINQT)qt_kde0.h $(WINQT)qt_str.h \
+		$(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_rip.cpp
+$(TARGETPFX)qt_set.obj: $(WINQT)qt_set.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_set.h $(WINQT)qt_bind.h \
+		$(WINQT)qt_main.h $(WINQT)qt_kde0.h qt_set.moc \
+		$(WINQT)qt_glyph.h $(WINQT)qt_xcmd.h $(WINQT)qt_str.h \
+		$(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_set.cpp
+$(TARGETPFX)qt_stat.obj: $(WINQT)qt_stat.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_stat.h $(WINQT)qt_win.h \
+		$(WINQT)qt_icon.h qt_stat.moc $(WINQT)qt_set.h \
+		$(WINQT)qt_bind.h $(WINQT)qt_main.h $(WINQT)qt_kde0.h \
+		$(WINQT)qt_str.h $(WINQT)qt_xpms.h $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_stat.cpp
+$(TARGETPFX)qt_str.obj: $(WINQT)qt_str.cpp $(WINQT)qt_str.h $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_str.cpp
+$(TARGETPFX)qt_streq.obj: $(WINQT)qt_streq.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_streq.h $(WINQT)qt_line.h \
+		$(WINQT)qt_str.h $(WINQT)qt_set.h $(WINQT)qt_bind.h \
+		$(WINQT)qt_main.h $(WINQT)qt_kde0.h $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_streq.cpp
+$(TARGETPFX)qt_svsel.obj: $(WINQT)qt_svsel.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_svsel.h $(WINQT)qt_bind.h \
+		$(WINQT)qt_main.h $(WINQT)qt_kde0.h $(WINQT)qt_str.h \
+		$(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_svsel.cpp
+$(TARGETPFX)qt_win.obj: $(WINQT)qt_win.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_win.h $(WINQT)qt_bind.h \
+		$(WINQT)qt_main.h $(WINQT)qt_kde0.h $(WINQT)qt_click.h \
+		$(WINQT)qt_glyph.h $(WINQT)qt_inv.h $(WINQT)qt_key.h \
+		$(WINQT)qt_icon.h $(WINQT)qt_map.h $(WINQT)qt_clust.h \
+		$(WINQT)qt_menu.h $(WINQT)qt_rip.h $(WINQT)qt_msg.h \
+		$(WINQT)qt_set.h $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_win.cpp
+$(TARGETPFX)qt_xcmd.obj: $(WINQT)qt_xcmd.cpp $(HACK_H) $(INCL)func_tab.h \
+		$(WINQT)qt_pre.h $(WINQT)qt_post.h $(WINQT)qt_xcmd.h \
+		qt_xcmd.moc $(WINQT)qt_key.h $(WINQT)qt_bind.h \
+		$(WINQT)qt_main.h $(WINQT)qt_kde0.h $(WINQT)qt_set.h \
+		$(WINQT)qt_str.h $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_xcmd.cpp
+$(TARGETPFX)qt_yndlg.obj: $(WINQT)qt_yndlg.cpp $(HACK_H) $(WINQT)qt_pre.h \
+		$(WINQT)qt_post.h $(WINQT)qt_yndlg.h qt_yndlg.moc \
+		$(WINQT)qt_key.h $(WINQT)qt_str.h $(QTn_H)
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) /OBJECT=$@ $(WINQT)qt_yndlg.cpp
+qt_kde0.moc: $(WINQT)qt_kde0.h $(QTn_H)
+	$(MOCPATH) /OBJECT=$@ $(WINQT)qt_kde0.h
+qt_main.moc: $(WINQT)qt_main.h $(WINQT)qt_kde0.h $(QTn_H)
+	$(MOCPATH) /OBJECT=$@ $(WINQT)qt_main.h
+qt_map.moc: $(WINQT)qt_map.h $(WINQT)qt_win.h $(WINQT)qt_clust.h $(QTn_H)
+	$(MOCPATH) /OBJECT=$@ $(WINQT)qt_map.h
+qt_menu.moc: $(WINQT)qt_menu.h $(WINQT)qt_win.h $(WINQT)qt_rip.h $(QTn_H)
+	$(MOCPATH) /OBJECT=$@ $(WINQT)qt_menu.h
+qt_msg.moc: $(WINQT)qt_msg.h $(WINQT)qt_win.h $(QTn_H)
+	$(MOCPATH) /OBJECT=$@ $(WINQT)qt_msg.h
+qt_plsel.moc: $(WINQT)qt_plsel.h $(QTn_H)
+	$(MOCPATH) /OBJECT=$@ $(WINQT)qt_plsel.h
+qt_set.moc: $(WINQT)qt_set.h $(WINQT)qt_bind.h $(WINQT)qt_main.h \
+		$(WINQT)qt_kde0.h $(QTn_H)
+	$(MOCPATH) /OBJECT=$@ $(WINQT)qt_set.h
+qt_stat.moc: $(WINQT)qt_stat.h $(WINQT)qt_win.h $(WINQT)qt_icon.h \
+		$(QTn_H)
+	$(MOCPATH) /OBJECT=$@ $(WINQT)qt_stat.h
+qt_xcmd.moc: $(WINQT)qt_xcmd.h $(QTn_H)
+	$(MOCPATH) /OBJECT=$@ $(WINQT)qt_xcmd.h
+qt_yndlg.moc: $(WINQT)qt_yndlg.h $(QTn_H)
+	$(MOCPATH) /OBJECT=$@ $(WINQT)qt_yndlg.h
+$(TARGETPFX)tile.obj: tile.c $(HACK_H)
+$(TARGETPFX)wc_chainin.obj: $(WINCHAIN)wc_chainin.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINCHAIN)wc_chainin.c
+$(TARGETPFX)wc_chainout.obj: $(WINCHAIN)wc_chainout.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINCHAIN)wc_chainout.c
+$(TARGETPFX)wc_trace.obj: $(WINCHAIN)wc_trace.c $(HACK_H) $(INCL)wintty.h \
+		$(INCL)func_tab.h
+	$(TARGET_CC) $(TARGET_CFLAGS) /OBJECT=$@ $(WINCHAIN)wc_trace.c
+$(TARGETPFX)allmain.obj: allmain.c $(HACK_H)
+$(TARGETPFX)alloc.obj: alloc.c $(CONFIG_H)
+$(TARGETPFX)apply.obj: apply.c $(HACK_H)
+$(TARGETPFX)artifact.obj: artifact.c $(HACK_H) $(INCL)artifact.h
+$(TARGETPFX)attrib.obj: attrib.c $(HACK_H)
+$(TARGETPFX)ball.obj: ball.c $(HACK_H)
+$(TARGETPFX)bones.obj: bones.c $(HACK_H)
+$(TARGETPFX)botl.obj: botl.c $(HACK_H)
+$(TARGETPFX)cmd.obj: cmd.c $(HACK_H) $(INCL)func_tab.h
+$(TARGETPFX)dbridge.obj: dbridge.c $(HACK_H)
+$(TARGETPFX)decl.obj: decl.c $(HACK_H)
+$(TARGETPFX)detect.obj: detect.c $(HACK_H) $(INCL)artifact.h
+$(TARGETPFX)dig.obj: dig.c $(HACK_H)
+$(TARGETPFX)display.obj: display.c $(HACK_H)
+$(TARGETPFX)dlb.obj: dlb.c $(CONFIG_H) $(INCL)dlb.h
+$(TARGETPFX)do.obj: do.c $(HACK_H)
+$(TARGETPFX)do_name.obj: do_name.c $(HACK_H)
+$(TARGETPFX)do_wear.obj: do_wear.c $(HACK_H)
+$(TARGETPFX)dog.obj: dog.c $(HACK_H)
+$(TARGETPFX)dogmove.obj: dogmove.c $(HACK_H) $(INCL)mfndpos.h
+$(TARGETPFX)dokick.obj: dokick.c $(HACK_H)
+$(TARGETPFX)dothrow.obj: dothrow.c $(HACK_H)
+$(TARGETPFX)drawing.obj: drawing.c $(CONFIG_H) $(INCL)color.h \
+		$(INCL)rm.h $(INCL)objclass.h $(INCL)defsym.h \
+		$(INCL)objects.h $(INCL)wintype.h $(INCL)sym.h
+$(TARGETPFX)dungeon.obj: dungeon.c $(HACK_H) $(INCL)dgn_file.h \
+		$(INCL)dlb.h
+$(TARGETPFX)eat.obj: eat.c $(HACK_H)
+$(TARGETPFX)end.obj: end.c $(HACK_H) $(INCL)dlb.h
+$(TARGETPFX)engrave.obj: engrave.c $(HACK_H)
+$(TARGETPFX)exper.obj: exper.c $(HACK_H)
+$(TARGETPFX)explode.obj: explode.c $(HACK_H)
+$(TARGETPFX)extralev.obj: extralev.c $(HACK_H)
+$(TARGETPFX)files.obj: files.c $(HACK_H) $(INCL)dlb.h $(INCL)wintty.h \
+		#zlib.h
+$(TARGETPFX)fountain.obj: fountain.c $(HACK_H)
+$(TARGETPFX)hack.obj: hack.c $(HACK_H)
+$(TARGETPFX)hacklib.obj: hacklib.c $(HACK_H)
+$(TARGETPFX)insight.obj: insight.c $(HACK_H)
+$(TARGETPFX)invent.obj: invent.c $(HACK_H)
+$(TARGETPFX)isaac64.obj: isaac64.c $(CONFIG_H) $(INCL)isaac64.h
+$(TARGETPFX)light.obj: light.c $(HACK_H)
+$(TARGETPFX)lock.obj: lock.c $(HACK_H)
+$(TARGETPFX)mail.obj: mail.c $(HACK_H) $(INCL)mail.h
+$(TARGETPFX)makemon.obj: makemon.c $(HACK_H)
+$(TARGETPFX)mcastu.obj: mcastu.c $(HACK_H)
+$(TARGETPFX)mdlib.obj: mdlib.c $(CONFIG_H) $(INCL)permonst.h \
+		$(INCL)align.h $(INCL)monattk.h $(INCL)monflag.h \
+		$(INCL)monsters.h $(INCL)objclass.h \
+		$(INCL)defsym.h $(INCL)objects.h $(INCL)wintype.h \
+		$(INCL)sym.h $(INCL)artilist.h $(INCL)dungeon.h \
+		$(INCL)sndprocs.h $(INCL)seffects.h $(INCL)obj.h \
+		$(INCL)monst.h $(INCL)mextra.h $(INCL)you.h \
+		$(INCL)attrib.h $(INCL)prop.h $(INCL)skills.h \
+		$(INCL)context.h $(INCL)flag.h $(INCL)dlb.h
+$(TARGETPFX)mhitm.obj: mhitm.c $(HACK_H) $(INCL)artifact.h
+$(TARGETPFX)mhitu.obj: mhitu.c $(HACK_H) $(INCL)artifact.h
+$(TARGETPFX)minion.obj: minion.c $(HACK_H)
+$(TARGETPFX)mklev.obj: mklev.c $(HACK_H)
+$(TARGETPFX)mkmap.obj: mkmap.c $(HACK_H) $(INCL)sp_lev.h
+$(TARGETPFX)mkmaze.obj: mkmaze.c $(HACK_H) $(INCL)sp_lev.h
+$(TARGETPFX)mkobj.obj: mkobj.c $(HACK_H)
+$(TARGETPFX)mkroom.obj: mkroom.c $(HACK_H)
+$(TARGETPFX)mon.obj: mon.c $(HACK_H) $(INCL)mfndpos.h
+$(TARGETPFX)mondata.obj: mondata.c $(HACK_H)
+$(TARGETPFX)monmove.obj: monmove.c $(HACK_H) $(INCL)mfndpos.h \
+		$(INCL)artifact.h
+$(TARGETPFX)monst.obj: monst.c $(CONFIG_H) $(INCL)permonst.h \
+		$(INCL)align.h $(INCL)monattk.h $(INCL)monflag.h \
+		$(INCL)monsters.h $(INCL)wintype.h $(INCL)sym.h \
+		$(INCL)defsym.h $(INCL)color.h
+$(TARGETPFX)mplayer.obj: mplayer.c $(HACK_H)
+$(TARGETPFX)mthrowu.obj: mthrowu.c $(HACK_H)
+$(TARGETPFX)muse.obj: muse.c $(HACK_H)
+$(TARGETPFX)music.obj: music.c $(HACK_H)
+$(TARGETPFX)nhlua.obj: nhlua.c $(HACK_H) $(INCL)dlb.h
+$(TARGETPFX)nhlsel.obj: nhlsel.c $(HACK_H) $(INCL)sp_lev.h
+$(TARGETPFX)nhlobj.obj: nhlobj.c $(HACK_H) $(INCL)sp_lev.h
+$(TARGETPFX)o_init.obj: o_init.c $(HACK_H)
+$(TARGETPFX)objects.obj: objects.c $(CONFIG_H) $(INCL)obj.h \
+		$(INCL)prop.h $(INCL)skills.h $(INCL)color.h \
+		$(INCL)objclass.h $(INCL)defsym.h $(INCL)objects.h
+$(TARGETPFX)objnam.obj: objnam.c $(HACK_H)
+$(TARGETPFX)options.obj: options.c $(CONFIG_H) $(INCL)objclass.h \
+		$(INCL)defsym.h $(INCL)objects.h $(INCL)flag.h \
+		$(HACK_H) $(INCL)tcap.h $(INCL)optlist.h
+$(TARGETPFX)pager.obj: pager.c $(HACK_H) $(INCL)dlb.h
+$(TARGETPFX)pickup.obj: pickup.c $(HACK_H)
+$(TARGETPFX)pline.obj: pline.c $(HACK_H)
+$(TARGETPFX)polyself.obj: polyself.c $(HACK_H)
+$(TARGETPFX)potion.obj: potion.c $(HACK_H)
+$(TARGETPFX)pray.obj: pray.c $(HACK_H)
+$(TARGETPFX)priest.obj: priest.c $(HACK_H) $(INCL)mfndpos.h
+$(TARGETPFX)quest.obj: quest.c $(HACK_H)
+$(TARGETPFX)questpgr.obj: questpgr.c $(HACK_H) $(INCL)dlb.h \
+		$(INCL)wintty.h
+$(TARGETPFX)read.obj: read.c $(HACK_H)
+$(TARGETPFX)rect.obj: rect.c $(HACK_H)
+$(TARGETPFX)region.obj: region.c $(HACK_H)
+$(TARGETPFX)restore.obj: restore.c $(HACK_H) $(INCL)tcap.h
+$(TARGETPFX)rip.obj: rip.c $(HACK_H)
+$(TARGETPFX)rnd.obj: rnd.c $(HACK_H) $(INCL)isaac64.h
+$(TARGETPFX)role.obj: role.c $(HACK_H)
+$(TARGETPFX)rumors.obj: rumors.c $(HACK_H) $(INCL)dlb.h
+$(TARGETPFX)save.obj: save.c $(HACK_H)
+$(TARGETPFX)sfstruct.obj: sfstruct.c $(HACK_H)
+$(TARGETPFX)shk.obj: shk.c $(HACK_H)
+$(TARGETPFX)shknam.obj: shknam.c $(HACK_H)
+$(TARGETPFX)sit.obj: sit.c $(HACK_H) $(INCL)artifact.h
+$(TARGETPFX)sounds.obj: sounds.c $(HACK_H)
+$(TARGETPFX)sp_lev.obj: sp_lev.c $(HACK_H) $(INCL)sp_lev.h
+$(TARGETPFX)spell.obj: spell.c $(HACK_H)
+$(TARGETPFX)steal.obj: steal.c $(HACK_H)
+$(TARGETPFX)steed.obj: steed.c $(HACK_H)
+$(TARGETPFX)symbols.obj: symbols.c $(HACK_H) $(INCL)tcap.h
+$(TARGETPFX)sys.obj: sys.c $(HACK_H)
+$(TARGETPFX)teleport.obj: teleport.c $(HACK_H)
+$(TARGETPFX)timeout.obj: timeout.c $(HACK_H)
+$(TARGETPFX)topten.obj: topten.c $(HACK_H) $(INCL)dlb.h
+$(TARGETPFX)track.obj: track.c $(HACK_H)
+$(TARGETPFX)trap.obj: trap.c $(HACK_H)
+$(TARGETPFX)u_init.obj: u_init.c $(HACK_H)
+$(TARGETPFX)utf8map.obj: utf8map.c $(HACK_H)
+$(TARGETPFX)uhitm.obj: uhitm.c $(HACK_H)
+$(TARGETPFX)vault.obj: vault.c $(HACK_H)
+$(TARGETPFX)version.obj: version.c $(HACK_H) $(INCL)dlb.h
+$(TARGETPFX)vision.obj: vision.c $(HACK_H)
+$(TARGETPFX)weapon.obj: weapon.c $(HACK_H)
+$(TARGETPFX)were.obj: were.c $(HACK_H)
+$(TARGETPFX)wield.obj: wield.c $(HACK_H)
+$(TARGETPFX)windows.obj: windows.c $(HACK_H) $(INCL)dlb.h $(INCL)wintty.h
+$(TARGETPFX)wizard.obj: wizard.c $(HACK_H)
+$(TARGETPFX)worm.obj: worm.c $(HACK_H)
+$(TARGETPFX)worn.obj: worn.c $(HACK_H)
+$(TARGETPFX)write.obj: write.c $(HACK_H)
+$(TARGETPFX)zap.obj: zap.c $(HACK_H)
+# DEPENDENCIES MUST END AT END OF FILE
+# IF YOU PUT STUFF HERE IT WILL GO AWAY

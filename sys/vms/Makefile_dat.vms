@@ -1,0 +1,156 @@
+#      NetHack Datafiles Makefile.dat $NHDT-Date: 1596486993 2020/08/03 20:36:33 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $
+# Copyright (c) 2018 by Pasi Kallinen
+# NetHack may be freely redistributed.  See license for details.
+
+# Root of source tree:
+NHSROOT=..
+
+# relative directories to dat
+DOC=[-.doc]
+DAT=[-.dat]
+INCL=[-.include]
+SRC=[-.src]
+UTIL=[-.util]
+SYSVMS=[-.sys.vms]
+SYSSHR=[-.sys.share]
+SYSUNIX=[-.sys.unix]
+WINTTY=[-.win.tty]
+WINSHR=[-.win.share]
+WINTTY=[-.win.tty]
+WINCURS=[-.win.curses]
+WINX11=[-.win.X11]
+WINQT=[-.win.Qt]
+WINSHIM=[-.win.shim]
+WINCHAIN=[-.win.chain]
+
+# Lua location relative to src
+LUAVER=546
+LUADOTVER=5.4.6
+LUAUNDERVER=5_4_6
+LUAINC=[-.lib.lua.lua$(LUAVER).src]
+LUALIB=[-.lib.lua]lua$(LUAVER).olb
+LUASRCDIR =[-.lib.lua.lua$(LUAVER).src]
+LUASRCINCDIR=$(LUASRCDIR)
+#LUASRCINCDIR=SYS$COMMON:[LUA.INCLUDE]
+
+#
+# If your compiler needs an appropriate switch to accept C99 code.
+# VSI C defaults to /STANDARD=relaxed which allows several C
+# dialects including C99.
+#
+# CSTD=/STANDARD=C99
+#
+
+# Compiler flags
+CFLAGS :=/INCLUDE=($(INCL),$(LUAINC)) /NAMES=(AS_IS) $(CSTD)
+CXXFLAGS = /INCLUDE_DIR=($(INCL),$(LUAINC)) /NAMES=(AS_IS)
+
+# Link flags
+LFLAGS =
+
+# external programs
+# MAKE = make
+CC = CC
+#$(TOUCH) :=SET FILE/TRUNCATE
+TOUCH = append/New _NLA0:     # only one file per $($(TOUCH))
+LINK = link
+RM = delete
+#TRUE uses an actual helper true.exe
+TRUE = true
+#FALSE uses an actual helper false.exe
+FALSE = false
+#ECHO uses an actual helper echo.exe
+ECHO = echo
+CXX ?= CXX
+MOC ?= moc
+MOCPATH ?= $(QTDIR)/bin/$(MOC)
+# The default is for the TARGET_* variables to match the defaults.
+# If we're cross-compiling these will get overridden elsewhere, likely via
+
+VARDAT = bogusmon data engrave epitaph rumors oracles options
+
+all:	$(VARDAT) spec_levs quest_levs
+
+$(UTIL)makedefs.exe:
+	pipe set def [-.util] &&  $(MAKE) makedefs && set def [-.dat]
+
+$(UTIL)tile2x11.exe:
+	pipe set def [-.util] && $(MAKE) tile2x11 && set def [-.dat]
+
+$(UTIL)tile2bmp.exe:
+	pipe set def [-.util] &&  $(MAKE) tile2bmp) && set def [-.dat]
+
+$(UTIL)x11tiles.exe : $(UTIL)tile2x11.exe ../win/share/monsters.txt \
+			../win/share/objects.txt ../win/share/other.txt \
+			../win/share/monsters.txt
+	mcr $(UTIL)tile2x11.exe ../win/share/monsters.txt \
+			../win/share/objects.txt ../win/share/other.txt \
+			-grayscale ../win/share/monsters.txt
+
+nhtiles.bmp: $(UTIL)tile2bmp.exe ../win/share/monsters.txt \
+				../win/share/objects.txt \
+				../win/share/other.txt
+	mcr $(UTIL)tile2bmp.exe $@
+
+NetHack.ad: ../win/X11/NetHack.ad
+# handle "#define foo bar" -lines
+	grep ^#define ../win/X11/NetHack.ad | \
+		sed -e 's/^#define/s/g' -e 's/  */ /g' \
+		    -e 's/$$/ g/g' > NetHack.ad.tmp
+	grep -v ^#define ../win/X11/NetHack.ad | \
+		sed -f NetHack.ad.tmp > NetHack.ad
+	-rm -f NetHack.ad.tmp
+
+pet_mark.xbm: $(WINX11)pet_mark.xbm
+	copy $(WINX11)pet_mark.xbm pet_mark.xbm
+
+pilemark.xbm: $(WINX11)pilemark.xbm
+	copy $(WINX11)pilemark.xbm pilemark.xbm
+
+rip.xpm: $(WINX11)rip.xpm
+	copy $(WINX11)rip.xpm rip.xpm
+
+nhsplash.xpm: $(WINSHR)nhsplash.xpm
+	copy $(WINSHR)nhsplash.xpm nhsplash.xpm
+
+nethack.icns: $(WINSHR)nhicns.uu
+	mcr $(UUDECODE) $(WINSHR)nhicns.uu
+
+data:	data.base $(UTIL)makedefs.exe
+	mcr $(UTIL)makedefs.exe -d
+
+rumors:	rumors.tru rumors.fal $(UTIL)makedefs.exe
+	mcr $(UTIL)makedefs.exe -r
+
+oracles:	oracles.txt $(UTIL)makedefs.exe
+	mcr $(UTIL)makedefs.exe -h
+
+engrave:	engrave.txt $(UTIL)makedefs.exe
+	mcr $(UTIL)makedefs.exe -s
+
+epitaph:	epitaph.txt $(UTIL)makedefs.exe
+	mcr $(UTIL)makedefs.exe -s
+
+bogusmon:	bogusmon.txt $(UTIL)makedefs.exe
+	mcr $(UTIL)makedefs.exe -s
+
+# note: 'options' should have already been made when include/date.h was created
+options:	$(UTIL)makedefs.exe
+	mcr $(UTIL)makedefs.exe -v
+
+# these don't actually do anything useful now that levcomp and dngcomp are gone
+spec_levs:
+	$(TOUCH) spec_levs
+quest_levs:
+	$(TOUCH) quest_levs
+
+clean:
+	-delete/log spec_levs.;*,quest_levs.;*,gitinfo.txt;*
+
+spotless: clean
+	-delete/log nhdat,$(addsuffix ;*$(comma),$(VARDAT) \
+		x11tiles, pet_mark.xbm, pilemark.xbm, rip.xpm, mapbg.xpm, \
+		rip.img, GEM_RSC.RSC, title.img, nh16.img, NetHack.ad, \
+		nhsplash.xpm, nhtiles.bmp)
+
+#eof#

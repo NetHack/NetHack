@@ -1,0 +1,325 @@
+#	Makefile for NetHack's utility programs.
+# NetHack 3.7  util Makefile.vms    $NHDT-Date: 1602258295 2020/10/09 15:44:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.53 $
+# Copyright (c) 2018 by Robert Patrick Rankin
+# NetHack may be freely redistributed.  See license for details.
+
+# Root of source tree relative to here:
+NHSROOT=[-]
+
+# NetHack 3.7 began introducing C99 code.
+#
+# If your compiler needs an appropriate switch to accept C99 code.
+# CSTD = -std=c99
+
+# directories relative to here (util)
+DOC=[-.doc]
+DAT=[-.dat]
+INCL=[-.include]
+SRC=[-.src]
+UTIL=[-.util]
+SYSVMS=[-.sys.vms]
+SYSSHR=[-.sys.share]
+SYSUNIX=[-.sys.unix]
+WINTTY=[-.win.tty]
+WINSHR=[-.win.share]
+WINTTY=[-.win.tty]
+WINCURS=[-.win.curses]
+WINX11=[-.win.X11]
+WINQT=[-.win.Qt]
+WINSHIM=[-.win.shim]
+WINCHAIN=[-.win.chain]
+
+# Lua location relative to here
+LUAVER=546
+LUADOTVER=5.4.6
+LUAUNDERVER=5_4_6
+LUAINC=[-.lib.lua.lua$(LUAVER).src]
+LUALIB=[-.lib.lua]lua$(LUAVER).olb
+LUASRCDIR =[-.lib.lua.lua$(LUAVER).src]
+LUASRCINCDIR=$(LUASRCDIR)
+#LUASRCINCDIR=SYS$COMMON:[LUA.INCLUDE]
+
+# hacklib
+HACKLIB=hacklib.olb
+HACKLIBOBJS=[-.src]hacklib.obj,[-.util]panic.obj
+
+comma:=,
+LIBS =
+OBJDIR = [-.src]
+
+# Compiler flags
+CFLAGS :=/INCLUDE=($(INCL),$(LUAINC)) /NAMES=(AS_IS) $(CSTD)
+CXXFLAGS = /INCLUDE_DIR=($(INCL),$(LUAINC)) /NAMES=(AS_IS)
+
+# Link flags
+LFLAGS =
+
+# external programs
+# MAKE = make
+CC = CC
+#touch :=SET FILE/TRUNCATE
+touch = append/New _NLA0:
+LINK = link
+RM = delete
+#TRUE uses an actual helper true.exe
+TRUE = true
+#FALSE uses an actual helper false.exe
+FALSE = false
+#ECHO uses an actual helper echo.exe
+ECHO = echo
+CXX ?= CXX
+MOC ?= moc
+MOCPATH ?= $(QTDIR)/bin/$(MOC)
+# The default is for the TARGET_* variables to match the defaults.
+# If we're cross-compiling these will get overridden elsewhere, likely via
+# a hints file. TARGETPFX was set above earlier.
+TARGET_CC = $(CC)
+TARGET_CFLAGS = $(CFLAGS) $(CSTD)
+TARGET_LINK = $(LINK)
+TARGET_LFLAGS = $(LFLAGS)
+TARGET_CXX = $(CXX)
+TARGET_CXXFLAGS = $(CXXFLAGS)
+TARGET_LIBS = $(LIBS)
+# [LINK might be defined to use $(CXX); we don't want that here.]
+CLINK=$(TARGET_LINK)
+CXXLINK=$(TARGET_LINK)
+
+# timestamps for primary header files, matching src/Makefile
+#CONFIG_H = $(SRC)config.h-t
+#HACK_H	 = $(SRC)hack.h-t
+
+# utility .c files
+MAKESRC = makedefs.c $(SRC)mdlib.c
+RECOVSRC = recover.c
+DLBSRC = dlb_main.c
+UTILSRCS = $(MAKESRC) panic.c $(RECOVSRC) $(DLBSRC)
+
+# files that define all monsters and objects
+CMONOBJ = $(SRC)monst.c $(SRC)objects.c
+OMONOBJ = $(OBJDIR)monst.obj $(OBJDIR)objects.obj
+# files that provide access to NetHack's names
+CNAMING = $(SRC)drawing.c $(CMONOBJ)
+ONAMING = $(OBJDIR)drawing.obj $(OMONOBJ)
+# dynamic memory allocation
+CALLOC = $(SRC)alloc.c
+OALLOC = $(OBJDIR)alloc.obj
+CPANIC = panic.c
+OPANIC = []panic.obj
+# build time info
+CDATE = $(SRC)date.c
+ODATE = $(OBJDIR)date.obj
+
+# object files for makedefs
+MAKEOBJS = []makedefs.obj $(OMONOBJ) $(ODATE) $(OALLOC) $(OPANIC)
+
+# object files for recovery utility
+RECOVOBJS = $(TARGETPFX)recover.obj
+
+# object files for the data librarian
+DLBOBJS = dlb_main.obj $(OBJDIR)dlb.obj $(OALLOC) $(OPANIC)
+
+# Distinguish between the build tools for the native host
+# and the build tools for the target environment in commands.
+# This allows the same set of Makefiles to be used for native
+# builds and for cross-compiles by overriding these in hints
+# files or on the command line.
+
+TARGETPFX=
+TARGET_CC = $(CC)
+TARGET_CFLAGS = $(CFLAGS) $(CSTD)
+TARGET_CLINK = $(CLINK)
+TARGET_LFLAGS = $(LFLAGS)
+TARGET_CXX = $(CXX)
+TARGET_CXXFLAGS = $(CXXFLAGS)
+
+#	hacklib
+#
+$(HACKLIB): $(HACKLIBOBJS) [-.util]panic.obj
+	LIBRARY/CREATE $(HACKLIB)/object
+	LIBRARY/INSERT $(HACKLIB) $(HACKLIBOBJS)
+#	dependencies for makedefs
+#
+
+makedefs.exe:	$(HACKLIB) $(MAKEOBJS) placeholder.obj mdgrep.h
+	$(CLINK) $(LFLAGS) /EXE=$@ \
+		$(addsuffix $(comma),$(MAKEOBJS)) placeholder.obj, \
+		$(HACKLIB)/lib
+
+# note: the headers listed here are maintained manually rather than via
+#	'make depend'; only the ones which are directly included by
+#	makedefs.c are listed, without various nested ones that they include;
+#	for makedefs (but not for nethack's core), mdlib.c gets included
+#	rather than be compiled separately
+makedefs.obj: makedefs.c $(SRC)mdlib.c $(CONFIG_H) \
+		$(INCL)permonst.h $(INCL)objclass.h \
+		$(INCL)artilist.h $(INCL)dungeon.h $(INCL)obj.h \
+		$(INCL)monst.h $(INCL)monsters.h $(INCL)objects.h \
+		$(INCL)you.h $(INCL)context.h $(INCL)flag.h \
+		$(INCL)dlb.h $(INCL)patchlevel.h mdgrep.h
+	$(CC) $(CFLAGS) $(CSTD) makedefs.c /OBJ=$@
+
+placeholder.c:
+	echo int makedefs_placeholder = 1; >$@
+
+placeholder.obj: placeholder.c
+
+
+# Don't require perl to build; that is why mdgrep.h is spelled wrong below.
+mdgreph: mdgrep.pl
+	perl mdgrep.pl
+
+# These are for reference purposes only. They aren't required in the build.
+$(INCL)onames.h: makedefs $(INCL)objects.h
+	mcr []makedefs -o
+$(INCL)pm.h: makedefs $(INCL)monsters.h
+	mcr []makedefs -p
+
+# we defer this makedefs call to the src Makefile, since it knows all about
+# the main src and include files date.h is a timestamp for
+$(INCL)date.h::
+	@pipe set def $(SRC) && $(MAKE) $(INCL)date.h && set def [-]
+
+# support code used by several of the utility programs (but not makedefs)
+panic.obj:     panic.c $(CONFIG_H)
+	$(CC) $(CFLAGS) $(CSTD) panic.c /OBJ=$@
+
+
+# with all of extern.h's functions to complain about, we drown in
+# 'defined but not used' without -u
+#lintdgn:
+#	@lint -axhu -I.include -DLINT $(UTILSRCS) $(CALLOC) \
+#		| sed '/_flsbuf/d'
+#
+#
+#	dependencies for recover
+#
+$(TARGETPFX)recover.exe: $(RECOVOBJS)
+	$(TARGET_CLINK) $(TARGET_LFLAGS) /EXE=$@ $(RECOVOBJS) $(LIBS)
+
+$(TARGETPFX)recover.obj: recover.c $(CONFIG_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) $(CSTD) recover.c /OBJ=$@
+
+
+#	dependencies for dlb
+#
+dlb:	$(DLBOBJS)
+	$(CLINK) $(LFLAGS) /EXE=dlb $(DLBOBJS) $(LIBS)
+
+dlb_main.obj: dlb_main.c $(CONFIG_H) $(INCL)dlb.h
+	$(CC) $(CFLAGS) $(CSTD) dlb_main.c /OBJ=$@
+
+
+#	dependencies for tile utilities
+#
+TEXT_IO = tiletext.obj tiletxt.obj $(OALLOC) $(ONAMING)
+GIFREADERS = gifread.obj
+PPMWRITERS = ppmwrite.obj
+
+tileutils: tilemap gif2txt txt2ppm tile2x11
+
+gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
+	$(CLINK) $(LFLAGS) /EXE=$@ $(GIFREADERS) $(TEXT_IO) $(LIBS)
+txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
+	$(CLINK) $(LFLAGS) /EXE=$@ $(PPMWRITERS) $(TEXT_IO) $(LIBS)
+
+tile2x11.exe: tile2x11.obj $(TEXT_IO)
+	$(CLINK) $(LFLAGS) /EXE=$@ tile2x11.obj $(TEXT_IO) $(LIBS)
+
+tile2bmp.exe: tile2bmp.obj $(TEXT_IO)
+	$(CLINK) $(LFLAGS) /EXE=$@ tile2bmp.obj $(TEXT_IO)
+
+tile2beos.exe: tile2beos.obj $(TEXT_IO)
+	$(CXXLINK) $(LFLAGS) /EXE=$@ tile2beos.obj $(TEXT_IO)
+
+#--compiling and linking in one step leaves extra debugging files (in their
+#  own subdirectories!) on OSX; compile and link separately to suppress
+#  that without mucking about with extra OS-specific CFLAGS and/or LFLAGS
+#tilemap: .win/share/tilemap.c $(HACK_H)
+#	$(CC) $(CFLAGS) $(LFLAGS) -o tilemap .win/share/tilemap.c $(LIBS)
+tilemap.exe: tilemap.obj $(OBJDIR)objects.obj $(OBJDIR)monst.obj \
+		 $(OBJDIR)drawing.obj
+	$(CLINK) $(LFLAGS) /EXE=$@ tilemap.obj $(OBJDIR)objects.obj  \
+		$(OBJDIR)monst.obj  $(OBJDIR)drawing.obj $(LIBS)
+$(SRC)tile.c: tilemap
+	mcr []tilemap
+
+tiletext.obj: $(WINSHR)tiletext.c $(CONFIG_H) $(WINSHR)tile.h
+	$(CC) $(CFLAGS) $(CSTD) /INCLUDE=$(WINSHR) $(WINSHR)tiletext.c /OBJ=$@
+tiletxt.obj: $(WINSHR)tiletxt.c $(WINSHR)tilemap.c $(HACK_H)
+	$(CC) $(CFLAGS) $(CSTD) /INCLUDE=$(WINSHR) $(WINSHR)tiletxt.c /OBJ=$@
+tilemap.obj: $(WINSHR)tilemap.c $(HACK_H)
+	$(CC) $(CFLAGS) $(CSTD) $(WINSHR)tilemap.c /OBJ=$@
+
+gifread.obj: $(WINSHR)gifread.c $(CONFIG_H) $(WINSHR)tile.h
+	$(CC) $(CFLAGS) $(CSTD) /INCLUDE=$(WINSHR) $(WINSHR)gifread.c /OBJ=$@
+ppmwrite.obj: $(WINSHR)ppmwrite.c $(CONFIG_H) $(WINSHR)tile.h
+	$(CC) $(CFLAGS) $(CSTD) /INCLUDE=$(WINSHR) $(WINSHR)ppmwrite.c /OBJ=$@
+
+tile2bmp.obj: $(WINSHR)tile2bmp.c $(HACK_H) $(WINSHR)tile.h
+	$(CC) $(CFLAGS) $(CSTD) /INCLUDE=$(WINSHR) $(WINSHR)tile2bmp.c /OBJ=$@
+
+tile2x11.obj: .win/X11/tile2x11.c $(HACK_H) .win/share/tile.h \
+						$(INCL)tile2x11.h
+	$(CC) $(CFLAGS) $(CSTD) /INCLUDE=$(WINSHR) $(WINSHR)tile2x11.c /OBJ=$@
+
+tile2img.obj: [-.win.gem]tile2img.c $(HACK_H) $(WINSHR)tile.h \
+						$(INCL)bitmfile.h
+	$(CC) $(CFLAGS) $(CSTD) /INCLUDE=$(WINSHR) [-.win.gem]tile2img.c /OBJ=$@
+xpm2img.obj: [-.win.gem]xpm2img.c $(HACK_H) $(INCL)bitmfile.h
+	$(CC) $(CFLAGS) $(CSTD) -c .win/gem/xpm2img.c /obj=$@
+bitmfile.obj: [-.win.gem]bitmfile.c $(INCL)bitmfile.h
+	$(CC) $(CFLAGS) $(CSTD) [-.win.gem]bitmfile.c /obj=$@
+
+uudecode.exe: uudecode.obj
+	$(CLINK) $(LFLAGS) /EXE=$@ uudecode.obj $(LIBS)
+uudecode.obj: $(SYSSHR)uudecode.c
+	$(CC) $(CFLAGS) $(CSTD) /obj=$@ $(SYSSHR)uudecode.c
+
+# make sure host object files from src are available when needed
+# (note: these dependencies have been copied from Makefile.src so only come
+# indirectly from 'make depend', hence are subject to bit rot as src changes)
+$(OBJDIR)alloc.obj: $(SRC)alloc.c $(CONFIG_H)
+	$(CC) $(CFLAGS) $(CSTD) $(SRC)alloc.c /obj=$@
+$(OBJDIR)drawing.obj: $(SRC)drawing.c $(CONFIG_H) $(INCL)color.h \
+		$(INCL)rm.h $(INCL)objclass.h $(INCL)defsym.h \
+		$(INCL)objects.h $(INCL)sym.h
+	$(CC) $(CFLAGS) $(CSTD) $(SRC)drawing.c /obj=$@
+$(OBJDIR)decl.obj: $(SRC)decl.c $(HACK_H)
+	$(CC) $(CFLAGS) $(CSTD) $(SRC)decl.c /obj=$@
+$(OBJDIR)monst.obj: $(SRC)monst.c $(CONFIG_H) $(INCL)permonst.h \
+		$(INCL)align.h $(INCL)monattk.h $(INCL)monflag.h \
+		$(INCL)monsters.h $(INCL)sym.h $(INCL)defsym.h \
+		$(INCL)color.h
+	$(CC) $(CFLAGS) $(CSTD) $(SRC)monst.c /obj=$@
+$(OBJDIR)objects.obj: $(SRC)objects.c $(CONFIG_H) $(INCL)obj.h \
+		$(INCL)prop.h $(INCL)skills.h $(INCL)color.h \
+		$(INCL)objclass.h $(INCL)defsym.h $(INCL)objects.h
+	$(CC) $(CFLAGS) $(CSTD) $(SRC)objects.c /obj=$@
+$(OBJDIR)dlb.obj: $(SRC)dlb.c $(CONFIG_H) $(INCL)dlb.h
+	$(CC) $(CFLAGS) $(CSTD) $(SRC)dlb.c /obj=$@
+# this differs substantially from what Makefile.src specifies
+$(OBJDIR)date.obj: $(SRC)date.c $(CONFIG_H)
+	$(CC) $(CFLAGS) $(CSTD) $(SRC)date.c /obj=$@
+
+# make sure hack.h dependencies get transitive information
+$(HACK_H): $(CONFIG_H)
+	@pipe set def $(SRC) && $(MAKE) $(HACK_H) && set def $(UTIL)
+$(CONFIG_H): $(INCL)config.h
+	@pipe set def $(SRC) && $(MAKE) $(CONFIG_H) && set def $(UTIL)
+
+clean-fixup:
+	-delete/log $(INCL)tile.h;*
+
+clean: clean-fixup
+	-delete/log *.obj;*
+
+spotless: clean
+	-delete/log makedefs.exe;*,recover.exe;*,dlb.exe;*
+	-delete/log gif2txt.exe;*,txt2ppm.exe;*,tile2x11.exe;* \
+		,tile2img.ttp;*,xpm2img.ttp;*, \
+		tilemap.exe;*,tileedit.exe;*,tile2bmp.exe;*,uudecode.exe;
+.PHONY: recover makedefs
+
+recover: recover.exe
+makedefs: makedefs.exe
+
