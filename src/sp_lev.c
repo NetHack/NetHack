@@ -1,4 +1,4 @@
-/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1704787190 2024/01/09 07:59:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.349 $ */
+/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1709921020 2024/03/08 18:03:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.359 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -118,7 +118,7 @@ static int get_table_buc(lua_State *);
 static int get_table_objclass(lua_State *);
 static int find_objtype(lua_State *, const char *);
 static int get_table_objtype(lua_State *);
-static const char *get_mkroom_name(int);
+static const char *get_mkroom_name(int) NONNULL;
 static int get_table_roomtype_opt(lua_State *, const char *, int);
 static int get_table_traptype_opt(lua_State *, const char *, int);
 static int get_traptype_byname(const char *);
@@ -3912,7 +3912,9 @@ get_mkroom_name(int rtype)
     for (i = 0; room_types[i].name; i++)
         if (room_types[i].type == rtype)
             return room_types[i].name;
-    return NULL;
+
+    impossible("get_mkroom_name unknown rtype %d", rtype);
+    return "unknown"; /* not NULL */
 }
 
 static int
