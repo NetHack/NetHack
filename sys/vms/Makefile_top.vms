@@ -331,7 +331,7 @@ $(INCL)nhlua.h:
 
 fetch-lua: []lib.dir [.lib]lua.dir
 	if f$$search("[.lib.lua]lua$(LUAVER).tgz").eqs."" then \
-	curl http://www.lua.org/ftp/lua-$(LUADOTVER).tar.gz \
+	curl --insecure https://www.lua.org/ftp/lua-$(LUADOTVER).tar.gz \
 		--output [.lib.lua]lua$(LUAVER).tgz
 	if f$$search("[.lib.lua]lua$(LUAVER).tgz").nes."" then \
 		gzip --force -d [.lib.lua]lua$(LUAVER).tgz
