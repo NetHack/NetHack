@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1709675219 2024/03/05 21:46:59 $  $NHDT-Branch: keni-mdlib-followup $:$NHDT-Revision: 1.1400 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1710008870 2024/03/09 18:27:50 $  $NHDT-Branch: keni-regex $:$NHDT-Revision: 1.1397 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1999,7 +1999,7 @@ extern void tutorial(boolean);
 #endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
 #endif /* MAKEDEFS_C MDLIB_C CPPREGEX_C */
 
-/* ### nhregex.c ### */
+/* ### {cpp,pmatch,posix}regex.c ### */
 
 extern struct nhregex *regex_init(void);
 extern boolean regex_compile(const char *, struct nhregex *) NONNULLARG1;
