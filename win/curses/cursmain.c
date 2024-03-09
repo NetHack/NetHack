@@ -462,6 +462,7 @@ void
 curses_display_nhwindow(winid wid, boolean block)
 {
     menu_item *selected = NULL;
+    int border = curses_window_has_border(wid) ? 1 : 0;
 
     if (wid == WIN_ERR)
         return;
@@ -475,8 +476,12 @@ curses_display_nhwindow(winid wid, boolean block)
     if (!iflags.window_inited && wid == MAP_WIN) {
         iflags.window_inited = TRUE;
     } else {
+        WINDOW *win = curses_get_nhwin(wid);
+
         /* actually display the window */
-        wnoutrefresh(curses_get_nhwin(wid));
+        wnoutrefresh(win);
+        if (border)
+            box(win, 0, 0);
         /* flush pending writes from other windows too */
         doupdate();
     }
