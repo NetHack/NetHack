@@ -1,4 +1,4 @@
-/* NetHack 3.7	dothrow.c	$NHDT-Date: 1695159620 2023/09/19 21:40:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.269 $ */
+/* NetHack 3.7	dothrow.c	$NHDT-Date: 1709969638 2024/03/09 07:33:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.285 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1075,7 +1075,7 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
  * throwing or kicking something.
  *
  * dx and dy should be the direction of the hurtle, not of the original
- * kick or throw and be only.
+ * kick or throw.
  */
 void
 hurtle(int dx, int dy, int range, boolean verbose)
@@ -1096,14 +1096,11 @@ hurtle(int dx, int dy, int range, boolean verbose)
         return;
     } else if (u.utrap) {
         You("are anchored by the %s.",
-            u.utraptype == TT_WEB
-                ? "web"
-                : u.utraptype == TT_LAVA
-                      ? hliquid("lava")
-                      : u.utraptype == TT_INFLOOR
-                            ? surface(u.ux, u.uy)
-                            : u.utraptype == TT_BURIEDBALL ? "buried ball"
-                                                           : "trap");
+            (u.utraptype == TT_WEB) ? "web"
+            : (u.utraptype == TT_LAVA) ? hliquid("lava")
+              : (u.utraptype == TT_INFLOOR) ? surface(u.ux, u.uy)
+                : (u.utraptype == TT_BURIEDBALL) ? "buried ball"
+                  : "trap");
         nomul(0);
         return;
     }
@@ -1119,7 +1116,8 @@ hurtle(int dx, int dy, int range, boolean verbose)
     gm.multi_reason = "moving through the air";
     gn.nomovemsg = ""; /* it just happens */
     if (verbose)
-        You("%s in the opposite direction.", range > 1 ? "hurtle" : "float");
+        You("%s in the opposite direction.",
+            (range > 1) ? "hurtle" : "float");
     /* if we're in the midst of shooting multiple projectiles, stop */
     endmultishot(TRUE);
     uc.x = u.ux;
