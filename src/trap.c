@@ -4450,7 +4450,7 @@ acid_damage(struct obj *obj)
 
 static void
 pot_acid_damage(
-    struct obj *obj,    
+    struct obj *obj,
     boolean in_invent,
     boolean described)
 {
@@ -4777,7 +4777,7 @@ rnd_nextto_goodpos(coordxy *x, coordxy *y, struct monst *mtmp)
 void
 back_on_ground(boolean rescued)
 {
-    const char *preposit = (Levitation || Flying) ? "over" : "on", 
+    const char *preposit = (Levitation || Flying) ? "over" : "on",
                *surf = surface(u.ux, u.uy), *you_are_back;
     char icebuf[QBUFSZ];
 

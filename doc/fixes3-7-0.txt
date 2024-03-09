@@ -2707,6 +2707,7 @@ remove a null sobj check from gold_detect that was situated after
 	adjust prototype in extern.h
 check for valid indexes of def_monsyms[] and def_oc_syms[] in
 	choose_classes_menu() (pr #1179 by argrath)
+split damage from acid potion into separate function (pr #1195 by argrath)
 
 
 Code Cleanup and Reorganization
