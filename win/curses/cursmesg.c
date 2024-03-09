@@ -374,7 +374,7 @@ curses_more(void)
 void
 curses_clear_unhighlight_message_window(void)
 {
-    int mh, mw, count,
+    int mh, mw, rx, ry,
         brdroffset = curses_window_has_border(MESSAGE_WIN) ? 1 : 0;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
 
@@ -387,9 +387,15 @@ curses_clear_unhighlight_message_window(void)
     } else {
         mx = mw + brdroffset; /* Force new line on new turn */
 
-        for (count = 0; count < mh; count++)
-            mvwchgat(win, count + brdroffset, brdroffset,
-                     mw, COLOR_PAIR(8), A_NORMAL, NULL);
+        for (ry = brdroffset; ry < mh; ry++) {
+            for (rx = brdroffset; rx < mw; rx++) {
+                chtype cht = mvwinch(win, ry, rx);
+                short clr = cht & A_COLOR;
+
+                mvwchgat(win, ry, rx, 1, A_NORMAL, PAIR_NUMBER(clr), NULL);
+            }
+        }
+
         wnoutrefresh(win);
     }
     wmove(win, my, mx);
