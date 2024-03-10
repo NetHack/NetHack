@@ -892,11 +892,12 @@ $(HACK_H): $(CONFIG_H) ../include/align.h ../include/artilist.h \
 		../include/nhlua.h ../include/obj.h ../include/objclass.h \
 		../include/objects.h ../include/permonst.h ../include/prop.h \
 		../include/quest.h ../include/rect.h ../include/region.h \
-		../include/rm.h ../include/seffects.h ../include/skills.h \
-		../include/sndprocs.h ../include/spell.h ../include/sym.h \
-		../include/sys.h ../include/timeout.h ../include/trap.h \
-		../include/vision.h ../include/winprocs.h \
-		../include/wintype.h ../include/you.h ../include/youprop.h
+		../include/rm.h ../include/seffects.h ../include/selvar.h \
+		../include/skills.h ../include/sndprocs.h ../include/spell.h \
+		../include/stairs.h ../include/sym.h ../include/sys.h \
+		../include/timeout.h ../include/trap.h ../include/vision.h \
+		../include/winprocs.h ../include/wintype.h ../include/you.h \
+		../include/youprop.h
 	touch $(HACK_H)
 #
 $(TARGETPFX)cppregex.o: ../sys/share/cppregex.cpp $(CONFIG_H)
@@ -1131,6 +1132,7 @@ $(TARGETPFX)attrib.o: attrib.c $(HACK_H)
 $(TARGETPFX)ball.o: ball.c $(HACK_H)
 $(TARGETPFX)bones.o: bones.c $(HACK_H)
 $(TARGETPFX)botl.o: botl.c $(HACK_H)
+$(TARGETPFX)calendar.o: calendar.c $(HACK_H)
 $(TARGETPFX)cmd.o: cmd.c $(HACK_H) ../include/func_tab.h
 $(TARGETPFX)coloratt.o: coloratt.c $(HACK_H)
 $(TARGETPFX)dbridge.o: dbridge.c $(HACK_H)
@@ -1152,7 +1154,7 @@ $(TARGETPFX)drawing.o: drawing.c $(CONFIG_H) ../include/defsym.h \
 $(TARGETPFX)dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h \
 		../include/dlb.h
 $(TARGETPFX)eat.o: eat.c $(HACK_H)
-$(TARGETPFX)end.o: end.c $(HACK_H) ../include/dlb.h ../include/nhmd4.h
+$(TARGETPFX)end.o: end.c $(HACK_H) ../include/dlb.h
 $(TARGETPFX)engrave.o: engrave.c $(HACK_H)
 $(TARGETPFX)exper.o: exper.c $(HACK_H)
 $(TARGETPFX)explode.o: explode.c $(HACK_H)
@@ -1160,6 +1162,7 @@ $(TARGETPFX)extralev.o: extralev.c $(HACK_H)
 $(TARGETPFX)files.o: files.c #zlib.h $(HACK_H) ../include/dlb.h \
 		../include/wintty.h
 $(TARGETPFX)fountain.o: fountain.c $(HACK_H)
+$(TARGETPFX)getpos.o: getpos.c $(HACK_H)
 $(TARGETPFX)hack.o: hack.c $(HACK_H)
 $(TARGETPFX)hacklib.o: hacklib.c $(HACK_H)
 $(TARGETPFX)insight.o: insight.c $(HACK_H)
@@ -1173,13 +1176,13 @@ $(TARGETPFX)mcastu.o: mcastu.c $(HACK_H)
 $(TARGETPFX)mdlib.o: mdlib.c $(CONFIG_H) ../include/align.h \
 		../include/artilist.h ../include/attrib.h \
 		../include/context.h ../include/defsym.h ../include/dlb.h \
-		../include/dungeon.h ../include/flag.h ../include/mextra.h \
-		../include/monattk.h ../include/monflag.h ../include/monst.h \
-		../include/monsters.h ../include/obj.h ../include/objclass.h \
-		../include/objects.h ../include/permonst.h ../include/prop.h \
-		../include/seffects.h ../include/skills.h \
-		../include/sndprocs.h ../include/sym.h ../include/wintype.h \
-		../include/you.h
+		../include/dungeon.h ../include/flag.h ../include/hacklib.h \
+		../include/mextra.h ../include/monattk.h ../include/monflag.h \
+		../include/monst.h ../include/monsters.h ../include/obj.h \
+		../include/objclass.h ../include/objects.h \
+		../include/permonst.h ../include/prop.h ../include/seffects.h \
+		../include/skills.h ../include/sndprocs.h ../include/sym.h \
+		../include/wintype.h ../include/you.h
 $(TARGETPFX)mhitm.o: mhitm.c $(HACK_H) ../include/artifact.h
 $(TARGETPFX)mhitu.o: mhitu.c $(HACK_H) ../include/artifact.h
 $(TARGETPFX)minion.o: minion.c $(HACK_H)
@@ -1225,12 +1228,14 @@ $(TARGETPFX)questpgr.o: questpgr.c $(HACK_H) ../include/dlb.h \
 $(TARGETPFX)read.o: read.c $(HACK_H)
 $(TARGETPFX)rect.o: rect.c $(HACK_H)
 $(TARGETPFX)region.o: region.c $(HACK_H)
+$(TARGETPFX)report.o: report.c $(HACK_H) ../include/dlb.h ../include/nhmd4.h
 $(TARGETPFX)restore.o: restore.c $(HACK_H) ../include/tcap.h
 $(TARGETPFX)rip.o: rip.c $(HACK_H)
 $(TARGETPFX)rnd.o: rnd.c $(HACK_H) ../include/isaac64.h
 $(TARGETPFX)role.o: role.c $(HACK_H)
 $(TARGETPFX)rumors.o: rumors.c $(HACK_H) ../include/dlb.h
 $(TARGETPFX)save.o: save.c $(HACK_H)
+$(TARGETPFX)selvar.o: selvar.c $(HACK_H) ../include/sp_lev.h
 $(TARGETPFX)sfstruct.o: sfstruct.c $(HACK_H)
 $(TARGETPFX)shk.o: shk.c $(HACK_H)
 $(TARGETPFX)shknam.o: shknam.c $(HACK_H)
@@ -1238,8 +1243,10 @@ $(TARGETPFX)sit.o: sit.c $(HACK_H) ../include/artifact.h
 $(TARGETPFX)sounds.o: sounds.c $(HACK_H)
 $(TARGETPFX)sp_lev.o: sp_lev.c $(HACK_H) ../include/sp_lev.h
 $(TARGETPFX)spell.o: spell.c $(HACK_H)
+$(TARGETPFX)stairs.o: stairs.c $(HACK_H)
 $(TARGETPFX)steal.o: steal.c $(HACK_H)
 $(TARGETPFX)steed.o: steed.c $(HACK_H)
+$(TARGETPFX)strutil.o: strutil.c $(HACK_H)
 $(TARGETPFX)symbols.o: symbols.c $(HACK_H) ../include/tcap.h
 $(TARGETPFX)sys.o: sys.c $(HACK_H)
 $(TARGETPFX)teleport.o: teleport.c $(HACK_H)
@@ -1259,6 +1266,7 @@ $(TARGETPFX)were.o: were.c $(HACK_H)
 $(TARGETPFX)wield.o: wield.c $(HACK_H)
 $(TARGETPFX)windows.o: windows.c $(HACK_H) ../include/dlb.h ../include/wintty.h
 $(TARGETPFX)wizard.o: wizard.c $(HACK_H)
+$(TARGETPFX)wizcmds.o: wizcmds.c $(HACK_H) ../include/func_tab.h
 $(TARGETPFX)worm.o: worm.c $(HACK_H)
 $(TARGETPFX)worn.o: worn.c $(HACK_H)
 $(TARGETPFX)write.o: write.c $(HACK_H)
