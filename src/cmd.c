@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1709675219 2024/03/05 21:46:59 $  $NHDT-Branch: keni-mdlib-followup $:$NHDT-Revision: 1.711 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1710029089 2024/03/10 00:04:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.712 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3882,11 +3882,13 @@ void
 confdir(boolean force_impairment)
 {
     if (force_impairment || u_maybe_impaired()) {
-        int x = NODIAG(u.umonnum) ? (int) dirs_ord[rn2(4)] : rn2(N_DIRS);
+        int kmax = NODIAG(u.umonnum) ? (N_DIRS / 2) : N_DIRS,
+            k = (int) dirs_ord[rn2(kmax)];
 
-        u.dx = xdir[x];
-        u.dy = ydir[x];
+        u.dx = xdir[k];
+        u.dy = ydir[k];
     }
+    return;
 }
 
 const char *

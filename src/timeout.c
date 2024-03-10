@@ -1,4 +1,4 @@
-/* NetHack 3.7	timeout.c	$NHDT-Date: 1703294874 2023/12/23 01:27:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.7	timeout.c	$NHDT-Date: 1710029105 2024/03/10 00:05:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.182 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1236,9 +1236,17 @@ slip_or_trip(void)
             You("lose your balance.");
             dismount_steed(DISMOUNT_FELL);
         } else if (!rn2(10 + ACURR(A_DEX))) {
-            int dir = rn2(N_DIRS);
-
-            hurtle(xdir[dir], ydir[dir], 1, FALSE);
+            /* Maybe slip in a random direction.  This takes place after
+               the hero has already changed location.  If the hero is
+               in grid bug form, only allow forward hurtle, otherwise a
+               90 degree orthogonal one after the step would make the
+               combined move appear to be a single diagonal step. */
+            if (!NODIAG(u.umonnum))
+                confdir(TRUE); /* sets u.dx and u.dy */
+            /* Only hurtle if the random directon won't move hero back
+               to same spot where this move started. */
+            if (u.ux + u.dx != u.ux0 || u.uy + u.dy != u.uy0)
+                hurtle(u.dx, u.dy, 1, FALSE);
         }
     } else {
         if (on_foot) {
