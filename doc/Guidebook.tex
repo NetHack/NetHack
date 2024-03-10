@@ -1,5 +1,5 @@
 \documentstyle[titlepage,longtable]{article}
-% NetHack 3.7  Guidebook.tex $NHDT-Date: 1699260377 2023/11/06 08:46:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.531 $ */
+% NetHack 3.7  Guidebook.tex $NHDT-Date: 1710008891 2024/03/09 18:28:11 $  $NHDT-Branch: keni-regex $:$NHDT-Revision: 1.559 $ */
 %+% we're still limping along in LaTeX 2.09 compatibility mode
 %-%\documentclass{article}
 %-%\usepackage{hyperref} % before longtable
@@ -5665,7 +5665,8 @@ possible to compile {\it NetHack\/} without regular expression support on
 a platform where
 there is no regular expression library. While this is not true of any modern
 platform, if your {\it NetHack\/} was built this way, patterns are instead glob
-patterns. This applies to Autopickup exceptions, Message types, Menu colors,
+patterns; regardless, this document refers to both as ``regular expressions.''
+This applies to Autopickup exceptions, Message types, Menu colors,
 and User sounds.
 
 %.hn 2
@@ -6062,7 +6063,7 @@ Each SOUND entry is broken down into the following parts:
 \elist
 
 %.lp ""
-The pattern should be a POSIX extended regular expression.
+The pattern should be a regular expression.
 
 For example:
 

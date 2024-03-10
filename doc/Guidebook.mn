@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.536 $ $NHDT-Date: 1699260377 2023/11/06 08:46:17 $
+.\" $NHDT-Branch: keni-regex $:$NHDT-Revision: 1.571 $ $NHDT-Date: 1710008891 2024/03/09 18:28:11 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\"+--
@@ -5112,7 +5112,9 @@ Regular expressions are normally POSIX extended regular expressions. It is
 possible to compile NetHack without regular expression support on a platform
 where there is no regular expression library. While this is not true of any
 modern platform, if your NetHack was built this way, patterns are instead glob
-patterns. This applies to Autopickup exceptions, Message types, Menu colors,
+patterns; regardless, this document refers to both as \(oqregular
+expressions.\(cq
+This applies to Autopickup exceptions, Message types, Menu colors,
 and User sounds.
 .hn 2
 Configuring Autopickup Exceptions
@@ -5462,7 +5464,7 @@ the volume to be set while playing the sound file;
 optional; the index corresponding to a sound file.
 .PE
 .lp ""
-The pattern should be a POSIX extended regular expression.
+The pattern should be a regular expression.
 .pg
 For example:
 .sd
