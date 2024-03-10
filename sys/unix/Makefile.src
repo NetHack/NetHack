@@ -831,7 +831,7 @@ package:
 #   cd sys/unix ; make -f Makefile.src updatedepend
 updatedepend: updatedepend-setup
 	cp Makefile.src ../../src && \
-	make -C ../../src MAKEFILE_NAME=Makefile.src -f Makefile.src depend && \
+	make -C ../../src MAKEFILE_NAME=Makefile.src -f Makefile.src depend2 && \
 	mv ../../src/Makefile.src .
 	@rm -f ../$(HACK_H)
 
@@ -857,10 +857,10 @@ updatedepend-setup:
 	@echo "#include \"hack.h\"" >> ../../src/tile.c
 
 MAKEFILE_NAME=Makefile
-#depend:	../sys/unix/depend.awk \
-#			$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
-#			$(CHAINSRC) $(GENCSRC) $(HACKCSRC)
-depend:
+depend:	../sys/unix/depend.awk \
+			$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
+			$(CHAINSRC) $(GENCSRC) $(HACKCSRC)
+depend2:	$(WINQTMOC)
 	$(AWK) -f ../sys/unix/depend.awk ../include/*.h ../win/*/*.h \
 		$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
 		$(CHAINSRC) $(GENCSRC) $(HACKCSRC) >makedep
@@ -1279,27 +1279,27 @@ $(TARGETPFX)worn.o: worn.c $(HACK_H)
 $(TARGETPFX)write.o: write.c $(HACK_H)
 $(TARGETPFX)zap.o: zap.c $(HACK_H)
 qt_kde0.moc: $(QTn_H) ../win/Qt/qt_kde0.h
-	$(MOCPATH) -o $@ $(QTn_H)
+	$(MOCPATH) -o $@ ../win/Qt/qt_kde0.h
 qt_main.moc: $(QTn_H) ../win/Qt/qt_kde0.h ../win/Qt/qt_main.h
-	$(MOCPATH) -o $@ $(QTn_H)
+	$(MOCPATH) -o $@ ../win/Qt/qt_main.h
 qt_map.moc: $(QTn_H) ../win/Qt/qt_clust.h ../win/Qt/qt_map.h ../win/Qt/qt_win.h
-	$(MOCPATH) -o $@ $(QTn_H)
+	$(MOCPATH) -o $@ ../win/Qt/qt_map.h
 qt_menu.moc: $(QTn_H) ../win/Qt/qt_menu.h ../win/Qt/qt_rip.h ../win/Qt/qt_win.h
-	$(MOCPATH) -o $@ $(QTn_H)
+	$(MOCPATH) -o $@ ../win/Qt/qt_menu.h
 qt_msg.moc: $(QTn_H) ../win/Qt/qt_msg.h ../win/Qt/qt_win.h
-	$(MOCPATH) -o $@ $(QTn_H)
+	$(MOCPATH) -o $@ ../win/Qt/qt_msg.h
 qt_plsel.moc: $(QTn_H) ../win/Qt/qt_plsel.h
-	$(MOCPATH) -o $@ $(QTn_H)
+	$(MOCPATH) -o $@ ../win/Qt/qt_plsel.h
 qt_set.moc: $(QTn_H) ../win/Qt/qt_bind.h ../win/Qt/qt_kde0.h \
 		../win/Qt/qt_main.h ../win/Qt/qt_set.h
-	$(MOCPATH) -o $@ $(QTn_H)
+	$(MOCPATH) -o $@ ../win/Qt/qt_set.h
 qt_stat.moc: $(QTn_H) ../win/Qt/qt_icon.h ../win/Qt/qt_stat.h \
 		../win/Qt/qt_win.h
-	$(MOCPATH) -o $@ $(QTn_H)
+	$(MOCPATH) -o $@ ../win/Qt/qt_stat.h
 qt_xcmd.moc: $(QTn_H) ../win/Qt/qt_xcmd.h
-	$(MOCPATH) -o $@ $(QTn_H)
+	$(MOCPATH) -o $@ ../win/Qt/qt_xcmd.h
 qt_yndlg.moc: $(QTn_H) ../win/Qt/qt_yndlg.h
-	$(MOCPATH) -o $@ $(QTn_H)
+	$(MOCPATH) -o $@ ../win/Qt/qt_yndlg.h
 # DEPENDENCIES MUST END AT END OF FILE
 # IF YOU PUT STUFF HERE IT WILL GO AWAY
 # see make depend above

@@ -172,7 +172,8 @@ function format_dep(target, source,		col, n, i, list, prefix, moc)
   #first: leading whitespace yields empty 1st element; not sure why moc
   #files duplicate the target as next element but we need to skip that too
   first = moc ? 3 : 2
-  if (dosort ){
+  source = list[first]
+  if (dosort){
     nhsort(list, first, n, 0)
   }
   for (i = first; i <= n; i++) {
@@ -185,7 +186,6 @@ function format_dep(target, source,		col, n, i, list, prefix, moc)
   }
   printf("\n")				#terminate
   #write build command if first source entry has non-include path prefix
-  source = list[first]
   if (moc) {
     print "\t$(MOCPATH) -o $@ " source
   } else if (source ~ /\// && substr(source, 1, 11) != "../include/") {
@@ -249,7 +249,7 @@ function nhsort(list, first, last, cmpid,		i,j,temp)
 
 function nhcmp(a,b,cmpid)
 {
-  if(cmpid == 0){	  # sort dependencies
+  if(cmpid == 0){		  # sort dependencies
       # 2 .c or .cpp files
     if (a ~ /\.c(pp)?$/ && b ~ /\.c(pp)?$/ ){ return a > b }
       # a .c or .cpp file and anything else
