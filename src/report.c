@@ -1,4 +1,4 @@
-/* NetHack 3.7	report.c	$NHDT-Date: 1709907875 2024/03/08 14:24:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
+/* NetHack 3.7	report.c	$NHDT-Date: 1710106611 2024/03/10 21:36:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.5 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2024 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -64,13 +64,15 @@
 
 # ifdef __linux__
 #include "nhmd4.h"
+/* v0 is just to suppress compiler warnings about unreachable code */
 #  define HASH_CONTEXTPTR(CTXP) \
+    volatile int v0 = 0; \
     unsigned char tmp[NHMD4_DIGEST_LENGTH];     \
     NHMD4_CTX CTXP ## _;                        \
     NHMD4_CTX *CTXP = &CTXP ## _
-#  define HASH_INIT(ctxp) (nhmd4_init(ctxp), 0)
-#  define HASH_UPDATE(ctx, ptr, len) (nhmd4_update(ctx, ptr, len), 0)
-#  define HASH_FINISH(ctxp) (nhmd4_final(ctxp, tmp), 0)
+#  define HASH_INIT(ctxp) (nhmd4_init(ctxp), v0)
+#  define HASH_UPDATE(ctx, ptr, len) (nhmd4_update(ctx, ptr, len), v0)
+#  define HASH_FINISH(ctxp) (nhmd4_final(ctxp, tmp), v0)
 #  define HASH_RESULT_SIZE(ctxp) NHMD4_RESULTLEN
 #  define HASH_RESULT(ctx, inp) *inp = tmp
 #  define HASH_CLEANUP(ctxp)
