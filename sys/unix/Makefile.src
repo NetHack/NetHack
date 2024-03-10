@@ -837,6 +837,7 @@ updatedepend-setup:
 	if [ $$p = $${p%/sys/unix} ]; then \
 		echo "updatedepend must be run in sys/unix"; exit 1; \
 	fi
+	touch $(HACK_H)
 	@	# generate bogus files
 	echo "Generating bogus include/nhlua.h"
 	(HFILE=../../include/nhlua.h && \
@@ -851,9 +852,9 @@ updatedepend-setup:
 	@echo "#include \"hack.h\"" >> ../../src/tile.c
 
 MAKEFILE_NAME=Makefile
-depend: ../sys/unix/depend.awk \
-		$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
-		$(CHAINSRC) $(GENCSRC) $(HACKCSRC)
+depend:	../sys/unix/depend.awk \
+			$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
+			$(CHAINSRC) $(GENCSRC) $(HACKCSRC)
 	$(AWK) -f ../sys/unix/depend.awk ../include/*.h ../win/*/*.h \
 		$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
 		$(CHAINSRC) $(GENCSRC) $(HACKCSRC) >makedep
@@ -869,6 +870,7 @@ depend: ../sys/unix/depend.awk \
 	- diff Makefile.bak $(MAKEFILE_NAME)
 	@rm -f Makefile.bak
 	@rm -f ../include/nhlua.h tile.c
+	@rm -f $(HACK_H)
 
 # DO NOT DELETE THIS LINE OR CHANGE ANYTHING BEYOND IT
 
@@ -1270,6 +1272,7 @@ $(TARGETPFX)wizcmds.o: wizcmds.c $(HACK_H) ../include/func_tab.h
 $(TARGETPFX)worm.o: worm.c $(HACK_H)
 $(TARGETPFX)worn.o: worn.c $(HACK_H)
 $(TARGETPFX)write.o: write.c $(HACK_H)
+$(TARGETPFX)zap.o: zap.c $(HACK_H)
 qt_kde0.moc: $(QTn_H) ../win/Qt/qt_kde0.h
 	$(MOCPATH) -o $@ $(QTn_H)
 qt_main.moc: $(QTn_H) ../win/Qt/qt_kde0.h ../win/Qt/qt_main.h

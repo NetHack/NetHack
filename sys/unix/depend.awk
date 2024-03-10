@@ -101,8 +101,8 @@ function output_dep(){
 function output_final(				x)
 {
   if(dorulesort){
-    nhsort(worklist, 1, worklistctr-1, 1)
-    for(x=1;x<worklistctr;x++){
+    nhsort(worklist, 1, worklistctr, 1)
+    for(x=1;x<=worklistctr;x++){
       file = worklist[x]
       output_final2()
     }
