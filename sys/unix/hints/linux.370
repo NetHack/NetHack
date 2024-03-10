@@ -43,6 +43,11 @@ endif
 GAMEUID  = $(USER)
 GAMEGRP  = games
 
+# This gives better backtraces by making all core functions global; this
+# works around a limitation in glibc's backtrace(3) function.
+# Recommended with CRASHREPORT.
+#NOSTATICCORE = 1
+
 #-----------------------------------------------------------------------------
 #-INCLUDE cross-pre1.370
 
