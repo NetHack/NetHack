@@ -49,24 +49,6 @@ ATTRNORETURN extern void nethack_exit(int) NORETURN;
 
 #define done_stopprint gp.program_state.stopprint
 
-#ifndef PANICTRACE
-# define NH_abort(x) NH_abort_
-#endif
-
-#ifdef AMIGA
-#define NH_abort_ Abort(0)
-#else
-#ifdef SYSV
-#define NH_abort_ (void) abort()
-#else
-#ifdef WIN32
-#define NH_abort_ win32_abort()
-#else
-#define NH_abort_ abort()
-#endif
-#endif /* !SYSV */
-#endif /* !AMIGA */
-
 /*
  * The order of these needs to match the macros in hack.h.
  */
@@ -1934,12 +1916,15 @@ NH_abort(char *why USED_FOR_CRASHREPORT)
 
 #endif /* ?VMS */
     }
-
 #ifndef NO_SIGNAL
     panictrace_setsignals(FALSE);
 #endif
 #endif /* PANICTRACE */
-    NH_abort_;
+#ifdef WIN32
+    win32_abort();
+#else
+    abort();
+#endif
 }
 #undef USED_FOR_CRASHREPORT
 
