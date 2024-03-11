@@ -454,10 +454,12 @@ QUIETCC=0
 #    Rule /=/ allows 2 definitions of char array brief_feeling
 # fi
 $(TARGETPFX)%.o : %.c
-	if [ x$(NOSTATICCORE) = 'x' ]; then \
+	@if [ x$(NOSTATICCORE) = 'x' ]; then \
+	    echo $(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ $< ; \
 	    $(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ $< ; \
 	else \
 	    ( \
+	    echo "Generating " intermediate file .$< ; \
 		$(AWK) ' \
 			BEGIN{print "#line 1 \"$<\""}; \
 			/=/{print;next}; \
@@ -465,6 +467,7 @@ $(TARGETPFX)%.o : %.c
 			sub(/^static( |$$)/, ""){print;next}; \
 			{print}; \
 		' < $< > .$< && \
+		echo $(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ .$< ; \
 		$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ .$< ; \
 	    ) \
 	fi
@@ -833,7 +836,7 @@ updatedepend: updatedepend-setup
 	cp Makefile.src ../../src && \
 	make -C ../../src MAKEFILE_NAME=Makefile.src -f Makefile.src depend2 && \
 	mv ../../src/Makefile.src .
-	@rm -f ../$(HACK_H)
+	@rm -f ../$(HACK_H) ../../include/nhlua.h
 
 # check pwd, create bogus derived files
 updatedepend-setup:
@@ -860,6 +863,8 @@ MAKEFILE_NAME=Makefile
 depend:	../sys/unix/depend.awk \
 			$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
 			$(CHAINSRC) $(GENCSRC) $(HACKCSRC)
+	$(MAKE) depend2
+
 depend2:	$(WINQTMOC)
 	$(AWK) -f ../sys/unix/depend.awk ../include/*.h ../win/*/*.h \
 		$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
