@@ -1562,7 +1562,7 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
         } else {
             miss("wand", mtmp);
         }
-        if (learnit && cansee(mtmp->mx, mtmp->my) && gz.zap_oseen)
+        if (learnit && gz.zap_oseen)
             makeknown(WAN_STRIKING);
         break;
     case WAN_TELEPORTATION:
