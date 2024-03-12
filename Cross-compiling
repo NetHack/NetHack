@@ -20,6 +20,7 @@ Part B Contents:
     B4. Case sample: msdos
     B5. Case sample: amiga (started but incomplete)
     B6. Case sample: Web Assembly, libnh
+    B7. Case sample: mips
 
 --------------------------------------------------------------------------------
  Part A - Cross-compiling NetHack
@@ -691,6 +692,39 @@ Cross-compiler url: https://emscripten.org/docs/getting_started/downloads.html
     The cross-compiler hints additions are enclosed inside ifdef sections
     and shouldn't interfere with the non-cross-compile builds using
     hints/linux.370 or hints/macOS.370.
+
+
+  +--------------------------------+
+  | B7. Case sample: mips  |
+  +--------------------------------+
+
+Cross-compiler used: gcc-mipsel-linux-gnu, g++-mipsel-linux-gnu
+Cross-compiler url:
+
+    Here's a brief guide to obtaining the cross-compiler sources on an
+    Ubuntu system and building NetHack with it.
+
+    For Ubuntu, the build prerequisite packages for building the compiler can
+    be easily obtained:
+        sudo apt install gcc-mipsel-linux-gnu
+        sudo apt install g++-mipsel-linux-gnu
+
+    On your linux host, prepare to cross-compile NetHack as follows:
+        cd sys/unix ; sh setup.sh hints/linux.370 ; cd ../..
+        make fetch-lua
+
+    Then, cross-compile to targets/mips as follows:
+        make CROSS_TO_MIPS=1 fetch-ncurses
+        make CROSS_TO_MIPS=1 package
+
+    Do not add any additional windowport interfaces to your build
+    (such as WANT_WIN_TTY=1 WANT_WIN_CURSES=1 WANT_WIN_X11=1 or
+    WANT_WIN_QT=1) as those aren't applicable to the mips cross-compile.
+
+    The cross-compiler hints additions are enclosed inside ifdef sections
+    and shouldn't interfere with the non-cross-compile builds using
+    hints/linux.370 or hints/macOS.370.
+
 
 ---
 
