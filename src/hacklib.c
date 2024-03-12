@@ -8,8 +8,7 @@
 
 /*=
     Assorted 'small' utility routines.  They're virtually independent of
-    NetHack, except that rounddiv may call panic().  setrandom calls one
-    of srandom(), srand48(), or srand() depending upon configuration.
+    NetHack.
 
       return type     routine name    argument type(s)
         boolean         digit           (char)
@@ -46,7 +45,6 @@
         const char *    ordin           (int)
         char *          sitoa           (int)
         int             sgn             (int)
-        int             rounddiv        (long, int)
         int             distmin         (int, int, int, int)
         int             dist2           (int, int, int, int)
         boolean         online2         (int, int)
@@ -654,33 +652,6 @@ sgn(int n)
 {
     return (n < 0) ? -1 : (n != 0);
 }
-
-#if 0
-/* calculate x/y, rounding as appropriate */
-int
-rounddiv(long x, int y)
-{
-    int r, m;
-    int divsgn = 1;
-
-    if (y == 0)
-        panic("division by zero in rounddiv");
-    else if (y < 0) {
-        divsgn = -divsgn;
-        y = -y;
-    }
-    if (x < 0) {
-        divsgn = -divsgn;
-        x = -x;
-    }
-    r = (int) (x / y);
-    m = x % y;
-    if (2 * m >= y)
-        r++;
-
-    return divsgn * r;
-}
-#endif
 
 /* distance between two points, in moves */
 int
