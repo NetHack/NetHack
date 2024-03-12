@@ -166,9 +166,6 @@ extern void objects_globals_init(void); /* objects.c */
 static char *name_file(const char *, const char *);
 static FILE *getfp(const char *, const char *, const char *, int);
 static void do_ext_makedefs(int, char **);
-#if 0
-static char *xcrypt(const char *);
-#endif
 static char *padline(char *, unsigned);
 static unsigned long read_rumors_file(const char *, int *,
                                       long *, unsigned long, unsigned);
@@ -975,28 +972,6 @@ grep0(FILE *inputfp0, FILE* outputfp0, int flg)
     }
     return;
 }
-
-#if 0
-/* trivial text encryption routine which can't be broken with `tr' */
-static char *
-xcrypt(const char *str)
-{ /* slightly different version in src/hacklib.c */
-    static char buf[BUFSZ];
-    const char *p;
-    char *q;
-    int bitmask;
-
-    for (bitmask = 1, p = str, q = buf; *p; q++) {
-        *q = *p++;
-        if (*q & (32 | 64))
-            *q ^= bitmask;
-        if ((bitmask <<= 1) >= 32)
-            bitmask = 1;
-    }
-    *q = '\0';
-    return buf;
-}
-#endif
 
 static char *
 padline(char *line, unsigned padlength)
