@@ -47,3 +47,9 @@ vms: update winprocs.h to ensure that CLR_MAX is defined; necessary for
 	compiling vmsmail.c which uses winprocs.h but not hack.h
 curses: when #quitting, just before the high scores are about to be shown
 	status_window was NULL and dereferenced, so add checks (issue #1090)
+when make was invoked with -j makedefs instances could end up running in
+	parallel and could trample on each other's temp files; default to
+	using mkstemp(); allow a port runtime library implementation that lacks
+	mkstemp() to define HAS_NO_MKSTEMP to revert to the old behaviour;
+	provide a work-alike mkstemp() implementation for windows visual studio
+	so there is no requirement to define HAS_NO_MKSTEMP there
