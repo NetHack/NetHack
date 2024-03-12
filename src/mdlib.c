@@ -28,7 +28,7 @@
 #include "flag.h"
 #include "dlb.h"
 #include "hacklib.h"
-#include <ctype.h>
+
 /* version information */
 #ifdef SHORT_FILENAMES
 #include "patchlev.h"
@@ -61,13 +61,6 @@ char *bannerc_string(char *, size_t, const char *) NONNULL NONNULLPTRS;
 int case_insensitive_comp(const char *, const char *) NONNULLPTRS;
 
 static void make_version(void);
-#if 0
-static char *eos(char *) NONNULL NONNULLARG1;
-#endif
-
-#if 0
-static char *mdlib_strsubst(char *, const char *, const char *);
-#endif
 
 #ifndef HAS_NO_MKSTEMP
 #ifdef _MSC_VER
@@ -419,35 +412,6 @@ mkstemp(char *template)
 #endif /* _MSC_VER */
 #endif /* HAS_NO_MKSTEMP */
 #endif /* MAKEDEFS_C || FOR_RUNTIME */
-
-#if 0
-static char *
-eos(char *str)
-{
-    while (*str)
-        str++;
-    return str;
-}
-#endif
-
-#if 0
-static char *
-mdlib_strsubst(char *bp, const char *orig, const char *replacement)
-{
-    char *found, buf[BUFSZ];
-
-    if (bp) {
-        /* [this could be replaced by strNsubst(bp, orig, replacement, 1)] */
-        found = strstr(bp, orig);
-        if (found) {
-            Strcpy(buf, found + strlen(orig));
-            Strcpy(found, replacement);
-            Strcat(bp, buf);
-        }
-    }
-    return bp;
-}
-#endif
 
 static char save_bones_compat_buf[BUFSZ];
 
@@ -898,24 +862,6 @@ build_options(void)
 }
 
 #undef STOREOPTTEXT
-
-int
-case_insensitive_comp(const char *s1, const char *s2)
-{
-    uchar u1, u2;
-
-    for (;; s1++, s2++) {
-        u1 = (uchar) *s1;
-        if (isupper(u1))
-            u1 = (uchar) tolower(u1);
-        u2 = (uchar) *s2;
-        if (isupper(u2))
-            u2 = (uchar) tolower(u2);
-        if (u1 == '\0' || u1 != u2)
-            break;
-    }
-    return u1 - u2;
-}
 
 void
 runtime_info_init(void)

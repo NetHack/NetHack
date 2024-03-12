@@ -23,7 +23,6 @@
 #include "dlb.h"
 #include "hacklib.h"
 
-#include <ctype.h>
 #ifdef MAC
 #if defined(__SC__) || defined(__MRC__) /* MPW compilers */
 #define MPWTOOL

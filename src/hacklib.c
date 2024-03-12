@@ -5,6 +5,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h" /* for config.h+extern.h */
+
 /*=
     Assorted 'small' utility routines.  They're virtually independent of
     NetHack, except that rounddiv may call panic().  setrandom calls one
@@ -945,6 +946,24 @@ unicodeval_to_utf8str(int uval, uint8 *buffer, size_t bufsz)
     }
     *b = '\0'; /* NUL terminate */
     return 1;
+}
+
+int
+case_insensitive_comp(const char *s1, const char *s2)
+{
+    uchar u1, u2;
+
+    for (;; s1++, s2++) {
+        u1 = (uchar) *s1;
+        if (isupper(u1))
+            u1 = (uchar) tolower(u1);
+        u2 = (uchar) *s2;
+        if (isupper(u2))
+            u2 = (uchar) tolower(u2);
+        if (u1 == '\0' || u1 != u2)
+            break;
+    }
+    return u1 - u2;
 }
 
 /*hacklib.c*/
