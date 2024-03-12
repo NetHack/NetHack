@@ -4970,6 +4970,7 @@ optfn_boolean(
     }
     if (req == do_set) {
         boolean nosexchange = FALSE;
+        int ln = 0;
 
         if (!allopt[optidx].addr)
             return optn_ok; /* silent retreat */
@@ -4984,8 +4985,6 @@ optfn_boolean(
 
         op = string_for_opt(opts, TRUE);
         if (op != empty_optstr) {
-            int ln;
-
             if (negated) {
                 config_error_add(
                            "Negated boolean '%s' should not have a parameter",
@@ -5018,7 +5017,7 @@ optfn_boolean(
         /* Before the change */
         switch (optidx) {
         case opt_female:
-            if (!strncmpi(opts, "female", 3)) {
+            if (!strncmpi(opts, "female", max(ln, 3))) {
                 if (!go.opt_initial && flags.female == negated) {
                     nosexchange = TRUE;
                 } else {
@@ -5026,7 +5025,7 @@ optfn_boolean(
                     return optn_ok;
                 }
             }
-            if (!strncmpi(opts, "male", 3)) {
+            if (!strncmpi(opts, "male", max(ln, 3))) {
                 if (!go.opt_initial && flags.female != negated) {
                     nosexchange = TRUE;
                 } else {
@@ -5036,7 +5035,7 @@ optfn_boolean(
             }
             break;
         case opt_perm_invent:
-            if (!negated && !can_set_perm_invent())
+            if (!negated && !go.opt_initial && !can_set_perm_invent())
                 return optn_silenterr;
             break;
         default:
@@ -5231,6 +5230,7 @@ can_set_perm_invent(void)
      * and is about to be changed to True.
      */
     uchar old_perminv_mode = iflags.perminv_mode;
+
     if (!(windowprocs.wincap & WC_PERM_INVENT)) {
 #ifdef TTY_GRAPHICS
 #ifdef TTY_PERM_INVENT
@@ -5239,7 +5239,7 @@ can_set_perm_invent(void)
         if (!check_tty_wincap(WC_PERM_INVENT))
 #endif
 #endif
-            return FALSE; /* should never happen */
+            return FALSE;
     }
 
     if (iflags.perminv_mode == InvOptNone)
@@ -7122,6 +7122,21 @@ initoptions_finish(void)
     apply_customizations_to_symset(gc.currentgraphics);
 #endif
     go.opt_initial = FALSE;
+
+    /*
+     * Do these after clearing the 'opt_initial' flag.
+     */
+
+    /* player's RC file might try to enable perm_invent before selecting
+       current interface, so the decision then would have been based on
+       default interface; re-check with the active interface now */
+    if (iflags.perm_invent) {
+        /* can_set_perm_invent() expects to be called when perm_invent
+           is about to be toggled On, so start with it Off */
+        iflags.perm_invent = FALSE;
+        if (can_set_perm_invent())
+            iflags.perm_invent = TRUE;
+    }
     return;
 }
 

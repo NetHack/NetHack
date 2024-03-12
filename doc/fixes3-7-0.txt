@@ -1887,6 +1887,9 @@ OPTIONS=symset:blank and symset:plain didn't load the specified symbols if
 for OPTIONS=symset:blank, S_engroom (engraving on a room floor spot) and
 	S_engrcorr (engraving on a corridor spot) retained their default
 	symbols ('`' and '#', respectively) instead of switching to space
+setting perm_invent in RC file before setting windowtype (whether later in
+	that file or via NETHACKOPTIONS) could result in it staying False
+	depending upon whether the default windowtype supported it
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
