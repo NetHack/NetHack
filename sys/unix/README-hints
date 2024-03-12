@@ -54,8 +54,8 @@ make WANT_BUNDLE=1            For macOS.370 only, place the build results into
 make WANT_MACSOUND=1          For macOS.370, include support for built-in macOS
                               sound libraries.
 make WANT_SPEECH=1            If one of the sound libraries was included, also
-                              include speech synthesis support (Recend macOS
-                              build that also includes WANT_MACSOUND=1.
+                              include speech synthesis support (Recent macOS
+                              build that also includes WANT_MACSOUND=1).
 
 make WANT_ASAN=1              Include support for the address sanitizer in the
                               build.
