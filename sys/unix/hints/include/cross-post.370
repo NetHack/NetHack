@@ -41,8 +41,6 @@ $(DOSFONT)/ter-u28b.psf: $(FONTTOP)/ter-u28b.bdf $(DOSFONT)/nh-u28b.bdf $(DOSFON
 	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u28b.bdf $(DOSFONT)/nh-u28b.bdf $@
 $(DOSFONT)/ter-u32b.psf: $(FONTTOP)/ter-u32b.bdf $(DOSFONT)/nh-u32b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
 	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u32b.bdf $(DOSFONT)/nh-u32b.bdf $@
-$(TARGETPFX)hacklib.a: $(TARGETPFX)hacklib.o
-	$(TARGET_AR) $(TARGET_ARFLAGS) $@ $(TARGETPFX)hacklib.o
 #
 .PHONY: dodata dospkg dosfonts
 dosfonts: $(FONTTARGETS)
@@ -151,6 +149,10 @@ $(TARGETPFX)recover.exe : $(TARGETPFX)recover.o
 	$(TARGET_LINK) $(TARGET_LFLAGS) $(TARGETPFX)recover.o -o $@
 endif  # CROSS_SHARED
 #
+ifdef CROSS
+$(TARGETPFX)hacklib.a: $(TARGETPFX)hacklib.o
+	$(TARGET_AR) $(TARGET_ARFLAGS) $@ $(TARGETPFX)hacklib.o
+endif
 ifdef BUILD_TARGET_LUA
 # Lua lib
 $(LUACROSSLIB): $(LUALIBOBJS)
