@@ -52,7 +52,6 @@
         char *          strstri         (const char *, const char *)
         boolean         fuzzymatch      (const char *, const char *,
                                          const char *, boolean)
-        void            setrandom       (void)
         int             swapbits        (int, int, int)
         void            nh_snprintf     (const char *, int, char *, size_t,
                                          const char *, ...)
