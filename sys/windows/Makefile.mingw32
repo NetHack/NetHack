@@ -1029,7 +1029,8 @@ endif
 
 nethackw: $(NHWTARGETS)
 
-$(GAMEDIR)/NetHackW.exe: $(NHWOBJS) $(NHWRES) $(DATEW_O) $(LUALIB) $(PDCWLIB) | $(GAMEDIR)
+$(GAMEDIR)/NetHackW.exe: $(NHWOBJS) $(NHWRES) $(DATEW_O) \
+			 $(LUALIB) $(HLHACKLIB) $(PDCWLIB) | $(GAMEDIR)
 	$(ld) $(LDFLAGS) -mwindows $^ $(HLHACKLIB) $(LIBS) -static -lstdc++ \
 		$(SOUNDLIBLIBS) -o$@
 
@@ -1121,7 +1122,7 @@ NHTARGET = $(GAMEDIR)/NetHack.exe
 
 nethack: $(NHTARGET)
 
-$(GAMEDIR)/NetHack.exe: $(NHOBJS) $(NHRES) $(DATE_O) $(LUALIB) $(PDCLIB) \
+$(GAMEDIR)/NetHack.exe: $(NHOBJS) $(NHRES) $(DATE_O) $(LUALIB) $(PDCLIB) $(HLHACKLIB) \
 	$(SOUNDLIBLIBS) | $(GAMEDIR)
 	$(ld) $(LDFLAGS) -mconsole $^ $(HLHACKLIB) $(LIBS) -static -lstdc++ -o$@
 
