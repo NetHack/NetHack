@@ -384,9 +384,9 @@ sys/unix:
 (files for UNIX versions)
 Install.unx     Makefile.check  Makefile.dat    Makefile.doc
 Makefile.src    Makefile.top    Makefile.utl    NewInstall.unx
-README.xcode    XCode.xcconfig  depend.awk      gitinfo.sh
-mkmkfile.sh     nethack.sh      setup.sh        sysconf
-unixmain.c      unixres.c       unixunix.c
+README-hints    README.xcode    XCode.xcconfig  depend.awk
+gitinfo.sh      mkmkfile.sh     nethack.sh      setup.sh
+sysconf         unixmain.c      unixres.c       unixunix.c
 
 sys/unix/NetHack.xcodeproj:
 (file for macOS Xcode)
