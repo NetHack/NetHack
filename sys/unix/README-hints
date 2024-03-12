@@ -1,0 +1,69 @@
+The sys/unix/hints subfolder contains Makefile content building blocks
+for various platforms and purposes.
+
+The sys/unix/hints/include subfolder contains Makefile content that
+is included in the distributed Makefiles.
+
+
+[.370 hints]
+
+
+There are two .370 series hints files provided with NetHack:
+    linux.370    for use on Linux
+    macOS.370    for use on macOS
+
+Those will also pull in content from sys/unix/hints/include/*.370,
+that is shared between the linux.370 and macOS.370 hints files.
+
+
+[.370 make build options]
+
+
+Here are some options that can be specified on the make command
+line to trigger specific build behavior. These are not mutually
+exclusive and multiple build options can be specified in many
+cases to include support for multiple features. Some of the options
+require prerequisite packages to be available on your build machine.
+
+make WANT_WIN_TTY=1           Include support for the TTY interface (default).
+make NANT_WIN_CURSES=1        Include support for the curses interface.
+make WANT_WIN_X11=1           Include support for the X11 interface.
+make WANT_WIN_Qt=1            Include support for Qt interface, defaults to Qt5.
+make WANT_WIN_QT5=1           Include support for Qt5 interface.
+make WANT_WIN_QT6=1           Include support for Qt6 interface. Only one Qtx
+                              option can be specified.
+make WANT_WIN_ALL=1           Include support for TTY,curses,X11, and Qt.
+make WANT_WINCHAIN=1          Include support for WINCHAIN.
+make WANT_LIBNH=1             Include support for libnh NetHack library.
+
+make WANT_DEFAULT=tty         Make tty the default interface if multiple window
+                              interfaces were specified.
+make WANT_DEFAULT=curses      Make curses the default interface if multiple window
+                              interfaces were specified.
+make WANT_DEFAULT=X11         Make X11 the default interface if multiple window
+                              interfaces were specified.
+make WANT_DEFAULT=Qt          Make Qt the default interface if multiple window
+                              interfaces were specified.
+
+make CROSS_TO_MSDOS=1 package Cross-compile for an MSDOS target package.
+make CROSS_TO_WASM=1          Cross-compile for a WASM target.
+make CROSS_TO_MIPS=1          Cross-compile for a mips target.
+
+make WANT_BUNDLE=1            For macOS.370 only, place the build results into 
+                              a macOS bundle layout.
+make WANT_MACSOUND=1          For macOS.370, include support for built-in macOS
+                              sound libraries.
+make WANT_SPEECH=1            If one of the sound libraries was included, also
+                              include speech synthesis support (Recend macOS
+                              build that also includes WANT_MACSOUND=1.
+
+make WANT_ASAN=1              Include support for the address sanitizer in the
+                              build.
+
+make WANT_SHARE_INSTALL=1     Place the results of the install/update portion
+                              of the build into a shared area on a multiuser
+                              system.
+                               
+make WANT_SOURCE_INSTALL=1    Place the results of the install/update portion
+                              of the build into a subfolder of the source
+                              tree, rather than in a system-wide shared area.
