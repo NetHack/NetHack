@@ -2133,6 +2133,11 @@ create_monster(monster *m, struct mkroom *croom)
         }
         if (m->waiting) {
             mtmp->mstrategy |= STRAT_WAITFORU;
+            /* if this is a vampire that got created already shifted into
+               bat/fog/wolf form and the special level or theme room didn't
+               explicitly request that, shift back to vampire */
+            if (vampshifted(mtmp) && m->appear != M_AP_MONSTER)
+                (void) newcham(mtmp, &mons[mtmp->cham], NO_NC_FLAGS);
         }
         if (m->has_invent) {
             discard_minvent(mtmp, TRUE);

@@ -4476,7 +4476,7 @@ decide_to_shapeshift(struct monst *mon, int shiftflags)
         /* regular shapeshifter */
         if (!rn2(6))
             dochng = TRUE;
-    } else {
+    } else if (!(mon->mstrategy & STRAT_WAITFORU)) {
         /* The vampire has to be in good health (mhp) to maintain
          * its shifted form.
          *
