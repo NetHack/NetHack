@@ -1243,7 +1243,7 @@ slip_or_trip(void)
                combined move appear to be a single diagonal step. */
             if (!NODIAG(u.umonnum))
                 confdir(TRUE); /* sets u.dx and u.dy */
-            /* Only hurtle if the random directon won't move hero back
+            /* Only hurtle if the random direction won't move hero back
                to same spot where this move started. */
             if (u.ux + u.dx != u.ux0 || u.uy + u.dy != u.uy0)
                 hurtle(u.dx, u.dy, 1, FALSE);
