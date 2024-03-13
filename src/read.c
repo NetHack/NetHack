@@ -144,7 +144,8 @@ tshirt_text(struct obj *tshirt, char *buf)
         "Minetown Better Business Bureau",
         "Minetown Watch",
         /* Discworld riff; unfortunately long */
- "Ms. Palm's House of Negotiable Affection--A Very Reputable House Of Disrepute",
+        "Ms. Palm's House of Negotiable Affection--A Very Reputable"
+            " House Of Disrepute",
         "Protection Racketeer",
         "Real men love Crom",
         "Somebody stole my Mojo!",
@@ -1442,6 +1443,8 @@ seffect_remove_curse(struct obj **sobjp)
                 }
             }
             if (sblessed || wornmask || obj->otyp == LOADSTONE
+                /* this treats an in-use leash as a worn item but does not
+                   do the same for lit lamp/candle [seems inconsistent] */
                 || (obj->otyp == LEASH && obj->leashmon)) {
                 /* water price varies by curse/bless status */
                 boolean shop_h2o = (obj->unpaid && obj->otyp == POT_WATER);
@@ -1728,8 +1731,8 @@ seffect_amnesia(struct obj **sobjp)
     if (Hallucination) /* Ommmmmm! */
         Your("mind releases itself from mundane concerns.");
     else if (!strncmpi(gp.plname, "Maud", 4))
-        pline(
-              "As your mind turns inward on itself, you forget everything else.");
+        pline("As your mind turns inward on itself,"
+              " you forget everything else.");
     else if (rn2(2))
         pline("Who was that Maud person anyway?");
     else
@@ -2809,7 +2812,8 @@ do_genocide(
     which = "all ";
     if (Hallucination) {
         if (Upolyd)
-            Strcpy(buf, pmname(gy.youmonst.data, flags.female ? FEMALE : MALE));
+            Strcpy(buf, pmname(gy.youmonst.data,
+                               flags.female ? FEMALE : MALE));
         else {
             Strcpy(buf, (flags.female && gu.urole.name.f) ? gu.urole.name.f
                                                        : gu.urole.name.m);
@@ -2944,8 +2948,8 @@ unpunish(void)
     setworn((struct obj *) 0, W_BALL); /* sets 'uball' to Null */
 }
 
-/* Prompt the player to create a stinking cloud and then create it if they give
- * a location. */
+/* prompt the player to create a stinking cloud and then create it if they
+   give a location */
 static void
 do_stinking_cloud(struct obj *sobj, boolean mention_stinking)
 {
