@@ -4236,9 +4236,11 @@ domagictrap(void)
             struct obj pseudo;
             long save_conf = HConfusion;
 
-            pseudo = cg.zeroobj; /* neither cursed nor blessed,
-                                    and zero out oextra */
-            pseudo.otyp = SCR_REMOVE_CURSE;
+            pseudo = cg.zeroobj; /* force 'uncursed' and zero out oextra */
+            /* used to be SCR_REMOVE_CURSE but that could cause seffects()
+               to have hero discover scroll of remove curse */
+            pseudo.otyp = SPE_REMOVE_CURSE;
+            pseudo.oclass = SPBOOK_CLASS;
             HConfusion = 0L;
             (void) seffects(&pseudo);
             HConfusion = save_conf;

@@ -1890,6 +1890,8 @@ for OPTIONS=symset:blank, S_engroom (engraving on a room floor spot) and
 setting perm_invent in RC file before setting windowtype (whether later in
 	that file or via NETHACKOPTIONS) could result in it staying False
 	depending upon whether the default windowtype supported it
+if hero was wielding potion(s) of unholy water and a magic trap gave its
+	remove curse effect, scroll of remove curse would become discovered
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
