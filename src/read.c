@@ -144,8 +144,8 @@ tshirt_text(struct obj *tshirt, char *buf)
         "Minetown Better Business Bureau",
         "Minetown Watch",
         /* Discworld riff; unfortunately long */
-        "Ms. Palm's House of Negotiable Affection--A Very Reputable"
-            " House Of Disrepute",
+        ("Ms. Palm's House of Negotiable Affection--A Very Reputable"
+            " House Of Disrepute"),
         "Protection Racketeer",
         "Real men love Crom",
         "Somebody stole my Mojo!",
