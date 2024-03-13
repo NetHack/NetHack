@@ -913,6 +913,16 @@ curses_print_glyph(
     special = glyphinfo->gm.glyphflags;
     ch = glyphinfo->ttychar;
     color = glyphinfo->gm.sym.color;
+
+#ifdef ENHANCED_SYMBOLS
+    /* The curses library does not support truecolor, only the more limited 256
+       color mode. On top of this, the windowport only supports 16 color mode.
+       Thus, we only allow users to customize glyph colors to the basic NetHack
+       colors. */
+    if (glyphinfo->gm.u && glyphinfo->gm.u->ucolor & NH_BASIC_COLOR) {
+        color = (glyphinfo->gm.u->ucolor & ~NH_BASIC_COLOR);
+    }
+#endif
     if ((special & MG_PET) && iflags.hilite_pet) {
         attr = curses_convert_attr(iflags.wc2_petattr);
     }
