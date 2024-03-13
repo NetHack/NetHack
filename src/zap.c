@@ -178,10 +178,11 @@ bhitm(struct monst *mtmp, struct obj *otmp)
         reveal_invis = TRUE;
         if (disguised_mimic)
             seemimic(mtmp);
+        learn_it = cansee(gb.bhitpos.x, gb.bhitpos.y);
         if (resists_magm(mtmp)) { /* match effect on player */
             shieldeff(mtmp->mx, mtmp->my);
             pline("Boing!");
-            break; /* skip makeknown */
+            /* 3.7: used to 'break' to avoid setting learn_it here */
         } else if (u.uswallow || rnd(20) < 10 + find_mac(mtmp)) {
             dmg = d(2, 12);
             if (dbldam)
@@ -190,9 +191,10 @@ bhitm(struct monst *mtmp, struct obj *otmp)
                 dmg = spell_damage_bonus(dmg);
             hit(zap_type_text, mtmp, exclam(dmg));
             (void) resist(mtmp, otmp->oclass, dmg, TELL);
-        } else
+        } else {
             miss(zap_type_text, mtmp);
-        learn_it = TRUE;
+            learn_it = FALSE;
+        }
         break;
     case WAN_SLOW_MONSTER:
     case SPE_SLOW_MONSTER:

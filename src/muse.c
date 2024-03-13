@@ -1562,7 +1562,10 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
         } else {
             miss("wand", mtmp);
         }
-        if (learnit && cansee(mtmp->mx, mtmp->my) && gz.zap_oseen)
+        /* need to see the wand being zapped and also the spot where the
+           target is hit; don't have to see the target itself though */
+        if (learnit && gz.zap_oseen && (hits_you
+                                        || cansee(mtmp->mx, mtmp->my)))
             makeknown(WAN_STRIKING);
         break;
     case WAN_TELEPORTATION:
