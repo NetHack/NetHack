@@ -2443,6 +2443,7 @@ clean:
 #   * win/share/cppregex.o commented out due to earlier rule
 #   * commented out $(TARGETPFX)tile.o: tile.c $(HACK_H)
 #   * commented out $(TARGETPFX)cppregex.o because it has its own rule already
+#   * check for an erroneous embedded Makefile comment char in the files.o line
 #   * $(TARGETPFX) becomes $(OTTY) in 1st batch with $(TTYDEF)
 #   * $(TARGETPFX) becomes $(OGUI) in 2nd batch with $(GUIDEF)
 #   * commented out the lines starting with
@@ -2719,7 +2720,7 @@ $(OTTY)engrave.o: engrave.c $(HACK_H)
 $(OTTY)exper.o: exper.c $(HACK_H)
 $(OTTY)explode.o: explode.c $(HACK_H)
 $(OTTY)extralev.o: extralev.c $(HACK_H)
-$(OTTY)files.o: files.c #zlib.h $(HACK_H) $(INCL)\dlb.h \
+$(OTTY)files.o: files.c $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\wintty.h
 $(OTTY)fountain.o: fountain.c $(HACK_H)
 $(OTTY)getpos.o: getpos.c $(HACK_H)
@@ -3092,7 +3093,7 @@ $(OGUI)engrave.o: engrave.c $(HACK_H)
 $(OGUI)exper.o: exper.c $(HACK_H)
 $(OGUI)explode.o: explode.c $(HACK_H)
 $(OGUI)extralev.o: extralev.c $(HACK_H)
-$(OGUI)files.o: files.c #zlib.h $(HACK_H) $(INCL)\dlb.h \
+$(OGUI)files.o: files.c $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\wintty.h
 $(OGUI)fountain.o: fountain.c $(HACK_H)
 $(OGUI)getpos.o: getpos.c $(HACK_H)
