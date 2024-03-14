@@ -24,6 +24,7 @@ static struct artifact *get_artifact(struct obj *) NONNULL; /* never returns nul
 static boolean bane_applies(const struct artifact *, struct monst *) NONNULLARG12;
 static int spec_applies(const struct artifact *, struct monst *) NONNULLARG12;
 static int invoke_ok(struct obj *);
+static void nothing_special(struct obj *);
 static int arti_invoke(struct obj *);
 static boolean Mb_hit(struct monst * magr, struct monst *mdef,
                       struct obj *, int *, int, boolean, char *);
@@ -1664,6 +1665,13 @@ doinvoke(void)
     return arti_invoke(obj);
 }
 
+static void
+nothing_special(struct obj *obj)
+{
+    if (carried(obj))
+        You_feel("a surge of power, but nothing seems to happen.");
+}
+
 static int
 arti_invoke(struct obj *obj)
 {
@@ -1718,8 +1726,10 @@ arti_invoke(struct obj *obj)
                              due to PermaBlind or eyeless polymorph;
                              vary the message in that situation */
                           && (HBlinded & ~TIMEOUT) != 0L) ? "slightly " : "");
-            else
-                goto nothing_special;
+            else {
+                nothing_special(obj);
+                return ECMD_TIME;
+            }
             if (healamt > 0) {
                 if (Upolyd)
                     u.mh += healamt;
@@ -1746,8 +1756,10 @@ arti_invoke(struct obj *obj)
                 u.uen += epboost;
                 disp.botl = TRUE;
                 You_feel("re-energized.");
-            } else
-                goto nothing_special;
+            } else {
+                nothing_special(obj);
+                return ECMD_TIME;
+            }
             break;
         }
         case UNTRAP: {
@@ -1806,7 +1818,8 @@ arti_invoke(struct obj *obj)
                 n = select_menu(tmpwin, PICK_ONE, &selected);
                 if (n <= 0) {
                     destroy_nhwindow(tmpwin);
-                    goto nothing_special;
+                    nothing_special(obj);
+                    return ECMD_TIME;
                 }
                 i = selected[0].item.a_int - 1;
                 free((genericptr_t) selected);
@@ -1844,8 +1857,10 @@ arti_invoke(struct obj *obj)
         case CREATE_AMMO: {
             struct obj *otmp = mksobj(ARROW, TRUE, FALSE);
 
-            if (!otmp)
-                goto nothing_special;
+            if (!otmp) {
+                nothing_special(obj);
+                return ECMD_TIME;
+            }
             otmp->blessed = obj->blessed;
             otmp->cursed = obj->cursed;
             otmp->bknown = obj->bknown;
@@ -1936,10 +1951,8 @@ arti_invoke(struct obj *obj)
         }
 
         if ((eprop & ~W_ARTI) || iprop) {
- nothing_special:
             /* you had the property from some other source too */
-            if (carried(obj))
-                You_feel("a surge of power, but nothing seems to happen.");
+            nothing_special(obj);
             return ECMD_TIME;
         }
         switch (oart->inv_prop) {
@@ -1957,8 +1970,10 @@ arti_invoke(struct obj *obj)
                 (void) float_down(I_SPECIAL | TIMEOUT, W_ARTI);
             break;
         case INVIS:
-            if (BInvis || Blind)
-                goto nothing_special;
+            if (BInvis || Blind) {
+                nothing_special(obj);
+                return ECMD_TIME;
+            }
             newsym(u.ux, u.uy);
             if (on)
                 Your("body takes on a %s transparency...",
