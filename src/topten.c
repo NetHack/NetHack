@@ -59,29 +59,29 @@ struct toptenentry {
 
 static struct toptenentry zerott;
 
-static void topten_print(const char *);
-static void topten_print_bold(const char *);
-static void outheader(void);
-static void outentry(int, struct toptenentry *, boolean);
-static void discardexcess(FILE *);
-static void readentry(FILE *, struct toptenentry *);
-static void writeentry(FILE *, struct toptenentry *);
+staticfn void topten_print(const char *);
+staticfn void topten_print_bold(const char *);
+staticfn void outheader(void);
+staticfn void outentry(int, struct toptenentry *, boolean);
+staticfn void discardexcess(FILE *);
+staticfn void readentry(FILE *, struct toptenentry *);
+staticfn void writeentry(FILE *, struct toptenentry *);
 #ifdef XLOGFILE
-static void writexlentry(FILE *, struct toptenentry *, int);
-static long encodexlogflags(void);
-static long encodeconduct(void);
-static long encodeachieve(boolean);
-static void add_achieveX(char *, const char *, boolean);
-static char *encode_extended_achievements(char *);
-static char *encode_extended_conducts(char *);
+staticfn void writexlentry(FILE *, struct toptenentry *, int);
+staticfn long encodexlogflags(void);
+staticfn long encodeconduct(void);
+staticfn long encodeachieve(boolean);
+staticfn void add_achieveX(char *, const char *, boolean);
+staticfn char *encode_extended_achievements(char *);
+staticfn char *encode_extended_conducts(char *);
 #endif
-static void free_ttlist(struct toptenentry *);
-static int classmon(char *);
-static int score_wanted(boolean, int, struct toptenentry *, int,
+staticfn void free_ttlist(struct toptenentry *);
+staticfn int classmon(char *);
+staticfn int score_wanted(boolean, int, struct toptenentry *, int,
                         const char **, int);
 #ifdef NO_SCAN_BRACK
-static void nsb_mung_line(char *);
-static void nsb_unmung_line(char *);
+staticfn void nsb_mung_line(char *);
+staticfn void nsb_unmung_line(char *);
 #endif
 
 /* "killed by",&c ["an"] 'gk.killer.name' */
@@ -158,7 +158,7 @@ formatkiller(
     }
 }
 
-static void
+staticfn void
 topten_print(const char *x)
 {
     if (gt.toptenwin == WIN_ERR)
@@ -167,7 +167,7 @@ topten_print(const char *x)
         putstr(gt.toptenwin, ATR_NONE, x);
 }
 
-static void
+staticfn void
 topten_print_bold(const char *x)
 {
     if (gt.toptenwin == WIN_ERR)
@@ -201,7 +201,7 @@ observable_depth(d_level *lev)
 }
 
 /* throw away characters until current record has been entirely consumed */
-static void
+staticfn void
 discardexcess(FILE *rfile)
 {
     int c;
@@ -213,7 +213,7 @@ discardexcess(FILE *rfile)
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
-static void
+staticfn void
 readentry(FILE *rfile, struct toptenentry *tt)
 {
     char inbuf[SCANBUFSZ], s1[SCANBUFSZ], s2[SCANBUFSZ], s3[SCANBUFSZ],
@@ -294,7 +294,7 @@ readentry(FILE *rfile, struct toptenentry *tt)
     }
 }
 
-static void
+staticfn void
 writeentry(FILE *rfile, struct toptenentry *tt)
 {
     static const char fmt32[] = "%c%c ";        /* role,gender */
@@ -333,7 +333,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 #ifdef XLOGFILE
 
 /* as tab is never used in eg. gp.plname or death, no need to mangle those. */
-static void
+staticfn void
 writexlentry(FILE *rfile, struct toptenentry *tt, int how)
 {
 #define Fprintf (void) fprintf
@@ -386,7 +386,7 @@ writexlentry(FILE *rfile, struct toptenentry *tt, int how)
 #undef XLOG_SEP
 }
 
-static long
+staticfn long
 encodexlogflags(void)
 {
     long e = 0L;
@@ -401,7 +401,7 @@ encodexlogflags(void)
     return e;
 }
 
-static long
+staticfn long
 encodeconduct(void)
 {
     long e = 0L;
@@ -445,7 +445,7 @@ encodeconduct(void)
     return e;
 }
 
-static long
+staticfn long
 encodeachieve(
     boolean secondlong) /* False: handle achievements 1..31, True: 32..62 */
 {
@@ -470,7 +470,7 @@ encodeachieve(
 }
 
 /* add the achievement or conduct comma-separated to string */
-static void
+staticfn void
 add_achieveX(char *buf, const char *achievement, boolean condition)
 {
     if (condition) {
@@ -481,7 +481,7 @@ add_achieveX(char *buf, const char *achievement, boolean condition)
     }
 }
 
-static char *
+staticfn char *
 encode_extended_achievements(char *buf)
 {
     char rnkbuf[40];
@@ -574,7 +574,7 @@ encode_extended_achievements(char *buf)
     return buf;
 }
 
-static char *
+staticfn char *
 encode_extended_conducts(char *buf)
 {
     buf[0] = '\0';
@@ -603,7 +603,7 @@ encode_extended_conducts(char *buf)
 
 #endif /* XLOGFILE */
 
-static void
+staticfn void
 free_ttlist(struct toptenentry *tt)
 {
     struct toptenentry *ttnext;
@@ -917,7 +917,7 @@ topten(int how, time_t when)
     }
 }
 
-static void
+staticfn void
 outheader(void)
 {
     char linebuf[BUFSZ];
@@ -934,7 +934,7 @@ outheader(void)
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* so>0: standout line; so=0: ordinary line */
-static void
+staticfn void
 outentry(int rank, struct toptenentry *t1, boolean so)
 {
     boolean second_line = TRUE;
@@ -1100,7 +1100,7 @@ outentry(int rank, struct toptenentry *t1, boolean so)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
-static int
+staticfn int
 score_wanted(
     boolean current_ver,
     int rank,
@@ -1344,7 +1344,7 @@ prscore(int argc, char **argv)
 #endif
 }
 
-static int
+staticfn int
 classmon(char *plch)
 {
     int i;
@@ -1459,7 +1459,7 @@ tt_doppel(struct monst *mon) {
 /* Lattice scanf isn't up to reading the scorefile.  What */
 /* follows deals with that; I admit it's ugly. (KL) */
 /* Now generally available (KL) */
-static void
+staticfn void
 nsb_mung_line(p)
 char *p;
 {
@@ -1467,7 +1467,7 @@ char *p;
         *p = '|';
 }
 
-static void
+staticfn void
 nsb_unmung_line(p)
 char *p;
 {

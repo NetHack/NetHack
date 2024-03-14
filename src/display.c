@@ -123,32 +123,32 @@
  */
 #include "hack.h"
 
-static void show_mon_or_warn(coordxy, coordxy, int);
-static void display_monster(coordxy, coordxy,
+staticfn void show_mon_or_warn(coordxy, coordxy, int);
+staticfn void display_monster(coordxy, coordxy,
                             struct monst *, int, boolean) NONNULLPTRS;
-static int swallow_to_glyph(int, int);
-static void display_warning(struct monst *) NONNULLARG1;
-static boolean next_to_gas(struct monst *, coordxy, coordxy) NONNULLARG1;
+staticfn int swallow_to_glyph(int, int);
+staticfn void display_warning(struct monst *) NONNULLARG1;
+staticfn boolean next_to_gas(struct monst *, coordxy, coordxy) NONNULLARG1;
 
-static int check_pos(coordxy, coordxy, int);
-static void get_bkglyph_and_framecolor(coordxy x, coordxy y, int *, uint32 *);
-static int tether_glyph(coordxy, coordxy);
-static void mimic_light_blocking(struct monst *) NONNULLARG1;
+staticfn int check_pos(coordxy, coordxy, int);
+staticfn void get_bkglyph_and_framecolor(coordxy x, coordxy y, int *, uint32 *);
+staticfn int tether_glyph(coordxy, coordxy);
+staticfn void mimic_light_blocking(struct monst *) NONNULLARG1;
 
 /*#define WA_VERBOSE*/ /* give (x,y) locations for all "bad" spots */
 #ifdef WA_VERBOSE
-static boolean more_than_one(coordxy, coordxy, coordxy, coordxy, coordxy);
+staticfn boolean more_than_one(coordxy, coordxy, coordxy, coordxy, coordxy);
 #endif
 
-static int set_twall(coordxy, coordxy, coordxy, coordxy,
+staticfn int set_twall(coordxy, coordxy, coordxy, coordxy,
                      coordxy, coordxy, coordxy, coordxy);
-static int set_wall(coordxy, coordxy, int);
-static int set_corn(coordxy, coordxy, coordxy, coordxy,
+staticfn int set_wall(coordxy, coordxy, int);
+staticfn int set_corn(coordxy, coordxy, coordxy, coordxy,
                     coordxy, coordxy, coordxy, coordxy);
-static int set_crosswall(coordxy, coordxy);
-static void set_seenv(struct rm *, coordxy, coordxy, coordxy, coordxy);
-static void t_warn(struct rm *);
-static int wall_angle(struct rm *);
+staticfn int set_crosswall(coordxy, coordxy);
+staticfn void set_seenv(struct rm *, coordxy, coordxy, coordxy, coordxy);
+staticfn void t_warn(struct rm *);
+staticfn int wall_angle(struct rm *);
 
 #define _glyph_at(x, y) gg.gbuf[y][x].glyphinfo.glyph
 
@@ -468,7 +468,7 @@ map_location(coordxy x, coordxy y, int show)
 }
 
 /* display something on monster layer; may need to fixup object layer */
-static void
+staticfn void
 show_mon_or_warn(coordxy x, coordxy y, int monglyph)
 {
     struct obj *o;
@@ -500,7 +500,7 @@ show_mon_or_warn(coordxy x, coordxy y, int monglyph)
  * a worm tail.
  *
  */
-static void
+staticfn void
 display_monster(
     coordxy x, coordxy y,   /* display position */
     struct monst *mon,      /* monster to display */
@@ -619,7 +619,7 @@ display_monster(
  *
  * Do not call for worm tails.
  */
-static void
+staticfn void
 display_warning(struct monst *mon)
 {
     coordxy x = mon->mx, y = mon->my;
@@ -653,7 +653,7 @@ warning_of(struct monst *mon)
 
 /* returns True if mon is adjacent and would be seen if vision wasn't
    blocked by being in a gas cloud (implicit; caller has already checked) */
-static boolean
+staticfn boolean
 next_to_gas(
     struct monst *mon,
     coordxy mx, coordxy my) /* won't match mon->mx,my if long worm's tail */
@@ -1072,7 +1072,7 @@ shieldeff(coordxy x, coordxy y)
     }
 }
 
-static int
+staticfn int
 tether_glyph(coordxy x, coordxy y)
 {
     int tdx, tdy;
@@ -1473,7 +1473,7 @@ see_monsters(void)
         newsym(u.ux, u.uy);
 }
 
-static void
+staticfn void
 mimic_light_blocking(struct monst *mtmp)
 {
     if (mtmp->minvis && is_lightblocker_mappear(mtmp)) {
@@ -1583,7 +1583,7 @@ static glyph_info no_ginfo = {
      : &gg.gbuf[(y)][(x)].glyphinfo)
 #else
 static glyph_info ginfo;
-static glyph_info *glyphinfo_at(coordxy, coordxy, int);
+staticfn glyph_info *glyphinfo_at(coordxy, coordxy, int);
 #define Glyphinfo_at(x, y, glyph) glyphinfo_at((x), (y), (glyph))
 #endif
 
@@ -2343,7 +2343,7 @@ back_to_glyph(coordxy x, coordxy y)
  * If you don't want a patchwork monster while hallucinating, decide on
  * a random monster in swallowed() and don't use what_mon() here.
  */
-static int
+staticfn int
 swallow_to_glyph(int mnum, int loc)
 {
     int m_3 = what_mon(mnum, rn2_on_display_rng) << 3;
@@ -2413,7 +2413,7 @@ glyphinfo_at(coordxy x, coordxy y, int glyph)
  *
  */
 
-static void
+staticfn void
 get_bkglyph_and_framecolor(
     coordxy x, coordxy y,
     int *bkglyph,
@@ -2609,9 +2609,9 @@ int wallcolors[sokoban_walls + 1] = {
      && gl.level.objects[(x)][(y)]->nexthere)
 #endif
 
-static int cmap_to_roguecolor(int);
+staticfn int cmap_to_roguecolor(int);
 
-static int
+staticfn int
 cmap_to_roguecolor(int cmap)
 {
     int color = NO_COLOR;
@@ -3006,8 +3006,8 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
 
 #ifdef WA_VERBOSE
 
-static const char *type_to_name(int);
-static void error4(coordxy, coordxy, int, int, int, int);
+staticfn const char *type_to_name(int);
+staticfn void error4(coordxy, coordxy, int, int, int, int);
 
 static int bad_count[MAX_TYPE]; /* count of positions flagged as bad */
 static const char *const type_names[MAX_TYPE] = {
@@ -3020,13 +3020,13 @@ static const char *const type_names[MAX_TYPE] = {
     "CLOUD"
 };
 
-static const char *
+staticfn const char *
 type_to_name(int type)
 {
     return (type < 0 || type >= MAX_TYPE) ? "unknown" : type_names[type];
 }
 
-static void
+staticfn void
 error4(coordxy x, coordxy y, int a, int b, int c, int dd)
 {
     pline("set_wall_state: %s @ (%d,%d) %s%s%s%s",
@@ -3042,7 +3042,7 @@ error4(coordxy x, coordxy y, int a, int b, int c, int dd)
  *
  * Things that are ambiguous: lava
  */
-static int
+staticfn int
 check_pos(coordxy x, coordxy y, int which)
 {
     int type;
@@ -3058,7 +3058,7 @@ check_pos(coordxy x, coordxy y, int which)
 /* Return TRUE if more than one is non-zero. */
 /*ARGSUSED*/
 #ifdef WA_VERBOSE
-static boolean
+staticfn boolean
 more_than_one(coordxy x, coordxy y, coordxy a, coordxy b, coordxy c)
 {
     if ((a && (b | c)) || (b && (a | c)) || (c && (a | b))) {
@@ -3073,7 +3073,7 @@ more_than_one(coordxy x, coordxy y, coordxy a, coordxy b, coordxy c)
 #endif
 
 /* Return the wall mode for a T wall. */
-static int
+staticfn int
 set_twall(
 #ifdef WA_VERBOSE
           coordxy x0, coordxy y0, /* used #if WA_VERBOSE */
@@ -3096,7 +3096,7 @@ set_twall(
 }
 
 /* Return wall mode for a horizontal or vertical wall. */
-static int
+staticfn int
 set_wall(coordxy x, coordxy y, int horiz)
 {
     int wmode, is_1, is_2;
@@ -3117,7 +3117,7 @@ set_wall(coordxy x, coordxy y, int horiz)
 }
 
 /* Return a wall mode for a corner wall. (x4,y4) is the "inner" position. */
-static int
+staticfn int
 set_corn(coordxy x1, coordxy y1, coordxy x2, coordxy y2, coordxy x3, coordxy y3, coordxy x4, coordxy y4)
 {
     coordxy wmode, is_1, is_2, is_3, is_4;
@@ -3145,7 +3145,7 @@ set_corn(coordxy x1, coordxy y1, coordxy x2, coordxy y2, coordxy x3, coordxy y3,
 }
 
 /* Return mode for a crosswall. */
-static int
+staticfn int
 set_crosswall(coordxy x, coordxy y)
 {
     coordxy wmode, is_1, is_2, is_3, is_4;
@@ -3274,7 +3274,7 @@ const seenV seenv_matrix[3][3] = {
 #define sign(z) ((z) < 0 ? -1 : ((z) != 0))
 
 /* Set the seen vector of lev as if seen from (x0,y0) to (x,y). */
-static void
+staticfn void
 set_seenv(
     struct rm *lev,
     coordxy x0, coordxy y0, /* from */
@@ -3358,7 +3358,7 @@ static const int cross_matrix[4][6] = {
 };
 
 /* Print out a T wall warning and all interesting info. */
-static void
+staticfn void
 t_warn(struct rm *lev)
 {
     static const char warn_str[] = "wall_angle: %s: case %d: seenv = 0x%x";
@@ -3418,7 +3418,7 @@ t_warn(struct rm *lev)
  * draw diagrams.  See rm.h for more details on the wall modes and
  * seen vector (SV).
  */
-static int
+staticfn int
 wall_angle(struct rm *lev)
 {
     unsigned int seenv = lev->seenv & 0xff;

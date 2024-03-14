@@ -8,51 +8,51 @@
 #define Your_Own_Role(mndx)  ((mndx) == gu.urole.mnum)
 #define Your_Own_Race(mndx)  ((mndx) == gu.urace.mnum)
 
-static boolean learnscrolltyp(short);
-static void cap_spe(struct obj *);
-static char *erode_obj_text(struct obj *, char *);
-static char *hawaiian_design(struct obj *, char *);
-static int read_ok(struct obj *);
-static void stripspe(struct obj *);
-static void p_glow1(struct obj *);
-static void p_glow2(struct obj *, const char *);
-static void forget(int);
-static int maybe_tame(struct monst *, struct obj *);
-static boolean can_center_cloud(coordxy, coordxy);
-static void display_stinking_cloud_positions(boolean);
-static void seffect_enchant_armor(struct obj **);
-static void seffect_destroy_armor(struct obj **);
-static void seffect_confuse_monster(struct obj **);
-static void seffect_scare_monster(struct obj **);
-static void seffect_remove_curse(struct obj **);
-static void seffect_create_monster(struct obj **);
-static void seffect_enchant_weapon(struct obj **);
-static void seffect_taming(struct obj **);
-static void seffect_genocide(struct obj **);
-static void seffect_light(struct obj **);
-static void seffect_charging(struct obj **);
-static void seffect_amnesia(struct obj **);
-static void seffect_fire(struct obj **);
-static void seffect_earth(struct obj **);
-static void seffect_punishment(struct obj **);
-static void seffect_stinking_cloud(struct obj **);
-static void seffect_blank_paper(struct obj **);
-static void seffect_teleportation(struct obj **);
-static void seffect_gold_detection(struct obj **);
-static void seffect_food_detection(struct obj **);
-static void seffect_identify(struct obj **);
-static void seffect_magic_mapping(struct obj **);
+staticfn boolean learnscrolltyp(short);
+staticfn void cap_spe(struct obj *);
+staticfn char *erode_obj_text(struct obj *, char *);
+staticfn char *hawaiian_design(struct obj *, char *);
+staticfn int read_ok(struct obj *);
+staticfn void stripspe(struct obj *);
+staticfn void p_glow1(struct obj *);
+staticfn void p_glow2(struct obj *, const char *);
+staticfn void forget(int);
+staticfn int maybe_tame(struct monst *, struct obj *);
+staticfn boolean can_center_cloud(coordxy, coordxy);
+staticfn void display_stinking_cloud_positions(boolean);
+staticfn void seffect_enchant_armor(struct obj **);
+staticfn void seffect_destroy_armor(struct obj **);
+staticfn void seffect_confuse_monster(struct obj **);
+staticfn void seffect_scare_monster(struct obj **);
+staticfn void seffect_remove_curse(struct obj **);
+staticfn void seffect_create_monster(struct obj **);
+staticfn void seffect_enchant_weapon(struct obj **);
+staticfn void seffect_taming(struct obj **);
+staticfn void seffect_genocide(struct obj **);
+staticfn void seffect_light(struct obj **);
+staticfn void seffect_charging(struct obj **);
+staticfn void seffect_amnesia(struct obj **);
+staticfn void seffect_fire(struct obj **);
+staticfn void seffect_earth(struct obj **);
+staticfn void seffect_punishment(struct obj **);
+staticfn void seffect_stinking_cloud(struct obj **);
+staticfn void seffect_blank_paper(struct obj **);
+staticfn void seffect_teleportation(struct obj **);
+staticfn void seffect_gold_detection(struct obj **);
+staticfn void seffect_food_detection(struct obj **);
+staticfn void seffect_identify(struct obj **);
+staticfn void seffect_magic_mapping(struct obj **);
 #ifdef MAIL_STRUCTURES
-static void seffect_mail(struct obj **);
+staticfn void seffect_mail(struct obj **);
 #endif /* MAIL_STRUCTURES */
-static void set_lit(coordxy, coordxy, genericptr);
-static void do_class_genocide(void);
-static void do_stinking_cloud(struct obj *, boolean);
-static boolean create_particular_parse(char *,
+staticfn void set_lit(coordxy, coordxy, genericptr);
+staticfn void do_class_genocide(void);
+staticfn void do_stinking_cloud(struct obj *, boolean);
+staticfn boolean create_particular_parse(char *,
                                        struct _create_particular_data *);
-static boolean create_particular_creation(struct _create_particular_data *);
+staticfn boolean create_particular_creation(struct _create_particular_data *);
 
-static boolean
+staticfn boolean
 learnscrolltyp(short scrolltyp)
 {
     if (!objects[scrolltyp].oc_name_known) {
@@ -74,7 +74,7 @@ learnscroll(struct obj *sobj)
 }
 
 /* max spe is +99, min is -99 */
-static void
+staticfn void
 cap_spe(struct obj *obj)
 {
     if (obj) {
@@ -83,7 +83,7 @@ cap_spe(struct obj *obj)
     }
 }
 
-static char *
+staticfn char *
 erode_obj_text(struct obj *otmp, char *buf)
 {
     int erosion = greatest_erosion(otmp);
@@ -217,7 +217,7 @@ hawaiian_motif(struct obj *shirt, char *buf)
     return buf;
 }
 
-static char *
+staticfn char *
 hawaiian_design(struct obj *shirt, char *buf)
 {
     static const char *const hawaiian_bgs[] = {
@@ -308,7 +308,7 @@ assign_candy_wrapper(struct obj *obj)
 }
 
 /* getobj callback for object to read */
-static int
+staticfn int
 read_ok(struct obj *obj)
 {
     if (!obj)
@@ -643,7 +643,7 @@ doread(void)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
-static void
+staticfn void
 stripspe(struct obj *obj)
 {
     if (obj->blessed || obj->spe <= 0) {
@@ -658,13 +658,13 @@ stripspe(struct obj *obj)
     }
 }
 
-static void
+staticfn void
 p_glow1(struct obj *otmp)
 {
     pline("%s briefly.", Yobjnam2(otmp, Blind ? "vibrate" : "glow"));
 }
 
-static void
+staticfn void
 p_glow2(struct obj *otmp, const char *color)
 {
     pline("%s%s%s for a moment.", Yobjnam2(otmp, Blind ? "vibrate" : "glow"),
@@ -998,7 +998,7 @@ recharge(struct obj *obj, int curse_bless)
  * Other things are subject to flags:
  *      howmuch & ALL_SPELLS    = forget all spells
  */
-static void
+staticfn void
 forget(int howmuch)
 {
     struct monst *mtmp;
@@ -1022,7 +1022,7 @@ forget(int howmuch)
 }
 
 /* monster is hit by scroll of taming's effect */
-static int
+staticfn int
 maybe_tame(struct monst *mtmp, struct obj *sobj)
 {
     int was_tame = mtmp->mtame;
@@ -1057,7 +1057,7 @@ valid_cloud_pos(coordxy x, coordxy y)
 /* Callback for getpos_sethilite, also used in determining whether a scroll
  * should have its regular effects, or not because it was out of range.
  */
-static boolean
+staticfn boolean
 can_center_cloud(coordxy x, coordxy y)
 {
     if (!valid_cloud_pos(x, y))
@@ -1065,7 +1065,7 @@ can_center_cloud(coordxy x, coordxy y)
     return (cansee(x, y) && distu(x, y) < 32);
 }
 
-static void
+staticfn void
 display_stinking_cloud_positions(boolean on_off)
 {
     coordxy x, y, dx, dy;
@@ -1092,7 +1092,7 @@ display_stinking_cloud_positions(boolean on_off)
     }
 }
 
-static void
+staticfn void
 seffect_enchant_armor(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1242,7 +1242,7 @@ seffect_enchant_armor(struct obj **sobjp)
               Blind ? "again" : "unexpectedly");
 }
 
-static void
+staticfn void
 seffect_destroy_armor(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1290,7 +1290,7 @@ seffect_destroy_armor(struct obj **sobjp)
     }
 }
 
-static void
+staticfn void
 seffect_confuse_monster(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1345,7 +1345,7 @@ seffect_confuse_monster(struct obj **sobjp)
     }
 }
 
-static void
+staticfn void
 seffect_scare_monster(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1380,7 +1380,7 @@ seffect_scare_monster(struct obj **sobjp)
     }
 }
 
-static void
+staticfn void
 seffect_remove_curse(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp; /* scroll or fake spellbook */
@@ -1497,7 +1497,7 @@ seffect_remove_curse(struct obj **sobjp)
     update_inventory();
 }
 
-static void
+staticfn void
 seffect_create_monster(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1516,7 +1516,7 @@ seffect_create_monster(struct obj **sobjp)
      */
 }
 
-static void
+staticfn void
 seffect_enchant_weapon(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1566,7 +1566,7 @@ seffect_enchant_weapon(struct obj **sobjp)
         cap_spe(uwep);
 }
 
-static void
+staticfn void
 seffect_taming(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1609,7 +1609,7 @@ seffect_taming(struct obj **sobjp)
     }
 }
 
-static void
+staticfn void
 seffect_genocide(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1628,7 +1628,7 @@ seffect_genocide(struct obj **sobjp)
         do_genocide((!scursed) | (2 * !!Confusion));
 }
 
-static void
+staticfn void
 seffect_light(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1675,7 +1675,7 @@ seffect_light(struct obj **sobjp)
     }
 }
 
-static void
+staticfn void
 seffect_charging(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1717,7 +1717,7 @@ seffect_charging(struct obj **sobjp)
         recharge(otmp, scursed ? -1 : sblessed ? 1 : 0);
 }
 
-static void
+staticfn void
 seffect_amnesia(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1737,7 +1737,7 @@ seffect_amnesia(struct obj **sobjp)
     exercise(A_WIS, FALSE);
 }
 
-static void
+staticfn void
 seffect_fire(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1806,7 +1806,7 @@ seffect_fire(struct obj **sobjp)
 #undef ZT_SPELL_O_FIRE
 }
 
-static void
+staticfn void
 seffect_earth(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1863,7 +1863,7 @@ seffect_earth(struct obj **sobjp)
     }
 }
 
-static void
+staticfn void
 seffect_punishment(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1878,7 +1878,7 @@ seffect_punishment(struct obj **sobjp)
     punish(sobj);
 }
 
-static void
+staticfn void
 seffect_stinking_cloud(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1892,7 +1892,7 @@ seffect_stinking_cloud(struct obj **sobjp)
     do_stinking_cloud(sobj, already_known);
 }
 
-static void
+staticfn void
 seffect_blank_paper(struct obj **sobjp UNUSED)
 {
     if (Blind)
@@ -1902,7 +1902,7 @@ seffect_blank_paper(struct obj **sobjp UNUSED)
     gk.known = TRUE;
 }
 
-static void
+staticfn void
 seffect_teleportation(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1922,7 +1922,7 @@ seffect_teleportation(struct obj **sobjp)
     }
 }
 
-static void
+staticfn void
 seffect_gold_detection(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1933,7 +1933,7 @@ seffect_gold_detection(struct obj **sobjp)
         *sobjp = 0; /* failure: strange_feeling() -> useup() */
 }
 
-static void
+staticfn void
 seffect_food_detection(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1942,7 +1942,7 @@ seffect_food_detection(struct obj **sobjp)
         *sobjp = 0; /* nothing detected: strange_feeling -> useup */
 }
 
-static void
+staticfn void
 seffect_identify(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -1989,7 +1989,7 @@ seffect_identify(struct obj **sobjp)
     }
 }
 
-static void
+staticfn void
 seffect_magic_mapping(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -2041,7 +2041,7 @@ seffect_magic_mapping(struct obj **sobjp)
 }
 
 #ifdef MAIL_STRUCTURES
-static void
+staticfn void
 seffect_mail(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
@@ -2354,7 +2354,7 @@ static struct litmon *gremlins = 0;
 /*
  * Low-level lit-field update routine.
  */
-static void
+staticfn void
 set_lit(coordxy x, coordxy y, genericptr_t val)
 {
     struct monst *mtmp;
@@ -2510,7 +2510,7 @@ litroom(
     return;
 }
 
-static void
+staticfn void
 do_class_genocide(void)
 {
     int i, j, immunecnt, gonecnt, goodcnt, class, feel_dead = 0;
@@ -2946,7 +2946,7 @@ unpunish(void)
 
 /* Prompt the player to create a stinking cloud and then create it if they give
  * a location. */
-static void
+staticfn void
 do_stinking_cloud(struct obj *sobj, boolean mention_stinking)
 {
     coord cc;
@@ -3001,7 +3001,7 @@ cant_revive(
     return FALSE;
 }
 
-static boolean
+staticfn boolean
 create_particular_parse(
     char *str,
     struct _create_particular_data *d)
@@ -3116,7 +3116,7 @@ create_particular_parse(
     return FALSE;
 }
 
-static boolean
+staticfn boolean
 create_particular_creation(
     struct _create_particular_data *d)
 {

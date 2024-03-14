@@ -33,55 +33,56 @@ struct lchoice {
 };
 
 #if 0
-static void Fread(genericptr_t, int, int, dlb *);
+staticfn void Fread(genericptr_t, int, int, dlb *);
 #endif
-static xint16 dname_to_dnum(const char *);
-static int find_branch(const char *, struct proto_dungeon *);
-static xint16 parent_dnum(const char *, struct proto_dungeon *);
-static int level_range(xint16, int, int, int, struct proto_dungeon *, int *);
-static xint16 parent_dlevel(const char *, struct proto_dungeon *);
-static int correct_branch_type(struct tmpbranch *);
-static branch *add_branch(int, int, struct proto_dungeon *);
-static void add_level(s_level *);
-static void init_level(int, int, struct proto_dungeon *);
-static int possible_places(int, boolean *, struct proto_dungeon *);
-static xint16 pick_level(boolean *, int);
-static boolean place_level(int, struct proto_dungeon *);
-static int get_dgn_flags(lua_State *);
-static int get_dgn_align(lua_State *);
-static void init_dungeon_levels(lua_State *, struct proto_dungeon *, int);
-static void init_dungeon_branches(lua_State *, struct proto_dungeon *, int);
-static void init_dungeon_set_entry(struct proto_dungeon *, int);
-static void init_dungeon_set_depth(struct proto_dungeon *, int);
-static void init_castle_tune(void);
-static void fixup_level_locations(void);
-static void free_proto_dungeon(struct proto_dungeon *);
-static boolean init_dungeon_dungeons(lua_State *, struct proto_dungeon *, int);
-static boolean unplaced_floater(struct dungeon *);
-static boolean unreachable_level(d_level *, boolean);
-static void tport_menu(winid, char *, struct lchoice *, d_level *, boolean);
-static const char *br_string(int);
-static char chr_u_on_lvl(d_level *);
-static void print_branch(winid, int, int, int, boolean, struct lchoice *);
-static char *get_annotation(d_level *);
-static void query_annotation(d_level *);
-static mapseen *load_mapseen(NHFILE *);
-static void save_mapseen(NHFILE *, mapseen *);
-static mapseen *find_mapseen(d_level *);
-static mapseen *find_mapseen_by_str(const char *);
-static void print_mapseen(winid, mapseen *, int, int, boolean);
-static boolean interest_mapseen(mapseen *);
-static void count_feat_lastseentyp(mapseen *, coordxy, coordxy);
-static void traverse_mapseenchn(int, winid, int, int, int *);
-static const char *seen_string(xint16, const char *);
-static const char *br_string2(branch *);
-static const char *shop_string(int);
-static char *tunesuffix(mapseen *, char *, size_t);
+staticfn xint16 dname_to_dnum(const char *);
+staticfn int find_branch(const char *, struct proto_dungeon *);
+staticfn xint16 parent_dnum(const char *, struct proto_dungeon *);
+staticfn int level_range(xint16, int, int, int, struct proto_dungeon *, int *);
+staticfn xint16 parent_dlevel(const char *, struct proto_dungeon *);
+staticfn int correct_branch_type(struct tmpbranch *);
+staticfn branch *add_branch(int, int, struct proto_dungeon *);
+staticfn void add_level(s_level *);
+staticfn void init_level(int, int, struct proto_dungeon *);
+staticfn int possible_places(int, boolean *, struct proto_dungeon *);
+staticfn xint16 pick_level(boolean *, int);
+staticfn boolean place_level(int, struct proto_dungeon *);
+staticfn int get_dgn_flags(lua_State *);
+staticfn int get_dgn_align(lua_State *);
+staticfn void init_dungeon_levels(lua_State *, struct proto_dungeon *, int);
+staticfn void init_dungeon_branches(lua_State *, struct proto_dungeon *, int);
+staticfn void init_dungeon_set_entry(struct proto_dungeon *, int);
+staticfn void init_dungeon_set_depth(struct proto_dungeon *, int);
+staticfn void init_castle_tune(void);
+staticfn void fixup_level_locations(void);
+staticfn void free_proto_dungeon(struct proto_dungeon *);
+staticfn boolean init_dungeon_dungeons(lua_State *, struct proto_dungeon *,
+                                      int);
+staticfn boolean unplaced_floater(struct dungeon *);
+staticfn boolean unreachable_level(d_level *, boolean);
+staticfn void tport_menu(winid, char *, struct lchoice *, d_level *, boolean);
+staticfn const char *br_string(int);
+staticfn char chr_u_on_lvl(d_level *);
+staticfn void print_branch(winid, int, int, int, boolean, struct lchoice *);
+staticfn char *get_annotation(d_level *);
+staticfn void query_annotation(d_level *);
+staticfn mapseen *load_mapseen(NHFILE *);
+staticfn void save_mapseen(NHFILE *, mapseen *);
+staticfn mapseen *find_mapseen(d_level *);
+staticfn mapseen *find_mapseen_by_str(const char *);
+staticfn void print_mapseen(winid, mapseen *, int, int, boolean);
+staticfn boolean interest_mapseen(mapseen *);
+staticfn void count_feat_lastseentyp(mapseen *, coordxy, coordxy);
+staticfn void traverse_mapseenchn(int, winid, int, int, int *);
+staticfn const char *seen_string(xint16, const char *);
+staticfn const char *br_string2(branch *);
+staticfn const char *shop_string(int);
+staticfn char *tunesuffix(mapseen *, char *, size_t);
 
 #ifdef DEBUG
-static void dumpit(void);
+staticfn void dumpit(void);
 
-static void
+staticfn void
 dumpit(void)
 {
 #define DD gd.dungeons[i]
@@ -265,7 +266,7 @@ restore_dungeon(NHFILE *nhfp)
 }
 
 #if 0
-static void
+staticfn void
 Fread(genericptr_t ptr, int size, int nitems, dlb *stream)
 {
     int cnt;
@@ -281,7 +282,7 @@ Fread(genericptr_t ptr, int size, int nitems, dlb *stream)
 
 DISABLE_WARNING_UNREACHABLE_CODE
 
-static xint16
+staticfn xint16
 dname_to_dnum(const char *s)
 {
     xint16 i;
@@ -308,7 +309,7 @@ find_level(const char *s)
 }
 
 /* Find the branch that links the named dungeon. */
-static int
+staticfn int
 find_branch(
     const char *s, /* dungeon name */
     struct proto_dungeon *pd)
@@ -343,7 +344,7 @@ DISABLE_WARNING_UNREACHABLE_CODE
  * Find the "parent" by searching the prototype branch list for the branch
  * listing, then figuring out to which dungeon it belongs.
  */
-static xint16
+staticfn xint16
 parent_dnum(
     const char *s, /* dungeon name */
     struct proto_dungeon *pd)
@@ -377,7 +378,7 @@ RESTORE_WARNING_UNREACHABLE_CODE
  *       a negative random component means from the (adjusted) base to the
  *       end of the dungeon.
  */
-static int
+staticfn int
 level_range(
     xint16 dgn,
     int base, int randc, int chain,
@@ -412,7 +413,7 @@ level_range(
     return 1;
 }
 
-static xint16
+staticfn xint16
 parent_dlevel(const char *s, struct proto_dungeon *pd)
 {
     int i, j, num, base, dnum = parent_dnum(s, pd);
@@ -437,7 +438,7 @@ parent_dlevel(const char *s, struct proto_dungeon *pd)
 }
 
 /* Convert from the temporary branch type to the dungeon branch type. */
-static int
+staticfn int
 correct_branch_type(struct tmpbranch *tbr)
 {
     switch (tbr->type) {
@@ -511,7 +512,7 @@ insert_branch(branch *new_branch, boolean extract_first)
 #undef branch_val
 
 /* Add a dungeon branch to the branch list. */
-static branch *
+staticfn branch *
 add_branch(
     int dgn, int child_entry_level,
     struct proto_dungeon *pd)
@@ -542,7 +543,7 @@ add_branch(
  * level that has a dungeon number less than the dungeon number of the
  * last entry.
  */
-static void
+staticfn void
 add_level(s_level *new_lev)
 {
     s_level *prev, *curr;
@@ -563,7 +564,7 @@ add_level(s_level *new_lev)
     }
 }
 
-static void
+staticfn void
 init_level(int dgn, int proto_index, struct proto_dungeon *pd)
 {
     s_level *new_level;
@@ -595,7 +596,7 @@ init_level(int dgn, int proto_index, struct proto_dungeon *pd)
     new_level->next = (s_level *) 0;
 }
 
-static int
+staticfn int
 possible_places(
     int idx,      /* prototype index */
     boolean *map, /* array MAXLEVEL+1 in length */
@@ -629,7 +630,7 @@ possible_places(
 DISABLE_WARNING_UNREACHABLE_CODE
 
 /* Pick the nth TRUE entry in the given boolean array. */
-static xint16
+staticfn xint16
 pick_level(
     boolean *map, /* an array MAXLEVEL+1 in size */
     int nth)
@@ -646,9 +647,9 @@ pick_level(
 RESTORE_WARNING_UNREACHABLE_CODE
 
 #ifdef DDEBUG
-static void indent(int);
+staticfn void indent(int);
 
-static void
+staticfn void
 indent(int d)
 {
     while (d-- > 0)
@@ -663,7 +664,7 @@ indent(int d)
  * all possible places have been tried.  If all possible places have
  * been exhausted, return false.
  */
-static boolean
+staticfn boolean
 place_level(int proto_index, struct proto_dungeon *pd)
 {
     boolean map[MAXLEVEL + 1]; /* valid levels are 1..MAXLEVEL inclusive */
@@ -741,7 +742,7 @@ static struct level_map {
 #undef X_LOCATE
 #undef X_GOAL
 
-static int
+staticfn int
 get_dgn_flags(lua_State *L)
 {
     int dgn_flags = 0;
@@ -778,7 +779,7 @@ get_dgn_flags(lua_State *L)
     return dgn_flags;
 }
 
-static int
+staticfn int
 get_dgn_align(lua_State *L)
 {
     static const char *const dgnaligns[] = {
@@ -794,7 +795,7 @@ get_dgn_align(lua_State *L)
     return a;
 }
 
-static void
+staticfn void
 init_dungeon_levels(
     lua_State *L,
     struct proto_dungeon *pd,
@@ -864,7 +865,7 @@ init_dungeon_levels(
         panic("init_dungeon: too many special levels");
 }
 
-static void
+staticfn void
 init_dungeon_branches(
     lua_State *L,
     struct proto_dungeon *pd,
@@ -930,7 +931,7 @@ init_dungeon_branches(
         panic("init_dungeon: too many branches");
 }
 
-static void
+staticfn void
 init_dungeon_set_entry(struct proto_dungeon *pd, int dngidx)
 {
     int dgn_entry = pd->tmpdungeon[dngidx].entry_lev;
@@ -957,7 +958,7 @@ init_dungeon_set_entry(struct proto_dungeon *pd, int dngidx)
     }
 }
 
-static void
+staticfn void
 init_dungeon_set_depth(struct proto_dungeon *pd, int dngidx)
 {
     branch *br;
@@ -994,7 +995,7 @@ init_dungeon_set_depth(struct proto_dungeon *pd, int dngidx)
         - (gd.dungeons[dngidx].entry_lev - 1);
 }
 
-static boolean
+staticfn boolean
 init_dungeon_dungeons(
    lua_State *L,
    struct proto_dungeon *pd,
@@ -1104,7 +1105,7 @@ init_dungeon_dungeons(
 }
 
 /* initialize the Castle drawbridge tune */
-static void
+staticfn void
 init_castle_tune(void)
 {
     int i;
@@ -1115,7 +1116,7 @@ init_castle_tune(void)
 }
 
 /* fix up the special level names and locations for quick access */
-static void
+staticfn void
 fixup_level_locations(void)
 {
     int i;
@@ -1177,7 +1178,7 @@ fixup_level_locations(void)
     }
 }
 
-static void
+staticfn void
 free_proto_dungeon(struct proto_dungeon *pd)
 {
     int i;
@@ -2130,7 +2131,7 @@ lev_by_name(const char *nam)
 
 #undef dlev_in_current_branch
 
-static boolean
+staticfn boolean
 unplaced_floater(struct dungeon *dptr)
 {
     branch *br;
@@ -2145,7 +2146,7 @@ unplaced_floater(struct dungeon *dptr)
     return FALSE;
 }
 
-static boolean
+staticfn boolean
 unreachable_level(d_level *lvl_p, boolean unplaced)
 {
     s_level *dummy;
@@ -2159,7 +2160,7 @@ unreachable_level(d_level *lvl_p, boolean unplaced)
     return FALSE;
 }
 
-static void
+staticfn void
 tport_menu(
     winid win,
     char *entry,
@@ -2195,7 +2196,7 @@ tport_menu(
 }
 
 /* Convert a branch type to a string usable by print_dungeon(). */
-static const char *
+staticfn const char *
 br_string(int type)
 {
     switch (type) {
@@ -2211,14 +2212,14 @@ br_string(int type)
     return " (unknown)";
 }
 
-static char
+staticfn char
 chr_u_on_lvl(d_level *dlev)
 {
     return u.uz.dnum == dlev->dnum && u.uz.dlevel == dlev->dlevel ? '*' : ' ';
 }
 
 /* Print all child branches between the lower and upper bounds. */
-static void
+staticfn void
 print_branch(
     winid win,
     int dnum, int lower_bound, int upper_bound,
@@ -2433,7 +2434,7 @@ recbranch_mapseen(d_level *source, d_level *dest)
     }
 }
 
-static char *
+staticfn char *
 get_annotation(d_level *lev)
 {
     mapseen *mptr;
@@ -2455,7 +2456,7 @@ print_level_annotation(void)
 
 /* ask user to annotate level lev.
    if lev is NULL, uses current level. */
-static void
+staticfn void
 query_annotation(d_level *lev)
 {
     mapseen *mptr;
@@ -2592,7 +2593,7 @@ load_exclusions(NHFILE *nhfp)
 }
 
 /* find the particular mapseen object in the chain; may return null */
-static mapseen *
+staticfn mapseen *
 find_mapseen(d_level *lev)
 {
     mapseen *mptr;
@@ -2604,7 +2605,7 @@ find_mapseen(d_level *lev)
     return mptr;
 }
 
-static mapseen *
+staticfn mapseen *
 find_mapseen_by_str(const char *s)
 {
     mapseen *mptr;
@@ -2650,7 +2651,7 @@ rm_mapseen(int ledger_num)
     }
 }
 
-static void
+staticfn void
 save_mapseen(NHFILE *nhfp, mapseen *mptr)
 {
     branch *curr;
@@ -2681,7 +2682,7 @@ save_mapseen(NHFILE *nhfp, mapseen *mptr)
     savecemetery(nhfp, &mptr->final_resting_place);
 }
 
-static mapseen *
+staticfn mapseen *
 load_mapseen(NHFILE *nhfp)
 {
     int branchnum = 0, brindx;
@@ -2842,7 +2843,7 @@ init_mapseen(d_level *lev)
   /* || (feat).water || (feat).ice || (feat).lava */
 
 /* returns true if this level has something interesting to print out */
-static boolean
+staticfn boolean
 interest_mapseen(mapseen *mptr)
 {
     if (on_level(&u.uz, &mptr->lev))
@@ -2913,7 +2914,7 @@ update_mapseen_for(coordxy x, coordxy y)
 }
 
 /* count mapseen feature from lastseentyp at x,y */
-static void
+staticfn void
 count_feat_lastseentyp(
     mapseen *mptr, /* remembered data for a level; update feat.X counts */
     coordxy x, coordxy y)
@@ -3304,7 +3305,7 @@ show_overview(
 }
 
 /* display endgame levels or non-endgame levels, not both */
-static void
+staticfn void
 traverse_mapseenchn(
     int viewendgame,    /* 0: show endgame branch; 1: show other branches */
     winid win,      /* output window */
@@ -3328,7 +3329,7 @@ traverse_mapseenchn(
     }
 }
 
-static const char *
+staticfn const char *
 seen_string(xint16 x, const char *obj)
 {
     /* players are computer scientists: 0, 1, 2, n */
@@ -3348,7 +3349,7 @@ seen_string(xint16 x, const char *obj)
 }
 
 /* better br_string */
-static const char *
+staticfn const char *
 br_string2(branch *br)
 {
     /* Special case: quest portal says closed if kicked from quest */
@@ -3400,7 +3401,7 @@ endgamelevelname(char *outbuf, int indx)
     return outbuf;
 }
 
-static const char *
+staticfn const char *
 shop_string(int rtype)
 {
     const char *str = "shop"; /* catchall */
@@ -3451,7 +3452,7 @@ shop_string(int rtype)
 
 /* if player knows about the mastermind tune, append it to Castle annotation;
    if drawbridge has been destroyed, flags.castletune will be zero */
-static char *
+staticfn char *
 tunesuffix(
     mapseen *mptr,
     char *outbuf,
@@ -3507,7 +3508,7 @@ tunesuffix(
         }                                                               \
     } while (0)
 
-static void
+staticfn void
 print_mapseen(
     winid win, mapseen *mptr,
     int final, /* -1: as menu; 0: not final;

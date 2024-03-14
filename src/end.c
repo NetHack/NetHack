@@ -20,26 +20,26 @@
 #define nowrap_add(a, b) (a = ((a + b) < 0 ? LONG_MAX : (a + b)))
 
 #ifndef NO_SIGNAL
-static void done_intr(int);
+staticfn void done_intr(int);
 # if defined(UNIX) || defined(VMS) || defined(__EMX__)
-static void done_hangup(int);
+staticfn void done_hangup(int);
 # endif
 #endif
-static void disclose(int, boolean);
-static void get_valuables(struct obj *) NO_NNARGS;
-static void sort_valuables(struct valuable_data *, int);
-static void artifact_score(struct obj *, boolean, winid);
-static boolean fuzzer_savelife(int);
+staticfn void disclose(int, boolean);
+staticfn void get_valuables(struct obj *) NO_NNARGS;
+staticfn void sort_valuables(struct valuable_data *, int);
+staticfn void artifact_score(struct obj *, boolean, winid);
+staticfn boolean fuzzer_savelife(int);
 ATTRNORETURN static void really_done(int) NORETURN;
-static void savelife(int);
-static boolean should_query_disclose_option(int, char *);
+staticfn void savelife(int);
+staticfn boolean should_query_disclose_option(int, char *);
 #ifdef DUMPLOG
-static void dump_plines(void);
+staticfn void dump_plines(void);
 #endif
-static void dump_everything(int, time_t);
-static void fixup_death(int);
-static int wordcount(char *);
-static void bel_copy1(char **, char *);
+staticfn void dump_everything(int, time_t);
+staticfn void fixup_death(int);
+staticfn int wordcount(char *);
+staticfn void bel_copy1(char **, char *);
 
 #if defined(__BEOS__) || defined(MICRO) || defined(OS2) || defined(WIN32)
 ATTRNORETURN extern void nethack_exit(int) NORETURN;
@@ -160,7 +160,7 @@ done2(void)
 #ifndef NO_SIGNAL
 /* called as signal() handler, so sent at least 1 arg */
 /*ARGSUSED*/
-static void
+staticfn void
 done_intr(int sig_unused UNUSED)
 {
     done_stopprint++;
@@ -175,7 +175,7 @@ done_intr(int sig_unused UNUSED)
 
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
 /* signal() handler */
-static void
+staticfn void
 done_hangup(int sig)
 {
 #ifdef HANGUPHANDLING
@@ -360,7 +360,7 @@ static const struct {
 
 /* clear away while-helpless when the cause of death caused that
    helplessness (ie, "petrified by <foo> while getting stoned") */
-static void
+staticfn void
 fixup_death(int how)
 {
     int i;
@@ -470,7 +470,7 @@ panic VA_DECL(const char *, str)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
-static boolean
+staticfn boolean
 should_query_disclose_option(int category, char *defquery)
 {
     int idx;
@@ -512,7 +512,7 @@ should_query_disclose_option(int category, char *defquery)
 }
 
 #ifdef DUMPLOG
-static void
+staticfn void
 dump_plines(void)
 {
     int i, j;
@@ -535,7 +535,7 @@ dump_plines(void)
 #endif  /* DUMPLOG */
 
 /*ARGSUSED*/
-static void
+staticfn void
 dump_everything(
     int how,     /* ASCENDED, ESCAPED, QUIT, etc */
     time_t when) /* date+time at end of game */
@@ -610,7 +610,7 @@ dump_everything(
 #endif
 }
 
-static void
+staticfn void
 disclose(int how, boolean taken)
 {
     char c = '\0', defquery;
@@ -694,7 +694,7 @@ disclose(int how, boolean taken)
 }
 
 /* try to get the player back in a viable state after being killed */
-static void
+staticfn void
 savelife(int how)
 {
     int uhpmin;
@@ -753,7 +753,7 @@ savelife(int how)
  * Get valuables from the given list.  Revised code: the list always remains
  * intact.
  */
-static void
+staticfn void
 get_valuables(struct obj *list) /* inventory or container contents */
 {
     struct obj *obj;
@@ -788,7 +788,7 @@ get_valuables(struct obj *list) /* inventory or container contents */
  *  Sort collected valuables, most frequent to least.  We could just
  *  as easily use qsort, but we don't care about efficiency here.
  */
-static void
+staticfn void
 sort_valuables(
     struct valuable_data list[],
     int size) /* max value is less than 20 */
@@ -897,7 +897,7 @@ done_object_cleanup(void)
 }
 
 /* called twice; first to calculate total, then to list relevant items */
-static void
+staticfn void
 artifact_score(
     struct obj *list,
     boolean counting, /* true => add up points; false => display them */
@@ -934,7 +934,7 @@ artifact_score(
 
 /* when dying while running the debug fuzzer, [almost] always keep going;
    True: forced survival; False: doomed unless wearing life-save amulet */
-static boolean
+staticfn boolean
 fuzzer_savelife(int how)
 {
     /*
@@ -1113,7 +1113,7 @@ done(int how)
 }
 
 /* separated from done() in order to specify the __noreturn__ attribute */
-static void
+staticfn void
 really_done(int how)
 {
     boolean taken;
@@ -1774,7 +1774,7 @@ restore_killers(NHFILE *nhfp)
     }
 }
 
-static int
+staticfn int
 wordcount(char *p)
 {
     int words = 0;
@@ -1790,7 +1790,7 @@ wordcount(char *p)
     return words;
 }
 
-static void
+staticfn void
 bel_copy1(char **inp, char *out)
 {
     char *in = *inp;

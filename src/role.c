@@ -696,10 +696,10 @@ const struct Align aligns[] = {
     { "evil", "unaligned", "Una", 0, A_NONE }
 };
 
-static int randrole_filtered(void);
-static char *promptsep(char *, int);
-static int role_gendercount(int);
-static int race_alignmentcount(int);
+staticfn int randrole_filtered(void);
+staticfn char *promptsep(char *, int);
+staticfn int role_gendercount(int);
+staticfn int race_alignmentcount(int);
 
 /* used by str2XXX() */
 static char NEARDATA randomstr[] = "random";
@@ -722,7 +722,7 @@ randrole(boolean for_display)
     return res;
 }
 
-static int
+staticfn int
 randrole_filtered(void)
 {
     int i, n = 0, set[SIZE(roles)];
@@ -1374,7 +1374,7 @@ clearrolefilter(int which)
     }
 }
 
-static char *
+staticfn char *
 promptsep(char *buf, int num_post_attribs)
 {
     const char *conjuct = "and ";
@@ -1389,7 +1389,7 @@ promptsep(char *buf, int num_post_attribs)
     return buf;
 }
 
-static int
+staticfn int
 role_gendercount(int rolenum)
 {
     int gendcount = 0;
@@ -1405,7 +1405,7 @@ role_gendercount(int rolenum)
     return gendcount;
 }
 
-static int
+staticfn int
 race_alignmentcount(int racenum)
 {
     int aligncount = 0;

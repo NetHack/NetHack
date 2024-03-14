@@ -7,29 +7,29 @@
 #include "mfndpos.h"
 #include "artifact.h"
 
-static void msg_mon_movement(struct monst *, coordxy, coordxy) NONNULLARG1;
-static void watch_on_duty(struct monst *);
-static int disturb(struct monst *);
-static void release_hero(struct monst *);
-static void distfleeck(struct monst *, int *, int *, int *);
-static int m_arrival(struct monst *);
-static void mind_blast(struct monst *);
-static boolean holds_up_web(coordxy, coordxy);
-static int count_webbing_walls(coordxy, coordxy);
-static boolean soko_allow_web(struct monst *);
-static boolean m_search_items(struct monst *, coordxy *, coordxy *, int *,
+staticfn void msg_mon_movement(struct monst *, coordxy, coordxy) NONNULLARG1;
+staticfn void watch_on_duty(struct monst *);
+staticfn int disturb(struct monst *);
+staticfn void release_hero(struct monst *);
+staticfn void distfleeck(struct monst *, int *, int *, int *);
+staticfn int m_arrival(struct monst *);
+staticfn void mind_blast(struct monst *);
+staticfn boolean holds_up_web(coordxy, coordxy);
+staticfn int count_webbing_walls(coordxy, coordxy);
+staticfn boolean soko_allow_web(struct monst *);
+staticfn boolean m_search_items(struct monst *, coordxy *, coordxy *, int *,
                               int *);
-static int postmov(struct monst *, struct permonst *, coordxy, coordxy, int,
-                   boolean, boolean, boolean, boolean);
-static boolean leppie_avoidance(struct monst *);
-static void leppie_stash(struct monst *);
-static boolean m_balks_at_approaching(struct monst *);
-static boolean stuff_prevents_passage(struct monst *);
-static int vamp_shift(struct monst *, struct permonst *, boolean);
-static void maybe_spin_web(struct monst *);
+staticfn int postmov(struct monst *, struct permonst *, coordxy, coordxy, int,
+                              boolean, boolean, boolean, boolean);
+staticfn boolean leppie_avoidance(struct monst *);
+staticfn void leppie_stash(struct monst *);
+staticfn boolean m_balks_at_approaching(struct monst *);
+staticfn boolean stuff_prevents_passage(struct monst *);
+staticfn int vamp_shift(struct monst *, struct permonst *, boolean);
+staticfn void maybe_spin_web(struct monst *);
 
 /* a11y: give a message when monster moved */
-static void
+staticfn void
 msg_mon_movement(struct monst *mtmp, coordxy omx, coordxy omy)
 {
     if (a11y.mon_movement && canspotmon(mtmp) && mtmp->mspotted) {
@@ -158,7 +158,7 @@ m_break_boulder(struct monst *mtmp, coordxy x, coordxy y)
     }
 }
 
-static void
+staticfn void
 watch_on_duty(struct monst *mtmp)
 {
     coordxy x, y;
@@ -299,7 +299,7 @@ mon_regen(struct monst *mon, boolean digest_meal)
  * Possibly awaken the given monster.  Return a 1 if the monster has been
  * jolted awake.
  */
-static int
+staticfn int
 disturb(struct monst *mtmp)
 {
     /*
@@ -334,7 +334,7 @@ disturb(struct monst *mtmp)
 }
 
 /* ungrab/expel held/swallowed hero */
-static void
+staticfn void
 release_hero(struct monst *mon)
 {
     if (mon == u.ustuck) {
@@ -478,7 +478,7 @@ monflee(
     mon_track_clear(mtmp);
 }
 
-static void
+staticfn void
 distfleeck(
     struct monst *mtmp,
     int *inrange, int *nearby, int *scared) /* output */
@@ -519,7 +519,7 @@ distfleeck(
 
 /* perform a special one-time action for a monster; returns -1 if nothing
    special happened, 0 if monster uses up its turn, 1 if monster is killed */
-static int
+staticfn int
 m_arrival(struct monst *mon)
 {
     mon->mstrategy &= ~STRAT_ARRIVE; /* always reset */
@@ -528,7 +528,7 @@ m_arrival(struct monst *mon)
 }
 
 /* a mind flayer unleashes a mind blast  */
-static void
+staticfn void
 mind_blast(struct monst *mtmp)
 {
     struct monst *m2, *nmon = (struct monst *) 0;
@@ -1052,7 +1052,7 @@ m_digweapon_check(
 }
 
 /* does leprechaun want to avoid the hero? */
-static boolean
+staticfn boolean
 leppie_avoidance(struct monst *mtmp)
 {
     struct obj *lepgold, *ygold;
@@ -1067,7 +1067,7 @@ leppie_avoidance(struct monst *mtmp)
 }
 
 /* unseen leprechaun with gold might stash it */
-static void
+staticfn void
 leppie_stash(struct monst *mtmp)
 {
     struct obj *gold;
@@ -1088,7 +1088,7 @@ leppie_stash(struct monst *mtmp)
 }
 
 /* does monster want to avoid you? */
-static boolean
+staticfn boolean
 m_balks_at_approaching(struct monst *mtmp)
 {
     /* peaceful, far away, or can't see you */
@@ -1115,7 +1115,7 @@ m_balks_at_approaching(struct monst *mtmp)
     return FALSE;
 }
 
-static boolean
+staticfn boolean
 holds_up_web(coordxy x, coordxy y)
 {
     stairway *sway;
@@ -1132,7 +1132,7 @@ holds_up_web(coordxy x, coordxy y)
 
 /* returns the number of walls in the four cardinal directions that could
    hold up a web */
-static int
+staticfn int
 count_webbing_walls(coordxy x, coordxy y)
 {
     return (holds_up_web(x, y - 1) + holds_up_web(x + 1, y)
@@ -1140,7 +1140,7 @@ count_webbing_walls(coordxy x, coordxy y)
 }
 
 /* reject webs which interfere with solving Sokoban */
-static boolean
+staticfn boolean
 soko_allow_web(struct monst *mon)
 {
     stairway *stway;
@@ -1157,7 +1157,7 @@ soko_allow_web(struct monst *mon)
 }
 
 /* monster might spin a web */
-static void
+staticfn void
 maybe_spin_web(struct monst *mtmp)
 {
     if (webmaker(mtmp->data)
@@ -1188,7 +1188,7 @@ maybe_spin_web(struct monst *mtmp)
 #define SQSRCHRADIUS 5
 
 /* monster looks for items it wants nearby */
-static boolean
+staticfn boolean
 m_search_items(
     struct monst *mtmp,
     coordxy *ggx, coordxy *ggy,
@@ -1313,7 +1313,7 @@ finish_search:
 
 #undef SQSRCHRADIUS
 
-static int
+staticfn int
 postmov(
     struct monst *mtmp,
     struct permonst *ptr,
@@ -2156,7 +2156,7 @@ undesirable_disp(
  * Inventory prevents passage under door.
  * Used by can_ooze() and can_fog().
  */
-static boolean
+staticfn boolean
 stuff_prevents_passage(struct monst *mtmp)
 {
     struct obj *chain, *obj;
@@ -2211,7 +2211,7 @@ can_fog(struct monst *mtmp)
     return FALSE;
 }
 
-static int
+staticfn int
 vamp_shift(
     struct monst *mon,
     struct permonst *ptr,

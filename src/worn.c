@@ -5,10 +5,10 @@
 
 #include "hack.h"
 
-static void m_lose_armor(struct monst *, struct obj *, boolean) NONNULLPTRS;
-static void clear_bypass(struct obj *) NO_NNARGS;
-static void m_dowear_type(struct monst *, long, boolean, boolean) NONNULLARG1;
-static int extra_pref(struct monst *, struct obj *) NONNULLARG1;
+staticfn void m_lose_armor(struct monst *, struct obj *, boolean) NONNULLPTRS;
+staticfn void clear_bypass(struct obj *) NO_NNARGS;
+staticfn void m_dowear_type(struct monst *, long, boolean, boolean) NONNULLARG1;
+staticfn int extra_pref(struct monst *, struct obj *) NONNULLARG1;
 
 const struct worn {
     long w_mask;
@@ -698,7 +698,7 @@ m_dowear(struct monst *mon, boolean creation)
         m_dowear_type(mon, W_ARM, creation, RACE_EXCEPTION);
 }
 
-static void
+staticfn void
 m_dowear_type(
     struct monst *mon,
     long flag,               /* wornmask value */
@@ -922,7 +922,7 @@ which_armor(struct monst *mon, long flag)
 }
 
 /* remove an item of armor and then drop it */
-static void
+staticfn void
 m_lose_armor(
     struct monst *mon,
     struct obj *obj,
@@ -937,7 +937,7 @@ m_lose_armor(
 }
 
 /* clear bypass bits for an object chain, plus contents if applicable */
-static void
+staticfn void
 clear_bypass(struct obj *objchn)
 {
     struct obj *o;
@@ -1214,7 +1214,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
 }
 
 /* bias a monster's preferences towards armor that has special benefits. */
-static int
+staticfn int
 extra_pref(struct monst *mon, struct obj *obj)
 {
     /* currently only does speed boots, but might be expanded if monsters

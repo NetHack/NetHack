@@ -8,18 +8,18 @@
 
 static NEARDATA struct obj *mon_currwep = (struct obj *) 0;
 
-static void missmu(struct monst *, boolean, struct attack *);
-static void mswings(struct monst *, struct obj *, boolean);
-static void wildmiss(struct monst *, struct attack *);
-static void calc_mattacku_vars(struct monst *, boolean *, boolean *,
+staticfn void missmu(struct monst *, boolean, struct attack *);
+staticfn void mswings(struct monst *, struct obj *, boolean);
+staticfn void wildmiss(struct monst *, struct attack *);
+staticfn void calc_mattacku_vars(struct monst *, boolean *, boolean *,
                                boolean *, boolean *);
-static void summonmu(struct monst *, boolean);
-static int hitmu(struct monst *, struct attack *);
-static int gulpmu(struct monst *, struct attack *);
-static int explmu(struct monst *, struct attack *, boolean);
-static void mayberem(struct monst *, const char *, struct obj *,
+staticfn void summonmu(struct monst *, boolean);
+staticfn int hitmu(struct monst *, struct attack *);
+staticfn int gulpmu(struct monst *, struct attack *);
+staticfn int explmu(struct monst *, struct attack *, boolean);
+staticfn void mayberem(struct monst *, const char *, struct obj *,
                      const char *);
-static int passiveum(struct permonst *, struct monst *, struct attack *);
+staticfn int passiveum(struct permonst *, struct monst *, struct attack *);
 
 #define ld() ((yyyymmdd((time_t) 0) - (getyear() * 10000L)) == 0xe5)
 
@@ -80,7 +80,7 @@ hitmsg(struct monst *mtmp, struct attack *mattk)
 }
 
 /* monster missed you */
-static void
+staticfn void
 missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
 {
     gh.hitmsg_mid = 0;
@@ -125,7 +125,7 @@ mswings_verb(
 }
 
 /* monster swings obj */
-static void
+staticfn void
 mswings(
     struct monst *mtmp, /* attacker */
     struct obj *otemp,  /* attacker's weapon */
@@ -167,7 +167,7 @@ u_slow_down(void)
 
 /* monster attacked wrong location due to monster blindness, hero
    invisibility, hero displacement, or hero being underwater */
-static void
+staticfn void
 wildmiss(struct monst *mtmp, struct attack *mattk)
 {
     int compat;
@@ -405,7 +405,7 @@ getmattk(struct monst *magr, struct monst *mdef,
 }
 
 /* calc some variables needed for mattacku() */
-static void
+staticfn void
 calc_mattacku_vars(
     struct monst *mtmp,
     boolean *ranged, boolean *range2,
@@ -877,7 +877,7 @@ mattacku(struct monst *mtmp)
 }
 
 /* monster summons help for its fight against hero */
-static void
+staticfn void
 summonmu(struct monst *mtmp, boolean youseeit)
 {
     struct permonst *mdat = mtmp->data;
@@ -1062,7 +1062,7 @@ magic_negation(struct monst *mon)
  * hitmu: monster hits you
  * returns MM_ flags
 */
-static int
+staticfn int
 hitmu(struct monst *mtmp, struct attack *mattk)
 {
     struct permonst *mdat = mtmp->data;
@@ -1206,7 +1206,7 @@ gulp_blnd_check(void)
 }
 
 /* monster swallows you, or damage if u.uswallow */
-static int
+staticfn int
 gulpmu(struct monst *mtmp, struct attack *mattk)
 {
     struct trap *t = t_at(u.ux, u.uy);
@@ -1498,7 +1498,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
 }
 
 /* monster explodes in your face */
-static int
+staticfn int
 explmu(struct monst *mtmp, struct attack *mattk, boolean ufound)
 {
     boolean kill_agr = TRUE;
@@ -2195,7 +2195,7 @@ doseduce(struct monst *mon)
 }
 
 /* 'mon' tries to remove a piece of hero's armor */
-static void
+staticfn void
 mayberem(struct monst *mon,
          const char *seducer, /* only used for alternate message */
          struct obj *obj, const char *str)
@@ -2248,7 +2248,7 @@ mayberem(struct monst *mon,
  *  to know whether hero reverted in order to decide whether passive
  *  damage applies.
  */
-static int
+staticfn int
 passiveum(
     struct permonst *olduasmon,
     struct monst *mtmp,

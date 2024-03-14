@@ -32,8 +32,8 @@
 
 static inline uint32_t lower_bits(uint64_t);
 static inline uint32_t upper_bits(uint64_t);
-static void isaac64_update(isaac64_ctx *);
-static void isaac64_mix(uint64_t[8]);
+staticfn void isaac64_update(isaac64_ctx *);
+staticfn void isaac64_mix(uint64_t[8]);
 
 /* Extract ISAAC64_SZ_LOG bits (starting at bit 3). */
 static inline uint32_t lower_bits(uint64_t x)
@@ -47,7 +47,7 @@ static inline uint32_t upper_bits(uint64_t y)
     return (y >> (ISAAC64_SZ_LOG+3)) & (ISAAC64_SZ-1);
 }
 
-static void isaac64_update(isaac64_ctx *_ctx){
+staticfn void isaac64_update(isaac64_ctx *_ctx){
   uint64_t *m;
   uint64_t *r;
   uint64_t  a;
@@ -100,7 +100,7 @@ static void isaac64_update(isaac64_ctx *_ctx){
   _ctx->n=ISAAC64_SZ;
 }
 
-static void isaac64_mix(uint64_t _x[8]){
+staticfn void isaac64_mix(uint64_t _x[8]){
   static const unsigned char SHIFT[8]={9,9,23,15,14,20,17,14};
   int i;
   for(i=0;i<8;i++){

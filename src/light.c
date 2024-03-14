@@ -41,11 +41,11 @@
 #define LSF_SHOW 0x1        /* display the light source */
 #define LSF_NEEDS_FIXUP 0x2 /* need oid fixup */
 
-static light_source *new_light_core(coordxy, coordxy,
+staticfn light_source *new_light_core(coordxy, coordxy,
                                     int, int, anything *) NONNULLPTRS;
-static void discard_flashes(void);
-static void write_ls(NHFILE *, light_source *);
-static int maybe_write_ls(NHFILE *, int, boolean);
+staticfn void discard_flashes(void);
+staticfn void write_ls(NHFILE *, light_source *);
+staticfn int maybe_write_ls(NHFILE *, int, boolean);
 
 /* imported from vision.c, for small circles */
 extern const coordxy circle_data[];
@@ -61,7 +61,7 @@ new_light_source(coordxy x, coordxy y, int range, int type, anything *id)
 }
 
 /* Create a new light source and return it.  Only used within this file. */
-static light_source *
+staticfn light_source *
 new_light_core(coordxy x, coordxy y, int range, int type, anything *id)
 {
     light_source *ls;
@@ -327,7 +327,7 @@ transient_light_cleanup(void)
 }
 
 /* camera flashes have Null object; caller wants to get rid of them now */
-static void
+staticfn void
 discard_flashes(void)
 {
     light_source *ls, *nxt_ls;
@@ -509,7 +509,7 @@ relink_light_sources(boolean ghostly)
  * sources that would be written.  If write_it is true, actually write
  * the light source out.
  */
-static int
+staticfn int
 maybe_write_ls(NHFILE *nhfp, int range, boolean write_it)
 {
     int count = 0, is_global;
@@ -572,7 +572,7 @@ light_sources_sanity_check(void)
 }
 
 /* Write a light source structure to disk. */
-static void
+staticfn void
 write_ls(NHFILE *nhfp, light_source *ls)
 {
     anything arg_save;

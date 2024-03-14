@@ -7,8 +7,9 @@
 #ifdef USE_ISAAC64
 #include "isaac64.h"
 
-static int whichrng(int (*fn)(int));
-static int RND(int);
+staticfn int whichrng(int (*fn)(int));
+staticfn int RND(int);
+staticfn void set_random(unsigned long, int (*)(int));
 
 #if 0
 static isaac64_ctx rng_state;
@@ -27,7 +28,7 @@ static struct rnglist_t rnglist[] = {
     { rn2_on_display_rng, FALSE, { 0 } },       /* DISP */
 };
 
-static int
+staticfn int
 whichrng(int (*fn)(int))
 {
     int i;
@@ -56,7 +57,7 @@ init_isaac64(unsigned long seed, int (*fn)(int))
                  (int) sizeof seed);
 }
 
-static int
+staticfn int
 RND(int x)
 {
     return (isaac64_next_uint64(&rnglist[CORE].rng_state) % x);
@@ -230,7 +231,7 @@ rnz(int i)
 /* Sets the seed for the random number generator */
 #ifdef USE_ISAAC64
 
-static void
+staticfn void
 set_random(unsigned long seed,
            int (*fn)(int))
 {
@@ -240,7 +241,7 @@ set_random(unsigned long seed,
 #else /* USE_ISAAC64 */
 
 /*ARGSUSED*/
-static void
+staticfn void
 set_random(unsigned long seed,
            int (*fn)(int) UNUSED)
 {

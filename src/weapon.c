@@ -10,12 +10,12 @@
  */
 #include "hack.h"
 
-static void give_may_advance_msg(int);
-static void finish_towel_change(struct obj *obj, int);
-static boolean could_advance(int);
-static boolean peaked_skill(int);
-static int slots_required(int);
-static void skill_advance(int);
+staticfn void give_may_advance_msg(int);
+staticfn void finish_towel_change(struct obj *obj, int);
+staticfn boolean could_advance(int);
+staticfn boolean peaked_skill(int);
+staticfn int slots_required(int);
+staticfn void skill_advance(int);
 
 /* Categories whose names don't come from OBJ_NAME(objects[type])
  */
@@ -69,7 +69,7 @@ static NEARDATA const char *const barehands_or_martial[] = {
 static NEARDATA const char kebabable[] = { S_XORN, S_DRAGON, S_JABBERWOCK,
                                            S_NAGA, S_GIANT,  '\0' };
 
-static void
+staticfn void
 give_may_advance_msg(int skill)
 {
     You_feel("more confident in your %sskills.",
@@ -461,14 +461,14 @@ silver_sears(struct monst *magr UNUSED, struct monst *mdef,
     }
 }
 
-static struct obj *oselect(struct monst *, int);
+staticfn struct obj *oselect(struct monst *, int);
 #define Oselect(x) \
     do {                                        \
         if ((otmp = oselect(mtmp, x)) != 0)     \
             return otmp;                        \
     } while (0)
 
-static struct obj *
+staticfn struct obj *
 oselect(struct monst *mtmp, int type)
 {
     struct obj *otmp;
@@ -957,7 +957,7 @@ dbon(void)
 }
 
 /* called when wet_a_towel() or dry_a_towel() is changing a towel's wetness */
-static void
+staticfn void
 finish_towel_change(struct obj *obj, int newspe)
 {
     /* towel wetness is always between 0 (dry) and 7, inclusive */
@@ -1069,7 +1069,7 @@ skill_name(int skill)
 }
 
 /* return the # of slots required to advance the skill */
-static int
+staticfn int
 slots_required(int skill)
 {
     int tmp = P_SKILL(skill);
@@ -1110,7 +1110,7 @@ can_advance(int skill, boolean speedy)
 }
 
 /* return true if this skill could be advanced if more slots were available */
-static boolean
+staticfn boolean
 could_advance(int skill)
 {
     if (P_RESTRICTED(skill)
@@ -1124,7 +1124,7 @@ could_advance(int skill)
 
 /* return true if this skill has reached its maximum and there's been enough
    practice to become eligible for the next step if that had been possible */
-static boolean
+staticfn boolean
 peaked_skill(int skill)
 {
     if (P_RESTRICTED(skill))
@@ -1135,7 +1135,7 @@ peaked_skill(int skill)
                           >= practice_needed_to_advance(P_SKILL(skill))));
 }
 
-static void
+staticfn void
 skill_advance(int skill)
 {
     u.weapon_slots -= slots_required(skill);

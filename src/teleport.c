@@ -6,18 +6,18 @@
 #include "hack.h"
 #define NEW_ENEXTO
 
-static boolean goodpos_onscary(coordxy, coordxy, struct permonst *);
-static boolean tele_jump_ok(coordxy, coordxy, coordxy, coordxy);
-static boolean teleok(coordxy, coordxy, boolean);
-static void vault_tele(void);
-static boolean rloc_pos_ok(coordxy, coordxy, struct monst *);
-static void rloc_to_core(struct monst *, coordxy, coordxy, unsigned);
-static void mvault_tele(struct monst *);
-static boolean m_blocks_teleporting(struct monst *);
-static stairway *stairway_find_forwiz(boolean, boolean);
+staticfn boolean goodpos_onscary(coordxy, coordxy, struct permonst *);
+staticfn boolean tele_jump_ok(coordxy, coordxy, coordxy, coordxy);
+staticfn boolean teleok(coordxy, coordxy, boolean);
+staticfn void vault_tele(void);
+staticfn boolean rloc_pos_ok(coordxy, coordxy, struct monst *);
+staticfn void rloc_to_core(struct monst *, coordxy, coordxy, unsigned);
+staticfn void mvault_tele(struct monst *);
+staticfn boolean m_blocks_teleporting(struct monst *);
+staticfn stairway *stairway_find_forwiz(boolean, boolean);
 
 /* does monster block others from teleporting? */
-static boolean
+staticfn boolean
 m_blocks_teleporting(struct monst *mtmp)
 {
     if (is_dlord(mtmp->data) || is_dprince(mtmp->data))
@@ -44,7 +44,7 @@ noteleport_level(struct monst *mon)
 /* this is an approximation of onscary() that doesn't use any 'struct monst'
    fields aside from 'monst->data'; used primarily for new monster creation
    and monster teleport destination, not for ordinary monster movement */
-static boolean
+staticfn boolean
 goodpos_onscary(
     coordxy x, coordxy y,
     struct permonst *mptr)
@@ -363,7 +363,7 @@ enexto_core(
  * need to be augmented to allow deliberate passage in wizard mode, but
  * only for explicitly chosen destinations.)
  */
-static boolean
+staticfn boolean
 tele_jump_ok(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
 {
     if (!isok(x2, y2))
@@ -397,7 +397,7 @@ tele_jump_ok(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
     return TRUE;
 }
 
-static boolean
+staticfn boolean
 teleok(coordxy x, coordxy y, boolean trapok)
 {
     if (!trapok) {
@@ -750,7 +750,7 @@ safe_teleds(int teleds_flags)
     return FALSE;
 }
 
-static void
+staticfn void
 vault_tele(void)
 {
     struct mkroom *croom = search_special(VAULT);
@@ -1491,7 +1491,7 @@ level_tele_trap(struct trap *trap, unsigned int trflags)
 }
 
 /* check whether monster can arrive at location <x,y> via Tport (or fall) */
-static boolean
+staticfn boolean
 rloc_pos_ok(
     coordxy x, coordxy y, /* coordinates of candidate location */
     struct monst *mtmp)
@@ -1558,7 +1558,7 @@ rloc_pos_ok(
  * a value because mtmp is a migrating_mon.  Worm tails are always
  * placed randomly around the head of the worm.
  */
-static void
+staticfn void
 rloc_to_core(
     struct monst *mtmp,
     coordxy x, coordxy y,
@@ -1689,7 +1689,7 @@ rloc_to_flag(
     rloc_to_core(mtmp, x, y, rlocflags);
 }
 
-static stairway *
+staticfn stairway *
 stairway_find_forwiz(boolean isladder, boolean up)
 {
     stairway *stway = gs.stairs;
@@ -1840,7 +1840,7 @@ control_mon_tele(
     return FALSE;
 }
 
-static void
+staticfn void
 mvault_tele(struct monst *mtmp)
 {
     struct mkroom *croom = search_special(VAULT);

@@ -32,30 +32,30 @@ struct _readobjnam_data {
     char fruitbuf[BUFSZ];
 };
 
-static char *strprepend(char *, const char *);
-static char *nextobuf(void);
-static void releaseobuf(char *);
-static void xcalled(char *, int, const char *, const char *);
-static char *xname_flags(struct obj *, unsigned);
-static char *minimal_xname(struct obj *);
-static void add_erosion_words(struct obj *, char *);
-static char *doname_base(struct obj *obj, unsigned);
-static boolean singplur_lookup(char *, char *, boolean,
+staticfn char *strprepend(char *, const char *);
+staticfn char *nextobuf(void);
+staticfn void releaseobuf(char *);
+staticfn void xcalled(char *, int, const char *, const char *);
+staticfn char *xname_flags(struct obj *, unsigned);
+staticfn char *minimal_xname(struct obj *);
+staticfn void add_erosion_words(struct obj *, char *);
+staticfn char *doname_base(struct obj *obj, unsigned);
+staticfn boolean singplur_lookup(char *, char *, boolean,
                                const char *const *);
-static char *singplur_compound(char *);
-static boolean ch_ksound(const char *basestr);
-static boolean badman(const char *, boolean);
-static boolean wishymatch(const char *, const char *, boolean);
-static short rnd_otyp_by_wpnskill(schar);
-static short rnd_otyp_by_namedesc(const char *, char, int);
-static struct obj *wizterrainwish(struct _readobjnam_data *);
-static void dbterrainmesg(const char *, coordxy, coordxy) NONNULLARG1;
-static void readobjnam_init(char *, struct _readobjnam_data *);
-static int readobjnam_preparse(struct _readobjnam_data *);
-static void readobjnam_parse_charges(struct _readobjnam_data *);
-static int readobjnam_postparse1(struct _readobjnam_data *);
-static int readobjnam_postparse2(struct _readobjnam_data *);
-static int readobjnam_postparse3(struct _readobjnam_data *);
+staticfn char *singplur_compound(char *);
+staticfn boolean ch_ksound(const char *basestr);
+staticfn boolean badman(const char *, boolean);
+staticfn boolean wishymatch(const char *, const char *, boolean);
+staticfn short rnd_otyp_by_wpnskill(schar);
+staticfn short rnd_otyp_by_namedesc(const char *, char, int);
+staticfn struct obj *wizterrainwish(struct _readobjnam_data *);
+staticfn void dbterrainmesg(const char *, coordxy, coordxy) NONNULLARG1;
+staticfn void readobjnam_init(char *, struct _readobjnam_data *);
+staticfn int readobjnam_preparse(struct _readobjnam_data *);
+staticfn void readobjnam_parse_charges(struct _readobjnam_data *);
+staticfn int readobjnam_postparse1(struct _readobjnam_data *);
+staticfn int readobjnam_postparse2(struct _readobjnam_data *);
+staticfn int readobjnam_postparse3(struct _readobjnam_data *);
 
 struct Jitem {
     int item;
@@ -118,7 +118,7 @@ static const struct Jitem Japanese_items[] = {
     { 0, "" }
 };
 
-static char *
+staticfn char *
 strprepend(char *s, const char *pref)
 {
     int i = (int) strlen(pref);
@@ -136,7 +136,7 @@ strprepend(char *s, const char *pref)
 static char NEARDATA obufs[NUMOBUF][BUFSZ];
 static int obufidx = 0;
 
-static char *
+staticfn char *
 nextobuf(void)
 {
     obufidx = (obufidx + 1) % NUMOBUF;
@@ -144,7 +144,7 @@ nextobuf(void)
 }
 
 /* put the most recently allocated buffer back if possible */
-static void
+staticfn void
 releaseobuf(char *bufp)
 {
     /* caller may not know whether bufp is the most recently allocated
@@ -528,7 +528,7 @@ reorder_fruit(boolean forward)
 }
 
 /* add "<pfx> called <sfx>" to end of buf, truncating if necessary */
-static void
+staticfn void
 xcalled(
     char *buf,       /* eos(obuf) or eos(&obuf[PREFIX]) */
     int siz,         /* BUFSZ or BUFSZ-PREFIX */
@@ -551,7 +551,7 @@ xname(struct obj *obj)
     return xname_flags(obj, CXN_NORMAL);
 }
 
-static char *
+staticfn char *
 xname_flags(
     struct obj *obj,
     unsigned cxn_flags) /* bitmask of CXN_xxx values */
@@ -995,7 +995,7 @@ xname_flags(
      brown potion               -- if oc_name_known not set
      potion of object detection -- if discovered
  */
-static char *
+staticfn char *
 minimal_xname(struct obj *obj)
 {
     char *bufp;
@@ -1098,7 +1098,7 @@ the_unique_pm(struct permonst *ptr)
     return uniq;
 }
 
-static void
+staticfn void
 add_erosion_words(struct obj *obj, char *prefix)
 {
     boolean iscrys = (obj->otyp == CRYSKNIFE);
@@ -1177,7 +1177,7 @@ erosion_matters(struct obj *obj)
 #define DONAME_FOR_MENU   4 /* [not used anywhere yet] */
 
 /* core of doname() */
-static char *
+staticfn char *
 doname_base(
     struct obj *obj,       /* object to format */
     unsigned doname_flags) /* special case requests */
@@ -2596,7 +2596,7 @@ static const char *const as_is[] = {
 };
 
 /* singularize/pluralize decisions common to both makesingular & makeplural */
-static boolean
+staticfn boolean
 singplur_lookup(
     char *basestr, char *endstring,  /* base string, pointer to eos(string) */
     boolean to_plural,         /* true => makeplural, false => makesingular */
@@ -2671,7 +2671,7 @@ singplur_lookup(
 }
 
 /* searches for common compounds, ex. lump of royal jelly */
-static char *
+staticfn char *
 singplur_compound(char *str)
 {
     /* if new entries are added, be sure to keep compound_start[] in sync */
@@ -3056,7 +3056,7 @@ makesingular(const char *oldstr)
 }
 
 
-static boolean
+staticfn boolean
 ch_ksound(const char *basestr)
 {
     /* these are some *ch words/suffixes that make a k-sound. They pluralize by
@@ -3082,7 +3082,7 @@ ch_ksound(const char *basestr)
     return FALSE;
 }
 
-static boolean
+staticfn boolean
 badman(
     const char *basestr,
     boolean to_plural)  /* True: makeplural, False: makesingular */
@@ -3131,7 +3131,7 @@ badman(
 }
 
 /* compare user string against object name string using fuzzy matching */
-static boolean
+staticfn boolean
 wishymatch(
     const char *u_str,      /* from user, so might be variant spelling */
     const char *o_str,      /* from objects[], so is in canonical form */
@@ -3318,7 +3318,7 @@ static const struct alt_spellings {
     { (const char *) 0, 0 },
 };
 
-static short
+staticfn short
 rnd_otyp_by_wpnskill(schar skill)
 {
     int i, n = 0;
@@ -3341,7 +3341,7 @@ rnd_otyp_by_wpnskill(schar skill)
     return otyp;
 }
 
-static short
+staticfn short
 rnd_otyp_by_namedesc(
     const char *name,
     char oclass,
@@ -3425,7 +3425,7 @@ shiny_obj(char oclass)
 }
 
 /* in wizard mode, readobjnam() can accept wishes for traps and terrain */
-static struct obj *
+staticfn struct obj *
 wizterrainwish(struct _readobjnam_data *d)
 {
     struct rm *lev;
@@ -3796,7 +3796,7 @@ wizterrainwish(struct _readobjnam_data *d)
 }
 
 /* message common to several wizterrainwish() results */
-static void
+staticfn void
 dbterrainmesg(
     const char *newtype,
     coordxy x, coordxy y)
@@ -3809,7 +3809,7 @@ dbterrainmesg(
 #define TIN_EMPTY 1
 #define TIN_SPINACH 2
 
-static void
+staticfn void
 readobjnam_init(char *bp, struct _readobjnam_data *d)
 {
     d->otmp = (struct obj *) 0;
@@ -3842,7 +3842,7 @@ readobjnam_init(char *bp, struct _readobjnam_data *d)
 
 /* return 1 if d->bp is empty or contains only various qualifiers like
    "blessed", "rustproof", and so on, or 0 if anything else is present */
-static int
+staticfn int
 readobjnam_preparse(struct _readobjnam_data *d)
 {
     char *save_bp = 0;
@@ -4054,7 +4054,7 @@ readobjnam_preparse(struct _readobjnam_data *d)
     return res;
 }
 
-static void
+staticfn void
 readobjnam_parse_charges(struct _readobjnam_data *d)
 {
     if (strlen(d->bp) > 1 && (d->p = strrchr(d->bp, '(')) != 0) {
@@ -4116,7 +4116,7 @@ readobjnam_parse_charges(struct _readobjnam_data *d)
         d->rechrg = 7; /* recharge_limit */
 }
 
-static int
+staticfn int
 readobjnam_postparse1(struct _readobjnam_data *d)
 {
     int i;
@@ -4528,7 +4528,7 @@ readobjnam_postparse1(struct _readobjnam_data *d)
     return 0;
 }
 
-static int
+staticfn int
 readobjnam_postparse2(struct _readobjnam_data *d)
 {
     int i;
@@ -4589,7 +4589,7 @@ readobjnam_postparse2(struct _readobjnam_data *d)
     return 0;
 }
 
-static int
+staticfn int
 readobjnam_postparse3(struct _readobjnam_data *d)
 {
     int i;

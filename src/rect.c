@@ -6,7 +6,7 @@
 
 int get_rect_ind(NhRect *);
 
-static boolean intersect(NhRect *, NhRect *, NhRect *);
+staticfn boolean intersect(NhRect *, NhRect *, NhRect *);
 
 /*
  * In this file, we will handle the various rectangle functions we
@@ -111,7 +111,7 @@ rnd_rect(void)
  * otherwise returns FALSE
  */
 
-static boolean
+staticfn boolean
 intersect(NhRect *r1, NhRect *r2, NhRect *r3)
 {
     if (r2->lx > r1->hx || r2->ly > r1->hy || r2->hx < r1->lx

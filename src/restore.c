@@ -12,30 +12,30 @@ extern int dotrow; /* shared with save */
 #endif
 
 #ifdef ZEROCOMP
-static void zerocomp_minit(void);
-static void zerocomp_mread(int, genericptr_t, unsigned int);
-static int zerocomp_mgetc(void);
+staticfn void zerocomp_minit(void);
+staticfn void zerocomp_mread(int, genericptr_t, unsigned int);
+staticfn int zerocomp_mgetc(void);
 #endif
 
-static void find_lev_obj(void);
-static void restlevchn(NHFILE *);
-static void restdamage(NHFILE *);
-static void restobj(NHFILE *, struct obj *);
-static struct obj *restobjchn(NHFILE *, boolean);
-static void restmon(NHFILE *, struct monst *);
-static struct monst *restmonchn(NHFILE *);
-static struct fruit *loadfruitchn(NHFILE *);
-static void freefruitchn(struct fruit *);
-static void ghostfruit(struct obj *);
-static boolean restgamestate(NHFILE *);
-static void restlevelstate(void);
-static int restlevelfile(xint8);
-static void rest_bubbles(NHFILE *);
-static void restore_gamelog(NHFILE *);
-static void restore_msghistory(NHFILE *);
-static void reset_oattached_mids(boolean);
-static void rest_levl(NHFILE *, boolean);
-static void rest_stairs(NHFILE *);
+staticfn void find_lev_obj(void);
+staticfn void restlevchn(NHFILE *);
+staticfn void restdamage(NHFILE *);
+staticfn void restobj(NHFILE *, struct obj *);
+staticfn struct obj *restobjchn(NHFILE *, boolean);
+staticfn void restmon(NHFILE *, struct monst *);
+staticfn struct monst *restmonchn(NHFILE *);
+staticfn struct fruit *loadfruitchn(NHFILE *);
+staticfn void freefruitchn(struct fruit *);
+staticfn void ghostfruit(struct obj *);
+staticfn boolean restgamestate(NHFILE *);
+staticfn void restlevelstate(void);
+staticfn int restlevelfile(xint8);
+staticfn void rest_bubbles(NHFILE *);
+staticfn void restore_gamelog(NHFILE *);
+staticfn void restore_msghistory(NHFILE *);
+staticfn void reset_oattached_mids(boolean);
+staticfn void rest_levl(NHFILE *, boolean);
+staticfn void rest_stairs(NHFILE *);
 
 /*
  * Save a mapping of IDs from ghost levels to the current level.  This
@@ -50,8 +50,8 @@ struct bucket {
     } map[N_PER_BUCKET];
 };
 
-static void clear_id_mapping(void);
-static void add_id_mapping(unsigned, unsigned);
+staticfn void clear_id_mapping(void);
+staticfn void add_id_mapping(unsigned, unsigned);
 
 #ifdef AMII_GRAPHICS
 void amii_setpens(int); /* use colors from save file */
@@ -68,7 +68,7 @@ extern int amii_numcolors;
 #define Mread(fd,adr,siz) mread((fd), (genericptr_t) (adr), (unsigned) (siz))
 
 /* Recalculate gl.level.objects[x][y], since this info was not saved. */
-static void
+staticfn void
 find_lev_obj(void)
 {
     struct obj *fobjtmp = (struct obj *) 0;
@@ -125,7 +125,7 @@ inven_inuse(boolean quietly)
     }
 }
 
-static void
+staticfn void
 restlevchn(NHFILE *nhfp)
 {
     int cnt = 0;
@@ -151,7 +151,7 @@ restlevchn(NHFILE *nhfp)
     }
 }
 
-static void
+staticfn void
 restdamage(NHFILE *nhfp)
 {
     unsigned int dmgcount = 0;
@@ -179,7 +179,7 @@ restdamage(NHFILE *nhfp)
 }
 
 /* restore one object */
-static void
+staticfn void
 restobj(NHFILE *nhfp, struct obj *otmp)
 {
     int buflen = 0;
@@ -234,7 +234,7 @@ restobj(NHFILE *nhfp, struct obj *otmp)
     }
 }
 
-static struct obj *
+staticfn struct obj *
 restobjchn(NHFILE *nhfp, boolean frozen)
 {
     struct obj *otmp, *otmp2 = 0;
@@ -303,7 +303,7 @@ restobjchn(NHFILE *nhfp, boolean frozen)
 }
 
 /* restore one monster */
-static void
+staticfn void
 restmon(NHFILE *nhfp, struct monst *mtmp)
 {
     int buflen = 0;
@@ -373,7 +373,7 @@ restmon(NHFILE *nhfp, struct monst *mtmp)
     } /* mextra */
 }
 
-static struct monst *
+staticfn struct monst *
 restmonchn(NHFILE *nhfp)
 {
     struct monst *mtmp, *mtmp2 = 0;
@@ -451,7 +451,7 @@ restmonchn(NHFILE *nhfp)
     return first;
 }
 
-static struct fruit *
+staticfn struct fruit *
 loadfruitchn(NHFILE *nhfp)
 {
     struct fruit *flist, *fnext;
@@ -471,7 +471,7 @@ loadfruitchn(NHFILE *nhfp)
     return flist;
 }
 
-static void
+staticfn void
 freefruitchn(struct fruit *flist)
 {
     struct fruit *fnext;
@@ -483,7 +483,7 @@ freefruitchn(struct fruit *flist)
     }
 }
 
-static void
+staticfn void
 ghostfruit(struct obj *otmp)
 {
     struct fruit *oldf;
@@ -504,8 +504,7 @@ ghostfruit(struct obj *otmp)
 #define SYSOPT_CHECK_SAVE_UID TRUE
 #endif
 
-static
-boolean
+staticfn boolean
 restgamestate(NHFILE *nhfp)
 {
     struct flag newgameflags;
@@ -700,7 +699,7 @@ restgamestate(NHFILE *nhfp)
 
 /* update game state pointers to those valid for the current level (so we
    don't dereference a wild u.ustuck when saving game state, for instance) */
-static void
+staticfn void
 restlevelstate(void)
 {
     /*
@@ -711,7 +710,7 @@ restlevelstate(void)
 }
 
 /*ARGSUSED*/
-static int
+staticfn int
 restlevelfile(xint8 ltmp)
 {
     char whynot[BUFSZ];
@@ -882,7 +881,7 @@ dorecover(NHFILE *nhfp)
     return 1;
 }
 
-static void
+staticfn void
 rest_stairs(NHFILE *nhfp)
 {
     int buflen = 0;
@@ -937,7 +936,7 @@ restcemetery(NHFILE *nhfp, struct cemetery **cemeteryaddr)
 }
 
 /*ARGSUSED*/
-static void
+staticfn void
 rest_levl(
     NHFILE *nhfp,
 #ifdef RLECOMP
@@ -1249,7 +1248,7 @@ get_plname_from_file(NHFILE *nhfp, char *plbuf)
 }
 
 /* restore Plane of Water's air bubbles and Plane of Air's clouds */
-static void
+staticfn void
 rest_bubbles(NHFILE *nhfp)
 {
     xint8 bbubbly;
@@ -1265,7 +1264,7 @@ rest_bubbles(NHFILE *nhfp)
         restore_waterlevel(nhfp);
 }
 
-static void
+staticfn void
 restore_gamelog(NHFILE *nhfp)
 {
     int slen = 0;
@@ -1288,7 +1287,7 @@ restore_gamelog(NHFILE *nhfp)
     }
 }
 
-static void
+staticfn void
 restore_msghistory(NHFILE *nhfp)
 {
     int msgsize = 0, msgcount = 0;
@@ -1313,7 +1312,7 @@ restore_msghistory(NHFILE *nhfp)
 }
 
 /* Clear all structures for object and monster ID mapping. */
-static void
+staticfn void
 clear_id_mapping(void)
 {
     struct bucket *curr;
@@ -1326,7 +1325,7 @@ clear_id_mapping(void)
 }
 
 /* Add a mapping to the ID map. */
-static void
+staticfn void
 add_id_mapping(unsigned int gid, unsigned int nid)
 {
     int idx;
@@ -1376,7 +1375,7 @@ lookup_id_mapping(unsigned int gid, unsigned int *nidp)
     return FALSE;
 }
 
-static void
+staticfn void
 reset_oattached_mids(boolean ghostly)
 {
     struct obj *otmp;

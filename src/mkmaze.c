@@ -6,27 +6,27 @@
 #include "hack.h"
 #include "sp_lev.h"
 
-static int iswall(coordxy, coordxy);
-static int iswall_or_stone(coordxy, coordxy);
-static boolean is_solid(coordxy, coordxy);
-static int extend_spine(int[3][3], int, int, int);
-static void wall_cleanup(coordxy, coordxy, coordxy, coordxy);
-static boolean okay(coordxy, coordxy, coordxy);
-static void maze0xy(coord *);
-static boolean put_lregion_here(coordxy, coordxy, coordxy, coordxy, coordxy,
+staticfn int iswall(coordxy, coordxy);
+staticfn int iswall_or_stone(coordxy, coordxy);
+staticfn boolean is_solid(coordxy, coordxy);
+staticfn int extend_spine(int[3][3], int, int, int);
+staticfn void wall_cleanup(coordxy, coordxy, coordxy, coordxy);
+staticfn boolean okay(coordxy, coordxy, coordxy);
+staticfn void maze0xy(coord *);
+staticfn boolean put_lregion_here(coordxy, coordxy, coordxy, coordxy, coordxy,
                                 coordxy, xint16, boolean, d_level *);
-static void baalz_fixup(void);
-static void setup_waterlevel(void);
-static void unsetup_waterlevel(void);
-static void check_ransacked(const char *);
-static void migr_booty_item(int, const char *);
-static void migrate_orc(struct monst *, unsigned long);
-static void shiny_orc_stuff(struct monst *);
-static void stolen_booty(void);
-static boolean maze_inbounds(coordxy, coordxy);
-static void maze_remove_deadends(xint16);
-static void populate_maze(void);
-static boolean is_exclusion_zone(xint16, coordxy, coordxy);
+staticfn void baalz_fixup(void);
+staticfn void setup_waterlevel(void);
+staticfn void unsetup_waterlevel(void);
+staticfn void check_ransacked(const char *);
+staticfn void migr_booty_item(int, const char *);
+staticfn void migrate_orc(struct monst *, unsigned long);
+staticfn void shiny_orc_stuff(struct monst *);
+staticfn void stolen_booty(void);
+staticfn boolean maze_inbounds(coordxy, coordxy);
+staticfn void maze_remove_deadends(xint16);
+staticfn void populate_maze(void);
+staticfn boolean is_exclusion_zone(xint16, coordxy, coordxy);
 
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
@@ -40,7 +40,7 @@ static boolean is_exclusion_zone(xint16, coordxy, coordxy);
         }                                                        \
     } while (0)
 
-static int
+staticfn int
 iswall(coordxy x, coordxy y)
 {
     int type;
@@ -52,7 +52,7 @@ iswall(coordxy x, coordxy y)
             || type == SDOOR || type == IRONBARS);
 }
 
-static int
+staticfn int
 iswall_or_stone(coordxy x, coordxy y)
 {
     /* out of bounds = stone */
@@ -63,7 +63,7 @@ iswall_or_stone(coordxy x, coordxy y)
 }
 
 /* return TRUE if out of bounds, wall or rock */
-static boolean
+staticfn boolean
 is_solid(coordxy x, coordxy y)
 {
     return (boolean) (!isok(x, y) || IS_STWALL(levl[x][y].typ));
@@ -148,7 +148,7 @@ set_levltyp_lit(coordxy x, coordxy y, schar typ, schar lit)
  *              W x W           This would extend a spine from x down.
  *              . W W
  */
-static int
+staticfn int
 extend_spine(int locale[3][3], int wall_there, int dx, int dy)
 {
     int spine, nx, ny;
@@ -180,7 +180,7 @@ extend_spine(int locale[3][3], int wall_there, int dx, int dy)
 }
 
 /* Remove walls totally surrounded by stone */
-static void
+staticfn void
 wall_cleanup(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
 {
     uchar type;
@@ -279,7 +279,7 @@ wallification(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
     fix_wall_spines(x1, y1, x2, y2);
 }
 
-static boolean
+staticfn boolean
 okay(coordxy x, coordxy y, coordxy dir)
 {
     mz_move(x, y, dir);
@@ -291,7 +291,7 @@ okay(coordxy x, coordxy y, coordxy dir)
 }
 
 /* find random starting point for maze generation */
-static void
+staticfn void
 maze0xy(coord *cc)
 {
     cc->x = 3 + 2 * rn2((gx.x_maze_max >> 1) - 1);
@@ -299,7 +299,7 @@ maze0xy(coord *cc)
     return;
 }
 
-static boolean
+staticfn boolean
 is_exclusion_zone(xint16 type, coordxy x, coordxy y)
 {
     struct exclusion_zone *ez = ge.exclusion_zones;
@@ -383,7 +383,7 @@ place_lregion(
     impossible("Couldn't place lregion type %d!", rtype);
 }
 
-static boolean
+staticfn boolean
 put_lregion_here(
     coordxy x, coordxy y,
     coordxy nlx, coordxy nly, coordxy nhx, coordxy nhy,
@@ -443,7 +443,7 @@ put_lregion_here(
 /* fix up Baalzebub's lair, which depicts a level-sized beetle;
    its legs are walls within solid rock--regular wallification
    classifies them as superfluous and gets rid of them */
-static void
+staticfn void
 baalz_fixup(void)
 {
     struct monst *mtmp;
@@ -674,7 +674,7 @@ fixup_special(void)
     gn.num_lregions = 0;
 }
 
-static void
+staticfn void
 check_ransacked(const char *s)
 {
     /* this kludge only works as long as orctown is minetn-1 */
@@ -684,7 +684,7 @@ check_ransacked(const char *s)
 #define ORC_LEADER 1
 static const char *const orcfruit[] = { "paddle cactus", "dwarven root" };
 
-static void
+staticfn void
 migrate_orc(struct monst *mtmp, unsigned long mflags)
 {
     int nlev, max_depth, cur_depth;
@@ -715,7 +715,7 @@ migrate_orc(struct monst *mtmp, unsigned long mflags)
     migrate_to_level(mtmp, ledger_no(&dest), MIGR_RANDOM, (coord *) 0);
 }
 
-static void
+staticfn void
 shiny_orc_stuff(struct monst *mtmp)
 {
     int gemprob, goldprob, otyp;
@@ -747,7 +747,7 @@ shiny_orc_stuff(struct monst *mtmp)
     }
 }
 
-static void
+staticfn void
 migr_booty_item(int otyp, const char *gang)
 {
     struct obj *otmp;
@@ -766,7 +766,7 @@ migr_booty_item(int otyp, const char *gang)
     }
 }
 
-static void
+staticfn void
 stolen_booty(void)
 {
     char *gang, gang_name[BUFSZ];
@@ -860,7 +860,7 @@ stolen_booty(void)
 
 #undef ORC_LEADER
 
-static boolean
+staticfn boolean
 maze_inbounds(coordxy x, coordxy y)
 {
     return (x >= 2 && y >= 2
@@ -870,7 +870,7 @@ maze_inbounds(coordxy x, coordxy y)
             && isok(x, y));
 }
 
-static void
+staticfn void
 maze_remove_deadends(xint16 typ)
 {
     char dirok[4];
@@ -1064,7 +1064,7 @@ pick_vibrasquare_location(void)
 }
 
 /* add objects and monsters to random maze */
-static void
+staticfn void
 populate_maze(void)
 {
     int i;
@@ -1488,9 +1488,9 @@ fumaroles(void)
 #define gbxmax (gx.xmax - 1)
 #define gbymax (gy.ymax - 1)
 
-static void set_wportal(void);
-static void mk_bubble(coordxy, coordxy, int);
-static void mv_bubble(struct bubble *, coordxy, coordxy, boolean);
+staticfn void set_wportal(void);
+staticfn void mk_bubble(coordxy, coordxy, int);
+staticfn void mv_bubble(struct bubble *, coordxy, coordxy, boolean);
 
 void
 movebubbles(void)
@@ -1748,7 +1748,7 @@ restore_waterlevel(NHFILE *nhfp)
     }
 }
 
-static void
+staticfn void
 set_wportal(void)
 {
     /* there better be only one magic portal on water level... */
@@ -1758,7 +1758,7 @@ set_wportal(void)
     impossible("set_wportal(): no portal!");
 }
 
-static void
+staticfn void
 setup_waterlevel(void)
 {
     int typ, glyph;
@@ -1806,7 +1806,7 @@ setup_waterlevel(void)
             mk_bubble(x, y, rn2(7));
 }
 
-static void
+staticfn void
 unsetup_waterlevel(void)
 {
     struct bubble *b, *bb;
@@ -1819,7 +1819,7 @@ unsetup_waterlevel(void)
     gb.bbubbles = ge.ebubbles = (struct bubble *) 0;
 }
 
-static void
+staticfn void
 mk_bubble(coordxy x, coordxy y, int n)
 {
     /*
@@ -1882,7 +1882,7 @@ mk_bubble(coordxy x, coordxy y, int n)
  * in the immediate neighborhood of one, he/she may get sucked inside.
  * This property also makes leaving a bubble slightly difficult.
  */
-static void
+staticfn void
 mv_bubble(struct bubble *b, coordxy dx, coordxy dy, boolean ini)
 {
     int i, j, colli = 0;

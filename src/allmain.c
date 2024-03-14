@@ -12,18 +12,18 @@
 #include <signal.h>
 #endif
 
-static void moveloop_preamble(boolean);
-static void u_calc_moveamt(int);
-static void maybe_do_tutorial(void);
+staticfn void moveloop_preamble(boolean);
+staticfn void u_calc_moveamt(int);
+staticfn void maybe_do_tutorial(void);
 #ifdef POSITIONBAR
-static void do_positionbar(void);
+staticfn void do_positionbar(void);
 #endif
-static void regen_pw(int);
-static void regen_hp(int);
-static void interrupt_multi(const char *);
-static void debug_fields(const char *);
+staticfn void regen_pw(int);
+staticfn void regen_hp(int);
+staticfn void interrupt_multi(const char *);
+staticfn void debug_fields(const char *);
 #ifndef NODUMPENUMS
-static void dump_enums(void);
+staticfn void dump_enums(void);
 #endif
 
 /*ARGSUSED*/
@@ -41,7 +41,7 @@ early_init(int argc UNUSED, char *argv[] UNUSED)
     runtime_info_init();
 }
 
-static void
+staticfn void
 moveloop_preamble(boolean resuming)
 {
     /* if a save file created in normal mode is now being restored in
@@ -101,7 +101,7 @@ moveloop_preamble(boolean resuming)
         update_inventory();
 }
 
-static void
+staticfn void
 u_calc_moveamt(int wtcap)
 {
     int moveamt = 0;
@@ -516,7 +516,7 @@ moveloop_core(void)
     }
 }
 
-static void
+staticfn void
 maybe_do_tutorial(void)
 {
     s_level *sp = find_level("tut-1");
@@ -549,7 +549,7 @@ moveloop(boolean resuming)
     }
 }
 
-static void
+staticfn void
 regen_pw(int wtcap)
 {
     if (u.uen < u.uenmax
@@ -571,7 +571,7 @@ regen_pw(int wtcap)
 #define U_CAN_REGEN() (Regeneration || (Sleepy && u.usleep))
 
 /* maybe recover some lost health (or lose some when an eel out of water) */
-static void
+staticfn void
 regen_hp(int wtcap)
 {
     int heal = 0;
@@ -832,7 +832,7 @@ welcome(boolean new_game) /* false => restoring an old game */
 }
 
 #ifdef POSITIONBAR
-static void
+staticfn void
 do_positionbar(void)
 {
     /* FIXME: this will break if any coordinate is too big for (char);
@@ -875,7 +875,7 @@ do_positionbar(void)
 }
 #endif
 
-static void
+staticfn void
 interrupt_multi(const char *msg)
 {
     if (gm.multi > 0 && !gc.context.travel && !gc.context.run) {
@@ -1043,7 +1043,7 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
  *                    optimization so that display output
  *                    can be debugged without buffering.
  */
-static void
+staticfn void
 debug_fields(const char *opts)
 {
     char *op;
@@ -1174,7 +1174,7 @@ struct enum_dump arti_enum_dump[] = {
 
 #ifndef NODUMPENUMS
 
-static void
+staticfn void
 dump_enums(void)
 {
     enum enum_dumps {

@@ -10,45 +10,45 @@
 #define CONTAINED_SYM '>' /* designator for inside a container */
 #define HANDS_SYM '-'     /* hands|fingers|self depending on context */
 
-static void inuse_classify(Loot *, struct obj *);
-static char *loot_xname(struct obj *);
-static int invletter_value(char);
-static int QSORTCALLBACK sortloot_cmp(const genericptr, const genericptr);
-static void reorder_invent(void);
-static struct obj *addinv_core0(struct obj *, struct obj *,
+staticfn void inuse_classify(Loot *, struct obj *);
+staticfn char *loot_xname(struct obj *);
+staticfn int invletter_value(char);
+staticfn int QSORTCALLBACK sortloot_cmp(const genericptr, const genericptr);
+staticfn void reorder_invent(void);
+staticfn struct obj *addinv_core0(struct obj *, struct obj *,
                                                          boolean) NONNULLARG1;
-static void noarmor(boolean);
-static void invdisp_nothing(const char *, const char *);
-static boolean worn_wield_only(struct obj *);
-static char *cinv_doname(struct obj *);
-static char *cinv_ansimpleoname(struct obj *);
-static boolean only_here(struct obj *);
-static void compactify(char *);
-static boolean taking_off(const char *);
-static void mime_action(const char *);
-static char *getobj_hands_txt(const char *, char *);
-static int ckvalidcat(struct obj *);
-static int ckunpaid(struct obj *);
-static char *safeq_xprname(struct obj *);
-static char *safeq_shortxprname(struct obj *);
-static char display_pickinv(const char *, const char *, const char *,
+staticfn void noarmor(boolean);
+staticfn void invdisp_nothing(const char *, const char *);
+staticfn boolean worn_wield_only(struct obj *);
+staticfn char *cinv_doname(struct obj *);
+staticfn char *cinv_ansimpleoname(struct obj *);
+staticfn boolean only_here(struct obj *);
+staticfn void compactify(char *);
+staticfn boolean taking_off(const char *);
+staticfn void mime_action(const char *);
+staticfn char *getobj_hands_txt(const char *, char *);
+staticfn int ckvalidcat(struct obj *);
+staticfn int ckunpaid(struct obj *);
+staticfn char *safeq_xprname(struct obj *);
+staticfn char *safeq_shortxprname(struct obj *);
+staticfn char display_pickinv(const char *, const char *, const char *,
                             boolean, boolean, long *);
-static char display_used_invlets(char);
-static boolean this_type_only(struct obj *);
-static void dounpaid(int, int, int);
-static struct obj *find_unpaid(struct obj *, struct obj **);
-static void menu_identify(int);
-static boolean tool_being_used(struct obj *);
-static int adjust_ok(struct obj *);
-static int adjust_gold_ok(struct obj *);
-static int doorganize_core(struct obj *);
-static char obj_to_let(struct obj *);
-static boolean item_naming_classification(struct obj *, char *, char *);
-static int item_reading_classification(struct obj *, char *);
-static void ia_addmenu(winid, int, char, const char *);
-static void itemactions_pushkeys(struct obj *, int);
-static int itemactions(struct obj *);
-static int dispinv_with_action(char *, boolean, const char *);
+staticfn char display_used_invlets(char);
+staticfn boolean this_type_only(struct obj *);
+staticfn void dounpaid(int, int, int);
+staticfn struct obj *find_unpaid(struct obj *, struct obj **);
+staticfn void menu_identify(int);
+staticfn boolean tool_being_used(struct obj *);
+staticfn int adjust_ok(struct obj *);
+staticfn int adjust_gold_ok(struct obj *);
+staticfn int doorganize_core(struct obj *);
+staticfn char obj_to_let(struct obj *);
+staticfn boolean item_naming_classification(struct obj *, char *, char *);
+staticfn int item_reading_classification(struct obj *, char *);
+staticfn void ia_addmenu(winid, int, char, const char *);
+staticfn void itemactions_pushkeys(struct obj *, int);
+staticfn int itemactions(struct obj *);
+staticfn int dispinv_with_action(char *, boolean, const char *);
 
 /* enum and structs are defined in wintype.h */
 static win_request_info wri_info;
@@ -76,7 +76,7 @@ static const char *inuse_headers[] = { /* [4] shown first, [1] last */
 
 /* sortloot() classification for in-use sort;
    called at most once [per sort] for each object */
-static void
+staticfn void
 inuse_classify(Loot *sort_item, struct obj *obj)
 {
     long w_mask = (obj->owornmask & (W_ACCESSORY | W_WEAPONS | W_ARMOR));
@@ -315,7 +315,7 @@ loot_classify(Loot *sort_item, struct obj *obj)
 }
 
 /* sortloot() formatting routine; for alphabetizing, not shown to user */
-static char *
+staticfn char *
 loot_xname(struct obj *obj)
 {
     struct obj saveo;
@@ -397,7 +397,7 @@ loot_xname(struct obj *obj)
 }
 
 /* '$'==1, 'a'-'z'==2..27, 'A'-'Z'==28..53, '#'==54, catchall 55 */
-static int
+staticfn int
 invletter_value(char c)
 {
     return ('a' <= c && c <= 'z') ? (c - 'a' + 2)
@@ -408,7 +408,7 @@ invletter_value(char c)
 }
 
 /* qsort comparison routine for sortloot() */
-static int QSORTCALLBACK
+staticfn int QSORTCALLBACK
 sortloot_cmp(const genericptr vptr1, const genericptr vptr2)
 {
     struct sortloot_item *sli1 = (struct sortloot_item *) vptr1,
@@ -744,7 +744,7 @@ assigninvlet(struct obj *otmp)
 #define inv_rank(o) ((o)->invlet ^ 040)
 
 /* sort the inventory; used by addinv() and doorganize() */
-static void
+staticfn void
 reorder_invent(void)
 {
     struct obj *otmp, *prev, *next;
@@ -1038,7 +1038,7 @@ addinv_core2(struct obj *obj)
  * Add obj to the hero's inventory.  Make sure the object is "free".
  * Adjust hero attributes as necessary.
  */
-static struct obj *
+staticfn struct obj *
 addinv_core0(struct obj *obj, struct obj *other_obj,
              boolean update_perm_invent)
 {
@@ -1581,7 +1581,7 @@ g_at(coordxy x, coordxy y)
 }
 
 /* compact a string of inventory letters by dashing runs of letters */
-static void
+staticfn void
 compactify(char *buf)
 {
     int i1 = 1, i2 = 1;
@@ -1626,13 +1626,13 @@ splittable(struct obj *obj)
 }
 
 /* match the prompt for either 'T' or 'R' command */
-static boolean
+staticfn boolean
 taking_off(const char *action)
 {
     return !strcmp(action, "take off") || !strcmp(action, "remove");
 }
 
-static void
+staticfn void
 mime_action(const char *word)
 {
     char buf[BUFSZ];
@@ -1673,7 +1673,7 @@ any_obj_ok(struct obj *obj)
 }
 
 /* return string describing your hands based on action. */
-static char *
+staticfn char *
 getobj_hands_txt(const char *action, char *qbuf)
 {
     if (!strcmp(action, "grease")) {
@@ -2092,14 +2092,14 @@ silly_thing(const char *word,
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
-static int
+staticfn int
 ckvalidcat(struct obj *otmp)
 {
     /* use allow_category() from pickup.c */
     return (int) allow_category(otmp);
 }
 
-static int
+staticfn int
 ckunpaid(struct obj *otmp)
 {
     return (otmp->unpaid || (Has_contents(otmp) && count_unpaid(otmp->cobj)));
@@ -2136,7 +2136,7 @@ static struct xprnctx {
 } safeq_xprn_ctx;
 
 /* safe_qbuf() -> short_oname() callback */
-static char *
+staticfn char *
 safeq_xprname(struct obj *obj)
 {
     return xprname(obj, (char *) 0, safeq_xprn_ctx.let, safeq_xprn_ctx.dot,
@@ -2144,7 +2144,7 @@ safeq_xprname(struct obj *obj)
 }
 
 /* alternate safe_qbuf() -> short_oname() callback */
-static char *
+staticfn char *
 safeq_shortxprname(struct obj *obj)
 {
     return xprname(obj, ansimpleoname(obj), safeq_xprn_ctx.let,
@@ -2530,7 +2530,7 @@ identify(struct obj *otmp)
 }
 
 /* menu of unidentified objects; select and identify up to id_limit of them */
-static void
+staticfn void
 menu_identify(int id_limit)
 {
     menu_item *pick_list;
@@ -2728,7 +2728,7 @@ doperminv(void)
 }
 
 /* should of course only be called for things in invent */
-static char
+staticfn char
 obj_to_let(struct obj *obj)
 {
     if (!flags.invlet_constant) {
@@ -2855,7 +2855,7 @@ enum item_action_actions {
 };
 
 /* construct text for the menu entries for IA_NAME_OBJ and IA_NAME_OTYP */
-static boolean
+staticfn boolean
 item_naming_classification(
     struct obj *obj,
     char *onamebuf,
@@ -2895,7 +2895,7 @@ item_naming_classification(
 }
 
 /* construct text for the menu entries for IA_READ_OBJ */
-static int
+staticfn int
 item_reading_classification(struct obj *obj, char *outbuf)
 {
     int otyp = obj->otyp, res = IA_READ_OBJ;
@@ -2936,7 +2936,7 @@ item_reading_classification(struct obj *obj, char *outbuf)
     return res;
 }
 
-static void
+staticfn void
 ia_addmenu(winid win, int act, char let, const char *txt)
 {
     anything any;
@@ -2948,7 +2948,7 @@ ia_addmenu(winid win, int act, char let, const char *txt)
              ATR_NONE, clr, txt, MENU_ITEMFLAGS_NONE);
 }
 
-static void
+staticfn void
 itemactions_pushkeys(struct obj *otmp, int act)
 {
         switch (act) {
@@ -3083,7 +3083,7 @@ itemactions_pushkeys(struct obj *otmp, int act)
 }
 
 /* Show menu of possible actions hero could do with item otmp */
-static int
+staticfn int
 itemactions(struct obj *otmp)
 {
     int n, act = IA_NONE;
@@ -3420,7 +3420,7 @@ itemactions(struct obj *otmp)
    order to preform context-sensitive item action on it; always returns 'ok';
    invent subsets specified by the ')', '[', '(', '=', '"', or '*' commands
    when they're invoked with the 'm' prefix (or without it for '*') */
-static int
+staticfn int
 dispinv_with_action(
     char *lets,                 /* list of invlet values to include */
     boolean use_inuse_ordering, /* affects sortloot() and header labels */
@@ -3475,7 +3475,7 @@ ddoinv(void)
  * next unpaid object is returned.  This routine recursively follows
  * containers.
  */
-static struct obj *
+staticfn struct obj *
 find_unpaid(struct obj *list, struct obj **last_found)
 {
     struct obj *obj;
@@ -3511,7 +3511,7 @@ free_pickinv_cache(void)
  * Internal function used by display_inventory and getobj that can display
  * inventory and return a count as well as a letter.
  */
-static char
+staticfn char
 display_pickinv(
     const char *lets,        /* non-compacted list of invlet values */
     const char *xtra_choice, /* non-object "bare hands" or "fingers" */
@@ -3906,7 +3906,7 @@ display_inventory(const char *lets, boolean want_reply)
  * Show what is current using inventory letters.
  *
  */
-static char
+staticfn char
 display_used_invlets(char avoidlet)
 {
     struct obj *otmp;
@@ -4092,7 +4092,7 @@ count_contents(
     return count;
 }
 
-static void
+staticfn void
 dounpaid(
     int count,       /* unpaid items in inventory */
     int floorcount,  /* unpaid items on floor (rare) */
@@ -4231,7 +4231,7 @@ dounpaid(
 }
 
 
-static boolean
+staticfn boolean
 this_type_only(struct obj *obj)
 {
     boolean res = (obj->oclass == gt.this_type);
@@ -4995,7 +4995,7 @@ doprwep(void)
 }
 
 /* caller is responsible for checking !wearing_armor() */
-static void
+staticfn void
 noarmor(boolean report_uskin)
 {
     if (!uskin || !report_uskin) {
@@ -5115,7 +5115,7 @@ dopramulet(void)
 }
 
 /* is 'obj' a tool that's in use?  can't simply check obj->owornmask */
-static boolean
+staticfn boolean
 tool_being_used(struct obj *obj)
 {
     /*
@@ -5334,7 +5334,7 @@ check_invent_gold(const char *why) /* 'why' == caller in case of warning */
 }
 
 /* normal getobj callback for item to #adjust; excludes gold */
-static int
+staticfn int
 adjust_ok(struct obj *obj)
 {
     if (!obj || obj->oclass == COIN_CLASS)
@@ -5344,7 +5344,7 @@ adjust_ok(struct obj *obj)
 }
 
 /* getobj callback for item to #adjust if gold is wonky; allows gold */
-static int
+staticfn int
 adjust_gold_ok(struct obj *obj)
 {
     if (!obj)
@@ -5485,7 +5485,7 @@ adjust_split(void)
     return doorganize_core(obj);
 }
 
-static int
+staticfn int
 doorganize_core(struct obj *obj)
 {
     struct obj *otmp, *splitting, *bumped;
@@ -5696,7 +5696,7 @@ doorganize_core(struct obj *obj)
 }
 
 /* common to display_minventory and display_cinventory */
-static void
+staticfn void
 invdisp_nothing(const char *hdr, const char *txt)
 {
     winid win;
@@ -5715,7 +5715,7 @@ invdisp_nothing(const char *hdr, const char *txt)
 }
 
 /* query_objlist callback: return things that are worn or wielded */
-static boolean
+staticfn boolean
 worn_wield_only(struct obj *obj)
 {
 #if 1
@@ -5797,7 +5797,7 @@ display_minventory(
 
 /* format a container name for cinventory_display(), inserting "trapped"
    if that's appropriate */
-static char *
+staticfn char *
 cinv_doname(struct obj *obj)
 {
     char *result = doname(obj);
@@ -5829,7 +5829,7 @@ cinv_doname(struct obj *obj)
 }
 
 /* used by safe_qbuf() if the full doname() result is too long */
-static char *
+staticfn char *
 cinv_ansimpleoname(struct obj *obj)
 {
     char *result = ansimpleoname(obj);
@@ -5883,7 +5883,7 @@ display_cinventory(struct obj *obj)
 }
 
 
-static boolean
+staticfn boolean
 only_here(struct obj *obj)
 {
     return (obj->ox == go.only.x && obj->oy == go.only.y);

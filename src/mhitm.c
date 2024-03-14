@@ -9,21 +9,21 @@
 static const char brief_feeling[] =
     "have a %s feeling for a moment, then it passes.";
 
-static void noises(struct monst *, struct attack *);
-static void pre_mm_attack(struct monst *, struct monst *);
-static void missmm(struct monst *, struct monst *, struct attack *);
-static int hitmm(struct monst *, struct monst *, struct attack *,
+staticfn void noises(struct monst *, struct attack *);
+staticfn void pre_mm_attack(struct monst *, struct monst *);
+staticfn void missmm(struct monst *, struct monst *, struct attack *);
+staticfn int hitmm(struct monst *, struct monst *, struct attack *,
                  struct obj *, int);
-static int gazemm(struct monst *, struct monst *, struct attack *);
-static int gulpmm(struct monst *, struct monst *, struct attack *);
-static int explmm(struct monst *, struct monst *, struct attack *);
-static int mdamagem(struct monst *, struct monst *, struct attack *,
+staticfn int gazemm(struct monst *, struct monst *, struct attack *);
+staticfn int gulpmm(struct monst *, struct monst *, struct attack *);
+staticfn int explmm(struct monst *, struct monst *, struct attack *);
+staticfn int mdamagem(struct monst *, struct monst *, struct attack *,
                     struct obj *, int);
-static void mswingsm(struct monst *, struct monst *, struct obj *);
-static int passivemm(struct monst *, struct monst *, boolean, int,
+staticfn void mswingsm(struct monst *, struct monst *, struct obj *);
+staticfn int passivemm(struct monst *, struct monst *, boolean, int,
                      struct obj *);
 
-static void
+staticfn void
 noises(struct monst *magr, struct attack *mattk)
 {
     boolean farq = (mdistu(magr) > 15);
@@ -37,7 +37,7 @@ noises(struct monst *magr, struct attack *mattk)
     }
 }
 
-static void
+staticfn void
 pre_mm_attack(struct monst *magr, struct monst *mdef)
 {
     boolean showit = FALSE;
@@ -72,8 +72,7 @@ pre_mm_attack(struct monst *magr, struct monst *mdef)
 }
 
 /* feedback for when a monster-vs-monster attack misses */
-static
-void
+staticfn void
 missmm(
     struct monst *magr, /* attacker */
     struct monst *mdef, /* defender */
@@ -631,7 +630,7 @@ failed_grab(
 }
 
 /* Returns the result of mdamagem(). */
-static int
+staticfn int
 hitmm(
     struct monst *magr,
     struct monst *mdef,
@@ -722,7 +721,7 @@ hitmm(
 }
 
 /* Returns the same values as mdamagem(). */
-static int
+staticfn int
 gazemm(struct monst *magr, struct monst *mdef, struct attack *mattk)
 {
     char buf[BUFSZ];
@@ -835,7 +834,7 @@ engulf_target(struct monst *magr, struct monst *mdef)
 }
 
 /* Returns the same values as mattackm(). */
-static int
+staticfn int
 gulpmm(
     struct monst *magr,
     struct monst *mdef,
@@ -954,7 +953,7 @@ gulpmm(
     return status;
 }
 
-static int
+staticfn int
 explmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
 {
     int result;
@@ -1000,7 +999,7 @@ explmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
 /*
  *  See comment at top of mattackm(), for return values.
  */
-static int
+staticfn int
 mdamagem(
     struct monst *magr,
     struct monst *mdef,
@@ -1259,7 +1258,7 @@ rustm(struct monst *mdef, struct obj *obj)
         (void) erode_obj(obj, (char *) 0, dmgtyp, EF_GREASE | EF_VERBOSE);
 }
 
-static void
+staticfn void
 mswingsm(
     struct monst *magr, /* attacker */
     struct monst *mdef, /* defender */
@@ -1279,7 +1278,7 @@ mswingsm(
  * Passive responses by defenders.  Does not replicate responses already
  * handled above.  Returns same values as mattackm.
  */
-static int
+staticfn int
 passivemm(
     struct monst *magr,
     struct monst *mdef,

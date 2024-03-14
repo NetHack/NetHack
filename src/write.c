@@ -3,15 +3,15 @@
 
 #include "hack.h"
 
-static int cost(struct obj *) NONNULLARG1;
-static boolean label_known(int, struct obj *) NO_NNARGS;
-static int write_ok(struct obj *) NO_NNARGS;
-static char *new_book_description(int, char *) NONNULL NONNULLPTRS;
+staticfn int cost(struct obj *) NONNULLARG1;
+staticfn boolean label_known(int, struct obj *) NO_NNARGS;
+staticfn int write_ok(struct obj *) NO_NNARGS;
+staticfn char *new_book_description(int, char *) NONNULL NONNULLPTRS;
 
 /*
  * returns basecost of a scroll or a spellbook
  */
-static int
+staticfn int
 cost(struct obj *otmp)
 {
     if (otmp->oclass == SPBOOK_CLASS)
@@ -61,7 +61,7 @@ cost(struct obj *otmp)
    unfortunately, we can't track things that haven't been added to
    the discoveries list and aren't present in current inventory,
    so some scrolls with ought to yield True will end up False */
-static boolean
+staticfn boolean
 label_known(int scrolltype, struct obj *objlist)
 {
     struct obj *otmp;
@@ -86,7 +86,7 @@ label_known(int scrolltype, struct obj *objlist)
 }
 
 /* getobj callback for object to write on */
-static int
+staticfn int
 write_ok(struct obj *obj)
 {
     if (!obj || (obj->oclass != SCROLL_CLASS && obj->oclass != SPBOOK_CLASS))
@@ -421,7 +421,7 @@ dowrite(struct obj *pen)
    looks funny, so we want to insert "into " prior to such descriptions;
    even that's rather iffy, indicating that such descriptions probably
    ought to be eliminated (especially "cloth"!) */
-static char *
+staticfn char *
 new_book_description(int booktype, char *outbuf)
 {
     /* subset of description strings from objects.c; if it grows

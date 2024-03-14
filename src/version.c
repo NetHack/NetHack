@@ -10,7 +10,7 @@
 #define OPTIONS_AT_RUNTIME
 #endif
 
-static void insert_rtoption(char *) NONNULLARG1;
+staticfn void insert_rtoption(char *) NONNULLARG1;
 
 /* fill buffer with short version (so caller can avoid including date.h)
  * buf cannot be NULL */
@@ -340,7 +340,7 @@ static struct rt_opt {
  * it depends which of several object files got linked into the
  * game image, so we insert those options here.
  */
-static void
+staticfn void
 insert_rtoption(char *buf)
 {
     int i;

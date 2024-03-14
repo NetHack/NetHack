@@ -401,7 +401,7 @@ mstrength(struct permonst *ptr)
 }
 
 /* returns True if monster can attack at range */
-static boolean
+staticfn boolean
 mstrength_ranged_attk(struct permonst *ptr)
 {
     int i, j;

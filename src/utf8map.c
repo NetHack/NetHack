@@ -37,24 +37,25 @@ static struct glyphid_cache_t *glyphid_cache;
 static unsigned glyphid_cache_lsize;
 static size_t glyphid_cache_size;
 struct find_struct glyphcache_find, to_custom_symbol_find;
-static void init_glyph_cache(void);
-static void add_glyph_to_cache(int glyphnum, const char *id);
-static int find_glyph_in_cache(const char *id);
-static uint32 glyph_hash(const char *id);
-static void to_custom_symset_entry_callback(int glyph,
+
+staticfn void init_glyph_cache(void);
+staticfn void add_glyph_to_cache(int glyphnum, const char *id);
+staticfn int find_glyph_in_cache(const char *id);
+staticfn uint32 glyph_hash(const char *id);
+staticfn void to_custom_symset_entry_callback(int glyph,
                                             struct find_struct *findwhat);
-static int unicode_val(const char *cp);
-static int parse_id(const char *id, struct find_struct *findwhat);
-static int glyph_find_core(const char *id, struct find_struct *findwhat);
-static char *fix_glyphname(char *str);
-static int32_t rgbstr_to_int32(const char *rgbstr);
+staticfn int unicode_val(const char *cp);
+staticfn int parse_id(const char *id, struct find_struct *findwhat);
+staticfn int glyph_find_core(const char *id, struct find_struct *findwhat);
+staticfn char *fix_glyphname(char *str);
+staticfn int32_t rgbstr_to_int32(const char *rgbstr);
 boolean closest_color(uint32_t lcolor, uint32_t *closecolor, int *clridx);
-static int color_distance(uint32_t, uint32_t);
-static boolean onlyhexdigits(const char *buf);
+staticfn int color_distance(uint32_t, uint32_t);
+staticfn boolean onlyhexdigits(const char *buf);
 
 static const long nonzero_black = CLR_BLACK | NH_BASIC_COLOR;
 
-static void
+staticfn void
 to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
 {
 #ifdef NO_PARSING_SYMSET
@@ -146,7 +147,7 @@ glyphrep_to_custom_map_entries(const char *op, int *glyphptr)
 
 static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
 
-static boolean
+staticfn boolean
 onlyhexdigits(const char *buf)
 {
     const char *dp = buf;
@@ -158,7 +159,7 @@ onlyhexdigits(const char *buf)
     return TRUE;
 }
 
-static int32_t
+staticfn int32_t
 rgbstr_to_int32(const char *rgbstr)
 {
     int r, g, b, milestone = 0;
@@ -214,7 +215,7 @@ rgbstr_to_int32(const char *rgbstr)
     return -1;
 }
 
-static char *
+staticfn char *
 fix_glyphname(char *str)
 {
     char *c;
@@ -230,7 +231,7 @@ fix_glyphname(char *str)
     return str;
 }
 
-static int
+staticfn int
 unicode_val(const char *cp)
 {
     const char *dp;
@@ -278,7 +279,7 @@ set_map_u(glyph_map *gmap, uint32 utf32ch, const uint8 *utf8str, long ucolor)
 }
 
 
-static int
+staticfn int
 glyph_find_core(const char *id, struct find_struct *findwhat)
 {
     int glyph;
@@ -374,7 +375,7 @@ void fill_glyphid_cache(void)
  * to traverse the entire table.
  */
 
-static void
+staticfn void
 init_glyph_cache(void)
 {
     size_t glyph;
@@ -411,7 +412,7 @@ void free_glyphid_cache(void)
     glyphid_cache = (struct glyphid_cache_t *) 0;
 }
 
-static void
+staticfn void
 add_glyph_to_cache(int glyphnum, const char *id)
 {
     uint32 hash = glyph_hash(id);
@@ -434,7 +435,7 @@ add_glyph_to_cache(int glyphnum, const char *id)
     panic("glyphid_cache full");
 }
 
-static int
+staticfn int
 find_glyph_in_cache(const char *id)
 {
     uint32 hash = glyph_hash(id);
@@ -457,7 +458,7 @@ find_glyph_in_cache(const char *id)
     return -1;
 }
 
-static uint32
+staticfn uint32
 glyph_hash(const char *id)
 {
     uint32 hash = 0;
@@ -669,7 +670,7 @@ add_custom_urep_entry(
     return 1;
 }
 
-static int
+staticfn int
 parse_id(const char *id, struct find_struct *findwhat)
 {
     FILE *fp = (FILE *) 0;
@@ -1107,7 +1108,7 @@ static struct {
  * https://www.compuphase.com/cmetric.htm
  **/
 
-static int
+staticfn int
 color_distance(uint32_t rgb1, uint32_t rgb2)
 {
     int r1 = (rgb1 >> 16) & 0xFF;
@@ -1165,12 +1166,12 @@ static struct {
 #undef PCHAR_TILES
 };
 
-static int glyphs_to_unicode(const char *id, const char *unicode_val,
+staticfn int glyphs_to_unicode(const char *id, const char *unicode_val,
                              long clr);
-static int find_glyphs(const char *id);
-static void just_find_callback(int glyph, struct find_struct *findwhat);
-static void to_unicode_callback(int glyph, struct find_struct *findwhat);
-static struct customization_detail *find_display_urep_customization(
+staticfn int find_glyphs(const char *id);
+staticfn void just_find_callback(int glyph, struct find_struct *findwhat);
+staticfn void to_unicode_callback(int glyph, struct find_struct *findwhat);
+staticfn struct customization_detail *find_display_urep_customization(
                 const char *customization_name, int glyphidx,
                 enum graphics_sets which_set);
 
@@ -1187,13 +1188,13 @@ test_glyphnames(void)
     reslt = glyphs_to_unicode("S_dog", "U+130E6", 0L);
 }
 
-static void
+staticfn void
 just_find_callback(int glyph UNUSED, struct find_struct *findwhat UNUSED)
 {
     return;
 }
 
-static int
+staticfn int
 find_glyphs(const char *id)
 {
     struct find_struct find_only = zero_find;
@@ -1203,7 +1204,7 @@ find_glyphs(const char *id)
     return glyph_find_core(id, &find_only);
 }
 
-static void
+staticfn void
 to_unicode_callback(int glyph UNUSED, struct find_struct *findwhat)
 {
     int uval;
