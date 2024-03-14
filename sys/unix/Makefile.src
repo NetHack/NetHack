@@ -1171,8 +1171,8 @@ $(TARGETPFX)engrave.o: engrave.c $(HACK_H)
 $(TARGETPFX)exper.o: exper.c $(HACK_H)
 $(TARGETPFX)explode.o: explode.c $(HACK_H)
 $(TARGETPFX)extralev.o: extralev.c $(HACK_H)
-$(TARGETPFX)files.o: files.c #zlib.h $(HACK_H) ../include/dlb.h \
-		../include/wintty.h
+$(TARGETPFX)files.o: files.c $(HACK_H) ../include/dlb.h ../include/wintty.h \
+		#zlib.h
 $(TARGETPFX)fountain.o: fountain.c $(HACK_H)
 $(TARGETPFX)getpos.o: getpos.c $(HACK_H)
 $(TARGETPFX)hack.o: hack.c $(HACK_H)

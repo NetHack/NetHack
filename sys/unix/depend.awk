@@ -250,6 +250,9 @@ function nhsort(list, first, last, cmpid,		i,j,temp)
 function nhcmp(a,b,cmpid)
 {
   if(cmpid == 0){		  # sort dependencies
+      # commented out entry (there can be only one) MUST be last
+    if (a ~ /^#/){ return 1}
+    if (b ~ /^#/){ return 0}
       # 2 .c or .cpp files
     if (a ~ /\.c(pp)?$/ && b ~ /\.c(pp)?$/ ){ return a > b }
       # a .c or .cpp file and anything else
