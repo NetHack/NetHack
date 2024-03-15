@@ -1,4 +1,4 @@
-/* NetHack 3.7	report.c	$NHDT-Date: 1710106611 2024/03/10 21:36:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.5 $ */
+/* NetHack 3.7	report.c	$NHDT-Date: 1710525914 2024/03/15 18:05:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2024 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -219,7 +219,7 @@ crashreport_bidshow(void)
     mark = uend;                                \
     if (utmp >= urem)                           \
         goto full;                              \
-    strncpy(uend, str, utmp);                   \
+    memcpy(uend, str, utmp);			\
     uend += utmp; urem -= utmp;                 \
     *uend = '\0';
 
