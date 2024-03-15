@@ -2043,6 +2043,7 @@ curses: if user's terminal was set to 'application keypad mode' (DEC VTxxx
 	entry told the terminal to send 8-bit escape sequences (via 3 char
 	"ESC SPC G"), nethack wasn't recognizing number pad keys
 curses: change petattr attributes, dropping support for curses-only ones
+curses: swap the grey and no-color color initialization
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project
