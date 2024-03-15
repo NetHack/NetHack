@@ -607,23 +607,8 @@ coordinates without a refresh.  Currently only used for the map. */
 static int
 get_framecolor(int nhcolor, int framecolor)
 {
-    boolean hicolor = (COLORS >= 16), adj_framecolor = framecolor;
-    static int framecolors[16][8] = {
-        { 0, 16, 8, 32, 17, 40, 48, 0 },    { 1, 18, 9, 33, 19, 41, 49, 1 },
-        { 2, 20, 10, 34, 21, 42, 50, 2 },   { 3, 22, 11, 35, 23, 43, 51, 3 },
-        { 4, 24, 12, 36, 25, 44, 52, 4 },   { 5, 26, 13, 37, 27, 45, 53, 5 },
-        { 6, 28, 14, 38, 29, 46, 54, 6 },   { 0, 30, 15, 72, 31, 88, 56, 0 },
-        { 0, 30, 15, 39, 31, 47, 55, 0 },   { 1, 18, 9, 73, 19, 89, 57, 121 },
-        { 2, 20, 10, 74, 21, 90, 58, 122 }, { 2, 22, 11, 75, 23, 91, 59, 123 },
-        { 4, 24, 12, 76, 25, 44, 60, 124 }, { 5, 26, 13, 77, 27, 93, 61, 125 },
-        { 6, 28, 14, 78, 29, 94, 62, 126 }, { 0, 30, 15, 79, 31, 95, 63, 127 },
-    };
-
-    if (framecolor < 16 && framecolor >= 8)
-        adj_framecolor = framecolor - 8;
-    return ((nhcolor < (hicolor ? 16 : 8) && adj_framecolor < 8)
-                ? framecolors[nhcolor][adj_framecolor]
-                : nhcolor);
+    /* curses_toggle_color_attr() adds the +1 and takes care of COLORS < 16 */
+    return (16 * (framecolor % 8)) + (nhcolor % 16);
 }
 
 static void
