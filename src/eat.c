@@ -64,7 +64,8 @@ static int tin_ok(struct obj *);
 #define nonrotting_food(otyp) \
     ((otyp) == LEMBAS_WAFER || (otyp) == CRAM_RATION)
 
-/* see hunger states in hack.h - texts used on bottom line */
+/* see hunger states in hack.h - texts used on bottom line
+   Also used in botl.c and insight.c  */
 const char *const hu_stat[] = {
     "Satiated", "        ", "Hungry  ", "Weak    ",
     "Fainting", "Fainted ", "Starved "

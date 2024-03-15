@@ -1455,9 +1455,9 @@ strange_feeling(struct obj *obj, const char *txt)
     useup(obj);
 }
 
-const char *bottlenames[] = { "bottle", "phial", "flagon", "carafe",
+static const char *bottlenames[] = { "bottle", "phial", "flagon", "carafe",
                               "flask",  "jar",   "vial" };
-const char *hbottlenames[] = {
+static const char *hbottlenames[] = {
     "jug", "pitcher", "barrel", "tin", "bag", "box", "glass", "beaker",
     "tumbler", "vase", "flowerpot", "pan", "thingy", "mug", "teacup",
     "teapot", "keg", "bucket", "thermos", "amphora", "wineskin", "parcel",

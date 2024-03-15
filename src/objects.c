@@ -10,13 +10,13 @@
 #include "color.h"
 #include "objclass.h"
 
-NEARDATA struct objdescr obj_descr_init[NUM_OBJECTS + 1] = {
+static struct objdescr obj_descr_init[NUM_OBJECTS + 1] = {
 #define OBJECTS_DESCR_INIT
 #include "objects.h"
 #undef OBJECTS_DESCR_INIT
 };
 
-NEARDATA struct objclass obj_init[NUM_OBJECTS + 1] = {
+static struct objclass obj_init[NUM_OBJECTS + 1] = {
 #define OBJECTS_INIT
 #include "objects.h"
 #undef OBJECTS_INIT

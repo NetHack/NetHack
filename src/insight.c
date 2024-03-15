@@ -2547,7 +2547,8 @@ show_gamelog(int final)
  *      Vanquished monsters.
  */
 
-/* the two uppercase choices are implemented but suppressed from menu */
+/* the two uppercase choices are implemented but suppressed from menu.
+   also used in options.c */
 const char *const vanqorders[NUM_VANQ_ORDER_MODES][3] = {
     { "t", "traditional: by monster level",
            "traditional: by monster level, by internal monster index" },

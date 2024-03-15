@@ -393,7 +393,7 @@ lib_dlb_ftell(dlb *dp)
     return dp->mark;
 }
 
-const dlb_procs_t lib_dlb_procs = { lib_dlb_init,  lib_dlb_cleanup,
+static const dlb_procs_t lib_dlb_procs = { lib_dlb_init,  lib_dlb_cleanup,
                                     lib_dlb_fopen, lib_dlb_fclose,
                                     lib_dlb_fread, lib_dlb_fseek,
                                     lib_dlb_fgets, lib_dlb_fgetc,
@@ -402,7 +402,7 @@ const dlb_procs_t lib_dlb_procs = { lib_dlb_init,  lib_dlb_cleanup,
 #endif /* DLBLIB */
 
 #ifdef DLBRSRC
-const dlb_procs_t rsrc_dlb_procs = { rsrc_dlb_init,  rsrc_dlb_cleanup,
+static const dlb_procs_t rsrc_dlb_procs = { rsrc_dlb_init,  rsrc_dlb_cleanup,
                                      rsrc_dlb_fopen, rsrc_dlb_fclose,
                                      rsrc_dlb_fread, rsrc_dlb_fseek,
                                      rsrc_dlb_fgets, rsrc_dlb_fgetc,

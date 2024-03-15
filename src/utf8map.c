@@ -28,7 +28,7 @@ struct find_struct {
     enum reserved_activities restype;
     genericptr_t reserved;
 };
-const struct find_struct zero_find = { 0 };
+static const struct find_struct zero_find = { 0 };
 struct glyphid_cache_t {
     int glyphnum;
     char *id;
@@ -36,7 +36,7 @@ struct glyphid_cache_t {
 static struct glyphid_cache_t *glyphid_cache;
 static unsigned glyphid_cache_lsize;
 static size_t glyphid_cache_size;
-struct find_struct glyphcache_find, to_custom_symbol_find;
+static struct find_struct glyphcache_find, to_custom_symbol_find;
 static void init_glyph_cache(void);
 static void add_glyph_to_cache(int glyphnum, const char *id);
 static int find_glyph_in_cache(const char *id);

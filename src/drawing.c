@@ -9,6 +9,11 @@
 #include "wintype.h"
 #include "sym.h"
 
+extern const struct symparse loadsyms[];
+extern const struct class_sym def_oc_syms[MAXOCLASSES];
+extern const struct class_sym def_monsyms[MAXMCLASSES];
+extern const uchar def_r_oc_syms[MAXOCLASSES];
+
 /* Relevant header information in rm.h, objclass.h, sym.h, defsym.h. */
 
 /* Default object class symbols.  See objclass.h.

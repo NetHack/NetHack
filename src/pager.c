@@ -1562,7 +1562,7 @@ add_quoted_engraving(coordxy x, coordxy y, char *buf)
     return TRUE;
 }
 
-/* also used by getpos hack in do_name.c */
+/* also used by getpos hack in getpos.c */
 const char what_is_an_unknown_object[] = "an unknown object";
 
 int

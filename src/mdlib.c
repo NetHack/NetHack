@@ -95,7 +95,7 @@ static char *opttext[MAXOPT] = { 0 };
     ((void) ((idxopttext < MAXOPT)                      \
              ? (opttext[idxopttext++] = dupstr(line))   \
              : 0))
-char optbuf[COLBUFSZ];
+static char optbuf[COLBUFSZ];
 static struct version_info version;
 static const char opt_indent[] = "    ";
 

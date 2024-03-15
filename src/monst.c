@@ -10,6 +10,9 @@
 
 #include "color.h"
 
+extern const struct attack c_sa_yes[NATTK];
+extern const struct attack c_sa_no[NATTK];
+
 #define NO_ATTK { 0, 0, 0, 0 }
 
 /* monster type with single name */
@@ -32,7 +35,7 @@
 #define ATTK(at, ad, n, d) { at, ad, n, d }
 #define A(a1, a2, a3, a4, a5, a6) { a1, a2, a3, a4, a5, a6 }
 
-struct permonst mons_init[NUMMONS + 1] = {
+static struct permonst mons_init[NUMMONS + 1] = {
 #include "monsters.h"
     /*
      * Array terminator, added to the end of the entries in monsters.h.

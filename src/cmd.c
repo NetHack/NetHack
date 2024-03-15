@@ -144,8 +144,10 @@ static char *doc_extcmd_flagstr(winid, const struct ext_func_tab *);
 
 static const char *readchar_queue = "";
 
-/* for rejecting attempts to use wizard mode commands */
+/* for rejecting attempts to use wizard mode commands
+ * Also used in wizcmds.c  */
 const char unavailcmd[] = "Unavailable command '%s'.";
+
 /* for rejecting #if !SHELL, !SUSPEND */
 static const char cmdnotavail[] = "'%s' command not available.";
 
@@ -1038,7 +1040,8 @@ makemap_prepost(boolean pre, boolean wiztower)
 }
 
 /* temporary? hack, since level type codes aren't the same as screen
-   symbols and only the latter have easily accessible descriptions */
+   symbols and only the latter have easily accessible descriptions.
+   Also used by wizcmds.c */
 const char *levltyp[MAX_TYPE + 2] = {
     "stone", "vertical wall", "horizontal wall", "top-left corner wall",
     "top-right corner wall", "bottom-left corner wall",
@@ -2029,7 +2032,7 @@ static const struct {
     { 0, (const char *) 0, FALSE }
 };
 
-int extcmdlist_length = SIZE(extcmdlist) - 1;
+static int extcmdlist_length = SIZE(extcmdlist) - 1;
 
 /* get entry i in the extended commands list. for windowport use. */
 struct ext_func_tab *

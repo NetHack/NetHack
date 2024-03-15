@@ -1714,7 +1714,7 @@ extern struct sound_procs macsound_procs;
 extern struct sound_procs qtsound_procs;
 #endif
 
-struct sound_procs nosound_procs = {
+static struct sound_procs nosound_procs = {
     SOUNDID(nosound),
     0L,
     (void (*)(void)) 0,                           /* init_nhsound   */

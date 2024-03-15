@@ -14,7 +14,9 @@ static const char
     *const minusattr[] = { "weak",    "stupid",
                            "foolish", "clumsy",
                            "fragile", "repulsive" };
-/* also used by enlightenment for non-abbreviated status info */
+/* also used by enlightenment in insight.c for non-abbreviated status info */
+extern const char *const attrname[6];
+
 const char
     *const attrname[] = { "strength", "intelligence", "wisdom",
                           "dexterity", "constitution", "charisma" };

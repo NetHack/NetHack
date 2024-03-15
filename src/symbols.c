@@ -373,6 +373,7 @@ symset_is_compatible(
  * particular types of symset "handling", define a
  * H_XXX macro in include/sym.h and add the name
  * to this array at the matching offset.
+ * Externally referenced from files.c, options.c, utf8map.c. 
  */
 const char *const known_handling[] = {
     "UNKNOWN", /* H_UNK  */

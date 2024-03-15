@@ -22,7 +22,8 @@
  *              ....X   +4
  *              @...X   +4
  *
- */
+ * Externally referenced from light.c
+*/
 const coordxy circle_data[] = {
     /*  0*/ 0,
     /*  1*/ 1,  1,

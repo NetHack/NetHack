@@ -1318,7 +1318,8 @@ obj_pmname(struct obj *obj)
 
 /* used by bogusmon(next) and also by init_CapMons(rumors.c);
    bogon_is_pname(below) checks a hard-coded subset of these rather than
-   use this list */
+   use this list.
+   Also used in rumors.c */
 const char bogon_codes[] = "-_+|="; /* see dat/bonusmon.txt */
 
 /* fake monsters used to be in a hard-coded array, now in a data file */

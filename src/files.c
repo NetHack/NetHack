@@ -492,7 +492,7 @@ fopen_datafile(const char *filename, const char *mode, int prefix)
 /* ----------  EXTERNAL FILE SUPPORT ----------- */
 
 /* determine byte order */
-const int bei = 1;
+static const int bei = 1;
 #define IS_BIGENDIAN() ( (*(char*)&bei) == 0 )
 
 void
@@ -1824,7 +1824,7 @@ docompress_file(const char *filename, boolean uncomp)
 static int lockfd = -1; /* for lock_file() to pass to unlock_file() */
 #endif
 #ifdef USE_FCNTL
-struct flock sflock; /* for unlocking, same as above */
+static struct flock sflock; /* for unlocking, same as above */
 #endif
 
 #if defined(HANGUPHANDLING)
@@ -2082,7 +2082,7 @@ unlock_file(const char *filename)
 
 /* ----------  BEGIN CONFIG FILE HANDLING ----------- */
 
-const char *default_configfile =
+static const char *default_configfile =
 #ifdef UNIX
     ".nethackrc";
 #else
@@ -2097,7 +2097,7 @@ const char *default_configfile =
 #endif
 #endif
 
-/* used for messaging */
+/* used for messaging. Also used in options.c */
 char configfile[BUFSZ];
 
 #ifdef MSDOS

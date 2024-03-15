@@ -10,7 +10,7 @@ static void clear_bypass(struct obj *) NO_NNARGS;
 static void m_dowear_type(struct monst *, long, boolean, boolean) NONNULLARG1;
 static int extra_pref(struct monst *, struct obj *) NONNULLARG1;
 
-const struct worn {
+static const struct worn {
     long w_mask;
     struct obj **w_obj;
     const char *w_what; /* for failing sanity check's feedback */

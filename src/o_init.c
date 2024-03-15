@@ -562,8 +562,8 @@ sortloot_descr(int otyp, char *outbuf)
 #define DISCO_ALPHABYCLASS 2 /* alphabetized within each class */
 #define DISCO_ALPHABETIZED 3 /* alphabetized across all classes */
 /* also used in options.c (optfn_sortdiscoveries) */
-const char disco_order_let[] = "osca";
-const char *const disco_orders_descr[] = {
+static const char disco_order_let[] = "osca";
+static const char *const disco_orders_descr[] = {
     "by order of discovery within each class",
     "sortloot order (by class with some sub-class groupings)",
     "alphabetical within each class",

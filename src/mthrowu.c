@@ -26,7 +26,7 @@ static NEARDATA const char *breathwep[] = {
 };
 
 /* hallucinatory ray types */
-const char *const hallublasts[] = {
+static const char *const hallublasts[] = {
     "asteroids", "beads", "bubbles", "butterflies", "champagne", "chaos",
     "coins", "cotton candy", "crumbs", "dark matter", "darkness", "dust specks",
     "emoticons", "emotions", "entropy", "flowers", "foam", "fog", "gamma rays",

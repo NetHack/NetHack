@@ -1109,6 +1109,7 @@ timet_delta(time_t etim, time_t stim) /* end and start times */
 
 #if !defined(NODUMPENUMS) || defined(ENHANCED_SYMBOLS)
 /* monsdump[] and objdump[] are also used in utf8map.c */
+
 #define DUMP_ENUMS
 struct enum_dump monsdump[] = {
 #include "monsters.h"
@@ -1124,46 +1125,46 @@ struct enum_dump objdump[] = {
 };
 
 #define DUMP_ENUMS_PCHAR
-struct enum_dump defsym_cmap_dump[] = {
+static struct enum_dump defsym_cmap_dump[] = {
 #include "defsym.h"
     { MAXPCHARS, "MAXPCHARS" },
 };
 #undef DUMP_ENUMS_PCHAR
 
 #define DUMP_ENUMS_MONSYMS
-struct enum_dump defsym_mon_syms_dump[] = {
+static struct enum_dump defsym_mon_syms_dump[] = {
 #include "defsym.h"
     { MAXMCLASSES, "MAXMCLASSES" },
 };
 #undef DUMP_ENUMS_MONSYMS
 
 #define DUMP_ENUMS_MONSYMS_DEFCHAR
-struct enum_dump defsym_mon_defchars_dump[] = {
+static struct enum_dump defsym_mon_defchars_dump[] = {
 #include "defsym.h"
 };
 #undef DUMP_ENUMS_MONSYMS_DEFCHAR
 
 #define DUMP_ENUMS_OBJCLASS_DEFCHARS
-struct enum_dump objclass_defchars_dump[] = {
+static struct enum_dump objclass_defchars_dump[] = {
 #include "defsym.h"
 };
 #undef DUMP_ENUMS_OBJCLASS_DEFCHARS
 
 #define DUMP_ENUMS_OBJCLASS_CLASSES
-struct enum_dump objclass_classes_dump[] = {
+static struct enum_dump objclass_classes_dump[] = {
 #include "defsym.h"
     { MAXOCLASSES, "MAXOCLASSES" },
 };
 #undef DUMP_ENUMS_OBJCLASS_CLASSES
 
 #define DUMP_ENUMS_OBJCLASS_SYMS
-struct enum_dump objclass_syms_dump[] = {
+static struct enum_dump objclass_syms_dump[] = {
 #include "defsym.h"
 };
 #undef DUMP_ENUMS_OBJCLASS_SYMS
 
 #define DUMP_ARTI_ENUM
-struct enum_dump arti_enum_dump[] = {
+static struct enum_dump arti_enum_dump[] = {
 #include "artilist.h"
     { AFTER_LAST_ARTIFACT, "AFTER_LAST_ARTIFACT" }
 };

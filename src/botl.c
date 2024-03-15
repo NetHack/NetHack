@@ -10,6 +10,7 @@
 
 extern const char *const hu_stat[]; /* defined in eat.c */
 
+/* also used in insight.c */
 const char *const enc_stat[] = {
     "",         "Burdened",  "Stressed",
     "Strained", "Overtaxed", "Overloaded"
@@ -591,7 +592,7 @@ static struct istat_s initblstats[MAXBLSTATS] = {
 
 #ifdef STATUS_HILITES
 
-const struct condmap condition_aliases[] = {
+static const struct condmap condition_aliases[] = {
     { "strangled",      BL_MASK_STRNGL },
     { "all",            BL_MASK_BAREH | BL_MASK_BLIND | BL_MASK_BUSY
                         | BL_MASK_CONF | BL_MASK_DEAF | BL_MASK_ELF_IRON

@@ -329,7 +329,7 @@ nhl_add_table_entry_region(lua_State *L, const char *name, coordxy x1,
 
 /* converting from special level "map character" to levl location type
    and back. order here is important. */
-const struct {
+static const struct {
     char ch;
     schar typ;
 } char2typ[] = {
