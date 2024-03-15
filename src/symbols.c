@@ -426,7 +426,7 @@ const struct symparse loadsyms[] = {
     { SYM_OTH, SYM_INVISIBLE + SYM_OFF_X, "S_invisible" },
     { SYM_OTH, SYM_PET_OVERRIDE + SYM_OFF_X, "S_pet_override" },
     { SYM_OTH, SYM_HERO_OVERRIDE + SYM_OFF_X, "S_hero_override" },
-    { 0, 0, (const char *) 0 } /* fence post */
+    { SYM_INVALID, 0, (const char *) 0 } /* fence post */
 };
 
 boolean
