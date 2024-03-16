@@ -154,8 +154,6 @@ curses_create_window(int width, int height, orient orientation)
 void
 curses_destroy_win(WINDOW *win)
 {
-    werase(win);
-    wrefresh(win);
     delwin(win);
     if (win == activemenu)
         activemenu = NULL;
