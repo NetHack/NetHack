@@ -1,4 +1,4 @@
-/* NetHack 3.7	light.c	$NHDT-Date: 1702680171 2023/12/15 22:42:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.7	light.c	$NHDT-Date: 1710549969 2024/03/16 00:46:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Dean Luick, 1994                                       */
 /* NetHack may be freely redistributed.  See license for details.       */
 
@@ -43,6 +43,7 @@
 
 static light_source *new_light_core(coordxy, coordxy,
                                     int, int, anything *) NONNULLPTRS;
+static void delete_ls(light_source *);
 static void discard_flashes(void);
 static void write_ls(NHFILE *, light_source *);
 static int maybe_write_ls(NHFILE *, int, boolean);
@@ -89,14 +90,12 @@ new_light_core(coordxy x, coordxy y, int range, int type, anything *id)
     return ls;
 }
 
-/*
- * Delete a light source. This assumes only one light source is attached
- * to an object at a time.
- */
+/* Find and delete a light source.
+   Assumes at most one light source is attached to an object at a time. */
 void
 del_light_source(int type, anything *id)
 {
-    light_source *curr, *prev;
+    light_source *curr;
     anything tmp_id;
 
     tmp_id = cg.zeroany;
@@ -115,23 +114,46 @@ del_light_source(int type, anything *id)
         break;
     }
 
-    for (prev = 0, curr = gl.light_base; curr; prev = curr, curr = curr->next) {
+    /* find the light source from its id */
+    for (curr = gl.light_base; curr; curr = curr->next) {
         if (curr->type != type)
             continue;
         if (curr->id.a_obj
-            == ((curr->flags & LSF_NEEDS_FIXUP) ? tmp_id.a_obj : id->a_obj)) {
+            == ((curr->flags & LSF_NEEDS_FIXUP) ? tmp_id.a_obj : id->a_obj))
+            break;
+    }
+    if (curr) {
+        delete_ls(curr);
+    } else {
+        impossible("del_light_source: not found type=%d, id=%s", type,
+                   fmt_ptr((genericptr_t) id->a_obj));
+    }
+}
+
+/* remove a light source from the light_base list and free it */
+static void
+delete_ls(light_source *ls)
+{
+    light_source *curr, *prev;
+
+    for (prev = 0, curr = gl.light_base; curr;
+         prev = curr, curr = curr->next) {
+        if (curr == ls) {
             if (prev)
                 prev->next = curr->next;
             else
                 gl.light_base = curr->next;
-
-            free((genericptr_t) curr);
-            gv.vision_full_recalc = 1;
-            return;
+            break;
         }
     }
-    impossible("del_light_source: not found type=%d, id=%s", type,
-               fmt_ptr((genericptr_t) id->a_obj));
+    if (curr) {
+        assert(curr == ls);
+        free((genericptr_t) ls);
+        gv.vision_full_recalc = 1;
+    } else {
+        impossible("delete_ls not found, ls=%s", fmt_ptr((genericptr_t) ls));
+    }
+    return;
 }
 
 /* Mark locations that are temporarily lit via mobile light sources. */
@@ -334,10 +356,8 @@ discard_flashes(void)
 
     for (ls = gl.light_base; ls; ls = nxt_ls) {
         nxt_ls = ls->next;
-        if (ls->type != LS_OBJECT)
-            continue;
-        if (!ls->id.a_obj)
-            del_light_source(LS_OBJECT, &ls->id);
+        if (ls->type == LS_OBJECT && !ls->id.a_obj)
+            delete_ls(ls);
     }
 }
 
