@@ -7992,12 +7992,6 @@ fruitadd(char *str, struct fruit *replace_fruit)
  */
 
 
-#if defined(MICRO) || defined(MAC) || defined(WIN32)
-#define OPTIONS_HEADING "OPTIONS"
-#else
-#define OPTIONS_HEADING "NETHACKOPTIONS"
-#endif
-
 static const char n_currently_set[] = "(%d currently set)";
 
 DISABLE_WARNING_FORMAT_NONLITERAL   /* RESTORE is after show_menucontrols() */
