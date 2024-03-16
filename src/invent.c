@@ -2048,11 +2048,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 
 void
 silly_thing(const char *word,
-#ifdef OBSOLETE_HANDLING
             struct obj *otmp)
-#else
-            struct obj *otmp UNUSED)
-#endif
 {
 #ifdef OBSOLETE_HANDLING
     /* 'P','R' vs 'W','T' handling is obsolete */

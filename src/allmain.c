@@ -26,9 +26,15 @@ staticfn void debug_fields(const char *);
 staticfn void dump_enums(void);
 #endif
 
+#ifdef CRASHREPORT
+#define USED_FOR_CRASHREPORT
+#else
+#define USED_FOR_CRASHREPORT UNUSED
+#endif
+
 /*ARGSUSED*/
 void
-early_init(int argc UNUSED, char *argv[] UNUSED)
+early_init(int argc USED_FOR_CRASHREPORT, char *argv[] USED_FOR_CRASHREPORT)
 {
 #ifdef CRASHREPORT
     /* Do this as early as possible, but let ports do other things first. */

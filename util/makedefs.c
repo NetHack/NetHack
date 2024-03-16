@@ -2176,7 +2176,7 @@ macronamelimit(char *name, int pref)
 void
 do_objs(void)
 {
-    int i, sum UNUSED = 0;
+    int i /*, sum = 0 */;
     char *c, *objnam;
     int nspell = 0;
     int prefix = 0;
@@ -2216,7 +2216,7 @@ do_objs(void)
             }
 #endif /*0*/
             class = objects[i].oc_class;
-            sum = 0;
+            /* sum = 0; */
         }
 
         for (c = objnam; *c; c++)
@@ -2289,7 +2289,7 @@ do_objs(void)
             Fprintf(ofp, "%s\t%d\n", macronamelimit(objnam, prefix), i);
         prefix = 0;
 
-        sum += objects[i].oc_prob;
+        /* sum += objects[i].oc_prob; */
 
         if (sumerr)
             break;

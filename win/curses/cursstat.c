@@ -301,7 +301,7 @@ draw_horizontal(boolean border)
         cap_and_hunger, exp_points, sho_score, sho_vers,
         /* both height and width get their values set,
          * but only width gets used in this function */
-        height UNUSED, width, w, xtra, clen, x, y, t, ex, ey,
+        height, width, w, xtra, clen, x, y, t, ex, ey,
         condstart = 0, conddummy = 0, versstart = 0;
 #ifdef STATUS_HILITES
     int coloridx = NO_COLOR, attrmask = 0;
@@ -672,6 +672,7 @@ draw_horizontal(boolean border)
         } /* i (fld) */
         wclrtoeol(win); /* [superfluous? draw_status() calls werase()] */
     } /* j (line) */
+    nhUse(height);
     return;
 }
 
