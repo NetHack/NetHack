@@ -308,9 +308,6 @@ override GAME=
 MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) $(TARGETPFX)libnh.a )
 endif  # WANT_LIBNH
 
-# XXX TESTING ONLY - macOS doesn't need this:
-CFLAGS += -DNOSTATICFN
-
 # Lua
 # when building liblua.a, avoid warning that use of tmpnam() should be
 # replaced by mkstemp(); the lua code doesn't use nethack's config.h so
