@@ -5890,7 +5890,7 @@ lspo_wallify(lua_State *L)
 
 /* reset_level is only needed for testing purposes */
 int
-lspo_reset_level(lua_State *L UNUSED)
+lspo_reset_level(lua_State *L)
 {
     boolean wtower = In_W_tower(u.ux, u.uy, &u.uz);
 
@@ -5906,7 +5906,7 @@ lspo_reset_level(lua_State *L UNUSED)
 
 /* finalize_level is only needed for testing purposes */
 int
-lspo_finalize_level(lua_State *L UNUSED)
+lspo_finalize_level(lua_State *L)
 {
     boolean wtower = In_W_tower(u.ux, u.uy, &u.uz);
     int i;

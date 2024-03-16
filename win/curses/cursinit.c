@@ -99,7 +99,7 @@ set_window_position(int *winx, int *winy, int *winw, int *winh,
 void
 curses_create_main_windows(void)
 {
-    int min_message_height UNUSED = 1;
+    /* int min_message_height = 1; */
     int message_orientation = 0;
     int status_orientation = 0;
     int border_space = 0;
@@ -133,7 +133,7 @@ curses_create_main_windows(void)
     }
 
     if ((term_cols - border_space) < COLNO) {
-        min_message_height++;
+        /* min_message_height++; */
     }
 
     /* Determine status window orientation */

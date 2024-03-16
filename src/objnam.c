@@ -3306,6 +3306,7 @@ static const struct alt_spellings {
     { "grapnel", GRAPPLING_HOOK },
     { "grapple", GRAPPLING_HOOK },
     { "protection from shape shifters", RIN_PROTECTION_FROM_SHAPE_CHAN },
+    { "accuracy", RIN_INCREASE_ACCURACY },
     /* if we ever add other sizes, move this to o_ranges[] with "bag" */
     { "box", LARGE_BOX },
     /* normally we wouldn't have to worry about unnecessary <space>, but
@@ -4743,6 +4744,21 @@ readobjnam_postparse3(struct _readobjnam_data *d)
         if (d->name) {
             d->typ = objtyp;
             return 2; /*goto typfnd;*/
+        }
+    }
+
+    /* got a class, but not specific type;
+       check alternate spellings of items with matching classes */
+    if (d->oclass && !d->typ) {
+        const struct alt_spellings *as = spellings;
+
+        while (as->sp) {
+            if (objects[as->ob].oc_class == d->oclass
+                && wishymatch(d->bp, as->sp, TRUE)) {
+                d->typ = as->ob;
+                return 2; /*goto typfnd;*/
+            }
+            as++;
         }
     }
 

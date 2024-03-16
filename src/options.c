@@ -1970,7 +1970,7 @@ optfn_map_mode(int optidx, int req, boolean negated, char *opts, char *op)
 /* all the key assignment options for menu_* commands are identical
    but optlist.h treats them as distinct rather than sharing one */
 staticfn int
-shared_menu_optfn(int optidx UNUSED, int req, boolean negated UNUSED,
+shared_menu_optfn(int optidx UNUSED, int req, boolean negated,
                    char *opts, char *op)
 {
     if (req == do_init) {
@@ -3969,7 +3969,7 @@ extern const char *const known_restrictions[]; /* symbols.c */
 
 staticfn int
 optfn_symset(
-    int optidx UNUSED,
+    int optidx,
     int req,
     boolean negated UNUSED,
     char *opts,
@@ -7992,12 +7992,6 @@ fruitadd(char *str, struct fruit *replace_fruit)
  */
 
 
-#if defined(MICRO) || defined(MAC) || defined(WIN32)
-#define OPTIONS_HEADING "OPTIONS"
-#else
-#define OPTIONS_HEADING "NETHACKOPTIONS"
-#endif
-
 static const char n_currently_set[] = "(%d currently set)";
 
 DISABLE_WARNING_FORMAT_NONLITERAL   /* RESTORE is after show_menucontrols() */
@@ -8621,7 +8615,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
                 (void) parseoptions(buf, setinitial, fromfile);
             } else {
                 /* compound option */
-                int k = opt_indx, reslt UNUSED;
+                int k = opt_indx, reslt;
 
                 if (allopt[k].has_handler && allopt[k].optfn) {
                     reslt = (*allopt[k].optfn)(allopt[k].idx, do_handler,

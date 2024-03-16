@@ -487,7 +487,7 @@ do_improvisation(struct obj *instr)
     struct obj itmp;
     boolean mundane = FALSE, same_old_song = FALSE;
     static char my_goto_song[] = {'C', '\0'},
-                *improvisation SOUNDLIBONLY = my_goto_song;
+                *improvisation = my_goto_song;
 
     itmp = *instr;
     itmp.oextra = (struct oextra *) 0; /* ok on this copy as instr maintains
@@ -706,6 +706,7 @@ do_improvisation(struct obj *instr)
         impossible("What a weird instrument (%d)!", instr->otyp);
         return 0;
     }
+    nhUse(improvisation);
     return 2; /* That takes time */
 }
 

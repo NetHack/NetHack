@@ -3724,7 +3724,7 @@ mhitm_ad_pest(
 void
 mhitm_ad_deth(
     struct monst *magr,
-    struct attack *mattk UNUSED,
+    struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pd = mdef->data;
@@ -3831,7 +3831,7 @@ do_stone_u(struct monst *mtmp)
 void
 do_stone_mon(
     struct monst *magr,
-    struct attack *mattk UNUSED,
+    struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pd = mdef->data;

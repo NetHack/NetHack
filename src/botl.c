@@ -1370,7 +1370,7 @@ evaluate_and_notify_windowport(
     boolean *valsetlist,
     int idx)
 {
-    int i, fld, updated = 0, notpresent UNUSED = 0;
+    int i, fld, updated = 0;
 
     /*
      *  Now pass the changed values to window port.
@@ -1384,7 +1384,6 @@ evaluate_and_notify_windowport(
             || ((fld == BL_XP || i == BL_EXP) && Upolyd)
             || ((fld == BL_VERS) && !flags.showvers)
             ) {
-            notpresent++;
             continue;
         }
         if (eval_notify_windowport_field(fld, valsetlist, idx))
