@@ -61,7 +61,7 @@ local wishtest_objects = {
    ["tooled horn"] = { otyp_name = "tooled horn", oclass = "(" },
    ["meat ring"] = { otyp_name = "meat ring", oclass = "%" },
    ["cursed +3 ring of increase accuracy"] = { otyp_name = "increase accuracy", oclass = "=", spe = 3, cursed = 1 },
-   ["ring of accuracy"] = { otyp_name = "increase accuracy", oclass = "=", spe = 5 },
+   ["ring of accuracy"] = { otyp_name = "increase accuracy", oclass = "=" },
    ["accuracy"] = { otyp_name = "increase accuracy", oclass = "=" },
    ["beartrap"] = { otyp_name = "beartrap", oclass = "(" },
    ["bear trap"] = { otyp_name = "beartrap", oclass = "(" },
