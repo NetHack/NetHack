@@ -7,19 +7,19 @@
 
 #include "hack.h"
 
-static boolean teleport_sink(void);
-static void dosinkring(struct obj *);
-static int drop(struct obj *);
-static int menudrop_split(struct obj *, long);
-static boolean engulfer_digests_food(struct obj *);
-static boolean danger_uprops(void);
-static int wipeoff(void);
-static int menu_drop(int);
-static boolean u_stuck_cannot_go(const char *);
-static NHFILE *currentlevel_rewrite(void);
-static void familiar_level_msg(void);
-static void final_level(void);
-static void temperature_change_msg(schar);
+staticfn boolean teleport_sink(void);
+staticfn void dosinkring(struct obj *);
+staticfn int drop(struct obj *);
+staticfn int menudrop_split(struct obj *, long);
+staticfn boolean engulfer_digests_food(struct obj *);
+staticfn boolean danger_uprops(void);
+staticfn int wipeoff(void);
+staticfn int menu_drop(int);
+staticfn boolean u_stuck_cannot_go(const char *);
+staticfn NHFILE *currentlevel_rewrite(void);
+staticfn void familiar_level_msg(void);
+staticfn void final_level(void);
+staticfn void temperature_change_msg(schar);
 
 /* static boolean badspot(coordxy,coordxy); */
 
@@ -447,7 +447,7 @@ polymorph_sink(void)
 
 /* Teleports the sink at the player's position;
    return True if sink teleported. */
-static boolean
+staticfn boolean
 teleport_sink(void)
 {
     coordxy cx, cy;
@@ -485,7 +485,7 @@ teleport_sink(void)
 }
 
 /* obj is a ring being dropped over a kitchen sink */
-static void
+staticfn void
 dosinkring(struct obj *obj)
 {
     struct obj *otmp, *otmp2;
@@ -701,7 +701,7 @@ canletgo(struct obj *obj, const char *word)
     return TRUE;
 }
 
-static int
+staticfn int
 drop(struct obj *obj)
 {
     if (!obj)
@@ -834,7 +834,7 @@ dropz(struct obj *obj, boolean with_impact)
 /* when swallowed, move dropped object from OBJ_FREE to u.ustuck's inventory;
    for purple worm, immediately eat any corpse, glob, or special meat item
    from object polymorph; return True if object is used up, False otherwise */
-static boolean
+staticfn boolean
 engulfer_digests_food(struct obj *obj)
 {
     /* animal swallower (purple worn) eats any
@@ -932,7 +932,7 @@ doddrop(void)
     return result;
 }
 
-static int /* check callers */
+staticfn int /* check callers */
 menudrop_split(struct obj *otmp, long cnt)
 {
     if (cnt && cnt < otmp->quan) {
@@ -949,7 +949,7 @@ menudrop_split(struct obj *otmp, long cnt)
 }
 
 /* Drop things from the hero's inventory, using a menu. */
-static int
+staticfn int
 menu_drop(int retry)
 {
     int n, i, n_dropped = 0;
@@ -1078,7 +1078,7 @@ menu_drop(int retry)
     return (n_dropped ? ECMD_TIME : ECMD_OK);
 }
 
-static boolean
+staticfn boolean
 u_stuck_cannot_go(const char *updn)
 {
     if (u.ustuck) {
@@ -1315,7 +1315,7 @@ doup(void)
 }
 
 /* check that we can write out the current level */
-static NHFILE *
+staticfn NHFILE *
 currentlevel_rewrite(void)
 {
     NHFILE *nhfp;
@@ -1415,7 +1415,7 @@ u_collide_m(struct monst *mtmp)
     }
 }
 
-static void
+staticfn void
 familiar_level_msg(void)
 {
     static const char *const fam_msgs[4] = {
@@ -1969,7 +1969,7 @@ hellish_smoke_mesg(void)
 }
 
 /* give a message when the level temperature is different from previous */
-static void
+staticfn void
 temperature_change_msg(schar prev_temperature)
 {
     if (prev_temperature != gl.level.flags.temperature) {
@@ -1995,7 +1995,7 @@ maybe_lvltport_feedback(void)
     }
 }
 
-static void
+staticfn void
 final_level(void)
 {
     /* reset monster hostility relative to player */
@@ -2266,7 +2266,7 @@ zombify_mon(anything *arg, long timeout)
 }
 
 /* return TRUE if hero properties are dangerous to hero */
-static boolean
+staticfn boolean
 danger_uprops(void)
 {
     return (Stoned || Slimed || Strangled || Sick);
@@ -2308,7 +2308,7 @@ donull(void)
     return ECMD_TIME; /* Do nothing, but let other things happen */
 }
 
-static int
+staticfn int
 wipeoff(void)
 {
     unsigned udelta = u.ucreamed;

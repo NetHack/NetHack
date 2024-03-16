@@ -10,16 +10,16 @@
 
 #include "hack.h"
 
-static short which_arti(int);
-static boolean mon_has_arti(struct monst *, short) NONNULLARG1;
+staticfn short which_arti(int);
+staticfn boolean mon_has_arti(struct monst *, short) NONNULLARG1;
 /* other_mon_has_arti() won't blow up if passed a NULL monst,
  * but its caller target_on() passes it a nonnull monst;
  * it may return a NULL monst pointer */
-static struct monst *other_mon_has_arti(struct monst *, short) NONNULLARG1;
-static struct obj *on_ground(short);  /* might return NULL obj pointer */
-static boolean you_have(int);
-static unsigned long target_on(int, struct monst *) NONNULLARG2;
-static unsigned long strategy(struct monst *) NONNULLARG1;
+staticfn struct monst *other_mon_has_arti(struct monst *, short) NONNULLARG1;
+staticfn struct obj *on_ground(short);  /* might return NULL obj pointer */
+staticfn boolean you_have(int);
+staticfn unsigned long target_on(int, struct monst *) NONNULLARG2;
+staticfn unsigned long strategy(struct monst *) NONNULLARG1;
 
 /* adding more neutral creatures will tend to reduce the number of monsters
    summoned by nasty(); adding more lawful creatures will reduce the number
@@ -141,7 +141,7 @@ mon_has_special(struct monst *mtmp)
 
 #define M_Wants(mask) (mtmp->data->mflags3 & (mask))
 
-static short
+staticfn short
 which_arti(int mask)
 {
     switch (mask) {
@@ -164,7 +164,7 @@ which_arti(int mask)
  *      since bell, book, candle, and amulet are all objects, not really
  *      artifacts right now.  [MRS]
  */
-static boolean
+staticfn boolean
 mon_has_arti(struct monst *mtmp, short otyp)
 {
     struct obj *otmp;
@@ -183,7 +183,7 @@ mon_has_arti(struct monst *mtmp, short otyp)
  * Returns some monster other than mtmp that
  * has artifact, or NULL monst pointer.
  */
-static struct monst *
+staticfn struct monst *
 other_mon_has_arti(struct monst *mtmp, short otyp)
 {
     struct monst *mtmp2;
@@ -201,7 +201,7 @@ other_mon_has_arti(struct monst *mtmp, short otyp)
  * Returns obj of type specified if there is one
  * on the ground, otherwise returns NULL obj pointer.
  */
-static struct obj *
+staticfn struct obj *
 on_ground(short otyp)
 {
     struct obj *otmp;
@@ -215,7 +215,7 @@ on_ground(short otyp)
     return (struct obj *) 0;
 }
 
-static boolean
+staticfn boolean
 you_have(int mask)
 {
     switch (mask) {
@@ -235,7 +235,7 @@ you_have(int mask)
     return 0;
 }
 
-static unsigned long
+staticfn unsigned long
 target_on(int mask, struct monst *mtmp)
 {
     short otyp;
@@ -261,7 +261,7 @@ target_on(int mask, struct monst *mtmp)
     return (unsigned long) STRAT_NONE;
 }
 
-static unsigned long
+staticfn unsigned long
 strategy(struct monst *mtmp)
 {
     unsigned long strat, dstrat;

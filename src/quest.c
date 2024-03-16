@@ -11,18 +11,18 @@
 #define Not_firsttime (on_level(&u.uz0, &u.uz))
 #define Qstat(x) (gq.quest_status.x)
 
-static void on_start(void);
-static void on_locate(void);
-static void on_goal(void);
-static boolean not_capable(void);
-static int is_pure(boolean);
-static void expulsion(boolean);
-static void chat_with_leader(struct monst *);
-static void chat_with_nemesis(void);
-static void chat_with_guardian(void);
-static void prisoner_speaks(struct monst *);
+staticfn void on_start(void);
+staticfn void on_locate(void);
+staticfn void on_goal(void);
+staticfn boolean not_capable(void);
+staticfn int is_pure(boolean);
+staticfn void expulsion(boolean);
+staticfn void chat_with_leader(struct monst *);
+staticfn void chat_with_nemesis(void);
+staticfn void chat_with_guardian(void);
+staticfn void prisoner_speaks(struct monst *);
 
-static void
+staticfn void
 on_start(void)
 {
     if (!Qstat(first_start)) {
@@ -36,7 +36,7 @@ on_start(void)
     }
 }
 
-static void
+staticfn void
 on_locate(void)
 {
     /* the locate messages are phrased in a manner such that they only
@@ -58,7 +58,7 @@ on_locate(void)
     }
 }
 
-static void
+staticfn void
 on_goal(void)
 {
     if (Qstat(killed_nemesis)) {
@@ -143,13 +143,13 @@ ok_to_quest(void)
                        && is_pure(FALSE) > 0) || Qstat(killed_leader));
 }
 
-static boolean
+staticfn boolean
 not_capable(void)
 {
     return (boolean) (u.ulevel < MIN_QUEST_LEVEL);
 }
 
-static int
+staticfn int
 is_pure(boolean talk)
 {
     int purity;
@@ -182,7 +182,7 @@ is_pure(boolean talk)
  * This assumes that the hero is currently _in_ the quest dungeon and that
  * there is a single branch to and from it.
  */
-static void
+staticfn void
 expulsion(boolean seal)
 {
     branch *br;
@@ -278,7 +278,7 @@ finish_quest(struct obj *obj) /* quest artifact or thrown unique item or faux
     }
 }
 
-static void
+staticfn void
 chat_with_leader(struct monst *mtmp)
 {
     if (!mtmp->mpeaceful || Qstat(pissed_off))
@@ -376,7 +376,7 @@ leader_speaks(struct monst *mtmp)
         chat_with_leader(mtmp);
 }
 
-static void
+staticfn void
 chat_with_nemesis(void)
 {
     /*  The nemesis will do most of the talking, but... */
@@ -423,7 +423,7 @@ nemesis_stinks(coordxy mx, coordxy my)
     gc.context.mon_moving = save_mon_moving;
 }
 
-static void
+staticfn void
 chat_with_guardian(void)
 {
     /*  These guys/gals really don't have much to say... */
@@ -433,7 +433,7 @@ chat_with_guardian(void)
         qt_pager("guardtalk_before");
 }
 
-static void
+staticfn void
 prisoner_speaks(struct monst *mtmp)
 {
     if (mtmp->data == &mons[PM_PRISONER]

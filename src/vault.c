@@ -5,18 +5,19 @@
 
 #include "hack.h"
 
-static boolean clear_fcorr(struct monst *, boolean) NONNULLARG1;
-static void blackout(coordxy, coordxy);
-static void restfakecorr(struct monst *) NONNULLARG1;
-static void parkguard(struct monst *) NONNULLARG1;
-static boolean in_fcorridor(struct monst *, coordxy, coordxy) NONNULLARG1;
-static boolean find_guard_dest(struct monst *, coordxy *, coordxy *) NONNULLARG23;
-static void move_gold(struct obj *, int) NONNULLARG1;
-static void wallify_vault(struct monst *) NONNULLARG1;
-static void gd_mv_monaway(struct monst *, int, int) NONNULLARG1;
-static void gd_pick_corridor_gold(struct monst *, int, int) NONNULLARG1;
-static int gd_move_cleanup(struct monst *, boolean, boolean) NONNULLARG1;
-static void gd_letknow(struct monst *) NONNULLARG1;
+staticfn boolean clear_fcorr(struct monst *, boolean) NONNULLARG1;
+staticfn void blackout(coordxy, coordxy);
+staticfn void restfakecorr(struct monst *) NONNULLARG1;
+staticfn void parkguard(struct monst *) NONNULLARG1;
+staticfn boolean in_fcorridor(struct monst *, coordxy, coordxy) NONNULLARG1;
+staticfn boolean find_guard_dest(struct monst *, coordxy *, coordxy *)
+                                 NONNULLARG23;
+staticfn void move_gold(struct obj *, int) NONNULLARG1;
+staticfn void wallify_vault(struct monst *) NONNULLARG1;
+staticfn void gd_mv_monaway(struct monst *, int, int) NONNULLARG1;
+staticfn void gd_pick_corridor_gold(struct monst *, int, int) NONNULLARG1;
+staticfn int gd_move_cleanup(struct monst *, boolean, boolean) NONNULLARG1;
+staticfn void gd_letknow(struct monst *) NONNULLARG1;
 
 void
 newegd(struct monst *mtmp)
@@ -42,7 +43,7 @@ free_egd(struct monst *mtmp)
 /* try to remove the temporary corridor (from vault to rest of map) being
    maintained by guard 'grd'; if guard is still in it, removal will fail,
    to be tried again later */
-static boolean
+staticfn boolean
 clear_fcorr(struct monst *grd, boolean forceshow)
 {
     coordxy fcx, fcy, fcbeg;
@@ -118,7 +119,7 @@ clear_fcorr(struct monst *grd, boolean forceshow)
    spots to unlit; if player used scroll/wand/spell of light while inside
    the corridor, we don't want the light to reappear if/when a new tunnel
    goes through the same area */
-static void
+staticfn void
 blackout(coordxy x, coordxy y)
 {
     struct rm *lev;
@@ -139,7 +140,7 @@ blackout(coordxy x, coordxy y)
         }
 }
 
-static void
+staticfn void
 restfakecorr(struct monst *grd)
 {
     /* it seems you left the corridor - let the guard disappear */
@@ -150,7 +151,7 @@ restfakecorr(struct monst *grd)
 }
 
 /* move guard--dead to alive--to <0,0> until temporary corridor is removed */
-static void
+staticfn void
 parkguard(struct monst *grd)
 {
     /* either guard is dead or will now be treated as if so;
@@ -187,7 +188,7 @@ grddead(struct monst *grd)
     return dispose;
 }
 
-static boolean
+staticfn boolean
 in_fcorridor(struct monst *grd, coordxy x, coordxy y)
 {
     int fci;
@@ -276,7 +277,7 @@ uleftvault(struct monst *grd)
     }
 }
 
-static boolean
+staticfn boolean
 find_guard_dest(struct monst *guard, coordxy *rx, coordxy *ry)
 {
     coordxy x, y, dd, lx, ly;
@@ -615,7 +616,7 @@ invault(void)
     }
 }
 
-static void
+staticfn void
 move_gold(struct obj *gold, int vroom)
 {
     coordxy nx, ny;
@@ -629,7 +630,7 @@ move_gold(struct obj *gold, int vroom)
     newsym(nx, ny);
 }
 
-static void
+staticfn void
 wallify_vault(struct monst *grd)
 {
     int typ;
@@ -716,7 +717,7 @@ wallify_vault(struct monst *grd)
     }
 }
 
-static void
+staticfn void
 gd_mv_monaway(struct monst *grd, int nx, int ny)
 {
     struct monst *mtmp = m_at(nx, ny);
@@ -733,7 +734,7 @@ gd_mv_monaway(struct monst *grd, int nx, int ny)
 
 /* have guard pick gold off the floor, possibly moving to the gold's
    position before message and back to his current spot after */
-static void
+staticfn void
 gd_pick_corridor_gold(struct monst *grd, int goldx, int goldy)
 {
     struct obj *gold;
@@ -817,7 +818,7 @@ gd_pick_corridor_gold(struct monst *grd, int goldx, int goldy)
 
 
 /* return 1: guard moved, -2: died  */
-static int
+staticfn int
 gd_move_cleanup(
     struct monst *grd,
     boolean semi_dead,
@@ -850,7 +851,7 @@ gd_move_cleanup(
     return -2;
 }
 
-static void
+staticfn void
 gd_letknow(struct monst *grd)
 {
     if (!cansee(grd->mx, grd->my) || !mon_visible(grd))

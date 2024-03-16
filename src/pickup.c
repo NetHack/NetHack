@@ -11,47 +11,47 @@
 
 #define CONTAINED_SYM '>' /* from invent.c */
 
-static void simple_look(struct obj *, boolean);
-static boolean query_classes(char *, boolean *, boolean *, const char *,
+staticfn void simple_look(struct obj *, boolean);
+staticfn boolean query_classes(char *, boolean *, boolean *, const char *,
                              struct obj *, boolean, int *);
-static boolean fatal_corpse_mistake(struct obj *, boolean);
-static boolean describe_decor(void);
-static void check_here(boolean);
-static boolean n_or_more(struct obj *);
-static boolean all_but_uchain(struct obj *);
+staticfn boolean fatal_corpse_mistake(struct obj *, boolean);
+staticfn boolean describe_decor(void);
+staticfn void check_here(boolean);
+staticfn boolean n_or_more(struct obj *);
+staticfn boolean all_but_uchain(struct obj *);
 #if 0 /* not used */
-static boolean allow_cat_no_uchain(struct obj *);
+staticfn boolean allow_cat_no_uchain(struct obj *);
 #endif
-static int autopick(struct obj *, int, menu_item **);
-static int count_categories(struct obj *, int);
-static int delta_cwt(struct obj *, struct obj *);
-static long carry_count(struct obj *, struct obj *, long, boolean, int *,
+staticfn int autopick(struct obj *, int, menu_item **);
+staticfn int count_categories(struct obj *, int);
+staticfn int delta_cwt(struct obj *, struct obj *);
+staticfn long carry_count(struct obj *, struct obj *, long, boolean, int *,
                         int *);
-static int lift_object(struct obj *, struct obj *, long *, boolean);
-static void pickup_prinv(struct obj *, long, const char *);
-static boolean mbag_explodes(struct obj *, int);
-static boolean is_boh_item_gone(void);
-static void do_boh_explosion(struct obj *, boolean);
-static long boh_loss(struct obj *, boolean);
-static int in_container(struct obj *);
-static int out_container(struct obj *);
-static long mbag_item_gone(boolean, struct obj *, boolean);
-static int stash_ok(struct obj *);
-static void explain_container_prompt(boolean);
-static int traditional_loot(boolean);
-static int menu_loot(int, boolean);
-static int tip_ok(struct obj *);
-static int choose_tip_container_menu(void);
-static struct obj *tipcontainer_gettarget(struct obj *, boolean *);
-static int tipcontainer_checks(struct obj *, struct obj *, boolean);
-static char in_or_out_menu(const char *, struct obj *, boolean, boolean,
+staticfn int lift_object(struct obj *, struct obj *, long *, boolean);
+staticfn void pickup_prinv(struct obj *, long, const char *);
+staticfn boolean mbag_explodes(struct obj *, int);
+staticfn boolean is_boh_item_gone(void);
+staticfn void do_boh_explosion(struct obj *, boolean);
+staticfn long boh_loss(struct obj *, boolean);
+staticfn int in_container(struct obj *);
+staticfn int out_container(struct obj *);
+staticfn long mbag_item_gone(boolean, struct obj *, boolean);
+staticfn int stash_ok(struct obj *);
+staticfn void explain_container_prompt(boolean);
+staticfn int traditional_loot(boolean);
+staticfn int menu_loot(int, boolean);
+staticfn int tip_ok(struct obj *);
+staticfn int choose_tip_container_menu(void);
+staticfn struct obj *tipcontainer_gettarget(struct obj *, boolean *);
+staticfn int tipcontainer_checks(struct obj *, struct obj *, boolean);
+staticfn char in_or_out_menu(const char *, struct obj *, boolean, boolean,
                            boolean, boolean);
-static boolean able_to_loot(coordxy, coordxy, boolean);
-static boolean reverse_loot(void);
-static boolean mon_beside(coordxy, coordxy);
-static int do_loot_cont(struct obj **, int, int);
-static int doloot_core(void);
-static void tipcontainer(struct obj *);
+staticfn boolean able_to_loot(coordxy, coordxy, boolean);
+staticfn boolean reverse_loot(void);
+staticfn boolean mon_beside(coordxy, coordxy);
+staticfn int do_loot_cont(struct obj **, int, int);
+staticfn int doloot_core(void);
+staticfn void tipcontainer(struct obj *);
 
 /* define for query_objlist() and autopickup() */
 #define FOLLOW(curr, flags) \
@@ -72,7 +72,7 @@ static const char
 /* BUG: this lets you look at cockatrice corpses while blind without
    touching them */
 /* much simpler version of the look-here code; used by query_classes() */
-static void
+staticfn void
 simple_look(struct obj *otmp, /* list of objects */
             boolean here)     /* flag for type of obj list linkage */
 {
@@ -137,7 +137,7 @@ collect_obj_classes(char ilets[], struct obj *otmp, boolean here,
  * it was changed to enhance menu entry ordering ('A' stands out, but
  * some players complain that it is too easy to choose accidentally).
  */
-static boolean
+staticfn boolean
 query_classes(
     char oclasses[], /* selected classes */
     boolean *one_at_a_time, /* to tell caller that user picked 'A' */
@@ -262,7 +262,7 @@ query_classes(
 }
 
 /* check whether hero is bare-handedly touching a cockatrice corpse */
-static boolean
+staticfn boolean
 fatal_corpse_mistake(struct obj *obj, boolean remotely)
 {
     if (uarmg || remotely || obj->otyp != CORPSE
@@ -331,7 +331,7 @@ deferred_decor(
 
 /* handle 'mention_decor' (when walking onto a dungeon feature such as
    stairs or altar, describe it even if it isn't covered up by an object) */
-static boolean
+staticfn boolean
 describe_decor(void)
 {
     char outbuf[BUFSZ], fbuf[QBUFSZ];
@@ -408,7 +408,7 @@ describe_decor(void)
 }
 
 /* look at the objects at our location, unless there are too many of them */
-static void
+staticfn void
 check_here(boolean picked_some)
 {
     struct obj *obj;
@@ -438,7 +438,7 @@ check_here(boolean picked_some)
 }
 
 /* query_objlist callback: return TRUE if obj's count is >= reference value */
-static boolean
+staticfn boolean
 n_or_more(struct obj *obj)
 {
     if (obj == uchain)
@@ -487,7 +487,7 @@ add_valid_menu_class(int c)
 }
 
 /* query_objlist callback: return TRUE if not uchain */
-static boolean
+staticfn boolean
 all_but_uchain(struct obj *obj)
 {
     return (boolean) (obj != uchain);
@@ -575,7 +575,7 @@ allow_category(struct obj *obj)
 
 #if 0 /* not used */
 /* query_objlist callback: return TRUE if valid category (class), no uchain */
-static boolean
+staticfn boolean
 allow_cat_no_uchain(struct obj *obj)
 {
     if (obj != uchain
@@ -949,7 +949,7 @@ autopick_testobj(struct obj *otmp, boolean calc_costly)
  * picked is zero, the pickup list is left alone.  The caller of this
  * function must free the pickup list.
  */
-static int
+staticfn int
 autopick(
     struct obj *olist,     /* the object list */
     int follow,            /* how to follow the object list */
@@ -1484,7 +1484,7 @@ query_category(
     return n;
 }
 
-static int
+staticfn int
 count_categories(struct obj *olist, int qflags)
 {
     char *pack;
@@ -1517,7 +1517,7 @@ count_categories(struct obj *olist, int qflags)
  *  object is removed from it.  Use before and after weight amounts rather
  *  than trying to match the calculation used by weight() in mkobj.c.
  */
-static int
+staticfn int
 delta_cwt(struct obj *container, struct obj *obj)
 {
     struct obj **prev;
@@ -1543,7 +1543,7 @@ delta_cwt(struct obj *container, struct obj *obj)
 }
 
 /* could we carry `obj'? if not, could we carry some of it/them? */
-static long
+staticfn long
 carry_count(struct obj *obj,            /* object to pick up... */
             struct obj *container,      /* ...bag it is coming out of */
             long count,
@@ -1678,8 +1678,7 @@ carry_count(struct obj *obj,            /* object to pick up... */
 }
 
 /* determine whether character is able and player is willing to carry `obj' */
-static
-int
+staticfn int
 lift_object(
     struct obj *obj,       /* object to pick up... */
     struct obj *container, /* ...bag it's coming out of */
@@ -1922,7 +1921,7 @@ pick_obj(struct obj *otmp)
 /* pickup_object()/out_container() helper;
    print an added-to-invent message for current object, limiting feedback
    about encumbrance to the first item which causes that to change */
-static void
+staticfn void
 pickup_prinv(
     struct obj *obj,
     long count,
@@ -2017,7 +2016,7 @@ container_at(coordxy x, coordxy y, boolean countem)
     return container_count;
 }
 
-static boolean
+staticfn boolean
 able_to_loot(
     coordxy x, coordxy y,
     boolean looting) /* loot vs tip */
@@ -2048,7 +2047,7 @@ able_to_loot(
     return TRUE;
 }
 
-static boolean
+staticfn boolean
 mon_beside(coordxy x, coordxy y)
 {
     int i, j;
@@ -2064,7 +2063,7 @@ mon_beside(coordxy x, coordxy y)
     return FALSE;
 }
 
-static int
+staticfn int
 do_loot_cont(
     struct obj **cobjp,
     int cindex, /* index of this container (1..N)... */
@@ -2153,7 +2152,7 @@ doloot(void)
 }
 
 /* loot a container on the floor or loot saddle from mon. */
-static int
+staticfn int
 doloot_core(void)
 {
     struct obj *cobj, *nobj;
@@ -2325,7 +2324,7 @@ doloot_core(void)
 }
 
 /* called when attempting to #loot while confused */
-static boolean
+staticfn boolean
 reverse_loot(void)
 {
     struct obj *goldob = 0, *coffers, *otmp, boxdummy;
@@ -2462,7 +2461,7 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
  * Decide whether an object being placed into a magic bag will cause
  * it to explode.  If the object is a bag itself, check recursively.
  */
-static boolean
+staticfn boolean
 mbag_explodes(struct obj *obj, int depthin)
 {
     /* these won't cause an explosion when they're empty */
@@ -2484,7 +2483,7 @@ mbag_explodes(struct obj *obj, int depthin)
     return FALSE;
 }
 
-static boolean
+staticfn boolean
 is_boh_item_gone(void)
 {
     return (boolean) (!rn2(13));
@@ -2492,7 +2491,7 @@ is_boh_item_gone(void)
 
 /* Scatter most of Bag of holding contents around.  Some items will be
    destroyed with the same chance as looting a cursed bag. */
-static void
+staticfn void
 do_boh_explosion(struct obj *boh, boolean on_floor)
 {
     struct obj *otmp, *nobj;
@@ -2511,7 +2510,7 @@ do_boh_explosion(struct obj *boh, boolean on_floor)
     /* boh is about to be deleted so no need to reset its in_use flag here */
 }
 
-static long
+staticfn long
 boh_loss(struct obj *container, boolean held)
 {
     /* sometimes toss objects if a cursed magic bag */
@@ -2532,7 +2531,7 @@ boh_loss(struct obj *container, boolean held)
 }
 
 /* Returns: -1 to stop, 1 item was inserted, 0 item was not inserted. */
-static int
+staticfn int
 in_container(struct obj *obj)
 {
     boolean floor_container = !carried(gc.current_container);
@@ -2699,7 +2698,7 @@ ck_bag(struct obj *obj)
 }
 
 /* Returns: -1 to stop, 1 item was removed, 0 item was not removed. */
-static int
+staticfn int
 out_container(struct obj *obj)
 {
     struct obj *otmp;
@@ -2775,7 +2774,7 @@ removed_from_icebox(struct obj *obj)
 }
 
 /* an object inside a cursed bag of holding is being destroyed */
-static long
+staticfn long
 mbag_item_gone(boolean held, struct obj *item, boolean silent)
 {
     struct monst *shkp;
@@ -2869,7 +2868,7 @@ container_gone(int (*fn)(OBJ_P))
             && !gc.current_container);
 }
 
-static void
+staticfn void
 explain_container_prompt(boolean more_containers)
 {
     static const char *const explaintext[] = {
@@ -2915,7 +2914,7 @@ u_handsy(void)
 }
 
 /* getobj callback for object to be stashed into a container */
-static int
+staticfn int
 stash_ok(struct obj *obj)
 {
     if (!obj)
@@ -3186,7 +3185,7 @@ use_container(
 }
 
 /* loot current_container (take things out or put things in), by prompting */
-static int
+staticfn int
 traditional_loot(boolean put_in)
 {
     int (*actionfunc)(OBJ_P), (*checkfunc)(OBJ_P);
@@ -3221,7 +3220,7 @@ traditional_loot(boolean put_in)
 }
 
 /* loot current_container (take things out or put things in), using a menu */
-static int
+staticfn int
 menu_loot(int retry, boolean put_in)
 {
     int n, i, n_looted = 0;
@@ -3352,7 +3351,7 @@ menu_loot(int retry, boolean put_in)
     return n_looted ? ECMD_TIME : ECMD_OK;
 }
 
-static char
+staticfn char
 in_or_out_menu(
     const char *prompt,
     struct obj *obj,
@@ -3435,7 +3434,7 @@ in_or_out_menu(
 }
 
 /* getobj callback for object to tip */
-static int
+staticfn int
 tip_ok(struct obj *obj)
 {
     if (!obj || obj->oclass == COIN_CLASS)
@@ -3459,7 +3458,7 @@ tip_ok(struct obj *obj)
    returns ECMD_CANCEL if menu was canceled,
    ECMD_TIME if a container was picked,
    otherwise returns ECMD_OK. */
-static int
+staticfn int
 choose_tip_container_menu(void)
 {
     int n, i;
@@ -3641,7 +3640,7 @@ enum tipping_check_values {
     TIPCHECK_EMPTY
 };
 
-static void
+staticfn void
 tipcontainer(struct obj *box) /* or bag */
 {
     coordxy ox = u.ux, oy = u.uy; /* #tip only works at hero's location */
@@ -3797,11 +3796,11 @@ tipcontainer(struct obj *box) /* or bag */
 }
 
 #if 0
-static int count_target_containers(struct obj *, struct obj *);
+staticfn int count_target_containers(struct obj *, struct obj *);
 
 /* returns number of containers in object chain; does not recurse into
    containers; skips bags of tricks when they're known */
-static int
+staticfn int
 count_target_containers(
     struct obj *olist,   /* list of objects (invent) */
     struct obj *excludo) /* particular object to exclude if found in list */
@@ -3823,7 +3822,7 @@ count_target_containers(
 /* ask user for a carried container into which they want box to be emptied;
    cancelled is TRUE if user cancelled the menu pick; hands aren't required
    when tipping to the floor but are when tipping into another container */
-static struct obj *
+staticfn struct obj *
 tipcontainer_gettarget(
     struct obj *box,
     boolean *cancelled)
@@ -3906,7 +3905,7 @@ tipcontainer_gettarget(
 /* Perform check on box if we can tip it.
    Returns one of TIPCHECK_foo values.
    If allowempty if TRUE, return TIPCHECK_OK instead of TIPCHECK_EMPTY. */
-static int
+staticfn int
 tipcontainer_checks(
     struct obj *box,       /* container player wants to tip */
     struct obj *targetbox, /* destination (used here for horn of plenty) */

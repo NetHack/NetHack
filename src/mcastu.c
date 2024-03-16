@@ -35,17 +35,17 @@ enum mcast_cleric_spells {
     CLC_GEYSER
 };
 
-static void cursetxt(struct monst *, boolean);
-static int choose_magic_spell(int);
-static int choose_clerical_spell(int);
-static int m_cure_self(struct monst *, int);
-static void cast_wizard_spell(struct monst *, int, int);
-static void cast_cleric_spell(struct monst *, int, int);
-static boolean is_undirected_spell(unsigned int, int);
-static boolean spell_would_be_useless(struct monst *, unsigned int, int);
+staticfn void cursetxt(struct monst *, boolean);
+staticfn int choose_magic_spell(int);
+staticfn int choose_clerical_spell(int);
+staticfn int m_cure_self(struct monst *, int);
+staticfn void cast_wizard_spell(struct monst *, int, int);
+staticfn void cast_cleric_spell(struct monst *, int, int);
+staticfn boolean is_undirected_spell(unsigned int, int);
+staticfn boolean spell_would_be_useless(struct monst *, unsigned int, int);
 
 /* feedback when frustrated monster couldn't cast a spell */
-static void
+staticfn void
 cursetxt(struct monst *mtmp, boolean undirected)
 {
     if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my)) {
@@ -73,7 +73,7 @@ cursetxt(struct monst *mtmp, boolean undirected)
 
 /* convert a level-based random selection into a specific mage spell;
    inappropriate choices will be screened out by spell_would_be_useless() */
-static int
+staticfn int
 choose_magic_spell(int spellval)
 {
     /* for 3.4.3 and earlier, val greater than 22 selected default spell */
@@ -126,7 +126,7 @@ choose_magic_spell(int spellval)
 }
 
 /* convert a level-based random selection into a specific cleric spell */
-static int
+staticfn int
 choose_clerical_spell(int spellnum)
 {
     /* for 3.4.3 and earlier, num greater than 13 selected the default spell
@@ -357,7 +357,7 @@ castmu(
     return ret;
 }
 
-static int
+staticfn int
 m_cure_self(struct monst *mtmp, int dmg)
 {
     if (mtmp->mhp < mtmp->mhpmax) {
@@ -439,8 +439,7 @@ death_inflicted_by(
    If you modify either of these, be sure to change is_undirected_spell()
    and spell_would_be_useless().
  */
-static
-void
+staticfn void
 cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
 {
     if (dmg == 0 && !is_undirected_spell(AD_SPEL, spellnum)) {
@@ -618,7 +617,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
-static void
+staticfn void
 cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
 {
     int orig_dmg = 0;
@@ -865,7 +864,7 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
-static boolean
+staticfn boolean
 is_undirected_spell(unsigned int adtyp, int spellnum)
 {
     if (adtyp == AD_SPEL) {
@@ -893,7 +892,7 @@ is_undirected_spell(unsigned int adtyp, int spellnum)
 }
 
 /* Some spells are useless under some circumstances. */
-static boolean
+staticfn boolean
 spell_would_be_useless(struct monst *mtmp, unsigned int adtyp, int spellnum)
 {
     /* Some spells don't require the player to really be there and can be cast

@@ -5,43 +5,43 @@
 
 #include "hack.h"
 
-static long itimeout(long);
-static long itimeout_incr(long, int);
-static void ghost_from_bottle(void);
-static int drink_ok(struct obj *);
-static void peffect_restore_ability(struct obj *);
-static void peffect_hallucination(struct obj *);
-static void peffect_water(struct obj *);
-static void peffect_booze(struct obj *);
-static void peffect_enlightenment(struct obj *);
-static void peffect_invisibility(struct obj *);
-static void peffect_see_invisible(struct obj *);
-static void peffect_paralysis(struct obj *);
-static void peffect_sleeping(struct obj *);
-static int peffect_monster_detection(struct obj *);
-static int peffect_object_detection(struct obj *);
-static void peffect_sickness(struct obj *);
-static void peffect_confusion(struct obj *);
-static void peffect_gain_ability(struct obj *);
-static void peffect_speed(struct obj *);
-static void peffect_blindness(struct obj *);
-static void peffect_gain_level(struct obj *);
-static void peffect_healing(struct obj *);
-static void peffect_extra_healing(struct obj *);
-static void peffect_full_healing(struct obj *);
-static void peffect_levitation(struct obj *);
-static void peffect_gain_energy(struct obj *);
-static void peffect_oil(struct obj *);
-static void peffect_acid(struct obj *);
-static void peffect_polymorph(struct obj *);
-static boolean H2Opotion_dip(struct obj *, struct obj *, boolean,
+staticfn long itimeout(long);
+staticfn long itimeout_incr(long, int);
+staticfn void ghost_from_bottle(void);
+staticfn int drink_ok(struct obj *);
+staticfn void peffect_restore_ability(struct obj *);
+staticfn void peffect_hallucination(struct obj *);
+staticfn void peffect_water(struct obj *);
+staticfn void peffect_booze(struct obj *);
+staticfn void peffect_enlightenment(struct obj *);
+staticfn void peffect_invisibility(struct obj *);
+staticfn void peffect_see_invisible(struct obj *);
+staticfn void peffect_paralysis(struct obj *);
+staticfn void peffect_sleeping(struct obj *);
+staticfn int peffect_monster_detection(struct obj *);
+staticfn int peffect_object_detection(struct obj *);
+staticfn void peffect_sickness(struct obj *);
+staticfn void peffect_confusion(struct obj *);
+staticfn void peffect_gain_ability(struct obj *);
+staticfn void peffect_speed(struct obj *);
+staticfn void peffect_blindness(struct obj *);
+staticfn void peffect_gain_level(struct obj *);
+staticfn void peffect_healing(struct obj *);
+staticfn void peffect_extra_healing(struct obj *);
+staticfn void peffect_full_healing(struct obj *);
+staticfn void peffect_levitation(struct obj *);
+staticfn void peffect_gain_energy(struct obj *);
+staticfn void peffect_oil(struct obj *);
+staticfn void peffect_acid(struct obj *);
+staticfn void peffect_polymorph(struct obj *);
+staticfn boolean H2Opotion_dip(struct obj *, struct obj *, boolean,
                              const char *);
-static short mixtype(struct obj *, struct obj *);
-static int dip_ok(struct obj *);
-static int dip_hands_ok(struct obj *);
-static void hold_potion(struct obj *, const char *, const char *,
+staticfn short mixtype(struct obj *, struct obj *);
+staticfn int dip_ok(struct obj *);
+staticfn int dip_hands_ok(struct obj *);
+staticfn void hold_potion(struct obj *, const char *, const char *,
                         const char *);
-static int potion_dip(struct obj *obj, struct obj *potion);
+staticfn int potion_dip(struct obj *obj, struct obj *potion);
 
 /* used to indicate whether quaff or dip has skipped an opportunity to
    use a fountain or such, in order to vary the feedback if hero lacks
@@ -50,7 +50,7 @@ static int potion_dip(struct obj *obj, struct obj *potion);
 static int drink_ok_extra = 0;
 
 /* force `val' to be within valid range for intrinsic timeout value */
-static long
+staticfn long
 itimeout(long val)
 {
     if (val >= TIMEOUT)
@@ -62,7 +62,7 @@ itimeout(long val)
 }
 
 /* increment `old' by `incr' and force result to be valid intrinsic timeout */
-static long
+staticfn long
 itimeout_incr(long old, int incr)
 {
     return itimeout((old & TIMEOUT) + (long) incr);
@@ -475,7 +475,7 @@ self_invis_message(void)
                         : "can't see yourself");
 }
 
-static void
+staticfn void
 ghost_from_bottle(void)
 {
     struct monst *mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, MM_NOMSG);
@@ -499,7 +499,7 @@ ghost_from_bottle(void)
 
 /* getobj callback for object to drink from, which also does double duty as
    the callback for dipping into (both just allow potions). */
-static int
+staticfn int
 drink_ok(struct obj *obj)
 {
     /* getobj()'s callback to test whether hands/self is a valid "item" to
@@ -630,7 +630,7 @@ dopotion(struct obj *otmp)
 
 /* potion or spell of restore ability; for spell, otmp is a temporary
    spellbook object that will be blessed if hero is skilled in healing */
-static void
+staticfn void
 peffect_restore_ability(struct obj *otmp)
 {
     gp.potion_unkn++;
@@ -677,7 +677,7 @@ peffect_restore_ability(struct obj *otmp)
     }
 }
 
-static void
+staticfn void
 peffect_hallucination(struct obj *otmp)
 {
     if (Halluc_resistance) {
@@ -698,7 +698,7 @@ peffect_hallucination(struct obj *otmp)
     }
 }
 
-static void
+staticfn void
 peffect_water(struct obj *otmp)
 {
     if (!otmp->blessed && !otmp->cursed) {
@@ -752,7 +752,7 @@ peffect_water(struct obj *otmp)
     }
 }
 
-static void
+staticfn void
 peffect_booze(struct obj *otmp)
 {
     gp.potion_unkn++;
@@ -776,7 +776,7 @@ peffect_booze(struct obj *otmp)
     }
 }
 
-static void
+staticfn void
 peffect_enlightenment(struct obj *otmp)
 {
     if (otmp->cursed) {
@@ -792,7 +792,7 @@ peffect_enlightenment(struct obj *otmp)
     }
 }
 
-static void
+staticfn void
 peffect_invisibility(struct obj *otmp)
 {
     boolean is_spell = (otmp->oclass == SPBOOK_CLASS);
@@ -818,7 +818,7 @@ peffect_invisibility(struct obj *otmp)
     }
 }
 
-static void
+staticfn void
 peffect_see_invisible(struct obj *otmp)
 {
     int msg = Invisible && !Blind;
@@ -857,7 +857,7 @@ peffect_see_invisible(struct obj *otmp)
     }
 }
 
-static void
+staticfn void
 peffect_paralysis(struct obj *otmp)
 {
     if (Free_action) {
@@ -877,7 +877,7 @@ peffect_paralysis(struct obj *otmp)
     }
 }
 
-static void
+staticfn void
 peffect_sleeping(struct obj *otmp)
 {
     if (Sleep_resistance || Free_action) {
@@ -890,7 +890,7 @@ peffect_sleeping(struct obj *otmp)
     }
 }
 
-static int
+staticfn int
 peffect_monster_detection(struct obj *otmp)
 {
     if (otmp->blessed) {
@@ -931,7 +931,7 @@ peffect_monster_detection(struct obj *otmp)
     return 0;
 }
 
-static int
+staticfn int
 peffect_object_detection(struct obj *otmp)
 {
     if (object_detect(otmp, 0))
@@ -940,7 +940,7 @@ peffect_object_detection(struct obj *otmp)
     return 0;
 }
 
-static void
+staticfn void
 peffect_sickness(struct obj *otmp)
 {
     pline("Yecch!  This stuff tastes like poison.");
@@ -990,7 +990,7 @@ peffect_sickness(struct obj *otmp)
     }
 }
 
-static void
+staticfn void
 peffect_confusion(struct obj *otmp)
 {
     if (!Confusion) {
@@ -1006,7 +1006,7 @@ peffect_confusion(struct obj *otmp)
                   FALSE);
 }
 
-static void
+staticfn void
 peffect_gain_ability(struct obj *otmp)
 {
     if (otmp->cursed) {
@@ -1028,7 +1028,7 @@ peffect_gain_ability(struct obj *otmp)
     }
 }
 
-static void
+staticfn void
 peffect_speed(struct obj *otmp)
 {
     boolean is_speed = (otmp->otyp == POT_SPEED);
@@ -1049,7 +1049,7 @@ peffect_speed(struct obj *otmp)
     }
 }
 
-static void
+staticfn void
 peffect_blindness(struct obj *otmp)
 {
     if (Blind || ((HBlinded || EBlinded) && BBlinded))
@@ -1059,7 +1059,7 @@ peffect_blindness(struct obj *otmp)
                  (boolean) !Blind);
 }
 
-static void
+staticfn void
 peffect_gain_level(struct obj *otmp)
 {
     if (otmp->cursed) {
@@ -1095,7 +1095,7 @@ peffect_gain_level(struct obj *otmp)
         u.uexp = rndexp(TRUE);
 }
 
-static void
+staticfn void
 peffect_healing(struct obj *otmp)
 {
     You_feel("better.");
@@ -1104,7 +1104,7 @@ peffect_healing(struct obj *otmp)
     exercise(A_CON, TRUE);
 }
 
-static void
+staticfn void
 peffect_extra_healing(struct obj *otmp)
 {
     You_feel("much better.");
@@ -1120,7 +1120,7 @@ peffect_extra_healing(struct obj *otmp)
         heal_legs(0);
 }
 
-static void
+staticfn void
 peffect_full_healing(struct obj *otmp)
 {
     You_feel("completely healed.");
@@ -1141,7 +1141,7 @@ peffect_full_healing(struct obj *otmp)
         heal_legs(0);
 }
 
-static void
+staticfn void
 peffect_levitation(struct obj *otmp)
 {
     /*
@@ -1200,7 +1200,7 @@ peffect_levitation(struct obj *otmp)
     float_vs_flight();
 }
 
-static void
+staticfn void
 peffect_gain_energy(struct obj *otmp)
 {
     int num;
@@ -1236,7 +1236,7 @@ peffect_gain_energy(struct obj *otmp)
     exercise(A_WIS, TRUE);
 }
 
-static void
+staticfn void
 peffect_oil(struct obj *otmp)
 {
     boolean good_for_you = FALSE, vulnerable;
@@ -1273,7 +1273,7 @@ peffect_oil(struct obj *otmp)
     exercise(A_WIS, good_for_you);
 }
 
-static void
+staticfn void
 peffect_acid(struct obj *otmp)
 {
     if (Acid_resistance) {
@@ -1294,7 +1294,7 @@ peffect_acid(struct obj *otmp)
     gp.potion_unkn++; /* holy/unholy water can burn like acid too */
 }
 
-static void
+staticfn void
 peffect_polymorph(struct obj *otmp)
 {
     You_feel("a little %s.", Hallucination ? "normal" : "strange");
@@ -1474,7 +1474,7 @@ bottlename(void)
 }
 
 /* handle item dipped into water potion or steed saddle splashed by same */
-static boolean
+staticfn boolean
 H2Opotion_dip(
     struct obj *potion,    /* water */
     struct obj *targobj,   /* item being dipped into the water */
@@ -2085,7 +2085,7 @@ potionbreathe(struct obj *obj)
 }
 
 /* returns the potion type when o1 is dipped in o2 */
-static short
+staticfn short
 mixtype(struct obj *o1, struct obj *o2)
 {
     int o1typ = o1->otyp, o2typ = o2->otyp;
@@ -2175,7 +2175,7 @@ mixtype(struct obj *o1, struct obj *o2)
 
 /* getobj callback for object to be dipped (not the thing being dipped into,
  * that uses drink_ok) */
-static int
+staticfn int
 dip_ok(struct obj *obj)
 {
     if (!obj)
@@ -2192,7 +2192,7 @@ dip_ok(struct obj *obj)
 }
 
 /* getobj callback for object to be dipped when hero has slippery hands */
-static int
+staticfn int
 dip_hands_ok(struct obj *obj)
 {
     if (!obj && (Glib && can_reach_floor(FALSE)))
@@ -2204,7 +2204,7 @@ dip_hands_ok(struct obj *obj)
 /* call hold_another_object() to deal with a transformed potion; its weight
    won't have changed but it might require an extra slot that isn't available
    or it might merge into some other carried stack */
-static void
+staticfn void
 hold_potion(
     struct obj *potobj,
     const char *drop_fmt, const char *drop_arg,
@@ -2370,7 +2370,7 @@ dip_into(void)
 }
 
 /* called by dodip() or dip_into() after obj and potion have been chosen */
-static int
+staticfn int
 potion_dip(struct obj *obj, struct obj *potion)
 {
     struct obj *singlepotion;

@@ -5,20 +5,20 @@
 
 #include "hack.h"
 
-static void setgemprobs(d_level *);
-static void randomize_gem_colors(void);
-static void shuffle(int, int, boolean);
-static void shuffle_all(void);
-static int QSORTCALLBACK discovered_cmp(const genericptr, const genericptr);
-static char *sortloot_descr(int, char *);
-static char *disco_typename(int);
-static void disco_append_typename(char *, int);
-static void disco_output_sorted(winid, char **, int, boolean);
-static char *oclass_to_name(char, char *);
+staticfn void setgemprobs(d_level *);
+staticfn void randomize_gem_colors(void);
+staticfn void shuffle(int, int, boolean);
+staticfn void shuffle_all(void);
+staticfn int QSORTCALLBACK discovered_cmp(const genericptr, const genericptr);
+staticfn char *sortloot_descr(int, char *);
+staticfn char *disco_typename(int);
+staticfn void disco_append_typename(char *, int);
+staticfn void disco_output_sorted(winid, char **, int, boolean);
+staticfn char *oclass_to_name(char, char *);
 
 #ifdef TILES_IN_GLYPHMAP
 extern glyph_map glyphmap[MAX_GLYPH];
-static void shuffle_tiles(void);
+staticfn void shuffle_tiles(void);
 
 /* Shuffle tile assignments to match descriptions, so a red potion isn't
  * displayed with a blue tile and so on.
@@ -29,7 +29,7 @@ static void shuffle_tiles(void);
  * is restored.  So might as well do that the first time instead of writing
  * another routine.
  */
-static void
+staticfn void
 shuffle_tiles(void)
 {
     int i;
@@ -48,7 +48,7 @@ shuffle_tiles(void)
 }
 #endif /* TILES_IN_GLYPHMAP */
 
-static void
+staticfn void
 setgemprobs(d_level *dlev)
 {
     int j, first, lev, sum = 0;
@@ -79,7 +79,7 @@ setgemprobs(d_level *dlev)
 }
 
 /* some gems can have different colors */
-static void
+staticfn void
 randomize_gem_colors(void)
 {
 #define COPY_OBJ_DESCR(o_dst, o_src) \
@@ -107,7 +107,7 @@ randomize_gem_colors(void)
 }
 
 /* shuffle descriptions on objects o_low to o_high */
-static void
+staticfn void
 shuffle(int o_low, int o_high, boolean domaterial)
 {
     int i, j, num_to_shuffle;
@@ -312,7 +312,7 @@ obj_shuffle_range(
 }
 
 /* randomize object descriptions */
-static void
+staticfn void
 shuffle_all(void)
 {
     /* entire classes; obj_shuffle_range() handles their exceptions */
@@ -516,7 +516,7 @@ static const short uniq_objs[] = {
 };
 
 /* discoveries qsort comparison function */
-static int QSORTCALLBACK
+staticfn int QSORTCALLBACK
 discovered_cmp(const genericptr v1, const genericptr v2)
 {
     const char *s1 = *(const char **) v1;
@@ -530,7 +530,7 @@ discovered_cmp(const genericptr v1, const genericptr v2)
     return res;
 }
 
-static char *
+staticfn char *
 sortloot_descr(int otyp, char *outbuf)
 {
     Loot sl_cookie;
@@ -621,7 +621,7 @@ choose_disco_sort(
 }
 
 /* augment obj_typename() with explanation of Japanese item names */
-static char *
+staticfn char *
 disco_typename(int otyp)
 {
     char *result = obj_typename(otyp);
@@ -653,7 +653,7 @@ disco_typename(int otyp)
 }
 
 /* append typename(dis) to buf[], possibly truncating in the process */
-static void
+staticfn void
 disco_append_typename(char *buf, int dis)
 {
     unsigned len = (unsigned) strlen(buf);
@@ -677,7 +677,7 @@ disco_append_typename(char *buf, int dis)
 }
 
 /* sort and output sorted_lines to window and free the lines */
-static void
+staticfn void
 disco_output_sorted(winid tmpwin,
                     char **sorted_lines, int sorted_ct,
                     boolean lootsort)
@@ -799,7 +799,7 @@ dodiscovered(void) /* free after Robert Viduya */
 }
 
 /* lower case let_to_name() output, which differs from def_oc_syms[].name */
-static char *
+staticfn char *
 oclass_to_name(char oclass, char *buf)
 {
     char *s;

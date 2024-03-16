@@ -5,16 +5,16 @@
 
 #include "hack.h"
 
-static boolean rm_waslit(void);
-static void mkcavepos(coordxy, coordxy, int, boolean, boolean);
-static void mkcavearea(boolean);
-static boolean pick_can_reach(struct obj *, coordxy, coordxy) NONNULLARG1;
-static int dig(void);
-static void dig_up_grave(coord *);
-static boolean watchman_canseeu(struct monst *) NONNULLARG1;
-static int adj_pit_checks(coord *, char *) NONNULLARG2;
-static void pit_flow(struct trap *, schar);
-static boolean furniture_handled(coordxy, coordxy, boolean);
+staticfn boolean rm_waslit(void);
+staticfn void mkcavepos(coordxy, coordxy, int, boolean, boolean);
+staticfn void mkcavearea(boolean);
+staticfn boolean pick_can_reach(struct obj *, coordxy, coordxy) NONNULLARG1;
+staticfn int dig(void);
+staticfn void dig_up_grave(coord *);
+staticfn boolean watchman_canseeu(struct monst *) NONNULLARG1;
+staticfn int adj_pit_checks(coord *, char *) NONNULLARG2;
+staticfn void pit_flow(struct trap *, schar);
+staticfn boolean furniture_handled(coordxy, coordxy, boolean);
 
 /* Indices returned by dig_typ() */
 enum dig_types {
@@ -26,7 +26,7 @@ enum dig_types {
     DIGTYP_TREE
 };
 
-static boolean
+staticfn boolean
 rm_waslit(void)
 {
     coordxy x, y;
@@ -44,7 +44,7 @@ rm_waslit(void)
  * boulders in the name of a nice effect.  Vision will get fixed up again
  * immediately after the effect is complete.
  */
-static void
+staticfn void
 mkcavepos(coordxy x, coordxy y, int dist, boolean waslit, boolean rockit)
 {
     struct rm *lev;
@@ -84,7 +84,7 @@ mkcavepos(coordxy x, coordxy y, int dist, boolean waslit, boolean rockit)
     feel_newsym(x, y);
 }
 
-static void
+staticfn void
 mkcavearea(boolean rockit)
 {
     int dist;
@@ -137,7 +137,7 @@ mkcavearea(boolean rockit)
 }
 
 /* called when attempting to break a statue or boulder with a pick */
-static boolean
+staticfn boolean
 pick_can_reach(struct obj *pick, coordxy x, coordxy y)
 {
     struct trap *t = t_at(x, y);
@@ -260,7 +260,7 @@ dig_check(struct monst *madeby, boolean verbose, coordxy x, coordxy y)
     return TRUE;
 }
 
-static int
+staticfn int
 dig(void)
 {
     struct rm *lev;
@@ -518,7 +518,7 @@ dig(void)
     return 1;
 }
 
-static boolean
+staticfn boolean
 furniture_handled(coordxy x, coordxy y, boolean madeby_u)
 {
     struct rm *lev = &levl[x][y];
@@ -963,7 +963,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
     return retval;
 }
 
-static void
+staticfn void
 dig_up_grave(coord *cc)
 {
     struct obj *otmp;
@@ -1296,7 +1296,7 @@ use_pick_axe2(struct obj *obj)
     return ECMD_TIME;
 }
 
-static boolean
+staticfn boolean
 watchman_canseeu(struct monst *mtmp)
 {
     if (is_watch(mtmp->data) && mtmp->mcansee && m_canseeu(mtmp)
@@ -1696,7 +1696,7 @@ zap_dig(void)
  * you're zapping a wand of digging laterally while
  * down in the pit.
  */
-static int
+staticfn int
 adj_pit_checks(coord *cc, char *msg)
 {
     int ltyp;
@@ -1777,7 +1777,7 @@ adj_pit_checks(coord *cc, char *msg)
 /*
  * Ensure that all conjoined pits fill up.
  */
-static void
+staticfn void
 pit_flow(struct trap *trap, schar filltyp)
 {
     /*

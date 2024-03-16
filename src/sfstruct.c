@@ -10,7 +10,7 @@
  * These were moved here from save.c and restore.c between 3.6.3 and 3.7.0.
  */
 
-static int getidx(int, int);
+staticfn int getidx(int, int);
 
 #if defined(UNIX) || defined(WIN32)
 #define USE_BUFFERING
@@ -66,7 +66,7 @@ static FILE *bw_FILE[MAXFD] = {0,0,0,0,0};
  *       happen.
  */
 
-static int
+staticfn int
 getidx(int fd, int flg)
 {
     int i, retval = -1;

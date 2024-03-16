@@ -5,27 +5,27 @@
 
 #include "hack.h"
 
-static boolean may_generate_eroded(struct obj *);
-static void mkobj_erosions(struct obj *);
-static void mkbox_cnts(struct obj *);
-static unsigned nextoid(struct obj *, struct obj *);
-static void mksobj_init(struct obj *, boolean);
-static int item_on_ice(struct obj *);
-static void shrinking_glob_gone(struct obj *);
-static void obj_timer_checks(struct obj *, coordxy, coordxy, int);
-static struct obj *save_mtraits(struct obj *, struct monst *);
-static void objlist_sanity(struct obj *, int, const char *);
-static void shop_obj_sanity(struct obj *, const char *);
-static void mon_obj_sanity(struct monst *, const char *);
-static void insane_obj_bits(struct obj *, struct monst *);
-static boolean nomerge_exception(struct obj *);
-static const char *where_name(struct obj *);
-static void insane_object(struct obj *, const char *, const char *,
+staticfn boolean may_generate_eroded(struct obj *);
+staticfn void mkobj_erosions(struct obj *);
+staticfn void mkbox_cnts(struct obj *);
+staticfn unsigned nextoid(struct obj *, struct obj *);
+staticfn void mksobj_init(struct obj *, boolean);
+staticfn int item_on_ice(struct obj *);
+staticfn void shrinking_glob_gone(struct obj *);
+staticfn void obj_timer_checks(struct obj *, coordxy, coordxy, int);
+staticfn struct obj *save_mtraits(struct obj *, struct monst *);
+staticfn void objlist_sanity(struct obj *, int, const char *);
+staticfn void shop_obj_sanity(struct obj *, const char *);
+staticfn void mon_obj_sanity(struct monst *, const char *);
+staticfn void insane_obj_bits(struct obj *, struct monst *);
+staticfn boolean nomerge_exception(struct obj *);
+staticfn const char *where_name(struct obj *);
+staticfn void insane_object(struct obj *, const char *, const char *,
                           struct monst *);
-static void check_contained(struct obj *, const char *);
-static void check_glob(struct obj *, const char *);
-static void sanity_check_worn(struct obj *);
-static void init_oextra(struct oextra *);
+staticfn void check_contained(struct obj *, const char *);
+staticfn void check_glob(struct obj *, const char *);
+staticfn void sanity_check_worn(struct obj *);
+staticfn void init_oextra(struct oextra *);
 
 struct icp {
     int iprob;   /* probability of an item type */
@@ -75,7 +75,7 @@ static const struct icp hellprobs[] = { { 20, WEAPON_CLASS },
 
 static const struct oextra zerooextra = DUMMY;
 
-static void
+staticfn void
 init_oextra(struct oextra *oex)
 {
     *oex = zerooextra;
@@ -172,7 +172,7 @@ free_omailcmd(struct obj *otmp)
 }
 
 /* can object be generated eroded? */
-static boolean
+staticfn boolean
 may_generate_eroded(struct obj *otmp)
 {
     /* initial hero inventory */
@@ -191,7 +191,7 @@ may_generate_eroded(struct obj *otmp)
 }
 
 /* random chance of applying erosions/grease to object */
-static void
+staticfn void
 mkobj_erosions(struct obj *otmp)
 {
     if (may_generate_eroded(otmp)) {
@@ -299,7 +299,7 @@ mkobj(int oclass, boolean artif)
     return mksobj(i, TRUE, artif);
 }
 
-static void
+staticfn void
 mkbox_cnts(struct obj *box)
 {
     int n;
@@ -527,7 +527,7 @@ next_ident(void)
 
 /* when splitting a stack that has o_id-based shop prices, pick an
    o_id value for the new stack that will maintain the same price */
-static unsigned
+staticfn unsigned
 nextoid(struct obj *oldobj, struct obj *newobj)
 {
     int olddif, newdif, trylimit = 256; /* limit of 4 suffices at present */
@@ -857,7 +857,7 @@ unknow_object(struct obj *obj)
 }
 
 /* do some initialization to newly created object; otyp must already be set */
-static void
+staticfn void
 mksobj_init(struct obj *otmp, boolean artif)
 {
     int mndx, tryct;
@@ -1374,7 +1374,7 @@ enum obj_on_ice {
 };
 
 /* used by shrink_glob(); is 'item' or enclosing container on or under ice? */
-static int
+staticfn int
 item_on_ice(struct obj *item)
 {
     struct obj *otmp;
@@ -1604,7 +1604,7 @@ shrink_glob(
 }
 
 /* a glob has shrunk away to nothing; handle owornmask, then delete glob */
-static void
+staticfn void
 shrinking_glob_gone(struct obj *obj)
 {
     xint16 owhere = obj->where;
@@ -2075,7 +2075,7 @@ obj_attach_mid(struct obj *obj, unsigned int mid)
     return obj;
 }
 
-static struct obj *
+staticfn struct obj *
 save_mtraits(struct obj *obj, struct monst *mtmp)
 {
     if (mtmp->ispriest)
@@ -2356,7 +2356,7 @@ peek_at_iced_corpse_age(struct obj *otmp)
     return retval;
 }
 
-static void
+staticfn void
 obj_timer_checks(
     struct obj *otmp,
     coordxy x, coordxy y,
@@ -2897,7 +2897,7 @@ obj_sanity_check(void)
 }
 
 /* sanity check for objects on specified list (fobj, &c) */
-static void
+staticfn void
 objlist_sanity(struct obj *objlist, int wheretype, const char *mesg)
 {
     struct obj *obj;
@@ -2960,7 +2960,7 @@ objlist_sanity(struct obj *objlist, int wheretype, const char *mesg)
 
 /* check obj->unpaid and obj->no_charge for shop sanity; caller has
    verified that at least one of them is set */
-static void
+staticfn void
 shop_obj_sanity(struct obj *obj, const char *mesg)
 {
     struct obj *otop;
@@ -3030,7 +3030,7 @@ shop_obj_sanity(struct obj *obj, const char *mesg)
 }
 
 /* sanity check for objects carried by all monsters in specified list */
-static void
+staticfn void
 mon_obj_sanity(struct monst *monlist, const char *mesg)
 {
     struct monst *mon;
@@ -3063,7 +3063,7 @@ mon_obj_sanity(struct monst *monlist, const char *mesg)
     }
 }
 
-static void
+staticfn void
 insane_obj_bits(struct obj *obj, struct monst *mon)
 {
     unsigned o_in_use = obj->in_use, o_bypass = obj->bypass,
@@ -3086,7 +3086,7 @@ insane_obj_bits(struct obj *obj, struct monst *mon)
 }
 
 /* does 'obj' use the 'nomerge' flag persistently? */
-static boolean
+staticfn boolean
 nomerge_exception(struct obj *obj)
 {
     /* special prize objects for achievement tracking are set 'nomerge'
@@ -3104,7 +3104,7 @@ static const char *const obj_state_names[NOBJ_STATES] = {
     "luafree"
 };
 
-static const char *
+staticfn const char *
 where_name(struct obj *obj)
 {
     static char unknown[32]; /* big enough to handle rogue 64-bit int */
@@ -3122,7 +3122,7 @@ where_name(struct obj *obj)
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
-static void
+staticfn void
 insane_object(
     struct obj *obj,
     const char *fmt,
@@ -3180,7 +3180,7 @@ init_dummyobj(struct obj *obj, short otyp, long oquan)
 }
 
 /* obj sanity check: check objects inside container */
-static void
+staticfn void
 check_contained(struct obj *container, const char *mesg)
 {
     struct obj *obj;
@@ -3226,7 +3226,7 @@ check_contained(struct obj *container, const char *mesg)
 }
 
 /* called when 'obj->globby' is set so we don't recheck it here */
-static void
+staticfn void
 check_glob(struct obj *obj, const char *mesg)
 {
 #define LOWEST_GLOB GLOB_OF_GRAY_OOZE
@@ -3253,7 +3253,7 @@ check_glob(struct obj *obj, const char *mesg)
 }
 
 /* check an object in hero's or monster's inventory which has worn mask set */
-static void
+staticfn void
 sanity_check_worn(struct obj *obj)
 {
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)

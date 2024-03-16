@@ -94,53 +94,53 @@ extern int dozap(void);              /**/
 extern int doorganize(void);         /**/
 #endif /* DUMB */
 
-static int dosuspend_core(void);
-static int dosh_core(void);
-static int doherecmdmenu(void);
-static int dotherecmdmenu(void);
-static int doprev_message(void);
-static int timed_occupation(void);
-static boolean can_do_extcmd(const struct ext_func_tab *);
-static int dotravel(void);
-static int dotravel_target(void);
-static int doclicklook(void);
-static int domouseaction(void);
-static int doterrain(void);
-static boolean u_have_seen_whole_selection(struct selectionvar *);
-static boolean u_have_seen_bounds_selection(struct selectionvar *);
-static boolean u_can_see_whole_selection(struct selectionvar *);
-static int dolookaround_floodfill_findroom(coordxy, coordxy);
-static void lookaround_known_room(coordxy, coordxy);
+staticfn int dosuspend_core(void);
+staticfn int dosh_core(void);
+staticfn int doherecmdmenu(void);
+staticfn int dotherecmdmenu(void);
+staticfn int doprev_message(void);
+staticfn int timed_occupation(void);
+staticfn boolean can_do_extcmd(const struct ext_func_tab *);
+staticfn int dotravel(void);
+staticfn int dotravel_target(void);
+staticfn int doclicklook(void);
+staticfn int domouseaction(void);
+staticfn int doterrain(void);
+staticfn boolean u_have_seen_whole_selection(struct selectionvar *);
+staticfn boolean u_have_seen_bounds_selection(struct selectionvar *);
+staticfn boolean u_can_see_whole_selection(struct selectionvar *);
+staticfn int dolookaround_floodfill_findroom(coordxy, coordxy);
+staticfn void lookaround_known_room(coordxy, coordxy);
 
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern void show_borlandc_stats(winid);
 #endif
-static boolean accept_menu_prefix(const struct ext_func_tab *);
-static void reset_cmd_vars(boolean);
+staticfn boolean accept_menu_prefix(const struct ext_func_tab *);
+staticfn void reset_cmd_vars(boolean);
 
-static void mcmd_addmenu(winid, int, const char *);
-static int there_cmd_menu_self(winid, coordxy, coordxy, int *);
-static int there_cmd_menu_next2u(winid, coordxy, coordxy, int, int *);
-static int there_cmd_menu_far(winid, coordxy, coordxy, int);
-static int there_cmd_menu_common(winid, coordxy, coordxy, int, int *);
-static void act_on_act(int, coordxy, coordxy);
-static char there_cmd_menu(coordxy, coordxy, int);
-static char here_cmd_menu(void);
+staticfn void mcmd_addmenu(winid, int, const char *);
+staticfn int there_cmd_menu_self(winid, coordxy, coordxy, int *);
+staticfn int there_cmd_menu_next2u(winid, coordxy, coordxy, int, int *);
+staticfn int there_cmd_menu_far(winid, coordxy, coordxy, int);
+staticfn int there_cmd_menu_common(winid, coordxy, coordxy, int, int *);
+staticfn void act_on_act(int, coordxy, coordxy);
+staticfn char there_cmd_menu(coordxy, coordxy, int);
+staticfn char here_cmd_menu(void);
 
-static char readchar_core(coordxy *, coordxy *, int *);
-static int parse(void);
-static void show_direction_keys(winid, char, boolean);
-static boolean help_dir(char, uchar, const char *);
+staticfn char readchar_core(coordxy *, coordxy *, int *);
+staticfn int parse(void);
+staticfn void show_direction_keys(winid, char, boolean);
+staticfn boolean help_dir(char, uchar, const char *);
 
-static void handler_rebind_keys_add(boolean);
-static boolean bind_key_fn(uchar, int (*)(void));
-static void commands_init(void);
-static boolean keylist_func_has_key(const struct ext_func_tab *, boolean *);
-static int keylist_putcmds(winid, boolean, int, int, boolean *);
-static const char *spkey_name(int);
+staticfn void handler_rebind_keys_add(boolean);
+staticfn boolean bind_key_fn(uchar, int (*)(void));
+staticfn void commands_init(void);
+staticfn boolean keylist_func_has_key(const struct ext_func_tab *, boolean *);
+staticfn int keylist_putcmds(winid, boolean, int, int, boolean *);
+staticfn const char *spkey_name(int);
 
-static int (*timed_occ_fn)(void);
-static char *doc_extcmd_flagstr(winid, const struct ext_func_tab *);
+staticfn int (*timed_occ_fn)(void);
+staticfn char *doc_extcmd_flagstr(winid, const struct ext_func_tab *);
 
 static const char *readchar_queue = "";
 
@@ -152,7 +152,7 @@ const char unavailcmd[] = "Unavailable command '%s'.";
 static const char cmdnotavail[] = "'%s' command not available.";
 
 /* the #prevmsg command */
-static int
+staticfn int
 doprev_message(void)
 {
     (void) nh_doprev_message();
@@ -160,7 +160,7 @@ doprev_message(void)
 }
 
 /* Count down by decrementing multi */
-static int
+staticfn int
 timed_occupation(void)
 {
     (*timed_occ_fn)();
@@ -439,7 +439,7 @@ extcmd_initiator(void)
     return gc.Cmd.extcmd_char;
 }
 
-static boolean
+staticfn boolean
 can_do_extcmd(const struct ext_func_tab *extcmd)
 {
     int ecflags = extcmd->flags;
@@ -500,7 +500,7 @@ doextcmd(void)
 }
 
 /* format extended command flags for display */
-static char *
+staticfn char *
 doc_extcmd_flagstr(
     winid menuwin,
     const struct ext_func_tab *efp) /* if Null, add a footnote to the menu */
@@ -1067,7 +1067,7 @@ levltyp_to_name(int typ)
 }
 
 /* #terrain command -- show known map, inspired by crawl's '|' command */
-static int
+staticfn int
 doterrain(void)
 {
     winid men;
@@ -1164,7 +1164,7 @@ doterrain(void)
 }
 
 /* has hero seen all locations in selection? */
-static boolean
+staticfn boolean
 u_have_seen_whole_selection(struct selectionvar *sel)
 {
     coordxy x, y;
@@ -1182,7 +1182,7 @@ u_have_seen_whole_selection(struct selectionvar *sel)
 }
 
 /* has hero seen all location of the rectangular outline in the selection */
-static boolean
+staticfn boolean
 u_have_seen_bounds_selection(struct selectionvar *sel)
 {
     coordxy x, y;
@@ -1215,7 +1215,7 @@ u_have_seen_bounds_selection(struct selectionvar *sel)
 }
 
 /* can hero currently see all locations in the selection */
-static boolean
+staticfn boolean
 u_can_see_whole_selection(struct selectionvar *sel)
 {
     coordxy x, y;
@@ -1232,7 +1232,7 @@ u_can_see_whole_selection(struct selectionvar *sel)
 }
 
 /* selection_floofill callback to get all locations in a room */
-static int
+staticfn int
 dolookaround_floodfill_findroom(coordxy x, coordxy y)
 {
     schar typ = levl[x][y].typ;
@@ -1245,7 +1245,7 @@ dolookaround_floodfill_findroom(coordxy x, coordxy y)
 }
 
 /* describe the room at x,y */
-static void
+staticfn void
 lookaround_known_room(coordxy x, coordxy y)
 {
     struct selectionvar *sel = selection_new();
@@ -2088,7 +2088,7 @@ get_changed_key_binds(strbuf_t *sbuf)
 }
 
 /* interactive key binding */
-static void
+staticfn void
 handler_rebind_keys_add(boolean keyfirst)
 {
     struct ext_func_tab *ec;
@@ -2403,7 +2403,7 @@ bind_key(uchar key, const char *command)
 }
 
 /* bind key by ext cmd function */
-static boolean
+staticfn boolean
 bind_key_fn(uchar key, int (*fn)(void))
 {
     struct ext_func_tab *extcmd;
@@ -2421,7 +2421,7 @@ bind_key_fn(uchar key, int (*fn)(void))
 }
 
 /* initialize all keyboard commands */
-static void
+staticfn void
 commands_init(void)
 {
     struct ext_func_tab *extcmd;
@@ -2456,7 +2456,7 @@ commands_init(void)
 #endif
 }
 
-static boolean
+staticfn boolean
 keylist_func_has_key(const struct ext_func_tab *extcmd,
                      boolean *skip_keys_used) /* boolean keys_used[256] */
 {
@@ -2472,7 +2472,7 @@ keylist_func_has_key(const struct ext_func_tab *extcmd,
     return FALSE;
 }
 
-static int
+staticfn int
 keylist_putcmds(winid datawin, boolean docount,
                 int incl_flags, int excl_flags,
                 boolean *keys_used) /* boolean keys_used[256] */
@@ -2869,7 +2869,7 @@ bind_specialkey(uchar key, const char *command)
     return FALSE;
 }
 
-static const char *
+staticfn const char *
 spkey_name(int nhkf)
 {
     const char *name = 0;
@@ -3137,7 +3137,7 @@ update_rest_on_space(void)
 /* commands which accept 'm' prefix to request menu operation or other
    alternate behavior; it's also overloaded for move-without-autopickup;
    there is no overlap between the two groups of commands */
-static boolean
+staticfn boolean
 accept_menu_prefix(const struct ext_func_tab *ec)
 {
     return (ec && ((ec->flags & CMD_M_PREFIX) != 0));
@@ -3225,7 +3225,7 @@ rnd_extcmd_idx(void)
     return rn2(extcmdlist_length + 1) - 1;
 }
 
-static void
+staticfn void
 reset_cmd_vars(boolean reset_cmdq)
 {
     gc.context.run = 0;
@@ -3703,7 +3703,7 @@ getdir(const char *s)
     return 1;
 }
 
-static void
+staticfn void
 show_direction_keys(
     winid win, /* should specify a window which is using a fixed-width font */
     char centerchar, /* '.' or '@' or ' ' */
@@ -3752,7 +3752,7 @@ show_direction_keys(
 /* explain choices if player has asked for getdir() help or has given
    an invalid direction after a prefix key ('F', 'g', 'm', &c), which
    might be bogus but could be up, down, or self when not applicable */
-static boolean
+staticfn boolean
 help_dir(
     char sym,
     uchar spkey, /* actual key; either prefix or ESC */
@@ -3915,7 +3915,7 @@ isok(coordxy x, coordxy y)
 }
 
 /* #herecmdmenu command */
-static int
+staticfn int
 doherecmdmenu(void)
 {
     char ch = here_cmd_menu();
@@ -3924,7 +3924,7 @@ doherecmdmenu(void)
 }
 
 /* #therecmdmenu command, a way to test there_cmd_menu without mouse */
-static int
+staticfn int
 dotherecmdmenu(void)
 {
     char ch;
@@ -4002,7 +4002,7 @@ enum menucmd {
     MCMD_TRAVEL,
 };
 
-static void
+staticfn void
 mcmd_addmenu(winid win, int act, const char *txt)
 {
     anything any;
@@ -4016,7 +4016,7 @@ mcmd_addmenu(winid win, int act, const char *txt)
 }
 
 /* command menu entries when targeting self */
-static int
+staticfn int
 there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
 {
     int K = 0;
@@ -4105,7 +4105,7 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
 }
 
 /* add entries to there_cmd_menu, when x,y is next to hero */
-static int
+staticfn int
 there_cmd_menu_next2u(
     winid win,
     coordxy x, coordxy y,
@@ -4205,7 +4205,7 @@ there_cmd_menu_next2u(
     return K;
 }
 
-static int
+staticfn int
 there_cmd_menu_far(winid win, coordxy x, coordxy y, int mod)
 {
     int K = 0;
@@ -4220,7 +4220,7 @@ there_cmd_menu_far(winid win, coordxy x, coordxy y, int mod)
     return K;
 }
 
-static int
+staticfn int
 there_cmd_menu_common(
     winid win,
     coordxy x, coordxy y,
@@ -4239,7 +4239,7 @@ there_cmd_menu_common(
 }
 
 /* queue up command(s) to perform #therecmdmenu action */
-static void
+staticfn void
 act_on_act(
     int act,                /* action */
     coordxy dx, coordxy dy) /* delta to adjacent spot (farther sometimes) */
@@ -4424,7 +4424,7 @@ act_on_act(
 
 /* offer choice of actions to perform at adjacent location <x,y>;
    a few choices can be farther away */
-static char
+staticfn char
 there_cmd_menu(coordxy x, coordxy y, int mod)
 {
     winid win;
@@ -4480,7 +4480,7 @@ there_cmd_menu(coordxy x, coordxy y, int mod)
     return ch;
 }
 
-static char
+staticfn char
 here_cmd_menu(void)
 {
     there_cmd_menu(u.ux, u.uy, CLICK_1);
@@ -4497,7 +4497,7 @@ click_to_cmd(coordxy x, coordxy y, int mod)
         cmdq_add_ec(CQ_CANNED, gc.Cmd.mousebtn[mod-1]->ef_funct);
 }
 
-static int
+staticfn int
 domouseaction(void)
 {
     coordxy x, y;
@@ -4672,7 +4672,7 @@ get_count(
 }
 
 
-static int
+staticfn int
 parse(void)
 {
     int foo;
@@ -4776,7 +4776,7 @@ end_of_input(void)
 }
 #endif /* HANGUPHANDLING */
 
-static char
+staticfn char
 readchar_core(coordxy *x, coordxy *y, int *mod)
 {
     int sym;
@@ -4862,7 +4862,7 @@ readchar_poskey(coordxy *x, coordxy *y, int *mod)
 }
 
 /* '_' command, #travel, via keyboard rather than mouse click */
-static int
+staticfn int
 dotravel(void)
 {
     coord cc;
@@ -4911,7 +4911,7 @@ dotravel(void)
 }
 
 /* #retravel, travel to iflags.travelcc, which must be set */
-static int
+staticfn int
 dotravel_target(void)
 {
     if (!isok(iflags.travelcc.x, iflags.travelcc.y)) {
@@ -4944,7 +4944,7 @@ dotravel_target(void)
 }
 
 /* mouse click look command */
-static int
+staticfn int
 doclicklook(void)
 {
     if (!isok(gc.clicklook_cc.x, gc.clicklook_cc.y))
@@ -5101,7 +5101,7 @@ paranoid_query(boolean be_paranoid, const char *prompt)
 }
 
 /* ^Z command, #suspend */
-static int
+staticfn int
 dosuspend_core(void)
 {
 #ifdef SUSPEND
@@ -5121,7 +5121,7 @@ dosuspend_core(void)
 }
 
 /* '!' command, #shell */
-static int
+staticfn int
 dosh_core(void)
 {
 #ifdef SHELL

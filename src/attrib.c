@@ -105,13 +105,13 @@ static const struct innate {
 
   hum_abil[] = { { 0, 0, 0, 0 } };
 
-static void exerper(void);
-static int rnd_attr(void);
-static int init_attr_role_redist(int, boolean);
-static void postadjabil(long *);
-static const struct innate *role_abil(int);
-static const struct innate *check_innate_abil(long *, long);
-static int innately(long *);
+staticfn void exerper(void);
+staticfn int rnd_attr(void);
+staticfn int init_attr_role_redist(int, boolean);
+staticfn void postadjabil(long *);
+staticfn const struct innate *role_abil(int);
+staticfn const struct innate *check_innate_abil(long *, long);
+staticfn int innately(long *);
 
 /* adjust an attribute; return TRUE if change is made, FALSE otherwise */
 boolean
@@ -505,7 +505,7 @@ exercise(int i, boolean inc_or_dec)
         (void) encumber_msg();
 }
 
-static void
+staticfn void
 exerper(void)
 {
     if (!(gm.moves % 10)) {
@@ -666,7 +666,7 @@ exerchk(void)
 
 /* return random hero attribute (by role's attr distribution).
    returns A_MAX if failed. */
-static int
+staticfn int
 rnd_attr(void)
 {
     int i, x = rn2(100);
@@ -683,7 +683,7 @@ rnd_attr(void)
    adjusting the base and maximum values of the attributes.
    if subtracting, np must be negative.
    returns the left over points. */
-static int
+staticfn int
 init_attr_role_redist(int np, boolean addition)
 {
     int tryct = 0;
@@ -761,7 +761,7 @@ vary_init_attr(void)
         }
 }
 
-static
+staticfn
 void
 postadjabil(long *ability)
 {
@@ -771,7 +771,7 @@ postadjabil(long *ability)
         see_monsters();
 }
 
-static const struct innate *
+staticfn const struct innate *
 role_abil(int r)
 {
     const struct {
@@ -800,7 +800,7 @@ role_abil(int r)
     return roleabils[i].abil;
 }
 
-static const struct innate *
+staticfn const struct innate *
 check_innate_abil(long *ability, long frommask)
 {
     const struct innate *abil = 0;
@@ -846,7 +846,7 @@ check_innate_abil(long *ability, long frommask)
 #define FROM_LYCN 6
 
 /* check whether particular ability has been obtained via innate attribute */
-static int
+staticfn int
 innately(long *ability)
 {
     const struct innate *iptr;

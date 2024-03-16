@@ -45,8 +45,11 @@ GAMEGRP  = games
 
 # This gives better backtraces by making all core functions global; this
 # works around a limitation in glibc's backtrace(3) function.
-# Recommended with CRASHREPORT.
-#NOSTATICCORE = 1
+# This will be turned on automatically with CRASHREPROT.
+# 1 to enable, 0 to disable
+USE_NOSTATICFN = 1
+# If you want CRASHREPORT but absolutely don't want NOSTATICFN, define this:
+#USE_NONOSTATICFN = 1
 
 #-----------------------------------------------------------------------------
 #-INCLUDE cross-pre1.370
@@ -342,6 +345,14 @@ ifneq "$(CCISCLANG)" ""
 # relevant lines in sysconf.
 POSTINSTALL+= sed -i -e 's;^GDBPATH=/usr/bin/gdb;\#GDBPATH=/usr/bin/gdb;' \
 		-e 's;PANICTRACE_GDB=1;PANICTRACE_GDB=0;' $(INSTDIR)/sysconf;
+endif
+
+ifeq 'USENONOSTATICFN' '1'
+CFLAGS += -DNONOSTATICFN
+else
+ifeq 'USE_NOSTATICFN' '1'
+CFLAGS += -DNOSTATICFN
+endif
 endif
 
 # Lua

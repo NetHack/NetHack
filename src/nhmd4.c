@@ -29,7 +29,7 @@
 
 #include "nhmd4.h"
 
-static const unsigned char *nhmd4_body(struct nhmd4_context *,
+staticfn const unsigned char *nhmd4_body(struct nhmd4_context *,
                                  const unsigned char *, size_t);
 
 /* Avoid a conflict from a Lua header */
@@ -79,7 +79,7 @@ static const unsigned char *nhmd4_body(struct nhmd4_context *,
  * This processes one or more 64-byte data blocks, but does NOT update
  * the bit counters.  There're no alignment requirements.
  */
-static const unsigned char *
+staticfn const unsigned char *
 nhmd4_body(
     struct nhmd4_context *ctx,
     const unsigned char *data,

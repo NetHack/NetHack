@@ -8,21 +8,21 @@
 extern const char unavailcmd[];                  /* cmd.c [27] */
 extern const char *levltyp[MAX_TYPE + 2];          /* cmd.c */
 
-static int size_monst(struct monst *, boolean);
-static int size_obj(struct obj *);
-static void count_obj(struct obj *, long *, long *, boolean, boolean);
-static void obj_chain(winid, const char *, struct obj *, boolean, long *,
+staticfn int size_monst(struct monst *, boolean);
+staticfn int size_obj(struct obj *);
+staticfn void count_obj(struct obj *, long *, long *, boolean, boolean);
+staticfn void obj_chain(winid, const char *, struct obj *, boolean, long *,
                       long *);
-static void mon_invent_chain(winid, const char *, struct monst *, long *,
+staticfn void mon_invent_chain(winid, const char *, struct monst *, long *,
                              long *);
-static void mon_chain(winid, const char *, struct monst *, boolean, long *,
+staticfn void mon_chain(winid, const char *, struct monst *, boolean, long *,
                       long *);
-static void contained_stats(winid, const char *, long *, long *);
-static void misc_stats(winid, long *, long *);
-static void you_sanity_check(void);
-static void makemap_unmakemon(struct monst *, boolean);
-static int QSORTCALLBACK migrsort_cmp(const genericptr, const genericptr);
-static void list_migrating_mons(d_level *);
+staticfn void contained_stats(winid, const char *, long *, long *);
+staticfn void misc_stats(winid, long *, long *);
+staticfn void you_sanity_check(void);
+staticfn void makemap_unmakemon(struct monst *, boolean);
+staticfn int QSORTCALLBACK migrsort_cmp(const genericptr, const genericptr);
+staticfn void list_migrating_mons(d_level *);
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
@@ -1099,7 +1099,7 @@ static const char template[] = "%-27s  %4ld  %6ld";
 static const char stats_hdr[] = "                             count  bytes";
 static const char stats_sep[] = "---------------------------  ----- -------";
 
-static int
+staticfn int
 size_obj(struct obj *otmp)
 {
     int sz = (int) sizeof (struct obj);
@@ -1117,7 +1117,7 @@ size_obj(struct obj *otmp)
     return sz;
 }
 
-static void
+staticfn void
 count_obj(struct obj *chain, long *total_count, long *total_size,
           boolean top, boolean recurse)
 {
@@ -1138,7 +1138,7 @@ count_obj(struct obj *chain, long *total_count, long *total_size,
 
 DISABLE_WARNING_FORMAT_NONLITERAL  /* RESTORE_WARNING follows wiz_show_stats */
 
-static void
+staticfn void
 obj_chain(
     winid win,
     const char *src,
@@ -1159,7 +1159,7 @@ obj_chain(
     }
 }
 
-static void
+staticfn void
 mon_invent_chain(
     winid win,
     const char *src,
@@ -1181,7 +1181,7 @@ mon_invent_chain(
     }
 }
 
-static void
+staticfn void
 contained_stats(
     winid win,
     const char *src,
@@ -1210,7 +1210,7 @@ contained_stats(
     }
 }
 
-static int
+staticfn int
 size_monst(struct monst *mtmp, boolean incl_wsegs)
 {
     int sz = (int) sizeof (struct monst);
@@ -1237,7 +1237,7 @@ size_monst(struct monst *mtmp, boolean incl_wsegs)
     return sz;
 }
 
-static void
+staticfn void
 mon_chain(
     winid win,
     const char *src,
@@ -1264,7 +1264,7 @@ mon_chain(
     }
 }
 
-static void
+staticfn void
 misc_stats(
     winid win,
     long *total_count, long *total_size)
@@ -1382,7 +1382,7 @@ misc_stats(
     }
 }
 
-static void
+staticfn void
 you_sanity_check(void)
 {
     struct monst *mtmp;
@@ -1428,7 +1428,7 @@ sanity_check(void)
 }
 
 /* qsort() comparison routine for use in list_migrating_mons() */
-static int QSORTCALLBACK
+staticfn int QSORTCALLBACK
 migrsort_cmp(const genericptr vptr1, const genericptr vptr2)
 {
     const struct monst *m1 = *(const struct monst **) vptr1,
@@ -1449,7 +1449,7 @@ migrsort_cmp(const genericptr vptr1, const genericptr vptr2)
 
 /* called by #migratemons; displays count of migrating monsters, optionally
    displays them as well */
-static void
+staticfn void
 list_migrating_mons(
     d_level *nextlevl) /* default destination for wiz_migrate_mons() */
 {

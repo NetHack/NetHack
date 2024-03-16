@@ -52,10 +52,10 @@
  * No item may be in more than one of these slots.
  */
 
-static boolean cant_wield_corpse(struct obj *) NONNULLARG1;
-static int ready_weapon(struct obj *) NO_NNARGS;
-static int ready_ok(struct obj *) NO_NNARGS;
-static int wield_ok(struct obj *) NO_NNARGS;
+staticfn boolean cant_wield_corpse(struct obj *) NONNULLARG1;
+staticfn int ready_weapon(struct obj *) NO_NNARGS;
+staticfn int ready_ok(struct obj *) NO_NNARGS;
+staticfn int wield_ok(struct obj *) NO_NNARGS;
 
 /* used by will_weld() */
 /* probably should be renamed */
@@ -128,7 +128,7 @@ setuwep(struct obj *obj)
         gu.unweapon = TRUE; /* for "bare hands" message */
 }
 
-static boolean
+staticfn boolean
 cant_wield_corpse(struct obj *obj)
 {
     char kbuf[BUFSZ];
@@ -159,7 +159,7 @@ empty_handed(void)
                : "not wielding anything";
 }
 
-static int
+staticfn int
 ready_weapon(struct obj *wep)
 {
     /* Separated function so swapping works easily */
@@ -284,7 +284,7 @@ setuswapwep(struct obj *obj)
 
 /* getobj callback for object to ready for throwing/shooting;
    this filter lets worn items through so that caller can reject them */
-static int
+staticfn int
 ready_ok(struct obj *obj)
 {
     if (!obj) /* '-', will empty quiver slot if chosen */
@@ -321,7 +321,7 @@ ready_ok(struct obj *obj)
 }
 
 /* getobj callback for object to wield */
-static int
+staticfn int
 wield_ok(struct obj *obj)
 {
     if (!obj)

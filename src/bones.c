@@ -5,15 +5,15 @@
 
 #include "hack.h"
 
-static boolean no_bones_level(d_level *);
-static void goodfruit(int);
-static void resetobjs(struct obj *, boolean);
-static void give_to_nearby_mon(struct obj *, coordxy, coordxy) NONNULLARG1;
-static boolean fixuporacle(struct monst *) NONNULLARG1;
-static void remove_mon_from_bones(struct monst *) NONNULLARG1;
-static void set_ghostly_objlist(struct obj *objchain);
+staticfn boolean no_bones_level(d_level *);
+staticfn void goodfruit(int);
+staticfn void resetobjs(struct obj *, boolean);
+staticfn void give_to_nearby_mon(struct obj *, coordxy, coordxy) NONNULLARG1;
+staticfn boolean fixuporacle(struct monst *) NONNULLARG1;
+staticfn void remove_mon_from_bones(struct monst *) NONNULLARG1;
+staticfn void set_ghostly_objlist(struct obj *objchain);
 
-static boolean
+staticfn boolean
 no_bones_level(d_level *lev)
 {
     s_level *sptr;
@@ -37,7 +37,7 @@ no_bones_level(d_level *lev)
  * ID is positive instead of negative).  This way, when we later save the
  * chain of fruit types, we know to only save the types that exist.
  */
-static void
+staticfn void
 goodfruit(int id)
 {
     struct fruit *f = fruit_from_indx(-id);
@@ -46,7 +46,7 @@ goodfruit(int id)
         f->fid = id;
 }
 
-static void
+staticfn void
 resetobjs(struct obj *ochain, boolean restore)
 {
     struct obj *otmp, *nobj;
@@ -220,7 +220,7 @@ sanitize_name(char *namebuf)
 /* Give object to a random object-liking monster on or adjacent to x,y
    but skipping hero's location.
    If no such monster, place object on floor at x,y. */
-static void
+staticfn void
 give_to_nearby_mon(struct obj *otmp, coordxy x, coordxy y)
 {
     struct monst *mtmp;
@@ -302,7 +302,7 @@ drop_upon_death(
 
 /* possibly restore oracle's room and/or put her back inside it; returns
    False if she's on the wrong level and should be removed, True otherwise */
-static boolean
+staticfn boolean
 fixuporacle(struct monst *oracle)
 {
     coord cc;
@@ -384,7 +384,7 @@ can_make_bones(void)
 
 /* monster might need to be removed before saving a bones file,
    in case these characters are not in their home bases */
-static void
+staticfn void
 remove_mon_from_bones(struct monst *mtmp)
 {
     struct permonst *mptr = mtmp->data;
@@ -740,7 +740,7 @@ bones_include_name(const char *name)
 }
 
 /* set the ghostly bit in a list of objects */
-static void
+staticfn void
 set_ghostly_objlist(struct obj *objchain)
 {
     while (objchain) {

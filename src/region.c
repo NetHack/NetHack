@@ -37,8 +37,8 @@ boolean enter_force_field(genericptr,genericptr);
 NhRegion *create_force_field(coordxy,coordxy,int,long);
 #endif
 
-static void reset_region_mids(NhRegion *);
-static boolean is_hero_inside_gas_cloud(void);
+staticfn void reset_region_mids(NhRegion *);
+staticfn boolean is_hero_inside_gas_cloud(void);
 
 static const callback_proc callbacks[] = {
 #define INSIDE_GAS_CLOUD 0
@@ -875,7 +875,7 @@ region_stats(
 RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* update monster IDs for region being loaded from bones; `ghostly' implied */
-static void
+staticfn void
 reset_region_mids(NhRegion *reg)
 {
     int i = 0, n = reg->n_monst;
@@ -1109,7 +1109,7 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
     return FALSE; /* Monster is still alive */
 }
 
-static boolean
+staticfn boolean
 is_hero_inside_gas_cloud(void)
 {
     int i;

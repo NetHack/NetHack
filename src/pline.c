@@ -9,10 +9,10 @@
                               * config file parsing) with modest decoration;
                               * result will then be truncated to BUFSZ-1 */
 
-static void putmesg(const char *);
-static char *You_buf(int);
+staticfn void putmesg(const char *);
+staticfn char *You_buf(int);
 #if defined(MSGHANDLER)
-static void execplinehandler(const char *);
+staticfn void execplinehandler(const char *);
 #endif
 #ifdef USER_SOUNDS
 extern void maybe_play_sound(const char *);
@@ -63,7 +63,7 @@ dumplogfreemessages(void)
 #endif
 
 /* keeps windowprocs usage out of pline() */
-static void
+staticfn void
 putmesg(const char *line)
 {
     int attr = ATR_NONE;
@@ -78,7 +78,7 @@ putmesg(const char *line)
     SoundSpeak(line);
 }
 
-static void vpline(const char *, va_list);
+staticfn void vpline(const char *, va_list);
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
@@ -133,7 +133,7 @@ set_msg_xy(coordxy x, coordxy y)
     a11y.msg_loc.y = y;
 }
 
-static void
+staticfn void
 vpline(const char *line, va_list the_args)
 {
     static int in_pline = 0;
@@ -312,7 +312,7 @@ Norep(const char *line, ...)
     va_end(the_args);
 }
 
-static char *
+staticfn char *
 You_buf(int siz)
 {
     if (siz > gy.you_buf_siz) {
@@ -520,7 +520,7 @@ livelog_printf(
 
 #endif /* !CHRONICLE */
 
-static void vraw_printf(const char *, va_list);
+staticfn void vraw_printf(const char *, va_list);
 
 void
 raw_printf(const char *line, ...)
@@ -536,7 +536,7 @@ raw_printf(const char *line, ...)
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
-static void
+staticfn void
 vraw_printf(const char *line, va_list the_args)
 {
     char pbuf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
@@ -609,7 +609,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 #if defined(MSGHANDLER)
 static boolean use_pline_handler = TRUE;
 
-static void
+staticfn void
 execplinehandler(const char *line)
 {
 #if defined(POSIX_TYPES) || defined(__GNUC__)
@@ -664,7 +664,7 @@ execplinehandler(const char *line)
 /*
  * varargs handling for files.c
  */
-static void vconfig_error_add(const char *, va_list);
+staticfn void vconfig_error_add(const char *, va_list);
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
@@ -678,7 +678,7 @@ config_error_add(const char *str, ...)
     va_end(the_args);
 }
 
-static void
+staticfn void
 vconfig_error_add(const char *str, va_list the_args)
 {       /* start of vconf...() or of nested block in USE_OLDARG's conf...() */
     int vlen = 0;

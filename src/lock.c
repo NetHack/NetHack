@@ -6,12 +6,12 @@
 #include "hack.h"
 
 /* occupation callbacks */
-static int picklock(void);
-static int forcelock(void);
+staticfn int picklock(void);
+staticfn int forcelock(void);
 
-static const char *lock_action(void);
-static boolean obstructed(coordxy, coordxy, boolean);
-static void chest_shatter_msg(struct obj *);
+staticfn const char *lock_action(void);
+staticfn boolean obstructed(coordxy, coordxy, boolean);
+staticfn void chest_shatter_msg(struct obj *);
 
 boolean
 picking_lock(coordxy *x, coordxy *y)
@@ -33,7 +33,7 @@ picking_at(coordxy x, coordxy y)
 }
 
 /* produce an occupation string appropriate for the current activity */
-static const char *
+staticfn const char *
 lock_action(void)
 {
     /* "unlocking"+2 == "locking" */
@@ -63,7 +63,7 @@ lock_action(void)
 }
 
 /* try to open/close a lock */
-static int
+staticfn int
 picklock(void)
 {
     if (gx.xlock.box) {
@@ -207,7 +207,7 @@ breakchestlock(struct obj *box, boolean destroyit)
 }
 
 /* try to force a locked chest */
-static int
+staticfn int
 forcelock(void)
 {
     if ((gx.xlock.box->ox != u.ux) || (gx.xlock.box->oy != u.uy))
@@ -908,7 +908,7 @@ doopen_indir(coordxy x, coordxy y)
     return ECMD_TIME;
 }
 
-static boolean
+staticfn boolean
 obstructed(coordxy x, coordxy y, boolean quietly)
 {
     struct monst *mtmp = m_at(x, y);
@@ -1257,7 +1257,7 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
     return res;
 }
 
-static void
+staticfn void
 chest_shatter_msg(struct obj *otmp)
 {
     const char *disposition;
