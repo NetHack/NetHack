@@ -9,7 +9,10 @@
 #include "curses.h"
 #include "hack.h"
 #include "wincurs.h"
+#include "cursinit.h"
+#include "cursmisc.h"
 #include "curswins.h"
+#include "cursstat.h"
 
 /* Window handling for curses interface */
 
@@ -23,6 +26,9 @@ typedef struct nhw {
     int x;                      /* start of window on terminal (left) */
     int y;                      /* start of window on terminal (top) */
     int orientation;            /* Placement of window relative to map */
+    boolean clr_inited;         /* fg/bg/colorpair inited? */
+    int fg, bg;                 /* foreground, background color index */
+    int colorpair;              /* color pair of fg, bg */
     boolean border;             /* Whether window has a visible border */
 } nethack_window;
 
@@ -52,7 +58,7 @@ static void clear_map(void);
 /* Create a window with the specified size and orientation */
 
 WINDOW *
-curses_create_window(int width, int height, orient orientation)
+curses_create_window(int wid, int width, int height, orient orientation)
 {
     int mapx = 0, mapy = 0, maph = 0, mapw = 0;
     int startx = 0;
@@ -142,12 +148,48 @@ curses_create_window(int width, int height, orient orientation)
     }
 
     win = newwin(height, width, starty, startx);
-    curses_toggle_color_attr(win, DIALOG_BORDER_COLOR, NONE, ON);
+
+    if (curses_is_text(wid))
+        wid = TEXT_WIN;
+    else if (curses_is_menu(wid))
+        wid = MENU_WIN;
+
+    if (nhwins[wid].clr_inited < 1)
+        curses_toggle_color_attr(win, DIALOG_BORDER_COLOR, NONE, ON);
     box(win, 0, 0);
-    curses_toggle_color_attr(win, DIALOG_BORDER_COLOR, NONE, OFF);
+    if (nhwins[wid].clr_inited < 1)
+        curses_toggle_color_attr(win, DIALOG_BORDER_COLOR, NONE, OFF);
     return win;
 }
 
+int
+curses_win_clr_inited(int wid)
+{
+    if (curses_is_text(wid)) {
+        wid = TEXT_WIN;
+    } else if (curses_is_menu(wid)) {
+        wid = MENU_WIN;
+    }
+    return nhwins[wid].clr_inited;
+}
+
+void
+curses_set_wid_colors(int wid, WINDOW *win)
+{
+    if (wid == TEXT_WIN || curses_is_text(wid)) {
+        wid = TEXT_WIN;
+        if (!nhwins[wid].clr_inited)
+            curses_parse_wid_colors(wid, iflags.wc_foregrnd_text, iflags.wc_backgrnd_text);
+    } else if (wid == MENU_WIN || curses_is_menu(wid)) {
+        wid = MENU_WIN;
+        if (!nhwins[wid].clr_inited)
+            curses_parse_wid_colors(wid, iflags.wc_foregrnd_menu, iflags.wc_backgrnd_menu);
+    }
+    /* FIXME: colors and nhwins[] entry for perm invent window */
+    if (nhwins[wid].clr_inited > 0) {
+        wbkgd(win ? win : nhwins[wid].curwin, COLOR_PAIR(nhwins[wid].colorpair));
+    }
+}
 
 /* Erase and delete curses window, and refresh standard windows */
 
@@ -183,6 +225,7 @@ curses_refresh_nethack_windows(void)
         refresh();
     } else {
         if (status_window != NULL) {
+            curses_set_wid_colors(STATUS_WIN, NULL);
             touchwin(status_window);
             wnoutrefresh(status_window);
         }
@@ -191,6 +234,7 @@ curses_refresh_nethack_windows(void)
             wnoutrefresh(map_window);
         }
         if (message_window != NULL) {
+            curses_set_wid_colors(MESSAGE_WIN, NULL);
             touchwin(message_window);
             wnoutrefresh(message_window);
         }
@@ -217,6 +261,67 @@ curses_get_nhwin(winid wid)
     return nhwins[wid].curwin;
 }
 
+boolean
+parse_hexstr(char *colorbuf, int *red, int *green, int *blue)
+{
+    int len = colorbuf ? strlen(colorbuf) : 0;
+
+    if (len == 7 && colorbuf[0] == '#') {
+        char tmpbuf[16];
+
+        Sprintf(tmpbuf, "0x%c%c", colorbuf[1], colorbuf[2]);
+        *red = strtol(tmpbuf, NULL, 0);
+        Sprintf(tmpbuf, "0x%c%c", colorbuf[3], colorbuf[4]);
+        *green = strtol(tmpbuf, NULL, 0);
+        Sprintf(tmpbuf, "0x%c%c", colorbuf[5], colorbuf[6]);
+        *blue = strtol(tmpbuf, NULL, 0);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+void
+curses_parse_wid_colors(int wid, char *fg, char *bg)
+{
+
+    if (curses_is_text(wid)) {
+        wid = TEXT_WIN;
+    } else if (curses_is_menu(wid)) {
+        wid = MENU_WIN;
+    }
+
+    if (nhwins[wid].clr_inited)
+        return;
+
+    int nh_fg = fg ? match_str2clr(fg, TRUE) : CLR_MAX;
+    int nh_bg = bg ? match_str2clr(bg, TRUE) : CLR_MAX;
+    int r, g, b;
+
+    if (nh_fg == CLR_MAX) {
+        if (fg && parse_hexstr(fg, &r, &g, &b)) {
+            nh_fg = curses_init_rgb(r, g, b);
+        } else {
+            nh_fg = -1;
+        }
+    }
+    if (nh_bg == CLR_MAX) {
+        if (bg && parse_hexstr(bg, &r, &g, &b)) {
+            nh_bg = curses_init_rgb(r, g, b);
+        } else {
+            nh_bg = -1;
+        }
+    }
+
+    nhwins[wid].fg = nh_fg;
+    nhwins[wid].bg = nh_bg;
+    if (nh_fg == -1 || nh_bg == -1) {
+        nhwins[wid].clr_inited = -1;
+    } else {
+        nhwins[wid].colorpair = curses_init_pair(nh_fg, nh_bg);
+        nhwins[wid].clr_inited = 1;
+    }
+}
+
 
 /* Add curses window pointer and window info to list for given NetHack winid */
 
@@ -241,6 +346,9 @@ curses_add_nhwin(winid wid, int height, int width, int y, int x,
     nhwins[wid].x = x;
     nhwins[wid].y = y;
     nhwins[wid].orientation = orientation;
+    nhwins[wid].fg = nhwins[wid].bg = 0;
+    nhwins[wid].colorpair = -1;
+    nhwins[wid].clr_inited = 0;
 
     if (border) {
         real_width += 2;        /* leave room for bounding box */
@@ -248,13 +356,18 @@ curses_add_nhwin(winid wid, int height, int width, int y, int x,
     }
 
     win = newwin(real_height, real_width, y, x);
+    nhwins[wid].curwin = win;
 
     switch (wid) {
     case MESSAGE_WIN:
         messagewin = win;
+        curses_parse_wid_colors(wid, iflags.wc_foregrnd_message, iflags.wc_backgrnd_message);
+        curses_set_wid_colors(wid, NULL);
         break;
     case STATUS_WIN:
         statuswin = win;
+        curses_parse_wid_colors(wid, iflags.wc_foregrnd_status, iflags.wc_backgrnd_status);
+        curses_set_wid_colors(wid, NULL);
         break;
     case MAP_WIN:
         mapwin = win;
@@ -266,7 +379,6 @@ curses_add_nhwin(winid wid, int height, int width, int y, int x,
         box(win, 0, 0);
     }
 
-    nhwins[wid].curwin = win;
 }
 
 
@@ -301,6 +413,7 @@ curses_add_wid(winid wid)
 void
 curses_refresh_nhwin(winid wid)
 {
+    curses_set_wid_colors(wid, NULL);
     wnoutrefresh(curses_get_nhwin(wid));
     doupdate();
 }
@@ -523,6 +636,7 @@ curses_puts(winid wid, int attr, const char *text)
     }
 #endif
 
+    curses_set_wid_colors(wid, NULL);
     if (curses_is_menu(wid) || curses_is_text(wid)) {
         if (!curses_menu_exists(wid)) {
             impossible(
@@ -553,6 +667,7 @@ curses_clear_nhwin(winid wid)
         clear_map();
     }
 
+    curses_set_wid_colors(wid, NULL);
     werase(win);
 
     if (border) {
@@ -568,6 +683,7 @@ curses_alert_win_border(winid wid, boolean onoff)
 
     if (!win || !curses_window_has_border(wid))
         return;
+    curses_set_wid_colors(wid, NULL);
     if (onoff)
         curses_toggle_color_attr(win, ALERT_BORDER_COLOR, NONE, ON);
     box(win, 0, 0);

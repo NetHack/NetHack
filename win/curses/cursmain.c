@@ -54,7 +54,7 @@ static char *dummy_get_color_string(void);
 struct window_procs curses_procs = {
     WPID(curses),
     (WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_COLOR | WC_INVERSE
-     | WC_HILITE_PET
+     | WC_HILITE_PET | WC_WINDOWCOLORS
 #ifdef NCURSES_MOUSE_VERSION /* (this macro name works for PDCURSES too) */
      | WC_MOUSE_SUPPORT
 #endif
@@ -426,6 +426,10 @@ curses_create_nhwindow(int type)
 {
     winid wid = curses_get_wid(type);
 
+    if (curses_is_menu(wid))
+        curses_parse_wid_colors(MENU_WIN, iflags.wc_foregrnd_menu, iflags.wc_backgrnd_menu);
+    else if (curses_is_text(wid))
+        curses_parse_wid_colors(TEXT_WIN, iflags.wc_foregrnd_text, iflags.wc_backgrnd_text);
     if (curses_is_menu(wid) || curses_is_text(wid)) {
         curses_start_menu(wid, MENU_BEHAVE_STANDARD);
         curses_add_wid(wid);

@@ -602,7 +602,7 @@ WINDHDR = $(MSWSYS)\win10.h $(MSWSYS)\winos.h $(MSWSYS)\win32api.h
 #
 
 !IF "$(ADD_CURSES)" == "Y"
-PDCURSESFLAGS = -DPDC_WIDE
+PDCURSESFLAGS = -DPDC_WIDE -DPDC_RGB
 CURSESOBJ= $(OTTY)cursdial.o $(OTTY)cursinit.o $(OTTY)cursinvt.o \
 	$(OTTY)cursmain.o $(OTTY)cursmesg.o $(OTTY)cursmisc.o \
 	$(OTTY)cursstat.o $(OTTY)curswins.o

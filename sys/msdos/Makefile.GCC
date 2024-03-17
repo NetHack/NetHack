@@ -446,7 +446,7 @@ endif
 #==========================================
 #
 ifeq "$(ADD_CURSES)" "Y"
-CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE" -DPDC_RGB
 ifdef WANT_DOSVGA
 CURSESDEF += -DCURSES_UNICODE -DPDC_WIDE
 endif
@@ -538,13 +538,13 @@ $(OBJ)/%.o : $(WCURSES)/%.c
 #==========================================
 
 $(OBJ)/%.o : $(PDCURSES_TOP)/%.c
-	$(CC) $(cflags)  -o$@  $<
+	$(CC) $(cflags) -o$@  $<
 
 $(OBJ)/%.o : $(PDCSRC)/%.c
-	$(CC) $(cflags)  -o$@  $<
+	$(CC) $(cflags) -o$@  $<
 
 $(OBJ)/%.o : $(PDCDOS)/%.c
-	$(CC) $(cflags)  -o$@  $<
+	$(CC) $(cflags) -o$@  $<
 
 #==========================================
 # Rules for LUA files

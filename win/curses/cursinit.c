@@ -297,6 +297,36 @@ curses_create_main_windows(void)
     }
 }
 
+static int pairs_used = 0;
+static int colors_used = 0;
+
+/* create a new color */
+int
+curses_init_rgb(int r, int g, int b)
+{
+    if (!can_change_color())
+        return 0;
+
+    if (colors_used < COLORS - 1) {
+        colors_used++;
+        init_color(colors_used, r*4, g*4, b*4);
+        return colors_used;
+    }
+    return 0;
+}
+
+/* create a new foreground/background combination */
+int
+curses_init_pair(int fg, int bg)
+{
+    if (pairs_used < COLOR_PAIRS - 1) {
+        pairs_used++;
+        init_pair(pairs_used, fg, bg);
+        return pairs_used;
+    }
+    return 0;
+}
+
 /* Initialize curses colors to colors used by NetHack */
 void
 curses_init_nhcolors(void)
@@ -335,6 +365,8 @@ curses_init_nhcolors(void)
         }
     }
 #endif
+    colors_used = maxc;
+    pairs_used = (maxc * 8) + 16 + 1;
 }
 
 #if 0   /* curses_choose_character + curses_character_dialog no longer used */

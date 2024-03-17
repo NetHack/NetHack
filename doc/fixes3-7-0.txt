@@ -2539,6 +2539,7 @@ curses: if panictrace is triggered, reset the terminal before giving backtrace
 curses: if a message is marked urgent, override message suppression initiated
 	by user having typed ESC at previous More>> prompt
 curses: implement a dialog for the windowborders option
+curses: implement the windowcolors option
 Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
 	dialog box ("Preferences..." on macOS)
 Qt: draw a border around each tile in the paper doll inventory; when BUC is
