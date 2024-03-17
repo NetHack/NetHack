@@ -179,15 +179,18 @@ curses_set_wid_colors(int wid, WINDOW *win)
     if (wid == TEXT_WIN || curses_is_text(wid)) {
         wid = TEXT_WIN;
         if (!nhwins[wid].clr_inited)
-            curses_parse_wid_colors(wid, iflags.wc_foregrnd_text, iflags.wc_backgrnd_text);
+            curses_parse_wid_colors(wid, iflags.wcolors[wcolor_text].fg,
+                                    iflags.wcolors[wcolor_text].bg);
     } else if (wid == MENU_WIN || curses_is_menu(wid)) {
         wid = MENU_WIN;
         if (!nhwins[wid].clr_inited)
-            curses_parse_wid_colors(wid, iflags.wc_foregrnd_menu, iflags.wc_backgrnd_menu);
+            curses_parse_wid_colors(wid, iflags.wcolors[wcolor_menu].fg,
+                                    iflags.wcolors[wcolor_menu].bg);
     }
     /* FIXME: colors and nhwins[] entry for perm invent window */
     if (nhwins[wid].clr_inited > 0) {
-        wbkgd(win ? win : nhwins[wid].curwin, COLOR_PAIR(nhwins[wid].colorpair));
+        wbkgd(win ? win : nhwins[wid].curwin,
+              COLOR_PAIR(nhwins[wid].colorpair));
     }
 }
 
@@ -361,12 +364,14 @@ curses_add_nhwin(winid wid, int height, int width, int y, int x,
     switch (wid) {
     case MESSAGE_WIN:
         messagewin = win;
-        curses_parse_wid_colors(wid, iflags.wc_foregrnd_message, iflags.wc_backgrnd_message);
+        curses_parse_wid_colors(wid, iflags.wcolors[wcolor_message].fg,
+                                iflags.wcolors[wcolor_message].bg);
         curses_set_wid_colors(wid, NULL);
         break;
     case STATUS_WIN:
         statuswin = win;
-        curses_parse_wid_colors(wid, iflags.wc_foregrnd_status, iflags.wc_backgrnd_status);
+        curses_parse_wid_colors(wid, iflags.wcolors[wcolor_status].fg,
+                                iflags.wcolors[wcolor_status].bg);
         curses_set_wid_colors(wid, NULL);
         break;
     case MAP_WIN:

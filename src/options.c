@@ -4698,17 +4698,31 @@ optfn_windowcolors(int optidx, int req, boolean negated UNUSED,
     }
     if (req == get_val || req == get_cnf_val) {
         Sprintf(
-            opts, "%s/%s %s/%s %s/%s %s/%s",
-            iflags.wc_foregrnd_menu ? iflags.wc_foregrnd_menu : defbrief,
-            iflags.wc_backgrnd_menu ? iflags.wc_backgrnd_menu : defbrief,
-            iflags.wc_foregrnd_message ? iflags.wc_foregrnd_message
-                                       : defbrief,
-            iflags.wc_backgrnd_message ? iflags.wc_backgrnd_message
-                                       : defbrief,
-            iflags.wc_foregrnd_status ? iflags.wc_foregrnd_status : defbrief,
-            iflags.wc_backgrnd_status ? iflags.wc_backgrnd_status : defbrief,
-            iflags.wc_foregrnd_text ? iflags.wc_foregrnd_text : defbrief,
-            iflags.wc_backgrnd_text ? iflags.wc_backgrnd_text : defbrief);
+                opts, "%s/%s %s/%s %s/%s %s/%s",
+                iflags.wcolors[wcolor_menu].fg
+                    ? iflags.wcolors[wcolor_menu].fg
+                    : defbrief,
+                iflags.wcolors[wcolor_menu].bg
+                    ? iflags.wcolors[wcolor_menu].bg
+                    : defbrief,
+                iflags.wcolors[wcolor_message].fg
+                    ? iflags.wcolors[wcolor_message].fg
+                    : defbrief,
+                iflags.wcolors[wcolor_message].bg
+                    ? iflags.wcolors[wcolor_message].bg
+                    : defbrief,
+                iflags.wcolors[wcolor_status].fg
+                    ? iflags.wcolors[wcolor_status].fg
+                    : defbrief,
+                iflags.wcolors[wcolor_status].bg
+                    ? iflags.wcolors[wcolor_status].bg
+                    : defbrief,
+                iflags.wcolors[wcolor_text].fg
+                    ? iflags.wcolors[wcolor_text].fg
+                    : defbrief,
+                iflags.wcolors[wcolor_text].bg
+                    ? iflags.wcolors[wcolor_text].bg
+                    : defbrief);
         return optn_ok;
     }
     return optn_ok;
@@ -9635,14 +9649,14 @@ wc_set_window_colors(char *op)
         "menu", "message", "status", "text"
     };
     static const char *const shortnames[] = { "mnu", "msg", "sts", "txt" };
-    static char **fgp[] = { &iflags.wc_foregrnd_menu,
-                            &iflags.wc_foregrnd_message,
-                            &iflags.wc_foregrnd_status,
-                            &iflags.wc_foregrnd_text };
-    static char **bgp[] = { &iflags.wc_backgrnd_menu,
-                            &iflags.wc_backgrnd_message,
-                            &iflags.wc_backgrnd_status,
-                            &iflags.wc_backgrnd_text };
+    static char **fgp[] = { &iflags.wcolors[wcolor_menu].fg,
+                            &iflags.wcolors[wcolor_message].fg,
+                            &iflags.wcolors[wcolor_status].fg,
+                            &iflags.wcolors[wcolor_text].fg };
+    static char **bgp[] = { &iflags.wcolors[wcolor_menu].bg,
+                            &iflags.wcolors[wcolor_message].bg,
+                            &iflags.wcolors[wcolor_status].bg,
+                            &iflags.wcolors[wcolor_text].bg };
 
     Strcpy(buf, op);
     newop = mungspaces(buf);
