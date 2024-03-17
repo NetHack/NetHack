@@ -4674,11 +4674,18 @@ optfn_windowchain(
 }
 #endif
 
+int wcolors_opt[WC_COUNT];
+
 staticfn int
 optfn_windowcolors(int optidx, int req, boolean negated UNUSED,
                    char *opts, char *op)
 {
     if (req == do_init) {
+        int wccount;
+
+        for (wccount = 0; wccount < WC_COUNT; ++wccount) {
+            wcolors_opt[wccount] = 0;
+        }
         return optn_ok;
     }
     if (req == do_set) {
@@ -9645,10 +9652,10 @@ wc_set_window_colors(char *op)
     int j;
     char buf[BUFSZ];
     char *wn, *tfg, *tbg, *newop;
-    static const char *const wnames[] = {
+    static const char *const wnames[WC_COUNT] = {
         "menu", "message", "status", "text"
     };
-    static const char *const shortnames[] = { "mnu", "msg", "sts", "txt" };
+    static const char *const shortnames[WC_COUNT] = { "mnu", "msg", "sts", "txt" };
     static char **fgp[] = { &iflags.wcolors[wcolor_menu].fg,
                             &iflags.wcolors[wcolor_message].fg,
                             &iflags.wcolors[wcolor_status].fg,
@@ -9706,7 +9713,7 @@ wc_set_window_colors(char *op)
         if (*newop)
             *newop++ = '\0';
 
-        for (j = 0; j < 4; ++j) {
+        for (j = 0; j < WC_COUNT; ++j) {
             if (!strcmpi(wn, wnames[j]) || !strcmpi(wn, shortnames[j])) {
                 if (!strstri(tfg, " ")) {
                     if (*fgp[j])
@@ -9718,6 +9725,12 @@ wc_set_window_colors(char *op)
                         free((genericptr_t) *bgp[j]);
                     *bgp[j] = dupstr(tbg);
                 }
+                if (wcolors_opt[j] != 0) {
+                    config_error_add(
+                        "windowcolors for %s windows specified multiple times",
+                        wnames[j]);
+                }
+                wcolors_opt[j]++;
                 break;
             }
         }
