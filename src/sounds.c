@@ -1933,6 +1933,10 @@ nosound_verbal(char *text, int32_t gender, int32_t tone,
 #endif
 
 #ifdef SND_SOUNDEFFECTS_AUTOMAP
+
+/* prototype in case a build defines staticfn to nothing */
+staticfn void initialize_semap_basenames(void);
+
 struct soundeffect_automapping {
     enum sound_effect_entries seid;
     const char *base_filename;
