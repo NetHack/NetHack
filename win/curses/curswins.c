@@ -572,6 +572,10 @@ curses_get_window_size(winid wid, int *height, int *width)
 boolean
 curses_window_has_border(winid wid)
 {
+    if (curses_is_menu(wid))
+        wid = MENU_WIN;
+    else if (curses_is_text(wid))
+        wid = TEXT_WIN;
     return nhwins[wid].border;
 }
 
