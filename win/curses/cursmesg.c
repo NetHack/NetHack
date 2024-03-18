@@ -395,9 +395,8 @@ curses_clear_unhighlight_message_window(void)
         for (ry = brdroffset; ry < mh; ry++) {
             for (rx = brdroffset; rx < mw; rx++) {
                 chtype cht = mvwinch(win, ry, rx);
-                short clr = cht & A_COLOR;
 
-                mvwchgat(win, ry, rx, 1, A_NORMAL, PAIR_NUMBER(clr), NULL);
+                mvwchgat(win, ry, rx, 1, A_NORMAL, PAIR_NUMBER(cht), NULL);
             }
         }
 
