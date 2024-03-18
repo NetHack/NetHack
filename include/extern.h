@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1710008870 2024/03/09 18:27:50 $  $NHDT-Branch: keni-regex $:$NHDT-Revision: 1.1397 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1710792423 2024/03/18 20:07:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1398 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -317,6 +317,7 @@ extern void free_one_menu_coloring(int);
 extern void free_menu_coloring(void);
 extern int count_menucolors(void);
 extern int32 check_enhanced_colors(char *) NONNULLARG1;
+extern const char *wc_color_name(int32) NONNULL;
 
 /* ### cmd.c ### */
 

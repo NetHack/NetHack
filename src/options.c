@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1708737173 2024/02/24 01:12:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.709 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1710792444 2024/03/18 20:07:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.723 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4677,8 +4677,10 @@ optfn_windowchain(
 int wcolors_opt[WC_COUNT];
 
 staticfn int
-optfn_windowcolors(int optidx, int req, boolean negated UNUSED,
-                   char *opts, char *op)
+optfn_windowcolors(
+    int optidx, int req,
+    boolean negated UNUSED,
+    char *opts, char *op)
 {
     if (req == do_init) {
         int wccount;
@@ -4691,8 +4693,7 @@ optfn_windowcolors(int optidx, int req, boolean negated UNUSED,
     if (req == do_set) {
         /* WINCAP
          * setting window colors
-         * syntax: windowcolors=menu foregrnd/backgrnd text
-         * foregrnd/backgrnd
+         * syntax: windowcolors=menu foregrnd/backgrnd text foregrnd/backgrnd
          */
         if ((op = string_for_opt(opts, FALSE)) != empty_optstr) {
             if (!wc_set_window_colors(op)) {
@@ -4704,8 +4705,8 @@ optfn_windowcolors(int optidx, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        Sprintf(
-                opts, "%s/%s %s/%s %s/%s %s/%s",
+        /* FIXME: this constructed value is not correct for 'get_cnf_val' */
+        Sprintf(opts, "%s/%s %s/%s %s/%s %s/%s",
                 iflags.wcolors[wcolor_menu].fg
                     ? iflags.wcolors[wcolor_menu].fg
                     : defbrief,
@@ -9649,13 +9650,12 @@ wc_set_window_colors(char *op)
      *  menu white/black message green/yellow status white/blue text
      * white/black
      */
-    int j;
-    char buf[BUFSZ];
-    char *wn, *tfg, *tbg, *newop;
     static const char *const wnames[WC_COUNT] = {
         "menu", "message", "status", "text"
     };
-    static const char *const shortnames[WC_COUNT] = { "mnu", "msg", "sts", "txt" };
+    static const char *const shortnames[WC_COUNT] = {
+        "mnu", "msg", "sts", "txt"
+    };
     static char **fgp[] = { &iflags.wcolors[wcolor_menu].fg,
                             &iflags.wcolors[wcolor_message].fg,
                             &iflags.wcolors[wcolor_status].fg,
@@ -9664,6 +9664,10 @@ wc_set_window_colors(char *op)
                             &iflags.wcolors[wcolor_message].bg,
                             &iflags.wcolors[wcolor_status].bg,
                             &iflags.wcolors[wcolor_text].bg };
+    int j;
+    int32 clr;
+    char buf[BUFSZ];
+    char *wn, *tfg, *tbg, *newop;
 
     Strcpy(buf, op);
     newop = mungspaces(buf);
@@ -9718,21 +9722,27 @@ wc_set_window_colors(char *op)
                 if (!strstri(tfg, " ")) {
                     if (*fgp[j])
                         free((genericptr_t) *fgp[j]);
-                    *fgp[j] = dupstr(tfg);
+                    clr = check_enhanced_colors(tfg);
+                    *fgp[j] = dupstr((clr >= 0) ? wc_color_name(clr) : tfg);
                 }
                 if (!strstri(tbg, " ")) {
                     if (*bgp[j])
                         free((genericptr_t) *bgp[j]);
-                    *bgp[j] = dupstr(tbg);
+                    clr = check_enhanced_colors(tbg);
+                    *bgp[j] = dupstr((clr >= 0) ? wc_color_name(clr) : tbg);
                 }
                 if (wcolors_opt[j] != 0) {
                     config_error_add(
-                        "windowcolors for %s windows specified multiple times",
-                        wnames[j]);
+                       "windowcolors for %s windows specified multiple times",
+                                     wnames[j]);
                 }
                 wcolors_opt[j]++;
                 break;
             }
+        }
+        if (j == WC_COUNT) {
+            config_error_add("windowcolors for unrecognized window type: %s",
+                             wn);
         }
     }
     return 1;

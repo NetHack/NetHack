@@ -1,4 +1,4 @@
-/* NetHack 3.7	coloratt.c	$NHDT-Date: 1709559438 2024/03/04 13:37:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1 $ */
+/* NetHack 3.7	coloratt.c	$NHDT-Date: 1710792438 2024/03/18 20:07:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.2 $ */
 /* Copyright (c) Pasi Kallinen, 2024 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -507,13 +507,16 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 
 extern const char regex_id[]; /* from sys/share/<various>regex.{c,cpp} */
 
-/* True: temporarily replace menu color entries with a fake set of menu
-   colors, { "light blue"=light_blue, "blue"=blue, "red"=red, &c }, that
-   illustrates most colors for use when the pick-a-color menu is rendered;
-   suppresses black and white because one of those will likely be invisible
-   due to matching the background; False: restore user-specified colorings */
+/* set up a menu for picking a color, one that shows each name in its color;
+   overrides player's MENUCOLORS with a set of "blue"=blue, "red"=red, and
+   so forth; suppresses color for black and white because one of those will
+   likely be invisible due to matching the background; the alternate set of
+   MENUCOLORS is kept around for potential re-use */
 void
-basic_menu_colors(boolean load_colors)
+basic_menu_colors(
+    boolean load_colors) /* True: temporarily replace menu color entries with
+                          * a fake set of menu colors which match their names;
+                          * False: restore user-specified colorings */
 {
     if (load_colors) {
         /* replace normal menu colors with a set specifically for colors */
@@ -537,7 +540,9 @@ basic_menu_colors(boolean load_colors)
 
             /* this orders the patterns last-in/first-out; that means
                that the "light <foo>" variations come before the basic
-               "<foo>" ones, which is exactly what we want */
+               "<foo>" ones, which is exactly what we want (so that the
+               shorter basic names won't get false matches as substrings
+               of the longer ones) */
             for (i = 0; i < SIZE(colornames); ++i) {
                 if (!colornames[i].name) /* first alias entry has no name */
                     break;
@@ -703,17 +708,78 @@ count_menucolors(void)
 int32
 check_enhanced_colors(char *buf)
 {
+    char xtra = '\0'; /* used to catch trailing junk after "#rrggbb" */
+    unsigned r, g, b;
     int32 retcolor = -1, color;
 
     if ((color = match_str2clr(buf, TRUE)) != CLR_MAX)  {
         retcolor = color | NH_BASIC_COLOR;
+    } else if (sscanf(buf, "#%02x%02x%02x%c", &r, &g, &b, &xtra) >= 3) {
+        retcolor = !xtra ? (int32) ((r << 16) | (g << 8) | b) : -1;
     } else {
-        for (color = 0; color < SIZE(colortable); ++color) {
-            if (!strcmpi(buf, colortable[color].name))
-                retcolor = colortable_to_int32(&colortable[color]);
+        /* altbuf: allow user's "grey" to match colortable[]'s "gray";
+         * fuzzymatch(): ignore spaces, hyphens, and underscores so that
+         * space or underscore in user-supplied name will match hyphen
+         * [note: caller splits text at spaces so we won't see any here]
+         */
+        char *altbuf = NULL, *grey = strstri(buf, "grey");
+        ptrdiff_t greyoffset = grey ? (grey - buf) : -1;
+
+        if (greyoffset >= 0) {
+            altbuf = dupstr(buf);
+            /* use direct copy because strsubst() is case-sensitive */
+            /*(void) strncpy(&altbuf[greyoffset], "gray", 4);*/
+            (void) memcpy(altbuf + greyoffset, "gray", 4);
         }
+        for (color = 0; color < SIZE(colortable); ++color) {
+            if (fuzzymatch(buf, colortable[color].name, " -_", TRUE)
+                || (altbuf && fuzzymatch(altbuf, colortable[color].name,
+                                         " -_", TRUE))) {
+                retcolor = colortable_to_int32(&colortable[color]);
+                break;
+            }
+        }
+        if (altbuf)
+            free(altbuf);
     }
     return retcolor;
 }
 
+/* return the canonical name of a particular color */
+const char *
+wc_color_name(int32 colorindx)
+{
+    static char hexcolor[sizeof "#rrggbb"]; /* includes room for '\0' */
+    const char *result = "no-color";
 
+    if (colorindx >= 0) {
+        int32 basicindx = colorindx & ~NH_BASIC_COLOR;
+
+        /* if colorindx has NH_BASIC_COLOR bit set, basicindx won't,
+           so differing implies a basic color */
+        if (basicindx != colorindx) {
+            assert(basicindx < 16);
+            result = colortable[basicindx].name;
+        } else {
+            int indx;
+            long r = (colorindx >> 16) & 0x0000ff, /* shift rrXXXX to rr */
+                 g = (colorindx >> 8) & 0x0000ff,  /* shift XXggXX to gg */
+                 b = colorindx & 0x0000ff;         /* mask  XXXXbb to bb */
+
+            Snprintf(hexcolor, sizeof hexcolor, "#%02x%02x%02x",
+                     (uint8) r, (uint8) g, (uint8) b);
+            result = hexcolor;
+            /* override hex value if this is a named color */
+            for (indx = 16; indx < SIZE(colortable); ++indx)
+                if (colortable[indx].r == r
+                    && colortable[indx].g == g
+                    && colortable[indx].b == b) {
+                    result = colortable[indx].name;
+                    break;
+                }
+        }
+    }
+    return result;
+}
+
+/*coloratt.c*/
