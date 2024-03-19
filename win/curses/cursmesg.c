@@ -1110,7 +1110,7 @@ curses_putmsghistory(const char *msg, boolean restoring_msghist)
      * right) brings up an initial display where the border around
      * the message window is missing.  This draws it.
      */
-    if (restoring_msghist)
+    if (restoring_msghist && !msg)
         curses_last_messages();
 }
 
