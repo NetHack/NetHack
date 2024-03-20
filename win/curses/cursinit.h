@@ -9,6 +9,8 @@
 /* Global declarations */
 
 void curses_create_main_windows(void);
+int curses_init_rgb(int r, int g, int b);
+int curses_init_pair(int fg, int bg);
 void curses_init_nhcolors(void);
 void curses_choose_character(void);
 int curses_character_dialog(const char **choices, const char *prompt);

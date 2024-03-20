@@ -681,7 +681,7 @@ getmsghistory(init)
 		   with the most recent.
 		   If init is TRUE, start over again from most recent message.
 
-putmsghistory(msg)
+putmsghistory(const char *msg, boolean restoring)
 		-- This is the counterpart to getmsghistory() for restores
 		   used to reload the port's message recall buffer.
 		   The routine is called repeatedly from the core restore
@@ -690,14 +690,16 @@ putmsghistory(msg)
 		   savefile.  The window port routine is expected to load the
 		   message recall buffers in such a way that the ordering
 		   remains correct.  The window port routine should make no
-		   assumptions about how
-		   many messages are forthcoming, nor should it assume that
-		   another message will follow this one, so it must be careful
-		   to keep all pointers/indexes intact at the end of each call.
+		   assumptions about how many messages are forthcoming, nor
+		   should it assume that another message will follow this one,
+		   so it must be careful to keep all pointers/indexes intact
+		   at the end of each call.
 		   If the window port receives more messages that can fit in
 		   its buffers, it is expected to scroll away the oldest from
 		   its buffers, much like it would with new messages being
 		   produced.
+		   At the end of restoring messages, this will be called
+		   one more time with msg NULL.
 
 
 III.  Global variables

@@ -6,12 +6,12 @@
 
 #include "hack.h"
 
-static void dowatersnakes(void);
-static void dowaterdemon(void);
-static void dowaternymph(void);
-static void gush(coordxy, coordxy, genericptr_t) NONNULLARG3;
-static void dofindgem(void);
-static boolean watchman_warn_fountain(struct monst *) NONNULLARG1;
+staticfn void dowatersnakes(void);
+staticfn void dowaterdemon(void);
+staticfn void dowaternymph(void);
+staticfn void gush(coordxy, coordxy, genericptr_t) NONNULLARG3;
+staticfn void dofindgem(void);
+staticfn boolean watchman_warn_fountain(struct monst *) NONNULLARG1;
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
@@ -34,7 +34,7 @@ floating_above(const char *what)
 RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* Fountain of snakes! */
-static void
+staticfn void
 dowatersnakes(void)
 {
     int num = rn1(5, 2);
@@ -60,7 +60,7 @@ dowatersnakes(void)
 }
 
 /* Water demon */
-static void
+staticfn void
 dowaterdemon(void)
 {
     struct monst *mtmp;
@@ -90,7 +90,7 @@ dowaterdemon(void)
 }
 
 /* Water Nymph */
-static void
+staticfn void
 dowaternymph(void)
 {
     struct monst *mtmp;
@@ -130,7 +130,7 @@ dogushforth(int drinking)
     }
 }
 
-static void
+staticfn void
 gush(coordxy x, coordxy y, genericptr_t poolcnt)
 {
     struct monst *mtmp;
@@ -161,7 +161,7 @@ gush(coordxy x, coordxy y, genericptr_t poolcnt)
 }
 
 /* Find a gem in the sparkling waters. */
-static void
+staticfn void
 dofindgem(void)
 {
     if (!Blind)
@@ -175,7 +175,7 @@ dofindgem(void)
     exercise(A_WIS, TRUE); /* a discovery! */
 }
 
-static boolean
+staticfn boolean
 watchman_warn_fountain(struct monst *mtmp)
 {
     if (is_watch(mtmp->data) && couldsee(mtmp->mx, mtmp->my)

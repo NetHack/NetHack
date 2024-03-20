@@ -96,10 +96,12 @@ static int optfn_##a(int, int, boolean, char *, char *);
 #endif
 #endif
 
-/* B:nm, ln, opt_*, setwhere?, on?, negat?, val?, dup?, hndlr? Alias, bool_p, term */
-/* C:nm, ln, opt_*, setwhere?, negateok?, valok?, dupok?, hndlr? Alias, desc */
-/* P:pfx, ln, opt_*, setwhere?, negateok?, valok?, dupok?, hndlr? Alias, desc*/
-
+/* B:nm, sec, ln, opt_*, setwhere?, on?, negat?, val?, dup?, hndlr? Alias,
+            bool_p, term */
+/* C:nm, sec, ln, opt_*, setwhere?, negateok?, valok?, dupok?, hndlr? Alias,
+            desc */
+/* P:pfx, sec, ln, opt_*, setwhere?, negateok?, valok?, dupok?, hndlr? Alias,
+            desc*/
     /*
      * Most of the options are in alphabetical order; a few are forced
      * to the top of list so that doset() will list them first and
@@ -850,7 +852,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 No, Yes, No, No, NoAlias, "window processor to use")
 #endif
     NHOPTC(windowcolors, Advanced, 80, opt_in, set_gameview,
-                No, Yes, No, No, NoAlias,
+                No, Yes, Yes, No, NoAlias,
                 "the foreground/background colors of windows")
  /* NHOPTC(windowtype) -- moved to top */
     NHOPTB(wizmgender, Advanced, 0, opt_in, set_wizonly,

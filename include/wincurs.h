@@ -32,7 +32,9 @@ extern WINDOW *activemenu;         /* curses window for menu requesting a
 #define STATUS_WIN  2
 #define MAP_WIN     3
 #define INV_WIN     4
-#define NHWIN_MAX   5
+#define TEXT_WIN    5
+#define MENU_WIN    6
+#define NHWIN_MAX   7
 #if !defined(__APPLE__) || !defined(NCURSES_VERSION)
 # define USE_DARKGRAY /* Allow "bright" black; delete if not visible */
 #endif  /* !__APPLE__ && !PDCURSES */
@@ -117,7 +119,9 @@ extern win_request_info *curses_ctrl_nhwindow(winid, int, win_request_info *);
 
 /* curswins.c */
 
-extern WINDOW *curses_create_window(int width, int height, orient orientation);
+extern WINDOW *curses_create_window(int wid, int width, int height, orient orientation);
+extern void curses_set_wid_colors(int wid, WINDOW *win);
+extern void curses_parse_wid_colors(int wid, char *fg, char *bg);
 extern void curses_destroy_win(WINDOW *win);
 extern WINDOW *curses_get_nhwin(winid wid);
 extern void curses_add_nhwin(winid wid, int height, int width, int y,
@@ -211,6 +215,8 @@ extern void curs_add_invt(int, char, attr_t, int, const char *);
 /* cursinit.c */
 
 extern void curses_create_main_windows(void);
+extern int curses_init_rgb(int r, int g, int b);
+extern int curses_init_pair(int fg, int bg);
 extern void curses_init_nhcolors(void);
 extern void curses_choose_character(void);
 extern int curses_character_dialog(const char **choices, const char *prompt);

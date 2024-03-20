@@ -195,6 +195,16 @@ struct debug_flags {
 #endif
 };
 
+enum windowcolors_windows {
+    wcolor_menu, wcolor_message, wcolor_status, wcolor_text,
+    WC_COUNT
+};
+
+struct windowcolors_struct {
+    char *fg;
+    char *bg;
+};
+
 struct accessibility_data {
     boolean accessiblemsg; /* use msg_loc for plined messages */
     coord msg_loc;         /* accessiblemsg: location */
@@ -379,6 +389,7 @@ struct instance_flags {
     int wc_align_status;      /*  status win at top|bot|right|left   */
     int wc_align_message;     /* message win at top|bot|right|left   */
     int wc_vary_msgcount;     /* show more old messages at a time    */
+#if 0
     char *wc_foregrnd_menu; /* points to foregrnd color name for menu win   */
     char *wc_backgrnd_menu; /* points to backgrnd color name for menu win   */
     char *wc_foregrnd_message; /* points to foregrnd color name for msg win */
@@ -387,6 +398,9 @@ struct instance_flags {
     char *wc_backgrnd_status; /* points to backgrnd color name for status   */
     char *wc_foregrnd_text; /* points to foregrnd color name for text win   */
     char *wc_backgrnd_text; /* points to backgrnd color name for text win   */
+#else
+    struct windowcolors_struct wcolors[WC_COUNT];
+#endif
     char *wc_font_map;      /* points to font name for the map win */
     char *wc_font_message;  /* points to font name for message win */
     char *wc_font_status;   /* points to font name for status win  */

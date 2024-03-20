@@ -99,7 +99,7 @@ set_window_position(int *winx, int *winy, int *winw, int *winh,
 void
 curses_create_main_windows(void)
 {
-    int min_message_height UNUSED = 1;
+    /* int min_message_height = 1; */
     int message_orientation = 0;
     int status_orientation = 0;
     int border_space = 0;
@@ -133,7 +133,7 @@ curses_create_main_windows(void)
     }
 
     if ((term_cols - border_space) < COLNO) {
-        min_message_height++;
+        /* min_message_height++; */
     }
 
     /* Determine status window orientation */
@@ -297,70 +297,76 @@ curses_create_main_windows(void)
     }
 }
 
+static int pairs_used = 0;
+static int colors_used = 0;
+
+/* create a new color */
+int
+curses_init_rgb(int r, int g, int b)
+{
+    if (!can_change_color())
+        return 0;
+
+    if (colors_used < COLORS - 1) {
+        colors_used++;
+        init_color(colors_used, r*4, g*4, b*4);
+        return colors_used;
+    }
+    return 0;
+}
+
+/* create a new foreground/background combination */
+int
+curses_init_pair(int fg, int bg)
+{
+    if (pairs_used < COLOR_PAIRS - 1) {
+        pairs_used++;
+        init_pair(pairs_used, fg, bg);
+        return pairs_used;
+    }
+    return 0;
+}
+
 /* Initialize curses colors to colors used by NetHack */
 void
 curses_init_nhcolors(void)
 {
-    if (has_colors()) {
-        use_default_colors();
-        init_pair(1, COLOR_BLACK, -1);
-        init_pair(2, COLOR_RED, -1);
-        init_pair(3, COLOR_GREEN, -1);
-        init_pair(4, COLOR_YELLOW, -1);
-        init_pair(5, COLOR_BLUE, -1);
-        init_pair(6, COLOR_MAGENTA, -1);
-        init_pair(7, COLOR_CYAN, -1);
-        init_pair(8, -1, -1);
+    /* COLOR_foo + 8 means COLOR | A_BOLD when COLORS < 16 */
+    /* otherwise assume the terminal has least 16 different colors */
+    /* these map to the NetHack CLR_ defines */
+    static const int fg_clr[16] = {
+        COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
+        COLOR_BLUE,  COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE,
+        -1, COLOR_RED + 8, COLOR_GREEN + 8, COLOR_YELLOW + 8,
+        COLOR_BLUE + 8, COLOR_MAGENTA + 8, COLOR_CYAN + 8, COLOR_WHITE + 8
+    };
+    static const int bg_clr[8] = {
+        -1, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
+        COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE
+    };
+    int bg, nhclr;
+    int maxc = (COLORS >= 16) ? 16 : 8;
 
-        {
-            int i;
-            boolean hicolor = FALSE;
+    if (!has_colors())
+        return;
 
-            static const int clr_remap[16] = {
-                COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
-                COLOR_BLUE,
-                COLOR_MAGENTA, COLOR_CYAN, -1, COLOR_WHITE,
-                COLOR_RED + 8, COLOR_GREEN + 8, COLOR_YELLOW + 8,
-                COLOR_BLUE + 8,
-                COLOR_MAGENTA + 8, COLOR_CYAN + 8, COLOR_WHITE + 8
-            };
+    use_default_colors();
 
-            for (i = 0; i < (COLORS >= 16 ? 16 : 8); i++) {
-                init_pair(17 + (i * 2) + 0, clr_remap[i], COLOR_RED);
-                init_pair(17 + (i * 2) + 1, clr_remap[i], COLOR_BLUE);
-            }
-
-            if (COLORS >= 16)
-                hicolor = TRUE;
-
-            /* Work around the crazy definitions above for more background
-               colors... */
-            for (i = 0; i < (COLORS >= 16 ? 16 : 8); i++) {
-                init_pair((hicolor ? 49 : 9) + i, clr_remap[i], COLOR_GREEN);
-                init_pair((hicolor ? 65 : 33) + i, clr_remap[i], COLOR_YELLOW);
-                init_pair((hicolor ? 81 : 41) + i, clr_remap[i], COLOR_MAGENTA);
-                init_pair((hicolor ? 97 : 49) + i, clr_remap[i], COLOR_CYAN);
-                init_pair((hicolor ? 113 : 57) + i, clr_remap[i], COLOR_WHITE);
-            }
-        }
-
-
-        if (COLORS >= 16) {
-# ifdef USE_DARKGRAY
-            if (iflags.wc2_darkgray) {
-                init_pair(1, COLOR_BLACK + 8, -1);
-            }
-# endif
-            init_pair(9, COLOR_WHITE, -1);
-            init_pair(10, COLOR_RED + 8, -1);
-            init_pair(11, COLOR_GREEN + 8, -1);
-            init_pair(12, COLOR_YELLOW + 8, -1);
-            init_pair(13, COLOR_BLUE + 8, -1);
-            init_pair(14, COLOR_MAGENTA + 8, -1);
-            init_pair(15, COLOR_CYAN + 8, -1);
-            init_pair(16, COLOR_WHITE + 8, -1);
+    for (nhclr = CLR_BLACK; nhclr < maxc; nhclr++) {
+        for (bg = 0; bg < 8; bg++) {
+            init_pair((maxc * bg) + nhclr + 1, fg_clr[nhclr], bg_clr[bg]);
         }
     }
+
+#ifdef USE_DARKGRAY
+    if (COLORS >= 16) {
+        if (iflags.wc2_darkgray) {
+            init_pair(CLR_BLACK + 1, COLOR_BLACK + 8, -1);
+        }
+    }
+#endif
+    colors_used = maxc;
+    pairs_used = (maxc * 8) + 16 + 1;
 }
 
 #if 0   /* curses_choose_character + curses_character_dialog no longer used */

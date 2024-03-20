@@ -60,6 +60,9 @@ local wishtest_objects = {
    ["blessed fireproof +2 pair of speed boots"] = { otyp_name = "speed boots", oclass = "[", oerodeproof = 1, blessed = 1, spe = 2 },
    ["tooled horn"] = { otyp_name = "tooled horn", oclass = "(" },
    ["meat ring"] = { otyp_name = "meat ring", oclass = "%" },
+   ["cursed +3 ring of increase accuracy"] = { otyp_name = "increase accuracy", oclass = "=", spe = 3, cursed = 1 },
+   ["ring of accuracy"] = { otyp_name = "increase accuracy", oclass = "=" },
+   ["accuracy"] = { otyp_name = "increase accuracy", oclass = "=" },
    ["beartrap"] = { otyp_name = "beartrap", oclass = "(" },
    ["bear trap"] = { otyp_name = "beartrap", oclass = "(" },
    ["landmine"] = { otyp_name = "land mine", oclass = "(" },
@@ -94,3 +97,4 @@ for str, tbl in pairs(wishtest_objects) do
       end
    end
 end
+pline("testwish: OK");

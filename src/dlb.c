@@ -59,20 +59,20 @@ extern unsigned FITSuint_(unsigned long long, const char *, int);
  */
 
 #define MAX_LIBS 4
-static library dlb_libs[MAX_LIBS];
+staticfn library dlb_libs[MAX_LIBS];
 
-static boolean readlibdir(library * lp);
-static boolean find_file(const char *name, library **lib, long *startp,
+staticfn boolean readlibdir(library * lp);
+staticfn boolean find_file(const char *name, library **lib, long *startp,
                          long *sizep);
-static boolean lib_dlb_init(void);
-static void lib_dlb_cleanup(void);
-static boolean lib_dlb_fopen(dlb *, const char *, const char *);
-static int lib_dlb_fclose(dlb *);
-static int lib_dlb_fread(char *, int, int, dlb *);
-static int lib_dlb_fseek(dlb *, long, int);
-static char *lib_dlb_fgets(char *, int, dlb *);
-static int lib_dlb_fgetc(dlb *);
-static long lib_dlb_ftell(dlb *);
+staticfn boolean lib_dlb_init(void);
+staticfn void lib_dlb_cleanup(void);
+staticfn boolean lib_dlb_fopen(dlb *, const char *, const char *);
+staticfn int lib_dlb_fclose(dlb *);
+staticfn int lib_dlb_fread(char *, int, int, dlb *);
+staticfn int lib_dlb_fseek(dlb *, long, int);
+staticfn char *lib_dlb_fgets(char *, int, dlb *);
+staticfn int lib_dlb_fgetc(dlb *);
+staticfn long lib_dlb_ftell(dlb *);
 
 /* not static because shared with dlb_main.c */
 boolean open_library(const char *lib_name, library *lp);
@@ -123,7 +123,7 @@ extern char *eos(char *);
  *
  * Return TRUE on success, FALSE on failure.
  */
-static boolean
+staticfn boolean
 readlibdir(library *lp) /* library pointer to fill in */
 {
     int i;
@@ -171,7 +171,7 @@ readlibdir(library *lp) /* library pointer to fill in */
  * Look for the file in our directory structure.  Return 1 if successful,
  * 0 if not found.  Fill in the size and starting position.
  */
-static boolean
+staticfn boolean
 find_file(const char *name, library **lib, long *startp, long *sizep)
 {
     int i, j;
@@ -228,7 +228,7 @@ close_library(library *lp)
  * Open the library file once using stdio.  Keep it open, but
  * keep track of the file position.
  */
-static boolean
+staticfn boolean
 lib_dlb_init(void)
 {
     /* zero out array */
@@ -248,7 +248,7 @@ lib_dlb_init(void)
     return TRUE;
 }
 
-static void
+staticfn void
 lib_dlb_cleanup(void)
 {
     int i;
@@ -269,7 +269,7 @@ build_dlb_filename(const char *lf)
 #endif
 
 /*ARGSUSED*/
-static boolean
+staticfn boolean
 lib_dlb_fopen(dlb *dp, const char *name, const char *mode UNUSED)
 {
     long start, size;
@@ -288,14 +288,14 @@ lib_dlb_fopen(dlb *dp, const char *name, const char *mode UNUSED)
 }
 
 /*ARGUSED*/
-static int
+staticfn int
 lib_dlb_fclose(dlb *dp UNUSED)
 {
     /* nothing needs to be done */
     return 0;
 }
 
-static int
+staticfn int
 lib_dlb_fread(char *buf, int size, int quan, dlb *dp)
 {
     long pos, nread, nbytes;
@@ -320,7 +320,7 @@ lib_dlb_fread(char *buf, int size, int quan, dlb *dp)
     return (int) nread;
 }
 
-static int
+staticfn int
 lib_dlb_fseek(dlb *dp, long pos, int whence)
 {
     long curpos;
@@ -345,7 +345,7 @@ lib_dlb_fseek(dlb *dp, long pos, int whence)
     return 0;
 }
 
-static char *
+staticfn char *
 lib_dlb_fgets(char *buf, int len, dlb *dp)
 {
     int i;
@@ -377,7 +377,7 @@ lib_dlb_fgets(char *buf, int len, dlb *dp)
     return buf;
 }
 
-static int
+staticfn int
 lib_dlb_fgetc(dlb *dp)
 {
     char c;
@@ -387,13 +387,13 @@ lib_dlb_fgetc(dlb *dp)
     return (int) c;
 }
 
-static long
+staticfn long
 lib_dlb_ftell(dlb *dp)
 {
     return dp->mark;
 }
 
-const dlb_procs_t lib_dlb_procs = { lib_dlb_init,  lib_dlb_cleanup,
+static const dlb_procs_t lib_dlb_procs = { lib_dlb_init,  lib_dlb_cleanup,
                                     lib_dlb_fopen, lib_dlb_fclose,
                                     lib_dlb_fread, lib_dlb_fseek,
                                     lib_dlb_fgets, lib_dlb_fgetc,
@@ -402,7 +402,7 @@ const dlb_procs_t lib_dlb_procs = { lib_dlb_init,  lib_dlb_cleanup,
 #endif /* DLBLIB */
 
 #ifdef DLBRSRC
-const dlb_procs_t rsrc_dlb_procs = { rsrc_dlb_init,  rsrc_dlb_cleanup,
+static const dlb_procs_t rsrc_dlb_procs = { rsrc_dlb_init,  rsrc_dlb_cleanup,
                                      rsrc_dlb_fopen, rsrc_dlb_fclose,
                                      rsrc_dlb_fread, rsrc_dlb_fseek,
                                      rsrc_dlb_fgets, rsrc_dlb_fgetc,

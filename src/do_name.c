@@ -5,18 +5,18 @@
 
 #include "hack.h"
 
-static char *nextmbuf(void);
-static char *name_from_player(char *, const char *, const char *);
-static void do_mgivenname(void);
-static boolean alreadynamed(struct monst *, char *, char *) NONNULLPTRS;
-static void do_oname(struct obj *) NONNULLARG1;
-static char *docall_xname(struct obj *) NONNULLARG1;
-static void namefloorobj(void);
+staticfn char *nextmbuf(void);
+staticfn char *name_from_player(char *, const char *, const char *);
+staticfn void do_mgivenname(void);
+staticfn boolean alreadynamed(struct monst *, char *, char *) NONNULLPTRS;
+staticfn void do_oname(struct obj *) NONNULLARG1;
+staticfn char *docall_xname(struct obj *) NONNULLARG1;
+staticfn void namefloorobj(void);
 
 #define NUMMBUF 5
 
 /* manage a pool of BUFSZ buffers, so callers don't have to */
-static char *
+staticfn char *
 nextmbuf(void)
 {
     static char NEARDATA bufs[NUMMBUF][BUFSZ];
@@ -101,7 +101,7 @@ safe_oname(struct obj *obj)
 
 /* get a name for a monster or an object from player;
    truncate if longer than PL_PSIZ, then return it */
-static char *
+staticfn char *
 name_from_player(
     char *outbuf,       /* output buffer, assumed to be at least BUFSZ long;
                          * anything longer than PL_PSIZ will be truncated */
@@ -154,7 +154,7 @@ christen_monst(struct monst *mtmp, const char *name)
 /* check whether user-supplied name matches or nearly matches an unnameable
    monster's name, or is an attempt to delete the monster's name; if so, give
    alternate reject message for do_mgivenname() */
-static boolean
+staticfn boolean
 alreadynamed(struct monst *mtmp, char *monnambuf, char *usrbuf)
 {
     char pronounbuf[10], *p;
@@ -195,7 +195,7 @@ alreadynamed(struct monst *mtmp, char *monnambuf, char *usrbuf)
 }
 
 /* allow player to assign a name to some chosen monster */
-static void
+staticfn void
 do_mgivenname(void)
 {
     char buf[BUFSZ], monnambuf[BUFSZ], qbuf[QBUFSZ];
@@ -286,7 +286,7 @@ do_mgivenname(void)
  * used with extreme care.  Applying a name to an object no longer
  * allocates a replacement object, so that old risk is gone.
  */
-static void
+staticfn void
 do_oname(struct obj *obj)
 {
     char *bufp, buf[BUFSZ], bufcpy[BUFSZ], qbuf[QBUFSZ];
@@ -600,7 +600,7 @@ docallcmd(void)
 }
 
 /* for use by safe_qbuf() */
-static char *
+staticfn char *
 docall_xname(struct obj *obj)
 {
     struct obj otemp;
@@ -672,7 +672,7 @@ docall(struct obj *obj)
     }
 }
 
-static void
+staticfn void
 namefloorobj(void)
 {
     coord cc;
@@ -1318,7 +1318,8 @@ obj_pmname(struct obj *obj)
 
 /* used by bogusmon(next) and also by init_CapMons(rumors.c);
    bogon_is_pname(below) checks a hard-coded subset of these rather than
-   use this list */
+   use this list.
+   Also used in rumors.c */
 const char bogon_codes[] = "-_+|="; /* see dat/bonusmon.txt */
 
 /* fake monsters used to be in a hard-coded array, now in a data file */

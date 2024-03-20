@@ -447,30 +447,9 @@ QUIETCC=0
 
 # NB: This is not used for all .c files (see explicit rules in
 #  dependencies).
-# if NOSTATICCORE
 #    A normal or cross compile.
-# else
-#    NOSTATICCORE: A compile that makes all functions non-static.
-#    Rule /=/ allows 2 definitions of char array brief_feeling
-# fi
 $(TARGETPFX)%.o : %.c
-	@if [ x$(NOSTATICCORE) = 'x' ]; then \
-	    echo $(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ $< ; \
-	    $(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ $< ; \
-	else \
-	    ( \
-	    echo "Generating " intermediate file .$< ; \
-		$(AWK) ' \
-			BEGIN{print "#line 1 \"$<\""}; \
-			/=/{print;next}; \
-			sub(/^static inline/, ""){print;next}; \
-			sub(/^static( |$$)/, ""){print;next}; \
-			{print}; \
-		' < $< > .$< && \
-		echo $(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ .$< ; \
-		$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ .$< ; \
-	    ) \
-	fi
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ $<
 
 # Verbosity definitions, begin
 #   Set QUIETCC=1 above to output less feedback while building.
@@ -1171,8 +1150,8 @@ $(TARGETPFX)engrave.o: engrave.c $(HACK_H)
 $(TARGETPFX)exper.o: exper.c $(HACK_H)
 $(TARGETPFX)explode.o: explode.c $(HACK_H)
 $(TARGETPFX)extralev.o: extralev.c $(HACK_H)
-$(TARGETPFX)files.o: files.c #zlib.h $(HACK_H) ../include/dlb.h \
-		../include/wintty.h
+$(TARGETPFX)files.o: files.c $(HACK_H) ../include/dlb.h ../include/wintty.h \
+		#zlib.h
 $(TARGETPFX)fountain.o: fountain.c $(HACK_H)
 $(TARGETPFX)getpos.o: getpos.c $(HACK_H)
 $(TARGETPFX)hack.o: hack.c $(HACK_H)

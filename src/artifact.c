@@ -21,17 +21,18 @@ static struct artifact *get_artifact(struct obj *) NONNULL; /* never returns nul
                              ? &artilist[(int) (o)->oartifact] \
                              : &artilist[ART_NONARTIFACT]) */
 
-static boolean bane_applies(const struct artifact *, struct monst *) NONNULLARG12;
-static int spec_applies(const struct artifact *, struct monst *) NONNULLARG12;
-static int invoke_ok(struct obj *);
-static int arti_invoke(struct obj *);
-static boolean Mb_hit(struct monst * magr, struct monst *mdef,
+staticfn boolean bane_applies(const struct artifact *, struct monst *)
+                      NONNULLARG12;
+staticfn int spec_applies(const struct artifact *, struct monst *) NONNULLARG12;
+staticfn int invoke_ok(struct obj *);
+staticfn int arti_invoke(struct obj *);
+staticfn boolean Mb_hit(struct monst * magr, struct monst *mdef,
                       struct obj *, int *, int, boolean, char *);
-static unsigned long abil_to_spfx(long *) NONNULLARG1;
-static uchar abil_to_adtyp(long *) NONNULLARG1;
-static int glow_strength(int);
-static boolean untouchable(struct obj *, boolean);
-static int count_surround_traps(coordxy, coordxy);
+staticfn unsigned long abil_to_spfx(long *) NONNULLARG1;
+staticfn uchar abil_to_adtyp(long *) NONNULLARG1;
+staticfn int glow_strength(int);
+staticfn boolean untouchable(struct obj *, boolean);
+staticfn int count_surround_traps(coordxy, coordxy);
 
 /* The amount added to the victim's total hit points to insure that the
    victim will be killed even after damage bonus/penalty adjustments.
@@ -69,10 +70,10 @@ static xint16 artidisco[NROFARTIFACTS];
  */
 static const struct arti_info zero_artiexist = {0}; /* all bits zero */
 
-static void hack_artifacts(void);
+staticfn void hack_artifacts(void);
 
 /* handle some special cases; must be called after u_init() */
-static void
+staticfn void
 hack_artifacts(void)
 {
     struct artifact *art;
@@ -891,7 +892,7 @@ arti_immune(struct obj *obj, int dtyp)
                       || weap->cary.adtyp == dtyp);
 }
 
-static boolean
+staticfn boolean
 bane_applies(const struct artifact *oart, struct monst *mon)
 {
     struct artifact atmp;
@@ -907,7 +908,7 @@ bane_applies(const struct artifact *oart, struct monst *mon)
 }
 
 /* decide whether an artifact's special attacks apply against mtmp */
-static int
+staticfn int
 spec_applies(const struct artifact *weap, struct monst *mtmp)
 {
     struct permonst *ptr;
@@ -1147,7 +1148,7 @@ static const char *const mb_verb[2][NUM_MB_INDICES] = {
 };
 
 /* called when someone is being hit by Magicbane */
-static boolean
+staticfn boolean
 Mb_hit(struct monst *magr, /* attacker */
        struct monst *mdef, /* defender */
        struct obj *mb,     /* Magicbane */
@@ -1629,7 +1630,7 @@ artifact_hit(
 RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* getobj callback for object to be invoked */
-static int
+staticfn int
 invoke_ok(struct obj *obj)
 {
     if (!obj)
@@ -1664,7 +1665,7 @@ doinvoke(void)
     return arti_invoke(obj);
 }
 
-static int
+staticfn int
 arti_invoke(struct obj *obj)
 {
     const struct artifact *oart = get_artifact(obj);
@@ -2056,7 +2057,7 @@ arti_cost(struct obj *otmp)
         return (100L * (long) objects[otmp->otyp].oc_cost);
 }
 
-static uchar
+staticfn uchar
 abil_to_adtyp(long *abil)
 {
     struct abil2adtyp_tag {
@@ -2080,7 +2081,7 @@ abil_to_adtyp(long *abil)
     return 0;
 }
 
-static unsigned long
+staticfn unsigned long
 abil_to_spfx(long *abil)
 {
     static const struct abil2spfx_tag {
@@ -2174,7 +2175,7 @@ static const char *const glow_verbs[] = {
 };
 
 /* relative strength that Sting is glowing (0..3), to select verb */
-static int
+staticfn int
 glow_strength(int count)
 {
     /* glow strength should also be proportional to proximity and
@@ -2328,7 +2329,7 @@ retouch_object(
    or an artifact which conveys something via being carried or which
    has an #invoke effect currently in operation undergoes a touch test;
    if it fails, it will be unworn/unwielded and maybe dropped */
-static boolean
+staticfn boolean
 untouchable(
     struct obj *obj, /* object to test; in invent or is steed's saddle */
     boolean drop_untouchable) /* whether to drop it if it can't be touched */
@@ -2438,7 +2439,7 @@ retouch_equipment(
         clear_bypasses(); /* reset upon final exit */
 }
 
-static int
+staticfn int
 count_surround_traps(coordxy x, coordxy y)
 {
     struct rm *levp;
@@ -2552,7 +2553,7 @@ is_art(struct obj *obj, int art)
                              ? &artilist[(int) (o)->oartifact] \
                              : &artilist[ART_NONARTIFACT]) */
 
-static struct artifact *
+staticfn struct artifact *
 get_artifact(struct obj *obj)
 {
     if (obj) {

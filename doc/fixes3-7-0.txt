@@ -2043,6 +2043,7 @@ curses: if user's terminal was set to 'application keypad mode' (DEC VTxxx
 	entry told the terminal to send 8-bit escape sequences (via 3 char
 	"ESC SPC G"), nethack wasn't recognizing number pad keys
 curses: change petattr attributes, dropping support for curses-only ones
+curses: swap the grey and no-color color initialization
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project
@@ -2538,6 +2539,7 @@ curses: if panictrace is triggered, reset the terminal before giving backtrace
 curses: if a message is marked urgent, override message suppression initiated
 	by user having typed ESC at previous More>> prompt
 curses: implement a dialog for the windowborders option
+curses: implement the windowcolors option
 Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
 	dialog box ("Preferences..." on macOS)
 Qt: draw a border around each tile in the paper doll inventory; when BUC is

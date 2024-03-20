@@ -14,12 +14,12 @@ struct wseg {
     coordxy wx, wy; /* the segment's position */
 };
 
-static void toss_wsegs(struct wseg *, boolean) NO_NNARGS;
-static void shrink_worm(int);
+staticfn void toss_wsegs(struct wseg *, boolean) NO_NNARGS;
+staticfn void shrink_worm(int);
 #if 0
-static void random_dir(int, int, int *, int *);
+staticfn void random_dir(int, int, int *, int *);
 #endif
-static struct wseg *create_worm_tail(int); /* may return NULL */
+staticfn struct wseg *create_worm_tail(int); /* may return NULL */
 
 /*  Description of long worm implementation.
  *
@@ -138,8 +138,7 @@ initworm(struct monst *worm, int wseg_count)
  *  Get rid of all worm segments on and following the given pointer curr.
  *  The display may or may not need to be updated as we free the segments.
  */
-static
-void
+staticfn void
 toss_wsegs(struct wseg *curr, boolean display_update)
 {
     struct wseg *nxtseg;
@@ -168,8 +167,7 @@ toss_wsegs(struct wseg *curr, boolean display_update)
  *
  *  Remove the tail segment of the worm (the starting segment of the list).
  */
-static
-void
+staticfn void
 shrink_worm(int wnum) /* worm number */
 {
     struct wseg *seg;
@@ -803,7 +801,7 @@ place_worm_tail_randomly(struct monst *worm, coordxy x, coordxy y)
  * This function, and the loop it serves, could be eliminated by coding
  * enexto() with a search radius.
  */
-static void
+staticfn void
 random_dir(int x, int y, int *nx, int *ny)
 {
     *nx = x + (x > 1                /* extreme left ? */
@@ -852,8 +850,7 @@ count_wsegs(struct monst *mtmp)
 /*  create_worm_tail()
  *  will create a worm tail chain of (num_segs + 1) and return pointer to it.
  */
-static
-struct wseg *
+staticfn struct wseg *
 create_worm_tail(int num_segs)
 {
     int i = 0;

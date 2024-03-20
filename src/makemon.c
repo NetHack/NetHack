@@ -14,17 +14,17 @@
     (mptr->mlet == S_HUMAN && Role_if(role_pm)   \
      && (mptr->msound == MS_LEADER || mptr->msound == MS_NEMESIS))
 
-static boolean uncommon(int);
-static int align_shift(struct permonst *);
-static int temperature_shift(struct permonst *);
-static boolean mk_gen_ok(int, unsigned, unsigned);
-static boolean wrong_elem_type(struct permonst *);
-static void m_initgrp(struct monst *, coordxy, coordxy, int, mmflags_nht);
-static void m_initthrow(struct monst *, int, int);
-static void m_initweap(struct monst *);
-static void m_initinv(struct monst *);
-static boolean makemon_rnd_goodpos(struct monst *, mmflags_nht, coord *);
-static void init_mextra(struct mextra *);
+staticfn boolean uncommon(int);
+staticfn int align_shift(struct permonst *);
+staticfn int temperature_shift(struct permonst *);
+staticfn boolean mk_gen_ok(int, unsigned, unsigned);
+staticfn boolean wrong_elem_type(struct permonst *);
+staticfn void m_initgrp(struct monst *, coordxy, coordxy, int, mmflags_nht);
+staticfn void m_initthrow(struct monst *, int, int);
+staticfn void m_initweap(struct monst *);
+staticfn void m_initinv(struct monst *);
+staticfn boolean makemon_rnd_goodpos(struct monst *, mmflags_nht, coord *);
+staticfn void init_mextra(struct mextra *);
 
 #define m_initsgrp(mtmp, x, y, mmf) m_initgrp(mtmp, x, y, 3, mmf)
 #define m_initlgrp(mtmp, x, y, mmf) m_initgrp(mtmp, x, y, 10, mmf)
@@ -51,7 +51,7 @@ is_home_elemental(struct permonst *ptr)
 /*
  * Return true if the given monster cannot exist on this elemental level.
  */
-static boolean
+staticfn boolean
 wrong_elem_type(struct permonst *ptr)
 {
     if (ptr->mlet == S_ELEMENTAL) {
@@ -74,7 +74,7 @@ wrong_elem_type(struct permonst *ptr)
 }
 
 /* make a group just like mtmp */
-static void
+staticfn void
 m_initgrp(struct monst *mtmp, coordxy x, coordxy y, int n, mmflags_nht mmflags)
 {
     coord mm;
@@ -140,8 +140,7 @@ m_initgrp(struct monst *mtmp, coordxy x, coordxy y, int n, mmflags_nht mmflags)
     }
 }
 
-static
-void
+staticfn void
 m_initthrow(struct monst *mtmp, int otyp, int oquan)
 {
     struct obj *otmp;
@@ -154,7 +153,7 @@ m_initthrow(struct monst *mtmp, int otyp, int oquan)
     (void) mpickobj(mtmp, otmp);
 }
 
-static void
+staticfn void
 m_initweap(struct monst *mtmp)
 {
     struct permonst *ptr = mtmp->data;
@@ -576,7 +575,7 @@ mkmonmoney(struct monst *mtmp, long amount)
     }
 }
 
-static void
+staticfn void
 m_initinv(struct monst *mtmp)
 {
     int cnt;
@@ -1041,7 +1040,7 @@ newmonhp(struct monst *mon, int mndx)
 
 static const struct mextra zeromextra = DUMMY;
 
-static void
+staticfn void
 init_mextra(struct mextra *mex)
 {
     *mex = zeromextra;
@@ -1058,7 +1057,7 @@ newmextra(void)
     return mextra;
 }
 
-static boolean
+staticfn boolean
 makemon_rnd_goodpos(
     struct monst *mon,
     mmflags_nht gpflags,
@@ -1567,7 +1566,7 @@ create_critters(
     return known;
 }
 
-static boolean
+staticfn boolean
 uncommon(int mndx)
 {
     if (mons[mndx].geno & (G_NOGEN | G_UNIQ))
@@ -1585,7 +1584,7 @@ uncommon(int mndx)
  *      comparing the dungeon alignment and monster alignment.
  *      return an integer in the range of 0-5.
  */
-static int
+staticfn int
 align_shift(struct permonst *ptr)
 {
     static NEARDATA long oldmoves = 0L; /* != 1, starting value of moves */
@@ -1615,7 +1614,7 @@ align_shift(struct permonst *ptr)
 }
 
 /* return larger value if monster prefers the level temperature */
-static int
+staticfn int
 temperature_shift(struct permonst *ptr)
 {
     if (gl.level.flags.temperature
@@ -1710,7 +1709,7 @@ rndmonst_adj(int minadj, int maxadj)
 }
 
 /* decide whether it's ok to generate a candidate monster by mkclass() */
-static boolean
+staticfn boolean
 mk_gen_ok(int mndx, unsigned mvflagsmask, unsigned genomask)
 {
     struct permonst *ptr = &mons[mndx];

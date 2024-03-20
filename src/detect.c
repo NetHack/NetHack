@@ -11,22 +11,22 @@
 #include "hack.h"
 #include "artifact.h"
 
-static boolean unconstrain_map(void);
-static void reconstrain_map(void);
-static void map_redisplay(void);
-static void browse_map(unsigned, const char *);
-static void map_monst(struct monst *, boolean);
-static void do_dknown_of(struct obj *);
-static boolean check_map_spot(coordxy, coordxy, char, unsigned);
-static boolean clear_stale_map(char, unsigned);
-static void sense_trap(struct trap *, coordxy, coordxy, int);
-static int detect_obj_traps(struct obj *, boolean, int);
-static void display_trap_map(int);
-static int furniture_detect(void);
-static void findone(coordxy, coordxy, genericptr_t);
-static void openone(coordxy, coordxy, genericptr_t);
-static int mfind0(struct monst *, boolean);
-static int reveal_terrain_getglyph(coordxy, coordxy, unsigned, int, unsigned);
+staticfn boolean unconstrain_map(void);
+staticfn void reconstrain_map(void);
+staticfn void map_redisplay(void);
+staticfn void browse_map(unsigned, const char *);
+staticfn void map_monst(struct monst *, boolean);
+staticfn void do_dknown_of(struct obj *);
+staticfn boolean check_map_spot(coordxy, coordxy, char, unsigned);
+staticfn boolean clear_stale_map(char, unsigned);
+staticfn void sense_trap(struct trap *, coordxy, coordxy, int);
+staticfn int detect_obj_traps(struct obj *, boolean, int);
+staticfn void display_trap_map(int);
+staticfn int furniture_detect(void);
+staticfn void findone(coordxy, coordxy, genericptr_t);
+staticfn void openone(coordxy, coordxy, genericptr_t);
+staticfn int mfind0(struct monst *, boolean);
+staticfn int reveal_terrain_getglyph(coordxy, coordxy, unsigned, int, unsigned);
 
 /* dummytrap: used when detecting traps finds a door or chest trap; the
    couple of fields that matter are always re-initialized during use so
@@ -51,7 +51,7 @@ struct found_things {
 
 /* bring hero out from underwater or underground or being engulfed;
    return True iff any change occurred */
-static boolean
+staticfn boolean
 unconstrain_map(void)
 {
     boolean res = u.uinwater || u.uburied || u.uswallow;
@@ -66,7 +66,7 @@ unconstrain_map(void)
 }
 
 /* put hero back underwater or underground or engulfed */
-static void
+staticfn void
 reconstrain_map(void)
 {
     /* if was in water and taken out, put back; bypass set_uinwater() */
@@ -75,7 +75,7 @@ reconstrain_map(void)
     u.uswallow = iflags.save_uswallow, iflags.save_uswallow = 0;
 }
 
-static void
+staticfn void
 map_redisplay(void)
 {
     reconstrain_map();
@@ -87,7 +87,7 @@ map_redisplay(void)
 }
 
 /* use getpos()'s 'autodescribe' to view whatever is currently shown on map */
-static void
+staticfn void
 browse_map(unsigned ter_typ, const char *ter_explain)
 {
     coord dummy_pos; /* don't care whether player actually picks a spot */
@@ -103,7 +103,7 @@ browse_map(unsigned ter_typ, const char *ter_explain)
 }
 
 /* extracted from monster_detection() so can be shared by do_vicinity_map() */
-static void
+staticfn void
 map_monst(struct monst *mtmp, boolean showtail)
 {
     int glyph = (monsym(mtmp->data) == ' ')
@@ -230,7 +230,7 @@ o_material(struct obj *obj, unsigned material)
     return (struct obj *) 0;
 }
 
-static void
+staticfn void
 do_dknown_of(struct obj *obj)
 {
     struct obj *otmp;
@@ -243,7 +243,7 @@ do_dknown_of(struct obj *obj)
 }
 
 /* Check whether the location has an outdated object displayed on it. */
-static boolean
+staticfn boolean
 check_map_spot(coordxy x, coordxy y, char oclass, unsigned material)
 {
     int glyph;
@@ -297,7 +297,7 @@ check_map_spot(coordxy x, coordxy y, char oclass, unsigned material)
  * reappear after the detection has completed.  Return true if noticeable
  * change occurs.
  */
-static boolean
+staticfn boolean
 clear_stale_map(char oclass, unsigned material)
 {
     coordxy zx, zy;
@@ -844,7 +844,7 @@ monster_detect(struct obj *otmp, /* detecting object (if any) */
     return 0;
 }
 
-static void
+staticfn void
 sense_trap(struct trap *trap, coordxy x, coordxy y, int src_cursed)
 {
     if (Hallucination || src_cursed) {
@@ -886,7 +886,7 @@ sense_trap(struct trap *trap, coordxy x, coordxy y, int src_cursed)
 /* check a list of objects for chest traps; return 1 if found at <ux,uy>,
    2 if found at some other spot, 3 if both, 0 otherwise; optionally
    update the map to show where such traps were found */
-static int
+staticfn int
 detect_obj_traps(
     struct obj *objlist,
     boolean show_them,
@@ -917,7 +917,7 @@ detect_obj_traps(
     return result;
 }
 
-static void
+staticfn void
 display_trap_map(int cursed_src)
 {
     struct monst *mon;
@@ -1051,7 +1051,7 @@ trap_detect(
     return 0;
 }
 
-static int
+staticfn int
 furniture_detect(void)
 {
     struct monst *mon;
@@ -1563,7 +1563,7 @@ cvt_sdoor_to_door(struct rm *lev)
 
 /* find something at one location; it should find all somethings there
    since it is used for magical detection rather than physical searching */
-static void
+staticfn void
 findone(coordxy zx, coordxy zy, genericptr_t whatfound)
 {
     struct trap *ttmp;
@@ -1624,7 +1624,7 @@ findone(coordxy zx, coordxy zy, genericptr_t whatfound)
     }
 }
 
-static void
+staticfn void
 openone(coordxy zx, coordxy zy, genericptr_t num)
 {
     struct trap *ttmp;
@@ -1831,7 +1831,7 @@ find_trap(struct trap *trap)
     }
 }
 
-static int
+staticfn int
 mfind0(struct monst *mtmp, boolean via_warning)
 {
     coordxy x = mtmp->mx, y = mtmp->my;
@@ -2015,7 +2015,7 @@ premap_detect(void)
     }
 }
 
-static int
+staticfn int
 reveal_terrain_getglyph(
     coordxy x, coordxy y,
     unsigned swallowed,

@@ -40,12 +40,12 @@
  *                       random intervals.
  */
 
-static boolean md_start(coord *);
-static boolean md_stop(coord *, coord *);
-static boolean md_rush(struct monst *, int, int);
-static void newmail(struct mail_info *);
+staticfn boolean md_start(coord *);
+staticfn boolean md_stop(coord *, coord *);
+staticfn boolean md_rush(struct monst *, int, int);
+staticfn void newmail(struct mail_info *);
 #if defined(SIMPLE_MAIL) || defined(SERVER_ADMIN_MSG)
-static void read_simplemail(const char *mbox, boolean adminmsg);
+staticfn void read_simplemail(const char *mbox, boolean adminmsg);
 #endif
 
 #if !defined(UNIX) && !defined(VMS)
@@ -145,7 +145,7 @@ getmailstatus(void)
  * Pick coordinates for a starting position for the mail daemon.  Called
  * from newmail() and newphone().
  */
-static boolean
+staticfn boolean
 md_start(coord *startp)
 {
     coord testcc;     /* scratch coordinates */
@@ -243,7 +243,7 @@ md_start(coord *startp)
  * enexto().  Use enexto() as a last resort because enexto() chooses
  * its point randomly, which is not what we want.
  */
-static boolean
+staticfn boolean
 md_stop(coord *stopp,  /* stopping position (we fill it in) */
         coord *startp) /* starting position (read only) */
 {
@@ -273,7 +273,7 @@ md_stop(coord *stopp,  /* stopping position (we fill it in) */
 }
 
 /* Let the mail daemon have a larger vocabulary. */
-static NEARDATA const char *mail_text[] = { "Gangway!", "Look out!",
+staticfn NEARDATA const char *mail_text[] = { "Gangway!", "Look out!",
                                             "Pardon me!" };
 #define md_exclamations() (mail_text[rn2(3)])
 
@@ -283,7 +283,7 @@ static NEARDATA const char *mail_text[] = { "Gangway!", "Look out!",
  * FALSE if the md gets stuck in a position where there is a monster.  Return
  * TRUE otherwise.
  */
-static boolean
+staticfn boolean
 md_rush(struct monst *md,
         int tx, int ty) /* destination of mail daemon */
 {
@@ -387,7 +387,7 @@ md_rush(struct monst *md,
 
 /* Deliver a scroll of mail. */
 /*ARGSUSED*/
-static void
+staticfn void
 newmail(struct mail_info *info)
 {
     struct monst *md;

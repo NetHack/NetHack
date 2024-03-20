@@ -4,20 +4,20 @@
 
 #include "hack.h"
 
-static boolean throne_mon_sound(struct monst *);
-static boolean beehive_mon_sound(struct monst *);
-static boolean morgue_mon_sound(struct monst *);
-static boolean zoo_mon_sound(struct monst *);
-static boolean temple_priest_sound(struct monst *);
-static boolean mon_is_gecko(struct monst *);
-static int domonnoise(struct monst *);
-static int dochat(void);
-static struct monst *responsive_mon_at(int, int);
-static int mon_in_room(struct monst *, int);
-static boolean oracle_sound(struct monst *);
+staticfn boolean throne_mon_sound(struct monst *);
+staticfn boolean beehive_mon_sound(struct monst *);
+staticfn boolean morgue_mon_sound(struct monst *);
+staticfn boolean zoo_mon_sound(struct monst *);
+staticfn boolean temple_priest_sound(struct monst *);
+staticfn boolean mon_is_gecko(struct monst *);
+staticfn int domonnoise(struct monst *);
+staticfn int dochat(void);
+staticfn struct monst *responsive_mon_at(int, int);
+staticfn int mon_in_room(struct monst *, int);
+staticfn boolean oracle_sound(struct monst *);
 
 /* this easily could be a macro, but it might overtax dumb compilers */
-static int
+staticfn int
 mon_in_room(struct monst *mon, int rmtyp)
 {
     int rno = levl[mon->mx][mon->my].roomno;
@@ -27,7 +27,7 @@ mon_in_room(struct monst *mon, int rmtyp)
 }
 
 
-static boolean
+staticfn boolean
 throne_mon_sound(struct monst *mtmp)
 {
     if ((mtmp->msleeping || is_lord(mtmp->data)
@@ -59,7 +59,7 @@ throne_mon_sound(struct monst *mtmp)
 }
 
 
-static boolean
+staticfn boolean
 beehive_mon_sound(struct monst *mtmp)
 {
     if ((mtmp->data->mlet == S_ANT && is_flyer(mtmp->data))
@@ -86,7 +86,7 @@ beehive_mon_sound(struct monst *mtmp)
     return FALSE;
 }
 
-static boolean
+staticfn boolean
 morgue_mon_sound(struct monst *mtmp)
 {
     if ((is_undead(mtmp->data) || is_vampshifter(mtmp))
@@ -112,7 +112,7 @@ morgue_mon_sound(struct monst *mtmp)
     return FALSE;
 }
 
-static boolean
+staticfn boolean
 zoo_mon_sound(struct monst *mtmp)
 {
     if ((mtmp->msleeping || is_animal(mtmp->data))
@@ -128,7 +128,7 @@ zoo_mon_sound(struct monst *mtmp)
     return FALSE;
 }
 
-static boolean
+staticfn boolean
 temple_priest_sound(struct monst *mtmp)
 {
     if (mtmp->ispriest && inhistemple(mtmp)
@@ -178,7 +178,7 @@ temple_priest_sound(struct monst *mtmp)
     return FALSE;
 }
 
-static boolean
+staticfn boolean
 oracle_sound(struct monst *mtmp)
 {
     if (mtmp->data != &mons[PM_ORACLE])
@@ -655,7 +655,7 @@ cry_sound(struct monst *mtmp)
 }
 
 /* return True if mon is a gecko or seems to look like one (hallucination) */
-static boolean
+staticfn boolean
 mon_is_gecko(struct monst *mon)
 {
     int glyph;
@@ -675,7 +675,7 @@ mon_is_gecko(struct monst *mon)
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
-static int /* check calls to this */
+staticfn int /* check calls to this */
 domonnoise(struct monst *mtmp)
 {
     char verbuf[BUFSZ];
@@ -1248,7 +1248,7 @@ dotalk(void)
     return result;
 }
 
-static int
+staticfn int
 dochat(void)
 {
     struct monst *mtmp;
@@ -1403,7 +1403,7 @@ dochat(void)
 }
 
 /* is there a monster at <x,y> that can see the hero and react? */
-static struct monst *
+staticfn struct monst *
 responsive_mon_at(int x, int y)
 {
     struct monst *mtmp = isok(x, y) ? m_at(x, y) : 0;
@@ -1616,7 +1616,7 @@ add_sound_mapping(const char *mapping)
     return 1;
 }
 
-static audio_mapping *
+staticfn audio_mapping *
 sound_matches_message(const char *msg)
 {
     audio_mapping *snd = soundmap;
@@ -1714,7 +1714,7 @@ extern struct sound_procs macsound_procs;
 extern struct sound_procs qtsound_procs;
 #endif
 
-struct sound_procs nosound_procs = {
+static struct sound_procs nosound_procs = {
     SOUNDID(nosound),
     0L,
     (void (*)(void)) 0,                           /* init_nhsound   */
@@ -1796,7 +1796,7 @@ assign_soundlib(int idx)
 }
 
 #if 0
-static void
+staticfn void
 choose_soundlib(const char *s)
 {
     int i;
@@ -1878,54 +1878,54 @@ get_soundlib_name(char *dest, int maxlen)
  */
 
 #if 0
-static void nosound_init_nhsound(void);
-static void nosound_exit_nhsound(const char *);
-static void nosound_suspend_nhsound(const char *);
-static void nosound_resume_nhsound(void);
-static void nosound_achievement(schar, schar, int32_t);
-static void nosound_soundeffect(int32_t, int32_t);
-static void nosound_play_usersound(char *, int32_t, int32_t);
-static void nosound_ambience(int32_t, int32_t, int32_t);
-static void nosound_verbal(char *text, int32_t gender, int32_t tone,
+staticfn void nosound_init_nhsound(void);
+staticfn void nosound_exit_nhsound(const char *);
+staticfn void nosound_suspend_nhsound(const char *);
+staticfn void nosound_resume_nhsound(void);
+staticfn void nosound_achievement(schar, schar, int32_t);
+staticfn void nosound_soundeffect(int32_t, int32_t);
+staticfn void nosound_play_usersound(char *, int32_t, int32_t);
+staticfn void nosound_ambience(int32_t, int32_t, int32_t);
+staticfn void nosound_verbal(char *text, int32_t gender, int32_t tone,
                            int32_t vol, int32_t moreinfo);
 
-static void
+staticfn void
 nosound_init_nhsound(void)
 {
 }
 
-static void
+staticfn void
 nosound_exit_nhsound(const char *reason)
 {
 }
 
-static void
+staticfn void
 nosound_achievement(schar ach1, schar ach2, int32_t repeat)
 {
 }
 
-static void
+staticfn void
 nosound_soundeffect(int32_t seid, int volume)
 {
 }
 
-static void
+staticfn void
 nosound_hero_playnotes(int32_t instr, const char *notes, int32_t vol)
 {
 }
 
-static void
+staticfn void
 nosound_play_usersound(char *filename, int volume, int idx)
 {
 }
 
-static void
+staticfn void
 nosound_ambience(int32_t ambienceid, int32_t ambience_action,
                 int32_t hero_proximity)
 {
 }
 
-static void
+staticfn void
 nosound_verbal(char *text, int32_t gender, int32_t tone,
                int32_t vol, int32_t moreinfo)
 {
@@ -1933,6 +1933,10 @@ nosound_verbal(char *text, int32_t gender, int32_t tone,
 #endif
 
 #ifdef SND_SOUNDEFFECTS_AUTOMAP
+
+/* prototype in case a build defines staticfn to nothing */
+staticfn void initialize_semap_basenames(void);
+
 struct soundeffect_automapping {
     enum sound_effect_entries seid;
     const char *base_filename;
@@ -1949,7 +1953,7 @@ static const struct soundeffect_automapping
 static const char *semap_basenames[SIZE(se_mappings_init)];
 static boolean basenames_initialized = FALSE;
 
-static void
+staticfn void
 initialize_semap_basenames(void)
 {
     int i;

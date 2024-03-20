@@ -6,6 +6,9 @@
 #include "curses.h"
 #include "hack.h"
 #include "wincurs.h"
+#include "cursinit.h"
+#include "curswins.h"
+#include "cursmisc.h"
 #include "cursdial.h"
 #include "func_tab.h"
 #include <ctype.h>
@@ -151,8 +154,9 @@ curses_line_input_dialog(
         free(tmpstr);
     }
 
-    bwin = curses_create_window(prompt_width, height,
+    bwin = curses_create_window(TEXT_WIN, prompt_width, height,
                                 iflags.window_inited ? UP : CENTER);
+    curses_set_wid_colors(TEXT_WIN, bwin);
     wrefresh(bwin);
     getbegyx(bwin, winy, winx);
     askwin = newwin(height, prompt_width, winy + 1, winx + 1);
@@ -277,7 +281,7 @@ curses_character_input_dialog(
     }
 
     if (iflags.wc_popup_dialog /*|| curses_stupid_hack*/) {
-        askwin = curses_create_window(prompt_width, prompt_height, UP);
+        askwin = curses_create_window(TEXT_WIN, prompt_width, prompt_height, UP);
         activemenu = askwin;
 
         for (count = 0; count < prompt_height; count++) {
@@ -286,6 +290,7 @@ curses_character_input_dialog(
             free(linestr);
         }
 
+        curses_set_wid_colors(TEXT_WIN, askwin);
         wrefresh(askwin);
     } else {
         /* TODO: add SUPPRESS_HISTORY flag, then after getting a response,
@@ -392,7 +397,8 @@ curses_ext_cmd(void)
     if (iflags.wc_popup_dialog) { /* Prompt in popup window */
         int x0, y0, w, h; /* bounding coords of popup */
 
-        extwin2 = curses_create_window(25, 1, UP);
+        extwin2 = curses_create_window(TEXT_WIN, 25, 1, UP);
+        curses_set_wid_colors(TEXT_WIN, extwin2);
         wrefresh(extwin2);
         /* create window inside window to prevent overwriting of border */
         getbegyx(extwin2, y0, x0);
@@ -784,13 +790,14 @@ curses_display_nhmenu(
 
     /* Display pre and post-game menus centered */
     if ((gm.moves <= 1 && !gi.invent) || gp.program_state.gameover) {
-        win = curses_create_window(current_menu->width,
+        win = curses_create_window(wid, current_menu->width,
                                    current_menu->height, CENTER);
     } else { /* Display during-game menus on the right out of the way */
-        win = curses_create_window(current_menu->width,
+        win = curses_create_window(wid, current_menu->width,
                                    current_menu->height, RIGHT);
     }
 
+    curses_set_wid_colors(wid, win);
     num_chosen = menu_get_selections(win, current_menu, how);
     curses_destroy_win(win);
 
@@ -1337,9 +1344,11 @@ menu_display_page(
             curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
         }
     }
-    curses_toggle_color_attr(win, DIALOG_BORDER_COLOR, NONE, ON);
+    if (curses_win_clr_inited(MENU_WIN) < 1)
+        curses_toggle_color_attr(win, DIALOG_BORDER_COLOR, NONE, ON);
     box(win, 0, 0);
-    curses_toggle_color_attr(win, DIALOG_BORDER_COLOR, NONE, OFF);
+    if (curses_win_clr_inited(MENU_WIN) < 1)
+        curses_toggle_color_attr(win, DIALOG_BORDER_COLOR, NONE, OFF);
     wrefresh(win);
 }
 

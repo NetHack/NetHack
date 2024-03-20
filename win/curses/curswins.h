@@ -9,11 +9,15 @@
 
 /* Global declarations */
 
-WINDOW *curses_create_window(int width, int height, orient orientation);
+WINDOW *curses_create_window(int wid, int width, int height, orient orientation);
 
+int curses_win_clr_inited(int wid);
+void curses_set_wid_colors(int wid, WINDOW *win);
 void curses_destroy_win(WINDOW * win);
 void curses_refresh_nethack_windows(void);
 WINDOW *curses_get_nhwin(winid wid);
+void curses_parse_wid_colors(int wid, char *fg, char *bg);
+boolean parse_hexstr(char *colorbuf, int *red, int *green, int *blue);
 void curses_add_nhwin(winid wid, int height, int width, int y, int x,
                       orient orientation, boolean border);
 void curses_add_wid(winid wid);

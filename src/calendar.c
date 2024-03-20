@@ -26,7 +26,7 @@
 #define LOCALTIME_type time_t *
 #endif
 
-static struct tm *getlt(void);
+staticfn struct tm *getlt(void);
 
 time_t
 getnow(void)
@@ -37,7 +37,7 @@ getnow(void)
     return datetime;
 }
 
-static struct tm *
+staticfn struct tm *
 getlt(void)
 {
     time_t date = getnow();

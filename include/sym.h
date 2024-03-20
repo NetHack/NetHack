@@ -56,6 +56,7 @@ struct symdef {
 };
 
 enum symparse_range {
+    SYM_INVALID = 0,
     SYM_CONTROL = 1, /* start/finish markers */
     SYM_PCHAR = 2,   /* index into showsyms  */
     SYM_OC = 3,      /* index into oc_syms   */

@@ -38,14 +38,14 @@ struct _doengrave_ctx {
     size_t len;          /* # of nonspace chars of new engraving text */
 };
 
-static int stylus_ok(struct obj *);
-static boolean u_can_engrave(void);
-static void doengrave_ctx_init(struct _doengrave_ctx *);
-static void doengrave_sfx_item_WAN(struct _doengrave_ctx *);
-static boolean doengrave_sfx_item(struct _doengrave_ctx *);
-static void doengrave_ctx_verb(struct _doengrave_ctx *);
-static int engrave(void);
-static const char *blengr(void);
+staticfn int stylus_ok(struct obj *);
+staticfn boolean u_can_engrave(void);
+staticfn void doengrave_ctx_init(struct _doengrave_ctx *);
+staticfn void doengrave_sfx_item_WAN(struct _doengrave_ctx *);
+staticfn boolean doengrave_sfx_item(struct _doengrave_ctx *);
+staticfn void doengrave_ctx_verb(struct _doengrave_ctx *);
+staticfn int engrave(void);
+staticfn const char *blengr(void);
 
 char *
 random_engraving(char *outbuf)
@@ -423,7 +423,7 @@ freehand(void)
 }
 
 /* getobj callback for an object to engrave with */
-static int
+staticfn int
 stylus_ok(struct obj *obj)
 {
     if (!obj)
@@ -445,7 +445,7 @@ stylus_ok(struct obj *obj)
 }
 
 /* can hero engrave at all (at their location)? */
-static boolean
+staticfn boolean
 u_can_engrave(void)
 {
     int levtyp = SURFACE_AT(u.ux, u.uy);
@@ -487,7 +487,7 @@ u_can_engrave(void)
 }
 
 /* initialize the doengrave data */
-static void
+staticfn void
 doengrave_ctx_init(struct _doengrave_ctx *de)
 {
     de->dengr = FALSE;
@@ -525,7 +525,7 @@ doengrave_ctx_init(struct _doengrave_ctx *de)
 }
 
 /* special engraving effects for WAND objects */
-static void
+staticfn void
 doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
 {
     switch (de->otmp->otyp) {
@@ -682,7 +682,7 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
 }
 
 /* special engraving effects for all objects */
-static boolean
+staticfn boolean
 doengrave_sfx_item(struct _doengrave_ctx *de)
 {
     switch (de->otmp->oclass) {
@@ -828,7 +828,7 @@ doengrave_sfx_item(struct _doengrave_ctx *de)
 }
 
 /* which verb phrasing to use for engraving */
-static void
+staticfn void
 doengrave_ctx_verb(struct _doengrave_ctx *de)
 {
     switch (de->type) {
@@ -1178,7 +1178,7 @@ doengr_exit:
 }
 
 /* occupation callback for engraving some text */
-static int
+staticfn int
 engrave(void)
 {
     struct engr *oep;
@@ -1620,7 +1620,7 @@ static const char blind_writing[][21] = {
      0x69, 0x76, 0x6b, 0x66, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 };
 
-static const char *
+staticfn const char *
 blengr(void)
 {
     return ROLL_FROM(blind_writing);

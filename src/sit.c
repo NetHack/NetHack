@@ -6,8 +6,8 @@
 #include "hack.h"
 #include "artifact.h"
 
-static void throne_sit_effect(void);
-static int lay_an_egg(void);
+staticfn void throne_sit_effect(void);
+staticfn int lay_an_egg(void);
 
 /* take away the hero's money */
 void
@@ -33,7 +33,7 @@ take_gold(void)
 }
 
 /* maybe do something when hero sits on a throne */
-static void
+staticfn void
 throne_sit_effect(void)
 {
     if (rnd(6) > 4) {
@@ -194,7 +194,7 @@ throne_sit_effect(void)
 }
 
 /* hero lays an egg */
-static int
+staticfn int
 lay_an_egg(void)
 {
     struct obj *uegg;

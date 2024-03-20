@@ -6,8 +6,9 @@
 #include "selvar.h"
 #include "sp_lev.h"
 
-static boolean sel_flood_havepoint(coordxy, coordxy, coordxy *, coordxy *, int);
-static long line_dist_coord(long, long, long, long, long, long);
+staticfn boolean sel_flood_havepoint(coordxy, coordxy, coordxy *, coordxy *,
+                                    int);
+staticfn long line_dist_coord(long, long, long, long, long, long);
 
 /* selection */
 struct selectionvar *
@@ -358,7 +359,7 @@ selection_do_grow(struct selectionvar *ov, int dir)
     selection_free(tmp, TRUE);
 }
 
-static int (*selection_flood_check_func)(coordxy, coordxy);
+staticfn int (*selection_flood_check_func)(coordxy, coordxy);
 
 void
 set_selection_floodfillchk(int (*f)(coordxy, coordxy))
@@ -367,7 +368,7 @@ set_selection_floodfillchk(int (*f)(coordxy, coordxy))
 }
 
 /* check whethere <x,y> is already in xs[],ys[] */
-static boolean
+staticfn boolean
 sel_flood_havepoint(
     coordxy x, coordxy y,
     coordxy xs[], coordxy ys[],
@@ -530,7 +531,7 @@ selection_do_ellipse(
 }
 
 /* square of distance from line segment (x1,y1, x2,y2) to point (x3,y3) */
-static long
+staticfn long
 line_dist_coord(long x1, long y1, long x2, long y2, long x3, long y3)
 {
     long px = x2 - x1;

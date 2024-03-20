@@ -26,7 +26,7 @@ char *fmt_ptr(const genericptr) NONNULL;
 #undef re_alloc
 #undef free
 extern void free(genericptr_t);
-static void heapmon_init(void);
+staticfn void heapmon_init(void);
 
 static FILE *heaplog = 0;
 static boolean tried_heaplog = FALSE;
@@ -138,7 +138,7 @@ fmt_ptr(const genericptr ptr)
 
 /* If ${NH_HEAPLOG} is defined and we can create a file by that name,
    then we'll log the allocation and release information to that file. */
-static void
+staticfn void
 heapmon_init(void)
 {
     char *logname = getenv("NH_HEAPLOG");

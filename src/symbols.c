@@ -5,10 +5,10 @@
 #include "hack.h"
 #include "tcap.h"
 
-static void savedsym_add(const char *, const char *, int);
-static struct _savedsym *savedsym_find(const char *, int);
+staticfn void savedsym_add(const char *, const char *, int);
+staticfn struct _savedsym *savedsym_find(const char *, int);
 #ifdef ENHANCED_SYMBOLS
-static void purge_custom_entries(enum graphics_sets which_set);
+staticfn void purge_custom_entries(enum graphics_sets which_set);
 #endif
 
 extern const uchar def_r_oc_syms[MAXOCLASSES];      /* drawing.c */
@@ -373,6 +373,7 @@ symset_is_compatible(
  * particular types of symset "handling", define a
  * H_XXX macro in include/sym.h and add the name
  * to this array at the matching offset.
+ * Externally referenced from files.c, options.c, utf8map.c. 
  */
 const char *const known_handling[] = {
     "UNKNOWN", /* H_UNK  */
@@ -425,7 +426,7 @@ const struct symparse loadsyms[] = {
     { SYM_OTH, SYM_INVISIBLE + SYM_OFF_X, "S_invisible" },
     { SYM_OTH, SYM_PET_OVERRIDE + SYM_OFF_X, "S_pet_override" },
     { SYM_OTH, SYM_HERO_OVERRIDE + SYM_OFF_X, "S_hero_override" },
-    { 0, 0, (const char *) 0 } /* fence post */
+    { SYM_INVALID, 0, (const char *) 0 } /* fence post */
 };
 
 boolean
@@ -716,7 +717,7 @@ savedsym_free(void)
     }
 }
 
-static struct _savedsym *
+staticfn struct _savedsym *
 savedsym_find(const char *name, int which_set)
 {
     struct _savedsym *tmp = saved_symbols;
@@ -729,7 +730,7 @@ savedsym_find(const char *name, int which_set)
     return NULL;
 }
 
-static void
+staticfn void
 savedsym_add(const char *name, const char *val, int which_set)
 {
     struct _savedsym *tmp = NULL;
@@ -1113,7 +1114,7 @@ struct customization_detail *find_display_urep_customization(
     const char *customization_name, int glyphidx,
     enum graphics_sets which_set);
 extern glyph_map glyphmap[MAX_GLYPH];
-static void shuffle_customizations(void);
+staticfn void shuffle_customizations(void);
 
 void
 apply_customizations_to_symset(enum graphics_sets which_set)
@@ -1141,7 +1142,7 @@ apply_customizations_to_symset(enum graphics_sets which_set)
 /* Shuffle the customizations to match shuffled object descriptions,
  * so a red potion isn't displayed with a blue customization, and so on.
  */
-static void
+staticfn void
 shuffle_customizations(void)
 {
     static const int offsets[2] = { GLYPH_OBJ_OFF, GLYPH_OBJ_PILETOP_OFF };
@@ -1209,7 +1210,7 @@ find_matching_symset_customiz(
     return (struct customization_detail *) 0;
 }
 
-static void
+staticfn void
 purge_custom_entries(enum graphics_sets which_set)
 {
     struct symset_customization *gdc = &gs.sym_customizations[which_set];

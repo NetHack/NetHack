@@ -4996,7 +4996,7 @@ plus widen each inventory line by two columns.
 .lp windowcolors
 If NetHack can, it should display windows with the specified
 foreground/background colors.
-Windows GUI only.
+Windows GUI and curses windowport only.
 The format is
 .si
 .lp "OPTION=windowcolors:wintype foreground/background"

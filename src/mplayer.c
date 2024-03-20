@@ -4,9 +4,9 @@
 
 #include "hack.h"
 
-static const char *dev_name(void);
-static void get_mplname(struct monst *, char *);
-static void mk_mplayer_armor(struct monst *, short);
+staticfn const char *dev_name(void);
+staticfn void get_mplname(struct monst *, char *);
+staticfn void mk_mplayer_armor(struct monst *, short);
 
 /* These are the names of those who
  * contributed to the development of NetHack 3.2/3.3/3.4/3.6.
@@ -40,7 +40,7 @@ static const char *const developers[] = {
 };
 
 /* return a randomly chosen developer name */
-static const char *
+staticfn const char *
 dev_name(void)
 {
     int i, m = 0, n = SIZE(developers);
@@ -68,7 +68,7 @@ dev_name(void)
     return (developers[i]);
 }
 
-static void
+staticfn void
 get_mplname(struct monst* mtmp, char *nam)
 {
     boolean fmlkind = is_female(mtmp->data);
@@ -91,7 +91,7 @@ get_mplname(struct monst* mtmp, char *nam)
                         (boolean) mtmp->female));
 }
 
-static void
+staticfn void
 mk_mplayer_armor(struct monst *mon, short typ)
 {
     struct obj *obj;

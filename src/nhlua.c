@@ -27,68 +27,68 @@ struct e;
 
 /* lua_CFunction prototypes */
 #ifdef DUMPLOG
-static int nhl_dump_fmtstr(lua_State *);
+staticfn int nhl_dump_fmtstr(lua_State *);
 #endif /* DUMPLOG */
-static int nhl_dnum_name(lua_State *);
-static int nhl_stairways(lua_State *);
-static int nhl_pushkey(lua_State *);
-static int nhl_doturn(lua_State *);
-static int nhl_debug_flags(lua_State *);
-static int nhl_timer_has_at(lua_State *);
-static int nhl_timer_peek_at(lua_State *);
-static int nhl_timer_stop_at(lua_State *);
-static int nhl_timer_start_at(lua_State *);
-static int nhl_get_cmd_key(lua_State *);
-static int nhl_callback(lua_State *);
-static int nhl_gamestate(lua_State *);
-static int nhl_test(lua_State *);
-static int nhl_getmap(lua_State *);
-static char splev_typ2chr(schar);
-static int nhl_gettrap(lua_State *);
-static int nhl_deltrap(lua_State *);
+staticfn int nhl_dnum_name(lua_State *);
+staticfn int nhl_stairways(lua_State *);
+staticfn int nhl_pushkey(lua_State *);
+staticfn int nhl_doturn(lua_State *);
+staticfn int nhl_debug_flags(lua_State *);
+staticfn int nhl_timer_has_at(lua_State *);
+staticfn int nhl_timer_peek_at(lua_State *);
+staticfn int nhl_timer_stop_at(lua_State *);
+staticfn int nhl_timer_start_at(lua_State *);
+staticfn int nhl_get_cmd_key(lua_State *);
+staticfn int nhl_callback(lua_State *);
+staticfn int nhl_gamestate(lua_State *);
+staticfn int nhl_test(lua_State *);
+staticfn int nhl_getmap(lua_State *);
+staticfn char splev_typ2chr(schar);
+staticfn int nhl_gettrap(lua_State *);
+staticfn int nhl_deltrap(lua_State *);
 #if 0
-static int nhl_setmap(lua_State *);
+staticfn int nhl_setmap(lua_State *);
 #endif
-static int nhl_impossible(lua_State *);
-static int nhl_pline(lua_State *);
-static int nhl_verbalize(lua_State *);
-static int nhl_parse_config(lua_State *);
-static int nhl_menu(lua_State *);
-static int nhl_text(lua_State *);
-static int nhl_getlin(lua_State *);
-static int nhl_makeplural(lua_State *);
-static int nhl_makesingular(lua_State *);
-static int nhl_s_suffix(lua_State *);
-static int nhl_ing_suffix(lua_State *);
-static int nhl_an(lua_State *);
-static int nhl_rn2(lua_State *);
-static int nhl_random(lua_State *);
-static int nhl_level_difficulty(lua_State *);
-static void init_nhc_data(lua_State *);
-static int nhl_push_anything(lua_State *, int, void *);
-static int nhl_meta_u_index(lua_State *);
-static int nhl_meta_u_newindex(lua_State *);
-static int nhl_u_clear_inventory(lua_State *);
-static int nhl_u_giveobj(lua_State *);
-static void init_u_data(lua_State *);
+staticfn int nhl_impossible(lua_State *);
+staticfn int nhl_pline(lua_State *);
+staticfn int nhl_verbalize(lua_State *);
+staticfn int nhl_parse_config(lua_State *);
+staticfn int nhl_menu(lua_State *);
+staticfn int nhl_text(lua_State *);
+staticfn int nhl_getlin(lua_State *);
+staticfn int nhl_makeplural(lua_State *);
+staticfn int nhl_makesingular(lua_State *);
+staticfn int nhl_s_suffix(lua_State *);
+staticfn int nhl_ing_suffix(lua_State *);
+staticfn int nhl_an(lua_State *);
+staticfn int nhl_rn2(lua_State *);
+staticfn int nhl_random(lua_State *);
+staticfn int nhl_level_difficulty(lua_State *);
+staticfn void init_nhc_data(lua_State *);
+staticfn int nhl_push_anything(lua_State *, int, void *);
+staticfn int nhl_meta_u_index(lua_State *);
+staticfn int nhl_meta_u_newindex(lua_State *);
+staticfn int nhl_u_clear_inventory(lua_State *);
+staticfn int nhl_u_giveobj(lua_State *);
+staticfn void init_u_data(lua_State *);
 #ifdef notyet
-static int nhl_set_package_path(lua_State *, const char *);
+staticfn int nhl_set_package_path(lua_State *, const char *);
 #endif
-static int traceback_handler(lua_State *);
-static uint32_t nhl_getmeminuse(lua_State *);
+staticfn int traceback_handler(lua_State *);
+staticfn uint32_t nhl_getmeminuse(lua_State *);
 #ifdef NHL_SANDBOX
-static void nhlL_openlibs(lua_State *, uint32_t);
+staticfn void nhlL_openlibs(lua_State *, uint32_t);
 #endif
-static void *nhl_alloc(void *, void *, size_t, size_t);
-static lua_State *nhlL_newstate (nhl_sandbox_info *, const char *);
-static void end_luapat(void);
-static int nhl_get_config(lua_State *);
-static int nhl_variable(lua_State *);
-static void nhl_clearfromtable(lua_State *, int, int, struct e *);
-static void nhl_warn(void *, const char *, int);
-static void nhl_clearfromtable(lua_State *, int, int, struct e *);
-static int nhl_panic(lua_State *);
-static void nhl_hookfn(lua_State *, lua_Debug *);
+staticfn void *nhl_alloc(void *, void *, size_t, size_t);
+staticfn lua_State *nhlL_newstate (nhl_sandbox_info *, const char *);
+staticfn void end_luapat(void);
+staticfn int nhl_get_config(lua_State *);
+staticfn int nhl_variable(lua_State *);
+staticfn void nhl_clearfromtable(lua_State *, int, int, struct e *);
+staticfn void nhl_warn(void *, const char *, int);
+staticfn void nhl_clearfromtable(lua_State *, int, int, struct e *);
+staticfn int nhl_panic(lua_State *);
+staticfn void nhl_hookfn(lua_State *, lua_Debug *);
 
 static const char *const nhcore_call_names[NUM_NHCORE_CALLS] = {
     "start_new_game",
@@ -329,7 +329,7 @@ nhl_add_table_entry_region(lua_State *L, const char *name, coordxy x1,
 
 /* converting from special level "map character" to levl location type
    and back. order here is important. */
-const struct {
+static const struct {
     char ch;
     schar typ;
 } char2typ[] = {
@@ -389,7 +389,7 @@ check_mapchr(const char *s)
     return INVALID_TYPE;
 }
 
-static char
+staticfn char
 splev_typ2chr(schar typ)
 {
     int i;
@@ -404,7 +404,7 @@ DISABLE_WARNING_UNREACHABLE_CODE
 
 /* local t = nh.gettrap(x,y); */
 /* local t = nh.gettrap({ x = 10, y = 10 }); */
-static int
+staticfn int
 nhl_gettrap(lua_State *L)
 {
     lua_Integer lx, ly;
@@ -458,7 +458,7 @@ nhl_gettrap(lua_State *L)
 }
 
 /* nh.deltrap(x,y); nh.deltrap({ x = 10, y = 15 }); */
-static int
+staticfn int
 nhl_deltrap(lua_State *L)
 {
     lua_Integer lx, ly;
@@ -517,7 +517,7 @@ DISABLE_WARNING_UNREACHABLE_CODE
 
 /* local loc = nh.getmap(x,y); */
 /* local loc = nh.getmap({ x = 10, y = 35 }); */
-static int
+staticfn int
 nhl_getmap(lua_State *L)
 {
     lua_Integer lx, ly;
@@ -607,7 +607,7 @@ nhl_getmap(lua_State *L)
 }
 
 /* impossible("Error!") */
-static int
+staticfn int
 nhl_impossible(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -621,7 +621,7 @@ nhl_impossible(lua_State *L)
 
 /* pline("It hits!") */
 /* pline("It hits!", true) */
-static int
+staticfn int
 nhl_pline(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -637,7 +637,7 @@ nhl_pline(lua_State *L)
 }
 
 /* verbalize("Fool!") */
-static int
+staticfn int
 nhl_verbalize(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -651,7 +651,7 @@ nhl_verbalize(lua_State *L)
 }
 
 /* parse_config("OPTIONS=!color") */
-static int
+staticfn int
 nhl_parse_config(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -665,7 +665,7 @@ nhl_parse_config(lua_State *L)
 }
 
 /* local windowtype = get_config("windowtype"); */
-static int
+staticfn int
 nhl_get_config(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -682,7 +682,7 @@ nhl_get_config(lua_State *L)
 /*
   str = getlin("What do you want to call this dungeon level?");
  */
-static int
+staticfn int
 nhl_getlin(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -707,7 +707,7 @@ nhl_getlin(lua_State *L)
 
  selected = menu("prompt", default, pickX,
                 { {key:"a", text:"option a"}, {key:"b", text:"option b"}, ... } ) */
-static int
+staticfn int
 nhl_menu(lua_State *L)
 {
     static const char *const pickX[] = { "none", "one", "any" }; /* PICK_x */
@@ -796,7 +796,7 @@ nhl_menu(lua_State *L)
 }
 
 /* text("foo\nbar\nbaz") */
-static int
+staticfn int
 nhl_text(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -841,7 +841,7 @@ nhl_text(lua_State *L)
 }
 
 /* makeplural("zorkmid") */
-static int
+staticfn int
 nhl_makeplural(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -855,7 +855,7 @@ nhl_makeplural(lua_State *L)
 }
 
 /* makesingular("zorkmids") */
-static int
+staticfn int
 nhl_makesingular(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -869,7 +869,7 @@ nhl_makesingular(lua_State *L)
 }
 
 /* s_suffix("foo") */
-static int
+staticfn int
 nhl_s_suffix(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -883,7 +883,7 @@ nhl_s_suffix(lua_State *L)
 }
 
 /* ing_suffix("foo") */
-static int
+staticfn int
 nhl_ing_suffix(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -897,7 +897,7 @@ nhl_ing_suffix(lua_State *L)
 }
 
 /* an("foo") */
-static int
+staticfn int
 nhl_an(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -911,7 +911,7 @@ nhl_an(lua_State *L)
 }
 
 /* rn2(10) */
-static int
+staticfn int
 nhl_rn2(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -926,7 +926,7 @@ nhl_rn2(lua_State *L)
 
 /* random(10);  -- is the same as rn2(10); */
 /* random(5,8); -- same as 5 + rn2(8); */
-static int
+staticfn int
 nhl_random(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -943,7 +943,7 @@ nhl_random(lua_State *L)
 }
 
 /* level_difficulty() */
-static int
+staticfn int
 nhl_level_difficulty(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -1070,7 +1070,7 @@ get_table_option(lua_State *L,
 
 #ifdef DUMPLOG
 /* local fname = dump_fmtstr("/tmp/nethack.%n.%d.log"); */
-static int
+staticfn int
 nhl_dump_fmtstr(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -1085,7 +1085,7 @@ nhl_dump_fmtstr(lua_State *L)
 #endif /* DUMPLOG */
 
 /* local dungeon_name = dnum_name(u.dnum); */
-static int
+staticfn int
 nhl_dnum_name(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -1108,7 +1108,7 @@ DISABLE_WARNING_UNREACHABLE_CODE
 /* set or get variables which are saved and restored along with the game.
    nh.variable("test", 10);
    local ten = nh.variable("test"); */
-static int
+staticfn int
 nhl_variable(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -1243,7 +1243,7 @@ restore_luadata(NHFILE *nhfp)
 }
 
 /* local stairs = stairways(); */
-static int
+staticfn int
 nhl_stairways(lua_State *L)
 {
     stairway *tmp = gs.stairs;
@@ -1274,7 +1274,7 @@ nhl_stairways(lua_State *L)
 /*
   test( { x = 123, y = 456 } );
 */
-static int
+staticfn int
 nhl_test(lua_State *L)
 {
     coordxy x, y;
@@ -1298,7 +1298,7 @@ nhl_test(lua_State *L)
 
 /* push a key into command queue */
 /* nh.pushkey("i"); */
-static int
+staticfn int
 nhl_pushkey(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -1314,7 +1314,7 @@ nhl_pushkey(lua_State *L)
 
 /* do a turn of moveloop, or until gm.multi is done if param is true. */
 /* nh.doturn(); nh.doturn(true); */
-static int
+staticfn int
 nhl_doturn(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -1334,7 +1334,7 @@ nhl_doturn(lua_State *L)
 /* nh.debug_flags({ mongen = false,
                     hunger = false,
                     overwrite_stairs = true }); */
-static int
+staticfn int
 nhl_debug_flags(lua_State *L)
 {
     int val;
@@ -1377,7 +1377,7 @@ DISABLE_WARNING_UNREACHABLE_CODE
 /* does location at x,y have timer? */
 /* local has_melttimer = nh.has_timer_at(x,y, "melt-ice"); */
 /* local has_melttimer = nh.has_timer_at({x=4,y=7}, "melt-ice"); */
-static int
+staticfn int
 nhl_timer_has_at(lua_State *L)
 {
     boolean ret = FALSE;
@@ -1408,7 +1408,7 @@ nhl_timer_has_at(lua_State *L)
 /* when does location at x,y timer trigger? */
 /* local melttime = nh.peek_timer_at(x,y, "melt-ice"); */
 /* local melttime = nh.peek_timer_at({x=5,y=6}, "melt-ice"); */
-static int
+staticfn int
 nhl_timer_peek_at(lua_State *L)
 {
     long when = 0L;
@@ -1436,7 +1436,7 @@ nhl_timer_peek_at(lua_State *L)
 /* stop timer at location x,y */
 /* nh.stop_timer_at(x,y, "melt-ice"); */
 /* nh.stop_timer_at({x=6,y=8}, "melt-ice"); */
-static int
+staticfn int
 nhl_timer_stop_at(lua_State *L)
 {
     short timertype = nhl_get_timertype(L, -1);
@@ -1461,7 +1461,7 @@ nhl_timer_stop_at(lua_State *L)
 
 /* start timer at location x,y */
 /* nh.start_timer_at(x,y, "melt-ice", 10); */
-static int
+staticfn int
 nhl_timer_start_at(lua_State *L)
 {
     short timertype = nhl_get_timertype(L, -2);
@@ -1493,7 +1493,7 @@ nhl_timer_start_at(lua_State *L)
 /* returns the visual interpretation of the key bound to an extended command,
    or the ext cmd name if not bound to any key */
 /* local helpkey = eckey("help"); */
-static int
+staticfn int
 nhl_get_cmd_key(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -1513,7 +1513,7 @@ nhl_get_cmd_key(lua_State *L)
 /* callback("level_enter", "function_name"); */
 /* callback("level_enter", "function_name", true); */
 /* level_enter, level_leave, cmd_before */
-static int
+staticfn int
 nhl_callback(lua_State *L)
 {
     int argc = lua_gettop(L);
@@ -1563,7 +1563,7 @@ nhl_callback(lua_State *L)
 /* currently handles inventory and turns. */
 /* gamestate(); -- save state */
 /* gamestate(true); -- restore state */
-static int
+staticfn int
 nhl_gamestate(lua_State *L)
 {
     static struct obj *gmst_invent = NULL;
@@ -1702,7 +1702,7 @@ static const struct {
 };
 
 /* register and init the constants table */
-static void
+staticfn void
 init_nhc_data(lua_State *L)
 {
     int i;
@@ -1718,7 +1718,7 @@ init_nhc_data(lua_State *L)
     lua_setglobal(L, "nhc");
 }
 
-static int
+staticfn int
 nhl_push_anything(lua_State *L, int anytype, void *src)
 {
     anything any = cg.zeroany;
@@ -1742,7 +1742,7 @@ nhl_push_anything(lua_State *L, int anytype, void *src)
 
 DISABLE_WARNING_UNREACHABLE_CODE
 
-static int
+staticfn int
 nhl_meta_u_index(lua_State *L)
 {
     static const struct {
@@ -1809,7 +1809,7 @@ nhl_meta_u_index(lua_State *L)
     return 0;
 }
 
-static int
+staticfn int
 nhl_meta_u_newindex(lua_State *L)
 {
     nhl_error(L, "Cannot set u table values");
@@ -1819,7 +1819,7 @@ nhl_meta_u_newindex(lua_State *L)
 
 RESTORE_WARNING_UNREACHABLE_CODE
 
-static int
+staticfn int
 nhl_u_clear_inventory(lua_State *L UNUSED)
 {
     while (gi.invent)
@@ -1829,7 +1829,7 @@ nhl_u_clear_inventory(lua_State *L UNUSED)
 
 /* Put object into player's inventory */
 /* u.giveobj(obj.new("rock")); */
-static int
+staticfn int
 nhl_u_giveobj(lua_State *L)
 {
     return nhl_obj_u_giveobj(L);
@@ -1841,7 +1841,7 @@ static const struct luaL_Reg nhl_u_functions[] = {
     { NULL, NULL }
 };
 
-static void
+staticfn void
 init_u_data(lua_State *L)
 {
     lua_newtable(L);
@@ -1856,7 +1856,7 @@ init_u_data(lua_State *L)
 }
 
 #ifdef notyet
-static int
+staticfn int
 nhl_set_package_path(lua_State *L, const char *path)
 {
     if (LUA_TTABLE != lua_getglobal(L, "package")) {
@@ -1870,7 +1870,7 @@ nhl_set_package_path(lua_State *L, const char *path)
 }
 #endif
 
-static int
+staticfn int
 traceback_handler(lua_State *L)
 {
     luaL_traceback(L, L, lua_tostring(L, 1), 0);
@@ -1878,7 +1878,7 @@ traceback_handler(lua_State *L)
     return 1;
 }
 
-static uint32_t
+staticfn uint32_t
 nhl_getmeminuse(lua_State *L)
 {
     return lua_gc(L, LUA_GCCOUNT) * 1024 + lua_gc(L, LUA_GCCOUNTB);
@@ -2377,7 +2377,7 @@ static struct e ct_os_files[] = {
 #define DROPIF(flag, lib, ct) \
     nhl_clearfromtable(L, !!(lflags & flag), lib, ct)
 
-static void
+staticfn void
 nhl_clearfromtable(lua_State *L, int flag, int tndx, struct e *todo)
 {
     while (todo->when != EOT) {
@@ -2428,7 +2428,7 @@ return values from "call it":
  * We're going to do #3.
  */
 #ifdef notyet
-static boolean
+staticfn boolean
 start_luapat(void)
 {
     int rv;
@@ -2449,7 +2449,7 @@ start_luapat(void)
 }
 #endif
 
-static void
+staticfn void
 end_luapat(void)
 {
     if (luapat) {
@@ -2459,7 +2459,7 @@ end_luapat(void)
 }
 
 #ifdef notyet
-static int
+staticfn int
 opencheckpat(lua_State *L, const char *ename, int param)
 {
     /* careful - we're using 2 different and unrelated Lua states */
@@ -2513,7 +2513,7 @@ nhl_pushhooked_open_table(lua_State *L)
 }
 
 #ifdef notyet
-static int
+staticfn int
 hooked_open(lua_State *L)
 {
     const char *mode;
@@ -2581,7 +2581,7 @@ hooked_open(lua_State *L)
     return (*io_open)(L);
 }
 
-static boolean
+staticfn boolean
 hook_open(lua_State *L)
 {
     boolean rv = FALSE;
@@ -2613,7 +2613,7 @@ hook_open(lua_State *L)
 DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 
 #ifdef NHL_SANDBOX
-static void
+staticfn void
 nhlL_openlibs(lua_State *L, uint32_t lflags)
 {
     /* translate lflags from user-friendly to internal */
@@ -2736,7 +2736,7 @@ UNSAFEIO:
 
 RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 
-static void *
+staticfn void *
 nhl_alloc(void *ud, void *ptr, size_t osize UNUSED, size_t nsize)
 {
     nhl_user_data *nud = ud;
@@ -2759,7 +2759,7 @@ nhl_alloc(void *ud, void *ptr, size_t osize UNUSED, size_t nsize)
 
 DISABLE_WARNING_UNREACHABLE_CODE
 
-static int
+staticfn int
 nhl_panic(lua_State *L)
 {
     const char *msg = lua_tostring(L, -1);
@@ -2775,7 +2775,7 @@ RESTORE_WARNING_UNREACHABLE_CODE
 
 /* called when lua issues a warning message; the text of the message
    is passed to us in pieces across multiple function calls */
-static void
+staticfn void
 nhl_warn(
     void *userdata UNUSED,
     const char *msg_fragment,
@@ -2796,7 +2796,7 @@ nhl_warn(
 }
 
 #ifdef NHL_SANDBOX
-static void
+staticfn void
 nhl_hookfn(lua_State *L, lua_Debug *ar UNUSED)
 {
     nhl_user_data *nud;
@@ -2811,7 +2811,7 @@ nhl_hookfn(lua_State *L, lua_Debug *ar UNUSED)
 }
 #endif
 
-static lua_State *
+staticfn lua_State *
 nhlL_newstate(nhl_sandbox_info *sbi, const char *name)
 {
     nhl_user_data *nud = 0;

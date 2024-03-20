@@ -7,33 +7,33 @@
 #include "mfndpos.h"
 #include <ctype.h>
 
-static void sanity_check_single_mon(struct monst *, boolean, const char *);
-static struct obj *make_corpse(struct monst *, unsigned);
-static int minliquid_core(struct monst *);
-static void m_calcdistress(struct monst *);
-static boolean monlineu(struct monst *, int, int);
-static long mm_2way_aggression(struct monst *, struct monst *);
-static long mm_aggression(struct monst *, struct monst *);
-static long mm_displacement(struct monst *, struct monst *);
-static void mon_leaving_level(struct monst *);
-static void m_detach(struct monst *, struct permonst *, boolean);
-static void set_mon_min_mhpmax(struct monst *, int);
-static void lifesaved_monster(struct monst *);
-static boolean vamprises(struct monst *);
-static void logdeadmon(struct monst *, int);
-static boolean ok_to_obliterate(struct monst *);
-static void qst_guardians_respond(void);
-static void peacefuls_respond(struct monst *);
-static void m_restartcham(struct monst *);
-static boolean restrap(struct monst *);
-static int pick_animal(void);
-static int pickvampshape(struct monst *);
-static boolean isspecmon(struct monst *);
-static boolean validspecmon(struct monst *, int);
-static int wiz_force_cham_form(struct monst *);
-static struct permonst *accept_newcham_form(struct monst *, int);
-static void kill_eggs(struct obj *) NO_NNARGS;
-static void pacify_guard(struct monst *);
+staticfn void sanity_check_single_mon(struct monst *, boolean, const char *);
+staticfn struct obj *make_corpse(struct monst *, unsigned);
+staticfn int minliquid_core(struct monst *);
+staticfn void m_calcdistress(struct monst *);
+staticfn boolean monlineu(struct monst *, int, int);
+staticfn long mm_2way_aggression(struct monst *, struct monst *);
+staticfn long mm_aggression(struct monst *, struct monst *);
+staticfn long mm_displacement(struct monst *, struct monst *);
+staticfn void mon_leaving_level(struct monst *);
+staticfn void m_detach(struct monst *, struct permonst *, boolean);
+staticfn void set_mon_min_mhpmax(struct monst *, int);
+staticfn void lifesaved_monster(struct monst *);
+staticfn boolean vamprises(struct monst *);
+staticfn void logdeadmon(struct monst *, int);
+staticfn boolean ok_to_obliterate(struct monst *);
+staticfn void qst_guardians_respond(void);
+staticfn void peacefuls_respond(struct monst *);
+staticfn void m_restartcham(struct monst *);
+staticfn boolean restrap(struct monst *);
+staticfn int pick_animal(void);
+staticfn int pickvampshape(struct monst *);
+staticfn boolean isspecmon(struct monst *);
+staticfn boolean validspecmon(struct monst *, int);
+staticfn int wiz_force_cham_form(struct monst *);
+staticfn struct permonst *accept_newcham_form(struct monst *, int);
+staticfn void kill_eggs(struct obj *) NO_NNARGS;
+staticfn void pacify_guard(struct monst *);
 
 extern const struct shclass shtypes[]; /* defined in shknam.c */
 
@@ -51,7 +51,7 @@ const char *warnings[] = {
 #endif /* 0 */
 
 
-static void
+staticfn void
 sanity_check_single_mon(
     struct monst *mtmp,
     boolean chk_geno,
@@ -515,7 +515,7 @@ pm_to_cham(int mndx)
  * G_NOCORPSE set in order to prevent wishing for one, finding tins of one,
  * etc....
  */
-static struct obj *
+staticfn struct obj *
 make_corpse(struct monst *mtmp, unsigned int corpseflags)
 {
     struct permonst *mdat = mtmp->data;
@@ -746,7 +746,7 @@ minliquid(struct monst *mtmp)
 }
 
 /* guts of minliquid() */
-static int
+staticfn int
 minliquid_core(struct monst *mtmp)
 {
     boolean inpool, inlava, infountain;
@@ -944,7 +944,7 @@ mcalcdistress(void)
     iter_mons(m_calcdistress);
 }
 
-static void
+staticfn void
 m_calcdistress(struct monst *mtmp)
 {
     /* must check non-moving monsters once/turn in case they managed
@@ -1824,7 +1824,7 @@ can_carry(struct monst *mtmp, struct obj *otmp)
 }
 
 /* is <nx,ny> in direct line with where 'mon' thinks hero is? */
-static boolean
+staticfn boolean
 monlineu(struct monst *mon, int nx, int ny)
 {
     return online2(nx, ny, mon->mux, mon->muy);
@@ -2151,7 +2151,7 @@ mfndpos(
 /* Part of mm_aggression that represents two-way aggression.  To avoid
    having to code each case twice, this function contains those cases that
    ought to happen twice, and mm_aggression will call it twice. */
-static long
+staticfn long
 mm_2way_aggression(struct monst *magr, struct monst *mdef)
 {
     /* zombies vs things that can be zombified */
@@ -2166,7 +2166,7 @@ mm_2way_aggression(struct monst *magr, struct monst *mdef)
    in the absence of Conflict.  There is no provision for targeting
    other monsters; just hand to hand fighting when they happen to be
    next to each other. */
-static long
+staticfn long
 mm_aggression(
     struct monst *magr, /* monster that is currently deciding where to move */
     struct monst *mdef) /* another monster which is next to it */
@@ -2189,7 +2189,7 @@ mm_aggression(
 }
 
 /* Monster displacing another monster out of the way */
-static long
+staticfn long
 mm_displacement(
     struct monst *magr, /* monster that is currently deciding where to move */
     struct monst *mdef) /* another monster which is next to it */
@@ -2426,7 +2426,7 @@ dealloc_monst(struct monst *mon)
 
 /* 'mon' is being removed from level due to migration [relmon from keepdogs
    or migrate_to_level] or due to death [m_detach from mondead or mongone] */
-static void
+staticfn void
 mon_leaving_level(struct monst *mon)
 {
     coordxy mx = mon->mx, my = mon->my;
@@ -2464,7 +2464,7 @@ mon_leaving_level(struct monst *mon)
 }
 
 /* 'mtmp' is going away; remove effects of mtmp from other data structures */
-static void
+staticfn void
 m_detach(
     struct monst *mtmp,
     struct permonst *mptr, /* reflects mtmp->data _prior_ to mtmp's death */
@@ -2536,7 +2536,7 @@ m_detach(
 
 /* give a life-saved monster a reasonable mhpmax value in case it has
    been the victim of excessive life draining */
-static void
+staticfn void
 set_mon_min_mhpmax(
     struct monst *mon,
     int minimum_mhpmax) /* monster life-saving has traditionally used 10 */
@@ -2567,7 +2567,7 @@ mlifesaver(struct monst *mon)
     return (struct obj *) 0;
 }
 
-static void
+staticfn void
 lifesaved_monster(struct monst *mtmp)
 {
     boolean surviver;
@@ -2619,7 +2619,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* when a shape-shifted vampire is killed, it reverts to base form instead
    of dying; moved into separate routine to unclutter mondead() */
-static boolean
+staticfn boolean
 vamprises(struct monst *mtmp)
 {
     int mndx = mtmp->cham;
@@ -2694,7 +2694,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* when a mon has died, maybe record an achievement or issue livelog message;
    moved into separate routine to unclutter mondead() */
-static void
+staticfn void
 logdeadmon(struct monst *mtmp, int mndx)
 {
     int howmany = gm.mvitals[mndx].died;
@@ -3528,7 +3528,7 @@ migrate_mon(
     migrate_to_level(mtmp, target_lev, xyloc, (coord *) 0);
 }
 
-static boolean
+staticfn boolean
 ok_to_obliterate(struct monst *mtmp)
 {
     /*
@@ -3786,7 +3786,7 @@ m_respond(struct monst *mtmp)
 }
 
 /* how quest guardians respond when you attack the quest leader */
-static void
+staticfn void
 qst_guardians_respond(void)
 {
     struct monst *mon;
@@ -3814,7 +3814,7 @@ qst_guardians_respond(void)
 }
 
 /* how other peacefuls react when you attack monster */
-static void
+staticfn void
 peacefuls_respond(struct monst *mtmp)
 {
     struct monst *mon;
@@ -4226,7 +4226,7 @@ rescham(void)
     iter_mons(normal_shape);
 }
 
-static void
+staticfn void
 m_restartcham(struct monst *mtmp)
 {
     if (!mtmp->mcan)
@@ -4261,7 +4261,7 @@ restore_cham(struct monst *mon)
 }
 
 /* unwatched hiders may hide again; if so, returns True */
-static boolean
+staticfn boolean
 restrap(struct monst *mtmp)
 {
     struct trap *t;
@@ -4443,7 +4443,7 @@ mon_animal_list(boolean construct)
     }
 }
 
-static int
+staticfn int
 pick_animal(void)
 {
     int res;
@@ -4528,7 +4528,7 @@ decide_to_shapeshift(struct monst *mon, int shiftflags)
     }
 }
 
-static int
+staticfn int
 pickvampshape(struct monst *mon)
 {
     int mndx = mon->cham, wolfchance = 10;
@@ -4565,7 +4565,7 @@ pickvampshape(struct monst *mon)
 }
 
 /* nonshapechangers who warrant special polymorph handling */
-static boolean
+staticfn boolean
 isspecmon(struct monst *mon)
 {
     return (mon->isshk || mon->ispriest || mon->isgd
@@ -4575,7 +4575,7 @@ isspecmon(struct monst *mon)
 /* restrict certain special monsters (shopkeepers, aligned priests,
    vault guards) to forms that allow them to behave sensibly (catching
    gold, speaking?) so that they don't need too much extra code */
-static boolean
+staticfn boolean
 validspecmon(struct monst *mon, int mndx)
 {
     if (mndx == NON_PM)
@@ -4659,7 +4659,7 @@ validvamp(struct monst *mon, int *mndx_p, int monclass)
     return (boolean) (*mndx_p != NON_PM);
 }
 
-static int
+staticfn int
 wiz_force_cham_form(struct monst *mon)
 {
     char pprompt[BUFSZ], parttwo[QBUFSZ], buf[BUFSZ], prevbuf[BUFSZ];
@@ -4810,7 +4810,7 @@ select_newcham_form(struct monst *mon)
 }
 
 /* this used to be inline within newcham() but monpolycontrol needs it too */
-static struct permonst *
+staticfn struct permonst *
 accept_newcham_form(struct monst *mon, int mndx)
 {
     struct permonst *mdat;
@@ -5168,7 +5168,7 @@ dead_species(int m_idx, boolean egg)
 }
 
 /* kill off any eggs of genocided monsters */
-static void
+staticfn void
 kill_eggs(struct obj *obj_list)
 {
     struct obj *otmp;
@@ -5325,7 +5325,7 @@ angry_guards(boolean silent)
     return FALSE;
 }
 
-static void
+staticfn void
 pacify_guard(struct monst *mtmp)
 {
     if (is_watch(mtmp->data))

@@ -19,7 +19,7 @@
 #endif
 
 #ifdef TEXT_TOMBSTONE
-static void center(int, char *);
+staticfn void center(int, char *);
 
 #ifndef NH320_DEDICATION
 /* A normal tombstone for end of game display. */
@@ -70,7 +70,7 @@ static const char *const rip_txt[] = {
 #define DEATH_LINE 8 /* *char[] line # for death description */
 #define YEAR_LINE 12 /* *char[] line # for year */
 
-static void
+staticfn void
 center(int line, char *text)
 {
     char *ip, *op;

@@ -7,14 +7,14 @@
 
 #include "hack.h"
 
-static boolean stock_room_goodpos(struct mkroom *, int, int, int, int);
-static boolean veggy_item(struct obj * obj, int);
-static int shkveg(void);
-static void mkveggy_at(int, int);
-static void mkshobj_at(const struct shclass *, int, int, boolean);
-static void nameshk(struct monst *, const char *const *);
-static int good_shopdoor(struct mkroom *, coordxy *, coordxy *);
-static int shkinit(const struct shclass *, struct mkroom *);
+staticfn boolean stock_room_goodpos(struct mkroom *, int, int, int, int);
+staticfn boolean veggy_item(struct obj * obj, int);
+staticfn int shkveg(void);
+staticfn void mkveggy_at(int, int);
+staticfn void mkshobj_at(const struct shclass *, int, int, boolean);
+staticfn void nameshk(struct monst *, const char *const *);
+staticfn int good_shopdoor(struct mkroom *, coordxy *, coordxy *);
+staticfn int shkinit(const struct shclass *, struct mkroom *);
 
 #define VEGETARIAN_CLASS (MAXOCLASSES + 1)
 
@@ -201,6 +201,7 @@ static const char *const shkhealthfoods[] = {
  * *_CLASS enum value) or a specific object enum value.
  * In the latter case, prepend it with a unary minus so the code can know
  * (by testing the sign) whether to use mkobj() or mksobj().
+ * shtypes[] is externally referenced from mkroom.c, mon.c and shk.c. 
  */
 const struct shclass shtypes[] = {
     { "general store",
@@ -372,7 +373,7 @@ init_shop_selection()
 
 /* decide whether an object or object type is considered vegetarian;
    for types, items which might go either way are assumed to be veggy */
-static boolean
+staticfn boolean
 veggy_item(struct obj* obj, int otyp /* used iff obj is null */)
 {
     int corpsenm;
@@ -400,7 +401,7 @@ veggy_item(struct obj* obj, int otyp /* used iff obj is null */)
     return FALSE;
 }
 
-static int
+staticfn int
 shkveg(void)
 {
     int i, j, maxprob, prob;
@@ -435,7 +436,7 @@ shkveg(void)
 }
 
 /* make a random item for health food store */
-static void
+staticfn void
 mkveggy_at(int sx, int sy)
 {
     struct obj *obj = mksobj_at(shkveg(), sx, sy, TRUE, TRUE);
@@ -446,7 +447,7 @@ mkveggy_at(int sx, int sy)
 }
 
 /* make an object of the appropriate type for a shop square */
-static void
+staticfn void
 mkshobj_at(const struct shclass *shp, int sx, int sy, boolean mkspecl)
 {
     struct monst *mtmp;
@@ -479,7 +480,7 @@ mkshobj_at(const struct shclass *shp, int sx, int sy, boolean mkspecl)
 }
 
 /* extract a shopkeeper name for the given shop type */
-static void
+staticfn void
 nameshk(struct monst *shk, const char *const *nlp)
 {
     int i, trycnt, names_avail;
@@ -573,7 +574,7 @@ free_eshk(struct monst *mtmp)
 /* find a door in room sroom which is good for shop entrance.
    returns -1 if no good door found, or the gd.doors index
    and the door coordinates in sx, sy */
-static int
+staticfn int
 good_shopdoor(struct mkroom *sroom, coordxy *sx, coordxy *sy)
 {
     int i;
@@ -619,7 +620,7 @@ good_shopdoor(struct mkroom *sroom, coordxy *sx, coordxy *sy)
 }
 
 /* create a new shopkeeper in the given room */
-static int
+staticfn int
 shkinit(const struct shclass *shp, struct mkroom *sroom)
 {
     int sh;
@@ -682,7 +683,7 @@ shkinit(const struct shclass *shp, struct mkroom *sroom)
     return sh;
 }
 
-static boolean
+staticfn boolean
 stock_room_goodpos(struct mkroom *sroom, int rmno, int sh, int sx, int sy)
 {
     if (sroom->irregular) {

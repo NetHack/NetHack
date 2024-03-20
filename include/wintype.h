@@ -208,6 +208,7 @@ enum to_core_flags {
 };
 
 enum from_core_requests {
+    invalid_core_request = 0,
     set_mode             = 1,
     request_settings     = 2,
     set_menu_promptstyle = 3,

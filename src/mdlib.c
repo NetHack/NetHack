@@ -60,7 +60,7 @@ char *version_id_string(char *, size_t, const char *) NONNULL NONNULLPTRS;
 char *bannerc_string(char *, size_t, const char *) NONNULL NONNULLPTRS;
 int case_insensitive_comp(const char *, const char *) NONNULLPTRS;
 
-static void make_version(void);
+staticfn void make_version(void);
 
 #ifndef HAS_NO_MKSTEMP
 #ifdef _MSC_VER
@@ -83,10 +83,10 @@ const char *do_runtime_info(int *) NO_NNARGS;
 void release_runtime_info(void);
 char *mdlib_version_string(char *, const char *) NONNULL NONNULLPTRS;
 
-static void build_options(void);
-static int count_and_validate_winopts(void);
-static void opt_out_words(char *, int *) NONNULLPTRS;
-static void build_savebones_compat_string(void);
+staticfn void build_options(void);
+staticfn int count_and_validate_winopts(void);
+staticfn void opt_out_words(char *, int *) NONNULLPTRS;
+staticfn void build_savebones_compat_string(void);
 
 static int idxopttext, done_runtime_opt_init_once = 0;
 #define MAXOPT 60 /* 3.7: currently 40 lines get inserted into opttext[] */
@@ -95,7 +95,7 @@ static char *opttext[MAXOPT] = { 0 };
     ((void) ((idxopttext < MAXOPT)                      \
              ? (opttext[idxopttext++] = dupstr(line))   \
              : 0))
-char optbuf[COLBUFSZ];
+static char optbuf[COLBUFSZ];
 static struct version_info version;
 static const char opt_indent[] = "    ";
 
@@ -160,7 +160,7 @@ static struct win_information window_opts[] = {
 };
 
 #if !defined(MAKEDEFS_C)
-static int count_and_validate_soundlibopts(void);
+staticfn int count_and_validate_soundlibopts(void);
 
 struct soundlib_information {
     enum soundlib_ids id;
@@ -252,7 +252,7 @@ md_ignored_features(void)
             );
 }
 
-static void
+staticfn void
 make_version(void)
 {
     int i;
@@ -415,7 +415,7 @@ mkstemp(char *template)
 
 static char save_bones_compat_buf[BUFSZ];
 
-static void
+staticfn void
 build_savebones_compat_string(void)
 {
 #ifdef VERSION_COMPATIBILITY
@@ -633,7 +633,7 @@ static const char *const build_opts[] = {
     "and basic NetHack features"
 };
 
-static int
+staticfn int
 count_and_validate_winopts(void)
 {
     int i, cnt = 0;
@@ -658,7 +658,7 @@ count_and_validate_winopts(void)
 }
 
 #if !defined(MAKEDEFS_C)
-static int
+staticfn int
 count_and_validate_soundlibopts(void)
 {
     int i, cnt = 0;
@@ -672,7 +672,7 @@ count_and_validate_soundlibopts(void)
 }
 #endif
 
-static void
+staticfn void
 opt_out_words(
     char *str,     /* input, but modified during processing */
     int *length_p) /* in/out */
@@ -700,7 +700,7 @@ opt_out_words(
     }
 }
 
-static void
+staticfn void
 build_options(void)
 {
     char buf[COLBUFSZ];

@@ -41,14 +41,14 @@
  * and placed there by 'makedefs'.
  */
 
-static void unpadline(char *);
-static void init_rumors(dlb *);
-static char *get_rnd_line(dlb *, char *, unsigned, int (*)(int),
+staticfn void unpadline(char *);
+staticfn void init_rumors(dlb *);
+staticfn char *get_rnd_line(dlb *, char *, unsigned, int (*)(int),
                           long, long, unsigned);
-static void init_oracles(dlb *);
-static void others_check(const char *ftype, const char *, winid *);
-static void couldnt_open_file(const char *);
-static void init_CapMons(void);
+staticfn void init_oracles(dlb *);
+staticfn void others_check(const char *ftype, const char *, winid *);
+staticfn void couldnt_open_file(const char *);
+staticfn void init_CapMons(void);
 
 /* used by CapitalMon(); set up by init_CapMons(), released by free_CapMons();
    there's no need for these to be put into 'struct instance_globals g' */
@@ -62,7 +62,7 @@ extern const char bogon_codes[]; /* from do_name.c */
 
 /* makedefs pads short rumors, epitaphs, engravings, and hallucinatory
    monster names with trailing underscores; strip those off */
-static void
+staticfn void
 unpadline(char *line)
 {
     char *p = eos(line);
@@ -80,7 +80,7 @@ unpadline(char *line)
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
-static void
+staticfn void
 init_rumors(dlb *fp)
 {
     static const char rumors_header[] = "%d,%ld,%lx;%d,%ld,%lx;0,0,%lx\n";
@@ -303,7 +303,7 @@ rumor_check(void)
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* 3.7: augments rumors_check(); test 'engrave' or 'epitaph' or 'bogusmon' */
-static void
+staticfn void
 others_check(
     const char *ftype, /* header: "{Engravings|Epitaphs|Bogus monsters}:" */
     const char *fname, /* filename: {ENGRAVEFILE|EPITAPHFILE|BOGUSMONFILE} */
@@ -415,7 +415,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
    chosen; however, if padlength is 0, lines following long lines are
    more likely than average to be picked, and lines after short lines
    are less likely */
-static char *
+staticfn char *
 get_rnd_line(
     dlb *fh,            /* already opened file */
     char *buf,          /* output buffer */
@@ -571,7 +571,7 @@ outrumor(
     pline1(line);
 }
 
-static void
+staticfn void
 init_oracles(dlb *fp)
 {
     int i;
@@ -760,7 +760,7 @@ doconsult(struct monst *oracl)
     return ECMD_TIME;
 }
 
-static void
+staticfn void
 couldnt_open_file(const char *filename)
 {
     int save_something = gp.program_state.something_worth_saving;
@@ -819,7 +819,7 @@ CapitalMon(
    having a capitalized type name like Green-elf or Archon, plus unique
    monsters whose "name" is a title rather than a personal name, plus
    hallucinatory monster names that fall into either of those categories */
-static void
+staticfn void
 init_CapMons(void)
 {
     unsigned pass;

@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1704316449 2024/01/03 21:14:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.508 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1710344449 2024/03/13 15:40:49 $  $NHDT-Branch: keni-staticfn $:$NHDT-Revision: 1.525 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -12,33 +12,33 @@
  */
 #define MAGIC_COOKIE 1000
 
-static int zaptype(int);
-static void probe_objchain(struct obj *) NO_NNARGS;
-static boolean zombie_can_dig(coordxy x, coordxy y);
-static void polyuse(struct obj *, int, int) NO_NNARGS;
-static void create_polymon(struct obj *, int) NO_NNARGS;
-static int stone_to_flesh_obj(struct obj *) NONNULLARG1;
-static boolean zap_updown(struct obj *) NONNULLARG1;
-static void zhitu(int, int, const char *, coordxy, coordxy) NO_NNARGS;
-static void revive_egg(struct obj *) NONNULLARG1;
-static boolean zap_steed(struct obj *) NONNULLARG1;
-static void skiprange(int, int *, int *) NONNULLPTRS;
-static void maybe_explode_trap(struct trap *, struct obj *,
+staticfn int zaptype(int);
+staticfn void probe_objchain(struct obj *) NO_NNARGS;
+staticfn boolean zombie_can_dig(coordxy x, coordxy y);
+staticfn void polyuse(struct obj *, int, int) NO_NNARGS;
+staticfn void create_polymon(struct obj *, int) NO_NNARGS;
+staticfn int stone_to_flesh_obj(struct obj *) NONNULLARG1;
+staticfn boolean zap_updown(struct obj *) NONNULLARG1;
+staticfn void zhitu(int, int, const char *, coordxy, coordxy) NO_NNARGS;
+staticfn void revive_egg(struct obj *) NONNULLARG1;
+staticfn boolean zap_steed(struct obj *) NONNULLARG1;
+staticfn void skiprange(int, int *, int *) NONNULLPTRS;
+staticfn void maybe_explode_trap(struct trap *, struct obj *,
                                boolean *) NONNULLARG3;
-static void zap_map(coordxy, coordxy, struct obj *) NONNULLARG3;
-static int zap_hit(int, int);
-static void disintegrate_mon(struct monst *, int, const char *) NONNULLARG1;
-static int adtyp_to_prop(int);
-static void backfire(struct obj *) NONNULLARG1;
-static int zap_ok(struct obj *) NO_NNARGS;
+staticfn void zap_map(coordxy, coordxy, struct obj *) NONNULLARG3;
+staticfn int zap_hit(int, int);
+staticfn void disintegrate_mon(struct monst *, int, const char *) NONNULLARG1;
+staticfn int adtyp_to_prop(int);
+staticfn void backfire(struct obj *) NONNULLARG1;
+staticfn int zap_ok(struct obj *) NO_NNARGS;
 /* all callers of boxlock_invent() pass a NONNULL obj, and boxlock
  * boxlock_invent() calls boxlock() which has nonnull arg. */
-static void boxlock_invent(struct obj *) NONNULLARG1;
-static int spell_hit_bonus(int);
-static int maybe_destroy_item(struct monst *, struct obj *, int) NONNULLPTRS;
-static boolean destroyable(struct obj *, int);
+staticfn void boxlock_invent(struct obj *) NONNULLARG1;
+staticfn int spell_hit_bonus(int);
+staticfn int maybe_destroy_item(struct monst *, struct obj *, int) NONNULLPTRS;
+staticfn boolean destroyable(struct obj *, int);
 
-static void wishcmdassist(int);
+staticfn void wishcmdassist(int);
 
 #define ZT_MAGIC_MISSILE (AD_MAGM - 1)
 #define ZT_FIRE (AD_FIRE - 1)
@@ -83,7 +83,7 @@ static const char *const flash_types[] = {
 };
 
 /* convert monster zap/spell/breath value to hero zap/spell/breath value */
-static int
+staticfn int
 zaptype(int type)
 {
     if (type <= -30 && -39 <= type) /* monster wand zap */
@@ -565,7 +565,7 @@ release_hold(void)
     }
 }
 
-static void
+staticfn void
 probe_objchain(struct obj *otmp)
 {
     for (; otmp; otmp = otmp->nobj) {
@@ -816,7 +816,7 @@ get_container_location(
 }
 
 /* can zombie dig the location at x,y */
-static boolean
+staticfn boolean
 zombie_can_dig(coordxy x, coordxy y)
 {
     if (isok(x, y)) {
@@ -1095,7 +1095,7 @@ revive(struct obj *corpse, boolean by_hero)
     return mtmp;
 }
 
-static void
+staticfn void
 revive_egg(struct obj *obj) /* nonnull */
 {
     /*
@@ -1439,7 +1439,7 @@ obj_shudders(struct obj *obj)
  * there's a random factor here to keep from always using the stuff
  * at the top of the pile.
  */
-static void
+staticfn void
 polyuse(struct obj *objhdr, int mat, int minwt)
 {
     struct obj *otmp, *otmp2;
@@ -1480,7 +1480,7 @@ polyuse(struct obj *objhdr, int mat, int minwt)
  * Polymorph some of the stuff in this pile into a monster, preferably
  * a golem of the kind okind.
  */
-static void
+staticfn void
 create_polymon(struct obj *obj, int okind)
 {
     struct permonst *mdat = (struct permonst *) 0;
@@ -1622,7 +1622,7 @@ obj_unpolyable(struct obj *obj)
 
 /* classes of items whose current charge count carries over across polymorph
  */
-static const char charged_objs[] = { WAND_CLASS, WEAPON_CLASS, ARMOR_CLASS,
+staticfn const char charged_objs[] = { WAND_CLASS, WEAPON_CLASS, ARMOR_CLASS,
                                      '\0' };
 
 /*
@@ -1918,7 +1918,7 @@ poly_obj(struct obj *obj, int id)
 }
 
 /* stone-to-flesh spell hits and maybe transforms or animates obj */
-static int
+staticfn int
 stone_to_flesh_obj(struct obj *obj) /* nonnull */
 {
     struct permonst *ptr;
@@ -2501,7 +2501,7 @@ zapnodir(struct obj *obj)
     }
 }
 
-static void
+staticfn void
 backfire(struct obj *otmp)
 {
     int dmg;
@@ -2514,7 +2514,7 @@ backfire(struct obj *otmp)
 }
 
 /* getobj callback for object to zap */
-static int
+staticfn int
 zap_ok(struct obj *obj)
 {
     if (obj && obj->oclass == WAND_CLASS)
@@ -2583,7 +2583,7 @@ dozap(void)
 }
 
 /* Lock or unlock all boxes in inventory */
-static void
+staticfn void
 boxlock_invent(struct obj *obj)
 {
     struct obj *otmp;
@@ -2970,7 +2970,7 @@ flashburn(long duration)
  * Return TRUE if the steed was hit by the wand.
  * Return FALSE if the steed was not hit by the wand.
  */
-static boolean
+staticfn boolean
 zap_steed(struct obj *obj) /* wand or spell */
 {
     int steedhit = FALSE;
@@ -3102,7 +3102,7 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
 }
 
 /* you've zapped an immediate type wand up or down */
-static boolean
+staticfn boolean
 zap_updown(struct obj *obj) /* wand or spell, nonnull */
 {
     boolean striking = FALSE, disclose = FALSE, map_zapped = FALSE;
@@ -3391,7 +3391,7 @@ spell_damage_bonus(
  * Generate the to hit bonus for a spell.  Based on the hero's skill in
  * spell class and dexterity.
  */
-static int
+staticfn int
 spell_hit_bonus(int skill)
 {
     int hit_bon = 0;
@@ -3463,7 +3463,7 @@ miss(const char *str, struct monst *mtmp)
            && flags.verbose) ? mon_nam(mtmp) : "it");
 }
 
-static void
+staticfn void
 skiprange(int range, int *skipstart, int *skipend)
 {
     int tr = (range / 4);
@@ -3478,7 +3478,7 @@ skiprange(int range, int *skipstart, int *skipend)
 /* Maybe explode a trap hit by object otmp's effect;
    cancellation beam hitting a magical trap causes an explosion.
    Might delete the trap; won't destroy otmp. */
-static void
+staticfn void
 maybe_explode_trap(
     struct trap *ttmp,
     struct obj *otmp,
@@ -3512,7 +3512,7 @@ maybe_explode_trap(
 
 /* zap_map() occurs before hitting monsters or objects and handles wands or
    spells that don't dish out 'elemental' damage */
-static void
+staticfn void
 zap_map(
     coordxy x, coordxy y,
     struct obj *obj) /* zapped wand, or book for cast spell */
@@ -4255,7 +4255,7 @@ zhitm(
     return tmp;
 }
 
-static void
+staticfn void
 zhitu(
     int type, int nd,
     const char *fltxt,
@@ -4514,7 +4514,7 @@ burn_floor_objects(
 }
 
 /* will zap/spell/breath attack score a hit against armor class `ac'? */
-static int
+staticfn int
 zap_hit(int ac,
         int type) /* either hero cast spell type or 0 */
 {
@@ -4531,7 +4531,7 @@ zap_hit(int ac,
     return (3 - chance < ac + spell_bonus);
 }
 
-static void
+staticfn void
 disintegrate_mon(
     struct monst *mon,
     int type, /* hero vs other */
@@ -5429,7 +5429,7 @@ break_statue(struct obj *obj)
  * Note that things like the Book of the Dead are eligible even though they
  * won't get destroyed, because it will attempt to be destroyed but print a
  * special message instead. */
-static boolean
+staticfn boolean
 destroyable(struct obj *obj, int adtyp)
 {
     if (obj->oartifact) {
@@ -5470,7 +5470,7 @@ destroyable(struct obj *obj, int adtyp)
 }
 
 /* convert attack damage AD_foo to property resistance */
-static int
+staticfn int
 adtyp_to_prop(int dmgtyp)
 {
     switch (dmgtyp) {
@@ -5589,6 +5589,7 @@ item_what(int dmgtyp)
  *      [6] shocked wand
  * (books, rings, and wands don't stack so don't need plural form;
  *  crumbling ring doesn't do damage so doesn't need killer reason)
+ * externally referenced from trap.c.
  */
 const char *const destroy_strings[][3] = {
     /* also used in trap.c */
@@ -5609,7 +5610,7 @@ const char *const destroy_strings[][3] = {
    whether it's the player or a monster having an item destroyed: players lose
    the HP and possibly die in this function, and the return value is unused,
    whereas monsters return the damage to their caller to be taken off later */
-static int
+staticfn int
 maybe_destroy_item(
     struct monst *carrier,
     struct obj *obj,
@@ -5973,7 +5974,7 @@ resist(struct monst *mtmp, char oclass, int damage, int tell)
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
-static void
+staticfn void
 wishcmdassist(int triesleft)
 {
     static NEARDATA const char *

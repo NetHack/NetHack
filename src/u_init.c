@@ -13,19 +13,19 @@ struct trobj {
     Bitfield(trbless, 2);
 };
 
-static struct obj *ini_inv_mkobj_filter(int, boolean);
-static short ini_inv_obj_substitution(struct trobj *,
+staticfn struct obj *ini_inv_mkobj_filter(int, boolean);
+staticfn short ini_inv_obj_substitution(struct trobj *,
                                       struct obj *) NONNULLPTRS;
-static void ini_inv_adjust_obj(struct trobj *,
+staticfn void ini_inv_adjust_obj(struct trobj *,
                                struct obj *) NONNULLPTRS;
-static void ini_inv_use_obj(struct obj *) NONNULLARG1;
-static void ini_inv(struct trobj *) NONNULLARG1;
-static void knows_object(int);
-static void knows_class(char);
-static void u_init_role(void);
-static void u_init_race(void);
-static void u_init_carry_attr_boost(void);
-static boolean restricted_spell_discipline(int);
+staticfn void ini_inv_use_obj(struct obj *) NONNULLARG1;
+staticfn void ini_inv(struct trobj *) NONNULLARG1;
+staticfn void knows_object(int);
+staticfn void knows_class(char);
+staticfn void u_init_role(void);
+staticfn void u_init_race(void);
+staticfn void u_init_carry_attr_boost(void);
+staticfn boolean restricted_spell_discipline(int);
 
 #define UNDEF_TYP 0
 #define UNDEF_SPE '\177'
@@ -558,7 +558,7 @@ static const struct def_skill Skill_W[] = {
     { P_NONE, 0 }
 };
 
-static void
+staticfn void
 knows_object(int obj)
 {
     discover_object(obj, TRUE, FALSE);
@@ -567,7 +567,7 @@ knows_object(int obj)
 
 /* Know ordinary (non-magical) objects of a certain class,
    like all gems except the loadstone and luckstone. */
-static void
+staticfn void
 knows_class(char sym)
 {
     struct obj odummy, *o;
@@ -609,7 +609,7 @@ knows_class(char sym)
 }
 
 /* role-specific initializations */
-static void
+staticfn void
 u_init_role(void)
 {
     int i;
@@ -766,7 +766,7 @@ u_init_role(void)
 }
 
 /* race-specific initializations */
-static void
+staticfn void
 u_init_race(void)
 {
     switch (Race_switch) {
@@ -839,7 +839,7 @@ u_init_race(void)
 }
 
 /* boost STR and CON until hero can carry inventory */
-static void
+staticfn void
 u_init_carry_attr_boost(void)
 {
     /* make sure you can carry all you have - especially for Tourists */
@@ -968,7 +968,7 @@ u_init(void)
 }
 
 /* skills aren't initialized, so we use the role-specific skill lists */
-static boolean
+staticfn boolean
 restricted_spell_discipline(int otyp)
 {
     const struct def_skill *skills;
@@ -1028,7 +1028,7 @@ restricted_spell_discipline(int otyp)
 }
 
 /* create random object of certain class, filtering out too powerful items */
-static struct obj *
+staticfn struct obj *
 ini_inv_mkobj_filter(int oclass, boolean got_level1_spellbook)
 {
     struct obj *obj;
@@ -1092,7 +1092,7 @@ ini_inv_mkobj_filter(int oclass, boolean got_level1_spellbook)
 
 /* substitute object with something else based on race.
    only changes otyp, and returns it. */
-static short
+staticfn short
 ini_inv_obj_substitution(struct trobj *trop, struct obj *obj)
 {
     if (gu.urace.mnum != PM_HUMAN) {
@@ -1116,7 +1116,7 @@ ini_inv_obj_substitution(struct trobj *trop, struct obj *obj)
     return obj->otyp;
 }
 
-static void
+staticfn void
 ini_inv_adjust_obj(struct trobj *trop, struct obj *obj)
 {
     if (trop->trclass == COIN_CLASS) {
@@ -1159,7 +1159,7 @@ ini_inv_adjust_obj(struct trobj *trop, struct obj *obj)
 }
 
 /* initial inventory: wear, wield, learn the spell/obj */
-static void
+staticfn void
 ini_inv_use_obj(struct obj *obj)
 {
     /* Make the type known if necessary */
@@ -1206,7 +1206,7 @@ ini_inv_use_obj(struct obj *obj)
         initialspell(obj);
 }
 
-static void
+staticfn void
 ini_inv(struct trobj *trop)
 {
     struct obj *obj;

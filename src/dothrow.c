@@ -7,21 +7,21 @@
 
 #include "hack.h"
 
-static int throw_obj(struct obj *, int);
-static boolean ok_to_throw(int *);
-static int throw_ok(struct obj *);
-static void autoquiver(void);
-static struct obj *find_launcher(struct obj *);
-static int gem_accept(struct monst *, struct obj *);
-static boolean toss_up(struct obj *, boolean) NONNULLARG1;
-static void sho_obj_return_to_u(struct obj * obj);
-static struct obj *return_throw_to_inv(struct obj *, long, boolean,
+staticfn int throw_obj(struct obj *, int);
+staticfn boolean ok_to_throw(int *);
+staticfn int throw_ok(struct obj *);
+staticfn void autoquiver(void);
+staticfn struct obj *find_launcher(struct obj *);
+staticfn int gem_accept(struct monst *, struct obj *);
+staticfn boolean toss_up(struct obj *, boolean) NONNULLARG1;
+staticfn void sho_obj_return_to_u(struct obj * obj);
+staticfn struct obj *return_throw_to_inv(struct obj *, long, boolean,
                                        struct obj *);
-static void tmiss(struct obj *, struct monst *, boolean);
-static int throw_gold(struct obj *);
-static void check_shop_obj(struct obj *, coordxy, coordxy, boolean);
-static void breakmsg(struct obj *, boolean);
-static boolean mhurtle_step(genericptr_t, coordxy, coordxy);
+staticfn void tmiss(struct obj *, struct monst *, boolean);
+staticfn int throw_gold(struct obj *);
+staticfn void check_shop_obj(struct obj *, coordxy, coordxy, boolean);
+staticfn void breakmsg(struct obj *, boolean);
+staticfn boolean mhurtle_step(genericptr_t, coordxy, coordxy);
 
 /* uwep might already be removed from inventory so test for W_WEP instead;
    for Valk+Mjollnir, caller needs to validate the strength requirement */
@@ -80,7 +80,7 @@ multishot_class_bonus(
 }
 
 /* Throw the selected object, asking for direction */
-static int
+staticfn int
 throw_obj(struct obj *obj, int shotlimit)
 {
     struct obj *otmp, *oldslot;
@@ -287,7 +287,7 @@ throw_obj(struct obj *obj, int shotlimit)
 }
 
 /* common to dothrow() and dofire() */
-static boolean
+staticfn boolean
 ok_to_throw(int *shotlimit_p) /* (see dothrow()) */
 {
     *shotlimit_p = LIMIT_TO_RANGE_INT(0, LARGEST_INT, gc.command_count);
@@ -307,7 +307,7 @@ ok_to_throw(int *shotlimit_p) /* (see dothrow()) */
 }
 
 /* getobj callback for object to be thrown */
-static int
+staticfn int
 throw_ok(struct obj *obj)
 {
     if (!obj)
@@ -371,7 +371,7 @@ dothrow(void)
 
 /* KMH -- Automatically fill quiver */
 /* Suggested by Jeffrey Bay <jbay@convex.hp.com> */
-static void
+staticfn void
 autoquiver(void)
 {
     struct obj *otmp, *oammo = 0, *omissile = 0, *omisc = 0, *altammo = 0;
@@ -437,7 +437,7 @@ autoquiver(void)
 
 /* look through hero inventory for launcher matching ammo,
    avoiding known cursed items. Returns NULL if no match. */
-static struct obj *
+staticfn struct obj *
 find_launcher(struct obj *ammo)
 {
     struct obj *otmp, *oX;
@@ -992,7 +992,7 @@ will_hurtle(struct monst *mon, coordxy x, coordxy y)
     return goodpos(x, y, mon, MM_IGNOREWATER | MM_IGNORELAVA);
 }
 
-static boolean
+staticfn boolean
 mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
 {
     struct monst *mon = (struct monst *) arg;
@@ -1180,7 +1180,7 @@ mhurtle(struct monst *mon, int dx, int dy, int range)
     return;
 }
 
-static void
+staticfn void
 check_shop_obj(struct obj *obj, coordxy x, coordxy y, boolean broken)
 {
     boolean costly_xy;
@@ -1255,7 +1255,7 @@ harmless_missile(struct obj *obj)
  *
  * Returns FALSE if the object is gone.
  */
-static boolean
+staticfn boolean
 toss_up(struct obj *obj, boolean hitsroof)
 {
     const char *action;
@@ -1432,7 +1432,7 @@ throwing_weapon(struct obj *obj)
 }
 
 /* the currently thrown object is returning to you (not for boomerangs) */
-static void
+staticfn void
 sho_obj_return_to_u(struct obj *obj)
 {
     /* might already be our location (bounced off a wall) */
@@ -1807,7 +1807,7 @@ throwit(struct obj *obj,
 /* handle a throw-and-return missile coming back into inventory; makes sure
    that if it was wielded, it will be re-wielded; if it was split off of a
    stack (boomerang), don't let it merge with a different compatible stack */
-static struct obj *
+staticfn struct obj *
 return_throw_to_inv(
     struct obj *obj,     /* object to add to invent */
     long wep_mask,       /* its owornmask before it was removed from invent */
@@ -1903,7 +1903,7 @@ omon_adj(struct monst *mon, struct obj *obj, boolean mon_notices)
 }
 
 /* thrown object misses target monster */
-static void
+staticfn void
 tmiss(struct obj *obj, struct monst *mon, boolean maybe_wakeup)
 {
     const char *missile = mshot_xname(obj);
@@ -2259,7 +2259,7 @@ thitmonst(
 
 #undef special_obj_hits_leader
 
-static int
+staticfn int
 gem_accept(struct monst *mon, struct obj *obj)
 {
     static NEARDATA const char
@@ -2557,7 +2557,7 @@ breaktest(struct obj *obj)
     }
 }
 
-static void
+staticfn void
 breakmsg(struct obj *obj, boolean in_view)
 {
     const char *to_pieces;
@@ -2599,7 +2599,7 @@ breakmsg(struct obj *obj, boolean in_view)
     }
 }
 
-static int
+staticfn int
 throw_gold(struct obj *obj)
 {
     int range, odx, ody;

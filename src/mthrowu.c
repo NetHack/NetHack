@@ -5,13 +5,13 @@
 
 #include "hack.h"
 
-static int monmulti(struct monst *, struct obj *, struct obj *);
-static void monshoot(struct monst *, struct obj *, struct obj *);
-static boolean ucatchgem(struct obj *, struct monst *);
-static const char *breathwep_name(int);
-static boolean drop_throw(struct obj *, boolean, coordxy, coordxy);
-static boolean blocking_terrain(coordxy, coordxy);
-static int m_lined_up(struct monst *, struct monst *) NONNULLARG12;
+staticfn int monmulti(struct monst *, struct obj *, struct obj *);
+staticfn void monshoot(struct monst *, struct obj *, struct obj *);
+staticfn boolean ucatchgem(struct obj *, struct monst *);
+staticfn const char *breathwep_name(int);
+staticfn boolean drop_throw(struct obj *, boolean, coordxy, coordxy);
+staticfn boolean blocking_terrain(coordxy, coordxy);
+staticfn int m_lined_up(struct monst *, struct monst *) NONNULLARG12;
 
 #define URETREATING(x, y) \
     (distmin(u.ux, u.uy, x, y) > distmin(u.ux0, u.uy0, x, y))
@@ -26,7 +26,7 @@ static NEARDATA const char *breathwep[] = {
 };
 
 /* hallucinatory ray types */
-const char *const hallublasts[] = {
+static const char *const hallublasts[] = {
     "asteroids", "beads", "bubbles", "butterflies", "champagne", "chaos",
     "coins", "cotton candy", "crumbs", "dark matter", "darkness", "dust specks",
     "emoticons", "emotions", "entropy", "flowers", "foam", "fog", "gamma rays",
@@ -156,7 +156,7 @@ thitu(
  * dothrow.c (for consistency). --KAA
  * Returns FALSE if object still exists (not destroyed).
  */
-static boolean
+staticfn boolean
 drop_throw(
     struct obj *obj,
     boolean ohit,
@@ -195,7 +195,7 @@ drop_throw(
 
 /* calculate multishot volley count for mtmp throwing otmp (if not ammo) or
    shooting otmp with mwep (if otmp is ammo and mwep appropriate launcher) */
-static int
+staticfn int
 monmulti(struct monst *mtmp, struct obj *otmp, struct obj *mwep)
 {
     int multishot = 1;
@@ -254,7 +254,7 @@ monmulti(struct monst *mtmp, struct obj *otmp, struct obj *mwep)
 }
 
 /* mtmp throws otmp, or shoots otmp with mwep, at hero or at monster mtarg */
-static void
+staticfn void
 monshoot(struct monst *mtmp, struct obj *otmp, struct obj *mwep)
 {
     struct monst *mtarg = gm.mtarget;
@@ -498,7 +498,7 @@ ohitmon(
 }
 
 /* hero catches gem thrown by mon iff poly'd into unicorn; might drop it */
-static boolean
+staticfn boolean
 ucatchgem(
     struct obj *gem,   /* caller has verified gem->oclass */
     struct monst *mon)
@@ -888,7 +888,7 @@ spitmm(struct monst *mtmp, struct attack *mattk, struct monst *mtarg)
 /* Return the name of a breath weapon. If the player is hallucinating, return
  * a silly name instead.
  * typ is AD_MAGM, AD_FIRE, etc */
-static const char *
+staticfn const char *
 breathwep_name(int typ)
 {
     if (Hallucination)
@@ -1078,7 +1078,7 @@ breamu(struct monst *mtmp, struct attack *mattk)
 }
 
 /* return TRUE if terrain at x,y blocks linedup checks */
-static boolean
+staticfn boolean
 blocking_terrain(coordxy x, coordxy y)
 {
     if (!isok(x, y) || IS_ROCK(levl[x][y].typ) || closed_door(x, y)
@@ -1172,7 +1172,7 @@ linedup(
     return FALSE;
 }
 
-static int
+staticfn int
 m_lined_up(struct monst *mtarg, struct monst *mtmp)
 {
     boolean utarget = (mtarg == &gy.youmonst);

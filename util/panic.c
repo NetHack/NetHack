@@ -19,7 +19,7 @@ extern void vms_abort(void);
 #endif
 
 /*VARARGS1*/
-boolean panicking;
+static boolean panicking;
 void panic(const char *, ...);
 
 DISABLE_WARNING_FORMAT_NONLITERAL

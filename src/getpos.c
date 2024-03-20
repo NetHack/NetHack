@@ -6,25 +6,25 @@
 
 extern const char what_is_an_unknown_object[]; /* from pager.c */
 
-static void getpos_toggle_hilite_state(void);
-static void getpos_getvalids_selection(struct selectionvar *,
+staticfn void getpos_toggle_hilite_state(void);
+staticfn void getpos_getvalids_selection(struct selectionvar *,
                                        boolean (*)(coordxy, coordxy));
-static void getpos_help_keyxhelp(winid, const char *, const char *, int);
-static void getpos_help(boolean, const char *);
-static int QSORTCALLBACK cmp_coord_distu(const void *, const void *);
-static int gloc_filter_classify_glyph(int);
-static int gloc_filter_floodfill_matcharea(coordxy, coordxy);
-static void gloc_filter_floodfill(coordxy, coordxy);
-static void gloc_filter_init(void);
-static void gloc_filter_done(void);
-static void gather_locs(coord **, int *, int);
-static void truncate_to_map(coordxy *, coordxy *, schar, schar);
-static void getpos_refresh(void);
+staticfn void getpos_help_keyxhelp(winid, const char *, const char *, int);
+staticfn void getpos_help(boolean, const char *);
+staticfn int QSORTCALLBACK cmp_coord_distu(const void *, const void *);
+staticfn int gloc_filter_classify_glyph(int);
+staticfn int gloc_filter_floodfill_matcharea(coordxy, coordxy);
+staticfn void gloc_filter_floodfill(coordxy, coordxy);
+staticfn void gloc_filter_init(void);
+staticfn void gloc_filter_done(void);
+staticfn void gather_locs(coord **, int *, int);
+staticfn void truncate_to_map(coordxy *, coordxy *, schar, schar);
+staticfn void getpos_refresh(void);
 /* Callback function for getpos() to highlight desired map locations.
  * Parameter TRUE: initialize and highlight, FALSE: done (remove highlights).
  */
-static void (*getpos_hilitefunc)(boolean) = (void (*)(boolean)) 0;
-static boolean (*getpos_getvalid)(coordxy, coordxy)
+staticfn void (*getpos_hilitefunc)(boolean) = (void (*)(boolean)) 0;
+staticfn boolean (*getpos_getvalid)(coordxy, coordxy)
                                           = (boolean (*)(coordxy, coordxy)) 0;
 enum getposHiliteState {
     HiliteNormalMap = 0,
@@ -67,7 +67,7 @@ getpos_sethilite(
    positions and showing them via temporary S_goodpos symbol;
    when 'bgcolors' is On, there are three states and showing them via
    setting background color becomes the default */
-static void
+staticfn void
 getpos_toggle_hilite_state(void)
 {
     /* getpos_hilitefunc isn't Null */
@@ -97,7 +97,7 @@ mapxy_valid(coordxy x, coordxy y)
     return FALSE;
 }
 
-static void
+staticfn void
 getpos_getvalids_selection(
     struct selectionvar *sel,
     boolean (*validf)(coordxy, coordxy))
@@ -132,7 +132,7 @@ static const char *const gloc_filtertxt[NUM_GFILTER] = {
     " in this area"
 };
 
-static void
+staticfn void
 getpos_help_keyxhelp(
     winid tmpwin,
     const char *k1, const char *k2,
@@ -162,7 +162,7 @@ getpos_help_keyxhelp(
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* the response for '?' help request in getpos() */
-static void
+staticfn void
 getpos_help(boolean force, const char *goal)
 {
     static const char *const fastmovemode[2] = { "8 units at a time",
@@ -307,7 +307,7 @@ getpos_help(boolean force, const char *goal)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
-static int QSORTCALLBACK
+staticfn int QSORTCALLBACK
 cmp_coord_distu(const void *a, const void *b)
 {
     const coord *c1 = a;
@@ -336,7 +336,7 @@ cmp_coord_distu(const void *a, const void *b)
     (isok((x), (y))                                             \
      && (selection_getpoint((x),(y), gg.gloc_filter_map)))
 
-static int
+staticfn int
 gloc_filter_classify_glyph(int glyph)
 {
     int c;
@@ -359,7 +359,7 @@ gloc_filter_classify_glyph(int glyph)
     return 0;
 }
 
-static int
+staticfn int
 gloc_filter_floodfill_matcharea(coordxy x, coordxy y)
 {
     int glyph = back_to_glyph(x, y);
@@ -377,7 +377,7 @@ gloc_filter_floodfill_matcharea(coordxy x, coordxy y)
     return FALSE;
 }
 
-static void
+staticfn void
 gloc_filter_floodfill(coordxy x, coordxy y)
 {
     gg.gloc_filter_floodfill_match_glyph = back_to_glyph(x, y);
@@ -386,7 +386,7 @@ gloc_filter_floodfill(coordxy x, coordxy y)
     selection_floodfill(gg.gloc_filter_map, x, y, FALSE);
 }
 
-static void
+staticfn void
 gloc_filter_init(void)
 {
     if (iflags.getloc_filter == GFILTER_AREA) {
@@ -407,7 +407,7 @@ gloc_filter_init(void)
     }
 }
 
-static void
+staticfn void
 gloc_filter_done(void)
 {
     if (gg.gloc_filter_map) {
@@ -490,7 +490,7 @@ gather_locs_interesting(coordxy x, coordxy y, int gloc)
 RESTORE_WARNINGS
 
 /* gather locations for monsters or objects shown on the map */
-static void
+staticfn void
 gather_locs(coord **arr_p, int *cnt_p, int gloc)
 {
     int pass, idx;
@@ -706,7 +706,7 @@ getpos_menu(coord *ccp, int gloc)
 }
 
 /* add dx,dy to cx,cy, truncating at map edges */
-static void
+staticfn void
 truncate_to_map(coordxy *cx, coordxy *cy, schar dx, schar dy)
 {
     /* diagonal moves complicate this... */
@@ -730,7 +730,7 @@ truncate_to_map(coordxy *cx, coordxy *cy, schar dx, schar dy)
 
 /* called when ^R typed; if '$' is being shown for valid spots, remove that;
    if alternate background color is being shown for that, redraw it */
-static void
+staticfn void
 getpos_refresh(void)
 {
     if (getpos_hilitefunc && getpos_hilite_state == HiliteGoodposSymbol) {

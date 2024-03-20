@@ -97,11 +97,11 @@ Strlen_(
     return (unsigned) len;
 }
 
-static boolean pmatch_internal(const char *, const char *, boolean,
+staticfn boolean pmatch_internal(const char *, const char *, boolean,
                                const char *);
 /* guts of pmatch(), pmatchi(), and pmatchz();
    match a string against a pattern */
-static boolean
+staticfn boolean
 pmatch_internal(const char *patrn, const char *strng,
                 boolean ci,     /* True => case-insensitive,
                                    False => case-sensitive */

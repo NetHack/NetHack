@@ -8,40 +8,40 @@
 
 /* #define DEBUG */ /* uncomment for debugging */
 
-static boolean could_move_onto_boulder(coordxy, coordxy);
-static int moverock(void);
-static void dosinkfall(void);
-static boolean findtravelpath(int);
-static boolean trapmove(coordxy, coordxy, struct trap *);
-static int QSORTCALLBACK notice_mons_cmp(const genericptr, const genericptr);
-static schar u_simple_floortyp(coordxy, coordxy);
-static boolean swim_move_danger(coordxy, coordxy);
-static boolean domove_bump_mon(struct monst *, int) NONNULLARG1;
-static boolean domove_attackmon_at(struct monst *, coordxy, coordxy,
+staticfn boolean could_move_onto_boulder(coordxy, coordxy);
+staticfn int moverock(void);
+staticfn void dosinkfall(void);
+staticfn boolean findtravelpath(int);
+staticfn boolean trapmove(coordxy, coordxy, struct trap *);
+staticfn int QSORTCALLBACK notice_mons_cmp(const genericptr, const genericptr);
+staticfn schar u_simple_floortyp(coordxy, coordxy);
+staticfn boolean swim_move_danger(coordxy, coordxy);
+staticfn boolean domove_bump_mon(struct monst *, int) NONNULLARG1;
+staticfn boolean domove_attackmon_at(struct monst *, coordxy, coordxy,
                                    boolean *) NONNULLPTRS;
-static boolean domove_fight_ironbars(coordxy, coordxy);
-static boolean domove_fight_web(coordxy, coordxy);
-static boolean domove_swap_with_pet(struct monst *,
+staticfn boolean domove_fight_ironbars(coordxy, coordxy);
+staticfn boolean domove_fight_web(coordxy, coordxy);
+staticfn boolean domove_swap_with_pet(struct monst *,
                                     coordxy, coordxy) NONNULLARG1;
-static boolean domove_fight_empty(coordxy, coordxy);
-static boolean air_turbulence(void);
-static void slippery_ice_fumbling(void);
-static boolean impaired_movement(coordxy *, coordxy *) NONNULLPTRS;
-static boolean avoid_moving_on_trap(coordxy, coordxy, boolean);
-static boolean avoid_moving_on_liquid(coordxy, coordxy, boolean);
-static boolean avoid_running_into_trap_or_liquid(coordxy, coordxy);
-static boolean move_out_of_bounds(coordxy, coordxy);
-static boolean carrying_too_much(void);
-static boolean escape_from_sticky_mon(coordxy, coordxy);
-static void domove_core(void);
-static void maybe_smudge_engr(coordxy, coordxy, coordxy, coordxy);
-static struct monst *monstinroom(struct permonst *, int) NONNULLARG1;
-static boolean furniture_present(int, int);
-static void move_update(boolean);
-static int pickup_checks(void);
-static boolean doorless_door(coordxy, coordxy);
-static void maybe_wail(void);
-static boolean water_turbulence(coordxy *, coordxy *);
+staticfn boolean domove_fight_empty(coordxy, coordxy);
+staticfn boolean air_turbulence(void);
+staticfn void slippery_ice_fumbling(void);
+staticfn boolean impaired_movement(coordxy *, coordxy *) NONNULLPTRS;
+staticfn boolean avoid_moving_on_trap(coordxy, coordxy, boolean);
+staticfn boolean avoid_moving_on_liquid(coordxy, coordxy, boolean);
+staticfn boolean avoid_running_into_trap_or_liquid(coordxy, coordxy);
+staticfn boolean move_out_of_bounds(coordxy, coordxy);
+staticfn boolean carrying_too_much(void);
+staticfn boolean escape_from_sticky_mon(coordxy, coordxy);
+staticfn void domove_core(void);
+staticfn void maybe_smudge_engr(coordxy, coordxy, coordxy, coordxy);
+staticfn struct monst *monstinroom(struct permonst *, int) NONNULLARG1;
+staticfn boolean furniture_present(int, int);
+staticfn void move_update(boolean);
+staticfn int pickup_checks(void);
+staticfn boolean doorless_door(coordxy, coordxy);
+staticfn void maybe_wail(void);
+staticfn boolean water_turbulence(coordxy *, coordxy *);
 
 #define IS_SHOP(x) (gr.rooms[x].rtype >= SHOPBASE)
 
@@ -131,7 +131,7 @@ revive_nasty(coordxy x, coordxy y, const char *msg)
 
 /* can hero move onto a spot containing one or more boulders?
    used for m<dir> and travel and during boulder push failure */
-static boolean
+staticfn boolean
 could_move_onto_boulder(coordxy sx, coordxy sy)
 {
     /* can if able to phaze through rock (must be poly'd, so not riding) */
@@ -152,7 +152,7 @@ could_move_onto_boulder(coordxy sx, coordxy sy)
     return squeezeablylightinvent();
 }
 
-static int
+staticfn int
 moverock(void)
 {
     coordxy rx, ry, sx, sy;
@@ -752,7 +752,7 @@ movobj(struct obj *obj, coordxy ox, coordxy oy)
     newsym(ox, oy);
 }
 
-static void
+staticfn void
 dosinkfall(void)
 {
     static const char fell_on_sink[] = "fell onto a sink";
@@ -1164,7 +1164,7 @@ test_move(
  * gt.travelmap keeps track of map locations we've moved through
  * this travel session. It will be cleared once the travel stops.
  */
-static boolean
+staticfn boolean
 findtravelpath(int mode)
 {
     if (!gt.travelmap)
@@ -1446,7 +1446,7 @@ is_valid_travelpt(coordxy x, coordxy y)
 /* try to escape being stuck in a trapped state by walking out of it;
    return true iff moving should continue to intended destination
    (all failures and most successful escapes leave hero at original spot) */
-static boolean
+staticfn boolean
 trapmove(
     coordxy x, coordxy y, /* targeted destination, <u.ux+u.dx,u.uy+u.dy> */
     struct trap *desttrap) /* nonnull if another trap at <x,y> */
@@ -1631,7 +1631,7 @@ notice_mon(struct monst *mtmp)
     }
 }
 
-static int QSORTCALLBACK
+staticfn int QSORTCALLBACK
 notice_mons_cmp(const genericptr ptr1, const genericptr ptr2)
 {
     const struct monst *m1 = *(const struct monst **) ptr1,
@@ -1720,7 +1720,7 @@ u_locomotion(const char *def)
 }
 
 /* Return a simplified floor solid/liquid state based on hero's state */
-static schar
+staticfn schar
 u_simple_floortyp(coordxy x, coordxy y)
 {
     boolean u_in_air = (Levitation || Flying || !grounded(gy.youmonst.data));
@@ -1768,7 +1768,7 @@ handle_tip(int tip)
 }
 
 /* Is it dangerous for hero to move to x,y due to water or lava? */
-static boolean
+staticfn boolean
 swim_move_danger(coordxy x, coordxy y)
 {
     schar newtyp = u_simple_floortyp(x, y);
@@ -1809,7 +1809,7 @@ swim_move_danger(coordxy x, coordxy y)
 }
 
 /* moving with 'm' prefix, bump into a monster? */
-static boolean
+staticfn boolean
 domove_bump_mon(struct monst *mtmp, int glyph)
 {
     /* If they used a 'm' command, trying to move onto a monster
@@ -1839,7 +1839,7 @@ domove_bump_mon(struct monst *mtmp, int glyph)
    returns TRUE if hero movement is used up.
    sets displaceu, if hero and monster could swap places instead.
 */
-static boolean
+staticfn boolean
 domove_attackmon_at(
     struct monst *mtmp,
     coordxy x, coordxy y,
@@ -1878,7 +1878,7 @@ domove_attackmon_at(
 }
 
 /* force-fight iron bars with your weapon? */
-static boolean
+staticfn boolean
 domove_fight_ironbars(coordxy x, coordxy y)
 {
     if (gc.context.forcefight && levl[x][y].typ == IRONBARS && uwep) {
@@ -1903,7 +1903,7 @@ domove_fight_ironbars(coordxy x, coordxy y)
 }
 
 /* force-fight a spider web with your weapon */
-static boolean
+staticfn boolean
 domove_fight_web(coordxy x, coordxy y)
 {
     struct trap *trap = t_at(x, y);
@@ -1980,7 +1980,7 @@ domove_fight_web(coordxy x, coordxy y)
 }
 
 /* maybe swap places with a pet? returns TRUE if swapped places */
-static boolean
+staticfn boolean
 domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
 {
     struct trap *trap;
@@ -2100,7 +2100,7 @@ domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
 }
 
 /* force-fight (x,y) which doesn't have anything to fight */
-static boolean
+staticfn boolean
 domove_fight_empty(coordxy x, coordxy y)
 {
     static const char unknown_obstacle[] = "an unknown obstacle";
@@ -2211,7 +2211,7 @@ domove_fight_empty(coordxy x, coordxy y)
 }
 
 /* does the plane of air disturb movement? */
-static boolean
+staticfn boolean
 air_turbulence(void)
 {
     if (Is_airlevel(&u.uz) && rn2(4) && !Levitation && !Flying) {
@@ -2234,7 +2234,7 @@ air_turbulence(void)
 }
 
 /* does water disturb the movement? */
-static boolean
+staticfn boolean
 water_turbulence(coordxy *x, coordxy *y)
 {
     if (u.uinwater) {
@@ -2265,7 +2265,7 @@ water_turbulence(coordxy *x, coordxy *y)
     return FALSE;
 }
 
-static void
+staticfn void
 slippery_ice_fumbling(void)
 {
     boolean on_ice = !Levitation && is_ice(u.ux, u.uy);
@@ -2294,7 +2294,7 @@ u_maybe_impaired(void)
 }
 
 /* change movement dir if impaired. return TRUE if can't move */
-static boolean
+staticfn boolean
 impaired_movement(coordxy *x, coordxy *y)
 {
     if (u_maybe_impaired()) {
@@ -2313,7 +2313,7 @@ impaired_movement(coordxy *x, coordxy *y)
     return FALSE;
 }
 
-static boolean
+staticfn boolean
 avoid_moving_on_trap(coordxy x, coordxy y, boolean msg)
 {
     struct trap *trap;
@@ -2329,7 +2329,7 @@ avoid_moving_on_trap(coordxy x, coordxy y, boolean msg)
     return FALSE;
 }
 
-static boolean
+staticfn boolean
 avoid_moving_on_liquid(
     coordxy x, coordxy y,
     boolean msg)
@@ -2361,7 +2361,7 @@ avoid_moving_on_liquid(
 
 /* when running/rushing, avoid stepping on a known trap or pool of liquid.
    returns TRUE if avoided. */
-static boolean
+staticfn boolean
 avoid_running_into_trap_or_liquid(coordxy x, coordxy y)
 {
     boolean would_stop = (gc.context.run >= 2);
@@ -2379,7 +2379,7 @@ avoid_running_into_trap_or_liquid(coordxy x, coordxy y)
 }
 
 /* trying to move out-of-bounds? */
-static boolean
+staticfn boolean
 move_out_of_bounds(coordxy x, coordxy y)
 {
     if (!isok(x, y)) {
@@ -2409,7 +2409,7 @@ move_out_of_bounds(coordxy x, coordxy y)
 }
 
 /* carrying too much to be able to move? */
-static boolean
+staticfn boolean
 carrying_too_much(void)
 {
     int wtcap;
@@ -2432,7 +2432,7 @@ carrying_too_much(void)
 
 /* try to pull free from sticking monster, or you release a monster
    you're sticking to. returns TRUE if you lose your movement. */
-static boolean
+staticfn boolean
 escape_from_sticky_mon(coordxy x, coordxy y)
 {
     if (u.ustuck && (x != u.ustuck->mx || y != u.ustuck->my)) {
@@ -2499,7 +2499,7 @@ domove(void)
         gd.domove_attempting = 0L;
 }
 
-static void
+staticfn void
 domove_core(void)
 {
     struct monst *mtmp;
@@ -2831,7 +2831,7 @@ runmode_delay_output(void)
     }
 }
 
-static void
+staticfn void
 maybe_smudge_engr(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
 {
     struct engr *ep;
@@ -3181,7 +3181,7 @@ spoteffects(boolean pick)
 }
 
 /* returns first matching monster */
-static struct monst *
+staticfn struct monst *
 monstinroom(struct permonst *mdat, int roomno)
 {
     struct monst *mtmp;
@@ -3197,7 +3197,7 @@ monstinroom(struct permonst *mdat, int roomno)
 }
 
 /* check whether room contains a particular type of furniture */
-static boolean
+staticfn boolean
 furniture_present(int furniture, int roomno)
 {
     int x, y, lx, ly, hx, hy;
@@ -3303,7 +3303,7 @@ in_town(coordxy x, coordxy y)
     return !has_subrooms;
 }
 
-static void
+staticfn void
 move_update(boolean newlev)
 {
     char c, *ptr1, *ptr2, *ptr3, *ptr4;
@@ -3502,7 +3502,7 @@ check_special_room(boolean newlev)
    0 = cannot pickup, no time taken
   -1 = do normal pickup
   -2 = loot the monster */
-static int
+staticfn int
 pickup_checks(void)
 {
     struct trap *traphere;
@@ -3776,7 +3776,7 @@ lookaround(void)
 }
 
 /* check for a doorway which lacks its door (NODOOR or BROKEN) */
-static boolean
+staticfn boolean
 doorless_door(coordxy x, coordxy y)
 {
     struct rm *lev_p = &levl[x][y];
@@ -3914,7 +3914,7 @@ unmul(const char *msg_override)
     }
 }
 
-static void
+staticfn void
 maybe_wail(void)
 {
     static short powers[] = { TELEPORT, SEE_INVIS, POISON_RES, COLD_RES,

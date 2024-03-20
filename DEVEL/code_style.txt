@@ -170,6 +170,19 @@ Variable names to avoid
                  processors with segmented architectures may treat
                  those as keywords. It is safest to just avoid them.
 
+    NEARDATA     Some data is marked with this define; the Amiga port uses
+                 it to mark data items to be used with a short addressing mode.
+                 You don't need to use this.
+
+static vs staticfn
+------------------
+
+The staticfn macro evaluates to either "static" or to nothing (see config.h).
+If possible, functions in src/*.c that would otherwise be marked static should
+be marked staticfn so platforms that do not name static functions in their
+stack traces can be forced to do so; this means function names cannot be
+reused.  Never use staticfn with data.
+
 Spaces in Expressions
 ---------------------
 
@@ -239,7 +252,6 @@ was source file(s) that didn't end in newline.  These days we try to force
 the final newline for every file, prior to release if not always maintained
 day-to-day.  The name at the end can still be worthwhile when editing or
 browsing multiple files.
-
 
 Vim Configuration
 =================

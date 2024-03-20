@@ -12,23 +12,29 @@
 #include <signal.h>
 #endif
 
-static void moveloop_preamble(boolean);
-static void u_calc_moveamt(int);
-static void maybe_do_tutorial(void);
+staticfn void moveloop_preamble(boolean);
+staticfn void u_calc_moveamt(int);
+staticfn void maybe_do_tutorial(void);
 #ifdef POSITIONBAR
-static void do_positionbar(void);
+staticfn void do_positionbar(void);
 #endif
-static void regen_pw(int);
-static void regen_hp(int);
-static void interrupt_multi(const char *);
-static void debug_fields(const char *);
+staticfn void regen_pw(int);
+staticfn void regen_hp(int);
+staticfn void interrupt_multi(const char *);
+staticfn void debug_fields(const char *);
 #ifndef NODUMPENUMS
-static void dump_enums(void);
+staticfn void dump_enums(void);
+#endif
+
+#ifdef CRASHREPORT
+#define USED_FOR_CRASHREPORT
+#else
+#define USED_FOR_CRASHREPORT UNUSED
 #endif
 
 /*ARGSUSED*/
 void
-early_init(int argc UNUSED, char *argv[] UNUSED)
+early_init(int argc USED_FOR_CRASHREPORT, char *argv[] USED_FOR_CRASHREPORT)
 {
 #ifdef CRASHREPORT
     /* Do this as early as possible, but let ports do other things first. */
@@ -41,7 +47,7 @@ early_init(int argc UNUSED, char *argv[] UNUSED)
     runtime_info_init();
 }
 
-static void
+staticfn void
 moveloop_preamble(boolean resuming)
 {
     /* if a save file created in normal mode is now being restored in
@@ -101,7 +107,7 @@ moveloop_preamble(boolean resuming)
         update_inventory();
 }
 
-static void
+staticfn void
 u_calc_moveamt(int wtcap)
 {
     int moveamt = 0;
@@ -516,7 +522,7 @@ moveloop_core(void)
     }
 }
 
-static void
+staticfn void
 maybe_do_tutorial(void)
 {
     s_level *sp = find_level("tut-1");
@@ -549,7 +555,7 @@ moveloop(boolean resuming)
     }
 }
 
-static void
+staticfn void
 regen_pw(int wtcap)
 {
     if (u.uen < u.uenmax
@@ -571,7 +577,7 @@ regen_pw(int wtcap)
 #define U_CAN_REGEN() (Regeneration || (Sleepy && u.usleep))
 
 /* maybe recover some lost health (or lose some when an eel out of water) */
-static void
+staticfn void
 regen_hp(int wtcap)
 {
     int heal = 0;
@@ -832,7 +838,7 @@ welcome(boolean new_game) /* false => restoring an old game */
 }
 
 #ifdef POSITIONBAR
-static void
+staticfn void
 do_positionbar(void)
 {
     /* FIXME: this will break if any coordinate is too big for (char);
@@ -875,7 +881,7 @@ do_positionbar(void)
 }
 #endif
 
-static void
+staticfn void
 interrupt_multi(const char *msg)
 {
     if (gm.multi > 0 && !gc.context.travel && !gc.context.run) {
@@ -1043,7 +1049,7 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
  *                    optimization so that display output
  *                    can be debugged without buffering.
  */
-static void
+staticfn void
 debug_fields(const char *opts)
 {
     char *op;
@@ -1109,6 +1115,7 @@ timet_delta(time_t etim, time_t stim) /* end and start times */
 
 #if !defined(NODUMPENUMS) || defined(ENHANCED_SYMBOLS)
 /* monsdump[] and objdump[] are also used in utf8map.c */
+
 #define DUMP_ENUMS
 struct enum_dump monsdump[] = {
 #include "monsters.h"
@@ -1124,46 +1131,46 @@ struct enum_dump objdump[] = {
 };
 
 #define DUMP_ENUMS_PCHAR
-struct enum_dump defsym_cmap_dump[] = {
+static struct enum_dump defsym_cmap_dump[] = {
 #include "defsym.h"
     { MAXPCHARS, "MAXPCHARS" },
 };
 #undef DUMP_ENUMS_PCHAR
 
 #define DUMP_ENUMS_MONSYMS
-struct enum_dump defsym_mon_syms_dump[] = {
+static struct enum_dump defsym_mon_syms_dump[] = {
 #include "defsym.h"
     { MAXMCLASSES, "MAXMCLASSES" },
 };
 #undef DUMP_ENUMS_MONSYMS
 
 #define DUMP_ENUMS_MONSYMS_DEFCHAR
-struct enum_dump defsym_mon_defchars_dump[] = {
+static struct enum_dump defsym_mon_defchars_dump[] = {
 #include "defsym.h"
 };
 #undef DUMP_ENUMS_MONSYMS_DEFCHAR
 
 #define DUMP_ENUMS_OBJCLASS_DEFCHARS
-struct enum_dump objclass_defchars_dump[] = {
+static struct enum_dump objclass_defchars_dump[] = {
 #include "defsym.h"
 };
 #undef DUMP_ENUMS_OBJCLASS_DEFCHARS
 
 #define DUMP_ENUMS_OBJCLASS_CLASSES
-struct enum_dump objclass_classes_dump[] = {
+static struct enum_dump objclass_classes_dump[] = {
 #include "defsym.h"
     { MAXOCLASSES, "MAXOCLASSES" },
 };
 #undef DUMP_ENUMS_OBJCLASS_CLASSES
 
 #define DUMP_ENUMS_OBJCLASS_SYMS
-struct enum_dump objclass_syms_dump[] = {
+static struct enum_dump objclass_syms_dump[] = {
 #include "defsym.h"
 };
 #undef DUMP_ENUMS_OBJCLASS_SYMS
 
 #define DUMP_ARTI_ENUM
-struct enum_dump arti_enum_dump[] = {
+static struct enum_dump arti_enum_dump[] = {
 #include "artilist.h"
     { AFTER_LAST_ARTIFACT, "AFTER_LAST_ARTIFACT" }
 };
@@ -1174,7 +1181,7 @@ struct enum_dump arti_enum_dump[] = {
 
 #ifndef NODUMPENUMS
 
-static void
+staticfn void
 dump_enums(void)
 {
     enum enum_dumps {

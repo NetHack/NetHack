@@ -22,7 +22,8 @@
  *              ....X   +4
  *              @...X   +4
  *
- */
+ * Externally referenced from light.c
+*/
 const coordxy circle_data[] = {
     /*  0*/ 0,
     /*  1*/ 1,  1,
@@ -86,14 +87,14 @@ static coordxy left_ptrs[ROWNO][COLNO]; /* LOS algorithm helpers */
 static coordxy right_ptrs[ROWNO][COLNO];
 
 /* Forward declarations. */
-static void fill_point(int, int);
-static void dig_point(int, int);
-static void view_init(void);
-static void view_from(coordxy, coordxy, seenV **, coordxy *, coordxy *, int,
+staticfn void fill_point(int, int);
+staticfn void dig_point(int, int);
+staticfn void view_init(void);
+staticfn void view_from(coordxy, coordxy, seenV **, coordxy *, coordxy *, int,
                       void (*)(coordxy, coordxy, genericptr_t),
                       genericptr_t);
-static void get_unused_cs(seenV ***, coordxy **, coordxy **);
-static void rogue_vision(seenV **, coordxy *, coordxy *);
+staticfn void get_unused_cs(seenV ***, coordxy **, coordxy **);
+staticfn void rogue_vision(seenV **, coordxy *, coordxy *);
 
 /* Macro definitions that I can't find anywhere. */
 #define sign(z) ((z) < 0 ? -1 : ((z) ? 1 : 0))
@@ -260,7 +261,7 @@ vision_reset(void)
  * Called from vision_recalc() and at least one light routine.  Get pointers
  * to the unused vision work area.
  */
-static void
+staticfn void
 get_unused_cs(seenV ***rows, coordxy **rmin, coordxy **rmax)
 {
     int row;
@@ -300,7 +301,7 @@ get_unused_cs(seenV ***rows, coordxy **rmin, coordxy **rmax)
  * We set the in_sight bit here as well to escape a bug that shows up
  * due to the one-sided lit wall hack.
  */
-static void
+staticfn void
 rogue_vision(seenV **next, coordxy *rmin, coordxy *rmax)
 {
     int rnum = levl[u.ux][u.uy].roomno - ROOMOFFSET; /* no SHARED... */
@@ -357,7 +358,7 @@ rogue_vision(seenV **next, coordxy *rmin, coordxy *rmax)
 
 #ifdef EXTEND_SPINE
 
-static int new_angle(struct rm *, unsigned char *, int, int);
+staticfn int new_angle(struct rm *, unsigned char *, int, int);
 /*
  * new_angle()
  *
@@ -400,7 +401,7 @@ static int new_angle(struct rm *, unsigned char *, int, int);
  *        many exceptions.  I may have to bite the bullet and do more
  *        checks.       - Dean 2/11/93
  */
-static int
+staticfn int
 new_angle(struct rm *lev, unsigned char *sv, int row, int col)
 {
     int res = *sv;
@@ -933,7 +934,7 @@ unblock_point(int x, int y)
  *   This means that a right-edge (a blocked spot that has an open
  *   spot on its right) will point to itself.
  */
-static void
+staticfn void
 dig_point(int row, int col)
 {
     int i;
@@ -1017,7 +1018,7 @@ dig_point(int row, int col)
     }
 }
 
-static void
+staticfn void
 fill_point(int row, int col)
 {
     int i;
@@ -1372,10 +1373,10 @@ static genericptr_t varg;
 
 #else /* !MACRO_CPATH -- quadrants are really functions */
 
-static int _q1_path(int, int, int, int);
-static int _q2_path(int, int, int, int);
-static int _q3_path(int, int, int, int);
-static int _q4_path(int, int, int, int);
+staticfn int _q1_path(int, int, int, int);
+staticfn int _q2_path(int, int, int, int);
+staticfn int _q3_path(int, int, int, int);
+staticfn int _q4_path(int, int, int, int);
 
 #define q1_path(sy, sx, y, x, dummy) result = _q1_path(sy, sx, y, x)
 #define q2_path(sy, sx, y, x, dummy) result = _q2_path(sy, sx, y, x)
@@ -1385,7 +1386,7 @@ static int _q4_path(int, int, int, int);
 /*
  * Quadrant I (step < 0).
  */
-static int
+staticfn int
 _q1_path(int scol, int srow, int y2, int x2)
 {
     int dx, dy;
@@ -1432,7 +1433,7 @@ _q1_path(int scol, int srow, int y2, int x2)
 /*
  * Quadrant IV (step > 0).
  */
-static int
+staticfn int
 _q4_path(int scol, int srow, int y2, int x2)
 {
     int dx, dy;
@@ -1479,7 +1480,7 @@ _q4_path(int scol, int srow, int y2, int x2)
 /*
  * Quadrant II (step < 0).
  */
-static int
+staticfn int
 _q2_path(int scol, int srow, int y2, int x2)
 {
     int dx, dy;
@@ -1526,7 +1527,7 @@ _q2_path(int scol, int srow, int y2, int x2)
 /*
  * Quadrant III (step > 0).
  */
-static int
+staticfn int
 _q3_path(int scol, int srow, int y2, int x2)
 {
     int dx, dy;
@@ -1613,11 +1614,11 @@ clear_path(int col1, int row1, int col2, int row2)
 /*
  * Defines local to Algorithm C.
  */
-static void right_side(int, int, int, const coordxy *);
-static void left_side(int, int, int, const coordxy *);
+staticfn void right_side(int, int, int, const coordxy *);
+staticfn void left_side(int, int, int, const coordxy *);
 
 /* Initialize algorithm C (nothing). */
-static void
+staticfn void
 view_init(void)
 {
 }
@@ -1632,7 +1633,7 @@ view_init(void)
  *   right_mark  last (right side) visible spot on prev row
  *   limits      points at range limit for current row, or NULL
  */
-static void
+staticfn void
 right_side(
     int row,
     int left,
@@ -1824,7 +1825,7 @@ right_side(
  * This routine is the mirror image of right_side().  See right_side() for
  * extensive comments.
  */
-static void
+staticfn void
 left_side(
     int row,
     int left_mark,
@@ -1968,7 +1969,7 @@ left_side(
  *   func           function to call on each spot
  *   arg            argument for func
  */
-static void
+staticfn void
 view_from(
     coordxy srow, coordxy scol,
     seenV **loc_cs_rows,

@@ -11,46 +11,46 @@
 #include "hack.h"
 #include "dlb.h"
 
-static boolean is_swallow_sym(int);
-static int append_str(char *, const char *) NONNULLPTRS;
-static void trap_description(char *, int, coordxy, coordxy) NONNULLARG1;
-static void look_at_object(char *, coordxy, coordxy, int) NONNULLARG1;
-static void look_at_monster(char *, char *, struct monst *,
+staticfn boolean is_swallow_sym(int);
+staticfn int append_str(char *, const char *) NONNULLPTRS;
+staticfn void trap_description(char *, int, coordxy, coordxy) NONNULLARG1;
+staticfn void look_at_object(char *, coordxy, coordxy, int) NONNULLARG1;
+staticfn void look_at_monster(char *, char *, struct monst *,
                                                coordxy, coordxy) NONNULLARG13;
 /* lookat() can return Null */
-static struct permonst *lookat(coordxy, coordxy, char *, char *) NONNULLPTRS;
-static boolean checkfile(char *, struct permonst *, unsigned,
+staticfn struct permonst *lookat(coordxy, coordxy, char *, char *) NONNULLPTRS;
+staticfn boolean checkfile(char *, struct permonst *, unsigned,
                                                             char *) NO_NNARGS;
-static int add_cmap_descr(int, int, int, int, coord,
+staticfn int add_cmap_descr(int, int, int, int, coord,
                           const char *, const char *,
                           boolean *, const char **, char *) NONNULLPTRS;
-static void look_region_nearby(coordxy *, coordxy *, coordxy *, coordxy *,
+staticfn void look_region_nearby(coordxy *, coordxy *, coordxy *, coordxy *,
                                boolean) NONNULLPTRS;
-static void look_all(boolean, boolean);
-static void look_traps(boolean);
-static void look_engrs(boolean);
-static void do_supplemental_info(char *, struct permonst *,
+staticfn void look_all(boolean, boolean);
+staticfn void look_traps(boolean);
+staticfn void look_engrs(boolean);
+staticfn void do_supplemental_info(char *, struct permonst *,
                                                          boolean) NONNULLPTRS;
-static void whatdoes_help(void);
-static void docontact(void);
-static void dispfile_help(void);
-static void dispfile_shelp(void);
-static void dispfile_optionfile(void);
-static void dispfile_optmenu(void);
-static void dispfile_license(void);
-static void dispfile_debughelp(void);
-static void dispfile_usagehelp(void);
-static void hmenu_doextversion(void);
-static void hmenu_dohistory(void);
-static void hmenu_dowhatis(void);
-static void hmenu_dowhatdoes(void);
-static void hmenu_doextlist(void);
-static void domenucontrols(void);
+staticfn void whatdoes_help(void);
+staticfn void docontact(void);
+staticfn void dispfile_help(void);
+staticfn void dispfile_shelp(void);
+staticfn void dispfile_optionfile(void);
+staticfn void dispfile_optmenu(void);
+staticfn void dispfile_license(void);
+staticfn void dispfile_debughelp(void);
+staticfn void dispfile_usagehelp(void);
+staticfn void hmenu_doextversion(void);
+staticfn void hmenu_dohistory(void);
+staticfn void hmenu_dowhatis(void);
+staticfn void hmenu_dowhatdoes(void);
+staticfn void hmenu_doextlist(void);
+staticfn void domenucontrols(void);
 #ifdef PORT_HELP
 extern void port_help(void);
 #endif
-static char *setopt_cmd(char *) NONNULL NONNULLARG1;
-static boolean add_quoted_engraving(coordxy, coordxy, char *) NONNULLARG3;
+staticfn char *setopt_cmd(char *) NONNULL NONNULLARG1;
+staticfn boolean add_quoted_engraving(coordxy, coordxy, char *) NONNULLARG3;
 
 enum checkfileflags {
     chkfilNone     = 0,
@@ -63,7 +63,7 @@ static const char invisexplain[] = "remembered, unseen, creature",
            altinvisexplain[] = "unseen creature"; /* for clairvoyance */
 
 /* Returns "true" for characters that could represent a monster's stomach. */
-static boolean
+staticfn boolean
 is_swallow_sym(int c)
 {
     int i;
@@ -77,7 +77,7 @@ is_swallow_sym(int c)
 /* Append " or "+new_str to the end of buf if new_str doesn't already exist
    as a substring of buf.  Return 1 if the string was appended, 0 otherwise.
    It is expected that buf is of size BUFSZ. */
-static int
+staticfn int
 append_str(char *buf, const char *new_str)
 {
     static const char sep[] = " or ";
@@ -159,7 +159,7 @@ monhealthdescr(struct monst *mon, boolean addspace, char *outbuf)
 }
 
 /* copy a trap's description into outbuf[] */
-static void
+staticfn void
 trap_description(char *outbuf, int tnum, coordxy x, coordxy y)
 {
     /*
@@ -310,7 +310,7 @@ object_from_map(int glyph, coordxy x, coordxy y, struct obj **obj_p)
     return fakeobj; /* when True, caller needs to dealloc *obj_p */
 }
 
-static void
+staticfn void
 look_at_object(
     char *buf, /* output buffer */
     coordxy x, coordxy y,
@@ -346,7 +346,7 @@ look_at_object(
     return;
 }
 
-static void
+staticfn void
 look_at_monster(
     char *buf, char *monbuf, /* buf: output, monbuf: optional output */
     struct monst *mtmp,
@@ -578,7 +578,7 @@ ice_descr(coordxy x, coordxy y, char *outbuf)
  * Return the name of the glyph found at (x,y).
  * If not hallucinating and the glyph is a monster, also monster data.
  */
-static struct permonst *
+staticfn struct permonst *
 lookat(coordxy x, coordxy y, char *buf, char *monbuf)
 {
     struct monst *mtmp = (struct monst *) 0;
@@ -751,7 +751,7 @@ ia_checkfile(struct obj *otmp)
  *
  * Returns True if an entry is found, False otherwise.
  */
-static boolean
+staticfn boolean
 checkfile(
     char *inp, /* string to look up */
     struct permonst *pm, /* monster type to look up (overrides 'inp') */
@@ -1054,7 +1054,7 @@ checkfile(
 }
 
 /* extracted from do_screen_description() */
-static int
+staticfn int
 add_cmap_descr(
     int found,          /* number of matching descriptions so far */
     int idx,            /* cmap index into defsyms[] */
@@ -1529,7 +1529,7 @@ do_screen_description(
 }
 
 /* when farlook is reporting on an engraving, include its text */
-static boolean
+staticfn boolean
 add_quoted_engraving(coordxy x, coordxy y, char *buf)
 {
     char temp_buf[BUFSZ];
@@ -1562,7 +1562,7 @@ add_quoted_engraving(coordxy x, coordxy y, char *buf)
     return TRUE;
 }
 
-/* also used by getpos hack in do_name.c */
+/* also used by getpos hack in getpos.c */
 const char what_is_an_unknown_object[] = "an unknown object";
 
 int
@@ -1828,7 +1828,7 @@ do_look(int mode, coord *click_cc)
     return ECMD_OK;
 }
 
-static void
+staticfn void
 look_region_nearby(
     coordxy *lo_x, coordxy *lo_y,
     coordxy *hi_x, coordxy *hi_y, boolean nearby)
@@ -1841,7 +1841,7 @@ look_region_nearby(
 
 DISABLE_WARNING_FORMAT_NONLITERAL /* RESTORE is after do_supplemental_info() */
 
-static void
+staticfn void
 look_all(
     boolean nearby,  /* True => within BOLTLIM, False => entire map */
     boolean do_mons) /* True => monsters, False => objects */
@@ -1942,7 +1942,7 @@ look_all(
 }
 
 /* give a /M style display of discovered traps, even when they're covered */
-static void
+staticfn void
 look_traps(boolean nearby)
 {
     winid win;
@@ -2008,7 +2008,7 @@ look_traps(boolean nearby)
 
 /* display of discovered engravings including headstones, even when they're
    covered provided they've been read */
-static void
+staticfn void
 look_engrs(boolean nearby)
 {
     winid win;
@@ -2119,7 +2119,7 @@ static const char *suptext2[] = {
     (char *) 0,
 };
 
-static void
+staticfn void
 do_supplemental_info(
     char *name,
     struct permonst *pm,
@@ -2287,7 +2287,7 @@ doidtrap(void)
     rest_on_space, #if SHELL, #if SUSPEND) are booleans.
 */
 
-static void
+staticfn void
 whatdoes_help(void)
 {
     dlb *fp;
@@ -2322,9 +2322,9 @@ struct wd_stack_frame {
     Bitfield(else_seen, 1);
 };
 
-static boolean whatdoes_cond(char *, struct wd_stack_frame *, int *, int);
+staticfn boolean whatdoes_cond(char *, struct wd_stack_frame *, int *, int);
 
-static boolean
+staticfn boolean
 whatdoes_cond(char *buf, struct wd_stack_frame *stack, int *depth, int lnum)
 {
     const char badstackfmt[] = "cmdhlp: too many &%c directives at line %d.";
@@ -2584,7 +2584,7 @@ dowhatdoes(void)
     return ECMD_OK;
 }
 
-static void
+staticfn void
 docontact(void)
 {
     winid cwin = create_nhwindow(NHW_TEXT);
@@ -2614,79 +2614,79 @@ docontact(void)
     destroy_nhwindow(cwin);
 }
 
-static void
+staticfn void
 dispfile_help(void)
 {
     display_file(HELP, TRUE);
 }
 
-static void
+staticfn void
 dispfile_shelp(void)
 {
     display_file(SHELP, TRUE);
 }
 
-static void
+staticfn void
 dispfile_optionfile(void)
 {
     display_file(OPTIONFILE, TRUE);
 }
 
-static void
+staticfn void
 dispfile_optmenu(void)
 {
     display_file(OPTMENUHELP, TRUE);
 }
 
-static void
+staticfn void
 dispfile_license(void)
 {
     display_file(LICENSE, TRUE);
 }
 
-static void
+staticfn void
 dispfile_debughelp(void)
 {
     display_file(DEBUGHELP, TRUE);
 }
 
-static void
+staticfn void
 dispfile_usagehelp(void)
 {
     display_file(USAGEHELP, TRUE);
 }
 
-static void
+staticfn void
 hmenu_doextversion(void)
 {
     (void) doextversion();
 }
 
-static void
+staticfn void
 hmenu_dohistory(void)
 {
     (void) dohistory();
 }
 
-static void
+staticfn void
 hmenu_dowhatis(void)
 {
     (void) dowhatis();
 }
 
-static void
+staticfn void
 hmenu_dowhatdoes(void)
 {
     (void) dowhatdoes();
 }
 
-static void
+staticfn void
 hmenu_doextlist(void)
 {
     (void) doextlist();
 }
 
-static void
+staticfn void
 domenucontrols(void)
 {
     winid cwin = create_nhwindow(NHW_TEXT);
@@ -2774,7 +2774,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
    normally 'O' but could be bound to something else, or not bound at all;
    with the implementation of a simple options subset, now need 'mO' to get
    the full options command; format it as 'm O' */
-static char *
+staticfn char *
 setopt_cmd(char *outbuf)
 {
     char cmdbuf[QBUFSZ];

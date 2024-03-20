@@ -240,22 +240,22 @@ mswin_init_nhwindows(int *argc, char **argv)
             | WC_FONTSIZ_TEXT | WC_VARY_MSGCOUNT,
         set_in_game);
 
-    mswin_color_from_string(iflags.wc_foregrnd_menu, &menu_fg_brush,
-                            &menu_fg_color);
-    mswin_color_from_string(iflags.wc_foregrnd_message, &message_fg_brush,
-                            &message_fg_color);
-    mswin_color_from_string(iflags.wc_foregrnd_status, &status_fg_brush,
-                            &status_fg_color);
-    mswin_color_from_string(iflags.wc_foregrnd_text, &text_fg_brush,
-                            &text_fg_color);
-    mswin_color_from_string(iflags.wc_backgrnd_menu, &menu_bg_brush,
-                            &menu_bg_color);
-    mswin_color_from_string(iflags.wc_backgrnd_message, &message_bg_brush,
-                            &message_bg_color);
-    mswin_color_from_string(iflags.wc_backgrnd_status, &status_bg_brush,
-                            &status_bg_color);
-    mswin_color_from_string(iflags.wc_backgrnd_text, &text_bg_brush,
-                            &text_bg_color);
+    mswin_color_from_string(iflags.wcolors[wcolor_menu].fg,
+                            &menu_fg_brush, &menu_fg_color);
+    mswin_color_from_string(iflags.wcolors[wcolor_message].fg,
+                            &message_fg_brush, &message_fg_color);
+    mswin_color_from_string(iflags.wcolors[wcolor_status].fg,
+                            &status_fg_brush, &status_fg_color);
+    mswin_color_from_string(iflags.wcolors[wcolor_text].fg,
+                            &text_fg_brush, &text_fg_color);
+    mswin_color_from_string(iflags.wcolors[wcolor_menu].bg,
+                            &menu_bg_brush, &menu_bg_color);
+    mswin_color_from_string(iflags.wcolors[wcolor_message].bg,
+                            &message_bg_brush, &message_bg_color);
+    mswin_color_from_string(iflags.wcolors[wcolor_status].bg,
+                            &status_bg_brush, &status_bg_color);
+    mswin_color_from_string(iflags.wcolors[wcolor_text].bg,
+                            &text_bg_brush, &text_bg_color);
 
     if (iflags.wc_splash_screen)
         mswin_display_splash_window(FALSE);
