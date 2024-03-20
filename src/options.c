@@ -357,7 +357,7 @@ staticfn void remove_autopickup_exception(struct autopickup_exception *);
 staticfn int count_apes(void);
 staticfn int count_cond(void);
 staticfn void enhance_menu_text(char *, size_t, int, boolean *,
-                              struct allopt_t *);
+                                struct allopt_t *);
 staticfn boolean can_set_perm_invent(void);
 staticfn int handler_align_misc(int);
 staticfn int handler_autounlock(int);
@@ -928,7 +928,9 @@ optfn_align_message(
 }
 
 staticfn int
-optfn_align_status(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_align_status(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1124,8 +1126,9 @@ optfn_autounlock(
 }
 
 staticfn int
-optfn_boulder(int optidx UNUSED, int req, boolean negated UNUSED,
-              char *opts, char *op UNUSED)
+optfn_boulder(
+    int optidx UNUSED, int req, boolean negated UNUSED,
+    char *opts, char *op UNUSED)
 {
 #ifdef BACKWARD_COMPAT
     int clash = 0;
@@ -1211,7 +1214,9 @@ optfn_catname(
 
 #ifdef CRASHREPORT
 staticfn int
-optfn_crash_email(int optidx UNUSED, int req, boolean negated UNUSED, char *opts, char *op)
+optfn_crash_email(
+    int optidx UNUSED, int req, boolean negated UNUSED,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1235,7 +1240,9 @@ optfn_crash_email(int optidx UNUSED, int req, boolean negated UNUSED, char *opts
 }
 
 staticfn int
-optfn_crash_name(int optidx UNUSED, int req, boolean negated UNUSED, char *opts, char *op)
+optfn_crash_name(
+    int optidx UNUSED, int req, boolean negated UNUSED,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1259,7 +1266,9 @@ optfn_crash_name(int optidx UNUSED, int req, boolean negated UNUSED, char *opts,
 }
 
 staticfn int
-optfn_crash_urlmax(int optidx UNUSED, int req, boolean negated UNUSED, char *opts, char *op)
+optfn_crash_urlmax(
+    int optidx UNUSED, int req, boolean negated UNUSED,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1289,8 +1298,9 @@ optfn_crash_urlmax(int optidx UNUSED, int req, boolean negated UNUSED, char *opt
 
 #ifdef CURSES_GRAPHICS
 staticfn int
-optfn_cursesgraphics(int optidx, int req, boolean negated,
-                     char *opts, char *op UNUSED)
+optfn_cursesgraphics(
+    int optidx, int req, boolean negated,
+    char *opts, char *op UNUSED)
 {
 #ifdef BACKWARD_COMPAT
     boolean badflag = FALSE;
@@ -1337,8 +1347,9 @@ optfn_cursesgraphics(int optidx, int req, boolean negated,
 #endif
 
 staticfn int
-optfn_DECgraphics(int optidx, int req, boolean negated,
-                  char *opts, char *op UNUSED)
+optfn_DECgraphics(
+    int optidx, int req, boolean negated,
+    char *opts, char *op UNUSED)
 {
 #ifdef BACKWARD_COMPAT
     boolean badflag = FALSE;
@@ -1384,7 +1395,9 @@ optfn_DECgraphics(int optidx, int req, boolean negated,
 }
 
 staticfn int
-optfn_disclose(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_disclose(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     int i, idx, prefix_val;
     unsigned num;
@@ -1511,8 +1524,9 @@ optfn_dogname(
 }
 
 staticfn int
-optfn_dungeon(int optidx UNUSED, int req, boolean negated UNUSED,
-              char *opts, char *op UNUSED)
+optfn_dungeon(
+    int optidx UNUSED, int req, boolean negated UNUSED,
+    char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1532,8 +1546,9 @@ optfn_dungeon(int optidx UNUSED, int req, boolean negated UNUSED,
 }
 
 staticfn int
-optfn_effects(int optidx UNUSED, int req, boolean negated UNUSED,
-              char *opts, char *op UNUSED)
+optfn_effects(
+    int optidx UNUSED, int req, boolean negated UNUSED,
+    char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1553,21 +1568,27 @@ optfn_effects(int optidx UNUSED, int req, boolean negated UNUSED,
 }
 
 staticfn int
-optfn_font_map(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_font_map(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     /* send them over to the prefix handling for font_ */
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_font_menu(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_font_menu(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     /* send them over to the prefix handling for font_ */
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_font_message(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_font_message(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     /* send them over to the prefix handling for font_ */
     return pfxfn_font(optidx, req, negated, opts, op);
@@ -1619,22 +1640,27 @@ optfn_font_size_text(
 }
 
 staticfn int
-optfn_font_status(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_font_status(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     /* send them over to the prefix handling for font_ */
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_font_text(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_font_text(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     /* send them over to the prefix handling for font_ */
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_fruit(int optidx UNUSED, int req, boolean negated,
-            char *opts, char *op)
+optfn_fruit(
+    int optidx UNUSED, int req, boolean negated,
+    char *opts, char *op)
 {
     struct fruit *forig = 0;
 
@@ -1741,7 +1767,9 @@ optfn_gender(
 }
 
 staticfn int
-optfn_glyph(int optidx UNUSED, int req, boolean negated, char *opts, char *op)
+optfn_glyph(
+    int optidx UNUSED, int req, boolean negated,
+    char *opts, char *op)
 {
 #ifdef ENHANCED_SYMBOLS
     int glyph;
@@ -1834,8 +1862,9 @@ optfn_horsename(
 }
 
 staticfn int
-optfn_IBMgraphics(int optidx, int req, boolean negated,
-                  char *opts, char *op UNUSED)
+optfn_IBMgraphics(
+    int optidx, int req, boolean negated,
+    char *opts, char *op UNUSED)
 {
 #ifdef BACKWARD_COMPAT
     const char *sym_name = allopt[optidx].name;
@@ -1890,7 +1919,9 @@ optfn_IBMgraphics(int optidx, int req, boolean negated,
 }
 
 staticfn int
-optfn_map_mode(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_map_mode(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     int i;
 
@@ -1995,92 +2026,105 @@ shared_menu_optfn(int optidx UNUSED, int req, boolean negated,
 }
 
 staticfn int
-optfn_menu_deselect_all(int optidx, int req, boolean negated,
-                        char *opts, char *op)
+optfn_menu_deselect_all(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     return shared_menu_optfn(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_menu_deselect_page(int optidx, int req, boolean negated,
-                         char *opts, char *op)
+optfn_menu_deselect_page(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     return shared_menu_optfn(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_menu_first_page(int optidx, int req, boolean negated,
-                      char *opts, char *op)
+optfn_menu_first_page(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     return shared_menu_optfn(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_menu_invert_all(int optidx, int req, boolean negated,
-                      char *opts, char *op)
+optfn_menu_invert_all(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     return shared_menu_optfn(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_menu_invert_page(int optidx, int req, boolean negated,
-                       char *opts, char *op)
+optfn_menu_invert_page(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     return shared_menu_optfn(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_menu_last_page(int optidx, int req, boolean negated,
-                     char *opts, char *op)
+optfn_menu_last_page(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     return shared_menu_optfn(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_menu_next_page(int optidx , int req, boolean negated,
-                     char *opts, char *op)
+optfn_menu_next_page(
+    int optidx , int req, boolean negated,
+    char *opts, char *op)
 {
     return shared_menu_optfn(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_menu_previous_page(int optidx, int req, boolean negated,
-                         char *opts, char *op)
+optfn_menu_previous_page(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     return shared_menu_optfn(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_menu_search(int optidx, int req, boolean negated,
-                  char *opts, char *op)
+optfn_menu_search(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     return shared_menu_optfn(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_menu_select_all(int optidx, int req, boolean negated,
-                      char *opts, char *op)
+optfn_menu_select_all(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     return shared_menu_optfn(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_menu_select_page(int optidx, int req, boolean negated,
-                       char *opts, char *op)
+optfn_menu_select_page(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     return shared_menu_optfn(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_menu_shift_left(int optidx, int req, boolean negated,
-                      char *opts, char *op)
+optfn_menu_shift_left(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     return shared_menu_optfn(optidx, req, negated, opts, op);
 }
 
 staticfn int
-optfn_menu_shift_right(int optidx, int req, boolean negated,
-                       char *opts, char *op)
+optfn_menu_shift_right(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     return shared_menu_optfn(optidx, req, negated, opts, op);
 }
@@ -2160,7 +2204,9 @@ optfn_menuinvertmode(
 }
 
 staticfn int
-optfn_menustyle(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_menustyle(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     int tmp;
     boolean val_required; /* no initializer based on opts because this can be
@@ -2216,8 +2262,9 @@ optfn_menustyle(int optidx, int req, boolean negated, char *opts, char *op)
 }
 
 staticfn int
-optfn_monsters(int optidx UNUSED, int req, boolean negated UNUSED,
-               char *opts, char *op UNUSED)
+optfn_monsters(
+    int optidx UNUSED, int req, boolean negated UNUSED,
+    char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2293,7 +2340,9 @@ optfn_mouse_support(
 }
 
 staticfn int
-optfn_msg_window(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_msg_window(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     int retval = optn_ok;
 #if PREV_MSGS
@@ -2358,7 +2407,9 @@ optfn_msg_window(int optidx, int req, boolean negated, char *opts, char *op)
 }
 
 staticfn int
-optfn_msghistory(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_msghistory(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2481,8 +2532,9 @@ optfn_number_pad(
 }
 
 staticfn int
-optfn_objects(int optidx UNUSED, int req, boolean negated UNUSED,
-              char *opts, char *op UNUSED)
+optfn_objects(
+    int optidx UNUSED, int req, boolean negated UNUSED,
+    char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2502,8 +2554,9 @@ optfn_objects(int optidx UNUSED, int req, boolean negated UNUSED,
 }
 
 staticfn int
-optfn_packorder(int optidx UNUSED, int req, boolean negated UNUSED,
-                char *opts, char *op)
+optfn_packorder(
+    int optidx UNUSED, int req, boolean negated UNUSED,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3008,7 +3061,9 @@ optfn_petattr(
 }
 
 staticfn int
-optfn_pettype(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_pettype(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3118,8 +3173,7 @@ optfn_pickup_burden(
 
 staticfn int
 optfn_pickup_types(
-    int optidx, int req,
-    boolean negated,
+    int optidx, int req, boolean negated,
     char *opts, char *op)
 {
     char ocl[MAXOCLASSES + 1], tbuf[MAXOCLASSES + 1], qbuf[QBUFSZ],
@@ -3215,8 +3269,7 @@ optfn_pickup_types(
 
 staticfn int
 optfn_pile_limit(
-    int optidx, int req,
-    boolean negated,
+    int optidx, int req, boolean negated,
     char *opts, char *op)
 {
     if (req == do_init) {
@@ -3282,7 +3335,9 @@ optfn_player_selection(
 }
 
 staticfn int
-optfn_playmode(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_playmode(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3354,8 +3409,9 @@ optfn_race(
 }
 
 staticfn int
-optfn_roguesymset(int optidx, int req, boolean negated UNUSED,
-                  char *opts, char *op)
+optfn_roguesymset(
+    int optidx, int req, boolean negated UNUSED,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3431,7 +3487,9 @@ optfn_role(
 }
 
 staticfn int
-optfn_runmode(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_runmode(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3470,7 +3528,9 @@ optfn_runmode(int optidx, int req, boolean negated, char *opts, char *op)
 }
 
 staticfn int
-optfn_scores(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_scores(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3622,8 +3682,9 @@ optfn_scroll_margin(
 }
 
 staticfn int
-optfn_soundlib(int optidx, int req, boolean negated UNUSED,
-                 char *opts, char *op)
+optfn_soundlib(
+    int optidx, int req, boolean negated UNUSED,
+    char *opts, char *op)
 {
     char soundlibbuf[WINTYPELEN];
 
@@ -3709,8 +3770,7 @@ optfn_sortdiscoveries(
 
 staticfn int
 optfn_sortloot(
-    int optidx, int req,
-    boolean negated UNUSED,
+    int optidx, int req, boolean negated UNUSED,
     char *opts, char *op)
 {
     int i;
@@ -3754,8 +3814,7 @@ optfn_sortloot(
 
 staticfn int
 optfn_sortvanquished(
-    int optidx, int req,
-    boolean negated,
+    int optidx, int req, boolean negated,
     char *opts, char *op)
 {
     extern const char *const vanqorders[][3]; /* insight.c */
@@ -3810,11 +3869,8 @@ optfn_sortvanquished(
 
 staticfn int
 optfn_statushilites(
-    int optidx UNUSED,
-    int req,
-    boolean negated,
-    char *opts,
-    char *op)
+    int optidx UNUSED, int req, boolean negated,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3911,11 +3967,8 @@ optfn_statuslines(
 #ifdef WIN32CON
 staticfn int
 optfn_subkeyvalue(
-    int optidx UNUSED,
-    int req,
-    boolean negated UNUSED,
-    char *opts,
-    char *op UNUSED)
+    int optidx UNUSED, int req, boolean negated UNUSED,
+    char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3937,8 +3990,9 @@ optfn_subkeyvalue(
 #endif /* WIN32CON */
 
 staticfn int
-optfn_suppress_alert(int optidx, int req, boolean negated,
-                     char *opts, char *op)
+optfn_suppress_alert(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3969,11 +4023,8 @@ extern const char *const known_restrictions[]; /* symbols.c */
 
 staticfn int
 optfn_symset(
-    int optidx,
-    int req,
-    boolean negated UNUSED,
-    char *opts,
-    char *op)
+    int optidx, int req, boolean negated UNUSED,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4045,7 +4096,9 @@ optfn_symset(
 }
 
 staticfn int
-optfn_term_cols(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_term_cols(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     int retval = optn_ok;
     long ltmp;
@@ -4084,7 +4137,9 @@ optfn_term_cols(int optidx, int req, boolean negated, char *opts, char *op)
 }
 
 staticfn int
-optfn_term_rows(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_term_rows(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     int retval = optn_ok;
     long ltmp;
@@ -4123,8 +4178,9 @@ optfn_term_rows(int optidx, int req, boolean negated, char *opts, char *op)
 }
 
 staticfn int
-optfn_tile_file(int optidx UNUSED, int req, boolean negated UNUSED,
-                char *opts, char *op)
+optfn_tile_file(
+    int optidx UNUSED, int req, boolean negated UNUSED,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4155,7 +4211,9 @@ optfn_tile_file(int optidx UNUSED, int req, boolean negated UNUSED,
 }
 
 staticfn int
-optfn_tile_height(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_tile_height(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4185,7 +4243,9 @@ optfn_tile_height(int optidx, int req, boolean negated, char *opts, char *op)
 }
 
 staticfn int
-optfn_tile_width(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_tile_width(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4215,8 +4275,9 @@ optfn_tile_width(int optidx, int req, boolean negated, char *opts, char *op)
 }
 
 staticfn int
-optfn_traps(int optidx UNUSED, int req, boolean negated UNUSED,
-            char *opts, char *op UNUSED)
+optfn_traps(
+    int optidx UNUSED, int req, boolean negated UNUSED,
+    char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4334,8 +4395,9 @@ optfn_versinfo(
 
 #ifdef VIDEOSHADES
 staticfn int
-optfn_videocolors(int optidx, int req, boolean negated UNUSED,
-                  char *opts, char *op UNUSED)
+optfn_videocolors(
+    int optidx, int req, boolean negated UNUSED,
+    char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4368,8 +4430,9 @@ optfn_videocolors(int optidx, int req, boolean negated UNUSED,
 }
 
 staticfn int
-optfn_videoshades(int optidx, int req, boolean negated UNUSED,
-                  char *opts, char *op UNUSED)
+optfn_videoshades(
+    int optidx, int req, boolean negated UNUSED,
+    char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4398,8 +4461,9 @@ optfn_videoshades(int optidx, int req, boolean negated UNUSED,
 
 #ifdef MSDOS
 staticfn int
-optfn_video_width(int optidx UNUSED, int req, boolean negated,
-                  char *opts, char *op)
+optfn_video_width(
+    int optidx UNUSED, int req, boolean negated,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4418,8 +4482,9 @@ optfn_video_width(int optidx UNUSED, int req, boolean negated,
 }
 
 staticfn int
-optfn_video_height(int optidx UNUSED, int req, boolean negated,
-                   char *opts, char *op)
+optfn_video_height(
+    int optidx UNUSED, int req, boolean negated,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4439,8 +4504,9 @@ optfn_video_height(int optidx UNUSED, int req, boolean negated,
 
 #ifdef NO_TERMS
 staticfn int
-optfn_video(int optidx, int req, boolean negated UNUSED,
-            char *opts, char *op UNUSED)
+optfn_video(
+    int optidx, int req, boolean negated UNUSED,
+    char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4473,8 +4539,9 @@ optfn_video(int optidx, int req, boolean negated UNUSED,
 #endif /* MSDOS */
 
 staticfn int
-optfn_warnings(int optidx, int req, boolean negated UNUSED,
-               char *opts, char *op UNUSED)
+optfn_warnings(
+    int optidx, int req, boolean negated UNUSED,
+    char *opts, char *op UNUSED)
 {
     int reslt;
 
@@ -4674,6 +4741,13 @@ optfn_windowchain(
 }
 #endif
 
+/* Win GUI and curses */
+static const char *const wcnames[WC_COUNT] = {
+    "menu", "message", "status", "text"
+};
+static const char *const wcshortnames[WC_COUNT] = {
+    "mnu", "msg", "sts", "txt"
+};
 int wcolors_opt[WC_COUNT];
 
 staticfn int
@@ -4682,9 +4756,9 @@ optfn_windowcolors(
     boolean negated UNUSED,
     char *opts, char *op)
 {
-    if (req == do_init) {
-        int wccount;
+    int wccount;
 
+    if (req == do_init) {
         for (wccount = 0; wccount < WC_COUNT; ++wccount) {
             wcolors_opt[wccount] = 0;
         }
@@ -4705,32 +4779,21 @@ optfn_windowcolors(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        /* FIXME: this constructed value is not correct for 'get_cnf_val' */
-        Sprintf(opts, "%s/%s %s/%s %s/%s %s/%s",
-                iflags.wcolors[wcolor_menu].fg
-                    ? iflags.wcolors[wcolor_menu].fg
-                    : defbrief,
-                iflags.wcolors[wcolor_menu].bg
-                    ? iflags.wcolors[wcolor_menu].bg
-                    : defbrief,
-                iflags.wcolors[wcolor_message].fg
-                    ? iflags.wcolors[wcolor_message].fg
-                    : defbrief,
-                iflags.wcolors[wcolor_message].bg
-                    ? iflags.wcolors[wcolor_message].bg
-                    : defbrief,
-                iflags.wcolors[wcolor_status].fg
-                    ? iflags.wcolors[wcolor_status].fg
-                    : defbrief,
-                iflags.wcolors[wcolor_status].bg
-                    ? iflags.wcolors[wcolor_status].bg
-                    : defbrief,
-                iflags.wcolors[wcolor_text].fg
-                    ? iflags.wcolors[wcolor_text].fg
-                    : defbrief,
-                iflags.wcolors[wcolor_text].bg
-                    ? iflags.wcolors[wcolor_text].bg
-                    : defbrief);
+        const char *fg, *bg;
+
+        /* TODO: wide 'get_val' may need to be wrapped in the menu display */
+        opts[0] = '\0';
+        for (wccount = 0; wccount < WC_COUNT; ++wccount) {
+            fg = iflags.wcolors[wccount].fg;
+            bg = iflags.wcolors[wccount].bg;
+            if (fg && (!*fg || !strcmp(fg, defbrief)))
+                fg = 0;
+            if (bg && (!*bg || !strcmp(bg, defbrief)))
+                bg = 0;
+            Sprintf(eos(opts), "%s%s %s/%s", !wccount ? "" : " ",
+                    (fg || bg) ? wcnames[wccount] : wcshortnames[wccount],
+                    fg ? fg : defbrief, bg ? bg : defbrief);
+        }
         return optn_ok;
     }
     return optn_ok;
@@ -9650,12 +9713,6 @@ wc_set_window_colors(char *op)
      *  menu white/black message green/yellow status white/blue text
      * white/black
      */
-    static const char *const wnames[WC_COUNT] = {
-        "menu", "message", "status", "text"
-    };
-    static const char *const shortnames[WC_COUNT] = {
-        "mnu", "msg", "sts", "txt"
-    };
     static char **fgp[] = { &iflags.wcolors[wcolor_menu].fg,
                             &iflags.wcolors[wcolor_message].fg,
                             &iflags.wcolors[wcolor_status].fg,
@@ -9718,7 +9775,7 @@ wc_set_window_colors(char *op)
             *newop++ = '\0';
 
         for (j = 0; j < WC_COUNT; ++j) {
-            if (!strcmpi(wn, wnames[j]) || !strcmpi(wn, shortnames[j])) {
+            if (!strcmpi(wn, wcnames[j]) || !strcmpi(wn, wcshortnames[j])) {
                 if (!strstri(tfg, " ")) {
                     if (*fgp[j])
                         free((genericptr_t) *fgp[j]);
@@ -9734,7 +9791,7 @@ wc_set_window_colors(char *op)
                 if (wcolors_opt[j] != 0) {
                     config_error_add(
                        "windowcolors for %s windows specified multiple times",
-                                     wnames[j]);
+                                     wcnames[j]);
                 }
                 wcolors_opt[j]++;
                 break;
