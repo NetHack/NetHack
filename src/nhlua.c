@@ -174,8 +174,6 @@ l_nhcore_call(int callidx)
 
     lua_getfield(gl.luacore, -1, nhcore_call_names[callidx]);
     ltyp = lua_type(gl.luacore, -1);
-    lua_remove(gl.luacore, -2); /* nhcore_call_names[callidx] */
-    lua_remove(gl.luacore, -2); /* nhcore */
     if (ltyp == LUA_TFUNCTION) {
         nhl_pcall_handle(gl.luacore, 0, 1, "l_nhcore_call", NHLpa_panic);
     } else {
