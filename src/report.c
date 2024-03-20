@@ -1,4 +1,4 @@
-/* NetHack 3.7	report.c	$NHDT-Date: 1710106611 2024/03/10 21:36:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.5 $ */
+/* NetHack 3.7	report.c	$NHDT-Date: 1710949744 2024/03/20 15:49:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2024 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -45,7 +45,7 @@
 #  define HASH_CLEANUP(ctxp)
 #  define HASH_OFLAGS O_RDONLY
 #  define HASH_BINFILE_DECL char *binfile = argv[0];
-#  ifdef BETA
+#  if (NH_DEVEL_STATUS == NH_STATUS_BETA)
 #   define HASH_BINFILE \
     if (!binfile || !*binfile) {                                        \
         /* If this triggers, investigate CFBundleGetMainBundle */       \

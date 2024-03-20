@@ -1,4 +1,4 @@
-/* NetHack 3.7	windsys.c	$NHDT-Date: 1596498321 2020/08/03 23:45:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.7	windsys.c	$NHDT-Date: 1710949760 2024/03/20 15:49:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -885,7 +885,7 @@ win32_cr_helper(char cmd, struct CRctxt *ctxp, void *p, int d){
             DWORD rv = GetModuleFileNameA(NULL, binfile, sizeof(binfile));
             if (rv == 0 || rv == sizeof(binfile))
                 return 1;
-#ifdef BETA
+#if (NH_DEVEL_STATUS == NH_STATUS_BETA)
             printf("FILE '%s'\n", binfile);
 #endif
             *(unsigned char **) p = (unsigned char *) binfile;
