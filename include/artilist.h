@@ -1,4 +1,4 @@
-/* NetHack 3.7  artilist.h      $NHDT-Date: 1596498526 2020/08/03 23:48:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.23 $ */
+/* NetHack 3.7  artilist.h      $NHDT-Date: 1710957374 2024/03/20 17:56:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,9 +19,10 @@ static const char *const artifact_names[] = {
 #elif defined(DUMP_ARTI_ENUM)
 #define A(nam, typ, s1, s2, mt, atk, dfn, cry, inv, al, cl, rac, \
           cost, clr, bn)                                         \
-        { ART_##bn, "ART_" #bn }
+    { ART_##bn, "ART_" #bn }
 #else
-/* in artifact.c, set up the actual artifact list structure */
+/* in artifact.c, set up the actual artifact list structure;
+   color field is for an artifact when it glows, not for the item itself */
 
 #define A(nam, typ, s1, s2, mt, atk, dfn, cry, inv, al, cl, rac, \
           cost, clr, bn)                                         \
@@ -107,9 +108,9 @@ static NEARDATA struct artifact artilist[] = {
       PHYS(5, 0), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, PM_ELF, 2000L,
       CLR_BRIGHT_BLUE, ORCRIST), /* bright blue is actually light blue */
 
-    A("Sting", ELVEN_DAGGER, (SPFX_WARN | SPFX_DFLAG2), 0, M2_ORC, PHYS(5, 0),
-      NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, PM_ELF, 800L, CLR_BRIGHT_BLUE,
-      STING),
+    A("Sting", ELVEN_DAGGER, (SPFX_WARN | SPFX_DFLAG2), 0, M2_ORC,
+      PHYS(5, 0), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, PM_ELF, 800L,
+      CLR_BRIGHT_BLUE, STING),
     /*
      *      Magicbane is a bit different!  Its magic fanfare
      *      unbalances victims in addition to doing some damage.
@@ -132,8 +133,8 @@ static NEARDATA struct artifact artilist[] = {
       NO_COLOR, DRAGONBANE),
 
     A("Demonbane", MACE, (SPFX_RESTR | SPFX_DFLAG2), 0, M2_DEMON,
-      PHYS(5, 0), NO_DFNS, NO_CARY, BANISH, A_LAWFUL, PM_CLERIC, NON_PM, 2500L,
-      NO_COLOR, DEMONBANE),
+      PHYS(5, 0), NO_DFNS, NO_CARY, BANISH, A_LAWFUL, PM_CLERIC, NON_PM,
+      2500L, NO_COLOR, DEMONBANE),
 
     A("Werebane", SILVER_SABER, (SPFX_RESTR | SPFX_DFLAG2), 0, M2_WERE,
       PHYS(5, 0), DFNS(AD_WERE), NO_CARY, 0, A_NONE, NON_PM, NON_PM, 1500L,
@@ -154,6 +155,7 @@ static NEARDATA struct artifact artilist[] = {
     A("Trollsbane", MORNING_STAR, (SPFX_RESTR | SPFX_DCLAS), 0, S_TROLL,
       PHYS(5, 0), NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 200L,
       NO_COLOR, TROLLSBANE),
+
     /*
      *      Two problems:  1) doesn't let trolls regenerate heads,
      *      2) doesn't give unusual message for 2-headed monsters (but
@@ -162,6 +164,7 @@ static NEARDATA struct artifact artilist[] = {
     A("Vorpal Blade", LONG_SWORD, (SPFX_RESTR | SPFX_BEHEAD), 0, 0,
       PHYS(5, 1), NO_DFNS, NO_CARY, 0, A_NEUTRAL, NON_PM, NON_PM, 4000L,
       NO_COLOR, VORPAL_BLADE),
+
     /*
      *      Ah, never shall I forget the cry,
      *              or the shriek that shrieked he,
@@ -173,6 +176,8 @@ static NEARDATA struct artifact artilist[] = {
     A("Snickersnee", KATANA, SPFX_RESTR, 0, 0, PHYS(0, 8), NO_DFNS, NO_CARY,
       0, A_LAWFUL, PM_SAMURAI, NON_PM, 1200L, NO_COLOR, SNICKERSNEE),
 
+    /* Sunsword emits light when wielded (handled in the core rather than
+       via artifact fields), but that light has no particular color */
     A("Sunsword", LONG_SWORD, (SPFX_RESTR | SPFX_DFLAG2), 0, M2_UNDEAD,
       PHYS(5, 0), DFNS(AD_BLND), NO_CARY, 0, A_LAWFUL, NON_PM, NON_PM, 1500L,
       NO_COLOR, SUNSWORD),
@@ -194,16 +199,18 @@ static NEARDATA struct artifact artilist[] = {
 
     A("The Sceptre of Might", MACE,
       (SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_DALIGN), 0, 0, PHYS(5, 0),
-      DFNS(AD_MAGM), NO_CARY, CONFLICT, A_LAWFUL, PM_CAVE_DWELLER, NON_PM, 2500L,
-      NO_COLOR, SCEPTRE_OF_MIGHT),
+      DFNS(AD_MAGM), NO_CARY, CONFLICT, A_LAWFUL, PM_CAVE_DWELLER, NON_PM,
+      2500L, NO_COLOR, SCEPTRE_OF_MIGHT),
 
-#if 0 /* OBSOLETE */
-A("The Palantir of Westernesse",        CRYSTAL_BALL,
-        (SPFX_NOGEN|SPFX_RESTR|SPFX_INTEL),
-                (SPFX_ESP|SPFX_REGEN|SPFX_HSPDAM), 0,
-        NO_ATTK,        NO_DFNS,        NO_CARY,
-        TAMING,         A_CHAOTIC, NON_PM , PM_ELF, 8000L, NO_COLOR,
-        PALANTIR_OF_WESTERNESSE ),
+#if 0   /* OBSOLETE -- from 3.1.0 to 3.2.x, this was quest artifact for the
+         * Elf role; in 3.3.0 elf became a race available to several roles
+         * and the Elf role along with its quest was eliminated; it's a bit
+         * overpowered to be an ordinary artifact so leave it excluded */
+    A("The Palantir of Westernesse", CRYSTAL_BALL,
+      (SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL),
+                                     (SPFX_ESP | SPFX_REGEN | SPFX_HSPDAM), 0,
+      NO_ATTK, NO_DFNS, NO_CARY, TAMING, A_CHAOTIC, NON_PM, PM_ELF, 8000L,
+      NO_COLOR, PALANTIR_OF_WESTERNESSE),
 #endif
 
     A("The Staff of Aesculapius", QUARTERSTAFF,
@@ -269,14 +276,14 @@ A("The Palantir of Westernesse",        CRYSTAL_BALL,
      *  terminator; otyp must be zero
      */
     A(0, 0, 0, 0, 0, NO_ATTK, NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 0L,
-      0, TERMINATOR) /* 0 is CLR_BLACK rather than NO_COLOR but it doesn't matter here */
+      NO_COLOR, TERMINATOR)
 
 }; /* artilist[] (or artifact_names[]) */
 #endif
 
 #undef A
 
-#if !defined(MAKEDEFS_C) && !defined(MDLIB_C) && !defined(ARTI_ENUM)
+#ifdef NO_ATTK
 #undef NO_ATTK
 #undef NO_DFNS
 #undef DFNS
