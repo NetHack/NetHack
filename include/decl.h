@@ -422,6 +422,12 @@ struct instance_globals_g {
     /* invent.c */
     long glyph_reset_timestamp;
 
+    /* nhlua.c */
+    boolean gmst_stored;
+    long gmst_moves;
+    struct obj *gmst_invent;
+    genericptr_t *gmst_ubak, *gmst_disco, *gmst_mvitals;
+
     /* pline.c */
     struct gamelog_line *gamelog;
 

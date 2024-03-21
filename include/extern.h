@@ -1966,20 +1966,29 @@ extern char *get_nh_lua_variables(void);
 extern void save_luadata(NHFILE *) NONNULLARG1;
 extern void restore_luadata(NHFILE *) NONNULLARG1;
 extern int nhl_pcall(lua_State *, int, int, const char *) NONNULLARG1;
-extern int nhl_pcall_handle(lua_State *, int, int, const char *, NHL_pcall_action) NONNULLARG1;
+extern int nhl_pcall_handle(lua_State *, int, int, const char *,
+                            NHL_pcall_action) NONNULLARG1;
 extern boolean load_lua(const char *, nhl_sandbox_info *) NONNULLARG12;
-ATTRNORETURN extern void nhl_error(lua_State *, const char *) NORETURN NONNULLARG12;
+ATTRNORETURN extern void nhl_error(lua_State *, const char *)
+                                                        NORETURN NONNULLARG12;
 extern void lcheck_param_table(lua_State *) NONNULLARG1;
 extern schar get_table_mapchr(lua_State *, const char *) NONNULLARG12;
-extern schar get_table_mapchr_opt(lua_State *, const char *, schar) NONNULLARG12;
+extern schar get_table_mapchr_opt(lua_State *, const char *, schar)
+                                                                 NONNULLARG12;
 extern short nhl_get_timertype(lua_State *, int) NONNULLARG1;
-extern boolean nhl_get_xy_params(lua_State *, lua_Integer *, lua_Integer *) NONNULLARG123;
-extern void nhl_add_table_entry_int(lua_State *, const char *, lua_Integer) NONNULLARG12;
-extern void nhl_add_table_entry_char(lua_State *, const char *, char) NONNULLARG12;
-extern void nhl_add_table_entry_str(lua_State *, const char *, const char *) NONNULLARG123;
-extern void nhl_add_table_entry_bool(lua_State *, const char *, boolean) NONNULLARG12;
+extern boolean nhl_get_xy_params(lua_State *, lua_Integer *, lua_Integer *)
+                                                                NONNULLARG123;
+extern void nhl_add_table_entry_int(lua_State *, const char *, lua_Integer)
+                                                                 NONNULLARG12;
+extern void nhl_add_table_entry_char(lua_State *, const char *, char)
+                                                                 NONNULLARG12;
+extern void nhl_add_table_entry_str(lua_State *, const char *, const char *)
+                                                                NONNULLARG123;
+extern void nhl_add_table_entry_bool(lua_State *, const char *, boolean)
+                                                                 NONNULLARG12;
 extern void nhl_add_table_entry_region(lua_State *, const char *,
-                                       coordxy, coordxy, coordxy, coordxy) NONNULLARG12;
+                                       coordxy, coordxy, coordxy, coordxy)
+                                                                 NONNULLARG12;
 extern schar splev_chr2typ(char);
 extern schar check_mapchr(const char *) NO_NNARGS;
 extern int get_table_int(lua_State *, const char *) NONNULLARG12;
@@ -1996,8 +2005,10 @@ extern int get_table_option(lua_State *, const char *, const char *,
 /* extern int str_lines_max_width(const char *); */
 extern const char *get_lua_version(void);
 extern void nhl_pushhooked_open_table(lua_State *L) NONNULLARG1;
+extern void free_tutorial(void);
 extern void tutorial(boolean);
 #endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
+
 #endif /* MAKEDEFS_C MDLIB_C CPPREGEX_C */
 
 /* ### {cpp,pmatch,posix}regex.c ### */

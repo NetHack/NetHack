@@ -404,6 +404,11 @@ static const struct instance_globals_g g_init_g = {
     { UNDEFINED_VALUES }, /* gems */
     /* invent.c */
     0L,      /* glyph_reset_timestamp */
+    /* nhlua.c */
+    FALSE, /* gmst_stored */
+    0L, /* gmst_moves */
+    NULL, /* gmst_invent */
+    NULL, NULL, NULL, /* gmst_ubak, gmst_disco, gmst_mvitals */
     /* pline.c */
     UNDEFINED_PTR, /* gamelog */
     /* region.c */

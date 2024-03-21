@@ -1210,6 +1210,7 @@ freedynamicdata(void)
     freeroleoptvals(); /* saveoptvals(&tnhfp) */
     cmdq_clear(CQ_CANNED);
     cmdq_clear(CQ_REPEAT);
+    free_tutorial(); /* (only needed if quiting while in tutorial) */
 
     /* some pointers in iflags */
     if (iflags.wc_font_map)

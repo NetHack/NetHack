@@ -1572,80 +1572,106 @@ nhl_callback(lua_State *L)
 staticfn int
 nhl_gamestate(lua_State *L)
 {
-    static long gmst_moves = 0;
-    static struct obj *gmst_invent = NULL;
-    static genericptr_t
-        *gmst_ubak = NULL, *gmst_disco = NULL, *gmst_mvitals= NULL;
-    static boolean gmst_stored = FALSE;
     long wornmask;
     struct obj *otmp;
     int argc = lua_gettop(L);
     boolean reststate = (argc > 0) ? lua_toboolean(L, -1) : FALSE;
 
     debugpline4("gamestate: %d:%d (%c vs %c)", u.uz.dnum, u.uz.dlevel,
-                reststate ? 'T' : 'F', gmst_stored ? 't' : 'f');
+                reststate ? 'T' : 'F', gg.gmst_stored ? 't' : 'f');
 
-    if (reststate && gmst_stored) {
+    if (reststate && gg.gmst_stored) {
         d_level cur_uz = u.uz, cur_uz0 = u.uz0;
 
         /* restore game state */
-        pline("Resetting time to move #%ld.", gmst_moves);
-        gm.moves = gmst_moves;
+        gm.moves = gg.gmst_moves;
+        pline("Resetting time to move #%ld.", gm.moves);
+        gg.gmst_moves = 0L;
+
         gl.lastinvnr = 51;
         while (gi.invent)
             useupall(gi.invent);
-        while ((otmp = gmst_invent) != NULL) {
+        while ((otmp = gg.gmst_invent) != NULL) {
             wornmask = otmp->owornmask;
             otmp->owornmask = 0L;
-            extract_nobj(otmp, &gmst_invent);
+            extract_nobj(otmp, &gg.gmst_invent);
             addinv_nomerge(otmp);
             if (wornmask)
                 setworn(otmp, wornmask);
         }
-        assert(gmst_ubak != NULL);
-        (void) memcpy((genericptr_t) &u, gmst_ubak, sizeof u);
-        free(gmst_ubak), gmst_ubak = NULL;
-        assert(gmst_disco != NULL);
-        (void) memcpy((genericptr_t) &gd.disco, gmst_disco, sizeof gd.disco);
-        free(gmst_disco), gmst_disco = NULL;
-        assert(gmst_mvitals != NULL);
-        (void) memcpy((genericptr_t) &gm.mvitals, gmst_mvitals,
+        assert(gg.gmst_ubak != NULL);
+        (void) memcpy((genericptr_t) &u, gg.gmst_ubak, sizeof u);
+        assert(gg.gmst_disco != NULL);
+        (void) memcpy((genericptr_t) &gd.disco, gg.gmst_disco,
+                      sizeof gd.disco);
+        assert(gg.gmst_mvitals != NULL);
+        (void) memcpy((genericptr_t) &gm.mvitals, gg.gmst_mvitals,
                       sizeof gm.mvitals);
-        free(gmst_mvitals), gmst_mvitals = NULL;
         /* some restored state would confuse the level change in progress */
         u.uz = cur_uz, u.uz0 = cur_uz0;
         init_uhunger();
-        gmst_stored = FALSE;
-    } else if (!reststate && !gmst_stored) {
+        free_tutorial(); /* release gg.gmst_XYZ */
+        gg.gmst_stored = FALSE;
+    } else if (!reststate && !gg.gmst_stored) {
         /* store game state */
+        gg.gmst_moves = gm.moves;
         while ((otmp = gi.invent) != NULL) {
             wornmask = otmp->owornmask;
             setnotworn(otmp);
             freeinv(otmp);
-            otmp->nobj = gmst_invent;
-            otmp->owornmask = wornmask;
-            gmst_invent = otmp;
+            otmp->owornmask = wornmask; /* flag for later restore */
+            otmp->nobj = gg.gmst_invent;
+            gg.gmst_invent = otmp;
         }
         gl.lastinvnr = 51; /* next inv letter to try to use will be 'a' */
-        gmst_moves = gm.moves;
-        gmst_ubak = (genericptr_t) alloc(sizeof u);
-        (void) memcpy(gmst_ubak, (genericptr_t) &u, sizeof u);
-        gmst_disco = (genericptr_t) alloc(sizeof gd.disco);
-        (void) memcpy(gmst_disco, (genericptr_t) &gd.disco, sizeof gd.disco);
-        gmst_mvitals = (genericptr_t) alloc(sizeof gm.mvitals);
-        (void) memcpy(gmst_mvitals, (genericptr_t) &gm.mvitals,
+        gg.gmst_ubak = (genericptr_t) alloc(sizeof u);
+        (void) memcpy(gg.gmst_ubak, (genericptr_t) &u, sizeof u);
+        gg.gmst_disco = (genericptr_t) alloc(sizeof gd.disco);
+        (void) memcpy(gg.gmst_disco, (genericptr_t) &gd.disco,
+                      sizeof gd.disco);
+        gg.gmst_mvitals = (genericptr_t) alloc(sizeof gm.mvitals);
+        (void) memcpy(gg.gmst_mvitals, (genericptr_t) &gm.mvitals,
                       sizeof gm.mvitals);
-        gmst_stored = TRUE;
+        gg.gmst_stored = TRUE;
     } else {
         impossible("nhl_gamestate: inconsistent state (%s vs %s)",
                    reststate ? "restore" : "save",
-                   gmst_stored ? "already stored" : "not stored");
+                   gg.gmst_stored ? "already stored" : "not stored");
     }
     update_inventory();
     return 0;
 }
 
 RESTORE_WARNING_UNREACHABLE_CODE
+
+/* free dynamic date allocated when entering tutorial;
+   called when exiting tutorial normally or if player quits while in it */
+void
+free_tutorial(void)
+{
+    struct obj *otmp;
+
+    /* for normal tutorial exit, gmst_invent will already be Null */
+    while ((otmp = gg.gmst_invent) != 0) {
+        /* set otmp->where = OBJ_FREE, otmp->nobj = NULL */
+        extract_nobj(otmp, &gg.gmst_invent);
+        /* gmst_invent is a list of invent items sequestered when entering
+           the tutorial; for them, owornmask is used as a flag to re-wear
+           them when exiting tutorial, not that they are currently worn;
+           clear it to avoid a "deleting worn obj" complaint from obfree() */
+        otmp->owornmask = 0L;
+        /* dealloc_obj() isn't enough (for containers, it assumes that
+           caller has already freed their contents) */
+        obfree(otmp, (struct obj *) 0);
+    }
+
+    if (gg.gmst_ubak)
+        free(gg.gmst_ubak), gg.gmst_ubak = NULL;
+    if (gg.gmst_disco)
+        free(gg.gmst_disco), gg.gmst_disco = NULL;
+    if (gg.gmst_mvitals)
+        free(gg.gmst_mvitals), gg.gmst_mvitals = NULL;
+}
 
 /* called from gotolevel(do.c) */
 void
@@ -2027,7 +2053,8 @@ nhl_loadlua(lua_State *L, const char *fname)
          * in use, and fseek(SEEK_END) only yields an upper bound on
          * the actual amount of data in that situation.]
          */
-        if ((cnt = dlb_fread(bufin, 1, min((int) buflen, LOADCHUNKSIZE), fh)) < 0L)
+        if ((cnt = dlb_fread(bufin, 1, min((int) buflen, LOADCHUNKSIZE), fh))
+            < 0L)
             break;
         buflen -= cnt; /* set up for next iteration, if any */
         if (cnt == 0L) {
