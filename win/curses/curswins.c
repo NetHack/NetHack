@@ -645,7 +645,6 @@ curses_puts(winid wid, int attr, const char *text)
     }
 #endif
 
-    curses_set_wid_colors(wid, NULL);
     if (curses_is_menu(wid) || curses_is_text(wid)) {
         if (!curses_menu_exists(wid)) {
             impossible(
@@ -657,6 +656,7 @@ curses_puts(winid wid, int attr, const char *text)
         curses_add_nhmenu_item(wid, &nul_glyphinfo, &Id, 0, 0,
                                attr, NO_COLOR, text, MENU_ITEMFLAGS_NONE);
     } else {
+        curses_set_wid_colors(wid, NULL);
         waddstr(win, text);
         wnoutrefresh(win);
     }
