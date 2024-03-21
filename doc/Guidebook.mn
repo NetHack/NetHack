@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: keni-regex $:$NHDT-Revision: 1.571 $ $NHDT-Date: 1710008891 2024/03/09 18:28:11 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.574 $ $NHDT-Date: 1711040379 2024/03/21 16:59:39 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\"+--
@@ -46,7 +46,7 @@
 .ds f0 \*(vr
 .ds f1 \" empty
 .\"DO NOT REMOVE NH_DATESUB .ds f2 DATE(%B %-d, %Y)
-.ds f2 February 29, 2024
+.ds f2 March 21, 2024
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -4994,23 +4994,24 @@ setting the value to 3 or 4 instead will keep borders for the map, message,
 and status windows but have room for two additional lines of inventory
 plus widen each inventory line by two columns.
 .lp windowcolors
-If NetHack can, it should display windows with the specified
-foreground/background colors.
+If NetHack can, it should display all windows of a particular style
+with the specified foreground and background colors.
 Windows GUI and curses windowport only.
 The format is
 .si
-.lp "OPTION=windowcolors:wintype foreground/background"
+.lp "\f(CROPTION=windowcolors:\fIstyle foreground\f(CR/\fIbackground\fR"
 .ei
-.pg
-where wintype is one of \(lqmenu\(rq, \(lqmessage\(rq, \(lqstatus\(rq,
+.lp ""
+where \fIstyle\fP is one of \(lqmenu\(rq, \(lqmessage\(rq, \(lqstatus\(rq,
 or \(lqtext\(rq, and
-foreground and background are colors, either a hexadecimal \\'#rrggbb',
+\fIforeground\fP and \fIbackground\fP are colors, either numeric (hash
+sign followed by three pairs of hexadecimal digits, \fI#rrggbb\fP),
 one of the named colors (black, red, green, brown,
-blue, magenta, cyan, orange, brightgreen, yellow, brightblue,
-brightmagenta, brightcyan, white, trueblack, gray, purple,
+blue, magenta, cyan, orange, bright-green, yellow, bright-blue,
+bright-magenta, bright-cyan, white, gray, purple,
 silver, maroon, fuchsia, lime, olive, navy, teal, aqua),
-or one of Windows UI colors (activeborder, activecaption,
-appworkspace, background, btnface, btnshadow, btntext,
+or (for Windows only) one of Windows UI colors (trueblack, activeborder,
+activecaption, appworkspace, background, btnface, btnshadow, btntext,
 captiontext, graytext, greytext, highlight, highlighttext,
 inactiveborder, inactivecaption, menu, menutext, scrollbar,
 window, windowframe, windowtext).

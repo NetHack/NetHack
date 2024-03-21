@@ -1,5 +1,5 @@
 \documentstyle[titlepage,longtable]{article}
-% NetHack 3.7  Guidebook.tex $NHDT-Date: 1710008891 2024/03/09 18:28:11 $  $NHDT-Branch: keni-regex $:$NHDT-Revision: 1.559 $ */
+% NetHack 3.7  Guidebook.tex $NHDT-Date: 1711040379 2024/03/21 16:59:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.562 $ */
 %+% we're still limping along in LaTeX 2.09 compatibility mode
 %-%\documentclass{article}
 %-%\usepackage{hyperref} % before longtable
@@ -48,7 +48,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7.0 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{DATE(%B %-d, %Y)}
-\date{February 29, 2024}
+\date{March 21, 2024}
 
 \maketitle
 
@@ -5511,27 +5511,28 @@ and status windows but have room for two additional lines of inventory
 plus widen each inventory line by two columns.
 %.lp
 \item[\ib{windowcolors}]
-If {\it NetHack\/} can, it should display windows with the specified
-foreground/background colors.
+If {\it NetHack\/} can, it should display all windows of a particular style
+with the specified foreground and background colors.
 Windows GUI and curses windowport only.
-The format is
-\begin{verbatim}
-    OPTION=windowcolors:wintype foreground/background
-\end{verbatim}
-
-%.pg
-where wintype is one of {\it menu}, {\it message}, {\it status}, or {\it text}, and
-foreground and background are colors, either a hexadecimal {\it \#rrggbb},
+The format is\\
+{\tt ~~~~OPTION=windowcolors:}{\it style foreground\/}{\tt /}{\it background}\\
+where {\it style} is one of {\tt menu}, {\tt message}, {\tt status},
+or {\tt text}, and
+{\it foreground} and {\it background} are colors, either numeric (hash
+sign followed by three pairs of hexadecimal digits, {\it \#rrggbb\/}),
 one of the named colors ({\it black}, {\it red}, {\it green}, {\it brown},
 {\it blue}, {\it magenta}, {\it cyan}, {\it orange},
-{\it brightgreen}, {\it yellow}, {\it brightblue}, {\it brightmagenta},
-{\it brightcyan}, {\it white}, {\it trueblack}, {\it gray}, {\it purple},
+{\it bright-green}, {\it yellow}, {\it bright-blue}, {\it bright-magenta},
+{\it bright-cyan}, {\it white}, {\it gray}, {\it purple},
 {\it silver}, {\it maroon}, {\it fuchsia}, {\it lime}, {\it olive},
-{\it navy}, {\it teal}, {\it aqua}), or one of Windows UI colors ({\it activeborder},
-{\it activecaption}, {\it appworkspace}, {\it background}, {\it btnface}, {\it btnshadow},
-{\it btntext}, {\it captiontext}, {\it graytext}, {\it greytext}, {\it highlight},
+{\it navy}, {\it teal}, {\it aqua}),
+or (for Windows only) one of Windows UI colors ({\it trueblack},
+{\it activeborder}, {\it activecaption}, {\it appworkspace}, {\it background},
+{\it btnface}, {\it btnshadow}, {\it btntext}, {\it captiontext},
+{\it graytext}, {\it greytext}, {\it highlight},
 {\it highlighttext}, {\it inactiveborder}, {\it inactivecaption}, {\it menu},
-{\it menutext}, {\it scrollbar}, {\it window}, {\it windowframe}, {\it windowtext}).
+{\it menutext}, {\it scrollbar}, {\it window}, {\it windowframe},
+{\it windowtext}).
 
 %.lp
 \item[\ib{wraptext}]
