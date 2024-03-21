@@ -49,7 +49,7 @@ des.levregion({ region = {51,2,77,18}, region_islev = 1, type="branch" })
 des.monster({ id = "Orion", coord = {20, 10}, inventory = function()
    des.object({ id = "leather armor", spe = 4 });
    des.object({ id = "yumi", spe = 4 });
-   des.object({ id = "arrow", spe = 4, quantity = 50 });
+   des.object({ id = "ya", spe = 4, quantity = 50 });
 end })
 -- The treasure of Orion
 des.object("chest", 20, 10)
