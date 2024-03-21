@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1396 $ $NHDT-Date: 1709928001 2024/03/08 20:00:01 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1402 $ $NHDT-Date: 1711034372 2024/03/21 15:19:32 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1892,6 +1892,8 @@ setting perm_invent in RC file before setting windowtype (whether later in
 	depending upon whether the default windowtype supported it
 if hero was wielding potion(s) of unholy water and a magic trap gave its
 	remove curse effect, scroll of remove curse would become discovered
+objects discovered during the tutorial carried over when normal play resumed;
+	counts of monsters created and vanquished carried over too
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

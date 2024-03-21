@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1705087450 2024/01/12 19:24:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.129 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1711034373 2024/03/21 15:19:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.141 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1557,17 +1557,26 @@ nhl_callback(lua_State *L)
 }
 
 /* store or restore game state */
-/* NOTE: doesn't work when saving/restoring the game */
-/* currently handles inventory and turns. */
+/*
+ * Currently handles
+ *   turn counter,
+ *   hero inventory and hunger,
+ *   hero attributes and skills and conducts (all via 'struct u'),
+ *   object discoveries,
+ *   monster generation and vanquished statistics.
+ * NOTE: wouldn't work after restore if game has been saved, so the
+ * #save command ('S') is disabled during the tutorial.
+ */
 /* gamestate(); -- save state */
 /* gamestate(true); -- restore state */
 staticfn int
 nhl_gamestate(lua_State *L)
 {
-    static struct obj *gmst_invent = NULL;
     static long gmst_moves = 0;
+    static struct obj *gmst_invent = NULL;
+    static genericptr_t
+        *gmst_ubak = NULL, *gmst_disco = NULL, *gmst_mvitals= NULL;
     static boolean gmst_stored = FALSE;
-    static struct you gmst_ubak;
     long wornmask;
     struct obj *otmp;
     int argc = lua_gettop(L);
@@ -1580,6 +1589,7 @@ nhl_gamestate(lua_State *L)
         d_level cur_uz = u.uz, cur_uz0 = u.uz0;
 
         /* restore game state */
+        pline("Resetting time to move #%ld.", gmst_moves);
         gm.moves = gmst_moves;
         gl.lastinvnr = 51;
         while (gi.invent)
@@ -1592,7 +1602,16 @@ nhl_gamestate(lua_State *L)
             if (wornmask)
                 setworn(otmp, wornmask);
         }
-        u = gmst_ubak;
+        assert(gmst_ubak != NULL);
+        (void) memcpy((genericptr_t) &u, gmst_ubak, sizeof u);
+        free(gmst_ubak), gmst_ubak = NULL;
+        assert(gmst_disco != NULL);
+        (void) memcpy((genericptr_t) &gd.disco, gmst_disco, sizeof gd.disco);
+        free(gmst_disco), gmst_disco = NULL;
+        assert(gmst_mvitals != NULL);
+        (void) memcpy((genericptr_t) &gm.mvitals, gmst_mvitals,
+                      sizeof gm.mvitals);
+        free(gmst_mvitals), gmst_mvitals = NULL;
         /* some restored state would confuse the level change in progress */
         u.uz = cur_uz, u.uz0 = cur_uz0;
         init_uhunger();
@@ -1609,7 +1628,13 @@ nhl_gamestate(lua_State *L)
         }
         gl.lastinvnr = 51; /* next inv letter to try to use will be 'a' */
         gmst_moves = gm.moves;
-        gmst_ubak = u;
+        gmst_ubak = (genericptr_t) alloc(sizeof u);
+        (void) memcpy(gmst_ubak, (genericptr_t) &u, sizeof u);
+        gmst_disco = (genericptr_t) alloc(sizeof gd.disco);
+        (void) memcpy(gmst_disco, (genericptr_t) &gd.disco, sizeof gd.disco);
+        gmst_mvitals = (genericptr_t) alloc(sizeof gm.mvitals);
+        (void) memcpy(gmst_mvitals, (genericptr_t) &gm.mvitals,
+                      sizeof gm.mvitals);
         gmst_stored = TRUE;
     } else {
         impossible("nhl_gamestate: inconsistent state (%s vs %s)",
