@@ -1892,7 +1892,7 @@ setting perm_invent in RC file before setting windowtype (whether later in
 	depending upon whether the default windowtype supported it
 if hero was wielding potion(s) of unholy water and a magic trap gave its
 	remove curse effect, scroll of remove curse would become discovered
-objects discovered during the tutorial carried over when normal play resumed;
+object discoveries during the tutorial carried over when normal play resumed;
 	counts of monsters created and vanquished carried over too
 
 
