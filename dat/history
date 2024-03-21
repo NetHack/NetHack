@@ -7,19 +7,19 @@ Mike Thome, and Jon Payne.
 
 Andries Brouwer did a major re-write while at Stichting Mathematisch Centrum
 (now Centrum Wiskunde & Informatica), transforming Hack into a very different
-game.  He published the Hack source code for use on UNIX(tm) systems by
+game.  He published the Hack source code for use on UNIX systems by
 posting that to Usenet newsgroup net.sources (later renamed comp.sources)
 releasing version 1.0 in December of 1984, then versions 1.0.1, 1.0.2, and
 finally 1.0.3 in July of 1985.  Usenet newsgroup net.games.hack (later
 renamed rec.games.hack, eventually replaced by rec.games.roguelike.nethack)
 was created for discussing it.
 
-Don G. Kneller ported Hack 1.0.3 to Microsoft(tm) C and MS-DOS(tm), producing
-PC HACK 1.01e, added support for DEC Rainbow graphics in version 1.03g, and
+Don G. Kneller ported Hack 1.0.3 to Microsoft C and MS-DOS, producing
+PC Hack 1.01e, added support for DEC Rainbow graphics in version 1.03g, and
 went on to produce at least four more versions (3.0, 3.2, 3.51, and 3.6;
 note that these are old Hack version numbers, not contemporary NetHack ones).
 
-R. Black ported PC HACK 3.51 to Lattice(tm) C and the Atari 520/1040ST,
+R. Black ported PC Hack 3.51 to Lattice C and the Atari 520/1040ST,
 producing ST Hack 1.03.
 
 Mike Stephenson merged these various versions back together, incorporating
@@ -179,7 +179,10 @@ maintained and enhanced 3.4 for the Microsoft Windows platform.  Alex Kompel
 contributed a new graphical interface for the Windows port.  Alex Kompel also
 contributed a Windows CE port for 3.4.1.
 
-Ron Van Iwaarden maintained 3.4 for OS/2.
+Ron Van Iwaarden was the sole maintainer of NetHack for OS/2 the past several
+releases. Unfortunately Ron's last OS/2 machine stopped working in early
+2006. A great many thanks to Ron for keeping NetHack alive on OS/2 all these
+years.
 
 Janne Salmijarvi and Teemu Suikki maintained and enhanced the
 Amiga port of 3.4 after Janne Salmijarvi resurrected it for 3.3.1.
@@ -229,7 +232,7 @@ Kevin Smolkowski, ensured that NetHack 3.6 continued to operate on various
 UNIX flavors and maintained the X11 interface.
 
 Ken Lorber, Haoyang Wang, Pat Rankin, and Dean Luick maintained the port
-of NetHack 3.6 for Mac OSX.
+of NetHack 3.6 for MacOS.
 
 Michael Allison, David Cohrs, Bart House, Pasi Kallinen, Alex Kompel,
 Dion Nicolaas, Derek S. Ray and Yitzhak Sapir maintained the port of
