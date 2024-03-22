@@ -592,10 +592,12 @@ impossible(const char *s, ...)
     }
 
 #ifdef CRASHREPORT
-    if(sysopt.crashreporturl){
-        boolean report = ('y' == yn_function("Report now?","yn",'n',FALSE));
+    if (sysopt.crashreporturl) {
+        boolean report = ('y' == yn_function("Report now?", ynchars,
+                                             'n', FALSE));
+
         raw_print("");  // prove to the user the character was accepted
-        if(report){
+        if (report) {
             submit_web_report(1, "Impossible", pbuf);
         }
     }
