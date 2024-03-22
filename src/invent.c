@@ -5595,7 +5595,7 @@ doorganize_core(struct obj *obj)
 
     collect = (let == obj->invlet);
     /* change the inventory and print the resulting item */
-    adj_type = collect ? "Collecting" : !splitting ? "Moving:" : "Splitting:";
+    adj_type = collect ? "Collecting:" : !splitting ? "Moving:" : "Splitting:";
 
     /*
      * don't use freeinv/addinv to avoid double-touching artifacts,
@@ -5603,7 +5603,8 @@ doorganize_core(struct obj *obj)
      */
     extract_nobj(obj, &gi.invent);
 
-    for (otmp = gi.invent; otmp;) {
+    for (otmp = gi.invent; otmp; ) {
+        otmpname = has_oname(otmp) ? ONAME(otmp) : (char *) 0;
         /* it's tempting to pull this outside the loop, but merged() could
            free ONAME(obj) [via obfree()] and replace it with ONAME(otmp) */
         objname = has_oname(obj) ? ONAME(obj) : (char *) 0;
@@ -5615,16 +5616,24 @@ doorganize_core(struct obj *obj)
                with compatible named ones; we only want that if it is
                the 'from' stack (obj) with a name and candidate (otmp)
                without one, not unnamed 'from' with named candidate. */
-            otmpname = has_oname(otmp) ? ONAME(otmp) : (char *) 0;
             if ((!otmpname || (objname && !strcmp(objname, otmpname)))
                 && merged(&otmp, &obj)) {
-                adj_type = "Merging:";
+                /*adj_type = "Collecting:"; //already set to this*/
                 obj = otmp;
                 otmp = otmp->nobj;
                 extract_nobj(obj, &gi.invent);
                 continue; /* otmp has already been updated */
             }
         } else if (otmp->invlet == let) {
+            /* Merging: when from and to are compatible */
+            if ((!otmpname || (objname && !strcmp(objname, otmpname)))
+                && merged(&otmp, &obj)) {
+                adj_type = "Merging:";
+                obj = otmp;
+                otmp = otmp->nobj;
+                extract_nobj(obj, &gi.invent);
+                break; /* otmp has been updated and we're done merging */
+            }
             /* Moving or splitting: don't merge extra compatible stacks.
                Found 'otmp' in destination slot; merge if compatible,
                otherwise bump whatever is there to an open slot. */

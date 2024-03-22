@@ -1373,6 +1373,16 @@ when a spellbook was polymorphed into a novel and then incrementing spestudied
 walking on ice can make you slide in a random direction
 if an adjacent statue was a in a pit, you could break it with a pick-axe even
 	though you're conceptually at the wrong elevation to reach it
+using '#adjust c c' to collect all invent items compatible with the one in
+	slot c prefixed the inventory update message with "Merging:" rather
+	than "Collecting:" if there was at least one compatible stack; when
+	there weren't any compatible stacks and it was effectively a no-op,
+	the prefix used was "Collecting", lacking its intended colon
+using '#adjust c d' or '#adjust d c' after splitting slot c via '#adjust Nc d'
+	for N less than c's stack size swapped c and d instead of re-merging
+	them even though merging was the intended behavior (the 3.6 change
+	that caused this was intended to avoid collecting other compatible
+	stacks while still merging the two specified ones)
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
