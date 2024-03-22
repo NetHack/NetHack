@@ -104,6 +104,8 @@ staticfn boolean can_do_extcmd(const struct ext_func_tab *);
 staticfn int dotravel(void);
 staticfn int dotravel_target(void);
 staticfn int doclicklook(void);
+staticfn boolean yn_menuable_resp(const char *);
+staticfn boolean yn_function_menu(const char *, const char *, char, char *);
 staticfn int domouseaction(void);
 staticfn int doterrain(void);
 staticfn boolean u_have_seen_whole_selection(struct selectionvar *);
@@ -4956,6 +4958,76 @@ doclicklook(void)
     return ECMD_OK;
 }
 
+/* can we use menu entries to respond to a query? */
+staticfn boolean
+yn_menuable_resp(const char *resp)
+{
+    return iflags.query_menu && iflags.window_inited
+        && (resp == ynchars || resp == ynqchars || resp == ynaqchars);
+}
+
+/* use a menu to ask a specific response to a query.
+   returns TRUE if we the menu was shown to the user.
+   puts the response char into res. */
+staticfn boolean
+yn_function_menu(
+    const char *query,
+    const char *resp,
+    char def,
+    char *res)
+{
+    if (yn_menuable_resp(resp)) {
+        winid win = create_nhwindow(NHW_MENU);
+        menu_item *sel;
+        anything any;
+        int n;
+        char keybuf[QBUFSZ];
+
+        start_menu(win, MENU_BEHAVE_STANDARD);
+        any = cg.zeroany;
+        any.a_char = 'y';
+        add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
+                 ATR_NONE, NO_COLOR, "Yes",
+                 (def == any.a_char) ? MENU_ITEMFLAGS_SELECTED
+                                     : MENU_ITEMFLAGS_NONE);
+        any.a_char = 'n';
+        add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
+                 ATR_NONE, NO_COLOR, "No",
+                 (def == any.a_char) ? MENU_ITEMFLAGS_SELECTED
+                                     : MENU_ITEMFLAGS_NONE);
+        if (resp == ynaqchars) {
+            any.a_char = 'a';
+            add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
+                     ATR_NONE, NO_COLOR, "All",
+                     (def == any.a_char) ? MENU_ITEMFLAGS_SELECTED
+                                         : MENU_ITEMFLAGS_NONE);
+        }
+        if (resp == ynqchars || resp == ynaqchars) {
+            any.a_char = 'q';
+            add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
+                     ATR_NONE, NO_COLOR, "Quit",
+                     (def == any.a_char) ? MENU_ITEMFLAGS_SELECTED
+                                         : MENU_ITEMFLAGS_NONE);
+        }
+        end_menu(win, query);
+        n = select_menu(win, PICK_ONE, &sel);
+        destroy_nhwindow(win);
+        if (n > 0) {
+            *res = sel[0].item.a_char;
+            /* two were selected? use the one that wasn't the default */
+            if (n > 1 && *res == def)
+                *res = sel[1].item.a_char;
+            free((genericptr_t) sel);
+        } else {
+            *res = def;
+        }
+        pline("%s %s", query, key2txt(*res, keybuf));
+        clear_nhwindow(WIN_MESSAGE);
+        return TRUE;
+    }
+    return FALSE;
+}
+
 /*
  *   Parameter validator for generic yes/no function to prevent
  *   the core from sending too long a prompt string to the
@@ -5007,7 +5079,9 @@ yn_function(
             gp.pline_flags &= ~PLINE_SPEECH;
         }
 #endif
-        res = (*windowprocs.win_yn_function)(query, resp, def);
+        if (!yn_function_menu(query, resp, def, &res)) {
+            res = (*windowprocs.win_yn_function)(query, resp, def);
+        }
         if (addcmdq)
             cmdq_add_key(CQ_REPEAT, res);
     }

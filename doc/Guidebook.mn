@@ -4473,6 +4473,8 @@ something pushes the old item into your alternate weapon slot (default off).
 Likewise for the \(oqa\(cq (apply) command if it causes the applied item to
 become wielded.
 Persistent.
+.lp query_menu
+Use a menu when asked specific yes/no queries, instead of a prompt.
 .lp quick_farsight
 When set, usually prevents the \(lqyou sense your surroundings\(rq message
 where play pauses to allow you to browse the map whenever clairvoyance

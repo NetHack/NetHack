@@ -231,6 +231,7 @@ struct accessibility_data {
  * and probably warrant a structure of their own elsewhere some day.
  */
 struct instance_flags {
+    boolean query_menu;    /* use a menu for yes/no queries */
     boolean showdamage;
     boolean debug_fuzzer;  /* fuzz testing */
     boolean defer_plname;  /* X11 hack: askname() might not set gp.plname */

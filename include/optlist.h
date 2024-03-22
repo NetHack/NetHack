@@ -581,6 +581,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(pushweapon, Behavior, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &flags.pushweapon, Term_False,
            "previous weapon goes to secondary slot")
+    NHOPTB(query_menu, Advanced, 0, opt_in, set_in_game,
+           Off, Yes, No, No, NoAlias, &iflags.query_menu, Term_False,
+           "use a menu for yes/no queries")
     NHOPTB(quick_farsight, Advanced, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &flags.quick_farsight, Term_False,
            "skip map browse when forced to looked at map")
