@@ -21,7 +21,7 @@ struct tty_perminvent_cell {
     Bitfield(text, 1);
     Bitfield(glyph, 1);
     union ttycellcontent content;
-    int32_t color;      /* adjusted color 0 = ignore
+    uint32 color;       /* adjusted color 0 = ignore
                          * 1-16             = NetHack color + 1
                          * 17..16,777,233   = 24-bit color  + 17
                          */

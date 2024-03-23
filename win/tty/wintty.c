@@ -287,7 +287,7 @@ static void tty_invent_box_glyph_init(struct WinDesc *cw);
 static boolean assesstty(enum inv_modes, short *, short *,
                          long *, long *, long *, long *, long *);
 static void ttyinv_populate_slot(struct WinDesc *, int, int,
-                                 const char *, int32_t, int);
+                                 const char *, uint32, int);
 #endif /* TTY_PERM_INVENT */
 
 /*
@@ -3067,7 +3067,8 @@ ttyinv_add_menu(
         row = (slot % rows_per_side) + 1; /* +1: top border */
         /* side: left side panel or right side panel, not a window column */
         side = slot / rows_per_side;
-        ttyinv_populate_slot(cw, row, side, text, clr, startcolor_at);
+        ttyinv_populate_slot(cw, row, side, text,
+                             (uint32) clr, startcolor_at);
     }
     return;
 }
@@ -3220,8 +3221,8 @@ ttyinv_end_menu(int window, struct WinDesc *cw)
 static void
 ttyinv_render(winid window, struct WinDesc *cw)
 {
-    int row, col, slot, side, filled_count = 0, slot_limit,
-                              current_row_color = NO_COLOR;
+    int row, col, slot, side, filled_count = 0, slot_limit;
+    uint32 current_row_color = NO_COLOR;
     struct tty_perminvent_cell *cell;
     char invbuf[BUFSZ];
     boolean force_redraw = gp.program_state.in_docrt ? TRUE : FALSE,
@@ -3335,7 +3336,7 @@ ttyinv_populate_slot(
     int row,  /* 'row' within the window, not within screen */
     int side, /* 'side'==0 is left panel or ==1 is right panel */
     const char *text,
-    int32_t color,
+    uint32 color,
     int clroffset)
 {
     struct tty_perminvent_cell *cell;
