@@ -2041,6 +2041,9 @@ level_difficulty(void)
              */
 #endif /*0*/
     }
+    /* ring of aggravate monster */
+    if (EAggravate_monster)
+        res += 15;
     return res;
 }
 

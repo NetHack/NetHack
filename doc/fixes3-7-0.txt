@@ -1383,6 +1383,7 @@ using '#adjust c d' or '#adjust d c' after splitting slot c via '#adjust Nc d'
 	them even though merging was the intended behavior (the 3.6 change
 	that caused this was intended to avoid collecting other compatible
 	stacks while still merging the two specified ones)
+ring of aggravate monster increases the level difficulty
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
