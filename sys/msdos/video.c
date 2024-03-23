@@ -378,6 +378,21 @@ term_start_bgcolor(int bgcolor)
 }
 
 void
+term_start_extracolor(uint32 nhcolor UNUSED)
+{
+}
+
+void
+term_start_256color(int idx UNUSED)
+{
+}
+
+void
+term_end_extracolor(void)
+{
+}
+
+void
 term_start_raw_bold(void)
 {
     standoutbeg();
