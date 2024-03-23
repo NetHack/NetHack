@@ -1062,6 +1062,7 @@ static void setGlyph(PNHMapWindow data, int i, int j,
     if ((data->map[i][j].glyph != fg->glyph)
             || (data->bkmap[i][j].glyph != bg->glyph)
         || data->map[i][j].ttychar != fg->ttychar
+        || data->map[i][j].gm.sym.color != fg->gm.sym.color
         || data->map[i][j].gm.nhcolor != fg->gm.nhcolor
         || data->map[i][j].gm.glyphflags != fg->gm.glyphflags
         || data->map[i][j].gm.tileidx != fg->gm.tileidx) {
