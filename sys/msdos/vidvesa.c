@@ -688,13 +688,13 @@ vesa_xputg(const glyph_info *glyphinfo, const glyph_info *bkglyphinfo UNUSED)
 #ifdef ENHANCED_SYMBOLS
     if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u && glyphinfo->gm.u->utf8str) {
         ch = glyphinfo->gm.u->utf32ch;
-        if (vesa_pixel_size > 8 && glyphinfo->gm.u->ucolor != 0) {
-            /* FIXME: won't display black (0,0,0) correctly, but the background
-               is usually black anyway */
-            attr = glyphinfo->gm.u->ucolor | 0x80000000;
-        }
     }
 #endif
+    if (vesa_pixel_size > 8 && glyphinfo->gm.nhcolor != 0) {
+        /* FIXME: won't display black (0,0,0) correctly, but the background
+           is usually black anyway */
+        attr = glyphinfo->gm.nhcolor | 0x80000000;
+    }
 
     row = currow;
     col = curcol;
