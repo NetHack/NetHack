@@ -118,8 +118,8 @@ HACKFILES := allmain alloc apply artifact attrib ball bones \
 	   botl calendar cmd coloratt dbridge decl detect dig display dlb do \
 	   do_name do_wear dog dogmove dokick dothrow drawing \
 	   dungeon eat end engrave exper explode extralev \
-	   files fountain getpos hack hacklib insight invent isaac64 light \
-	   lock mail makemon mcastu mdlib mhitm mhitu minion mklev \
+	   files fountain getpos glyphs hack hacklib insight invent isaac64 \
+	   light lock mail makemon mcastu mdlib mhitm mhitu minion mklev \
 	   mkmap mkmaze mkobj mkroom mon \
 	   mondata monmove monst mplayer mthrowu muse music \
 	   nhlua nhlsel nhlobj objnam o_init objects \
@@ -700,7 +700,9 @@ $(TARGETPFX)attrib.obj: attrib.c $(HACK_H)
 $(TARGETPFX)ball.obj: ball.c $(HACK_H)
 $(TARGETPFX)bones.obj: bones.c $(HACK_H)
 $(TARGETPFX)botl.obj: botl.c $(HACK_H)
+$(TARGETPFX)calendar.obj: calendar.c $(HACK_H)
 $(TARGETPFX)cmd.obj: cmd.c $(HACK_H) $(INCL)func_tab.h
+$(TARGETPFX)coloratt.obj: coloratt.c $(HACK_H)
 $(TARGETPFX)dbridge.obj: dbridge.c $(HACK_H)
 $(TARGETPFX)decl.obj: decl.c $(HACK_H)
 $(TARGETPFX)detect.obj: detect.c $(HACK_H) $(INCL)artifact.h
@@ -728,6 +730,8 @@ $(TARGETPFX)extralev.obj: extralev.c $(HACK_H)
 $(TARGETPFX)files.obj: files.c $(HACK_H) $(INCL)dlb.h $(INCL)wintty.h \
 		#zlib.h
 $(TARGETPFX)fountain.obj: fountain.c $(HACK_H)
+$(TARGETPFX)getpos.obj: getpos.c $(HACK_H)
+$(TARGETPFX)glyphs.obj: glyphs.c $(HACK_H)
 $(TARGETPFX)hack.obj: hack.c $(HACK_H)
 $(TARGETPFX)hacklib.obj: hacklib.c $(HACK_H)
 $(TARGETPFX)insight.obj: insight.c $(HACK_H)
@@ -791,12 +795,14 @@ $(TARGETPFX)questpgr.obj: questpgr.c $(HACK_H) $(INCL)dlb.h \
 $(TARGETPFX)read.obj: read.c $(HACK_H)
 $(TARGETPFX)rect.obj: rect.c $(HACK_H)
 $(TARGETPFX)region.obj: region.c $(HACK_H)
+$(TARGETPFX)report.obj: report.c $(HACK_H)
 $(TARGETPFX)restore.obj: restore.c $(HACK_H) $(INCL)tcap.h
 $(TARGETPFX)rip.obj: rip.c $(HACK_H)
 $(TARGETPFX)rnd.obj: rnd.c $(HACK_H) $(INCL)isaac64.h
 $(TARGETPFX)role.obj: role.c $(HACK_H)
 $(TARGETPFX)rumors.obj: rumors.c $(HACK_H) $(INCL)dlb.h
 $(TARGETPFX)save.obj: save.c $(HACK_H)
+$(TARGETPFX)selvar.obj: selvar.c $(HACK_H)
 $(TARGETPFX)sfstruct.obj: sfstruct.c $(HACK_H)
 $(TARGETPFX)shk.obj: shk.c $(HACK_H)
 $(TARGETPFX)shknam.obj: shknam.c $(HACK_H)
@@ -804,6 +810,7 @@ $(TARGETPFX)sit.obj: sit.c $(HACK_H) $(INCL)artifact.h
 $(TARGETPFX)sounds.obj: sounds.c $(HACK_H)
 $(TARGETPFX)sp_lev.obj: sp_lev.c $(HACK_H) $(INCL)sp_lev.h
 $(TARGETPFX)spell.obj: spell.c $(HACK_H)
+$(TARGETPFX)stairs.obj: stairs.c $(HACK_H)
 $(TARGETPFX)steal.obj: steal.c $(HACK_H)
 $(TARGETPFX)steed.obj: steed.c $(HACK_H)
 $(TARGETPFX)symbols.obj: symbols.c $(HACK_H) $(INCL)tcap.h
@@ -824,6 +831,7 @@ $(TARGETPFX)were.obj: were.c $(HACK_H)
 $(TARGETPFX)wield.obj: wield.c $(HACK_H)
 $(TARGETPFX)windows.obj: windows.c $(HACK_H) $(INCL)dlb.h $(INCL)wintty.h
 $(TARGETPFX)wizard.obj: wizard.c $(HACK_H)
+$(TARGETPFX)wizcmds.obj: wizcmds.c $(HACK_H)
 $(TARGETPFX)worm.obj: worm.c $(HACK_H)
 $(TARGETPFX)worn.obj: worn.c $(HACK_H)
 $(TARGETPFX)write.obj: write.c $(HACK_H)

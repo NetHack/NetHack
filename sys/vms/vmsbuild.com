@@ -423,7 +423,7 @@ $ gosub compile_list
 $ c_list = "allmain,apply,artifact,attrib,ball,bones,botl,calendar,cmd" -
 	+ ",coloratt,dbridge,dothrow,drawing,detect,dig,display,do,do_name" -
 	+ ",do_wear,dog,dogmove,dokick,dungeon,eat,end,engrave,exper,explode" -
-	+ ",extralev,files,fountain,getpos"
+	+ ",extralev,files,fountain,getpos,glyphs"
 $ gosub compile_list
 $ c_list = "hack,hacklib,insight,invent,light,lock,mail,makemon" -
 	+ ",mcastu,mdlib,mhitm,mhitu,minion,mklev,mkmap,mkmaze" -

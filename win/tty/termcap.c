@@ -17,8 +17,9 @@ static char *e_atr2str(int);
 
 void cmov(int, int);
 void nocmov(int, int);
-void term_start_24bitcolor(struct unicode_representation *);
-void term_end_24bitcolor(void);
+void term_start_extracolor(uint32 nhcolor);
+void term_end_extracolor(void);
+void term_start_256color(int);
 
 #if defined(TERMLIB)
 #if (!defined(UNIX) || !defined(TERMINFO)) && !defined(TOS)
@@ -1468,30 +1469,29 @@ term_start_bgcolor(int color)
     xputs(tmp);
 }
 
-#ifdef ENHANCED_SYMBOLS
-
 #ifndef SEP2
-#define tcfmtstr "\033[38;2;%ld;%ld;%ldm"
 #ifdef UNIX
-#define tcfmtstr24bit "\033[38;2;%u;%u;%um"
+#define tcfmtstr "\033[38;2;%d;%d;%dm"
+#define tcfmtstr24bit "\033[38;2;%d;%d;%dm"
 #define tcfmtstr256 "\033[38;5;%dm"
 #else
-#define tcfmtstr24bit "\033[38;2;%lu;%lu;%lum"
+#define tcfmtstr "\033[38;2;%ld;%ld;%ldm"
+#define tcfmtstr24bit "\033[38;2;%ld;%ld;%ldm"
 #define tcfmtstr256 "\033[38:5:%ldm"
 #endif
 #endif
 
-static void emit24bit(long mcolor);
+static void emit24bit(uint32 color24bit);
 static void emit256(int u256coloridx);
 
-static void emit24bit(long mcolor)
+static void emit24bit(uint32 color24bit)
 {
     static char tcolorbuf[QBUFSZ];
 
     Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr,
-             ((mcolor >> 16) & 0xFF),   /* red */
-             ((mcolor >>  8) & 0xFF),   /* green */
-             ((mcolor >>  0) & 0xFF));  /* blue */
+             ((color24bit >> 16) & 0xFF),   /* red */
+             ((color24bit >>  8) & 0xFF),   /* green */
+             ((color24bit >>  0) & 0xFF));  /* blue */
     xputs(tcolorbuf);
 }
 
@@ -1505,26 +1505,25 @@ static void emit256(int u256coloridx)
 }
 
 void
-term_start_24bitcolor(struct unicode_representation *urep)
+term_start_256color(int idx)
 {
-    if (urep && SYMHANDLING(H_UTF8)) {
-        /* color 0 has bit 0x1000000 set */
-        long mcolor = (urep->ucolor & 0xFFFFFF);
-        if (iflags.colorcount == 256)
-            emit256(urep->u256coloridx);
-        else
-            emit24bit(mcolor);
-    }
+    emit256(idx);
 }
 
 void
-term_end_24bitcolor(void)
+term_start_extracolor(uint32 nhcolor)
 {
-    if (SYMHANDLING(H_UTF8)) {
-        xputs("\033[0m");
-    }
-}
-#endif /* ENHANCED_SYMBOLS */
-#endif /* TTY_GRAPHICS && !NO_TERMS  */
+    /* color 0 has bit NH_BASIC_COLOR set */
+    uint32 modcolor = COLORVAL(nhcolor);
 
+    emit24bit(modcolor);
+}
+
+void
+term_end_extracolor(void)
+{
+    xputs("\033[0m");
+}
+
+#endif /* TTY_GRAPHICS && !NO_TERMS  */
 /*termcap.c*/

@@ -170,8 +170,9 @@ struct console_t {
     WORD background;
     WORD foreground;
     WORD attr;
-    int current_nhcolor;
-    int current_nhbkcolor;
+    int32 current_nhcolor;
+    int32 current_nhbkcolor;
+    int32 current_colorflags;
     int current_nhattr[ATR_INVERSE+1];
     COORD cursor;
     HANDLE hConOut;
@@ -207,6 +208,7 @@ struct console_t {
     0,                                                     /* attr */
     0,                                                     /* current_nhcolor */
     0,                                                     /* current_nhbkcolor */
+    0,                                                     /* current_colorflags */
     {FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE},
     {0, 0},   /* cursor */
     NULL,     /* hConOut*/
@@ -693,8 +695,7 @@ emit_start_24bitcolor(long color24bit)
 {
     DWORD unused, reserved;
     static char tcolorbuf[QBUFSZ];
-    long mcolor =
-        (color24bit & 0xFFFFFF); /* color 0 has bit 0x1000000 set */
+    uint32 mcolor = COLORVAL(color24bit);
     Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr24bit,
              ((mcolor >> 16) & 0xFF),   /* red */
              ((mcolor >>  8) & 0xFF),   /* green */
@@ -1451,21 +1452,36 @@ g_pututf8(uint8 *sequence)
 }
 
 void
-term_start_24bitcolor(struct unicode_representation *uval)
+term_start_extracolor(uint32 nhcolor)
 {
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
-    console.color24 = uval->ucolor; /* color 0 has bit 0x1000000 set */
-    console.color256idx = uval->u256coloridx;
+    if ((nhcolor & NH_BASIC_COLOR) == 0) {
+        console.color24 = COLORVAL(nhcolor); /* color 0 has bit 0x1000000 set */
+        console.current_colorflags = 0;
+    } else {
 #endif
+        /* NH_BASIC_COLOR */
+        console.current_nhcolor = COLORVAL(nhcolor);
+        console.current_colorflags = NH_BASIC_COLOR;
+        term_start_color(console.current_nhcolor);
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+    }
+#endif    
+}
+
+void term_start_256color(int idx)
+{
+    console.color256idx = idx;
 }
 
 void
-term_end_24bitcolor(void)
+term_end_extracolor(void)
 {
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
     console.color24 = 0L;
     console.color256idx = 0;
 #endif
+    console.current_nhcolor = NO_COLOR;
 }
 
 void

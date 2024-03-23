@@ -1102,11 +1102,9 @@ vesa_Init(void)
     vesa_SwitchMode(vesa_mode);
     vesa_SetViewPort();
     windowprocs.win_cliparound = vesa_cliparound;
-#ifdef ENHANCED_SYMBOLS
     if (vesa_pixel_size > 8) {
-        windowprocs.wincap2 |= WC2_U_24BITCOLOR;
+        windowprocs.wincap2 |= WC2_EXTRACOLORS;
     }
-#endif
 #ifdef TILES_IN_GLYPHMAP
     paletteptr = get_palette();
     iflags.tile_view = TRUE;

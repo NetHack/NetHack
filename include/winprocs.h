@@ -260,13 +260,13 @@ extern
 #define WC2_GUICOLOR      0x2000L /* 14 display colours outside map win */
 /* pline() can overload the display attributes argument passed to putstr()
    with one or more flags and at most one of bold/blink/inverse/&c */
-#define WC2_URGENT_MESG   0x4000L /* 15 putstr(WIN_MESSAGE) supports urgency
-                                   *    via non-display attribute flag  */
-#define WC2_SUPPRESS_HIST 0x8000L /* 16 putstr(WIN_MESSAGE) supports history
-                                   *    suppression via non-disp attr   */
+#define WC2_URGENT_MESG   0x4000L  /* 15 putstr(WIN_MESSAGE) supports urgency
+                                    *    via non-display attribute flag  */
+#define WC2_SUPPRESS_HIST 0x8000L  /* 16 putstr(WIN_MESSAGE) supports history
+                                    *    suppression via non-disp attr   */
 #define WC2_MENU_SHIFT   0x010000L /* 17 horizontal menu scrolling */
 #define WC2_U_UTF8STR    0x020000L /* 18 utf8str support */
-#define WC2_U_24BITCOLOR 0x040000L /* 19 24-bit color support available */
+#define WC2_EXTRACOLORS  0x040000L /* 19 color support beyond NH_BASIC_COLOR */
                                    /* 13 free bits */
 
 #define ALIGN_LEFT   1

@@ -509,7 +509,7 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   botl.c calendar.c cmd.c coloratt.c dbridge.c decl.c detect.c dig.c display.c \
 	   dlb.c do.c do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c \
 	   drawing.c dungeon.c eat.c end.c engrave.c exper.c explode.c \
-	   files.c fountain.c hack.c \
+	   files.c fountain.c getpos.c glyphs.c hack.c \
 	   insight.c invent.c isaac64.c light.c \
 	   lock.c mail.c makemon.c mcastu.c mdlib.c mhitm.c \
 	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
@@ -517,9 +517,9 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   nhlua.c nhlsel.c nhlobj.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
 	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c \
-	   rip.c rnd.c role.c rumors.c save.c sfstruct.c \
-	   shk.c shknam.c sit.c sounds.c \
-	   sp_lev.c spell.c steal.c steed.c symbols.c sys.c teleport.c \
+	   rip.c rnd.c role.c rumors.c save.c selvar.c sfstruct.c \
+	   shk.c shknam.c sit.c sounds.c sp_lev.c spell.c \
+	   stairs.c steal.c steed.c symbols.c sys.c teleport.c \
 	   timeout.c topten.c track.c trap.c u_init.c uhitm.c utf8map.c \
 	   vault.c version.c vision.c weapon.c were.c wield.c \
 	   windows.c wizard.c worm.c worn.c write.c zap.c
@@ -664,7 +664,7 @@ VTTYOBJ05 = $(OTTY)do_name.o  $(OTTY)do_wear.o  $(OTTY)dog.o      $(OTTY)dogmove
 VTTYOBJ06 = $(OTTY)dothrow.o  $(OTTY)drawing.o  $(OTTY)dungeon.o  $(OTTY)eat.o
 VTTYOBJ07 = $(OTTY)end.o      $(OTTY)engrave.o  $(OTTY)exper.o    $(OTTY)explode.o
 VTTYOBJ08 = $(OTTY)extralev.o $(OTTY)files.o    $(OTTY)fountain.o $(OTTY)getpos.o
-VTTYOBJ09 = $(OTTY)hack.o     $(OTTY)insight.o  $(OTTY)invent.o
+VTTYOBJ09 = $(OTTY)glyphs.o   $(OTTY)hack.o     $(OTTY)insight.o  $(OTTY)invent.o
 VTTYOBJ10 = $(OTTY)isaac64.o  $(OTTY)light.o    $(OTTY)lock.o     $(OTTY)mail.o
 VTTYOBJ11 = $(OTTY)makemon.o  $(OTTY)mcastu.o   $(OTTY)mhitm.o    $(OTTY)mhitu.o
 VTTYOBJ12 = $(OTTY)minion.o   $(OTTY)mklev.o    $(OTTY)mkmap.o    $(OTTY)mkmaze.o
@@ -732,7 +732,7 @@ VGUIOBJ05 = $(OGUI)do_wear.o  $(OGUI)dog.o      $(OGUI)dogmove.o  $(OGUI)dokick.
 VGUIOBJ06 = $(OGUI)dothrow.o  $(OGUI)drawing.o  $(OGUI)dungeon.o  $(OGUI)eat.o
 VGUIOBJ07 = $(OGUI)end.o      $(OGUI)engrave.o  $(OGUI)exper.o    $(OGUI)explode.o
 VGUIOBJ08 = $(OGUI)extralev.o $(OGUI)files.o    $(OGUI)fountain.o $(OGUI)getpos.o
-VGUIOBJ09 = $(OGUI)hack.o     $(OGUI)insight.o  $(OGUI)invent.o
+VGUIOBJ09 = $(OGUI)glyphs.o   $(OGUI)hack.o     $(OGUI)insight.o  $(OGUI)invent.o
 VGUIOBJ10 = $(OGUI)isaac64.o  $(OGUI)light.o    $(OGUI)lock.o     $(OGUI)mail.o
 VGUIOBJ11 = $(OGUI)makemon.o  $(OGUI)mcastu.o   $(OGUI)mhitm.o    $(OGUI)mhitu.o
 VGUIOBJ12 = $(OGUI)minion.o   $(OGUI)mklev.o    $(OGUI)mkmap.o    $(OGUI)mkmaze.o
@@ -2724,6 +2724,7 @@ $(OTTY)files.o: files.c $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\wintty.h
 $(OTTY)fountain.o: fountain.c $(HACK_H)
 $(OTTY)getpos.o: getpos.c $(HACK_H)
+$(OTTY)glyphs.o: glyphs.c $(HACK_H)
 $(OTTY)hack.o: hack.c $(HACK_H)
 $(OTTY)hacklib.o: hacklib.c $(HACK_H)
 $(OTTY)insight.o: insight.c $(HACK_H)
@@ -3097,6 +3098,7 @@ $(OGUI)files.o: files.c $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\wintty.h
 $(OGUI)fountain.o: fountain.c $(HACK_H)
 $(OGUI)getpos.o: getpos.c $(HACK_H)
+$(OGUI)glyphs.o: glyphs.c $(HACK_H)
 $(OGUI)hack.o: hack.c $(HACK_H)
 $(OGUI)hacklib.o: hacklib.c $(HACK_H)
 $(OGUI)insight.o: insight.c $(HACK_H)

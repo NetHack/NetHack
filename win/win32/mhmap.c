@@ -977,19 +977,16 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
             && glyphinfo->gm.u
             && glyphinfo->gm.u->utf8str) {
             ch = glyphinfo->gm.u->utf32ch;
-            if (glyphinfo->gm.u->ucolor != 0) {
-                if ((glyphinfo->gm.u->ucolor & NH_BASIC_COLOR) == 0) {
-                    rgbcolor = RGB(
-                                 (glyphinfo->gm.u->ucolor >> 16) & 0xFF,
-                                 (glyphinfo->gm.u->ucolor >>  8) & 0xFF,
-                                 (glyphinfo->gm.u->ucolor >>  0) & 0xFF);
-                } else {
-                    color = (int) (glyphinfo->gm.u->ucolor & ~NH_BASIC_COLOR);
-                    rgbcolor = nhcolor_to_RGB(color);
-                }
-            }
         }
 #endif
+        if ((glyphinfo->gm.nhcolor & NH_BASIC_COLOR) == 0) {
+            rgbcolor = RGB((glyphinfo->gm.nhcolor >> 16) & 0xFF,
+                           (glyphinfo->gm.nhcolor >>  8) & 0xFF,
+                           (glyphinfo->gm.nhcolor >>  0) & 0xFF);
+        } else {
+            color = (int) COLORVAL(glyphinfo->gm.nhcolor);
+            rgbcolor = nhcolor_to_RGB(color);
+        }
         if (((data->map[i][j].gm.glyphflags & MG_PET) && iflags.hilite_pet)
             || ((data->map[i][j].gm.glyphflags & (MG_DETECT | MG_BW_LAVA
                                                   | MG_BW_ICE | MG_BW_SINK
@@ -1065,7 +1062,7 @@ static void setGlyph(PNHMapWindow data, int i, int j,
     if ((data->map[i][j].glyph != fg->glyph)
             || (data->bkmap[i][j].glyph != bg->glyph)
         || data->map[i][j].ttychar != fg->ttychar
-        || data->map[i][j].gm.sym.color != fg->gm.sym.color
+        || data->map[i][j].gm.nhcolor != fg->gm.nhcolor
         || data->map[i][j].gm.glyphflags != fg->gm.glyphflags
         || data->map[i][j].gm.tileidx != fg->gm.tileidx) {
         data->map[i][j] = *fg;

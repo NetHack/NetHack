@@ -150,8 +150,8 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   botl.c calendar.c cmd.c coloratt.c dbridge.c decl.c detect.c dig.c \
 	   display.c dlb.c do.c do_name.c do_wear.c dog.c dogmove.c dokick.c \
 	   dothrow.c drawing.c dungeon.c eat.c end.c engrave.c exper.c \
-	   explode.c extralev.c files.c fountain.c getpos.c hack.c hacklib.c \
-	   insight.c invent.c light.c lock.c \
+	   explode.c extralev.c files.c fountain.c getpos.c glyphs.c hack.c \
+	   hacklib.c insight.c invent.c light.c lock.c \
 	   mail.c makemon.c mcastu.c mhitm.c mhitu.c minion.c \
 	   mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c mondata.c \
 	   monmove.c monst.c mplayer.c mthrowu.c muse.c music.c o_init.c \
@@ -196,8 +196,8 @@ HOBJ1 = allmain.obj,alloc.obj,apply.obj,artifact.obj,attrib.obj, \
 	do.obj,do_name.obj,do_wear.obj
 HOBJ2 = dog.obj,dogmove.obj,dokick.obj,dothrow.obj,drawing.obj, \
 	dungeon.obj,eat.obj,end.obj,engrave.obj,exper.obj,explode.obj, \
-	extralev.obj,files.obj,fountain.obj,getpos.obj,hack.obj,hacklib.obj, \
-	insight.obj,invent.obj
+	extralev.obj,files.obj,fountain.obj,getpos.obj,glyphs.obj,hack.obj, \
+	hacklib.obj,insight.obj,invent.obj
 HOBJ3 = light.obj,lock.obj,mail.obj,makemon.obj,mcastu.obj, \
 	mhitm.obj,mhitu.obj,minion.obj,mklev.obj,mkmap.obj,mkmaze.obj, \
 	mkobj.obj,mkroom.obj,mon.obj,mondata.obj,monmove.obj

@@ -7,9 +7,6 @@
 
 staticfn void savedsym_add(const char *, const char *, int);
 staticfn struct _savedsym *savedsym_find(const char *, int);
-#ifdef ENHANCED_SYMBOLS
-staticfn void purge_custom_entries(enum graphics_sets which_set);
-#endif
 
 extern const uchar def_r_oc_syms[MAXOCLASSES];      /* drawing.c */
 
@@ -346,8 +343,9 @@ clear_symsetentry(int which_set, boolean name_too)
        isn't using UTF8, discard the data for that */
     if (old_handling == H_UTF8 && gs.symset[other_set].handling != H_UTF8)
         free_all_glyphmap_u();
-    purge_custom_entries(which_set);
 #endif
+    purge_custom_entries(which_set);
+    clear_all_glyphmap_colors();
 }
 
 /* called from windmain.c */
@@ -357,7 +355,7 @@ symset_is_compatible(
     unsigned long wincap2)
 {
 #ifdef ENHANCED_SYMBOLS
-#define WC2_utf8_bits (WC2_U_UTF8STR | WC2_U_24BITCOLOR)
+#define WC2_utf8_bits (WC2_U_UTF8STR)
     if (handling == H_UTF8 && ((wincap2 & WC2_utf8_bits) != WC2_utf8_bits))
         return FALSE;
 #undef WC2_bits
@@ -462,8 +460,10 @@ parse_sym_line(char *buf, int which_set)
     /* find the '=' or ':' */
     bufp = strchr(buf, '=');
     altp = strchr(buf, ':');
+
     if (!bufp || (altp && altp < bufp))
         bufp = altp;
+
     if (!bufp) {
         if (strncmpi(buf, "finish", 6) == 0) {
             /* end current graphics set */
@@ -480,15 +480,15 @@ parse_sym_line(char *buf, int which_set)
     if (*bufp == ' ')
         ++bufp;
 
-
     symp = match_sym(buf);
     if (!symp && buf[0] == 'G' && buf[1] == '_') {
-#ifdef ENHANCED_SYMBOLS
         if (gc.chosen_symset_start) {
             is_glyph = match_glyph(buf);
         } else {
             is_glyph = TRUE; /* report error only once */
         }
+#ifdef ENHANCED_SYMBOLS
+        enhanced_unavailable = FALSE;
 #else
         enhanced_unavailable = TRUE;
 #endif
@@ -627,8 +627,8 @@ parse_sym_line(char *buf, int which_set)
         } else {
             /* Not SYM_CONTROL */
             if (gs.symset[which_set].handling != H_UTF8) {
-                val = sym_val(bufp);
                 if (gc.chosen_symset_start) {
+                    val = sym_val(bufp);
                     if (which_set == PRIMARYSET) {
                         update_primary_symset(symp, val);
                     } else if (which_set == ROGUESET) {
@@ -643,6 +643,9 @@ parse_sym_line(char *buf, int which_set)
 #endif
             }
         }
+    } else if (gc.chosen_symset_start) {
+        /* glyph, not symbol */
+        glyphrep_to_custom_map_entries(buf, &glyph);
     }
 #ifndef ENHANCED_SYMBOLS
     nhUse(glyph);
@@ -677,6 +680,7 @@ load_symset(const char *s, int which_set)
 
     if (read_sym_file(which_set)) {
         switch_symbols(TRUE);
+        apply_customizations(gc.currentgraphics);
     } else {
         clear_symsetentry(which_set, TRUE);
         return 0;
@@ -816,24 +820,20 @@ parsesymbols(char *opts, int which_set)
     mungspaces(strval);
 
     symp = match_sym(symname);
-#ifdef ENHANCED_SYMBOLS
     if (!symp && symname[0] == 'G' && symname[1] == '_') {
         is_glyph = match_glyph(symname);
     }
-#endif
     if (!symp && !is_glyph)
         return FALSE;
     if (symp) {
         if (symp->range && symp->range != SYM_CONTROL) {
             if (gs.symset[which_set].handling == H_UTF8
                 || (lowc(strval[0]) == 'u' && strval[1] == '+')) {
-#ifdef ENHANCED_SYMBOLS
                 char buf[BUFSZ];
                 int glyph;
 
                 Snprintf(buf, sizeof buf, "%s:%s", opts, strval);
                 glyphrep_to_custom_map_entries(buf, &glyph);
-#endif /* ENHANCED_SYMBOLS */
             } else {
                     val = sym_val(strval);
                     if (which_set == ROGUESET)
@@ -1066,17 +1066,13 @@ do_symset(boolean rogueflag)
     if (gs.symset[which_set].name) {
         /* non-default symbols */
         int ok;
-#ifdef ENHANCED_SYMBOLS
         if (!glyphid_cache_status()) {
             fill_glyphid_cache();
         }
-#endif
         ok = read_sym_file(which_set);
-#ifdef ENHANCED_SYMBOLS
         if (glyphid_cache_status()) {
             free_glyphid_cache();
         }
-#endif
         if (ok) {
             ready_to_switch = TRUE;
         } else {
@@ -1093,173 +1089,24 @@ do_symset(boolean rogueflag)
             assign_graphics(ROGUESET);
     } else if (!rogueflag)
         assign_graphics(PRIMARYSET);
-#ifdef ENHANCED_SYMBOLS
-    apply_customizations_to_symset(rogueflag ? ROGUESET : PRIMARYSET);
-#endif
+    apply_customizations(rogueflag ? ROGUESET : PRIMARYSET);
     preference_update("symset");
     return TRUE;
 }
 
-#ifdef ENHANCED_SYMBOLS
-
-RESTORE_WARNING_FORMAT_NONLITERAL
-
-struct customization_detail *find_display_sym_customization(
-    const char *customization_name, const struct symparse *symparse,
-    enum graphics_sets which_set);
-struct customization_detail *find_matching_symset_customiz(
-    const char *customization_name, int custtype,
-    enum graphics_sets which_set);
-struct customization_detail *find_display_urep_customization(
-    const char *customization_name, int glyphidx,
-    enum graphics_sets which_set);
 extern glyph_map glyphmap[MAX_GLYPH];
-staticfn void shuffle_customizations(void);
 
 void
-apply_customizations_to_symset(enum graphics_sets which_set)
+clear_all_glyphmap_colors(void)
 {
-    glyph_map *gmap;
-    struct customization_detail *details;
+    int glyph;
 
-    if (gs.symset[which_set].handling == H_UTF8
-        && gs.sym_customizations[which_set].count
-        && gs.sym_customizations[which_set].details) {
-        /* These UTF-8 customizations get applied to the glyphmap array,
-           not to symset entries */
-        details = gs.sym_customizations[which_set].details;
-        while (details) {
-            gmap = &glyphmap[details->content.urep.glyphidx];
-            (void) set_map_u(gmap,
-                             details->content.urep.u.utf32ch,
-                             details->content.urep.u.utf8str,
-                             details->content.urep.u.ucolor);
-            details = details->next;
-        }
-        shuffle_customizations();
-    }
-}
-/* Shuffle the customizations to match shuffled object descriptions,
- * so a red potion isn't displayed with a blue customization, and so on.
- */
-staticfn void
-shuffle_customizations(void)
-{
-    static const int offsets[2] = { GLYPH_OBJ_OFF, GLYPH_OBJ_PILETOP_OFF };
-    int j;
-
-    for (j = 0; j < SIZE(offsets); j++) {
-        glyph_map *obj_glyphs = glyphmap + offsets[j];
-        int i;
-        struct unicode_representation *tmp_u[NUM_OBJECTS];
-        int duplicate[NUM_OBJECTS];
-
-        for (i = 0; i < NUM_OBJECTS; i++) {
-            duplicate[i] = -1;
-            tmp_u[i] = (struct unicode_representation *) 0;
-        }
-        for (i = 0; i < NUM_OBJECTS; i++) {
-            int idx = objects[i].oc_descr_idx;
-
-            /*
-             * Shuffling gem appearances can cause the same oc_descr_idx to
-             * appear more than once. Detect this condition and ensure that
-             * each pointer points to a unique allocation.
-             */
-            if (duplicate[idx] >= 0) {
-                /* Current structure already appears in tmp_u */
-                struct unicode_representation *other = tmp_u[duplicate[idx]];
-
-                tmp_u[i] = (struct unicode_representation *)
-                           alloc(sizeof *tmp_u[i]);
-                *tmp_u[i] = *other;
-                if (other->utf8str != NULL) {
-                    tmp_u[i]->utf8str = (uint8 *)
-                                        dupstr((const char *) other->utf8str);
-                }
-            } else {
-                tmp_u[i] = obj_glyphs[idx].u;
-                if (obj_glyphs[idx].u != NULL)  {
-                    duplicate[idx] = i;
-                    obj_glyphs[idx].u = NULL;
-                }
-            }
-        }
-        for (i = 0; i < NUM_OBJECTS; i++) {
-            /* Some glyphmaps may not have been transferred */
-            if (obj_glyphs[i].u != NULL) {
-                free(obj_glyphs[i].u->utf8str);
-                free(obj_glyphs[i].u);
-            }
-            obj_glyphs[i].u = tmp_u[i];
-        }
+    for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
+        if (glyphmap[glyph].nhcolor)
+            glyphmap[glyph].nhcolor = 0;
     }
 }
 
-struct customization_detail *
-find_matching_symset_customiz(
-    const char *customization_name,
-    int custtype,
-    enum graphics_sets which_set)
-{
-    struct symset_customization *gdc = &gs.sym_customizations[which_set];
-
-    if ((gdc->custtype == custtype)
-        && (strcmp(customization_name, gdc->customization_name) != 0))
-        return gdc->details;
-    return (struct customization_detail *) 0;
-}
-
-staticfn void
-purge_custom_entries(enum graphics_sets which_set)
-{
-    struct symset_customization *gdc = &gs.sym_customizations[which_set];
-    struct customization_detail *details = gdc->details, *next;
-
-    while (details) {
-        next = details->next;
-        if (gdc->custtype == custom_ureps) {
-            if (details->content.urep.u.utf8str)
-                free(details->content.urep.u.utf8str);
-            details->content.urep.u.utf8str = (uint8 *) 0;
-            details->content.urep.u.ucolor = 0L;
-            details->content.urep.u.u256coloridx = 0L;
-        } else if (gdc->custtype == custom_symbols) {
-            details->content.sym.symparse = (struct symparse *) 0;
-            details->content.sym.val = 0;
-        }
-        free(details);
-        details = next;
-    }
-    gdc->details = 0;
-    gdc->details_end = 0;
-    if (gdc->customization_name) {
-        free((genericptr_t) gdc->customization_name);
-        gdc->customization_name = 0;
-    }
-    gdc->count = 0;
-}
-
-struct customization_detail *
-find_display_sym_customization(
-    const char *customization_name,
-    const struct symparse *symparse,
-    enum graphics_sets which_set)
-{
-    struct symset_customization *gdc = &gs.sym_customizations[which_set];
-    struct customization_detail *symdetails;
-
-    if ((gdc->custtype == custom_symbols)
-        && (strcmp(customization_name, gdc->customization_name) == 0)) {
-        symdetails = gdc->details;
-        while (symdetails) {
-            if (symdetails->content.sym.symparse == symparse)
-                return symdetails;
-            symdetails = symdetails->next;
-        }
-    }
-    return (struct customization_detail *) 0;
-}
-#endif /* ENHANCED_SYMBOLS */
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /*symbols.c*/

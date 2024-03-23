@@ -54,7 +54,8 @@
 #define DRAGON_SILVER CLR_BRIGHT_CYAN
 #define HI_ZAP CLR_BRIGHT_BLUE
 
-#define NH_BASIC_COLOR 0x1000000
+#define NH_BASIC_COLOR  0x1000000
+#define COLORVAL(x) ((x) & 0xFFFFFF)
 
 enum nhcolortype { no_color, nh_color, rgb_color };
 

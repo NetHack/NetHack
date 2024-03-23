@@ -127,19 +127,34 @@ X11_print_glyph(
         X11_map_symbol *ch_ptr;
         X11_color color;
         unsigned special;
+        uint32 nhcolor = 0;
         int colordif;
         X11_color *co_ptr;
 
         color = glyphinfo->gm.sym.color;
         special = glyphinfo->gm.glyphflags;
         ch = glyph_char(glyphinfo);
-#ifdef ENHANCED_SYMBOLS
-        if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u != NULL
-            && glyphinfo->gm.u->ucolor != 0
-            && (glyphinfo->gm.u->ucolor & NH_BASIC_COLOR) != 0)
-            color = glyphinfo->gm.u->ucolor & ~NH_BASIC_COLOR;
-#endif
 
+        if (glyphinfo->gm.nhcolor != 0) {
+            if ((glyphinfo->gm.nhcolor & NH_BASIC_COLOR) != 0) {
+                /* NH_BASIC_COLOR */
+                color = COLORVAL(glyphinfo->gm.nhcolor);
+#if 0
+            } else if (iflags.colorcount == 256
+                       && (X11_procs.wincap2 & WC2_EXTRACOLORS) != 0
+                       && (glyphinfo->gm.nhcolor & NH_BASIC_COLOR) == 0) {
+                int clr256idx;
+                uint32 closecolor = 0;
+
+                if (closest_color(COLORVAL(glyphinfo->gm.nhcolor),
+                    &closecolor, &clr256idx))
+                    nhcolor = COLORVAL(closecolor);
+#endif
+            } else {
+                /* 24-bit color, NH_BASIC_COLOR == 0 */
+                nhcolor = COLORVAL(glyphinfo->gm.nhcolor);
+            }
+        }
         if (special != map_info->tile_map.glyphs[y][x].glyphflags) {
             map_info->tile_map.glyphs[y][x].glyphflags = special;
             update_bbox = TRUE;
@@ -160,16 +175,11 @@ X11_print_glyph(
                         && iflags.use_inverse))
                       ? CLR_MAX : 0;
         color += colordif;
-#ifdef ENHANCED_SYMBOLS
-        if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u != NULL
-            && glyphinfo->gm.u->ucolor != 0
-            && (glyphinfo->gm.u->ucolor & NH_BASIC_COLOR) == 0) {
-                color = glyphinfo->gm.u->ucolor | 0x80000000;
-                if (colordif != 0) {
-                    color |= 0x40000000;
-                }
-        }
-#endif
+        if (nhcolor != 0)
+            color = nhcolor | 0x80000000;
+        if (colordif != 0)
+            color |= 0x40000000;
+        
         if (*co_ptr != color) {
             *co_ptr = color;
             if (!map_info->is_tile)

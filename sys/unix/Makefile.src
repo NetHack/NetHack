@@ -510,7 +510,7 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   dlb.c do.c do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c \
 	   drawing.c dungeon.c eat.c end.c engrave.c exper.c explode.c \
 	   extralev.c files.c fountain.c hack.c hacklib.c \
-	   getpos.c insight.c invent.c isaac64.c light.c \
+	   getpos.c glyphs.c insight.c invent.c isaac64.c light.c \
 	   lock.c mail.c makemon.c mcastu.c mdlib.c mhitm.c \
 	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
 	   mondata.c monmove.c monst.c mplayer.c mthrowu.c muse.c music.c \
@@ -581,8 +581,8 @@ HOSTOBJ = $(FIRSTOBJ) alloc.o drawing.o
 HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)apply.o $(TARGETPFX)artifact.o $(TARGETPFX)attrib.o \
 	$(TARGETPFX)ball.o $(TARGETPFX)bones.o $(TARGETPFX)botl.o \
-	$(TARGETPFX)calendar.o \
-	$(TARGETPFX)cmd.o $(TARGETPFX)coloratt.o $(TARGETPFX)dbridge.o $(TARGETPFX)decl.o \
+	$(TARGETPFX)calendar.o $(TARGETPFX)cmd.o \
+	$(TARGETPFX)coloratt.o $(TARGETPFX)dbridge.o $(TARGETPFX)decl.o \
 	$(TARGETPFX)detect.o $(TARGETPFX)dig.o $(TARGETPFX)display.o \
 	$(TARGETPFX)dlb.o $(TARGETPFX)do.o $(TARGETPFX)do_name.o \
 	$(TARGETPFX)do_wear.o $(TARGETPFX)dog.o $(TARGETPFX)dogmove.o \
@@ -590,10 +590,10 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)dungeon.o $(TARGETPFX)eat.o $(TARGETPFX)end.o \
 	$(TARGETPFX)engrave.o $(TARGETPFX)exper.o $(TARGETPFX)explode.o \
 	$(TARGETPFX)extralev.o $(TARGETPFX)files.o $(TARGETPFX)fountain.o \
-	$(TARGETPFX)getpos.o $(TARGETPFX)hack.o $(TARGETPFX)insight.o \
-	$(TARGETPFX)invent.o $(TARGETPFX)isaac64.o $(TARGETPFX)light.o \
-	$(TARGETPFX)lock.o $(TARGETPFX)mail.o $(TARGETPFX)makemon.o \
-	$(TARGETPFX)mcastu.o $(TARGETPFX)mdlib.o \
+	$(TARGETPFX)getpos.o $(TARGETPFX)glyphs.o $(TARGETPFX)hack.o \
+	$(TARGETPFX)insight.o $(TARGETPFX)invent.o $(TARGETPFX)isaac64.o \
+	$(TARGETPFX)light.o $(TARGETPFX)lock.o $(TARGETPFX)mail.o \
+	$(TARGETPFX)makemon.o $(TARGETPFX)mcastu.o $(TARGETPFX)mdlib.o \
 	$(TARGETPFX)mhitm.o $(TARGETPFX)mhitu.o $(TARGETPFX)minion.o \
 	$(TARGETPFX)mklev.o $(TARGETPFX)mkmap.o $(TARGETPFX)mkmaze.o \
 	$(TARGETPFX)mkobj.o $(TARGETPFX)mkroom.o $(TARGETPFX)mon.o \
@@ -611,17 +611,18 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)role.o $(TARGETPFX)rumors.o $(TARGETPFX)save.o \
 	$(TARGETPFX)selvar.o $(TARGETPFX)sfstruct.o \
 	$(TARGETPFX)shk.o $(TARGETPFX)shknam.o $(TARGETPFX)sit.o \
-	$(TARGETPFX)sounds.o $(TARGETPFX)sp_lev.o $(TARGETPFX)spell.o $(TARGETPFX)stairs.o \
-	$(TARGETPFX)symbols.o $(TARGETPFX)sys.o $(TARGETPFX)steal.o \
-	$(TARGETPFX)steed.o $(TARGETPFX)strutil.o $(TARGETPFX)teleport.o \
-	$(TARGETPFX)timeout.o $(TARGETPFX)topten.o $(TARGETPFX)track.o $(TARGETPFX)trap.o \
-	$(TARGETPFX)u_init.o $(TARGETPFX)uhitm.o $(TARGETPFX)utf8map.o \
-	$(TARGETPFX)vault.o $(TARGETPFX)vision.o $(TARGETPFX)weapon.o \
+	$(TARGETPFX)sounds.o $(TARGETPFX)sp_lev.o $(TARGETPFX)spell.o \
+	$(TARGETPFX)stairs.o $(TARGETPFX)symbols.o $(TARGETPFX)sys.o \
+	$(TARGETPFX)steal.o $(TARGETPFX)steed.o $(TARGETPFX)strutil.o \
+	$(TARGETPFX)teleport.o $(TARGETPFX)timeout.o $(TARGETPFX)topten.o \
+	$(TARGETPFX)track.o $(TARGETPFX)trap.o $(TARGETPFX)u_init.o \
+	$(TARGETPFX)uhitm.o $(TARGETPFX)utf8map.o $(TARGETPFX)vault.o \
+	$(TARGETPFX)vision.o $(TARGETPFX)weapon.o \
 	$(TARGETPFX)were.o $(TARGETPFX)wield.o $(TARGETPFX)windows.o \
-	$(TARGETPFX)wizard.o $(TARGETPFX)wizcmds.o $(TARGETPFX)worm.o $(TARGETPFX)worn.o \
-	$(TARGETPFX)write.o $(TARGETPFX)zap.o \
+	$(TARGETPFX)wizard.o $(TARGETPFX)wizcmds.o $(TARGETPFX)worm.o \
+	$(TARGETPFX)worn.o $(TARGETPFX)write.o $(TARGETPFX)zap.o \
 	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) $(HINTOBJ) $(SNDLIBOBJ) \
-	$(TARGETPFX)version.o
+	$(TARGETPFX)version.o 
 
 DATE_O = $(TARGETPFX)date.o
 
@@ -1154,6 +1155,7 @@ $(TARGETPFX)files.o: files.c $(HACK_H) ../include/dlb.h ../include/wintty.h \
 		#zlib.h
 $(TARGETPFX)fountain.o: fountain.c $(HACK_H)
 $(TARGETPFX)getpos.o: getpos.c $(HACK_H)
+$(TARGETPFX)glyphs.o: glyphs.c $(HACK_H)
 $(TARGETPFX)hack.o: hack.c $(HACK_H)
 $(TARGETPFX)hacklib.o: hacklib.c $(HACK_H)
 $(TARGETPFX)insight.o: insight.c $(HACK_H)

@@ -76,8 +76,6 @@ struct classic_representation {
 };
 
 struct unicode_representation {
-    uint32 ucolor;
-    uint16 u256coloridx;
     uint32 utf32ch;
     uint8 *utf8str;
 };
@@ -85,6 +83,7 @@ struct unicode_representation {
 typedef struct glyph_map_entry {
     unsigned glyphflags;
     struct classic_representation sym;
+    uint32 nhcolor;
     short int tileidx;
 #ifdef ENHANCED_SYMBOLS
     struct unicode_representation *u;

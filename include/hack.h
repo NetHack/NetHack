@@ -412,9 +412,7 @@ enum earlyarg {
 #ifndef NODUMPENUMS
     , ARG_DUMPENUMS
 #endif
-#ifdef ENHANCED_SYMBOLS
     , ARG_DUMPGLYPHIDS
-#endif
 #ifdef WIN32
     , ARG_WINDOWS
 #endif

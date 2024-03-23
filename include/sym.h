@@ -129,8 +129,8 @@ enum graphics_sets {
         UNICODESET = NUM_GRAPHICS
 };
 
-#ifdef ENHANCED_SYMBOLS
-enum customization_types { custom_none, custom_symbols, custom_ureps };
+enum customization_types { custom_none, custom_symbols,
+    custom_ureps, custom_nhcolor,  custom_count };
 
 struct custom_symbol {
     const struct symparse *symparse;
@@ -140,9 +140,14 @@ struct custom_urep {
     int glyphidx;
     struct unicode_representation u;
 };
+struct custom_nhcolor {
+    int glyphidx;
+    uint32 nhcolor;
+};
 union customization_content {
     struct custom_symbol sym;
     struct custom_urep urep;
+    struct custom_nhcolor ccolor;
 };
 struct customization_detail {
     union customization_content content;
@@ -154,11 +159,10 @@ struct customization_detail {
 struct symset_customization {
     const char *customization_name;
     int count;
-    int custtype;
+    enum customization_types custtype;
     struct customization_detail *details;
     struct customization_detail *details_end;
 };
-#endif /* ENHANCED_SYMBOLS */
 
 extern const struct symdef defsyms[MAXPCHARS + 1]; /* defaults */
 #define WARNCOUNT 6 /* number of different warning levels */

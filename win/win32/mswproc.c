@@ -93,7 +93,7 @@ struct window_procs mswin_procs = {
     WC2_HITPOINTBAR | WC2_FLUSH_STATUS | WC2_RESET_STATUS | WC2_HILITE_STATUS |
 #endif
 #ifdef ENHANCED_SYMBOLS
-     WC2_U_UTF8STR | WC2_U_24BITCOLOR |
+     WC2_U_UTF8STR | WC2_EXTRACOLORS |
 #endif
     0L,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */

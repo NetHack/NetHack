@@ -1771,9 +1771,7 @@ optfn_glyph(
     int optidx UNUSED, int req, boolean negated,
     char *opts, char *op)
 {
-#ifdef ENHANCED_SYMBOLS
     int glyph;
-#endif
 
     if (req == do_init) {
         return optn_ok;
@@ -1790,10 +1788,8 @@ optfn_glyph(
             return optn_err;
         /* strip leading/trailing spaces, condense internal ones (3.6.2) */
         mungspaces(op);
-#ifdef ENHANCED_SYMBOLS
         if (!glyphrep_to_custom_map_entries(op, &glyph))
             return optn_err;
-#endif
         return optn_ok;
     }
     if (req == get_val) {
@@ -4077,19 +4073,12 @@ optfn_symset(
     if (req == do_handler) {
         int reslt;
 
-        if (gs.symset[PRIMARYSET].handling == H_UTF8) {
-#ifdef ENHANCED_SYMBOLS
-            if (!glyphid_cache_status())
-                fill_glyphid_cache();
-#endif
-        }
+        if (!glyphid_cache_status())
+            fill_glyphid_cache();
         reslt = handler_symset(optidx);
-        if (gs.symset[PRIMARYSET].handling == H_UTF8) {
-#ifdef ENHANCED_SYMBOLS
-            if (glyphid_cache_status())
-                free_glyphid_cache();
-#endif
-        }
+        if (glyphid_cache_status())
+            free_glyphid_cache();
+        /* apply_customizations(gc.currentgraphics); */
         return reslt;
     }
     return optn_ok;
@@ -6928,11 +6917,9 @@ initoptions_init(void)
             gc.cmdline_windowsys = NULL;
     }
 
-#ifdef ENHANCED_SYMBOLS
     /* make any symbol parsing quicker */
     if (!glyphid_cache_status())
         fill_glyphid_cache();
-#endif
 
     /* set up the command parsing */
     reset_commands(TRUE); /* init */
@@ -7201,11 +7188,9 @@ initoptions_finish(void)
         && !opt_set_in_config[opt_bgcolors])
         iflags.bgcolors = FALSE;
 
-#ifdef ENHANCED_SYMBOLS
     if (glyphid_cache_status())
         free_glyphid_cache();
-    apply_customizations_to_symset(gc.currentgraphics);
-#endif
+    apply_customizations(gc.currentgraphics);
     go.opt_initial = FALSE;
 
     /*

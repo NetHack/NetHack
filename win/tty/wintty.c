@@ -122,7 +122,7 @@ struct window_procs tty_procs = {
      | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_STATUSLINES
      | WC2_U_UTF8STR | WC2_PETATTR
 #if !defined(NO_TERMS) || defined(WIN32CON)
-     | WC2_U_24BITCOLOR
+     | WC2_EXTRACOLORS
 #endif
     ),
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
@@ -252,6 +252,9 @@ static void status_sanity_check(void);
 void g_pututf8(uint8 *utf8str);
 #endif
 
+/* this is always present to reduce preproc conditional code */
+static boolean calling_from_update_inventory = FALSE;
+
 #ifdef TTY_PERM_INVENT
 static struct tty_perminvent_cell emptyttycell = {
     0, 0, 0, { 0 }, NO_COLOR + 1
@@ -270,7 +273,6 @@ static long last_glyph_reset_when;
 #ifndef NOINVSYM /* invent.c */
 #define NOINVSYM '#'
 #endif
-static boolean calling_from_update_inventory = FALSE;
 static int ttyinv_create_window(int, struct WinDesc *);
 static void ttyinv_remove_data(struct WinDesc *, boolean);
 static void ttyinv_add_menu(winid, struct WinDesc *, char ch, int attr,
@@ -3800,11 +3802,9 @@ tty_print_glyph(
 {
     boolean inverse_on = FALSE, colordone = FALSE, glyphdone = FALSE;
     boolean petattr = FALSE;
-    int ch, color;
+    int ch;
+    uint32 color, nhcolor = 0;
     unsigned special;
-#ifdef ENHANCED_SYMBOLS
-    boolean color24bit_on = FALSE;
-#endif
 
     HUPSKIP();
 #ifdef CLIPPING
@@ -3832,31 +3832,48 @@ tty_print_glyph(
     }
 #endif
     if (iflags.use_color) {
-        if (color != ttyDisplay->color) {
-            if (ttyDisplay->color != NO_COLOR)
-                term_end_color();
-        }
-#ifdef ENHANCED_SYMBOLS
-        /* we don't link with termcap.o if NO_TERMS is defined */
-        if ((tty_procs.wincap2 & WC2_U_24BITCOLOR) && SYMHANDLING(H_UTF8)
-            && iflags.colorcount >= 256
-#ifdef TTY_PERM_INVENT
-            && !calling_from_update_inventory
-#endif
-            && glyphinfo->gm.u && glyphinfo->gm.u->ucolor) {
-            if ((glyphinfo->gm.u->ucolor & NH_BASIC_COLOR) == 0) {
-                term_start_24bitcolor(glyphinfo->gm.u);
-                color24bit_on = TRUE;
-                colordone = TRUE;
+        uint32 closecolor;
+        int clridx;
+
+        if (iflags.colorcount >= 256
+                && glyphinfo->gm.nhcolor != 0
+                && !calling_from_update_inventory
+                && (tty_procs.wincap2 & WC2_EXTRACOLORS) != 0) {
+            if ((glyphinfo->gm.nhcolor & NH_BASIC_COLOR) != 0) {
+                /* don't set colordone or nhcolor */
+                color = COLORVAL(glyphinfo->gm.nhcolor);
+            }  else if (iflags.colorcount == 256) {
+                if (closest_color(COLORVAL(glyphinfo->gm.nhcolor),
+                    &closecolor, &clridx)) {
+                    if (ttyDisplay->color != NO_COLOR) {
+                        term_end_color();
+                    }
+                    ttyDisplay->colorflags = 0;
+                    term_start_256color(clridx);
+                    colordone = TRUE;
+                }
             } else {
-                color = glyphinfo->gm.u->ucolor & ~NH_BASIC_COLOR;
+                nhcolor = COLORVAL(glyphinfo->gm.nhcolor);
+                if (ttyDisplay->color != NO_COLOR) {
+                    term_end_color();
+                }
+                ttyDisplay->colorflags = 0;
+                term_start_extracolor(nhcolor);
+                colordone = TRUE;
             }
         }
-#endif
         if (!colordone) {
+            /* NH_BASIC_COLOR processing */
+            ttyDisplay->colorflags = NH_BASIC_COLOR;
+            if (color != ttyDisplay->color) {
+                if (ttyDisplay->color != NO_COLOR) {
+                    term_end_color();
+                }
+            }
             ttyDisplay->color = color;
-            if (color != NO_COLOR)
-                term_start_color(color);
+            if (color != NO_COLOR) {
+                term_start_color(ttyDisplay->color);
+            }
         }
     }   /* iflags.use_color aka iflags.wc_color */
 
@@ -3865,9 +3882,9 @@ tty_print_glyph(
        (tried bold for ice but it didn't look very good; inverse is easier
        to see although the Valkyrie quest ends up being hard on the eyes) */
     if (iflags.use_color
-        && bkglyphinfo && bkglyphinfo->framecolor != NO_COLOR) {
-        ttyDisplay->framecolor = bkglyphinfo->framecolor;
-        term_start_bgcolor(bkglyphinfo->framecolor);
+        && bkglyphinfo && bkglyphinfo->gm.nhcolor != NO_COLOR) {
+        ttyDisplay->framecolor = bkglyphinfo->gm.nhcolor;
+        term_start_bgcolor(bkglyphinfo->gm.nhcolor);
     } else if ((special & MG_PET) != 0 && iflags.hilite_pet) {
         term_start_attr(iflags.wc2_petattr);
         petattr = TRUE;
@@ -3906,15 +3923,15 @@ tty_print_glyph(
         /* turn off color as well, turning off ATR_INVERSE may have done
           this already and if so, we won't know the current state unless
           we do it explicitly */
-        if (ttyDisplay->color != NO_COLOR
-            || ttyDisplay->framecolor != NO_COLOR) {
-            term_end_color();
-            ttyDisplay->color = ttyDisplay->framecolor = NO_COLOR;
+        if (ttyDisplay->colorflags == NH_BASIC_COLOR) {
+            if (ttyDisplay->color != NO_COLOR
+                || ttyDisplay->framecolor != NO_COLOR) {
+                term_end_color();
+                ttyDisplay->color = ttyDisplay->framecolor = NO_COLOR;
+            }
+        } else {
+            term_end_extracolor();
         }
-#ifdef ENHANCED_SYMBOLS
-        if (color24bit_on)
-            term_end_24bitcolor();
-#endif
     }
     print_vt_code1(AVTC_GLYPH_END);
 

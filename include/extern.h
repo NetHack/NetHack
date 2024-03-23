@@ -318,6 +318,11 @@ extern void free_menu_coloring(void);
 extern int count_menucolors(void);
 extern int32 check_enhanced_colors(char *) NONNULLARG1;
 extern const char *wc_color_name(int32) NONNULL;
+extern int32_t rgbstr_to_int32(const char *rgbstr);
+extern boolean closest_color(uint32_t lcolor, uint32_t *closecolor, int *clridx);
+extern int color_distance(uint32_t, uint32_t);
+extern boolean onlyhexdigits(const char *buf);
+extern uint32 get_nhcolor_from_256_index(int idx);
 
 /* ### cmd.c ### */
 
@@ -1079,6 +1084,29 @@ extern void getpos_sethilite(void(*f)(boolean), boolean(*d)(coordxy,coordxy));
 extern boolean mapxy_valid(coordxy, coordxy);
 extern boolean gather_locs_interesting(coordxy, coordxy, int);
 
+/* ### glyphs.c ### */
+
+extern int glyphrep_to_custom_map_entries(const char *op,
+                                          int *glyph) NONNULLPTRS;
+extern int add_custom_urep_entry(const char *symset_name, int glyphidx,
+                                 uint32 utf32ch, const uint8 *utf8str,
+                                 enum graphics_sets which_set) NONNULLARG1;
+extern int add_custom_nhcolor_entry(const char *customization_name,
+                                    int glyphidx, uint32 nhcolor,
+                                    enum graphics_sets which_set) NONNULLARG1;
+int set_map_nhcolor(glyph_map *gm, uint32 nhcolor) NONNULLARG1;
+extern int unicode_val(const char *);
+extern int glyphrep(const char *) NONNULLARG1;
+extern int match_glyph(char *) NONNULLARG1;
+extern void dump_all_glyphids(FILE *fp) NONNULLARG1;
+extern void fill_glyphid_cache(void);
+extern void free_glyphid_cache(void);
+extern boolean glyphid_cache_status(void);
+extern void apply_customizations(enum graphics_sets which_set);
+extern void purge_custom_entries(enum graphics_sets which_set);
+extern void purge_all_custom_entries(void);
+extern void dump_glyphids(void);
+
 /* ### hack.c ### */
 
 extern boolean is_valid_travelpt(coordxy, coordxy);
@@ -1399,9 +1427,6 @@ extern void runtime_info_init(void);
 extern const char *do_runtime_info(int *) NO_NNARGS;
 extern void release_runtime_info(void);
 extern char *mdlib_version_string(char *, const char *) NONNULL NONNULLPTRS;
-#ifdef ENHANCED_SYMBOLS
-extern void dump_glyphids(void);
-#endif
 
 /* ### mhitm.c ### */
 
@@ -3002,12 +3027,7 @@ extern const struct symparse *match_sym(char *) NONNULLARG1;
 extern void savedsym_free(void);
 extern void savedsym_strbuf(strbuf_t *) NONNULLARG1;
 extern boolean parsesymbols(char *, int) NONNULLARG1;
-#ifdef ENHANCED_SYMBOLS
-extern struct customization_detail *find_matching_symset_customiz(
-               const char *symset_name, int custtype,
-               enum graphics_sets which_set) NONNULLARG1;
-extern void apply_customizations_to_symset(enum graphics_sets which_set);
-#endif
+extern void clear_all_glyphmap_colors(void);
 
 /* ### sys.c ### */
 
@@ -3353,21 +3373,10 @@ extern int hide_privileges(boolean);
 /* ### utf8map.c ### */
 
 #ifdef ENHANCED_SYMBOLS
-extern int glyphrep(const char *) NONNULLARG1;
 extern char *mixed_to_utf8(char *buf, size_t bufsz, const char *str,
                            int *) NONNULLARG1;
-extern int match_glyph(char *) NONNULLARG1;
-extern void dump_all_glyphids(FILE *fp) NONNULLARG1;
-extern void fill_glyphid_cache(void);
-extern void free_glyphid_cache(void);
-extern boolean glyphid_cache_status(void);
-extern int glyphrep_to_custom_map_entries(const char *op, int *glyph) NONNULLPTRS;
 void free_all_glyphmap_u(void);
-int add_custom_urep_entry(const char *symset_name, int glyphidx,
-                          uint32 utf32ch, const uint8 *utf8str, long ucolor,
-                          enum graphics_sets which_set) NONNULLARG1;
-int set_map_u(glyph_map *gm, uint32 utf32ch, const uint8 *utf8str,
-              long ucolor) NONNULLPTRS;
+int set_map_u(glyph_map *gm, uint32 utf32ch, const uint8 *utf8str) NONNULLPTRS;
 #endif /* ENHANCED_SYMBOLS */
 
 /* ### vault.c ### */

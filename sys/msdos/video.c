@@ -483,7 +483,7 @@ tty_start_screen(void)
 void
 gr_init(void)
 {
-    windowprocs.wincap2 &= ~WC2_U_24BITCOLOR;
+    windowprocs.wincap2 &= ~WC2_EXTRACOLORS;
 #ifdef SCREEN_VGA
     if (iflags.usevga) {
         vga_Init();

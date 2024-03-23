@@ -1168,6 +1168,7 @@ freedynamicdata(void)
     msgtype_free();
     savedsym_free();
     tmp_at(DISP_FREEMEM, 0); /* temporary display effects */
+    purge_all_custom_entries();
 #ifdef FREE_ALL_MEMORY
 #define free_current_level() savelev(&tnhfp, -1)
 #define freeobjchn(X) (saveobjchn(&tnhfp, &X), X = 0)

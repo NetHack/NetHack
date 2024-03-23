@@ -756,9 +756,7 @@ static const struct instance_globals_s g_init_s = {
     { 0, 0 }, /* save_dlevel */
     /* symbols.c */
     { DUMMY }, /* symset */
-#ifdef ENHANCED_SYMBOLS
-    { { 0 } }, /* symset_customizations */
-#endif
+    { { 0 }, { 0 } }, /* symset_customizations */
     DUMMY, /* showsyms */
     /* files.c */
     0, /* symset_count */

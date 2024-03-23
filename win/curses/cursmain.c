@@ -63,6 +63,7 @@ struct window_procs curses_procs = {
 #ifdef CURSES_UNICODE
      | WC2_U_UTF8STR
 #endif
+     | WC2_EXTRACOLORS
 #ifdef SELECTSAVED
      | WC2_SELECTSAVED
 #endif
@@ -912,6 +913,7 @@ curses_print_glyph(
     int glyph;
     int ch;
     int color;
+    uint32 nhcolor = 0;
     unsigned int special;
     int attr = -1;
 
@@ -919,6 +921,22 @@ curses_print_glyph(
     special = glyphinfo->gm.glyphflags;
     ch = glyphinfo->ttychar;
     color = glyphinfo->gm.sym.color;
+    /*  Extra color handling
+     *  FIQ: The curses library does not support truecolor, only the more limited 256
+     *  color mode. On top of this, the windowport only supports 16 color mode.
+     *  Thus, we only allow users to customize glyph colors to the basic NetHack
+     *  colors. */
+    if (glyphinfo->gm.nhcolor != 0
+        && (curses_procs.wincap2 & WC2_EXTRACOLORS) != 0) {
+        if ((glyphinfo->gm.nhcolor & NH_BASIC_COLOR) != 0) {
+            color = COLORVAL(glyphinfo->gm.nhcolor);
+#if 0
+        } else {
+            /* 24-bit color, NH_BASIC_COLOR == 0 */
+            nhcolor = COLORVAL(glyphinfo->gm.nhcolor);
+#endif
+        }
+    }
     if ((special & MG_PET) && iflags.hilite_pet) {
         attr = curses_convert_attr(iflags.wc2_petattr);
     }
@@ -955,20 +973,15 @@ curses_print_glyph(
         }
     }
 
+    curses_putch(wid, x, y, ch,
 #ifdef ENHANCED_SYMBOLS
-    if (SYMHANDLING(H_UTF8)
-        && glyphinfo->gm.u
-        && glyphinfo->gm.u->utf8str) {
-        curses_putch(wid, x, y, ch, glyphinfo->gm.u, color,
-                     bkglyphinfo->framecolor, attr);
-    } else {
-        curses_putch(wid, x, y, ch, NULL, color,
-                     bkglyphinfo->framecolor, attr);
-    }
-#else
-    curses_putch(wid, x, y, ch, color,
-                 bkglyphinfo->framecolor, attr);
+                 (SYMHANDLING(H_UTF8)
+                  && glyphinfo->gm.u && glyphinfo->gm.u->utf8str)
+                      ? glyphinfo->gm.u : NULL, 
 #endif
+                 (nhcolor != 0) ? nhcolor : color,
+                 bkglyphinfo->framecolor, attr);
+
 }
 
 /*

@@ -911,9 +911,7 @@ static const struct early_opt earlyopts[] = {
 #ifndef NODUMPENUMS
     { ARG_DUMPENUMS, "dumpenums", 9, FALSE },
 #endif
-#ifdef ENHANCED_SYMBOLS
     { ARG_DUMPGLYPHIDS, "dumpglyphids", 12, FALSE },
-#endif
 #ifdef WIN32
     { ARG_WINDOWS, "windows", 4, TRUE },
 #endif
@@ -1012,11 +1010,9 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
             dump_enums();
             return 2;
 #endif
-#ifdef ENHANCED_SYMBOLS
         case ARG_DUMPGLYPHIDS:
             dump_glyphids();
             return 2;
-#endif
 #ifdef CRASHREPORT
         case ARG_BIDSHOW:
             crashreport_bidshow();
@@ -1113,7 +1109,7 @@ timet_delta(time_t etim, time_t stim) /* end and start times */
     return (long) difftime(etim, stim);
 }
 
-#if !defined(NODUMPENUMS) || defined(ENHANCED_SYMBOLS)
+#if !defined(NODUMPENUMS)
 /* monsdump[] and objdump[] are also used in utf8map.c */
 
 #define DUMP_ENUMS
@@ -1277,13 +1273,11 @@ dump_enums(void)
 }
 #endif /* NODUMPENUMS */
 
-#ifdef ENHANCED_SYMBOLS
 void
 dump_glyphids(void)
 {
     dump_all_glyphids(stdout);
 }
-#endif /* ENHANCED_SYMBOLS */
-#endif /* !NODUMPENUMS || ENHANCED_SYMBOLS */
+#endif /* !NODUMPENUMS */
 
 /*allmain.c*/

@@ -582,20 +582,20 @@ void NetHackQtMapViewport::PrintGlyph(int x, int y,
     Glyphcolor(x, y) = (uint32) glyphinfo->gm.sym.color;
     GlyphFramecolor(x, y) = (uint32) bkglyphinfo->framecolor;
 #ifdef ENHANCED_SYMBOLS
-    if (SYMHANDLING(H_UTF8)
-        && glyphinfo->gm.u
-        && glyphinfo->gm.u->utf8str) {
+    if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u && glyphinfo->gm.u->utf8str) {
         Glyphttychar(x, y) = glyphinfo->gm.u->utf32ch;
-        if (glyphinfo->gm.u->ucolor != 0) {
-            if ((glyphinfo->gm.u->ucolor & NH_BASIC_COLOR) == 0) {
-                Glyphcolor(x, y) = glyphinfo->gm.u->ucolor | 0x80000000;
-            } else {
-                Glyphcolor(x, y) =
-                            (uint32) glyphinfo->gm.u->ucolor & ~NH_BASIC_COLOR;
-            }
-        }
     }
 #endif
+    if (glyphinfo->gm.nhcolor != 0) {
+        uint32 nhcolor = COLORVAL(glyphinfo->gm.nhcolor);
+        if (glyphinfo->gm.nhcolor == nhcolor) {
+            /* 24-bit color */
+            Glyphcolor(x, y) = COLORVAL(glyphinfo->gm.nhcolor) | 0x80000000;
+        } else {
+            /* NH_BASIC_COLOR */
+            Glyphcolor(x, y) = COLORVAL(glyphinfo->gm.nhcolor);
+        }
+    }
     Glyphflags(x, y) = glyphinfo->gm.glyphflags;
     Glyphtileidx(x, y) = (unsigned short) glyphinfo->gm.tileidx;
     Changed(x, y);
