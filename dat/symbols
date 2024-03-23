@@ -279,6 +279,50 @@ start: IBMgraphics
 	S_sw_mr: \xb3			# meta-3, vertical rule
 	S_expl_ml: \xb3			# meta-3, vertical rule
 	S_expl_mr: \xb3			# meta-3, vertical rule
+	G_vwall_sokoban:  /blue
+	G_hwall_sokoban:  /blue
+	G_tlcorn_sokoban: /blue
+	G_trcorn_sokoban: /blue
+	G_blcorn_sokoban: /blue
+	G_brcorn_sokoban: /blue
+	G_crwall_sokoban: /blue
+	G_tuwall_sokoban: /blue
+	G_tdwall_sokoban: /blue
+	G_tlwall_sokoban: /blue
+	G_trwall_sokoban: /blue
+	G_vwall_gehennom:  /red
+	G_hwall_gehennom:  /red
+	G_tlcorn_gehennom: /red
+	G_trcorn_gehennom: /red
+	G_blcorn_gehennom: /red
+	G_brcorn_gehennom: /red
+	G_crwall_gehennom: /red
+	G_tuwall_gehennom: /red
+	G_tdwall_gehennom: /red
+	G_tlwall_gehennom: /red
+	G_trwall_gehennom: /red
+	G_vwall_knox: /brown
+	G_hwall_knox: /brown
+	G_tlcorn_knox: /brown
+	G_trcorn_knox: /brown
+	G_blcorn_knox: /brown
+	G_brcorn_knox: /brown
+	G_crwall_knox: /brown
+	G_tuwall_knox: /brown
+	G_tdwall_knox: /brown
+	G_tlwall_knox: /brown
+	G_trwall_knox: /brown
+	G_vwall_mines: /orange
+	G_hwall_mines: /orange
+	G_tlcorn_mines: /orange
+	G_trcorn_mines: /orange
+	G_blcorn_mines: /orange
+	G_brcorn_mines: /orange
+	G_crwall_mines: /orange
+	G_tuwall_mines: /orange
+	G_tdwall_mines: /orange
+	G_tlwall_mines: /orange
+	G_trwall_mines: /orange
 finish
 
 start: IBMGraphics_1
@@ -302,6 +346,50 @@ start: IBMGraphics_1
 	S_sw_mr: \xb3			# meta-3, vertical rule
 	S_expl_ml: \xb3			# meta-3, vertical rule
 	S_expl_mr: \xb3			# meta-3, vertical rule
+	G_vwall_sokoban:  /blue
+	G_hwall_sokoban:  /blue
+	G_tlcorn_sokoban: /blue
+	G_trcorn_sokoban: /blue
+	G_blcorn_sokoban: /blue
+	G_brcorn_sokoban: /blue
+	G_crwall_sokoban: /blue
+	G_tuwall_sokoban: /blue
+	G_tdwall_sokoban: /blue
+	G_tlwall_sokoban: /blue
+	G_trwall_sokoban: /blue
+	G_vwall_gehennom: /red
+	G_hwall_gehennom:  /red
+	G_tlcorn_gehennom: /red
+	G_trcorn_gehennom: /red
+	G_blcorn_gehennom: /red
+	G_brcorn_gehennom: /red
+	G_crwall_gehennom: /red
+	G_tuwall_gehennom: /red
+	G_tdwall_gehennom: /red
+	G_tlwall_gehennom: /red
+	G_trwall_gehennom: /red
+	G_vwall_knox: /brown
+	G_hwall_knox: /brown
+	G_tlcorn_knox: /brown
+	G_trcorn_knox: /brown
+	G_blcorn_knox: /brown
+	G_brcorn_knox: /brown
+	G_crwall_knox: /brown
+	G_tuwall_knox: /brown
+	G_tdwall_knox: /brown
+	G_tlwall_knox: /brown
+	G_trwall_knox: /brown
+	G_vwall_mines: /orange
+	G_hwall_mines: /orange
+	G_tlcorn_mines: /orange
+	G_trcorn_mines: /orange
+	G_blcorn_mines: /orange
+	G_brcorn_mines: /orange
+	G_crwall_mines: /orange
+	G_tuwall_mines: /orange
+	G_tdwall_mines: /orange
+	G_tlwall_mines: /orange
+	G_trwall_mines: /orange
 finish
 
 start: IBMGraphics_2
@@ -330,6 +418,50 @@ start: IBMGraphics_2
 	S_sw_mr: \xb3			# meta-3, vertical rule
 	S_expl_ml: \xb3			# meta-3, vertical rule
 	S_expl_mr: \xb3			# meta-3, vertical rule
+	G_vwall_sokoban:  /blue
+	G_hwall_sokoban:  /blue
+	G_tlcorn_sokoban: /blue
+	G_trcorn_sokoban: /blue
+	G_blcorn_sokoban: /blue
+	G_brcorn_sokoban: /blue
+	G_crwall_sokoban: /blue
+	G_tuwall_sokoban: /blue
+	G_tdwall_sokoban: /blue
+	G_tlwall_sokoban: /blue
+	G_trwall_sokoban: /blue
+	G_vwall_gehennom: /red
+	G_hwall_gehennom:  /red
+	G_tlcorn_gehennom: /red
+	G_trcorn_gehennom: /red
+	G_blcorn_gehennom: /red
+	G_brcorn_gehennom: /red
+	G_crwall_gehennom: /red
+	G_tuwall_gehennom: /red
+	G_tdwall_gehennom: /red
+	G_tlwall_gehennom: /red
+	G_trwall_gehennom: /red
+	G_vwall_knox: /brown
+	G_hwall_knox: /brown
+	G_tlcorn_knox: /brown
+	G_trcorn_knox: /brown
+	G_blcorn_knox: /brown
+	G_brcorn_knox: /brown
+	G_crwall_knox: /brown
+	G_tuwall_knox: /brown
+	G_tdwall_knox: /brown
+	G_tlwall_knox: /brown
+	G_trwall_knox: /brown
+	G_vwall_mines: /orange
+	G_hwall_mines: /orange
+	G_tlcorn_mines: /orange
+	G_trcorn_mines: /orange
+	G_blcorn_mines: /orange
+	G_brcorn_mines: /orange
+	G_crwall_mines: /orange
+	G_tuwall_mines: /orange
+	G_tdwall_mines: /orange
+	G_tlwall_mines: /orange
+	G_trwall_mines: /orange
 finish
 
 start: RogueIBM
@@ -508,6 +640,50 @@ start: curses
 	S_sw_mr: \xf8			# meta-3, vertical rule
 	S_expl_ml: \xf8			# meta-3, vertical rule
 	S_expl_mr: \xf8			# meta-3, vertical rule
+	G_vwall_sokoban:  /blue
+	G_hwall_sokoban:  /blue
+	G_tlcorn_sokoban: /blue
+	G_trcorn_sokoban: /blue
+	G_blcorn_sokoban: /blue
+	G_brcorn_sokoban: /blue
+	G_crwall_sokoban: /blue
+	G_tuwall_sokoban: /blue
+	G_tdwall_sokoban: /blue
+	G_tlwall_sokoban: /blue
+	G_trwall_sokoban: /blue
+	G_vwall_gehennom: /red
+	G_hwall_gehennom:  /red
+	G_tlcorn_gehennom: /red
+	G_trcorn_gehennom: /red
+	G_blcorn_gehennom: /red
+	G_brcorn_gehennom: /red
+	G_crwall_gehennom: /red
+	G_tuwall_gehennom: /red
+	G_tdwall_gehennom: /red
+	G_tlwall_gehennom: /red
+	G_trwall_gehennom: /red
+	G_vwall_knox: /brown
+	G_hwall_knox: /brown
+	G_tlcorn_knox: /brown
+	G_trcorn_knox: /brown
+	G_blcorn_knox: /brown
+	G_brcorn_knox: /brown
+	G_crwall_knox: /brown
+	G_tuwall_knox: /brown
+	G_tdwall_knox: /brown
+	G_tlwall_knox: /brown
+	G_trwall_knox: /brown
+	G_vwall_mines: /orange
+	G_hwall_mines: /orange
+	G_tlcorn_mines: /orange
+	G_trcorn_mines: /orange
+	G_blcorn_mines: /orange
+	G_brcorn_mines: /orange
+	G_crwall_mines: /orange
+	G_tuwall_mines: /orange
+	G_tdwall_mines: /orange
+	G_tlwall_mines: /orange
+	G_trwall_mines: /orange
 finish
 
 start: DECgraphics
@@ -553,6 +729,50 @@ start: DECgraphics
 	S_expl_ml: \xf8			# meta-x, vertical rule
 	S_expl_mr: \xf8			# meta-x, vertical rule
 	S_expl_bc: \xf3			# meta-s, low horizontal line
+	G_vwall_sokoban:  /blue
+	G_hwall_sokoban:  /blue
+	G_tlcorn_sokoban: /blue
+	G_trcorn_sokoban: /blue
+	G_blcorn_sokoban: /blue
+	G_brcorn_sokoban: /blue
+	G_crwall_sokoban: /blue
+	G_tuwall_sokoban: /blue
+	G_tdwall_sokoban: /blue
+	G_tlwall_sokoban: /blue
+	G_trwall_sokoban: /blue
+	G_vwall_gehennom: /red
+	G_hwall_gehennom:  /red
+	G_tlcorn_gehennom: /red
+	G_trcorn_gehennom: /red
+	G_blcorn_gehennom: /red
+	G_brcorn_gehennom: /red
+	G_crwall_gehennom: /red
+	G_tuwall_gehennom: /red
+	G_tdwall_gehennom: /red
+	G_tlwall_gehennom: /red
+	G_trwall_gehennom: /red
+	G_vwall_knox: /brown
+	G_hwall_knox: /brown
+	G_tlcorn_knox: /brown
+	G_trcorn_knox: /brown
+	G_blcorn_knox: /brown
+	G_brcorn_knox: /brown
+	G_crwall_knox: /brown
+	G_tuwall_knox: /brown
+	G_tdwall_knox: /brown
+	G_tlwall_knox: /brown
+	G_trwall_knox: /brown
+	G_vwall_mines: /orange
+	G_hwall_mines: /orange
+	G_tlcorn_mines: /orange
+	G_trcorn_mines: /orange
+	G_blcorn_mines: /orange
+	G_brcorn_mines: /orange
+	G_crwall_mines: /orange
+	G_tuwall_mines: /orange
+	G_tdwall_mines: /orange
+	G_tlwall_mines: /orange
+	G_trwall_mines: /orange
 finish
 
 start: MACgraphics
