@@ -105,6 +105,7 @@ staticfn int dotravel(void);
 staticfn int dotravel_target(void);
 staticfn int doclicklook(void);
 staticfn boolean yn_menuable_resp(const char *);
+staticfn void yn_func_menu_opt(winid, char, const char *, char);
 staticfn boolean yn_function_menu(const char *, const char *, char, char *);
 staticfn int domouseaction(void);
 staticfn int doterrain(void);
@@ -4966,6 +4967,20 @@ yn_menuable_resp(const char *resp)
         && (resp == ynchars || resp == ynqchars || resp == ynaqchars);
 }
 
+staticfn void
+yn_func_menu_opt(winid win, char key, const char *text, char def)
+{
+    anything any;
+
+    any = cg.zeroany;
+    any.a_char = key;
+    add_menu(win, &nul_glyphinfo, &any, key, 0,
+             ATR_NONE, NO_COLOR, text,
+             (def == key) ? MENU_ITEMFLAGS_SELECTED
+                          : MENU_ITEMFLAGS_NONE);
+
+}
+
 /* use a menu to ask a specific response to a query.
    returns TRUE if the menu was shown to the user.
    puts the response char into res. */
@@ -4979,36 +4994,16 @@ yn_function_menu(
     if (yn_menuable_resp(resp)) {
         winid win = create_nhwindow(NHW_MENU);
         menu_item *sel;
-        anything any;
         int n;
         char keybuf[QBUFSZ];
 
         start_menu(win, MENU_BEHAVE_STANDARD);
-        any = cg.zeroany;
-        any.a_char = 'y';
-        add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
-                 ATR_NONE, NO_COLOR, "Yes",
-                 (def == any.a_char) ? MENU_ITEMFLAGS_SELECTED
-                                     : MENU_ITEMFLAGS_NONE);
-        any.a_char = 'n';
-        add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
-                 ATR_NONE, NO_COLOR, "No",
-                 (def == any.a_char) ? MENU_ITEMFLAGS_SELECTED
-                                     : MENU_ITEMFLAGS_NONE);
-        if (resp == ynaqchars) {
-            any.a_char = 'a';
-            add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
-                     ATR_NONE, NO_COLOR, "All",
-                     (def == any.a_char) ? MENU_ITEMFLAGS_SELECTED
-                                         : MENU_ITEMFLAGS_NONE);
-        }
-        if (resp == ynqchars || resp == ynaqchars) {
-            any.a_char = 'q';
-            add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
-                     ATR_NONE, NO_COLOR, "Quit",
-                     (def == any.a_char) ? MENU_ITEMFLAGS_SELECTED
-                                         : MENU_ITEMFLAGS_NONE);
-        }
+        yn_func_menu_opt(win, 'y', "Yes", def);
+        yn_func_menu_opt(win, 'n', "No", def);
+        if (resp == ynaqchars)
+            yn_func_menu_opt(win, 'a', "All", def);
+        if (resp == ynqchars || resp == ynaqchars)
+            yn_func_menu_opt(win, 'q', "Quit", def);
         end_menu(win, query);
         n = select_menu(win, PICK_ONE, &sel);
         destroy_nhwindow(win);
