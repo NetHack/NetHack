@@ -1085,6 +1085,9 @@ tamedog(struct monst *mtmp, struct obj *obj)
         return FALSE;
 
     /* worst case, at least it'll be peaceful. */
+    if (!mtmp->mpeaceful && canspotmon(mtmp))
+        pline("%s seems %s.", Monnam(mtmp),
+              Hallucination ? "really chill" : "more amiable");
     mtmp->mpeaceful = 1;
     set_malign(mtmp);
     if (flags.moonphase == FULL_MOON && night() && rn2(6) && obj
