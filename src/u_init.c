@@ -1,4 +1,4 @@
-/* NetHack 3.7	u_init.c	$NHDT-Date: 1621131203 2021/05/16 02:13:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.75 $ */
+/* NetHack 3.7	u_init.c	$NHDT-Date: 1711165379 2024/03/23 03:42:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -166,8 +166,6 @@ static struct trobj Valkyrie[] = {
     { 0, 0, 0, 0, 0 }
 };
 static struct trobj Wizard[] = {
-#define W_MULTSTART 2
-#define W_MULTEND 6
     { QUARTERSTAFF, 1, WEAPON_CLASS, 1, 1 },
     { CLOAK_OF_MAGIC_RESISTANCE, 0, ARMOR_CLASS, 1, UNDEF_BLESS },
     { UNDEF_TYP, UNDEF_SPE, WAND_CLASS, 1, UNDEF_BLESS },
@@ -1267,5 +1265,19 @@ ini_inv(struct trobj *trop)
         trop++;
     }
 }
+
+#undef UNDEF_TYP
+#undef UNDEF_SPE
+#undef UNDEF_BLESS
+#undef B_MAJOR
+#undef B_MINOR
+#undef C_AMMO
+#undef M_BOOK
+#undef RAN_BOW
+#undef RAN_TWO_ARROWS
+#undef RAN_ZERO_ARROWS
+#undef R_DAGGERS
+#undef S_ARROWS
+#undef T_DARTS
 
 /*u_init.c*/
