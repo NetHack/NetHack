@@ -4964,7 +4964,8 @@ staticfn boolean
 yn_menuable_resp(const char *resp)
 {
     return iflags.query_menu && iflags.window_inited
-        && (resp == ynchars || resp == ynqchars || resp == ynaqchars);
+        && (resp == ynchars || resp == ynqchars || resp == ynaqchars
+            || resp == rightleftchars);
 }
 
 staticfn void
@@ -4998,8 +4999,13 @@ yn_function_menu(
         char keybuf[QBUFSZ];
 
         start_menu(win, MENU_BEHAVE_STANDARD);
-        yn_func_menu_opt(win, 'y', "Yes", def);
-        yn_func_menu_opt(win, 'n', "No", def);
+        if (resp == rightleftchars) {
+            yn_func_menu_opt(win, 'r', "Right", def);
+            yn_func_menu_opt(win, 'l', "Left", def);
+        } else {
+            yn_func_menu_opt(win, 'y', "Yes", def);
+            yn_func_menu_opt(win, 'n', "No", def);
+        }
         if (resp == ynaqchars)
             yn_func_menu_opt(win, 'a', "All", def);
         if (resp == ynqchars || resp == ynaqchars)

@@ -2155,7 +2155,7 @@ accessory_or_armor_on(struct obj *obj)
                     Sprintf(qbuf, "Which %s%s, Right or Left?",
                             humanoid(gy.youmonst.data) ? "ring-" : "",
                             body_part(FINGER));
-                    answer = yn_function(qbuf, "rl", '\0', TRUE);
+                    answer = yn_function(qbuf, rightleftchars, '\0', TRUE);
                     switch (answer) {
                     case '\0':
                     case '\033':

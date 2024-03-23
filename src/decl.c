@@ -135,6 +135,7 @@ const char ynchars[] = "yn";
 const char ynqchars[] = "ynq";
 const char ynaqchars[] = "ynaq";
 const char ynNaqchars[] = "yn#aq";
+const char rightleftchars[] = "rl";
 NEARDATA long yn_number = 0L;
 
 #ifdef PANICTRACE
