@@ -4967,7 +4967,7 @@ yn_menuable_resp(const char *resp)
 }
 
 /* use a menu to ask a specific response to a query.
-   returns TRUE if we the menu was shown to the user.
+   returns TRUE if the menu was shown to the user.
    puts the response char into res. */
 staticfn boolean
 yn_function_menu(
