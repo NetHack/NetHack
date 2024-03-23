@@ -1,4 +1,4 @@
-/* NetHack 3.7	unixunix.c	$NHDT-Date: 1687124609 2023/06/18 21:43:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.7	unixunix.c	$NHDT-Date: 1711213894 2024/03/23 17:11:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -182,14 +182,17 @@ getlock(void)
         unlock_file(HLOCK);
         if (iflags.window_inited) {
 #ifdef SELF_RECOVER
-            c = yn_function("Old game in progress. Destroy [y], Recover [r], or Cancel [n]?", "ynr", 'n', FALSE);
+            c = yn_function(
+             "Old game in progress. Destroy [y], Recover [r], or Cancel [n]?",
+                            "ynr", 'n', FALSE);
 #else
             /* this is a candidate for paranoid_confirmation */
             c = y_n(destroy_old_game_prompt);
 #endif
         } else {
 #ifdef SELF_RECOVER
-            (void) raw_printf("\nThere is already a game in progress under your name. Do what?\n");
+            (void) raw_printf(
+        "\nThere is already a game in progress under your name.  Do what?\n");
             (void) raw_printf("\n  y - Destroy old game");
             (void) raw_printf("\n  r - Try to recover it");
             (void) raw_printf("\n  n - Cancel");
@@ -241,15 +244,52 @@ getlock(void)
     unlock_file(HLOCK);
     if (fd == -1) {
         error("cannot creat lock file (%s).", fq_lock);
+        /*NOTREACHED*/
     } else {
         if (write(fd, (genericptr_t) &gh.hackpid, sizeof gh.hackpid)
             != sizeof gh.hackpid) {
             error("cannot write lock (%s)", fq_lock);
+            /*NOTREACHED*/
         }
         if (close(fd) == -1) {
             error("cannot close lock (%s)", fq_lock);
+            /*NOTREACHED*/
         }
     }
+}
+
+/* caller couldn't find a regular save file but did find a panic one */
+void
+ask_about_panic_save(void)
+{
+#ifdef CHECK_PANIC_SAVE
+    static const char Instead_prompt[] = "Start a new game instead?";
+    int c = '\0';
+
+    pline("There is no regular save file but there is a panic one.");
+    pline("It might be recoverable with demi-divine intervention.");
+    if (iflags.window_inited) {
+        c = yn_function(Instead_prompt, "yn\033q", 'n', FALSE);
+    } else {
+        raw_printf("%s [yn] (n) ", Instead_prompt);
+        (void) fflush(stdout);
+        do {
+            c = getchar();
+            if (c == EOF || c == '\033' || c == '\0')
+                break;
+            c = lowc(c);
+        } while (!strchr("ynq\n", c));
+    }
+    if (c != 'y') {
+        /* caller successfully called getlock() and made <levelfile>.0 */
+        delete_levelfile(0);
+        unlock_file(HLOCK); /* just in case, release 'perm' */
+        if (iflags.window_inited)
+            exit_nhwindows((char *) 0);
+        nh_terminate(EXIT_SUCCESS);
+    }
+#endif
+    return; /* proceed with new game */
 }
 
 /* normalize file name - we don't like .'s, /'s, spaces */

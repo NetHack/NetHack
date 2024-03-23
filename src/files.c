@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1693083234 2023/08/26 20:53:54 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.378 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1711213887 2024/03/23 17:11:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.397 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1205,6 +1205,50 @@ restore_saved_game(void)
     return nhfp;
 }
 
+/* called if there is no save file for current character */
+int
+check_panic_save(void)
+{
+    int result = 0;
+#ifdef CHECK_PANIC_SAVE
+    FILE *cf;
+    const char *savef;
+
+    set_error_savefile();
+    savef = fqname(gs.SAVEF, SAVEPREFIX, 0);
+
+    /*
+     * This duplicates part of docompress_file().
+     * We don't want to start by uncompressing just to check for the
+     * file's existence and then have to recompress it.
+     */
+
+#ifdef COMPRESS_EXTENSION
+    unsigned ln = (unsigned) (strlen(savef) + strlen(COMPRESS_EXTENSION));
+    char *cfn = (char *) alloc(ln + 1);
+
+    Strcpy(cfn, savef);
+    Strcat(cfn, COMPRESS_EXTENSION);
+    if ((cf = fopen(cfn, RDBMODE)) != NULL) {
+        (void) fclose(cf);
+        result = 1;
+    }
+    free((genericptr_t) cfn);
+#endif /* COMPRESS_EXTENSION */
+
+    if (!result) {
+        /* maybe it has already been manually uncompressed */
+        if ((cf = fopen(savef, RDBMODE)) != NULL) {
+            (void) fclose(cf);
+            result = 1;
+        }
+    }
+
+    set_savefile_name(TRUE); /* reset to normal */
+#endif /* CHECK_PANIC_SAVE */
+    return result;
+}
+
 #if defined(SELECTSAVED)
 
 char *
@@ -1252,11 +1296,11 @@ plname_from_file(const char *filename, boolean without_wait_synch_per_file)
 #define EXTSTR ""
 #endif
 
-    if ( sscanf( filename, "%*[^/]/%d%63[^.]" EXTSTR, &uid, name ) == 2 ) {
+    if (sscanf(filename, "%*[^/]/%d%63[^.]" EXTSTR, &uid, name) == 2) {
 #undef EXTSTR
         /* "_" most likely means " ", which certainly looks nicer */
-        for (k=0; name[k]; k++)
-            if ( name[k] == '_' )
+        for (k = 0; name[k]; k++)
+            if (name[k] == '_')
                 name[k] = ' ';
         return dupstr(name);
     } else
@@ -1376,7 +1420,8 @@ get_saved_games(void)
                         char *r;
 
                         Sprintf(filename, "save/%d%s", uid, name);
-                        r = plname_from_file(filename, ALLOW_WAITSYNCH_PERFILE);
+                        r = plname_from_file(filename,
+                                             ALLOW_WAITSYNCH_PERFILE);
                         if (r)
                             result[j++] = r;
                     }
@@ -1629,6 +1674,7 @@ docompress_file(const char *filename, boolean uncomp)
     }
 
     free((genericptr_t) cfn);
+    return;
 }
 
 #endif /* COMPRESS : external compression */

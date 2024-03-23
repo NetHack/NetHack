@@ -1,4 +1,4 @@
-/* NetHack 3.7	unixconf.h	$NHDT-Date: 1607461111 2020/12/08 20:58:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.7	unixconf.h	$NHDT-Date: 1711213886 2024/03/23 17:11:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -117,6 +117,21 @@
 #if defined(MACOS) && !defined(TIMED_DELAY)
 #define TIMED_DELAY
 #endif
+
+/*
+ * At start of game, if there are lock and level files for current
+ * character in the playground directory, ask whether to recover them
+ * (into a save file).
+ */
+/* #define SELF_RECOVER */
+
+/*
+ * At start of game, if there is no save file to restore or lock and
+ * level files to recover but there is a panic save file for the current
+ * character, tell the player that it exists and ask whether to start a
+ * new game.  Does not attempt to rename and restore the panic save file.
+ */
+#define CHECK_PANIC_SAVE
 
 /* #define AVOID_WIN_IOCTL */ /* ensure USE_WIN_IOCTL remains undefined */
 

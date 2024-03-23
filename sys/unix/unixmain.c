@@ -1,4 +1,4 @@
-/* NetHack 3.7	unixmain.c	$NHDT-Date: 1708737183 2024/02/24 01:13:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.126 $ */
+/* NetHack 3.7	unixmain.c	$NHDT-Date: 1711213891 2024/03/23 17:11:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.127 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -305,6 +305,16 @@ main(int argc, char *argv[])
                 goto attempt_restore;
             }
         }
+
+#ifdef CHECK_PANIC_SAVE
+        /* no save file; check for a panic save; if the check finds one,
+           ask the player whether to proceed with a new game; it will
+           quit instead of returning if the answer isn't yes */
+        if (check_panic_save())
+            ask_about_panic_save();
+#endif
+
+        /* no save file; start a new game */
         newgame();
         wd_message();
     }

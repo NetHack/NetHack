@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1710792423 2024/03/18 20:07:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1398 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1711213872 2024/03/23 17:11:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1400 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1010,6 +1010,12 @@ extern NHFILE *create_savefile(void);
 extern NHFILE *open_savefile(void);
 extern int delete_savefile(void);
 extern NHFILE *restore_saved_game(void);
+extern int check_panic_save(void);
+#ifdef SELECTSAVED
+extern char *plname_from_file(const char *, boolean) NONNULLARG1;
+#endif
+extern char **get_saved_games(void);
+extern void free_saved_games(char **);
 extern void nh_compress(const char *);
 extern void nh_uncompress(const char *);
 extern boolean lock_file(const char *, int, int) NONNULLARG1;
@@ -1032,11 +1038,6 @@ extern int read_sym_file(int);
 extern void paniclog(const char *, const char *) NONNULLPTRS;
 extern void testinglog(const char *, const char *, const char *);
 extern int validate_prefix_locations(char *);
-#ifdef SELECTSAVED
-extern char *plname_from_file(const char *, boolean) NONNULLARG1;
-#endif
-extern char **get_saved_games(void);
-extern void free_saved_games(char **);
 #ifdef SELF_RECOVER
 extern boolean recover_savefile(void);
 extern void assure_syscf_file(void);
@@ -3325,6 +3326,7 @@ extern void tty_utf8graphics_fixup(void);
 
 #ifdef UNIX
 extern void getlock(void);
+extern void ask_about_panic_save(void);
 extern void regularize(char *) NONNULLARG1;
 #if defined(TIMED_DELAY) && !defined(msleep) && defined(SYSV)
 extern void msleep(unsigned);
