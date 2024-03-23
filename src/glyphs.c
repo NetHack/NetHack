@@ -102,7 +102,7 @@ glyphrep_to_custom_map_entries(const char *op, int *glyphptr)
     int milestone, reslt = 0;
     long rgb = 0L;
     boolean slash = FALSE, colon = FALSE;
-    
+
     if (!glyphid_cache)
         reslt = 1; /* for debugger use only; no cache available */
 
@@ -111,20 +111,23 @@ glyphrep_to_custom_map_entries(const char *op, int *glyphptr)
     c_unicode = c_colorval = (char *) 0;
     c_glyphid = cp = buf;
     while (*cp) {
-        if ((*cp == '/') || (*cp == ':')) {
-            if (*cp == '/')
-                slash = TRUE;
-            if (*cp == ':')
+        if (*cp == ':' || *cp == '/') {
+            if (*cp == ':') {
                 colon = TRUE;
-            *cp = '\0';
+                *cp = '\0';
+            }
+            if (*cp == '/') {
+                slash = TRUE;
+                *cp = '\0';
+            }
             milestone++;
         }
         cp++;
-        if (colon && milestone < 2 && *cp == 'U') {
+        if (colon) {
             c_unicode = cp;
             colon = FALSE;
         }
-        if (slash && milestone >= 2) {
+        if (slash) {
             c_colorval = cp;
             slash = FALSE;
         }
@@ -132,10 +135,16 @@ glyphrep_to_custom_map_entries(const char *op, int *glyphptr)
     /* some sanity checks */
     if (c_glyphid && *c_glyphid == ' ')
         c_glyphid++;
-    if (c_unicode && *c_unicode == ' ')
-        c_unicode++;
     if (c_colorval && *c_colorval == ' ')
         c_colorval++;
+    if (c_unicode && *c_unicode == ' ') {
+        while (*c_unicode == ' ') {
+            c_unicode++;
+        }
+    }
+    if (c_unicode && !*c_unicode)
+        c_unicode = 0;
+
     if ((c_colorval && (rgb = rgbstr_to_int32(c_colorval)) != -1L)
         || !c_colorval) {
         /* if the color 0 is an actual color, as opposed to just "not set"
@@ -148,9 +157,7 @@ glyphrep_to_custom_map_entries(const char *op, int *glyphptr)
                                       : (rgb == 0L) ? nonzero_black
                                                     : rgb;
     }
-    if (c_unicode 
-        && (*c_unicode == 'U' || *c_unicode == 'u')
-        && (c_unicode[1] == '+'))
+    if (c_unicode)
         to_custom_symbol_find.unicode_val = c_unicode;
     to_custom_symbol_find.extraval = glyphptr;
     to_custom_symbol_find.callback = to_custom_symset_entry_callback;
