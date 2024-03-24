@@ -1037,7 +1037,7 @@ revive(struct obj *corpse, boolean by_hero)
             }
             /* tame the revived monster if its ghost was tame */
             if (ghost->mtame && !mtmp->mtame) {
-                if (tamedog(mtmp, (struct obj *) 0)) {
+                if (tamedog(mtmp, (struct obj *) 0, FALSE)) {
                     /* ghost's edog data is ignored */
                     mtmp->mtame = ghost->mtame;
                 }

@@ -1069,7 +1069,7 @@ dogfood(struct monst *mon, struct obj *obj)
  * on the original mtmp.  It now returns TRUE if the taming succeeded.
  */
 boolean
-tamedog(struct monst *mtmp, struct obj *obj)
+tamedog(struct monst *mtmp, struct obj *obj, boolean givemsg)
 {
     /* reduce timed sleep or paralysis, leaving mtmp->mcanmove as-is
        (note: if mtmp is donning armor, this will reduce its busy time) */
@@ -1085,9 +1085,11 @@ tamedog(struct monst *mtmp, struct obj *obj)
         return FALSE;
 
     /* worst case, at least it'll be peaceful. */
-    if (!mtmp->mpeaceful && canspotmon(mtmp))
+    if (givemsg && !mtmp->mpeaceful && canspotmon(mtmp)) {
         pline("%s seems %s.", Monnam(mtmp),
               Hallucination ? "really chill" : "more amiable");
+        givemsg = FALSE; /* don't give another message below */
+    }
     mtmp->mpeaceful = 1;
     set_malign(mtmp);
     if (flags.moonphase == FULL_MOON && night() && rn2(6) && obj
@@ -1172,6 +1174,10 @@ tamedog(struct monst *mtmp, struct obj *obj)
             return TRUE; /* oops, it died... */
         /* `obj' is now obsolete */
     }
+
+    if (givemsg && canspotmon(mtmp))
+        pline("%s seems quite %s.", Monnam(mtmp),
+              Hallucination ? "approachable" : "friendly");
 
     newsym(mtmp->mx, mtmp->my);
     if (attacktype(mtmp->data, AT_WEAP)) {

@@ -218,7 +218,7 @@ deadbook_pacify_undead(struct monst *mtmp)
                 if (mtmp->mtame < 20)
                     mtmp->mtame++;
             } else
-                (void) tamedog(mtmp, (struct obj *) 0);
+                (void) tamedog(mtmp, (struct obj *) 0, TRUE);
         else
             monflee(mtmp, 0, FALSE, TRUE);
     }

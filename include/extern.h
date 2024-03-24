@@ -735,7 +735,7 @@ extern void keepdogs(boolean);
 extern void migrate_to_level(struct monst *, xint16, xint16, coord *) NONNULLARG1;
 extern void discard_migrations(void);
 extern int dogfood(struct monst *, struct obj *) NONNULLPTRS;
-extern boolean tamedog(struct monst *, struct obj *) NONNULLARG1;
+extern boolean tamedog(struct monst *, struct obj *, boolean) NONNULLARG1;
 extern void abuse_dog(struct monst *) NONNULLARG1;
 extern void wary_dog(struct monst *, boolean) NONNULLARG1;
 
