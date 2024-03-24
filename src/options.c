@@ -8487,13 +8487,14 @@ doset_simple(void)
             reset_customizations();
             docrt_flags(opt_crt_flags);
         }
-        /*
+
+/*
  *      I don't think the status window requires updating between
  *      simplemenu iterations.
         if (disp.botl || disp.botlx) {
             bot();
         }
-  */
+ */
     } while (pickedone > 0);
     give_opt_msg = TRUE;
     return ECMD_OK;
