@@ -250,6 +250,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 No, Yes, No, No, NoAlias,
                 "load curses display symbols into symset")
 #endif
+    NHOPTB(customcolors, Map, 0, opt_out, set_in_game,
+           On, Yes, No, No, "customcolours", &iflags.customcolors,
+           Term_False, "use custom colors in map")
     NHOPTB(dark_room, Advanced, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.dark_room, Term_False,
            "show floor outside line of sight differently")

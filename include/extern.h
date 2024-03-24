@@ -1110,6 +1110,8 @@ extern void apply_customizations(enum graphics_sets which_set);
 extern void purge_custom_entries(enum graphics_sets which_set);
 extern void purge_all_custom_entries(void);
 extern void dump_glyphids(void);
+extern void clear_all_glyphmap_colors(void);
+extern void reset_customizations(void);
 
 /* ### hack.c ### */
 
@@ -3031,7 +3033,6 @@ extern const struct symparse *match_sym(char *) NONNULLARG1;
 extern void savedsym_free(void);
 extern void savedsym_strbuf(strbuf_t *) NONNULLARG1;
 extern boolean parsesymbols(char *, int) NONNULLARG1;
-extern void clear_all_glyphmap_colors(void);
 
 /* ### sys.c ### */
 

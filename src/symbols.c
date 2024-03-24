@@ -1094,19 +1094,6 @@ do_symset(boolean rogueflag)
     return TRUE;
 }
 
-extern glyph_map glyphmap[MAX_GLYPH];
-
-void
-clear_all_glyphmap_colors(void)
-{
-    int glyph;
-
-    for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
-        if (glyphmap[glyph].customcolor)
-            glyphmap[glyph].customcolor = 0;
-    }
-}
-
 RESTORE_WARNING_FORMAT_NONLITERAL
 
 /*symbols.c*/

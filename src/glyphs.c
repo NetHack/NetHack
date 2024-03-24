@@ -474,10 +474,12 @@ apply_customizations(enum graphics_sets which_set)
                                          details->content.urep.u.utf8str);
                 }
 #endif
-                if (sc->custtype == custom_nhcolor) {
-                    gmap = &glyphmap[details->content.ccolor.glyphidx];
-                    (void) set_map_nhcolor(gmap,
-                                           details->content.ccolor.nhcolor);
+                if (iflags.customcolors) {
+                    if (sc->custtype == custom_nhcolor) {
+                        gmap = &glyphmap[details->content.ccolor.glyphidx];
+                        (void) set_map_nhcolor(gmap,
+                                               details->content.ccolor.nhcolor);
+                    }
                 }
                 details = details->next;
             }
@@ -1031,6 +1033,25 @@ parse_id(const char *id, struct find_struct *findwhat)
     findwhat->val = 0;
     findwhat->loadsyms_offset = 0;
     return 0;
+}
+
+/* extern glyph_map glyphmap[MAX_GLYPH]; */
+
+void
+clear_all_glyphmap_colors(void)
+{
+    int glyph;
+
+    for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
+        if (glyphmap[glyph].customcolor)
+            glyphmap[glyph].customcolor = 0;
+    }
+}
+
+void reset_customizations(void)
+{
+    clear_all_glyphmap_colors();
+    apply_customizations(gc.currentgraphics);
 }
 
 /* not used yet */

@@ -375,6 +375,7 @@ struct instance_flags {
     boolean fireassist;      /* autowield launcher when using fire-command */
     boolean wizweight;       /* display weight of everything in wizard mode */
     boolean wizmgender;      /* test gender info from core in window port */
+    boolean customcolors;    /* support customcolors defined in glyphmap */
     /*
      * Window capability support.
      */

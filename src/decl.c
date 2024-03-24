@@ -655,6 +655,7 @@ static const struct instance_globals_o g_init_o = {
     FALSE, /* opt_need_redraw */
     FALSE, /* opt_need_glyph_reset */
     FALSE, /* opt_need_promptstyle */
+    FALSE, /* opt_reset_customizations */
     /* pickup.c */
     0,  /* oldcap */
     /* restore.c */
