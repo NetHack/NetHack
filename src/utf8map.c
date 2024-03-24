@@ -145,6 +145,67 @@ mixed_to_utf8(char *buf, size_t bufsz, const char *str, int *retflags)
     *put = '\0';
     return buf;
 }
+
+int
+add_custom_urep_entry(
+    const char *customization_name,
+    int glyphidx,
+    uint32 utf32ch,
+    const uint8 *utf8str,
+    enum graphics_sets which_set)
+{
+    struct symset_customization *gdc = &gs.sym_customizations[which_set][custom_ureps];
+    struct customization_detail *details, *newdetails = 0;
+
+
+    if (!gdc->details) {
+        gdc->customization_name = dupstr(customization_name);
+        gdc->custtype = custom_ureps;
+        gdc->details = 0;
+        gdc->details_end = 0;
+    }
+    details = find_matching_customization(customization_name,
+                                            custom_ureps, which_set); /* FIXME */
+    if (details) {
+        while (details) {
+            if (details->content.urep.glyphidx == glyphidx) {
+                if (details->content.urep.u.utf8str)
+                    free(details->content.urep.u.utf8str);
+                if (utf32ch) {
+                    details->content.urep.u.utf8str =
+                        (uint8 *) dupstr((const char *) utf8str);
+                    details->content.urep.u.utf32ch = utf32ch;
+                } else {
+                    details->content.urep.u.utf8str = (uint8 *) 0;
+                    details->content.urep.u.utf32ch = 0;
+                }
+                return 1;
+            }
+            details = details->next;
+        }
+    }
+    /* create new details entry */
+    newdetails = (struct customization_detail *) alloc(
+                                        sizeof (struct customization_detail));
+    newdetails->content.urep.glyphidx = glyphidx;
+    if (utf8str && *utf8str) {
+        newdetails->content.urep.u.utf8str =
+            (uint8 *) dupstr((const char *) utf8str);
+    } else {
+        newdetails->content.urep.u.utf8str =
+            (uint8 *) 0;
+    }
+    newdetails->content.urep.u.utf32ch = utf32ch;
+    newdetails->next = (struct customization_detail *) 0;
+    if (gdc->details == NULL) {
+        gdc->details = newdetails;
+    } else {
+        gdc->details_end->next = newdetails;
+    }
+    gdc->details_end = newdetails;
+    gdc->count++;
+    return 1;
+}
 #endif /* ENHANCED_SYMBOLS */
 
 /* utf8map.c */

@@ -36,10 +36,6 @@ static size_t glyphid_cache_size;
 static struct find_struct glyphcache_find, to_custom_symbol_find;
 static const long nonzero_black = CLR_BLACK | NH_BASIC_COLOR;
 
-staticfn struct customization_detail *find_matching_customization(
-    const char *customization_name, enum customization_types custtype,
-    enum graphics_sets which_set);
-
 staticfn void init_glyph_cache(void);
 staticfn void add_glyph_to_cache(int glyphnum, const char *id);
 staticfn int find_glyph_in_cache(const char *id);
@@ -404,69 +400,6 @@ glyphrep(const char *op)
     return 0;
 }
 
-#ifdef ENHANCED_SYMBOLS
-int
-add_custom_urep_entry(
-    const char *customization_name,
-    int glyphidx,
-    uint32 utf32ch,
-    const uint8 *utf8str,
-    enum graphics_sets which_set)
-{
-    struct symset_customization *gdc = &gs.sym_customizations[which_set][custom_ureps];
-    struct customization_detail *details, *newdetails = 0;
-
-
-    if (!gdc->details) {
-        gdc->customization_name = dupstr(customization_name);
-        gdc->custtype = custom_ureps;
-        gdc->details = 0;
-        gdc->details_end = 0;
-    }
-    details = find_matching_customization(customization_name,
-                                            custom_ureps, which_set); /* FIXME */
-    if (details) {
-        while (details) {
-            if (details->content.urep.glyphidx == glyphidx) {
-                if (details->content.urep.u.utf8str)
-                    free(details->content.urep.u.utf8str);
-                if (utf32ch) {
-                    details->content.urep.u.utf8str =
-                        (uint8 *) dupstr((const char *) utf8str);
-                    details->content.urep.u.utf32ch = utf32ch;
-                } else {
-                    details->content.urep.u.utf8str = (uint8 *) 0;
-                    details->content.urep.u.utf32ch = 0;
-                }
-                return 1;
-            }
-            details = details->next;
-        }
-    }
-    /* create new details entry */
-    newdetails = (struct customization_detail *) alloc(
-                                        sizeof (struct customization_detail));
-    newdetails->content.urep.glyphidx = glyphidx;
-    if (utf8str && *utf8str) {
-        newdetails->content.urep.u.utf8str =
-            (uint8 *) dupstr((const char *) utf8str);
-    } else {
-        newdetails->content.urep.u.utf8str =
-            (uint8 *) 0;
-    }
-    newdetails->content.urep.u.utf32ch = utf32ch;
-    newdetails->next = (struct customization_detail *) 0;
-    if (gdc->details == NULL) {
-        gdc->details = newdetails;
-    } else {
-        gdc->details_end->next = newdetails;
-    }
-    gdc->details_end = newdetails;
-    gdc->count++;
-    return 1;
-}
-#endif
-
 int
 add_custom_nhcolor_entry(
     const char *customization_name,
@@ -695,7 +628,7 @@ shuffle_customizations(void)
 }
 #endif
 
-staticfn struct customization_detail *
+struct customization_detail *
 find_matching_customization(
     const char *customization_name,
     enum customization_types custtype,
@@ -754,30 +687,6 @@ purge_custom_entries(enum graphics_sets which_set)
         gdc->count = 0;
     }
 }
-
-#if 0
-struct customization_detail *
-find_display_sym_customization(
-    const char *customization_name,
-    const struct symparse *symparse,
-    enum graphics_sets which_set)
-{
-    struct symset_customization *gdc;
-    struct customization_detail *symdetails;
-    
-    gdc = &gs.sym_customizations[which_set][custom_symbols];
-    if ((gdc->custtype == custom_symbols)
-        && (strcmp(customization_name, gdc->customization_name) == 0)) {
-        symdetails = gdc->details;
-        while (symdetails) {
-            if (symdetails->content.sym.symparse == symparse)
-                return symdetails;
-            symdetails = symdetails->next;
-        }
-    }
-    return (struct customization_detail *) 0;
-}
-#endif
 
 staticfn int
 parse_id(const char *id, struct find_struct *findwhat)
@@ -1124,6 +1033,59 @@ parse_id(const char *id, struct find_struct *findwhat)
     return 0;
 }
 
+/* not used yet */
+
+#if 0
+staticfn struct customization_detail *find_display_sym_customization(
+    const char *customization_name, const struct symparse *symparse,
+    enum graphics_sets which_set);
+staticfn struct customization_detail *find_display_urep_customization(
+    const char *customization_name, int glyphidx,
+    enum graphics_sets which_set);
+
+struct customization_detail *
+find_display_sym_customization(
+    const char *customization_name,
+    const struct symparse *symparse,
+    enum graphics_sets which_set)
+{
+    struct symset_customization *gdc;
+    struct customization_detail *symdetails;
+
+    gdc = &gs.sym_customizations[which_set][custom_symbols];
+    if ((gdc->custtype == custom_symbols)
+        && (strcmp(customization_name, gdc->customization_name) == 0)) {
+        symdetails = gdc->details;
+        while (symdetails) {
+            if (symdetails->content.sym.symparse == symparse)
+                return symdetails;
+            symdetails = symdetails->next;
+        }
+    }
+    return (struct customization_detail *) 0;
+}
+
+struct customization_detail *
+find_display_urep_customization(
+    const char *customization_name,
+    int glyphidx,
+    enum graphics_sets which_set)
+{
+    struct symset_customization *gdc = &gs.sym_customizations[which_set];
+    struct customization_detail *urepdetails;
+
+    if ((gdc->custtype == custom_reps)
+        || (strcmp(customization_name, gdc->customization_name) == 0)) {
+        urepdetails = gdc->details;
+        while (urepdetails) {
+            if (urepdetails->content.urep.glyphidx == glyphidx)
+                return urepdetails;
+            urepdetails = urepdetails->next;
+        }
+    }
+    return (struct customization_detail *) 0;
+}
+#endif  /* 0 not used yet */
 
 #ifdef TEST_GLYPHNAMES
 
@@ -1205,28 +1167,6 @@ glyphs_to_unicode(const char *id, const char *unicode_val, long clr)
     return glyph_find_core(id, &to_unicode);
 }
 
-#if 0
-struct customization_detail *
-find_display_urep_customization(
-    const char *customization_name,
-    int glyphidx,
-    enum graphics_sets which_set)
-{
-    struct symset_customization *gdc = &gs.sym_customizations[which_set];
-    struct customization_detail *urepdetails;
-
-    if ((gdc->custtype == custom_reps)
-        || (strcmp(customization_name, gdc->customization_name) == 0)) {
-        urepdetails = gdc->details;
-        while (urepdetails) {
-            if (urepdetails->content.urep.glyphidx == glyphidx)
-                return urepdetails;
-            urepdetails = urepdetails->next;
-        }
-    }
-    return (struct customization_detail *) 0;
-}
-#endif /* 0 */
 #endif /* SOME TEST STUFF */
 
 /* glyphs.c */

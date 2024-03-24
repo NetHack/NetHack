@@ -1094,6 +1094,10 @@ extern int add_custom_urep_entry(const char *symset_name, int glyphidx,
 extern int add_custom_nhcolor_entry(const char *customization_name,
                                     int glyphidx, uint32 nhcolor,
                                     enum graphics_sets which_set) NONNULLARG1;
+struct customization_detail *find_matching_customization(
+                                             const char *customization_name,
+                                             enum customization_types custtype,
+                                             enum graphics_sets which_set);
 int set_map_nhcolor(glyph_map *gm, uint32 nhcolor) NONNULLARG1;
 extern int unicode_val(const char *);
 extern int glyphrep(const char *) NONNULLARG1;
