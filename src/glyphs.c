@@ -99,14 +99,13 @@ glyphrep_to_custom_map_entries(const char *op, int *glyphptr)
 {
     to_custom_symbol_find = zero_find;
     char buf[BUFSZ], *c_glyphid, *c_unicode, *c_colorval, *cp;
-    int milestone, reslt = 0;
+    int reslt = 0;
     long rgb = 0L;
     boolean slash = FALSE, colon = FALSE;
 
     if (!glyphid_cache)
         reslt = 1; /* for debugger use only; no cache available */
 
-    milestone = 0;
     Snprintf(buf, sizeof buf, "%s", op);
     c_unicode = c_colorval = (char *) 0;
     c_glyphid = cp = buf;
@@ -120,7 +119,6 @@ glyphrep_to_custom_map_entries(const char *op, int *glyphptr)
                 slash = TRUE;
                 *cp = '\0';
             }
-            milestone++;
         }
         cp++;
         if (colon) {
