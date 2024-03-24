@@ -537,7 +537,7 @@ wiz_panic(void)
     }
     if (paranoid_query(TRUE,
                        "Do you want to call panic() and end your game?"))
-        panic("Crash test.");
+        panic("Crash test (#panic).");
     return ECMD_OK;
 }
 
