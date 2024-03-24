@@ -376,6 +376,7 @@ struct instance_flags {
     boolean wizweight;       /* display weight of everything in wizard mode */
     boolean wizmgender;      /* test gender info from core in window port */
     boolean customcolors;    /* support customcolors defined in glyphmap */
+    boolean customsymbols;   /* support customsymbols defined in glyphmap */
     /*
      * Window capability support.
      */

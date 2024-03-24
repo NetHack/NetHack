@@ -680,7 +680,8 @@ load_symset(const char *s, int which_set)
 
     if (read_sym_file(which_set)) {
         switch_symbols(TRUE);
-        apply_customizations(gc.currentgraphics);
+        apply_customizations(gc.currentgraphics,
+                             do_custom_symbols | do_custom_colors);
     } else {
         clear_symsetentry(which_set, TRUE);
         return 0;
@@ -1089,7 +1090,8 @@ do_symset(boolean rogueflag)
             assign_graphics(ROGUESET);
     } else if (!rogueflag)
         assign_graphics(PRIMARYSET);
-    apply_customizations(rogueflag ? ROGUESET : PRIMARYSET);
+    apply_customizations(rogueflag ? ROGUESET : PRIMARYSET,
+                         (do_custom_symbols | do_custom_colors));
     preference_update("symset");
     return TRUE;
 }

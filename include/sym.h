@@ -129,6 +129,12 @@ enum graphics_sets {
         UNICODESET = NUM_GRAPHICS
 };
 
+enum do_customizations {
+       do_custom_none,
+       do_custom_colors,
+       do_custom_symbols
+};
+
 enum customization_types { custom_none, custom_symbols,
     custom_ureps, custom_nhcolor,  custom_count };
 

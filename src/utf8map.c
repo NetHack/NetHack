@@ -208,6 +208,14 @@ add_custom_urep_entry(
 }
 #endif /* ENHANCED_SYMBOLS */
 
+void reset_customsymbols(void)
+{
+#ifdef ENHANCED_SYMBOLS
+    free_all_glyphmap_u();
+    apply_customizations(gc.currentgraphics, do_custom_symbols);
+#endif
+}
+
 /* utf8map.c */
 
 

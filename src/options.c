@@ -4078,7 +4078,8 @@ optfn_symset(
         reslt = handler_symset(optidx);
         if (glyphid_cache_status())
             free_glyphid_cache();
-        /* apply_customizations(gc.currentgraphics); */
+        /* apply_customizations(gc.currentgraphics,
+                        (do_custom_colors | do_custom_symbols)); */
         return reslt;
     }
     return optn_ok;
@@ -5230,7 +5231,10 @@ optfn_boolean(
             go.opt_need_glyph_reset = TRUE;
             break;
         case opt_customcolors:
-            go.opt_reset_customizations = TRUE;
+            go.opt_reset_customcolors = TRUE;
+            break;
+        case opt_customsymbols:
+            go.opt_reset_customsymbols = TRUE;
             break;
         case opt_menucolors:
         case opt_guicolor:
@@ -7193,7 +7197,8 @@ initoptions_finish(void)
 
     if (glyphid_cache_status())
         free_glyphid_cache();
-    apply_customizations(gc.currentgraphics);
+    apply_customizations(gc.currentgraphics,
+                        (do_custom_colors | do_custom_symbols));
     go.opt_initial = FALSE;
 
     /*
@@ -8392,7 +8397,8 @@ doset_simple_menu(void)
 
     go.opt_need_redraw = FALSE;
     go.opt_need_glyph_reset = FALSE;
-    go.opt_reset_customizations = FALSE;
+    go.opt_reset_customcolors = FALSE;
+    go.opt_reset_customsymbols = FALSE;
     pick_cnt = select_menu(tmpwin, PICK_ONE, &pick_list);
     /* note:  without the complication of a preselected entry, a PICK_ONE
        menu returning pick_cnt > 0 implies exactly 1 */
@@ -8483,8 +8489,11 @@ doset_simple(void)
         }
         if (go.opt_need_promptstyle)
             adjust_menu_promptstyle(WIN_INVEN, &iflags.menu_headings);
-        if (go.opt_reset_customizations) {
-            reset_customizations();
+        if (go.opt_reset_customcolors || go.opt_reset_customsymbols) {
+            if (go.opt_reset_customcolors)
+                reset_customcolors();
+            if (go.opt_reset_customsymbols)
+                reset_customsymbols();
             docrt_flags(opt_crt_flags);
         }
 
@@ -8738,13 +8747,16 @@ doset(void) /* changing options via menu by Per Liboriussen */
     if (go.opt_need_glyph_reset) {
         reset_glyphmap(gm_optionchange);
     }
-    if (go.opt_reset_customizations) {
-        reset_customizations();
-        docrt();
-    }
-    if (go.opt_need_redraw) {
-        check_gold_symbol();
-        reglyph_darkroom();
+    if (go.opt_reset_customcolors
+        || go.opt_reset_customsymbols || go.opt_need_redraw) {
+        if (go.opt_reset_customcolors)
+            reset_customcolors();
+        if (go.opt_reset_customsymbols)
+            reset_customsymbols();
+        if (go.opt_need_redraw) {
+            check_gold_symbol();
+            reglyph_darkroom();
+        }
         docrt();
     }
     if (go.opt_need_promptstyle) {

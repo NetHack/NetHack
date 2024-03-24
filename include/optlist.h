@@ -253,6 +253,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(customcolors, Map, 0, opt_out, set_in_game,
            On, Yes, No, No, "customcolours", &iflags.customcolors,
            Term_False, "use custom colors in map")
+    NHOPTB(customsymbols, Map, 0, opt_out, set_in_game,
+           On, Yes, No, No, "customsymbols", &iflags.customsymbols,
+           Term_False, "use custom utf8 symbols in map")
     NHOPTB(dark_room, Advanced, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.dark_room, Term_False,
            "show floor outside line of sight differently")

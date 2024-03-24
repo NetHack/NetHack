@@ -449,12 +449,16 @@ add_custom_nhcolor_entry(
 }
 
 void
-apply_customizations(enum graphics_sets which_set)
+apply_customizations(
+        enum graphics_sets which_set,
+        enum do_customizations docustomize)
 {
     glyph_map *gmap;
     struct customization_detail *details;
     struct symset_customization *sc;
-    boolean at_least_one = FALSE;
+    boolean at_least_one = FALSE,
+            do_colors = ((docustomize & do_custom_colors) != 0),
+            do_symbols = ((docustomize & do_custom_symbols) != 0);
     int custs;
 
     for (custs = 0; custs < (int) custom_count; ++custs) {
@@ -466,15 +470,17 @@ apply_customizations(enum graphics_sets which_set)
             details = sc->details;
             while (details) {
 #ifdef ENHANCED_SYMBOLS
-                if (sc->custtype == custom_ureps) {
-                    gmap = &glyphmap[details->content.urep.glyphidx];
-                    if (gs.symset[which_set].handling == H_UTF8)
-                        (void) set_map_u(gmap,
-                                         details->content.urep.u.utf32ch,
-                                         details->content.urep.u.utf8str);
+                if (iflags.customsymbols && do_symbols) {
+                    if (sc->custtype == custom_ureps) {
+                        gmap = &glyphmap[details->content.urep.glyphidx];
+                        if (gs.symset[which_set].handling == H_UTF8)
+                            (void) set_map_u(gmap,
+                                             details->content.urep.u.utf32ch,
+                                             details->content.urep.u.utf8str);
+                    }
                 }
 #endif
-                if (iflags.customcolors) {
+                if (iflags.customcolors && do_colors) {
                     if (sc->custtype == custom_nhcolor) {
                         gmap = &glyphmap[details->content.ccolor.glyphidx];
                         (void) set_map_nhcolor(gmap,
@@ -1048,10 +1054,10 @@ clear_all_glyphmap_colors(void)
     }
 }
 
-void reset_customizations(void)
+void reset_customcolors(void)
 {
     clear_all_glyphmap_colors();
-    apply_customizations(gc.currentgraphics);
+    apply_customizations(gc.currentgraphics, do_custom_colors);
 }
 
 /* not used yet */
