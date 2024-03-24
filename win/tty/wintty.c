@@ -3873,7 +3873,7 @@ tty_print_glyph(
             }
             ttyDisplay->color = color;
             if (color != NO_COLOR) {
-                term_start_color(ttyDisplay->color);
+                term_start_color(color);
             }
         }
     }   /* iflags.use_color aka iflags.wc_color */
@@ -3884,8 +3884,8 @@ tty_print_glyph(
        to see although the Valkyrie quest ends up being hard on the eyes) */
     if (iflags.use_color
         && bkglyphinfo && bkglyphinfo->gm.nhcolor != NO_COLOR) {
-        ttyDisplay->framecolor = bkglyphinfo->gm.nhcolor;
-        term_start_bgcolor(bkglyphinfo->gm.nhcolor);
+        ttyDisplay->framecolor = bkglyphinfo->framecolor;
+        term_start_bgcolor(bkglyphinfo->framecolor);
     } else if ((special & MG_PET) != 0 && iflags.hilite_pet) {
         term_start_attr(iflags.wc2_petattr);
         petattr = TRUE;
