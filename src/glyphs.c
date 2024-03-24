@@ -5,12 +5,9 @@
 #include "hack.h"
 
 extern const struct symparse loadsyms[];
+extern glyph_map glyphmap[MAX_GLYPH];
 extern struct enum_dump monsdump[];
 extern struct enum_dump objdump[];
-extern glyph_map glyphmap[MAX_GLYPH];
-extern const char *const known_handling[];        /* symbols.c */
-extern glyph_map glyphmap[MAX_GLYPH];
-staticfn void shuffle_customizations(void);
 
 #define Fprintf (void) fprintf
 
@@ -42,14 +39,7 @@ static const long nonzero_black = CLR_BLACK | NH_BASIC_COLOR;
 staticfn struct customization_detail *find_matching_customization(
     const char *customization_name, enum customization_types custtype,
     enum graphics_sets which_set);
-#if 0
-staticfn struct customization_detail *find_display_sym_customization(
-    const char *customization_name, const struct symparse *symparse,
-    enum graphics_sets which_set);
-staticfn struct customization_detail *find_display_urep_customization(
-    const char *customization_name, int glyphidx,
-    enum graphics_sets which_set);
-#endif
+
 staticfn void init_glyph_cache(void);
 staticfn void add_glyph_to_cache(int glyphnum, const char *id);
 staticfn int find_glyph_in_cache(const char *id);
@@ -59,15 +49,12 @@ staticfn void to_custom_symset_entry_callback(int glyph,
 staticfn int parse_id(const char *id, struct find_struct *findwhat);
 staticfn int glyph_find_core(const char *id, struct find_struct *findwhat);
 staticfn char *fix_glyphname(char *str);
+staticfn void shuffle_customizations(void);
 /* staticfn void purge_custom_entries(enum graphics_sets which_set); */
-
 
 staticfn void
 to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
 {
-#if 0
-    glyph_map *gmap = &glyphmap[glyph];
-#endif
 #ifdef ENHANCED_SYMBOLS
     uint8 utf8str[6] = { 0, 0, 0, 0, 0, 0 };
     int uval = 0;
@@ -517,13 +504,6 @@ add_custom_nhcolor_entry(
                                         sizeof (struct customization_detail));
     newdetails->content.urep.glyphidx = glyphidx;
     newdetails->content.ccolor.nhcolor = nhcolor;
-#if 0
-    if ((nhcolor & NH_BASIC_COLOR) != 0) {
-        newdetails->content.ccolor.nhcolor = nhcolor;
-    } else {
-        newdetails->content.ccolor.nhcolor = nhcolor;
-    }
-#endif
     newdetails->next = (struct customization_detail *) 0;
     if (gdc->details == NULL) {
         gdc->details = newdetails;
