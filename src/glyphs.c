@@ -578,6 +578,63 @@ apply_customizations(enum graphics_sets which_set)
 /* Shuffle the customizations to match shuffled object descriptions,
  * so a red potion isn't displayed with a blue customization, and so on.
  */
+
+#if 0
+staticfn void
+shuffle_customizations(void)
+{
+    static const int offsets[2] = { GLYPH_OBJ_OFF, GLYPH_OBJ_PILETOP_OFF };
+    int j;
+
+    for (j = 0; j < SIZE(offsets); j++) {
+        glyph_map *obj_glyphs = glyphmap + offsets[j];
+        int i;
+        struct unicode_representation *tmp_u[NUM_OBJECTS];
+        int duplicate[NUM_OBJECTS];
+
+        for (i = 0; i < NUM_OBJECTS; i++) {
+            duplicate[i] = -1;
+            tmp_u[i] = (struct unicode_representation *) 0;
+        }
+        for (i = 0; i < NUM_OBJECTS; i++) {
+            int idx = objects[i].oc_descr_idx;
+
+            /*
+             * Shuffling gem appearances can cause the same oc_descr_idx to
+             * appear more than once. Detect this condition and ensure that
+             * each pointer points to a unique allocation.
+             */
+            if (duplicate[idx] >= 0) {
+                /* Current structure already appears in tmp_u */
+                struct unicode_representation *other = tmp_u[duplicate[idx]];
+
+                tmp_u[i] = (struct unicode_representation *)
+                           alloc(sizeof *tmp_u[i]);
+                *tmp_u[i] = *other;
+                if (other->utf8str != NULL) {
+                    tmp_u[i]->utf8str = (uint8 *)
+                                        dupstr((const char *) other->utf8str);
+                }
+            } else {
+                tmp_u[i] = obj_glyphs[idx].u;
+                if (obj_glyphs[idx].u != NULL)  {
+                    duplicate[idx] = i;
+                    obj_glyphs[idx].u = NULL;
+                }
+            }
+        }
+        for (i = 0; i < NUM_OBJECTS; i++) {
+            /* Some glyphmaps may not have been transferred */
+            if (obj_glyphs[i].u != NULL) {
+                free(obj_glyphs[i].u->utf8str);
+                free(obj_glyphs[i].u);
+            }
+            obj_glyphs[i].u = tmp_u[i];
+        }
+    }
+}
+
+#else
 staticfn void
 shuffle_customizations(void)
 {
@@ -615,6 +672,7 @@ shuffle_customizations(void)
 #endif
                 uint32 other_nhcolor = tmp_nhcolor[duplicate[idx]];
 
+                tmp_nhcolor[i] = other_nhcolor;
 #ifdef ENHANCED_SYMBOLS
                 tmp_u[i] = (struct unicode_representation *)
                            alloc(sizeof *tmp_u[i]);
@@ -624,16 +682,22 @@ shuffle_customizations(void)
                                         dupstr((const char *) other->utf8str);
                 }
 #endif
-                tmp_nhcolor[i] = other_nhcolor;
             } else {
+                tmp_nhcolor[i] = obj_glyphs[idx].nhcolor;
 #ifdef ENHANCED_SYMBOLS
                 tmp_u[i] = obj_glyphs[idx].u;
-                if (obj_glyphs[idx].u != NULL)  {
+#endif
+                if (
+#ifdef ENHANCED_SYMBOLS
+                    obj_glyphs[idx].u != NULL ||
+#endif
+                    obj_glyphs[idx].nhcolor != 0) {
                     duplicate[idx] = i;
+#ifdef ENHANCED_SYMBOLS
                     obj_glyphs[idx].u = NULL;
+#endif
+                    obj_glyphs[idx].nhcolor = 0;
                 }
- #endif
-                tmp_nhcolor[i] = obj_glyphs[idx].nhcolor;
             }
         }
         for (i = 0; i < NUM_OBJECTS; i++) {
@@ -643,11 +707,13 @@ shuffle_customizations(void)
                 free(obj_glyphs[i].u->utf8str);
                 free(obj_glyphs[i].u);
             }
+            obj_glyphs[i].u = tmp_u[i];
 #endif
             obj_glyphs[i].nhcolor = tmp_nhcolor[i];
         }
     }
 }
+#endif
 
 staticfn struct customization_detail *
 find_matching_customization(
