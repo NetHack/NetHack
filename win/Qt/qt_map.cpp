@@ -586,14 +586,14 @@ void NetHackQtMapViewport::PrintGlyph(int x, int y,
         Glyphttychar(x, y) = glyphinfo->gm.u->utf32ch;
     }
 #endif
-    if (glyphinfo->gm.nhcolor != 0) {
-        uint32 nhcolor = COLORVAL(glyphinfo->gm.nhcolor);
-        if (glyphinfo->gm.nhcolor == nhcolor) {
+    if (glyphinfo->gm.customcolor != 0) {
+        uint32 nhcolor = COLORVAL(glyphinfo->gm.customcolor);
+        if (glyphinfo->gm.customcolor == nhcolor) {
             /* 24-bit color */
-            Glyphcolor(x, y) = COLORVAL(glyphinfo->gm.nhcolor) | 0x80000000;
+            Glyphcolor(x, y) = COLORVAL(glyphinfo->gm.customcolor) | 0x80000000;
         } else {
             /* NH_BASIC_COLOR */
-            Glyphcolor(x, y) = COLORVAL(glyphinfo->gm.nhcolor);
+            Glyphcolor(x, y) = COLORVAL(glyphinfo->gm.customcolor);
         }
     }
     Glyphflags(x, y) = glyphinfo->gm.glyphflags;

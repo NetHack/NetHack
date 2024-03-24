@@ -1102,8 +1102,8 @@ clear_all_glyphmap_colors(void)
     int glyph;
 
     for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
-        if (glyphmap[glyph].nhcolor)
-            glyphmap[glyph].nhcolor = 0;
+        if (glyphmap[glyph].customcolor)
+            glyphmap[glyph].customcolor = 0;
     }
 }
 

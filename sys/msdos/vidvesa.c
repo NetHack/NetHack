@@ -690,10 +690,10 @@ vesa_xputg(const glyph_info *glyphinfo, const glyph_info *bkglyphinfo UNUSED)
         ch = glyphinfo->gm.u->utf32ch;
     }
 #endif
-    if (vesa_pixel_size > 8 && glyphinfo->gm.nhcolor != 0) {
+    if (vesa_pixel_size > 8 && glyphinfo->gm.customcolor != 0) {
         /* FIXME: won't display black (0,0,0) correctly, but the background
            is usually black anyway */
-        attr = glyphinfo->gm.nhcolor | 0x80000000;
+        attr = glyphinfo->gm.customcolor | 0x80000000;
     }
 
     row = currow;

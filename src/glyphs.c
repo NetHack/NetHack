@@ -647,7 +647,7 @@ shuffle_customizations(void)
 #ifdef ENHANCED_SYMBOLS
         struct unicode_representation *tmp_u[NUM_OBJECTS];
 #endif
-        uint32 tmp_nhcolor[NUM_OBJECTS];
+        uint32 tmp_customcolor[NUM_OBJECTS];
         int duplicate[NUM_OBJECTS];
 
         for (i = 0; i < NUM_OBJECTS; i++) {
@@ -655,7 +655,7 @@ shuffle_customizations(void)
 #ifdef ENHANCED_SYMBOLS
             tmp_u[i] = (struct unicode_representation *) 0;
 #endif
-            tmp_nhcolor[i] = 0;
+            tmp_customcolor[i] = 0;
         }
         for (i = 0; i < NUM_OBJECTS; i++) {
             int idx = objects[i].oc_descr_idx;
@@ -670,9 +670,9 @@ shuffle_customizations(void)
                 /* Current structure already appears in tmp_u */
                 struct unicode_representation *other = tmp_u[duplicate[idx]];
 #endif
-                uint32 other_nhcolor = tmp_nhcolor[duplicate[idx]];
+                uint32 other_customcolor = tmp_customcolor[duplicate[idx]];
 
-                tmp_nhcolor[i] = other_nhcolor;
+                tmp_customcolor[i] = other_customcolor;
 #ifdef ENHANCED_SYMBOLS
                 tmp_u[i] = (struct unicode_representation *)
                            alloc(sizeof *tmp_u[i]);
@@ -683,7 +683,7 @@ shuffle_customizations(void)
                 }
 #endif
             } else {
-                tmp_nhcolor[i] = obj_glyphs[idx].nhcolor;
+                tmp_customcolor[i] = obj_glyphs[idx].customcolor;
 #ifdef ENHANCED_SYMBOLS
                 tmp_u[i] = obj_glyphs[idx].u;
 #endif
@@ -691,12 +691,12 @@ shuffle_customizations(void)
 #ifdef ENHANCED_SYMBOLS
                     obj_glyphs[idx].u != NULL ||
 #endif
-                    obj_glyphs[idx].nhcolor != 0) {
+                    obj_glyphs[idx].customcolor != 0) {
                     duplicate[idx] = i;
 #ifdef ENHANCED_SYMBOLS
                     obj_glyphs[idx].u = NULL;
 #endif
-                    obj_glyphs[idx].nhcolor = 0;
+                    obj_glyphs[idx].customcolor = 0;
                 }
             }
         }
@@ -709,7 +709,7 @@ shuffle_customizations(void)
             }
             obj_glyphs[i].u = tmp_u[i];
 #endif
-            obj_glyphs[i].nhcolor = tmp_nhcolor[i];
+            obj_glyphs[i].customcolor = tmp_customcolor[i];
         }
     }
 }

@@ -3837,14 +3837,14 @@ tty_print_glyph(
         int clridx;
 
         if (iflags.colorcount >= 256
-                && glyphinfo->gm.nhcolor != 0
+                && glyphinfo->gm.customcolor != 0
                 && !calling_from_update_inventory
                 && (tty_procs.wincap2 & WC2_EXTRACOLORS) != 0) {
-            if ((glyphinfo->gm.nhcolor & NH_BASIC_COLOR) != 0) {
+            if ((glyphinfo->gm.customcolor & NH_BASIC_COLOR) != 0) {
                 /* don't set colordone or nhcolor */
-                color = COLORVAL(glyphinfo->gm.nhcolor);
+                color = COLORVAL(glyphinfo->gm.customcolor);
             }  else if (iflags.colorcount == 256) {
-                if (closest_color(COLORVAL(glyphinfo->gm.nhcolor),
+                if (closest_color(COLORVAL(glyphinfo->gm.customcolor),
                     &closecolor, &clridx)) {
                     if (ttyDisplay->color != NO_COLOR) {
                         term_end_color();
@@ -3854,7 +3854,7 @@ tty_print_glyph(
                     colordone = TRUE;
                 }
             } else {
-                nhcolor = COLORVAL(glyphinfo->gm.nhcolor);
+                nhcolor = COLORVAL(glyphinfo->gm.customcolor);
                 if (ttyDisplay->color != NO_COLOR) {
                     term_end_color();
                 }
@@ -3883,7 +3883,7 @@ tty_print_glyph(
        (tried bold for ice but it didn't look very good; inverse is easier
        to see although the Valkyrie quest ends up being hard on the eyes) */
     if (iflags.use_color
-        && bkglyphinfo && bkglyphinfo->gm.nhcolor != NO_COLOR) {
+        && bkglyphinfo && bkglyphinfo->gm.customcolor != NO_COLOR) {
         ttyDisplay->framecolor = bkglyphinfo->framecolor;
         term_start_bgcolor(bkglyphinfo->framecolor);
     } else if ((special & MG_PET) != 0 && iflags.hilite_pet) {

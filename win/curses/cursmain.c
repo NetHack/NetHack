@@ -926,14 +926,14 @@ curses_print_glyph(
      *  color mode. On top of this, the windowport only supports 16 color mode.
      *  Thus, we only allow users to customize glyph colors to the basic NetHack
      *  colors. */
-    if (glyphinfo->gm.nhcolor != 0
+    if (glyphinfo->gm.customcolor != 0
         && (curses_procs.wincap2 & WC2_EXTRACOLORS) != 0) {
-        if ((glyphinfo->gm.nhcolor & NH_BASIC_COLOR) != 0) {
-            color = COLORVAL(glyphinfo->gm.nhcolor);
+        if ((glyphinfo->gm.customcolor & NH_BASIC_COLOR) != 0) {
+            color = COLORVAL(glyphinfo->gm.customcolor);
 #if 0
         } else {
             /* 24-bit color, NH_BASIC_COLOR == 0 */
-            nhcolor = COLORVAL(glyphinfo->gm.nhcolor);
+            nhcolor = COLORVAL(glyphinfo->gm.customcolor);
 #endif
         }
     }

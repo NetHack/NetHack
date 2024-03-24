@@ -860,7 +860,7 @@ set_map_nhcolor(glyph_map *gmap, uint32 nhcolor)
     if (!tmpgm)
         return 0;
 
-    gmap->nhcolor = nhcolor;
+    gmap->customcolor = nhcolor;
     return 1;
 }
 
