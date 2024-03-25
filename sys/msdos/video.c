@@ -378,12 +378,7 @@ term_start_bgcolor(int bgcolor)
 }
 
 void
-term_start_extracolor(uint32 nhcolor UNUSED)
-{
-}
-
-void
-term_start_256color(int idx UNUSED)
+term_start_extracolor(uint32 nhcolor UNUSED, uint16 color256idx UNUSED)
 {
 }
 

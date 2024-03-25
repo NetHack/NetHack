@@ -1452,12 +1452,13 @@ g_pututf8(uint8 *sequence)
 }
 
 void
-term_start_extracolor(uint32 nhcolor)
+term_start_extracolor(uint32 nhcolor, uint16 color256idx)
 {
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
     if ((nhcolor & NH_BASIC_COLOR) == 0) {
         console.color24 = COLORVAL(nhcolor); /* color 0 has bit 0x1000000 set */
         console.current_colorflags = 0;
+        console.color256idx = color256idx;
     } else {
 #endif
         /* NH_BASIC_COLOR */
@@ -1471,7 +1472,6 @@ term_start_extracolor(uint32 nhcolor)
 
 void term_start_256color(int idx)
 {
-    console.color256idx = idx;
 }
 
 void

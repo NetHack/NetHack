@@ -17,9 +17,8 @@ static char *e_atr2str(int);
 
 void cmov(int, int);
 void nocmov(int, int);
-void term_start_extracolor(uint32 nhcolor);
+void term_start_extracolor(uint32, uint16);
 void term_end_extracolor(void);
-void term_start_256color(int);
 
 #if defined(TERMLIB)
 #if (!defined(UNIX) || !defined(TERMINFO)) && !defined(TOS)
@@ -1470,60 +1469,55 @@ term_start_bgcolor(int color)
 }
 
 #ifndef SEP2
+#define tcfmtstr "\033[38;2;%ld;%ld;%ldm"
 #ifdef UNIX
-#define tcfmtstr "\033[38;2;%d;%d;%dm"
-#define tcfmtstr24bit "\033[38;2;%d;%d;%dm"
+#define tcfmtstr24bit "\033[38;2;%u;%u;%um"
 #define tcfmtstr256 "\033[38;5;%dm"
 #else
-#define tcfmtstr "\033[38;2;%ld;%ld;%ldm"
-#define tcfmtstr24bit "\033[38;2;%ld;%ld;%ldm"
-#define tcfmtstr256 "\033[38:5:%ldm"
+#define tcfmtstr24bit "\033[38;2;%lu;%lu;%lum"
+#define tcfmtstr256 "\033[38:5:%lum"
 #endif
 #endif
 
-static void emit24bit(uint32 color24bit);
+static void emit24bit(long mcolor);
 static void emit256(int u256coloridx);
 
-static void emit24bit(uint32 color24bit)
+static void emit24bit(long mcolor)
 {
     static char tcolorbuf[QBUFSZ];
 
     Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr,
-             ((color24bit >> 16) & 0xFF),   /* red */
-             ((color24bit >>  8) & 0xFF),   /* green */
-             ((color24bit >>  0) & 0xFF));  /* blue */
+             ((mcolor >> 16) & 0xFF),   /* red */
+             ((mcolor >>  8) & 0xFF),   /* green */
+             ((mcolor >>  0) & 0xFF));  /* blue */
     xputs(tcolorbuf);
 }
 
-static void emit256(int u256coloridx)
+static void emit256(int color256idx)
 {
     static char tcolorbuf[QBUFSZ];
 
     Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr256,
-             u256coloridx);
+             color256idx);
     xputs(tcolorbuf);
 }
 
 void
-term_start_256color(int idx)
+term_start_extracolor(uint32 customcolor, uint16 color256idx)
 {
-    emit256(idx);
-}
-
-void
-term_start_extracolor(uint32 nhcolor)
-{
-    /* color 0 has bit NH_BASIC_COLOR set */
-    uint32 modcolor = COLORVAL(nhcolor);
-
-    emit24bit(modcolor);
+    /* color 0 has bit 0x1000000 set */
+    long mcolor = (customcolor & 0xFFFFFF);
+    if (iflags.colorcount == 256)
+        emit256(color256idx);
+    else
+        emit24bit(mcolor);
 }
 
 void
 term_end_extracolor(void)
 {
-    xputs("\033[0m");
+        xputs("\033[0m");
 }
-
 #endif /* TTY_GRAPHICS && !NO_TERMS  */
+
 /*termcap.c*/

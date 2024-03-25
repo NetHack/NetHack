@@ -252,9 +252,7 @@ static void status_sanity_check(void);
 void g_pututf8(uint8 *utf8str);
 #endif
 
-/* this is always present to reduce preproc conditional code */
 static boolean calling_from_update_inventory = FALSE;
-
 #ifdef TTY_PERM_INVENT
 static struct tty_perminvent_cell emptyttycell = {
     0, 0, 0, { 0 }, NO_COLOR + 1
@@ -3067,8 +3065,7 @@ ttyinv_add_menu(
         row = (slot % rows_per_side) + 1; /* +1: top border */
         /* side: left side panel or right side panel, not a window column */
         side = slot / rows_per_side;
-        ttyinv_populate_slot(cw, row, side, text,
-                             (uint32) clr, startcolor_at);
+        ttyinv_populate_slot(cw, row, side, text, clr, startcolor_at);
     }
     return;
 }
@@ -3221,8 +3218,8 @@ ttyinv_end_menu(int window, struct WinDesc *cw)
 static void
 ttyinv_render(winid window, struct WinDesc *cw)
 {
-    int row, col, slot, side, filled_count = 0, slot_limit;
-    uint32 current_row_color = NO_COLOR;
+    int row, col, slot, side, filled_count = 0, slot_limit,
+                              current_row_color = NO_COLOR;
     struct tty_perminvent_cell *cell;
     char invbuf[BUFSZ];
     boolean force_redraw = gp.program_state.in_docrt ? TRUE : FALSE,
@@ -3336,7 +3333,7 @@ ttyinv_populate_slot(
     int row,  /* 'row' within the window, not within screen */
     int side, /* 'side'==0 is left panel or ==1 is right panel */
     const char *text,
-    uint32 color,
+    int32_t color,
     int clroffset)
 {
     struct tty_perminvent_cell *cell;
@@ -3804,12 +3801,8 @@ tty_print_glyph(
     boolean inverse_on = FALSE, colordone = FALSE, glyphdone = FALSE;
     boolean petattr = FALSE;
     int ch;
-    uint32 color, nhcolor = 0;
+    uint32 color;
     unsigned special;
-#if 0
-    int clridx;
-    uint32 closecolor;
-#endif
 
     HUPSKIP();
 #ifdef CLIPPING
@@ -3837,34 +3830,29 @@ tty_print_glyph(
     }
 #endif
     if (iflags.use_color) {
-        if (color != ttyDisplay->color) {
-            if (ttyDisplay->color != NO_COLOR) {
-                term_end_color();
-            }
-        }
         ttyDisplay->colorflags = NH_BASIC_COLOR;
-        if (iflags.colorcount >= 256 && glyphinfo->gm.customcolor != 0
-                && !calling_from_update_inventory
-                && (tty_procs.wincap2 & WC2_EXTRACOLORS) != 0) {
-            if ((glyphinfo->gm.customcolor & NH_BASIC_COLOR) != 0) {
-                /* don't set colordone or nhcolor */
-                color = COLORVAL(glyphinfo->gm.customcolor);
-            }  else if (iflags.colorcount == 256) {
-                ttyDisplay->colorflags = 0; /* not NH_BASIC_COLOR */
-                term_start_256color(glyphinfo->gm.color256idx);
-            } else {
-                nhcolor = COLORVAL(glyphinfo->gm.customcolor);
+        if (color != ttyDisplay->color) {
+            if (ttyDisplay->color != NO_COLOR)
+                term_end_color();
+        }
+        /* we don't link with termcap.o if NO_TERMS is defined */
+        if ((tty_procs.wincap2 & WC2_EXTRACOLORS)
+            && glyphinfo->gm.customcolor != 0
+            && iflags.colorcount >= 256
+            && !calling_from_update_inventory) {
+            if ((glyphinfo->gm.customcolor & NH_BASIC_COLOR) == 0) {
+                term_start_extracolor(glyphinfo->gm.customcolor,
+                                      glyphinfo->gm.color256idx);
                 ttyDisplay->colorflags = 0;
-                term_start_extracolor(nhcolor);
                 colordone = TRUE;
+            } else {
+                color = COLORVAL(glyphinfo->gm.customcolor);
             }
         }
         if (!colordone) {
-            /* NH_BASIC_COLOR processing */
             ttyDisplay->color = color;
-            if (color != NO_COLOR) {
+            if (color != NO_COLOR)
                 term_start_color(color);
-            }
         }
     }   /* iflags.use_color aka iflags.wc_color */
 
