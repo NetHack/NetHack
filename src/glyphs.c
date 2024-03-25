@@ -569,6 +569,8 @@ shuffle_customizations(void)
         struct unicode_representation *tmp_u[NUM_OBJECTS];
 #endif
         uint32 tmp_customcolor[NUM_OBJECTS];
+        uint16 tmp_color256idx[NUM_OBJECTS];
+
         int duplicate[NUM_OBJECTS];
 
         for (i = 0; i < NUM_OBJECTS; i++) {
@@ -577,6 +579,7 @@ shuffle_customizations(void)
             tmp_u[i] = (struct unicode_representation *) 0;
 #endif
             tmp_customcolor[i] = 0;
+            tmp_color256idx[i] = 0;
         }
         for (i = 0; i < NUM_OBJECTS; i++) {
             int idx = objects[i].oc_descr_idx;
@@ -592,8 +595,10 @@ shuffle_customizations(void)
                 struct unicode_representation *other = tmp_u[duplicate[idx]];
 #endif
                 uint32 other_customcolor = tmp_customcolor[duplicate[idx]];
+                uint16 other_color256idx = tmp_color256idx[duplicate[idx]];
 
                 tmp_customcolor[i] = other_customcolor;
+                tmp_color256idx[i] = other_color256idx;
 #ifdef ENHANCED_SYMBOLS
                 tmp_u[i] = (struct unicode_representation *)
                            alloc(sizeof *tmp_u[i]);
@@ -605,6 +610,7 @@ shuffle_customizations(void)
 #endif
             } else {
                 tmp_customcolor[i] = obj_glyphs[idx].customcolor;
+                tmp_color256idx[i] = obj_glyphs[idx].color256idx;
 #ifdef ENHANCED_SYMBOLS
                 tmp_u[i] = obj_glyphs[idx].u;
 #endif
@@ -618,6 +624,7 @@ shuffle_customizations(void)
                     obj_glyphs[idx].u = NULL;
 #endif
                     obj_glyphs[idx].customcolor = 0;
+                    obj_glyphs[idx].color256idx = 0;
                 }
             }
         }
@@ -631,6 +638,7 @@ shuffle_customizations(void)
             obj_glyphs[i].u = tmp_u[i];
 #endif
             obj_glyphs[i].customcolor = tmp_customcolor[i];
+            obj_glyphs[i].color256idx = tmp_color256idx[i];
         }
     }
 }
