@@ -3806,6 +3806,10 @@ tty_print_glyph(
     int ch;
     uint32 color, nhcolor = 0;
     unsigned special;
+#if 0
+    int clridx;
+    uint32 closecolor;
+#endif
 
     HUPSKIP();
 #ifdef CLIPPING
@@ -3833,16 +3837,19 @@ tty_print_glyph(
     }
 #endif
     if (iflags.use_color) {
-        uint32 closecolor;
-        int clridx;
-
-        if (iflags.colorcount >= 256
-                && glyphinfo->gm.customcolor != 0
+        if (color != ttyDisplay->color) {
+            if (ttyDisplay->color != NO_COLOR) {
+                term_end_color();
+            }
+        }
+        ttyDisplay->colorflags = NH_BASIC_COLOR;
+        if (iflags.colorcount >= 256 && glyphinfo->gm.customcolor != 0
                 && !calling_from_update_inventory
                 && (tty_procs.wincap2 & WC2_EXTRACOLORS) != 0) {
             if ((glyphinfo->gm.customcolor & NH_BASIC_COLOR) != 0) {
                 /* don't set colordone or nhcolor */
                 color = COLORVAL(glyphinfo->gm.customcolor);
+#if 0
             }  else if (iflags.colorcount == 256) {
                 if (closest_color(COLORVAL(glyphinfo->gm.customcolor),
                     &closecolor, &clridx)) {
@@ -3853,11 +3860,9 @@ tty_print_glyph(
                     term_start_256color(clridx);
                     colordone = TRUE;
                 }
+#endif
             } else {
                 nhcolor = COLORVAL(glyphinfo->gm.customcolor);
-                if (ttyDisplay->color != NO_COLOR) {
-                    term_end_color();
-                }
                 ttyDisplay->colorflags = 0;
                 term_start_extracolor(nhcolor);
                 colordone = TRUE;
@@ -3865,12 +3870,6 @@ tty_print_glyph(
         }
         if (!colordone) {
             /* NH_BASIC_COLOR processing */
-            ttyDisplay->colorflags = NH_BASIC_COLOR;
-            if (color != ttyDisplay->color) {
-                if (ttyDisplay->color != NO_COLOR) {
-                    term_end_color();
-                }
-            }
             ttyDisplay->color = color;
             if (color != NO_COLOR) {
                 term_start_color(color);
@@ -3883,7 +3882,7 @@ tty_print_glyph(
        (tried bold for ice but it didn't look very good; inverse is easier
        to see although the Valkyrie quest ends up being hard on the eyes) */
     if (iflags.use_color
-        && bkglyphinfo && bkglyphinfo->gm.customcolor != NO_COLOR) {
+        && bkglyphinfo && bkglyphinfo->framecolor != NO_COLOR) {
         ttyDisplay->framecolor = bkglyphinfo->framecolor;
         term_start_bgcolor(bkglyphinfo->framecolor);
     } else if ((special & MG_PET) != 0 && iflags.hilite_pet) {
@@ -3924,15 +3923,13 @@ tty_print_glyph(
         /* turn off color as well, turning off ATR_INVERSE may have done
           this already and if so, we won't know the current state unless
           we do it explicitly */
-        if (ttyDisplay->colorflags == NH_BASIC_COLOR) {
-            if (ttyDisplay->color != NO_COLOR
-                || ttyDisplay->framecolor != NO_COLOR) {
-                term_end_color();
-                ttyDisplay->color = ttyDisplay->framecolor = NO_COLOR;
-            }
-        } else {
-            term_end_extracolor();
+        if (ttyDisplay->color != NO_COLOR
+            || ttyDisplay->framecolor != NO_COLOR) {
+            term_end_color();
+            ttyDisplay->color = ttyDisplay->framecolor = NO_COLOR;
         }
+        if (ttyDisplay->colorflags != NH_BASIC_COLOR)
+            term_end_extracolor();
     }
     print_vt_code1(AVTC_GLYPH_END);
 
