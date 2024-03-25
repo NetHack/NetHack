@@ -3334,7 +3334,7 @@ ttyinv_populate_slot(
     int row,  /* 'row' within the window, not within screen */
     int side, /* 'side'==0 is left panel or ==1 is right panel */
     const char *text,
-    int32_t color,
+    uint32 color,
     int clroffset)
 {
     struct tty_perminvent_cell *cell;
