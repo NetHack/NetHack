@@ -913,7 +913,7 @@ curses_print_glyph(
     int glyph;
     int ch;
     int color;
-    uint32 nhcolor = 0;
+    int nhcolor = 0;
     unsigned int special;
     int attr = -1;
 
