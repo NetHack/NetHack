@@ -319,7 +319,7 @@ extern int count_menucolors(void);
 extern int32 check_enhanced_colors(char *) NONNULLARG1;
 extern const char *wc_color_name(int32) NONNULL;
 extern int32_t rgbstr_to_int32(const char *rgbstr);
-extern boolean closest_color(uint32_t lcolor, uint32_t *closecolor, int *clridx);
+extern boolean closest_color(uint32_t lcolor, uint32_t *closecolor, uint16 *clridx);
 extern int color_distance(uint32_t, uint32_t);
 extern boolean onlyhexdigits(const char *buf);
 extern uint32 get_nhcolor_from_256_index(int idx);
@@ -1098,7 +1098,7 @@ struct customization_detail *find_matching_customization(
                                              const char *customization_name,
                                              enum customization_types custtype,
                                              enum graphics_sets which_set);
-int set_map_nhcolor(glyph_map *gm, uint32 nhcolor) NONNULLARG1;
+int set_map_customcolor(glyph_map *gm, uint32 nhcolor) NONNULLARG1;
 extern int unicode_val(const char *);
 extern int glyphrep(const char *) NONNULLARG1;
 extern int match_glyph(char *) NONNULLARG1;

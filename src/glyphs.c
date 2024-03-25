@@ -483,7 +483,7 @@ apply_customizations(
                 if (iflags.customcolors && do_colors) {
                     if (sc->custtype == custom_nhcolor) {
                         gmap = &glyphmap[details->content.ccolor.glyphidx];
-                        (void) set_map_nhcolor(gmap,
+                        (void) set_map_customcolor(gmap,
                                                details->content.ccolor.nhcolor);
                     }
                 }
@@ -1051,6 +1051,7 @@ clear_all_glyphmap_colors(void)
     for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
         if (glyphmap[glyph].customcolor)
             glyphmap[glyph].customcolor = 0;
+        glyphmap[glyph].color256idx = 0;
     }
 }
 

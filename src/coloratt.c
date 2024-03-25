@@ -853,14 +853,20 @@ rgbstr_to_int32(const char *rgbstr)
 }
 
 int
-set_map_nhcolor(glyph_map *gmap, uint32 nhcolor)
+set_map_customcolor(glyph_map *gmap, uint32 nhcolor)
 {
     glyph_map *tmpgm = gmap;
+    uint32 closecolor = 0;
+    uint16 clridx = 0;
 
     if (!tmpgm)
         return 0;
 
     gmap->customcolor = nhcolor;
+    if (closest_color(nhcolor, &closecolor, &clridx))
+        gmap->color256idx = clridx;
+    else
+        gmap->color256idx = 0;
     return 1;
 }
 
@@ -976,7 +982,7 @@ color_distance(uint32_t rgb1, uint32_t rgb2)
 }
 
 boolean
-closest_color(uint32 lcolor, uint32 *closecolor, int *clridx)
+closest_color(uint32 lcolor, uint32 *closecolor, uint16 *clridx)
 {
     int i, color_index = -1, similar = INT_MAX, current;
     boolean retbool = FALSE;

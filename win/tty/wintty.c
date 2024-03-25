@@ -3849,18 +3849,9 @@ tty_print_glyph(
             if ((glyphinfo->gm.customcolor & NH_BASIC_COLOR) != 0) {
                 /* don't set colordone or nhcolor */
                 color = COLORVAL(glyphinfo->gm.customcolor);
-#if 0
             }  else if (iflags.colorcount == 256) {
-                if (closest_color(COLORVAL(glyphinfo->gm.customcolor),
-                    &closecolor, &clridx)) {
-                    if (ttyDisplay->color != NO_COLOR) {
-                        term_end_color();
-                    }
-                    ttyDisplay->colorflags = 0;
-                    term_start_256color(clridx);
-                    colordone = TRUE;
-                }
-#endif
+                ttyDisplay->colorflags = 0; /* not NH_BASIC_COLOR */
+                term_start_256color(glyphinfo->gm.color256idx);
             } else {
                 nhcolor = COLORVAL(glyphinfo->gm.customcolor);
                 ttyDisplay->colorflags = 0;

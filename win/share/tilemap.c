@@ -1362,7 +1362,7 @@ main(int argc UNUSED, char *argv[] UNUSED)
     Fprintf(ofp, "%smaxothtile = %d;\n\n", indent, lastothtile);
     Fprintf(ofp, "#define NO_CUSTOMCOLOR (0U)\n\n");
     Fprintf(ofp, "/* glyph, ttychar, { %s%s } */\n",
-            "glyphflags, { NO_COLOR, symidx }, NO_CUSTOMCOLOR, ovidx, tileidx", enhanced);
+            "glyphflags, { NO_COLOR, symidx }, NO_CUSTOMCOLOR, NO_CUSTOMCOLOR, ovidx, tileidx", enhanced);
 #ifdef ENHANCED_SYMBOLS
     enhanced = ", 0"; /* replace ", utf8rep" since we're done with that */
 #endif
@@ -1370,7 +1370,7 @@ main(int argc UNUSED, char *argv[] UNUSED)
     Fprintf(ofp, "%sNO_GLYPH, ' ', NO_COLOR,\n", indent);
     Fprintf(ofp, "%s%s/* glyph_map */\n", indent, indent);
     Fprintf(ofp, "%s%s{ %s, TILE_UNEXPLORED%s }\n", indent, indent,
-            "MG_UNEXPL, { NO_COLOR, SYM_UNEXPLORED + SYM_OFF_X }, NO_CUSTOMCOLOR",
+            "MG_UNEXPL, { NO_COLOR, SYM_UNEXPLORED + SYM_OFF_X }, NO_CUSTOMCOLOR, NO_CUSTOMCOLOR",
             enhanced);
     Fprintf(ofp, "};\n");
     Fprintf(ofp, "\nglyph_map glyphmap[MAX_GLYPH] = {\n");
@@ -1385,7 +1385,7 @@ main(int argc UNUSED, char *argv[] UNUSED)
             /*NOTREACHED*/
         }
         Fprintf(ofp,
-                "    { 0U, { NO_COLOR, 0 }, NO_CUSTOMCOLOR, %4d%s },   /* [%04d] %s:%03d %s */\n",
+                "    { 0U, { NO_COLOR, 0 }, NO_CUSTOMCOLOR, NO_CUSTOMCOLOR, %4d%s },   /* [%04d] %s:%03d %s */\n",
                 tilenum, enhanced, i,
                 tilesrc_texts[tilelist[tilenum]->src],
                 tilelist[tilenum]->file_entry,

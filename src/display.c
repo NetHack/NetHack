@@ -1566,12 +1566,12 @@ see_traps(void)
 }
 
 /*  glyph, ttychar, framecolor,
-    { glyphflags, { NO_COLOR, sym.symidx }, nhcolor, tileidx, u } */
+    { glyphflags, { NO_COLOR, sym.symidx }, customcolor, color256idx, tileidx, u } */
 static glyph_info no_ginfo = {
     NO_GLYPH, ' ', NO_COLOR,
     { MG_BADXY, { NO_COLOR, 0 },
     0,
-    0
+    0U, 0U
 #ifdef ENHANCED_SYMBOLS
       , 0
 #endif
@@ -1602,7 +1602,7 @@ const glyph_info nul_glyphinfo = {
             MG_UNEXPL,
             { NO_COLOR, SYM_UNEXPLORED + SYM_OFF_X },
               0,
-              0
+              0U, 0U
 #ifdef ENHANCED_SYMBOLS
                , 0
 #endif
@@ -1616,7 +1616,7 @@ extern glyph_map glyphmap[MAX_GLYPH]; /* from tile.c */
 glyph_map glyphmap[MAX_GLYPH] = {
     { 0U, { NO_COLOR, 0 },
       0,
-      0
+      0U, 0U
 #ifdef ENHANCED_SYMBOLS
        , 0
 #endif
@@ -2029,7 +2029,7 @@ static gbuf_entry nul_gbuf = {
         /* glyphinfo.gm */
         { MG_UNEXPL, { NO_COLOR, 0 },
           0,
-          0
+          0U, 0U
 #ifdef ENHANCED_SYMBOLS
             , 0
 #endif
