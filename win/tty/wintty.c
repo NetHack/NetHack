@@ -3065,7 +3065,8 @@ ttyinv_add_menu(
         row = (slot % rows_per_side) + 1; /* +1: top border */
         /* side: left side panel or right side panel, not a window column */
         side = slot / rows_per_side;
-        ttyinv_populate_slot(cw, row, side, text, clr, startcolor_at);
+        ttyinv_populate_slot(cw, row, side, text,
+                             (uint32) clr, startcolor_at);
     }
     return;
 }
@@ -3218,8 +3219,8 @@ ttyinv_end_menu(int window, struct WinDesc *cw)
 static void
 ttyinv_render(winid window, struct WinDesc *cw)
 {
-    int row, col, slot, side, filled_count = 0, slot_limit,
-                              current_row_color = NO_COLOR;
+    int row, col, slot, side, filled_count = 0, slot_limit;
+    uint32 current_row_color = NO_COLOR;
     struct tty_perminvent_cell *cell;
     char invbuf[BUFSZ];
     boolean force_redraw = gp.program_state.in_docrt ? TRUE : FALSE,
