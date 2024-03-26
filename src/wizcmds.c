@@ -1884,12 +1884,17 @@ wizcustom_callback(winid win, int glyphnum, char *id)
 
     if (win && id) {
         cgm = &glyphmap[glyphnum];
-        if (cgm->u || cgm->customcolor != 0) {
+        if (
+#ifdef ENHANCED_SYMBOLS
+            cgm->u ||
+#endif
+            cgm->customcolor != 0) {
             Sprintf(bufa, "[%04d] %-44s", glyphnum, id);
             Sprintf(bufb, "'\\%03d' %02d",
                     gs.showsyms[cgm->sym.symidx], cgm->sym.color);
             Sprintf(bufc, "%011x", cgm->customcolor);
             bufu[0] = '\0';
+#ifdef ENHANCED_SYMBOLS
             if (cgm->u && cgm->u->utf8str) {
                 Sprintf(bufu, "U+%04x", cgm->u->utf32ch);
                 cp = cgm->u->utf8str;
@@ -1899,6 +1904,7 @@ wizcustom_callback(winid win, int glyphnum, char *id)
                     cp++;
                 }
             }
+#endif
             any.a_int = glyphnum + 1; /* avoid 0 */
             Sprintf(buf, "%s %s %s %s", bufa, bufb, bufc, bufu);
             add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
