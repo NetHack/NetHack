@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1699813308 2023/11/12 18:21:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.419 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1711484961 2024/03/26 20:29:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.443 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -951,6 +951,8 @@ hmon_hitmon_weapon_melee(
                                    50 + 15 * (greatest_erosion(obj)
                                               - greatest_erosion(monwep)),
                                    100))) {
+        static const char from_your_blow[] = " from the force of your blow!";
+        char buf[BUFSZ];
         /*
          * 2.5% chance of shattering defender's weapon when
          * using a two-handed weapon; less if uwep is rusted.
@@ -963,8 +965,20 @@ hmon_hitmon_weapon_melee(
          */
         setmnotwielded(mon, monwep);
         mon->weapon_check = NEED_WEAPON;
-        pline("%s from the force of your blow!",
-              Yobjnam2(monwep, "shatter"));
+        if (canseemon(mon))
+            /* Yobjnam2(X,"shatter") yields "Shk's X shatters" if X is owned
+               by a shop or "Mon's X shatters" if X is carried by a monster
+               (or "{Your|The} X shatters" if {carried by hero|last resort})*/
+            Strcpy(buf, Yobjnam2(monwep, "shatter"));
+        else /* hero is blind or can't see invisible mon */
+            /* construct "Its weapon shatters"; not an exact replacement
+               for Yobjnam2() if an unseen mon other than the shopkeeper
+               is wielding a shop-owned weapon; telepathy or extended
+               monster detection will name mon but not its weapon */
+            Sprintf(buf, "%s weapon%s %s", s_suffix(Monnam(mon)),
+                    plur(monwep->quan), otense(monwep, "shatter"));
+        buf[sizeof buf - sizeof from_your_blow] = '\0';
+        pline("%s%s", buf, from_your_blow);
         m_useupall(mon, monwep);
         /* If someone just shattered MY weapon, I'd flee! */
         if (rn2(4)) {

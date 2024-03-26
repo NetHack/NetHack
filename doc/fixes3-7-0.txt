@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1402 $ $NHDT-Date: 1711034372 2024/03/21 15:19:32 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1407 $ $NHDT-Date: 1711484961 2024/03/26 20:29:21 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1384,6 +1384,8 @@ using '#adjust c d' or '#adjust d c' after splitting slot c via '#adjust Nc d'
 	that caused this was intended to avoid collecting other compatible
 	stacks while still merging the two specified ones)
 ring of aggravate monster increases the level difficulty
+if hero shattered an unseen monster's weapon, the [also unseen] weapon was
+	described in the feedback
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
