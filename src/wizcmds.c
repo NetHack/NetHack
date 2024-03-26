@@ -1818,4 +1818,94 @@ wiz_migrate_mons(void)
     return ECMD_OK;
 }
 
+/* #wizcustom command to see glyphmap customizations */
+int
+wiz_custom(void)
+{
+    extern const char *const known_handling[];     /* symbols.c */
+
+    if (wizard) {
+        static const char wizcustom[] = "#wizcustom";
+        winid win;
+        char buf[BUFSZ], bufa[BUFSZ];  
+        int n;
+#if 0
+        int j, glyph;
+#endif
+        menu_item *pick_list = (menu_item *) 0;
+
+        if (!glyphid_cache_status())
+            fill_glyphid_cache();
+
+        win = create_nhwindow(NHW_MENU);
+        start_menu(win, MENU_BEHAVE_STANDARD);
+        add_menu_heading(win,
+                         "    glyph  glyph identifier                        "
+                         "     sym   clr customcolor unicode utf8");
+        Sprintf(bufa, "%s: colorcount=%d %s", wizcustom, iflags.colorcount,
+                gs.symset[PRIMARYSET].name ? gs.symset[PRIMARYSET].name
+                                          : "default");
+        if (gc.currentgraphics == PRIMARYSET && gs.symset[PRIMARYSET].name)
+            Strcat(bufa, ", active");
+        if (gs.symset[PRIMARYSET].handling) {
+            Sprintf(eos(bufa), ", handler=%s",
+                    known_handling[gs.symset[PRIMARYSET].handling]);
+        }
+        Sprintf(buf, "%s", bufa);
+        wizcustom_glyphids(win);
+        end_menu(win, bufa);
+        n = select_menu(win, PICK_NONE, &pick_list);
+        destroy_nhwindow(win);
+#if 0
+        for (j = 0; j < n; ++j) {
+            glyph = pick_list[j].item.a_int - 1; /* -1: reverse +1 above */
+        }
+#endif
+        if (n >= 1)
+            free((genericptr_t) pick_list);
+        if (glyphid_cache_status())
+            free_glyphid_cache();
+        docrt();
+    } else
+        pline(unavailcmd, ecname_from_fn(wiz_custom));
+    return ECMD_OK;
+}
+
+void
+wizcustom_callback(winid win, int glyphnum, char *id)
+{
+    extern glyph_map glyphmap[MAX_GLYPH];
+    glyph_map *cgm;
+    int clr = NO_COLOR;
+    char buf[BUFSZ], bufa[BUFSZ], bufb[BUFSZ], bufc[BUFSZ], bufd[BUFSZ],
+        bufu[BUFSZ];
+    anything any;
+    uint8 *cp;
+
+    if (win && id) {
+        cgm = &glyphmap[glyphnum];
+        if (cgm->u || cgm->customcolor != 0) {
+            Sprintf(bufa, "[%04d] %-44s", glyphnum, id);
+            Sprintf(bufb, "'\\%03d' %02d",
+                    gs.showsyms[cgm->sym.symidx], cgm->sym.color);
+            Sprintf(bufc, "%011x", cgm->customcolor);
+            bufu[0] = '\0';
+            if (cgm->u && cgm->u->utf8str) {
+                Sprintf(bufu, "U+%04x", cgm->u->utf32ch);
+                cp = cgm->u->utf8str;
+                while (*cp) {
+                    Sprintf(bufd, " <%d>", (int) *cp);
+                    Strcat(bufu, bufd);
+                    cp++;
+                }
+            }
+            any.a_int = glyphnum + 1; /* avoid 0 */
+            Sprintf(buf, "%s %s %s %s", bufa, bufb, bufc, bufu);
+            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
+                     MENU_ITEMFLAGS_NONE);
+        }
+    }
+    return;
+}
+
 /*wizcmds.c*/

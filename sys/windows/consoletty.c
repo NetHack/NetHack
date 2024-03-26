@@ -997,8 +997,10 @@ tty_startup(int *wid, int *hgt)
     *wid = console.width;
     *hgt = console.height;
     set_option_mod_status("mouse_support", set_in_game);
-    iflags.colorcount = 16777216;
-//    iflags.colorcount = 256;
+    if (iflags.colorcount == 0) {
+        iflags.colorcount = 16777216;
+        //    iflags.colorcount = 256;
+    }
 }
 
 void
@@ -2404,6 +2406,11 @@ void nethack_enter_consoletty(void)
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
     char buf[BUFSZ], *bp, *localestr;
     BOOL success;
+
+    if (iflags.colorcount == 0) {
+        iflags.colorcount = 16777216;
+        //    iflags.colorcount = 256;
+    }
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
 #if 0
     /* set up state needed by early_raw_print() */

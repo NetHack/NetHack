@@ -39,6 +39,7 @@ static const long nonzero_black = CLR_BLACK | NH_BASIC_COLOR;
 staticfn void init_glyph_cache(void);
 staticfn void add_glyph_to_cache(int glyphnum, const char *id);
 staticfn int find_glyph_in_cache(const char *id);
+staticfn char *find_glyphid_in_cache_by_glyphnum(int glyphnum);
 staticfn uint32 glyph_hash(const char *id);
 staticfn void to_custom_symset_entry_callback(int glyph,
                                             struct find_struct *findwhat);
@@ -341,6 +342,23 @@ find_glyph_in_cache(const char *id)
     return -1;
 }
 
+staticfn char *
+find_glyphid_in_cache_by_glyphnum(int glyphnum)
+{
+    size_t idx;
+
+    if (!glyphid_cache)
+        return (char *) 0;
+    for (idx = 0; idx < glyphid_cache_size; ++idx) {
+        if (glyphid_cache[idx].glyphnum == glyphnum
+            && glyphid_cache[idx].id != 0) {
+            /* Match found */
+            return glyphid_cache[idx].id;
+        }
+    }
+    return (char *) 0;
+}
+
 staticfn uint32
 glyph_hash(const char *id)
 {
@@ -362,17 +380,6 @@ boolean
 glyphid_cache_status(void)
 {
     return (glyphid_cache != 0);
-}
-
-void
-dump_all_glyphids(FILE *fp)
-{
-    struct find_struct dump_glyphid_find = zero_find;
-
-    dump_glyphid_find.findtype = find_nothing;
-    dump_glyphid_find.reserved = (genericptr_t) fp;
-    dump_glyphid_find.restype = res_dump_glyphids;
-    (void) parse_id((char *) 0, &dump_glyphid_find);
 }
 
 int
@@ -703,6 +710,32 @@ purge_custom_entries(enum graphics_sets which_set)
         gdc->count = 0;
     }
 }
+void
+dump_all_glyphids(FILE *fp)
+{
+    struct find_struct dump_glyphid_find = zero_find;
+
+    dump_glyphid_find.findtype = find_nothing;
+    dump_glyphid_find.reserved = (genericptr_t) fp;
+    dump_glyphid_find.restype = res_dump_glyphids;
+    (void) parse_id((char *) 0, &dump_glyphid_find);
+}
+
+void
+wizcustom_glyphids(winid win)
+{
+    int glyphnum;
+    char *id;
+
+    if (!glyphid_cache)
+        return;
+    for (glyphnum = 0; glyphnum < MAX_GLYPH; ++glyphnum) {
+        id = find_glyphid_in_cache_by_glyphnum(glyphnum);
+        if (id) {
+            wizcustom_callback(win, glyphnum, id);
+        }
+    }
+ }
 
 staticfn int
 parse_id(const char *id, struct find_struct *findwhat)

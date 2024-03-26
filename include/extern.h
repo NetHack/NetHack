@@ -1103,6 +1103,7 @@ extern int unicode_val(const char *);
 extern int glyphrep(const char *) NONNULLARG1;
 extern int match_glyph(char *) NONNULLARG1;
 extern void dump_all_glyphids(FILE *fp) NONNULLARG1;
+extern void wizcustom_glyphids(winid win);
 extern void fill_glyphid_cache(void);
 extern void free_glyphid_cache(void);
 extern boolean glyphid_cache_status(void);
@@ -3690,6 +3691,7 @@ extern void cuss(struct monst *) NONNULLARG1;
 
 /* ### wizcmds.c ### */
 
+extern int wiz_custom(void);
 extern int wiz_detect(void);
 extern int wiz_flip_level(void);
 extern int wiz_fuzzer(void);
@@ -3718,6 +3720,7 @@ extern int wiz_wish(void);
 extern void makemap_remove_mons(void);
 extern void wiz_levltyp_legend(void);
 extern void wiz_map_levltyp(void);
+extern void wizcustom_callback(winid win, int glyphnum, char *id);
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
 extern int wiz_display_macros(void);
 extern int wiz_mon_diff(void);
