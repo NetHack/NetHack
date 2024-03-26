@@ -499,6 +499,9 @@ MAIN(int argc, char *argv[])
     char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
     char failbuf[BUFSZ];
     int getlock_result = 0;
+    HWND hwnd;
+    HDC hdc;
+    int bpp;
 
 #ifdef _MSC_VER
     _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
@@ -513,6 +516,16 @@ MAIN(int argc, char *argv[])
 #endif /* WIN32CON */
 
     early_init(argc, argv);
+    /* setting iflags.colorcount has to be after early_init()
+     * because it zeros out all of iflags */
+    hwnd = GetDesktopWindow();
+    hdc = GetDC(hwnd);
+    if (hdc) {
+        bpp = GetDeviceCaps(hdc, BITSPIXEL);
+        iflags.colorcount = (bpp >= 16) ? 16777216 : (bpp >= 8) ? 256 : 16;
+        ReleaseDC(hwnd, hdc);
+    }
+
 #ifdef _MSC_VER
 #ifdef DEBUG
     /* set these appropriately for VS debugging */
