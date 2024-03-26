@@ -1,4 +1,4 @@
-/* NetHack 3.7	symbols.c	$NHDT-Date: 1661295669 2022/08/23 23:01:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.7	symbols.c	$NHDT-Date: 1711477037 2024/03/26 18:17:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.120 $ */
 /* Copyright (c) NetHack Development Team 2020.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -851,17 +851,19 @@ parsesymbols(char *opts, int which_set)
 const struct symparse *
 match_sym(char *buf)
 {
-    int i;
-    struct alternate_parse {
+    static struct alternate_parse {
         const char *altnm;
         const char *nm;
     } alternates[] = {
-        { "S_armour", "S_armor" },     { "S_explode1", "S_expl_tl" },
+        { "S_armour", "S_armor" },     { "S_suit", "S_armor" },
+        /* alt explosion names are numbered in phone key/button layout */
+        { "S_explode1", "S_expl_tl" },
         { "S_explode2", "S_expl_tc" }, { "S_explode3", "S_expl_tr" },
         { "S_explode4", "S_expl_ml" }, { "S_explode5", "S_expl_mc" },
         { "S_explode6", "S_expl_mr" }, { "S_explode7", "S_expl_bl" },
         { "S_explode8", "S_expl_bc" }, { "S_explode9", "S_expl_br" },
     };
+    int i;
     size_t len = strlen(buf);
     const char *p = strchr(buf, ':'), *q = strchr(buf, '=');
     const struct symparse *sp = loadsyms;
