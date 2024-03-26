@@ -1906,7 +1906,7 @@ wizcustom_callback(winid win, int glyphnum, char *id)
             }
 #endif
             any.a_int = glyphnum + 1; /* avoid 0 */
-            Sprintf(buf, "%s %s %s %s", bufa, bufb, bufc, bufu);
+            Snprintf(buf, sizeof buf, "%s %s %s %s", bufa, bufb, bufc, bufu);
             add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
                      MENU_ITEMFLAGS_NONE);
         }
