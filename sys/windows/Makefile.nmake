@@ -29,7 +29,7 @@
 # The default make target (so just typing 'nmake' is useful).
 #
 
-default : install
+default : package
 
 #
 #------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ GIT_AVAILABLE = N
 # You can override INTERNET_AVAILABLE and GIT_AVAILABLE on the nmake command
 # line by adding GIT=1
 #   for example:
-#      nmake GIT=1 install
+#      nmake GIT=1 package
 #
 #------------------------------------------------------------------------------
 # This Makefile will attempt to auto-detect your selected target architecture
@@ -171,6 +171,8 @@ X11     = ..\win\X11     # X11 support files
 LIBDIR  = ..\lib         # libraries and external bits
 SUBM    = ..\submodules  # NetHack git submodules
 SndWavDir = ..\sound\wav # sound files that get integrated
+BinDir = ..\binary
+PkgDir = ..\package
 
 #==============================================================================
 # Sanity checks for prerequisite Lua and pdcursesmod
@@ -1370,18 +1372,7 @@ DLB =
 #  Everything
 #
 
-all :	install
-
-install:  envchk.tag libdir.tag ottydir$(TARGET_CPU).tag \
-		outldir$(TARGET_CPU).tag oguidir$(TARGET_CPU).tag \
-		oluadir$(TARGET_CPU).tag opdcdir$(TARGET_CPU).tag \
-		opdccdir$(TARGET_CPU).tag opdcgdir$(TARGET_CPU).tag \
-		$(LUASRC)\lua.h $(PDCDEP) \
-		$(INCL)\nhlua.h $(OUTL)utility.tag \
-		$(DAT)\data $(DAT)\rumors $(DAT)\oracles $(DAT)\engrave \
-		$(DAT)\epitaph $(DAT)\bogusmon $(GAMEDIR)\NetHack.exe \
-		$(GAMEDIR)\NetHackW.exe $(GAMEDIRDLLS) install.tag
-	@echo Done.
+all :	package
 
 !IF "$(INTERNET_AVAILABLE)" == "Y"
 !IF "$(GIT_AVAILABLE)" == "Y"
@@ -1480,7 +1471,7 @@ $(GAMEDIR)\NetHack.exe : gamedir.tag $(OTTY)consoletty.o \
 		$(OTTY)date.o
 		$(OTTY)console.res
 << keep
-	@if exist install.tag del install.tag
+	@if exist binary.tag del binary.tag
 
 #---------
 # NetHackW
@@ -1510,7 +1501,7 @@ $(GAMEDIR)\NetHackW.exe : gamedir.tag $(OGUI)tile.o \
 # install
 #--------
 #
-install.tag: 	$(DAT)\data $(DAT)\rumors $(DAT)\oracles $(DLB) \
+binary.tag: 	$(DAT)\data $(DAT)\rumors $(DAT)\oracles $(DLB) \
 		$(HACKCSRC) $(SOUNDSRCS)
 ! IF ("$(USE_DLB)"=="Y")
 	copy nhdat$(NHV)          $(GAMEDIR)
@@ -1549,7 +1540,7 @@ install.tag: 	$(DAT)\data $(DAT)\rumors $(DAT)\oracles $(DLB) \
 	@if exist $(GAMEDIR)\NetHackW.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHackW.PDB to conserve space
 	-if exist $(MSWSYS)\.nethackrc.template copy $(MSWSYS)\.nethackrc.template   $(GAMEDIR)
 	-if not exist $(GAMEDIR)\record. goto>$(GAMEDIR)\record.
-	echo install done > $@
+	echo binary built > $@
 
 #	copy $(MSWSYS)\windsyshlp    $(GAMEDIR)
 
@@ -1764,6 +1755,11 @@ opdcgdir$(TARGET_CPU).tag:
 libdir.tag:
 	@if not exist $(LIBDIR)\*.* echo creating directory $(LIB:\=/)
 	@if not exist $(LIBDIR)\*.* mkdir $(LIBDIR)
+	@echo directory created >$@
+
+pkgdir.tag:
+	if NOT exist $(PkgDir)\*.* echo creating directory $(PkgDir:\=/)
+	if NOT exist $(PkgDir)\*.* mkdir $(PkgDir)
 	@echo directory created >$@
 
 #==========================================
@@ -2299,6 +2295,41 @@ $(SndWavDir)\sa2_xpleveldown.wav: $(SndWavDir)\sa2_xpleveldown.uu $(U)uudecode.e
 $(SndWavDir)\sa2_xplevelup.wav: $(SndWavDir)\sa2_xplevelup.uu $(U)uudecode.exe
 
 #===============================================================================
+# packaging
+#===============================================================================
+
+PKGFILES = .nethackrc.template Guidebook.txt license NetHack.exe NetHack.txt \
+	 NetHackW.exe opthelp nhdat370 record symbols sysconf.template
+FILESTOZIP = $(BinDir)\.nethackrc.template $(BinDir)\Guidebook.txt $(BinDir)\license \
+	$(BinDir)\NetHack.exe $(BinDir)\NetHack.txt $(BinDir)\NetHackW.exe \
+	$(BinDir)\opthelp $(BinDir)\nhdat370 $(BinDir)\record \
+	$(BinDir)\symbols $(BinDir)\sysconf.template 
+DBGSYMS = NetHack.PDB NetHackW.PDB
+PDBTOZIP = $(BinDir)\NetHack.PDB $(BinDir)\NetHackW.PDB
+MAINZIP = $(PkgDir)\nethack-$(NHV)-win-$(TARGET_CPU).zip
+DBGSYMZIP = $(PkgDir)\nethack-$(NHV)-win-$(TARGET_CPU)-debugsymbols.zip
+
+package: binary $(FILESTOZIP) $(MAINZIP) $(DBGSYMZIP)
+	@echo NetHack Windows package created: $(MAINZIP)
+
+$(MAINZIP): $(FILESTOZIP)
+	if not exist $(PkgDir)\*.* mkdir $(PkgDir)
+	tar -a -cf $(MAINZIP) -C $(BinDir) $(PKGFILES)
+$(DBGSYMZIP): $(PDBTOZIP)
+	tar -a -cf $(DBGSYMZIP) -C $(BinDir) $(DBGSYMS)
+
+binary:  envchk.tag libdir.tag ottydir$(TARGET_CPU).tag \
+		outldir$(TARGET_CPU).tag oguidir$(TARGET_CPU).tag \
+		oluadir$(TARGET_CPU).tag opdcdir$(TARGET_CPU).tag \
+		opdccdir$(TARGET_CPU).tag opdcgdir$(TARGET_CPU).tag \
+		$(LUASRC)\lua.h $(PDCDEP) \
+		$(INCL)\nhlua.h $(OUTL)utility.tag \
+		$(DAT)\data $(DAT)\rumors $(DAT)\oracles $(DAT)\engrave \
+		$(DAT)\epitaph $(DAT)\bogusmon $(GAMEDIR)\NetHack.exe \
+		$(GAMEDIR)\NetHackW.exe $(GAMEDIRDLLS) binary.tag
+	@echo NetHack is up to date.
+
+#===============================================================================
 # Housekeeping
 #===============================================================================
 
@@ -2359,6 +2390,8 @@ spotless: clean
 	if exist $(DAT)\data		del $(DAT)\data
 	if exist tilemappings.lst       del tilemappings.lst
 	if exist $(SndWavDir)\*.wav     del $(SndWavDir)\*.wav
+	if exist $(MAINZIP)             del $(MAINZIP)
+	if exist $(DBGSYMZIP)           del $(DBGSYMZIP)
 	if exist $(OBJTTY)\*            rmdir $(OBJTTY) /s /Q
 	if exist $(OBJGUI)\*            rmdir $(OBJGUI) /s /Q
 	if exist $(OBJUTIL)\*           rmdir $(OBJUTIL) /s /Q
@@ -2375,11 +2408,12 @@ spotless: clean
 	if exist $(OBJPDCG_B)\*         rmdir $(OBJPDCG_B) /s /Q
 
 clean:
-	if exist install.tag            del install.tag
+	if exist binary.tag             del binary.tag
 	if exist gamedir.tag            del gamedir.tag
 	if exist envchk.tag             del envchk.tag
 	if exist cpu.tag                del cpu.tag
 	if exist envchk.tag             del envchk.tag
+	if exist pkgdir.tag             del pkgdir.tag
 	if exist $(OUTL)utility.tag     del $(OUTL)utility.tag
 	if exist $(OTTY)sp_lev.tag      del $(OTTY)sp_lev.tag
 	if exist $(OGUI)sp_lev.tag      del $(OGUI)sp_lev.tag

@@ -1,0 +1,149 @@
+Building NetHack using the Visual Studio IDE
+
+Prerequisite Requirements:
+
+A copy of Microsoft Visual Studio Community Edition needs to
+be installed on your machine, and the Lua prerequisite source
+files are required as outlined in sys/windows/Install.windows.
+
+The build Makefiles and procedures produce two executables:
+    a. A TTY and curses version of NetHack in nethack.exe
+    b. A Windows and curses graphical version in nethackw.exe.
+
+You can use one of the following build environments:
+
+/---------------------------------------------\
+|    Directories for a Windows NetHack build  |
+\---------------------------------------------/
+
+               (NetHack-top)
+                     |
+  +-----+------+-----+-------+-----------+-----------+-----~-----+------+
+  |     |      |     |       |           |           |           |      |
+ dat   doc  include lib     src         sys         win    submodules  util
+                     |                   |           |           |
+               +----------+          +------+      +----+     +----+
+               |          |          |      |      |    |     |    |
+               |          |          |      |      |    |     |    |
+           lua-5.4.6  pdcursesmod  share windows  tty  win32 lua pdcursesmod
+                                                  |
+                                                  vs
+                                                  |
+    +----------+-------+--------+--------+-----------+-------+-----+------+
+    |          |       |        |        |           |       |     |      |
+ makedefs NetHack NetHackW PDCurses PDCursesGui tile2bmp tilemap tiles uudecode
+
+
+/-----------------------------------------------------------\
+| Building From the Command Line Using nmake from one of the |
+| Visual Studio Community Editions                           |
+\-----------------------------------------------------------/
+
+Required components that are not bundled in the NetHack repository, but
+are required to build NetHack yourself.
+
+Lua
+        NetHack 3.7 for Windows requires 3rd party Lua source that is not part
+        of the NetHack distribution or repository.
+
+        A windows cmd command procedure for fetching prerequisite
+        sources is available, and can be run as follows from the top of
+        the NetHack source tree to obtain lua:
+            sys\windows\fetch.cmd lua
+
+Curses
+        If you want to include curses interface support in NetHack 3.7 for
+        3rd part pdcursesmod source code is required and is not part of the
+        NetHack distribution or repository.
+
+        A windows cmd command procedure for fetching prerequisite
+        sources is available, and can be run as follows from the top of
+        the NetHack source tree to obtain pdcursesmod:
+            sys\windows\fetch.cmd pdcursesmod
+
+Building
+
+Two different versions of NetHack will be built for Windows from the
+command line using the Makefile approach:
+    A tty port utilizing the Win32 Console I/O subsystem Console,
+    and a curses interface in an executabled called NetHack.exe.
+        NetHack
+    A Win32 native port built on the Windows API Graphical NetHack,
+    and graphical curses in an executable called NetHackW.exe.
+
+The Makefile configurations will build both; NetHack.exe and NetHackW.exe
+and will be able to use the same datafiles, save files and bones files.
+
+Since the last official release of NetHack, compilers and computer
+architectures have evolved and you can now choose whether to build
+a 32-bit x86 version, or a 64-bit x64 version.  The default Makefile
+is set up for a 32-bit x86 version, but that's only because it will
+run on the most number of existing Windows environments. Change it if you
+want. Be aware that NetHack's save files and bones files in the 3.7.0
+release have not yet evolved enough to allow them to interchange between
+the 32-bit version and the 64-bit version (or between different platforms).
+That may change in future.
+
+I. Dispelling the Myths:
+
+    Compiling NetHack for Windows is not as easy as it sounds, nor as hard
+    as it looks, however it will behoove you to read this entire section
+    through before beginning the task.
+
+    We have provided a Visual Studio nmake Makefile.make in
+    sys/windows/Makefile.nmake, which you use from the Windows command
+    line.
+
+
+II. To compile your copy of NetHack on a Windows machine:
+
+Setting Up
+
+1.  Change your current directory to the sys\windows subfolder of the nethack
+    source tree, if you are at the top of the NetHack source tree.
+        cd sys\windows.
+
+2.  Execute .\nhsetup.bat to place copies of the Makefiles in
+    the src subfolder. The file sys\windows\Makefile.nmake will copied
+    to a file src\Makefile.
+        .\nhsetup.bat
+
+3.  Change your current directory to the src subfolder of the nethack
+    source tree. The following command assumes you are still in the
+    sys\windows folder from steps #1 and #2 above:
+        cd ..\..\src
+
+Compiling
+
+4.  Now that everything is set up, you should be ready to start the
+    process.
+
+    Your current directory should be the NetHack src directory.
+
+    Issue these following command:
+	    nmake package
+
+    If all goes well, intermediate NetHack files will be placed in the
+    binary subfolder of the NetHack tree, and the final NetHack package
+    for windows will be in the package subfolder.
+
+Notes:
+
+1.  To rebuild NetHack after changing something, change your current directory
+    to src and issue the appropriate command for your compiler:
+
+    For Microsoft compiler:
+        nmake package
+
+2.  Depending on the build and compiler and tools used above, the
+    package produced by the build will be either contain:
+      - a 32-bit (x86) .exe file,
+        which should run on any recent Win32 environment.
+    or
+      - a 64-bit (x64) .exe file,
+        which should run on any 64-bit Windows O/S.
+
+    **Note**: saved games and bones files are NOT compatible between the
+    32-bit and the 64-bit versions at this time.
+
+

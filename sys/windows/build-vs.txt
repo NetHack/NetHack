@@ -1,0 +1,53 @@
+Building NetHack using the Visual Studio IDE
+
+Prerequisite Requirements:
+
+A copy of Microsoft Visual Studio Community Edition needs to
+be installed on your machine, and the Lua prerequisite source
+files are required as outlined in sys/windows/Install.windows.
+
+The nmake build Makefiles and procedures produce two executable
+versions:
+
+    a. A TTY and curses version of NetHack in nethack.exe
+    b. A Windows and curses graphical version in nethackw.exe.
+
+/---------------------------------------------\
+|    Directories for a Windows NetHack build  |
+\---------------------------------------------/
+
+               (NetHack-top)
+                     |
+  +-----+------+-----+-------+-----------+-----------+-----~-----+------+
+  |     |      |     |       |           |           |           |      |
+ dat   doc  include lib     src         sys         win    submodules  util
+                     |                   |           |           |
+               +----------+          +------+      +----+     +----+
+               |          |          |      |      |    |     |    |
+               |          |          |      |      |    |     |    |
+           lua-5.4.6  pdcursesmod  share windows  tty  win32 lua pdcursesmod
+                                                  |
+                                                  vs
+                                                  |
+    +----------+-------+--------+--------+-----------+-------+-----+------+
+    |          |       |        |        |           |       |     |      |
+ makedefs NetHack NetHackW PDCurses PDCursesGui tile2bmp tilemap tiles uudecode
+
+
+/-----------------------------------------------------------\
+| Building And Running Using Visual Studio 2017, 2019, 2022  |
+\-----------------------------------------------------------/
+
+When using Visual Studio Community Edition, load the provided solution
+file within the IDE, build the solution.
+
+The Visual Studio NetHack solution file can be found here:
+    sys\windows\vs\NetHack.sln
+
+The steps are:
+    1. Launch the IDE.
+    2. Open the appropriate solution file in sys\windows\vs\NetHack.sln.
+    3. Select the build configuration you wish to use (Release, Debug, etc.).
+    4. From the build menu, select build solution.
+    5. Type F5 to start debugging.
+

@@ -28,7 +28,7 @@
 # The default make target (so just typing 'mingw32-make').
 #
 
-default: install
+default: package
 
 #---------------------------------------------------------------
 # Where do you want the game to be built (which folder)?
@@ -263,6 +263,8 @@ WCURSES =../win/curses
 WSHR    =../win/share
 QT      =../win/Qt
 SNDWAVDIR = ../sound/wav
+BinDir = ../binary
+PkgDir = ../package
 
 #
 #  Object directory.
@@ -1129,6 +1131,29 @@ $(GAMEDIR)/NetHack.exe: $(NHOBJS) $(NHRES) $(DATE_O) $(LUALIB) $(PDCLIB) $(HLHAC
 $(ONH)/%.o: $(SRC)/%.c $(NHLUAH) | $(ONH)
 	$(cc) $(CFLAGSNH) $< -o$@
 
+#==========================================
+# package
+#==========================================
+TARGET_CPU = x64
+NHV=370
+PKGFILES = .nethackrc.template Guidebook.txt license NetHack.exe NetHack.txt \
+        NetHackW.exe opthelp nhdat370 record symbols sysconf.template
+FILESTOZIP = $(addprefix $(GAMEDIR)/, $(PKGFILES))
+MAINZIP = $(PkgDir)/nethack-$(NHV)-win-$(TARGET_CPU)-msys2.zip
+
+package: binary $(FILESTOZIP) $(MAINZIP)
+       @echo NetHack Windows package created: $(MAINZIP)
+
+$(MAINZIP): $(FILESTOZIP) | $(PkgDir)
+	/c/Windows/System32/tar -a -cf $(MAINZIP) -C $(GAMEDIR) $(PKGFILES)
+	@echo NetHack Windows package created: $(MAINZIP)
+
+$(PkgDir):
+	@mkdir -p $@
+
+CLEAN_DIR += $(PkgDir)
+CLEAN_FILE += $(MAINZIP)
+
 #       In NetHack 3.7, date.c must be recompiled after any other file is compiled,
 #       otherwise the game internal build timestamp (and potentially git hash)
 #       will not be accurate.
@@ -1187,7 +1212,7 @@ CLEAN_FILE += $(NHTARGET) $(NHOBJS) $(NHRES)
 #=============== TARGETS ==================
 #==========================================
 
-.PHONY: all clean default install lua makedefs recover $(PDCURSES) $(PDCURSES)w \
+.PHONY: all clean default binary lua makedefs recover $(PDCURSES) $(PDCURSES)w \
 	tile2bmp tilemap uudecode dlb nethackw nethack tileutil \
 	fetchlua fetchpdcurses
 
@@ -1195,30 +1220,30 @@ CLEAN_FILE += $(NHTARGET) $(NHOBJS) $(NHRES)
 #  Everything
 #
 
-all: install
+all: package
 
-TO_INSTALL = $(GAMEDIR)/NetHack.exe $(RTARGETS) $(GAMEDIRDLLS) \
+TO_BINARY = $(GAMEDIR)/NetHack.exe $(RTARGETS) $(GAMEDIRDLLS) \
 	     $(addprefix $(GAMEDIR)/, \
 	     $(addsuffix .template, sysconf .nethackrc symbols) \
 	     Guidebook.txt NetHack.txt license opthelp record)
 
 ifeq "$(HAVE_SOUNDLIB)" "Y"
-TO_INSTALL += $(addprefix $(GAMEDIR)/, $(addsuffix .wav, $(WAVLIST)))
+TO_BINARY += $(addprefix $(GAMEDIR)/, $(addsuffix .wav, $(WAVLIST)))
 endif
 
 ifeq "$(USE_LUADLL)" "Y"
-TO_INSTALL += $(LUADLL)
+TO_BINARY += $(LUADLL)
 endif
 
 ifneq "$(SKIP_NETHACKW)" "Y"
-TO_INSTALL += $(GAMEDIR)/NetHackW.exe
+TO_BINARY += $(GAMEDIR)/NetHackW.exe
 endif
 
 ifeq "$(USE_DLB)" "Y"
-TO_INSTALL += $(DLB)
+TO_BINARY += $(DLB)
 endif
 
-install: fetchlua fetchpdcurses $(TO_INSTALL)
+binary: fetchlua fetchpdcurses $(TO_BINARY)
 ifdef CI_COMPILER
 	ls -l $(SRC)
 	ls -l $(DAT)
@@ -1255,7 +1280,7 @@ $(GAMEDIR)/%: $(MSWSYS)/%
 $(GAMEDIR)/%: $(SNDWAVDIR)/%
 	cp $< $@
 
-CLEAN_FILE += $(TO_INSTALL)
+CLEAN_FILE += $(TO_BINARY)
 
 clean:
 	@-rm -f $(CLEAN_FILE)
