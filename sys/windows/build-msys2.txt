@@ -54,7 +54,7 @@ Lua
         NetHack 3.7 for Windows requires 3rd party Lua source that is not part
         of the NetHack distribution or repository.
 
-        A windows cmd command procedure for fetching prerequisite
+        A bash shell script for fetching prerequisite
         sources is available, and can be run as follows from the top of
         the NetHack source tree to obtain lua:
             sh sys/windows/fetch.sh lua
@@ -64,10 +64,10 @@ Curses
         3rd part pdcursesmod source code is required and is not part of the
         NetHack distribution or repository.
 
-        A windows cmd command procedure for fetching prerequisite
+        A bash shell script for fetching prerequisite
         sources is available, and can be run as follows from the top of
         the NetHack source tree to obtain pdcursesmod:
-            sh sys/windows/fetch.sh lua
+            sh sys/windows/fetch.sh pdcursesmod
 
 Building
 
