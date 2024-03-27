@@ -33,19 +33,42 @@ NetHack for Windows:
        The steps are documented in sys/windows/build-msys2.txt.
 
 /--------------------------------------------------------------\
-|          If you experience a problem                         |
+|   Executing NetHack from zip file                            |
 \--------------------------------------------------------------/
 
 Executing NetHack on your machine
 
-    Your personal config file will be created from a template file the
-    first time you fire up NetHack. If you want to edit it you can use
-    the following filename to do so:
+    Unzip the files to a folder on your machine, from
+    Windows explorer right-click | Extract all...
+    or by using tar:
+        Windows command prompt:
+           tar -xf nethack-370-win-x64.zip
+
+        MSYS2 bash shell:
+           /c/Windows/System32/tar -xf nethack-370-win-x64.zip
+
+    Run NetHack.exe or NetHackW.exe from the folder where you unzipped.
+
+    Your personal config file, if it doesn't exist, will be created
+    from a template file the first time you fire up NetHack.
+
+    If you want to edit your actual personal config file you can
+    reference the file as follows:
+
+        From Windows cmd command prompt:
         %USERPROFILE%\nethack\.nethackrc
+
+        From Windows powershell:
+        $env:USERPROFILE\nethack\.nethackrc
+
+        From MSYS2 bash shell:
+        $USERPROFILE/nethack/.nethackrc
+
 
     If you want to see where NetHack expects to find the other files it
     utilizes, you can issue the following command:
         nethack --showpaths
+
 
 Play NetHack.
 
