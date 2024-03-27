@@ -281,7 +281,7 @@ The bat bites!
 
 
 Player the Rambler   St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15 Neutral
-Dlvl:1 $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 T:752 Hungry Conf
+Doom:1 $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 T:752 Hungry Conf
 .TE
 .ft R
 .ce 1
@@ -296,7 +296,7 @@ center box tab(~);
 L.
 Player the Rambler   St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15        \"
 Neutral $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 Hungry          \"
-Dlvl:1 T:752                                  Conf            \"
+Doom:1 T:752                                  Conf            \"
 .TE
 .ft R
 .ce 1
@@ -357,11 +357,11 @@ coincide.  Your alignment influences how other
 monsters react toward you.  Monsters of a like alignment are more likely
 to be non-aggressive, while those of an opposing alignment are more likely
 to be seriously offended at your presence.
-.lp "Dungeon Level"
-How deep you are in the dungeon.  You start at level one and the number
-increases as you go deeper into the dungeon.  Some levels are special,
-and are identified by a name and not a number.  The Amulet of Yendor is
-reputed to be somewhere beneath the twentieth level.
+.lp "Location"
+Your general position within the Mazes of Menace.  You start out on the
+first level of the Dungeons of Doom.  The level number increases as you
+you go deeper into the dungeon.  You might encounter other locations.
+The Amulet of Yendor is reputedly somewhere beneath the twentieth level.
 .lp "Gold    "
 The number of gold pieces you are openly carrying.  Gold which you have
 concealed in containers is not counted.
@@ -885,7 +885,7 @@ Precede \(oqO\(cq with the \(oqm\(cq prefix to show advanced options.
 .lp \(haO
 Show overview.
 .lp ""
-Shortcut for \(lq#overview\(rq:  list interesting dungeon levels visited.
+Shortcut for \(lq#overview\(rq:  list interesting locations visited.
 .lp ""
 (Prior to 3.6.0, \(oq\(haO\(cq was a debug mode command which listed
 the placement of all special levels.
