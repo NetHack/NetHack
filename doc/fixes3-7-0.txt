@@ -1907,6 +1907,10 @@ if hero was wielding potion(s) of unholy water and a magic trap gave its
 	remove curse effect, scroll of remove curse would become discovered
 object discoveries during the tutorial carried over when normal play resumed;
 	counts of monsters created and vanquished carried over too
+end-of-game attribute disclosure in wizard mode reported incorrect text for
+	for apron/alchemy smock's conferral of poison+acid resistances
+	(3.6.x was susceptible to this for T-shirt text but since T-shirts
+	don't confer any attributes, it wasn't noticeable)
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

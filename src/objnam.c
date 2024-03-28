@@ -928,8 +928,17 @@ xname_flags(
         releaseobuf(obufp);
     }
 
-    /* maybe give some extra information which isn't shown during play */
-    if (gp.program_state.gameover && bufspaceleft > 0) {
+    /* give some extra information when game is over; for end-of-game
+       attribute disclosure in wizard mode, ysimple_name() calls
+       minimal_xname() which passes us a dummy object with o_id==0;
+       tshirt_text(), apron_text(), and so forth base their result on
+       o_id and would give inconsistent information compared to what
+       just got shown for inventory disclosure; fortunately, we want to
+       avoid the 'with text' part of
+           "You were acid resistant because of your alchemy smock \
+           with text \"Kiss the cook\"."
+       when disclosing attributes anyway */
+    if (gp.program_state.gameover && obj->o_id && bufspaceleft > 0) {
         const char *lbl;
         char tmpbuf[BUFSZ];
 
@@ -1033,9 +1042,9 @@ minimal_xname(struct obj *obj)
     if (obj->otyp == SLIME_MOLD)
         bareobj.spe = obj->spe;
 
-    /* bufp will be an obuf[] and a pointer into middle of that is viable */
     bufp = distant_name(&bareobj, xname);
-    /* undo forced setting of bareobj.blessed for cleric (preist[ess]) */
+    /* undo forced setting of bareobj.blessed for cleric (preist[ess]);
+       bufp is an obuf[] so a pointer into the middle of that is viable */
     if (!strncmp(bufp, "uncursed ", 9))
         bufp += 9;
 
