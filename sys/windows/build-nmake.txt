@@ -24,11 +24,6 @@ Prerequisite Requirements:
         the NetHack source tree to obtain pdcursesmod:
             sys\windows\fetch.cmd pdcursesmod
 
-
-A copy of Microsoft Visual Studio Community Edition needs to
-be installed on your machine, and the Lua prerequisite source
-files are required as outlined in sys/windows/Install.windows.
-
 The build Makefiles and procedures produce two executables:
     a. A TTY and curses version of NetHack in nethack.exe
     b. A Windows and curses graphical version in nethackw.exe.
