@@ -1,4 +1,4 @@
-/* NetHack 3.7	mondata.c	$NHDT-Date: 1685180674 2023/05/27 09:44:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.122 $ */
+/* NetHack 3.7	mondata.c	$NHDT-Date: 1711620615 2024/03/28 10:10:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -865,6 +865,8 @@ name_to_monplus(
                to the rank title prefix (input has been singularized) */
             { "master thief", PM_MASTER_OF_THIEVES, NEUTRAL },
             { "master of assassin", PM_MASTER_ASSASSIN, NEUTRAL },
+            { "master-lich", PM_MASTER_LICH, NEUTRAL }, /* cf arch-lich */
+            { "masterlich", PM_MASTER_LICH, NEUTRAL }, /* cf demilich */
             /* Outdated names */
             { "invisible stalker", PM_STALKER, NEUTRAL },
             { "high-elf", PM_ELVEN_MONARCH, NEUTRAL }, /* PM_HIGH_ELF is

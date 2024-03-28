@@ -1386,6 +1386,8 @@ using '#adjust c d' or '#adjust d c' after splitting slot c via '#adjust Nc d'
 ring of aggravate monster increases the level difficulty
 if hero shattered an unseen monster's weapon, the [also unseen] weapon was
 	described in the feedback
+don't self-genocide if a monk picks "master-lich" or "masterlich" as target
+	(was matching "Master" rank)
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
