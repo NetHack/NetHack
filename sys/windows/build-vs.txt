@@ -2,15 +2,34 @@ Building NetHack using the Visual Studio IDE
 
 Prerequisite Requirements:
 
-A copy of Microsoft Visual Studio Community Edition needs to
-be installed on your machine, and the Lua prerequisite source
-files are required as outlined in sys/windows/Install.windows.
+  o Visual Studio Community Edition
+        A copy of Microsoft Visual Studio Community Edition needs to
+        be installed on your machine. See:
+        https://visualstudio.microsoft.com/vs/community/
+  o Lua
+        NetHack 3.7 for Windows requires 3rd party Lua source that is not part
+        of the NetHack distribution or repository.
 
-The nmake build Makefiles and procedures produce two executable
+        A windows cmd command procedure for fetching prerequisite sources
+        is available, and can be run as follows from the top of the
+        NetHack source tree to obtain lua:
+            sys\windows\fetch.cmd lua
+  o pdcursesmod (Only required if curses interface support is desired)
+        If you want to include curses interface support in NetHack 3.7 for
+        3rd part pdcursesmod source code is required and is not part of the
+        NetHack distribution or repository.
+
+        A windows cmd command procedure for fetching prerequisite
+        sources is available, and can be run as follows from the top of
+        the NetHack source tree to obtain pdcursesmod:
+            sys\windows\fetch.cmd pdcursesmod
+
+This processes produces a zip file containing two executable
 versions:
 
     a. A TTY and curses version of NetHack in nethack.exe
     b. A Windows and curses graphical version in nethackw.exe.
+
 
 /---------------------------------------------\
 |    Directories for a Windows NetHack build  |

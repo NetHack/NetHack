@@ -23,7 +23,7 @@ We provide documentation for the follow three different approaches
 and tool suites that may be used to compile and package
 NetHack for Windows:
 
-    1. With the Visusal Studio Integrated Development Environment (IDE).
+    1. With the Visual Studio Integrated Development Environment (IDE).
        The steps are documented in sys/windows/build-vs.txt.
 
     2. At the Windows command line, using Visual Studio's nmake.exe.

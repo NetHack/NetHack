@@ -1,26 +1,33 @@
-Building NetHack using the Visual Studio IDE
+Building NetHack using MSYS2
 
 Prerequisite Requirements:
 
-    MSYS2 
+  o  MSYS2
         - https://www.msys2.org/
         - Download the installer, and start the UCRT64 shell.
-    then
-       pacman -S mingw-w64-ucrt-x86_64-gcc 
-       pacman -S git
-       pacman -S vim (or your editor of choice)
-       pacman -S man (otherwise "git help foo" will not work)
+     then
+          pacman -S mingw-w64-ucrt-x86_64-gcc
+          pacman -S git
+          pacman -S vim (or your editor of choice)
+          pacman -S man (otherwise "git help foo" will not work)
+  o Lua
+        NetHack 3.7 for Windows requires 3rd party Lua source that is not part
+        of the NetHack distribution or repository.
 
-  OR
+        A windows cmd command procedure for fetching prerequisite sources
+        is available, and can be run as follows from the top of the
+        NetHack source tree to obtain lua:
+            sys\windows\fetch.cmd lua
+  o pdcursesmod (Only required if curses interface support is desired)
+        If you want to include curses interface support in NetHack 3.7 for
+        3rd part pdcursesmod source code is required and is not part of the
+        NetHack distribution or repository.
 
-    [the follow is untested]
-        MinGW-w64 - winlibs standalone build
-        - https://github.com/brechtsanders/winlibs_mingw
-        - Download one of the releases from
-          https://github.com/brechtsanders/winlibs_mingw/releases
-          and extract the contents into a folder (ideally in a folder
-          without spaces in the path), and add the location of the
-          subfolder containing gcc.exe to your PATH.
+        A windows cmd command procedure for fetching prerequisite
+        sources is available, and can be run as follows from the top of
+        the NetHack source tree to obtain pdcursesmod:
+            sys\windows\fetch.cmd pdcursesmod
+
 
 /---------------------------------------------\
 |    Directories for a Windows NetHack build  |
@@ -143,5 +150,14 @@ Notes:
     For Microsoft compiler:
         make -f Makefile.mingw32
 
+2.  An alternative to MSYS2 may be MinGW-w64 - winlibs standalone build.
+    That has not been tested by us at time of writing.
+        MinGW-w64 - winlibs standalone build
+        - https://github.com/brechtsanders/winlibs_mingw
+        - Download one of the releases from
+          https://github.com/brechtsanders/winlibs_mingw/releases
+          and extract the contents into a folder (ideally in a folder
+          without spaces in the path), and add the location of the
+          subfolder containing gcc.exe to your PATH.
 
 
