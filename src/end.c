@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1711734217 2024/03/29 17:43:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.312 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1711735821 2024/03/29 18:10:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.313 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -30,7 +30,7 @@ staticfn void get_valuables(struct obj *) NO_NNARGS;
 staticfn void sort_valuables(struct valuable_data *, int);
 staticfn void artifact_score(struct obj *, boolean, winid);
 staticfn boolean fuzzer_savelife(int);
-ATTRNORETURN static void really_done(int) NORETURN;
+ATTRNORETURN staticfn void really_done(int) NORETURN;
 staticfn void savelife(int);
 staticfn boolean should_query_disclose_option(int, char *);
 #ifdef DUMPLOG
