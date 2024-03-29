@@ -782,14 +782,14 @@ wc_color_name(int32 colorindx)
     return result;
 }
 
-/* hex[] is defined in decl.c */
+/* hexdd[] is defined in decl.c */
 boolean
 onlyhexdigits(const char *buf)
 {
     const char *dp = buf;
 
     for (dp = buf; *dp; ++dp) {
-        if (!(strchr(hex, *dp) || *dp == '-'))
+        if (!(strchr(hexdd, *dp) || *dp == '-'))
             return FALSE;
     }
     return TRUE;

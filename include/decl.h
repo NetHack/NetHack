@@ -65,7 +65,7 @@ extern NEARDATA boolean has_strong_rngseed;
 extern struct engr *head_engr;
 
 /* used by coloratt.c, options.c, utf8map.c, windows.c */
-extern const char hex[33];
+extern const char hexdd[33];
 
 /* material strings */
 extern const char *materialnm[];

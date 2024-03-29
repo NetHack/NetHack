@@ -13,7 +13,7 @@ extern struct enum_dump objdump[];
 extern glyph_map glyphmap[MAX_GLYPH];
 extern const char *const known_handling[];        /* symbols.c */
 
-/* hex[] is defined in decl.c */
+/* hexdd[] is defined in decl.c */
 
 int
 unicode_val(const char *cp)
@@ -24,11 +24,11 @@ unicode_val(const char *cp)
     if (cp && *cp) {
         cval = dcount = 0;
         if ((*cp == 'U' || *cp == 'u')
-            && cp[1] == '+' && cp[2] && (dp = strchr(hex, cp[2])) != 0) {
+            && cp[1] == '+' && cp[2] && (dp = strchr(hexdd, cp[2])) != 0) {
             cp += 2; /* move past the 'U' and '+' */
             do {
-                cval = (cval * 16) + ((int) (dp - hex) / 2);
-            } while (*++cp && (dp = strchr(hex, *cp)) != 0 && ++dcount < 7);
+                cval = (cval * 16) + ((int) (dp - hexdd) / 2);
+            } while (*++cp && (dp = strchr(hexdd, *cp)) != 0 && ++dcount < 7);
         }
     }
     return cval;

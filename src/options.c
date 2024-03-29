@@ -6662,7 +6662,7 @@ escapes(const char *cp, /* might be 'tp', updating in place */
         char *tp)       /* result is never longer than 'cp' */
 {
     static NEARDATA const char oct[] = "01234567", dec[] = "0123456789";
-    /* hex[] is defined in decl.c */
+    /* hexdd[] is defined in decl.c */
 
     const char *dp;
     int cval, meta, dcount;
@@ -6695,11 +6695,11 @@ escapes(const char *cp, /* might be 'tp', updating in place */
                 cval = (cval * 8) + (*cp - '0');
             } while (*++cp && strchr(oct, *cp) && ++dcount < 3);
         } else if ((cp[1] == 'x' || cp[1] == 'X') && cp[2]
-                   && (dp = strchr(hex, cp[2])) != 0) {
+                   && (dp = strchr(hexdd, cp[2])) != 0) {
             cp += 2; /* move past backslash and 'X' */
             do {
-                cval = (cval * 16) + ((int) (dp - hex) / 2);
-            } while (*++cp && (dp = strchr(hex, *cp)) != 0 && ++dcount < 2);
+                cval = (cval * 16) + ((int) (dp - hexdd) / 2);
+            } while (*++cp && (dp = strchr(hexdd, *cp)) != 0 && ++dcount < 2);
         } else { /* C-style character escapes */
             switch (*++cp) {
             case '\\':

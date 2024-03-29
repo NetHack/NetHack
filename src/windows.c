@@ -1432,7 +1432,7 @@ encglyph(int glyph)
     return encbuf;
 }
 
-/* hex[] is defined in decl.c */
+/* hexdd[] is defined in decl.c */
 
 int
 decode_glyph(const char *str, int *glyph_ptr)
@@ -1441,18 +1441,18 @@ decode_glyph(const char *str, int *glyph_ptr)
     const char *dp;
 
     for (; *str && ++dcount <= 4; ++str) {
-        if ((dp = strchr(hex, *str)) != 0) {
+        if ((dp = strchr(hexdd, *str)) != 0) {
             retval++;
-            rndchk = (rndchk * 16) + ((int) (dp - hex) / 2);
+            rndchk = (rndchk * 16) + ((int) (dp - hexdd) / 2);
         } else
             break;
     }
     if (rndchk == gc.context.rndencode) {
         *glyph_ptr = dcount = 0;
         for (; *str && ++dcount <= 4; ++str) {
-            if ((dp = strchr(hex, *str)) != 0) {
+            if ((dp = strchr(hexdd, *str)) != 0) {
                 retval++;
-                *glyph_ptr = (*glyph_ptr * 16) + ((int) (dp - hex) / 2);
+                *glyph_ptr = (*glyph_ptr * 16) + ((int) (dp - hexdd) / 2);
             } else
                 break;
         }
