@@ -1255,9 +1255,11 @@ cancel_item(struct obj *obj)
                          || obj->oclass == WEAPON_CLASS || is_weptool(obj)))
         || otyp == POT_ACID
         || otyp == POT_SICKNESS
-        || (otyp == POT_WATER && (obj->blessed || obj->cursed))) {
+        || (otyp == POT_WATER && (obj->blessed || obj->cursed))
+        /* not magic; cancels to blank spellbook */
+        || otyp == SPE_NOVEL) {
         int cancelled_spe = (obj->oclass == WAND_CLASS
-                             || obj->otyp == CRYSTAL_BALL) ? -1 : 0;
+                             || otyp == CRYSTAL_BALL) ? -1 : 0;
 
         if (obj->spe != cancelled_spe
             && otyp != WAN_CANCELLATION /* can't cancel cancellation */
@@ -1273,10 +1275,12 @@ cancel_item(struct obj *obj)
             obj->spe = 0;
             break;
         case SPBOOK_CLASS:
-            if (otyp != SPE_CANCELLATION && otyp != SPE_NOVEL
-                && otyp != SPE_BOOK_OF_THE_DEAD) {
+            if (otyp != SPE_CANCELLATION && otyp != SPE_BOOK_OF_THE_DEAD) {
                 costly_alteration(obj, COST_CANCEL);
                 obj->otyp = SPE_BLANK_PAPER;
+                /* cancelling a novel is more involved than a spellbook */
+                if (otyp == SPE_NOVEL) /* old type */
+                    blank_novel(obj);
             }
             break;
         case POTION_CLASS:
@@ -1311,6 +1315,20 @@ cancel_item(struct obj *obj)
     unbless(obj);
     uncurse(obj);
     return;
+}
+
+/* soaking or cancelling a novel converts it into a blank spellbook but
+   needs more than just changing its otyp (caller is responsible for that) */
+void
+blank_novel(struct obj *obj)
+{
+    assert(obj->otyp == SPE_BLANK_PAPER);
+    /* novelidx overloads corpsenm, not used for spellbooks */
+    obj->novelidx = 0;
+    free_oname(obj); /* get rid of [former] novel's title */
+    /* a blank spellbook weighs more than a novel; update obj's weight and
+       recursively the weight of any container holding it */
+    container_weight(obj);
 }
 
 /* Remove a positive enchantment or charge from obj,

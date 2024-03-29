@@ -4613,16 +4613,8 @@ water_damage(
             obj->spestudied = rn2(obj->spestudied);
         obj->dknown = 0;
         /* blanking a novel is more involved than blanking a spellbook */
-        if (otyp == SPE_NOVEL) { /* old type */
-            obj->novelidx = 0; /* overloads corpsenm, not used for splbooks */
-            free_oname(obj);
-            /* novels weigh less than spellbooks; apparently blanking them
-               magically makes them become heavier */
-            do {
-                obj->owt = weight(obj);
-                obj = (obj->where == OBJ_CONTAINED) ? obj->ocontainer : 0;
-            } while (obj);
-        }
+        if (otyp == SPE_NOVEL) /* old type */
+            blank_novel(obj);
         if (in_invent)
             update_inventory();
         return ER_DAMAGED;
