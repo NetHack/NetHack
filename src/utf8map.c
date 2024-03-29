@@ -13,8 +13,7 @@ extern struct enum_dump objdump[];
 extern glyph_map glyphmap[MAX_GLYPH];
 extern const char *const known_handling[];        /* symbols.c */
 
-static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
-
+/* hex[] is defined in decl.c */
 
 int
 unicode_val(const char *cp)

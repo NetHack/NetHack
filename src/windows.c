@@ -1432,10 +1432,11 @@ encglyph(int glyph)
     return encbuf;
 }
 
+/* hex[] is defined in decl.c */
+
 int
 decode_glyph(const char *str, int *glyph_ptr)
 {
-    static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
     int rndchk = 0, dcount = 0, retval = 0;
     const char *dp;
 

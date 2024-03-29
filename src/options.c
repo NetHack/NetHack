@@ -6661,8 +6661,9 @@ staticfn void
 escapes(const char *cp, /* might be 'tp', updating in place */
         char *tp)       /* result is never longer than 'cp' */
 {
-    static NEARDATA const char oct[] = "01234567", dec[] = "0123456789",
-                               hex[] = "00112233445566778899aAbBcCdDeEfF";
+    static NEARDATA const char oct[] = "01234567", dec[] = "0123456789";
+    /* hex[] is defined in decl.c */
+
     const char *dp;
     int cval, meta, dcount;
 

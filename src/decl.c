@@ -93,6 +93,9 @@ const char *fqn_prefix_names[PREFIX_COUNT] = {
 };
 #endif
 
+/* used by coloratt.c, options.c, utf8map.c, windows.c */
+const char hex[33] = "00112233445566778899aAbBcCdDeEfF";
+
 /* x/y/z deltas for the 10 movement directions (8 compass pts, 2 down/up) */
 const schar xdir[N_DIRS_Z] = { -1, -1,  0,  1,  1,  1,  0, -1, 0,  0 };
 const schar ydir[N_DIRS_Z] = {  0, -1, -1, -1,  0,  1,  1,  1, 0,  0 };

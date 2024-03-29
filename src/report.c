@@ -146,7 +146,7 @@ crashreport_init(int argc UNUSED, char *argv[] UNUSED)
         goto skip;
     close(fd);
 
-    static const char hex[] = "0123456789abcdef";
+    static const char hexdigits[] = "0123456789abcdef";
     char *p = bid;
     unsigned char *in;
     HASH_RESULT(ctxp, &in);
@@ -158,8 +158,8 @@ crashreport_init(int argc UNUSED, char *argv[] UNUSED)
         cnt = (uint8) sizeof bid / 2 - 1;
     while (cnt) {
         /* sprintf(p, "%02x", *in++), p += 2; */
-        *p++ = hex[(*in >> 4) & 0x0f];
-        *p++ = hex[*in++ & 0x0f];
+        *p++ = hexdigits[(*in >> 4) & 0x0f];
+        *p++ = hexdigits[*in++ & 0x0f];
         --cnt;
     }
     *p = '\0';

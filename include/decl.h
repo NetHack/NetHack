@@ -64,6 +64,9 @@ extern const char *fqn_prefix_names[PREFIX_COUNT];
 extern NEARDATA boolean has_strong_rngseed;
 extern struct engr *head_engr;
 
+/* used by coloratt.c, options.c, utf8map.c, windows.c */
+extern const char hex[33];
+
 /* material strings */
 extern const char *materialnm[];
 
