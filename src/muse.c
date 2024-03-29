@@ -1,4 +1,4 @@
-/* NetHack 3.7	muse.c	$NHDT-Date: 1702356860 2023/12/12 04:54:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.203 $ */
+/* NetHack 3.7	muse.c	$NHDT-Date: 1711734229 2024/03/29 17:43:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.216 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -35,7 +35,7 @@ staticfn struct permonst *muse_newcham_mon(struct monst *);
 staticfn int mloot_container(struct monst *mon, struct obj *, boolean);
 staticfn void you_aggravate(struct monst *);
 #if 0
-static boolean necrophiliac(struct obj *, boolean);
+staticfn boolean necrophiliac(struct obj *, boolean);
 #endif
 staticfn void mon_consume_unstone(struct monst *, struct obj *, boolean,
                                 boolean);
@@ -2561,7 +2561,7 @@ rnd_misc_item(struct monst *mtmp)
 
 #if 0
 /* check whether hero is carrying a corpse or contained petrifier corpse */
-static boolean
+staticfn boolean
 necrophiliac(struct obj *objlist, boolean any_corpse)
 {
     while (objlist) {

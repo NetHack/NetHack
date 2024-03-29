@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1709597568 2024/03/05 00:12:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.305 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1711734217 2024/03/29 17:43:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.312 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -816,11 +816,11 @@ sort_valuables(
  * odds_and_ends() was used for 3.6.0 and 3.6.1.
  * Schroedinger's Cat is handled differently as of 3.6.2.
  */
-static boolean odds_and_ends(struct obj *, int);
+staticfn boolean odds_and_ends(struct obj *, int);
 
 #define CAT_CHECK 2
 
-static boolean
+staticfn boolean
 odds_and_ends(struct obj *list, int what)
 {
     struct obj *otmp;
