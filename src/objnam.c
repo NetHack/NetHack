@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1702349266 2023/12/12 02:47:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.407 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1711809641 2024/03/30 14:40:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.427 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -340,6 +340,7 @@ distant_name(
     char *(*func)(OBJ_P)) /* formatting routine (usually xname or doname) */
 {
     char *str;
+    unsigned save_oid;
     coordxy ox = 0, oy = 0;
         /*
          * (r * r): square of the x or y distance;
@@ -360,6 +361,19 @@ distant_name(
     int r = (u.xray_range > 2) ? u.xray_range : 2,
         neardist = (r * r) * 2 - r; /* same as r*r + r*(r-1) */
 
+   /* setting o_id to 0 prevents xname() from adding T-shirt or apron
+      slogan, Hawaiian shirt motif, or candy wrapper label when called
+      with 'program_state.gameover' set; we want this suppression for
+      html-dump (not implemented in nethack) to prevent object-on-map
+      tooltips from including that extra text; also guards against a
+      potential change to minimal_xname() [indirectly used by attribute
+      disclosure] that propogates o_id rather than leave it 0, and
+      against a potential extra chance to browse the map with getpos()
+      during final disclosure (not currently implemented, nor planned) */
+    save_oid = obj->o_id;
+    if (gp.program_state.gameover)
+        obj->o_id = 0;
+
     /* this maybe-nearby part used to be replicated in multiple callers */
     if (get_obj_location(obj, &ox, &oy, 0) && cansee(ox, oy)
         && (obj->oartifact || distu(ox, oy) <= neardist)) {
@@ -379,6 +393,9 @@ distant_name(
         str = (*func)(obj);
         --gd.distantname;
     }
+
+    obj->o_id = save_oid; /* reset to normal */
+
     return str;
 }
 
