@@ -112,8 +112,8 @@
     <Content Include="Images\Wide310x150Logo.scale-125.png" />
     <Content Include="Images\Wide310x150Logo.scale-150.png" />
     <Content Include="Images\Wide310x150Logo.scale-200.png" />
-    <Content Include="..\..\..\binary\$(Configuration)\$(Platform)\.nethackrc.template">
-      <Link>NetHackW\.nethackrc.template</Link>
+    <Content Include="..\..\..\binary\$(Configuration)\$(Platform)\nethackrc.template">
+      <Link>NetHackW\nethackrc.template</Link>
     </Content>
     <Content Include="..\..\..\binary\$(Configuration)\$(Platform)\Guidebook.txt">
       <Link>NetHackW\Guidebook.txt</Link>

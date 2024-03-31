@@ -1538,7 +1538,7 @@ binary.tag: 	$(DAT)\data $(DAT)\rumors $(DAT)\oracles $(DLB) \
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
 	@if exist $(GAMEDIR)\NetHack.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHack.PDB to conserve space
 	@if exist $(GAMEDIR)\NetHackW.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHackW.PDB to conserve space
-	-if exist $(MSWSYS)\.nethackrc.template copy $(MSWSYS)\.nethackrc.template   $(GAMEDIR)
+	-if exist $(MSWSYS)\nethackrc.template copy $(MSWSYS)\nethackrc.template   $(GAMEDIR)
 	-if not exist $(GAMEDIR)\record. goto>$(GAMEDIR)\record.
 	echo binary built > $@
 
@@ -2298,9 +2298,9 @@ $(SndWavDir)\sa2_xplevelup.wav: $(SndWavDir)\sa2_xplevelup.uu $(U)uudecode.exe
 # packaging
 #===============================================================================
 
-PKGFILES = .nethackrc.template Guidebook.txt license NetHack.exe NetHack.txt \
+PKGFILES = nethackrc.template Guidebook.txt license NetHack.exe NetHack.txt \
 	 NetHackW.exe opthelp nhdat370 record symbols sysconf.template
-FILESTOZIP = $(BinDir)\.nethackrc.template $(BinDir)\Guidebook.txt $(BinDir)\license \
+FILESTOZIP = $(BinDir)\nethackrc.template $(BinDir)\Guidebook.txt $(BinDir)\license \
 	$(BinDir)\NetHack.exe $(BinDir)\NetHack.txt $(BinDir)\NetHackW.exe \
 	$(BinDir)\opthelp $(BinDir)\nhdat370 $(BinDir)\record \
 	$(BinDir)\symbols $(BinDir)\sysconf.template 

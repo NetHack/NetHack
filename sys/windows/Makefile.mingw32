@@ -1136,7 +1136,7 @@ $(ONH)/%.o: $(SRC)/%.c $(NHLUAH) | $(ONH)
 #==========================================
 TARGET_CPU = x64
 NHV=370
-PKGFILES = .nethackrc.template Guidebook.txt license NetHack.exe NetHack.txt \
+PKGFILES = nethackrc.template Guidebook.txt license NetHack.exe NetHack.txt \
         NetHackW.exe opthelp nhdat370 record symbols sysconf.template
 FILESTOZIP = $(addprefix $(GAMEDIR)/, $(PKGFILES))
 MAINZIP = $(PkgDir)/nethack-$(NHV)-win-$(TARGET_CPU)-msys2.zip
@@ -1224,7 +1224,7 @@ all: package
 
 TO_BINARY = $(GAMEDIR)/NetHack.exe $(RTARGETS) $(GAMEDIRDLLS) \
 	     $(addprefix $(GAMEDIR)/, \
-	     $(addsuffix .template, sysconf .nethackrc symbols) \
+	     $(addsuffix .template, sysconf nethackrc symbols) \
 	     Guidebook.txt NetHack.txt license opthelp record)
 
 ifeq "$(HAVE_SOUNDLIB)" "Y"
