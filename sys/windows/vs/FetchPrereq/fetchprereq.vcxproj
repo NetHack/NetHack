@@ -20,11 +20,6 @@
   </ItemGroup>
   <Import Project="..\config.props" />
   <Import Project="..\dirs.props" />
-  <Import Project="..\default.props" />
-  <Import Project="..\NetHackProperties.props" />
-  <Import Project="..\console.props" />
-  <Import Project="..\common.props" />
-  <Import Project="..\files.props" />
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{503AE687-C33A-45ED-93AA-83967E176D67}</ProjectGuid>
@@ -57,11 +52,17 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="!Exists('$(LibDir)pdcurses') OR !Exists('$(LibDir)lua-5.4.6')">
-    <NMakeBuildCommandLine>pushd $(vsDir)fetchprereq %26%26 nmake -F fetchprereq.nmake %26%26 popd</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>pushd $(vsDir)fetchprereq %26%26 nmake -F fetchprereq.nmake clean %26%26 popd</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>pushd $(vsDir)fetchprereq %26%26 nmake -F fetchprereq.nmake rebuild %26%26 popd</NMakeReBuildCommandLine>
-    <NMakePreprocessorDefinitions>_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <PropertyGroup Condition="Exists('$(LibDir)pdcursesmod') AND Exists('$(LibDir)lua-$(LUA_VERSION)')">
+	<NMakeBuildCommandLine>echo lib\pdcursesmod and lib\lua-$(LUA_VERSION) are already present</NMakeBuildCommandLine>
+	<NMakeCleanCommandLine>pushd $(vsDir)fetchprereq %26%26 nmake -F fetchprereq.nmake clean %26%26 popd</NMakeCleanCommandLine>
+	<NMakeReBuildCommandLine>echo rebuilding lib\pdcursesmod and lib\lua-$(LUA_VERSION)</NMakeReBuildCommandLine>
+	<NMakePreprocessorDefinitions>_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    </PropertyGroup>
+    <PropertyGroup Condition="!Exists('$(LibDir)pdcursesmod') OR !Exists('$(LibDir)lua-$(LUA_VERSION)')">
+	<NMakeBuildCommandLine>pushd $(vsDir)fetchprereq %26%26 nmake -F fetchprereq.nmake %26%26 popd</NMakeBuildCommandLine>
+	<NMakeCleanCommandLine>pushd $(vsDir)fetchprereq %26%26 nmake -F fetchprereq.nmake clean %26%26 popd</NMakeCleanCommandLine>
+	<NMakeReBuildCommandLine>pushd $(vsDir)fetchprereq %26%26 nmake -F fetchprereq.nmake rebuild %26%26 popd</NMakeReBuildCommandLine>
+	<NMakePreprocessorDefinitions>_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

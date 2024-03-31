@@ -51,7 +51,7 @@ fetch-pdcurses:
 	cd $(LIBDIR)
 	curl --insecure -L -R $(PDCURL)$(PDCURSES_VERSION).zip -o $(PDCDIST).zip
 	if not exist $(PDCDIST)\*.* mkdir $(PDCDIST)
-	tar -C $(PDCDIST) --strip-components=1 -xvf $(CURLPDCDST).zip
+	tar -zxC $(PDCDIST) --strip-components=1 -f $(CURLPDCDST).zip
 	if exist $(CURLPDCDST).zip del $(CURLPDCDST).zip
 	cd ..\sys\windows\vs\fetchprereq
 	@echo $(PDCDIST) has been fetched into $(LIBDIR)\$(PDCDIST)
@@ -69,6 +69,10 @@ libdir:
 	@if not exist $(LIBDIR)\*.* mkdir $(LIBDIR)
 
 clean:
+	@if exist $(LIBDIR)\$(PDCDIST) rmdir /Q $(LIBDIR)\$(PDCDIST) /s
+	@if exist $(LIBDIR)\lua-$(LUA_VERSION) rmdir /Q $(LIBDIR)\lua-$(LUA_VERSION) /s
+	@if exist ..\..\..\..\include\nhlua.h del /Q ..\..\..\..\include\nhlua.h
 
 rebuild:
-
+	@if exist $(LIBDIR)\$(PDCDIST) echo nothing to do for lib\$(PDCDIST)
+	@if exist $(LIBDIR)\lua-$(LUA_VERSION) echo nothing to do for lib\lua-$(LUA_VERSION)
