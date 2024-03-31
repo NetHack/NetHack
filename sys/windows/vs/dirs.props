@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
+    <PropertyGroup>
+    <LUA_VERSION>5.4.6</LUA_VERSION>
     <RootDir>$(MSBuildProjectDirectory)\..\..\..\..\</RootDir>
-    <vsDir>$(RootDir)sys\windows\vs\</vsDir>
     <BinDir>$(RootDir)binary\$(Configuration)\$(Platform)\</BinDir>
     <ObjDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\$(TargetName)\</ObjDir>
     <SymbolsDir>$(ProjectDir)symbols\$(Configuration)\$(Platform)\$(TargetName)\</SymbolsDir>
@@ -20,6 +20,7 @@
     <UtilDir>$(RootDir)util\</UtilDir>
     <SysShareDir>$(RootDir)sys\share\</SysShareDir>
     <SysWindDir>$(RootDir)sys\windows\</SysWindDir>
+    <vsDir>$(SysWindDir)vs\</vsDir>
     <WinShareDir>$(RootDir)win\share\</WinShareDir>
     <WinTtyDir>$(RootDir)win\tty\</WinTtyDir>
     <WinWin32Dir>$(RootDir)win\win32\</WinWin32Dir>
@@ -27,20 +28,14 @@
     <IntDir>$(ObjDir)</IntDir>
     <WinCursDir>$(RootDir)win\curses\</WinCursDir>
     <SubmodulesDir>$(RootDir)submodules\</SubmodulesDir>
-    <LuaDir>$(SubmodulesDir)lua\</LuaDir>
+    <LuaDir>$(LibDir)lua-$(LUA_VERSION)\src\</LuaDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(PDCURSESMOD)'=='' AND Exists('$(SubmodulesDir)PDCursesMod')">
-    <PDCURSESMOD>$(SubmodulesDir)PDCursesMod\</PDCURSESMOD>
+  <PropertyGroup Condition="'$(PDCURSESMOD)'=='' AND Exists('$(LibDir)pdcursesmod\curses.h')">
+    <PDCURSESMOD>$(LibDir)pdcursesmod\</PDCURSESMOD>
     <PDCURSES>$(PDCURSESMOD)</PDCURSES>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(PDCURSESMOD)'=='' AND Exists('$(LibDir)PDCursesMod')">
-    <PDCURSESMOD>$(LibDir)PDCursesMod\</PDCURSESMOD>
+  <PropertyGroup Condition="'$(PDCURSESMOD)'=='' AND Exists('$(SubmodulesDir)pdcursesmod\curses.h')">
+    <PDCURSESMOD>$(SubmodulesDir)pdcursesmod\</PDCURSESMOD>
     <PDCURSES>$(PDCURSESMOD)</PDCURSES>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(PDCURSES)'=='' AND '$(PDCURSESMOD)'=='' AND Exists('$(SubmodulesDir)PDCurses')">
-    <PDCURSES>$(SubmodulesDir)PDCurses\</PDCURSES>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(PDCURSES)'=='' AND '$(PDCURSESMOD)'=='' AND Exists('$(LibDir)PDCurses')">
-    <PDCURSES>$(LibDir)PDCurses\</PDCURSES>
   </PropertyGroup>
 </Project>
