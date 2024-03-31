@@ -17,6 +17,9 @@
 #ifdef TTY_GRAPHICS
 #include "dlb.h"
 
+/* leave this undefined; it produces bad screen output with rxvt-unicode */
+/*#define DECgraphicsOptimization*/
+
 #ifdef MAC
 #define MICRO /* The Mac is a MICRO only for this file, not in general! */
 #ifdef THINK_C
@@ -3709,12 +3712,16 @@ g_putch(int in_ch)
         }
         (void) putchar((ch ^ 0x80)); /* Strip 8th bit */
     } else {
+        if (GFlag
+#ifdef DECgraphicsOptimization
         /* for DECgraphics, we only need to switch back from the line
            drawing character set to the normal one if 'ch' is a lowercase
            letter or one of a handful of punctuation characters (the
            range is contiguous but somewhat odd); deferring graph_off()
            now might allow skipping both it and next potential graph_on() */
-        if (GFlag && ch >= 0x5f && ch <= 0x7e) {
+            && ch >= 0x5f && ch <= 0x7e
+#endif
+            ) {
             graph_off();
             GFlag = FALSE;
         }

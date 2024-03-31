@@ -7,6 +7,9 @@
 
 #if defined(TTY_GRAPHICS) && !defined(NO_TERMS)
 
+/* leave this undefined; it produces bad screen output with rxvt-unicode */
+/*#define DECgraphicsOptimization*/
+
 #include "wintty.h"
 #include "tcap.h"
 
@@ -395,15 +398,15 @@ tty_decgraphics_termcap_fixup(void)
 #ifdef PC9800
     init_hilite();
 #endif
-    if (nh_HE && *nh_HE)
-        xputs(nh_HE); /* turn off any active highlighting (before maybe
-                       * changing HE or AE) */
 
 #if defined(ASCIIGRAPH) && !defined(NO_TERMS)
+#if DECgraphicsOptimization
     /* some termcaps suffer from the bizarre notion that resetting
        video attributes should also reset the chosen character set */
     if (dynamic_HIHE) {
         assert(nh_HE != NULL);
+        xputs(nh_HE); /* turn off any active highlighting (before maybe
+                       * changing HE or AE) */
         (void) strsubst(nh_HE, AE, "");
         (void) strsubst(nh_HE, ctrlO, "");
         /* if AE has prefixing, substituting an empty string for it in HE
@@ -413,29 +416,32 @@ tty_decgraphics_termcap_fixup(void)
         (void) strsubst(nh_HE, "\033(B", "");
         (void) strsubst(nh_HE, "\033(A", "");
     }
+#endif
 
     /* if AE is still present in HE, set a flag so that glyph writing
        code will know that AS needs to be refreshed for consecutive
        line drawing characters */
-    if (nh_HE && *nh_HE) {
-        const char *ae = AE;
+    const char *ae = AE;
 
-        if (digit(*ae)) { /* skip over delay prefix, if any */
-            do
-                ++ae;
-            while (digit(*ae));
-            if (*ae == '.') {
-                ++ae;
-                if (digit(*ae))
-                    ++ae;
-            }
-            if (*ae == '*')
+    if (digit(*ae)) { /* skip over delay prefix, if any */
+        do
+            ++ae;
+        while (digit(*ae));
+        if (*ae == '.') {
+            ++ae;
+            if (digit(*ae))
                 ++ae;
         }
-        if (strstr(nh_HE, ae)) /* stdc strstr(), not nethack's strstri() */
-            HE_resets_AS = TRUE;
+        if (*ae == '*')
+            ++ae;
     }
+    /* stdc strstr(), not nethack's strstri(); HE ends color, ME ends
+       inverse video; they might have the same value; sequences to end
+       other attributes aren't known to sometimes contain AE */
+    if ((nh_HE && strstr(nh_HE, ae)) || (ME && strstr(ME, ae)))
+        HE_resets_AS = TRUE;
 
+#ifdef DECgraphicsOptimization
     /* some termcaps have AS load the line-drawing character set as
        primary instead of having initialization load it as secondary
        (we've already done that init) and then having AS simply switch
@@ -450,8 +456,9 @@ tty_decgraphics_termcap_fixup(void)
         AS = ctrlN;
         AE = ctrlO;
     }
-#endif
+#endif /* DECgraphicsOptimization */
     xputs(AE);
+#endif /* ASCIIGRAPH && !NO_TERMS */
 }
 #endif /* TERMLIB */
 
