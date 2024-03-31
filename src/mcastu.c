@@ -229,7 +229,7 @@ castmu(
     }
 
     if (mattk->adtyp == AD_SPEL || mattk->adtyp == AD_CLRC) {
-        /* monst->m_lev is unsigned (uchar), permonst->mspec_used is int */
+        /* monst->m_lev is unsigned (uchar), monst->mspec_used is int */
         mtmp->mspec_used = (int) ((mtmp->m_lev < 8) ? (10 - mtmp->m_lev) : 2);
     }
 
