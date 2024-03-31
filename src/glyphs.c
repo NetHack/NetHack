@@ -52,6 +52,7 @@ staticfn void shuffle_customizations(void);
 staticfn void
 to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
 {
+    int idx = gs.symset_which_set;
 #ifdef ENHANCED_SYMBOLS
     uint8 utf8str[6] = { 0, 0, 0, 0, 0, 0 };
     int uval = 0;
@@ -59,17 +60,19 @@ to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
 
     if (findwhat->extraval)
         *findwhat->extraval = glyph;
+
+    assert(idx >= 0 && idx < NUM_GRAPHICS);
 #ifdef ENHANCED_SYMBOLS
     if (findwhat->unicode_val)
         uval = unicode_val(findwhat->unicode_val);
     if (uval && unicodeval_to_utf8str(uval, utf8str, sizeof utf8str)) {
-        add_custom_urep_entry(gs.symset[gs.symset_which_set].name, glyph, uval, utf8str,
-                          gs.symset_which_set);
+        add_custom_urep_entry(gs.symset[idx].name, glyph, uval,
+                              utf8str, gs.symset_which_set);
     }
 #endif
     if (findwhat->color) {
-        add_custom_nhcolor_entry(gs.symset[gs.symset_which_set].name, glyph, findwhat->color,
-                          gs.symset_which_set);
+        add_custom_nhcolor_entry(gs.symset[idx].name, glyph,
+                                 findwhat->color, gs.symset_which_set);
     }
 }
 
