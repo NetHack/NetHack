@@ -179,8 +179,8 @@ static NEARDATA struct artifact artilist[] = {
     /* Sunsword emits light when wielded (handled in the core rather than
        via artifact fields), but that light has no particular color */
     A("Sunsword", LONG_SWORD, (SPFX_RESTR | SPFX_DFLAG2), 0, M2_UNDEAD,
-      PHYS(5, 0), DFNS(AD_BLND), NO_CARY, 0, A_LAWFUL, NON_PM, NON_PM, 1500L,
-      NO_COLOR, SUNSWORD),
+      PHYS(5, 0), DFNS(AD_BLND), NO_CARY, BLINDING_RAY, A_LAWFUL, NON_PM,
+      NON_PM, 1500L, NO_COLOR, SUNSWORD),
 
     /*
      *      The artifacts for the quest dungeon, all self-willed.

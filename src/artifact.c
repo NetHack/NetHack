@@ -1916,6 +1916,10 @@ arti_invoke(struct obj *obj)
             }
             break;
         }
+        case BLINDING_RAY:
+            if (getdir((char *) 0))
+                do_blinding_ray(obj);
+            break;
         }
     } else {
         long eprop = (u.uprops[oart->inv_prop].extrinsic ^= W_ARTI),

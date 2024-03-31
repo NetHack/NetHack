@@ -54,11 +54,24 @@ staticfn boolean find_poleable_mon(coord *, int, int);
 static const char
     no_elbow_room[] = "don't have enough elbow-room to maneuver.";
 
+void
+do_blinding_ray(struct obj *obj)
+{
+    struct monst *mtmp = bhit(u.dx, u.dy, COLNO, FLASHED_LIGHT,
+                    (int (*) (MONST_P, OBJ_P)) 0,
+                    (int (*) (OBJ_P, OBJ_P)) 0, &obj);
+
+    obj->ox = u.ux, obj->oy = u.uy; /* flash_hits_mon() wants this */
+    if (mtmp)
+        (void) flash_hits_mon(mtmp, obj);
+    /* normally bhit() would do this but for FLASHED_LIGHT we want it
+       to be deferred until after flash_hits_mon() */
+    transient_light_cleanup();
+}
+
 staticfn int
 use_camera(struct obj *obj)
 {
-    struct monst *mtmp;
-
     if (Underwater) {
         pline("Using your camera underwater would void the warranty.");
         return ECMD_OK;
@@ -83,15 +96,7 @@ use_camera(struct obj *obj)
     } else if (!u.dx && !u.dy) {
         (void) zapyourself(obj, TRUE);
     } else {
-        mtmp = bhit(u.dx, u.dy, COLNO, FLASHED_LIGHT,
-                    (int (*) (MONST_P, OBJ_P)) 0,
-                    (int (*) (OBJ_P, OBJ_P)) 0, &obj);
-        obj->ox = u.ux, obj->oy = u.uy; /* flash_hits_mon() wants this */
-        if (mtmp)
-            (void) flash_hits_mon(mtmp, obj);
-        /* normally bhit() would do this but for FLASHED_LIGHT we want it
-           to be deferred until after flash_hits_mon() */
-        transient_light_cleanup();
+        do_blinding_ray(obj);
     }
     return ECMD_TIME;
 }

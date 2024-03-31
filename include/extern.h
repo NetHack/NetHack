@@ -103,6 +103,7 @@ extern long timet_delta(time_t, time_t);
 
 /* ### apply.c ### */
 
+extern void do_blinding_ray(struct obj *) NONNULLPTRS;
 extern int doapply(void);
 extern int dorub(void);
 extern int dojump(void);
