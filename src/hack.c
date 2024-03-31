@@ -3971,7 +3971,7 @@ saving_grace(int dmg)
 void
 showdamage(int dmg)
 {
-    if (!iflags.showdamage)
+    if (!iflags.showdamage || !dmg)
         return;
 
     pline("[HP %i, %i left]", -dmg, Upolyd ? u.mh : u.uhp);
