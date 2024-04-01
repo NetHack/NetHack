@@ -536,6 +536,10 @@ sys/windows/vs/makedefs:
 (files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 aftermakedefs.proj  makedefs.vcxproj
 
+sys/windows/vs/package:
+(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+package.nmake    package.vcxproj
+
 sys/windows/vs/recover:
 (files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 afterrecover.proj  recover.vcxproj
