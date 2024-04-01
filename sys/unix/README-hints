@@ -67,3 +67,5 @@ make WANT_SHARE_INSTALL=1     Place the results of the install/update portion
 make WANT_SOURCE_INSTALL=1    Place the results of the install/update portion
                               of the build into a subfolder of the source
                               tree, rather than in a system-wide shared area.
+make VIEWDEPRECATIONS=1       Turn off the suppression of -Wdeprecated and
+                              -Wdeprecated-declarations warnings
