@@ -89,7 +89,9 @@ CXX=clang++ -std=gnu++11
 # clang-specific follows
 CLANGGTEQ14 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 14)
 ifeq "$(CLANGGTEQ14)" "1"
+ifneq "$(KEEPDEPRECATIONS)" "1"
 CFLAGS+=-Wno-deprecated-declarations
+endif  # not KEEPDEPRECATIONS
 else
 # older versions complain about things newer ones don't without this
 CFLAGS+=-Wno-missing-field-initializers
@@ -116,8 +118,10 @@ GPPGTEQ12 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 12)
 ifeq "$(GPPGTEQ9)" "1"
 CCXXFLAGS+=-Wformat-overflow
 ifdef CPLUSPLUS_NEED_DEPSUPPRESS
+ifneq "$(KEEPDEPRECATIONS)" "1"
 CCXXFLAGS+=-Wno-deprecated-copy
 CCXXFLAGS+=-Wno-deprecated-declarations
+endif  # not KEEPDEPRECATIONS
 endif  # CPLUSPLUS_NEED_DEPSUPPRESS
 endif  # g++ version greater than or equal to 9
 ifeq "$(GPPGTEQ11)" "1"
@@ -149,8 +153,10 @@ ifeq "$(CLANGPPGTEQ14)" "1"
 CPLUSPLUS_NEED_DEPSUPPRESS=1
 endif
 ifdef CPLUSPLUS_NEED_DEPSUPPRESS
+ifneq "$(KEEPDEPRECATIONS)" "1"
 CCXXFLAGS+=-Wno-deprecated
 CCXXFLAGS+=-Wno-deprecated-declarations
+endif  # not KEEPDEPRECATIONS
 endif  # CPLUSPLUS_NEED_DEPSUPPRESS
 # The clang++ linker seems to have trouble linking if the following isn't
 # included when compiling the C files by clang..
