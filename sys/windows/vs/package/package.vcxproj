@@ -20,6 +20,7 @@
   </ItemGroup>
   <Import Project="..\config.props" />
   <Import Project="..\dirs.props" />
+  <Import Project="..\NetHackProperties.props" />
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{0B53AF9B-E1A4-478B-9246-43A39E8B4027}</ProjectGuid>
@@ -53,7 +54,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-	<NMakeBuildCommandLine>pushd $(vsDir)package %26%26 nmake -F package.nmake BinDir=&quot;$(BinDir)\&quot; Platform=&quot;$(Platform)&quot; PlatformShortName=&quot;$(PlatformShortName)&quot; Configuration=&quot;$(Configuration)&quot; %26%26 popd</NMakeBuildCommandLine>
+	<NMakeBuildCommandLine>pushd $(vsDir)package %26%26 nmake -F package.nmake BinDir=&quot;$(BinDir)\&quot; Platform=&quot;$(Platform)&quot; PlatformShortName=&quot;$(PlatformShortName)&quot; Configuration=&quot;$(Configuration)&quot; NETHACK_VERSION=&quot;$(NETHACK_VERSION)&quot; %26%26 popd</NMakeBuildCommandLine>
 	<NMakeCleanCommandLine>pushd $(vsDir)package %26%26 nmake -F package.nmake clean %26%26 popd</NMakeCleanCommandLine>
 	<NMakeReBuildCommandLine>pushd $(vsDir)package %26%26 nmake -F package.nmake rebuild %26%26 popd</NMakeReBuildCommandLine>
   </PropertyGroup>

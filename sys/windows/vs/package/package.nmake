@@ -2,7 +2,13 @@
 #==============================================================================
 #
 #  The version of the game this Makefile was designed for
+
+!IFNDEF NETHACK_VERSION
 NETHACK_VERSION="3.7.0"
+!MESSAGE NETHACK_VERSION set to $(NETHACK_VERSION).
+!ELSE
+!MESSAGE NETHACK_VERSION set to $(NETHACK_VERSION) by caller.
+!ENDIF
 
 # A brief variation for use in macros
 NHV=$(NETHACK_VERSION:.=)
