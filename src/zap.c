@@ -340,11 +340,10 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             pline("%s turns transparent!", nambuf);
             reveal_invis = TRUE;
             learn_it = TRUE;
-        }
-        else if (couldsee && !canseemon(mtmp)) {
+        } else if (couldsee && !canseemon(mtmp)) {
             /* keep the immediate effects of make invisible and teleportation
-             * ambiguous by using the same message that's used if we teleported
-             * mtmp (and it ended up somewhere you can't see) */
+               ambiguous by using the same message that's used if we
+               teleported mtmp (and it ended up somewhere you can't see) */
             pline("%s vanishes!", nambuf);
         }
         break;
@@ -5442,8 +5441,8 @@ break_statue(struct obj *obj)
     return TRUE;
 }
 
-/* Return TRUE if obj is eligible to pass to maybe_destroy_item given the type of
- * elemental damage it's being subjected to.
+/* Return TRUE if obj is eligible to pass to maybe_destroy_item given
+ * the type of elemental damage it's being subjected to.
  * Note that things like the Book of the Dead are eligible even though they
  * won't get destroyed, because it will attempt to be destroyed but print a
  * special message instead. */
@@ -5621,10 +5620,10 @@ const char *const destroy_strings[][3] = {
 };
 
 /* guts of destroy_items();
-   caller must decide whether obj is eligible, though there's one case (Book of
-   the Dead) in which an eligible item shouldn't be destroyed (it prints a
+   caller must decide whether obj is eligible, though there's one case (Book
+   of the Dead) in which an eligible item shouldn't be destroyed (it prints a
    special message instead).
-   Returns the amount of damage done, but this is used differently depending on
+   Returns the amount of damage done, but it's used differently depending on
    whether it's the player or a monster having an item destroyed: players lose
    the HP and possibly die in this function, and the return value is unused,
    whereas monsters return the damage to their caller to be taken off later */
@@ -5735,19 +5734,19 @@ maybe_destroy_item(
             return 0;
 
         if (u_carry || vis) {
-            mult = (cnt == 1L)
-                       ? ((quan == 1L) ? ""                         /* 1 of 1 */
-                                       : "One of ")                 /* 1 of N */
-                       : ((cnt < quan) ? "Some of "                 /* n of N */
-                          : (quan == 2L) ? "Both of "  /* 2 of 2 */
-                                         : "All of "); /* N of N */
+            mult = (cnt == 1L) ? ((quan == 1L) ? "" /* 1 of 1 */
+                                  : "One of ")      /* 1 of N */
+                   : ((cnt < quan) ? "Some of "     /* n of N */
+                      : (quan == 2L) ? "Both of "   /* 2 of 2 */
+                        : "All of ");               /* N of N */
             pline("%s%s %s!", mult,
                   (cnt == 1L && quan == 1L) ? Yname2(obj) : yname(obj),
                   destroy_strings[dindx][(cnt > 1L)]);
         }
         if (u_carry) { /* effects that happen only to the player */
             if (osym == POTION_CLASS && dmgtyp != AD_COLD
-                && (!breathless(gy.youmonst.data) || haseyes(gy.youmonst.data))) {
+                && (!breathless(gy.youmonst.data)
+                    || haseyes(gy.youmonst.data))) {
                 potionbreathe(obj);
             }
             if (obj->owornmask) { /* m_useup handles these for monster */
@@ -5787,20 +5786,20 @@ maybe_destroy_item(
     return dmg;
 }
 
-/* scaling factor; dmg/5 stacks of items will be subjected to destroy_items() */
+/* scaling factor; dmg/5 stacks will be subjected to destroy_items() */
 #define DMG_DESTROY_SCALE 5
 /* largest amount of stacks that will be destroyed in a single call */
 #define MAX_ITEMS_DESTROYED 20
 
 /* target items of specified class in mon's inventory for possible destruction
- * return total amount of damage inflicted, though this is unused if mon is the
- * player */
+   return total amount of damage inflicted, though this is unused if mon is
+   the player */
 int
 destroy_items(
     struct monst *mon, /* monster whose invent is being subjected to
                         * destruction */
-    int dmgtyp,         /* AD_**** - currently only cold, fire, elec */
-    int dmg_in)         /* the amount of HP damage the attack dealt */
+    int dmgtyp,        /* AD_**** - currently only cold, fire, elec */
+    int dmg_in)        /* the amount of HP damage the attack dealt */
 {
     struct obj *obj;
     int i, defer;
@@ -5822,9 +5821,9 @@ destroy_items(
         items_to_destroy[i].deferred = FALSE;
     }
 
-    /* Don't straight up destroy all items with an equal chance; limit it based
-     * on the amount of damage being dealt by the source of the item
-     * destruction. */
+    /* don't straight up destroy all items with an equal chance; limit it
+       based on the amount of damage being dealt by the source of the item
+       destruction */
     limit = dmg_in / DMG_DESTROY_SCALE;
     if (dmg_in % DMG_DESTROY_SCALE > rn2(DMG_DESTROY_SCALE)) {
         limit++; /* dmg = 9: 20% chance of limit=1, 80% of limit=2, etc */
@@ -5895,8 +5894,7 @@ destroy_items(
                 || (obj->otyp == POT_WATER && ismnum(u.ulycn)
                     && (Upolyd ? obj->blessed : obj->cursed)))) {
             items_to_destroy[i].deferred = TRUE;
-        }
-        else {
+        } else {
             items_to_destroy[i].deferred = FALSE;
         }
     }
@@ -5919,8 +5917,8 @@ destroy_items(
             }
         }
     }
-    /* almost certainly not everything was destroyed; remove bypass bit after it
-     * was set earlier */
+    /* almost certainly not everything was destroyed; clear bypass bit after
+       it was set earlier */
     bypass_objlist(*objchn, FALSE);
     return dmg_out;
 }
@@ -6123,7 +6121,7 @@ makewish(void)
     else
         livelog_printf((LL_WISH | maybe_LL_arti), "wished for %s", wish);
     /* TODO? maybe generate a second event describing what was received since
-       those just echo player's request rather than show actual result */
+       these just echo player's request rather than show actual result */
 
     const char *verb = ((Is_airlevel(&u.uz) || u.uinwater) ? "slip" : "drop"),
                *oops_msg = (u.uswallow
@@ -6153,12 +6151,11 @@ flash_str(
 
     typ = zaptype(typ);
     if (Hallucination && !nohallu) {
-        /* always return "blast of foo" for simplicity.
-         * This could be extended with hallucinatory rays, but probably
-         * not worth it at this time. */
+        /* always return "blast of foo" for simplicity;
+           this could be extended with hallucinatory rays, but probably
+           not worth it at this time */
         Sprintf(fltxt, "blast of %s", rnd_hallublast());
-    }
-    else {
+    } else {
         Strcpy(fltxt, flash_types[typ]);
     }
     return fltxt;
