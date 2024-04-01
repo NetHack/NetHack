@@ -2,7 +2,7 @@ Copyright (c) NetHack Development Team 1990-2024
 NetHack may be freely redistributed.  See license for details.
 ==============================================================
   Instructions for compiling NetHack 3.7 on a Windows system
-                (Windows 8.x/10/11 or later only)
+      (only tested on Windows 10/11 or later)
 ==============================================================
 Last revision: $NHDT-Date: 1594155895 2020/07/07 21:04:55 $
 

@@ -54,7 +54,7 @@ versions:
 
 
 /-----------------------------------------------------------\
-| Building And Running Using Visual Studio 2017, 2019, 2022  |
+| Building And Running Using Visual Studio 2019, 2022       |
 \-----------------------------------------------------------/
 
 When using Visual Studio Community Edition, load the provided solution
