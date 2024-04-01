@@ -7,10 +7,9 @@
 	<MakeDir Directories="$(BinDir)"/>
 	<Copy SourceFiles="$(SysWindDir)porthelp" DestinationFolder="$(DatDir)"/>
 	<WriteLinesToFile File="$(DatDir)dlb.lst" Lines="@(DlbList->'%(filename)%(extension)')" Overwrite="true"/>
-	<Exec Command="&quot;$(ToolsDir)dlb.exe&quot; cIf dlb.lst &quot;$(BinDir)nhdat&quot;" WorkingDirectory="$(DatDir)"/>
+	<Exec Command="&quot;$(ToolsDir)dlb.exe&quot; cIf dlb.lst &quot;$(BinDir)\nhdat&quot;" WorkingDirectory="$(DatDir)"/>
 	<Delete Files="$(DatDir)porthelp"/>
-
-	</Target>
+  </Target>
   <Target Name="Clean">
 	<Delete Files="$(BinDir)nhdat$(VERSION_MAJOR)$(VERSION_MINOR)$(PATCHLEVEL)"/>
   </Target>

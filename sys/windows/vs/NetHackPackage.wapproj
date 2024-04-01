@@ -112,25 +112,25 @@
     <Content Include="Images\Wide310x150Logo.scale-125.png" />
     <Content Include="Images\Wide310x150Logo.scale-150.png" />
     <Content Include="Images\Wide310x150Logo.scale-200.png" />
-    <Content Include="..\..\..\binary\$(Configuration)\$(Platform)\nethackrc.template">
+    <Content Include="..\..\..\vsbinary\$(Configuration)\$(Platform)\nethackrc.template">
       <Link>NetHackW\nethackrc.template</Link>
     </Content>
-    <Content Include="..\..\..\binary\$(Configuration)\$(Platform)\Guidebook.txt">
+    <Content Include="..\..\..\vsbinary\$(Configuration)\$(Platform)\Guidebook.txt">
       <Link>NetHackW\Guidebook.txt</Link>
     </Content>
-    <Content Include="..\..\..\binary\$(Configuration)\$(Platform)\license">
+    <Content Include="..\..\..\vsbinary\$(Configuration)\$(Platform)\license">
       <Link>NetHackW\license</Link>
     </Content>
-    <Content Include="..\..\..\binary\$(Configuration)\$(Platform)\nhdat$(VERSION_MAJOR)$(VERSION_MINOR)$(PATCHLEVEL)">
+    <Content Include="..\..\..\vsbinary\$(Configuration)\$(Platform)\nhdat$(VERSION_MAJOR)$(VERSION_MINOR)$(PATCHLEVEL)">
       <Link>NetHackW\nhdat$(VERSION_MAJOR)$(VERSION_MINOR)$(PATCHLEVEL)</Link>
     </Content>
-    <Content Include="..\..\..\binary\$(Configuration)\$(Platform)\opthelp">
+    <Content Include="..\..\..\vsbinary\$(Configuration)\$(Platform)\opthelp">
       <Link>NetHackW\opthelp</Link>
     </Content>
-    <Content Include="..\..\..\binary\$(Configuration)\$(Platform)\symbols.template">
+    <Content Include="..\..\..\vsbinary\$(Configuration)\$(Platform)\symbols.template">
       <Link>NetHackW\symbols.template</Link>
     </Content>
-    <Content Include="..\..\..\binary\$(Configuration)\$(Platform)\sysconf.template">
+    <Content Include="..\..\..\vsbinary\$(Configuration)\$(Platform)\sysconf.template">
       <Link>NetHackW\sysconf.template</Link>
     </Content>
     <Content Include="Images\Wide310x150Logo.scale-400.png" />

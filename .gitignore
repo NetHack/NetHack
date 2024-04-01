@@ -35,6 +35,9 @@ Makefile
 Debug/
 Release/
 binary/
+package/*
+vspackage/
+vsbinary/
 build/
 ipch/
 lib/*

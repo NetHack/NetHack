@@ -1,0 +1,129 @@
+# NetHack 3.7 package.nmake
+#==============================================================================
+#
+#  The version of the game this Makefile was designed for
+NETHACK_VERSION="3.7.0"
+
+# A brief variation for use in macros
+NHV=$(NETHACK_VERSION:.=)
+NHV=$(NHV:"=)
+
+#
+#  relative directories from root of NetHack tree.
+#
+
+#LIBSDIR=lib              # libraries and external bits
+#SUBMSDIR=submodules      # NetHack git submodules
+PACKAGESDIR=vspackage     # put in vspackage to distinguish
+ROOTDIR=..\..\..\..       # root of NetHack tree relative to project file
+
+# Directories we might have to collect things from
+#
+INCL    = $(ROOTDIR)\include     # NetHack include files
+DAT     = $(ROOTDIR)\dat         # NetHack data files
+DOC     = $(ROOTDIR)\doc         # NetHack documentation files
+UTIL    = $(ROOTDIR)\util        # Utility source
+SRC     = $(ROOTDIR)\src         # Main source
+SSYS    = $(ROOTDIR)\sys\share   # Shared system files
+MSWSYS  = $(ROOTDIR)\sys\windows # MS windows specific files
+TTY     = $(ROOTDIR)\win\tty     # window port files (tty)
+MSWIN   = $(ROOTDIR)\win\win32   # window port files (win32)
+WCURSES = $(ROOTDIR)\win\curses  # window port files (curses)
+WSHR    = $(ROOTDIR)\win\share   # Tile support files
+QT      = $(ROOTDIR)\win\Qt      # QT support files
+X11     = $(ROOTDIR)\win\X11     # X11 support files
+LIBDIR  = $(ROOTDIR)\lib         # libraries and external bits
+SUBMDIR = $(ROOTDIR)\submodules  # NetHack git submodules
+SndWavDir = $(ROOTDIR)\sound\wav # sound files that get integrated
+
+# Directories we might place collected things
+#
+VSBINDIR=$(ROOTDIR)\vsbinary
+VSPACKAGEDIR = $(ROOTDIR)\vspackage
+
+
+
+default: packageall
+
+#===============================================================================
+# makefile rules
+#===============================================================================
+
+# Rules for files in dat
+{$(DAT)}.dat{$(VSBINDIR)}.dat:
+	copy /Y $< $@
+
+#===============================================================================
+# packaging
+#===============================================================================
+
+PKGFILES=Guidebook.txt license NetHack.exe NetHack.txt \
+	 NetHackW.exe opthelp nhdat370 record symbols.template sysconf.template \
+	nethackrc.template
+FILESTOZIP=$(VSBINDIR)\Guidebook.txt $(VSBINDIR)\license \
+	$(VSBINDIR)\NetHack.exe $(VSBINDIR)\NetHack.txt $(VSBINDIR)\NetHackW.exe \
+	$(VSBINDIR)\opthelp $(VSBINDIR)\nhdat370 $(VSBINDIR)\record \
+	$(VSBINDIR)\symbols.template $(VSBINDIR)\sysconf.template $(VSBINDIR)\nethackrc.template
+DBGSYMS = NetHack.PDB NetHackW.PDB
+PDBTOZIP = ..\NetHack\symbols\$(Configuration)\$(Platform)\NetHack.PDB \
+	   ..\NetHackW\symbols\$(Configuration)\$(Platform)\NetHackW.PDB
+MAINZIP = $(VSPACKAGEDIR)\nethack-$(NHV)-win-$(PlatformShortName).zip
+DBGSYMZIP = $(VSPACKAGEDIR)\nethack-$(NHV)-win-$(PlatformShortName)-debugsymbols.zip
+
+packageall: packagezip
+
+packagezip: showvar vsbindir vspackagedir $(FILESTOZIP) $(MAINZIP) $(DBGSYMZIP)
+	@echo NetHack Windows package created: $(MAINZIP)
+
+$(MAINZIP): $(FILESTOZIP)
+#	if not exist $(VSPACKAGEDIR)\*.* mkdir $(VSPACKAGEDIR)
+	tar -a -cf $(MAINZIP) -C $(VSBINDIR) $(PKGFILES)
+
+$(DBGSYMZIP): $(PDBTOZIP)
+	tar -a -cf $(DBGSYMZIP) $(PDBTOZIP)
+
+$(VSBINDIR)\license: $(BinDir)\license
+	copy /Y $(BinDir)\license $@
+$(VSBINDIR)\Guidebook.txt: $(BinDir)\Guidebook.txt
+	copy /Y $(BinDir)\Guidebook.txt $@
+$(VSBINDIR)\NetHack.exe: $(BinDir)\NetHack.exe
+	copy /Y $(BinDir)\NetHack.exe $@
+$(VSBINDIR)\NetHack.txt: $(BinDir)\NetHack.txt
+	copy /Y $(BinDir)\NetHack.txt $@
+$(VSBINDIR)\NetHackW.exe: $(BinDir)\NetHackW.exe
+	copy /Y $(BinDir)\NetHackW.exe $@
+$(VSBINDIR)\opthelp: $(BinDir)\opthelp
+	copy /Y $(BinDir)\opthelp $@
+$(VSBINDIR)\nhdat$(NHV): $(BinDir)\nhdat$(NHV)
+	copy /Y $(BinDir)\nhdat$(NHV) $@
+$(VSBINDIR)\symbols.template: $(BinDir)\symbols.template
+	copy /Y $(BinDir)\symbols.template $@
+$(VSBINDIR)\nethackrc.template: $(BinDir)\nethackrc.template
+	copy /Y $(BinDir)\nethackrc.template $@
+$(VSBINDIR)\sysconf.template: $(BinDir)\sysconf.template
+	copy /Y $(BinDir)\sysconf.template $@
+$(VSBINDIR)\record:
+	-if not exist $(VSBINDIR)\record. goto>$(VSBINDIR)\record.
+
+showvar:
+	@echo BinDir=[$(BinDir)]
+	@echo Platform=[$(Platform)]
+	@echo PlatformShortName=[$(PlatformShortName)]
+	@echo Configuration=[$(Configuration)]
+
+vspackagedir:
+	@if not exist $(VSPACKAGEDIR)\*.* echo creating directory $(VSPACKAGEDIR:\=/)
+	@if not exist $(VSPACKAGEDIR)\*.* mkdir $(VSPACKAGEDIR)
+
+vsbindir:
+	@if not exist $(VSBINDIR)\*.* echo creating directory $(VSBINDIR:\=/)
+	@if not exist $(VSBINDIR)\*.* mkdir $(VSBINDIR)
+
+clean:
+#	@if exist $(LIBDIR)\$(PDCDIST) rmdir /Q $(LIBDIR)\$(PDCDIST) /s
+#	@if exist $(LIBDIR)\lua-$(LUA_VERSION) rmdir /Q $(LIBDIR)\lua-$(LUA_VERSION) /s
+#	@if exist ..\..\..\..\include\nhlua.h del /Q ..\..\..\..\include\nhlua.h
+
+rebuild:
+#	@if exist $(LIBDIR)\$(PDCDIST) echo nothing to do for lib\$(PDCDIST)
+#	@if exist $(LIBDIR)\lua-$(LUA_VERSION) echo nothing to do for lib\lua-$(LUA_VERSION)
