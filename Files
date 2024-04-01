@@ -438,7 +438,7 @@ win10.c                  win10.h                  win32api.h
 windmain.c               windsys.c                winos.h
 
 sys/windows/vs:
-(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(files for Visual Studio 2019 or 2022 Community Edition builds)
 NetHack.sln                   NetHackPackage.appxmanifest
 NetHackPackage.wapproj        NetHackProperties.props
 Package.StoreAssociation.xml  ScreenShot.PNG
@@ -450,11 +450,11 @@ dirs.props                    dll.props
 files.props
 
 sys/windows/vs/FetchPrereq:
-(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(files for Visual Studio 2019 or 2022 Community Edition builds)
 fetchprereq.nmake    fetchprereq.vcxproj
 
 sys/windows/vs/Images:
-(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(files for Visual Studio 2019 or 2022 Community Edition builds)
 BadgeLogo.scale-100.png
 BadgeLogo.scale-125.png
 BadgeLogo.scale-150.png
@@ -509,55 +509,55 @@ Wide310x150Logo.scale-200.png
 Wide310x150Logo.scale-400.png
 
 sys/windows/vs/NetHack:
-(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(files for Visual Studio 2019 or 2022 Community Edition builds)
 NetHack.vcxproj    afternethack.proj
 
 sys/windows/vs/NetHackW:
-(file for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(file for Visual Studio 2019 or 2022 Community Edition builds)
 NetHackW.vcxproj
 
 sys/windows/vs/PDCurses:
-(file for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(file for Visual Studio 2019 or 2022 Community Edition builds)
 PDCurses.vcxproj
 
 sys/windows/vs/PDCursesGui:
-(file for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(file for Visual Studio 2019 or 2022 Community Edition builds)
 pdcursesgui.vcxproj
 
 sys/windows/vs/dlb:
-(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(files for Visual Studio 2019 or 2022 Community Edition builds)
 afterdlb.proj  dlb.vcxproj
 
 sys/windows/vs/hacklib:
-(file for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(file for Visual Studio 2019 or 2022 Community Edition builds)
 hacklib.vcxproj
 
 sys/windows/vs/makedefs:
-(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(files for Visual Studio 2019 or 2022 Community Edition builds)
 aftermakedefs.proj  makedefs.vcxproj
 
 sys/windows/vs/package:
-(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(files for Visual Studio 2019 or 2022 Community Edition builds)
 package.nmake    package.vcxproj
 
 sys/windows/vs/recover:
-(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(files for Visual Studio 2019 or 2022 Community Edition builds)
 afterrecover.proj  recover.vcxproj
 
 sys/windows/vs/tile2bmp:
-(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(files for Visual Studio 2019 or 2022 Community Edition builds)
 aftertile2bmp.proj  tile2bmp.vcxproj
 
 sys/windows/vs/tilemap:
-(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(files for Visual Studio 2019 or 2022 Community Edition builds)
 aftertilemap.proj  tilemap.vcxproj
 
 sys/windows/vs/tiles:
-(file for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(file for Visual Studio 2019 or 2022 Community Edition builds)
 tiles.vcxproj
 
 sys/windows/vs/uudecode:
-(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+(files for Visual Studio 2019 or 2022 Community Edition builds)
 afteruudecode.proj  uudecode.vcxproj
 
 test:
