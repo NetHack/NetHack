@@ -542,6 +542,7 @@ tty_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
     /* to port dependant tty setup */
     tty_startup(&wid, &hgt);
     setftty(); /* calls start_screen */
+    tty_curs_set(0);
 
     /* set up tty descriptor */
     ttyDisplay = (struct DisplayDesc *) alloc(sizeof (struct DisplayDesc));
@@ -807,6 +808,7 @@ tty_exit_nhwindows(const char *str)
 {
     winid i;
 
+    tty_curs_set(1);
     tty_suspend_nhwindows(str);
     /*
      * Disable windows to avoid calls to window routines.
@@ -3985,6 +3987,7 @@ tty_nhgetch(void)
 
     HUPSKIP_RESULT('\033');
     print_vt_code1(AVTC_INLINE_SYNC);
+    tty_curs_set(1);
     (void) fflush(stdout);
     /* Note: if raw_print() and wait_synch() get called to report terminal
      * initialization problems, then wins[] and ttyDisplay might not be
@@ -4018,6 +4021,7 @@ tty_nhgetch(void)
         }
 #endif
     }
+    tty_curs_set(0);
     if (!i)
         i = '\033'; /* map NUL to ESC since nethack doesn't expect NUL */
     else if (i == EOF)
