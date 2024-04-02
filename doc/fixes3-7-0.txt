@@ -1389,6 +1389,7 @@ if hero shattered an unseen monster's weapon, the [also unseen] weapon was
 don't self-genocide if a monk picks "master-lich" or "masterlich" as target
 	(was matching "Master" rank)
 Sunsword can be invoked to create a blinding ray
+Excalibur is much harder to get if hero is not a knight
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
