@@ -191,6 +191,7 @@ extern void term_start_color(int color);
 extern void term_start_bgcolor(int color);
 extern void term_start_extracolor(uint32, uint16);
 extern void term_end_extracolor(void); /* termcap.c, consoletty.c */
+extern void term_curs_set(int);
 
 /* ### topl.c ### */
 
@@ -255,7 +256,6 @@ extern void tty_raw_print_bold(const char *);
 extern int tty_nhgetch(void);
 extern int tty_nh_poskey(coordxy *, coordxy *, int *);
 extern void tty_nhbell(void);
-extern void tty_curs_set(int);
 extern int tty_doprev_message(void);
 extern char tty_yn_function(const char *, const char *, char);
 extern void tty_getlin(const char *, char *);

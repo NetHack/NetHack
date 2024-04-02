@@ -747,16 +747,6 @@ tty_nhbell(void)
     (void) fflush(stdout);
 }
 
-/* hide or show cursor */
-void
-tty_curs_set(int visibility)
-{
-    if (!visibility && nh_VI)
-        xputs(nh_VI);
-    else if (visibility && nh_VE)
-        xputs(nh_VE);
-}
-
 #ifdef ASCIIGRAPH
 void
 graph_on(void)
@@ -1493,6 +1483,16 @@ term_start_bgcolor(int color)
     char tmp[8];
     Sprintf(tmp, "\033[%dm", ((color % 8) + 40));
     xputs(tmp);
+}
+
+/* hide or show cursor */
+void
+term_curs_set(int visibility)
+{
+    if (!visibility && nh_VI)
+        xputs(nh_VI);
+    else if (visibility && nh_VE)
+        xputs(nh_VE);
 }
 
 #ifndef SEP2

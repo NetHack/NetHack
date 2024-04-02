@@ -79,9 +79,9 @@ hooked_tty_getlin(
     for (;;) {
         (void) fflush(stdout);
         Strcat(strcat(strcpy(gt.toplines, query), " "), obufp);
-        tty_curs_set(1);
+        term_curs_set(1);
         c = pgetchar();
-        tty_curs_set(0);
+        term_curs_set(0);
         if (c == '\033' || c == EOF) {
             if (c == '\033' && obufp[0] != '\0') {
                 obufp[0] = '\0';
