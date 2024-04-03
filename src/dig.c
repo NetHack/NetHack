@@ -313,7 +313,7 @@ dig(void)
             Soundeffect(se_bang_weapon_side, 100);
             pline("Bang!  You hit with the broad side of %s!",
                   the(xname(uwep)));
-            wake_nearby();
+            wake_nearby(FALSE);
             break;
         default:
             Your("swing misses its mark.");
@@ -511,7 +511,7 @@ dig(void)
 
         if (!gd.did_dig_msg) {
             You("hit the %s with all your might.", d_target[dig_target]);
-            wake_nearby();
+            wake_nearby(FALSE);
             gd.did_dig_msg = TRUE;
         }
     }
@@ -674,7 +674,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
         else
             add_damage(x, y, heros_fault ? SHOP_PIT_COST : 0L);
         if (madeby_u)
-            wake_nearby();
+            wake_nearby(FALSE);
         /* in case we're digging down while encased in solid rock
            which is blocking levitation or flight */
         switch_terrain();
@@ -864,7 +864,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
     } else if (is_pool_or_lava(dig_x, dig_y)) {
         pline_The("%s sloshes furiously for a moment, then subsides.",
                   hliquid(is_lava(dig_x, dig_y) ? "lava" : "water"));
-        wake_nearby(); /* splashing */
+        wake_nearby(FALSE); /* splashing */
 
     } else if (old_typ == DRAWBRIDGE_DOWN
                || (is_drawbridge_wall(dig_x, dig_y) >= 0)) {
@@ -894,7 +894,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
              */
             Soundeffect(se_kadoom_boulder_falls_in, 60);
             pline("KADOOM!  The boulder falls in!");
-            wake_nearby();
+            wake_nearby(FALSE);
             (void) delfloortrap(ttmp);
         }
         delobj(boulder_here);
@@ -1160,7 +1160,7 @@ use_pick_axe2(struct obj *obj)
                 gn.nomovemsg = "You pull free.";
             } else if (lev->typ == IRONBARS) {
                 pline("Clang!");
-                wake_nearby();
+                wake_nearby(FALSE);
             } else if (IS_WATERWALL(lev->typ)) {
                 pline("Splash!");
             } else if (lev->typ == LAVAWALL) {
@@ -1185,7 +1185,7 @@ use_pick_axe2(struct obj *obj)
                     if (vibrate)
                         losehp(Maybe_Half_Phys(2), "axing a hard object",
                                KILLED_BY);
-                    wake_nearby();
+                    wake_nearby(FALSE);
                 } else {
                     /* using a pick but dig_target is DIGTYPE_UNDIGGABLE
                        and there is at least one boulder or statue or both

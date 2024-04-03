@@ -478,7 +478,7 @@ use_whistle(struct obj *obj)
         else
             You(whistle_str, obj->cursed ? "shrill" : "high");
         Soundeffect(se_shrill_whistle, 50);
-        wake_nearby();
+        wake_nearby(TRUE);
         if (obj->cursed)
             vault_summon_gd();
     }
@@ -492,7 +492,7 @@ use_magic_whistle(struct obj *obj)
     } else if (obj->cursed && !rn2(2)) {
         You("produce a %shigh-%s.", Underwater ? "very " : "",
             Deaf ? "frequency vibration" : "pitched humming noise");
-        wake_nearby();
+        wake_nearby(TRUE);
     } else {
         /* it's magic!  it works underwater too (at a higher pitch) */
         You(Deaf ? alt_whistle_str : whistle_str,
@@ -1296,7 +1296,7 @@ use_bell(struct obj **optr)
         obj->known = 1;
     }
     if (wakem)
-        wake_nearby();
+        wake_nearby(TRUE);
 }
 
 staticfn void

@@ -1366,7 +1366,7 @@ dokick(void)
             return (gc.context.move ? ECMD_TIME : ECMD_OK);
     }
 
-    wake_nearby();
+    wake_nearby(FALSE);
     u_wipe_engr(2);
 
     if (!isok(x, y)) {

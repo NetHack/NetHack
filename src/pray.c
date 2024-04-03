@@ -2193,7 +2193,7 @@ prayer_done(void) /* M. Stephenson (1.0.3b) */
         /* praying at an unaligned altar, not necessarily in Gehennom */
         You("%s diabolical laughter all around you...",
             !Deaf ? "hear" : "intuit");
-        wake_nearby();
+        wake_nearby(FALSE);
         adjalign(-2);
         exercise(A_WIS, FALSE);
         if (!Inhell) {

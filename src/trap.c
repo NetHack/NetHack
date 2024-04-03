@@ -1374,7 +1374,7 @@ trapeffect_sqky_board(
                   Deaf ? "vibrates" : "squeaks ",
                   Deaf ? "" : trapnote(trap, FALSE),
                   Deaf ? "" : " loudly");
-            wake_nearby();
+            wake_nearby(FALSE);
         }
     } else {
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
@@ -6119,7 +6119,7 @@ chest_trap(
                                          (boolean) shkp->mpeaceful, TRUE);
                 delobj(otmp);
             }
-            wake_nearby();
+            wake_nearby(FALSE);
             losehp(Maybe_Half_Phys(d(6, 6)), buf, KILLED_BY_AN);
             exercise(A_STR, FALSE);
             if (costly && loss) {
@@ -6418,7 +6418,7 @@ b_trapped(const char *item, int bodypart)
 
     Soundeffect(se_kaboom, 80);
     pline("KABOOM!!  %s was booby-trapped!", The(item));
-    wake_nearby();
+    wake_nearby(FALSE);
     losehp(Maybe_Half_Phys(dmg), "explosion", KILLED_BY_AN);
     exercise(A_STR, FALSE);
     if (bodypart != NO_PART)

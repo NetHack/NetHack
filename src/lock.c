@@ -234,7 +234,7 @@ forcelock(void)
             return ((gx.xlock.usedtime = 0));
         }
     } else             /* blunt */
-        wake_nearby(); /* due to hammering on the container */
+        wake_nearby(FALSE); /* due to hammering on the container */
 
     if (rn2(100) >= gx.xlock.chance)
         return 1; /* still busy */

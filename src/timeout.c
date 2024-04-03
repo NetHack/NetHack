@@ -871,7 +871,7 @@ nh_timeout(void)
                     if ((inv_weight() > -500)) {
                         if (!Deaf)
                             You("make a lot of noise!");
-                        wake_nearby();
+                        wake_nearby(FALSE);
                     }
                 }
                 /* from outside means slippery ice; don't reset

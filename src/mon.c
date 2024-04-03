@@ -24,6 +24,7 @@ staticfn void logdeadmon(struct monst *, int);
 staticfn boolean ok_to_obliterate(struct monst *);
 staticfn void qst_guardians_respond(void);
 staticfn void peacefuls_respond(struct monst *);
+staticfn void wake_nearto_core(coordxy, coordxy, int, boolean);
 staticfn void m_restartcham(struct monst *);
 staticfn boolean restrap(struct monst *);
 staticfn int pick_animal(void);
@@ -4011,14 +4012,14 @@ wakeup(struct monst *mtmp, boolean via_attack)
 
 /* Wake up nearby monsters without angering them. */
 void
-wake_nearby(void)
+wake_nearby(boolean petcall)
 {
-    wake_nearto(u.ux, u.uy, u.ulevel * 20);
+    wake_nearto_core(u.ux, u.uy, u.ulevel * 20, petcall);
 }
 
 /* Wake up monsters near some particular location. */
-void
-wake_nearto(coordxy x, coordxy y, int distance)
+staticfn void
+wake_nearto_core(coordxy x, coordxy y, int distance, boolean petcall)
 {
     struct monst *mtmp;
 
@@ -4032,7 +4033,7 @@ wake_nearto(coordxy x, coordxy y, int distance)
             mtmp->msleeping = 0; /* wake indeterminate sleep */
             if (!(mtmp->data->geno & G_UNIQ))
                 mtmp->mstrategy &= ~STRAT_WAITMASK; /* wake 'meditation' */
-            if (gc.context.mon_moving)
+            if (gc.context.mon_moving || !petcall)
                 continue;
             if (mtmp->mtame) {
                 if (!mtmp->isminion)
@@ -4043,6 +4044,12 @@ wake_nearto(coordxy x, coordxy y, int distance)
         }
     }
     disturb_buried_zombies(x, y);
+}
+
+void
+wake_nearto(coordxy x, coordxy y, int distance)
+{
+    wake_nearto_core(x, y, distance, FALSE);
 }
 
 /* NOTE: we must check for mimicry before calling this routine */

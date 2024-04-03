@@ -1716,7 +1716,7 @@ extern void m_respond(struct monst *) NONNULLARG1;
 extern void setmangry(struct monst *, boolean) NONNULLARG1;
 extern void wake_msg(struct monst *, boolean) NONNULLARG1;
 extern void wakeup(struct monst *, boolean) NONNULLARG1;
-extern void wake_nearby(void);
+extern void wake_nearby(boolean);
 extern void wake_nearto(coordxy, coordxy, int);
 extern void seemimic(struct monst *) NONNULLARG1;
 extern void normal_shape(struct monst *) NONNULLARG1;
