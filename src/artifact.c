@@ -1668,11 +1668,13 @@ doinvoke(void)
 staticfn int
 arti_invoke(struct obj *obj)
 {
-    const struct artifact *oart = get_artifact(obj);
+    const struct artifact *oart;
+
     if (!obj) {
         impossible("arti_invoke without obj");
         return ECMD_OK;
     }
+    oart = get_artifact(obj);
     if (oart == &artilist[ART_NONARTIFACT] || !oart->inv_prop) {
         if (obj->otyp == CRYSTAL_BALL)
             use_crystal_ball(&obj);
@@ -1909,16 +1911,47 @@ arti_invoke(struct obj *obj)
             }
 
             if (nvanished) {
-                pline("%she demon%s disappear%s in a cloud of brimstone!",
-                      nstayed ? (nvanished > nstayed ? "Most of t" : "Some of t") : "T",
-                      nvanished > 1 ? "s" : "",
-                      nvanished > 1 ? "" : "s");
+                char subject[] = "demons";
+
+                if (nvanished == 1)
+                    *(eos(subject) - 1) = '\0'; /* remove 's' */
+                pline("%s %s %s in a cloud of brimstone!",
+                      nstayed ? ((nvanished > nstayed)
+                                 ? "Most of the"
+                                 : "Some of the")
+                              : "The",
+                      subject, vtense(subject, "disappear"));
             }
             break;
         }
         case BLINDING_RAY:
-            if (getdir((char *) 0) && (u.dx || u.dy))
-                do_blinding_ray(obj);
+            if (getdir((char *) 0)) {
+                if (u.dx || u.dy) {
+                    do_blinding_ray(obj);
+                } else if (u.dz) {
+                    /* up or down; light this map spot */
+                    levl[u.ux][u.uy].lit = 1;
+                    pline("%s", ((Blind || levl[u.ux][u.uy].waslit)
+                                 ? nothing_seems_to_happen
+                                 : "It is lit here now."));
+                } else { /* zapyourself() */
+                    boolean vulnerable = (u.umonnum == PM_GREMLIN);
+                    int damg = obj->blessed ? 15 : !obj->cursed ? 10 : 5;
+
+                    if (vulnerable) /* could be fatal if Unchanging */
+                        (void) lightdamage(obj, TRUE, 2 * damg);
+
+                    if (!flashburn((long) (damg + rnd(damg))) && !vulnerable)
+                        pline("%s", nothing_seems_to_happen);
+                }
+            } else {
+                /* no direction picked */
+                pline("%s", Never_mind);
+                obj->age = gm.moves;
+            }
+            break;
+        default:
+            impossible("Unknown invoke power %d.", oart->inv_prop);
             break;
         }
     } else {
