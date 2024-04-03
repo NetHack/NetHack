@@ -1842,7 +1842,8 @@ wiz_custom(void)
         add_menu_heading(win,
                          "    glyph  glyph identifier                        "
                          "     sym   clr customcolor unicode utf8");
-        Sprintf(bufa, "%s: colorcount=%d %s", wizcustom, iflags.colorcount,
+        Sprintf(bufa, "%s: colorcount=%ld %s", wizcustom,
+                (long) iflags.colorcount,
                 gs.symset[PRIMARYSET].name ? gs.symset[PRIMARYSET].name
                                           : "default");
         if (gc.currentgraphics == PRIMARYSET && gs.symset[PRIMARYSET].name)
@@ -1892,11 +1893,11 @@ wizcustom_callback(winid win, int glyphnum, char *id)
             Sprintf(bufa, "[%04d] %-44s", glyphnum, id);
             Sprintf(bufb, "'\\%03d' %02d",
                     gs.showsyms[cgm->sym.symidx], cgm->sym.color);
-            Sprintf(bufc, "%011x", cgm->customcolor);
+            Sprintf(bufc, "%011lx", (unsigned long) cgm->customcolor);
             bufu[0] = '\0';
 #ifdef ENHANCED_SYMBOLS
             if (cgm->u && cgm->u->utf8str) {
-                Sprintf(bufu, "U+%04x", cgm->u->utf32ch);
+                Sprintf(bufu, "U+%04lx", (unsigned long) cgm->u->utf32ch);
                 cp = cgm->u->utf8str;
                 while (*cp) {
                     Sprintf(bufd, " <%d>", (int) *cp);
