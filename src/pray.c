@@ -1,4 +1,4 @@
-/* NetHack 3.7	pray.c	$NHDT-Date: 1702349066 2023/12/12 02:44:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.205 $ */
+/* NetHack 3.7	pray.c	$NHDT-Date: 1712233483 2024/04/04 12:24:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.217 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1814,7 +1814,8 @@ dosacrifice(void)
     int value = 0;
 
     if (!on_altar() || u.uswallow) {
-        You("are not standing on an altar.");
+        You("are not %s an altar.",
+            (Levitation || Flying) ? "over" : "on");
         return ECMD_OK;
     } else if (Confusion || Stunned || Hallucination) {
         You("are too impaired to perform the rite.");
