@@ -2692,6 +2692,9 @@ domove_core(void)
     /* tentatively move the hero plus steed; leave CLIPPING til later */
     u.ux += u.dx;
     u.uy += u.dy;
+
+    m_postmove_effect(&gy.youmonst);
+
     if (u.usteed) {
         u.usteed->mx = u.ux;
         u.usteed->my = u.uy;

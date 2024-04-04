@@ -593,6 +593,26 @@ mind_blast(struct monst *mtmp)
     }
 }
 
+/* do whatever effects monster has after moving.
+   called for both monsters and polyed hero.
+   for hero, called after location changes,
+   to prevent spam messages for hero getting enveloped in a cloud.
+   for monsters, called before location changes,
+   because monsters don't have "previous location" field */
+void
+m_postmove_effect(struct monst *mtmp)
+{
+    boolean is_u = (mtmp == &gy.youmonst) ? TRUE : FALSE;
+    coordxy x = is_u ? u.ux0 : mtmp->mx,
+        y = is_u ? u.uy0 : mtmp->my;
+
+    /* Hezrous create clouds of stench. This does not cost a move. */
+    if (mtmp->data == &mons[PM_HEZROU]) /* stench */
+        create_gas_cloud(x, y, 1, 8);
+    else if (mtmp->data == &mons[PM_STEAM_VORTEX] && !mtmp->mcan)
+        create_gas_cloud(x, y, 1, 0); /* harmless vapor */
+}
+
 /* returns 1 if monster died moving, 0 otherwise */
 /* The whole dochugw/m_move/distfleeck/mfndpos section is serious spaghetti
  * code. --KAA
@@ -779,12 +799,6 @@ dochug(struct monst *mtmp)
     /*
      * PHASE THREE: Now the actual movement phase
      */
-
-    /* Hezrous create clouds of stench. This does not cost a move. */
-    if (mtmp->data == &mons[PM_HEZROU]) /* stench */
-        create_gas_cloud(mtmp->mx, mtmp->my, 1, 8);
-    else if (mtmp->data == &mons[PM_STEAM_VORTEX] && !mtmp->mcan)
-        create_gas_cloud(mtmp->mx, mtmp->my, 1, 0); /* harmless vapor */
 
     /* A killer bee may eat honey in order to turn into a queen bee,
        costing it a move. */
@@ -1886,6 +1900,8 @@ m_move(struct monst *mtmp, int after)
             (void) m_break_boulder(mtmp, nix, niy);
             return MMOVE_DONE;
         }
+
+        m_postmove_effect(mtmp);
 
         /* move a normal monster; for a long worm, remove_monster() and
            place_monster() only manipulate the head; they leave tail as-is */
