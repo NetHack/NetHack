@@ -1315,11 +1315,15 @@ dolookaround(void)
 
     iflags.getloc_filter = GFILTER_VIEW;
     for (y = 0; y < ROWNO; y++)
-        for (x = 1; x < COLNO; x++)
+        for (x = 1; x < COLNO; x++) {
+            int glyph = glyph_at(x, y),
+                mapsym = glyph_is_cmap(glyph) ? glyph_to_cmap(glyph) : -1;
+
             if (!u_at(x, y)
-                && (gather_locs_interesting(x, y, GLOC_INTERESTING) ||
-                    (corr_next2u && (glyph_at(x,y) == cmap_to_glyph(S_corr)
-                                     || glyph_at(x,y) == cmap_to_glyph(S_litcorr))))) {
+                && (gather_locs_interesting(x, y, GLOC_INTERESTING)
+                    /* note: GLOC_INTERESTING catches S_engrcorr */
+                    || (corr_next2u && (mapsym == S_corr
+                                        || mapsym == S_litcorr)))) {
                 char buf[BUFSZ];
                 coord cc;
                 int sym = 0;
@@ -1329,6 +1333,7 @@ dolookaround(void)
                 do_screen_description(cc, TRUE, sym, buf, &firstmatch, NULL);
                 pline_xy(x, y, "%s.", firstmatch);
             }
+        }
 
     iflags.getloc_filter = tmp_getloc_filter;
     a11y.accessiblemsg = tmp_accessiblemsg;
@@ -2056,7 +2061,8 @@ count_bind_keys(void)
     int i;
 
     for (i = 0; i < extcmdlist_length; i++)
-        if (extcmdlist[i].key && gc.Cmd.commands[extcmdlist[i].key] != &extcmdlist[i])
+        if (extcmdlist[i].key
+            && gc.Cmd.commands[extcmdlist[i].key] != &extcmdlist[i])
             nbinds++;
     return nbinds;
 }
@@ -2345,7 +2351,8 @@ bind_mousebtn(int btn, const char *command)
     struct ext_func_tab *extcmd;
 
     if (btn < 1 || btn > NUM_MOUSE_BUTTONS) {
-        config_error_add("Wrong mouse button, valid are 1-%i", NUM_MOUSE_BUTTONS);
+        config_error_add("Wrong mouse button, valid are 1-%i",
+                         NUM_MOUSE_BUTTONS);
         return FALSE;
     }
     btn--;
@@ -3056,13 +3063,13 @@ reset_commands(boolean initial)
             /* phone_layout has been toggled */
             for (i = 0; i < 3; i++) {
                 c = '1' + i;             /* 1,2,3 <-> 7,8,9 */
-                cmdtmp = gc.Cmd.commands[c];              /* tmp = [1] */
+                cmdtmp = gc.Cmd.commands[c];                 /* tmp = [1] */
                 gc.Cmd.commands[c] = gc.Cmd.commands[c + 6]; /* [1] = [7] */
-                gc.Cmd.commands[c + 6] = cmdtmp;          /* [7] = tmp */
+                gc.Cmd.commands[c + 6] = cmdtmp;             /* [7] = tmp */
                 c = (M('1') & 0xff) + i; /* M-1,M-2,M-3 <-> M-7,M-8,M-9 */
-                cmdtmp = gc.Cmd.commands[c];              /* tmp = [M-1] */
-                gc.Cmd.commands[c] = gc.Cmd.commands[c + 6]; /* [M-1] = [M-7] */
-                gc.Cmd.commands[c + 6] = cmdtmp;          /* [M-7] = tmp */
+                cmdtmp = gc.Cmd.commands[c];                 /* tmp = [M-1] */
+                gc.Cmd.commands[c] = gc.Cmd.commands[c + 6]; /* [M-1]=[M-7] */
+                gc.Cmd.commands[c + 6] = cmdtmp;             /* [M-7] = tmp */
             }
         }
     } /*?initial*/
@@ -3394,8 +3401,8 @@ rhack(int key)
                            && gd.domove_attempting) {
                     /* not a movement command, but a move prefix earlier? */
                     ; /* just do nothing */
-                } else if (((gd.domove_attempting & (DOMOVE_RUSH | DOMOVE_WALK))
-                            != 0L)
+                } else if (((gd.domove_attempting
+                             & (DOMOVE_RUSH | DOMOVE_WALK)) != 0L)
                            && !gc.context.travel && !dxdy_moveok()) {
                     /* trying to move diagonally as a grid bug */
                     You_cant("get there from here...");
