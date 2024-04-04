@@ -1316,14 +1316,17 @@ dolookaround(void)
     iflags.getloc_filter = GFILTER_VIEW;
     for (y = 0; y < ROWNO; y++)
         for (x = 1; x < COLNO; x++) {
-            int glyph = glyph_at(x, y),
-                mapsym = glyph_is_cmap(glyph) ? glyph_to_cmap(glyph) : -1;
+            int glyph, mapsym;
+            boolean iscorr = (corr_next2u
+                              && (glyph = glyph_at(x, y)) >= 0
+                              && glyph_is_cmap(glyph)
+                              && ((mapsym = glyph_to_cmap(glyph)) == S_corr
+                                   || mapsym == S_litcorr));
 
             if (!u_at(x, y)
                 && (gather_locs_interesting(x, y, GLOC_INTERESTING)
                     /* note: GLOC_INTERESTING catches S_engrcorr */
-                    || (corr_next2u && (mapsym == S_corr
-                                        || mapsym == S_litcorr)))) {
+                    || iscorr)) {
                 char buf[BUFSZ];
                 coord cc;
                 int sym = 0;
