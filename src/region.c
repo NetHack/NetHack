@@ -1041,6 +1041,7 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
 {
     NhRegion *reg = (NhRegion *) p1;
     struct monst *mtmp = (struct monst *) p2;
+    struct monst *umon = mtmp ? mtmp : &gy.youmonst;
     int dam = reg->arg.a_int;
 
     /*
@@ -1049,7 +1050,7 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
      */
 
     /* fog clouds maintain gas clouds, even poisonous ones */
-    if (reg->ttl < 20 && mtmp && mtmp->data == &mons[PM_FOG_CLOUD])
+    if (reg->ttl < 20 && umon && umon->data == &mons[PM_FOG_CLOUD])
         reg->ttl += 5;
 
     if (dam < 1)
