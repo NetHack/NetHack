@@ -47,7 +47,7 @@
           /* OR 2b. hero is using a telepathy inducing */  \
           /*        object and in range                */  \
           || (Unblind_telepat                              \
-              && (mdistu(mon) <= (BOLT_LIM * BOLT_LIM)))))
+              && (mdistu(mon) <= u.unblind_telepat_range))))
 
 /* organized to perform cheaper tests first;
    is_pool() vs is_pool_or_lava(): hero who is underwater can see adjacent

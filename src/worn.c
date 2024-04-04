@@ -5,6 +5,7 @@
 
 #include "hack.h"
 
+staticfn void recalc_telepat_range(void);
 staticfn void m_lose_armor(struct monst *, struct obj *, boolean) NONNULLPTRS;
 staticfn void clear_bypass(struct obj *) NO_NNARGS;
 staticfn void m_dowear_type(struct monst *, long, boolean, boolean) NONNULLARG1;
@@ -43,6 +44,25 @@ static const struct worn {
          : 0)
 /* note: monsters don't have clairvoyance, so dependency on hero's role here
    has no significant effect on their use of w_blocks() */
+
+/* calc the range of hero's unblind telepathy */
+staticfn void
+recalc_telepat_range(void)
+{
+    const struct worn *wp;
+    int nobjs = 0;
+
+    for (wp = worn; wp->w_mask; wp++) {
+        struct obj *oobj = *(wp->w_obj);
+
+        if (oobj && objects[oobj->otyp].oc_oprop == TELEPAT)
+            nobjs++;
+    }
+    if (nobjs)
+        u.unblind_telepat_range = (BOLT_LIM * BOLT_LIM) * nobjs;
+    else
+        u.unblind_telepat_range = -1;
+}
 
 /* Updated to use the extrinsic and blocked fields. */
 void
@@ -114,6 +134,7 @@ setworn(struct obj *obj, long mask)
         iflags.tux_penalty = (uarm && Role_if(PM_MONK) && gu.urole.spelarmr);
     }
     update_inventory();
+    recalc_telepat_range();
 }
 
 /* called e.g. when obj is destroyed */
@@ -147,6 +168,7 @@ setnotworn(struct obj *obj)
     if (!uarm)
         iflags.tux_penalty = FALSE;
     update_inventory();
+    recalc_telepat_range();
 }
 
 /* called when saving with FREEING flag set has just discarded inventory */

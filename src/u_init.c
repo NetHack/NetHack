@@ -928,6 +928,8 @@ u_init(void)
      */
     u.nv_range = 1;
     u.xray_range = -1;
+    u.unblind_telepat_range = -1;
+
     /* OPTIONS:blind results in permanent blindness (unless overridden
        by the Eyes of the Overworld, which will clear 'u.uroleplay.blind'
        to void the conduct, but will leave the PermaBlind bit set so that

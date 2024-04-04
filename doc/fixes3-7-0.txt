@@ -1392,6 +1392,7 @@ Sunsword can be invoked to create a blinding ray
 Excalibur is much harder to get if hero is not a knight
 pets considered any noise made by hero made as whistling
 silent monsters in stinking clouds don't cough
+unblind telepathy range depends on number of telepathy granting items worn
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

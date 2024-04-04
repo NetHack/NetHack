@@ -389,6 +389,7 @@ struct you {
     /* These ranges can never be more than MAX_RANGE (vision.h). */
     int nv_range;   /* current night vision range */
     int xray_range; /* current xray vision range */
+    int unblind_telepat_range;
 
 /*
  * These variables are valid globally only when punished and blind.
