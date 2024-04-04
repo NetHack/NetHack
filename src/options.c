@@ -8497,14 +8497,11 @@ doset_simple(void)
                 reset_customsymbols();
             docrt_flags(opt_crt_flags);
         }
-
-/*
- *      I don't think the status window requires updating between
- *      simplemenu iterations.
-        if (disp.botl || disp.botlx) {
+        /* status may need updating if terminal is tall enough that
+           doset_simple menu doesn't cover up status or wide enough for
+           curses to honor player's choice of align_status:Right|Left */
+        if (disp.botl || disp.botlx)
             bot();
-        }
- */
     } while (pickedone > 0);
     give_opt_msg = TRUE;
     return ECMD_OK;
