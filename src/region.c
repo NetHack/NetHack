@@ -1084,9 +1084,12 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
         mtmp = (struct monst *) p2;
 
         if (m_poisongas_ok(mtmp) != M_POISONGAS_OK) {
-            if (cansee(mtmp->mx, mtmp->my))
-                pline("%s coughs!", Monnam(mtmp));
-            wake_nearto(mtmp->mx, mtmp->my, 2);
+            if (!is_silent(mtmp->data)) {
+                if (cansee(mtmp->mx, mtmp->my)
+                    || (distu(mtmp->mx, mtmp->my) < 8))
+                    pline("%s coughs!", Monnam(mtmp));
+                wake_nearto(mtmp->mx, mtmp->my, 2);
+            }
             if (heros_fault(reg))
                 setmangry(mtmp, TRUE);
             if (haseyes(mtmp->data) && mtmp->mcansee) {
