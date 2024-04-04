@@ -439,6 +439,8 @@ moveloop_core(void)
         curs_on_u();
     }
 
+    m_everyturn_effect(&gy.youmonst);
+
     gc.context.move = 1;
 
     if (gm.multi >= 0 && go.occupation) {

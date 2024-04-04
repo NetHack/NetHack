@@ -1143,6 +1143,13 @@ create_gas_cloud(coordxy x, coordxy y, int cloudsize, int damage)
     int newidx = 1; /* initial spot is already taken */
     boolean inside_cloud = is_hero_inside_gas_cloud();
 
+    /* a single-point cloud on hero and it deals no damage.
+       probably a natural cause of being polyed. don't message about it */
+    if (!gc.context.mon_moving && u_at(x, y) && cloudsize == 1
+        && (!damage
+            || (damage && m_poisongas_ok(&gy.youmonst) == M_POISONGAS_OK)))
+        inside_cloud = TRUE;
+
     if (cloudsize > MAX_CLOUD_SIZE) {
         impossible("create_gas_cloud: cloud too large (%d)!", cloudsize);
         cloudsize = MAX_CLOUD_SIZE;

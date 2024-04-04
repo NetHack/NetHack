@@ -593,6 +593,23 @@ mind_blast(struct monst *mtmp)
     }
 }
 
+/* called every turn for each living monster on the map,
+   and the hero */
+void
+m_everyturn_effect(struct monst *mtmp)
+{
+    boolean is_u = (mtmp == &gy.youmonst) ? TRUE : FALSE;
+    coordxy x = is_u ? u.ux : mtmp->mx,
+        y = is_u ? u.uy : mtmp->my;
+
+    if (mtmp->data == &mons[PM_FOG_CLOUD]) {
+        NhRegion *reg = visible_region_at(x, y);
+
+        if (!reg)
+            create_gas_cloud(x, y, 1, 0); /* harmless vapor */
+    }
+}
+
 /* do whatever effects monster has after moving.
    called for both monsters and polyed hero.
    for hero, called after location changes,

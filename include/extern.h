@@ -1827,6 +1827,7 @@ extern void mon_track_add(struct monst *, coordxy, coordxy) NONNULLARG1;
 extern void mon_track_clear(struct monst *) NONNULLARG1;
 extern boolean monhaskey(struct monst *, boolean) NONNULLARG1;
 extern void mon_regen(struct monst *, boolean) NONNULLARG1;
+extern void m_everyturn_effect(struct monst *) NONNULLARG1;
 extern void m_postmove_effect(struct monst *) NONNULLARG1;
 extern int dochugw(struct monst *, boolean) NONNULLARG1;
 extern boolean onscary(coordxy, coordxy, struct monst *) NONNULLARG3;
