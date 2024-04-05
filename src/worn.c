@@ -5,7 +5,6 @@
 
 #include "hack.h"
 
-staticfn void recalc_telepat_range(void);
 staticfn void m_lose_armor(struct monst *, struct obj *, boolean) NONNULLPTRS;
 staticfn void clear_bypass(struct obj *) NO_NNARGS;
 staticfn void m_dowear_type(struct monst *, long, boolean, boolean) NONNULLARG1;
@@ -46,7 +45,7 @@ static const struct worn {
    has no significant effect on their use of w_blocks() */
 
 /* calc the range of hero's unblind telepathy */
-staticfn void
+void
 recalc_telepat_range(void)
 {
     const struct worn *wp;
@@ -58,6 +57,10 @@ recalc_telepat_range(void)
         if (oobj && objects[oobj->otyp].oc_oprop == TELEPAT)
             nobjs++;
     }
+    /* count all artifacts with SPFX_ESP as one */
+    if (ETelepat & W_ART)
+        nobjs++;
+
     if (nobjs)
         u.unblind_telepat_range = (BOLT_LIM * BOLT_LIM) * nobjs;
     else

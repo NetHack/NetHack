@@ -711,6 +711,7 @@ set_artifact_intrinsic(struct obj *otmp, boolean on, long wp_mask)
             ETelepat |= wp_mask;
         else
             ETelepat &= ~wp_mask;
+        recalc_telepat_range();
         see_monsters();
     }
     if (spfx & SPFX_STLTH) {

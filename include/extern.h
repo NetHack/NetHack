@@ -3757,6 +3757,7 @@ extern void flip_worm_segs_horizontal(struct monst *, int, int) NONNULLARG1;
 
 /* ### worn.c ### */
 
+extern void recalc_telepat_range(void);
 extern void setworn(struct obj *, long) NO_NNARGS; /* has tests for obj */
 extern void setnotworn(struct obj *) NO_NNARGS; /* has tests for obj */
 extern void allunworn(void);
