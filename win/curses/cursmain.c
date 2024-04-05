@@ -954,7 +954,7 @@ curses_print_glyph(
 */
         if ((special & MG_OBJPILE) && iflags.hilite_pile) {
             if (iflags.wc_color)
-                color = 16 + (color * 2) + 1;
+                color = get_framecolor(color, CLR_BLUE);
             else /* if (iflags.use_inverse) */
                 attr = A_REVERSE;
         }

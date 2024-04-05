@@ -727,7 +727,8 @@ is_main_window(winid wid)
 /* Unconditionally write a single character to a window at the given
 coordinates without a refresh.  Currently only used for the map. */
 
-static int
+/* convert nhcolor (fg) and framecolor (bg) to curses colorpair */
+int
 get_framecolor(int nhcolor, int framecolor)
 {
     /* curses_toggle_color_attr() adds the +1 and takes care of COLORS < 16 */

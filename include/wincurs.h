@@ -149,6 +149,7 @@ extern void curses_puts(winid wid, int attr, const char *text);
 extern void curses_clear_nhwin(winid wid);
 extern void curses_alert_win_border(winid wid, boolean onoff);
 extern void curses_alert_main_borders(boolean onoff);
+extern int get_framecolor(int nhcolor, int framecolor);
 extern void curses_draw_map(int sx, int sy, int ex, int ey);
 extern boolean curses_map_borders(int *sx, int *sy, int *ex, int *ey,
                                   int ux, int uy);
