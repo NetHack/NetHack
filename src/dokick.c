@@ -1,4 +1,4 @@
-/* NetHack 3.7	dokick.c	$NHDT-Date: 1625963851 2021/07/11 00:37:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.7	dokick.c	$NHDT-Date: 1712453347 2024/04/07 01:29:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.223 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -306,15 +306,19 @@ ghitm(struct monst *mtmp, struct obj *gold)
             msg_given = TRUE;
         }
     } else {
+        unsigned was_sleeping = mtmp->msleeping;
         long umoney, value = gold->quan * objects[gold->otyp].oc_cost;
 
-        mtmp->msleeping = 0;
+        mtmp->msleeping = 0; /* end indeterminate sleep (won't get here
+                              * for temporary--counted--sleep since that
+                              * uses mfrozen and mfrozen implies !mcanmove) */
         finish_meating(mtmp);
         if (!mtmp->isgd && !rn2(4)) /* not always pleasing */
             setmangry(mtmp, TRUE);
         /* greedy monsters catch gold */
         if (cansee(mtmp->mx, mtmp->my))
-            pline("%s catches the gold.", Monnam(mtmp));
+            pline("%s %scatches the gold.", Monnam(mtmp),
+                  was_sleeping ? "awakens and " : "");
         (void) mpickobj(mtmp, gold);
         gold = (struct obj *) 0; /* obj has been freed */
         if (mtmp->isshk) {

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1407 $ $NHDT-Date: 1711484961 2024/03/26 20:29:21 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1416 $ $NHDT-Date: 1712453344 2024/04/07 01:29:04 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1393,6 +1393,9 @@ Excalibur is much harder to get if hero is not a knight
 pets considered any noise made by hero made as whistling
 silent monsters in stinking clouds don't cough
 unblind telepathy range depends on number of telepathy granting items worn
+gold thrown or kicked at a sleeping monster with the 'greedy' attribute gets
+	caught instead of being treated as an attack but the catch message
+	neglected to report that target monster was awakened in the process
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
