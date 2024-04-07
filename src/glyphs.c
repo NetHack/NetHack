@@ -66,13 +66,35 @@ to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
     if (findwhat->unicode_val)
         uval = unicode_val(findwhat->unicode_val);
     if (uval && unicodeval_to_utf8str(uval, utf8str, sizeof utf8str)) {
-        add_custom_urep_entry(gs.symset[idx].name, glyph, uval,
+        /* presently the customizations are affiliated with a particular
+         * symset but we don't have any symset context, so ignore it for now
+         * in order to avoid a segfault. FIXME:
+         * One future idea might be to store the U+ entries under "UTF8"
+         * and apply those customizations to any current symset if it has
+         * a UTF8 handler. Similar approach for unaffiliated glyph/symbols
+         * non-UTF color customizations
+         */
+        if (gs.symset[idx].name) {
+            add_custom_urep_entry(gs.symset[idx].name, glyph, uval,
                               utf8str, gs.symset_which_set);
+        } else {
+            static int glyphnag = 0;
+
+            if (!glyphnag++)
+                config_error_add("Unimplemented customization feature, ignoring for now");
+        }
     }
 #endif
     if (findwhat->color) {
-        add_custom_nhcolor_entry(gs.symset[idx].name, glyph,
+        if (gs.symset[idx].name) {
+            add_custom_nhcolor_entry(gs.symset[idx].name, glyph,
                                  findwhat->color, gs.symset_which_set);
+        } else {
+            static int colornag = 0;
+
+            if (!colornag++)
+                config_error_add("Unimplemented customization feature, ignoring for now");
+        }
     }
 }
 
