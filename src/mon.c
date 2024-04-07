@@ -97,17 +97,16 @@ sanity_check_single_mon(
             /* bad if not fmon list or if not vault guard */
             if (strcmp(msg, "fmon") || !mtmp->isgd)
                 impossible("dead monster on %s; %s at <%d,%d>",
-                           msg, mons[mndx].pmnames[NEUTRAL],
-                           mx, my);
+                           msg, mptr->pmnames[NEUTRAL], mx, my);
 #endif
             return;
         }
         if (chk_geno && (gm.mvitals[mndx].mvflags & G_GENOD) != 0)
             impossible("genocided %s in play (%s)",
-                        pmname(&mons[mndx], Mgender(mtmp)), msg);
+                       pmname(mptr, Mgender(mtmp)), msg);
         if (mtmp->mtame && !mtmp->mpeaceful)
             impossible("tame %s is not peaceful (%s)",
-                        pmname(&mons[mndx], Mgender(mtmp)), msg);
+                       pmname(mptr, Mgender(mtmp)), msg);
     }
     if (mtmp->isshk && !has_eshk(mtmp))
         impossible("shk without eshk (%s)", msg);
@@ -139,6 +138,14 @@ sanity_check_single_mon(
         } else if (!t_at(mx, my))
             impossible("trapped without a trap (%s)", msg);
     }
+    /* monst->mfrozen is difficult to deal with--it's used for paralysis,
+       for temporary sleep, and for being busy (usually donning armor);
+       code that sets mfrozen needs to also clear mcanmove, otherwise the
+       helpless() test will be unreliable */
+    if (mtmp->mfrozen && mtmp->mcanmove)
+        impossible("frozen monster [%s%s] is able to move (%s)",
+                   mtmp->mtame ? "tame " : mtmp->mpeaceful ? "peaceful " : "",
+                   pmname(mptr, Mgender(mtmp)), msg);
 
     /* monster is hiding? */
     if (mtmp->mundetected) {
@@ -270,7 +277,8 @@ mon_sanity_check(void)
         sanity_check_single_mon(mtmp, FALSE, "migr");
 
         if ((mtmp->mstate
-             & ~(MON_MIGRATING | MON_LIMBO | MON_ENDGAME_MIGR | MON_OFFMAP)) != 0L
+             & ~(MON_MIGRATING | MON_LIMBO | MON_ENDGAME_MIGR | MON_OFFMAP))
+            != 0L
             || !(mtmp->mstate & MON_MIGRATING))
             impossible("migrating mon (%s) with mstate set to 0x%08lx",
                        fmt_ptr((genericptr_t) mtmp), mtmp->mstate);
