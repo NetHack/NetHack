@@ -67,8 +67,9 @@ to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
         uval = unicode_val(findwhat->unicode_val);
     if (uval && unicodeval_to_utf8str(uval, utf8str, sizeof utf8str)) {
         /* presently the customizations are affiliated with a particular
-         * symset but we don't have any symset context, so ignore it for now
-         * in order to avoid a segfault. FIXME:
+         * symset but if we don't have any symset context, ignore it for now
+         * in order to avoid a segfault.
+         * FIXME:
          * One future idea might be to store the U+ entries under "UTF8"
          * and apply those customizations to any current symset if it has
          * a UTF8 handler. Similar approach for unaffiliated glyph/symbols
