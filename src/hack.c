@@ -1763,6 +1763,7 @@ handle_tip(int tip)
             break;
         default:
             impossible("Unknown tip in handle_tip(%i)", tip);
+            break;
         }
     }
 }
@@ -1997,8 +1998,11 @@ domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
         seemimic(mtmp);
     u.ux = mtmp->mx, u.uy = mtmp->my; /* resume swapping positions */
 
-    if (mtmp->mtrapped && (trap = t_at(mtmp->mx, mtmp->my)) != 0
-        && is_pit(trap->ttyp)
+    trap = mtmp->mtrapped ? t_at(mtmp->mx, mtmp->my) : 0;
+    if (!trap)
+        mtmp->mtrapped = 0;
+
+    if (mtmp->mtrapped && is_pit(trap->ttyp)
         && sobj_at(BOULDER, trap->tx, trap->ty)) {
         /* can't swap places with pet pinned in a pit by a boulder */
         didnt_move = TRUE;
@@ -2021,8 +2025,16 @@ domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
         didnt_move = TRUE;
     } else if (mtmp->mpeaceful && mtmp->mtrapped) {
         /* all mtame are also mpeaceful, so this affects pets too */
-        You("stop.  %s can't move out of that trap.",
-            upstart(y_monnam(mtmp)));
+        assert(trap != NULL); /* implied by mtrapped */
+        const char *what = trapname(trap->ttyp, FALSE), *which = "that ";
+        char anbuf[10];
+
+        if (!trap->tseen) {
+            feeltrap(trap); /* show on map once mtmp is out of the way */
+            which = just_an(anbuf, what); /* "a " or "an " */
+        }
+        You("stop.  %s can't move out of %s%s.",
+            upstart(y_monnam(mtmp)), which, what);
         handle_tip(TIP_UNTRAP_MON);
         didnt_move = TRUE;
     } else if (mtmp->mpeaceful
@@ -2030,7 +2042,7 @@ domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
                    || t_at(u.ux0, u.uy0) != NULL
                    || mundisplaceable(mtmp))) {
         /* displacing peaceful into unsafe or trapped space, or trying to
-         * displace quest leader, Oracle, shopkeeper, or priest */
+           displace quest leader, Oracle, shopkeeper, priest, or vault guard */
         You("stop.  %s doesn't want to swap places.",
             upstart(y_monnam(mtmp)));
         didnt_move = TRUE;
