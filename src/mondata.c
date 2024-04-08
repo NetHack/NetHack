@@ -566,10 +566,13 @@ sticks(struct permonst *ptr)
 boolean
 cantvomit(struct permonst *ptr)
 {
-    /* rats and mice are incapable of vomiting;
+    /* rats and mice are incapable of vomiting; likewise with horses;
        which other creatures have the same limitation? */
     if (ptr->mlet == S_RODENT && ptr != &mons[PM_ROCK_MOLE]
         && ptr != &mons[PM_WOODCHUCK])
+        return TRUE;
+    if (ptr == &mons[PM_WARHORSE] || ptr == &mons[PM_HORSE]
+        || ptr == &mons[PM_PONY])
         return TRUE;
     return FALSE;
 }
