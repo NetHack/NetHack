@@ -543,6 +543,7 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
 
     switch (mndx) {
     case PM_GRAY_DRAGON:
+    case PM_GOLD_DRAGON:
     case PM_SILVER_DRAGON:
 #if 0 /* DEFERRED */
     case PM_SHIMMERING_DRAGON:
