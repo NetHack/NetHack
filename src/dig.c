@@ -1953,8 +1953,8 @@ bury_an_obj(struct obj *otmp, boolean *dealloced)
     obj_extract_self(otmp);
 
     under_ice = is_ice(otmp->ox, otmp->oy);
-    if (otmp->otyp == ROCK && !under_ice) {
-        /* merges into burying material */
+    if ((otmp->otyp == ROCK && !under_ice) || otmp->otyp == BOULDER) {
+        /* merges into burying material; boulder removal is for #wizbury */
         if (dealloced)
             *dealloced = TRUE;
         obfree(otmp, (struct obj *) 0);
@@ -1966,7 +1966,7 @@ bury_an_obj(struct obj *otmp, boolean *dealloced)
      */
     if (otmp->otyp == CORPSE) {
         ; /* should cancel timer if under_ice */
-    } else if ((under_ice ? otmp->oclass == POTION_CLASS : is_organic(otmp))
+    } else if ((under_ice ? (otmp->oclass == POTION_CLASS) : is_organic(otmp))
                && !obj_resists(otmp, 5, 95)) {
         (void) start_timer((under_ice ? 0L : 250L) + (long) rnd(250),
                            TIMER_OBJECT, ROT_ORGANIC, obj_to_any(otmp));
@@ -2223,14 +2223,45 @@ struct obj *otmp;
 int
 wiz_debug_cmd_bury(void)
 {
-    int x, y;
+    struct obj *otmp;
+    int x, y, before = 0, after = 0, diff;
 
     for (x = u.ux - 1; x <= u.ux + 1; x++)
-        for (y = u.uy - 1; y <= u.uy + 1; y++)
-            if (isok(x, y))
-                bury_objs(x, y);
+        for (y = u.uy - 1; y <= u.uy + 1; y++) {
+            if (!isok(x, y))
+                continue;
+            for (otmp = gl.level.objects[x][y]; otmp; otmp = otmp->nexthere)
+                ++before;
+
+            bury_objs(x, y);
+        }
+
+    if (before == 0) { /* there was nothing here */
+        pline("No objects here or adjacent to bury.");
+    } else {
+        for (x = u.ux - 1; x <= u.ux + 1; x++)
+            for (y = u.uy - 1; y <= u.uy + 1; y++) {
+                if (!isok(x, y))
+                    continue;
+                for (otmp = gl.level.objects[x][y]; otmp; otmp = otmp->nexthere)
+                    ++after;
+            }
+        diff = before - after;
+        /* will be 0 if only unburiable objects (The Amulet, &c) are present;
+           if uball got buried, uchain went away--count that as being buried */
+        if (diff == 0)
+            pline("No objects buried.");
+        else
+            pline("%d object%s buried.", diff, plur(diff));
+    }
     return ECMD_OK;
 }
 #endif /* DEBUG */
+
+#undef BY_YOU
+#undef BY_OBJECT
+/* for 'onefile' testing, leave STRIDENT defined so that the other instance
+   of it in pray.c will trigger a complaint if someone changes its value */
+/*#undef STRIDENT*/
 
 /*dig.c*/
