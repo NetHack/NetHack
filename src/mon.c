@@ -688,10 +688,10 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
         free_mgivenname(mtmp);
         newsym(x, y);
         return obj;
-#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
-    case LEAVESTATUE: case NON_PM: case NUMMONS:
+    case NON_PM: case LEAVESTATUE: case NUMMONS: /* never use as index */
         break;
 
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
     case PM_GIANT_ANT: case PM_KILLER_BEE: case PM_SOLDIER_ANT:
     case PM_FIRE_ANT: case PM_GIANT_BEETLE: case PM_QUEEN_BEE:
 
