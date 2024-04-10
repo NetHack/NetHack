@@ -2725,12 +2725,12 @@ logdeadmon(struct monst *mtmp, int mndx)
         shkdetail[0] = '\0';
         if (mtmp->isshk) {
             howmany = 1;
-            /* ", the <shoptype> priorietor" needs a trailing comma for
+            /* ", the <shoptype> proprietor" needs a trailing comma for
                the alternate phrasing "<shk>, shkdetails, has been killed"
                when hero isn't directly responsible */
             Snprintf(shkdetail, sizeof shkdetail, ", the %s %s%s",
                      shtypes[ESHK(mtmp)->shoptype - SHOPBASE].name,
-                     /* in case shk name doesn't include Mr or Ms honoric */
+                     /* in case shk name doesn't include Mr or Ms honorific */
                      mtmp->female ? "proprietrix" : "proprietor",
                      herodidit ? "" : ",");
         } else if (mndx == PM_HIGH_CLERIC) {

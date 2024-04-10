@@ -658,7 +658,7 @@ execplinehandler(const char *line)
         ret = _spawnv(_P_NOWAIT, env, args);
     }
 #else
-#error MSGHANDLER is not implemented on this sysytem.
+#error MSGHANDLER is not implemented on this system.
 #endif
 }
 #endif /* MSGHANDLER */
