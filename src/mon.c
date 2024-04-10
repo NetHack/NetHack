@@ -689,13 +689,14 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
         newsym(x, y);
         return obj;
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
-    case LEAVESTATUE: case NON_PM: case PM_GIANT_ANT: case NUMMONS:
+    case LEAVESTATUE: case NON_PM: case NUMMONS:
         break;
 
-    case PM_KILLER_BEE: case PM_SOLDIER_ANT: case PM_FIRE_ANT:
-    case PM_GIANT_BEETLE: case PM_QUEEN_BEE: case PM_QUIVERING_BLOB:
-    case PM_ACID_BLOB: case PM_GELATINOUS_CUBE: case PM_CHICKATRICE:
-    case PM_COCKATRICE: case PM_PYROLISK: 
+    case PM_GIANT_ANT: case PM_KILLER_BEE: case PM_SOLDIER_ANT:
+    case PM_FIRE_ANT: case PM_GIANT_BEETLE: case PM_QUEEN_BEE:
+
+    case PM_QUIVERING_BLOB: case PM_ACID_BLOB: case PM_GELATINOUS_CUBE:
+    case PM_CHICKATRICE: case PM_COCKATRICE: case PM_PYROLISK: 
 
     case PM_JACKAL: case PM_FOX: case PM_COYOTE: case PM_WEREJACKAL:
     case PM_LITTLE_DOG: case PM_DINGO: case PM_DOG: case PM_LARGE_DOG:
@@ -728,7 +729,9 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     case PM_ROTHE: case PM_MUMAK: case PM_LEOCROTTA: case PM_WUMPUS:
     case PM_TITANOTHERE: case PM_BALUCHITHERIUM: case PM_MASTODON:
     case PM_SEWER_RAT: case PM_GIANT_RAT: case PM_RABID_RAT:
-    case PM_WERERAT: case PM_ROCK_MOLE: case PM_WOODCHUCK:
+    case PM_WERERAT:
+
+    case PM_ROCK_MOLE: case PM_WOODCHUCK:
     case PM_CAVE_SPIDER: case PM_CENTIPEDE: case PM_GIANT_SPIDER:
     case PM_SCORPION:
     case PM_LURKER_ABOVE: case PM_TRAPPER:
@@ -741,8 +744,9 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
 
     case PM_GRID_BUG: case PM_XAN: case PM_YELLOW_LIGHT: case PM_BLACK_LIGHT:
     case PM_ZRUTY: case PM_COUATL: case PM_ALEAX: case PM_ANGEL:
-    case PM_KI_RIN: case PM_ARCHON: case PM_BAT: case PM_GIANT_BAT:
-    case PM_RAVEN: case PM_VAMPIRE_BAT:
+    case PM_KI_RIN: case PM_ARCHON:
+
+    case PM_BAT: case PM_GIANT_BAT: case PM_RAVEN: case PM_VAMPIRE_BAT:
     case PM_PLAINS_CENTAUR: case PM_FOREST_CENTAUR: case PM_MOUNTAIN_CENTAUR:
 
     case PM_BABY_GRAY_DRAGON: case PM_BABY_GOLD_DRAGON:
@@ -756,11 +760,14 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
 
     case PM_LICHEN: case PM_BROWN_MOLD: case PM_YELLOW_MOLD:
     case PM_GREEN_MOLD: case PM_RED_MOLD: case PM_SHRIEKER:
-    case PM_VIOLET_FUNGUS: case PM_GNOME: case PM_GNOME_LEADER:
-    case PM_GNOMISH_WIZARD: case PM_GNOME_RULER:
-    case PM_GIANT: case PM_STONE_GIANT: case PM_HILL_GIANT:
+    case PM_VIOLET_FUNGUS:
+
+    case PM_GNOME: case PM_GNOME_LEADER: case PM_GNOMISH_WIZARD:
+    case PM_GNOME_RULER:
+    case PM_GIANT: case PM_STONE_GIANT: case PM_HILL_GIANT: 
     case PM_FIRE_GIANT: case PM_FROST_GIANT: case PM_ETTIN:
     case PM_STORM_GIANT: case PM_TITAN:
+
     case PM_MINOTAUR: case PM_JABBERWOCK: case PM_KEYSTONE_KOP:
     case PM_KOP_SERGEANT: case PM_KOP_LIEUTENANT: case PM_KOP_KAPTAIN:
     case PM_LICH: case PM_DEMILICH:
@@ -777,8 +784,9 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     case PM_RUST_MONSTER: case PM_DISENCHANTER:
 
     case PM_GARTER_SNAKE: case PM_SNAKE: case PM_WATER_MOCCASIN:
-    case PM_PYTHON: case PM_PIT_VIPER: case PM_COBRA: case PM_TROLL:
-    case PM_ICE_TROLL: case PM_ROCK_TROLL: case PM_WATER_TROLL:
+    case PM_PYTHON: case PM_PIT_VIPER: case PM_COBRA:
+
+    case PM_TROLL: case PM_ICE_TROLL: case PM_ROCK_TROLL: case PM_WATER_TROLL:
     case PM_OLOG_HAI: case PM_UMBER_HULK:
 
     case PM_VLAD_THE_IMPALER:
@@ -794,7 +802,8 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     case PM_HUMAN: case PM_HUMAN_WERERAT: case PM_HUMAN_WEREJACKAL:
     case PM_HUMAN_WEREWOLF: case PM_ELF: case PM_WOODLAND_ELF:
     case PM_GREEN_ELF: case PM_GREY_ELF: case PM_ELF_NOBLE:
-    case PM_ELVEN_MONARCH: case PM_DOPPELGANGER: case PM_SHOPKEEPER:
+    case PM_ELVEN_MONARCH:
+    case PM_DOPPELGANGER: case PM_SHOPKEEPER:
     case PM_GUARD: case PM_PRISONER: case PM_ORACLE:
     case PM_ALIGNED_CLERIC: case PM_HIGH_CLERIC:
     case PM_SOLDIER: case PM_SERGEANT: case PM_NURSE:
