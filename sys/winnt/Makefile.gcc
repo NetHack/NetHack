@@ -848,7 +848,7 @@ $(GAMEDIR)/NetHack.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)guistu
 	@echo Linking $@...
 	$(link) $(lflags) -o$@ $(ALLOBJ) $(TTYOBJ) $(O)nttty.o $(O)tile.o \
 		$(O)guistub.o $(O)conres.o $(PDCLIB) $(conlibs) -static -lstdc++
-	@if exist $(O)install.tag del $(O)install.tag
+	@$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 
 # NetHackW
 # full tty linkage libs:
@@ -864,7 +864,7 @@ $(GAMEDIR)/NetHackW.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)ttystub.o \
 	@echo Linking $@...
 	$(link) $(lflags) -mwindows -o$@ $(ALLOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o \
 		$(O)winres.o $(PDCLIB) $(guilibs) -static -lstdc++
-	@if exist $(O)install.tag del $(O)install.tag
+	@$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 endif
 
 $(O)nhdefkey.o:
