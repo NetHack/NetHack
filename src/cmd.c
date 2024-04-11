@@ -3305,7 +3305,7 @@ rhack(int key)
     gc.context.travel = gc.context.travel1 = 0;
     {
         const struct ext_func_tab *tlist;
-        int res, (*func)(void);
+        int res, (*func)(void) = NULL;
 
  do_cmdq_extcmd:
         if (cmdq_ec)
