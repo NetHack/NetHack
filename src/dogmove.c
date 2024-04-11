@@ -1145,6 +1145,10 @@ dog_move(
             return MMOVE_NOTHING;
         }
 
+        /* avoid a location hero just kicked */
+        if (m_avoid_kicked_loc(mtmp, nx, ny))
+            continue;
+
         {
             /* Dog avoids harmful traps, but perhaps it has to pass one
              * in order to follow player.  (Non-harmful traps do not
