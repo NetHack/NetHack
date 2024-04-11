@@ -2506,8 +2506,10 @@ domove(void)
         gd.domove_succeeded = 0L;
         domove_core();
         /* gd.domove_succeeded is available to make assessments now */
-        if ((gd.domove_succeeded & (DOMOVE_RUSH | DOMOVE_WALK)) != 0)
+        if ((gd.domove_succeeded & (DOMOVE_RUSH | DOMOVE_WALK)) != 0) {
             maybe_smudge_engr(ux1, uy1, u.ux, u.uy);
+            maybe_adjust_hero_bubble();
+        }
         gd.domove_attempting = 0L;
 }
 

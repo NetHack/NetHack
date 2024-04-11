@@ -532,7 +532,8 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     struct obj *obj = (struct obj *) 0;
     struct obj *otmp = (struct obj *) 0;
     coordxy x = mtmp->mx, y = mtmp->my;
-    int mndx = monsndx(mdat);
+/*    int mndx = monsndx(mdat); */
+    enum monnums mndx = monsndx(mdat);
     unsigned corpstatflags = corpseflags;
     boolean burythem = ((corpstatflags & CORPSTAT_BURIED) != 0);
 
@@ -687,8 +688,168 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
         free_mgivenname(mtmp);
         newsym(x, y);
         return obj;
+    case NON_PM: case LEAVESTATUE: case NUMMONS: /* never use as index */
+        break;
+
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+    case PM_GIANT_ANT: case PM_KILLER_BEE: case PM_SOLDIER_ANT:
+    case PM_FIRE_ANT: case PM_GIANT_BEETLE: case PM_QUEEN_BEE:
+
+    case PM_QUIVERING_BLOB: case PM_ACID_BLOB: case PM_GELATINOUS_CUBE:
+    case PM_CHICKATRICE: case PM_COCKATRICE: case PM_PYROLISK: 
+
+    case PM_JACKAL: case PM_FOX: case PM_COYOTE: case PM_WEREJACKAL:
+    case PM_LITTLE_DOG: case PM_DINGO: case PM_DOG: case PM_LARGE_DOG:
+    case PM_WOLF: case PM_WEREWOLF: case PM_WINTER_WOLF_CUB:
+    case PM_WARG: case PM_WINTER_WOLF: case PM_HELL_HOUND_PUP:
+    case PM_HELL_HOUND:
+
+    case PM_GAS_SPORE: case PM_FLOATING_EYE: case PM_FREEZING_SPHERE:
+    case PM_FLAMING_SPHERE: case PM_SHOCKING_SPHERE:
+
+    case PM_KITTEN: case PM_HOUSECAT: case PM_JAGUAR: case PM_LYNX:
+    case PM_PANTHER: case PM_LARGE_CAT:  case PM_TIGER:
+
+    case PM_DISPLACER_BEAST: case PM_GREMLIN:
+    case PM_GARGOYLE: case PM_WINGED_GARGOYLE:
+
+    case PM_HOBBIT: case PM_DWARF: case PM_BUGBEAR: case PM_DWARF_LEADER:
+    case PM_DWARF_RULER:
+    case PM_MIND_FLAYER: case PM_MASTER_MIND_FLAYER: case PM_MANES:
+    case PM_HOMUNCULUS: case PM_IMP: case PM_LEMURE: case PM_QUASIT:
+    case PM_TENGU: case PM_BLUE_JELLY: case PM_SPOTTED_JELLY:
+    case PM_OCHRE_JELLY: case PM_KOBOLD: case PM_LARGE_KOBOLD:
+    case PM_KOBOLD_LEADER: case PM_KOBOLD_SHAMAN: case PM_LEPRECHAUN:
+    case PM_SMALL_MIMIC: case PM_LARGE_MIMIC: case PM_GIANT_MIMIC:
+    case PM_WOOD_NYMPH: case PM_WATER_NYMPH: case PM_MOUNTAIN_NYMPH:
+    case PM_GOBLIN: case PM_HOBGOBLIN: case PM_ORC: case PM_HILL_ORC:
+    case PM_MORDOR_ORC: case PM_URUK_HAI: case PM_ORC_SHAMAN:
+    case PM_ORC_CAPTAIN:
+    case PM_ROCK_PIERCER: case PM_IRON_PIERCER: case PM_GLASS_PIERCER:
+    case PM_ROTHE: case PM_MUMAK: case PM_LEOCROTTA: case PM_WUMPUS:
+    case PM_TITANOTHERE: case PM_BALUCHITHERIUM: case PM_MASTODON:
+    case PM_SEWER_RAT: case PM_GIANT_RAT: case PM_RABID_RAT:
+    case PM_WERERAT:
+
+    case PM_ROCK_MOLE: case PM_WOODCHUCK:
+    case PM_CAVE_SPIDER: case PM_CENTIPEDE: case PM_GIANT_SPIDER:
+    case PM_SCORPION:
+    case PM_LURKER_ABOVE: case PM_TRAPPER:
+    case PM_PONY: case PM_HORSE: case PM_WARHORSE:
+    case PM_FOG_CLOUD: case PM_DUST_VORTEX: case PM_ICE_VORTEX:
+    case PM_ENERGY_VORTEX: case PM_STEAM_VORTEX: case PM_FIRE_VORTEX:
+
+    case PM_BABY_LONG_WORM: case PM_BABY_PURPLE_WORM:
+    case PM_PURPLE_WORM:
+
+    case PM_GRID_BUG: case PM_XAN: case PM_YELLOW_LIGHT: case PM_BLACK_LIGHT:
+    case PM_ZRUTY: case PM_COUATL: case PM_ALEAX: case PM_ANGEL:
+    case PM_KI_RIN: case PM_ARCHON:
+
+    case PM_BAT: case PM_GIANT_BAT: case PM_RAVEN: case PM_VAMPIRE_BAT:
+    case PM_PLAINS_CENTAUR: case PM_FOREST_CENTAUR: case PM_MOUNTAIN_CENTAUR:
+
+    case PM_BABY_GRAY_DRAGON: case PM_BABY_GOLD_DRAGON:
+    case PM_BABY_SILVER_DRAGON: case PM_BABY_RED_DRAGON:
+    case PM_BABY_WHITE_DRAGON: case PM_BABY_ORANGE_DRAGON:
+    case PM_BABY_BLACK_DRAGON: case PM_BABY_BLUE_DRAGON:
+    case PM_BABY_GREEN_DRAGON: case PM_BABY_YELLOW_DRAGON:
+
+    case PM_STALKER: case PM_AIR_ELEMENTAL: case PM_FIRE_ELEMENTAL:
+    case PM_EARTH_ELEMENTAL: case PM_WATER_ELEMENTAL:
+
+    case PM_LICHEN: case PM_BROWN_MOLD: case PM_YELLOW_MOLD:
+    case PM_GREEN_MOLD: case PM_RED_MOLD: case PM_SHRIEKER:
+    case PM_VIOLET_FUNGUS:
+
+    case PM_GNOME: case PM_GNOME_LEADER: case PM_GNOMISH_WIZARD:
+    case PM_GNOME_RULER:
+    case PM_GIANT: case PM_STONE_GIANT: case PM_HILL_GIANT: 
+    case PM_FIRE_GIANT: case PM_FROST_GIANT: case PM_ETTIN:
+    case PM_STORM_GIANT: case PM_TITAN:
+
+    case PM_MINOTAUR: case PM_JABBERWOCK: case PM_KEYSTONE_KOP:
+    case PM_KOP_SERGEANT: case PM_KOP_LIEUTENANT: case PM_KOP_KAPTAIN:
+    case PM_LICH: case PM_DEMILICH:
+    case PM_MASTER_LICH: case PM_ARCH_LICH:
+
+    case PM_RED_NAGA_HATCHLING: case PM_BLACK_NAGA_HATCHLING:
+    case PM_GOLDEN_NAGA_HATCHLING: case PM_GUARDIAN_NAGA_HATCHLING:
+    case PM_RED_NAGA: case PM_BLACK_NAGA: case PM_GOLDEN_NAGA:
+    case PM_GUARDIAN_NAGA:
+
+    case PM_OGRE: case PM_OGRE_LEADER: case PM_OGRE_TYRANT:
+
+    case PM_QUANTUM_MECHANIC: case PM_GENETIC_ENGINEER:
+    case PM_RUST_MONSTER: case PM_DISENCHANTER:
+
+    case PM_GARTER_SNAKE: case PM_SNAKE: case PM_WATER_MOCCASIN:
+    case PM_PYTHON: case PM_PIT_VIPER: case PM_COBRA:
+
+    case PM_TROLL: case PM_ICE_TROLL: case PM_ROCK_TROLL: case PM_WATER_TROLL:
+    case PM_OLOG_HAI: case PM_UMBER_HULK:
+
+    case PM_VLAD_THE_IMPALER:
+
+    case PM_BARROW_WIGHT: case PM_WRAITH: case PM_NAZGUL:
+    case PM_XORN: case PM_MONKEY: case PM_APE: case PM_OWLBEAR:
+    case PM_YETI: case PM_CARNIVOROUS_APE: case PM_SASQUATCH:
+
+    case PM_GHOUL: case PM_SKELETON:
+
+    case PM_STRAW_GOLEM: case PM_FLESH_GOLEM:
+
+    case PM_HUMAN: case PM_HUMAN_WERERAT: case PM_HUMAN_WEREJACKAL:
+    case PM_HUMAN_WEREWOLF: case PM_ELF: case PM_WOODLAND_ELF:
+    case PM_GREEN_ELF: case PM_GREY_ELF: case PM_ELF_NOBLE:
+    case PM_ELVEN_MONARCH:
+    case PM_DOPPELGANGER: case PM_SHOPKEEPER:
+    case PM_GUARD: case PM_PRISONER: case PM_ORACLE:
+    case PM_ALIGNED_CLERIC: case PM_HIGH_CLERIC:
+    case PM_SOLDIER: case PM_SERGEANT: case PM_NURSE:
+    case PM_LIEUTENANT: case PM_CAPTAIN: case PM_WATCHMAN:
+    case PM_WATCH_CAPTAIN:
+
+    case PM_MEDUSA: case PM_WIZARD_OF_YENDOR: case PM_CROESUS:
+    case PM_GHOST: case PM_SHADE: case PM_WATER_DEMON:
+    case PM_AMOROUS_DEMON: case PM_HORNED_DEVIL:
+    case PM_ERINYS: case PM_BARBED_DEVIL: case PM_MARILITH: case PM_VROCK:
+    case PM_HEZROU: case PM_BONE_DEVIL: case PM_ICE_DEVIL: case PM_NALFESHNEE:
+    case PM_PIT_FIEND: case PM_SANDESTIN: case PM_BALROG: case PM_JUIBLEX:
+    case PM_YEENOGHU: case PM_ORCUS: case PM_GERYON: case PM_DISPATER:
+    case PM_BAALZEBUB: case PM_ASMODEUS: case PM_DEMOGORGON:
+    case PM_DEATH: case PM_PESTILENCE: case PM_FAMINE:
+    case PM_MAIL_DAEMON: case PM_DJINNI:
+
+    case PM_JELLYFISH: case PM_PIRANHA: case PM_SHARK: case PM_GIANT_EEL:
+    case PM_ELECTRIC_EEL: case PM_KRAKEN:
+    case PM_NEWT: case PM_GECKO: case PM_IGUANA: case PM_BABY_CROCODILE:
+    case PM_LIZARD: case PM_CHAMELEON: case PM_CROCODILE:
+    case PM_SALAMANDER: case PM_LONG_WORM_TAIL:
+
+    case PM_ARCHEOLOGIST: case PM_BARBARIAN: case PM_CAVE_DWELLER:
+    case PM_HEALER: case PM_KNIGHT: case PM_MONK: case PM_CLERIC:
+    case PM_RANGER: case PM_ROGUE: case PM_SAMURAI: case PM_TOURIST:
+    case PM_VALKYRIE: case PM_WIZARD:
+
+    case PM_LORD_CARNARVON: case PM_PELIAS: case PM_SHAMAN_KARNOV:
+    case PM_HIPPOCRATES: case PM_KING_ARTHUR: case PM_GRAND_MASTER:
+    case PM_ARCH_PRIEST: case PM_ORION: case PM_MASTER_OF_THIEVES:
+    case PM_LORD_SATO: case PM_TWOFLOWER: case PM_NORN:
+    case PM_NEFERET_THE_GREEN: case PM_MINION_OF_HUHETOTL:
+    case PM_THOTH_AMON: case PM_CHROMATIC_DRAGON: case PM_CYCLOPS:
+    case PM_IXOTH: case PM_MASTER_KAEN: case PM_NALZOK:
+    case PM_SCORPIUS: case PM_MASTER_ASSASSIN: case PM_ASHIKAGA_TAKAUJI:
+    case PM_LORD_SURTUR: case PM_DARK_ONE: case PM_STUDENT:
+    case PM_CHIEFTAIN: case PM_NEANDERTHAL: case PM_ATTENDANT:
+    case PM_PAGE: case PM_ABBOT: case PM_ACOLYTE: case PM_HUNTER:
+    case PM_THUG: case PM_NINJA: case PM_ROSHI: case PM_GUIDE:
+    case PM_WARRIOR: case PM_APPRENTICE:
+    /*FALLTHRU*/
+#else
     default:
- default_1:
+#endif
+default_1:
         if (gm.mvitals[mndx].mvflags & G_NOCORPSE) {
             return (struct obj *) 0;
         } else {

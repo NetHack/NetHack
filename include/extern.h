@@ -1550,6 +1550,7 @@ extern void movebubbles(void);
 extern void water_friction(void);
 extern void save_waterlevel(NHFILE *) NONNULLARG1;
 extern void restore_waterlevel(NHFILE *) NONNULLARG1;
+extern void maybe_adjust_hero_bubble(void);
 
 /* ### mkobj.c ### */
 

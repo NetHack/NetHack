@@ -1396,6 +1396,7 @@ unblind telepathy range depends on number of telepathy granting items worn
 gold thrown or kicked at a sleeping monster with the 'greedy' attribute gets
 	caught instead of being treated as an attack but the catch message
 	neglected to report that target monster was awakened in the process
+hero movement affects the water bubble movement direction
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
