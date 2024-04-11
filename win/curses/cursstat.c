@@ -27,7 +27,7 @@ static char *status_vals_long[MAXBLSTATS];
 static unsigned long *curses_colormasks;
 static long curses_condition_bits;
 static int curses_status_colors[MAXBLSTATS];
-static int hpbar_percent, hpbar_color;
+static int hpbar_percent, hpbar_crit_hp, hpbar_color;
 static int vert_status_dirty;
 
 static void draw_status(void);
@@ -57,7 +57,7 @@ curses_status_init(void)
         *status_vals_long[i] = '\0';
     }
     curses_condition_bits = 0L;
-    hpbar_percent = 0, hpbar_color = NO_COLOR;
+    hpbar_percent = hpbar_crit_hp = 0, hpbar_color = NO_COLOR;
     vert_status_dirty = 1;
 
     /* let genl_status_init do most of the initialization */
@@ -180,8 +180,8 @@ curses_status_update(
             } else {
                 Sprintf(status_vals[fldidx],
                         (fldidx == BL_TITLE && iflags.wc2_hitpointbar)
-                        ? "%-30s" : status_fieldfmt[fldidx]
-                                    ? status_fieldfmt[fldidx] : "%s",
+                        ? "%-30.30s" : status_fieldfmt[fldidx]
+                                     ? status_fieldfmt[fldidx] : "%s",
                         text);
                 /* strip trailing spaces; core ought to do this for us */
                 if (fldidx == BL_HUNGER || fldidx == BL_LEVELDESC)
@@ -195,7 +195,9 @@ curses_status_update(
             curses_status_colors[fldidx] = color_and_attr;
             if (iflags.wc2_hitpointbar && fldidx == BL_HP) {
                 hpbar_percent = percent;
-                hpbar_color = color_and_attr;
+                hpbar_crit_hp = critically_low_hp(TRUE) ? 1 : 0;
+                hpbar_color = ((color_and_attr & 0x00ff) | (HL_INVERSE << 8)
+                               | (hpbar_crit_hp ? (HL_BLINK << 8) : 0));
             }
         }
     } else { /* BL_FLUSH */
@@ -950,8 +952,9 @@ draw_vertical(boolean border)
 
 /* hitpointbar using hp percent calculation */
 static void
-curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
-           int bar_len) /* width of space within the brackets */
+curs_HPbar(
+    char *text, /* pre-padded with trailing spaces if short */
+    int bar_len) /* width of space within the brackets */
 {
 #ifdef STATUS_HILITES
     int coloridx = 0;
@@ -967,6 +970,8 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
         bar_len = k;
     (void) strncpy(bar, text, bar_len);
     bar[bar_len] = '\0';
+    if (hpbar_crit_hp)
+        repad_with_dashes(bar);
 
     bar_pos = (bar_len * hpbar_percent) / 100;
     if (bar_pos < 1 && hpbar_percent > 0)
@@ -980,6 +985,8 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
     }
 
     waddch(win, '[');
+    if (hpbar_crit_hp)
+        wattron(win, A_BLINK);
     if (*bar) { /* True unless dead (0 HP => bar_pos == 0) */
         /* fixed attribute, not nhattr2curses((hpbar_color >> 8) & 0x00FF) */
         wattron(win, A_REVERSE); /* do this even if hilite_delta is 0 */
@@ -1008,6 +1015,8 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
         *bar2 = savedch;
         waddstr(win, bar2);
     }
+    if (hpbar_crit_hp)
+        wattroff(win, A_BLINK);
     waddch(win, ']');
 }
 

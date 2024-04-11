@@ -2611,11 +2611,6 @@ tiles: male and female variations in monsters.txt; tested only with tile2bmp
 tty: use bright colors directly on supporting terminals
 tty: if a message is marked urgent, override message suppression initiated
 	by user having typed ESC at previous --More-- prompt
-tty+DECgraphics: when ready to print a normal character after having printed
-	a line-drawing character, don't switch back to normal character set
-	unless current char is one that gets rendered differently as a line
-	drawing char (mainly lowercase letters) so that we might be able to
-	avoid the need to switch to line drawing for next char that uses that
 Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
 	unixconf.h from enabling SUSPEND without need to modify unixconf.h
 Unix: support --nethackrc=filename on the command line; same effect as
@@ -2628,6 +2623,9 @@ X11: echo getline prompt and response (wishes, applying names) to message
 	window and dumplog message history
 X11: fix map expose area, no longer leaving black bars on the map
 tty and curses: support italic as text attribute
+tty and curses: when hitpointbar is displayed, make it blink if current HP is
+	below the "critical HP" threshold (where prayer treats being injured
+	as major trouble)
 
 
 NetHack Community Patches (or Variation) Included
