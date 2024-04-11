@@ -53,3 +53,6 @@ when make was invoked with -j makedefs instances could end up running in
 	mkstemp() to define HAS_NO_MKSTEMP to revert to the old behaviour;
 	provide a work-alike mkstemp() implementation for windows visual studio
 	so there is no requirement to define HAS_NO_MKSTEMP there
+fix the mingw32 build of NetHack 3.6.7 by updating sys/winnt/Makefile.gcc,
+	sys/winnt/winnt.c and sys/winnt/stubs.c
+

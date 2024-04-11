@@ -139,7 +139,7 @@ SKIP_NETHACKW=Y
 #==============================================================================
 
 #  The version of the game this Makefile was designed for
-NETHACK_VERSION="3.6.6"
+NETHACK_VERSION="3.6.7"
 
 # A brief version for use in macros
 NHV1=$(subst .,,$(NETHACK_VERSION))
@@ -375,8 +375,8 @@ endif
 
 COMCTRL = comctl32.lib
 
-KEYDLLS = $(GAMEDIR)/nhdefkey.dll $(GAMEDIR)/nh340key.dll \
-	  $(GAMEDIR)/nhraykey.dll
+#KEYDLLS = $(GAMEDIR)/nhdefkey.dll $(GAMEDIR)/nh340key.dll \
+#	  $(GAMEDIR)/nhraykey.dll
 
 TILEUTIL16  = $(UTIL)/tile2bmp.exe
 TILEBMP16   = $(SRC)/tiles.bmp
@@ -844,11 +844,11 @@ gamedir.tag:
 	test -d $(GAMEDIR) && echo directory created > $@
 
 $(GAMEDIR)/NetHack.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)guistub.o \
-			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)conres.o $(KEYDLLS)
+			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)conres.o
 	@echo Linking $@...
 	$(link) $(lflags) -o$@ $(ALLOBJ) $(TTYOBJ) $(O)nttty.o $(O)tile.o \
 		$(O)guistub.o $(O)conres.o $(PDCLIB) $(conlibs) -static -lstdc++
-	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
+	@if exist $(O)install.tag del $(O)install.tag
 
 # NetHackW
 # full tty linkage libs:
@@ -860,11 +860,11 @@ $(GAMEDIR)/NetHack.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)guistu
 
 ifneq "$(SKIP_NETHACKW)" "Y"
 $(GAMEDIR)/NetHackW.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)ttystub.o \
-			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)winres.o $(KEYDLLS)
+			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)winres.o
 	@echo Linking $@...
 	$(link) $(lflags) -mwindows -o$@ $(ALLOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o \
 		$(O)winres.o $(PDCLIB) $(guilibs) -static -lstdc++
-	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
+	@if exist $(O)install.tag del $(O)install.tag
 endif
 
 $(O)nhdefkey.o:
@@ -1353,8 +1353,8 @@ endif
 
 clean:
 	if exist initialchk del initialchk
-	if exist $(O)install.tag del $(O)install.tag
-	if exist $(O)utility.tag del $(O)utility.tag
+	$(subst /,\,if exist $(O)install.tag del $(O)install.tag)
+	$(subst /,\,if exist $(O)utility.tag del $(O)utility.tag)
 ifneq "$(W_UTIL)" ""
 	if exist $(W_UTIL)\makedefs.exe    del $(W_UTIL)\makedefs.exe
 	if exist $(W_UTIL)\levcomp.exe     del $(W_UTIL)\levcomp.exe

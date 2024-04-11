@@ -45,7 +45,7 @@ boolean win32_cursorblink;
 HANDLE ffhandle = (HANDLE) 0;
 WIN32_FIND_DATA ffd;
 extern int GUILaunched;
-boolean getreturn_enabled;
+extern boolean getreturn_enabled;
 int redirect_stdout;
 
 typedef HWND(WINAPI *GETCONSOLEWINDOW)();
