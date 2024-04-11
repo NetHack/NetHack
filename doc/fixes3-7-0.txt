@@ -1321,6 +1321,7 @@ save and restore hero tracks, increase track length
 change vrock and hezrou from red to green, adjust vrock tile to have green
 change wolf and werewolf to grey, warg to black
 change [master] mind flayer, the Wizard, and the riders to bright magenta
+change Nalzok and Minion of Huhetotl to bright red
 walking into a shopkeeper tries to pay the bill
 show billed items in a menu when paying with non-traditional menustyle
 prioritize paying shopkeeper next to you even if multiple are detected
