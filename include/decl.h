@@ -515,6 +515,8 @@ struct instance_globals_j {
 
 struct instance_globals_k {
 
+    coord kickedloc; /* location hero just kicked */
+
     /* decl.c */
     struct obj *kickedobj;     /* object in flight due to kicking */
     struct kinfo killer;

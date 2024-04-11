@@ -3446,8 +3446,14 @@ rhack(int key)
             }
             /* reset_cmd_vars() sets context.move to False so we might
                need to change it [back] to True */
-            if ((res & ECMD_TIME) != 0)
+            if ((res & ECMD_TIME) != 0) {
                 gc.context.move = TRUE;
+                if (func != dokick) {
+                    /* hero did something else than kicking a location;
+                       reset the location, so pets don't avoid it */
+                    gk.kickedloc.x = 0, gk.kickedloc.y = 0;
+                }
+            }
             return;
         }
         /* if we reach here, cmd wasn't found in cmdlist[] */

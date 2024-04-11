@@ -2511,6 +2511,8 @@ domove(void)
             maybe_adjust_hero_bubble();
         }
         gd.domove_attempting = 0L;
+
+        gk.kickedloc.x = 0, gk.kickedloc.y = 0;
 }
 
 staticfn void

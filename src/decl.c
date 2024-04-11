@@ -477,6 +477,7 @@ static const struct instance_globals_j g_init_j = {
 };
 
 static const struct instance_globals_k g_init_k = {
+    { 0, 0 }, /* kickedloc */
     /* decl.c */
     UNDEFINED_PTR, /* kickedobj */
     DUMMY, /* killer */

@@ -1314,6 +1314,7 @@ dokick(void)
 
     x = u.ux + u.dx;
     y = u.uy + u.dy;
+    gk.kickedloc.x = x, gk.kickedloc.y = y;
 
     /* KMH -- Kicking boots always succeed */
     if (uarmf && uarmf->otyp == KICKING_BOOTS)

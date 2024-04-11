@@ -1215,6 +1215,21 @@ maybe_spin_web(struct monst *mtmp)
     }
 }
 
+/* monster avoids a location nx, ny, if hero kicked that location */
+boolean
+m_avoid_kicked_loc(struct monst *mtmp, coordxy nx, coordxy ny)
+{
+    if ((mtmp->mpeaceful || mtmp->mtame)
+        && mtmp->mcansee
+        && !mtmp->mconf && !mtmp->mstun
+        && !Conflict
+        && isok(gk.kickedloc.x, gk.kickedloc.y)
+        && nx == gk.kickedloc.x && ny == gk.kickedloc.y
+        && next2u(nx, ny))
+        return TRUE;
+    return FALSE;
+}
+
 /* max distmin() distance for monster to look for items */
 #define SQSRCHRADIUS 5
 
@@ -1830,6 +1845,9 @@ m_move(struct monst *mtmp, int after)
                 continue;
             nx = poss[i].x;
             ny = poss[i].y;
+
+            if (m_avoid_kicked_loc(mtmp, nx, ny))
+                continue;
 
             if (MON_AT(nx, ny) && (info[i] & ALLOW_MDISP)
                 && !(info[i] & ALLOW_M) && !better_with_displacing)
