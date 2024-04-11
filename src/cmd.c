@@ -144,6 +144,7 @@ staticfn const char *spkey_name(int);
 
 staticfn int (*timed_occ_fn)(void);
 staticfn char *doc_extcmd_flagstr(winid, const struct ext_func_tab *);
+staticfn int dummyfunction(void);
 
 static const char *readchar_queue = "";
 
@@ -3267,6 +3268,7 @@ rhack(int key)
     struct _cmd_queue cq, *cmdq = NULL;
     const struct ext_func_tab *cmdq_ec = 0, *prefix_seen = 0;
     boolean was_m_prefix = FALSE;
+    int (*func)(void) = dummyfunction;
 
     iflags.menu_requested = FALSE;
     gc.context.nopick = 0;
@@ -3305,7 +3307,7 @@ rhack(int key)
     gc.context.travel = gc.context.travel1 = 0;
     {
         const struct ext_func_tab *tlist;
-        int res, (*func)(void) = NULL;
+        int res;
 
  do_cmdq_extcmd:
         if (cmdq_ec)
@@ -5229,6 +5231,12 @@ dosh_core(void)
     Norep(cmdnotavail, "#shell");
 #endif
     return ECMD_OK;
+}
+
+staticfn int
+dummyfunction(void)
+{
+    return ECMD_CANCEL;
 }
 
 /*cmd.c*/
