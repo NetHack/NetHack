@@ -46,7 +46,7 @@
 .ds f0 \*(vr
 .ds f1 \" empty
 .\"DO NOT REMOVE NH_DATESUB .ds f2 DATE(%B %-d, %Y)
-.ds f2 March 21, 2024
+.ds f2 April 12, 2024
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -4057,8 +4057,29 @@ In text windowing, text highlighting or inverse video is often used;
 with tiles, generally displays a small plus-symbol beside the object
 on the top of the pile.
 .lp hitpointbar
-Show a hit point bar graph behind your name and title.
-Only available for TTY, Curses, and Windows GUI, and only when statushilites is on.
+Show a hit point bar graph behind your name and title in the status
+display (default off).
+.lp ""
+The \(lqcurses\(rq interface supports it even if the status highlighting
+feature has been disabled when building the program.
+The \(lqtty\(rq and \(lqmswin\(rq (aka \(lqWindows GUI\(rq) interfaces
+support it only if status highlighting is left enabled when building.
+You don't need to set up any highlighting rules in order to display
+the bar.
+If there is one for hitpoints in effect and it specifies color, that
+color will be used for the bar.
+However if it specifies video attributes, they will be ignored in
+favor of \fIinverse\fP.
+For tty and curses, \fIblink\fP will also be used if the current
+hitpoint value is at or below the \fIcritical HP\fP threshold.
+.lp ""
+The \(lqQt\(rq interface also supports hitpointbar, by drawing
+a solid bar above the name and title with a hard-coded color scheme.
+(As of this writing, having the bar enabled unintentionally inhibits
+resizing the status panel.
+To resize that, use the \f(CR#optionsfull\fP command to toggle the
+\fIhitpointbar\fP option off, perform the resize while it's off, then
+use the same command to toggle it back on.)
 .lp horsename
 Name your starting horse (for example \(lqhorsename:Trigger\(rq).
 Cannot be set with the \(oq\f(CRO\fP\(cq command.
