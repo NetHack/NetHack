@@ -47,6 +47,7 @@ staticfn void launch_drop_spot(struct obj *, coordxy, coordxy);
 staticfn boolean find_random_launch_coord(struct trap *, coord *);
 staticfn int mkroll_launch(struct trap *, coordxy, coordxy, short, long);
 staticfn boolean isclearpath(coord *, int, schar, schar);
+staticfn boolean m_easy_escape_pit(struct monst *) NONNULLARG1;
 staticfn void dofiretrap(struct obj *);
 staticfn void domagictrap(void);
 staticfn void pot_acid_damage(struct obj *, boolean, boolean);
@@ -3544,6 +3545,14 @@ isclearpath(
     return TRUE;
 }
 
+/* can monster escape from a pit easily */
+staticfn boolean
+m_easy_escape_pit(struct monst *mtmp)
+{
+    return (mtmp->data == &mons[PM_PIT_FIEND]
+            || mtmp->data->msize >= MZ_HUGE);
+}
+
 int
 mintrap(struct monst *mtmp, unsigned mintrapflags)
 {
@@ -3563,7 +3572,7 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
             seetrap(trap);
         }
 
-        if (!rn2(40) || (is_pit(trap->ttyp) && mtmp->data->msize >= MZ_HUGE)) {
+        if (!rn2(40) || (is_pit(trap->ttyp) && m_easy_escape_pit(mtmp))) {
             if (sobj_at(BOULDER, mtmp->mx, mtmp->my)
                 && is_pit(trap->ttyp)) {
                 if (!rn2(2)) {
@@ -3576,7 +3585,7 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
                 if (canseemon(mtmp)) {
                     if (is_pit(trap->ttyp))
                         pline("%s climbs %sout of the pit.", Monnam(mtmp),
-                              mtmp->data->msize >= MZ_HUGE ? "easily " : "");
+                              m_easy_escape_pit(mtmp) ? "easily " : "");
                     else if (trap->ttyp == BEAR_TRAP || trap->ttyp == WEB)
                         pline("%s pulls free of the %s.", Monnam(mtmp),
                               trapname(trap->ttyp, FALSE));
@@ -4008,7 +4017,7 @@ climb_pit(void)
         reset_utrap(FALSE);
         fill_pit(u.ux, u.uy);
         gv.vision_full_recalc = 1; /* vision limits change */
-    } else if (!(--u.utrap) || gy.youmonst.data->msize >= MZ_HUGE) {
+    } else if (!(--u.utrap) || m_easy_escape_pit(&gy.youmonst)) {
         reset_utrap(FALSE);
         You("%s to the edge of the %s.",
             (Sokoban && Levitation)
