@@ -317,7 +317,9 @@ VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
 
 DLBOBJ = $(O)dlb.o
 
-REGEX  = $(O)cppregex.o
+REGEX  = cppregex
+#REGEX  = posixregex
+REGEXOBJ = $(O)$(REGEX).o
 
 TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
 
@@ -336,7 +338,7 @@ OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 	 $(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
 	 $(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
 	 $(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
-	 $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(REGEX)  \
+	 $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(REGEXOBJ)  \
 	 $(CURSESOBJ)
 
 ifneq "$(SKIP_NETHACKW)" "Y"
@@ -483,14 +485,18 @@ endif
 
 ifndef TRAVIS_COMPILER
 cc     = i686-w64-mingw32-gcc.exe
-cxx    = g++
+cxx    = i686-w64-mingw32-g++.exe
 rc     = windres
-link   = i686-w64-mingw32-gcc.exe
 else
 cc     = gcc
 cxx    = g++
 rc     = windres
-link   = gcc
+endif
+
+ifeq "$(REGEX)" "cppregex"
+link   = $(cxx)
+else
+link   = $(cc)
 endif
 
 ifeq "$(WANT_WIN_QT4)" "Y"
