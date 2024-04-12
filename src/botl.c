@@ -1902,6 +1902,19 @@ bl_idx_to_fldname(int idx)
     return (const char *) 0;
 }
 
+/* used when rendering hitpointbar; inoutbuf[] has been padded with
+   trailing spaces; replace pairs of spaces with pairs of space+dash */
+void
+repad_with_dashes(char *inoutbuf)
+{
+    char *p = eos(inoutbuf);
+
+    while (p >= inoutbuf + 2 && p[-1] == ' ' && p[-2] == ' ') {
+        p[-1] = '-';
+        p -= 2;
+    }
+}
+
 #ifdef STATUS_HILITES
 
 /****************************************************************************/
