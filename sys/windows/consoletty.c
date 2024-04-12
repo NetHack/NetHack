@@ -2077,8 +2077,13 @@ void
 check_and_set_font(void)
 {
     if (!check_font_widths()) {
-        raw_print("WARNING: glyphs too wide in console font."
-                  "  Changing code page to 437 and font to Consolas\n");
+        const char *msg = "WARNING: glyphs too wide in console font."
+                          " Changing code page to 437 and font to Consolas";
+
+        if (iflags.window_inited)
+            pline ("%s", msg);
+        else
+            raw_printf("%s\n", msg);
         set_known_good_console_font();
     }
 }

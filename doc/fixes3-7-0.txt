@@ -818,7 +818,7 @@ elves and rangers get alignment penalty for cutting down trees
 casting a forgotten spell uses some random amount of power
 heroes starting with a spell have at least one level one spell, and
 	have just enough power to cast it
-huge monsters get easily out of pits
+huge monsters and pit fiends get easily out of pits
 give a message when a trapped monster frees itself from some trap
 change kitchen sink glyph to a white {
 killed wood golem has a chance to also drop small shields, clubs,
