@@ -1495,6 +1495,15 @@ term_curs_set(int visibility)
         xputs(nh_VE);
 }
 
+#ifdef CHANGE_COLOR
+void
+tty_change_color(int color UNUSED, long rgb UNUSED, int reverse UNUSED)
+{
+    return;
+}
+#endif /* CHANGE_COLOR */
+
+
 #ifndef SEP2
 #define tcfmtstr "\033[38;2;%ld;%ld;%ldm"
 #ifdef UNIX

@@ -790,7 +790,7 @@ hup_cliparound(int x UNUSED, int y UNUSED)
 #ifdef CHANGE_COLOR
 /*ARGSUSED*/
 staticfn void
-hup_change_color(int color, long rgb, int reverse)
+hup_change_color(int color UNUSED, long rgb UNUSED, int reverse UNUSED)
 {
     return;
 }
@@ -798,7 +798,7 @@ hup_change_color(int color, long rgb, int reverse)
 #ifdef MAC
 /*ARGSUSED*/
 staticfn short
-hup_set_font_name(winid window, char *fontname)
+hup_set_font_name(winid window UNUSED, char *fontname UNUSED)
 {
     return 0;
 }

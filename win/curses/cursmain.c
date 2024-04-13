@@ -44,8 +44,8 @@ extern glyph_info mesg_gi;
 static void dummy_update_position_bar(char *);
 #endif
 #ifdef CHANGE_COLOR
-static void dummy_change_color(int, long, int);
-static char *dummy_get_color_string(void);
+static void curses_change_color(int, long, int);
+static char *curses_get_color_string(void);
 #endif
 
 /* Public functions for curses NetHack interface */
@@ -119,12 +119,12 @@ struct window_procs curses_procs = {
     curses_number_pad,
     curses_delay_output,
 #ifdef CHANGE_COLOR
-    dummy_change_color,
+    curses_change_color,
 #ifdef MAC /* old OS 9, not OSX */
     (void (*)(int)) 0,
     (short (*)(winid, char *)) 0,
 #endif
-    dummy_get_color_string,
+    curses_get_color_string,
 #endif
     curses_start_screen,
     curses_end_screen,
@@ -1278,13 +1278,21 @@ dummy_update_position_bar(char *arg UNUSED)
 
 #ifdef CHANGE_COLOR
 static void
-dummy_change_color(int a1 UNUSED, long a2 UNUSED, int a3 UNUSED)
+curses_change_color(int color, long rgb, int reverse UNUSED)
 {
-    return;
+    short r, g, b;
+
+    if (!can_change_color())
+        return;
+
+    r = (rgb >> 16) & 0xFF;
+    g = (rgb >> 8) & 0xFF;
+    b = rgb & 0xFF;
+    init_color(color % 16, r * 4, g * 4, b * 4);
 }
 
 static char *
-dummy_get_color_string(void)
+curses_get_color_string(void)
 {
     return (char *) 0;
 }

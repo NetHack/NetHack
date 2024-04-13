@@ -536,11 +536,11 @@ static int optfn_##a(int, int, boolean, char *, char *);
 #ifdef CHANGE_COLOR
 #ifndef MAC     /* not old Mac OS9 */
     NHOPTC(palette, Advanced, 15, opt_in, set_gameview,
-                No, Yes, No, No, "hicolor",
+                No, Yes, Yes, No, "hicolor",
                 "palette (adjust an RGB color in palette (color/R-G-B)")
 #else
     NHOPTC(palette, Advanced, 15, opt_in, set_in_game,
-                No, Yes, No, No, "hicolor",
+                No, Yes, Yes, No, "hicolor",
                 "palette (00c/880/-fff is blue/yellow/reverse white)")
 #endif
 #endif
