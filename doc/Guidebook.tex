@@ -48,7 +48,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7.0 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{DATE(%B %-d, %Y)}
-\date{March 21, 2024}
+\date{April 12, 2024}
 
 \maketitle
 
@@ -4433,8 +4433,31 @@ with tiles, generally displays a small plus-symbol beside the object
 on the top of the pile.
 %.lp
 \item[\ib{hitpointbar}]
-Show a hit point bar graph behind your name and title.
-Only available for TTY, Curses, and Windows GUI, and only when statushilites is on.
+Show a hit point bar graph behind your name and title in the status
+display (default off).
+\\
+%.lp
+The ``curses'' interface supports it even if the status highlighting
+feature has been disabled when building the program.
+The ``tty'' and ``mswin'' (aka ``Windows GUI'') interfaces
+support it only if status highlighting is left enabled when building.
+You don't need to set up any highlighting rules in order to display
+the bar.
+If there is one for hitpoints in effect and it specifies color, that
+color will be used for the bar.
+However if it specifies video attributes, they will be ignored in
+favor of {\it inverse}.
+For tty and curses, {\it blink\/} will also be used if the current
+hitpoint value is at or below the {\it critical HP\/} threshold.
+\\
+%.lp
+The ``Qt'' interface also supports hitpointbar, by drawing
+a solid bar above the name and title with a hard-coded color scheme.
+(As of this writing, having the bar enabled unintentionally inhibits
+resizing the status panel.
+To resize that, use the {\tt \#optionsfull} command to toggle the
+{\it hitpointbar\/} option off, perform the resize while it's off, then
+use the same command to toggle it back on.)
 %.lp
 \item[\ib{horsename}]
 Name your starting horse (for example, ``{\tt horsename:Trigger}'').

@@ -1016,4 +1016,80 @@ get_nhcolor_from_256_index(int idx)
         retcolor = color_256_definitions[idx].value;
     return retcolor;
 }
+
+#ifdef CHANGE_COLOR
+
+int
+count_alt_palette(void)
+{
+    int clr, clrcount = 0;
+
+    for (clr = 0; clr < CLR_MAX; ++clr) {
+        if (ga.altpalette[clr] != 0U)
+            clrcount++;
+    }
+    return clrcount;
+}
+
+int
+alternative_palette(char *op)
+{
+    char buf[BUFSZ], *c_colorid, *c_colorval, *cp;
+    int reslt = 0, coloridx = CLR_MAX;
+    long rgb = 0L;
+    boolean slash = FALSE;
+
+    if (!op)
+        return 0;
+
+    Snprintf(buf, sizeof buf, "%s", op);
+    c_colorval = (char *) 0;
+    c_colorid = cp = buf;
+    while (*cp) {
+        if (*cp == ':' || *cp == '/') {
+            if (*cp == '/') {
+                slash = TRUE;
+                *cp = '\0';
+            }
+        }
+        cp++;
+        if (slash) {
+            c_colorval = cp;
+            slash = FALSE;
+        }
+    }
+    /* some sanity checks */
+    if (c_colorid && *c_colorid == ' ')
+        c_colorid++;
+    if (c_colorval && *c_colorval == ' ')
+        c_colorval++;
+    if (c_colorid)
+        coloridx = match_str2clr(c_colorid, TRUE);
+
+    if (c_colorval && coloridx >= 0 && coloridx < CLR_MAX) {
+        rgb = rgbstr_to_int32(c_colorval);
+        if (rgb != -1) {
+            ga.altpalette[coloridx] = (uint32) rgb | NH_ALTPALETTE;
+            /* use COLORVAL(ga.altpalette[coloridx]) to get
+               the actual rgb value out of ga.altpalette[] */
+            reslt = 1;
+        }
+    }
+    return reslt;
+}
+
+void
+change_palette(void)
+{
+    int clridx;
+
+    for (clridx = 0; clridx < CLR_MAX; ++clridx) {
+        if (ga.altpalette[clridx] != 0) {
+            long rgb = (long) (ga.altpalette[clridx] & ~NH_ALTPALETTE);
+            (*windowprocs.win_change_color)(clridx, rgb, 0);
+        }
+    }
+}
+#endif /* CHANGE_COLOR */
+
 /*coloratt.c*/

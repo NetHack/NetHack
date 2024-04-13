@@ -115,7 +115,7 @@ struct window_procs mswin_procs = {
     mswin_nh_poskey, mswin_nhbell, mswin_doprev_message, mswin_yn_function,
     mswin_getlin, mswin_get_ext_cmd, mswin_number_pad, mswin_delay_output,
 #ifdef CHANGE_COLOR /* only a Mac option currently */
-    mswin, mswin_change_background,
+    mswin_change_color, mswin_get_color_string,
 #endif
     /* other defs that really should go away (they're tty specific) */
     mswin_start_screen, mswin_end_screen, mswin_outrip,
@@ -1901,9 +1901,9 @@ mswin_delay_output(void)
 }
 
 void
-mswin_change_color(void)
+mswin_change_color(int color, long rgb, int reverse)
 {
-    logDebug("mswin_change_color()\n");
+    logDebug("mswin_change_color(%d, %ld, %d)\n", color, rgb, reverse);
 }
 
 char *

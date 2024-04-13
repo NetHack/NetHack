@@ -178,7 +178,7 @@ void mswin_getlin(const char *question, char *input);
 int mswin_get_ext_cmd(void);
 void mswin_number_pad(int state);
 void mswin_delay_output(void);
-void mswin_change_color(void);
+void mswin_change_color(int color, long rgb, int reverse);
 char *mswin_get_color_string(void);
 void mswin_start_screen(void);
 void mswin_end_screen(void);

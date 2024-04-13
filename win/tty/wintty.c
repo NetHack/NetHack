@@ -803,6 +803,14 @@ tty_resume_nhwindows(void)
     docrt();
 }
 
+#ifdef CHANGE_COLOR
+char *
+tty_get_color_string(void)
+{
+    return (char *) 0;
+}
+#endif /* CHANGE_COLOR */
+
 void
 tty_exit_nhwindows(const char *str)
 {
@@ -3940,6 +3948,14 @@ term_curs_set(int visibility UNUSED)
 {
     /* nothing */
 }
+
+#ifdef CHANGE_COLOR
+void
+tty_change_color(int color UNUSED, long rgb UNUSED, int reverse UNUSED)
+{
+    /* nothing */
+}
+#endif /* CHANGE_COLOR */
 
 #endif  /* NO_TERMS */
 

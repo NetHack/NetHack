@@ -315,6 +315,8 @@ static const menu_cmd_t default_menu_cmd_info[] = {
     { (char *) 0, '\0', (char *) 0 }
 };
 
+static const char n_currently_set[] = "(%d currently set)";
+
 staticfn void nmcpy(char *, const char *, int);
 staticfn void escapes(const char *, char *);
 staticfn void rejectoption(const char *);
@@ -2575,57 +2577,78 @@ optfn_packorder(
 }
 
 #ifdef CHANGE_COLOR
+
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 staticfn int
 optfn_palette(
     int optidx UNUSED, int req, boolean negated UNUSED,
     char *opts, char *op)
 {
-#ifndef WIN32
-    int cnt, tmp, reverse;
-    char *pt = op;
-    long rgb;
-#endif
-
     if (req == do_init) {
         return optn_ok;
     }
     if (req == do_set) {
         if (op == empty_optstr)
             return optn_err;
-        /*
-          Non-WIN32 variant
-                 palette (00c/880/-fff is blue/yellow/reverse white)
-          WIN32 variant
-                 palette (adjust an RGB color in palette (color-R-G-B)
-        */
 
-        if (match_optname(opts, "palette", 3, TRUE)
-#ifdef MAC
-            || match_optname(opts, "hicolor", 3, TRUE)
-#endif
-            ) {
-            int color_number, color_incr;
-
-#ifndef WIN32
-            if (duplicate)
-                complain_about_duplicate(optidx);
-#endif
-#ifdef MAC
-            if (match_optname(opts, "hicolor", 3, TRUE)) {
-                color_number = CLR_MAX + 4; /* HARDCODED inverse number */
-                color_incr = -1;
-            } else
-#endif
-            {
-                color_number = 0;
-                color_incr = 1;
-            }
-#ifdef WIN32
+        if (match_optname(opts, "palette", 3, TRUE)) {
+            /*
+             *  palette (adjust an RGB color in palette (color/R-G-B)
+             */
             if (!alternative_palette(op)) {
                 config_error_add("Error in palette parameter '%s'", op);
                 return optn_err;
             }
-#else
+            if (!go.opt_initial)
+                go.opt_update_basic_palette = TRUE;
+        }
+        return optn_ok;
+    }
+    if (req == get_val || req == get_cnf_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, n_currently_set, count_alt_palette());
+        return optn_ok;
+    }
+    return optn_ok;
+}
+
+#if 0
+/* old MAC OS9 code */
+staticfn int
+optfn_palette(
+    int optidx UNUSED, int req, boolean negated UNUSED,
+    char *opts, char *op)
+{
+    int cnt, tmp, reverse;
+    char *pt = op;
+    long rgb;
+
+     * Mac OS9 variant
+     *        palette (00c/880/-fff is blue/yellow/reverse white)
+     */
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+        if (op == empty_optstr)
+            return optn_err;
+
+        if (match_optname(opts, "palette", 3, TRUE)
+            || match_optname(opts, "hicolor", 3, TRUE)) {
+            int color_number, color_incr;
+
+            if (duplicate)
+                complain_about_duplicate(optidx);
+            if (match_optname(opts, "hicolor", 3, TRUE)) {
+                color_number = CLR_MAX + 4; /* HARDCODED inverse number */
+                color_incr = -1;
+            } else {
+                color_number = 0;
+                color_incr = 1;
+            }
+            /* ----------- Mac OS 9 code -------------------------*/
             while (*pt && color_number >= 0) {
                 cnt = 3;
                 rgb = 0L;
@@ -2637,21 +2660,15 @@ optfn_palette(
                 }
                 while (cnt-- > 0) {
                     if (*pt && *pt != '/') {
-#ifdef AMIGA
-                        rgb <<= 4;
-#else
                         rgb <<= 8;
-#endif
                         tmp = *pt++;
                         if (isalpha((uchar) tmp)) {
                             tmp = (tmp + 9) & 0xf; /* Assumes ASCII... */
                         } else {
                             tmp &= 0xf; /* Digits in ASCII too... */
                         }
-#ifndef AMIGA
                         /* Add an extra so we fill f -> ff and 0 -> 00 */
                         rgb += tmp << 4;
-#endif
                         rgb += tmp;
                     }
                 }
@@ -2660,20 +2677,25 @@ optfn_palette(
                 change_color(color_number, rgb, reverse);
                 color_number += color_incr;
             }
-#endif /* !WIN32 */
-            if (!go.opt_initial) {
-                go.opt_need_redraw = TRUE;
-            }
+
+            if (!go.opt_initial)
+                go.opt_update_basic_palette = TRUE;
         }
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        opts[0] = '\0';
-        Sprintf(opts, "%s", get_color_string());
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, n_currently_set, count_alt_palette());
         return optn_ok;
     }
     return optn_ok;
+
 }
+#endif  /* 0 */
+
+RESTORE_WARNING_FORMAT_NONLITERAL
+
 #endif /* CHANGE_COLOR */
 
 /* for "paranoid_confirmation:foo" and alias "[!]prayconfirm" */
@@ -6333,7 +6355,6 @@ handler_msgtype(void)
     return optn_ok;
 }
 
-
 staticfn int
 handler_versinfo(void)
 {
@@ -8071,8 +8092,6 @@ fruitadd(char *str, struct fruit *replace_fruit)
  */
 
 
-static const char n_currently_set[] = "(%d currently set)";
-
 DISABLE_WARNING_FORMAT_NONLITERAL   /* RESTORE is after show_menucontrols() */
 
 staticfn int
@@ -8400,6 +8419,7 @@ doset_simple_menu(void)
     go.opt_need_glyph_reset = FALSE;
     go.opt_reset_customcolors = FALSE;
     go.opt_reset_customsymbols = FALSE;
+    go.opt_update_basic_palette = FALSE;
     pick_cnt = select_menu(tmpwin, PICK_ONE, &pick_list);
     /* note:  without the complication of a preselected entry, a PICK_ONE
        menu returning pick_cnt > 0 implies exactly 1 */
@@ -8490,6 +8510,12 @@ doset_simple(void)
         }
         if (go.opt_need_promptstyle)
             adjust_menu_promptstyle(WIN_INVEN, &iflags.menu_headings);
+        if (go.opt_update_basic_palette) {
+#ifdef CHANGE_COLOR
+	    change_palette();
+#endif
+            go.opt_update_basic_palette = FALSE;
+        }
         if (go.opt_reset_customcolors || go.opt_reset_customsymbols) {
             if (go.opt_reset_customcolors)
                 reset_customcolors();
@@ -8745,8 +8771,14 @@ doset(void) /* changing options via menu by Per Liboriussen */
     if (go.opt_need_glyph_reset) {
         reset_glyphmap(gm_optionchange);
     }
-    if (go.opt_reset_customcolors
+    if (go.opt_reset_customcolors || go.opt_update_basic_palette
         || go.opt_reset_customsymbols || go.opt_need_redraw) {
+        if (go.opt_update_basic_palette) {
+#ifdef CHANGE_COLOR
+            change_palette();
+#endif
+            go.opt_update_basic_palette = FALSE;
+        }
         if (go.opt_reset_customcolors)
             reset_customcolors();
         if (go.opt_reset_customsymbols)

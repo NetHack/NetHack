@@ -325,6 +325,11 @@ extern boolean closest_color(uint32_t lcolor, uint32_t *closecolor, uint16 *clri
 extern int color_distance(uint32_t, uint32_t);
 extern boolean onlyhexdigits(const char *buf);
 extern uint32 get_nhcolor_from_256_index(int idx);
+#ifdef CHANGE_COLOR
+extern int count_alt_palette(void);
+extern int alternative_palette(char *);
+extern void change_palette(void);
+#endif
 
 /* ### cmd.c ### */
 

@@ -2080,6 +2080,8 @@ curses: if user's terminal was set to 'application keypad mode' (DEC VTxxx
 	"ESC SPC G"), nethack wasn't recognizing number pad keys
 curses: change petattr attributes, dropping support for curses-only ones
 curses: swap the grey and no-color color initialization
+curses: allow changing default colors with the 'palette' config option
+	(only if compiled with CHANGE_COLOR)
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project
