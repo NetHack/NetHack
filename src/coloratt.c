@@ -5,6 +5,8 @@
 #include "hack.h"
 #include <ctype.h>
 
+staticfn int32 alt_color_spec(const char *cp);
+
 struct color_names {
     const char *name;
     int color;
@@ -1067,7 +1069,11 @@ alternative_palette(char *op)
         coloridx = match_str2clr(c_colorid, TRUE);
 
     if (c_colorval && coloridx >= 0 && coloridx < CLR_MAX) {
-        rgb = rgbstr_to_int32(c_colorval);
+        if (*c_colorval == '#' || *c_colorval == '\\') {
+            rgb = alt_color_spec(c_colorval);
+        } else {
+            rgb = rgbstr_to_int32(c_colorval);
+        }
         if (rgb != -1) {
             ga.altpalette[coloridx] = (uint32) rgb | NH_ALTPALETTE;
             /* use COLORVAL(ga.altpalette[coloridx]) to get
@@ -1089,6 +1095,48 @@ change_palette(void)
             (*windowprocs.win_change_color)(clridx, rgb, 0);
         }
     }
+}
+
+staticfn int32
+alt_color_spec(const char *cp)
+{
+    static NEARDATA const char oct[] = "01234567", dec[] = "0123456789";
+    /* hexdd[] is defined in decl.c */
+
+    const char *dp;
+    int32 cval = -1;
+    int dcount;
+
+    cval = dcount = 0; /* for decimal, octal, hexadecimal cases */
+    while (*cp) {
+        if (((*cp != '\\') && (*cp != '#')) || !cp[1]) {
+            /* simple val, or nothing left for \ to escape */
+            cval = *cp++;
+        } else if (*cp != '#' && strchr(dec, cp[1])) {
+            ++cp; /* move past backslash to first digit */
+            do {
+                cval = (cval * 10) + (*cp - '0');
+            } while (*++cp && strchr(dec, *cp) && ++dcount < 3);
+        } else if (*cp != '#' && (cp[1] == 'o' || cp[1] == 'O') && cp[2]
+                   && strchr(oct, cp[2])) {
+            cp += 2; /* move past backslash and 'O' */
+            do {
+                cval = (cval * 8) + (*cp - '0');
+            } while (*++cp && strchr(oct, *cp) && ++dcount < 8);
+        } else if (((cp[1] == 'x' || cp[1] == 'X') && cp[2]
+                    && (dp = strchr(hexdd, cp[2])) != 0)
+                   || (cp[0] == '#' && cp[1]
+                       && (dp = strchr(hexdd, cp[1])) != 0)) {
+            if (*cp == '\\')
+                cp += 2; /* move past backslash and 'X' */
+            else if (*cp == '#')
+                cp += 1; /* move past '#' */
+            do {
+                cval = (cval * 16) + ((int) (dp - hexdd) / 2);
+            } while (*++cp && (dp = strchr(hexdd, *cp)) != 0 && ++dcount < 6);
+        }
+    }
+    return cval;
 }
 #endif /* CHANGE_COLOR */
 
