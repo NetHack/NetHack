@@ -1092,7 +1092,7 @@ change_palette(void)
 
     for (clridx = 0; clridx < CLR_MAX; ++clridx) {
         if (ga.altpalette[clridx] != 0) {
-            long rgb = (long) (ga.altpalette[clridx] & ~NH_ALTPALETTE);
+            long rgb = (long) COLORVAL(ga.altpalette[clridx]);
             (*windowprocs.win_change_color)(clridx, rgb, 0);
         }
     }
