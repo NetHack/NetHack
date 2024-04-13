@@ -1106,7 +1106,7 @@ alt_color_spec(const char *str)
 
     const char *dp, *cp = str;
     int32 cval = -1;
-    int dcount;
+    int dcount, dlimit = 6;
     boolean hexescape = FALSE, octescape = FALSE;
 
     dcount = 0; /* for decimal, octal, hexadecimal cases */
@@ -1120,33 +1120,36 @@ alt_color_spec(const char *str)
     if (hexescape || octescape) {
         cval = 0;
         cp += 2;
+        if (octescape)
+            dlimit = 8;
     } else if (*cp == '#' && cp[1]) {
         hexescape = TRUE;
         cval = 0;
         cp += 1;
     } else if (cp[1]) {
         cval = 0;
+        dlimit = 8;
     } else if (!cp[1]) {
         if (strchr(dec, *cp) != 0) {
             /* simple val, or nothing left for \ to escape */
             cval = (*cp - '0');
         }
+        dlimit = 1;
         cp++;
     }
 
     while (*cp) {
         if (!hexescape && !octescape && strchr(dec, *cp)) {
-            do {
-                cval = (cval * 10) + (*cp - '0');
-            } while (*++cp && strchr(dec, *cp) && ++dcount < 8);
+            cval = (cval * 10) + (*cp - '0');
         } else if (octescape && strchr(oct, *cp)) {
-            do {
-                cval = (cval * 8) + (*cp - '0');
-            } while (*++cp && strchr(oct, *cp) && ++dcount < 8);
+            cval = (cval * 8) + (*cp - '0');
         } else if (hexescape && (dp = strchr(hexdd, *cp)) != 0) {
-            do {
-                cval = (cval * 16) + ((int) (dp - hexdd) / 2);
-            } while (*++cp && (dp = strchr(hexdd, *cp)) != 0 && ++dcount < 6);
+            cval = (cval * 16) + ((int) (dp - hexdd) / 2);
+        }
+        ++cp;
+        if (++dcount > dlimit) {
+            cval = -1;
+            break;
         }
     }
     return cval;
