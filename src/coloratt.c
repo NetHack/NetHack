@@ -5,8 +5,6 @@
 #include "hack.h"
 #include <ctype.h>
 
-staticfn int32 alt_color_spec(const char *cp);
-
 struct color_names {
     const char *name;
     int color;
@@ -220,6 +218,10 @@ static struct nethack_color colortable[] = {
   { rgb_color, 153, 137, "white-smoke",             "#F5F5F5", 245, 245, 245 },
   { rgb_color, 154, 138, "white",                   "#FFFFFF", 255, 255, 255 },
 };
+
+#ifdef CHANGE_COLOR
+staticfn int32 alt_color_spec(const char *cp);
+#endif
 
 int32
 colortable_to_int32(struct nethack_color *cte)
@@ -1069,10 +1071,9 @@ alternative_palette(char *op)
         coloridx = match_str2clr(c_colorid, TRUE);
 
     if (c_colorval && coloridx >= 0 && coloridx < CLR_MAX) {
-        if (*c_colorval == '#' || *c_colorval == '\\') {
+        rgb = rgbstr_to_int32(c_colorval);
+        if (rgb == -1) {
             rgb = alt_color_spec(c_colorval);
-        } else {
-            rgb = rgbstr_to_int32(c_colorval);
         }
         if (rgb != -1) {
             ga.altpalette[coloridx] = (uint32) rgb | NH_ALTPALETTE;
@@ -1098,39 +1099,51 @@ change_palette(void)
 }
 
 staticfn int32
-alt_color_spec(const char *cp)
+alt_color_spec(const char *str)
 {
     static NEARDATA const char oct[] = "01234567", dec[] = "0123456789";
     /* hexdd[] is defined in decl.c */
 
-    const char *dp;
+    const char *dp, *cp = str;
     int32 cval = -1;
     int dcount;
+    boolean hexescape = FALSE, octescape = FALSE;
 
-    cval = dcount = 0; /* for decimal, octal, hexadecimal cases */
-    while (*cp) {
-        if (((*cp != '\\') && (*cp != '#')) || !cp[1]) {
+    dcount = 0; /* for decimal, octal, hexadecimal cases */
+    hexescape =
+        (*cp == '\\' && cp[1] && (cp[1] == 'x' || cp[1] == 'X') && cp[2]);
+    if (!hexescape) {
+        octescape =
+            (*cp == '\\' && cp[1] && (cp[1] == 'o' || cp[1] == 'O') && cp[2]);
+    }
+
+    if (hexescape || octescape) {
+        cval = 0;
+        cp += 2;
+    } else if (*cp == '#' && cp[1]) {
+        hexescape = TRUE;
+        cval = 0;
+        cp += 1;
+    } else if (cp[1]) {
+        cval = 0;
+    } else if (!cp[1]) {
+        if (strchr(dec, *cp) != 0) {
             /* simple val, or nothing left for \ to escape */
-            cval = *cp++;
-        } else if (*cp != '#' && strchr(dec, cp[1])) {
-            ++cp; /* move past backslash to first digit */
+            cval = (*cp - '0');
+        }
+        cp++;
+    }
+
+    while (*cp) {
+        if (!hexescape && !octescape && strchr(dec, *cp)) {
             do {
                 cval = (cval * 10) + (*cp - '0');
-            } while (*++cp && strchr(dec, *cp) && ++dcount < 3);
-        } else if (*cp != '#' && (cp[1] == 'o' || cp[1] == 'O') && cp[2]
-                   && strchr(oct, cp[2])) {
-            cp += 2; /* move past backslash and 'O' */
+            } while (*++cp && strchr(dec, *cp) && ++dcount < 8);
+        } else if (octescape && strchr(oct, *cp)) {
             do {
                 cval = (cval * 8) + (*cp - '0');
             } while (*++cp && strchr(oct, *cp) && ++dcount < 8);
-        } else if (((cp[1] == 'x' || cp[1] == 'X') && cp[2]
-                    && (dp = strchr(hexdd, cp[2])) != 0)
-                   || (cp[0] == '#' && cp[1]
-                       && (dp = strchr(hexdd, cp[1])) != 0)) {
-            if (*cp == '\\')
-                cp += 2; /* move past backslash and 'X' */
-            else if (*cp == '#')
-                cp += 1; /* move past '#' */
+        } else if (hexescape && (dp = strchr(hexdd, *cp)) != 0) {
             do {
                 cval = (cval * 16) + ((int) (dp - hexdd) / 2);
             } while (*++cp && (dp = strchr(hexdd, *cp)) != 0 && ++dcount < 6);
