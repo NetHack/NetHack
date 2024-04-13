@@ -667,6 +667,13 @@ init_sound_disp_gamewindows(void)
         SoundAchievement(0, sa2_newgame_nosplash, 0);
     }
 
+#ifdef CHANGE_COLOR
+    /* init_nhwindows() has already been called, so before
+       creating the windows, check to see if there are any
+       palette entries to alter */
+    change_palette();
+#endif
+
     WIN_MESSAGE = create_nhwindow(NHW_MESSAGE);
     if (VIA_WINDOWPORT()) {
         status_initialize(0);

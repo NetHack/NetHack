@@ -550,5 +550,19 @@ stdio_nhgetch(void)
     return getchar();
 }
 
+#ifdef CHANGE_COLOR
+void
+safe_change_color(int color UNUSED, long rgb UNUSED, int reverse UNUSED)
+{
+}
+
+char *
+safe_get_color_string(void)
+{
+    return ("");
+}
+
+
+#endif
 
 /* safeprocs.c */

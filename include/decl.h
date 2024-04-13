@@ -157,6 +157,11 @@ struct instance_globals_a {
     short *animal_list; /* list of PM values for animal monsters */
     int animal_list_count;
 
+#ifdef CHANGE_COLOR
+    /* options.c */
+    uint32 altpalette[CLR_MAX];
+#endif
+
     /* pickup.c */
     int A_first_hint; /* menustyle:Full plus 'A' response + !paranoid:A */
     int A_second_hint; /* menustyle:Full plus 'A' response + paranoid:A */
@@ -759,6 +764,7 @@ struct instance_globals_o {
     boolean opt_need_promptstyle;
     boolean opt_reset_customcolors;
     boolean opt_reset_customsymbols;
+    boolean opt_update_basic_palette;
 
     /* pickup.c */
     int oldcap; /* last encumbrance */

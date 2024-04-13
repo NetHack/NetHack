@@ -790,7 +790,7 @@ hup_cliparound(int x UNUSED, int y UNUSED)
 #ifdef CHANGE_COLOR
 /*ARGSUSED*/
 staticfn void
-hup_change_color(int color, int reverse, long rgb)
+hup_change_color(int color, long rgb, int reverse)
 {
     return;
 }

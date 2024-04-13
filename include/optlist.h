@@ -534,14 +534,14 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 No, Yes, No, No, NoAlias,
                 "the inventory order of the items in your pack")
 #ifdef CHANGE_COLOR
-#ifndef WIN32
+#ifndef MAC     /* not old Mac OS9 */
+    NHOPTC(palette, Advanced, 15, opt_in, set_gameview,
+                No, Yes, No, No, "hicolor",
+                "palette (adjust an RGB color in palette (color/R-G-B)")
+#else
     NHOPTC(palette, Advanced, 15, opt_in, set_in_game,
                 No, Yes, No, No, "hicolor",
                 "palette (00c/880/-fff is blue/yellow/reverse white)")
-#else
-    NHOPTC(palette, Advanced, 15, opt_in, set_in_config,
-                No, Yes, No, No, "hicolor",
-                "palette (adjust an RGB color in palette (color-R-G-B)")
 #endif
 #endif
     /* prior to paranoid_confirmation, 'prayconfirm' was a distinct option */
