@@ -8511,7 +8511,9 @@ doset_simple(void)
         if (go.opt_need_promptstyle)
             adjust_menu_promptstyle(WIN_INVEN, &iflags.menu_headings);
         if (go.opt_update_basic_palette) {
-            change_palette();
+#ifdef CHANGE_COLOR
+	    change_palette();
+#endif
             go.opt_update_basic_palette = FALSE;
         }
         if (go.opt_reset_customcolors || go.opt_reset_customsymbols) {
@@ -8772,7 +8774,9 @@ doset(void) /* changing options via menu by Per Liboriussen */
     if (go.opt_reset_customcolors || go.opt_update_basic_palette
         || go.opt_reset_customsymbols || go.opt_need_redraw) {
         if (go.opt_update_basic_palette) {
+#ifdef CHANGE_COLOR
             change_palette();
+#endif
             go.opt_update_basic_palette = FALSE;
         }
         if (go.opt_reset_customcolors)
