@@ -838,7 +838,7 @@ $(O)winres.o: $(TILEBMP16) $(MSWIN)/NetHackW.rc $(MSWIN)/mnsel.bmp \
 	$(rc) -o$@ --include-dir $(MSWIN) -i $(MSWIN)/NetHackW.rc
 
 $(O)conres.o: $(MSWSYS)/console.rc $(MSWSYS)/NetHack.ico 
-	$(rc) -o$@ --include-dir $(MSWSYS) -i $(MSWSYS)/console.rc
+	$(rc) -o$@ --include-dir $(MSWSYS) --target=pe-i386 -i $(MSWSYS)/console.rc
 
 #==========================================
 #  The game targets.
