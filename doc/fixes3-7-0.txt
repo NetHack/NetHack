@@ -1399,6 +1399,7 @@ gold thrown or kicked at a sleeping monster with the 'greedy' attribute gets
 	neglected to report that target monster was awakened in the process
 hero movement affects the water bubble movement direction
 pets and peacefuls avoid a location hero just kicked
+shopkeepers bill you for using their bear trap or land mine
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

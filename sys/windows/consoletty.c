@@ -2000,21 +2000,6 @@ tty_ibmgraphics_fixup(void)
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
 }
 
-#ifdef CHANGE_COLOR
-#ifdef NO_TERMS
-void
-tty_change_color(int color UNUSED, long rgb UNUSED, int reverse UNUSED)
-{
-}
-
-char *
-tty_get_color_string(void)
-{
-    return ("");
-}
-#endif
-#endif /* CHANGE_COLOR */
-
 #ifdef PORT_DEBUG
 void
 win32con_debug_keystrokes(void)

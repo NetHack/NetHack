@@ -219,6 +219,10 @@ static struct nethack_color colortable[] = {
   { rgb_color, 154, 138, "white",                   "#FFFFFF", 255, 255, 255 },
 };
 
+#ifdef CHANGE_COLOR
+staticfn int32 alt_color_spec(const char *cp);
+#endif
+
 int32
 colortable_to_int32(struct nethack_color *cte)
 {
@@ -1068,6 +1072,9 @@ alternative_palette(char *op)
 
     if (c_colorval && coloridx >= 0 && coloridx < CLR_MAX) {
         rgb = rgbstr_to_int32(c_colorval);
+        if (rgb == -1) {
+            rgb = alt_color_spec(c_colorval);
+        }
         if (rgb != -1) {
             ga.altpalette[coloridx] = (uint32) rgb | NH_ALTPALETTE;
             /* use COLORVAL(ga.altpalette[coloridx]) to get
@@ -1085,10 +1092,67 @@ change_palette(void)
 
     for (clridx = 0; clridx < CLR_MAX; ++clridx) {
         if (ga.altpalette[clridx] != 0) {
-            long rgb = (long) (ga.altpalette[clridx] & ~NH_ALTPALETTE);
+            long rgb = (long) COLORVAL(ga.altpalette[clridx]);
             (*windowprocs.win_change_color)(clridx, rgb, 0);
         }
     }
+}
+
+staticfn int32
+alt_color_spec(const char *str)
+{
+    static NEARDATA const char oct[] = "01234567", dec[] = "0123456789";
+    /* hexdd[] is defined in decl.c */
+
+    const char *dp, *cp = str;
+    int32 cval = -1;
+    int dcount, dlimit = 6;
+    boolean hexescape = FALSE, octescape = FALSE;
+
+    dcount = 0; /* for decimal, octal, hexadecimal cases */
+    hexescape =
+        (*cp == '\\' && cp[1] && (cp[1] == 'x' || cp[1] == 'X') && cp[2]);
+    if (!hexescape) {
+        octescape =
+            (*cp == '\\' && cp[1] && (cp[1] == 'o' || cp[1] == 'O') && cp[2]);
+    }
+
+    if (hexescape || octescape) {
+        cval = 0;
+        cp += 2;
+        if (octescape)
+            dlimit = 8;
+    } else if (*cp == '#' && cp[1]) {
+        hexescape = TRUE;
+        cval = 0;
+        cp += 1;
+    } else if (cp[1]) {
+        cval = 0;
+        dlimit = 8;
+    } else if (!cp[1]) {
+        if (strchr(dec, *cp) != 0) {
+            /* simple val, or nothing left for \ to escape */
+            cval = (*cp - '0');
+        }
+        dlimit = 1;
+        cp++;
+    }
+
+    while (*cp) {
+        if (!hexescape && !octescape && strchr(dec, *cp)) {
+            cval = (cval * 10) + (*cp - '0');
+        } else if (octescape && strchr(oct, *cp)) {
+            cval = (cval * 8) + (*cp - '0');
+        } else if (hexescape && (dp = strchr(hexdd, *cp)) != 0) {
+            cval = (cval * 16) + ((int) (dp - hexdd) / 2);
+        }
+        ++cp;
+        if (++dcount > dlimit) {
+            cval = -1;
+            break;
+        }
+    }
+    return cval;
 }
 #endif /* CHANGE_COLOR */
 

@@ -5523,4 +5523,21 @@ globby_bill_fixup(struct obj *obj_absorber, struct obj *obj_absorbed)
     return;
 }
 
+/* Shopkeeper bills for use of a land mine or bear trap they own */
+void
+use_unpaid_trapobj(struct obj *otmp, coordxy x, coordxy y)
+{
+    if (otmp->unpaid) {
+        if (!Deaf) {
+            struct monst *shkp = find_objowner(otmp, x, y);
+
+            if (shkp && !muteshk(shkp)) {
+                SetVoice(shkp, 0, 80, 0);
+                verbalize("You set it, you buy it!");
+            }
+        }
+        bill_dummy_object(otmp);
+    }
+}
+
 /*shk.c*/
