@@ -300,7 +300,7 @@ enum player_selector_control {
     psc_control_count
 };
 
-static const s_psc_id[psc_control_count] = {
+static const int s_psc_id[psc_control_count] = {
     IDC_PLSEL_NAME_GROUP,
     IDC_PLSEL_ROLE_GROUP,
     IDC_PLSEL_RACE_GROUP,
