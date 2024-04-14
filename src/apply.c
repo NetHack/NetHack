@@ -4076,6 +4076,9 @@ apply_ok(struct obj *obj)
         || obj->otyp == LUMP_OF_ROYAL_JELLY)
         return GETOBJ_SUGGEST;
 
+    if (obj->otyp == BANANA && Hallucination)
+        return GETOBJ_DOWNPLAY;
+
     if (is_graystone(obj)) {
         /* The only case where we don't suggest a gray stone is if we KNOW it
            isn't a touchstone. */
@@ -4284,6 +4287,12 @@ doapply(void)
     case TOUCHSTONE:
         res = use_stone(obj);
         break;
+    case BANANA:
+        if (Hallucination) {
+            pline("It rings! ... But no-one answers.");
+            break;
+        }
+        /*FALLTHRU*/
     default:
         /* Pole-weapons can strike at a distance */
         if (is_pole(obj)) {
