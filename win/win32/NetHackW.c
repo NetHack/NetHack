@@ -15,6 +15,10 @@
 #include "mhmain.h"
 #include "mhmap.h"
 
+#if defined(__GNUC__)
+extern int mingw_main(int argc, char *argv[]);
+#endif
+
 #if !defined(SAFEPROCS)
 #error You must #define SAFEPROCS to build winhack.c
 #endif
@@ -237,7 +241,11 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     }
     GUILaunched = 1;
     /* let main do the argument processing */
+#if defined(__GNUC__)
+    (void) mingw_main(argc, argv);
+#else
     (void) main(argc, argv);
+#endif
     return 0;
 }
 
