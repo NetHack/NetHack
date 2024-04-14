@@ -1615,7 +1615,7 @@ unpaid shop-owned glob that shrank to nothing had weight 0 which triggered
 	onbill warnings when 'sanity_check' was On; for 'Ix' and itemized
 	billing, the empty weight was shown to player if 'wizweight' was On
 if 'showrace' was On and invisible hero couldn't see invisible so didn't see
-	self, the color of wherever could be seen underneath changed to white
+	self, the color of whatever could be seen underneath changed to white
 in wizard mode, a poly'd priest/priestess attempting to polymorph into priest
 	or priestess in order to rehumanize became a new man or woman instead
 	because "priest" matched "aligned cleric" rather than the role monster
@@ -2541,7 +2541,7 @@ the '*' command (list inventory items in use) now shows items in a specific
 	order: amulet, ring on main hand (potentially affected by cursed
 	one-handed weapon), ring on off hand, blindfold, wielded weapon,
 	secondary or alternate weapon, quiver, suit, cloak, shield, helmet,
-	gloves, boots, shirt, lit lamps and candles, leashes attached to pets
+	gloves, boots, shirt, lit lamps and candles, leashes attached to pets,
 	instead of by object class (sortpack) or inventory letter (!sortpack);
 	new perm_invent+perminv_mode==inuse does the same
 allow the ')', '[', '(', '=', '"', and '*' commands to be preceded by the 'm'
