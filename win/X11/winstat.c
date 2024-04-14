@@ -1305,7 +1305,7 @@ struct X_status_value {
 
 /* valid type values */
 #define SV_VALUE 0 /* displays a label:value pair */
-#define SV_LABEL 1 /* displays a changable label */
+#define SV_LABEL 1 /* displays a changeable label */
 #define SV_NAME  2 /* displays an unchangeable name */
 
 /* for overloaded conditions */
@@ -1377,7 +1377,7 @@ static struct X_status_value shown_stats[NUM_STATS] = {
     { "Alignment",    SV_VALUE, W0,  -2L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
     /* 18, optionally displayed */
     { "Time",         SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
-    /* 19, condtionally present, optionally displayed when present */
+    /* 19, conditionally present, optionally displayed when present */
     { "Score",        SV_VALUE, W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
     /* F_HUNGER: 20 (blank if 'normal') */
     { "",             SV_NAME,  W0,  -1L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
@@ -1754,7 +1754,7 @@ skip_cond_val(struct X_status_value *sv)
     if (sv->set) {
         /* if condition was highlighted and the alternate value has
            also requested to be highlighted, it used its own copy of
-           'set' but the same widget so the highlighing got toggled
+           'set' but the same widget so the highlighting got toggled
            off; this will turn in back on in that exceptional case */
         hilight_label(sv->w);
         sv->set = FALSE;
@@ -1875,7 +1875,7 @@ update_fancy_status_field(int i, int color, int attributes)
             break;
         /*
          * Label stats.  With the exceptions of hunger and encumbrance
-         * these are either on or off.  Pleae leave the ternary operators
+         * these are either on or off.  Please leave the ternary operators
          * the way they are.  I want to specify 0 or 1, not a boolean.
          */
         case F_HUNGER:

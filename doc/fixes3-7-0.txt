@@ -176,12 +176,12 @@ prevent searching or waiting next to a hostile monster if boolean option
 	safe_wait is on - override with 'm'
 prevent searching or waiting if hero is slimed, stoning, strangled,
 	or deadly ill if safe_wait is on - override with 'm'
-allow random mimics to show up mimicing more furniture than just stairs
+allow random mimics to show up mimicking more furniture than just stairs
 scatter exploding bag of holding contents instead of outright deleting them
 male hero poly'd into nymph chooses charm vs seduce message based on being
 	male rather than on all nymphs being female but charm message was
 	using hardcoded pronouns She,her for target monster--wrong for male
-	target and noticable if "<mon> finishes taking off his suit" is given
+	target and noticeable if "<mon> finishes taking off his suit" is given
 hostile monsters with a ranged attack try to stay away from melee range
 allow displacing peaceful creatures
 unicorn horns don't restore attribute loss anymore
@@ -330,7 +330,7 @@ attacking non-adjacent concealed mimic by applying a polearm would make the
 hero could break a wand ("raising the wand high over your head, you break it
 	in two") even if hands were welded to a two-handed weapon or to a
 	one-handed weapon and also to a shield
-if a monster threw a cocktrice egg at the hero but hit and petrified another
+if a monster threw a cockatrice egg at the hero but hit and petrified another
 	monster, the hero would get credit/blame for killing it
 since ki-rin look quite a bit like unicorns, make them be more like one:
 	allow them to use their own horn to cure themselves; remove M1_ANIMAL,
@@ -364,7 +364,7 @@ allow monsters to use wand of undead turning to revive corpses on floor
 	in some situations
 selling a container to a shop for gold leaves any contents that the shop
 	doesn't ordinarily buy and sell owned by the hero, but selling the
-	container for credit resulted in the shop taking poesession of such
+	container for credit resulted in the shop taking possession of such
 	contents without giving any additional credit; mark out of place
 	contents 'no_charge' so that hero can reclaim them without buying
 add some new demonic and angelic maledictions
@@ -633,7 +633,7 @@ gas clouds are a little random in how they spread out from a point
 Izchak occasionally stocks wands/scrolls/spellbooks of light
 data tracking for #overview was mis-using u.urooms[] and after being in a
 	situation where hero was in multiple rooms at once, visiting other
-	levels might flag unvisisted rooms as having been visited
+	levels might flag unvisited rooms as having been visited
 special damage attacks by the Riders and by fatal-illness inflictors such as
 	Demogorgon did no damage against other monsters, only against the hero
 using obj->o_id to control 'random' behavior of a helm of opposite alignment
@@ -844,7 +844,7 @@ clear obj->bypass for buried objects [a giant on ice triggers a fire trap,
 	that there are buried objects which are 'flagged bypass']
 give Sunsword as starting gear only to lawful Angels; since Demonbane has
 	become a mace and Angels only get swords, they won't start with it
-for #knownclass with menustyle=Tradtional, allow player to ask for `a even if
+for #knownclass with menustyle=Traditional, allow player to ask for `a even if
 	no artifacts have been discovered yet, same as `<any-object-class>;
 	likewise for `u to ask to see unique items
 reduce eucalyptus leaf nutrition to 1
@@ -973,7 +973,7 @@ similarly, if #wizfliplevel was used to transpose an active level while a
 blessed potion of polymorph will prompt user for monster to poly into
 out of array bounds access attempt occurred when deciding whether to bounce
 	if wand or spell zap reached edge of map
-if blind hero was challanged by a vault guard, it wasn't possible to see how
+if blind hero was challenged by a vault guard, it wasn't possible to see how
 	to start following that guard out of the vault
 make taming via magic harp be consistent with scroll of taming and charm
 	spell:  an angry shopkeeper becomes pacified (but never tamed)
@@ -1000,10 +1000,10 @@ when invisible without see invisible you could see your hands glowing red
 greased saddle makes it impossible to mount the steed
 if an item-using monster zaps a wand of digging downward on a level that
 	doesn't allow holes but does allow pits, create a pit and trigger it
-no longer override the effect of a new moon by simply carring a lizard corpse
+no longer override the effect of a new moon by simply carrying a lizard corpse
 make explosions burn monster's armor just like they do hero's armor
 make healing and extra healing better by upping the average amount healed
-lifesaving healing amount depends on the consitution
+lifesaving healing amount depends on the constitution
 hitting a monster with a wielded potion hits you far less
 pyrolisks get a mundane bite attack
 chances of random item being an artifact depends on already existing artifacts
@@ -1019,10 +1019,10 @@ trappers and lurkers above enfold themselves around and crush their victims,
 	not swallow and digest
 attempting to move up or down when poly'd into a holder and holding a monster
 	rejected the move; release the monster instead
-thowing a non-weapon while engulfed by an ochre jelly reported that the item
+throwing a non-weapon while engulfed by an ochre jelly reported that the item
 	vanished into the jelly's "currents"
 if a pet gelatinous cube eats a container, treat it the same as when a hostile
-	one does:  the container is destroyed but its conters are engulfed
+	one does:  the container is destroyed but its contents are engulfed
 when breaking a wand of sleep hits the hero with the explosion, don't describe
 	that as "the sleep ray hits you"
 expose fuzz tester to wizard-mode as #debugfuzzer extended command
@@ -1074,7 +1074,7 @@ phrasing of the "you can't" message when attempting to name any monster
 	<space> to remove the existing name without assigning a new one
 some instances of using up or stealing shop-owned boulder didn't charge for it
 when hero hears an unseen monster reading a scroll, only describe the monster
-	acccurately if hero is not hallucinating and monster is same species
+	accurately if hero is not hallucinating and monster is same species
 	as hero's current form
 don't allow monsters to disarm hero with bullwhip if hero is engulfed
 teleporting an object out of a shop put it on the shop bill instead of dealing
@@ -1119,7 +1119,7 @@ giants occasionally get a battle axe or a two-handed sword
 give gremlin the property it stole, if possible
 'F'orcefighting with a war hammer has a small chance of breaking iron bars
 player assigned name for monsters, specific objects, or object types could be
-	longer than what was intented to be allowed; for 'curses', much longer
+	longer than what was intended to be allowed; for 'curses', much longer
 very rarely random items are generated eroded, erodeproof, or greased
 Nazgul can see invisible
 fix a case where punished iron ball yanked hero on top of a monster
@@ -1213,8 +1213,8 @@ hero might hear unseen monster read scroll of create monster or scroll of
 wizard mode wish for terrain while on a fountain|sink spot made the counter
 	for number of fountains|sinks become one too big; would affect level
 	sound messages if all fountains|sinks were eventually destroyed
-add a level arrival region to the Gnone King's Wine Cellar variation of the
-	Mines' End level so that hero can't end up in the treature chamber
+add a level arrival region to the Gnome King's Wine Cellar variation of the
+	Mines' End level so that hero can't end up in the treasure chamber
 make potion of water become discovered if dipping a carried container into an
 	uncursed one reports that water gets inside or slides right off
 a monster which was temporarily asleep wouldn't be affected by taming (either
@@ -1345,7 +1345,7 @@ if polymorphing a potion turned it into oil, dipping potions produced oil
 	randomly, or a horn of plenty produced a magic potion and converted
 	it into oil, the resulting potion of oil had its age (amount left)
 	set of the original potion's age (turn it was created) and could burn
-	for an arbitrarily long time if applied; conversely, polymophing oil
+	for an arbitrarily long time if applied; conversely, polymorphing oil
 	into non-oil kept its relative age (no noticeable effect though)
 an engulfer capable of passing through iron bars could do so even when hero
 	was engulfed
@@ -1405,7 +1405,7 @@ shopkeepers bill you for using their bear trap or land mine
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
 ------------------------------------------------------------
 incrementing EDITLEVEL to invalidate incompatible save files was not working
-	as intended because VERSION_COMPABILITY was defined as 3.7.0-0 and up
+	as intended because VERSION_COMPATIBILITY was defined as 3.7.0-0 and up
 	rather than as 3.7.0-N for the current EDITLEVEL 'N'; undefine it
 fix compile when DLB isn't defined
 urealtime.realtime was being incorrectly calculated
@@ -1426,10 +1426,10 @@ if running and Blind or Stunned or Fumbling or Dex < 10, encountering a closed
 	repeatedly until eventually interrupted by approaching monster or
 	hunger or ^C
 data.base lookup of an entry with any blank lines would falsely claim that
-	"'data' file in wrong fromat or corrupted" after some extra checks
+	"'data' file in wrong format or corrupted" after some extra checks
 	were added while investigating tab handling anomalies
 using nhl_error() to report a Lua processing problem would clobber the stack
-level teleporation's "You materialize on a different level!" could be given
+level teleportation's "You materialize on a different level!" could be given
 	out of sequence with other arrival messages
 more sequencing: if wielding Sting or similar and level teleporting to a
 	level with different warning effect, the start-glowing or stop-glowing
@@ -1500,7 +1500,7 @@ the checks and handling for fountains, sinks, and drawbridges were being
 	missed during liquid_flow
 monster movement flags unification allowed displacer beasts to displace Riders
 a long worm with no visible segments (but one internal segment) might trigger
-	warning: tail 'segement' at <0,some_y>, worm at <mx,my> if teleported
+	warning: tail 'segment' at <0,some_y>, worm at <mx,my> if teleported
 adding displacer beast inadvertently introduced a regression in swapping with
 	pets, allowing them to be pulled into water by hero on/over water
 splitting #if MAIL into #if MAIL_STRUCTURES and #if MAIL made it possible to
@@ -1603,7 +1603,7 @@ an item thrown or dropped while swallowed was treated as being picked up by an
 	unseen monster so object fields {known, dknown, bknown} got cleared
 segfault if gremlin fled weaponless hero wearing gold dragon scales/mail
 'disambiguate WHACK' patch affected field layout of objects[] but EDITLEVEL
-	wasn't incremented, allowing incompatable save files to be restored
+	wasn't incremented, allowing incompatible save files to be restored
 restore the boulder exception for piletops that had been unintentionally
 	removed during the expanded-glyphs changes
 misaligned potion colors due to lack of reset_glyphmap() following obj shuffle;
@@ -1615,14 +1615,14 @@ unpaid shop-owned glob that shrank to nothing had weight 0 which triggered
 	onbill warnings when 'sanity_check' was On; for 'Ix' and itemized
 	billing, the empty weight was shown to player if 'wizweight' was On
 if 'showrace' was On and invisible hero couldn't see invisible so didn't see
-	self, the color of wharever could be seen underneath changed to white
+	self, the color of wherever could be seen underneath changed to white
 in wizard mode, a poly'd priest/priestess attempting to polymorph into priest
 	or priestess in order to rehumanize became a new man or woman instead
 	because "priest" matched "aligned cleric" rather than the role monster
 if a glob which has just shrunk away to nothing was wielded or quivered,
 	unwield it before destroying it
 after changes to gender tracking for corpses and statues, when a unique
-	monster got turned into a statue if was erroneouly flagged as female
+	monster got turned into a statue if was erroneously flagged as female
 	rather than 'historic'
 changing engraving to an occupation resulted in not dulling a weapon used to
 	engrave a single character
@@ -1634,7 +1634,7 @@ turning movement into commands broke the rest_on_space option; it also
 cursed scroll of light had special message when wielding Sunsword that didn't
 	work for wearing gold dragon scales/mail
 giving a prefix keystroke other than 'm' prior to a command that doesn't use
-	prefixes was siliently ignored instead of being rejected
+	prefixes was silently ignored instead of being rejected
 prior revision broke all prefix usage
 movement command revamp broke 'm>' and 'm<' on stairs to avoid auto-pickup at
 	the destination
@@ -1653,8 +1653,8 @@ rearranging the feedback for first-kill and first-hit introduced a bug by
 	other non-weapon hits for as long as never-hit conduct stayed unbroken
 counting "just picked up" items when deciding what pseudo-classes should be
 	included for the 'I' command's object class prompt was operating on
-	an uninitialized varaible
-changes to stair internals resulted in summoned Kops blockcading the stairs up
+	an uninitialized variable
+changes to stair internals resulted in summoned Kops blockading the stairs up
 	rather than intended stairs down
 dumplog's list of "major events" showed all logged events, not just major ones
 pickup via menu ignored player-specified count when picking up gold
@@ -1685,7 +1685,7 @@ one-shot food testing ability conferred by blessed scroll of food detection
 worn ring of slow digestion blocks per-turn hunger but not the hunger caused
 	by wearing it; white dragon scales/mail was blocking per-turn hunger
 	and didn't cause any hunger itself; change to treat it like the ring
-if the progarm was built with EXTRA_SANITY_CHECKS enabled, changing levels
+if the program was built with EXTRA_SANITY_CHECKS enabled, changing levels
 	while riding would give impossible warning "no monster to remove"
 the change to protect Rider corpses from being destroyed by exploding chests
 	inadvertently prevented them from being used up when Riders revived
@@ -1788,7 +1788,7 @@ anti-magic field's reduction of hero's maximum energy could result in current
 if hero was killed by a wand zapped by a monster, cause of death was reported
 	as "killed by a bolt of <damage type> imagined by <monster>"
 throttle the difficulty of the monsters in theme room "buried zombies"
-buried troll whose auto-revive timer expired might triger panic with
+buried troll whose auto-revive timer expired might trigger panic with
         "revive default case 6"
 throwing a helm of brilliance could yield "breaking odd object?"
 sanity checking of engravings was stopping after first problem found
@@ -1821,7 +1821,7 @@ special level loader didn't check for bad coordinates supplied by <level>.lua
 hero might not be credited with "entered Mine Town" achievement for the town
 	variations which treat the whole level as the town if that level gets
 	entered via falling or level teleport
-in the theme room "water-surrounded vault", guarantee an item which can be
+in the theme room "water-surrounded vault", guarantee an item which can
 	be used to escape from the room in one of the four chests
 pets capable of using items would pick up and wear cursed armor
 if something breakable was set up as alternate weapon and the second of two
@@ -2185,7 +2185,7 @@ Qt: force the 'toptenwin' option On so that high scores display at end of game
 Qt: during role/race/&c selection, update role titles with their icons, and
 	also Valk eligibility, when gender is toggled
 Qt: if a menu of objects contains at least one iron ball, and player is not
-	alreadly in the midst of entering a count, recognize '0' as a group
+	already in the midst of entering a count, recognize '0' as a group
 	accelerator rather than the start of a count
 Qt: {maybe just Qt+macOS:} when viewing a text window ('V' to look at 'history'
 	for instance), clicking on [Search], entering a search target in the
@@ -2513,7 +2513,7 @@ preceding #overview with the 'm' prefix brings up the overview display as a
 include monster size in feedback for wand of probing and stethoscope
 crystal armor is now subject to cracking damage rather than outright breakage
 when a doppelganger takes on mplayer (fake hero) form, usually choose role
-	from the high scores file; name too if visable at the time
+	from the high scores file; name too if visible at the time
 can now write unknown spellbook without need of Luck when spell is known;
 	if spell becomes known without having read its book (potential divine
 	gift), writing the book while the spell is still fresh will succeed
@@ -2786,7 +2786,7 @@ options overhaul: moved the option definitions into include/optlist.h;
 	for retrieving the option value, and for processing the option
 	following its selection in the 'O' menu, added doc/options.txt file.
 function reglyph_darkroom() relocated from options.c to display.c
-resurrect 'makedefs -m' to be able to derive default mons[].diffculty values
+resurrect 'makedefs -m' to be able to derive default mons[].difficulty values
 	suitable for assigning to new or changed monsters
 convert obj->oextra->omid from pointer to scalar
 get rid of unused obj->oextra->olong

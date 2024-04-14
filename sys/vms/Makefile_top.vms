@@ -98,7 +98,7 @@ DIRPERM  = 0755
 # per discussion in Install.X11 and Install.Qt
 # Qt prefers nhtiles.bmp but can use x11tiles, and it ignores NetHack.ad.
 # X11 uses those last two.
-# Both can display a convential text map instead of tiles.
+# Both can display a conventional text map instead of tiles.
 #	tty and/or curses (no extra data files outside of the dlb container):
 #VARDATND =
 #	All X11 and/or Qt variations may also include tty or curses or both):

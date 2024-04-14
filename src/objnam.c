@@ -367,7 +367,7 @@ distant_name(
       html-dump (not implemented in nethack) to prevent object-on-map
       tooltips from including that extra text; also guards against a
       potential change to minimal_xname() [indirectly used by attribute
-      disclosure] that propogates o_id rather than leave it 0, and
+      disclosure] that propagates o_id rather than leave it 0, and
       against a potential extra chance to browse the map with getpos()
       during final disclosure (not currently implemented, nor planned) */
     save_oid = obj->o_id;

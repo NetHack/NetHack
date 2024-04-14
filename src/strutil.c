@@ -53,7 +53,7 @@ strbuf_empty(strbuf_t *strbuf)
     strbuf_init(strbuf);
 }
 
-/* strbuf_nl_to_crlf() converts all occurences of \n to \r\n */
+/* strbuf_nl_to_crlf() converts all occurrences of \n to \r\n */
 void
 strbuf_nl_to_crlf(strbuf_t *strbuf)
 {
