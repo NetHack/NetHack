@@ -1235,7 +1235,7 @@ cpostfx(int pm)
         if (!Displaced) /* give a message (before setting the timeout) */
             toggle_displacement((struct obj *) 0, 0L, TRUE);
         if (pm == PM_SHIMMERING_DRAGON)
-            incr_itimeout(&HDisplaced, rn1(300, 300))
+            incr_itimeout(&HDisplaced, rn1(300, 300));
         else
             incr_itimeout(&HDisplaced, d(6, 6));
         break;
