@@ -134,7 +134,7 @@ TARGET_CPU=x86
 #
 #==============================================================================
 
-SKIP_NETHACKW=Y
+#SKIP_NETHACKW=Y
 
 #==============================================================================
 
@@ -513,12 +513,13 @@ cdebug =
 linkdebug =
 endif
 
+RESTARGET = --target=pe-i386
 CFLAGSBASE  = -c $(cflags) $(WINPINC) $(cdebug) $(CURSESDEF)
 #LFLAGSBASEC = $(linkdebug)
 #LFLAGSBASEG = $(linkdebug) -mwindows
 baselibs = -lwinmm -lshell32 -lole32 -luuid
 conlibs = -lgdi32 $(baselibs) $(BCRYPT)
-guilibs = -lcomctl32 $(baselibs)
+guilibs = -lgdi32 -lcomctl32 -lcomdlg32 -lole32 -lshell32 -luuid -lwinmm -lshcore $(baselibs) $(BCRYPT)
 ifeq "$(WANT_WIN_QT4)" "Y"
     # Might be either Qt 4 or Qt 5
     ifeq "$(HAVE_QT5)" "Y"
@@ -722,7 +723,7 @@ $(QT4)/%.moc : $(QT4)/%.h
 ifeq "$(SKIP_NETHACKW)" "Y"
 NETHACKW_EXE =
 else
-NETHACKW_EXE = $(GAMEDIR)/NetHack.exe
+NETHACKW_EXE = $(GAMEDIR)/NetHackW.exe
 endif
 
 SHELL=CMD.EXE
@@ -835,10 +836,10 @@ $(O)winres.o: $(TILEBMP16) $(MSWIN)/NetHackW.rc $(MSWIN)/mnsel.bmp \
 	 $(MSWIN)/mnselcnt.bmp $(MSWIN)/mnunsel.bmp \
 	 $(MSWIN)/petmark.bmp $(MSWIN)/pilemark.bmp $(MSWIN)/NetHack.ico $(MSWIN)/rip.bmp \
 	 $(MSWIN)/splash.bmp
-	$(rc) -o$@ --include-dir $(MSWIN) -i $(MSWIN)/NetHackW.rc
+	$(rc) -o$@ --include-dir $(MSWIN) $(RESTARGET) -i $(MSWIN)/NetHackW.rc
 
 $(O)conres.o: $(MSWSYS)/console.rc $(MSWSYS)/NetHack.ico 
-	$(rc) -o$@ --include-dir $(MSWSYS) --target=pe-i386 -i $(MSWSYS)/console.rc
+	$(rc) -o$@ --include-dir $(MSWSYS) $(RESTARGET) -i $(MSWSYS)/console.rc
 
 #==========================================
 #  The game targets.

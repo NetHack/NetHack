@@ -2,7 +2,6 @@
 /* Copyright (C) 2018 by Bart House 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifdef _MSC_VER
 #include "win10.h"
 #include <process.h>
 #include <VersionHelpers.h>
@@ -119,6 +118,3 @@ win10_is_desktop_bridge_application()
 
     return FALSE;
 }
-
-
-#endif /* _MSC_VER */
