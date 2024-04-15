@@ -34,7 +34,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // remains consistent on all systems.
 IDI_NETHACKW            ICON                    "NETHACK.ICO"
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
@@ -455,6 +454,16 @@ sound_Wooden_Harp_G WAVE "sound_Wooden_Harp_G.wav"
 sa2_xpleveldown WAVE "sa2_xpleveldown.wav"
 sa2_xplevelup WAVE "sa2_xplevelup.wav"
 #endif
+
+#ifndef ID_MANIFEST
+#define ID_MANIFEST 1
+#endif
+#ifndef RT_MANIFEST
+#define RT_MANIFEST MAKEINTRESOURCE(24)
+#endif
+
+ID_MANIFEST RT_MANIFEST "NetHackW.exe.manifest"
+
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 

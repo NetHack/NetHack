@@ -1124,20 +1124,18 @@ cpptmpflags = $(ctmpflags)
 # declarations for use on Intel x86 systems
 !IF "$(TARGET_CPU)" == "x86"
 DLLENTRY = @12
-EXEVER=5.01
 MACHINE=/MACHINE:X86
 !ENDIF
 
 # declarations for use on AMD64 systems
 !IF "$(TARGET_CPU)" == "x64"
 DLLENTRY =
-EXEVER=5.02
 MACHINE=/MACHINE:X64
 !ENDIF
 
 # for Windows applications
-conlflags = $(lflags) -subsystem:console,$(EXEVER)
-guilflags = $(lflags) -subsystem:windows,$(EXEVER)
+conlflags = $(lflags) -subsystem:console
+guilflags = $(lflags) -subsystem:windows
 
 # basic subsystem specific libraries, less the C Run-Time
 baselibs    = kernel32.lib $(optlibs) $(winsocklibs) advapi32.lib gdi32.lib \
@@ -1476,7 +1474,8 @@ $(GAMEDIR)\NetHackW.exe : gamedir.tag $(OGUI)tile.o \
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo   Linking $(@:\=/)
 	$(link) $(LFLAGS) $(guilflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB \
-		/MAP:$(OGUI)$(@B).MAP $(LIBS) $(PDCWINGUILIB) $(LUALIB) \
+		/MAP:$(OGUI)$(@B).MAP \
+		$(LIBS) $(PDCWINGUILIB) $(LUALIB) \
 		$(GUISOUNDLIBS) $(OGUIHACKLIB) \
 		$(guilibs) $(COMCTRL) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJGUI)
@@ -1557,7 +1556,7 @@ tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
 $(OGUI)NetHackW.res: $(SRC)\tiles.bmp $(MSWIN)\NetHackW.rc $(MSWIN)\NetHack.ico \
 	$(MSWIN)\mnsel.bmp $(MSWIN)\mnselcnt.bmp $(MSWIN)\mnunsel.bmp \
 	$(MSWIN)\petmark.bmp $(MSWIN)\pilemark.bmp $(MSWIN)\NetHack.ico \
-	$(MSWIN)\rip.bmp $(MSWIN)\splash.bmp $(WAV)
+	$(MSWIN)\rip.bmp $(MSWIN)\splash.bmp $(MSWIN)\NetHackW.exe.manifest $(WAV)
 	@echo Building resource file $@ from $**
 	$(rc) -nologo -r -fo$@ -i$(MSWIN) -i$(SndWavDir) -dNDEBUG $(RCFLAGS) $(MSWIN)\NetHackW.rc
 
@@ -2326,6 +2325,7 @@ binary:  envchk.tag libdir.tag ottydir$(TARGET_CPU).tag \
 
 spotless: clean
 	if exist $(GAMEDIR)\NetHack.exe del $(GAMEDIR)\NetHack.exe
+	if exist $(GAMEDIR)\NetHackW.exe del $(GAMEDIR)NetHackW.exe
 	if exist $(GAMEDIR)\NetHack.pdb del $(GAMEDIR)\NetHack.pdb
 	if exist $(GAMEDIR)\nhdat$(NHV) del $(GAMEDIR)\nhdat$(NHV)
 	if exist $(INCL)\date.h         del $(INCL)\date.h
