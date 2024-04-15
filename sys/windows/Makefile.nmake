@@ -1558,7 +1558,7 @@ $(OGUI)NetHackW.res: $(SRC)\tiles.bmp $(MSWIN)\NetHackW.rc $(MSWIN)\NetHack.ico 
 	$(MSWIN)\petmark.bmp $(MSWIN)\pilemark.bmp $(MSWIN)\NetHack.ico \
 	$(MSWIN)\rip.bmp $(MSWIN)\splash.bmp $(MSWIN)\NetHackW.exe.manifest $(WAV)
 	@echo Building resource file $@ from $**
-	$(rc) -nologo -r -fo$@ -i$(MSWIN) -i$(SndWavDir) -dNDEBUG $(RCFLAGS) $(MSWIN)\NetHackW.rc
+	$(rc) -nologo -r -fo$@ -i$(MSWIN) -i$(SndWavDir) -dNDEBUG -dVIA_MAKE $(RCFLAGS) $(MSWIN)\NetHackW.rc
 
 $(OTTY)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico $(WAV)
 	@echo Building resource file $@ from $**

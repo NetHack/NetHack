@@ -1083,7 +1083,7 @@ $(ONHW)/%.o: $(WCURSES)/%.c $(NHLUAH) | $(ONHW)
 
 $(NHWRES): $(MSWIN)/NetHackW.rc $(MSWIN)/NetHackW.exe.manifest \
 		$(BMPS) $(WAV) $(MSWIN)/NetHack.ico | $(ONHW)
-	$(rc) --include-dir=$(MSWIN) $(RCFLAGS) --input=$< -o$@
+	$(rc) --include-dir=$(MSWIN) $(RCFLAGS) -DVIA_MAKE --input=$< -o$@
 
 $(MSWIN)/tiles.bmp: $(U)tile2bmp.exe $(TILEFILES)
 	$< $@
