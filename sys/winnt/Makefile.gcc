@@ -563,7 +563,7 @@ LFLAGSU = $(LFLAGSBASEC)
 #==========================================
 
 CFLAGS   = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG) -DSAFEPROCS
-lflags  = $(LFLAGSBASEC) $(linkdebuf)
+lflags  = $(LFLAGSBASEC) $(linkdebug)
 
 CXXFLAGS = $(CFLAGS)
 

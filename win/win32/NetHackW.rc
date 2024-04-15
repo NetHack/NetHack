@@ -377,17 +377,13 @@ BEGIN
 END
 
 #endif    // English (United States) resources
-/////////////////////////////////////////////////////////////////////////////
 
+#ifndef ID_MANIFEST
+#define ID_MANIFEST 1
+#endif
+#ifndef RT_MANIFEST
+#define RT_MANIFEST MAKEINTRESOURCE(24)
+#endif
 
-
-#ifndef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// Generated from the TEXTINCLUDE 3 resource.
-//
-
-
-/////////////////////////////////////////////////////////////////////////////
-#endif    // not APSTUDIO_INVOKED
+ID_MANIFEST RT_MANIFEST "NetHackW.exe.manifest"
 
