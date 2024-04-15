@@ -1081,7 +1081,8 @@ $(ONHW)/%.o: $(WSHR)/%.c $(NHLUAH) | $(ONHW)
 $(ONHW)/%.o: $(WCURSES)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $(PDCINCL) $< -o$@
 
-$(NHWRES): $(MSWIN)/NetHackW.rc $(BMPS) $(WAV) $(MSWIN)/NetHack.ico | $(ONHW)
+$(NHWRES): $(MSWIN)/NetHackW.exe.manifest $(MSWIN)/NetHackW.rc \
+		$(BMPS) $(WAV) $(MSWIN)/NetHack.ico | $(ONHW)
 	$(rc) --include-dir=$(MSWIN) $(RCFLAGS) --input=$< -o$@
 
 $(MSWIN)/tiles.bmp: $(U)tile2bmp.exe $(TILEFILES)
