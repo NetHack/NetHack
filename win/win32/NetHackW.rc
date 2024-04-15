@@ -462,9 +462,8 @@ sa2_xplevelup WAVE "sa2_xplevelup.wav"
 #ifndef RT_MANIFEST
 #define RT_MANIFEST MAKEINTRESOURCE(24)
 #endif
-#endif
-
 ID_MANIFEST RT_MANIFEST "NetHackW.exe.manifest"
+#endif
 
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
