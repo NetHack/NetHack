@@ -378,12 +378,12 @@ END
 
 #endif    // English (United States) resources
 
+#ifdef VIA_MAKE
 #ifndef ID_MANIFEST
 #define ID_MANIFEST 1
 #endif
 #ifndef RT_MANIFEST
 #define RT_MANIFEST MAKEINTRESOURCE(24)
 #endif
-
 ID_MANIFEST RT_MANIFEST "NetHackW.exe.manifest"
-
+#endif

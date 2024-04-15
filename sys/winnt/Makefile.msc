@@ -778,7 +778,7 @@ $(O)NetHackW.res: $(TILEBMP16) $(MSWIN)\NetHackW.rc $(MSWIN)\mnsel.bmp \
 	$(MSWIN)\mnselcnt.bmp $(MSWIN)\mnunsel.bmp \
 	$(MSWIN)\petmark.bmp $(MSWIN)\pilemark.bmp $(MSWIN)\NetHack.ico $(MSWIN)\rip.bmp \
 	$(MSWIN)\splash.bmp
-	@$(rc) -r -fo$@ -i$(MSWIN) -dNDEBUG $(MSWIN)\NetHackW.rc
+	@$(rc) -r -fo$@ -i$(MSWIN) -dNDEBUG -dVIA_MAKE $(MSWIN)\NetHackW.rc
 
 $(O)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
 	@$(rc) -r -fo$@ -i$(MSWSYS) -dNDEBUG $(MSWSYS)\console.rc

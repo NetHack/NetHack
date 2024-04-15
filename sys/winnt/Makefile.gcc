@@ -836,7 +836,7 @@ $(O)winres.o: $(TILEBMP16) $(MSWIN)/NetHackW.rc $(MSWIN)/mnsel.bmp \
 	 $(MSWIN)/mnselcnt.bmp $(MSWIN)/mnunsel.bmp \
 	 $(MSWIN)/petmark.bmp $(MSWIN)/pilemark.bmp $(MSWIN)/NetHack.ico $(MSWIN)/rip.bmp \
 	 $(MSWIN)/splash.bmp
-	$(rc) -o$@ --include-dir $(MSWIN) $(RESTARGET) -i $(MSWIN)/NetHackW.rc
+	$(rc) -o$@ --include-dir $(MSWIN) $(RESTARGET) -DVIA_MAKE -i $(MSWIN)/NetHackW.rc
 
 $(O)conres.o: $(MSWSYS)/console.rc $(MSWSYS)/NetHack.ico 
 	$(rc) -o$@ --include-dir $(MSWSYS) $(RESTARGET) -i $(MSWSYS)/console.rc
