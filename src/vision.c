@@ -521,7 +521,7 @@ vision_recalc(int control)
     int oldseenv;      /* previous seenv value */
 
     gv.vision_full_recalc = 0; /* reset flag */
-    if (gi.in_mklev || !iflags.vision_inited)
+    if (gi.in_mklev || gp.program_state.in_getlev || !iflags.vision_inited)
         return;
 
     /*

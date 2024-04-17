@@ -1950,6 +1950,7 @@ show_glyph(coordxy x, coordxy y, int glyph)
 
     if (a11y.glyph_updates && !a11y.mon_notices_blocked
         && !gp.program_state.in_docrt
+        && !gp.program_state.in_getlev
         && (oldglyph != glyph || gg.gbuf[y][x].gnew)) {
         int c = glyph_to_cmap(glyph);
         if ((glyph_is_nothing(oldglyph) || glyph_is_unexplored(oldglyph)
