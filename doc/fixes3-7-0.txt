@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1416 $ $NHDT-Date: 1712453344 2024/04/07 01:29:04 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1427 $ $NHDT-Date: 1713334798 2024/04/17 06:19:58 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1929,6 +1929,8 @@ if a tame or peaceful monster was trapped and blind hero hadn't seen the trap
 	yet, attempting to swap places would report "You stop.  <Mon> can't
 	move out of that trap." and if the 'tips' option was On, #untrap would
 	be suggested; but #untrap would fail due "you know of no traps there"
+camera flash hitting a hidden mimic mentioned it as being a mimic but didn't
+	bring it out of hiding
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

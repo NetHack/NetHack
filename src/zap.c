@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1710344449 2024/03/13 15:40:49 $  $NHDT-Branch: keni-staticfn $:$NHDT-Revision: 1.525 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1713334819 2024/04/17 06:20:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.532 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -423,7 +423,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
                 mcureblindness(mtmp, canseemon(mtmp));
             if (canseemon(mtmp)) {
                 if (disguised_mimic) {
-                    if (is_obj_mappear(mtmp,STRANGE_OBJECT)) {
+                    if (is_obj_mappear(mtmp, STRANGE_OBJECT)) {
                         /* it can do better now */
                         set_mimic_sym(mtmp);
                         newsym(mtmp->mx, mtmp->my);
@@ -3871,27 +3871,31 @@ bhit(
         }
 
         /* if mtmp is a shade and missile passes harmlessly through it,
-           give message and skip it in order to keep going */
-        if (mtmp && (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
-            && shade_miss(&gy.youmonst, mtmp, obj, TRUE, TRUE))
+           give message and skip it in order to keep going;
+           if attack is light and mtmp is a mimic pretending to be an
+           object, behave as if there is no monster here (if pretending
+           to be furniture, it will be revealed by flash_hits_mon()) */
+        if (mtmp && (((weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
+                      && shade_miss(&gy.youmonst, mtmp, obj, TRUE, TRUE))
+                     || (weapon == FLASHED_LIGHT
+                         && M_AP_TYPE(mtmp) == M_AP_OBJECT)))
             mtmp = (struct monst *) 0;
 
         if (mtmp) {
             gn.notonhead = (x != mtmp->mx || y != mtmp->my);
             if (weapon == FLASHED_LIGHT) {
-                /* FLASHED_LIGHT hitting invisible monster should
-                   pass through instead of stop so we call
-                   flash_hits_mon() directly rather than returning
-                   mtmp back to caller.  That allows the flash to
-                   keep on going.  Note that we use mtmp->minvis
-                   not canspotmon() because it makes no difference
-                   whether the hero can see the monster or not. */
+                /* FLASHED_LIGHT hitting invisible monster should pass
+                   through instead of stop so we call flash_hits_mon()
+                   directly rather than returning mtmp back to caller.
+                   That allows the flash to keep on going.  Note that we
+                   use mtmp->minvis not canspotmon() because it makes no
+                   difference whether hero can see the monster or not. */
                 if (mtmp->minvis) {
                     obj->ox = u.ux, obj->oy = u.uy;
                     (void) flash_hits_mon(mtmp, obj);
                 } else {
                     tmp_at(DISP_END, 0);
-                    result = mtmp; /* caller will call flash_hits_mon */
+                    result = mtmp; /* caller will call flash_hits_mon() */
                     goto bhit_done;
                 }
             } else if (weapon == INVIS_BEAM) {

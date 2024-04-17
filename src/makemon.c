@@ -1,4 +1,4 @@
-/* NetHack 3.7	makemon.c	$NHDT-Date: 1695327268 2023/09/21 20:14:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.227 $ */
+/* NetHack 3.7	makemon.c	$NHDT-Date: 1713334814 2024/04/17 06:20:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.245 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1464,8 +1464,8 @@ makemon(
                     exclaim = TRUE;
             } else if (canseemon(mtmp)) {
                 /* mimic masquerading as furniture or object and not sensed */
-                mhidden_description(mtmp, FALSE, mbuf);
-                what = upstart(strsubst(mbuf, ", mimicking ", ""));
+                mhidden_description(mtmp, MHID_ARTICLE | MHID_ALTMON, mbuf);
+                what = upstart(mbuf);
             }
             if (what) {
                 set_msg_xy(mtmp->mx, mtmp->my);

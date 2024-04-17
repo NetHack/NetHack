@@ -1,4 +1,4 @@
-/* NetHack 3.7	pager.c	$NHDT-Date: 1702349268 2023/12/12 02:47:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ */
+/* NetHack 3.7	pager.c	$NHDT-Date: 1713334816 2024/04/17 06:20:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.274 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -119,7 +119,8 @@ self_lookat(char *outbuf)
     if (u.usteed)
         Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
     if (u.uundetected || (Upolyd && U_AP_TYPE))
-        mhidden_description(&gy.youmonst, FALSE, eos(outbuf));
+        mhidden_description(&gy.youmonst, MHID_PREFIX | MHID_ARTICLE,
+                            eos(outbuf));
     if (Punished)
         Sprintf(eos(outbuf), ", chained to %s",
                 uball ? ansimpleoname(uball) : "nothing?");
@@ -177,34 +178,46 @@ trap_description(char *outbuf, int tnum, coordxy x, coordxy y)
 }
 
 /* describe a hidden monster; used for look_at during extended monster
-   detection and for probing; also when looking at self */
+   detection and for probing; also when looking at self and camera feedback */
 void
 mhidden_description(
-    struct monst *mon,
-    boolean altmon, /* for probing: if mimicking a monster, say so */
-    char *outbuf)
+    struct monst *mon,   /* hidden monster to describe */
+    unsigned mhid_flags, /* controls optional aspects of description */
+    char *outbuf)        /* output buffer */
 {
     struct obj *otmp;
+    const char *what;
+    boolean incl_prefix = (mhid_flags & MHID_PREFIX) != 0,
+            incl_article = (mhid_flags & MHID_ARTICLE) != 0,
+            show_altmon = (mhid_flags & MHID_ALTMON) != 0;
     boolean fakeobj, isyou = (mon == &gy.youmonst);
     coordxy x = isyou ? u.ux : mon->mx, y = isyou ? u.uy : mon->my;
     int glyph = (gl.level.flags.hero_memory && !isyou) ? levl[x][y].glyph
-                                                      : glyph_at(x, y);
+                                                       : glyph_at(x, y);
 
     *outbuf = '\0';
     if (M_AP_TYPE(mon) == M_AP_FURNITURE
         || M_AP_TYPE(mon) == M_AP_OBJECT) {
-        Strcpy(outbuf, ", mimicking ");
+        if (incl_prefix)
+            Strcpy(outbuf, ", mimicking ");
         if (M_AP_TYPE(mon) == M_AP_FURNITURE) {
-            Strcat(outbuf, an(defsyms[mon->mappearance].explanation));
+            what = defsyms[mon->mappearance].explanation;
+            if (incl_article)
+                what = an(what);
+            Strcat(outbuf, what);
         } else if (M_AP_TYPE(mon) == M_AP_OBJECT
                    /* remembered glyph, not glyph_at() which is 'mon' */
                    && glyph_is_object(glyph)) {
  objfrommap:
             otmp = (struct obj *) 0;
             fakeobj = object_from_map(glyph, x, y, &otmp);
-            Strcat(outbuf, (otmp && otmp->otyp != STRANGE_OBJECT)
-                              ? ansimpleoname(otmp)
-                              : an(obj_descr[STRANGE_OBJECT].oc_name));
+            what = (otmp && otmp->otyp != STRANGE_OBJECT)
+                   ? simpleonames(otmp)
+                   : obj_descr[STRANGE_OBJECT].oc_name;
+            if (incl_article)
+                what = an(what);
+            Strcat(outbuf, what);
+
             if (fakeobj && otmp) {
                 otmp->where = OBJ_FREE; /* object_from_map set to OBJ_FLOOR */
                 dealloc_obj(otmp);
@@ -213,9 +226,14 @@ mhidden_description(
             Strcat(outbuf, something);
         }
     } else if (M_AP_TYPE(mon) == M_AP_MONSTER) {
-        if (altmon)
-            Sprintf(outbuf, ", masquerading as %s",
-                    an(pmname(&mons[mon->mappearance], Mgender(mon))));
+        if (show_altmon) {
+            if (incl_prefix)
+                Strcat(outbuf, ", masquerading as ");
+            what = pmname(&mons[mon->mappearance], Mgender(mon));
+            if (incl_prefix)
+                what = an(what);
+            Strcat(outbuf, what);
+        }
     } else if (isyou ? u.uundetected : mon->mundetected) {
         Strcpy(outbuf, ", hiding");
         if (hides_under(mon->data)) {
@@ -407,7 +425,7 @@ look_at_monster(
     /* we know the hero sees a monster at this location, but if it's shown
        due to persistent monster detection he might remember something else */
     if (mtmp->mundetected || M_AP_TYPE(mtmp))
-        mhidden_description(mtmp, FALSE, eos(buf));
+        mhidden_description(mtmp, MHID_PREFIX | MHID_ARTICLE, eos(buf));
 
     if (monbuf) {
         unsigned how_seen = howmonseen(mtmp);

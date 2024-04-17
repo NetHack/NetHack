@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1711213872 2024/03/23 17:11:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1400 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1713334799 2024/04/17 06:19:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1420 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2243,7 +2243,7 @@ extern void msgtype_free(void);
 extern char *self_lookat(char *) NONNULL NONNULLARG1;
 extern char *monhealthdescr(struct monst *mon, boolean,
                             char *) NONNULL NONNULLARG3;
-extern void mhidden_description(struct monst *, boolean, char *) NONNULLPTRS;
+extern void mhidden_description(struct monst *, unsigned, char *) NONNULLPTRS;
 extern boolean object_from_map(int, coordxy, coordxy,
                                struct obj **) NONNULLPTRS;
 extern const char *waterbody_name(coordxy, coordxy) NONNULL;

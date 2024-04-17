@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1711484961 2024/03/26 20:29:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.443 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1713334817 2024/04/17 06:20:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.444 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6092,8 +6092,9 @@ nohandglow(struct monst *mon)
 
 /* returns 1 if light flash has noticeable effect on 'mtmp', 0 otherwise */
 int
-flash_hits_mon(struct monst *mtmp,
-               struct obj *otmp) /* source of flash */
+flash_hits_mon(
+    struct monst *mtmp,
+    struct obj *otmp) /* source of flash */
 {
     struct rm *lev;
     int tmp, amt, useeit, res = 0;
@@ -6102,6 +6103,29 @@ flash_hits_mon(struct monst *mtmp,
         return 0;
     lev = &levl[mtmp->mx][mtmp->my];
     useeit = canseemon(mtmp);
+
+    if (M_AP_TYPE(mtmp) != M_AP_NOTHING) {
+        char whatbuf[BUFSZ];
+        coordxy x = mtmp->mx, y = mtmp->my;
+        int oldglyph = glyph_at(x, y);
+
+        /* 'altmon' probably doesn't matter here because 'whatbuf' will
+           only be shown if the glyph changes and wakeup() doesn't call
+           seemimic() for M_AP_MONSTER */
+        mhidden_description(mtmp, MHID_ALTMON, whatbuf);
+
+        wakeup(mtmp, FALSE); /* -> seemimic() -> newsym(); also calls
+                              * finish_meating() to end quickmimic */
+
+        /* if glyph has changed then hero saw something happen */
+        if (glyph_at(x, y) != oldglyph)
+            pline("That %s is really %s%c", whatbuf,
+                  /* y_monnam()+a_monnam() */
+                  x_monnam(mtmp, mtmp->mtame ? ARTICLE_YOUR : ARTICLE_A,
+                           (char *) 0, 0, FALSE),
+                  mtmp->mtame ? '.' : '!');
+        res = 1; /* mtmp is affected whether hero sees it or not */
+    }
 
     if (mtmp->msleeping && haseyes(mtmp->data)) {
         mtmp->msleeping = 0;

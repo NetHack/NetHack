@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.h	$NHDT-Date: 1701132211 2023/11/28 00:43:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.240 $ */
+/* NetHack 3.7	hack.h	$NHDT-Date: 1713334806 2024/04/17 06:20:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.253 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1101,6 +1101,11 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define GP_CHECKSCARY   0x00800000L /* check monster for onscary() */
 #define GP_AVOID_MONPOS 0x01000000L /* don't accept existing mon location */
 /* 25 bits used */
+
+/* flags for mhidden_description() (pager.c; used for mimics and hiders) */
+#define MHID_PREFIX  1 /* include ", mimicking " prefix */
+#define MHID_ARTICLE 2 /* include "a " or "an " after prefix */
+#define MHID_ALTMON  4 /* if mimicking a monster, include that */
 
 /* flags for make_corpse() and mkcorpstat(); 0..7 are recorded in obj->spe */
 #define CORPSTAT_NONE     0x00

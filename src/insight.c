@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1702023267 2023/12/08 08:14:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1713334807 2024/04/17 06:20:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.112 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3227,7 +3227,8 @@ mstatusline(struct monst *mtmp)
     /* a stethoscope exposes mimic before getting here so this
        won't be relevant for it, but wand of probing doesn't */
     if (mtmp->mundetected || mtmp->m_ap_type)
-        mhidden_description(mtmp, TRUE, eos(info));
+        mhidden_description(mtmp, MHID_PREFIX | MHID_ARTICLE | MHID_ALTMON,
+                            eos(info));
     if (mtmp->mcan)
         Strcat(info, ", cancelled");
     if (mtmp->mconf)
