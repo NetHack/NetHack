@@ -1,4 +1,4 @@
-/* NetHack 3.7	dogmove.c	$NHDT-Date: 1646688063 2022/03/07 21:21:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.112 $ */
+/* NetHack 3.7	dogmove.c	$NHDT-Date: 1713336326 2024/04/17 06:45:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1443,7 +1443,7 @@ quickmimic(struct monst *mtmp)
     if (trycnt == 0)
         idx = SIZE(qm) - 1;
 
-    Strcpy(buf, mon_nam(mtmp));
+    Strcpy(buf, y_monnam(mtmp)); /* "your <pet>" or "the <mon>" or "Fang" */
     spotted = canspotmon(mtmp);
     seeloc = cansee(mtmp->mx, mtmp->my);
 
