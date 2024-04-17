@@ -942,13 +942,14 @@ typedef struct {
 #define ARTICLE_YOUR 3
 
 /* x_monnam() monster name suppress masks */
-#define SUPPRESS_IT 0x01
-#define SUPPRESS_INVISIBLE 0x02
+#define SUPPRESS_IT            0x01
+#define SUPPRESS_INVISIBLE     0x02
 #define SUPPRESS_HALLUCINATION 0x04
-#define SUPPRESS_SADDLE 0x08
-#define EXACT_NAME 0x0F
-#define SUPPRESS_NAME 0x10
-#define AUGMENT_IT 0x20 /* use "someone" or "something" instead of "it" */
+#define SUPPRESS_SADDLE        0x08
+#define SUPPRESS_MAPPEARANCE   0x10
+#define EXACT_NAME             0x1F
+#define SUPPRESS_NAME 0x20
+#define AUGMENT_IT    0x40 /* use "someone" or "something" instead of "it" */
 
 /* pline (et al) for a single string argument (suppress compiler warning) */
 #define pline1(cstr) pline("%s", cstr)

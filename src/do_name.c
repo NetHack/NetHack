@@ -807,8 +807,14 @@ rndghostname(void)
  * suppress
  *
  * SUPPRESS_IT, SUPPRESS_INVISIBLE, SUPPRESS_HALLUCINATION, SUPPRESS_SADDLE.
+ * SUPPRESS_MAPPEARANCE: if monster is mimicking another monster (cloned
+ *              Wizard or quickmimic pet), describe the real monster rather
+ *              than its current form;
  * EXACT_NAME: combination of all the above
  * SUPPRESS_NAME: omit monster's assigned name (unless uniq w/ pname).
+ * AUGMENT_IT: not suppression but shares suppression bitmask; if result
+ *              would have been "it", return "someone" if humanoid or
+ *              "something" otherwise.
  *
  * Bug: if the monster is a priest or shopkeeper, not every one of these
  * options works, since those are special cases.
@@ -823,9 +829,11 @@ x_monnam(
 {
     char *buf = nextmbuf();
     struct permonst *mdat = mtmp->data;
-    const char *pm_name = mon_pmname(mtmp);
-    boolean do_hallu, do_invis, do_it, do_saddle, do_name, augment_it;
-    boolean name_at_start, has_adjectives, insertbuf2;
+    const char *pm_name;
+    boolean do_hallu, do_invis, do_it, do_saddle, do_mappear,
+            do_exact, do_name, augment_it;
+    boolean name_at_start, has_adjectives, insertbuf2,
+            mappear_as_mon = (M_AP_TYPE(mtmp) == M_AP_MONSTER);
     char *bp, buf2[BUFSZ];
 
     if (mtmp == &gy.youmonst)
@@ -852,6 +860,8 @@ x_monnam(
             && !gp.program_state.gameover && mtmp != u.usteed
             && !engulfing_u(mtmp) && !(suppress & SUPPRESS_IT);
     do_saddle = !(suppress & SUPPRESS_SADDLE);
+    do_mappear = mappear_as_mon && !(suppress & SUPPRESS_MAPPEARANCE);
+    do_exact = (suppress & EXACT_NAME) == EXACT_NAME;
     do_name = !(suppress & SUPPRESS_NAME) || type_is_pname(mdat);
     augment_it = (suppress & AUGMENT_IT) != 0;
 
@@ -867,7 +877,7 @@ x_monnam(
     }
 
     /* priests and minions: don't even use this function */
-    if (mtmp->ispriest || mtmp->isminion) {
+    if ((mtmp->ispriest || mtmp->isminion) && !do_mappear) {
         char *name;
         long save_prop = EHalluc_resistance;
         unsigned save_invis = mtmp->minvis;
@@ -878,8 +888,7 @@ x_monnam(
         if (!do_invis)
             mtmp->minvis = 0;
         /* EXACT_NAME will force "of <deity>" on the Astral Plane */
-        name = priestname(mtmp, article,
-                          ((suppress & EXACT_NAME) == EXACT_NAME), buf2);
+        name = priestname(mtmp, article, do_exact, buf2);
         EHalluc_resistance = save_prop;
         mtmp->minvis = save_invis;
         if (article == ARTICLE_NONE && !strncmp(name, "the ", 4))
@@ -887,12 +896,21 @@ x_monnam(
         return strcpy(buf, name);
     }
 
+    /* 'pm_name' is the base part of the name */
+    if (do_mappear) {
+        assert(ismnum(mtmp->mappearance));
+        pm_name = pmname(&mons[mtmp->mappearance],
+                         mtmp->female ? FEMALE : MALE);
+    } else {
+        pm_name = mon_pmname(mtmp);
+    }
+
     /* Shopkeepers: use shopkeeper name.  For normal shopkeepers, just
      * "Asidonhopo"; for unusual ones, "Asidonhopo the invisible
      * shopkeeper" or "Asidonhopo the blue dragon".  If hallucinating,
      * none of this applies.
      */
-    if (mtmp->isshk && !do_hallu) {
+    if (mtmp->isshk && !do_hallu && !do_mappear) {
         if (adjective && article == ARTICLE_THE) {
             /* pathological case: "the angry Asidonhopo the blue dragon"
                sounds silly */
