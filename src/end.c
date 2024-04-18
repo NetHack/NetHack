@@ -942,15 +942,7 @@ fuzzer_savelife(int how)
      * 'done_seq' is maintained in done().
      */
     if (!gp.program_state.panicking
-        && how != PANICKED && how != TRICKED
-        /* Guard against getting stuck in a loop if we die in one of
-         * the few ways where life-saving isn't effective (cited case
-         * was burning in lava when the level was too full to allow
-         * teleporting to safety).  Skip the life-save attempt if we've
-         * died on the same move more than 100 times; give up instead.
-         * [Note: 100 deaths on the same move may seem excessive but it
-         * has been demonstrated that a limit of 20 was not enough.] */
-        && (gd.done_seq++ < gh.hero_seq + 100L)) {
+        && how != PANICKED && how != TRICKED) {
         savelife(how);
 
         /* periodically restore characteristics plus lost experience
@@ -997,6 +989,18 @@ fuzzer_savelife(int how)
         /* clear stale cause of death info after life-saving */
         gk.killer.name[0] = '\0';
         gk.killer.format = 0;
+
+        /* Guard against getting stuck in a loop if we die in one of
+         * the few ways where life-saving isn't effective (cited case
+         * was burning in lava when the level was too full to allow
+         * teleporting to safety).  Deal with it by recreating
+         * the level, if we're in wizmode */
+        if (gd.done_seq++ > gh.hero_seq + 100L) {
+            if (!wizard)
+                return FALSE; /* can't deal with it */
+            cmdq_add_ec(CQ_CANNED, wiz_makemap);
+        }
+
         return TRUE;
     }
     return FALSE; /* panic or too many consecutive deaths */
