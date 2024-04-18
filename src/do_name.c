@@ -896,11 +896,10 @@ x_monnam(
         return strcpy(buf, name);
     }
 
-    /* 'pm_name' is the base part of the name */
+    /* 'pm_name' is the base part of most names */
     if (do_mappear) {
         assert(ismnum(mtmp->mappearance));
-        pm_name = pmname(&mons[mtmp->mappearance],
-                         mtmp->female ? FEMALE : MALE);
+        pm_name = pmname(&mons[mtmp->mappearance], Mgender(mtmp));
     } else {
         pm_name = mon_pmname(mtmp);
     }
@@ -1289,7 +1288,7 @@ const char *
 mon_pmname(struct monst *mon)
 {
     /* for neuter, mon->data->pmnames[MALE] will be Null and use [NEUTRAL] */
-    return pmname(mon->data, mon->female ? FEMALE : MALE);
+    return pmname(mon->data, Mgender(mon));
 }
 
 /* mons[]->pmname for a corpse or statue or figurine */
@@ -1305,7 +1304,7 @@ obj_pmname(struct obj *obj)
 
         /* obj->oextra->omonst->data is Null but ...->mnum is set */
         if (ismnum(m->mnum))
-            return pmname(&mons[m->mnum], m->female ? FEMALE : MALE);
+            return pmname(&mons[m->mnum], Mgender(m));
     }
 #endif
     if ((obj->otyp == CORPSE || obj->otyp == STATUE || obj->otyp == FIGURINE)
