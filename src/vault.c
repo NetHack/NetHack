@@ -657,7 +657,8 @@ wallify_vault(struct monst *grd)
                 if ((mon = m_at(x, y)) != 0 && mon != grd) {
                     if (mon->mtame)
                         yelp(mon);
-                    (void) rloc(mon, RLOC_ERR);
+                    if (!rloc(mon, RLOC_MSG))
+                        m_into_limbo(mon);
                 }
                 /* move gold at wall locations into the vault */
                 if ((gold = g_at(x, y)) != 0) {
