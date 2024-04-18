@@ -855,7 +855,7 @@ match_sym(char *buf)
         const char *altnm;
         const char *nm;
     } alternates[] = {
-        { "S_armour", "S_armor" },     { "S_suit", "S_armor" },
+        { "S_armour", "S_armor" },
         /* alt explosion names are numbered in phone key/button layout */
         { "S_explode1", "S_expl_tl" },
         { "S_explode2", "S_expl_tc" }, { "S_explode3", "S_expl_tr" },
