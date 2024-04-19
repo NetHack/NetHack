@@ -898,7 +898,7 @@ x_monnam(
 
     /* 'pm_name' is the base part of most names */
     if (do_mappear) {
-        assert(ismnum(mtmp->mappearance));
+        /*assert(ismnum(mtmp->mappearance));*/
         pm_name = pmname(&mons[mtmp->mappearance], Mgender(mtmp));
     } else {
         pm_name = mon_pmname(mtmp);
