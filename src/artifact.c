@@ -1942,7 +1942,8 @@ arti_invoke(struct obj *obj)
                     if (vulnerable) /* could be fatal if Unchanging */
                         (void) lightdamage(obj, TRUE, 2 * damg);
 
-                    if (!flashburn((long) (damg + rnd(damg))) && !vulnerable)
+                    if (!flashburn((long) (damg + rnd(damg)), FALSE)
+                        && !vulnerable)
                         pline("%s", nothing_seems_to_happen);
                 }
             } else {

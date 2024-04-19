@@ -688,7 +688,7 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
            do this before maybe blinding the hero via flashburn() */
         mon_spell_hits_spot(mtmp, AD_ELEC, u.ux, u.uy);
         /* blind hero; no effect if already blind */
-        (void) flashburn((long) rnd(100));
+        (void) flashburn((long) rnd(100), TRUE);
         break;
     }
     case CLC_CURSE_ITEMS:

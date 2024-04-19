@@ -2657,7 +2657,7 @@ zapyourself(struct obj *obj, boolean ordinary)
             ugolemeffects(AD_ELEC, orig_dmg);
         }
         (void) destroy_items(&gy.youmonst, AD_ELEC, orig_dmg);
-        (void) flashburn((long) rnd(100));
+        (void) flashburn((long) rnd(100), TRUE);
         break;
 
     case SPE_FIREBALL:
@@ -2836,7 +2836,7 @@ zapyourself(struct obj *obj, boolean ordinary)
             damage = 5;
         damage = lightdamage(obj, ordinary, damage);
         damage += rnd(25);
-        if (flashburn((long) damage))
+        if (flashburn((long) damage, FALSE))
             learn_it = TRUE;
         damage = 0; /* reset */
         break;
@@ -2971,13 +2971,23 @@ lightdamage(
 
 /* light[ning] causes blindness */
 boolean
-flashburn(long duration)
+flashburn(long duration, boolean via_lightning)
 {
     if (!resists_blnd(&gy.youmonst)) {
         You(are_blinded_by_the_flash);
         make_blinded(duration, FALSE);
         if (!Blind)
             Your1(vision_clears);
+        return TRUE;
+    }
+    /* if blinding is resisted due to magical equipment (Sunsword), give
+       a sparkle animation (even if also resisted due to being blind)
+       _unless_ this is lightning-induced; we don't want a double sparkle
+       if hero is both lightning resistant and blindness resistant, or
+       worse, have a single sparkle where the player confuses blindness
+       resistance for lightning resistance */
+    if (!via_lightning && resists_blnd_by_arti(&gy.youmonst)) {
+        shieldeff(u.ux, u.uy);
         return TRUE;
     }
     return FALSE;
@@ -4817,7 +4827,7 @@ dobuzz(
                 Your("%s tingles.", body_part(ARM));
             }
             if (damgtype == ZT_LIGHTNING)
-                (void) flashburn((long) d(nd, 50));
+                (void) flashburn((long) d(nd, 50), TRUE);
             stop_occupation();
             nomul(0);
         }

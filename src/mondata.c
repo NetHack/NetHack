@@ -170,14 +170,13 @@ resists_magm(struct monst *mon)
     return FALSE;
 }
 
-/* True iff monster is resistant to light-induced blindness */
+/* True iff monster is resistant to light-induced blindness due to some
+   mundane reason (already blinded) */
 boolean
 resists_blnd(struct monst *mon)
 {
     struct permonst *ptr = mon->data;
     boolean is_you = (mon == &gy.youmonst);
-    long slotmask;
-    struct obj *o;
 
     if (is_you ? (Blind || Unaware)
                : (mon->mblinded || !mon->mcansee || !haseyes(ptr)
@@ -189,21 +188,32 @@ resists_blnd(struct monst *mon)
     if (dmgtype_fromattack(ptr, AD_BLND, AT_EXPL)
         || dmgtype_fromattack(ptr, AD_BLND, AT_GAZE))
         return TRUE;
+    return resists_blnd_by_arti(mon);
+}
+
+/* True iff monster is resistant to light-induced blindness due to worn
+   or wielded magical equipment (used to decide whether to show sparkle
+   animation when resisting) */
+boolean
+resists_blnd_by_arti(struct monst *mon)
+{
+    struct obj *o;
+    boolean is_you = (mon == &gy.youmonst);
+
     o = is_you ? uwep : MON_WEP(mon);
     if (o && o->oartifact && defends(AD_BLND, o))
         return TRUE;
     o = is_you ? gi.invent : mon->minvent;
-    slotmask = W_ARMOR | W_ACCESSORY;
-    if (!is_you /* assumes monsters don't wield non-weapons */
-        || (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
-        slotmask |= W_WEP;
-    if (is_you && u.twoweap)
-        slotmask |= W_SWAPWEP;
     for (; o; o = o->nobj)
-        if (((o->owornmask & slotmask) != 0L
-             && objects[o->otyp].oc_oprop == BLINDED)
-            || (o->oartifact && defends_when_carried(AD_BLND, o)))
+        if (defends_when_carried(AD_BLND, o))
             return TRUE;
+#if 0   /* omit this; the Eyes of the Overworld have no carry property and
+         * their worn property is magic resistance rather than blindness
+         * resistance; wearing them blocks blindness without actually
+         * preventing it, so don't classify them as providing resistance */
+    if (is_you && is_art(uamul, ART_EYES_OF_THE_OVERWORLD))
+        return TRUE;
+#endif /* 0 */
     return FALSE;
 }
 

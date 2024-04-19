@@ -1773,6 +1773,7 @@ extern boolean defended(struct monst *, int) NONNULLARG1;
 extern boolean resists_drli(struct monst *) NONNULLARG1;
 extern boolean resists_magm(struct monst *) NONNULLARG1;
 extern boolean resists_blnd(struct monst *) NONNULLARG1;
+extern boolean resists_blnd_by_arti(struct monst *) NONNULLARG1;
 extern boolean can_blnd(struct monst *, struct monst *,
                         uchar, struct obj *) NONNULLARG2;
 extern boolean ranged_attk(struct permonst *) NONNULLARG1;
@@ -3829,7 +3830,7 @@ extern int dozap(void);
 extern int zapyourself(struct obj *, boolean) NONNULLARG1;
 extern void ubreatheu(struct attack *) NONNULLARG1;
 extern int lightdamage(struct obj *, boolean, int) NONNULLARG1;
-extern boolean flashburn(long);
+extern boolean flashburn(long, boolean);
 extern boolean cancel_monst(struct monst *, struct obj *, boolean, boolean,
                             boolean) NONNULLARG12;
 extern void zapsetup(void);
