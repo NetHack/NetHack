@@ -22,6 +22,7 @@ staticfn int mkinvk_check_wall(coordxy x, coordxy y);
 staticfn void mk_knox_portal(coordxy, coordxy);
 staticfn void makevtele(void);
 staticfn void fill_ordinary_room(struct mkroom *, boolean) NONNULLARG1;
+staticfn void themerooms_post_level_generate(void);
 staticfn void makelevel(void);
 staticfn boolean bydoor(coordxy, coordxy);
 staticfn void mktrap_victim(struct trap *);
@@ -333,11 +334,6 @@ makerooms(void)
         lua_getglobal(themes, "post_themerooms_generate");
         nhl_pcall_handle(themes, 0, 0, "makerooms-3", NHLpa_panic);
         iflags.in_lua = gi.in_mk_themerooms = FALSE;
-
-        wallification(1, 0, COLNO - 1, ROWNO - 1);
-        free(gc.coder);
-        gc.coder = NULL;
-        lua_gc(themes, LUA_GCCOLLECT);
     }
 }
 
@@ -1077,6 +1073,29 @@ fill_ordinary_room(
 }
 
 staticfn void
+themerooms_post_level_generate(void)
+{
+    lua_State *themes = (lua_State *) gl.luathemes[u.uz.dnum];
+
+     /* themes should already be loaded by makerooms();
+      * if not, we don't run this either */
+    if (!themes)
+        return;
+
+    reset_xystart_size();
+    iflags.in_lua = gi.in_mk_themerooms = TRUE;
+    gt.themeroom_failed = FALSE;
+    lua_getglobal(themes, "post_level_generate");
+    nhl_pcall_handle(themes, 0, 0, "post_level_generate", NHLpa_panic);
+    iflags.in_lua = gi.in_mk_themerooms = FALSE;
+
+    wallification(1, 0, COLNO - 1, ROWNO - 1);
+    free(gc.coder);
+    gc.coder = NULL;
+    lua_gc(themes, LUA_GCCOLLECT);
+}
+
+staticfn void
 makelevel(void)
 {
     struct mkroom *croom;
@@ -1240,6 +1259,8 @@ makelevel(void)
     for (i = 0; i < gn.nroom; ++i) {
         fill_special_room(&gr.rooms[i]);
     }
+
+    themerooms_post_level_generate();
 
     if (gl.luacore && nhcb_counts[NHCB_LVL_ENTER]) {
         lua_getglobal(gl.luacore, "nh_callback_run");

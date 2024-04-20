@@ -19,11 +19,13 @@
 -- for each level, the core first calls pre_themerooms_generate(),
 -- then it calls themerooms_generate() multiple times until it decides
 -- enough rooms have been generated, and then it calls
--- post_themerooms_generate().  The lua state is persistent through
--- the gameplay, but not across saves, so remember to reset any variables.
+-- post_themerooms_generate(). When the level has been generated, with
+-- joining corridors and rooms filled, the core calls post_level_generate().
+-- The lua state is persistent through the gameplay, but not across saves,
+-- so remember to reset any variables.
 
 
-local buried_treasure = { };
+local postprocess = { };
 
 themeroom_fills = {
 
@@ -89,13 +91,29 @@ themeroom_fills = {
       locs:iterate(func);
    end,
 
+   -- Garden
+   {
+      eligible = function(rm) return rm.lit == true; end,
+      contents = function(rm)
+         local s = selection.room();
+         local npts = (s:numpoints() / 6);
+         for i = 1, npts do
+            des.monster({ id = "wood nymph", asleep = true });
+            if (percent(30)) then
+               des.feature("fountain");
+            end
+         end
+         table.insert(postprocess, { handler = make_garden_walls, data = { sel = selection.room() } });
+      end
+   },
+
    -- Buried treasure
    function(rm)
       des.object({ id = "chest", buried = true, contents = function(otmp)
                       local xobj = otmp:totable();
                       -- keep track of the last buried treasure
                       if (xobj.NO_OBJ == nil) then
-                         buried_treasure = { x = xobj.ox, y = xobj.oy };
+                         table.insert(postprocess, { handler = make_dig_engraving, data = { x = xobj.ox, y = xobj.oy }});
                       end
                       for i = 1, d(3,4) do
                          des.object();
@@ -791,30 +809,11 @@ end
 
 -- called before any rooms are generated
 function pre_themerooms_generate()
-   -- reset the buried treasure location
-   buried_treasure = { };
 end
 
 -- called after all rooms have been generated
+-- but before creating connecting corridors/doors, or filling rooms
 function post_themerooms_generate()
-   if (buried_treasure.x ~= nil) then
-      local floors = selection.negate():filter_mapchar(".");
-      local pos = floors:rndcoord(0);
-      local tx = buried_treasure.x - pos.x - 1;
-      local ty = buried_treasure.y - pos.y;
-      local dig = "";
-      if (tx == 0 and ty == 0) then
-         dig = " here";
-      else
-         if (tx < 0 or tx > 0) then
-            dig = string.format(" %i %s", math.abs(tx), (tx > 0) and "east" or "west");
-         end
-         if (ty < 0 or ty > 0) then
-            dig = dig .. string.format(" %i %s", math.abs(ty), (ty > 0) and "south" or "north");
-         end
-      end
-      des.engraving({ coord = pos, type = "burn", text = "Dig" .. dig });
-   end
 end
 
 function themeroom_fill(rm)
@@ -846,3 +845,36 @@ function themeroom_fill(rm)
    end
 end
 
+-- postprocess callback: create an engraving pointing at a location
+function make_dig_engraving(data)
+   local floors = selection.negate():filter_mapchar(".");
+   local pos = floors:rndcoord(0);
+   local tx = data.x - pos.x - 1;
+   local ty = data.y - pos.y;
+   local dig = "";
+   if (tx == 0 and ty == 0) then
+      dig = " here";
+   else
+      if (tx < 0 or tx > 0) then
+         dig = string.format(" %i %s", math.abs(tx), (tx > 0) and "east" or "west");
+      end
+      if (ty < 0 or ty > 0) then
+         dig = dig .. string.format(" %i %s", math.abs(ty), (ty > 0) and "south" or "north");
+      end
+   end
+   des.engraving({ coord = pos, type = "burn", text = "Dig" .. dig });
+end
+
+-- postprocess callback: turn room walls into trees
+function make_garden_walls(data)
+   local sel = data.sel:grow();
+   des.replace_terrain({ selection = sel, fromterrain="w", toterrain = "T" });
+end
+
+-- called once after the whole level has been generated
+function post_level_generate()
+   for i, v in ipairs(postprocess) do
+      v.handler(v.data);
+   end
+   postprocess = { };
+end
