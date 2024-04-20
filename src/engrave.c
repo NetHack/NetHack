@@ -1,4 +1,4 @@
-/* NetHack 3.7	engrave.c	$NHDT-Date: 1664616835 2022/10/01 09:33:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.7	engrave.c	$NHDT-Date: 1713657038 2024/04/20 23:50:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.156 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -800,7 +800,8 @@ doengrave_sfx_item(struct _doengrave_ctx *de)
                               de->frosted ? "frosty" : "dusty");
                     de->dengr = TRUE;
                 } else {
-                    pline("%s can't wipe out this engraving.", Yname2(de->otmp));
+                    pline("%s can't wipe out this engraving.",
+                          Yname2(de->otmp));
                 }
             } else {
                 pline("%s %s.", Yobjnam2(de->otmp, "get"),
@@ -833,7 +834,8 @@ doengrave_ctx_verb(struct _doengrave_ctx *de)
 {
     switch (de->type) {
     default:
-        de->everb = de->adding ? "add to the weird writing on" : "write strangely on";
+        de->everb = de->adding ? "add to the weird writing on"
+                               : "write strangely on";
         break;
     case DUST:
         de->everb = de->adding ? "add to the writing in" : "write in";
@@ -898,7 +900,7 @@ doengrave(void)
     if (!u_can_engrave())
         return ECMD_FAIL;
 
-    de = (struct _doengrave_ctx *) alloc(sizeof(struct _doengrave_ctx));
+    de = (struct _doengrave_ctx *) alloc(sizeof (struct _doengrave_ctx));
     doengrave_ctx_init(de);
 
     gm.multi = 0;              /* moves consumed */
@@ -1022,7 +1024,8 @@ doengrave(void)
     }
     /* Early exit for some implements. */
     if (!de->ptext) {
-        if (de->otmp && de->otmp->oclass == WAND_CLASS && !can_reach_floor(TRUE))
+        if (de->otmp && de->otmp->oclass == WAND_CLASS
+            && !can_reach_floor(TRUE))
             cant_reach_floor(u.ux, u.uy, FALSE, TRUE);
         de->ret = ECMD_TIME;
         goto doengr_exit;
@@ -1069,7 +1072,8 @@ doengrave(void)
                     /* defer deletion until after we *know* we're engraving */
                     de->eow = TRUE;
                 }
-            } else if (de->type == DUST || de->type == MARK || de->type == ENGR_BLOOD) {
+            } else if (de->type == DUST || de->type == MARK
+                       || de->type == ENGR_BLOOD) {
                 You("cannot wipe out the message that is %s the %s here.",
                     (de->oep->engr_type == BURN)
                         ? (de->frosted ? "melted into" : "burned into")
@@ -1082,7 +1086,8 @@ doengrave(void)
                     You("will overwrite the current message.");
                 de->eow = TRUE;
             }
-        } else if (de->oep && Strlen(de->oep->engr_txt[actual_text]) >= BUFSZ - 1) {
+        } else if (de->oep
+                   && Strlen(de->oep->engr_txt[actual_text]) >= BUFSZ - 1) {
             There("is no room to add anything else here.");
             de->ret = ECMD_TIME;
             goto doengr_exit;
@@ -1097,10 +1102,12 @@ doengrave(void)
     if (de->otmp != &hands_obj)
         You("%s the %s with %s.", de->everb, de->eloc, doname(de->otmp));
     else
-        You("%s the %s with your %s.", de->everb, de->eloc, body_part(FINGERTIP));
+        You("%s the %s with your %s.",
+            de->everb, de->eloc, body_part(FINGERTIP));
 
     /* Prompt for engraving! */
-    Sprintf(de->qbuf, "What do you want to %s the %s here?", de->everb, de->eloc);
+    Sprintf(de->qbuf, "What do you want to %s the %s here?",
+            de->everb, de->eloc);
     getlin(de->qbuf, de->ebuf);
     /* convert tabs to spaces and condense consecutive spaces to one */
     mungspaces(de->ebuf);
@@ -1442,7 +1449,8 @@ save_engravings(NHFILE *nhfp)
     }
     if (perform_bwrite(nhfp)) {
         if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &no_more_engr, sizeof no_more_engr);
+            bwrite(nhfp->fd, (genericptr_t) &no_more_engr,
+                   sizeof no_more_engr);
     }
     if (release_data(nhfp))
         head_engr = 0;
@@ -1457,19 +1465,21 @@ rest_engravings(NHFILE *nhfp)
     head_engr = 0;
     while (1) {
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &lth, sizeof(unsigned));
+            mread(nhfp->fd, (genericptr_t) &lth, sizeof (unsigned));
 
         if (lth == 0)
             return;
         ep = newengr(lth);
         if (nhfp->structlevel) {
-            mread(nhfp->fd, (genericptr_t) ep, sizeof(struct engr) + lth);
+            mread(nhfp->fd, (genericptr_t) ep, sizeof (struct engr) + lth);
         }
         ep->nxt_engr = head_engr;
         head_engr = ep;
-        ep->engr_txt[actual_text] = (char *) (ep + 1);    /* Andreas Bormann */
-        ep->engr_txt[remembered_text] = ep->engr_txt[actual_text] + ep->engr_szeach;
-        ep->engr_txt[pristine_text] = ep->engr_txt[remembered_text] + ep->engr_szeach;
+        ep->engr_txt[actual_text] = (char *) (ep + 1); /* Andreas Bormann */
+        ep->engr_txt[remembered_text] = ep->engr_txt[actual_text]
+                                      + ep->engr_szeach;
+        ep->engr_txt[pristine_text] = ep->engr_txt[remembered_text]
+                                    + ep->engr_szeach;
         while (ep->engr_txt[actual_text][0] == ' ')
             ep->engr_txt[actual_text]++;
         while (ep->engr_txt[remembered_text][0] == ' ')

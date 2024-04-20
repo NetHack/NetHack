@@ -1,4 +1,4 @@
-/* NetHack 3.7	lock.c	$NHDT-Date: 1703070191 2023/12/20 11:03:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.7	lock.c	$NHDT-Date: 1713657045 2024/04/20 23:50:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -241,7 +241,7 @@ forcelock(void)
 
     You("succeed in forcing the lock.");
     exercise(gx.xlock.picktyp ? A_DEX : A_STR, TRUE);
-    /* breakchestlock() might destroy gx.xlock.box; if so, gx.xlock context will
+    /* breakchestlock() might destroy xlock.box; if so, xlock context will
        be cleared (delobj -> obfree -> maybe_reset_pick); but it might not,
        so explicitly clear that manually */
     breakchestlock(gx.xlock.box, (boolean) (!gx.xlock.picktyp && !rn2(3)));
@@ -441,7 +441,8 @@ pick_lock(
 
         count = 0;
         c = 'n'; /* in case there are no boxes here */
-        for (otmp = gl.level.objects[cc.x][cc.y]; otmp; otmp = otmp->nexthere) {
+        for (otmp = gl.level.objects[cc.x][cc.y]; otmp;
+             otmp = otmp->nexthere) {
             /* autounlock on boxes: only the one that was just discovered to
                be locked; don't include any other boxes which might be here */
             if (autounlock && otmp != container)
@@ -681,11 +682,14 @@ doforce(void)
         return ECMD_OK;
     }
     if (!u_have_forceable_weapon()) {
-        You_cant("force anything %s weapon.",
+        boolean use_plural = uwep && uwep->quan > 1;
+
+        You_cant("force anything %s weapon%s.",
                  !uwep ? "when not wielding a"
-                       : (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep))
-                             ? "without a proper"
-                             : "with that");
+                 : (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep))
+                   ? (use_plural ? "without proper" : "without a proper")
+                   : (use_plural ? "with that" : "with those"),
+                 use_plural ? "s" : "");
         return ECMD_OK;
     }
     if (!can_reach_floor(TRUE)) {
