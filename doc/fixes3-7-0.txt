@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1427 $ $NHDT-Date: 1713334798 2024/04/17 06:19:58 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1428 $ $NHDT-Date: 1713657038 2024/04/20 23:50:38 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1400,6 +1400,8 @@ gold thrown or kicked at a sleeping monster with the 'greedy' attribute gets
 hero movement affects the water bubble movement direction
 pets and peacefuls avoid a location hero just kicked
 shopkeepers bill you for using their bear trap or land mine
+when engraving with a stack of eligible weapons, split one off the stack and
+	dull it rather than dull the whole stack
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

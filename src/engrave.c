@@ -1,4 +1,4 @@
-/* NetHack 3.7	engrave.c	$NHDT-Date: 1713657038 2024/04/20 23:50:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.156 $ */
+/* NetHack 3.7	engrave.c	$NHDT-Date: 1713657576 2024/04/20 23:59:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.157 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1100,7 +1100,9 @@ doengrave(void)
 
     /* Tell adventurer what is going on */
     if (de->otmp != &hands_obj)
-        You("%s the %s with %s.", de->everb, de->eloc, doname(de->otmp));
+        You("%s the %s with %s%s.", de->everb, de->eloc,
+            (de->type == ENGRAVE && de->otmp->quan > 1L) ? "one of " : "",
+            doname(de->otmp));
     else
         You("%s the %s with your %s.",
             de->everb, de->eloc, body_part(FINGERTIP));
@@ -1260,6 +1262,28 @@ engrave(void)
 
     /* Step 3: affect stylus from engraving - it might wear out. */
     if (dulling_wep) {
+        boolean splitstack = FALSE, dulled = FALSE;
+
+        /* 'stylus' is guaranteed to be a weapon */
+        if (stylus->quan > 1L) {
+            if (firsttime)
+                pline("One of %s gets dull.", yname(stylus));
+            /*
+             * FIXME?
+             *  If 'stylus' is a stack that's welded to hero's hand,
+             *  ordinarily it couldn't be split.  This allows the player
+             *  to unweld one at a time (dulling in the process) until
+             *  there is only one left.  Is that what we really want?
+             *  [Perhaps caller should reject welded stack, or set type
+             *  to DUST instead of ENGRAVE?]
+             */
+            stylus = gc.context.engraving.stylus = splitobj(stylus, 1L);
+            splitstack = TRUE;
+        } else {
+            /* normal case: stylus->quan==1 */
+            if (firsttime)
+                pline("%s gets dull.", Yname2(stylus));
+        }
         /* Dull the weapon at a rate of -1 enchantment per 2 characters,
          * rounding down.
          * The number of characters obtainable given starting enchantment:
@@ -1268,9 +1292,6 @@ engrave(void)
          * engrave "Elbereth" all at once.
          * However, you can engrave "Elb", then "ere", then "th", by taking
          * advantage of the rounding down. */
-        if (firsttime) {
-            pline("%s dull.", Yobjnam2(stylus, "get"));
-        }
         if (gc.context.engraving.actionct % 2 == 1) { /* 1st,3rd,... action */
             /* deduct a point on 1st, 3rd, 5th, ... turns, unless this is the
              * last character being engraved (a rather convoluted way to round
@@ -1286,8 +1307,20 @@ engrave(void)
                 truncate = TRUE;
             } else if (*endc || gc.context.engraving.actionct == 1) {
                 stylus->spe -= 1;
-                update_inventory();
+                dulled = TRUE;
             }
+        }
+        if (splitstack) {
+            /* 'stylus' has been split off; remainder might still be worn */
+            stylus->owornmask = 0L;
+            obj_extract_self(stylus);
+            stylus = hold_another_object(stylus, "You drop one %s!",
+                                         doname(stylus), (char *) NULL);
+        } else if (dulled && stylus->known) {
+            /* reflect change in stylus->spe; not needed for splitstack
+               since hold_another_object() does this */
+            prinv((char *) NULL, stylus, 1L);
+            update_inventory();
         }
     } else if (marker) {
         int ink_cost = max(rate / 2, 1); /* Prevent infinite graffiti */
