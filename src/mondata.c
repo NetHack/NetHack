@@ -170,8 +170,7 @@ resists_magm(struct monst *mon)
     return FALSE;
 }
 
-/* True iff monster is resistant to light-induced blindness due to some
-   mundane reason (already blinded) */
+/* True if monster is resistant to light-induced blindness */
 boolean
 resists_blnd(struct monst *mon)
 {
