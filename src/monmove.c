@@ -859,6 +859,8 @@ dochug(struct monst *mtmp)
 
         if (!status)
             status = m_move(mtmp, 0);
+        if (mon_offmap(mtmp))
+            return 1;
         if (status != MMOVE_DIED)
             distfleeck(mtmp, &inrange, &nearby, &scared); /* recalc */
 
