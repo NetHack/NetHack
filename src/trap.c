@@ -3384,6 +3384,7 @@ launch_obj(
                 if (!Deaf)
                     pline("Thump!");
                 wake_nearto(x2, y2, 16);
+                break;
             }
         }
     } /* while dist > 0 */
