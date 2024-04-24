@@ -363,6 +363,16 @@ place_lregion(
         hy = ROWNO - 1;
     }
 
+    /* clamp the area to the map */
+    if (lx < 1)
+        lx = 1;
+    if (hx > COLNO - 1)
+        hx = COLNO - 1;
+    if (ly < 0)
+        ly = 0;
+    if (hy > ROWNO - 1)
+        hy = ROWNO - 1;
+
     /* first a probabilistic approach */
 
     oneshot = (lx == hx && ly == hy);
