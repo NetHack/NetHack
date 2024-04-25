@@ -2645,7 +2645,7 @@ throw_gold(struct obj *obj)
         /* see if the gold has a place to move into */
         odx = u.ux + u.dx;
         ody = u.uy + u.dy;
-        if (!ZAP_POS(levl[odx][ody].typ) || closed_door(odx, ody)) {
+        if (!isok(odx, ody) || !ZAP_POS(levl[odx][ody].typ) || closed_door(odx, ody)) {
             gb.bhitpos.x = u.ux;
             gb.bhitpos.y = u.uy;
         } else {
