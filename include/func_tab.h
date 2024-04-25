@@ -21,6 +21,7 @@
 #define MOVEMENTCMD  0x0400 /* used to move hero/cursor */
 #define MOUSECMD     0x0800 /* cmd allowed to be bound to mouse button */
 #define CMD_INSANE   0x1000 /* suppress sanity check (for ^P and ^R) */
+#define AUTOCOMP_ADJ 0x2000 /* user changed command autocompletion */
 
 /* flags for extcmds_match() */
 #define ECM_NOFLAGS       0

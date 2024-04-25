@@ -9503,6 +9503,7 @@ all_options_strbuf(strbuf_t *sbuf)
     all_options_menucolors(sbuf);
     all_options_msgtypes(sbuf);
     all_options_apes(sbuf);
+    all_options_autocomplete(sbuf);
 #ifdef STATUS_HILITES
     all_options_statushilites(sbuf);
 #endif
