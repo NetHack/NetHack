@@ -739,7 +739,17 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     if (pluralize)
         Strcpy(buf, makeplural(buf));
 
-    if (obj->otyp == T_SHIRT && program_state.gameover) {
+    /* additional information shown during end-of-game inventory disclosure */
+    if (obj->otyp == T_SHIRT && program_state.gameover
+        /* o_id will be 0 for wizard mode attribute disclosure (formatted
+           via from_what() -> ysimple_name() -> minimal_xname() -> xname()
+           by the enlightenment code; moot here since T-shirts don't affect
+           any attributes (but for 3.7, aprons will have comparable text) */
+        && obj->o_id
+        /* distantname is non-0 for do_screen_description() which is used
+           to produce tooltip text for HTMLDUMP (not supported by nethack) */
+        && !distantname
+        ) {
         char tmpbuf[BUFSZ];
 
         Sprintf(eos(buf), " with text \"%s\"", tshirt_text(obj, tmpbuf));
