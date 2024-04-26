@@ -1192,7 +1192,7 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
                           data->menui.menu.items[lpdis->itemID].count);
             }
 
-            /* TOOD: add blinking for blink text */
+            /* TODO: add blinking for blink text */
 
             cached_font * blink_font = mswin_get_font(NHW_MENU, ATR_BLINK, lpdis->hDC, FALSE);
             SelectObject(lpdis->hDC, blink_font->hFont);

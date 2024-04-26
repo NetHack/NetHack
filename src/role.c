@@ -1744,7 +1744,7 @@ role_selection_prolog(int which, winid where)
         else if ((allowmask & ROLE_ALIGNMASK) == AM_NEUTRAL)
             a = 1; /* aligns[neutral] */
         else if ((allowmask & ROLE_ALIGNMASK) == AM_CHAOTIC)
-            a = 2; /* alings[chaotic] */
+            a = 2; /* aligns[chaotic] */
     }
     if (c >= 0) {
         assert(IndexOkT(c, races));
@@ -1754,7 +1754,7 @@ role_selection_prolog(int which, winid where)
         else if ((allowmask & ROLE_ALIGNMASK) == AM_NEUTRAL)
             a = 1; /* aligns[neutral] */
         else if ((allowmask & ROLE_ALIGNMASK) == AM_CHAOTIC)
-            a = 2; /* alings[chaotic] */
+            a = 2; /* aligns[chaotic] */
         /* [c never forces gender] */
     }
     /* [g and a don't constrain anything sufficiently

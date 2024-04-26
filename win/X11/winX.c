@@ -2655,7 +2655,7 @@ init_standard_windows(void)
     XtSetArg(args[num_args], nhStr(XtNbottom), XtChainBottom); num_args++;
     XtSetValues(map_viewport, args, num_args);
 
-    /* Create the status window, with the form as it's parent. */
+    /* Create the status window, with the form as its parent. */
     status_win = find_free_window();
     wp = &window_list[status_win];
     wp->cursx = wp->cursy = wp->pixel_width = wp->pixel_height = 0;
