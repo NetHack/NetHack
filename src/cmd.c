@@ -1665,7 +1665,7 @@ struct ext_func_tab extcmdlist[] = {
     { '>',    "down", "go down a staircase",
               /* allows 'm' prefix (for move without autopickup) but not the
                  g/G/F movement modifiers; not flagged as MOVEMENTCMD because
-                 that would would suppress it from dokeylist output */
+                 that would suppress it from dokeylist output */
               dodown, CMD_M_PREFIX, NULL },
     { 'd',    "drop", "drop an item",
               dodrop, 0, NULL },

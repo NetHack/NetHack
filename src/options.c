@@ -3000,7 +3000,7 @@ optfn_perminv_mode(
         /* use a menu to choose new value for perminv_mode */
         retval = handler_perminv_mode();
     } else if (req == get_val) {
-        /* value shown when examining current option settings; exclosed
+        /* value shown when examining current option settings; enclosed
            within square brackets for 'O', shown as-is when setting value */
         Sprintf(opts, "%s", perminv_modes[iflags.perminv_mode][2]);
         if (iflags.perminv_mode != InvOptNone && !iflags.perm_invent
