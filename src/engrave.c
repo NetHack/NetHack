@@ -763,10 +763,16 @@ doengrave_sfx_item(struct _doengrave_ctx *de)
         if (is_art(de->otmp, ART_FIRE_BRAND)) {
             de->type = BURN; /* doesn't dull weapon */
         } else if (is_blade(de->otmp)) {
-            if ((int) de->otmp->spe > -3)
-                de->type = ENGRAVE;
+            /* if non-blade or welded or too dull, engraving type stays set
+               to DUST; feedback for that is only given for bladed weapons */
+            if (welded(de->otmp))
+                pline("%s can only scratch the %s.",
+                      Yname2(de->otmp), surface(u.ux, u.uy));
+            else if ((int) de->otmp->spe <= -3)
+                pline("%s too dull for engraving.",
+                      Yobjnam2(de->otmp, "are"));
             else
-                pline("%s too dull for engraving.", Yobjnam2(de->otmp, "are"));
+                de->type = ENGRAVE;
         }
         break;
 
@@ -1101,7 +1107,10 @@ doengrave(void)
     /* Tell adventurer what is going on */
     if (de->otmp != &hands_obj)
         You("%s the %s with %s%s.", de->everb, de->eloc,
-            (de->type == ENGRAVE && de->otmp->quan > 1L) ? "one of " : "",
+            /* since doname() yields "N items" when quantity is more than
+               one, match that by using "1 of" rather than "one of" when
+               informating the player that the stack will be split */
+            (de->type == ENGRAVE && de->otmp->quan > 1L) ? "1 of " : "",
             doname(de->otmp));
     else
         You("%s the %s with your %s.",
@@ -1264,20 +1273,14 @@ engrave(void)
     if (dulling_wep) {
         boolean splitstack = FALSE, dulled = FALSE;
 
-        /* 'stylus' is guaranteed to be a weapon */
+        /* 'dulling_wep' guarantees that 'stylus' is a weapon which is
+           not welded to the hero's hand(s) */
         if (stylus->quan > 1L) {
             if (firsttime)
                 pline("One of %s gets dull.", yname(stylus));
-            /*
-             * FIXME?
-             *  If 'stylus' is a stack that's welded to hero's hand,
-             *  ordinarily it couldn't be split.  This allows the player
-             *  to unweld one at a time (dulling in the process) until
-             *  there is only one left.  Is that what we really want?
-             *  [Perhaps caller should reject welded stack, or set type
-             *  to DUST instead of ENGRAVE?]
-             */
             stylus = gc.context.engraving.stylus = splitobj(stylus, 1L);
+            /* if stack is wielded or quivered, the split-off one isn't */
+            stylus->owornmask = 0L;
             splitstack = TRUE;
         } else {
             /* normal case: stylus->quan==1 */
@@ -1311,8 +1314,6 @@ engrave(void)
             }
         }
         if (splitstack) {
-            /* 'stylus' has been split off; remainder might still be worn */
-            stylus->owornmask = 0L;
             obj_extract_self(stylus);
             stylus = hold_another_object(stylus, "You drop one %s!",
                                          doname(stylus), (char *) NULL);

@@ -1402,6 +1402,9 @@ pets and peacefuls avoid a location hero just kicked
 shopkeepers bill you for using their bear trap or land mine
 when engraving with a stack of eligible weapons, split one off the stack and
 	dull it rather than dull the whole stack
+when engraving with a stack of cursed weapons, treat it differently if that
+	stack is welded to hero's hand:  write in dust and leave whole stack
+	welded rather than split one off stack to engrave on floor
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
