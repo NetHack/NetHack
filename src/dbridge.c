@@ -131,28 +131,30 @@ db_under_typ(int mask)
  * We want to know whether a wall (or a door) is the portcullis (passageway)
  * of an eventual drawbridge.
  *
- * Return value:  the direction of the drawbridge.
+ * Return value:  the direction of the drawbridge, or -1 if not valid
  */
-
 int
 is_drawbridge_wall(coordxy x, coordxy y)
 {
     struct rm *lev;
 
+    if (!isok(x, y))
+        return -1;
+
     lev = &levl[x][y];
     if (lev->typ != DOOR && lev->typ != DBWALL)
         return -1;
 
-    if (IS_DRAWBRIDGE(levl[x + 1][y].typ)
+    if (isok(x + 1, y) && IS_DRAWBRIDGE(levl[x + 1][y].typ)
         && (levl[x + 1][y].drawbridgemask & DB_DIR) == DB_WEST)
         return DB_WEST;
-    if (IS_DRAWBRIDGE(levl[x - 1][y].typ)
+    if (isok(x - 1, y) && IS_DRAWBRIDGE(levl[x - 1][y].typ)
         && (levl[x - 1][y].drawbridgemask & DB_DIR) == DB_EAST)
         return DB_EAST;
-    if (IS_DRAWBRIDGE(levl[x][y - 1].typ)
+    if (isok(x, y - 1) && IS_DRAWBRIDGE(levl[x][y - 1].typ)
         && (levl[x][y - 1].drawbridgemask & DB_DIR) == DB_SOUTH)
         return DB_SOUTH;
-    if (IS_DRAWBRIDGE(levl[x][y + 1].typ)
+    if (isok(x, y + 1) && IS_DRAWBRIDGE(levl[x][y + 1].typ)
         && (levl[x][y + 1].drawbridgemask & DB_DIR) == DB_NORTH)
         return DB_NORTH;
 
