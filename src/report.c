@@ -541,10 +541,16 @@ NH_panictrace_gdb(void)
 # endif /* !PANICTRACE_GDB */
 }
 
+#ifdef DUMPLOG_CORE
+#define USED_if_dumplog
+#else
+#define USED_if_dumplog UNUSED
+#endif
+
 /* lineno==0 gives the most recent message (e.g.
    "Do you want to call panic..." if called from #panic) */
 const char *
-get_saved_pline(int lineno)
+get_saved_pline(int lineno USED_if_dumplog)
 {
 #ifdef DUMPLOG_CORE
     int p;
@@ -565,6 +571,8 @@ get_saved_pline(int lineno)
 #endif /* DUMPLOG_CORE */
     return NULL;
 }
+
+#undef USED_if_dumplog
 
 # ifndef NO_SIGNAL
 /* called as signal() handler, so sent at least one arg */
