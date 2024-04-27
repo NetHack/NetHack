@@ -24,7 +24,6 @@ staticfn int trapeffect_bear_trap(struct monst *, struct trap *, unsigned);
 staticfn int trapeffect_slp_gas_trap(struct monst *, struct trap *, unsigned);
 staticfn int trapeffect_rust_trap(struct monst *, struct trap *, unsigned);
 staticfn int trapeffect_fire_trap(struct monst *, struct trap *, unsigned);
-staticfn int trapeffect_pit(struct monst *, struct trap *, unsigned);
 staticfn int trapeffect_hole(struct monst *, struct trap *, unsigned);
 staticfn int trapeffect_telep_trap(struct monst *, struct trap *, unsigned);
 staticfn int trapeffect_level_telep(struct monst *, struct trap *, unsigned);
@@ -1746,7 +1745,7 @@ trapeffect_fire_trap(
     return Trap_Effect_Finished;
 }
 
-staticfn int
+int
 trapeffect_pit(
     struct monst *mtmp,
     struct trap *trap,

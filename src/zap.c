@@ -5,6 +5,7 @@
 
 #include "hack.h"
 
+extern int trapeffect_pit(struct monst *, struct trap *, unsigned); /* from trap.c */
 /* Disintegration rays have special treatment; corpses are never left.
  * But the routine which calculates the damage is separate from the routine
  * which kills the monster.  The damage routine returns this cookie to
@@ -5064,6 +5065,10 @@ zap_over_floor(
                 rangemod -= 3;
                 lev->typ = ROOM, lev->flags = 0;
                 t = maketrap(x, y, PIT);
+                /* If you're walking on water and zap a wand of fire down
+                   to evaporate a pool, you should fall in the pit. */
+                if (u.ux == x && u.uy == y)
+                    trapeffect_pit(&gy.youmonst, t, 0);
                 /*if (t) -- this was before the vapor cloud was added --
                       t->tseen = 1;*/
                 if (see_it)
