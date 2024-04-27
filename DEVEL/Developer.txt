@@ -70,11 +70,14 @@ A. If you have never set up git on this machine before:
 	Windows:
 	    git config --global credential.helper store
 	Linux:
-	    (This may vary by distribution.)
+	    (This will vary by distribution.)
 	    cd /usr/share/doc/git/contrib/credentail/libsecret
 	    sudo apt-get install libglib-2.0-dev libsecret-1-dev
 	    sudo make
 	    git config --global credential.helper `pwd`/git-credential-libsecret
+		OR
+	    sudo yum install git-credential-libsecret
+	    git config --global credential.helper /usr/libexec/git-core/git-credential-libsecret
 
 B. Specify the prefix for variable substitution:
    (This assumes you are not a member of DevTeam or any variant's development
