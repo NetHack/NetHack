@@ -308,6 +308,13 @@ enum cost_alteration_types {
     COST_CRACK   = 19, /* damage to crystal armor */
 };
 
+/* used by unpaid_cost(shk.h) */
+enum unpaid_cost_flags {
+    COST_NOCONTENTS = 0,
+    COST_CONTENTS   = 1,
+    COST_SINGLEOBJ  = 2,
+};
+
 /* read.c, create_particular() & create_particular_parse() */
 struct _create_particular_data {
     int quan;

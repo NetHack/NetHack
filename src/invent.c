@@ -4110,7 +4110,7 @@ dounpaid(
     }
     if  (otmp && !contnr) {
         /* 1 item; use pline instead of popup menu */
-        cost = unpaid_cost(otmp, FALSE);
+        cost = unpaid_cost(otmp, COST_NOCONTENTS);
         iflags.suppress_price++; /* suppress "(unpaid)" suffix */
         pline1(xprname(otmp, distant_name(otmp, doname),
                        carried(otmp) ? otmp->invlet : CONTAINED_SYM,
@@ -4136,7 +4136,7 @@ dounpaid(
                         classcount++;
                     }
 
-                    totcost += cost = unpaid_cost(otmp, FALSE);
+                    totcost += cost = unpaid_cost(otmp, COST_NOCONTENTS);
                     iflags.suppress_price++; /* suppress "(unpaid)" suffix */
                     putstr(win, 0, xprname(otmp, distant_name(otmp, doname),
                                            ilet, TRUE, cost, 0L));
@@ -4162,7 +4162,7 @@ dounpaid(
 
                 marker = (struct obj *) 0; /* haven't found any */
                 while (find_unpaid(otmp->cobj, &marker)) {
-                    totcost += cost = unpaid_cost(marker, FALSE);
+                    totcost += cost = unpaid_cost(marker, COST_NOCONTENTS);
                     contcost += cost;
                     if (otmp->cknown) {
                         iflags.suppress_price++; /* suppress "(unpaid)" sfx */
