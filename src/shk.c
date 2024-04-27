@@ -2705,7 +2705,7 @@ alter_cost(
 long
 unpaid_cost(
     struct obj *unp_obj, /* known to be unpaid or contain unpaid */
-    boolean include_contents)
+    uchar cost_type) /* COST_NOCONTENTS, COST_CONTENTS, or COST_SINGLEOBJ */
 {
     struct bill_x *bp = (struct bill_x *) 0;
     struct monst *shkp = 0;
@@ -2729,9 +2729,15 @@ unpaid_cost(
 #endif
     for (shop = u.ushops; *shop; shop++) {
         if ((shkp = shop_keeper(*shop)) != 0) {
-            if ((bp = onbill(unp_obj, shkp, TRUE)))
-                amt = unp_obj->quan * bp->price;
-            if (include_contents && Has_contents(unp_obj))
+            if ((bp = onbill(unp_obj, shkp, TRUE))) {
+                amt = bp->price;
+                if (cost_type != COST_SINGLEOBJ) {
+                    /* use quan rather than get_pricing_units -- glob weight
+                       should already be factored into bp->price */
+                    amt *= unp_obj->quan;
+                }
+            }
+            if (cost_type == COST_CONTENTS && Has_contents(unp_obj))
                 amt = contained_cost(unp_obj, shkp, amt, FALSE, TRUE);
             if (bp || (!unp_obj->unpaid && amt))
                 break;

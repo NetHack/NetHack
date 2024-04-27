@@ -710,7 +710,7 @@ bill_dummy_object(struct obj *otmp)
     long cost = 0L;
 
     if (otmp->unpaid) {
-        cost = unpaid_cost(otmp, FALSE);
+        cost = unpaid_cost(otmp, COST_SINGLEOBJ);
         subfrombill(otmp, shop_keeper(*u.ushops));
     }
     dummy = newobj();
