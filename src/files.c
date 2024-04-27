@@ -170,6 +170,7 @@ staticfn boolean cnf_line_NAME(char *);
 staticfn boolean cnf_line_ROLE(char *);
 staticfn boolean cnf_line_dogname(char *);
 staticfn boolean cnf_line_catname(char *);
+#ifdef SYSCF
 staticfn boolean cnf_line_WIZARDS(char *);
 staticfn boolean cnf_line_SHELLERS(char *);
 staticfn boolean cnf_line_EXPLORERS(char *);
@@ -199,6 +200,8 @@ staticfn boolean cnf_line_SAVEFORMAT(char *);
 staticfn boolean cnf_line_BONESFORMAT(char *);
 staticfn boolean cnf_line_ACCESSIBILITY(char *);
 staticfn boolean cnf_line_PORTABLE_DEVICE_PATHS(char *);
+staticfn void parseformat(int *, char *);
+#endif /* SYSCF */
 staticfn boolean cnf_line_BOULDER(char *);
 staticfn boolean cnf_line_MENUCOLOR(char *);
 staticfn boolean cnf_line_HILITE_STATUS(char *);
@@ -222,7 +225,6 @@ staticfn void parse_conf_buf(struct _cnf_parser_state *parser,
 /* next one is in extern.h; why here too? */
 boolean parse_conf_str(const char *str, boolean (*proc)(char *arg));
 staticfn boolean parse_conf_file(FILE *fp, boolean (*proc)(char *arg));
-staticfn void parseformat(int *, char *);
 staticfn FILE *fopen_wizkit_file(void);
 staticfn void wizkit_addinv(struct obj *);
 boolean proc_wizkit_line(char *buf);
@@ -2754,6 +2756,8 @@ cnf_line_catname(char *bufp)
     return TRUE;
 }
 
+#ifdef SYSCF
+
 staticfn boolean
 cnf_line_WIZARDS(char *bufp)
 {
@@ -3117,6 +3121,8 @@ cnf_line_PORTABLE_DEVICE_PATHS(char *bufp)
 #endif
     return TRUE;
 }
+
+#endif  /* SYSCF */
 
 staticfn boolean
 cnf_line_BOULDER(char *bufp)
@@ -3809,6 +3815,7 @@ parse_conf_file(FILE *fp, boolean (*proc)(char *arg))
     return parser.rv;
 }
 
+#ifdef SYSCF
 staticfn void
 parseformat(int *arr, char *str)
 {
@@ -3841,6 +3848,7 @@ parseformat(int *arr, char *str)
             }
         }
 }
+#endif /* SYSCF */
 
 /* ----------  END CONFIG FILE HANDLING ----------- */
 
