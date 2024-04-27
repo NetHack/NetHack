@@ -1109,7 +1109,7 @@ doengrave(void)
         You("%s the %s with %s%s.", de->everb, de->eloc,
             /* since doname() yields "N items" when quantity is more than
                one, match that by using "1 of" rather than "one of" when
-               informating the player that the stack will be split */
+               informing the player that the stack will be split */
             (de->type == ENGRAVE && de->otmp->quan > 1L) ? "1 of " : "",
             doname(de->otmp));
     else
