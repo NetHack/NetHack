@@ -489,6 +489,7 @@ PACKAGE=@true
 HACKLIBSRC = hacklib.c
 HACKLIBOBJS = hacklib.o
 HACKLIB = hacklib.a
+TARGET_HACKLIB = $(TARGETPFX)hacklib.a
 
 MAKEDEFS = ../util/makedefs
 
@@ -638,45 +639,45 @@ pregame:
 $(GAME):	pregame $(MAKEDEFS) $(LUALIB) $(WAVS) $(SYSTEM)
 	@echo "$(GAME) is up to date."
 
-Sysunix: $(HOSTOBJ) $(HOBJ) $(TARGETPFX)$(HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
+Sysunix: $(HOSTOBJ) $(HOBJ) $(TARGET_HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(DATE_O) $(TARGETPFX)$(HACKLIB) $(WINLIB) \
+		$(HOBJ) $(DATE_O) $(TARGET_HACKLIB) $(WINLIB) \
 		$(TARGET_LIBS) $(LUALIBS) $(AUTOLIBS)
 	@touch Sysunix
 
-Sys3B2:	$(HOSTOBJ) $(HOBJ) $(TARGETPFX)$(HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
+Sys3B2:	$(HOSTOBJ) $(HOBJ) $(TARGET_HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(DATE_O) $(TARGETPFX)$(HACKLIB) $(WINLIB) \
+		$(HOBJ) $(DATE_O) $(TARGET_HACKLIB) $(WINLIB) \
 		$(LUALIBS) -lmalloc
 	@touch Sys3B2
 
-Sysatt:	$(HOSTOBJ) $(HOBJ) $(TARGETPFX)$(HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
+Sysatt:	$(HOSTOBJ) $(HOBJ) $(TARGET_HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Loading $(GAME)."
 	$(AT)$(LD) $(TARGET_LFLAGS) /lib/crt0s.o /lib/shlib.ifile \
-		-o $(GAMEBIN) $(HOSTOBJ) $(HOBJ) $(DATE_O) $(TARGETPFX)$(HACKLIB) \
+		-o $(GAMEBIN) $(HOSTOBJ) $(HOBJ) $(DATE_O) $(TARGET_HACKLIB) \
 		$(LUALIBS)
 	@touch Sysatt
 
-Systos:	$(HOSTOBJ) $(HOBJ) $(TARGETPFX)$(HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
+Systos:	$(HOSTOBJ) $(HOBJ) $(TARGET_HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(DATE_O) $(TARGETPFX)$(HACKLIB) \
+		$(HOBJ) $(DATE_O) $(TARGET_HACKLIB) \
 		$(WINLIB) $(LUALIBS)
 	@touch Systos
 
-SysV-AT:	DUMB.Setup $(HOSTOBJ) $(HOBJ) $(TARGETPFX)$(HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
+SysV-AT:	DUMB.Setup $(HOSTOBJ) $(HOBJ) $(TARGET_HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(DATE_O) $(TARGETPFX)$(HACKLIB) \
+		$(HOBJ) $(DATE_O) $(TARGET_HACKLIB) \
 		$(WINLIB) $(LUALIBS)
 	@touch SysV-AT
 
-SysBe: $(HOSTOBJ) $(HOBJ) $(TARGETPFX)$(HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
+SysBe: $(HOSTOBJ) $(HOBJ) $(TARGET_HACKLIB) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAME) \
-		$(HOBJ) $(DATE_O) $(TARGETPFX)$(HACKLIB) \
+		$(HOBJ) $(DATE_O) $(TARGET_HACKLIB) \
 		$(WINLIB) $(TARGET_LIBS) $(LUALIBS)
 	@xres -o $(GAME) ../win/BeOS/nethack.rsrc
 	@mimeset -f $(GAME)
@@ -763,7 +764,7 @@ $(TARGETPFX)sfstruct.o: sfstruct.c $(HACK_H)
 
 #	date.c should be recompiled any time any of the source or include code
 #	is modified.
-$(TARGETPFX)date.o: date.c $(HACK_H) $(HACKCSRC)  $(HOBJ) $(TARGETPFX)$(HACKLIB)
+$(TARGETPFX)date.o: date.c $(HACK_H) $(HACKCSRC)  $(HOBJ) $(TARGET_HACKLIB)
 	$(TARGET_CC) $(TARGET_CFLAGS) $(GITHASH) $(GITBRANCH) -c -o $@ date.c
 
 #	date.h should be remade any time any of the source or include code
