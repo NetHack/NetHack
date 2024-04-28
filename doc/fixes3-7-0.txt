@@ -1406,6 +1406,9 @@ when engraving with a stack of cursed weapons, treat it differently if that
 	stack is welded to hero's hand:  write in dust and leave whole stack
 	welded rather than split one off stack to engrave on floor
 hero or monster didn't fall into pit if water at the location was boiled away
+shopkeepers magnified the cost of shop items used up as a group; normally
+	using an item splits 1 from its stack, but applying a stack of N
+	candles to light them all charged N * N * single_candle_price
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
