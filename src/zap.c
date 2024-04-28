@@ -5036,14 +5036,14 @@ zap_over_floor(
             /* a burning web is too flimsy to notice if you can't see it */
             if (see_it)
                 Norep("A web bursts into flames!");
-            (void) delfloortrap(t);
+            (void) delfloortrap(t), t = (struct trap *) 0;
             if (see_it)
                 newsym(x, y);
         }
         if (is_ice(x, y)) {
             melt_ice(x, y, (char *) 0);
         } else if (is_pool(x, y)) {
-            boolean on_water_level = Is_waterlevel(&u.uz);
+            boolean on_water_level = Is_waterlevel(&u.uz), msggiven = FALSE;
             const char *msgtxt = (!Deaf)
                                  ? "You hear hissing gas." /* Deaf-aware */
                                  : (type >= 0)
@@ -5052,10 +5052,14 @@ zap_over_floor(
 
             /* don't create steam clouds on Plane of Water; air bubble
                movement and gas regions don't understand each other */
-            if (!on_water_level)
+            if (!on_water_level) {
                 create_gas_cloud(x, y, rnd(5), 0); /* 1..5, no damg */
+                if (iflags.last_msg == PLNMSG_ENVELOPED_IN_GAS)
+                    msggiven = TRUE;
+            }
 
             if (lev->typ != POOL) { /* MOAT or DRAWBRIDGE_UP or WATER */
+                t = (struct trap *) 0;
                 if (on_water_level)
                     msgtxt = (see_it || !Deaf) ? "Some water boils." : 0;
                 else if (see_it)
@@ -5069,9 +5073,10 @@ zap_over_floor(
                 if (see_it)
                     msgtxt = "The water evaporates.";
             }
-            if (msgtxt)
+            if (msgtxt && !msggiven)
                 Norep("%s", msgtxt);
-            if (lev->typ == ROOM) {
+
+            if (lev->typ == ROOM) { /* POOL changed to ROOM above */
                 if ((mon = m_at(x, y)) != 0) {
                     /* probably ought to do some hefty damage to any
                        creature caught in boiling water;
@@ -5081,6 +5086,15 @@ zap_over_floor(
                     }
                 }
                 newsym(x, y);
+                if (t) {
+                    /* if water walking/swimming/magical breathing, maybe fall
+                       into the new pit (after the water evaporation message);
+                       if flying or levitating, nothing will happen */
+                    if (u_at(x, y))
+                        dotrap(t, NO_TRAP_FLAGS);
+                    else if (mon)
+                        mintrap(mon, NO_TRAP_FLAGS);
+                }
             }
         } else if (IS_FOUNTAIN(lev->typ)) {
             create_gas_cloud(x, y, rnd(3), 0); /* 1..3, no damage */

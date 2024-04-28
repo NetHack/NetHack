@@ -1232,9 +1232,11 @@ create_gas_cloud(coordxy x, coordxy y, int cloudsize, int damage)
     cloud->glyph = cmap_to_glyph(damage ? S_poisoncloud : S_cloud);
     add_region(cloud);
 
-    if (!gi.in_mklev && !inside_cloud && is_hero_inside_gas_cloud())
+    if (!gi.in_mklev && !inside_cloud && is_hero_inside_gas_cloud()) {
         You("are enveloped in a cloud of %s!",
             damage ? "noxious gas" : "steam");
+        iflags.last_msg = PLNMSG_ENVELOPED_IN_GAS;
+    }
 
     return cloud;
 }

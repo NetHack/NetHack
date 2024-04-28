@@ -496,6 +496,7 @@ enum plnmsg_types {
     PLNMSG_ONE_ITEM_HERE,       /* "you see <single item> here" */
     PLNMSG_TOWER_OF_FLAME,      /* scroll of fire */
     PLNMSG_CAUGHT_IN_EXPLOSION, /* explode() feedback */
+    PLNMSG_ENVELOPED_IN_GAS,    /* create_gas_cloud() feedback */
     PLNMSG_OBJ_GLOWS,           /* "the <obj> glows <color>" */
     PLNMSG_OBJNAM_ONLY,         /* xname/doname only, for #tip */
     PLNMSG_OK_DONT_DIE,         /* overriding death in explore/wizard mode */

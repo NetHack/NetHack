@@ -1405,6 +1405,7 @@ when engraving with a stack of eligible weapons, split one off the stack and
 when engraving with a stack of cursed weapons, treat it differently if that
 	stack is welded to hero's hand:  write in dust and leave whole stack
 	welded rather than split one off stack to engrave on floor
+hero or monster didn't fall into pit if water at the location was boiled away
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
