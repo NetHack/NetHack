@@ -2907,6 +2907,8 @@ objlist_sanity(struct obj *objlist, int wheretype, const char *mesg)
             insane_object(obj, ofmt0, mesg, (struct monst *) 0);
         if (obj->where == OBJ_INVENT && obj->how_lost != LOST_NONE) {
             char lostbuf[40];
+
+            /* %d: bitfield is unsigned but narrow, so promotes to int */
             Sprintf(lostbuf, "how_lost=%d obj in inventory!", obj->how_lost);
             insane_object(obj, ofmt0, lostbuf, (struct monst *) 0);
         }
@@ -2946,6 +2948,37 @@ objlist_sanity(struct obj *objlist, int wheretype, const char *mesg)
                     insane_object(obj, ofmt0, maskbuf, (struct monst *) 0);
                 }
                 break;
+            }
+        }
+        if (obj->otyp == LEASH && obj->leashmon) {
+            char buf[BUFSZ];
+            struct monst *mtmp = find_mid(obj->leashmon, FM_FMON);
+
+            if (obj->where == OBJ_INVENT) {
+                if (!mtmp) { /* found leash with phantom mon */
+                    Sprintf(buf, "leashmon=%u no monst,",
+                            (unsigned) obj->leashmon);
+                    insane_object(obj, ofmt0, buf, (struct monst *) 0);
+                } else if (!mtmp->mleashed) { /* found leashed mon
+                                               * not flagged as leashed */
+                    Sprintf(buf, "leashmon=%u %s not leashed,",
+                            (unsigned) obj->leashmon, mon_pmname(mtmp));
+                    insane_object(obj, ofmt0, buf, (struct monst *) 0);
+                }
+            } else {
+                struct monst *mtmp2 = (obj->where == OBJ_MINVENT)
+                                      ? obj->ocarry : (struct monst *) 0;
+
+                if (mtmp) { /* found monst leashed by non-invent leash */
+                    Sprintf(buf, "leashmon:%u %s leashed by %s leash,",
+                            (unsigned) obj->leashmon,
+                            mon_pmname(mtmp), where_name(obj));
+                    insane_object(obj, ofmt0, buf, mtmp2);
+                } else { /* found non-invent leash with m_id of phantom mon */
+                    Sprintf(buf, "leashmon:%u no monst for %s leash,",
+                            (unsigned) obj->leashmon, where_name(obj));
+                    insane_object(obj, ofmt0, buf, mtmp2);
+                }
             }
         }
         if (obj->globby)
@@ -3165,11 +3198,13 @@ init_dummyobj(struct obj *obj, short otyp, long oquan)
          /* obj->dknown = 0; */
          /* suppress known except for amulets (needed for fakes & real AoY) */
          obj->known = (obj->oclass == AMULET_CLASS)
-                       ? obj->known
+                         ? obj->known
                          /* default is "on" for types which don't use it */
                          : !objects[otyp].oc_uses_known;
          obj->quan = oquan ? oquan : 1L;
          obj->corpsenm = NON_PM; /* suppress statue and figurine details */
+         if (obj->otyp == LEASH)
+             obj->leashmon = 0; /* overloads corpsenm, avoid NON_PM */
          if (obj->otyp == BOULDER)
              obj->next_boulder = 0; /* overloads corpsenm, avoid NON_PM */
          /* but suppressing fruit details leads to "bad fruit #0" */

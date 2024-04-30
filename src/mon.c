@@ -216,6 +216,24 @@ sanity_check_single_mon(
         }
 #endif
     }
+    if (mtmp->mleashed) {
+        if (!get_mleash(mtmp))
+            impossible("monst %u: leashed but no leash for %s",
+                       mtmp->m_id, mon_pmname(mtmp));
+        else if (!mtmp->mtame)
+            impossible("monst %u: leashed but not tame %s",
+                       mtmp->m_id, mon_pmname(mtmp));
+#if 0
+        /* after hero moves, leashed mon won't necessarily pass 'm_next2u()'
+           test; 90 is farthest observed distance with expert jumping spell
+           when very slow mon is already several steps away and hero jumps in
+           opposite direction (if hero teleports, leashed mon moves adjacent
+           immediately; knockback has shorter range than magical jumping) */
+        else if (distu(mtmp->mx, mtmp->my) > 90) /*if (!m_next2u(mtmp))*/
+            impossible("monst %u: leashed but not next to you (%d)",
+                       mtmp->m_id, distu(mtmp->mx, mtmp->my));
+#endif
+    }
 }
 
 void

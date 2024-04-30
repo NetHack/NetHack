@@ -1769,6 +1769,16 @@ poly_obj(struct obj *obj, int id)
             otmp->cursed = FALSE;
         }
     }
+    if (obj->otyp == LEASH && obj->leashmon != 0) {
+        if (otmp->otyp == LEASH) {
+            otmp->leashmon = obj->leashmon;
+            /* clear m_id before delobj(), to avoid o_unleash() by obfree() */
+            obj->leashmon = 0;
+        } else {
+            /* obfree() would do this if we didn't do it here */
+            o_unleash(obj);
+        }
+    }
 
     /* no box contents --KAA */
     if (Has_contents(otmp))

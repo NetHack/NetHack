@@ -702,10 +702,10 @@ o_unleash(struct obj *otmp)
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
         if (mtmp->m_id == (unsigned) otmp->leashmon) {
             mtmp->mleashed = 0;
-            otmp->leashmon = 0;
-            update_inventory();
             break;
         }
+    otmp->leashmon = 0;
+    update_inventory();
 }
 
 /* mtmp is about to die, or become untame */
