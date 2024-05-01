@@ -396,7 +396,7 @@ gloc_filter_init(void)
         /* special case: if we're in a doorway, try to figure out which
            direction we're moving, and use that side of the doorway */
         if (IS_DOOR(levl[u.ux][u.uy].typ)) {
-            if (u.dx || u.dy) {
+            if ((u.dx || u.dy) && isok(u.ux + u.dx, u.uy + u.dy)) {
                 gloc_filter_floodfill(u.ux + u.dx, u.uy + u.dy);
             } else {
                 /* TODO: maybe add both sides of the doorway? */
