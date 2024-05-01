@@ -2965,7 +2965,12 @@ objlist_sanity(struct obj *objlist, int wheretype, const char *mesg)
                             (unsigned) obj->leashmon, mon_pmname(mtmp));
                     insane_object(obj, ofmt0, buf, (struct monst *) 0);
                 }
-            } else {
+
+            /* have to explicitly exclude migrating_objs because the
+               obj->migr_species field overlays obj->corpsenm just like
+               obj->leashmon does, so obj->leashmon and consequently 'mtmp'
+               might be inaccurate for any leash found on migrating_objs */
+            } else if (obj->where != OBJ_MIGRATING) {
                 struct monst *mtmp2 = (obj->where == OBJ_MINVENT)
                                       ? obj->ocarry : (struct monst *) 0;
 
