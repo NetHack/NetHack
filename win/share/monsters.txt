@@ -14234,43 +14234,45 @@ Z = (195, 195, 195)
   ....CJJJCLAAAAAA
   ..LLLLL.LLLLLAA.
 }
+#: Ixoth is a male red dragon
+#: [for many years his tile erroneously depicted a demon]
 # tile 742 (Ixoth,male)
 {
-  ....O......O....
-  ....O......O....
-  ...LOOCDDCOOL...
-  ...DDDDDDDDDDD..
-  .CCDDDGDDGDDDCC.
-  CCDKDDDDDDDDJCCC
-  CDDKKKDIIDJJDCCD
-  CDDKDDKJJJDDDCDD
-  CCDKDDDDDDDDKCDD
-  .CCDKKDDDDKKCDDD
-  .CCDADKDDKDACDD.
-  .DDDADDDDDDADDD.
-  ....CCDDDDKKAA..
-  ...CDDDAADDDKAA.
-  ..CDDDAAA.DDDK..
-  ................
+  ......IIIDA.....
+  .....GDGDDDA....
+  ....IDDDDDDA....
+  ..DCHHD..DDA....
+  CHCHCD..IDDA....
+  HD.D...IDDA.....
+  ......HIDAAAAAA.
+  ....IHIDAAAAAAAA
+  ..IHHIDAJDDJAAA.
+  .IHHHIDDDDDDJAA.
+  .IHHHIDDDDDDDAA.
+  DDHHIIDDDDDDDDA.
+  ID.HIDDHHDDJDJA.
+  IDAAID.AADDADDA.
+  ....IDAAJJJDDJA.
+  ........DDDDJA..
 }
 # tile 743 (Ixoth,female)
 {
-  ....O......O....
-  ....O......O....
-  ...LOOCDDCOOL...
-  ...DDDDDDDDDDD..
-  .CCDDDGDDGDDDCC.
-  CCDKDDDDDDDDJCCC
-  CDDKKKDIIDJJDCCD
-  CDDKDDKJJJDDDCDD
-  CCDKDDDDDDDDKCDD
-  .CCDKKDDDDKKCDDD
-  .CCDADKDDKDACDD.
-  .DDDADDDDDDADDD.
-  ....CCDDDDKKAA..
-  ...CDDDAADDDKAA.
-  ..CDDDAAA.DDDK..
-  ................
+  ......IIIDA.....
+  .....GDGDDDA....
+  ....IDDDDDDA....
+  ..DCHHD..DDA....
+  CHCHCD..IDDA....
+  HD.D...IDDA.....
+  ......HIDAAAAAA.
+  ....IHIDAAAAAAAA
+  ..IHHIDAJDDJAAA.
+  .IHHHIDDDDDDJAA.
+  .IHHHIDDDDDDDAA.
+  DDHHIIDDDDDDDDA.
+  ID.HIDDHHDDJDJA.
+  IDAAID.AADDADDA.
+  ....IDAAJJJDDJA.
+  ........DDDDJA..
 }
 # tile 744 (Master Kaen,male)
 {

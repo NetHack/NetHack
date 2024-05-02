@@ -1409,6 +1409,8 @@ hero or monster didn't fall into pit if water at the location was boiled away
 shopkeepers magnified the cost of shop items used up as a group; normally
 	using an item splits 1 from its stack, but applying a stack of N
 	candles to light them all charged N * N * single_candle_price
+the tile for Ixoth (knight's quest nemesis) depicted a demon rather than a
+	dragon; change it to be a red dragon
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
