@@ -30,9 +30,10 @@ des.monster("Vlad the Impaler", 06, 05)
 des.monster("V",niches[1])
 des.monster("V",niches[2])
 des.monster("V",niches[3])
-des.monster("V",niches[4])
-des.monster("V",niches[5])
-des.monster("V",niches[6])
+-- The brides
+des.monster("Vampire Lady",niches[4])
+des.monster("Vampire Lady",niches[5])
+des.monster("Vampire Lady",niches[6])
 -- The doors
 des.door("closed",08,03)
 des.door("closed",10,03)
