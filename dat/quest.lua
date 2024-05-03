@@ -1370,7 +1370,7 @@ return when you have attained the post of %R."]],
 Something is obviously wrong here.  Strange shapes lumber around
 outside %H!
 
-You realize that the %l needs your assistance!]],
+You realize that %l needs your assistance!]],
       },
       goal_first = {
          synopsis = "[You are surrounded by brimstone, lava, and elementals.]",
@@ -1453,7 +1453,7 @@ as you have failed us utterly."]],
          synopsis = "[You have reached %i.  %nC lurks further ahead.]",
          output = "text",
          text = [[You remember the descriptions of %i, given
-to you by the %l.  It is ahead that you will find
+to you by %l.  It is ahead that you will find
 %n's trail.]],
       },
       locate_next = {
