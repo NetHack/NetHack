@@ -3466,7 +3466,7 @@ check_special_room(boolean newlev)
             intemple(roomno + ROOMOFFSET);
         /*FALLTHRU*/
         default:
-            msg_given = (rt == TEMPLE);
+            msg_given = (rt == TEMPLE || rt >= SHOPBASE);
             rt = 0;
             break;
         }
