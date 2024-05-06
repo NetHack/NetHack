@@ -5849,6 +5849,7 @@ destroy_items(
     int limit; /* max amount of item stacks destroyed, based on damage */
     struct {
         unsigned oid;
+        struct obj *otmp;
         boolean deferred;
     } items_to_destroy[MAX_ITEMS_DESTROYED];
     int elig_stacks = 0; /* number of destroyable objects found so far */
@@ -5856,11 +5857,13 @@ destroy_items(
     /* this is a struct obj** because we might destroy the first item in it */
     struct obj **objchn = u_carry ? &gi.invent : &mon->minvent;
     int dmg_out = 0; /* damage caused by items getting destroyed */
+    xint8 where = NOBJ_STATES;
 
     /* initialize items_to_destroy */
     for (i = 0; i < MAX_ITEMS_DESTROYED; ++i) {
         /* 0 should not be a valid o_id for anything */
         items_to_destroy[i].oid = 0;
+        items_to_destroy[i].otmp = (struct obj *) 0;
         items_to_destroy[i].deferred = FALSE;
     }
 
@@ -5923,6 +5926,11 @@ destroy_items(
             continue;
         }
         items_to_destroy[i].oid = obj->o_id;
+        items_to_destroy[i].otmp = obj;
+        if (where == NOBJ_STATES)
+            where = obj->where;
+        else if (where != obj->where)
+            impossible("destroy_item: items in multiple chains");
 
         /* if loss of this item might dump us onto a trap, hold off
            until later because potential recursive destroy_items() will
@@ -5948,15 +5956,13 @@ destroy_items(
         /* if we saved some items for later (most likely just a worn ring
            of levitation) and they're still in inventory, handle them on the
            second iteration of the loop */
-        struct obj *nobj;
-        for (obj = *objchn; obj; obj = nobj) {
-            nobj = obj->nobj;
-            for (i = 0; i < elig_stacks; ++i) {
-                if (obj->o_id == items_to_destroy[i].oid
-                    && (items_to_destroy[i].deferred == (defer == 1))) {
-                    dmg_out += maybe_destroy_item(mon, obj, dmgtyp);
-                    break;
-                }
+        for (i = 0; i < elig_stacks; ++i) {
+            obj = items_to_destroy[i].otmp;
+            if (obj && obj->o_id == items_to_destroy[i].oid
+                && obj->where == where
+                && (items_to_destroy[i].deferred == (defer == 1))) {
+                dmg_out += maybe_destroy_item(mon, obj, dmgtyp);
+                items_to_destroy[i].otmp = (struct obj *) 0;
             }
         }
     }

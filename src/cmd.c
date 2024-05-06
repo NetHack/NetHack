@@ -1008,6 +1008,7 @@ makemap_prepost(boolean pre, boolean wiztower)
         set_uinwater(0); /* u.uinwater = 0 */
         u.uundetected = 0; /* not hidden, even if means are available */
         dmonsfree(); /* purge dead monsters from 'fmon' */
+        dobjsfree();
 
         /* discard current level; "saving" is used to release dynamic data */
         zero_nhfile(&tmpnhfp);  /* also sets fd to -1 as desired */

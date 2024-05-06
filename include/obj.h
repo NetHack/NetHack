@@ -81,7 +81,8 @@ struct obj {
 #define OBJ_BURIED 6    /* object buried */
 #define OBJ_ONBILL 7    /* object on shk bill */
 #define OBJ_LUAFREE 8   /* object has been dealloc'd, but is ref'd by lua */
-#define NOBJ_STATES 9
+#define OBJ_DELETED 9   /* object is marked for deletion by dobjsfree() */
+#define NOBJ_STATES 10
     xint16 timed; /* # of fuses (timers) attached to this obj */
 
     Bitfield(cursed, 1);    /* uncursed when neither cursed nor blessed */

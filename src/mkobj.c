@@ -13,6 +13,7 @@ staticfn void mksobj_init(struct obj *, boolean);
 staticfn int item_on_ice(struct obj *);
 staticfn void shrinking_glob_gone(struct obj *);
 staticfn void obj_timer_checks(struct obj *, coordxy, coordxy, int);
+staticfn void dealloc_obj_real(struct obj *);
 staticfn struct obj *save_mtraits(struct obj *, struct monst *);
 staticfn void objlist_sanity(struct obj *, int, const char *);
 staticfn void shop_obj_sanity(struct obj *, const char *);
@@ -2478,6 +2479,7 @@ obj_extract_self(struct obj *obj)
     switch (obj->where) {
     case OBJ_FREE:
     case OBJ_LUAFREE:
+    case OBJ_DELETED:
         break;
     case OBJ_FLOOR:
         remove_object(obj);
@@ -2656,7 +2658,7 @@ container_weight(struct obj *object)
 }
 
 /*
- * Deallocate the object.  _All_ objects should be run through here for
+ * Mark object to be deallocated.  _All_ objects should be run through here for
  * them to be deallocated.
  */
 void
@@ -2695,13 +2697,23 @@ dealloc_obj(struct obj *obj)
     if (obj == gk.kickedobj)
         gk.kickedobj = 0;
 
-    if (obj->oextra)
-        dealloc_oextra(obj);
     if (obj->lua_ref_cnt) {
         /* obj is referenced from a lua script, let lua gc free it */
         obj->where = OBJ_LUAFREE;
         return;
     }
+    /* mark object as deleted, put it into queue to be freed */
+    obj->where = OBJ_DELETED;
+    obj->nobj = go.objs_deleted;
+    go.objs_deleted = obj;
+}
+
+/* actually deallocate the object */
+staticfn void
+dealloc_obj_real(struct obj *obj)
+{
+    if (obj->oextra)
+        dealloc_oextra(obj);
 
     /* clear out of date information contained in the about-to-become
        stale memory so that potential used-after-freed bugs (should never
@@ -2710,6 +2722,22 @@ dealloc_obj(struct obj *obj)
        similar so this is mainly useful for ordinary malloc/free */
     *obj = cg.zeroobj;
     free((genericptr_t) obj);
+}
+
+/* free all the objects marked for deletion */
+void
+dobjsfree(void)
+{
+    struct obj *otmp = go.objs_deleted;
+
+    while (go.objs_deleted) {
+        otmp = go.objs_deleted->nobj;
+        if (go.objs_deleted->where != OBJ_DELETED)
+            panic("dobjsfree: obj where is not OBJ_DELETED");
+        obj_extract_self(go.objs_deleted);
+        dealloc_obj_real(go.objs_deleted);
+        go.objs_deleted = otmp;
+    }
 }
 
 /* create an object from a horn of plenty; mirrors bagotricks(makemon.c) */

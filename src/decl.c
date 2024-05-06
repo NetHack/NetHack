@@ -642,6 +642,7 @@ static const struct instance_globals_n g_init_n = {
 };
 
 static const struct instance_globals_o g_init_o = {
+    NULL, /* objs_deleted */
     /* dbridge.c */
     { { 0 } }, /* occupants */
     /* decl.c */
