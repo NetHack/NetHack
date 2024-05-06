@@ -2628,6 +2628,7 @@ domove_core(void)
 
     /* warn maybe player before walking into known traps */
     if (ParanoidTrap && (trap = t_at(x, y)) != 0 && trap->tseen
+        && (test_move(u.ux, u.uy, x - u.ux, y - u.uy, TEST_MOVE))
         && (!gc.context.nopick || gc.context.run)
         && !Stunned && !Confusion
         && (immune_to_trap(&gy.youmonst, trap->ttyp) != TRAP_CLEARLY_IMMUNE
