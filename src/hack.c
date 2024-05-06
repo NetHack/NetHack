@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1702017600 2023/12/08 06:40:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.422 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1715022473 2024/05/06 19:07:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.447 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1005,8 +1005,8 @@ test_move(
             } else {
                 if (mode == DO_MOVE) {
                     if (amorphous(gy.youmonst.data))
-                        You(
-   "try to ooze under the door, but can't squeeze your possessions through.");
+                        You("try to ooze under the door,"
+                            " but can't squeeze your possessions through.");
                     if (flags.autoopen && !gc.context.run
                         && !Confusion && !Stunned && !Fumbling) {
                         gc.context.door_opened
@@ -1090,7 +1090,8 @@ test_move(
         /* FIXME: should be using lastseentyp[x][y] rather than seen vector
          */
         if ((levl[x][y].seenv && is_pool_or_lava(x, y)) /* known pool/lava */
-            && ((IS_WATERWALL(levl[x][y].typ) || levl[x][y].typ == LAVAWALL) /* never enter wall of liquid */
+            && ((IS_WATERWALL(levl[x][y].typ) /* never enter wall of liquid */
+                 || levl[x][y].typ == LAVAWALL)
                 /* don't enter pool or lava (must be one of the two to
                    get here) unless flying or levitating or have known
                    water-walking for pool or known lava-walking and
@@ -2626,12 +2627,13 @@ domove_core(void)
     if (u_rooted())
         return;
 
-    /* warn maybe player before walking into known traps */
+    /* maybe ask player for confirmation before walking into known traps */
     if (ParanoidTrap && (trap = t_at(x, y)) != 0 && trap->tseen
         && (!gc.context.nopick || gc.context.run)
         && !Stunned && !Confusion
+        && test_move(u.ux, u.uy, u.dx, u.dy, TEST_MOVE)
         && (immune_to_trap(&gy.youmonst, trap->ttyp) != TRAP_CLEARLY_IMMUNE
-            /* hallucination: all traps still show as ^, but the
+            /* Hallucination: all traps still show as ^, but the
                hero can't tell what they are, so treat as dangerous */
             || Hallucination)) {
         char qbuf[QBUFSZ];
