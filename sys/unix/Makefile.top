@@ -20,11 +20,11 @@ NHSROOT=.
 #	to execute things like 'data' and 'rumors'.)
 # MAKE = make
 
-#	make NetHack (as opposite to variants or such)
+#	make mhack variant
 #PREFIX	 = /usr
-GAME     = nethack
-# GAME     = nethack.exe
-# GAME     = nethack.prg
+GAME     = mhack
+# GAME     = mhack.exe
+# GAME     = mhack.prg
 #GAMEUID  = games
 #GAMEGRP  = bin
 

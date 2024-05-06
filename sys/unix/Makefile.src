@@ -407,8 +407,8 @@ WINCURSESLIB = -lncurses
 # LIBS =
 
 # make NetHack
-GAME     = nethack
-# GAME     = nethack.prg
+GAME     = mhack
+# GAME     = mhack.prg
 GAMEBIN = $(GAME)
 
 # if you defined RANDOM in unixconf.h since your system did not come

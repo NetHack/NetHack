@@ -257,8 +257,8 @@ ALLOBJS = $(HACKOBJS) $(VMSOBJS) $(WINTTYOBJS)  $(RANDOBJ) \
 		$(WINCURSESOBJS) $(WINX11OBJS) $(WINQTOBJS) \
 		$(WINSHAREOBJS) $(REGEXOBJ) $(TERMCAPOBJ)
 
-GAME     = nethack
-# GAME     = nethack.prg
+GAME     = mhack
+# GAME     = mhack.prg
 GAMEBIN = $(GAME).exe
 
 LINKOBJLIST   = $(addsuffix $(comma), $(ALLOBJS))

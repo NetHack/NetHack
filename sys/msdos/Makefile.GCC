@@ -21,7 +21,7 @@
 # Game Installation Variables
 # NOTE: Make sure GAMEDIR exists before make is started.
 
-GAME = nethack
+GAME = mhack
 # The GNU Make has a problem if you include a drive spec below (unfortunately).
 GAMEDIR =../binary
 

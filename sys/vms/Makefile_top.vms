@@ -66,9 +66,9 @@ LUABASELIB = liblua-$(LUADOTVER).olb
 
 #	make NetHack (as opposite to variants or such)
 #PREFIX	 = /usr
-GAME     = nethack
-# GAME     = nethack.exe
-# GAME     = nethack.prg
+GAME     = mhack
+# GAME     = mhack.exe
+# GAME     = mhack.prg
 #GAMEUID  = games
 #GAMEGRP  = bin
 

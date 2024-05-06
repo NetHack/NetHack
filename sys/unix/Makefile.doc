@@ -80,7 +80,7 @@ $(MAKEDEFS)	: ../util/makedefs.c ../include/config.h ../src/mdlib.c \
 		  ../util/mdgrep.h
 	( cd ../util ; make makedefs )
 
-GAME	= nethack
+GAME	= mhack
 MANDIR	?= /usr/man/man6
 MANEXT	= 6
 NROFF ?= nroff
