@@ -103,6 +103,10 @@ del_light_source(int type, anything *id)
        has only been partially restored during a level change
        (in particular: chameleon vs prot. from shape changers) */
     switch (type) {
+    case LS_NONE:
+        impossible("del_light_source:type=none");
+        tmp_id.a_uint = 0;
+        break;
     case LS_OBJECT:
         tmp_id.a_uint = id->a_obj ? id->a_obj->o_id : 0;
         break;

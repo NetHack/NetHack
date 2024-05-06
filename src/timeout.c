@@ -1942,6 +1942,9 @@ staticfn const char *
 kind_name(short kind)
 {
     switch (kind) {
+    case TIMER_NONE:
+        impossible("no timer type");
+        return "none";
     case TIMER_LEVEL:
         return "level";
     case TIMER_GLOBAL:
@@ -2179,7 +2182,7 @@ start_timer(
 {
     timer_element *gnu, *dup;
 
-    if (kind < 0 || kind >= NUM_TIMER_KINDS
+    if (kind <= TIMER_NONE || kind >= NUM_TIMER_KINDS
         || func_index < 0 || func_index >= NUM_TIME_FUNCS)
         panic("start_timer (%s: %d)", kind_name(kind), (int) func_index);
 

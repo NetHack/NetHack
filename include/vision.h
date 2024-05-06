@@ -12,8 +12,12 @@
 /*
  * Light source sources
  */
-#define LS_OBJECT 0
-#define LS_MONSTER 1
+enum ls_sources {
+    LS_NONE = 0,
+    LS_OBJECT = 1,
+    LS_MONSTER = 2,
+    NUM_LS_SOURCES
+};
 
 /*
  *  cansee()    - Returns true if the hero can see the location.
