@@ -3438,6 +3438,9 @@ shop_string(int rtype)
     case WANDSHOP:
         str = "wand shop";
         break;
+    case TOOLSHOP:
+        str = "hardware store";
+        break;
     case BOOKSHOP:
         str = "bookstore";
         break;
