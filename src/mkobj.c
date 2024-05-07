@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkobj.c	$NHDT-Date: 1704316444 2024/01/03 21:14:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.282 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1715109575 2024/05/07 19:19:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.296 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2692,6 +2692,13 @@ dealloc_obj(struct obj *obj)
         obj->lamplit = 0;
     }
 
+    /* clear some bits that obj_sanity() would complain about if it were
+       to be called when the objs_deleted list is populated */
+    obj->unpaid = obj->no_charge = 0;
+    obj->in_use = obj->bypass = obj->nomerge = 0;
+    if (obj->otyp == BOULDER)
+        obj->next_boulder = 0;
+
     if (obj == gt.thrownobj)
         gt.thrownobj = 0;
     if (obj == gk.kickedobj)
@@ -2728,7 +2735,7 @@ dealloc_obj_real(struct obj *obj)
 void
 dobjsfree(void)
 {
-    struct obj *otmp = go.objs_deleted;
+    struct obj *otmp;
 
     while (go.objs_deleted) {
         otmp = go.objs_deleted->nobj;
@@ -2894,6 +2901,7 @@ obj_sanity_check(void)
     objlist_sanity(gm.migrating_objs, OBJ_MIGRATING, "migrating sanity");
     objlist_sanity(gl.level.buriedobjlist, OBJ_BURIED, "buried sanity");
     objlist_sanity(gb.billobjs, OBJ_ONBILL, "bill sanity");
+    objlist_sanity(go.objs_deleted, OBJ_DELETED, "deleted object sanity");
 
     mon_obj_sanity(fmon, "minvent sanity");
     mon_obj_sanity(gm.migrating_mons, "migrating minvent sanity");
