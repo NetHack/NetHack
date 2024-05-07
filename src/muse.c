@@ -29,6 +29,8 @@ staticfn void m_use_undead_turning(struct monst *, struct obj *);
 staticfn boolean hero_behind_chokepoint(struct monst *);
 staticfn boolean mon_has_friends(struct monst *);
 staticfn int mbhitm(struct monst *, struct obj *);
+staticfn boolean fhito_loc(struct obj *obj, coordxy x, coordxy y,
+                           int (*fhito)(OBJ_P, OBJ_P));
 staticfn void mbhit(struct monst *, int, int (*)(MONST_P, OBJ_P),
                   int (*)(OBJ_P, OBJ_P), struct obj *);
 staticfn struct permonst *muse_newcham_mon(struct monst *);
@@ -1622,6 +1624,29 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
     return 0;
 }
 
+/* hit all objects at x,y with fhito function */
+staticfn boolean
+fhito_loc(struct obj *obj,
+          coordxy tx, coordxy ty,
+          int (*fhito)(OBJ_P, OBJ_P))
+{
+    struct obj *otmp, *next_obj;
+    int hitanything = 0;
+
+    if (!fhito || !OBJ_AT(tx, ty))
+        return FALSE;
+
+    for (otmp = gl.level.objects[tx][ty]; otmp; otmp = next_obj) {
+        next_obj = otmp->nexthere;
+
+        if (otmp->where != OBJ_FLOOR || otmp->ox != tx || otmp->oy != ty)
+            continue;
+        hitanything += (*fhito)(otmp, obj);
+    }
+
+    return hitanything ? TRUE : FALSE;
+}
+
 /* A modified bhit() for monsters.  Based on bhit() in zap.c.  Unlike
  * buzz(), bhit() doesn't take into account the possibility of a monster
  * zapping you, so we need a special function for it.  (Unless someone wants
@@ -1667,20 +1692,8 @@ mbhit(
             (*fhitm)(mtmp, obj);
             range -= 3;
         }
-        /* modified by GAN to hit all objects */
-        if (fhito) {
-            int hitanything = 0;
-            struct obj *next_obj;
-
-            for (otmp = gl.level.objects[gb.bhitpos.x][gb.bhitpos.y]; otmp;
-                 otmp = next_obj) {
-                /* Fix for polymorph bug, Tim Wright */
-                next_obj = otmp->nexthere;
-                hitanything += (*fhito)(otmp, obj);
-            }
-            if (hitanything)
-                range--;
-        }
+        if (fhito_loc(obj, gb.bhitpos.x, gb.bhitpos.y, fhito))
+            range--;
         ltyp = levl[gb.bhitpos.x][gb.bhitpos.y].typ;
         dbx = x, dby = y;
         if (otyp == WAN_STRIKING

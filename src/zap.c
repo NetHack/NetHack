@@ -2426,6 +2426,8 @@ bhitpile(
                     continue;
             }
         }
+        if (otmp->where != OBJ_FLOOR || otmp->ox != tx || otmp->oy != ty)
+            continue;
         hitanything += (*fhito)(otmp, obj);
     }
 
