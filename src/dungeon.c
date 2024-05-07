@@ -3408,9 +3408,10 @@ staticfn const char *
 shop_string(int rtype)
 {
     const char *str = "shop"; /* catchall */
+    enum roomtype_types ertype = rtype;
 
     /* Yuck, redundancy...but shclass.name doesn't cut it as a noun */
-    switch (rtype) {
+    switch (ertype) {
     case SHOPBASE - 1:
         str = "untended shop";
         break; /* see recalc_mapseen */
@@ -3447,7 +3448,20 @@ shop_string(int rtype)
     case CANDLESHOP:
         str = "lighting shop";
         break;
-    default:
+    /* non-shops room types */
+    case OROOM:
+    case THEMEROOM:
+    case COURT:
+    case SWAMP:
+    case VAULT:
+    case BEEHIVE:
+    case MORGUE:
+    case BARRACKS:
+    case ZOO:
+    case DELPHI:
+    case TEMPLE:
+    case LEPREHALL:
+    case COCKNEST:
         break;
     }
     return str;
