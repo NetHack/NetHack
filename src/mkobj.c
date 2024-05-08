@@ -2658,14 +2658,19 @@ container_weight(struct obj *object)
 }
 
 /*
- * Mark object to be deallocated.  _All_ objects should be run through here for
- * them to be deallocated.
+ * Mark object to be deallocated.  _All_ objects should be run through here
+ * for them to be deallocated.
  */
 void
 dealloc_obj(struct obj *obj)
 {
-    if (obj->where != OBJ_FREE && obj->where != OBJ_LUAFREE)
-        panic("dealloc_obj: obj not free");
+    if (obj->where == OBJ_DELETED) {
+        impossible("dealloc_obj: obj already deleted (type=%d)", obj->otyp);
+        return;
+    } else if (obj->where != OBJ_FREE && obj->where != OBJ_LUAFREE) {
+        panic("dealloc_obj: obj not free (type=%d, where=%d)",
+              obj->otyp, obj->where);
+    }
     if (obj->nobj)
         panic("dealloc_obj with nobj");
     if (obj->cobj)
@@ -2691,13 +2696,6 @@ dealloc_obj(struct obj *obj)
         del_light_source(LS_OBJECT, obj_to_any(obj));
         obj->lamplit = 0;
     }
-
-    /* clear some bits that obj_sanity() would complain about if it were
-       to be called when the objs_deleted list is populated */
-    obj->unpaid = obj->no_charge = 0;
-    obj->in_use = obj->bypass = obj->nomerge = 0;
-    if (obj->otyp == BOULDER)
-        obj->next_boulder = 0;
 
     if (obj == gt.thrownobj)
         gt.thrownobj = 0;
@@ -3140,12 +3138,18 @@ mon_obj_sanity(struct monst *monlist, const char *mesg)
 staticfn void
 insane_obj_bits(struct obj *obj, struct monst *mon)
 {
-    unsigned o_in_use = obj->in_use, o_bypass = obj->bypass,
-             /* having obj->nomerge be set might be intentional */
-             o_nomerge = (obj->nomerge && !nomerge_exception(obj)),
-             /* next_boulder is only for object name formatting when
-                pushing boulders and should be reset by next sanity check */
-             o_boulder = (obj->otyp == BOULDER && obj->next_boulder);
+    unsigned o_in_use, o_bypass, o_nomerge, o_boulder;
+
+    if (obj->where == OBJ_DELETED)
+        return; /* skip bit checking for deleted objects */
+
+    o_in_use = obj->in_use;
+    o_bypass = obj->bypass;
+    /* having obj->nomerge be set might be intentional */
+    o_nomerge = (obj->nomerge && !nomerge_exception(obj));
+    /* next_boulder is only for object name formatting when pushing
+       boulders and should be reset by time of next sanity check */
+    o_boulder = (obj->otyp == BOULDER && obj->next_boulder);
 
     if (o_in_use || o_bypass || o_nomerge || o_boulder) {
         char infobuf[QBUFSZ];
