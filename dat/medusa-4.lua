@@ -1,4 +1,4 @@
--- NetHack medusa medusa-4.lua	$NHDT-Date: 1652196028 2022/05/10 15:20:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.6 $
+-- NetHack medusa medusa-4.lua	$NHDT-Date: 1715180180 2024/05/08 14:56:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1990, 1991 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
@@ -38,11 +38,12 @@ place:set(04,08);
 place:set(10,04);
 place:set(10,08);
 place:set(10,12);
+local medloc = place:rndcoord(1); -- Medusa location; also used for down stairs
 --
 des.region(selection.area(00,00,74,19),"lit")
--- fixup_special hack: The first "room" region in Medusa levels gets filled with
--- some leaderboard statues, so this needs to be a room; setting irregular=1
--- will force this
+-- fixup_special hack: The first "room" region in Medusa levels gets filled
+-- with some leaderboard statues, so this needs to be a room; setting
+-- irregular=1 will force this
 des.region({ region={13,03, 18,13}, lit=1, type="ordinary", irregular=1 })
 --
 des.teleport_region({ region = {64,01,74,17}, dir="down" });
@@ -50,7 +51,7 @@ des.teleport_region({ region = {02,02,18,13}, dir="up" });
 --
 des.levregion({ region = {67,01,74,20}, type="stair-up" });
 
-des.stair("down", place:rndcoord(1))
+des.stair("down", medloc)
 --
 des.door("locked",04,06)
 des.door("locked",04,10)
@@ -99,7 +100,7 @@ for i=1,7 do
    des.trap()
 end
 --
-des.monster("Medusa", place:rndcoord(1))
+des.monster("Medusa", medloc)
 des.monster("kraken", 07,07)
 --
 -- the nesting dragon
