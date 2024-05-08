@@ -1411,6 +1411,7 @@ shopkeepers magnified the cost of shop items used up as a group; normally
 	candles to light them all charged N * N * single_candle_price
 the tile for Ixoth (knight's quest nemesis) depicted a demon rather than a
 	dragon; change it to be a red dragon
+untrapping containers or doors gives some experience
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
