@@ -1,4 +1,4 @@
-/* NetHack 3.7	dungeon.c	$NHDT-Date: 1704043695 2023/12/31 17:28:15 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.207 $ */
+/* NetHack 3.7	dungeon.c	$NHDT-Date: 1715203022 2024/05/08 21:17:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.222 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -61,7 +61,7 @@ staticfn boolean init_dungeon_dungeons(lua_State *, struct proto_dungeon *,
 staticfn boolean unplaced_floater(struct dungeon *);
 staticfn boolean unreachable_level(d_level *, boolean);
 staticfn void tport_menu(winid, char *, struct lchoice *, d_level *, boolean);
-staticfn const char *br_string(int);
+staticfn const char *br_string(int) NONNULL;
 staticfn char chr_u_on_lvl(d_level *);
 staticfn void print_branch(winid, int, int, int, boolean, struct lchoice *);
 staticfn char *get_annotation(d_level *);
@@ -74,10 +74,10 @@ staticfn void print_mapseen(winid, mapseen *, int, int, boolean);
 staticfn boolean interest_mapseen(mapseen *);
 staticfn void count_feat_lastseentyp(mapseen *, coordxy, coordxy);
 staticfn void traverse_mapseenchn(int, winid, int, int, int *);
-staticfn const char *seen_string(xint16, const char *);
-staticfn const char *br_string2(branch *);
-staticfn const char *shop_string(int);
-staticfn char *tunesuffix(mapseen *, char *, size_t);
+staticfn const char *seen_string(xint16, const char *) NONNULL NONNULLARG2;
+staticfn const char *br_string2(branch *) NONNULL NONNULLARG1;
+staticfn const char *shop_string(int) NONNULL;
+staticfn char *tunesuffix(mapseen *, char *, size_t) NONNULL NONNULLPTRS;
 
 #ifdef DEBUG
 staticfn void dumpit(void);
@@ -3339,7 +3339,7 @@ seen_string(xint16 x, const char *obj)
     switch (x) {
     case 0:
         return "no";
-    /* an() returns too much.  index is ok in this case */
+    /* an() returns too much.  index/strchr is ok in this case */
     case 1:
         return strchr(vowels, *obj) ? "an" : "a";
     case 2:
@@ -3404,68 +3404,19 @@ endgamelevelname(char *outbuf, int indx)
     return outbuf;
 }
 
+/* short shop description */
 staticfn const char *
 shop_string(int rtype)
 {
-    const char *str = "shop"; /* catchall */
-    enum roomtype_types ertype = rtype;
+    extern const struct shclass shtypes[]; /* defined in shknam.c */
+    const char *str = "shop?"; /* catchall */
 
-    /* Yuck, redundancy...but shclass.name doesn't cut it as a noun */
-    switch (ertype) {
-    case SHOPBASE - 1:
+    if (rtype < SHOPBASE) {
         str = "untended shop";
-        break; /* see recalc_mapseen */
-    case SHOPBASE:
-        str = "general store";
-        break;
-    case ARMORSHOP:
-        str = "armor shop";
-        break;
-    case SCROLLSHOP:
-        str = "scroll shop";
-        break;
-    case POTIONSHOP:
-        str = "potion shop";
-        break;
-    case WEAPONSHOP:
-        str = "weapon shop";
-        break;
-    case FOODSHOP:
-        str = "delicatessen";
-        break;
-    case RINGSHOP:
-        str = "jewelers";
-        break;
-    case WANDSHOP:
-        str = "wand shop";
-        break;
-    case TOOLSHOP:
-        str = "hardware store";
-        break;
-    case BOOKSHOP:
-        str = "bookstore";
-        break;
-    case FODDERSHOP:
-        str = "health food store";
-        break;
-    case CANDLESHOP:
-        str = "lighting shop";
-        break;
-    /* non-shops room types */
-    case OROOM:
-    case THEMEROOM:
-    case COURT:
-    case SWAMP:
-    case VAULT:
-    case BEEHIVE:
-    case MORGUE:
-    case BARRACKS:
-    case ZOO:
-    case DELPHI:
-    case TEMPLE:
-    case LEPREHALL:
-    case COCKNEST:
-        break;
+    } else if (shtypes[rtype - SHOPBASE].annotation) {
+        str = shtypes[rtype - SHOPBASE].annotation;
+    } else if (shtypes[rtype - SHOPBASE].name) {
+        str = shtypes[rtype - SHOPBASE].name;
     }
     return str;
 }

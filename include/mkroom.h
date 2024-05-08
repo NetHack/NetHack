@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkroom.h	$NHDT-Date: 1596498547 2020/08/03 23:49:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.7	mkroom.h	$NHDT-Date: 1715203003 2024/05/08 21:16:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -26,6 +26,7 @@ struct mkroom {
 
 struct shclass {
     const char *name; /* name of the shop type */
+    const char *annotation; /* simpler name for #overview; Null if same */
     char symb;        /* this identifies the shop type */
     int prob;         /* the shop type probability in % */
     schar shdist;     /* object placement type */
