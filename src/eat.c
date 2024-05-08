@@ -1,4 +1,4 @@
-/* NetHack 3.7	eat.c	$NHDT-Date: 1706915814 2024/02/02 23:16:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.329 $ */
+/* NetHack 3.7	eat.c	$NHDT-Date: 1715177703 2024/05/08 14:15:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.334 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -15,7 +15,7 @@ staticfn const char *food_xname(struct obj *, boolean);
 staticfn void choke(struct obj *);
 staticfn void recalc_wt(void);
 staticfn int adj_victual_nutrition(void);
-staticfn struct obj *touchfood(struct obj *) NONNULL;
+staticfn struct obj *touchfood(struct obj *);
 staticfn void do_reset_eat(void);
 staticfn void done_eating(boolean);
 staticfn void cprefx(int);
@@ -354,6 +354,7 @@ adj_victual_nutrition(void)
     return nut;
 }
 
+/* might destroy otmp if hero drops it */
 staticfn struct obj *
 touchfood(struct obj *otmp)
 {
@@ -376,6 +377,8 @@ touchfood(struct obj *otmp)
             sellobj_state(SELL_DONTSELL);
             dropy(otmp);
             sellobj_state(SELL_NORMAL);
+            if (otmp->where == OBJ_DELETED)
+                otmp = (struct obj *) NULL;
         } else {
             otmp = addinv_nomerge(otmp);
         }
@@ -419,10 +422,15 @@ do_reset_eat(void)
 {
     debugpline0("do_reset_eat...");
     if (gc.context.victual.piece) {
+        struct obj *otmp;
+
         gc.context.victual.o_id = 0;
-        gc.context.victual.piece = touchfood(gc.context.victual.piece);
-        gc.context.victual.o_id = gc.context.victual.piece->o_id;
-        recalc_wt();
+        otmp = touchfood(gc.context.victual.piece);
+        gc.context.victual.piece = otmp;
+        if (otmp) {
+            gc.context.victual.o_id = otmp->o_id;
+            recalc_wt();
+        }
     }
     gc.context.victual.fullwarn
         = gc.context.victual.eating
@@ -1868,7 +1876,9 @@ eatcorpse(struct obj *otmp)
     if (!tp && !nonrotting_corpse(mnum) && (otmp->orotten || !rn2(7))) {
         if (rottenfood(otmp)) {
             otmp->orotten = TRUE;
-            (void) touchfood(otmp);
+            otmp = touchfood(otmp);
+            if (!otmp)
+                return 1;
             retcode = 1;
         }
 
@@ -2833,15 +2843,21 @@ doeat(void)
         if (u.uhs != SATIATED)
             gc.context.victual.canchoke = 0;
         gc.context.victual.o_id = 0;
-        gc.context.victual.piece = touchfood(otmp);
-        gc.context.victual.o_id = gc.context.victual.piece->o_id;
+        otmp = touchfood(otmp);
+        if (otmp) {
+            gc.context.victual.piece = otmp;
+            gc.context.victual.o_id = otmp->o_id;
+        } else {
+            do_reset_eat();
+        }
         /* if there's only one bite left, there sometimes won't be any
            "you finish eating" message when done; use different wording
            for resuming with one bite remaining instead of trying to
            determine whether or not "you finish" is going to be given */
         You("%s your meal.",
             !one_bite_left ? "resume" : "consume the last bite of");
-        start_eating(gc.context.victual.piece, FALSE);
+        if (otmp)
+            start_eating(otmp, FALSE);
         return ECMD_TIME;
     }
 
@@ -2861,9 +2877,15 @@ doeat(void)
     }
 
     already_partly_eaten = otmp->oeaten ? TRUE : FALSE;
-    gc.context.victual.piece = otmp = touchfood(otmp);
-    gc.context.victual.o_id = gc.context.victual.piece->o_id;
-    gc.context.victual.usedtime = 0;
+    otmp = touchfood(otmp);
+    if (otmp) {
+        gc.context.victual.piece = otmp;
+        gc.context.victual.o_id = otmp->o_id;
+        gc.context.victual.usedtime = 0;
+    } else {
+        do_reset_eat();
+        return ECMD_TIME;
+    }
 
     /* Now we need to calculate delay and nutritional info.
      * The base nutrition calculated here and in eatcorpse() accounts
