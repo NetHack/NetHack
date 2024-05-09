@@ -2556,14 +2556,16 @@ save_exclusions(NHFILE *nhfp)
     struct exclusion_zone *ez;
     int nez;
 
-    for (nez = 0, ez = ge.exclusion_zones; ez; ez = ez->next, ++nez) ;
+    for (nez = 0, ez = ge.exclusion_zones; ez; ez = ez->next, ++nez)
+        ;
 
     if (nhfp->structlevel)
         bwrite(nhfp->fd, (genericptr_t) &nez, sizeof nez);
 
     for (ez = ge.exclusion_zones; ez; ez = ez->next) {
         if (nhfp->structlevel) {
-            bwrite(nhfp->fd, (genericptr_t) &ez->zonetype, sizeof ez->zonetype);
+            bwrite(nhfp->fd, (genericptr_t) &ez->zonetype,
+                   sizeof ez->zonetype);
             bwrite(nhfp->fd, (genericptr_t) &ez->lx, sizeof ez->lx);
             bwrite(nhfp->fd, (genericptr_t) &ez->ly, sizeof ez->ly);
             bwrite(nhfp->fd, (genericptr_t) &ez->hx, sizeof ez->hx);
@@ -3409,14 +3411,15 @@ staticfn const char *
 shop_string(int rtype)
 {
     extern const struct shclass shtypes[]; /* defined in shknam.c */
+    int shoptype = rtype - SHOPBASE; /* convert room type to shop type */
     const char *str = "shop?"; /* catchall */
 
-    if (rtype < SHOPBASE) {
+    if (shoptype < 0) {
         str = "untended shop";
-    } else if (shtypes[rtype - SHOPBASE].annotation) {
-        str = shtypes[rtype - SHOPBASE].annotation;
-    } else if (shtypes[rtype - SHOPBASE].name) {
-        str = shtypes[rtype - SHOPBASE].name;
+    } else if (shtypes[shoptype].annotation) {
+        str = shtypes[shoptype].annotation;
+    } else if (shtypes[shoptype].name) {
+        str = shtypes[shoptype].name;
     }
     return str;
 }
