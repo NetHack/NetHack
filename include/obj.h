@@ -128,6 +128,7 @@ struct obj {
     Bitfield(nomerge, 1);   /* set temporarily to prevent merging */
     Bitfield(how_lost, 2);  /* stolen by mon or thrown, dropped by hero */
 
+    Bitfield(material, 5); /* material this obj is made of */
     Bitfield(in_use, 1); /* for magic items before useup items */
     Bitfield(bypass, 1); /* mark this as an object to be skipped by bhito() */
     Bitfield(cknown, 1); /* for containers (including statues): the contents
@@ -282,16 +283,16 @@ struct obj {
 #define is_suit(otmp) \
     (otmp->oclass == ARMOR_CLASS && objects[otmp->otyp].oc_armcat == ARM_SUIT)
 #define is_elven_armor(otmp)                                              \
-    ((otmp)->otyp == ELVEN_LEATHER_HELM                                   \
-     || (otmp)->otyp == ELVEN_MITHRIL_COAT || (otmp)->otyp == ELVEN_CLOAK \
+    ((otmp)->otyp == ELVEN_HELM                                   \
+     || (otmp)->otyp == ELVEN_RING_MAIL || (otmp)->otyp == ELVEN_CLOAK \
      || (otmp)->otyp == ELVEN_SHIELD || (otmp)->otyp == ELVEN_BOOTS)
 #define is_orcish_armor(otmp)                                            \
     ((otmp)->otyp == ORCISH_HELM || (otmp)->otyp == ORCISH_CHAIN_MAIL    \
      || (otmp)->otyp == ORCISH_RING_MAIL || (otmp)->otyp == ORCISH_CLOAK \
      || (otmp)->otyp == URUK_HAI_SHIELD || (otmp)->otyp == ORCISH_SHIELD)
 #define is_dwarvish_armor(otmp)               \
-    ((otmp)->otyp == DWARVISH_IRON_HELM       \
-     || (otmp)->otyp == DWARVISH_MITHRIL_COAT \
+    ((otmp)->otyp == DWARVISH_HELM       \
+     || (otmp)->otyp == DWARVISH_RING_MAIL \
      || (otmp)->otyp == DWARVISH_CLOAK        \
      || (otmp)->otyp == DWARVISH_ROUNDSHIELD)
 #define is_gnomish_armor(otmp) (FALSE)
@@ -371,16 +372,16 @@ struct obj {
 /* age field of this is relative age rather than absolute; does not include
    magic lamp */
 #define age_is_relative(otmp) \
-    ((otmp)->otyp == BRASS_LANTERN || (otmp)->otyp == OIL_LAMP      \
+    ((otmp)->otyp == LANTERN || (otmp)->otyp == OIL_LAMP      \
      || (otmp)->otyp == CANDELABRUM_OF_INVOCATION                   \
      || (otmp)->otyp == TALLOW_CANDLE || (otmp)->otyp == WAX_CANDLE \
      || (otmp)->otyp == POT_OIL)
 /* object can be ignited; magic lamp used to excluded here too but all
    usage of this macro ended up testing
      (ignitable(obj) || obj->otyp == MAGIC_LAMP)
-   so include it; brass lantern can be lit but not by fire */
+   so include it; lantern can be lit but not by fire */
 #define ignitable(otmp) \
-    ((otmp)->otyp == BRASS_LANTERN || (otmp)->otyp == OIL_LAMP      \
+    ((otmp)->otyp == LANTERN || (otmp)->otyp == OIL_LAMP      \
      || ((otmp)->otyp == MAGIC_LAMP && (otmp)->spe > 0)             \
      || (otmp)->otyp == CANDELABRUM_OF_INVOCATION                   \
      || (otmp)->otyp == TALLOW_CANDLE || (otmp)->otyp == WAX_CANDLE \
@@ -399,10 +400,13 @@ struct obj {
     ((obj)->otyp == LUCKSTONE || (obj)->otyp == LOADSTONE \
      || (obj)->otyp == FLINT || (obj)->otyp == TOUCHSTONE)
 
+/* worthless glass -- assumes all GLASS * are worthless glass */
+#define is_worthless_glass(obj) \
+    ((obj)->oclass == GEM_CLASS && obj->material == GLASS)
+
 /* misc helpers, simple enough to be macros */
 #define is_flimsy(otmp)                           \
-    (objects[(otmp)->otyp].oc_material <= LEATHER \
-     || (otmp)->otyp == RUBBER_HOSE)
+    (otmp->material <= LEATHER || (otmp)->otyp == RUBBER_HOSE)
 #define is_plural(o) \
     ((o)->quan != 1L                                                    \
      /* "the Eyes of the Overworld" are plural, but                     \

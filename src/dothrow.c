@@ -20,7 +20,6 @@ staticfn struct obj *return_throw_to_inv(struct obj *, long, boolean,
 staticfn void tmiss(struct obj *, struct monst *, boolean);
 staticfn int throw_gold(struct obj *);
 staticfn void check_shop_obj(struct obj *, coordxy, coordxy, boolean);
-staticfn void breakmsg(struct obj *, boolean);
 staticfn boolean mhurtle_step(genericptr_t, coordxy, coordxy);
 
 /* uwep might already be removed from inventory so test for W_WEP instead;
@@ -1337,7 +1336,7 @@ toss_up(struct obj *obj, boolean hitsroof)
         int material = objects[otyp].oc_material;
         boolean is_silver = (material == SILVER),
                 less_damage = (hard_helmet(uarmh)
-                               && (!is_silver || !Hate_silver)),
+                               && (!is_silver || !Hate_material(SILVER))),
                 harmless = (stone_missile(obj)
                             && passes_rocks(gy.youmonst.data)),
                 artimsg = FALSE;
@@ -1363,7 +1362,7 @@ toss_up(struct obj *obj, boolean hitsroof)
                 dmg = 0;
             if (obj->blessed && mon_hates_blessings(&gy.youmonst))
                 dmg += rnd(4);
-            if (is_silver && Hate_silver)
+            if (is_silver && Hate_material(SILVER))
                 dmg += rnd(20);
         }
         if (dmg > 1 && less_damage)
@@ -1405,8 +1404,12 @@ toss_up(struct obj *obj, boolean hitsroof)
             gt.thrownobj = 0;  /* now either gone or on floor */
             done(STONING);
             return obj ? TRUE : FALSE;
+        } else if (Hate_material(obj->material)) {
+            /* dmgval() already added extra damage */
+            searmsg(&gy.youmonst, &gy.youmonst, obj, FALSE);
+            exercise(A_CON, FALSE);
         }
-        if (is_silver && Hate_silver)
+        if (is_silver && Hate_material(SILVER))
             pline_The("silver sears you!");
         if (harmless)
             hit(thesimpleoname(obj), &gy.youmonst, " but doesn't hurt.");
@@ -2017,7 +2020,7 @@ thitmonst(
         case GAUNTLETS_OF_FUMBLING:
             tmp -= 3;
             break;
-        case LEATHER_GLOVES:
+        case GLOVES:
         case GAUNTLETS_OF_DEXTERITY:
             break;
         default:
@@ -2270,7 +2273,7 @@ gem_accept(struct monst *mon, struct obj *obj)
         addluck[]    = " gratefully";
     char buf[BUFSZ];
     boolean is_buddy = sgn(mon->data->maligntyp) == sgn(u.ualign.type);
-    boolean is_gem = objects[obj->otyp].oc_material == GEMSTONE;
+    boolean is_gem = obj->material == GEMSTONE;
     int ret = 0;
 
     Strcpy(buf, Monnam(mon));
@@ -2517,8 +2520,17 @@ breakobj(
             }
         }
     }
-    if (!fracture)
-        delobj(obj);
+    if (!fracture) {
+        /* FIXME: This replicates useup() code but we can't use useup() since
+         * obj isn't necessarily in hero's inventory */
+        if (obj->quan > 1) {
+            obj->quan--;
+            obj->owt = weight(obj);
+        }
+        else {
+            delobj(obj);
+        }
+    }
     return 1;
 }
 
@@ -2535,13 +2547,13 @@ breaktest(struct obj *obj)
     /* this may need to be changed if actual glass armor gets added someday;
        for now, it affects crystal plate mail and helm of brilliance;
        either of them will have to be cracked 4 times before breaking */
-    if (obj->oclass == ARMOR_CLASS && objects[obj->otyp].oc_material == GLASS)
-        nonbreakchance = 90;
+    if (obj->oclass == ARMOR_CLASS && obj->material == GLASS)
+        nonbreakchance = 0;
 
     if (obj_resists(obj, nonbreakchance, 99))
         return FALSE;
-    if (objects[obj->otyp].oc_material == GLASS && !obj->oartifact
-        && obj->oclass != GEM_CLASS)
+    if (obj->material == GLASS && !obj->oerodeproof
+        && !obj->oartifact && obj->oclass != GEM_CLASS)
         return TRUE;
     switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
     case EXPENSIVE_CAMERA:
@@ -2568,7 +2580,7 @@ breakmsg(struct obj *obj, boolean in_view)
     to_pieces = "";
     switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
     default: /* glass or crystal wand */
-        if (obj->oclass != WAND_CLASS)
+        if (obj->material != GLASS)
             impossible("breaking odd object (%d)?", obj->otyp);
         /*FALLTHRU*/
     case LENSES:
@@ -2598,6 +2610,66 @@ breakmsg(struct obj *obj, boolean in_view)
         break;
     }
 }
+
+/* Possibly destroy a glass object by its use in melee or thrown combat.
+ * Return TRUE if destroyed.
+ * Separate logic from breakobj because we are not unconditionally breaking the
+ * object, and we also need to make sure it's removed from the inventory
+ * properly. */
+staticfn boolean
+break_glass_obj(struct obj* obj)
+{
+    if (!breaktest(obj) || rn2(6))
+        return FALSE;
+    /* now we are definitely breaking it */
+
+    boolean your_fault = !gc.context.mon_moving;
+
+    /* remove its worn flags */
+    long unwornmask = obj->owornmask;
+    if (!unwornmask) {
+        impossible("breaking non-equipped glass obj?");
+        return FALSE;
+    }
+    if (carried(obj)) { /* hero's item */
+        if (obj->quan == 1L) {
+            if (obj == uwep) {
+                gu.unweapon = TRUE;
+            }
+            setworn(NULL, unwornmask);
+        }
+        update_inventory();
+    } else if (mcarried(obj)) { /* monster's item */
+        if (obj->quan == 1L) {
+            struct monst* mon = obj->ocarry;
+            mon->misc_worn_check &= ~unwornmask;
+            if (unwornmask & W_WEP) {
+                setmnotwielded(mon, obj);
+                possibly_unwield(mon, FALSE);
+            } else if (unwornmask & W_ARMG) {
+                mselftouch(mon, NULL, TRUE);
+            }
+            /* shouldn't really be needed but... */
+            update_mon_extrinsics(mon, obj, FALSE, FALSE);
+        }
+    } else {
+        impossible("breaking glass obj in melee but not in inventory?");
+        return FALSE;
+    }
+
+    if (obj->quan == 1L) {
+        obj->owornmask = 0;
+        pline("%s breaks into pieces!", upstart(yname(obj)));
+        obj_extract_self(obj); /* it's being destroyed */
+    } else {
+        pline("One of %s breaks into pieces!", yname(obj));
+    }
+    breakobj(obj, obj->ox, obj->oy, your_fault, TRUE);
+    if (carried(obj))
+        update_inventory();
+    return TRUE;
+}
+
 
 staticfn int
 throw_gold(struct obj *obj)

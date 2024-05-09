@@ -1280,7 +1280,7 @@ chest_shatter_msg(struct obj *otmp)
     HBlinded = 1L,  BBlinded = 0L;
     thing = singular(otmp, xname);
     HBlinded = save_HBlinded,  BBlinded = save_BBlinded;
-    switch (objects[otmp->otyp].oc_material) {
+    switch (otmp->material) {
     case PAPER:
         disposition = "is torn to shreds";
         break;
@@ -1298,6 +1298,9 @@ chest_shatter_msg(struct obj *otmp)
         break;
     case WOOD:
         disposition = "splinters to fragments";
+        break;
+    case SLIME:
+        disposition = "splatters";
         break;
     default:
         disposition = "is destroyed";

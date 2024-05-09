@@ -480,7 +480,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             dmg *= 2;
         if (otyp == SPE_DRAIN_LIFE)
             dmg = spell_damage_bonus(dmg);
-        if (resists_drli(mtmp)) {
+        if (resists_drli(mtmp) || item_catches_drain(mtmp)) {
             shieldeff(mtmp->mx, mtmp->my);
         } else if (!resist(mtmp, otmp->oclass, dmg, NOTELL)
                    && !DEADMONSTER(mtmp)) {
@@ -1474,7 +1474,7 @@ polyuse(struct obj *objhdr, int mat, int minwt)
             continue;
 #endif
 
-        if (((int) objects[otmp->otyp].oc_material == mat)
+        if (((int) otmp->material == mat)
             == (rn2(minwt + 1) != 0)) {
             /* appropriately add damage to bill */
             if (costly_spot(otmp->ox, otmp->oy)) {
@@ -1521,8 +1521,10 @@ create_polymon(struct obj *obj, int okind)
     /* some of these choices are arbitrary */
     switch (okind) {
     case IRON:
+    case COLD_IRON:
     case METAL:
     case MITHRIL:
+    case ADAMANTINE:
         pm_index = PM_IRON_GOLEM;
         material = "metal ";
         break;
@@ -1555,6 +1557,10 @@ create_polymon(struct obj *obj, int okind)
     case BONE:
         pm_index = PM_SKELETON; /* nearest thing to "bone golem" */
         material = "bony ";
+        break;
+    case SHADOW:
+        pm_index = PM_SHADE; /* nearest thing to "shadow" */
+        material = "shadowy ";
         break;
     case GOLD:
         pm_index = PM_GOLD_GOLEM;
@@ -1603,7 +1609,7 @@ do_osshock(struct obj *obj)
         /* some may metamorphosize */
         for (i = obj->quan; i; i--)
             if (!rn2(Luck + 45)) {
-                gp.poly_zapped = objects[obj->otyp].oc_material;
+                gp.poly_zapped = obj->material;
                 break;
             }
     }
@@ -1838,8 +1844,8 @@ poly_obj(struct obj *obj, int id)
 
     case GEM_CLASS:
         if (otmp->quan > (long) rnd(4)
-            && objects[obj->otyp].oc_material == MINERAL
-            && objects[otmp->otyp].oc_material != MINERAL) {
+            && obj->material == MINERAL
+            && otmp->material != MINERAL) {
             otmp->otyp = ROCK; /* transmutation backfired */
             otmp->quan /= 2L;  /* some material has been lost */
         }
@@ -1955,8 +1961,7 @@ stone_to_flesh_obj(struct obj *obj) /* nonnull */
     boolean smell = FALSE, golem_xform = FALSE;
     int res = 1; /* affected object by default */
 
-    if (objects[obj->otyp].oc_material != MINERAL
-        && objects[obj->otyp].oc_material != GEMSTONE)
+    if (obj->material != MINERAL && obj->material != GEMSTONE)
         return 0;
     /* Heart of Ahriman usually resists; ordinary items rarely do */
     if (obj_resists(obj, 2, 98))
@@ -2044,7 +2049,14 @@ stone_to_flesh_obj(struct obj *obj) /* nonnull */
     case WEAPON_CLASS: /* crysknife */
         /*FALLTHRU*/
     default:
-        res = 0;
+        if (valid_obj_material(obj, FLESH)) {
+            pline("%s to flesh!", Tobjnam(obj, "turn"));
+            obj->material = FLESH;
+            obj->owt = weight(obj);
+        }
+        else {
+            res = 0;
+        }
         break;
     }
 
@@ -6041,7 +6053,7 @@ wishcmdassist(int triesleft)
   "Wish details:",
   "",
   "Enter the name of an object, such as \"potion of monster detection\",",
-  "\"scroll labeled README\", \"elven mithril-coat\", or \"Grimtooth\"",
+  "\"scroll labeled README\", \"elven ring mail\", or \"Grimtooth\"",
   "(without the quotes).",
   "",
   "For object types which come in stacks, you may specify a plural name",

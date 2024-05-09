@@ -78,6 +78,10 @@ resetobjs(struct obj *ochain, boolean restore)
             } else if (has_oname(otmp)) {
                 sanitize_name(ONAME(otmp));
             }
+            /* prevent materials from differing on things like rings */
+            if (!valid_obj_material(otmp, otmp->material)) {
+                otmp->material = objects[otmp->otyp].oc_material;
+            }
             /* 3.6.3: set no_charge for partly eaten food in shop;
                all other items become goods for sale if in a shop */
             if (otmp->oclass == FOOD_CLASS && otmp->oeaten) {
@@ -168,11 +172,13 @@ resetobjs(struct obj *ochain, boolean restore)
             } else if (otmp->otyp == AMULET_OF_YENDOR) {
                 /* no longer the real Amulet */
                 otmp->otyp = FAKE_AMULET_OF_YENDOR;
+                otmp->material = PLASTIC;
                 curse(otmp);
             } else if (otmp->otyp == CANDELABRUM_OF_INVOCATION) {
                 if (otmp->lamplit)
                     end_burn(otmp, TRUE);
                 otmp->otyp = WAX_CANDLE;
+                otmp->material = WAX;
                 otmp->age = 50L; /* assume used */
                 if (otmp->spe > 0)
                     otmp->quan = (long) otmp->spe;
@@ -181,6 +187,7 @@ resetobjs(struct obj *ochain, boolean restore)
                 curse(otmp);
             } else if (otmp->otyp == BELL_OF_OPENING) {
                 otmp->otyp = BELL;
+                otmp->material = COPPER;
                 curse(otmp);
             } else if (otmp->otyp == SPE_BOOK_OF_THE_DEAD) {
                 otmp->otyp = SPE_BLANK_PAPER;

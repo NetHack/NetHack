@@ -114,8 +114,9 @@ const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
                              "flesh",      "paper",   "cloth",      "leather",
                              "wooden",     "bone",    "dragonhide", "iron",
                              "metal",      "copper",  "silver",     "gold",
-                             "platinum",   "mithril", "plastic",    "glass",
-                             "gemstone",   "stone" };
+                             "platinum",   "adamantine", "cold iron", "mithril", 
+                             "plastic",    "gelatinous", "glass",     "crystal",   
+                             "shadowspun", "stone" };
 const char quitchars[] = " \r\n\033";
 NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 const int shield_static[SHIELD_COUNT] = {

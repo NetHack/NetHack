@@ -393,7 +393,7 @@
    redundant but allows the function calls to be skipped most of the time */
 #define Unaware (gm.multi < 0 && (unconscious() || is_fainted()))
 
-#define Hate_silver (u.ulycn >= LOW_PM || hates_silver(gy.youmonst.data))
+#define Hate_material(material) mon_hates_material(&gy.youmonst, material)
 
 /* _Hitchhikers_Guide_to_the_Galaxy_ on uses for 'towel': "wrap it round
    your head to ward off noxious fumes" [we require it to be damp or wet] */

@@ -55,7 +55,7 @@ des.door("locked",19,06)
 des.altar({ x=36,y=02, align="coaligned", type="shrine" })
 -- Shaman Karnov
 des.monster({ id = "Shaman Karnov", coord = {35, 02}, inventory = function()
-   des.object({ id = "leather armor", spe = 5 });
+   des.object({ id = "light armor", spe = 5 });
    des.object({ id = "club", spe = 5 });
 end })
 -- The treasure of Shaman Karnov

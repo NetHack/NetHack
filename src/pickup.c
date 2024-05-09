@@ -2125,6 +2125,15 @@ do_loot_cont(
     }
     cobj->lknown = 1; /* floor container, so no need for update_inventory() */
 
+    if (Hate_material(cobj->material)) {
+        char kbuf[BUFSZ];
+        pline("The %s lid %s!", materialnm[cobj->material],
+              (cobj->material == SILVER || cobj->material == COLD_IRON) 
+                ? "sears your flesh" : "hurts to touch");
+        Sprintf(kbuf, "opening a %s container", materialnm[cobj->material]);
+        losehp(rnd(sear_damage(cobj->material)), kbuf, KILLED_BY);
+    }
+    
     if (cobj->otyp == BAG_OF_TRICKS) {
         int tmp;
 

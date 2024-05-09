@@ -213,7 +213,7 @@ losexp(
        wizard mode request to reduce level; never fatal though */
     if (drainer && !strcmp(drainer, "#levelchange"))
         drainer = 0;
-    else if (resists_drli(&gy.youmonst))
+    else if (resists_drli(&gy.youmonst) || item_catches_drain(&gy.youmonst))
         return;
 
     /* level-loss message; "Goodbye level 1." is fatal; divine anger

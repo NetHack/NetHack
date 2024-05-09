@@ -545,7 +545,7 @@ gain_guardian_angel(void)
             mtmp->mhp = mtmp->mhpmax =
                 d((int) mtmp->m_lev, 10) + 30 + rnd(30);
             if ((otmp = select_hwep(mtmp)) == 0) {
-                otmp = mksobj(SILVER_SABER, FALSE, FALSE);
+                otmp = mksobj(SABER, FALSE, FALSE);
                 if (mpickobj(mtmp, otmp))
                     panic("merged weapon?");
             }

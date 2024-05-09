@@ -152,7 +152,7 @@ function test_object()
    des.object({ id = "silver dagger", spe = 127, buc = "cursed" });
    des.object({ id = "silver dagger", spe = -127, buc = "blessed" });
    des.object({ id = "bamboo arrow", quantity = 100 });
-   des.object({ id = "leather armor", eroded = 1 });
+   des.object({ id = "light armor", eroded = 1 });
    des.object({ id = "probing", recharged = 2, spe = 3 });
    des.object({ name = "Random object" });
    des.object({ class = "*", name = "Random stone" });

@@ -262,6 +262,7 @@ struct monst {
 /* Macros for whether a type of monster is too strong for a specific level. */
 #define montoostrong(monindx, lev) (mons[monindx].difficulty > lev)
 #define montooweak(monindx, lev) (mons[monindx].difficulty < lev)
+#define helpless(mon) ((mon)->msleeping || !(mon)->mcanmove)
 
 #ifdef PMNAME_MACROS
 #define Mgender(mon) ((mon)->female ? FEMALE : MALE)

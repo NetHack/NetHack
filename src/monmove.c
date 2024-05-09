@@ -832,8 +832,8 @@ dochug(struct monst *mtmp)
        to move. Movement itself is handled by the m_move() function. */
     if (!nearby || mtmp->mflee || scared || mtmp->mconf || mtmp->mstun
         || (mtmp->minvis && !rn2(3))
-        || (mdat->mlet == S_LEPRECHAUN && !findgold(gi.invent)
-            && (findgold(mtmp->minvent) || rn2(2)))
+        || (mdat->mlet == S_LEPRECHAUN && !findgold(gi.invent, FALSE)
+            && (findgold(mtmp->minvent, FALSE) || rn2(2)))
         || (is_wanderer(mdat) && !rn2(4)) || (Conflict && !mtmp->iswiz)
         || (!mtmp->mcansee && !rn2(4)) || mtmp->mpeaceful) {
 
@@ -953,7 +953,7 @@ mon_would_take_item(struct monst *mtmp, struct obj *otmp)
         return FALSE;
     if (mtmp->mtame && otmp->cursed)
         return FALSE; /* note: will get overridden if mtmp will eat otmp */
-    if (is_unicorn(mtmp->data) && objects[otmp->otyp].oc_material != GEMSTONE)
+    if (is_unicorn(mtmp->data) && otmp->material != GEMSTONE)
         return FALSE;
     if (!mindless(mtmp->data) && !is_animal(mtmp->data) && pctload < 75
         && searches_for_item(mtmp, otmp))
@@ -961,7 +961,7 @@ mon_would_take_item(struct monst *mtmp, struct obj *otmp)
     if (likes_gold(mtmp->data) && otmp->otyp == GOLD_PIECE && pctload < 95)
         return TRUE;
     if (likes_gems(mtmp->data) && otmp->oclass == GEM_CLASS
-        && objects[otmp->otyp].oc_material != MINERAL && pctload < 85)
+        && otmp->material != MINERAL && pctload < 85)
         return TRUE;
     if (likes_objs(mtmp->data) && strchr(practical, otmp->oclass)
         && pctload < 75)
@@ -1092,9 +1092,9 @@ leppie_avoidance(struct monst *mtmp)
     struct obj *lepgold, *ygold;
 
     if (mtmp->data == &mons[PM_LEPRECHAUN]
-        && ((lepgold = findgold(mtmp->minvent))
+        && ((lepgold = findgold(mtmp->minvent, TRUE))
             && (lepgold->quan
-                > ((ygold = findgold(gi.invent)) ? ygold->quan : 0L))))
+                > ((ygold = findgold(gi.invent, TRUE)) ? ygold->quan : 0L))))
         return TRUE;
 
     return FALSE;
@@ -1113,7 +1113,7 @@ leppie_stash(struct monst *mtmp)
         && levl[mtmp->mx][mtmp->my].typ == ROOM
         && !t_at(mtmp->mx, mtmp->my)
         && rn2(4)
-        && (gold = findgold(mtmp->minvent)) != 0) {
+        && (gold = findgold(mtmp->minvent, FALSE)) != 0) {
         mdrop_obj(mtmp, gold, FALSE);
         gold = g_at(mtmp->mx, mtmp->my);
         if (gold)
@@ -2228,7 +2228,7 @@ stuff_prevents_passage(struct monst *mtmp)
         if (obj->oclass != GEM_CLASS && !(typ >= ARROW && typ <= BOOMERANG)
             && !(typ >= DAGGER && typ <= CRYSKNIFE) && typ != SLING
             && !is_cloak(obj) && typ != FEDORA && !is_gloves(obj)
-            && typ != LEATHER_JACKET && typ != CREDIT_CARD && !is_shirt(obj)
+            && typ != JACKET && typ != CREDIT_CARD && !is_shirt(obj)
             && !(typ == CORPSE && verysmall(&mons[obj->corpsenm]))
             && typ != FORTUNE_COOKIE && typ != CANDY_BAR && typ != PANCAKE
             && typ != LEMBAS_WAFER && typ != LUMP_OF_ROYAL_JELLY
@@ -2237,7 +2237,7 @@ stuff_prevents_passage(struct monst *mtmp)
             && typ != BAG_OF_HOLDING && typ != BAG_OF_TRICKS
             && !Is_candle(obj) && typ != OILSKIN_SACK && typ != LEASH
             && typ != STETHOSCOPE && typ != BLINDFOLD && typ != TOWEL
-            && typ != TIN_WHISTLE && typ != MAGIC_WHISTLE
+            && typ != PEA_WHISTLE && typ != MAGIC_WHISTLE
             && typ != MAGIC_MARKER && typ != TIN_OPENER && typ != SKELETON_KEY
             && typ != LOCK_PICK)
             return TRUE;

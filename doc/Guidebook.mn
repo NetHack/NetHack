@@ -2806,13 +2806,13 @@ a n.
 Dragon scale mail	1
 Plate mail, Crystal plate mail	3
 Bronze plate mail, Splint mail,	\"
-\ \ \ Banded mail, Dwarvish mithril-coat	4
-Chain mail, Elven mithril-coat	5
+\ \ \ Banded mail, dwarvish ring mail	4
+Chain mail, elven ring mail	5
 Scale mail, Orcish chain mail	6
-Ring mail, Studded leather armor,	\"
+Ring mail, studded armor,	\"
 \ \ \ Dragon scales	7
-Leather armor, Orcish ring mail	8
-Leather jacket	9
+light armor, Orcish ring mail	8
+jacket	9
 none	10
 .TE
 .pg

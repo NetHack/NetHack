@@ -291,7 +291,7 @@ dosit(void)
                    pline("Squelch!");
                 }
                 useupf(obj, obj->quan);
-            } else if (!(Is_box(obj) || objects[obj->otyp].oc_material == CLOTH))
+            } else if (!(Is_box(obj) || obj->material == CLOTH))
                 pline("It's not very comfortable...");
         }
     } else if (trap != 0 || (u.utrap && (u.utraptype >= TT_LAVA))) {

@@ -26,11 +26,16 @@ enum obj_material_types {
     SILVER      = 14, /* Ag */
     GOLD        = 15, /* Au */
     PLATINUM    = 16, /* Pt */
-    MITHRIL     = 17,
-    PLASTIC     = 18,
-    GLASS       = 19,
-    GEMSTONE    = 20,
-    MINERAL     = 21
+    ADAMANTINE  = 17,
+    COLD_IRON   = 18, /* Iron that has been cold-forged */
+    MITHRIL     = 19,
+    PLASTIC     = 20,
+    SLIME       = 21,
+    GLASS       = 22,
+    GEMSTONE    = 23,
+    SHADOW      = 24,
+    MINERAL     = 25,
+    NUM_MATERIAL_TYPES = 26
 };
 
 enum obj_armor_types {
@@ -184,21 +189,19 @@ extern NEARDATA struct objdescr obj_descr[NUM_OBJECTS + 1];
 #define OBJ_NAME(obj) (obj_descr[(obj).oc_name_idx].oc_name)
 #define OBJ_DESCR(obj) (obj_descr[(obj).oc_descr_idx].oc_descr)
 
-#define is_organic(otmp) (objects[otmp->otyp].oc_material <= WOOD)
+#define is_organic(otmp) (otmp->material <= WOOD)
 #define is_metallic(otmp) \
-    (objects[otmp->otyp].oc_material >= IRON            \
-     && objects[otmp->otyp].oc_material <= MITHRIL)
+    (otmp->material >= IRON && otmp->material <= MITHRIL)
 
 /* primary damage: fire/rust/--- */
 /* is_flammable(otmp), is_rottable(otmp) in mkobj.c */
-#define is_rustprone(otmp) (objects[otmp->otyp].oc_material == IRON)
+#define is_rustprone(otmp) (otmp->material == IRON || otmp->material == COLD_IRON)
 #define is_crackable(otmp) \
     (objects[(otmp)->otyp].oc_material == GLASS         \
      && (otmp)->oclass == ARMOR_CLASS) /* erosion_matters() */
 /* secondary damage: rot/acid/acid */
 #define is_corrodeable(otmp) \
-    (objects[otmp->otyp].oc_material == COPPER          \
-     || objects[otmp->otyp].oc_material == IRON)
+    (otmp->material == COPPER || otmp->material == IRON)
 /* subject to any damage */
 #define is_damageable(otmp) \
     (is_rustprone(otmp) || is_flammable(otmp)           \

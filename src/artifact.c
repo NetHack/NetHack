@@ -183,7 +183,9 @@ mk_artifact(
                 eligible[0] = m;
                 n = 1;
                 break; /* skip all other candidates */
-            }
+            } else if (Hate_material(SILVER) && a->otyp == SABER)
+                continue; /* kludge to stop silver-haters from getting silver */
+
             /* found something to consider for random selection */
             if (a->alignment != A_NONE || u.ugifts > 0) {
                 /* right alignment, or non-aligned with at least 1
@@ -470,8 +472,8 @@ shade_glare(struct obj *obj)
 {
     const struct artifact *arti;
 
-    /* any silver object is effective */
-    if (objects[obj->otyp].oc_material == SILVER)
+    /* any silver object is effective; bone too, though it gets no bonus */
+    if (obj->material == SILVER || obj->material == BONE)
         return TRUE;
     /* non-silver artifacts with bonus against undead also are effective */
     arti = get_artifact(obj);
@@ -847,7 +849,7 @@ touch_artifact(struct obj *obj, struct monst *mon)
 
     if (((badclass || badalign) && self_willed)
         || (badalign && (!yours || !rn2(4)))) {
-        int dmg, tmp;
+        int dmg;
         char buf[BUFSZ];
 
         if (!yours)
@@ -855,9 +857,10 @@ touch_artifact(struct obj *obj, struct monst *mon)
         You("are blasted by %s power!", s_suffix(the(xname(obj))));
         touch_blasted = TRUE;
         dmg = d((Antimagic ? 2 : 4), (self_willed ? 10 : 4));
-        /* add half (maybe quarter) of the usual silver damage bonus */
-        if (objects[obj->otyp].oc_material == SILVER && Hate_silver)
-            tmp = rnd(10), dmg += Maybe_Half_Phys(tmp);
+        /* add half of the usual material damage bonus */
+        if (Hate_material(obj->material)) {
+            dmg += (rnd(sear_damage(obj->material)) / 2) + 1;
+        }
         Sprintf(buf, "touching %s", oart->name);
         losehp(dmg, buf, KILLED_BY); /* magic damage, not physical */
         exercise(A_WIS, FALSE);
@@ -1550,6 +1553,14 @@ artifact_hit(
         /* some non-living creatures (golems, vortices) are vulnerable to
            life drain effects so can get "<Arti> draws the <life>" feedback */
         const char *life = nonliving(mdef->data) ? "animating force" : "life";
+        if (item_catches_drain(mdef)) {
+            /* This has to go here rather than along with the resists_drli
+             * check; otherwise a drainable item gets drained even if the
+             * attack is a miss.
+             * Return FALSE because no special draining damage happened so we
+             * want the attack to do its regular non-artifact damage. */
+            return FALSE;
+        }
 
         if (!youdefend) {
             int m_lev = (int) mdef->m_lev, /* will be 0 for 1d4 mon */
@@ -2293,12 +2304,13 @@ retouch_object(
 
     if (touch_artifact(obj, &gy.youmonst)) {
         char buf[BUFSZ];
-        int dmg = 0, tmp;
-        boolean ag = (objects[obj->otyp].oc_material == SILVER && Hate_silver),
+        int dmg = 0;
+        int tmp = 0;
+        boolean hatemat = Hate_material(obj->material),
                 bane = bane_applies(get_artifact(obj), &gy.youmonst);
 
         /* nothing else to do if hero can successfully handle this object */
-        if (!ag && !bane)
+        if (!hatemat && !bane)
             return 1;
 
         /* hero can't handle this object, but didn't get touch_artifact()'s
@@ -2309,7 +2321,7 @@ retouch_object(
         if (!touch_blasted) {
             const char *what = killer_xname(obj);
 
-            if (ag && !obj->oartifact && !bane) {
+            if (hatemat && !obj->oartifact && !bane) {
                 /* 'obj' is silver; for rings and wands it ended up that
                    way due to randomization at start of game; showing this
                    game's silver item without stating that it is silver
@@ -2322,14 +2334,24 @@ retouch_object(
             }
             /* damage is somewhat arbitrary; half the usual 1d20 physical
                for silver, 1d10 magical for <foo>bane, potentially both */
-            if (ag)
-                tmp = rnd(10), dmg += Maybe_Half_Phys(tmp);
+            if (hatemat) {
+                tmp = rnd(10);
+                dmg += Maybe_Half_Phys(tmp);
+            }
             if (bane)
                 dmg += rnd(10);
             Sprintf(buf, "handling %s", what);
             losehp(dmg, buf, KILLED_BY);
             exercise(A_CON, FALSE);
         }
+        /* concession to elves wishing to use iron gear: don't make them
+         * totally unable to use them. In fact, they can touch them just fine
+         * as long as they're willing to.
+         * In keeping with the flavor of searing vs just pain implemented
+         * everywhere else, only silver is actually unbearable -- other
+         * hated non-silver materials can be used too. */
+        if (!bane && !(hatemat && obj->material == SILVER))
+            return 1;
     }
 
     /* removing a worn item might result in loss of levitation,

@@ -1024,10 +1024,16 @@ magic_negation(struct monst *mon)
         /* a_can field is only applicable for armor (which must be worn) */
         if ((o->owornmask & W_ARMOR) != 0L) {
             armpro = objects[o->otyp].a_can;
+            /* mithril armor grants MC 2 even if it has a different base
+             * material */
+            if (((o->owornmask & W_ARM) || (o->owornmask & W_ARMC))
+                && o->material == MITHRIL && armpro < 2) {
+                armpro = 2;
+            }
             if (armpro > mc)
                 mc = armpro;
         } else if ((o->owornmask & W_AMUL) != 0L) {
-            via_amul = (o->otyp == AMULET_OF_GUARDING);
+            via_amul = TRUE;
         }
         /* if we've already confirmed Protection, skip additional checks */
         if (is_you || gotprot)
@@ -1076,6 +1082,11 @@ hitmu(struct monst *mtmp, struct attack *mattk)
 
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
+
+    /* Awaken nearby monsters */
+    if (!(is_silent(mdat) && gm.multi < 0) && rn2(10)) {
+        wake_nearto(u.ux, u.uy, combat_noise(mtmp->data));
+    }
 
     /*  If the monster is undetected & hits you, you should know where
      *  the attack came from.
@@ -1131,6 +1142,16 @@ hitmu(struct monst *mtmp, struct attack *mattk)
         mhm.damage -= rnd(-u.uac);
         if (mhm.damage < 1)
             mhm.damage = 1;
+    }
+
+    /* handle body/equipment made out of harmful materials for touch attacks */
+    /* should come after AC damage reduction */
+    long armask = attack_contact_slots(mtmp, mattk->aatyp);
+    struct obj* hated_obj;
+    mhm.damage += special_dmgval(mtmp, &gy.youmonst, armask, &hated_obj);
+    if (hated_obj) {
+        searmsg(mtmp, &gy.youmonst, hated_obj, FALSE);
+        exercise(A_CON, FALSE);
     }
 
     if (mhm.damage) {
@@ -2096,7 +2117,7 @@ doseduce(struct monst *mon)
             disp.botl = TRUE;
             break;
         case 3:
-            if (!resists_drli(&gy.youmonst)) {
+            if (!resists_drli(&gy.youmonst) && !item_catches_drain(&gy.youmonst)) {
                 You_feel("out of shape.");
                 losexp("overexertion");
             } else {
@@ -2417,6 +2438,14 @@ passiveum(
             }
             pline("%s is jolted with your electricity!", Monnam(mtmp));
             break;
+        case AD_MTRL: /* change material (transmuter) */
+            if (mon_currwep) {
+                /* by_you==True: passive counterattack to hero's action
+                   is hero's fault */
+                (void) warp_material(mon_currwep, TRUE);
+                /* No message */
+            }
+            break;
         default:
             tmp = 0;
             break;
@@ -2458,6 +2487,36 @@ cloneu(void)
     u.mh -= mon->mhp;
     disp.botl = TRUE;
     return mon;
+}
+
+/* Given an attacking monster and the attack type it's currently attacking with,
+ * return a bitmask of W_ARM* values representing the gear slots that might be
+ * coming in contact with the defender.
+ * Intended to return worn items. Will not return W_WEP.
+ * Does not check to see whether slots are ineligible due to being covered by
+ * some other piece of gear. Usually special_dmgval() will handle that.
+ */
+long
+attack_contact_slots(struct monst *magr, int aatyp)
+{
+    struct obj* mwep = (magr == &gy.youmonst ? uwep : magr->mw);
+    if (aatyp == AT_CLAW || aatyp == AT_TUCH || (aatyp == AT_WEAP && !mwep)
+        || (aatyp == AT_HUGS && hug_throttles(magr->data))) {
+        /* attack with hands; gloves and rings might touch */
+        return W_ARMG | W_RINGL | W_RINGR;
+    }
+    if (aatyp == AT_HUGS && !hug_throttles(magr->data)) {
+        /* bear hug which is not a strangling attack; gloves and rings might
+         * touch, but also all torso slots */
+        return W_ARMG | W_RINGL | W_RINGR | W_ARMC | W_ARM | W_ARMU;
+    }
+    if (aatyp == AT_KICK) {
+        return W_ARMF;
+    }
+    if (aatyp == AT_BUTT) {
+        return W_ARMH;
+    }
+    return 0;
 }
 
 /*mhitu.c*/

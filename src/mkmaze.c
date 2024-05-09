@@ -804,7 +804,7 @@ stolen_booty(void)
     cnt = rnd(3);
     for (i = 0; i < cnt; ++i)
         migr_booty_item(SKELETON_KEY, gang);
-    otyp = rn2((GAUNTLETS_OF_DEXTERITY - LEATHER_GLOVES) + 1) + LEATHER_GLOVES;
+    otyp = rn2((GAUNTLETS_OF_DEXTERITY - GLOVES) + 1) + GLOVES;
     migr_booty_item(otyp, gang);
     cnt = rnd(10);
     for (i = 0; i < cnt; ++i) {
@@ -821,7 +821,7 @@ stolen_booty(void)
             && otyp != CORPSE && otyp != EGG && otyp != TIN)
             migr_booty_item(otyp, gang);
     }
-    migr_booty_item(rn2(2) ? LONG_SWORD : SILVER_SABER, gang);
+    migr_booty_item(rn2(2) ? LONG_SWORD : SABER, gang);
     /* create the leader of the orc gang */
     mtmp = makemon(&mons[PM_ORC_CAPTAIN], 0, 0, MM_NONAME);
     if (mtmp) {

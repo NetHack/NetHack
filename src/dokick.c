@@ -37,6 +37,7 @@ kickdmg(struct monst *mon, boolean clumsy)
     int dmg = (ACURRSTR + ACURR(A_DEX) + ACURR(A_CON)) / 15;
     int specialdmg, kick_skill = P_NONE;
     boolean trapkilled = FALSE;
+    struct obj* hated_obj = NULL;
 
     if (uarmf && uarmf->otyp == KICKING_BOOTS)
         dmg += 5;
@@ -53,7 +54,7 @@ kickdmg(struct monst *mon, boolean clumsy)
     if (mon->data == &mons[PM_SHADE])
         dmg = 0;
 
-    specialdmg = special_dmgval(&gy.youmonst, mon, W_ARMF, (long *) 0);
+    specialdmg = special_dmgval(&gy.youmonst, mon, W_ARMF, &hated_obj);
 
     if (mon->data == &mons[PM_SHADE] && !specialdmg) {
         pline_The("%s.", kick_passes_thru);
@@ -90,6 +91,8 @@ kickdmg(struct monst *mon, boolean clumsy)
     dmg += specialdmg; /* for blessed (or hypothetically, silver) boots */
     if (uarmf)
         dmg += uarmf->spe;
+    if (specialdmg && hated_obj)
+        searmsg(&gy.youmonst, mon, hated_obj, TRUE);
     dmg += u.udaminc; /* add ring(s) of increase damage */
     if (dmg > 0)
         mon->mhp -= dmg;
@@ -200,7 +203,8 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
                 continue;
 
             kickdieroll = rnd(20);
-            specialdmg = special_dmgval(&gy.youmonst, mon, W_ARMF, (long *) 0);
+            struct obj* hated_obj;
+            specialdmg = special_dmgval(&gy.youmonst, mon, W_ARMF, &hated_obj);
             if (mon->data == &mons[PM_SHADE] && !specialdmg) {
                 /* doesn't matter whether it would have hit or missed,
                    and shades have no passive counterattack */
@@ -209,6 +213,9 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
             } else if (tmp > kickdieroll) {
                 You("kick %s.", mon_nam(mon));
                 sum = damageum(mon, uattk, specialdmg);
+                if (hated_obj) {
+                    searmsg(&gy.youmonst, mon, hated_obj, FALSE);
+                }
                 (void) passive(mon, uarmf, (sum != M_ATTK_MISS),
                                !(sum & M_ATTK_DEF_DIED), AT_KICK, FALSE);
                 if ((sum & M_ATTK_DEF_DIED))
@@ -433,7 +440,7 @@ container_impact_dmg(
         const char *result = (char *) 0;
 
         otmp2 = otmp->nobj;
-        if (objects[otmp->otyp].oc_material == GLASS
+        if (obj->material == GLASS
             && otmp->oclass != GEM_CLASS && !obj_resists(otmp, 33, 100)) {
             result = "shatter";
         } else if (otmp->otyp == EGG && !rn2(3)) {
@@ -551,6 +558,12 @@ really_kick_object(coordxy x, coordxy y)
                     killer_xname(gk.kickedobj));
             instapetrify(gk.killer.name);
         }
+    }
+
+    if (!uarmf && Hate_material(gk.kickedobj->material)) {
+        searmsg(NULL, &gy.youmonst, gk.kickedobj, FALSE);
+        losehp(rnd(sear_damage(gk.kickedobj->material)),
+               "kicking something disagreeable", KILLED_BY);
     }
 
     isgold = (gk.kickedobj->oclass == COIN_CLASS);
@@ -1709,8 +1722,7 @@ ship_object(struct obj *otmp, coordxy x, coordxy y, boolean shop_floor_obj)
     if (breaktest(otmp)) {
         const char *result;
 
-        if (objects[otmp->otyp].oc_material == GLASS
-            || otmp->otyp == EXPENSIVE_CAMERA) {
+        if (otmp->material == GLASS || otmp->otyp == EXPENSIVE_CAMERA) {
             if (otmp->otyp == MIRROR)
                 change_luck(-2);
             result = "crash";

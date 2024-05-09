@@ -152,7 +152,7 @@ mk_mplayer(struct permonst *ptr, coordxy x, coordxy y, boolean special)
         cloak  = !rn2(8) ? STRANGE_OBJECT
                          : rnd_class(OILSKIN_CLOAK, CLOAK_OF_DISPLACEMENT);
         helm   = !rn2(8) ? STRANGE_OBJECT
-                         : rnd_class(ELVEN_LEATHER_HELM, HELM_OF_TELEPATHY);
+                         : rnd_class(ELVEN_HELM, HELM_OF_TELEPATHY);
         shield = !rn2(8) ? STRANGE_OBJECT
                          : rnd_class(ELVEN_SHIELD, SHIELD_OF_REFLECTION);
 
@@ -284,7 +284,7 @@ mk_mplayer(struct permonst *ptr, coordxy x, coordxy y, boolean special)
             if (weapon == WAR_HAMMER) /* valkyrie: wimpy weapon or Mjollnir */
                 mk_mplayer_armor(mtmp, GAUNTLETS_OF_POWER);
             else if (rn2(8))
-                mk_mplayer_armor(mtmp, rnd_class(LEATHER_GLOVES,
+                mk_mplayer_armor(mtmp, rnd_class(GLOVES,
                                                  GAUNTLETS_OF_DEXTERITY));
             if (rn2(8))
                 mk_mplayer_armor(mtmp, rnd_class(LOW_BOOTS,

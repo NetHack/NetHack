@@ -358,6 +358,11 @@ dig(void)
                 else if (uarmf)
                     dmg = (dmg + 1) / 2;
                 You("hit yourself in the %s.", body_part(FOOT));
+                if (Hate_material(uwep->material)) {
+                    /* extra damage already applied by dmgval() */
+                    searmsg(&gy.youmonst, &gy.youmonst, uwep, FALSE);
+                    exercise(A_CON, FALSE);
+                }
                 Sprintf(kbuf, "chopping off %s own %s", uhis(),
                         body_part(FOOT));
                 losehp(Maybe_Half_Phys(dmg), kbuf, KILLED_BY);

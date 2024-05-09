@@ -138,6 +138,8 @@ make_sick(long xtime,
           int type)
 {
     struct kinfo *kptr;
+    struct obj *otmp;
+    int copperarmor;
     long old = Sick;
 
 #if 0   /* tell player even if hero is unconscious */
@@ -147,6 +149,20 @@ make_sick(long xtime,
     if (xtime > 0L) {
         if (Sick_resistance)
             return;
+        /* Copper's anti-microbial properties make it effective in warding off
+         * sickness. */
+        for (otmp = gi.invent; otmp; otmp = otmp->nobj) {
+            if ((otmp->owornmask & W_ARMOR) && otmp->material == COPPER) {
+                copperarmor++;
+            }
+        }
+        if (rn2(5) < copperarmor) {
+            /* practially, someone could have copper helm, boots, body armor,
+             * shield, gloves. If they're *all* copper, you're immune to
+             * sickness. */
+            You_feel("briefly ill.");
+            return;
+        }
         if (!old) {
             /* newly sick */
             You_feel("deathly sick.");
