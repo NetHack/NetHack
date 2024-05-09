@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1713334819 2024/04/17 06:20:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.532 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1715284462 2024/05/09 19:54:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.539 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3644,20 +3644,20 @@ zap_map(
     } /* !u.uz */
 
     if (obj->otyp == WAN_PROBING) {
-        schar ltyp;
         /*
          * Probing, either up/down or lateral.
          */
+        schar ltyp;
+        int oldtyp, oldglyph;
 
-        /* map unseen terrain */
-        if (!cansee(x, y)) {
-            int oldglyph = glyph_at(x, y);
-
-            show_map_spot(x, y, FALSE);
-            if (oldglyph != glyph_at(x, y)) {
-                /* TODO: need to give some message */
-                learn_it = TRUE;
-            }
+        /* map terrain; might reveal a special room which is already within
+           view that hasn't been entered yet */
+        oldtyp = gl.lastseentyp[x][y];
+        oldglyph = glyph_at(x, y);
+        show_map_spot(x, y, FALSE);
+        if (oldtyp != gl.lastseentyp[x][y] || oldglyph != glyph_at(x, y)) {
+            /* TODO: ought to give some message */
+            learn_it = TRUE;
         }
         ltyp = SURFACE_AT(x, y);
         /* secret door gets revealed, converted into regular door */
