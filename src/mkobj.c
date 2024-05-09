@@ -2702,6 +2702,12 @@ dealloc_obj(struct obj *obj)
     if (obj == gk.kickedobj)
         gk.kickedobj = 0;
 
+    /* if obj came from the most recent splitobj(), it's no longer eligible
+       for unsplitobj(); perform inline clear_splitobjs() */
+    if (obj->o_id == gc.context.objsplit.parent_oid
+        || obj->o_id == gc.context.objsplit.child_oid)
+        gc.context.objsplit.parent_oid = gc.context.objsplit.child_oid = 0;
+
     if (obj->lua_ref_cnt) {
         /* obj is referenced from a lua script, let lua gc free it */
         obj->where = OBJ_LUAFREE;
