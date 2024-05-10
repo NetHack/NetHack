@@ -993,9 +993,9 @@ const char *deflt_content;
        more likely to be picked than normal but it's nothing to worry about */
     (void) fputs(xcrypt(deflt_content), ofp);
 
-    tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE);
+    tfp = getfp(DATA_TEMPLATE, "grep-s.tmp", WRTMODE);
     grep0(ifp, tfp);
-    ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE);
+    ifp = getfp(DATA_TEMPLATE, "grep-s.tmp", RDTMODE);
 
     while ((line = fgetline(ifp)) != 0) {
         if (line[0] != '#' && line[0] != '\n')
@@ -1005,7 +1005,7 @@ const char *deflt_content;
     Fclose(ifp);
     Fclose(ofp);
 
-    delete_file(DATA_TEMPLATE, "grep.tmp");
+    delete_file(DATA_TEMPLATE, "grep-s.tmp");
     return;
 }
 
@@ -2291,9 +2291,9 @@ do_dungeon()
     }
     Fprintf(ofp, "%s", Dont_Edit_Data);
 
-    tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE);
+    tfp = getfp(DATA_TEMPLATE, "grep-e.tmp", WRTMODE);
     grep0(ifp, tfp);
-    ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE);
+    ifp = getfp(DATA_TEMPLATE, "grep-e.tmp", RDTMODE);
 
     while ((line = fgetline(ifp)) != 0) {
         SpinCursor(3);
@@ -2308,7 +2308,7 @@ do_dungeon()
     Fclose(ifp);
     Fclose(ofp);
 
-    delete_file(DATA_TEMPLATE, "grep.tmp");
+    delete_file(DATA_TEMPLATE, "grep-e.tmp");
     return;
 }
 

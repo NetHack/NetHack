@@ -112,12 +112,17 @@ quest.dat:	quest.txt ../util/makedefs
 oracles:	oracles.txt ../util/makedefs
 	../util/makedefs -h
 
-engrave:	engrave.txt ../util/makedefs
+# note: 'makedefs -s' constructs three files at once, but traditional 'make'
+# doesn't provide any way for a Makefile to indicate that; use arbitrary
+# dependencies to prevent parallel make from running multiple instances of
+# 'makedefs -s' at the same time; depending upon how 'make' checks timestamps,
+# this might result in building all three of them three times in a row
+# [that will still produce the correct result in the end, and the extra
+# overhead of doing it should be negligible; 'gnu make' only runs it once]
+engrave:	epitaph engrave.txt ../util/makedefs
 	../util/makedefs -s
-
-epitaph:	epitaph.txt ../util/makedefs
+epitaph:	bogusmon epitaph.txt ../util/makedefs
 	../util/makedefs -s
-
 bogusmon:	bogusmon.txt ../util/makedefs
 	../util/makedefs -s
 

@@ -47,6 +47,11 @@ vms: update winprocs.h to ensure that CLR_MAX is defined; necessary for
 	compiling vmsmail.c which uses winprocs.h but not hack.h
 curses: when #quitting, just before the high scores are about to be shown
 	status_window was NULL and dereferenced, so add checks (issue #1090)
+unix: update Makefile.dat so that if parallel make is used, it will build
+	the data files "engrave", "epitaph", and "bogusmon" sequentially;
+	'makedefs -s' builds all three at once and doing parallel instances
+	of that can produce seemingly mysterious problems by stomping on
+	each other's results
 fix the mingw32 build of NetHack 3.6.7 by updating sys/winnt/Makefile.gcc,
 	sys/winnt/winnt.c and sys/winnt/stubs.c
 
