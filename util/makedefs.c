@@ -178,9 +178,7 @@ extern void NDECL(objects_init); /* objects.c */
 
 static void NDECL(link_sanity_check);
 static char *FDECL(name_file, (const char *, const char *));
-#ifdef HAS_NO_MKSTEMP
 static void FDECL(delete_file, (const char *template, const char *));
-#endif
 static FILE *FDECL(getfp, (const char *, const char *, const char *, int));
 static void FDECL(do_ext_makedefs, (int, char **));
 
@@ -420,7 +418,6 @@ const char *tag;
     return namebuf;
 }
 
-#ifdef HAS_NO_MKSTEMP
 static void
 delete_file(template, tag)
 const char *template;
@@ -430,7 +427,6 @@ const char *tag;
 
     Unlink(name);
 }
-#endif
 
 static FILE *
 getfp(template, tag, mode, flg)
