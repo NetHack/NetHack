@@ -52,12 +52,6 @@
 #define rewind(fp) fseek((fp), 0L, SEEK_SET) /* guarantee a return value */
 #endif
 
-#ifndef HAS_NO_MKSTEMP
-#ifdef _MSC_VER
-static int FDECL(mkstemp, (char *));
-#endif
-#endif
-
 #if defined(UNIX) && !defined(LINT) && !defined(GCC_WARN)
 static const char SCCS_Id[] UNUSED = "@(#)makedefs.c\t3.6\t2020/03/04";
 #endif
@@ -136,8 +130,6 @@ static struct version_info version;
 #define CLOSE_OFF_TABLE_STRING "99" /* for the close table */
 #define FAR_OFF_TABLE_STRING "0xff" /* for the far table */
 
-#define FLG_TEMPFILE  0x01              /* flag for temp file */
-
 #define sign(z) ((z) < 0 ? -1 : ((z) ? 1 : 0))
 #ifdef VISION_TABLES
 static char xclear[MAX_ROW][MAX_COL];
@@ -179,7 +171,7 @@ extern void NDECL(objects_init); /* objects.c */
 static void NDECL(link_sanity_check);
 static char *FDECL(name_file, (const char *, const char *));
 static void FDECL(delete_file, (const char *template, const char *));
-static FILE *FDECL(getfp, (const char *, const char *, const char *, int));
+static FILE *FDECL(getfp, (const char *, const char *, const char *));
 static void FDECL(do_ext_makedefs, (int, char **));
 
 static void NDECL(make_version);
@@ -429,39 +421,16 @@ const char *tag;
 }
 
 static FILE *
-getfp(template, tag, mode, flg)
+getfp(template, tag, mode)
 const char *template;
 const char *tag;
 const char *mode;
-#ifndef HAS_NO_MKSTEMP
-int flg;
-#else
-int flg UNUSED;
-#endif
 {
     char *name = name_file(template, tag);
-    FILE *rv = (FILE *) 0;
-#ifndef HAS_NO_MKSTEMP
-    boolean istemp = (flg & FLG_TEMPFILE) != 0;
-    char tmpfbuf[MAXFNAMELEN];
-    int tmpfd;
-#endif
+    FILE *rv = fopen(name, mode);
 
-#ifndef HAS_NO_MKSTEMP
-    if (istemp) {
-        (void) snprintf(tmpfbuf, sizeof tmpfbuf, DATA_TEMPLATE, "mdXXXXXX");
-        tmpfd = mkstemp(tmpfbuf);
-        if (tmpfd >= 0)
-            rv = fdopen(tmpfd, WRTMODE);   /* temp file is always read+write */
-    } else
-#endif
-    rv = fopen(name, mode);
     if (!rv) {
-        Fprintf(stderr, "Can't open '%s'.\n",
-#ifndef HAS_NO_MKSTEMP
-                istemp ? tmpfbuf :
-#endif
-                name);
+        Fprintf(stderr, "Can't open '%s'.\n", name);
         exit(EXIT_FAILURE);
     }
     return rv;
@@ -485,7 +454,7 @@ static int FDECL(grep_check_id, (const char *));
 static void FDECL(grep_show_wstack, (const char *));
 static char *FDECL(do_grep_control, (char *));
 static void NDECL(do_grep);
-static void FDECL(grep0, (FILE *, FILE *, int));
+static void FDECL(grep0, (FILE *, FILE *));
 
 static int grep_trace = 0;
 
@@ -836,7 +805,7 @@ char *buf;
 }
 #endif
 
-static void grep0(FILE *, FILE *, int);
+static void grep0(FILE *, FILE *);
 
 static void
 do_grep()
@@ -851,26 +820,14 @@ do_grep()
         exit(EXIT_FAILURE);
     }
 
-    grep0(inputfp, outputfp, 0);
+    grep0(inputfp, outputfp);
 }
 
 static void
-grep0(inputfp0, outputfp0, flg)
+grep0(inputfp0, outputfp0)
 FILE *inputfp0;
 FILE *outputfp0;
-#ifndef HAS_NO_MKSTEMP
-int flg;
-#else
-int flg UNUSED;
-#endif
 {
-#ifndef HAS_NO_MKSTEMP
-    /* if grep0 is passed FLG_TEMPFILE flag, it will
-       leave the output file open when it returns.
-       The caller will have to take care of calling
-       fclose() when it is done with the file */
-    boolean istemp = (flg & FLG_TEMPFILE) != 0;
-#endif
     char buf[16384]; /* looong, just in case */
 
     while (!feof(inputfp0) && !ferror(inputfp0)) {
@@ -910,12 +867,7 @@ int flg UNUSED;
         exit(EXIT_FAILURE);
     }
     fclose(inputfp0);
-#ifndef HAS_NO_MKSTEMP
-    if (istemp)
-        rewind(outputfp0);
-    else
-#endif
-        fclose(outputfp0);
+    fclose(outputfp0);
     if (grep_sp) {
         Fprintf(stderr, "%d unterminated conditional level%s\n", grep_sp,
                 grep_sp == 1 ? "" : "s");
@@ -1041,13 +993,9 @@ const char *deflt_content;
        more likely to be picked than normal but it's nothing to worry about */
     (void) fputs(xcrypt(deflt_content), ofp);
 
-    tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE, FLG_TEMPFILE);
-    grep0(ifp, tfp, FLG_TEMPFILE);
-#ifndef HAS_NO_MKSTEMP
-    ifp = tfp;
-#else
-    ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE, 0);
-#endif
+    tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE);
+    grep0(ifp, tfp);
+    ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE);
 
     while ((line = fgetline(ifp)) != 0) {
         if (line[0] != '#' && line[0] != '\n')
@@ -1057,10 +1005,7 @@ const char *deflt_content;
     Fclose(ifp);
     Fclose(ofp);
 
-#ifdef HAS_NO_MKSTEMP
     delete_file(DATA_TEMPLATE, "grep.tmp");
-#endif
-
     return;
 }
 
@@ -2346,13 +2291,10 @@ do_dungeon()
     }
     Fprintf(ofp, "%s", Dont_Edit_Data);
 
-    tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE, FLG_TEMPFILE);
-    grep0(ifp, tfp, FLG_TEMPFILE);
-#ifndef HAS_NO_MKSTEMP
-    ifp = tfp;
-#else
-    ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE, 0);
-#endif
+    tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE);
+    grep0(ifp, tfp);
+    ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE);
+
     while ((line = fgetline(ifp)) != 0) {
         SpinCursor(3);
 
@@ -2363,13 +2305,10 @@ do_dungeon()
         (void) fputs(line, ofp);
         free(line);
     }
-
     Fclose(ifp);
     Fclose(ofp);
 
-#ifdef HAS_NO_MKSTEMP
     delete_file(DATA_TEMPLATE, "grep.tmp");
-#endif
     return;
 }
 
@@ -3017,24 +2956,6 @@ char *str;
         str++;
     return str;
 }
-
-#ifndef HAS_NO_MKSTEMP
-#ifdef _MSC_VER
-int
-mkstemp(template)
-char *template;
-{
-    int err;
-
-    err = _mktemp_s(template, strlen(template) + 1);
-    if( err != 0 )
-        return -1;
-    return _open(template,
-                 _O_RDWR | _O_BINARY | _O_TEMPORARY | _O_CREAT,
-                 _S_IREAD | _S_IWRITE);
-}
-#endif /* _MSC_VER */
-#endif /* HAS_NO_MKSTEMP */
 
 /*
  * macro used to control vision algorithms:
