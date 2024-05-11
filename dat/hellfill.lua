@@ -373,13 +373,18 @@ hells = {
 
    -- 5: mazes, thick walls, occasionally lava instead of walls
    function ()
+      local wwid = 1 + math.random(2);
       des.level_init({ style = "solidfill", fg = " ", lit = 0 });
       des.level_flags("mazelevel", "noflip");
-      des.level_init({ style = "maze", wallthick = 1 + math.random(2), corrwid = math.random(2) });
+      des.level_init({ style = "maze", wallthick = wwid, corrwid = math.random(2) });
       if (percent(50)) then
          local outside_walls = selection.match(" ");
          des.replace_terrain({ mapfragment = "w", toterrain = "L" });
          des.terrain(outside_walls, " ");  -- return the outside back to solid wall
+         if (wwid == 3 and percent(40)) then
+            local sel = selection.match("LLL\nLLL\nLLL");
+            des.terrain(sel:percentage(30 * math.random(4)), "Z");
+         end
       end
    end,
 
