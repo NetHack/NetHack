@@ -410,9 +410,9 @@ update_file(
 void
 copy_symbols_content(void)
 {
-    char dst_path[MAX_PATH],
-         interim_path[MAX_PATH],
-         orig_path[MAX_PATH];
+    char dst_path[MAX_PATH], interim_path[MAX_PATH], orig_path[MAX_PATH];
+
+    boolean no_template = FALSE;
 
     /* Using the SYSCONFPREFIX path, lock it so that it does not change */
     fqn_prefix_locked[SYSCONFPREFIX] = TRUE;
@@ -424,13 +424,28 @@ copy_symbols_content(void)
     strcpy(dst_path, gf.fqn_prefix[SYSCONFPREFIX]);
     strcat(dst_path, SYMBOLS);
 
-    if (!file_exists(interim_path) || file_newer(orig_path, interim_path))
+    if (!file_exists(orig_path)) {
+        char alt_orig_path[MAX_PATH];
+
+        strcpy(alt_orig_path, gf.fqn_prefix[DATAPREFIX]);
+        strcat(alt_orig_path, SYMBOLS);
+        if (file_exists(alt_orig_path)) {
+            no_template = TRUE;
+            /* <dist>symbols -> <dist>symbols.template */
+            copy_file(gf.fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE,
+                      gf.fqn_prefix[DATAPREFIX], SYMBOLS, TRUE);
+        }
+    }
+    if (!file_exists(interim_path) || file_newer(orig_path, interim_path)) {
+        /* <dist>symbols.template -> <playground>symbols.template */
         copy_file(gf.fqn_prefix[SYSCONFPREFIX], SYMBOLS_TEMPLATE,
                   gf.fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, TRUE);
-
-    if (!file_exists(dst_path) || file_newer(interim_path, dst_path))
+    }
+    if (!file_exists(dst_path) || file_newer(interim_path, dst_path)) {
+        /* <playground>symbols.template -> <playground>symbols */
         copy_file(gf.fqn_prefix[SYSCONFPREFIX], SYMBOLS,
-                    gf.fqn_prefix[SYSCONFPREFIX], SYMBOLS_TEMPLATE, TRUE);
+                  gf.fqn_prefix[SYSCONFPREFIX], SYMBOLS_TEMPLATE, TRUE);
+    }
 }
 
 void copy_sysconf_content(void)
