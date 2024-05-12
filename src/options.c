@@ -3449,7 +3449,8 @@ optfn_roguesymset(
             } else {
                 if (!go.opt_initial && Is_rogue_level(&u.uz))
                     assign_graphics(ROGUESET);
-                go.opt_need_redraw = TRUE;
+                go.opt_need_redraw = go.opt_need_glyph_reset = TRUE;
+                go.opt_symset_changed = TRUE;
             }
         } else
             return optn_err;
@@ -4072,6 +4073,7 @@ optfn_symset(
                 }
                 switch_symbols(gs.symset[PRIMARYSET].name != (char *) 0);
                 go.opt_need_redraw = go.opt_need_glyph_reset = TRUE;
+                go.opt_symset_changed = TRUE;
             }
         } else
             return optn_err;
@@ -8508,6 +8510,8 @@ doset_simple(void)
         if (go.opt_need_redraw) {
             check_gold_symbol();
             reglyph_darkroom();
+            if (go.opt_symset_changed)
+                opt_crt_flags &= ~docrtRefresh;
             docrt_flags(opt_crt_flags);
             flush_screen(1);
         }

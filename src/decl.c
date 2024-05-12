@@ -668,6 +668,7 @@ static const struct instance_globals_o g_init_o = {
     FALSE, /* opt_reset_customcolors */
     FALSE, /* opt_reset_customsymbols */
     FALSE, /* opt_update_basic_palette */
+    FALSE, /* opt_symset_changed */
     /* pickup.c */
     0,  /* oldcap */
     /* restore.c */

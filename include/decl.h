@@ -767,6 +767,7 @@ struct instance_globals_o {
     boolean opt_reset_customcolors;
     boolean opt_reset_customsymbols;
     boolean opt_update_basic_palette;
+    boolean opt_symset_changed;
 
     /* pickup.c */
     int oldcap; /* last encumbrance */
