@@ -848,7 +848,7 @@ merged(struct obj **potmp, struct obj **pobj)
             otmp->owt = weight(otmp), otmp->bknown = 0;
         /* and puddings!!!1!!one! */
         else if (!Is_pudding(otmp))
-            otmp->owt += obj->owt;
+            otmp->owt = weight(otmp);
         if (!has_oname(otmp) && has_oname(obj))
             otmp = *potmp = oname(otmp, ONAME(obj), ONAME_SKIP_INVUPD);
         obj_extract_self(obj);

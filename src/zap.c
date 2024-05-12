@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1713334819 2024/04/17 06:20:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.532 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1715284462 2024/05/09 19:54:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.539 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2438,6 +2438,8 @@ bhitpile(
                     continue;
             }
         }
+        if (otmp->where != OBJ_FLOOR || otmp->ox != tx || otmp->oy != ty)
+            continue;
         hitanything += (*fhito)(otmp, obj);
     }
 
@@ -3654,20 +3656,20 @@ zap_map(
     } /* !u.uz */
 
     if (obj->otyp == WAN_PROBING) {
-        schar ltyp;
         /*
          * Probing, either up/down or lateral.
          */
+        schar ltyp;
+        int oldtyp, oldglyph;
 
-        /* map unseen terrain */
-        if (!cansee(x, y)) {
-            int oldglyph = glyph_at(x, y);
-
-            show_map_spot(x, y, FALSE);
-            if (oldglyph != glyph_at(x, y)) {
-                /* TODO: need to give some message */
-                learn_it = TRUE;
-            }
+        /* map terrain; might reveal a special room which is already within
+           view that hasn't been entered yet */
+        oldtyp = gl.lastseentyp[x][y];
+        oldglyph = glyph_at(x, y);
+        show_map_spot(x, y, FALSE);
+        if (oldtyp != gl.lastseentyp[x][y] || oldglyph != glyph_at(x, y)) {
+            /* TODO: ought to give some message */
+            learn_it = TRUE;
         }
         ltyp = SURFACE_AT(x, y);
         /* secret door gets revealed, converted into regular door */
@@ -5861,6 +5863,7 @@ destroy_items(
     int limit; /* max amount of item stacks destroyed, based on damage */
     struct {
         unsigned oid;
+        struct obj *otmp;
         boolean deferred;
     } items_to_destroy[MAX_ITEMS_DESTROYED];
     int elig_stacks = 0; /* number of destroyable objects found so far */
@@ -5868,11 +5871,13 @@ destroy_items(
     /* this is a struct obj** because we might destroy the first item in it */
     struct obj **objchn = u_carry ? &gi.invent : &mon->minvent;
     int dmg_out = 0; /* damage caused by items getting destroyed */
+    xint8 where = NOBJ_STATES;
 
     /* initialize items_to_destroy */
     for (i = 0; i < MAX_ITEMS_DESTROYED; ++i) {
         /* 0 should not be a valid o_id for anything */
         items_to_destroy[i].oid = 0;
+        items_to_destroy[i].otmp = (struct obj *) 0;
         items_to_destroy[i].deferred = FALSE;
     }
 
@@ -5935,6 +5940,11 @@ destroy_items(
             continue;
         }
         items_to_destroy[i].oid = obj->o_id;
+        items_to_destroy[i].otmp = obj;
+        if (where == NOBJ_STATES)
+            where = obj->where;
+        else if (where != obj->where)
+            impossible("destroy_item: items in multiple chains");
 
         /* if loss of this item might dump us onto a trap, hold off
            until later because potential recursive destroy_items() will
@@ -5960,15 +5970,13 @@ destroy_items(
         /* if we saved some items for later (most likely just a worn ring
            of levitation) and they're still in inventory, handle them on the
            second iteration of the loop */
-        struct obj *nobj;
-        for (obj = *objchn; obj; obj = nobj) {
-            nobj = obj->nobj;
-            for (i = 0; i < elig_stacks; ++i) {
-                if (obj->o_id == items_to_destroy[i].oid
-                    && (items_to_destroy[i].deferred == (defer == 1))) {
-                    dmg_out += maybe_destroy_item(mon, obj, dmgtyp);
-                    break;
-                }
+        for (i = 0; i < elig_stacks; ++i) {
+            obj = items_to_destroy[i].otmp;
+            if (obj && obj->o_id == items_to_destroy[i].oid
+                && obj->where == where
+                && (items_to_destroy[i].deferred == (defer == 1))) {
+                dmg_out += maybe_destroy_item(mon, obj, dmgtyp);
+                items_to_destroy[i].otmp = (struct obj *) 0;
             }
         }
     }

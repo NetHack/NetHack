@@ -1,4 +1,4 @@
-/* NetHack 3.7	detect.c	$NHDT-Date: 1703070189 2023/12/20 11:03:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.171 $ */
+/* NetHack 3.7	detect.c	$NHDT-Date: 1715284441 2024/05/09 19:54:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.178 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -260,7 +260,8 @@ check_map_spot(coordxy x, coordxy y, char oclass, unsigned material)
             if (material
                 && objects[glyph_to_obj(glyph)].oc_material == material) {
                 /* object shown here is of interest because material matches */
-                for (otmp = gl.level.objects[x][y]; otmp; otmp = otmp->nexthere)
+                for (otmp = gl.level.objects[x][y]; otmp;
+                     otmp = otmp->nexthere)
                     if (o_material(otmp, GOLD))
                         return FALSE;
                 /* didn't find it; perhaps a monster is carrying it */
@@ -274,7 +275,8 @@ check_map_spot(coordxy x, coordxy y, char oclass, unsigned material)
             }
             if (oclass && objects[glyph_to_obj(glyph)].oc_class == oclass) {
                 /* obj shown here is of interest because its class matches */
-                for (otmp = gl.level.objects[x][y]; otmp; otmp = otmp->nexthere)
+                for (otmp = gl.level.objects[x][y]; otmp;
+                     otmp = otmp->nexthere)
                     if (o_in(otmp, oclass))
                         return FALSE;
                 /* didn't find it; perhaps a monster is carrying it */
@@ -324,7 +326,7 @@ gold_detect(struct obj *sobj)
     int ter_typ = TER_DETECT | TER_OBJ;
 
     gk.known = stale = clear_stale_map(COIN_CLASS,
-                                    (unsigned) (sobj->blessed ? GOLD : 0));
+                                       (unsigned) (sobj->blessed ? GOLD : 0));
 
     /* look for gold carried by monsters (might be in a container) */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -1331,6 +1333,7 @@ use_crystal_ball(struct obj **optr)
     return;
 }
 
+/* used by magic mapping, clairvoyance, and wand of probing */
 void
 show_map_spot(coordxy x, coordxy y, boolean cnf)
 {
@@ -1376,6 +1379,9 @@ show_map_spot(coordxy x, coordxy y, boolean cnf)
                 lev->glyph = oldglyph;
         }
     }
+    /* possibly update #overview */
+    if (!cnf && lev->roomno >= ROOMOFFSET)
+        room_discovered(lev->roomno - ROOMOFFSET);
 }
 
 void
@@ -1405,7 +1411,8 @@ do_mapping(void)
 
 /* clairvoyance */
 void
-do_vicinity_map(struct obj *sobj) /* scroll--actually fake spellbook--object */
+do_vicinity_map(
+    struct obj *sobj) /* scroll--actually fake spellbook--object */
 {
     int zx, zy;
     struct monst *mtmp;

@@ -103,6 +103,10 @@ del_light_source(int type, anything *id)
        has only been partially restored during a level change
        (in particular: chameleon vs prot. from shape changers) */
     switch (type) {
+    case LS_NONE:
+        impossible("del_light_source:type=none");
+        tmp_id.a_uint = 0;
+        break;
     case LS_OBJECT:
         tmp_id.a_uint = id->a_obj ? id->a_obj->o_id : 0;
         break;
@@ -148,6 +152,7 @@ delete_ls(light_source *ls)
     }
     if (curr) {
         assert(curr == ls);
+        (void) memset((genericptr_t) ls, 0, sizeof(light_source));
         free((genericptr_t) ls);
         gv.vision_full_recalc = 1;
     } else {
@@ -433,6 +438,7 @@ save_light_sources(NHFILE *nhfp, int range)
             /* if global and not doing local, or vice versa, remove it */
             if (is_global ^ (range == RANGE_LEVEL)) {
                 *prev = curr->next;
+                (void) memset((genericptr_t) curr, 0, sizeof(light_source));
                 free((genericptr_t) curr);
             } else {
                 prev = &(*prev)->next;

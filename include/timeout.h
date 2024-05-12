@@ -10,11 +10,12 @@ typedef void (*timeout_proc)(ANY_P *, long);
 
 /* kind of timer */
 enum timer_type {
-    TIMER_LEVEL = 0,   /* event specific to level [melting ice] */
-    TIMER_GLOBAL = 1,  /* event follows current play [not used] */
-    TIMER_OBJECT = 2,  /* event follows an object [various] */
-    TIMER_MONSTER = 3, /* event follows a monster [not used] */
-    NUM_TIMER_KINDS    /* 4 */
+    TIMER_NONE = 0,
+    TIMER_LEVEL = 1,   /* event specific to level [melting ice] */
+    TIMER_GLOBAL = 2,  /* event follows current play [not used] */
+    TIMER_OBJECT = 3,  /* event follows an object [various] */
+    TIMER_MONSTER = 4, /* event follows a monster [not used] */
+    NUM_TIMER_KINDS    /* 5 */
 };
 
 /* save/restore timer ranges */

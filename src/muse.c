@@ -1,4 +1,4 @@
-/* NetHack 3.7	muse.c	$NHDT-Date: 1711734229 2024/03/29 17:43:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.216 $ */
+/* NetHack 3.7	muse.c	$NHDT-Date: 1715109270 2024/05/07 19:14:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.218 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -29,6 +29,8 @@ staticfn void m_use_undead_turning(struct monst *, struct obj *);
 staticfn boolean hero_behind_chokepoint(struct monst *);
 staticfn boolean mon_has_friends(struct monst *);
 staticfn int mbhitm(struct monst *, struct obj *);
+staticfn boolean fhito_loc(struct obj *obj, coordxy x, coordxy y,
+                           int (*fhito)(OBJ_P, OBJ_P));
 staticfn void mbhit(struct monst *, int, int (*)(MONST_P, OBJ_P),
                   int (*)(OBJ_P, OBJ_P), struct obj *);
 staticfn struct permonst *muse_newcham_mon(struct monst *);
@@ -1622,6 +1624,29 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
     return 0;
 }
 
+/* hit all objects at x,y with fhito function */
+staticfn boolean
+fhito_loc(struct obj *obj,
+          coordxy tx, coordxy ty,
+          int (*fhito)(OBJ_P, OBJ_P))
+{
+    struct obj *otmp, *next_obj;
+    int hitanything = 0;
+
+    if (!fhito || !OBJ_AT(tx, ty))
+        return FALSE;
+
+    for (otmp = gl.level.objects[tx][ty]; otmp; otmp = next_obj) {
+        next_obj = otmp->nexthere;
+
+        if (otmp->where != OBJ_FLOOR || otmp->ox != tx || otmp->oy != ty)
+            continue;
+        hitanything += (*fhito)(otmp, obj);
+    }
+
+    return hitanything ? TRUE : FALSE;
+}
+
 /* A modified bhit() for monsters.  Based on bhit() in zap.c.  Unlike
  * buzz(), bhit() doesn't take into account the possibility of a monster
  * zapping you, so we need a special function for it.  (Unless someone wants
@@ -1636,7 +1661,6 @@ mbhit(
     struct obj *obj)              /* 2nd arg to fhitm/fhito */
 {
     struct monst *mtmp;
-    struct obj *otmp;
     uchar ltyp;
     int ddx, ddy, otyp = obj->otyp;
 
@@ -1667,48 +1691,19 @@ mbhit(
             (*fhitm)(mtmp, obj);
             range -= 3;
         }
-        /* modified by GAN to hit all objects */
-        if (fhito) {
-            int hitanything = 0;
-            struct obj *next_obj;
-
-            for (otmp = gl.level.objects[gb.bhitpos.x][gb.bhitpos.y]; otmp;
-                 otmp = next_obj) {
-                /* Fix for polymorph bug, Tim Wright */
-                next_obj = otmp->nexthere;
-                hitanything += (*fhito)(otmp, obj);
-            }
-            if (hitanything)
-                range--;
-        }
+        if (fhito_loc(obj, gb.bhitpos.x, gb.bhitpos.y, fhito))
+            range--;
         ltyp = levl[gb.bhitpos.x][gb.bhitpos.y].typ;
         dbx = x, dby = y;
         if (otyp == WAN_STRIKING
             /* if levl[x][y].typ is DRAWBRIDGE_UP then the zap is passing
                over the moat in front of a closed drawbridge and doesn't
-               hit any part of the bridge's mechanism */
+               hit any part of the bridge's mechanism (yet; it might be
+               about to hit the closed portcullis on the next iteration) */
             && ltyp != DRAWBRIDGE_UP && find_drawbridge(&dbx, &dby)) {
-            /* this might kill mon and destroy obj; mon will remain
-               accessible even if dead but obj could be deleted */
+            /* this might kill mon and destroy obj but they'll remain
+               accessible; (*fhitm)() and (*fhito)() use obj for zap type */
             destroy_drawbridge(dbx, dby);
-            for (otmp = mon->minvent; otmp; otmp = otmp->nobj)
-                if (otmp == obj)
-                    break;
-            if (!otmp) {
-                for (otmp = gl.level.objects[x][y]; otmp;
-                     otmp = otmp->nexthere)
-                    if (otmp == obj)
-                        break;
-            }
-            /* if otmp is Null, mon isn't carrying obj anymore and didn't
-               just drop it here; assume that it was destroyed and stop
-               the zap; not really correct behavior but we can't continue
-               without the responsible object because fhitm (mbhitm) and
-               fhito (bhito) will want it at forthcoming spots in zap path */
-            if (!otmp) {
-                /*obj = NULL;*/
-                break;
-            }
         } else if (IS_DOOR(ltyp) || ltyp == SDOOR) {
             switch (otyp) {
             /* note: monsters don't use opening or locking magic

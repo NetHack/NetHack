@@ -1942,6 +1942,9 @@ staticfn const char *
 kind_name(short kind)
 {
     switch (kind) {
+    case TIMER_NONE:
+        impossible("no timer type");
+        return "none";
     case TIMER_LEVEL:
         return "level";
     case TIMER_GLOBAL:
@@ -2162,6 +2165,7 @@ run_timers(void)
         if (curr->kind == TIMER_OBJECT)
             (curr->arg.a_obj)->timed--;
         (*timeout_funcs[curr->func_index].f)(&curr->arg, curr->timeout);
+        (void) memset((genericptr_t) curr, 0, sizeof(timer_element));
         free((genericptr_t) curr);
     }
 }
@@ -2178,7 +2182,7 @@ start_timer(
 {
     timer_element *gnu, *dup;
 
-    if (kind < 0 || kind >= NUM_TIMER_KINDS
+    if (kind <= TIMER_NONE || kind >= NUM_TIMER_KINDS
         || func_index < 0 || func_index >= NUM_TIME_FUNCS)
         panic("start_timer (%s: %d)", kind_name(kind), (int) func_index);
 
@@ -2236,6 +2240,7 @@ stop_timer(short func_index, anything *arg)
             (arg->a_obj)->timed--;
         if ((cleanup_func = timeout_funcs[doomed->func_index].cleanup) != 0)
             (*cleanup_func)(arg, timeout);
+        (void) memset((genericptr_t) doomed, 0, sizeof(timer_element));
         free((genericptr_t) doomed);
         return (timeout - gm.moves);
     }
@@ -2313,6 +2318,7 @@ obj_stop_timers(struct obj *obj)
                 gt.timer_base = curr->next;
             if ((cleanup_func = timeout_funcs[curr->func_index].cleanup) != 0)
                 (*cleanup_func)(&curr->arg, curr->timeout);
+            (void) memset((genericptr_t) curr, 0, sizeof(timer_element));
             free((genericptr_t) curr);
         } else {
             prev = curr;
@@ -2353,6 +2359,7 @@ spot_stop_timers(coordxy x, coordxy y, short func_index)
                 gt.timer_base = curr->next;
             if ((cleanup_func = timeout_funcs[curr->func_index].cleanup) != 0)
                 (*cleanup_func)(&curr->arg, curr->timeout);
+            (void) memset((genericptr_t) curr, 0, sizeof(timer_element));
             free((genericptr_t) curr);
         } else {
             prev = curr;
@@ -2618,6 +2625,7 @@ save_timers(NHFILE *nhfp, int range)
                     prev->next = curr->next;
                 else
                     gt.timer_base = curr->next;
+                (void) memset((genericptr_t) curr, 0, sizeof(timer_element));
                 free((genericptr_t) curr);
                 /* prev stays the same */
             } else {

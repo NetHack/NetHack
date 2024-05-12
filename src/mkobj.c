@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkobj.c	$NHDT-Date: 1704316444 2024/01/03 21:14:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.282 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1715109575 2024/05/07 19:19:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.296 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -13,6 +13,7 @@ staticfn void mksobj_init(struct obj *, boolean);
 staticfn int item_on_ice(struct obj *);
 staticfn void shrinking_glob_gone(struct obj *);
 staticfn void obj_timer_checks(struct obj *, coordxy, coordxy, int);
+staticfn void dealloc_obj_real(struct obj *);
 staticfn struct obj *save_mtraits(struct obj *, struct monst *);
 staticfn void objlist_sanity(struct obj *, int, const char *);
 staticfn void shop_obj_sanity(struct obj *, const char *);
@@ -2572,6 +2573,7 @@ obj_extract_self(struct obj *obj)
     switch (obj->where) {
     case OBJ_FREE:
     case OBJ_LUAFREE:
+    case OBJ_DELETED:
         break;
     case OBJ_FLOOR:
         remove_object(obj);
@@ -2750,14 +2752,19 @@ container_weight(struct obj *object)
 }
 
 /*
- * Deallocate the object.  _All_ objects should be run through here for
- * them to be deallocated.
+ * Mark object to be deallocated.  _All_ objects should be run through here
+ * for them to be deallocated.
  */
 void
 dealloc_obj(struct obj *obj)
 {
-    if (obj->where != OBJ_FREE && obj->where != OBJ_LUAFREE)
-        panic("dealloc_obj: obj not free");
+    if (obj->where == OBJ_DELETED) {
+        impossible("dealloc_obj: obj already deleted (type=%d)", obj->otyp);
+        return;
+    } else if (obj->where != OBJ_FREE && obj->where != OBJ_LUAFREE) {
+        panic("dealloc_obj: obj not free (type=%d, where=%d)",
+              obj->otyp, obj->where);
+    }
     if (obj->nobj)
         panic("dealloc_obj with nobj");
     if (obj->cobj)
@@ -2789,13 +2796,29 @@ dealloc_obj(struct obj *obj)
     if (obj == gk.kickedobj)
         gk.kickedobj = 0;
 
-    if (obj->oextra)
-        dealloc_oextra(obj);
+    /* if obj came from the most recent splitobj(), it's no longer eligible
+       for unsplitobj(); perform inline clear_splitobjs() */
+    if (obj->o_id == gc.context.objsplit.parent_oid
+        || obj->o_id == gc.context.objsplit.child_oid)
+        gc.context.objsplit.parent_oid = gc.context.objsplit.child_oid = 0;
+
     if (obj->lua_ref_cnt) {
         /* obj is referenced from a lua script, let lua gc free it */
         obj->where = OBJ_LUAFREE;
         return;
     }
+    /* mark object as deleted, put it into queue to be freed */
+    obj->where = OBJ_DELETED;
+    obj->nobj = go.objs_deleted;
+    go.objs_deleted = obj;
+}
+
+/* actually deallocate the object */
+staticfn void
+dealloc_obj_real(struct obj *obj)
+{
+    if (obj->oextra)
+        dealloc_oextra(obj);
 
     /* clear out of date information contained in the about-to-become
        stale memory so that potential used-after-freed bugs (should never
@@ -2804,6 +2827,22 @@ dealloc_obj(struct obj *obj)
        similar so this is mainly useful for ordinary malloc/free */
     *obj = cg.zeroobj;
     free((genericptr_t) obj);
+}
+
+/* free all the objects marked for deletion */
+void
+dobjsfree(void)
+{
+    struct obj *otmp;
+
+    while (go.objs_deleted) {
+        otmp = go.objs_deleted->nobj;
+        if (go.objs_deleted->where != OBJ_DELETED)
+            panic("dobjsfree: obj where is not OBJ_DELETED");
+        obj_extract_self(go.objs_deleted);
+        dealloc_obj_real(go.objs_deleted);
+        go.objs_deleted = otmp;
+    }
 }
 
 /* create an object from a horn of plenty; mirrors bagotricks(makemon.c) */
@@ -2960,6 +2999,7 @@ obj_sanity_check(void)
     objlist_sanity(gm.migrating_objs, OBJ_MIGRATING, "migrating sanity");
     objlist_sanity(gl.level.buriedobjlist, OBJ_BURIED, "buried sanity");
     objlist_sanity(gb.billobjs, OBJ_ONBILL, "bill sanity");
+    objlist_sanity(go.objs_deleted, OBJ_DELETED, "deleted object sanity");
 
     mon_obj_sanity(fmon, "minvent sanity");
     mon_obj_sanity(gm.migrating_mons, "migrating minvent sanity");
@@ -3198,12 +3238,18 @@ mon_obj_sanity(struct monst *monlist, const char *mesg)
 staticfn void
 insane_obj_bits(struct obj *obj, struct monst *mon)
 {
-    unsigned o_in_use = obj->in_use, o_bypass = obj->bypass,
-             /* having obj->nomerge be set might be intentional */
-             o_nomerge = (obj->nomerge && !nomerge_exception(obj)),
-             /* next_boulder is only for object name formatting when
-                pushing boulders and should be reset by next sanity check */
-             o_boulder = (obj->otyp == BOULDER && obj->next_boulder);
+    unsigned o_in_use, o_bypass, o_nomerge, o_boulder;
+
+    if (obj->where == OBJ_DELETED)
+        return; /* skip bit checking for deleted objects */
+
+    o_in_use = obj->in_use;
+    o_bypass = obj->bypass;
+    /* having obj->nomerge be set might be intentional */
+    o_nomerge = (obj->nomerge && !nomerge_exception(obj));
+    /* next_boulder is only for object name formatting when pushing
+       boulders and should be reset by time of next sanity check */
+    o_boulder = (obj->otyp == BOULDER && obj->next_boulder);
 
     if (o_in_use || o_bypass || o_nomerge || o_boulder) {
         char infobuf[QBUFSZ];
