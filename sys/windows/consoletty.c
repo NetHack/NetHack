@@ -2097,16 +2097,20 @@ static int CALLBACK EnumFontCallback(
 void
 check_and_set_font(void)
 {
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     if (!check_font_widths()) {
-        const char *msg = "WARNING: glyphs too wide in console font."
-                          " Changing code page to 437 and font to Consolas";
+        if (wizard) {
+            const char *msg = "WARNING: glyphs too wide in console font."
+                             " Changing code page to 437 and font to Consolas";
 
-        if (iflags.window_inited)
-            pline ("%s", msg);
-        else
-            raw_printf("%s\n", msg);
+            if (iflags.window_inited)
+                pline ("%s", msg);
+            else
+                raw_printf("%s\n", msg);
+        }
         set_known_good_console_font();
     }
+#endif
 }
 
 /* check_font_widths returns TRUE if all glyphs in current console font
