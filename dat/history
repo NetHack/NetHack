@@ -179,7 +179,10 @@ maintained and enhanced 3.4 for the Microsoft Windows platform.  Alex Kompel
 contributed a new graphical interface for the Windows port.  Alex Kompel also
 contributed a Windows CE port for 3.4.1.
 
-Ron Van Iwaarden maintained 3.4 for OS/2.
+Ron Van Iwaarden was the sole maintainer of NetHack for OS/2 the past several
+releases. Unfortunately Ron's last OS/2 machine stopped working in early
+2006. A great many thanks to Ron for keeping NetHack alive on OS/2 all these
+years.
 
 Janne Salmijarvi and Teemu Suikki maintained and enhanced the
 Amiga port of 3.4 after Janne Salmijarvi resurrected it for 3.3.1.
@@ -229,7 +232,7 @@ Kevin Smolkowski, ensured that NetHack 3.6 continued to operate on various
 UNIX flavors and maintained the X11 interface.
 
 Ken Lorber, Haoyang Wang, Pat Rankin, and Dean Luick maintained the port
-of NetHack 3.6 for Mac OSX.
+of NetHack 3.6 for MacOS.
 
 Michael Allison, David Cohrs, Bart House, Pasi Kallinen, Alex Kompel,
 Dion Nicolaas, Derek S. Ray and Yitzhak Sapir maintained the port of
