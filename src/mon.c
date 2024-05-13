@@ -832,7 +832,7 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     case PM_OGRE: case PM_OGRE_LEADER: case PM_OGRE_TYRANT:
 
     case PM_QUANTUM_MECHANIC: case PM_GENETIC_ENGINEER:
-    case PM_RUST_MONSTER: case PM_DISENCHANTER:
+    case PM_RUST_MONSTER: case PM_TRANSMUTER: case PM_DISENCHANTER:
 
     case PM_GARTER_SNAKE: case PM_SNAKE: case PM_WATER_MOCCASIN:
     case PM_PYTHON: case PM_PIT_VIPER: case PM_COBRA:

@@ -36,7 +36,6 @@ staticfn char *strprepend(char *, const char *);
 staticfn char *nextobuf(void);
 staticfn void releaseobuf(char *);
 staticfn void xcalled(char *, int, const char *, const char *);
-staticfn char *xname_forcemat(struct obj *);
 staticfn char *xname_flags(struct obj *, unsigned);
 staticfn char *minimal_xname(struct obj *);
 staticfn void add_erosion_words(struct obj *, char *);

@@ -2146,6 +2146,7 @@ extern char *corpse_xname(struct obj *, const char *, unsigned) NONNULLARG1;
 extern char *cxname(struct obj *) NONNULLARG1;
 extern char *cxname_singular(struct obj *) NONNULLARG1;
 extern char *killer_xname(struct obj *) NONNULLARG1;
+extern char *xname_forcemat(struct obj *) NONNULLARG1;
 extern char *short_oname(struct obj *, char *(*)(struct obj *),
                          char *(*)(struct obj *), unsigned) NONNULLARG12;
 extern const char *singular(struct obj *, char *(*)(struct obj *)) NONNULLPTRS;
@@ -3325,6 +3326,8 @@ extern void mhitm_ad_sedu(struct monst *, struct attack *, struct monst *,
                           struct mhitm_data *) NONNULLPTRS;
 extern void mhitm_ad_ssex(struct monst *, struct attack *, struct monst *,
                           struct mhitm_data *) NONNULLPTRS;
+extern void mhitm_ad_mtrl(struct monst *, struct attack *, struct monst *,
+                           struct mhitm_data *) NONNULLPTRS;
 extern void mhitm_adtyping(struct monst *, struct attack *, struct monst *,
                            struct mhitm_data *) NONNULLPTRS;
 extern boolean do_stone_u(struct monst *) NONNULLARG1;

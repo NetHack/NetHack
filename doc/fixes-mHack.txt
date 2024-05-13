@@ -26,6 +26,7 @@ Platform- and/or Interface-Specific New Features
 NetHack Community Patches (or Variation) Included
 -------------------------------------------------
 Imported object materials from SpliceHack.
+Imported transmuter from SpliceHack.
 
 
 Code Cleanup and Reorganization

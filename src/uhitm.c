@@ -4608,6 +4608,63 @@ mhitm_ad_ssex(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
+mhitm_ad_mtrl(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
+{
+
+    if (magr == &gy.youmonst) {
+        /* uhitm */
+        /* there's no msomearmor() function, so just do damage */
+    } else if (mdef == &gy.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        hitmsg(magr, mattk);
+        /* uncancelled is sufficient enough; please
+           don't make this attack less frequent */
+        if (uncancelled) {
+            struct obj *obj = some_armor(&gy.youmonst);
+
+            if (!obj) {
+                /* some rings are susceptible;
+                   amulets and blindfolds aren't (at present) */
+                switch (rn2(5)) {
+                case 0:
+                    break;
+                case 1:
+                    obj = uright;
+                    break;
+                case 2:
+                    obj = uleft;
+                    break;
+                case 3:
+                    obj = uamul;
+                    break;
+                case 4:
+                    obj = ublindf;
+                    break;
+                }
+            }
+            if (obj && warp_material(obj, FALSE)) {
+                pline("That's odd, you don't remember putting on %s...",
+                    an(xname_forcemat(obj)));
+                update_inventory();
+                disp.botl = TRUE;
+            }
+            if (obj)
+                mhm->damage = 0;
+            if (!rn2(20))
+                (void) rloc(magr, TRUE);
+        }
+    } else {
+        /* mhitm */
+        /* there's no msomearmor() function, so just do damage */
+    }
+}
+
+void
 mhitm_adtyping(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
@@ -4655,6 +4712,7 @@ mhitm_adtyping(
     case AD_FAMN: mhitm_ad_famn(magr, mattk, mdef, mhm); break;
     case AD_DGST: mhitm_ad_dgst(magr, mattk, mdef, mhm); break;
     case AD_HALU: mhitm_ad_halu(magr, mattk, mdef, mhm); break;
+    case AD_MTRL: mhitm_ad_mtrl(magr, mattk, mdef, mhm); break;
     default:
         mhm->damage = 0;
     }
@@ -5760,6 +5818,7 @@ passive(
             monstunseesu(M_SEEN_MAGR);
         }
         break;
+    case AD_MTRL:
     case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
         if (mhitb) {
             if (aatyp == AT_KICK) {
@@ -5909,7 +5968,7 @@ passive_obj(
     /* if caller hasn't specified an object, use uwep, uswapwep or uarmg */
     if (!obj) {
         obj = (u.twoweap && uswapwep && !rn2(2)) ? uswapwep : uwep;
-        if (!obj && mattk->adtyp == AD_ENCH)
+        if (!obj && (mattk->adtyp == AD_ENCH || mattk->adtyp == AD_MTRL))
             obj = uarmg; /* no weapon? then must be gloves */
         if (!obj)
             return; /* no object to affect */
@@ -5947,6 +6006,13 @@ passive_obj(
     case AD_CORR:
         if (!mon->mcan) {
             (void) erode_obj(obj, (char *) 0, ERODE_CORRODE, EF_GREASE);
+        }
+        break;
+    case AD_MTRL:
+        if (!mon->mcan) {
+            if(warp_material(obj, TRUE) && carried(obj)) {
+                pline("Your %s warps!", simpleonames(obj));
+            }
         }
         break;
     case AD_ENCH:
