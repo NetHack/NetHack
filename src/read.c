@@ -2383,8 +2383,9 @@ litroom(
     struct obj *obj) /* scroll, spellbook (for spell), or wand of light */
 {
     struct obj *otmp;
-    boolean blessed_effect = (obj && obj->oclass == SCROLL_CLASS
-                              && obj->blessed);
+    boolean blessed_effect = (obj &&
+                             ((obj->oclass == SCROLL_CLASS && obj->blessed) ||
+                             (obj->oclass == WAND_CLASS && P_SKILL(P_WAND) > P_BASIC)));
     char is_lit = 0; /* value is irrelevant but assign something anyway; its
                       * address is used as a 'not null' flag for set_lit() */
 

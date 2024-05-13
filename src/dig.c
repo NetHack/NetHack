@@ -1488,7 +1488,7 @@ draft_message(boolean unexpected)
 
 /* digging via wand zap or spell cast */
 void
-zap_dig(void)
+zap_dig(boolean override_maze)
 {
     struct rm *room;
     struct monst *mtmp;
@@ -1554,7 +1554,7 @@ zap_dig(void)
 
     /* normal case: digging across the level */
     shopdoor = shopwall = FALSE;
-    maze_dig = gl.level.flags.is_maze_lev && !Is_earthlevel(&u.uz);
+    maze_dig = gl.level.flags.is_maze_lev && !Is_earthlevel(&u.uz) && !override_maze;
     zx = u.ux + u.dx;
     zy = u.uy + u.dy;
     if (u.utrap && u.utraptype == TT_PIT

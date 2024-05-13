@@ -33,6 +33,7 @@ staticfn void skill_advance(int);
 #define PN_CLERIC_SPELL (-12)
 #define PN_ESCAPE_SPELL (-13)
 #define PN_MATTER_SPELL (-14)
+#define PN_WAND (-15)
 
 static NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
     /* Weapon */
@@ -44,7 +45,7 @@ static NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
     PN_ATTACK_SPELL, PN_HEALING_SPELL, PN_DIVINATION_SPELL,
     PN_ENCHANTMENT_SPELL, PN_CLERIC_SPELL, PN_ESCAPE_SPELL, PN_MATTER_SPELL,
     /* Other */
-    PN_BARE_HANDED, PN_TWO_WEAPONS, PN_RIDING
+    PN_BARE_HANDED, PN_TWO_WEAPONS, PN_RIDING, PN_WAND
 };
 
 /* note: entry [0] isn't used */
@@ -53,6 +54,7 @@ static NEARDATA const char *const odd_skill_names[] = {
     "two weapon combat", "riding", "polearms", "saber", "hammer", "whip",
     "attack spells", "healing spells", "divination spells",
     "enchantment spells", "clerical spells", "escape spells", "matter spells",
+    "wands"
 };
 /* indexed via is_martial() */
 static NEARDATA const char *const barehands_or_martial[] = {
@@ -1818,13 +1820,16 @@ skill_init(const struct def_skill *class_skill)
         P_ADVANCE(skill) = 0;
     }
 
-    /* Set skill for all weapons in inventory to be basic */
+    /* Set skill for all weapons (and wands) in inventory to be basic */
     for (obj = gi.invent; obj; obj = obj->nobj) {
         /* don't give skill just because of carried ammo, wait until
            we see the relevant launcher (prevents an archeologist's
            touchstone from inadvertently providing skill in sling) */
         if (is_ammo(obj))
             continue;
+
+        if(obj->oclass == WAND_CLASS)
+            P_SKILL(P_WAND) = P_BASIC;
 
         skill = weapon_type(obj);
         if (skill != P_NONE)
