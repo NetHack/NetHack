@@ -103,13 +103,13 @@ rumors:	rumors.tru rumors.fal ../util/makedefs
 oracles:	oracles.txt ../util/makedefs
 	../util/makedefs -h
 
-engrave:	../util/makedefs
+engrave:	engrave.txt ../util/makedefs
 	../util/makedefs -2
 
-epitaph:	../util/makedefs
+epitaph:	epitaph.txt ../util/makedefs
 	../util/makedefs -1
 
-bogusmon:	../util/makedefs
+bogusmon:	bogusmon.txt ../util/makedefs
 	../util/makedefs -3
 
 options:	../util/makedefs
