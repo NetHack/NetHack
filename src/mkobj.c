@@ -3961,6 +3961,11 @@ static const struct icp bow_materials[] = {
     { 20, PLASTIC},
     { 10, GOLD}
 };
+static const struct icp statue_materials[] = {
+    {900, MINERAL},
+    { 99, IRON},
+    {  1, GOLD}
+};
 
 /* TODO: Orcish? */
 
@@ -4014,6 +4019,8 @@ material_list(struct obj* obj)
         case FROST_HORN:
         case HORN_OF_PLENTY:
             return horn_materials;
+        case STATUE:
+            return statue_materials;
         default:
             break;
     }

@@ -5488,9 +5488,21 @@ fracture_rock(struct obj *obj) /* no texts here! */
     if (by_you && obj->otyp == BOULDER)
         sokoban_guilt();
 
-    obj->otyp = ROCK;
-    obj->oclass = GEM_CLASS;
-    obj->quan = (long) rn1(60, 7);
+    int old_material = (obj->material);
+
+    if(old_material == GOLD) {
+        obj->otyp = GOLD_PIECE;
+        obj->oclass = COIN_CLASS;
+        obj->quan = (long) rn1(6000, 700);
+    } else if (old_material == IRON) {
+        obj->otyp = IRON_CHAIN;
+        obj->oclass = CHAIN_CLASS;
+        obj->quan = (long) rn1(20, 2);
+    } else { /*rock, hopefully*/
+        obj->otyp = ROCK;
+        obj->oclass = GEM_CLASS;
+        obj->quan = (long) rn1(60, 7);
+    }
     obj->owt = weight(obj);
     obj->dknown = obj->bknown = obj->rknown = 0;
     obj->known = objects[obj->otyp].oc_uses_known ? 0 : 1;
