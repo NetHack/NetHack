@@ -38,7 +38,13 @@ SHORT COMMANDS
 
        -q     Generate the rumors file.
 
-       -s     Generate the bogusmon , engrave and epitaphfiles.
+       -s     Generate the bogusmon , engrave and epitaph files.
+
+       -1     Generate the epitaph file.
+
+       -2     Generate the engrave file.
+
+       -3     Generate the bogusmon file.
 
        -h     Generate the oracles file.
 
