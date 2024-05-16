@@ -1,4 +1,4 @@
-/* NetHack 3.7	read.c	$NHDT-Date: 1708126537 2024/02/16 23:35:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.300 $ */
+/* NetHack 3.7	read.c	$NHDT-Date: 1715889745 2024/05/16 20:02:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.308 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2385,6 +2385,7 @@ litroom(
     struct obj *otmp;
     boolean blessed_effect = (obj && obj->oclass == SCROLL_CLASS
                               && obj->blessed);
+    boolean no_op = (u.uswallow || Underwater || Is_waterlevel(&u.uz));
     char is_lit = 0; /* value is irrelevant but assign something anyway; its
                       * address is used as a 'not null' flag for set_lit() */
 
@@ -2447,12 +2448,14 @@ litroom(
                 pline("%s shines briefly.", Monnam(u.ustuck));
             else
                 pline("%s glistens.", Monnam(u.ustuck));
-        } else if (!Blind)
-            pline("A lit field surrounds you!");
+        } else if (!Blind && (!Is_rogue_level(&u.uz)
+                              || levl[u.ux][u.uy].typ != CORR)) {
+            pline("A lit field %ssurrounds you!", no_op ? "briefly " : "");
+        }
     }
 
     /* No-op when swallowed or in water */
-    if (u.uswallow || Underwater || Is_waterlevel(&u.uz))
+    if (no_op)
         return;
     /*
      *  If we are darkening the room and the hero is punished but not
@@ -2477,9 +2480,14 @@ litroom(
             gr.rooms[rnum].rlit = on;
         }
         /* hallways remain dark on the rogue level */
-    } else
+    } else if (is_art(obj, ART_SUNSWORD)) {
+        /* Sunsword's #invoke power directed up or down lights hero's spot
+           (do_clear_area() rejects radius 0 so call set_lit() directly) */
+        set_lit(u.ux, u.uy, (genericptr_t) &is_lit);
+    } else {
         do_clear_area(u.ux, u.uy, blessed_effect ? 9 : 5,
                       set_lit, (genericptr_t) (on ? &is_lit : (char *) 0));
+    }
 
     /*
      *  If we are not blind, then force a redraw on all positions in sight

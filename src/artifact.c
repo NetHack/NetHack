@@ -1,4 +1,4 @@
-/* NetHack 3.7	artifact.c	$NHDT-Date: 1711734229 2024/03/29 17:43:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.230 $ */
+/* NetHack 3.7	artifact.c	$NHDT-Date: 1715889721 2024/05/16 20:02:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.236 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1930,11 +1930,14 @@ arti_invoke(struct obj *obj)
                 if (u.dx || u.dy) {
                     do_blinding_ray(obj);
                 } else if (u.dz) {
-                    /* up or down; light this map spot */
-                    levl[u.ux][u.uy].lit = 1;
-                    pline("%s", ((Blind || levl[u.ux][u.uy].waslit)
-                                 ? nothing_seems_to_happen
-                                 : "It is lit here now."));
+                    /* up or down => light this map spot; litroom() uses
+                       radius 0 for Sunsword, except on Rogue level where
+                       whole room gets lit and corridor spots remain unlit */
+                    litroom(TRUE, obj);
+                    pline("%s", ((!Blind && levl[u.ux][u.uy].lit
+                                  && !levl[u.ux][u.uy].waslit)
+                                 ? "It is lit here now."
+                                 : nothing_seems_to_happen));
                 } else { /* zapyourself() */
                     boolean vulnerable = (u.umonnum == PM_GREMLIN);
                     int damg = obj->blessed ? 15 : !obj->cursed ? 10 : 5;
