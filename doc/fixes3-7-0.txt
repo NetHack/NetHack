@@ -2097,6 +2097,9 @@ curses: change petattr attributes, dropping support for curses-only ones
 curses: swap the grey and no-color color initialization
 curses: allow changing default colors with the 'palette' config option
 	(only if compiled with CHANGE_COLOR)
+curses: if messages have been issued during start-up (for instance, warnings
+	about issues in run-time config file), prompt user to press <return>
+	so that they can be read before curses erases the screen
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project

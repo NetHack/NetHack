@@ -206,6 +206,8 @@ void
 def_raw_print(const char *s)
 {
     puts(s);
+    if (*s)
+        iflags.raw_printed++;
 }
 
 staticfn

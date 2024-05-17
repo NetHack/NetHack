@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.c	$NHDT-Date: 1708290310 2024/02/18 21:05:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.386 $ */
+/* NetHack 3.7	wintty.c	$NHDT-Date: 1715979847 2024/05/17 21:04:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.406 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -208,15 +208,10 @@ boolean GFlag = FALSE;
 boolean HE_resets_AS; /* see termcap.c */
 #endif
 
-#if defined(MICRO) || defined(WIN32CON)
-static const char to_continue[] = "to continue";
-#define getret() getreturn(to_continue)
-#else
-static void getret(void);
-#endif
 static void bail(const char *); /* __attribute__((noreturn)) */
 static void newclipping(coordxy, coordxy);
 static void new_status_window(void);
+static void getret(void);
 static void erase_menu_or_text(winid, struct WinDesc *, boolean);
 static void free_window_info(struct WinDesc *, boolean);
 static boolean toggle_menu_curr(winid, tty_menu_item *, int, boolean,
@@ -770,10 +765,12 @@ tty_get_nh_event(void)
     return;
 }
 
-#if !defined(MICRO) && !defined(WIN32CON)
 static void
 getret(void)
 {
+#if defined(MICRO) || defined(WIN32CON)
+    getreturn("to continue");
+#else
     HUPSKIP();
     xputs("\n");
     if (flags.standout)
@@ -784,8 +781,9 @@ getret(void)
     if (flags.standout)
         standoutend();
     xwaitforspace(" ");
-}
 #endif
+    iflags.raw_printed = 0;
+}
 
 void
 tty_suspend_nhwindows(const char *str)
@@ -3965,6 +3963,8 @@ tty_raw_print(const char *str)
     HUPSKIP();
     if (ttyDisplay)
         ttyDisplay->rawprint++;
+    else if (*str)
+        iflags.raw_printed++;
     print_vt_code2(AVTC_SELECT_WINDOW, NHW_BASE);
 #if defined(MICRO) || defined(WIN32CON)
     msmsg("%s\n", str);
@@ -3980,6 +3980,8 @@ tty_raw_print_bold(const char *str)
     HUPSKIP();
     if (ttyDisplay)
         ttyDisplay->rawprint++;
+    else if (*str)
+        iflags.raw_printed++;
     print_vt_code2(AVTC_SELECT_WINDOW, NHW_BASE);
     term_start_raw_bold();
 #if defined(MICRO) || defined(WIN32CON)
@@ -5257,9 +5259,6 @@ play_usersound_via_idx(int idx, int volume)
 #endif
 
 #undef RESIZABLE
-#ifdef getret
-#undef getret
-#endif
 #undef HUPSKIP
 #undef HUPSKIP_RESULT
 #undef ttypanic
