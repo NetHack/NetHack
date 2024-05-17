@@ -1,4 +1,4 @@
-/* NetHack 3.7	spell.c	$NHDT-Date: 1708126538 2024/02/16 23:35:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.7	spell.c	$NHDT-Date: 1715984438 2024/05/17 22:20:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.169 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -892,11 +892,13 @@ skill_based_spellbook_id(void)
    doesn't have enough power), it only covers open space; this also
    means that it can't hit monsters inside walls, which makes sense as
    they would be earthed */
-#define CHAIN_LIGHTNING_TYP(typ) (IS_POOL(typ) || SPACE_POS(typ))
-#define CHAIN_LIGHTNING_POS(x, y)                                       \
-    (isok(x, y) && (CHAIN_LIGHTNING_TYP(levl[x][y].typ) ||              \
-                    (IS_DOOR(levl[x][y].typ) &&                         \
-                     !(levl[x][y].doormask & (D_CLOSED | D_LOCKED)))))
+#define CHAIN_LIGHTNING_TYP(typ) \
+    (SPACE_POS(typ) || (typ) == POOL || (typ) == MOAT /* not WATER */   \
+     || (typ) == DRAWBRIDGE_UP || (typ) == LAVAPOOL)  /* not LAVAWALL */
+#define CHAIN_LIGHTNING_POS(x, y) \
+    (isok(x, y) && (CHAIN_LIGHTNING_TYP(levl[x][y].typ)                 \
+                    || (IS_DOOR(levl[x][y].typ)                         \
+                        && !(levl[x][y].doormask & (D_CLOSED | D_LOCKED)))))
 
 struct chain_lightning_zap {
     /* direction in which this zap is currently moving; this is an
@@ -968,8 +970,8 @@ propagate_chain_lightning(
     clq->q[clq->tail++] = zap;
 
     /* Draw it. */
-    tmp_at(DISP_CHANGE, zapdir_to_glyph(
-               xdir[zap.dir], ydir[zap.dir], clq->displayed_beam));
+    tmp_at(DISP_CHANGE, zapdir_to_glyph(xdir[zap.dir], ydir[zap.dir],
+                                        clq->displayed_beam));
     tmp_at(zap.x, zap.y);
 }
 
@@ -1007,20 +1009,40 @@ cast_chain_lightning(void)
             struct monst *mon = m_at(zap.x, zap.y);
 
             if (mon) {
-                struct obj *unused; /* AD_ELEC can't destroy armor */
-                int dmg = zhitm(mon, BZ_U_SPELL(AD_ELEC - 1), 2, &unused);
+                struct obj *unused = 0; /* AD_ELEC can't destroy armor */
+                int dmg;
+
+                gn.notonhead = (mon->mx != gb.bhitpos.x
+                                || mon->my != gb.bhitpos.y);
+                dmg = zhitm(mon, BZ_U_SPELL(AD_ELEC - 1), 2, &unused);
 
                 if (dmg) {
                     /* mon has been damaged, but we haven't yet printed the
                        messages or given kill credit; assume the hero can
                        sense their spell hitting monsters, because they can
                        steer it away from peacefuls */
-                    if (DEADMONSTER(mon))
+                    if (DEADMONSTER(mon)) {
                         xkilled(mon, XKILL_GIVEMSG);
-                    else
+                    } else {
                         pline("You shock %s%s", mon_nam(mon), exclam(dmg));
+                        /* if a long worm, only map 'I' for its head */
+                        if (!canseemon(mon) && !gn.notonhead)
+                            /* FIXME: this doesn't work, possibly because
+                               cleaning up tmp_at() restores old glyph? */
+                            map_invisible(zap.x, zap.y);
+                    }
                 } else if (canseemon(mon)) {
                     pline("%s resists.", Monnam(mon));
+                }
+                if (!DEADMONSTER(mon)) {
+                    /* wakeup is via attack, but since mon is already
+                       hostile we pass via_attack==False rather than True,
+                       otherwise other monsters witnessing this would treat
+                       it as seeing hero attack a peaceful; mimic will be
+                       exposed; forcefight makes hider unhide */
+                    gc.context.forcefight++;
+                    wakeup(mon, FALSE);
+                    gc.context.forcefight--;
                 }
             }
 

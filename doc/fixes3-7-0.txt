@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1428 $ $NHDT-Date: 1713657038 2024/04/20 23:50:38 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1435 $ $NHDT-Date: 1715984437 2024/05/17 22:20:37 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1943,6 +1943,7 @@ if a tame or peaceful monster was trapped and blind hero hadn't seen the trap
 	be suggested; but #untrap would fail due "you know of no traps there"
 camera flash hitting a hidden mimic mentioned it as being a mimic but didn't
 	bring it out of hiding
+when chain lightning hit a sleeping monster, the victim didn't wake up
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
