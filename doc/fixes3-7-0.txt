@@ -1944,6 +1944,9 @@ if a tame or peaceful monster was trapped and blind hero hadn't seen the trap
 camera flash hitting a hidden mimic mentioned it as being a mimic but didn't
 	bring it out of hiding
 when chain lightning hit a sleeping monster, the victim didn't wake up
+on medusa-4, Medusa and the downstairs were located in different chambers
+on medusa-3 and medusa-4, Perseus's statue was located in a different chamber
+	from Medusa
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
