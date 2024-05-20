@@ -72,6 +72,8 @@ des.trap({ type = "magic portal", coord = { 4,4 }, seen = true });
 des.engraving({ coord = { 5,9 }, type = "engrave", text = "This door is locked. Kick it with '" .. nh.eckey("kick") .. "'", degrade = false });
 des.door({ coord = { 5,10 }, state = "locked" });
 
+des.engraving({ coord = { 5,12 }, type = "engrave", text = "Look around the map with '" .. nh.eckey("glance") .. "'", degrade = false });
+
 --
 
 des.engraving({ coord = { 10,13 }, type = "engrave", text = "Use '" .. nh.eckey("search") .. "' to search for secret doors", degrade = false });
