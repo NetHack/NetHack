@@ -3380,10 +3380,10 @@ itemactions(struct obj *otmp)
 
     /* w: wield, hold in hands, works on everything but with different
        advice text; not mentioned for things that are already wielded */
-    if (otmp == uwep) {
-        ;
+    if (otmp == uwep || cantwield(gy.youmonst.data)) {
+        ; /* either already wielded or can't wield anything; skip 'w' */
     } else if (otmp->oclass == WEAPON_CLASS || is_weptool(otmp)
-               || is_wet_towel(otmp)) {
+               || is_wet_towel(otmp) || otmp->otyp == HEAVY_IRON_BALL) {
         Sprintf(buf, "Wield this %s as your weapon",
                 (otmp->quan > 1L) ? "stack" : "item");
         ia_addmenu(win, IA_WIELD_OBJ, 'w', buf);
@@ -3394,8 +3394,12 @@ itemactions(struct obj *otmp)
         /* originally this was using "hold this item in your hands" but
            there's no concept of "holding an item", plus it unwields
            whatever item you already have wielded so use "wield this item" */
-        Sprintf(buf, "Wield this %s in your hands",
-                (otmp->quan > 1L) ? "stack" : "item");
+        Sprintf(buf, "Wield this %s in your %s",
+                (otmp->quan > 1L) ? "stack" : "item",
+                /* only two-handed weapons and unicorn horns care about
+                   pluralizing "hand" and they won't reach here, but plural
+                   sounds better when poly'd into something with "claw" */
+                makeplural(body_part(HAND)));
         ia_addmenu(win, IA_WIELD_OBJ, 'w', buf);
     }
 
