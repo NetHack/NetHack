@@ -2830,6 +2830,7 @@ enum item_action_actions {
     IA_DROP_OBJ, /* 'd' */
     IA_EAT_OBJ, /* 'e' */
     IA_ENGRAVE_OBJ, /* 'E' */
+    IA_FIRE_OBJ, /* 'f' */
     IA_ADJUST_OBJ, /* 'i' #adjust inventory letter */
     IA_ADJUST_STACK, /* 'I' #adjust with count to split stack */
     IA_SACRIFICE, /* 'O' offer sacrifice */
@@ -2870,8 +2871,8 @@ item_naming_classification(
         Sprintf(onamebuf, "%s %s %s",
                 (!has_oname(obj) || !*ONAME(obj)) ? Name : Rename,
                 the_unique_obj(obj) ? "the"
-                : !is_plural(obj) ? "this"
-                  : "these",
+                : !is_plural(obj) ? "this specific"
+                  : "this stack of", /*"these",*/
                 simpleonames(obj));
     }
     if (call_ok(obj) == GETOBJ_SUGGEST) {
@@ -2991,6 +2992,9 @@ itemactions_pushkeys(struct obj *otmp, int act)
         case IA_ENGRAVE_OBJ:
             cmdq_add_ec(CQ_CANNED, doengrave);
             cmdq_add_key(CQ_CANNED, otmp->invlet);
+            break;
+        case IA_FIRE_OBJ:
+            cmdq_add_ec(CQ_CANNED, dofire);
             break;
         case IA_ADJUST_OBJ:
             cmdq_add_ec(CQ_CANNED, doorganize); /* #adjust */
@@ -3205,27 +3209,54 @@ itemactions(struct obj *otmp)
     /* d: drop item, works on everything except worn items; those will
        always have a takeoff/remove choice so we don't have to worry
        about the menu maybe being empty when 'd' is suppressed */
-    if (!already_worn)
-        ia_addmenu(win, IA_DROP_OBJ, 'd', "Drop this item");
+    if (!already_worn) {
+        Sprintf(buf, "Drop this %s", (otmp->quan > 1L) ? "stack" : "item");
+        ia_addmenu(win, IA_DROP_OBJ, 'd', buf);
+    }
 
     /* e: eat item */
-    if (otmp->otyp == TIN && uwep && uwep->otyp == TIN_OPENER)
-        ia_addmenu(win, IA_EAT_OBJ, 'e',
-                   "Open and eat this tin with your tin opener");
-    else if (otmp->otyp == TIN)
-        ia_addmenu(win, IA_EAT_OBJ, 'e', "Open and eat this tin");
-    else if (is_edible(otmp))
-        ia_addmenu(win, IA_EAT_OBJ, 'e', "Eat this item");
+    if (otmp->otyp == TIN) {
+        Sprintf(buf, "Open %s%s and eat the contents",
+                (otmp->quan > 1L) ? "one of these tins" : "this tin",
+                (otmp->otyp == TIN && uwep && uwep->otyp == TIN_OPENER)
+                ? " with your tin opener" : "");
+        ia_addmenu(win, IA_EAT_OBJ, 'e', buf);
+    } else if (is_edible(otmp)) {
+        Sprintf(buf, "Eat %s", (otmp->quan > 1L) ? "one of these" : "this");
+        ia_addmenu(win, IA_EAT_OBJ, 'e', buf);
+    }
 
     /* E: engrave with item */
-    if (otmp->otyp == TOWEL)
-        ia_addmenu(win, IA_ENGRAVE_OBJ, 'E', "Wipe the floor with this towel");
-    else if (otmp->otyp == MAGIC_MARKER)
-        ia_addmenu(win, IA_ENGRAVE_OBJ, 'E', "Scribble graffiti on the floor");
-    else if (otmp->oclass == WEAPON_CLASS || otmp->oclass == WAND_CLASS
-             || otmp->oclass == GEM_CLASS || otmp->oclass == RING_CLASS)
+    if (otmp->otyp == TOWEL) {
         ia_addmenu(win, IA_ENGRAVE_OBJ, 'E',
-                   "Write on the floor with this object");
+                   "Wipe the floor with this towel");
+    } else if (otmp->otyp == MAGIC_MARKER) {
+        ia_addmenu(win, IA_ENGRAVE_OBJ, 'E',
+                   "Scribble graffiti on the floor");
+    } else if (otmp->oclass == WEAPON_CLASS || otmp->oclass == WAND_CLASS
+             || otmp->oclass == GEM_CLASS || otmp->oclass == RING_CLASS) {
+        Sprintf(buf, "%s on the %s with %s",
+                (is_blade(otmp) || otmp->oclass == WAND_CLASS
+                 || ((otmp->oclass == GEM_CLASS || otmp->oclass == RING_CLASS)
+                     && objects[otmp->otyp].oc_tough)) ? "Engrave" : "Write",
+                surface(u.ux, u.uy),
+                (otmp->quan > 1L) ? "one of these items" : "this item");
+        ia_addmenu(win, IA_ENGRAVE_OBJ, 'E', buf);
+    }
+
+    /* f: fire quivered ammo */
+    if (otmp == uquiver) {
+        boolean shoot = ammo_and_launcher(otmp, uwep);
+
+        /* FIXME: see the multi-shot FIXME about "one of" for 't: throw' */
+        Sprintf(buf, "%s %s", shoot ? "Shoot" : "Throw",
+                (otmp->quan > 1L) ? "one of these" : "this");
+        if (shoot) {
+            assert(uwep != NULL);
+            Sprintf(eos(buf), " with your wielded %s", simpleonames(uwep));
+        }
+        ia_addmenu(win, IA_FIRE_OBJ, 'f', buf);
+    }
 
     /* i: #adjust inventory letter; gold can't be adjusted unless there
        is some in a slot other than '$' (which shouldn't be possible) */
@@ -3255,8 +3286,11 @@ itemactions(struct obj *otmp)
         /* FIXME: should also handle player owned container (so not
            flagged 'unpaid') holding shop owned items */
         && (mtmp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE))) != 0
-        && inhishop(mtmp))
-        ia_addmenu(win, IA_BUY_OBJ, 'p', "Buy this unpaid item");
+        && inhishop(mtmp)) {
+        Sprintf(buf, "Buy this unpaid %s",
+                (otmp->quan > 1L) ? "stack" : "item");
+        ia_addmenu(win, IA_BUY_OBJ, 'p', buf);
+    }
 
     /* P: put on accessory */
     if (!already_worn) {
@@ -3272,14 +3306,20 @@ itemactions(struct obj *otmp)
     }
 
     /* q: drink item */
-    if (otmp->oclass == POTION_CLASS)
-        ia_addmenu(win, IA_QUAFF_OBJ, 'q', "Quaff this potion");
+    if (otmp->oclass == POTION_CLASS) {
+        Sprintf(buf, "Quaff (drink) %s",
+                (otmp->quan > 1L) ? "one of these potions" : "this potion");
+        ia_addmenu(win, IA_QUAFF_OBJ, 'q', buf);
+    }
 
     /* Q: quiver throwable item */
     if ((otmp->oclass == GEM_CLASS || otmp->oclass == WEAPON_CLASS)
-        && otmp != uquiver)
-        ia_addmenu(win, IA_QUIVER_OBJ, 'Q',
-                   "Quiver this item for easy throwing");
+        && otmp != uquiver) {
+        Sprintf(buf, "Quiver this %s for easy %s with \'f\'ire",
+                (otmp->quan > 1L) ? "stack" : "item",
+                ammo_and_launcher(otmp, uwep) ? "shooting" : "throwing");
+        ia_addmenu(win, IA_QUIVER_OBJ, 'Q', buf);
+    }
 
     /* r: read item */
     if (item_reading_classification(otmp, buf) == IA_READ_OBJ)
@@ -3297,7 +3337,7 @@ itemactions(struct obj *otmp)
 
     /* t: throw item */
     if (!already_worn) {
-        const char *verb = ammo_and_launcher(otmp, uwep) ? "Shoot" : "Throw";
+        boolean shoot = ammo_and_launcher(otmp, uwep);
 
         /*
          * FIXME:
@@ -3307,10 +3347,17 @@ itemactions(struct obj *otmp)
          *  volley count and that could randomly yield 1 here and 2..N
          *  while throwing or vice versa.
          */
-        Sprintf(buf, "%s %s", verb,
+        Sprintf(buf, "%s %s%s", shoot ? "Shoot" : "Throw",
                 (otmp->quan == 1L) ? "this item"
                 : (otmp->otyp == GOLD_PIECE) ? "them"
-                  : "one of these");
+                  : "one of these",
+                /* if otmp is quivered, we've already listed
+                   'f - shoot|throw this item' as a choice;
+                   if 't' is duplicating that, say so ('t' and 'f'
+                   behavior differs for throwing a stack of gold) */
+                (otmp == uquiver && (otmp->otyp != GOLD_PIECE
+                                     || otmp->quan == 1L))
+                ? " (same as 'f')" : "");
         ia_addmenu(win, IA_THROW_OBJ, 't', buf);
     }
 
@@ -3333,17 +3380,24 @@ itemactions(struct obj *otmp)
 
     /* w: wield, hold in hands, works on everything but with different
        advice text; not mentioned for things that are already wielded */
-    if (otmp == uwep)
+    if (otmp == uwep) {
         ;
-    else if (otmp->oclass == WEAPON_CLASS || is_weptool(otmp)
-             || is_wet_towel(otmp))
-        ia_addmenu(win, IA_WIELD_OBJ, 'w', "Wield this as your weapon");
-    else if (otmp->otyp == TIN_OPENER)
-        ia_addmenu(win, IA_WIELD_OBJ, 'w', "Hold the tin opener to open tins");
-    else if (!already_worn)
-        /* FIXME: there's no concept of "holding an item" that's any
-           different from having it in inventory; 'w' means wield as weapon */
-        ia_addmenu(win, IA_WIELD_OBJ, 'w', "Hold this item in your hands");
+    } else if (otmp->oclass == WEAPON_CLASS || is_weptool(otmp)
+               || is_wet_towel(otmp)) {
+        Sprintf(buf, "Wield this %s as your weapon",
+                (otmp->quan > 1L) ? "stack" : "item");
+        ia_addmenu(win, IA_WIELD_OBJ, 'w', buf);
+    } else if (otmp->otyp == TIN_OPENER) {
+        ia_addmenu(win, IA_WIELD_OBJ, 'w',
+                   "Wield the tin opener to easily open tins");
+    } else if (!already_worn) {
+        /* originally this was using "hold this item in your hands" but
+           there's no concept of "holding an item", plus it unwields
+           whatever item you already have wielded so use "wield this item" */
+        Sprintf(buf, "Wield this %s in your hands",
+                (otmp->quan > 1L) ? "stack" : "item");
+        ia_addmenu(win, IA_WIELD_OBJ, 'w', buf);
+    }
 
     /* W: wear armor */
     if (!already_worn) {
@@ -3387,12 +3441,15 @@ itemactions(struct obj *otmp)
 
     /* z: Zap wand */
     if (otmp->oclass == WAND_CLASS)
-        ia_addmenu(win, IA_ZAP_OBJ, 'z', "Zap this wand to release its magic");
+        ia_addmenu(win, IA_ZAP_OBJ, 'z',
+                   "Zap this wand to release its magic");
 
     /* ?: Look up an item in the game's database */
-    if (ia_checkfile(otmp))
-        ia_addmenu(win, IA_WHATIS_OBJ, '/',
-                   "Look up information about this item");
+    if (ia_checkfile(otmp)) {
+        Sprintf(buf, "Look up information about %s",
+                (otmp->quan > 1L) ? "these" : "this");
+        ia_addmenu(win, IA_WHATIS_OBJ, '/', buf);
+    }
 
     Sprintf(buf, "Do what with %s?", the(cxname(otmp)));
     end_menu(win, buf);
