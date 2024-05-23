@@ -358,11 +358,12 @@ learn(void)
     int i;
     short booktype;
     char splname[BUFSZ];
-    boolean costly = TRUE;
+    boolean costly = TRUE, faded_to_blank = FALSE;
     struct obj *book = gc.context.spbook.book;
 
     /* JDS: lenses give 50% faster reading; 33% smaller read time */
-    if (gc.context.spbook.delay && ublindf && ublindf->otyp == LENSES && rn2(2))
+    if (gc.context.spbook.delay && ublindf
+        && ublindf->otyp == LENSES && rn2(2))
         gc.context.spbook.delay++;
     if (Confusion) { /* became confused while learning */
         (void) confused_book(book);
@@ -400,6 +401,7 @@ learn(void)
         if (book->spestudied > MAX_SPELL_STUDY) {
             pline("This spellbook is too faint to be read any more.");
             book->otyp = booktype = SPE_BLANK_PAPER;
+            faded_to_blank = TRUE;
             /* reset spestudied as if polymorph had taken place */
             book->spestudied = rn2(book->spestudied);
         } else {
@@ -409,7 +411,6 @@ learn(void)
             book->spestudied++;
             exercise(A_WIS, TRUE); /* extra study */
         }
-        makeknown((int) booktype);
     } else { /* (spellid(i) == NO_SPELL) */
         /* for a normal book, spestudied will be zero, but for
            a polymorphed one, spestudied will be non-zero and
@@ -418,6 +419,7 @@ learn(void)
             /* pre-used due to being the product of polymorph */
             pline("This spellbook is too faint to read even once.");
             book->otyp = booktype = SPE_BLANK_PAPER;
+            faded_to_blank = TRUE;
             /* reset spestudied as if polymorph had taken place */
             book->spestudied = rn2(book->spestudied);
         } else {
@@ -432,7 +434,17 @@ learn(void)
                 You("add %s to your repertoire, as '%c'.",
                     splname, spellet(i));
         }
+    }
+    if (i < MAXSPELL) {
+        /* might be learning a new spellbook type or spellbook of blank paper;
+           if so, persistent inventory will get updated */
         makeknown((int) booktype);
+        /* makeknown() calls update inventory when discovering something
+           new but is a no-op for something that's already known so wouldn't
+           update persistent inventory to reflect faded book if spellbook of
+           blank paper happens to already be discovered */
+        if (faded_to_blank)
+            update_inventory();
     }
 
     if (book->cursed) { /* maybe a demon cursed it */
