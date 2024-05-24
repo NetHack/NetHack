@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1710029089 2024/03/10 00:04:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.712 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1716592962 2024/05/24 23:22:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.728 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1725,7 +1725,7 @@ struct ext_func_tab extcmdlist[] = {
     { M('l'), "loot", "loot a box on the floor",
               doloot, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
     { '\0',   "migratemons",
-#ifdef DEBUG_MIGRATING_MONSTERS
+#ifdef DEBUG_MIGRATING_MONS
               "show migrating monsters and migrate N random ones",
 #else
               "show migrating monsters",
