@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1706079843 2024/01/24 07:04:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.549 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1716588803 2024/05/24 22:13:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.568 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3896,11 +3896,9 @@ mnearto(
         return res;
 
     if (move_other && (othermon = m_at(x, y)) != 0) {
-        if (othermon->wormno)
-            remove_worm(othermon);
-        else
-            remove_monster(x, y);
-
+        /* take othermon off the map; it might end up immediately returning
+           but for the moment it is leaving */
+        mon_leaving_level(othermon);
         othermon->mx = othermon->my = 0; /* 'othermon' is not on the map */
         othermon->mstate |= MON_OFFMAP;
     }
