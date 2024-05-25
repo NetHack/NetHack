@@ -2834,7 +2834,7 @@ split_mon(
             disp.botl = TRUE;
             You("multiply%s!", reason);
         }
-    } else {
+    } else if (mon->mhpmax > 1) {
         mtmp2 = clone_mon(mon, 0, 0);
         if (mtmp2) {
             mtmp2->mhpmax = mon->mhpmax / 2;
