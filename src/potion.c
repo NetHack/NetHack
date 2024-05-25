@@ -1,4 +1,4 @@
-/* NetHack 3.7	potion.c	$NHDT-Date: 1704316448 2024/01/03 21:14:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.256 $ */
+/* NetHack 3.7	potion.c	$NHDT-Date: 1716668700 2024/05/25 20:25:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.265 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2827,16 +2827,27 @@ split_mon(
                                     : (const char *) s_suffix(mon_nam(mtmp)));
 
     if (mon == &gy.youmonst) {
-        mtmp2 = cloneu();
+        if (u.mh > u.mhmax) /* sanity precaution */
+            u.mh = u.mhmax;
+        mtmp2 = (u.mh > 1) ? cloneu() : (struct monst *) 0;
         if (mtmp2) {
+            /* mtmp2 has been created with mhpmax = u.mhmax, mhp = u.mh / 2,
+               and u.mh -= mtmp2->mhpmax; these reductions for both max hp
+               can't make either of them exceed corresponding current hp */
             mtmp2->mhpmax = u.mhmax / 2;
             u.mhmax -= mtmp2->mhpmax;
             disp.botl = TRUE;
             You("multiply%s!", reason);
         }
-    } else if (mon->mhpmax > 1) {
-        mtmp2 = clone_mon(mon, 0, 0);
+    } else {
+        if (mon->mhp > mon->mhpmax) /* sanity precaution */
+            mon->mhp = mon->mhpmax;
+        mtmp2 = (mon->mhp > 1) ? clone_mon(mon, 0, 0) : (struct monst *) 0;
         if (mtmp2) {
+            assert(mon->mhpmax >= mon->mhp); /* mon->mhpmax > 1 */
+            /* mtmp2 has been created with mhpmax = mon->mhpmax,
+               mhp = mon->mhp / 2, and mon->mh -= mtmp2->mhp;
+               dividing max by 2 can't result in it exceeding current */
             mtmp2->mhpmax = mon->mhpmax / 2;
             mon->mhpmax -= mtmp2->mhpmax;
             if (canspotmon(mon))
