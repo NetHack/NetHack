@@ -740,7 +740,7 @@ struct rogueroom {
     int nroom; /* Only meaningful for "real" rooms */
 };
 
-#define NUM_ROLES (13)
+#define NUM_ROLES (14)
 struct role_filter {
     boolean roles[NUM_ROLES + 1];
     short mask;

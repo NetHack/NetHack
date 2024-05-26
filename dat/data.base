@@ -4987,6 +4987,7 @@ shark
 			translation by Hugh G. Evelyn-White ]
 shito
 	A Japanese stabbing knife.
+merchant
 shopkeeper
 	There have been three general theories put forward to explain
 	the phenomenon of the wandering shops or, as they are
@@ -6271,6 +6272,27 @@ paladin
 	Seignieur,
 	 Dame            26 to 29
 	Paladin             30
+mer* ranks
+part-timer
+cashier
+secretary
+bookkeeper
+nummularius
+coactore
+faeneratore
+argentarius
+publican
+	Merchant ranks
+	  title            level
+	Part-timer        1 to 2
+	Cashier           3 to 5
+	Secretary         6 to 9
+	Bookkeeper       10 to 13
+	Nummularius      14 to 17
+	Coactore         18 to 21
+	Faeneratore      22 to 25
+	Argentarius      26 to 29
+	Publican            30
 mon* ranks
 monk
 candidate

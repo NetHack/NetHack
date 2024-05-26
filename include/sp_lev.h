@@ -147,6 +147,7 @@ typedef struct {
 
 typedef struct {
     Str_or_Len name;
+    Str_or_Len material;
     int corpsenm;
     short id, spe;
     packed_coord coord;

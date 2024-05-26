@@ -2346,6 +2346,19 @@ create_object(object *o, struct mkroom *croom)
         }
     }
 
+    if(o->material.str) {
+        int i, l;
+        for (i = 1; i < NUM_MATERIAL_TYPES; i++) {
+            l = strlen(materialnm[i]);
+            if (l > 0 && !strncmpi(o->material.str, materialnm[i], l) && valid_obj_material(otmp, i))
+            {
+                otmp->material = i;
+                l++;
+                break; /* from the for loop */
+            }
+        }
+    }
+
     if (o->achievement) {
         static const char prize_warning[] = "multiple prizes on %s level";
 
@@ -3482,6 +3495,7 @@ lspo_object(lua_State *L)
 {
     static object zeroobject = {
             { 0 },   /* Str_or_len name */
+            { 0 },   /* Str_or_len material */
             0,       /* corpsenm */
             0, 0,    /* id, spe */
             0,       /* coord */
@@ -3558,6 +3572,7 @@ lspo_object(lua_State *L)
         tmpobj.curse_state = get_table_buc(L);
         tmpobj.corpsenm = NON_PM;
         tmpobj.name.str = get_table_str_opt(L, "name", (char *) 0);
+        tmpobj.material.str = get_table_str_opt(L, "material", (char *) 0);
         tmpobj.quan = get_table_int_or_random(L, "quantity", -1);
         tmpobj.buried = get_table_boolean_opt(L, "buried", 0);
         tmpobj.lit = get_table_boolean_opt(L, "lit", 0);
@@ -3670,6 +3685,7 @@ lspo_object(lua_State *L)
         spo_pop_container();
 
     Free(tmpobj.name.str);
+    Free(tmpobj.material.str);
 
     nhl_push_obj(L, otmp);
 

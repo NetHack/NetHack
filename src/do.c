@@ -1548,7 +1548,11 @@ goto_level(
      */
     if (on_level(&u.uz, &qstart_level) && !newdungeon && !ok_to_quest()) {
         pline("A mysterious force prevents you from descending.");
-        return;
+        if(wizard) {
+            pline("But the mysterious force relents.");
+        } else {
+            return;
+        }
     }
 
     if (on_level(newlevel, &u.uz))

@@ -1768,6 +1768,11 @@ doname(struct obj *obj)
 char *
 doname_with_price(struct obj *obj)
 {
+    if(Role_if(PM_MERCHANT)) {
+        if(shop_object(u.ux, u.uy) && !obj->no_charge && !Blind && !Deaf) {
+            makeknown(obj->otyp);
+        }
+    }
     return doname_base(obj, DONAME_WITH_PRICE);
 }
 

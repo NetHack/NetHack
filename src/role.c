@@ -269,6 +269,45 @@ const struct Role roles[NUM_ROLES+1] = {
       A_WIS,
       SPE_RESTORE_ABILITY,
       -4 },
+    { { "Merchant", 0 },
+      { { "Part-timer", 0 },
+        { "Cashier", 0 },
+        { "Secretary", 0 },
+        { "Bookkeeper", 0 },
+        { "Nummularius", 0 },
+        { "Coactore", 0 },
+        { "Faeneratore", 0 },
+        { "Argentarius", 0 },
+        { "Publican", 0 } },
+      "Mercury", "_Venus", "Mars", /* Roman/planets */
+      "Mer",
+      "Genzano",
+      "the Shore of Nemi",
+      PM_MERCHANT,
+      NON_PM,
+      PM_UMBRICIUS_SCAURUS,
+      PM_TRADER,
+      PM_EMPEROR_CALIGULA,
+      PM_GOLD_GOLEM,
+      PM_GIANT_MIMIC,
+      S_GOLEM,
+      S_MIMIC,
+      ART_TOUCH_OF_MIDAS,
+      MH_HUMAN | ROLE_MALE | ROLE_FEMALE | ROLE_LAWFUL | ROLE_NEUTRAL,
+      /* Str Int Wis Dex Con Cha */
+      { 7, 12, 10, 7, 7, 12 },
+      { 10, 20, 20, 15, 15, 20 },
+      { 9, 0, 0, 9, 0, 0 }, /* Hit points */
+      { 1, 0, 0, 1, 0, 1 },
+      11, /* Energy */
+      0,
+      5,
+      3,
+      2,
+      9,
+      A_INT,
+      SPE_WIZARD_LOCK,
+      -4 },
     { { "Priest", "Priestess" },
       { { "Aspirant", 0 },
         { "Acolyte", 0 },
@@ -376,7 +415,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Archer", 0 },
         { "Sharpshooter", 0 },
         { "Marksman", "Markswoman" } },
-      "Mercury", "_Venus", "Mars", /* Roman/planets */
+      "Thalna", "Selvans", "Laran", /* Etruscan */
       "Ran",
       "Orion's camp",
       "the cave of the wumpus",
@@ -2111,6 +2150,8 @@ Hello(struct monst *mtmp)
     switch (Role_switch) {
     case PM_KNIGHT:
         return "Salutations"; /* Olde English */
+    case PM_MERCHANT:
+        return "Ave"; /* Latin */
     case PM_SAMURAI:
         return (mtmp && mtmp->data == &mons[PM_SHOPKEEPER])
                     ? "Irasshaimase"
@@ -2134,6 +2175,8 @@ Goodbye(void)
     switch (Role_switch) {
     case PM_KNIGHT:
         return "Fare thee well"; /* Olde English */
+    case PM_MERCHANT:
+        return "Vale"; /* Latin */
     case PM_SAMURAI:
         return "Sayonara"; /* Japanese */
     case PM_TOURIST:

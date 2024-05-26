@@ -4503,7 +4503,7 @@ shopdig(int fall)
     if (!shkp)
         return;
     if (!inhishop(shkp)) {
-        if (Role_if(PM_KNIGHT)) {
+        if (Role_if(PM_KNIGHT) || Role_if(PM_MERCHANT)) {
             You_feel("like a common thief.");
             adjalign(-sgn(u.ualign.type));
         }
@@ -4532,7 +4532,7 @@ shopdig(int fall)
                 }
             }
         }
-        if (Role_if(PM_KNIGHT)) {
+        if (Role_if(PM_KNIGHT) || Role_if(PM_MERCHANT)) {
             You_feel("like a common thief.");
             adjalign(-sgn(u.ualign.type));
         }

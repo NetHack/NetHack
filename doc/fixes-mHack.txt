@@ -17,6 +17,11 @@ General New Features
 --------------------
 Added wands skill, which can be #enhanced for more powerful wand effects.
 	Certain monsters have high effective wand skill as well.
+Added Merchant role.
+	Merchants are always looking for markets to buy supplies and sell
+	their wares. They start with precious gems and expensive pieces of jewelry.
+	On the Merchant Quest, Umbricius Scaurus tasks the player with fighting
+	Emperor Caligula for the Touch of Midas.
 
 
 Platform- and/or Interface-Specific New Features

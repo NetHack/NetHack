@@ -726,6 +726,8 @@ struct instance_globals_n {
     short nocreate2;
     short nocreate3;
     short nocreate4;
+    short nocreate5;
+    short nocreate6;
 
     boolean havestate;
     unsigned long magic; /* validate that structure layout is preserved */

@@ -195,6 +195,9 @@ mk_mplayer(struct permonst *ptr, coordxy x, coordxy y, boolean special)
             if (rn2(2))
                 armor = rnd_class(PLATE_MAIL, CHAIN_MAIL);
             break;
+        case PM_MERCHANT:
+            /* Stick to defaults */
+            break;
         case PM_MONK:
             weapon = !rn2(3) ? SHURIKEN : STRANGE_OBJECT;
             armor = STRANGE_OBJECT;

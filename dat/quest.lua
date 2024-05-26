@@ -1301,6 +1301,223 @@ may be the last time you stand before %l.]],
          text = "\"Well met, %p.  How goeth thy search for the Amulet of Yendor?\"",
       },
    },
+   Mer = {
+      assignquest = {
+         synopsis = "[Travel to %i, and continue to %ns ship. Defeat %ni and secure %o.]",
+         output = "text",
+         text = [["You've amassed quite the fortune, %p. But all we hold dear
+is in peril.
+
+Recently, %n visited the ancient city of Sardis. There he
+discovered a relic forgotten by time, %o,
+capable of turning everything and everyone into gold!
+
+With this new power, %n has struck terror into everyone
+from Britannia to Egypt. He turned many promising %cP
+into gold statues, and sent an army of gold golems to attack
+the Senate. Perhaps worst of all, by dumping this much gold
+on the market, he has made all our coins worthless!
+
+Today %n is sitting atop piles of gold in his Round Ship,
+the giant barge he built upon Lake Nemi. You must go there %p,
+and take %o away from him!
+
+The fate of the Empire depends on it!"]]
+      },
+      badalign = {
+         synopsis = "[Return when you are truly %a.]",
+         output = "text",
+         text = [["We need an honest business partner for this particular
+transaction. Someone who will fulfill the terms of the
+contract, down to the letter. Unfortunately, you have
+gotten unreliable. Do not return until you have truly
+become %a."]]
+      },
+      badlevel = {
+         synopsis = "[You are not ready to face %n.  Come back when you are %Ra.]",
+         output = "text",
+         text = [["You strike a hard bargain, %p, but we need someone more
+experienced to challenge %n. Go, advance your knowledge of the
+world. When you have earned the rank of %R, you might be ready."]]
+      },
+      discourage = {
+         "\"%d is weak. Kneel before me, I am your god now.\"",
+         "\"Hundreds before you wanted me dead. Hundreds before you lay at my feet.\"",
+         "\"Let them hate me, so long as they fear me.\"",
+         "\"I will torment you slowly, so that you may feel you are dying.\"",
+         "\"Kneel, young %r. I have existed from the morning of the world.\"",
+         "\"You cannot win, %p. I shall exist until the last star falls from the sky.\"",
+         "\"You stand no chance against me, I am a living god!\"",
+         "\"I shall bathe my horse in your blood. That is, if there's anything left of you.\"",
+         "\"If only the Roman people had a single neck to cut off!\"",
+         "\"You dare challenge an Emperor? I'll have you crucified!\"",
+      },
+      encourage = {
+         "\"When you are in trouble, call upon %d for help.\"",
+         "\"With %o upon his fists, %n is dangerous to fight up close.\"",
+         "\"%n is rich, but even a fish cannot swim if laden with gold.\"",
+         "\"No deal is good enough for %n. He must be defeated quickly.\"",
+         "\"Consider this a high-risk, high-reward business venture.\"",
+         "\"I'm betting on your success, %p.\"",
+         "\"If you don't succeed, the Empire will fall into chaos.\"",
+         "\"Watch out for %ns soldiers.\"",
+         "\"Try fighting %n at a distance.\"",
+         "\"We'll be as rich as patricians if you prevail.\"",
+      },
+      firsttime = {
+         synopsis = "[You have reached %H but strange beings stalk the streets.]",
+         output = "text",
+         text = [[How peculiar, you've been transported back to %H. But
+something is amiss - where are all your fellow %cP?
+The Appian Way is usually quite busy this time of year.
+
+And by %d, what are those strange beings walking
+about? Those aren't men, but machinations!]],
+      },
+      goal_first = {
+         synopsis = "[There are many gold statues here, with screaming faces.]",
+         output = "text",
+         text = [[You are struck by the sheer opulence of the Round Ship.
+%ns lair is overflowing with gold and jewels,
+enough to pay for a thousand aqueducts.
+
+There are even statues made of gold. They are
+incredibly detailed, they almost look real. But
+for some reason they all appear to be screaming
+in silence.]]
+      },
+      goal_next = {
+         text = "Again, you return to the Round Ship of %n."
+      },
+      gotit = {
+         synopsis = "[%o seems dangerous, it was not safe with %n.]",
+         output = "text",
+         text = [[You feel a sense of dread as you pick up %o.
+But dangerous as it is, this relic is safer in your possession
+than in the hands of the tyrant, %n.]]
+      },
+      guardtalk_after = {
+         "\"Ave %p, found any rare scrolls on your journey?\"",
+         "\"Thirsty after all that fighting? Try some of my wine.\"",
+         "\"Precious gems for sale! Void of glass, guaranteed!\"",
+         "\"You overthrew %n? Thank %d, there's hope yet.\"",
+         "\"Can I borrow some gold, %p? I'll pay you back double.\"",
+      },
+      guardtalk_before = {
+         "\"Welcome back %p, found any rare scrolls on your journey?\"",
+         "\"I'd offer you a free drink, but %n taxed my wine!\"",
+         "\"Precious gems for sale! Void of glass, guaranteed!\"",
+         "\"If %n makes his horse a consul, I shall make my dog an accountant.\"",
+         "\"Can I borrow some gold, %p? I'll pay you back double.\"",
+      },
+      hasamulet = {
+         synopsis = "[Take the Amulet to the heavens, offer it to %d.]",
+         output = "text",
+         text = [["Excellent work, %p! Your assets in the Empire are collecting
+a hefty interest. But now that you have recovered the
+Amulet of Yendor, it is clear that %d has greater
+fortunes in store for you. The legends say that if you
+climb up to the heavens with the Amulet and offer it
+to %d, you shall earn a reward more precious than
+any gold or jewel."]]
+      },
+      killed_nemesis = {
+         synopsis = "[%n dies.]",
+         output = "text",
+         text = [[%n defiantly shouts:
+
+    "I live!"
+
+Then he breathes his last and his body falls without ceremony.]]
+      },
+      leader_first = {
+         synopsis = "[%lC checks whether you are ready to save the Roman Empire.]",
+         output = "text",
+         text = [["Ave, %p. I thought you'd never return to the known world.
+Unfortunately, %n has finally snapped. If he is not
+defeated, the entire Empire will pay a terrible price.
+So, are you ready to save Roman civilization?"]],
+      },
+      leader_last = {
+         synopsis = "[You have failed and %lC never wants to see you again.]",
+         output = "text",
+         text = [["You have offered us the worst deal since the third Punic War.
+And we refuse. We are never doing business with you
+again, we will not even lend you a single gold piece.
+Leave the Empire, and never return."]]
+      },
+      leader_next = {
+         text = "\"Ave. By %d, I hope you are ready now, %p.\""
+      },
+      leader_other = {
+         text = "\"We need you, %p, are you ready now?\""
+      },
+      locate_first = {
+         synopsis = "[You feel a cold breeze around %i.]",
+         output = "text",
+         text = [["You feel a cold breeze around you as you approach %i.
+%ns ship can't be far."]]
+      },
+      locate_next = {
+         text = "You feel a chill down your spine as you return to %i."
+      },
+      nemesis_first = {
+         synopsis = "[%n threatens to kill you and mutilate your remains.]",
+         output = "text",
+         text = [["The traitors must be desperate if they are sending a mere
+%r as an assassin. Fool. I will crush you like all others
+who challenged my rule. And when you lay dead, your remains
+shall be a footstool for my horse!"]],
+      },
+      nemesis_next = {
+         text = "\"I always love a good battle in the arena. But the games are over. It's time to die.\"",
+      },
+      nemesis_other = {
+         synopsis = "[%n accuses you of cowardice.]",
+         output = "text",
+         text = [["What a cowardly %r you are. Fight me with honor, %p!
+If you stand your ground, that will at least be entertaining."]],
+      },
+      nemesis_wantsit = {
+         text = "\"I was destined to have %o, and destined to kill you for it!\"",
+      },
+      nexttime = {
+         text = "Once again, you are standing in %H.",
+      },
+      offeredit = {
+         synopsis = "[%lC wants to keep %o and find the Amulet of Yendor.]",
+         output = "text",
+         text = [[%lC smiles nervously as you approach.
+
+"You retrieved %o? How... profitable...
+Honestly, I am just happy that %n cannot use it.
+You can keep it. I am but a humble fish sauce salesman.
+%o is safer than you. Now you better get back to your
+distant trade route.
+
+I'll keep your assets safe for you. When you return
+with the Amulet of Yendor, I can give you a financial
+report.
+
+And, %p? Be wary. All that glitters is not gold."]],
+      },
+      offeredit2 = {
+         synopsis = "[Be careful with %o and find the Amulet of Yendor.]",
+         output = "text",
+         text = [["By %d! Do not throw %o, that's dangerous!
+Those gauntlets can earn enormous profits, but also
+cause terrible loss. You should take them back with
+you to %Z, to aid in your expedition for the Amulet.
+You can return through the magic portal that brought
+you here."]],
+      },
+      othertime = {
+         text = [[You stand in %H again. You worry that this might be the last time you see your homeland.]],
+      },
+      posthanks = {
+         text = "\"Ave, %p. How is your search for the Amulet of Yendor?\"",
+      },
+   },
    Mon = {
       assignquest = {
          synopsis = "[Find %i, then continue to %ns lair.  Defeat %ni and return with %o.]",

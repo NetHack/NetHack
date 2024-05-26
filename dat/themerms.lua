@@ -144,11 +144,11 @@ themeroom_fills = {
    -- Massacre
    function(rm)
       local mon = { "apprentice", "warrior", "ninja", "thug",
-                    "hunter", "acolyte", "abbot", "page",
+                    "hunter", "acolyte", "trader", "abbot", "page",
                     "attendant", "neanderthal", "chieftain",
                     "student", "wizard", "valkyrie", "tourist",
                     "samurai", "rogue", "ranger", "priestess",
-                    "priest", "monk", "knight", "healer",
+                    "priest", "merchant", "monk", "knight", "healer",
                     "cavewoman", "caveman", "barbarian",
                     "archeologist" };
       local idx = math.random(#mon);

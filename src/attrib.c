@@ -45,6 +45,8 @@ static const struct innate {
 
   kni_abil[] = { { 7, &(HFast), "quick", "slow" }, { 0, 0, 0, 0 } },
 
+  mer_abil[] = { { 10, &(HFast), "quick", "slow" }, { 0, 0, 0, 0 } },
+
   mon_abil[] = { { 1, &(HFast), "", "" },
                  { 1, &(HSleep_resistance), "", "" },
                  { 1, &(HSee_invisible), "", "" },
@@ -783,6 +785,7 @@ role_abil(int r)
         { PM_CAVE_DWELLER, cav_abil },
         { PM_HEALER, hea_abil },
         { PM_KNIGHT, kni_abil },
+        { PM_MERCHANT, mer_abil },
         { PM_MONK, mon_abil },
         { PM_CLERIC, pri_abil },
         { PM_RANGER, ran_abil },
