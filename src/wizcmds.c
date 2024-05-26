@@ -1401,6 +1401,24 @@ you_sanity_check(void)
         if (u.ustuck != mtmp)
             impossible("sanity_check: you over monster");
     }
+    /* [should we also check for (u.uhp < 1), (Upolyd && u.mh < 1),
+       and (u.uen < 0) here?] */
+    if (u.uhp > u.uhpmax) {
+        impossible("current hero health (%d) better than maximum? (%d)",
+                   u.uhp, u.uhpmax);
+        u.uhp = u.uhpmax;
+    }
+    if (Upolyd && u.mh > u.mhmax) {
+        impossible(
+              "current hero health as monster (%d) better than maximum? (%d)",
+                   u.mh, u.mhmax);
+        u.mh = u.mhmax;
+    }
+    if (u.uen > u.uenmax) {
+        impossible("current hero energy (%d) better than maximum? (%d)",
+                   u.uen, u.uenmax);
+        u.uen = u.uenmax;
+    }
 
     check_wornmask_slots();
     (void) check_invent_gold("invent");

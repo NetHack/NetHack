@@ -75,23 +75,20 @@ sanity_check_single_mon(
                        mtmp->mnum, mndx, msg);
             mtmp->mnum = mndx;
         }
-#if 0   /*
-         * Gremlins don't obey the (mhpmax >= m_lev) rule so disable
-         * this check, at least for the time being.  We could skip it
-         * when the cloned flag is set, but the original gremlin would
-         * still be an issue.
-         */
         /* check before DEADMONSTER() because dead monsters should still
            have sane mhpmax */
         if (mtmp->mhpmax < 1
+            /* Gremlins don't obey the (mhpmax >= m_lev) rule so disable
+             * this check, at least for the time being.  We could skip it
+             * when the cloned flag is set, but the original gremlin would
+             * still be an issue.
             || mtmp->mhpmax < (int) mtmp->m_lev
+             */
             || mtmp->mhp > mtmp->mhpmax)
-            impossible(
-                     "%s: level %d monster #%u [%s] has %d cur HP, %d max HP",
-                       msg, (int) mtmp->m_lev,
+            impossible("%s: level %d %s #%u [%s] has %d cur HP, %d max HP",
+                       msg, (int) mtmp->m_lev, mptr->pmnames[NEUTRAL],
                        mtmp->m_id, fmt_ptr((genericptr_t) mtmp),
                        mtmp->mhp, mtmp->mhpmax);
-#endif
         if (DEADMONSTER(mtmp)) {
 #if 0
             /* bad if not fmon list or if not vault guard */

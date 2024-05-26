@@ -2832,7 +2832,7 @@ split_mon(
         mtmp2 = (u.mh > 1) ? cloneu() : (struct monst *) 0;
         if (mtmp2) {
             /* mtmp2 has been created with mhpmax = u.mhmax, mhp = u.mh / 2,
-               and u.mh -= mtmp2->mhpmax; these reductions for both max hp
+               and u.mh -= mtmp2->mhp; these reductions for both max hp
                can't make either of them exceed corresponding current hp */
             mtmp2->mhpmax = u.mhmax / 2;
             u.mhmax -= mtmp2->mhpmax;
