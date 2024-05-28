@@ -1010,8 +1010,8 @@ dog_move(
 
     if (edog) {
         j = dog_invent(mtmp, edog, udist);
-        if (j == 2)
-            return MMOVE_DIED; /* died */
+        if (j == 2 || mon_offmap(mtmp))
+            return DEADMONSTER(mtmp) ? MMOVE_DIED : MMOVE_DONE;
         else if (j == 1)
             goto newdogpos; /* eating something */
 
