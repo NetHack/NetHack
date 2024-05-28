@@ -1714,10 +1714,11 @@ trapeffect_fire_trap(
 
             if (thitm(0, mtmp, (struct obj *) 0, num, immolate))
                 trapkilled = TRUE;
-            else
-                /* we know mhp is at least `num' below mhpmax,
-                   so no (mhp > mhpmax) check is needed here */
+            else {
                 mtmp->mhpmax -= rn2(num + 1);
+                if (mtmp->mhp > mtmp->mhpmax)
+                    mtmp->mhp = mtmp->mhpmax;
+            }
         }
         if (burnarmor(mtmp) || rn2(3)) {
             int xtradmg = destroy_items(mtmp, AD_FIRE, orig_dmg);
