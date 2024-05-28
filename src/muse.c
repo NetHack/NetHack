@@ -899,6 +899,7 @@ use_defensive(struct monst *mtmp)
                 pline("%s has made a pit in the %s.", Monnam(mtmp),
                       surface(mtmp->mx, mtmp->my));
             }
+            fill_pit(mtmp->mx, mtmp->my);
             return (mintrap(mtmp, FORCEBUNGLE) == Trap_Killed_Mon) ? 1 : 2;
         }
         t = maketrap(mtmp->mx, mtmp->my, HOLE);
@@ -915,6 +916,7 @@ use_defensive(struct monst *mtmp)
             You_hear("%s crash through the %s.", something,
                      surface(mtmp->mx, mtmp->my));
         }
+        fill_pit(mtmp->mx, mtmp->my);
         /* we made sure that there is a level for mtmp to go to */
         migrate_to_level(mtmp, ledger_no(&u.uz) + 1, MIGR_RANDOM,
                          (coord *) 0);

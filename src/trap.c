@@ -3819,13 +3819,14 @@ float_up(void)
     return;
 }
 
+/* a boulder fills a pit or a hole at x,y */
 void
 fill_pit(coordxy x, coordxy y)
 {
     struct obj *otmp;
     struct trap *t;
 
-    if ((t = t_at(x, y)) != 0 && is_pit(t->ttyp)
+    if ((t = t_at(x, y)) != 0 && (is_pit(t->ttyp) || is_hole(t->ttyp))
         && (otmp = sobj_at(BOULDER, x, y)) != 0) {
         obj_extract_self(otmp);
         (void) flooreffects(otmp, x, y, "settle");
