@@ -2164,7 +2164,8 @@ u_teleport_mon(struct monst *mtmp, boolean give_feedback)
         if (give_feedback)
             You("are no longer inside %s!", mon_nam(mtmp));
         unstuck(mtmp);
-        (void) rloc(mtmp, RLOC_MSG);
+        if (!rloc(mtmp, RLOC_MSG))
+            m_into_limbo(mtmp);
     } else if ((is_rider(mtmp->data) || control_teleport(mtmp->data))
                && rn2(13) && enexto(&cc, u.ux, u.uy, mtmp->data))
         rloc_to(mtmp, cc.x, cc.y);
