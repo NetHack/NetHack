@@ -1949,6 +1949,7 @@ when chain lightning hit a sleeping monster, the victim didn't wake up
 on medusa-4, Medusa and the downstairs were located in different chambers
 on medusa-3 and medusa-4, Perseus's statue was located in a different chamber
 	from Medusa
+omit "a" from "drowned in a limitless water" when drowning on Plane of Water
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
