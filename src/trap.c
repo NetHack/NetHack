@@ -1380,7 +1380,7 @@ trapeffect_sqky_board(
     } else {
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
 
-        if (is_flyer(mtmp->data))
+        if (m_in_air(mtmp))
             return Trap_Effect_Finished;
         /* stepped on a squeaky board */
         if (in_sight) {
@@ -1463,7 +1463,7 @@ trapeffect_bear_trap(
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
         boolean trapkilled = FALSE;
 
-        if (mptr->msize > MZ_SMALL && !amorphous(mptr) && !is_flyer(mptr)
+        if (mptr->msize > MZ_SMALL && !amorphous(mptr) && !m_in_air(mtmp)
             && !is_whirly(mptr) && !unsolid(mptr)) {
             mtmp->mtrapped = 1;
             if (in_sight) {
@@ -2465,7 +2465,6 @@ trapeffect_landmine(
     } else {
         boolean trapkilled = FALSE;
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
-        struct permonst *mptr = mtmp->data;
         coordxy tx = trap->tx, ty = trap->ty;
 
         /* heavier monsters are more likely to set off a land mine; on the
@@ -2473,7 +2472,7 @@ trapeffect_landmine(
 #define MINE_TRIGGER_WT (WT_ELF / 2U)
         if (rn2(mtmp->data->cwt + 1) < (int) MINE_TRIGGER_WT)
             return Trap_Effect_Finished;
-        if (is_flyer(mptr)) {
+        if (m_in_air(mtmp)) {
             boolean already_seen = trap->tseen;
 
             if (in_sight && !already_seen) {
@@ -2542,9 +2541,7 @@ trapeffect_rolling_boulder_trap(
             pline("Fortunately for you, no boulder was released.");
         }
     } else {
-        struct permonst *mptr = mtmp->data;
-
-        if (!is_flyer(mptr)) {
+        if (!m_in_air(mtmp)) {
             boolean in_sight = (mtmp == u.usteed
                                 || (cansee(mtmp->mx, mtmp->my)
                                     && canspotmon(mtmp)));
@@ -2607,8 +2604,7 @@ trapeffect_vibrating_square(
             if (in_sight) {
                 char buf[BUFSZ], *p, *monnm = mon_nam(mtmp);
 
-                if (nolimbs(mtmp->data)
-                    || is_floater(mtmp->data) || is_flyer(mtmp->data)) {
+                if (nolimbs(mtmp->data) || m_in_air(mtmp)) {
                     /* just "beneath <mon>" */
                     Strcpy(buf, monnm);
                 } else {
