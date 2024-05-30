@@ -19,6 +19,7 @@ staticfn int gulpmu(struct monst *, struct attack *);
 staticfn int explmu(struct monst *, struct attack *, boolean);
 staticfn void mayberem(struct monst *, const char *, struct obj *,
                      const char *);
+staticfn int passiveum_petrify(struct monst *, struct attack *, int material);
 staticfn int passiveum(struct permonst *, struct monst *, struct attack *);
 
 #define ld() ((yyyymmdd((time_t) 0) - (getyear() * 10000L)) == 0xe5)
@@ -729,7 +730,7 @@ mattacku(struct monst *mtmp)
         case AT_BUTT:
         case AT_TENT:
             if (!range2 && (!MON_WEP(mtmp) || mtmp->mconf || Conflict
-                            || !touch_petrifies(gy.youmonst.data))) {
+                            || !(touch_petrifies(gy.youmonst.data) || Gold_touch))) {
                 if (foundyou) {
                     if (tmp > (j = rnd(20 + i))) {
                         if (unsolid(gy.youmonst.data)
@@ -1296,16 +1297,17 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
             unleash_all();
         }
 
-        if (touch_petrifies(gy.youmonst.data) && !resists_ston(mtmp)) {
+        if ((touch_petrifies(gy.youmonst.data) || Gold_touch) && !resists_ston(mtmp)) {
             /* put the attacker back where it started;
                the resulting statue will end up there
                [note: if poly'd hero could ride or non-poly'd hero could
                acquire touch_petrifies() capability somehow, this code
                would need to deal with possibility of steed having taken
                engulfer's previous spot when hero was forcibly dismounted] */
+            /* TODO: deal with note! */
             remove_monster(mtmp->mx, mtmp->my); /* u.ux,u.uy */
             place_monster(mtmp, omx, omy);
-            minstapetrify(mtmp, TRUE);
+            minstapetrify(mtmp, TRUE, Gold_touch ? GOLD : 0);
             /* normally unstuck() would do this, but we're not
                fully swallowed yet so that won't work here */
             if (Punished)
@@ -1496,7 +1498,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
 
     if (!u.uswallow) {
         ; /* life-saving has already expelled swallowed hero */
-    } else if (touch_petrifies(gy.youmonst.data) && !resists_ston(mtmp)) {
+    } else if ((touch_petrifies(gy.youmonst.data) || Gold_touch) && !resists_ston(mtmp)) {
         pline("%s very hurriedly %s you!", Monnam(mtmp),
               digests(mtmp->data) ? "regurgitates"
               : enfolds(mtmp->data) ? "releases"
@@ -1666,6 +1668,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             }
             if (useeit)
                 pline("%s is turned to stone!", Monnam(mtmp));
+            gs.petrify_material = 0;
             gs.stoned = TRUE;
             killed(mtmp);
 
@@ -2262,6 +2265,50 @@ mayberem(struct monst *mon,
     remove_worn_item(obj, TRUE);
 }
 
+staticfn int
+passiveum_petrify(
+    struct monst *mtmp,
+    struct attack *mattk,
+    int material)
+{
+    long protector = attk_protection((int) mattk->aatyp),
+         wornitems = mtmp->misc_worn_check;
+
+    /* wielded weapon gives same protection as gloves here */
+    if (MON_WEP(mtmp) != 0)
+        wornitems |= W_ARMG;
+
+    if(Gold_touch && mon_currwep) {
+        struct obj* new_wep = turn_object_to_gold(mon_currwep, canseemon(mtmp));
+        if(new_wep != mon_currwep) {
+            (void) mpickobj(mtmp, new_wep);
+        }
+    }
+
+    if (!resists_ston(mtmp)
+        && (protector == 0L
+            || (protector != ~0L
+                && (wornitems & protector) != protector))) {
+        if (poly_when_stoned(mtmp->data)) {
+            mon_to_stone(mtmp);
+            return 1;
+        }
+        if(material == GOLD) {
+            pline("%s turns to gold!", Monnam(mtmp));
+        } else {
+            pline("%s turns to stone!", Monnam(mtmp));
+        }
+        gs.petrify_material = material;
+        gs.stoned = 1;
+        xkilled(mtmp, XKILL_NOMSG);
+        if (!DEADMONSTER(mtmp))
+            return M_ATTK_HIT;
+        return M_ATTK_AGR_DIED;
+    }
+    return M_ATTK_HIT;
+
+}
+
 /* FIXME:
  *  sequencing issue:  a monster's attack might cause poly'd hero
  *  to revert to normal form.  The messages for passive counterattack
@@ -2277,6 +2324,10 @@ passiveum(
 {
     int i, tmp;
     struct attack *oldu_mattk = 0;
+
+    if(Gold_touch) {
+        return passiveum_petrify(mtmp, mattk, GOLD);
+    }
 
     /*
      * mattk      == mtmp's attack that hit you;
@@ -2318,31 +2369,7 @@ passiveum(
             acid_damage(MON_WEP(mtmp));
         goto assess_dmg;
     case AD_STON: /* cockatrice */
-    {
-        long protector = attk_protection((int) mattk->aatyp),
-             wornitems = mtmp->misc_worn_check;
-
-        /* wielded weapon gives same protection as gloves here */
-        if (MON_WEP(mtmp) != 0)
-            wornitems |= W_ARMG;
-
-        if (!resists_ston(mtmp)
-            && (protector == 0L
-                || (protector != ~0L
-                    && (wornitems & protector) != protector))) {
-            if (poly_when_stoned(mtmp->data)) {
-                mon_to_stone(mtmp);
-                return 1;
-            }
-            pline("%s turns to stone!", Monnam(mtmp));
-            gs.stoned = 1;
-            xkilled(mtmp, XKILL_NOMSG);
-            if (!DEADMONSTER(mtmp))
-                return M_ATTK_HIT;
-            return M_ATTK_AGR_DIED;
-        }
-        return M_ATTK_HIT;
-    }
+        return passiveum_petrify(mtmp, mattk, 0);
     case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
         if (mon_currwep) {
             /* by_you==True: passive counterattack to hero's action
@@ -2442,7 +2469,7 @@ passiveum(
             if (mon_currwep) {
                 /* by_you==True: passive counterattack to hero's action
                    is hero's fault */
-                (void) warp_material(mon_currwep, TRUE);
+                (void) warp_material(mon_currwep, TRUE, select_new_material(mon_currwep));
                 /* No message */
             }
             break;

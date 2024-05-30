@@ -3670,7 +3670,7 @@ instapetrify(const char *str)
 }
 
 void
-minstapetrify(struct monst *mon, boolean byplayer)
+minstapetrify(struct monst *mon, boolean byplayer, int material)
 {
     if (resists_ston(mon))
         return;
@@ -3685,13 +3685,19 @@ minstapetrify(struct monst *mon, boolean byplayer)
        intrinsic speed (comparable to similar effect on the hero) */
     mon_adjust_speed(mon, -3, (struct obj *) 0);
 
-    if (cansee(mon->mx, mon->my))
-        pline("%s turns to stone.", Monnam(mon));
+    if (cansee(mon->mx, mon->my)) {
+        if(material == GOLD) {
+            pline("%s turns to gold.", Monnam(mon));
+        } else {
+            pline("%s turns to stone.", Monnam(mon));
+        }
+    }
     if (byplayer) {
         gs.stoned = TRUE;
+        gs.petrify_material = material;
         xkilled(mon, XKILL_NOMSG);
     } else
-        monstone(mon);
+        monstone(mon,material);
 }
 
 void
@@ -3739,7 +3745,7 @@ mselftouch(
                   arg ? mon_nam(mon) : Monnam(mon),
                   corpse_xname(mwep, (const char *) 0, CXN_PFX_THE));
         }
-        minstapetrify(mon, byplayer);
+        minstapetrify(mon, byplayer, 0);
         /* if life-saved, might not be able to continue wielding */
         if (!DEADMONSTER(mon)
             && !which_armor(mon, W_ARMG) && !resists_ston(mon))

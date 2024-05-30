@@ -862,7 +862,7 @@ engulfer_digests_food(struct obj *obj)
             (void) newcham(u.ustuck, could_slime ? &mons[PM_GREEN_SLIME] : 0,
                            could_slime ? NC_SHOW_MSG : NO_NC_FLAGS);
         } else if (could_petrify) {
-            minstapetrify(u.ustuck, TRUE);
+            minstapetrify(u.ustuck, TRUE, 0);
         } else if (could_grow) {
             (void) grow_up(u.ustuck, (struct monst *) 0);
         } else if (could_heal) {

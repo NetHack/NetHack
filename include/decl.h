@@ -899,6 +899,7 @@ struct instance_globals_s {
     stairway *stairs;
     int smeq[MAXNROFROOMS + 1];
     boolean stoned; /* done to monsters hit by 'c' */
+    int petrify_material;
     struct spell spl_book[MAXSPELL + 1];
     struct mkroom *subrooms;
 

@@ -381,6 +381,8 @@
 
 #define Lifesaved u.uprops[LIFESAVED].extrinsic
 
+#define Gold_touch u.uprops[GOLD_TOUCH].extrinsic
+
 /*
  * Some pseudo-properties.
  */

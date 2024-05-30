@@ -657,6 +657,8 @@ set_artifact_intrinsic(struct obj *otmp, boolean on, long wp_mask)
         mask = &EPoison_resistance;
     else if (dtyp == AD_DRLI)
         mask = &EDrain_resistance;
+    else if (dtyp == AD_STON)
+        mask = &EStone_resistance;
 
     if (mask && wp_mask == W_ART && !on) {
         /* find out if some other artifact also confers this intrinsic;
@@ -788,6 +790,16 @@ set_artifact_intrinsic(struct obj *otmp, boolean on, long wp_mask)
             EProtection |= wp_mask;
         else
             EProtection &= ~wp_mask;
+    }
+    if (spfx & SPFX_GOLD) {
+        if (on) {
+            Gold_touch |= wp_mask;
+            EHunger |= wp_mask;
+        }
+        else {
+            Gold_touch &= ~wp_mask;
+            EHunger |= wp_mask;
+        }
     }
 
     if (wp_mask == W_ART && !on && oart->inv_prop) {

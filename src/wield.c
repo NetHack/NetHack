@@ -166,6 +166,14 @@ ready_weapon(struct obj *wep)
     int res = ECMD_OK;
     boolean was_twoweap = u.twoweap, had_wep = (uwep != 0);
 
+    if(Gold_touch && wep) {
+        struct obj* new_wep = turn_object_to_gold(wep, TRUE);
+        if(wep != new_wep) {
+            pick_obj(new_wep);
+            return ECMD_TIME;
+        }
+    }
+
     if (!wep) {
         /* No weapon */
         if (uwep) {

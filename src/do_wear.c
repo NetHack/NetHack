@@ -2258,6 +2258,14 @@ accessory_or_armor_on(struct obj *obj)
     if ((obj->oartifact || will_touch_skin(mask)) && !retouch_object(&obj, FALSE))
         return ECMD_TIME; /* costs a turn even though it didn't get worn */
 
+    if(Gold_touch) {
+        struct obj* new_obj = turn_object_to_gold(obj, TRUE);
+        if(obj != new_obj) {
+            pick_obj(new_obj);
+            return ECMD_TIME;
+        }
+    }
+
     if (armor) {
         int delay;
 

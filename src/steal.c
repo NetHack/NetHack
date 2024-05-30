@@ -631,7 +631,7 @@ steal(struct monst *mtmp, char *objnambuf)
     otmp->how_lost = LOST_STOLEN;
     (void) mpickobj(mtmp, otmp); /* may free otmp */
     if (could_petrify && !(mtmp->misc_worn_check & W_ARMG)) {
-        minstapetrify(mtmp, TRUE);
+        minstapetrify(mtmp, TRUE, 0);
         return -1;
     }
     return (gm.multi < 0) ? 0 : 1;

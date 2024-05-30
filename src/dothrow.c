@@ -97,6 +97,13 @@ throw_obj(struct obj *obj, int shotlimit)
         goto unsplit_stack;
     }
 
+    if(Gold_touch) {
+        struct obj* new_obj = turn_object_to_gold(obj, TRUE);
+        if(obj != new_obj) {
+            obj = new_obj;
+        }
+    }
+
     /*
      * Throwing gold is usually for getting rid of it when
      * a leprechaun approaches, or for bribing an oncoming
@@ -876,9 +883,9 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
                     an(pmname(mon->data, NEUTRAL)));
             instapetrify(gk.killer.name);
         }
-        if (touch_petrifies(gy.youmonst.data)
+        if ((touch_petrifies(gy.youmonst.data) || Gold_touch)
             && !which_armor(mon, W_ARMU | W_ARM | W_ARMC)) {
-            minstapetrify(mon, TRUE);
+            minstapetrify(mon, TRUE, Gold_touch ? GOLD : 0);
         }
         wake_nearto(x, y, 10);
         return FALSE;
@@ -1034,13 +1041,13 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
         /* check whether 'mon' is turned to stone by touching 'mtmp' */
         if (touch_petrifies(mtmp->data)
             && !which_armor(mon, W_ARMU | W_ARM | W_ARMC)) {
-            minstapetrify(mon, !gc.context.mon_moving);
+            minstapetrify(mon, !gc.context.mon_moving, 0);
             newsym(mon->mx, mon->my);
         }
         /* and whether 'mtmp' is turned to stone by being touched by 'mon' */
         if (touch_petrifies(mon->data)
             && !which_armor(mtmp, W_ARMU | W_ARM | W_ARMC)) {
-            minstapetrify(mtmp, !gc.context.mon_moving);
+            minstapetrify(mtmp, !gc.context.mon_moving, 0);
             newsym(mtmp->mx, mtmp->my);
         }
     } else if (u_at(x, y)) {
@@ -1048,10 +1055,10 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
         pline("%s bumps into you.", Some_Monnam(mon));
         stop_occupation();
         /* check whether 'mon' is turned to stone by touching poly'd hero */
-        if (Upolyd && touch_petrifies(gy.youmonst.data)
+        if (((Upolyd && touch_petrifies(gy.youmonst.data)) || Gold_touch)
             && !which_armor(mon, W_ARMU | W_ARM | W_ARMC)) {
             /* give poly'd hero credit/blame despite a monster causing it */
-            minstapetrify(mon, TRUE);
+            minstapetrify(mon, TRUE, Gold_touch ? GOLD : 0);
             newsym(mon->mx, mon->my);
         }
         /* and whether hero is turned to stone by being touched by 'mon' */
@@ -2239,7 +2246,7 @@ thitmonst(
         wakeup(mon, TRUE);
         if (obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])) {
             if (is_animal(md)) {
-                minstapetrify(u.ustuck, TRUE);
+                minstapetrify(u.ustuck, TRUE, 0);
                 /* Don't leave a cockatrice corpse available in a statue */
                 if (!u.uswallow) {
                     delobj(obj);

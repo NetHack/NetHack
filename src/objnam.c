@@ -673,12 +673,12 @@ xname_flags(
             Strcat(buf, " ");
         }
         if (!dknown)
-            Strcpy(buf, "amulet");
+            Strcat(buf, "amulet");
         else if (typ == AMULET_OF_YENDOR || typ == FAKE_AMULET_OF_YENDOR)
             /* each must be identified individually */
-            Strcpy(buf, known ? actualn : dn);
+            Strcat(buf, known ? actualn : dn);
         else if (nn)
-            Strcpy(buf, actualn);
+            Strcat(buf, actualn);
         else if (un)
             xcalled(buf, BUFSZ - PREFIX, "amulet", un);
         else

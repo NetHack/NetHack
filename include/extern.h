@@ -1648,7 +1648,9 @@ extern struct obj *obj_absorb(struct obj **, struct obj **);
 extern struct obj *obj_meld(struct obj **, struct obj **);
 extern void pudding_merge_message(struct obj *, struct obj *) NONNULLARG12;
 extern boolean valid_obj_material(struct obj *, int) NONNULLARG1;
-extern boolean warp_material(struct obj *, boolean) NONNULLARG1;
+extern int select_new_material(struct obj *) NONNULLARG1;
+extern boolean warp_material(struct obj *, boolean, int) NONNULLARG1;
+extern struct obj *turn_object_to_gold(struct obj *, boolean) NONNULLARG1;
 extern struct obj *init_dummyobj(struct obj *, short, long);
 
 /* ### mkroom.c ### */
@@ -1714,7 +1716,7 @@ extern boolean corpse_chance(struct monst *, struct monst *, boolean) NONNULLARG
 extern void mondead(struct monst *) NONNULLARG1;
 extern void mondied(struct monst *) NONNULLARG1;
 extern void mongone(struct monst *) NONNULLARG1;
-extern void monstone(struct monst *) NONNULLARG1;
+extern void monstone(struct monst *, int) NONNULLARG1;
 extern void monkilled(struct monst *, const char *, int) NONNULLARG1;
 extern void set_ustuck(struct monst *);
 extern void unstuck(struct monst *) NONNULLARG1;
@@ -2359,6 +2361,7 @@ extern int loot_mon(struct monst *, int *, boolean *) NO_NNARGS;
 extern int dotip(void);
 extern struct autopickup_exception *check_autopickup_exceptions(struct obj *) NONNULLARG1;
 extern boolean autopick_testobj(struct obj *, boolean) NONNULLARG1;
+extern void tipcontainer(struct obj *);
 
 /* ### pline.c ### */
 
@@ -3178,7 +3181,7 @@ extern void seetrap(struct trap *) NONNULLARG1;
 extern void feeltrap(struct trap *) NONNULLARG1;
 extern int mintrap(struct monst *, unsigned) NONNULLARG1;
 extern void instapetrify(const char *) NO_NNARGS;
-extern void minstapetrify(struct monst *, boolean) NONNULLARG1;
+extern void minstapetrify(struct monst *, boolean, int) NONNULLARG1;
 extern void selftouch(const char *) NONNULLARG1;
 extern void mselftouch(struct monst *, const char *, boolean) NONNULLARG1;
 extern void float_up(void);

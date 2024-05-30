@@ -64,6 +64,17 @@ use_saddle(struct obj *otmp)
         return ECMD_TIME;
     }
     ptr = mtmp->data;
+
+    /* Impossible unless saddles are allowed to turn to gold */
+    if(Gold_touch) {
+        if (!munstone(mtmp, TRUE)) {
+            minstapetrify(mtmp, TRUE, GOLD);
+        }
+        if (!resists_ston(mtmp)) {
+            return ECMD_TIME;
+        }
+    }
+
     if (touch_petrifies(ptr) && !uarmg && !Stone_resistance) {
         char kbuf[BUFSZ];
 
@@ -273,6 +284,15 @@ mount_steed(
     }
 
     ptr = mtmp->data;
+
+    if(Gold_touch) {
+        if (!munstone(mtmp, TRUE)) {
+            minstapetrify(mtmp, TRUE, GOLD);
+        }
+        if (!resists_ston(mtmp)) {
+            return (FALSE);
+        }
+    }
     if (touch_petrifies(ptr) && !Stone_resistance) {
         char kbuf[BUFSZ];
 

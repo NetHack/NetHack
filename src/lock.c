@@ -639,6 +639,15 @@ pick_lock(
             gx.xlock.box = 0;
         }
     }
+
+    if(Gold_touch) {
+        struct obj* new_pick = turn_object_to_gold(pick, TRUE);
+        if(pick != new_pick) {
+            pick_obj(new_pick);
+            return PICKLOCK_DID_NOTHING;
+        }
+    }
+
     gc.context.move = 0;
     gx.xlock.chance = ch;
     gx.xlock.picktyp = picktyp;

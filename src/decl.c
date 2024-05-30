@@ -766,6 +766,7 @@ static const struct instance_globals_s g_init_s = {
     UNDEFINED_PTR, /* stairs */
     DUMMY, /* smeq */
     FALSE, /* stoned */
+    0, /* petrify_material */
     { DUMMY }, /* spl_book */
     UNDEFINED_PTR, /* subrooms */
     /* do.c */

@@ -833,6 +833,17 @@ hmon_hitmon_barehands(struct _hitmon_data *hmd, struct monst *mon)
 {
     long spcdmgflg; /* worn masks */
 
+    if(Gold_touch) {
+        if (!munstone(mon, TRUE)) {
+            minstapetrify(mon, TRUE, GOLD);
+        }
+        if (!resists_ston(mon)) {
+            hmd->doreturn = TRUE;
+            hmd->retval = !DEADMONSTER(mon);
+            return;
+        }
+    }
+
     if (hmd->mdat == &mons[PM_SHADE]) {
         hmd->dmg = 0;
     } else {
@@ -1121,7 +1132,7 @@ hmon_hitmon_misc_obj(
                              : CXN_ARTICLE));
             obj->dknown = 1;
             if (!munstone(mon, TRUE))
-                minstapetrify(mon, TRUE);
+                minstapetrify(mon, TRUE, 0);
             if (resists_ston(mon))
                 break;
             /* note: hp may be <= 0 even if munstoned==TRUE */
@@ -1175,7 +1186,7 @@ hmon_hitmon_misc_obj(
             obj->known = 1; /* (not much point...) */
             useup_eggs(obj);
             if (!munstone(mon, TRUE))
-                minstapetrify(mon, TRUE);
+                minstapetrify(mon, TRUE, 0);
             if (resists_ston(mon))
                 break;
             hmd->doreturn = TRUE;
@@ -3812,7 +3823,7 @@ do_stone_mon(
     if (!resists_ston(mdef)) {
         if (gv.vis && canseemon(mdef))
             pline("%s turns to stone!", Monnam(mdef));
-        monstone(mdef);
+        monstone(mdef,0);
  post_stone:
         if (!DEADMONSTER(mdef)) {
             mhm->hitflags = M_ATTK_MISS;
@@ -4038,7 +4049,7 @@ mhitm_ad_ston(
     if (magr == &gy.youmonst) {
         /* uhitm */
         if (!munstone(mdef, TRUE))
-            minstapetrify(mdef, TRUE);
+            minstapetrify(mdef, TRUE, 0);
         mhm->damage = 0;
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
@@ -4647,7 +4658,7 @@ mhitm_ad_mtrl(
                     break;
                 }
             }
-            if (obj && warp_material(obj, FALSE)) {
+            if (obj && warp_material(obj, FALSE, select_new_material(obj))) {
                 pline("That's odd, you don't remember putting on %s...",
                     an(xname_forcemat(obj)));
                 update_inventory();
@@ -6010,7 +6021,7 @@ passive_obj(
         break;
     case AD_MTRL:
         if (!mon->mcan) {
-            if(warp_material(obj, TRUE) && carried(obj)) {
+            if(warp_material(obj, TRUE, select_new_material(obj)) && carried(obj)) {
                 pline("Your %s warps!", simpleonames(obj));
             }
         }

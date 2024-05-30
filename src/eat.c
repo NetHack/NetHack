@@ -636,7 +636,7 @@ eat_brains(
                mind flayers don't have those capabilities */
             if (visflag && canseemon(magr))
                 pline("%s turns to stone!", Monnam(magr));
-            monstone(magr);
+            monstone(magr,0);
             if (!DEADMONSTER(magr)) {
                 /* life-saved; don't continue eating the brains */
                 return M_ATTK_MISS;
@@ -2752,6 +2752,14 @@ doeat(void)
             u.uedibility = 0;
             if (res == 1)
                 return ECMD_OK;
+        }
+    }
+
+    if (Gold_touch) {
+        struct obj* new_obj = turn_object_to_gold(otmp, TRUE);
+        if(otmp != new_obj) {
+            pick_obj(new_obj);
+            return ECMD_TIME;
         }
     }
 

@@ -1118,6 +1118,7 @@ use_mirror(struct obj *obj)
             return ECMD_TIME;
         if (vis)
             pline("%s is turned to stone!", Monnam(mtmp));
+        gs.petrify_material = 0;
         gs.stoned = TRUE;
         killed(mtmp);
     } else if (monable && mtmp->data == &mons[PM_FLOATING_EYE]) {
@@ -4120,6 +4121,14 @@ doapply(void)
     if (!retouch_object(&obj, FALSE))
         return ECMD_TIME; /* evading your grasp costs a turn; just be
                              grateful that you don't drop it as well */
+
+    if (Gold_touch) {
+        struct obj* new_obj = turn_object_to_gold(obj, TRUE);
+        if(obj != new_obj) {
+            pick_obj(new_obj);
+            return ECMD_TIME;
+        }
+    }
 
     if (obj->oclass == WAND_CLASS)
         return do_break_wand(obj);

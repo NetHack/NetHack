@@ -602,6 +602,14 @@ dodrink(void)
     }
     otmp->in_use = TRUE; /* you've opened the stopper */
 
+    if (Gold_touch) {
+        struct obj* new_obj = turn_object_to_gold(otmp, TRUE);
+        if(otmp != new_obj) {
+            pick_obj(new_obj);
+            return ECMD_TIME;
+        }
+    }
+
     if (objdescr_is(otmp, "milky")
         && !(gm.mvitals[PM_GHOST].mvflags & G_GONE)
         && !rn2(POTION_OCCUPANT_CHANCE(gm.mvitals[PM_GHOST].born))) {

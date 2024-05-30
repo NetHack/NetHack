@@ -51,7 +51,6 @@ staticfn boolean reverse_loot(void);
 staticfn boolean mon_beside(coordxy, coordxy);
 staticfn int do_loot_cont(struct obj **, int, int);
 staticfn int doloot_core(void);
-staticfn void tipcontainer(struct obj *);
 
 /* define for query_objlist() and autopickup() */
 #define FOLLOW(curr, flags) \
@@ -1785,6 +1784,14 @@ pickup_object(
     unsigned save_how_lost;
     int res;
 
+    if(Gold_touch) {
+        struct obj* new_obj = turn_object_to_gold(obj, TRUE);
+        if(obj != new_obj) {
+            count = new_obj->quan;
+            obj = new_obj;
+        }
+    }
+
     if (obj->quan < count) {
         impossible("pickup_object: count %ld > quan %ld?", count, obj->quan);
         return 0;
@@ -2073,6 +2080,12 @@ do_loot_cont(
 
     if (!cobj)
         return ECMD_OK;
+    if(Gold_touch) {
+        struct obj* new_cobj = turn_object_to_gold(cobj, TRUE);
+        if(cobj != new_cobj) {
+            return ECMD_OK;
+        }
+    }
     if (cobj->olocked) {
         int res = ECMD_OK;
 
@@ -2436,6 +2449,7 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
                 You_cant("do that without limbs."); /* not body_part(HAND) */
                 return 0;
             }
+
             if (otmp->cursed) {
                 You("can't.  The saddle seems to be stuck to %s.",
                     x_monnam(mtmp, ARTICLE_THE, (char *) 0,
@@ -2447,6 +2461,11 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
             if (flags.verbose)
                 You("take %s off of %s.",
                     thesimpleoname(otmp), mon_nam(mtmp));
+
+            if(Gold_touch) {
+                otmp = turn_object_to_gold(otmp, TRUE);
+            }
+
             otmp = hold_another_object(otmp, "You drop %s!", doname(otmp),
                                        (const char *) 0);
             nhUse(otmp);
@@ -2546,6 +2565,10 @@ in_container(struct obj *obj)
     boolean floor_container = !carried(gc.current_container);
     boolean was_unpaid = FALSE;
     char buf[BUFSZ];
+
+    if (Gold_touch) {
+        obj = turn_object_to_gold(obj, TRUE);
+    }
 
     if (!gc.current_container) {
         impossible("<in> no gc.current_container?");
@@ -2714,6 +2737,10 @@ out_container(struct obj *obj)
     int res;
     long count;
     boolean is_gold = (obj->oclass == COIN_CLASS);
+
+    if (Gold_touch) {
+        obj = turn_object_to_gold(obj, TRUE);
+    }
 
     if (!gc.current_container) {
         impossible("<out> no gc.current_container?");
@@ -3649,7 +3676,7 @@ enum tipping_check_values {
     TIPCHECK_EMPTY
 };
 
-staticfn void
+void
 tipcontainer(struct obj *box) /* or bag */
 {
     coordxy ox = u.ux, oy = u.uy; /* #tip only works at hero's location */

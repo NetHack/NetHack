@@ -84,9 +84,10 @@ enum prop_types {
     REFLECTING        = 64,
     FREE_ACTION       = 65,
     FIXED_ABIL        = 66,
-    LIFESAVED         = 67
+    LIFESAVED         = 67,
+    GOLD_TOUCH        = 68,
 };
-#define LAST_PROP (LIFESAVED)
+#define LAST_PROP (GOLD_TOUCH)
 
 /*** Where the properties come from ***/
 /* Definitions were moved here from obj.h and you.h */

@@ -1436,7 +1436,7 @@ m_consume_obj(struct monst *mtmp, struct obj *otmp)
             } else if (!resists_ston(mtmp)) {
                 if (vis)
                     pline("%s turns to stone!", Monnam(mtmp));
-                monstone(mtmp);
+                monstone(mtmp,0);
             }
         }
         if (heal)
@@ -3194,7 +3194,7 @@ mongone(struct monst *mdef)
 
 /* drop a statue or rock and remove monster */
 void
-monstone(struct monst *mdef)
+monstone(struct monst *mdef, int material)
 {
     struct obj *otmp, *obj, *oldminvent;
     coordxy x = mdef->mx, y = mdef->my;
@@ -3260,6 +3260,11 @@ monstone(struct monst *mdef)
             (void) add_to_container(otmp, obj);
         }
         otmp->owt = weight(otmp);
+        if(material) {
+            warp_material(otmp, FALSE, material);
+        }
+    } else if(material == GOLD) {
+        otmp = mkgold(100, x, y);
     } else
         otmp = mksobj_at(ROCK, x, y, TRUE, FALSE);
 
@@ -3452,8 +3457,9 @@ xkilled(
     gv.vamp_rise_msg = FALSE; /* might get set in mondead(); checked below */
     gd.disintegested = nocorpse; /* alternate vamp_rise mesg needed if true */
     /* dispose of monster and make cadaver */
-    if (gs.stoned)
-        monstone(mtmp);
+    if (gs.stoned) {
+        monstone(mtmp, gs.petrify_material);
+    }
     else
         mondead(mtmp);
     gd.disintegested = FALSE; /* reset */
@@ -3476,6 +3482,7 @@ xkilled(
     mndx = monsndx(mdat);
 
     if (gs.stoned) {
+        gs.petrify_material = 0;
         gs.stoned = FALSE;
         goto cleanup;
     }

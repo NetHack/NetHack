@@ -1855,6 +1855,8 @@ attributes_enlightenment(
         you_have("free action", from_what(FREE_ACTION));
     if (Fixed_abil)
         you_have("fixed abilities", from_what(FIXED_ABIL));
+    if (Gold_touch)
+        you_can("turn things you touch to gold", from_what(GOLD_TOUCH));
     if (Lifesaved)
         enl_msg("Your life ", "will be", "would have been", " saved", "");
 
