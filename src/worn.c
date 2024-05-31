@@ -550,12 +550,7 @@ update_mon_extrinsics(
         case JUMPING:
             break;
         default:
-            /* 1 through 8 correspond to MR_xxx mask values */
-            if (which >= 1 && which <= 8) {
-                /* FIRE,COLD,SLEEP,DISINT,SHOCK,POISON,ACID,STONE */
-                mask = (uchar) (1 << (which - 1));
-                mon->mextrinsics |= (unsigned short) mask;
-            }
+            mon->mextrinsics |= (unsigned short) res_to_mr(which);
             break;
         }
     } else { /* off */
@@ -592,7 +587,7 @@ update_mon_extrinsics(
              * only one pass but a worn alchemy smock will be an
              * alternate source for either of those two resistances.
              */
-            mask = (uchar) (1 << (which - 1));
+            mask = res_to_mr(which);
             for (otmp = mon->minvent; otmp; otmp = otmp->nobj) {
                 if (otmp == obj || !otmp->owornmask)
                     continue;

@@ -67,6 +67,9 @@ enum ms_sounds {
 #define MR_POISON       0x20 /* resists poison */
 #define MR_ACID         0x40 /* resists acid */
 #define MR_STONE        0x80 /* resists petrification */
+/* NB: the above resistances correspond to the first 8 hero properties in
+   prop_types (FIRE_RES through STONE_RES), which can be converted to their
+   MR_foo equivalents with the macro res_to_mr() defined in prop.h */
 /* other resistances: magic, sickness */
 /* other conveyances: teleport, teleport control, telepathy */
 

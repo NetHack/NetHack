@@ -1498,13 +1498,16 @@ monstunseesu(unsigned long seenres)
 void
 give_u_to_m_resistances(struct monst *mtmp)
 {
-    const int u_intrins[] = { FIRE_RES, COLD_RES, SLEEP_RES, DISINT_RES, SHOCK_RES, POISON_RES, ACID_RES, STONE_RES };
-    const int m_intrins[] = { MR_FIRE,  MR_COLD,  MR_SLEEP,  MR_DISINT,  MR_ELEC,   MR_POISON,  MR_ACID,  MR_STONE };
-    int i;
+    int intr;
 
-    for (i = 0; i < SIZE(u_intrins); i++)
-        if (u.uprops[u_intrins[i]].intrinsic & INTRINSIC)
-            mtmp->mintrinsics |= m_intrins[i];
+    /* convert the hero's current set of intrinsics to their monster
+       equivalents -- FIRE_RES to MR_FIRE, COLD_RES to MR_COLD, etc -- and
+       add each to the mintrinsics field for the given monster */
+    for (intr = FIRE_RES; intr <= STONE_RES; intr++) {
+        if ((u.uprops[intr].intrinsic & INTRINSIC) != 0L) {
+            mtmp->mintrinsics |= (unsigned short) res_to_mr(intr);
+        }
+    }
 }
 
 /* Can monster resist conflict caused by hero?
