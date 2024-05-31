@@ -3044,8 +3044,9 @@ blow_up_landmine(struct trap *trap)
         /* if under the portcullis, the bridge is adjacent */
         if (find_drawbridge(&dbx, &dby))
             destroy_drawbridge(dbx, dby);
-        trap = t_at(x, y); /* expected to be null after destruction */
     }
+    trap = t_at(x, y); /* expected to be null after destruction */
+    /* or could be null if scatter blew up oil which melted ice */
     /* convert landmine into pit */
     if (trap) {
         if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz)) {
