@@ -2450,6 +2450,8 @@ bhitpile(
     if (hidingunder) /* pile might have been destroyed or dispersed */
         maybe_unhide_at(tx, ty);
 
+    fill_pit(tx, ty);
+
     return hitanything;
 }
 

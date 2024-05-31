@@ -2185,6 +2185,7 @@ revive_corpse(struct obj *corpse)
                     Soundeffect(se_scratching, 50);
                     You_hear("scratching noises.");
                 }
+                fill_pit(mtmp->mx, mtmp->my);
                 break;
             }
             /*FALLTHRU*/
