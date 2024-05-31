@@ -1,4 +1,4 @@
--- NetHack tower tower1.lua	$NHDT-Date: 1652196037 2022/05/10 15:20:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1 $
+-- NetHack tower tower1.lua	$NHDT-Date: 1717178759 2024/05/31 18:05:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 -- NetHack may be freely redistributed.  See license for details.
 --
@@ -30,10 +30,15 @@ des.monster("Vlad the Impaler", 06, 05)
 des.monster("V",niches[1])
 des.monster("V",niches[2])
 des.monster("V",niches[3])
--- The brides
-des.monster("Vampire Lady",niches[4])
-des.monster("Vampire Lady",niches[5])
-des.monster("Vampire Lady",niches[6])
+-- The brides; they weren't named in Bram Stoker's original _Dracula_
+-- and when appearing in umpteen subsequent books and movies there is
+-- no consensus for their names.  According to the Wikipedia entry for
+-- "Brides of Dracula", the "Czechoslovakian TV film Hrabe Drakula (1971)"
+-- gave them titles rather than (or perhaps in addition to) specific names
+-- and we use those titles here.
+des.monster({ id="Vampire Lady", niches[4], name="Madame" })
+des.monster({ id="Vampire Lady", niches[5], name="Marquise" })
+des.monster({ id="Vampire Lady", niches[6], name="Countess" })
 -- The doors
 des.door("closed",08,03)
 des.door("closed",10,03)
