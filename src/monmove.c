@@ -958,7 +958,7 @@ mon_would_take_item(struct monst *mtmp, struct obj *otmp)
     if (!mindless(mtmp->data) && !is_animal(mtmp->data) && pctload < 75
         && searches_for_item(mtmp, otmp))
         return TRUE;
-    if (likes_gold(mtmp->data) && otmp->otyp == GOLD_PIECE && pctload < 95)
+    if (likes_gold(mtmp->data) && otmp->material == GOLD && pctload < 95)
         return TRUE;
     if (likes_gems(mtmp->data) && otmp->oclass == GEM_CLASS
         && otmp->material != MINERAL && pctload < 85)

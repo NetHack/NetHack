@@ -434,6 +434,7 @@ tactics(struct monst *mtmp)
                               distant_name(otmp, doname));
                     obj_extract_self(otmp);
                     (void) mpickobj(mtmp, otmp);
+                    check_gear_next_turn(mtmp);
                     return 1;
                 } else
                     return 0;
