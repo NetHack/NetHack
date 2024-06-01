@@ -87,6 +87,11 @@ CFLAGS+=-fsanitize=address
 LFLAGS+=-fsanitize=address
 endif
 
+ifeq "$(USE_UBSAN)" "1"
+CFLAGS+=-fsanitize=undefined
+LFLAGS+=-fsanitize=undefined
+endif
+
 ifeq "$(USE_CURSESLIB)" "1"
 # default
 CURSESLIB = -lncurses -ltinfo
