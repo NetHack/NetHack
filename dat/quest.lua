@@ -1354,7 +1354,7 @@ rank of %R, you might be ready."]]
       },
       encourage = {
          "\"When you are in trouble, call upon %d for help.\"",
-         "\"With %o upon his fists, %n is dangerous to fight up close.\"",
+         "\"With %o upon his head, %n is dangerous to fight up close.\"",
          "\"%n is rich, but even a fish cannot swim if laden with gold.\"",
          "\"No deal is good enough for %n. He must be defeated quickly.\"",
          "\"Consider this a high-risk, high-reward business venture.\"",
@@ -1515,8 +1515,8 @@ And, %p? Be wary. All that glitters is not gold."]],
          synopsis = "[Be careful with %o and find the Amulet of Yendor.]",
          output = "text",
          text = [["By %d! Do not throw %o, that's dangerous!
-Those gauntlets can earn enormous profits, but also
-cause terrible loss. You should take them back with
+That crown can earn enormous profits, but also
+cause terrible loss. You should take it back with
 you to %Z, to aid in your expedition for the Amulet.
 You can return through the magic portal that brought
 you here."]],
