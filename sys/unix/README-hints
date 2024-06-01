@@ -60,6 +60,9 @@ make WANT_SPEECH=1            If one of the sound libraries was included, also
 make WANT_ASAN=1              Include support for the address sanitizer in the
                               build.
 
+make WANT_UBSAN=1             Include support for the undefined behaviour
+                              sanitizer in the build.
+
 make WANT_SHARE_INSTALL=1     Place the results of the install/update portion
                               of the build into a shared area on a multiuser
                               system.

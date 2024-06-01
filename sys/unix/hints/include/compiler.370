@@ -33,6 +33,10 @@ ifeq "$(WANT_ASAN)" "1"
 USE_ASAN=1
 endif
 
+ifeq "$(WANT_UBSAN)" "1"
+USE_UBSAN=1
+endif
+
 # If you want to override the compiler detection just carried out
 # uncomment one of the following pairs. Note, however, that
 # doing this after the detection above will likely result in
