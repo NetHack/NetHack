@@ -35,10 +35,11 @@ des.monster("V",niches[3])
 -- no consensus for their names.  According to the Wikipedia entry for
 -- "Brides of Dracula", the "Czechoslovakian TV film Hrabe Drakula (1971)"
 -- gave them titles rather than (or perhaps in addition to) specific names
--- and we use those titles here.
-des.monster({ id="Vampire Lady", niches[4], name="Madame" })
-des.monster({ id="Vampire Lady", niches[5], name="Marquise" })
-des.monster({ id="Vampire Lady", niches[6], name="Countess" })
+-- and we use those titles here.  Marking them as 'waiting' forces them to
+-- start in vampire form instead of vampshifted into bat/fog/wolf form.
+des.monster({ id="Vampire Lady", niches[4], name="Madame", waiting=1 })
+des.monster({ id="Vampire Lady", niches[5], name="Marquise", waiting=1 })
+des.monster({ id="Vampire Lady", niches[6], name="Countess", waiting=1 })
 -- The doors
 des.door("closed",08,03)
 des.door("closed",10,03)

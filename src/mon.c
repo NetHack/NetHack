@@ -5027,8 +5027,11 @@ mgender_from_permonst(
     } else if (is_female(mdat)) {
         mtmp->female = TRUE;
     } else if (!is_neuter(mdat)) {
-        /* usually leave as-is; same chance to change as polymorphing hero */
-        if (!rn2(10))
+        /* usually leave as-is; same chance to change as polymorphing hero;
+           vampires use controlled shapechange (from their perspective, even
+           if it is random from the player's perspective) and don't undergo
+           gender change */
+        if (!rn2(10) && !(is_vampire(mdat) || is_vampshifter(mtmp)))
             mtmp->female = !mtmp->female;
     }
 }
