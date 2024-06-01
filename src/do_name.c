@@ -440,7 +440,7 @@ oname(
         case ART_YENDORIAN_EXPRESS_CARD:
             obj->material = PLATINUM;
             break;
-        case ART_TOUCH_OF_MIDAS:
+        case ART_CROWN_OF_MIDAS:
             obj->material = GOLD;
             break;
         default:

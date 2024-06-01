@@ -38,11 +38,11 @@ des.door("locked",51,04)
 -- Shops
 des.region({ region={12,01, 27,04}, lit=1, type="shop", filled=1 })
 des.region({ region={64,15, 72,17}, lit=1, type="shop", filled=1 })
--- Umbricius Scaurus
-des.monster({ id = "Umbricius Scaurus", coord = {51, 02}, inventory = function()
+-- Pasion
+des.monster({ id = "Pasion", coord = {51, 02}, inventory = function()
    des.object({ id = "skeleton key"});
 end })
--- guards for the office of Scaurus
+-- guards for Pasion's office
 des.monster("trader", 50, 02)
 des.monster("trader", 52, 02)
 des.monster("trader", 51, 03)

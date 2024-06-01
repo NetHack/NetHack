@@ -274,25 +274,25 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Cashier", 0 },
         { "Secretary", 0 },
         { "Bookkeeper", 0 },
-        { "Nummularius", 0 },
-        { "Coactore", 0 },
-        { "Faeneratore", 0 },
-        { "Argentarius", 0 },
-        { "Publican", 0 } },
-      "Mercury", "_Venus", "Mars", /* Roman/planets */
+        { "Branch Manager", 0 },
+        { "Regional Manager", 0 },
+        { "Department Head", 0 },
+        { "Executive", 0 },
+        { "Chairman", "Chairwoman" } },
+      "Attis", "Cybele", "Sabazios", /* Gods of Phrygia */
       "Mer",
-      "Genzano",
-      "the Shore of Nemi",
+      "Gordion",
+      "the Shore of Sakarya",
       PM_MERCHANT,
       NON_PM,
-      PM_UMBRICIUS_SCAURUS,
+      PM_PASION,
       PM_TRADER,
-      PM_EMPEROR_CALIGULA,
+      PM_SOSTRATUS,
       PM_GOLD_GOLEM,
       PM_GIANT_MIMIC,
       S_GOLEM,
       S_MIMIC,
-      ART_TOUCH_OF_MIDAS,
+      ART_CROWN_OF_MIDAS,
       MH_HUMAN | ROLE_MALE | ROLE_FEMALE | ROLE_LAWFUL | ROLE_NEUTRAL,
       /* Str Int Wis Dex Con Cha */
       { 7, 12, 10, 7, 7, 12 },
@@ -415,7 +415,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Archer", 0 },
         { "Sharpshooter", 0 },
         { "Marksman", "Markswoman" } },
-      "Thalna", "Selvans", "Laran", /* Etruscan */
+      "Mercury", "_Venus", "Mars", /* Roman/planets */
       "Ran",
       "Orion's camp",
       "the cave of the wumpus",
@@ -2150,8 +2150,6 @@ Hello(struct monst *mtmp)
     switch (Role_switch) {
     case PM_KNIGHT:
         return "Salutations"; /* Olde English */
-    case PM_MERCHANT:
-        return "Ave"; /* Latin */
     case PM_SAMURAI:
         return (mtmp && mtmp->data == &mons[PM_SHOPKEEPER])
                     ? "Irasshaimase"

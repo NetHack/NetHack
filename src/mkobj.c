@@ -3948,7 +3948,10 @@ static const struct icp horn_materials[] = {
 static const struct icp elvenhelm_materials[] = {
     {700, LEATHER},
     {200, COPPER},
-    { 99, WOOD},
+    { 90, WOOD},
+    {  5, CLOTH},
+    {  3, SILVER},
+    {  1, GOLD},
     {  1, SHADOW},
 };
 static const struct icp bow_materials[] = {
@@ -3988,6 +3991,9 @@ material_list(struct obj* obj)
         case HELM_OF_BRILLIANCE:
             return NULL;
         /* Any other cases for specific object types go here. */
+        case DUNCE_CAP:
+        case CORNUTHAUM:
+            return elvenhelm_materials;
         case SHIELD_OF_REFLECTION:
             return shiny_materials;
         case BOW:

@@ -9,21 +9,22 @@ des.map([[
 }}}}}}}}|.........|.........|............|.................|}}}}}}--------}}
 }}}}}}}}|.........+.........|-------------------------+----|}}}}}}}}}}}}}}}}
 }}}}}}}}|.........|.........|........|..........|..........|}}}}}}}}}}}}}}}}
-}}}}}}}}|.........|.........|........+..........|..........|}}}}}}}}}}}}}}}}
-}}}}}}}}|.........|.........|........|..........|..........|}}}}}}}}}}}}}}}}
-}}}}}}}}|----+-----------------------|------....+..........|}}}}}}}}}}}}}}}}
-}}}}}}}}|...............|............|.....|....|..........|}}}}}}}}}}}}}}}}
-}}}}}}}}|...............+............|.....|....|..........|}}}}}}}}}}}}}}}}
-}}}}}}}}-------.........|............|.....+....|...--------}}}}}}}}}}}}}}}}
-}}}}}}}}}}}}}}--------..|............|.....|---------}}}}}}}}}}}}}}}}}}}}}}}
-}}}}}}}}}}}}}}}}}}}}}---------......---------}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-}}}}}}}}}}}}}}}}}}}}}}}}}}}}}---..---}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-}}}}....................................................................}}}}
+T}}}}TTT|.........|.........|........+..........|..........|TTTTT}}}}}}}}TTT
+T}}TTTTT|.........|.........|........|..........|..........|TTTTTTT}}}}}TTTT
+TT}TTTTT|----+-----------------------|------....+..........|TTTTTTTTT}}TTTTT
+TT}TTTTT|...............|............|.....|....|..........|TTTTTTTTTT}}TTTT
+TT}}TTTT|...............+............|.....|....|..........|TTTTTTTTTTT}}TTT
+TTT}}TTT-------.........|............|.....+....|...--------TTTTTTTTTTTT}}}T
+TTT}}TTTTTTTTT--------..|............|.....|---------TTTTTTTTTTTTTTTTTTTTT}}
+TTT}}TTTTTTTTTTTTTTTT---------......---------TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+}}}}}TTTTTTTTTTTTTTTTTTTTTTT---..---TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+}}}}}TTTTTTTTTTTTTTTTTTTTTTTTTT..TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+}}}}....................................................................TTTT
 ............................................................................
 ]]);
 
 des.region(selection.area(00,00,75,19), "lit")
+des.replace_terrain({ region={00,00, 75,19}, fromterrain="T", toterrain=".", chance=20 })
 
 des.stair("up", 33, 19)
 
@@ -42,9 +43,9 @@ des.door("locked",48,10)
 des.door("locked",43,13)
 des.door("locked",37,08)
 
--- Caligula's room
-des.object({ id = "gauntlets of power", coord = {33, 8}, buc="cursed", spe=0, name="The Touch of Midas" })
-des.monster("Emperor Caligula", 33, 8)
+-- Sostratus' room
+des.object({ id = "dunce cap", coord = {33, 8}, buc="cursed", spe=3, name="The Crown of Midas" })
+des.monster("Sostratus", 33, 8)
 des.monster("succubus",33,9)
 des.monster("succubus",33,7)
 des.monster("incubus",34,8)
@@ -139,8 +140,8 @@ for i = 1,10 do
 	des.monster({id = "giant mimic", appear_as = "obj:gold piece", x = c.x, y = c.y})
 end
 
--- Incitatus' stable
-des.monster({id = "warhorse", x = 40, y = 13, peaceful = 1, asleep=1, name = "Incitatus"})
+-- Stable
+des.monster({id = "warhorse", x = 40, y = 13, peaceful = 1, asleep=1})
 incitatus_stable = selection.area(38,11,42,14)
 for i = 1,10 do
 	des.object("apple", incitatus_stable:rndcoord(1))

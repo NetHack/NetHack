@@ -224,10 +224,10 @@ static NEARDATA struct artifact artilist[] = {
       NO_ATTK, NO_DFNS, CARY(AD_MAGM), 0, A_LAWFUL, PM_KNIGHT, NON_PM, 1500L,
       NO_COLOR, MAGIC_MIRROR_OF_MERLIN),
 
-    A("The Touch of Midas", GAUNTLETS_OF_POWER,
+    A("The Crown of Midas", DUNCE_CAP,
       (SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_GOLD), 0, 0,
       NO_ATTK, DFNS(AD_STON), NO_CARY, 0, A_NEUTRAL, PM_MERCHANT, NON_PM, 20000L,
-      NO_COLOR, TOUCH_OF_MIDAS),
+      NO_COLOR, CROWN_OF_MIDAS),
 
     A("The Eyes of the Overworld", LENSES,
       (SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_XRAY), 0, 0, NO_ATTK,
