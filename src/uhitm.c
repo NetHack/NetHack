@@ -1212,6 +1212,12 @@ hmon_hitmon_misc_obj(
                 obj->owt = weight(obj);
                 if (hmd->thrown)
                     place_object(obj, mon->mx, mon->my);
+            } else if (obj->corpsenm == PM_PYROLISK) {
+                useup_eggs(obj);
+                explode(mon->mx, mon->my, -11, d(3, 6), 0, EXPL_FIERY);
+                hmd->doreturn = TRUE;
+                hmd->retval = !DEADMONSTER(mon);
+                return;
             } else {
                 pline("Splat!");
                 useup_eggs(obj);

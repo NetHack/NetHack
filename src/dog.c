@@ -991,6 +991,8 @@ dogfood(struct monst *mon, struct obj *obj)
         case ENORMOUS_MEATBALL:
             return carni ? DOGFOOD : MANFOOD;
         case EGG:
+            if (obj->corpsenm == PM_PYROLISK && !likes_fire(mptr))
+                return POISON;
             return carni ? CADAVER : MANFOOD;
         case CORPSE:
             if ((peek_at_iced_corpse_age(obj) + 50L <= gm.moves

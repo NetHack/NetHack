@@ -1402,6 +1402,8 @@ m_consume_obj(struct monst *mtmp, struct obj *otmp)
             mcureblindness(mtmp, canseemon(mtmp));
         if (ispet && deadmimic)
             quickmimic(mtmp);
+        if (otmp->otyp == EGG && corpsenm == PM_PYROLISK)
+            explode(mtmp->mx, mtmp->my, -11, d(3, 6), 0, EXPL_FIERY);
         if (corpsenm != NON_PM)
             mon_givit(mtmp, &mons[corpsenm]);
     }
@@ -1728,6 +1730,9 @@ mon_givit(struct monst *mtmp, struct permonst *ptr)
 {
     int prop = corpse_intrinsic(ptr);
     boolean vis = canseemon(mtmp);
+
+    if (DEADMONSTER(mtmp))
+        return;
 
     if (ptr == &mons[PM_STALKER]) {
         /*

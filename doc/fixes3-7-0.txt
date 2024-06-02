@@ -2587,6 +2587,7 @@ if hero is punished or tethered to a buried iron ball and has no inventory (or
 	in the status display so that it will be visible for screenshots or
 	during streaming video
 'query_menu' option to use a menu when asked certain yes/no questions
+pyrolisk eggs explode when broken
 
 
 Platform- and/or Interface-Specific New Features
