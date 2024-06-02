@@ -1952,8 +1952,8 @@ weight(struct obj *obj)
         /* 3.7: always weigh at least 1 unit; used to yield 0 for 1..49 */
         wt = (int) ((obj->quan + 50L) / 100L);
         return max(wt, 1);
-    } else if (obj->otyp == HEAVY_IRON_BALL && obj->owt != 0) {
-        return (int) obj->owt; /* kludge for "very" heavy iron ball */
+    } else if (obj->otyp == HEAVY_BALL && obj->owt != 0) {
+        return (int) obj->owt; /* kludge for "very" heavy ball */
     } else if (obj->otyp == CANDELABRUM_OF_INVOCATION && obj->spe) {
         return wt + obj->spe * (int) objects[TALLOW_CANDLE].oc_weight;
     }
@@ -4009,6 +4009,7 @@ material_list(struct obj* obj)
         case SKELETON_KEY:
         case LOCK_PICK:
         case TIN_OPENER:
+        case HEAVY_BALL:
             return metal_materials;
         case BELL:
         case BUGLE:

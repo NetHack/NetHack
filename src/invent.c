@@ -5206,7 +5206,7 @@ useupf(struct obj *obj, long numused)
 static NEARDATA const char *names[] = {
     0, "Illegal objects", "Weapons", "Armor", "Rings", "Amulets", "Tools",
     "Comestibles", "Potions", "Scrolls", "Spellbooks", "Wands", "Coins",
-    "Gems/Stones", "Boulders/Statues", "Iron balls", "Chains", "Venoms"
+    "Gems/Stones", "Boulders/Statues", "Heavy balls", "Chains", "Venoms"
 };
 static NEARDATA const char oth_symbols[] = { CONTAINED_SYM, '\0' };
 static NEARDATA const char *oth_names[] = { "Bagged/Boxed items" };

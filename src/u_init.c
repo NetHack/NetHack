@@ -1091,7 +1091,7 @@ ini_inv_mkobj_filter(int oclass, boolean got_level1_spellbook)
      * i.e. the discovery wishing, are still OK.
      * Also, don't get a couple of really useless items.  (Note:
      * punishment isn't "useless".  Some players who start out with
-     * one will immediately read it and use the iron ball as a
+     * one will immediately read it and use the heavy ball as a
      * weapon.)
      */
     obj = mkobj(oclass, FALSE);

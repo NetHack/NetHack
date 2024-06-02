@@ -1847,7 +1847,7 @@ buried_ball(coord *cc)
        then u.utraptype needs to be for buried ball */
     if (!u.utrap || u.utraptype == TT_BURIEDBALL) {
         for (otmp = gl.level.buriedobjlist; otmp; otmp = otmp->nobj) {
-            if (otmp->otyp != HEAVY_IRON_BALL)
+            if (otmp->otyp != HEAVY_BALL)
                 continue;
             /* if found at the target spot, we're done */
             if (otmp->ox == cc->x && otmp->oy == cc->y)
@@ -1934,7 +1934,7 @@ bury_an_obj(struct obj *otmp, boolean *dealloced)
     if (otmp == uball) {
         unpunish();
         set_utrap((unsigned) rn1(50, 20), TT_BURIEDBALL);
-        pline_The("iron ball gets buried!");
+        pline_The("heavy ball gets buried!");
     }
     /* after unpunish(), or might get deallocated chain */
     otmp2 = otmp->nexthere;
@@ -1978,7 +1978,7 @@ bury_an_obj(struct obj *otmp, boolean *dealloced)
 #if 0
     /* rusting of buried metal not yet implemented */
     } else if (is_rustprone(otmp)) {
-        (void) start_timer((long) rnd((otmp->otyp == HEAVY_IRON_BALL)
+        (void) start_timer((long) rnd((otmp->otyp == HEAVY_BALL)
                                          ? 1500
                                          : 250),
                            TIMER_OBJECT, RUST_METAL, obj_to_any(otmp));

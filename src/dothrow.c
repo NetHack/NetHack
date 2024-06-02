@@ -370,7 +370,7 @@ dothrow(void)
 
     obj = getobj("throw", throw_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
     /* it is also possible to throw food */
-    /* (or jewels, or iron balls... ) */
+    /* (or jewels, or heavy balls... ) */
 
     return obj ? throw_obj(obj, shotlimit) : ECMD_CANCEL;
 }
@@ -1097,7 +1097,7 @@ hurtle(int dx, int dy, int range, boolean verbose)
      * for diagonal movement, give the player a message and return.
      */
     if (Punished && !carried(uball)) {
-        You_feel("a tug from the iron ball.");
+        You_feel("a tug from the heavy ball.");
         nomul(0);
         return;
     } else if (u.utrap) {
@@ -1572,7 +1572,7 @@ throwit(struct obj *obj,
          * than 1, so the effects from throwing attached balls are
          * actually possible
          */
-        if (obj->otyp == HEAVY_IRON_BALL)
+        if (obj->otyp == HEAVY_BALL)
             range = urange - (int) (obj->owt / 100);
         else
             range = urange - (int) (obj->owt / 40);
@@ -1896,7 +1896,7 @@ omon_adj(struct monst *mon, struct obj *obj, boolean mon_notices)
     }
     /* some objects are more likely to hit than others */
     switch (obj->otyp) {
-    case HEAVY_IRON_BALL:
+    case HEAVY_BALL:
         if (obj != uball)
             tmp += 2;
         break;
@@ -2194,7 +2194,7 @@ thitmonst(
                 wakeup(mon, TRUE);
         }
 
-    } else if (otyp == HEAVY_IRON_BALL) {
+    } else if (otyp == HEAVY_BALL) {
         exercise(A_STR, TRUE);
         if (tmp >= dieroll) {
             int was_swallowed = guaranteed_hit;

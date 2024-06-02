@@ -340,7 +340,7 @@ worn_item_removal(
                     : 0;
     if (strip_art) { /* convert "a/an/the <object>" to "your object" */
         copynchars(article, objbuf, strip_art);
-        /* when removing attached iron ball, caller passes 'uchain';
+        /* when removing attached heavy ball, caller passes 'uchain';
            when formatted, it will be "an iron chain (attached to you)";
            change "an" to "the" rather than to "your" in that situation */
         (void) strsubst(objbuf, article, (obj == uchain) ? "the " : "your ");
@@ -611,7 +611,7 @@ steal(struct monst *mtmp, char *objnambuf)
     if (objnambuf)
         Strcpy(objnambuf, yname(otmp));
     /* usually set mavenge bit so knights won't suffer an alignment penalty
-       during retaliation; not applicable for removing attached iron ball */
+       during retaliation; not applicable for removing attached heavy ball */
     if (!Conflict && !(was_punished && !Punished))
         mtmp->mavenge = 1;
 

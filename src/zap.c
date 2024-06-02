@@ -4058,7 +4058,7 @@ bhit(
         }
         /* limit range of ball so hero won't make an invalid move */
         if (weapon == THROWN_WEAPON && range > 0
-            && obj->otyp == HEAVY_IRON_BALL) {
+            && obj->otyp == HEAVY_BALL) {
             struct obj *bobj;
             struct trap *t;
 

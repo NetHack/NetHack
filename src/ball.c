@@ -24,7 +24,7 @@ ballrelease(boolean showmsg)
 {
     if (carried(uball) && !welded(uball)) {
         if (showmsg)
-            pline("Startled, you drop the iron ball.");
+            pline("Startled, you drop the heavy ball.");
         if (uwep == uball)
             setuwep((struct obj *) 0);
         if (uswapwep == uball)
@@ -53,7 +53,7 @@ ballfall(void)
     if (gets_hit) {
         int dmg = rn1(7, 25);
 
-        pline_The("iron ball falls on your %s.", body_part(HEAD));
+        pline_The("heavy ball falls on your %s.", body_part(HEAD));
         if (uarmh) {
             if (hard_helmet(uarmh)) {
                 pline("Fortunately, you are wearing a hard helmet.");
@@ -61,7 +61,7 @@ ballfall(void)
             } else if (flags.verbose)
                 pline("%s does not protect you.", Yname2(uarmh));
         }
-        losehp(Maybe_Half_Phys(dmg), "crunched in the head by an iron ball",
+        losehp(Maybe_Half_Phys(dmg), "crunched in the head by a heavy ball",
                NO_KILLER_PREFIX);
     }
 }
@@ -773,7 +773,7 @@ drag_ball(coordxy x, coordxy y, int *bc_control,
  drag:
 
     if (near_capacity() > SLT_ENCUMBER && dist2(x, y, u.ux, u.uy) <= 2) {
-        You("cannot %sdrag the heavy iron ball.",
+        You("cannot %sdrag the heavy ball.",
             gi.invent ? "carry all that and also " : "");
         nomul(0);
         return FALSE;
@@ -787,13 +787,13 @@ drag_ball(coordxy x, coordxy y, int *bc_control,
         || ((t = t_at(uchain->ox, uchain->oy))
             && (is_pit(t->ttyp) || is_hole(t->ttyp)))) {
         if (Levitation) {
-            You_feel("a tug from the iron ball.");
+            You_feel("a tug from the heavy ball.");
             if (t)
                 t->tseen = 1;
         } else {
             struct monst *victim;
 
-            You("are jerked back by the iron ball!");
+            You("are jerked back by the heavy ball!");
             if ((victim = m_at(uchain->ox, uchain->oy)) != 0) {
                 int tmp;
                 int dieroll = rnd(20);
@@ -873,7 +873,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 /*
  *  drop_ball()
  *
- *  The punished hero drops or throws her iron ball.  If the hero is
+ *  The punished hero drops or throws her heavy ball.  If the hero is
  *  blind, we must reset the order and glyph.  Check for side effects.
  *  This routine expects the ball to be already placed.
  *
@@ -1002,31 +1002,31 @@ drag_down(void)
     forward = carried(uball) && (uwep == uball || !uwep || !rn2(3));
 
     if (carried(uball) && !welded(uball))
-        You("lose your grip on the iron ball.");
+        You("lose your grip on the heavy ball.");
 
     cls();  /* previous level is still displayed although you
                went down the stairs. Avoids bug C343-20 */
 
     if (forward) {
         if (rn2(6)) {
-            pline_The("iron ball drags you downstairs!");
+            pline_The("heavy ball drags you downstairs!");
             losehp(Maybe_Half_Phys(rnd(6)),
-                   "dragged downstairs by an iron ball", NO_KILLER_PREFIX);
+                   "dragged downstairs by a heavy ball", NO_KILLER_PREFIX);
             litter();
         }
     } else {
         if (rn2(2)) {
             Soundeffect(se_iron_ball_hits_you, 25);
-            pline_The("iron ball smacks into you!");
-            losehp(Maybe_Half_Phys(rnd(20)), "iron ball collision",
+            pline_The("heavy ball smacks into you!");
+            losehp(Maybe_Half_Phys(rnd(20)), "heavy ball collision",
                    KILLED_BY_AN);
             exercise(A_STR, FALSE);
             dragchance -= 2;
         }
         if ((int) dragchance >= rnd(6)) {
-            pline_The("iron ball drags you downstairs!");
+            pline_The("heavy ball drags you downstairs!");
             losehp(Maybe_Half_Phys(rnd(3)),
-                   "dragged downstairs by an iron ball", NO_KILLER_PREFIX);
+                   "dragged downstairs by a heavy ball", NO_KILLER_PREFIX);
             exercise(A_STR, FALSE);
             litter();
         }
@@ -1041,14 +1041,14 @@ bc_sanity_check(void)
 
     if (Punished && (!uball || !uchain)) {
         impossible("Punished without %s%s%s?",
-                   !uball ? "iron ball" : "",
+                   !uball ? "heavy ball" : "",
                    (!uball && !uchain) ? " and " : "",
                    !uchain ? "attached chain" : "");
     } else if (!Punished && (uball || uchain)) {
         impossible("Attached %s%s%s without being Punished?",
                    uchain ? "chain" : "",
                    (uchain && uball) ? " and " : "",
-                   uball ? "iron ball" : "");
+                   uball ? "heavy ball" : "");
     }
     /* ball is free when swallowed, when changing levels or during air bubble
        management on Plane of Water (both of which start and end in between
@@ -1057,7 +1057,7 @@ bc_sanity_check(void)
     freeball = (!uball || uball->where == OBJ_FREE
                 /* lie to simplify the testing logic */
                 || (freechain && uball->where == OBJ_INVENT));
-    if (uball && (uball->otyp != HEAVY_IRON_BALL
+    if (uball && (uball->otyp != HEAVY_BALL
                   || (uball->where != OBJ_FLOOR
                       && uball->where != OBJ_INVENT
                       && uball->where != OBJ_FREE)

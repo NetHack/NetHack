@@ -133,7 +133,7 @@ float_vs_flight(void)
         BFlying &= ~I_SPECIAL;
     /* being trapped on the ground (bear trap, web, molten lava survived
        with fire resistance, former lava solidified via cold, tethered
-       to a buried iron ball) overrides floating--the floor is reachable */
+       to a buried heavy ball) overrides floating--the floor is reachable */
     if ((HLevitation || ELevitation) && stuck_in_floor)
         BLevitation |= I_SPECIAL;
     else
@@ -1028,7 +1028,7 @@ polymon(int mntmp)
         if (attacktype(uptr, AT_SPIT))
             pline(use_thec, monsterc, "spit venom");
         if (uptr->mlet == S_NYMPH)
-            pline(use_thec, monsterc, "remove an iron ball");
+            pline(use_thec, monsterc, "remove a heavy ball");
         if (attacktype(uptr, AT_GAZE))
             pline(use_thec, monsterc, "gaze at monsters");
         if (might_hide && webmaker(uptr))

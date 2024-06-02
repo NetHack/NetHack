@@ -1658,7 +1658,7 @@ ship_object(struct obj *otmp, coordxy x, coordxy y, boolean shop_floor_obj)
     if (!cc.y)
         return FALSE;
 
-    /* objects other than attached iron ball always fall down ladder,
+    /* objects other than attached heavy ball always fall down ladder,
        but have a chance of staying otherwise */
     nodrop = (otmp == uball) || (otmp == uchain)
              || (toloc != MIGR_LADDER_UP && rn2(3));

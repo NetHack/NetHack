@@ -1243,7 +1243,7 @@ hit_bars(
             static const char *const barsounds[] = {
                 "", "Whang", "Whap", "Flapp", "Clink", "Clonk"
             };
-            int bsindx = (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL)
+            int bsindx = (obj_type == BOULDER || obj_type == HEAVY_BALL)
                          ? 1
                          : harmless_missile(otmp) ? 2
                          : is_flimsy(otmp) ? 3
@@ -1260,11 +1260,11 @@ hit_bars(
             noise = 4 * 4;
 
         if (your_fault && (otmp->otyp == WAR_HAMMER
-                           || otmp->otyp == HEAVY_IRON_BALL)) {
-            /* iron ball isn't a weapon or wep-tool so doesn't use obj->spe;
+                           || otmp->otyp == HEAVY_BALL)) {
+            /* heavy ball isn't a weapon or wep-tool so doesn't use obj->spe;
                weight is normally 480 but can be increased by increments
                of 160 (scrolls of punishment read while already punished) */
-            int spe = ((otmp->otyp == HEAVY_IRON_BALL) /* 3+ for iron ball */
+            int spe = ((otmp->otyp == HEAVY_BALL) /* 3+ for heavy ball */
                        ? ((int) otmp->owt / IRON_BALL_W_INCR)
                        : otmp->spe);
             /* chance: used in saving throw for the bars; more likely to

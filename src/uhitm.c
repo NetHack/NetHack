@@ -1093,7 +1093,7 @@ hmon_hitmon_misc_obj(
 {
     switch (obj->otyp) {
     case BOULDER:         /* 1d20 */
-    case HEAVY_IRON_BALL: /* 1d25 */
+    case HEAVY_BALL: /* 1d25 */
     case IRON_CHAIN:      /* 1d4+1 */
         hmd->dmg = dmgval(obj, mon);
         if (mon_hates_material(mon, obj->material)) {
@@ -1607,7 +1607,7 @@ hmon_hitmon_msg_hit(
         else /* hand_to_hand */
             You("%s %s%s",
                 (obj && (is_shield(obj)
-                         || obj->otyp == HEAVY_IRON_BALL)) ? "bash"
+                         || obj->otyp == HEAVY_BALL)) ? "bash"
                 : (obj && (objects[obj->otyp].oc_skill == P_WHIP
                            || is_wet_towel(obj))) ? "lash"
                   : Role_if(PM_BARBARIAN) ? "smite"
@@ -1887,7 +1887,7 @@ shade_aware(struct obj *obj)
      *    when it comes to shades.
      */
     if (obj->otyp == BOULDER
-        || obj->otyp == HEAVY_IRON_BALL
+        || obj->otyp == HEAVY_BALL
         || obj->otyp == IRON_CHAIN      /* dmgval handles those first three */
         || obj->otyp == MIRROR          /* silver in the reflective surface */
         || obj->otyp == CLOVE_OF_GARLIC /* causes shades to flee */

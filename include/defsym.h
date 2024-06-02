@@ -468,7 +468,7 @@
     OBJCLASS2(12, '$', COIN,   GOLD_SYM, S_coin, "coins", "pile of coins")
     OBJCLASS(13,  '*', GEM,    S_gem, "rocks", "gem or rock")
     OBJCLASS(14,  '`', ROCK,   S_rock, "large stones", "boulder or statue")
-    OBJCLASS(15,  '0', BALL,   S_ball, "iron balls", "iron ball")
+    OBJCLASS(15,  '0', BALL,   S_ball, "heavy balls", "heavy ball")
     OBJCLASS(16,  '_', CHAIN,  S_chain, "chains", "iron chain")
     OBJCLASS(17,  '.', VENOM,  S_venom, "venoms", "splash of venom")
 

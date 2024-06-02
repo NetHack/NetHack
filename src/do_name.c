@@ -651,8 +651,8 @@ docall_xname(struct obj *obj)
         otemp.known = 0; /* suppress tin type (homemade, &c) and mon type */
     else if (otemp.otyp == FIGURINE)
         otemp.corpsenm = NON_PM; /* suppress mon type */
-    else if (otemp.otyp == HEAVY_IRON_BALL)
-        otemp.owt = objects[HEAVY_IRON_BALL].oc_weight; /* not "very heavy" */
+    else if (otemp.otyp == HEAVY_BALL)
+        otemp.owt = objects[HEAVY_BALL].oc_weight; /* not "very heavy" */
     else if (otemp.oclass == FOOD_CLASS && otemp.globby)
         otemp.owt = 120; /* 6*20, neither a small glob nor a large one */
 

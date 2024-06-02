@@ -3772,7 +3772,7 @@ float_up(void)
             coord cc;
 
             cc.x = u.ux, cc.y = u.uy;
-            /* caveat: this finds the first buried iron ball within
+            /* caveat: this finds the first buried heavy ball within
                one step of the specified location, not necessarily the
                buried [former] uball at the original anchor point */
             (void) buried_ball(&cc);

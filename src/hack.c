@@ -690,7 +690,7 @@ still_chewing(coordxy x, coordxy y)
         if (metallivorous(gy.youmonst.data)) { /* should always be True here */
             /* arbitrary amount; unlike proper eating, nutrition is
                bestowed in a lump sum at the end */
-            int nut = (int) objects[HEAVY_IRON_BALL].oc_weight;
+            int nut = (int) objects[HEAVY_BALL].oc_weight;
 
             /* lesshungry() requires that victual be set up, so skip it;
                morehungry() of a negative amount will increase nutrition
@@ -760,7 +760,7 @@ dosinkfall(void)
     int dmg;
     boolean lev_boots = (uarmf && uarmf->otyp == LEVITATION_BOOTS),
             innate_lev = ((HLevitation & (FROMOUTSIDE | FROMFORM)) != 0L),
-            /* to handle being chained to buried iron ball, trying to
+            /* to handle being chained to buried heavy ball, trying to
                levitate but being blocked, then moving onto adjacent sink;
                no need to worry about being blocked by terrain because we
                couldn't be over a sink at the same time */
@@ -2819,7 +2819,7 @@ domove_core(void)
     /* must come after we finished picking up, in spoteffects() */
     if (cause_delay) {
         nomul(-2);
-        gm.multi_reason = "dragging an iron ball";
+        gm.multi_reason = "dragging a heavy ball";
         gn.nomovemsg = "";
     }
 
@@ -2940,7 +2940,7 @@ switch_terrain(void)
     } else if (BLevitation) {
         BLevitation &= ~FROMOUTSIDE;
         /* we're probably levitating now; if not, we must be chained
-           to a buried iron ball so get float_up() feedback for that */
+           to a buried heavy ball so get float_up() feedback for that */
         if (Levitation || BLevitation)
             float_up();
     }

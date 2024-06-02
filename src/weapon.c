@@ -342,9 +342,9 @@ dmgval(struct obj *otmp, struct monst *mon)
     if (ptr == &mons[PM_SHADE] && !shade_glare(otmp))
         tmp = 0;
 
-    /* "very heavy iron ball"; weight increase is in increments */
-    if (otyp == HEAVY_IRON_BALL && tmp > 0) {
-        int wt = (int) objects[HEAVY_IRON_BALL].oc_weight;
+    /* "very heavy ball"; weight increase is in increments */
+    if (otyp == HEAVY_BALL && tmp > 0) {
+        int wt = (int) objects[HEAVY_BALL].oc_weight;
 
         if ((int) otmp->owt > wt) {
             wt = ((int) otmp->owt - wt) / IRON_BALL_W_INCR;

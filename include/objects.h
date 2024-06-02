@@ -93,7 +93,7 @@ GENERIC("wand",       WAND_CLASS,    GENERIC_WAND),    /* [11] */
 GENERIC("coin",       COIN_CLASS,    GENERIC_COIN),    /* [12] */
 GENERIC("gem",        GEM_CLASS,     GENERIC_GEM),     /* [13] */
 GENERIC("large rock", ROCK_CLASS,    GENERIC_ROCK),    /* [14] bldr+statue */
-GENERIC("iron ball",  BALL_CLASS,    GENERIC_BALL),    /* [15] */
+GENERIC("heavy ball",  BALL_CLASS,    GENERIC_BALL),    /* [15] */
 GENERIC("iron chain", CHAIN_CLASS,   GENERIC_CHAIN),   /* [16] */
 GENERIC("venom",      VENOM_CLASS,   GENERIC_VENOM),   /* [17] */
 #undef GENERIC
@@ -1580,10 +1580,10 @@ OBJECT(OBJ("statue", NoDes),
        BITS(1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, P_NONE, MINERAL), 0,
        ROCK_CLASS, 900, 0, 2500, 0, 20, 20, 0, 0, 2500, CLR_WHITE, STATUE),
 
-OBJECT(OBJ("heavy iron ball", NoDes),
+OBJECT(OBJ("heavy ball", NoDes),
        BITS(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, WHACK, P_NONE, IRON), 0,
        BALL_CLASS, 1000, 0, 480, 10, 25, 25, 0, 0, 200, HI_METAL,
-                                                            HEAVY_IRON_BALL),
+                                                            HEAVY_BALL),
         /* +d4 when "very heavy" */
 OBJECT(OBJ("iron chain", NoDes),
        BITS(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, WHACK, P_NONE, IRON), 0,

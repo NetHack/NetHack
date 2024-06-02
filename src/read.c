@@ -2892,7 +2892,7 @@ void
 punish(struct obj *sobj)
 {
     /* angrygods() calls this with NULL sobj arg */
-    struct obj *reuse_ball = (sobj && sobj->otyp == HEAVY_IRON_BALL)
+    struct obj *reuse_ball = (sobj && sobj->otyp == HEAVY_BALL)
                                 ? sobj : (struct obj *) 0;
     /* analyzer doesn't know that the one caller that passes a NULL
      * sobj (angrygods) checks !Punished first, so add a guard */
@@ -2902,7 +2902,7 @@ punish(struct obj *sobj)
     if (!reuse_ball)
         You("are being punished for your misbehavior!");
     if (Punished) {
-        Your("iron ball gets heavier.");
+        Your("heavy ball gets heavier.");
         uball->owt += IRON_BALL_W_INCR * (1 + cursed_levy);
         return;
     }
