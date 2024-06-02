@@ -1473,7 +1473,11 @@ dopay(void)
     }
 
     if ((!sk && (!Blind || Blind_telepat)) || (!Blind && !seensk)) {
-        There("appears to be no shopkeeper here to receive your payment.");
+        if(Role_if(PM_MERCHANT)) {
+            There("appears to be no other shopkeeper here to receive your payment.");
+        } else {
+            There("appears to be no shopkeeper here to receive your payment.");
+        }
         return ECMD_OK;
     }
 
