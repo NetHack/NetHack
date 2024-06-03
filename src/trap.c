@@ -3674,8 +3674,10 @@ minstapetrify(struct monst *mon, boolean byplayer, int material)
 {
     if (resists_ston(mon))
         return;
-    if (poly_when_stoned(mon->data)) {
-        mon_to_stone(mon);
+    if (material && monmaterial(monsndx(mon->data)))
+        return;
+    if (poly_when_petrified(mon->data, material ? material : MINERAL)) {
+        mon_to_material(mon, material ? material : MINERAL);
         return;
     }
     if (!vamp_stone(mon))
@@ -5512,13 +5514,15 @@ help_monster_out(
     }
 
     /* is it a cockatrice?... */
-    if (touch_petrifies(mtmp->data) && !uarmg && !Stone_resistance) {
+    if ((touch_petrifies(mtmp->data) || (mtmp->mgoldtouch && monmaterial(monsndx(gy.youmonst.data)) != GOLD))
+        && !uarmg && !Stone_resistance) {
         const char *mtmp_pmname = mon_pmname(mtmp);
+        int petrify_mat = mtmp->mgoldtouch ? GOLD : MINERAL;
 
         You("grab the trapped %s using your bare %s.",
             mtmp_pmname, makeplural(body_part(HAND)));
 
-        if (poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM)) {
+        if (poly_when_petrified(gy.youmonst.data, petrify_mat) && polymon(determine_polymon(petrify_mat))) {
             display_nhwindow(WIN_MESSAGE, FALSE);
         } else {
             char kbuf[BUFSZ];

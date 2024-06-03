@@ -3642,16 +3642,18 @@ xkilled(
 
 #undef LEVEL_SPECIFIC_NOCORPSE
 
-/* changes the monster into a stone monster of the same type
-   this should only be called when poly_when_stoned() is true */
-void
-mon_to_stone(struct monst *mtmp)
+/* changes the monster into a monster of the same type and differing material
+   this should only be called when poly_when_petrified() is true */
+void mon_to_material(struct monst *mtmp, int material)
 {
     if (mtmp->data->mlet == S_GOLEM) {
-        /* it's a golem, and not a stone golem */
+        /* it's a golem, and not a golem of the correct material */
         if (canseemon(mtmp))
             pline("%s solidifies...", Monnam(mtmp));
-        if (newcham(mtmp, &mons[PM_STONE_GOLEM], NO_NC_FLAGS)) {
+        /* currently only petrifying to stone and gold are implemented
+           if petrification to other materials is added, consider that
+           determine_polymon might return a shade or skeleton */
+        if (newcham(mtmp, &mons[determine_polymon(material)], NO_NC_FLAGS)) {
             if (canseemon(mtmp))
                 pline("Now it's %s.", an(pmname(mtmp->data, Mgender(mtmp))));
         } else {
@@ -3660,6 +3662,15 @@ mon_to_stone(struct monst *mtmp)
         }
     } else
         impossible("Can't polystone %s!", a_monnam(mtmp));
+
+}
+
+/* changes the monster into a stone monster of the same type
+   this should only be called when poly_when_stoned() is true */
+void
+mon_to_stone(struct monst *mtmp)
+{
+    mon_to_material(mtmp, MINERAL);
 }
 
 boolean

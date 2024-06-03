@@ -727,7 +727,7 @@ polymon(int mntmp)
     boolean sticking = sticks(gy.youmonst.data) && u.ustuck && !u.uswallow,
             was_blind = !!Blind, dochange = FALSE, was_expelled = FALSE,
             was_hiding_under = u.uundetected && hides_under(gy.youmonst.data);
-    int mlvl, newMaxStr;
+    int mlvl, newMaxStr, petrify_mat;
 
     if (gm.mvitals[mntmp].mvflags & G_GENOD) { /* allow G_EXTINCT */
         You_feel("rather %s-ish.",
@@ -793,10 +793,15 @@ polymon(int mntmp)
     Strcat(buf, pmname(&mons[mntmp], flags.female ? FEMALE : MALE));
     You("%s %s!", (u.umonnum != mntmp) ? "turn into" : "feel like", an(buf));
 
-    if (Stoned && poly_when_stoned(&mons[mntmp])) {
-        /* poly_when_stoned already checked stone golem genocide */
-        mntmp = PM_STONE_GOLEM;
-        make_stoned(0L, "You turn to stone!", 0, (char *) 0, 0);
+    petrify_mat = u.petrify_material ? u.petrify_material : MINERAL;
+    if (Stoned && poly_when_petrified(&mons[mntmp], petrify_mat)) {
+        /* poly_when_stoned already checked golem genocide */
+        mntmp = determine_polymon(petrify_mat);
+        if(petrify_mat == GOLD) {
+            make_stoned(0L, "You turn to gold!", 0, (char *) 0, 0);;
+        } else {
+            make_stoned(0L, "You turn to stone!", 0, (char *) 0, 0);
+        }
     }
 
     u.mtimedone = rn1(500, 500);

@@ -75,14 +75,70 @@ noattacks(struct permonst *ptr)
     return TRUE;
 }
 
+int
+determine_polymon(int material)
+{
+    /* some of these choices are arbitrary */
+    switch(material) {
+    case IRON:
+    case COLD_IRON:
+    case METAL:
+    case MITHRIL:
+    case ADAMANTINE:
+        return PM_IRON_GOLEM;
+    case COPPER:
+    case SILVER:
+    case PLATINUM:
+    case GEMSTONE:
+    case MINERAL:
+        return PM_STONE_GOLEM;
+    case 0:
+    case FLESH:
+        /* there is no flesh type, but all food is type 0, so we use it */
+        return PM_FLESH_GOLEM;
+    case WOOD:
+        return PM_WOOD_GOLEM;
+    case LEATHER:
+        return PM_LEATHER_GOLEM;
+    case CLOTH:
+        return PM_ROPE_GOLEM;
+    case BONE:
+        return PM_SKELETON; /* nearest thing to "bone golem" */
+    case SHADOW:
+        return PM_SHADE; /* nearest thing to "shadow" */
+    case GOLD:
+        return PM_GOLD_GOLEM;
+    case GLASS:
+        return PM_GLASS_GOLEM;
+    case PAPER:
+        return PM_PAPER_GOLEM;
+    default:
+        /* if all else fails... */
+        return PM_STRAW_GOLEM;
+    }
+}
+
 /* does monster-type transform into something else when petrified? */
+boolean
+poly_when_petrified(struct permonst *ptr, int petrify_material)
+{
+    /* golems turn into golems of appropriate material unless latter is genocided */
+    if(is_golem(ptr)) {
+        int pm_index = determine_polymon(petrify_material);
+        if(!is_golem(&mons[pm_index])) {
+            pm_index = PM_STONE_GOLEM;
+        }
+        return (ptr != &mons[pm_index] && !(gm.mvitals[pm_index].mvflags & G_GENOD));
+        /* allow G_EXTINCT */
+    } else {
+        return FALSE;
+    }
+}
+
 boolean
 poly_when_stoned(struct permonst *ptr)
 {
-    /* non-stone golems turn into stone golems unless latter is genocided */
-    return (boolean) (is_golem(ptr) && ptr != &mons[PM_STONE_GOLEM]
-                      && !(gm.mvitals[PM_STONE_GOLEM].mvflags & G_GENOD));
-    /* allow G_EXTINCT */
+    return poly_when_petrified(ptr, MINERAL);
 }
 
 /* is 'mon' (possibly youmonst) protected against damage type 'adtype' via

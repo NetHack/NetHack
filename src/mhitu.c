@@ -2285,12 +2285,12 @@ passiveum_petrify(
         }
     }
 
-    if (!resists_ston(mtmp)
+    if (!resists_ston(mtmp) && monmaterial(monsndx(mtmp->data)) != material
         && (protector == 0L
             || (protector != ~0L
                 && (wornitems & protector) != protector))) {
-        if (poly_when_stoned(mtmp->data)) {
-            mon_to_stone(mtmp);
+        if (poly_when_petrified(mtmp->data, Gold_touch ? GOLD : MINERAL)) {
+            mon_to_material(mtmp, Gold_touch ? GOLD : MINERAL);
             return 1;
         }
         if(material == GOLD) {

@@ -3803,9 +3803,9 @@ mhitm_ad_halu(
 boolean
 do_stone_u(struct monst *mtmp, int material)
 {
-    if (!Stoned && !Stone_resistance
-        && !(poly_when_stoned(gy.youmonst.data)
-             && polymon(PM_STONE_GOLEM))) {
+    if (!Stoned && !Stone_resistance && !(material == GOLD && monmaterial(monsndx(gy.youmonst.data)) == GOLD)
+        && !(poly_when_petrified(gy.youmonst.data, material ? material : MINERAL)
+             && polymon(determine_polymon(material ? material : MINERAL)))) {
         int kformat = KILLED_BY_AN;
         const char *kname = pmname(mtmp->data, Mgender(mtmp));
 

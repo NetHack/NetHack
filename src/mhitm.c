@@ -221,9 +221,10 @@ mdisplacem(
      */
     gv.vis = (canspotmon(magr) && canspotmon(mdef));
 
-    if (touch_petrifies(pd) && !resists_ston(magr)) {
+    if ((touch_petrifies(pd) || (mdef->mgoldtouch && monmaterial(monsndx(magr->data)) != GOLD))
+        && !resists_ston(magr)) {
         if (!which_armor(magr, W_ARMG)) {
-            if (poly_when_stoned(pa)) {
+            if (poly_when_petrified(pa, mdef->mgoldtouch ? GOLD : MINERAL)) {
                 mon_to_stone(magr);
                 return M_ATTK_HIT; /* no damage during the polymorph */
             }
@@ -232,9 +233,9 @@ mdisplacem(
                     pline("%s tries to move %s out of %s way.", Monnam(magr),
                           mon_nam(mdef), is_rider(pa) ? "the" : mhis(magr));
                 }
-                pline("%s turns to stone!", Monnam(magr));
+                pline("%s turns to %s!", Monnam(magr), mdef->mgoldtouch ? "gold" : "stone");
             }
-            monstone(magr,0);
+            monstone(magr,mdef->mgoldtouch ? GOLD: 0);
             if (!DEADMONSTER(magr))
                 return M_ATTK_HIT; /* lifesaved */
             else if (magr->mtame && !gv.vis)
@@ -995,7 +996,7 @@ mdamagem(
 
     if ((touch_petrifies(pd) /* or flesh_petrifies() */
          || (mattk->adtyp == AD_DGST && pd == &mons[PM_MEDUSA])
-         || mdef->mgoldtouch)
+         || (mdef->mgoldtouch && monmaterial(monsndx(magr->data)) != GOLD))
         && !resists_ston(magr)) {
         long protector = attk_protection((int) mattk->aatyp),
              wornitems = magr->misc_worn_check;
