@@ -1,4 +1,4 @@
-/* NetHack 3.7	sys.c	$NHDT-Date: 1693083254 2023/08/26 20:54:14 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.7	sys.c	$NHDT-Date: 1717449153 2024/06/03 21:12:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -20,6 +20,8 @@ struct sysopt sysopt;
 void
 sys_early_init(void)
 {
+    const char *p;
+
     sysopt.support = (char *) 0;
     sysopt.recover = (char *) 0;
 #ifdef SYSCF
@@ -27,15 +29,22 @@ sys_early_init(void)
 #else
     sysopt.wizards = dupstr(WIZARD_NAME);
 #endif
+
+    if ((p = getenv("DEBUGFILES")) != 0) {
+        sysopt.debugfiles = dupstr(p);
+        sysopt.env_dbgfl = 1; /* prevent sysconf processing from overriding */
+    } else {
 #if defined(SYSCF) || !defined(DEBUGFILES)
-    sysopt.debugfiles = (char *) 0;
+        sysopt.debugfiles = (char *) 0;
 #else
-    sysopt.debugfiles = dupstr(DEBUGFILES);
+        sysopt.debugfiles = dupstr(DEBUGFILES);
 #endif
+        sysopt.env_dbgfl = 0;
+    }
+
 #ifdef DUMPLOG
     sysopt.dumplogfile = (char *) 0;
 #endif
-    sysopt.env_dbgfl = 0; /* haven't checked getenv("DEBUGFILES") yet */
     sysopt.shellers = (char *) 0;
     sysopt.explorers = (char *) 0;
     sysopt.genericusers = (char *) 0;
@@ -105,6 +114,7 @@ sysopt_release(void)
     if (sysopt.debugfiles)
         free((genericptr_t) sysopt.debugfiles),
         sysopt.debugfiles = (char *) 0;
+    sysopt.env_dbgfl = 0;
 #ifdef DUMPLOG
     if (sysopt.dumplogfile)
         free((genericptr_t) sysopt.dumplogfile), sysopt.dumplogfile=(char *) 0;
