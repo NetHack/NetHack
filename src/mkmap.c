@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkmap.c	$NHDT-Date: 1596498181 2020/08/03 23:43:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.7	mkmap.c	$NHDT-Date: 1717432093 2024/06/03 16:28:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) J. C. Collet, M. Stephenson and D. Cohrs, 1992   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -403,9 +403,11 @@ remove_rooms(int lx, int ly, int hx, int hy)
 }
 
 /*
- * Remove roomno from the rooms array, decrementing nroom.  Also updates
- * all level roomno values of affected higher numbered rooms.  Assumes
- * level structure contents corresponding to roomno have already been reset.
+ * Remove roomno from the rooms array, decrementing nroom.
+ * The last room is swapped from the being-removed room and locations
+ * within it have their roomno field updated.  Other rooms are unaffected.
+ * Assumes level structure contents corresponding to roomno have already
+ * been reset.
  * Currently handles only the removal of rooms that have no subrooms.
  */
 staticfn void
@@ -420,8 +422,7 @@ remove_room(unsigned int roomno)
         /* since the order in the array only matters for making corridors,
          * copy the last room over the one being removed on the assumption
          * that corridors have already been dug. */
-        (void) memcpy((genericptr_t) croom, (genericptr_t) maxroom,
-                      sizeof(struct mkroom));
+        *croom = *maxroom;
 
         /* since maxroom moved, update affected level roomno values */
         oroomno = gn.nroom + ROOMOFFSET;
