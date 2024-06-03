@@ -2035,7 +2035,7 @@ void
 tty_curs(
     winid window,
     int x, int y) /* not xchar: perhaps xchar is unsigned
-                                     * then curx-x would be unsigned too */
+                   * then curx-x would be unsigned too */
 {
     struct WinDesc *cw = 0;
     int cx = ttyDisplay->curx;
@@ -2051,10 +2051,9 @@ tty_curs(
 #if defined(TILES_IN_GLYPHMAP) && defined(MSDOS)
     adjust_cursor_flags(cw);
 #endif
-    cw->curx = --x; /* column 0 is never used */
-    cw->cury = y;
+
+    if (x < 1 || y < 0 || y >= cw->rows || x > cw->cols) {
 #ifdef DEBUG
-    if (x < 0 || y < 0 || y >= cw->rows || x > cw->cols) {
         const char *s = "[unknown type]";
 
         switch (cw->type) {
@@ -2078,16 +2077,14 @@ tty_curs(
             break;
         }
         debugpline4("bad curs positioning win %d %s (%d,%d)", window, s, x, y);
-        /* This return statement caused a functional difference between
-           DEBUG and non-DEBUG operation, so it is being commented
-           out. It caused tty_curs() to fail to move the cursor to the
-           location it needed to be if the x,y range checks failed,
-           leaving the next piece of output to be displayed at whatever
-           random location the cursor happened to be at prior. */
-
-        /* return; */
-    }
 #endif
+        /* for a while this 'return' was commented out, but that resulted in
+           using x,y as if they're good after discovering that they're bad */
+        return;
+    }
+    cw->curx = --x; /* column 0 is not used */
+    cw->cury = y;
+
     x += cw->offx;
     y += cw->offy;
 
