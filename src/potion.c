@@ -233,9 +233,10 @@ make_slimed(long xtime, const char *msg)
 
 /* start or stop petrification */
 void
-make_stoned(long xtime, const char *msg, int killedby, const char *killername)
+make_stoned(long xtime, const char *msg, int killedby, const char *killername, int material)
 {
     long old = Stoned;
+    u.petrify_material = material;
 
 #if 0   /* tell player even if hero is unconscious */
     if (Unaware)

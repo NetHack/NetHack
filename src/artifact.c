@@ -465,6 +465,23 @@ arti_reflects(struct obj *obj)
     return FALSE;
 }
 
+/* used to check whether a monster has the golden touch from an artifact */
+boolean
+arti_golden_touch(struct obj *obj)
+{
+    const struct artifact *arti = get_artifact(obj);
+
+    if (arti != &artilist[ART_NONARTIFACT]) {
+        /* while being worn */
+        if ((obj->owornmask & ~W_ART) && (arti->spfx & SPFX_GOLD))
+            return TRUE;
+        /* just being carried - should not be possible*/
+        if (arti->cspfx & SPFX_GOLD)
+            return TRUE;
+    }
+    return FALSE;
+}
+
 /* decide whether this obj is effective when attacking against shades;
    does not consider the bonus for blessed objects versus undead */
 boolean

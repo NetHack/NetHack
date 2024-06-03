@@ -994,14 +994,22 @@ mdamagem(
     mhm.done = FALSE;
 
     if ((touch_petrifies(pd) /* or flesh_petrifies() */
-         || (mattk->adtyp == AD_DGST && pd == &mons[PM_MEDUSA]))
+         || (mattk->adtyp == AD_DGST && pd == &mons[PM_MEDUSA])
+         || mdef->mgoldtouch)
         && !resists_ston(magr)) {
         long protector = attk_protection((int) mattk->aatyp),
              wornitems = magr->misc_worn_check;
-
         /* wielded weapon gives same protection as gloves here */
-        if (mwep)
+        if (mwep) {
             wornitems |= W_ARMG;
+            if(mdef->mgoldtouch) {
+                struct obj* new_wep = turn_object_to_gold(mwep, canseemon(magr));
+                if(mwep != new_wep) {
+                    mpickobj(magr, new_wep);
+                    return M_ATTK_MISS;
+                }
+            }
+        }
 
         if (protector == 0L
             || (protector != ~0L && (wornitems & protector) != protector)) {
@@ -1010,8 +1018,8 @@ mdamagem(
                 return M_ATTK_HIT; /* no damage during the polymorph */
             }
             if (gv.vis && canspotmon(magr))
-                pline("%s turns to stone!", Monnam(magr));
-            monstone(magr,0);
+                pline("%s turns to %s!", Monnam(magr), mdef->mgoldtouch ? "gold" : "stone");
+            monstone(magr, magr->mgoldtouch ? GOLD : 0);
             if (!DEADMONSTER(magr))
                 return M_ATTK_HIT; /* lifesaved */
             else if (magr->mtame && !gv.vis)

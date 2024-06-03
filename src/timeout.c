@@ -129,18 +129,37 @@ static NEARDATA const char *const stoned_texts[] = {
     "You are a statue."                 /* 1 */
 };
 
+static NEARDATA const char *const golded_texts[] = {
+    "You are slowing down.",            /* 5 */
+    "Your limbs are stiffening.",       /* 4 */
+    "Your limbs have turned to gold.",  /* 3 */
+    "You have turned to gold.",         /* 2 */
+    "You are a gold statue."            /* 1 */
+};
+
 staticfn void
 stoned_dialogue(void)
 {
     long i = (Stoned & TIMEOUT);
 
-    if (i > 0L && i <= SIZE(stoned_texts)) {
-        char buf[BUFSZ];
+    if(u.petrify_material == GOLD) {
+        if (i > 0L && i <= SIZE(golded_texts)) {
+            char buf[BUFSZ];
 
-        Strcpy(buf, stoned_texts[SIZE(stoned_texts) - i]);
-        if (nolimbs(gy.youmonst.data) && strstri(buf, "limbs"))
-            (void) strsubst(buf, "limbs", "extremities");
-        urgent_pline("%s", buf);
+            Strcpy(buf, golded_texts[SIZE(golded_texts) - i]);
+            if (nolimbs(gy.youmonst.data) && strstri(buf, "limbs"))
+                (void) strsubst(buf, "limbs", "extremities");
+            urgent_pline("%s", buf);
+        }
+    } else {
+        if (i > 0L && i <= SIZE(stoned_texts)) {
+            char buf[BUFSZ];
+
+            Strcpy(buf, stoned_texts[SIZE(stoned_texts) - i]);
+            if (nolimbs(gy.youmonst.data) && strstri(buf, "limbs"))
+                (void) strsubst(buf, "limbs", "extremities");
+            urgent_pline("%s", buf);
+        }
     }
     switch ((int) i) {
     case 5: /* slowing down */
@@ -431,7 +450,7 @@ slime_dialogue(void)
     case 1L: /* turning into slime */
         /* if also turning to stone, stop doing that (no message) */
         if (Stoned)
-            make_stoned(0L, (char *) 0, KILLED_BY_AN, (char *) 0);
+            make_stoned(0L, (char *) 0, KILLED_BY_AN, (char *) 0, 0);
         break;
     }
     exercise(A_DEX, FALSE);

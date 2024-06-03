@@ -148,6 +148,7 @@ extern boolean arti_immune(struct obj *, int);
 extern boolean spec_ability(struct obj *, unsigned long);
 extern boolean confers_luck(struct obj *) NONNULLPTRS;
 extern boolean arti_reflects(struct obj *);
+extern boolean arti_golden_touch(struct obj *);
 extern boolean shade_glare(struct obj *) NONNULLPTRS;
 extern boolean restrict_name(struct obj *, const char *) NONNULLPTRS;
 extern boolean attacks(int, struct obj *);
@@ -2431,7 +2432,7 @@ extern void make_confused(long, boolean);
 extern void make_stunned(long, boolean);
 extern void make_sick(long, const char *, boolean, int) NO_NNARGS;
 extern void make_slimed(long, const char *) NO_NNARGS;
-extern void make_stoned(long, const char *, int, const char *) NO_NNARGS;
+extern void make_stoned(long, const char *, int, const char *, int) NO_NNARGS;
 extern void make_vomiting(long, boolean);
 extern void make_blinded(long, boolean);
 extern void toggle_blindness(void);
@@ -3333,7 +3334,7 @@ extern void mhitm_ad_mtrl(struct monst *, struct attack *, struct monst *,
                            struct mhitm_data *) NONNULLPTRS;
 extern void mhitm_adtyping(struct monst *, struct attack *, struct monst *,
                            struct mhitm_data *) NONNULLPTRS;
-extern boolean do_stone_u(struct monst *) NONNULLARG1;
+extern boolean do_stone_u(struct monst *, int) NONNULLARG1;
 extern void do_stone_mon(struct monst *, struct attack *, struct monst *,
                          struct mhitm_data *) NONNULLARG134;
 extern int damageum(struct monst *, struct attack *, int) NONNULLARG12;

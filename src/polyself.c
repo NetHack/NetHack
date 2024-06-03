@@ -404,7 +404,7 @@ newman(void)
     if (Sick)
         make_sick(0L, (char *) 0, FALSE, SICK_ALL);
     if (Stoned)
-        make_stoned(0L, (char *) 0, 0, (char *) 0);
+        make_stoned(0L, (char *) 0, 0, (char *) 0, 0);
     if (u.uhp <= 0) {
         if (Polymorph_control) { /* even when Stunned || Unaware */
             if (u.uhp <= 0)
@@ -796,7 +796,7 @@ polymon(int mntmp)
     if (Stoned && poly_when_stoned(&mons[mntmp])) {
         /* poly_when_stoned already checked stone golem genocide */
         mntmp = PM_STONE_GOLEM;
-        make_stoned(0L, "You turn to stone!", 0, (char *) 0);
+        make_stoned(0L, "You turn to stone!", 0, (char *) 0, 0);
     }
 
     u.mtimedone = rn1(500, 500);
@@ -822,7 +822,7 @@ polymon(int mntmp)
 
     if (Stone_resistance && Stoned) { /* parnes@eniac.seas.upenn.edu */
         make_stoned(0L, "You no longer seem to be petrifying.", 0,
-                    (char *) 0);
+                    (char *) 0, 0);
     }
     if (Sick_resistance && Sick) {
         make_sick(0L, (char *) 0, FALSE, SICK_ALL);

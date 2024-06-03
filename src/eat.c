@@ -630,7 +630,7 @@ eat_brains(
         if (magr == &gy.youmonst) {
             if (!Stone_resistance && !Stoned)
                 make_stoned(5L, (char *) 0, KILLED_BY_AN,
-                            pmname(pd, Mgender(mdef)));
+                            pmname(pd, Mgender(mdef)), 0);
         } else {
             /* no need to check for poly_when_stoned or Stone_resistance;
                mind flayers don't have those capabilities */
@@ -861,7 +861,7 @@ fix_petrification(void)
                 ACURR(A_CHA) > 15 ? "fine " : "");
     else
         Strcpy(buf, "You feel limber!");
-    make_stoned(0L, buf, 0, (char *) 0);
+    make_stoned(0L, buf, 0, (char *) 0, 0);
 }
 
 /*
@@ -2478,7 +2478,7 @@ fpostfx(struct obj *otmp)
                 if (!Stoned) {
                     Sprintf(gk.killer.name, "%s egg",
                             mons[otmp->corpsenm].pmnames[NEUTRAL]);
-                    make_stoned(5L, (char *) 0, KILLED_BY_AN, gk.killer.name);
+                    make_stoned(5L, (char *) 0, KILLED_BY_AN, gk.killer.name, 0);
                 }
             }
             /* note: no "tastes like chicken" message for eggs */

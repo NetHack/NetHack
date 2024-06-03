@@ -376,7 +376,7 @@ fix_worst_trouble(int trouble)
 
     switch (trouble) {
     case TROUBLE_STONED:
-        make_stoned(0L, "You feel more limber.", 0, (char *) 0);
+        make_stoned(0L, "You feel more limber.", 0, (char *) 0, 0);
         break;
     case TROUBLE_SLIMED:
         make_slimed(0L, "The slime disappears.");

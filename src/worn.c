@@ -511,6 +511,14 @@ update_mon_extrinsics(
     int which = (int) objects[obj->otyp].oc_oprop,
         altwhich = altprop(obj);
 
+    if(arti_golden_touch(obj)) {
+        if(!which) {
+            which = GOLD_TOUCH;
+        } else if(!altwhich) {
+            altwhich = GOLD_TOUCH;
+        }
+    }
+
     unseen = !canseemon(mon);
     if (!which && !altwhich)
         goto maybe_blocks;
@@ -527,6 +535,10 @@ update_mon_extrinsics(
                 gi.in_mklev = TRUE;
             mon_adjust_speed(mon, 0, obj);
             gi.in_mklev = save_in_mklev;
+            break;
+        }
+        case GOLD_TOUCH: {
+            mon->mgoldtouch = TRUE;
             break;
         }
         /* properties handled elsewhere */
@@ -569,6 +581,10 @@ update_mon_extrinsics(
                 gi.in_mklev = TRUE;
             mon_adjust_speed(mon, 0, obj);
             gi.in_mklev = save_in_mklev;
+            break;
+        }
+        case GOLD_TOUCH: {
+            mon->mgoldtouch = FALSE;
             break;
         }
         case FIRE_RES:

@@ -844,6 +844,10 @@ hmon_hitmon_barehands(struct _hitmon_data *hmd, struct monst *mon)
         }
     }
 
+    if(mon->mgoldtouch) {
+        do_stone_u(mon, GOLD);
+    }
+
     if (hmd->mdat == &mons[PM_SHADE]) {
         hmd->dmg = 0;
     } else {
@@ -1349,6 +1353,19 @@ hmon_hitmon_do_hit(
     if (!obj) { /* attack with bare hands */
         hmon_hitmon_barehands(hmd, mon);
     } else {
+        if(mon->mgoldtouch) {
+            struct obj* new_obj = turn_object_to_gold(obj, TRUE);
+            if(obj != new_obj) {
+                if(hmd->thrown == HMON_THROWN) {
+                    mpickobj(mon, new_obj);
+                } else {
+                    pick_obj(new_obj);
+                }
+                hmd->doreturn = TRUE;
+                hmd->retval = TRUE;
+                return;
+            }
+        }
         /* obj is not NULL here because of the !obj check in this if block,
          , so no guard is needed ahead of stone_missile(obj) */
         /* stone missile does not hurt xorn or earth elemental, but doesn't
@@ -3784,7 +3801,7 @@ mhitm_ad_halu(
 }
 
 boolean
-do_stone_u(struct monst *mtmp)
+do_stone_u(struct monst *mtmp, int material)
 {
     if (!Stoned && !Stone_resistance
         && !(poly_when_stoned(gy.youmonst.data)
@@ -3797,7 +3814,7 @@ do_stone_u(struct monst *mtmp)
                 kname = the(kname);
             kformat = KILLED_BY;
         }
-        make_stoned(5L, (char *) 0, kformat, kname);
+        make_stoned(5L, (char *) 0, kformat, kname, material);
         return 1;
         /* done_in_by(mtmp, STONING); */
     }
@@ -3912,7 +3929,7 @@ mhitm_ad_phys(
                     pline("%s hits you with the %s corpse.", Monnam(magr),
                           mons[otmp->corpsenm].pmnames[NEUTRAL]);
                     if (!Stoned) {
-                        if (do_stone_u(magr)) {
+                        if (do_stone_u(magr, 0)) {
                             mhm->hitflags = M_ATTK_HIT;
                             mhm->done = 1;
                             return;
@@ -3972,6 +3989,15 @@ mhitm_ad_phys(
                        || magr != u.ustuck) {
                 hitmsg(magr, mattk);
                 mhm->hitflags |= M_ATTK_HIT;
+            }
+
+            if(magr->mgoldtouch) {
+                if(!otmp || (mhm->hitflags & M_ATTK_HIT) > 0) {
+                    if (do_stone_u(magr, GOLD)) {
+                        mhm->done = 1;
+                        return;
+                    }
+                }
             }
         }
     } else {
@@ -4085,7 +4111,7 @@ mhitm_ad_ston(
                  * during a new moon could become quite a bit harder.
                  */
                 if (!rn2(10) || flags.moonphase == NEW_MOON) {
-                    if (do_stone_u(magr)) {
+                    if (do_stone_u(magr, 0)) {
                         mhm->hitflags = M_ATTK_HIT;
                         mhm->done = TRUE;
                         return;
