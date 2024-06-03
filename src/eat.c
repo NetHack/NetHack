@@ -2031,7 +2031,14 @@ fprefx(struct obj *otmp)
             useup(otmp);
             explode(u.ux, u.uy, -11, d(3, 6), 0, EXPL_FIERY);
             return FALSE;
-        }
+        } else if (stale_egg(otmp)) {
+            pline("Ugh.  Rotten egg."); /* perhaps others like it */
+            /* increasing existing nausea means that it will take longer
+               before eventual vomit, but also means that constitution
+               will be abused more times before illness completes */
+            make_vomiting((Vomiting & TIMEOUT) + (long) d(10, 4), TRUE);
+        } else
+            goto give_feedback;
         break;
     case FOOD_RATION: /* nutrition 800 */
         /* 200+800 remains below 1000+1, the satiation threshold */
@@ -2116,12 +2123,6 @@ fprefx(struct obj *otmp)
                             : "Yo' mama");
             }
 #endif
-        } else if (otmp->otyp == EGG && stale_egg(otmp)) {
-            pline("Ugh.  Rotten egg."); /* perhaps others like it */
-            /* increasing existing nausea means that it will take longer
-               before eventual vomit, but also means that constitution
-               will be abused more times before illness completes */
-            make_vomiting((Vomiting & TIMEOUT) + (long) d(10, 4), TRUE);
         } else {
  give_feedback:
             pline("This %s is %s", singular(otmp, xname),
