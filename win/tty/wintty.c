@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.c	$NHDT-Date: 1715979847 2024/05/17 21:04:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.406 $ */
+/* NetHack 3.7	wintty.c	$NHDT-Date: 1717482166 2024/06/04 06:22:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.408 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2052,8 +2052,8 @@ tty_curs(
     adjust_cursor_flags(cw);
 #endif
 
-    if (x < 1 || y < 0 || y >= cw->rows || x > cw->cols) {
 #ifdef DEBUG
+    if (x < 1 || y < 0 || y >= cw->rows || x > cw->cols) {
         const char *s = "[unknown type]";
 
         switch (cw->type) {
@@ -2076,12 +2076,18 @@ tty_curs(
             s = "[base window]";
             break;
         }
-        debugpline4("bad curs positioning win %d %s (%d,%d)", window, s, x, y);
-#endif
-        /* for a while this 'return' was commented out, but that resulted in
-           using x,y as if they're good after discovering that they're bad */
-        return;
+        /* avoid sending a line to the message window if we're complaining
+           about cursor positioning in message window; perhaps raw_printf?
+           this ought to be using impossible() so that someone might
+           actually see it */
+        if (cw->type != NHW_MESSAGE)
+            debugpline4("tty_curs: bad positioning win %d %s <%d,%d>",
+                        window, s, x, y);
+        /* don't try to fix up x,y here because then tty_curs() would
+           behave differently depending on whether DEBUG is defined;
+           garbage in, garbage out is the order of the day... */
     }
+#endif /* DEBUG */
     cw->curx = --x; /* column 0 is not used */
     cw->cury = y;
 
