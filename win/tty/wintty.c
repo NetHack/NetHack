@@ -788,6 +788,7 @@ getret(void)
 void
 tty_suspend_nhwindows(const char *str)
 {
+    term_curs_set(1);
     settty(str); /* calls end_screen, perhaps raw_print */
     if (!str)
         tty_raw_print(""); /* calls fflush(stdout) */
@@ -798,6 +799,7 @@ tty_resume_nhwindows(void)
 {
     gettty();
     setftty(); /* calls start_screen */
+    term_curs_set(0);
     docrt();
 }
 
@@ -814,7 +816,6 @@ tty_exit_nhwindows(const char *str)
 {
     winid i;
 
-    term_curs_set(1);
     tty_suspend_nhwindows(str);
     /*
      * Disable windows to avoid calls to window routines.

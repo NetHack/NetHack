@@ -2026,6 +2026,7 @@ tty: if a group accelerator matched a menu command ('^' in menu for '/')
 	it wouldn't work to select, just to manipulate the menu
 tty: after resize changes which included screen erasure changes, ^C and yes|y
 	to "Really quit?" while a menu was open would lead to a panic
+tty: make cursor visible again when using ! or ^Z to temporarily leave nethack
 Unix: after lua changes to Makefiles, 'make spotless' for dat subdirectory
 	left some generated data files which should have been deleted
 Unix: reject "--sX" on command line except if "X" is "cores" (so "--scores");
