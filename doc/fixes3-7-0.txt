@@ -1414,6 +1414,7 @@ shopkeepers magnified the cost of shop items used up as a group; normally
 the tile for Ixoth (knight's quest nemesis) depicted a demon rather than a
 	dragon; change it to be a red dragon
 untrapping containers or doors gives some experience
+only honor DEBUGFILES (for activating debugpline() calls) when in wizard mode
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
