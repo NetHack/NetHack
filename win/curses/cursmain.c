@@ -860,6 +860,7 @@ void
 curses_wait_synch(void)
 {
     if (iflags.raw_printed) {
+#ifndef PDCURSES
         int chr;
         /*
          * If any message has been issued via raw_print(), make the user
@@ -873,6 +874,7 @@ curses_wait_synch(void)
         do {
             chr = fgetc(stdin);
         } while (chr > 0 && chr != C('j') && chr != C('m') && chr != '\033');
+#endif
         iflags.raw_printed = 0;
     }
 
