@@ -1,4 +1,4 @@
-/* NetHack 3.7	were.c	$NHDT-Date: 1689448846 2023/07/15 19:20:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.7	were.c	$NHDT-Date: 1717570494 2024/06/05 06:54:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.36 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -127,6 +127,13 @@ new_were(struct monst *mon)
     newsym(mon->mx, mon->my);
     mon_break_armor(mon, FALSE);
     possibly_unwield(mon, FALSE);
+
+    /* vision capability isn't changing so we don't call set_apparxy() to
+       update mon's idea of where hero is; peaceful check is redundant */
+    if (gc.context.mon_moving && !mon->mpeaceful
+        && onscary(mon->mux, mon->muy, mon)
+        && monnear(mon, mon->mux, mon->muy))
+        monflee(mon, rn1(9, 2), TRUE, TRUE); /* 2..10 turns */
 }
 
 /* were-creature (even you) summons a horde */

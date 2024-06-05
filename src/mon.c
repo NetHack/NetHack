@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1716588803 2024/05/24 22:13:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.568 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1717570485 2024/06/05 06:54:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.573 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5281,6 +5281,20 @@ newcham(
     }
     if (mtmp == u.usteed)
         poly_steed(mtmp, olddata);
+
+    /* old form might not have been affected by Elbereth but perhaps the
+       new form is */
+    if (gc.context.mon_moving) {
+        /* give 'mtmp' a new chance to pinpoint hero's location */
+        if (!u_at(mtmp->mux, mtmp->muy))
+            set_apparxy(mtmp);
+        /* if hero is on Elbereth or scare monster, mtmp in new form might
+           become scared */
+        if (!mtmp->mpeaceful
+            && onscary(mtmp->mux, mtmp->muy, mtmp)
+            && monnear(mtmp, mtmp->mux, mtmp->muy))
+            monflee(mtmp, rn1(9, 2), TRUE, TRUE); /* 2..10 turns */
+    }
 
     return 1;
 }

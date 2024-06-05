@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1435 $ $NHDT-Date: 1715984437 2024/05/17 22:20:37 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1442 $ $NHDT-Date: 1717570484 2024/06/05 06:54:44 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1415,6 +1415,9 @@ the tile for Ixoth (knight's quest nemesis) depicted a demon rather than a
 	dragon; change it to be a red dragon
 untrapping containers or doors gives some experience
 only honor DEBUGFILES (for activating debugpline() calls) when in wizard mode
+if hero is on scroll of scare monster or Elbereth, werecreature switching from
+	human to beast form or general monster polymorphing into a susceptible
+	form will become scared right away instead on its next move
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
