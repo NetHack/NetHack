@@ -1567,6 +1567,16 @@ process_menu_window(winid window, struct WinDesc *cw)
                 goto group_accel;
 
             count = (count * 10L) + (long) (morc - '0');
+
+	    /* debugfuzzer can easily push the input to overflow
+	       long and cause ubsan to be upset. There is no practical
+	       need to have such a big counts. Limit max for what int
+	       could hold. That is 8 digits so should be enough. */
+	    if (count >= (1L << 30)) {
+	        finished = TRUE;
+	        break;
+	    }
+
             /*
              * It is debatable whether we should allow 0 to
              * start a count.  There is no difference if the
