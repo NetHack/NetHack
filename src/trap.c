@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1708283914 2024/02/18 19:18:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.577 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1717884802 2024/06/08 22:13:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.598 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4277,8 +4277,9 @@ fire_damage(
     if (catch_lit(obj))
         return FALSE;
 
-    if (Is_container(obj)) {
+    if (Is_container(obj) || obj->otyp == STATUE) {
         switch (obj->otyp) {
+        case STATUE:
         case ICE_BOX:
             return FALSE; /* Immune */
         case CHEST:
@@ -4292,8 +4293,12 @@ fire_damage(
             break;
         }
         if ((!force && (Luck + 5) > rn2(chance))
-            || (is_flammable(obj) && obj->oerodeproof))
+            /* note: containers aren't subject to erosion so are never
+               marked fireproof/corrodeproof/&c */
+            /*|| (is_flammable(obj) && obj->oerodeproof)*/
+            ) {
             return FALSE;
+        }
         /* Container is burnt up - dump contents out */
         if (in_sight)
             pline("%s catches fire and burns.", Yname2(obj));
