@@ -1,4 +1,4 @@
-/* NetHack 3.7  wintype.h       $NHDT-Date: 1700470031 2023/11/20 08:47:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
+/* NetHack 3.7  wintype.h       $NHDT-Date: 1717880364 2024/06/08 20:59:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.52 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -96,7 +96,7 @@ typedef struct glyph_map_entry {
         g_info initialization in display.c
         nul_glyphinfo initialization in display.c
  */
-typedef struct gi {
+typedef struct glyphinfo {
     int glyph;            /* the display entity */
     int ttychar;
     uint32 framecolor;
