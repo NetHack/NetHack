@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1442 $ $NHDT-Date: 1717570484 2024/06/05 06:54:44 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1443 $ $NHDT-Date: 1717878584 2024/06/08 20:29:44 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1954,6 +1954,8 @@ on medusa-4, Medusa and the downstairs were located in different chambers
 on medusa-3 and medusa-4, Perseus's statue was located in a different chamber
 	from Medusa
 omit "a" from "drowned in a limitless water" when drowning on Plane of Water
+restoring a save file could trigger impossible "rnd(0) attempted" if it tried
+	to make an unhidden mimic hide an an object
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

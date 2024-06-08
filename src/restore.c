@@ -1,4 +1,4 @@
-/* NetHack 3.7	restore.c	$NHDT-Date: 1686726258 2023/06/14 07:04:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.211 $ */
+/* NetHack 3.7	restore.c	$NHDT-Date: 1717878585 2024/06/08 20:29:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.228 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -709,6 +709,8 @@ restlevelstate(void)
     return;
 }
 
+/* after getlev(), put current level into a level/lock file;
+   essential when splitting a save file into individual level files */
 /*ARGSUSED*/
 staticfn int
 restlevelfile(xint8 ltmp)
@@ -718,8 +720,8 @@ restlevelfile(xint8 ltmp)
 
     nhfp = create_levelfile(ltmp, whynot);
     if (!nhfp) {
-        /* BUG: should suppress any attempt to write a panic
-           save file if file creation is now failing... */
+        /* failed to create a new file; don't attempt to make a panic save */
+        gp.program_state.something_worth_saving = 0;
         panic("restlevelfile: %s", whynot);
     }
     bufon(nhfp->fd);
@@ -756,6 +758,9 @@ dorecover(NHFILE *nhfp)
         gp.program_state.restoring = 0;
         return 0;
     }
+    /* after restgamestate() -> restnames() so that 'bases[]' is populated */
+    init_oclass_probs(); /* recompute go.oclass_prob_totals[] */
+
     restlevelstate();
 #ifdef INSURANCE
     savestateinlock();
@@ -825,6 +830,9 @@ dorecover(NHFILE *nhfp)
     (void) validate(nhfp, (char *) 0, FALSE);
     get_plname_from_file(nhfp, gp.plname);
 
+    /* not 0 nor REST_GSTATE nor REST_LEVELS */
+    gp.program_state.restoring = REST_CURRENT_LEVEL;
+
     getlev(nhfp, 0, (xint8) 0);
     close_nhfile(nhfp);
     restlevelstate();
@@ -836,7 +844,6 @@ dorecover(NHFILE *nhfp)
         assign_graphics(ROGUESET);
     reset_glyphmap(gm_levelchange);
     max_rank_sz(); /* to recompute gm.mrank_sz (botl.c) */
-    init_oclass_probs(); /* recompute go.oclass_prob_totals[] */
 
     if ((uball && !uchain) || (uchain && !uball)) {
         impossible("restgamestate: lost ball & chain");
@@ -1133,7 +1140,7 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
         }
 
         /* regenerate monsters while on another level */
-        if (!u.uz.dlevel)
+        if (!u.uz.dlevel || gp.program_state.restoring == REST_LEVELS)
             continue;
         if (ghostly) {
             /* reset peaceful/malign relative to new character;

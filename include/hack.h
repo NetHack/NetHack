@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.h	$NHDT-Date: 1713334806 2024/04/17 06:20:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.253 $ */
+/* NetHack 3.7	hack.h	$NHDT-Date: 1717878594 2024/06/08 20:29:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.257 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -727,8 +727,9 @@ struct restore_info {
 };
 
 enum restore_stages {
-    REST_GSTATE = 1,    /* restoring current level and game state */
-    REST_LEVELS = 2,    /* restoring remainder of dungeon */
+    REST_GSTATE = 1, /* restoring game state + first pass of current level */
+    REST_LEVELS = 2, /* restoring remainder of dungeon */
+    REST_CURRENT_LEVEL = 3, /* final pass of restoring current level */
 };
 
 struct rogueroom {
