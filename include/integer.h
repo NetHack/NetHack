@@ -1,4 +1,4 @@
-/* NetHack 3.7	integer.h	$NHDT-Date: 1596498539 2020/08/03 23:48:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $ */
+/* NetHack 3.7	integer.h	$NHDT-Date: 1717967331 2024/06/09 21:08:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
 /*      Copyright (c) 2016 by Michael Allison          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -100,5 +100,14 @@ typedef int32_t int32;
 typedef uint32_t uint32;
 typedef int64_t int64;
 typedef uint64_t uint64;
+
+/* for non-negative L, calculate L * 10 + D, avoiding signed overflow;
+   yields -1 if overflow would have happened;
+   assumes compiler will optimize the constants */
+#define AppendLongDigit(L,D) \
+    (((L) < LONG_MAX / 10L                                      \
+      || ((L) == LONG_MAX / 10L && (D) <= LONG_MAX % 10L))      \
+     ? (L) * 10L + (D)                                          \
+     : -1L)
 
 #endif /* INTEGER_H */

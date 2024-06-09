@@ -1,4 +1,4 @@
-/* NetHack 3.7	mswproc.c	$NHDT-Date: 1613292828 2021/02/14 08:53:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.165 $ */
+/* NetHack 3.7	mswproc.c	$NHDT-Date: 1717967341 2024/06/09 21:09:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.193 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1637,6 +1637,7 @@ mswin_yn_function(const char *question, const char *choices, char def)
             char z, digit_string[2];
             int n_len = 0;
             long value = 0;
+
             mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, ("#"), 1);
             n_len++;
             digit_string[1] = '\0';
@@ -1650,7 +1651,10 @@ mswin_yn_function(const char *question, const char *choices, char def)
             do { /* loop until we get a non-digit */
                 z = lowc(readchar());
                 if (digit(z)) {
-                    value = (10 * value) + (z - '0');
+                    long dgt = (long) (z - '0');
+
+                    /* value = (10 * value) + (z - '0'); */
+                    value = AppendLongDigit(value, dgt);
                     if (value < 0)
                         break; /* overflow: try again */
                     digit_string[0] = z;

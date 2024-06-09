@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1716592962 2024/05/24 23:22:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.728 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1717967336 2024/06/09 21:08:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.729 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4669,7 +4669,10 @@ get_count(
         }
 
         if (digit(key)) {
-            cnt = 10L * cnt + (long) (key - '0');
+            long dgt = (long) (key - '0');
+
+            /* cnt = (10 * cnt) + (key - '0'); */
+            cnt = AppendLongDigit(cnt, dgt);
             if (cnt < 0L)
                 cnt = 0L;
             else if (maxcount > 0L && cnt > maxcount)

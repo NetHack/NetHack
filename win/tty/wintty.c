@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.c	$NHDT-Date: 1717482166 2024/06/04 06:22:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.408 $ */
+/* NetHack 3.7	wintty.c	$NHDT-Date: 1717967340 2024/06/09 21:09:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.410 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1566,7 +1566,14 @@ process_menu_window(winid window, struct WinDesc *cw)
             if (!counting && strchr(gacc, morc))
                 goto group_accel;
 
-            count = (count * 10L) + (long) (morc - '0');
+            {
+                long dgt = (long) (morc - '0');
+
+                /* count = (10 * count) + (morc - '0'); */
+                count = AppendLongDigit(count, dgt);
+                if (count < 0L) /* overflow */
+                    continue; /* reset_count is True */
+            }
             /*
              * It is debatable whether we should allow 0 to
              * start a count.  There is no difference if the
