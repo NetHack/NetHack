@@ -102,7 +102,7 @@ typedef struct glyphinfo {
     uint32 framecolor;
     glyph_map gm;
 } glyph_info;
-#define GLYPH_INFO_P struct gi
+/*#define GLYPH_INFO_P struct glyphinfo //not used*/
 
 /* select_menu() "how" argument types */
 /* [MINV_PICKMASK in monst.h assumes these have values of 0, 1, 2] */
