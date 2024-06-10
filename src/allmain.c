@@ -952,7 +952,7 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
     for (idx = 0; idx < SIZE(earlyopts); idx++) {
         if (earlyopts[idx].e == e_arg){
             break;
-	}
+        }
     }
     if (idx >= SIZE(earlyopts) || argc < 1)
         return 0;

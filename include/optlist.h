@@ -237,13 +237,13 @@ static int optfn_##a(int, int, boolean, char *, char *);
 #ifdef CRASHREPORT
     NHOPTC(crash_email, Advanced, PL_NSIZ, opt_in, set_in_game,
                 No, Yes, No, No, NoAlias,
-		"email address for reporting")
+                "email address for reporting")
     NHOPTC(crash_name, Advanced, PL_NSIZ, opt_in, set_in_game,
                 No, Yes, No, No, NoAlias,
-		"your name for reporting")
+                "your name for reporting")
     NHOPTC(crash_urlmax, Advanced, PL_NSIZ, opt_in, set_in_game,
                 No, Yes, No, No, NoAlias,
-		"length of longest url we can generate")
+                "length of longest url we can generate")
 #endif
 #ifdef CURSES_GRAPHICS
     NHOPTC(cursesgraphics, Advanced, 70, opt_in, set_in_config,

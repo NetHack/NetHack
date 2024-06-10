@@ -162,7 +162,7 @@ time_from_yyyymmddhhmmss(char *buf)
             timeresult = mktime(&t);
         }
         if (timeresult == (time_t) -1)
-	    ;
+            ;
 #if 0
 TODO: set_debugpline1, debugpline1 -> function pointer
             debugpline1("time_from_yyyymmddhhmmss(%s) would have returned -1",

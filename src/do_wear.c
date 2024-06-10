@@ -2496,7 +2496,7 @@ glibr(void)
         } else if (wastwoweap) {
             /* preceding msg was about non-dominant hand */
             which = URIGHTY ? "right " : "left ";
-	}
+        }
         pline("%s %s%s %s%s from your %s%s.",
               !strncmp(thiswep, "corpse", 6) ? "The" : "Your",
               otherwep ? "other " : "", thiswep, xfl ? "also " : "",

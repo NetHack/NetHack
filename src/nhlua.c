@@ -2000,7 +2000,7 @@ nhl_pcall_handle(lua_State *L, int nargs, int nresults, const char *name,
                        nud->name ? nud->name : "(unknown)",
                        lua_tostring(L, -1));
                 /* Drop the error.  If the caller cares, use nhl_pcall(). */
-	    lua_pop(L, 1);
+            lua_pop(L, 1);
         }
     }
     return rv;

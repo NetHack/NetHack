@@ -8519,7 +8519,7 @@ doset_simple(void)
             adjust_menu_promptstyle(WIN_INVEN, &iflags.menu_headings);
         if (go.opt_update_basic_palette) {
 #ifdef CHANGE_COLOR
-	    change_palette();
+            change_palette();
 #endif
             go.opt_update_basic_palette = FALSE;
         }

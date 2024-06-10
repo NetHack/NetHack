@@ -1923,7 +1923,7 @@ make_lockname(const char *filename UNUSED_conditional, char *lockname)
 /* lock a file */
 boolean
 lock_file(const char *filename, int whichprefix,
-	  int retryct UNUSED_conditional)
+          int retryct UNUSED_conditional)
 {
 #ifndef USE_FCNTL
     char locknambuf[BUFSZ];

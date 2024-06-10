@@ -405,7 +405,7 @@ printf("ShellExecute returned: %p\n",rv);   // >32 is ok
         if (pid == 0) {
             char err[100];
 #  ifdef CRASHREPORT_EXEC_NOSTDERR
-	    int devnull;
+            int devnull;
                 /* Keep the output clean - firefox spews useless errors on
                  * my system. */
             (void) close(2);
@@ -416,9 +416,9 @@ printf("ShellExecute returned: %p\n",rv);   // >32 is ok
             Sprintf(err, "Can't start " CRASHREPORT ": %s", strerror(errno));
             raw_print(err);
 #  ifdef CRASHREPORT_EXEC_NOSTDERR
-	    (void) close(devnull);
+            (void) close(devnull);
 #  endif
-	    exit(1);
+            exit(1);
         } else {
             int status;
             errno = 0;
