@@ -404,7 +404,7 @@ remove_rooms(int lx, int ly, int hx, int hy)
 
 /*
  * Remove roomno from the rooms array, decrementing nroom.
- * The last room is swapped from the being-removed room and locations
+ * The last room is swapped with the being-removed room and locations
  * within it have their roomno field updated.  Other rooms are unaffected.
  * Assumes level structure contents corresponding to roomno have already
  * been reset.
