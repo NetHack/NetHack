@@ -1,4 +1,4 @@
-/* NetHack 3.7	sit.c	$NHDT-Date: 1627414178 2021/07/27 19:29:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.7	sit.c	$NHDT-Date: 1718136168 2024/06/11 20:02:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -36,8 +36,27 @@ take_gold(void)
 staticfn void
 throne_sit_effect(void)
 {
-    if (rnd(6) > 4) {
-        switch (rnd(13)) {
+    coordxy tx = u.ux, ty = u.uy;
+
+    if (rnd(6) > 4) { /* [why so convoluted? it's the same as '!rn2(3)'] */
+        int effect = rnd(13);
+
+        if (wizard) {
+            char buf[BUFSZ];
+            int which;
+
+            buf[0] = '\0';
+            getlin("Throne sit effect (1..13)", buf);
+            if (buf[0] == '\033') {
+                pline("%s", Never_mind);
+                return; /* caller will still cause a move to elapse */
+            }
+            which = atoi(buf);
+            if (which >= 1 && which <= 13)
+                effect = which;
+        }
+
+        switch (effect) {
         case 1:
             (void) adjattrib(rn2(A_MAX), -rn1(4, 3), FALSE);
             losehp(rnd(10), "cursed throne", KILLED_BY_AN);
@@ -91,7 +110,7 @@ throne_sit_effect(void)
                 verbalize("Thine audience hath been summoned, %s!",
                           flags.female ? "Dame" : "Sire");
                 while (cnt--)
-                    (void) makemon(courtmon(), u.ux, u.uy, NO_MM_FLAGS);
+                    (void) makemon(courtmon(), tx, ty, NO_MM_FLAGS);
                 break;
             }
         case 8:
@@ -185,11 +204,21 @@ throne_sit_effect(void)
             You_feel("somehow out of place...");
     }
 
-    if (!rn2(3) && IS_THRONE(levl[u.ux][u.uy].typ)) {
-        /* may have teleported */
-        levl[u.ux][u.uy].typ = ROOM, levl[u.ux][u.uy].flags = 0;
-        pline_The("throne vanishes in a puff of logic.");
-        newsym(u.ux, u.uy);
+    /* 3.7: when the random chance for removal is hit, ask for confirmation
+       if in wizard mode, and remove the throne even if hero was teleported
+       away from it.  [This used to remove a throne at hero's current
+       location if there happened to be one, so for the teleport case that
+       only happened when teleporting back to the same point where hero
+       started from.]  "Analyzing a throne" doesn't really make any sense
+       but if the answer is yes than it will vanish in a puff of logic. */
+    if (!rn2(3) && (!wizard || y_n("Analyze throne?") == 'y')) {
+        levl[tx][ty].typ = ROOM, levl[tx][ty].flags = 0;
+        map_background(tx, ty, FALSE);
+        newsym_force(tx, ty);
+        /* "[God] promptly vanishes in a puff of logic" is from
+           Douglas Adams' _Hitchhiker's_Guide_to_the_Galaxy_. */
+        pline_The("throne %s in a puff of logic.",
+                  cansee(tx, ty) ? "vanishes" : "has vanished");
     }
 }
 
