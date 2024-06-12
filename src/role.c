@@ -282,7 +282,7 @@ const struct Role roles[NUM_ROLES+1] = {
       "Attis", "Cybele", "Sabazios", /* Gods of Phrygia */
       "Mer",
       "Gordion",
-      "the Shore of Sakarya",
+      "the Pactolus River",
       PM_MERCHANT,
       NON_PM,
       PM_PASION,
@@ -293,10 +293,10 @@ const struct Role roles[NUM_ROLES+1] = {
       S_GOLEM,
       S_MIMIC,
       ART_CROWN_OF_MIDAS,
-      MH_HUMAN | ROLE_MALE | ROLE_FEMALE | ROLE_LAWFUL | ROLE_NEUTRAL,
+      MH_HUMAN | MH_GNOME | ROLE_MALE | ROLE_FEMALE | ROLE_NEUTRAL,
       /* Str Int Wis Dex Con Cha */
-      { 7, 12, 10, 7, 7, 12 },
-      { 10, 20, 20, 15, 15, 20 },
+      { 6, 7, 7, 7, 7, 10 },
+      { 10, 20, 10, 10, 20, 30 },
       { 9, 0, 0, 9, 0, 0 }, /* Hit points */
       { 1, 0, 0, 1, 0, 1 },
       11, /* Energy */

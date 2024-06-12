@@ -371,18 +371,27 @@ static const struct def_skill Skill_K[] = {
     { P_NONE, 0 }
 };
 static const struct def_skill Skill_Mer[] = {
-    { P_FLAIL, P_BASIC },
-    { P_UNICORN_HORN, P_BASIC },
-    { P_WHIP, P_BASIC },
-    { P_POLEARMS, P_SKILLED },
-    { P_KNIFE, P_SKILLED },
+    { P_DAGGER, P_SKILLED },
+    { P_KNIFE, P_EXPERT },
     { P_AXE, P_EXPERT },
-    { P_PICK_AXE, P_EXPERT },
+    { P_PICK_AXE, P_SKILLED },
+    { P_SHORT_SWORD, P_BASIC },
+    { P_FLAIL, P_BASIC },
+    { P_CLUB, P_BASIC },
+    { P_MACE, P_BASIC },
+    { P_MORNING_STAR, P_BASIC },
     { P_HAMMER, P_EXPERT },
+    { P_QUARTERSTAFF, P_BASIC },
+    { P_POLEARMS, P_BASIC },
+    { P_SPEAR, P_SKILLED },
     { P_TRIDENT, P_EXPERT },
+    { P_LANCE, P_BASIC },
+    { P_SLING, P_BASIC },
+    { P_DART, P_BASIC },
+    { P_WHIP, P_EXPERT },
     { P_MATTER_SPELL, P_SKILLED },
     { P_ENCHANTMENT_SPELL, P_BASIC },
-    { P_DIVINATION_SPELL, P_EXPERT },
+    { P_DIVINATION_SPELL, P_SKILLED },
     { P_RIDING, P_BASIC },
     { P_BARE_HANDED_COMBAT, P_EXPERT },
     { P_WAND, P_EXPERT },
@@ -1086,7 +1095,7 @@ ini_inv_mkobj_filter(int oclass, boolean got_level1_spellbook)
 
     /*
      * For random objects, do not create certain overly powerful
-     * items: wand of wishing, ring of levitation, or the
+     * items: wand of wishing or the
      * polymorph/polymorph control combination.  Specific objects,
      * i.e. the discovery wishing, are still OK.
      * Also, don't get a couple of really useless items.  (Note:
@@ -1099,8 +1108,8 @@ ini_inv_mkobj_filter(int oclass, boolean got_level1_spellbook)
 
     while (otyp == WAN_WISHING || otyp == gn.nocreate
            || otyp == gn.nocreate2 || otyp == gn.nocreate3
-           || otyp == gn.nocreate4 || otyp == gn.nocreate6
-           || otyp == gn.nocreate6 || otyp == RIN_LEVITATION
+           || otyp == gn.nocreate4 || otyp == gn.nocreate5
+           || otyp == gn.nocreate6
            /* 'useless' items */
            || otyp == POT_HALLUCINATION
            || otyp == POT_ACID
@@ -1120,6 +1129,8 @@ ini_inv_mkobj_filter(int oclass, boolean got_level1_spellbook)
            /* Merchants already get these rings */
            || (otyp == RIN_INCREASE_DAMAGE && Role_if(PM_MERCHANT))
            || (otyp == RIN_INCREASE_ACCURACY && Role_if(PM_MERCHANT))
+           /* Merchants should get expensive rings */
+           || (objects[otyp].oc_cost < 200 && Role_if(PM_MERCHANT))
            /* Merchants should not get random rocks */
            || (oclass == GEM_CLASS
                && !(otyp >= FIRST_REAL_GEM && otyp <= LAST_REAL_GEM)

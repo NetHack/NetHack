@@ -1,62 +1,79 @@
 des.level_init({ style = "solidfill", fg = " " });
 des.level_flags("mazelevel", "noteleport", "hardfloor")
 des.map([[
-TT.....TTTT------------------TTTTTTT---------------------------|TTTTTTTTTTTT
-TT.....TTTT|................|TTTTTTT|..........|.......|.......|TTTTTTTTTTTT
-TT.....TTTT|................|TTTTTTT|....PP....|.......|.......|TTTTTTTTTTTT
-TT.....TTTT|................|TTTTTTT|....PP....|.......|.......|TTTTTTTTTTTT
-TT.....TTTT|................|TTTTTTT|..........----+----.......|TTTTTTTTTTTT
-TT.....TTTT--------+---------TTTTTTT|......................{...|TTTTTTTTTTTT
-TT.....TTTTTTTTTTTT.TTTTTTTTTTTTTTTT|..........................|TTTTTTTTTTTT
-TT.....TTTTTTTTTTTT...TTTTTTTTTTTTTT-----------+----------------TTTTTTTTTTTT
-TT.....TTTTTTTTTTTTTT....TTTTTTTTTTTTTTTTT......TTTTTTTTTTTTTTTTTT..........
-TT.....TTTTTTTTTTTTTTTT.....TTTTTTTTT........TTTTTTTTTTTTTT.........TTTTTTTT
-TT.....TTTTTTTTTTTTTTTTTTT..............TTTTTTTTTTTTTT......TTTTTTTTTTTTTTTT
-TT.....TTTTTTTTTTTTTTTTTTTTTTTTTTTT........TTTTTTT.....TTTT.........TTTTTTTT
-TT.....TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.............TTTTTTTTTTTTTTTT..TTTTTTT
-TT.....TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.....TTTTTTTTTTTTTTTTTTTTT.TTTTTTT
-TT.....TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.....TTTTTTTT}TTTTTTTTTTT-----+-----TT
-TT.....TTTTTTTTTTTTTTTTTTTTTTTTTT......TTTTTTTTTTT}}}TTTTTTTTTT|.........|TT
-TT.....TTTTTTTTTTTTTTTTTTTTT......TTTTTTTTTTTTTTT}}}}}TTTTTTTTT|.........|TT
-TT.....TTTTTTTTTTTTTTTT......TTTTTTTTTTTTTTTTTTTTT}}}TTTTTTTTTT|.........|TT
-TT......................TTTTTTTTTTTTTTTTTTTTTTTTTTT}TTTTTTTTTTT-----------TT
-TT.....TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+.T.....T.|------------------------------------------------------------------
+.........|..................|.......|..........|.......|.......|...........|
+.T.....T.|..................|.......|....PP....|.......|.......|...........|
+.........|..................|.......|....PP....|.......|.......|...........|
+.T.....T.|..................|---+---|..........----+----.......|...........|
+.........|---------+---------.......|......................{...|...........|
+.T.....T.|......|................T..|..........................|----+------|
+.........|......|.....--------......-----------+----------------.......|...|
+.T.....T.|......|..T..|......|.........................................+...|
+.........|......|.....|......|...T...T...T...T...T...TT.T....T...T.....|...|
+.T.....T.|......+.....|......|........................PPPPPPPPPPPT.....----|
+.........|-------------......|...T.TT...T.TT..TT.TTT..PPPPPPPPPPP......|...|
+.T.....T.|...|..|.....|......|...TPPPPPPPPPPPPPP.PPPPPPPPT.TTT.TTT.....+...|
+.........|...|..|.....|+------....P..PPPP.T.PPPP..PPPPP..T.............|...|
+.T.....T.|...|..+.....|...........PPPPPPPPPPPPPPP.PPPTT........-----+------|
+.........|--+-..|.....|.----+---.TTT...TTT...TTTT....T...T...T.|...........|
+.T.....T.|......|.....|.|......|...............................|...........|
+.........|..T...-------.|......|.T...T...T...T...T...T...T...T.|...........|
+........................|......|...............................|...........|
+.T.....T.|------------------------------------------------------------------
 ]]);
 
 -- Dungeon Description
 des.region(selection.area(00,00,75,19), "lit")
-des.replace_terrain({ region={00,00, 75,19}, fromterrain="T", toterrain=".", chance=20 })
 
 -- Portal arrival point
 des.terrain({04,00}, ".")
 des.levregion({ region = {04,00,04,00}, type="branch" })
 -- Stairs
-des.stair("down", 75,08)
+if d(4) > 2 then
+   des.stair("down", 73,08)
+else
+   des.stair("down", 73,12)
+end
 -- Doors
+des.door("closed",12,15)
+des.door("closed",16,10)
+des.door("closed",16,14)
+des.door("closed",19,05)
+des.door("closed",23,13)
+des.door("closed",28,15)
+des.door("closed",32,04)
 des.door("locked",47,07)
 des.door("locked",51,04)
--- Shops
-des.region({ region={12,01, 27,04}, lit=1, type="shop", filled=1 })
-des.region({ region={64,15, 72,17}, lit=1, type="shop", filled=1 })
--- Pasion
+des.door("closed",68,06)
+des.door("closed",68,14)
+des.door("closed",71,08)
+des.door("closed",71,12)
+-- Special rooms
+des.region({ region={10,01, 27,04}, lit=1, type="shop", filled=1 })
+des.region({ region={17,12, 21,16}, lit=1, type="temple", filled=1 })
+des.region({ region={29,01, 35,03}, lit=1, type="beehive", filled=1 })
+des.region({ region={64,01, 74,05}, lit=1, type="shop", filled=1 })
+des.region({ region={64,15, 74,18}, lit=1, type="morgue", filled=1 })
+-- Temple altar
+des.altar({ x=19, y=14, align="chaos", type="shrine" })
+-- Pasion's office
 des.monster({ id = "Pasion", coord = {51, 02}, inventory = function()
    des.object({ id = "skeleton key"});
 end })
--- guards for Pasion's office
 des.monster("trader", 50, 02)
 des.monster("trader", 52, 02)
 des.monster("trader", 51, 03)
 des.monster("trader", 51, 01)
--- guards for the yard
+-- Pasion's yard
 local yardlocs = selection.floodfill(51,05);
 for i = 1,8 do
    des.monster("trader", yardlocs:rndcoord(1))
 end
+-- Undiggable
+des.non_diggable(selection.area(00,00,75,19))
 
--- the middle of town
-des.object({id = "statue", montype="trader", material="gold", x = 38, y = 10})
-
--- the Appian Way
+-- the Road
 for i = 1,9 do
    local y = (i*2) + 1
    local road_roll = d(4)

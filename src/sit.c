@@ -429,6 +429,7 @@ rndcurse(void)
                 continue; /* next target */
 
             if (otmp->oartifact && spec_ability(otmp, SPFX_INTEL)
+                && !(otmp->otyp == DUNCE_CAP)
                 && rn2(10) < 8) {
                 pline("%s!", Tobjnam(otmp, "resist"));
                 continue;

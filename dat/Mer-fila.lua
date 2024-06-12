@@ -1,28 +1,58 @@
-des.level_init({ style="mines", fg=".", bg="T", smoothed=true, joined=true, walled=true })
-des.level_flags("mazelevel", "noflip");
+des.room({ type = "ordinary",
+           contents = function()
+              des.stair("up")
+              des.object()
+              des.monster({ class = "'", peaceful=0 })
+              des.monster("gold golem")
+           end
+})
 
---
-des.stair("up")
-des.stair("down")
---
-des.object()
-des.object()
-des.object()
-des.object()
-des.object()
-des.object()
-des.object()
---
-des.trap()
-des.trap()
-des.trap()
-des.trap()
---
-des.monster({ id = "gold golem", peaceful=0 })
-des.monster({ id = "gold golem", peaceful=0 })
-des.monster({ id = "stone golem", peaceful=0 })
-des.monster({ id = "stone golem", peaceful=0 })
-des.monster({ id = "stone golem", peaceful=0 })
-des.monster({ class = "'", peaceful=0 })
-des.monster({ id = "giant mimic", peaceful=0 })
-des.monster({ id = "giant mimic", peaceful=0 })
+des.room({ type = "ordinary",
+           contents = function()
+              des.object()
+              des.object()
+              des.monster({ class = "'", peaceful=0 })
+              des.monster("gold golem")
+           end
+})
+
+des.room({ type = "ordinary",
+           contents = function()
+              des.object()
+              des.trap()
+              des.object()
+              des.monster("giant mimic")
+              des.monster("giant mimic")
+           end
+})
+
+des.room({ type = "ordinary",
+           contents = function()
+              des.stair("down")
+              des.object()
+              des.trap()
+              des.monster({ class = "'", peaceful=0 })
+              des.monster("gold golem")
+              des.monster("giant mimic")
+           end
+})
+
+des.room({ type = "ordinary",
+           contents = function()
+              des.object()
+              des.object()
+              des.trap()
+              des.monster({ class = "'", peaceful=0 })
+              des.monster("gold golem")
+           end
+})
+
+des.room({ type = "ordinary",
+           contents = function()
+              des.object()
+              des.trap()
+              des.monster("giant mimic")
+           end
+})
+
+des.random_corridors()

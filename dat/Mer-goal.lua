@@ -1,58 +1,131 @@
 des.level_init({ style = "solidfill", fg = " " });
-des.level_flags("mazelevel", "noteleport", "hardfloor")
+des.level_flags("mazelevel")
 des.map([[
-}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-}}}}}}}}}}}}}}}}}}}}}}}}}}}}}---..---}}}}}}}}}}}}}}}}}}}}}}}}}}}}}--------}}
-}}}}}}}}}}}}}}}}}}}}}---------......---------}}}}}}}}}}}}}}}}}}}}}|......|}}
-}}}}}}}}}}}}}}--------......|............|..---------}}}}}}}}}}}}}.......|}}
-}}}}}}}}-------...|.........+............+..........--------}}}}}}|......|}}
-}}}}}}}}|.........|.........|............|.................|}}}}}}--------}}
-}}}}}}}}|.........+.........|-------------------------+----|}}}}}}}}}}}}}}}}
-}}}}}}}}|.........|.........|........|..........|..........|}}}}}}}}}}}}}}}}
-T}}}}TTT|.........|.........|........+..........|..........|TTTTT}}}}}}}}TTT
-T}}TTTTT|.........|.........|........|..........|..........|TTTTTTT}}}}}TTTT
-TT}TTTTT|----+-----------------------|------....+..........|TTTTTTTTT}}TTTTT
-TT}TTTTT|...............|............|.....|....|..........|TTTTTTTTTT}}TTTT
-TT}}TTTT|...............+............|.....|....|..........|TTTTTTTTTTT}}TTT
-TTT}}TTT-------.........|............|.....+....|...--------TTTTTTTTTTTT}}}T
-TTT}}TTTTTTTTT--------..|............|.....|---------TTTTTTTTTTTTTTTTTTTTT}}
-TTT}}TTTTTTTTTTTTTTTT---------......---------TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
-}}}}}TTTTTTTTTTTTTTTTTTTTTTT---..---TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
-}}}}}TTTTTTTTTTTTTTTTTTTTTTTTTT..TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
-}}}}....................................................................TTTT
-............................................................................
+TTTTTTTTT}}}}}TTT-----------------------------------------------------------
+TTTTTTTT..}}}}}.T|................T|.|.|.|............+...........+........|
+TTTTTTTT...}}}}}.F....{.....T.T...T|.+.+.|............|...........|........|
+TTTTTT...}}}}}...F..........T.T...T|.|.|.|............|-------------------S|
+TTTTTT.}}}}}...TT|................T|.F.F.|............|..................|+|
+TTTTTT..}}}}}.TTTF..........T.T...T---+--|............|..................|+|
+TTTTTTT.}}}}}.TTTF..........T.T...TTTT.TT|-----+------|..................|+|
+TTTTTTT..}}}..TTT|.........TT.TT.........|............|..................|+|
+TTTTTTTT..}..TTTTF.TT.TT.TTT...TTT.TT.TT.|............|..................|+|
+T........}}}.....+...........{...........+............+.................\S+|
+TTTTTTTT..}..TTTTF.TT.TT.TTT...TTT.TT.TT.|............|..................|+|
+TTTTTTT..}}}..TTT|.........TT.TT.........|............|..................|+|
+TTTTTTT.}}}}}..TTF..........T.T...TTTT.TT|-----+------|..................|+|
+TTTTTTT..}}}}}...F..........T.T...T---+--|............|..................|+|
+TTTTTTTT...}}}}}.|................T|.F.F.|............|..................|+|
+TTTTTTT...}}}}}..F..........T.T...T|.|.|.|............|..................|+|
+TTTTT...}}}}}...TF....{.....T.T...T|.+.+.|............|-------------------S|
+TTT...}}}}}...TTT|..........T.T...T|.|.|.|............|...........|........|
+TTT.}}}}}...TTTTT|................T|.|.|.|............+...........+........|
+TTT}}}}}TTTTTTTTT-----------------------------------------------------------
 ]]);
 
-des.region(selection.area(00,00,75,19), "lit")
-des.replace_terrain({ region={00,00, 75,19}, fromterrain="T", toterrain=".", chance=20 })
+des.region(selection.area(00,00,40,19), "lit")
+des.region(selection.area(41,00,75,19), "unlit")
+des.replace_terrain({ region={00,00, 16,19}, fromterrain="T", toterrain=".", chance=50 })
 
-des.stair("up", 33, 19)
-
-for i = 1,1000 do
-	des.gold({amount = d(500)})
-end
+des.stair("up", 1, 9)
 
 -- Doors
-des.door("locked",24,12)
-des.door("locked",13,10)
-des.door("locked",18,06)
-des.door("locked",28,04)
-des.door("locked",41,04)
-des.door("locked",54,06)
-des.door("locked",48,10)
-des.door("locked",43,13)
-des.door("locked",37,08)
+des.door("locked", 17,09)
+des.door("closed", 37,02)
+des.door("closed", 37,16)
+des.door("locked", 38,05)
+des.door("locked", 38,13)
+des.door("closed", 39,02)
+des.door("closed", 39,16)
+des.door("locked", 41,09)
+des.door("locked", 47,06)
+des.door("locked", 47,12)
+des.door("locked", 54,01)
+des.door("locked", 54,09)
+des.door("locked", 54,18)
+des.door("locked", 66,01)
+des.door("locked", 66,18)
+des.door("locked", 73,09)
+des.door("locked", 74,03)
+des.door("locked", 74,04)
+des.door("locked", 74,05)
+des.door("locked", 74,06)
+des.door("locked", 74,07)
+des.door("locked", 74,08)
+des.door("locked", 74,09)
+des.door("locked", 74,10)
+des.door("locked", 74,11)
+des.door("locked", 74,12)
+des.door("locked", 74,13)
+des.door("locked", 74,14)
+des.door("locked", 74,15)
+des.door("locked", 74,16)
 
 -- Sostratus' room
-des.object({ id = "dunce cap", coord = {33, 8}, buc="cursed", spe=3, name="The Crown of Midas" })
-des.monster("Sostratus", 33, 8)
-des.monster("succubus",33,9)
-des.monster("succubus",33,7)
-des.monster("incubus",34,8)
-des.monster("succubus",32,8)
+des.object({ id = "dunce cap", coord = {72, 09}, buc="cursed", spe=3, name="The Crown of Midas" })
+des.monster("Sostratus", 72, 09)
+des.monster("succubus",72,07)
+des.monster("succubus",72,08)
+des.monster("incubus",72,10)
+des.monster("succubus",72,11)
+local main_room = selection.area(55,04,71,15)
+for i=1,100 do
+	if d(20) > 15 then
+		local cm = main_room:rndcoord(1)
+		des.monster({id = "giant mimic", appear_as = "obj:gold piece", x = cm.x, y = cm.y})
+	end
+	local cg = main_room:rndcoord(1)
+	des.gold({amount = d(500), x = cg.x, y = cg.y})
+	des.trap("board", main_room:rndcoord(1))
+end
+
+-- River
+river = selection.area(01,01,16,18)
+des.object({id = "statue", montype="merchant", material="gold", x = 3, y = 9})
+for i = 1,15 do
+	for j=1,5 do
+		local cg = river:rndcoord(1)
+		des.gold({amount = d(500), x = cg.x, y = cg.y})
+	end
+	local cs = river:rndcoord(1)
+	des.object({id = "statue", montype="merchant", material="gold", x = cs.x, y = cs.y})
+	des.monster("acid blob", river:rndcoord(1))
+	des.monster("spotted jelly", river:rndcoord(1))
+end
+
+-- Courtyard
+courtyard = selection.area(18,01,33,18)
+for i = 1,10 do
+	des.monster("gold golem", courtyard:rndcoord(1))
+	des.monster("'", courtyard:rndcoord(1))
+end
+
+-- Stable
+if d(4) == 4 then
+	des.monster("horse", 36, 01)
+else
+	des.object({id = "statue", montype="horse", material="gold", x = 36, y = 01})
+end
+if d(4) == 4 then
+	des.monster("horse", 36, 18)
+else
+	des.object({id = "statue", montype="horse", material="gold", x = 36, y = 18})
+end
+des.object("saddle", 38, 01)
+if d(4) == 4 then
+	des.monster("horse", 40, 01)
+else
+	des.object({id = "statue", montype="horse", material="gold", x = 40, y = 01})
+end
+if d(4) == 4 then
+	des.monster("horse", 40, 18)
+else
+	des.object({id = "statue", montype="horse", material="gold", x = 40, y = 18})
+end
+des.object("saddle", 38, 18)
 
 -- Statue room
-statue_room = selection.area(25,11,36,14)
+statue_room = selection.area(42,07,53,11)
 for i = 1,40 do
 	local c = statue_room:rndcoord(1)
 	local mon = { "merchant", "soldier", "rogue", "ranger", "barbarian", "healer", "wizard" }
@@ -60,29 +133,8 @@ for i = 1,40 do
 	des.object({id = "statue", montype=mon[mon_idx], material="gold", x = c.x, y = c.y})
 end
 
--- Gem room
-gem_room = selection.area(09,11,23,12)
-for i = 1,30 do
-	local c = gem_room:rndcoord(1)
-	local gem = { "dilithium crystal", "diamond", "ruby", "sapphire", "black opal", "emerald" }
-	local gem_idx = d(#gem)
-	des.object({id = gem[gem_idx], x = c.x, y = c.y})
-end
-
--- Golem room
-golem_room = selection.area(09,05,17,09)
-for i = 1,20 do
-	des.monster("gold golem", golem_room:rndcoord(1))
-end
-for i = 1,10 do
-	des.monster("stone golem", golem_room:rndcoord(1))
-end
-for i = 1,10 do
-	des.monster("'", golem_room:rndcoord(1))
-end
-
 -- Weapon room
-weapon_room = selection.area(19,04,27,09)
+weapon_room = selection.area(42,01,53,05)
 for i = 1,40 do
 	local c = weapon_room:rndcoord(1)
 	local weap = { "dart", "spear", "javelin", "trident", "dagger", "knife", "stiletto",
@@ -99,69 +151,44 @@ for i = 1,40 do
 	des.object({id = weap[weap_idx], material=weap_mat, x = c.x, y = c.y})
 end
 
--- Gold monster room
-monster_room = selection.area(29,03,40,05)
-for i = 1,35 do
-	local c = monster_room:rndcoord(1)
-	local mon = { "golden naga", "gold dragon" }
-	local mon_idx = d(#mon)
-	if i < 8 then
-		des.monster({ id = mon[mon_idx], x=c.x, y=c.y, asleep=1, peaceful = 0})
-	else
-		des.object({id = "statue", montype=mon[mon_idx], material="gold", x = c.x, y = c.y})
+-- Armor room
+armor_room = selection.area(42,13,53,18)
+for i = 1,40 do
+	local c = armor_room:rndcoord(1)
+	local armr = { "dented pot", "helm of caution", "helm of opposite alignment",
+				   "helm of telepathy", "plate mail", "splint mail", "banded mail",
+				   "chain mail", "scale mail", "ring mail", "small shield",
+				   "large shield"}
+	local armr_idx = d(#armr)
+	local armr_mat = "gold"
+	if d(6) == 6 then
+		armr_mat = "copper"
 	end
+	des.object({id = armr[armr_idx], material=armr_mat, x = c.x, y = c.y})
 end
 
--- Animal room
-animal_room = selection.area(42,04,51,05)
-for i = 1,20 do
-	local c = animal_room:rndcoord(1)
-	local mon = { "dog", "jackal", "wolf", "lynx", "panther", "tiger" }
-	local mon_idx = d(#mon)
-	if i < 10 then
-		des.monster({ id = mon[mon_idx], x=c.x, y=c.y, asleep=1, peaceful = 0})
-	else
-		des.object({id = "statue", montype=mon[mon_idx], material="gold", x = c.x, y = c.y})
-	end
+-- Dragon room
+local dragon_room = selection.area(55,01,65,02)
+des.monster("gold dragon",65,01)
+des.monster("yellow dragon",65,02)
+for i=1,5 do
+	local cs = dragon_room:rndcoord(1)
+	des.object({id = "statue", montype="gold dragon", material="gold", x = cs.x, y = cs.y})
 end
 
--- Barracks
-des.region({ region={49,07,58,12}, type="barracks", filled=1 })
-
--- Mimic room
-mimic_room_top = selection.area(38,07,47,09)
-for i = 1,10 do
-	local c = mimic_room_top:rndcoord(1)
-	des.monster({id = "giant mimic", appear_as = "obj:gold piece", x = c.x, y = c.y})
-end
-mimic_room_bot = selection.area(44,10,47,13)
-for i = 1,10 do
-	local c = mimic_room_bot:rndcoord(1)
-	des.monster({id = "giant mimic", appear_as = "obj:gold piece", x = c.x, y = c.y})
+-- Golden naga room
+local naga_room = selection.area(55,17,65,18)
+des.monster("golden naga",65,17)
+des.monster("black naga",65,18)
+for i=1,5 do
+	local cs = naga_room:rndcoord(1)
+	des.object({id = "statue", montype="golden naga", material="gold", x = cs.x, y = cs.y})
 end
 
--- Stable
-des.monster({id = "warhorse", x = 40, y = 13, peaceful = 1, asleep=1})
-incitatus_stable = selection.area(38,11,42,14)
-for i = 1,10 do
-	des.object("apple", incitatus_stable:rndcoord(1))
-	des.object("carrot", incitatus_stable:rndcoord(1))
+-- Chests
+for x=67,74 do
+	des.object({id = "chest", material="gold", x = x, y = 1})
+	des.object({id = "chest", material="gold", x = x, y = 2})
+	des.object({id = "chest", material="gold", x = x, y = 17})
+	des.object({id = "chest", material="gold", x = x, y = 18})
 end
-
--- Floating Altar
-des.object({id = "statue", montype="priest", material="gold", x=71,y=3,})
-des.altar({ x=70,y=3,align="noalign",type="sanctum" })
-
--- Water
-des.monster("giant eel", 0, 0)
-des.monster("giant eel", 0, 1)
-des.monster("giant eel", 0, 2)
-des.monster("giant eel", 0, 3)
-des.monster("electric eel", 0, 4)
-des.monster("electric eel", 0, 5)
-des.monster("jellyfish", 1, 0)
-des.monster("jellyfish", 1, 1)
-des.monster("jellyfish", 1, 2)
-des.monster("jellyfish", 1, 3)
-des.monster("jellyfish", 1, 4)
-des.monster("jellyfish", 1, 5)
