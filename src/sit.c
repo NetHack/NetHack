@@ -41,12 +41,12 @@ throne_sit_effect(void)
     if (rnd(6) > 4) { /* [why so convoluted? it's the same as '!rn2(3)'] */
         int effect = rnd(13);
 
-        if (wizard) {
+        if (wizard && !iflags.debug_fuzzer) {
             char buf[BUFSZ];
             int which;
 
             buf[0] = '\0';
-            getlin("Throne sit effect (1..13)", buf);
+            getlin("Throne sit effect (1..13) [0=random]", buf);
             if (buf[0] == '\033') {
                 pline("%s", Never_mind);
                 return; /* caller will still cause a move to elapse */
