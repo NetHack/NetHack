@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1443 $ $NHDT-Date: 1717878584 2024/06/08 20:29:44 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1445 $ $NHDT-Date: 1718303201 2024/06/13 18:26:41 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1957,6 +1957,9 @@ omit "a" from "drowned in a limitless water" when drowning on Plane of Water
 restoring a save file could trigger impossible "rnd(0) attempted" if it tried
 	to make an unhidden mimic hide as an object; if the code was marked as
 	a released version, it would crash due to divide by 0 error instead
+fix regression of a post-3.6 fix:  if 2 Wizards of Yendor were in play and 1
+	escaped the dungeon, bookkeeping for current number of Wizards stayed
+	at 2, interferring with future Wizard behavior
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

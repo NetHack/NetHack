@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1713334799 2024/04/17 06:19:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1420 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1718303205 2024/06/13 18:26:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1426 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3702,7 +3702,7 @@ extern int pick_nasty(int);
 extern int nasty(struct monst *) NO_NNARGS;
 extern void resurrect(void);
 extern void intervene(void);
-extern void wizdead(void);
+extern void wizdeadorgone(void);
 extern void cuss(struct monst *) NONNULLARG1;
 
 /* ### wizcmds.c ### */

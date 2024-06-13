@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1717570485 2024/06/05 06:54:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.573 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1718303201 2024/06/13 18:26:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.576 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2678,13 +2678,15 @@ m_detach(
     mon_leaving_level(mtmp);
 
     mtmp->mhp = 0; /* simplify some tests: force mhp to 0 */
+    /* death handling for the Wizard needs to take place even if he is
+       leaving the dungeon alive rather than dying */
+    if (mtmp->iswiz)
+        wizdeadorgone();
     /* foodead() might give quest feedback for foo having died; skip that
        if we're called for mongone() rather than mondead(); saving bones
        or wizard mode genocide of "*" can result in special monsters going
        away without having been killed */
     if (due_to_death) {
-        if (mtmp->iswiz)
-            wizdead();
         if (mtmp->data->msound == MS_NEMESIS) {
             nemdead();
             /* The Archeologist, Caveman, and Priest quest texts describe

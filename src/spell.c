@@ -1,4 +1,4 @@
-/* NetHack 3.7	spell.c	$NHDT-Date: 1715984438 2024/05/17 22:20:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.169 $ */
+/* NetHack 3.7	spell.c	$NHDT-Date: 1718303203 2024/06/13 18:26:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.171 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -283,8 +283,7 @@ deadbook(struct obj *book2)
                are not artifacts */
             pline("At least one of your relics is cursed...");
         } else if (arti1_primed && arti2_primed) {
-            unsigned soon =
-                (unsigned) d(2, 6); /* time til next intervene() */
+            unsigned soon = (unsigned) d(2, 6); /* time til next intervene() */
 
             /* successful invocation */
             mkinvokearea();
@@ -292,7 +291,7 @@ deadbook(struct obj *book2)
             record_achievement(ACH_INVK);
             /* in case you haven't killed the Wizard yet, behave as if
                you just did */
-            u.uevent.udemigod = 1; /* wizdead() */
+            u.uevent.udemigod = 1; /* wizdeadorgone() */
             if (!u.udg_cnt || u.udg_cnt > soon)
                 u.udg_cnt = soon;
         } else { /* at least one relic not prepared properly */

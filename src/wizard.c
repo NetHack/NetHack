@@ -1,4 +1,4 @@
-/* NetHack 3.7	wizard.c	$NHDT-Date: 1705357487 2024/01/15 22:24:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.105 $ */
+/* NetHack 3.7	wizard.c	$NHDT-Date: 1718303204 2024/06/13 18:26:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -793,8 +793,10 @@ intervene(void)
     }
 }
 
+/* Wizard of Yendor is being removed from play (dead or escaped the dungeon);
+   keep the bookkeeping for him up to date */
 void
-wizdead(void)
+wizdeadorgone(void)
 {
     gc.context.no_of_wizards--;
     if (!u.uevent.udemigod) {
