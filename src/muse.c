@@ -1927,8 +1927,8 @@ use_offensive(struct monst *mtmp)
          */
         if (cansee(mtmp->mx, mtmp->my)) {
             otmp->dknown = 1;
-            pline_xy(mtmp->mx, mtmp->my,
-                     "%s hurls %s!", Monnam(mtmp), singular(otmp, doname));
+            pline_mon(mtmp, "%s hurls %s!",
+                      Monnam(mtmp), singular(otmp, doname));
         }
         m_throw(mtmp, mtmp->mx, mtmp->my, sgn(mtmp->mux - mtmp->mx),
                 sgn(mtmp->muy - mtmp->my),

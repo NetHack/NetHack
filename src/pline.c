@@ -116,6 +116,18 @@ pline_xy(coordxy x, coordxy y, const char *line, ...)
     va_end(the_args);
 }
 
+void
+pline_mon(struct monst *mtmp, const char *line, ...)
+{
+    va_list the_args;
+
+    set_msg_xy(mtmp->mx, mtmp->my);
+
+    va_start(the_args, line);
+    vpline(line, the_args);
+    va_end(the_args);
+}
+
 /* set the direction where next message happens */
 void
 set_msg_dir(int dir)

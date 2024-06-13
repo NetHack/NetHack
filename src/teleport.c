@@ -1916,8 +1916,8 @@ mlevel_tele_trap(
                 assign_level(&tolevel, &valley_level);
             } else if (Is_botlevel(&u.uz)) {
                 if (in_sight && trap->tseen)
-                    pline_xy(mtmp->mx, mtmp->my,
-                             "%s avoids the %s.", Monnam(mtmp),
+                    pline_mon(mtmp, "%s avoids the %s.",
+                              Monnam(mtmp),
                              (tt == HOLE) ? "hole" : "trap");
                 return Trap_Effect_Finished;
             } else {
@@ -1929,9 +1929,9 @@ mlevel_tele_trap(
                                       || is_home_elemental(mtmp->data)
                                       || rn2(7))) {
                 if (in_sight && mtmp->data->mlet != S_ELEMENTAL) {
-                    pline_xy(mtmp->mx, mtmp->my,
-                             "%s seems to shimmer for a moment.",
-                             Monnam(mtmp));
+                    pline_mon(mtmp,
+                              "%s seems to shimmer for a moment.",
+                              Monnam(mtmp));
                     seetrap(trap);
                 }
                 return Trap_Effect_Finished;
@@ -1949,7 +1949,7 @@ mlevel_tele_trap(
                    currently inside his or her own special room */
                 || (tt == NO_TRAP && onscary(0, 0, mtmp))) {
                 if (in_sight)
-                    pline_xy(mtmp->mx, mtmp->my,
+                    pline_mon(mtmp,
                              "%s seems very disoriented for a moment.",
                              Monnam(mtmp));
                 return Trap_Effect_Finished;
@@ -1964,8 +1964,8 @@ mlevel_tele_trap(
                 nlev = random_teleport_level();
                 if (nlev == depth(&u.uz)) {
                     if (in_sight)
-                        pline_xy(mtmp->mx, mtmp->my,
-                                 "%s shudders for a moment.", Monnam(mtmp));
+                        pline_mon(mtmp, "%s shudders for a moment.",
+                                  Monnam(mtmp));
                     return Trap_Effect_Finished;
                 }
                 get_level(&tolevel, nlev);
@@ -1976,8 +1976,7 @@ mlevel_tele_trap(
         }
 
         if (in_sight) {
-            pline_xy(mtmp->mx, mtmp->my,
-                     "Suddenly, %s %s.", mon_nam(mtmp),
+            pline_mon(mtmp, "Suddenly, %s %s.", mon_nam(mtmp),
                      (tt == HOLE) ? "falls into a hole"
                    : (tt == TRAPDOOR) ? "falls through a trap door"
                    : "disappears out of sight");

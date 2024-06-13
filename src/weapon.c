@@ -839,9 +839,9 @@ mon_wield_item(struct monst *mon)
         if (canseemon(mon)) {
             boolean newly_welded;
 
-            pline_xy(mon->mx, mon->my,
-                     "%s wields %s%c", Monnam(mon), doname(obj),
-                     exclaim ? '!' : '.');
+            pline_mon(mon, "%s wields %s%c",
+                      Monnam(mon), doname(obj),
+                      exclaim ? '!' : '.');
             /* 3.6.3: mwelded() predicate expects the object to have its
                W_WEP bit set in owormmask, but the pline here and for
                artifact_light don't want that because they'd have '(weapon

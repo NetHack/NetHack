@@ -2359,6 +2359,7 @@ extern void dumplogfreemessages(void);
 extern void pline(const char *, ...) PRINTF_F(1, 2);
 extern void pline_dir(int, const char *, ...) PRINTF_F(2, 3);
 extern void pline_xy(coordxy, coordxy, const char *, ...) PRINTF_F(3, 4);
+extern void pline_mon(struct monst *, const char *, ...) PRINTF_F(2, 3) NONNULLARG1;
 extern void set_msg_dir(int);
 extern void set_msg_xy(coordxy, coordxy);
 extern void custompline(unsigned, const char *, ...) PRINTF_F(2, 3);
