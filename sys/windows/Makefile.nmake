@@ -8,8 +8,8 @@
 #       MS Visual Studio Visual C++ compiler
 #
 #       Visual Studio Compilers Tested:
-#            - Microsoft Visual Studio 2019 Community Edition v 16.11.36
-#            - Microsoft Visual Studio 2022 Community Edition v 17.10.1
+#            - Microsoft Visual Studio 2019 Community Edition v 16.11.37
+#            - Microsoft Visual Studio 2022 Community Edition v 17.10.2
 #
 #==============================================================================
 #   This is used for building two distinct executables of NetHack:
