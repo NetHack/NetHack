@@ -20,6 +20,7 @@ struct trap {
     coordxy tx, ty;
     d_level dst; /* destination for portals/holes/trapdoors */
     coord launch;
+#define teledest launch /* x,y destination for teleport traps, if > 0 */
     Bitfield(ttyp, 5);
     Bitfield(tseen, 1);
     Bitfield(once, 1);

@@ -220,6 +220,19 @@ themeroom_fills = {
       end;
       locs:iterate(func);
    end,
+
+   -- Teleportation hub
+   function(rm)
+      local locs = selection.room():filter_mapchar(".");
+      for i = 1, 2 + nh.rn2(3) do
+         local pos = locs:rndcoord(1);
+         if (pos.x > 0) then
+            pos.x = pos.x + rm.region.x1 - 1;
+            pos.y = pos.y + rm.region.y1;
+            table.insert(postprocess, { handler = make_a_trap, data = { type = "teleport", seen = true, coord = pos, teledest = 1 } });
+         end
+      end
+   end,
 };
 
 themerooms = {
@@ -869,6 +882,17 @@ end
 function make_garden_walls(data)
    local sel = data.sel:grow();
    des.replace_terrain({ selection = sel, fromterrain="w", toterrain = "T" });
+end
+
+-- postprocess callback: make a trap
+function make_a_trap(data)
+   if (data.teledest == 1 and data.type == "teleport") then
+      local locs = selection.negate():filter_mapchar(".");
+      repeat
+         data.teledest = locs:rndcoord(1);
+      until (data.teledest.x ~= data.coord.x and data.teledest.y ~= data.coord.y);
+   end
+   des.trap(data);
 end
 
 -- called once after the whole level has been generated

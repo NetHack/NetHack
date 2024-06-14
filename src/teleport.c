@@ -1098,6 +1098,8 @@ dotele(
     if (next_to_u()) {
         if (trap && trap_once)
             vault_tele();
+        else if (trap && isok(trap->teledest.x, trap->teledest.y))
+            teleds(trap->teledest.x, trap->teledest.y, TELEDS_TELEPORT);
         else
             tele();
         (void) next_to_u();
@@ -1450,6 +1452,20 @@ tele_trap(struct trap *trap)
         deltrap(trap);
         newsym(u.ux, u.uy); /* get rid of trap symbol */
         vault_tele();
+    } else if (isok(trap->teledest.x, trap->teledest.y)) {
+        coord cc;
+        struct monst *mtmp = m_at(trap->teledest.x, trap->teledest.y);
+
+        if (mtmp) {
+            if (!enexto(&cc, mtmp->mx, mtmp->my, mtmp->data)) {
+                /* could not find some other place to put mtmp; the level must
+                 * be nearly or completely full */
+                You1(shudder_for_moment);
+                return;
+            }
+            rloc_to(mtmp, cc.x, cc.y);
+        }
+        teleds(trap->teledest.x, trap->teledest.y, TELEDS_TELEPORT);
     } else
         tele();
 }
@@ -1882,7 +1898,16 @@ mtele_trap(struct monst *mtmp, struct trap *trap, int in_sight)
          */
         if (trap->once)
             mvault_tele(mtmp);
-        else
+        else if (isok(trap->teledest.x, trap->teledest.y)) {
+            /* monster teleporting onto hero's or another monster's spot does
+             * not work the same as hero teleporting onto monster's spot where
+             * the incoming monster displaces the resident to the nearest
+             * possible space - instead it just doesn't work. */
+            if (!(m_at(trap->teledest.x, trap->teledest.y)
+                  || u_at(trap->teledest.x, trap->teledest.y))) {
+                rloc_to_core(mtmp, trap->teledest.x, trap->teledest.y, RLOC_MSG);
+            }
+        } else
             (void) rloc(mtmp, RLOC_NONE);
 
         if (in_sight) {

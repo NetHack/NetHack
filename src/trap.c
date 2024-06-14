@@ -541,6 +541,15 @@ maketrap(coordxy x, coordxy y, int typ)
 
         unearth_objs(x, y);
         break;
+    case TELEP_TRAP:
+        if (isok(gl.launchplace.x, gl.launchplace.y)) {
+            ttmp->teledest.x = gx.xstart + gl.launchplace.x;
+            ttmp->teledest.y = gy.ystart + gl.launchplace.y;
+            if (ttmp->teledest.x == x && ttmp->teledest.y == y) {
+                impossible("making fixed-dest tele trap pointing to itself");
+            }
+        }
+        break;
     }
 
     if (!oldplace) {
