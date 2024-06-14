@@ -216,7 +216,7 @@ throne_sit_effect(void)
         map_background(tx, ty, FALSE);
         newsym_force(tx, ty);
         /* "[God] promptly vanishes in a puff of logic" is from
-           Douglas Adams' _Hitchhiker's_Guide_to_the_Galaxy_. */
+           Douglas Adams' _The_Hitchhiker's_Guide_to_the_Galaxy_. */
         pline_The("throne %s in a puff of logic.",
                   cansee(tx, ty) ? "vanishes" : "has vanished");
     }
