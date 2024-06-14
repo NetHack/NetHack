@@ -716,7 +716,7 @@ m_unleash(struct monst *mtmp, boolean feedback)
 
     if (feedback) {
         if (canseemon(mtmp))
-            pline("%s pulls free of %s leash!", Monnam(mtmp), mhis(mtmp));
+            pline_mon(mtmp, "%s pulls free of %s leash!", Monnam(mtmp), mhis(mtmp));
         else
             Your("leash falls slack.");
     }
@@ -946,7 +946,7 @@ check_leash(coordxy x, coordxy y)
                     if (!DEADMONSTER(mtmp))
                         u.uconduct.killer = save_pacifism;
                 } else {
-                    pline("%s is choked by the leash!", Monnam(mtmp));
+                    pline_mon(mtmp, "%s is choked by the leash!", Monnam(mtmp));
                     /* tameness eventually drops to 1 here (never 0) */
                     if (mtmp->mtame && rn2(mtmp->mtame))
                         mtmp->mtame--;
@@ -1531,6 +1531,8 @@ splash_lit(struct obj *obj)
                     && ((!is_flyer(mtmp->data) && !is_floater(mtmp->data))
                         || Is_waterlevel(&u.uz)));
             snuff = FALSE;
+            if (useeit)
+                set_msg_xy(x, y);
         }
 
         if (useeit || uhearit)
@@ -1576,11 +1578,14 @@ catch_lit(struct obj *obj)
             && obj->cursed && !rn2(2))
             return FALSE;
 
-        if (obj->where == OBJ_INVENT || cansee(x, y))
+        if (obj->where == OBJ_INVENT || cansee(x, y)) {
+            if (obj->where == OBJ_FLOOR && cansee(x, y))
+                set_msg_xy(x, y);
             pline("%s %s %s", Yname2(obj),
                   /* "catches light!" or "feels warm." */
                   otense(obj, Blind ? "feel" : "catch"),
                   Blind ? "warm." : "light!");
+        }
         if (obj->otyp == POT_OIL)
             makeknown(obj->otyp);
         if (carried(obj) && obj->unpaid && costly_spot(u.ux, u.uy)) {
@@ -2434,6 +2439,7 @@ fig_transform(anything *arg, long timeout)
 
         case OBJ_FLOOR:
             if (cansee_spot && !silent) {
+                set_msg_xy(cc.x, cc.y);
                 if (suppress_see)
                     pline("%s suddenly vanishes!", an(xname(figurine)));
                 else
