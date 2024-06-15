@@ -52,6 +52,19 @@ gettrack(coordxy x, coordxy y)
     return (coord *) 0;
 }
 
+/* return TRUE if x,y has hero tracks on it */
+boolean
+hastrack(coordxy x, coordxy y)
+{
+    int i;
+
+    for (i = 0; i < utcnt; i++)
+        if (utrack[i].x == x && utrack[i].y == y)
+            return TRUE;
+
+    return FALSE;
+}
+
 /* save the hero tracking info */
 void
 save_track(NHFILE *nhfp)

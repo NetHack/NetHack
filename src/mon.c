@@ -2316,7 +2316,10 @@ mfndpos(
                                    ttmp->ttyp);
                             continue;
                     }
-                    if (!m_harmless_trap(mon, ttmp)) {
+                    /* fixed-destination teleport trap, was used by hero */
+                    if (fixed_tele_trap(ttmp) && hastrack(nx, ny))
+                        info[cnt] |= ALLOW_TRAPS;
+                    else if (!m_harmless_trap(mon, ttmp)) {
                         if (!(flag & ALLOW_TRAPS)) {
                             if (mon_knows_traps(mon, ttmp->ttyp))
                                 continue;

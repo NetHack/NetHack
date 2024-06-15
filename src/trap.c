@@ -2897,6 +2897,11 @@ dotrap(struct trap *trap, unsigned trflags)
 
     nomul(0);
 
+    if (fixed_tele_trap(trap)) {
+        trflags |= FORCETRAP;
+        forcetrap = TRUE;
+    }
+
     /* KMH -- You can't escape the Sokoban level traps */
     if (Sokoban && (is_pit(ttype) || is_hole(ttype))) {
         /* The "air currents" message is still appropriate -- even when
@@ -3653,6 +3658,11 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
         /* monster has seen such a trap before */
         boolean already_seen = (mon_knows_traps(mtmp, tt)
                                 || (tt == HOLE && !mindless(mptr)));
+
+        if (fixed_tele_trap(trap)) {
+            mintrapflags |= FORCETRAP;
+            forcetrap = TRUE;
+        }
 
         if (mtmp == u.usteed) {
             ; /* true when called from dotrap, inescapable is not an option */

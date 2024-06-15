@@ -1456,6 +1456,7 @@ tele_trap(struct trap *trap)
         coord cc;
         struct monst *mtmp = m_at(trap->teledest.x, trap->teledest.y);
 
+        settrack();
         if (mtmp) {
             if (!enexto(&cc, mtmp->mx, mtmp->my, mtmp->data)) {
                 /* could not find some other place to put mtmp; the level must
