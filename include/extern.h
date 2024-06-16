@@ -763,6 +763,7 @@ extern void quickmimic(struct monst *) NONNULLARG1;
 
 /* ### dokick.c ### */
 
+extern long bribe_price(struct monst *) NONNULLARG1;
 extern boolean ghitm(struct monst *, struct obj *) NONNULLPTRS;
 extern void container_impact_dmg(struct obj *, coordxy, coordxy) NONNULLARG1;
 extern int dokick(void);
@@ -2900,6 +2901,7 @@ extern const char *maybe_gasp(struct monst *) NONNULLARG1;
 extern const char *cry_sound(struct monst *) NONNULLARG1;
 extern int dotalk(void);
 extern int tiphat(void);
+extern void bribe_comment(struct monst *, boolean) NONNULLARG1;
 #ifdef USER_SOUNDS
 extern int add_sound_mapping(const char *) NONNULLARG1;
 extern void play_sound_for_message(const char *) NONNULLARG1;

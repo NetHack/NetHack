@@ -14,6 +14,7 @@
 staticfn void kickdmg(struct monst *, boolean);
 staticfn boolean maybe_kick_monster(struct monst *, coordxy, coordxy);
 staticfn void kick_monster(struct monst *, coordxy, coordxy);
+staticfn boolean is_corrupt(struct monst *) NONNULLARG1;
 staticfn int kick_object(coordxy, coordxy, char *) NONNULLARG3;
 staticfn int really_kick_object(coordxy, coordxy);
 staticfn char *kickstr(char *, const char *) NONNULLPTRS;
@@ -293,6 +294,59 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
     kickdmg(mon, clumsy);
 }
 
+staticfn boolean
+is_corrupt(struct monst *mtmp)
+{
+    struct permonst *ptr = mtmp->data;
+    /* Psychologically unable to accept a bribe */
+    if(!humanoid(ptr) || mindless(ptr)) {
+        return FALSE;
+    }
+    /* Does not care for money or the things it can buy */
+    if(!(likes_gold(ptr) || likes_gems(ptr) || likes_objs(ptr) || likes_magic(ptr))) {
+        return FALSE;
+    }
+    /* Hates your race */
+    if((Race_if(PM_ELF) && is_orc(ptr)) || (Race_if(PM_ORC) && is_elf(ptr))) {
+        return FALSE;
+    }
+    /* Takes pride in their job, or at least fears their employer */
+    if(ptr == &mons[gu.urole.guardnum] || ptr->mlet == S_ANGEL || ptr->mlet == S_LICH
+        || is_watch(ptr) || mtmp->isshk || mtmp->ispriest || mtmp->isgd) {
+        return FALSE;
+    }
+    /* Has ambitions beyond mere wealth */
+    if(is_covetous(ptr) || is_mplayer(ptr) || (ptr->geno & G_UNIQ)) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+long
+bribe_price(struct monst *mtmp)
+{
+    int base = 0L;
+    switch(P_SKILL(P_BRIBERY)) {
+    case P_MASTER:
+    case P_GRAND_MASTER: 
+    case P_EXPERT:
+        base = 250L;
+        break;
+    case P_SKILLED:
+        base = 500L;
+        break;
+    case P_BASIC:
+        base = 750L;
+        break;
+    case P_ISRESTRICTED:
+    case P_UNSKILLED:
+    default:
+        base = 1000L;
+    }
+    return base + ((base * mtmp->m_lev * mtmp->m_lev) / ACURR(A_CHA));
+}
+
+
 /*
  *  Return TRUE if caught (the gold taken care of), FALSE otherwise.
  *  The gold object is *not* attached to the fobj chain!
@@ -302,7 +356,7 @@ ghitm(struct monst *mtmp, struct obj *gold)
 {
     boolean msg_given = FALSE;
 
-    if (!likes_gold(mtmp->data) && !mtmp->isshk && !mtmp->ispriest
+    if (!is_corrupt(mtmp) && !mtmp->isshk && !mtmp->ispriest
         && !mtmp->isgd && !is_mercenary(mtmp->data)) {
         wakeup(mtmp, TRUE);
     } else if (!mtmp->mcanmove) {
@@ -369,39 +423,20 @@ ghitm(struct monst *mtmp, struct obj *gold)
                         : mtmp->mpeaceful
                           ? "I'll take care of that; please move along."
                           : "I'll take that; now get moving.");
-        } else if (is_mercenary(mtmp->data)) {
+        } else if (is_watch(mtmp->data)) {
+            SetVoice(mtmp, 0, 80, 0);
+            verbalize("I don't take bribes from scum like you!");
+        } else if (is_corrupt(mtmp)) {
             boolean was_angry = !mtmp->mpeaceful;
-            long goldreqd = 0L;
-
-            if (mtmp->data == &mons[PM_SOLDIER])
-                goldreqd = 100L;
-            else if (mtmp->data == &mons[PM_SERGEANT])
-                goldreqd = 250L;
-            else if (mtmp->data == &mons[PM_LIEUTENANT])
-                goldreqd = 500L;
-            else if (mtmp->data == &mons[PM_CAPTAIN])
-                goldreqd = 750L;
-
-            if (goldreqd && rn2(3)) {
-                umoney = money_cnt(gi.invent);
-                goldreqd += (umoney + u.ulevel * rn2(5)) / ACURR(A_CHA);
-                if (value > goldreqd)
-                    mtmp->mpeaceful = TRUE;
+            long goldreqd = bribe_price(mtmp);
+            if(value >= goldreqd) {
+                mtmp->mpeaceful = TRUE;
+                use_skill(P_BRIBERY, 1);
             }
 
-            if (!mtmp->mpeaceful) {
-                SetVoice(mtmp, 0, 80, 0);
-                if (goldreqd)
-                    verbalize("That's not enough, coward!");
-                else /* unbribable (watchman) */
-                    verbalize("I don't take bribes from scum like you!");
-            } else if (was_angry) {
-                SetVoice(mtmp, 0, 80, 0);
-                verbalize("That should do.  Now beat it!");
-            } else {
-                SetVoice(mtmp, 0, 80, 0);
-                verbalize("Thanks for the tip, %s.",
-                          flags.female ? "lady" : "buddy");
+            bribe_comment(mtmp, was_angry);
+            if(value >= (goldreqd*2) && mtmp->mpeaceful && was_angry) {
+                You("wonder if you overpaid.");
             }
         }
         return TRUE;

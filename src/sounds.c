@@ -1530,6 +1530,157 @@ tiphat(void)
     return res;
 }
 
+void
+bribe_comment(struct monst *mtmp, boolean was_angry)
+{
+    char verbuf[BUFSZ];
+    const char* verbl_msg = 0;
+    struct permonst *ptr = mtmp->data;
+    int msound = ptr->msound;
+
+    if (msound == MS_ORC && Race_if(PM_ORC)) {
+        msound = MS_HUMANOID;
+    }
+    switch(msound) {
+    case MS_GRUNT:
+    case MS_MUMBLE:
+    case MS_WERE:
+    case MS_ORC:
+        if (!mtmp->mpeaceful) {
+            verbl_msg = "Hmph.";
+        } else if (was_angry) {
+            verbl_msg = "Hmmm.";
+        } else {
+            verbl_msg = 0;
+        }
+        break;
+    case MS_LAUGH:
+        if (!mtmp->mpeaceful) {
+            verbl_msg = "Ha.";
+        } else if (was_angry) {
+            verbl_msg = "Haha!";
+        } else {
+            verbl_msg = 0;
+        }
+        break;
+    case MS_ARREST:
+        if (!mtmp->mpeaceful) {
+            verbl_msg = "Bribery of a public official is punishable under the law!";
+        } else if(was_angry) {
+            verbl_msg = "Don't tell the Kop Kommissioner!";
+        } else {
+            verbl_msg = "Thanks, that will buy us a few cream pies!";
+        }
+        break;
+    case MS_SOLDIER:
+        if (!mtmp->mpeaceful) {
+            verbl_msg = "That's not enough, coward!";
+        } else if (was_angry) {
+            verbl_msg = "That should do. Now beat it!";
+        } else {
+            Sprintf(verbuf, "Thanks for the tip, %s.",
+                    flags.female ? "lady" : "buddy");
+            verbl_msg = verbuf;
+        }
+        break;
+    case MS_DJINNI:
+        if (!mtmp->mpeaceful) {
+            verbl_msg = "A paltry sum for a being such as me.";
+        } else {
+            verbl_msg = "I appreciate your generosity.";
+        }
+        break;
+    case MS_NURSE:
+        if (!mtmp->mpeaceful) {
+            verbl_msg = "That can barely pay for a potion of healing.";
+        } else {
+            verbl_msg = "Thanks, medical school is expensive!";
+        }
+        break;
+    case MS_SEDUCE:
+        if (!mtmp->mpeaceful) {
+            verbl_msg = "Wow, that is really tiny!";
+        } else {
+            Sprintf(verbuf, "Call me sometime, %s.",
+                    flags.female ? "beautiful" : "handsome");
+            verbl_msg = verbuf;
+        }
+        break;
+    case MS_VAMPIRE:
+        if (!mtmp->mpeaceful) {
+            verbl_msg = "That vill not satisfy my craving!";
+        } else {
+            verbl_msg = "I suppose that can help pay off the coffin.";
+        }
+        break;
+    case MS_BOAST:
+        if (!mtmp->mpeaceful) {
+            verbl_msg = "Fee, Fie, Foe, Fum, that is quite a pitiful sum!";
+        } else {
+            verbl_msg = "This will make a fine addition to my collection.";
+        }
+        break;
+    case MS_HUMANOID:
+        if (is_elf(ptr)) {
+            if(!mtmp->mpeaceful) {
+                verbl_msg = "Our loyalty cannot be bought so cheaply!";
+            } else if (was_angry) {
+                verbl_msg = "These funds shall serve us well against orcish scum.";
+            } else if (Race_if(PM_ELF)) {
+                Sprintf(verbuf, "Thank you, %s.",
+                        flags.female ? "sister" : "brother");
+                verbl_msg = verbuf;
+            } else {
+                verbl_msg = "Thanks.";
+            }
+        }
+        else if (is_dwarf(ptr)) {
+            if (!mtmp->mpeaceful) {
+                verbl_msg = "There's more gold than that under my toenails.";
+            } else if (was_angry) {
+                verbl_msg = "Not bad. Now get out of my way.";
+            } else {
+                verbl_msg = "Thanks.";
+            }
+        }
+        else if (is_gnome(ptr)) {
+            if (!mtmp->mpeaceful) {
+                verbl_msg = "Insufficient funds!";
+            } else if (was_angry) {
+                verbl_msg = "You have a deal!";
+            } else {
+                verbl_msg = "Nifty!";
+            }
+        }
+        else if (ptr->mlet == S_CENTAUR) {
+            if (!mtmp->mpeaceful) {
+                verbl_msg = "I've seen more valuable globs of green slime.";
+            } else if (was_angry) {
+                verbl_msg = "An acceptable amount. Now kindly leave me alone.";
+            } else {
+                verbl_msg = 0;
+            }
+        }
+        else {
+            if (!mtmp->mpeaceful) {
+                verbl_msg = "That is not enough, cheapskate!";
+            } else if (was_angry) {
+                verbl_msg = "That is better. Now move along.";
+            } else {
+                verbl_msg = 0;
+            }
+        }
+        break;
+    default:
+        verbl_msg = 0;
+    }
+    if(verbl_msg) {
+        SetVoice(mtmp, 0, 80, 0);
+        verbalize1(verbl_msg);
+    }
+}
+
+
 #ifdef USER_SOUNDS
 
 typedef struct audio_mapping_rec {

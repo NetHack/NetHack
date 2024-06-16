@@ -306,8 +306,7 @@ demon_talk(struct monst *mtmp)
         return 1;
     }
     cash = money_cnt(gi.invent);
-    demand = (cash * (rnd(80) + 20 * Athome))
-           / (100 * (1 + (sgn(u.ualign.type) == sgn(mtmp->data->maligntyp))));
+    demand = bribe_price(mtmp);
 
     if (!demand || gm.multi < 0) { /* you have no gold or can't move */
         mtmp->mpeaceful = 0;

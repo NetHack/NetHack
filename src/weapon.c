@@ -34,6 +34,7 @@ staticfn void skill_advance(int);
 #define PN_ESCAPE_SPELL (-13)
 #define PN_MATTER_SPELL (-14)
 #define PN_WAND (-15)
+#define PN_BRIBERY (-16)
 
 static NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
     /* Weapon */
@@ -45,7 +46,7 @@ static NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
     PN_ATTACK_SPELL, PN_HEALING_SPELL, PN_DIVINATION_SPELL,
     PN_ENCHANTMENT_SPELL, PN_CLERIC_SPELL, PN_ESCAPE_SPELL, PN_MATTER_SPELL,
     /* Other */
-    PN_BARE_HANDED, PN_TWO_WEAPONS, PN_RIDING, PN_WAND
+    PN_BARE_HANDED, PN_TWO_WEAPONS, PN_RIDING, PN_WAND, PN_BRIBERY
 };
 
 /* note: entry [0] isn't used */
@@ -54,7 +55,7 @@ static NEARDATA const char *const odd_skill_names[] = {
     "two weapon combat", "riding", "polearms", "saber", "hammer", "whip",
     "attack spells", "healing spells", "divination spells",
     "enchantment spells", "clerical spells", "escape spells", "matter spells",
-    "wands"
+    "wands", "bribery"
 };
 /* indexed via is_martial() */
 static NEARDATA const char *const barehands_or_martial[] = {
@@ -1844,6 +1845,11 @@ skill_init(const struct def_skill *class_skill)
     } else if (Role_if(PM_WIZARD)) {
         P_SKILL(P_ATTACK_SPELL) = P_BASIC;
         P_SKILL(P_ENCHANTMENT_SPELL) = P_BASIC;
+    }
+
+    /* set skills for bribery */
+    if (Role_if(PM_MERCHANT)) {
+        P_SKILL(P_BRIBERY) = P_BASIC;
     }
 
     /* walk through array to set skill maximums */

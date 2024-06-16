@@ -63,8 +63,9 @@ enum p_skills {
     P_TWO_WEAPON_COMBAT  = 36, /* pair of weapons, one in each hand */
     P_RIDING             = 37, /* How well you control your steed */
     P_WAND               = 38,
+    P_BRIBERY            = 39,
 
-    P_NUM_SKILLS         = 39
+    P_NUM_SKILLS         = 40
 };
 
 #define P_MARTIAL_ARTS P_BARE_HANDED_COMBAT /* Role distinguishes */
@@ -75,7 +76,7 @@ enum p_skills {
 #define P_FIRST_SPELL P_ATTACK_SPELL
 #define P_LAST_SPELL P_MATTER_SPELL
 
-#define P_LAST_H_TO_H P_WAND
+#define P_LAST_H_TO_H P_BRIBERY
 #define P_FIRST_H_TO_H P_BARE_HANDED_COMBAT
 
 /* These roles qualify for a martial arts bonus */
