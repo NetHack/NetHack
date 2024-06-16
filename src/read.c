@@ -1417,12 +1417,6 @@ seffect_remove_curse(struct obj **sobjp)
                show known blessed scroll losing bknown when confused */
             if (obj == sobj && obj->quan == 1L)
                 continue;
-            if (obj->oartifact && obj->cursed && spec_ability(obj, SPFX_INTEL)
-                && obj->otyp == DUNCE_CAP
-                && rn2(10) < 8) {
-                pline("%s!", Tobjnam(obj, "resist"));
-                continue;
-            }
             wornmask = (obj->owornmask & ~(W_BALL | W_ART | W_ARTI));
             if (wornmask && !sblessed) {
                 /* handle a couple of special cases; we don't
