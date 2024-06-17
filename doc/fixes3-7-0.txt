@@ -1418,6 +1418,10 @@ only honor DEBUGFILES (for activating debugpline() calls) when in wizard mode
 if hero is on scroll of scare monster or Elbereth, werecreature switching from
 	human to beast form or general monster polymorphing into a susceptible
 	form will become scared right away instead on its next move
+'altmeta' option didn't work as intended when 'number_pad' was On; typing
+	"n <count> ESC c" wasn't treated as "n <count> M-c" because reading
+	the 'n' changed program_state.input_state from commandInp to otherInp,
+	preventing special ESC handling; not an issue when number_pad was Off
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

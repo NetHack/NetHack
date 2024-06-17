@@ -4716,7 +4716,9 @@ get_count(
     return key;
 }
 
-
+/* main command input routine when not repeating and not executing canned
+   commands; input comes via get_count() which collects repeat count if one
+   is present and returns next non-digit to us */
 staticfn int
 parse(void)
 {
@@ -4728,9 +4730,17 @@ parse(void)
     flush_screen(1); /* Flush screen buffer. Put the cursor on the hero. */
 
     /* affects readchar() behavior for ESC iff 'altmeta' option is On;
-       reset to 0 by readchar() */
+       is always reset to otherInp by readchar() */
     gp.program_state.input_state = commandInp;
+
     if (!gc.Cmd.num_pad || (foo = readchar()) == gc.Cmd.spkeys[NHKF_COUNT]) {
+        /* if 'num_pad' is On then readchar() has just reset input_state;
+           set it back to commandInp, so that get_count() supports 'altmeta';
+           otherwise "n<count>ESC<character>" becomes "n<count>ESC" (with
+           <character> not read from keyboard yet) rather than intended count
+           and meta keystroke "n<count>M-<character>" */
+        gp.program_state.input_state = commandInp;
+
         foo = get_count((char *) 0, '\0', LARGEST_INT,
                         &gc.command_count, GC_NOFLAGS);
         gl.last_command_count = gc.command_count;
