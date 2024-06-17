@@ -1964,6 +1964,9 @@ restoring a save file could trigger impossible "rnd(0) attempted" if it tried
 fix regression of a post-3.6 fix:  if 2 Wizards of Yendor were in play and 1
 	escaped the dungeon, bookkeeping for current number of Wizards stayed
 	at 2, interferring with future Wizard behavior
+sometimes a repeat count from the preceding command carried over to most
+	recent one when using do-again (^A); if the most recent one was an
+	extended command, the spurious repeat was for '#'
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

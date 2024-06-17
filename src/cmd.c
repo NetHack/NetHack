@@ -4743,8 +4743,8 @@ parse(void)
 
         foo = get_count((char *) 0, '\0', LARGEST_INT,
                         &gc.command_count, GC_NOFLAGS);
-        gl.last_command_count = gc.command_count;
     }
+    gl.last_command_count = gc.command_count;
 
     if (foo == gc.Cmd.spkeys[NHKF_ESC]) { /* esc cancels count (TH) */
         clear_nhwindow(WIN_MESSAGE);
