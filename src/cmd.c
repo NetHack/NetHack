@@ -878,7 +878,7 @@ domonability(void)
     char c = '\0';
 
     if (might_hide && webmaker(uptr)) {
-        c = yn_function("Hide [h] or spin a web [s]?", "hsq", 'q', TRUE);
+        c = yn_function("Hide [h] or spin a web [s]?", hidespinchars, 'q', TRUE);
         if (c == 'q' || c == '\033')
             return ECMD_OK;
     }
@@ -5017,7 +5017,7 @@ yn_menuable_resp(const char *resp)
 {
     return iflags.query_menu && iflags.window_inited
         && (resp == ynchars || resp == ynqchars || resp == ynaqchars
-            || resp == rightleftchars);
+            || resp == rightleftchars || resp == hidespinchars);
 }
 
 staticfn void
@@ -5054,13 +5054,16 @@ yn_function_menu(
         if (resp == rightleftchars) {
             yn_func_menu_opt(win, 'r', "Right", def);
             yn_func_menu_opt(win, 'l', "Left", def);
+        } else if (resp == hidespinchars) {
+            yn_func_menu_opt(win, 'h', "Hide", def);
+            yn_func_menu_opt(win, 's', "Spin a web", def);
         } else {
             yn_func_menu_opt(win, 'y', "Yes", def);
             yn_func_menu_opt(win, 'n', "No", def);
         }
         if (resp == ynaqchars)
             yn_func_menu_opt(win, 'a', "All", def);
-        if (resp == ynqchars || resp == ynaqchars)
+        if (resp == ynqchars || resp == ynaqchars || resp == hidespinchars)
             yn_func_menu_opt(win, 'q', "Quit", def);
         end_menu(win, query);
         n = select_menu(win, PICK_ONE, &sel);

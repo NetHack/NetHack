@@ -85,6 +85,7 @@ extern const char ynqchars[];
 extern const char ynaqchars[];
 extern const char ynNaqchars[];
 extern const char rightleftchars[];
+extern const char hidespinchars[];
 extern NEARDATA long yn_number;
 extern struct restore_info restoreinfo;
 extern NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
