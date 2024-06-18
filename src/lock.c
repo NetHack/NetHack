@@ -1,4 +1,4 @@
-/* NetHack 3.7	lock.c	$NHDT-Date: 1713657045 2024/04/20 23:50:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.7	lock.c	$NHDT-Date: 1718745135 2024/06/18 21:12:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.137 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -688,7 +688,7 @@ doforce(void)
                  !uwep ? "when not wielding a"
                  : (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep))
                    ? (use_plural ? "without proper" : "without a proper")
-                   : (use_plural ? "with that" : "with those"),
+                   : (use_plural ? "with those" : "with that"),
                  use_plural ? "s" : "");
         return ECMD_OK;
     }
