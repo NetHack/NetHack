@@ -386,6 +386,7 @@ struct nomakedefs_s {
     const char *copyright_banner_c;
     const char *git_sha;
     const char *git_branch;
+    const char *git_prefix;
     const char *version_string;
     const char *version_id;
     unsigned long version_number;

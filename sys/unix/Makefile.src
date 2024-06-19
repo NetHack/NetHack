@@ -765,7 +765,7 @@ $(TARGETPFX)sfstruct.o: sfstruct.c $(HACK_H)
 #	date.c should be recompiled any time any of the source or include code
 #	is modified.
 $(TARGETPFX)date.o: date.c $(HACK_H) $(HACKCSRC)  $(HOBJ) $(TARGET_HACKLIB)
-	$(TARGET_CC) $(TARGET_CFLAGS) $(GITHASH) $(GITBRANCH) -c -o $@ date.c
+	$(TARGET_CC) $(TARGET_CFLAGS) $(GITHASH) $(GITBRANCH) $(GITPREFIX) -c -o $@ date.c
 
 #	date.h should be remade any time any of the source or include code
 #	is modified.  Unfortunately, this would make the contents of this

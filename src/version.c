@@ -58,6 +58,10 @@ getversionstring(char *buf, size_t bufsz)
                      "%sbranch:%s",
                      c++ ? "," : "", nomakedefs.git_branch);
 #endif
+        if (nomakedefs.git_prefix)
+            Snprintf(eos(buf), (bufsz - strlen(buf)) - 1,
+                     "%sprefix:%s",
+                     c++ ? "," : "", nomakedefs.git_prefix);
         if (c)
             Snprintf(eos(buf), (bufsz - strlen(buf)) - 1,
                      "%s", ")");
