@@ -447,7 +447,7 @@ copy_oextra(struct obj *obj2, struct obj *obj1)
 }
 
 /*
- * Split obj so that it gets size gets reduced by num. The quantity num is
+ * Split stack so that its size gets reduced by num.  The quantity num is
  * put in the object structure delivered by this call.  The returned object
  * has its wornmask cleared and is positioned just following the original
  * in the nobj chain (and nexthere chain when on the floor).
