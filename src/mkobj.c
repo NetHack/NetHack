@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkobj.c	$NHDT-Date: 1715109575 2024/05/07 19:19:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.296 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1718999849 2024/06/21 19:57:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.299 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3185,7 +3185,7 @@ nomerge_exception(struct obj *obj)
 static const char *const obj_state_names[NOBJ_STATES] = {
     "free", "floor", "contained", "invent",
     "minvent", "migrating", "buried", "onbill",
-    "luafree"
+    "luafree", "deleted",
 };
 
 staticfn const char *
