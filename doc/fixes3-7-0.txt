@@ -1422,6 +1422,10 @@ if hero is on scroll of scare monster or Elbereth, werecreature switching from
 	"n <count> ESC c" wasn't treated as "n <count> M-c" because reading
 	the 'n' changed program_state.input_state from commandInp to otherInp,
 	preventing special ESC handling; not an issue when number_pad was Off
+a 3.6 fix to avoid a potential "object lost" panic when drinking potions had
+	unintended side-effect of making used up potions on shop's bill become
+	separate bill entries all with count 1 despite having come from same
+	unpaid stack; affected Ix inventory listing and itemized shop billing
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
