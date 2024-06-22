@@ -387,6 +387,10 @@ GITHASH = -DNETHACK_GIT_SHA=\"$(GIT_HASH)\"
 GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
 !ENDIF
 
+!IFDEF GIT_PREFIX
+GITPREFIX = -DNETHACK_GIT_PREFIX=\"$(GIT_PREFIX)\"
+!ENDIF
+
 #===============-=================================================
 # LUA library
 # Official source for Lua is http://www.lua.org/ftp/lua-5.4.6.tar.gz
@@ -1593,7 +1597,7 @@ $(OUTL)makedefs.o: $(U)makedefs.c $(SRC)\mdlib.c $(CONFIG_H) $(INCL)\permonst.h 
 #	$(Q)$(CC) -DENUM_PM $(CFLAGS) $(TTYDEF) $(CROSSCOMPILE) /EP -Fo$@ $(U)makedefs.c >$(OUTL)makedefs.c.preproc
 
 #
-# This is awful, but it allows the GITHASH and GITBRANCH macros to be
+# This is awful, but it allows the GITHASH, GITBRANCH and GITPREFIX macros to be
 # defined and utilized, using only build-in Windows and nmake commands,
 # as well as the necessary git commands.
 #
@@ -1604,6 +1608,7 @@ $(OTTY)date.o: $(HACKINCL) $(HACKSRC) $(HACKOBJ) $(ALLOBJTTY) $(CURSESOBJ)
 !IF "$(GIT_AVAILABLE)" == "1"
 	@git rev-parse --verify HEAD 2>&1 >$(OTTY)date1.tmp
 	@git rev-parse --abbrev-ref HEAD 2>&1 >$(OTTY)date2.tmp
+	@git config nethack.substprefix 2>&1 >$(OTTY)date3.tmp
 	@echo.>date.nmk
 	@echo OBJ = $(OBJTTY)>>date.nmk
 	@echo O = ^$(OBJTTY)^^^\>>date.nmk
@@ -1611,6 +1616,7 @@ $(OTTY)date.o: $(HACKINCL) $(HACKSRC) $(HACKOBJ) $(ALLOBJTTY) $(CURSESOBJ)
 	@echo CFLAGS = $(CFLAGS) ^\>>date.nmk
 	@for /F "usebackq" %%A IN ("$(OTTY)date1.tmp") DO @echo.	-DNETHACK_GIT_SHA=\"%%A\" ^\>>date.nmk
 	@for /F "usebackq" %%A IN ("$(OTTY)date2.tmp") DO @echo.	-DNETHACK_GIT_BRANCH=\"%%A\">>date.nmk
+	@for /F "usebackq" %%A IN ("$(OTTY)date3.tmp") DO @echo.	-DNETHACK_GIT_PREFIX=\"%%A\">>date.nmk
 	@echo.>>date.nmk
 	@echo default: ^$(OTTY)date.o>>date.nmk
 	@echo.>>date.nmk
@@ -1624,6 +1630,7 @@ $(OGUI)date.o: $(HACKINCL) $(HACKSRC) $(HACKOBJ) $(ALLOBJGUI)
 !IF "$(GIT_AVAILABLE)" == "1"
 	@git rev-parse --verify HEAD 2>&1 >$(OGUI)date1.tmp
 	@git rev-parse --abbrev-ref HEAD 2>&1 >$(OGUI)date2.tmp
+	@git config nethack.substprefix 2>&1 >$(OTTY)date3.tmp
 	@echo.>date.nmk
 	@echo OBJ = $(OBJGUI)>>date.nmk
 	@echo O = ^$(OBJGUI)^^^\>>date.nmk
@@ -1631,6 +1638,7 @@ $(OGUI)date.o: $(HACKINCL) $(HACKSRC) $(HACKOBJ) $(ALLOBJGUI)
 	@echo CFLAGS = $(CFLAGS) ^\>>date.nmk
 	@for /F "usebackq" %%A IN ("$(OGUI)date1.tmp") DO @echo.	-DNETHACK_GIT_SHA=\"%%A\" ^\>>date.nmk
 	@for /F "usebackq" %%A IN ("$(OGUI)date2.tmp") DO @echo.	-DNETHACK_GIT_BRANCH=\"%%A\">>date.nmk
+	@for /F "usebackq" %%A IN ("$(OTTY)date3.tmp") DO @echo.	-DNETHACK_GIT_PREFIX=\"%%A\">>date.nmk
 	@echo.>>date.nmk
 	@echo default: ^$(OGUI)date.o>>date.nmk
 	@echo.>>date.nmk

@@ -211,11 +211,15 @@ ifeq "$(INTERNET_AVAILABLE)" "Y"
 ifeq "$(GIT_AVAILABLE)" "Y"
 GIT_HASH := $(shell echo `git rev-parse --verify HEAD` 2>&1)
 GIT_BRANCH := $(shell echo `git rev-parse --abbrev-ref HEAD` 2>&1)
+GIT_PREFIX := $(shell echo `git config nethack.substprefix` 2>&1)
 ifdef GIT_HASH
 GITHASH = -DNETHACK_GIT_SHA=\"$(GIT_HASH)\"
 endif
 ifdef GIT_BRANCH
 GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
+endif
+ifdef GIT_PREFIX
+GITPREFIX = -DNETHACK_GIT_PREFIX=\"$(GIT_PREFIX)\"
 endif
 endif
 endif
@@ -1048,7 +1052,7 @@ $(ONHW)/%.o: $(SRC)/%.c $(NHLUAH) | $(ONHW)
 #       was just recompiled. date.h is not used in the build of NetHack 3.7.
 #
 $(ONHW)/date.o: $(SRC)/date.c $(NHWOBJS) | $(ONHW)
-	$(cc) $(CFLAGSW) $(GITHASH) $(GITBRANCH) $< -o$@
+	$(cc) $(CFLAGSW) $(GITHASH) $(GITBRANCH) $(GITPREFIX) $< -o$@
 
 $(ONHW)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONHW)
 	$(cc) $(CPPFLAGSW) $< -o$@
@@ -1164,7 +1168,7 @@ CLEAN_FILE += $(MAINZIP)
 #       was just recompiled. date.h is not used in the build of NetHack 3.7.
 #
 $(ONH)/date.o: $(SRC)/date.c $(NHOBJS) $(NHRES) | $(ONH)
-	$(cc) $(CFLAGSNH) $(GITHASH) $(GITBRANCH) $< -o$@
+	$(cc) $(CFLAGSNH) $(GITHASH) $(GITBRANCH) $(GITPREFIX) $< -o$@
 
 $(ONH)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONH)
 	$(cc) $(CPPFLAGSNH) $< -o$@
