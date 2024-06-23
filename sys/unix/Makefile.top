@@ -322,6 +322,7 @@ dofiles-nodlb:
 
 LUA_URL :=www.lua.org/ftp
 LUA_URL_MIRROR :=www.tecgraf.puc-rio.br/lua/mirror/ftp
+LUA_URL_NHD :=www.nethack.org/download/thirdparty
 
 fetch-lua-mirror: LUA_URL :=$(LUA_URL_MIRROR)
 fetch-lua-mirror: fetch-Lua
@@ -331,36 +332,33 @@ fetch-lua: fetch-Lua
 	@true
 
 fetch-Lua:
-	@( mkdir -p lib && cd lib && \
-	  n=0; \
+	@( \
+	  shac1=`command -v shasum`; \
+	  shac2=`command -v sha256sum`; \
+	  if [ ! -z $$shac1 ]; then \
+	    shac="$$shac1 -a 256"; elif [ ! -z $$shac2 ]; then \
+	    shac=$$shac2; else echo "CAUTION: no way to check integrity"; \
+	  fi; \
+	  set -- DUMMY $(LUA_URL) $(LUA_URL_MIRROR) $(LUA_URL_NHD); \
+	  luafile=lua-$(LUA_VERSION).tar.gz; \
 	  export curlstatus=1; \
-	  while [ $${n} -lt 2 ]; do \
+	  mkdir -p lib && cd lib && \
+	  while [ $$# -gt 0 ]; do \
+	    shift; \
 	    if [ $$curlstatus -ne 0 ]; then \
-	      if [ $${n} -eq 0 ]; then \
-	          luaurl=https://$(LUA_URL)/lua-$(LUA_VERSION).tar.gz; \
-	      fi; \
-	      if [ $${n} -eq 1 ]; then \
-	          luaurl=https://$(LUA_URL_MIRROR)/lua-$(LUA_VERSION).tar.gz; \
-	      fi; \
+	      luaurl=https://$$1/$$luafile; \
 	      echo trying $$luaurl; \
-	      shac1=`command -v shasum`; \
-	      shac2=`command -v sha256sum`; \
-	      if [ ! -z $$shac1 ]; then \
-	        shac="$$shac1 -a 256"; elif [ ! -z $$shac2 ]; then \
-	        shac=$$shac2; else echo "CAUTION: no way to check integrity"; \
-	      fi; \
 	      curl -R -O $$luaurl; \
-	      export curlstatus=$$?; \
+	      curlstatus=$$?; \
 	      if [ $$curlstatus -eq 0 ]; then \
 	        if [ ! -z "$$shac" ]; then \
 	          echo Checking integrity with $$shac; \
-	          $$shac -w -c ../submodules/CHKSUMS < lua-$(LUA_VERSION).tar.gz; \
+	          $$shac -w -c ../submodules/CHKSUMS < $$luafile; \
 	        fi; \
-	        tar zxf lua-$(LUA_VERSION).tar.gz && \
-	        rm -f lua-$(LUA_VERSION).tar.gz; \
+	        tar zxf $$luafile && \
+	        rm -f $$luafile; \
 	      fi; \
 	    fi; \
-	    n=`expr $$n + 1`; \
 	  done; \
 	  true )
 
