@@ -2273,28 +2273,37 @@ Doname2(struct obj *obj)
     return s;
 }
 
-#if 0 /* stalled-out work in progress */
-/* Doname2() for itemized buying of 'obj' from a shop */
+/* doname() for itemized buying of 'obj' from a shop */
 char *
-payDoname(struct obj *obj)
+paydoname(struct obj *obj)
 {
     static const char and_contents[] = " and its contents";
-    char *p = doname(obj);
+    char *p;
 
-    if (Is_container(obj) && !obj->cknown) {
-        if (obj->unpaid) {
-            if ((int) strlen(p) + sizeof and_contents - 1 < BUFSZ - PREFIX)
-                Strcat(p, and_contents);
-            *p = highc(*p);
-        } else {
-            p = strprepend(p, "Contents of ");
+    /* suppress invent-style price; caller will add billing-style price */
+    iflags.suppress_price++;
+    p = doname_base(obj, 0U);
+    iflags.suppress_price--;
+
+    if (Has_contents(obj)) {
+        if (!strncmp(p, "a ", 2))
+            p += 2;
+        else if (!strncmp(p, "an ", 3))
+            p += 3;
+        p = strprepend(p, obj->unpaid ? "an unpaid " : "your ");
+
+        if (!obj->cknown) {
+            if (obj->unpaid) {
+                if ((int) strlen(p) + sizeof and_contents - 1
+                    < BUFSZ - PREFIX)
+                    Strcat(p, and_contents);
+            } else {
+                p = strprepend(p, "contents of ");
+            }
         }
-    } else {
-        *p = highc(*p);
     }
     return p;
 }
-#endif /*0*/
 
 /* returns "[your ]xname(obj)" or "Foobar's xname(obj)" or "the xname(obj)" */
 char *

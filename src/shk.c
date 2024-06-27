@@ -5,11 +5,39 @@
 
 #include "hack.h"
 
+/* CONTAINED_BUYING: for itemized billing (including default menu for
+   'p'), unpaid items in containers are concealed from itemized billing;
+   there's a single price for the container and all its contents;
+   player must pay all-or-nothing for such, and all used up items have
+   to already be paid for */
+/*#define CONTAINED_BUYING*/ /**** not fully implemented yet ****/
+
 #define PAY_SOME 2
 #define PAY_BUY 1
 #define PAY_CANT 0 /* too poor */
 #define PAY_SKIP (-1)
 #define PAY_BROKE (-2)
+
+enum billitem_status {
+    FullyUsedUp   = 1, /* completely used up; obj->where==OBJ_ONBILL */
+    PartlyUsedUp  = 2, /* partly used up; obj->where==OBJ_INVENT or similar */
+    PartlyIntact  = 3, /* intact portion of partly used up item */
+    FullyIntact   = 4, /* normal unpaid item */
+    BillContainer = 5, /* container holding unpaid item(s) */
+};
+/* this is similar to sortloot; the shop bill gets converted into a array of
+   struct sortbill_item so that sorting and traversal don't need to access
+   the original bill or even the shk; the array gets sorted by usedup vs
+   unpaid and by cost within each of those two categories */
+struct sortbill_item {
+    struct obj *obj;
+    long cost;
+    long quan;
+    int bidx;
+    int8 usedup; /* small but signed */
+    boolean queuedpay;
+};
+typedef struct sortbill_item Bill;
 
 staticfn void makekops(coord *);
 staticfn void call_kops(struct monst *, boolean);
@@ -44,10 +72,17 @@ staticfn long get_cost(struct obj *, struct monst *);
 staticfn long set_cost(struct obj *, struct monst *);
 staticfn const char *shk_embellish(struct obj *, long);
 staticfn long cost_per_charge(struct monst *, struct obj *, boolean);
-staticfn long cheapest_item(struct monst *);
-staticfn int menu_pick_pay_items(struct monst *);
+
+staticfn int QSORTCALLBACK sortbill_cmp(const genericptr, const genericptr)
+                                                                  NONNULLPTRS;
+staticfn long cheapest_item(int, Bill *) NONNULLPTRS;
+staticfn int make_itemized_bill(struct monst *shkp, Bill **ibill) NONNULLPTRS;
+staticfn int menu_pick_pay_items(int, Bill *) NONNULLPTRS;
+staticfn boolean pay_billed_items(struct monst *, int, Bill *, boolean,
+                                  boolean *) NONNULLPTRS;
 staticfn int dopayobj(struct monst *, struct bill_x *, struct obj **, int,
-                    boolean);
+                      boolean);
+staticfn void reject_purchase(struct monst *, struct obj *, long) NONNULLPTRS;
 staticfn long stolen_container(struct obj *, struct monst *, long, boolean);
 staticfn long corpsenm_price_adj(struct obj *);
 staticfn long getprice(struct obj *, boolean);
@@ -1367,70 +1402,242 @@ static const char
         no_money[] = "Moreover, you%s have no gold.",
         not_enough_money[] = "Besides, you don't have enough to interest %s.";
 
+/* if one item is used-up and the other isn't, the used-up one comes first;
+   otherwise, if their costs differ, the more expensive one comes first;
+   if costs are the same, use internal index as tie-breaker for stable sort */
+staticfn int QSORTCALLBACK
+sortbill_cmp(const genericptr vptr1, const genericptr vptr2)
+{
+    const struct sortbill_item *sbi1 = (struct sortbill_item *) vptr1,
+                               *sbi2 = (struct sortbill_item *) vptr2;
+    long cost1 = sbi1->cost, cost2 = sbi2->cost;
+    int bidx1 = sbi1->bidx, bidx2 = sbi2->bidx,
+        /* sort such that FullyUsedUp and PartlyUsedUp come before
+            PartlyIntact, FullyIntact, and BillContainer */
+        used1 = sbi1->usedup <= PartlyUsedUp, /* 0=>unpaid, 1=>used */
+        used2 = sbi2->usedup <= PartlyUsedUp;
+
+    if (used1 != used2)
+        return (used2 - used1); /* bigger comes before smaller here */
+    if (cost1 != cost2)
+        return (cost2 - cost1); /* bigger comes before smaller here too */
+    /* index into eshkp->bill_p[] isn't unique (an item that is partly
+       used and partly intact will have two ibill[] entries indexing same
+       bill_p[] element) but duplicates won't reach here (used1 vs used2) */
+    return (bidx1 - bidx2);
+}
+
 /* delivers the cheapest item on the list */
 staticfn long
-cheapest_item(struct monst *shkp)
+cheapest_item(int ibillct, Bill *ibill)
 {
-    int ct = ESHK(shkp)->billct;
-    struct bill_x *bp = ESHK(shkp)->bill_p;
-    long gmin = (bp->price * bp->bquan);
+    int i;
+    long gmin = ibill[0].cost;
 
-    while (ct--) {
-        if (bp->price * bp->bquan < gmin)
-            gmin = bp->price * bp->bquan;
-        bp++;
-    }
+    /*
+     * 3.7: old version didn't determine cheapest item correctly if it
+     * was either the partly used or partly intact portion of a partially
+     * used stack.  Rather than modify it to use bp_to_obj() in order to
+     * obtain quanities for every entry on eshkp->bill_p[], switch to
+     * ibill[] which has already split such items into separate entries.
+     */
+
+    for (i = 1; i < ibillct; ++i)
+        if (ibill[i].cost < gmin)
+            gmin = ibill[i].cost;
     return gmin;
+}
+
+/* for itemized purchasing, create an alternate shop bill that hides
+   container contents */
+staticfn int /* returns number of entries */
+make_itemized_bill(
+    struct monst *shkp,
+    Bill **ibill_p) /* output, a 'sortloot array' */
+{
+    static Bill zerosbi; /* Null sortbill item */
+    Bill *ibill;
+    struct bill_x *bp;
+    struct obj *otmp;
+    struct eshk *eshkp = ESHK(shkp);
+    int i, n, ebillct = eshkp->billct;
+    int8 used;
+    long quan, cost;
+
+    /* this overallocates unless there happens to be a used-up portion
+       and an intact potion for every object on the bill; doing it this
+       way avoids the need to look up every object on the bill an extra
+       time; (the +1 for a terminator isn't actually needed) */
+    n = 2 * ebillct + 1;
+    ibill = *ibill_p = (Bill *) alloc(n * sizeof *ibill);
+    for (i = 0; i < n; ++i)
+        ibill[i] = zerosbi;
+
+    n = 0; /* number of entries in ibill[]; won't necessary match ebillct */
+    for (i = 0; i < ebillct; ++i) {
+        bp = &(eshkp->bill_p[i]);
+        bp->queuedpay = FALSE;
+        /* find the object on the bill */
+        otmp = bp_to_obj(bp);
+        if (!otmp) {
+            impossible("Can't find shop bill entry for #%d", bp->bo_id);
+            continue;
+        }
+
+        if (otmp->quan == 0L || otmp->where == OBJ_ONBILL) {
+            /* item is completely used up; restore quantity from when it
+               was first unpaid; otmp is on billobjs list where it can
+               only be seen via Ix and itemized billing while paying shk */
+            otmp->quan = bp->bquan;
+            bp->useup = 1; /* (expected to be set already) */
+        } else if (otmp->quan < bp->bquan) {
+            /* item is partly used up; we will create two entries in the
+               augmented bill: one for the used up part here, another for
+               the intact part (which might be inside a container if put in
+               after using part of a stack; used up part isn't) below */
+            ibill[n].obj = otmp;
+            ibill[n].quan = bp->bquan - otmp->quan;
+            ibill[n].cost = (long) bp->price * ibill[n].quan;
+            ibill[n].bidx = i; /* duplicate index into eshkp->bill_p[] */
+            ibill[n].usedup = PartlyUsedUp; /* for sorting */
+            ++n; /* intact portion will be a separate entry, next */
+        }
+
+        if (otmp->where == OBJ_ONBILL) {
+            /* completely used up */
+            quan = bp->bquan;
+            cost = (long) bp->price * quan;
+            used = FullyUsedUp;
+#ifdef CONTAINED_BUYING
+        } else if (otmp->where == OBJ_CONTAINED || Has_contents(otmp)) {
+            int j;
+            struct obj *item = otmp;
+
+            /* when it's in a container, put the container rather than the
+               specific object into ibill[]; find outermost container */
+            while (otmp->where == OBJ_CONTAINED)
+                otmp = otmp->ocontainer;
+            /* this container might already be in ibill[] if it is unpaid
+               itself or if it holds more than one unpaid item and another
+               besides this one has already been processed; only include
+               first instance */
+            for (j = 0; j < n; ++j)
+                if (otmp == ibill[j].obj) {
+                    /* unpaid container might be on bill as FullyIntact */
+                    ibill[j].usedup = BillContainer;
+                    break;
+                }
+            if (j < n)
+                continue; /* 'i' loop */
+            /* include 1 container containing unpaid item(s) */
+            quan = 1L;
+            cost = unpaid_cost(otmp, COST_CONTENTS);
+            /* an unpaid container without any unpaid contents is classified
+               as 'FullyIntact'; a container with unpaid contents will be
+               'BillContainer' regardless of whether it is unpaid itself */
+            used = (otmp == item) ? FullyIntact : BillContainer;
+#endif
+        } else {
+            /* ordinary unpaid; when partly used, these are values for the
+               intact portion; might be an empty shop-owned container */
+            quan = otmp->quan;
+            cost = (long) bp->price * quan;
+            used = (quan < bp->bquan) ? PartlyIntact : FullyIntact;
+        }
+
+        ibill[n].obj = otmp;
+        ibill[n].quan = quan;
+        ibill[n].cost = cost;
+        ibill[n].bidx = i;
+        ibill[n].usedup = used;
+        ++n;
+    }
+    ibill[n].bidx = -1; /* end of list; not strictly needed */
+
+    /* ibill[0..n-1] contains data, ibill[n] has Null obj and -1 bidx */
+    qsort((genericptr_t) ibill, n, sizeof *ibill, sortbill_cmp);
+    return n;
 }
 
 /* show items on your bill in a menu, and ask which to pay.
    returns the number of entries selected. */
 staticfn int
-menu_pick_pay_items(struct monst *shkp)
+menu_pick_pay_items(
+    int ibillct, /* number of entries in ibill[] */
+    Bill *ibill) /* all used up items, if any, precede all intact items */
 {
-    struct eshk *eshkp = ESHK(shkp);
+    struct obj *otmp;
     winid win;
     anything any;
     menu_item *pick_list = (menu_item *) 0;
-    int i, j, n, clr = NO_COLOR;
-    char buf[BUFSZ];
+    char *p, buf[BUFSZ];
+    boolean save_wizweight;
+    long amt, largest_amt, save_quan;
+    int i, j, n, amt_width;
 
     any = cg.zeroany;
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
 
-    for (n = 0; n < eshkp->billct; n++) {
-        struct obj *otmp;
-        struct bill_x *bp = &(eshkp->bill_p[n]);
+    /* we go through ibill[] twice, first time to control price formatting
+       during the second */
+    largest_amt = 0L;
+    for (i = 0; i < ibillct; ++i)
+        if (ibill[i].cost > largest_amt)
+            largest_amt = ibill[i].cost;
+    Sprintf(buf, "%ld", largest_amt);
+    amt_width = (int) strlen(buf);
 
-        bp->queuedpay = FALSE;
-
-        /* find the object on one of the lists */
-        if ((otmp = bp_to_obj(bp)) != 0) {
-            /* if completely used up, object quantity is stale;
-               restoring it to its original value here avoids
-               making the partly-used-up code more complicated */
-            if (bp->useup)
-                otmp->quan = bp->bquan;
-            Snprintf(buf, sizeof buf, "%s%s",
-                    bp->useup ? "(used up) " : "",
-                    doname(otmp));
-            any.a_int = n + 1; /* +1: avoid 0 */
-            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
-                     MENU_ITEMFLAGS_NONE);
-        }
+    /* avoid showing item weights to unclutter billing a bit */
+    save_wizweight = iflags.wizweight;
+    iflags.wizweight = FALSE;
+    /* show the "used up items" header if there are any used up items on
+       the bill, no matter whether there are also any intact items;
+       note: ibill[] has been sorted to hold used-up items first */
+    if (ibill[0].usedup <= PartlyUsedUp) {
+        Sprintf(buf, "Used up item%s:",
+                (ibillct > 1 && ibill[1].usedup) ? "s" : "");
+        add_menu_heading(win, buf);
     }
+    for (i = 0; i < ibillct; ++i) {
+        /* the "unpaid items" header is only shown if the "used up items"
+           one was shown before the first menu entry */
+        if (i > 0 && (ibill[i - 1].usedup <= PartlyUsedUp)
+            && (ibill[i].usedup >= PartlyIntact)) {
+            Sprintf(buf, "Unpaid item%s:", (i < ibillct - 1) ? "s" : "");
+            add_menu_heading(win, buf);
+        }
+        otmp = ibill[i].obj;
+        save_quan = otmp->quan;
+        otmp->quan = ibill[i].quan; /* in case it's partly used */
+        p = paydoname(otmp);
+        otmp->quan = save_quan;
+        amt = ibill[i].cost;
+        /* this doesn't support hallucinatory currency because shopkeeper
+           isn't hallucinating; also, that would mess up the alignment */
+        Snprintf(buf, sizeof buf, "%*ld Zm, %s", amt_width, amt, p);
+        any.a_int = i + 1; /* +1: avoid 0 */
+        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR, buf,
+                 MENU_ITEMFLAGS_NONE);
+    }
+    iflags.wizweight = save_wizweight;
 
     end_menu(win, "Pay for which items?");
     n = select_menu(win, PICK_ANY, &pick_list);
     destroy_nhwindow(win);
 
     for (j = 0; j < n; ++j) {
+        /*
+         * FIXME:
+         *  The menu will accept a subset count for each entry but buying
+         *  doesn't have any support for that.
+         */
         i = pick_list[j].item.a_int - 1; /* -1: reverse +1 above */
-        eshkp->bill_p[i].queuedpay = TRUE;
+        ibill[i].queuedpay = TRUE;
     }
     free(pick_list);
-    return n;
+    /* for ESC, return 0 instead of usual -1 */
+    return max(n, 0);
 }
 
 /* the #pay command */
@@ -1440,9 +1647,10 @@ dopay(void)
     struct eshk *eshkp;
     struct monst *shkp;
     struct monst *nxtm, *resident;
+    Bill *ibill = (Bill *) NULL;
     long ltmp;
     long umoney;
-    int pass, tmp, sk = 0, seensk = 0, nexttosk = 0;
+    int sk = 0, seensk = 0, nexttosk = 0;
     boolean paid = FALSE, stashed_gold = (hidden_gold(TRUE) > 0L);
 
     gm.multi = 0;
@@ -1560,9 +1768,9 @@ dopay(void)
 
     if (shkp != resident && NOTANGRY(shkp)) {
         umoney = money_cnt(gi.invent);
-        if (!ltmp)
+        if (!ltmp) {
             You("do not owe %s anything.", shkname(shkp));
-        else if (!umoney) {
+        } else if (!umoney) {
             You("%shave no gold.", stashed_gold ? "seem to " : "");
             if (stashed_gold)
                 pline("But you have some gold stashed away.");
@@ -1655,8 +1863,9 @@ dopay(void)
             else
                 Strcat(sbuf,
                        "for gold picked up and the use of merchandise.");
-        } else
+        } else {
             Strcat(sbuf, "for the use of merchandise.");
+        }
         pline1(sbuf);
         if (umoney + eshkp->credit < dtmp) {
             pline("But you don't%s have enough gold%s.",
@@ -1688,114 +1897,15 @@ dopay(void)
             paid = TRUE;
         }
     }
+
     /* now check items on bill */
     if (eshkp->billct) {
-        boolean itemize;
-        boolean queuedpay = FALSE, via_menu;
-        int iprompt;
+        int ibillct = make_itemized_bill(shkp, &ibill);
 
-        umoney = money_cnt(gi.invent);
-        if (!umoney && !eshkp->credit) {
-            You("%shave no gold or credit%s.",
-                stashed_gold ? "seem to " : "", paid ? " left" : "");
-            return ECMD_OK;
-        }
-        if ((umoney + eshkp->credit) < cheapest_item(shkp)) {
-            You("don't have enough gold to buy%s the item%s you picked.",
-                eshkp->billct > 1 ? " any of" : "", plur(eshkp->billct));
-            if (stashed_gold)
-                pline("Maybe you have some gold stashed away?");
-            return ECMD_OK;
-        }
-
-        via_menu = (flags.menu_style != MENU_TRADITIONAL);
-        /* allow 'm p' to request a menu for menustyle:traditional;
-           for other styles, it will do the opposite; that doesn't make
-           a whole lot of sense for a 'request-menu' prefix, but otherwise
-           it would simply be redundant and there wouldn't be any way to
-           skip the menu when hero owes for multiple items */
-        if (iflags.menu_requested)
-            via_menu = !via_menu;
-        /* this will loop for a second iteration iff not initially using a
-           menu and player answers 'm' to custom ynq prompt */
-        do {
-            if (via_menu && eshkp->billct > 1) {
-                if (!menu_pick_pay_items(shkp))
-                    return ECMD_OK;
-                queuedpay = TRUE;
-                itemize = FALSE;
-                via_menu = FALSE; /* reset so that we don't loop */
-            } else {
-                /* this isn't quite right; it itemizes without asking if the
-                   single item on bill is partly used up and partly unpaid */
-                iprompt = (eshkp->billct < 2) ? 'y'
-                          : yn_function("Itemized billing?",
-                                        "ynq m", 'q', TRUE);
-                itemize = (iprompt == 'y');
-                if (iprompt == 'q')
-                    goto thanks;
-                via_menu = (iprompt == 'm');
-            }
-        } while (via_menu);
-
-        for (pass = 0; pass <= 1; pass++) {
-            tmp = 0;
-            while (tmp < eshkp->billct) {
-                struct obj *otmp;
-                struct bill_x *bp = &(eshkp->bill_p[tmp]);
-
-                if (queuedpay && !bp->queuedpay) {
-                    tmp++;
-                    continue;
-                }
-
-                /* find the object on one of the lists */
-                if ((otmp = bp_to_obj(bp)) != 0) {
-                    /* if completely used up, object quantity is stale;
-                       restoring it to its original value here avoids
-                       making the partly-used-up code more complicated */
-                    if (bp->useup)
-                        otmp->quan = bp->bquan;
-                } else {
-                    impossible("Shopkeeper administration out of order.");
-                    setpaid(shkp); /* be nice to the player */
-                    return ECMD_TIME;
-                }
-                if (pass == bp->useup && otmp->quan == bp->bquan) {
-                    /* pay for used-up items on first pass and others
-                     * on second, so player will be stuck in the store
-                     * less often; things which are partly used up
-                     * are processed on both passes */
-                    tmp++;
-                } else {
-                    switch (dopayobj(shkp, bp, &otmp, pass, itemize)) {
-                    case PAY_CANT:
-                        return ECMD_TIME; /*break*/
-                    case PAY_BROKE:
-                        paid = TRUE;
-                        goto thanks; /*break*/
-                    case PAY_SKIP:
-                        tmp++;
-                        continue; /*break*/
-                    case PAY_SOME:
-                        paid = TRUE;
-                        if (itemize)
-                            bot();
-                        continue; /*break*/
-                    case PAY_BUY:
-                        paid = TRUE;
-                        break;
-                    }
-                    if (itemize)
-                        bot();
-                    *bp = eshkp->bill_p[--eshkp->billct];
-                }
-            }
-        }
- thanks:
-        if (!itemize)
-            update_inventory(); /* Done in dopayobj() if itemize. */
+        if (!pay_billed_items(shkp, ibillct, ibill, stashed_gold, &paid))
+            goto pay_done;
     }
+
     if (!ANGRY(shkp) && paid) {
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
@@ -1810,7 +1920,177 @@ dopay(void)
                   !eshkp->surcharge ? "!" : ".");
         }
     }
-    return ECMD_TIME;
+ pay_done:
+    if (paid)
+        update_inventory();
+    iflags.menu_requested = FALSE; /* reset */
+    /* free the sortbill array used for itemized billing */
+    if (ibill) {
+        free((genericptr_t) ibill), ibill = NULL;
+        nhUse(ibill);
+    }
+    return paid ? ECMD_TIME : ECMD_OK;
+}
+
+/* for menustyle=Traditional, choose between paying for everything (by
+   declining to itemize), asking item-by-item (by accepting itemization),
+   or switch to selecting via menu (special 'm' answer at "Itemize? [ynq m]"
+   prompt); for other menustyles, always select via menu;
+   player can use 'm' prefix before 'p' command to invert those behaviors;
+   then actually pay for the selected items, item by item for as long as
+   hero has enough credit+cash */
+staticfn boolean
+pay_billed_items(
+    struct monst *shkp,
+    int ibillct,
+    Bill *ibill,
+    boolean stashed_gold,
+    boolean *paid_p)
+{
+    struct bill_x *bp;
+    struct obj *otmp;
+    long umoney;
+    boolean itemize, more_than_one;
+    boolean queuedpay = FALSE, via_menu;
+    int indx, bidx, pass, iprompt, j, ebillct;
+    struct eshk *eshkp = ESHK(shkp);
+
+    umoney = money_cnt(gi.invent);
+    if (!umoney && !eshkp->credit) {
+        You("%shave no gold or credit%s.",
+            stashed_gold ? "seem to " : "", *paid_p ? " left" : "");
+        return TRUE;
+    }
+    bp = eshkp->bill_p;
+    otmp = bp_to_obj(bp);
+    ebillct = eshkp->billct;
+    more_than_one = (ebillct > 1 || otmp->where == OBJ_CONTAINED
+                     || otmp->quan < bp->bquan);
+    if ((umoney + eshkp->credit) < cheapest_item(ibillct, ibill)) {
+        You("don't have enough gold to buy%s the item%s %s.",
+            more_than_one ? " any of" : "", plur(more_than_one ? 2 : 1),
+            (ebillct > 1) ? "you've picked" : "on your bill");
+        if (stashed_gold)
+            pline("Maybe you have some gold stashed away?");
+        return TRUE;
+    }
+
+    via_menu = (flags.menu_style != MENU_TRADITIONAL);
+    /* allow 'm p' to request a menu for menustyle:traditional;
+       for other styles, it will do the opposite; that doesn't make
+       a whole lot of sense for a 'request-menu' prefix, but otherwise
+       it would simply be redundant and there wouldn't be any way to
+       skip the menu when hero owes for multiple items */
+    if (iflags.menu_requested)
+        via_menu = !via_menu;
+    /* this will loop for a second iteration iff not initially using a
+       menu and player answers 'm' at custom ynq prompt */
+    do {
+        if (via_menu && more_than_one) {
+            if (!menu_pick_pay_items(ibillct, ibill))
+                return TRUE;
+            queuedpay = TRUE;
+            itemize = FALSE;
+            via_menu = FALSE; /* reset so that we don't loop */
+        } else {
+            iprompt = !more_than_one ? 'y'
+                      : yn_function("Itemized billing?", "ynq m", 'q', TRUE);
+            if (iprompt == 'q')
+                return TRUE;
+            itemize = (iprompt == 'y');
+            via_menu = (iprompt == 'm');
+        }
+    } while (via_menu);
+
+    /*
+     * 3.7:  this used to make two passes through eshkp->bill_p[],
+     * the first for used up items and the second for unpaid ones.
+     * Items which were partly used were processed on both passes.
+     *
+     * Now it makes one pass through ibill[], which has all used up
+     * items sorted to the beginning and unpaid ones sorted to the end.
+     * Partly used items have two entries for same base item, one in
+     * each section.
+     */
+    for (indx = 0; indx < ibillct; ++indx) {
+        if (queuedpay && !ibill[indx].queuedpay)
+            continue;
+
+        /*
+         * TODO:                                ********
+         *  Finish implementing CONTAINED_BUYING.
+         *  If a container holds any unpaid items, it might not be on
+         *  the regular eshkp->bill_p[] bill itself.  And possibly only
+         *  some of its contents will be.
+         *  To keep things simpler, disallow purchase of a container that
+         *  holds one or more unpaid items if there are any used up items
+         *  that haven't been paid for yet.  This will avoid the complex
+         *  case of using part of a stack, putting the unused portion
+         *  into a container, then declining to buy the used up portion
+         *  before buying the unpaid portion along with the container.
+         *  Partly used/partly intact items must always have their used
+         *  up portion paid for before the shopkeeper will sell the
+         *  intact ones; encountering that mid-container would end up
+         *  being very cumbersome.
+         */
+
+        bidx = ibill[indx].bidx;
+        bp = &eshkp->bill_p[bidx];
+        otmp = ibill[indx].obj;
+        pass = (ibill[indx].usedup <= PartlyUsedUp) ? 0 : 1;
+
+#ifdef CONTAINED_BUYING
+        /***TEMP***/
+        if (ibill[indx].usedup == BillContainer) {
+            verbalize("You need to remove any unpaid items from that %s"
+                      " and buy them separately.", simpleonames(otmp));
+            return PAY_CANT;
+        }
+#endif
+
+        switch (dopayobj(shkp, bp, &otmp, pass, itemize)) {
+        case PAY_CANT:
+            return FALSE;
+        case PAY_BROKE:
+            *paid_p = TRUE;
+            return TRUE;
+        case PAY_SKIP:
+            continue;
+        case PAY_SOME:
+            *paid_p = TRUE;
+            if (itemize)
+                bot();
+            continue;
+        case PAY_BUY:
+            *paid_p = TRUE;
+            break;
+        }
+        if (itemize)
+            bot();
+
+        /* remove from eshkp->bill+p[] unless this was the used up portion
+           of partly used up item (since removal would take out both; note:
+           can't buy PartlyIntact until PartlyUsedUp has been paid for) */
+        if (ibill[indx].usedup == PartlyUsedUp) {
+            for (j = 0; j < ibillct; ++j)
+                if (ibill[j].bidx == bidx && ibill[j].usedup == PartlyIntact) {
+                    bp->bquan = ibill[j].obj->quan;
+                    ibill[j].usedup = FullyIntact;
+                    break;
+                }
+        } else {
+            /* if we get here, something was bought and needs to be removed
+               from shop bill; move last bill_p[] entry into vacated slot;
+               also update ibill[] indices for it */
+            *bp = eshkp->bill_p[ebillct - 1];
+            for (j = 0; j < ibillct; ++j)
+                if (ibill[j].bidx == ebillct - 1)
+                    ibill[j].bidx = bidx;
+            ebillct -= 1;
+            eshkp->billct = ebillct;
+        }
+    }
+    return TRUE;
 }
 
 /* return 2 if used-up portion paid
@@ -1835,7 +2115,8 @@ dopayobj(
     boolean stashed_gold = (hidden_gold(TRUE) > 0L),
             consumed = (which == 0);
 
-    if (!obj->unpaid && !bp->useup) {
+    if (!obj->unpaid && !bp->useup
+        && !(Has_contents(obj) && unpaid_cost(obj, COST_CONTENTS))) {
         impossible("Paid object on bill??");
         return PAY_BUY;
     }
@@ -1856,14 +2137,21 @@ dopayobj(
         /* dealing with ordinary unpaid item */
         quan = obj->quan;
     }
+    ltmp = (long) bp->price * quan;
+
     obj->quan = quan;        /* to be used by doname() */
     obj->unpaid = 0;         /* ditto */
     iflags.suppress_price++; /* affects containers */
-    ltmp = bp->price * quan;
     buy = PAY_BUY; /* flag; if changed then return early */
 
     if (itemize) {
         char qbuf[BUFSZ], qsfx[BUFSZ];
+
+        /*
+         * TODO:
+         *  This should also accept 'a' and 'q' to end itemized paying:
+         *  'a' to buy the rest without asking, 'q' to just stop.
+         */
 
         Sprintf(qsfx, " for %ld %s.  Pay?", ltmp, currency(ltmp));
         (void) safe_qbuf(qbuf, (char *) 0, qsfx, obj,
@@ -1871,23 +2159,14 @@ dopayobj(
                          (quan == 1L) ? "that" : "those");
         if (y_n(qbuf) == 'n') {
             buy = PAY_SKIP;                         /* don't want to buy */
-        } else if (quan < bp->bquan && !consumed) { /* partly used goods */
-            obj->quan = bp->bquan - save_quan;      /* used up amount */
-            if (!Deaf && !muteshk(shkp)) {
-                SetVoice(shkp, 0, 80, 0);
-                verbalize("%s for the other %s before buying %s.",
-                      ANGRY(shkp) ? "Pay" : "Please pay",
-                      simpleonames(obj), /* short name suffices */
-                      save_quan > 1L ? "these" : "this one");
-            } else {
-                pline("%s %s%s your bill for the other %s first.",
-                      Shknam(shkp),
-                      ANGRY(shkp) ? "angrily " : "",
-                      nolimbs(shkp->data) ? "motions to" : "points out",
-                      simpleonames(obj));
-            }
-            buy = PAY_SKIP; /* shk won't sell */
         }
+    } /* itemize */
+
+    if (quan < bp->bquan && !consumed) { /* partly used goods */
+        /* shk won't sell the intact portion until the used up portion has
+           been paid for (once it has been, bp->bquan will match quan) */
+        reject_purchase(shkp, obj, bp->bquan);
+        buy = PAY_SKIP;
     }
     if (buy == PAY_BUY && umoney + ESHK(shkp)->credit < ltmp) {
         You("don't%s have gold%s enough to pay for %s.",
@@ -1896,7 +2175,6 @@ dopayobj(
             thesimpleoname(obj));
         buy = itemize ? PAY_SKIP : PAY_CANT;
     }
-
     if (buy != PAY_BUY) {
         /* restore unpaid object to original state */
         obj->quan = save_quan;
@@ -1931,6 +2209,38 @@ dopayobj(
         update_inventory(); /* Done just once in dopay() if !itemize. */
     }
     return buy;
+}
+
+/* called if an item on shop bill is partly used up and partly intact and
+   player tries to buy the intact portion before paying for used up portion
+   (not actually very effective since player can just drop the unpaid
+   portion then pick it back up to have it get its own distinct bill entry;
+   the former partly used up portion becomes a fully used up separate item) */
+staticfn void
+reject_purchase(
+    struct monst *shkp,
+    struct obj *obj,
+    long billed_quan)
+{
+    long intact_quan = obj->quan;
+
+    assert(intact_quan < billed_quan);
+    /* temporarily change obj to refer to the used up portion */
+    obj->quan = billed_quan - intact_quan;
+    if (!Deaf && !muteshk(shkp)) {
+        SetVoice(shkp, 0, 80, 0);
+        verbalize("%s for the other %s before buying %s.",
+                  ANGRY(shkp) ? "Pay" : "Please pay",
+                  simpleonames(obj), /* short name suffices */
+                  (intact_quan > 1L) ? "these" : "this one");
+    } else {
+        pline("%s %s%s your bill for the other %s first.",
+              Shknam(shkp),
+              ANGRY(shkp) ? "angrily " : "",
+              nolimbs(shkp->data) ? "motions to" : "points out",
+              simpleonames(obj));
+    }
+    obj->quan = intact_quan;
 }
 
 /* routine called after dying (or quitting) */
@@ -3078,9 +3388,9 @@ splitbill(struct obj *obj, struct obj *otmp)
     }
     bp->bquan -= otmp->quan;
 
-    if (ESHK(shkp)->billct == BILLSZ)
+    if (ESHK(shkp)->billct == BILLSZ) {
         otmp->unpaid = 0;
-    else {
+    } else {
         tmp = bp->price;
         bp = &(ESHK(shkp)->bill_p[ESHK(shkp)->billct]);
         bp->bo_id = otmp->o_id;
