@@ -4727,6 +4727,7 @@ shk_move(struct monst *shkp)
                     appr = gtx = gty = 0;
             }
         }
+#undef GDIST
     }
 
     z = move_special(shkp, inhishop(shkp), appr, uondoor, avoid, omx, omy,
@@ -5855,5 +5856,18 @@ use_unpaid_trapobj(struct obj *otmp, coordxy x, coordxy y)
         bill_dummy_object(otmp);
     }
 }
+
+#ifdef CONTAINED_BUYING
+#undef CONTAINED_BUYING
+#endif
+#undef PAY_SOME
+#undef PAY_BUY
+#undef PAY_CANT
+#undef PAY_SKIP
+#undef PAY_BROKE
+#undef NOTANGRY
+#undef ANGRY
+#undef IS_SHOP
+#undef muteshk
 
 /*shk.c*/

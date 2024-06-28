@@ -91,6 +91,7 @@ move_special(struct monst *mtmp, boolean in_his_shop, schar appr,
             }
         }
     }
+#undef GDIST
     if (mtmp->ispriest && avoid && nix == omx && niy == omy
         && onlineu(omx, omy)) {
         /* might as well move closer as long it's going to stay
@@ -900,5 +901,8 @@ restpriest(struct monst *mtmp, boolean ghostly)
             assign_level(&(EPRI(mtmp)->shrlevel), &u.uz);
     }
 }
+
+#undef ALGN_SINNED
+#undef ALGN_PIOUS
 
 /*priest.c*/
