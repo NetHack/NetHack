@@ -5,11 +5,12 @@
 
 #include "hack.h"
 
-/* CONTAINED_BUYING: for itemized billing (including default menu for
-   'p'), unpaid items in containers are concealed from itemized billing;
-   there's a single price for the container and all its contents;
-   player must pay all-or-nothing for such, and all used up items have
-   to already be paid for */
+/* CONTAINED_BUYING: for itemized billing (including default menu for 'p'),
+   unpaid items in containers are concealed whether or not its has been
+   flagged as contents-known; there's a single price for the container and
+   all its contents
+   [TODO: player must pay all-or-nothing for such, and all used up items
+   have to already be paid for] */
 /*#define CONTAINED_BUYING*/ /**** not fully implemented yet ****/
 
 #define PAY_SOME 2
@@ -1453,7 +1454,7 @@ cheapest_item(int ibillct, Bill *ibill)
 staticfn int /* returns number of entries */
 make_itemized_bill(
     struct monst *shkp,
-    Bill **ibill_p) /* output, a 'sortloot array' */
+    Bill **ibill_p) /* output, augmented bill similar to a 'sortloot array' */
 {
     static Bill zerosbi; /* Null sortbill item */
     Bill *ibill;
@@ -2068,7 +2069,7 @@ pay_billed_items(
         if (itemize)
             bot();
 
-        /* remove from eshkp->bill+p[] unless this was the used up portion
+        /* remove from eshkp->bill_p[] unless this was the used up portion
            of partly used up item (since removal would take out both; note:
            can't buy PartlyIntact until PartlyUsedUp has been paid for) */
         if (ibill[indx].usedup == PartlyUsedUp) {
