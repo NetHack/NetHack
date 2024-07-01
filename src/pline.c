@@ -1,4 +1,4 @@
-/* NetHack 3.7	pline.c	$NHDT-Date: 1693083243 2023/08/26 20:54:03 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.124 $ */
+/* NetHack 3.7	pline.c	$NHDT-Date: 1719819280 2024/07/01 07:34:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.130 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -594,6 +594,12 @@ impossible(const char *s, ...)
     pline("%s", pbuf);
     gp.pline_flags = 0;
 
+    if (gp.program_state.in_sanity_check) {
+        /* skip rest of multi-line feedback */
+        gp.program_state.in_impossible = 0;
+        return;
+    }
+
     Strcpy(pbuf2, "Program in disorder!");
     if (gp.program_state.something_worth_saving)
         Strcat(pbuf2, "  (Saving and reloading may fix this problem.)");
@@ -608,7 +614,7 @@ impossible(const char *s, ...)
         boolean report = ('y' == yn_function("Report now?", ynchars,
                                              'n', FALSE));
 
-        raw_print("");  // prove to the user the character was accepted
+        raw_print(""); /* prove to the user the character was accepted */
         if (report) {
             submit_web_report(1, "Impossible", pbuf);
         }
