@@ -1426,6 +1426,11 @@ a 3.6 fix to avoid a potential "object lost" panic when drinking potions had
 	unintended side-effect of making used up potions on shop's bill become
 	separate bill entries all with count 1 despite having come from same
 	unpaid stack; affected Ix inventory listing and itemized shop billing
+buying shop items which include any unpaid ones inside containers would reveal
+	them even when the containers hadn't been opened (obj->cknown==0);
+	recent change to pay via menu made the problem become more visible;
+	shopping has been changed such that buying anything that is inside a
+	container requires that the whole container be bought as a unit
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

@@ -2279,18 +2279,31 @@ paydoname(struct obj *obj)
 {
     static const char and_contents[] = " and its contents";
     char *p;
+    unsigned save_cknown = obj->cknown;
+    boolean save_wizweight = iflags.wizweight;
 
+    if (Has_contents(obj))
+        obj->cknown = 0;
+    /* avoid showing item weights to unclutter billing's pay-menu a bit */
+    iflags.wizweight = FALSE;
     /* suppress invent-style price; caller will add billing-style price */
     iflags.suppress_price++;
     p = doname_base(obj, 0U);
     iflags.suppress_price--;
+    iflags.wizweight = save_wizweight;
 
     if (Has_contents(obj)) {
-        if (!strncmp(p, "a ", 2))
-            p += 2;
-        else if (!strncmp(p, "an ", 3))
-            p += 3;
-        p = strprepend(p, obj->unpaid ? "an unpaid " : "your ");
+        /* buy_container() sets no_charge for a container that has just
+           been purchased so that when paydoname() is called by
+           shk_names_obj(), we'll provide "a/an <container>" instead of
+           "your <container>" */
+        if (!obj->no_charge) {
+            if (!strncmp(p, "a ", 2))
+                p += 2;
+            else if (!strncmp(p, "an ", 3))
+                p += 3;
+            p = strprepend(p, obj->unpaid ? "an unpaid " : "your ");
+        }
 
         if (!obj->cknown) {
             if (obj->unpaid) {
@@ -2298,10 +2311,11 @@ paydoname(struct obj *obj)
                     < BUFSZ - PREFIX)
                     Strcat(p, and_contents);
             } else {
-                p = strprepend(p, "contents of ");
+                p = strprepend(p, "the contents of ");
             }
         }
     }
+    obj->cknown = save_cknown;
     return p;
 }
 
