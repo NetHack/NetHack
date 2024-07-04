@@ -722,12 +722,12 @@ bill_dummy_object(struct obj *otmp)
     dummy->timed = 0;
     copy_oextra(dummy, otmp);
     if (has_omid(dummy))
-        free_omid(dummy); /* only one association with m_id*/
+        free_omid(dummy); /* only one association with m_id */
     if (Is_candle(dummy))
         dummy->lamplit = 0;
     dummy->owornmask = 0L; /* dummy object is not worn */
     addtobill(dummy, FALSE, TRUE, TRUE);
-    if (cost)
+    if (cost && dummy->where != OBJ_DELETED)
         alter_cost(dummy, -cost);
     /* no_charge is only valid for some locations */
     otmp->no_charge = (otmp->where == OBJ_FLOOR
