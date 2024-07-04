@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1717884802 2024/06/08 22:13:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.598 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1720128169 2024/07/04 21:22:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.602 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4082,7 +4082,7 @@ climb_pit(void)
            many times without further user intervention by using a run
            attempt to keep retrying to escape from the pit) */
         if (u.usteed)
-            Norep("%s is still in a pit.", upstart(y_monnam(u.usteed)));
+            Norep("%s is still in a pit.", YMonnam(u.usteed));
         else
             Norep((Hallucination && !rn2(5))
                       ? "You've fallen, and you can't get up."

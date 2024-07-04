@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1718303205 2024/06/13 18:26:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1426 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1720128155 2024/07/04 21:22:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1430 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -649,6 +649,7 @@ extern char *Some_Monnam(struct monst *) NONNULLARG1;
 extern char *noname_monnam(struct monst *, int) NONNULLARG1;
 extern char *m_monnam(struct monst *) NONNULLARG1;
 extern char *y_monnam(struct monst *) NONNULLARG1;
+extern char *YMonnam(struct monst *) NONNULLARG1;
 extern char *Adjmonnam(struct monst *, const char *) NONNULLARG1;
 extern char *Amonnam(struct monst *) NONNULLARG1;
 extern char *a_monnam(struct monst *) NONNULLARG1;

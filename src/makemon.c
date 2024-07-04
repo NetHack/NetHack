@@ -1,4 +1,4 @@
-/* NetHack 3.7	makemon.c	$NHDT-Date: 1713334814 2024/04/17 06:20:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.245 $ */
+/* NetHack 3.7	makemon.c	$NHDT-Date: 1720128166 2024/07/04 21:22:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.249 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1999,11 +1999,11 @@ grow_up(struct monst *mtmp, struct monst *victim)
                            slightly less sexist if prepared for it...) */
                       : (fem && !mtmp->female) ? "female " : "",
                     pmname(ptr, fem));
-            pline("%s %s %s.", upstart(y_monnam(mtmp)),
-                  (fem != mtmp->female) ? "changes into"
-                                        : humanoid(ptr) ? "becomes"
-                                                        : "grows up into",
-                  an(buf));
+            pline_mon(mtmp, "%s %s %s.", YMonnam(mtmp),
+                      (fem != mtmp->female) ? "changes into"
+                                            : humanoid(ptr) ? "becomes"
+                                                            : "grows up into",
+                      an(buf));
         }
         set_mon_data(mtmp, ptr);
         if (mtmp->cham == oldtype && is_shapeshifter(ptr))

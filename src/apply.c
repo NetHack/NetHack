@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1708126533 2024/02/16 23:35:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.437 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1720128162 2024/07/04 21:22:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.449 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -716,7 +716,8 @@ m_unleash(struct monst *mtmp, boolean feedback)
 
     if (feedback) {
         if (canseemon(mtmp))
-            pline_mon(mtmp, "%s pulls free of %s leash!", Monnam(mtmp), mhis(mtmp));
+            pline_mon(mtmp, "%s pulls free of %s leash!",
+                      Monnam(mtmp), mhis(mtmp));
         else
             Your("leash falls slack.");
     }
@@ -2046,8 +2047,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
     if (!is_valid_jump_pos(cc.x, cc.y, magic, TRUE)) {
         return ECMD_FAIL;
     } else if (u.usteed && u_at(cc.x, cc.y)) {
-        pline("%s isn't capable of jumping in place.",
-              upstart(y_monnam(u.usteed)));
+        pline("%s isn't capable of jumping in place.", YMonnam(u.usteed));
         return ECMD_FAIL;
     } else {
         coord uc;

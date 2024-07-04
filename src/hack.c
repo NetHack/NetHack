@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1715022473 2024/05/06 19:07:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.447 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1720128165 2024/07/04 21:22:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.449 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -389,7 +389,7 @@ moverock(void)
                 case TELEP_TRAP:
                     if (u.usteed)
                         pline("%s pushes %s and suddenly it disappears!",
-                              upstart(y_monnam(u.usteed)), the(xname(otmp)));
+                              YMonnam(u.usteed), the(xname(otmp)));
                     else
                         You("push %s and suddenly it disappears!",
                             the(xname(otmp)));
@@ -450,8 +450,7 @@ moverock(void)
                         exercise(A_STR, TRUE);
                 } else {
                     if (givemesg)
-                        pline("%s moves %s.",
-                              upstart(y_monnam(u.usteed)), what);
+                        pline("%s moves %s.", YMonnam(u.usteed), what);
                 }
                 gb.bldrpushtime = gm.moves;
             }
@@ -489,7 +488,7 @@ moverock(void)
             what = the(xname(otmp));
             if (u.usteed)
                 pline("%s tries to move %s, but cannot.",
-                      upstart(y_monnam(u.usteed)), what);
+                      YMonnam(u.usteed), what);
             else
                 You("try to move %s, but in vain.", what);
             if (Blind)
@@ -1075,7 +1074,7 @@ test_move(
     } else if (dx && dy && worm_cross(ux, uy, x, y)) {
         /* consecutive long worm segments are at <ux,y> and <x,uy> */
         if (mode == DO_MOVE)
-            pline("%s is in your way.", Monnam(m_at(ux, y)));
+            pline("%s is in your way.", YMonnam(m_at(ux, y)));
         return FALSE;
     }
     /* Pick travel path that does not require crossing a trap.
@@ -2009,20 +2008,20 @@ domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
         didnt_move = TRUE;
     } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
         /* can't swap places when pet can't move to your spot */
-        You("stop.  %s can't move diagonally.", upstart(y_monnam(mtmp)));
+        You("stop.  %s can't move diagonally.", YMonnam(mtmp));
         didnt_move = TRUE;
     } else if (u_with_boulder
                && !(verysmall(mtmp->data)
                     && (!mtmp->minvent || curr_mon_load(mtmp) <= 600))) {
         /* can't swap places when pet won't fit there with the boulder */
         You("stop.  %s won't fit into the same spot that you're at.",
-            upstart(y_monnam(mtmp)));
+            YMonnam(mtmp));
         didnt_move = TRUE;
     } else if (u.ux0 != x && u.uy0 != y && bad_rock(mtmp->data, x, u.uy0)
                && bad_rock(mtmp->data, u.ux0, y)
                && (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
         /* can't swap places when pet won't fit thru the opening */
-        You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
+        You("stop.  %s won't fit through.", YMonnam(mtmp));
         didnt_move = TRUE;
     } else if (mtmp->mpeaceful && mtmp->mtrapped) {
         /* all mtame are also mpeaceful, so this affects pets too */
@@ -2034,8 +2033,7 @@ domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
             feeltrap(trap); /* show on map once mtmp is out of the way */
             which = just_an(anbuf, what); /* "a " or "an " */
         }
-        You("stop.  %s can't move out of %s%s.",
-            upstart(y_monnam(mtmp)), which, what);
+        You("stop.  %s can't move out of %s%s.", YMonnam(mtmp), which, what);
         handle_tip(TIP_UNTRAP_MON);
         didnt_move = TRUE;
     } else if (mtmp->mpeaceful
@@ -2044,8 +2042,7 @@ domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
                    || mundisplaceable(mtmp))) {
         /* displacing peaceful into unsafe or trapped space, or trying to
            displace quest leader, Oracle, shopkeeper, priest, or vault guard */
-        You("stop.  %s doesn't want to swap places.",
-            upstart(y_monnam(mtmp)));
+        You("stop.  %s doesn't want to swap places.", YMonnam(mtmp));
         didnt_move = TRUE;
     } else {
         mtmp->mtrapped = 0;
@@ -2460,7 +2457,7 @@ escape_from_sticky_mon(coordxy x, coordxy y)
              */
             mtmp = u.ustuck;
             set_ustuck((struct monst *) 0);
-            You("release %s.", mon_nam(mtmp));
+            You("release %s.", y_monnam(mtmp));
         } else {
             /* If holder is asleep or paralyzed:
              *      37.5% chance of getting away,
@@ -2478,7 +2475,7 @@ escape_from_sticky_mon(coordxy x, coordxy y)
  pull_free:
                 mtmp = u.ustuck;
                 set_ustuck((struct monst *) 0);
-                You("pull free from %s.", mon_nam(mtmp));
+                You("pull free from %s.", y_monnam(mtmp));
                 break;
             case 3:
                 if (!u.ustuck->mcanmove) {
@@ -2490,7 +2487,7 @@ escape_from_sticky_mon(coordxy x, coordxy y)
             default:
                 if (u.ustuck->mtame && !Conflict && !u.ustuck->mconf)
                     goto pull_free;
-                You("cannot escape from %s!", mon_nam(u.ustuck));
+                You("cannot escape from %s!", y_monnam(u.ustuck));
                 nomul(0);
                 return TRUE;
             }
@@ -2733,7 +2730,7 @@ domove_core(void)
             mtmp->mux = u.ux, mtmp->muy = u.uy;
 
             pline("%s swaps places with you...",
-                  !noticed_it ? Something : Monnam(mtmp));
+                  !noticed_it ? Something : YMonnam(mtmp));
             if (!canspotmon(mtmp))
                 map_invisible(u.ux0, u.uy0);
             /* monster chose to swap places; hero doesn't get any credit
@@ -3673,7 +3670,7 @@ lookaround(void)
                     || (infront && !gc.context.travel)) {
                     if (flags.mention_walls)
                         pline_xy(x, y, "%s blocks your path.",
-                              upstart(a_monnam(mtmp)));
+                                 upstart(a_monnam(mtmp)));
                     goto stop;
                 }
             }
