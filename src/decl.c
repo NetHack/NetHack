@@ -1,4 +1,4 @@
-/* NetHack 3.7	decl.c	$NHDT-Date: 1706079841 2024/01/24 07:04:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.314 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1720074480 2024/07/04 06:28:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.334 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -792,6 +792,7 @@ static const struct instance_globals_s g_init_s = {
     (struct menucoloring *) 0, /* save_colorings */
     FALSE, /* simple_options_help */
     /* pickup.c */
+    FALSE, /* sellobj_first */
     FALSE, /* shop_filter */
     /* pline.c */
 #ifdef DUMPLOG_CORE

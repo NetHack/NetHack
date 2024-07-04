@@ -1,4 +1,4 @@
-/* NetHack 3.7	pickup.c	$NHDT-Date: 1707521383 2024/02/09 23:29:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.370 $ */
+/* NetHack 3.7	pickup.c	$NHDT-Date: 1720074481 2024/07/04 06:28:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.374 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2608,12 +2608,14 @@ in_container(struct obj *obj)
         if (obj->oclass != COIN_CLASS) {
             /* sellobj() will take an unpaid item off the shop bill */
             was_unpaid = obj->unpaid ? TRUE : FALSE;
-            /* don't sell when putting the item into your own container,
-             * but handle billing correctly */
-            sellobj_state(gc.current_container->no_charge
-                          ? SELL_DONTSELL : SELL_DELIBERATE);
+            if (gs.sellobj_first) {
+                /* don't sell when putting the item into your own container,
+                   but handle billing correctly */
+                sellobj_state(gc.current_container->no_charge
+                              ? SELL_DONTSELL : SELL_DELIBERATE);
+                gs.sellobj_first = FALSE;
+            }
             sellobj(obj, u.ux, u.uy);
-            sellobj_state(SELL_NORMAL);
         }
     }
     if (Icebox && !age_is_relative(obj)) {
@@ -2645,8 +2647,8 @@ in_container(struct obj *obj)
         /* if carried, shop goods will be flagged 'unpaid' and obfree() will
            handle bill issues, but if on floor, we need to put them on bill
            before deleting them (non-shop items will be flagged 'no_charge') */
-        if (floor_container
-            && costly_spot(gc.current_container->ox, gc.current_container->oy)) {
+        if (floor_container && costly_spot(gc.current_container->ox,
+                                           gc.current_container->oy)) {
             struct obj save_no_charge;
 
             save_no_charge.no_charge = gc.current_container->no_charge;
@@ -2943,6 +2945,7 @@ use_container(
     long loss;
 
     ga.abort_looting = FALSE;
+    gs.sellobj_first = TRUE; /* in_container() should call sellobj_state() */
     emptymsg[0] = '\0';
 
     if (!u_handsy())
@@ -3176,6 +3179,7 @@ use_container(
         update_inventory();
     }
 
+    sellobj_state(SELL_NORMAL); /* in case in_container() set it */
     *objp = gc.current_container; /* might have become null */
     if (gc.current_container)
         gc.current_container = 0; /* avoid hanging on to stale pointer */

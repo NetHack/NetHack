@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1445 $ $NHDT-Date: 1718303201 2024/06/13 18:26:41 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1450 $ $NHDT-Date: 1720074479 2024/07/04 06:27:59 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1431,6 +1431,12 @@ buying shop items which include any unpaid ones inside containers would reveal
 	recent change to pay via menu made the problem become more visible;
 	shopping has been changed such that buying anything that is inside a
 	container requires that the whole container be bought as a unit
+using #loot -> 'i'n to put multiple items into a shop-owned container would
+	ask whether to sell each item to the shop, and was prepared to accept
+	'a' to sell the current one plus all the rest beyond it, or to accept
+	'q' to not sell the current one or any beyond it, but the sell vs
+	don't-sell state was being reset for each item so 'a' and 'q' didn't
+	stick beyond the current one
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

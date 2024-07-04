@@ -1,4 +1,4 @@
-/* NetHack 3.7  decl.h  $NHDT-Date: 1706079834 2024/01/24 07:03:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.355 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1720074483 2024/07/04 06:28:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.373 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -937,6 +937,7 @@ struct instance_globals_s {
     boolean simple_options_help;
 
     /* pickup.c */
+    boolean sellobj_first; /* True => need sellobj_state(); False => don't */
     boolean shop_filter;
 
     /* pline.c */
