@@ -1401,6 +1401,7 @@ gold thrown or kicked at a sleeping monster with the 'greedy' attribute gets
 	neglected to report that target monster was awakened in the process
 hero movement affects the water bubble movement direction
 pets and peacefuls avoid a location hero just kicked
+pets avoid a possible boulder pushing location in sokoban
 shopkeepers bill you for using their bear trap or land mine
 when engraving with a stack of eligible weapons, split one off the stack and
 	dull it rather than dull the whole stack
