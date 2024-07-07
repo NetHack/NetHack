@@ -959,25 +959,24 @@ test_move(
             return FALSE;
         } else {
             if (mode == DO_MOVE) {
-                if (is_db_wall(x, y))
+                if (is_db_wall(x, y)) {
                     pline("That drawbridge is up!");
-                /* sokoban restriction stays even after puzzle is solved */
-                else if (Passes_walls && !may_passwall(x, y)
-                         && In_sokoban(&u.uz))
+                } else if (Passes_walls && !may_passwall(x, y)
+                           && In_sokoban(&u.uz)) {
+                    /* soko restriction stays even after puzzle is solved */
                     pline_The("Sokoban walls resist your ability.");
-                else if (flags.mention_walls) {
+                } else if (flags.mention_walls) {
                     char buf[BUFSZ];
-                    coord cc;
-                    int sym = 0;
-                    const char *firstmatch = 0;
+                    int glyph = back_to_glyph(x, y),
+                        sym = glyph_is_cmap(glyph) ? glyph_to_cmap(glyph) : -1;
 
-                    cc.x = x, cc.y = y;
-                    do_screen_description(cc, TRUE, sym, buf, &firstmatch,
-                                          NULL);
-                    if (!strcmp(firstmatch, "stone"))
-                        Sprintf(buf, "solid stone");
+                    if (sym == S_stone)
+                        Strcpy(buf, "solid stone");
+                    else if (sym >= 0)
+                        Strcpy(buf, an(defsyms[sym].explanation));
                     else
-                        Sprintf(buf, "%s", an(firstmatch));
+                        Sprintf(buf, "impossible [background glyph=%d]",
+                                glyph);
                     pline_dir(xytod(dx, dy), "It's %s.", buf);
                 }
             }
