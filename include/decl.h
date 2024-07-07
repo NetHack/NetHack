@@ -194,7 +194,7 @@ struct instance_globals_b {
 #endif
 
     /* decl.c */
-    int bases[MAXOCLASSES + 1];
+    int bases[MAXOCLASSES + 2]; /* make bases[MAXOCLASSES+1] available */
     coord bhitpos; /* place where throw or zap hits or stops */
     struct obj *billobjs; /* objects not yet paid for */
 

@@ -1,4 +1,4 @@
-/* NetHack 3.7	o_init.c	$NHDT-Date: 1701720461 2023/12/04 20:07:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.79 $ */
+/* NetHack 3.7	o_init.c	$NHDT-Date: 1720391455 2024/07/07 22:30:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -192,8 +192,12 @@ init_objects(void)
     /* extra entry allows deriving the range of a class via
        bases[class] through bases[class+1]-1 for all classes
        (except for ILLOBJ_CLASS which is separated from WEAPON_CLASS
-       by generic objects) */
-    gb.bases[MAXOCLASSES] = NUM_OBJECTS;
+       by generic objects); second extra entry is to prevent an
+       explained crash in doclassdisco(), where the code ended up
+       attempting to process non-existent class MAXOCLASSES; the
+       [MAXOCLASSES+1] element gives that non-class 0 objects
+       when traversing objects[] from bases[X] through bases[X+1]-1 */
+    gb.bases[MAXOCLASSES] = gb.bases[MAXOCLASSES + 1] = NUM_OBJECTS;
     /* hypothetically someone might remove all objects of some class,
        or be adding a new class and not populated it yet, leaving gaps
        in bases[]; guarantee that there are no such gaps */
@@ -757,7 +761,8 @@ dodiscovered(void) /* free after Robert Viduya */
                 if (oclass != prev_class) {
                     if ((alphabyclass || lootsort) && sorted_ct) {
                         /* output previous class */
-                        disco_output_sorted(tmpwin, sorted_lines, sorted_ct, lootsort);
+                        disco_output_sorted(tmpwin, sorted_lines, sorted_ct,
+                                            lootsort);
                         sorted_ct = 0;
                     }
                     if (!alphabetized || alphabyclass) {
@@ -884,7 +889,7 @@ doclassdisco(void)
              i < NUM_OBJECTS && objects[i].oc_class == oclass; ++i)
             if ((dis = gd.disco[i]) != 0 && interesting_to_discover(dis)) {
                 if (!strchr(discosyms, c)) {
-                    Sprintf(eos(discosyms), "%c", c);
+                    (void) strkitten(discosyms, c);
                     if (!traditional) {
                         any.a_int = c;
                         add_menu(tmpwin, &nul_glyphinfo, &any,
@@ -981,6 +986,9 @@ doclassdisco(void)
         break;
     default:
         oclass = def_char_to_objclass(c);
+        /* this should never happen but has been observed via the fuzzer */
+        if (oclass == MAXOCLASSES)
+            impossible("doclassdisco: invalid object class '%s'", visctrl(c));
         Sprintf(buf, "Discovered %s in %s", let_to_name(oclass, FALSE, FALSE),
                 (flags.discosort == 'o') ? "order of discovery"
                 : (flags.discosort == 's') ? "'sortloot' order"
