@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1711735821 2024/03/29 18:10:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.313 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1720397752 2024/07/08 00:15:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.315 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -14,10 +14,6 @@
 #include <limits.h>
 #endif
 #include "dlb.h"
-
-
-/* add b to long a, convert wraparound to max value */
-#define nowrap_add(a, b) (a = ((a + b) < 0 ? LONG_MAX : (a + b)))
 
 #ifndef NO_SIGNAL
 staticfn void done_intr(int);

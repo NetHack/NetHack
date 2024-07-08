@@ -1,4 +1,4 @@
-/* NetHack 3.7	botl.c	$NHDT-Date: 1694893342 2023/09/16 19:42:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.239 $ */
+/* NetHack 3.7	botl.c	$NHDT-Date: 1720397739 2024/07/08 00:15:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.264 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -423,17 +423,20 @@ long
 botl_score(void)
 {
     long deepest = deepest_lev_reached(FALSE);
-    long utotal;
+    long umoney, depthbonus;
 
     /* hidden_gold(False): only gold in containers whose contents are known */
-    utotal = money_cnt(gi.invent) + hidden_gold(FALSE);
-    if ((utotal -= u.umoney0) < 0L)
-        utotal = 0L;
-    utotal += u.urexp + (50 * (deepest - 1))
-          + (deepest > 30 ? 10000 : deepest > 20 ? 1000 * (deepest - 20) : 0);
-    if (utotal < u.urexp)
-        utotal = LONG_MAX; /* wrap around */
-    return utotal;
+    umoney = money_cnt(gi.invent) + hidden_gold(FALSE);
+    /* don't include initial gold; don't impose penalty if its all gone */
+    if ((umoney -= u.umoney0) < 0L)
+        umoney = 0L;
+    depthbonus = 50 * (deepest - 1)
+                 + (deepest > 30) ? 10000
+                   : (deepest > 20) ? 1000 * (deepest - 20)
+                     : 0;
+    /* neither umoney nor depthbonus can grow unusually big (gold due to
+       weight); u.urexp might */
+    return nowrap_add(u.urexp, umoney + depthbonus);
 }
 #endif /* SCORE_ON_BOTL */
 
