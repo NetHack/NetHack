@@ -5158,6 +5158,18 @@ yn_function(
         dumplogmsg(dumplog_buf);
     }
 #endif
+    /* should not happen but cq.key has been observed to not obey 'resp';
+       do this after dumplog has recorded the potentially bad value */
+    if (!res || (resp && !strchr(resp, res))) {
+        /* this probably needs refinement since caller is expecting something
+           within 'resp' and ESC won't be (it could be present, but as a flag
+           for unshown possibilities rather than as acceptable input) */
+        int altres = def ? def : '\033';
+
+        impossible("yn_function() returned '%s'; using '%s' instead",
+                   visctrl(res), visctrl(altres));
+        res = altres;
+    }
     /* in case we're called via getdir() which sets input_state */
     gp.program_state.input_state = otherInp;
     return res;
