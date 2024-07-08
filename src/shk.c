@@ -1979,7 +1979,7 @@ pay_billed_items(
     otmp = bp_to_obj(bp);
     ebillct = eshkp->billct;
     more_than_one = (ebillct > 1 || otmp->quan < bp->bquan
-                     /* note: will only get here for for single item, so
+                     /* note: will only get here for a single item, so
                         we can deduce that it is ibill[0] */
                      || ibill[0].usedup == UndisclosedContainer);
     if ((umoney + eshkp->credit) < cheapest_item(ibillct, ibill)) {
