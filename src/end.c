@@ -910,7 +910,7 @@ artifact_score(
             value = arti_cost(otmp); /* zorkmid value */
             points = value * 5 / 2;  /* score value */
             if (counting) {
-                nowrap_add(u.urexp, points);
+                u.urexp = nowrap_add(u.urexp, points);
             } else {
                 discover_object(otmp->otyp, TRUE, FALSE);
                 otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
@@ -1320,7 +1320,7 @@ really_done(int how)
         tmp += 50L * (long) (deepest - 1);
         if (deepest > 20)
             tmp += 1000L * (long) ((deepest > 30) ? 10 : deepest - 20);
-        nowrap_add(u.urexp, tmp);
+        u.urexp = nowrap_add(u.urexp, tmp);
 
         /* ascension gives a score bonus iff offering to original deity */
         if (how == ASCENDED && u.ualign.type == u.ualignbase[A_ORIGINAL]) {
@@ -1329,7 +1329,7 @@ really_done(int how)
             tmp = (u.ualignbase[A_CURRENT] == u.ualignbase[A_ORIGINAL])
                       ? u.urexp
                       : (u.urexp / 2L);
-            nowrap_add(u.urexp, tmp);
+            u.urexp = nowrap_add(u.urexp, tmp);
         }
     }
 
@@ -1427,7 +1427,7 @@ really_done(int how)
                 if (val->list[i].count != 0L) {
                     tmp = val->list[i].count
                           * (long) objects[val->list[i].typ].oc_cost;
-                    nowrap_add(u.urexp, tmp);
+                    u.urexp = nowrap_add(u.urexp, tmp);
                 }
 
         /* count the points for artifacts */
@@ -1440,7 +1440,7 @@ really_done(int how)
             while (mtmp) {
                 Sprintf(eos(pbuf), " and %s", mon_nam(mtmp));
                 if (mtmp->mtame)
-                    nowrap_add(u.urexp, mtmp->mhp);
+                    u.urexp = nowrap_add(u.urexp, mtmp->mhp);
                 mtmp = mtmp->nmon;
             }
             /* [it might be more robust to create a housecat and add it to
@@ -1449,7 +1449,7 @@ really_done(int how)
                 int mhp, m_lev = adj_lev(&mons[PM_HOUSECAT]);
 
                 mhp = d(m_lev, 8);
-                nowrap_add(u.urexp, mhp);
+                u.urexp = nowrap_add(u.urexp, mhp);
                 Strcat(eos(pbuf), " and Schroedinger's cat");
             }
             dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
