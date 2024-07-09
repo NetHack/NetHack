@@ -1983,6 +1983,9 @@ fix regression of a post-3.6 fix:  if 2 Wizards of Yendor were in play and 1
 sometimes a repeat count from the preceding command carried over to most
 	recent one when using do-again (^A); if the most recent one was an
 	extended command, the spurious repeat was for '#'
+if peaceful monsters react when seeing hero attack a peaceful monster, don't
+	have quest guardians run away; also, quest leader only becomes angry
+	if the monster being attacked is a quest guardian
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

@@ -4050,14 +4050,20 @@ peacefuls_respond(struct monst *mtmp)
                         }
                     }
                     /* shopkeepers and temple priests might gasp in
-                       surprise, but they won't become angry here */
-                    if (mon->isshk || mon->ispriest) {
+                       surprise, but they won't become angry here;
+                       quest leader will only get angry if hero attacks
+                       own quest guardians */
+                    if (mon->isshk || mon->ispriest
+                        || (mon->data == &mons[quest_info(MS_LEADER)]
+                            && mtmp->data != &mons[gu.urole.guardnum])) {
                         if (exclaimed)
                             pline_mon(mon, "%s%s", buf, " then shrugs.");
                         continue;
                     }
 
-                    if (mon->data->mlevel < rn2(10)) {
+                    if (mon->data->mlevel < rn2(10)
+                        /* don't have quest guardians turn to flee */
+                        && (mon->data != &mons[gu.urole.guardnum])) {
                         alreadyfleeing = (mon->mflee || mon->mfleetim);
                         monflee(mon, rn2(50) + 25, TRUE, !exclaimed);
                         if (exclaimed) {
@@ -4075,6 +4081,7 @@ peacefuls_respond(struct monst *mtmp)
                            * perhaps reduce tameness? */
                     } else {
                         mon->mpeaceful = 0;
+                        mon->mstrategy &= ~STRAT_WAITMASK;
                         adjalign(-1);
                         if (!exclaimed)
                             pline_mon(mon, "%s gets angry!", Monnam(mon));
