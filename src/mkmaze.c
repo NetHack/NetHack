@@ -40,6 +40,7 @@ staticfn boolean is_exclusion_zone(xint16, coordxy, coordxy);
         }                                                        \
     } while (0)
 
+/* used to determine if wall spines can join this location */
 staticfn int
 iswall(coordxy x, coordxy y)
 {
@@ -49,9 +50,11 @@ iswall(coordxy x, coordxy y)
         return 0;
     type = levl[x][y].typ;
     return (IS_WALL(type) || IS_DOOR(type)
+            || type == LAVAWALL || type == WATER
             || type == SDOOR || type == IRONBARS);
 }
 
+/* used to determine if wall spines can join this location */
 staticfn int
 iswall_or_stone(coordxy x, coordxy y)
 {

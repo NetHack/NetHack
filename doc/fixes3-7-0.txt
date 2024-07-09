@@ -1438,6 +1438,7 @@ using #loot -> 'i'n to put multiple items into a shop-owned container would
 	'q' to not sell the current one or any beyond it, but the sell vs
 	don't-sell state was being reset for each item so 'a' and 'q' didn't
 	stick beyond the current one
+join wall "spines" with walls of water and lava
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
