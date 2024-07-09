@@ -1987,6 +1987,9 @@ sometimes a repeat count from the preceding command carried over to most
 if peaceful monsters react when seeing hero attack a peaceful monster, don't
 	have quest guardians run away; also, quest leader only becomes angry
 	if the monster being attacked is a quest guardian
+farlook of water/lava location listed wall of lava before molten lava; because
+	of that, lava was omitted ("molten" suppressed to reduce vebosity,
+	resulting in "lava" which got skipped as substring of "wall of lava")
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
