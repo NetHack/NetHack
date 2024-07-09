@@ -5160,7 +5160,7 @@ yn_function(
 #endif
     /* should not happen but cq.key has been observed to not obey 'resp';
        do this after dumplog has recorded the potentially bad value */
-    if (!res || (resp && !strchr(resp, res))) {
+    if (resp && res && !strchr(resp, res)) {
         /* this probably needs refinement since caller is expecting something
            within 'resp' and ESC won't be (it could be present, but as a flag
            for unshown possibilities rather than as acceptable input) */
