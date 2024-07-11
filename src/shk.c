@@ -1,4 +1,4 @@
-/* NetHack 3.7	shk.c	$NHDT-Date: 1652299941 2022/05/11 20:12:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.232 $ */
+/* NetHack 3.7	shk.c	$NHDT-Date: 1720717993 2024/07/11 17:13:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.298 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1134,7 +1134,7 @@ obfree(struct obj *obj, struct obj *merge)
 
     if ((bp = onbill(obj, shkp, FALSE)) != 0) {
         if (!merge) {
-            bp->useup = 1;
+            bp->useup = TRUE;
             obj->unpaid = 0; /* only for doinvbill */
             /* for used up glob, put back original weight in case it gets
                formatted ('I x' or itemized billing) with 'wizweight' On */
@@ -1483,7 +1483,6 @@ make_itemized_bill(
     n = 0; /* number of entries in ibill[]; won't necessary match ebillct */
     for (i = 0; i < ebillct; ++i) {
         bp = &eshkp->bill_p[i];
-        bp->queuedpay = FALSE; /* [no longer used] */
         /* find the object on the bill */
         otmp = bp_to_obj(bp);
         if (!otmp) {
@@ -1496,7 +1495,7 @@ make_itemized_bill(
                was first unpaid; otmp is on billobjs list where it can
                only be seen via Ix and itemized billing while paying shk */
             otmp->quan = bp->bquan;
-            bp->useup = 1; /* (expected to be set already) */
+            bp->useup = TRUE; /* (expected to be set already) */
         } else if (otmp->quan < bp->bquan) {
             /* item is partly used up; we will create two entries in the
                augmented bill: one for the used up part here, another for
@@ -3253,10 +3252,10 @@ add_one_tobill(
     bp->bo_id = obj->o_id;
     bp->bquan = obj->quan;
     if (dummy) {              /* a dummy object must be inserted into  */
-        bp->useup = 1;        /* the gb.billobjs chain here.  crucial for */
+        bp->useup = TRUE;        /* the gb.billobjs chain here.  crucial for */
         add_to_billobjs(obj); /* eating floorfood in shop.  see eat.c  */
     } else
-        bp->useup = 0;
+        bp->useup = FALSE;
     bp->price = get_cost(obj, shkp);
     if (obj->globby) {
         /* for globs, the amt charged for quan 1 depends on owt */
@@ -3556,7 +3555,7 @@ splitbill(struct obj *obj, struct obj *otmp)
         bp = &(ESHK(shkp)->bill_p[ESHK(shkp)->billct]);
         bp->bo_id = otmp->o_id;
         bp->bquan = otmp->quan;
-        bp->useup = 0;
+        bp->useup = FALSE;
         bp->price = tmp;
         ESHK(shkp)->billct++;
     }
@@ -3579,7 +3578,7 @@ sub_one_frombill(struct obj *obj, struct monst *shkp)
             otmp->where = OBJ_FREE;
             otmp->quan = (bp->bquan -= obj->quan);
             otmp->owt = 0; /* superfluous */
-            bp->useup = 1;
+            bp->useup = TRUE;
             add_to_billobjs(otmp);
             return;
         }
