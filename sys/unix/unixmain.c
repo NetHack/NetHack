@@ -164,7 +164,7 @@ main(int argc, char *argv[])
      */
     u.uhp = 1; /* prevent RIP on early quits */
 #if defined(HANGUPHANDLING)
-    svp.program_state.preserve_locks = 1;
+    program_state.preserve_locks = 1;
 #ifndef NO_SIGNAL
     sethanguphandler((SIG_RET_TYPE) hangup);
 #endif
@@ -239,7 +239,7 @@ main(int argc, char *argv[])
     if (*svp.plname) {
         getlock();
 #if defined(HANGUPHANDLING)
-        svp.program_state.preserve_locks = 0; /* after getlock() */
+        program_state.preserve_locks = 0; /* after getlock() */
 #endif
     }
 
@@ -276,8 +276,8 @@ main(int argc, char *argv[])
                 }
             }
         }
-        if (svp.program_state.in_self_recover) {
-            svp.program_state.in_self_recover = FALSE;
+        if (program_state.in_self_recover) {
+            program_state.in_self_recover = FALSE;
         }
     }
 

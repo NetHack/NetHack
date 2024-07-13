@@ -355,7 +355,7 @@ loot_xname(struct obj *obj)
     if (wizard) { /* flags.debug */
         /* paranoia:  before toggling off wizard mode, guard against a
            panic in xname() producing a normal mode panic save file */
-        svp.program_state.something_worth_saving = 0;
+        program_state.something_worth_saving = 0;
         flags.debug = FALSE;
     }
 
@@ -363,7 +363,7 @@ loot_xname(struct obj *obj)
 
     if (save_debug) {
         flags.debug = TRUE;
-        svp.program_state.something_worth_saving = 1;
+        program_state.something_worth_saving = 1;
     }
     /* restore the object */
     if (obj->oclass == POTION_CLASS) {
@@ -2650,7 +2650,7 @@ update_inventory(void)
 {
     int save_suppress_price;
 
-    if (!svp.program_state.in_moveloop) /* not covered by suppress_map_output */
+    if (!program_state.in_moveloop) /* not covered by suppress_map_output */
         return;
     if (suppress_map_output()) /* despite name, used for perm_invent too */
         return;
@@ -6120,7 +6120,7 @@ sync_perminvent(void)
         WIN_INVEN = create_nhwindow(NHW_MENU);
     }
 
-    if (WIN_INVEN != WIN_ERR && svp.program_state.beyond_savefile_load) {
+    if (WIN_INVEN != WIN_ERR && program_state.beyond_savefile_load) {
         gi.in_sync_perminvent = 1;
         (void) display_inventory((char *) 0, FALSE);
         gi.in_sync_perminvent = 0;

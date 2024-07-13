@@ -676,10 +676,10 @@ next_to_gas(
 boolean
 suppress_map_output(void)
 {
-    if (gi.in_mklev || svp.program_state.saving || svp.program_state.restoring)
+    if (gi.in_mklev || program_state.saving || program_state.restoring)
         return TRUE;
 #ifdef HANGUPHANDLING
-    if (svp.program_state.done_hup)
+    if (program_state.done_hup)
         return TRUE;
 #endif
     return FALSE;
@@ -1658,10 +1658,10 @@ docrt_flags(int refresh_flags)
             redrawonly = (refresh_flags & docrtRefresh) != 0,
             nocls = (refresh_flags & docrtNocls) != 0;
 
-    if (!u.ux || svp.program_state.in_docrt)
+    if (!u.ux || program_state.in_docrt)
         return; /* display isn't ready yet */
 
-    svp.program_state.in_docrt = TRUE;
+    program_state.in_docrt = TRUE;
 
     if (redrawonly) {
         redraw_map(FALSE);
@@ -1713,7 +1713,7 @@ docrt_flags(int refresh_flags)
         disp.botlx = TRUE; /* force a redraw of the bottom lines */
         /* note: caller needs to call bot() to actually redraw status */
     }
-    svp.program_state.in_docrt = FALSE;
+    program_state.in_docrt = FALSE;
 }
 
 /* for panning beyond a clipped region; resend the current map data to
@@ -1949,8 +1949,8 @@ show_glyph(coordxy x, coordxy y, int glyph)
     oldglyph = gg.gbuf[y][x].glyphinfo.glyph;
 
     if (a11y.glyph_updates && !a11y.mon_notices_blocked
-        && !svp.program_state.in_docrt
-        && !svp.program_state.in_getlev
+        && !program_state.in_docrt
+        && !program_state.in_getlev
         && (oldglyph != glyph || gg.gbuf[y][x].gnew)) {
         int c = glyph_to_cmap(glyph);
         if ((glyph_is_nothing(oldglyph) || glyph_is_unexplored(oldglyph)
@@ -2165,7 +2165,7 @@ flush_screen(int cursor_on_u)
         return; /* if already flushing then return */
     flushing = 1;
 #ifdef HANGUPHANDLING
-    if (svp.program_state.done_hup)
+    if (program_state.done_hup)
         return;
 #endif
 

@@ -782,7 +782,7 @@ curses_update_inventory(int arg)
     }
 
     /* skip inventory updating during character initialization */
-    if (!svp.program_state.in_moveloop && !svp.program_state.gameover)
+    if (!program_state.in_moveloop && !program_state.gameover)
         return;
 
     if (!arg) {

@@ -986,7 +986,6 @@ static const struct instance_globals_saved_p init_svp = {
     DUMMY,                               /* plname */
     DUMMY,                               /* pl_character */
     DUMMY,                               /* pl_fruit */
-    UNDEFINED_VALUES,                    /* program_state */
 };
 
 static const struct instance_globals_saved_q init_svq = {
@@ -1028,6 +1027,8 @@ static const struct instance_globals_saved_y init_svy = {
     UNDEFINED_VALUE,                     /* ymin */
     UNDEFINED_VALUE                      /* ymax */
 };
+
+static const struct sinfo init_program_state = { 0 };
 
 #if 0
 struct instance_globals g;
@@ -1078,6 +1079,7 @@ struct instance_globals_saved_t svt;
 struct instance_globals_saved_u svu;
 struct instance_globals_saved_x svx;
 struct instance_globals_saved_y svy;
+struct sinfo program_state;
 
 const struct const_globals cg = {
     DUMMY, /* zeroobj */
@@ -1154,6 +1156,7 @@ decl_globals_init(void)
     svu = init_svu;
     svx = init_svx;
     svy = init_svy;
+    program_state = init_program_state;
 
     gv.valuables[0].list = gg.gems;
     gv.valuables[0].size = SIZE(gg.gems);

@@ -82,7 +82,7 @@ eraseoldlocks(void)
     int i;
 
 #if defined(HANGUPHANDLING)
-    svp.program_state.preserve_locks = 0; /* not required but shows intent */
+    program_state.preserve_locks = 0; /* not required but shows intent */
     /* cannot use maxledgerno() here, because we need to find a lock name
      * before starting everything (including the dungeon initialization
      * that sets astral_level, needed for maxledgerno()) up
@@ -216,7 +216,7 @@ getlock(void)
         }
 #ifdef SELF_RECOVER
         if (c == 'r' || c == 'R') {
-            if (recover_savefile() && svp.program_state.in_self_recover) {
+            if (recover_savefile() && program_state.in_self_recover) {
                 set_levelfile_name(gl.lock, 0);
                 fq_lock = fqname(gl.lock, LEVELPREFIX, 0);
                 goto gotlock;

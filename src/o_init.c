@@ -460,7 +460,7 @@ discover_object(
                 exercise(A_WIS, TRUE);
         }
         /* !in_moveloop => initial inventory, gameover => final disclosure */
-        if (svp.program_state.in_moveloop && !svp.program_state.gameover) {
+        if (program_state.in_moveloop && !program_state.gameover) {
             if (objects[oindx].oc_class == GEM_CLASS)
                 gem_learned(oindx); /* could affect price of unpaid gems */
             update_inventory();

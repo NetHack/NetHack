@@ -533,7 +533,7 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
         if (!data->text.text) {
             data->text.text = mswin_init_text_buffer(
-                svp.program_state.gameover ? FALSE : GetNHApp()->bWrapText);
+                program_state.gameover ? FALSE : GetNHApp()->bWrapText);
             if (!data->text.text)
                 break;
         }

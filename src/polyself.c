@@ -109,7 +109,7 @@ set_uasmon(void)
        which won't be known during the restore process: but BFlying
        and BStealth should be set correctly already in that case, so
        there's nothing to do */
-    if (!svp.program_state.restoring)
+    if (!program_state.restoring)
         float_vs_flight(); /* maybe toggle (BFlying & I_SPECIAL) */
     polysense();
 

@@ -839,7 +839,7 @@ x_monnam(
     if (mtmp == &gy.youmonst)
         return strcpy(buf, "you"); /* ignore article, "invisible", &c */
 
-    if (svp.program_state.gameover)
+    if (program_state.gameover)
         suppress |= SUPPRESS_HALLUCINATION;
     if (article == ARTICLE_YOUR && !mtmp->mtame)
         article = ARTICLE_THE;
@@ -857,7 +857,7 @@ x_monnam(
     do_hallu = Hallucination && !(suppress & SUPPRESS_HALLUCINATION);
     do_invis = mtmp->minvis && !(suppress & SUPPRESS_INVISIBLE);
     do_it = !canspotmon(mtmp) && article != ARTICLE_YOUR
-            && !svp.program_state.gameover && mtmp != u.usteed
+            && !program_state.gameover && mtmp != u.usteed
             && !engulfing_u(mtmp) && !(suppress & SUPPRESS_IT);
     do_saddle = !(suppress & SUPPRESS_SADDLE);
     do_mappear = mappear_as_mon && !(suppress & SUPPRESS_MAPPEARANCE);
@@ -1481,7 +1481,7 @@ const char *
 hliquid(
     const char *liquidpref) /* use as-is when not hallucintg (unless empty) */
 {
-    boolean hallucinate = Hallucination && !svp.program_state.gameover;
+    boolean hallucinate = Hallucination && !program_state.gameover;
 
     if (hallucinate || !liquidpref || !*liquidpref) {
         int indx, count = SIZE(hliquids);

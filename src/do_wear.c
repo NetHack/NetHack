@@ -810,7 +810,7 @@ dragon_armor_handling(
     case GOLD_DRAGON_SCALES:
     case GOLD_DRAGON_SCALE_MAIL:
         (void) make_hallucinated((long) !puton,
-                                 svp.program_state.restoring ? FALSE : TRUE,
+                                 program_state.restoring ? FALSE : TRUE,
                                  W_ARM);
         break;
     case ORANGE_DRAGON_SCALES:

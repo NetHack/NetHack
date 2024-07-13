@@ -1755,7 +1755,7 @@ restore_waterlevel(NHFILE *nhfp)
         b->next = (struct bubble *) 0;
     } else {
         /* avoid "saving and reloading may fix this" */
-        svp.program_state.something_worth_saving = 0;
+        program_state.something_worth_saving = 0;
         /* during restore, information about what level this is might not
            be available so we're wishy-washy about what we describe */
         impossible("No %s to restore?",
@@ -1764,7 +1764,7 @@ restore_waterlevel(NHFILE *nhfp)
                    : (Is_airlevel(&u.uz) || Is_airlevel(&gu.uz_save))
                      ? "clouds"
                      : "air bubbles or clouds");
-        svp.program_state.something_worth_saving = 1;
+        program_state.something_worth_saving = 1;
     }
 }
 

@@ -1282,7 +1282,7 @@ X11_update_inventory(int arg)
 
     if (iflags.perm_invent) {
         /* skip any calls to update_inventory() before in_moveloop starts */
-        if (svp.program_state.in_moveloop || svp.program_state.gameover) {
+        if (program_state.in_moveloop || program_state.gameover) {
             updated_inventory = 1; /* hack to avoid mapping&raising window */
             if (!arg) {
                 (void) display_inventory((char *) 0, FALSE);
@@ -1798,7 +1798,7 @@ X11_hangup(Widget w, XEvent *event, String *params, Cardinal *num_params)
 static void
 X11_bail(const char *mesg)
 {
-    svp.program_state.something_worth_saving = 0;
+    program_state.something_worth_saving = 0;
     clearlocks();
     X11_exit_nhwindows(mesg);
     nh_terminate(EXIT_SUCCESS);
@@ -2041,7 +2041,7 @@ X11_getlin(
     /* we get here after the popup has exited;
        put prompt and response into the message window (and into
        core's dumplog history) unless play hasn't started yet */
-    if (svp.program_state.in_moveloop || svp.program_state.gameover) {
+    if (program_state.in_moveloop || program_state.gameover) {
         /* single space has meaning (to remove a previously applied name) so
            show it clearly; don't care about legibility of multiple spaces */
         const char *visanswer = !input[0] ? "<empty>"

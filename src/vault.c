@@ -49,7 +49,7 @@ clear_fcorr(struct monst *grd, boolean forceshow)
     coordxy fcx, fcy, fcbeg;
     struct monst *mtmp;
     boolean sawcorridor = FALSE,
-            silently = svp.program_state.stopprint ? TRUE : FALSE;
+            silently = program_state.stopprint ? TRUE : FALSE;
     struct egd *egrd = EGD(grd);
     struct trap *trap;
     struct rm *lev;

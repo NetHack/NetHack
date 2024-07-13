@@ -771,8 +771,8 @@ attempt_restore:
                 }
             }
         }
-        if (svp.program_state.in_self_recover) {
-            svp.program_state.in_self_recover = FALSE;
+        if (program_state.in_self_recover) {
+            program_state.in_self_recover = FALSE;
             set_savefile_name(TRUE);
         }
     }

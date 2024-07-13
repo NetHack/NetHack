@@ -412,7 +412,7 @@ byebye(void)
         (void) sys$delprc(&mail_pid, (genericptr_t) 0), mail_pid = 0;
 #endif
 #ifdef FREE_ALL_MEMORY
-    if (progname && !svp.program_state.panicking) {
+    if (progname && !program_state.panicking) {
         if (gh.hname == progname)
             gh.hname = (char *) 0;
         free((genericptr_t) progname), progname = (char *) 0;
@@ -421,7 +421,7 @@ byebye(void)
 
     /* SIGHUP doesn't seem to do anything on VMS, so we fudge it here... */
     hup = (void (*)(int)) signal(SIGHUP, SIG_IGN);
-    if (!svp.program_state.exiting++
+    if (!program_state.exiting++
         && hup != (void (*)(int)) SIG_DFL
         && hup != (void (*)(int)) SIG_IGN) {
         (*hup)(SIGHUP);
@@ -446,7 +446,7 @@ genericptr_t mechargs)     /* [0] is argc, [1..argc] are the real args */
     if (condition == SS$_ACCVIO /* access violation */
         || (condition >= SS$_ASTFLT && condition <= SS$_TBIT)
         || (condition >= SS$_ARTRES && condition <= SS$_INHCHME)) {
-        svp.program_state.done_hup = TRUE; /* pretend hangup has been attempted */
+        program_state.done_hup = TRUE; /* pretend hangup has been attempted */
 #if (NH_DEVEL_STATUS == NH_STATUS_RELEASED)
         if (wizard)
 #endif

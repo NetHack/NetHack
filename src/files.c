@@ -703,7 +703,7 @@ clearlocks(void)
     int x;
 
 #ifdef HANGUPHANDLING
-    if (svp.program_state.preserve_locks)
+    if (program_state.preserve_locks)
         return;
 #endif
 #ifndef NO_SIGNAL
@@ -1101,7 +1101,7 @@ create_savefile(void)
         nhfp->fieldlevel = FALSE;
         nhfp->ftype = NHF_SAVEFILE;
         nhfp->mode = WRITING;
-        if (svp.program_state.in_self_recover || do_historical) {
+        if (program_state.in_self_recover || do_historical) {
             do_historical = TRUE;       /* force it */
             nhfp->structlevel = TRUE;
             nhfp->fieldlevel = FALSE;
@@ -1155,7 +1155,7 @@ open_savefile(void)
         nhfp->fieldlevel = FALSE;
         nhfp->ftype = NHF_SAVEFILE;
         nhfp->mode = READING;
-        if (svp.program_state.in_self_recover || do_historical) {
+        if (program_state.in_self_recover || do_historical) {
             do_historical = TRUE;       /* force it */
             nhfp->structlevel = TRUE;
             nhfp->fieldlevel = FALSE;
@@ -1875,7 +1875,7 @@ static struct flock sflock; /* for unlocking, same as above */
 #endif
 
 #if defined(HANGUPHANDLING)
-#define HUP if (!svp.program_state.done_hup)
+#define HUP if (!program_state.done_hup)
 #else
 #define HUP
 #endif
@@ -3447,7 +3447,7 @@ config_error_init(boolean from_file, const char *sourcename, boolean secure)
 
     tmp->next = config_error_data;
     config_error_data = tmp;
-    svp.program_state.config_error_ready = TRUE;
+    program_state.config_error_ready = TRUE;
 }
 
 staticfn boolean
@@ -3513,7 +3513,7 @@ config_erradd(const char *buf)
     punct = c_eos((char *) buf) - 1; /* eos(buf)-1 is valid */
     punct = strchr(".!?", *punct) ? "" : ".";
 
-    if (!svp.program_state.config_error_ready) {
+    if (!program_state.config_error_ready) {
         /* either very early, where pline() will use raw_print(), or
            player gave bad value when prompted by interactive 'O' command */
         pline("%s%s%s", !iflags.window_inited ? "config_error_add: " : "",
@@ -3575,7 +3575,7 @@ config_error_done(void)
     }
     config_error_data = tmp->next;
     free(tmp);
-    svp.program_state.config_error_ready = (config_error_data != 0);
+    program_state.config_error_ready = (config_error_data != 0);
     return n;
 }
 
@@ -3978,14 +3978,14 @@ read_wizkit(void)
     if (!wizard || !(fp = fopen_wizkit_file()))
         return;
 
-    svp.program_state.wizkit_wishing = 1;
+    program_state.wizkit_wishing = 1;
     config_error_init(TRUE, "WIZKIT", FALSE);
 
     parse_conf_file(fp, proc_wizkit_line);
     (void) fclose(fp);
 
     config_error_done();
-    svp.program_state.wizkit_wishing = 0;
+    program_state.wizkit_wishing = 0;
 
     return;
 }
@@ -4195,8 +4195,8 @@ paniclog(
 #ifdef PANICLOG
     FILE *lfile;
 
-    if (!svp.program_state.in_paniclog) {
-        svp.program_state.in_paniclog = 1;
+    if (!program_state.in_paniclog) {
+        program_state.in_paniclog = 1;
         lfile = fopen_datafile(PANICLOG, "a", TROUBLEPREFIX);
         if (lfile) {
 #ifdef PANICLOG_FMT2
@@ -4216,7 +4216,7 @@ paniclog(
 #endif /* !PANICLOG_FMT2 */
             (void) fclose(lfile);
         }
-        svp.program_state.in_paniclog = 0;
+        program_state.in_paniclog = 0;
     }
 #endif /* PANICLOG */
     return;
@@ -4323,9 +4323,9 @@ recover_savefile(void)
     /*
      * Set a flag for the savefile routines to know the
      * circumstances and act accordingly:
-     *    svp.program_state.in_self_recover
+     *    program_state.in_self_recover
      */
-    svp.program_state.in_self_recover = TRUE;
+    program_state.in_self_recover = TRUE;
     set_savefile_name(TRUE);
     snhfp = create_savefile();
     if (!snhfp) {
@@ -4433,11 +4433,11 @@ recover_savefile(void)
         close_nhfile(gnhfp);
         close_nhfile(snhfp);
         close_nhfile(lnhfp);
-        svp.program_state.in_self_recover = FALSE;
+        program_state.in_self_recover = FALSE;
         delete_savefile();
         return FALSE;
     }
-    /* we don't clear svp.program_state.in_self_recover here, we
+    /* we don't clear program_state.in_self_recover here, we
        leave it as a flag to reload the structlevel savefile
        in the caller. The caller should then clear it. */
     return TRUE;

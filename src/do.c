@@ -900,7 +900,7 @@ obj_no_longer_held(struct obj *obj)
          */
         if (!obj->oerodeproof || !rn2(10)) {
             /* if monsters aren't moving, assume player is responsible */
-            if (!svc.context.mon_moving && !svp.program_state.gameover)
+            if (!svc.context.mon_moving && !program_state.gameover)
                 costly_alteration(obj, COST_DEGRD);
             obj->otyp = WORM_TOOTH;
             obj->oerodeproof = 0;
@@ -1348,7 +1348,7 @@ save_currentstate(void)
 {
     NHFILE *nhfp;
 
-    svp.program_state.in_checkpoint++;
+    program_state.in_checkpoint++;
     if (flags.ins_chkpt) {
         /* write out just-attained level, with pets and everything */
         nhfp = currentlevel_rewrite();
@@ -1363,7 +1363,7 @@ save_currentstate(void)
 
     /* write out non-level state */
     savestateinlock();
-    svp.program_state.in_checkpoint--;
+    program_state.in_checkpoint--;
 }
 #endif
 

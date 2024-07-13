@@ -789,7 +789,7 @@ curses_display_nhmenu(
     menu_determine_pages(current_menu);
 
     /* Display pre and post-game menus centered */
-    if ((svm.moves <= 1 && !gi.invent) || svp.program_state.gameover) {
+    if ((svm.moves <= 1 && !gi.invent) || program_state.gameover) {
         win = curses_create_window(wid, current_menu->width,
                                    current_menu->height, CENTER);
     } else { /* Display during-game menus on the right out of the way */
@@ -1033,7 +1033,7 @@ menu_win_size(nhmenu *menu)
     int maxheaderwidth = menu->prompt ? (int) strlen(menu->prompt) : 0;
     nhmenu_item *menu_item_ptr, *last_item_ptr = NULL;
 
-    if (svp.program_state.gameover) {
+    if (program_state.gameover) {
         /* for final inventory disclosure, use full width */
         maxwidth = term_cols - 2; /* +2: borders assumed */
     } else {

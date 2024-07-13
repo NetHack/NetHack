@@ -2395,7 +2395,7 @@ record_achievement(schar achidx)
     /* avoid livelog for achievements recorded during final disclosure:
        nudist and blind-from-birth; also ascension which is suppressed
        by this gets logged separately in really_done() */
-    if (svp.program_state.gameover)
+    if (program_state.gameover)
         return;
 
     if (absidx >= ACH_RNK1 && absidx <= ACH_RNK8) {
@@ -2717,7 +2717,7 @@ dovanquished(void)
 #define UniqCritterIndx(mndx) \
     ((mons[mndx].geno & G_UNIQ) != 0 && mndx != PM_HIGH_CLERIC)
 
-#define done_stopprint svp.program_state.stopprint
+#define done_stopprint program_state.stopprint
 
 void
 list_vanquished(char defquery, boolean ask)
@@ -2852,7 +2852,7 @@ list_vanquished(char defquery, boolean ask)
      * still in progress, so use present tense via pline(), or for dumplog
      * which needs putstr() and past tense.
      */
-    } else if (!svp.program_state.gameover) {
+    } else if (!program_state.gameover) {
         /* #vanquished rather than final disclosure, so pline() is ok */
         pline("No creatures have been vanquished.");
 #ifdef DUMPLOG
@@ -2927,7 +2927,7 @@ list_genocided(char defquery, boolean ask)
     char buf[BUFSZ];
     boolean genoing, /* prompting for genocide or class genocide */
             dumping; /* for DUMPLOG; doesn't need to be conditional */
-    boolean both = (svp.program_state.gameover || wizard || discover);
+    boolean both = (program_state.gameover || wizard || discover);
 
     dumping = (defquery == 'd');
     genoing = (defquery == 'g');
@@ -3031,7 +3031,7 @@ list_genocided(char defquery, boolean ask)
         }
 
     /* See the comment for similar code near the end of list_vanquished(). */
-    } else if (!svp.program_state.gameover) {
+    } else if (!program_state.gameover) {
         /* #genocided rather than final disclosure, so pline() is ok and
            extinction has been ignored */
         pline("No creatures have been genocided%s.", genoing ? " yet" : "");

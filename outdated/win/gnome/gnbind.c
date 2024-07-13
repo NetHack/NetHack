@@ -907,7 +907,7 @@ gnome_nhgetch()
     g_askingQuestion = 1;
     /* Process events until a key press event arrives. */
     while (g_numKeys == 0) {
-        if (svp.program_state.done_hup)
+        if (program_state.done_hup)
             return '\033';
         gtk_main_iteration();
     }
@@ -945,7 +945,7 @@ gnome_nh_poskey(int *x, int *y, int *mod)
     g_askingQuestion = 0;
     /* Process events until a key or map-click arrives. */
     while (g_numKeys == 0 && g_numClicks == 0) {
-        if (svp.program_state.done_hup)
+        if (program_state.done_hup)
             return '\033';
         gtk_main_iteration();
     }

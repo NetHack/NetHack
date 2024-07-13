@@ -71,7 +71,7 @@ moveloop_preamble(boolean resuming)
     }
 
     if (!resuming) { /* new game */
-        svp.program_state.beyond_savefile_load = 1; /* for TTY_PERM_INVENT */
+        program_state.beyond_savefile_load = 1; /* for TTY_PERM_INVENT */
         svc.context.rndencode = rnd(9000);
         set_wear((struct obj *) 0); /* for side-effects of starting gear */
         reset_justpicked(gi.invent);
@@ -100,7 +100,7 @@ moveloop_preamble(boolean resuming)
     u.uz0.dlevel = u.uz.dlevel;
     svc.context.move = 0;
 
-    svp.program_state.in_moveloop = 1;
+    program_state.in_moveloop = 1;
     /* for perm_invent preset at startup, display persistent inventory after
        invent is fully populated and the in_moveloop flag has been set */
     if (iflags.perm_invent)
@@ -166,7 +166,7 @@ moveloop_core(void)
     boolean monscanmove = FALSE;
 
 #ifdef SAFERHANGUP
-    if (svp.program_state.done_hup)
+    if (program_state.done_hup)
         end_of_input();
 #endif
     get_nh_event();
@@ -781,7 +781,7 @@ newgame(void)
 #ifdef INSURANCE
     save_currentstate();
 #endif
-    svp.program_state.something_worth_saving++; /* useful data now exists */
+    program_state.something_worth_saving++; /* useful data now exists */
 
     /* Success! */
     welcome(TRUE);

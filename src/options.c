@@ -578,7 +578,7 @@ parseoptions(
     }
 
     /* allow optfn's to test whether they were called from parseoptions() */
-    svp.program_state.in_parseoptions++;
+    program_state.in_parseoptions++;
 
     if (got_match && matchidx >= 0) {
         duplicate = duplicate_opt_detection(matchidx);
@@ -604,8 +604,8 @@ parseoptions(
         }
     }
 
-    if (svp.program_state.in_parseoptions > 0)
-        svp.program_state.in_parseoptions--;
+    if (program_state.in_parseoptions > 0)
+        program_state.in_parseoptions--;
 
 #if 0
     /* This specialization shouldn't be needed any longer because each of

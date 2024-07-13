@@ -1222,7 +1222,7 @@ X11_player_selection_dialog(void)
 
     if (ps_selected == PS_QUIT
 #if defined(HANGUPHANDLING)
-        || svp.program_state.done_hup
+        || program_state.done_hup
 #endif
        ) {
         clearlocks();
@@ -1300,7 +1300,7 @@ X11_player_selection_prompts(void)
 
         if (ps_selected == PS_QUIT
 #if defined(HANGUPHANDLING)
-            || svp.program_state.done_hup
+            || program_state.done_hup
 #endif
            ) {
             clearlocks();
@@ -1373,7 +1373,7 @@ X11_player_selection_prompts(void)
 
             if (ps_selected == PS_QUIT
 #if defined(HANGUPHANDLING)
-                || svp.program_state.done_hup
+                || program_state.done_hup
 #endif
                ) {
                 clearlocks();
@@ -1445,7 +1445,7 @@ X11_player_selection_prompts(void)
 
             if (ps_selected == PS_QUIT
 #if defined(HANGUPHANDLING)
-			    || svp.program_state.done_hup
+			    || program_state.done_hup
 #endif
                 ) {
                 clearlocks();
@@ -1515,7 +1515,7 @@ X11_player_selection_prompts(void)
 
             if (ps_selected == PS_QUIT
 #if defined(HANGUPHANDLING)
-		|| svp.program_state.done_hup
+		|| program_state.done_hup
 #endif
                ) {
                 clearlocks();

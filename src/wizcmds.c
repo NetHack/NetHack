@@ -1435,7 +1435,7 @@ sanity_check(void)
         iflags.sanity_no_check = FALSE;
         return;
     }
-    svp.program_state.in_sanity_check++;
+    program_state.in_sanity_check++;
     you_sanity_check();
     obj_sanity_check();
     timer_sanity_check();
@@ -1444,7 +1444,7 @@ sanity_check(void)
     bc_sanity_check();
     trap_sanity_check();
     engraving_sanity_check();
-    svp.program_state.in_sanity_check--;
+    program_state.in_sanity_check--;
 }
 
 /* qsort() comparison routine for use in list_migrating_mons() */

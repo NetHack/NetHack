@@ -521,7 +521,7 @@ vision_recalc(int control)
     int oldseenv;      /* previous seenv value */
 
     gv.vision_full_recalc = 0; /* reset flag */
-    if (gi.in_mklev || svp.program_state.in_getlev || !iflags.vision_inited)
+    if (gi.in_mklev || program_state.in_getlev || !iflags.vision_inited)
         return;
 
     /*
@@ -825,9 +825,9 @@ vision_recalc(int control)
     /* This newsym() caused a crash delivering msg about failure to open
      * dungeon file init_dungeons() -> panic() -> done(11) ->
      * vision_recalc(2) -> newsym() -> crash!  u.ux and u.uy are 0 and
-     * svp.program_state.panicking == 1 under those circumstances
+     * program_state.panicking == 1 under those circumstances
      */
-    if (!svp.program_state.panicking)
+    if (!program_state.panicking)
         newsym(u.ux, u.uy); /* Make sure the hero shows up! */
 
     /* Set the new min and max pointers. */

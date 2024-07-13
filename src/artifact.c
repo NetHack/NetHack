@@ -705,7 +705,7 @@ set_artifact_intrinsic(struct obj *otmp, boolean on, long wp_mask)
          * when restoring a game
          */
         (void) make_hallucinated((long) !on,
-                                 svp.program_state.restoring ? FALSE : TRUE,
+                                 program_state.restoring ? FALSE : TRUE,
                                  wp_mask);
     }
     if (spfx & SPFX_ESP) {

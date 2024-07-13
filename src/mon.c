@@ -1176,7 +1176,7 @@ movemon_singlemon(struct monst *mtmp)
     if (u.utotype
 #ifdef SAFERHANGUP
         /* or if the program has lost contact with the user */
-        || svp.program_state.done_hup
+        || program_state.done_hup
 #endif
         ) {
         gs.somebody_can_move = FALSE;

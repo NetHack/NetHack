@@ -721,7 +721,7 @@ restlevelfile(xint8 ltmp)
     nhfp = create_levelfile(ltmp, whynot);
     if (!nhfp) {
         /* failed to create a new file; don't attempt to make a panic save */
-        svp.program_state.something_worth_saving = 0;
+        program_state.something_worth_saving = 0;
         panic("restlevelfile: %s", whynot);
     }
     bufon(nhfp->fd);
@@ -738,7 +738,7 @@ dorecover(NHFILE *nhfp)
     int rtmp;
 
     /* suppress map display if some part of the code tries to update that */
-    svp.program_state.restoring = REST_GSTATE;
+    program_state.restoring = REST_GSTATE;
 
     get_plname_from_file(nhfp, svp.plname);
     getlev(nhfp, 0, (xint8) 0);
@@ -755,7 +755,7 @@ dorecover(NHFILE *nhfp)
         close_nhfile(nhfp);
         (void) delete_savefile();
         u.usteed_mid = u.ustuck_mid = 0;
-        svp.program_state.restoring = 0;
+        program_state.restoring = 0;
         return 0;
     }
     /* after restgamestate() -> restnames() so that 'bases[]' is populated */
@@ -769,7 +769,7 @@ dorecover(NHFILE *nhfp)
     if (rtmp < 2)
         return rtmp; /* dorecover called recursively */
 
-    svp.program_state.restoring = REST_LEVELS;
+    program_state.restoring = REST_LEVELS;
 
     /* these pointers won't be valid while we're processing the
      * other levels, but they'll be reset again by restlevelstate()
@@ -831,12 +831,12 @@ dorecover(NHFILE *nhfp)
     get_plname_from_file(nhfp, svp.plname);
 
     /* not 0 nor REST_GSTATE nor REST_LEVELS */
-    svp.program_state.restoring = REST_CURRENT_LEVEL;
+    program_state.restoring = REST_CURRENT_LEVEL;
 
     getlev(nhfp, 0, (xint8) 0);
     close_nhfile(nhfp);
     restlevelstate();
-    svp.program_state.something_worth_saving = 1; /* useful data now exists */
+    program_state.something_worth_saving = 1; /* useful data now exists */
 
     if (!wizard && !discover)
         (void) delete_savefile();
@@ -866,9 +866,9 @@ dorecover(NHFILE *nhfp)
     gv.vision_full_recalc = 1; /* recompute vision (not saved) */
 
     run_timers(); /* expire all timers that have gone off while away */
-    svp.program_state.restoring = 0; /* affects bot() so clear before docrt() */
+    program_state.restoring = 0; /* affects bot() so clear before docrt() */
 
-    if (ge.early_raw_messages && !svp.program_state.beyond_savefile_load) {
+    if (ge.early_raw_messages && !program_state.beyond_savefile_load) {
         /*
          * We're about to obliterate some potentially important
          * startup messages, so give the player a chance to see them.
@@ -877,7 +877,7 @@ dorecover(NHFILE *nhfp)
         wait_synch();
     }
     u.usteed_mid = u.ustuck_mid = 0;
-    svp.program_state.beyond_savefile_load = 1;
+    program_state.beyond_savefile_load = 1;
 
     docrt();
     clear_nhwindow(WIN_MESSAGE);
@@ -907,7 +907,7 @@ rest_stairs(NHFILE *nhfp)
         if (nhfp->structlevel) {
             Mread(nhfp->fd, &stway, sizeof stway);
         }
-        if (svp.program_state.restoring != REST_GSTATE
+        if (program_state.restoring != REST_GSTATE
             && stway.tolev.dnum == u.uz.dnum) {
             /* stairway dlevel is relative, make it absolute */
             stway.tolev.dlevel += u.uz.dlevel;
@@ -1012,7 +1012,7 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
     short tlev;
 #endif
 
-    svp.program_state.in_getlev = TRUE;
+    program_state.in_getlev = TRUE;
 
     if (ghostly)
         clear_id_mapping();
@@ -1096,7 +1096,7 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
         if (nhfp->structlevel)
             Mread(nhfp->fd, trap, sizeof *trap);
         if (trap->tx != 0) {
-            if (svp.program_state.restoring != REST_GSTATE
+            if (program_state.restoring != REST_GSTATE
                 && trap->dst.dnum == u.uz.dnum) {
                 /* convert relative destination to absolute */
                 trap->dst.dlevel += u.uz.dlevel;
@@ -1140,7 +1140,7 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
         }
 
         /* regenerate monsters while on another level */
-        if (!u.uz.dlevel || svp.program_state.restoring == REST_LEVELS)
+        if (!u.uz.dlevel || program_state.restoring == REST_LEVELS)
             continue;
         if (ghostly) {
             /* reset peaceful/malign relative to new character;
@@ -1242,7 +1242,7 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
 
     if (ghostly)
         clear_id_mapping();
-    svp.program_state.in_getlev = FALSE;
+    program_state.in_getlev = FALSE;
 }
 
 void

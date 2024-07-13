@@ -3294,7 +3294,7 @@ rhack(int key)
     svc.context.nopick = 0;
  got_prefix_input:
 #ifdef SAFERHANGUP
-    if (svp.program_state.done_hup)
+    if (program_state.done_hup)
         end_of_input();
 #endif
     if ((cmdq = cmdq_pop()) != 0) {
@@ -3634,7 +3634,7 @@ getdir(const char *s)
     }
 
  retry:
-    svp.program_state.input_state = getdirInp;
+    program_state.input_state = getdirInp;
     if (gi.in_doagain || *readchar_queue)
         dirsym = readchar();
     else
@@ -4648,7 +4648,7 @@ get_count(
     unsigned gc_flags)   /* control flags: GC_SAVEHIST, GC_ECHOFIRST */
 {
     char qbuf[QBUFSZ];
-    int key, save_input_state = svp.program_state.input_state;
+    int key, save_input_state = program_state.input_state;
     long cnt = 0L, first = inkey ? (long) (inkey - '0') : 0L;
     boolean backspaced = FALSE, showzero = TRUE,
             /* should "Count: 123" go into message history? */
@@ -4670,7 +4670,7 @@ get_count(
         } else {
             /* if readchar() has already been called in this loop, it will
                have reset input_state; put that back to its previous value */
-            svp.program_state.input_state = save_input_state;
+            program_state.input_state = save_input_state;
             key = readchar();
         }
 
@@ -4737,7 +4737,7 @@ parse(void)
 
     /* affects readchar() behavior for ESC iff 'altmeta' option is On;
        is always reset to otherInp by readchar() */
-    svp.program_state.input_state = commandInp;
+    program_state.input_state = commandInp;
 
     if (!gc.Cmd.num_pad || (foo = readchar()) == gc.Cmd.spkeys[NHKF_COUNT]) {
         /* if 'num_pad' is On then readchar() has just reset input_state;
@@ -4745,7 +4745,7 @@ parse(void)
            otherwise "n<count>ESC<character>" becomes "n<count>ESC" (with
            <character> not read from keyboard yet) rather than intended count
            and meta keystroke "n<count>M-<character>" */
-        svp.program_state.input_state = commandInp;
+        program_state.input_state = commandInp;
 
         foo = get_count((char *) 0, '\0', LARGEST_INT,
                         &gc.command_count, GC_NOFLAGS);
@@ -4791,8 +4791,8 @@ hangup(
     int sig_unused UNUSED)   /* called as signal() handler, so sent
                               * at least one arg */
 {
-    if (svp.program_state.exiting)
-        svp.program_state.in_moveloop = 0;
+    if (program_state.exiting)
+        program_state.in_moveloop = 0;
     nhwindows_hangup();
 #ifdef SAFERHANGUP
     /* When using SAFERHANGUP, the done_hup flag is tested in rhack
@@ -4801,10 +4801,10 @@ hangup(
        protects against losing objects in the process of being thrown,
        but also potentially riskier because the disconnected program
        must continue running longer before attempting a hangup save. */
-    svp.program_state.done_hup++;
+    program_state.done_hup++;
     /* defer hangup iff game appears to be in progress */
-    if (svp.program_state.in_moveloop
-        && svp.program_state.something_worth_saving)
+    if (program_state.in_moveloop
+        && program_state.something_worth_saving)
         return;
 #endif /* SAFERHANGUP */
     end_of_input();
@@ -4815,16 +4815,16 @@ end_of_input(void)
 {
 #ifdef NOSAVEONHANGUP
 #ifdef INSURANCE
-    if (flags.ins_chkpt && svp.program_state.something_worth_saving)
+    if (flags.ins_chkpt && program_state.something_worth_saving)
         program_state.preserve_locks = 1; /* keep files for recovery */
 #endif
-    svp.program_state.something_worth_saving = 0; /* don't save */
+    program_state.something_worth_saving = 0; /* don't save */
 #endif
 
 #ifndef SAFERHANGUP
-    if (!svp.program_state.done_hup++)
+    if (!program_state.done_hup++)
 #endif
-        if (svp.program_state.something_worth_saving)
+        if (program_state.something_worth_saving)
             (void) dosave0();
     if (soundprocs.sound_exit_nhsound)
         (*soundprocs.sound_exit_nhsound)("end_of_input");
@@ -4875,7 +4875,7 @@ readchar_core(coordxy *x, coordxy *y, int *mod)
         sym = '\033';
 #ifdef ALTMETA
     } else if (sym == '\033' && iflags.altmeta
-               && svp.program_state.input_state != otherInp) {
+               && program_state.input_state != otherInp) {
         /* iflags.altmeta: treat two character ``ESC c'' as single `M-c' but
            only when we're called by parse() [possibly via get_count()]
            or getpos() [to support Alt+digit] or getdir() [for arrow keys
@@ -4895,7 +4895,7 @@ readchar_core(coordxy *x, coordxy *y, int *mod)
  readchar_done:
     /* next readchar() will be for an ordinary char unless parse()
        sets this back to non-zero */
-    svp.program_state.input_state = otherInp;
+    program_state.input_state = otherInp;
     return (char) sym;
 }
 
@@ -4917,7 +4917,7 @@ readchar_poskey(coordxy *x, coordxy *y, int *mod)
 {
     char ch;
 
-    svp.program_state.input_state = getposInp;
+    program_state.input_state = getposInp;
     ch = readchar_core(x, y, mod);
     return ch;
 }
@@ -5171,7 +5171,7 @@ yn_function(
         res = altres;
     }
     /* in case we're called via getdir() which sets input_state */
-    svp.program_state.input_state = otherInp;
+    program_state.input_state = otherInp;
     return res;
 }
 

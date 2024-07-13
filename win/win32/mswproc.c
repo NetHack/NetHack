@@ -1251,7 +1251,7 @@ void
 mswin_update_inventory(int arg)
 {
     logDebug("mswin_update_inventory(%d)\n", arg);
-    if (iflags.perm_invent && svp.program_state.something_worth_saving
+    if (iflags.perm_invent && program_state.something_worth_saving
         && iflags.window_inited && WIN_INVEN != WIN_ERR)
         display_inventory(NULL, FALSE);
 }
@@ -2862,7 +2862,7 @@ int
 NHMessageBox(HWND hWnd, LPCTSTR text, UINT type)
 {
     TCHAR title[MAX_LOADSTRING];
-    if (svp.program_state.exiting && !strcmp(text, "\n"))
+    if (program_state.exiting && !strcmp(text, "\n"))
         text = "Press Enter to exit";
 
     LoadString(GetNHApp()->hApp, IDS_APP_TITLE_SHORT, title, MAX_LOADSTRING);

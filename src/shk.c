@@ -4908,7 +4908,7 @@ after_shk_move(struct monst *shkp)
         /* reset bill_p, need to re-calc player's occupancy too */
         eshkp->bill_p = &eshkp->bill[0];
         /* only re-check occupancy if game hasn't just ended */
-        if (!svp.program_state.gameover)
+        if (!program_state.gameover)
             check_special_room(FALSE);
     }
 }

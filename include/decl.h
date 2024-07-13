@@ -1194,7 +1194,6 @@ struct instance_globals_saved_p {
     char plname[PL_NSIZ]; /* player name */
     char pl_character[PL_CSIZ];
     char pl_fruit[PL_FSIZ];
-    struct sinfo program_state; /* flags describing game's current state */
 };
 
 struct instance_globals_saved_q {
@@ -1280,6 +1279,7 @@ extern struct instance_globals_saved_t svt;
 extern struct instance_globals_saved_u svu;
 extern struct instance_globals_saved_x svx;
 extern struct instance_globals_saved_y svy;
+extern struct sinfo program_state; /* flags describing game's current state */
 
 struct const_globals {
     const struct obj zeroobj;      /* used to zero out a struct obj */

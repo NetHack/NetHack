@@ -456,7 +456,7 @@ staticfn boolean
 skip_pager(boolean common UNUSED)
 {
     /* WIZKIT: suppress plot feedback if starting with quest artifact */
-    if (svp.program_state.wizkit_wishing)
+    if (program_state.wizkit_wishing)
         return TRUE;
     return FALSE;
 }

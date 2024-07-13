@@ -24,7 +24,7 @@
 static long final_fpos; /* [note: do not move this to the 'g' struct] */
 #endif
 
-#define done_stopprint svp.program_state.stopprint
+#define done_stopprint program_state.stopprint
 
 #define newttentry() (struct toptenentry *) alloc(sizeof (struct toptenentry))
 #define dealloc_ttentry(ttent) free((genericptr_t) (ttent))
@@ -642,7 +642,7 @@ topten(int how, time_t when)
      * topten uses alloc() several times, which will lead to
      * problems if the panic was the result of an alloc() failure.
      */
-    if (svp.program_state.panicking)
+    if (program_state.panicking)
         return;
 
     if (iflags.toptenwin) {
@@ -650,7 +650,7 @@ topten(int how, time_t when)
     }
 
 #if defined(HANGUPHANDLING)
-#define HUP if (!svp.program_state.done_hup)
+#define HUP if (!program_state.done_hup)
 #else
 #define HUP
 #endif

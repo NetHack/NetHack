@@ -41,7 +41,7 @@ staticfn void zerocomp_bputc(int);
 #endif
 
 #if defined(HANGUPHANDLING)
-#define HUP if (!svp.program_state.done_hup)
+#define HUP if (!program_state.done_hup)
 #else
 #define HUP
 #endif
@@ -59,7 +59,7 @@ dosave(void)
         clear_nhwindow(WIN_MESSAGE);
         pline("Saving...");
 #if defined(HANGUPHANDLING)
-        svp.program_state.done_hup = 0;
+        program_state.done_hup = 0;
 #endif
         if (dosave0()) {
             u.uhp = -1; /* universal game's over indicator */
@@ -86,7 +86,7 @@ dosave0(void)
     NHFILE *nhfp, *onhfp;
     int res = 0;
 
-    svp.program_state.saving++; /* inhibit status and perm_invent updates */
+    program_state.saving++; /* inhibit status and perm_invent updates */
     /* we may get here via hangup signal, in which case we want to fix up
        a few of things before saving so that they won't be restored in
        an improper state; these will be no-ops for normal save sequence */
@@ -103,7 +103,7 @@ dosave0(void)
        when punished, make sure ball and chain are placed too */
     done_object_cleanup(); /* maybe force some items onto map */
 
-    if (!svp.program_state.something_worth_saving || !gs.SAVEF[0])
+    if (!program_state.something_worth_saving || !gs.SAVEF[0])
         goto done;
 
     fq_save = fqname(gs.SAVEF, SAVEPREFIX, 1); /* level files take 0 */
@@ -230,11 +230,11 @@ dosave0(void)
     delete_levelfile(0);
     nh_compress(fq_save);
     /* this should probably come sooner... */
-    svp.program_state.something_worth_saving = 0;
+    program_state.something_worth_saving = 0;
     res = 1;
 
  done:
-    svp.program_state.saving--;
+    program_state.saving--;
     return res;
 }
 
@@ -276,7 +276,7 @@ savegamestate(NHFILE *nhfp)
 {
     unsigned long uid;
 
-    svp.program_state.saving++; /* caller should/did already set this... */
+    program_state.saving++; /* caller should/did already set this... */
     uid = (unsigned long) getuid();
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) &uid, sizeof uid);
@@ -338,7 +338,7 @@ savegamestate(NHFILE *nhfp)
     save_luadata(nhfp);
     if (nhfp->structlevel)
         bflush(nhfp->fd);
-    svp.program_state.saving--;
+    program_state.saving--;
     return;
 }
 
@@ -364,7 +364,7 @@ savestateinlock(void)
     char whynot[BUFSZ];
     NHFILE *nhfp;
 
-    svp.program_state.saving++; /* inhibit status and perm_invent updates */
+    program_state.saving++; /* inhibit status and perm_invent updates */
     /* When checkpointing is on, the full state needs to be written
      * on each checkpoint.  When checkpointing is off, only the pid
      * needs to be in the level.0 file, so it does not need to be
@@ -385,7 +385,7 @@ savestateinlock(void)
          */
         nhfp = open_levelfile(0, whynot);
         if (tricked_fileremoved(nhfp, whynot)) {
-            svp.program_state.saving--;
+            program_state.saving--;
             return;
         }
 
@@ -408,7 +408,7 @@ savestateinlock(void)
                than after so that screen updating behaves normally;
                game data shouldn't be inconsistent yet, unlike it would
                become midway through saving */
-            svp.program_state.saving--;
+            program_state.saving--;
             done(TRICKED);
             return;
         }
@@ -433,7 +433,7 @@ savestateinlock(void)
         }
         close_nhfile(nhfp);
     }
-    svp.program_state.saving--;
+    program_state.saving--;
     gh.havestate = flags.ins_chkpt;
     return;
 }
@@ -450,7 +450,7 @@ savelev(NHFILE *nhfp, xint8 lev)
        but we'll be called during run-down */
     if (set_uz_save && perform_bwrite(nhfp)) {
         if (u.uz.dnum == 0 && u.uz.dlevel == 0) {
-            svp.program_state.something_worth_saving = 0;
+            program_state.something_worth_saving = 0;
             panic("savelev: where are we?");
         }
         gu.uz_save = u.uz;
@@ -469,7 +469,7 @@ savelev_core(NHFILE *nhfp, xint8 lev)
     short tlev;
 #endif
 
-    svp.program_state.saving++; /* even if current mode is FREEING */
+    program_state.saving++; /* even if current mode is FREEING */
 
     if (!nhfp)
         panic("Save on bad file!"); /* impossible */
@@ -564,7 +564,7 @@ savelev_core(NHFILE *nhfp, xint8 lev)
         if (nhfp->structlevel)
             bflush(nhfp->fd);
     }
-    svp.program_state.saving--;
+    program_state.saving--;
     if (release_data(nhfp)) {
         clear_level_structures();
         gf.ftrap = 0;
@@ -717,7 +717,7 @@ save_stairs(NHFILE *nhfp)
 
     while (stway) {
         if (perform_bwrite(nhfp)) {
-            boolean use_relative = (svp.program_state.restoring != REST_GSTATE
+            boolean use_relative = (program_state.restoring != REST_GSTATE
                                     && stway->tolev.dnum == u.uz.dnum);
             if (use_relative) {
                 /* make dlevel relative to current level */
@@ -988,7 +988,7 @@ savetrapchn(NHFILE *nhfp, struct trap *trap)
     struct trap *trap2;
 
     while (trap) {
-        boolean use_relative = (svp.program_state.restoring != REST_GSTATE
+        boolean use_relative = (program_state.restoring != REST_GSTATE
                                 && trap->dst.dnum == u.uz.dnum);
         trap2 = trap->ntrap;
         if (use_relative)

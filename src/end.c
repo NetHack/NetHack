@@ -43,7 +43,7 @@ ATTRNORETURN extern void nethack_exit(int) NORETURN;
 #define nethack_exit exit
 #endif
 
-#define done_stopprint svp.program_state.stopprint
+#define done_stopprint program_state.stopprint
 
 /*
  * The order of these needs to match the macros in hack.h.
@@ -175,7 +175,7 @@ staticfn void
 done_hangup(int sig)
 {
 #ifdef HANGUPHANDLING
-    svp.program_state.done_hup++;
+    program_state.done_hup++;
 #endif
     sethanguphandler((void (*)(int)) SIG_IGN);
     done_intr(sig);
@@ -391,7 +391,7 @@ panic VA_DECL(const char *, str)
     VA_START(str);
     VA_INIT(str, char *);
 
-    if (svp.program_state.panicking++)
+    if (program_state.panicking++)
         NH_abort(NULL); /* avoid loops - this should never happen*/
 
     gb.bot_disabled = TRUE;
@@ -404,9 +404,9 @@ panic VA_DECL(const char *, str)
         iflags.window_inited = FALSE; /* they're gone; force raw_print()ing */
     }
 
-    raw_print(svp.program_state.gameover
+    raw_print(program_state.gameover
                   ? "Postgame wrapup disrupted."
-                  : !svp.program_state.something_worth_saving
+                  : !program_state.something_worth_saving
                         ? "Program initialization has failed."
                         : "Suddenly, the dungeon collapses.");
 #ifndef MICRO
@@ -414,11 +414,11 @@ panic VA_DECL(const char *, str)
     if (!wizard)
         raw_printf("Report the following error to \"%s\" or at \"%s\".",
                    DEVTEAM_EMAIL, DEVTEAM_URL);
-    else if (svp.program_state.something_worth_saving)
+    else if (program_state.something_worth_saving)
         raw_print("\nError save file being written.\n");
 #else /* !NOTIFY_NETHACK_BUGS */
     if (!wizard) {
-        const char *maybe_rebuild = !svp.program_state.something_worth_saving
+        const char *maybe_rebuild = !program_state.something_worth_saving
                                      ? "."
                                      : "\nand it may be possible to rebuild.";
 
@@ -437,7 +437,7 @@ panic VA_DECL(const char *, str)
     /* XXX can we move this above the prints?  Then we'd be able to
      * suppress "it may be possible to rebuild" based on dosave0()
      * or say it's NOT possible to rebuild. */
-    if (svp.program_state.something_worth_saving && !iflags.debug_fuzzer) {
+    if (program_state.something_worth_saving && !iflags.debug_fuzzer) {
         set_error_savefile();
         if (dosave0()) {
             /* os/win port specific recover instructions */
@@ -937,7 +937,7 @@ fuzzer_savelife(int how)
      * Some debugging code pulled out of done() to unclutter it.
      * 'done_seq' is maintained in done().
      */
-    if (!svp.program_state.panicking
+    if (!program_state.panicking
         && how != PANICKED && how != TRICKED) {
         savelife(how);
 
@@ -1019,9 +1019,9 @@ done(int how)
             return;
         }
     }
-    if (svp.program_state.panicking
+    if (program_state.panicking
 #ifdef HANGUPHANDLING
-        || svp.program_state.done_hup
+        || program_state.done_hup
 #endif
         || (how == QUIT && done_stopprint)) {
         /* skip status update if panicking or disconnected
@@ -1094,7 +1094,7 @@ done(int how)
         /* if hangup has occurred, the only possible answer to a paranoid
            query is 'no'; we want 'no' as the default for "Die?" but can't
            accept it more than once if there's no user supplying it */
-        && !(svp.program_state.done_hup && gd.done_seq++ == gh.hero_seq)
+        && !(program_state.done_hup && gd.done_seq++ == gh.hero_seq)
 #endif
         && !paranoid_query(ParanoidDie, "Die?")) {
         pline("OK, so you don't %s.", (how == CHOKING) ? "choke" : "die");
@@ -1128,11 +1128,11 @@ really_done(int how)
     /*
      *  The game is now over...
      */
-    svp.program_state.gameover = 1;
+    program_state.gameover = 1;
     /* in case of a subsequent panic(), there's no point trying to save */
-    svp.program_state.something_worth_saving = 0;
+    program_state.something_worth_saving = 0;
 #ifdef HANGUPHANDLING
-    if (svp.program_state.done_hup)
+    if (program_state.done_hup)
         done_stopprint++;
 #endif
     /* render vision subsystem inoperative */
@@ -1140,7 +1140,7 @@ really_done(int how)
 
     /* maybe use up active invent item(s), place thrown/kicked missile,
        deal with ball and chain possibly being temporarily off the map */
-    if (!svp.program_state.panicking)
+    if (!program_state.panicking)
         done_object_cleanup();
     /* in case we're panicking; normally cleared by done_object_cleanup() */
     iflags.perm_invent = FALSE;
@@ -1657,7 +1657,7 @@ container_contents(
 ATTRNORETURN void
 nh_terminate(int status)
 {
-    svp.program_state.in_moveloop = 0; /* won't be returning to normal play */
+    program_state.in_moveloop = 0; /* won't be returning to normal play */
 
     l_nhcore_call(NHCORE_GAME_EXIT);
 #ifdef MAC
@@ -1665,7 +1665,7 @@ nh_terminate(int status)
 #endif
     /* don't bother to try to release memory if we're in panic mode, to
        avoid trouble in case that happens to be due to memory problems */
-    if (!svp.program_state.panicking) {
+    if (!program_state.panicking) {
         freedynamicdata();
         dlb_cleanup();
         l_nhcore_done();
@@ -1679,10 +1679,10 @@ nh_terminate(int status)
      */
     /* don't call exit() if already executing within an exit handler;
        that would cancel any other pending user-mode handlers */
-    if (svp.program_state.exiting)
+    if (program_state.exiting)
         return;
 #endif
-    svp.program_state.exiting = 1;
+    program_state.exiting = 1;
     nethack_exit(status);
 }
 

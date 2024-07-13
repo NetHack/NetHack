@@ -1814,7 +1814,7 @@ add_menu_heading(winid tmpwin, const char *buf)
         color = iflags.menu_headings.color;
 
     /* suppress highlighting during end-of-game disclosure */
-    if (svp.program_state.gameover)
+    if (program_state.gameover)
         attr = ATR_NONE, color = NO_COLOR;
 
     add_menu(tmpwin, &nul_glyphinfo, &any, '\0', '\0', attr, color,
@@ -1862,10 +1862,10 @@ getlin(const char *query, char *bufp)
 {
     boolean old_bot_disabled = gb.bot_disabled;
 
-    svp.program_state.in_getlin = 1;
+    program_state.in_getlin = 1;
     gb.bot_disabled = TRUE;
     (*windowprocs.win_getlin)(query, bufp);
     gb.bot_disabled = old_bot_disabled;
-    svp.program_state.in_getlin = 0;
+    program_state.in_getlin = 0;
 }
 /*windows.c*/

@@ -193,7 +193,7 @@ nhmain(int argc, char *argv[])
      * It seems you really want to play.
      */
     u.uhp = 1; /* prevent RIP on early quits */
-    svp.program_state.preserve_locks = 1;
+    program_state.preserve_locks = 1;
 #ifndef NO_SIGNAL
     sethanguphandler((SIG_RET_TYPE) hangup);
 #endif
@@ -272,7 +272,7 @@ nhmain(int argc, char *argv[])
      */
     if (*svp.plname) {
         getlock();
-        svp.program_state.preserve_locks = 0; /* after getlock() */
+        program_state.preserve_locks = 0; /* after getlock() */
     }
 
     if (*svp.plname && (nhfp = restore_saved_game()) != 0) {

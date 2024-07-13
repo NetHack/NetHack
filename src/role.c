@@ -2204,7 +2204,7 @@ genl_player_setup(int screenheight)
     char pick4u = 'n';
     int result = 0; /* assume failure (player chooses to 'quit') */
 
-    svp.program_state.in_role_selection++; /* affects tty menu cleanup */
+    program_state.in_role_selection++; /* affects tty menu cleanup */
     /* Used to avoid "Is this ok?" if player has already specified all
      * four facets of role.
      * Note that rigid_role_checks might force any unspecified facets to
@@ -2704,7 +2704,7 @@ genl_player_setup(int screenheight)
     result = 1;
 
  setup_done:
-    svp.program_state.in_role_selection--;
+    program_state.in_role_selection--;
     return result;
 }
 

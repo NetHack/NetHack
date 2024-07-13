@@ -325,7 +325,7 @@ obj_is_pname(struct obj *obj)
 {
     if (!obj->oartifact || !has_oname(obj))
         return FALSE;
-    if (!svp.program_state.gameover && !iflags.override_ID) {
+    if (!program_state.gameover && !iflags.override_ID) {
         if (not_fully_identified(obj))
             return FALSE;
     }
@@ -371,7 +371,7 @@ distant_name(
       against a potential extra chance to browse the map with getpos()
       during final disclosure (not currently implemented, nor planned) */
     save_oid = obj->o_id;
-    if (svp.program_state.gameover)
+    if (program_state.gameover)
         obj->o_id = 0;
 
     /* this maybe-nearby part used to be replicated in multiple callers */
@@ -955,7 +955,7 @@ xname_flags(
            "You were acid resistant because of your alchemy smock \
            with text \"Kiss the cook\"."
        when disclosing attributes anyway */
-    if (svp.program_state.gameover && obj->o_id && bufspaceleft > 0) {
+    if (program_state.gameover && obj->o_id && bufspaceleft > 0) {
         const char *lbl;
         char tmpbuf[BUFSZ];
 
@@ -1625,7 +1625,7 @@ doname_base(
        bill might not be available yet while restore is in progress
        (objects won't normally be formatted during that time, but if
        'perm_invent' is enabled then they might be [not any more...]) */
-    if (iflags.suppress_price || svp.program_state.restoring) {
+    if (iflags.suppress_price || program_state.restoring) {
         ; /* don't attempt to obtain any shop pricing, even if 'with_price' */
     } else if (is_unpaid(obj)) { /* in inventory or in container in invent */
         char pricebuf[40];
@@ -4894,7 +4894,7 @@ readobjnam(char *bp, struct obj *no_wish)
      * Disallow such topology tweaks for WIZKIT startup wishes.
      */
  wiztrap:
-    if (wizard && !svp.program_state.wizkit_wishing && !d.oclass) {
+    if (wizard && !program_state.wizkit_wishing && !d.oclass) {
         /* [inline code moved to separate routine to unclutter readobjnam] */
         if ((d.otmp = wizterrainwish(&d)) != 0)
             return d.otmp;
@@ -4982,7 +4982,7 @@ readobjnam(char *bp, struct obj *no_wish)
             if (rn1cnt > 6 - d.gsize)
                 rn1cnt = 6 - d.gsize;
             if (d.cnt > rn1cnt
-                && (!wizard || svp.program_state.wizkit_wishing
+                && (!wizard || program_state.wizkit_wishing
                     || y_n("Override glob weight limit?") != 'y'))
                 d.cnt = rn1cnt;
             d.otmp->owt *= (unsigned) d.cnt;

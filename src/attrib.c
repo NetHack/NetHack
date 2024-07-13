@@ -191,7 +191,7 @@ adjattrib(
     disp.botl = TRUE;
     if (msgflg <= 0)
         You_feel("%s%s!", (incr > 1 || incr < -1) ? "very " : "", attrstr);
-    if (svp.program_state.in_moveloop && (ndx == A_STR || ndx == A_CON))
+    if (program_state.in_moveloop && (ndx == A_STR || ndx == A_CON))
         (void) encumber_msg();
     return TRUE;
 }

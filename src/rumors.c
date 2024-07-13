@@ -763,16 +763,16 @@ doconsult(struct monst *oracl)
 staticfn void
 couldnt_open_file(const char *filename)
 {
-    int save_something = svp.program_state.something_worth_saving;
+    int save_something = program_state.something_worth_saving;
 
     /* most likely the file is missing, so suppress impossible()'s
        "saving and restoring might fix this" (unless the fuzzer,
        which escalates impossible to panic, is running) */
     if (!iflags.debug_fuzzer)
-        svp.program_state.something_worth_saving = 0;
+        program_state.something_worth_saving = 0;
 
     impossible("Can't open '%s' file.", filename);
-    svp.program_state.something_worth_saving = save_something;
+    program_state.something_worth_saving = save_something;
 }
 
 /* is 'word' a capitalized monster name that should be preceded by "the"?

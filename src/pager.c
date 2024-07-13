@@ -507,7 +507,7 @@ waterbody_name(coordxy x, coordxy y)
 {
     static char pooltype[40];
     schar ltyp;
-    boolean hallucinate = Hallucination && !svp.program_state.gameover;
+    boolean hallucinate = Hallucination && !program_state.gameover;
 
     if (!isok(x, y))
         return "drink"; /* should never happen */
@@ -1203,7 +1203,7 @@ do_screen_description(
         skipped_venom = 0, found = 0; /* count of matching syms found */
     boolean hit_trap, need_to_look = FALSE,
             submerged = (Underwater && !Is_waterlevel(&u.uz)),
-            hallucinate = (Hallucination && !svp.program_state.gameover);
+            hallucinate = (Hallucination && !program_state.gameover);
     const char *x_str;
     nhsym tmpsym;
     glyph_info glyphinfo = nul_glyphinfo;
