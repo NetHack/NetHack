@@ -184,7 +184,7 @@ watch_on_duty(struct monst *mtmp)
             }
         } else if (is_digging()) {
             /* chewing, wand/spell of digging are checked elsewhere */
-            watch_dig(mtmp, gc.context.digging.pos.x, gc.context.digging.pos.y,
+            watch_dig(mtmp, svc.context.digging.pos.x, svc.context.digging.pos.y,
                       FALSE);
         }
     }
@@ -287,7 +287,7 @@ void
 mon_regen(struct monst *mon, boolean digest_meal)
 {
     if (mon->mhp < mon->mhpmax
-        && (gm.moves % 20 == 0 || regenerates(mon->data)))
+        && (svm.moves % 20 == 0 || regenerates(mon->data)))
         mon->mhp++;
     if (mon->mspec_used)
         mon->mspec_used--;
@@ -357,7 +357,7 @@ find_pmmonst(int pm)
 {
     struct monst *mtmp = 0;
 
-    if ((gm.mvitals[pm].mvflags & G_GENOD) == 0)
+    if ((svm.mvitals[pm].mvflags & G_GENOD) == 0)
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if (DEADMONSTER(mtmp))
                 continue;
@@ -999,7 +999,7 @@ mon_would_consume_item(struct monst *mtmp, struct obj *otmp)
 
     if (mtmp->mtame && has_edog(mtmp) /* has_edog(): not guardian angel */
         && (ftyp = dogfood(mtmp, otmp)) < MANFOOD
-        && (ftyp < ACCFOOD || EDOG(mtmp)->hungrytime <= gm.moves))
+        && (ftyp < ACCFOOD || EDOG(mtmp)->hungrytime <= svm.moves))
         return TRUE;
 
     return FALSE;
@@ -1338,7 +1338,7 @@ m_search_items(
             costly = costly_spot(xx, yy);
 
             /* look through the items on this location */
-            for (otmp = gl.level.objects[xx][yy];
+            for (otmp = svl.level.objects[xx][yy];
                  otmp; otmp = otmp->nexthere) {
                 /* monsters may pick rocks up, but won't go out of their way
                    to grab them; this might hamper sling wielders, but it cuts
@@ -1673,7 +1673,7 @@ m_move(struct monst *mtmp, int after)
         return MMOVE_DONE; /* still eating */
     }
     if (hides_under(ptr) && OBJ_AT(mtmp->mx, mtmp->my)
-        && can_hide_under_obj(gl.level.objects[mtmp->mx][mtmp->my]) && rn2(10))
+        && can_hide_under_obj(svl.level.objects[mtmp->mx][mtmp->my]) && rn2(10))
         return MMOVE_NOTHING; /* do not leave hiding place */
 
     /* Where does 'mtmp' think you are?  Not necessary if m_move() called
@@ -1854,7 +1854,7 @@ m_move(struct monst *mtmp, int after)
         chi = -1;
         nidist = dist2(nix, niy, ggx, ggy);
         /* allow monsters be shortsighted on some levels for balance */
-        if (!mtmp->mpeaceful && gl.level.flags.shortsighted
+        if (!mtmp->mpeaceful && svl.level.flags.shortsighted
             && nidist > (couldsee(nix, niy) ? 144 : 36) && appr == 1)
             appr = 0;
         if (is_unicorn(ptr) && noteleport_level(mtmp)) {
@@ -2281,7 +2281,7 @@ can_ooze(struct monst *mtmp)
 boolean
 can_fog(struct monst *mtmp)
 {
-    if (!(gm.mvitals[PM_FOG_CLOUD].mvflags & G_GENOD) && is_vampshifter(mtmp)
+    if (!(svm.mvitals[PM_FOG_CLOUD].mvflags & G_GENOD) && is_vampshifter(mtmp)
         && !Protection_from_shape_changers && !stuff_prevents_passage(mtmp))
         return TRUE;
     return FALSE;

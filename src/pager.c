@@ -115,7 +115,7 @@ self_lookat(char *outbuf)
     Sprintf(outbuf, "%s%s%s called %s",
             /* being blinded may hide invisibility from self */
             (Invis && (senseself() || !Blind)) ? "invisible " : "", race,
-            pmname(&mons[u.umonnum], Ugender), gp.plname);
+            pmname(&mons[u.umonnum], Ugender), svp.plname);
     if (u.usteed)
         Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
     if (u.uundetected || (Upolyd && U_AP_TYPE))
@@ -192,7 +192,7 @@ mhidden_description(
             show_altmon = (mhid_flags & MHID_ALTMON) != 0;
     boolean fakeobj, isyou = (mon == &gy.youmonst);
     coordxy x = isyou ? u.ux : mon->mx, y = isyou ? u.uy : mon->my;
-    int glyph = (gl.level.flags.hero_memory && !isyou) ? levl[x][y].glyph
+    int glyph = (svl.level.flags.hero_memory && !isyou) ? levl[x][y].glyph
                                                        : glyph_at(x, y);
 
     *outbuf = '\0';
@@ -265,7 +265,7 @@ object_from_map(int glyph, coordxy x, coordxy y, struct obj **obj_p)
     *obj_p = (struct obj *) 0;
     /* TODO: check inside containers in case glyph came from detection */
     if ((otmp = sobj_at(glyphotyp, x, y)) == 0)
-        for (otmp = gl.level.buriedobjlist; otmp; otmp = otmp->nobj)
+        for (otmp = svl.level.buriedobjlist; otmp; otmp = otmp->nobj)
             if (otmp->ox == x && otmp->oy == y && otmp->otyp == glyphotyp)
                 break;
 
@@ -286,10 +286,10 @@ object_from_map(int glyph, coordxy x, coordxy y, struct obj **obj_p)
         if (otmp->oclass == COIN_CLASS)
             otmp->quan = 2L; /* to force pluralization */
         else if (otmp->otyp == SLIME_MOLD)
-            otmp->spe = gc.context.current_fruit; /* give it a type */
+            otmp->spe = svc.context.current_fruit; /* give it a type */
         if (mtmp && has_mcorpsenm(mtmp)) { /* mimic as corpse/statue */
             if (otmp->otyp == SLIME_MOLD)
-                /* override gc.context.current_fruit to avoid
+                /* override svc.context.current_fruit to avoid
                      look, use 'O' to make new named fruit, look again
                    giving different results when current_fruit changes */
                 otmp->spe = MCORPSENM(mtmp);
@@ -474,8 +474,8 @@ look_at_monster(
                 if (Hallucination) {
                     Strcat(monbuf, "paranoid delusion");
                 } else {
-                    unsigned long mW = (gc.context.warntype.obj
-                                        | gc.context.warntype.polyd),
+                    unsigned long mW = (svc.context.warntype.obj
+                                        | svc.context.warntype.polyd),
                                   m2 = mtmp->data->mflags2;
                     const char *whom = ((mW & M2_HUMAN & m2) ? "human"
                                         : (mW & M2_ELF & m2) ? "elf"
@@ -507,7 +507,7 @@ waterbody_name(coordxy x, coordxy y)
 {
     static char pooltype[40];
     schar ltyp;
-    boolean hallucinate = Hallucination && !gp.program_state.gameover;
+    boolean hallucinate = Hallucination && !svp.program_state.gameover;
 
     if (!isok(x, y))
         return "drink"; /* should never happen */
@@ -1203,7 +1203,7 @@ do_screen_description(
         skipped_venom = 0, found = 0; /* count of matching syms found */
     boolean hit_trap, need_to_look = FALSE,
             submerged = (Underwater && !Is_waterlevel(&u.uz)),
-            hallucinate = (Hallucination && !gp.program_state.gameover);
+            hallucinate = (Hallucination && !svp.program_state.gameover);
     const char *x_str;
     nhsym tmpsym;
     glyph_info glyphinfo = nul_glyphinfo;
@@ -2072,7 +2072,7 @@ look_engrs(boolean nearby)
             if (!e)
                 continue;
             glyph = glyph_at(x, y);
-            sym = ((levl[x][y].typ == GRAVE || gl.lastseentyp[x][y] == GRAVE)
+            sym = ((levl[x][y].typ == GRAVE || svl.lastseentyp[x][y] == GRAVE)
                    ? S_grave
                    : (levl[x][y].typ == CORR) ? S_engrcorr
                      : S_engroom);

@@ -28,9 +28,9 @@ noises(struct monst *magr, struct attack *mattk)
 {
     boolean farq = (mdistu(magr) > 15);
 
-    if (!Deaf && (farq != gf.far_noise || gm.moves - gn.noisetime > 10)) {
+    if (!Deaf && (farq != gf.far_noise || svm.moves - gn.noisetime > 10)) {
         gf.far_noise = farq;
-        gn.noisetime = gm.moves;
+        gn.noisetime = svm.moves;
         You_hear("%s%s.",
                  (mattk->aatyp == AT_EXPL) ? "an explosion" : "some noises",
                  farq ? " in the distance" : "");
@@ -360,7 +360,7 @@ mattackm(
      * some cases, in which case this still counts as its move for the round
      * and it shouldn't move again.
      */
-    magr->mlstmv = gm.moves;
+    magr->mlstmv = svm.moves;
 
     /* controls whether a mind flayer uses all of its tentacle-for-DRIN
        attacks; when fighting a headless monster, stop after the first

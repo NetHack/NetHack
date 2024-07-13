@@ -1179,7 +1179,7 @@ enhance_weapon_skill(void)
     int clr = NO_COLOR;
 
     /* player knows about #enhance, don't show tip anymore */
-    gc.context.tips[TIP_ENHANCE] = TRUE;
+    svc.context.tips[TIP_ENHANCE] = TRUE;
 
     if (wizard && y_n("Advance skills without practice?") == 'y')
         speedy = TRUE;

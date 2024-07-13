@@ -429,7 +429,7 @@ l_selection_room(lua_State *L)
     if (argc == 1) {
         int i = luaL_checkinteger(L, -1);
 
-        croom = (i >= 0 && i < gn.nroom) ? &gr.rooms[i] : NULL;
+        croom = (i >= 0 && i < svn.nroom) ? &svr.rooms[i] : NULL;
     }
 
     sel = selection_from_mkroom(croom);

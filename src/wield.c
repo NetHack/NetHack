@@ -371,14 +371,14 @@ dowield(void)
         /* previously interrupted armor removal mustn't be resumed */
         reset_remarm();
         /* if player chose a partial stack but can't wield it, undo split */
-        if (wep->o_id && wep->o_id == gc.context.objsplit.child_oid)
+        if (wep->o_id && wep->o_id == svc.context.objsplit.child_oid)
             unsplitobj(wep);
         return ECMD_FAIL;
-    } else if (wep->o_id && wep->o_id == gc.context.objsplit.child_oid) {
+    } else if (wep->o_id && wep->o_id == svc.context.objsplit.child_oid) {
         /* if wep is the result of supplying a count to getobj()
            we don't want to split something already wielded; for
            any other item, we need to give it its own inventory slot */
-        if (uwep && uwep->o_id == gc.context.objsplit.parent_oid) {
+        if (uwep && uwep->o_id == svc.context.objsplit.parent_oid) {
             unsplitobj(wep);
             /* wep was merged back to uwep, already_wielded uses wep */
             wep = uwep;
@@ -538,11 +538,11 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
             You("already have no ammunition readied!");
         }
         return ECMD_OK;
-    } else if (newquiver->o_id == gc.context.objsplit.child_oid) {
+    } else if (newquiver->o_id == svc.context.objsplit.child_oid) {
         /* if newquiver is the result of supplying a count to getobj()
            we don't want to split something already in the quiver;
            for any other item, we need to give it its own inventory slot */
-        if (uquiver && uquiver->o_id == gc.context.objsplit.parent_oid) {
+        if (uquiver && uquiver->o_id == svc.context.objsplit.parent_oid) {
             unsplitobj(newquiver);
             goto already_quivered;
         } else if (newquiver->oclass == COIN_CLASS) {

@@ -372,40 +372,40 @@ struct dgn_topology { /* special dungeon levels for speed */
 
 /* macros for accessing the dungeon levels by their old names */
 /* clang-format off */
-#define oracle_level            (gd.dungeon_topology.d_oracle_level)
-#define bigroom_level           (gd.dungeon_topology.d_bigroom_level)
-#define rogue_level             (gd.dungeon_topology.d_rogue_level)
-#define medusa_level            (gd.dungeon_topology.d_medusa_level)
-#define stronghold_level        (gd.dungeon_topology.d_stronghold_level)
-#define valley_level            (gd.dungeon_topology.d_valley_level)
-#define wiz1_level              (gd.dungeon_topology.d_wiz1_level)
-#define wiz2_level              (gd.dungeon_topology.d_wiz2_level)
-#define wiz3_level              (gd.dungeon_topology.d_wiz3_level)
-#define juiblex_level           (gd.dungeon_topology.d_juiblex_level)
-#define orcus_level             (gd.dungeon_topology.d_orcus_level)
-#define baalzebub_level         (gd.dungeon_topology.d_baalzebub_level)
-#define asmodeus_level          (gd.dungeon_topology.d_asmodeus_level)
-#define portal_level            (gd.dungeon_topology.d_portal_level)
-#define sanctum_level           (gd.dungeon_topology.d_sanctum_level)
-#define earth_level             (gd.dungeon_topology.d_earth_level)
-#define water_level             (gd.dungeon_topology.d_water_level)
-#define fire_level              (gd.dungeon_topology.d_fire_level)
-#define air_level               (gd.dungeon_topology.d_air_level)
-#define astral_level            (gd.dungeon_topology.d_astral_level)
-#define tower_dnum              (gd.dungeon_topology.d_tower_dnum)
-#define sokoban_dnum            (gd.dungeon_topology.d_sokoban_dnum)
-#define mines_dnum              (gd.dungeon_topology.d_mines_dnum)
-#define quest_dnum              (gd.dungeon_topology.d_quest_dnum)
-#define tutorial_dnum           (gd.dungeon_topology.d_tutorial_dnum)
-#define qstart_level            (gd.dungeon_topology.d_qstart_level)
-#define qlocate_level           (gd.dungeon_topology.d_qlocate_level)
-#define nemesis_level           (gd.dungeon_topology.d_nemesis_level)
-#define knox_level              (gd.dungeon_topology.d_knox_level)
-#define mineend_level           (gd.dungeon_topology.d_mineend_level)
-#define sokoend_level           (gd.dungeon_topology.d_sokoend_level)
+#define oracle_level            (svd.dungeon_topology.d_oracle_level)
+#define bigroom_level           (svd.dungeon_topology.d_bigroom_level)
+#define rogue_level             (svd.dungeon_topology.d_rogue_level)
+#define medusa_level            (svd.dungeon_topology.d_medusa_level)
+#define stronghold_level        (svd.dungeon_topology.d_stronghold_level)
+#define valley_level            (svd.dungeon_topology.d_valley_level)
+#define wiz1_level              (svd.dungeon_topology.d_wiz1_level)
+#define wiz2_level              (svd.dungeon_topology.d_wiz2_level)
+#define wiz3_level              (svd.dungeon_topology.d_wiz3_level)
+#define juiblex_level           (svd.dungeon_topology.d_juiblex_level)
+#define orcus_level             (svd.dungeon_topology.d_orcus_level)
+#define baalzebub_level         (svd.dungeon_topology.d_baalzebub_level)
+#define asmodeus_level          (svd.dungeon_topology.d_asmodeus_level)
+#define portal_level            (svd.dungeon_topology.d_portal_level)
+#define sanctum_level           (svd.dungeon_topology.d_sanctum_level)
+#define earth_level             (svd.dungeon_topology.d_earth_level)
+#define water_level             (svd.dungeon_topology.d_water_level)
+#define fire_level              (svd.dungeon_topology.d_fire_level)
+#define air_level               (svd.dungeon_topology.d_air_level)
+#define astral_level            (svd.dungeon_topology.d_astral_level)
+#define tower_dnum              (svd.dungeon_topology.d_tower_dnum)
+#define sokoban_dnum            (svd.dungeon_topology.d_sokoban_dnum)
+#define mines_dnum              (svd.dungeon_topology.d_mines_dnum)
+#define quest_dnum              (svd.dungeon_topology.d_quest_dnum)
+#define tutorial_dnum           (svd.dungeon_topology.d_tutorial_dnum)
+#define qstart_level            (svd.dungeon_topology.d_qstart_level)
+#define qlocate_level           (svd.dungeon_topology.d_qlocate_level)
+#define nemesis_level           (svd.dungeon_topology.d_nemesis_level)
+#define knox_level              (svd.dungeon_topology.d_knox_level)
+#define mineend_level           (svd.dungeon_topology.d_mineend_level)
+#define sokoend_level           (svd.dungeon_topology.d_sokoend_level)
 /* clang-format on */
 
-#define dunlev_reached(x) (gd.dungeons[(x)->dnum].dunlev_ureached)
+#define dunlev_reached(x) (svd.dungeons[(x)->dnum].dunlev_ureached)
 #define MAXLINFO (MAXDUNGEON * MAXLEVEL)
 
 enum lua_theme_group {
@@ -1073,10 +1073,10 @@ typedef struct {
 
 #define MATCH_WARN_OF_MON(mon) \
     (Warn_of_mon                                                        \
-     && ((gc.context.warntype.obj & (mon)->data->mflags2) != 0           \
-         || (gc.context.warntype.polyd & (mon)->data->mflags2) != 0      \
-         || (gc.context.warntype.species                                 \
-             && (gc.context.warntype.species == (mon)->data))))
+     && ((svc.context.warntype.obj & (mon)->data->mflags2) != 0           \
+         || (svc.context.warntype.polyd & (mon)->data->mflags2) != 0      \
+         || (svc.context.warntype.species                                 \
+             && (svc.context.warntype.species == (mon)->data))))
 
 typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 

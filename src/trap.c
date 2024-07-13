@@ -522,7 +522,7 @@ maketrap(coordxy x, coordxy y, int typ)
             && (is_hole(typ) || IS_DOOR(lev->typ) || IS_WALL(lev->typ)))
             add_damage(x, y, /* schedule repair */
                        ((IS_DOOR(lev->typ) || IS_WALL(lev->typ))
-                        && !gc.context.mon_moving)
+                        && !svc.context.mon_moving)
                            ? SHOP_HOLE_COST
                            : 0L);
         lev->doormask = 0;     /* subsumes altarmask, icedpool... */
@@ -535,8 +535,8 @@ maketrap(coordxy x, coordxy y, int typ)
         else if (lev->typ == STONE || lev->typ == SCORR)
             (void) set_levltyp(x, y, CORR);
         else if (IS_WALL(lev->typ) || lev->typ == SDOOR)
-            (void) set_levltyp(x, y,  gl.level.flags.is_maze_lev ? ROOM
-                                      : gl.level.flags.is_cavernous_lev ? CORR
+            (void) set_levltyp(x, y,  svl.level.flags.is_maze_lev ? ROOM
+                                      : svl.level.flags.is_cavernous_lev ? CORR
                                         : DOOR);
 
         unearth_objs(x, y);
@@ -824,7 +824,7 @@ animate_statue(
 
     /* if this isn't caused by a monster using a wand of striking,
        there might be consequences for the hero */
-    if (!gc.context.mon_moving) {
+    if (!svc.context.mon_moving) {
         /* if statue is owned by a shop, hero will have to pay for it;
            stolen_value gives a message (about debt or use of credit)
            which refers to "it" so needs to follow a message describing
@@ -3192,9 +3192,9 @@ launch_obj(
        launched (perhaps a monster triggered it), destroy context so that
        next dig attempt never thinks you're resuming previous effort */
     if ((otyp == BOULDER || otyp == STATUE)
-        && singleobj->ox == gc.context.digging.pos.x
-        && singleobj->oy == gc.context.digging.pos.y)
-        (void) memset((genericptr_t) &gc.context.digging, 0,
+        && singleobj->ox == svc.context.digging.pos.x
+        && singleobj->oy == svc.context.digging.pos.y)
+        (void) memset((genericptr_t) &svc.context.digging, 0,
                       sizeof(struct dig_info));
 
     dist = distmin(x1, y1, x2, y2);
@@ -3711,9 +3711,9 @@ instapetrify(const char *str)
     if (poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM))
         return;
     urgent_pline("You turn to stone...");
-    gk.killer.format = KILLED_BY;
-    if (str != gk.killer.name)
-        Strcpy(gk.killer.name, str ? str : "");
+    svk.killer.format = KILLED_BY;
+    if (str != svk.killer.name)
+        Strcpy(svk.killer.name, str ? str : "");
     done(STONING);
 }
 
@@ -4911,7 +4911,7 @@ rescued_from_terrain(int how)
     iflags.last_msg = PLNMSG_BACK_ON_GROUND; /* for describe_decor() */
     /* feedback just disclosed this */
     update_lastseentyp(u.ux, u.uy);
-    iflags.prev_decor = gl.lastseentyp[u.ux][u.uy];
+    iflags.prev_decor = svl.lastseentyp[u.ux][u.uy];
 }
 
 /* return TRUE iff player relocated */
@@ -5036,14 +5036,14 @@ drown(void)
         /* killer format and name are reconstructed every iteration
            because lifesaving resets them */
         pool_of_water = waterbody_name(u.ux, u.uy);
-        gk.killer.format = KILLED_BY_AN;
+        svk.killer.format = KILLED_BY_AN;
         /* avoid "drowned in [a] water" */
         if (!strcmp(pool_of_water, "water"))
-            pool_of_water = "deep water", gk.killer.format = KILLED_BY;
+            pool_of_water = "deep water", svk.killer.format = KILLED_BY;
         /* avoid "drowned in _a_ limitless water" on Plane of Water */
         else if (!strcmp(pool_of_water, "limitless water"))
-            gk.killer.format = KILLED_BY;
-        Strcpy(gk.killer.name, pool_of_water);
+            svk.killer.format = KILLED_BY;
+        Strcpy(svk.killer.name, pool_of_water);
         done(DROWNING);
         /* oops, we're still alive.  better get out of the water. */
         if (safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT))
@@ -5715,7 +5715,7 @@ untrap(
     here = u_at(x, y); /* !u.dx && !u.dy */
 
     if (here) /* are there are one or more containers here? */
-        for (otmp = gl.level.objects[x][y]; otmp; otmp = otmp->nexthere)
+        for (otmp = svl.level.objects[x][y]; otmp; otmp = otmp->nexthere)
             if (Is_box(otmp)) {
                 if (++boxcnt > 1)
                     break;
@@ -5818,7 +5818,7 @@ untrap(
                whether any had been found but not attempted to untrap;
                now at most one per move may be checked and we only
                continue on to door handling if they are all declined */
-            for (otmp = gl.level.objects[x][y]; otmp; otmp = otmp->nexthere)
+            for (otmp = svl.level.objects[x][y]; otmp; otmp = otmp->nexthere)
                 if (Is_box(otmp)) {
                     (void) safe_qbuf(qbuf, "There is ",
                                      " here.  Check it for traps?", otmp,
@@ -6183,7 +6183,7 @@ chest_trap(
                 unpunish();
             /* destroy everything at the spot (the Amulet, the
                invocation tools, and Rider corpses will remain intact) */
-            for (otmp = gl.level.objects[ox][oy]; otmp; otmp = otmp2) {
+            for (otmp = svl.level.objects[ox][oy]; otmp; otmp = otmp2) {
                 otmp2 = otmp->nexthere;
                 if (costly)
                     loss += stolen_value(otmp, otmp->ox, otmp->oy,
@@ -6716,8 +6716,8 @@ lava_effects(void)
             u.uhp = -1;
             /* killer format and name are reconstructed every iteration
                because lifesaving resets them */
-            gk.killer.format = KILLED_BY;
-            Strcpy(gk.killer.name, lava_killer);
+            svk.killer.format = KILLED_BY;
+            Strcpy(svk.killer.name, lava_killer);
             urgent_pline("You %s...", boil_away ? "boil away"
                                                 : "burn to a crisp");
             done(BURNING);
@@ -6796,8 +6796,8 @@ sink_into_lava(void)
 
         u.utrap -= (1 << 8);
         if (u.utrap < (1 << 8)) {
-            gk.killer.format = KILLED_BY;
-            Strcpy(gk.killer.name, "molten lava");
+            svk.killer.format = KILLED_BY;
+            Strcpy(svk.killer.name, "molten lava");
             urgent_pline("You sink below the surface and die.");
             burn_away_slime(); /* add insult to injury? */
             done(DISSOLVED);
@@ -6860,13 +6860,13 @@ maybe_finish_sokoban(void)
         if (!t) {
             /* for livelog to report the sokoban depth in the way that
                players tend to think about it: 1 for entry level, 4 for top */
-            int sokonum = gd.dungeons[u.uz.dnum].entry_lev - u.uz.dlevel + 1;
+            int sokonum = svd.dungeons[u.uz.dnum].entry_lev - u.uz.dlevel + 1;
 
             /* we've passed the last trap without finding a pit or hole;
                clear the sokoban_rules flag so that luck penalties for
                things like breaking boulders or jumping will no longer
                be given, and restrictions on diagonal moves are lifted */
-            Sokoban = 0; /* clear gl.level.flags.sokoban_rules */
+            Sokoban = 0; /* clear svl.level.flags.sokoban_rules */
             /*
              * TODO: give some feedback about solving the sokoban puzzle
              * (perhaps say "congratulations" in Japanese?).

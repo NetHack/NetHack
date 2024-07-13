@@ -906,7 +906,7 @@ place_monster(struct monst *mon, coordxy x, coordxy y)
                    mon->mstate, buf);
         return;
     }
-    if ((othermon = gl.level.monsters[x][y]) != 0) {
+    if ((othermon = svl.level.monsters[x][y]) != 0) {
         describe_level(buf, 0);
         monnm = minimal_monnam(mon, FALSE);
         othnm = (mon != othermon) ? minimal_monnam(othermon, TRUE) : "itself";
@@ -914,7 +914,7 @@ place_monster(struct monst *mon, coordxy x, coordxy y)
                    monnm, othnm, x, y, othermon->mstate, mon->mstate, buf);
     }
     mon->mx = x, mon->my = y;
-    gl.level.monsters[x][y] = mon;
+    svl.level.monsters[x][y] = mon;
     mon->mstate = MON_FLOOR;
 }
 

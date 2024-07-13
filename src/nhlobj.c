@@ -379,7 +379,7 @@ l_obj_at(lua_State *L)
         cvt_to_abscoord(&x, &y);
 
         lua_pop(L, 2);
-        (void) l_obj_push(L, gl.level.objects[x][y]);
+        (void) l_obj_push(L, svl.level.objects[x][y]);
         return 1;
     } else
         nhl_error(L, "l_obj_at: Wrong args");

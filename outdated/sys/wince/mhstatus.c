@@ -182,7 +182,7 @@ FormatStatusString(char *text, int format)
     int hp, hpmax;
     int cap = near_capacity();
 
-    Strcpy(text, gp.plname);
+    Strcpy(text, svp.plname);
     if ('a' <= text[0] && text[0] <= 'z')
         text[0] += 'A' - 'a';
     text[10] = 0;
@@ -253,7 +253,7 @@ FormatStatusString(char *text, int format)
 
     /* forth line */
     if (flags.time)
-        Sprintf(nb = eos(nb), "T:%ld ", gm.moves);
+        Sprintf(nb = eos(nb), "T:%ld ", svm.moves);
 
     if (strcmp(hu_stat[u.uhs], "        ")) {
         Strcat(text, hu_stat[u.uhs]);

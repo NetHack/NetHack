@@ -130,7 +130,7 @@ new_were(struct monst *mon)
 
     /* vision capability isn't changing so we don't call set_apparxy() to
        update mon's idea of where hero is; peaceful check is redundant */
-    if (gc.context.mon_moving && !mon->mpeaceful
+    if (svc.context.mon_moving && !mon->mpeaceful
         && onscary(mon->mux, mon->muy, mon)
         && monnear(mon, mon->mux, mon->muy))
         monflee(mon, rn1(9, 2), TRUE, TRUE); /* 2..10 turns */

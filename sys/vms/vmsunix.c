@@ -120,7 +120,7 @@ getlock(void)
        'a','b',&c below; override the default and use <uid><charname>
        if we aren't restricting the number of simultaneous games */
     if (!gl.locknum)
-        Sprintf(gl.lock, "_%u%s", (unsigned) getuid(), gp.plname);
+        Sprintf(gl.lock, "_%u%s", (unsigned) getuid(), svp.plname);
 
     regularize(gl.lock);
     set_levelfile_name(gl.lock, 0);
@@ -154,8 +154,8 @@ getlock(void)
     if (fd == -1) {
         error("cannot creat lock file.");
     } else {
-        if (write(fd, (char *) &gh.hackpid, sizeof(gh.hackpid))
-            != sizeof(gh.hackpid)) {
+        if (write(fd, (char *) &svh.hackpid, sizeof(svh.hackpid))
+            != sizeof(svh.hackpid)) {
             error("cannot write lock");
         }
         if (close(fd) == -1) {

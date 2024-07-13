@@ -453,7 +453,7 @@ ohitmon(
                           (nonliving(mtmp->data) || is_vampshifter(mtmp)
                            || !canspotmon(mtmp)) ? "destroyed" : "killed");
                 /* don't blame hero for unknown rolling boulder trap */
-                if (!gc.context.mon_moving && (otmp->otyp != BOULDER
+                if (!svc.context.mon_moving && (otmp->otyp != BOULDER
                                             || range >= 0 || otmp->otrapped))
                     xkilled(mtmp, XKILL_NOMSG);
                 else
@@ -484,7 +484,7 @@ ohitmon(
             mtmp->mblinded = tmp;
         }
 
-        if (!DEADMONSTER(mtmp) && !gc.context.mon_moving)
+        if (!DEADMONSTER(mtmp) && !svc.context.mon_moving)
             setmangry(mtmp, TRUE);
 
         objgone = drop_throw(otmp, 1, gb.bhitpos.x, gb.bhitpos.y);

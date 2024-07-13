@@ -582,7 +582,7 @@ knows_class(char sym)
      *        arrow, and spear limitation below.
      */
 
-    for (ct = gb.bases[(uchar) sym]; ct < gb.bases[(uchar) sym + 1]; ct++) {
+    for (ct = svb.bases[(uchar) sym]; ct < svb.bases[(uchar) sym + 1]; ct++) {
         /* not flagged as magic but shouldn't be pre-discovered */
         if (ct == CORNUTHAUM || ct == DUNCE_CAP)
             continue;
@@ -911,7 +911,7 @@ u_init(void)
 
     init_uhunger();
     for (i = 0; i <= MAXSPELL; i++)
-        gs.spl_book[i].sp_id = NO_SPELL;
+        svs.spl_book[i].sp_id = NO_SPELL;
     u.ublesscnt = 300; /* no prayers just yet */
     u.ualignbase[A_CURRENT] = u.ualignbase[A_ORIGINAL] = u.ualign.type =
         aligns[flags.initalign].value;

@@ -157,10 +157,10 @@ vpline(const char *line, va_list the_args)
     if (!line || !*line)
         return;
 #ifdef HANGUPHANDLING
-    if (gp.program_state.done_hup)
+    if (svp.program_state.done_hup)
         return;
 #endif
-    if (gp.program_state.wizkit_wishing)
+    if (svp.program_state.wizkit_wishing)
         return;
 
     if (a11y.accessiblemsg && isok(a11y.msg_loc.x,a11y.msg_loc.y)) {
@@ -509,7 +509,7 @@ livelog_printf(long ll_type, const char *line, ...)
     (void) vsnprintf(gamelogbuf, sizeof gamelogbuf, line, the_args);
     va_end(the_args);
 
-    gamelog_add(ll_type, gm.moves, gamelogbuf);
+    gamelog_add(ll_type, svm.moves, gamelogbuf);
     strNsubst(gamelogbuf, "\t", "_", 0);
     livelog_add(ll_type, gamelogbuf);
 }
@@ -542,7 +542,7 @@ raw_printf(const char *line, ...)
     va_start(the_args, line);
     vraw_printf(line, the_args);
     va_end(the_args);
-    if (!gp.program_state.beyond_savefile_load)
+    if (!svp.program_state.beyond_savefile_load)
         ge.early_raw_messages++;
 }
 
@@ -567,7 +567,7 @@ vraw_printf(const char *line, va_list the_args)
 #if defined(MSGHANDLER)
     execplinehandler(line);
 #endif
-    if (!gp.program_state.beyond_savefile_load)
+    if (!svp.program_state.beyond_savefile_load)
         ge.early_raw_messages++;
 }
 
@@ -579,10 +579,10 @@ impossible(const char *s, ...)
     char pbuf2[BUFSZ];
 
     va_start(the_args, s);
-    if (gp.program_state.in_impossible)
+    if (svp.program_state.in_impossible)
         panic("impossible called impossible");
 
-    gp.program_state.in_impossible = 1;
+    svp.program_state.in_impossible = 1;
     (void) vsnprintf(pbuf, sizeof pbuf, s, the_args);
     va_end(the_args);
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
@@ -594,14 +594,14 @@ impossible(const char *s, ...)
     pline("%s", pbuf);
     gp.pline_flags = 0;
 
-    if (gp.program_state.in_sanity_check) {
+    if (svp.program_state.in_sanity_check) {
         /* skip rest of multi-line feedback */
-        gp.program_state.in_impossible = 0;
+        svp.program_state.in_impossible = 0;
         return;
     }
 
     Strcpy(pbuf2, "Program in disorder!");
-    if (gp.program_state.something_worth_saving)
+    if (svp.program_state.something_worth_saving)
         Strcat(pbuf2, "  (Saving and reloading may fix this problem.)");
     pline("%s", pbuf2);
     pline("Please report these messages to %s.", DEVTEAM_EMAIL);
@@ -621,7 +621,7 @@ impossible(const char *s, ...)
     }
 #endif
 
-    gp.program_state.in_impossible = 0;
+    svp.program_state.in_impossible = 0;
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL

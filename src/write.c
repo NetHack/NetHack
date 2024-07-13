@@ -171,8 +171,8 @@ dowrite(struct obj *pen)
 
     deferred = real = 0; /* not any scroll or book */
     deferralchance = 0;  /* incremented for each oc_uname match */
-    first = gb.bases[(int) paper->oclass];
-    last = gb.bases[(int) paper->oclass + 1] - 1;
+    first = svb.bases[(int) paper->oclass];
+    last = svb.bases[(int) paper->oclass + 1] - 1;
     /* first loop: look for match with name/description */
     for (i = first; i <= last; i++) {
         /* extra shufflable descr not representing a real object */
@@ -363,7 +363,7 @@ dowrite(struct obj *pen)
                 Strcpy(namebuf, OBJ_DESCR(objects[new_obj->otyp]));
                 wipeout_text(namebuf, (6 + MAXULEV - u.ulevel) / 6, 0);
             } else
-                Sprintf(namebuf, "%s was here!", gp.plname);
+                Sprintf(namebuf, "%s was here!", svp.plname);
             You("write \"%s\" and the scroll disappears.", namebuf);
             useup(paper);
         }

@@ -406,7 +406,7 @@ newmail(struct mail_info *info)
 
     message_seen = TRUE;
     SetVoice(md, 0, 80, 0);
-    verbalize("%s, %s!  %s.", Hello(md), gp.plname, info->display_txt);
+    verbalize("%s, %s!  %s.", Hello(md), svp.plname, info->display_txt);
 
     if (info->message_typ) {
         struct obj *obj = mksobj(SCR_MAIL, FALSE, FALSE);
@@ -447,7 +447,7 @@ ckmailstatus(void)
         return;
     if (mustgetmail < 0) {
 #if defined(AMIGA) || defined(MSDOS) || defined(TOS)
-        mustgetmail = (gm.moves < 2000) ? (100 + rn2(2000)) : (2000 + rn2(3000));
+        mustgetmail = (svm.moves < 2000) ? (100 + rn2(2000)) : (2000 + rn2(3000));
 #endif
         return;
     }
@@ -533,12 +533,12 @@ ckmailstatus(void)
 
     if (!mailbox || u.uswallow || !flags.biff
 #ifdef MAILCKFREQ
-        || gm.moves < laststattime + MAILCKFREQ
+        || svm.moves < laststattime + MAILCKFREQ
 #endif
         )
         return;
 
-    laststattime = gm.moves;
+    laststattime = svm.moves;
     if (stat(mailbox, &nmstat)) {
 #ifdef PERMANENT_MAILBOX
         pline("Cannot get status of MAIL=\"%s\" anymore.", mailbox);
@@ -668,8 +668,8 @@ ck_server_admin_msg(void)
     static struct stat ost,nst;
     static long lastchk = 0;
 
-    if (gm.moves < lastchk + SERVER_ADMIN_MSG_CKFREQ) return;
-    lastchk = gm.moves;
+    if (svm.moves < lastchk + SERVER_ADMIN_MSG_CKFREQ) return;
+    lastchk = svm.moves;
 
     if (!stat(SERVER_ADMIN_MSG, &nst)) {
         if (nst.st_mtime > ost.st_mtime)

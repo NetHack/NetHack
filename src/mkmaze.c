@@ -305,7 +305,7 @@ maze0xy(coord *cc)
 staticfn boolean
 is_exclusion_zone(xint16 type, coordxy x, coordxy y)
 {
-    struct exclusion_zone *ez = ge.exclusion_zones;
+    struct exclusion_zone *ez = sve.exclusion_zones;
 
     while (ez) {
         if (((type == LR_DOWNTELE && (ez->zonetype == LR_DOWNTELE || ez->zonetype == LR_TELE))
@@ -332,7 +332,7 @@ bad_location(
     return (boolean) (occupied(x, y)
                       || within_bounded_area(x, y, nlx, nly, nhx, nhy)
                       || !((levl[x][y].typ == CORR
-                            && gl.level.flags.is_maze_lev)
+                            && svl.level.flags.is_maze_lev)
                            || levl[x][y].typ == ROOM
                            || levl[x][y].typ == AIR));
 }
@@ -355,7 +355,7 @@ place_lregion(
          * if there are rooms and this a branch, let place_branch choose
          * the branch location (to avoid putting branches in corridors).
          */
-        if (rtype == LR_BRANCH && gn.nroom) {
+        if (rtype == LR_BRANCH && svn.nroom) {
             place_branch(Is_branchlev(&u.uz), 0, 0);
             return;
         }
@@ -562,7 +562,7 @@ fixup_special(void)
     boolean added_branch = FALSE;
 
     if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz)) {
-        gl.level.flags.hero_memory = 0;
+        svl.level.flags.hero_memory = 0;
         /* water level is an odd beast - it has to be set up
            before calling place_lregions etc. */
         setup_waterlevel();
@@ -597,24 +597,24 @@ fixup_special(void)
         case LR_DOWNTELE:
             /* save the region outlines for goto_level() */
             if (r->rtype == LR_TELE || r->rtype == LR_UPTELE) {
-                gu.updest.lx = r->inarea.x1;
-                gu.updest.ly = r->inarea.y1;
-                gu.updest.hx = r->inarea.x2;
-                gu.updest.hy = r->inarea.y2;
-                gu.updest.nlx = r->delarea.x1;
-                gu.updest.nly = r->delarea.y1;
-                gu.updest.nhx = r->delarea.x2;
-                gu.updest.nhy = r->delarea.y2;
+                svu.updest.lx = r->inarea.x1;
+                svu.updest.ly = r->inarea.y1;
+                svu.updest.hx = r->inarea.x2;
+                svu.updest.hy = r->inarea.y2;
+                svu.updest.nlx = r->delarea.x1;
+                svu.updest.nly = r->delarea.y1;
+                svu.updest.nhx = r->delarea.x2;
+                svu.updest.nhy = r->delarea.y2;
             }
             if (r->rtype == LR_TELE || r->rtype == LR_DOWNTELE) {
-                gd.dndest.lx = r->inarea.x1;
-                gd.dndest.ly = r->inarea.y1;
-                gd.dndest.hx = r->inarea.x2;
-                gd.dndest.hy = r->inarea.y2;
-                gd.dndest.nlx = r->delarea.x1;
-                gd.dndest.nly = r->delarea.y1;
-                gd.dndest.nhx = r->delarea.x2;
-                gd.dndest.nhy = r->delarea.y2;
+                svd.dndest.lx = r->inarea.x1;
+                svd.dndest.ly = r->inarea.y1;
+                svd.dndest.hx = r->inarea.x2;
+                svd.dndest.hy = r->inarea.y2;
+                svd.dndest.nlx = r->delarea.x1;
+                svd.dndest.nly = r->delarea.y1;
+                svd.dndest.nhx = r->delarea.x2;
+                svd.dndest.nhy = r->delarea.y2;
             }
             /* place_lregion gets called from goto_level() */
             break;
@@ -634,7 +634,7 @@ fixup_special(void)
         struct obj *otmp;
         int tryct;
 
-        croom = &gr.rooms[0]; /* the first room defined on the medusa level */
+        croom = &svr.rooms[0]; /* the first room defined on the medusa level */
         for (tryct = rnd(4); tryct; tryct--) {
             x = somex(croom);
             y = somey(croom);
@@ -669,9 +669,9 @@ fixup_special(void)
         }
     } else if (Role_if(PM_CLERIC) && In_quest(&u.uz)) {
         /* less chance for undead corpses (lured from lower morgues) */
-        gl.level.flags.graveyard = 1;
+        svl.level.flags.graveyard = 1;
     } else if (Is_stronghold(&u.uz)) {
-        gl.level.flags.graveyard = 1;
+        svl.level.flags.graveyard = 1;
     } else if (on_level(&u.uz, &baalzebub_level)) {
         /* custom wallify the "beetle" potion of the level */
         baalz_fixup();
@@ -680,7 +680,7 @@ fixup_special(void)
     }
 
     if ((sp = Is_special(&u.uz)) != 0 && sp->flags.town) /* Mine Town */
-        gl.level.flags.has_town = 1;
+        svl.level.flags.has_town = 1;
 
     if (gl.lregions)
         free((genericptr_t) gl.lregions), gl.lregions = 0;
@@ -705,7 +705,7 @@ migrate_orc(struct monst *mtmp, unsigned long mflags)
 
     cur_depth = (int) depth(&u.uz);
     max_depth = dunlevs_in_dungeon(&u.uz)
-                + (gd.dungeons[u.uz.dnum].depth_start - 1);
+                + (svd.dungeons[u.uz.dnum].depth_start - 1);
     if (mflags == ORC_LEADER) {
         /* Note that the orc leader will take possession of any
          * remaining stuff not already delivered to other
@@ -961,7 +961,7 @@ create_maze(int corrwid, int wallthick, boolean rmdeadends)
     rdx = (gx.x_maze_max / scale);
     rdy = (gy.y_maze_max / scale);
 
-    if (gl.level.flags.corrmaze)
+    if (svl.level.flags.corrmaze)
         for (x = 2; x < (rdx * 2); x++)
             for (y = 2; y < (rdy * 2); y++)
                 levl[x][y].typ = STONE;
@@ -979,7 +979,7 @@ create_maze(int corrwid, int wallthick, boolean rmdeadends)
     walkfrom((int) mm.x, (int) mm.y, 0);
 
     if (rmdeadends)
-        maze_remove_deadends((gl.level.flags.corrmaze) ? CORR : ROOM);
+        maze_remove_deadends((svl.level.flags.corrmaze) ? CORR : ROOM);
 
     /* restore bounds */
     gx.x_maze_max = tmp_xmax;
@@ -1052,10 +1052,10 @@ pick_vibrasquare_location(void)
 
     if (x_range <= INVPOS_X_MARGIN || y_range <= INVPOS_Y_MARGIN
         || (x_range * y_range) <= (INVPOS_DISTANCE * INVPOS_DISTANCE)) {
-        debugpline2("gi.inv_pos: maze is too small! (%d x %d)",
+        debugpline2("svi.inv_pos: maze is too small! (%d x %d)",
                     gx.x_maze_max, gy.y_maze_max);
     }
-    gi.inv_pos.x = gi.inv_pos.y = 0; /*{occupied() => invocation_pos()}*/
+    svi.inv_pos.x = svi.inv_pos.y = 0; /*{occupied() => invocation_pos()}*/
     do {
         x = rn1(x_range, x_maze_min + INVPOS_X_MARGIN + 1);
         y = rn1(y_range, y_maze_min + INVPOS_Y_MARGIN + 1);
@@ -1068,8 +1068,8 @@ pick_vibrasquare_location(void)
                  || abs(x - stway->sx) == abs(y - stway->sy)
                  || distmin(x, y, stway->sx, stway->sy) <= INVPOS_DISTANCE
                  || !SPACE_POS(levl[x][y].typ) || occupied(x, y)));
-    gi.inv_pos.x = x;
-    gi.inv_pos.y = y;
+    svi.inv_pos.x = x;
+    svi.inv_pos.y = y;
 #undef INVPOS_X_MARGIN
 #undef INVPOS_Y_MARGIN
 #undef INVPOS_DISTANCE
@@ -1121,22 +1121,22 @@ makemaz(const char *s)
                      "%s-%d", s, rnd((int) sp->rndlevs));
         else
             Strcpy(protofile, s);
-    } else if (*(gd.dungeons[u.uz.dnum].proto)) {
+    } else if (*(svd.dungeons[u.uz.dnum].proto)) {
         if (dunlevs_in_dungeon(&u.uz) > 1) {
             if (sp && sp->rndlevs)
                 Snprintf(protofile, sizeof protofile,
-                         "%s%d-%d", gd.dungeons[u.uz.dnum].proto,
+                         "%s%d-%d", svd.dungeons[u.uz.dnum].proto,
                          dunlev(&u.uz), rnd((int) sp->rndlevs));
             else
                 Snprintf(protofile, sizeof protofile,
-                         "%s%d", gd.dungeons[u.uz.dnum].proto,
+                         "%s%d", svd.dungeons[u.uz.dnum].proto,
                          dunlev(&u.uz));
         } else if (sp && sp->rndlevs) {
             Snprintf(protofile, sizeof protofile,
-                     "%s-%d", gd.dungeons[u.uz.dnum].proto,
+                     "%s-%d", svd.dungeons[u.uz.dnum].proto,
                      rnd((int) sp->rndlevs));
         } else
-            Strcpy(protofile, gd.dungeons[u.uz.dnum].proto);
+            Strcpy(protofile, svd.dungeons[u.uz.dnum].proto);
 
     } else
         Strcpy(protofile, "");
@@ -1179,8 +1179,8 @@ makemaz(const char *s)
         impossible("Couldn't load \"%s\" - making a maze.", protofile);
     }
 
-    gl.level.flags.is_maze_lev = 1;
-    gl.level.flags.corrmaze = !rn2(3);
+    svl.level.flags.is_maze_lev = 1;
+    svl.level.flags.corrmaze = !rn2(3);
 
     if (!Invocation_lev(&u.uz) && rn2(2)) {
         create_maze(-1, -1, !rn2(5));
@@ -1188,7 +1188,7 @@ makemaz(const char *s)
         create_maze(1, 1, FALSE);
     }
 
-    if (!gl.level.flags.corrmaze)
+    if (!svl.level.flags.corrmaze)
         wallification(2, 2, gx.x_maze_max, gy.y_maze_max);
 
     mazexy(&mm);
@@ -1198,7 +1198,7 @@ makemaz(const char *s)
         mkstairs(mm.x, mm.y, 0, (struct mkroom *) 0, FALSE); /* down */
     } else { /* choose "vibrating square" location */
         pick_vibrasquare_location();
-        maketrap(gi.inv_pos.x, gi.inv_pos.y, VIBRATING_SQUARE);
+        maketrap(svi.inv_pos.x, svi.inv_pos.y, VIBRATING_SQUARE);
     }
 
     /* place branch stair or portal */
@@ -1222,7 +1222,7 @@ walkfrom(coordxy x, coordxy y, schar typ)
     int dirs[4];
 
     if (!typ) {
-        if (gl.level.flags.corrmaze)
+        if (svl.level.flags.corrmaze)
             typ = CORR;
         else
             typ = ROOM;
@@ -1267,7 +1267,7 @@ walkfrom(coordxy x, coordxy y, schar typ)
     int dirs[4];
 
     if (!typ) {
-        if (gl.level.flags.corrmaze)
+        if (svl.level.flags.corrmaze)
             typ = CORR;
         else
             typ = ROOM;
@@ -1301,7 +1301,7 @@ void
 mazexy(coord *cc)
 {
     coordxy x, y;
-    int allowedtyp = (gl.level.flags.corrmaze ? CORR : ROOM);
+    int allowedtyp = (svl.level.flags.corrmaze ? CORR : ROOM);
     int cpt = 0;
 
     do {
@@ -1357,7 +1357,7 @@ get_level_extends(
             }
         }
     }
-    xmin -= (nonwall || !gl.level.flags.is_maze_lev) ? 2 : 1;
+    xmin -= (nonwall || !svl.level.flags.is_maze_lev) ? 2 : 1;
     if (xmin < 0)
         xmin = 0;
 
@@ -1373,7 +1373,7 @@ get_level_extends(
             }
         }
     }
-    xmax += (nonwall || !gl.level.flags.is_maze_lev) ? 2 : 1;
+    xmax += (nonwall || !svl.level.flags.is_maze_lev) ? 2 : 1;
     if (xmax >= COLNO)
         xmax = COLNO - 1;
 
@@ -1389,7 +1389,7 @@ get_level_extends(
             }
         }
     }
-    ymin -= (nonwall || !gl.level.flags.is_maze_lev) ? 2 : 1;
+    ymin -= (nonwall || !svl.level.flags.is_maze_lev) ? 2 : 1;
 
     found = nonwall = FALSE;
     for (ymax = ROWNO - 1; !found && ymax >= 0; ymax--) {
@@ -1403,7 +1403,7 @@ get_level_extends(
             }
         }
     }
-    ymax += (nonwall || !gl.level.flags.is_maze_lev) ? 2 : 1;
+    ymax += (nonwall || !svl.level.flags.is_maze_lev) ? 2 : 1;
 
     *left = xmin;
     *right = xmax;
@@ -1450,7 +1450,7 @@ mkportal(coordxy x, coordxy y, xint16 todnum, xint16 todlevel)
         return;
     }
     debugpline4("mkportal: at <%d,%d>, to %s, level %d", x, y,
-                gd.dungeons[todnum].dname, todlevel);
+                svd.dungeons[todnum].dname, todlevel);
     ttmp->dst.dnum = todnum;
     ttmp->dst.dlevel = todlevel;
     return;
@@ -1467,7 +1467,7 @@ fumaroles(void)
         nmax++;
         sizemin += 5;
     }
-    if (gl.level.flags.temperature > 0) {
+    if (svl.level.flags.temperature > 0) {
         nmax++;
         sizemin += 5;
     }
@@ -1497,10 +1497,10 @@ fumaroles(void)
  */
 
 /* bubble movement boundaries */
-#define gbxmin (gx.xmin + 1)
-#define gbymin (gy.ymin + 1)
-#define gbxmax (gx.xmax - 1)
-#define gbymax (gy.ymax - 1)
+#define gbxmin (svx.xmin + 1)
+#define gbymin (svy.ymin + 1)
+#define gbxmax (svx.xmax - 1)
+#define gbymax (svy.ymax - 1)
 
 /* the bubble hero is in */
 static struct bubble *hero_bubble = NULL;
@@ -1540,7 +1540,7 @@ movebubbles(void)
          * Pick up everything inside of a bubble then fill all bubble
          * locations.
          */
-        for (b = up ? gb.bbubbles : ge.ebubbles; b;
+        for (b = up ? svb.bbubbles : ge.ebubbles; b;
              b = up ? b->next : b->prev) {
             if (b->cons)
                 panic("movebubbles: cons != null");
@@ -1556,7 +1556,7 @@ movebubbles(void)
                         if (OBJ_AT(x, y)) {
                             struct obj *olist = (struct obj *) 0, *otmp;
 
-                            while ((otmp = gl.level.objects[x][y]) != 0) {
+                            while ((otmp = svl.level.objects[x][y]) != 0) {
                                 remove_object(otmp);
                                 otmp->ox = otmp->oy = 0;
                                 otmp->nexthere = olist;
@@ -1644,7 +1644,7 @@ movebubbles(void)
      * would eventually end up in the last bubble in the chain.
      */
     up = !up;
-    for (b = up ? gb.bbubbles : ge.ebubbles; b; b = up ? b->next : b->prev) {
+    for (b = up ? svb.bbubbles : ge.ebubbles; b; b = up ? b->next : b->prev) {
         int rx = rn2(3), ry = rn2(3);
 
         mv_bubble(b, b->dx + 1 - (!b->dx ? rx : (rx ? 1 : 0)),
@@ -1697,21 +1697,21 @@ save_waterlevel(NHFILE *nhfp)
 {
     struct bubble *b;
 
-    if (!gb.bbubbles)
+    if (!svb.bbubbles)
         return;
 
     if (perform_bwrite(nhfp)) {
         int n = 0;
-        for (b = gb.bbubbles; b; b = b->next)
+        for (b = svb.bbubbles; b; b = b->next)
             ++n;
         if (nhfp->structlevel) {
             bwrite(nhfp->fd, (genericptr_t) &n, sizeof(int));
-            bwrite(nhfp->fd, (genericptr_t) &gx.xmin, sizeof(int));
-            bwrite(nhfp->fd, (genericptr_t) &gy.ymin, sizeof(int));
-            bwrite(nhfp->fd, (genericptr_t) &gx.xmax, sizeof(int));
-            bwrite(nhfp->fd, (genericptr_t) &gy.ymax, sizeof(int));
+            bwrite(nhfp->fd, (genericptr_t) &svx.xmin, sizeof(int));
+            bwrite(nhfp->fd, (genericptr_t) &svy.ymin, sizeof(int));
+            bwrite(nhfp->fd, (genericptr_t) &svx.xmax, sizeof(int));
+            bwrite(nhfp->fd, (genericptr_t) &svy.ymax, sizeof(int));
         }
-        for (b = gb.bbubbles; b; b = b->next) {
+        for (b = svb.bbubbles; b; b = b->next) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) b, sizeof(struct bubble));
         }
@@ -1727,14 +1727,14 @@ restore_waterlevel(NHFILE *nhfp)
     struct bubble *b = (struct bubble *) 0, *btmp;
     int i, n = 0;
 
-    gb.bbubbles = (struct bubble *) 0;
+    svb.bbubbles = (struct bubble *) 0;
     set_wportal();
     if (nhfp->structlevel) {
         mread(nhfp->fd,(genericptr_t) &n, sizeof (int));
-        mread(nhfp->fd,(genericptr_t) &gx.xmin, sizeof (int));
-        mread(nhfp->fd,(genericptr_t) &gy.ymin, sizeof (int));
-        mread(nhfp->fd,(genericptr_t) &gx.xmax, sizeof (int));
-        mread(nhfp->fd,(genericptr_t) &gy.ymax, sizeof (int));
+        mread(nhfp->fd,(genericptr_t) &svx.xmin, sizeof (int));
+        mread(nhfp->fd,(genericptr_t) &svy.ymin, sizeof (int));
+        mread(nhfp->fd,(genericptr_t) &svx.xmax, sizeof (int));
+        mread(nhfp->fd,(genericptr_t) &svy.ymax, sizeof (int));
     }
     for (i = 0; i < n; i++) {
         btmp = b;
@@ -1745,7 +1745,7 @@ restore_waterlevel(NHFILE *nhfp)
             btmp->next = b;
             b->prev = btmp;
         } else {
-            gb.bbubbles = b;
+            svb.bbubbles = b;
             b->prev = (struct bubble *) 0;
         }
         mv_bubble(b, 0, 0, TRUE);
@@ -1755,7 +1755,7 @@ restore_waterlevel(NHFILE *nhfp)
         b->next = (struct bubble *) 0;
     } else {
         /* avoid "saving and reloading may fix this" */
-        gp.program_state.something_worth_saving = 0;
+        svp.program_state.something_worth_saving = 0;
         /* during restore, information about what level this is might not
            be available so we're wishy-washy about what we describe */
         impossible("No %s to restore?",
@@ -1764,7 +1764,7 @@ restore_waterlevel(NHFILE *nhfp)
                    : (Is_airlevel(&u.uz) || Is_airlevel(&gu.uz_save))
                      ? "clouds"
                      : "air bubbles or clouds");
-        gp.program_state.something_worth_saving = 1;
+        svp.program_state.something_worth_saving = 1;
     }
 }
 
@@ -1789,15 +1789,15 @@ setup_waterlevel(void)
               (int) u.uz.dnum, (int) u.uz.dlevel);
 
     /* ouch, hardcoded... (file scope statics and used in bxmin,bymax,&c) */
-    gx.xmin = 3;
-    gy.ymin = 1;
+    svx.xmin = 3;
+    svy.ymin = 1;
     /* use separate statements so that compiler won't complain about min()
        comparing two constants; the alternative is to do this in the
        preprocessor: #if (20 > ROWNO-1) ymax=ROWNO-1 #else ymax=20 #endif */
-    gx.xmax = 78;
-    gx.xmax = min(gx.xmax, (COLNO - 1) - 1);
-    gy.ymax = 20;
-    gy.ymax = min(gy.ymax, (ROWNO - 1));
+    svx.xmax = 78;
+    svx.xmax = min(svx.xmax, (COLNO - 1) - 1);
+    svy.ymax = 20;
+    svy.ymax = min(svy.ymax, (ROWNO - 1));
 
     /* entire level is remembered as one glyph and any unspecified portion
        should default to level's base element rather than to usual stone */
@@ -1832,11 +1832,11 @@ unsetup_waterlevel(void)
     struct bubble *b, *bb;
 
     /* free bubbles */
-    for (b = gb.bbubbles; b; b = bb) {
+    for (b = svb.bbubbles; b; b = bb) {
         bb = b->next;
         free((genericptr_t) b);
     }
-    gb.bbubbles = ge.ebubbles = (struct bubble *) 0;
+    svb.bbubbles = ge.ebubbles = (struct bubble *) 0;
 }
 
 staticfn void
@@ -1882,8 +1882,8 @@ mk_bubble(coordxy x, coordxy y, int n)
     (void) memcpy((genericptr_t) b->bm, (genericptr_t) bmask[n],
                   (bmask[n][1] + 2) * sizeof (b->bm[0]));
     b->cons = 0;
-    if (!gb.bbubbles)
-        gb.bbubbles = b;
+    if (!svb.bbubbles)
+        svb.bbubbles = b;
     if (ge.ebubbles) {
         ge.ebubbles->next = b;
         b->prev = ge.ebubbles;

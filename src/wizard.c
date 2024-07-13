@@ -86,7 +86,7 @@ amulet(void)
         }
     }
 
-    if (!gc.context.no_of_wizards)
+    if (!svc.context.no_of_wizards)
         return;
     /* find Wizard, and wake him if necessary */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -295,7 +295,7 @@ strategy(struct monst *mtmp)
         break;
     }
 
-    if (gc.context.made_amulet)
+    if (svc.context.made_amulet)
         if ((strat = target_on(M3_WANTSAMUL, mtmp)) != STRAT_NONE)
             return strat;
 
@@ -544,7 +544,7 @@ pick_nasty(
            master mind flayer -> mind flayer,
        but the substitutes are likely to be genocided too */
     alt = res;
-    if ((gm.mvitals[res].mvflags & G_GENOD) != 0
+    if ((svm.mvitals[res].mvflags & G_GENOD) != 0
         || (difcap > 0 && mons[res].difficulty >= difcap)
          /* note: nasty() -> makemon() ignores G_HELL|G_NOHELL;
             arch-lich and master lich are both flagged as hell-only;
@@ -552,7 +552,7 @@ pick_nasty(
             outside of Gehennom (unless the latter has been genocided) */
         || (mons[res].geno & (Inhell ? G_NOHELL : G_HELL)) != 0)
         alt = big_to_little(res);
-    if (alt != res && (gm.mvitals[alt].mvflags & G_GENOD) == 0) {
+    if (alt != res && (svm.mvitals[alt].mvflags & G_GENOD) == 0) {
         const char *mnam = mons[alt].pmnames[NEUTRAL],
                    *lastspace = strrchr(mnam, ' ');
 
@@ -702,7 +702,7 @@ resurrect(void)
     long elapsed;
     const char *verb;
 
-    if (!gc.context.no_of_wizards) {
+    if (!svc.context.no_of_wizards) {
         /* make a new Wizard */
         verb = "kill";
         mtmp = makemon(&mons[PM_WIZARD_OF_YENDOR], u.ux, u.uy, MM_NOWAIT);
@@ -718,7 +718,7 @@ resurrect(void)
             if (mtmp->iswiz
                 /* if he has the Amulet, he won't bring it to you */
                 && !mon_has_amulet(mtmp)
-                && (elapsed = gm.moves - mtmp->mlstmv) > 0L) {
+                && (elapsed = svm.moves - mtmp->mlstmv) > 0L) {
                 mon_catchup_elapsed_time(mtmp, elapsed);
                 if (elapsed >= LARGEST_INT)
                     elapsed = LARGEST_INT - 1;
@@ -798,7 +798,7 @@ intervene(void)
 void
 wizdeadorgone(void)
 {
-    gc.context.no_of_wizards--;
+    svc.context.no_of_wizards--;
     if (!u.uevent.udemigod) {
         u.uevent.udemigod = TRUE;
         u.udg_cnt = rn1(250, 50);

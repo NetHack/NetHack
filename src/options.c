@@ -578,7 +578,7 @@ parseoptions(
     }
 
     /* allow optfn's to test whether they were called from parseoptions() */
-    gp.program_state.in_parseoptions++;
+    svp.program_state.in_parseoptions++;
 
     if (got_match && matchidx >= 0) {
         duplicate = duplicate_opt_detection(matchidx);
@@ -604,8 +604,8 @@ parseoptions(
         }
     }
 
-    if (gp.program_state.in_parseoptions > 0)
-        gp.program_state.in_parseoptions--;
+    if (svp.program_state.in_parseoptions > 0)
+        svp.program_state.in_parseoptions--;
 
 #if 0
     /* This specialization shouldn't be needed any longer because each of
@@ -1695,7 +1695,7 @@ optfn_fruit(
             f = fruit_from_name(op, FALSE, &fnum);
             if (!f) {
                 if (!flags.made_fruit)
-                    forig = fruit_from_name(gp.pl_fruit, FALSE, (int *) 0);
+                    forig = fruit_from_name(svp.pl_fruit, FALSE, (int *) 0);
 
                 if (!forig && fnum >= 100) {
                     config_error_add(
@@ -1705,19 +1705,19 @@ optfn_fruit(
             }
         }
  goodfruit:
-        nmcpy(gp.pl_fruit, op, PL_FSIZ);
-        sanitize_name(gp.pl_fruit);
+        nmcpy(svp.pl_fruit, op, PL_FSIZ);
+        sanitize_name(svp.pl_fruit);
         /* OBJ_NAME(objects[SLIME_MOLD]) won't work for this after
            initialization; it gets changed to generic "fruit" */
-        if (!*gp.pl_fruit)
-            nmcpy(gp.pl_fruit, "slime mold", PL_FSIZ);
+        if (!*svp.pl_fruit)
+            nmcpy(svp.pl_fruit, "slime mold", PL_FSIZ);
         if (!go.opt_initial) {
             /* if 'forig' is nonNull, we replace it rather than add
                a new fruit; it can only be nonNull if no fruits have
                been created since the previous name was put in place */
-            (void) fruitadd(gp.pl_fruit, forig);
+            (void) fruitadd(svp.pl_fruit, forig);
             if (give_opt_msg)
-                pline("Fruit is now \"%s\".", gp.pl_fruit);
+                pline("Fruit is now \"%s\".", svp.pl_fruit);
         }
         /* If initial, then initoptions is allowed to do it instead
          * of here (initoptions always has to do it even if there's
@@ -1727,7 +1727,7 @@ optfn_fruit(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        Sprintf(opts, "%s", gp.pl_fruit);
+        Sprintf(opts, "%s", svp.pl_fruit);
         return optn_ok;
     }
     return optn_ok;
@@ -2446,13 +2446,13 @@ optfn_name(
 
         if ((op = string_for_env_opt(allopt[optidx].name, opts, FALSE))
             != empty_optstr) {
-            nmcpy(gp.plname, op, PL_NSIZ);
+            nmcpy(svp.plname, op, PL_NSIZ);
         } else
             return optn_err;
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        Sprintf(opts, "%s", gp.plname);
+        Sprintf(opts, "%s", svp.plname);
         return optn_ok;
     }
     return optn_ok;
@@ -3491,7 +3491,7 @@ optfn_role(
                 config_error_add("Unknown %s '%s'", allopt[optidx].name, op);
                 return optn_err;
             }
-            nmcpy(gp.pl_character, op, PL_NSIZ); /* Backwards compat */
+            nmcpy(svp.pl_character, op, PL_NSIZ); /* Backwards compat */
             saveoptstr(optidx, rolestring(flags.initrole, roles, name.m));
         }
         return optn_ok;
@@ -7080,7 +7080,7 @@ initoptions_init(void)
 
     /* since this is done before init_objects(), do partial init here */
     objects[SLIME_MOLD].oc_name_idx = SLIME_MOLD;
-    nmcpy(gp.pl_fruit, OBJ_NAME(objects[SLIME_MOLD]), PL_FSIZ);
+    nmcpy(svp.pl_fruit, OBJ_NAME(objects[SLIME_MOLD]), PL_FSIZ);
 }
 
 /*
@@ -7167,7 +7167,7 @@ initoptions_finish(void)
         free((genericptr_t) gc.cmdline_rcfile), gc.cmdline_rcfile = 0;
     /*[end of nethackrc handling]*/
 
-    (void) fruitadd(gp.pl_fruit, (struct fruit *) 0);
+    (void) fruitadd(svp.pl_fruit, (struct fruit *) 0);
     /*
      * Remove "slime mold" from list of object names.  This will
      * prevent it from being wished unless it's actually present
@@ -7975,7 +7975,7 @@ fruitadd(char *str, struct fruit *replace_fruit)
     struct fruit *f;
     int highest_fruit_id = 0, globpfx;
     char buf[PL_FSIZ], altname[PL_FSIZ];
-    boolean user_specified = (str == gp.pl_fruit);
+    boolean user_specified = (str == svp.pl_fruit);
     /* if not user-specified, then it's a fruit name for a fruit on
      * a bones level or from orctown raider's loot...
      */
@@ -7991,21 +7991,21 @@ fruitadd(char *str, struct fruit *replace_fruit)
            they already received it in their original game;
            str==pl_fruit but makesingular() creates a copy
            so we need to copy that back into pl_fruit */
-        nmcpy(gp.pl_fruit, makesingular(str), PL_FSIZ);
+        nmcpy(svp.pl_fruit, makesingular(str), PL_FSIZ);
 
         /* disallow naming after other foods (since it'd be impossible
          * to tell the difference); globs might have a size prefix which
          * needs to be skipped in order to match the object type name
          */
-        globpfx = (!strncmp(gp.pl_fruit, "small ", 6)
-                   || !strncmp(gp.pl_fruit, "large ", 6)) ? 6
-                  : (!strncmp(gp.pl_fruit, "medium ", 7)) ? 7
-                    : (!strncmp(gp.pl_fruit, "very large ", 11)) ? 11
+        globpfx = (!strncmp(svp.pl_fruit, "small ", 6)
+                   || !strncmp(svp.pl_fruit, "large ", 6)) ? 6
+                  : (!strncmp(svp.pl_fruit, "medium ", 7)) ? 7
+                    : (!strncmp(svp.pl_fruit, "very large ", 11)) ? 11
                       : 0;
-        for (i = gb.bases[FOOD_CLASS]; objects[i].oc_class == FOOD_CLASS; i++) {
-            if (!strcmp(OBJ_NAME(objects[i]), gp.pl_fruit)
+        for (i = svb.bases[FOOD_CLASS]; objects[i].oc_class == FOOD_CLASS; i++) {
+            if (!strcmp(OBJ_NAME(objects[i]), svp.pl_fruit)
                 || (globpfx > 0
-                    && !strcmp(OBJ_NAME(objects[i]), &gp.pl_fruit[globpfx]))) {
+                    && !strcmp(OBJ_NAME(objects[i]), &svp.pl_fruit[globpfx]))) {
                 found = TRUE;
                 break;
             }
@@ -8013,7 +8013,7 @@ fruitadd(char *str, struct fruit *replace_fruit)
         if (!found) {
             char *c;
 
-            for (c = gp.pl_fruit; *c >= '0' && *c <= '9'; c++)
+            for (c = svp.pl_fruit; *c >= '0' && *c <= '9'; c++)
                 continue;
             if (!*c || isspace((uchar) *c))
                 numeric = TRUE;
@@ -8022,22 +8022,22 @@ fruitadd(char *str, struct fruit *replace_fruit)
             /* these checks for applying food attributes to actual items
                are case sensitive; "glob of foo" is caught by 'found'
                if 'foo' is a valid glob; when not valid, allow it as-is */
-            || !strncmp(gp.pl_fruit, "cursed ", 7)
-            || !strncmp(gp.pl_fruit, "uncursed ", 9)
-            || !strncmp(gp.pl_fruit, "blessed ", 8)
-            || !strncmp(gp.pl_fruit, "partly eaten ", 13)
-            || (!strncmp(gp.pl_fruit, "tin of ", 7)
-                && (!strcmp(gp.pl_fruit + 7, "spinach")
-                    || ismnum(name_to_mon(gp.pl_fruit + 7, (int *) 0))))
-            || !strcmp(gp.pl_fruit, "empty tin")
-            || (!strcmp(gp.pl_fruit, "glob")
-                || (globpfx > 0 && !strcmp("glob", &gp.pl_fruit[globpfx])))
-            || ((str_end_is(gp.pl_fruit, " corpse")
-                 || str_end_is(gp.pl_fruit, " egg"))
-                && ismnum(name_to_mon(gp.pl_fruit, (int *) 0)))) {
-            Strcpy(buf, gp.pl_fruit);
-            Strcpy(gp.pl_fruit, "candied ");
-            nmcpy(gp.pl_fruit + 8, buf, PL_FSIZ - 8);
+            || !strncmp(svp.pl_fruit, "cursed ", 7)
+            || !strncmp(svp.pl_fruit, "uncursed ", 9)
+            || !strncmp(svp.pl_fruit, "blessed ", 8)
+            || !strncmp(svp.pl_fruit, "partly eaten ", 13)
+            || (!strncmp(svp.pl_fruit, "tin of ", 7)
+                && (!strcmp(svp.pl_fruit + 7, "spinach")
+                    || ismnum(name_to_mon(svp.pl_fruit + 7, (int *) 0))))
+            || !strcmp(svp.pl_fruit, "empty tin")
+            || (!strcmp(svp.pl_fruit, "glob")
+                || (globpfx > 0 && !strcmp("glob", &svp.pl_fruit[globpfx])))
+            || ((str_end_is(svp.pl_fruit, " corpse")
+                 || str_end_is(svp.pl_fruit, " egg"))
+                && ismnum(name_to_mon(svp.pl_fruit, (int *) 0)))) {
+            Strcpy(buf, svp.pl_fruit);
+            Strcpy(svp.pl_fruit, "candied ");
+            nmcpy(svp.pl_fruit + 8, buf, PL_FSIZ - 8);
         }
         *altname = '\0';
         /* This flag indicates that a fruit has been made since the
@@ -8052,7 +8052,7 @@ fruitadd(char *str, struct fruit *replace_fruit)
             /* replace_fruit is already part of the fruit chain;
                update it in place rather than looking it up again */
             f = replace_fruit;
-            copynchars(f->fname, gp.pl_fruit, PL_FSIZ - 1);
+            copynchars(f->fname, svp.pl_fruit, PL_FSIZ - 1);
             goto nonew;
         }
     } else {
@@ -8083,7 +8083,7 @@ fruitadd(char *str, struct fruit *replace_fruit)
     gf.ffruit = f;
  nonew:
     if (user_specified)
-        gc.context.current_fruit = f->fid;
+        svc.context.current_fruit = f->fid;
     return f->fid;
 }
 
@@ -9885,7 +9885,7 @@ set_playmode(void)
 {
     if (wizard) {
         if (authorize_wizard_mode())
-            gp.plnamelen = (int) strlen(strcpy(gp.plname, "wizard"));
+            gp.plnamelen = (int) strlen(strcpy(svp.plname, "wizard"));
         else
             wizard = FALSE; /* not allowed or not available */
         /* try explore mode if we didn't make it into wizard mode */

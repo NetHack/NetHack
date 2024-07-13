@@ -566,7 +566,7 @@ mattacku(struct monst *mtmp)
                  * parallelism to work, we can't rephrase it, so we
                  * zap the "laid by you" momentarily instead.
                  */
-                struct obj *obj = gl.level.objects[u.ux][u.uy];
+                struct obj *obj = svl.level.objects[u.ux][u.uy];
 
                 if (obj || u.umonnum == PM_TRAPPER
                     || (gy.youmonst.data->mlet == S_EEL
@@ -585,14 +585,14 @@ mattacku(struct monst *mtmp)
                         pline(
                              "Wait, %s!  There's a hidden %s named %s there!",
                               m_monnam(mtmp),
-                              pmname(gy.youmonst.data, Ugender), gp.plname);
+                              pmname(gy.youmonst.data, Ugender), svp.plname);
                     else
                         pline(
                           "Wait, %s!  There's a %s named %s hiding under %s!",
                               m_monnam(mtmp),
                               pmname(gy.youmonst.data, Ugender),
-                              gp.plname,
-                              doname(gl.level.objects[u.ux][u.uy]));
+                              svp.plname,
+                              doname(svl.level.objects[u.ux][u.uy]));
                     if (obj)
                         obj->spe = save_spe;
                 } else
@@ -614,7 +614,7 @@ mattacku(struct monst *mtmp)
             pline("It gets stuck on you.");
         else /* see note about m_monnam() above */
             pline("Wait, %s!  That's a %s named %s!", m_monnam(mtmp),
-                  pmname(gy.youmonst.data, Ugender), gp.plname);
+                  pmname(gy.youmonst.data, Ugender), svp.plname);
         if (sticky)
             set_ustuck(mtmp);
         gy.youmonst.m_ap_type = M_AP_NOTHING;
@@ -635,7 +635,7 @@ mattacku(struct monst *mtmp)
         else /* see note about m_monnam() above */
             pline("Wait, %s!  That %s is really %s named %s!", m_monnam(mtmp),
                   mimic_obj_name(&gy.youmonst),
-                  an(pmname(&mons[u.umonnum], Ugender)), gp.plname);
+                  an(pmname(&mons[u.umonnum], Ugender)), svp.plname);
         if (gm.multi < 0) { /* this should always be the case */
             char buf[BUFSZ];
 
@@ -870,7 +870,7 @@ mattacku(struct monst *mtmp)
             bot();
         /* give player a chance of waking up before dying -kaa */
         if (sum[i] == M_ATTK_HIT) { /* successful attack */
-            if (u.usleep && u.usleep < gm.moves && !rn2(10)) {
+            if (u.usleep && u.usleep < svm.moves && !rn2(10)) {
                 gm.multi = -1;
                 gn.nomovemsg = "The combat suddenly awakens you.";
             }
@@ -1095,7 +1095,7 @@ hitmu(struct monst *mtmp, struct attack *mattk)
             const char *what;
             char Amonbuf[BUFSZ];
 
-            if ((obj = gl.level.objects[mtmp->mx][mtmp->my]) != 0) {
+            if ((obj = svl.level.objects[mtmp->mx][mtmp->my]) != 0) {
                 if (Blind && !obj->dknown)
                     what = something;
                 else if (is_pool(mtmp->mx, mtmp->my) && !Underwater)
@@ -1667,8 +1667,8 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             if (poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM))
                 break;
             urgent_pline("You turn to stone...");
-            gk.killer.format = KILLED_BY;
-            Strcpy(gk.killer.name, pmname(mtmp->data, Mgender(mtmp)));
+            svk.killer.format = KILLED_BY;
+            Strcpy(svk.killer.name, pmname(mtmp->data, Mgender(mtmp)));
             done(STONING);
         }
         break;
@@ -2451,14 +2451,14 @@ cloneu(void)
 
     if (u.mh <= 1)
         return (struct monst *) 0;
-    if (gm.mvitals[mndx].mvflags & G_EXTINCT)
+    if (svm.mvitals[mndx].mvflags & G_EXTINCT)
         return (struct monst *) 0;
     mon = makemon(gy.youmonst.data, u.ux, u.uy,
                   NO_MINVENT | MM_EDOG | MM_NOMSG);
     if (!mon)
         return NULL;
     mon->mcloned = 1;
-    mon = christen_monst(mon, gp.plname);
+    mon = christen_monst(mon, svp.plname);
     initedog(mon);
     mon->m_lev = gy.youmonst.data->mlevel;
     mon->mhpmax = u.mhmax;

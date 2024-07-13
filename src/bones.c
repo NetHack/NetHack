@@ -22,7 +22,7 @@ no_bones_level(d_level *lev)
         assign_level(lev, &gs.save_dlevel);
 
     return (boolean) (((sptr = Is_special(lev)) != 0 && !sptr->boneid)
-                      || !gd.dungeons[lev->dnum].boneid
+                      || !svd.dungeons[lev->dnum].boneid
                       /* no bones on the last or multiway branch levels
                          in any dungeon (level 1 isn't multiway) */
                       || Is_botlevel(lev)
@@ -94,7 +94,7 @@ resetobjs(struct obj *ochain, boolean restore)
                                       result depends upon hero's location */
                                    && inside_shop(ox, oy)
                                    && *(p = in_rooms(ox, oy, SHOPBASE))
-                                   && tended_shop(&gr.rooms[*p - ROOMOFFSET]));
+                                   && tended_shop(&svr.rooms[*p - ROOMOFFSET]));
             }
         } else { /* saving */
             /* do not zero out o_ids for ghost levels anymore */
@@ -317,7 +317,7 @@ fixuporacle(struct monst *oracle)
 
     oracle->mpeaceful = 1; /* for behavior toward next character */
     o_ridx = levl[oracle->mx][oracle->my].roomno - ROOMOFFSET;
-    if (o_ridx >= 0 && gr.rooms[o_ridx].rtype == DELPHI)
+    if (o_ridx >= 0 && svr.rooms[o_ridx].rtype == DELPHI)
         return TRUE; /* no fixup needed */
 
     /*
@@ -328,14 +328,14 @@ fixuporacle(struct monst *oracle)
      */
 
     /* find original delphi chamber; should always succeed */
-    for (ridx = 0; ridx < SIZE(gr.rooms); ++ridx)
-        if (gr.rooms[ridx].orig_rtype == DELPHI)
+    for (ridx = 0; ridx < SIZE(svr.rooms); ++ridx)
+        if (svr.rooms[ridx].orig_rtype == DELPHI)
             break;
 
-    if (o_ridx != ridx && ridx < SIZE(gr.rooms)) {
+    if (o_ridx != ridx && ridx < SIZE(svr.rooms)) {
         /* room found and she's not in it, so try to move her there */
-        cc.x = (gr.rooms[ridx].lx + gr.rooms[ridx].hx) / 2;
-        cc.y = (gr.rooms[ridx].ly + gr.rooms[ridx].hy) / 2;
+        cc.x = (svr.rooms[ridx].lx + svr.rooms[ridx].hx) / 2;
+        cc.y = (svr.rooms[ridx].ly + svr.rooms[ridx].hy) / 2;
         if (enexto(&cc, cc.x, cc.y, oracle->data)) {
             rloc_to(oracle, cc.x, cc.y);
             o_ridx = levl[oracle->mx][oracle->my].roomno - ROOMOFFSET;
@@ -345,7 +345,7 @@ fixuporacle(struct monst *oracle)
            same as used to happen before this fixup was introduced] */
     }
     if (ridx == o_ridx) /* if she's in her room, mark it as such */
-        gr.rooms[ridx].rtype = DELPHI;
+        svr.rooms[ridx].rtype = DELPHI;
     return TRUE; /* keep oracle in new bones file */
 }
 
@@ -462,7 +462,7 @@ savebones(int how, time_t when, struct obj *corpse)
             return;
         }
         give_u_to_m_resistances(mtmp);
-        mtmp = christen_monst(mtmp, gp.plname);
+        mtmp = christen_monst(mtmp, svp.plname);
         newsym(u.ux, u.uy);
         /* ["Your body rises from the dead as an <mname>..." used
            to be given here, but it has been moved to done() so that
@@ -478,7 +478,7 @@ savebones(int how, time_t when, struct obj *corpse)
 
         /* embed your possessions in your statue */
         otmp = mk_named_object(STATUE, &mons[u.umonnum], u.ux, u.uy,
-                               gp.plname);
+                               svp.plname);
 
         drop_upon_death((struct monst *) 0, otmp, u.ux, u.uy);
         if (!otmp)
@@ -495,7 +495,7 @@ savebones(int how, time_t when, struct obj *corpse)
         gi.in_mklev = FALSE;
         if (!mtmp)
             return;
-        mtmp = christen_monst(mtmp, gp.plname);
+        mtmp = christen_monst(mtmp, svp.plname);
         if (corpse)
             (void) obj_attach_mid(corpse, mtmp->m_id);
     }
@@ -521,8 +521,8 @@ savebones(int how, time_t when, struct obj *corpse)
     }
     set_ghostly_objlist(fobj);
     resetobjs(fobj, FALSE);
-    set_ghostly_objlist(gl.level.buriedobjlist);
-    resetobjs(gl.level.buriedobjlist, FALSE);
+    set_ghostly_objlist(svl.level.buriedobjlist);
+    resetobjs(svl.level.buriedobjlist, FALSE);
 
     /* Hero is no longer on the map. */
     u.ux0 = u.ux, u.uy0 = u.uy;
@@ -534,7 +534,7 @@ savebones(int how, time_t when, struct obj *corpse)
             levl[x][y].seenv = 0;
             levl[x][y].waslit = 0;
             levl[x][y].glyph = GLYPH_UNEXPLORED;
-            gl.lastseentyp[x][y] = 0;
+            svl.lastseentyp[x][y] = 0;
         }
 
     /* Attach bones info to the current level before saving. */
@@ -546,7 +546,7 @@ savebones(int how, time_t when, struct obj *corpse)
        gender and alignment reflect final values rather than what the
        character started out as, same as topten and logfile entries */
     Sprintf(newbones->who, "%s-%.3s-%.3s-%.3s-%.3s",
-            gp.plname, gu.urole.filecode,
+            svp.plname, gu.urole.filecode,
             gu.urace.filecode, genders[flags.female].filecode,
             aligns[1 - u.ualign.type].filecode);
     formatkiller(newbones->how, sizeof newbones->how, how, TRUE);
@@ -556,13 +556,13 @@ savebones(int how, time_t when, struct obj *corpse)
     newbones->bonesknown = FALSE;
     /* if current character died on a bones level, the cemetery list
        will have multiple entries, most recent (this dead hero) first */
-    newbones->next = gl.level.bonesinfo;
-    gl.level.bonesinfo = newbones;
+    newbones->next = svl.level.bonesinfo;
+    svl.level.bonesinfo = newbones;
     /* flag these bones if they are being created in wizard mode;
        they might already be flagged as such, even when we're playing
        in normal mode, if this level came from a previous bones file */
     if (wizard)
-        gl.level.flags.wizard_bones = 1;
+        svl.level.flags.wizard_bones = 1;
 
     nhfp = create_bonesfile(&u.uz, &bonesid, whynot);
     if (!nhfp) {
@@ -690,7 +690,7 @@ getbones(void)
                     resetobjs(mtmp->minvent, TRUE);
             }
             resetobjs(fobj, TRUE);
-            resetobjs(gl.level.buriedobjlist, TRUE);
+            resetobjs(svl.level.buriedobjlist, TRUE);
             fix_shop_damage();
         }
     }
@@ -731,7 +731,7 @@ bones_include_name(const char *name)
     Strcat(buf, "-");
     len = strlen(buf);
 
-    for (bp = gl.level.bonesinfo; bp; bp = bp->next) {
+    for (bp = svl.level.bonesinfo; bp; bp = bp->next) {
         if (!strncmp(bp->who, buf, len))
             return TRUE;
     }

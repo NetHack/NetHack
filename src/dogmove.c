@@ -142,7 +142,7 @@ cursed_object_at(coordxy x, coordxy y)
 {
     struct obj *otmp;
 
-    for (otmp = gl.level.objects[x][y]; otmp; otmp = otmp->nexthere)
+    for (otmp = svl.level.objects[x][y]; otmp; otmp = otmp->nexthere)
         if (otmp->cursed)
             return TRUE;
     return FALSE;
@@ -223,8 +223,8 @@ dog_eat(struct monst *mtmp,
     char objnambuf[BUFSZ], *obj_name;
 
     objnambuf[0] = '\0';
-    if (edog->hungrytime < gm.moves)
-        edog->hungrytime = gm.moves;
+    if (edog->hungrytime < svm.moves)
+        edog->hungrytime = svm.moves;
     nutrit = dog_nutrition(mtmp, obj);
 
     if (devour) {
@@ -309,7 +309,7 @@ dog_eat(struct monst *mtmp,
         /* It's a reward if it's DOGFOOD and the player dropped/threw it.
            We know the player had it if invlet is set. -dlc */
         if (dogfood(mtmp, obj) == DOGFOOD && obj->invlet)
-            edog->apport += (int) (200L / ((long) edog->dropdist + gm.moves
+            edog->apport += (int) (200L / ((long) edog->dropdist + svm.moves
                                            - edog->droptime));
         if (obj->unpaid) {
             /* edible item owned by shop has been thrown or kicked
@@ -342,9 +342,9 @@ dog_starve(struct monst *mtmp)
 staticfn boolean
 dog_hunger(struct monst *mtmp, struct edog *edog)
 {
-    if (gm.moves > edog->hungrytime + DOG_WEAK) {
+    if (svm.moves > edog->hungrytime + DOG_WEAK) {
         if (!carnivorous(mtmp->data) && !herbivorous(mtmp->data)) {
-            edog->hungrytime = gm.moves + DOG_WEAK;
+            edog->hungrytime = svm.moves + DOG_WEAK;
             /* but not too high; it might polymorph */
         } else if (!edog->mhpmax_penalty) {
             /* starving pets are limited in healing */
@@ -365,7 +365,7 @@ dog_hunger(struct monst *mtmp, struct edog *edog)
             else
                 You_feel("worried about %s.", y_monnam(mtmp));
             stop_occupation();
-        } else if (gm.moves > edog->hungrytime + DOG_STARVE
+        } else if (svm.moves > edog->hungrytime + DOG_STARVE
                    || DEADMONSTER(mtmp)) {
             dog_starve(mtmp);
             return TRUE;
@@ -401,10 +401,10 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
                 if (edog->apport > 1)
                     edog->apport--;
                 edog->dropdist = udist; /* hpscdi!jon */
-                edog->droptime = gm.moves;
+                edog->droptime = svm.moves;
             }
     } else {
-        if ((obj = gl.level.objects[omx][omy]) != 0
+        if ((obj = svl.level.objects[omx][omy]) != 0
             && !strchr(nofetch, obj->oclass)
 #ifdef MAIL_STRUCTURES
             && obj->otyp != SCR_MAIL
@@ -545,7 +545,7 @@ dog_goal(
 
     /* follow player if appropriate */
     if (gg.gtyp == UNDEF || (gg.gtyp != DOGFOOD && gg.gtyp != APPORT
-                          && gm.moves < edog->hungrytime)) {
+                          && svm.moves < edog->hungrytime)) {
         gg.gx = u.ux;
         gg.gy = u.uy;
         if (after && udist <= 4 && u_at(gg.gx, gg.gy))
@@ -875,7 +875,7 @@ pet_ranged_attk(struct monst *mtmp)
     if (!mtmp->isminion) {
         struct edog *dog = EDOG(mtmp);
 
-        hungry = (gm.moves > (dog->hungrytime + DOG_HUNGRY));
+        hungry = (svm.moves > (dog->hungrytime + DOG_HUNGRY));
     }
 
     /* Identify the best target in a straight line from the pet;
@@ -1015,7 +1015,7 @@ dog_move(
         else if (j == 1)
             goto newdogpos; /* eating something */
 
-        whappr = (gm.moves - edog->whistletime < 5);
+        whappr = (svm.moves - edog->whistletime < 5);
     } else
         whappr = 0;
 
@@ -1122,7 +1122,7 @@ dog_move(
 
             if ((mstatus & (M_ATTK_HIT | M_ATTK_DEF_DIED)) == M_ATTK_HIT
                 && rn2(4)
-                && mtmp2->mlstmv != gm.moves
+                && mtmp2->mlstmv != svm.moves
                 && !onscary(mtmp->mx, mtmp->my, mtmp2)
                 /* monnear check needed: long worms hit on tail */
                 && monnear(mtmp2, mtmp->mx, mtmp->my)) {
@@ -1179,13 +1179,13 @@ dog_move(
         /* (minion isn't interested; `cursemsg' stays FALSE) */
         if (edog) {
             boolean can_reach_food = could_reach_item(mtmp, nx, ny);
-            for (obj = gl.level.objects[nx][ny]; obj; obj = obj->nexthere) {
+            for (obj = svl.level.objects[nx][ny]; obj; obj = obj->nexthere) {
                 if (obj->cursed) {
                     cursemsg[i] = TRUE;
                 } else if (can_reach_food
                            && (otyp = dogfood(mtmp, obj)) < MANFOOD
                            && (otyp < ACCFOOD
-                               || edog->hungrytime <= gm.moves)) {
+                               || edog->hungrytime <= svm.moves)) {
                     /* Note: our dog likes the food so much that he
                      * might eat it even when it conceals a cursed object */
                     nix = nx;
@@ -1264,7 +1264,7 @@ dog_move(
             /* describe top item of pile, not necessarily cursed item itself;
                don't use glyph_at() here--it would return the pet but we want
                to know whether an object is remembered at this map location */
-            struct obj *o = (!Hallucination && gl.level.flags.hero_memory
+            struct obj *o = (!Hallucination && svl.level.flags.hero_memory
                              && glyph_is_object(levl[nix][niy].glyph))
                                ? vobj_at(nix, niy) : 0;
             const char *what = o ? distant_name(o, doname) : something;

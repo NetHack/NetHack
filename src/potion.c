@@ -597,14 +597,14 @@ dodrink(void)
     otmp->in_use = TRUE; /* you've opened the stopper */
 
     if (objdescr_is(otmp, "milky")
-        && !(gm.mvitals[PM_GHOST].mvflags & G_GONE)
-        && !rn2(POTION_OCCUPANT_CHANCE(gm.mvitals[PM_GHOST].born))) {
+        && !(svm.mvitals[PM_GHOST].mvflags & G_GONE)
+        && !rn2(POTION_OCCUPANT_CHANCE(svm.mvitals[PM_GHOST].born))) {
         ghost_from_bottle();
         useup(otmp);
         return ECMD_TIME;
     } else if (objdescr_is(otmp, "smoky")
-               && !(gm.mvitals[PM_DJINNI].mvflags & G_GONE)
-               && !rn2(POTION_OCCUPANT_CHANCE(gm.mvitals[PM_DJINNI].born))) {
+               && !(svm.mvitals[PM_DJINNI].mvflags & G_GONE)
+               && !rn2(POTION_OCCUPANT_CHANCE(svm.mvitals[PM_DJINNI].born))) {
         djinni_from_bottle(otmp);
         useup(otmp);
         return ECMD_TIME;
@@ -1897,7 +1897,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
            when inside a tended shop */
         if (!shkp) /* if shkp was killed, unpaid ought to cleared already */
             obj->unpaid = 0;
-        else if (gc.context.mon_moving) /* obj thrown by monster */
+        else if (svc.context.mon_moving) /* obj thrown by monster */
             subfrombill(obj, shkp);
         else /* obj thrown by hero */
             (void) stolen_value(obj, u.ux, u.uy, (boolean) shkp->mpeaceful,

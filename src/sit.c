@@ -135,7 +135,7 @@ throne_sit_effect(void)
             break;
         case 10:
             if (Luck < 0 || (HSee_invisible & INTRINSIC)) {
-                if (gl.level.flags.nommap) {
+                if (svl.level.flags.nommap) {
                     pline("A terrible drone fills your head!");
                     make_confused((HConfusion & TIMEOUT) + (long) rnd(30),
                                   FALSE);
@@ -303,7 +303,7 @@ dosit(void)
         && !(uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
         struct obj *obj;
 
-        obj = gl.level.objects[u.ux][u.uy];
+        obj = svl.level.objects[u.ux][u.uy];
         if (gy.youmonst.data->mlet == S_DRAGON && obj->oclass == COIN_CLASS) {
             You("coil up around your %shoard.",
                 (obj->quan + money_cnt(gi.invent) < u.ulevel * 1000)

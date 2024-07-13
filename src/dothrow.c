@@ -89,7 +89,7 @@ throw_obj(struct obj *obj, int shotlimit)
     long wep_mask;
     boolean twoweap, weakmultishot;
     int res = ECMD_TIME;
-    struct obj_split save_osplit = gc.context.objsplit;
+    struct obj_split save_osplit = svc.context.objsplit;
 
     /* ask "in what direction?" */
     if (!getdir((char *) 0)) {
@@ -140,8 +140,8 @@ throw_obj(struct obj *obj, int shotlimit)
             /* throwing with one hand, but pluralize since the
                expression "with your bare hands" sounds better */
             makeplural(body_part(HAND)));
-        Sprintf(gk.killer.name, "throwing %s bare-handed", killer_xname(obj));
-        instapetrify(gk.killer.name);
+        Sprintf(svk.killer.name, "throwing %s bare-handed", killer_xname(obj));
+        instapetrify(svk.killer.name);
     }
     if (welded(obj)) {
         weldmsg(obj);
@@ -280,7 +280,7 @@ throw_obj(struct obj *obj, int shotlimit)
             || obj->o_id == save_osplit.child_oid)) {
         /* futureproofing: objsplit will have been affected if partial stack
            was thrown; objects will have been split off stack to throw. */
-        gc.context.objsplit = save_osplit;
+        svc.context.objsplit = save_osplit;
         (void) unsplitobj(obj);
     }
     return res;
@@ -579,7 +579,7 @@ void
 endmultishot(boolean verbose)
 {
     if (gm.m_shot.i < gm.m_shot.n) {
-        if (verbose && !gc.context.mon_moving) {
+        if (verbose && !svc.context.mon_moving) {
             You("stop %s after the %d%s %s.",
                 gm.m_shot.s ? "firing" : "throwing",
                 gm.m_shot.i, ordin(gm.m_shot.i),
@@ -873,9 +873,9 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
         if (touch_petrifies(mon->data)
             /* this is a bodily collision, so check for body armor */
             && !uarmu && !uarm && !uarmc) {
-            Sprintf(gk.killer.name, "bumping into %s",
+            Sprintf(svk.killer.name, "bumping into %s",
                     an(pmname(mon->data, NEUTRAL)));
-            instapetrify(gk.killer.name);
+            instapetrify(svk.killer.name);
         }
         if (touch_petrifies(gy.youmonst.data)
             && !which_armor(mon, W_ARMU | W_ARM | W_ARMC)) {
@@ -1031,17 +1031,17 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
     if ((mtmp = m_at(x, y)) != 0 && mtmp != mon) {
         if (canseemon(mon) || canseemon(mtmp))
             pline("%s bumps into %s.", Monnam(mon), a_monnam(mtmp));
-        wakeup(mtmp, !gc.context.mon_moving);
+        wakeup(mtmp, !svc.context.mon_moving);
         /* check whether 'mon' is turned to stone by touching 'mtmp' */
         if (touch_petrifies(mtmp->data)
             && !which_armor(mon, W_ARMU | W_ARM | W_ARMC)) {
-            minstapetrify(mon, !gc.context.mon_moving);
+            minstapetrify(mon, !svc.context.mon_moving);
             newsym(mon->mx, mon->my);
         }
         /* and whether 'mtmp' is turned to stone by being touched by 'mon' */
         if (touch_petrifies(mon->data)
             && !which_armor(mtmp, W_ARMU | W_ARM | W_ARMC)) {
-            minstapetrify(mtmp, !gc.context.mon_moving);
+            minstapetrify(mtmp, !svc.context.mon_moving);
             newsym(mtmp->mx, mtmp->my);
         }
     } else if (u_at(x, y)) {
@@ -1057,12 +1057,12 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
         }
         /* and whether hero is turned to stone by being touched by 'mon' */
         if (touch_petrifies(mon->data) && !(uarmu || uarm || uarmc)) {
-            Snprintf(gk.killer.name, sizeof gk.killer.name, "being hit by %s",
+            Snprintf(svk.killer.name, sizeof svk.killer.name, "being hit by %s",
                      /* combine m_monnam() and noname_monnam():
                         "{your,a} hurtling cockatrice" w/o assigned name */
                      x_monnam(mon, mon->mtame ? ARTICLE_YOUR : ARTICLE_A,
                               "hurtling", EXACT_NAME | SUPPRESS_NAME, FALSE));
-            instapetrify(gk.killer.name);
+            instapetrify(svk.killer.name);
             newsym(u.ux, u.uy);
         }
     }
@@ -1134,7 +1134,7 @@ mhurtle(struct monst *mon, int dx, int dy, int range)
 {
     coord mc, cc;
 
-    wakeup(mon, !gc.context.mon_moving);
+    wakeup(mon, !svc.context.mon_moving);
     /* At the very least, debilitate the monster */
     mon->movement = 0;
     mon->mstun = 1;
@@ -1397,8 +1397,8 @@ toss_up(struct obj *obj, boolean hitsroof)
                    && !(poly_when_stoned(gy.youmonst.data)
                         && polymon(PM_STONE_GOLEM))) {
  petrify:
-            gk.killer.format = KILLED_BY;
-            Strcpy(gk.killer.name, "elementary physics"); /* what goes up... */
+            svk.killer.format = KILLED_BY;
+            Strcpy(svk.killer.name, "elementary physics"); /* what goes up... */
             You("turn to stone.");
             if (obj)
                 dropy(obj); /* bypass most of hitfloor() */
@@ -1818,8 +1818,8 @@ return_throw_to_inv(
 
     /* if 'obj' is from a stack split, we can put it back by undoing split
        so there's no chance of merging with some other compatible stack */
-    if (obj->o_id == gc.context.objsplit.parent_oid
-        || obj->o_id == gc.context.objsplit.child_oid) {
+    if (obj->o_id == svc.context.objsplit.parent_oid
+        || obj->o_id == svc.context.objsplit.child_oid) {
         obj->nobj = gi.invent;
         gi.invent = obj;
         obj->where = OBJ_INVENT;
@@ -1925,7 +1925,7 @@ tmiss(struct obj *obj, struct monst *mon, boolean maybe_wakeup)
 #define special_obj_hits_leader(obj, mon) \
     ((is_quest_artifact(obj) || objects[obj->otyp].oc_unique    \
       || (obj->otyp == FAKE_AMULET_OF_YENDOR && !obj->known))   \
-     && mon->m_id == gq.quest_status.leader_m_id)
+     && mon->m_id == svq.quest_status.leader_m_id)
 
 /* whether or not object should be destroyed when it hits its target */
 boolean
@@ -1944,7 +1944,7 @@ should_mulch_missile(struct obj *obj)
        around longer on average. */
     chance = 3 + greatest_erosion(obj) - obj->spe;
     broken = chance > 1 ? rn2(chance) : !rn2(4);
-    if (obj->blessed && (gc.context.mon_moving ? !rn2(3) : !rnl(4)))
+    if (obj->blessed && (svc.context.mon_moving ? !rn2(3) : !rnl(4)))
         broken = FALSE;
 
     /* Flint and hard gems don't break easily */
@@ -2614,8 +2614,8 @@ throw_gold(struct obj *obj)
         You("cannot throw gold at yourself.");
         /* If we tried to throw part of a stack, force it to merge back
            together (same as in throw_obj).  Essential for gold. */
-        if (obj->o_id == gc.context.objsplit.parent_oid
-            || obj->o_id == gc.context.objsplit.child_oid)
+        if (obj->o_id == svc.context.objsplit.parent_oid
+            || obj->o_id == svc.context.objsplit.child_oid)
             (void) unsplitobj(obj);
         return ECMD_CANCEL;
     }

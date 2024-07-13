@@ -248,7 +248,7 @@ sengr_at(const char *s, coordxy x, coordxy y, boolean strict)
 {
     struct engr *ep = engr_at(x, y);
 
-    if (ep && ep->engr_type != HEADSTONE && ep->engr_time <= gm.moves) {
+    if (ep && ep->engr_type != HEADSTONE && ep->engr_time <= svm.moves) {
         if (strict ? !strcmpi(ep->engr_txt[actual_text], s)
                    : (strstri(ep->engr_txt[actual_text], s) != 0))
             return ep;
@@ -355,7 +355,7 @@ read_engr_at(coordxy x, coordxy y)
             You("%s: \"%s\".", (Blind) ? "feel the words" : "read", et);
             Strcpy(ep->engr_txt[remembered_text], ep->engr_txt[actual_text]);
             ep->eread = 1;
-            if (gc.context.run > 0)
+            if (svc.context.run > 0)
                 nomul(0);
         }
     }
@@ -642,7 +642,7 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
                      ? "Chips fly out from the headstone."
                      : de->frosted
                         ? "Ice chips fly up from the ice surface!"
-                        : (gl.level.locations[u.ux][u.uy].typ
+                        : (svl.level.locations[u.ux][u.uy].typ
                           == DRAWBRIDGE_DOWN)
                            ? "Splinters fly up from the bridge."
                            : "Gravel flies up from the floor.");
@@ -1006,7 +1006,7 @@ doengrave(void)
     if (*de->buf) {
         struct engr *tmp_ep;
 
-        make_engr_at(u.ux, u.uy, de->buf, gm.moves, de->type);
+        make_engr_at(u.ux, u.uy, de->buf, svm.moves, de->type);
         tmp_ep = engr_at(u.ux, u.uy);
         if (!Blind) {
             if (tmp_ep != 0) {
@@ -1167,13 +1167,13 @@ doengrave(void)
         de->disprefresh = TRUE;
     }
 
-    Strcpy(gc.context.engraving.text, de->ebuf);
-    gc.context.engraving.nextc = gc.context.engraving.text;
-    gc.context.engraving.stylus = de->otmp;
-    gc.context.engraving.type = de->type;
-    gc.context.engraving.pos.x = u.ux;
-    gc.context.engraving.pos.y = u.uy;
-    gc.context.engraving.actionct = 0;
+    Strcpy(svc.context.engraving.text, de->ebuf);
+    svc.context.engraving.nextc = svc.context.engraving.text;
+    svc.context.engraving.stylus = de->otmp;
+    svc.context.engraving.type = de->type;
+    svc.context.engraving.pos.x = u.ux;
+    svc.context.engraving.pos.y = u.uy;
+    svc.context.engraving.actionct = 0;
     set_occupation(engrave, "engraving", 0);
 
     if (de->post_engr_text[0])
@@ -1203,31 +1203,31 @@ engrave(void)
     char buf[BUFSZ]; /* holds the post-this-action engr text, including
                       * anything already there */
     const char *finishverb; /* "You finish [foo]." */
-    struct obj * stylus; /* shorthand for gc.context.engraving.stylus */
-    boolean firsttime = (gc.context.engraving.actionct == 0);
+    struct obj * stylus; /* shorthand for svc.context.engraving.stylus */
+    boolean firsttime = (svc.context.engraving.actionct == 0);
     int rate = 10; /* # characters that can be engraved in this action */
     boolean truncate = FALSE;
-    boolean neweng = (gc.context.engraving.actionct == 0);
+    boolean neweng = (svc.context.engraving.actionct == 0);
 
-    boolean carving = (gc.context.engraving.type == ENGRAVE
-                       || gc.context.engraving.type == HEADSTONE);
+    boolean carving = (svc.context.engraving.type == ENGRAVE
+                       || svc.context.engraving.type == HEADSTONE);
     boolean dulling_wep, marker;
     char *endc; /* points at character 1 beyond the last character to engrave
                  * this action */
     int i, space_left;
 
-    if (gc.context.engraving.pos.x != u.ux
-        || gc.context.engraving.pos.y != u.uy) { /* teleported? */
+    if (svc.context.engraving.pos.x != u.ux
+        || svc.context.engraving.pos.y != u.uy) { /* teleported? */
         You("are unable to continue engraving.");
         return 0;
     }
     /* Stylus might have been taken out of inventory and destroyed somehow.
      * Not safe to dereference stylus until after this. */
-    if (gc.context.engraving.stylus == &hands_obj) { /* bare finger */
+    if (svc.context.engraving.stylus == &hands_obj) { /* bare finger */
         stylus = (struct obj *) 0;
     } else {
         for (stylus = gi.invent; stylus; stylus = stylus->nobj) {
-            if (stylus == gc.context.engraving.stylus)
+            if (stylus == svc.context.engraving.stylus)
                 break;
         }
         if (!stylus) {
@@ -1239,14 +1239,14 @@ engrave(void)
     dulling_wep = (carving && stylus && stylus->oclass == WEAPON_CLASS
                    && (stylus->otyp != ATHAME || stylus->cursed));
     marker = (stylus && stylus->otyp == MAGIC_MARKER
-              && gc.context.engraving.type == MARK);
+              && svc.context.engraving.type == MARK);
 
-    gc.context.engraving.actionct++;
+    svc.context.engraving.actionct++;
 
     /* sanity checks */
     if (dulling_wep && !is_blade(stylus)) {
         impossible("carving with non-bladed weapon");
-    } else if (gc.context.engraving.type == MARK && !marker) {
+    } else if (svc.context.engraving.type == MARK && !marker) {
         impossible("making graffiti with non-marker stylus");
     }
 
@@ -1263,7 +1263,7 @@ engrave(void)
 
     /* Step 2: Compute last character that can be engraved this action. */
     i = rate;
-    for (endc = gc.context.engraving.nextc; *endc && i > 0; endc++) {
+    for (endc = svc.context.engraving.nextc; *endc && i > 0; endc++) {
         if (*endc != ' ') {
             i--;
         }
@@ -1278,7 +1278,7 @@ engrave(void)
         if (stylus->quan > 1L) {
             if (firsttime)
                 pline("One of %s gets dull.", yname(stylus));
-            stylus = gc.context.engraving.stylus = splitobj(stylus, 1L);
+            stylus = svc.context.engraving.stylus = splitobj(stylus, 1L);
             /* if stack is wielded or quivered, the split-off one isn't */
             stylus->owornmask = 0L;
             splitstack = TRUE;
@@ -1295,7 +1295,7 @@ engrave(void)
          * engrave "Elbereth" all at once.
          * However, you can engrave "Elb", then "ere", then "th", by taking
          * advantage of the rounding down. */
-        if (gc.context.engraving.actionct % 2 == 1) { /* 1st,3rd,... action */
+        if (svc.context.engraving.actionct % 2 == 1) { /* 1st,3rd,... action */
             /* deduct a point on 1st, 3rd, 5th, ... turns, unless this is the
              * last character being engraved (a rather convoluted way to round
              * down), but always deduct a point on the 1st turn to prevent
@@ -1308,7 +1308,7 @@ engrave(void)
                     impossible("<= -3 weapon valid for engraving");
                 }
                 truncate = TRUE;
-            } else if (*endc || gc.context.engraving.actionct == 1) {
+            } else if (*endc || svc.context.engraving.actionct == 1) {
                 stylus->spe -= 1;
                 dulled = TRUE;
             }
@@ -1340,7 +1340,7 @@ engrave(void)
         }
     }
 
-    switch (gc.context.engraving.type) {
+    switch (svc.context.engraving.type) {
     default:
         finishverb = "your weird engraving";
         break;
@@ -1371,9 +1371,9 @@ engrave(void)
         Strcpy(buf, oep->engr_txt[actual_text]);
 
     space_left = (int) (sizeof buf - strlen(buf) - 1U);
-    if (endc - gc.context.engraving.nextc > space_left) {
+    if (endc - svc.context.engraving.nextc > space_left) {
         You("run out of room to write.");
-        endc = gc.context.engraving.nextc + space_left;
+        endc = svc.context.engraving.nextc + space_left;
         truncate = TRUE;
     }
 
@@ -1381,25 +1381,25 @@ engrave(void)
      * can't go any further. */
     if (truncate && *endc != '\0') {
         *endc = '\0';
-        You("are only able to write \"%s\".", gc.context.engraving.text);
+        You("are only able to write \"%s\".", svc.context.engraving.text);
     } else {
         /* input was not truncated; stylus may still have worn out on the last
          * character, though */
         truncate = FALSE;
     }
 
-    (void) strncat(buf, gc.context.engraving.nextc,
-                   min(space_left, endc - gc.context.engraving.nextc));
-    make_engr_at(u.ux, u.uy, buf, gm.moves - gm.multi,
-                 gc.context.engraving.type);
+    (void) strncat(buf, svc.context.engraving.nextc,
+                   min(space_left, endc - svc.context.engraving.nextc));
+    make_engr_at(u.ux, u.uy, buf, svm.moves - gm.multi,
+                 svc.context.engraving.type);
     oep = engr_at(u.ux, u.uy);
     if (oep)
         oep->eread = 1;
 
     if (*endc) {
-        gc.context.engraving.nextc = endc;
+        svc.context.engraving.nextc = endc;
         if (neweng) {
-            newsym(gc.context.engraving.pos.x, gc.context.engraving.pos.y);
+            newsym(svc.context.engraving.pos.x, svc.context.engraving.pos.y);
         }
         return 1; /* not yet finished this turn */
     } else { /* finished engraving */
@@ -1413,12 +1413,12 @@ engrave(void)
             /* only print this if engraving took multiple actions */
             You("finish %s.", finishverb);
         }
-        gc.context.engraving.text[0] = '\0';
-        gc.context.engraving.nextc = (char *) 0;
-        gc.context.engraving.stylus = (struct obj *) 0;
+        svc.context.engraving.text[0] = '\0';
+        svc.context.engraving.nextc = (char *) 0;
+        svc.context.engraving.stylus = (struct obj *) 0;
     }
     if (neweng)
-        newsym(gc.context.engraving.pos.x, gc.context.engraving.pos.y);
+        newsym(svc.context.engraving.pos.x, svc.context.engraving.pos.y);
     return 0;
 }
 
@@ -1521,7 +1521,7 @@ rest_engravings(NHFILE *nhfp)
         /* mark as finished for bones levels -- no problem for
          * normal levels as the player must have finished engraving
          * to be able to move again */
-        ep->engr_time = gm.moves;
+        ep->engr_time = svm.moves;
     }
 }
 

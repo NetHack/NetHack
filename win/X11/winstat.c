@@ -1535,7 +1535,7 @@ update_val(struct X_status_value *attr_rec, long new_value)
 
     if (attr_rec->type == SV_LABEL) {
         if (attr_rec == &shown_stats[F_NAME]) {
-            Strcpy(buf, gp.plname);
+            Strcpy(buf, svp.plname);
             buf[0] = highc(buf[0]);
             Strcat(buf, " the ");
             if (Upolyd) {
@@ -1550,12 +1550,12 @@ update_val(struct X_status_value *attr_rec, long new_value)
                 Strcat(buf, mnam);
             } else {
                 Strcat(buf,
-                       rank_of(u.ulevel, gp.pl_character[0], flags.female));
+                       rank_of(u.ulevel, svp.pl_character[0], flags.female));
             }
 
         } else if (attr_rec == &shown_stats[F_DLEVEL]) {
             if (!describe_level(buf, 0)) {
-                Strcpy(buf, gd.dungeons[u.uz.dnum].dname);
+                Strcpy(buf, svd.dungeons[u.uz.dnum].dname);
                 Sprintf(eos(buf), ", level %d", depth(&u.uz));
             }
         } else if (attr_rec == &shown_stats[F_VERS]) {
@@ -1987,7 +1987,7 @@ update_fancy_status_field(int i, int color, int attributes)
             val = (long) u.ualign.type;
             break;
         case F_TIME:
-            val = flags.time ? (long) gm.moves : 0L;
+            val = flags.time ? (long) svm.moves : 0L;
             break;
         case F_SCORE:
 #ifdef SCORE_ON_BOTL

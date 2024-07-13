@@ -22,7 +22,7 @@ mon_in_room(struct monst *mon, int rmtyp)
 {
     int rno = levl[mon->mx][mon->my].roomno;
     if (rno >= ROOMOFFSET)
-        return gr.rooms[rno - ROOMOFFSET].rtype == rmtyp;
+        return svr.rooms[rno - ROOMOFFSET].rtype == rmtyp;
     return FALSE;
 }
 
@@ -211,24 +211,24 @@ dosounds(void)
 
     hallu = Hallucination ? 1 : 0;
 
-    if (gl.level.flags.nfountains && !rn2(400)) {
+    if (svl.level.flags.nfountains && !rn2(400)) {
         static const char *const fountain_msg[4] = {
             "bubbling water.", "water falling on coins.",
             "the splashing of a naiad.", "a soda fountain!",
         };
         You_hear1(fountain_msg[rn2(3) + hallu]);
     }
-    if (gl.level.flags.nsinks && !rn2(300)) {
+    if (svl.level.flags.nsinks && !rn2(300)) {
         static const char *const sink_msg[3] = {
             "a slow drip.", "a gurgling noise.", "dishes being washed!",
         };
         You_hear1(sink_msg[rn2(2) + hallu]);
     }
-    if (gl.level.flags.has_court && !rn2(200)) {
+    if (svl.level.flags.has_court && !rn2(200)) {
         if (get_iter_mons(throne_mon_sound))
             return;
     }
-    if (gl.level.flags.has_swamp && !rn2(200)) {
+    if (svl.level.flags.has_swamp && !rn2(200)) {
         static const char *const swamp_msg[3] = {
             "hear mosquitoes!", "smell marsh gas!", /* so it's a smell...*/
             "hear Donald Duck!",
@@ -236,10 +236,10 @@ dosounds(void)
         You1(swamp_msg[rn2(2) + hallu]);
         return;
     }
-    if (gl.level.flags.has_vault && !rn2(200)) {
+    if (svl.level.flags.has_vault && !rn2(200)) {
         if (!(sroom = search_special(VAULT))) {
             /* strange ... */
-            gl.level.flags.has_vault = 0;
+            svl.level.flags.has_vault = 0;
             return;
         }
         if (gd_sound())
@@ -275,15 +275,15 @@ dosounds(void)
             }
         return;
     }
-    if (gl.level.flags.has_beehive && !rn2(200)) {
+    if (svl.level.flags.has_beehive && !rn2(200)) {
         if (get_iter_mons(beehive_mon_sound))
             return;
     }
-    if (gl.level.flags.has_morgue && !rn2(200)) {
+    if (svl.level.flags.has_morgue && !rn2(200)) {
         if (get_iter_mons(morgue_mon_sound))
             return;
     }
-    if (gl.level.flags.has_barracks && !rn2(200)) {
+    if (svl.level.flags.has_barracks && !rn2(200)) {
         static const char *const barracks_msg[4] = {
             "blades being honed.", "loud snoring.", "dice being thrown.",
             "General MacArthur!",
@@ -306,14 +306,14 @@ dosounds(void)
             }
         }
     }
-    if (gl.level.flags.has_zoo && !rn2(200)) {
+    if (svl.level.flags.has_zoo && !rn2(200)) {
         if (get_iter_mons(zoo_mon_sound))
             return;
     }
-    if (gl.level.flags.has_shop && !rn2(200)) {
+    if (svl.level.flags.has_shop && !rn2(200)) {
         if (!(sroom = search_special(ANY_SHOP))) {
             /* strange... */
-            gl.level.flags.has_shop = 0;
+            svl.level.flags.has_shop = 0;
             return;
         }
         if (tended_shop(sroom)
@@ -326,7 +326,7 @@ dosounds(void)
         }
         return;
     }
-    if (gl.level.flags.has_temple && !rn2(200)
+    if (svl.level.flags.has_temple && !rn2(200)
         && !(Is_astralevel(&u.uz) || Is_sanctum(&u.uz))) {
         if (get_iter_mons(temple_priest_sound))
             return;
@@ -414,7 +414,7 @@ growl(struct monst *mtmp)
         if (canseemon(mtmp) || !Deaf) {
             pline("%s %s!", Monnam(mtmp), vtense((char *) 0, growl_verb));
             iflags.last_msg = PLNMSG_GROWL;
-            if (gc.context.run)
+            if (svc.context.run)
                 nomul(0);
         }
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 18);
@@ -464,7 +464,7 @@ yelp(struct monst *mtmp)
     if (yelp_verb) {
         Soundeffect(se, 70);  /* Soundeffect() handles Deaf or not Deaf */
         pline("%s %s!", Monnam(mtmp), vtense((char *) 0, yelp_verb));
-        if (gc.context.run)
+        if (svc.context.run)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 12);
     }
@@ -504,7 +504,7 @@ whimper(struct monst *mtmp)
             Soundeffect(se, 50);
         }
         pline("%s %s.", Monnam(mtmp), vtense((char *) 0, whimper_verb));
-        if (gc.context.run)
+        if (svc.context.run)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 6);
     }
@@ -693,7 +693,7 @@ domonnoise(struct monst *mtmp)
         return ECMD_OK;
 
     /* leader might be poly'd; if he can still speak, give leader speech */
-    if (mtmp->m_id == gq.quest_status.leader_m_id && msound > MS_ANIMAL)
+    if (mtmp->m_id == svq.quest_status.leader_m_id && msound > MS_ANIMAL)
         msound = MS_LEADER;
     /* make sure it's your role's quest guardian; adjust if not */
     else if (msound == MS_GUARDIAN && ptr != &mons[gu.urole.guardnum])
@@ -839,9 +839,9 @@ domonnoise(struct monst *mtmp)
         } else if (mtmp->mpeaceful) {
             if (mtmp->mtame
                 && (mtmp->mconf || mtmp->mflee || mtmp->mtrapped
-                    || gm.moves > EDOG(mtmp)->hungrytime || mtmp->mtame < 5))
+                    || svm.moves > EDOG(mtmp)->hungrytime || mtmp->mtame < 5))
                 pline_msg = "whines.";
-            else if (mtmp->mtame && EDOG(mtmp)->hungrytime > gm.moves + 1000)
+            else if (mtmp->mtame && EDOG(mtmp)->hungrytime > svm.moves + 1000)
                 pline_msg = "yips.";
             else {
                 if (ptr != &mons[PM_DINGO]) /* dingos do not actually bark */
@@ -857,10 +857,10 @@ domonnoise(struct monst *mtmp)
                 || mtmp->mtame < 5) {
                 Soundeffect(se_feline_yowl, 80);
                 pline_msg = "yowls.";
-            } else if (gm.moves > EDOG(mtmp)->hungrytime) {
+            } else if (svm.moves > EDOG(mtmp)->hungrytime) {
                 Soundeffect(se_feline_meow, 80);
                 pline_msg = "meows.";
-            } else if (EDOG(mtmp)->hungrytime > gm.moves + 1000) {
+            } else if (EDOG(mtmp)->hungrytime > svm.moves + 1000) {
                 Soundeffect(se_feline_purr, 40);
                 pline_msg = "purrs.";
             } else {
@@ -910,7 +910,7 @@ domonnoise(struct monst *mtmp)
         if (mtmp->mtame < 5) {
             Soundeffect(se_equine_neigh, 60);
             pline_msg = "neighs.";
-        } else if (gm.moves > EDOG(mtmp)->hungrytime) {
+        } else if (svm.moves > EDOG(mtmp)->hungrytime) {
             Soundeffect(se_equine_whinny, 60);
             pline_msg = "whinnies.";
         } else {
@@ -1045,7 +1045,7 @@ domonnoise(struct monst *mtmp)
         } else if (mtmp->mhp < mtmp->mhpmax / 2)
             pline_msg = "asks for a potion of healing.";
         else if (mtmp->mtame && !mtmp->isminion
-                 && gm.moves > EDOG(mtmp)->hungrytime)
+                 && svm.moves > EDOG(mtmp)->hungrytime)
             verbl_msg = "I'm hungry.";
         /* Specific monsters' interests */
         else if (is_elf(ptr))
@@ -1191,7 +1191,7 @@ domonnoise(struct monst *mtmp)
         boolean ms_Death = (ptr == &mons[PM_DEATH]);
 
         /* 3.6 tribute */
-        if (ms_Death && !gc.context.tribute.Deathnotice
+        if (ms_Death && !svc.context.tribute.Deathnotice
             && (book = u_have_novel()) != 0) {
             if ((tribtitle = noveltitle(&book->novelidx)) != 0) {
                 Sprintf(verbuf, "Ah, so you have a copy of /%s/.", tribtitle);
@@ -1201,7 +1201,7 @@ domonnoise(struct monst *mtmp)
                     Strcat(verbuf, "  I may have been misquoted there.");
                 verbl_msg = verbuf;
             }
-            gc.context.tribute.Deathnotice = 1;
+            svc.context.tribute.Deathnotice = 1;
         } else if (ms_Death && rn2(3) && Death_quote(verbuf, sizeof verbuf)) {
             verbl_msg = verbuf;
         /* end of tribute addition */
@@ -1338,7 +1338,7 @@ dochat(void)
             /* Talking to a wall; secret door remains hidden by behaving
                like a wall; IS_WALL() test excludes solid rock even when
                that serves as a wall bordering a corridor */
-            if (Blind && !IS_WALL(gl.lastseentyp[tx][ty])) {
+            if (Blind && !IS_WALL(svl.lastseentyp[tx][ty])) {
                 /* when blind, you can only talk to a wall if it has
                    already been mapped as a wall */
                 ;

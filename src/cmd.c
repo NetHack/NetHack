@@ -978,11 +978,11 @@ makemap_prepost(boolean pre, boolean wiztower)
             if (Is_mineend_level(&u.uz)) {
                 if (remove_achievement(ACH_MINE_PRIZE))
                     pline(Unachieve, "Mine's-end");
-                gc.context.achieveo.mines_prize_oid = 0;
+                svc.context.achieveo.mines_prize_oid = 0;
             } else if (Is_sokoend_level(&u.uz)) {
                 if (remove_achievement(ACH_SOKO_PRIZE))
                     pline(Unachieve, "Soko-prize");
-                gc.context.achieveo.soko_prize_oid = 0;
+                svc.context.achieveo.soko_prize_oid = 0;
             }
         }
         if (Punished) {
@@ -992,17 +992,17 @@ makemap_prepost(boolean pre, boolean wiztower)
         /* reset lock picking unless it's for a carried container */
         maybe_reset_pick((struct obj *) 0);
         /* reset interrupted digging if it was taking place on this level */
-        if (on_level(&gc.context.digging.level, &u.uz))
-            (void) memset((genericptr_t) &gc.context.digging, 0,
+        if (on_level(&svc.context.digging.level, &u.uz))
+            (void) memset((genericptr_t) &svc.context.digging, 0,
                           sizeof (struct dig_info));
         /* reset cached targets */
         iflags.travelcc.x = iflags.travelcc.y = 0; /* travel destination */
-        gc.context.polearm.hitmon = (struct monst *) 0; /* polearm target */
+        svc.context.polearm.hitmon = (struct monst *) 0; /* polearm target */
         /* escape from trap */
         reset_utrap(FALSE);
         check_special_room(TRUE); /* room exit */
-        (void) memset((genericptr_t) &gd.dndest, 0, sizeof (dest_area));
-        (void) memset((genericptr_t) &gu.updest, 0, sizeof (dest_area));
+        (void) memset((genericptr_t) &svd.dndest, 0, sizeof (dest_area));
+        (void) memset((genericptr_t) &svu.updest, 0, sizeof (dest_area));
         u.ustuck = (struct monst *) 0;
         u.uswallow = u.uswldtim = 0;
         set_uinwater(0); /* u.uinwater = 0 */
@@ -1354,10 +1354,10 @@ set_move_cmd(int dir, int run)
     u.dy = ydir[dir];
     /* #reqmenu -prefix disables autopickup during movement */
     if (iflags.menu_requested)
-        gc.context.nopick = 1;
-    gc.context.travel = gc.context.travel1 = 0;
+        svc.context.nopick = 1;
+    svc.context.travel = svc.context.travel1 = 0;
     if (!gd.domove_attempting && !u.dz) {
-        gc.context.run = run;
+        svc.context.run = run;
         gd.domove_attempting |= (!run ? DOMOVE_WALK : DOMOVE_RUSH);
     }
 }
@@ -1554,12 +1554,12 @@ do_rush(void)
 {
     if ((gd.domove_attempting & DOMOVE_RUSH)) {
         Norep("Double rush prefix, canceled.");
-        gc.context.run = 0;
+        svc.context.run = 0;
         gd.domove_attempting = 0;
         return ECMD_CANCEL;
     }
 
-    gc.context.run = 2;
+    svc.context.run = 2;
     gd.domove_attempting |= DOMOVE_RUSH;
     return ECMD_OK;
 }
@@ -1570,12 +1570,12 @@ do_run(void)
 {
     if ((gd.domove_attempting & DOMOVE_RUSH)) {
         Norep("Double run prefix, canceled.");
-        gc.context.run = 0;
+        svc.context.run = 0;
         gd.domove_attempting = 0;
         return ECMD_CANCEL;
     }
 
-    gc.context.run = 3;
+    svc.context.run = 3;
     gd.domove_attempting |= DOMOVE_RUSH;
     return ECMD_OK;
 }
@@ -1584,14 +1584,14 @@ do_run(void)
 int
 do_fight(void)
 {
-    if (gc.context.forcefight) {
+    if (svc.context.forcefight) {
         Norep("Double fight prefix, canceled.");
-        gc.context.forcefight = 0;
+        svc.context.forcefight = 0;
         gd.domove_attempting = 0;
         return ECMD_CANCEL;
     }
 
-    gc.context.forcefight = 1;
+    svc.context.forcefight = 1;
     gd.domove_attempting |= DOMOVE_WALK;
     return ECMD_OK;
 }
@@ -1616,7 +1616,7 @@ do_repeat(void)
         cmdq_clear(CQ_REPEAT);
         gc.command_queue[CQ_REPEAT] = repeat_copy;
         iflags.menu_requested = FALSE;
-        if (gc.context.move)
+        if (svc.context.move)
             res = ECMD_TIME;
     }
     return res;
@@ -3264,13 +3264,13 @@ rnd_extcmd_idx(void)
 staticfn void
 reset_cmd_vars(boolean reset_cmdq)
 {
-    gc.context.run = 0;
-    gc.context.nopick = gc.context.forcefight = FALSE;
-    gc.context.move = gc.context.mv = FALSE;
+    svc.context.run = 0;
+    svc.context.nopick = svc.context.forcefight = FALSE;
+    svc.context.move = svc.context.mv = FALSE;
     gd.domove_attempting = 0;
     gm.multi = 0;
     iflags.menu_requested = FALSE;
-    gc.context.travel = gc.context.travel1 = 0;
+    svc.context.travel = svc.context.travel1 = 0;
     if (gt.travelmap) {
         selection_free(gt.travelmap, TRUE);
         gt.travelmap = NULL;
@@ -3291,10 +3291,10 @@ rhack(int key)
     int (*func)(void) = dummyfunction;
 
     iflags.menu_requested = FALSE;
-    gc.context.nopick = 0;
+    svc.context.nopick = 0;
  got_prefix_input:
 #ifdef SAFERHANGUP
-    if (gp.program_state.done_hup)
+    if (svp.program_state.done_hup)
         end_of_input();
 #endif
     if ((cmdq = cmdq_pop()) != 0) {
@@ -3329,7 +3329,7 @@ rhack(int key)
     }
 
     /* handle most movement commands */
-    gc.context.travel = gc.context.travel1 = 0;
+    svc.context.travel = svc.context.travel1 = 0;
     {
         const struct ext_func_tab *tlist;
         int res;
@@ -3433,16 +3433,16 @@ rhack(int key)
                     ; /* just do nothing */
                 } else if (((gd.domove_attempting
                              & (DOMOVE_RUSH | DOMOVE_WALK)) != 0L)
-                           && !gc.context.travel && !dxdy_moveok()) {
+                           && !svc.context.travel && !dxdy_moveok()) {
                     /* trying to move diagonally as a grid bug */
                     You_cant("get there from here...");
                     reset_cmd_vars(TRUE);
                     return;
                 } else if ((gd.domove_attempting & DOMOVE_WALK) != 0L) {
                     if (gm.multi)
-                        gc.context.mv = TRUE;
+                        svc.context.mv = TRUE;
                     domove();
-                    gc.context.forcefight = 0;
+                    svc.context.forcefight = 0;
                     iflags.menu_requested = FALSE;
                     return;
                 } else if ((gd.domove_attempting & DOMOVE_RUSH) != 0L) {
@@ -3451,7 +3451,7 @@ rhack(int key)
                             gm.multi = max(COLNO, ROWNO);
                         u.last_str_turn = 0;
                     }
-                    gc.context.mv = TRUE;
+                    svc.context.mv = TRUE;
                     domove();
                     iflags.menu_requested = FALSE;
                     return;
@@ -3474,7 +3474,7 @@ rhack(int key)
             /* reset_cmd_vars() sets context.move to False so we might
                need to change it [back] to True */
             if ((res & ECMD_TIME) != 0) {
-                gc.context.move = TRUE;
+                svc.context.move = TRUE;
                 if (func != dokick) {
                     /* hero did something else than kicking a location;
                        reset the location, so pets don't avoid it */
@@ -3493,7 +3493,7 @@ rhack(int key)
         cmdq_clear(CQ_REPEAT);
     }
     /* didn't move */
-    gc.context.move = FALSE;
+    svc.context.move = FALSE;
     gm.multi = 0;
     return;
 }
@@ -3634,7 +3634,7 @@ getdir(const char *s)
     }
 
  retry:
-    gp.program_state.input_state = getdirInp;
+    svp.program_state.input_state = getdirInp;
     if (gi.in_doagain || *readchar_queue)
         dirsym = readchar();
     else
@@ -4114,7 +4114,7 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
 #endif
 
     if (OBJ_AT(x, y)) {
-        struct obj *otmp = gl.level.objects[x][y];
+        struct obj *otmp = svl.level.objects[x][y];
 
         Sprintf(buf, "Pick up %s", otmp->nexthere ? "items" : doname(otmp));
         mcmd_addmenu(win, MCMD_PICKUP, buf), ++K;
@@ -4648,7 +4648,7 @@ get_count(
     unsigned gc_flags)   /* control flags: GC_SAVEHIST, GC_ECHOFIRST */
 {
     char qbuf[QBUFSZ];
-    int key, save_input_state = gp.program_state.input_state;
+    int key, save_input_state = svp.program_state.input_state;
     long cnt = 0L, first = inkey ? (long) (inkey - '0') : 0L;
     boolean backspaced = FALSE, showzero = TRUE,
             /* should "Count: 123" go into message history? */
@@ -4670,7 +4670,7 @@ get_count(
         } else {
             /* if readchar() has already been called in this loop, it will
                have reset input_state; put that back to its previous value */
-            gp.program_state.input_state = save_input_state;
+            svp.program_state.input_state = save_input_state;
             key = readchar();
         }
 
@@ -4732,12 +4732,12 @@ parse(void)
 
     iflags.in_parse = TRUE;
     gc.command_count = 0;
-    gc.context.move = TRUE; /* assume next command will take game time */
+    svc.context.move = TRUE; /* assume next command will take game time */
     flush_screen(1); /* Flush screen buffer. Put the cursor on the hero. */
 
     /* affects readchar() behavior for ESC iff 'altmeta' option is On;
        is always reset to otherInp by readchar() */
-    gp.program_state.input_state = commandInp;
+    svp.program_state.input_state = commandInp;
 
     if (!gc.Cmd.num_pad || (foo = readchar()) == gc.Cmd.spkeys[NHKF_COUNT]) {
         /* if 'num_pad' is On then readchar() has just reset input_state;
@@ -4745,7 +4745,7 @@ parse(void)
            otherwise "n<count>ESC<character>" becomes "n<count>ESC" (with
            <character> not read from keyboard yet) rather than intended count
            and meta keystroke "n<count>M-<character>" */
-        gp.program_state.input_state = commandInp;
+        svp.program_state.input_state = commandInp;
 
         foo = get_count((char *) 0, '\0', LARGEST_INT,
                         &gc.command_count, GC_NOFLAGS);
@@ -4791,8 +4791,8 @@ hangup(
     int sig_unused UNUSED)   /* called as signal() handler, so sent
                               * at least one arg */
 {
-    if (gp.program_state.exiting)
-        gp.program_state.in_moveloop = 0;
+    if (svp.program_state.exiting)
+        svp.program_state.in_moveloop = 0;
     nhwindows_hangup();
 #ifdef SAFERHANGUP
     /* When using SAFERHANGUP, the done_hup flag is tested in rhack
@@ -4801,10 +4801,10 @@ hangup(
        protects against losing objects in the process of being thrown,
        but also potentially riskier because the disconnected program
        must continue running longer before attempting a hangup save. */
-    gp.program_state.done_hup++;
+    svp.program_state.done_hup++;
     /* defer hangup iff game appears to be in progress */
-    if (gp.program_state.in_moveloop
-        && gp.program_state.something_worth_saving)
+    if (svp.program_state.in_moveloop
+        && svp.program_state.something_worth_saving)
         return;
 #endif /* SAFERHANGUP */
     end_of_input();
@@ -4815,16 +4815,16 @@ end_of_input(void)
 {
 #ifdef NOSAVEONHANGUP
 #ifdef INSURANCE
-    if (flags.ins_chkpt && gp.program_state.something_worth_saving)
+    if (flags.ins_chkpt && svp.program_state.something_worth_saving)
         program_state.preserve_locks = 1; /* keep files for recovery */
 #endif
-    gp.program_state.something_worth_saving = 0; /* don't save */
+    svp.program_state.something_worth_saving = 0; /* don't save */
 #endif
 
 #ifndef SAFERHANGUP
-    if (!gp.program_state.done_hup++)
+    if (!svp.program_state.done_hup++)
 #endif
-        if (gp.program_state.something_worth_saving)
+        if (svp.program_state.something_worth_saving)
             (void) dosave0();
     if (soundprocs.sound_exit_nhsound)
         (*soundprocs.sound_exit_nhsound)("end_of_input");
@@ -4875,7 +4875,7 @@ readchar_core(coordxy *x, coordxy *y, int *mod)
         sym = '\033';
 #ifdef ALTMETA
     } else if (sym == '\033' && iflags.altmeta
-               && gp.program_state.input_state != otherInp) {
+               && svp.program_state.input_state != otherInp) {
         /* iflags.altmeta: treat two character ``ESC c'' as single `M-c' but
            only when we're called by parse() [possibly via get_count()]
            or getpos() [to support Alt+digit] or getdir() [for arrow keys
@@ -4895,7 +4895,7 @@ readchar_core(coordxy *x, coordxy *y, int *mod)
  readchar_done:
     /* next readchar() will be for an ordinary char unless parse()
        sets this back to non-zero */
-    gp.program_state.input_state = otherInp;
+    svp.program_state.input_state = otherInp;
     return (char) sym;
 }
 
@@ -4917,7 +4917,7 @@ readchar_poskey(coordxy *x, coordxy *y, int *mod)
 {
     char ch;
 
-    gp.program_state.input_state = getposInp;
+    svp.program_state.input_state = getposInp;
     ch = readchar_core(x, y, mod);
     return ch;
 }
@@ -4989,16 +4989,16 @@ dotravel_target(void)
 
     iflags.getloc_travelmode = FALSE;
 
-    gc.context.travel = 1;
-    gc.context.travel1 = 1;
-    gc.context.run = 8;
-    gc.context.nopick = 1;
+    svc.context.travel = 1;
+    svc.context.travel1 = 1;
+    svc.context.run = 8;
+    svc.context.nopick = 1;
     gd.domove_attempting |= DOMOVE_RUSH;
 
     if (!gm.multi)
         gm.multi = max(COLNO, ROWNO);
     u.last_str_turn = 0;
-    gc.context.mv = TRUE;
+    svc.context.mv = TRUE;
 
     domove();
     return ECMD_TIME;
@@ -5011,7 +5011,7 @@ doclicklook(void)
     if (!isok(gc.clicklook_cc.x, gc.clicklook_cc.y))
         return ECMD_OK;
 
-    gc.context.move = FALSE;
+    svc.context.move = FALSE;
     auto_describe(gc.clicklook_cc.x, gc.clicklook_cc.y);
 
     return ECMD_OK;
@@ -5171,7 +5171,7 @@ yn_function(
         res = altres;
     }
     /* in case we're called via getdir() which sets input_state */
-    gp.program_state.input_state = otherInp;
+    svp.program_state.input_state = otherInp;
     return res;
 }
 

@@ -234,7 +234,7 @@ struct instance_flags {
     boolean query_menu;    /* use a menu for yes/no queries */
     boolean showdamage;
     boolean debug_fuzzer;  /* fuzz testing */
-    boolean defer_plname;  /* X11 hack: askname() might not set gp.plname */
+    boolean defer_plname;  /* X11 hack: askname() might not set svp.plname */
     boolean herecmd_menu;  /* use menu when mouseclick on yourself */
     boolean invis_goldsym; /* gold symbol is ' '? */
     boolean in_lua;        /* executing a lua script */
