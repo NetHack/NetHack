@@ -1,26 +1,13 @@
-/* NetHack 3.7	steal.c	$NHDT-Date: 1707122967 2024/02/05 08:49:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.121 $ */
+/* NetHack 3.7	steal.c	$NHDT-Date: 1720895742 2024/07/13 18:35:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-staticfn const char *equipname(struct obj *);
 staticfn int unstolenarm(void);
 staticfn int stealarm(void);
 staticfn void worn_item_removal(struct monst *, struct obj *);
-
-staticfn const char *
-equipname(struct obj *otmp)
-{
-    return ((otmp == uarmu) ? shirt_simple_name(otmp)
-            : (otmp == uarmf) ? boots_simple_name(otmp)
-              : (otmp == uarms) ? shield_simple_name(otmp)
-                : (otmp == uarmg) ? gloves_simple_name(otmp)
-                  : (otmp == uarmc) ? cloak_simple_name(otmp)
-                    : (otmp == uarmh) ? helm_simple_name(otmp)
-                      : suit_simple_name(otmp));
-}
 
 /* proportional subset of gold; return value actually fits in an int */
 long
@@ -168,7 +155,7 @@ unstolenarm(void)
             break;
     gs.stealoid = 0;
     if (obj) {
-        You("finish taking off your %s.", equipname(obj));
+        You("finish taking off your %s.", armor_simple_name(obj));
     }
     return 0;
 }
@@ -319,6 +306,7 @@ worn_item_removal(
     struct obj *obj)
 {
     char objbuf[BUFSZ], article[20], *p;
+    const char *verb;
     int strip_art;
 
     Strcpy(objbuf, doname(obj));
@@ -342,7 +330,13 @@ worn_item_removal(
         && (!strncmp(p + 5, "left ", 5) || !strncmp(p + 5, "right ", 6)))
         (void) strsubst(p + 2, "on", "from");
 
-    pline("%s takes off %s.", Monnam(mon), objbuf);
+    /* slightly iffy for alternate weapon that isn't actively dual-wielded,
+       but it's better to alert the player to the change in equipment than
+       to suppress the message for that case */
+    verb = ((obj->owornmask & W_WEAPONS) != 0L) ? "disarms"
+           : ((obj->owornmask & W_ACCESSORY) != 0L) ? "removes"
+             : "takes off";
+    pline("%s %s %s.", Some_Monnam(mon), verb, objbuf);
     iflags.last_msg = PLNMSG_MON_TAKES_OFF_ITEM;
     /* removal might trigger more messages (due to loss of Lev|Fly;
        descending happens before the theft in progress finishes) */
@@ -363,6 +357,7 @@ steal(struct monst *mtmp, char *objnambuf)
     int tmp, could_petrify, armordelay, olddelay, icnt,
         named = 0, retrycnt = 0;
     boolean monkey_business = is_animal(mtmp->data),
+            seen = canspotmon(mtmp),
             was_doffing, was_punished = Punished;
 
     if (objnambuf)
@@ -375,10 +370,9 @@ steal(struct monst *mtmp, char *objnambuf)
        teleporting to safety could result in a previously visible thief
        no longer being visible; it could also be a case of a blinded
        hero being able to see via wearing the Eyes of the Overworld and
-       having those stolen; remember the name in order to avoid "It"
-       in the eventual "<Monnam> stole <item>" message; (the name might
-       already be "It"; if so, that's ok) */
-    Strcpy(Monnambuf, Monnam(mtmp));
+       having those stolen; remember the name as it is now; if unseen,
+       monkeys will be "It" and nymphs will be "Someone" */
+    Strcpy(Monnambuf, Some_Monnam(mtmp));
 
     /* food being eaten might already be used up but will not have
        been removed from inventory yet; we don't want to steal that,
@@ -496,7 +490,7 @@ steal(struct monst *mtmp, char *objnambuf)
             pline("%s tries to %s %s%s but gives up.", Monnambuf,
                   ROLL_FROM(how),
                   (otmp->owornmask & W_ARMOR) ? "your " : "",
-                  (otmp->owornmask & W_ARMOR) ? equipname(otmp)
+                  (otmp->owornmask & W_ARMOR) ? armor_simple_name(otmp)
                                               : yname(otmp));
             /* the fewer items you have, the less likely the thief
                is going to stick around to try again (0) instead of
@@ -541,7 +535,6 @@ steal(struct monst *mtmp, char *objnambuf)
             } else {
                 int curssv = otmp->cursed;
                 int slowly;
-                boolean seen = canspotmon(mtmp);
 
                 otmp->cursed = 0;
                 slowly = (armordelay >= 1 || gm.multi < 0);
@@ -552,7 +545,7 @@ steal(struct monst *mtmp, char *objnambuf)
                                  : !slowly ? "hand over"
                                    : was_doffing ? "continue removing"
                                      : "start removing",
-                                 equipname(otmp));
+                                 armor_simple_name(otmp));
                 else
                     urgent_pline("%s seduces you and %s off your %s.",
                                  !seen ? "She" : Adjmonnam(mtmp, "beautiful"),
@@ -560,7 +553,7 @@ steal(struct monst *mtmp, char *objnambuf)
                                  : !slowly ? "you take"
                                    : was_doffing ? "you continue taking"
                                      : "you start taking",
-                                 equipname(otmp));
+                                 armor_simple_name(otmp));
                 named++;
                 /* the following is to set multi for later on */
                 nomul(-armordelay);
@@ -580,6 +573,10 @@ steal(struct monst *mtmp, char *objnambuf)
             impossible("Tried to steal a strange worn thing. [%d]",
                        otmp->oclass);
         }
+        /* hero's blindfold might have just been stolen; if so, replace
+           cached "It" or "Someone" with Monnam */
+        if (!seen && canspotmon(mtmp))
+            Strcpy(Monnambuf, Monnam(mtmp));
     } else if (otmp->owornmask) { /* weapon or ball&chain */
         struct obj *item = otmp;
 
@@ -750,29 +747,29 @@ stealamulet(struct monst *mtmp)
         /* take off outer gear if we're targeting [hypothetical]
            quest artifact suit, shirt, gloves, or rings */
         if ((otmp == uarm || otmp == uarmu) && uarmc)
-            remove_worn_item(uarmc, FALSE);
+            worn_item_removal(mtmp, uarmc);
         if (otmp == uarmu && uarm)
-            remove_worn_item(uarm, FALSE);
+            worn_item_removal(mtmp, uarm);
         if ((otmp == uarmg || ((otmp == uright || otmp == uleft) && uarmg))
             && uwep) {
             /* gloves are about to be unworn; unwield weapon(s) first */
             if (u.twoweap)    /* remove_worn_item(uswapwep) indirectly */
-                remove_worn_item(uswapwep, FALSE); /* clears u.twoweap */
-            remove_worn_item(uwep, FALSE);
+                worn_item_removal(mtmp, uswapwep); /* clears u.twoweap */
+            worn_item_removal(mtmp, uwep);
         }
         if ((otmp == uright || otmp == uleft) && uarmg)
             /* calls Gloves_off() to handle wielded cockatrice corpse */
-            remove_worn_item(uarmg, FALSE);
+            worn_item_removal(mtmp, uarmg);
 
         /* finally, steal the target item */
         if (otmp->owornmask)
-            remove_worn_item(otmp, TRUE);
+            worn_item_removal(mtmp, otmp);
         if (otmp->unpaid)
             subfrombill(otmp, shop_keeper(*u.ushops));
         freeinv(otmp);
         Strcpy(buf, doname(otmp));
         (void) mpickobj(mtmp, otmp); /* could merge and free otmp but won't */
-        pline("%s steals %s!", Monnam(mtmp), buf);
+        pline("%s steals %s!", Some_Monnam(mtmp), buf);
         if (can_teleport(mtmp->data) && !tele_restrict(mtmp))
             (void) rloc(mtmp, RLOC_MSG);
         (void) encumber_msg();

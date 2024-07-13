@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_wear.c	$NHDT-Date: 1702017586 2023/12/08 06:39:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.175 $ */
+/* NetHack 3.7	do_wear.c	$NHDT-Date: 1720895740 2024/07/13 18:35:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.188 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1853,7 +1853,8 @@ armoroff(struct obj *otmp)
         }
         if (what) {
             /* sizeof offdelaybuf == 60; increase it if this becomes longer */
-            Sprintf(offdelaybuf, "You finish taking off your %s.", what);
+            Snprintf(offdelaybuf, sizeof offdelaybuf,
+                     "You finish taking off your %s.", what);
             gn.nomovemsg = offdelaybuf;
         }
     } else {

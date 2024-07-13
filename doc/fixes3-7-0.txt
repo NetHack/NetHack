@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1450 $ $NHDT-Date: 1720074479 2024/07/04 06:27:59 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1455 $ $NHDT-Date: 1720895738 2024/07/13 18:35:38 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1439,6 +1439,12 @@ using #loot -> 'i'n to put multiple items into a shop-owned container would
 	don't-sell state was being reset for each item so 'a' and 'q' didn't
 	stick beyond the current one
 join wall "spines" with walls of water and lava
+some theft messages by nymphs force "she", others use default monster naming
+	which yields "it" when unseen; change the latter to "someone" which
+	still differs from "she" in a series of messages but isn't as jarring
+if a nymph stole worn armor and got killed (perhaps by pet) before hero's next
+	turn, feedback would be "You finish taking off your suit." regardless
+	of the type of armor being taken off
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
