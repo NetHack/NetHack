@@ -651,8 +651,6 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
         Sprintf(buf, "interior of %s", mon_nam(u.ustuck));
         pm = u.ustuck->data;
     } else if (glyph_is_monster(glyph)) {
-        gb.bhitpos.x = x;
-        gb.bhitpos.y = y;
         if ((mtmp = m_at(x, y)) != 0) {
             look_at_monster(buf, monbuf, mtmp, x, y);
             pm = mtmp->data;
@@ -1901,8 +1899,6 @@ look_all(
                 if (glyph_is_monster(glyph)) {
                     struct monst *mtmp;
 
-                    gb.bhitpos.x = x; /* [is this actually necessary?] */
-                    gb.bhitpos.y = y;
                     if (u_at(x, y) && canspotself()) {
                         (void) self_lookat(lookbuf);
                         ++count;
