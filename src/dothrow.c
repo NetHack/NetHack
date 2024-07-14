@@ -15,6 +15,7 @@ staticfn struct obj *find_launcher(struct obj *);
 staticfn int gem_accept(struct monst *, struct obj *);
 staticfn boolean toss_up(struct obj *, boolean) NONNULLARG1;
 staticfn void sho_obj_return_to_u(struct obj * obj);
+staticfn void throwit_return(boolean);
 staticfn struct obj *return_throw_to_inv(struct obj *, long, boolean,
                                        struct obj *);
 staticfn void tmiss(struct obj *, struct monst *, boolean);
@@ -1450,6 +1451,14 @@ sho_obj_return_to_u(struct obj *obj)
     }
 }
 
+staticfn void
+throwit_return(boolean clear_thrownobj)
+{
+    iflags.returning_missile = (genericptr_t) 0;
+    if (clear_thrownobj)
+        gt.thrownobj = (struct obj *) 0;
+}
+
 /* throw an object, NB: obj may be consumed in the process */
 void
 throwit(struct obj *obj,
@@ -1460,7 +1469,7 @@ throwit(struct obj *obj,
 {
     struct monst *mon;
     int range, urange;
-    boolean crossbowing, clear_thrownobj = FALSE,
+    boolean crossbowing,
             impaired = (Confusion || Stunned || Blind
                         || Hallucination || Fumbling),
             tethered_weapon = (obj->otyp == AKLYS && (wep_mask & W_WEP) != 0);
@@ -1538,8 +1547,8 @@ throwit(struct obj *obj,
         } else {
             hitfloor(obj, TRUE);
         }
-        clear_thrownobj = TRUE;
-        goto throwit_return;
+        throwit_return(TRUE);
+        return;
 
     } else if (obj->otyp == BOOMERANG && !Underwater) {
         if (Is_airlevel(&u.uz) || Levitation)
@@ -1549,8 +1558,8 @@ throwit(struct obj *obj,
         if (mon == &gy.youmonst) { /* the thing was caught */
             exercise(A_DEX, TRUE);
             obj = return_throw_to_inv(obj, wep_mask, twoweap, oldslot);
-            clear_thrownobj = TRUE;
-            goto throwit_return;
+            throwit_return(TRUE);
+            return;
         }
     } else {
         /* crossbow range is independent of strength */
@@ -1625,7 +1634,8 @@ throwit(struct obj *obj,
                we're about to return */
             if (tethered_weapon)
                 tmp_at(DISP_END, 0);
-            goto throwit_return;
+            throwit_return(FALSE);
+            return;
         }
     }
 
@@ -1633,8 +1643,8 @@ throwit(struct obj *obj,
         boolean obj_gone;
 
         if (mon->isshk && obj->where == OBJ_MINVENT && obj->ocarry == mon) {
-            clear_thrownobj = TRUE;
-            goto throwit_return; /* alert shk caught it */
+            throwit_return(TRUE); /* alert shk caught it */
+            return;
         }
         (void) snuff_candle(obj);
         gn.notonhead = (gb.bhitpos.x != mon->mx || gb.bhitpos.y != mon->my);
@@ -1658,11 +1668,12 @@ throwit(struct obj *obj,
             tmp_at(DISP_END, 0);
     } else if (u.uswallow && !iflags.returning_missile) {
  swallowit:
-        if (obj != uball)
+        if (obj != uball) {
             (void) mpickobj(u.ustuck, obj); /* clears 'gt.thrownobj' */
-        else
-            clear_thrownobj = TRUE;
-        goto throwit_return;
+            throwit_return(FALSE);
+        } else
+            throwit_return(TRUE);
+        return;
     } else {
         /* Mjollnir must be wielded to be thrown--caller verifies this;
            aklys must be wielded as primary to return when thrown */
@@ -1712,8 +1723,8 @@ throwit(struct obj *obj,
                     if (!ship_object(obj, u.ux, u.uy, FALSE))
                         dropy(obj);
                 }
-                clear_thrownobj = TRUE;
-                goto throwit_return;
+                throwit_return(TRUE);
+                return;
             } else {
                 if (tethered_weapon)
                     tmp_at(DISP_END, 0);
@@ -1742,8 +1753,8 @@ throwit(struct obj *obj,
             tmp_at(DISP_END, 0);
             breakmsg(obj, cansee(gb.bhitpos.x, gb.bhitpos.y));
             if (breakobj(obj, gb.bhitpos.x, gb.bhitpos.y, TRUE, TRUE)) {
-                clear_thrownobj = TRUE;
-                goto throwit_return;
+                throwit_return(TRUE);
+                return;
             }
         }
         if (!Deaf && !Underwater) {
@@ -1755,8 +1766,8 @@ throwit(struct obj *obj,
             }
         }
         if (flooreffects(obj, gb.bhitpos.x, gb.bhitpos.y, "fall")) {
-            clear_thrownobj = TRUE;
-            goto throwit_return;
+            throwit_return(TRUE);
+            return;
         }
         obj_no_longer_held(obj);
         if (mon && mon->isshk && is_pick(obj)) {
@@ -1765,13 +1776,13 @@ throwit(struct obj *obj,
             if (*u.ushops || obj->unpaid)
                 check_shop_obj(obj, gb.bhitpos.x, gb.bhitpos.y, FALSE);
             (void) mpickobj(mon, obj); /* may merge and free obj */
-            clear_thrownobj = TRUE;
-            goto throwit_return;
+            throwit_return(TRUE);
+            return;
         }
         (void) snuff_candle(obj);
         if (!mon && ship_object(obj, gb.bhitpos.x, gb.bhitpos.y, FALSE)) {
-            clear_thrownobj = TRUE;
-            goto throwit_return;
+            throwit_return(TRUE);
+            return;
         }
         gt.thrownobj = (struct obj *) 0;
         place_object(obj, gb.bhitpos.x, gb.bhitpos.y);
@@ -1797,10 +1808,7 @@ throwit(struct obj *obj,
             gv.vision_full_recalc = 1;
     }
 
- throwit_return:
-    iflags.returning_missile = (genericptr_t) 0;
-    if (clear_thrownobj)
-        gt.thrownobj = (struct obj *) 0;
+    throwit_return(FALSE);
     return;
 }
 
