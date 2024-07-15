@@ -1445,6 +1445,10 @@ some theft messages by nymphs force "she", others use default monster naming
 if a nymph stole worn armor and got killed (perhaps by pet) before hero's next
 	turn, feedback would be "You finish taking off your suit." regardless
 	of the type of armor being taken off
+when setting an option interactively [via O or 3.7's mO], if the particular
+	option uses a prompt to get a line of input (for compounds: 'fruit',
+	'scores', most numeric ones), input was treated as a comma-separated
+	list of option[:value] rather than just the new value of that option
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

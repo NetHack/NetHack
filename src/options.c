@@ -478,8 +478,19 @@ parseoptions(
     using_alias = FALSE;
     go.opt_initial = tinitial;
     go.opt_from_file = tfrom_file;
-    if ((op = strchr(opts, ',')) != 0) {
+    /*
+     * Process elements of comma-separated list in right to left order.
+     * When some options are set interactively--notably various compound
+     * options that issue a prompt for a value--they use parseoptions()
+     * to handle setting the new value.  For those, 'tinitial' is False
+     * and if user tries to supply a comma-separated list, it will be
+     * treated as part of the current option, probably failing to parse.
+     */
+    if (tinitial && (op = strchr(opts, ',')) != 0) {
         *op++ = 0;
+        /* current element remains pending while the rest of the line gets
+           handled recursively; if the rest of line contains any commas,
+           then the process will recurse deeper as it is processed */
         if (!parseoptions(op, go.opt_initial, go.opt_from_file))
             retval = FALSE;
     }
@@ -8573,8 +8584,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
     anything any;
     menu_item *pick_list;
     int indexoffset, startpass, endpass;
-    boolean setinitial = FALSE, fromfile = FALSE,
-            gavehelp = FALSE, skiphelp = !iflags.cmdassist;
+    boolean gavehelp = FALSE, skiphelp = !iflags.cmdassist;
     int clr = NO_COLOR;
 
     if (iflags.menu_requested) {
@@ -8731,7 +8741,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
                 /* boolean option */
                 Sprintf(buf, "%s%s", *allopt[opt_indx].addr ? "!" : "",
                         allopt[opt_indx].name);
-                (void) parseoptions(buf, setinitial, fromfile);
+                (void) parseoptions(buf, FALSE, FALSE);
             } else {
                 /* compound option */
                 int k = opt_indx, reslt;
@@ -8755,7 +8765,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
                     (void) strncat(eos(buf), abuf,
                                    (sizeof buf - 1 - strlen(buf)));
                     /* pass the buck */
-                    (void) parseoptions(buf, setinitial, fromfile);
+                    (void) parseoptions(buf, FALSE, FALSE);
                 }
             }
             if (wc_supported(allopt[opt_indx].name)
