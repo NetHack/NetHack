@@ -1374,7 +1374,7 @@ m_consume_obj(struct monst *mtmp, struct obj *otmp)
                                               || corpsenm == PM_LARGE_MIMIC
                                               || corpsenm == PM_GIANT_MIMIC));
         slimer = (otmp->otyp == GLOB_OF_GREEN_SLIME);
-        poly = polyfodder(otmp);
+        poly = polyfood(otmp);
         grow = mlevelgain(otmp);
         heal = mhealup(otmp);
         eyes = (otmp->otyp == CARROT);
