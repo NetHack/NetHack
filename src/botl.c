@@ -427,7 +427,7 @@ botl_score(void)
 
     /* hidden_gold(False): only gold in containers whose contents are known */
     umoney = money_cnt(gi.invent) + hidden_gold(FALSE);
-    /* don't include initial gold; don't impose penalty if its all gone */
+    /* don't include initial gold; don't impose penalty if it's all gone */
     if ((umoney -= u.umoney0) < 0L)
         umoney = 0L;
     depthbonus = 50 * (deepest - 1)
@@ -508,8 +508,8 @@ staticfn void split_clridx(int, int *, int *);
 staticfn boolean is_ltgt_percentnumber(const char *);
 staticfn boolean has_ltgt_percentnumber(const char *);
 staticfn int splitsubfields(char *, char ***, int);
-staticfn boolean is_fld_arrayvalues(const char *, const char *const *, int, int,
-                                  int *);
+staticfn boolean is_fld_arrayvalues(const char *, const char *const *,
+                                    int, int, int *);
 staticfn int query_arrayvalue(const char *, const char *const *, int, int);
 staticfn void status_hilite_add_threshold(int, struct hilite_s *);
 staticfn boolean parse_status_hl2(char (*)[QBUFSZ], boolean);
@@ -520,7 +520,7 @@ staticfn unsigned long str2conditionbitmask(char *);
 staticfn boolean parse_condition(char (*)[QBUFSZ], int);
 staticfn char *hlattr2attrname(int, char *, size_t);
 staticfn void status_hilite_linestr_add(int, struct hilite_s *, unsigned long,
-                                      const char *);
+                                        const char *);
 staticfn void status_hilite_linestr_done(void);
 staticfn int status_hilite_linestr_countfield(int);
 staticfn void status_hilite_linestr_gather_conditions(void);
@@ -529,7 +529,7 @@ staticfn char *status_hilite2str(struct hilite_s *);
 staticfn int status_hilite_menu_choose_field(void);
 staticfn int status_hilite_menu_choose_behavior(int);
 staticfn int status_hilite_menu_choose_updownboth(int, const char *, boolean,
-                                                boolean);
+                                                  boolean);
 staticfn boolean status_hilite_menu_add(int);
 staticfn boolean status_hilite_remove(int);
 staticfn boolean status_hilite_menu_fld(int);
