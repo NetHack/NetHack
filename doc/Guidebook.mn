@@ -483,7 +483,7 @@ A closed door, or a spellbook containing a spell you may be able to learn.
 Your character or a human or an elf.
 .lp \f(CR$\fP
 A pile of gold.
-.lp \f(CR\(ha\fP \" \(ah == 'hat' == circumflex accent == caret ^
+.lp \f(CR\(ha\fP \" \(ha == 'hat' == full sized caret ^
 A trap (once you have detected it).
 .lp \f(CR)\fP
 A weapon.
