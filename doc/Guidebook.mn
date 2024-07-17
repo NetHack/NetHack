@@ -523,7 +523,7 @@ or a pool of lava or a wall of lava.
 An opulent throne.
 .lp "\f(CRa\fP-\f(CRz\fP\ \ \fIand\fP"
 .lp "\f(CRA\fP-\f(CRZ\fP\ \ \fIand\fP"
-.lp "\f(CR@&\(aq\fP" \" \(aq == apostrophe / single quote
+.lp "\f(CR@&\(aq:;\fP" \" \(aq == apostrophe / single quote
 Letters and certain other symbols represent the various inhabitants
 of the Mazes of Menace.
 Watch out, they can be nasty and vicious.
