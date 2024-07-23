@@ -284,9 +284,9 @@ digcheck_fail_message(enum digcheck_result digresult, struct monst *madeby,
         break;
     case DIGCHECK_FAIL_CANTDIG:
     case DIGCHECK_FAIL_TOOHARD:
+    case DIGCHECK_FAIL_UNDESTROYABLETRAP:
         pline_The("%s here is too hard to %s.", surface(x, y), verb);
         break;
-    case DIGCHECK_FAIL_UNDESTROYABLETRAP:
     case DIGCHECK_FAIL_WATERLEVEL:
         pline_The("%s splashes and subsides.", hliquid("water"));
         break;
