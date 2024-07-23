@@ -1,4 +1,4 @@
-/* NetHack 3.7	detect.c	$NHDT-Date: 1715284441 2024/05/09 19:54:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.178 $ */
+/* NetHack 3.7	detect.c	$NHDT-Date: 1721684299 2024/07/22 21:38:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.180 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1914,7 +1914,7 @@ dosearch0(int aflag) /* intrinsic autosearch vs explicit searching */
                 if (u_at(x, y))
                     continue;
 
-                if (Blind && !aflag)
+                if (!aflag && (Blind || visible_region_at(x, y)))
                     feel_location(x, y);
                 if (levl[x][y].typ == SDOOR) {
                     if (rnl(7 - fund))
@@ -2022,6 +2022,11 @@ premap_detect(void)
     }
 }
 
+/* used to see under visible gas/cloud regions; caller must declare cmaptmp */
+#define glyph_is_gascloud(glyph) \
+    (glyph_is_cmap(glyph) && ((cmaptmp = glyph_to_cmap(glyph)) == S_cloud \
+                              || cmaptmp == S_poisoncloud))
+
 staticfn int
 reveal_terrain_getglyph(
     coordxy x, coordxy y,
@@ -2029,14 +2034,16 @@ reveal_terrain_getglyph(
     int default_glyph,
     unsigned which_subset)
 {
+    struct trap *t;
+    struct monst *mtmp;
     int glyph, levl_glyph;
     uchar seenv;
     boolean keep_traps = (which_subset & TER_TRP) != 0,
             keep_objs = (which_subset & TER_OBJ) != 0,
             keep_mons = (which_subset & TER_MON) != 0,
             full = (which_subset & TER_FULL) != 0;
-    struct monst *mtmp;
-    struct trap *t;
+    int cmaptmp = 0; /* used by glyph_is_gascloud() macro */
+    NhRegion *reg = visible_region_at(x, y);
 
     /* for 'full', show the actual terrain for the entire level,
        otherwise what the hero remembers for seen locations with
@@ -2059,23 +2066,38 @@ reveal_terrain_getglyph(
         glyph = !swallowed ? glyph_at(x, y) : levl_glyph;
         if (keep_mons && u_at(x, y) && swallowed)
             glyph = mon_to_glyph(u.ustuck, rn2_on_display_rng);
-        else if (((glyph_is_monster(glyph)
-                   || glyph_is_warning(glyph)) && !keep_mons)
+        else if ((!keep_mons && (glyph_is_monster(glyph)
+                                 || glyph_is_warning(glyph)))
                  || glyph_is_swallow(glyph))
             glyph = levl_glyph;
-        if (((glyph_is_object(glyph) && !keep_objs)
+        if (((!keep_objs && glyph_is_object(glyph))
              || glyph_is_invisible(glyph))
             && keep_traps && !covers_traps(x, y)) {
             if ((t = t_at(x, y)) != 0 && t->tseen)
                 glyph = trap_to_glyph(t);
         }
-        if ((glyph_is_object(glyph) && !keep_objs)
-            || (glyph_is_trap(glyph) && !keep_traps)
+        if ((!keep_objs && glyph_is_object(glyph))
+            /* we either show both traps and visible regions (trap if both
+               are present at the same spot) or neither traps nor regions */
+            || (!keep_traps && (glyph_is_trap(glyph)
+                                || (reg && glyph_is_gascloud(glyph))))
             || glyph_is_invisible(glyph)) {
             if (!seenv) {
-                glyph = default_glyph;
+                /* it's possible to have a visible region shown at an
+                   otherwise unexplored location (cast stinking cloud
+                   through unexplored corridor into lit room, then approach
+                   far enough to be adjacent to the cloud without having
+                   seen the corridor underneath it) */
+                glyph = !reg ? default_glyph : GLYPH_UNEXPLORED;
             } else if (svl.lastseentyp[x][y] == levl[x][y].typ) {
                 glyph = back_to_glyph(x, y);
+            } else if (keep_traps && reg && glyph_is_gascloud(glyph)) {
+                t = t_at(x, y);
+                glyph = (t && t->tseen) ? trap_to_glyph(t)
+                                        : back_to_glyph(x, y);
+                /* FIXME? what about objects temporarily hidden by regions?
+                   when objects are being shown, shouldn't showing them take
+                   precedence over showing the region, just like traps? */
             } else {
                 /* look for a mimic here posing as furniture;
                    if we don't find one, we'll have to fake it */
@@ -2115,17 +2137,21 @@ reveal_terrain_getglyph(
     return glyph;
 }
 
+#undef glyph_is_gascloud
+
 #ifdef DUMPLOG
 void
 dump_map(void)
 {
+    char buf[COLBUFSZ];
     coordxy x, y;
     int glyph, skippedrows, lastnonblank;
-    unsigned subset = TER_MAP | TER_TRP | TER_OBJ | TER_MON;
-    int default_glyph = cmap_to_glyph(svl.level.flags.arboreal ? S_tree
-                                                             : S_stone);
-    char buf[COLBUFSZ];
     boolean blankrow, toprow;
+    unsigned subset = TER_MAP | TER_TRP | TER_OBJ | TER_MON;
+    /* cmap_to_glyph() evaluates its argument multiple times, so pull the
+       tree vs stone conditional out of it */
+    nhsym default_sym = svl.level.flags.arboreal ? S_tree : S_stone;
+    int default_glyph = cmap_to_glyph(default_sym);
 
     /*
      * Squeeze out excess vertical space when dumping the map.
