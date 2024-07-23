@@ -1449,6 +1449,8 @@ when setting an option interactively [via O or 3.7's mO], if the particular
 	option uses a prompt to get a line of input (for compounds: 'fruit',
 	'scores', most numeric ones), input was treated as a comma-separated
 	list of option[:value] rather than just the new value of that option
+when there was a trap on a no-dig level, the floor beneath it was always
+	"too hard to dig into", making it impossible to remove the trap
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
