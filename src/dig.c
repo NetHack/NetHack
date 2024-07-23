@@ -234,7 +234,7 @@ dig_check(struct monst *madeby, coordxy x, coordxy y)
         return DIGCHECK_FAIL_UNDESTROYABLETRAP;
     } else if (!Can_dig_down(&u.uz) && !levl[x][y].candig) {
         if (ttmp) {
-            if (ttmp->ttyp != HOLE && !is_pit(ttmp->ttyp))
+            if (!is_hole(ttmp->ttyp) && !is_pit(ttmp->ttyp))
                 return DIGCHECK_PASSED_DESTROY_TRAP;
             else
                 return DIGCHECK_FAIL_CANTDIG;
