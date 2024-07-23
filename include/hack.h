@@ -327,6 +327,28 @@ struct _create_particular_data {
     boolean sleeping, saddled, invisible, hidden;
 };
 
+/* dig_check() results */
+
+enum digcheck_result {
+    DIGCHECK_PASSED                 = 1,
+    DIGCHECK_PASSED_DESTROY_TRAP    = 2,
+    DIGCHECK_PASSED_PITONLY         = 3,
+    DIGCHECK_FAILED                 = 4,
+    DIGCHECK_FAIL_ONSTAIRS          = DIGCHECK_FAILED,
+    DIGCHECK_FAIL_ONLADDER,
+    DIGCHECK_FAIL_THRONE,
+    DIGCHECK_FAIL_ALTAR,
+    DIGCHECK_FAIL_AIRLEVEL,
+    DIGCHECK_FAIL_WATERLEVEL,
+    DIGCHECK_FAIL_TOOHARD,
+    DIGCHECK_FAIL_UNDESTROYABLETRAP,
+    DIGCHECK_FAIL_CANTDIG,
+    DIGCHECK_FAIL_BOULDER,
+    DIGCHECK_FAIL_OBJ_POOL_OR_TRAP
+};
+
+    
+
 /* Dismount: causes for why you are no longer riding */
 enum dismount_types {
     DISMOUNT_GENERIC  = 0,

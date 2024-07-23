@@ -205,59 +205,97 @@ is_digging(void)
 #define BY_YOU (&gy.youmonst)
 #define BY_OBJECT ((struct monst *) 0)
 
-boolean
-dig_check(struct monst *madeby, boolean verbose, coordxy x, coordxy y)
+enum digcheck_result
+dig_check(struct monst *madeby, coordxy x, coordxy y)
 {
     struct trap *ttmp = t_at(x, y);
-    const char *verb =
-        (madeby == BY_YOU && uwep && is_axe(uwep)) ? "chop" : "dig in";
 
     if (On_stairs(x, y)) {
         stairway *stway = stairway_at(x, y);
         if (stway->isladder) {
-            if (verbose)
-                pline_The("ladder resists your effort.");
-        } else if (verbose)
-            pline_The("stairs are too hard to %s.", verb);
-        return FALSE;
+            return DIGCHECK_FAIL_ONLADDER;
+        } else {
+            return DIGCHECK_FAIL_ONSTAIRS;
+        }
     } else if (IS_THRONE(levl[x][y].typ) && madeby != BY_OBJECT) {
-        if (verbose)
-            pline_The("throne is too hard to break apart.");
-        return FALSE;
+        return DIGCHECK_FAIL_THRONE;
     } else if (IS_ALTAR(levl[x][y].typ)
                && (madeby != BY_OBJECT
                    || (altarmask_at(x, y) & AM_SANCTUM) != 0)) {
-        if (verbose)
-            pline_The("altar is too hard to break apart.");
-        return FALSE;
+        return DIGCHECK_FAIL_ALTAR;
     } else if (Is_airlevel(&u.uz)) {
-        if (verbose)
-            You("cannot %s thin air.", verb);
-        return FALSE;
+        return DIGCHECK_FAIL_AIRLEVEL;
     } else if (Is_waterlevel(&u.uz)) {
-        if (verbose)
-            pline_The("%s splashes and subsides.", hliquid("water"));
-        return FALSE;
+        return DIGCHECK_FAIL_WATERLEVEL;
     } else if ((IS_ROCK(levl[x][y].typ) && levl[x][y].typ != SDOOR
-                && (levl[x][y].wall_info & W_NONDIGGABLE) != 0)
-               || (ttmp
-                   && (undestroyable_trap(ttmp->ttyp)
-                       || (!Can_dig_down(&u.uz) && !levl[x][y].candig)))) {
-        if (verbose)
-            pline_The("%s here is too hard to %s.", surface(x, y), verb);
-        return FALSE;
+                && (levl[x][y].wall_info & W_NONDIGGABLE) != 0)) {
+        return DIGCHECK_FAIL_TOOHARD;
+    } else if (ttmp && undestroyable_trap(ttmp->ttyp)) {
+        return DIGCHECK_FAIL_UNDESTROYABLETRAP;
+    } else if (!Can_dig_down(&u.uz) && !levl[x][y].candig) {
+        if (ttmp) {
+            if (ttmp->ttyp != HOLE && !is_pit(ttmp->ttyp))
+                return DIGCHECK_PASSED_DESTROY_TRAP;
+            else
+                return DIGCHECK_FAIL_CANTDIG;
+        } else {
+            return DIGCHECK_PASSED_PITONLY;
+        }
     } else if (sobj_at(BOULDER, x, y)) {
-        if (verbose)
-            There("isn't enough room to %s here.", verb);
-        return FALSE;
+        return DIGCHECK_FAIL_BOULDER;
     } else if (madeby == BY_OBJECT
                /* the block against existing traps is mainly to
                   prevent broken wands from turning holes into pits */
                && (ttmp || is_pool_or_lava(x, y))) {
         /* digging by player handles pools separately */
-        return FALSE;
+        return DIGCHECK_FAIL_OBJ_POOL_OR_TRAP;
     }
-    return TRUE;
+    return DIGCHECK_PASSED;
+}
+
+void
+digcheck_fail_message(enum digcheck_result digresult, struct monst *madeby,
+                      coordxy x, coordxy y)
+{
+    const char *verb =
+        (madeby == BY_YOU && uwep && is_axe(uwep)) ? "chop" : "dig in";
+
+    if (digresult < DIGCHECK_FAILED)
+        return;
+
+    switch (digresult) {
+    case DIGCHECK_FAIL_AIRLEVEL:
+        You("cannot %s thin air.", verb);
+        break;
+    case DIGCHECK_FAIL_ALTAR:
+        pline_The("altar is too hard to break apart.");
+        break;
+    case DIGCHECK_FAIL_BOULDER:
+        There("isn't enough room to %s here.", verb);
+        break;
+    case DIGCHECK_FAIL_ONLADDER:
+        pline_The("ladder resists your effort.");
+        break;
+    case DIGCHECK_FAIL_ONSTAIRS:
+        pline_The("stairs are too hard to %s.", verb);
+        break;
+    case DIGCHECK_FAIL_THRONE:
+        pline_The("throne is too hard to break apart.");
+        break;
+    case DIGCHECK_FAIL_CANTDIG:
+    case DIGCHECK_FAIL_TOOHARD:
+        pline_The("%s here is too hard to %s.", surface(x, y), verb);
+        break;
+    case DIGCHECK_FAIL_UNDESTROYABLETRAP:
+    case DIGCHECK_FAIL_WATERLEVEL:
+        pline_The("%s splashes and subsides.", hliquid("water"));
+        break;
+    case DIGCHECK_FAIL_OBJ_POOL_OR_TRAP:
+    case DIGCHECK_PASSED:
+    case DIGCHECK_PASSED_PITONLY:
+    case DIGCHECK_PASSED_DESTROY_TRAP:
+        break;
+    }
 }
 
 staticfn int
@@ -267,6 +305,7 @@ dig(void)
     coordxy dpx = svc.context.digging.pos.x, dpy = svc.context.digging.pos.y;
     boolean ispick = uwep && is_pick(uwep);
     const char *verb = (!uwep || is_pick(uwep)) ? "dig into" : "chop through";
+    enum digcheck_result dcresult = DIGCHECK_PASSED;
 
     lev = &levl[dpx][dpy];
     /* perhaps a nymph stole your pick-axe while you were busy digging */
@@ -278,8 +317,11 @@ dig(void)
         return 0;
 
     if (svc.context.digging.down) {
-        if (!dig_check(BY_YOU, TRUE, u.ux, u.uy))
+        dcresult = dig_check(BY_YOU, u.ux, u.uy);
+        if (dcresult >= DIGCHECK_FAILED) {
+            digcheck_fail_message(dcresult, BY_YOU, u.ux, u.uy);
             return 0;
+        }
     } else { /* !svc.context.digging.down */
         if (IS_TREE(lev->typ) && !may_dig(dpx, dpy)
             && dig_typ(uwep, dpx, dpy) == DIGTYP_TREE) {
@@ -367,6 +409,17 @@ dig(void)
                 deltrap(ttmp);
                 reset_utrap(TRUE); /* release from trap, maybe Lev or Fly */
             }
+            /* we haven't made any progress toward a pit yet */
+            svc.context.digging.effort = 0;
+            return 0;
+        } else if (ttmp && dcresult == DIGCHECK_PASSED_DESTROY_TRAP) {
+            const char *ttmpname = trapname(ttmp->ttyp, FALSE);
+
+            if (ispick)
+                You("destroy %s with %s.",
+                    ttmp->tseen ? the(ttmpname) : an(ttmpname),
+                    yobjnam(uwep, (const char *) 0));
+            deltrap(ttmp);
             /* we haven't made any progress toward a pit yet */
             svc.context.digging.effort = 0;
             return 0;
@@ -637,6 +690,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
     }
     shopdoor = IS_DOOR(lev->typ) && *in_rooms(x, y, SHOPBASE);
     oldobjs = svl.level.objects[x][y];
+
     ttmp = maketrap(x, y, ttyp);
     if (!ttmp)
         return;
@@ -836,7 +890,8 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
     schar typ, old_typ;
     coordxy dig_x, dig_y;
     boolean nohole, retval = FALSE;
-
+    enum digcheck_result dig_check_result;
+ 
     if (!cc) {
         dig_x = u.ux;
         dig_y = u.uy;
@@ -849,7 +904,10 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
 
     ttmp = t_at(dig_x, dig_y);
     lev = &levl[dig_x][dig_y];
-    nohole = (!Can_dig_down(&u.uz) && !lev->candig);
+    dig_check_result = dig_check(BY_YOU, dig_x, dig_y);
+    /* nohole = (!Can_dig_down(&u.uz) && !lev->candig); */
+    nohole = (dig_check_result == DIGCHECK_FAIL_CANTDIG
+                  || dig_check_result == DIGCHECK_FAIL_TOOHARD);
     old_typ = lev->typ;
 
     if ((ttmp && (undestroyable_trap(ttmp->ttyp) || nohole))
@@ -952,7 +1010,9 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
             }
 
             /* finally we get to make a hole */
-            if (nohole || pit_only)
+            if (nohole || pit_only
+                || dig_check_result == DIGCHECK_PASSED_DESTROY_TRAP
+                || dig_check_result == DIGCHECK_PASSED_PITONLY)
                 digactualhole(dig_x, dig_y, BY_YOU, PIT);
             else
                 digactualhole(dig_x, dig_y, BY_YOU, HOLE);

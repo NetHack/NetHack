@@ -498,7 +498,9 @@ extern int wiz_mgender(void);
 extern int dig_typ(struct obj *, coordxy, coordxy);
 extern boolean is_digging(void);
 extern int holetime(void);
-extern boolean dig_check(struct monst *, boolean, coordxy, coordxy);
+extern enum digcheck_result dig_check(struct monst *, coordxy, coordxy);
+extern void digcheck_fail_message(enum digcheck_result, struct monst *,
+                                  coordxy, coordxy);
 extern void digactualhole(coordxy, coordxy, struct monst *, int);
 extern boolean dighole(boolean, boolean, coord *);
 extern int use_pick_axe(struct obj *) NONNULLARG1;
