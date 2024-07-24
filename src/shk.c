@@ -42,6 +42,8 @@ struct sortbill_item {
 typedef struct sortbill_item Bill;
 
 staticfn void makekops(coord *);
+staticfn void getcad(struct monst *, const char *, coordxy, coordxy, boolean,
+                     boolean, boolean);
 staticfn void call_kops(struct monst *, boolean);
 staticfn void kops_gone(boolean);
 
@@ -5040,6 +5042,42 @@ makekops(coord *mm)
     }
 }
 
+staticfn void
+getcad(
+    struct monst *shkp, const char *dmgstr, coordxy x, coordxy y,
+    boolean uinshp, boolean animal, boolean pursue)
+{
+    boolean dugwall = (!strcmp(dmgstr, "dig into")    /* wand */
+                    || !strcmp(dmgstr, "damage")); /* pick-axe */
+
+    if (muteshk(shkp)) {
+        if (animal && !helpless(shkp))
+            yelp(shkp);
+    } else if (pursue || uinshp || !um_dist(x, y, 1)) {
+        if (!Deaf) {
+            SetVoice(shkp, 0, 80, 0);
+            verbalize("How dare you %s my %s?", dmgstr,
+                        dugwall ? "shop" : "door");
+        } else {
+            pline("%s is %s that you decided to %s %s %s!",
+                    Shknam(shkp), ROLL_FROM(angrytexts),
+                    dmgstr, noit_mhis(shkp), dugwall ? "shop" : "door");
+        }
+    } else {
+        if (!Deaf) {
+            pline("%s shouts:", Shknam(shkp));
+            SetVoice(shkp, 0, 80, 0);
+            verbalize("Who dared %s my %s?", dmgstr,
+                        dugwall ? "shop" : "door");
+        } else {
+            pline("%s is %s that someone decided to %s %s %s!",
+                    Shknam(shkp), ROLL_FROM(angrytexts),
+                    dmgstr, noit_mhis(shkp), dugwall ? "shop" : "door");
+        }
+    }
+    hot_pursuit(shkp);
+}
+
 void
 pay_for_damage(const char *dmgstr, boolean cant_mollify)
 {
@@ -5048,8 +5086,6 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
     boolean uinshp = (*u.ushops != '\0');
     char qbuf[80];
     coordxy x, y;
-    boolean dugwall = (!strcmp(dmgstr, "dig into")    /* wand */
-                       || !strcmp(dmgstr, "damage")); /* pick-axe */
     boolean animal, pursue;
     struct damage *tmp_dam, *appear_here = 0;
     long cost_of_damage = 0L;
@@ -5120,7 +5156,8 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
         if (!cansee(shkp->mx, shkp->my))
             return;
         pursue = TRUE;
-        goto getcad;
+        getcad(shkp, dmgstr, x, y, uinshp, animal, pursue);
+        return;
     }
 
     if (uinshp) {
@@ -5130,8 +5167,10 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
             mnexto(shkp, RLOC_NOMSG);
         }
         pursue = um_dist(shkp->mx, shkp->my, 1);
-        if (pursue)
-            goto getcad;
+        if (pursue) {
+            getcad(shkp, dmgstr, x, y, uinshp, animal, pursue);
+            return;
+        }
     } else {
         /*
          * Make shkp show up at the door.  Effect:  If there is a monster
@@ -5164,33 +5203,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
     if ((um_dist(x, y, 1) && !uinshp) || cant_mollify
         || (money_cnt(gi.invent) + ESHK(shkp)->credit) < cost_of_damage
         || !rn2(50)) {
- getcad:
-        if (muteshk(shkp)) {
-            if (animal && !helpless(shkp))
-                yelp(shkp);
-        } else if (pursue || uinshp || !um_dist(x, y, 1)) {
-            if (!Deaf) {
-                SetVoice(shkp, 0, 80, 0);
-                verbalize("How dare you %s my %s?", dmgstr,
-                          dugwall ? "shop" : "door");
-            } else {
-                pline("%s is %s that you decided to %s %s %s!",
-                      Shknam(shkp), ROLL_FROM(angrytexts),
-                      dmgstr, noit_mhis(shkp), dugwall ? "shop" : "door");
-            }
-        } else {
-            if (!Deaf) {
-                pline("%s shouts:", Shknam(shkp));
-                SetVoice(shkp, 0, 80, 0);
-                verbalize("Who dared %s my %s?", dmgstr,
-                          dugwall ? "shop" : "door");
-            } else {
-                pline("%s is %s that someone decided to %s %s %s!",
-                      Shknam(shkp), ROLL_FROM(angrytexts),
-                      dmgstr, noit_mhis(shkp), dugwall ? "shop" : "door");
-            }
-        }
-        hot_pursuit(shkp);
+        getcad(shkp, dmgstr, x, y, uinshp, animal, pursue);
         return;
     }
 
