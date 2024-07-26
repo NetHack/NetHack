@@ -1,5 +1,5 @@
 #      NetHack Top-level Makefile.
-# NetHack 3.7  Makefile.top    $NHDT-Date: 1693519381 2023/08/31 22:03:01 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.91 $
+# NetHack 3.7  Makefile.top    $NHDT-Date: 1722019636 2024/07/26 18:47:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -353,8 +353,8 @@ fetch-Lua:
 	      export curlstatus=$$?; \
 	      if [ $$curlstatus -eq 0 ]; then \
 	        if [ ! -z "$$shac" ]; then \
-	          echo Checking integrity with $$shac; \
-	          $$shac -w -c ../submodules/CHKSUMS < lua-$(LUA_VERSION).tar.gz; \
+		  echo Checking integrity of lua-$(LUA_VERSION).tar.gz with $$shac; \
+	          $$shac -w --ignore-missing -c ../submodules/CHKSUMS < lua-$(LUA_VERSION).tar.gz; \
 	        fi; \
 	        tar zxf lua-$(LUA_VERSION).tar.gz && \
 	        rm -f lua-$(LUA_VERSION).tar.gz; \
