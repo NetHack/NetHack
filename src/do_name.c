@@ -790,6 +790,7 @@ rndghostname(void)
  * a_monnam:    a newt          it      an invisible orc        Fido
  * m_monnam:    newt            xan     orc                     Fido
  * y_monnam:    your newt     your xan  your invisible orc      Fido
+ * YMonnam:     Your newt     Your xan  Your invisible orc      Fido
  * noname_monnam(mon,article):
  *              article newt    art xan art invisible orc       art dog
  */
