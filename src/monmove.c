@@ -1,4 +1,4 @@
-/* NetHack 3.7	monmove.c	$NHDT-Date: 1701435190 2023/12/01 12:53:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.229 $ */
+/* NetHack 3.7	monmove.c	$NHDT-Date: 1722116054 2024/07/27 21:34:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.255 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -18,9 +18,9 @@ staticfn boolean holds_up_web(coordxy, coordxy);
 staticfn int count_webbing_walls(coordxy, coordxy);
 staticfn boolean soko_allow_web(struct monst *);
 staticfn boolean m_search_items(struct monst *, coordxy *, coordxy *, int *,
-                              int *);
+                                int *) NONNULLPTRS;
 staticfn int postmov(struct monst *, struct permonst *, coordxy, coordxy, int,
-                              boolean, boolean, boolean, boolean);
+                     unsigned, boolean, boolean, boolean) NONNULLPTRS;
 staticfn boolean leppie_avoidance(struct monst *);
 staticfn void leppie_stash(struct monst *);
 staticfn boolean m_balks_at_approaching(struct monst *);
@@ -598,19 +598,20 @@ mind_blast(struct monst *mtmp)
     }
 }
 
-/* called every turn for each living monster on the map,
-   and the hero */
+/* called every turn for each living monster on the map, and the hero;
+   caller makes sure that we're not called for DEADMONSTER() */
 void
 m_everyturn_effect(struct monst *mtmp)
 {
     boolean is_u = (mtmp == &gy.youmonst) ? TRUE : FALSE;
     coordxy x = is_u ? u.ux : mtmp->mx,
-        y = is_u ? u.uy : mtmp->my;
+            y = is_u ? u.uy : mtmp->my;
 
     if (mtmp->data == &mons[PM_FOG_CLOUD]) {
-        NhRegion *reg = visible_region_at(x, y);
-
-        if (!reg)
+        /* don't leave a vapor cloud if some other gas cloud is already
+           present, or when flowing under closed doors so that visibility
+           changes aren't mixed with messages about doing such */
+        if (!closed_door(x, y) && !visible_region_at(x, y))
             create_gas_cloud(x, y, 1, 0); /* harmless vapor */
     }
 }
@@ -626,7 +627,7 @@ m_postmove_effect(struct monst *mtmp)
 {
     boolean is_u = (mtmp == &gy.youmonst) ? TRUE : FALSE;
     coordxy x = is_u ? u.ux0 : mtmp->mx,
-        y = is_u ? u.uy0 : mtmp->my;
+            y = is_u ? u.uy0 : mtmp->my;
 
     /* Hezrous create clouds of stench. This does not cost a move. */
     if (mtmp->data == &mons[PM_HEZROU]) /* stench */
@@ -1371,7 +1372,7 @@ m_search_items(
         }
     }
 
-finish_search:
+ finish_search:
     if (minr < SQSRCHRADIUS && *appr == -1) {
         if (distmin(omx, omy, mtmp->mux, mtmp->muy) <= 3) {
             *ggx = mtmp->mux;
@@ -1390,7 +1391,7 @@ postmov(
     struct permonst *ptr,
     coordxy omx, coordxy omy,
     int mmoved,
-    boolean sawmon,
+    unsigned seenflgs,
     boolean can_tunnel,
     boolean can_unlock,
     boolean can_open)
@@ -1419,15 +1420,18 @@ postmov(
             && IS_DOOR(levl[nix][niy].typ)
             && ((levl[nix][niy].doormask & (D_LOCKED | D_CLOSED)) != 0)
             && can_fog(mtmp)) {
-            if (sawmon) {
+            /* note: remove_monster()+place_monster is not right for
+               long worms but they won't reach here */
+            if (seenflgs) {
                 remove_monster(nix, niy);
                 place_monster(mtmp, omx, omy);
                 newsym(nix, niy), newsym(omx, omy);
             }
-            if (vamp_shift(mtmp, &mons[PM_FOG_CLOUD], sawmon)) {
+            if (vamp_shift(mtmp, &mons[PM_FOG_CLOUD],
+                           ((seenflgs & 1) != 0) ? TRUE : FALSE)) {
                 ptr = mtmp->data; /* update cached value */
             }
-            if (sawmon) {
+            if (seenflgs) {
                 remove_monster(omx, omy);
                 place_monster(mtmp, nix, niy);
                 newsym(omx, omy), newsym(nix, niy);
@@ -1475,7 +1479,7 @@ postmov(
             if ((here->doormask & (D_LOCKED | D_CLOSED)) != 0
                 && amorphous(ptr)) {
                 if (flags.verbose && canseemon(mtmp))
-                    pline_mon(mtmp, "%s %s under the door.", Monnam(mtmp),
+                    pline_mon(mtmp, "%s %s under the door.", YMonnam(mtmp),
                           (ptr == &mons[PM_FOG_CLOUD]
                            || ptr->mlet == S_LIGHT) ? "flows" : "oozes");
             } else if (here->doormask & D_LOCKED && can_unlock) {
@@ -1647,7 +1651,7 @@ m_move(struct monst *mtmp, int after)
     boolean getitems = FALSE;
     boolean avoid = FALSE;
     boolean better_with_displacing = FALSE;
-    boolean sawmon = canspotmon(mtmp); /* before it moved */
+    unsigned seenflgs;
     struct permonst *ptr;
     int chi, mmoved = MMOVE_NOTHING; /* not strictly nec.: chi >= 0 will do */
     long info[9];
@@ -1673,8 +1677,12 @@ m_move(struct monst *mtmp, int after)
         return MMOVE_DONE; /* still eating */
     }
     if (hides_under(ptr) && OBJ_AT(mtmp->mx, mtmp->my)
-        && can_hide_under_obj(svl.level.objects[mtmp->mx][mtmp->my]) && rn2(10))
+        && can_hide_under_obj(svl.level.objects[mtmp->mx][mtmp->my])
+        && rn2(10))
         return MMOVE_NOTHING; /* do not leave hiding place */
+
+    /* set up pre-move visibility flags */
+    seenflgs = (canseemon(mtmp) ? 1 : 0) | (canspotmon(mtmp) ? 2 : 0);
 
     /* Where does 'mtmp' think you are?  Not necessary if m_move() called
        from this file, but needed for other calls of m_move(). */
@@ -1691,7 +1699,7 @@ m_move(struct monst *mtmp, int after)
     /* my dog gets special treatment */
     if (mtmp->mtame) {
         return postmov(mtmp, ptr, omx, omy, dog_move(mtmp, after),
-                       sawmon, can_tunnel, can_unlock, can_open);
+                       seenflgs, can_tunnel, can_unlock, can_open);
     }
 
     /* and the acquisitive monsters get special treatment */
@@ -1720,7 +1728,7 @@ m_move(struct monst *mtmp, int after)
             mmoved = MMOVE_NOTHING;
         }
         return postmov(mtmp, ptr, omx, omy, mmoved,
-                       sawmon, can_tunnel, can_unlock, can_open);
+                       seenflgs, can_tunnel, can_unlock, can_open);
     }
 
     /* likewise for shopkeeper, guard, or priest */
@@ -1742,7 +1750,7 @@ m_move(struct monst *mtmp, int after)
         case 1:
             return postmov(mtmp, ptr, omx, omy,
                            (xm != 1) ? MMOVE_NOTHING : MMOVE_MOVED,
-                           sawmon, can_tunnel, can_unlock, can_open);
+                           seenflgs, can_tunnel, can_unlock, can_open);
         }
     }
 
@@ -1765,7 +1773,7 @@ m_move(struct monst *mtmp, int after)
         else
             mnexto(mtmp, RLOC_MSG);
         return postmov(mtmp, ptr, omx, omy, MMOVE_MOVED,
-                       sawmon, can_tunnel, can_unlock, can_open);
+                       seenflgs, can_tunnel, can_unlock, can_open);
     }
  not_special:
     if (u.uswallow && !mtmp->mflee && u.ustuck != mtmp)
@@ -1825,7 +1833,7 @@ m_move(struct monst *mtmp, int after)
 
     if (getitems && m_search_items(mtmp, &ggx, &ggy, &mmoved, &appr))
         return postmov(mtmp, ptr, omx, omy, mmoved,
-                       sawmon, can_tunnel, can_unlock, can_open);
+                       seenflgs, can_tunnel, can_unlock, can_open);
 
     /* don't tunnel if hostile and close enough to prefer a weapon */
     if (can_tunnel && needspick(ptr)
@@ -1988,7 +1996,7 @@ m_move(struct monst *mtmp, int after)
             worm_nomove(mtmp);
     }
     return postmov(mtmp, ptr, omx, omy, mmoved,
-                   sawmon, can_tunnel, can_unlock, can_open);
+                   seenflgs, can_tunnel, can_unlock, can_open);
 }
 
 /* The part of m_move that deals with a monster attacking another monster (and
@@ -2287,6 +2295,9 @@ can_fog(struct monst *mtmp)
     return FALSE;
 }
 
+/* this is called when a vampire turns into a fog cloud in order to move
+   under a closed door; if it was sensed via telepathy or seen via
+   infravision, its new fog cloud shape will disappear */
 staticfn int
 vamp_shift(
     struct monst *mon,
@@ -2294,34 +2305,16 @@ vamp_shift(
     boolean domsg)
 {
     int reslt = 0;
-    char oldmtype[BUFSZ];
-    boolean sawmon = canseemon(mon); /* before shape change */
-
-    /* remember current monster type before shapechange */
-    Strcpy(oldmtype, domsg ? noname_monnam(mon, ARTICLE_THE) : "");
 
     if (mon->data == ptr) {
         /* already right shape */
         reslt = 1;
-        domsg = FALSE;
     } else if (is_vampshifter(mon)) {
-        reslt = newcham(mon, ptr, NO_NC_FLAGS);
-    }
-
-    if (reslt && domsg) {
-        /* might have seen vampire/bat/wolf with infravision then be
-           unable to see the same creature when it turns into a fog cloud */
-        if (canspotmon(mon))
-            You("%s %s where %s was.",
-                !canseemon(mon) ? "now detect" : "observe",
-                noname_monnam(mon, ARTICLE_A), oldmtype);
-        else
-            You("can no longer %s %s.", sawmon ? "see" : "sense", oldmtype);
-        /* this message is given when it turns into a fog cloud
-           in order to move under a closed door */
+        reslt = newcham(mon, ptr, domsg ? NC_SHOW_MSG : NO_NC_FLAGS);
+        /* shape-change message is given when vampshifter turns into a
+           fog cloud in order to move under a closed door */
         display_nhwindow(WIN_MESSAGE, FALSE);
     }
-
     return reslt;
 }
 
