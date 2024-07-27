@@ -1,5 +1,5 @@
 #      NetHack Top-level Makefile.
-# NetHack 3.7  Makefile.top    $NHDT-Date: 1722043180 2024/07/27 01:19:40 $  $NHDT-Branch: keni-fetchlua $:$NHDT-Revision: 1.108 $
+# NetHack 3.7  Makefile.top    $NHDT-Date: 1722119081 2024/07/27 22:24:41 $  $NHDT-Branch: keni-fetchlua $:$NHDT-Revision: 1.109 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -325,8 +325,12 @@ LUA_URL_MIRROR :=www.tecgraf.puc-rio.br/lua/mirror/ftp
 LUA_URL_NHD :=www.nethack.org/download/thirdparty
 LUA_URL_list:=$(LUA_URL) $(LUA_URL_MIRROR) $(LUA_URL_NHD)
 
-fetch-lua-mirror: LUA_URL :=$(LUA_URL_MIRROR)
+fetch-lua-mirror: LUA_URL_list:=$(LUA_URL_MIRROR)
 fetch-lua-mirror: fetch-Lua
+	@true
+
+fetch-lua-nhd: LUA_URL_list:=$(LUA_URL_NHD)
+fetch-lua-nhd: fetch-Lua
 	@true
 
 fetch-lua: fetch-Lua
