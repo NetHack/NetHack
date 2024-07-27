@@ -1,5 +1,5 @@
 #      NetHack Top-level Makefile.
-# NetHack 3.7  Makefile.top    $NHDT-Date: 1722019636 2024/07/26 18:47:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $
+# NetHack 3.7  Makefile.top    $NHDT-Date: 1722043180 2024/07/27 01:19:40 $  $NHDT-Branch: keni-fetchlua $:$NHDT-Revision: 1.108 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -323,6 +323,7 @@ dofiles-nodlb:
 LUA_URL :=www.lua.org/ftp
 LUA_URL_MIRROR :=www.tecgraf.puc-rio.br/lua/mirror/ftp
 LUA_URL_NHD :=www.nethack.org/download/thirdparty
+LUA_URL_list:=$(LUA_URL) $(LUA_URL_MIRROR) $(LUA_URL_NHD)
 
 fetch-lua-mirror: LUA_URL :=$(LUA_URL_MIRROR)
 fetch-lua-mirror: fetch-Lua
@@ -339,7 +340,7 @@ fetch-Lua:
 	    shac="$$shac1 -a 256"; elif [ ! -z $$shac2 ]; then \
 	    shac=$$shac2; else echo "CAUTION: no way to check integrity"; \
 	  fi; \
-	  set -- DUMMY $(LUA_URL) $(LUA_URL_MIRROR) $(LUA_URL_NHD); \
+	  set -- DUMMY $(LUA_URL_list); \
 	  luafile=lua-$(LUA_VERSION).tar.gz; \
 	  export curlstatus=1; \
 	  mkdir -p lib && cd lib && \
@@ -347,13 +348,20 @@ fetch-Lua:
 	    shift; \
 	    if [ $$curlstatus -ne 0 ]; then \
 	      luaurl=https://$$1/$$luafile; \
-	      echo trying $$luaurl; \
+	      echo Trying $$luaurl; \
 	      curl -R -O $$luaurl; \
 	      curlstatus=$$?; \
 	      if [ $$curlstatus -eq 0 ]; then \
 	        if [ ! -z "$$shac" ]; then \
-	          echo Checking integrity of $$luafile with $$shac; \
-	          $$shac -w --ignore-missing -c ../submodules/CHKSUMS < $$luafile; \
+		    CHKSUMS=../submodules/CHKSUMS; \
+		    CHKSUMSTMP=../submodules/CHKSUMS.tmp; \
+		    fgrep $$luafile < $$CHKSUMS > $$CHKSUMSTMP; \
+		    if [ -z $$CHKSUMSTMP ]; then \
+		      echo "Cannot check $$luafile - no checksum known"; \
+		    else \
+		      echo Checking integrity of $$luafile with $$shac; \
+		      $$shac -w --ignore-missing -c $$CHKSUMSTMP < $$luafile; \
+		    fi; \
 	        fi; \
 	        tar zxf $$luafile && \
 	        rm -f $$luafile; \
