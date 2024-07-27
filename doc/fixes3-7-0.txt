@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1445 $ $NHDT-Date: 1718303201 2024/06/13 18:26:41 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1457 $ $NHDT-Date: 1721684298 2024/07/22 21:38:18 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1401,6 +1401,7 @@ gold thrown or kicked at a sleeping monster with the 'greedy' attribute gets
 	neglected to report that target monster was awakened in the process
 hero movement affects the water bubble movement direction
 pets and peacefuls avoid a location hero just kicked
+pets avoid a possible boulder pushing location in sokoban
 shopkeepers bill you for using their bear trap or land mine
 when engraving with a stack of eligible weapons, split one off the stack and
 	dull it rather than dull the whole stack
@@ -1426,6 +1427,33 @@ a 3.6 fix to avoid a potential "object lost" panic when drinking potions had
 	unintended side-effect of making used up potions on shop's bill become
 	separate bill entries all with count 1 despite having come from same
 	unpaid stack; affected Ix inventory listing and itemized shop billing
+buying shop items which include any unpaid ones inside containers would reveal
+	them even when the containers hadn't been opened (obj->cknown==0);
+	recent change to pay via menu made the problem become more visible;
+	shopping has been changed such that buying anything that is inside a
+	container requires that the whole container be bought as a unit
+using #loot -> 'i'n to put multiple items into a shop-owned container would
+	ask whether to sell each item to the shop, and was prepared to accept
+	'a' to sell the current one plus all the rest beyond it, or to accept
+	'q' to not sell the current one or any beyond it, but the sell vs
+	don't-sell state was being reset for each item so 'a' and 'q' didn't
+	stick beyond the current one
+join wall "spines" with walls of water and lava
+some theft messages by nymphs force "she", others use default monster naming
+	which yields "it" when unseen; change the latter to "someone" which
+	still differs from "she" in a series of messages but isn't as jarring
+if a nymph stole worn armor and got killed (perhaps by pet) before hero's next
+	turn, feedback would be "You finish taking off your suit." regardless
+	of the type of armor being taken off
+when setting an option interactively [via O or 3.7's mO], if the particular
+	option uses a prompt to get a line of input (for compounds: 'fruit',
+	'scores', most numeric ones), input was treated as a comma-separated
+	list of option[:value] rather than just the new value of that option
+when there was a trap on a no-dig level, the floor beneath it was always
+	"too hard to dig into", making it impossible to remove the trap
+the #terrain command didn't know how to cope with visible gas/cloud regions;
+	treat as traps as far as player choice of whether to show or hide;
+	if/when a spot contains both region and trap, show the trap
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
@@ -1971,6 +1999,12 @@ fix regression of a post-3.6 fix:  if 2 Wizards of Yendor were in play and 1
 sometimes a repeat count from the preceding command carried over to most
 	recent one when using do-again (^A); if the most recent one was an
 	extended command, the spurious repeat was for '#'
+if peaceful monsters react when seeing hero attack a peaceful monster, don't
+	have quest guardians run away; also, quest leader only becomes angry
+	if the monster being attacked is a quest guardian
+farlook of water/lava location listed wall of lava before molten lava; because
+	of that, lava was omitted ("molten" suppressed to reduce vebosity,
+	resulting in "lava" which got skipped as substring of "wall of lava")
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

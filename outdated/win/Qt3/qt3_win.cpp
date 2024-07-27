@@ -1031,9 +1031,9 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
 
     QButtonGroup* namebox = new QButtonGroup(1,Horizontal,"Name",this);
     QLineEdit* name = new QLineEdit(namebox);
-    name->setMaxLength(sizeof(gp.plname)-1);
-    if ( strncmp(gp.plname,"player",6) && strncmp(gp.plname,"games",5) )
-	name->setText(gp.plname);
+    name->setMaxLength(sizeof(svp.plname)-1);
+    if ( strncmp(svp.plname,"player",6) && strncmp(svp.plname,"games",5) )
+	name->setText(svp.plname);
     connect(name, SIGNAL(textChanged(const QString&)),
 	    this, SLOT(selectName(const QString&)) );
     name->setFocus();
@@ -1189,7 +1189,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
 
 void NetHackQtPlayerSelector::selectName(const QString& n)
 {
-    strncpy(gp.plname,n.latin1(),sizeof(gp.plname)-1);
+    strncpy(svp.plname,n.latin1(),sizeof(svp.plname)-1);
 }
 
 void NetHackQtPlayerSelector::selectRole()
@@ -2535,7 +2535,7 @@ void NetHackQtStatusWindow::updateStats()
 	encumber.setLabel(enc);
 	encumber.show();
     }
-    Strcpy(buf, gp.plname);
+    Strcpy(buf, svp.plname);
     if ('a' <= buf[0] && buf[0] <= 'z') buf[0] += 'A'-'a';
     Strcat(buf, " the ");
     if (u.mtimedone) {
@@ -2598,7 +2598,7 @@ void NetHackQtStatusWindow::updateStats()
 	align.setLabel("Lawful");
     }
 
-    if (::flags.time) time.setLabel("Time:",(long)gm.moves);
+    if (::flags.time) time.setLabel("Time:",(long)svm.moves);
     else time.setLabel("");
 #ifdef SCORE_ON_BOTL
     if (::flags.showscore) {
@@ -3310,7 +3310,7 @@ static char** rip_line=0;
     long year;
 
     /* Put name on stone */
-    Sprintf(rip_line[NAME_LINE], "%s", gp.plname);
+    Sprintf(rip_line[NAME_LINE], "%s", svp.plname);
 
     /* Put $ on stone */
     Sprintf(rip_line[GOLD_LINE], "%ld Au", done_money);
@@ -4037,7 +4037,7 @@ void NetHackQtMainWindow::keyPressEvent(QKeyEvent* event)
 
 void NetHackQtMainWindow::closeEvent(QCloseEvent* e)
 {
-    if ( gp.program_state.something_worth_saving ) {
+    if ( program_state.something_worth_saving ) {
 	switch ( QMessageBox::information( this, "NetHack",
 	    "This will end your NetHack session",
 	    "&Save", "&Cancel", 0, 1 ) )
@@ -4629,7 +4629,7 @@ void NetHackQtBind::qt_askname()
 	NetHackQtSavedGameSelector sgsel((const char**)saved);
 	ch = sgsel.choose();
 	if ( ch >= 0 )
-	    strcpy(gp.plname,saved[ch]);
+	    strcpy(svp.plname,saved[ch]);
     }
     free_saved_games(saved);
 
@@ -4849,7 +4849,7 @@ void NetHackQtBind::qt_update_inventory()
     if (main)
 	main->updateInventory();
     /* doesn't work yet
-    if (gp.program_state.something_worth_saving && iflags.perm_invent)
+    if (program_state.something_worth_saving && iflags.perm_invent)
         display_inventory(NULL, FALSE);
     */
 }
@@ -4903,14 +4903,14 @@ int NetHackQtBind::qt_nhgetch()
     //
     while (keybuffer.Empty()
 #ifdef SAFERHANGUP
-	   && !gp.program_state.done_hup
+	   && !program_state.done_hup
 #endif
 	   ) {
 	qApp->enter_loop();
     }
 
 #ifdef SAFERHANGUP
-    if (gp.program_state.done_hup && keybuffer.Empty()) return '\033';
+    if (program_state.done_hup && keybuffer.Empty()) return '\033';
 #endif
     return keybuffer.GetAscii();
 }
@@ -4924,13 +4924,13 @@ int NetHackQtBind::qt_nh_poskey(int *x, int *y, int *mod)
     //
     while (keybuffer.Empty() && clickbuffer.Empty()
 #ifdef SAFERHANGUP
-	   && !gp.program_state.done_hup
+	   && !program_state.done_hup
 #endif
 	   ) {
 	qApp->enter_loop();
     }
 #ifdef SAFERHANGUP
-    if (gp.program_state.done_hup && keybuffer.Empty()) return '\033';
+    if (program_state.done_hup && keybuffer.Empty()) return '\033';
 #endif
     if (!keybuffer.Empty()) {
 	return keybuffer.GetAscii();
@@ -5179,7 +5179,7 @@ bool NetHackQtBind::notify(QObject *receiver, QEvent *event)
 
     bool result=QApplication::notify(receiver,event);
 #ifdef SAFERHANGUP
-    if (gp.program_state.done_hup) {
+    if (program_state.done_hup) {
 	keybuffer.Put('\033');
 	qApp->exit_loop();
 	return TRUE;

@@ -69,7 +69,7 @@ curses_create_window(int wid, int width, int height, orient orientation)
 
     if ((orientation == UP) || (orientation == DOWN) ||
         (orientation == LEFT) || (orientation == RIGHT)) {
-        if (gi.invent || (gm.moves > 1)) {
+        if (gi.invent || (svm.moves > 1)) {
             map_border = curses_window_has_border(MAP_WIN);
             curses_get_window_xy(MAP_WIN, &mapx, &mapy);
             curses_get_window_size(MAP_WIN, &maph, &mapw);
@@ -104,7 +104,7 @@ curses_create_window(int wid, int width, int height, orient orientation)
         starty = (term_rows / 2) - (height / 2);
         break;
     case UP:
-        if (gi.invent || (gm.moves > 1)) {
+        if (gi.invent || (svm.moves > 1)) {
             startx = (mapw / 2) - (width / 2) + mapx + mapb_offset;
         } else {
             startx = 0;
@@ -113,7 +113,7 @@ curses_create_window(int wid, int width, int height, orient orientation)
         starty = mapy + mapb_offset;
         break;
     case DOWN:
-        if (gi.invent || (gm.moves > 1)) {
+        if (gi.invent || (svm.moves > 1)) {
             startx = (mapw / 2) - (width / 2) + mapx + mapb_offset;
         } else {
             startx = 0;
@@ -129,7 +129,7 @@ curses_create_window(int wid, int width, int height, orient orientation)
         starty = term_rows - height;
         break;
     case RIGHT:
-        if (gi.invent || (gm.moves > 1)) {
+        if (gi.invent || (svm.moves > 1)) {
             startx = (mapw + mapx + (mapb_offset * 2)) - width;
         } else {
             startx = term_cols - width;
@@ -222,7 +222,7 @@ curses_refresh_nethack_windows(void)
         return;
     }
 
-    if ((gm.moves <= 1) && !gi.invent) {
+    if ((svm.moves <= 1) && !gi.invent) {
         /* Main windows not yet displayed; refresh base window instead */
         touchwin(stdscr);
         refresh();

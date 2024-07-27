@@ -282,7 +282,7 @@ add_region(NhRegion *reg)
     NhRegion **tmp_reg;
     int i, j;
 
-    if (gm.max_regions <= gn.n_regions) {
+    if (gm.max_regions <= svn.n_regions) {
         tmp_reg = gr.regions;
         gr.regions =
             (NhRegion **) alloc((gm.max_regions + 10) * sizeof (NhRegion *));
@@ -293,8 +293,8 @@ add_region(NhRegion *reg)
         }
         gm.max_regions += 10;
     }
-    gr.regions[gn.n_regions] = reg;
-    gn.n_regions++;
+    gr.regions[svn.n_regions] = reg;
+    svn.n_regions++;
     /* Check for monsters inside the region */
     for (i = reg->bounding_box.lx; i <= reg->bounding_box.hx; i++)
         for (j = reg->bounding_box.ly; j <= reg->bounding_box.hy; j++) {
@@ -341,16 +341,16 @@ remove_region(NhRegion *reg)
 {
     int i, x, y;
 
-    for (i = 0; i < gn.n_regions; i++)
+    for (i = 0; i < svn.n_regions; i++)
         if (gr.regions[i] == reg)
             break;
-    if (i == gn.n_regions)
+    if (i == svn.n_regions)
         return;
 
     /* remove region before potential newsym() calls, but don't free it yet */
-    if (--gn.n_regions != i)
-        gr.regions[i] = gr.regions[gn.n_regions];
-    gr.regions[gn.n_regions] = (NhRegion *) 0;
+    if (--svn.n_regions != i)
+        gr.regions[i] = gr.regions[svn.n_regions];
+    gr.regions[svn.n_regions] = (NhRegion *) 0;
 
     /* Update screen if necessary */
     reg->ttl = -2L; /* for visible_region_at */
@@ -386,9 +386,9 @@ clear_regions(void)
 {
     int i;
 
-    for (i = 0; i < gn.n_regions; i++)
+    for (i = 0; i < svn.n_regions; i++)
         free_region(gr.regions[i]);
-    gn.n_regions = 0;
+    svn.n_regions = 0;
     if (gm.max_regions > 0)
         free((genericptr_t) gr.regions);
     gm.max_regions = 0;
@@ -412,7 +412,7 @@ run_regions(void)
 
     /* End of life ? */
     /* Do it backward because the array will be modified */
-    for (i = gn.n_regions - 1; i >= 0; i--) {
+    for (i = svn.n_regions - 1; i >= 0; i--) {
         if (gr.regions[i]->ttl == 0L) {
             if ((f_indx = gr.regions[i]->expire_f) == NO_CALLBACK
                 || (*callbacks[f_indx])(gr.regions[i], (genericptr_t) 0))
@@ -421,7 +421,7 @@ run_regions(void)
     }
 
     /* Process remaining regions */
-    for (i = 0; i < gn.n_regions; i++) {
+    for (i = 0; i < svn.n_regions; i++) {
         /* Make the region age */
         if (gr.regions[i]->ttl > 0L)
             gr.regions[i]->ttl--;
@@ -464,7 +464,7 @@ in_out_region(coordxy x, coordxy y)
     int i, f_indx = 0;
 
     /* First check if hero can do the move */
-    for (i = 0; i < gn.n_regions; i++) {
+    for (i = 0; i < svn.n_regions; i++) {
         if (gr.regions[i]->attach_2_u)
             continue;
         if (inside_region(gr.regions[i], x, y)
@@ -478,7 +478,7 @@ in_out_region(coordxy x, coordxy y)
     }
 
     /* Callbacks for the regions hero does leave */
-    for (i = 0; i < gn.n_regions; i++) {
+    for (i = 0; i < svn.n_regions; i++) {
         if (gr.regions[i]->attach_2_u)
             continue;
         if (hero_inside(gr.regions[i])
@@ -492,7 +492,7 @@ in_out_region(coordxy x, coordxy y)
     }
 
     /* Callbacks for the regions hero does enter */
-    for (i = 0; i < gn.n_regions; i++) {
+    for (i = 0; i < svn.n_regions; i++) {
         if (gr.regions[i]->attach_2_u)
             continue;
         if (!hero_inside(gr.regions[i])
@@ -517,7 +517,7 @@ m_in_out_region(struct monst *mon, coordxy x, coordxy y)
     int i, f_indx = 0;
 
     /* First check if mon can do the move */
-    for (i = 0; i < gn.n_regions; i++) {
+    for (i = 0; i < svn.n_regions; i++) {
         if (gr.regions[i]->attach_2_m == mon->m_id)
             continue;
         if (inside_region(gr.regions[i], x, y)
@@ -531,7 +531,7 @@ m_in_out_region(struct monst *mon, coordxy x, coordxy y)
     }
 
     /* Callbacks for the regions mon does leave */
-    for (i = 0; i < gn.n_regions; i++) {
+    for (i = 0; i < svn.n_regions; i++) {
         if (gr.regions[i]->attach_2_m == mon->m_id)
             continue;
         if (mon_in_region(gr.regions[i], mon)
@@ -543,7 +543,7 @@ m_in_out_region(struct monst *mon, coordxy x, coordxy y)
     }
 
     /* Callbacks for the regions mon does enter */
-    for (i = 0; i < gn.n_regions; i++) {
+    for (i = 0; i < svn.n_regions; i++) {
         if (gr.regions[i]->attach_2_m == mon->m_id)
             continue;
         if (!mon_in_region(gr.regions[i], mon)
@@ -565,7 +565,7 @@ update_player_regions(void)
 {
     int i;
 
-    for (i = 0; i < gn.n_regions; i++)
+    for (i = 0; i < svn.n_regions; i++)
         if (!gr.regions[i]->attach_2_u
             && inside_region(gr.regions[i], u.ux, u.uy))
             set_hero_inside(gr.regions[i]);
@@ -581,7 +581,7 @@ update_monster_region(struct monst *mon)
 {
     int i;
 
-    for (i = 0; i < gn.n_regions; i++) {
+    for (i = 0; i < svn.n_regions; i++) {
         if (inside_region(gr.regions[i], mon->mx, mon->my)) {
             if (!mon_in_region(gr.regions[i], mon))
                 add_mon_to_reg(gr.regions[i], mon);
@@ -606,7 +606,7 @@ struct monst *monold, *monnew;
 {
     int i;
 
-    for (i = 0; i < gn.n_regions; i++)
+    for (i = 0; i < svn.n_regions; i++)
         if (mon_in_region(gr.regions[i], monold)) {
             remove_mon_from_reg(gr.regions[i], monold);
             add_mon_to_reg(gr.regions[i], monnew);
@@ -621,7 +621,7 @@ remove_mon_from_regions(struct monst *mon)
 {
     int i;
 
-    for (i = 0; i < gn.n_regions; i++)
+    for (i = 0; i < svn.n_regions; i++)
         if (mon_in_region(gr.regions[i], mon))
             remove_mon_from_reg(gr.regions[i], mon);
 }
@@ -637,7 +637,7 @@ visible_region_at(coordxy x, coordxy y)
 {
     int i;
 
-    for (i = 0; i < gn.n_regions; i++) {
+    for (i = 0; i < svn.n_regions; i++) {
         if (!gr.regions[i]->visible || gr.regions[i]->ttl == -2L)
             continue;
         if (inside_region(gr.regions[i], x, y))
@@ -666,10 +666,10 @@ save_regions(NHFILE *nhfp)
         goto skip_lots;
     if (nhfp->structlevel) {
         /* timestamp */
-        bwrite(nhfp->fd, (genericptr_t) &gm.moves, sizeof (gm.moves));
-        bwrite(nhfp->fd, (genericptr_t) &gn.n_regions, sizeof (gn.n_regions));
+        bwrite(nhfp->fd, (genericptr_t) &svm.moves, sizeof (svm.moves));
+        bwrite(nhfp->fd, (genericptr_t) &svn.n_regions, sizeof (svn.n_regions));
     }
-    for (i = 0; i < gn.n_regions; i++) {
+    for (i = 0; i < svn.n_regions; i++) {
         r = gr.regions[i];
         if (nhfp->structlevel) {
             bwrite(nhfp->fd, (genericptr_t) &r->bounding_box, sizeof (NhRect));
@@ -744,15 +744,15 @@ rest_regions(NHFILE *nhfp)
     if (ghostly)
         tmstamp = 0;
     else
-        tmstamp = (gm.moves - tmstamp);
+        tmstamp = (svm.moves - tmstamp);
 
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &gn.n_regions, sizeof (gn.n_regions));
+        mread(nhfp->fd, (genericptr_t) &svn.n_regions, sizeof (svn.n_regions));
 
-    gm.max_regions = gn.n_regions;
-    if (gn.n_regions > 0)
-        gr.regions = (NhRegion **) alloc(sizeof (NhRegion *) * gn.n_regions);
-    for (i = 0; i < gn.n_regions; i++) {
+    gm.max_regions = svn.n_regions;
+    if (svn.n_regions > 0)
+        gr.regions = (NhRegion **) alloc(sizeof (NhRegion *) * svn.n_regions);
+    for (i = 0; i < svn.n_regions; i++) {
         r = gr.regions[i] = (NhRegion *) alloc(sizeof (NhRegion));
         if (nhfp->structlevel) {
             mread(nhfp->fd, (genericptr_t) &r->bounding_box, sizeof (NhRect));
@@ -834,7 +834,7 @@ rest_regions(NHFILE *nhfp)
     }
     /* remove expired regions, do not trigger the expire_f callback (yet!);
        also update monster lists if this data is coming from a bones file */
-    for (i = gn.n_regions - 1; i >= 0; i--) {
+    for (i = svn.n_regions - 1; i >= 0; i--) {
         r = gr.regions[i];
         if (r->ttl == 0L)
             remove_region(r);
@@ -858,9 +858,9 @@ region_stats(
 
     /* other stats formats take one parameter; this takes two */
     Sprintf(hdrbuf, hdrfmt, (long) sizeof (NhRegion), (long) sizeof (NhRect));
-    *count = (long) gn.n_regions; /* might be 0 even though max_regions isn't */
+    *count = (long) svn.n_regions; /* might be 0 even though max_regions isn't */
     *size = (long) gm.max_regions * (long) sizeof (NhRegion);
-    for (i = 0; i < gn.n_regions; ++i) {
+    for (i = 0; i < svn.n_regions; ++i) {
         rg = gr.regions[i];
         *size += (long) rg->nrects * (long) sizeof (NhRect);
         if (rg->enter_msg)
@@ -972,7 +972,7 @@ create_force_field(coordxy x, coordxy y, int radius, long ttl)
         tmprect.hy--;
     }
     ff->ttl = ttl;
-    if (!gi.in_mklev && !gc.context.mon_moving)
+    if (!gi.in_mklev && !svc.context.mon_moving)
         set_heros_fault(ff); /* assume player has created it */
  /* ff->can_enter_f = enter_force_field; */
  /* ff->can_leave_f = enter_force_field; */
@@ -1118,7 +1118,7 @@ is_hero_inside_gas_cloud(void)
 {
     int i;
 
-    for (i = 0; i < gn.n_regions; i++)
+    for (i = 0; i < svn.n_regions; i++)
         if (hero_inside(gr.regions[i])
             && gr.regions[i]->inside_f == INSIDE_GAS_CLOUD)
             return TRUE;
@@ -1148,7 +1148,7 @@ create_gas_cloud(coordxy x, coordxy y, int cloudsize, int damage)
 
     /* a single-point cloud on hero and it deals no damage.
        probably a natural cause of being polyed. don't message about it */
-    if (!gc.context.mon_moving && u_at(x, y) && cloudsize == 1
+    if (!svc.context.mon_moving && u_at(x, y) && cloudsize == 1
         && (!damage
             || (damage && m_poisongas_ok(&gy.youmonst) == M_POISONGAS_OK)))
         inside_cloud = TRUE;
@@ -1222,7 +1222,7 @@ create_gas_cloud(coordxy x, coordxy y, int cloudsize, int damage)
     /* If cloud was constrained in small space, give it more time to live. */
     cloud->ttl = (cloud->ttl * cloudsize) / newidx;
 
-    if (!gi.in_mklev && !gc.context.mon_moving)
+    if (!gi.in_mklev && !svc.context.mon_moving)
         set_heros_fault(cloud); /* assume player has created it */
     cloud->inside_f = INSIDE_GAS_CLOUD;
     cloud->expire_f = EXPIRE_GAS_CLOUD;
@@ -1262,7 +1262,7 @@ create_gas_cloud_selection(struct selectionvar *sel, int damage)
                 add_rect_to_reg(cloud, &tmprect);
             }
 
-    if (!gi.in_mklev && !gc.context.mon_moving)
+    if (!gi.in_mklev && !svc.context.mon_moving)
         set_heros_fault(cloud); /* assume player has created it */
     cloud->inside_f = INSIDE_GAS_CLOUD;
     cloud->expire_f = EXPIRE_GAS_CLOUD;
@@ -1285,7 +1285,7 @@ region_danger(void)
 {
     int i, f_indx, n = 0;
 
-    for (i = 0; i < gn.n_regions; i++) {
+    for (i = 0; i < svn.n_regions; i++) {
         /* only care about regions that hero is in */
         if (!hero_inside(gr.regions[i]))
             continue;
@@ -1313,7 +1313,7 @@ region_safety(void)
     NhRegion *r = 0;
     int i, f_indx, n = 0;
 
-    for (i = 0; i < gn.n_regions; i++) {
+    for (i = 0; i < svn.n_regions; i++) {
         /* only care about regions that hero is in */
         if (!hero_inside(gr.regions[i]))
             continue;

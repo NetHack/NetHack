@@ -184,7 +184,7 @@ remember_topl(void)
         cw->datlen[idx] = (short) len;
     }
     Strcpy(cw->data[idx], gt.toplines);
-    if (!gp.program_state.in_checkpoint) {
+    if (!program_state.in_checkpoint) {
         *gt.toplines = '\0';
         cw->maxcol = cw->maxrow = (idx + 1) % cw->rows;
     }

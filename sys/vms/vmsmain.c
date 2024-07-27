@@ -58,7 +58,7 @@ main(int argc, char *argv[])
        isn't at risk of getting clobbered by core's handling of DEBUGFILES */
     progname = dupstr(vms_basename(argv[0], FALSE));
     gh.hname = progname;
-    gh.hackpid = getpid();
+    svh.hackpid = getpid();
     (void) umask(0);
 
     choose_windows(DEFAULT_WINDOW_SYS);
@@ -281,11 +281,11 @@ process_options(int argc, char *argv[])
 #endif
         case 'u':
             if (argv[0][2])
-                (void) strncpy(gp.plname, argv[0] + 2, sizeof(gp.plname) - 1);
+                (void) strncpy(svp.plname, argv[0] + 2, sizeof(svp.plname) - 1);
             else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(gp.plname, argv[0], sizeof(gp.plname) - 1);
+                (void) strncpy(svp.plname, argv[0], sizeof(svp.plname) - 1);
             } else
                 raw_print("Player name expected after -u");
             break;
@@ -390,8 +390,8 @@ whoami(void)
      */
     char *s;
 
-    if (!*gp.plname && (s = nh_getenv("USER")))
-        (void) lcase(strncpy(gp.plname, s, sizeof(gp.plname) - 1));
+    if (!*svp.plname && (s = nh_getenv("USER")))
+        (void) lcase(strncpy(svp.plname, s, sizeof(svp.plname) - 1));
 }
 
 static void
@@ -412,7 +412,7 @@ byebye(void)
         (void) sys$delprc(&mail_pid, (genericptr_t) 0), mail_pid = 0;
 #endif
 #ifdef FREE_ALL_MEMORY
-    if (progname && !gp.program_state.panicking) {
+    if (progname && !program_state.panicking) {
         if (gh.hname == progname)
             gh.hname = (char *) 0;
         free((genericptr_t) progname), progname = (char *) 0;
@@ -421,7 +421,7 @@ byebye(void)
 
     /* SIGHUP doesn't seem to do anything on VMS, so we fudge it here... */
     hup = (void (*)(int)) signal(SIGHUP, SIG_IGN);
-    if (!gp.program_state.exiting++
+    if (!program_state.exiting++
         && hup != (void (*)(int)) SIG_DFL
         && hup != (void (*)(int)) SIG_IGN) {
         (*hup)(SIGHUP);
@@ -446,7 +446,7 @@ genericptr_t mechargs)     /* [0] is argc, [1..argc] are the real args */
     if (condition == SS$_ACCVIO /* access violation */
         || (condition >= SS$_ASTFLT && condition <= SS$_TBIT)
         || (condition >= SS$_ARTRES && condition <= SS$_INHCHME)) {
-        gp.program_state.done_hup = TRUE; /* pretend hangup has been attempted */
+        program_state.done_hup = TRUE; /* pretend hangup has been attempted */
 #if (NH_DEVEL_STATUS == NH_STATUS_RELEASED)
         if (wizard)
 #endif

@@ -237,7 +237,7 @@ void NetHackQtBind::qt_askname()
     int ch = -1; // -1 => new game
 
     have_asked = true;
-    str_copy(default_plname, gp.plname, PL_NSIZ);
+    str_copy(default_plname, svp.plname, PL_NSIZ);
 
     // We do it all here (plus qt_plsel.cpp and qt_svsel.cpp),
     // nothing in player_selection().
@@ -252,7 +252,7 @@ void NetHackQtBind::qt_askname()
         NetHackQtSavedGameSelector sgsel((const char **) saved);
         ch = sgsel.choose();
         if (ch >= 0)
-            str_copy(gp.plname, saved[ch], SIZE(gp.plname));
+            str_copy(svp.plname, saved[ch], SIZE(svp.plname));
         // caller needs new lock name even if plname[] hasn't changed
         // because successful get_saved_games() clobbers gs.SAVEF[]
         ::iflags.renameinprogress = TRUE;
@@ -282,10 +282,10 @@ void NetHackQtBind::qt_askname()
         break;
     }
 
-    if (!*gp.plname)
+    if (!*svp.plname)
         // in case Choose() returns with plname[] empty
-        Strcpy(gp.plname, default_plname);
-    else if (strcmp(gp.plname, default_plname) != 0)
+        Strcpy(svp.plname, default_plname);
+    else if (strcmp(svp.plname, default_plname) != 0)
         // caller needs to set new lock file name
         ::iflags.renameinprogress = TRUE;
     return;
@@ -498,7 +498,7 @@ void NetHackQtBind::qt_update_inventory(int arg UNUSED)
 	main->updateInventory(); // update the paper doll inventory subset
 
     /* doesn't work yet
-    if (gp.program_state.something_worth_saving && iflags.perm_invent)
+    if (program_state.something_worth_saving && iflags.perm_invent)
         display_inventory(NULL, false);
     */
 }
@@ -667,7 +667,7 @@ char NetHackQtBind::qt_more()
     // ^C comment in that routine] when the core triggers --More-- via
     //  done2() -> really_done() -> display_nhwindow(WIN_MESSAGE, TRUE)
     // (get rid of this if the exec() loop issue gets properly fixed)
-    if (::gp.program_state.gameover)
+    if (::program_state.gameover)
         return ch; // bypass --More-- and just continue with program exit
 
     NetHackQtMessageWindow *mesgwin = main ? main->GetMessageWindow() : NULL;

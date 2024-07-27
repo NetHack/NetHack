@@ -132,14 +132,14 @@ whoami(void)
      */
     char *s;
 
-    if (*gp.plname)
+    if (*svp.plname)
         return;
     if (s = nh_getenv("USER")) {
-        (void) strncpy(gp.plname, s, sizeof(gp.plname) - 1);
+        (void) strncpy(svp.plname, s, sizeof(svp.plname) - 1);
         return;
     }
     if (s = nh_getenv("LOGNAME")) {
-        (void) strncpy(gp.plname, s, sizeof(gp.plname) - 1);
+        (void) strncpy(svp.plname, s, sizeof(svp.plname) - 1);
         return;
     }
 }
@@ -177,11 +177,11 @@ process_options(int argc, char **argv)
 #endif
         case 'u':
             if (argv[0][2])
-                (void) strncpy(gp.plname, argv[0] + 2, sizeof(gp.plname) - 1);
+                (void) strncpy(svp.plname, argv[0] + 2, sizeof(svp.plname) - 1);
             else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(gp.plname, argv[0], sizeof(gp.plname) - 1);
+                (void) strncpy(svp.plname, argv[0], sizeof(svp.plname) - 1);
             } else
                 raw_print("Player name expected after -u");
             break;
@@ -236,15 +236,15 @@ getlock(void)
 {
     int fd;
 
-    Sprintf(gl.lock, "%d%s", getuid(), gp.plname);
+    Sprintf(gl.lock, "%d%s", getuid(), svp.plname);
     regularize(gl.lock);
     set_levelfile_name(gl.lock, 0);
     fd = creat(gl.lock, FCMASK);
     if (fd == -1) {
         error("cannot creat lock file.");
     } else {
-        if (write(fd, (genericptr_t) &gh.hackpid, sizeof(gh.hackpid))
-            != sizeof(gh.hackpid)) {
+        if (write(fd, (genericptr_t) &svh.hackpid, sizeof(svh.hackpid))
+            != sizeof(svh.hackpid)) {
             error("cannot write lock");
         }
         if (close(fd) == -1) {

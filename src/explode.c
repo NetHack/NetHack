@@ -296,9 +296,9 @@ explode(
      */
 
     if (olet == MON_EXPLODE && !you_exploding) {
-        /* when explode() is called recursively, gk.killer.name might change so
+        /* when explode() is called recursively, svk.killer.name might change so
            we need to retain a copy of the current value for this explosion */
-        str = strcpy(killr_buf, gk.killer.name);
+        str = strcpy(killr_buf, svk.killer.name);
         do_hallu = (Hallucination
                     && (strstri(str, "'s explosion")
                         || strstri(str, "s' explosion")));
@@ -468,7 +468,7 @@ explode(
                      * with an explosion attack, leave them (and their gear)
                      * unharmed, to avoid punishing them from using such
                      * polyforms creatively */
-                    if (!gc.context.mon_moving && you_exploding)
+                    if (!svc.context.mon_moving && you_exploding)
                         uhurt = 0;
                 } else if (inside_engulfer) {
                     /* for inside_engulfer, only <u.ux,u.uy> is affected */
@@ -477,7 +477,7 @@ explode(
 
                 /* Affect the floor unless the player caused the explosion
                  * from inside their engulfer. */
-                if (!(u.uswallow && !gc.context.mon_moving))
+                if (!(u.uswallow && !svc.context.mon_moving))
                     (void) zap_over_floor(xx, yy, type,
                                           &shopdamage, FALSE,
                                           exploding_wand_typ);
@@ -557,7 +557,7 @@ explode(
                                   && completelyburns(mtmp->data))
                                  ? XKILL_NOCORPSE : 0);
 
-                    if (!gc.context.mon_moving) {
+                    if (!svc.context.mon_moving) {
                         xkilled(mtmp, XKILL_GIVEMSG | xkflg);
                     } else if (mdef && mtmp == mdef) {
                         /* 'mdef' killed self trying to cure being turned
@@ -579,7 +579,7 @@ explode(
                             adtyp = AD_RBRE; /* no corpse */
                         monkilled(mtmp, "", (int) adtyp);
                     }
-                } else if (!gc.context.mon_moving) {
+                } else if (!svc.context.mon_moving) {
                     /* all affected monsters, even if mdef is set */
                     setmangry(mtmp, TRUE);
                 }
@@ -644,26 +644,26 @@ explode(
             } else {
                 if (olet == MON_EXPLODE) {
                     if (generic) /* explosion was unseen; str=="explosion", */
-                        ;        /* gk.killer.name=="gas spore's explosion". */
-                    else if (str != gk.killer.name && str != hallu_buf)
-                        Strcpy(gk.killer.name, str);
-                    gk.killer.format = KILLED_BY_AN;
+                        ;        /* svk.killer.name=="gas spore's explosion". */
+                    else if (str != svk.killer.name && str != hallu_buf)
+                        Strcpy(svk.killer.name, str);
+                    svk.killer.format = KILLED_BY_AN;
                 } else if (olet == TRAP_EXPLODE) {
-                    gk.killer.format = NO_KILLER_PREFIX;
-                    Snprintf(gk.killer.name, sizeof gk.killer.name,
+                    svk.killer.format = NO_KILLER_PREFIX;
+                    Snprintf(svk.killer.name, sizeof svk.killer.name,
                              "caught %sself in a %s", uhim(),
                              str);
                 } else if (type >= 0 && olet != SCROLL_CLASS) {
-                    gk.killer.format = NO_KILLER_PREFIX;
-                    Snprintf(gk.killer.name, sizeof gk.killer.name,
+                    svk.killer.format = NO_KILLER_PREFIX;
+                    Snprintf(svk.killer.name, sizeof svk.killer.name,
                              "caught %sself in %s own %s", uhim(),
                              uhis(), str);
                 } else {
-                    gk.killer.format = (!strcmpi(str, "tower of flame")
+                    svk.killer.format = (!strcmpi(str, "tower of flame")
                                      || !strcmpi(str, "fireball"))
                                         ? KILLED_BY_AN
                                         : KILLED_BY;
-                    Strcpy(gk.killer.name, str);
+                    Strcpy(svk.killer.name, str);
                 }
                 if (iflags.last_msg == PLNMSG_CAUGHT_IN_EXPLOSION
                     || iflags.last_msg == PLNMSG_TOWER_OF_FLAME) /*seffects()*/
@@ -745,7 +745,7 @@ scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
     if (shop_origin)
         credit_report(shkp, 0, TRUE);   /* establish baseline, without msgs */
 
-    while ((otmp = (individual_object ? obj : gl.level.objects[sx][sy])) != 0) {
+    while ((otmp = (individual_object ? obj : svl.level.objects[sx][sy])) != 0) {
         if (otmp == uball || otmp == uchain) {
             boolean waschain = (otmp == uchain);
 
@@ -1047,15 +1047,15 @@ mon_explodes(struct monst *mon, struct attack *mattk)
 
     /* This might end up killing you, too; you never know...
      * also, it is used in explode() messages */
-    Sprintf(gk.killer.name, "%s explosion",
+    Sprintf(svk.killer.name, "%s explosion",
             s_suffix(pmname(mon->data, Mgender(mon))));
-    gk.killer.format = KILLED_BY_AN;
+    svk.killer.format = KILLED_BY_AN;
 
     explode(mon->mx, mon->my, type, dmg, MON_EXPLODE,
             adtyp_to_expltype(mattk->adtyp));
 
     /* reset killer */
-    gk.killer.name[0] = '\0';
+    svk.killer.name[0] = '\0';
 }
 
 /*explode.c*/

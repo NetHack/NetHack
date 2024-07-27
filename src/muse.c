@@ -68,8 +68,8 @@ precheck(struct monst *mon, struct obj *obj)
         struct monst *mtmp;
 
         if (objdescr_is(obj, "milky")) {
-            if (!(gm.mvitals[PM_GHOST].mvflags & G_GONE)
-                && !rn2(POTION_OCCUPANT_CHANCE(gm.mvitals[PM_GHOST].born))) {
+            if (!(svm.mvitals[PM_GHOST].mvflags & G_GONE)
+                && !rn2(POTION_OCCUPANT_CHANCE(svm.mvitals[PM_GHOST].born))) {
                 if (!enexto(&cc, mon->mx, mon->my, &mons[PM_GHOST]))
                     return 0;
                 mquaffmsg(mon, obj);
@@ -94,8 +94,8 @@ precheck(struct monst *mon, struct obj *obj)
             }
         }
         if (objdescr_is(obj, "smoky")
-            && !(gm.mvitals[PM_DJINNI].mvflags & G_GONE)
-            && !rn2(POTION_OCCUPANT_CHANCE(gm.mvitals[PM_DJINNI].born))) {
+            && !(svm.mvitals[PM_DJINNI].mvflags & G_GONE)
+            && !rn2(POTION_OCCUPANT_CHANCE(svm.mvitals[PM_DJINNI].born))) {
             if (!enexto(&cc, mon->mx, mon->my, &mons[PM_DJINNI]))
                 return 0;
             mquaffmsg(mon, obj);
@@ -598,7 +598,7 @@ find_defensive(struct monst *mtmp, boolean tryescape)
                or some other monster is there */
             if (u_at(xx, yy)
                 || (xx != x && yy != y && !diag_ok)
-                || (gl.level.monsters[xx][yy] && !(xx == x && yy == y)))
+                || (svl.level.monsters[xx][yy] && !(xx == x && yy == y)))
                 continue;
             /* skip if there's no trap or can't/won't move onto trap */
             if ((t = t_at(xx, yy)) == 0
@@ -771,7 +771,7 @@ staticfn int
 mon_escape(struct monst *mtmp, boolean vismon)
 {
     if (mon_has_special(mtmp)
-        || (mtmp->iswiz && gc.context.no_of_wizards < 2))
+        || (mtmp->iswiz && svc.context.no_of_wizards < 2))
         return 0;
     if (vismon)
         pline("%s escapes the dungeon!", Monnam(mtmp));
@@ -1611,7 +1611,7 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
                 /* context.bypasses=True: if resist() happens to be fatal,
                    make_corpse() will set obj->bypass on the new corpse
                    so that mbhito() will skip it instead of reviving it */
-                gc.context.bypasses = TRUE; /* for make_corpse() */
+                svc.context.bypasses = TRUE; /* for make_corpse() */
                 (void) resist(mtmp, WAND_CLASS, rnd(8), NOTELL);
             }
             if (wake) {
@@ -1645,7 +1645,7 @@ fhito_loc(struct obj *obj,
     if (!fhito || !OBJ_AT(tx, ty))
         return FALSE;
 
-    for (otmp = gl.level.objects[tx][ty]; otmp; otmp = next_obj) {
+    for (otmp = svl.level.objects[tx][ty]; otmp; otmp = next_obj) {
         next_obj = otmp->nexthere;
 
         if (otmp->where != OBJ_FLOOR || otmp->ox != tx || otmp->oy != ty)
@@ -2038,7 +2038,7 @@ find_misc(struct monst *mtmp)
             for (yy = y - 1; yy <= y + 1; yy++)
                 if (isok(xx, yy) && !u_at(xx, yy)
                     && (diag_ok || xx == x || yy == y)
-                    && ((xx == x && yy == y) || !gl.level.monsters[xx][yy]))
+                    && ((xx == x && yy == y) || !svl.level.monsters[xx][yy]))
                     if ((t = t_at(xx, yy)) != 0
                         && (ignore_boulders || !sobj_at(BOULDER, xx, yy))
                         && !onscary(xx, yy, mtmp)) {
@@ -2848,14 +2848,14 @@ mon_consume_unstone(
     if (mon->mtame && !mon->isminion && nutrit > 0) {
         struct edog *edog = EDOG(mon);
 
-        if (edog->hungrytime < gm.moves)
-            edog->hungrytime = gm.moves;
+        if (edog->hungrytime < svm.moves)
+            edog->hungrytime = svm.moves;
         edog->hungrytime += nutrit;
         mon->mconf = 0;
     }
     /* use up monster's next move */
     mon->movement -= NORMAL_SPEED;
-    mon->mlstmv = gm.moves;
+    mon->mlstmv = svm.moves;
 }
 
 /* decide whether obj can cure petrification; also used when picking up */
@@ -3114,7 +3114,7 @@ muse_unslime(
     }
     /* use up monster's next move */
     mon->movement -= NORMAL_SPEED;
-    mon->mlstmv = gm.moves;
+    mon->mlstmv = svm.moves;
     return res;
 }
 

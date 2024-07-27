@@ -96,7 +96,7 @@ genl_outrip(winid tmpwin, int how, time_t when)
     dp[x] = (char *) 0;
 
     /* Put name on stone */
-    Sprintf(buf, "%.*s", (int) STONE_LINE_LEN, gp.plname);
+    Sprintf(buf, "%.*s", (int) STONE_LINE_LEN, svp.plname);
     center(NAME_LINE, buf);
 
     /* Put $ on stone */

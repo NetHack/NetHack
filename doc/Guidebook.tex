@@ -48,7 +48,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7.0 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{DATE(%B %-d, %Y)}
-\date{April 12, 2024}
+\date{July 16, 2024}
 
 \maketitle
 
@@ -514,92 +514,79 @@ game will use default symbols.  Here is a list of what the default
 symbols mean:
 
 \blist{}
-%.lp
-\item[\tb{- {\rm and} |}]
-The walls of a room, or an open door.  Or a grave ({\tt |}).
-%.lp
+\item[\tb{-}]
+The horizontal or corner walls of a room, or an open east/west door.
+\item[\tb{|}]
+The vertical walls of a room, or an open north/south door, or a grave.
 \item[\tb{.}]
-The floor of a room, ice, or a doorless doorway.
-%.lp
+The floor of a room, or ice, or a doorless doorway, or the span of an
+open drawbridge.
 \item[\tb{\#}]
-A corridor, or iron bars, or a tree, or possibly a kitchen sink (if
-your dungeon has sinks), or a drawbridge.
-%.lp
+A corridor, or iron bars, or a tree, or the portcullis of a closed
+drawbridge.\\
+%.lp ""
+Note: engravings in corridors also appear as \# but are shown in
+a different color from normal corridor locations.
 \item[\tb{>}]
 Stairs down: a way to the next level.
-%.lp
 \item[\tb{<}]
 Stairs up: a way to the previous level.
-%.lp
 \item[\tb{+}]
 A closed door, or a spellbook containing a spell you may be able to learn.
-%.lp
 \item[\tb{@}]
-Your character or a human.
-%.lp
+Your character or a human or an elf.
 \item[\tb{\$}]
 A pile of gold.
-%.lp
 \item[\tb{\^}]
 A trap (once you have detected it).
-%.lp
 \item[\tb{)}]
 A weapon.
-%.lp
 \item[\tb{[}]
 A suit or piece of armor.
-%.lp
 \item[\tb{\%}]
 Something edible (not necessarily healthy).
-%.lp
 \item[\tb{?}]
 A scroll.
-%.lp
 \item[\tb{/}]
 A wand.
-%.lp
 \item[\tb{=}]
 A ring.
-%.lp
 \item[\tb{!}]
 A potion.
-%.lp
 \item[\tb{(}]
 A useful item (pick-axe, key, lamp \ldots).
-%.lp
 \item[\tb{"}]
 An amulet or a spider web.
-%.lp
 \item[\tb{*}]
 A gem or rock (possibly valuable, possibly worthless).
-%.lp
 \item[\tb{\`}]
-A boulder or statue.
-%.lp
+A boulder or statue or an engraving on the floor of a room.\\
+%.lp ""
+Note: statues are displayed as if they were the monsters they depict
+so won't appear as a {\it grave accent\/} (aka {\it back-tick}).
 \item[\tb{0}]
 An iron ball.
-%.lp
 \item[\tb{\verb+_+}]
 An altar, or an iron chain.
-%.lp
 \item[\tb{\{}]
-A fountain.
-%.lp
+A fountain or a sink.
 \item[\tb{\}}]
-A pool of water or moat or a pool of lava.
-%.lp
+A pool of water or moat or a wall of water
+or a pool of lava or a wall of lava.
 \item[\tb{$\backslash$}]
 An opulent throne.
-%.lp
-\item[\tb{a-zA-Z {\rm \& other symbols}}]
+\item[\tb{a-z}]
+\item[\tb{A-Z}]
+\item[\tb{@\&\verb+'+:;}]
 Letters and certain other symbols represent the various inhabitants
-of the Mazes of Menace.  Watch out, they can be nasty and vicious.
+of the Mazes of Menace.
+Watch out, they can be nasty and vicious.
 Sometimes, however, they can be helpful.
-%.lp
 \item[\tb{I}]
-This marks the last known location of an invisible or otherwise unseen
-monster.  Note that the monster could have moved.
-The `{\tt F}' and `{\tt m}' commands may be useful here.
+Rather than a specific type of monster, this marks the last known
+location of an invisible or otherwise unseen monster.
+Note that the monster could have moved.
+The `{\tt s}', `{\tt F}', and `{\tt m}' commands may be useful here.
 
 \elist
 %.pg

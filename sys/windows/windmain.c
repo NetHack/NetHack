@@ -704,17 +704,17 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         (*utf8graphics_mode_callback)();
 #endif
 
-    /* strip role,race,&c suffix; calls askname() if gp.plname[] is empty
+    /* strip role,race,&c suffix; calls askname() if svp.plname[] is empty
        or holds a generic user name like "player" or "games" */
     plnamesuffix();
-    set_playmode(); /* sets gp.plname to "wizard" for wizard mode */
+    set_playmode(); /* sets svp.plname to "wizard" for wizard mode */
     /* until the getlock code is resolved, override askname()'s
        setting of renameallowed; when False, player_selection()
        won't resent renaming as an option */
     iflags.renameallowed = FALSE;
     /* Obtain the name of the logged on user and incorporate
      * it into the name. */
-    Sprintf(fnamebuf, "%s", gp.plname);
+    Sprintf(fnamebuf, "%s", svp.plname);
     (void) fname_encode(
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.", '%',
         fnamebuf, encodedfnamebuf, BUFSZ);
@@ -732,8 +732,8 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (!nhfp) {
         raw_print("Cannot create lock file");
     } else {
-        gh.hackpid = GetCurrentProcessId();
-        (void) write(nhfp->fd, (genericptr_t) &gh.hackpid, sizeof(gh.hackpid));
+        svh.hackpid = GetCurrentProcessId();
+        (void) write(nhfp->fd, (genericptr_t) &svh.hackpid, sizeof(svh.hackpid));
         close_nhfile(nhfp);
     }
     /*
@@ -771,8 +771,8 @@ attempt_restore:
                 }
             }
         }
-        if (gp.program_state.in_self_recover) {
-            gp.program_state.in_self_recover = FALSE;
+        if (program_state.in_self_recover) {
+            program_state.in_self_recover = FALSE;
             set_savefile_name(TRUE);
         }
     }
@@ -923,11 +923,11 @@ process_options(int argc, char * argv[])
 #endif
         case 'u':
             if (argv[0][2])
-                (void) strncpy(gp.plname, argv[0] + 2, sizeof(gp.plname) - 1);
+                (void) strncpy(svp.plname, argv[0] + 2, sizeof(svp.plname) - 1);
             else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(gp.plname, argv[0], sizeof(gp.plname) - 1);
+                (void) strncpy(svp.plname, argv[0], sizeof(svp.plname) - 1);
             } else
                 raw_print("Player name expected after -u");
             break;
@@ -1052,7 +1052,7 @@ port_help(void)
 boolean
 authorize_wizard_mode(void)
 {
-    if (!strcmp(gp.plname, WIZARD_NAME))
+    if (!strcmp(svp.plname, WIZARD_NAME))
         return TRUE;
     return FALSE;
 }
@@ -1417,8 +1417,8 @@ gotlock:
               gf.fqn_prefix[LEVELPREFIX]);
         raw_print(oops);
     } else {
-        if (write(fd, (char *) &gh.hackpid, sizeof(gh.hackpid))
-            != sizeof(gh.hackpid)) {
+        if (write(fd, (char *) &svh.hackpid, sizeof(svh.hackpid))
+            != sizeof(svh.hackpid)) {
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
             chdirx(orgdir, 0);
 #endif

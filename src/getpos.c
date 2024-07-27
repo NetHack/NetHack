@@ -1054,7 +1054,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                                     goto foundc;
                                 /* next, try glyph that's remembered here
                                    (might be trap or object) */
-                                if (gl.level.flags.hero_memory
+                                if (svl.level.flags.hero_memory
                                     /* !terrainmode: don't move to remembered
                                        trap or object if not currently shown */
                                     && !iflags.terrainmode) {
@@ -1064,7 +1064,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                                         goto foundc;
                                 }
                                 /* last, try actual terrain here (shouldn't
-                                   we be using gl.lastseentyp[][] instead?) */
+                                   we be using svl.lastseentyp[][] instead?) */
                                 if (levl[tx][ty].seenv) {
                                     k = back_to_glyph(tx, ty);
                                     if (glyph_is_cmap(k)

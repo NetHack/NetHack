@@ -248,7 +248,7 @@ magic_map_background(coordxy x, coordxy y, int show)
         else if (lev->typ == CORR && glyph == cmap_to_glyph(S_litcorr))
             glyph = cmap_to_glyph(S_corr);
     }
-    if (gl.level.flags.hero_memory)
+    if (svl.level.flags.hero_memory)
         lev->glyph = glyph;
     if (show)
         show_glyph(x, y, glyph);
@@ -279,7 +279,7 @@ map_background(coordxy x, coordxy y, int show)
 {
     int glyph = back_to_glyph(x, y);
 
-    if (gl.level.flags.hero_memory)
+    if (svl.level.flags.hero_memory)
         levl[x][y].glyph = glyph;
     if (show)
         show_glyph(x, y, glyph);
@@ -297,7 +297,7 @@ map_trap(struct trap *trap, int show)
     coordxy x = trap->tx, y = trap->ty;
     int glyph = trap_to_glyph(trap);
 
-    if (gl.level.flags.hero_memory)
+    if (svl.level.flags.hero_memory)
         levl[x][y].glyph = glyph;
     if (show)
         show_glyph(x, y, glyph);
@@ -314,7 +314,7 @@ map_engraving(struct engr *ep, int show)
     coordxy x = ep->engr_x, y = ep->engr_y;
     int glyph = engraving_to_glyph(ep);
 
-    if (gl.level.flags.hero_memory)
+    if (svl.level.flags.hero_memory)
         levl[x][y].glyph = glyph;
     if (show)
         show_glyph(x, y, glyph);
@@ -350,7 +350,7 @@ map_object(struct obj *obj, int show)
         }
     }
 
-    if (gl.level.flags.hero_memory) {
+    if (svl.level.flags.hero_memory) {
         /* MRKR: While hallucinating, statues are seen as random monsters */
         /*       but remembered as random objects.                        */
 
@@ -377,7 +377,7 @@ void
 map_invisible(coordxy x, coordxy y)
 {
     if (x != u.ux || y != u.uy) { /* don't display I at hero's location */
-        if (gl.level.flags.hero_memory)
+        if (svl.level.flags.hero_memory)
             levl[x][y].glyph = GLYPH_INVISIBLE;
         show_glyph(x, y, GLYPH_INVISIBLE);
     }
@@ -410,7 +410,7 @@ unmap_object(coordxy x, coordxy y)
     struct trap *trap;
     struct engr *ep;
 
-    if (!gl.level.flags.hero_memory)
+    if (!svl.level.flags.hero_memory)
         return;
 
     if ((trap = t_at(x, y)) != 0 && trap->tseen && !covers_traps(x, y)) {
@@ -545,7 +545,7 @@ display_monster(
             if (!sensed) {
                 show_glyph(x, y, glyph);
                 /* override real topology with mimic's fake one */
-                gl.lastseentyp[x][y] = cmap_to_type(sym);
+                svl.lastseentyp[x][y] = cmap_to_type(sym);
             }
             break;
         }
@@ -676,10 +676,10 @@ next_to_gas(
 boolean
 suppress_map_output(void)
 {
-    if (gi.in_mklev || gp.program_state.saving || gp.program_state.restoring)
+    if (gi.in_mklev || program_state.saving || program_state.restoring)
         return TRUE;
 #ifdef HANGUPHANDLING
-    if (gp.program_state.done_hup)
+    if (program_state.done_hup)
         return TRUE;
 #endif
     return FALSE;
@@ -842,14 +842,14 @@ feel_location(coordxy x, coordxy y)
              */
             if (uchain && uchain->where == OBJ_FLOOR
                 && uchain->ox == x && uchain->oy == y
-                && gl.level.objects[x][y] == uchain)
+                && svl.level.objects[x][y] == uchain)
                 u.bc_felt |= BC_CHAIN;
             else
                 u.bc_felt &= ~BC_CHAIN; /* do not feel the chain */
 
             if (uball && uball->where == OBJ_FLOOR
                 && uball->ox == x && uball->oy == y
-                && gl.level.objects[x][y] == uball)
+                && svl.level.objects[x][y] == uball)
                 u.bc_felt |= BC_BALL;
             else
                 u.bc_felt &= ~BC_BALL; /* do not feel the ball */
@@ -1255,7 +1255,7 @@ flash_glyph_at(coordxy x, coordxy y, int tg, int rpt)
 
     rpt *= 2; /* two loop iterations per 'count' */
     glyph[0] = tg;
-    glyph[1] = (gl.level.flags.hero_memory) ? levl[x][y].glyph
+    glyph[1] = (svl.level.flags.hero_memory) ? levl[x][y].glyph
                                          : back_to_glyph(x, y);
     /* even iteration count (guaranteed) ends with glyph[1] showing;
        caller might want to override that, but no newsym() calls here
@@ -1456,7 +1456,7 @@ see_monsters(void)
         if (mon->wormno)
             see_wsegs(mon);
         if (Warn_of_mon
-            && (gc.context.warntype.obj & mon->data->mflags2) != 0L)
+            && (svc.context.warntype.obj & mon->data->mflags2) != 0L)
             new_warn_obj_cnt++;
     }
 
@@ -1658,10 +1658,10 @@ docrt_flags(int refresh_flags)
             redrawonly = (refresh_flags & docrtRefresh) != 0,
             nocls = (refresh_flags & docrtNocls) != 0;
 
-    if (!u.ux || gp.program_state.in_docrt)
+    if (!u.ux || program_state.in_docrt)
         return; /* display isn't ready yet */
 
-    gp.program_state.in_docrt = TRUE;
+    program_state.in_docrt = TRUE;
 
     if (redrawonly) {
         redraw_map(FALSE);
@@ -1713,7 +1713,7 @@ docrt_flags(int refresh_flags)
         disp.botlx = TRUE; /* force a redraw of the bottom lines */
         /* note: caller needs to call bot() to actually redraw status */
     }
-    gp.program_state.in_docrt = FALSE;
+    program_state.in_docrt = FALSE;
 }
 
 /* for panning beyond a clipped region; resend the current map data to
@@ -1949,8 +1949,8 @@ show_glyph(coordxy x, coordxy y, int glyph)
     oldglyph = gg.gbuf[y][x].glyphinfo.glyph;
 
     if (a11y.glyph_updates && !a11y.mon_notices_blocked
-        && !gp.program_state.in_docrt
-        && !gp.program_state.in_getlev
+        && !program_state.in_docrt
+        && !program_state.in_getlev
         && (oldglyph != glyph || gg.gbuf[y][x].gnew)) {
         int c = glyph_to_cmap(glyph);
         if ((glyph_is_nothing(oldglyph) || glyph_is_unexplored(oldglyph)
@@ -2165,7 +2165,7 @@ flush_screen(int cursor_on_u)
         return; /* if already flushing then return */
     flushing = 1;
 #ifdef HANGUPHANDLING
-    if (gp.program_state.done_hup)
+    if (program_state.done_hup)
         return;
 #endif
 
@@ -2228,7 +2228,7 @@ back_to_glyph(coordxy x, coordxy y)
     switch (ptr->typ) {
     case SCORR:
     case STONE:
-        idx = gl.level.flags.arboreal ? S_tree : S_stone;
+        idx = svl.level.flags.arboreal ? S_tree : S_stone;
         break;
     case ROOM:
         idx = S_room;
@@ -2379,7 +2379,7 @@ swallow_to_glyph(int mnum, int loc)
  *
  * Change the given zap direction and beam type into a glyph.  Each beam
  * type has four glyphs, one for each of the symbols below.  The order of
- * the zap symbols [0-3] as defined in rm.h are:
+ * the zap symbols [0-3] as defined in defsym.h are:
  *
  *      |  S_vbeam      ( 0, 1) or ( 0,-1)
  *      -  S_hbeam      ( 1, 0) or (-1, 0)
@@ -2446,7 +2446,7 @@ get_bkglyph_and_framecolor(
         switch (lev->typ) {
         case SCORR:
         case STONE:
-            idx = gl.level.flags.arboreal ? S_tree : S_stone;
+            idx = svl.level.flags.arboreal ? S_tree : S_stone;
             break;
         case ROOM:
            idx = S_room;
@@ -2624,8 +2624,8 @@ int wallcolors[sokoban_walls + 1] = {
 
 #if 0
 #define is_objpile(x, y)                          \
-    (!Hallucination && gl.level.objects[(x)][(y)] \
-     && gl.level.objects[(x)][(y)]->nexthere)
+    (!Hallucination && svl.level.objects[(x)][(y)] \
+     && svl.level.objects[(x)][(y)]->nexthere)
 #endif
 
 staticfn int cmap_to_roguecolor(int);
@@ -3017,7 +3017,7 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
             color = NO_COLOR;
         gmap->sym.color = color;
     }
-    gg.glyph_reset_timestamp = gm.moves;
+    gg.glyph_reset_timestamp = svm.moves;
 }
 
 /* ------------------------------------------------------------------------ */

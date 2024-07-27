@@ -1,4 +1,4 @@
-/* NetHack 3.7	integer.h	$NHDT-Date: 1717967331 2024/06/09 21:08:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.7	integer.h	$NHDT-Date: 1720397754 2024/07/08 00:15:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $ */
 /*      Copyright (c) 2016 by Michael Allison          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -109,5 +109,10 @@ typedef uint64_t uint64;
       || ((L) == LONG_MAX / 10L && (D) <= LONG_MAX % 10L))      \
      ? (L) * 10L + (D)                                          \
      : -1L)
+
+/* add a and b, return max long value if overflow would have occurred;
+   assumes that both a and b are non-negative; caller should apply
+   cast(s) to (long) in the arguments if any are needed */
+#define nowrap_add(a,b) ((a) <= (LONG_MAX - (b)) ? ((a) + (b)) : LONG_MAX)
 
 #endif /* INTEGER_H */

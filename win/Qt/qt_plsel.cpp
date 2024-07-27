@@ -40,17 +40,17 @@ extern "C" {
 /* check whether plname[] is among the list of generic user names */
 static bool generic_plname()
 {
-    if (*gp.plname) {
+    if (*svp.plname) {
         const char *sptr, *p;
         const char *genericusers = sysopt.genericusers;
-        int ln = (int) strlen(gp.plname);
+        int ln = (int) strlen(svp.plname);
 
         if (!genericusers || !*genericusers)
             genericusers = "player games";
         else if (!strcmp(genericusers, "*")) /* "*" => always ask for name */
             return true;
 
-        while ((sptr = strstri(genericusers, gp.plname)) != NULL) {
+        while ((sptr = strstri(genericusers, svp.plname)) != NULL) {
             /* check for full word: start of list or following a space */
             if ((sptr == genericusers || sptr[-1] == ' ')
                 /* and also preceding a space or at end of list */
@@ -263,8 +263,8 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(
 
     // if plname[] contains a generic user name, clear it
     if (generic_plname())
-        *gp.plname = '\0';
-    name->setText(gp.plname);
+        *svp.plname = '\0';
+    name->setText(svp.plname);
     connect(name, SIGNAL(textChanged(const QString&)),
             this, SLOT(selectName(const QString&)));
     name->setFocus();
@@ -545,7 +545,7 @@ void NetHackQtPlayerSelector::Randomize()
 // if plname[] is empty, disable [Play], otherwise [Play] is the default
 void NetHackQtPlayerSelector::plnamePlayVsQuit()
 {
-    if (*gp.plname) {
+    if (*svp.plname) {
         play_btn->setEnabled(true);
         play_btn->setDefault(true);
         //quit_btn->setDefault(false);
@@ -564,7 +564,7 @@ void NetHackQtPlayerSelector::selectName(const QString& n)
     // (it would be better to set up a validator that rejects leading spaces)
     while (*name_str == ' ')
         ++name_str;
-    str_copy(gp.plname, name_str, PL_NSIZ);
+    str_copy(svp.plname, name_str, PL_NSIZ);
     // possibly enable or disable the [Play] button
     plnamePlayVsQuit();
 }

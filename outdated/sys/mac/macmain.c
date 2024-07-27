@@ -225,7 +225,7 @@ process_openfile(short src_vol, long src_dir, Str255 fName, OSType ftype)
             Handle name = Get1Resource('STR ', PLAYER_NAME_RES_ID);
             if (name) {
                 Str255 save_f_p;
-                P2C(*(StringHandle) name, gp.plname);
+                P2C(*(StringHandle) name, svp.plname);
                 set_savefile_name(TRUE);
                 C2P(fqname(gs.SAVEF, SAVEPREFIX, 0), save_f_p);
                 force_hdelete(theDirs.dataRefNum, theDirs.dataDirID,

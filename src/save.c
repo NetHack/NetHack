@@ -41,7 +41,7 @@ staticfn void zerocomp_bputc(int);
 #endif
 
 #if defined(HANGUPHANDLING)
-#define HUP if (!gp.program_state.done_hup)
+#define HUP if (!program_state.done_hup)
 #else
 #define HUP
 #endif
@@ -59,7 +59,7 @@ dosave(void)
         clear_nhwindow(WIN_MESSAGE);
         pline("Saving...");
 #if defined(HANGUPHANDLING)
-        gp.program_state.done_hup = 0;
+        program_state.done_hup = 0;
 #endif
         if (dosave0()) {
             u.uhp = -1; /* universal game's over indicator */
@@ -86,7 +86,7 @@ dosave0(void)
     NHFILE *nhfp, *onhfp;
     int res = 0;
 
-    gp.program_state.saving++; /* inhibit status and perm_invent updates */
+    program_state.saving++; /* inhibit status and perm_invent updates */
     /* we may get here via hangup signal, in which case we want to fix up
        a few of things before saving so that they won't be restored in
        an improper state; these will be no-ops for normal save sequence */
@@ -103,7 +103,7 @@ dosave0(void)
        when punished, make sure ball and chain are placed too */
     done_object_cleanup(); /* maybe force some items onto map */
 
-    if (!gp.program_state.something_worth_saving || !gs.SAVEF[0])
+    if (!program_state.something_worth_saving || !gs.SAVEF[0])
         goto done;
 
     fq_save = fqname(gs.SAVEF, SAVEPREFIX, 1); /* level files take 0 */
@@ -190,7 +190,7 @@ dosave0(void)
     for (ltmp = (xint8) 1; ltmp <= maxledgerno(); ltmp++) {
         if (ltmp == ledger_no(&gu.uz_save))
             continue;
-        if (!(gl.level_info[ltmp].flags & LFILE_EXISTS))
+        if (!(svl.level_info[ltmp].flags & LFILE_EXISTS))
             continue;
 #ifdef MICRO
         curs(WIN_MAP, 1 + dotcnt++, dotrow);
@@ -208,12 +208,12 @@ dosave0(void)
             HUP pline1(whynot);
             close_nhfile(nhfp);
             (void) delete_savefile();
-            HUP Strcpy(gk.killer.name, whynot);
+            HUP Strcpy(svk.killer.name, whynot);
             HUP done(TRICKED);
             goto done;
         }
         minit(); /* ZEROCOMP */
-        getlev(onhfp, gh.hackpid, ltmp);
+        getlev(onhfp, svh.hackpid, ltmp);
         close_nhfile(onhfp);
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &ltmp, sizeof ltmp); /* lvl no. */
@@ -230,11 +230,11 @@ dosave0(void)
     delete_levelfile(0);
     nh_compress(fq_save);
     /* this should probably come sooner... */
-    gp.program_state.something_worth_saving = 0;
+    program_state.something_worth_saving = 0;
     res = 1;
 
  done:
-    gp.program_state.saving--;
+    program_state.saving--;
     return res;
 }
 
@@ -276,11 +276,11 @@ savegamestate(NHFILE *nhfp)
 {
     unsigned long uid;
 
-    gp.program_state.saving++; /* caller should/did already set this... */
+    program_state.saving++; /* caller should/did already set this... */
     uid = (unsigned long) getuid();
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) &uid, sizeof uid);
-        bwrite(nhfp->fd, (genericptr_t) &gc.context, sizeof gc.context);
+        bwrite(nhfp->fd, (genericptr_t) &svc.context, sizeof svc.context);
         bwrite(nhfp->fd, (genericptr_t) &flags, sizeof flags);
     }
     urealtime.finish_time = getnow();
@@ -313,23 +313,23 @@ savegamestate(NHFILE *nhfp)
     if (release_data(nhfp))
         gm.migrating_mons = (struct monst *) 0;
     if (nhfp->structlevel)
-        bwrite(nhfp->fd, (genericptr_t) gm.mvitals, sizeof gm.mvitals);
+        bwrite(nhfp->fd, (genericptr_t) svm.mvitals, sizeof svm.mvitals);
     save_dungeon(nhfp, (boolean) !!perform_bwrite(nhfp),
                  (boolean) !!release_data(nhfp));
     savelevchn(nhfp);
     if (nhfp->structlevel) {
-        bwrite(nhfp->fd, (genericptr_t) &gm.moves, sizeof gm.moves);
-        bwrite(nhfp->fd, (genericptr_t) &gq.quest_status,
-               sizeof gq.quest_status);
-        bwrite(nhfp->fd, (genericptr_t) gs.spl_book,
+        bwrite(nhfp->fd, (genericptr_t) &svm.moves, sizeof svm.moves);
+        bwrite(nhfp->fd, (genericptr_t) &svq.quest_status,
+               sizeof svq.quest_status);
+        bwrite(nhfp->fd, (genericptr_t) svs.spl_book,
                sizeof (struct spell) * (MAXSPELL + 1));
     }
     save_artifacts(nhfp);
     save_oracles(nhfp);
     if (nhfp->structlevel) {
-        bwrite(nhfp->fd, (genericptr_t) gp.pl_character,
-               sizeof gp.pl_character);
-        bwrite(nhfp->fd, (genericptr_t) gp.pl_fruit, sizeof gp.pl_fruit);
+        bwrite(nhfp->fd, (genericptr_t) svp.pl_character,
+               sizeof svp.pl_character);
+        bwrite(nhfp->fd, (genericptr_t) svp.pl_fruit, sizeof svp.pl_fruit);
     }
     savefruitchn(nhfp);
     savenames(nhfp);
@@ -338,7 +338,7 @@ savegamestate(NHFILE *nhfp)
     save_luadata(nhfp);
     if (nhfp->structlevel)
         bflush(nhfp->fd);
-    gp.program_state.saving--;
+    program_state.saving--;
     return;
 }
 
@@ -349,7 +349,7 @@ tricked_fileremoved(NHFILE *nhfp, char *whynot)
     if (!nhfp) {
         pline1(whynot);
         pline("Probably someone removed it.");
-        Strcpy(gk.killer.name, whynot);
+        Strcpy(svk.killer.name, whynot);
         done(TRICKED);
         return TRUE;
     }
@@ -364,7 +364,7 @@ savestateinlock(void)
     char whynot[BUFSZ];
     NHFILE *nhfp;
 
-    gp.program_state.saving++; /* inhibit status and perm_invent updates */
+    program_state.saving++; /* inhibit status and perm_invent updates */
     /* When checkpointing is on, the full state needs to be written
      * on each checkpoint.  When checkpointing is off, only the pid
      * needs to be in the level.0 file, so it does not need to be
@@ -385,15 +385,15 @@ savestateinlock(void)
          */
         nhfp = open_levelfile(0, whynot);
         if (tricked_fileremoved(nhfp, whynot)) {
-            gp.program_state.saving--;
+            program_state.saving--;
             return;
         }
 
         if (nhfp->structlevel)
             (void) read(nhfp->fd, (genericptr_t) &hpid, sizeof hpid);
-        if (gh.hackpid != hpid) {
+        if (svh.hackpid != hpid) {
             Sprintf(whynot, "Level #0 pid (%d) doesn't match ours (%d)!",
-                    hpid, gh.hackpid);
+                    hpid, svh.hackpid);
             goto giveup;
         }
         close_nhfile(nhfp);
@@ -402,19 +402,19 @@ savestateinlock(void)
         if (!nhfp) {
             pline1(whynot);
  giveup:
-            Strcpy(gk.killer.name, whynot);
+            Strcpy(svk.killer.name, whynot);
             /* done(TRICKED) will return when running in wizard mode;
                clear the display-update-suppression flag before rather
                than after so that screen updating behaves normally;
                game data shouldn't be inconsistent yet, unlike it would
                become midway through saving */
-            gp.program_state.saving--;
+            program_state.saving--;
             done(TRICKED);
             return;
         }
         nhfp->mode = WRITING;
         if (nhfp->structlevel)
-            (void) write(nhfp->fd, (genericptr_t) &gh.hackpid, sizeof gh.hackpid);
+            (void) write(nhfp->fd, (genericptr_t) &svh.hackpid, sizeof svh.hackpid);
         if (flags.ins_chkpt) {
             int currlev = ledger_no(&u.uz);
 
@@ -433,7 +433,7 @@ savestateinlock(void)
         }
         close_nhfile(nhfp);
     }
-    gp.program_state.saving--;
+    program_state.saving--;
     gh.havestate = flags.ins_chkpt;
     return;
 }
@@ -450,7 +450,7 @@ savelev(NHFILE *nhfp, xint8 lev)
        but we'll be called during run-down */
     if (set_uz_save && perform_bwrite(nhfp)) {
         if (u.uz.dnum == 0 && u.uz.dlevel == 0) {
-            gp.program_state.something_worth_saving = 0;
+            program_state.something_worth_saving = 0;
             panic("savelev: where are we?");
         }
         gu.uz_save = u.uz;
@@ -469,7 +469,7 @@ savelev_core(NHFILE *nhfp, xint8 lev)
     short tlev;
 #endif
 
-    gp.program_state.saving++; /* even if current mode is FREEING */
+    program_state.saving++; /* even if current mode is FREEING */
 
     if (!nhfp)
         panic("Save on bad file!"); /* impossible */
@@ -500,9 +500,9 @@ savelev_core(NHFILE *nhfp, xint8 lev)
             dmonsfree();
 
         if (lev >= 0 && lev <= maxledgerno())
-            gl.level_info[lev].flags |= VISITED;
+            svl.level_info[lev].flags |= VISITED;
         if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &gh.hackpid, sizeof gh.hackpid);
+            bwrite(nhfp->fd, (genericptr_t) &svh.hackpid, sizeof svh.hackpid);
 #ifdef TOS
         tlev = lev;
         tlev &= 0x00ff;
@@ -520,24 +520,24 @@ savelev_core(NHFILE *nhfp, xint8 lev)
        the guessing that was needed in 3.4.3 and without having to
        interpret level data to find where to start; unfortunately it
        still needs to handle all the data compression schemes */
-    savecemetery(nhfp, &gl.level.bonesinfo);
+    savecemetery(nhfp, &svl.level.bonesinfo);
     if (nhfp->mode == FREEING) /* see above */
         goto skip_lots;
 
     savelevl(nhfp, ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     if (nhfp->structlevel) {
-        bwrite(nhfp->fd, (genericptr_t) gl.lastseentyp, sizeof gl.lastseentyp);
-        bwrite(nhfp->fd, (genericptr_t) &gm.moves, sizeof gm.moves);
+        bwrite(nhfp->fd, (genericptr_t) svl.lastseentyp, sizeof svl.lastseentyp);
+        bwrite(nhfp->fd, (genericptr_t) &svm.moves, sizeof svm.moves);
         save_stairs(nhfp);
-        bwrite(nhfp->fd, (genericptr_t) &gu.updest, sizeof (dest_area));
-        bwrite(nhfp->fd, (genericptr_t) &gd.dndest, sizeof (dest_area));
-        bwrite(nhfp->fd, (genericptr_t) &gl.level.flags, sizeof gl.level.flags);
-        bwrite(nhfp->fd, (genericptr_t) &gd.doors_alloc, sizeof gd.doors_alloc);
+        bwrite(nhfp->fd, (genericptr_t) &svu.updest, sizeof (dest_area));
+        bwrite(nhfp->fd, (genericptr_t) &svd.dndest, sizeof (dest_area));
+        bwrite(nhfp->fd, (genericptr_t) &svl.level.flags, sizeof svl.level.flags);
+        bwrite(nhfp->fd, (genericptr_t) &svd.doors_alloc, sizeof svd.doors_alloc);
         /* don't rely on underlying write() behavior to write
          *  nothing if count arg is 0, just skip it */
-        if (gd.doors_alloc)
-            bwrite(nhfp->fd, (genericptr_t) gd.doors,
-                   gd.doors_alloc * sizeof (coord));
+        if (svd.doors_alloc)
+            bwrite(nhfp->fd, (genericptr_t) svd.doors,
+                   svd.doors_alloc * sizeof (coord));
     }
     save_rooms(nhfp); /* no dynamic memory to reclaim */
 
@@ -551,7 +551,7 @@ savelev_core(NHFILE *nhfp, xint8 lev)
     save_worm(nhfp); /* save worm information */
     savetrapchn(nhfp, gf.ftrap);
     saveobjchn(nhfp, &fobj);
-    saveobjchn(nhfp, &gl.level.buriedobjlist);
+    saveobjchn(nhfp, &svl.level.buriedobjlist);
     saveobjchn(nhfp, &gb.billobjs);
     save_engravings(nhfp);
     savedamage(nhfp); /* pending shop wall and/or floor repair */
@@ -564,12 +564,12 @@ savelev_core(NHFILE *nhfp, xint8 lev)
         if (nhfp->structlevel)
             bflush(nhfp->fd);
     }
-    gp.program_state.saving--;
+    program_state.saving--;
     if (release_data(nhfp)) {
         clear_level_structures();
         gf.ftrap = 0;
         gb.billobjs = 0;
-        (void) memset(gr.rooms, 0, sizeof(gr.rooms));
+        (void) memset(svr.rooms, 0, sizeof(svr.rooms));
     }
     return;
 }
@@ -688,7 +688,7 @@ savedamage(NHFILE *nhfp)
     struct damage *damageptr, *tmp_dam;
     unsigned int xl = 0;
 
-    damageptr = gl.level.damagelist;
+    damageptr = svl.level.damagelist;
     for (tmp_dam = damageptr; tmp_dam; tmp_dam = tmp_dam->next)
         xl++;
     if (perform_bwrite(nhfp)) {
@@ -706,7 +706,7 @@ savedamage(NHFILE *nhfp)
             free((genericptr_t) tmp_dam);
     }
     if (release_data(nhfp))
-        gl.level.damagelist = 0;
+        svl.level.damagelist = 0;
 }
 
 staticfn void
@@ -717,7 +717,7 @@ save_stairs(NHFILE *nhfp)
 
     while (stway) {
         if (perform_bwrite(nhfp)) {
-            boolean use_relative = (gp.program_state.restoring != REST_GSTATE
+            boolean use_relative = (program_state.restoring != REST_GSTATE
                                     && stway->tolev.dnum == u.uz.dnum);
             if (use_relative) {
                 /* make dlevel relative to current level */
@@ -840,17 +840,17 @@ saveobjchn(NHFILE *nhfp, struct obj **obj_p)
              * Always invalidate the pointer, but ensure that we have
              * the o_id in order to restore the pointer on reload.
              */
-            if (otmp == gc.context.victual.piece) {
-                gc.context.victual.o_id = otmp->o_id;
-                gc.context.victual.piece = (struct obj *) 0;
+            if (otmp == svc.context.victual.piece) {
+                svc.context.victual.o_id = otmp->o_id;
+                svc.context.victual.piece = (struct obj *) 0;
             }
-            if (otmp == gc.context.tin.tin) {
-                gc.context.tin.o_id = otmp->o_id;
-                gc.context.tin.tin = (struct obj *) 0;
+            if (otmp == svc.context.tin.tin) {
+                svc.context.tin.o_id = otmp->o_id;
+                svc.context.tin.tin = (struct obj *) 0;
             }
-            if (otmp == gc.context.spbook.book) {
-                gc.context.spbook.o_id = otmp->o_id;
-                gc.context.spbook.book = (struct obj *) 0;
+            if (otmp == svc.context.spbook.book) {
+                svc.context.spbook.o_id = otmp->o_id;
+                svc.context.spbook.book = (struct obj *) 0;
             }
             otmp->where = OBJ_FREE; /* set to free so dealloc will work */
             otmp->nobj = NULL;      /* nobj saved into otmp2 */
@@ -961,9 +961,9 @@ savemonchn(NHFILE *nhfp, struct monst *mtmp)
         if (mtmp->minvent)
             saveobjchn(nhfp, &mtmp->minvent);
         if (release_data(nhfp)) {
-            if (mtmp == gc.context.polearm.hitmon) {
-                gc.context.polearm.m_id = mtmp->m_id;
-                gc.context.polearm.hitmon = NULL;
+            if (mtmp == svc.context.polearm.hitmon) {
+                svc.context.polearm.m_id = mtmp->m_id;
+                svc.context.polearm.hitmon = NULL;
             }
             if (mtmp == u.ustuck)
                 u.ustuck_mid = u.ustuck->m_id;
@@ -988,7 +988,7 @@ savetrapchn(NHFILE *nhfp, struct trap *trap)
     struct trap *trap2;
 
     while (trap) {
-        boolean use_relative = (gp.program_state.restoring != REST_GSTATE
+        boolean use_relative = (program_state.restoring != REST_GSTATE
                                 && trap->dst.dnum == u.uz.dnum);
         trap2 = trap->ntrap;
         if (use_relative)
@@ -1045,13 +1045,13 @@ savelevchn(NHFILE *nhfp)
     s_level *tmplev, *tmplev2;
     int cnt = 0;
 
-    for (tmplev = gs.sp_levchn; tmplev; tmplev = tmplev->next)
+    for (tmplev = svs.sp_levchn; tmplev; tmplev = tmplev->next)
         cnt++;
     if (perform_bwrite(nhfp)) {
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &cnt, sizeof cnt);
     }
-    for (tmplev = gs.sp_levchn; tmplev; tmplev = tmplev2) {
+    for (tmplev = svs.sp_levchn; tmplev; tmplev = tmplev2) {
         tmplev2 = tmplev->next;
         if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
@@ -1061,7 +1061,7 @@ savelevchn(NHFILE *nhfp)
             free((genericptr_t) tmplev);
     }
     if (release_data(nhfp))
-        gs.sp_levchn = 0;
+        svs.sp_levchn = 0;
 }
 
 void
@@ -1073,7 +1073,7 @@ store_plname_in_file(NHFILE *nhfp)
         bufoff(nhfp->fd);
         /* bwrite() before bufon() uses plain write() */
         bwrite(nhfp->fd, (genericptr_t) &plsiztmp, sizeof plsiztmp);
-        bwrite(nhfp->fd, (genericptr_t) gp.plname, plsiztmp);
+        bwrite(nhfp->fd, (genericptr_t) svp.plname, plsiztmp);
         bufon(nhfp->fd);
     }
     return;

@@ -170,7 +170,7 @@ does_block(int x, int y, struct rm *lev)
 #endif
 
     /* Boulders block light. */
-    for (obj = gl.level.objects[x][y]; obj; obj = obj->nexthere)
+    for (obj = svl.level.objects[x][y]; obj; obj = obj->nexthere)
         if (obj->otyp == BOULDER)
             return 1;
 
@@ -311,12 +311,12 @@ rogue_vision(seenV **next, coordxy *rmin, coordxy *rmax)
     /* If in a lit room, we are able to see to its boundaries. */
     /* If dark, set COULD_SEE so various spells work -dlc */
     if (rnum >= 0) {
-        for (zy = gr.rooms[rnum].ly - 1; zy <= gr.rooms[rnum].hy + 1; zy++) {
-            rmin[zy] = start = gr.rooms[rnum].lx - 1;
-            rmax[zy] = stop = gr.rooms[rnum].hx + 1;
+        for (zy = svr.rooms[rnum].ly - 1; zy <= svr.rooms[rnum].hy + 1; zy++) {
+            rmin[zy] = start = svr.rooms[rnum].lx - 1;
+            rmax[zy] = stop = svr.rooms[rnum].hx + 1;
 
             for (zx = start; zx <= stop; zx++) {
-                if (gr.rooms[rnum].rlit) {
+                if (svr.rooms[rnum].rlit) {
                     next[zy][zx] = COULD_SEE | IN_SIGHT;
                     levl[zx][zy].seenv = SVALL; /* see the walls */
                 } else
@@ -521,7 +521,7 @@ vision_recalc(int control)
     int oldseenv;      /* previous seenv value */
 
     gv.vision_full_recalc = 0; /* reset flag */
-    if (gi.in_mklev || gp.program_state.in_getlev || !iflags.vision_inited)
+    if (gi.in_mklev || program_state.in_getlev || !iflags.vision_inited)
         return;
 
     /*
@@ -825,9 +825,9 @@ vision_recalc(int control)
     /* This newsym() caused a crash delivering msg about failure to open
      * dungeon file init_dungeons() -> panic() -> done(11) ->
      * vision_recalc(2) -> newsym() -> crash!  u.ux and u.uy are 0 and
-     * gp.program_state.panicking == 1 under those circumstances
+     * program_state.panicking == 1 under those circumstances
      */
-    if (!gp.program_state.panicking)
+    if (!program_state.panicking)
         newsym(u.ux, u.uy); /* Make sure the hero shows up! */
 
     /* Set the new min and max pointers. */

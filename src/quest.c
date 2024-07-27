@@ -9,7 +9,7 @@
 #include "quest.h"
 
 #define Not_firsttime (on_level(&u.uz0, &u.uz))
-#define Qstat(x) (gq.quest_status.x)
+#define Qstat(x) (svq.quest_status.x)
 
 staticfn void on_start(void);
 staticfn void on_locate(void);
@@ -411,16 +411,16 @@ nemesis_speaks(void)
 void
 nemesis_stinks(coordxy mx, coordxy my)
 {
-    boolean save_mon_moving = gc.context.mon_moving;
+    boolean save_mon_moving = svc.context.mon_moving;
 
     /*
      * Some nemeses (determined by caller) release a cloud of noxious
      * gas when they die.  Don't make the hero be responsible for such
      * a cloud even if hero has just killed nemesis.
      */
-    gc.context.mon_moving = TRUE;
+    svc.context.mon_moving = TRUE;
     create_gas_cloud(mx, my, 5, 8);
-    gc.context.mon_moving = save_mon_moving;
+    svc.context.mon_moving = save_mon_moving;
 }
 
 staticfn void

@@ -114,7 +114,7 @@ find_quest_artifact(unsigned whichchains)
             qarti = find_qarti(gm.migrating_objs);
     }
     if (!qarti && (whichchains & (1 << OBJ_BURIED)) != 0)
-        qarti = find_qarti(gl.level.buriedobjlist);
+        qarti = find_qarti(svl.level.buriedobjlist);
 
     return qarti;
 }
@@ -217,9 +217,9 @@ qtext_pronoun(
                 : (lwhich == 'i') ? "them"
                 : (lwhich == 'j') ? "their" : "?";
     } else {
-        godgend = (who == 'd') ? gq.quest_status.godgend
-            : (who == 'l') ? gq.quest_status.ldrgend
-            : (who == 'n') ? gq.quest_status.nemgend
+        godgend = (who == 'd') ? svq.quest_status.godgend
+            : (who == 'l') ? svq.quest_status.ldrgend
+            : (who == 'n') ? svq.quest_status.nemgend
             : 2; /* default to neuter */
         pnoun = (lwhich == 'h') ? genders[godgend].he
                 : (lwhich == 'i') ? genders[godgend].him
@@ -239,7 +239,7 @@ convert_arg(char c)
 
     switch (c) {
     case 'p':
-        str = gp.plname;
+        str = svp.plname;
         break;
     case 'c':
         str = (flags.female && gu.urole.name.f) ? gu.urole.name.f
@@ -312,7 +312,7 @@ convert_arg(char c)
         str = Blind ? "sense" : "see";
         break;
     case 'Z':
-        str = gd.dungeons[0].dname;
+        str = svd.dungeons[0].dname;
         break;
     case '%':
         str = "%";
@@ -456,7 +456,7 @@ staticfn boolean
 skip_pager(boolean common UNUSED)
 {
     /* WIZKIT: suppress plot feedback if starting with quest artifact */
-    if (gp.program_state.wizkit_wishing)
+    if (program_state.wizkit_wishing)
         return TRUE;
     return FALSE;
 }
@@ -637,12 +637,12 @@ qt_montype(void)
 
     if (rn2(5)) {
         qpm = gu.urole.enemy1num;
-        if (qpm != NON_PM && rn2(5) && !(gm.mvitals[qpm].mvflags & G_GENOD))
+        if (qpm != NON_PM && rn2(5) && !(svm.mvitals[qpm].mvflags & G_GENOD))
             return &mons[qpm];
         return mkclass(gu.urole.enemy1sym, 0);
     }
     qpm = gu.urole.enemy2num;
-    if (qpm != NON_PM && rn2(5) && !(gm.mvitals[qpm].mvflags & G_GENOD))
+    if (qpm != NON_PM && rn2(5) && !(svm.mvitals[qpm].mvflags & G_GENOD))
         return &mons[qpm];
     return mkclass(gu.urole.enemy2sym, 0);
 }

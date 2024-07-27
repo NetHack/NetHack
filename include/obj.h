@@ -302,14 +302,14 @@ struct obj {
 /* Eggs and other food */
 #define MAX_EGG_HATCH_TIME 200 /* longest an egg can remain unhatched */
 #define stale_egg(egg) \
-    ((gm.moves - (egg)->age) > (2 * MAX_EGG_HATCH_TIME))
+    ((svm.moves - (egg)->age) > (2 * MAX_EGG_HATCH_TIME))
 #define ofood(o) ((o)->otyp == CORPSE || (o)->otyp == EGG || (o)->otyp == TIN)
     /* note: sometimes eggs and tins have special corpsenm values that
        shouldn't be used as an index into mons[]                       */
-#define polyfodder(obj) \
+#define polyfood(obj) \
     (ofood(obj) && (obj)->corpsenm >= LOW_PM                            \
      && (pm_to_cham((obj)->corpsenm) != NON_PM                          \
-                    || dmgtype(&mons[(obj)->corpsenm], AD_POLY)))
+         || dmgtype(&mons[(obj)->corpsenm], AD_POLY)))
 #define mlevelgain(obj) (ofood(obj) && (obj)->corpsenm == PM_WRAITH)
 #define mhealup(obj) (ofood(obj) && (obj)->corpsenm == PM_NURSE)
 #define Is_pudding(o) \
@@ -420,8 +420,8 @@ struct obj {
                        || (o)->otyp == AMULET_OF_UNCHANGING)
 
 /* achievement tracking; 3.6.x did this differently */
-#define is_mines_prize(o) ((o)->o_id == gc.context.achieveo.mines_prize_oid)
-#define is_soko_prize(o) ((o)->o_id == gc.context.achieveo.soko_prize_oid)
+#define is_mines_prize(o) ((o)->o_id == svc.context.achieveo.mines_prize_oid)
+#define is_soko_prize(o) ((o)->o_id == svc.context.achieveo.soko_prize_oid)
 
 /* is_art() is now a function in artifact.c */
 /* #define is_art(o,art) ((o) && (o)->oartifact == (art)) */

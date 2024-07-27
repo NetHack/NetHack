@@ -191,7 +191,7 @@ adjattrib(
     disp.botl = TRUE;
     if (msgflg <= 0)
         You_feel("%s%s!", (incr > 1 || incr < -1) ? "very " : "", attrstr);
-    if (gp.program_state.in_moveloop && (ndx == A_STR || ndx == A_CON))
+    if (program_state.in_moveloop && (ndx == A_STR || ndx == A_CON))
         (void) encumber_msg();
     return TRUE;
 }
@@ -387,8 +387,8 @@ poisoned(
     }
 
     if (u.uhp < 1) {
-        gk.killer.format = kprefix;
-        Strcpy(gk.killer.name, pkiller);
+        svk.killer.format = kprefix;
+        Strcpy(svk.killer.name, pkiller);
         /* "Poisoned by a poisoned ___" is redundant */
         done(strstri(pkiller, "poison") ? DIED : POISONING);
     }
@@ -501,14 +501,14 @@ exercise(int i, boolean inc_or_dec)
                                                                       : "Con",
                     (inc_or_dec) ? "inc" : "dec", AEXE(i));
     }
-    if (gm.moves > 0 && (i == A_STR || i == A_CON))
+    if (svm.moves > 0 && (i == A_STR || i == A_CON))
         (void) encumber_msg();
 }
 
 staticfn void
 exerper(void)
 {
-    if (!(gm.moves % 10)) {
+    if (!(svm.moves % 10)) {
         /* Hunger Checks */
         int hs = (u.uhunger > 1000) ? SATIATED
                  : (u.uhunger > 150) ? NOT_HUNGRY
@@ -555,7 +555,7 @@ exerper(void)
     }
 
     /* status checks */
-    if (!(gm.moves % 5)) {
+    if (!(svm.moves % 5)) {
         debugpline0("exerper: Status checks");
         if ((HClairvoyant & (INTRINSIC | TIMEOUT)) && !BClairvoyant)
             exercise(A_WIS, TRUE);
@@ -590,11 +590,11 @@ exerchk(void)
     /*  Check out the periodic accumulations */
     exerper();
 
-    if (gm.moves >= gc.context.next_attrib_check) {
+    if (svm.moves >= svc.context.next_attrib_check) {
         debugpline1("exerchk: ready to test. multi = %ld.", gm.multi);
     }
     /*  Are we ready for a test? */
-    if (gm.moves >= gc.context.next_attrib_check && !gm.multi) {
+    if (svm.moves >= svc.context.next_attrib_check && !gm.multi) {
         debugpline0("exerchk: testing.");
         /*
          *      Law of diminishing returns (Part II):
@@ -658,9 +658,9 @@ exerchk(void)
                platform-dependent rounding/truncation for negative vals */
             AEXE(i) = (abs(ax) / 2) * mod_val;
         }
-        gc.context.next_attrib_check += rn1(200, 800);
+        svc.context.next_attrib_check += rn1(200, 800);
         debugpline1("exerchk: next check at %ld.",
-                    gc.context.next_attrib_check);
+                    svc.context.next_attrib_check);
     }
 }
 
@@ -1072,7 +1072,7 @@ newhp(void)
             hp += rnd(gu.urole.hpadv.inrnd);
         if (gu.urace.hpadv.inrnd > 0)
             hp += rnd(gu.urace.hpadv.inrnd);
-        if (gm.moves <= 1L) { /* initial hero; skip for polyself to new man */
+        if (svm.moves <= 1L) { /* initial hero; skip for polyself to new man */
             /* Initialize alignment stuff */
             u.ualign.type = aligns[flags.initalign].value;
             u.ualign.record = gu.urole.initrecord;

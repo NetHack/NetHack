@@ -36,7 +36,7 @@ pckeys(unsigned char scancode, unsigned char shift)
 {
     boolean opening_dialog;
 
-    opening_dialog = gp.pl_character[0] ? FALSE : TRUE;
+    opening_dialog = svp.pl_character[0] ? FALSE : TRUE;
     switch (scancode) {
 #ifdef SIMULATE_CURSOR
     case 0x3d: /* F3 = toggle cursor type */

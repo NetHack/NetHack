@@ -35,7 +35,7 @@ noteleport_level(struct monst *mon)
             return TRUE;
 
     /* natural no-teleport level */
-    if (gl.level.flags.noteleport)
+    if (svl.level.flags.noteleport)
         return TRUE;
 
     return FALSE;
@@ -368,30 +368,30 @@ tele_jump_ok(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
 {
     if (!isok(x2, y2))
         return FALSE;
-    if (gd.dndest.nlx > 0) {
+    if (svd.dndest.nlx > 0) {
         /* if inside a restricted region, can't teleport outside */
-        if (within_bounded_area(x1, y1, gd.dndest.nlx, gd.dndest.nly,
-                                gd.dndest.nhx, gd.dndest.nhy)
-            && !within_bounded_area(x2, y2, gd.dndest.nlx, gd.dndest.nly,
-                                    gd.dndest.nhx, gd.dndest.nhy))
+        if (within_bounded_area(x1, y1, svd.dndest.nlx, svd.dndest.nly,
+                                svd.dndest.nhx, svd.dndest.nhy)
+            && !within_bounded_area(x2, y2, svd.dndest.nlx, svd.dndest.nly,
+                                    svd.dndest.nhx, svd.dndest.nhy))
             return FALSE;
         /* and if outside, can't teleport inside */
-        if (!within_bounded_area(x1, y1, gd.dndest.nlx, gd.dndest.nly,
-                                 gd.dndest.nhx, gd.dndest.nhy)
-            && within_bounded_area(x2, y2, gd.dndest.nlx, gd.dndest.nly,
-                                   gd.dndest.nhx, gd.dndest.nhy))
+        if (!within_bounded_area(x1, y1, svd.dndest.nlx, svd.dndest.nly,
+                                 svd.dndest.nhx, svd.dndest.nhy)
+            && within_bounded_area(x2, y2, svd.dndest.nlx, svd.dndest.nly,
+                                   svd.dndest.nhx, svd.dndest.nhy))
             return FALSE;
     }
-    if (gu.updest.nlx > 0) { /* ditto */
-        if (within_bounded_area(x1, y1, gu.updest.nlx, gu.updest.nly,
-                                gu.updest.nhx, gu.updest.nhy)
-            && !within_bounded_area(x2, y2, gu.updest.nlx, gu.updest.nly,
-                                    gu.updest.nhx, gu.updest.nhy))
+    if (svu.updest.nlx > 0) { /* ditto */
+        if (within_bounded_area(x1, y1, svu.updest.nlx, svu.updest.nly,
+                                svu.updest.nhx, svu.updest.nhy)
+            && !within_bounded_area(x2, y2, svu.updest.nlx, svu.updest.nly,
+                                    svu.updest.nhx, svu.updest.nhy))
             return FALSE;
-        if (!within_bounded_area(x1, y1, gu.updest.nlx, gu.updest.nly,
-                                 gu.updest.nhx, gu.updest.nhy)
-            && within_bounded_area(x2, y2, gu.updest.nlx, gu.updest.nly,
-                                   gu.updest.nhx, gu.updest.nhy))
+        if (!within_bounded_area(x1, y1, svu.updest.nlx, svu.updest.nly,
+                                 svu.updest.nhx, svu.updest.nhy)
+            && within_bounded_area(x2, y2, svu.updest.nlx, svu.updest.nly,
+                                   svu.updest.nhx, svu.updest.nhy))
             return FALSE;
     }
     return TRUE;
@@ -1124,10 +1124,10 @@ level_tele(void)
 
     if (iflags.debug_fuzzer) {
         do {
-            newlevel.dnum = rn2(gn.n_dgns);
+            newlevel.dnum = rn2(svn.n_dgns);
         } while (newlevel.dnum == astral_level.dnum
-                 || gd.dungeons[newlevel.dnum].flags.unconnected
-                 || !gd.dungeons[newlevel.dnum].num_dunlevs);
+                 || svd.dungeons[newlevel.dnum].flags.unconnected
+                 || !svd.dungeons[newlevel.dnum].num_dunlevs);
         newlevel.dlevel = 1 + rn2(dunlevs_in_dungeon(&newlevel));
         assign_level(&u.ucamefrom, &u.uz);
         schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0, (char *) 0);
@@ -1214,8 +1214,8 @@ level_tele(void)
             if (gi.invent)
                 Your("possessions land on the %s with a thud.",
                      surface(u.ux, u.uy));
-            gk.killer.format = NO_KILLER_PREFIX;
-            Strcpy(gk.killer.name, "committed suicide");
+            svk.killer.format = NO_KILLER_PREFIX;
+            Strcpy(svk.killer.name, "committed suicide");
             done(DIED);
             pline("An energized cloud of dust begins to coalesce.");
             Your("body rematerializes%s.",
@@ -1239,7 +1239,7 @@ level_tele(void)
          * we let negative values requests fall into the "heaven" handling.
          */
         if (In_quest(&u.uz) && newlev > 0)
-            newlev = newlev + gd.dungeons[u.uz.dnum].depth_start - 1;
+            newlev = newlev + svd.dungeons[u.uz.dnum].depth_start - 1;
     } else { /* involuntary level tele */
  random_levtport:
         newlev = random_teleport_level();
@@ -1269,7 +1269,7 @@ level_tele(void)
         return;
     }
 
-    gk.killer.name[0] = 0; /* still alive, so far... */
+    svk.killer.name[0] = 0; /* still alive, so far... */
 
     if (iflags.debug_fuzzer && newlev < 0)
         goto random_levtport;
@@ -1286,8 +1286,8 @@ level_tele(void)
             You("arrive in heaven.");
             SetVoice((struct monst *) 0, 0, 80, voice_deity);
             verbalize("Thou art early, but we'll admit thee.");
-            gk.killer.format = NO_KILLER_PREFIX;
-            Strcpy(gk.killer.name, "went to heaven prematurely");
+            svk.killer.format = NO_KILLER_PREFIX;
+            Strcpy(svk.killer.name, "went to heaven prematurely");
         } else if (newlev == -9) {
             You_feel("deliriously happy.");
             pline("(In fact, you're on Cloud 9!)");
@@ -1295,7 +1295,7 @@ level_tele(void)
         } else
             You("are now high above the clouds...");
 
-        if (gk.killer.name[0]) {
+        if (svk.killer.name[0]) {
             ; /* arrival in heaven is pending */
         } else if (Levitation) {
             escape_by_flying = "float gently down to earth";
@@ -1304,14 +1304,14 @@ level_tele(void)
         } else {
             pline("Unfortunately, you don't know how to fly.");
             You("plummet a few thousand feet to your death.");
-            Sprintf(gk.killer.name,
+            Sprintf(svk.killer.name,
                     "teleported out of the dungeon and fell to %s death",
                     uhis());
-            gk.killer.format = NO_KILLER_PREFIX;
+            svk.killer.format = NO_KILLER_PREFIX;
         }
     }
 
-    if (gk.killer.name[0]) { /* the chosen destination was not survivable */
+    if (svk.killer.name[0]) { /* the chosen destination was not survivable */
         d_level lsav;
 
         /* set specific death location; this also suppresses bones */
@@ -1337,7 +1337,7 @@ level_tele(void)
         /* wizard mode menu; no further validation needed */
         ;
     } else if (u.uz.dnum == medusa_level.dnum
-               && newlev >= gd.dungeons[u.uz.dnum].depth_start
+               && newlev >= svd.dungeons[u.uz.dnum].depth_start
                                 + dunlevs_in_dungeon(&u.uz)) {
         find_hell(&newlevel);
     } else {
@@ -1348,7 +1348,7 @@ level_tele(void)
         d_level *qbranch = In_quest(&u.uz) ? &qstart_level
                           : In_mines(&u.uz) ? &mineend_level
                             : &sanctum_level;
-        int deepest = gd.dungeons[qbranch->dnum].depth_start
+        int deepest = svd.dungeons[qbranch->dnum].depth_start
                       + dunlevs_in_dungeon(qbranch) - 1;
 
         /* if invocation did not yet occur, teleporting into
@@ -1386,7 +1386,7 @@ level_tele(void)
 
     /* in case player just read a scroll and is about to be asked to
        call it something, we can't defer until the end of the turn */
-    if (u.utotype && !gc.context.mon_moving)
+    if (u.utotype && !svc.context.mon_moving)
         deferred_goto();
 #endif
 }
@@ -1528,25 +1528,25 @@ rloc_pos_ok(
     yy = mtmp->my;
     if (!xx) {
         /* no current location (migrating monster arrival) */
-        if (gd.dndest.nlx && On_W_tower_level(&u.uz))
+        if (svd.dndest.nlx && On_W_tower_level(&u.uz))
             return (((yy & 2) != 0)
                     /* inside xor not within */
-                    ^ !within_bounded_area(x, y, gd.dndest.nlx, gd.dndest.nly,
-                                           gd.dndest.nhx, gd.dndest.nhy));
-        if (gu.updest.lx && (yy & 1) != 0) /* moving up */
-            return (within_bounded_area(x, y, gu.updest.lx, gu.updest.ly,
-                                        gu.updest.hx, gu.updest.hy)
-                    && (!gu.updest.nlx
+                    ^ !within_bounded_area(x, y, svd.dndest.nlx, svd.dndest.nly,
+                                           svd.dndest.nhx, svd.dndest.nhy));
+        if (svu.updest.lx && (yy & 1) != 0) /* moving up */
+            return (within_bounded_area(x, y, svu.updest.lx, svu.updest.ly,
+                                        svu.updest.hx, svu.updest.hy)
+                    && (!svu.updest.nlx
                         || !within_bounded_area(x, y,
-                                              gu.updest.nlx, gu.updest.nly,
-                                              gu.updest.nhx, gu.updest.nhy)));
-        if (gd.dndest.lx && (yy & 1) == 0) /* moving down */
-            return (within_bounded_area(x, y, gd.dndest.lx, gd.dndest.ly,
-                                        gd.dndest.hx, gd.dndest.hy)
-                    && (!gd.dndest.nlx
+                                              svu.updest.nlx, svu.updest.nly,
+                                              svu.updest.nhx, svu.updest.nhy)));
+        if (svd.dndest.lx && (yy & 1) == 0) /* moving down */
+            return (within_bounded_area(x, y, svd.dndest.lx, svd.dndest.ly,
+                                        svd.dndest.hx, svd.dndest.hy)
+                    && (!svd.dndest.nlx
                         || !within_bounded_area(x, y,
-                                              gd.dndest.nlx, gd.dndest.nly,
-                                              gd.dndest.nhx, gd.dndest.nhy)));
+                                              svd.dndest.nlx, svd.dndest.nly,
+                                              svd.dndest.nhx, svd.dndest.nhy)));
     } else {
         /* [try to] prevent a shopkeeper or temple priest from being
            sent out of his room (caller might resort to goodpos() if
@@ -2033,7 +2033,7 @@ rloco(struct obj *obj)
     obj_extract_self(obj);
     otx = obj->ox;
     oty = obj->oy;
-    restricted_fall = (otx == 0 && gd.dndest.lx);
+    restricted_fall = (otx == 0 && svd.dndest.lx);
     do {
         tx = rn1(COLNO - 3, 2);
         ty = rn2(ROWNO);
@@ -2041,20 +2041,20 @@ rloco(struct obj *obj)
             break;
     } while (!goodpos(tx, ty, (struct monst *) 0, 0)
              || (restricted_fall
-                 && (!within_bounded_area(tx, ty, gd.dndest.lx, gd.dndest.ly,
-                                          gd.dndest.hx, gd.dndest.hy)
-                     || (gd.dndest.nlx
+                 && (!within_bounded_area(tx, ty, svd.dndest.lx, svd.dndest.ly,
+                                          svd.dndest.hx, svd.dndest.hy)
+                     || (svd.dndest.nlx
                          && within_bounded_area(tx, ty,
-                                              gd.dndest.nlx, gd.dndest.nly,
-                                              gd.dndest.nhx, gd.dndest.nhy))))
+                                              svd.dndest.nlx, svd.dndest.nly,
+                                              svd.dndest.nhx, svd.dndest.nhy))))
              /* on the Wizard Tower levels, objects inside should
                 stay inside and objects outside should stay outside */
-             || (gd.dndest.nlx && On_W_tower_level(&u.uz)
-                 && within_bounded_area(tx, ty, gd.dndest.nlx, gd.dndest.nly,
-                                        gd.dndest.nhx, gd.dndest.nhy)
+             || (svd.dndest.nlx && On_W_tower_level(&u.uz)
+                 && within_bounded_area(tx, ty, svd.dndest.nlx, svd.dndest.nly,
+                                        svd.dndest.nhx, svd.dndest.nhy)
                     != within_bounded_area(otx, oty,
-                                           gd.dndest.nlx, gd.dndest.nly,
-                                           gd.dndest.nhx, gd.dndest.nhy)));
+                                           svd.dndest.nlx, svd.dndest.nly,
+                                           svd.dndest.nhx, svd.dndest.nhy)));
 
     if (flooreffects(obj, tx, ty, "fall")) {
         /* update old location since flooreffects() couldn't;
@@ -2140,12 +2140,12 @@ random_teleport_level(void)
            no one can randomly teleport past it */
         if (dunlev_reached(&u.uz) < qlocate_depth)
             bottom = qlocate_depth;
-        min_depth = gd.dungeons[u.uz.dnum].depth_start;
-        max_depth = bottom + (gd.dungeons[u.uz.dnum].depth_start - 1);
+        min_depth = svd.dungeons[u.uz.dnum].depth_start;
+        max_depth = bottom + (svd.dungeons[u.uz.dnum].depth_start - 1);
     } else {
         min_depth = 1;
         max_depth = dunlevs_in_dungeon(&u.uz)
-                    + (gd.dungeons[u.uz.dnum].depth_start - 1);
+                    + (svd.dungeons[u.uz.dnum].depth_start - 1);
         /* can't reach Sanctum if the invocation hasn't been performed */
         if (Inhell && !u.uevent.invoked)
             max_depth -= 1;

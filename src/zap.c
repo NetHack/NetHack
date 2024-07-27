@@ -234,7 +234,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
                 dmg *= 2;
             if (otyp == SPE_TURN_UNDEAD)
                 dmg = spell_damage_bonus(dmg);
-            gc.context.bypasses = TRUE; /* for make_corpse() */
+            svc.context.bypasses = TRUE; /* for make_corpse() */
             if (!resist(mtmp, otmp->oclass, dmg, NOTELL)) {
                 if (!DEADMONSTER(mtmp))
                     monflee(mtmp, 0, FALSE, TRUE);
@@ -273,7 +273,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
                     pline("%s shudders!", Monnam(mtmp));
                     learn_it = TRUE;
                 }
-                /* gc.context.bypasses = TRUE; ## for make_corpse() */
+                /* svc.context.bypasses = TRUE; ## for make_corpse() */
                 /* no corpse after system shock */
                 xkilled(mtmp, XKILL_GIVEMSG | XKILL_NOCORPSE);
             } else {
@@ -309,7 +309,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
                 /* flag to indicate that cleanup is needed; object
                    bypass cleanup also clears mon->mextra->mcorpsenm
                    for all long worms on the level */
-                gc.context.bypasses = TRUE;
+                svc.context.bypasses = TRUE;
             }
         }
         break;
@@ -724,10 +724,10 @@ montraits(
         if (mtmp->m_id) {
             mtmp2->m_id = mtmp->m_id;
             /* might be bringing quest leader back to life */
-            if (gq.quest_status.leader_is_dead
+            if (svq.quest_status.leader_is_dead
                 /* leader_is_dead implies leader_m_id is valid */
-                && mtmp2->m_id == gq.quest_status.leader_m_id)
-                gq.quest_status.leader_is_dead = FALSE;
+                && mtmp2->m_id == svq.quest_status.leader_m_id)
+                svq.quest_status.leader_is_dead = FALSE;
         }
         mtmp2->mx = mtmp->mx;
         mtmp2->my = mtmp->my;
@@ -1144,7 +1144,7 @@ unturn_dead(struct monst *mon)
         save_norevive = otmp->norevive;
         otmp->norevive = 0;
 
-        if ((mtmp2 = revive(otmp, !gc.context.mon_moving)) != 0) {
+        if ((mtmp2 = revive(otmp, !svc.context.mon_moving)) != 0) {
             ++res;
             /* might get revived as a zombie rather than corpse's monster */
             different_type = (mtmp2->data != &mons[corpsenm]);
@@ -1432,7 +1432,7 @@ obj_shudders(struct obj *obj)
 {
     int zap_odds;
 
-    if (gc.context.bypasses && obj->bypass)
+    if (svc.context.bypasses && obj->bypass)
         return FALSE;
 
     if (obj->oclass == WAND_CLASS)
@@ -1463,7 +1463,7 @@ polyuse(struct obj *objhdr, int mat, int minwt)
 
     for (otmp = objhdr; minwt > 0 && otmp; otmp = otmp2) {
         otmp2 = otmp->nexthere;
-        if (gc.context.bypasses && otmp->bypass)
+        if (svc.context.bypasses && otmp->bypass)
             continue;
         if (otmp == uball || otmp == uchain)
             continue;
@@ -1505,7 +1505,7 @@ create_polymon(struct obj *obj, int okind)
     const char *material;
     int pm_index;
 
-    if (gc.context.bypasses) {
+    if (svc.context.bypasses) {
         /* this is approximate because the "no golems" !obj->nexthere
            check below doesn't understand bypassed objects; but it
            should suffice since bypassed objects always end up as a
@@ -1575,7 +1575,7 @@ create_polymon(struct obj *obj, int okind)
         break;
     }
 
-    if (!(gm.mvitals[pm_index].mvflags & G_GENOD))
+    if (!(svm.mvitals[pm_index].mvflags & G_GENOD))
         mdat = &mons[pm_index];
 
     mtmp = makemon(mdat, obj->ox, obj->oy, MM_NOMSG);
@@ -1819,7 +1819,7 @@ poly_obj(struct obj *obj, int id)
 
     case SPBOOK_CLASS:
         while (otmp->otyp == SPE_POLYMORPH)
-            otmp->otyp = rnd_class(gb.bases[SPBOOK_CLASS], SPE_BLANK_PAPER);
+            otmp->otyp = rnd_class(svb.bases[SPBOOK_CLASS], SPE_BLANK_PAPER);
         /* reduce spellbook abuse; non-blank books degrade;
            3.7: novels don't use spestudied so shouldn't degrade to blank
            (but don't force spestudied to zero for them since a non-zero
@@ -2110,13 +2110,13 @@ bhito(struct obj *obj, struct obj *otmp)
          *             the invent or mon->minvent chain, possibly recursively.
          *
          * The bypass bit on all objects is reset each turn, whenever
-         * gc.context.bypasses is set.
+         * svc.context.bypasses is set.
          *
-         * We check the obj->bypass bit above AND gc.context.bypasses
+         * We check the obj->bypass bit above AND svc.context.bypasses
          * as a safeguard against any stray occurrence left in an obj
          * struct someplace, although that should never happen.
          */
-        if (gc.context.bypasses) {
+        if (svc.context.bypasses) {
             return 0;
         } else {
             debugpline1("%s for a moment.", Tobjnam(obj, "pulsate"));
@@ -2158,7 +2158,7 @@ bhito(struct obj *obj, struct obj *otmp)
                 (void) boxlock(obj, otmp);
 
             if (obj_shudders(obj)) {
-                boolean cover = ((obj == gl.level.objects[u.ux][u.uy])
+                boolean cover = ((obj == svl.level.objects[u.ux][u.uy])
                                  && u.uundetected
                                  && hides_under(gy.youmonst.data));
 
@@ -2247,7 +2247,7 @@ bhito(struct obj *obj, struct obj *otmp)
             } else {
                 int oox = obj->ox, ooy = obj->oy;
 
-                if (gc.context.mon_moving ? !breaks(obj, oox, ooy)
+                if (svc.context.mon_moving ? !breaks(obj, oox, ooy)
                                           : !hero_breaks(obj, oox, ooy, 0))
                     maybelearnit = FALSE; /* nothing broke */
                 else
@@ -2287,7 +2287,7 @@ bhito(struct obj *obj, struct obj *otmp)
                 struct monst *mtmp;
                 coordxy ox, oy;
                 unsigned save_norevive;
-                boolean by_u = !gc.context.mon_moving;
+                boolean by_u = !svc.context.mon_moving;
                 int corpsenm = corpse_revive_type(obj);
                 char *corpsname = cxname_singular(obj);
 
@@ -2385,7 +2385,7 @@ bhitpile(
     boolean hidingunder, first;
     int prevotyp, hitanything = 0;
 
-    if (!gl.level.objects[tx][ty])
+    if (!svl.level.objects[tx][ty])
         return 0;
 
     /* if hiding underneath an object and zapping up or down, the top item
@@ -2395,7 +2395,7 @@ bhitpile(
 
     if (obj->otyp == SPE_FORCE_BOLT || obj->otyp == WAN_STRIKING) {
         struct trap *t = t_at(tx, ty);
-        struct obj *topofpile = gl.level.objects[tx][ty];
+        struct obj *topofpile = svl.level.objects[tx][ty];
 
         /* We can't settle for the default calling sequence of
            bhito(otmp) -> break_statue(otmp) -> activate_statue_trap(ox,oy)
@@ -2408,12 +2408,12 @@ bhitpile(
         /* assume zapping up or down while hiding under the top item can
            still activate the trap even if it's below (when zapping up)
            or above (when zapping down) */
-        if (gl.level.objects[tx][ty] != topofpile)
+        if (svl.level.objects[tx][ty] != topofpile)
             first = FALSE; /* top item was statue which activated */
     }
 
     gp.poly_zapped = -1;
-    for (otmp = gl.level.objects[tx][ty]; otmp; otmp = next_obj) {
+    for (otmp = svl.level.objects[tx][ty]; otmp; otmp = next_obj) {
         next_obj = otmp->nexthere;
         if (hidingunder) {
             if (first) {
@@ -2432,14 +2432,14 @@ bhitpile(
     }
 
     if (gp.poly_zapped >= 0)
-        create_polymon(gl.level.objects[tx][ty], gp.poly_zapped);
+        create_polymon(svl.level.objects[tx][ty], gp.poly_zapped);
 
     /* when boulders are present they're expected to be on top; with
        multiple boulders it's possible for some to have been changed into
        non-boulders (polymorph, stone-to-flesh) while ones beneath resist,
        so re-stack pile if there are any non-boulders above boulders */
     prevotyp = BOULDER;
-    for (otmp = gl.level.objects[tx][ty]; otmp; otmp = otmp->nexthere) {
+    for (otmp = svl.level.objects[tx][ty]; otmp; otmp = otmp->nexthere) {
         if (otmp->otyp == BOULDER && prevotyp != BOULDER) {
             recreate_pile_at(tx, ty);
             break;
@@ -2820,8 +2820,8 @@ zapyourself(struct obj *obj, boolean ordinary)
             break;
         }
         learn_it = TRUE;
-        Sprintf(gk.killer.name, "shot %sself with a death ray", uhim());
-        gk.killer.format = NO_KILLER_PREFIX;
+        Sprintf(svk.killer.name, "shot %sself with a death ray", uhim());
+        svk.killer.format = NO_KILLER_PREFIX;
         /* probably don't need these to be urgent; player just gave input
            without subsequent opportunity to dismiss --More-- with ESC */
         urgent_pline("You irradiate yourself with pure energy!");
@@ -3177,7 +3177,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
             map_zapped = TRUE;
             if (ltyp == ICE || IS_FURNITURE(ltyp)) {
                 surf = "it";
-                if (gl.lastseentyp[x][y] != rememberedltyp)
+                if (svl.lastseentyp[x][y] != rememberedltyp)
                     ptmp += 1;
             } else {
                 surf = the(surface(x, y));
@@ -3323,7 +3323,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
          */
         if (u.uundetected && hides_under(gy.youmonst.data)) {
             int hitit = 0;
-            otmp = gl.level.objects[u.ux][u.uy];
+            otmp = svl.level.objects[u.ux][u.uy];
 
             if (otmp)
                 hitit = bhito(otmp, obj);
@@ -3581,7 +3581,7 @@ zap_map(
             case WAN_POLYMORPH:
             case SPE_POLYMORPH:
                 del_engr(e);
-                make_engr_at(x, y, random_engraving(ebuf), gm.moves, 0);
+                make_engr_at(x, y, random_engraving(ebuf), svm.moves, 0);
                 break;
             case WAN_CANCELLATION:
             case SPE_CANCELLATION:
@@ -3654,10 +3654,10 @@ zap_map(
 
         /* map terrain; might reveal a special room which is already within
            view that hasn't been entered yet */
-        oldtyp = gl.lastseentyp[x][y];
+        oldtyp = svl.lastseentyp[x][y];
         oldglyph = glyph_at(x, y);
         show_map_spot(x, y, FALSE);
-        if (oldtyp != gl.lastseentyp[x][y] || oldglyph != glyph_at(x, y)) {
+        if (oldtyp != svl.lastseentyp[x][y] || oldglyph != glyph_at(x, y)) {
             /* TODO: ought to give some message */
             learn_it = TRUE;
         }
@@ -4409,8 +4409,8 @@ zhitu(
             break;
         }
         monstunseesu(M_SEEN_MAGR);
-        gk.killer.format = KILLED_BY_AN;
-        Strcpy(gk.killer.name, fltxt ? fltxt : "");
+        svk.killer.format = KILLED_BY_AN;
+        Strcpy(svk.killer.name, fltxt ? fltxt : "");
         /* when killed by disintegration breath, don't leave corpse */
         u.ugrave_arise = (type == -ZT_BREATH(ZT_DEATH)) ? -3 : NON_PM;
         done(DIED);
@@ -4513,7 +4513,7 @@ burn_floor_objects(
     char buf1[BUFSZ], buf2[BUFSZ];
     int cnt = 0;
 
-    for (obj = gl.level.objects[x][y]; obj; obj = obj2) {
+    for (obj = svl.level.objects[x][y]; obj; obj = obj2) {
         obj2 = obj->nexthere;
         if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS
             || (obj->oclass == FOOD_CLASS
@@ -4559,7 +4559,7 @@ burn_floor_objects(
     }
     /* This also ignites floor items, but does not change cnt
        because they weren't consumed. */
-    ignite_items(gl.level.objects[x][y]);
+    ignite_items(svl.level.objects[x][y]);
     return cnt;
 }
 
@@ -5009,15 +5009,15 @@ melt_ice_away(anything *arg, long timeout UNUSED)
 {
     coordxy x, y;
     long where = arg->a_long;
-    boolean save_mon_moving = gc.context.mon_moving; /* will be False */
+    boolean save_mon_moving = svc.context.mon_moving; /* will be False */
 
     /* melt_ice -> minliquid -> mondead|xkilled shouldn't credit/blame hero */
-    gc.context.mon_moving = TRUE; /* hero isn't causing this ice to melt */
+    svc.context.mon_moving = TRUE; /* hero isn't causing this ice to melt */
     y = (coordxy) (where & 0xFFFF);
     x = (coordxy) ((where >> 16) & 0xFFFF);
     /* melt_ice does newsym when appropriate */
     melt_ice(x, y, "Some ice melts away.");
-    gc.context.mon_moving = save_mon_moving;
+    svc.context.mon_moving = save_mon_moving;
 }
 
 /* Burn floor scrolls, evaporate pools, etc... in a single square.
@@ -5128,7 +5128,7 @@ zap_over_floor(
         if (is_pool(x, y) || is_lava(x, y) || lavawall) {
             boolean lava = (is_lava(x, y) || lavawall),
                     moat = is_moat(x, y);
-            int chance = max(2, 5 + gl.level.flags.temperature * 10);
+            int chance = max(2, 5 + svl.level.flags.temperature * 10);
 
             if (IS_WATERWALL(lev->typ) || (lavawall && rn2(chance))) {
                 /* For now, don't let WATER freeze. */
@@ -5421,7 +5421,7 @@ void
 fracture_rock(struct obj *obj) /* no texts here! */
 {
     coordxy x, y;
-    boolean by_you = !gc.context.mon_moving;
+    boolean by_you = !svc.context.mon_moving;
 
     if (by_you && get_obj_location(obj, &x, &y, 0) && costly_spot(x, y)) {
         struct monst *shkp = 0;
@@ -5468,7 +5468,7 @@ break_statue(struct obj *obj)
     /* [obj is assumed to be on floor, so no get_obj_location() needed] */
     struct trap *trap = t_at(obj->ox, obj->oy);
     struct obj *item;
-    boolean by_you = !gc.context.mon_moving;
+    boolean by_you = !svc.context.mon_moving;
 
     if (trap && trap->ttyp == STATUE_TRAP
         && activate_statue_trap(trap, obj->ox, obj->oy, TRUE))

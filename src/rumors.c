@@ -582,7 +582,7 @@ init_oracles(dlb *fp)
     (void) dlb_fgets(line, sizeof line, fp); /* skip "don't edit" comment*/
     (void) dlb_fgets(line, sizeof line, fp);
     if (sscanf(line, "%5d\n", &cnt) == 1 && cnt > 0) {
-        go.oracle_cnt = (unsigned) cnt;
+        svo.oracle_cnt = (unsigned) cnt;
         go.oracle_loc = (unsigned long *) alloc((unsigned) cnt * sizeof(long));
         for (i = 0; i < cnt; i++) {
             (void) dlb_fgets(line, sizeof line, fp);
@@ -597,19 +597,19 @@ save_oracles(NHFILE *nhfp)
 {
     if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t) &go.oracle_cnt,
-                       sizeof go.oracle_cnt);
-            if (go.oracle_cnt) {
+                bwrite(nhfp->fd, (genericptr_t) &svo.oracle_cnt,
+                       sizeof svo.oracle_cnt);
+            if (svo.oracle_cnt) {
                 if (nhfp->structlevel) {
                     bwrite(nhfp->fd, (genericptr_t) go.oracle_loc,
-                           go.oracle_cnt * sizeof (long));
+                           svo.oracle_cnt * sizeof (long));
                 }
             }
     }
     if (release_data(nhfp)) {
-        if (go.oracle_cnt) {
+        if (svo.oracle_cnt) {
             free((genericptr_t) go.oracle_loc);
-            go.oracle_loc = 0, go.oracle_cnt = 0, go.oracle_flg = 0;
+            go.oracle_loc = 0, svo.oracle_cnt = 0, go.oracle_flg = 0;
         }
     }
 }
@@ -618,13 +618,13 @@ void
 restore_oracles(NHFILE *nhfp)
 {
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &go.oracle_cnt, sizeof go.oracle_cnt);
+        mread(nhfp->fd, (genericptr_t) &svo.oracle_cnt, sizeof svo.oracle_cnt);
 
-    if (go.oracle_cnt) {
-        go.oracle_loc = (unsigned long *) alloc(go.oracle_cnt * sizeof(long));
+    if (svo.oracle_cnt) {
+        go.oracle_loc = (unsigned long *) alloc(svo.oracle_cnt * sizeof(long));
         if (nhfp->structlevel) {
             mread(nhfp->fd, (genericptr_t) go.oracle_loc,
-                  go.oracle_cnt * sizeof (long));
+                  svo.oracle_cnt * sizeof (long));
         }
         go.oracle_flg = 1; /* no need to call init_oracles() */
     }
@@ -640,7 +640,7 @@ outoracle(boolean special, boolean delphi)
 
     /* early return if we couldn't open ORACLEFILE on previous attempt,
        or if all the oracularities are already exhausted */
-    if (go.oracle_flg < 0 || (go.oracle_flg > 0 && go.oracle_cnt == 0))
+    if (go.oracle_flg < 0 || (go.oracle_flg > 0 && svo.oracle_cnt == 0))
         return;
 
     oracles = dlb_fopen(ORACLEFILE, "r");
@@ -649,17 +649,17 @@ outoracle(boolean special, boolean delphi)
         if (go.oracle_flg == 0) { /* if this is the first outoracle() */
             init_oracles(oracles);
             go.oracle_flg = 1;
-            if (go.oracle_cnt == 0)
+            if (svo.oracle_cnt == 0)
                 goto close_oracles;
         }
         /* oracle_loc[0] is the special oracle;
            oracle_loc[1..oracle_cnt-1] are normal ones */
-        if (go.oracle_cnt <= 1 && !special)
+        if (svo.oracle_cnt <= 1 && !special)
             goto close_oracles; /*(shouldn't happen)*/
-        oracle_idx = special ? 0 : rnd((int) go.oracle_cnt - 1);
+        oracle_idx = special ? 0 : rnd((int) svo.oracle_cnt - 1);
         (void) dlb_fseek(oracles, (long) go.oracle_loc[oracle_idx], SEEK_SET);
         if (!special) /* move offset of very last one into this slot */
-            go.oracle_loc[oracle_idx] = go.oracle_loc[--go.oracle_cnt];
+            go.oracle_loc[oracle_idx] = go.oracle_loc[--svo.oracle_cnt];
 
         tmpwin = create_nhwindow(NHW_TEXT);
         if (delphi)
@@ -723,7 +723,7 @@ doconsult(struct monst *oracl)
         break;
     case 'n':
         if (umoney <= (long) minor_cost /* don't even ask */
-            || (go.oracle_cnt == 1 || go.oracle_flg < 0))
+            || (svo.oracle_cnt == 1 || go.oracle_flg < 0))
             return ECMD_OK;
         Sprintf(qbuf, "\"Then dost thou desire a major one?\" (%d %s)",
                 major_cost, currency((long) major_cost));
@@ -763,16 +763,16 @@ doconsult(struct monst *oracl)
 staticfn void
 couldnt_open_file(const char *filename)
 {
-    int save_something = gp.program_state.something_worth_saving;
+    int save_something = program_state.something_worth_saving;
 
     /* most likely the file is missing, so suppress impossible()'s
        "saving and restoring might fix this" (unless the fuzzer,
        which escalates impossible to panic, is running) */
     if (!iflags.debug_fuzzer)
-        gp.program_state.something_worth_saving = 0;
+        program_state.something_worth_saving = 0;
 
     impossible("Can't open '%s' file.", filename);
-    gp.program_state.something_worth_saving = save_something;
+    program_state.something_worth_saving = save_something;
 }
 
 /* is 'word' a capitalized monster name that should be preceded by "the"?

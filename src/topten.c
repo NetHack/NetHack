@@ -24,7 +24,7 @@
 static long final_fpos; /* [note: do not move this to the 'g' struct] */
 #endif
 
-#define done_stopprint gp.program_state.stopprint
+#define done_stopprint program_state.stopprint
 
 #define newttentry() (struct toptenentry *) alloc(sizeof (struct toptenentry))
 #define dealloc_ttentry(ttent) free((genericptr_t) (ttent))
@@ -85,7 +85,7 @@ staticfn void nsb_mung_line(char *);
 staticfn void nsb_unmung_line(char *);
 #endif
 
-/* "killed by",&c ["an"] 'gk.killer.name' */
+/* "killed by",&c ["an"] 'svk.killer.name' */
 void
 formatkiller(
     char *buf,
@@ -104,12 +104,12 @@ formatkiller(
         "", "", "", "", ""
     };
     unsigned l;
-    char c, *kname = gk.killer.name;
+    char c, *kname = svk.killer.name;
 
     buf[0] = '\0'; /* lint suppression */
-    switch (gk.killer.format) {
+    switch (svk.killer.format) {
     default:
-        impossible("bad killer format? (%d)", gk.killer.format);
+        impossible("bad killer format? (%d)", svk.killer.format);
         /*FALLTHRU*/
     case NO_KILLER_PREFIX:
         break;
@@ -333,7 +333,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 
 #ifdef XLOGFILE
 
-/* as tab is never used in eg. gp.plname or death, no need to mangle those. */
+/* as tab is never used in eg. svp.plname or death, no need to mangle those. */
 staticfn void
 writexlentry(FILE *rfile, struct toptenentry *tt, int how)
 {
@@ -359,12 +359,12 @@ writexlentry(FILE *rfile, struct toptenentry *tt, int how)
     formatkiller(tmpbuf, sizeof tmpbuf, how, FALSE);
     Fprintf(rfile, "%s%cname=%s%cdeath=%s",
             buf, /* (already includes separator) */
-            XLOG_SEP, gp.plname, XLOG_SEP, tmpbuf);
+            XLOG_SEP, svp.plname, XLOG_SEP, tmpbuf);
     if (gm.multi < 0)
         Fprintf(rfile, "%cwhile=%s", XLOG_SEP,
                 gm.multi_reason ? gm.multi_reason : "helpless");
     Fprintf(rfile, "%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx", XLOG_SEP,
-            encodeconduct(), XLOG_SEP, gm.moves, XLOG_SEP,
+            encodeconduct(), XLOG_SEP, svm.moves, XLOG_SEP,
             encodeachieve(FALSE));
     Fprintf(rfile, "%cachieveX=%s", XLOG_SEP,
             encode_extended_achievements(achbuf));
@@ -642,7 +642,7 @@ topten(int how, time_t when)
      * topten uses alloc() several times, which will lead to
      * problems if the panic was the result of an alloc() failure.
      */
-    if (gp.program_state.panicking)
+    if (program_state.panicking)
         return;
 
     if (iflags.toptenwin) {
@@ -650,7 +650,7 @@ topten(int how, time_t when)
     }
 
 #if defined(HANGUPHANDLING)
-#define HUP if (!gp.program_state.done_hup)
+#define HUP if (!program_state.done_hup)
 #else
 #define HUP
 #endif
@@ -683,7 +683,7 @@ topten(int how, time_t when)
     copynchars(t0->plrace, gu.urace.filecode, ROLESZ);
     copynchars(t0->plgend, genders[flags.female].filecode, ROLESZ);
     copynchars(t0->plalign, aligns[1 - u.ualign.type].filecode, ROLESZ);
-    copynchars(t0->name, gp.plname, NAMSZ);
+    copynchars(t0->name, svp.plname, NAMSZ);
     formatkiller(t0->death, sizeof t0->death, how, TRUE);
     t0->birthdate = yyyymmdd(ubirthday);
     t0->deathdate = yyyymmdd(when);
@@ -1020,7 +1020,7 @@ outentry(int rank, struct toptenentry *t1, boolean so)
             }
             Sprintf(eos(linebuf), fmt, arg);
         } else {
-            Sprintf(eos(linebuf), " in %s", gd.dungeons[t1->deathdnum].dname);
+            Sprintf(eos(linebuf), " in %s", svd.dungeons[t1->deathdnum].dname);
             if (t1->deathdnum != knox_level.dnum)
                 Sprintf(eos(linebuf), " on level %d", t1->deathlev);
             if (t1->deathlev != t1->maxlvl)
@@ -1251,7 +1251,7 @@ prscore(int argc, char **argv)
             playerct = 0;
             players = (const char **) 0;
         } else {
-            player0 = gp.plname;
+            player0 = svp.plname;
             if (!*player0)
                 player0 = "all"; /* if no plname[], show all scores
                                   * (possibly filtered by '-v') */

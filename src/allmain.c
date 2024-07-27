@@ -71,15 +71,15 @@ moveloop_preamble(boolean resuming)
     }
 
     if (!resuming) { /* new game */
-        gp.program_state.beyond_savefile_load = 1; /* for TTY_PERM_INVENT */
-        gc.context.rndencode = rnd(9000);
+        program_state.beyond_savefile_load = 1; /* for TTY_PERM_INVENT */
+        svc.context.rndencode = rnd(9000);
         set_wear((struct obj *) 0); /* for side-effects of starting gear */
         reset_justpicked(gi.invent);
         (void) pickup(1);      /* autopickup at initial location */
         /* only matters if someday a character is able to start with
            clairvoyance (wizard with cornuthaum perhaps?); without this,
            first "random" occurrence would always kick in on turn 1 */
-        gc.context.seer_turn = (long) rnd(30);
+        svc.context.seer_turn = (long) rnd(30);
         /* give hero initial movement points; new game only--for restore,
            pending movement points were included in the save file */
         u.umovement = NORMAL_SPEED;
@@ -98,9 +98,9 @@ moveloop_preamble(boolean resuming)
     }
 
     u.uz0.dlevel = u.uz.dlevel;
-    gc.context.move = 0;
+    svc.context.move = 0;
 
-    gp.program_state.in_moveloop = 1;
+    program_state.in_moveloop = 1;
     /* for perm_invent preset at startup, display persistent inventory after
        invent is fully populated and the in_moveloop flag has been set */
     if (iflags.perm_invent)
@@ -166,7 +166,7 @@ moveloop_core(void)
     boolean monscanmove = FALSE;
 
 #ifdef SAFERHANGUP
-    if (gp.program_state.done_hup)
+    if (program_state.done_hup)
         end_of_input();
 #endif
     get_nh_event();
@@ -176,26 +176,26 @@ moveloop_core(void)
 
     dobjsfree();
 
-    if (gc.context.bypasses)
+    if (svc.context.bypasses)
         clear_bypasses();
 
     if (iflags.sanity_check || iflags.debug_fuzzer)
         sanity_check();
 
-    if (gc.context.move) {
+    if (svc.context.move) {
         /* actual time passed */
         u.umovement -= NORMAL_SPEED;
 
         do { /* hero can't move this turn loop */
             mvl_wtcap = encumber_msg();
 
-            gc.context.mon_moving = TRUE;
+            svc.context.mon_moving = TRUE;
             do {
                 monscanmove = movemon();
                 if (u.umovement >= NORMAL_SPEED)
                     break; /* it's now your turn */
             } while (monscanmove);
-            gc.context.mon_moving = FALSE;
+            svc.context.mon_moving = FALSE;
 
             if (!monscanmove && u.umovement < NORMAL_SPEED) {
                 /* both hero and monsters are out of steam this round */
@@ -222,7 +222,7 @@ moveloop_core(void)
                 u_calc_moveamt(mvl_wtcap);
                 settrack();
 
-                gm.moves++;
+                svm.moves++;
                 /*
                  * Never allow 'moves' to grow big enough to wrap.
                  * We don't care what the maximum possible 'long int'
@@ -231,16 +231,16 @@ moveloop_core(void)
                  * When imposing the limit, use a mystic decimal value
                  * instead of a magic binary one such as 0x7fffffffL.
                  */
-                if (gm.moves >= 1000000000L) {
+                if (svm.moves >= 1000000000L) {
                     display_nhwindow(WIN_MESSAGE, TRUE);
                     urgent_pline("The dungeon capitulates.");
                     done(ESCAPED);
                 }
                 /* 'moves' is misnamed; it represents turns; hero_seq is
                    a value that is distinct every time the hero moves */
-                gh.hero_seq = gm.moves << 3;
+                gh.hero_seq = svm.moves << 3;
 
-                if (flags.time && !gc.context.run)
+                if (flags.time && !svc.context.run)
                     disp.time_botl = TRUE; /* 'moves' just changed */
 
                 /********************************/
@@ -277,8 +277,8 @@ moveloop_core(void)
 
                 /* moving around while encumbered is hard work */
                 if (mvl_wtcap > MOD_ENCUMBER && u.umoved) {
-                    if (!(mvl_wtcap < EXT_ENCUMBER ? gm.moves % 30
-                          : gm.moves % 10)) {
+                    if (!(mvl_wtcap < EXT_ENCUMBER ? svm.moves % 30
+                          : svm.moves % 10)) {
                         overexert_hp();
                     }
                 }
@@ -320,7 +320,7 @@ moveloop_core(void)
                     }
                 }
 
-                if (!gl.level.flags.noautosearch && Searching && gm.multi >= 0)
+                if (!svl.level.flags.noautosearch && Searching && gm.multi >= 0)
                     (void) dosearch0(1);
                 if (Warning)
                     warnreveal();
@@ -349,7 +349,7 @@ moveloop_core(void)
                 /* vision will be updated as bubbles move */
                 if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
                     movebubbles();
-                else if (gl.level.flags.fumaroles)
+                else if (svl.level.flags.fumaroles)
                     fumaroles();
 
                 /* when immobile, count is in turns */
@@ -382,13 +382,13 @@ moveloop_core(void)
         if (iflags.hilite_delta)
             status_eval_next_unhilite();
 #endif
-        if (gm.moves >= gc.context.seer_turn) {
+        if (svm.moves >= svc.context.seer_turn) {
             if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)
                 && !BClairvoyant)
                 do_vicinity_map((struct obj *) 0);
             /* we maintain this counter even when clairvoyance isn't
                taking place; on average, go again 30 turns from now */
-            gc.context.seer_turn = gm.moves + (long) rn1(31, 15); /*15..45*/
+            svc.context.seer_turn = svm.moves + (long) rn1(31, 15); /*15..45*/
             /* [it used to be that on every 15th turn, there was a 50%
                chance of farsight, so it could happen as often as every
                15 turns or theoretically never happen at all; but when
@@ -417,7 +417,7 @@ moveloop_core(void)
 
     clear_splitobjs();
     find_ac();
-    if (!gc.context.mv || Blind) {
+    if (!svc.context.mv || Blind) {
         /* redo monsters if hallu or wearing a helm of telepathy */
         if (Hallucination) { /* update screen randomly */
             see_monsters();
@@ -443,7 +443,7 @@ moveloop_core(void)
 
     m_everyturn_effect(&gy.youmonst);
 
-    gc.context.move = 1;
+    svc.context.move = 1;
 
     if (gm.multi >= 0 && go.occupation) {
 #if defined(MICRO) || defined(WIN32CON)
@@ -485,10 +485,10 @@ moveloop_core(void)
         runmode_delay_output();
         if (!gm.multi) {
             /* lookaround may clear multi */
-            gc.context.move = 0;
+            svc.context.move = 0;
             return;
         }
-        if (gc.context.mv) {
+        if (svc.context.mv) {
             if (gm.multi < COLNO && !--gm.multi)
                 end_running(TRUE);
             domove();
@@ -509,10 +509,10 @@ moveloop_core(void)
     if (gv.vision_full_recalc)
         vision_recalc(0); /* vision! */
     /* when running in non-tport mode, this gets done through domove() */
-    if ((!gc.context.run || flags.runmode == RUN_TPORT)
-        && (gm.multi && (!gc.context.travel ? !(gm.multi % 7)
-                        : !(gm.moves % 7L)))) {
-        if (flags.time && gc.context.run)
+    if ((!svc.context.run || flags.runmode == RUN_TPORT)
+        && (gm.multi && (!svc.context.travel ? !(gm.multi % 7)
+                        : !(svm.moves % 7L)))) {
+        if (flags.time && svc.context.run)
             disp.botl = TRUE;
         /* [should this be flush_screen() instead?] */
         display_nhwindow(WIN_MAP, FALSE);
@@ -564,7 +564,7 @@ regen_pw(int wtcap)
 {
     if (u.uen < u.uenmax
         && ((wtcap < MOD_ENCUMBER
-             && (!(gm.moves % ((MAXULEV + 8 - u.ulevel)
+             && (!(svm.moves % ((MAXULEV + 8 - u.ulevel)
                               * (Role_if(PM_WIZARD) ? 3 : 4)
                               / 6)))) || Energy_regeneration)) {
         int upper = (int) (ACURR(A_WIS) + ACURR(A_INT)) / 15 + 1;
@@ -597,10 +597,10 @@ regen_hp(int wtcap)
             /* eel out of water loses hp, similar to monster eels;
                as hp gets lower, rate of further loss slows down */
             if (u.mh > 1 && !Regeneration && rn2(u.mh) > rn2(8)
-                && (!Half_physical_damage || !(gm.moves % 2L)))
+                && (!Half_physical_damage || !(svm.moves % 2L)))
                 heal = -1;
         } else if (u.mh < u.mhmax) {
-            if (U_CAN_REGEN() || (encumbrance_ok && !(gm.moves % 20L)))
+            if (U_CAN_REGEN() || (encumbrance_ok && !(svm.moves % 20L)))
                 heal = 1;
         }
         if (heal) {
@@ -726,14 +726,14 @@ newgame(void)
     /* make sure welcome messages are given before noticing monsters */
     notice_mon_off();
     disp.botlx = TRUE;
-    gc.context.ident = 1;
-    gc.context.warnlevel = 1;
-    gc.context.next_attrib_check = 600L; /* arbitrary first setting */
-    gc.context.tribute.enabled = TRUE;   /* turn on 3.6 tributes    */
-    gc.context.tribute.tributesz = sizeof(struct tribute_info);
+    svc.context.ident = 1;
+    svc.context.warnlevel = 1;
+    svc.context.next_attrib_check = 600L; /* arbitrary first setting */
+    svc.context.tribute.enabled = TRUE;   /* turn on 3.6 tributes    */
+    svc.context.tribute.tributesz = sizeof(struct tribute_info);
 
     for (i = LOW_PM; i < NUMMONS; i++)
-        gm.mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
+        svm.mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
 
     init_objects(); /* must be before u_init() */
 
@@ -781,7 +781,7 @@ newgame(void)
 #ifdef INSURANCE
     save_currentstate();
 #endif
-    gp.program_state.something_worth_saving++; /* useful data now exists */
+    program_state.something_worth_saving++; /* useful data now exists */
 
     /* Success! */
     welcome(TRUE);
@@ -833,12 +833,12 @@ welcome(boolean new_game) /* false => restoring an old game */
 
     pline(new_game ? "%s %s, welcome to NetHack!  You are a%s."
                    : "%s %s, the%s, welcome back to NetHack!",
-          Hello((struct monst *) 0), gp.plname, buf);
+          Hello((struct monst *) 0), svp.plname, buf);
 
     if (new_game) {
         /* guarantee that 'major' event category is never empty */
         livelog_printf(LL_ACHIEVE, "%s the%s entered the dungeon",
-                       gp.plname, buf);
+                       svp.plname, buf);
     } else {
         /* if restoring in Gehennom, give same hot/smoky message as when
            first entering it */
@@ -895,7 +895,7 @@ do_positionbar(void)
 staticfn void
 interrupt_multi(const char *msg)
 {
-    if (gm.multi > 0 && !gc.context.travel && !gc.context.run) {
+    if (gm.multi > 0 && !svc.context.travel && !svc.context.run) {
         nomul(0);
         if (flags.verbose && msg)
             Norep("%s", msg);

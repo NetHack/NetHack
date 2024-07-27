@@ -401,18 +401,18 @@ e_died(struct entity *etmp, int xkill_flags, int how)
 {
     if (is_u(etmp)) {
         if (how == DROWNING) {
-            gk.killer.name[0] = 0; /* drown() sets its own killer */
+            svk.killer.name[0] = 0; /* drown() sets its own killer */
             (void) drown();
         } else if (how == BURNING) {
-            gk.killer.name[0] = 0; /* lava_effects() sets own killer */
+            svk.killer.name[0] = 0; /* lava_effects() sets own killer */
             (void) lava_effects();
         } else {
             coord xy;
 
             /* use more specific killer if specified */
-            if (!gk.killer.name[0]) {
-                gk.killer.format = KILLED_BY_AN;
-                Strcpy(gk.killer.name, "falling drawbridge");
+            if (!svk.killer.name[0]) {
+                svk.killer.format = KILLED_BY_AN;
+                Strcpy(svk.killer.name, "falling drawbridge");
             }
             done(how);
             /* So, you didn't die */
@@ -432,12 +432,12 @@ e_died(struct entity *etmp, int xkill_flags, int how)
     } else {
         int entitycnt;
 
-        gk.killer.name[0] = 0;
+        svk.killer.name[0] = 0;
 /* fake "digested to death" damage-type suppresses corpse */
 #define mk_message(dest) (((dest & XKILL_NOMSG) != 0) ? (char *) 0 : "")
 #define mk_corpse(dest) (((dest & XKILL_NOCORPSE) != 0) ? AD_DGST : AD_PHYS)
         /* if monsters are moving, one of them caused the destruction */
-        if (gc.context.mon_moving)
+        if (svc.context.mon_moving)
             monkilled(etmp->emon,
                       mk_message(xkill_flags), mk_corpse(xkill_flags));
         else /* you caused it */
@@ -570,8 +570,8 @@ do_entity(struct entity *etmp)
     } else {
         if (crm->typ == DRAWBRIDGE_DOWN) {
             if (is_u(etmp)) {
-                gk.killer.format = NO_KILLER_PREFIX;
-                Strcpy(gk.killer.name,
+                svk.killer.format = NO_KILLER_PREFIX;
+                Strcpy(svk.killer.name,
                        "crushed to death underneath a drawbridge");
             }
             pline("%s crushed underneath the drawbridge.",
@@ -690,8 +690,8 @@ do_entity(struct entity *etmp)
                       E_phrase(etmp, "disappear"));
         }
         if (!e_survives_at(etmp, etmp->ex, etmp->ey)) {
-            gk.killer.format = KILLED_BY_AN;
-            Strcpy(gk.killer.name, "closing drawbridge");
+            svk.killer.format = KILLED_BY_AN;
+            Strcpy(svk.killer.name, "closing drawbridge");
             e_died(etmp, XKILL_NOMSG, CRUSHING);
             return;
         }
@@ -723,8 +723,8 @@ do_entity(struct entity *etmp)
                     pline("%s into the %s.", E_phrase(etmp, "fall"),
                           lava ? hliquid("lava") : "moat");
             }
-        gk.killer.format = NO_KILLER_PREFIX;
-        Strcpy(gk.killer.name, "fell from a drawbridge");
+        svk.killer.format = NO_KILLER_PREFIX;
+        Strcpy(svk.killer.name, "fell from a drawbridge");
         e_died(etmp, /* CRUSHING is arbitrary */
                XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                is_pool(etmp->ex, etmp->ey) ? DROWNING
@@ -738,8 +738,8 @@ do_entity(struct entity *etmp)
 staticfn void
 nokiller(void)
 {
-    gk.killer.name[0] = '\0';
-    gk.killer.format = 0;
+    svk.killer.name[0] = '\0';
+    svk.killer.format = 0;
     m_to_e((struct monst *) 0, 0, 0, &go.occupants[0]);
     m_to_e((struct monst *) 0, 0, 0, &go.occupants[1]);
 }
@@ -947,8 +947,8 @@ destroy_drawbridge(coordxy x, coordxy y)
             if (e_inview)
                 pline("%s blown apart by flying debris.",
                       E_phrase(etmp2, "are"));
-            gk.killer.format = KILLED_BY_AN;
-            Strcpy(gk.killer.name, "exploding drawbridge");
+            svk.killer.format = KILLED_BY_AN;
+            Strcpy(svk.killer.name, "exploding drawbridge");
             e_died(etmp2,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                    CRUSHING); /*no corpse*/
@@ -980,8 +980,8 @@ destroy_drawbridge(coordxy x, coordxy y)
                     debugpline1("%s from shrapnel", E_phrase(etmp1, "die"));
                 }
             }
-            gk.killer.format = KILLED_BY_AN;
-            Strcpy(gk.killer.name, "collapsing drawbridge");
+            svk.killer.format = KILLED_BY_AN;
+            Strcpy(svk.killer.name, "collapsing drawbridge");
             e_died(etmp1,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                    CRUSHING); /*no corpse*/

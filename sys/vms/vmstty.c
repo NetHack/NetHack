@@ -158,7 +158,7 @@ vms_getchar(void)
     static volatile int recurse = 0; /* SMG is not AST re-entrant! */
 #endif
 
-    if (gp.program_state.done_hup) {
+    if (program_state.done_hup) {
         /* hangup has occurred; do not attempt to get further user input */
         return ESC;
     }

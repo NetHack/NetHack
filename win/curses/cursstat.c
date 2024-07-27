@@ -1886,7 +1886,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
     wmove(win, y, x);
 
     get_playerrank(rank);
-    sprintf(buf, "%s the %s", gp.plname, rank);
+    sprintf(buf, "%s the %s", svp.plname, rank);
 
     /* Use the title as HP bar (similar to hitpointbar) */
     draw_bar(TRUE, hp, hpmax, buf);
@@ -1954,7 +1954,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
         print_statdiff(" Exp:", &prevlevel, u.ulevel, STAT_OTHER);
 
     if (flags.time)
-        print_statdiff(" T:", &prevtime, gm.moves, STAT_TIME);
+        print_statdiff(" T:", &prevtime, svm.moves, STAT_TIME);
 
     curses_add_statuses(win, FALSE, FALSE, NULL, NULL);
 }
@@ -1973,7 +1973,7 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
     char race[BUFSZ];
     Strcpy(race, gu.urace.adj);
     race[0] = highc(race[0]);
-    wprintw(win, "%s the %s %s%s%s", gp.plname,
+    wprintw(win, "%s the %s %s%s%s", svp.plname,
             (u.ualign.type == A_CHAOTIC ? "Chaotic" :
              u.ualign.type == A_NEUTRAL ? "Neutral" : "Lawful"),
             Upolyd ? "" : race, Upolyd ? "" : " ",
@@ -2035,7 +2035,7 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
 #endif /* SCORE_ON_BOTL */
 
     if (flags.time)
-        print_statdiff(" T:", &prevtime, gm.moves, STAT_TIME);
+        print_statdiff(" T:", &prevtime, svm.moves, STAT_TIME);
 
     curses_add_statuses(win, TRUE, FALSE, &x, &y);
 
@@ -2092,7 +2092,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
 
     get_playerrank(rank);
     int ranklen = strlen(rank);
-    int namelen = strlen(gp.plname);
+    int namelen = strlen(svp.plname);
     int maxlen = 19;
 #ifdef STATUS_COLORS
     if (!iflags.hitpointbar)
@@ -2109,7 +2109,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
         while ((ranklen + namelen) > maxlen)
             ranklen--; /* Still doesn't fit, strip rank */
     }
-    sprintf(buf, "%-*s the %-*s", namelen, gp.plname, ranklen, rank);
+    sprintf(buf, "%-*s the %-*s", namelen, svp.plname, ranklen, rank);
     draw_bar(TRUE, hp, hpmax, buf);
     wmove(win, y++, x);
     wprintw(win, "%s", dungeons[u.uz.dnum].dname);
@@ -2188,7 +2188,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
     wmove(win, y++, x);
 
     if (flags.time) {
-        print_statdiff("Time:          ", &prevtime, gm.moves, STAT_TIME);
+        print_statdiff("Time:          ", &prevtime, svm.moves, STAT_TIME);
         wmove(win, y++, x);
     }
 

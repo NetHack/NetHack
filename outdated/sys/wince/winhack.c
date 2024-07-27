@@ -226,8 +226,8 @@ gotlock:
     if (fd == -1) {
         error("cannot creat lock file (%s.)", fq_lock);
     } else {
-        if (write(fd, (char *) &gh.hackpid, sizeof(gh.hackpid))
-            != sizeof(gh.hackpid)) {
+        if (write(fd, (char *) &svh.hackpid, sizeof(svh.hackpid))
+            != sizeof(svh.hackpid)) {
             error("cannot write lock (%s)", fq_lock);
         }
         if (close(fd) == -1) {

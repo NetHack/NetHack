@@ -1,4 +1,4 @@
-/* NetHack 3.7	permonst.h	$NHDT-Date: 1596498555 2020/08/03 23:49:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.7	permonst.h	$NHDT-Date: 1721844081 2024/07/24 18:01:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.25 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -11,14 +11,14 @@ enum monnums {
 #include "monsters.h"
 #undef MONS_ENUM
         NUMMONS,
-        NON_PM = -1,                    /* "not a monster */
-        LOW_PM = NON_PM + 1,            /* first monster in mons */
-        LEAVESTATUE = NON_PM - 1,       /* leave statue instead of corpse;
-                                         * there are two lower values assigned
-                                         * in end.c so that (x == LEAVESTATUE)
-                                         * will test FALSE in bones.c:
-                                         *  (NON_PM - 2) for no corpse
-                                         *  (NON_PM - 3) for no corpse, no grave */
+        NON_PM = -1,              /* "not a monster" */
+        LOW_PM = NON_PM + 1,      /* first monster in mons */
+        LEAVESTATUE = NON_PM - 1, /* leave statue instead of corpse;
+                                   * there are two lower values assigned
+                                   * in end.c so that (x == LEAVESTATUE)
+                                   * will test FALSE in bones.c:
+                                   *  (NON_PM - 2) for no corpse
+                                   *  (NON_PM - 3) for no corpse, no grave */
         HIGH_PM = NUMMONS - 1,
         SPECIAL_PM = PM_LONG_WORM_TAIL  /* [normal] < ~ < [special] */
                 /* mons[SPECIAL_PM] through mons[NUMMONS-1], inclusive, are

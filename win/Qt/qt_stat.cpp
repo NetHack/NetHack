@@ -858,17 +858,17 @@ void NetHackQtStatusWindow::updateStats()
 	buf = nh_capitalize_words(pmname(&mons[u.umonnum],
                                   ::flags.female ? FEMALE : MALE));
     } else {
-	buf = rank_of(u.ulevel, gp.pl_character[0], ::flags.female);
+	buf = rank_of(u.ulevel, svp.pl_character[0], ::flags.female);
     }
     QString buf2;
     char buf3[BUFSZ];
-    buf2 = nh_qsprintf("%s the %s", upstart(strcpy(buf3, gp.plname)),
+    buf2 = nh_qsprintf("%s the %s", upstart(strcpy(buf3, svp.plname)),
                        buf.toLatin1().constData());
     name.setLabel(buf2, NetHackQtLabelledIcon::NoNum, u.ulevel);
 
     if (!describe_level(buf3, 0)) {
 	Sprintf(buf3, "%s, level %d",
-                gd.dungeons[u.uz.dnum].dname, ::depth(&u.uz));
+                svd.dungeons[u.uz.dnum].dname, ::depth(&u.uz));
     }
     dlevel.setLabel(buf3);
 
@@ -966,7 +966,7 @@ void NetHackQtStatusWindow::updateStats()
     if (::flags.time) {
         // hypothetically Time could grow to enough digits to have trouble
         // fitting, but it's not worth worrying about
-        time.setLabel("Time:", (long) gm.moves);
+        time.setLabel("Time:", (long) svm.moves);
     } else {
         time.setLabel("");
     }

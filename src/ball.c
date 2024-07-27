@@ -359,7 +359,7 @@ bc_order(void)
         || u.uswallow)
         return BCPOS_DIFFER;
 
-    for (obj = gl.level.objects[uball->ox][uball->oy]; obj;
+    for (obj = svl.level.objects[uball->ox][uball->oy]; obj;
          obj = obj->nexthere) {
         if (obj == uchain)
             return BCPOS_CHAIN;

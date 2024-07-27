@@ -1,4 +1,4 @@
-/* NetHack 3.7	pline.c	$NHDT-Date: 1693083243 2023/08/26 20:54:03 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.124 $ */
+/* NetHack 3.7	pline.c	$NHDT-Date: 1719819280 2024/07/01 07:34:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.130 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -157,10 +157,10 @@ vpline(const char *line, va_list the_args)
     if (!line || !*line)
         return;
 #ifdef HANGUPHANDLING
-    if (gp.program_state.done_hup)
+    if (program_state.done_hup)
         return;
 #endif
-    if (gp.program_state.wizkit_wishing)
+    if (program_state.wizkit_wishing)
         return;
 
     if (a11y.accessiblemsg && isok(a11y.msg_loc.x,a11y.msg_loc.y)) {
@@ -509,7 +509,7 @@ livelog_printf(long ll_type, const char *line, ...)
     (void) vsnprintf(gamelogbuf, sizeof gamelogbuf, line, the_args);
     va_end(the_args);
 
-    gamelog_add(ll_type, gm.moves, gamelogbuf);
+    gamelog_add(ll_type, svm.moves, gamelogbuf);
     strNsubst(gamelogbuf, "\t", "_", 0);
     livelog_add(ll_type, gamelogbuf);
 }
@@ -542,7 +542,7 @@ raw_printf(const char *line, ...)
     va_start(the_args, line);
     vraw_printf(line, the_args);
     va_end(the_args);
-    if (!gp.program_state.beyond_savefile_load)
+    if (!program_state.beyond_savefile_load)
         ge.early_raw_messages++;
 }
 
@@ -567,7 +567,7 @@ vraw_printf(const char *line, va_list the_args)
 #if defined(MSGHANDLER)
     execplinehandler(line);
 #endif
-    if (!gp.program_state.beyond_savefile_load)
+    if (!program_state.beyond_savefile_load)
         ge.early_raw_messages++;
 }
 
@@ -579,10 +579,10 @@ impossible(const char *s, ...)
     char pbuf2[BUFSZ];
 
     va_start(the_args, s);
-    if (gp.program_state.in_impossible)
+    if (program_state.in_impossible)
         panic("impossible called impossible");
 
-    gp.program_state.in_impossible = 1;
+    program_state.in_impossible = 1;
     (void) vsnprintf(pbuf, sizeof pbuf, s, the_args);
     va_end(the_args);
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
@@ -594,8 +594,14 @@ impossible(const char *s, ...)
     pline("%s", pbuf);
     gp.pline_flags = 0;
 
+    if (program_state.in_sanity_check) {
+        /* skip rest of multi-line feedback */
+        program_state.in_impossible = 0;
+        return;
+    }
+
     Strcpy(pbuf2, "Program in disorder!");
-    if (gp.program_state.something_worth_saving)
+    if (program_state.something_worth_saving)
         Strcat(pbuf2, "  (Saving and reloading may fix this problem.)");
     pline("%s", pbuf2);
     pline("Please report these messages to %s.", DEVTEAM_EMAIL);
@@ -608,14 +614,14 @@ impossible(const char *s, ...)
         boolean report = ('y' == yn_function("Report now?", ynchars,
                                              'n', FALSE));
 
-        raw_print("");  // prove to the user the character was accepted
+        raw_print(""); /* prove to the user the character was accepted */
         if (report) {
             submit_web_report(1, "Impossible", pbuf);
         }
     }
 #endif
 
-    gp.program_state.in_impossible = 0;
+    program_state.in_impossible = 0;
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL

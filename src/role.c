@@ -1664,31 +1664,31 @@ plnamesuffix(void)
     /* some generic user names will be ignored in favor of prompting */
     if (sysopt.genericusers) {
         if (*sysopt.genericusers == '*') {
-            gp.plname[0] = '\0';
+            svp.plname[0] = '\0';
         } else {
             /* need to ignore appended '-role-race-gender-alignment';
                'plnamelen' is non-zero when dealing with plname[] value that
                contains a username with dash(es) in it and is usually 0 */
-            i = ((eptr = strchr(gp.plname + gp.plnamelen, '-')) != 0)
-                ? (int) (eptr - gp.plname)
-                : (int) Strlen(gp.plname);
+            i = ((eptr = strchr(svp.plname + gp.plnamelen, '-')) != 0)
+                ? (int) (eptr - svp.plname)
+                : (int) Strlen(svp.plname);
             /* look for plname[] in the 'genericusers' space-separated list */
-            if (findword(sysopt.genericusers, gp.plname, i, FALSE))
+            if (findword(sysopt.genericusers, svp.plname, i, FALSE))
                 /* it's generic; remove it so that askname() will be called */
-                gp.plname[0] = '\0';
+                svp.plname[0] = '\0';
         }
-        if (!gp.plname[0])
+        if (!svp.plname[0])
             gp.plnamelen = 0;
     }
 
     do {
-        if (!gp.plname[0]) {
-            askname(); /* fill gp.plname[] if necessary, or set defer_plname */
+        if (!svp.plname[0]) {
+            askname(); /* fill svp.plname[] if necessary, or set defer_plname */
             gp.plnamelen = 0; /* plname[] might have -role-race-&c attached */
         }
 
         /* Look for tokens delimited by '-' */
-        sptr = gp.plname + gp.plnamelen;
+        sptr = svp.plname + gp.plnamelen;
         if ((eptr = strchr(sptr, '-')) != (char *) 0)
             *eptr++ = '\0';
         while (eptr) {
@@ -1707,10 +1707,10 @@ plnamesuffix(void)
             else if ((i = str2align(sptr)) != ROLE_NONE)
                 flags.initalign = i;
         }
-    } while (!gp.plname[0] && !iflags.defer_plname);
+    } while (!svp.plname[0] && !iflags.defer_plname);
 
-    /* commas in the gp.plname confuse the record file, convert to spaces */
-    (void) strNsubst(gp.plname, ",", " ", 0);
+    /* commas in the svp.plname confuse the record file, convert to spaces */
+    (void) strNsubst(svp.plname, ",", " ", 0);
 }
 
 /* show current settings for name, role, race, gender, and alignment
@@ -1762,7 +1762,7 @@ role_selection_prolog(int which, winid where)
 
     Sprintf(buf, "%12s ", "name:");
     Strcat(buf, (which == RS_NAME) ? choosing
-                : !*gp.plname ? not_yet : gp.plname);
+                : !*svp.plname ? not_yet : svp.plname);
     putstr(where, 0, buf);
     Sprintf(buf, "%12s ", "role:");
     assert(which == RS_ROLE || r == ROLE_NONE || r == ROLE_RANDOM
@@ -1982,15 +1982,15 @@ role_init(void)
     /* Check for a valid role.  Try flags.initrole first. */
     if (!validrole(flags.initrole)) {
         /* Try the player letter second */
-        if ((flags.initrole = str2role(gp.pl_character)) < 0)
+        if ((flags.initrole = str2role(svp.pl_character)) < 0)
             /* None specified; pick a random role */
             flags.initrole = randrole_filtered();
     }
 
     /* We now have a valid role index.  Copy the role name back. */
     /* This should become OBSOLETE */
-    Strcpy(gp.pl_character, roles[flags.initrole].name.m);
-    gp.pl_character[PL_CSIZ - 1] = '\0';
+    Strcpy(svp.pl_character, roles[flags.initrole].name.m);
+    svp.pl_character[PL_CSIZ - 1] = '\0';
 
     /* Check for a valid race */
     if (!validrace(flags.initrole, flags.initrace))
@@ -2025,7 +2025,7 @@ role_init(void)
         pm->maligntyp = alignmnt * 3;
         /* if gender is random, we choose it now instead of waiting
            until the leader monster is created */
-        gq.quest_status.ldrgend =
+        svq.quest_status.ldrgend =
             is_neuter(pm) ? 2 : is_female(pm) ? 1 : is_male(pm)
                                                         ? 0
                                                         : (rn2(100) < 50);
@@ -2048,7 +2048,7 @@ role_init(void)
         pm->mflags3 |= M3_WANTSARTI | M3_WAITFORU;
         /* if gender is random, we choose it now instead of waiting
            until the nemesis monster is created */
-        gq.quest_status.nemgend = is_neuter(pm) ? 2 : is_female(pm) ? 1
+        svq.quest_status.nemgend = is_neuter(pm) ? 2 : is_female(pm) ? 1
                                    : is_male(pm) ? 0 : (rn2(100) < 50);
     }
 
@@ -2074,7 +2074,7 @@ role_init(void)
         gu.urole.cgod = roles[flags.pantheon].cgod;
     }
     /* 0 or 1; no gods are neuter, nor is gender randomized */
-    gq.quest_status.godgend = !strcmpi(align_gtitle(alignmnt), "goddess");
+    svq.quest_status.godgend = !strcmpi(align_gtitle(alignmnt), "goddess");
 
 #if 0
 /*
@@ -2204,7 +2204,7 @@ genl_player_setup(int screenheight)
     char pick4u = 'n';
     int result = 0; /* assume failure (player chooses to 'quit') */
 
-    gp.program_state.in_role_selection++; /* affects tty menu cleanup */
+    program_state.in_role_selection++; /* affects tty menu cleanup */
     /* Used to avoid "Is this ok?" if player has already specified all
      * four facets of role.
      * Note that rigid_role_checks might force any unspecified facets to
@@ -2681,8 +2681,8 @@ genl_player_setup(int screenheight)
             /* plnamesuffix() can change any or all of ROLE, RACE,
                GEND, ALGN; we'll override that and honor only the name */
             saveROLE = ROLE, saveRACE = RACE, saveGEND = GEND, saveALGN = ALGN;
-            gp.plname[0] = '\0';
-            plnamesuffix(); /* calls askname() when gp.plname[] is empty */
+            svp.plname[0] = '\0';
+            plnamesuffix(); /* calls askname() when svp.plname[] is empty */
             ROLE = saveROLE, RACE = saveRACE, GEND = saveGEND, ALGN = saveALGN;
             break; /* getconfirmation is still True */
         }
@@ -2704,7 +2704,7 @@ genl_player_setup(int screenheight)
     result = 1;
 
  setup_done:
-    gp.program_state.in_role_selection--;
+    program_state.in_role_selection--;
     return result;
 }
 
@@ -2800,7 +2800,7 @@ plsel_startmenu(int ttyrows, int aspect)
     rolename = (ROLE < 0) ? "<role>"
                : (GEND == 1 && roles[ROLE].name.f) ? roles[ROLE].name.f
                  : roles[ROLE].name.m;
-    if (!gp.plname[0] || ROLE < 0 || RACE < 0 || GEND < 0 || ALGN < 0) {
+    if (!svp.plname[0] || ROLE < 0 || RACE < 0 || GEND < 0 || ALGN < 0) {
         /* "<role> <race.noun> <gender> <alignment>" */
         Sprintf(qbuf, "%.20s %.20s %.20s %.20s",
                 rolename,
@@ -2810,7 +2810,7 @@ plsel_startmenu(int ttyrows, int aspect)
     } else {
         /* "<name> the <alignment> <gender> <race.adjective> <role>" */
         Sprintf(qbuf, "%.20s the %.20s %.20s %.20s %.20s",
-                gp.plname,
+                svp.plname,
                 aligns[ALGN].adj,
                 genders[GEND].adj,
                 races[RACE].adj,
