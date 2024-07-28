@@ -275,7 +275,8 @@ WASM_CFLAGS += -Wshadow
 # Nethack C flags
 WASM_CFLAGS += $(WINCFLAGS)   #WINCFLAGS set from multiw-2.370
 WASM_CFLAGS += -DSYSCF -DSYSCF_FILE=\"/sysconf\" -DSECURE
-WASM_CFLAGS += -g -I../include -DNOTPARMDECL
+#WASM_CFLAGS += -g -I../include -DNOTPARMDECL
+WASM_CFLAGS += -I../include -DNOTPARMDECL
 # NetHack sources control
 WASM_CFLAGS += -DDLB
 WASM_CFLAGS += -DHACKDIR=\"$(HACKDIR)\"

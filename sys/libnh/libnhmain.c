@@ -227,7 +227,7 @@ nhmain(int argc, char *argv[])
     /* wizard mode access is deferred until here */
     set_playmode(); /* sets plname to "wizard" for wizard mode */
     /* hide any hyphens from plnamesuffix() */
-    svp.plnamelen = exact_username ? (int) strlen(svp.plname) : 0;
+    gp.plnamelen = exact_username ? (int) strlen(svp.plname) : 0;
     /* strip role,race,&c suffix; calls askname() if plname[] is empty
        or holds a generic user name like "player" or "games" */
     plnamesuffix();
@@ -382,12 +382,12 @@ process_options(int argc, char *argv[])
         case 'u':
             if (argv[0][2]) {
                 (void) strncpy(svp.plname, argv[0] + 2, sizeof svp.plname - 1);
-                svp.plnamelen = 0; /* plname[] might have -role-race attached */
+                gp.plnamelen = 0; /* plname[] might have -role-race attached */
             } else if (argc > 1) {
                 argc--;
                 argv++;
                 (void) strncpy(svp.plname, argv[0], sizeof svp.plname - 1);
-                svp.plnamelen = 0;
+                gp.plnamelen = 0;
             } else {
                 raw_print("Player name expected after -u");
             }
