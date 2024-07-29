@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1720128155 2024/07/04 21:22:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1430 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1722116044 2024/07/27 21:34:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1433 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1757,7 +1757,7 @@ extern void kill_genocided_monsters(void);
 extern void golemeffects(struct monst *, int, int);
 extern boolean angry_guards(boolean);
 extern void pacify_guards(void);
-extern void decide_to_shapeshift(struct monst *, int) NONNULLARG1;
+extern void decide_to_shapeshift(struct monst *) NONNULLARG1;
 extern boolean vamp_stone(struct monst *) NONNULLARG1;
 extern void check_gear_next_turn(struct monst *) NONNULLARG1;
 extern void copy_mextra(struct monst *, struct monst *);
