@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1722116051 2024/07/27 21:34:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.583 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1722365546 2024/07/30 18:52:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.584 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4669,7 +4669,7 @@ decide_to_shapeshift(struct monst *mon)
     boolean dochng = FALSE;
 
     if (!is_vampshifter(mon)) {
-        /* regular shapeshifter */
+        /* regular shapeshifter; 'ptr' is Null */
         if (!rn2(6))
             dochng = TRUE;
     } else if (!(mon->mstrategy & STRAT_WAITFORU)) {
@@ -4715,20 +4715,7 @@ decide_to_shapeshift(struct monst *mon)
         }
     }
     if (dochng) {
-        unsigned ncflags = (is_vampshifter(mon) || canspotmon(mon))
-                           ? NC_SHOW_MSG : 0U;
-
-        if (!ncflags) {
-            /* cheat */
-            struct permonst *oldptr = mon->data;
-
-            mon->data = ptr;
-            if (canspotmon(mon))
-                ncflags = NC_SHOW_MSG;
-            mon->data = oldptr;
-        }
-
-        if (newcham(mon, ptr, ncflags)) {
+        if (newcham(mon, ptr, NC_SHOW_MSG)) {
             /* for vampshift, override the 10% chance for sex change
                (by forcing original gender in case that occurred) */
             if (is_vampshifter(mon)) {
