@@ -161,6 +161,16 @@ luabin:
 	( cd $(LUATOP) \
 	  && make $(LUAMAKEFILES) all && cd $(LUA2NHTOP) )
 
+# This is only needed for some internal tools.
+nhlua:
+	base=`ls -td lib/lua-*|head -1` ; \
+	[ -z $$base ] && $(MAKE) fetch-lua ; \
+	base=`ls -td lib/lua-*|head -1` ; \
+	cp -R $$base/ lib/nhlsrc ; \
+	rm -f util/nhlua ; \
+	( cd lib/nhlsrc && $(MAKE) clean posix ) ; \
+	cp lib/nhlsrc/src/lua util/nhlua
+
 # hints file could set LUATESTTARGET to this if GITSUBMODULES is defined
 submodules/lua/lua.h:
 	git submodule init submodules/lua
