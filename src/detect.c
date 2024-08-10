@@ -2042,8 +2042,6 @@ reveal_terrain_getglyph(
             keep_objs = (which_subset & TER_OBJ) != 0,
             keep_mons = (which_subset & TER_MON) != 0,
             full = (which_subset & TER_FULL) != 0;
-    int cmaptmp = 0; /* used by glyph_is_gascloud() macro */
-    NhRegion *reg = visible_region_at(x, y);
 
     /* for 'full', show the actual terrain for the entire level,
        otherwise what the hero remembers for seen locations with
@@ -2055,6 +2053,10 @@ reveal_terrain_getglyph(
         glyph = back_to_glyph(x, y);
         levl[x][y].seenv = seenv;
     } else {
+        int cmaptmp = 0; /* used by glyph_is_gascloud() macro */
+        NhRegion *reg = visible_region_at(x, y);
+        boolean was_mon = FALSE;
+
         levl_glyph = svl.level.flags.hero_memory ? levl[x][y].glyph
                      : seenv ? back_to_glyph(x, y)
                        : default_glyph;
@@ -2064,12 +2066,14 @@ reveal_terrain_getglyph(
            the invisible monster glyph, which is handled like
            an object, replacing any object or trap at its spot) */
         glyph = !swallowed ? glyph_at(x, y) : levl_glyph;
-        if (keep_mons && u_at(x, y) && swallowed)
+        if (keep_mons && u_at(x, y) && swallowed) {
             glyph = mon_to_glyph(u.ustuck, rn2_on_display_rng);
-        else if ((!keep_mons && (glyph_is_monster(glyph)
+        } else if ((!keep_mons && (glyph_is_monster(glyph)
                                  || glyph_is_warning(glyph)))
-                 || glyph_is_swallow(glyph))
+                   || glyph_is_swallow(glyph)) {
             glyph = levl_glyph;
+            was_mon = TRUE;
+        }
         if (((!keep_objs && glyph_is_object(glyph))
              || glyph_is_invisible(glyph))
             && keep_traps && !covers_traps(x, y)) {
@@ -2081,6 +2085,7 @@ reveal_terrain_getglyph(
                are present at the same spot) or neither traps nor regions */
             || (!keep_traps && (glyph_is_trap(glyph)
                                 || (reg && glyph_is_gascloud(glyph))))
+            || (reg && was_mon)
             || glyph_is_invisible(glyph)) {
             if (!seenv) {
                 /* it's possible to have a visible region shown at an
@@ -2089,15 +2094,18 @@ reveal_terrain_getglyph(
                    far enough to be adjacent to the cloud without having
                    seen the corridor underneath it) */
                 glyph = !reg ? default_glyph : GLYPH_UNEXPLORED;
-            } else if (svl.lastseentyp[x][y] == levl[x][y].typ) {
-                glyph = back_to_glyph(x, y);
-            } else if (keep_traps && reg && glyph_is_gascloud(glyph)) {
+            } else if (keep_traps && reg
+                       && (glyph_is_gascloud(glyph) || was_mon)) {
                 t = t_at(x, y);
-                glyph = (t && t->tseen) ? trap_to_glyph(t)
-                                        : back_to_glyph(x, y);
+                /* we need reg->glyph here when there's a monster shown
+                   at a region spot; the region glyph isn't the remembered
+                   background glyph or the current glyph */
+                glyph = (t && t->tseen) ? trap_to_glyph(t) : reg->glyph;
                 /* FIXME? what about objects temporarily hidden by regions?
                    when objects are being shown, shouldn't showing them take
                    precedence over showing the region, just like traps? */
+            } else if (svl.lastseentyp[x][y] == levl[x][y].typ) {
+                glyph = back_to_glyph(x, y);
             } else {
                 /* look for a mimic here posing as furniture;
                    if we don't find one, we'll have to fake it */

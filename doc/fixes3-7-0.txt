@@ -2005,6 +2005,9 @@ if peaceful monsters react when seeing hero attack a peaceful monster, don't
 farlook of water/lava location listed wall of lava before molten lava; because
 	of that, lava was omitted ("molten" suppressed to reduce vebosity,
 	resulting in "lava" which got skipped as substring of "wall of lava")
+having #terrain display gas cloud regions as if they were traps didn't work
+	for monsters in such regions that are shown when adjacent to hero or
+	sensed via ESP
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
