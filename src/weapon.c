@@ -1,4 +1,4 @@
-/* NetHack 3.7	weapon.c	$NHDT-Date: 1690488665 2023/07/27 20:11:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.111 $ */
+/* NetHack 3.7	weapon.c	$NHDT-Date: 1723318730 2024/08/10 19:38:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.127 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -11,7 +11,7 @@
 #include "hack.h"
 
 staticfn void give_may_advance_msg(int);
-staticfn void finish_towel_change(struct obj *obj, int);
+staticfn void finish_towel_change(struct obj *obj, int) NONNULLARG1;
 staticfn boolean could_advance(int);
 staticfn boolean peaked_skill(int);
 staticfn int slots_required(int);
@@ -66,8 +66,10 @@ static NEARDATA const char *const barehands_or_martial[] = {
                ? barehands_or_martial[martial_bonus()]  \
                : odd_skill_names[-skill_names_indices[type]])
 
-static NEARDATA const char kebabable[] = { S_XORN, S_DRAGON, S_JABBERWOCK,
-                                           S_NAGA, S_GIANT,  '\0' };
+/* targets that provide attacker with small to-hit bonus when using a spear */
+static NEARDATA const char kebabable[] = {
+    S_XORN, S_DRAGON, S_JABBERWOCK, S_NAGA, S_GIANT,  '\0'
+};
 
 staticfn void
 give_may_advance_msg(int skill)
@@ -184,7 +186,7 @@ hitval(struct obj *otmp, struct monst *mon)
 }
 
 /* Historical note: The original versions of Hack used a range of damage
- * which was similar to, but not identical to the damage used in Advanced
+ * which was similar to, but not identical to, the damage used in Advanced
  * Dungeons and Dragons.  I figured that since it was so close, I may as well
  * make it exactly the same as AD&D, adding some more weapons in the process.
  * This has the advantage that it is at least possible that the player would
@@ -976,10 +978,10 @@ finish_towel_change(struct obj *obj, int newspe)
 
 /* increase a towel's wetness */
 void
-wet_a_towel(struct obj *obj,
-            int amt, /* positive: new value; negative: increment by -amt;
-                        zero: no-op */
-            boolean verbose)
+wet_a_towel(
+    struct obj *obj,
+    int amt, /* positive: new val; negative: increment by -amt; zero: no-op */
+    boolean verbose)
 {
     int newspe = (amt <= 0) ? obj->spe - amt : amt;
 
