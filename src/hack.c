@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1720128165 2024/07/04 21:22:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.449 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1723410639 2024/08/11 21:10:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.452 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2517,11 +2517,12 @@ domove_core(void)
 {
     struct monst *mtmp;
     struct rm *tmpr;
+    NhRegion *newreg, *oldreg;
     coordxy x, y;
     struct trap *trap = NULL;
     int glyph;
     coordxy chainx = 0, chainy = 0,
-          ballx = 0, bally = 0;         /* ball&chain new positions */
+            ballx = 0, bally = 0;       /* ball&chain new positions */
     int bc_control = 0;                 /* control for ball&chain */
     boolean cause_delay = FALSE,        /* dragging ball will skip a move */
             displaceu = FALSE;          /* involuntary swap */
@@ -2624,10 +2625,14 @@ domove_core(void)
         return;
 
     /* maybe ask player for confirmation before walking into known traps */
-    if (ParanoidTrap && (trap = t_at(x, y)) != 0 && trap->tseen
+    if (ParanoidTrap && !Stunned && !Confusion
+        /* skip if player used 'm' prefix or is moving recklessly */
         && (!svc.context.nopick || svc.context.run)
-        && !Stunned && !Confusion
+        /* check for discovered trap */
+        && (trap = t_at(x, y)) != 0 && trap->tseen
+        /* check whether attempted move will be viable */
         && test_move(u.ux, u.uy, u.dx, u.dy, TEST_MOVE)
+        /* override confirmation if the trap is harmless to the hero */
         && (immune_to_trap(&gy.youmonst, trap->ttyp) != TRAP_CLEARLY_IMMUNE
             /* Hallucination: all traps still show as ^, but the
                hero can't tell what they are, so treat as dangerous */
@@ -2657,6 +2662,33 @@ domove_core(void)
            ask via y/n if parnoid_confirm:confirm isn't also set or via
            yes/no if it is */
         if (!paranoid_query(ParanoidConfirm, qbuf)) {
+            nomul(0);
+            svc.context.move = 0;
+            return;
+        }
+    }
+    /* treat entering a visible region like entering a trap */
+    if (ParanoidTrap && !Blind && !Stunned && !Confusion && !Hallucination
+        /* skip if player used 'm' prefix or is moving recklessly */
+        && (!svc.context.nopick || svc.context.run)
+        /* check for region(s) */
+        && (newreg = visible_region_at(x, y)) != 0
+        && ((oldreg = visible_region_at(u.ux, u.uy)) == 0
+            /* if moving from one region into another, only ask for
+               confirmation if the one potentially being entered inflicts
+               damage (poison gas) and the one being exited doesn't (vapor) */
+            || (reg_damg(newreg) > 0 && reg_damg(oldreg) == 0))
+        /* check whether attempted move will be viable */
+        && test_move(u.ux, u.uy, u.dx, u.dy, TEST_MOVE)
+        /* we don't override confirmation for poison resistance since the
+           region also hinders hero's vision even if/when no damage is done */
+        ) {
+        char qbuf[QBUFSZ];
+
+        Snprintf(qbuf, sizeof qbuf, "%s into that %s cloud?",
+                 locomotion(gy.youmonst.data, "step"),
+                 (reg_damg(newreg) > 0) ? "poison gas" : "vapor");
+        if (!paranoid_query(ParanoidConfirm, upstart(qbuf))) {
             nomul(0);
             svc.context.move = 0;
             return;

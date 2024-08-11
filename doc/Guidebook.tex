@@ -48,7 +48,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7.0 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{DATE(%B %-d, %Y)}
-\date{July 29, 2024}
+\date{August 11, 2024}
 
 \maketitle
 
@@ -1803,6 +1803,9 @@ Show map without obstructions.
 In normal play you can view the explored portion of the current level's
 map without monsters; without monsters and objects; or without monsters,
 objects, and traps.\\
+%.lp ""
+If there are visible clouds of gas in view, they are treated like traps
+when deciding whether to show them or the floor underneath them.\\
 %.lp ""
 In explore mode, you can choose to view the full map rather than just
 its explored portion.
@@ -4752,6 +4755,8 @@ than immediately praying; on by default;
 \item[{\tt trap~~~}]
 require `{\tt y}' to confirm an attempt to move into or onto a known trap,
 unless doing so is considered to be harmless;
+when enabled, this confirmation is also used for moving into visible
+gas cloud regions;
 (to require ``yes'' rather than just `y', set Confirm too);
 confirmation can be skipped by using the `{\tt m}' movement prefix;
 \item[{\tt swim~~~}]
@@ -4770,7 +4775,7 @@ turn on all of the above.
 \elist
 %.ei
 %.ed
-By default, the pray and swim choices are enabled, the others disabled.
+By default, the pray, swim, and trap choices are enabled, the others disabled.
 To disable them without setting
 any of the other choices, use ``{\it paranoid\verb+_+confirmation:none}''.
 To keep them enabled while setting any of the others, you can

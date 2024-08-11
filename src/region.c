@@ -1,4 +1,4 @@
-/* NetHack 3.7	region.c	$NHDT-Date: 1707462965 2024/02/09 07:16:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.7	region.c	$NHDT-Date: 1723410640 2024/08/11 21:10:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -628,6 +628,29 @@ remove_mon_from_regions(struct monst *mon)
 
 #endif /*0*/
 
+/* per-turn damaeg inflicted by visible region; hides details from caller */
+int
+reg_damg(NhRegion *reg)
+{
+    int damg = (!reg->visible || reg->ttl == -2L) ? 0 : reg->arg.a_int;
+
+    return damg;
+}
+
+/* check whether current level has any visible regions */
+boolean
+any_visible_region(void)
+{
+    int i;
+
+    for (i = 0; i < svn.n_regions; i++) {
+        if (!gr.regions[i]->visible || gr.regions[i]->ttl == -2L)
+            continue;
+        return TRUE;
+    }
+    return FALSE;
+}
+
 /*
  * Check if a spot is under a visible region (eg: gas cloud).
  * Returns NULL if not, otherwise returns region.
@@ -666,8 +689,8 @@ save_regions(NHFILE *nhfp)
         goto skip_lots;
     if (nhfp->structlevel) {
         /* timestamp */
-        bwrite(nhfp->fd, (genericptr_t) &svm.moves, sizeof (svm.moves));
-        bwrite(nhfp->fd, (genericptr_t) &svn.n_regions, sizeof (svn.n_regions));
+        bwrite(nhfp->fd, (genericptr_t) &svm.moves, sizeof svm.moves);
+        bwrite(nhfp->fd, (genericptr_t) &svn.n_regions, sizeof svn.n_regions);
     }
     for (i = 0; i < svn.n_regions; i++) {
         r = gr.regions[i];
@@ -747,11 +770,11 @@ rest_regions(NHFILE *nhfp)
         tmstamp = (svm.moves - tmstamp);
 
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &svn.n_regions, sizeof (svn.n_regions));
+        mread(nhfp->fd, (genericptr_t) &svn.n_regions, sizeof svn.n_regions);
 
     gm.max_regions = svn.n_regions;
     if (svn.n_regions > 0)
-        gr.regions = (NhRegion **) alloc(sizeof (NhRegion *) * svn.n_regions);
+        gr.regions = (NhRegion **) alloc(svn.n_regions * sizeof (NhRegion *));
     for (i = 0; i < svn.n_regions; i++) {
         r = gr.regions[i] = (NhRegion *) alloc(sizeof (NhRegion));
         if (nhfp->structlevel) {

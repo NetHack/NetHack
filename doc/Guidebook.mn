@@ -46,7 +46,7 @@
 .ds f0 \*(vr
 .ds f1 \" empty
 .\"DO NOT REMOVE NH_DATESUB .ds f2 DATE(%B %-d, %Y)
-.ds f2 July 29, 2024
+.ds f2 August 11, 2024
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -1695,6 +1695,9 @@ Show map without obstructions.
 In normal play you can view the explored portion of the current level's
 map without monsters; without monsters and objects; or without monsters,
 objects, and traps.
+.lp ""
+If there are visible clouds of gas in view, they are treated like traps
+when deciding whether to show them or the floor underneath them.
 .lp ""
 In explore mode, you can choose to view the full map rather than just
 its explored portion.
@@ -4323,7 +4326,8 @@ symbols for the various object types.
 Any omitted types are filled in at the end from the previous order.
 .lp paranoid_confirmation
 A space separated list of specific situations where alternate
-prompting is desired.  The default is \(lqparanoid_confirmation:pray swim trap\(rq.
+prompting is desired.
+The default is \(lqparanoid_confirmation:pray swim trap\(rq.
 .PS Were-change
 .PL Confirm
 for any prompts which are set to require \(lqyes\(rq rather than \(oqy\(cq,
@@ -4357,6 +4361,8 @@ than immediately praying; on by default;
 .PL trap
 require \(oqy\(cq to confirm an attempt to move into or onto a known trap,
 unless doing so is considered to be harmless;
+when enabled, this confirmation is also used for moving into visible
+gas cloud regions;
 (to require \(lqyes\(rq rather than just \(oqy\(cq, set Confirm too);
 confirmation can be skipped by using the \(oq\f(CRm\fP\(cq movement prefix;
 .PL swim
@@ -4373,7 +4379,7 @@ commands even when wearing just one applicable item;
 .PL all
 turn on all of the above.
 .PE
-By default, the pray and swim choices are enabled, the others disabled.
+By default, the pray, swim, and trap choices are enabled, the others disabled.
 To disable them without setting
 any of the other choices, use \f(CRparanoid_confirmation:none\fP.
 To keep them enabled while setting any of the others, you can

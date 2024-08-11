@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1457 $ $NHDT-Date: 1721684298 2024/07/22 21:38:18 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1460 $ $NHDT-Date: 1723410638 2024/08/11 21:10:38 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -2546,6 +2546,8 @@ paranoid_confirm:swim to prevent accidental dunking into dangerous liquids;
 paranoid_confirm:trap to confirm entering a known trap unless it is harmless;
 	like revised paranoid_confirm:pray, requires y/n response; add
 	paranoid_confirm:Confirm to require yes/no instead
+extend 'paranoid_confirm:trap' to request confirmation when entering visible
+	gas cloud regions
 paranoid_confirm:Autoall to confirm picking 'A' in menustyle:Full filter menu
 looking at a monster will indicate whether it is asleep, and waking up a
 	monster yields a message

@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1722116044 2024/07/27 21:34:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1433 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1723410638 2024/08/11 21:10:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1434 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2574,6 +2574,8 @@ extern boolean in_out_region(coordxy, coordxy);
 extern boolean m_in_out_region(struct monst *, coordxy, coordxy) NONNULLARG1;
 extern void update_player_regions(void);
 extern void update_monster_region(struct monst *) NONNULLARG1;
+extern int reg_damg(NhRegion *) NONNULLARG1;
+extern boolean any_visible_region(void);
 extern NhRegion *visible_region_at(coordxy, coordxy);
 extern void show_region(NhRegion *, coordxy, coordxy) NONNULLARG1;
 extern void save_regions(NHFILE *) NONNULLARG1;
