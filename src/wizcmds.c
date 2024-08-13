@@ -1,4 +1,4 @@
-/* NetHack 3.7	wizcmds.c	$NHDT-Date: 1716592982 2024/05/24 23:23:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $ */
+/* NetHack 3.7	wizcmds.c	$NHDT-Date: 1723580901 2024/08/13 20:28:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
 /*-Copyright (c) Robert Patrick Rankin, 2024. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1049,7 +1049,7 @@ wiz_intrinsic(void)
                 if (!Warn_of_mon) {
                     svc.context.warntype.speciesidx = PM_GRID_BUG;
                     svc.context.warntype.species
-                                       = &mons[svc.context.warntype.speciesidx];
+                                     = &mons[svc.context.warntype.speciesidx];
                 }
                 goto def_feedback;
             case GLIB:

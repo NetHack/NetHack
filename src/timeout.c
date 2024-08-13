@@ -1,4 +1,4 @@
-/* NetHack 3.7	timeout.c	$NHDT-Date: 1710029105 2024/03/10 00:05:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.182 $ */
+/* NetHack 3.7	timeout.c	$NHDT-Date: 1723580900 2024/08/13 20:28:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.190 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2055,6 +2055,9 @@ wiz_timeout_queue(void)
         putstr(win, 0, "");
         Sprintf(buf, "Vault counter is %d.", u.uinvault);
         putstr(win, 0, buf);
+    }
+    if (any_visible_region()) {
+        visible_region_summary(win);
     }
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);

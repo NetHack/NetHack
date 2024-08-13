@@ -1,4 +1,4 @@
-/* NetHack 3.7	region.c	$NHDT-Date: 1723410640 2024/08/11 21:10:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
+/* NetHack 3.7	region.c	$NHDT-Date: 1723580898 2024/08/13 20:28:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -39,6 +39,7 @@ NhRegion *create_force_field(coordxy,coordxy,int,long);
 
 staticfn void reset_region_mids(NhRegion *);
 staticfn boolean is_hero_inside_gas_cloud(void);
+staticfn void make_gas_cloud(NhRegion *, int, boolean) NONNULLARG1;
 
 static const callback_proc callbacks[] = {
 #define INSIDE_GAS_CLOUD 0
@@ -651,6 +652,46 @@ any_visible_region(void)
     return FALSE;
 }
 
+/* for the wizard mode #timeout command */
+void
+visible_region_summary(winid win)
+{
+    NhRegion *reg;
+    char buf[BUFSZ], typbuf[QBUFSZ];
+    int i, damg, hdr_done = 0;
+
+    for (i = 0; i < svn.n_regions; i++) {
+        reg = gr.regions[i];
+        if (!reg->visible || reg->ttl == -2L)
+            continue;
+
+        if (!hdr_done++) {
+            putstr(win, 0, "");
+            putstr(win, 0, "Visible regions");
+        }
+        /*
+         * TODO? sort the regions by time-to-live or by bounding box.
+         */
+
+        /* we display relative time (turns left) rather than absolute
+           (the turn when region will go away);
+           since time-to-live has already been decremented, regions
+           which are due to timeout on the next turn have ttl==0;
+           adding 1 is intended to make the display be less confusing */
+        Sprintf(buf, "%5ld", reg->ttl + 1L);
+        damg = reg->arg.a_int;
+        if (damg)
+            Sprintf(typbuf, "poison gas (%d)", damg);
+        else
+            Strcpy(typbuf, "vapor");
+        Sprintf(eos(buf), "  %-16s", typbuf);
+        Sprintf(eos(buf), "  @[%d,%d..%d,%d]",
+                reg->bounding_box.lx, reg->bounding_box.ly,
+                reg->bounding_box.hx, reg->bounding_box.hy);
+        putstr(win, 0, buf);
+    }
+}
+
 /*
  * Check if a spot is under a visible region (eg: gas cloud).
  * Returns NULL if not, otherwise returns region.
@@ -1148,13 +1189,41 @@ is_hero_inside_gas_cloud(void)
     return FALSE;
 }
 
+/* details of gas cloud creation which are common to create_gas_cloud()
+   and create_gas_cloud_selection() */
+staticfn void
+make_gas_cloud(
+    NhRegion *cloud,
+    int damage,
+    boolean inside_cloud)
+{
+    if (!gi.in_mklev && !svc.context.mon_moving)
+        set_heros_fault(cloud); /* assume player has created it */
+    cloud->inside_f = INSIDE_GAS_CLOUD;
+    cloud->expire_f = EXPIRE_GAS_CLOUD;
+    cloud->arg = cg.zeroany;
+    cloud->arg.a_int = damage;
+    cloud->visible = TRUE;
+    cloud->glyph = cmap_to_glyph(damage ? S_poisoncloud : S_cloud);
+    add_region(cloud);
+
+    if (!gi.in_mklev && !inside_cloud && is_hero_inside_gas_cloud()) {
+        You("are enveloped in a cloud of %s!",
+            damage ? "noxious gas" : "steam");
+        iflags.last_msg = PLNMSG_ENVELOPED_IN_GAS;
+    }
+}
+
 /* Create a gas cloud which starts at (x,y) and grows outward from it via
  * breadth-first search.
  * cloudsize is the number of squares the cloud will attempt to fill.
  * damage is how much it deals to afflicted creatures. */
 #define MAX_CLOUD_SIZE 150
 NhRegion *
-create_gas_cloud(coordxy x, coordxy y, int cloudsize, int damage)
+create_gas_cloud(
+    coordxy x, coordxy y,
+    int cloudsize,
+    int damage)
 {
     NhRegion *cloud;
     int i, j;
@@ -1195,13 +1264,13 @@ create_gas_cloud(coordxy x, coordxy y, int cloudsize, int damage)
         for (i = 4; i > 0; --i) {
             coordxy swapidx = rn2(i);
             coord tmp = dirs[swapidx];
-            dirs[swapidx] = dirs[i-1];
-            dirs[i-1] = tmp;
+
+            dirs[swapidx] = dirs[i - 1];
+            dirs[i - 1] = tmp;
         }
         int nvalid = 0; /* # of valid adjacent spots */
         for (i = 0; i < 4; ++i) {
-            /* try all 4 directions */
-
+            /* try all 4 cardinal directions */
             int dx = dirs[i].x, dy = dirs[i].y;
             boolean isunpicked = TRUE;
 
@@ -1245,28 +1314,15 @@ create_gas_cloud(coordxy x, coordxy y, int cloudsize, int damage)
     /* If cloud was constrained in small space, give it more time to live. */
     cloud->ttl = (cloud->ttl * cloudsize) / newidx;
 
-    if (!gi.in_mklev && !svc.context.mon_moving)
-        set_heros_fault(cloud); /* assume player has created it */
-    cloud->inside_f = INSIDE_GAS_CLOUD;
-    cloud->expire_f = EXPIRE_GAS_CLOUD;
-    cloud->arg = cg.zeroany;
-    cloud->arg.a_int = damage;
-    cloud->visible = TRUE;
-    cloud->glyph = cmap_to_glyph(damage ? S_poisoncloud : S_cloud);
-    add_region(cloud);
-
-    if (!gi.in_mklev && !inside_cloud && is_hero_inside_gas_cloud()) {
-        You("are enveloped in a cloud of %s!",
-            damage ? "noxious gas" : "steam");
-        iflags.last_msg = PLNMSG_ENVELOPED_IN_GAS;
-    }
-
+    make_gas_cloud(cloud, damage, inside_cloud);
     return cloud;
 }
 
 /* create a single gas cloud from selection */
 NhRegion *
-create_gas_cloud_selection(struct selectionvar *sel, int damage)
+create_gas_cloud_selection(
+    struct selectionvar *sel,
+    int damage)
 {
     NhRegion *cloud;
     NhRect tmprect;
@@ -1285,19 +1341,7 @@ create_gas_cloud_selection(struct selectionvar *sel, int damage)
                 add_rect_to_reg(cloud, &tmprect);
             }
 
-    if (!gi.in_mklev && !svc.context.mon_moving)
-        set_heros_fault(cloud); /* assume player has created it */
-    cloud->inside_f = INSIDE_GAS_CLOUD;
-    cloud->expire_f = EXPIRE_GAS_CLOUD;
-    cloud->arg = cg.zeroany;
-    cloud->arg.a_int = damage;
-    cloud->visible = TRUE;
-    cloud->glyph = cmap_to_glyph(damage ? S_poisoncloud : S_cloud);
-    add_region(cloud);
-
-    if (!gi.in_mklev && !inside_cloud && is_hero_inside_gas_cloud())
-        You("are enveloped in a cloud of %s!",
-            damage ? "noxious gas" : "steam");
+    make_gas_cloud(cloud, damage, inside_cloud);
     return cloud;
 }
 
