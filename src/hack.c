@@ -2624,6 +2624,38 @@ domove_core(void)
     if (u_rooted())
         return;
 
+    /* treat entering a visible gas cloud region like entering a trap;
+       there could be a known trap as well as a region at the target spot;
+       if so, ask about entring the region first; even though this could
+       lead to two consecutive confirmation prompts, the situation seems to
+       be too uncommon to warrant a separate case with combined trap+region
+       confirmation */
+    if (ParanoidTrap && !Blind && !Stunned && !Confusion && !Hallucination
+        /* skip if player used 'm' prefix or is moving recklessly */
+        && (!svc.context.nopick || svc.context.run)
+        /* check for region(s) */
+        && (newreg = visible_region_at(x, y)) != 0
+        && ((oldreg = visible_region_at(u.ux, u.uy)) == 0
+            /* if moving from one region into another, only ask for
+               confirmation if the one potentially being entered inflicts
+               damage (poison gas) and the one being exited doesn't (vapor) */
+            || (reg_damg(newreg) > 0 && reg_damg(oldreg) == 0))
+        /* check whether attempted move will be viable */
+        && test_move(u.ux, u.uy, u.dx, u.dy, TEST_MOVE)
+        /* we don't override confirmation for poison resistance since the
+           region also hinders hero's vision even if/when no damage is done */
+        ) {
+        char qbuf[QBUFSZ];
+
+        Snprintf(qbuf, sizeof qbuf, "%s into that %s cloud?",
+                 locomotion(gy.youmonst.data, "step"),
+                 (reg_damg(newreg) > 0) ? "poison gas" : "vapor");
+        if (!paranoid_query(ParanoidConfirm, upstart(qbuf))) {
+            nomul(0);
+            svc.context.move = 0;
+            return;
+        }
+    }
     /* maybe ask player for confirmation before walking into known traps */
     if (ParanoidTrap && !Stunned && !Confusion
         /* skip if player used 'm' prefix or is moving recklessly */
@@ -2662,33 +2694,6 @@ domove_core(void)
            ask via y/n if parnoid_confirm:confirm isn't also set or via
            yes/no if it is */
         if (!paranoid_query(ParanoidConfirm, qbuf)) {
-            nomul(0);
-            svc.context.move = 0;
-            return;
-        }
-    }
-    /* treat entering a visible region like entering a trap */
-    if (ParanoidTrap && !Blind && !Stunned && !Confusion && !Hallucination
-        /* skip if player used 'm' prefix or is moving recklessly */
-        && (!svc.context.nopick || svc.context.run)
-        /* check for region(s) */
-        && (newreg = visible_region_at(x, y)) != 0
-        && ((oldreg = visible_region_at(u.ux, u.uy)) == 0
-            /* if moving from one region into another, only ask for
-               confirmation if the one potentially being entered inflicts
-               damage (poison gas) and the one being exited doesn't (vapor) */
-            || (reg_damg(newreg) > 0 && reg_damg(oldreg) == 0))
-        /* check whether attempted move will be viable */
-        && test_move(u.ux, u.uy, u.dx, u.dy, TEST_MOVE)
-        /* we don't override confirmation for poison resistance since the
-           region also hinders hero's vision even if/when no damage is done */
-        ) {
-        char qbuf[QBUFSZ];
-
-        Snprintf(qbuf, sizeof qbuf, "%s into that %s cloud?",
-                 locomotion(gy.youmonst.data, "step"),
-                 (reg_damg(newreg) > 0) ? "poison gas" : "vapor");
-        if (!paranoid_query(ParanoidConfirm, upstart(qbuf))) {
             nomul(0);
             svc.context.move = 0;
             return;
