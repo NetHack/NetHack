@@ -1085,7 +1085,7 @@ expire_gas_cloud(genericptr_t p1, genericptr_t p2 UNUSED)
                     if (pass == 1) {
                         if (!does_block(x, y, &levl[x][y]))
                             unblock_point(x, y);
-                        if (u_at(x, y))
+                        if (u_at(x, y) && !u.uswallow)
                             gg.gas_cloud_diss_within = TRUE;
                     } else { /* pass==2 */
                         if (cansee(x, y))
@@ -1209,6 +1209,9 @@ make_gas_cloud(
 
     if (!gi.in_mklev && !inside_cloud && is_hero_inside_gas_cloud()) {
         You("are enveloped in a cloud of %s!",
+            /* FIXME: "steam" is wrong if this cloud is just the trail of
+               a fog cloud's movmement; changing to "vapor" would handle
+               that but seems a step backward when it really is steam */
             damage ? "noxious gas" : "steam");
         iflags.last_msg = PLNMSG_ENVELOPED_IN_GAS;
     }

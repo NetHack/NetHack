@@ -1454,6 +1454,8 @@ when there was a trap on a no-dig level, the floor beneath it was always
 the #terrain command didn't know how to cope with visible gas/cloud regions;
 	treat as traps as far as player choice of whether to show or hide;
 	if/when a spot contains both region and trap, show the trap
+region expiration reported "the gas cloud around you dissipates" even when the
+	hero was swallowed
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
