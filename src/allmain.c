@@ -1,4 +1,4 @@
-/* NetHack 3.7	allmain.c	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.238 $ */
+/* NetHack 3.7	allmain.c	$NHDT-Date: 1723833610 2024/08/16 18:40:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.258 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -425,11 +425,14 @@ moveloop_core(void)
             see_traps();
             if (u.uswallow)
                 swallowed(0);
-        } else if (Unblind_telepat) {
+        } else if (Unblind_telepat || Warning || Warn_of_mon
+                   /* this is needed for the case where you saw a monster
+                      due to being next to it while it's in a gas cloud
+                      and then you moved away; it should no longer be seen
+                      when that happens, even if it hasn't moved */
+                   || any_visible_region()) { /* TODO: optimize this */
             see_monsters();
-        } else if (Warning || Warn_of_mon)
-            see_monsters();
-
+        }
         if (gv.vision_full_recalc)
             vision_recalc(0); /* vision! */
     }

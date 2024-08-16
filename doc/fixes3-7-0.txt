@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1460 $ $NHDT-Date: 1723410638 2024/08/11 21:10:38 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1461 $ $NHDT-Date: 1723833609 2024/08/16 18:40:09 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -2008,6 +2008,8 @@ farlook of water/lava location listed wall of lava before molten lava; because
 having #terrain display gas cloud regions as if they were traps didn't work
 	for monsters in such regions that are shown when adjacent to hero or
 	sensed via ESP
+when a monster within a gas cloud was displayed on the map because the hero
+	was next to it, it remained displayed if hero moved away
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
