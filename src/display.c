@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.c	$NHDT-Date: 1707462961 2024/02/09 07:16:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.231 $ */
+/* NetHack 3.7	display.c	$NHDT-Date: 1723834773 2024/08/16 18:59:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -125,13 +125,13 @@
 
 staticfn void show_mon_or_warn(coordxy, coordxy, int);
 staticfn void display_monster(coordxy, coordxy,
-                            struct monst *, int, boolean) NONNULLPTRS;
+                              struct monst *, int, boolean) NONNULLPTRS;
 staticfn int swallow_to_glyph(int, int);
 staticfn void display_warning(struct monst *) NONNULLARG1;
-staticfn boolean next_to_gas(struct monst *, coordxy, coordxy) NONNULLARG1;
-
+staticfn boolean mon_overrides_region(struct monst *, coordxy, coordxy);
 staticfn int check_pos(coordxy, coordxy, int);
-staticfn void get_bkglyph_and_framecolor(coordxy x, coordxy y, int *, uint32 *);
+staticfn void get_bkglyph_and_framecolor(coordxy x, coordxy y, int *,
+                                         uint32 *);
 staticfn int tether_glyph(coordxy, coordxy);
 staticfn void mimic_light_blocking(struct monst *) NONNULLARG1;
 
@@ -141,10 +141,10 @@ staticfn boolean more_than_one(coordxy, coordxy, coordxy, coordxy, coordxy);
 #endif
 
 staticfn int set_twall(coordxy, coordxy, coordxy, coordxy,
-                     coordxy, coordxy, coordxy, coordxy);
+                       coordxy, coordxy, coordxy, coordxy);
 staticfn int set_wall(coordxy, coordxy, int);
 staticfn int set_corn(coordxy, coordxy, coordxy, coordxy,
-                    coordxy, coordxy, coordxy, coordxy);
+                      coordxy, coordxy, coordxy, coordxy);
 staticfn int set_crosswall(coordxy, coordxy);
 staticfn void set_seenv(struct rm *, coordxy, coordxy, coordxy, coordxy);
 staticfn void t_warn(struct rm *);
@@ -442,10 +442,11 @@ unmap_object(coordxy x, coordxy y)
  * Internal to display.c, this is a #define for speed.
  */
 #define _map_location(x, y, show) \
-    {                                                                       \
-        struct obj *obj;                                           \
-        struct trap *trap;                                         \
+    do {                                                                    \
+        struct obj *obj;                                                    \
+        struct trap *trap;                                                  \
         struct engr *ep;                                                    \
+        NhRegion *_ml_reg;                                                  \
                                                                             \
         if ((obj = vobj_at(x, y)) && !covers_objects(x, y))                 \
             map_object(obj, show);                                          \
@@ -459,7 +460,9 @@ unmap_object(coordxy x, coordxy y)
             map_background(x, y, show);                                     \
                                                                             \
         update_lastseentyp(x, y);                                           \
-    }
+        if (show && !Blind && (_ml_reg = visible_region_at(x, y)) != 0)     \
+            show_region(_ml_reg, x, y);                                     \
+    } while (0)
 
 void
 map_location(coordxy x, coordxy y, int show)
@@ -651,23 +654,41 @@ warning_of(struct monst *mon)
     return wl;
 }
 
-/* returns True if mon is adjacent and would be seen if vision wasn't
-   blocked by being in a gas cloud (implicit; caller has already checked) */
+/* used by newsym() to decide whether to show a monster or a visible gas
+   cloud region when both are at the same spot; caller deals with region */
 staticfn boolean
-next_to_gas(
-    struct monst *mon,
+mon_overrides_region(
+    struct monst *mon, /* might be Null */
     coordxy mx, coordxy my) /* won't match mon->mx,my if long worm's tail */
 {
-    int r = (u.xray_range > 1) ? u.xray_range : 1;
+    int r;
 
-    if (distu(mx, my) > r * (r + 1))
+    /* this is redundant because newsym() doesn't call us when swallowed */
+    if (u.uswallow && (!mon || mon != u.ustuck))
         return FALSE;
-    /* decide whether monster at <mx,my> could be seen without couldsee()
-       because the gas cloud inhibits that (don't need to check infravision
-       when monster is adjacent) */
-    if (Blind || !_mon_visible(mon))
-        return FALSE;
-    return TRUE;
+
+    if (mon) {
+        /* when not a worm tail, show mon if sensed rather than seen */
+        if (mx == mon->mx && my == mon->my
+            && (sensemon(mon) || mon_warning(mon)))
+            return TRUE;
+
+        /* even if worm tail;
+           check whether the spot is adjacent and 'mon' would be visible
+           there if the gas cloud wasn't interfering with normal vision;
+           _mon_visible() handles mon->mundetected; don't need to check
+           infravision when monster is adjacent */
+        r = (u.xray_range > 1) ? u.xray_range : 1;
+        if (!Blind && _mon_visible(mon)
+            && M_AP_TYPE(mon) != M_AP_FURNITURE
+            && M_AP_TYPE(mon) != M_AP_OBJECT
+            && distu(mx, my) <= r * (r + 1))
+            return TRUE;
+    }
+
+    /* if not overriding region for current mon, propagate "remembered,
+       unseen monster" */
+    return glyph_is_invisible(levl[mx][my].glyph) ? TRUE : FALSE;
 }
 
 /* map or status window might not be ready for output during level creation
@@ -865,7 +886,7 @@ feel_location(coordxy x, coordxy y)
             show_glyph(x, y, lev->glyph = cmap_to_glyph(S_corr));
     }
     /* draw monster on top if we can sense it */
-    if ((x != u.ux || y != u.uy) && (mon = m_at(x, y)) != 0 && sensemon(mon))
+    if (!u_at(x, y) && (mon = m_at(x, y)) != 0 && sensemon(mon))
         display_monster(x, y, mon,
                         (tp_sensemon(mon) || MATCH_WARN_OF_MON(mon))
                             ? PHYSICALLY_SEEN
@@ -933,18 +954,18 @@ newsym(coordxy x, coordxy y)
          * seen when there's no gas region.
          *
          * FIXME:
-         *  The adjacency checking here works when the hero is outside
-         *  the region and the monster is inside, and when they're both
-         *  inside, but not when the hero is inside and monster outside
-         *  (because 'reg' will be Null for mon's <x,y>).  Checking
-         *  whether hero is inside a region for every newsym() seems
-         *  excessive.  The hero is usually blind when in a gas cloud
-         *  so the problem is less noticeable then it might otherwise be.
+         *  The adjacency checking [in mon_overrides_region()] works
+         *  when the hero is outside the region and the monster is
+         *  inside, and when they're both inside, but not when the
+         *  hero is inside and monster outside (because 'reg' will be
+         *  Null for mon's <x,y>).  Checking whether hero is inside
+         *  a region for every newsym() seems excessive.  The hero is
+         *  usually blind when in a gas cloud so the problem is less
+         *  noticeable then it might otherwise be.
          */
         if (reg && (ACCESSIBLE(lev->typ)
                     || (reg->visible && is_pool_or_lava(x, y)))) {
-            if (!(mon && (((sensemon(mon) || mon_warning(mon)) && !worm_tail)
-                          || next_to_gas(mon, x, y)))) { /* even if tail */
+            if (!mon_overrides_region(mon, x, y)) {
                 show_region(reg, x, y);
                 return;
             }
