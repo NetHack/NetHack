@@ -2012,6 +2012,7 @@ having #terrain display gas cloud regions as if they were traps didn't work
 	sensed via ESP
 when a monster within a gas cloud was displayed on the map because the hero
 	was next to it, it remained displayed if hero moved away
+eating a pyrolisk egg on the floor triggered an "object lost" panic
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
