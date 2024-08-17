@@ -629,7 +629,7 @@ remove_mon_from_regions(struct monst *mon)
 
 #endif /*0*/
 
-/* per-turn damaeg inflicted by visible region; hides details from caller */
+/* per-turn damage inflicted by visible region; hides details from caller */
 int
 reg_damg(NhRegion *reg)
 {
@@ -1210,7 +1210,7 @@ make_gas_cloud(
     if (!gi.in_mklev && !inside_cloud && is_hero_inside_gas_cloud()) {
         You("are enveloped in a cloud of %s!",
             /* FIXME: "steam" is wrong if this cloud is just the trail of
-               a fog cloud's movmement; changing to "vapor" would handle
+               a fog cloud's movement; changing to "vapor" would handle
                that but seems a step backward when it really is steam */
             damage ? "noxious gas" : "steam");
         iflags.last_msg = PLNMSG_ENVELOPED_IN_GAS;
