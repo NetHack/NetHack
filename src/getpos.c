@@ -1,4 +1,4 @@
-/* NetHack 3.7	getpos.c	$NHDT-Date: 1708126536 2024/02/16 23:35:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.307 $ */
+/* NetHack 3.7	getpos.c	$NHDT-Date: 1723875487 2024/08/17 06:18:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $ */
 /*-Copyright (c) Pasi Kallinen, 2023. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1033,7 +1033,11 @@ getpos(coord *ccp, boolean force, const char *goal)
                         || c == (int) gs.showsyms[sidx]
                         /* have '^' match webs and vibrating square or any
                            other trap that uses something other than '^' */
-                        || (c == '^' && is_cmap_trap(sidx)))
+                        || (c == '^' && is_cmap_trap(sidx))
+                        /* have room engraving character (default '`')
+                           match corridor engravings (default '#') too */
+                        || (c == gs.showsyms[S_engroom]
+                            && is_cmap_engraving(sidx)))
                         matching[sidx] = (char) ++k;
                 }
                 if (k) {

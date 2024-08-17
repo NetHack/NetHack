@@ -1,4 +1,4 @@
-/* NetHack 3.7	sym.h */
+/* NetHack	3.7	sym.h	$NHDT-Date: $ $NHDT-Branch: $ $NHDT-Revision: $ */
 /*      Copyright (c) 2016 by Pasi Kallinen              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -105,6 +105,7 @@ struct symsetentry {
 #define is_cmap_water(i) ((i) == S_pool || (i) == S_water)
 #define is_cmap_lava(i) ((i) == S_lava || (i) == S_lavawall)
 #define is_cmap_stairs(i) ((i) >= S_upstair && (i) <= S_brdnladder)
+#define is_cmap_engraving(i) ((i) == S_engroom || (i) == S_engrcorr)
 
 /* misc symbol definitions */
 enum misc_symbols {
