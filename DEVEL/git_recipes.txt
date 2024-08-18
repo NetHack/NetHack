@@ -46,7 +46,7 @@ you specify:
 
 Adds the changes you've made in (filename) to the pre-commit staging area.
 (also referred to as the 'index')
- OR
+ OR 
 Make a new file be tracked by git.
 
 "nhadd" is the preferred syntax and will automatically update the source file
