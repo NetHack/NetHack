@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1461 $ $NHDT-Date: 1723833609 2024/08/16 18:40:09 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1464 $ $NHDT-Date: 1723945837 2024/08/18 01:50:37 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1456,6 +1456,8 @@ the #terrain command didn't know how to cope with visible gas/cloud regions;
 	if/when a spot contains both region and trap, show the trap
 region expiration reported "the gas cloud around you dissipates" even when the
 	hero was swallowed
+reduce shopkeeper's innate speed from 18 to 16 so that a hasted shopkeeper
+	doesn't always get 2 moves per turn
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
