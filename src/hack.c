@@ -9,6 +9,7 @@
 /* #define DEBUG */ /* uncomment for debugging */
 
 staticfn boolean could_move_onto_boulder(coordxy, coordxy);
+staticfn void moverock_done(coordxy, coordxy);
 staticfn int moverock(void);
 staticfn void dosinkfall(void);
 staticfn boolean findtravelpath(int);
@@ -152,6 +153,15 @@ could_move_onto_boulder(coordxy sx, coordxy sy)
     return squeezeablylightinvent();
 }
 
+staticfn void
+moverock_done(coordxy sx, coordxy sy)
+{
+    struct obj *otmp;
+    for (otmp = svl.level.objects[sx][sy]; otmp; otmp = otmp->nexthere)
+        if (otmp->otyp == BOULDER)
+            otmp->next_boulder = 0; /* resume normal xname() for this obj */
+}
+
 staticfn int
 moverock(void)
 {
@@ -161,7 +171,6 @@ moverock(void)
     struct monst *mtmp, *shkp;
     const char *what;
     boolean costly, firstboulder = TRUE;
-    int res = 0;
 
     sx = u.ux + u.dx, sy = u.uy + u.dy; /* boulder starting position */
     while ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
@@ -170,8 +179,8 @@ moverock(void)
             pline("That feels like a boulder.");
             map_object(otmp, TRUE);
             nomul(0);
-            res = -1;
-            goto moverock_done;
+            moverock_done(sx, sy);
+            return -1;
         }
 
         /* when otmp->next_boulder is 1, xname() will format it as
@@ -197,6 +206,7 @@ moverock(void)
            reveals an unseen boulder or lack of remembered, unseen monster */
         if (svc.context.nopick) {
             int oldglyph = glyph_at(sx, sy); /* before feel_location() */
+            int res;
 
             feel_location(sx, sy); /* same for all 3 if/else-if/else cases */
             if (throws_rocks(gy.youmonst.data)) {
@@ -221,7 +231,8 @@ moverock(void)
                     svc.context.door_opened = svc.context.move = TRUE;
                 res = -1; /* don't move to <sx,sy>, so no soko guilt */
             }
-            goto moverock_done; /* stop further push attempts */
+            moverock_done(sx, sy); /* stop further push attempts */
+            return res;
         }
         if (Levitation || Is_airlevel(&u.uz)) {
             /* FIXME?  behavior in an air bubble on the water level should
@@ -232,8 +243,8 @@ moverock(void)
                 feel_location(sx, sy);
             You("don't have enough leverage to push %s.", the(xname(otmp)));
             /* Give them a chance to climb over it? */
-            res = -1;
-            goto moverock_done;
+            moverock_done(sx, sy);
+            return -1;
         }
         if (verysmall(gy.youmonst.data) && !u.usteed) {
             if (Blind)
@@ -261,8 +272,8 @@ moverock(void)
 
             if (revive_nasty(rx, ry,
                              "You sense movement on the other side.")) {
-                res = -1;
-                goto moverock_done;
+                moverock_done(sx, sy);
+                return -1;
             }
 
             if (mtmp && !noncorporeal(mtmp->data)
@@ -307,6 +318,7 @@ moverock(void)
             if (ttmp) {
                 int newlev = 0; /* lint suppression */
                 d_level dest;
+                int res;
 
                 /* if a trap operates on the boulder, don't attempt
                    to move any others at this location; return -1
@@ -336,7 +348,8 @@ moverock(void)
                         if (cansee(rx, ry))
                             newsym(rx, ry);
                         res = sobj_at(BOULDER, sx, sy) ? -1 : 0;
-                        goto moverock_done;
+                        moverock_done(sx, sy);
+                        return res;
                     }
                     break;
                 case SPIKED_PIT:
@@ -353,7 +366,8 @@ moverock(void)
                     if (mtmp && !Blind)
                         newsym(rx, ry);
                     res = sobj_at(BOULDER, sx, sy) ? -1 : 0;
-                    goto moverock_done;
+                    moverock_done(sx, sy);
+                    return res;
                 case HOLE:
                 case TRAPDOOR:
                     Soundeffect(se_kerplunk_boulder_gone, 40);
@@ -377,7 +391,8 @@ moverock(void)
                     if (cansee(rx, ry))
                         newsym(rx, ry);
                     res = sobj_at(BOULDER, sx, sy) ? -1 : 0;
-                    goto moverock_done;
+                    moverock_done(sx, sy);
+                    return res;
                 case LEVEL_TELEP:
                     /* 20% chance of picking current level; 100% chance for
                        that if in single-level branch (Knox) or in endgame */
@@ -408,7 +423,8 @@ moverock(void)
                     }
                     seetrap(ttmp);
                     res = sobj_at(BOULDER, sx, sy) ? -1 : 0;
-                    goto moverock_done;
+                    moverock_done(sx, sy);
+                    return res;
                 default:
                     break; /* boulder not affected by this trap */
                 }
@@ -541,19 +557,13 @@ moverock(void)
                 sokoban_guilt();
                 break;
             } else {
-                res = -1;
-                goto moverock_done;
+                moverock_done(sx, sy);
+                return -1;
             }
         }
     }
-    res = 0;
-
- moverock_done:
-    for (otmp = svl.level.objects[sx][sy]; otmp; otmp = otmp->nexthere)
-        if (otmp->otyp == BOULDER)
-            otmp->next_boulder = 0; /* resume normal xname() for this obj */
-
-    return res;
+    moverock_done(sx, sy);
+    return 0;
 }
 
 /*
