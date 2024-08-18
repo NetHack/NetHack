@@ -371,7 +371,7 @@ steal(struct monst *mtmp, char *objnambuf)
        no longer being visible; it could also be a case of a blinded
        hero being able to see via wearing the Eyes of the Overworld and
        having those stolen; remember the name as it is now; if unseen,
-       monkeys will be "It" and nymphs will be "Someone" */
+       nymphs will be "Someone" and monkeys will be "Something" */
     Strcpy(Monnambuf, Some_Monnam(mtmp));
 
     /* food being eaten might already be used up but will not have
@@ -574,13 +574,13 @@ steal(struct monst *mtmp, char *objnambuf)
                        otmp->oclass);
         }
         /* hero's blindfold might have just been stolen; if so, replace
-           cached "It" or "Someone" with Monnam */
+           cached "Someone" or "Something" with Monnam */
         if (!seen && canspotmon(mtmp))
             Strcpy(Monnambuf, Monnam(mtmp));
     } else if (otmp->owornmask) { /* weapon or ball&chain */
         struct obj *item = otmp;
 
-        if (otmp == uball && uchain != NULL)
+        if (otmp == uball) /* non-Null uball implies non-Null uchain */
             item = uchain; /* yields a more accurate 'takes off' message */
         worn_item_removal(mtmp, item);
         /* if we switched from uball to uchain for the preface message,
