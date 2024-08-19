@@ -448,12 +448,20 @@ run_regions(void)
         }
     }
 
-    if (gg.gas_cloud_diss_within)
+    if (gg.gas_cloud_diss_within) {
         pline_The("gas cloud around you dissipates.");
-    if (gg.gas_cloud_diss_seen)
-        You_see("%s dissipate.",
-                gg.gas_cloud_diss_seen == 1
-                ? "a gas cloud" : "some gas clouds");
+        /* normally won't see additional dissipation when within */
+        /* FIXME? this assumes that additional dissipation is close by */
+        if (u.xray_range <= 1)
+            gg.gas_cloud_diss_seen = 0;
+        gg.gas_cloud_diss_within = FALSE;
+    }
+    if (gg.gas_cloud_diss_seen) {
+        You_see("%s gas cloud%s dissipate.",
+                (gg.gas_cloud_diss_seen == 1) ? "a" : "some",
+                plur(gg.gas_cloud_diss_seen));
+        gg.gas_cloud_diss_seen = 0;
+    }
 }
 
 /*
@@ -1086,11 +1094,13 @@ expire_gas_cloud(genericptr_t p1, genericptr_t p2 UNUSED)
                     if (pass == 1) {
                         if (!does_block(x, y, &levl[x][y]))
                             unblock_point(x, y);
-                        if (u_at(x, y) && !u.uswallow)
-                            gg.gas_cloud_diss_within = TRUE;
                     } else { /* pass==2 */
-                        if (cansee(x, y))
-                            gg.gas_cloud_diss_seen++;
+                        if (!u.uswallow) {
+                            if (u_at(x, y))
+                                gg.gas_cloud_diss_within = TRUE;
+                            else if (cansee(x, y))
+                                gg.gas_cloud_diss_seen++;
+                        }
                     }
                 }
             }

@@ -1456,6 +1456,8 @@ the #terrain command didn't know how to cope with visible gas/cloud regions;
 	if/when a spot contains both region and trap, show the trap
 region expiration reported "the gas cloud around you dissipates" even when the
 	hero was swallowed
+region expiration could report "the gas cloud around you dissipates" and also
+	"you see a gas cloud dissipate" for the same cloud spot
 reduce shopkeeper's innate speed from 18 to 16 so that a hasted shopkeeper
 	doesn't always get 2 moves per turn
 
