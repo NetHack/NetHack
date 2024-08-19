@@ -659,6 +659,7 @@ visible_region_summary(winid win)
     NhRegion *reg;
     char buf[BUFSZ], typbuf[QBUFSZ];
     int i, damg, hdr_done = 0;
+    const char *fldsep = iflags.menu_tab_sep ? "\t" : "  ";
 
     for (i = 0; i < svn.n_regions; i++) {
         reg = gr.regions[i];
@@ -684,8 +685,8 @@ visible_region_summary(winid win)
             Sprintf(typbuf, "poison gas (%d)", damg);
         else
             Strcpy(typbuf, "vapor");
-        Sprintf(eos(buf), "  %-16s", typbuf);
-        Sprintf(eos(buf), "  @[%d,%d..%d,%d]",
+        Sprintf(eos(buf), "%s%-16s", fldsep, typbuf);
+        Sprintf(eos(buf), "%s@[%d,%d..%d,%d]", fldsep,
                 reg->bounding_box.lx, reg->bounding_box.ly,
                 reg->bounding_box.hx, reg->bounding_box.hy);
         putstr(win, 0, buf);
