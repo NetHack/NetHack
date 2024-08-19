@@ -644,6 +644,7 @@ u_init_role(void)
     case PM_CAVE_DWELLER:
         Cave_man[C_AMMO].trquan = rn1(11, 10); /* 10..20 */
         ini_inv(Cave_man);
+        knows_object(FLINT);
         skill_init(Skill_C);
         break;
     case PM_HEALER:
@@ -651,7 +652,12 @@ u_init_role(void)
         ini_inv(Healer);
         if (!rn2(25))
             ini_inv(Lamp);
+        knows_object(POT_HEALING);
+        knows_object(POT_EXTRA_HEALING);
         knows_object(POT_FULL_HEALING);
+        knows_object(SPE_HEALING);
+        knows_object(SPE_EXTRA_HEALING);
+        knows_object(SPE_STONE_TO_FLESH);
         skill_init(Skill_H);
         break;
     case PM_KNIGHT:
@@ -1212,6 +1218,9 @@ ini_inv(struct trobj *trop)
     struct obj *obj;
     int otyp;
     boolean got_sp1 = FALSE; /* got a level 1 spellbook? */
+
+    if (u.uroleplay.broke)
+        return;
 
     while (trop->trclass) {
         otyp = (int) trop->trotyp;

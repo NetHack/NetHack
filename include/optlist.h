@@ -213,6 +213,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 No, Yes, No, No, NoAlias,
                 "deprecated (use S_boulder in sym file instead)")
 #endif
+    NHOPTB(broke, Advanced, 0, opt_in, set_in_config,
+           Off, Yes, No, No, NoAlias, &u.uroleplay.broke, Term_False,
+           "start game with no inventory or spells")
     NHOPTC(catname, Advanced, PL_PSIZ, opt_in, set_gameview,
                 No, Yes, No, No, NoAlias,
                 "name of your starting pet if it is a kitten")

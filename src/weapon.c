@@ -1660,13 +1660,15 @@ skill_init(const struct def_skill *class_skill)
     }
 
     /* set skills for magic */
-    if (Role_if(PM_HEALER) || Role_if(PM_MONK)) {
-        P_SKILL(P_HEALING_SPELL) = P_BASIC;
-    } else if (Role_if(PM_CLERIC)) {
-        P_SKILL(P_CLERIC_SPELL) = P_BASIC;
-    } else if (Role_if(PM_WIZARD)) {
-        P_SKILL(P_ATTACK_SPELL) = P_BASIC;
-        P_SKILL(P_ENCHANTMENT_SPELL) = P_BASIC;
+    if (!u.uroleplay.broke) {
+        if (Role_if(PM_HEALER) || Role_if(PM_MONK)) {
+            P_SKILL(P_HEALING_SPELL) = P_BASIC;
+        } else if (Role_if(PM_CLERIC)) {
+            P_SKILL(P_CLERIC_SPELL) = P_BASIC;
+        } else if (Role_if(PM_WIZARD)) {
+            P_SKILL(P_ATTACK_SPELL) = P_BASIC;
+            P_SKILL(P_ENCHANTMENT_SPELL) = P_BASIC;
+        }
     }
 
     /* walk through array to set skill maximums */
@@ -1679,13 +1681,15 @@ skill_init(const struct def_skill *class_skill)
             P_SKILL(skill) = P_UNSKILLED;
     }
 
-    /* High potential fighters already know how to use their hands. */
-    if (P_MAX_SKILL(P_BARE_HANDED_COMBAT) > P_EXPERT)
-        P_SKILL(P_BARE_HANDED_COMBAT) = P_BASIC;
+    if (!u.uroleplay.broke) {
+        /* High potential fighters already know how to use their hands. */
+        if (P_MAX_SKILL(P_BARE_HANDED_COMBAT) > P_EXPERT)
+            P_SKILL(P_BARE_HANDED_COMBAT) = P_BASIC;
 
-    /* Roles that start with a horse know how to ride it */
-    if (gu.urole.petnum == PM_PONY)
-        P_SKILL(P_RIDING) = P_BASIC;
+        /* Roles that start with a horse know how to ride it */
+        if (gu.urole.petnum == PM_PONY)
+            P_SKILL(P_RIDING) = P_BASIC;
+    }
 
     /*
      * Make sure we haven't missed setting the max on a skill
