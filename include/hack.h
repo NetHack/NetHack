@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.h	$NHDT-Date: 1717878594 2024/06/08 20:29:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.257 $ */
+/* NetHack 3.7	hack.h	$NHDT-Date: 1724094288 2024/08/19 19:04:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.261 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1139,6 +1139,7 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define MHID_PREFIX  1 /* include ", mimicking " prefix */
 #define MHID_ARTICLE 2 /* include "a " or "an " after prefix */
 #define MHID_ALTMON  4 /* if mimicking a monster, include that */
+#define MHID_REGION  8 /* include region when mon is in one */
 
 /* flags for make_corpse() and mkcorpstat(); 0..7 are recorded in obj->spe */
 #define CORPSTAT_NONE     0x00

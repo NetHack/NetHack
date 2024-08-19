@@ -1,4 +1,4 @@
-/* NetHack 3.7	pager.c	$NHDT-Date: 1720565361 2024/07/09 22:49:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.275 $ */
+/* NetHack 3.7	pager.c	$NHDT-Date: 1724094301 2024/08/19 19:05:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.279 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -118,8 +118,10 @@ self_lookat(char *outbuf)
             pmname(&mons[u.umonnum], Ugender), svp.plname);
     if (u.usteed)
         Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
-    if (u.uundetected || (Upolyd && U_AP_TYPE))
-        mhidden_description(&gy.youmonst, MHID_PREFIX | MHID_ARTICLE,
+    if (u.uundetected || (Upolyd && U_AP_TYPE)
+        || visible_region_at(u.ux, u.uy))
+        mhidden_description(&gy.youmonst,
+                            MHID_PREFIX | MHID_ARTICLE | MHID_REGION,
                             eos(outbuf));
     if (Punished)
         Sprintf(eos(outbuf), ", chained to %s",
@@ -187,9 +189,12 @@ mhidden_description(
 {
     struct obj *otmp;
     const char *what;
+    NhRegion *reg;
+    size_t buflen;
     boolean incl_prefix = (mhid_flags & MHID_PREFIX) != 0,
             incl_article = (mhid_flags & MHID_ARTICLE) != 0,
-            show_altmon = (mhid_flags & MHID_ALTMON) != 0;
+            show_altmon = (mhid_flags & MHID_ALTMON) != 0,
+            force_region = (mhid_flags & MHID_REGION) != 0;
     boolean fakeobj, isyou = (mon == &gy.youmonst);
     coordxy x = isyou ? u.ux : mon->mx, y = isyou ? u.uy : mon->my;
     int glyph = (svl.level.flags.hero_memory && !isyou) ? levl[x][y].glyph
@@ -249,6 +254,26 @@ mhidden_description(
         } else {
             if (mon->data->mlet == S_EEL && is_pool(x, y))
                 Strcat(outbuf, " in murky water");
+        }
+    }
+
+    /* FIXME: <x,y> isn't right when looking at long worm tails */
+    if ((reg = visible_region_at(x, y)) != 0
+        && (buflen = strlen(outbuf)) < BUFSZ - 1) {
+        int r = (u.xray_range > 1) ? u.xray_range : 1;
+
+        /* at present, hero must be next to the monster; being able to see
+           from the hero's spot to the monster's spot would be much better,
+           but a visible region marks all its spots as can't-be-seen, so
+           this monster's spot is !cansee and !couldsee [maybe we need an
+           additional vision bit for "hero's side of edge of gas cloud"?] */
+        if (distu(x, y) <= r * (r + 1) || force_region) {
+            int rglyph = reg->glyph;
+            boolean poison_gas = (glyph_is_cmap(rglyph)
+                                  && glyph_to_cmap(rglyph) == S_poisoncloud);
+
+            Snprintf(eos(outbuf), BUFSZ - buflen, ", in a cloud of %s",
+                     poison_gas ? "poison gas" : "vapor");
         }
     }
 }
@@ -424,8 +449,9 @@ look_at_monster(
 
     /* we know the hero sees a monster at this location, but if it's shown
        due to persistent monster detection he might remember something else */
-    if (mtmp->mundetected || M_AP_TYPE(mtmp))
-        mhidden_description(mtmp, MHID_PREFIX | MHID_ARTICLE, eos(buf));
+    if (mtmp->mundetected || M_AP_TYPE(mtmp) || visible_region_at(x, y))
+        mhidden_description(mtmp, MHID_PREFIX | MHID_ARTICLE | MHID_REGION,
+                            eos(buf));
 
     if (monbuf) {
         unsigned how_seen = howmonseen(mtmp);

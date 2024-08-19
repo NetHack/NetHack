@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1702023269 2023/12/08 08:14:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.485 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1724094299 2024/08/19 19:04:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.516 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4658,8 +4658,23 @@ look_here(
         }
         return (!!Blind ? ECMD_TIME : ECMD_OK);
     }
-    if (!skip_objects && (trap = t_at(u.ux, u.uy)) && trap->tseen)
-        There("is %s here.", an(trapname(trap->ttyp, FALSE)));
+    if (!skip_objects) {
+        NhRegion *reg;
+        char regbuf[QBUFSZ];
+
+        regbuf[0] = '\0';
+        if ((reg = visible_region_at(u.ux, u.uy)) != 0)
+            Sprintf(regbuf, "a %s cloud",
+                    reg_damg(reg) ? "poison gas" : "vapor");
+        if ((trap = t_at(u.ux, u.uy)) != 0 && !trap->tseen)
+            trap = (struct trap *) NULL;
+
+        if (reg || trap)
+            There("is %s%s%s here.",
+                  reg ? regbuf : "",
+                  (reg && trap) ? " and " : "",
+                  trap ? an(trapname(trap->ttyp, FALSE)) : "");
+    }
 
     otmp = svl.level.objects[u.ux][u.uy];
     dfeature = dfeature_at(u.ux, u.uy, fbuf2);

@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1713334807 2024/04/17 06:20:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.112 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1724094296 2024/08/19 19:04:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.115 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3205,7 +3205,7 @@ mstatusline(struct monst *mtmp)
     if (mtmp->data == &mons[PM_LONG_WORM]) {
         int segndx, nsegs = count_wsegs(mtmp);
 
-        /* the worm code internals don't consider the head of be one of
+        /* the worm code internals don't consider the head to be one of
            the worm's segments, but we count it as such when presenting
            worm feedback to the player */
         if (!nsegs) {
@@ -3226,8 +3226,10 @@ mstatusline(struct monst *mtmp)
         Strcat(info, ", eating");
     /* a stethoscope exposes mimic before getting here so this
        won't be relevant for it, but wand of probing doesn't */
-    if (mtmp->mundetected || mtmp->m_ap_type)
-        mhidden_description(mtmp, MHID_PREFIX | MHID_ARTICLE | MHID_ALTMON,
+    if (mtmp->mundetected || mtmp->m_ap_type
+        || visible_region_at(gb.bhitpos.x, gb.bhitpos.y))
+        mhidden_description(mtmp,
+                       MHID_PREFIX | MHID_ARTICLE | MHID_ALTMON | MHID_REGION,
                             eos(info));
     if (mtmp->mcan)
         Strcat(info, ", cancelled");
@@ -3311,7 +3313,9 @@ mstatusline(struct monst *mtmp)
 void
 ustatusline(void)
 {
+    NhRegion *reg;
     char info[BUFSZ];
+    size_t ln;
 
     info[0] = '\0';
     if (Sick) {
@@ -3366,15 +3370,29 @@ ustatusline(void)
         Strcat(info, Very_fast ? ", very fast" : ", fast");
     if (u.uundetected)
         Strcat(info, ", concealed");
+    else if (U_AP_TYPE != M_AP_NOTHING)
+        Strcat(info, ", disguised");
     if (Invis)
         Strcat(info, ", invisible");
     if (u.ustuck) {
-        if (sticks(gy.youmonst.data))
-            Strcat(info, ", holding ");
-        else
+        if (u.uswallow)
+            Strcat(info, digests(u.ustuck->data) ? ", being digested by "
+                                                 : ", engulfed by ");
+        else if (!sticks(gy.youmonst.data))
             Strcat(info, ", held by ");
-        Strcat(info, mon_nam(u.ustuck));
+        else
+            Strcat(info, ", holding ");
+        /* FIXME? a_monnam() uses x_monnam() which has a special case that
+           forces "the" instead of "a" when formatting u.ustuck while hero
+           is swallowed; we don't really want that here but it isn't worth
+           fiddling with just for self-probing while engulfed */
+        Strcat(info, a_monnam(u.ustuck));
     }
+    if (!u.uswallow
+        && (reg = visible_region_at(u.ux, u.uy)) != 0
+        && (ln = strlen(info)) < sizeof info)
+        Snprintf(eos(info), sizeof info - ln, ", in a cloud of %s",
+                 reg_damg(reg) ? "poison gas" : "vapor");
 
     pline("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s.", svp.plname,
           piousness(FALSE, align_str(u.ualign.type)),
