@@ -2632,6 +2632,14 @@ vanqsort_cmp(
         }
         res = mcls1 - mcls2; /* class */
         if (res == 0) {
+            /* Riders are in the same class as major demons; group Riders
+               at the start of that class regardless of secondary ordering;
+               res -1 => #1 is a Rider, #2 isn't;
+                    0 => both riders or both major demons;
+                   +1 => #2 is a Rider, #1 isn't */
+            res = is_rider(&mons[indx2]) - is_rider(&mons[indx1]);
+            if (res)
+                break;
             mlev1 = mons[indx1].mlevel;
             mlev2 = mons[indx2].mlevel;
             res = mlev1 - mlev2; /* mlevel low to high */
@@ -2710,6 +2718,7 @@ int
 dovanquished(void)
 {
     list_vanquished(iflags.menu_requested ? 'a' : 'y', FALSE);
+    iflags.menu_requested = FALSE;
     return ECMD_OK;
 }
 
@@ -2746,12 +2755,19 @@ list_vanquished(char defquery, boolean ask)
         total_killed += (long) nkilled;
     }
 
+    /*
+     * FIXME:
+     *  Setting sort order should take place for explicit 'm #vanquished'
+     *  even when there are less than 2 types vanquished so far.
+     */
+
     /* vanquished creatures list;
      * includes all dead monsters, not just those killed by the player
      */
     if (ntypes != 0) {
         char mlet, prev_mlet = 0; /* used as small integer, not character */
-        boolean class_header, uniq_header, was_uniq = FALSE;
+        boolean class_header, uniq_header, Rider,
+                was_uniq = FALSE, special_hdr = FALSE;
 
         c = ask ? yn_function(
                             "Do you want an account of creatures vanquished?",
@@ -2780,9 +2796,17 @@ list_vanquished(char defquery, boolean ask)
             for (ni = 0; ni < ntypes; ni++) {
                 i = mindx[ni];
                 nkilled = svm.mvitals[i].died;
+                Rider = is_rider(&mons[i]);
                 mlet = mons[i].mlet;
-                if (class_header && mlet != prev_mlet) {
-                    Strcpy(buf, def_monsyms[(int) mlet].explain);
+                if (class_header
+                    && (mlet != prev_mlet || (special_hdr && !Rider))) {
+                    if (!Rider) {
+                        Strcpy(buf, def_monsyms[(int) mlet].explain);
+                        special_hdr = FALSE;
+                    } else {
+                        Strcpy(buf, "Rider");
+                        special_hdr = TRUE;
+                    }
                     /* 'ask' implies final disclosure, where highlighting
                        of various header lines is suppressed */
                     putstr(klwin, ask ? ATR_NONE : iflags.menu_headings.attr,
