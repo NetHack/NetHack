@@ -1701,6 +1701,18 @@ findit(void)
     char buf[BUFSZ];
     struct found_things found;
 
+    /*
+     * FIXME:
+     *  When things are found, this should show the updated map and allow
+     *  browsing.
+     *
+     *  Currently, "You reveal a trap!" will map the trap but not reveal it
+     *  if that trap is covered by something, which is fairly common for
+     *  early levels where corpses of fake heroes usually hide the traps
+     *  that killed them.  That's most likely to occur for wizard mode ^E
+     *  but can happen in normal play by using wand of secret door detection.
+     */
+
     if (u.uswallow)
         return 0;
 
