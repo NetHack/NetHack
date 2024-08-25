@@ -2717,7 +2717,7 @@ set_vanq_order(boolean for_vanq)
 int
 dovanquished(void)
 {
-    list_vanquished(iflags.menu_requested ? 'a' : 'y', FALSE);
+    list_vanquished(iflags.menu_requested ? 'A' : 'y', FALSE);
     iflags.menu_requested = FALSE;
     return ECMD_OK;
 }
@@ -2728,6 +2728,7 @@ dovanquished(void)
 
 #define done_stopprint program_state.stopprint
 
+/* used for #vanquished and end of game disclosure and end of game dumplog */
 void
 list_vanquished(char defquery, boolean ask)
 {
@@ -2738,12 +2739,25 @@ list_vanquished(char defquery, boolean ask)
     winid klwin;
     short mindx[NUMMONS];
     char c, buf[BUFSZ], buftoo[BUFSZ];
-    boolean dumping; /* for DUMPLOG; doesn't need to be conditional */
+    /* 'A' is only supplied by 'm #vanquished'; 'd' is only supplied by
+       dump_everything() when writing dumplog, so won't happen if built
+       without '#define DUMPLOG' but there's no need for conditionals here */
+    boolean force_sort = (defquery == 'A'),
+            dumping = (defquery == 'd');
 
-    dumping = (defquery == 'd');
-    if (dumping) {
+    /* normally we don't ask about sort order for the vanquished list unless
+       it contains at least two entries; however, if player has used explicit
+       'm #vanquished', choose order no matter what it contains so far */
+    if (force_sort) { /* iflags.menu_requested via dovanquished() */
+        /* choose value for vanq_sortmode via menu; ESC cancels choosing
+           sort order but continues with vanquishd monsters display */
+        (void) set_vanq_order(TRUE);
+    }
+    if (dumping || force_sort) {
+        /* switch from 'A' or 'd' to 'y'; 'ask' is already False for the
+           cases that might supply 'A' or 'd' */
         defquery = 'y';
-        ask = FALSE; /* redundant; caller passes False with defquery=='d' */
+        ask = FALSE; /* redundant */
     }
 
     /* get totals first */
@@ -2755,12 +2769,6 @@ list_vanquished(char defquery, boolean ask)
         total_killed += (long) nkilled;
     }
 
-    /*
-     * FIXME:
-     *  Setting sort order should take place for explicit 'm #vanquished'
-     *  even when there are less than 2 types vanquished so far.
-     */
-
     /* vanquished creatures list;
      * includes all dead monsters, not just those killed by the player
      */
@@ -2769,10 +2777,23 @@ list_vanquished(char defquery, boolean ask)
         boolean class_header, uniq_header, Rider,
                 was_uniq = FALSE, special_hdr = FALSE;
 
-        c = ask ? yn_function(
-                            "Do you want an account of creatures vanquished?",
-                              ynaqchars, defquery, TRUE)
-                : defquery;
+        if (ask) {
+            char allow_yn[10];
+
+            if (ntypes > 1) {
+                Strcpy(allow_yn, ynaqchars);
+            } else {
+                Strcpy(allow_yn, ynqchars); /* don't include 'a', but */
+                Strcat(allow_yn, "\033a");  /* allow user to answer 'a' */
+                if (defquery == 'a') /* potential default from 'disclose' */
+                    defquery = 'y';
+            }
+            c = yn_function("Do you want an account of creatures vanquished?",
+                            allow_yn, defquery, TRUE);
+        } else {
+            c = defquery;
+        }
+
         if (c == 'q')
             done_stopprint++;
         if (c == 'y' || c == 'a') {
