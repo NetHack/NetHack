@@ -308,8 +308,10 @@ is_exclusion_zone(xint16 type, coordxy x, coordxy y)
     struct exclusion_zone *ez = sve.exclusion_zones;
 
     while (ez) {
-        if (((type == LR_DOWNTELE && (ez->zonetype == LR_DOWNTELE || ez->zonetype == LR_TELE))
-             || (type == LR_UPTELE && (ez->zonetype == LR_UPTELE || ez->zonetype == LR_TELE))
+        if (((type == LR_DOWNTELE
+              && (ez->zonetype == LR_DOWNTELE || ez->zonetype == LR_TELE))
+             || (type == LR_UPTELE
+                 && (ez->zonetype == LR_UPTELE || ez->zonetype == LR_TELE))
              || type == ez->zonetype)
             && within_bounded_area(x, y, ez->lx, ez->ly, ez->hx, ez->hy))
             return TRUE;
@@ -406,7 +408,8 @@ put_lregion_here(
 {
     struct monst *mtmp;
 
-    if (bad_location(x, y, nlx, nly, nhx, nhy) || is_exclusion_zone(rtype, x, y)) {
+    if (bad_location(x, y, nlx, nly, nhx, nhy)
+        || is_exclusion_zone(rtype, x, y)) {
         if (!oneshot) {
             return FALSE; /* caller should try again */
         } else {
@@ -420,7 +423,8 @@ put_lregion_here(
                     mtmp->mtrapped = 0;
                 deltrap(t);
             }
-            if (bad_location(x, y, nlx, nly, nhx, nhy) || is_exclusion_zone(rtype, x, y))
+            if (bad_location(x, y, nlx, nly, nhx, nhy)
+                || is_exclusion_zone(rtype, x, y))
                 return FALSE;
         }
     }
@@ -807,7 +811,7 @@ stolen_booty(void)
     cnt = rnd(3);
     for (i = 0; i < cnt; ++i)
         migr_booty_item(SKELETON_KEY, gang);
-    otyp = rn2((GAUNTLETS_OF_DEXTERITY - LEATHER_GLOVES) + 1) + LEATHER_GLOVES;
+    otyp = rn1((GAUNTLETS_OF_DEXTERITY - LEATHER_GLOVES) + 1, LEATHER_GLOVES);
     migr_booty_item(otyp, gang);
     cnt = rnd(10);
     for (i = 0; i < cnt; ++i) {
@@ -1456,6 +1460,8 @@ mkportal(coordxy x, coordxy y, xint16 todnum, xint16 todlevel)
     return;
 }
 
+/* augment the Plane of Fire; called from goto_level() when arriving and
+   moveloop_core() when on the level */
 void
 fumaroles(void)
 {
@@ -1509,13 +1515,16 @@ staticfn void set_wportal(void);
 staticfn void mk_bubble(coordxy, coordxy, int);
 staticfn void mv_bubble(struct bubble *, coordxy, coordxy, boolean);
 
+/* augment the Plane of Water; called from goto_level() when arriving and
+   moveloop_core() when on the level */
 void
 movebubbles(void)
 {
-    static const struct rm water_pos = { cmap_b_to_glyph(S_water), WATER, 0,
-                                         0, 0, 0, 0, 0, 0, 0 };
-    static const struct rm air_pos = { cmap_b_to_glyph(S_cloud), AIR, 0, 0, 0,
-                                       1, 0, 0, 0, 0 };
+    static const struct rm water_pos = {
+        cmap_b_to_glyph(S_water), WATER, 0, 0, 0, 0, 0, 0, 0, 0
+    }, air_pos = {
+        cmap_b_to_glyph(S_cloud), AIR, 0, 0, 0, 1, 0, 0, 0, 0
+    };
     static boolean up = FALSE;
     struct bubble *b;
     struct container *cons;

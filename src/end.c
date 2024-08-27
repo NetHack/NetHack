@@ -937,8 +937,7 @@ fuzzer_savelife(int how)
      * Some debugging code pulled out of done() to unclutter it.
      * 'done_seq' is maintained in done().
      */
-    if (!program_state.panicking
-        && how != PANICKED && how != TRICKED) {
+    if (!program_state.panicking && how != PANICKED && how != TRICKED) {
         savelife(how);
 
         /* periodically restore characteristics plus lost experience
@@ -986,11 +985,14 @@ fuzzer_savelife(int how)
         svk.killer.name[0] = '\0';
         svk.killer.format = 0;
 
-        /* Guard against getting stuck in a loop if we die in one of
+        /*
+         * Guard against getting stuck in a loop if we die in one of
          * the few ways where life-saving isn't effective (cited case
          * was burning in lava when the level was too full to allow
-         * teleporting to safety).  Deal with it by recreating
-         * the level, if we're in wizmode */
+         * teleporting to safety).  Deal with it by recreating the level
+         * if we're in wizmode (always the case for debug_fuzzer unless
+         * player has used a debugger to fiddle with 'iflags' bits).
+         */
         if (gd.done_seq++ > gh.hero_seq + 100L) {
             if (!wizard)
                 return FALSE; /* can't deal with it */
