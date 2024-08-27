@@ -3713,7 +3713,7 @@ wizterrainwish(struct _readobjnam_data *d)
                 lev->wall_info |= (old_wall_info & WM_MASK);
             /* set up trapped flag; open door states aren't eligible */
             if (d->trapped == 2 /* 2: wish includes explicit "untrapped" */
-                || secret /* secret doors can't trapped due to their use
+                || secret /* secret doors can't be trapped due to their use
                            * of both doormask and wall_info; those both
                            * overlay rm->flags and partially conflict */
                 || (lev->doormask & (D_LOCKED | D_CLOSED)) == 0)
