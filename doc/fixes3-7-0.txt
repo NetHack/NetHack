@@ -1462,7 +1462,7 @@ reduce shopkeeper's innate speed from 18 to 16 so that a hasted shopkeeper
 	doesn't always get 2 moves per turn
 when a secret corridor was discovered by wand of secret door detection or by
 	wizard mode ^E and converted into a regular corridor, if there was a
-	formerly embbered object at the spot, presence of the object would be
+	formerly embedded object at the spot, presence of the object would be
 	forgotten unless within range of a light source
 
 
