@@ -248,7 +248,8 @@ magic_map_background(coordxy x, coordxy y, int show)
         else if (lev->typ == CORR && glyph == cmap_to_glyph(S_litcorr))
             glyph = cmap_to_glyph(S_corr);
     }
-    if (svl.level.flags.hero_memory && glyph_is_cmap(lev->glyph))
+    if (svl.level.flags.hero_memory
+        && (glyph_is_unexplored(lev->glyph) || glyph_is_cmap(lev->glyph)))
         lev->glyph = glyph;
     if (show)
         show_glyph(x, y, glyph);
