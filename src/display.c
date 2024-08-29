@@ -982,6 +982,8 @@ newsym(coordxy x, coordxy y)
             if (see_self)
                 display_self();
         } else {
+            boolean show = FALSE;
+
             see_it = mon && (mon_visible(mon)
                              || (!worm_tail && (tp_sensemon(mon)
                                                 || MATCH_WARN_OF_MON(mon))));
@@ -994,7 +996,7 @@ newsym(coordxy x, coordxy y)
                     if (tt == BEAR_TRAP || is_pit(tt) || tt == WEB)
                         trap->tseen = 1;
                 }
-                _map_location(x, y, 0); /* map under the monster */
+                _map_location(x, y, show); /* map under the monster */
                 /* also gets rid of any invisibility glyph */
                 display_monster(x, y, mon,
                                 see_it ? PHYSICALLY_SEEN : DETECTED,
