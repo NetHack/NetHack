@@ -1,4 +1,4 @@
-/* NetHack 3.7	vision.c	$NHDT-Date: 1707424350 2024/02/08 20:32:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.7	vision.c	$NHDT-Date: 1724939600 2024/08/29 13:53:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990. */
 /* NetHack may be freely redistributed.  See license for details.       */
 
@@ -2093,8 +2093,8 @@ do_clear_area(
 
         /* vision doesn't pass through water or clouds, detection should
            [this probably ought to be an arg supplied by our caller...] */
-        override_vision =
-            (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz)) && detecting(func);
+        override_vision = (detecting(func)
+                           && (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz)));
 
         if (range > MAX_RADIUS || range < 1)
             panic("do_clear_area:  illegal range %d", range);
@@ -2107,8 +2107,8 @@ do_clear_area(
             y = 0;
         for (; y <= max_y; y++) {
             offset = limits[v_abs(y - srow)];
-            if ((min_x = (scol - offset)) < 0)
-                min_x = 0;
+            if ((min_x = (scol - offset)) < 1)
+                min_x = 1;
             if ((max_x = (scol + offset)) >= COLNO)
                 max_x = COLNO - 1;
             for (x = min_x; x <= max_x; x++)
