@@ -1,4 +1,4 @@
-# NetHack 3.7  symbols       $NHDT-Date: 1709388512 2024/03/02 14:08:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $
+# NetHack 3.7  symbols       $NHDT-Date: 1725052751 2024/08/30 21:19:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.36 $
 # Copyright (c) 2006 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -627,10 +627,10 @@ start: curses
 	S_bars: \xfc			# meta-|, not-equals sign (was '#')
 	S_tree: \xe7			# meta-g, plus or minus sign
 	S_room: \xfe			# meta-z, centered dot
-	S_engroom: \xee                 # epsilon
-	S_corr: \xe1			# meta-a, solid block
-	S_litcorr: \xe1			# meta-a, solid block
-	S_engrcorr: \xe1			# meta-a, solid block
+	# S_engroom: \xee		# epsilon [\xee is actually cross wall]
+	S_corr: \xe1			# meta-a, checkerboard
+	S_litcorr: \xe1			# meta-a, checkerboard
+	S_engrcorr: \xe1		# meta-a, checkerboard
 	S_ice: \xfe			# meta-z, centered dot
 	S_vodbridge: \xfe		# meta-z, centered dot
 	S_hodbridge: \xfe		# meta-z, centered dot
@@ -702,8 +702,8 @@ start: DECgraphics
 	S_tlwall: \xf5			# meta-u, T left
 	S_trwall: \xf4			# meta-t, T right
 	S_ndoor: \xfe			# meta-~, centered dot
-	S_vodoor: \xe1			# meta-a, solid block
-	S_hodoor: \xe1			# meta-a, solid block
+	S_vodoor: \xe1			# meta-a, checkerboard
+	S_hodoor: \xe1			# meta-a, checkerboard
 	S_bars: \xfc			# meta-|, not-equals (used to be pi)
 	S_tree: \xe7			# meta-g, plus-or-minus
 	S_room: \xfe			# meta-~, centered dot
