@@ -17,7 +17,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL 106
+#define EDITLEVEL 107
 
 /*
  * Development status possibilities.

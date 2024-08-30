@@ -2664,6 +2664,8 @@ if hero is punished or tethered to a buried iron ball and has no inventory (or
 	during streaming video
 'query_menu' option to use a menu when asked certain yes/no questions
 pyrolisk eggs explode when broken
+wand of secret door detection, spell of detect unseen, and wizard mode ^E now
+	flash the cursor at each location where detection finds something
 
 
 Platform- and/or Interface-Specific New Features

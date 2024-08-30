@@ -596,6 +596,7 @@ encode_extended_conducts(char *buf)
     add_achieveX(buf, "blind",        u.uroleplay.blind);
     add_achieveX(buf, "deaf",         u.uroleplay.deaf);
     add_achieveX(buf, "nudist",       u.uroleplay.nudist);
+    add_achieveX(buf, "pauper",       u.uroleplay.pauper);
     add_achieveX(buf, "bonesless",    !flags.bones);
     add_achieveX(buf, "petless",      !u.uconduct.pets);
 

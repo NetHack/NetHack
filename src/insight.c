@@ -2061,6 +2061,8 @@ show_conduct(int final)
         you_have_been("deaf from birth");
     if (u.uroleplay.nudist)
         you_have_been("faithfully nudist");
+    if (u.uroleplay.pauper)
+        enl_msg(You_, "have gone", "started out", " without possessions", "");
 
     if (!u.uconduct.food)
         enl_msg(You_, "have gone", "went", " without food", "");

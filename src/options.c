@@ -5172,6 +5172,10 @@ optfn_boolean(
 
         /* After the change */
         switch (optidx) {
+        case opt_pauper:
+            /* pauper implies nudist */
+            u.uroleplay.nudist = u.uroleplay.pauper;
+            break;
         case opt_ascii_map:
             iflags.wc_tiled_map = negated;
             break;

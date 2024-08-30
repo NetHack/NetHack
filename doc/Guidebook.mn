@@ -3465,6 +3465,8 @@ Blind from birth.
 Deaf from birth.
 .PL Nudist
 Never wore any armor.
+.PL Pauper
+Started out with no possessions.
 .PL Ascended
 Delivered the Amulet to its final destination.
 .PE
@@ -3501,7 +3503,7 @@ instrument played closely
 enough\(embut not too close!\(emto
 the Castle level's drawbridge or can be given to you via prayer boon.
 .pg
-\fIBlind\fP, \fIDeaf\fP, and \fINudist\fP are also conducts, and they can only be
+\fIBlind\fP, \fIDeaf\fP, \fINudist\fP, and \FIPauper\fP are also conducts, and they can only be
 enabled by setting the correspondingly named option in NETHACKOPTIONS
 or run-time configuration file prior to game start.
 In the case of \fIBlind\fP and \fIDeaf\fP, the option also enforces the conduct.
@@ -4396,6 +4398,8 @@ use the \(oq\f(CR+\fP\(cq form and list entries to be added by their name
 and entries to be removed by \(oq\f(CR!\fP\(cq and name.
 The positive (no \(oq!\(cq) and negative (with \(oq!\(cq) entries
 can be intermixed.
+.lp pauper
+Start the character with no possessions (default false).  Persistent.
 .lp perm_invent
 If true, always display your current inventory in a window (default false).
 .lp ""

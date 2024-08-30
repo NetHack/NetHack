@@ -548,6 +548,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTC(paranoid_confirmation, Advanced, 28, opt_in, set_in_game,
                 Yes, Yes, Yes, Yes, "prayconfirm",
                 "extra prompting in certain situations")
+    NHOPTB(pauper, Advanced, 0, opt_in, set_in_config,
+           Off, Yes, No, No, NoAlias, &u.uroleplay.pauper, Term_False,
+           "start your character without any items")
     NHOPTB(perm_invent, Advanced, 0, opt_in, set_in_game,
                 Off, Yes, No, No, NoAlias, &iflags.perm_invent, Term_Off,
                 "show persistent inventory window")
