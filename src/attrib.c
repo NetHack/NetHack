@@ -1,4 +1,4 @@
-/* NetHack 3.7	attrib.c	$NHDT-Date: 1651908297 2022/05/07 07:24:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.86 $ */
+/* NetHack 3.7	attrib.c	$NHDT-Date: 1725138479 2024/08/31 21:07:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.127 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1072,7 +1072,7 @@ newhp(void)
             hp += rnd(gu.urole.hpadv.inrnd);
         if (gu.urace.hpadv.inrnd > 0)
             hp += rnd(gu.urace.hpadv.inrnd);
-        if (svm.moves <= 1L) { /* initial hero; skip for polyself to new man */
+        if (svm.moves == 0) { /* initial hero; skip for polyself to new man */
             /* Initialize alignment stuff */
             u.ualign.type = aligns[flags.initalign].value;
             u.ualign.record = gu.urole.initrecord;

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1464 $ $NHDT-Date: 1723945837 2024/08/18 01:50:37 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1471 $ $NHDT-Date: 1725138479 2024/08/31 21:07:59 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -2021,6 +2021,9 @@ having #terrain display gas cloud regions as if they were traps didn't work
 when a monster within a gas cloud was displayed on the map because the hero
 	was next to it, it remained displayed if hero moved away
 eating a pyrolisk egg on the floor triggered an "object lost" panic
+core object creation and the curses interface's window handling both became
+	confused by the 'pauper' option/conduct because they assumed that invent
+	being Null meant that the game hadn't started yet
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

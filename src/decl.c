@@ -1,4 +1,4 @@
-/* NetHack 3.7	decl.c	$NHDT-Date: 1720074480 2024/07/04 06:28:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.334 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1725138480 2024/08/31 21:08:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.337 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -963,7 +963,7 @@ static const struct instance_globals_saved_m init_svm = {
     /* dungeon.c */
     UNDEFINED_PTR,                       /* mapseenchn */
     /* decl.c */
-    1L,                                  /* moves; misnamed turn counter */
+    0L,                                  /* moves; misnamed turn counter */
     { UNDEFINED_VALUES }                 /* mvitals */
 };
 

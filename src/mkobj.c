@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkobj.c	$NHDT-Date: 1718999849 2024/06/21 19:57:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.299 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1725138481 2024/08/31 21:08:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.304 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1160,7 +1160,7 @@ mksobj(int otyp, boolean init, boolean artif)
 
     otmp = newobj();
     *otmp = cg.zeroobj;
-    otmp->age = svm.moves;
+    otmp->age = max(svm.moves, 1L);
     otmp->o_id = next_ident();
     otmp->quan = 1L;
     otmp->oclass = let;
@@ -1341,7 +1341,7 @@ start_corpse_timeout(struct obj *body)
 
     action = ROT_CORPSE;               /* default action: rot away */
     rot_adjust = gi.in_mklev ? 25 : 10; /* give some variation */
-    age = svm.moves - body->age;
+    age = max(svm.moves, 1) - body->age;
     if (age > ROT_AGE)
         when = rot_adjust;
     else
@@ -2381,8 +2381,7 @@ obj_timer_checks(
 
             /* mark the corpse as being on ice */
             otmp->on_ice = 1;
-            debugpline3("%s is now on ice at <%d,%d>.", The(xname(otmp)), x,
-                        y);
+            debugpline3("%s is now on ice at <%d,%d>.", The(xname(otmp)), x, y);
             /* Adjust the time remaining */
             tleft *= ROT_ICE_ADJUSTMENT;
             restart_timer = TRUE;
