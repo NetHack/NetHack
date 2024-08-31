@@ -408,7 +408,7 @@ getmattk(
 
     /* liches have a touch attack for cold damage and also a spell attack;
        they won't use the spell for monster vs monster so become impotent
-       aganst cold resistant foes; change the touch damage from cold to
+       against cold resistant foes; change the touch damage from cold to
        physical if target will resist */
     } else if (indx == 0 && attk->aatyp == AT_TUCH && attk->adtyp == AD_COLD
                && (udefend ? Cold_resistance : resists_cold(mdef))

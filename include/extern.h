@@ -9,7 +9,7 @@
  * The placements of the NONNULLARG* and NONNULLPTRS macros were done
  * using the following rules:
  * These were the rules that were followed when determining which function
- * parameters should be nonnul, and which are nullable:
+ * parameters should be nonnull, and which are nullable:
  *
  *   1. If the first use of, or reference to, the pointer parameter in the
  *      function is a dereference, then the parameter will be considered

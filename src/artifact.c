@@ -1801,7 +1801,7 @@ arti_invoke(struct obj *obj)
 
             any = cg.zeroany; /* set all bits to zero */
             start_menu(tmpwin, MENU_BEHAVE_STANDARD);
-            /* use index+1 (cant use 0) as identifier */
+            /* use index+1 (can't use 0) as identifier */
             for (i = num_ok_dungeons = 0; i < svn.n_dgns; i++) {
                 if (!svd.dungeons[i].dunlev_ureached)
                     continue;

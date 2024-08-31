@@ -1060,7 +1060,7 @@ minimal_xname(struct obj *obj)
         bareobj.spe = obj->spe;
 
     bufp = distant_name(&bareobj, xname);
-    /* undo forced setting of bareobj.blessed for cleric (preist[ess]);
+    /* undo forced setting of bareobj.blessed for cleric (priest[ess]);
        bufp is an obuf[] so a pointer into the middle of that is viable */
     if (!strncmp(bufp, "uncursed ", 9))
         bufp += 9;
