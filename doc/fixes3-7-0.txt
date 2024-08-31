@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1471 $ $NHDT-Date: 1725138479 2024/08/31 21:07:59 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1472 $ $NHDT-Date: 1725143669 2024/08/31 22:34:29 $
 
 General Fixes and Modified Features
 -----------------------------------
