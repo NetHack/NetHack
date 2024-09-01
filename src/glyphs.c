@@ -189,6 +189,35 @@ fix_glyphname(char *str)
     return str;
 }
 
+int
+glyph_to_cmap(int glyph)
+{
+    if (glyph == GLYPH_CMAP_STONE_OFF)
+        return S_stone;
+    else if (glyph_is_cmap_main(glyph))
+        return (glyph - GLYPH_CMAP_MAIN_OFF) + S_vwall;
+    else if (glyph_is_cmap_mines(glyph))
+        return (glyph - GLYPH_CMAP_MINES_OFF) + S_vwall;
+    else if (glyph_is_cmap_gehennom(glyph))
+        return (glyph - GLYPH_CMAP_GEH_OFF) + S_vwall;
+    else if (glyph_is_cmap_knox(glyph))
+        return (glyph - GLYPH_CMAP_KNOX_OFF) + S_vwall;
+    else if (glyph_is_cmap_sokoban(glyph))
+        return (glyph - GLYPH_CMAP_SOKO_OFF) + S_vwall;
+    else if (glyph_is_cmap_a(glyph))
+        return (glyph - GLYPH_CMAP_A_OFF) + S_ndoor;
+    else if (glyph_is_cmap_altar(glyph))
+        return S_altar;
+    else if (glyph_is_cmap_b(glyph))
+        return (glyph - GLYPH_CMAP_B_OFF) + S_grave;
+    else if (glyph_is_cmap_c(glyph))
+        return (glyph - GLYPH_CMAP_C_OFF) + S_digbeam;
+    else if (glyph_is_cmap_zap(glyph))
+        return ((glyph - GLYPH_ZAP_OFF) % 4) + S_vbeam;
+    else
+        return MAXPCHARS;
+}
+
 staticfn int
 glyph_find_core(const char *id, struct find_struct *findwhat)
 {
