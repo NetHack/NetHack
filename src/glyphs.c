@@ -214,6 +214,10 @@ glyph_to_cmap(int glyph)
         return (glyph - GLYPH_CMAP_C_OFF) + S_digbeam;
     else if (glyph_is_cmap_zap(glyph))
         return ((glyph - GLYPH_ZAP_OFF) % 4) + S_vbeam;
+    else if (glyph_is_swallow(glyph))
+        return glyph_to_swallow(glyph) + S_sw_tl;
+    else if (glyph_is_explosion(glyph))
+        return glyph_to_explosion(glyph) + S_expl_tl;
     else
         return MAXPCHARS;
 }
@@ -1051,8 +1055,7 @@ parse_id(const char *id, struct find_struct *findwhat)
 
                         j = glyph - GLYPH_EXPLODE_OFF;
                         expl = j / ((S_expl_br - S_expl_tl) + 1);
-                        cmap = (j % ((S_expl_br - S_expl_tl) + 1))
-                               + S_expl_tl;
+                        cmap = glyph_to_explosion(glyph) + S_expl_tl;
                         i = cmap - S_expl_tl;
                         Snprintf(buf[2], sizeof buf[2], "%s ",
                                  expl_type_texts[expl]);
