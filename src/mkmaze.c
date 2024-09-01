@@ -1515,8 +1515,8 @@ staticfn void set_wportal(void);
 staticfn void mk_bubble(coordxy, coordxy, int);
 staticfn void mv_bubble(struct bubble *, coordxy, coordxy, boolean);
 
-/* augment the Plane of Water; called from goto_level() when arriving and
-   moveloop_core() when on the level */
+/* augment the Planes of Water (for bubbles) and Air (for clouds); called
+   from goto_level() when arriving and moveloop_core() when on the level */
 void
 movebubbles(void)
 {

@@ -2634,12 +2634,13 @@ vanqsort_cmp(
         }
         res = mcls1 - mcls2; /* class */
         if (res == 0) {
-            /* Riders are in the same class as major demons; group Riders
-               at the start of that class regardless of secondary ordering;
-               res -1 => #1 is a Rider, #2 isn't;
-                    0 => both riders or both major demons;
-                   +1 => #2 is a Rider, #1 isn't */
+            /* Riders are in the same class as major demons, yielding res==0
+               above when both mcls1 and mcls2 are either Riders or demons or
+               one of each; force Riders to be sorted before demons */
             res = is_rider(&mons[indx2]) - is_rider(&mons[indx1]);
+            /* res -1 => #1 is a Rider, #2 isn't;
+                    0 => both Riders or neither;
+                   +1 => #2 is a Rider, #1 isn't */
             if (res)
                 break;
             mlev1 = mons[indx1].mlevel;
