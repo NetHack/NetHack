@@ -1,4 +1,4 @@
-/* NetHack 3.7	spell.c	$NHDT-Date: 1718303203 2024/06/13 18:26:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.171 $ */
+/* NetHack 3.7	spell.c	$NHDT-Date: 1725227807 2024/09/01 21:56:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.173 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -888,7 +888,8 @@ skill_based_spellbook_id(void)
         }
 
         if (objects[booktype].oc_level <= known_up_to_level)
-            makeknown(booktype);
+            /* makeknown(booktype) but don't exercise Wisdom */
+            discover_object(booktype, TRUE, FALSE);
     }
 }
 

@@ -1,4 +1,4 @@
-/* NetHack 3.7	dog.c	$NHDT-Date: 1700012881 2023/11/15 01:48:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.147 $ */
+/* NetHack 3.7	dog.c	$NHDT-Date: 1725227804 2024/09/01 21:56:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.164 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -186,6 +186,7 @@ make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
     return mtmp;
 }
 
+/* used exclusively for hero's starting pet */
 struct monst *
 makedog(void)
 {
@@ -219,13 +220,19 @@ makedog(void)
     mtmp = makemon(&mons[pettype], u.ux, u.uy, MM_EDOG);
 
     if (!mtmp)
-        return ((struct monst *) 0); /* pets were genocided */
+        return ((struct monst *) 0); /* pets were genocided [how?] */
 
-    svc.context.startingpet_mid = mtmp->m_id;
-    /* Horses already wear a saddle */
-    if (pettype == PM_PONY && !!(otmp = mksobj(SADDLE, TRUE, FALSE))) {
-        otmp->dknown = otmp->bknown = otmp->rknown = 1;
-        put_saddle_on_mon(otmp, mtmp);
+    if (!svc.context.startingpet_mid) {
+        svc.context.startingpet_mid = mtmp->m_id;
+        if (!u.uroleplay.pauper) {
+            /* initial horses already wear a saddle (unless hero is a pauper) */
+            if (pettype == PM_PONY && !!(otmp = mksobj(SADDLE, TRUE, FALSE))) {
+                otmp->dknown = otmp->bknown = otmp->rknown = 1;
+                put_saddle_on_mon(otmp, mtmp);
+            }
+        }
+    } else {
+        impossible("makedog() when startingpet_mid is already non-zero?");
     }
 
     if (!gp.petname_used++ && *petname)
