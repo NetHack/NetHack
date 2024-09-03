@@ -2024,6 +2024,8 @@ eating a pyrolisk egg on the floor triggered an "object lost" panic
 core object creation and the curses interface's window handling both became
 	confused by the 'pauper' option/conduct because they assumed that invent
 	being Null meant that the game hadn't started yet
+wizards were discovering unread spellbooks whenever any skill was advanced; do so
+	only when a spell skill is advanced
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

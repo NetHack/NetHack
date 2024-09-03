@@ -1148,7 +1148,11 @@ skill_advance(int skill)
         P_SKILL(skill) >= P_MAX_SKILL(skill) ? "most" : "more",
         P_NAME(skill));
 
-    skill_based_spellbook_id();
+    /* wizards discover spellbook IDs depending on spell 'school' skill limits;
+       this allows them to successfully write books for unknown spells without
+       the Luck bias they used to have over other roles */
+    if (skill >= P_FIRST_SPELL && skill <= P_LAST_SPELL)
+        skill_based_spellbook_id();
 }
 
 static const struct skill_range {
