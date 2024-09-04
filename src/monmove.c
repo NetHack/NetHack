@@ -159,6 +159,15 @@ m_break_boulder(struct monst *mtmp, coordxy x, coordxy y)
             set_msg_xy(x, y);
             pline_The("boulder falls apart.");
         }
+
+        /* boulders pushed onto shop's boundary or free spot are cases where
+           an item not in hero's inventory can have its unpaid flag set;
+           if the boulder isn't already on the bill, don't charge for it */
+        if (otmp->unpaid) {
+            /* remove original from bill and add cloned copy to used-up bill */
+            bill_dummy_object(otmp);
+        }
+        /* fracturing keeps otmp, changing its otyp from BOULDER to ROCK */
         fracture_rock(otmp);
     }
 }

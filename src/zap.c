@@ -5416,7 +5416,7 @@ mon_spell_hits_spot(
     }
 }
 
-/* fractured by pick-axe or wand of striking or by vault guard */
+/* fractured by pick-axe or wand of striking or by vault guard or shopkeeper */
 void
 fracture_rock(struct obj *obj) /* no texts here! */
 {
