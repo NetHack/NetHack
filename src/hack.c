@@ -482,13 +482,16 @@ moverock(void)
             } else {
                 newsym(sx, sy);
             }
-            /* maybe adjust bill if boulder was pushed across shop boundary */
+            /* maybe adjust bill if boulder was pushed across shop boundary;
+               normally otmp->unpaid would not apply because otmp isn't in hero's
+               inventory, but addtobill() sets it and subfrombill() clears it */
             if (costly && !costly_spot(rx, ry)) {
+                /* pushing from inside the shop to its boundary (or free spot) */
                 addtobill(otmp, FALSE, FALSE, FALSE);
             } else if (!costly && costly_spot(rx, ry) && otmp->unpaid
-                       && ((shkp = shop_keeper(*in_rooms(rx, ry, SHOPBASE)))
-                           != 0)
+                       && ((shkp = shop_keeper(*in_rooms(rx, ry, SHOPBASE))) != 0)
                        && onshopbill(otmp, shkp, TRUE)) {
+                /* [can this case actually happen?] */
                 subfrombill(otmp, shkp);
             } else if (otmp->unpaid
                        && (shkp = find_objowner(otmp, sx, sy)) != 0
