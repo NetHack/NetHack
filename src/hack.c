@@ -546,16 +546,17 @@ moverock(void)
                        Sokoban rules because on next step you could go
                        past it without pushing it to plug a pit or hole */
                     sokoban_guilt();
-                    break;
                 }
-                break;
+                moverock_done(sx, sy);
+                return 0;
             }
 
             if (could_move_onto_boulder(sx, sy)) {
                 pline(
                    "However, you can squeeze yourself into a small opening.");
                 sokoban_guilt();
-                break;
+                moverock_done(sx, sy);
+                return 0;
             } else {
                 moverock_done(sx, sy);
                 return -1;
