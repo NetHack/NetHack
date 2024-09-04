@@ -907,6 +907,8 @@ kick_ouch(coordxy x, coordxy y, const char *kickobjnam)
 staticfn void
 kick_door(coordxy x, coordxy y, int avrg_attrib)
 {
+    boolean doorbuster;
+
     if (gm.maploc->doormask == D_ISOPEN || gm.maploc->doormask == D_BROKEN
         || gm.maploc->doormask == D_NODOOR) {
         kick_dumb(x, y);
@@ -920,9 +922,11 @@ kick_door(coordxy x, coordxy y, int avrg_attrib)
     }
 
     exercise(A_DEX, TRUE);
+    doorbuster = Upolyd && is_giant(gy.youmonst.data);
     /* door is known to be CLOSED or LOCKED */
-    if (rnl(35) < avrg_attrib + (!martial() ? 0 : ACURR(A_DEX))) {
+    if (doorbuster || (rnl(35) < avrg_attrib + (!martial() ? 0 : ACURR(A_DEX)))) {
         boolean shopdoor = *in_rooms(x, y, SHOPBASE) ? TRUE : FALSE;
+
         /* break the door */
         if (gm.maploc->doormask & D_TRAPPED) {
             if (flags.verbose)

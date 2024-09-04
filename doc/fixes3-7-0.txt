@@ -1466,6 +1466,7 @@ when a secret corridor was discovered by wand of secret door detection or by
 	wizard mode ^E and converted into a regular corridor, if there was a
 	formerly embedded object at the spot, presence of the object would be
 	forgotten unless within range of a light source
+when poly'd into a giant, kicking a closed door always succeeds in breaking it
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
