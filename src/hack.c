@@ -14,7 +14,8 @@ staticfn int moverock(void);
 staticfn void dosinkfall(void);
 staticfn boolean findtravelpath(int);
 staticfn boolean trapmove(coordxy, coordxy, struct trap *);
-staticfn int QSORTCALLBACK notice_mons_cmp(const genericptr, const genericptr);
+staticfn int QSORTCALLBACK notice_mons_cmp(const genericptr,
+                                           const genericptr) NONNULLPTRS;
 staticfn schar u_simple_floortyp(coordxy, coordxy);
 staticfn boolean swim_move_danger(coordxy, coordxy);
 staticfn boolean domove_bump_mon(struct monst *, int) NONNULLARG1;
@@ -483,17 +484,19 @@ moverock(void)
                 newsym(sx, sy);
             }
             /* maybe adjust bill if boulder was pushed across shop boundary;
-               normally otmp->unpaid would not apply because otmp isn't in hero's
-               inventory, but addtobill() sets it and subfrombill() clears it */
+               normally otmp->unpaid would not apply because otmp isn't in
+               hero's inventory, but addtobill() sets it and subfrombill()
+               clears it */
             if (costly && !costly_spot(rx, ry)) {
-                /* pushing from inside the shop to its boundary (or free spot) */
+                /* pushing from inside shop to its boundary (or free spot) */
                 addtobill(otmp, FALSE, FALSE, FALSE);
             } else if (!costly && costly_spot(rx, ry) && otmp->unpaid
-                       && ((shkp = shop_keeper(*in_rooms(rx, ry, SHOPBASE))) != 0)
+                       && ((shkp = shop_keeper(*in_rooms(rx, ry, SHOPBASE)))
+                           != 0)
                        && onshopbill(otmp, shkp, TRUE)) {
                 /* this can happen if hero pushes boulder from farther inside
-                   the shop into shop's free spot (which will add it to the bill),
-                   then teleports or Passes_walls to the doorway (without exiting
+                   shop into shop's free spot (which will add it to the bill),
+                   then teleports or Passes_walls to doorway (without exiting
                    the shop), and then pushes the boulder from the free spot
                    back into the shop; it's contingent upon the shopkeeper not
                    "muttering an incantation" to fracture the boulder while it
@@ -589,7 +592,7 @@ still_chewing(coordxy x, coordxy y)
     struct obj *boulder = sobj_at(BOULDER, x, y);
     const char *digtxt = (char *) 0, *dmgtxt = (char *) 0;
 
-    if (svc.context.digging.down) /* not continuing previous dig (w/ pick-axe) */
+    if (svc.context.digging.down) /* not continuing prev dig (w/ pick-axe) */
         (void) memset((genericptr_t) &svc.context.digging, 0,
                       sizeof (struct dig_info));
 
@@ -967,7 +970,8 @@ test_move(
                     You("cannot pass through the bars.");
                 return FALSE;
             }
-        } else if (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data)) {
+        } else if (tunnels(gy.youmonst.data)
+                   && !needspick(gy.youmonst.data)) {
             /* Eat the rock. */
             if (mode == DO_MOVE && still_chewing(x, y))
                 return FALSE;
@@ -988,7 +992,8 @@ test_move(
                 } else if (flags.mention_walls) {
                     char buf[BUFSZ];
                     int glyph = back_to_glyph(x, y),
-                        sym = glyph_is_cmap(glyph) ? glyph_to_cmap(glyph) : -1;
+                        sym = glyph_is_cmap(glyph) ? glyph_to_cmap(glyph)
+                                                   : -1;
 
                     if (sym == S_stone)
                         Strcpy(buf, "solid stone");
@@ -1318,12 +1323,13 @@ findtravelpath(int mode)
                             || (!Blind && couldsee(nx, ny)))) {
                         if (nx == ux && ny == uy) {
                             if (mode == TRAVP_TRAVEL || mode == TRAVP_VALID) {
-                                boolean visited =
-                                    selection_getpoint(x, y, gt.travelmap);
+                                boolean visited
+                                    = selection_getpoint(x, y, gt.travelmap);
                                 u.dx = x - ux;
                                 u.dy = y - uy;
                                 if (mode == TRAVP_TRAVEL
-                                    && ((x == u.tx && y == u.ty) || visited)) {
+                                    && ((x == u.tx && y == u.ty)
+                                        || visited)) {
                                     nomul(0);
                                     /* reset run so domove run checks work */
                                     svc.context.run = 8;
@@ -1333,7 +1339,8 @@ findtravelpath(int mode)
                                         iflags.travelcc.x
                                         = iflags.travelcc.y = 0;
                                 }
-                                selection_setpoint(u.ux, u.uy, gt.travelmap, 1);
+                                selection_setpoint(u.ux, u.uy,
+                                                   gt.travelmap, 1);
                                 return TRUE;
                             }
                         } else if (!travel[nx][ny]) {
@@ -1687,7 +1694,8 @@ notice_all_mons(boolean reset)
         }
 
         if (i) {
-            qsort((genericptr_t) arr, (size_t) i, sizeof *arr, notice_mons_cmp);
+            qsort((genericptr_t) arr, (size_t) i, sizeof *arr,
+                  notice_mons_cmp);
 
             for (j = 0; j < i; j++)
                 notice_mon(arr[j]);
@@ -2060,7 +2068,7 @@ domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
                    || t_at(u.ux0, u.uy0) != NULL
                    || mundisplaceable(mtmp))) {
         /* displacing peaceful into unsafe or trapped space, or trying to
-           displace quest leader, Oracle, shopkeeper, priest, or vault guard */
+           displace quest leader, Oracle, shk, priest, or vault guard */
         You("stop.  %s doesn't want to swap places.", YMonnam(mtmp));
         didnt_move = TRUE;
     } else {
@@ -2145,7 +2153,8 @@ domove_fight_empty(coordxy x, coordxy y)
     /* specifying 'F' with no monster wastes a turn */
     if (svc.context.forcefight
         /* remembered an 'I' && didn't use a move command */
-        || (glyph_is_invisible(glyph) && !m_at(x, y) && !svc.context.nopick)) {
+        || (glyph_is_invisible(glyph) && !m_at(x, y)
+            && !svc.context.nopick)) {
         struct obj *boulder = 0;
         boolean explo = (Upolyd && attacktype(gy.youmonst.data, AT_EXPL)),
                 solid = (off_edge || (!accessible(x, y)
@@ -2225,7 +2234,7 @@ domove_fight_empty(coordxy x, coordxy y)
         nomul(0);
         if (explo) {
             struct attack *attk
-                        = attacktype_fordmg(gy.youmonst.data, AT_EXPL, AD_ANY);
+                       = attacktype_fordmg(gy.youmonst.data, AT_EXPL, AD_ANY);
 
             /* no monster has been attacked so we have bypassed explum() */
             wake_nearto(u.ux, u.uy, 7 * 7); /* same radius as explum() */
@@ -2775,7 +2784,8 @@ domove_core(void)
 
     if (mtmp) {
         if (displaceu) {
-            boolean noticed_it = (canspotmon(mtmp) || glyph_is_invisible(glyph)
+            boolean noticed_it = (canspotmon(mtmp)
+                                  || glyph_is_invisible(glyph)
                                   || glyph_is_warning(glyph));
 
             remove_monster(u.ux, u.uy);
@@ -2810,7 +2820,7 @@ domove_core(void)
                    && !(is_hider(mtmp->data) && mtmp->mundetected)) {
             if (!domove_swap_with_pet(mtmp, x, y)) {
                 u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
-                /* could skip this bit since we're about to call u_on_newpos() */
+                /* could skip this since we're about to call u_on_newpos() */
                 if (u.usteed)
                     u.usteed->mx = u.ux, u.usteed->my = u.uy;
             }
@@ -3739,7 +3749,8 @@ lookaround(void)
                 continue;
 
             /* stop for traps, sometimes */
-            if (avoid_moving_on_trap(x, y, (infront && svc.context.run > 1))) {
+            if (avoid_moving_on_trap(x, y,
+                                     (infront && svc.context.run > 1))) {
                 if (svc.context.run == 1)
                     goto bcorr; /* if you must */
                 if (infront)
@@ -3762,7 +3773,7 @@ lookaround(void)
                     }
                     goto stop;
                 }
-                /* we're orthogonal to a closed door, consider it a corridor */
+                /* orthogonal to a closed door, consider it a corridor */
                 goto bcorr;
             } else if (levl[x][y].typ == CORR) {
                 /* corridor */

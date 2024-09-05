@@ -296,8 +296,8 @@ explode(
      */
 
     if (olet == MON_EXPLODE && !you_exploding) {
-        /* when explode() is called recursively, svk.killer.name might change so
-           we need to retain a copy of the current value for this explosion */
+        /* when explode() is called recursively, svk.killer.name might change
+           so retain a copy of the current value for this explosion */
         str = strcpy(killr_buf, svk.killer.name);
         do_hallu = (Hallucination
                     && (strstri(str, "'s explosion")
@@ -515,19 +515,19 @@ explode(
                 }
 
                 if ((explmask[i][j] & EXPL_MON) != 0) {
-                    /* damage from ring/wand explosion isn't itself
-                     * electrical in nature, nor is damage from freezing potion
-                     * really cold in nature, nor is damage from boiling potion
-                     * or exploding oil; only burning items damage is the "same
-                     * type" as the explosion. Because this is imperfect and
-                     * marginal (burning items only deal 1 damage), ignore it
-                     * for golemeffects(). */
+                    /* Damage from ring/wand explosion isn't itself
+                     * electrical in nature, nor is damage from freezing
+                     * potion really cold in nature, nor is damage from
+                     * boiling potion or exploding oil; only burning items
+                     * damage is the "same type" as the explosion.  Because
+                     * this is imperfect and marginal (burning items only
+                     * deal 1 damage), ignore it for golemeffects(). */
                     golemeffects(mtmp, (int) adtyp, dam);
                     mtmp->mhp -= itemdmg; /* item destruction dmg */
                 } else {
-                    /* call resist with 0 and do damage manually so 1) we can
+                    /* Call resist with 0 and do damage manually so 1) we can
                      * get out the message before doing the damage, and 2) we
-                     * can call mondied, not killed, if it's not your blast
+                     * can call mondied, not killed, if it's not your blast.
                      */
                     int mdam = dam;
 
@@ -644,7 +644,7 @@ explode(
             } else {
                 if (olet == MON_EXPLODE) {
                     if (generic) /* explosion was unseen; str=="explosion", */
-                        ;        /* svk.killer.name=="gas spore's explosion". */
+                        ; /* svk.killer.name=="gas spore's explosion". */
                     else if (str != svk.killer.name && str != hallu_buf)
                         Strcpy(svk.killer.name, str);
                     svk.killer.format = KILLED_BY_AN;
@@ -745,7 +745,8 @@ scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
     if (shop_origin)
         credit_report(shkp, 0, TRUE);   /* establish baseline, without msgs */
 
-    while ((otmp = (individual_object ? obj : svl.level.objects[sx][sy])) != 0) {
+    while ((otmp = (individual_object ? obj
+                                      : svl.level.objects[sx][sy])) != 0) {
         if (otmp == uball || otmp == uchain) {
             boolean waschain = (otmp == uchain);
 
@@ -917,7 +918,8 @@ scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
                        retrieve the item and drop it back inside the shop,
                        the owed charges will only be reduced at that point
                        by the lesser shopkeeper buying-price.
-                       The non-gold situation will likely get adjusted further.
+                       The non-gold situation will likely get adjusted
+                       further.
                      */
                     if (stmp->obj->otyp == GOLD_PIECE) {
                         addtobill(stmp->obj, FALSE, FALSE, TRUE);
@@ -1006,12 +1008,14 @@ adtyp_to_expltype(const int adtyp)
     }
 }
 
-/* A monster explodes in a way that produces a real explosion (e.g. a sphere or
- * gas spore, not a yellow light or similar).
+/* A monster explodes in a way that produces a real explosion (e.g. a sphere
+ * or gas spore, not a yellow light or similar).
  * This is some common code between explmu() and explmm().
  */
 void
-mon_explodes(struct monst *mon, struct attack *mattk)
+mon_explodes(
+    struct monst *mon,
+    struct attack *mattk)
 {
     int dmg;
     int type;
@@ -1029,8 +1033,9 @@ mon_explodes(struct monst *mon, struct attack *mattk)
         type = PHYS_EXPL_TYPE;
     }
     else if (mattk->adtyp >= AD_MAGM && mattk->adtyp <= AD_SPC2) {
-        /* The -1, +20, *-1 math is to set it up as a 'monster breath' type for
-         * the explosions (it isn't, but this is the closest analogue). */
+        /* The -1, +20, *-1 math is to set it up as a 'monster breath' type
+         * for the explosions (it isn't, but this is the closest analogue). */
+        /* FIXME: there are macros for kind of thing... */
         type = -((mattk->adtyp - 1) + 20);
     }
     else {
@@ -1039,8 +1044,8 @@ mon_explodes(struct monst *mon, struct attack *mattk)
     }
 
     /* Kill it now so it won't appear to be caught in its own explosion.
-     * Must check to see if already dead - which happens if this is called from
-     * an AT_BOOM attack upon death. */
+     * Must check to see if already dead - which happens if this is called
+     * from an AT_BOOM attack upon death. */
     if (!DEADMONSTER(mon)) {
         mondead(mon);
     }

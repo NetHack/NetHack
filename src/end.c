@@ -1622,7 +1622,7 @@ container_contents(
                                  | (flags.sortpack ? SORTLOOT_PACK : 0));
                     sortedcobj = sortloot(&box->cobj, sortflags, FALSE,
                                           (boolean (*)(OBJ_P)) 0);
-                    for (srtc = sortedcobj; ((obj = srtc->obj) != 0); ++srtc) {
+                    for (srtc = sortedcobj; (obj = srtc->obj) != 0; ++srtc) {
                         if (identified) {
                             discover_object(obj->otyp, TRUE, FALSE);
                             obj->known = obj->bknown = obj->dknown
@@ -1748,9 +1748,9 @@ save_killers(NHFILE *nhfp)
     struct kinfo *kptr;
 
     if (perform_bwrite(nhfp)) {
-        for (kptr = &svk.killer; kptr != (struct kinfo *) 0; kptr = kptr->next) {
+        for (kptr = &svk.killer; kptr; kptr = kptr->next) {
             if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t) kptr, sizeof(struct kinfo));
+                bwrite(nhfp->fd, (genericptr_t) kptr, sizeof (struct kinfo));
         }
     }
     if (release_data(nhfp)) {
@@ -1904,9 +1904,11 @@ NH_abort(char *why USED_FOR_CRASHREPORT)
             gdb_prio++;
 
         if (gdb_prio > libc_prio) {
-            (void) (NH_panictrace_gdb() || (libc_prio && NH_panictrace_libc()));
+            (void) (NH_panictrace_gdb()
+                    || (libc_prio && NH_panictrace_libc()));
         } else {
-            (void) (NH_panictrace_libc() || (gdb_prio && NH_panictrace_gdb()));
+            (void) (NH_panictrace_libc()
+                    || (gdb_prio && NH_panictrace_gdb()));
         }
 
 #else /* VMS */

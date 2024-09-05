@@ -225,9 +225,12 @@ makedog(void)
     if (!svc.context.startingpet_mid) {
         svc.context.startingpet_mid = mtmp->m_id;
         if (!u.uroleplay.pauper) {
-            /* initial horses already wear a saddle (unless hero is a pauper) */
-            if (pettype == PM_PONY && !!(otmp = mksobj(SADDLE, TRUE, FALSE))) {
-                otmp->dknown = otmp->bknown = otmp->rknown = 1;
+            /* initial horses already wear saddle (unless hero is a pauper) */
+            if (pettype == PM_PONY
+                && (otmp = mksobj(SADDLE, TRUE, FALSE)) != 0) {
+                /* pseudo initial inventory; saddle is not actually in hero's
+                 * invent so assume that update_inventory() isn't needed */
+                fully_identify_obj(otmp);
                 put_saddle_on_mon(otmp, mtmp);
             }
         }

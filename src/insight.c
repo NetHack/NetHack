@@ -106,7 +106,8 @@ static struct ll_achieve_msg achieve_msg [] = {
 #define you_are(attr, ps) enl_msg(You_, are, were, (attr), (ps))
 #define you_have(attr, ps) enl_msg(You_, have, had, (attr), (ps))
 #define you_can(attr, ps) enl_msg(You_, can, could, (attr), (ps))
-#define you_have_been(goodthing) enl_msg(You_, have_been, were, (goodthing), "")
+#define you_have_been(goodthing) \
+    enl_msg(You_, have_been, were, (goodthing), "")
 #define you_have_never(badthing) \
     enl_msg(You_, have_never, never, (badthing), "")
 #define you_have_X(something) \
@@ -603,7 +604,8 @@ background_enlightenment(int unused_mode UNUSED, int final)
         you_have("just started your adventure", "");
     } else {
         /* 'turns' grates on the nerves in this context... */
-        Sprintf(buf, "the dungeon %ld turn%s ago", svm.moves, plur(svm.moves));
+        Sprintf(buf, "the dungeon %ld turn%s ago",
+                svm.moves, plur(svm.moves));
         /* same phrasing for current and final: "entered" is unconditional */
         enlght_line(You_, "entered ", buf, "");
     }
@@ -1501,7 +1503,8 @@ attributes_enlightenment(
     item_resistance_message(AD_DISN, " protected from disintegration", final);
     if (Shock_resistance)
         you_are("shock resistant", from_what(SHOCK_RES));
-    item_resistance_message(AD_ELEC, " protected from electric shocks", final);
+    item_resistance_message(AD_ELEC, " protected from electric shocks",
+                            final);
     if (Poison_resistance)
         you_are("poison resistant", from_what(POISON_RES));
     if (Acid_resistance) {
@@ -1548,23 +1551,19 @@ attributes_enlightenment(
         Sprintf(buf, "aware of the presence of %s",
                 (svc.context.warntype.obj & M2_ORC) ? "orcs"
                 : (svc.context.warntype.obj & M2_ELF) ? "elves"
-                : (svc.context.warntype.obj & M2_DEMON) ? "demons" : something);
+                  : (svc.context.warntype.obj & M2_DEMON) ? "demons"
+                    : something);
         you_are(buf, from_what(WARN_OF_MON));
     }
     if (Warn_of_mon && svc.context.warntype.polyd) {
         Sprintf(buf, "aware of the presence of %s",
                 ((svc.context.warntype.polyd & (M2_HUMAN | M2_ELF))
-                 == (M2_HUMAN | M2_ELF))
-                    ? "humans and elves"
-                    : (svc.context.warntype.polyd & M2_HUMAN)
-                          ? "humans"
-                          : (svc.context.warntype.polyd & M2_ELF)
-                                ? "elves"
-                                : (svc.context.warntype.polyd & M2_ORC)
-                                      ? "orcs"
-                                      : (svc.context.warntype.polyd & M2_DEMON)
-                                            ? "demons"
-                                            : "certain monsters");
+                 == (M2_HUMAN | M2_ELF)) ? "humans and elves"
+                    : (svc.context.warntype.polyd & M2_HUMAN) ? "humans"
+                      : (svc.context.warntype.polyd & M2_ELF) ? "elves"
+                        : (svc.context.warntype.polyd & M2_ORC) ? "orcs"
+                          : (svc.context.warntype.polyd & M2_DEMON) ? "demons"
+                            : "certain monsters");
         you_are(buf, "");
     }
     warnspecies =  svc.context.warntype.speciesidx;
@@ -2800,7 +2799,7 @@ list_vanquished(char defquery, boolean ask)
         if (c == 'q')
             done_stopprint++;
         if (c == 'y' || c == 'a') {
-            if (c == 'a' && ntypes > 1) { /* ask player to choose sort order */
+            if (c == 'a' && ntypes > 1) { /* ask user to choose sort order */
                 /* choose value for vanq_sortmode via menu; ESC cancels list
                    of vanquished monsters but does not set 'done_stopprint' */
                 if (set_vanq_order(TRUE) < 0)

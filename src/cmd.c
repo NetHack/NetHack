@@ -2195,7 +2195,7 @@ handler_rebind_keys_add(boolean keyfirst)
             ec = &extcmdlist[i-1];
             cmdstr = ec->ef_txt;
         }
-bindit:
+ bindit:
         if (!key) {
             pline("Bind which key? ");
             key = pgetchar();
@@ -2229,8 +2229,7 @@ handler_rebind_keys(void)
     menu_item *picks = (menu_item *) 0;
     int clr = NO_COLOR;
 
-redo_rebind:
-
+ redo_rebind:
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;

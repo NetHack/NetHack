@@ -1186,8 +1186,8 @@ doengrave(void)
     }
 
     /* Engraving will always take at least one action via being run as an
-     * occupation, so do not count this setup as taking time. */
-doengr_exit:
+       occupation, so do not count this setup as taking time. */
+ doengr_exit:
     if (de->disprefresh)
         newsym(u.ux, u.uy);
     retval = de->ret;

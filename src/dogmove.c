@@ -317,7 +317,8 @@ dog_eat(struct monst *mtmp,
             oprice = unpaid_cost(obj, COST_CONTENTS);
             pline("That %s will cost you %ld %s.", objnambuf, oprice,
                   currency(oprice));
-            /* m_consume_obj->delobj->obfree will handle actual shop billing update */
+            /* m_consume_obj -> delobj -> obfree will actual handle shop
+               billing update */
         }
         m_consume_obj(mtmp, obj);
     }
@@ -1338,7 +1339,10 @@ could_reach_item(struct monst *mon, coordxy nx, coordxy ny)
  * calls deep.
  */
 staticfn boolean
-can_reach_location(struct monst *mon, coordxy mx, coordxy my, coordxy fx, coordxy fy)
+can_reach_location(
+    struct monst *mon,
+    coordxy mx, coordxy my,
+    coordxy fx, coordxy fy)
 {
     int i, j;
     int dist;

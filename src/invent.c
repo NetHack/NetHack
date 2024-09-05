@@ -404,7 +404,8 @@ invletter_value(char c)
            : ('A' <= c && c <= 'Z') ? (c - 'A' + 2 + 26)
              : (c == '$') ? 1
                : (c == '#') ? 1 + invlet_basic + 1
-                 : 1 + invlet_basic + 1 + 1; /* none of the above (shouldn't happen) */
+                 : 1 + invlet_basic + 1 + 1; /* none of the above 
+                                              * (shouldn't happen) */
 }
 
 /* qsort comparison routine for sortloot() */
@@ -1006,11 +1007,11 @@ addinv_core1(struct obj *obj)
        dumplog, originally just recorded in XLOGFILE */
     if (is_mines_prize(obj)) {
         record_achievement(ACH_MINE_PRIZE);
-        svc.context.achieveo.mines_prize_oid = 0; /* done with luckstone o_id */
+        svc.context.achieveo.mines_prize_oid = 0; /* done w/ luckstone o_id */
         obj->nomerge = 0; /* was set in create_object(sp_lev.c) */
     } else if (is_soko_prize(obj)) {
         record_achievement(ACH_SOKO_PRIZE);
-        svc.context.achieveo.soko_prize_oid = 0; /* done with bag/amulet o_id */
+        svc.context.achieveo.soko_prize_oid = 0; /* done w/ bag/amulet o_id */
         obj->nomerge = 0; /* (got set in sp_lev.c) */
     }
 }
@@ -1794,8 +1795,9 @@ getobj(
         *bp++ = ' '; /* put a space after the '-' in the prompt */
         break;
     case GETOBJ_DOWNPLAY: /* acceptable but not shown as likely choice */
-    case GETOBJ_EXCLUDE_INACCESS:   /* nothing currently gives this for '-' but
-                                     * theoretically could if wearing gloves */
+    case GETOBJ_EXCLUDE_INACCESS:   /* nothing currently gives this for '-'
+                                     * but theoretically could if wearing
+                                     * gloves */
     case GETOBJ_EXCLUDE_SELECTABLE: /* ditto, I think... */
         allownone = TRUE;
         *ap++ = HANDS_SYM;
@@ -2186,7 +2188,8 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
         ofilter = not_fully_identified;
     }
 
-    iletct = collect_obj_classes(ilets, gi.invent, FALSE, ofilter, &itemcount);
+    iletct = collect_obj_classes(ilets, gi.invent, FALSE, ofilter,
+                                 &itemcount);
     unpaid = count_unpaid(gi.invent);
 
     if (ident && !iletct) {
@@ -3119,11 +3122,13 @@ itemactions(struct obj *otmp)
     if (otmp->oclass == COIN_CLASS)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Flip a coin");
     else if (otmp->otyp == CREAM_PIE)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Hit yourself with this cream pie");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a',
+                   "Hit yourself with this cream pie");
     else if (otmp->otyp == BULLWHIP)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Lash out with this whip");
     else if (otmp->otyp == GRAPPLING_HOOK)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Grapple something with this hook");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a',
+                   "Grapple something with this hook");
     else if (otmp->otyp == BAG_OF_TRICKS && objects[otmp->otyp].oc_name_known)
         /* bag of tricks skips this unless discovered */
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Reach into this bag");
@@ -3187,7 +3192,8 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Make this figurine transform");
     else if (otmp->otyp == UNICORN_HORN)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Use this unicorn horn");
-    else if (otmp->otyp == HORN_OF_PLENTY && objects[otmp->otyp].oc_name_known)
+    else if (otmp->otyp == HORN_OF_PLENTY
+             && objects[otmp->otyp].oc_name_known)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Blow into the horn of plenty");
     else if (otmp->otyp >= WOODEN_FLUTE && otmp->otyp <= DRUM_OF_EARTHQUAKE)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Play this musical instrument");
@@ -3417,7 +3423,8 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_SWAPWEAPON, 'x',
                    "Ready this as an alternate weapon");
     else if (otmp == uswapwep)
-        ia_addmenu(win, IA_SWAPWEAPON, 'x', "Swap this with your main weapon");
+        ia_addmenu(win, IA_SWAPWEAPON, 'x',
+                   "Swap this with your main weapon");
 
     /* this is based on TWOWEAPOK() in wield.c; we don't call can_two_weapon()
        because it is very verbose; attempting to two-weapon might be rejected
@@ -3997,7 +4004,8 @@ display_used_invlets(char avoidlet)
                     tmpglyph = obj_to_glyph(otmp, rn2_on_display_rng);
                     map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);
                     add_menu(win, &tmpglyphinfo, &any, ilet, 0,
-                             ATR_NONE, clr, doname(otmp), MENU_ITEMFLAGS_NONE);
+                             ATR_NONE, clr, doname(otmp),
+                             MENU_ITEMFLAGS_NONE);
                 }
             }
             if (flags.sortpack && *++invlet)
@@ -4866,7 +4874,8 @@ stackobj(struct obj *obj)
 {
     struct obj *otmp;
 
-    for (otmp = svl.level.objects[obj->ox][obj->oy]; otmp; otmp = otmp->nexthere)
+    for (otmp = svl.level.objects[obj->ox][obj->oy]; otmp;
+         otmp = otmp->nexthere)
         if (otmp != obj && merged(&obj, &otmp))
             break;
     return;
@@ -5565,7 +5574,7 @@ doorganize_core(struct obj *obj)
     char let;
 #define GOLD_INDX   0
 #define GOLD_OFFSET 1
-#define OVRFLW_INDX (GOLD_OFFSET + invlet_basic) /* past gold & 2*26 letters */
+#define OVRFLW_INDX (GOLD_OFFSET + invlet_basic) /* past gold+2*26 letters */
     char lets[1 + invlet_basic + 1 + 1]; /* room for '$a-zA-Z#\0' */
     char qbuf[QBUFSZ];
     char *objname, *otmpname;
@@ -5671,7 +5680,9 @@ doorganize_core(struct obj *obj)
 
     collect = (let == obj->invlet);
     /* change the inventory and print the resulting item */
-    adj_type = collect ? "Collecting:" : !splitting ? "Moving:" : "Splitting:";
+    adj_type = collect ? "Collecting:"
+               : !splitting ? "Moving:"
+                 : "Splitting:";
 
     /*
      * don't use freeinv/addinv to avoid double-touching artifacts,

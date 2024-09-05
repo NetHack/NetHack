@@ -38,7 +38,8 @@ staticfn void Fread(genericptr_t, int, int, dlb *);
 staticfn xint16 dname_to_dnum(const char *);
 staticfn int find_branch(const char *, struct proto_dungeon *);
 staticfn xint16 parent_dnum(const char *, struct proto_dungeon *);
-staticfn int level_range(xint16, int, int, int, struct proto_dungeon *, int *);
+staticfn int level_range(xint16, int, int, int, struct proto_dungeon *,
+                         int *);
 staticfn xint16 parent_dlevel(const char *, struct proto_dungeon *);
 staticfn int correct_branch_type(struct tmpbranch *);
 staticfn branch *add_branch(int, int, struct proto_dungeon *);
@@ -1006,7 +1007,8 @@ init_dungeon_dungeons(
     int dgn_base, dgn_range, dgn_align, dgn_entry, dgn_chance, dgn_flags;
 
     dgn_name = get_table_str(L, "name");
-    dgn_bonetag = get_table_str_opt(L, "bonetag", emptystr); /* TODO: single char or "none" */
+    /* TODO: accept single char or "none" for bonetag */
+    dgn_bonetag = get_table_str_opt(L, "bonetag", emptystr);
     dgn_protoname = get_table_str_opt(L, "protofile", emptystr);
     dgn_base = get_table_int(L, "base");
     dgn_range = get_table_int_opt(L, "range", 0);
@@ -1059,10 +1061,12 @@ init_dungeon_dungeons(
     pd->tmpdungeon[dngidx].chance = dgn_chance;
     pd->tmpdungeon[dngidx].entry_lev = dgn_entry;
 
-    Strcpy(svd.dungeons[dngidx].fill_lvl, dgn_fill); /* FIXME: fill_lvl len */
-    Strcpy(svd.dungeons[dngidx].dname, dgn_name); /* FIXME: dname length */
-    Strcpy(svd.dungeons[dngidx].proto, dgn_protoname); /* FIXME: proto length */
-    Strcpy(svd.dungeons[dngidx].themerms, dgn_themerms); /* FIXME: length */
+    /* FIXME: these should have length checks */
+    Strcpy(svd.dungeons[dngidx].fill_lvl, dgn_fill);
+    Strcpy(svd.dungeons[dngidx].dname, dgn_name);
+    Strcpy(svd.dungeons[dngidx].proto, dgn_protoname);
+    Strcpy(svd.dungeons[dngidx].themerms, dgn_themerms);
+    /* FIXME: accept "none", convert that to '\0' */
     svd.dungeons[dngidx].boneid = *dgn_bonetag ? *dgn_bonetag : 0;
     free((genericptr) dgn_fill);
     /* free((genericptr) dgn_protoname); -- stored in pd.tmpdungeon[] */
@@ -1079,8 +1083,9 @@ init_dungeon_dungeons(
         svd.dungeons[dngidx].depth_start = 1;
         svd.dungeons[dngidx].dunlev_ureached = 1;
     } else {
-        svd.dungeons[dngidx].ledger_start = svd.dungeons[dngidx - 1].ledger_start
-            + svd.dungeons[dngidx - 1].num_dunlevs;
+        svd.dungeons[dngidx].ledger_start
+            = svd.dungeons[dngidx - 1].ledger_start
+              + svd.dungeons[dngidx - 1].num_dunlevs;
         svd.dungeons[dngidx].dunlev_ureached = 0;
     }
 
@@ -1403,8 +1408,8 @@ ledger_to_dnum(xint16 ledgerno)
     /* find i such that (i->base + 1) <= ledgerno <= (i->base + i->count) */
     for (i = 0; i < svn.n_dgns; i++)
         if (svd.dungeons[i].ledger_start < ledgerno
-            && (ledgerno
-                <= svd.dungeons[i].ledger_start + svd.dungeons[i].num_dunlevs))
+            && ledgerno <= (svd.dungeons[i].ledger_start
+                            + svd.dungeons[i].num_dunlevs))
             return i;
 
     panic("level number out of range [ledger_to_dnum(%d)]", (int) ledgerno);
@@ -1475,7 +1480,7 @@ builds_up(d_level *lev)
     branch *br;
     if (dptr->num_dunlevs > 1)
         return (boolean) (dptr->entry_lev == dptr->num_dunlevs);
-    /* else, single-level branch; find the branch connection that connects this
+    /* else, single-level branch; find branch connection that connects this
      * dungeon from a parent dungeon and determine whether it builds up from
      * that */
     for (br = svb.branches; br; br = br->next) {
@@ -1981,7 +1986,7 @@ boolean
 Invocation_lev(d_level *lev)
 {
     return (boolean) (In_hell(lev)
-                    && lev->dlevel == svd.dungeons[lev->dnum].num_dunlevs - 1);
+                   && lev->dlevel == svd.dungeons[lev->dnum].num_dunlevs - 1);
 }
 
 /* use instead of depth() wherever a degree of difficulty is made
@@ -2104,7 +2109,7 @@ lev_by_name(const char *nam)
             /* either wizard mode or else seen and not forgotten;
                note: used to be '(flags & (FORGOTTEN|VISITED)) == VISITED'
                back when amnesia could cause levels to be forgotten */
-            && (wizard || (svl.level_info[idx].flags & (VISITED)) == VISITED)) {
+            && (wizard || (svl.level_info[idx].flags & VISITED) == VISITED)) {
             lev = depth(&dlev);
         }
     } else { /* not a specific level; try branch names */
@@ -2116,9 +2121,10 @@ lev_by_name(const char *nam)
         if (idx >= 0) {
             idxtoo = (idx >> 8) & 0x00FF;
             idx &= 0x00FF;
-            /* either wizard mode, or else _both_ sides of branch seen */
-            if (wizard || (((svl.level_info[idx].flags & (VISITED)) == VISITED)
-                           && ((svl.level_info[idxtoo].flags & (VISITED))
+            /* either wizard mode, or else _both_ sides of branch seen; */
+            /* (flags & VISITED)==VISITED: see comment about amnesia above */
+            if (wizard || (((svl.level_info[idx].flags & VISITED) == VISITED)
+                           && ((svl.level_info[idxtoo].flags & VISITED)
                                == VISITED))) {
                 if (ledger_to_dnum(idxtoo) == u.uz.dnum)
                     idx = idxtoo;
@@ -2586,7 +2592,8 @@ load_exclusions(NHFILE *nhfp)
     while (nez-- > 0) {
         ez = (struct exclusion_zone *) alloc(sizeof *ez);
         if (nhfp->structlevel) {
-            mread(nhfp->fd, (genericptr_t) &ez->zonetype, sizeof ez->zonetype);
+            mread(nhfp->fd, (genericptr_t) &ez->zonetype,
+                  sizeof ez->zonetype);
             mread(nhfp->fd, (genericptr_t) &ez->lx, sizeof ez->lx);
             mread(nhfp->fd, (genericptr_t) &ez->ly, sizeof ez->ly);
             mread(nhfp->fd, (genericptr_t) &ez->hx, sizeof ez->hx);
@@ -2827,11 +2834,13 @@ init_mapseen(d_level *lev)
     init->lev.dlevel = lev->dlevel;
 
     /* walk until we get to the place where we should insert init */
-    for (mptr = svm.mapseenchn, prev = 0; mptr; prev = mptr, mptr = mptr->next)
+    for (mptr = svm.mapseenchn, prev = 0; mptr;
+         prev = mptr, mptr = mptr->next) {
         if (mptr->lev.dnum > init->lev.dnum
             || (mptr->lev.dnum == init->lev.dnum
                 && mptr->lev.dlevel > init->lev.dlevel))
             break;
+    }
     if (!prev) {
         init->next = svm.mapseenchn;
         svm.mapseenchn = init;
@@ -3232,7 +3241,8 @@ recalc_mapseen(void)
 }
 
 /*ARGUSED*/
-/* valley and sanctum levels get automatic annotation once temple is entered */
+/* valley and sanctum levels get automatic annotation once their temple
+   is entered */
 void
 mapseen_temple(
     struct monst *priest UNUSED) /* not used; might be useful someday */

@@ -141,7 +141,8 @@ throw_obj(struct obj *obj, int shotlimit)
             /* throwing with one hand, but pluralize since the
                expression "with your bare hands" sounds better */
             makeplural(body_part(HAND)));
-        Sprintf(svk.killer.name, "throwing %s bare-handed", killer_xname(obj));
+        Sprintf(svk.killer.name, "throwing %s bare-handed",
+                killer_xname(obj));
         instapetrify(svk.killer.name);
     }
     if (welded(obj)) {
@@ -1058,7 +1059,8 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
         }
         /* and whether hero is turned to stone by being touched by 'mon' */
         if (touch_petrifies(mon->data) && !(uarmu || uarm || uarmc)) {
-            Snprintf(svk.killer.name, sizeof svk.killer.name, "being hit by %s",
+            Snprintf(svk.killer.name, sizeof svk.killer.name,
+                     "being hit by %s",
                      /* combine m_monnam() and noname_monnam():
                         "{your,a} hurtling cockatrice" w/o assigned name */
                      x_monnam(mon, mon->mtame ? ARTICLE_YOUR : ARTICLE_A,
@@ -1346,8 +1348,8 @@ toss_up(struct obj *obj, boolean hitsroof)
 
         if (obj->oartifact && !harmless)
             /* need a fake die roll here; rn1(18,2) avoids 1 and 20 */
-            artimsg = artifact_hit((struct monst *) 0, &gy.youmonst, obj, &dmg,
-                                   rn1(18, 2));
+            artimsg = artifact_hit((struct monst *) 0, &gy.youmonst, obj,
+                                   &dmg, rn1(18, 2));
 
         if (!dmg) { /* probably wasn't a weapon; base damage on weight */
             dmg = ((int) obj->owt + 99) / 100;
@@ -1399,7 +1401,8 @@ toss_up(struct obj *obj, boolean hitsroof)
                         && polymon(PM_STONE_GOLEM))) {
  petrify:
             svk.killer.format = KILLED_BY;
-            Strcpy(svk.killer.name, "elementary physics"); /* what goes up... */
+            /* what goes up... */
+            Strcpy(svk.killer.name, "elementary physics");
             You("turn to stone.");
             if (obj)
                 dropy(obj); /* bypass most of hitfloor() */
@@ -1760,7 +1763,8 @@ throwit(struct obj *obj,
         if (!Deaf && !Underwater) {
             /* Some sound effects when item lands in water or lava */
             if (is_pool(gb.bhitpos.x, gb.bhitpos.y)
-                || (is_lava(gb.bhitpos.x, gb.bhitpos.y) && !is_flammable(obj))) {
+                || (is_lava(gb.bhitpos.x, gb.bhitpos.y)
+                    && !is_flammable(obj))) {
                 Soundeffect(se_splash, 50);
                 pline((weight(obj) > 9) ? "Splash!" : "Plop!");
             }
@@ -2658,7 +2662,8 @@ throw_gold(struct obj *obj)
         /* see if the gold has a place to move into */
         odx = u.ux + u.dx;
         ody = u.uy + u.dy;
-        if (!isok(odx, ody) || !ZAP_POS(levl[odx][ody].typ) || closed_door(odx, ody)) {
+        if (!isok(odx, ody)
+            || !ZAP_POS(levl[odx][ody].typ) || closed_door(odx, ody)) {
             gb.bhitpos.x = u.ux;
             gb.bhitpos.y = u.uy;
         } else {

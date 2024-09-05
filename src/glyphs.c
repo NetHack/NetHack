@@ -1,4 +1,4 @@
-/* NetHack 3.7	glyphs.c	*/
+/* NetHack 3.7	glyphs.c	TODO: add NHDT branch/date/revision tags */
 /* Copyright (c) Michael Allison, 2021. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -82,7 +82,8 @@ to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
             static int glyphnag = 0;
 
             if (!glyphnag++)
-                config_error_add("Unimplemented customization feature, ignoring for now");
+                config_error_add("Unimplemented customization feature,"
+                                 " ignoring for now");
         }
     }
 #endif
@@ -94,7 +95,8 @@ to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
             static int colornag = 0;
 
             if (!colornag++)
-                config_error_add("Unimplemented customization feature, ignoring for now");
+                config_error_add("Unimplemented customization feature,"
+                                 " ignoring for now");
         }
     }
 }
@@ -208,7 +210,8 @@ glyph_find_core(const char *id, struct find_struct *findwhat)
                     break;
                 case find_pm:
                     if (glyph_is_monster(glyph)
-                        && monsym(&mons[glyph_to_mon(glyph)]) == findwhat->val)
+                        && monsym(&mons[glyph_to_mon(glyph)])
+                           == findwhat->val)
                         do_callback = TRUE;
                     break;
                 case find_oc:
@@ -517,7 +520,7 @@ apply_customizations(
                     if (sc->custtype == custom_nhcolor) {
                         gmap = &glyphmap[details->content.ccolor.glyphidx];
                         (void) set_map_customcolor(gmap,
-                                               details->content.ccolor.nhcolor);
+                                             details->content.ccolor.nhcolor);
                     }
                 }
                 details = details->next;
@@ -683,7 +686,8 @@ find_matching_customization(
     enum customization_types custtype,
     enum graphics_sets which_set)
 {
-    struct symset_customization *gdc = &gs.sym_customizations[which_set][custtype];
+    struct symset_customization *gdc
+        = &gs.sym_customizations[which_set][custtype];
 
     if ((gdc->custtype == custtype) && gdc->customization_name
         && (strcmp(customization_name, gdc->customization_name) == 0))

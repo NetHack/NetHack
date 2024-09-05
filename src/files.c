@@ -318,7 +318,8 @@ fname_encode(
             (void) sprintf(op, "%c%02X", quotechar, *sp);
             op += 3;
             cnt += 3;
-        } else if ((strchr(legal, *sp) != 0) || (strchr(hexdigits, *sp) != 0)) {
+        } else if ((strchr(legal, *sp) != 0)
+                   || (strchr(hexdigits, *sp) != 0)) {
             *op++ = *sp;
             *op = '\0';
             cnt++;
@@ -965,8 +966,8 @@ set_savefile_name(boolean regularize_it)
 #endif
 #if defined(WIN32)
     if (regularize_it) {
-        static const char okchars[] =
-            "*ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.";
+        static const char okchars[]
+            = "*ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.";
         const char *legal = okchars;
 
         ++legal; /* skip '*' wildcard character */
@@ -1049,7 +1050,8 @@ set_savefile_name(boolean regularize_it)
     }
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
     if (overflow)
-        impossible("set_savefile_name() couldn't complete without overflow %d",
+        impossible("set_savefile_name() couldn't complete"
+                   " without overflow %d",
                    overflow);
 #endif
 }
@@ -1946,7 +1948,8 @@ lock_file(const char *filename, int whichprefix,
 #ifdef USE_FCNTL
     lockfd = open(filename, O_RDWR);
     if (lockfd == -1) {
-        HUP raw_printf("Cannot open file %s.  Is NetHack installed correctly?",
+        HUP raw_printf("Cannot open file %s. "
+                       " Is NetHack installed correctly?",
                        filename);
         gn.nesting--;
         return FALSE;
@@ -1970,8 +1973,8 @@ lock_file(const char *filename, int whichprefix,
 
 #ifdef USE_FCNTL
         if (retryct--) {
-            HUP raw_printf(
-               "Waiting for release of fcntl lock on %s.  (%d retries left.)",
+            HUP raw_printf("Waiting for release of fcntl lock on %s. "
+                           " (%d retries left.)",
                            filename, retryct);
             sleep(1);
         } else {
@@ -1987,7 +1990,8 @@ lock_file(const char *filename, int whichprefix,
         switch (errnosv) { /* George Barbanis */
         case EEXIST:
             if (retryct--) {
-                HUP raw_printf("Waiting for access to %s.  (%d retries left).",
+                HUP raw_printf("Waiting for access to %s. "
+                               " (%d retries left).",
                                filename, retryct);
 #if defined(SYSV) || defined(ULTRIX) || defined(VMS)
                 (void)
@@ -2022,8 +2026,8 @@ lock_file(const char *filename, int whichprefix,
             /* take a wild guess at the underlying cause */
             HUP perror(lockname);
             HUP raw_printf("Cannot lock %s.", filename);
-            HUP raw_printf(
-  "(Perhaps you are running NetHack from inside the distribution package?).");
+            HUP raw_printf("(Perhaps you are running NetHack from"
+                           " inside the distribution package?).");
             gn.nesting--;
             return FALSE;
         default:
@@ -2174,8 +2178,8 @@ do_write_config_file(void)
         wait_synch();
         pline("Some settings are not saved!");
         wait_synch();
-        pline(
-           "All manual customization and comments are removed from the file!");
+        pline("All manual customization and comments are removed"
+              " from the file!");
         wait_synch();
     }
 #define overwrite_prompt "Overwrite config file %.*s?"
@@ -2534,7 +2538,8 @@ handle_config_section(char *buf)
         }
         if (*sect) { /* got a section name */
             gc.config_section_current = dupstr(sect);
-            debugpline1("set config section: '%s'", gc.config_section_current);
+            debugpline1("set config section: '%s'",
+                        gc.config_section_current);
         } else { /* empty section name => end of sections */
             free_config_sections();
             debugpline0("unset config section");
@@ -2981,8 +2986,8 @@ cnf_line_MAX_STATUENAME_RANK(char *bufp)
     int n = atoi(bufp);
 
     if (n < 1) {
-        config_error_add(
-               "Illegal value in MAX_STATUENAME_RANK (minimum is 1)");
+        config_error_add("Illegal value in MAX_STATUENAME_RANK"
+                         " (minimum is 1)");
         n = 10;
     }
     sysopt.tt_oname_maxrank = n;
@@ -2998,8 +3003,8 @@ cnf_line_LIVELOG(char *bufp)
     long L = strtol(bufp, NULL, 0);
 
     if (L < 0L || L > 0xffffL) {
-        config_error_add(
-              "Illegal value for LIVELOG (must be between 0 and 0xFFFF).");
+        config_error_add("Illegal value for LIVELOG"
+                         " (must be between 0 and 0xFFFF).");
         return 0;
     }
     sysopt.livelog = L;
@@ -3109,8 +3114,8 @@ cnf_line_PORTABLE_DEVICE_PATHS(char *bufp)
     int n = atoi(bufp);
 
     if (n < 0 || n > 1) {
-        config_error_add(
-                   "Illegal value in PORTABLE_DEVICE_PATHS (not 0,1)");
+        config_error_add("Illegal value in PORTABLE_DEVICE_PATHS"
+                         " (not 0 or 1)");
         n = 0;
     }
     sysopt.portable_device_paths = n;
@@ -3733,7 +3738,8 @@ parse_conf_buf(struct _cnf_parser_state *p, boolean (*proc)(char *arg))
                 char *bufp = find_optparam(p->buf);
 
                 if (!bufp) {
-                    config_error_add("Format is CHOOSE=section1,section2,...");
+                    config_error_add("Format is CHOOSE=section1"
+                                     ",section2,...");
                     p->rv = FALSE;
                     free(p->buf), p->buf = (char *) 0;
                     return;
@@ -3915,8 +3921,8 @@ fopen_wizkit_file(void)
     else if (errno != ENOENT) {
         /* e.g., problems when setuid NetHack can't search home
          * directory restricted to user */
-        raw_printf("Couldn't open default gw.wizkit file %s (%d).", tmp_wizkit,
-                   errno);
+        raw_printf("Couldn't open default gw.wizkit file %s (%d).",
+                   tmp_wizkit, errno);
         wait_synch();
     }
 #endif
@@ -4047,7 +4053,7 @@ read_sym_file(int which_set)
             clear_symsetentry(which_set, TRUE);
         config_error_done();
 
-        /* If name was defined, it was invalid.  Then we're loading fallback */
+        /* If name was defined, it was invalid. Then we're loading fallback */
         if (gs.symset[which_set].name) {
             gs.symset[which_set].explicitly = FALSE;
             return 0;
@@ -4087,8 +4093,8 @@ check_recordfile(const char *dir UNUSED_if_not_OS2_CODEVIEW)
     if (fd >= 0) {
 #ifdef VMS /* must be stream-lf to use UPDATE_RECORD_IN_PLACE */
         if (!file_is_stmlf(fd)) {
-            raw_printf(
-                   "Warning: scoreboard file '%s' is not in stream_lf format",
+            raw_printf("Warning: scoreboard file '%s'"
+                       " is not in stream_lf format",
                        fq_record);
             wait_synch();
         }
@@ -4280,16 +4286,18 @@ recover_savefile(void)
     }
     if (read(gnhfp->fd, (genericptr_t) &hpid, sizeof hpid) != sizeof hpid) {
         raw_printf("\n%s\n%s\n",
-            "Checkpoint data incompletely written or subsequently clobbered.",
+                   "Checkpoint data incompletely written"
+                   " or subsequently clobbered.",
                    "Recovery impossible.");
         close_nhfile(gnhfp);
         return FALSE;
     }
     if (read(gnhfp->fd, (genericptr_t) &savelev, sizeof(savelev))
         != sizeof(savelev)) {
-        raw_printf(
-         "\nCheckpointing was not in effect for %s -- recovery impossible.\n",
-                   gl.lock);
+        raw_printf("\n%s %s %s\n",
+                   "Checkpointing was not in effect for",
+                   gl.lock,
+                   "-- recovery impossible.");
         close_nhfile(gnhfp);
         return FALSE;
     }
@@ -4304,7 +4312,8 @@ recover_savefile(void)
         || (read(gnhfp->fd, (genericptr_t) &sfi, sizeof sfi) != sizeof sfi)
         || (read(gnhfp->fd, (genericptr_t) &pltmpsiz, sizeof pltmpsiz)
             != sizeof pltmpsiz) || (pltmpsiz > PL_NSIZ)
-        || (read(gnhfp->fd, (genericptr_t) &tmpplbuf, pltmpsiz) != pltmpsiz)) {
+        || (read(gnhfp->fd, (genericptr_t) &tmpplbuf, pltmpsiz)
+            != pltmpsiz)) {
         raw_printf("\nError reading %s -- can't recover.\n", gl.lock);
         close_nhfile(gnhfp);
         return FALSE;
@@ -4832,7 +4841,8 @@ choose_passage(int passagecnt, /* total of available passages */
     res = (int) svc.context.novel.pasg[idx];
     /* move the last slot's passage index into the slot just used
        and reduce the number of passages available */
-    svc.context.novel.pasg[idx] = svc.context.novel.pasg[--svc.context.novel.count];
+    svc.context.novel.pasg[idx]
+                          = svc.context.novel.pasg[--svc.context.novel.count];
     return res;
 }
 
