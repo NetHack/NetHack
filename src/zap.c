@@ -2483,7 +2483,7 @@ do_enlightenment_effect(void)
 
 /*
  * zapnodir - zaps a NODIR wand/spell.
- * added by GAN 11/03/86
+ * Won't get here if wand has no charges (unless wresting 1 last charge).
  */
 void
 zapnodir(struct obj *obj)
@@ -2493,36 +2493,45 @@ zapnodir(struct obj *obj)
     switch (obj->otyp) {
     case WAN_LIGHT:
     case SPE_LIGHT:
+        /* FIXME? wand of light becoming discovered should be contingent upon
+           seeing at least one previously unlit spot become lit */
+        known = (obj->dknown && !Blind);
         litroom(TRUE, obj);
-        if (!Blind)
-            known = TRUE;
-        if (lightdamage(obj, TRUE, 5))
-            known = TRUE;
+        (void) lightdamage(obj, TRUE, 5);
         break;
     case WAN_SECRET_DOOR_DETECTION:
     case SPE_DETECT_UNSEEN:
-        if (!findit())
-            return;
-        if (!Blind)
-            known = TRUE;
+        /* findit() gives sufficient feedback to discover the wand even when
+           blinded or when it fails to find anything */
+        known = !!obj->dknown;
+        (void) findit();
         break;
     case WAN_CREATE_MONSTER:
-        known = create_critters(rn2(23) ? 1 : rn1(7, 2),
-                                (struct permonst *) 0, FALSE);
+        /* create_critters() returns True iff hero sees a new monster appear */
+        if (create_critters(rn2(23) ? 1 : rn1(7, 2),
+                            (struct permonst *) 0, FALSE))
+            known = !!obj->dknown;
         break;
     case WAN_WISHING:
-        known = TRUE;
         if (Luck + rn2(5) < 0) {
             pline("Unfortunately, nothing happens.");
-            break;
+            known = FALSE;
+        } else {
+            known = !!obj->dknown;
+            /* wand of wishing asks player what to wish for so always becomes
+               discovered (unless it hasn't been seen) */
+            makewish();
         }
-        makewish();
         break;
     case WAN_ENLIGHTENMENT:
-        known = TRUE;
+        known = !!obj->dknown;
+        /* do_enlightenmnt_effect() always describes enlightenment */
         do_enlightenment_effect();
         break;
+    default:
+        break;
     }
+
     if (known) {
         if (!objects[obj->otyp].oc_name_known)
             more_experienced(0, 10);
