@@ -491,7 +491,13 @@ moverock(void)
             } else if (!costly && costly_spot(rx, ry) && otmp->unpaid
                        && ((shkp = shop_keeper(*in_rooms(rx, ry, SHOPBASE))) != 0)
                        && onshopbill(otmp, shkp, TRUE)) {
-                /* [can this case actually happen?] */
+                /* this can happen if hero pushes boulder from farther inside
+                   the shop into shop's free spot (which will add it to the bill),
+                   then teleports or Passes_walls to the doorway (without exiting
+                   the shop), and then pushes the boulder from the free spot
+                   back into the shop; it's contingent upon the shopkeeper not
+                   "muttering an incantation" to fracture the boulder while it
+                   is unpaid at the free spot */
                 subfrombill(otmp, shkp);
             } else if (otmp->unpaid
                        && (shkp = find_objowner(otmp, sx, sy)) != 0
