@@ -868,8 +868,6 @@ drag_ball(coordxy x, coordxy y, int *bc_control,
     return TRUE;
 }
 
-DISABLE_WARNING_FORMAT_NONLITERAL
-
 /*
  *  drop_ball()
  *
@@ -890,7 +888,7 @@ drop_ball(coordxy x, coordxy y)
     }
 
     if (x != u.ux || y != u.uy) {
-        static const char *const pullmsg = "The ball pulls you out of the %s!";
+        static const char pullmsg[] = "The ball pulls you out of the ";
         struct trap *t;
         long side;
 
@@ -898,20 +896,20 @@ drop_ball(coordxy x, coordxy y)
             && u.utraptype != TT_INFLOOR && u.utraptype != TT_BURIEDBALL) {
             switch (u.utraptype) {
             case TT_PIT:
-                pline(pullmsg, "pit");
+                pline("%s%s!", pullmsg, "pit");
                 break;
             case TT_WEB:
-                pline(pullmsg, "web");
+                pline("%s%s!", pullmsg, "web");
                 Soundeffect(se_destroy_web, 30);
                 pline_The("web is destroyed!");
                 deltrap(t_at(u.ux, u.uy));
                 break;
             case TT_LAVA:
-                pline(pullmsg, hliquid("lava"));
+                pline("%s%s!", pullmsg, hliquid("lava"));
                 break;
             case TT_BEARTRAP:
                 side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
-                pline(pullmsg, "bear trap");
+                pline("%s%s!", pullmsg, "bear trap");
                 set_wounded_legs(side, rn1(1000, 500));
                 if (!u.usteed) {
                     Your("%s %s is severely damaged.",
@@ -940,7 +938,7 @@ drop_ball(coordxy x, coordxy y)
             u.ux = x - u.dx;
             u.uy = y - u.dy;
         }
-        gv.vision_full_recalc = 1; /* hero has moved, recalculate vision later */
+        gv.vision_full_recalc = 1; /* hero has moved, recalc vision later */
 
         if (Blind) {
             /* drop glyph under the chain */
@@ -960,8 +958,6 @@ drop_ball(coordxy x, coordxy y)
         }
     }
 }
-
-RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* ball&chain cause hero to randomly lose stuff from inventory */
 staticfn void

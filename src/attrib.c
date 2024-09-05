@@ -405,8 +405,10 @@ change_luck(schar n)
         u.uluck = LUCKMAX;
 }
 
+/* decide whether there are more blessed luckstones (plus luck-conferring
+   artifacts) than cursed ones; optionally combine uncursed with blessed */
 int
-stone_luck(boolean parameter) /* So I can't think up of a good name.  So sue me. --KAA */
+stone_luck(boolean include_uncursed)
 {
     struct obj *otmp;
     long bonchance = 0;
@@ -415,9 +417,7 @@ stone_luck(boolean parameter) /* So I can't think up of a good name.  So sue me.
         if (confers_luck(otmp)) {
             if (otmp->cursed)
                 bonchance -= otmp->quan;
-            else if (otmp->blessed)
-                bonchance += otmp->quan;
-            else if (parameter)
+            else if (otmp->blessed || include_uncursed)
                 bonchance += otmp->quan;
         }
 

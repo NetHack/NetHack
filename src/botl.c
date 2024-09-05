@@ -2276,7 +2276,7 @@ get_hilite(
                 txtstr = gb.blstats[idx][fldidx].val;
                 if (fldidx == BL_TITLE)
                     /* "<name> the <rank-title>", skip past "<name> the " */
-                    txtstr += (strlen(svp.plname) + sizeof " the " - sizeof "");
+                    txtstr += strlen(svp.plname) + sizeof " the " - sizeof "";
                 if (hl->rel == TXT_VALUE && hl->textmatch[0]) {
                     if (fuzzymatch(hl->textmatch, txtstr, "\" -_", TRUE)) {
                         rule = hl;
@@ -2697,7 +2697,7 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
                                  is_out_of_range);
                 return FALSE;
             } else if (dt == ANY_LONG
-                       && (hilite.value.a_long < (grt ? -1L : lt ? 1L : 0L))) {
+                       && hilite.value.a_long < (grt ? -1L : lt ? 1L : 0L)) {
                 config_error_add("%s'%s%ld'%s", threshold_value,
                                  op, hilite.value.a_long, is_out_of_range);
                 return FALSE;
@@ -3509,7 +3509,8 @@ status_hilite_menu_choose_behavior(int fld)
     if (fld == BL_HP) {
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_CRITICALHP;
-        Sprintf(buf,  "Highlight critically low %s", initblstats[fld].fldname);
+        Sprintf(buf,  "Highlight critically low %s",
+                initblstats[fld].fldname);
         add_menu(tmpwin, &nul_glyphinfo, &any, 'C', 0, ATR_NONE,
                  clr, buf, MENU_ITEMFLAGS_NONE);
         nopts++;

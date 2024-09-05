@@ -371,7 +371,8 @@ dig(void)
     if (svc.context.digging.down) {
         struct trap *ttmp = t_at(dpx, dpy);
 
-        if (svc.context.digging.effort > 250 || (ttmp && ttmp->ttyp == HOLE)) {
+        if (svc.context.digging.effort > 250
+            || (ttmp && ttmp->ttyp == HOLE)) {
             (void) dighole(FALSE, FALSE, (coord *) 0);
             (void) memset((genericptr_t) &svc.context.digging, 0,
                           sizeof svc.context.digging);
@@ -491,7 +492,8 @@ dig(void)
             }
             if (svl.level.flags.is_maze_lev) {
                 lev->typ = ROOM, lev->flags = 0;
-            } else if (svl.level.flags.is_cavernous_lev && !in_town(dpx, dpy)) {
+            } else if (svl.level.flags.is_cavernous_lev
+                       && !in_town(dpx, dpy)) {
                 lev->typ = CORR, lev->flags = 0;
             } else {
                 lev->typ = DOOR, lev->doormask = D_NODOOR;
@@ -1287,7 +1289,8 @@ use_pick_axe2(struct obj *obj)
                 || svc.context.digging.down) {
                 if (flags.autodig && dig_target == DIGTYP_ROCK
                     && !svc.context.digging.down
-                    && u_at(svc.context.digging.pos.x, svc.context.digging.pos.y)
+                    && u_at(svc.context.digging.pos.x,
+                            svc.context.digging.pos.y)
                     && (svm.moves <= svc.context.digging.lastdigtime + 2
                         && svm.moves >= svc.context.digging.lastdigtime)) {
                     /* avoid messages if repeated autodigging */
@@ -1333,7 +1336,8 @@ use_pick_axe2(struct obj *obj)
               surface(u.ux, u.uy));
         u_wipe_engr(3);
     } else {
-        if (svc.context.digging.pos.x != u.ux || svc.context.digging.pos.y != u.uy
+        if (svc.context.digging.pos.x != u.ux
+            || svc.context.digging.pos.y != u.uy
             || !on_level(&svc.context.digging.level, &u.uz)
             || !svc.context.digging.down) {
             svc.context.digging.chew = FALSE;

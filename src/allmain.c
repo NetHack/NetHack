@@ -320,7 +320,8 @@ moveloop_core(void)
                     }
                 }
 
-                if (!svl.level.flags.noautosearch && Searching && gm.multi >= 0)
+                if (Searching && !svl.level.flags.noautosearch
+                    && gm.multi >= 0)
                     (void) dosearch0(1);
                 if (Warning)
                     warnreveal();
@@ -751,7 +752,7 @@ newgame(void)
                        * any artifacts */
     u_init();
 
-    l_nhcore_init();  /* create a Lua state that lasts until the end of the game */
+    l_nhcore_init();  /* create a Lua state that lasts until end of game */
     reset_glyphmap(gm_newgame);
 #ifndef NO_SIGNAL
     (void) signal(SIGINT, (SIG_RET_TYPE) done1);
@@ -828,11 +829,12 @@ welcome(boolean new_game) /* false => restoring an old game */
         Sprintf(eos(buf), " %s", align_str(u.ualignbase[A_ORIGINAL]));
     if (!gu.urole.name.f
         && (new_game
-                ? (gu.urole.allow & ROLE_GENDMASK) == (ROLE_MALE | ROLE_FEMALE)
-                : currentgend != flags.initgend))
+            ? (gu.urole.allow & ROLE_GENDMASK) == (ROLE_MALE | ROLE_FEMALE)
+            : currentgend != flags.initgend))
         Sprintf(eos(buf), " %s", genders[currentgend].adj);
     Sprintf(eos(buf), " %s %s", gu.urace.adj,
-            (currentgend && gu.urole.name.f) ? gu.urole.name.f : gu.urole.name.m);
+            (currentgend && gu.urole.name.f) ? gu.urole.name.f
+                                             : gu.urole.name.m);
 
     pline(new_game ? "%s %s, welcome to NetHack!  You are a%s."
                    : "%s %s, the%s, welcome back to NetHack!",
@@ -1242,11 +1244,13 @@ dump_enums(void)
         objclass_syms_dump,
         arti_enum_dump,
     };
-    static const char *const pfx[NUM_ENUM_DUMPS] = { "PM_", "", "",
-                                                     "", "", "", "",
-                                                     "", "", "" };
+    static const char *const pfx[NUM_ENUM_DUMPS] = {
+        "PM_", "", "", "", "", "", "", "", "", ""
+    };
     /* 0 = dump numerically only, 1 = add 'char' comment */
-    static const int dumpflgs[NUM_ENUM_DUMPS] = { 0, 0, 0, 0, 0, 1, 1, 0, 0, 0 };
+    static const int dumpflgs[NUM_ENUM_DUMPS] = {
+        0, 0, 0, 0, 0, 1, 1, 0, 0, 0
+    };
     static int szd[NUM_ENUM_DUMPS] = { SIZE(monsdump), SIZE(objdump),
                                        SIZE(omdump), SIZE(defsym_cmap_dump),
                                        SIZE(defsym_mon_syms_dump),

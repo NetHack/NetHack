@@ -94,7 +94,7 @@ resetobjs(struct obj *ochain, boolean restore)
                                       result depends upon hero's location */
                                    && inside_shop(ox, oy)
                                    && *(p = in_rooms(ox, oy, SHOPBASE))
-                                   && tended_shop(&svr.rooms[*p - ROOMOFFSET]));
+                                 && tended_shop(&svr.rooms[*p - ROOMOFFSET]));
             }
         } else { /* saving */
             /* do not zero out o_ids for ghost levels anymore */

@@ -947,7 +947,8 @@ check_leash(coordxy x, coordxy y)
                     if (!DEADMONSTER(mtmp))
                         u.uconduct.killer = save_pacifism;
                 } else {
-                    pline_mon(mtmp, "%s is choked by the leash!", Monnam(mtmp));
+                    pline_mon(mtmp, "%s is choked by the leash!",
+                              Monnam(mtmp));
                     /* tameness eventually drops to 1 here (never 0) */
                     if (mtmp->mtame && rn2(mtmp->mtame))
                         mtmp->mtame--;
@@ -1428,7 +1429,8 @@ use_candle(struct obj **optr)
         else if (!otmp->lamplit && was_lamplit)
             pline("%s out.", (obj->quan > 1L) ? "They go" : "It goes");
         if (obj->unpaid) {
-            struct monst *shkp VOICEONLY = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
+            struct monst *shkp VOICEONLY
+                               = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
 
             SetVoice(shkp, 0, 80, 0);
             verbalize("You %s %s, you bought %s!",
@@ -1590,7 +1592,8 @@ catch_lit(struct obj *obj)
         if (obj->otyp == POT_OIL)
             makeknown(obj->otyp);
         if (carried(obj) && obj->unpaid && costly_spot(u.ux, u.uy)) {
-            struct monst *shkp VOICEONLY = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
+            struct monst *shkp VOICEONLY
+                               = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
 
             /* if it catches while you have it, then it's your tough luck */
             check_unpaid(obj);
@@ -1670,7 +1673,8 @@ use_lamp(struct obj *obj)
             if (obj->unpaid && costly_spot(u.ux, u.uy)
                 && obj->age == 20L * (long) objects[obj->otyp].oc_cost) {
                 const char *ithem = (obj->quan > 1L) ? "them" : "it";
-                struct monst *shkp VOICEONLY = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
+                struct monst *shkp VOICEONLY
+                               = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
 
                 SetVoice(shkp, 0, 80, 0);
                 verbalize("You burn %s, you bought %s!", ithem, ithem);

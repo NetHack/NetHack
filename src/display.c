@@ -1592,7 +1592,8 @@ see_traps(void)
 }
 
 /*  glyph, ttychar, framecolor,
-    { glyphflags, { NO_COLOR, sym.symidx }, customcolor, color256idx, tileidx, u } */
+    { glyphflags, { NO_COLOR, sym.symidx },
+    customcolor, color256idx, tileidx, u } */
 static glyph_info no_ginfo = {
     NO_GLYPH, ' ', NO_COLOR,
     { MG_BADXY, { NO_COLOR, 0 },
@@ -2086,7 +2087,8 @@ clear_glyph_buffer(void)
                      || giptr->gm.sym.color != nul_gbuf.glyphinfo.gm.sym.color
                      || giptr->gm.glyphflags
                         != nul_gbuf.glyphinfo.gm.glyphflags
-                     || giptr->gm.customcolor != nul_gbuf.glyphinfo.gm.customcolor
+                     || giptr->gm.customcolor
+                        != nul_gbuf.glyphinfo.gm.customcolor
                      || giptr->gm.tileidx != nul_gbuf.glyphinfo.gm.tileidx)
 #else
     nul_gbuf.gnew = (giptr->ttychar != ' '
@@ -2211,9 +2213,11 @@ flush_screen(int cursor_on_u)
             if (gptr->gnew
                 || (gw.wsettings.map_frame_color != NO_COLOR
                     && bkglyphinfo.framecolor != NO_COLOR)) {
-                map_glyphinfo(x, y, bkglyph, 0, &bkglyphinfo); /* won't touch framecolor */
+                /* map_glyphinfo() won't touch framecolor */
+                map_glyphinfo(x, y, bkglyph, 0, &bkglyphinfo);
                 print_glyph(WIN_MAP, x, y,
-                            Glyphinfo_at(x, y, gptr->glyphinfo.glyph), &bkglyphinfo);
+                            Glyphinfo_at(x, y, gptr->glyphinfo.glyph),
+                            &bkglyphinfo);
                 gptr->gnew = 0;
             }
         }
@@ -2509,7 +2513,7 @@ get_bkglyph_and_framecolor(
         }
 
         if (!cansee(x, y) && (!lev->waslit || flags.dark_room)) {
-            /* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
+            /* Floor spaces and corridors are dark if unlit. */
             if (lev->typ == CORR && idx == S_litcorr)
                 idx = S_corr;
             else if (idx == S_room)
@@ -3126,7 +3130,9 @@ set_twall(
 #else
           coordxy x0 UNUSED, coordxy y0 UNUSED,
 #endif
-          coordxy x1, coordxy y1, coordxy x2, coordxy y2, coordxy x3, coordxy y3)
+          coordxy x1, coordxy y1,
+          coordxy x2, coordxy y2,
+          coordxy x3, coordxy y3)
 {
     int wmode, is_1, is_2, is_3;
 
@@ -3164,7 +3170,11 @@ set_wall(coordxy x, coordxy y, int horiz)
 
 /* Return a wall mode for a corner wall. (x4,y4) is the "inner" position. */
 staticfn int
-set_corn(coordxy x1, coordxy y1, coordxy x2, coordxy y2, coordxy x3, coordxy y3, coordxy x4, coordxy y4)
+set_corn(
+    coordxy x1, coordxy y1,
+    coordxy x2, coordxy y2,
+    coordxy x3, coordxy y3,
+    coordxy x4, coordxy y4)
 {
     coordxy wmode, is_1, is_2, is_3, is_4;
 

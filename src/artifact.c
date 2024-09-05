@@ -14,7 +14,7 @@
  *        the contents, just the total size.
  */
 
-staticfn struct artifact *get_artifact(struct obj *) NONNULL; /* never returns null */
+staticfn struct artifact *get_artifact(struct obj *) NONNULL;
 
 /* #define get_artifact(o) \
     (((o) && ((o)->artifact > 0 && (o)->artifact < AFTER_LAST_ARTIFACT)) \
@@ -2041,7 +2041,8 @@ finesse_ahriman(struct obj *obj)
 
     /* if we aren't levitating or this isn't an artifact which confers
        levitation via #invoke then freeinv() won't toggle levitation */
-    if (!Levitation || (oart = get_artifact(obj)) == &artilist[ART_NONARTIFACT]
+    if (!Levitation
+        || (oart = get_artifact(obj)) == &artilist[ART_NONARTIFACT]
         || oart->inv_prop != LEVITATION || !(ELevitation & W_ARTI))
         return FALSE;
 
@@ -2258,7 +2259,9 @@ glow_verb(int count, /* 0 means blind rather than no applicable creatures */
 
 /* use for warning "glow" for Sting, Orcrist, and Grimtooth */
 void
-Sting_effects(int orc_count) /* new count (warn_obj_cnt is old count); -1 is a flag value */
+Sting_effects(
+    int orc_count) /* new count (warn_obj_cnt is old count);
+                    * -1 is a flag value */
 {
     if (u_wield_art(ART_STING)
         || u_wield_art(ART_ORCRIST)
@@ -2501,8 +2504,7 @@ staticfn int
 count_surround_traps(coordxy x, coordxy y)
 {
     struct rm *levp;
-    struct obj *otmp;
-    struct trap *ttmp;
+    struct obj *o;
     coordxy dx, dy;
     int glyph, ret = 0;
 
@@ -2518,7 +2520,7 @@ count_surround_traps(coordxy x, coordxy y)
             glyph = glyph_at(dx, dy);
             if (glyph_is_trap(glyph))
                 continue;
-            if ((ttmp = t_at(dx, dy)) != 0) {
+            if (t_at(dx, dy)) {
                 ++ret;
                 continue;
             }
@@ -2527,8 +2529,8 @@ count_surround_traps(coordxy x, coordxy y)
                 ++ret;
                 continue;
             }
-            for (otmp = svl.level.objects[dx][dy]; otmp; otmp = otmp->nexthere)
-                if (Is_container(otmp) && otmp->otrapped) {
+            for (o = svl.level.objects[dx][dy]; o; o = o->nexthere)
+                if (Is_container(o) && o->otrapped) {
                     ++ret; /* we're counting locations, so just */
                     break; /* count the first one in a pile     */
                 }
