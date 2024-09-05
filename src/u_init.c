@@ -193,7 +193,7 @@ static struct trobj Blindfold[] = { { BLINDFOLD, 0, TOOL_CLASS, 1, 0 },
                                     { 0, 0, 0, 0, 0 } };
 static struct trobj Instrument[] = { { WOODEN_FLUTE, 0, TOOL_CLASS, 1, 0 },
                                      { 0, 0, 0, 0, 0 } };
-static struct trobj Xtra_food[] = { { UNDEF_TYP, UNDEF_SPE, FOOD_CLASS, 2, 0 },
+static struct trobj Xtra_food[] = { { UNDEF_TYP, UNDEF_SPE, FOOD_CLASS, 2, 0},
                                     { 0, 0, 0, 0, 0 } };
 static struct trobj Leash[] = { { LEASH, 0, TOOL_CLASS, 1, 0 },
                                 { 0, 0, 0, 0, 0 } };
@@ -621,7 +621,7 @@ u_init_role(void)
     /* the program used to check moves<=1 && invent==NULL do decide whether
        a new game has started, but due to the 'pauper' option/conduct, can't
        rely on invent becoming non-Null anymore; instead, initialize moves
-       to 0 instead of 1 and then set it to 1 here, where invent init occurs */
+       to 0 instead of 1, then set it to 1 here, where invent init occurs */
     svm.moves = 1L;
 
     switch (Role_switch) {
@@ -722,8 +722,9 @@ u_init_role(void)
         ini_inv(Rogue);
         if (!rn2(5))
             ini_inv(Blindfold);
-        knows_object(SACK, FALSE); /* FALSE: don't override pauper here, but sack
-                                    * will be made known in pauper_reinit() */
+        knows_object(SACK, FALSE); /* FALSE: don't override pauper here,
+                                    * but sack will be made known in
+                                    * pauper_reinit() */
         knows_class(WEAPON_CLASS); /* daggers only */
         skill_init(Skill_R);
         break;
@@ -1324,8 +1325,8 @@ ini_inv(struct trobj *trop)
             if (obj->oclass == RING_CLASS || obj->oclass == SPBOOK_CLASS)
                 gn.nocreate4 = otyp;
         }
-        /* Put post-creation object adjustments that don't depend on whether it
-         * was UNDEF_TYP or not after this. */
+        /* Put post-creation object adjustments that don't depend on whether
+         * it was UNDEF_TYP or not after this. */
 
         otyp = ini_inv_obj_substitution(trop, obj);
 

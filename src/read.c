@@ -2472,7 +2472,8 @@ litroom(
         int rx, ry;
 
         if (rnum >= 0) {
-            for (rx = svr.rooms[rnum].lx - 1; rx <= svr.rooms[rnum].hx + 1; rx++)
+            for (rx = svr.rooms[rnum].lx - 1; rx <= svr.rooms[rnum].hx + 1;
+                 rx++)
                 for (ry = svr.rooms[rnum].ly - 1;
                      ry <= svr.rooms[rnum].hy + 1; ry++)
                     set_lit(rx, ry,
@@ -2738,7 +2739,8 @@ do_genocide(
                 pline1(thats_enough_tries);
                 return;
             }
-            Strcpy(promptbuf, "What type of monster do you want to genocide?");
+            Strcpy(promptbuf,
+                   "What type of monster do you want to genocide?");
             if (i > 0)
                 Snprintf(eos(promptbuf), sizeof promptbuf - strlen(promptbuf),
                          " [enter %s]",
@@ -2803,8 +2805,10 @@ do_genocide(
                      * aren't supposed to be hampered by deafness....
                      */
                     if (flags.verbose)
-                        pline("A thunderous voice booms through the caverns:");
+                        pline("A thunderous voice booms"
+                              " through the caverns:");
                     SetVoice((struct monst *) 0, 0, 80, voice_deity);
+                    /* FIXME? shouldn't this override deafness? */
                     verbalize("No, mortal!  That will not be done.");
                 }
                 continue;

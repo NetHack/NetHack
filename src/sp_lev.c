@@ -55,7 +55,8 @@ staticfn unsigned int sp_amask_to_amask(unsigned int sp_amask);
 staticfn void create_monster(monster *, struct mkroom *);
 staticfn struct obj *create_object(object *, struct mkroom *);
 staticfn void create_altar(altar *, struct mkroom *);
-staticfn boolean search_door(struct mkroom *, coordxy *, coordxy *, xint16, int);
+staticfn boolean search_door(struct mkroom *, coordxy *, coordxy *, xint16,
+                             int) NONNULLPTRS;
 staticfn void create_corridor(corridor *);
 staticfn struct mkroom *build_room(room *, struct mkroom *);
 staticfn void light_region(region *);
@@ -102,7 +103,8 @@ staticfn void sel_set_ter(coordxy, coordxy, genericptr_t);
 staticfn void sel_set_door(coordxy, coordxy, genericptr_t);
 staticfn void sel_set_feature(coordxy, coordxy, genericptr_t);
 staticfn void levregion_add(lev_region *);
-staticfn void get_table_xy_or_coord(lua_State *, lua_Integer *, lua_Integer *);
+staticfn void get_table_xy_or_coord(lua_State *, lua_Integer *,
+                                    lua_Integer *) NONNULLPTRS;
 staticfn int get_table_region(lua_State *, const char *, lua_Integer *,
                         lua_Integer *, lua_Integer *, lua_Integer *, boolean);
 staticfn void set_wallprop_in_selection(lua_State *, int);
@@ -1535,7 +1537,8 @@ create_room(
                    + rn2(hx - (lx > 0 ? lx : 3) - dx - xborder + 1);
             yabs = ly + (ly > 0 ? ylim : 2)
                    + rn2(hy - (ly > 0 ? ly : 2) - dy - yborder + 1);
-            if (ly == 0 && hy >= (ROWNO - 1) && (!svn.nroom || !rn2(svn.nroom))
+            if (ly == 0 && hy >= ROWNO - 1
+                && (!svn.nroom || !rn2(svn.nroom))
                 && (yabs + dy > ROWNO / 2)) {
                 yabs = rn1(3, 2);
                 if (svn.nroom < 4 && dy > 1)
@@ -4617,7 +4620,8 @@ lspo_door(lua_State *L)
 
         get_table_xy_or_coord(L, &dx, &dy);
         x = dx, y = dy;
-        msk = doorstates2i[get_table_option(L, "state", "random", doorstates)];
+        msk = doorstates2i[get_table_option(L, "state", "random",
+                                            doorstates)];
     }
 
     typ = (msk == -1) ? rnddoor() : (coordxy) msk;
@@ -5358,7 +5362,7 @@ l_get_lregion(lua_State *L, lev_region *tmplregion)
 
 /* teleport_region({ region = { x1,y1, x2,y2 } }); */
 /* teleport_region({ region = { x1,y1, x2,y2 }, [ region_islev = 1, ]
- *     exclude = { x1,y1, x2,y2 }, [ exclude_islen = 1, ] [ dir = "up" ] }); */
+ *   exclude = { x1,y1, x2,y2 }, [ exclude_islen = 1, ] [ dir = "up" ] }); */
 /* TODO: maybe allow using selection, with a new method "getextents()"? */
 int
 lspo_teleport_region(lua_State *L)
@@ -5507,8 +5511,8 @@ lspo_region(lua_State *L)
     if (argc <= 1) {
         lcheck_param_table(L);
 
-        /* TODO: "unfilled" ==> filled=0, "filled" ==> filled=1, and
-         * "lvflags_only" ==> filled=2, probably in a get_table_needfill_opt */
+        /* TODO: "unfilled" => filled=0, "filled" => filled=1, and
+         * "lvflags_only" => filled=2, probably in a get_table_needfill_opt */
         needfill = get_table_int_opt(L, "filled", 0);
         irregular = get_table_boolean_opt(L, "irregular", 0);
         joined = get_table_boolean_opt(L, "joined", TRUE);

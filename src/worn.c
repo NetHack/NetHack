@@ -7,7 +7,8 @@
 
 staticfn void m_lose_armor(struct monst *, struct obj *, boolean) NONNULLPTRS;
 staticfn void clear_bypass(struct obj *) NO_NNARGS;
-staticfn void m_dowear_type(struct monst *, long, boolean, boolean) NONNULLARG1;
+staticfn void m_dowear_type(struct monst *, long, boolean, boolean)
+                                                                  NONNULLARG1;
 staticfn int extra_pref(struct monst *, struct obj *) NONNULLARG1;
 
 static const struct worn {

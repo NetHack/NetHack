@@ -1196,7 +1196,8 @@ dump_fmtstr(
                 break;
             case 'n': /* player name */
                 if (fullsubs)
-                    Sprintf(tmpbuf, "%s", *svp.plname ? svp.plname : "unknown");
+                    Sprintf(tmpbuf, "%s",
+                            *svp.plname ? svp.plname : "unknown");
                 else
                     Strcpy(tmpbuf, "{hero name}");
                 break;
@@ -1672,7 +1673,8 @@ choose_classes_menu(const char *prompt,
         case 0:
             idx = def_char_to_monclass(*class_list);
             if (!IndexOk(idx, def_monsyms)) {
-                panic("choose_classes_menu: invalid monclass '%c'", *class_list);
+                panic("choose_classes_menu: invalid monclass '%c'",
+                      *class_list);
                 /*NOTREACHED*/
             }
             text = def_monsyms[idx].explain;
@@ -1682,7 +1684,8 @@ choose_classes_menu(const char *prompt,
         case 1:
             idx = def_char_to_objclass(*class_list);
             if (!IndexOk(idx, def_oc_syms)) {
-                panic("choose_classes_menu: invalid objclass '%c'", *class_list);
+                panic("choose_classes_menu: invalid objclass '%c'",
+                      *class_list);
                 /*NOTREACHED*/
             }
             text = def_oc_syms[idx].explain;

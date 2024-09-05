@@ -745,12 +745,14 @@ save_regions(NHFILE *nhfp)
     for (i = 0; i < svn.n_regions; i++) {
         r = gr.regions[i];
         if (nhfp->structlevel) {
-            bwrite(nhfp->fd, (genericptr_t) &r->bounding_box, sizeof (NhRect));
+            bwrite(nhfp->fd, (genericptr_t) &r->bounding_box,
+                   sizeof (NhRect));
             bwrite(nhfp->fd, (genericptr_t) &r->nrects, sizeof (short));
         }
         for (j = 0; j < r->nrects; j++) {
             if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t) &r->rects[j], sizeof (NhRect));
+                bwrite(nhfp->fd, (genericptr_t) &r->rects[j],
+                       sizeof (NhRect));
         }
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &r->attach_2_u, sizeof (boolean));
@@ -931,7 +933,7 @@ region_stats(
 
     /* other stats formats take one parameter; this takes two */
     Sprintf(hdrbuf, hdrfmt, (long) sizeof (NhRegion), (long) sizeof (NhRect));
-    *count = (long) svn.n_regions; /* might be 0 even though max_regions isn't */
+    *count = (long) svn.n_regions; /* might be 0 even tho max_regions isn't */
     *size = (long) gm.max_regions * (long) sizeof (NhRegion);
     for (i = 0; i < svn.n_regions; ++i) {
         rg = gr.regions[i];

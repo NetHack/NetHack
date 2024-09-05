@@ -414,12 +414,14 @@ savestateinlock(void)
         }
         nhfp->mode = WRITING;
         if (nhfp->structlevel)
-            (void) write(nhfp->fd, (genericptr_t) &svh.hackpid, sizeof svh.hackpid);
+            (void) write(nhfp->fd, (genericptr_t) &svh.hackpid,
+                         sizeof svh.hackpid);
         if (flags.ins_chkpt) {
             int currlev = ledger_no(&u.uz);
 
             if (nhfp->structlevel)
-                (void) write(nhfp->fd, (genericptr_t) &currlev, sizeof currlev);
+                (void) write(nhfp->fd, (genericptr_t) &currlev,
+                             sizeof currlev);
             save_savefile_name(nhfp);
             store_version(nhfp);
             store_savefileinfo(nhfp);
@@ -526,13 +528,16 @@ savelev_core(NHFILE *nhfp, xint8 lev)
 
     savelevl(nhfp, ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     if (nhfp->structlevel) {
-        bwrite(nhfp->fd, (genericptr_t) svl.lastseentyp, sizeof svl.lastseentyp);
+        bwrite(nhfp->fd, (genericptr_t) svl.lastseentyp,
+               sizeof svl.lastseentyp);
         bwrite(nhfp->fd, (genericptr_t) &svm.moves, sizeof svm.moves);
         save_stairs(nhfp);
         bwrite(nhfp->fd, (genericptr_t) &svu.updest, sizeof (dest_area));
         bwrite(nhfp->fd, (genericptr_t) &svd.dndest, sizeof (dest_area));
-        bwrite(nhfp->fd, (genericptr_t) &svl.level.flags, sizeof svl.level.flags);
-        bwrite(nhfp->fd, (genericptr_t) &svd.doors_alloc, sizeof svd.doors_alloc);
+        bwrite(nhfp->fd, (genericptr_t) &svl.level.flags,
+               sizeof svl.level.flags);
+        bwrite(nhfp->fd, (genericptr_t) &svd.doors_alloc,
+               sizeof svd.doors_alloc);
         /* don't rely on underlying write() behavior to write
          *  nothing if count arg is 0, just skip it */
         if (svd.doors_alloc)
@@ -980,7 +985,7 @@ savemonchn(NHFILE *nhfp, struct monst *mtmp)
     }
 }
 
-/* save traps; gf.ftrap is the only trap chain so the 2nd arg is superfluous */
+/* save traps; gf.ftrap is the only trap chain so 2nd arg is superfluous */
 staticfn void
 savetrapchn(NHFILE *nhfp, struct trap *trap)
 {

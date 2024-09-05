@@ -166,24 +166,8 @@ doextversion(void)
             done_rt = FALSE,
             done_dlb = FALSE,
             prolog;
-#if 0   /* moved to util/mdlib.c and rendered via do_runtime_info() */
-    const char *lua_info[] = {
- "About Lua: Copyright (c) 1994-2017 Lua.org, PUC-Rio.",
- /*        1         2         3         4         5         6         7
-  1234567890123456789012345678901234567890123456789012345678901234567890123456789
-  */
- "    \"Permission is hereby granted, free of charge, to any person obtaining",
- "     a copy of this software and associated documentation files (the ",
- "     \"Software\"), to deal in the Software without restriction including",
- "     without limitation the rights to use, copy, modify, merge, publish,",
- "     distribute, sublicense, and/or sell copies of the Software, and to ",
- "     permit persons to whom the Software is furnished to do so, subject to",
- "     the following conditions:",
- "     The above copyright notice and this permission notice shall be",
- "     included in all copies or substantial portions of the Software.\"",
-        (const char *) 0
-  };
-#endif /*0*/
+    /* lua_info[] moved to util/mdlib.c and rendered via do_runtime_info() */
+
 #if defined(OPTIONS_AT_RUNTIME)
     use_dlb = FALSE;
 #else

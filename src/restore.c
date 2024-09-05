@@ -533,7 +533,7 @@ restgamestate(NHFILE *nhfp)
     svc.context.warntype.species = (ismnum(svc.context.warntype.speciesidx))
                                   ? &mons[svc.context.warntype.speciesidx]
                                   : (struct permonst *) 0;
-    /* svc.context.victual.piece, .tin.tin, .spellbook.book, and .polearm.hitmon
+    /* context.victual.piece, .tin.tin, .spellbook.book, and .polearm.hitmon
        are pointers which get set to Null during save and will be recovered
        via corresponding o_id or m_id while objs or mons are being restored */
 
@@ -1413,7 +1413,8 @@ reset_oattached_mids(boolean ghostly)
    returns 1: use svp.plname[], 0: new game, -1: quit */
 int
 restore_menu(
-    winid bannerwin) /* if not WIN_ERR, clear window and show copyright in menu */
+    winid bannerwin) /* if not WIN_ERR, clear window
+                      * and show copyright in menu */
 {
     winid tmpwin;
     anything any;

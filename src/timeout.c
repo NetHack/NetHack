@@ -2611,7 +2611,8 @@ save_timers(NHFILE *nhfp, int range)
     if (perform_bwrite(nhfp)) {
         if (range == RANGE_GLOBAL) {
             if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t) &svt.timer_id, sizeof(svt.timer_id));
+                bwrite(nhfp->fd, (genericptr_t) &svt.timer_id,
+                       sizeof svt.timer_id);
         }
         count = maybe_write_timer(nhfp, range, FALSE);
         if (nhfp->structlevel)
@@ -2651,7 +2652,8 @@ restore_timers(NHFILE *nhfp, int range, long adjust)
 
     if (range == RANGE_GLOBAL) {
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &svt.timer_id, sizeof svt.timer_id);
+            mread(nhfp->fd, (genericptr_t) &svt.timer_id,
+                  sizeof svt.timer_id);
     }
 
     /* restore elements */

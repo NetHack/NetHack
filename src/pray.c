@@ -443,7 +443,8 @@ fix_worst_trouble(int trouble)
             if ((otmp = stuck_ring(uleft, RIN_SUSTAIN_ABILITY)) != 0) {
                 if (otmp == uleft)
                     what = leftglow;
-            } else if ((otmp = stuck_ring(uright, RIN_SUSTAIN_ABILITY)) != 0) {
+            } else if ((otmp = stuck_ring(uright, RIN_SUSTAIN_ABILITY))
+                       != 0) {
                 if (otmp == uright)
                     what = rightglow;
             }
@@ -848,7 +849,8 @@ gcrownu(void)
     case A_CHAOTIC:
         u.uevent.uhand_of_elbereth = 3;
         in_hand = u_wield_art(ART_STORMBRINGER);
-        already_exists = exist_artifact(RUNESWORD, artiname(ART_STORMBRINGER));
+        already_exists = exist_artifact(RUNESWORD,
+                                        artiname(ART_STORMBRINGER));
         what = (((already_exists && !in_hand) || class_gift != STRANGE_OBJECT)
                 ? "take lives"
                 : "steal souls");
@@ -1859,8 +1861,8 @@ dosacrifice(void)
 
         /* KMH, conduct */
         if (!u.uconduct.gnostic++)
-            livelog_printf(LL_CONDUCT,
-                           "rejected atheism by offering %s on an altar of %s",
+            livelog_printf(LL_CONDUCT, "rejected atheism"
+                                       " by offering %s on an altar of %s",
                            corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
                            a_gname());
 
@@ -2066,9 +2068,9 @@ can_pray(boolean praying) /* false means no messages should be given */
 
     if (gp.p_aligntyp == A_NONE) /* praying to Moloch */
         gp.p_type = -2;
-    else if ((gp.p_trouble > 0) ? (u.ublesscnt > 200) /* big trouble */
-             : (gp.p_trouble < 0) ? (u.ublesscnt > 100) /* minor difficulties */
-               : (u.ublesscnt > 0))                  /* not in trouble */
+    else if ((gp.p_trouble > 0) ? (u.ublesscnt > 200)   /* big trouble */
+             : (gp.p_trouble < 0) ? (u.ublesscnt > 100) /* minor difficulty */
+               : (u.ublesscnt > 0))                     /* not in trouble */
         gp.p_type = 0;                     /* too soon... */
     else if ((int) Luck < 0 || u.ugangr || alignment < 0)
         gp.p_type = 1; /* too naughty... */
@@ -2119,7 +2121,8 @@ dopray(void)
      * than just "y" (will also require "no" to decline).
      */
     if (ParanoidPray) {
-        ok = paranoid_query(ParanoidConfirm, "Are you sure you want to pray?");
+        ok = paranoid_query(ParanoidConfirm,
+                            "Are you sure you want to pray?");
 
         /* clear command recall buffer; otherwise ^A to repeat p(ray) would
            do so without confirmation (if 'ok') or do nothing (if '!ok') */

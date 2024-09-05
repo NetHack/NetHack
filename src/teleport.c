@@ -1531,22 +1531,25 @@ rloc_pos_ok(
         if (svd.dndest.nlx && On_W_tower_level(&u.uz))
             return (((yy & 2) != 0)
                     /* inside xor not within */
-                    ^ !within_bounded_area(x, y, svd.dndest.nlx, svd.dndest.nly,
+                    ^ !within_bounded_area(x, y,
+                                           svd.dndest.nlx, svd.dndest.nly,
                                            svd.dndest.nhx, svd.dndest.nhy));
         if (svu.updest.lx && (yy & 1) != 0) /* moving up */
-            return (within_bounded_area(x, y, svu.updest.lx, svu.updest.ly,
+            return (within_bounded_area(x, y,
+                                        svu.updest.lx, svu.updest.ly,
                                         svu.updest.hx, svu.updest.hy)
                     && (!svu.updest.nlx
                         || !within_bounded_area(x, y,
-                                              svu.updest.nlx, svu.updest.nly,
-                                              svu.updest.nhx, svu.updest.nhy)));
+                                            svu.updest.nlx, svu.updest.nly,
+                                            svu.updest.nhx, svu.updest.nhy)));
         if (svd.dndest.lx && (yy & 1) == 0) /* moving down */
-            return (within_bounded_area(x, y, svd.dndest.lx, svd.dndest.ly,
+            return (within_bounded_area(x, y,
+                                        svd.dndest.lx, svd.dndest.ly,
                                         svd.dndest.hx, svd.dndest.hy)
                     && (!svd.dndest.nlx
                         || !within_bounded_area(x, y,
-                                              svd.dndest.nlx, svd.dndest.nly,
-                                              svd.dndest.nhx, svd.dndest.nhy)));
+                                            svd.dndest.nlx, svd.dndest.nly,
+                                            svd.dndest.nhx, svd.dndest.nhy)));
     } else {
         /* [try to] prevent a shopkeeper or temple priest from being
            sent out of his room (caller might resort to goodpos() if
@@ -1906,7 +1909,8 @@ mtele_trap(struct monst *mtmp, struct trap *trap, int in_sight)
              * possible space - instead it just doesn't work. */
             if (!(m_at(trap->teledest.x, trap->teledest.y)
                   || u_at(trap->teledest.x, trap->teledest.y))) {
-                rloc_to_core(mtmp, trap->teledest.x, trap->teledest.y, RLOC_MSG);
+                rloc_to_core(mtmp, trap->teledest.x, trap->teledest.y,
+                             RLOC_MSG);
             }
         } else
             (void) rloc(mtmp, RLOC_NONE);
@@ -2041,16 +2045,18 @@ rloco(struct obj *obj)
             break;
     } while (!goodpos(tx, ty, (struct monst *) 0, 0)
              || (restricted_fall
-                 && (!within_bounded_area(tx, ty, svd.dndest.lx, svd.dndest.ly,
+                 && (!within_bounded_area(tx, ty,
+                                          svd.dndest.lx, svd.dndest.ly,
                                           svd.dndest.hx, svd.dndest.hy)
                      || (svd.dndest.nlx
                          && within_bounded_area(tx, ty,
-                                              svd.dndest.nlx, svd.dndest.nly,
-                                              svd.dndest.nhx, svd.dndest.nhy))))
+                                            svd.dndest.nlx, svd.dndest.nly,
+                                            svd.dndest.nhx, svd.dndest.nhy))))
              /* on the Wizard Tower levels, objects inside should
                 stay inside and objects outside should stay outside */
              || (svd.dndest.nlx && On_W_tower_level(&u.uz)
-                 && within_bounded_area(tx, ty, svd.dndest.nlx, svd.dndest.nly,
+                 && within_bounded_area(tx, ty,
+                                        svd.dndest.nlx, svd.dndest.nly,
                                         svd.dndest.nhx, svd.dndest.nhy)
                     != within_bounded_area(otx, oty,
                                            svd.dndest.nlx, svd.dndest.nly,

@@ -275,7 +275,8 @@ dosit(void)
         You("are already sitting on %s.", mon_nam(u.usteed));
         return ECMD_OK;
     }
-    if (u.uundetected && is_hider(gy.youmonst.data) && u.umonnum != PM_TRAPPER)
+    if (u.uundetected && is_hider(gy.youmonst.data)
+        && u.umonnum != PM_TRAPPER) /* trapper can stay hidden on floor */
         u.uundetected = 0; /* no longer on the ceiling */
 
     if (!can_reach_floor(FALSE)) {
@@ -320,7 +321,8 @@ dosit(void)
                    pline("Squelch!");
                 }
                 useupf(obj, obj->quan);
-            } else if (!(Is_box(obj) || objects[obj->otyp].oc_material == CLOTH))
+            } else if (!(Is_box(obj)
+                         || objects[obj->otyp].oc_material == CLOTH))
                 pline("It's not very comfortable...");
         }
     } else if (trap != 0 || (u.utrap && (u.utraptype >= TT_LAVA))) {

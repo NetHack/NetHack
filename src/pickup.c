@@ -693,14 +693,15 @@ pickup(int what) /* should be a long */
         t = t_at(u.ux, u.uy);
         if (!can_reach_floor(t && is_pit(t->ttyp))) {
             (void) describe_decor(); /* even when !flags.mention_decor */
-            if ((gm.multi && !svc.context.run) || (autopickup && !flags.pickup)
+            if ((gm.multi && !svc.context.run)
+                || (autopickup && !flags.pickup)
                 || (t && (uteetering_at_seen_pit(t) || uescaped_shaft(t))))
                 read_engr_at(u.ux, u.uy);
             return 0;
         }
-        /* multi && !svc.context.run means they are in the middle of some other
-         * action, or possibly paralyzed, sleeping, etc.... and they just
-         * teleported onto the object.  They shouldn't pick it up.
+        /* multi && !svc.context.run means they are in the middle of some
+         * other action, or possibly paralyzed, sleeping, etc.... and they
+         * just teleported onto the object.  They shouldn't pick it up.
          */
         if ((gm.multi && !svc.context.run)
             || (autopickup && !flags.pickup)
@@ -2117,7 +2118,8 @@ do_loot_cont(
                 && res != ECMD_TIME
                 && ccount == 1 && u_have_forceable_weapon()) {
                 /* single container, and we could #force it open... */
-                cmdq_add_ec(CQ_CANNED, doforce); /* doforce asks for confirmation */
+                /* note: doforce asks for confirmation */
+                cmdq_add_ec(CQ_CANNED, doforce);
                 ga.abort_looting = TRUE;
             }
         }
@@ -2227,8 +2229,8 @@ doloot_core(void)
                  cobj = cobj->nexthere)
                 if (Is_container(cobj)) {
                     any.a_obj = cobj;
-                    add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                             ATR_NONE, clr, doname(cobj), MENU_ITEMFLAGS_NONE);
+                    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
+                             doname(cobj), MENU_ITEMFLAGS_NONE);
                 }
             end_menu(win, "Loot which containers?");
             n = select_menu(win, PICK_ANY, &pick_list);
@@ -2334,7 +2336,8 @@ reverse_loot(void)
 
     if (!rn2(3)) {
         /* n objects: 1/(n+1) chance per object, 1/(n+1) to fall off end */
-        for (n = inv_cnt(TRUE), otmp = gi.invent; otmp; --n, otmp = otmp->nobj)
+        for (n = inv_cnt(TRUE), otmp = gi.invent; otmp;
+             --n, otmp = otmp->nobj)
             if (!rn2(n + 1)) {
                 prinv("You find old loot:", otmp, 0L);
                 return TRUE;
@@ -2363,7 +2366,7 @@ reverse_loot(void)
         if (g_at(x, y))
             pline("Ok, now there is loot here.");
     } else {
-        /* find original coffers chest if present, otherwise use nearest one */
+        /* find original coffers chest if present, otherwise use nearest */
         otmp = 0;
         for (coffers = fobj; coffers; coffers = coffers->nobj)
             if (coffers->otyp == CHEST) {
@@ -2646,7 +2649,7 @@ in_container(struct obj *obj)
         obfree(obj, (struct obj *) 0);
         /* if carried, shop goods will be flagged 'unpaid' and obfree() will
            handle bill issues, but if on floor, we need to put them on bill
-           before deleting them (non-shop items will be flagged 'no_charge') */
+           before deleting them (non-shop items will be flagged 'no_charge')*/
         if (floor_container && costly_spot(gc.current_container->ox,
                                            gc.current_container->oy)) {
             struct obj save_no_charge;
@@ -3302,7 +3305,8 @@ menu_loot(int retry, boolean put_in)
                 n_looted += res;
             }
         }
-    } else if (put_in && loot_justpicked && count_justpicked(gi.invent) == 1) {
+    } else if (put_in && loot_justpicked
+               && count_justpicked(gi.invent) == 1) {
         otmp = find_justpicked(gi.invent);
         if (otmp) {
             n_looted = 1;
@@ -3415,7 +3419,8 @@ in_or_out_menu(
     if (more_containers) {
         any.a_int = 7; /* 'n' */
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
-                 ATR_NONE, clr, "loot next container", MENU_ITEMFLAGS_SELECTED);
+                 ATR_NONE, clr, "loot next container",
+                 MENU_ITEMFLAGS_SELECTED);
     }
     any.a_int = 8; /* 'q' */
     Strcpy(buf, alreadyused ? "done" : "do nothing");
@@ -3560,7 +3565,8 @@ dotip(void)
                     return res;
                 /* else pick-from-gi.invent below */
             } else {
-                for (cobj = svl.level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
+                for (cobj = svl.level.objects[cc.x][cc.y]; cobj;
+                     cobj = nobj) {
                     nobj = cobj->nexthere;
                     if (!Is_container(cobj))
                         continue;
@@ -3683,7 +3689,8 @@ tipcontainer(struct obj *box) /* or bag */
 
     if (tipcontainer_checks(box, targetbox, FALSE) != TIPCHECK_OK)
         return;
-    if (targetbox && tipcontainer_checks(targetbox, NULL, TRUE) != TIPCHECK_OK)
+    if (targetbox
+        && tipcontainer_checks(targetbox, NULL, TRUE) != TIPCHECK_OK)
         return;
 
     {

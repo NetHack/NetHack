@@ -792,12 +792,13 @@ domonnoise(struct monst *mtmp)
             int vampindex;
 
             if (kindred) {
-                verbl_msg =
-                    "This is my hunting ground that you dare to prowl!";
+                verbl_msg = "This is my hunting ground"
+                            " that you dare to prowl!";
             } else if (gy.youmonst.data == &mons[PM_SILVER_DRAGON]
                        || gy.youmonst.data == &mons[PM_BABY_SILVER_DRAGON]) {
                 /* Silver dragons are silver in color, not made of silver */
-                Sprintf(verbuf, "%s!  Your silver sheen does not frighten me!",
+                Sprintf(verbuf,
+                        "%s!  Your silver sheen"" does not frighten me!",
                         (gy.youmonst.data == &mons[PM_SILVER_DRAGON])
                             ? "Fool"
                             : "Young Fool");
@@ -1067,11 +1068,12 @@ domonnoise(struct monst *mtmp)
                                Phase 1         Phase 2      Phase 3
                          Collect underpants       ?          Profit
                    and they never verbalize step 2 so we don't either */
-                verbl_msg = (gnomeplan == 1) ? "Phase one, collect underpants."
-                                             : "Phase three, profit!";
+                verbl_msg = (gnomeplan == 1)
+                            ? "Phase one, collect underpants."
+                            : "Phase three, profit!";
             } else {
-                verbl_msg =
-                "Many enter the dungeon, and few return to the sunlit lands.";
+                verbl_msg = "Many enter the dungeon,"
+                            " and few return to the sunlit lands.";
             }
         } else
             switch (monsndx(ptr)) {
@@ -1334,7 +1336,8 @@ dochat(void)
                           Hallucination ? rndmonnam((char *) 0) : "statue");
             return ECMD_OK;
         }
-        if (!Deaf && (IS_WALL(levl[tx][ty].typ) || levl[tx][ty].typ == SDOOR)) {
+        if (!Deaf && (IS_WALL(levl[tx][ty].typ)
+                      || levl[tx][ty].typ == SDOOR)) {
             /* Talking to a wall; secret door remains hidden by behaving
                like a wall; IS_WALL() test excludes solid rock even when
                that serves as a wall bordering a corridor */
@@ -1561,9 +1564,11 @@ add_sound_mapping(const char *mapping)
     text[sizeof text - 1] = '\0';
     if (sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d %d",
                text, filename, &volume, &idx) == 4
-        || sscanf(mapping, "MESG %10[^\"] \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d %d",
+        || sscanf(mapping,
+                  "MESG %10[^\"] \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d %d",
                   msgtyp, text, filename, &volume, &idx) == 5
-        || sscanf(mapping, "MESG %10[^\"] \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d",
+        || sscanf(mapping,
+                  "MESG %10[^\"] \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d",
                   msgtyp, text, filename, &volume) == 4
         || sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d",
                   text, filename, &volume) == 3) {
@@ -1587,7 +1592,8 @@ add_sound_mapping(const char *mapping)
 
             if (!regex_compile(text, new_map->regex)) {
                 char errbuf[BUFSZ];
-                char *re_error_desc = regex_error_desc(new_map->regex, errbuf);
+                char *re_error_desc
+                         = regex_error_desc(new_map->regex, errbuf);
 
                 regex_free(new_map->regex);
                 free((genericptr_t) new_map->filename);
@@ -2134,7 +2140,11 @@ base_soundname_to_filename(
 #endif
 
 void
-set_voice(struct monst *mtmp SPEECHONLY, int32_t tone SPEECHONLY, int32_t volume SPEECHONLY, int32_t moreinfo SPEECHONLY)
+set_voice(
+    struct monst *mtmp SPEECHONLY,
+    int32_t tone SPEECHONLY,
+    int32_t volume SPEECHONLY,
+    int32_t moreinfo SPEECHONLY)
 {
 #ifdef SND_SPEECH
     int32_t gender = (mtmp && mtmp->female) ? FEMALE : MALE;

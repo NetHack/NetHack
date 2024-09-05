@@ -4,7 +4,7 @@
 
 #include "hack.h"
 
-/* spellmenu arguments; 0 thru n-1 used as svs.spl_book[] index when swapping */
+/* spellmenu arguments; 0..n-1 used as svs.spl_book[] index when swapping */
 #define SPELLMENU_CAST (-2)
 #define SPELLMENU_VIEW (-1)
 #define SPELLMENU_SORT (MAXSPELL) /* special menu entry */
@@ -498,7 +498,8 @@ study_book(struct obj *spellbook)
            svc.context.spbook.book become erased somehow, resume reading it */
         && booktype != SPE_BLANK_PAPER) {
         You("continue your efforts to %s.",
-            (booktype == SPE_NOVEL) ? "read the novel" : "memorize the spell");
+            (booktype == SPE_NOVEL) ? "read the novel"
+                                    : "memorize the spell");
     } else {
         /* KMH -- Simplified this code */
         if (booktype == SPE_BLANK_PAPER) {
@@ -516,7 +517,8 @@ study_book(struct obj *spellbook)
                              spellbook->o_id)) {
                 if (!u.uconduct.literate++)
                     livelog_printf(LL_CONDUCT,
-                                   "became literate by reading %s", tribtitle);
+                                   "became literate by reading %s",
+                                   tribtitle);
 
                 check_unpaid(spellbook);
                 makeknown(booktype);
@@ -2033,7 +2035,8 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 staticfn boolean
 dospellmenu(
     const char *prompt,
-    int splaction, /* SPELLMENU_CAST, SPELLMENU_VIEW, or svs.spl_book[] index */
+    int splaction, /* SPELLMENU_CAST, SPELLMENU_VIEW, or
+                    * svs.spl_book[] index */
     int *spell_no)
 {
     winid tmpwin;
