@@ -11,6 +11,7 @@
 staticfn boolean could_move_onto_boulder(coordxy, coordxy);
 staticfn void moverock_done(coordxy, coordxy);
 staticfn int moverock(void);
+staticfn int moverock_core(coordxy, coordxy);
 staticfn void dosinkfall(void);
 staticfn boolean findtravelpath(int);
 staticfn boolean trapmove(coordxy, coordxy, struct trap *);
@@ -166,21 +167,31 @@ moverock_done(coordxy sx, coordxy sy)
 staticfn int
 moverock(void)
 {
-    coordxy rx, ry, sx, sy;
+    coordxy sx, sy;
+    int ret;
+
+    sx = u.ux + u.dx, sy = u.uy + u.dy; /* boulder starting position */
+    ret = moverock_core(sx, sy);
+    moverock_done(sx, sy);
+    return ret;
+}
+
+staticfn int
+moverock_core(coordxy sx, coordxy sy)
+{
+    coordxy rx, ry;
     struct obj *otmp;
     struct trap *ttmp;
     struct monst *mtmp, *shkp;
     const char *what;
     boolean costly, firstboulder = TRUE;
 
-    sx = u.ux + u.dx, sy = u.uy + u.dy; /* boulder starting position */
     while ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
 
         if (Blind && glyph_to_obj(glyph_at(sx, sy)) != BOULDER) {
             pline("That feels like a boulder.");
             map_object(otmp, TRUE);
             nomul(0);
-            moverock_done(sx, sy);
             return -1;
         }
 
@@ -232,7 +243,6 @@ moverock(void)
                     svc.context.door_opened = svc.context.move = TRUE;
                 res = -1; /* don't move to <sx,sy>, so no soko guilt */
             }
-            moverock_done(sx, sy); /* stop further push attempts */
             return res;
         }
         if (Levitation || Is_airlevel(&u.uz)) {
@@ -244,7 +254,6 @@ moverock(void)
                 feel_location(sx, sy);
             You("don't have enough leverage to push %s.", the(xname(otmp)));
             /* Give them a chance to climb over it? */
-            moverock_done(sx, sy);
             return -1;
         }
         if (verysmall(gy.youmonst.data) && !u.usteed) {
@@ -273,7 +282,6 @@ moverock(void)
 
             if (revive_nasty(rx, ry,
                              "You sense movement on the other side.")) {
-                moverock_done(sx, sy);
                 return -1;
             }
 
@@ -319,7 +327,6 @@ moverock(void)
             if (ttmp) {
                 int newlev = 0; /* lint suppression */
                 d_level dest;
-                int res;
 
                 /* if a trap operates on the boulder, don't attempt
                    to move any others at this location; return -1
@@ -348,9 +355,7 @@ moverock(void)
                         fill_pit(u.ux, u.uy);
                         if (cansee(rx, ry))
                             newsym(rx, ry);
-                        res = sobj_at(BOULDER, sx, sy) ? -1 : 0;
-                        moverock_done(sx, sy);
-                        return res;
+                        return sobj_at(BOULDER, sx, sy) ? -1 : 0;
                     }
                     break;
                 case SPIKED_PIT:
@@ -366,9 +371,7 @@ moverock(void)
                     }
                     if (mtmp && !Blind)
                         newsym(rx, ry);
-                    res = sobj_at(BOULDER, sx, sy) ? -1 : 0;
-                    moverock_done(sx, sy);
-                    return res;
+                    return sobj_at(BOULDER, sx, sy) ? -1 : 0;
                 case HOLE:
                 case TRAPDOOR:
                     Soundeffect(se_kerplunk_boulder_gone, 40);
@@ -391,9 +394,7 @@ moverock(void)
                     levl[rx][ry].candig = 1;
                     if (cansee(rx, ry))
                         newsym(rx, ry);
-                    res = sobj_at(BOULDER, sx, sy) ? -1 : 0;
-                    moverock_done(sx, sy);
-                    return res;
+                    return sobj_at(BOULDER, sx, sy) ? -1 : 0;
                 case LEVEL_TELEP:
                     /* 20% chance of picking current level; 100% chance for
                        that if in single-level branch (Knox) or in endgame */
@@ -423,9 +424,7 @@ moverock(void)
                         otmp->owornmask = (long) MIGR_RANDOM;
                     }
                     seetrap(ttmp);
-                    res = sobj_at(BOULDER, sx, sy) ? -1 : 0;
-                    moverock_done(sx, sy);
-                    return res;
+                    return sobj_at(BOULDER, sx, sy) ? -1 : 0;
                 default:
                     break; /* boulder not affected by this trap */
                 }
@@ -559,7 +558,6 @@ moverock(void)
                        past it without pushing it to plug a pit or hole */
                     sokoban_guilt();
                 }
-                moverock_done(sx, sy);
                 return 0;
             }
 
@@ -567,15 +565,12 @@ moverock(void)
                 pline(
                    "However, you can squeeze yourself into a small opening.");
                 sokoban_guilt();
-                moverock_done(sx, sy);
                 return 0;
             } else {
-                moverock_done(sx, sy);
                 return -1;
             }
         }
     }
-    moverock_done(sx, sy);
     return 0;
 }
 
