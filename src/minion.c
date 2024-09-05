@@ -459,7 +459,8 @@ ndemon(aligntyp atyp) /* A_NONE is used for 'any alignment' */
 
 /* guardian angel has been affected by conflict so is abandoning hero */
 void
-lose_guardian_angel(struct monst *mon) /* if null, angel hasn't been created yet */
+lose_guardian_angel(
+    struct monst *mon) /* if Null, angel hasn't been created yet */
 {
     coord mm;
     int i;

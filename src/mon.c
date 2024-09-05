@@ -865,7 +865,7 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
 #else
     default:
 #endif
-default_1:
+ default_1:
         if (svm.mvitals[mndx].mvflags & G_NOCORPSE) {
             return (struct obj *) 0;
         } else {
@@ -1038,7 +1038,8 @@ minliquid_core(struct monst *mtmp)
          * water damage to dead monsters' inventory, but survivors need to
          * be handled here.  Swimmers are able to protect their stuff...
          */
-        if ((waterwall || !is_clinger(mtmp->data)) && !cant_drown(mtmp->data)) {
+        if ((waterwall || !is_clinger(mtmp->data))
+            && !cant_drown(mtmp->data)) {
             /* like hero with teleport intrinsic or spell, teleport away
                if possible */
             if (can_teleport(mtmp->data) && !tele_restrict(mtmp)) {
@@ -1685,9 +1686,9 @@ mon_give_prop(struct monst *mtmp, int prop)
     const char *msg = NULL;
     unsigned short intrinsic = 0; /* MR_* constant */
 
-    /* Pets don't have all the fields that the hero does, so they can't get all
-       the same intrinsics. If it happens to choose strength gain or teleport
-       control or whatever, ignore it. */
+    /* Pets don't have all the fields that the hero does, so they can't get
+       all the same intrinsics.  If it happens to choose strength gain or
+       teleport control or whatever, ignore it. */
     switch (prop) {
     case FIRE_RES:
         msg = "%s shivers slightly.";
@@ -2224,7 +2225,8 @@ mfndpos(
                 /* Displacement also displaces the Elbereth/scare monster,
                  * as long as you are visible.
                  */
-                if (Displaced && monseeu && mon->mux == nx && mon->muy == ny) {
+                if (Displaced && monseeu
+                    && mon->mux == nx && mon->muy == ny) {
                     dispx = u.ux;
                     dispy = u.uy;
                 } else {
@@ -2275,7 +2277,8 @@ mfndpos(
                     }
                     /* Note: ALLOW_SANCT only prevents movement, not
                        attack, into a temple. */
-                    if (svl.level.flags.has_temple && *in_rooms(nx, ny, TEMPLE)
+                    if (svl.level.flags.has_temple
+                        && *in_rooms(nx, ny, TEMPLE)
                         && !*in_rooms(x, y, TEMPLE)
                         && in_your_sanctuary((struct monst *) 0, nx, ny)) {
                         if (!(flag & ALLOW_SANCT))
@@ -2309,8 +2312,8 @@ mfndpos(
                  */
                 if ((ttmp = t_at(nx, ny)) != 0) {
                     if (ttmp->ttyp >= TRAPNUM || ttmp->ttyp == 0) {
-                        impossible(
-                         "A monster looked at a very strange trap of type %d.",
+                        impossible("A monster looked at a very strange trap"
+                                   " of type %d.",
                                    ttmp->ttyp);
                             continue;
                     }
@@ -3084,7 +3087,8 @@ corpse_chance(
                     There("is an explosion in your %s!", body_part(STOMACH));
                     Sprintf(svk.killer.name, "%s explosion",
                             s_suffix(pmname(mdat, Mgender(mon))));
-                    losehp(Maybe_Half_Phys(tmp), svk.killer.name, KILLED_BY_AN);
+                    losehp(Maybe_Half_Phys(tmp), svk.killer.name,
+                           KILLED_BY_AN);
                 } else {
                     You_hear("an explosion.");
                     magr->mhp -= tmp;
@@ -3348,7 +3352,7 @@ killed(struct monst *mtmp)
 void
 xkilled(
     struct monst *mtmp,
-    int xkill_flags) /* 1: suppress message, 2: suppress corpse, 4: pacifist */
+    int xkill_flags) /* 1: suppress mesg, 2: suppress corpse, 4: pacifist */
 {
     int tmp, mndx;
     coordxy x = mtmp->mx, y = mtmp->my;
@@ -3932,7 +3936,8 @@ mnearto(
 
     if (move_other && othermon) {
         res = 2; /* moving another monster out of the way */
-        if (!mnearto(othermon, x, y, FALSE, rlocflags))  /* no 'move_other' this time */
+        /* 'move_other'==FALSE this time; fail rather than recurse */
+        if (!mnearto(othermon, x, y, FALSE, rlocflags))
             deal_with_overcrowding(othermon);
     }
 

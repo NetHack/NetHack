@@ -486,10 +486,10 @@ RESTORE_WARNING_UNREACHABLE_CODE
    and set the x and y values.
    return TRUE if there are such params in the stack.
    Note that this does not adjust the values of x and y at all from what is
-   specified in the level file; so, it returns absolute coordinates rather than
-   map-relative coordinates. Callers of this function must decide if they want
-   to interpret the values as absolute or as map-relative, and adjust
-   accordingly.
+   specified in the level file; so, it returns absolute coordinates rather
+   than map-relative coordinates. Callers of this function must decide if
+   they want to interpret the values as absolute or as map-relative, and
+   adjust accordingly.
  */
 boolean
 nhl_get_xy_params(lua_State *L, lua_Integer *x, lua_Integer *y)
@@ -700,11 +700,12 @@ nhl_getlin(lua_State *L)
 }
 
 /*
- selected = menu("prompt", default, pickX, { "a" = "option a", "b" = "option b", ...})
+ selected = menu("prompt",default,pickX,{"a"="option a", "b"="option b",...})
  pickX = 0,1,2, or "none", "one", "any" (PICK_X in code)
 
  selected = menu("prompt", default, pickX,
-                { {key:"a", text:"option a"}, {key:"b", text:"option b"}, ... } ) */
+                 {{key:"a", text:"option a"},{key:"b", text:"option b"},... })
+ */
 staticfn int
 nhl_menu(lua_State *L)
 {
@@ -2335,12 +2336,14 @@ static struct e ct_base_base[] = {
     { EOT, NULL }
 };
 
-/* NHL_BASE_ERROR - not really safe - might not want Lua to kill the process */
+/* NHL_BASE_ERROR - not really safe--might not want Lua to kill the process */
 static struct e ct_base_error[] = {
-    { IFFLAG, "assert" },   /* ok, calls error */
-    { IFFLAG, "error" },    /* ok, calls G->panic */
-    { NEVER, "print" }, /*not ok - calls lua_writestring/lua_writeline -> stdout*/
-    { NEVER, "warn" }, /*not ok - calls lua_writestringerror -> stderr*/
+    { IFFLAG, "assert" }, /* ok, calls error */
+    { IFFLAG, "error" },  /* ok, calls G->panic */
+    { NEVER, "print" },   /* not ok - calls lua_writestring/lua_writeline
+                           * which write to stdout */
+    { NEVER, "warn" },    /* not ok - calls lua_writestringerror which writes
+                           * to stderr */
     { EOT, NULL }
 };
 
@@ -2548,13 +2551,15 @@ is pop sufficient? XXX or wrong - look at the balance
  */
 #define HOOKTBLNAME "org.nethack.nethack.sb.fs"
 #ifdef notyet
-static int (*io_open)(lua_State *) = NULL; /* XXX this may have to be in g TBD */
+static int (*io_open)(lua_State *) = NULL; /* XXX this may have to be in
+                                            * struct g (gi now) TBD */
 #endif
 
 void
 nhl_pushhooked_open_table(lua_State *L)
 {
     int hot = lua_getfield(L, LUA_REGISTRYINDEX, HOOKTBLNAME);
+
     if (hot == LUA_TNONE) {
         lua_newtable(L);
         lua_pushvalue(L, -1);

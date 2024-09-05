@@ -28,21 +28,21 @@ static NEARDATA const char *breathwep[] = {
 /* hallucinatory ray types */
 static const char *const hallublasts[] = {
     "asteroids", "beads", "bubbles", "butterflies", "champagne", "chaos",
-    "coins", "cotton candy", "crumbs", "dark matter", "darkness", "dust specks",
-    "emoticons", "emotions", "entropy", "flowers", "foam", "fog", "gamma rays",
-    "gelatin", "gemstones", "ghosts", "glass shards", "glitter", "good vibes",
-    "gravel", "gravity", "gravy", "grawlixes", "holy light", "hornets",
-    "hot air", "hyphens", "hypnosis", "infrared", "insects", "laser beams",
-    "leaves", "lightening", "logic gates", "magma", "marbles", "mathematics",
-    "megabytes", "metal shavings", "metapatterns", "meteors", "mist", "mud",
-    "music", "nanites", "needles", "noise", "nostalgia", "oil", "paint",
-    "photons", "pixels", "plasma", "polarity", "powder", "powerups",
-    "prismatic light", "pure logic", "purple", "radio waves", "rainbows",
-    "rock music", "rocket fuel", "rope", "sadness", "salt", "sand", "scrolls",
-    "sludge", "smileys", "snowflakes", "sparkles", "specularity", "spores",
-    "stars", "steam", "tetrahedrons", "text", "the past", "tornadoes",
-    "toxic waste", "ultraviolet light", "viruses", "water", "waveforms", "wind",
-    "X-rays", "zorkmids"
+    "coins", "cotton candy", "crumbs", "dark matter", "darkness", "data",
+    "dust specks", "emoticons", "emotions", "entropy", "flowers", "foam",
+    "fog", "gamma rays", "gelatin", "gemstones", "ghosts", "glass shards",
+    "glitter", "good vibes", "gravel", "gravity", "gravy", "grawlixes",
+    "holy light", "hornets", "hot air", "hyphens", "hypnosis", "infrared",
+    "insects", "jargon", "laser beams", "leaves", "lightening", "logic gates",
+    "magma", "marbles", "mathematics", "megabytes", "metal shavings",
+    "metapatterns", "meteors", "mist", "mud", "music", "nanites", "needles",
+    "noise", "nostalgia", "oil", "paint", "photons", "pixels", "plasma",
+    "polarity", "powder", "powerups", "prismatic light", "pure logic",
+    "purple", "radio waves", "rainbows", "rock music", "rocket fuel", "rope",
+    "sadness", "salt", "sand", "scrolls", "sludge", "smileys", "snowflakes",
+    "sparkles", "specularity", "spores", "stars", "steam", "tetrahedrons",
+    "text", "the past", "tornadoes", "toxic waste", "ultraviolet light",
+    "viruses", "water", "waveforms", "wind", "X-rays", "zorkmids"
 };
 
 /* Return a random hallucinatory blast. */
@@ -121,8 +121,8 @@ thitu(
         if (is_acid && Acid_resistance) {
             pline("It doesn't seem to hurt you.");
             monstseesu(M_SEEN_ACID);
-        } else if (obj && stone_missile(obj) && passes_rocks(gy.youmonst.data)) {
-
+        } else if (obj && stone_missile(obj)
+                   && passes_rocks(gy.youmonst.data)) {
             /* use 'named' as an approximation for "hitting from above";
                we avoid "passes through you" for horizontal flight path
                because missile stops and that wording would suggest that
@@ -319,8 +319,8 @@ ohitmon(
     struct obj *otmp,   /* missile; might be destroyed by drop_throw */
     int range,          /* how much farther will object travel if it misses;
                          * use -1 to signify to keep going even after hit,
-                         * unless it's gone (used for rolling_boulder_traps) */
-    boolean verbose)/* give message(s) even when you can't see what happened */
+                         * unless it's gone (for rolling_boulder_traps) */
+    boolean verbose)/* give messages even when you can't see what happened */
 {
     int damage, tmp;
     boolean vis, ismimic, objgone;

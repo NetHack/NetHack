@@ -170,7 +170,8 @@ md_start(coord *startp)
      * hero.
      */
     while (stway) {
-        if (stway->tolev.dnum == u.uz.dnum && couldsee(stway->sx, stway->sy)) {
+        if (stway->tolev.dnum == u.uz.dnum
+            && couldsee(stway->sx, stway->sy)) {
             startp->x = stway->sx;
             startp->y = stway->sy;
             return TRUE;
@@ -184,8 +185,8 @@ md_start(coord *startp)
      * position that could be seen.  What we really ought to be doing is
      * finding a path from a stairwell...
      *
-     * The arrays gv.viz_rmin[] and gv.viz_rmax[] are set even when blind.  These
-     * are the LOS limits for each row.
+     * The arrays gv.viz_rmin[] and gv.viz_rmax[] are set even when blind.
+     * These are the LOS limits for each row.
      */
     lax = 0; /* be picky */
     max_distance = -1;
@@ -447,7 +448,8 @@ ckmailstatus(void)
         return;
     if (mustgetmail < 0) {
 #if defined(AMIGA) || defined(MSDOS) || defined(TOS)
-        mustgetmail = (svm.moves < 2000) ? (100 + rn2(2000)) : (2000 + rn2(3000));
+        mustgetmail = (svm.moves < 2000) ? (100 + rn2(2000))
+                                         : (2000 + rn2(3000));
 #endif
         return;
     }
@@ -488,11 +490,13 @@ readmail(struct obj *otmp UNUSED)
            (suboptimal but works correctly);
            dollar sign and fractional zorkmids are inappropriate within
            nethack but are suitable for typical dysfunctional spam mail */
-     "Buy a potion of gain level for only $19.99!  Guaranteed to be blessed!",
-        /* DEVTEAM_URL will be substituted for 2nd "%s"; terminating punctuation
-           (formerly "!") has deliberately been omitted so that it can't be
-           mistaken for part of the URL (unfortunately that is still followed
-           by a closing quote--in the pline below, not the data here) */
+        ("Buy a potion of gain level for only $19.99! "
+         " Guaranteed to be blessed!"),
+        /* DEVTEAM_URL will be substituted for 2nd "%s";
+           terminating punctuation (formerly "!") has deliberately been
+           omitted so that it can't be mistaken for part of the URL
+           (unfortunately that is still followed by a closing quote--in
+           the pline below, not the data here) */
         "%sInvitation: Visit the NetHack web site at %s%s"
     };
     const char *const it_reads = "It reads:  \"";

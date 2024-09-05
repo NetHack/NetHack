@@ -320,13 +320,16 @@ fill_zoo(struct mkroom *sroom)
             if (sroom->irregular) {
                 if ((int) levl[sx][sy].roomno != rmno || levl[sx][sy].edge
                     || (sroom->doorct
-                        && distmin(sx, sy, svd.doors[sh].x, svd.doors[sh].y) <= 1))
+                        && (distmin(sx, sy, svd.doors[sh].x, svd.doors[sh].y)
+                            <= 1)))
                     continue;
             } else if (!SPACE_POS(levl[sx][sy].typ)
                        || (sroom->doorct
                            && ((sx == sroom->lx && svd.doors[sh].x == sx - 1)
-                               || (sx == sroom->hx && svd.doors[sh].x == sx + 1)
-                               || (sy == sroom->ly && svd.doors[sh].y == sy - 1)
+                               || (sx == sroom->hx && svd.doors[sh].x
+                                   == sx + 1)
+                               || (sy == sroom->ly && svd.doors[sh].y
+                                   == sy - 1)
                                || (sy == sroom->hy
                                    && svd.doors[sh].y == sy + 1))))
                 continue;
@@ -362,7 +365,8 @@ fill_zoo(struct mkroom *sroom)
             case ZOO:
             case LEPREHALL:
                 if (sroom->doorct) {
-                    int distval = dist2(sx, sy, svd.doors[sh].x, svd.doors[sh].y);
+                    int distval = dist2(sx, sy,
+                                        svd.doors[sh].x, svd.doors[sh].y);
                     i = sq(distval);
                 } else
                     i = goldlim;
@@ -1022,17 +1026,17 @@ cmap_to_type(int sym)
     return typ;
 }
 
-/* With the introduction of themed rooms, there are certain room shapes that may
- * generate a door, the square just inside the door, and only one other ROOM
- * square touching that one. E.g.
+/* With the introduction of themed rooms, there are certain room shapes that
+ * may generate a door, the square just inside the door, and only one other
+ * ROOM square touching that one. E.g.
  *   ---
  * ---..
  * +....
  * ---..
  *   ---
- * This means that if the room becomes a shop, the shopkeeper will move between
- * those two squares nearest the door without ever allowing the player to get
- * past them.
+ * This means that if the room becomes a shop, the shopkeeper will move
+ * between those two squares nearest the door without ever allowing the
+ * player to get past them.
  * Before approving sroom as a shop, check for this circumstance, and if it
  * exists, don't consider it as valid for a shop.
  *

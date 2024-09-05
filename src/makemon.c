@@ -76,7 +76,10 @@ wrong_elem_type(struct permonst *ptr)
 
 /* make a group just like mtmp */
 staticfn void
-m_initgrp(struct monst *mtmp, coordxy x, coordxy y, int n, mmflags_nht mmflags)
+m_initgrp(
+    struct monst *mtmp,
+    coordxy x, coordxy y, int n,
+    mmflags_nht mmflags)
 {
     coord mm;
     int cnt = rnd(n);
@@ -830,7 +833,8 @@ clone_mon(
     struct monst *m2;
 
     /* may be too weak or have been extinguished for population control */
-    if (mon->mhp <= 1 || (svm.mvitals[monsndx(mon->data)].mvflags & G_EXTINCT))
+    if (mon->mhp <= 1
+        || (svm.mvitals[monsndx(mon->data)].mvflags & G_EXTINCT) != 0)
         return (struct monst *) 0;
 
     if (x == 0) {
@@ -1269,7 +1273,7 @@ makemon(
         mon_learns_traps(mtmp, PIT);
         mon_learns_traps(mtmp, HOLE);
     }
-    if (Is_stronghold(&u.uz) && !mindless(ptr)) /* know about the trap doors */
+    if (Is_stronghold(&u.uz) && !mindless(ptr)) /* know about trap doors */
         mon_learns_traps(mtmp, TRAPDOOR);
     /* quest leader and nemesis both know about all trap types */
     if (ptr->msound == MS_LEADER || ptr->msound == MS_NEMESIS)
@@ -1502,7 +1506,8 @@ unmakemon(
        that just happened when creating this monster or the threshold
        had already been reached and further increments were suppressed;
        assume the latter */
-    if (countbirth && svm.mvitals[mndx].born > 0 && svm.mvitals[mndx].born < 255)
+    if (countbirth && svm.mvitals[mndx].born > 0
+        && svm.mvitals[mndx].born < 255)
         svm.mvitals[mndx].born -= 1;
     if ((mon->data->geno & G_UNIQ) != 0)
         svm.mvitals[mndx].mvflags &= ~G_EXTINCT;
@@ -1780,7 +1785,8 @@ mkclass_aligned(char class, int spc, /* special mons[].geno handling */
     /*  Assumption #2:  monsters of a given class are presented in ascending
      *                  order of strength.
      */
-    for (last = first; last < SPECIAL_PM && mons[last].mlet == class; last++) {
+    for (last = first; last < SPECIAL_PM && mons[last].mlet == class;
+         last++) {
         if (atyp != A_NONE && sgn(mons[last].maligntyp) != sgn(atyp))
             continue;
         /* traditionally mkclass() ignored hell-only and never-in-hell;

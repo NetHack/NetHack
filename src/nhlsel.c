@@ -79,7 +79,8 @@ l_selection_gc(lua_State *L)
 staticfn struct selectionvar *
 l_selection_to(lua_State *L, int index)
 {
-    struct selectionvar *sel = (struct selectionvar *) lua_touserdata(L, index);
+    struct selectionvar *sel
+                           = (struct selectionvar *) lua_touserdata(L, index);
 
     if (!sel)
         nhl_error(L, "Selection error");
@@ -92,8 +93,8 @@ staticfn struct selectionvar *
 l_selection_push_new(lua_State *L)
 {
     struct selectionvar *tmp = selection_new();
-    struct selectionvar
-        *sel = (struct selectionvar *) lua_newuserdata(L, sizeof(struct selectionvar));
+    struct selectionvar *sel
+   = (struct selectionvar *) lua_newuserdata(L, sizeof (struct selectionvar));
 
     luaL_getmetatable(L, "selection");
     lua_setmetatable(L, -2);
@@ -109,8 +110,8 @@ l_selection_push_new(lua_State *L)
 void
 l_selection_push_copy(lua_State *L, struct selectionvar *tmp)
 {
-    struct selectionvar
-        *sel = (struct selectionvar *) lua_newuserdata(L, sizeof(struct selectionvar));
+    struct selectionvar *sel
+   = (struct selectionvar *) lua_newuserdata(L, sizeof (struct selectionvar));
 
     luaL_getmetatable(L, "selection");
     lua_setmetatable(L, -2);
@@ -152,7 +153,7 @@ DISABLE_WARNING_UNREACHABLE_CODE
 /* local sel = selection.set(); */
 /* local sel = sel:set(); */
 /* local sel = selection.set(sel); */
-/* TODO: allow setting multiple coordinates at once: set({x,y}, {x,y}, ...); */
+/* TODO: allow setting multiple coords at once: set({x1,y1},{x2,y2},...); */
 staticfn int
 l_selection_setpoint(lua_State *L)
 {
@@ -240,7 +241,8 @@ l_selection_getpoint(lua_State *L)
         crd = SP_COORD_PACK_RANDOM(0);
     else
         crd = SP_COORD_PACK(x,y);
-    get_location_coord(&x, &y, ANY_LOC, gc.coder ? gc.coder->croom : NULL, crd);
+    get_location_coord(&x, &y, ANY_LOC,
+                       gc.coder ? gc.coder->croom : NULL, crd);
 
     val = selection_getpoint(x, y, sel);
     lua_settop(L, 0);
@@ -277,7 +279,7 @@ l_selection_not(lua_State *L)
 staticfn int
 l_selection_and(lua_State *L)
 {
-    int x,y;
+    int x, y;
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
     struct selectionvar *selr = l_selection_push_new(L);
@@ -287,7 +289,9 @@ l_selection_and(lua_State *L)
 
     for (x = rect.lx; x <= rect.hx; x++)
         for (y = rect.ly; y <= rect.hy; y++) {
-            int val = selection_getpoint(x, y, sela) & selection_getpoint(x, y, selb);
+            int val = (selection_getpoint(x, y, sela)
+                       & selection_getpoint(x, y, selb));
+
             selection_setpoint(x, y, selr, val);
         }
 
@@ -310,7 +314,9 @@ l_selection_or(lua_State *L)
 
     for (x = rect.lx; x <= rect.hx; x++)
         for (y = rect.ly; y <= rect.hy; y++) {
-            int val = selection_getpoint(x, y, sela) | selection_getpoint(x, y, selb);
+            int val = (selection_getpoint(x, y, sela)
+                       | selection_getpoint(x, y, selb));
+
             selection_setpoint(x, y, selr, val);
         }
     selr->bounds = rect;
@@ -334,11 +340,13 @@ l_selection_xor(lua_State *L)
 
     for (x = rect.lx; x <= rect.hx; x++)
         for (y = rect.ly; y <= rect.hy; y++) {
-            int val = selection_getpoint(x, y, sela) ^ selection_getpoint(x, y, selb);
+            int val = (selection_getpoint(x, y, sela)
+                       ^ selection_getpoint(x, y, selb));
+
             selection_setpoint(x, y, selr, val);
         }
-    /* this may have created a smaller or irregular selection with bounds_dirty
-     * set to true - update its boundaries */
+    /* this may have created a smaller or irregular selection with
+     * bounds_dirty set to true - update its boundaries */
     selection_recalc_bounds(selr);
 
     lua_remove(L, 1);
@@ -366,8 +374,8 @@ l_selection_sub(lua_State *L)
             int val = (a_pt ^ b_pt) & a_pt;
             selection_setpoint(x, y, selr, val);
         }
-    /* this may have created a smaller or irregular selection with bounds_dirty
-     * set to true - update its boundaries */
+    /* this may have created a smaller or irregular selection with
+     * bounds_dirty set to true - update its boundaries */
     selection_recalc_bounds(selr);
 
     lua_remove(L, 1);
@@ -506,8 +514,10 @@ l_selection_line(lua_State *L)
         nhl_error(L, "selection.line: illegal arguments");
     }
 
-    get_location_coord(&x1, &y1, ANY_LOC, gc.coder ? gc.coder->croom : NULL, SP_COORD_PACK(x1,y1));
-    get_location_coord(&x2, &y2, ANY_LOC, gc.coder ? gc.coder->croom : NULL, SP_COORD_PACK(x2,y2));
+    get_location_coord(&x1, &y1, ANY_LOC, gc.coder ? gc.coder->croom : NULL,
+                       SP_COORD_PACK(x1, y1));
+    get_location_coord(&x2, &y2, ANY_LOC, gc.coder ? gc.coder->croom : NULL,
+                       SP_COORD_PACK(x2, y2));
 
     (void) l_selection_clone(L);
     sel = l_selection_check(L, 2);
@@ -603,10 +613,10 @@ l_selection_randline(lua_State *L)
         (void) l_selection_check(L, 1);
     }
 
-    get_location_coord(&x1, &y1, ANY_LOC,
-                       gc.coder ? gc.coder->croom : NULL, SP_COORD_PACK(x1, y1));
-    get_location_coord(&x2, &y2, ANY_LOC,
-                       gc.coder ? gc.coder->croom : NULL, SP_COORD_PACK(x2, y2));
+    get_location_coord(&x1, &y1, ANY_LOC, gc.coder ? gc.coder->croom : NULL,
+                       SP_COORD_PACK(x1, y1));
+    get_location_coord(&x2, &y2, ANY_LOC, gc.coder ? gc.coder->croom : NULL,
+                       SP_COORD_PACK(x2, y2));
 
     (void) l_selection_clone(L);
     sel = l_selection_check(L, 2);
@@ -619,10 +629,13 @@ l_selection_randline(lua_State *L)
 staticfn int
 l_selection_grow(lua_State *L)
 {
+    const char *const growdirs[] = {
+        "all", "random", "north", "west", "east", "south", NULL
+    };
+    const int growdirs2i[] = {
+        W_ANY, W_RANDOM, W_NORTH, W_WEST, W_EAST, W_SOUTH, 0
+    };
     int argc = lua_gettop(L);
-    const char *const growdirs[] = { "all", "random", "north", "west", "east", "south", NULL };
-    const int growdirs2i[] = { W_ANY, W_RANDOM, W_NORTH, W_WEST, W_EAST, W_SOUTH, 0 };
-
     struct selectionvar *sel = l_selection_check(L, 1);
     int dir = growdirs2i[luaL_checkoption(L, 2, "all", growdirs)];
 
@@ -723,8 +736,8 @@ l_selection_flood(lua_State *L)
         /*NOTREACHED*/
     }
 
-    get_location_coord(&x, &y, ANY_LOC,
-                       gc.coder ? gc.coder->croom : NULL, SP_COORD_PACK(x, y));
+    get_location_coord(&x, &y, ANY_LOC, gc.coder ? gc.coder->croom : NULL,
+                       SP_COORD_PACK(x, y));
 
     if (isok(x, y)) {
         set_floodfillchk_match_under(levl[x][y].typ);
@@ -773,8 +786,8 @@ l_selection_circle(lua_State *L)
         /*NOTREACHED*/
     }
 
-    get_location_coord(&x, &y, ANY_LOC,
-                       gc.coder ? gc.coder->croom : NULL, SP_COORD_PACK(x, y));
+    get_location_coord(&x, &y, ANY_LOC, gc.coder ? gc.coder->croom : NULL,
+                       SP_COORD_PACK(x, y));
 
     selection_do_ellipse(sel, x, y, r, r, !filled);
 
@@ -824,8 +837,8 @@ l_selection_ellipse(lua_State *L)
         /*NOTREACHED*/
     }
 
-    get_location_coord(&x, &y, ANY_LOC,
-                       gc.coder ? gc.coder->croom : NULL, SP_COORD_PACK(x, y));
+    get_location_coord(&x, &y, ANY_LOC, gc.coder ? gc.coder->croom : NULL,
+                       SP_COORD_PACK(x, y));
 
     selection_do_ellipse(sel, x, y, r1, r2, !filled);
 
@@ -847,8 +860,8 @@ l_selection_gradient(lua_State *L)
      * if they are set, the gradient is centered on a (x,y) to (x2,y2) line */
     coordxy x = 0, y = 0, x2 = -1, y2 = -1;
     /* points are always added within mindist of the center; the chance for a
-     * point between mindist and maxdist to be added to the selection starts at
-     * 100% at mindist and decreases linearly to 0% at maxdist */
+     * point between mindist and maxdist to be added to the selection starts
+     * at 100% at mindist and decreases linearly to 0% at maxdist */
     coordxy mindist = 0, maxdist = 0;
     long type = 0;
     static const char *const gradtypes[] = {
@@ -867,8 +880,8 @@ l_selection_gradient(lua_State *L)
         y2 = (coordxy) get_table_int_opt(L, "y2", -1);
         cvt_to_abscoord(&x, &y);
         cvt_to_abscoord(&x2, &y2);
-        /* maxdist is required because there's no obvious default value for it,
-         * whereas mindist has an obvious default of 0 */
+        /* maxdist is required because there's no obvious default value for
+         * it, whereas mindist has an obvious default of 0 */
         maxdist = get_table_int(L, "maxdist");
         mindist = get_table_int_opt(L, "mindist", 0);
 
@@ -896,7 +909,8 @@ l_selection_gradient(lua_State *L)
 
 /* sel:iterate(function(x,y) ... end);
  * The x, y coordinates passed to the function are map- or room-relative
- * rather than absolute, unless there has been no previous map or room defined.
+ * rather than absolute, unless there has been no previous map or room
+ * defined.
  */
 staticfn int
 l_selection_iterate(lua_State *L)
@@ -917,8 +931,9 @@ l_selection_iterate(lua_State *L)
                     lua_pushvalue(L, 2);
                     lua_pushinteger(L, tmpx);
                     lua_pushinteger(L, tmpy);
-                    if (nhl_pcall_handle(L, 2, 0, "l_selection_iterate", NHLpa_impossible)) {
-                        /* abort the loops to prevent possible error cascade */
+                    if (nhl_pcall_handle(L, 2, 0, "l_selection_iterate",
+                                         NHLpa_impossible)) {
+                        /* abort loops to prevent possible error cascade */
                         goto out;
                     }
                 }
@@ -926,7 +941,7 @@ l_selection_iterate(lua_State *L)
         nhl_error(L, "wrong parameters");
         /*NOTREACHED*/
     }
-out:
+ out:
     return 0;
 }
 

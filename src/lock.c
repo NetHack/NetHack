@@ -29,7 +29,8 @@ picking_lock(coordxy *x, coordxy *y)
 boolean
 picking_at(coordxy x, coordxy y)
 {
-    return (boolean) (go.occupation == picklock && gx.xlock.door == &levl[x][y]);
+    return (boolean) (go.occupation == picklock
+                      && gx.xlock.door == &levl[x][y]);
 }
 
 /* produce an occupation string appropriate for the current activity */
@@ -107,7 +108,8 @@ picklock(void)
         /* unfortunately we don't have a 'tknown' flag to record
            "known to be trapped" so declining to disarm and then
            retrying lock manipulation will find it all over again */
-        if (y_n("You find a trap!  Do you want to try to disarm it?") == 'y') {
+        if (y_n("You find a trap!  Do you want to try to disarm it?")
+            == 'y') {
             const char *what;
             boolean alreadyunlocked;
 
@@ -182,7 +184,8 @@ breakchestlock(struct obj *box, boolean destroyit)
             if (!rn2(3) || otmp->oclass == POTION_CLASS) {
                 chest_shatter_msg(otmp);
                 if (costly)
-                    loss += stolen_value(otmp, u.ux, u.uy, peaceful_shk, TRUE);
+                    loss += stolen_value(otmp, u.ux, u.uy, peaceful_shk,
+                                         TRUE);
                 if (otmp->quan == 1L) {
                     obfree(otmp, (struct obj *) 0);
                     continue;
@@ -506,7 +509,8 @@ pick_lock(
                     You_cant("do that with %s.",
                              an(simple_typename(picktyp)));
                     return PICKLOCK_LEARNED_SOMETHING;
-                } else if (autounlock && !touch_artifact(pick, &gy.youmonst)) {
+                } else if (autounlock
+                           && !touch_artifact(pick, &gy.youmonst)) {
                     /* note: for !autounlock, apply already did touch check */
                     return PICKLOCK_DID_SOMETHING;
                 }
@@ -878,7 +882,8 @@ doopen_indir(coordxy x, coordxy y)
                        && (flags.autounlock & AUTOUNLOCK_KICK) != 0
                        && ynq("Kick it?") == 'y') {
                 cmdq_add_ec(CQ_CANNED, dokick);
-                cmdq_add_dir(CQ_CANNED, sgn(cc.x - u.ux), sgn(cc.y - u.uy), 0);
+                cmdq_add_dir(CQ_CANNED,
+                             sgn(cc.x - u.ux), sgn(cc.y - u.uy), 0);
                 res = ECMD_TIME;
             }
         }
@@ -989,7 +994,8 @@ doclose(void)
         schar oldlastseentyp = update_mapseen_for(x, y);
 
         feel_location(x, y);
-        if (door->glyph != oldglyph || svl.lastseentyp[x][y] != oldlastseentyp)
+        if (door->glyph != oldglyph
+            || svl.lastseentyp[x][y] != oldlastseentyp)
             res = ECMD_TIME; /* learned something */
     }
 

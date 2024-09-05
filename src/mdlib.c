@@ -76,7 +76,7 @@ extern int GUILaunched;
 
 /* these are in extern.h but we don't include hack.h */
 /* XXX move to new file mdlib.h? */
-extern void populate_nomakedefs(struct version_info *) NONNULLARG1; /* date.c */
+extern void populate_nomakedefs(struct version_info *) NONNULLARG1; /*date.c*/
 extern void free_nomakedefs(void); /* date.c */
 void runtime_info_init(void);
 const char *do_runtime_info(int *) NO_NNARGS;
@@ -363,9 +363,9 @@ version_id_string(char *outbuf, size_t bufsz, const char *build_date)
     Strcpy(&subbuf[1], PORT_SUB_ID);
 #endif
 
-    Snprintf(outbuf, bufsz, "%s NetHack%s Version %s%s - last %s %s.", PORT_ID,
-            subbuf, mdlib_version_string(versbuf, "."), statusbuf,
-            date_via_env ? "revision" : "build", build_date);
+    Snprintf(outbuf, bufsz, "%s NetHack%s Version %s%s - last %s %s.",
+             PORT_ID, subbuf, mdlib_version_string(versbuf, "."), statusbuf,
+             date_via_env ? "revision" : "build", build_date);
     return outbuf;
 }
 
@@ -836,7 +836,8 @@ build_options(void)
  /*        1         2         3         4         5         6         7
   1234567890123456789012345678901234567890123456789012345678901234567890123456
   */
- "    \"Permission is hereby granted, free of charge, to any person obtaining",
+ ("    \"Permission is hereby granted, free of charge,"
+  " to any person obtaining"),
  "     a copy of this software and associated documentation files (the ",
  "     \"Software\"), to deal in the Software without restriction including",
  "     without limitation the rights to use, copy, modify, merge, publish,",

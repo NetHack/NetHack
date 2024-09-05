@@ -85,7 +85,8 @@ precheck(struct monst *mon, struct obj *obj)
                               mon_nam(mon),
                               Hallucination ? rndmonnam(NULL)
                                             : (const char *) "ghost");
-                        pline("%s is frightened to death, and unable to move.",
+                        pline("%s is frightened to death,"
+                              " and unable to move.",
                               Monnam(mon));
                     }
                     paralyze_monst(mon, 3);
@@ -3157,7 +3158,8 @@ green_mon(struct monst *mon)
         /* approximation */
         if (strstri(ptr->pmnames[NEUTRAL], "green")
             || (ptr->pmnames[MALE] && strstri(ptr->pmnames[MALE], "green"))
-            || (ptr->pmnames[FEMALE] && strstri(ptr->pmnames[FEMALE], "green")))
+            || (ptr->pmnames[FEMALE]
+                && strstri(ptr->pmnames[FEMALE], "green")))
             return TRUE;
         switch (monsndx(ptr)) {
         case PM_FOREST_CENTAUR:

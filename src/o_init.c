@@ -332,7 +332,8 @@ shuffle_all(void)
 
     /* do whole classes (amulets, &c) */
     for (idx = 0; idx < SIZE(shuffle_classes); idx++) {
-        obj_shuffle_range(svb.bases[(int) shuffle_classes[idx]], &first, &last);
+        obj_shuffle_range(svb.bases[(int) shuffle_classes[idx]],
+                          &first, &last);
         shuffle(first, last, TRUE);
     }
     /* do type ranges (helms, &c) */
@@ -577,7 +578,7 @@ static const char *const disco_orders_descr[] = {
 
 int
 choose_disco_sort(
-    int mode) /* 0 => 'O' cmd, 1 => full discoveries; 2 => class discoveries */
+    int mode) /* 0 => 'O' cmd, 1 => full discoveries; 2 => class disco */
 {
     winid tmpwin;
     menu_item *selected;
@@ -607,7 +608,7 @@ choose_disco_sort(
         add_menu_str(tmpwin,
                      "      are equivalent for single class discovery, but");
         add_menu_str(tmpwin,
-                     "      will matter for future use of total discoveries.");
+                    "      will matter for future use of total discoveries.");
     }
     end_menu(tmpwin, "Ordering of discoveries");
 
@@ -995,7 +996,8 @@ doclassdisco(void)
                   : "alphabetical order");
         putstr(tmpwin, 0, buf); /* skip iflags.menu_headings */
         sorted_ct = 0;
-        for (i = svb.bases[(int) oclass]; i <= svb.bases[oclass + 1] - 1; ++i) {
+        for (i = svb.bases[(int) oclass]; i <= svb.bases[oclass + 1] - 1;
+             ++i) {
             if ((dis = svd.disco[i]) != 0 && interesting_to_discover(dis)) {
                 ++ct;
                 Strcpy(buf,  objects[dis].oc_pre_discovered ? "* " : "  ");

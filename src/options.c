@@ -1290,11 +1290,12 @@ optfn_crash_urlmax(
         return optn_ok;
     }
     if (req == do_set) {
-        if ((op = string_for_opt(opts, FALSE))
-            != empty_optstr) {
+        if ((op = string_for_opt(opts, FALSE)) != empty_optstr) {
             int temp = atoi(op);
-            if(temp < 75){
-                config_error_add("Invalid value %d for crash_urlmax.  Minimum value is 75.",temp);
+
+            if (temp < 75){
+                config_error_add("Invalid value %d for crash_urlmax. "
+                                 " Minimum value is 75.", temp);
                 return optn_err;
             }
             gc.crash_urlmax = temp;
@@ -3545,7 +3546,8 @@ optfn_runmode(
                 return optn_err;
             }
         } else {
-            config_error_add("Value is mandatory for %s", allopt[optidx].name);
+            config_error_add("Value is mandatory for %s",
+                             allopt[optidx].name);
             return optn_err;
         }
         return optn_ok;
@@ -5662,9 +5664,11 @@ handler_msg_window(void)
         for (i = 0; i < SIZE(menutype); i++) {
             if (i < 2 && is_curses)
                 continue;
-            Sprintf(buf, "%-12.12s%c%.60s", msgwind[i][0], sep, msgwind[i][1]);
+            Sprintf(buf, "%-12.12s%c%.60s", msgwind[i][0], sep,
+                    msgwind[i][1]);
             any.a_char = c = *msgwind[i][0];
-            add_menu(tmpwin, &nul_glyphinfo, &any, *buf, 0, ATR_NONE, clr, buf,
+            add_menu(tmpwin, &nul_glyphinfo, &any, *buf, 0,
+                     ATR_NONE, clr, buf,
                      (c == iflags.prevmsg_window) ? MENU_ITEMFLAGS_SELECTED
                                                   : MENU_ITEMFLAGS_NONE);
             /* second line is prefixed by spaces that "c - " would use */
@@ -5958,7 +5962,8 @@ handler_runmode(void)
 staticfn int
 handler_petattr(void)
 {
-    int tmp = query_attr("Select pet highlight attribute", iflags.wc2_petattr);
+    int tmp
+        = query_attr("Select pet highlight attribute", iflags.wc2_petattr);
 
     if (tmp != -1) {
         iflags.wc2_petattr = tmp;
@@ -8017,10 +8022,11 @@ fruitadd(char *str, struct fruit *replace_fruit)
                   : (!strncmp(svp.pl_fruit, "medium ", 7)) ? 7
                     : (!strncmp(svp.pl_fruit, "very large ", 11)) ? 11
                       : 0;
-        for (i = svb.bases[FOOD_CLASS]; objects[i].oc_class == FOOD_CLASS; i++) {
+        for (i = svb.bases[FOOD_CLASS]; objects[i].oc_class == FOOD_CLASS;
+             i++) {
             if (!strcmp(OBJ_NAME(objects[i]), svp.pl_fruit)
-                || (globpfx > 0
-                    && !strcmp(OBJ_NAME(objects[i]), &svp.pl_fruit[globpfx]))) {
+                || (globpfx > 0 && !strcmp(OBJ_NAME(objects[i]),
+                                           &svp.pl_fruit[globpfx]))) {
                 found = TRUE;
                 break;
             }
@@ -8612,7 +8618,8 @@ doset(void) /* changing options via menu by Per Liboriussen */
             "For a brief explanation of how this works, type '?' to select",
             "the next menu choice, then press <enter> or <return>.",
             NULL, /* actual '?' menu entry gets inserted here */
-            "[To suppress this menu help, toggle off the 'cmdassist' option.]",
+            ("[To suppress this menu help,"
+             " toggle off the 'cmdassist' option.]"),
             "",
         };
         any = cg.zeroany;
@@ -8621,7 +8628,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
                 Sprintf(buf, "%4s%.75s", "", helptext[i]);
                 add_menu_str(tmpwin, buf);
             } else {
-                any.a_int = HELP_IDX + 1; /* processing pick_list subtracts 1 */
+                any.a_int = HELP_IDX + 1; /* handling pick_list subtracts 1 */
                 add_menu(tmpwin, &nul_glyphinfo, &any, '?', '?', ATR_NONE,
                          clr, "view help for options menu",
                          MENU_ITEMFLAGS_SKIPINVERT);
@@ -9226,7 +9233,8 @@ static const char *opt_intro[] = {
 #endif
     "or press \"O\" while playing and use the menu.",
     "",
- "Boolean options (which can be negated by prefixing them with '!' or \"no\"):",
+    ("Boolean options (which can be negated by prefixing them"
+     " with '!' or \"no\"):"),
     (char *) 0
 };
 
