@@ -1071,7 +1071,7 @@ void NetHackQtTextWindow::UseRIP(int how, time_t when)
 
     /* Put name on stone */
     (void) snprintf(rip_line[NAME_LINE], STONE_LINE_LEN + 1,
-                    "%.*s", STONE_LINE_LEN, gp.plname);
+                    "%.*s", STONE_LINE_LEN, svp.plname);
 
     /* Put $ on stone;
        to keep things safe and relatively simple, impose an arbitrary

@@ -413,7 +413,7 @@ shkveg(void)
 
     j = maxprob = 0;
     ok[0] = 0; /* lint suppression */
-    for (i = gb.bases[(int) oclass]; i < NUM_OBJECTS; ++i) {
+    for (i = svb.bases[(int) oclass]; i < NUM_OBJECTS; ++i) {
         if (objects[i].oc_class != oclass)
             break;
 
@@ -463,7 +463,7 @@ mkshobj_at(const struct shclass *shp, int sx, int sy, boolean mkspecl)
         struct obj *novel = mksobj_at(SPE_NOVEL, sx, sy, FALSE, FALSE);
 
         if (novel)
-            gc.context.tribute.bookstock = TRUE;
+            svc.context.tribute.bookstock = TRUE;
         return;
     }
 
@@ -575,7 +575,7 @@ free_eshk(struct monst *mtmp)
 }
 
 /* find a door in room sroom which is good for shop entrance.
-   returns -1 if no good door found, or the gd.doors index
+   returns -1 if no good door found, or the svd.doors index
    and the door coordinates in sx, sy */
 staticfn int
 good_shopdoor(struct mkroom *sroom, coordxy *sx, coordxy *sy)
@@ -585,12 +585,12 @@ good_shopdoor(struct mkroom *sroom, coordxy *sx, coordxy *sy)
     for (i = 0; i < sroom->doorct; i++) {
         int di = sroom->fdoor + i;
 
-        *sx = gd.doors[di].x;
-        *sy = gd.doors[di].y;
+        *sx = svd.doors[di].x;
+        *sy = svd.doors[di].y;
 
         /* check that the shopkeeper placement is sane */
         if (sroom->irregular) {
-            int rmno = (int) ((sroom - gr.rooms) + ROOMOFFSET);
+            int rmno = (int) ((sroom - svr.rooms) + ROOMOFFSET);
 
             if (isok(*sx - 1, *sy) && !levl[*sx - 1][*sy].edge
                 && (int) levl[*sx - 1][*sy].roomno == rmno)
@@ -646,7 +646,7 @@ shkinit(const struct shclass *shp, struct mkroom *sroom)
             pline("doormax=%d doorct=%d fdoor=%d", gd.doorindex, sroom->doorct,
                   sh);
             while (j--) {
-                pline("door [%d,%d]", gd.doors[sh].x, gd.doors[sh].y);
+                pline("door [%d,%d]", svd.doors[sh].x, svd.doors[sh].y);
                 sh++;
             }
             display_nhwindow(WIN_MESSAGE, FALSE);
@@ -666,11 +666,11 @@ shkinit(const struct shclass *shp, struct mkroom *sroom)
     set_malign(shk);
     shk->msleeping = 0;
     mon_learns_traps(shk, ALL_TRAPS); /* we know all the traps already */
-    eshkp->shoproom = (schar) ((sroom - gr.rooms) + ROOMOFFSET);
+    eshkp->shoproom = (schar) ((sroom - svr.rooms) + ROOMOFFSET);
     sroom->resident = shk;
     eshkp->shoptype = sroom->rtype;
     assign_level(&eshkp->shoplevel, &u.uz);
-    eshkp->shd = gd.doors[sh];
+    eshkp->shd = svd.doors[sh];
     eshkp->shk.x = sx;
     eshkp->shk.y = sy;
     eshkp->robbed = eshkp->credit = eshkp->debit = eshkp->loan = 0L;
@@ -692,12 +692,12 @@ stock_room_goodpos(struct mkroom *sroom, int rmno, int sh, int sx, int sy)
     if (sroom->irregular) {
         if (levl[sx][sy].edge
             || (int) levl[sx][sy].roomno != rmno
-            || distmin(sx, sy, gd.doors[sh].x, gd.doors[sh].y) <= 1)
+            || distmin(sx, sy, svd.doors[sh].x, svd.doors[sh].y) <= 1)
             return FALSE;
-    } else if ((sx == sroom->lx && gd.doors[sh].x == sx - 1)
-               || (sx == sroom->hx && gd.doors[sh].x == sx + 1)
-               || (sy == sroom->ly && gd.doors[sh].y == sy - 1)
-               || (sy == sroom->hy && gd.doors[sh].y == sy + 1))
+    } else if ((sx == sroom->lx && svd.doors[sh].x == sx - 1)
+               || (sx == sroom->hx && svd.doors[sh].x == sx + 1)
+               || (sy == sroom->ly && svd.doors[sh].y == sy - 1)
+               || (sy == sroom->hy && svd.doors[sh].y == sy + 1))
         return FALSE;
 
     /* only generate items on solid floor squares */
@@ -721,7 +721,7 @@ stock_room(int shp_indx, struct mkroom *sroom)
     int sx, sy, sh;
     int stockcount = 0, specialspot = 0;
     char buf[BUFSZ];
-    int rmno = (int) ((sroom - gr.rooms) + ROOMOFFSET);
+    int rmno = (int) ((sroom - svr.rooms) + ROOMOFFSET);
     const struct shclass *shp = &shtypes[shp_indx];
 
     /* first, try to place a shopkeeper in the room */
@@ -729,8 +729,8 @@ stock_room(int shp_indx, struct mkroom *sroom)
         return;
 
     /* make sure no doorways without doors, and no trapped doors, in shops */
-    sx = gd.doors[sroom->fdoor].x;
-    sy = gd.doors[sroom->fdoor].y;
+    sx = svd.doors[sroom->fdoor].x;
+    sy = svd.doors[sroom->fdoor].y;
     if (levl[sx][sy].doormask == D_NODOOR) {
         levl[sx][sy].doormask = D_ISOPEN;
         newsym(sx, sy);
@@ -760,7 +760,7 @@ stock_room(int shp_indx, struct mkroom *sroom)
                               || *in_rooms(m, n, 0)) ? ROOM : CORR;
     }
 
-    if (gc.context.tribute.enabled && !gc.context.tribute.bookstock) {
+    if (svc.context.tribute.enabled && !svc.context.tribute.bookstock) {
         /*
          * Out of the number of spots where we're actually
          * going to put stuff, randomly single out one in particular.
@@ -792,7 +792,7 @@ stock_room(int shp_indx, struct mkroom *sroom)
         mongone(mtmp);
     }
 
-    gl.level.flags.has_shop = TRUE;
+    svl.level.flags.has_shop = TRUE;
 }
 
 /* does shkp's shop stock this item type? */
@@ -865,7 +865,7 @@ shkname(struct monst *mtmp)
     } else {
         const char *shknm = ESHK(mtmp)->shknam;
 
-        if (Hallucination && !gp.program_state.gameover) {
+        if (Hallucination && !program_state.gameover) {
             const char *const *nlp;
             int num;
 

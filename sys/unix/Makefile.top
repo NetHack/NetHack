@@ -1,5 +1,5 @@
 #      NetHack Top-level Makefile.
-# NetHack 3.7  Makefile.top    $NHDT-Date: 1693519381 2023/08/31 22:03:01 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.91 $
+# NetHack 3.7  Makefile.top    $NHDT-Date: 1722119081 2024/07/27 22:24:41 $  $NHDT-Branch: keni-fetchlua $:$NHDT-Revision: 1.109 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -160,6 +160,16 @@ lib/lua-$(LUA_VERSION)/src/lua.h:
 luabin:
 	( cd $(LUATOP) \
 	  && make $(LUAMAKEFILES) all && cd $(LUA2NHTOP) )
+
+# This is only needed for some internal tools.
+nhlua:
+	base=`ls -td lib/lua-*|head -1` ; \
+	[ -z $$base ] && $(MAKE) fetch-lua ; \
+	base=`ls -td lib/lua-*|head -1` ; \
+	cp -R $$base/ lib/nhlsrc ; \
+	rm -f util/nhlua ; \
+	( cd lib/nhlsrc && $(MAKE) clean posix ) ; \
+	cp lib/nhlsrc/src/lua util/nhlua
 
 # hints file could set LUATESTTARGET to this if GITSUBMODULES is defined
 submodules/lua/lua.h:
@@ -322,45 +332,55 @@ dofiles-nodlb:
 
 LUA_URL :=www.lua.org/ftp
 LUA_URL_MIRROR :=www.tecgraf.puc-rio.br/lua/mirror/ftp
+LUA_URL_NHD :=www.nethack.org/download/thirdparty
+LUA_URL_list:=$(LUA_URL) $(LUA_URL_MIRROR) $(LUA_URL_NHD)
 
-fetch-lua-mirror: LUA_URL :=$(LUA_URL_MIRROR)
+fetch-lua-mirror: LUA_URL_list:=$(LUA_URL_MIRROR)
 fetch-lua-mirror: fetch-Lua
+	@true
+
+fetch-lua-nhd: LUA_URL_list:=$(LUA_URL_NHD)
+fetch-lua-nhd: fetch-Lua
 	@true
 
 fetch-lua: fetch-Lua
 	@true
 
 fetch-Lua:
-	@( mkdir -p lib && cd lib && \
-	  n=0; \
+	@( \
+	  shac1=`command -v shasum`; \
+	  shac2=`command -v sha256sum`; \
+	  if [ ! -z $$shac1 ]; then \
+	    shac="$$shac1 -a 256"; elif [ ! -z $$shac2 ]; then \
+	    shac=$$shac2; else echo "CAUTION: no way to check integrity"; \
+	  fi; \
+	  set -- DUMMY $(LUA_URL_list); \
+	  luafile=lua-$(LUA_VERSION).tar.gz; \
 	  export curlstatus=1; \
-	  while [ $${n} -lt 2 ]; do \
+	  mkdir -p lib && cd lib && \
+	  while [ $$# -gt 0 ]; do \
+	    shift; \
 	    if [ $$curlstatus -ne 0 ]; then \
-	      if [ $${n} -eq 0 ]; then \
-	          luaurl=https://$(LUA_URL)/lua-$(LUA_VERSION).tar.gz; \
-	      fi; \
-	      if [ $${n} -eq 1 ]; then \
-	          luaurl=https://$(LUA_URL_MIRROR)/lua-$(LUA_VERSION).tar.gz; \
-	      fi; \
-	      echo trying $$luaurl; \
-	      shac1=`command -v shasum`; \
-	      shac2=`command -v sha256sum`; \
-	      if [ ! -z $$shac1 ]; then \
-	        shac="$$shac1 -a 256"; elif [ ! -z $$shac2 ]; then \
-	        shac=$$shac2; else echo "CAUTION: no way to check integrity"; \
-	      fi; \
+	      luaurl=https://$$1/$$luafile; \
+	      echo Trying $$luaurl; \
 	      curl -R -O $$luaurl; \
-	      export curlstatus=$$?; \
+	      curlstatus=$$?; \
 	      if [ $$curlstatus -eq 0 ]; then \
 	        if [ ! -z "$$shac" ]; then \
-	          echo Checking integrity with $$shac; \
-	          $$shac -w -c ../submodules/CHKSUMS < lua-$(LUA_VERSION).tar.gz; \
+		    CHKSUMS=../submodules/CHKSUMS; \
+		    CHKSUMSTMP=../submodules/CHKSUMS.tmp; \
+		    fgrep $$luafile < $$CHKSUMS > $$CHKSUMSTMP; \
+		    if [ -z $$CHKSUMSTMP ]; then \
+		      echo "Cannot check $$luafile - no checksum known"; \
+		    else \
+		      echo Checking integrity of $$luafile with $$shac; \
+		      $$shac -w --ignore-missing -c $$CHKSUMSTMP < $$luafile; \
+		    fi; \
 	        fi; \
-	        tar zxf lua-$(LUA_VERSION).tar.gz && \
-	        rm -f lua-$(LUA_VERSION).tar.gz; \
+	        tar zxf $$luafile && \
+	        rm -f $$luafile; \
 	      fi; \
 	    fi; \
-	    n=`expr $$n + 1`; \
 	  done; \
 	  true )
 

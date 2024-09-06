@@ -776,7 +776,7 @@ Currently this is limited to arrow keys, but this may be expanded. */
 int
 curses_convert_keys(int key)
 {
-    boolean reject = (gp.program_state.input_state == otherInp),
+    boolean reject = (program_state.input_state == otherInp),
             as_is = FALSE, numpad_esc = FALSE;
     int ret = key;
 

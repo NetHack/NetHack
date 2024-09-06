@@ -1,4 +1,4 @@
-/* NetHack 3.7	pickup.c	$NHDT-Date: 1707521383 2024/02/09 23:29:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.370 $ */
+/* NetHack 3.7	pickup.c	$NHDT-Date: 1720074481 2024/07/04 06:28:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.374 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -312,7 +312,7 @@ force_decor(boolean via_probing)
     iflags.prev_decor = STONE;
     (void) describe_decor();
     gd.decor_fumble_override = gd.decor_levitate_override = FALSE;
-    gl.lastseentyp[u.ux][u.uy] = levl[u.ux][u.uy].typ;
+    svl.lastseentyp[u.ux][u.uy] = levl[u.ux][u.uy].typ;
 }
 
 void
@@ -421,14 +421,14 @@ check_here(boolean picked_some)
     }
 
     /* count the objects here */
-    for (obj = gl.level.objects[u.ux][u.uy]; obj; obj = obj->nexthere) {
+    for (obj = svl.level.objects[u.ux][u.uy]; obj; obj = obj->nexthere) {
         if (obj != uchain)
             ct++;
     }
 
     /* If there are objects here, take a look. */
     if (ct) {
-        if (gc.context.run)
+        if (svc.context.run)
             nomul(0);
         flush_screen(1);
         (void) look_here(ct, lhflags);
@@ -681,7 +681,7 @@ pickup(int what) /* should be a long */
         struct trap *t;
 
         /* no auto-pick if no-pick move, nothing there, or in a pool */
-        if (autopickup && (gc.context.nopick || !OBJ_AT(u.ux, u.uy)
+        if (autopickup && (svc.context.nopick || !OBJ_AT(u.ux, u.uy)
                            || (is_pool(u.ux, u.uy) && !Underwater)
                            || is_lava(u.ux, u.uy))) {
             if (flags.mention_decor)
@@ -693,16 +693,17 @@ pickup(int what) /* should be a long */
         t = t_at(u.ux, u.uy);
         if (!can_reach_floor(t && is_pit(t->ttyp))) {
             (void) describe_decor(); /* even when !flags.mention_decor */
-            if ((gm.multi && !gc.context.run) || (autopickup && !flags.pickup)
+            if ((gm.multi && !svc.context.run)
+                || (autopickup && !flags.pickup)
                 || (t && (uteetering_at_seen_pit(t) || uescaped_shaft(t))))
                 read_engr_at(u.ux, u.uy);
             return 0;
         }
-        /* multi && !gc.context.run means they are in the middle of some other
-         * action, or possibly paralyzed, sleeping, etc.... and they just
-         * teleported onto the object.  They shouldn't pick it up.
+        /* multi && !svc.context.run means they are in the middle of some
+         * other action, or possibly paralyzed, sleeping, etc.... and they
+         * just teleported onto the object.  They shouldn't pick it up.
          */
-        if ((gm.multi && !gc.context.run)
+        if ((gm.multi && !svc.context.run)
             || (autopickup && !flags.pickup)
             || notake(gy.youmonst.data)) {
             check_here(FALSE);
@@ -713,14 +714,14 @@ pickup(int what) /* should be a long */
         }
 
         /* if there's anything here, stop running */
-        if (OBJ_AT(u.ux, u.uy) && gc.context.run && gc.context.run != 8
-            && !gc.context.nopick)
+        if (OBJ_AT(u.ux, u.uy) && svc.context.run && svc.context.run != 8
+            && !svc.context.nopick)
             nomul(0);
     }
 
     add_valid_menu_class(0); /* reset */
     if (!u.uswallow) {
-        objchain_p = &gl.level.objects[u.ux][u.uy];
+        objchain_p = &svl.level.objects[u.ux][u.uy];
         traverse_how = BY_NEXTHERE;
     } else {
         objchain_p = &u.ustuck->minvent;
@@ -2005,7 +2006,7 @@ container_at(coordxy x, coordxy y, boolean countem)
     struct obj *cobj, *nobj;
     int container_count = 0;
 
-    for (cobj = gl.level.objects[x][y]; cobj; cobj = nobj) {
+    for (cobj = svl.level.objects[x][y]; cobj; cobj = nobj) {
         nobj = cobj->nexthere;
         if (Is_container(cobj)) {
             container_count++;
@@ -2077,7 +2078,7 @@ do_loot_cont(
         int res = ECMD_OK;
 
 #if 0
-        if (ccount < 2 && (gl.level.objects[cobj->ox][cobj->oy] == cobj))
+        if (ccount < 2 && (svl.level.objects[cobj->ox][cobj->oy] == cobj))
             pline("%s locked.",
                   cobj->lknown ? "It is" : "Hmmm, it turns out to be");
         else
@@ -2105,7 +2106,7 @@ do_loot_cont(
                     res = ECMD_TIME;
                 /* attempting to untrap or unlock might trigger a trap
                    which destroys 'cobj'; inform caller if that happens */
-                for (otmp = gl.level.objects[ox][oy]; otmp;
+                for (otmp = svl.level.objects[ox][oy]; otmp;
                      otmp = otmp->nexthere)
                     if (otmp == cobj)
                         break;
@@ -2117,7 +2118,8 @@ do_loot_cont(
                 && res != ECMD_TIME
                 && ccount == 1 && u_have_forceable_weapon()) {
                 /* single container, and we could #force it open... */
-                cmdq_add_ec(CQ_CANNED, doforce); /* doforce asks for confirmation */
+                /* note: doforce asks for confirmation */
+                cmdq_add_ec(CQ_CANNED, doforce);
                 ga.abort_looting = TRUE;
             }
         }
@@ -2223,12 +2225,12 @@ doloot_core(void)
             win = create_nhwindow(NHW_MENU);
             start_menu(win, MENU_BEHAVE_STANDARD);
 
-            for (cobj = gl.level.objects[cc.x][cc.y]; cobj;
+            for (cobj = svl.level.objects[cc.x][cc.y]; cobj;
                  cobj = cobj->nexthere)
                 if (Is_container(cobj)) {
                     any.a_obj = cobj;
-                    add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                             ATR_NONE, clr, doname(cobj), MENU_ITEMFLAGS_NONE);
+                    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
+                             doname(cobj), MENU_ITEMFLAGS_NONE);
                 }
             end_menu(win, "Loot which containers?");
             n = select_menu(win, PICK_ANY, &pick_list);
@@ -2249,7 +2251,7 @@ doloot_core(void)
             if (n != 0)
                 c = 'y';
         } else {
-            for (cobj = gl.level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
+            for (cobj = svl.level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
                 nobj = cobj->nexthere;
 
                 if (Is_container(cobj)) {
@@ -2334,7 +2336,8 @@ reverse_loot(void)
 
     if (!rn2(3)) {
         /* n objects: 1/(n+1) chance per object, 1/(n+1) to fall off end */
-        for (n = inv_cnt(TRUE), otmp = gi.invent; otmp; --n, otmp = otmp->nobj)
+        for (n = inv_cnt(TRUE), otmp = gi.invent; otmp;
+             --n, otmp = otmp->nobj)
             if (!rn2(n + 1)) {
                 prinv("You find old loot:", otmp, 0L);
                 return TRUE;
@@ -2363,7 +2366,7 @@ reverse_loot(void)
         if (g_at(x, y))
             pline("Ok, now there is loot here.");
     } else {
-        /* find original coffers chest if present, otherwise use nearest one */
+        /* find original coffers chest if present, otherwise use nearest */
         otmp = 0;
         for (coffers = fobj; coffers; coffers = coffers->nobj)
             if (coffers->otyp == CHEST) {
@@ -2608,16 +2611,18 @@ in_container(struct obj *obj)
         if (obj->oclass != COIN_CLASS) {
             /* sellobj() will take an unpaid item off the shop bill */
             was_unpaid = obj->unpaid ? TRUE : FALSE;
-            /* don't sell when putting the item into your own container,
-             * but handle billing correctly */
-            sellobj_state(gc.current_container->no_charge
-                          ? SELL_DONTSELL : SELL_DELIBERATE);
+            if (gs.sellobj_first) {
+                /* don't sell when putting the item into your own container,
+                   but handle billing correctly */
+                sellobj_state(gc.current_container->no_charge
+                              ? SELL_DONTSELL : SELL_DELIBERATE);
+                gs.sellobj_first = FALSE;
+            }
             sellobj(obj, u.ux, u.uy);
-            sellobj_state(SELL_NORMAL);
         }
     }
     if (Icebox && !age_is_relative(obj)) {
-        obj->age = gm.moves - obj->age; /* actual age */
+        obj->age = svm.moves - obj->age; /* actual age */
         /* stop any corpse timeouts when frozen */
         if (obj->otyp == CORPSE) {
             if (obj->timed) {
@@ -2644,9 +2649,9 @@ in_container(struct obj *obj)
         obfree(obj, (struct obj *) 0);
         /* if carried, shop goods will be flagged 'unpaid' and obfree() will
            handle bill issues, but if on floor, we need to put them on bill
-           before deleting them (non-shop items will be flagged 'no_charge') */
-        if (floor_container
-            && costly_spot(gc.current_container->ox, gc.current_container->oy)) {
+           before deleting them (non-shop items will be flagged 'no_charge')*/
+        if (floor_container && costly_spot(gc.current_container->ox,
+                                           gc.current_container->oy)) {
             struct obj save_no_charge;
 
             save_no_charge.no_charge = gc.current_container->no_charge;
@@ -2756,7 +2761,7 @@ void
 removed_from_icebox(struct obj *obj)
 {
     if (!age_is_relative(obj)) {
-        obj->age = gm.moves - obj->age; /* actual age */
+        obj->age = svm.moves - obj->age; /* actual age */
         if (obj->otyp == CORPSE) {
             struct monst *m = get_mtraits(obj, FALSE);
             boolean iceT = m ? (m->data == &mons[PM_ICE_TROLL])
@@ -2845,7 +2850,7 @@ observe_quantum_cat(struct obj *box, boolean makecat, boolean givemsg)
             /* set_corpsenm() will start the rot timer that was removed
                when makemon() created SchroedingersBox; start it from
                now rather than from when this special corpse got created */
-            deadcat->age = gm.moves;
+            deadcat->age = svm.moves;
             set_corpsenm(deadcat, PM_HOUSECAT);
             deadcat = oname(deadcat, sc, ONAME_NO_FLAGS);
         }
@@ -2943,6 +2948,7 @@ use_container(
     long loss;
 
     ga.abort_looting = FALSE;
+    gs.sellobj_first = TRUE; /* in_container() should call sellobj_state() */
     emptymsg[0] = '\0';
 
     if (!u_handsy())
@@ -3176,6 +3182,7 @@ use_container(
         update_inventory();
     }
 
+    sellobj_state(SELL_NORMAL); /* in case in_container() set it */
     *objp = gc.current_container; /* might have become null */
     if (gc.current_container)
         gc.current_container = 0; /* avoid hanging on to stale pointer */
@@ -3298,7 +3305,8 @@ menu_loot(int retry, boolean put_in)
                 n_looted += res;
             }
         }
-    } else if (put_in && loot_justpicked && count_justpicked(gi.invent) == 1) {
+    } else if (put_in && loot_justpicked
+               && count_justpicked(gi.invent) == 1) {
         otmp = find_justpicked(gi.invent);
         if (otmp) {
             n_looted = 1;
@@ -3411,7 +3419,8 @@ in_or_out_menu(
     if (more_containers) {
         any.a_int = 7; /* 'n' */
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
-                 ATR_NONE, clr, "loot next container", MENU_ITEMFLAGS_SELECTED);
+                 ATR_NONE, clr, "loot next container",
+                 MENU_ITEMFLAGS_SELECTED);
     }
     any.a_int = 8; /* 'q' */
     Strcpy(buf, alreadyused ? "done" : "do nothing");
@@ -3472,7 +3481,7 @@ choose_tip_container_menu(void)
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
 
-    for (otmp = gl.level.objects[u.ux][u.uy], i = 0; otmp;
+    for (otmp = svl.level.objects[u.ux][u.uy], i = 0; otmp;
          otmp = otmp->nexthere)
         if (Is_container(otmp)) {
             ++i;
@@ -3556,7 +3565,8 @@ dotip(void)
                     return res;
                 /* else pick-from-gi.invent below */
             } else {
-                for (cobj = gl.level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
+                for (cobj = svl.level.objects[cc.x][cc.y]; cobj;
+                     cobj = nobj) {
                     nobj = cobj->nexthere;
                     if (!Is_container(cobj))
                         continue;
@@ -3679,7 +3689,8 @@ tipcontainer(struct obj *box) /* or bag */
 
     if (tipcontainer_checks(box, targetbox, FALSE) != TIPCHECK_OK)
         return;
-    if (targetbox && tipcontainer_checks(targetbox, NULL, TRUE) != TIPCHECK_OK)
+    if (targetbox
+        && tipcontainer_checks(targetbox, NULL, TRUE) != TIPCHECK_OK)
         return;
 
     {

@@ -94,3 +94,4 @@ bundle/*
 *.user
 util/*.lib
 util/*.exp
+submodules/CHKSUMS.tmp

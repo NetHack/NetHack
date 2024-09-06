@@ -232,7 +232,7 @@ xwaitforspace(const char *s) /* chars allowed besides return */
     morc = 0;
     while (
 #ifdef HANGUPHANDLING
-        !gp.program_state.done_hup &&
+        !program_state.done_hup &&
 #endif
         (c = tty_nhgetch()) != EOF) {
         if (c == '\n' || c == '\r')

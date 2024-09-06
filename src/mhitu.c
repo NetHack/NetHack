@@ -1,4 +1,4 @@
-/* NetHack 3.7	mhitu.c	$NHDT-Date: 1689448844 2023/07/15 19:20:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.301 $ */
+/* NetHack 3.7	mhitu.c	$NHDT-Date: 1721844072 2024/07/24 18:01:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.318 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -132,8 +132,10 @@ mswings(
     boolean bash)       /* True: polearm used at too close range */
 {
     if (flags.verbose && !Blind && mon_visible(mtmp)) {
-        pline_mon(mtmp, "%s %s %s%s %s.", Monnam(mtmp), mswings_verb(otemp, bash),
-              (otemp->quan > 1L) ? "one of " : "", mhis(mtmp), xname(otemp));
+        pline_mon(mtmp, "%s %s %s%s %s.", Monnam(mtmp),
+                  mswings_verb(otemp, bash),
+                  (otemp->quan > 1L) ? "one of " : "",
+                  mhis(mtmp), xname(otemp));
     }
 }
 
@@ -302,12 +304,15 @@ expels(
 
 /* select a monster's next attack, possibly substituting for its usual one */
 struct attack *
-getmattk(struct monst *magr, struct monst *mdef,
-         int indx, int prev_result[], struct attack *alt_attk_buf)
+getmattk(
+    struct monst *magr, struct monst *mdef,
+    int indx, int prev_result[],
+    struct attack *alt_attk_buf)
 {
     struct permonst *mptr = magr->data;
     struct attack *attk = &mptr->mattk[indx];
     struct obj *weap = (magr == &gy.youmonst) ? uwep : MON_WEP(magr);
+    boolean udefend = mdef == &gy.youmonst;
 
     /* honor SEDUCE=0 */
     if (!SYSOPT_SEDUCE) {
@@ -338,7 +343,7 @@ getmattk(struct monst *magr, struct monst *mdef,
         attk->adtyp = AD_STUN;
 
     /* make drain-energy damage be somewhat in proportion to energy */
-    } else if (attk->adtyp == AD_DREN && mdef == &gy.youmonst) {
+    } else if (attk->adtyp == AD_DREN && udefend) {
         int ulev = max(u.ulevel, 6);
 
         *alt_attk_buf = *attk;
@@ -400,7 +405,31 @@ getmattk(struct monst *magr, struct monst *mdef,
         *alt_attk_buf = *attk;
         attk = alt_attk_buf;
         attk->adtyp = AD_PHYS;
+
+    /* liches have a touch attack for cold damage and also a spell attack;
+       they won't use the spell for monster vs monster so become impotent
+       aganst cold resistant foes; change the touch damage from cold to
+       physical if target will resist */
+    } else if (indx == 0 && attk->aatyp == AT_TUCH && attk->adtyp == AD_COLD
+               && (udefend ? Cold_resistance : resists_cold(mdef))
+               /* don't substitute if target is immune to normal damage */
+               && mdef->data != &mons[PM_SHADE]) {
+        *alt_attk_buf = *attk;
+        attk = alt_attk_buf;
+        attk->adtyp = AD_PHYS;
+        /* lessen new physical damage compared to old cold damage:
+         *        before  after
+         * lich:    1d10  1d6
+         * demi:    3d4   2d4
+         * master:  3d6   2d6
+         * arch-:   5d6   3d6
+         */
+        attk->damn = (attk->damn + 1) / 2;
+        if (attk->damd == 10)
+            attk->damd = 6;
+
     }
+
     return attk;
 }
 
@@ -566,7 +595,7 @@ mattacku(struct monst *mtmp)
                  * parallelism to work, we can't rephrase it, so we
                  * zap the "laid by you" momentarily instead.
                  */
-                struct obj *obj = gl.level.objects[u.ux][u.uy];
+                struct obj *obj = svl.level.objects[u.ux][u.uy];
 
                 if (obj || u.umonnum == PM_TRAPPER
                     || (gy.youmonst.data->mlet == S_EEL
@@ -585,14 +614,14 @@ mattacku(struct monst *mtmp)
                         pline(
                              "Wait, %s!  There's a hidden %s named %s there!",
                               m_monnam(mtmp),
-                              pmname(gy.youmonst.data, Ugender), gp.plname);
+                              pmname(gy.youmonst.data, Ugender), svp.plname);
                     else
                         pline(
                           "Wait, %s!  There's a %s named %s hiding under %s!",
                               m_monnam(mtmp),
                               pmname(gy.youmonst.data, Ugender),
-                              gp.plname,
-                              doname(gl.level.objects[u.ux][u.uy]));
+                              svp.plname,
+                              doname(svl.level.objects[u.ux][u.uy]));
                     if (obj)
                         obj->spe = save_spe;
                 } else
@@ -614,7 +643,7 @@ mattacku(struct monst *mtmp)
             pline("It gets stuck on you.");
         else /* see note about m_monnam() above */
             pline("Wait, %s!  That's a %s named %s!", m_monnam(mtmp),
-                  pmname(gy.youmonst.data, Ugender), gp.plname);
+                  pmname(gy.youmonst.data, Ugender), svp.plname);
         if (sticky)
             set_ustuck(mtmp);
         gy.youmonst.m_ap_type = M_AP_NOTHING;
@@ -628,14 +657,15 @@ mattacku(struct monst *mtmp)
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
         if (!youseeit)
-            pline("%s %s!", Something, (likes_gold(mtmp->data)
-                                      && gy.youmonst.mappearance == GOLD_PIECE)
-                                           ? "tries to pick you up"
-                                           : "disturbs you");
+            pline("%s %s!", Something,
+                  (likes_gold(mtmp->data)
+                   && gy.youmonst.mappearance == GOLD_PIECE)
+                  ? "tries to pick you up"
+                  : "disturbs you");
         else /* see note about m_monnam() above */
             pline("Wait, %s!  That %s is really %s named %s!", m_monnam(mtmp),
                   mimic_obj_name(&gy.youmonst),
-                  an(pmname(&mons[u.umonnum], Ugender)), gp.plname);
+                  an(pmname(&mons[u.umonnum], Ugender)), svp.plname);
         if (gm.multi < 0) { /* this should always be the case */
             char buf[BUFSZ];
 
@@ -870,7 +900,7 @@ mattacku(struct monst *mtmp)
             bot();
         /* give player a chance of waking up before dying -kaa */
         if (sum[i] == M_ATTK_HIT) { /* successful attack */
-            if (u.usleep && u.usleep < gm.moves && !rn2(10)) {
+            if (u.usleep && u.usleep < svm.moves && !rn2(10)) {
                 gm.multi = -1;
                 gn.nomovemsg = "The combat suddenly awakens you.";
             }
@@ -1060,7 +1090,8 @@ magic_negation(struct monst *mon)
            protection is too easy); it confers minimum mc 1 instead of 0 */
         if ((is_you && ((HProtection && u.ublessed > 0) || u.uspellprot))
             /* aligned priests and angels have innate intrinsic Protection */
-            || (mon->data == &mons[PM_ALIGNED_CLERIC] || is_minion(mon->data)))
+            || (mon->data == &mons[PM_ALIGNED_CLERIC]
+                || is_minion(mon->data)))
             mc = 1;
     }
     return mc;
@@ -1095,7 +1126,7 @@ hitmu(struct monst *mtmp, struct attack *mattk)
             const char *what;
             char Amonbuf[BUFSZ];
 
-            if ((obj = gl.level.objects[mtmp->mx][mtmp->my]) != 0) {
+            if ((obj = svl.level.objects[mtmp->mx][mtmp->my]) != 0) {
                 if (Blind && !obj->dknown)
                     what = something;
                 else if (is_pool(mtmp->mx, mtmp->my) && !Underwater)
@@ -1667,8 +1698,8 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             if (poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM))
                 break;
             urgent_pline("You turn to stone...");
-            gk.killer.format = KILLED_BY;
-            Strcpy(gk.killer.name, pmname(mtmp->data, Mgender(mtmp)));
+            svk.killer.format = KILLED_BY;
+            Strcpy(svk.killer.name, pmname(mtmp->data, Mgender(mtmp)));
             done(STONING);
         }
         break;
@@ -1837,7 +1868,7 @@ mdamageu(struct monst *mtmp, int n)
 int
 could_seduce(
     struct monst *magr, struct monst *mdef,
-    struct attack *mattk) /* non-Null: current atk; Null: general capability */
+    struct attack *mattk) /* non-Null: current atk; Null: genrl capability */
 {
     struct permonst *pagr;
     boolean agrinvis, defperc;
@@ -1965,7 +1996,7 @@ doseduce(struct monst *mon)
             /* confirmation prompt when charisma is high bypassed if deaf */
             if (!Deaf && rn2(20) < ACURR(A_CHA)) {
                 (void) safe_qbuf(qbuf, "\"That ",
-                                 " looks pretty.  Would you wear it for me?\"",
+                                " looks pretty.  Would you wear it for me?\"",
                                  ring, xname, simpleonames, "ring");
                 makeknown(RIN_ADORNMENT);
                 SetVoice(mon, 0, 80, 0);
@@ -2221,7 +2252,7 @@ mayberem(struct monst *mon,
     if (Deaf) {
         pline("%s takes off your %s.", seducer, str);
     } else if (rn2(20) < ACURR(A_CHA)) {
-        SetVoice(mon, 0, 80, 0); /* y_n a.k.a. yn_function is set up for this */
+        SetVoice(mon, 0, 80, 0); /* y_n aka yn_function is set up for this */
         Sprintf(qbuf, "\"Shall I remove your %s, %s?\"", str,
                 (!rn2(2) ? "lover" : !rn2(2) ? "dear" : "sweetheart"));
         if (y_n(qbuf) == 'n')
@@ -2451,14 +2482,14 @@ cloneu(void)
 
     if (u.mh <= 1)
         return (struct monst *) 0;
-    if (gm.mvitals[mndx].mvflags & G_EXTINCT)
+    if (svm.mvitals[mndx].mvflags & G_EXTINCT)
         return (struct monst *) 0;
     mon = makemon(gy.youmonst.data, u.ux, u.uy,
                   NO_MINVENT | MM_EDOG | MM_NOMSG);
     if (!mon)
         return NULL;
     mon->mcloned = 1;
-    mon = christen_monst(mon, gp.plname);
+    mon = christen_monst(mon, svp.plname);
     initedog(mon);
     mon->m_lev = gy.youmonst.data->mlevel;
     mon->mhpmax = u.mhmax;

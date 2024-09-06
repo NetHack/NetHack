@@ -1,4 +1,4 @@
-/* NetHack 3.7	monsters.h	$NHDT-Date: 1705092146 2024/01/12 20:42:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.119 $ */
+/* NetHack 3.7	monsters.h	$NHDT-Date: 1723945838 2024/08/18 01:50:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2693,8 +2693,17 @@
             | M2_SHAPESHIFTER,
         M3_INFRAVISIBLE,
         11, HI_DOMESTIC, DOPPELGANGER),
+    /* 3.7: shopkeepers used to have speed 18, but if/when they were
+       hasted they always got 2 moves per turn and had a tendency to move
+       away from blocking the door and then move right back; since they
+       might start with a potion of speed and drink that as soon as the
+       hero gets close, once inside the shop the hero could have trouble
+       getting out again; also, being slowed still guaranteed one move
+       per turn; reduce their innate speed from 18 to 16 for a hasted
+       speed of 22 rather than 24 and slowed speed of 11 rather than 12;
+       they will still block the shop door, but not as tenaciously */
     MON(NAM("shopkeeper"), S_HUMAN,
-        LVL(12, 18, 0, 50, 0), G_NOGEN,
+        LVL(12, 16, 0, 50, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 4, 4), ATTK(AT_WEAP, AD_PHYS, 4, 4),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_SELL, MZ_HUMAN), 0, 0,

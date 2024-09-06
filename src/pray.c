@@ -443,7 +443,8 @@ fix_worst_trouble(int trouble)
             if ((otmp = stuck_ring(uleft, RIN_SUSTAIN_ABILITY)) != 0) {
                 if (otmp == uleft)
                     what = leftglow;
-            } else if ((otmp = stuck_ring(uright, RIN_SUSTAIN_ABILITY)) != 0) {
+            } else if ((otmp = stuck_ring(uright, RIN_SUSTAIN_ABILITY))
+                       != 0) {
                 if (otmp == uright)
                     what = rightglow;
             }
@@ -690,8 +691,8 @@ fry_by_god(aligntyp resp_god, boolean via_disintegration)
 {
     You("%s!", !via_disintegration ? "fry to a crisp"
                                    : "disintegrate into a pile of dust");
-    gk.killer.format = KILLED_BY;
-    Sprintf(gk.killer.name, "the wrath of %s", align_gname(resp_god));
+    svk.killer.format = KILLED_BY;
+    Sprintf(svk.killer.name, "the wrath of %s", align_gname(resp_god));
     done(DIED);
 }
 
@@ -848,7 +849,8 @@ gcrownu(void)
     case A_CHAOTIC:
         u.uevent.uhand_of_elbereth = 3;
         in_hand = u_wield_art(ART_STORMBRINGER);
-        already_exists = exist_artifact(RUNESWORD, artiname(ART_STORMBRINGER));
+        already_exists = exist_artifact(RUNESWORD,
+                                        artiname(ART_STORMBRINGER));
         what = (((already_exists && !in_hand) || class_gift != STRANGE_OBJECT)
                 ? "take lives"
                 : "steal souls");
@@ -1011,7 +1013,7 @@ give_spell(void)
                 || carrying(MAGIC_MARKER))
                 break;
         }
-        otmp->otyp = rnd_class(gb.bases[SPBOOK_CLASS], SPE_BLANK_PAPER);
+        otmp->otyp = rnd_class(svb.bases[SPBOOK_CLASS], SPE_BLANK_PAPER);
     }
     /*
      * 25% chance of learning the spell directly instead of
@@ -1220,7 +1222,7 @@ pleased(aligntyp g_align)
                 } else if (u.uevent.uheard_tune < 2) {
                     Soundeffect(se_divine_music, 50);
                     You_hear("a divine music...");
-                    pline("It sounds like:  \"%s\".", gt.tune);
+                    pline("It sounds like:  \"%s\".", svt.tune);
                     u.uevent.uheard_tune++;
                     record_achievement(ACH_TUNE);
                     break;
@@ -1350,8 +1352,8 @@ pleased(aligntyp g_align)
        of nutrition will be required.  The increase gets throttled if
        it ever reaches 32K so that configurations using 16-bit ints are
        still viable. */
-    if (gm.moves > 100000L) {
-        long incr = (gm.moves - 100000L) / 100L,
+    if (svm.moves > 100000L) {
+        long incr = (svm.moves - 100000L) / 100L,
              largest_ublesscnt_incr = (long) (LARGEST_INT - u.ublesscnt);
 
         if (incr > largest_ublesscnt_incr)
@@ -1372,7 +1374,7 @@ water_prayer(boolean bless_water)
     long changed = 0;
     boolean other = FALSE, bc_known = !(Blind || Hallucination);
 
-    for (otmp = gl.level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere) {
+    for (otmp = svl.level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere) {
         /* turn water into (un)holy water */
         if (otmp->otyp == POT_WATER
             && (bless_water ? !otmp->blessed : !otmp->cursed)) {
@@ -1531,8 +1533,8 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
         /*[apparently shrug/snarl can be sensed without being seen]*/
         pline("%s shrugs and retains dominion over %s,", Moloch, u_gname());
         pline("then mercilessly snuffs out your life.");
-        Sprintf(gk.killer.name, "%s indifference", s_suffix(Moloch));
-        gk.killer.format = KILLED_BY;
+        Sprintf(svk.killer.name, "%s indifference", s_suffix(Moloch));
+        svk.killer.format = KILLED_BY;
         done(DIED);
         /* life-saved (or declined to die in wizard/explore mode) */
         pline("%s snarls and tries again...", Moloch);
@@ -1859,8 +1861,8 @@ dosacrifice(void)
 
         /* KMH, conduct */
         if (!u.uconduct.gnostic++)
-            livelog_printf(LL_CONDUCT,
-                           "rejected atheism by offering %s on an altar of %s",
+            livelog_printf(LL_CONDUCT, "rejected atheism"
+                                       " by offering %s on an altar of %s",
                            corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
                            a_gname());
 
@@ -1871,7 +1873,7 @@ dosacrifice(void)
             return ECMD_TIME;
 
         if (otmp->corpsenm == PM_ACID_BLOB
-            || (gm.moves <= peek_at_iced_corpse_age(otmp) + 50)) {
+            || (svm.moves <= peek_at_iced_corpse_age(otmp) + 50)) {
             value = mons[otmp->corpsenm].difficulty + 1;
             if (otmp->oeaten)
                 value = eaten_stat(value, otmp);
@@ -2066,9 +2068,9 @@ can_pray(boolean praying) /* false means no messages should be given */
 
     if (gp.p_aligntyp == A_NONE) /* praying to Moloch */
         gp.p_type = -2;
-    else if ((gp.p_trouble > 0) ? (u.ublesscnt > 200) /* big trouble */
-             : (gp.p_trouble < 0) ? (u.ublesscnt > 100) /* minor difficulties */
-               : (u.ublesscnt > 0))                  /* not in trouble */
+    else if ((gp.p_trouble > 0) ? (u.ublesscnt > 200)   /* big trouble */
+             : (gp.p_trouble < 0) ? (u.ublesscnt > 100) /* minor difficulty */
+               : (u.ublesscnt > 0))                     /* not in trouble */
         gp.p_type = 0;                     /* too soon... */
     else if ((int) Luck < 0 || u.ugangr || alignment < 0)
         gp.p_type = 1; /* too naughty... */
@@ -2096,7 +2098,7 @@ pray_revive(void)
 {
     struct obj *otmp;
 
-    for (otmp = gl.level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere)
+    for (otmp = svl.level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere)
         if (otmp->otyp == CORPSE && has_omonst(otmp)
             && OMONST(otmp)->mtame && !OMONST(otmp)->isminion)
             break;
@@ -2119,7 +2121,8 @@ dopray(void)
      * than just "y" (will also require "no" to decline).
      */
     if (ParanoidPray) {
-        ok = paranoid_query(ParanoidConfirm, "Are you sure you want to pray?");
+        ok = paranoid_query(ParanoidConfirm,
+                            "Are you sure you want to pray?");
 
         /* clear command recall buffer; otherwise ^A to repeat p(ray) would
            do so without confirmation (if 'ok') or do nothing (if '!ok') */
@@ -2586,7 +2589,7 @@ blocked_boulder(int dx, int dy)
     int nx, ny;
     long count = 0L;
 
-    for (otmp = gl.level.objects[u.ux + dx][u.uy + dy]; otmp;
+    for (otmp = svl.level.objects[u.ux + dx][u.uy + dy]; otmp;
          otmp = otmp->nexthere) {
         if (otmp->otyp == BOULDER)
             count += otmp->quan;

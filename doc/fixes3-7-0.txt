@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1445 $ $NHDT-Date: 1718303201 2024/06/13 18:26:41 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1472 $ $NHDT-Date: 1725143669 2024/08/31 22:34:29 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1162,6 +1162,8 @@ prevent hug attacks and touch or engulf attacks for wrap, stick-to, and
 	vortices, a few others) or against worm tails
 wand of speed gives temporary speed, potion gives intrinsic
 some monsters (riders, shopkeepers, priests, quest leader) can break boulders
+if hero owes shop for a boulder and shopkeeper breaks it, continue to bill hero
+	for the boulder rather than switching to the resulting rocks
 corpse-eating monsters will go out of their way to eat corpses on the floor
 warnings via impossible() would be unseen if message suppression via ESC at
 	--More-- prompt was in effect
@@ -1401,6 +1403,7 @@ gold thrown or kicked at a sleeping monster with the 'greedy' attribute gets
 	neglected to report that target monster was awakened in the process
 hero movement affects the water bubble movement direction
 pets and peacefuls avoid a location hero just kicked
+pets avoid a possible boulder pushing location in sokoban
 shopkeepers bill you for using their bear trap or land mine
 when engraving with a stack of eligible weapons, split one off the stack and
 	dull it rather than dull the whole stack
@@ -1422,6 +1425,48 @@ if hero is on scroll of scare monster or Elbereth, werecreature switching from
 	"n <count> ESC c" wasn't treated as "n <count> M-c" because reading
 	the 'n' changed program_state.input_state from commandInp to otherInp,
 	preventing special ESC handling; not an issue when number_pad was Off
+a 3.6 fix to avoid a potential "object lost" panic when drinking potions had
+	unintended side-effect of making used up potions on shop's bill become
+	separate bill entries all with count 1 despite having come from same
+	unpaid stack; affected Ix inventory listing and itemized shop billing
+buying shop items which include any unpaid ones inside containers would reveal
+	them even when the containers hadn't been opened (obj->cknown==0);
+	recent change to pay via menu made the problem become more visible;
+	shopping has been changed such that buying anything that is inside a
+	container requires that the whole container be bought as a unit
+using #loot -> 'i'n to put multiple items into a shop-owned container would
+	ask whether to sell each item to the shop, and was prepared to accept
+	'a' to sell the current one plus all the rest beyond it, or to accept
+	'q' to not sell the current one or any beyond it, but the sell vs
+	don't-sell state was being reset for each item so 'a' and 'q' didn't
+	stick beyond the current one
+join wall "spines" with walls of water and lava
+some theft messages by nymphs force "she", others use default monster naming
+	which yields "it" when unseen; change the latter to "someone" which
+	still differs from "she" in a series of messages but isn't as jarring
+if a nymph stole worn armor and got killed (perhaps by pet) before hero's next
+	turn, feedback would be "You finish taking off your suit." regardless
+	of the type of armor being taken off
+when setting an option interactively [via O or 3.7's mO], if the particular
+	option uses a prompt to get a line of input (for compounds: 'fruit',
+	'scores', most numeric ones), input was treated as a comma-separated
+	list of option[:value] rather than just the new value of that option
+when there was a trap on a no-dig level, the floor beneath it was always
+	"too hard to dig into", making it impossible to remove the trap
+the #terrain command didn't know how to cope with visible gas/cloud regions;
+	treat as traps as far as player choice of whether to show or hide;
+	if/when a spot contains both region and trap, show the trap
+region expiration reported "the gas cloud around you dissipates" even when the
+	hero was swallowed
+region expiration could report "the gas cloud around you dissipates" and also
+	"you see a gas cloud dissipate" for the same cloud spot
+reduce shopkeeper's innate speed from 18 to 16 so that a hasted shopkeeper
+	doesn't always get 2 moves per turn
+when a secret corridor was discovered by wand of secret door detection or by
+	wizard mode ^E and converted into a regular corridor, if there was a
+	formerly embedded object at the spot, presence of the object would be
+	forgotten unless within range of a light source
+when poly'd into a giant, kicking a closed door always succeeds in breaking it
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
@@ -1967,6 +2012,23 @@ fix regression of a post-3.6 fix:  if 2 Wizards of Yendor were in play and 1
 sometimes a repeat count from the preceding command carried over to most
 	recent one when using do-again (^A); if the most recent one was an
 	extended command, the spurious repeat was for '#'
+if peaceful monsters react when seeing hero attack a peaceful monster, don't
+	have quest guardians run away; also, quest leader only becomes angry
+	if the monster being attacked is a quest guardian
+farlook of water/lava location listed wall of lava before molten lava; because
+	of that, lava was omitted ("molten" suppressed to reduce vebosity,
+	resulting in "lava" which got skipped as substring of "wall of lava")
+having #terrain display gas cloud regions as if they were traps didn't work
+	for monsters in such regions that are shown when adjacent to hero or
+	sensed via ESP
+when a monster within a gas cloud was displayed on the map because the hero
+	was next to it, it remained displayed if hero moved away
+eating a pyrolisk egg on the floor triggered an "object lost" panic
+core object creation and the curses interface's window handling both became
+	confused by the 'pauper' option/conduct because they assumed that invent
+	being Null meant that the game hadn't started yet
+wizards were discovering unread spellbooks whenever any skill was advanced; do so
+	only when a spell skill is advanced
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
@@ -2505,6 +2567,8 @@ paranoid_confirm:swim to prevent accidental dunking into dangerous liquids;
 paranoid_confirm:trap to confirm entering a known trap unless it is harmless;
 	like revised paranoid_confirm:pray, requires y/n response; add
 	paranoid_confirm:Confirm to require yes/no instead
+extend 'paranoid_confirm:trap' to request confirmation when entering visible
+	gas cloud regions
 paranoid_confirm:Autoall to confirm picking 'A' in menustyle:Full filter menu
 looking at a monster will indicate whether it is asleep, and waking up a
 	monster yields a message
@@ -2538,6 +2602,8 @@ for ranger characters, shooting any type of arrow while wielding the Longbow
 change the #vanquished command from debug-only to general user command
 add 'sortvanquished' option to be able to set the preferred sort order without
 	using 'm #vanquished' and to have it persist across save/restore
+when sorting vanquished monsters by monster class, treat the Riders as a
+	separate class from major demons
 add #genocided command
 have 'I u' mention whether there are any unpaid items on the floor (unusual
 	but not impossible); it doesn't itemize them or show shop price
@@ -2606,6 +2672,9 @@ if hero is punished or tethered to a buried iron ball and has no inventory (or
 	during streaming video
 'query_menu' option to use a menu when asked certain yes/no questions
 pyrolisk eggs explode when broken
+pauper-option to start the character with no possessions
+wand of secret door detection, spell of detect unseen, and wizard mode ^E now
+	flash the cursor at each location where detection finds something
 
 
 Platform- and/or Interface-Specific New Features

@@ -7,7 +7,8 @@
 
 staticfn void m_lose_armor(struct monst *, struct obj *, boolean) NONNULLPTRS;
 staticfn void clear_bypass(struct obj *) NO_NNARGS;
-staticfn void m_dowear_type(struct monst *, long, boolean, boolean) NONNULLARG1;
+staticfn void m_dowear_type(struct monst *, long, boolean, boolean)
+                                                                  NONNULLARG1;
 staticfn int extra_pref(struct monst *, struct obj *) NONNULLARG1;
 
 static const struct worn {
@@ -971,7 +972,7 @@ clear_bypass(struct obj *objchn)
 
 /* all objects with their bypass bit set should now be reset to normal;
    this can be a relatively expensive operation so is only called if
-   gc.context.bypasses is set */
+   svc.context.bypasses is set */
 void
 clear_bypasses(void)
 {
@@ -980,14 +981,14 @@ clear_bypasses(void)
     /*
      * 'Object' bypass is also used for one monster function:
      * polymorph control of long worms.  Activated via setting
-     * gc.context.bypasses even if no specific object has been
+     * svc.context.bypasses even if no specific object has been
      * bypassed.
      */
 
     clear_bypass(fobj);
     clear_bypass(gi.invent);
     clear_bypass(gm.migrating_objs);
-    clear_bypass(gl.level.buriedobjlist);
+    clear_bypass(svl.level.buriedobjlist);
     clear_bypass(gb.billobjs);
     clear_bypass(go.objs_deleted);
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -1018,14 +1019,14 @@ clear_bypasses(void)
     if (uchain)
         uchain->bypass = 0;
 
-    gc.context.bypasses = FALSE;
+    svc.context.bypasses = FALSE;
 }
 
 void
 bypass_obj(struct obj *obj)
 {
     obj->bypass = 1;
-    gc.context.bypasses = TRUE;
+    svc.context.bypasses = TRUE;
 }
 
 /* set or clear the bypass bit in a list of objects */
@@ -1035,7 +1036,7 @@ bypass_objlist(
     boolean on) /* TRUE => set, FALSE => clear */
 {
     if (on && objchain)
-        gc.context.bypasses = TRUE;
+        svc.context.bypasses = TRUE;
     while (objchain) {
         objchain->bypass = on ? 1 : 0;
         objchain = objchain->nobj;

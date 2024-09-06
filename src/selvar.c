@@ -761,9 +761,10 @@ selection_size_description(struct selectionvar *sel, char *buf)
     selection_getbounds(sel, &rect);
     dx = rect.hx - rect.lx + 1;
     dy = rect.hy - rect.ly + 1;
-    Sprintf(buf, "%s %i by %i", selection_is_irregular(sel) ? "irregularly shaped"
+    Sprintf(buf, "%s %i by %i",
+            selection_is_irregular(sel) ? "irregularly shaped"
             : (dx == dy) ? "square"
-            : "rectangular",
+              : "rectangular",
             dx, dy);
     return buf;
 }
@@ -780,7 +781,7 @@ selection_from_mkroom(struct mkroom *croom)
     if (!croom)
         return sel;
 
-    rmno = (unsigned)((croom - gr.rooms) + ROOMOFFSET);
+    rmno = (unsigned)((croom - svr.rooms) + ROOMOFFSET);
     for (y = croom->ly; y <= croom->hy; y++)
         for (x = croom->lx; x <= croom->hx; x++)
             if (isok(x, y) && !levl[x][y].edge

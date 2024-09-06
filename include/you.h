@@ -162,6 +162,7 @@ struct u_roleplay {
     boolean blind;  /* permanently blind */
     boolean nudist; /* has not worn any armor, ever */
     boolean deaf;   /* permanently deaf */
+    boolean pauper; /* no starting inventory */
     long numbones;  /* # of bones files loaded  */
 };
 

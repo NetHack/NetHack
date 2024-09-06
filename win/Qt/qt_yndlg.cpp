@@ -220,7 +220,7 @@ char NetHackQtYnDialog::Exec()
                     // for "ynaq" (where "all" is a choice) it's "stop"
                     // and for end of game disclosure it really is "quit"
                     if (question.left(10) == QString("Dump core?")
-                        || (::gp.program_state.gameover
+                        || (::program_state.gameover
                             && question.left(11) == QString("Do you want")))
                         button_name = "Quit";
                     else if (is_ynaq)

@@ -411,19 +411,19 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
  * overwritten without confirmation when a user starts up
  * another game with the same player name.
  */
-    Strcpy(gl.lock, gp.plname);
+    Strcpy(gl.lock, svp.plname);
     regularize(gl.lock);
     getlock();
 #else        /* What follows is !PC_LOCKING */
 #ifdef AMIGA /* We'll put the bones & levels in the user specified directory \
                 -jhsa */
-    Strcat(gl.lock, gp.plname);
+    Strcat(gl.lock, svp.plname);
     Strcat(gl.lock, ".99");
 #else
     /* I'm not sure what, if anything, is left here, but old MFLOPPY had
      * conflicts with set_lock_and_bones() in files.c.
      */
-    Strcpy(gl.lock, gp.plname);
+    Strcpy(gl.lock, svp.plname);
     Strcat(gl.lock, ".99");
     regularize(gl.lock); /* is this necessary? */
                       /* not compatible with full path a la AMIGA */
@@ -436,9 +436,9 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (!nhfp) {
         raw_print("Cannot create lock file");
     } else {
-        gh.hackpid = 1;
+        svh.hackpid = 1;
         if (nhfp->structlevel)
-            write(nhfp->fd, (genericptr_t) &gh.hackpid, sizeof(gh.hackpid));
+            write(nhfp->fd, (genericptr_t) &svh.hackpid, sizeof(svh.hackpid));
         close_nhfile(nhfp);
     }
 
@@ -549,11 +549,11 @@ process_options(int argc, char *argv[])
 #endif
         case 'u':
             if (argv[0][2])
-                (void) strncpy(gp.plname, argv[0] + 2, sizeof(gp.plname) - 1);
+                (void) strncpy(svp.plname, argv[0] + 2, sizeof(svp.plname) - 1);
             else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(gp.plname, argv[0], sizeof(gp.plname) - 1);
+                (void) strncpy(svp.plname, argv[0], sizeof(svp.plname) - 1);
             } else
                 raw_print("Player name expected after -u");
             break;
@@ -715,7 +715,7 @@ port_help(void)
 boolean
 authorize_wizard_mode(void)
 {
-    if (!strcmp(gp.plname, WIZARD_NAME))
+    if (!strcmp(svp.plname, WIZARD_NAME))
         return TRUE;
     return FALSE;
 }

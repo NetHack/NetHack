@@ -142,7 +142,7 @@ struct context_info {
                              * 3: FH, 4: ff+, 5: ff-, 6: FF+, 7: FF-,
                              * 8: travel */
     unsigned startingpet_mid; /* monster id number for initial pet */
-    int current_fruit;      /* fruit->fid corresponding to gp.pl_fruit[] */
+    int current_fruit;      /* fruit->fid corresponding to svp.pl_fruit[] */
     int mysteryforce;       /* adjusts how often "mysterious force" kicks in */
     int rndencode;          /* randomized escape sequence introducer */
     int warnlevel;          /* threshold (digit) to warn about unseen mons */

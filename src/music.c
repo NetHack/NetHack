@@ -714,23 +714,23 @@ staticfn char *
 improvised_notes(boolean *same_as_last_time)
 {
     static const char notes[7] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G' };
-    /* target buffer has to be in gc.context, otherwise saving game 
+    /* target buffer has to be in svc.context, otherwise saving game 
      * between improvised recitals would not be able to maintain
      * the same_as_last_time context. */
 
     /* You can change your tune, usually */
-    if (!(Unchanging && gc.context.jingle[0] != '\0')) {
-        int i, notecount = rnd(SIZE(gc.context.jingle) - 1); /* 1 - 5 */
+    if (!(Unchanging && svc.context.jingle[0] != '\0')) {
+        int i, notecount = rnd(SIZE(svc.context.jingle) - 1); /* 1 - 5 */
 
         for (i = 0; i < notecount; ++i) {
-            gc.context.jingle[i] = ROLL_FROM(notes);
+            svc.context.jingle[i] = ROLL_FROM(notes);
         }
-        gc.context.jingle[notecount] = '\0';
+        svc.context.jingle[notecount] = '\0';
         *same_as_last_time = FALSE;
     } else {
         *same_as_last_time = TRUE;
     }
-    return gc.context.jingle;
+    return svc.context.jingle;
 }
 
 /*
@@ -769,7 +769,7 @@ do_play_instrument(struct obj *instr)
     if (c == 'q') {
         goto nevermind;
     } else if (c == 'y') {
-        Strcpy(buf, gt.tune);
+        Strcpy(buf, svt.tune);
     } else {
         getlin("What tune are you playing? [5 notes, A-G]", buf);
         (void) mungspaces(buf);
@@ -794,7 +794,7 @@ do_play_instrument(struct obj *instr)
      */
     if (Is_stronghold(&u.uz)) {
         exercise(A_WIS, TRUE); /* just for trying */
-        if (!strcmp(buf, gt.tune)) {
+        if (!strcmp(buf, svt.tune)) {
             /* Search for the drawbridge */
             for (y = u.uy - 1; y <= u.uy + 1; y++)
                 for (x = u.ux - 1; x <= u.ux + 1; x++) {
@@ -834,13 +834,13 @@ do_play_instrument(struct obj *instr)
 
                 for (x = 0; x < (int) strlen(buf); x++)
                     if (x < 5) {
-                        if (buf[x] == gt.tune[x]) {
+                        if (buf[x] == svt.tune[x]) {
                             gears++;
                             matched[x] = TRUE;
                         } else {
                             for (y = 0; y < 5; y++)
-                                if (!matched[y] && buf[x] == gt.tune[y]
-                                    && buf[y] != gt.tune[y]) {
+                                if (!matched[y] && buf[x] == svt.tune[y]
+                                    && buf[y] != svt.tune[y]) {
                                     tumblers++;
                                     matched[y] = TRUE;
                                     break;

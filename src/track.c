@@ -76,8 +76,10 @@ save_track(NHFILE *nhfp)
             bwrite(nhfp->fd, (genericptr_t) &utcnt, sizeof utcnt);
             bwrite(nhfp->fd, (genericptr_t) &utpnt, sizeof utpnt);
             for (i = 0; i < utcnt; i++) {
-                bwrite(nhfp->fd, (genericptr_t) &utrack[i].x, sizeof utrack[i].x);
-                bwrite(nhfp->fd, (genericptr_t) &utrack[i].y, sizeof utrack[i].y);
+                bwrite(nhfp->fd, (genericptr_t) &utrack[i].x,
+                       sizeof utrack[i].x);
+                bwrite(nhfp->fd, (genericptr_t) &utrack[i].y,
+                       sizeof utrack[i].y);
             }
         }
     }

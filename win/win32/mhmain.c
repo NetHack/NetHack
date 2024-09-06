@@ -457,16 +457,16 @@ MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_CLOSE: {
         /* exit gracefully */
-        if (gp.program_state.gameover) {
+        if (program_state.gameover) {
             /* assume the user really meant this, as the game is already
              * over... */
             /* to make sure we still save bones, just set stop printing flag
              */
-            gp.program_state.stopprint++;
+            program_state.stopprint++;
             NHEVENT_KBD(
                 '\033'); /* and send keyboard input as if user pressed ESC */
             /* additional code for this is done in menu and rip windows */
-        } else if (!gp.program_state.something_worth_saving) {
+        } else if (!program_state.something_worth_saving) {
             /* User exited before the game started, e.g. during splash display
              */
             /* Just get out. */
@@ -842,7 +842,7 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     case IDM_SAVE:
         if (iflags.debug_fuzzer)
             break;
-        if (!gp.program_state.gameover && !gp.program_state.done_hup)
+        if (!program_state.gameover && !program_state.done_hup)
             dosave();
         else
             MessageBeep(0);

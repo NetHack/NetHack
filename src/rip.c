@@ -58,7 +58,8 @@ static const char *const rip_txt[] = {
     "         |                  |            |     Ascended     |",
     "         |       1001       |            |                  |",
     "      *  |     *  *  *      | *        * |      *  *  *     | *",
-    " _____)/\\|\\__//(\\/(/\\)/\\//\\/|_)________)/|\\\\_/_/(\\/(/\\)/\\/\\/|_)____",
+    (" _____)/\\|\\__//(\\/(/\\)/\\//\\/|_)___"
+     "_____)/|\\\\_/_/(\\/(/\\)/\\/\\/|_)____"),
     0
 };
 #define STONE_LINE_CENT 19 /* char[] element of center of stone face */
@@ -96,7 +97,7 @@ genl_outrip(winid tmpwin, int how, time_t when)
     dp[x] = (char *) 0;
 
     /* Put name on stone */
-    Sprintf(buf, "%.*s", (int) STONE_LINE_LEN, gp.plname);
+    Sprintf(buf, "%.*s", (int) STONE_LINE_LEN, svp.plname);
     center(NAME_LINE, buf);
 
     /* Put $ on stone */

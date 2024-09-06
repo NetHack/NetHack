@@ -126,18 +126,18 @@ staticfn boolean
 maybe_kick_monster(struct monst *mon, coordxy x, coordxy y)
 {
     if (mon) {
-        boolean save_forcefight = gc.context.forcefight;
+        boolean save_forcefight = svc.context.forcefight;
 
         gb.bhitpos.x = x;
         gb.bhitpos.y = y;
         if (!mon->mpeaceful || !canspotmon(mon))
-            gc.context.forcefight = TRUE; /* attack even if invisible */
+            svc.context.forcefight = TRUE; /* attack even if invisible */
         /* kicking might be halted by discovery of hidden monster,
            by player declining to attack peaceful monster,
            or by passing out due to encumbrance */
         if (attack_checks(mon, (struct obj *) 0) || overexertion())
             mon = 0; /* don't kick after all */
-        gc.context.forcefight = save_forcefight;
+        svc.context.forcefight = save_forcefight;
     }
     return (boolean) (mon != 0);
 }
@@ -200,7 +200,8 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
                 continue;
 
             kickdieroll = rnd(20);
-            specialdmg = special_dmgval(&gy.youmonst, mon, W_ARMF, (long *) 0);
+            specialdmg = special_dmgval(&gy.youmonst, mon, W_ARMF,
+                                        (long *) 0);
             if (mon->data == &mons[PM_SHADE] && !specialdmg) {
                 /* doesn't matter whether it would have hit or missed,
                    and shades have no passive counterattack */
@@ -491,10 +492,11 @@ kick_object(coordxy x, coordxy y, char *kickobjnam)
 
     *kickobjnam = '\0';
     /* if a pile, the "top" object gets kicked */
-    gk.kickedobj = gl.level.objects[x][y];
+    gk.kickedobj = svl.level.objects[x][y];
     if (gk.kickedobj) {
-        /* kick object; if doing is fatal, done() will clean up gk.kickedobj */
-        Strcpy(kickobjnam, killer_xname(gk.kickedobj)); /* matters iff res==0 */
+        /* formatted object name matters iff res==0 */
+        Strcpy(kickobjnam, killer_xname(gk.kickedobj));
+        /* kick object; if fatal, done() will clean up kickedobj */
         res = really_kick_object(x, y);
         gk.kickedobj = (struct obj *) 0;
     }
@@ -547,9 +549,9 @@ really_kick_object(coordxy x, coordxy y)
             ; /* hero has been transformed but kick continues */
         } else {
             /* normalize body shape here; foot, not body_part(FOOT) */
-            Sprintf(gk.killer.name, "kicking %s barefoot",
+            Sprintf(svk.killer.name, "kicking %s barefoot",
                     killer_xname(gk.kickedobj));
-            instapetrify(gk.killer.name);
+            instapetrify(svk.killer.name);
         }
     }
 
@@ -907,6 +909,8 @@ kick_ouch(coordxy x, coordxy y, const char *kickobjnam)
 staticfn void
 kick_door(coordxy x, coordxy y, int avrg_attrib)
 {
+    boolean doorbuster;
+
     if (gm.maploc->doormask == D_ISOPEN || gm.maploc->doormask == D_BROKEN
         || gm.maploc->doormask == D_NODOOR) {
         kick_dumb(x, y);
@@ -920,9 +924,12 @@ kick_door(coordxy x, coordxy y, int avrg_attrib)
     }
 
     exercise(A_DEX, TRUE);
+    doorbuster = Upolyd && is_giant(gy.youmonst.data);
     /* door is known to be CLOSED or LOCKED */
-    if (rnl(35) < avrg_attrib + (!martial() ? 0 : ACURR(A_DEX))) {
+    if (doorbuster
+        || (rnl(35) < avrg_attrib + (!martial() ? 0 : ACURR(A_DEX)))) {
         boolean shopdoor = *in_rooms(x, y, SHOPBASE) ? TRUE : FALSE;
+
         /* break the door */
         if (gm.maploc->doormask & D_TRAPPED) {
             if (flags.verbose)
@@ -1130,7 +1137,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
 
         /* nothing, fruit or trouble? 75:23.5:1.5% */
         if (rn2(3)) {
-            if (!rn2(6) && !(gm.mvitals[PM_KILLER_BEE].mvflags & G_GONE))
+            if (!rn2(6) && !(svm.mvitals[PM_KILLER_BEE].mvflags & G_GONE))
                 You_hear("a low buzzing."); /* a warning */
             kick_ouch(x, y, "");
             return ECMD_TIME;
@@ -1200,7 +1207,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
             exercise(A_DEX, TRUE);
             return ECMD_TIME;
         } else if (!(gm.maploc->looted & S_LPUDDING) && !rn2(3)
-                   && !(gm.mvitals[PM_BLACK_PUDDING].mvflags & G_GONE)) {
+                   && !(svm.mvitals[PM_BLACK_PUDDING].mvflags & G_GONE)) {
             Soundeffect(se_gushing_sound, 100);
             if (Blind) {
                 if (!Deaf)
@@ -1215,7 +1222,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
             gm.maploc->looted |= S_LPUDDING;
             return ECMD_TIME;
         } else if (!(gm.maploc->looted & S_LDWASHER) && !rn2(3)
-                   && !(gm.mvitals[PM_AMOROUS_DEMON].mvflags & G_GONE)) {
+                   && !(svm.mvitals[PM_AMOROUS_DEMON].mvflags & G_GONE)) {
             /* can't resist... */
             pline("%s returns!", (Blind ? Something : "The dish washer"));
             if (makemon(&mons[PM_AMOROUS_DEMON], x, y,
@@ -1364,12 +1371,12 @@ dokick(void)
     mtmp = isok(x, y) ? m_at(x, y) : 0;
     /* might not kick monster if it is hidden and becomes revealed,
        if it is peaceful and player declines to attack, or if the
-       hero passes out due to encumbrance with low hp; gc.context.move
+       hero passes out due to encumbrance with low hp; svc.context.move
        will be 1 unless player declines to kick peaceful monster */
     if (mtmp) {
         oldglyph = glyph_at(x, y);
         if (!maybe_kick_monster(mtmp, x, y))
-            return (gc.context.move ? ECMD_TIME : ECMD_OK);
+            return (svc.context.move ? ECMD_TIME : ECMD_OK);
     }
 
     wake_nearby(FALSE);
@@ -1417,7 +1424,7 @@ dokick(void)
             map_invisible(x, y);
         }
         /* recoil if floating */
-        if ((Is_airlevel(&u.uz) || Levitation) && gc.context.move) {
+        if ((Is_airlevel(&u.uz) || Levitation) && svc.context.move) {
             int range;
 
             range =
@@ -1547,7 +1554,7 @@ impact_drop(
 
     isrock = (missile && missile->otyp == ROCK);
     oct = dct = 0L;
-    for (obj = gl.level.objects[x][y]; obj; obj = obj2) {
+    for (obj = svl.level.objects[x][y]; obj; obj = obj2) {
         obj2 = obj->nexthere;
         if (obj == missile)
             continue;
@@ -1603,11 +1610,11 @@ impact_drop(
             You("removed %ld %s worth of goods!", price, currency(price));
             if (cansee(shkp->mx, shkp->my)) {
                 if (ESHK(shkp)->customer[0] == 0)
-                    (void) strncpy(ESHK(shkp)->customer, gp.plname, PL_NSIZ);
+                    (void) strncpy(ESHK(shkp)->customer, svp.plname, PL_NSIZ);
                 if (angry)
                     pline("%s is infuriated!", Shknam(shkp));
                 else
-                    pline("\"%s, you are a thief!\"", gp.plname);
+                    pline("\"%s, you are a thief!\"", svp.plname);
             } else
                 You_hear("a scream, \"Thief!\"");
             hot_pursuit(shkp);
@@ -1654,7 +1661,7 @@ ship_object(struct obj *otmp, coordxy x, coordxy y, boolean shop_floor_obj)
     unpaid = is_unpaid(otmp);
 
     if (OBJ_AT(x, y)) {
-        for (obj = gl.level.objects[x][y]; obj; obj = obj->nexthere) {
+        for (obj = svl.level.objects[x][y]; obj; obj = obj->nexthere) {
             if (obj == uchain)
                 chainthere = TRUE;
             else if (obj != otmp)

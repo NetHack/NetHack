@@ -231,9 +231,9 @@ losexp(
         SoundAchievement(0, sa2_xpleveldown, 0);
     } else { /* u.ulevel==1 */
         if (drainer) {
-            gk.killer.format = KILLED_BY;
-            if (gk.killer.name != drainer)
-                Strcpy(gk.killer.name, drainer);
+            svk.killer.format = KILLED_BY;
+            if (svk.killer.name != drainer)
+                Strcpy(svk.killer.name, drainer);
             done(DIED);
         }
         /* no drainer or lifesaved */

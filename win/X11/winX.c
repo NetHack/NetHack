@@ -1282,7 +1282,7 @@ X11_update_inventory(int arg)
 
     if (iflags.perm_invent) {
         /* skip any calls to update_inventory() before in_moveloop starts */
-        if (gp.program_state.in_moveloop || gp.program_state.gameover) {
+        if (program_state.in_moveloop || program_state.gameover) {
             updated_inventory = 1; /* hack to avoid mapping&raising window */
             if (!arg) {
                 (void) display_inventory((char *) 0, FALSE);
@@ -1798,7 +1798,7 @@ X11_hangup(Widget w, XEvent *event, String *params, Cardinal *num_params)
 static void
 X11_bail(const char *mesg)
 {
-    gp.program_state.something_worth_saving = 0;
+    program_state.something_worth_saving = 0;
     clearlocks();
     X11_exit_nhwindows(mesg);
     nh_terminate(EXIT_SUCCESS);
@@ -1815,7 +1815,7 @@ askname_delete(Widget w, XEvent *event, String *params, Cardinal *num_params)
     nhUse(num_params);
 
     nh_XtPopdown(w);
-    (void) strcpy(gp.plname, "Mumbles"); /* give them a name... ;-) */
+    (void) strcpy(svp.plname, "Mumbles"); /* give them a name... ;-) */
     exit_x_event = TRUE;
 }
 
@@ -1840,11 +1840,11 @@ askname_done(Widget w, XtPointer client_data, XtPointer call_data)
     }
 
     /* Truncate name if necessary */
-    if (len >= sizeof gp.plname - 1)
-        len = sizeof gp.plname - 1;
+    if (len >= sizeof svp.plname - 1)
+        len = sizeof svp.plname - 1;
 
-    (void) strncpy(gp.plname, s, len);
-    gp.plname[len] = '\0';
+    (void) strncpy(svp.plname, s, len);
+    svp.plname[len] = '\0';
     XtFree(s);
 
     nh_XtPopdown(XtParent(dialog));
@@ -1892,7 +1892,7 @@ X11_askname(void)
                           (XtCallbackProc) 0);
 
     SetDialogPrompt(dialog, nhStr("What is your name?")); /* set prompt */
-    SetDialogResponse(dialog, gp.plname, PL_NSIZ); /* set default answer */
+    SetDialogResponse(dialog, svp.plname, PL_NSIZ); /* set default answer */
 
     XtRealizeWidget(popup);
     positionpopup(popup, TRUE); /* center,bottom */
@@ -2041,7 +2041,7 @@ X11_getlin(
     /* we get here after the popup has exited;
        put prompt and response into the message window (and into
        core's dumplog history) unless play hasn't started yet */
-    if (gp.program_state.in_moveloop || gp.program_state.gameover) {
+    if (program_state.in_moveloop || program_state.gameover) {
         /* single space has meaning (to remove a previously applied name) so
            show it clearly; don't care about legibility of multiple spaces */
         const char *visanswer = !input[0] ? "<empty>"

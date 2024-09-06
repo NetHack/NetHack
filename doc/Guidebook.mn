@@ -46,7 +46,7 @@
 .ds f0 \*(vr
 .ds f1 \" empty
 .\"DO NOT REMOVE NH_DATESUB .ds f2 DATE(%B %-d, %Y)
-.ds f2 April 12, 2024
+.ds f2 August 11, 2024
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -455,69 +455,89 @@ option.
 The map (rest of the screen)
 .pg
 The rest of the screen is the map of the level as you have explored it
-so far.  Each symbol on the screen represents something.  You can set
-various graphics options to change some of the symbols the game uses;
-otherwise, the game will use default symbols.  Here is a list of what the
-default symbols mean:
-.lp "\\- and | "
-The walls of a room, or an open door.  Or a grave (|).
-.lp .
-The floor of a room, ice, or a doorless doorway.
-.lp #
-A corridor, or iron bars, or a tree, or possibly a kitchen sink (if
-your dungeon has sinks), or a drawbridge.
-.lp >
+so far.
+Each symbol on the screen represents something.
+You can set various graphics options to change some of the symbols the
+game uses; otherwise, the game will use default symbols.
+Here is a list of what the default symbols mean:
+.lp \f(CR\\-\fP
+The horizontal or corner walls of a room, or an open east/west door.
+.lp \f(CR|\fP
+The vertical walls of a room, or an open north/south door, or a grave.
+.lp \f(CR.\fP
+The floor of a room, or ice, or a doorless doorway, or the span of an
+open drawbridge.
+.lp \f(CR#\fP
+A corridor, or iron bars, or a tree, or the portcullis of a closed
+drawbridge.
+.lp ""
+Note: engravings in corridors also appear as \f(CR#\fP but are shown in
+a different color from normal corridor locations.
+.lp \f(CR>\fP
 Stairs down: a way to the next level.
-.lp <
+.lp \f(CR<\fP
 Stairs up: a way to the previous level.
-.lp +
+.lp \f(CR+\fP
 A closed door, or a spellbook containing a spell you may be able to learn.
-.lp @
-Your character or a human.
-.lp $
+.lp \f(CR@\fP
+Your character or a human or an elf.
+.lp \f(CR$\fP
 A pile of gold.
-.lp \(ha \" ^
+.lp \f(CR\(ha\fP \" \(ha == 'hat' == full sized caret ^
 A trap (once you have detected it).
-.lp )
+.lp \f(CR)\fP
 A weapon.
-.lp [
+.lp \f(CR[\fP
 A suit or piece of armor.
-.lp %
+.lp \f(CR%\fP
 Something edible (not necessarily healthy).
-.lp ?
+.lp \f(CR?\fP
 A scroll.
-.lp /
+.lp \f(CR/\fP
 A wand.
-.lp =
+.lp \f(CR=\fP
 A ring.
-.lp !
+.lp \f(CR!\fP
 A potion.
-.lp (
+.lp \f(CR(\fP
 A useful item (pick-axe, key, lamp...).
-.lp \(dq \" \(dq == double quote
+.lp \f(CR\(dq\fP \" \(dq == double quote
 An amulet or a spider web.
-.lp *
+.lp \f(CR*\fP
 A gem or rock (possibly valuable, possibly worthless).
-.lp \`
-A boulder or statue.
-.lp 0
+.lp \f(CR\`\fP
+A boulder or statue or an engraving on the floor of a room.
+.lp ""
+Note: statues are displayed as if they were the monsters they depict
+so won't appear as a \fIgrave accent\fP (aka \fIback-tick\fP).
+.lp \f(CR0\fP
 An iron ball.
-.lp _
+.lp \f(CR_\fP
 An altar, or an iron chain.
-.lp {
-A fountain.
-.lp }
-A pool of water or moat or a pool of lava.
-.lp \\\\
+.lp \f(CR{\fP
+A fountain or a sink.
+.lp \f(CR}\fP
+A pool of water or moat or a wall of water
+or a pool of lava or a wall of lava.
+.lp \f(CR\\\\\fP
 An opulent throne.
-.lp "a-zA-Z and other symbols"
+.lp "\f(CRa\fP-\f(CRz\fP\ \ \fIand\fP"
+.lp "\f(CRA\fP-\f(CRH\fP\f(CRJ\fP-\f(CRZ\fP\ \ \fIand\fP"
+.lp "\f(CR@&\(aq:;\fP" \" \(aq == apostrophe / single quote
 Letters and certain other symbols represent the various inhabitants
-of the Mazes of Menace.  Watch out, they can be nasty and vicious.
+of the Mazes of Menace.
+Watch out, they can be nasty and vicious.
 Sometimes, however, they can be helpful.
-.lp I
-This marks the last known location of an invisible or otherwise unseen
-monster.  Note that the monster could have moved.
-The \(oqF\(cq and \(oqm\(cq commands may be useful here.
+.lp \f(CRI\fP
+Rather than a specific type of monster, this marks the last known
+location of an invisible or otherwise unseen monster.
+Note that the monster could have moved.
+The \(oqs\(cq, \(oqF\(cq, and \(oqm\(cq commands may be useful here.
+.lp \f(CR1\fP-\f(CR5\fP
+The digits 1 through 5 may be displayed, marking unseen monsters sensed
+via the \fIWarning\fP attribute.
+Less dangerous monsters are indicated by lower values, more dangerous by
+higher values.
 .pg
 You need not memorize all these symbols; you can ask the game what any
 symbol represents with the \(oq/\(cq command (see the next section for
@@ -1675,6 +1695,9 @@ Show map without obstructions.
 In normal play you can view the explored portion of the current level's
 map without monsters; without monsters and objects; or without monsters,
 objects, and traps.
+.lp ""
+If there are visible clouds of gas in view, they are treated like traps
+when deciding whether to show them or the floor underneath them.
 .lp ""
 In explore mode, you can choose to view the full map rather than just
 its explored portion.
@@ -3442,6 +3465,8 @@ Blind from birth.
 Deaf from birth.
 .PL Nudist
 Never wore any armor.
+.PL Pauper
+Started out with no possessions.
 .PL Ascended
 Delivered the Amulet to its final destination.
 .PE
@@ -3478,7 +3503,7 @@ instrument played closely
 enough\(embut not too close!\(emto
 the Castle level's drawbridge or can be given to you via prayer boon.
 .pg
-\fIBlind\fP, \fIDeaf\fP, and \fINudist\fP are also conducts, and they can only be
+\fIBlind\fP, \fIDeaf\fP, \fINudist\fP, and \FIPauper\fP are also conducts, and they can only be
 enabled by setting the correspondingly named option in NETHACKOPTIONS
 or run-time configuration file prior to game start.
 In the case of \fIBlind\fP and \fIDeaf\fP, the option also enforces the conduct.
@@ -4303,7 +4328,8 @@ symbols for the various object types.
 Any omitted types are filled in at the end from the previous order.
 .lp paranoid_confirmation
 A space separated list of specific situations where alternate
-prompting is desired.  The default is \(lqparanoid_confirmation:pray swim trap\(rq.
+prompting is desired.
+The default is \(lqparanoid_confirmation:pray swim trap\(rq.
 .PS Were-change
 .PL Confirm
 for any prompts which are set to require \(lqyes\(rq rather than \(oqy\(cq,
@@ -4337,6 +4363,8 @@ than immediately praying; on by default;
 .PL trap
 require \(oqy\(cq to confirm an attempt to move into or onto a known trap,
 unless doing so is considered to be harmless;
+when enabled, this confirmation is also used for moving into visible
+gas cloud regions;
 (to require \(lqyes\(rq rather than just \(oqy\(cq, set Confirm too);
 confirmation can be skipped by using the \(oq\f(CRm\fP\(cq movement prefix;
 .PL swim
@@ -4353,7 +4381,7 @@ commands even when wearing just one applicable item;
 .PL all
 turn on all of the above.
 .PE
-By default, the pray and swim choices are enabled, the others disabled.
+By default, the pray, swim, and trap choices are enabled, the others disabled.
 To disable them without setting
 any of the other choices, use \f(CRparanoid_confirmation:none\fP.
 To keep them enabled while setting any of the others, you can
@@ -4370,6 +4398,8 @@ use the \(oq\f(CR+\fP\(cq form and list entries to be added by their name
 and entries to be removed by \(oq\f(CR!\fP\(cq and name.
 The positive (no \(oq!\(cq) and negative (with \(oq!\(cq) entries
 can be intermixed.
+.lp pauper
+Start the character with no possessions (default false).  Persistent.
 .lp perm_invent
 If true, always display your current inventory in a window (default false).
 .lp ""

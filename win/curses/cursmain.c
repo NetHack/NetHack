@@ -326,9 +326,9 @@ curses_askname(void)
         }
 #endif /* SELECTSAVED */
 
-    curses_line_input_dialog("Who are you?", gp.plname, PL_NSIZ);
-    (void) mungspaces(gp.plname);
-    if (!gp.plname[0] || gp.plname[0] == '\033')
+    curses_line_input_dialog("Who are you?", svp.plname, PL_NSIZ);
+    (void) mungspaces(svp.plname);
+    if (!svp.plname[0] || svp.plname[0] == '\033')
          goto bail;
 
     iflags.renameallowed = TRUE; /* tty uses this, we don't [yet?] */
@@ -782,7 +782,7 @@ curses_update_inventory(int arg)
     }
 
     /* skip inventory updating during character initialization */
-    if (!gp.program_state.in_moveloop && !gp.program_state.gameover)
+    if (!program_state.in_moveloop && !program_state.gameover)
         return;
 
     if (!arg) {

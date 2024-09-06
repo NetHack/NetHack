@@ -352,11 +352,11 @@ plsel_dialog_acceptvalues(void)
     XtSetArg(args[0], nhStr(XtNstring), &s);
     XtGetValues(plsel_name_input, args, ONE);
 
-    (void) strncpy(gp.plname, (char *) s, sizeof gp.plname - 1);
-    gp.plname[sizeof gp.plname - 1] = '\0';
-    (void) mungspaces(gp.plname);
-    if (strlen(gp.plname) < 1)
-        (void) strcpy(gp.plname, "Mumbles");
+    (void) strncpy(svp.plname, (char *) s, sizeof svp.plname - 1);
+    svp.plname[sizeof svp.plname - 1] = '\0';
+    (void) mungspaces(svp.plname);
+    if (strlen(svp.plname) < 1)
+        (void) strcpy(svp.plname, "Mumbles");
     iflags.renameinprogress = FALSE;
 }
 
@@ -779,8 +779,8 @@ X11_create_player_selection_name(Widget form)
     XtSetArg(args[num_args], nhStr(XtNeditType),
              !plsel_ask_name ? XawtextRead : XawtextEdit); num_args++;
     XtSetArg(args[num_args], nhStr(XtNresize), XawtextResizeWidth); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNstring), gp.plname); num_args++;
-    XtSetArg(args[num_args], XtNinsertPosition, strlen(gp.plname)); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNstring), svp.plname); num_args++;
+    XtSetArg(args[num_args], XtNinsertPosition, strlen(svp.plname)); num_args++;
     XtSetArg(args[num_args], nhStr(XtNaccelerators),
              XtParseAcceleratorTable(plsel_input_accelerators)); num_args++;
     plsel_name_input = XtCreateManagedWidget("name_input",
@@ -1222,7 +1222,7 @@ X11_player_selection_dialog(void)
 
     if (ps_selected == PS_QUIT
 #if defined(HANGUPHANDLING)
-        || gp.program_state.done_hup
+        || program_state.done_hup
 #endif
        ) {
         clearlocks();
@@ -1300,7 +1300,7 @@ X11_player_selection_prompts(void)
 
         if (ps_selected == PS_QUIT
 #if defined(HANGUPHANDLING)
-            || gp.program_state.done_hup
+            || program_state.done_hup
 #endif
            ) {
             clearlocks();
@@ -1373,7 +1373,7 @@ X11_player_selection_prompts(void)
 
             if (ps_selected == PS_QUIT
 #if defined(HANGUPHANDLING)
-                || gp.program_state.done_hup
+                || program_state.done_hup
 #endif
                ) {
                 clearlocks();
@@ -1445,7 +1445,7 @@ X11_player_selection_prompts(void)
 
             if (ps_selected == PS_QUIT
 #if defined(HANGUPHANDLING)
-			    || gp.program_state.done_hup
+			    || program_state.done_hup
 #endif
                 ) {
                 clearlocks();
@@ -1515,7 +1515,7 @@ X11_player_selection_prompts(void)
 
             if (ps_selected == PS_QUIT
 #if defined(HANGUPHANDLING)
-		|| gp.program_state.done_hup
+		|| program_state.done_hup
 #endif
                ) {
                 clearlocks();
@@ -1539,15 +1539,15 @@ void
 X11_player_selection(void)
 {
     if (iflags.wc_player_selection == VIA_DIALOG) {
-        if (!*gp.plname) {
+        if (!*svp.plname) {
 #ifdef UNIX
             char *defplname = get_login_name();
 #else
             char *defplname = (char *)0;
 #endif
-            (void) strncpy(gp.plname, defplname ? defplname : "Mumbles",
-                           sizeof gp.plname - 1);
-            gp.plname[sizeof gp.plname - 1] = '\0';
+            (void) strncpy(svp.plname, defplname ? defplname : "Mumbles",
+                           sizeof svp.plname - 1);
+            svp.plname[sizeof svp.plname - 1] = '\0';
             iflags.renameinprogress = TRUE;
         }
         X11_player_selection_dialog();

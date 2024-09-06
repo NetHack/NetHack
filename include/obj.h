@@ -1,4 +1,4 @@
-/* NetHack 3.7	obj.h	$NHDT-Date: 1633802062 2021/10/09 17:54:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.94 $ */
+/* NetHack 3.7	obj.h	$NHDT-Date: 1718999845 2024/06/21 19:57:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -82,6 +82,8 @@ struct obj {
 #define OBJ_ONBILL 7    /* object on shk bill */
 #define OBJ_LUAFREE 8   /* object has been dealloc'd, but is ref'd by lua */
 #define OBJ_DELETED 9   /* object is marked for deletion by dobjsfree() */
+    /* note: OBJ_xxx values are used in obj_state_names[] in mkobj.c
+       so adding, removing, or renumbering these needs to change that too */
 #define NOBJ_STATES 10
     xint16 timed; /* # of fuses (timers) attached to this obj */
 
@@ -300,14 +302,14 @@ struct obj {
 /* Eggs and other food */
 #define MAX_EGG_HATCH_TIME 200 /* longest an egg can remain unhatched */
 #define stale_egg(egg) \
-    ((gm.moves - (egg)->age) > (2 * MAX_EGG_HATCH_TIME))
+    ((svm.moves - (egg)->age) > (2 * MAX_EGG_HATCH_TIME))
 #define ofood(o) ((o)->otyp == CORPSE || (o)->otyp == EGG || (o)->otyp == TIN)
     /* note: sometimes eggs and tins have special corpsenm values that
        shouldn't be used as an index into mons[]                       */
-#define polyfodder(obj) \
+#define polyfood(obj) \
     (ofood(obj) && (obj)->corpsenm >= LOW_PM                            \
      && (pm_to_cham((obj)->corpsenm) != NON_PM                          \
-                    || dmgtype(&mons[(obj)->corpsenm], AD_POLY)))
+         || dmgtype(&mons[(obj)->corpsenm], AD_POLY)))
 #define mlevelgain(obj) (ofood(obj) && (obj)->corpsenm == PM_WRAITH)
 #define mhealup(obj) (ofood(obj) && (obj)->corpsenm == PM_NURSE)
 #define Is_pudding(o) \
@@ -418,8 +420,8 @@ struct obj {
                        || (o)->otyp == AMULET_OF_UNCHANGING)
 
 /* achievement tracking; 3.6.x did this differently */
-#define is_mines_prize(o) ((o)->o_id == gc.context.achieveo.mines_prize_oid)
-#define is_soko_prize(o) ((o)->o_id == gc.context.achieveo.soko_prize_oid)
+#define is_mines_prize(o) ((o)->o_id == svc.context.achieveo.mines_prize_oid)
+#define is_soko_prize(o) ((o)->o_id == svc.context.achieveo.soko_prize_oid)
 
 /* is_art() is now a function in artifact.c */
 /* #define is_art(o,art) ((o) && (o)->oartifact == (art)) */

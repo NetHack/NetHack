@@ -84,7 +84,7 @@ extern void msmsg(const char *, ...);
  */
 #define HUPSKIP() \
     do {                                        \
-        if (gp.program_state.done_hup) {        \
+        if (program_state.done_hup) {        \
             morc = '\033';                      \
             return;                             \
         }                                       \
@@ -92,7 +92,7 @@ extern void msmsg(const char *, ...);
     /* morc=ESC - in case we bypass xwaitforspace() which sets that */
 #define HUPSKIP_RESULT(RES) \
     do {                                        \
-        if (gp.program_state.done_hup)          \
+        if (program_state.done_hup)          \
             return (RES);                       \
     } while (0)
 #else /* !HANGUPHANDLING */
@@ -376,11 +376,11 @@ winch_handler(int sig_unused UNUSED)
     }
 #endif
 
-    gp.program_state.resize_pending++; /* resize_tty() will reset it */
+    program_state.resize_pending++; /* resize_tty() will reset it */
     /* if nethack is waiting for input, which is the most likely scenario,
        we will go ahead and respond to the resize immediately; otherwise,
        tty_nhgetch() will do so the next time it's called */
-    if (gp.program_state.getting_char) {
+    if (program_state.getting_char) {
         resize_tty();
 #if 0   /* [this doesn't work as intended and seems to be unnecessary] */
         if (resize_mesg) {
@@ -402,7 +402,7 @@ resize_tty(void)
     struct WinDesc *cw;
 
     /* reset to 0 rather than just decrement */
-    gp.program_state.resize_pending = 0;
+    program_state.resize_pending = 0;
     resize_mesg = 0;
 
     getwindowsz(); /* update LI and CO */
@@ -647,7 +647,7 @@ tty_player_selection(void)
 }
 
 /*
- * gp.plname is filled either by an option (-u Player  or  -uPlayer) or
+ * svp.plname is filled either by an option (-u Player  or  -uPlayer) or
  * explicitly (by being the wizard) or by askname.
  * It may still contain a suffix denoting the role, etc.
  * Always called after init_nhwindows() and before
@@ -668,7 +668,7 @@ tty_askname(void)
         case 0:
             break; /* no game chosen; start new game */
         case 1:
-            return; /* gp.plname[] has been set */
+            return; /* svp.plname[] has been set */
         }
 #endif /* SELECTSAVED */
 
@@ -731,7 +731,7 @@ tty_askname(void)
                     && !(c >= '0' && c <= '9' && ct > 0))
                     c = '_';
 #endif
-            if (ct < (int) (sizeof gp.plname) - 1) {
+            if (ct < (int) (sizeof svp.plname) - 1) {
 #if defined(MICRO)
 #if defined(MSDOS)
                 if (iflags.grmode) {
@@ -742,13 +742,13 @@ tty_askname(void)
 #else
                 (void) putchar(c);
 #endif
-                gp.plname[ct++] = c;
+                svp.plname[ct++] = c;
 #ifdef WIN32CON
                 ttyDisplay->curx++;
 #endif
             }
         }
-        gp.plname[ct] = 0;
+        svp.plname[ct] = 0;
     } while (ct == 0);
 
     /* move to next line to simulate echo of user's <return> */
@@ -1978,7 +1978,7 @@ tty_dismiss_nhwindow(winid window)
                    can't refresh--force the screen to be cleared instead
                    (affects dismissal of 'reset role filtering' menu if
                    screen height forces that to need a second page) */
-                if (gp.program_state.in_role_selection)
+                if (program_state.in_role_selection)
                     clearscreen = TRUE;
 
                 erase_menu_or_text(window, cw, clearscreen);
@@ -3041,7 +3041,7 @@ ttyinv_add_menu(
                          : !show_gold ? 26
                            : 27);
 
-    if (!gp.program_state.in_moveloop)
+    if (!program_state.in_moveloop)
         return;
     slot = selector_to_slot(ch, ttyinvmode, &ignore);
     if (inuse_only && slot > 2 * rows_per_side)
@@ -3216,7 +3216,7 @@ ttyinv_end_menu(int window, struct WinDesc *cw)
 {
     if (iflags.perm_invent
         || gp.perm_invent_toggling_direction == toggling_on) {
-        if (gp.program_state.in_moveloop) {
+        if (program_state.in_moveloop) {
             boolean inuse_only = ((ttyinvmode & InvInUse) != 0);
             int rows_per_side = inuse_only ? cw->maxrow - 2 : 0;
             int old_slots_used = ttyinv_slots_used; /* value before render */
@@ -3245,7 +3245,7 @@ ttyinv_render(winid window, struct WinDesc *cw)
     uint32 current_row_color = NO_COLOR;
     struct tty_perminvent_cell *cell;
     char invbuf[BUFSZ];
-    boolean force_redraw = gp.program_state.in_docrt ? TRUE : FALSE,
+    boolean force_redraw = program_state.in_docrt ? TRUE : FALSE,
             inuse_only = (ttyinvmode & InvInUse) != 0,
             show_gold = (ttyinvmode & InvShowGold) != 0 && !inuse_only,
             sparse = (ttyinvmode & InvSparse) != 0 && !inuse_only;
@@ -3603,7 +3603,7 @@ tty_wait_synch(void)
         if (ttyDisplay->inmore) {
             addtopl("--More--");
             (void) fflush(stdout);
-        } else if (ttyDisplay->inread > gp.program_state.gameover) {
+        } else if (ttyDisplay->inread > program_state.gameover) {
             /* this can only happen if we were reading and got interrupted */
             ttyDisplay->toplin = TOPLINE_SPECIAL_PROMPT;
             /* do this twice; 1st time gets the Quit? message again */
@@ -4036,19 +4036,19 @@ tty_nhgetch(void)
         i = randomkey();
     } else {
 #ifdef RESIZABLE
-        if (gp.program_state.resize_pending)
+        if (program_state.resize_pending)
             resize_tty();
 #endif
-        gp.program_state.getting_char++;
+        program_state.getting_char++;
 #ifdef UNIX
-        i = (gp.program_state.getting_char == 1)
+        i = (program_state.getting_char == 1)
               ? tgetch()
               : ((read(fileno(stdin), (genericptr_t) &nestbuf, 1) == 1)
                  ? (int) nestbuf : EOF);
 #else
         i = tgetch();
 #endif
-        gp.program_state.getting_char--;
+        program_state.getting_char--;
 #ifdef RESIZABLE
         if (resize_mesg) {
             resize_mesg = 0;

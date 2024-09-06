@@ -1,4 +1,4 @@
-/* NetHack 3.7	mextra.h	$NHDT-Date: 1596498545 2020/08/03 23:49:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.30 $ */
+/* NetHack 3.7	mextra.h	$NHDT-Date: 1720717969 2024/07/11 17:12:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -113,7 +113,6 @@ struct epri {
 struct bill_x {
     unsigned bo_id;
     boolean useup;
-    boolean queuedpay;
     long price; /* price per unit */
     long bquan; /* amount used up */
 };
@@ -123,8 +122,8 @@ struct eshk {
     long credit;          /* amount credited to customer */
     long debit;           /* amount of debt for using unpaid items */
     long loan;            /* shop-gold picked (part of debit) */
-    int shoptype;         /* the value of gr.rooms[shoproom].rtype */
-    schar shoproom;       /* index in gr.rooms; set by inshop() */
+    int shoptype;         /* the value of svr.rooms[shoproom].rtype */
+    schar shoproom;       /* index in svr.rooms; set by inshop() */
     schar unused;         /* to force alignment for stupid compilers */
     boolean following;    /* following customer since he owes us sth */
     boolean surcharge;    /* angry shk inflates prices */

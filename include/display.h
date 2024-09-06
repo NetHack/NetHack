@@ -19,7 +19,7 @@
  * Returns the head of the list of objects that the player can see
  * at location (x,y).  [Vestige of unimplemented invisible objects.]
  */
-#define vobj_at(x, y) (gl.level.objects[x][y])
+#define vobj_at(x, y) (svl.level.objects[x][y])
 
 /*
  * sensemon()
@@ -63,7 +63,7 @@
  */
 #define _mon_warning(mon) \
     (Warning && !(mon)->mpeaceful && (mdistu(mon) < 100)     \
-     && (((int) ((mon)->m_lev / 4)) >= gc.context.warnlevel))
+     && (((int) ((mon)->m_lev / 4)) >= svc.context.warnlevel))
 
 /*
  * mon_visible()
@@ -820,7 +820,7 @@ enum glyph_offsets {
    expression but there will always be sequence points in between */
 #define obj_is_piletop(obj) \
     ((obj)->where == OBJ_FLOOR                                  \
-     && (go.otg_otmp = gl.level.objects[(obj)->ox][(obj)->oy]->nexthere) != 0 \
+     && (go.otg_otmp = svl.level.objects[(obj)->ox][(obj)->oy]->nexthere) != 0 \
      && ((obj)->otyp != BOULDER || go.otg_otmp->otyp == BOULDER))
 /* used to hide info such as potion and gem color when not seen yet;
    stones and rock are excluded for gem class; LAST_SPELL includes blank

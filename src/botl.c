@@ -1,4 +1,4 @@
-/* NetHack 3.7	botl.c	$NHDT-Date: 1694893342 2023/09/16 19:42:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.239 $ */
+/* NetHack 3.7	botl.c	$NHDT-Date: 1720397739 2024/07/08 00:15:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.264 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -58,7 +58,7 @@ do_statusline1(void)
     if (suppress_map_output())
         return strcpy(newbot1, "");
 
-    Strcpy(newbot1, gp.plname);
+    Strcpy(newbot1, svp.plname);
     if ('a' <= newbot1[0] && newbot1[0] <= 'z')
         newbot1[0] += 'A' - 'a';
     newbot1[10] = 0;
@@ -160,7 +160,7 @@ do_statusline2(void)
 
     /* time/move counter */
     if (flags.time)
-        Sprintf(tmmv, "T:%ld", gm.moves);
+        Sprintf(tmmv, "T:%ld", svm.moves);
     else
         tmmv[0] = '\0';
     tln = strlen(tmmv);
@@ -281,7 +281,7 @@ timebot(void)
     if (gb.bot_disabled)
         return;
     /* we're called when disp.time_botl is set and general disp.botl
-       is clear; disp.time_botl gets set whenever gm.moves changes value
+       is clear; disp.time_botl gets set whenever svm.moves changes value
        so there's no benefit in tracking previous value to decide whether
        to skip update; suppress_map_output() handles program_state.restoring
        and program_state.done_hup (tty hangup => no further output at all)
@@ -423,17 +423,20 @@ long
 botl_score(void)
 {
     long deepest = deepest_lev_reached(FALSE);
-    long utotal;
+    long umoney, depthbonus;
 
     /* hidden_gold(False): only gold in containers whose contents are known */
-    utotal = money_cnt(gi.invent) + hidden_gold(FALSE);
-    if ((utotal -= u.umoney0) < 0L)
-        utotal = 0L;
-    utotal += u.urexp + (50 * (deepest - 1))
-          + (deepest > 30 ? 10000 : deepest > 20 ? 1000 * (deepest - 20) : 0);
-    if (utotal < u.urexp)
-        utotal = LONG_MAX; /* wrap around */
-    return utotal;
+    umoney = money_cnt(gi.invent) + hidden_gold(FALSE);
+    /* don't include initial gold; don't impose penalty if it's all gone */
+    if ((umoney -= u.umoney0) < 0L)
+        umoney = 0L;
+    depthbonus = 50 * (deepest - 1)
+                 + (deepest > 30) ? 10000
+                   : (deepest > 20) ? 1000 * (deepest - 20)
+                     : 0;
+    /* neither umoney nor depthbonus can grow unusually big (gold due to
+       weight); u.urexp might */
+    return nowrap_add(u.urexp, umoney + depthbonus);
 }
 #endif /* SCORE_ON_BOTL */
 
@@ -448,7 +451,7 @@ describe_level(
     int ret = 1;
 
     if (Is_knox(&u.uz)) {
-        Sprintf(buf, "%s", gd.dungeons[u.uz.dnum].dname);
+        Sprintf(buf, "%s", svd.dungeons[u.uz.dnum].dname);
         addbranch = FALSE;
     } else if (In_quest(&u.uz)) {
         Sprintf(buf, "Home %d", dunlev(&u.uz));
@@ -468,7 +471,7 @@ describe_level(
         ret = 0;
     }
     if (addbranch) {
-        Sprintf(eos(buf), ", %s", gd.dungeons[u.uz.dnum].dname);
+        Sprintf(eos(buf), ", %s", svd.dungeons[u.uz.dnum].dname);
         (void) strsubst(buf, "The ", "the ");
     }
     if (addspace)
@@ -505,8 +508,8 @@ staticfn void split_clridx(int, int *, int *);
 staticfn boolean is_ltgt_percentnumber(const char *);
 staticfn boolean has_ltgt_percentnumber(const char *);
 staticfn int splitsubfields(char *, char ***, int);
-staticfn boolean is_fld_arrayvalues(const char *, const char *const *, int, int,
-                                  int *);
+staticfn boolean is_fld_arrayvalues(const char *, const char *const *,
+                                    int, int, int *);
 staticfn int query_arrayvalue(const char *, const char *const *, int, int);
 staticfn void status_hilite_add_threshold(int, struct hilite_s *);
 staticfn boolean parse_status_hl2(char (*)[QBUFSZ], boolean);
@@ -517,7 +520,7 @@ staticfn unsigned long str2conditionbitmask(char *);
 staticfn boolean parse_condition(char (*)[QBUFSZ], int);
 staticfn char *hlattr2attrname(int, char *, size_t);
 staticfn void status_hilite_linestr_add(int, struct hilite_s *, unsigned long,
-                                      const char *);
+                                        const char *);
 staticfn void status_hilite_linestr_done(void);
 staticfn int status_hilite_linestr_countfield(int);
 staticfn void status_hilite_linestr_gather_conditions(void);
@@ -526,7 +529,7 @@ staticfn char *status_hilite2str(struct hilite_s *);
 staticfn int status_hilite_menu_choose_field(void);
 staticfn int status_hilite_menu_choose_behavior(int);
 staticfn int status_hilite_menu_choose_updownboth(int, const char *, boolean,
-                                                boolean);
+                                                  boolean);
 staticfn boolean status_hilite_menu_add(int);
 staticfn boolean status_hilite_remove(int);
 staticfn boolean status_hilite_menu_fld(int);
@@ -766,7 +769,7 @@ bot_via_windowport(void)
     /*
      *  Player name and title.
      */
-    Strcpy(nb = buf, gp.plname);
+    Strcpy(nb = buf, svp.plname);
     nb[0] = highc(nb[0]);
     titl = !Upolyd ? rank() : pmname(&mons[u.umonnum], Ugender);
     i = (int) (strlen(buf) + sizeof " the " + strlen(titl) - sizeof "");
@@ -870,7 +873,7 @@ bot_via_windowport(void)
     gb.blstats[idx][BL_EXP].a.a_long = u.uexp;
 
     /* Time (moves) */
-    gb.blstats[idx][BL_TIME].a.a_long = gm.moves;
+    gb.blstats[idx][BL_TIME].a.a_long = svm.moves;
 
     /* Hunger */
     /* note: u.uhs is unsigned, and 3.6.1's STATUS_HILITE defined
@@ -1039,7 +1042,7 @@ stat_update_time(void)
     int fld = BL_TIME;
 
     /* Time (moves) */
-    gb.blstats[idx][fld].a.a_long = gm.moves;
+    gb.blstats[idx][fld].a.a_long = svm.moves;
     gv.valset[fld] = FALSE;
 
     eval_notify_windowport_field(fld, gv.valset, idx);
@@ -1295,17 +1298,17 @@ eval_notify_windowport_field(
     }
 
     /* Temporary? hack: moveloop()'s prolog for a new game sets
-     * gc.context.rndencode after the status window has been init'd,
+     * svc.context.rndencode after the status window has been init'd,
      * so $:0 has already been encoded and cached by the window
      * port.  Without this hack, gold's \G sequence won't be
      * recognized and ends up being displayed as-is for 'gu.update_all'.
      *
-     * Also, even if gc.context.rndencode hasn't changed and the
+     * Also, even if svc.context.rndencode hasn't changed and the
      * gold amount itself hasn't changed, the glyph portion of the
      * encoding may have changed if a new symset was put into effect.
      *
      *  \GXXXXNNNN:25
-     *  XXXX = the gc.context.rndencode portion
+     *  XXXX = the svc.context.rndencode portion
      *  NNNN = the glyph portion
      *  25   = the gold amount
      *
@@ -1313,10 +1316,10 @@ eval_notify_windowport_field(
      * not to honor an initial highlight, so force 'gu.update_all = TRUE'.
      */
     if (fld == BL_GOLD
-        && (gc.context.rndencode != oldrndencode
+        && (svc.context.rndencode != oldrndencode
             || gs.showsyms[COIN_CLASS + SYM_OFF_O] != oldgoldsym)) {
         gu.update_all = TRUE; /* chg = 2; */
-        oldrndencode = gc.context.rndencode;
+        oldrndencode = svc.context.rndencode;
         oldgoldsym = gs.showsyms[COIN_CLASS + SYM_OFF_O];
     }
 
@@ -2020,7 +2023,7 @@ status_eval_next_unhilite(void)
     struct istat_s *curr;
     long next_unhilite, this_unhilite;
 
-    gb.bl_hilite_moves = gm.moves; /* simplified; at one point we used to
+    gb.bl_hilite_moves = svm.moves; /* simplified; at one point we used to
                                     * try to encode fractional amounts for
                                     * multiple moves within same turn */
     /* figure out whether an unhilight needs to be performed now */
@@ -2273,7 +2276,7 @@ get_hilite(
                 txtstr = gb.blstats[idx][fldidx].val;
                 if (fldidx == BL_TITLE)
                     /* "<name> the <rank-title>", skip past "<name> the " */
-                    txtstr += (strlen(gp.plname) + sizeof " the " - sizeof "");
+                    txtstr += strlen(svp.plname) + sizeof " the " - sizeof "";
                 if (hl->rel == TXT_VALUE && hl->textmatch[0]) {
                     if (fuzzymatch(hl->textmatch, txtstr, "\" -_", TRUE)) {
                         rule = hl;
@@ -2694,7 +2697,7 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
                                  is_out_of_range);
                 return FALSE;
             } else if (dt == ANY_LONG
-                       && (hilite.value.a_long < (grt ? -1L : lt ? 1L : 0L))) {
+                       && hilite.value.a_long < (grt ? -1L : lt ? 1L : 0L)) {
                 config_error_add("%s'%s%ld'%s", threshold_value,
                                  op, hilite.value.a_long, is_out_of_range);
                 return FALSE;
@@ -3506,7 +3509,8 @@ status_hilite_menu_choose_behavior(int fld)
     if (fld == BL_HP) {
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_CRITICALHP;
-        Sprintf(buf,  "Highlight critically low %s", initblstats[fld].fldname);
+        Sprintf(buf,  "Highlight critically low %s",
+                initblstats[fld].fldname);
         add_menu(tmpwin, &nul_glyphinfo, &any, 'C', 0, ATR_NONE,
                  clr, buf, MENU_ITEMFLAGS_NONE);
         nopts++;
