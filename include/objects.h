@@ -1,4 +1,4 @@
-/* NetHack 3.7	objects.h	$NHDT-Date: 1700725879 2023/11/23 07:51:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.7	objects.h	$NHDT-Date: 1725653011 2024/09/06 20:03:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -423,8 +423,8 @@ BOW("crossbow", NoDes,          1, 45, 50, 40, 0, WOOD, P_CROSSBOW, HI_WOOD,
 #define CLOAK(name,desc,kn,mgc,power,prob,delay,wt,cost,ac,can,metal,c,sn)  \
     ARMOR(name, desc, kn, mgc, 0, power, prob, delay, wt,  \
           cost, ac, can, ARM_CLOAK, metal, c,sn)
-#define SHIELD(name,desc,kn,mgc,blk,power,prob,delay,wt,cost,ac,can,metal,c,sn) \
-    ARMOR(name, desc, kn, mgc, blk, power, prob, delay, wt, \
+#define SHIELD(name,desc,kn,mgc,blk,pow,prob,delay,wt,cost,ac,can,metal,c,sn) \
+    ARMOR(name, desc, kn, mgc, blk, pow, prob, delay, wt, \
           cost, ac, can, ARM_SHIELD, metal, c,sn)
 #define GLOVES(name,desc,kn,mgc,power,prob,delay,wt,cost,ac,can,metal,c,sn)  \
     ARMOR(name, desc, kn, mgc, 0, power, prob, delay, wt,  \
@@ -601,34 +601,41 @@ ARMOR("T-shirt", NoDes,
 
 /* cloaks */
 CLOAK("mummy wrapping", NoDes,
-      1, 0,          0,  0, 0,  3,  2, 10, 1,  CLOTH, CLR_GRAY, MUMMY_WRAPPING),
+      1, 0,          0,  0, 0,  3,  2, 10, 1,  CLOTH, CLR_GRAY,
+                                                        MUMMY_WRAPPING),
         /* worn mummy wrapping blocks invisibility */
 CLOAK("elven cloak", "faded pall",
       0, 1,    STEALTH,  8, 0, 10, 60,  9, 1,  CLOTH, CLR_BLACK, ELVEN_CLOAK),
 CLOAK("orcish cloak", "coarse mantelet",
-      0, 0,          0,  8, 0, 10, 40, 10, 1,  CLOTH, CLR_BLACK, ORCISH_CLOAK),
+      0, 0,          0,  8, 0, 10, 40, 10, 1,  CLOTH, CLR_BLACK,
+                                                        ORCISH_CLOAK),
 CLOAK("dwarvish cloak", "hooded cloak",
-      0, 0,          0,  8, 0, 10, 50, 10, 1,  CLOTH, HI_CLOTH, DWARVISH_CLOAK),
+      0, 0,          0,  8, 0, 10, 50, 10, 1,  CLOTH, HI_CLOTH,
+                                                        DWARVISH_CLOAK),
 CLOAK("oilskin cloak", "slippery cloak",
-      0, 0,          0,  8, 0, 10, 50,  9, 2,  CLOTH, HI_CLOTH, OILSKIN_CLOAK),
+      0, 0,          0,  8, 0, 10, 50,  9, 2,  CLOTH, HI_CLOTH,
+                                                        OILSKIN_CLOAK),
 CLOAK("robe", NoDes,
       1, 1,          0,  3, 0, 15, 50,  8, 2,  CLOTH, CLR_RED, ROBE),
         /* robe was adopted from slash'em, where it's worn as a suit
            rather than as a cloak and there are several variations */
 CLOAK("alchemy smock", "apron",
-      0, 1, POISON_RES,  9, 0, 10, 50,  9, 1,  CLOTH, CLR_WHITE, ALCHEMY_SMOCK),
+      0, 1, POISON_RES,  9, 0, 10, 50,  9, 1,  CLOTH, CLR_WHITE,
+                                                        ALCHEMY_SMOCK),
 CLOAK("leather cloak", NoDes,
-      1, 0,          0,  8, 0, 15, 40,  9, 1,  LEATHER, CLR_BROWN, LEATHER_CLOAK),
+      1, 0,          0,  8, 0, 15, 40,  9, 1,  LEATHER, CLR_BROWN,
+                                                        LEATHER_CLOAK),
 /* with shuffled appearances... */
 CLOAK("cloak of protection", "tattered cape",
-      0, 1, PROTECTION,  9, 0, 10, 50,  7, 3,  CLOTH, HI_CLOTH, CLOAK_OF_PROTECTION),
+      0, 1, PROTECTION,  9, 0, 10, 50,  7, 3,  CLOTH, HI_CLOTH,
+                                                        CLOAK_OF_PROTECTION),
         /* cloak of protection is now the only item conferring MC 3 */
 CLOAK("cloak of invisibility", "opera cloak",
       0, 1,      INVIS, 10, 0, 10, 60,  9, 1,  CLOTH, CLR_BRIGHT_MAGENTA,
                                                         CLOAK_OF_INVISIBILITY),
 CLOAK("cloak of magic resistance", "ornamental cope",
       0, 1,  ANTIMAGIC,  2, 0, 10, 60,  9, 1,  CLOTH, CLR_WHITE,
-                                                        CLOAK_OF_MAGIC_RESISTANCE),
+                                                   CLOAK_OF_MAGIC_RESISTANCE),
         /*  'cope' is not a spelling mistake... leave it be */
 CLOAK("cloak of displacement", "piece of cloth",
       0, 1,  DISPLACED, 10, 0, 10, 50,  9, 1,  CLOTH, HI_CLOTH,
@@ -981,7 +988,7 @@ TOOL("bugle",               NoDes, 1, 0, 0, 0,  4, 10, 15, COPPER, HI_COPPER,
 TOOL("leather drum",      "drum", 0, 0, 0, 0,  4, 25, 25, LEATHER, HI_LEATHER,
                                                                 LEATHER_DRUM),
 TOOL("drum of earthquake","drum", 0, 0, 1, 1,  2, 25, 25, LEATHER, HI_LEATHER,
-                                                           DRUM_OF_EARTHQUAKE),
+                                                          DRUM_OF_EARTHQUAKE),
 /* tools useful as weapons */
 WEPTOOL("pick-axe", NoDes,
         1, 0, 0, 20, 100,  50,  6,  3, WHACK,  P_PICK_AXE, IRON, HI_METAL,
@@ -1000,17 +1007,17 @@ WEPTOOL("unicorn horn", NoDes,
 OBJECT(OBJ("Candelabrum of Invocation", "candelabrum"),
        BITS(0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, P_NONE, GOLD),
        0, TOOL_CLASS, 0, 0, 10, 5000, 0, 0, 0, 0, 200, HI_GOLD,
-                                                    CANDELABRUM_OF_INVOCATION),
+                                                   CANDELABRUM_OF_INVOCATION),
 OBJECT(OBJ("Bell of Opening", "silver bell"),
        BITS(0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, P_NONE, SILVER),
        0, TOOL_CLASS, 0, 0, 10, 5000, 0, 0, 0, 0, 50, HI_SILVER,
-                                                    BELL_OF_OPENING),
+                                                   BELL_OF_OPENING),
 #undef TOOL
 #undef WEPTOOL
 
 /* Comestibles ... */
-#define FOOD(name, prob, delay, wt, unk, tin, nutrition, color, sn)     \
-    OBJECT(OBJ(name, NoDes),                                       \
+#define FOOD(name, prob, delay, wt, unk, tin, nutrition, color, sn) \
+    OBJECT(OBJ(name, NoDes),                                            \
            BITS(1, 1, unk, 0, 0, 0, 0, 0, 0, 0, 0, P_NONE, tin), 0,     \
            FOOD_CLASS, prob, delay, wt, nutrition / 20 + 5, 0, 0, 0, 0, \
            nutrition, color, sn)
@@ -1044,38 +1051,41 @@ OBJECT(OBJ("meat ring", NoDes),
 /* pudding 'corpses' will turn into these and combine;
    must be in same order as the pudding monsters */
 FOOD("glob of gray ooze",     0,  2, 20, 0, FLESH,  20, CLR_GRAY,
-                                                        GLOB_OF_GRAY_OOZE),
+                                                       GLOB_OF_GRAY_OOZE),
 FOOD("glob of brown pudding", 0,  2, 20, 0, FLESH,  20, CLR_BROWN,
-                                                        GLOB_OF_BROWN_PUDDING),
+                                                       GLOB_OF_BROWN_PUDDING),
 FOOD("glob of green slime",   0,  2, 20, 0, FLESH,  20, CLR_GREEN,
-                                                        GLOB_OF_GREEN_SLIME),
+                                                       GLOB_OF_GREEN_SLIME),
 FOOD("glob of black pudding", 0,  2, 20, 0, FLESH,  20, CLR_BLACK,
-                                                        GLOB_OF_BLACK_PUDDING),
+                                                       GLOB_OF_BLACK_PUDDING),
 
 /* fruits & veggies */
 FOOD("kelp frond",            0,  1,  1, 0, VEGGY,  30, CLR_GREEN, KELP_FROND),
 FOOD("eucalyptus leaf",       3,  1,  1, 0, VEGGY,   1, CLR_GREEN,
-                                                             EUCALYPTUS_LEAF),
+                                                          EUCALYPTUS_LEAF),
 FOOD("apple",                15,  1,  2, 0, VEGGY,  50, CLR_RED, APPLE),
 FOOD("orange",               10,  1,  2, 0, VEGGY,  80, CLR_ORANGE, ORANGE),
 FOOD("pear",                 10,  1,  2, 0, VEGGY,  50, CLR_BRIGHT_GREEN,
-                                                                    PEAR),
+                                                          PEAR),
 FOOD("melon",                10,  1,  5, 0, VEGGY, 100, CLR_BRIGHT_GREEN,
-                                                                    MELON),
+                                                          MELON),
 FOOD("banana",               10,  1,  2, 0, VEGGY,  80, CLR_YELLOW, BANANA),
 FOOD("carrot",               15,  1,  2, 0, VEGGY,  50, CLR_ORANGE, CARROT),
 FOOD("sprig of wolfsbane",    7,  1,  1, 0, VEGGY,  40, CLR_GREEN,
                                                           SPRIG_OF_WOLFSBANE),
-FOOD("clove of garlic",       7,  1,  1, 0, VEGGY,  40, CLR_WHITE, CLOVE_OF_GARLIC),
+FOOD("clove of garlic",       7,  1,  1, 0, VEGGY,  40, CLR_WHITE,
+                                                          CLOVE_OF_GARLIC),
 /* name of slime mold is changed based on player's OPTION=fruit:something
    and bones data might have differently named ones from prior games */
-FOOD("slime mold",           75,  1,  5, 0, VEGGY, 250, HI_ORGANIC, SLIME_MOLD),
+FOOD("slime mold",           75,  1,  5, 0, VEGGY, 250, HI_ORGANIC,
+                                                          SLIME_MOLD),
 
 /* people food */
 FOOD("lump of royal jelly",   0,  1,  2, 0, VEGGY, 200, CLR_YELLOW,
                                                         LUMP_OF_ROYAL_JELLY),
 FOOD("cream pie",            25,  1, 10, 0, VEGGY, 100, CLR_WHITE, CREAM_PIE),
-FOOD("candy bar",            13,  1,  2, 0, VEGGY, 100, CLR_BRIGHT_BLUE, CANDY_BAR),
+FOOD("candy bar",            13,  1,  2, 0, VEGGY, 100, CLR_BRIGHT_BLUE,
+                                                                CANDY_BAR),
 FOOD("fortune cookie",       55,  1,  1, 0, VEGGY,  40, CLR_YELLOW,
                                                               FORTUNE_COOKIE),
 FOOD("pancake",              25,  2,  2, 0, VEGGY, 200, CLR_YELLOW, PANCAKE),
@@ -1206,30 +1216,33 @@ SCROLL("stinking cloud",             "VELOX NEB",  1,  15, 300,
      * Code in win/share/tilemap.c depends on SCR_STINKING_CLOUD preceding
      * these and on how many of them there are.  If a real scroll gets added
      * after stinking cloud or the number of extra descriptions changes,
-     * tilemap.c must be modified to match.
+     * tilemap.c must be modified to match.  Mgc,Prob,Cost are superfluous.
+     * SC values must be distinct but are only used by 'nethack --dumpenums'.
      */
-SCROLL(NoDes,      "FOOBIE BLETCH",  1,   0, 100, SC01),
-SCROLL(NoDes,              "TEMOV",  1,   0, 100, SC02),
-SCROLL(NoDes,         "GARVEN DEH",  1,   0, 100, SC03),
-SCROLL(NoDes,            "READ ME",  1,   0, 100, SC04),
-SCROLL(NoDes,      "ETAOIN SHRDLU",  1,   0, 100, SC05),
-SCROLL(NoDes,        "LOREM IPSUM",  1,   0, 100, SC06),
-SCROLL(NoDes,              "FNORD",  1,   0, 100, SC07), /* Illuminati */
-SCROLL(NoDes,            "KO BATE",  1,   0, 100, SC08), /* Kurd Lasswitz */
-SCROLL(NoDes,      "ABRA KA DABRA",  1,   0, 100, SC09), /* traditional incantation */
-SCROLL(NoDes,       "ASHPD SODALG",  1,   0, 100, SC10), /* Portal */
-SCROLL(NoDes,            "ZLORFIK",  1,   0, 100, SC11), /* Zak McKracken */
-SCROLL(NoDes,      "GNIK SISI VLE",  1,   0, 100, SC12), /* Zak McKracken */
-SCROLL(NoDes,    "HAPAX LEGOMENON",  1,   0, 100, SC13),
-SCROLL(NoDes,  "EIRIS SAZUN IDISI",  1,   0, 100, SC14), /* Merseburg Incantations */
-SCROLL(NoDes,    "PHOL ENDE WODAN",  1,   0, 100, SC15), /* Merseburg Incantations */
-SCROLL(NoDes,              "GHOTI",  1,   0, 100, SC16), /* pronounced as 'fish',
-                                                          George Bernard Shaw */
-SCROLL(NoDes, "MAPIRO MAHAMA DIROMAT", 1, 0, 100, SC17), /* Wizardry */
-SCROLL(NoDes,  "VAS CORP BET MANI",  1,   0, 100, SC18), /* Ultima */
-SCROLL(NoDes,            "XOR OTA",  1,   0, 100, SC19), /* Aarne Haapakoski */
-SCROLL(NoDes, "STRC PRST SKRZ KRK",  1,   0, 100, SC20), /* Czech and Slovak
-                                                             tongue-twister */
+#define XTRA_SCROLL_LABEL(text, sn) SCROLL(NoDes, text, 1, 0, 100, sn)
+XTRA_SCROLL_LABEL(     "FOOBIE BLETCH", SC01),
+XTRA_SCROLL_LABEL(             "TEMOV", SC02),
+XTRA_SCROLL_LABEL(        "GARVEN DEH", SC03),
+XTRA_SCROLL_LABEL(           "READ ME", SC04),
+XTRA_SCROLL_LABEL(     "ETAOIN SHRDLU", SC05),
+XTRA_SCROLL_LABEL(       "LOREM IPSUM", SC06),
+XTRA_SCROLL_LABEL(             "FNORD", SC07), /* Illuminati */
+XTRA_SCROLL_LABEL(           "KO BATE", SC08), /* Kurd Lasswitz */
+XTRA_SCROLL_LABEL(     "ABRA KA DABRA", SC09), /* traditional incantation */
+XTRA_SCROLL_LABEL(      "ASHPD SODALG", SC10), /* Portal */
+XTRA_SCROLL_LABEL(           "ZLORFIK", SC11), /* Zak McKracken */
+XTRA_SCROLL_LABEL(     "GNIK SISI VLE", SC12), /* Zak McKracken */
+XTRA_SCROLL_LABEL(   "HAPAX LEGOMENON", SC13),
+XTRA_SCROLL_LABEL( "EIRIS SAZUN IDISI", SC14), /* Merseburg Incantations */
+XTRA_SCROLL_LABEL(   "PHOL ENDE WODAN", SC15), /* Merseburg Incantations */
+XTRA_SCROLL_LABEL(             "GHOTI", SC16), /* pronounced as 'fish',
+                                                * George Bernard Shaw */
+XTRA_SCROLL_LABEL("MAPIRO MAHAMA DIROMAT", SC17), /* Wizardry */
+XTRA_SCROLL_LABEL( "VAS CORP BET MANI", SC18), /* Ultima */
+XTRA_SCROLL_LABEL(           "XOR OTA", SC19), /* Aarne Haapakoski */
+XTRA_SCROLL_LABEL("STRC PRST SKRZ KRK", SC20), /* Czech and Slovak
+                                                * tongue-twister */
+#undef XTRA_SCROLL_LABEL
     /* These must come last because they have special fixed descriptions.
      */
 #ifdef MAIL_STRUCTURES
@@ -1489,11 +1502,11 @@ COIN("gold piece", 1000, GOLD, 1, GOLD_PIECE),
            BITS(0, 1, 0, 0, 0, 0, 0, 0, 0,                              \
                 HARDGEM(mohs), 0, -P_SLING, glass),                     \
            0, GEM_CLASS, prob, 0, 1, gval, 3, 3, 0, 0, nutr, color, sn)
-#define ROCK(name,desc,kn,prob,wt,gval,sdam,ldam,mgc,nutr,mohs,glass,color,sn) \
+#define ROCK(name,desc,kn,prob,wt,gval,sdam,ldam,mgc,nutr,mohs,glass,colr,sn) \
     OBJECT(OBJ(name, desc),                                             \
            BITS(kn, 1, 0, 0, mgc, 0, 0, 0, 0,                           \
                 HARDGEM(mohs), 0, -P_SLING, glass),                     \
-           0, GEM_CLASS, prob, 0, wt, gval, sdam, ldam, 0, 0, nutr, color, sn)
+           0, GEM_CLASS, prob, 0, wt, gval, sdam, ldam, 0, 0, nutr, colr, sn)
 GEM("dilithium crystal", "white",  2, 1, 4500, 15,  5, GEMSTONE, CLR_WHITE,
                                                         DILITHIUM_CRYSTAL),
 MARKER(FIRST_REAL_GEM, DILITHIUM_CRYSTAL)

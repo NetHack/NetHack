@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.h	$NHDT-Date: 1724094288 2024/08/19 19:04:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.261 $ */
+/* NetHack 3.7	hack.h	$NHDT-Date: 1725653009 2024/09/06 20:03:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.262 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1129,7 +1129,8 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define MM_MINVIS       0x00100000L /* for ^G/create_particular */
 /* if more MM_ flag masks are added, skip or renumber the GP_ one(s) */
 #define GP_ALLOW_XY     0x00200000L /* [actually used by enexto() to decide
-                                     * whether to make extra call to goodpos()] */
+                                     * whether to make an extra call to
+                                     * goodpos()] */
 #define GP_ALLOW_U      0x00400000L /* don't reject hero's location */
 #define GP_CHECKSCARY   0x00800000L /* check monster for onscary() */
 #define GP_AVOID_MONPOS 0x01000000L /* don't accept existing mon location */
@@ -1393,9 +1394,9 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 /* flags passed to getobj() to control how it responds to player input */
 #define GETOBJ_NOFLAGS  0x0
 #define GETOBJ_ALLOWCNT 0x1 /* is a count allowed with this command? */
-#define GETOBJ_PROMPT   0x2 /* should it force a prompt for input? (prevents it
-                               exiting early with "You don't have anything to
-                               foo" if nothing in inventory is valid) */
+#define GETOBJ_PROMPT   0x2 /* should it force a prompt for input? (prevents
+                             * it exiting early with "You don't have anything
+                             * to foo" if nothing in inventory is valid) */
 
 /* flags for hero_breaks() and hits_bars(); BRK_KNOWN* let callers who have
    already called breaktest() prevent it from being called again since it
@@ -1418,11 +1419,11 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define NC_SHOW_MSG          0x01U
 #define NC_VIA_WAND_OR_SPELL 0x02U
 
-/* constant passed to explode() for gas spores because gas spores are weird
- * Specifically, this is an exception to the whole "explode() uses dobuzz types"
- * system (the range -1 to -9 isn't used by it, for some reason), where this is
- * effectively an extra dobuzz type, and some zap.c code needs to be aware of
- * it.  */
+/* Constant passed to explode() for gas spores because gas spores are weird.
+ * Specifically, this is an exception to whole "explode() uses dobuzz types"
+ * system (the range -1 to -9 isn't used by it, for some reason), where this
+ * is effectively an extra dobuzz type, and some zap.c code needs to be aware
+ * of it. */
 #define PHYS_EXPL_TYPE -1
 
 /* macros for dobuzz() type */

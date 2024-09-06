@@ -1,4 +1,4 @@
-/* NetHack 3.7	winprocs.h	$NHDT-Date: 1683748057 2023/05/10 19:47:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.74 $ */
+/* NetHack 3.7	winprocs.h	$NHDT-Date: 1725653017 2024/09/06 20:03:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) David Cohrs, 1992                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -420,7 +420,8 @@ struct chain_procs {
                               unsigned long *);
     boolean (*win_can_suspend)(CARGS);
     void (*win_update_inventory)(CARGS, int);
-    win_request_info *(*win_ctrl_nhwindow)(CARGS, winid, int, win_request_info *);
+    win_request_info *(*win_ctrl_nhwindow)(CARGS, winid, int,
+                                           win_request_info *);
 };
 #endif /* WINCHAIN */
 

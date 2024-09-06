@@ -1,4 +1,4 @@
-/* NetHack 3.7	permonst.h	$NHDT-Date: 1721844081 2024/07/24 18:01:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.7	permonst.h	$NHDT-Date: 1725653014 2024/09/06 20:03:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -83,7 +83,8 @@ struct permonst {
     uchar mcolor;               /* color to use */
 };
 
-extern NEARDATA struct permonst mons[NUMMONS + 1]; /* the master list of monster types */
+extern NEARDATA struct permonst mons[NUMMONS + 1]; /* the master list of
+                                                    * monster types */
 
 #define VERY_SLOW 3
 #define SLOW_SPEED 9

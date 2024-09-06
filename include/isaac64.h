@@ -36,7 +36,7 @@ struct isaac64_ctx{
 
 
 /**
- * isaac64_init - Initialize an instance of the ISAAC64 random number generator.
+ * isaac64_init - Initialize an instance of ISAAC64 random number generator.
  * @_ctx:   The ISAAC64 instance to initialize.
  * @_seed:  The specified seed bytes.
  *          This may be NULL if _nseed is less than or equal to zero.
@@ -77,8 +77,8 @@ uint64_t isaac64_next_uint(isaac64_ctx *_ctx,uint64_t _n);
  * @_ctx: The ISAAC64 instance to generate the value with.
  * Returns a high-quality float uniformly distributed between 0 (inclusive)
  *  and 1 (exclusive).
- * All of the float's mantissa bits are random, e.g., the least significant bit
- *  may still be non-zero even if the value is less than 0.5, and any
+ * All of the float's mantissa bits are random, e.g., the least significant
+ *  bit may still be non-zero even if the value is less than 0.5, and any
  *  representable float in the range [0,1) has a chance to be returned, though
  *  values very close to zero become increasingly unlikely.
  * To generate cheaper float values that do not have these properties, use

@@ -42,11 +42,11 @@
 #ifdef ACTIVATE_WARNING_PRAGMAS
 #if defined(__clang__)
 #define DISABLE_WARNING_UNREACHABLE_CODE \
-                           _Pragma("clang diagnostic push") \
-                           _Pragma("clang diagnostic ignored \"-Wunreachable-code\"")
+    _Pragma("clang diagnostic push")                                    \
+    _Pragma("clang diagnostic ignored \"-Wunreachable-code\"")
 #define DISABLE_WARNING_FORMAT_NONLITERAL \
-                           _Pragma("clang diagnostic push") \
-                           _Pragma("clang diagnostic ignored \"-Wformat-nonliteral\"")
+    _Pragma("clang diagnostic push")                                    \
+    _Pragma("clang diagnostic ignored \"-Wformat-nonliteral\"")
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_FORMAT_NONLITERAL _Pragma("clang diagnostic pop")
@@ -55,13 +55,14 @@
 #define STDC_Pragma_AVAILABLE
 
 #elif defined(__GNUC__)
-/* unlike in clang, -Wunreachable-code does not function in later versions of gcc */
+/* unlike in clang, -Wunreachable-code does not function in later versions
+   of gcc [this may be an issue of requiring -O1 or higher] */
 #define DISABLE_WARNING_UNREACHABLE_CODE \
-                           _Pragma("GCC diagnostic push") \
-                           _Pragma("GCC diagnostic ignored \"-Wunreachable-code\"")
+    _Pragma("GCC diagnostic push")                                      \
+    _Pragma("GCC diagnostic ignored \"-Wunreachable-code\"")
 #define DISABLE_WARNING_FORMAT_NONLITERAL \
-                           _Pragma("GCC diagnostic push") \
-                           _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"")
+    _Pragma("GCC diagnostic push")                                      \
+    _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"")
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_FORMAT_NONLITERAL _Pragma("GCC diagnostic pop")
@@ -72,14 +73,14 @@
 #elif defined(_MSC_VER)
 #if _MSC_VER > 1916
 #define DISABLE_WARNING_UNREACHABLE_CODE \
-                           _Pragma("warning( push )") \
-                           _Pragma("warning( disable : 4702 )")
+    _Pragma("warning( push )")                                  \
+    _Pragma("warning( disable : 4702 )")
 #define DISABLE_WARNING_FORMAT_NONLITERAL \
-                           _Pragma("warning( push )") \
-                           _Pragma("warning( disable : 4774 )")
+    _Pragma("warning( push )")                                  \
+    _Pragma("warning( disable : 4774 )")
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT \
-                           _Pragma("warning( push )") \
-                           _Pragma("warning( disable : 4127 )")
+    _Pragma("warning( push )")                                  \
+    _Pragma("warning( disable : 4127 )")
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT _Pragma("warning( pop )")
 #define RESTORE_WARNING_FORMAT_NONLITERAL _Pragma("warning( pop )")
 #define RESTORE_WARNING_UNREACHABLE_CODE _Pragma("warning( pop )")
@@ -87,14 +88,14 @@
 #define STDC_Pragma_AVAILABLE
 #else  /* Visual Studio prior to 2019 below */
 #define DISABLE_WARNING_UNREACHABLE_CODE \
-                           __pragma(warning(push)) \
-                           __pragma(warning(disable:4702))
+    __pragma(warning(push))                                     \
+    __pragma(warning(disable:4702))
 #define DISABLE_WARNING_FORMAT_NONLITERAL \
-                           __pragma(warning(push)) \
-                           __pragma(warning(disable:4774))
+    __pragma(warning(push))                                     \
+    __pragma(warning(disable:4774))
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT \
-                           __pragma(warning(push)) \
-                           __pragma(warning(disable:4127))
+    __pragma(warning(push))                                     \
+    __pragma(warning(disable:4127))
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT __pragma(warning(pop))
 #define RESTORE_WARNING_FORMAT_NONLITERAL __pragma(warning(pop))
 #define RESTORE_WARNING_UNREACHABLE_CODE __pragma(warning(pop))

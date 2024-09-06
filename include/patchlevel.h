@@ -1,4 +1,4 @@
-/* NetHack 3.7	patchlevel.h	$NHDT-Date: 1720717988 2024/07/11 17:13:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.261 $ */
+/* NetHack 3.7	patchlevel.h	$NHDT-Date: 1725653013 2024/09/06 20:03:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.264 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -84,14 +84,15 @@
  *      ubuntu impish 21.10; disable that for any Linux unless GCC_URWARN is
  *      defined to force it back into effect
  *  update_inventory() after leash goes slack
- *  player assigned name for monsters, specific objects, or object types could be
-        longer than what was intended to be allowed; for 'curses', much longer
- *  windows: added winflexbison to travis-ci configuration to permit full build of
- *      levcomp and dgncomp
- *  windows: a bad chdir specified in win/win32/dgnstuff.mak caused full build to
- *      abort
- *  windows: the console.rc file had outdated information stating 3.6.3 when the
- *      official 3.6.6 binary was built.
+ *  player assigned name for monsters, specific objects, or object types
+ *      could be longer than what was intended to be allowed; for 'curses',
+ *      it could be much longer
+ *  windows: added winflexbison to travis-ci configuration to permit full
+ *      build of levcomp and dgncomp
+ *  windows: a bad chdir specified in win/win32/dgnstuff.mak caused full build
+ *      to abort
+ *  windows: the console.rc file had outdated information stating 3.6.3 when
+ *      the official 3.6.6 binary was built.
  *  windows: switch from using keyhandling dll's to incorporating the three
  *      variations (default, ray, 340) in sys/winnt/nttty.c
  *  curses: cherry-picked selectsaved code from 3.7 for menu of save files
@@ -103,7 +104,8 @@
  *  invalid status highlight color could be maliciously used to corrupt memory
  *  formatting corpse names used internal buffers differently from formatting
  *      other objects and could potentially clobber memory
- *  avoid divide by 0 crash if 'bogusmon' (file of bogus monster types) is empty
+ *  avoid divide by 0 crash if 'bogusmon' (file of bogus monster types) is
+ *      empty
  *  avoid #wizrumorcheck crash if either 'rumors.tru' or 'rumors.fal' or both
  *      were empty when makedefs built 'rumors'
  */
@@ -113,10 +115,12 @@
  *  fix accessing mons[-1] when trying to gate in a non-valid demon
  *  fix accessing mons[-1] when monster figures out if a tin cures stoning
  *  have string_for_opt() return empty_optstr on failure
- *  ensure existing callers of string_for_opt() check return value before using it
+ *  ensure existing callers of string_for_opt() check return value before
+ *       using it
  *  fix potential buffer overflow in add_menu_coloring()
  *  fix potential buffer overflow in sym_val()
- *  fix potential buffer overflow in pline(), raw_printf(), and config_error_add()
+ *  fix potential buffer overflow in pline(), raw_printf(), and
+ *       config_error_add()
  *  fix potential buffer overflow in choose_windows()
  *  use vsnprintf instead of vsprintf in pline.c where possible
  *  Windows: includes a fix from a 3.6.4 post-release update where
@@ -127,24 +131,24 @@
 /*  Patch 4, December 18, 2019
  *
  *  fix potential buffer overflow when parsing run-time configuration file
- *  GDBPATH and GREPPATH from sysconf or -D... on compilation command line were
- *      being processed even if PANICTRACE was disabled but only being freed
- *      at end of game when that was enabled
+ *  GDBPATH and GREPPATH from sysconf or -D... on compilation command line
+ *      were being processed even if PANICTRACE was disabled but only being
+ *      freed at end of game when that was enabled
  *  fix the article used in the message when your steed encounters a polymorph
  *      trap
  *  allow teleporting onto the vibrating square
- *  message "your knapsack can't accommodate any more items" when picking stuff
- *      up or removing such from container was inaccurate if there was some
- *      gold pending; vary the message rather than add more convoluted pickup
- *      code
+ *  message "your knapsack can't accommodate any more items" when picking
+ *      stuff up or removing such from container was inaccurate if there was
+ *      some gold pending; vary the message rather than add more convoluted
+ *      pickup code
  *  dozen-ish assorted spelling/typo fixes in messages and source comments
  *  wizard mode wishing for terrain would leave it unmapped if done while blind
  *  wizard mode terrain wish could leave hero in water (severe vision limits)
  *      or in lava (trapped, sinking) which wasn't there any more
  *  flying hero can go down (via '>') holes or trap doors instead of escaping
  *      trap
- *  polymorphed hero hiding on the ceiling can now use '>' to unhide instead of
- *      being told "you can't go down here"
+ *  polymorphed hero hiding on the ceiling can now use '>' to unhide instead
+ *      of being told "you can't go down here"
  *  fix compilation on platforms that split the ncurses and tinfo libraries
  *  Windows: allow all game files to be on a portable device via the sysconf
  *      option 'portable_device_paths'
@@ -157,7 +161,8 @@
  *     off due to being polymorphed
  *  Fixed 'object lost' panic when attempting to crawl out of the water during
  *     emergency disrobing/dropping
- *  Running now stops when moving over engravings so you can tell where they are
+ *  Running now stops when moving over engravings so you can tell where they
+ *     are
  *  Fixed detection of unseen/secret doors which failed to find monsters hiding
  *     under objects and failed to find monsters hiding at trap locations
  *  Ensured fatal status conditions made it to disclosure and/or dumplog
@@ -182,13 +187,14 @@
  *  Improved performance of some tty versions by reducing the number of
  *     function calls made from mapglyph
  *  Allowed the msdos implementation to build with curses and PDCurses
- *  Included over 100 other fixes and improvements as outlined in doc/fixes36.3
+ *  Included over 100 other fixes and improvements as outlined in
+ *     doc/fixes36.3 (later renamed doc/fixes3-6-3.txt)
  */
 
 /*  Patch 2, May 7, 2019
  *
  *  Over 320 bug fixes including a couple of crash bug fixes as outlined in
- *      doc/fixes36.2
+ *      doc/fixes36.2 (later renamed to doc/fixes-3-6-2.txt)
  *  More than 15 enhancements or improvements
  *  Ensuring that unix Makefiles do not rely on features unique to gnu make
  *  Improvements to hilite_status parsing in an effort to ensure that expected
@@ -202,13 +208,13 @@
 /*  Patch 1, April 27, 2018
  *
  *  Over four hundred and seventy bug fixes and improvements as outlined in
- *      doc/fixes36.1
+ *      doc/fixes36.1 (later renamed to doc/fixes3-6-1.txt)
  */
 
 /*
  *  NetHack 3.6.0, December 7, 2015
  *
- *  Hundreds of bug fixes as outlined in doc/fixes36.0.
+ *  Hundreds of bug fixes as outlined in doc/fixes36.0 (doc/fixes3-6-0.txt).
  *  Some code reorganization.
  *  Some new features.
  *  Variations of some community patches rolled in.

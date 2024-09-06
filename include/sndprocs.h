@@ -1,4 +1,4 @@
-/* NetHack 3.7	sndprocs.h	$NHDT-Date: 1693253118 2023/08/28 20:05:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.7	sndprocs.h	$NHDT-Date: 1725653015 2024/09/06 20:03:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) Michael Allison, 2022                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -69,7 +69,8 @@ struct sound_voice {
 
 extern struct sound_procs sndprocs;
 
-#define SOUNDID(soundname) #soundname, ((enum soundlib_ids) soundlib_##soundname)
+#define SOUNDID(soundname) \
+    #soundname, ((enum soundlib_ids) soundlib_##soundname)
 
 /*
  * Types of triggers
@@ -295,7 +296,7 @@ enum findsound_approaches {
 enum sound_file_flags {
     sff_default,            /* add dir prefix + '/' + sound + suffix */
     sff_base_only,          /* base sound name only, no dir, no suffix */
-    sff_havedir_append_rest, /* dir provided, append base sound name + suffix */
+    sff_havedir_append_rest, /* dir provided, append base sound name+suffix */
     sff_baseknown_add_rest /* base is already known, add dir and suffix */
 };
 

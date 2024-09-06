@@ -1,4 +1,4 @@
-/* NetHack 3.7	hacklib.h	$NHDT-Date: 1657918089 2022/07/15 20:48:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1132 $ */
+/* NetHack 3.7	hacklib.h	$NHDT-Date: 1725653010 2024/09/06 20:03:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -35,7 +35,8 @@ extern char *xcrypt(const char *, char *) NONNULL NONNULLPTRS;
 extern boolean onlyspace(const char *) NONNULLARG1;
 extern char *tabexpand(char *) NONNULL NONNULLARG1;
 extern char *visctrl(char) NONNULL;
-extern char *stripchars(char *, const char *, const char *) NONNULL NONNULLPTRS;
+extern char *stripchars(char *, const char *,
+                                            const char *) NONNULL NONNULLPTRS;
 extern char *stripdigits(char *) NONNULL NONNULLARG1;
 extern char *strsubst(char *, const char *, const char *) NONNULL NONNULLPTRS;
 extern int strNsubst(char *, const char *, const char *, int) NONNULLPTRS;

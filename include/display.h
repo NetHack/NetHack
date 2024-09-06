@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.h	$NHDT-Date: 1698741423 2023/10/31 08:37:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.7	display.h	$NHDT-Date: 1725653008 2024/09/06 20:03:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -87,7 +87,7 @@
     (/* The hero can see the monster IF the monster                     */ \
      (!mon->minvis || See_invisible)  /*     1. is not invisible        */ \
      && !mon->mundetected             /* AND 2. not an undetected hider */ \
-     && !(mon->mburied || u.uburied)) /* AND 3. neither you nor it is buried */
+     && !(mon->mburied || u.uburied)) /* AND 3. neither you nor it buried */
 #else   /* without 'mburied' and 'uburied' */
 #define _mon_visible(mon) \
     (/* The hero can see the monster IF the monster                     */ \
@@ -228,14 +228,14 @@
 #define DISP_ALL     (-2) /* Like beam, but still displayed if not visible. */
 #define DISP_TETHER  (-3) /* Like beam, but tether glyph differs from final */
 #define DISP_FLASH   (-4) /* Clean up each glyph before displaying new one. */
-#define DISP_ALWAYS  (-5) /* Like flash, but still displayed if not visible. */
+#define DISP_ALWAYS  (-5) /* Like flash, but still displayed if not visible */
 #define DISP_CHANGE  (-6) /* Change glyph. */
 #define DISP_END     (-7) /* Clean up. */
 #define DISP_FREEMEM (-8) /* Free all memory during exit only. */
 
 /* Total number of cmap indices in the shield_static[] array. */
 #define SHIELD_COUNT 21
-#define BACKTRACK (-1)    /* flag for DISP_END to display each prior location */
+#define BACKTRACK    (-1) /* for DISP_END to display each prior location */
 
 /*
  * display_self()
@@ -760,7 +760,8 @@ enum glyph_offsets {
  * considered objects.
  */
 #define glyph_is_normal_male_monster(glyph) \
-    ((glyph) >= GLYPH_MON_MALE_OFF && (glyph) < (GLYPH_MON_MALE_OFF + NUMMONS))
+    ((glyph) >= GLYPH_MON_MALE_OFF                      \
+     && (glyph) < (GLYPH_MON_MALE_OFF + NUMMONS))
 #define glyph_is_normal_female_monster(glyph) \
     ((glyph) >= GLYPH_MON_FEM_OFF && (glyph) < (GLYPH_MON_FEM_OFF + NUMMONS))
 #define glyph_is_normal_monster(glyph) \
@@ -769,7 +770,8 @@ enum glyph_offsets {
 #define glyph_is_female_pet(glyph) \
     ((glyph) >= GLYPH_PET_FEM_OFF && (glyph) < (GLYPH_PET_FEM_OFF + NUMMONS))
 #define glyph_is_male_pet(glyph) \
-    ((glyph) >= GLYPH_PET_MALE_OFF && (glyph) < (GLYPH_PET_MALE_OFF + NUMMONS))
+    ((glyph) >= GLYPH_PET_MALE_OFF                      \
+     && (glyph) < (GLYPH_PET_MALE_OFF + NUMMONS))
 #define glyph_is_pet(glyph) \
     (glyph_is_male_pet(glyph) || glyph_is_female_pet(glyph))
 #define glyph_is_ridden_female_monster(glyph) \
@@ -779,8 +781,8 @@ enum glyph_offsets {
     ((glyph) >= GLYPH_RIDDEN_MALE_OFF                   \
      && (glyph) < (GLYPH_RIDDEN_MALE_OFF + NUMMONS))
 #define glyph_is_ridden_monster(glyph) \
-    (glyph_is_ridden_male_monster(glyph) \
-        || glyph_is_ridden_female_monster(glyph))
+    (glyph_is_ridden_male_monster(glyph)                \
+     || glyph_is_ridden_female_monster(glyph))
 #define glyph_is_detected_female_monster(glyph) \
     ((glyph) >= GLYPH_DETECT_FEM_OFF                    \
      && (glyph) < (GLYPH_DETECT_FEM_OFF + NUMMONS))
@@ -788,10 +790,10 @@ enum glyph_offsets {
     ((glyph) >= GLYPH_DETECT_MALE_OFF                   \
      && (glyph) < (GLYPH_DETECT_MALE_OFF + NUMMONS))
 #define glyph_is_detected_monster(glyph) \
-    (glyph_is_detected_male_monster(glyph) \
+    (glyph_is_detected_male_monster(glyph)              \
         || glyph_is_detected_female_monster(glyph))
-#define glyph_is_monster(glyph)                            \
-    (glyph_is_normal_monster(glyph) || glyph_is_pet(glyph) \
+#define glyph_is_monster(glyph) \
+    (glyph_is_normal_monster(glyph) || glyph_is_pet(glyph)              \
      || glyph_is_ridden_monster(glyph) || glyph_is_detected_monster(glyph))
 #define glyph_is_invisible(glyph) ((glyph) == GLYPH_INVISIBLE)
 
@@ -819,8 +821,9 @@ enum glyph_offsets {
    the otg_otmp assignment might occur multiple times in the same
    expression but there will always be sequence points in between */
 #define obj_is_piletop(obj) \
-    ((obj)->where == OBJ_FLOOR                                  \
-     && (go.otg_otmp = svl.level.objects[(obj)->ox][(obj)->oy]->nexthere) != 0 \
+    ((obj)->where == OBJ_FLOOR                                             \
+     && ((go.otg_otmp = svl.level.objects[(obj)->ox][(obj)->oy]->nexthere) \
+         != 0)                                                             \
      && ((obj)->otyp != BOULDER || go.otg_otmp->otyp == BOULDER))
 /* used to hide info such as potion and gem color when not seen yet;
    stones and rock are excluded for gem class; LAST_SPELL includes blank
