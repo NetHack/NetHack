@@ -4045,6 +4045,15 @@ saving_grace(int dmg)
     }
 
     if (!u.usaving_grace && dmg >= u.uhp && (u.uhp * 100 / u.uhpmax) > 90) {
+        /* saving_grace doesn't have it's own livelog classification;
+           we might invent one, or perhaps use LL_LIFESAVE, but surviving
+           certain death (or preserving worn amulet of life saving) via
+           saving-grace feels like breaking a conduct; not sure how best
+           to phrase this though... */
+        livelog_printf(LL_CONDUCT, "%s (%d damage, %d/%d HP)",
+                       "survived one-shot death via saving-grave",
+                       dmg, u.uhp, u.uhpmax);
+
         /* note: this could reduce dmg to 0 if u.uhpmax==1 */
         dmg = u.uhp - 1;
         u.usaving_grace = 1; /* used up */

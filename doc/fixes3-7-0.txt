@@ -1135,7 +1135,6 @@ give feedback when some types of damage are avoided due to MC (aka negation)
 feedback if a named, shape-shifted vampire reverted to original shape rather
 	than dying when engulfed could say "Dracula turns into Dracula"
 adjust archeologist and valkyrie starting intrinsics
-once per game if receiving killing blow from near-full hp, leave 1 hp
 spell of knock can knock back small monsters
 protection from shape changers now prevents the Wizard from mimicking monsters
 having worn levitation boots removed and destroyed (scroll, monster spell,
@@ -2675,6 +2674,14 @@ pyrolisk eggs explode when broken
 pauper-option to start the character with no possessions
 wand of secret door detection, spell of detect unseen, and wizard mode ^E now
 	flash the cursor at each location where detection finds something
+saving-grace: once per game if receiving a killing blow from full or nearly
+	full HP, survive with 1 HP
+livelog/#chronicle for saving-grace: if saving-grace prevents hero's death,
+	report it [at present, it uses the livelog classification for breaking
+	a conduct]
+enlightenment/attribute disclosure for saving-grace: include a line for have
+	or haven't been saved (game in progress) or did or didn't get saved
+	(game over) via saving-grace
 
 
 Platform- and/or Interface-Specific New Features
