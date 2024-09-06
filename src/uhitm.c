@@ -5906,11 +5906,11 @@ passive(
                 You("are suddenly very cold!");
                 mdamageu(mon, tmp);
                 /* monster gets stronger with your heat! */
-                mon->mhp += tmp / 2;
+                mon->mhp += (tmp + rn2(2)) / 2;
                 if (mon->mhpmax < mon->mhp)
                     mon->mhpmax = mon->mhp;
                 /* at a certain point, the monster will reproduce! */
-                if (mon->mhpmax > ((int) (mon->m_lev + 1) * 8))
+                if (mon->mhpmax > (((int) mon->m_lev) + 1) * 8)
                     (void) split_mon(mon, &gy.youmonst);
             }
             break;

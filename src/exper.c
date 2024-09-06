@@ -321,8 +321,8 @@ pluslvl(
         u.mh += hpinc;
     }
     hpinc = newhp();
-    setuhpmax(u.uhpmax + hpinc);
     u.uhp += hpinc;
+    setuhpmax(u.uhpmax + hpinc); /* will lower u.uhp if it exceeds uhpmax */
 
     /* increase spell power/energy points */
     eninc = newpw();

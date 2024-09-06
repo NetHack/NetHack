@@ -342,14 +342,12 @@ castmu(
         break;
     case AD_SPEL: /* wizard spell */
     case AD_CLRC: /* clerical spell */
-    {
         if (mattk->adtyp == AD_SPEL)
             cast_wizard_spell(mtmp, dmg, spellnum);
         else
             cast_cleric_spell(mtmp, dmg, spellnum);
         dmg = 0; /* done by the spell casting functions */
         break;
-    }
     } /* switch */
     if (dmg)
         mdamageu(mtmp, dmg);
@@ -441,6 +439,11 @@ death_inflicted_by(
 staticfn void
 cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
 {
+    if (dmg < 0) {
+        impossible("monster cast wizard spell (%d) with negative dmg (%d)?",
+                   spellnum, dmg);
+        return;
+    }
     if (dmg == 0 && !is_undirected_spell(AD_SPEL, spellnum)) {
         impossible("cast directed wizard spell (%d) with dmg=0?", spellnum);
         return;
@@ -620,6 +623,12 @@ staticfn void
 cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
 {
     int orig_dmg = 0;
+
+    if (dmg < 0) {
+        impossible("monster cast cleric spell (%d) with negative dmg (%d)?",
+                   spellnum, dmg);
+        return;
+    }
     if (dmg == 0 && !is_undirected_spell(AD_CLRC, spellnum)) {
         impossible("cast directed cleric spell (%d) with dmg=0?", spellnum);
         return;

@@ -1211,7 +1211,7 @@ hitmu(struct monst *mtmp, struct attack *mattk)
             else if (*hpmax_p > lowerlimit)
                 *hpmax_p = lowerlimit;
             /* else unlikely...
-             * already at or below minimum threshold; do nothing */
+             * already at or below minimum threshold, do nothing to hpmax */
             disp.botl = TRUE;
         }
 
@@ -1846,16 +1846,27 @@ gazemu(struct monst *mtmp, struct attack *mattk)
 void
 mdamageu(struct monst *mtmp, int n)
 {
+    if (n < 0) {
+        impossible("mdamageu for negative damage? (%d)", n);
+        n = 0;
+    }
+
     disp.botl = TRUE;
     if (Upolyd) {
         u.mh -= n;
         showdamage(n);
+        /* caller might have reduced mhmax before calling mdamageu() */
+        if (u.mh > u.mhmax)
+            u.mh = u.mhmax;
         if (u.mh < 1)
             rehumanize();
     } else {
         n = saving_grace(n);
         u.uhp -= n;
         showdamage(n);
+        /* caller might have reduced uhpmax before calling mdamageu() */
+        if (u.uhp > u.uhpmax)
+            u.uhp = u.uhpmax;
         if (u.uhp < 1)
             done_in_by(mtmp, DIED);
     }
@@ -2422,10 +2433,10 @@ passiveum(
                 break;
             }
             pline("%s is suddenly very cold!", Monnam(mtmp));
-            u.mh += tmp / 2;
+            u.mh += (tmp + rn2(2)) / 2;
             if (u.mhmax < u.mh)
                 u.mhmax = u.mh;
-            if (u.mhmax > ((gy.youmonst.data->mlevel + 1) * 8))
+            if (u.mhmax > (((int) gy.youmonst.data->mlevel + 1) * 8))
                 (void) split_mon(&gy.youmonst, mtmp);
             break;
         case AD_STUN: /* Yellow mold */
