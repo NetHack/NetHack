@@ -2175,7 +2175,7 @@ tport_menu(
     char *entry,
     struct lchoice *lchoices,
     d_level *lvl_p,
-    boolean unreachable)
+    boolean cannotreach)
 {
     char tmpbuf[BUFSZ];
     anything any;
@@ -2185,7 +2185,7 @@ tport_menu(
     lchoices->dgn[lchoices->idx] = lvl_p->dnum;
     lchoices->playerlev[lchoices->idx] = depth(lvl_p);
     any = cg.zeroany;
-    if (unreachable) {
+    if (cannotreach) {
         /* not selectable, but still consumes next menuletter;
            prepend padding in place of missing menu selector */
         Sprintf(tmpbuf, "    %s", entry);
@@ -2785,7 +2785,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* Remove all mapseen objects for a particular dnum.
  * Useful during quest expulsion to remove quest levels.
- * [No longer deleted, just marked as unreachable.  #overview will
+ * [No longer deleted, just marked as notreachable.  #overview will
  * ignore such levels, end of game disclosure will include them.]
  */
 void
@@ -2797,7 +2797,7 @@ remdun_mapseen(int dnum)
     while ((mptr = *mptraddr) != 0) {
         if (mptr->lev.dnum == dnum) {
 #if 1 /* use this... */
-            mptr->flags.unreachable = 1;
+            mptr->flags.notreachable = 1;
         }
 #else /* old deletion code */
             *mptraddr = mptr->next;
@@ -2862,7 +2862,7 @@ interest_mapseen(mapseen *mptr)
 {
     if (on_level(&u.uz, &mptr->lev))
         return TRUE;
-    if (mptr->flags.unreachable || mptr->flags.forgot)
+    if (mptr->flags.notreachable || mptr->flags.forgot)
         return FALSE;
     /* when in tutorial, show all tutorial levels visited whether interesting
        or not and don't show any other levels; when outside tutorial, don't
@@ -2889,7 +2889,7 @@ interest_mapseen(mapseen *mptr)
         return TRUE;
     /* when in the endgame, list all endgame levels visited, whether they
        have annotations or not, so that #overview doesn't become extremely
-       sparse once the rest of the dungeon has been flagged as unreachable */
+       sparse once the rest of the dungeon has been flagged as notreachable */
     if (In_endgame(&u.uz))
         return (boolean) In_endgame(&mptr->lev);
     /* level is of interest if it has non-zero feature count or known bones
@@ -3075,17 +3075,17 @@ recalc_mapseen(void)
     /* reset all features; mptr->feat.* = 0; */
     (void) memset((genericptr_t) &mptr->feat, 0, sizeof mptr->feat);
     /* reset most flags; some level-specific ones are left as-is */
-    if (mptr->flags.unreachable) {
-        mptr->flags.unreachable = 0; /* reached it; Eye of the Aethiopica? */
+    if (mptr->flags.notreachable) {
+        mptr->flags.notreachable = 0; /* reached it; Eye of the Aethiopica? */
         if (In_quest(&u.uz)) {
             mapseen *mptrtmp = svm.mapseenchn;
 
-            /* when quest was unreachable due to ejection and portal removal,
+            /* when quest was notreachable due to ejection and portal removal,
                getting back to it via arti-invoke should revive annotation
                data for all quest levels, not just the one we're on now */
             do {
                 if (mptrtmp->lev.dnum == mptr->lev.dnum)
-                    mptrtmp->flags.unreachable = 0;
+                    mptrtmp->flags.notreachable = 0;
                 mptrtmp = mptrtmp->next;
             } while (mptrtmp);
         }
@@ -3628,7 +3628,7 @@ print_mapseen(
         Sprintf(buf, "%sA primitive area.", PREFIX);
     } else if (on_level(&mptr->lev, &qstart_level)) {
         Sprintf(buf, "%sHome%s.", PREFIX,
-                mptr->flags.unreachable ? " (no way back...)" : "");
+                mptr->flags.notreachable ? " (no way back...)" : "");
         if (u.uevent.qcompleted)
             Sprintf(buf, "%sCompleted quest for %s.", PREFIX, ldrname());
         else if (mptr->flags.questing)
