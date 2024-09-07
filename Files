@@ -431,11 +431,11 @@ sys/windows:
 Install.windows          Makefile.mingw32         Makefile.mingw32.depend
 Makefile.nmake           build-msys2.txt          build-nmake.txt
 build-vs.txt             console.rc               consoletty.c
-fetch.cmd                fetch.sh                 guitty.c
-nethack.def              nethackrc.template       nhico.uu
-nhsetup.bat              porthelp                 sysconf.template
-win10.c                  win10.h                  win32api.h
-windmain.c               windsys.c                winos.h
+fetch.cmd                guitty.c                 nethack.def
+nethackrc.template       nhico.uu                 nhsetup.bat
+porthelp                 sysconf.template         win10.c
+win10.h                  win32api.h               windmain.c
+windsys.c                winos.h
 
 sys/windows/vs:
 (files for Visual Studio 2019 or 2022 Community Edition builds)
