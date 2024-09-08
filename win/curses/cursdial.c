@@ -1444,6 +1444,9 @@ curs_nonselect_menu_action(
     case MENU_SEARCH: {
         char search_key[BUFSZ];
 
+        if (how == PICK_NONE)
+            break;
+
         search_key[0] = '\0';
         curses_line_input_dialog("Search for:", search_key, BUFSZ);
 
