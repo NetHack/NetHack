@@ -233,7 +233,6 @@ struct accessibility_data {
 struct instance_flags {
     boolean query_menu;    /* use a menu for yes/no queries */
     boolean showdamage;
-    boolean debug_fuzzer;  /* fuzz testing */
     boolean defer_plname;  /* X11 hack: askname() might not set svp.plname */
     boolean herecmd_menu;  /* use menu when mouseclick on yourself */
     boolean invis_goldsym; /* gold symbol is ' '? */
@@ -244,6 +243,7 @@ struct instance_flags {
                                 * indirectly so we can't use xname_flags() */
     boolean remember_getpos; /* save getpos() positioning in do-again queue */
     boolean sad_feeling;   /* unseen pet is dying */
+    xint8 debug_fuzzer;    /* fuzz testing */
     int at_midnight;       /* only valid during end of game disclosure */
     int at_night;          /* also only valid during end of game disclosure */
     int failing_untrap;    /* move_into_trap() -> spoteffects() -> dotrap() */
