@@ -76,6 +76,13 @@ NROFFISGROFF := $(shell echo `nroff --version | grep "GNU groff version"`)
 ifneq "$(NROFFISGROFF)" ""
 # get the version of groff and flag if it is gt or eq to 1.23
 GROFFGE123 := $(shell expr `echo $(NROFFISGROFF) | cut -f2 -d.` \>= 23)
+# or less than 1.24
+GROFFLT124 := $(shell expr `echo $(NROFFISGROFF) | cut -f2 -d.` \< 24)
+# -Wtab -Wrange are for the sake of tmac.n.
+NROFF_FLAGS := -wall -Wtab -Wrange
+ifneq "$(GROFFLT124)" ""
+NROFF_FLAGS += -Wel -Wscale
+endif
 endif  # NROFFISGROFF
 
 ifneq "$(NROFFISGROFF)" ""   # It's groff
@@ -83,7 +90,8 @@ ifneq "$(NROFFISGROFF)" ""   # It's groff
 MAN2TXTPRE += -Tascii
 ifneq "$(GROFFGE123)" ""   # It's groff 1.23 or greater
 #$(info GROFFGE123=$(GROFFGE123))
-# add the groff 1.23 specific plain text flag -P
+# nroff in groff 1.23 supports the -P option to pass arguments to the
+# output driver.  -cbou are flags to grotty(1).
 MAN2TXTPRE += -P -cbou
 MAN2TXTPOST=
 else
