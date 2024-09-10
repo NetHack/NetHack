@@ -288,15 +288,15 @@ Dlvl:1 $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 T:752 Hungry Conf
 .if t .sp 0.5v
 Figure 1
 .
-.\" Figure 2 uses trailing spaces to force the same width as Figure 1.
 .BR 1
 .ft CR
 .TS
 center box tab(~);
 L.
-Player the Rambler   St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15        \"
-Neutral $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 Hungry          \"
-Dlvl:1 T:752                                  Conf            \"
+.\" Use trailing spaces to force the same width as Figure 1.
+Player the Rambler   St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15        \&
+Neutral $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 Hungry          \&
+Dlvl:1 T:752                                  Conf            \&
 .TE
 .ft R
 .ce 1
@@ -2828,11 +2828,11 @@ center;
 a n.
 Dragon scale mail	1
 Plate mail, Crystal plate mail	3
-Bronze plate mail, Splint mail,	\"
+Bronze plate mail, Splint mail,	\&
 \ \ \ Banded mail, Dwarvish mithril-coat	4
 Chain mail, Elven mithril-coat	5
 Scale mail, Orcish chain mail	6
-Ring mail, Studded leather armor,	\"
+Ring mail, Studded leather armor,	\&
 \ \ \ Dragon scales	7
 Leather armor, Orcish ring mail	8
 Leather jacket	9
