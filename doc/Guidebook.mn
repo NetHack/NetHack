@@ -31,7 +31,8 @@
 .lt 70n
 .\}
 .
-.so tmac.nh	\" extra macros which aren't in tmac.n
+.so tmac.nh \" extra macros which aren't in tmac.n
+.if !\n(nH .so doc/tmac.nh
 .
 .\" building Guidebook.txt doesn't have CR font available; groff 1.23 issues
 .\" a warning each time any font can't be loaded; earlier versions silently

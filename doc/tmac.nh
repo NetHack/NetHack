@@ -8,6 +8,10 @@
 .\"   cluttered as their number increased.  It now uses the '.so' directive
 .\"   to include this file.  (tmac.n is passed to 'roff on the command line.)
 .
+.\" Protect against being sourced twice.
+.nr nH +1
+.if \n(nH>1 .nx
+.
 .\" labeled paragraph start
 .\" .PS word
 .\"	set the width for the label column
