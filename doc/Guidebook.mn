@@ -5494,7 +5494,7 @@ SOUND=MESG hide "^You miss the " "swing.wav" 75
 .ft
 .ei
 .ed
-.BR 0 .\" without this, the next section seems too close to this one
+.BR 0 \" without this, the next section seems too close to this one
 .hn 2
 Configuring Status Hilites
 .pg
@@ -5678,7 +5678,7 @@ OPTION=hilite_status: condition/lev+fly/red&inverse
 .ft
 .ei
 .ed
-.BR 0 .\" without this, the next section seems too close to this one
+.BR 0 \" without this, the next section seems too close to this one
 .hn 2
 Modifying NetHack Symbols
 .pg
