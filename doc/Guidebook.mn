@@ -430,13 +430,15 @@ Movement modifiers:
 .lp ""
 Other conditions and modifiers exist, but there isn't enough room to
 display them with the other status fields.
+.\" Don't give the next paragraph a first-line indent.
+.nr @p \n(pi \" Save mn's paragraph indentation.
+.nr pi 0
 .pg
-.in -5n .\" outdent this paragraph
 The \f(CR#attributes\fP command (default key \f(CR\(haX\fP) will show
 all current status information in unabbreviated format.
 It also shows other information which might be included on the status
 lines if those had more room.
-.in 0 .\" reset indentation
+.nr pi \n(@p \" Restore mn's paragraph indentation.
 .hn 2
 The message line (top)
 .pg
