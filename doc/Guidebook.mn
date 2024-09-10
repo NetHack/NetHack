@@ -3463,7 +3463,8 @@ instrument played closely
 enough\(embut not too close!\(emto
 the Castle level's drawbridge or can be given to you via prayer boon.
 .pg
-\fIBlind\fP, \fIDeaf\fP, \fINudist\fP, and \FIPauper\fP are also conducts, and they can only be
+\fIBlind\fP, \fIDeaf\fP, \fINudist\fP,
+and \fIPauper\fP are also conducts, and they can only be
 enabled by setting the correspondingly named option in NETHACKOPTIONS
 or run-time configuration file prior to game start.
 In the case of \fIBlind\fP and \fIDeaf\fP, the option also enforces the conduct.
