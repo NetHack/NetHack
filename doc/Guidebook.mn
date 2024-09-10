@@ -2825,15 +2825,15 @@ Here is a list of the armor class values provided by suits of armor:
 .\" line and leading spaces to indent their second line.
 .TS
 center;
-a n.
+l r.
 Dragon scale mail	1
 Plate mail, Crystal plate mail	3
 Bronze plate mail, Splint mail,	\&
-\ \ \ Banded mail, Dwarvish mithril-coat	4
+   Banded mail, Dwarvish mithril-coat	4
 Chain mail, Elven mithril-coat	5
 Scale mail, Orcish chain mail	6
 Ring mail, Studded leather armor,	\&
-\ \ \ Dragon scales	7
+   Dragon scales	7
 Leather armor, Orcish ring mail	8
 Leather jacket	9
 none	10
