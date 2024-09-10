@@ -89,7 +89,8 @@
 .	if \\n(id=0 \{\
 .		di			\" end diversion
 .		fi			\" resume filling
-.		in -\\n(piu		\" dedent
+.		ie \\n(.i<\\n(pi .in 0
+.		el .in -\\n(piu		\" dedent
 .		ev			\" pop environment
 .		ne \\n(dnu		\" be sure you have room
 .		nf			\" don't reprocess display
