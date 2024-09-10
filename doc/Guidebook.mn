@@ -3390,87 +3390,47 @@ it because they fall into the same category of \(lqbragging rights\(rq
 and to limit the number of questions during disclosure.
 Listed here roughly in order of difficulty and not necessarily in the order
 in which you might accomplish them.
-.\" Vary the output between Guidebook.txt and Guidebook.{ps,pdf}
-.ie n \{\
-.\" fixed-width font: default key width is fine;
-.\" display longest entries (below) across two lines for Guidebook.txt
-.PS "Mines'\~End"
-.\}
-.el \{\
-.\" proportional font: force blank line, indent, and use slightly wider key
 .sp
-.in +5n
-.PS "Mines'\~End\~"
-.\}
-.fi
-.PL "<Rank>"
-Attained rank title <Rank>.
-.PL Shop
-Entered a shop.
-.PL Temple
-Entered a temple.
-.PL Mines
-Entered the Gnomish Mines.
-.PL Town
-Entered Mine Town.
-.PL Oracle
-Consulted the Oracle of Delphi.
-.PL Novel
-Read a passage from a Discworld Novel.
-.PL Sokoban
-Entered Sokoban.
-.PL "Big\~Room"
-Entered the Big Room.
-.ie n \{\
-.PL "Soko-Prize"
-Explored to the top of Sokoban
-.br
-and found a special item there.
-.PL "Mines'\~End"
-Explored to the bottom of the Gnomish Mines
-.br
-and found a special item there.
-.\}
-.el \{\
-.PL "Soko-Prize"
+.TS
+center;
+L Lz2 L.
+\fIRank\fP	\-	Attained rank title \fIRank\fP.
+Shop	\-	Entered a shop.
+Temple	\-	Entered a temple.
+Mines	\-	Entered the Gnomish Mines.
+Town	\-	Entered Mine Town.
+Oracle	\-	Consulted the Oracle of Delphi.
+Novel	\-	Read a passage from a Discworld Novel.
+Sokoban	\-	Entered Sokoban.
+Big Room	\-	Entered the Big Room.
+Soko-Prize	\-	T{
 Explored to the top of Sokoban and found a special item there.
-.PL "Mines'\~End"
-Explored to the bottom of the Gnomish Mines and found a special item there.
-.\}
-.fi
-.PL Medusa
-Defeated Medusa.
-.PL Tune
+T}
+Mines' End	\-	T{
+Explored to the bottom of the Gnomish Mines and found a special item
+there.
+T}
+Medusa	\-	Defeated Medusa.
+Tune	\-	T{
 Discovered the tune that can be used to open and close the drawbridge on
 the Castle level.
-.PL Bell
-Acquired the Bell of Opening.
-.PL Gehennom
-Entered Gehennom.
-.PL Candle
-Acquired the Candelabrum of Invocation.
-.PL Book
-Acquired the Book of the Dead.
-.PL Invocation
+T}
+Bell	\-	Acquired the Bell of Opening.
+Gehennom	\-	Entered Gehennom.
+Candle	\-	Acquired the Candelabrum of Invocation.
+Book	\-	Acquired the Book of the Dead.
+Invocation	\-	T{
 Gained access to the bottommost level of Gehennom.
-.PL Amulet
-Acquired the fabled Amulet of Yendor.
-.PL Endgame
-Reached the Elemental Planes.
-.PL Astral
-Reached the Astral Plane level.
-.PL Blind
-Blind from birth.
-.PL Deaf
-Deaf from birth.
-.PL Nudist
-Never wore any armor.
-.PL Pauper
-Started out with no possessions.
-.PL Ascended
-Delivered the Amulet to its final destination.
-.PE
-.if t .in -5n  \" undo proportional-width font-specific indentation
+T}
+Amulet	\-	Acquired the fabled Amulet of Yendor.
+Endgame	\-	Reached the Elemental Planes.
+Astral	\-	Reached the Astral Plane level.
+Blind	\-	Blind from birth.
+Deaf	\-	Deaf from birth.
+Nudist	\-	Never wore any armor.
+Pauper	\-	Started out with no possessions.
+Ascended	\-	Delivered the Amulet to its final destination.
+.TE
 .sp
 .lp "Notes:  "
 .pg
