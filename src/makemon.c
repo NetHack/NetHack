@@ -336,8 +336,9 @@ m_initweap(struct monst *mtmp)
             if ((!rn2(20) || is_lord(ptr))
                  && sgn(mtmp->isminion ? EMIN(mtmp)->min_align
                                        : ptr->maligntyp) == A_LAWFUL)
-                otmp = oname(otmp,
-                             artiname(ART_SUNSWORD),
+                /* [note: this used to have a 50:50 chance for Sunsword or
+                   Demonbane, but Demonbane has been changed into a mace] */
+                otmp = oname(otmp, artiname(ART_SUNSWORD),
                              ONAME_RANDOM); /* randomly created */
             bless(otmp);
             otmp->oerodeproof = TRUE;

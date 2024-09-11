@@ -438,7 +438,7 @@ learn(void)
         /* might be learning a new spellbook type or spellbook of blank paper;
            if so, persistent inventory will get updated */
         makeknown((int) booktype);
-        /* makeknown() calls update inventory when discovering something
+        /* makeknown() calls update_inventory() when discovering something
            new but is a no-op for something that's already known so wouldn't
            update persistent inventory to reflect faded book if spellbook of
            blank paper happens to already be discovered */
