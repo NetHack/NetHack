@@ -1,4 +1,4 @@
-/* NetHack 3.7	attrib.c	$NHDT-Date: 1725138479 2024/08/31 21:07:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.7	attrib.c	$NHDT-Date: 1726168587 2024/09/12 19:16:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.129 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -355,14 +355,25 @@ poisoned(
     i = !fatal ? 1 : rn2(fatal + (thrown_weapon ? 20 : 0));
     if (i == 0 && typ != A_CHA) {
         /* sometimes survivable instant kill */
-        loss = 6 + d(4, 6);
+        loss = 6 + d(4, 6); /* 6 + 4d6 => 10..34 */
         if (u.uhp <= loss) {
             u.uhp = -1;
             disp.botl = TRUE;
             pline_The("poison was deadly...");
         } else {
             /* survived, but with severe reaction */
-            u.uhpmax = max(3, u.uhpmax - (loss / 2));
+            int olduhp = u.uhp,
+                newuhpmax = u.uhpmax - (loss / 2);
+
+            setuhpmax(max(newuhpmax, minuhpmax(3)));
+            /* reduce pending loss if uhp has already been reduced due to
+               drop in uhpmax */
+            if (u.uhp < olduhp) {
+                loss -= (olduhp - u.uhp);
+                if (loss < 1)
+                    loss = 1;
+            }
+
             losehp(loss, pkiller, kprefix); /* poison damage */
             if (adjattrib(A_CON, (typ != A_CON) ? -1 : -3, TRUE))
                 poisontell(A_CON, TRUE);
@@ -1221,7 +1232,8 @@ acurrstr(void)
    to distinguish between observable +0 result and no-visible-effect
    due to an attribute not being able to exceed maximum or minimum */
 boolean
-extremeattr(int attrindx) /* does attrindx's value match its max or min? */
+extremeattr(
+    int attrindx) /* does attrindx's value match its max or min? */
 {
     /* Fixed_abil and racial MINATTR/MAXATTR aren't relevant here */
     int lolimit = 3, hilimit = 25, curval = ACURR(attrindx);
@@ -1272,8 +1284,9 @@ adjalign(int n)
 
 /* change hero's alignment type, possibly losing use of artifacts */
 void
-uchangealign(int newalign,
-             int reason) /* A_CG_CONVERT, A_CG_HELM_ON, or A_CG_HELM_OFF */
+uchangealign(
+    int newalign,
+    int reason) /* A_CG_CONVERT, A_CG_HELM_ON, or A_CG_HELM_OFF */
 {
     aligntyp oldalign = u.ualign.type;
 

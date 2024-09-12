@@ -1,4 +1,4 @@
-/* NetHack 3.7	mcastu.c	$NHDT-Date: 1705428596 2024/01/16 18:09:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.7	mcastu.c	$NHDT-Date: 1726168598 2024/09/12 19:16:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.105 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -390,7 +390,18 @@ touch_of_death(struct monst *mtmp)
         Strcpy(svk.killer.name, kbuf);
         done(DIED);
     } else {
-        u.uhpmax -= drain;
+        /* HP manipulation similar to poisoned(attrib.c) */
+        int olduhp = u.uhp,
+            newuhpmax = u.uhpmax - drain;
+
+        setuhpmax(max(newuhpmax, minuhpmax(3)));
+        /* reduce pending loss if uhp has already been reduced due to
+           drop in uhpmax */
+        if (u.uhp < olduhp) {
+            dmg -= (olduhp - u.uhp);
+            if (dmg < 1)
+                dmg = 1;
+        }
         losehp(dmg, kbuf, KILLED_BY);
     }
     svk.killer.name[0] = '\0'; /* not killed if we get here... */
