@@ -46,7 +46,7 @@
 .ds f0 \*(vr
 .ds f1 \" empty
 .\"DO NOT REMOVE NH_DATESUB .ds f2 DATE(%B %-d, %Y)
-.ds f2 August 11, 2024
+.ds f2 September 13, 2024
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -5798,6 +5798,8 @@ d	S_dog	(dog or other canine)
 D	S_dragon	(dragon)
 ;	S_eel	(sea monster)
 E	S_elemental	(elemental)
+#	S_engrcorr	(engraving in a corridor)
+\`	S_engroom	(engraving in a room)
 /	S_expl_tl	(explosion top left)
 \-	S_expl_tc	(explosion top center)
 \\	S_expl_tr	(explosion top right)
