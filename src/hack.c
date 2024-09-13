@@ -4049,8 +4049,9 @@ saving_grace(int dmg)
            we might invent one, or perhaps use LL_LIFESAVE, but surviving
            certain death (or preserving worn amulet of life saving) via
            saving-grace feels like breaking a conduct; not sure how best
-           to phrase this though... */
-        livelog_printf(LL_CONDUCT, "%s (%d damage, %d/%d HP)",
+           to phrase this though; classifying it as a spoiler will hide it
+           from #chronicle during play but show it to livelog observers */
+        livelog_printf(LL_CONDUCT | LL_SPOILER, "%s (%d damage, %d/%d HP)",
                        "survived one-shot death via saving-grave",
                        dmg, u.uhp, u.uhpmax);
 

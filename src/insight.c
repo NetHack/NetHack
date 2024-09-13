@@ -1922,7 +1922,8 @@ attributes_enlightenment(
     }
 #endif
 
-    {
+    /* saving-grace: show during final disclosure, hide during normal play */
+    if (final || wizard || discover) {
         static const char *verbchoices[2][2] = {
             { "might avoid", "have avoided" },
             { "could have avoided", "avoided" },
