@@ -2705,7 +2705,7 @@ relink_timers(boolean ghostly)
                     nid = curr->arg.a_uint;
                 curr->arg.a_obj = find_oid(nid);
                 if (!curr->arg.a_obj)
-                    panic("cant find o_id %d", nid);
+                    panic("can't find o_id %d", nid);
                 curr->needs_fixup = 0;
             } else if (curr->kind == TIMER_MONSTER) {
                 panic("relink_timers: no monster timer implemented");

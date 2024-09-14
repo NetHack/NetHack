@@ -797,7 +797,7 @@ newgame(void)
     return;
 }
 
-/* show "welcome [back] to nethack" message at program startup */
+/* show "welcome [back] to NetHack" message at program startup */
 void
 welcome(boolean new_game) /* false => restoring an old game */
 {

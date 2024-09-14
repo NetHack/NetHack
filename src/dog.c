@@ -949,7 +949,7 @@ dogfood(struct monst *mon, struct obj *obj)
     switch (obj->oclass) {
     case FOOD_CLASS:
         fx = (obj->otyp == CORPSE || obj->otyp == TIN || obj->otyp == EGG)
-                /* corpsenm might be NON_PM (special tin, unhatachable egg) */
+                /* corpsenm might be NON_PM (special tin, unhatchable egg) */
                 ? obj->corpsenm
                 : NON_PM;
         /* mons[NUMMONS] is a valid array entry, though not a valid monster;

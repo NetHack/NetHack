@@ -664,7 +664,7 @@ find_targ(
                 /* if a long worm, only accept the head as a target */
                 && targ->mx == curx && targ->my == cury) /* not tail */
                 break;
-            /* If the pet can't see it, it assumes it aint there */
+            /* If the pet can't see it, it assumes it ain't there */
             targ = 0;
         }
     }

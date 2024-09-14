@@ -520,7 +520,7 @@ relink_light_sources(boolean ghostly)
                     ls->id.a_monst = find_mid(nid, FM_EVERYWHERE);
                 }
                 if (!ls->id.a_monst)
-                    impossible("relink_light_sources: cant find %c_id %d",
+                    impossible("relink_light_sources: can't find %c_id %d",
                                which, nid);
             } else
                 impossible("relink_light_sources: bad type (%d)", ls->type);

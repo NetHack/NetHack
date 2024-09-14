@@ -985,7 +985,7 @@ beautiful(void)
     const char *res;
     int cha = ACURR(A_CHA);
 
-    /* don't bother complaining about the sexism; nethack is not real life */
+    /* don't bother complaining about the sexism; NetHack is not real life */
     res = ((cha >= 25) ? "sublime" /* 25 is the maximum possible */
            : (cha >= 19) ? "splendorous" /* note: not "splendiferous" */
              : (cha >= 16) ? ((poly_gender() == 1) ? "beautiful" : "handsome")
@@ -3373,7 +3373,7 @@ use_pole(struct obj *obj, boolean autohit)
      *      .52125.
      *      .85458.
      *      ...9...
-     *  (Note: no roles in nethack can become expert or better
+     *  (Note: no roles in NetHack can become expert or better
      *  for polearm skill; Yeoman in slash'em can become expert.)
      */
     min_range = 4;
@@ -3704,7 +3704,7 @@ use_grapple(struct obj *obj)
         int clr = NO_COLOR;
 
         any = cg.zeroany; /* set all bits to zero */
-        any.a_int = 1; /* use index+1 (cant use 0) as identifier */
+        any.a_int = 1; /* use index+1 (can't use 0) as identifier */
         start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any.a_int++;
         Sprintf(buf, "an object on the %s", surface(cc.x, cc.y));
