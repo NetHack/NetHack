@@ -19,6 +19,8 @@ GUIDEBOOK = Guidebook		# regular ASCII file
 # Some versions of col need -x to keep them from converting spaces to tabs;
 # some versions of col don't do the conversion by default and don't
 # recognize the option.  Sigh.
+#
+# col is unnecessary, but harmless, with groff.  See grotty(1).
 COLCMD = col -bx
 #COLCMD = col -b
 

@@ -31,7 +31,8 @@
 .lt 70n
 .\}
 .
-.so tmac.nh	\" extra macros which aren't in tmac.n
+.so tmac.nh \" extra macros which aren't in tmac.n
+.if !\n(nH .so doc/tmac.nh
 .
 .\" building Guidebook.txt doesn't have CR font available; groff 1.23 issues
 .\" a warning each time any font can't be loaded; earlier versions silently
@@ -288,15 +289,15 @@ Dlvl:1 $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 T:752 Hungry Conf
 .if t .sp 0.5v
 Figure 1
 .
-.\" Figure 2 uses trailing spaces to force the same width as Figure 1.
 .BR 1
 .ft CR
 .TS
 center box tab(~);
 L.
-Player the Rambler   St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15        \"
-Neutral $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 Hungry          \"
-Dlvl:1 T:752                                  Conf            \"
+.\" Use trailing spaces to force the same width as Figure 1.
+Player the Rambler   St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15        \&
+Neutral $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 Hungry          \&
+Dlvl:1 T:752                                  Conf            \&
 .TE
 .ft R
 .ce 1
@@ -429,13 +430,15 @@ Movement modifiers:
 .lp ""
 Other conditions and modifiers exist, but there isn't enough room to
 display them with the other status fields.
+.\" Don't give the next paragraph a first-line indent.
+.nr @p \n(pi \" Save mn's paragraph indentation.
+.nr pi 0
 .pg
-.in -5n .\" outdent this paragraph
 The \f(CR#attributes\fP command (default key \f(CR\(haX\fP) will show
 all current status information in unabbreviated format.
 It also shows other information which might be included on the status
 lines if those had more room.
-.in 0 .\" reset indentation
+.nr pi \n(@p \" Restore mn's paragraph indentation.
 .hn 2
 The message line (top)
 .pg
@@ -2825,15 +2828,15 @@ Here is a list of the armor class values provided by suits of armor:
 .\" line and leading spaces to indent their second line.
 .TS
 center;
-a n.
+l r.
 Dragon scale mail	1
 Plate mail, Crystal plate mail	3
-Bronze plate mail, Splint mail,	\"
-\ \ \ Banded mail, Dwarvish mithril-coat	4
+Bronze plate mail, Splint mail,	\&
+   Banded mail, Dwarvish mithril-coat	4
 Chain mail, Elven mithril-coat	5
 Scale mail, Orcish chain mail	6
-Ring mail, Studded leather armor,	\"
-\ \ \ Dragon scales	7
+Ring mail, Studded leather armor,	\&
+   Dragon scales	7
 Leather armor, Orcish ring mail	8
 Leather jacket	9
 none	10
@@ -3390,87 +3393,47 @@ it because they fall into the same category of \(lqbragging rights\(rq
 and to limit the number of questions during disclosure.
 Listed here roughly in order of difficulty and not necessarily in the order
 in which you might accomplish them.
-.\" Vary the output between Guidebook.txt and Guidebook.{ps,pdf}
-.ie n \{\
-.\" fixed-width font: default key width is fine;
-.\" display longest entries (below) across two lines for Guidebook.txt
-.PS "Mines'\~End"
-.\}
-.el \{\
-.\" proportional font: force blank line, indent, and use slightly wider key
 .sp
-.in +5n
-.PS "Mines'\~End\~"
-.\}
-.fi
-.PL "<Rank>"
-Attained rank title <Rank>.
-.PL Shop
-Entered a shop.
-.PL Temple
-Entered a temple.
-.PL Mines
-Entered the Gnomish Mines.
-.PL Town
-Entered Mine Town.
-.PL Oracle
-Consulted the Oracle of Delphi.
-.PL Novel
-Read a passage from a Discworld Novel.
-.PL Sokoban
-Entered Sokoban.
-.PL "Big\~Room"
-Entered the Big Room.
-.ie n \{\
-.PL "Soko-Prize"
-Explored to the top of Sokoban
-.br
-and found a special item there.
-.PL "Mines'\~End"
-Explored to the bottom of the Gnomish Mines
-.br
-and found a special item there.
-.\}
-.el \{\
-.PL "Soko-Prize"
+.TS
+center;
+L Lz2 L.
+\fIRank\fP	\-	Attained rank title \fIRank\fP.
+Shop	\-	Entered a shop.
+Temple	\-	Entered a temple.
+Mines	\-	Entered the Gnomish Mines.
+Town	\-	Entered Mine Town.
+Oracle	\-	Consulted the Oracle of Delphi.
+Novel	\-	Read a passage from a Discworld Novel.
+Sokoban	\-	Entered Sokoban.
+Big Room	\-	Entered the Big Room.
+Soko-Prize	\-	T{
 Explored to the top of Sokoban and found a special item there.
-.PL "Mines'\~End"
-Explored to the bottom of the Gnomish Mines and found a special item there.
-.\}
-.fi
-.PL Medusa
-Defeated Medusa.
-.PL Tune
+T}
+Mines' End	\-	T{
+Explored to the bottom of the Gnomish Mines and found a special item
+there.
+T}
+Medusa	\-	Defeated Medusa.
+Tune	\-	T{
 Discovered the tune that can be used to open and close the drawbridge on
 the Castle level.
-.PL Bell
-Acquired the Bell of Opening.
-.PL Gehennom
-Entered Gehennom.
-.PL Candle
-Acquired the Candelabrum of Invocation.
-.PL Book
-Acquired the Book of the Dead.
-.PL Invocation
+T}
+Bell	\-	Acquired the Bell of Opening.
+Gehennom	\-	Entered Gehennom.
+Candle	\-	Acquired the Candelabrum of Invocation.
+Book	\-	Acquired the Book of the Dead.
+Invocation	\-	T{
 Gained access to the bottommost level of Gehennom.
-.PL Amulet
-Acquired the fabled Amulet of Yendor.
-.PL Endgame
-Reached the Elemental Planes.
-.PL Astral
-Reached the Astral Plane level.
-.PL Blind
-Blind from birth.
-.PL Deaf
-Deaf from birth.
-.PL Nudist
-Never wore any armor.
-.PL Pauper
-Started out with no possessions.
-.PL Ascended
-Delivered the Amulet to its final destination.
-.PE
-.if t .in -5n  \" undo proportional-width font-specific indentation
+T}
+Amulet	\-	Acquired the fabled Amulet of Yendor.
+Endgame	\-	Reached the Elemental Planes.
+Astral	\-	Reached the Astral Plane level.
+Blind	\-	Blind from birth.
+Deaf	\-	Deaf from birth.
+Nudist	\-	Never wore any armor.
+Pauper	\-	Started out with no possessions.
+Ascended	\-	Delivered the Amulet to its final destination.
+.TE
 .sp
 .lp "Notes:  "
 .pg
@@ -3503,7 +3466,8 @@ instrument played closely
 enough\(embut not too close!\(emto
 the Castle level's drawbridge or can be given to you via prayer boon.
 .pg
-\fIBlind\fP, \fIDeaf\fP, \fINudist\fP, and \FIPauper\fP are also conducts, and they can only be
+\fIBlind\fP, \fIDeaf\fP, \fINudist\fP,
+and \fIPauper\fP are also conducts, and they can only be
 enabled by setting the correspondingly named option in NETHACKOPTIONS
 or run-time configuration file prior to game start.
 In the case of \fIBlind\fP and \fIDeaf\fP, the option also enforces the conduct.
@@ -5530,7 +5494,7 @@ SOUND=MESG hide "^You miss the " "swing.wav" 75
 .ft
 .ei
 .ed
-.BR 0 .\" without this, the next section seems too close to this one
+.BR 0 \" without this, the next section seems too close to this one
 .hn 2
 Configuring Status Hilites
 .pg
@@ -5714,7 +5678,7 @@ OPTION=hilite_status: condition/lev+fly/red&inverse
 .ft
 .ei
 .ed
-.BR 0 .\" without this, the next section seems too close to this one
+.BR 0 \" without this, the next section seems too close to this one
 .hn 2
 Modifying NetHack Symbols
 .pg

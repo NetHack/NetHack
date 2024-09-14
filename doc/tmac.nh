@@ -8,6 +8,10 @@
 .\"   cluttered as their number increased.  It now uses the '.so' directive
 .\"   to include this file.  (tmac.n is passed to 'roff on the command line.)
 .
+.\" Protect against being sourced twice.
+.nr nH +1
+.if \n(nH>1 .nx
+.
 .\" labeled paragraph start
 .\" .PS word
 .\"	set the width for the label column
@@ -85,7 +89,8 @@
 .	if \\n(id=0 \{\
 .		di			\" end diversion
 .		fi			\" resume filling
-.		in -\\n(piu		\" dedent
+.		ie \\n(.i<\\n(pi .in 0
+.		el .in -\\n(piu		\" dedent
 .		ev			\" pop environment
 .		ne \\n(dnu		\" be sure you have room
 .		nf			\" don't reprocess display
@@ -118,7 +123,7 @@
 .\"    $1 - repeat count for amount of padding (optional; default is 1)
 .de BR
 .ie \\.$==0 .nr bR 1v
-.el .nr bR (\\$1-0)v
+.el .nr bR 0\\$1v
 \0
 .sp \\n(bR
 .br

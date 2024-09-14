@@ -1,4 +1,4 @@
-\" @(#)$Id: tmac.n,v 1.4 2002/01/19 13:41:15 michael.allison Exp $
+.\" @(#)$Id: tmac.n,v 1.4 2002/01/19 13:41:15 michael.allison Exp $
 .\" The News macro package
 .\"
 .\" This  is  the macro package that is used to format news documents.  It
@@ -761,4 +761,3 @@
 .\" couple of miscellaneous requests
 .bd S 3 3				\" embolden special font chars if B
 .hy 2					\" don't hyphenate last lines
-
