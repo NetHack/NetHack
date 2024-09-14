@@ -2186,6 +2186,11 @@ curses: allow changing default colors with the 'palette' config option
 curses: if messages have been issued during start-up (for instance, warnings
 	about issues in run-time config file), prompt user to press <return>
 	so that they can be read before curses erases the screen
+documentation: when building plain text Guidebook.txt from Guidebook.mn, avoid
+	attempting to use CR font; change doesn't affect building Guidebook.ps
+	which utilizes CR to get various instances of fixed-width text
+documentation: improve Guidebook *roff formatting and prepare for use of future release
+	of groff 1.24.0 (pr #1280 by g-branden-robinson)
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project
@@ -2315,6 +2320,20 @@ Qt+macOS: since menu entry help->"About Qt NetHack" gets hijacked and becomes
 	which stays where intended and brings up the same information
 Qt+macOS: suppress unwanted "Search [______]" action from being inserted as the
 	first entry in the menubar's "Help" dropdown menu
+sound: add a soundlib interface that consists of a specification
+	documented in doc/sound.txt; default 'nosound' soundlib implementation
+	of the specification in src/sounds.c
+sound: added 'macsound' soundlib implementation for use on macOS; the
+	interface implementation resides in the objective C file
+	sound/macsound/macsound.m; built on top of the built-in AppKit
+	NSSound, #import <AppKit/AppKit.h>, linked using -framework AppKit.
+sound: added 'windsound' soundlib implementation for use on Windows; the
+	interface implementation resides in the file
+	sound/windsound/windsound.c; built on top of the win32 api,
+	header file mmsystem.h, linked with winmm.
+sound: add 'qtsound' soundlib implementation for use on any platform
+	with Qt; the interface implementation resides win/Qt/qt_bind.cpp;
+	built on top of Qt.
 tiles: add indicator of thonged portion to aklys tile
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
@@ -2341,6 +2360,7 @@ Unix: work-around a build issue in ubuntu 21.10 by using ifdef to skip the
 Unix: re-do command line parsing
 Unix: add ../include/nhlua.h to the alloc.o dependencies in Makefile.utl to
 	match Makefile.src
+Unix: implement SELF_RECOVER compile-time option, on by default on linux
 user_sounds: move the message hook from inside individual window display ports
 	to the core where it allows MSGTYP_NOSHOW msgtyp's to still trigger
 	sounds to correct a reported github issue; also fixes a past reported
@@ -2374,24 +2394,6 @@ X11: (possibly X11+macOS): try harder to resize the getlin() prompt, if needed,
 X11: set all selectable menu lines to the same length, left justified
 X11: initializing the get-extended-command widget modified memory beyond what
 	it dynamically allocated
-sound: add a soundlib interface that consists of a specification
-	documented in doc/sound.txt; default 'nosound' soundlib implementation
-	of the specification in src/sounds.c
-sound: added 'macsound' soundlib implementation for use on macOS; the
-	interface implementation resides in the objective C file
-	sound/macsound/macsound.m; built on top of the built-in AppKit
-	NSSound, #import <AppKit/AppKit.h>, linked using -framework AppKit.
-sound: added 'windsound' soundlib implementation for use on Windows; the
-	interface implementation resides in the file
-	sound/windsound/windsound.c; built on top of the win32 api,
-	header file mmsystem.h, linked with winmm.
-sound: add 'qtsound' soundlib implementation for use on any platform
-	with Qt; the interface implementation resides win/Qt/qt_bind.cpp;
-	built on top of Qt.
-documentation: when building plain text Guidebook.txt from Guidebook.mn, avoid
-	attempting to use CR font; change doesn't affect building Guidebook.ps
-	which utilizes CR to get various instances of fixed-width text
-Unix: implement SELF_RECOVER compile-time option, on by default on linux
 
 
 General New Features
