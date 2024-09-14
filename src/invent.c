@@ -1930,7 +1930,8 @@ getobj(
 
             menuquery[0] = qbuf[0] = '\0';
             if (iflags.force_invmenu)
-                Sprintf(menuquery, "What do you want to %s?", word);
+                Snprintf(menuquery, sizeof menuquery,
+                         "What do you want to %s?", word);
             if (!allowed_choices || *allowed_choices == HANDS_SYM
                 || *buf == HANDS_SYM)
                 handsbuf = getobj_hands_txt(word, qbuf);
