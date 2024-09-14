@@ -2024,10 +2024,13 @@ when a monster within a gas cloud was displayed on the map because the hero
 	was next to it, it remained displayed if hero moved away
 eating a pyrolisk egg on the floor triggered an "object lost" panic
 core object creation and the curses interface's window handling both became
-	confused by the 'pauper' option/conduct because they assumed that invent
-	being Null meant that the game hadn't started yet
-wizards were discovering unread spellbooks whenever any skill was advanced; do so
-	only when a spell skill is advanced
+	confused by the 'pauper' option/conduct because they assumed that
+	invent being Null meant that the game hadn't started yet
+wizards were discovering unread spellbooks whenever any skill was advanced;
+	do so only when a spell skill is advanced
+if tips were enabled, the getpos/farlook tip clobbered the initial prompt (at
+	least for tty's one line message window), so reissue the prompt after
+	the tip has been displayed
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
@@ -2189,8 +2192,8 @@ curses: if messages have been issued during start-up (for instance, warnings
 documentation: when building plain text Guidebook.txt from Guidebook.mn, avoid
 	attempting to use CR font; change doesn't affect building Guidebook.ps
 	which utilizes CR to get various instances of fixed-width text
-documentation: improve Guidebook *roff formatting and prepare for use of future release
-	of groff 1.24.0 (pr #1280 by g-branden-robinson)
+documentation: improve Guidebook *roff formatting and prepare for use of
+	future release of groff 1.24.0 (pr #1280 by g-branden-robinson)
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project

@@ -1152,7 +1152,7 @@ extern void impact_disturbs_zombies(struct obj *, boolean) NONNULLARG1;
 extern void disturb_buried_zombies(coordxy, coordxy);
 extern boolean u_maybe_impaired(void);
 extern const char *u_locomotion(const char *) NONNULLARG1;
-extern void handle_tip(int);
+extern boolean handle_tip(int);
 extern void domove(void);
 extern void runmode_delay_output(void);
 extern void overexert_hp(void);

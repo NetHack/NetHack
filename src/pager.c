@@ -1627,7 +1627,7 @@ add_quoted_engraving(coordxy x, coordxy y, char *buf)
 }
 
 /* also used by getpos hack in getpos.c */
-const char what_is_an_unknown_object[] = "an unknown object";
+const char what_is_a_location[] = "a monster, object or location";
 
 int
 do_look(int mode, coord *click_cc)
@@ -1833,11 +1833,11 @@ do_look(int mode, coord *click_cc)
             if (from_screen) {
                 if (flags.verbose)
                     pline("Please move the cursor to %s.",
-                          what_is_an_unknown_object);
+                          what_is_a_location);
                 else
-                    pline("Pick an object.");
+                    pline("Pick %s.", what_is_a_location);
 
-                ans = getpos(&cc, quick, what_is_an_unknown_object);
+                ans = getpos(&cc, quick, what_is_a_location);
                 if (ans < 0 || cc.x < 0)
                     break; /* done */
                 flags.verbose = FALSE; /* only print long question once */

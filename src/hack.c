@@ -1760,25 +1760,26 @@ u_simple_floortyp(coordxy x, coordxy y)
     return ROOM;
 }
 
-/* maybe show a helpful gameplay tip? */
-void
+/* maybe show a helpful gameplay tip? returns True if tip gets shown */
+boolean
 handle_tip(int tip)
 {
     if (!flags.tips)
-        return;
+        return FALSE;
 
     if (tip >= 0 && tip < NUM_TIPS && !svc.context.tips[tip]) {
         svc.context.tips[tip] = TRUE;
+        /* the "Tip:" prefix is a hint to use of OPTIONS=!tips to suppress */
         switch (tip) {
         case TIP_ENHANCE:
-            pline("(Use the #enhance command to advance them.)");
+            pline("(Tip: use the #enhance command to advance them.)");
             break;
         case TIP_SWIM:
-            pline("(Use '%s' prefix to step in if you really want to.)",
+            pline("(Tip: use '%s' prefix to step in if you really want to.)",
                   visctrl(cmd_from_func(do_reqmenu)));
             break;
         case TIP_UNTRAP_MON:
-            pline("(Perhaps #untrap would help?)");
+            pline("(Tip: perhaps #untrap would help?)");
             break;
         case TIP_GETPOS:
             l_nhcore_call(NHCORE_GETPOS_TIP);
@@ -1787,7 +1788,9 @@ handle_tip(int tip)
             impossible("Unknown tip in handle_tip(%i)", tip);
             break;
         }
+        return TRUE;
     }
+    return FALSE;
 }
 
 /* Is it dangerous for hero to move to x,y due to water or lava? */
@@ -1823,7 +1826,7 @@ swim_move_danger(coordxy x, coordxy y)
                 You("avoid %s into the %s.",
                     ing_suffix(u_locomotion("step")),
                     waterbody_name(x, y));
-                handle_tip(TIP_SWIM);
+                (void) handle_tip(TIP_SWIM);
                 return TRUE;
             }
         }
@@ -2056,7 +2059,7 @@ domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
             which = just_an(anbuf, what); /* "a " or "an " */
         }
         You("stop.  %s can't move out of %s%s.", YMonnam(mtmp), which, what);
-        handle_tip(TIP_UNTRAP_MON);
+        (void) handle_tip(TIP_UNTRAP_MON);
         didnt_move = TRUE;
     } else if (mtmp->mpeaceful
                && (!goodpos(u.ux0, u.uy0, mtmp, 0)
@@ -2687,6 +2690,11 @@ domove_core(void)
         /* check for discovered trap */
         && (trap = t_at(x, y)) != 0 && trap->tseen
         /* check whether attempted move will be viable */
+    /*
+     * FIXME:
+     *  this will result in "Really step into trap?" if there is a
+     *  peaceful or tame monster already there.
+     */
         && test_move(u.ux, u.uy, u.dx, u.dy, TEST_MOVE)
         /* override confirmation if the trap is harmless to the hero */
         && (immune_to_trap(&gy.youmonst, trap->ttyp) != TRAP_CLEARLY_IMMUNE

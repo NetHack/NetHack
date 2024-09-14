@@ -4,7 +4,7 @@
 
 #include "hack.h"
 
-extern const char what_is_an_unknown_object[]; /* from pager.c */
+extern const char what_is_a_location[]; /* from pager.c */
 
 staticfn void getpos_toggle_hilite_state(void);
 staticfn void getpos_getvalids_selection(struct selectionvar *,
@@ -265,7 +265,7 @@ getpos_help(boolean force, const char *goal)
         /* disgusting hack; the alternate selection characters work for any
            getpos call, but only matter for dowhatis (and doquickwhatis,
            also for dotherecmdmenu's simulated mouse) */
-        doing_what_is = (goal == what_is_an_unknown_object);
+        doing_what_is = (goal == what_is_a_location);
         if (doing_what_is) {
             Sprintf(kbuf, "'%s' or '%s' or '%s' or '%s'",
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]),
@@ -816,7 +816,8 @@ getpos(coord *ccp, boolean force, const char *goal)
         mMoOdDxX[i] = gc.Cmd.spkeys[mMoOdDxX_def[i]];
     mMoOdDxX[SIZE(mMoOdDxX_def)] = '\0';
 
-    handle_tip(TIP_GETPOS);
+    if (handle_tip(TIP_GETPOS))
+        show_goal_msg = TRUE; /* tip has overwritten prompt in mesg window */
 
     if (!goal)
         goal = "desired location";
