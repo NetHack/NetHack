@@ -1124,6 +1124,7 @@ extern void purge_all_custom_entries(void);
 extern void dump_glyphids(void);
 extern void clear_all_glyphmap_colors(void);
 extern void reset_customcolors(void);
+extern int glyph_to_cmap(int);
 
 /* ### hack.c ### */
 

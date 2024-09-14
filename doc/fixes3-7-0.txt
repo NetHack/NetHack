@@ -2873,6 +2873,7 @@ remove a null sobj check from gold_detect that was situated after
 check for valid indexes of def_monsyms[] and def_oc_syms[] in
 	choose_classes_menu() (pr #1179 by argrath)
 split damage from acid potion into separate function (pr #1195 by argrath)
+add swallow and explosion glyphs to glyph_to_cmap() (pr #1277 by ars3niy)
 
 
 Code Cleanup and Reorganization
@@ -3005,4 +3006,5 @@ remove TEXTCOLOR build option
 relocate general-purpose function choose_classes_menu(), from
 	options.c to windows.c
 remove register from variable declarations
+make glyph_to_cmap() a function instead of a macro
 

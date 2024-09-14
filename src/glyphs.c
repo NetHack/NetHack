@@ -221,7 +221,8 @@ glyph_to_cmap(int glyph)
     else if (glyph_is_explosion(glyph))
         return glyph_to_explosion(glyph) + S_expl_tl;
     else
-        return MAXPCHARS;
+        return MAXPCHARS;    /* MAXPCHARS is legal array index because
+                                of trailing fencepost entry */
 }
 
 staticfn int
