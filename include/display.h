@@ -725,33 +725,12 @@ enum glyph_offsets {
      && (glyph) < (GLYPH_CMAP_C_OFF + ((S_goodpos - S_digbeam) + 1)))
 
 /* final MAXPCHARS is legal array index because of trailing fencepost entry */
-#define glyph_to_cmap(glyph) \
-    (((glyph) == GLYPH_CMAP_STONE_OFF)                                  \
-      ? S_stone                                                         \
-      : glyph_is_cmap_main(glyph)                                       \
-        ? (((glyph) - GLYPH_CMAP_MAIN_OFF) + S_vwall)                   \
-        : glyph_is_cmap_mines(glyph)                                    \
-          ? (((glyph) - GLYPH_CMAP_MINES_OFF) + S_vwall)                \
-          : glyph_is_cmap_gehennom(glyph)                               \
-            ? (((glyph) - GLYPH_CMAP_GEH_OFF) + S_vwall)                \
-            : glyph_is_cmap_knox(glyph)                                 \
-              ? (((glyph) - GLYPH_CMAP_KNOX_OFF) + S_vwall)             \
-              : glyph_is_cmap_sokoban(glyph)                            \
-                ? (((glyph) - GLYPH_CMAP_SOKO_OFF) + S_vwall)           \
-                : glyph_is_cmap_a(glyph)                                \
-                  ? (((glyph) - GLYPH_CMAP_A_OFF) + S_ndoor)            \
-                  : glyph_is_cmap_altar(glyph)                          \
-                    ? (S_altar)                                         \
-                    : glyph_is_cmap_b(glyph)                            \
-                      ? (((glyph) - GLYPH_CMAP_B_OFF) + S_grave)        \
-                      : glyph_is_cmap_c(glyph)                          \
-                        ? (((glyph) - GLYPH_CMAP_C_OFF) + S_digbeam)    \
-                        : glyph_is_cmap_zap(glyph)                      \
-                          ? ((((glyph) - GLYPH_ZAP_OFF) % 4) + S_vbeam) \
-                          : MAXPCHARS)
+int glyph_to_cmap(int glpyh);
 
 #define glyph_to_swallow(glyph) \
     (glyph_is_swallow(glyph) ? (((glyph) - GLYPH_SWALLOW_OFF) & 0x7) : 0)
+#define glyph_to_explosion(glyph) \
+    (glyph_is_explosion(glyph) ? (((glyph) - GLYPH_EXPLODE_OFF) % (S_expl_br - S_expl_tl + 1)) : 0)
 #define glyph_to_warning(glyph) \
     (glyph_is_warning(glyph) ? ((glyph) - GLYPH_WARNING_OFF) : NO_GLYPH)
 
