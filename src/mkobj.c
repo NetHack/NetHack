@@ -3658,7 +3658,7 @@ obj_absorb(struct obj **obj1, struct obj **obj2)
  * on the floor, the floor object goes first.  Note that when
  * a globby monster dies, its corpse (new glob) will be created
  * on the floor; when a glob is dropped, thrown, or kicked it
- * in will be free at the time obj_meld() gets called.
+ * will be free at the time obj_meld() gets called.
  *
  * Wrapper for obj_absorb() so that floor_effects works more
  * cleanly (since we don't know which we want to stay around).
