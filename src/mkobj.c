@@ -952,8 +952,7 @@ mksobj_init(struct obj *otmp, boolean artif)
                need to perform any fix up and returns glob->owt as-is */
             otmp->owt = objects[otmp->otyp].oc_weight;
             otmp->known = otmp->dknown = 1;
-            otmp->corpsenm = PM_GRAY_OOZE
-                           + (otmp->otyp - GLOB_OF_GRAY_OOZE);
+            otmp->corpsenm = PM_GRAY_OOZE + (otmp->otyp - GLOB_OF_GRAY_OOZE);
             start_glob_timeout(otmp, 0L);
         } else {
             if (otmp->otyp != CORPSE && otmp->otyp != MEAT_RING
@@ -3656,16 +3655,19 @@ obj_absorb(struct obj **obj1, struct obj **obj2)
 /*
  * Causes the heavier object to absorb the lighter object in
  * most cases, but if one object is OBJ_FREE and the other is
- * on the floor, the floor object goes first.
+ * on the floor, the floor object goes first.  Note that when
+ * a globby monster dies, its corpse (new glob) will be created
+ * on the floor; when a glob is dropped, thrown, or kicked it
+ * in will be free at the time obj_meld() gets called.
  *
- * wrapper for obj_absorb so that floor_effects works more
- * cleanly (since we don't know which we want to stay around)
+ * Wrapper for obj_absorb() so that floor_effects works more
+ * cleanly (since we don't know which we want to stay around).
  */
 struct obj *
 obj_meld(struct obj **obj1, struct obj **obj2)
 {
     struct obj *otmp1, *otmp2, *result = 0;
-    int ox, oy;
+    int ox, oy; /* coordinates for the glob that goes away */
 
     if (obj1 && obj2) {
         otmp1 = *obj1;
@@ -3695,8 +3697,14 @@ obj_meld(struct obj **obj1, struct obj **obj2)
             }
             /* callers really ought to take care of this; glob melding is
                a bookkeeping issue rather than a display one */
-            if (ox && cansee(ox, oy))
-                newsym(ox, oy);
+            if (ox) {
+                if (cansee(ox, oy))
+                    newsym(ox, oy);
+                /* and this; a hides-under monster might be hiding under
+                   the glob that went away; if there's nothing else there
+                   to hide under, force it out of hiding */
+                maybe_unhide_at(ox, oy);
+            }
         }
     } else {
         impossible("obj_meld: not called with two actual objects");
