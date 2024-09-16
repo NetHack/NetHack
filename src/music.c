@@ -216,6 +216,7 @@ charm_monsters(int distance)
     }
 }
 
+/* Try to make a pit. */
 staticfn void
 do_pit(coordxy x, coordxy y, unsigned tu_pit)
 {
@@ -408,11 +409,13 @@ do_earthquake(int force)
             case FOUNTAIN: /* make the fountain disappear */
                 if (cansee(x, y))
                     pline_The("fountain falls%s.", into_a_chasm);
-                goto do_pit;
+                do_pit(x, y, tu_pit);
+                break;
             case SINK:
                 if (cansee(x, y))
                     pline_The("kitchen sink falls%s.", into_a_chasm);
-                goto do_pit;
+                do_pit(x, y, tu_pit);
+                break;
             case ALTAR:
                 amsk = altarmask_at(x, y);
                 /* always preserve the high altars */
@@ -423,15 +426,18 @@ do_earthquake(int force)
                     pline_The("%s altar falls%s.",
                               align_str(algn), into_a_chasm);
                 desecrate_altar(FALSE, algn);
-                goto do_pit;
+                do_pit(x, y, tu_pit);
+                break;
             case GRAVE:
                 if (cansee(x, y))
                     pline_The("headstone topples%s.", into_a_chasm);
-                goto do_pit;
+                do_pit(x, y, tu_pit);
+                break;
             case THRONE:
                 if (cansee(x, y))
                     pline_The("throne falls%s.", into_a_chasm);
-                goto do_pit;
+                do_pit(x, y, tu_pit);
+                break;
             case SCORR:
                 levl[x][y].typ = CORR;
                 unblock_point(x, y);
@@ -439,8 +445,7 @@ do_earthquake(int force)
                     pline("A secret corridor is revealed.");
                 /*FALLTHRU*/
             case CORR:
-            case ROOM: /* Try to make a pit. */
- do_pit:
+            case ROOM:
                 do_pit(x, y, tu_pit);
                 break;
             case SDOOR:
@@ -450,8 +455,10 @@ do_earthquake(int force)
                 /*FALLTHRU*/
             case DOOR: /* make the door collapse */
                 /* if already doorless, treat like room or corridor */
-                if (levl[x][y].doormask == D_NODOOR)
-                    goto do_pit;
+                if (levl[x][y].doormask == D_NODOOR) {
+                    do_pit(x, y, tu_pit);
+                    break;
+                }
                 /* wasn't doorless, now it will be */
                 levl[x][y].doormask = D_NODOOR;
                 unblock_point(x, y);
