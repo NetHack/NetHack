@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1472 $ $NHDT-Date: 1725143669 2024/08/31 22:34:29 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1480 $ $NHDT-Date: 1726609530 2024/09/17 21:45:30 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -778,9 +778,8 @@ covetous monsters will teleport to downstairs or upstairs to heal
 have fake player monsters use verbalize instead of pline when reacting to chat
 fix mention_walls distinguishing unseen walls from solid stone
 don't push unknown boulders when moving
-in flush_screen, reorder the code slightly to complete the bot() and
-	timebot() calls prior to the window port call to place the cursor
-	on the hero
+in flush_screen, reorder the code slightly to complete the bot() and timebot()
+	calls prior to the window port call to place the cursor on the hero
 magic traps can toggle intrinsic invisibility
 Death attacking a monster does drain life attack
 add unique Rider revival messages
@@ -2031,6 +2030,9 @@ wizards were discovering unread spellbooks whenever any skill was advanced;
 if tips were enabled, the getpos/farlook tip clobbered the initial prompt (at
 	least for tty's one line message window), so reissue the prompt after
 	the tip has been displayed
+a post-3.6 change to try to cope with invalid light source data when restoring
+	corrupted save file caused "panic: relink_light_sources" for valid
+	save file if saved while hero was poly'd into a light emitting monster
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

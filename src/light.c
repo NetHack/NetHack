@@ -1,4 +1,4 @@
-/* NetHack 3.7	light.c	$NHDT-Date: 1710549969 2024/03/16 00:46:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.7	light.c	$NHDT-Date: 1726609514 2024/09/17 21:45:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.75 $ */
 /* Copyright (c) Dean Luick, 1994                                       */
 /* NetHack may be freely redistributed.  See license for details.       */
 
@@ -499,32 +499,24 @@ relink_light_sources(boolean ghostly)
     for (ls = gl.light_base; ls; ls = ls->next) {
         if (ls->flags & LSF_NEEDS_FIXUP) {
             if (ls->type == LS_OBJECT || ls->type == LS_MONSTER) {
-                if (!ls->id.a_uint) {
-                    /* it was possible to get stuck in this loop on bad
-                     * savefile data load and repeatedly prompt the player
-                     * for a key press after displaying an impossible message.
-                     * Consider this bad data from a savefile and panic() */
-                     panic("relink_light_sources: id = 0, type = %d",
-                           (int) ls->type);
-                }
-                if (ghostly) {
-                    if (!lookup_id_mapping(ls->id.a_uint, &nid))
-                        impossible("relink_light_sources: no id mapping");
-                } else
-                    nid = ls->id.a_uint;
-                if (ls->type == LS_OBJECT) {
-                    which = 'o';
-                    ls->id.a_obj = find_oid(nid);
-                } else {
-                    which = 'm';
-                    ls->id.a_monst = find_mid(nid, FM_EVERYWHERE);
-                }
-                if (!ls->id.a_monst)
-                    impossible("relink_light_sources: can't find %c_id %d",
-                               which, nid);
-            } else
-                impossible("relink_light_sources: bad type (%d)", ls->type);
+                nid = ls->id.a_uint;
+                if (ghostly && !lookup_id_mapping(nid, &nid))
+                    panic("relink_light_sources: no id mapping");
 
+                which = '\0';
+                if (ls->type == LS_OBJECT) {
+                    if ((ls->id.a_obj = find_oid(nid)) == 0)
+                        which = 'o';
+                } else {
+                    if ((ls->id.a_monst = find_mid(nid, FM_EVERYWHERE)) == 0)
+                        which = 'm';
+                }
+                if (which != '\0')
+                    panic("relink_light_sources: can't find %c_id %u",
+                          which, nid);
+            } else {
+                panic("relink_light_sources: bad type (%d)", ls->type);
+            }
             ls->flags &= ~LSF_NEEDS_FIXUP;
         }
     }
