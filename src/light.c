@@ -496,6 +496,22 @@ relink_light_sources(boolean ghostly)
     unsigned nid;
     light_source *ls;
 
+    /*
+     * Caveat:
+     *  There has been at least one instance during to-be-3.7 development
+     *  where the light_base linked list ended up with a circular link.
+     *  If that happens, then once all the traversed elements have their
+     *  LSF_NEEDS_FIXUP flag cleared, the traversal attempt will run wild.
+     *
+     *  The circular list instance was blamed on attempting to restore
+     *  a save file which should have been invalidated by version/patch/
+     *  editlevel verification, but wasn't rejected because EDITLEVEL
+     *  didn't get incremented when it should have been.  Valid data should
+     *  never produce the problem and it isn't possible in general to guard
+     *  against code updates that neglect to set the verification info up
+     *  to date.
+     */
+
     for (ls = gl.light_base; ls; ls = ls->next) {
         if (ls->flags & LSF_NEEDS_FIXUP) {
             if (ls->type == LS_OBJECT || ls->type == LS_MONSTER) {
