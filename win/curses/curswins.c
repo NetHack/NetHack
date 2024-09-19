@@ -199,6 +199,27 @@ curses_set_wid_colors(int wid, WINDOW *win)
 void
 curses_destroy_win(WINDOW *win)
 {
+    int mapwidth = 0, winwidth, dummyht;
+
+    /*
+     * In case map is narrower than the space alloted for it, if we
+     * are destroying a popup window and it is wider than the map,
+     * erase the popup first.  It probably has overwritten some of
+     * the next-to-map empty space.  If we don't clear that now, the
+     * base window will remember it and redisplay it during refreshes.
+     *
+     * Note: since we almost never destroy non-popups, we don't really
+     * need to determine whether 'win' is one.  Overhead for unnecessary
+     * erasure is negligible.
+     */
+    getmaxyx(win, dummyht, winwidth); /* macro, assigns to its args */
+    if (mapwin)
+        getmaxyx(mapwin, dummyht, mapwidth);
+    if (winwidth > mapwidth) {
+        werase(win);
+        wnoutrefresh(win);
+    }
+
     delwin(win);
     if (win == activemenu)
         activemenu = NULL;
@@ -329,8 +350,9 @@ curses_parse_wid_colors(int wid, char *fg, char *bg)
 /* Add curses window pointer and window info to list for given NetHack winid */
 
 void
-curses_add_nhwin(winid wid, int height, int width, int y, int x,
-                 orient orientation, boolean border)
+curses_add_nhwin(
+    winid wid, int height, int width, int y, int x,
+    orient orientation, boolean border)
 {
     WINDOW *win;
     int real_width = width;

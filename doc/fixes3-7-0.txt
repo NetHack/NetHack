@@ -2192,6 +2192,9 @@ curses: allow changing default colors with the 'palette' config option
 curses: if messages have been issued during start-up (for instance, warnings
 	about issues in run-time config file), prompt user to press <return>
 	so that they can be read before curses erases the screen
+curses: when the map was narrower than the space set aside for it, wide popup
+	windows could write into the unused space and whatever was written
+	there would stick after the popup was removed
 documentation: when building plain text Guidebook.txt from Guidebook.mn, avoid
 	attempting to use CR font; change doesn't affect building Guidebook.ps
 	which utilizes CR to get various instances of fixed-width text
