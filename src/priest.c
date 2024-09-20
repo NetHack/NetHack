@@ -1,4 +1,4 @@
-/* NetHack 3.7	priest.c	$NHDT-Date: 1693292537 2023/08/29 07:02:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.7	priest.c	$NHDT-Date: 1726862063 2024/09/20 19:54:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -314,19 +314,21 @@ priestname(
     if (!mon->ispriest && !mon->isminion) /* should never happen...  */
         return strcpy(pname, what);       /* caller must be confused */
 
+    /* this was done near the end but we want 'what' to be updated sooner */
+    if (mon->ispriest || aligned_priest || high_priest)
+        what = do_hallu ? "poohbah" : mon->female ? "priestess" : "priest";
+
     *pname = '\0';
     if (article != ARTICLE_NONE && (!do_hallu || !bogon_is_pname(whatcode))) {
         if (article == ARTICLE_YOUR || (article == ARTICLE_A && high_priest))
             article = ARTICLE_THE;
         if (article == ARTICLE_THE) {
-            Strcat(pname, "the ");
+            Strcpy(pname, "the ");
+        } else if (!strncmpi(what, "Angel ", 6)) {
+            /* bypass just_an(); it would yield "the " due to capital A */
+            Strcpy(pname, "an ");
         } else {
-            char buf2[BUFSZ] = DUMMY;
-
-            /* don't let "Angel of <foo>" fool an() into using "the " */
-            Strcpy(buf2, pname);
-            *buf2 = lowc(*buf2);
-            (void) just_an(pname, buf2);
+            (void) just_an(pname, what);
         }
     }
     /* pname[] contains "" or {"a ","an ","the "} */
@@ -338,24 +340,14 @@ priestname(
     }
     if (mon->isminion && EMIN(mon)->renegade) {
         /* avoid "an renegade Angel" */
-        if (!strcmp(pname, "an ")) /* will fail for "an invisible " */
+        if (!strcmp(pname, "an ") && !mon->minvis)
             Strcpy(pname, "a ");
         Strcat(pname, "renegade ");
     }
 
-    if (mon->ispriest || aligned_priest) { /* high_priest implies ispriest */
-        if (!aligned_priest && !high_priest) {
-            ; /* polymorphed priest; use ``what'' as is */
-        } else {
-            if (high_priest)
-                Strcat(pname, Hallucination ? "grand " : "high ");
-            if (Hallucination)
-                what = "poohbah";
-            else if (mon->female)
-                what = "priestess";
-            else
-                what = "priest";
-        }
+    if (mon->ispriest || aligned_priest) {
+        if (high_priest)
+            Strcat(pname, do_hallu ? "grand " : "high ");
     } else {
         if (mon->mtame && !strcmpi(what, "Angel"))
             Strcat(pname, "guardian ");

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1483 $ $NHDT-Date: 1726809289 2024/09/20 05:14:49 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1484 $ $NHDT-Date: 1726862062 2024/09/20 19:54:22 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -2035,6 +2035,11 @@ if tips were enabled, the getpos/farlook tip clobbered the initial prompt (at
 a post-3.6 change to try to cope with invalid light source data when restoring
 	corrupted save file caused "panic: relink_light_sources" for valid
 	save file if saved while hero was poly'd into a light emitting monster
+priestname() didn't handle "a" vs" "an" prefix correctly; normally priests are
+	named as "the priest of <deity>" but hearing an unseen priest read a
+	scroll doesn't force "the" and yielded "You hear an priest of <deity>
+	incant <scroll>."
+
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
