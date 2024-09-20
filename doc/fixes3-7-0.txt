@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1480 $ $NHDT-Date: 1726609530 2024/09/17 21:45:30 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1483 $ $NHDT-Date: 1726809289 2024/09/20 05:14:49 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -118,7 +118,8 @@ tribute (Discworld snippets) typos, in book order rather than fix order:
 	Moving Pictures passage #10 initial single quote should be double,
 	 #12 "or" -> "of", #14 second instance of "megalomaniac" misspelled
 	Lords and Ladies passage #5, near end add missing opening double
-	 quote, passage #7 last paragraph, "to" -> "be"
+	 quote, passage #6 first footnote, insert omitted "be", passage #7
+	last paragraph, "to" -> "be"
 	Men at Arms passage #1, italicize /for/, passage #2, insert omitted
 	 word "had": 'it was /fate/ that _had_ let Edward'
 	Interesting Times passage #1, italicize several words
