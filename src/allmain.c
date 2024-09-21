@@ -1,4 +1,4 @@
-/* NetHack 3.7	allmain.c	$NHDT-Date: 1723833610 2024/08/16 18:40:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.258 $ */
+/* NetHack 3.7	allmain.c	$NHDT-Date: 1726894914 2024/09/21 05:01:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.261 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -777,7 +777,7 @@ newgame(void)
 
     if (flags.legacy) {
         flush_screen(1);
-        com_pager("legacy");
+        com_pager(u.uroleplay.pauper ? "pauper_legacy" : "legacy");
     }
 
     urealtime.realtime = 0L;
