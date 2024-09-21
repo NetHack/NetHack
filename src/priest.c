@@ -314,7 +314,8 @@ priestname(
     if (!mon->ispriest && !mon->isminion) /* should never happen...  */
         return strcpy(pname, what);       /* caller must be confused */
 
-    /* this was done near the end but we want 'what' to be updated sooner */
+    /* for high priest(ess), "high" (or "grand" for poohbah) will be inserted
+       [this was done near the end but we want 'what' to be updated sooner] */
     if (mon->ispriest || aligned_priest || high_priest)
         what = do_hallu ? "poohbah" : mon->female ? "priestess" : "priest";
 
@@ -324,8 +325,9 @@ priestname(
             article = ARTICLE_THE;
         if (article == ARTICLE_THE) {
             Strcpy(pname, "the ");
-        } else if (!strncmpi(what, "Angel ", 6)) {
-            /* bypass just_an(); it would yield "the " due to capital A */
+        } else if (!strcmp(what, "Angel")) {
+            /* bypass just_an(); it would yield "" due to treating capital A
+               as indicating a personal name */
             Strcpy(pname, "an ");
         } else {
             (void) just_an(pname, what);

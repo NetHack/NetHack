@@ -119,7 +119,7 @@ tribute (Discworld snippets) typos, in book order rather than fix order:
 	 #12 "or" -> "of", #14 second instance of "megalomaniac" misspelled
 	Lords and Ladies passage #5, near end add missing opening double
 	 quote, passage #6 first footnote, insert omitted "be", passage #7
-	last paragraph, "to" -> "be"
+	 last paragraph, "to" -> "be"
 	Men at Arms passage #1, italicize /for/, passage #2, insert omitted
 	 word "had": 'it was /fate/ that _had_ let Edward'
 	Interesting Times passage #1, italicize several words
