@@ -2073,10 +2073,16 @@ show_conduct(int final)
         you_have_been("blind from birth");
     if (u.uroleplay.deaf)
         you_have_been("deaf from birth");
+    /* note: we don't report "you are without possessions" unless the
+       game started with the pauper option set */
+    if (u.uroleplay.pauper)
+        enl_msg(You_, gi.invent ? "started" : "are", "started out",
+                " without possessions", "");
+    /* nudist is far more than a subset of possessionless, and a much
+       more impressive accomplishment, but showing "started out without
+       possessions" before "faithfully nudist" looks more logical */
     if (u.uroleplay.nudist)
         you_have_been("faithfully nudist");
-    if (u.uroleplay.pauper)
-        enl_msg(You_, "have gone", "started out", " without possessions", "");
 
     if (!u.uconduct.food)
         enl_msg(You_, "have gone", "went", " without food", "");
