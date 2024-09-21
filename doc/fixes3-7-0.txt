@@ -2891,6 +2891,10 @@ check for valid indexes of def_monsyms[] and def_oc_syms[] in
 	choose_classes_menu() (pr #1179 by argrath)
 split damage from acid potion into separate function (pr #1195 by argrath)
 add swallow and explosion glyphs to glyph_to_cmap() (pr #1277 by ars3niy)
+split "cannot_push" on moverock_done() into a separate function (pr #1282
+	by argrath)
+split making pits on do_earthquake() into a separate function and
+	eliminate some gotos on do_earthquake() (pr #1287 by argrath)
 
 
 Code Cleanup and Reorganization
