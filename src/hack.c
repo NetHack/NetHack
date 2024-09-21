@@ -9,6 +9,7 @@
 /* #define DEBUG */ /* uncomment for debugging */
 
 staticfn boolean could_move_onto_boulder(coordxy, coordxy);
+staticfn int cannot_push(struct obj *, coordxy, coordxy);
 staticfn void moverock_done(coordxy, coordxy);
 staticfn int moverock(void);
 staticfn int moverock_core(coordxy, coordxy);
@@ -155,6 +156,59 @@ could_move_onto_boulder(coordxy sx, coordxy sy)
     return squeezeablylightinvent();
 }
 
+staticfn int
+cannot_push(struct obj *otmp, coordxy sx, coordxy sy)
+{
+    if (throws_rocks(gy.youmonst.data)) {
+        boolean
+            canpickup = (!Sokoban
+                         /* similar exception as in can_lift():
+                            when poly'd into a giant, you can
+                            pick up a boulder if you have a free
+                            slot or into the overflow ('#') slot
+                            unless already carrying at least one */
+                        && (inv_cnt(FALSE) < invlet_basic
+                               || !carrying(BOULDER))),
+            willpickup = (canpickup
+                          && (flags.pickup && !svc.context.nopick)
+                          && autopick_testobj(otmp, TRUE));
+
+        if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
+            You("aren't skilled enough to %s %s from %s.",
+                willpickup ? "pick up" : "push aside",
+                the(xname(otmp)), y_monnam(u.usteed));
+        } else {
+            /*
+             * will pick up:  you easily pick it up
+             * can but won't: you maneuver over it and could pick it up
+             * can't pick up: you maneuver over it (possibly followed
+             *     by feedback from failed auto-pickup attempt)
+             */
+            pline("However, you %s%s.",
+                  willpickup ? "easily pick it up"
+                             : "maneuver over it",
+                  (canpickup && !willpickup)
+                             ? " and could pick it up"
+                             : "");
+            /* similar to dropping everything and squeezing onto
+               a Sokoban boulder's spot, moving to same breaks the
+               Sokoban rules because on next step you could go
+               past it without pushing it to plug a pit or hole */
+            sokoban_guilt();
+        }
+        return 0;
+    }
+
+    if (could_move_onto_boulder(sx, sy)) {
+        pline(
+           "However, you can squeeze yourself into a small opening.");
+        sokoban_guilt();
+        return 0;
+    } else {
+        return -1;
+    }
+}
+
 staticfn void
 moverock_done(coordxy sx, coordxy sy)
 {
@@ -260,7 +314,7 @@ moverock_core(coordxy sx, coordxy sy)
             if (Blind)
                 feel_location(sx, sy);
             pline("You're too small to push that %s.", xname(otmp));
-            goto cannot_push;
+            return cannot_push(otmp, sx, sy);
         }
         if (isok(rx, ry) && !IS_ROCK(levl[rx][ry].typ)
             && levl[rx][ry].typ != IRONBARS
@@ -277,7 +331,7 @@ moverock_core(coordxy sx, coordxy sy)
                     feel_location(sx, sy);
                 pline("%s won't roll diagonally on this %s.",
                       The(xname(otmp)), surface(sx, sy));
-                goto cannot_push;
+                return cannot_push(otmp, sx, sy);
             }
 
             if (revive_nasty(rx, ry,
@@ -312,7 +366,7 @@ moverock_core(coordxy sx, coordxy sy)
                                         : upstart(you_or_steed),
                           deliver_part1 ? "it" : the(xname(otmp)));
                 }
-                goto cannot_push;
+                return cannot_push(otmp, sx, sy);
             }
 
             if (closed_door(rx, ry))
@@ -520,55 +574,7 @@ moverock_core(coordxy sx, coordxy sy)
                 You("try to move %s, but in vain.", what);
             if (Blind)
                 feel_location(sx, sy);
- cannot_push:
-            if (throws_rocks(gy.youmonst.data)) {
-                boolean
-                    canpickup = (!Sokoban
-                                 /* similar exception as in can_lift():
-                                    when poly'd into a giant, you can
-                                    pick up a boulder if you have a free
-                                    slot or into the overflow ('#') slot
-                                    unless already carrying at least one */
-                              && (inv_cnt(FALSE) < invlet_basic
-                                     || !carrying(BOULDER))),
-                    willpickup = (canpickup
-                                  && (flags.pickup && !svc.context.nopick)
-                                  && autopick_testobj(otmp, TRUE));
-
-                if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
-                    You("aren't skilled enough to %s %s from %s.",
-                        willpickup ? "pick up" : "push aside",
-                        the(xname(otmp)), y_monnam(u.usteed));
-                } else {
-                    /*
-                     * will pick up:  you easily pick it up
-                     * can but won't: you maneuver over it and could pick it up
-                     * can't pick up: you maneuver over it (possibly followed
-                     *     by feedback from failed auto-pickup attempt)
-                     */
-                    pline("However, you %s%s.",
-                          willpickup ? "easily pick it up"
-                                     : "maneuver over it",
-                          (canpickup && !willpickup)
-                                     ? " and could pick it up"
-                                     : "");
-                    /* similar to dropping everything and squeezing onto
-                       a Sokoban boulder's spot, moving to same breaks the
-                       Sokoban rules because on next step you could go
-                       past it without pushing it to plug a pit or hole */
-                    sokoban_guilt();
-                }
-                return 0;
-            }
-
-            if (could_move_onto_boulder(sx, sy)) {
-                pline(
-                   "However, you can squeeze yourself into a small opening.");
-                sokoban_guilt();
-                return 0;
-            } else {
-                return -1;
-            }
+            return cannot_push(otmp, sx, sy);
         }
     }
     return 0;
