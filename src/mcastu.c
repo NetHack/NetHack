@@ -395,13 +395,9 @@ touch_of_death(struct monst *mtmp)
             newuhpmax = u.uhpmax - drain;
 
         setuhpmax(max(newuhpmax, minuhpmax(3)));
-        /* reduce pending loss if uhp has already been reduced due to
-           drop in uhpmax */
-        if (u.uhp < olduhp) {
-            dmg -= (olduhp - u.uhp);
-            if (dmg < 1)
-                dmg = 1;
-        }
+        dmg = adjuhploss(dmg, olduhp); /* reduce pending damage if uhp has
+                                        * already been reduced due to drop
+                                        * in uhpmax */
         losehp(dmg, kbuf, KILLED_BY);
     }
     svk.killer.name[0] = '\0'; /* not killed if we get here... */

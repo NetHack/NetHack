@@ -243,7 +243,7 @@ losestr(int num, const char *knam, schar k_format)
 
         if (Upolyd) {
             /* when still poly'd, reduce you-as-monst maxHP; never below 1 */
-            u.mhmax -= min(dmg, u.mhmax - 1);
+            setuhpmax(max(u.mhmax - dmg, 1)); /* acts as setmhmax() */
         } else if (!waspolyd) {
             /* not polymorphed now and didn't rehumanize when taking damage;
                reduce max HP, but not below uhpmin */
@@ -352,6 +352,11 @@ poisoned(
         kprefix = KILLED_BY;
     }
 
+    /*
+     * FIXME:
+     *  this operates on u.uhp[max] even when hero is polymorphed....
+     */
+
     i = !fatal ? 1 : rn2(fatal + (thrown_weapon ? 20 : 0));
     if (i == 0 && typ != A_CHA) {
         /* sometimes survivable instant kill */
@@ -366,13 +371,7 @@ poisoned(
                 newuhpmax = u.uhpmax - (loss / 2);
 
             setuhpmax(max(newuhpmax, minuhpmax(3)));
-            /* reduce pending loss if uhp has already been reduced due to
-               drop in uhpmax */
-            if (u.uhp < olduhp) {
-                loss -= (olduhp - u.uhp);
-                if (loss < 1)
-                    loss = 1;
-            }
+            loss = adjuhploss(loss, olduhp);
 
             losehp(loss, pkiller, kprefix); /* poison damage */
             if (adjattrib(A_CON, (typ != A_CON) ? -1 : -3, TRUE))
@@ -1146,18 +1145,46 @@ minuhpmax(int altmin)
     return max(u.ulevel, altmin);
 }
 
-/* update u.uhpmax and values of other things that depend upon it */
+/* update u.uhpmax or u.mhmax and values of other things that depend upon
+   whichever of them is relevant */
 void
 setuhpmax(int newmax)
 {
-    if (newmax != u.uhpmax) {
-        u.uhpmax = newmax;
-        if (u.uhpmax > u.uhppeak)
-            u.uhppeak = u.uhpmax;
-        disp.botl = TRUE;
+    if (!Upolyd) {
+        if (newmax != u.uhpmax) {
+            u.uhpmax = newmax;
+            if (u.uhpmax > u.uhppeak)
+                u.uhppeak = u.uhpmax;
+            disp.botl = TRUE;
+        }
+        if (u.uhp > u.uhpmax)
+            u.uhp = u.uhpmax, disp.botl = TRUE;
+    } else { /* Upolyd */
+        if (newmax != u.mhmax) {
+            u.mhmax = newmax;
+            disp.botl = TRUE;
+        }
+        if (u.mh > u.mhmax)
+            u.mh = u.mhmax, disp.botl = TRUE;
     }
-    if (u.uhp > u.uhpmax)
-        u.uhp = u.uhpmax, disp.botl = TRUE;
+}
+
+/* called after setuhpmax() when damage is pending;
+   if uhpmax (or mhmax) has been reduced, it might have caused uhp (or mh)
+   to be reduced too; if so, recalculate pending loss to account for that */
+int
+adjuhploss(
+    int loss, /* pending hp loss */
+    int olduhp) /* does double duty as oldmh when Upolyd */
+{
+    if (!Upolyd) {
+        if (u.uhp < olduhp)
+            loss -= (olduhp - u.uhp);
+    } else {
+        if (u.mh < olduhp)
+            loss -= (olduhp - u.mh);
+    }
+    return max(loss, 1);
 }
 
 /* return the current effective value of a specific characteristic
