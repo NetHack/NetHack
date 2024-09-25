@@ -915,8 +915,13 @@ domonability(void)
         if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)) {
             if (split_mon(&gy.youmonst, (struct monst *) 0))
                 dryup(u.ux, u.uy, TRUE);
-        } else
+        } else if (is_pool(u.ux, u.uy)) {
+            /* is_pool: might be wearing water walking boots or amulet of
+               magical breathing */
+            (void) split_mon(&gy.youmonst, (struct monst *) 0);
+        } else {
             There("is no fountain here.");
+        }
     } else if (is_unicorn(uptr)) {
         use_unicorn_horn((struct obj **) 0);
         return ECMD_TIME;
