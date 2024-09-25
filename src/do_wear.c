@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_wear.c	$NHDT-Date: 1720895740 2024/07/13 18:35:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.188 $ */
+/* NetHack 3.7	do_wear.c	$NHDT-Date: 1727251255 2024/09/25 08:00:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.191 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -940,9 +940,24 @@ Amulet_on(void)
     case AMULET_OF_LIFE_SAVING:
     case AMULET_VERSUS_POISON:
     case AMULET_OF_REFLECTION:
-    case AMULET_OF_MAGICAL_BREATHING:
     case FAKE_AMULET_OF_YENDOR:
         break;
+    case AMULET_OF_MAGICAL_BREATHING: {
+        boolean was_in_poison_gas;
+
+        /* amulet is already on; we need to check hero's gas-cloud status
+           when it was off */
+        EMagical_breathing &= ~W_AMUL;
+        was_in_poison_gas = region_danger();
+        EMagical_breathing |= W_AMUL;
+        if (was_in_poison_gas) {
+            You("are no longer bothered by the poison gas.");
+            makeknown(AMULET_OF_MAGICAL_BREATHING);
+        }
+        /* no need to check for becoming able to breathe underwater;
+           if we are underwater, we already can or we would have drowned */
+        break;
+    }
     case AMULET_OF_UNCHANGING:
         if (Slimed)
             make_slimed(0L, (char *) 0);
@@ -1039,8 +1054,7 @@ Amulet_off(void)
         break;
     case AMULET_OF_MAGICAL_BREATHING:
         if (Underwater) {
-            /* HMagical_breathing must be set off
-                before calling drown() */
+            /* HMagical_breathing must be set off before calling drown() */
             setworn((struct obj *) 0, W_AMUL);
             if (!cant_drown(gy.youmonst.data) && !Swimming) {
                 You("suddenly inhale an unhealthy amount of %s!",
@@ -1049,6 +1063,9 @@ Amulet_off(void)
             }
             return;
         }
+        /*
+         * FIXME: we need a poison gas region check here
+         */
         break;
     case AMULET_OF_STRANGULATION:
         if (Strangled) {

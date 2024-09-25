@@ -1,4 +1,4 @@
-/* NetHack 3.7	region.c	$NHDT-Date: 1723580898 2024/08/13 20:28:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.7	region.c	$NHDT-Date: 1727251269 2024/09/25 08:01:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1410,7 +1410,14 @@ region_safety(void)
 
     if (n > 1 || (n == 1 && !r)) {
         /* multiple overlapping cloud regions or non-expiring one */
-        safe_teleds(TELEDS_NO_FLAGS);
+        (void) safe_teleds(TELEDS_NO_FLAGS);
+        /* maybe there's no safe place available; must get hero out of danger
+           or prayer's "fix all troubles" result will get stuck in a loop */
+        if (region_danger()) {
+            set_itimeout(&HMagical_breathing, (long) (d(4, 4) + 4));
+            /* not already Breathless or wouldn't be in region danger */
+            You_feel("able to breathe.");
+        }
     } else if (r) {
         remove_region(r);
         pline_The("gas cloud enveloping you dissipates.");
