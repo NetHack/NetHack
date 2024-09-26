@@ -224,6 +224,7 @@ curses_destroy_win(WINDOW *win)
     if (win == activemenu)
         activemenu = NULL;
     curses_refresh_nethack_windows();
+    nhUse(dummyht);
 }
 
 

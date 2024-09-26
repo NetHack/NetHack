@@ -14,6 +14,7 @@ staticfn void slime_dialogue(void);
 staticfn void slimed_to_death(struct kinfo *) NO_NNARGS;
 staticfn void sickness_dialogue(void);
 staticfn void phaze_dialogue(void);
+staticfn void region_dialogue(void);
 staticfn void done_timeout(int, int);
 staticfn void slip_or_trip(void);
 staticfn void see_lamp_flicker(struct obj *, const char *) NONNULLPTRS;
