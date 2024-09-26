@@ -6650,13 +6650,15 @@ lava_effects(void)
      * (3.7: that assumption is no longer true, but having boots be the first
      * thing to come into contact with lava makes sense.)
      */
-    if (uarmf && uarmf->in_use) {
+    if (uarmf && (uarmf->in_use
+                  || (is_organic(uarmf) && !uarmf->oerodeproof))) {
         obj = uarmf;
         pline("%s into flame!", Yobjnam2(obj, "burst"));
         ++burnmesgcount;
         iflags.in_lava_effects++; /* (see above) */
         (void) Boots_off();
-        useup(obj);
+        if (obj->o_id != protect_oid)
+            useup(obj);
         iflags.in_lava_effects--;
         ++burncount;
     }

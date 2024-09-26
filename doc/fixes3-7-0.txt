@@ -2039,7 +2039,8 @@ priestname() didn't handle "a" vs" "an" prefix correctly; normally priests are
 	named as "the priest of <deity>" but hearing an unseen priest read a
 	scroll doesn't force "the" and yielded "You hear an priest of <deity>
 	incant <scroll>."
-
+non-fireproof water walking boots wouldn't be burnt up if fire resistant hero
+	walked on molten lava
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

@@ -283,19 +283,8 @@ remove_worn_item(
         setnotworn(obj);
     }
 
-    /*
-     * Fingers crossed; hope unwearing obj didn't destroy it.  Loss of
-     * levitation, flight, water walking, magical breathing or perhaps
-     * some other property can subject hero to hardship.  drown() won't
-     * drop an 'in_use' item during emergency_disrobe() to crawl out
-     * of water.  Surviving in_lava() only burns up items which aren't
-     * able to confer such properties but dying to it will destroy all
-     * in-use items, keeping them out of subsequent bones.  Triggering
-     * traps might pose a risk of item destruction (fire, explosion)
-     * but usually that will be like the surviving lava case--the items
-     * that are affected aren't ones that will be unworn and trigger
-     * the whole mess.
-     */
+    if (obj->where == OBJ_DELETED)
+        debugpline1("remove_worn_item() \"%s\" deleted!", simpleonames(obj));
     obj->in_use = oldinuse;
 }
 
