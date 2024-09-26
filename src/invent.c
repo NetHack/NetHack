@@ -404,7 +404,7 @@ invletter_value(char c)
            : ('A' <= c && c <= 'Z') ? (c - 'A' + 2 + 26)
              : (c == '$') ? 1
                : (c == '#') ? 1 + invlet_basic + 1
-                 : 1 + invlet_basic + 1 + 1; /* none of the above 
+                 : 1 + invlet_basic + 1 + 1; /* none of the above
                                               * (shouldn't happen) */
 }
 
@@ -1764,7 +1764,7 @@ getobj(
             } else if (cq.typ == CMDQ_INT) {
                 /* getting a partial stack */
                 if (!cntgiven && allowcnt) {
-                    cnt = cq.intval;
+                    cnt = (long) cq.intval;
                     cntgiven = TRUE;
                     goto need_more_cq; /* now, get CMDQ_KEY */
                 } else {
@@ -1773,11 +1773,11 @@ getobj(
                     return NULL;
                 }
             }
-            if (!otmp)             /* didn't find what we were looking for, */
+            if (!otmp) {           /* didn't find what we were looking for, */
                 cmdq_clear(CQ_CANNED); /* so discard any other queued cmnds */
-            else if (cntgiven) {
+            } else if (cntgiven) {
                 /* if stack is smaller than count, drop the whole stack */
-                if (cnt < 1 || otmp->quan <= cnt)
+                if (cnt < 1L || otmp->quan <= cnt)
                     cntgiven = FALSE;
                 goto split_otmp;
             }
@@ -1873,7 +1873,7 @@ getobj(
         return (struct obj *) 0;
     }
     for (;;) {
-        cnt = 0;
+        cnt = 0L;
         cntgiven = FALSE;
         Sprintf(qbuf, "What do you want to %s?", word);
         if (gi.in_doagain) {
@@ -1894,7 +1894,7 @@ getobj(
             ilet = yn_function(qbuf, (char *) 0, '\0', FALSE);
         }
         if (digit(ilet)) {
-            long tmpcnt = 0;
+            long tmpcnt = 0L;
 
             if (!allowcnt) {
                 pline("No count allowed with this command.");
@@ -1921,7 +1921,7 @@ getobj(
            select-from-invent before checking whether gold has been picked */
         if (ilet == '?' || ilet == '*') {
             char *allowed_choices = (ilet == '?') ? lets : (char *) 0;
-            long ctmp = 0;
+            long ctmp = 0L;
             char menuquery[QBUFSZ];
             char *handsbuf = (char *) 0;
 
@@ -1950,9 +1950,9 @@ getobj(
                     pline1(Never_mind);
                 return (struct obj *) 0;
             }
-            if (ilet == '*')
+            if (ilet == '*' || ilet == '?')
                 goto redo_menu;
-            if (allowcnt && ctmp >= 0) {
+            if (allowcnt && ctmp >= 0L) {
                 cnt = ctmp;
                 cntgiven = TRUE;
             }
@@ -1977,10 +1977,10 @@ getobj(
              * gold pieces was allowed, and did interesting things to
              * your money supply.  The LRS is the tax bureau from Larn.
              */
-            if (cntgiven && cnt <= 0) {
-                if (cnt < 0)
-                    pline_The(
-                  "LRS would be very interested to know you have that much.");
+            if (cntgiven && cnt <= 0L) {
+                if (cnt < 0L)
+                    pline_The("LRS would be very interested to know"
+                              " you have that much.");
                 return (struct obj *) 0;
             }
         }
@@ -2007,7 +2007,7 @@ getobj(
         }
         disp.botl = TRUE; /* May have changed the amount of money */
         if (otmp && !gi.in_doagain) {
-            if (cntgiven && cnt > 0)
+            if (cntgiven && cnt > 0L)
                 cmdq_add_int(CQ_REPEAT, cnt);
             cmdq_add_key(CQ_REPEAT, ilet);
         }
@@ -2019,7 +2019,7 @@ getobj(
             if (gi.in_doagain)
                 return (struct obj *) 0;
             continue;
-        } else if (cnt < 0 || otmp->quan < cnt) {
+        } else if (cnt < 0L || otmp->quan < cnt) {
             You("don't have that many!  You have only %ld.", otmp->quan);
             if (gi.in_doagain)
                 return (struct obj *) 0;
@@ -2033,7 +2033,7 @@ getobj(
     }
  split_otmp:
     if (cntgiven) {
-        if (cnt == 0)
+        if (cnt == 0L)
             return (struct obj *) 0;
         if (cnt != otmp->quan) {
             /* don't split a stack of cursed loadstones */
@@ -3866,19 +3866,28 @@ display_pickinv(
     if (save_flags_sortpack != flags.sortpack)
         flags.sortpack = save_flags_sortpack;
 
-    /* default for force_invmenu is a list of likely candidates;
-       add '*' for 'show all' as an extra choice unless list already
-       includes everything; won't work via keyboard if current menu
-       uses '*' as group accelerator for gems but might work via mouse */
-    if (iflags.force_invmenu && lets && want_reply
-        && ((allowxtra && !usextra)
-            || (int) strlen(lets) < inv_cnt(TRUE))) {
+    /* default for force_invmenu is a menu listing likely candidates;
+       add '*' for 'list all' as an extra choice unless the menu already
+       includes everything; when reissuing the menu after player has
+       picked '*', add '?' for 'list likely candidates' to reverse that */
+    if (iflags.force_invmenu && want_reply) {
+        const char *menutext = NULL;
+
         any = cg.zeroany;
-        add_menu_heading(win, "Special");
-        any.a_char = '*';
-        add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, clr,
-                 "(list everything)", MENU_ITEMFLAGS_NONE);
-        gotsomething = TRUE;
+        if ((allowxtra && !usextra)
+            || (lets && (int) strlen(lets) < inv_cnt(TRUE))) {
+            any.a_char = '*';
+            menutext = "(list everything)";
+        } else if (!lets) {
+            any.a_char = '?';
+            menutext = "(list likely candidates)";
+        }
+        if (menutext) {
+            add_menu_heading(win, "Special");
+            add_menu(win, &nul_glyphinfo, &any, any.a_char, 0, ATR_NONE, clr,
+                     menutext, MENU_ITEMFLAGS_NONE);
+            gotsomething = TRUE; /* menu isn't empty */
+        }
     }
     unsortloot(&sortedinvent);
     /* for permanent inventory where nothing has been listed (because
