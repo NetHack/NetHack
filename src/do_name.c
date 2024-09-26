@@ -987,8 +987,8 @@ x_monnam(
         name_at_start = (boolean) type_is_pname(mdat);
     }
 
-    if (name_at_start && (article == ARTICLE_YOUR || !has_adjectives)) {
-        if (mdat == &mons[PM_WIZARD_OF_YENDOR])
+    if (name_at_start) {
+        if (has_adjectives || mdat == &mons[PM_WIZARD_OF_YENDOR])
             article = ARTICLE_THE;
         else
             article = ARTICLE_NONE;
