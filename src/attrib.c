@@ -243,18 +243,18 @@ losestr(int num, const char *knam, schar k_format)
 
         if (Upolyd) {
             /* when still poly'd, reduce you-as-monst maxHP; never below 1 */
-            setuhpmax(max(u.mhmax - dmg, 1)); /* acts as setmhmax() */
+            setuhpmax(max(u.mhmax - dmg, 1), FALSE); /* acts as setmhmax() */
         } else if (!waspolyd) {
             /* not polymorphed now and didn't rehumanize when taking damage;
                reduce max HP, but not below uhpmin */
             if (u.uhpmax > uhpmin)
-                setuhpmax(max(u.uhpmax - dmg, uhpmin));
+                setuhpmax(max(u.uhpmax - dmg, uhpmin), FALSE);
         }
         disp.botl = TRUE;
     }
 #if 0   /* only possible if uhpmax was already less than uhpmin */
     if (!Upolyd && u.uhpmax < uhpmin) {
-        setuhpmax(min(olduhpmax, uhpmin));
+        setuhpmax(min(olduhpmax, uhpmin), FALSE);
         if (!Drain_resistance)
             losexp(NULL); /* won't be fatal when no 'drainer' is supplied */
     }
@@ -370,7 +370,7 @@ poisoned(
             int olduhp = u.uhp,
                 newuhpmax = u.uhpmax - (loss / 2);
 
-            setuhpmax(max(newuhpmax, minuhpmax(3)));
+            setuhpmax(max(newuhpmax, minuhpmax(3)), TRUE); /*True: see FIXME*/
             loss = adjuhploss(loss, olduhp);
 
             losehp(loss, pkiller, kprefix); /* poison damage */
@@ -1148,9 +1148,9 @@ minuhpmax(int altmin)
 /* update u.uhpmax or u.mhmax and values of other things that depend upon
    whichever of them is relevant */
 void
-setuhpmax(int newmax)
+setuhpmax(int newmax, boolean even_when_polyd)
 {
-    if (!Upolyd) {
+    if (!Upolyd || even_when_polyd) {
         if (newmax != u.uhpmax) {
             u.uhpmax = newmax;
             if (u.uhpmax > u.uhppeak)

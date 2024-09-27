@@ -368,7 +368,7 @@ fix_curse_trouble(struct obj *otmp, const char *what)
 staticfn void
 fix_worst_trouble(int trouble)
 {
-    int i, maxhp, polyd = NON_PM;
+    int i, maxhp;
     struct obj *otmp = 0;
     const char *what = (const char *) 0;
     static NEARDATA const char leftglow[] = "Your left ring softly glows",
@@ -420,19 +420,16 @@ fix_worst_trouble(int trouble)
         You_feel("much better.");
         if (Upolyd) {
             maxhp = u.mhmax + rnd(5);
-            setuhpmax(max(maxhp, 5 + 1));
+            setuhpmax(max(maxhp, 5 + 1), FALSE); /* acts as setmhmax() */
             u.mh = u.mhmax;
-            polyd = u.umonnum;
-            u.umonnum = u.umonster; /* temporarily unpolymorph so that next
-                                     * setuhpmax() call deals with u.uhpmax */
         }
         maxhp = u.uhpmax;
         if (maxhp < u.ulevel * 5 + 11)
             maxhp += rnd(5);
-        setuhpmax(max(maxhp, 5 + 1));
-        u.uhp = u.uhpmax;
-        if (polyd != NON_PM)
-            u.umonnum = polyd; /* restore Upolyd */
+        /* True: update u.uhpmax even if currently poly'd */
+        setuhpmax(max(maxhp, 5 + 1), TRUE);
+        u.uhp = u.uhpmax; /* setuhpmax() will do this when u.uhp is higher
+                           * than u.uhpmax; prayer also does this if lower */
         disp.botl = TRUE;
         break;
     case TROUBLE_COLLAPSING:

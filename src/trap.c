@@ -4154,7 +4154,7 @@ dofiretrap(
             u.uhpmax -= rn2(min(u.uhpmax, num + 1)), disp.botl = TRUE;
         } /* note: no 'else' here */
         if (u.uhpmax < uhpmin) {
-            setuhpmax(min(olduhpmax, uhpmin)); /* sets disp.botl */
+            setuhpmax(min(olduhpmax, uhpmin), FALSE); /* sets disp.botl */
             if (!Drain_resistance)
                 losexp(NULL); /* never fatal when 'drainer' is Null */
         }

@@ -2464,7 +2464,7 @@ fpostfx(struct obj *otmp)
             u.mh += otmp->cursed ? -rnd(20) : rnd(20), disp.botl = TRUE;
             if (u.mh > u.mhmax) {
                 if (!rn2(17))
-                    u.mhmax++;
+                    setuhpmax(u.mhmax + 1, FALSE);
                 u.mh = u.mhmax;
             } else if (u.mh <= 0) {
                 rehumanize();
@@ -2473,7 +2473,7 @@ fpostfx(struct obj *otmp)
             u.uhp += otmp->cursed ? -rnd(20) : rnd(20), disp.botl = TRUE;
             if (u.uhp > u.uhpmax) {
                 if (!rn2(17))
-                    setuhpmax(u.uhpmax + 1);
+                    setuhpmax(u.uhpmax + 1, FALSE);
                 u.uhp = u.uhpmax;
             } else if (u.uhp <= 0) {
                 svk.killer.format = KILLED_BY_AN;

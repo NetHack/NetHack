@@ -251,14 +251,14 @@ losexp(
     num = (int) u.uhpinc[u.ulevel];
     u.uhpmax -= num;
     if (u.uhpmax < uhpmin)
-        setuhpmax(uhpmin);
+        setuhpmax(uhpmin, TRUE);
     /* uhpmax might try to go up if it has previously been reduced by
        strength loss or by a fire trap or by an attack by Death which
        all use a different minimum than life-saving or experience loss;
        we don't allow it to go up because that contradicts assumptions
        elsewhere (such as healing wielder who drains with Stormbringer) */
     if (u.uhpmax > olduhpmax)
-        setuhpmax(olduhpmax);
+        setuhpmax(olduhpmax, TRUE);
 
     u.uhp -= num;
     if (u.uhp < 1)
@@ -306,7 +306,8 @@ newexplevel(void)
 void
 pluslvl(
     boolean incr) /* True: incremental experience growth;
-                   * False: potion of gain level or wraith corpse */
+                   * False: potion of gain level or wraith corpse
+                   *        or wizard mode #levelchange */
 {
     int hpinc, eninc;
 
@@ -317,12 +318,13 @@ pluslvl(
        in order to retain normal human/whatever increase for later) */
     if (Upolyd) {
         hpinc = monhp_per_lvl(&gy.youmonst);
-        u.mhmax += hpinc;
         u.mh += hpinc;
+        setuhpmax(u.mhmax, FALSE); /* acts as setmhmax() when Upolyd */
     }
     hpinc = newhp();
     u.uhp += hpinc;
-    setuhpmax(u.uhpmax + hpinc); /* will lower u.uhp if it exceeds uhpmax */
+    setuhpmax(u.uhpmax + hpinc, TRUE); /* will lower u.uhp if it exceeds
+                                        * u.uhpmax */
 
     /* increase spell power/energy points */
     eninc = newpw();

@@ -202,7 +202,7 @@ extern void vary_init_attr(void);
 extern void adjabil(int, int);
 extern int newhp(void);
 extern int minuhpmax(int);
-extern void setuhpmax(int);
+extern void setuhpmax(int, boolean);
 extern int adjuhploss(int, int);
 extern schar acurr(int);
 extern schar acurrstr(void);

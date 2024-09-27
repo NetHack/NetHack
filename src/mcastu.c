@@ -392,9 +392,10 @@ touch_of_death(struct monst *mtmp)
     } else {
         /* HP manipulation similar to poisoned(attrib.c) */
         int olduhp = u.uhp,
+            uhpmin = minuhpmax(3),
             newuhpmax = u.uhpmax - drain;
 
-        setuhpmax(max(newuhpmax, minuhpmax(3)));
+        setuhpmax(max(newuhpmax, uhpmin), FALSE);
         dmg = adjuhploss(dmg, olduhp); /* reduce pending damage if uhp has
                                         * already been reduced due to drop
                                         * in uhpmax */

@@ -383,7 +383,7 @@ newman(void)
         hpmax = u.ulevel; /* min of 1 HP per level */
     /* retain same proportion for current HP; u.uhp * hpmax / u.uhpmax */
     u.uhp = rounddiv((long) u.uhp * (long) hpmax, u.uhpmax);
-    u.uhpmax = hpmax;
+    setuhpmax(hpmax, TRUE); /* might reduce u.uhp */
     /*
      * Do the same for spell power.
      */

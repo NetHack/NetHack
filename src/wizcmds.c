@@ -444,16 +444,17 @@ wiz_flip_level(void)
 int
 wiz_level_change(void)
 {
-    char buf[BUFSZ] = DUMMY;
+    char buf[BUFSZ], dummy = '\0';
     int newlevel = 0;
     int ret;
 
+    buf[0] = '\0'; /* in case EDIT_GETLIN is enabled */
     getlin("To what experience level do you want to be set?", buf);
     (void) mungspaces(buf);
     if (buf[0] == '\033' || buf[0] == '\0')
         ret = 0;
     else
-        ret = sscanf(buf, "%d", &newlevel);
+        ret = sscanf(buf, "%d%c", &newlevel, &dummy);
 
     if (ret != 1) {
         pline1(Never_mind);
@@ -480,6 +481,7 @@ wiz_level_change(void)
         while (u.ulevel < newlevel)
             pluslvl(FALSE);
     }
+    /* blessed full healing or restore ability won't fix any lost levels */
     u.ulevelmax = u.ulevel;
     return ECMD_OK;
 }
