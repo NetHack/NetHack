@@ -1,0 +1,59 @@
+Instructions for building and installing nethack under cygwin
+=============================================================
+
+0. This version of nethack is for those who prefer to run the game using
+   terminal emulation, such as in mintty, instead of inside of a separate
+   window.  It is configured to feel very much like running nethack inside
+   a terminal in OSX or Linux.
+
+   It is so thoroughly derived from the sys/unix directory that it uses
+   most of the files from there.  If you wish to do nethack development
+   in cygwin, you will find other development tools in sys/unix that should
+   work as is.
+
+1. First, open the cygwin setup program and make sure the following
+   packages are installed:
+
+	gcc-core (about 19M, under Devel category)
+	gdb (abotu 2.8M, under Develo category)
+	libncurses-devel (about 1.2M, under Libs category)
+	make (about 450k, under Devel category)
+	cygwin-devel (about 350k, under Devel category)
+	flex (about 350k, under Devel category)
+	m4 (about 270k, under Interpreters category)
+	byacc (about 70k, under Devel category)
+
+2. Next, check the cygwin_hints file in this directory, and change anything
+   you'd like customized for your system.  Building and installing should
+   work without having to change anything.
+
+3. (Optional) If this isn't your first time trying to build it, to make sure
+   the build state is clean, go to the top nethack directory, and run:
+
+	make spotless
+
+4. Now configure the game by running (in this directory):
+
+	./setup.sh
+
+5. To build, go back to the top nethack directory, and run:
+
+	make all
+
+   For speed, you can compile and link safely in parallel by using
+   "make -j8 all" for example, but there appear to be some race
+   conditions after the link, so to finish cleanly, run "make all"
+   after the parallel build completes.
+
+6. If all goes well and you are ready to install, in the top nethack
+   directory, run:
+
+   	make install
+
+7. The game will now be installed at /usr/games/nethack and should be ready to
+   run under mintty, the default terminal emulator that comes with cygwin.
+
+   The default symset used is DECgraphics, which seems to look the best under
+   mintty, but when you change window contexts, the characters can become
+   corrupted.  To restore, simply hit "ctrl-r" to refresh the screen.
+
