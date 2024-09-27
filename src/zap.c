@@ -5233,8 +5233,10 @@ zap_over_floor(
 
     case ZT_POISON_GAS:
         /* poison gas with range 1: green dragon/iron golem breath (AD_DRST);
-           caller is placing a series of 1x1 clouds along the zap's path */
-        (void) create_gas_cloud(x, y, 1, 8);
+           caller is placing a series of 1x1 clouds along the zap's path;
+           <x,y> for wall locations might be included--reject those */
+        if (ZAP_POS(lev->typ))
+            (void) create_gas_cloud(x, y, 1, 8);
         break;
 
     case ZT_LIGHTNING:
