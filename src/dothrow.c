@@ -1948,6 +1948,7 @@ should_mulch_missile(struct obj *obj)
 
     /* only ammo (excluding magic stones) or missiles will break */
     if (!obj || !(is_ammo(obj) || is_missile(obj))
+        || obj->otyp == BOOMERANG
         || objects[obj->otyp].oc_magic)
         return FALSE;
 
