@@ -2043,6 +2043,8 @@ non-fireproof water walking boots wouldn't be burnt up if fire resistant hero
 	walked on molten lava
 1x1 poison gas clouds for green dragon and iron golem breath could be placed
 	at wall locations
+if a pile of objects had arrow(s) on top, map location classification got
+	confused and reported 'unexplore area'
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

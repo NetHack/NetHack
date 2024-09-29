@@ -837,20 +837,20 @@ enum glyph_offsets {
 /* generic objects are after strange object (GLYPH_OBJ_OFF) and before
    other objects (GLYPH_OBJ_OFF + FIRST_OBJECT) */
 #define glyph_is_normal_generic_obj(glyph) \
-    ((glyph) > GLYPH_OBJ_OFF && (glyph) < GLYPH_OBJ_OFF + FIRST_OBJECT)
+    ((glyph) > GLYPH_OBJ_OFF && (glyph) < GLYPH_OBJ_OFF + FIRST_OBJECT - 1)
 #define glyph_is_piletop_generic_obj(glyph) \
     ((glyph) > GLYPH_OBJ_PILETOP_OFF                            \
-     && (glyph) < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT)
+     && (glyph) < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1)
 #define glyph_is_generic_object(glyph) \
     (glyph_is_normal_generic_obj(glyph)                         \
      || glyph_is_piletop_generic_obj(glyph))
 #define glyph_is_normal_piletop_obj(glyph) \
     ((glyph) == GLYPH_OBJ_PILETOP_OFF                           \
-     || ((glyph) > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT         \
+     || ((glyph) > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1     \
          && (glyph) < (GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS)))
 #define glyph_is_normal_object(glyph) \
     ((glyph) == GLYPH_OBJ_OFF                                   \
-     || ((glyph) >= GLYPH_OBJ_OFF + FIRST_OBJECT                \
+     || ((glyph) >= GLYPH_OBJ_OFF + FIRST_OBJECT - 1            \
          && (glyph) < (GLYPH_OBJ_OFF + NUM_OBJECTS))            \
      || glyph_is_normal_piletop_obj(glyph))
 
