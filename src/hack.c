@@ -9,6 +9,7 @@
 /* #define DEBUG */ /* uncomment for debugging */
 
 staticfn boolean could_move_onto_boulder(coordxy, coordxy);
+staticfn void cannot_push_msg(struct obj *, coordxy, coordxy);
 staticfn int cannot_push(struct obj *, coordxy, coordxy);
 staticfn void moverock_done(coordxy, coordxy);
 staticfn int moverock(void);
@@ -154,6 +155,21 @@ could_move_onto_boulder(coordxy sx, coordxy sy)
         return TRUE;
     /* can squeeze to spot if carrying extremely little, otherwise can't */
     return squeezeablylightinvent();
+}
+
+staticfn void
+cannot_push_msg(struct obj *otmp, coordxy sx, coordxy sy)
+{
+    const char *what;
+
+    what = the(xname(otmp));
+    if (u.usteed)
+        pline("%s tries to move %s, but cannot.",
+              YMonnam(u.usteed), what);
+    else
+        You("try to move %s, but in vain.", what);
+    if (Blind)
+        feel_location(sx, sy);
 }
 
 staticfn int
@@ -369,8 +385,10 @@ moverock_core(coordxy sx, coordxy sy)
                 return cannot_push(otmp, sx, sy);
             }
 
-            if (closed_door(rx, ry))
-                goto nopushmsg;
+            if (closed_door(rx, ry)) {
+                cannot_push_msg(otmp, sx, sy);
+                return cannot_push(otmp, sx, sy);
+            }
 
             /* at this point the boulder should be able to move (though
                potentially into something like a trap, pool, or lava) */
@@ -565,15 +583,7 @@ moverock_core(coordxy sx, coordxy sy)
                 stolen_value(otmp, sx, sy, TRUE, FALSE);
             }
         } else {
- nopushmsg:
-            what = the(xname(otmp));
-            if (u.usteed)
-                pline("%s tries to move %s, but cannot.",
-                      YMonnam(u.usteed), what);
-            else
-                You("try to move %s, but in vain.", what);
-            if (Blind)
-                feel_location(sx, sy);
+            cannot_push_msg(otmp, sx, sy);
             return cannot_push(otmp, sx, sy);
         }
     }
