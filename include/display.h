@@ -981,9 +981,10 @@ enum glyph_offsets {
 #if 0
 #define glyph_is_piletop(glyph) \
     (glyph_is_body_piletop(glyph)           \
-     || glyph_is_statue_piletop(glyph)      \
+     || glyph_is_fem_statue_piletop(glyph)  \
+     || glyph_is_male_statue_piletop(glyph) \
      || glyph_is_piletop_generic_obj(glyph) \
-     || glyph_is_obj_piletop(glyph))
+     || glyph_is_normal_piletop_obj(glyph))
 #endif
 
 /* mgflags for altering map_glyphinfo() internal behavior */

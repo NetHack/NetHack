@@ -1608,10 +1608,11 @@ foundone(coordxy zx, coordxy zy, int glyph)
     if (glyph_is_cmap(glyph) || glyph_is_unexplored(glyph))
         levl[zx][zy].seenv = SVALL;
 
-    if (!Blind) {
+    {
         seenV save_viz = gv.viz_array[zy][zx];
 
-        gv.viz_array[zy][zx] = COULD_SEE | IN_SIGHT;
+        if (!Blind)
+            gv.viz_array[zy][zx] = COULD_SEE | IN_SIGHT;
         newsym(zx, zy);
         gv.viz_array[zy][zx] = save_viz;
     }
@@ -1665,6 +1666,7 @@ findone(coordxy zx, coordxy zy, genericptr_t whatfound)
         && ttmp->ttyp != STATUE_TRAP) {
         flash_glyph_at(zx, zy, trap_to_glyph(ttmp), FOUND_FLASH_COUNT);
         ttmp->tseen = 1;
+        sense_trap(ttmp, zx, zy, 0); /* handles Hallucination */
         foundone(zx, zy, trap_to_glyph(ttmp));
         found_p->num_traps++;
     }
@@ -1673,7 +1675,6 @@ findone(coordxy zx, coordxy zy, genericptr_t whatfound)
         dummytrap.tx = zx, dummytrap.ty = zy;
         flash_glyph_at(zx, zy, trap_to_glyph(&dummytrap), FOUND_FLASH_COUNT);
         dummytrap.tseen = 1;
-        map_trap(&dummytrap, 1);
         sense_trap(&dummytrap, zx, zy, 0); /* handles Hallucination */
         foundone(zx, zy, trap_to_glyph(&dummytrap));
         found_p->num_traps++;
@@ -2345,11 +2346,11 @@ reveal_terrain(
                 keep_objs = (which_subset & TER_OBJ) != 0,
                 keep_mons = (which_subset & TER_MON) != 0; /* not used */
         unsigned swallowed = u.uswallow; /* before unconstrain_map() */
+        nhsym default_sym = svl.level.flags.arboreal ? S_tree : S_stone;
 
         if (unconstrain_map())
             docrt();
-        default_glyph = cmap_to_glyph(svl.level.flags.arboreal ? S_tree
-                                                             : S_stone);
+        default_glyph = cmap_to_glyph(default_sym);
 
         for (x = 1; x < COLNO; x++)
             for (y = 0; y < ROWNO; y++) {

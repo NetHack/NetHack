@@ -50,7 +50,9 @@ staticfn void shuffle_customizations(void);
 /* staticfn void purge_custom_entries(enum graphics_sets which_set); */
 
 staticfn void
-to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
+to_custom_symset_entry_callback(
+    int glyph,
+    struct find_struct *findwhat)
 {
     int idx = gs.symset_which_set;
 #ifdef ENHANCED_SYMBOLS
@@ -107,7 +109,9 @@ to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
  *               0 = failure
  */
 int
-glyphrep_to_custom_map_entries(const char *op, int *glyphptr)
+glyphrep_to_custom_map_entries(
+    const char *op,
+    int *glyphptr)
 {
     to_custom_symbol_find = zero_find;
     char buf[BUFSZ], *c_glyphid, *c_unicode, *c_colorval, *cp;
@@ -222,11 +226,13 @@ glyph_to_cmap(int glyph)
         return glyph_to_explosion(glyph) + S_expl_tl;
     else
         return MAXPCHARS;    /* MAXPCHARS is legal array index because
-                                of trailing fencepost entry */
+                              * of trailing fencepost entry */
 }
 
 staticfn int
-glyph_find_core(const char *id, struct find_struct *findwhat)
+glyph_find_core(
+    const char *id,
+    struct find_struct *findwhat)
 {
     int glyph;
     boolean do_callback, end_find = FALSE;
@@ -492,7 +498,7 @@ add_custom_nhcolor_entry(
         gdc->details_end = 0;
     }
     details = find_matching_customization(customization_name,
-                                            custom_nhcolor, which_set);
+                                          custom_nhcolor, which_set);
     if (details) {
         while (details) {
             if (details->content.ccolor.glyphidx == glyphidx) {
@@ -503,8 +509,7 @@ add_custom_nhcolor_entry(
         }
     }
     /* create new details entry */
-    newdetails = (struct customization_detail *) alloc(
-                                        sizeof (struct customization_detail));
+    newdetails = (struct customization_detail *) alloc(sizeof *newdetails);
     newdetails->content.urep.glyphidx = glyphidx;
     newdetails->content.ccolor.nhcolor = nhcolor;
     newdetails->next = (struct customization_detail *) 0;
@@ -520,8 +525,8 @@ add_custom_nhcolor_entry(
 
 void
 apply_customizations(
-        enum graphics_sets which_set,
-        enum do_customizations docustomize)
+    enum graphics_sets which_set,
+    enum do_customizations docustomize)
 {
     glyph_map *gmap;
     struct customization_detail *details;
@@ -802,7 +807,9 @@ wizcustom_glyphids(winid win)
  }
 
 staticfn int
-parse_id(const char *id, struct find_struct *findwhat)
+parse_id(
+    const char *id,
+    struct find_struct *findwhat)
 {
     FILE *fp = (FILE *) 0;
     int i = 0, j, mnum, glyph,
