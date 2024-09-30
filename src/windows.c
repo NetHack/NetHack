@@ -1797,6 +1797,12 @@ add_menu(
     const char *str,            /* menu text */
     unsigned int itemflags)     /* itemflags such as MENU_ITEMFLAGS_SELECTED */
 {
+    if (!str) {
+        /* if 'str' is Null, just return without adding any menu entry */
+        debugpline0("add_menu(Null)");
+        return;
+    }
+
     if (iflags.use_menu_color) {
         if ((itemflags & MENU_ITEMFLAGS_SKIPMENUCOLORS) == 0)
             (void) get_menu_coloring(str, &color, &attr);

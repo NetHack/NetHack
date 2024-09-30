@@ -2502,6 +2502,8 @@ query_arrayvalue(
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     for (i = arrmin; i < arrmax; i++) {
+        if (!arr[i])  /* the array of hunger status values has a gap ...*/
+            continue; /*... set to Null between Satiated and Hungry     */
         any = cg.zeroany;
         any.a_int = i + adj;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
