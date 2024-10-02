@@ -2947,6 +2947,19 @@ doeat(void)
                     livelog_printf(LL_CONDUCT,
                            "consumed animal products (%s) for the first time",
                                    food_xname(otmp, FALSE));
+
+           /* Check for gluten-containing items */
+           if (otmp->otyp == PANCAKE || otmp->otyp == FORTUNE_COOKIE
+               || otmp->otyp == CREAM_PIE || otmp->otyp == CANDY_BAR
+               || otmp->otyp == CRAM_RATION) { /* lembas are gluten-free */
+               if (!u.uconduct.gluten++ && !ll_conduct) {
+                   livelog_printf(LL_CONDUCT,
+                          "violated gluten-free conduct for the first time, by eating %s",
+                                  an(food_xname(otmp, FALSE)));
+                   ll_conduct++;
+               }
+           }
+
             break;
         }
 

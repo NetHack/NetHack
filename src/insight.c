@@ -2091,6 +2091,8 @@ show_conduct(int final)
         you_have_X("followed a strict vegan diet");
     else if (!u.uconduct.unvegetarian)
         you_have_been("vegetarian");
+    if (u.uconduct.food && !u.uconduct.gluten)
+        you_have_X("followed a gluten-free diet");
 
     if (!u.uconduct.gnostic)
         you_have_been("an atheist");
