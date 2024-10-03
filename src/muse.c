@@ -1275,9 +1275,9 @@ m_use_undead_turning(struct monst *mtmp, struct obj *obj)
        we don't check whether hero is poly'd into an undead--the
        wand's turning effect is too weak to be a useful direct
        attack--only whether hero is carrying at least one corpse */
-    if (carrying(CORPSE)) {
+    if (carrying(CORPSE)
         /*
-         * Hero is carrying one or more corpses but isn't wielding
+         * If hero is carrying one or more corpses but isn't wielding
          * a cockatrice corpse (unless being hit by one won't do
          * the monster much harm); otherwise we'd be using this wand
          * as a defensive item with higher priority.
@@ -1293,12 +1293,10 @@ m_use_undead_turning(struct monst *mtmp, struct obj *obj)
          * dropped; player might not choose to spend a wand charge
          * on that when/if hero acquires this wand).
          */
-        gm.m.offensive = obj;
-        gm.m.has_offense = MUSE_WAN_UNDEAD_TURNING;
-    } else if (linedup_callback(ax, ay, bx, by, linedup_chk_corpse)) {
-        /* There's a corpse on the ground in a direct line from the
-         * monster to the hero, and up to 3 steps beyond.
-         */
+        || linedup_callback(ax, ay, bx, by, linedup_chk_corpse)
+        /* or there's a corpse on the ground in a direct line from the
+           monster to the hero, and up to 3 steps beyond. */
+        ) {
         gm.m.offensive = obj;
         gm.m.has_offense = MUSE_WAN_UNDEAD_TURNING;
     }
@@ -1361,10 +1359,8 @@ mon_has_friends(struct monst *mtmp)
 boolean
 find_offensive(struct monst *mtmp)
 {
-    struct obj *obj;
-    boolean reflection_skip = m_seenres(mtmp, M_SEEN_REFL) != 0
-        || monnear(mtmp, mtmp->mux, mtmp->muy);
-    struct obj *helmet = which_armor(mtmp, W_ARMH);
+    struct obj *obj, *mtmp_helmet;
+    boolean reflection_skip;
 
     gm.m.offensive = (struct obj *) 0;
     gm.m.has_offense = 0;
@@ -1384,6 +1380,9 @@ find_offensive(struct monst *mtmp)
         return FALSE;
 
 #define nomore(x)       if (gm.m.has_offense == x) continue;
+    reflection_skip = (m_seenres(mtmp, M_SEEN_REFL) != 0
+                       || monnear(mtmp, mtmp->mux, mtmp->muy));
+    mtmp_helmet = which_armor(mtmp, W_ARMH);
     /* this picks the last viable item rather than prioritizing choices */
     for (obj = mtmp->minvent; obj; obj = obj->nobj) {
         if (!reflection_skip) {
@@ -1454,7 +1453,7 @@ find_offensive(struct monst *mtmp)
             /* do try to move hero to a more vulnerable spot */
             && (onscary(u.ux, u.uy, mtmp)
                 || (hero_behind_chokepoint(mtmp) && mon_has_friends(mtmp))
-                || (stairway_at(u.ux, u.uy)))) {
+                || stairway_at(u.ux, u.uy))) {
             gm.m.offensive = obj;
             gm.m.has_offense = MUSE_WAN_TELEPORTATION;
         }
@@ -1491,7 +1490,7 @@ find_offensive(struct monst *mtmp)
          */
         nomore(MUSE_SCR_EARTH);
         if (obj->otyp == SCR_EARTH
-            && (hard_helmet(helmet) || mtmp->mconf
+            && (hard_helmet(mtmp_helmet) || mtmp->mconf
                 || amorphous(mtmp->data) || passes_walls(mtmp->data)
                 || noncorporeal(mtmp->data) || unsolid(mtmp->data)
                 || !rn2(10))
@@ -1517,6 +1516,12 @@ find_offensive(struct monst *mtmp)
             && dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 2
             && mtmp->mcansee && haseyes(mtmp->data)
             && !m_seenres(mtmp, M_SEEN_FIRE)) {
+            /*
+             * TODO?
+             *  Could choose scroll if <mux,muy> (where attacker thinks
+             *  hero is located) is ice and attacker either isn't also
+             *  on ice or is able to fly/float/swim.
+             */
             gm.m.offensive = obj;
             gm.m.has_offense = MUSE_SCR_FIRE;
         }
@@ -1958,9 +1963,9 @@ rnd_offensive_item(struct monst *mtmp)
         return WAN_DEATH;
     switch (rn2(9 - (difficulty < 4) + 4 * (difficulty > 6))) {
     case 0: {
-        struct obj *helmet = which_armor(mtmp, W_ARMH);
+        struct obj *mtmp_helmet = which_armor(mtmp, W_ARMH);
 
-        if (hard_helmet(helmet) || amorphous(pm)
+        if (hard_helmet(mtmp_helmet) || amorphous(pm)
             || passes_walls(pm) || noncorporeal(pm) || unsolid(pm))
             return SCR_EARTH;
     } /* fall through */
