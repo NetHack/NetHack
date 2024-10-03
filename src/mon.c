@@ -4555,6 +4555,9 @@ hideunder(struct monst *mtmp)
                && (otmp = svl.level.objects[x][y]) != 0
                /* most things can be hidden under, but not all */
                && can_hide_under_obj(otmp)
+               /* pets won't hide under a cursed item or an item of any BUC
+                  state that shares a pile with one or more cursed items */
+               && (!mtmp->mtame || !cursed_object_at(x, y))
                /* aquatic creatures don't reach here; other swimmers
                   shouldn't hide beneath underwater objects */
                && !is_pool_or_lava(x, y)) {

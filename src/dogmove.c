@@ -1270,8 +1270,11 @@ dog_move(
                                ? vobj_at(nix, niy) : 0;
             const char *what = o ? distant_name(o, doname) : something;
 
-            pline("%s %s reluctantly over %s.", noit_Monnam(mtmp),
-                  vtense((char *) 0, locomotion(mtmp->data, "step")), what);
+            pline("%s %s reluctantly %s %s.", noit_Monnam(mtmp),
+                  vtense((char *) 0, locomotion(mtmp->data, "step")),
+                  (is_flyer(mtmp->data) || is_floater(mtmp->data)) ? "over"
+                                                                   : "onto",
+                  what);
         }
         mon_track_add(mtmp, omx, omy);
         /* We have to know if the pet's going to do a combined eat and

@@ -1471,6 +1471,8 @@ interactively setting a status highlight for hunger with 'O' and choosing
 	'text match' could crash while setting up the menu of hunger status
 	value strings; happened for curses or if the program was built to
 	use C++ regex processing but not for tty+posixregex
+a pet with the hides-under attribute could "move reluctantly over" a cursed
+	object and then hide under it
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
