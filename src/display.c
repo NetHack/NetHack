@@ -1853,6 +1853,10 @@ show_glyph(coordxy x, coordxy y, int glyph)
     boolean show_glyph_change = FALSE;
     int oldglyph;
 
+    /* don't process map glyphs when saving, restoring, or in_mklev */
+    if (suppress_map_output())
+        return;
+
     //if (glyph == 3972 || glyph == 3988)
     //    __debugbreak();
     /*
