@@ -692,19 +692,22 @@ mon_overrides_region(
     return glyph_is_invisible(levl[mx][my].glyph) ? TRUE : FALSE;
 }
 
+#ifdef HANGUPHANDLING
+#define _suppress_map_output() \
+    (gi.in_mklev || program_state.saving || program_state.restoring     \
+     || program_state.done_hup)
+#else
+#define _suppress_map_output() \
+    (gi.in_mklev || program_state.saving || program_state.restoring)
+#endif
+
 /* map or status window might not be ready for output during level creation
    or game restoration (something like u.usteed which affects display of
    the hero and also a status condition might not be set up yet) */
 boolean
 suppress_map_output(void)
 {
-    if (gi.in_mklev || program_state.saving || program_state.restoring)
-        return TRUE;
-#ifdef HANGUPHANDLING
-    if (program_state.done_hup)
-        return TRUE;
-#endif
-    return FALSE;
+    return _suppress_map_output();
 }
 
 /*
@@ -740,7 +743,7 @@ feel_location(coordxy x, coordxy y)
     struct monst *mon;
 
     /* replicate safeguards used by newsym(); might not be required here */
-    if (suppress_map_output())
+    if (_suppress_map_output())
         return;
 
     if (!isok(x, y))
@@ -909,7 +912,7 @@ newsym(coordxy x, coordxy y)
     struct rm *lev = &(levl[x][y]);
 
     /* don't try to produce map output when level is in a state of flux */
-    if (suppress_map_output())
+    if (_suppress_map_output())
         return;
 
     /* only permit updating the hero when swallowed */
@@ -1854,7 +1857,7 @@ show_glyph(coordxy x, coordxy y, int glyph)
     int oldglyph;
 
     /* don't process map glyphs when saving, restoring, or in_mklev */
-    if (suppress_map_output())
+    if (_suppress_map_output())
         return;
 
     //if (glyph == 3972 || glyph == 3988)
@@ -2187,7 +2190,7 @@ flush_screen(int cursor_on_u)
     int bkglyph;
 
     /* 3.7: don't update map, status, or perm_invent during save/restore */
-    if (suppress_map_output())
+    if (_suppress_map_output())
         return;
 
     if (cursor_on_u == -1)
@@ -2656,12 +2659,6 @@ int wallcolors[sokoban_walls + 1] = {
     color = iflags.use_color ? explodecolors[n] : NO_COLOR
 #define wall_color(n) color = iflags.use_color ? wallcolors[n] : NO_COLOR
 #define altar_color(n) color = iflags.use_color ? altarcolors[n] : NO_COLOR
-
-#if 0
-#define is_objpile(x, y)                          \
-    (!Hallucination && svl.level.objects[(x)][(y)] \
-     && svl.level.objects[(x)][(y)]->nexthere)
-#endif
 
 staticfn int cmap_to_roguecolor(int);
 
@@ -3770,11 +3767,17 @@ fn_cmap_to_glyph(int cmap)
 #undef DETECTED
 #undef PHYSICALLY_SEEN
 #undef is_worm_tail
+#undef _suppress_map_output
 #undef TMP_AT_MAX_GLYPHS
 #undef Glyphinfo_at
 #undef reset_glyph_bbox
 #undef HAS_ROGUE_IBM_GRAPHICS
 #undef GMAP_SET
 #undef GMAP_ROGUELEVEL
+#ifndef WA_VERBOSE
+#undef more_than_one
+#endif
+#undef only
+#undef set_corner
 
 /*display.c*/
