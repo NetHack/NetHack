@@ -199,6 +199,9 @@ read_txttile(FILE *txtfile, pixel (*pixels)[TILE_X])
     if (reslt <= 0)
         goto done;
 
+    ttype[sizeof ttype - 1] = '\0';
+    buf[sizeof buf - 1] = '\0';
+
     if (tile_set == MONSTER_SET && gend[0] == 'f')
         gidx = 1;
 
@@ -260,10 +263,14 @@ read_txttile(FILE *txtfile, pixel (*pixels)[TILE_X])
             }
             if (k == -1) {
                 Fprintf(stderr, "color %c not in colormap!\n", inbuf[i]);
-            } else {
+            } else if (k >= 0 && k < MAXCOLORMAPSIZE) {
                 pixels[j][i].r = ColorMap[CM_RED][k];
                 pixels[j][i].g = ColorMap[CM_GREEN][k];
                 pixels[j][i].b = ColorMap[CM_BLUE][k];
+            } else {
+                Fprintf(stderr,
+                        "%d exceeds array boundary for ColorMap[][%d]!\n",
+                        k, MAXCOLORMAPSIZE);
             }
         }
     }

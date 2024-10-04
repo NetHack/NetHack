@@ -1499,14 +1499,19 @@ add_tileref(
     char buf[BUFSZ];
 
     if (!tilelist[n]) {
-        tilelist[n] = malloc(sizeof temp);
-        tilelist[n]->tilenum = n;
-        tilelist[n]->src = src;
-        tilelist[n]->file_entry = entrynum;
-        /* leave room for trailing "...nnnn" */
-        Snprintf(tilelist[n]->tilenam, sizeof tilelist[n]->tilenam - 7,
-                 "%s%s", prefix, nam);
-        tilelist[n]->references[0] = '\0';
+        if ((tilelist[n] = malloc(sizeof temp)) != 0) {
+            tilelist[n]->tilenum = n;
+            tilelist[n]->src = src;
+            tilelist[n]->file_entry = entrynum;
+            /* leave room for trailing "...nnnn" */
+            Snprintf(tilelist[n]->tilenam, sizeof tilelist[n]->tilenam - 7,
+                     "%s%s", prefix, nam);
+            tilelist[n]->references[0] = '\0';
+        } else {
+            Fprintf(stderr, "tilemap malloc failure %zu bytes\n",
+                    sizeof temp);
+            exit(EXIT_FAILURE);
+        }
     }
     Snprintf(temp.references,
              sizeof temp.references - 7, /* room for "...nnnn" */

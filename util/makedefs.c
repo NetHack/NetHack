@@ -482,7 +482,7 @@ getfp(const char *template, const char *tag, const char *mode, int flg)
         err = tmpfile_s(&rv);
 #if defined(MSDOS) || defined(WIN32)
         if (!err && (!strcmp(mode, WRTMODE) || !strcmp(mode, RDTMODE))) {
-           _setmode(fileno(rv), O_TEXT);
+            (void) _setmode(fileno(rv), O_TEXT);
         }
 #endif
     } else
@@ -1321,6 +1321,10 @@ do_data(void)
 
     /* reprocess the scratch file; 1st format an error msg, just in case */
     line = malloc(BUFSZ + MAXFNAMELEN);
+    if (!line) {
+        fprintf(stderr, "makedefs malloc() failure\n");
+        exit(EXIT_FAILURE);
+    }
     Sprintf(line, "rewind of \"%s\"", tempfile);
     if (rewind(tfp) != 0)
         goto dead_data;

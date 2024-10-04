@@ -5936,8 +5936,8 @@ destroy_items(
         i = (elig_stacks < limit) ? elig_stacks : rn2(elig_stacks);
         /* do this afterwards to avoid not filling items_to_destroy[0] */
         elig_stacks++;
-        if (i >= limit) {
-            /* random index was too high */
+        if (i < 0 || i >= limit) {
+            /* random index was too high; mollify analyzer by including < 0 */
             continue;
         }
         items_to_destroy[i].oid = obj->o_id;

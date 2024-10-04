@@ -158,6 +158,7 @@ main(int argc, char **argv)
         strcpy(dest, dnbuf);
     }
 #endif /* !MSDOS && !VMS && !WIN32 && !__APPLE__  */
+    dest[sizeof dest - 1] = '\0';
 
 /* create output file */
 #if defined(MSDOS) || defined(WIN32)
