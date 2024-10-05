@@ -1,4 +1,4 @@
-/* NetHack 3.7	mklev.c	$NHDT-Date: 1704830831 2024/01/09 20:07:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.175 $ */
+/* NetHack 3.7	mklev.c	$NHDT-Date: 1728168518 2024/10/05 22:48:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.191 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1105,14 +1105,17 @@ makelevel(void)
     branch *branchp;
     stairway *prevstairs;
     int room_threshold;
-    s_level *slev = Is_special(&u.uz);
+    s_level *slev;
     int i;
 
-    if (wiz1_level.dlevel == 0)
+    if (wiz1_level.dlevel == 0) {
+        impossible("makelevel() called when dungeon not yet initialized.");
         init_dungeons();
+    }
     oinit(); /* assign level dependent obj probabilities */
     clear_level_structures();
 
+    slev = Is_special(&u.uz);
     /* check for special levels */
     if (slev && !Is_rogue_level(&u.uz)) {
         makemaz(slev->proto);
