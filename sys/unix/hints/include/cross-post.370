@@ -42,7 +42,7 @@ $(DOSFONT)/ter-u28b.psf: $(FONTTOP)/ter-u28b.bdf $(DOSFONT)/nh-u28b.bdf $(DOSFON
 $(DOSFONT)/ter-u32b.psf: $(FONTTOP)/ter-u32b.bdf $(DOSFONT)/nh-u32b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
 	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u32b.bdf $(DOSFONT)/nh-u32b.bdf $@
 #
-.PHONY: dodata dospkg dosfonts
+.PHONY: dodata dospkg dosfonts recover
 dosfonts: $(FONTTARGETS)
 dospkg: dodata dosfonts $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
 	$(TARGET_STUBEDIT) $(GAMEBIN) minstack=2048K
@@ -145,14 +145,14 @@ $(TARGETPFX)tileset.o : ../win/share/tileset.c
 $(TARGETPFX)bmptiles.o : ../win/share/bmptiles.c
 $(TARGETPFX)giftiles.o : ../win/share/giftiles.c
 $(TARGETPFX)recover.o : ../util/recover.c
-$(TARGETPFX)recover.exe : $(TARGETPFX)recover.o $(TARGETPFX)hacklib.a
-	$(TARGET_LINK) $(TARGET_LFLAGS) \
-	$(TARGETPFX)recover.o $(TARGETPFX)hacklib.a -o $@
 endif  # CROSS_SHARED
 #
 ifdef CROSS
 $(TARGETPFX)hacklib.a: $(TARGETPFX)hacklib.o
 	$(TARGET_AR) $(TARGET_ARFLAGS) $@ $(TARGETPFX)hacklib.o
+$(TARGETPFX)recover.exe : $(TARGETPFX)recover.o $(TARGETPFX)hacklib.a
+	$(TARGET_LINK) $(TARGET_LFLAGS) \
+	$(TARGETPFX)recover.o $(TARGETPFX)hacklib.a -o $@
 endif
 ifdef BUILD_TARGET_LUA
 # Lua lib
