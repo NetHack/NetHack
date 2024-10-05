@@ -145,8 +145,9 @@ $(TARGETPFX)tileset.o : ../win/share/tileset.c
 $(TARGETPFX)bmptiles.o : ../win/share/bmptiles.c
 $(TARGETPFX)giftiles.o : ../win/share/giftiles.c
 $(TARGETPFX)recover.o : ../util/recover.c
-$(TARGETPFX)recover.exe : $(TARGETPFX)recover.o
-	$(TARGET_LINK) $(TARGET_LFLAGS) $(TARGETPFX)recover.o -o $@
+$(TARGETPFX)recover.exe : $(TARGETPFX)recover.o $(TARGETPFX)hacklib.a
+	$(TARGET_LINK) $(TARGET_LFLAGS) \
+	$(TARGETPFX)recover.o $(TARGETPFX)hacklib.a -o $@
 endif  # CROSS_SHARED
 #
 ifdef CROSS
