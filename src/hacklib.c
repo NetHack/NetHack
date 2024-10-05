@@ -936,4 +936,22 @@ case_insensitive_comp(const char *s1, const char *s2)
     return u1 - u2;
 }
 
+boolean
+copy_bytes(int ifd, int ofd)
+{
+    char buf[BUFSIZ];
+    int nfrom, nto;
+
+    do {
+        nto = 0;
+        nfrom = read(ifd, buf, BUFSIZ);
+        /* read can return -1 */
+        if (nfrom >= 0 && nfrom <= BUFSIZ)
+            nto = write(ofd, buf, nfrom);
+        if (nto != nfrom || nfrom < 0)
+            return FALSE;
+    } while (nfrom == BUFSIZ);
+    return TRUE;
+}
+
 /*hacklib.c*/

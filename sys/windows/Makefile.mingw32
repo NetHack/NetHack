@@ -523,7 +523,7 @@ recover: $(RTARGETS)
 $(GAMEDIR)/recover.txt: $(DOC)/recover.txt | $(GAMEDIR)
 	cp $< $@
 
-$(GAMEDIR)/recover.exe: $(ROBJS) | $(GAMEDIR)
+$(GAMEDIR)/recover.exe: $(ROBJS) $(HLHACKLIB) | $(GAMEDIR)
 	$(ld) $(LDFLAGS) $^ -o$@
 
 $(OR)/recover.o: $(U)recover.c | $(OR)

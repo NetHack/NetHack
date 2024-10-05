@@ -78,7 +78,7 @@ extern void nh_snprintf_w_impossible(const char *func, int line, char *str,
 extern unsigned Strlen_(const char *, const char *, int) NONNULLPTRS;
 #endif
 extern int unicodeval_to_utf8str(int, uint8 *, size_t);
-
+extern boolean copy_bytes(int, int);
 
 #endif /* HACKLIB_H */
 

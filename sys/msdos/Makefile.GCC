@@ -702,8 +702,8 @@ $(O)hacklibu.o:  $(CONFIG_H) $(SRC)/hacklib.c
 #  Recover Utility
 #==========================================
 
-$(U)recover.exe:   $(RECOVOBJS)
-	$(LINK) $(LFLAGS) -o$@ $(O)recover.o
+$(U)recover.exe:   $(RECOVOBJS) $(HACKLIB)
+	$(LINK) $(LFLAGS) -o$@ $(O)recover.o $(HACKLIB)
 
 $(O)recover.o:   $(CONFIG_H) $(U)recover.c
 	$(CC) $(cflags) -o$@ $(U)recover.c

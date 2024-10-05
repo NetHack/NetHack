@@ -278,7 +278,7 @@ lintdgn:
 #	dependencies for recover
 #
 $(TARGETPFX)recover: $(RECOVOBJS)
-	$(TARGET_CLINK) $(TARGET_LFLAGS) -o recover $(RECOVOBJS) $(LIBS)
+	$(TARGET_CLINK) $(TARGET_LFLAGS) -o recover $(RECOVOBJS) $(HACKLIB) $(LIBS)
 
 $(TARGETPFX)recover.o: recover.c $(CONFIG_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) $(CSTD) -c recover.c -o $@

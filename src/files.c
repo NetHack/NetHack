@@ -230,10 +230,6 @@ staticfn void wizkit_addinv(struct obj *);
 boolean proc_wizkit_line(char *buf);
 void read_wizkit(void);  /* in extern.h; why here too? */
 staticfn FILE *fopen_sym_file(void);
-
-#ifdef SELF_RECOVER
-staticfn boolean copy_bytes(int, int);
-#endif
 staticfn NHFILE *viable_nhfile(NHFILE *);
 
 /* return a file's name without its path and optionally trailing 'type' */
@@ -4449,24 +4445,6 @@ recover_savefile(void)
     /* we don't clear program_state.in_self_recover here, we
        leave it as a flag to reload the structlevel savefile
        in the caller. The caller should then clear it. */
-    return TRUE;
-}
-
-boolean
-copy_bytes(int ifd, int ofd)
-{
-    char buf[BUFSIZ];
-    int nfrom, nto;
-
-    do {
-        nto = 0;
-        nfrom = read(ifd, buf, BUFSIZ);
-        /* read can return -1 */
-        if (nfrom >= 0 && nfrom <= BUFSIZ)
-            nto = write(ofd, buf, nfrom);
-        if (nto != nfrom || nfrom < 0)
-            return FALSE;
-    } while (nfrom == BUFSIZ);
     return TRUE;
 }
 

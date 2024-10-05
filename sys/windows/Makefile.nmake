@@ -9,7 +9,7 @@
 #
 #       Visual Studio Compilers Tested:
 #            - Microsoft Visual Studio 2019 Community Edition v 16.11.38
-#            - Microsoft Visual Studio 2022 Community Edition v 17.11.2
+#            - Microsoft Visual Studio 2022 Community Edition v 17.11.4
 #
 #==============================================================================
 #   This is used for building two distinct executables of NetHack:
@@ -1538,7 +1538,7 @@ binary.tag: 	$(DAT)\data $(DAT)\rumors $(DAT)\oracles $(DLB) \
 
 #	copy $(MSWSYS)\windsyshlp    $(GAMEDIR)
 
-recover: $(U)recover.exe
+recover: $(OUTLHACKLIB) $(U)recover.exe
 	if exist $(U)recover.exe copy $(U)recover.exe  $(GAMEDIR)
 	if exist $(DOC)\recover.txt copy $(DOC)\recover.txt $(GAMEDIR)\recover.txt
 
@@ -1892,9 +1892,10 @@ nhdat$(NHV):	$(U)dlb.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) $(LUA_FILES)
 #  Recover Utility
 #==========================================
 
-$(U)recover.exe: $(RECOVOBJS)
+$(U)recover.exe: $(RECOVOBJS) $(OUTLHACKLIB)
 	@echo Linking $(@:\=/)
-	@$(link) $(LFLAGS) /PDB:"$(OUTL)$(@B).PDB" /MAP:"$(OUTL)$(@B).MAP" -out:$@ $(RECOVOBJS)
+	@$(link) $(LFLAGS) /PDB:"$(OUTL)$(@B).PDB" /MAP:"$(OUTL)$(@B).MAP" \
+		-out:$@ $(RECOVOBJS) $(OUTLHACKLIB)
 
 $(OUTL)recover.o: $(CONFIG_H) $(U)recover.c $(MSWSYS)\win32api.h
 	$(Q)$(CC) $(CFLAGS) $(TTYDEF) -Fo$@ $(U)recover.c
