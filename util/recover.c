@@ -201,9 +201,12 @@ copy_bytes(int ifd, int ofd)
     int nfrom, nto;
 
     do {
+        nto = 0;
         nfrom = read(ifd, buf, BUFSIZ);
-        nto = write(ofd, buf, nfrom);
-        if (nto != nfrom) {
+        /* read can return -1 */
+        if (nfrom >= 0 && nfrom <= BUFSIZ)
+            nto = write(ofd, buf, nfrom);
+        if (nto != nfrom || nfrom < 0) {
             Fprintf(stderr, "file copy failed!\n");
             exit(EXIT_FAILURE);
         }
@@ -333,6 +336,7 @@ restore_savefile(char *basename)
         return -1;
     }
 
+    assert((size_t) pltmpsiz <= sizeof plbuf);
     if (write(sfd, (genericptr_t) plbuf, pltmpsiz) != pltmpsiz) {
         Fprintf(stderr, "Error writing %s; recovery failed (player name).\n",
                 savename);
@@ -404,8 +408,8 @@ store_formatindicator(int fd)
     char indicate = 'h';      /* historical */
     int cmc = 0;
 
-    write(fd, (genericptr_t) &indicate, sizeof indicate);
-    write(fd, (genericptr_t) &cmc, sizeof cmc);
+    (void) write(fd, (genericptr_t) &indicate, sizeof indicate);
+    (void) write(fd, (genericptr_t) &cmc, sizeof cmc);
 }
 
 

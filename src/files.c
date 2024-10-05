@@ -4456,9 +4456,10 @@ boolean
 copy_bytes(int ifd, int ofd)
 {
     char buf[BUFSIZ];
-    int nfrom, nto = 0;
+    int nfrom, nto;
 
     do {
+        nto = 0;
         nfrom = read(ifd, buf, BUFSIZ);
         /* read can return -1 */
         if (nfrom >= 0 && nfrom <= BUFSIZ)
