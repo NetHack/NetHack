@@ -193,8 +193,9 @@ panic.obj:     panic.c $(CONFIG_H)
 #
 #	dependencies for recover
 #
-$(TARGETPFX)recover.exe: $(RECOVOBJS)
-	$(TARGET_CLINK) $(TARGET_LFLAGS) /EXE=$@ $(RECOVOBJS) $(LIBS)
+$(TARGETPFX)recover.exe: $(HACKLIB) $(RECOVOBJS)
+	$(TARGET_CLINK) $(TARGET_LFLAGS) /EXE=$@ \
+	$(RECOVOBJS),$(HACKLIB)/lib $(LIBS)
 
 $(TARGETPFX)recover.obj: recover.c $(CONFIG_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) $(CSTD) recover.c /OBJ=$@
