@@ -24,6 +24,7 @@
 #include "winos.h"
 #include "hack.h"
 #include "wintty.h"
+#include <VersionHelpers.h>
 #include <sys\types.h>
 #include <sys\stat.h>
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
@@ -570,120 +571,120 @@ void emit_show_curor(void);
 void
 emit_hide_cursor(void)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static const char escseq[] = "\x1b[?25l";
 
     WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, &reserved);
+                  &unused, NULL);
 }
 
 void
 emit_show_cursor(void)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static const char escseq[] = "\x1b[?25h";
 
     WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, &reserved);
+                  &unused, NULL);
 }
 
 void
 emit_start_bold(void)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static const char escseq[] = "\x1b[1m";
 
     WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, &reserved);
+                  &unused, NULL);
 }
 
 void
 emit_stop_bold(void)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static const char escseq[] = "\x1b[24m";
 
     WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, &reserved);
+                  &unused, NULL);
 }
 #if 0
 emit_start_dim(void)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static const char escseq[] = "\x1b[4m";
 
     WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, &reserved);
+                  &unused, NULL);
 }
 
 void
 emit_stop_dim(void)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static const char escseq[] = "\x1b[24m";
 
     WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, &reserved);
+                  &unused, NULL);
 }
 #endif
 
 void
 emit_start_blink(void)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static const char escseq[] = "\x1b[5m";
 
     WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, &reserved);
+                  &unused, NULL);
 }
 
 void
 emit_stop_blink(void)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static const char escseq[] = "\x1b[25m";
 
     WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, &reserved);
+                  &unused, NULL);
 }
 
 void
 emit_start_underline(void)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static const char escseq[] = "\x1b[4m";
 
     WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, &reserved);
+                  &unused, NULL);
 }
 
 void
 emit_stop_underline(void)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static const char escseq[] = "\x1b[24m";
 
     WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, &reserved);
+                  &unused, NULL);
 }
 void
 emit_start_inverse(void)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static const char escseq[] = "\x1b[7m";
 
     WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, &reserved);
+                  &unused, NULL);
 }
 
 void
 emit_stop_inverse(void)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static const char escseq[] = "\x1b[27m";
 
     WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, &reserved);
+                  &unused, NULL);
 }
 
 #if 0
@@ -704,17 +705,17 @@ emit_stop_inverse(void)
 void
 emit_start_256color(int u256coloridx)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static char tcolorbuf[QBUFSZ];
     Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr256, u256coloridx);
     WriteConsoleA(console.hConOut, (LPCSTR) tcolorbuf,
-                  (int) strlen(tcolorbuf), &unused, &reserved);
+                  (int) strlen(tcolorbuf), &unused, NULL);
 }
 
 void
 emit_start_24bitcolor(long color24bit)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static char tcolorbuf[QBUFSZ];
     uint32 mcolor = COLORVAL(color24bit);
     Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr24bit,
@@ -722,26 +723,26 @@ emit_start_24bitcolor(long color24bit)
              ((mcolor >>  8) & 0xFF),   /* green */
              ((mcolor >>  0) & 0xFF));  /* blue */
     WriteConsoleA(console.hConOut, (LPCSTR) tcolorbuf,
-                  (int) strlen(tcolorbuf), &unused, &reserved);
+                  (int) strlen(tcolorbuf), &unused, NULL);
 }
 
 void
 emit_default_color(void)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static char escseq[] = "\x1b[39m";
 
     WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, &reserved);
+                  &unused, NULL);
 }
 void
 emit_return_to_default(void)
 {
-    DWORD unused, reserved;
+    DWORD unused;
     static char escseq[] = "\x1b[0m";
 
     WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, &reserved);
+                  &unused, NULL);
 }
 static boolean newattr_on = TRUE;
 static boolean color24_on = TRUE;
@@ -778,7 +779,6 @@ back_buffer_flip(void)
     cell_t *front = console.front_buffer;
     COORD pos;
     DWORD unused;
-    DWORD reserved;
     unsigned do_anything, did_anything;
 
     if (!console.is_ready)
@@ -843,13 +843,13 @@ back_buffer_flip(void)
                     did_anything |= did_colorseq;
                     WriteConsoleA(console.hConOut, back->colorseq,
                                   (int) strlen(back->colorseq), &unused,
-                                  &reserved);
+                                  NULL);
                 }
                 if (back->bkcolorseq) {
                     did_anything |= did_bkcolorseq;
                     WriteConsoleA(console.hConOut, back->bkcolorseq,
                                   (int) strlen(back->bkcolorseq), &unused,
-                                  &reserved);
+                                  NULL);
                 }
                 if ((did_anything | (did_colorseq | did_bkcolorseq | did_color24)) == 0) {
                     did_anything &= ~(did_bkcolorseq | did_color24);
@@ -862,12 +862,12 @@ back_buffer_flip(void)
                     if (SYMHANDLING(H_UTF8) || !console.has_unicode) {
                         WriteConsoleA(console.hConOut, (LPCSTR) back->utf8str,
                                       (int) strlen((char *) back->utf8str),
-                                      &unused, &reserved);
+                                      &unused, NULL);
                         did_anything |= did_utf8_content;
                     } else {
 #endif
                     WriteConsoleW(console.hConOut, &back->wcharacter, 1,
-                                  &unused, &reserved);
+                                  &unused, NULL);
                     did_anything |= did_wide_content;
 #ifdef UTF8_FROM_CORE
                     }
@@ -1524,9 +1524,6 @@ raw_clear_screen(void)
         cell_t * front = console.front_buffer;
         COORD pos;
         DWORD unused;
-#ifdef VIRTUAL_TERMINAL_SEQUENCES
-        DWORD reserved;
-#endif
 
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
         pos.Y = 0;
@@ -1552,10 +1549,10 @@ raw_clear_screen(void)
                 *back = clear_cell;
                 if (console.has_unicode)
                     WriteConsoleW(console.hConOut, &back->wcharacter, 1,
-                                  &unused, &reserved);
+                                  &unused, NULL);
                 else
                     WriteConsoleA(console.hConOut, (LPCSTR) back->utf8str,
-                                    (int) strlen((char *) back->utf8str), &unused, &reserved);
+                                    (int) strlen((char *) back->utf8str), &unused, NULL);
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
                 *front = *back;
                 back++;
@@ -2511,7 +2508,7 @@ void nethack_enter_consoletty(void)
     buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
 
     /* determine whether OS version has unicode support */
-    console.has_unicode = ((GetVersion() & 0x80000000) == 0);
+    console.has_unicode = (IsWindows8OrGreater());
 
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
     /* store the original code page*/
@@ -2651,7 +2648,7 @@ VA_DECL(const char *, fmt)
         if (console.cursor.Y > console.height - 4) {
             xputs("Hit <Enter> to continue.");
             while (pgetchar() != '\n')
-                ;
+               ;
             raw_clear_screen();
             set_console_cursor(1, 0);
         }
@@ -3333,7 +3330,7 @@ is_altseq(unsigned long shiftstate)
 
     case RIGHT_ALT_PRESSED:
     case RIGHT_ALT_PRESSED | LEFT_ALT_PRESSED:
-        return (GetVersion() & 0x80000000) == 0;
+        return (IsWindows8OrGreater());
 
     default:
         return 0;
