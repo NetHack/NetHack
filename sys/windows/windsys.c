@@ -416,12 +416,14 @@ static HWND
 GetConsoleHandle(void)
 {
     HMODULE hMod = GetModuleHandle("kernel32.dll");
-    GETCONSOLEWINDOW pfnGetConsoleWindow =
-        (GETCONSOLEWINDOW) GetProcAddress(hMod, "GetConsoleWindow");
-    if (pfnGetConsoleWindow)
-        return pfnGetConsoleWindow();
-    else
-        return GetConsoleHwnd();
+
+    if (hMod) {
+        GETCONSOLEWINDOW pfnGetConsoleWindow =
+            (GETCONSOLEWINDOW) GetProcAddress(hMod, "GetConsoleWindow");
+        if (pfnGetConsoleWindow)
+            return pfnGetConsoleWindow();
+    }
+    return GetConsoleHwnd();
 }
 
 static HWND
@@ -434,7 +436,7 @@ GetConsoleHwnd(void)
     /* Get current window title */
     GetConsoleTitle(OldTitle, sizeof OldTitle);
 
-    (void) sprintf(NewTitle, "NETHACK%ld/%ld", GetTickCount(),
+    (void) sprintf(NewTitle, "NETHACK%lld/%ld", GetTickCount64(),
                    GetCurrentProcessId());
     SetConsoleTitle(NewTitle);
 
