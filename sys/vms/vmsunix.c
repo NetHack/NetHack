@@ -603,8 +603,9 @@ vmscond lib$find_file_end(void **);
 
 /* collect a list of character names from all save files for this player */
 int
-vms_get_saved_games(const char *savetemplate, /* wildcarded save file name in native VMS format */
-                    char ***outarray)
+vms_get_saved_games(
+    const char *savetemplate, /* wildcarded save name in native VMS format */
+    char ***outarray)
 {
     struct dsc in, out;
     unsigned short l;

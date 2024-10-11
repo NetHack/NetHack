@@ -2710,6 +2710,12 @@ livelog/#chronicle for saving-grace: if saving-grace prevents hero's death,
 enlightenment/attribute disclosure for saving-grace: include a line for have
 	or haven't been saved (game in progress) or did or didn't get saved
 	(game over) via saving-grace
+'selectsaved' lists "name-role-race-gend-algn" instead of just "name" in the
+	menu of save files available to be restored
+'selectsaved' prefixes "name-role-race-gend-algn" with "- " for normal play,
+	"X " for explore mode, or "D " for debug mode if any of the games
+	shown in its menu weren't saved during normal play; if they're all
+	normal play, the prefix is suppressed
 
 
 Platform- and/or Interface-Specific New Features

@@ -719,11 +719,7 @@ clearlocks(void)
 staticfn int QSORTCALLBACK
 strcmp_wrap(const void *p, const void *q)
 {
-#if defined(UNIX) && defined(QT_GRAPHICS)
-    return strncasecmp(*(char **) p, *(char **) q, 16);
-#else
-    return strncmpi(*(char **) p, *(char **) q, 16);
-#endif
+    return strcmp(*(char **) p, *(char **) q);
 }
 #endif
 
@@ -989,7 +985,7 @@ set_savefile_name(boolean regularize_it)
     if (strlen(gs.SAVEF) < (SAVESIZE - 1))
         (void) strncat(gs.SAVEF, svp.plname, (SAVESIZE - strlen(gs.SAVEF)));
 #endif
-#if defined(MICRO) && !defined(VMS) && !defined(WIN32) && !defined(MSDOS)
+#if defined(MICRO) && !defined(WIN32) && !defined(MSDOS)
     if (strlen(gs.SAVEP) < (SAVESIZE - 1))
         Strcpy(gs.SAVEF, gs.SAVEP);
     else
@@ -1252,9 +1248,12 @@ check_panic_save(void)
 #if defined(SELECTSAVED)
 
 char *
-plname_from_file(const char *filename, boolean without_wait_synch_per_file)
+plname_from_file(
+    const char *filename,
+    boolean without_wait_synch_per_file)
 {
-    NHFILE *nhfp = (NHFILE *) 0;
+    NHFILE *nhfp;
+    unsigned ln;
     char *result = 0;
 
     Strcpy(gs.SAVEF, filename);
@@ -1271,60 +1270,32 @@ plname_from_file(const char *filename, boolean without_wait_synch_per_file)
     nh_uncompress(gs.SAVEF);
     if ((nhfp = open_savefile()) != 0) {
         if (validate(nhfp, filename, without_wait_synch_per_file) == 0) {
-            char tplname[PL_NSIZ];
-
-            get_plname_from_file(nhfp, tplname);
-            result = dupstr(tplname);
+            /* room for "name+role+race+gend+algn X" where the space before
+               X is actually NUL and X is playmode: one of '-', 'X', or 'D' */
+            ln = (unsigned) PL_NSIZ_PLUS;
+            result = memset((genericptr_t) alloc(ln), '\0', ln);
+            get_plname_from_file(nhfp, result, FALSE);
         }
         close_nhfile(nhfp);
     }
     nh_compress(gs.SAVEF);
-
-    return result;
-#if 0
-/* --------- obsolete - used to be ifndef STORE_PLNAME_IN_FILE ----*/
-#if defined(UNIX) && defined(QT_GRAPHICS)
-    /* Name not stored in save file, so we have to extract it from
-       the filename, which loses information
-       (eg. "/", "_", and "." characters are lost. */
-    int k;
-    int uid;
-    char name[64]; /* more than PL_NSIZ */
-#ifdef COMPRESS_EXTENSION
-#define EXTSTR COMPRESS_EXTENSION
-#else
-#define EXTSTR ""
-#endif
-
-    if (sscanf(filename, "%*[^/]/%d%63[^.]" EXTSTR, &uid, name) == 2) {
-#undef EXTSTR
-        /* "_" most likely means " ", which certainly looks nicer */
-        for (k = 0; name[k]; k++)
-            if (name[k] == '_')
-                name[k] = ' ';
-        return dupstr(name);
-    } else
-#endif /* UNIX && QT_GRAPHICS */
-    {
-        return 0;
-    }
-/* --------- end of obsolete code ----*/
-#endif /* 0 - WAS STORE_PLNAME_IN_FILE*/
+    return result; /* file's plname[]+playmode value */
 }
 #endif /* defined(SELECTSAVED) */
 
 #define SUPPRESS_WAITSYNCH_PERFILE TRUE
 #define ALLOW_WAITSYNCH_PERFILE FALSE
 
+/* get list of saved games owned by current user */
 char **
 get_saved_games(void)
 {
+    char **result = NULL;
 #if defined(SELECTSAVED)
 #if defined(WIN32) || defined(UNIX)
     int n;
 #endif
     int j = 0;
-    char **result = 0;
 
 #ifdef WIN32
     {
@@ -1351,8 +1322,8 @@ get_saved_games(void)
         }
 
         if (n > 0) {
-            files = (char **) alloc((n + 1) * sizeof(char *)); /* at most */
-            (void) memset((genericptr_t) files, 0, (n + 1) * sizeof(char *));
+            files = (char **) alloc((n + 1) * sizeof (char *)); /* at most */
+            (void) memset((genericptr_t) files, 0, (n + 1) * sizeof (char *));
             if (findfirst((char *) fq_save)) {
                 i = 0;
                 do {
@@ -1362,8 +1333,8 @@ get_saved_games(void)
         }
 
         if (n > 0) {
-            result = (char **) alloc((n + 1) * sizeof(char *)); /* at most */
-            (void) memset((genericptr_t) result, 0, (n + 1) * sizeof(char *));
+            result = (char **) alloc((n + 1) * sizeof (char *)); /* at most */
+            (void) memset((genericptr_t) result, 0, (n + 1) * sizeof (char *));
             for(i = 0; i < n; i++) {
                 char *r;
                 r = plname_from_file(files[i], SUPPRESS_WAITSYNCH_PERFILE);
@@ -1390,7 +1361,7 @@ get_saved_games(void)
         if (count_failures)
             wait_synch();
     }
-#endif
+#endif /* WIN32 */
 #ifdef UNIX
     /* posixly correct version */
     int myuid = getuid();
@@ -1409,7 +1380,7 @@ get_saved_games(void)
             (void) memset((genericptr_t) result, 0, (n + 1) * sizeof(char *));
             for (i = 0, j = 0; i < n; i++) {
                 int uid;
-                char name[64]; /* more than PL_NSIZ */
+                char name[64]; /* more than PL_NSIZ+1 */
                 struct dirent *entry = readdir(dir);
 
                 if (!entry)
@@ -1430,7 +1401,7 @@ get_saved_games(void)
             closedir(dir);
         }
     }
-#endif
+#endif /* UNIX */
 #ifdef VMS
     Strcpy(svp.plname, "*");
     set_savefile_name(FALSE);
@@ -1440,14 +1411,14 @@ get_saved_games(void)
     if (j > 0) {
         if (j > 1)
             qsort(result, j, sizeof (char *), strcmp_wrap);
-        result[j] = 0;
-        return result;
+        result[j] = (char *) NULL;
     } else if (result) { /* could happen if save files are obsolete */
         free_saved_games(result);
+        result = (char **) NULL;
     }
 #endif /* SELECTSAVED */
 
-    return 0;
+    return result;
 }
 #undef SUPPRESS_WAITSYNCH_PERFILE
 #undef ALLOW_WAITSYNCH_PERFILE
@@ -1456,10 +1427,10 @@ void
 free_saved_games(char **saved)
 {
     if (saved) {
-        int i = 0;
+        int i;
 
-        while (saved[i])
-            free((genericptr_t) saved[i++]);
+        for (i = 0; saved[i]; ++i)
+            free((genericptr_t) saved[i]);
         free((genericptr_t) saved);
     }
 }
@@ -4260,7 +4231,7 @@ recover_savefile(void)
     int processed[256];
     char savename[SAVESIZE], errbuf[BUFSZ], indicator;
     struct savefile_info sfi;
-    char tmpplbuf[PL_NSIZ];
+    char tmpplbuf[PL_NSIZ_PLUS];
     const char *savewrite_failure = (const char *) 0;
 
     for (lev = 0; lev < 256; lev++)
@@ -4307,7 +4278,7 @@ recover_savefile(void)
             != sizeof version_data)
         || (read(gnhfp->fd, (genericptr_t) &sfi, sizeof sfi) != sizeof sfi)
         || (read(gnhfp->fd, (genericptr_t) &pltmpsiz, sizeof pltmpsiz)
-            != sizeof pltmpsiz) || (pltmpsiz > PL_NSIZ)
+            != sizeof pltmpsiz) || (pltmpsiz > PL_NSIZ_PLUS)
         || (read(gnhfp->fd, (genericptr_t) &tmpplbuf, pltmpsiz)
             != pltmpsiz)) {
         raw_printf("\nError reading %s -- can't recover.\n", gl.lock);

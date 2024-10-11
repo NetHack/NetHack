@@ -2618,7 +2618,7 @@ extern int dorecover(NHFILE *) NONNULLARG1;
 extern void restcemetery(NHFILE *, struct cemetery **) NONNULLARG12;
 extern void trickery(char *) NO_NNARGS;
 extern void getlev(NHFILE *, int, xint8) NONNULLARG1;
-extern void get_plname_from_file(NHFILE *, char *) NONNULLARG12;
+extern void get_plname_from_file(NHFILE *, char *, boolean) NONNULLARG12;
 #ifdef SELECTSAVED
 extern int restore_menu(winid);
 #endif

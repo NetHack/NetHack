@@ -431,6 +431,8 @@ extern struct nomakedefs_s nomakedefs;
 #define PL_CSIZ 32 /* sizeof pl_character */
 #define PL_FSIZ 32 /* fruit name */
 #define PL_PSIZ 63 /* player-given names for pets, other monsters, objects */
+/* room for "name-role-race-gend-algn" plus 1 character playmode code */
+#define PL_NSIZ_PLUS (PL_NSIZ + 4 * (1 + 4) + 1) /* 53 */
 
 #define MAXDUNGEON 16 /* current maximum number of dungeons */
 #define MAXLEVEL 32   /* max number of levels in one dungeon */

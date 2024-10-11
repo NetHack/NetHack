@@ -740,7 +740,7 @@ dorecover(NHFILE *nhfp)
     /* suppress map display if some part of the code tries to update that */
     program_state.restoring = REST_GSTATE;
 
-    get_plname_from_file(nhfp, svp.plname);
+    get_plname_from_file(nhfp, svp.plname, TRUE);
     getlev(nhfp, 0, (xint8) 0);
     if (!restgamestate(nhfp)) {
         NHFILE tnhfp;
@@ -828,7 +828,7 @@ dorecover(NHFILE *nhfp)
     restoreinfo.mread_flags = 0;
     rewind_nhfile(nhfp);        /* return to beginning of file */
     (void) validate(nhfp, (char *) 0, FALSE);
-    get_plname_from_file(nhfp, svp.plname);
+    get_plname_from_file(nhfp, svp.plname, TRUE);
 
     /* not 0 nor REST_GSTATE nor REST_LEVELS */
     program_state.restoring = REST_CURRENT_LEVEL;
@@ -1245,15 +1245,33 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
     program_state.in_getlev = FALSE;
 }
 
+/* "name-role-race-gend-algn" occurs very early in a save file; sometimes we
+   want the whole thing, other times just "name" (for svp.plname[]) */
 void
-get_plname_from_file(NHFILE *nhfp, char *plbuf)
+get_plname_from_file(
+    NHFILE *nhfp,
+    char *outbuf, /* size must be at least [PL_NSIZ_PLUS] even if name_only */
+    boolean name_only) /* True: just name; False: name-role-race-gend-algn */
 {
+    char plbuf[PL_NSIZ_PLUS];
     int pltmpsiz = 0;
 
+    plbuf[0] = '\0';
     if (nhfp->structlevel) {
-        (void) read(nhfp->fd, (genericptr_t) &pltmpsiz, sizeof(pltmpsiz));
+        (void) read(nhfp->fd, (genericptr_t) &pltmpsiz, sizeof pltmpsiz);
+        /* pltmpsiz should now be PL_NSIZ_PLUS */
         (void) read(nhfp->fd, (genericptr_t) plbuf, pltmpsiz);
+        /* plbuf[PL_NSIZ_PLUS-2] should be '\0';
+           plbuf[PL_NSIZ_PLUS-1] should be '-' or 'X' or 'D' */
     }
+    /* "-race-role-gend-algn" is already present except that it has been
+       hidden by replacing the initial dash with NUL; if we want that
+       information, replace the NUL with a dash */
+    if (!name_only)
+        *eos(plbuf) = '-';
+    /* not simple strcpy(); playmode is in the last slot and could (probably
+       will) be preceded by NULs */
+    (void) memcpy((genericptr_t) outbuf, (genericptr_t) plbuf, PL_NSIZ_PLUS);
     return;
 }
 
@@ -1418,7 +1436,8 @@ restore_menu(
 {
     winid tmpwin;
     anything any;
-    char **saved;
+    char **saved, *next, mode, menutext[BUFSZ];
+    boolean all_normal;
     menu_item *chosen_game = (menu_item *) 0;
     int k, clet, ch = 0; /* ch: 0 => new game */
     int clr = NO_COLOR;
@@ -1438,19 +1457,35 @@ restore_menu(
             add_menu_str(tmpwin, "");
         }
         add_menu_str(tmpwin, "Select one of your saved games");
+        /* if all the save files have a playmode of '-' then we'll just list
+           their character name-role-race-gend-algn values, but if any are
+           'X' or 'D', we'll list playmode along with name-role-&c values
+           for every entry; first, figure out if they're all normal play */
+        for (all_normal = TRUE, k = 0; all_normal && saved[k]; ++k) {
+            next = saved[k];
+            mode = next[PL_NSIZ_PLUS - 1]; /* fixed last char, beyond '\0' */
+            if (mode != '-')
+                all_normal = FALSE;
+        }
         for (k = 0; saved[k]; ++k) {
             any.a_int = k + 1;
-            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                     ATR_NONE, clr, saved[k], MENU_ITEMFLAGS_NONE);
+            next = saved[k];
+            mode = next[PL_NSIZ_PLUS - 1];
+            if (all_normal)
+                Sprintf(menutext, "%.*s", PL_NSIZ_PLUS - 1, next);
+            else
+                Sprintf(menutext, "%c %.*s", mode, PL_NSIZ_PLUS - 1, next);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
+                     menutext, MENU_ITEMFLAGS_SKIPMENUCOLORS);
         }
         clet = (k <= 'n' - 'a') ? 'n' : 0; /* new game */
         any.a_int = -1;                    /* not >= 0 */
-        add_menu(tmpwin, &nul_glyphinfo, &any, clet, 0, ATR_NONE,
-                 clr, "Start a new character", MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, clet, 0, ATR_NONE, clr,
+                 "Start a new character", MENU_ITEMFLAGS_NONE);
         clet = (k + 1 <= 'q' - 'a') ? 'q' : 0; /* quit */
         any.a_int = -2;
-        add_menu(tmpwin, &nul_glyphinfo, &any, clet, 0, ATR_NONE,
-                 clr, "Never mind (quit)", MENU_ITEMFLAGS_SELECTED);
+        add_menu(tmpwin, &nul_glyphinfo, &any, clet, 0, ATR_NONE, clr,
+                 "Never mind (quit)", MENU_ITEMFLAGS_SELECTED);
         /* no prompt on end_menu, as we've done our own at the top */
         end_menu(tmpwin, (char *) 0);
         if (select_menu(tmpwin, PICK_ONE, &chosen_game) > 0) {
