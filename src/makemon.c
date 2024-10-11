@@ -1804,11 +1804,9 @@ mkclass_aligned(char class, int spc, /* special mons[].geno handling */
             /* consider it; don't reject a toostrong() monster if we
                don't have anything yet (num==0) or if it is the same
                (or lower) difficulty as preceding candidate (non-zero
-               'num' implies last > first so mons[last-1] is safe);
-               sometimes accept it even if high difficulty */
+               'num' implies last > first so mons[last-1] is safe) */
             if (num && montoostrong(last, maxmlev)
-                && mons[last].difficulty > mons[last - 1].difficulty
-                && rn2(2))
+                && mons[last].difficulty > mons[last - 1].difficulty)
                 break;
             if ((k = (mons[last].geno & G_FREQ)) > 0) {
                 /* skew towards lower value monsters at lower exp. levels
