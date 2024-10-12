@@ -1076,7 +1076,7 @@ savelevchn(NHFILE *nhfp)
 void
 store_plname_in_file(NHFILE *nhfp)
 {
-    char hero[PL_NSIZ_PLUS]; /* [PL_NSIZ + 4*4 + 1] */
+    char hero[PL_NSIZ_PLUS]; /* [PL_NSIZ + 4*(1+3) + 1] */
     int plsiztmp = (int) sizeof hero;
 
     (void) memset((genericptr_t) hero, '\0', sizeof hero);
