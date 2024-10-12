@@ -728,7 +728,7 @@ enum glyph_offsets {
 #define glyph_to_explosion(glyph) \
     (glyph_is_explosion(glyph) ? (((glyph) - GLYPH_EXPLODE_OFF) % (S_expl_br - S_expl_tl + 1)) : 0)
 #define glyph_to_warning(glyph) \
-    (glyph_is_warning(glyph) ? ((glyph) - GLYPH_WARNING_OFF) : NO_GLYPH)
+    (glyph_is_warning(glyph) ? ((glyph) - GLYPH_WARNING_OFF) : 0)
 
 /*
  * Return true if the given glyph is what we want.  Note that bodies are
