@@ -551,8 +551,14 @@ wiz_fuzzer(void)
         pline("The fuzz tester will make NetHack execute random keypresses.");
         There("is no conventional way out of this mode.");
     }
-    if (paranoid_query(TRUE, "Do you want to start fuzz testing?"))
-        iflags.debug_fuzzer = TRUE; /* Thoth, take the reins */
+    if (paranoid_query(TRUE, "Do you want to start fuzz testing?")) {
+        /* Thoth, take the reins */
+        if (y_n("Do you want to call panic() after impossible()?") == 'n') {
+            iflags.debug_fuzzer = fuzzer_impossible_continue;
+        } else {
+            iflags.debug_fuzzer = fuzzer_impossible_panic;
+        }
+    }
     return ECMD_OK;
 }
 

@@ -587,7 +587,7 @@ impossible(const char *s, ...)
     va_end(the_args);
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
-    if (iflags.debug_fuzzer == 1)
+    if (iflags.debug_fuzzer == fuzzer_impossible_panic)
         panic("%s", pbuf);
 
     gp.pline_flags = URGENT_MESSAGE;

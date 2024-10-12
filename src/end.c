@@ -77,7 +77,7 @@ done1(int sig_unused UNUSED)
 #ifndef NO_SIGNAL
     (void) signal(SIGINT, SIG_IGN);
 #endif
-    iflags.debug_fuzzer = FALSE;
+    iflags.debug_fuzzer = fuzzer_off;
     if (flags.ignintr) {
 #ifndef NO_SIGNAL
         (void) signal(SIGINT, (SIG_RET_TYPE) done1);
