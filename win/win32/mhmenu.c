@@ -1532,6 +1532,8 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
                 int iter = topIndex;
                 do {
                     i = iter % data->menui.menu.size;
+                    if (iflags.debug_fuzzer && iter > 1000000)
+                        ch = data->menui.menu.items[i].accelerator;
                     if (data->menui.menu.items[i].accelerator == ch) {
                         if (data->how == PICK_ANY) {
                             SelectMenuItem(
