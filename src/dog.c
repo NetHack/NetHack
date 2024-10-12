@@ -943,6 +943,8 @@ dogfood(struct monst *mon, struct obj *obj)
             starving, mblind;
     int fx;
 
+    if (obj->opoisoned && !resists_poison(mon))
+        return POISON;
     if (is_quest_artifact(obj) || obj_resists(obj, 0, 95))
         return obj->cursed ? TABU : APPORT;
 
