@@ -847,7 +847,7 @@ m_dowear_type(
 
     if (!creation) {
         if (sawmon) {
-            char buf[BUFSZ], oldarm[BUFSZ], newarm[BUFSZ];
+            char buf[BUFSZ], oldarm[BUFSZ], newarm[BUFSZ + sizeof "another "];
 
             /* "<Mon> [removes <oldarm> and ]puts on <newarm>."
                uses accessory verbs for armor but we can live with that */
@@ -863,14 +863,13 @@ m_dowear_type(
                if newarm and oldarm have identical descriptions, substitute
                "another <newarm>" for "a|an <newarm>" */
             if (!strcmpi(newarm, oldarm)) {
-                if (!strncmpi(newarm, "a ", 2)
-                    && strlen(newarm) + sizeof "another " - sizeof "a "
-                       < sizeof newarm)
+                /* size of newarm[] has been overallocated to guarantee
+                   enough room to insert "another " */
+                if (!strncmpi(newarm, "a ", 2))
                     (void) strsubst(newarm, "a ", "another ");
-                else if (!strncmpi(newarm, "an ", 3)
-                         && strlen(newarm) + sizeof "another " - sizeof "an "
-                            < sizeof newarm)
+                else if (!strncmpi(newarm, "an ", 3))
                     (void) strsubst(newarm, "an ", "another ");
+                newarm[BUFSZ - 1] = '\0';
             }
             pline("%s%s puts on %s.", Monnam(mon), buf, newarm);
             if (autocurse)
