@@ -723,7 +723,7 @@ staticfn void
 m_dowear_type(
     struct monst *mon,
     long flag,               /* wornmask value */
-    boolean creation,
+    boolean creation,        /* no wear messages when mon is being created */
     boolean racialexception) /* small monsters that are allowed for player
                               * races (gnomes) can wear suits */
 {
@@ -847,14 +847,32 @@ m_dowear_type(
 
     if (!creation) {
         if (sawmon) {
-            char buf[BUFSZ];
+            char buf[BUFSZ], oldarm[BUFSZ], newarm[BUFSZ];
 
-            if (old)
-                Sprintf(buf, " removes %s and", distant_name(old, doname));
-            else
-                buf[0] = '\0';
-            pline("%s%s puts on %s.", Monnam(mon), buf,
-                  distant_name(best, doname));
+            /* "<Mon> [removes <oldarm> and ]puts on <newarm>."
+               uses accessory verbs for armor but we can live with that */
+            if (old) {
+                Strcpy(oldarm, distant_name(old, doname));
+                Snprintf(buf, sizeof buf, " removes %s and", oldarm);
+            } else {
+                buf[0] = oldarm[0] = '\0';
+            }
+            Strcpy(newarm, distant_name(best, doname));
+            /* a monster will swap an item of the same type as the one it
+               is replacing when the enchantment is better;
+               if newarm and oldarm have identical descriptions, substitute
+               "another <newarm>" for "a|an <newarm>" */
+            if (!strcmpi(newarm, oldarm)) {
+                if (!strncmpi(newarm, "a ", 2)
+                    && strlen(newarm) + sizeof "another " - sizeof "a "
+                       < sizeof newarm)
+                    (void) strsubst(newarm, "a ", "another ");
+                else if (!strncmpi(newarm, "an ", 3)
+                         && strlen(newarm) + sizeof "another " - sizeof "an "
+                            < sizeof newarm)
+                    (void) strsubst(newarm, "an ", "another ");
+            }
+            pline("%s%s puts on %s.", Monnam(mon), buf, newarm);
             if (autocurse)
                 pline("%s %s %s %s for a moment.", s_suffix(Monnam(mon)),
                       simpleonames(best), otense(best, "glow"),
