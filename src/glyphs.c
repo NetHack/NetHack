@@ -675,12 +675,14 @@ shuffle_customizations(void)
                 tmp_customcolor[i] = other_customcolor;
                 tmp_color256idx[i] = other_color256idx;
 #ifdef ENHANCED_SYMBOLS
-                tmp_u[i] = (struct unicode_representation *)
-                           alloc(sizeof *tmp_u[i]);
-                *tmp_u[i] = *other;
-                if (other->utf8str != NULL) {
-                    tmp_u[i]->utf8str = (uint8 *)
-                                        dupstr((const char *) other->utf8str);
+                if (other) {
+                    tmp_u[i] = (struct unicode_representation *) alloc(
+                        sizeof *tmp_u[i]);
+                    *tmp_u[i] = *other;
+                    if (other->utf8str != NULL) {
+                        tmp_u[i]->utf8str =
+                            (uint8 *) dupstr((const char *) other->utf8str);
+                    }
                 }
 #endif
             } else {
