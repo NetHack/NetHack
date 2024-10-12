@@ -1478,13 +1478,15 @@ restore_menu(
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                      menutext, MENU_ITEMFLAGS_SKIPMENUCOLORS);
         }
-        clet = (k <= 'n' - 'a') ? 'n' : 0; /* new game */
+        clet = (k <= 'n' - 'a') ? 'n'      /* new game */
+               : (k <= 26 + 'N' - 'A') ? 'N' : 0;
         any.a_int = -1;                    /* not >= 0 */
-        add_menu(tmpwin, &nul_glyphinfo, &any, clet, 0, ATR_NONE, clr,
+        add_menu(tmpwin, &nul_glyphinfo, &any, clet, 'N', ATR_NONE, clr,
                  "Start a new character", MENU_ITEMFLAGS_NONE);
-        clet = (k + 1 <= 'q' - 'a') ? 'q' : 0; /* quit */
+        clet = (k + 1 <= 'q' - 'a' && clet == 'n') ? 'q'  /* quit */
+               : (k + 1 <= 26 + 'Q' - 'A' && clet == 'N') ? 'Q' : 0;
         any.a_int = -2;
-        add_menu(tmpwin, &nul_glyphinfo, &any, clet, 0, ATR_NONE, clr,
+        add_menu(tmpwin, &nul_glyphinfo, &any, clet, 'Q', ATR_NONE, clr,
                  "Never mind (quit)", MENU_ITEMFLAGS_SELECTED);
         /* no prompt on end_menu, as we've done our own at the top */
         end_menu(tmpwin, (char *) 0);

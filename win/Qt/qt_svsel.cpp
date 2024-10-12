@@ -23,13 +23,9 @@
 //              ...               as many buttons as needed
 //----
 //
-// TODO?
-//  Character names are sorted alphabetically.  It would be useful to
-//  be able to sort by role or by game start date or by save date.
-//  The core fetches character names from inside the files; it could
-//  obtain the information needed for alternate sorting.  Simpler
-//  enhancement:  instead of just showing the character name, show
-//  "name-role-race-gender-alignment".
+// FIXME:
+//  If there are a lot of saved games available, the selection dialog
+//  needs vertical scrolling capability.
 //
 // Note:
 //  The code in this file is not used if the program is built without

@@ -59,4 +59,10 @@ The status window can't be resized while hitpointbar is active.
 Toggling it off, resizing as desired, then toggling it back on is a
 viable workaround.
 
+When choosing a saved game to restore ('selectsaved' option), the
+selection dialog does not provide any way to scroll if there are more
+games than will fit on the screen.  Access to "New game" and "Quit"
+isn't affected because those both have distinct buttons rather than
+rely on fake save file entries at the end of the list.
+
 -----
