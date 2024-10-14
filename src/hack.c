@@ -1899,7 +1899,7 @@ domove_attackmon_at(
         || ((hides_under(mtmp->data) || mtmp->data->mlet == S_EEL)
             && !is_safemon(mtmp))) {
         /* target monster might decide to switch places with you... */
-        *displaceu = (mtmp->data == &mons[PM_DISPLACER_BEAST] && !rn2(2)
+        *displaceu = (is_displaced(mtmp->data) && !rn2(2)
                       && mtmp->mux == u.ux0 && mtmp->muy == u.uy0
                       && !helpless(mtmp)
                       && !mtmp->meating && !mtmp->mtrapped

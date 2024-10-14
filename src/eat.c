@@ -1239,9 +1239,14 @@ cpostfx(int pm)
         }
         break;
     case PM_DISPLACER_BEAST:
+    case PM_SHIMMERING_DRAGON:
+    case PM_BABY_SHIMMERING_DRAGON:
         if (!Displaced) /* give a message (before setting the timeout) */
             toggle_displacement((struct obj *) 0, 0L, TRUE);
-        incr_itimeout(&HDisplaced, d(6, 6));
+        if (pm == PM_SHIMMERING_DRAGON)
+            incr_itimeout(&HDisplaced, rn1(300, 300));
+        else
+            incr_itimeout(&HDisplaced, d(6, 6));
         break;
     case PM_DISENCHANTER:
         /* picks an intrinsic at random and removes it; there's
