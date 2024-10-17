@@ -548,6 +548,7 @@ flip_level(
     timer_element *timer;
     boolean ball_active = FALSE, ball_fliparea = FALSE;
     stairway *stway;
+    struct exclusion_zone *ez;
 
     /* nothing to do unless (flp & 1) or (flp & 2) or both */
     if ((flp & 3) == 0)
@@ -869,6 +870,28 @@ flip_level(
             if (flp & 2)
                 tx = FlipX(tx);
             timer->arg.a_long = ((tx << 16) | ty);
+        }
+    }
+
+    /* exclusion zones */
+    for (ez = sve.exclusion_zones; ez; ez = ez->next) {
+        if (flp & 1) {
+            ez->ly = FlipY(ez->ly);
+            ez->hy = FlipY(ez->hy);
+            if (ez->ly > ez->hy) {
+                itmp = ez->ly;
+                ez->ly = ez->hy;
+                ez->hy = itmp;
+            }
+        }
+        if (flp & 2) {
+            ez->lx = FlipX(ez->lx);
+            ez->hx = FlipX(ez->hx);
+            if (ez->lx > ez->hx) {
+                itmp = ez->lx;
+                ez->lx = ez->hx;
+                ez->hx = itmp;
+            }
         }
     }
 
@@ -5430,18 +5453,27 @@ lspo_exclusion(lua_State *L)
     };
     struct exclusion_zone *ez = (struct exclusion_zone *) alloc(sizeof *ez);
     lua_Integer x1,y1,x2,y2;
+    coordxy a1,b1,a2,b2;
 
     create_des_coder();
     lcheck_param_table(L);
     ez->zonetype = ez_types2i[get_table_option(L, "type", "teleport",
                                                       ez_types)];
     get_table_region(L, "region", &x1, &y1, &x2, &y2, FALSE);
-    ez->lx = x1;
-    ez->ly = y1;
-    ez->hx = x2;
-    ez->hy = y2;
-    cvt_to_abscoord(&ez->lx, &ez->ly);
-    cvt_to_abscoord(&ez->hx, &ez->hy);
+
+    a1 = x1, b1 = y1;
+    a2 = x2, b2 = y2;
+
+    get_location_coord(&a1, &b1, ANY_LOC|NO_LOC_WARN, gc.coder->croom,
+                       SP_COORD_PACK(a1, b1));
+    get_location_coord(&a2, &b2, ANY_LOC|NO_LOC_WARN, gc.coder->croom,
+                       SP_COORD_PACK(a2, b2));
+
+    ez->lx = a1;
+    ez->ly = b1;
+    ez->hx = a2;
+    ez->hy = b2;
+
     ez->next = sve.exclusion_zones;
     sve.exclusion_zones = ez;
     return 0;
