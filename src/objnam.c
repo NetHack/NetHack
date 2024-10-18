@@ -3490,8 +3490,9 @@ set_wallprop_from_str(char *bp)
         wall_prop |= W_NONDIGGABLE;
     if (strstr(bp, "unphaseable ") || strstr(bp, "nonpasswall "))
         wall_prop |= W_NONPASSWALL;
+    /* |= because wall_info (aka flags) is overloaded with other stuff */
     if (wall_prop)
-        levl[u.ux][u.uy].wall_info = wall_prop;
+        levl[u.ux][u.uy].wall_info |= wall_prop;
 }
 
 /* in wizard mode, readobjnam() can accept wishes for traps and terrain */
@@ -3775,6 +3776,7 @@ wizterrainwish(struct _readobjnam_data *d)
             wall = VWALL;
         madeterrain = TRUE;
         lev->typ = wall;
+        lev->flags = 0;
         set_wallprop_from_str(bp);
         fix_wall_spines(max(0,u.ux-1), max(0,u.uy-1),
                         min(COLNO,u.ux+1), min(ROWNO,u.uy+1));
