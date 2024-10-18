@@ -39,7 +39,8 @@ enum level_region_types {
     LR_BRANCH,
     LR_TELE,
     LR_UPTELE,
-    LR_DOWNTELE
+    LR_DOWNTELE,
+    LR_MONGEN,
 };
 
 typedef struct dest_area { /* non-stairway level change identifier */

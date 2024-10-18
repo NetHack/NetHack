@@ -1552,6 +1552,7 @@ extern void bound_digging(void);
 extern void mkportal(coordxy, coordxy, xint16, xint16);
 extern boolean bad_location(coordxy, coordxy, coordxy, coordxy, coordxy,
                             coordxy);
+extern boolean is_exclusion_zone(xint16, coordxy, coordxy);
 /* dungeon.c u_on_rndspot() passes NULL final arg to place_lregion() */
 extern void place_lregion(coordxy, coordxy, coordxy, coordxy, coordxy,
                           coordxy, coordxy, coordxy, xint16, d_level *) NO_NNARGS;
@@ -3075,6 +3076,8 @@ extern boolean goodpos(coordxy, coordxy, struct monst *,
                        mmflags_nht) NO_NNARGS;
 extern boolean enexto(coord *, coordxy, coordxy,
                       struct permonst *) NONNULLARG1;
+extern boolean enexto_gpflags(coord *, coordxy, coordxy, struct permonst *,
+                           mmflags_nht) NONNULLARG1;
 extern boolean enexto_core(coord *, coordxy, coordxy, struct permonst *,
                            mmflags_nht) NONNULLARG1;
 extern void teleds(coordxy, coordxy, int);

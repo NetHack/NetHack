@@ -1237,7 +1237,7 @@ when a werecreature in human form attacked hero, it could transform to critter
 status highlighting for hit points didn't work as intended for up or down HP
 	changes; 'up' rule was used for both, 'down' rule was ignored
 unhide an unseen water monster using a polymorph trap on land
-allow defining random-teleport exclusion zones in lua
+allow defining random-teleport or monster-generation exclusion zones in lua
 if Magicbane cancelled a shapeshifter, forcing it to 'unshift', subsequent
 	messages continued to refer to the shifted form
 a pet that was poison resistant but not stoning resistant would eat Medusa's
@@ -1473,6 +1473,7 @@ interactively setting a status highlight for hunger with 'O' and choosing
 	use C++ regex processing but not for tty+posixregex
 a pet with the hides-under attribute could "move reluctantly over" a cursed
 	object and then hide under it
+prevent monster generation in the sokoban trap hallway
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

@@ -5446,10 +5446,10 @@ int
 lspo_exclusion(lua_State *L)
 {
     static const char *const ez_types[] = {
-        "teleport", "teleport-up", "teleport-down", NULL
+        "teleport", "teleport-up", "teleport-down", "monster-generation", NULL
     };
     static const int ez_types2i[] = {
-        LR_TELE, LR_UPTELE, LR_DOWNTELE, 0
+        LR_TELE, LR_UPTELE, LR_DOWNTELE, LR_MONGEN, 0
     };
     struct exclusion_zone *ez = (struct exclusion_zone *) alloc(sizeof *ez);
     lua_Integer x1,y1,x2,y2;

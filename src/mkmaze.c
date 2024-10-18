@@ -26,7 +26,6 @@ staticfn void stolen_booty(void);
 staticfn boolean maze_inbounds(coordxy, coordxy);
 staticfn void maze_remove_deadends(xint16);
 staticfn void populate_maze(void);
-staticfn boolean is_exclusion_zone(xint16, coordxy, coordxy);
 
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
@@ -302,7 +301,7 @@ maze0xy(coord *cc)
     return;
 }
 
-staticfn boolean
+boolean
 is_exclusion_zone(xint16 type, coordxy x, coordxy y)
 {
     struct exclusion_zone *ez = sve.exclusion_zones;

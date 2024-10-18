@@ -129,7 +129,7 @@ m_initgrp(
          * are peaceful and some are not, the result will just be a
          * smaller group.
          */
-        if (enexto(&mm, mm.x, mm.y, mtmp->data)) {
+        if (enexto_gpflags(&mm, mm.x, mm.y, mtmp->data, mmflags)) {
             mon = makemon(mtmp->data, mm.x, mm.y, (mmflags | MM_NOGRP));
             if (mon) {
                 mon->mpeaceful = FALSE;

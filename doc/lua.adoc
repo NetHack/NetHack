@@ -531,9 +531,10 @@ Example:
 === exclusion
 
 Exclude an area of the map from being randomly chosen target when
-falling or teleporting into the level.  Multiple exclusions per level are allowed.
+falling or teleporting into the level, or creating a monster.
+Multiple exclusions per level are allowed.
 
-* type is one of "teleport", "teleport-up", or "teleport-down".
+* type is one of "teleport", "teleport-up", "teleport-down", or "monster-generation".
 
 Example:
 
