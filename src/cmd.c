@@ -3507,7 +3507,7 @@ rhack(int key)
     }
 
     if (bad_command) {
-        Norep("Unknown command '%s'.", visctrl(key));
+        custompline(SUPPRESS_HISTORY, "Unknown command '%s'.", visctrl(key));
         cmdq_clear(CQ_CANNED);
         cmdq_clear(CQ_REPEAT);
     }
