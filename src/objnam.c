@@ -48,6 +48,7 @@ staticfn boolean badman(const char *, boolean);
 staticfn boolean wishymatch(const char *, const char *, boolean);
 staticfn short rnd_otyp_by_wpnskill(schar);
 staticfn short rnd_otyp_by_namedesc(const char *, char, int);
+staticfn void set_wallprop_from_str(char *) NONNULLARG1;
 staticfn struct obj *wizterrainwish(struct _readobjnam_data *);
 staticfn void dbterrainmesg(const char *, coordxy, coordxy) NONNULLARG1;
 staticfn void readobjnam_init(char *, struct _readobjnam_data *);
@@ -3479,6 +3480,20 @@ shiny_obj(char oclass)
     return (int) rnd_otyp_by_namedesc("shiny", oclass, 0);
 }
 
+/* set wall under hero undiggable/unphaseable from string */
+staticfn void
+set_wallprop_from_str(char *bp)
+{
+    int wall_prop = 0;
+
+    if (strstr(bp, "undiggable ") || strstr(bp, "nondiggable "))
+        wall_prop |= W_NONDIGGABLE;
+    if (strstr(bp, "unphaseable ") || strstr(bp, "nonpasswall "))
+        wall_prop |= W_NONPASSWALL;
+    if (wall_prop)
+        levl[u.ux][u.uy].wall_info = wall_prop;
+}
+
 /* in wizard mode, readobjnam() can accept wishes for traps and terrain */
 staticfn struct obj *
 wizterrainwish(struct _readobjnam_data *d)
@@ -3649,11 +3664,13 @@ wizterrainwish(struct _readobjnam_data *d)
     } else if (!BSTRCMPI(bp, p - 4, "tree")) {
         lev->typ = TREE;
         lev->looted = d->looted ? (TREE_LOOTED | TREE_SWARM) : 0;
+        set_wallprop_from_str(bp);
         pline("A tree.");
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 4, "bars")) {
         lev->typ = IRONBARS;
         lev->flags = 0;
+        set_wallprop_from_str(bp);
         /* [FIXME: if this isn't a wall or door location where 'horizontal'
             is already set up, that should be calculated for this spot.
             Unfortunately, it can be tricky; placing one in open space
@@ -3750,7 +3767,7 @@ wizterrainwish(struct _readobjnam_data *d)
             badterrain = TRUE;
         }
     } else if (!BSTRCMPI(bp, p - 4, "wall")
-                         && (bp == p - 4 || p[-4] == ' ')) {
+                         && (bp == p - 4 || p[-5] == ' ')) {
         schar wall = HWALL;
 
         if ((isok(u.ux, u.uy-1) && IS_WALL(levl[u.ux][u.uy-1].typ))
@@ -3758,6 +3775,7 @@ wizterrainwish(struct _readobjnam_data *d)
             wall = VWALL;
         madeterrain = TRUE;
         lev->typ = wall;
+        set_wallprop_from_str(bp);
         fix_wall_spines(max(0,u.ux-1), max(0,u.uy-1),
                         min(COLNO,u.ux+1), min(ROWNO,u.uy+1));
         pline("A wall.");
