@@ -15,6 +15,10 @@ WIZARDS=*
 # Uses the same syntax as the WIZARDS option above.
 #SHELLERS=
 
+# Execute this program whenever a new message-window message is shown.
+# The program will get the message text as the only parameter.
+#MSGHANDLER=\path\program
+
 # Show debugging information originating from these source files.
 # Use '*' for all, or list source files separated by spaces.
 # Only available if game has been compiled with DEBUG.

@@ -48,6 +48,7 @@ sys_early_init(void)
     sysopt.shellers = (char *) 0;
     sysopt.explorers = (char *) 0;
     sysopt.genericusers = (char *) 0;
+    sysopt.msghandler = (char *) 0;
     sysopt.maxplayers = 0; /* XXX eventually replace MAX_NR_OF_PLAYERS */
     sysopt.bones_pools = 0;
     sysopt.livelog = LL_NONE;
@@ -115,6 +116,8 @@ sysopt_release(void)
         free((genericptr_t) sysopt.debugfiles),
         sysopt.debugfiles = (char *) 0;
     sysopt.env_dbgfl = 0;
+    if (sysopt.msghandler)
+        free((genericptr_t) sysopt.msghandler), sysopt.msghandler = (char *) 0;
 #ifdef DUMPLOG
     if (sysopt.dumplogfile)
         free((genericptr_t) sysopt.dumplogfile), sysopt.dumplogfile=(char *) 0;

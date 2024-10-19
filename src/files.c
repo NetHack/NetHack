@@ -173,6 +173,7 @@ staticfn boolean cnf_line_catname(char *);
 #ifdef SYSCF
 staticfn boolean cnf_line_WIZARDS(char *);
 staticfn boolean cnf_line_SHELLERS(char *);
+staticfn boolean cnf_line_MSGHANDLER(char *);
 staticfn boolean cnf_line_EXPLORERS(char *);
 staticfn boolean cnf_line_DEBUGFILES(char *);
 staticfn boolean cnf_line_DUMPLOGFILE(char *);
@@ -2757,6 +2758,15 @@ cnf_line_SHELLERS(char *bufp)
 }
 
 staticfn boolean
+cnf_line_MSGHANDLER(char *bufp)
+{
+    if (sysopt.msghandler)
+        free((genericptr_t) sysopt.msghandler);
+    sysopt.msghandler = dupstr(bufp);
+    return TRUE;
+}
+
+staticfn boolean
 cnf_line_EXPLORERS(char *bufp)
 {
     if (sysopt.explorers)
@@ -3272,6 +3282,7 @@ static const struct match_config_line_stmt {
 #ifdef SYSCF
     CNFL_S(WIZARDS, 7),
     CNFL_S(SHELLERS, 8),
+    CNFL_S(MSGHANDLER, 9),
     CNFL_S(EXPLORERS, 7),
     CNFL_S(DEBUGFILES, 5),
     CNFL_S(DUMPLOGFILE, 7),

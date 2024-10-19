@@ -6064,6 +6064,10 @@ escape command (!).  The syntax is the same as WIZARDS.
 EXPLORERS\ =\ A list of users who are allowed to use the explore mode.
 The syntax is the same as WIZARDS.
 .lp
+MSGHANDLER\ =\ A path and filename of executable.  Whenever a message-window
+message is shown, NetHack runs this program.  The program will get
+the message as the only parameter.
+.lp
 MAXPLAYERS\ =\ Limit the maximum number of games that can be running
 at the same time.
 .lp

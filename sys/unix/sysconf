@@ -32,6 +32,10 @@ EXPLORERS=*
 # Uses the same syntax as the WIZARDS and EXPLORERS options above.
 #SHELLERS=
 
+# Execute this program whenever a new message-window message is shown.
+# The program will get the message text as the only parameter.
+#MSGHANDLER=/usr/bin/espeak
+
 # If the user name is found in this list, prompt for username instead.
 # Uses the same syntax as the WIZARDS option above.
 # A public server should probably disable this.

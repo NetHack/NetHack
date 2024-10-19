@@ -15,6 +15,7 @@ struct sysopt {
     char *shellers;   /* like wizards, for ! command (-DSHELL); also ^Z */
     char *genericusers; /* usernames that prompt for user name */
     char *debugfiles; /* files to show debugplines in. '*' is all. */
+    char *msghandler;
 #ifdef DUMPLOG
     char *dumplogfile; /* where the dump file is saved */
 #endif

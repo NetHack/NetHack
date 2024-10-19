@@ -641,12 +641,6 @@ typedef unsigned char uchar;
  * at least 28 additional rows beneath the status window on your terminal  */
 /* #define TTY_PERM_INVENT */
 
-/* NetHack will execute an external program whenever a new message-window
- * message is shown.  The program to execute is given in environment variable
- * NETHACK_MSGHANDLER.  It will get the message as the only parameter.
- * Only available with POSIX_TYPES, GNU C, or WIN32 */
-/* #define MSGHANDLER */
-
 /* enable status highlighting via STATUS_HILITE directives in run-time
    config file and the 'statushilites' option */
 #define STATUS_HILITES         /* support hilites of status fields */
