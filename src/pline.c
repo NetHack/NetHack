@@ -664,6 +664,8 @@ execplinehandler(const char *line)
     }
 #else
     use_pline_handler = FALSE;
+    nhUse(args);
+    nhUse(line);
 #endif
 }
 
