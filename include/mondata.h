@@ -154,6 +154,9 @@
 #define infravision(ptr) (((ptr)->mflags3 & M3_INFRAVISION))
 #define infravisible(ptr) (((ptr)->mflags3 & M3_INFRAVISIBLE))
 #define is_displacer(ptr) (((ptr)->mflags3 & M3_DISPLACES) != 0L)
+#define is_displaced(ptr) ((ptr) == &mons[PM_DISPLACER_BEAST] \
+                            || (ptr) == &mons[PM_SHIMMERING_DRAGON] \
+                            || (ptr) == &mons[PM_BABY_SHIMMERING_DRAGON])
 #define is_mplayer(ptr) \
     (((ptr) >= &mons[PM_ARCHEOLOGIST]) && ((ptr) <= &mons[PM_WIZARD]))
 #define is_watch(ptr) \

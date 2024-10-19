@@ -2153,7 +2153,7 @@ set_apparxy(struct monst *mtmp)
     }
 
     notseen = (!mtmp->mcansee || (Invis && !perceives(mtmp->data)));
-    notthere = (Displaced && mtmp->data != &mons[PM_DISPLACER_BEAST]);
+    notthere = (Displaced && !is_displaced(mtmp->data));
     /* add cases as required.  eg. Displacement ... */
     if (Underwater) {
         displ = 1;
