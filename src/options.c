@@ -8165,6 +8165,28 @@ optfn_o_bind_keys(
 }
 
 staticfn int
+optfn_o_autocomplete(
+    int optidx UNUSED, int req, boolean negated UNUSED,
+    char *opts, char *op UNUSED)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+    }
+    if (req == get_val || req == get_cnf_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, n_currently_set, count_autocompletions());
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        handler_change_autocompletions();
+    }
+    return optn_ok;
+}
+
+staticfn int
 optfn_o_menu_colors(int optidx UNUSED, int req, boolean negated UNUSED,
               char *opts, char *op UNUSED)
 {

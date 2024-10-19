@@ -1475,6 +1475,7 @@ a pet with the hides-under attribute could "move reluctantly over" a cursed
 	object and then hide under it
 prevent monster generation in the sokoban trap hallway
 change MSGHANDLER from compile-time to sysconf option
+allow changing extended command autocompletions via #optionsfull
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

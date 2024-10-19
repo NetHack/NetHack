@@ -2266,6 +2266,73 @@ handler_rebind_keys(void)
     }
 }
 
+void
+handler_change_autocompletions(void)
+{
+    winid win;
+    anything any;
+    int i, n;
+    menu_item *picks = (menu_item *) 0;
+    int clr = NO_COLOR;
+    struct ext_func_tab *ec;
+    char buf[BUFSZ];
+
+    win = create_nhwindow(NHW_MENU);
+    start_menu(win, MENU_BEHAVE_STANDARD);
+    any = cg.zeroany;
+
+    for (i = 0; i < extcmdlist_length; i++) {
+        ec = &extcmdlist[i];
+
+        if ((ec->flags & (INTERNALCMD|CMD_NOT_AVAILABLE)) != 0)
+            continue;
+        if (strlen(ec->ef_txt) < 2)
+            continue;
+
+        any.a_int = (i + 1);
+        Sprintf(buf, "%c %s: %s",
+                (ec->flags & AUTOCOMP_ADJ) ? '*' : ' ',
+                ec->ef_txt, ec->ef_desc);
+        add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr, buf,
+                 (ec->flags & AUTOCOMPLETE)
+                 ? MENU_ITEMFLAGS_SELECTED :
+                 MENU_ITEMFLAGS_NONE);
+    }
+
+    end_menu(win, "Which commands autocomplete?");
+    n = select_menu(win, PICK_ANY, &picks);
+    if (n >= 0) {
+        int j;
+
+        for (i = 0; i < extcmdlist_length; i++) {
+            boolean setit = FALSE;
+
+            ec = &extcmdlist[i];
+
+            if ((ec->flags & (INTERNALCMD|CMD_NOT_AVAILABLE)) != 0)
+                continue;
+            if (strlen(ec->ef_txt) < 2)
+                continue;
+
+            Sprintf(buf, "%s", ec->ef_txt);
+
+            for (j = 0; j < n; ++j) {
+                if (ec == &extcmdlist[(picks[j].item.a_int - 1)]) {
+                    parseautocomplete(buf, TRUE);
+                    setit = TRUE;
+                    break;
+                }
+            }
+
+            if (!setit) {
+                parseautocomplete(buf, FALSE);
+            }
+        }
+    }
+
+    destroy_nhwindow(win);
+}
+
 /* find extended command entries matching findstr.
    if findstr is NULL, returns all available entries.
    returns: number of matching extended commands,
@@ -2972,8 +3039,12 @@ parseautocomplete(char *autocomplete, boolean condition)
     /* find and modify the extended command */
     for (efp = extcmdlist; efp->ef_txt; efp++) {
         if (!strcmp(autocomplete, efp->ef_txt)) {
-            if (condition == ((efp->flags & AUTOCOMPLETE) ? FALSE : TRUE))
-                efp->flags |= AUTOCOMP_ADJ;
+            if (condition == ((efp->flags & AUTOCOMPLETE) ? FALSE : TRUE)) {
+                if ((efp->flags & AUTOCOMP_ADJ))
+                    efp->flags &= ~AUTOCOMP_ADJ;
+                else
+                    efp->flags |= AUTOCOMP_ADJ;
+            }
             if (condition)
                 efp->flags |= AUTOCOMPLETE;
             else
@@ -3002,6 +3073,20 @@ all_options_autocomplete(strbuf_t *sbuf)
                     efp->ef_txt);
             strbuf_append(sbuf, buf);
         }
+}
+
+/* return the number of changed autocompletions */
+int
+count_autocompletions(void)
+{
+    struct ext_func_tab *efp;
+    int n = 0;
+
+    for (efp = extcmdlist; efp->ef_txt; efp++)
+        if ((efp->flags & AUTOCOMP_ADJ) != 0)
+            n++;
+
+    return n;
 }
 
 /* save&clear the mouse button actions, or restore the saved ones */
