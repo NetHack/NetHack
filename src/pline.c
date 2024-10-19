@@ -625,7 +625,7 @@ static boolean use_pline_handler = TRUE;
 staticfn void
 execplinehandler(const char *line)
 {
-#if defined(POSIX_TYPES) || defined(__GNUC__)
+#if defined(UNIX) && (defined(POSIX_TYPES) || defined(__GNUC__))
     int f;
 #endif
     const char *args[3];
@@ -633,7 +633,7 @@ execplinehandler(const char *line)
     if (!use_pline_handler || !sysopt.msghandler)
         return;
 
-#if defined(POSIX_TYPES) || defined(__GNUC__)
+#if defined(UNIX) && (defined(POSIX_TYPES) || defined(__GNUC__))
     f = fork();
     if (f == 0) { /* child */
         args[0] = sysopt.msghandler;
