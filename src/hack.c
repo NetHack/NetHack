@@ -161,11 +161,11 @@ could_move_onto_boulder(coordxy sx, coordxy sy)
 
 staticfn void
 dopush(
-    coordxy sx, 
-    coordxy sy, 
-    coordxy rx, 
-    coordxy ry, 
-    struct obj *otmp, 
+    coordxy sx,
+    coordxy sy,
+    coordxy rx,
+    coordxy ry,
+    struct obj *otmp,
     boolean costly)
 {
     struct monst *shkp;
