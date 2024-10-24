@@ -8,6 +8,7 @@
 #include "config.h"
 #include "dlb.h"
 #include "hacklib.h"
+#include "hack.h"
 
 #if !defined(O_WRONLY) && !defined(MAC) && !defined(AZTEC_C)
 #include <fcntl.h>
@@ -18,7 +19,7 @@
 
 ATTRNORETURN static void xexit(int) NORETURN;
 ATTRNORETURN extern void panic(const char *, ...) NORETURN;
-FILE *fopen_datafile(const char *, const char *);
+FILE *fopen_datafile(const char *, const char *, int);
 
 #ifdef DLB
 #ifdef DLBLIB
@@ -134,8 +135,9 @@ Write(int out, char *buf, long len)
 
 /* open_library(dlb.c) needs this (which normally comes from src/files.c) */
 FILE *
-fopen_datafile(const char *filename, const char *mode)
+fopen_datafile(const char *filename, const char *mode, int prefix)
 {
+    assert(prefix == DATAPREFIX);
     return fopen(filename, mode);
 }
 
