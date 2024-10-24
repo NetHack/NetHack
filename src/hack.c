@@ -9,6 +9,8 @@
 /* #define DEBUG */ /* uncomment for debugging */
 
 staticfn boolean could_move_onto_boulder(coordxy, coordxy);
+staticfn void dopush(coordxy, coordxy, coordxy, coordxy, struct obj *,
+                     boolean);
 staticfn void cannot_push_msg(struct obj *, coordxy, coordxy);
 staticfn int cannot_push(struct obj *, coordxy, coordxy);
 staticfn void moverock_done(coordxy, coordxy);
@@ -158,6 +160,87 @@ could_move_onto_boulder(coordxy sx, coordxy sy)
 }
 
 staticfn void
+dopush(
+    coordxy sx, 
+    coordxy sy, 
+    coordxy rx, 
+    coordxy ry, 
+    struct obj *otmp, 
+    boolean costly)
+{
+    struct monst *shkp;
+
+    {
+        const char *what;
+        boolean givemesg, easypush;
+        /* give boulder pushing feedback if this is a different
+           boulder than the last one pushed or if it's been at
+           least 2 turns since we last pushed this boulder;
+           unlike with Norep(), intervening messages don't cause
+           it to repeat, only doing something else in the meantime */
+        if (otmp->o_id != gb.bldrpush_oid) {
+            gb.bldrpushtime = svm.moves + 1L;
+            gb.bldrpush_oid = otmp->o_id;
+        }
+        givemesg = (svm.moves > gb.bldrpushtime + 2L
+                    || svm.moves < gb.bldrpushtime);
+        what = givemesg ? the(xname(otmp)) : 0;
+        if (!u.usteed) {
+            easypush = throws_rocks(gy.youmonst.data);
+            if (givemesg)
+                pline("With %s effort you move %s.",
+                      easypush ? "little" : "great", what);
+            if (!easypush)
+                exercise(A_STR, TRUE);
+        } else {
+            if (givemesg)
+                pline("%s moves %s.", YMonnam(u.usteed), what);
+        }
+        gb.bldrpushtime = svm.moves;
+    }
+
+    /* Move the boulder *after* the message. */
+    if (glyph_is_invisible(levl[rx][ry].glyph))
+        unmap_object(rx, ry);
+    otmp->next_boulder = 0;
+    movobj(otmp, rx, ry); /* does newsym(rx,ry) */
+    if (Blind) {
+        feel_location(rx, ry);
+        feel_location(sx, sy);
+    } else {
+        newsym(sx, sy);
+    }
+    /* maybe adjust bill if boulder was pushed across shop boundary;
+       normally otmp->unpaid would not apply because otmp isn't in
+       hero's inventory, but addtobill() sets it and subfrombill()
+       clears it */
+    if (costly && !costly_spot(rx, ry)) {
+        /* pushing from inside shop to its boundary (or free spot) */
+        addtobill(otmp, FALSE, FALSE, FALSE);
+    } else if (!costly && costly_spot(rx, ry) && otmp->unpaid
+               && ((shkp = shop_keeper(*in_rooms(rx, ry, SHOPBASE)))
+                   != 0)
+               && onshopbill(otmp, shkp, TRUE)) {
+        /* this can happen if hero pushes boulder from farther inside
+           shop into shop's free spot (which will add it to the bill),
+           then teleports or Passes_walls to doorway (without exiting
+           the shop), and then pushes the boulder from the free spot
+           back into the shop; it's contingent upon the shopkeeper not
+           "muttering an incantation" to fracture the boulder while it
+           is unpaid at the free spot */
+        subfrombill(otmp, shkp);
+    } else if (otmp->unpaid
+               && (shkp = find_objowner(otmp, sx, sy)) != 0
+               && !strchr(in_rooms(rx, ry, SHOPBASE),
+                          ESHK(shkp)->shoproom)) {
+        /* once the boulder is fully out of the shop, so that it's
+         * impossible to change your mind and push it back in without
+         * leaving and triggering Kops, switch it to stolen_value */
+        stolen_value(otmp, sx, sy, TRUE, FALSE);
+    }
+}
+
+staticfn void
 cannot_push_msg(struct obj *otmp, coordxy sx, coordxy sy)
 {
     const char *what;
@@ -252,8 +335,7 @@ moverock_core(coordxy sx, coordxy sy)
     coordxy rx, ry;
     struct obj *otmp;
     struct trap *ttmp;
-    struct monst *mtmp, *shkp;
-    const char *what;
+    struct monst *mtmp;
     boolean costly, firstboulder = TRUE;
 
     while ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
@@ -472,8 +554,10 @@ moverock_core(coordxy sx, coordxy sy)
                        that if in single-level branch (Knox) or in endgame */
                     newlev = random_teleport_level();
                     /* if trap doesn't work, skip "disappears" message */
-                    if (newlev == depth(&u.uz))
-                        goto dopush;
+                    if (newlev == depth(&u.uz)) {
+                        dopush(sx, sy, rx, ry, otmp, costly);
+                        continue;
+                    }
                     /*FALLTHRU*/
                 case TELEP_TRAP:
                     if (u.usteed)
@@ -513,75 +597,7 @@ moverock_core(coordxy sx, coordxy sy)
                 remove_object(otmp);
                 place_object(otmp, otmp->ox, otmp->oy);
             }
-
-            {
-                boolean givemesg, easypush;
- dopush:
-                /* give boulder pushing feedback if this is a different
-                   boulder than the last one pushed or if it's been at
-                   least 2 turns since we last pushed this boulder;
-                   unlike with Norep(), intervening messages don't cause
-                   it to repeat, only doing something else in the meantime */
-                if (otmp->o_id != gb.bldrpush_oid) {
-                    gb.bldrpushtime = svm.moves + 1L;
-                    gb.bldrpush_oid = otmp->o_id;
-                }
-                givemesg = (svm.moves > gb.bldrpushtime + 2L
-                            || svm.moves < gb.bldrpushtime);
-                what = givemesg ? the(xname(otmp)) : 0;
-                if (!u.usteed) {
-                    easypush = throws_rocks(gy.youmonst.data);
-                    if (givemesg)
-                        pline("With %s effort you move %s.",
-                              easypush ? "little" : "great", what);
-                    if (!easypush)
-                        exercise(A_STR, TRUE);
-                } else {
-                    if (givemesg)
-                        pline("%s moves %s.", YMonnam(u.usteed), what);
-                }
-                gb.bldrpushtime = svm.moves;
-            }
-
-            /* Move the boulder *after* the message. */
-            if (glyph_is_invisible(levl[rx][ry].glyph))
-                unmap_object(rx, ry);
-            otmp->next_boulder = 0;
-            movobj(otmp, rx, ry); /* does newsym(rx,ry) */
-            if (Blind) {
-                feel_location(rx, ry);
-                feel_location(sx, sy);
-            } else {
-                newsym(sx, sy);
-            }
-            /* maybe adjust bill if boulder was pushed across shop boundary;
-               normally otmp->unpaid would not apply because otmp isn't in
-               hero's inventory, but addtobill() sets it and subfrombill()
-               clears it */
-            if (costly && !costly_spot(rx, ry)) {
-                /* pushing from inside shop to its boundary (or free spot) */
-                addtobill(otmp, FALSE, FALSE, FALSE);
-            } else if (!costly && costly_spot(rx, ry) && otmp->unpaid
-                       && ((shkp = shop_keeper(*in_rooms(rx, ry, SHOPBASE)))
-                           != 0)
-                       && onshopbill(otmp, shkp, TRUE)) {
-                /* this can happen if hero pushes boulder from farther inside
-                   shop into shop's free spot (which will add it to the bill),
-                   then teleports or Passes_walls to doorway (without exiting
-                   the shop), and then pushes the boulder from the free spot
-                   back into the shop; it's contingent upon the shopkeeper not
-                   "muttering an incantation" to fracture the boulder while it
-                   is unpaid at the free spot */
-                subfrombill(otmp, shkp);
-            } else if (otmp->unpaid
-                       && (shkp = find_objowner(otmp, sx, sy)) != 0
-                       && !strchr(in_rooms(rx, ry, SHOPBASE),
-                                  ESHK(shkp)->shoproom)) {
-                /* once the boulder is fully out of the shop, so that it's
-                 * impossible to change your mind and push it back in without
-                 * leaving and triggering Kops, switch it to stolen_value */
-                stolen_value(otmp, sx, sy, TRUE, FALSE);
-            }
+            dopush(sx, sy, rx, ry, otmp, costly);
         } else {
             cannot_push_msg(otmp, sx, sy);
             return cannot_push(otmp, sx, sy);
