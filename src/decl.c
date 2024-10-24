@@ -146,8 +146,6 @@ NEARDATA long yn_number = 0L;
 const char *ARGV0;
 #endif
 
-#define IVMAGIC 0xdeadbeef
-
 static const struct Role urole_init_data = {
     { "Undefined", 0 },
     { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 },
@@ -228,7 +226,6 @@ static const struct instance_globals_a g_init_a = {
     /* trap.c */
     { 0, 0, FALSE }, /* acid_ctx */
     TRUE, /* havestate*/
-    IVMAGIC  /* a_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_b g_init_b = {
@@ -261,7 +258,6 @@ static const struct instance_globals_b g_init_b = {
     FALSE, /* bot_disabled */
 
     TRUE, /* havestate*/
-    IVMAGIC  /* b_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_c g_init_c = {
@@ -312,7 +308,6 @@ static const struct instance_globals_c g_init_c = {
     /* uhitm.c */
     NON_PM, /* corpsenm_digested */
     TRUE, /* havestate*/
-    IVMAGIC  /* c_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_d g_init_d = {
@@ -340,7 +335,6 @@ static const struct instance_globals_d g_init_d = {
     FALSE, /* decor_fumble_override */
     FALSE, /* decor_levitate_override */
     TRUE, /* havestate*/
-    IVMAGIC  /* d_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_e g_init_e = {
@@ -355,7 +349,6 @@ static const struct instance_globals_e g_init_e = {
     /* new */
     0,      /* early_raw_messages */
     TRUE, /* havestate*/
-    IVMAGIC  /* e_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_f g_init_f = {
@@ -374,7 +367,6 @@ static const struct instance_globals_f g_init_f = {
     /* shk.c */
     0L, /* followmsg */
     TRUE, /* havestate*/
-    IVMAGIC  /* f_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_g g_init_g = {
@@ -411,7 +403,6 @@ static const struct instance_globals_g g_init_g = {
     /* per-level glyph mapping flags */
     0L,     /* glyphmap_perlevel_flags */
     TRUE, /* havestate*/
-    IVMAGIC  /* g_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_h g_init_h = {
@@ -430,7 +421,6 @@ static const struct instance_globals_h g_init_h = {
     NULL, /* hitmsg_prev */
     /* save.c */
     TRUE, /* havestate*/
-    IVMAGIC  /* h_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_i g_init_i = {
@@ -453,14 +443,12 @@ static const struct instance_globals_i g_init_i = {
     FALSE, /* in_mk_themerooms */
 
     TRUE, /* havestate*/
-    IVMAGIC  /* i_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_j g_init_j = {
     /* apply.c */
     0,  /* jumping_is_magic */
     TRUE, /* havestate*/
-    IVMAGIC  /* j_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_k g_init_k = {
@@ -470,7 +458,6 @@ static const struct instance_globals_k g_init_k = {
     /* read.c */
     UNDEFINED_VALUE, /* known */
     TRUE, /* havestate*/
-    IVMAGIC  /* k_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_l g_init_l = {
@@ -520,7 +507,6 @@ static const struct instance_globals_l g_init_l = {
     DUMMY,   /* lua_ver[LUA_VER_BUFSIZ] */
     DUMMY,   /* lua_copyright[LUA_COPYRIGHT_BUFSIZ] */
     TRUE, /* havestate*/
-    IVMAGIC  /* l_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_m g_init_m = {
@@ -569,7 +555,6 @@ static const struct instance_globals_m g_init_m = {
     /* trap.c */
     FALSE, /* mentioned_water */
     TRUE, /* havestate*/
-    IVMAGIC  /* m_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_n g_init_n = {
@@ -604,7 +589,6 @@ static const struct instance_globals_n g_init_n = {
     STRANGE_OBJECT, /* nocreate3 */
     STRANGE_OBJECT, /* nocreate4 */
     TRUE, /* havestate*/
-    IVMAGIC  /* n_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_o g_init_o = {
@@ -648,7 +632,6 @@ static const struct instance_globals_o g_init_o = {
     /* zap.c */
     FALSE,  /* obj_zapped */
     TRUE, /* havestate*/
-    IVMAGIC  /* o_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_p g_init_p = {
@@ -684,12 +667,10 @@ static const struct instance_globals_p g_init_p = {
     /* zap.c */
     UNDEFINED_VALUE, /* poly_zap */
     TRUE, /* havestate*/
-    IVMAGIC  /* p_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_q g_init_q = {
     TRUE, /* havestate*/
-    IVMAGIC  /* q_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_r g_init_r = {
@@ -710,7 +691,6 @@ static const struct instance_globals_r g_init_r = {
     /* shk.c */
     UNDEFINED_VALUES, /* repo */
     TRUE, /* havestate*/
-    IVMAGIC  /* r_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_s g_init_s = {
@@ -767,7 +747,6 @@ static const struct instance_globals_s g_init_s = {
     /* vision.c */
     0, /* seethru */
     TRUE, /* havestate*/
-    IVMAGIC  /* s_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_t g_init_t = {
@@ -802,7 +781,6 @@ static const struct instance_globals_t g_init_t = {
     0, /* twohits */
     /**/
     TRUE, /* havestate*/
-    IVMAGIC  /* t_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_u g_init_u = {
@@ -816,7 +794,6 @@ static const struct instance_globals_u g_init_u = {
     /* save.c */
     { 0, 0 }, /* uz_save */
     TRUE, /* havestate*/
-    IVMAGIC  /* u_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_v g_init_v = {
@@ -842,7 +819,6 @@ static const struct instance_globals_v g_init_v = {
     FALSE, /* vision_full_recalc */
     UNDEFINED_VALUES,  /* voice */
     TRUE, /* havestate*/
-    IVMAGIC  /* v_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_w g_init_w = {
@@ -860,7 +836,6 @@ static const struct instance_globals_w g_init_w = {
     /* new */
     { wdmode_traditional, NO_COLOR },       /* wsettings */
     TRUE, /* havestate*/
-    IVMAGIC  /* w_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_x g_init_x = {
@@ -874,7 +849,6 @@ static const struct instance_globals_x g_init_x = {
     UNDEFINED_VALUE, /* xstart */
     UNDEFINED_VALUE, /* xsize */
     TRUE, /* havestate*/
-    IVMAGIC  /* x_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_y g_init_y = {
@@ -888,7 +862,6 @@ static const struct instance_globals_y g_init_y = {
     UNDEFINED_VALUE, /* ystart */
     UNDEFINED_VALUE, /* ysize */
     TRUE, /* havestate*/
-    IVMAGIC  /* y_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_z g_init_z = {
@@ -897,7 +870,6 @@ static const struct instance_globals_z g_init_z = {
     /* muse.c */
     FALSE, /* zap_oseen */
     TRUE, /* havestate*/
-    IVMAGIC  /* z_magic to validate that structure layout has been preserved */
 };
 
 static const struct instance_globals_saved_b init_svb = {
@@ -1092,12 +1064,6 @@ const struct const_globals cg = {
 
 #define MAGICCHECK(xx) \
     do {                                                                   \
-        if ((xx).magic != IVMAGIC) {                                       \
-            raw_printf(                                                    \
-                 "decl_globals_init: %s.magic in unexpected state (%lx).", \
-                       #xx, (xx).magic);                                   \
-            exit(1);                                                       \
-        }                                                                  \
         if ((xx).havestate != TRUE) {                                      \
             raw_printf(                                                    \
                  "decl_globals_init: %s.havestate not True.", #xx);        \
