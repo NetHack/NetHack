@@ -331,7 +331,7 @@ m_initweap(struct monst *mtmp)
     case S_ANGEL:
         if (humanoid(ptr)) {
             /* create minion stuff; bypass mongets */
-            int typ = rn2(3) ? LONG_SWORD : MACE;
+            int typ = rn2(3) ? LONG_SWORD : SILVER_MACE;
             const char *nam = (typ == LONG_SWORD) ? "Sunsword" : "Demonbane";
 
             otmp = mksobj(typ, FALSE, FALSE);
@@ -346,7 +346,7 @@ m_initweap(struct monst *mtmp)
             /* make long sword be +0 to +3, mace be +3 to +6 to compensate
                for being significantly weaker against large opponents */
             otmp->spe = rn2(4);
-            if (typ == MACE)
+            if (typ == SILVER_MACE)
                 otmp->spe += 3;
             (void) mpickobj(mtmp, otmp);
 
