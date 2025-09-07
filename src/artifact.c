@@ -175,7 +175,7 @@ mk_artifact(
     boolean adjust_spe)  /* whether to add spe to situational artifacts */
 {
     const struct artifact *a;
-    int m, n, altn;
+    int m, n, altn, chance;
     boolean by_align = (alignment != A_NONE);
     short o_typ = (by_align || !otmp) ? 0 : otmp->otyp;
     boolean unique = !by_align && otmp && objects[o_typ].oc_unique;
@@ -225,14 +225,17 @@ mk_artifact(
             }
 
             /* found something to consider for random selection */
-            if ((a->alignment != A_NONE || u.ugifts > 0 || !rn2(3)) &&
+            chance = max(10 - (max_giftvalue - a->gift_value), 1)
+            if ((rn2(10) < chance) &&
+                (a->alignment != A_NONE || u.ugifts > 0 || !rn2(3)) &&
                 (!rn2(4) || skill_compatibility >= P_SKILLED ||
                  (skill_compatibility >= P_BASIC && rn2(2)))) {
                 /* right alignment, or non-aligned with at least 1
                    previous gift bestowed, makes this one viable;
                    unaligned artifacts are possible even as the first
                    gift, but less likely; if it's a bad weapon type
-                   for the role that also makes it less likely */
+                   for the role or too weak for the point in time
+                   that also makes it less likely */
                 eligible[n++] = m;
             } else {
                 /* if no candidates have been found yet, record
