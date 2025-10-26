@@ -429,15 +429,13 @@ Run-time configuration options were discussed above and use a platform
 specific name for a file in a platform specific location.
 For Unix, the
 name is '.nethackrc' in the user's home directory.
-
-.br
+.PP
 All other files are in the playground directory,
 normally /usr/games/lib/nethackdir.
 If DLB was defined during the compile, the data files and special levels
 will be inside a larger file, normally nhdat, instead of being separate
 files.
-
-.br
+.PP
 .DT
 .\" continuation lines begin with <backslash><space><tab>
 .ta \w'cmdhelp, opthelp, wizhelp\ \ \ 'u
@@ -528,16 +526,13 @@ sysconf	System-wide options.  Required if
 \ 	program is built with 'SYSCF' option
 .br
 \ 	enabled, ignored if not.
-.br
-
+.PP
 The location of 'sysconf' is specified at build time and can't be changed
 except by updating source file "config.h" and rebuilding the program.
-.br
-
+.PP
 NetHack's Guidebook might not be present if whoever packaged or installed
 the program distribution neglected to include it.
-.br
-
+.PP
 In a perfect world, 'paniclog' would remain empty.
 .SH ENVIRONMENT
 .DT
@@ -561,12 +556,10 @@ MAILREADER	Replacement for default reader
 NETHACKDIR or HACKDIR	Playground.
 .br
 NETHACKOPTIONS	String predefining several NetHack options.
-.br
-
+.PP
 If the same option is specified in both NETHACKOPTIONS and .nethackrc,
 the value assigned in NETHACKOPTIONS takes precedence.
-.br
-
+.PP
 SHOPTYPE and SPLEVTYPE can be used in debugging (wizard) mode.
 .br
 DEBUGFILES can be used if the program was built with 'DEBUG' enabled.
