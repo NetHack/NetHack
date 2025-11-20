@@ -4477,7 +4477,7 @@ lspo_gold(lua_State *L)
     if (argc == 3) {
         amount = luaL_checkinteger(L, 1);
         x = gldx = luaL_checkinteger(L, 2);
-        y = gldy = luaL_checkinteger(L, 2);
+        y = gldy = luaL_checkinteger(L, 3);
     } else if (argc == 2 && lua_type(L, 2) == LUA_TTABLE) {
         amount = luaL_checkinteger(L, 1);
         (void) get_coord(L, 2, &gldx, &gldy);
