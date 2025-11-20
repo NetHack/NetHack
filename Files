@@ -548,6 +548,10 @@ sys/windows/vs/makedefs:
 (files for Visual Studio Community builds)
 aftermakedefs.proj  makedefs.vcxproj
 
+sys/windows/vs/nhlua_h:
+(file for Visual Studio Community builds)
+nhlua_h.vcxproj
+
 sys/windows/vs/package:
 (files for Visual Studio Community builds)
 package.nmake    package.vcxproj

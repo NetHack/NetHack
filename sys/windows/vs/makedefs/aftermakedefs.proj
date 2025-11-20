@@ -2,12 +2,12 @@
   <Import Project="..\dirs.props"/>
   <Import Project="$(vsDir)files.props"/>
   <Target Name="Build"
-     Inputs="$(ToolsDir)makedefs.exe"
+     Inputs="$(ToolsDir)$(HostTools)makedefs.exe"
 	 Outputs="@(Defs)">
-	<Exec Command="&quot;$(ToolsDir)makedefs.exe&quot; -d" WorkingDirectory="$(DatDir)"/>
-	<Exec Command="&quot;$(ToolsDir)makedefs.exe&quot; -r" WorkingDirectory="$(DatDir)"/>
-	<Exec Command="&quot;$(ToolsDir)makedefs.exe&quot; -s" WorkingDirectory="$(DatDir)"/>
-	<Exec Command="&quot;$(ToolsDir)makedefs.exe&quot; -h" WorkingDirectory="$(DatDir)"/>
+	<Exec Command="&quot;$(ToolsDir)$(HostTools)makedefs.exe&quot; -d" WorkingDirectory="$(DatDir)"/>
+	<Exec Command="&quot;$(ToolsDir)$(HostTools)makedefs.exe&quot; -r" WorkingDirectory="$(DatDir)"/>
+	<Exec Command="&quot;$(ToolsDir)$(HostTools)makedefs.exe&quot; -s" WorkingDirectory="$(DatDir)"/>
+	<Exec Command="&quot;$(ToolsDir)$(HostTools)makedefs.exe&quot; -h" WorkingDirectory="$(DatDir)"/>
   </Target>
   <Target Name="Clean">
 	<Delete Files="@(Defs)"/>

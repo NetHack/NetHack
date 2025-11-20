@@ -67,7 +67,8 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalOptions>/Gs /Oi- /w44774 /w45262 %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4244;4245;4310;4706;4820;4324</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Platform)'=='ARM64'">4100;4244;4245;4310;4706;4820;4324</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Platform)'!='ARM64'">4244;4245;4310;4706;4820;4324</DisableSpecificWarnings>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>

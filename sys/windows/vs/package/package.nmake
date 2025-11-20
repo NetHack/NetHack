@@ -22,6 +22,7 @@ NHV=$(NHV:"=)
 #SUBMSDIR=submodules      # NetHack git submodules
 PACKAGESDIR=vspackage     # put in vspackage to distinguish
 ROOTDIR=..\..\..\..       # root of NetHack tree relative to project file
+PlatformFileName=$(lowercase $(PlatformShortName))
 
 # Directories we might have to collect things from
 #
@@ -74,8 +75,8 @@ FILESTOZIP=$(VSBINDIR)\Guidebook.txt $(VSBINDIR)\license \
 DBGSYMS = NetHack.PDB NetHackW.PDB
 PDBTOZIP = ..\NetHack\symbols\$(Configuration)\$(Platform)\NetHack.PDB \
 	   ..\NetHackW\symbols\$(Configuration)\$(Platform)\NetHackW.PDB
-MAINZIP = $(VSPACKAGEDIR)\nethack-$(NHV)-win-$(PlatformShortName).zip
-DBGSYMZIP = $(VSPACKAGEDIR)\nethack-$(NHV)-win-$(PlatformShortName)-debugsymbols.zip
+MAINZIP = $(VSPACKAGEDIR)\nethack-$(NHV)-win-$(PlatformFileName).zip
+DBGSYMZIP = $(VSPACKAGEDIR)\nethack-$(NHV)-win-$(PlatformFileName)-debugsymbols.zip
 
 packageall: packagezip
 
