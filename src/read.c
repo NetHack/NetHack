@@ -2637,6 +2637,7 @@ do_class_genocide(void)
         class = name_to_monclass(buf, (int *) 0);
         if (class == 0 && (i = name_to_mon(buf, (int *) 0)) != NON_PM)
             class = mons[i].mlet;
+
         immunecnt = gonecnt = goodcnt = 0;
         for (i = LOW_PM; i < NUMMONS; i++) {
             if (mons[i].mlet == class) {
@@ -2648,6 +2649,24 @@ do_class_genocide(void)
                     goodcnt++;
             }
         }
+
+        if (immunecnt + gonecnt + goodcnt == 0) {
+            pline("That %s does not represent any monster.",
+                  strlen(buf) == 1 ? "symbol" : "response");
+            continue;
+        }
+
+        if (ParanoidGenocide) {
+            boolean ok;
+            snprintf(promptbuf, sizeof promptbuf,
+                    "Are you sure you want to genocide all '%c' monsters?",
+                    def_monsyms[class].sym);
+            ok = paranoid_query(ParanoidGenocide, promptbuf);
+            if (!ok) {
+                continue;
+            }
+        }
+
         if (!goodcnt && class != mons[gu.urole.mnum].mlet
             && class != mons[gu.urace.mnum].mlet) {
             if (gonecnt)
@@ -2667,9 +2686,7 @@ do_class_genocide(void)
                 }
                 pline("Eliminated %d monster%s.", gonecnt, plur(gonecnt));
                 return;
-            } else
-                pline("That %s does not represent any monster.",
-                      strlen(buf) == 1 ? "symbol" : "response");
+            }
             continue;
         }
 
