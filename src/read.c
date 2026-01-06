@@ -2661,6 +2661,7 @@ do_class_genocide(void)
             snprintf(promptbuf, sizeof promptbuf,
                     "Are you sure you want to genocide all '%c' monsters?",
                     def_monsyms[class].sym);
+            promptbuf[sizeof promptbuf - 1] = 0;
             ok = paranoid_query(ParanoidGenocide, promptbuf);
             if (!ok) {
                 continue;
@@ -2863,6 +2864,17 @@ do_genocide(
                 continue;
             }
             ptr = &mons[mndx];
+            if (ParanoidGenocide) {
+                boolean ok;
+                snprintf(promptbuf, sizeof promptbuf,
+                        "Are you sure you want to genocide all %s?",
+                        makeplural(ptr->pmnames[NEUTRAL]));
+                promptbuf[sizeof promptbuf - 1] = 0;
+                ok = paranoid_query(ParanoidGenocide, promptbuf);
+                if (!ok) {
+                    continue;
+                }
+            }
             /* first revert if current shifted form or base vampire form */
             if (Upolyd && vampshifted(&gy.youmonst)
                 && (mndx == u.umonnum || mndx == gy.youmonst.cham))
