@@ -194,6 +194,8 @@ static const struct paranoia_opts {
     { PARANOID_REMOVE, "Remove", 1, "Takeoff", 1,
       /* normally when there is only 1 candidate it's chosen automatically */
       "always pick from inventory for Remove and Takeoff" },
+    { PARANOID_GENOCIDE, "genocide", 1, NULL, 0,
+      "y required to genocide monsters" },
     /* for config file parsing; interactive menu skips these */
     { 0, "none", 4, 0, 0, 0 }, /* require full word match */
     { ~0, "all", 3, 0, 0, 0 }, /* ditto */

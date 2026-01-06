@@ -90,6 +90,7 @@ struct flag {
 #define PARANOID_SWIM       0x0400
 #define PARANOID_TRAP       0x0800
 #define PARANOID_AUTOALL    0x1000
+#define PARANOID_GENOCIDE   0x2000
     unsigned versinfo; /* flag mask for 'showvers' option */
     /* mask bits for 'versinfo'; numeric order does not match display order
        which is "name branch number" */
@@ -565,6 +566,8 @@ enum runmode_types {
 #define ParanoidTrap ((flags.paranoia_bits & PARANOID_TRAP) != 0)
 /* Require confirmation for choosing 'A' in class menu for menustyle:Full */
 #define ParanoidAutoAll ((flags.paranoia_bits & PARANOID_AUTOALL) != 0U)
+/* Require confirmation to genocide a monster */
+#define ParanoidGenocide ((flags.paranoia_bits & PARANOID_GENOCIDE) != 0U)
 
 /* command parsing, mainly dealing with number_pad handling;
    not saved and restored */
