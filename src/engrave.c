@@ -370,18 +370,26 @@ read_engr_at(coordxy x, coordxy y)
 
         if (sensed) {
             char *et, buf[BUFSZ];
+            const char *endpunct;
             int maxelen = (int) (sizeof buf
                                  /* sizeof "literal" counts terminating \0 */
-                                 - sizeof "You feel the words: \"\".");
+                                 - sizeof "You feel the words: \"\"."),
+                elen = (int) strlen(ep->engr_txt[actual_text]);
 
-            if ((int) strlen(ep->engr_txt[actual_text]) > maxelen) {
+            if (elen > maxelen) {
                 (void) strncpy(buf, ep->engr_txt[actual_text], maxelen);
                 buf[maxelen] = '\0';
                 et = buf;
+                elen = maxelen;
             } else {
                 et = ep->engr_txt[actual_text];
             }
-            You("%s: \"%s\".", (Blind) ? "feel the words" : "read", et);
+            endpunct = "";
+            if (elen > 0 && !strchr(".!?", et[elen - 1])) {
+                endpunct = ".";
+            }
+            You("%s: \"%s\"%s", (Blind) ? "feel the words" : "read", et,
+                endpunct);
             Strcpy(ep->engr_txt[remembered_text], ep->engr_txt[actual_text]);
             ep->eread = 1;
             ep->erevealed = 1;
