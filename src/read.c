@@ -2659,8 +2659,8 @@ do_class_genocide(void)
         if (ParanoidGenocide) {
             boolean ok;
             snprintf(promptbuf, sizeof promptbuf,
-                    "Are you sure you want to genocide all '%c' monsters?",
-                    def_monsyms[class].sym);
+                     "Are you sure you want to genocide all '%c' monsters?",
+                     def_monsyms[class].sym);
             promptbuf[sizeof promptbuf - 1] = 0;
             ok = paranoid_query(ParanoidGenocide, promptbuf);
             if (!ok) {
@@ -2867,8 +2867,8 @@ do_genocide(
             if (ParanoidGenocide) {
                 boolean ok;
                 snprintf(promptbuf, sizeof promptbuf,
-                        "Are you sure you want to genocide all %s?",
-                        makeplural(ptr->pmnames[NEUTRAL]));
+                         "Are you sure you want to genocide all %s?",
+                         makeplural(ptr->pmnames[NEUTRAL]));
                 promptbuf[sizeof promptbuf - 1] = 0;
                 ok = paranoid_query(ParanoidGenocide, promptbuf);
                 if (!ok) {
