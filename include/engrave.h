@@ -13,6 +13,8 @@ enum engraving_texts {
     text_states
 };
 
+#define engr_text_space(ep) ((char *) ((ep) + 1))
+
 struct engr {
     struct engr *nxt_engr;
     char *engr_txt[text_states];
