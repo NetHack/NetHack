@@ -895,4 +895,319 @@ start: Enhanced1
 	G_trwall_mines: U+251C/113-126-142
 finish
 
+# Korean Hangul/Hanja symbols for better readability
+# Uses intuitive Korean characters: Hangul for common words,
+# Hanja for basic ideographs, and Korean jamo for shape similarity
+start: Korean
+	Description: Korean Hangul/Hanja symbols
+	Handling: UTF8
+	# === Dungeon structure ===
+	S_vwall: U+2502                     # │ vertical wall
+	S_hwall: U+2500                     # ─ horizontal wall
+	S_tlcorn: U+250c                    # ┌ top left corner
+	S_trcorn: U+2510                    # ┐ top right corner
+	S_blcorn: U+2514                    # └ bottom left corner
+	S_brcorn: U+2518                    # ┘ bottom right corner
+	S_crwall: U+253c                    # ┼ cross wall
+	S_tuwall: U+2534                    # ┴ T up
+	S_tdwall: U+252c                    # ┬ T down
+	S_tlwall: U+2524                    # ┤ T left
+	S_trwall: U+251c                    # ├ T right
+	S_room: U+00b7                      # · room floor
+	S_darkroom: U+00b7                  # · dark room
+	S_corr: U+2591                      # ░ corridor
+	S_litcorr: U+2592                   # ▒ lit corridor
+	S_upstair: U+4E0A                   # 上 upstairs (basic hanja)
+	S_dnstair: U+4E0B                   # 下 downstairs (basic hanja)
+	S_upladder: U+4E0A                  # 上 up ladder
+	S_dnladder: U+4E0B                  # 下 down ladder
+	S_altar: U+3160                     # ㅠ altar (jamo shape)
+	S_grave: U+BB18                     # 묘 grave (hangul intuitive)
+	S_throne: U+738B                    # 王 throne (basic hanja)
+	S_sink: U+C2F1                      # 싱 sink (hangul abbrev)
+	S_fountain: U+6C34                  # 水 fountain (basic hanja)
+	S_pool: U+BABb                      # 못 pool (hangul intuitive)
+	S_ice: U+BE59                       # 빙 ice (hangul intuitive)
+	S_lava: U+706B                      # 火 lava (basic hanja)
+	S_lavawall: U+706B                  # 火 lava wall
+	S_vodoor: U+BB38                    # 문 vertical door (hangul)
+	S_hodoor: U+BB38                    # 문 horizontal door (hangul)
+	S_vcdoor: U+BB38                    # 문 vertical closed door
+	S_hcdoor: U+BB38                    # 문 horizontal closed door
+	S_ndoor: U+00b7                     # · no door
+	S_tree: U+6728                      # 木 tree (basic hanja)
+	S_cloud: U+BEAD                     # 뭉 cloud (hangul onomatopoeia)
+	S_water: U+6C34                     # 水 water (basic hanja)
+	S_air: U+2591                       # ░ air
+	# === Object classes ===
+	S_weapon: U+5200                    # 刀 weapon (basic hanja)
+	S_armor: U+7532                     # 甲 armor (basic hanja)
+	S_ring: U+3147                      # ㅇ ring (jamo shape)
+	S_amulet: U+BAA9                    # 목 amulet/necklace (hangul abbrev)
+	S_potion: U+C57D                    # 약 potion (hangul intuitive)
+	S_scroll: U+AE00                    # 글 scroll (hangul intuitive)
+	S_book: U+CC45                      # 책 book (hangul intuitive)
+	S_wand: U+BD09                      # 봉 wand (hangul intuitive)
+	S_coin: U+91D1                      # 金 gold (basic hanja)
+	S_gem: U+BE5B                       # 빛 gem (hangul association)
+	S_rock: U+B3CC                      # 돌 rock (hangul intuitive)
+	S_ball: U+ACF5                      # 공 ball (hangul intuitive)
+	S_chain: U+EC87                     # 쇠 chain (hangul intuitive)
+	S_food: U+BC25                      # 밥 food (hangul intuitive)
+	S_tool: U+ACF5                      # 공 tool (hangul)
+	# === Monster classes ===
+	S_human: U+4EBA                     # 人 human (basic hanja)
+	S_ghost: U+C720                     # 유 ghost (hangul abbrev)
+	S_demon: U+60E1                     # 惡 demon (hanja, pairs with 天)
+	S_angel: U+5929                     # 天 angel (basic hanja)
+	S_dragon: U+C6A9                    # 용 dragon (hangul intuitive)
+	S_giant: U+5927                     # 大 giant (basic hanja)
+	S_snake: U+BC40                     # 뱀 snake (hangul intuitive)
+	S_rodent: U+C950                    # 쥐 rodent (hangul intuitive)
+	S_spider: U+AC70                    # 거 spider (hangul abbrev)
+	S_dog: U+AC1C                       # 개 dog (hangul intuitive)
+	S_feline: U+B0E5                    # 냥 cat (hangul onomatopoeia)
+	S_horse: U+B9D0                     # 말 horse (hangul intuitive)
+	S_unicorn: U+BFDC                   # 뿔 unicorn (hangul feature)
+	S_bat: U+BC15                       # 박 bat (hangul abbrev)
+	S_orc: U+C6BC                       # 옼 orc (hangul abbrev)
+	S_kobold: U+CF54                    # 코 kobold (hangul abbrev)
+	S_troll: U+D2B8                     # 트 troll (hangul abbrev)
+	S_goblin: U+ACE0                    # 고 goblin (hangul abbrev)
+	S_wolf: U+B291                      # 늑 wolf (hangul abbrev)
+	S_bear: U+ACF0                      # 곰 bear (hangul intuitive)
+	S_eye: U+76EE                       # 目 eye (basic hanja pictograph)
+	S_jelly: U+C290                     # 슬 jelly/slime (hangul abbrev)
+	S_zombie: U+C880                    # 좀 zombie (hangul abbrev)
+	S_mummy: U+BBF8                     # 미 mummy (hangul abbrev)
+	S_vampire: U+D761                   # 흡 vampire (hangul association)
+	S_lich: U+B9AC                      # 리 lich (hangul abbrev)
+	S_nymph: U+B2D8                     # 님 nymph (hangul abbrev)
+	S_ogre: U+C624                      # 오 ogre (hangul abbrev)
+	S_golem: U+ACE8                     # 골 golem (hangul abbrev)
+	S_ant: U+AC1C                       # 개 ant (hangul for gaemi)
+	S_bee: U+BC8C                       # 벌 bee (hangul intuitive)
+	S_worm: U+BC8C                      # 벌 worm (hangul)
+	S_blob: U+C290                      # 슬 blob (hangul abbrev)
+	S_pudding: U+C290                   # 슬 pudding (hangul abbrev)
+	S_vortex: U+C18C                    # 소 vortex (hangul abbrev)
+	S_elemental: U+C6D0                 # 원 elemental (hangul abbrev)
+	S_fungus: U+BC84                    # 버 fungus (hangul abbrev)
+	S_gnome: U+B09C                     # 난 gnome (hangul abbrev)
+	S_humanoid: U+4EBA                  # 人 humanoid (basic hanja)
+	S_imp: U+C784                       # 임 imp (hangul abbrev)
+	S_kop: U+ACBD                       # 경 kop (hangul abbrev)
+	S_leprechaun: U+B808                # 레 leprechaun (hangul abbrev)
+	S_mimic: U+BAA8                     # 모 mimic (hangul abbrev)
+	S_naga: U+B098                      # 나 naga (hangul abbrev)
+	S_piercer: U+B6AB                   # 뚫 piercer (hangul intuitive)
+	S_quadruped: U+C218                 # 수 quadruped (hangul abbrev)
+	S_rustmonst: U+B179                 # 녹 rust monster (hangul intuitive)
+	S_trapper: U+C7A1                   # 잡 trapper (hangul intuitive)
+	S_umber: U+C6C0                     # 움 umber hulk (hangul abbrev)
+	S_wraith: U+C601                    # 영 wraith (hangul abbrev)
+	S_xan: U+C7A0                       # 잠 xan (hangul intuitive)
+	S_light: U+BE5B                     # 빛 light (hangul intuitive)
+	S_xorn: U+C885                      # 종 xorn (hangul abbrev)
+	S_yeti: U+C608                      # 예 yeti (hangul abbrev)
+	S_zruty: U+C988                     # 즈 zruty (hangul abbrev)
+	S_centaur: U+BC18                   # 반 centaur (hangul abbrev for 반인반마)
+	S_eel: U+BC40                       # 뱀 eel (hangul)
+	S_lizard: U+B3C4                    # 도 lizard (hangul abbrev)
+	S_cockatrice: U+B2ED                # 닭 cockatrice (hangul intuitive)
+	S_gremlin: U+ADF8                   # 그 gremlin (hangul abbrev)
+	S_jabberwock: U+C7AC                # 재 jabberwock (hangul abbrev)
+	S_quantmech: U+C591                 # 양 quantum mechanic (hangul for 양자)
+	# === Glyphs with branch colors ===
+	G_vwall_sokoban:  U+2502/blue
+	G_hwall_sokoban:  U+2500/blue
+	G_tlcorn_sokoban: U+250c/blue
+	G_trcorn_sokoban: U+2510/blue
+	G_blcorn_sokoban: U+2514/blue
+	G_brcorn_sokoban: U+2518/blue
+	G_crwall_sokoban: U+253c/blue
+	G_tuwall_sokoban: U+2534/blue
+	G_tdwall_sokoban: U+252c/blue
+	G_tlwall_sokoban: U+2524/blue
+	G_trwall_sokoban: U+251c/blue
+	G_vwall_gehennom:  U+2502/red
+	G_hwall_gehennom:  U+2500/red
+	G_tlcorn_gehennom: U+250c/red
+	G_trcorn_gehennom: U+2510/red
+	G_blcorn_gehennom: U+2514/red
+	G_brcorn_gehennom: U+2518/red
+	G_crwall_gehennom: U+253c/red
+	G_tuwall_gehennom: U+2534/red
+	G_tdwall_gehennom: U+252c/red
+	G_tlwall_gehennom: U+2524/red
+	G_trwall_gehennom: U+251c/red
+	G_vwall_knox:  U+2502/150-75-0
+	G_hwall_knox:  U+2500/150-75-0
+	G_tlcorn_knox: U+250c/150-75-0
+	G_trcorn_knox: U+2510/150-75-0
+	G_blcorn_knox: U+2514/150-75-0
+	G_brcorn_knox: U+2518/150-75-0
+	G_crwall_knox: U+253c/150-75-0
+	G_tuwall_knox: U+2534/150-75-0
+	G_tdwall_knox: U+252c/150-75-0
+	G_tlwall_knox: U+2524/150-75-0
+	G_trwall_knox: U+251c/150-75-0
+	G_vwall_mines:  U+2502/113-126-142
+	G_hwall_mines:  U+2500/113-126-142
+	G_tlcorn_mines: U+250c/113-126-142
+	G_trcorn_mines: U+2510/113-126-142
+	G_blcorn_mines: U+2514/113-126-142
+	G_brcorn_mines: U+2518/113-126-142
+	G_crwall_mines: U+253c/113-126-142
+	G_tuwall_mines: U+2534/113-126-142
+	G_tdwall_mines: U+252c/113-126-142
+	G_tlwall_mines: U+2524/113-126-142
+	G_trwall_mines: U+251c/113-126-142
+finish
+
+# Emoji symbols for modern terminals with full Unicode support
+start: Emoji
+	Description: Emoji symbols for modern terminals
+	Handling: UTF8
+	# === Dungeon structure ===
+	S_vwall: U+2502                     # │ vertical wall
+	S_hwall: U+2500                     # ─ horizontal wall
+	S_tlcorn: U+250c                    # ┌ top left corner
+	S_trcorn: U+2510                    # ┐ top right corner
+	S_blcorn: U+2514                    # └ bottom left corner
+	S_brcorn: U+2518                    # ┘ bottom right corner
+	S_crwall: U+253c                    # ┼ cross wall
+	S_tuwall: U+2534                    # ┴ T up
+	S_tdwall: U+252c                    # ┬ T down
+	S_tlwall: U+2524                    # ┤ T left
+	S_trwall: U+251c                    # ├ T right
+	S_room: U+00b7                      # · room floor
+	S_corr: U+2591                      # ░ corridor
+	S_litcorr: U+2592                   # ▒ lit corridor
+	S_upstair: U+2B06                   # ⬆ upstairs
+	S_dnstair: U+2B07                   # ⬇ downstairs
+	S_upladder: U+2B06                  # ⬆ up ladder
+	S_dnladder: U+2B07                  # ⬇ down ladder
+	S_altar: U+26E9                     # ⛩ altar
+	S_grave: U+26B0                     # ⚰ grave
+	S_throne: U+1F451                   # 👑 throne
+	S_sink: U+1F6B0                     # 🚰 sink
+	S_fountain: U+26F2                  # ⛲ fountain
+	S_pool: U+1F4A7                     # 💧 pool
+	S_ice: U+2744                       # ❄ ice
+	S_lava: U+1F525                     # 🔥 lava
+	S_lavawall: U+1F525                 # 🔥 lava wall
+	S_vodoor: U+1F6AA                   # 🚪 door
+	S_hodoor: U+1F6AA                   # 🚪 door
+	S_tree: U+1F333                     # 🌳 tree
+	S_cloud: U+2601                     # ☁ cloud
+	S_water: U+1F30A                    # 🌊 water
+	# === Object classes ===
+	S_weapon: U+2694                    # ⚔ weapon
+	S_armor: U+1F6E1                    # 🛡 armor
+	S_ring: U+1F48D                     # 💍 ring
+	S_amulet: U+1F4FF                   # 📿 amulet
+	S_potion: U+1F9EA                   # 🧪 potion
+	S_scroll: U+1F4DC                   # 📜 scroll
+	S_book: U+1F4D6                     # 📖 book
+	S_wand: U+1FA84                     # 🪄 wand
+	S_coin: U+1FA99                     # 🪙 coin
+	S_gem: U+1F48E                      # 💎 gem
+	S_rock: U+1FAA8                     # 🪨 rock
+	S_ball: U+26BD                      # ⚽ ball
+	S_chain: U+26D3                     # ⛓ chain
+	S_food: U+1F356                     # 🍖 food
+	S_tool: U+1F527                     # 🔧 tool
+	# === Monster classes ===
+	S_human: U+1F9D1                    # 🧑 human
+	S_ghost: U+1F47B                    # 👻 ghost
+	S_demon: U+1F47F                    # 👿 demon
+	S_angel: U+1F607                    # 😇 angel
+	S_dragon: U+1F409                   # 🐉 dragon
+	S_giant: U+1F9CC                    # 🧌 giant/troll
+	S_snake: U+1F40D                    # 🐍 snake
+	S_rodent: U+1F401                   # 🐁 rodent
+	S_spider: U+1F577                   # 🕷 spider
+	S_dog: U+1F415                      # 🐕 dog
+	S_feline: U+1F408                   # 🐈 cat
+	S_horse: U+1F40E                    # 🐎 horse
+	S_unicorn: U+1F984                  # 🦄 unicorn
+	S_bat: U+1F987                      # 🦇 bat
+	S_wolf: U+1F43A                     # 🐺 wolf
+	S_bear: U+1F43B                     # 🐻 bear
+	S_ant: U+1F41C                      # 🐜 ant
+	S_bee: U+1F41D                      # 🐝 bee
+	S_eye: U+1F441                      # 👁 eye
+	S_worm: U+1FAB1                     # 🪱 worm
+	S_blob: U+1F9A0                     # 🦠 blob
+	S_pudding: U+1F9A0                  # 🦠 pudding
+	S_vortex: U+1F300                   # 🌀 vortex
+	S_elemental: U+1F4A8                # 💨 elemental
+	S_fungus: U+1F344                   # 🍄 fungus
+	S_gnome: U+1F9D9                    # 🧙 gnome
+	S_humanoid: U+1F9D1                 # 🧑 humanoid
+	S_jelly: U+1F9A0                    # 🦠 jelly
+	S_zombie: U+1F9DF                   # 🧟 zombie
+	S_mummy: U+1F9DF                    # 🧟 mummy
+	S_vampire: U+1F9DB                  # 🧛 vampire
+	S_lich: U+1F480                     # 💀 lich
+	S_nymph: U+1F9DA                    # 🧚 nymph
+	S_ogre: U+1F9CC                     # 🧌 ogre
+	S_golem: U+1F916                    # 🤖 golem
+	S_orc: U+1F9CC                      # 🧌 orc
+	S_kobold: U+1F9CC                   # 🧌 kobold
+	S_troll: U+1F9CC                    # 🧌 troll
+	S_goblin: U+1F47A                   # 👺 goblin
+	S_centaur: U+1F434                  # 🐴 centaur
+	S_eel: U+1F40D                      # 🐍 eel
+	S_lizard: U+1F98E                   # 🦎 lizard
+	S_cockatrice: U+1F413               # 🐓 cockatrice
+	S_light: U+2728                     # ✨ light
+	# === Glyphs with branch colors ===
+	G_vwall_sokoban:  U+2502/blue
+	G_hwall_sokoban:  U+2500/blue
+	G_tlcorn_sokoban: U+250c/blue
+	G_trcorn_sokoban: U+2510/blue
+	G_blcorn_sokoban: U+2514/blue
+	G_brcorn_sokoban: U+2518/blue
+	G_crwall_sokoban: U+253c/blue
+	G_tuwall_sokoban: U+2534/blue
+	G_tdwall_sokoban: U+252c/blue
+	G_tlwall_sokoban: U+2524/blue
+	G_trwall_sokoban: U+251c/blue
+	G_vwall_gehennom:  U+2502/red
+	G_hwall_gehennom:  U+2500/red
+	G_tlcorn_gehennom: U+250c/red
+	G_trcorn_gehennom: U+2510/red
+	G_blcorn_gehennom: U+2514/red
+	G_brcorn_gehennom: U+2518/red
+	G_crwall_gehennom: U+253c/red
+	G_tuwall_gehennom: U+2534/red
+	G_tdwall_gehennom: U+252c/red
+	G_tlwall_gehennom: U+2524/red
+	G_trwall_gehennom: U+251c/red
+	G_vwall_knox:  U+2502/150-75-0
+	G_hwall_knox:  U+2500/150-75-0
+	G_tlcorn_knox: U+250c/150-75-0
+	G_trcorn_knox: U+2510/150-75-0
+	G_blcorn_knox: U+2514/150-75-0
+	G_brcorn_knox: U+2518/150-75-0
+	G_crwall_knox: U+253c/150-75-0
+	G_tuwall_knox: U+2534/150-75-0
+	G_tdwall_knox: U+252c/150-75-0
+	G_tlwall_knox: U+2524/150-75-0
+	G_trwall_knox: U+251c/150-75-0
+	G_vwall_mines:  U+2502/113-126-142
+	G_hwall_mines:  U+2500/113-126-142
+	G_tlcorn_mines: U+250c/113-126-142
+	G_trcorn_mines: U+2510/113-126-142
+	G_blcorn_mines: U+2514/113-126-142
+	G_brcorn_mines: U+2518/113-126-142
+	G_crwall_mines: U+253c/113-126-142
+	G_tuwall_mines: U+2534/113-126-142
+	G_tdwall_mines: U+252c/113-126-142
+	G_tlwall_mines: U+2524/113-126-142
+	G_trwall_mines: U+251c/113-126-142
+finish
+
 # symbols EOF
