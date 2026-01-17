@@ -164,6 +164,8 @@ NHCFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 NHCFLAGS+=-DTIMED_DELAY
 NHCFLAGS+=-DDUMPLOG
 NHCFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
+# i18n (internationalization) support - Korean localization
+NHCFLAGS+=-DLOCALEDIR=\"$(HACKDIR)/locale\"
 #NHCFLAGS+=-DGREPPATH=\"/usr/bin/grep\"
 NHCFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
 #NHCFLAGS+=-DNOMAIL
@@ -427,6 +429,11 @@ DLLIB = -ldl
 
 # Only needed for GLIBC stack trace:
 LFLAGS+=-rdynamic
+
+# i18n (internationalization) support - link with libintl if available
+# On most Linux systems, gettext is part of glibc and doesn't need -lintl
+# Uncomment the following line if your system requires explicit linking:
+#LFLAGS+=-lintl
 
 # if TTY_TILES_ESCCODES
 #WINSRC += tile.c

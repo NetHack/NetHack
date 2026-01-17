@@ -531,7 +531,8 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   strutil.c symbols.c sys.c teleport.c \
 	   timeout.c topten.c track.c trap.c u_init.c utf8map.c \
 	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
-	   windows.c wizard.c wizcmds.c worm.c worn.c write.c zap.c
+	   windows.c wizard.c wizcmds.c worm.c worn.c write.c zap.c \
+	   i18n.c ko_postpos.c
 
 # all operating-system-dependent .c (for dependencies and such)
 SYSCSRC = ../sys/share/pcmain.c ../sys/share/pcsys.c \
@@ -577,7 +578,7 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	rm.h sp_lev.h spell.h sndprocs.h seffects.h stairs.h sys.h \
 	tcap.h timeout.h tradstdc.h trap.h unixconf.h vision.h vmsconf.h \
 	wintty.h wincurs.h winX.h winprocs.h wintype.h you.h youprop.h \
-	weight.h
+	weight.h i18n.h ko_postpos.h
 
 HSOURCES = $(HACKINCL) dgn_file.h
 

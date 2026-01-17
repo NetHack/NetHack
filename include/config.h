@@ -555,6 +555,13 @@ typedef unsigned char uchar;
  * bugs left here.
  */
 
+/* ENABLE_NLS: Enable Native Language Support (gettext-based internationalization)
+ * When enabled, NetHack can display messages in languages other than English.
+ * Requires libintl and appropriate .mo translation files.
+ * Korean localization includes automatic postposition (조사) handling.
+ */
+#define ENABLE_NLS
+
 /* SELECTSAVED: Enable the 'selectsaved' run-time option, allowing it
  * to be set in user's config file or NETHACKOPTIONS.  When set, if
  * player is about to be given the "who are you?" prompt, check for
