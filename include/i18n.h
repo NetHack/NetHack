@@ -50,12 +50,6 @@ extern boolean is_korean_locale(void);
  */
 extern char *process_korean_postpositions(char *buf, const char *format, ...);
 
-/* UTF-8 display width calculation for wide characters (CJK, emoji) */
-extern int utf8_display_width(const char *utf8str);
-
-/* Check if a UTF-8 character is a wide character (full-width) */
-extern int utf8_char_width(const char *utf8str);
-
 #else /* !ENABLE_NLS */
 
 /* Fallback macros when NLS is disabled */
@@ -68,10 +62,15 @@ extern int utf8_char_width(const char *utf8str);
 #define get_current_language() "en"
 #define is_korean_locale() FALSE
 #define process_korean_postpositions(buf, fmt, ...) (buf)
-#define utf8_display_width(s) ((int)strlen(s))
-#define utf8_char_width(s) 1
 
 #endif /* ENABLE_NLS */
+
+/*
+ * UTF-8 width functions are always available (defined in i18n.c)
+ * These are needed for proper TTY rendering regardless of NLS setting.
+ */
+extern int utf8_display_width(const char *utf8str);
+extern int utf8_char_width(const char *utf8str);
 
 /*
  * Korean postposition markers for translation strings

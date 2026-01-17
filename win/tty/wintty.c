@@ -13,6 +13,7 @@
 #define H2344_BROKEN
 
 #include "hack.h"
+#include "i18n.h"
 
 #ifdef TTY_GRAPHICS
 #include "dlb.h"
@@ -3861,6 +3862,7 @@ tty_print_glyph(
     int ch;
     uint32 color;
     unsigned special;
+    int char_width = 1;  /* display width of the glyph (1 or 2 for CJK) */
 
     HUPSKIP();
 #ifdef CLIPPING
@@ -3946,6 +3948,8 @@ tty_print_glyph(
             && glyphinfo->gm.u && glyphinfo->gm.u->utf8str) {
         /* we have a sequence to do */
         g_pututf8(glyphinfo->gm.u->utf8str);
+        /* Calculate actual display width for CJK/wide characters */
+        char_width = utf8_char_width((const char *)glyphinfo->gm.u->utf8str);
         glyphdone = TRUE;
     }
 #endif
@@ -3970,8 +3974,10 @@ tty_print_glyph(
     }
     print_vt_code1(AVTC_GLYPH_END);
 
-    wins[window]->curx++; /* one character over */
-    ttyDisplay->curx++;   /* the real cursor moved too */
+    /* Move cursor by the actual display width of the character.
+     * CJK/wide characters occupy 2 columns in the terminal. */
+    wins[window]->curx += char_width;
+    ttyDisplay->curx += char_width;
 }
 
 #ifdef NO_TERMS  /* termcap.o isn't linked in */

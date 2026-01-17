@@ -3,13 +3,75 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include <wchar.h>
+#include <wctype.h>
+
+/*
+ * UTF-8 width functions - always available regardless of ENABLE_NLS
+ * These are needed for proper TTY rendering of wide characters.
+ */
+
+/*
+ * Calculate display width of a UTF-8 string
+ *
+ * Uses wcwidth() to handle wide characters (CJK, emoji).
+ * Returns the number of terminal columns needed to display the string.
+ */
+int
+utf8_display_width(const char *utf8str)
+{
+    wchar_t wc;
+    int width = 0;
+    int len;
+
+    if (!utf8str)
+        return 0;
+
+    /* Ensure locale is set for mbtowc */
+    while (*utf8str) {
+        len = mbtowc(&wc, utf8str, MB_CUR_MAX);
+        if (len <= 0) {
+            /* Invalid or incomplete sequence, count as 1 */
+            width++;
+            utf8str++;
+        } else {
+            int w = wcwidth(wc);
+            /* wcwidth returns -1 for non-printable, treat as 1 */
+            width += (w > 0) ? w : 1;
+            utf8str += len;
+        }
+    }
+
+    return width;
+}
+
+/*
+ * Get display width of a single UTF-8 character
+ *
+ * Returns 1 for half-width, 2 for full-width characters.
+ */
+int
+utf8_char_width(const char *utf8str)
+{
+    wchar_t wc;
+    int len;
+    int w;
+
+    if (!utf8str || !*utf8str)
+        return 0;
+
+    len = mbtowc(&wc, utf8str, MB_CUR_MAX);
+    if (len <= 0)
+        return 1;
+
+    w = wcwidth(wc);
+    return (w > 0) ? w : 1;
+}
 
 #ifdef ENABLE_NLS
 
 #include "i18n.h"
 #include "ko_postpos.h"
-#include <wchar.h>
-#include <wctype.h>
 
 /* Domain name for gettext */
 #define TEXTDOMAIN "nethack"
@@ -92,63 +154,6 @@ boolean
 is_korean_locale(void)
 {
     return korean_locale;
-}
-
-/*
- * Calculate display width of a UTF-8 string
- *
- * Uses wcwidth() to handle wide characters (CJK, emoji).
- * Returns the number of terminal columns needed to display the string.
- */
-int
-utf8_display_width(const char *utf8str)
-{
-    wchar_t wc;
-    int width = 0;
-    int len;
-
-    if (!utf8str)
-        return 0;
-
-    /* Ensure locale is set for mbtowc */
-    while (*utf8str) {
-        len = mbtowc(&wc, utf8str, MB_CUR_MAX);
-        if (len <= 0) {
-            /* Invalid or incomplete sequence, count as 1 */
-            width++;
-            utf8str++;
-        } else {
-            int w = wcwidth(wc);
-            /* wcwidth returns -1 for non-printable, treat as 1 */
-            width += (w > 0) ? w : 1;
-            utf8str += len;
-        }
-    }
-
-    return width;
-}
-
-/*
- * Get display width of a single UTF-8 character
- *
- * Returns 1 for half-width, 2 for full-width characters.
- */
-int
-utf8_char_width(const char *utf8str)
-{
-    wchar_t wc;
-    int len;
-    int w;
-
-    if (!utf8str || !*utf8str)
-        return 0;
-
-    len = mbtowc(&wc, utf8str, MB_CUR_MAX);
-    if (len <= 0)
-        return 1;
-
-    w = wcwidth(wc);
-    return (w > 0) ? w : 1;
 }
 
 /*
