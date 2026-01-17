@@ -104,25 +104,20 @@ get_locale_for_lang(const char *lang)
  * Set the language at runtime
  *
  * This function changes the locale and updates gettext settings.
+ * For gettext to work, we need:
+ * 1. LOCPATH pointing to the locale directory (for user-installed locales)
+ * 2. A non-C locale set (glibc ignores LANGUAGE when LC_ALL=C)
+ * 3. LANGUAGE set to the desired language code
  */
 void
 set_language(const char *lang)
 {
-    const char *locale_name;
     const char *localedir;
+    const char *locale_name;
+    char *loc_result;
 
     if (!lang || !*lang)
         lang = "ko";  /* Default to Korean for HanNetHack */
-
-    /* Get full locale name */
-    locale_name = get_locale_for_lang(lang);
-
-    /* Set the environment variables for gettext */
-    setenv("LANGUAGE", lang, 1);
-    setenv("LC_ALL", locale_name, 1);
-
-    /* Set locale */
-    setlocale(LC_ALL, locale_name);
 
     /* Determine locale directory */
     localedir = getenv("NETHACK_LOCALE_DIR");
@@ -134,7 +129,29 @@ set_language(const char *lang)
 #endif
     }
 
-    /* Reinitialize gettext with new locale */
+    /* Set LOCPATH so setlocale can find user-installed locales */
+    setenv("LOCPATH", localedir, 1);
+
+    /* Set LANGUAGE for gettext message catalog lookup */
+    setenv("LANGUAGE", lang, 1);
+
+    /* Get the full locale name for this language */
+    locale_name = get_locale_for_lang(lang);
+
+    /* Try to set the locale - this requires locale data to exist in LOCPATH
+     * or system locale directories. If the locale is available, gettext
+     * will use LANGUAGE to find the message catalog. */
+    loc_result = setlocale(LC_ALL, locale_name);
+    if (!loc_result) {
+        /* Locale not available, try empty string (use environment) */
+        loc_result = setlocale(LC_ALL, "");
+    }
+    if (!loc_result) {
+        /* Last resort: C.UTF-8 for basic UTF-8 support */
+        setlocale(LC_ALL, "C.UTF-8");
+    }
+
+    /* Initialize gettext with locale directory */
     bindtextdomain(TEXTDOMAIN, localedir);
     bind_textdomain_codeset(TEXTDOMAIN, "UTF-8");
     textdomain(TEXTDOMAIN);
