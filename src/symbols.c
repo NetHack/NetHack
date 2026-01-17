@@ -525,6 +525,7 @@ parse_sym_line(char *buf, int which_set)
                     tmpsp->nocolor = 0;
                     tmpsp->primary = 0;
                     tmpsp->rogue = 0;
+                    tmpsp->fullwidth = 0;
                     break;
                 case 2:
                     /* handler type identified */

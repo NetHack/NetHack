@@ -2123,6 +2123,11 @@ tty_curs(
     }
 #endif
 
+    /* For fullwidth symbol sets (CJK), each map tile occupies 2 columns */
+    if (window == WIN_MAP && gs.symset[gc.currentgraphics].fullwidth) {
+        x = x * 2;
+    }
+
     if (y == cy && x == cx)
         return;
 
