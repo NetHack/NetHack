@@ -895,174 +895,184 @@ start: Enhanced1
 	G_trwall_mines: U+251C/113-126-142
 finish
 
-# Korean Hangul/Hanja symbols for better readability
-# Uses intuitive Korean characters: Hangul for common words,
-# Hanja for basic ideographs, and Korean jamo for shape similarity
+# Korean full-width symbol set
+# All symbols use 2-column wide characters for consistent alignment
+# Hangul for common words, Hanja for classical concepts
 start: Korean
-	Description: Korean Hangul/Hanja symbols
+	Description: Korean Hangul/Hanja symbols (fullwidth)
 	Handling: UTF8
-	# === Dungeon structure ===
-	S_vwall: U+2502                     # │ vertical wall
-	S_hwall: U+2500                     # ─ horizontal wall
-	S_tlcorn: U+250c                    # ┌ top left corner
-	S_trcorn: U+2510                    # ┐ top right corner
-	S_blcorn: U+2514                    # └ bottom left corner
-	S_brcorn: U+2518                    # ┘ bottom right corner
-	S_crwall: U+253c                    # ┼ cross wall
-	S_tuwall: U+2534                    # ┴ T up
-	S_tdwall: U+252c                    # ┬ T down
-	S_tlwall: U+2524                    # ┤ T left
-	S_trwall: U+251c                    # ├ T right
-	S_room: U+00b7                      # · room floor
-	S_darkroom: U+00b7                  # · dark room
-	S_corr: U+2591                      # ░ corridor
-	S_litcorr: U+2592                   # ▒ lit corridor
-	S_upstair: U+4E0A                   # 上 upstairs (basic hanja)
-	S_dnstair: U+4E0B                   # 下 downstairs (basic hanja)
+	# === Dungeon structure (all fullwidth) ===
+	S_vwall: U+FF5C                     # ｜ fullwidth vertical line
+	S_hwall: U+2550                     # ═ double horizontal
+	S_tlcorn: U+256D                    # ╭ rounded corner
+	S_trcorn: U+256E                    # ╮ rounded corner
+	S_blcorn: U+2570                    # ╰ rounded corner
+	S_brcorn: U+256F                    # ╯ rounded corner
+	S_crwall: U+256C                    # ╬ double cross
+	S_tuwall: U+2569                    # ╩ double T up
+	S_tdwall: U+2566                    # ╦ double T down
+	S_tlwall: U+2563                    # ╣ double T left
+	S_trwall: U+2560                    # ╠ double T right
+	S_room: U+3000                      # 　 ideographic space (fullwidth)
+	S_darkroom: U+3000                  # 　 ideographic space
+	S_corr: U+2593                      # ▓ dark shade
+	S_litcorr: U+2592                   # ▒ medium shade
+	S_upstair: U+4E0A                   # 上 upstairs (hanja)
+	S_dnstair: U+4E0B                   # 下 downstairs (hanja)
 	S_upladder: U+4E0A                  # 上 up ladder
 	S_dnladder: U+4E0B                  # 下 down ladder
-	S_altar: U+3160                     # ㅠ altar (jamo shape)
-	S_grave: U+BB18                     # 묘 grave (hangul intuitive)
-	S_throne: U+738B                    # 王 throne (basic hanja)
-	S_sink: U+C2F1                      # 싱 sink (hangul abbrev)
-	S_fountain: U+6C34                  # 水 fountain (basic hanja)
-	S_pool: U+BABb                      # 못 pool (hangul intuitive)
-	S_ice: U+BE59                       # 빙 ice (hangul intuitive)
-	S_lava: U+706B                      # 火 lava (basic hanja)
-	S_lavawall: U+706B                  # 火 lava wall
-	S_vodoor: U+BB38                    # 문 vertical door (hangul)
-	S_hodoor: U+BB38                    # 문 horizontal door (hangul)
-	S_vcdoor: U+BB38                    # 문 vertical closed door
-	S_hcdoor: U+BB38                    # 문 horizontal closed door
-	S_ndoor: U+00b7                     # · no door
-	S_tree: U+6728                      # 木 tree (basic hanja)
-	S_cloud: U+BEAD                     # 뭉 cloud (hangul onomatopoeia)
-	S_water: U+6C34                     # 水 water (basic hanja)
-	S_air: U+2591                       # ░ air
-	# === Object classes ===
-	S_weapon: U+5200                    # 刀 weapon (basic hanja)
-	S_armor: U+7532                     # 甲 armor (basic hanja)
-	S_ring: U+3147                      # ㅇ ring (jamo shape)
-	S_amulet: U+BAA9                    # 목 amulet/necklace (hangul abbrev)
-	S_potion: U+C57D                    # 약 potion (hangul intuitive)
-	S_scroll: U+AE00                    # 글 scroll (hangul intuitive)
-	S_book: U+CC45                      # 책 book (hangul intuitive)
-	S_wand: U+BD09                      # 봉 wand (hangul intuitive)
-	S_coin: U+91D1                      # 金 gold (basic hanja)
-	S_gem: U+BE5B                       # 빛 gem (hangul association)
-	S_rock: U+B3CC                      # 돌 rock (hangul intuitive)
-	S_ball: U+ACF5                      # 공 ball (hangul intuitive)
-	S_chain: U+EC87                     # 쇠 chain (hangul intuitive)
-	S_food: U+BC25                      # 밥 food (hangul intuitive)
-	S_tool: U+ACF5                      # 공 tool (hangul)
-	# === Monster classes ===
-	S_human: U+4EBA                     # 人 human (basic hanja)
-	S_ghost: U+C720                     # 유 ghost (hangul abbrev)
-	S_demon: U+60E1                     # 惡 demon (hanja, pairs with 天)
-	S_angel: U+5929                     # 天 angel (basic hanja)
-	S_dragon: U+C6A9                    # 용 dragon (hangul intuitive)
-	S_giant: U+5927                     # 大 giant (basic hanja)
-	S_snake: U+BC40                     # 뱀 snake (hangul intuitive)
-	S_rodent: U+C950                    # 쥐 rodent (hangul intuitive)
-	S_spider: U+AC70                    # 거 spider (hangul abbrev)
-	S_dog: U+AC1C                       # 개 dog (hangul intuitive)
-	S_feline: U+B0E5                    # 냥 cat (hangul onomatopoeia)
-	S_horse: U+B9D0                     # 말 horse (hangul intuitive)
-	S_unicorn: U+BFDC                   # 뿔 unicorn (hangul feature)
-	S_bat: U+BC15                       # 박 bat (hangul abbrev)
-	S_orc: U+C6BC                       # 옼 orc (hangul abbrev)
-	S_kobold: U+CF54                    # 코 kobold (hangul abbrev)
-	S_troll: U+D2B8                     # 트 troll (hangul abbrev)
-	S_goblin: U+ACE0                    # 고 goblin (hangul abbrev)
-	S_wolf: U+B291                      # 늑 wolf (hangul abbrev)
-	S_bear: U+ACF0                      # 곰 bear (hangul intuitive)
-	S_eye: U+76EE                       # 目 eye (basic hanja pictograph)
-	S_jelly: U+C290                     # 슬 jelly/slime (hangul abbrev)
-	S_zombie: U+C880                    # 좀 zombie (hangul abbrev)
-	S_mummy: U+BBF8                     # 미 mummy (hangul abbrev)
-	S_vampire: U+D761                   # 흡 vampire (hangul association)
-	S_lich: U+B9AC                      # 리 lich (hangul abbrev)
-	S_nymph: U+B2D8                     # 님 nymph (hangul abbrev)
-	S_ogre: U+C624                      # 오 ogre (hangul abbrev)
-	S_golem: U+ACE8                     # 골 golem (hangul abbrev)
-	S_ant: U+AC1C                       # 개 ant (hangul for gaemi)
-	S_bee: U+BC8C                       # 벌 bee (hangul intuitive)
+	S_altar: U+795E                     # 神 altar (hanja)
+	S_grave: U+5893                     # 墓 grave (hanja)
+	S_throne: U+738B                    # 王 throne (hanja)
+	S_sink: U+6C34                      # 水 sink (hanja)
+	S_fountain: U+6CC9                  # 泉 fountain (hanja)
+	S_pool: U+6C60                      # 池 pool (hanja)
+	S_ice: U+6C37                       # 氷 ice (hanja)
+	S_lava: U+706B                      # 火 lava (hanja)
+	S_lavawall: U+7194                  # 熔 lava wall (hanja)
+	S_vodoor: U+9580                    # 門 vertical door (hanja)
+	S_hodoor: U+9580                    # 門 horizontal door (hanja)
+	S_vcdoor: U+9589                    # 閉 vertical closed door (hanja)
+	S_hcdoor: U+9589                    # 閉 horizontal closed door (hanja)
+	S_ndoor: U+3000                     # 　 no door (ideographic space)
+	S_bars: U+7A97                      # 窗 bars (hanja)
+	S_tree: U+6728                      # 木 tree (hanja)
+	S_cloud: U+96F2                     # 雲 cloud (hanja)
+	S_water: U+6D77                     # 海 water (hanja)
+	S_air: U+98A8                       # 風 air (hanja)
+	# === Object classes (Korean Hangul - all fullwidth) ===
+	S_weapon: U+AC80                    # 검 weapon (hangul)
+	S_armor: U+AC11                     # 갑 armor (hangul)
+	S_ring: U+BC18                      # 반 ring (hangul)
+	S_amulet: U+BAA9                    # 목 amulet (hangul)
+	S_potion: U+C57D                    # 약 potion (hangul)
+	S_scroll: U+AE00                    # 글 scroll (hangul)
+	S_book: U+CC45                      # 책 book (hangul)
+	S_wand: U+BD09                      # 봉 wand (hangul)
+	S_coin: U+AD08                      # 금 gold (hangul)
+	S_gem: U+BCF4                       # 보 gem (hangul)
+	S_rock: U+B3CC                      # 돌 rock (hangul)
+	S_ball: U+AD6C                      # 구 ball (hangul)
+	S_chain: U+C1E0                     # 쇠 chain (hangul)
+	S_food: U+BC25                      # 밥 food (hangul)
+	S_tool: U+AE30                      # 기 tool (hangul)
+	# === Monster classes (Korean/Hanja - all fullwidth) ===
+	S_human: U+4EBA                     # 人 human (hanja)
+	S_ghost: U+9B3C                     # 鬼 ghost (hanja)
+	S_demon: U+9B54                     # 魔 demon (hanja)
+	S_angel: U+5929                     # 天 angel (hanja)
+	S_dragon: U+C6A9                    # 용 dragon (hangul)
+	S_giant: U+AC70                     # 거 giant (hangul)
+	S_snake: U+C0AC                     # 사 snake (hangul)
+	S_rodent: U+C950                    # 쥐 rodent (hangul)
+	S_spider: U+AC70                    # 거 spider (hangul)
+	S_dog: U+AC1C                       # 개 dog (hangul)
+	S_feline: U+ACE0                    # 고 cat (hangul)
+	S_horse: U+B9D0                     # 말 horse (hangul)
+	S_unicorn: U+C720                   # 유 unicorn (hangul)
+	S_bat: U+BC15                       # 박 bat (hangul)
+	S_orc: U+C624                       # 오 orc (hangul)
+	S_kobold: U+CF54                    # 코 kobold (hangul)
+	S_troll: U+D2B8                     # 트 troll (hangul)
+	S_goblin: U+ACE0                    # 고 goblin (hangul)
+	S_wolf: U+B291                      # 늑 wolf (hangul)
+	S_bear: U+ACF0                      # 곰 bear (hangul)
+	S_eye: U+B208                       # 눈 eye (hangul)
+	S_jelly: U+C810                     # 점 jelly (hangul)
+	S_zombie: U+C8BD                    # 좀 zombie (hangul)
+	S_mummy: U+BBF8                     # 미 mummy (hangul)
+	S_vampire: U+D761                   # 흡 vampire (hangul)
+	S_lich: U+B9AC                      # 리 lich (hangul)
+	S_nymph: U+B2D8                     # 님 nymph (hangul)
+	S_ogre: U+C624                      # 오 ogre (hangul)
+	S_golem: U+ACE8                     # 골 golem (hangul)
+	S_ant: U+AC1C                       # 개 ant (hangul)
+	S_bee: U+BC8C                       # 벌 bee (hangul)
 	S_worm: U+BC8C                      # 벌 worm (hangul)
-	S_blob: U+C290                      # 슬 blob (hangul abbrev)
-	S_pudding: U+C290                   # 슬 pudding (hangul abbrev)
-	S_vortex: U+C18C                    # 소 vortex (hangul abbrev)
-	S_elemental: U+C6D0                 # 원 elemental (hangul abbrev)
-	S_fungus: U+BC84                    # 버 fungus (hangul abbrev)
-	S_gnome: U+B09C                     # 난 gnome (hangul abbrev)
-	S_humanoid: U+4EBA                  # 人 humanoid (basic hanja)
-	S_imp: U+C784                       # 임 imp (hangul abbrev)
-	S_kop: U+ACBD                       # 경 kop (hangul abbrev)
-	S_leprechaun: U+B808                # 레 leprechaun (hangul abbrev)
-	S_mimic: U+BAA8                     # 모 mimic (hangul abbrev)
-	S_naga: U+B098                      # 나 naga (hangul abbrev)
-	S_piercer: U+B6AB                   # 뚫 piercer (hangul intuitive)
-	S_quadruped: U+C218                 # 수 quadruped (hangul abbrev)
-	S_rustmonst: U+B179                 # 녹 rust monster (hangul intuitive)
-	S_trapper: U+C7A1                   # 잡 trapper (hangul intuitive)
-	S_umber: U+C6C0                     # 움 umber hulk (hangul abbrev)
-	S_wraith: U+C601                    # 영 wraith (hangul abbrev)
-	S_xan: U+C7A0                       # 잠 xan (hangul intuitive)
-	S_light: U+BE5B                     # 빛 light (hangul intuitive)
-	S_xorn: U+C885                      # 종 xorn (hangul abbrev)
-	S_yeti: U+C608                      # 예 yeti (hangul abbrev)
-	S_zruty: U+C988                     # 즈 zruty (hangul abbrev)
-	S_centaur: U+BC18                   # 반 centaur (hangul abbrev for 반인반마)
-	S_eel: U+BC40                       # 뱀 eel (hangul)
-	S_lizard: U+B3C4                    # 도 lizard (hangul abbrev)
-	S_cockatrice: U+B2ED                # 닭 cockatrice (hangul intuitive)
-	S_gremlin: U+ADF8                   # 그 gremlin (hangul abbrev)
-	S_jabberwock: U+C7AC                # 재 jabberwock (hangul abbrev)
-	S_quantmech: U+C591                 # 양 quantum mechanic (hangul for 양자)
-	# === Glyphs with branch colors ===
-	G_vwall_sokoban:  U+2502/blue
-	G_hwall_sokoban:  U+2500/blue
-	G_tlcorn_sokoban: U+250c/blue
-	G_trcorn_sokoban: U+2510/blue
-	G_blcorn_sokoban: U+2514/blue
-	G_brcorn_sokoban: U+2518/blue
-	G_crwall_sokoban: U+253c/blue
-	G_tuwall_sokoban: U+2534/blue
-	G_tdwall_sokoban: U+252c/blue
-	G_tlwall_sokoban: U+2524/blue
-	G_trwall_sokoban: U+251c/blue
-	G_vwall_gehennom:  U+2502/red
-	G_hwall_gehennom:  U+2500/red
-	G_tlcorn_gehennom: U+250c/red
-	G_trcorn_gehennom: U+2510/red
-	G_blcorn_gehennom: U+2514/red
-	G_brcorn_gehennom: U+2518/red
-	G_crwall_gehennom: U+253c/red
-	G_tuwall_gehennom: U+2534/red
-	G_tdwall_gehennom: U+252c/red
-	G_tlwall_gehennom: U+2524/red
-	G_trwall_gehennom: U+251c/red
-	G_vwall_knox:  U+2502/150-75-0
-	G_hwall_knox:  U+2500/150-75-0
-	G_tlcorn_knox: U+250c/150-75-0
-	G_trcorn_knox: U+2510/150-75-0
-	G_blcorn_knox: U+2514/150-75-0
-	G_brcorn_knox: U+2518/150-75-0
-	G_crwall_knox: U+253c/150-75-0
-	G_tuwall_knox: U+2534/150-75-0
-	G_tdwall_knox: U+252c/150-75-0
-	G_tlwall_knox: U+2524/150-75-0
-	G_trwall_knox: U+251c/150-75-0
-	G_vwall_mines:  U+2502/113-126-142
-	G_hwall_mines:  U+2500/113-126-142
-	G_tlcorn_mines: U+250c/113-126-142
-	G_trcorn_mines: U+2510/113-126-142
-	G_blcorn_mines: U+2514/113-126-142
-	G_brcorn_mines: U+2518/113-126-142
-	G_crwall_mines: U+253c/113-126-142
-	G_tuwall_mines: U+2534/113-126-142
-	G_tdwall_mines: U+252c/113-126-142
-	G_tlwall_mines: U+2524/113-126-142
-	G_trwall_mines: U+251c/113-126-142
+	S_blob: U+C810                      # 점 blob (hangul)
+	S_pudding: U+C810                   # 점 pudding (hangul)
+	S_vortex: U+C18C                    # 소 vortex (hangul)
+	S_elemental: U+C815                 # 정 elemental (hangul)
+	S_fungus: U+BC84                    # 버 fungus (hangul)
+	S_gnome: U+B09C                     # 난 gnome (hangul)
+	S_humanoid: U+C778                  # 인 humanoid (hangul)
+	S_imp: U+C784                       # 임 imp (hangul)
+	S_kop: U+ACBD                       # 경 kop (hangul)
+	S_leprechaun: U+B808                # 레 leprechaun (hangul)
+	S_mimic: U+BAA8                     # 모 mimic (hangul)
+	S_naga: U+B098                      # 나 naga (hangul)
+	S_piercer: U+B6AB                   # 뚫 piercer (hangul)
+	S_quadruped: U+C218                 # 수 quadruped (hangul)
+	S_rustmonst: U+B179                 # 녹 rust monster (hangul)
+	S_trapper: U+C7A1                   # 잡 trapper (hangul)
+	S_umber: U+C6C0                     # 움 umber hulk (hangul)
+	S_wraith: U+C601                    # 영 wraith (hangul)
+	S_xan: U+C7A0                       # 잠 xan (hangul)
+	S_light: U+BFDB                     # 빛 light (hangul)
+	S_xorn: U+C885                      # 종 xorn (hangul)
+	S_yeti: U+C608                      # 예 yeti (hangul)
+	S_zruty: U+C988                     # 즈 zruty (hangul)
+	S_centaur: U+BCBC                   # 뻬 centaur (hangul)
+	S_eel: U+C7A5                       # 장 eel (hangul)
+	S_lizard: U+B3C4                    # 도 lizard (hangul)
+	S_cockatrice: U+C554                # 암 cockatrice (hangul)
+	S_gremlin: U+ADF8                   # 그 gremlin (hangul)
+	S_jabberwock: U+C7AC                # 재 jabberwock (hangul)
+	S_quantmech: U+C591                 # 양 quantum mechanic (hangul)
+	# === Traps (fullwidth) ===
+	S_arrow_trap: U+C2F4                # 살 arrow trap (hangul)
+	S_dart_trap: U+C2F4                 # 살 dart trap (hangul)
+	S_land_mine: U+AD11                 # 광 mine (hangul)
+	S_fire_trap: U+706B                 # 火 fire trap (hanja)
+	S_pit: U+AD6C                       # 구 pit (hangul)
+	S_hole: U+AD6C                      # 구 hole (hangul)
+	S_web: U+AC70                       # 거 web (hangul)
+	S_magic_portal: U+BB38              # 문 portal (hangul)
+	# === Glyphs with branch colors (fullwidth) ===
+	G_vwall_sokoban:  U+FF5C/blue
+	G_hwall_sokoban:  U+2550/blue
+	G_tlcorn_sokoban: U+256D/blue
+	G_trcorn_sokoban: U+256E/blue
+	G_blcorn_sokoban: U+2570/blue
+	G_brcorn_sokoban: U+256F/blue
+	G_crwall_sokoban: U+256C/blue
+	G_tuwall_sokoban: U+2569/blue
+	G_tdwall_sokoban: U+2566/blue
+	G_tlwall_sokoban: U+2563/blue
+	G_trwall_sokoban: U+2560/blue
+	G_vwall_gehennom:  U+FF5C/red
+	G_hwall_gehennom:  U+2550/red
+	G_tlcorn_gehennom: U+256D/red
+	G_trcorn_gehennom: U+256E/red
+	G_blcorn_gehennom: U+2570/red
+	G_brcorn_gehennom: U+256F/red
+	G_crwall_gehennom: U+256C/red
+	G_tuwall_gehennom: U+2569/red
+	G_tdwall_gehennom: U+2566/red
+	G_tlwall_gehennom: U+2563/red
+	G_trwall_gehennom: U+2560/red
+	G_vwall_knox:  U+FF5C/150-75-0
+	G_hwall_knox:  U+2550/150-75-0
+	G_tlcorn_knox: U+256D/150-75-0
+	G_trcorn_knox: U+256E/150-75-0
+	G_blcorn_knox: U+2570/150-75-0
+	G_brcorn_knox: U+256F/150-75-0
+	G_crwall_knox: U+256C/150-75-0
+	G_tuwall_knox: U+2569/150-75-0
+	G_tdwall_knox: U+2566/150-75-0
+	G_tlwall_knox: U+2563/150-75-0
+	G_trwall_knox: U+2560/150-75-0
+	G_vwall_mines:  U+FF5C/113-126-142
+	G_hwall_mines:  U+2550/113-126-142
+	G_tlcorn_mines: U+256D/113-126-142
+	G_trcorn_mines: U+256E/113-126-142
+	G_blcorn_mines: U+2570/113-126-142
+	G_brcorn_mines: U+256F/113-126-142
+	G_crwall_mines: U+256C/113-126-142
+	G_tuwall_mines: U+2569/113-126-142
+	G_tdwall_mines: U+2566/113-126-142
+	G_tlwall_mines: U+2563/113-126-142
+	G_trwall_mines: U+2560/113-126-142
 finish
 
 # Emoji symbols for modern terminals with full Unicode support
