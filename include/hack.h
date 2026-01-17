@@ -41,6 +41,7 @@
 #include "wintype.h"
 #include "vision.h"
 #include "you.h"
+#include "i18n.h"
 
 #define TELL 1
 #define NOTELL 0

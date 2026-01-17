@@ -409,6 +409,7 @@ const struct symparse loadsyms[] = {
     { SYM_CONTROL, 4, "color" },
     { SYM_CONTROL, 4, "colour" },
     { SYM_CONTROL, 5, "restrictions" },
+    { SYM_CONTROL, 6, "fullwidth" },
 #define PCHAR_PARSE
 #include "defsym.h"
 #undef PCHAR_PARSE
@@ -620,6 +621,19 @@ parse_sym_line(char *buf, int which_set)
                             break; /* while loop */
                         }
                         n++;
+                    }
+                }
+                break;
+            case 6: /* fullwidth:yes - for CJK wide character symsets */
+                if (gc.chosen_symset_start) {
+                    if (bufp) {
+                        if (!strcmpi(bufp, "true") || !strcmpi(bufp, "yes")
+                            || !strcmpi(bufp, "on"))
+                            gs.symset[which_set].fullwidth = 1;
+                        else if (!strcmpi(bufp, "false")
+                                 || !strcmpi(bufp, "no")
+                                 || !strcmpi(bufp, "off"))
+                            gs.symset[which_set].fullwidth = 0;
                     }
                 }
                 break;

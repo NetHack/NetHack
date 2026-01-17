@@ -44,6 +44,7 @@ early_init(int argc USED_FOR_CRASHREPORT, char *argv[] USED_FOR_CRASHREPORT)
     monst_globals_init();
     sys_early_init();
     runtime_info_init();
+    init_i18n();
 }
 
 staticfn void

@@ -81,7 +81,8 @@ struct symsetentry {
     Bitfield(primary, 1);     /* restricted for use as primary set    */
     Bitfield(rogue, 1);       /* restricted for use as rogue lev set  */
     Bitfield(explicitly, 1);  /* explicit symset set                  */
-                              /* 4 free bits */
+    Bitfield(fullwidth, 1);   /* symbols are 2-column wide (CJK)      */
+                              /* 3 free bits */
 };
 
 /*
