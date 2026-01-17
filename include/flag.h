@@ -302,6 +302,7 @@ struct instance_flags {
 
     /* stuff that is related to options and/or user or platform preferences
      */
+    char language[8];     /* language code for i18n (e.g., "ko", "en") */
     unsigned msg_history; /* hint: # of top lines to save */
     int getpos_coords;    /* show coordinates when getting cursor position */
     int menuinvertmode;   /* 0 = invert toggles every item;

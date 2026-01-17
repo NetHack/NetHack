@@ -404,6 +404,11 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(legacy, Advanced, 0, opt_out, set_in_config,
            On, Yes, No, No, NoAlias, &flags.legacy, Term_False,
            "show introductory message")
+#ifdef ENABLE_NLS
+    NHOPTC(language, General, 7, opt_in, set_in_game,
+                No, Yes, No, Yes, NoAlias,
+                "language for messages (ko, en, etc.)")
+#endif
     NHOPTB(lit_corridor, Advanced, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &flags.lit_corridor, Term_False,
            "show dark corridors as lit if in sight")

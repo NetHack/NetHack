@@ -81,61 +81,95 @@ static char current_lang[8] = "";
 static boolean korean_locale = FALSE;
 
 /*
+ * Map language code to full locale name
+ */
+static const char *
+get_locale_for_lang(const char *lang)
+{
+    if (!lang || !*lang)
+        return "ko_KR.UTF-8";  /* Default to Korean for HanNetHack */
+    if (strcmp(lang, "ko") == 0)
+        return "ko_KR.UTF-8";
+    if (strcmp(lang, "en") == 0)
+        return "en_US.UTF-8";
+    if (strcmp(lang, "ja") == 0)
+        return "ja_JP.UTF-8";
+    if (strcmp(lang, "zh") == 0)
+        return "zh_CN.UTF-8";
+    /* For other codes, try to construct a locale name */
+    return "en_US.UTF-8";  /* Fallback */
+}
+
+/*
+ * Set the language at runtime
+ *
+ * This function changes the locale and updates gettext settings.
+ */
+void
+set_language(const char *lang)
+{
+    const char *locale_name;
+    const char *localedir;
+
+    if (!lang || !*lang)
+        lang = "ko";  /* Default to Korean for HanNetHack */
+
+    /* Get full locale name */
+    locale_name = get_locale_for_lang(lang);
+
+    /* Set the environment variables for gettext */
+    setenv("LANGUAGE", lang, 1);
+    setenv("LC_ALL", locale_name, 1);
+
+    /* Set locale */
+    setlocale(LC_ALL, locale_name);
+
+    /* Determine locale directory */
+    localedir = getenv("NETHACK_LOCALE_DIR");
+    if (!localedir) {
+#ifdef LOCALEDIR
+        localedir = LOCALEDIR;
+#else
+        localedir = "/usr/share/locale";
+#endif
+    }
+
+    /* Reinitialize gettext with new locale */
+    bindtextdomain(TEXTDOMAIN, localedir);
+    bind_textdomain_codeset(TEXTDOMAIN, "UTF-8");
+    textdomain(TEXTDOMAIN);
+
+    /* Update cached language info */
+    strncpy(current_lang, lang, sizeof(current_lang) - 1);
+    current_lang[sizeof(current_lang) - 1] = '\0';
+
+    /* Check if Korean */
+    korean_locale = (strcmp(current_lang, "ko") == 0);
+}
+
+/*
  * Initialize internationalization subsystem
  *
  * Should be called early in main() or allmain.c
+ * Uses iflags.language if set, otherwise defaults to Korean.
  */
 void
 init_i18n(void)
 {
     const char *lang;
-    const char *localedir;
 
-    /* Set locale from environment */
-    setlocale(LC_ALL, "");
-
-    /* Determine locale directory */
-    /* Try environment variable first, then standard locations */
-    localedir = getenv("NETHACK_LOCALE_DIR");
-    if (!localedir) {
-#ifdef LOCALEDIR
-        localedir = LOCALEDIR;  /* Defined in Makefile */
-#else
-        localedir = "/usr/share/locale";  /* Default fallback */
-#endif
-    }
-
-    /* Initialize gettext */
-    bindtextdomain(TEXTDOMAIN, localedir);
-    bind_textdomain_codeset(TEXTDOMAIN, "UTF-8");
-    textdomain(TEXTDOMAIN);
-
-    /* Cache current language */
-    lang = getenv("LANGUAGE");
-    if (!lang)
-        lang = getenv("LC_ALL");
-    if (!lang)
-        lang = getenv("LC_MESSAGES");
-    if (!lang)
-        lang = getenv("LANG");
-
-    if (lang) {
-        /* Extract language code (e.g., "ko" from "ko_KR.UTF-8") */
-        strncpy(current_lang, lang, sizeof(current_lang) - 1);
-        current_lang[sizeof(current_lang) - 1] = '\0';
-
-        /* Truncate at underscore or dot */
-        char *p = strchr(current_lang, '_');
-        if (p) *p = '\0';
-        p = strchr(current_lang, '.');
-        if (p) *p = '\0';
-
-        /* Check if Korean */
-        korean_locale = (strcmp(current_lang, "ko") == 0);
+    /* Check if language was set in options */
+    if (iflags.language[0]) {
+        lang = iflags.language;
     } else {
-        strcpy(current_lang, "en");
-        korean_locale = FALSE;
+        /* Default to Korean for HanNetHack */
+        lang = "ko";
+        strncpy(iflags.language, lang, sizeof(iflags.language) - 1);
+        iflags.language[sizeof(iflags.language) - 1] = '\0';
     }
+
+    /* Apply the language setting */
+    set_language(lang);
 }
 
 /*

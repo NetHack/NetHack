@@ -31,6 +31,9 @@
 /* Initialize internationalization subsystem */
 extern void init_i18n(void);
 
+/* Set the language at runtime (e.g., "ko", "en") */
+extern void set_language(const char *lang);
+
 /* Get current language code (e.g., "ko", "en") */
 extern const char *get_current_language(void);
 
@@ -59,6 +62,7 @@ extern char *process_korean_postpositions(char *buf, const char *format, ...);
 #define C_(Context, String) (String)
 
 #define init_i18n()     ((void)0)
+#define set_language(x) ((void)0)
 #define get_current_language() "en"
 #define is_korean_locale() FALSE
 #define process_korean_postpositions(buf, fmt, ...) (buf)

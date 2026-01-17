@@ -1824,6 +1824,39 @@ optfn_gender(
     return optn_ok;
 }
 
+#ifdef ENABLE_NLS
+staticfn int
+optfn_language(
+    int optidx UNUSED, int req, boolean negated,
+    char *opts, char *op)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+        if (negated) {
+            bad_negation("language", FALSE);
+            return optn_err;
+        }
+        if ((op = string_for_opt(opts, FALSE)) == empty_optstr)
+            return optn_err;
+
+        /* Store the language code */
+        strncpy(iflags.language, op, sizeof(iflags.language) - 1);
+        iflags.language[sizeof(iflags.language) - 1] = '\0';
+
+        /* Apply the language change */
+        set_language(iflags.language);
+        return optn_ok;
+    }
+    if (req == get_val || req == get_cnf_val) {
+        Sprintf(opts, "%s", iflags.language[0] ? iflags.language : "ko");
+        return optn_ok;
+    }
+    return optn_ok;
+}
+#endif /* ENABLE_NLS */
+
 staticfn int
 optfn_glyph(
     int optidx UNUSED, int req, boolean negated,
