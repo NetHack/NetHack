@@ -145,7 +145,7 @@ gush(coordxy x, coordxy y, genericptr_t poolcnt)
         return;
 
     if (!((*(int *) poolcnt)++))
-        pline("Water gushes forth from the overflowing fountain!");
+        pline(_("Water gushes forth from the overflowing fountain!"));
 
     /* Put a pool at x, y */
     set_levltyp(x, y, POOL);
@@ -254,7 +254,7 @@ drinkfountain(void)
     if (mgkftn && u.uluck >= 0 && fate >= 10) {
         int i, ii, littleluck = (u.uluck < 4);
 
-        pline("Wow!  This makes you feel great!");
+        pline(_("Wow!  This makes you feel great!"));
         /* blessed restore ability */
         for (ii = 0; ii < A_MAX; ii++)
             if (ABASE(ii) < AMAX(ii)) {
@@ -270,7 +270,7 @@ drinkfountain(void)
                 i = 0;
         }
         display_nhwindow(WIN_MESSAGE, FALSE);
-        pline("A wisp of vapor escapes the fountain...");
+        pline(_("A wisp of vapor escapes the fountain..."));
         exercise(A_WIS, TRUE);
         levl[u.ux][u.uy].blessedftn = 0;
         return;
@@ -318,7 +318,7 @@ drinkfountain(void)
             struct obj *obj, *nextobj;
             int buc_changed = 0;
 
-            pline("This water's no good!");
+            pline(_("This water's no good!"));
             morehungry(rn1(20, 11));
             exercise(A_CON, FALSE);
             /* this is more severe than rndcurse() */

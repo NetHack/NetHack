@@ -483,7 +483,7 @@ ghost_from_bottle(void)
     struct monst *mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, MM_NOMSG);
 
     if (!mtmp) {
-        pline("This bottle turns out to be empty.");
+        pline(_("This bottle turns out to be empty."));
         return;
     }
     if (Blind) {
@@ -647,7 +647,7 @@ peffect_restore_ability(struct obj *otmp)
 {
     gp.potion_unkn++;
     if (otmp->cursed) {
-        pline("Ulch!  This makes you feel mediocre!");
+        pline(_("Ulch!  This makes you feel mediocre!"));
         return;
     } else {
         int i, ii;
@@ -959,7 +959,7 @@ peffect_object_detection(struct obj *otmp)
 staticfn void
 peffect_sickness(struct obj *otmp)
 {
-    pline("Yecch!  This stuff tastes like poison.");
+    pline(_("Yecch!  This stuff tastes like poison."));
     if (otmp->blessed) {
         pline("(But in fact it was mildly stale %s.)", fruitname(TRUE));
         if (!Role_if(PM_HEALER)) {
@@ -1011,7 +1011,7 @@ peffect_confusion(struct obj *otmp)
 {
     if (!Confusion) {
         if (Hallucination) {
-            pline("What a trippy feeling!");
+            pline(_("What a trippy feeling!"));
             gp.potion_unkn++;
         } else
             pline("Huh, What?  Where am I?");
@@ -1026,7 +1026,7 @@ staticfn void
 peffect_gain_ability(struct obj *otmp)
 {
     if (otmp->cursed) {
-        pline("Ulch!  That potion tasted foul!");
+        pline(_("Ulch!  That potion tasted foul!"));
         gp.potion_unkn++;
     } else if (Fixed_abil) {
         gp.potion_nothing++;
@@ -1259,7 +1259,7 @@ peffect_oil(struct obj *otmp)
 
     if (otmp->lamplit) {
         if (likes_fire(gy.youmonst.data)) {
-            pline("Ahh, a refreshing drink.");
+            pline(_("Ahh, a refreshing drink."));
             good_for_you = TRUE;
         } else {
             /*
@@ -1284,7 +1284,7 @@ peffect_oil(struct obj *otmp)
     } else if (otmp->cursed) {
         pline("This tastes like castor oil.");
     } else {
-        pline("That was smooth!");
+        pline(_("That was smooth!"));
     }
     exercise(A_WIS, good_for_you);
 }

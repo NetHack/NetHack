@@ -522,3 +522,212 @@ msgstr "성별 선택"
 #: src/role.c
 msgid "Pick an alignment or creed"
 msgstr "성향 선택"
+
+#: src/role.c
+msgid "Shall I pick a character for you? [ynaq] "
+msgstr "캐릭터를 자동으로 선택할까요? [ynaq] "
+
+#: src/role.c
+msgid "Auto-select "
+msgstr "자동 선택: "
+
+#: src/role.c
+msgid "race"
+msgstr "종족"
+
+#: src/role.c
+msgid "role"
+msgstr "역할"
+
+#: src/role.c
+msgid "gender"
+msgstr "성별"
+
+#: src/role.c
+msgid "alignment"
+msgstr "성향"
+
+#: src/role.c
+msgid " and "
+msgstr ", "
+
+#: src/role.c
+msgid "? [ynaq] "
+msgstr "? [ynaq] "
+
+#: src/role.c
+msgid "Pick%s %s first"
+msgstr "%2$s%1$s 먼저 선택"
+
+#: src/role.c
+msgid " another"
+msgstr " 다른"
+
+#: src/role.c
+msgid "Reset"
+msgstr "초기화"
+
+#: src/role.c
+msgid "Set"
+msgstr "설정"
+
+#: src/role.c
+msgid "role/race/&c filtering"
+msgstr "역할/종족/등 필터"
+
+#: src/role.c
+msgid "Incompatible race!"
+msgstr "호환되지 않는 종족!"
+
+# ============================================================
+# 도움말/키 목록 (Help/Key List)
+# ============================================================
+
+#: src/cmd.c
+msgid "Directional keys:"
+msgstr "방향키:"
+
+#: src/cmd.c
+msgid "Miscellaneous keys:"
+msgstr "기타 키:"
+
+#: src/cmd.c
+msgid "General commands:"
+msgstr "일반 명령어:"
+
+#: src/cmd.c
+msgid "Game commands:"
+msgstr "게임 명령어:"
+
+#: src/cmd.c
+msgid "Debug mode commands:"
+msgstr "디버그 모드 명령어:"
+
+# ============================================================
+# 분수/샘 메시지 (Fountain Messages)
+# ============================================================
+
+#: src/fountain.c
+msgid "Wow!  This makes you feel great!"
+msgstr "와! 기분이 매우 좋아졌다!"
+
+#: src/fountain.c
+msgid "A wisp of vapor escapes the fountain..."
+msgstr "한 줄기 수증기가 분수에서 피어오른다..."
+
+#: src/fountain.c
+msgid "The cool draught refreshes you."
+msgstr "시원한 물이 당신을 상쾌하게 한다."
+
+#: src/fountain.c
+msgid "The water is foul!  You gag and vomit."
+msgstr "물이 더럽다! 구역질이 나서 토했다."
+
+#: src/fountain.c
+msgid "The water is contaminated!"
+msgstr "물이 오염되었다!"
+
+#: src/fountain.c
+msgid "This water's no good!"
+msgstr "이 물은 좋지 않다!"
+
+#: src/fountain.c
+msgid "The fountain dries up!"
+msgstr "분수가 말라버렸다!"
+
+#: src/fountain.c
+msgid "Water gushes forth from the overflowing fountain!"
+msgstr "넘치는 분수에서 물이 솟아오른다!"
+
+# ============================================================
+# 음식/먹기 메시지 (Food/Eating Messages)
+# ============================================================
+
+#: src/eat.c
+msgid "This food really hits the spot"
+msgstr "이 음식 정말 맛있다"
+
+#: src/eat.c
+msgid "Eating that is instantly fatal."
+msgstr "그것을 먹으면 즉사한다."
+
+#: src/eat.c
+msgid "Yum!  That was real brain food!"
+msgstr "냠! 정말 머리에 좋은 음식이었다!"
+
+#: src/eat.c
+msgid "For some reason, that tasted bland."
+msgstr "어쩐지 싱거운 맛이다."
+
+#: src/eat.c
+msgid "Oh wow!  Great stuff!"
+msgstr "와! 대단하다!"
+
+#: src/eat.c
+msgid "Ugh.  Rotten egg."
+msgstr "윽. 썩은 달걀이다."
+
+#: src/eat.c
+msgid "Yak - dog food!"
+msgstr "윽 - 개밥이잖아!"
+
+#: src/eat.c
+msgid "This tripe ration is surprisingly good!"
+msgstr "이 양 내장이 의외로 맛있다!"
+
+#: src/eat.c
+msgid "Ulch - that %s was tainted%s!"
+msgstr "윽 - 그 %s{은/는} 상했다%s!"
+
+#: src/eat.c
+msgid "Ecch - that must have been poisonous!"
+msgstr "윽 - 독이 있었던 게 틀림없다!"
+
+#: src/eat.c
+msgid "This tastes just like chicken!"
+msgstr "닭고기 맛이 난다!"
+
+# ============================================================
+# 물약 메시지 (Potion Messages)
+# ============================================================
+
+#: src/potion.c
+msgid "This bottle turns out to be empty."
+msgstr "이 병은 비어 있었다."
+
+#: src/potion.c
+msgid "Ulch!  This makes you feel mediocre!"
+msgstr "윽! 평범해진 기분이다!"
+
+#: src/potion.c
+msgid "Wow!  This makes you feel %s!"
+msgstr "와! %s 기분이다!"
+
+#: src/potion.c
+msgid "Yecch!  This stuff tastes like poison."
+msgstr "윽! 이건 독 맛이 난다."
+
+#: src/potion.c
+msgid "Ulch!  That potion tasted foul!"
+msgstr "윽! 그 물약 맛이 끔찍했다!"
+
+#: src/potion.c
+msgid "This tastes like %s."
+msgstr "%s 맛이 난다."
+
+#: src/potion.c
+msgid "This burns like %s!"
+msgstr "%s처럼 타오른다!"
+
+#: src/potion.c
+msgid "Ahh, a refreshing drink."
+msgstr "아, 상쾌한 음료다."
+
+#: src/potion.c
+msgid "What a trippy feeling!"
+msgstr "이상한 기분이다!"
+
+#: src/potion.c
+msgid "That was smooth!"
+msgstr "부드러웠다!"
+

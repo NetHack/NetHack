@@ -74,3014 +74,2975 @@ questtext = {
  t suffix:	return strip_the_prefix(root);]],
       },
       angel_cuss = {
-         "\"Repent, and thou shalt be saved!\"",
-         "\"Thou shalt pay for thine insolence!\"",
-         "\"Very soon, my child, thou shalt meet thy maker.\"",
-         "\"The great %D has sent me to make you pay for your sins!\"",
-         "\"The wrath of %D is now upon you!\"",
-         "\"Thy life belongs to %D now!\"",
-         "\"Dost thou wish to receive thy final blessing?\"",
-         "\"Thou art but a godless void.\"",
-         "\"Thou art not worthy to seek the Amulet.\"",
-         "\"No one expects the Spanish Inquisition!\"",
-         "\"Judgment hath been passed upon thee, %p.\"",
-         "\"Thy reckoning is at hand, %p.\"",
-         "\"Thou shalt be brought before %D for thy crimes!\"",
-         "\"With %D as my witness, I shall strike thee down.\"",
+         "\"회개하라, 그리하면 구원받으리라!\"",
+         "\"네 건방짐에 대한 대가를 치르리라!\"",
+         "\"곧, 나의 자녀여, 네 창조주를 만나게 될 것이다.\"",
+         "\"위대하신 %D께서 네 죄값을 치르게 하라고 나를 보내셨다!\"",
+         "\"%D의 진노가 이제 네게 임했다!\"",
+         "\"네 목숨은 이제 %D의 것이다!\"",
+         "\"마지막 축복을 받고 싶으냐?\"",
+         "\"너는 그저 신 없는 공허일 뿐이다.\"",
+         "\"너는 부적을 찾을 자격이 없다.\"",
+         "\"아무도 스페인 종교재판을 예상하지 못한다!\"",
+         "\"심판이 너에게 내려졌다, %p.\"",
+         "\"네 심판의 시간이 가까웠다, %p.\"",
+         "\"네 죄를 위해 %D 앞에 끌려가게 될 것이다!\"",
+         "\"%D을(를) 증인으로 삼아, 널 쓰러뜨리겠다.\"",
       },
       banished = {
-         synopsis = "[You are banished from %H for betraying your allegiance to %d.]",
+         synopsis = "[%d에 대한 충성을 배신하여 %H에서 추방되었다.]",
          output = "text",
-         text = [["You have betrayed all those who hold allegiance to %d, as you once did.
-My allegiance to %d holds fast and I cannot condone or accept what you
-have done.
+         text = [["당신은 한때 그랬던 것처럼 %d에게 충성하는 모든 이들을 배신했다.
+나의 %d에 대한 충성은 변함없으며, 당신이 한 일을
+용납하거나 받아들일 수 없다.
 
-Leave this place.  You shall never set foot at %H again.
-That which you seek is now lost forever, for without the Bell of Opening,
-you will never be able to enter the place where he who has the Amulet
-resides.
+이곳을 떠나라. 다시는 %H에 발을 들여놓을 수 없을 것이다.
+당신이 찾는 것은 이제 영원히 잃어버린 것이다. 열림의 종 없이는
+부적을 가진 자가 있는 곳에 들어갈 수 없을 것이기 때문이다.
 
-Go now!  You are banished from this place.]],
+당장 가라! 이 장소에서 추방되었다.]],
       },
       demon_cuss = {
-         "\"I first mistook thee for a statue, when I regarded thy head of stone.\"",
-         "\"Come here often?\"",
-         "\"Doth pain excite thee?  Wouldst thou prefer the whip?\"",
-         "\"Thinkest thou it shall tickle as I rip out thy lungs?\"",
-         "\"Eat slime and die!\"",
-         "\"Go ahead, fetch thy mama!  I shall wait.\"",
-         "\"Go play leapfrog with a herd of unicorns!\"",
-         "\"Hast thou been drinking, or art thou always so clumsy?\"",
-         "\"This time I shall let thee off with a spanking, but let it not happen again.\"",
-         "\"I've met smarter (and prettier) acid blobs.\"",
-         "\"Look!  Thy bootlace is undone!\"",
-         "\"Mercy!  Dost thou wish me to die of laughter?\"",
-         "\"Run away!  Live to flee another day!\"",
-         "\"Thou hadst best fight better than thou canst dress!\"",
-         "\"Twixt thy cousin and thee, Medusa is the prettier.\"",
-         "\"Methinks thou wert unnaturally stirred by yon corpse back there, eh, varlet?\"",
-         "\"Up thy nose with a rubber hose!\"",
-         "\"Verily, thy corpse could not smell worse!\"",
-         "\"Wait!  I shall polymorph into a grid bug to give thee a fighting chance!\"",
-         "\"Why search for the Amulet?  Thou wouldst but lose it, cretin.\"",
-         "\"Thou ought to be a comedian, thy skills are so laughable!\"",
-         "\"Thy gaze is so vacant, I thought thee a floating eye!\"",
-         "\"Thy head is unfit for a mind flayer to munch upon!\"",
-         "\"Only thy reflection could love thee!\"",
-         "\"Hast thou considered masking thine odour?\"",
-         "\"Hold! Thy face is a most exquisite torture!\"",
-         "\"I should fart in thy direction, but it might improve thy smell!\"",
+         "\"처음엔 네 돌대가리를 보고 조각상인 줄 알았다.\"",
+         "\"여기 자주 오나?\"",
+         "\"고통이 좋으냐? 채찍을 원하느냐?\"",
+         "\"내가 네 폐를 뽑을 때 간지러울 것 같으냐?\"",
+         "\"슬라임이나 먹고 죽어라!\"",
+         "\"어서, 엄마나 불러와라! 기다리마.\"",
+         "\"유니콘 떼와 말뛰기나 하러 가라!\"",
+         "\"술을 마셨느냐, 아니면 원래 그렇게 서투르냐?\"",
+         "\"이번엔 엉덩이만 때리고 봐주마, 다시는 이러지 마라.\"",
+         "\"더 똑똑하고 예쁜 산성 젤리도 만나봤다.\"",
+         "\"봐라! 신발끈이 풀렸다!\"",
+         "\"자비를! 웃겨 죽이려고 하느냐?\"",
+         "\"도망쳐라! 다음에 또 도망칠 수 있게 살아라!\"",
+         "\"옷 입는 것보다는 싸우는 게 나아야 할 텐데!\"",
+         "\"네 사촌과 너 사이에서, 메두사가 더 예쁘다.\"",
+         "\"저기 시체에 이상하게 흥분하더구나, 이 망나니야?\"",
+         "\"코에 호스나 쑤셔라!\"",
+         "\"네 시체는 더 이상 나쁜 냄새가 날 수 없을 것이다!\"",
+         "\"잠깐! 공정한 싸움을 위해 그리드버그로 변신하마!\"",
+         "\"왜 부적을 찾느냐? 어차피 잃어버릴 텐데, 이 바보야.\"",
+         "\"코미디언이나 해라, 실력이 웃기니까!\"",
+         "\"네 눈빛이 너무 멍해서 떠다니는 눈인 줄 알았다!\"",
+         "\"네 머리는 마인드 플레이어가 먹기에도 부적합하다!\"",
+         "\"오직 네 거울 속 모습만이 널 사랑할 수 있다!\"",
+         "\"네 체취를 가리는 것을 고려해 봤느냐?\"",
+         "\"멈춰! 네 얼굴은 최고의 고문이다!\"",
+         "\"네 쪽으로 방귀를 뀌어야 하는데, 네 냄새가 나아질 것 같다!\"",
       },
       legacy = {
-         synopsis = "[%dC has chosen you to recover the Amulet of Yendor for %dI.]",
+         synopsis = "[%d이(가) 옌더의 부적을 되찾도록 당신을 선택했다.]",
          output = "menu",
-         text = [[It is written in the Book of %d:
+         text = [[%d의 책에 기록되어 있으니:
 
-    After the Creation, the cruel god Moloch rebelled
-    against the authority of Marduk the Creator.
-    Moloch stole from Marduk the most powerful of all
-    the artifacts of the gods, the Amulet of Yendor,
-    and he hid it in the dark cavities of Gehennom, the
-    Under World, where he now lurks, and bides his time.
+    창조 이후, 잔인한 신 몰록이 창조주 마르둑의
+    권위에 반역하였다.
+    몰록은 마르둑으로부터 신들의 모든 유물 중
+    가장 강력한 옌더의 부적을 훔쳐,
+    지금 그가 숨어 때를 기다리고 있는
+    지하 세계 게헨놈의 어두운 동굴에 숨겼다.
 
-Your %G %d seeks to possess the Amulet, and with it
-to gain deserved ascendance over the other gods.
+당신의 %G %d은(는) 부적을 손에 넣어
+다른 신들 위에 마땅히 군림하고자 한다.
 
-You, a newly trained %r, have been heralded
-from birth as the instrument of %d.  You are destined
-to recover the Amulet for your deity, or die in the
-attempt.  Your hour of destiny has come.  For the sake
-of us all:  Go bravely with %d!]],
+갓 수련을 마친 %r인 당신은 태어날 때부터
+%d의 도구로 예언되어 왔다. 당신은 신을 위해
+부적을 되찾거나, 그 시도 중에 죽을 운명이다.
+당신의 운명의 시간이 왔다.
+우리 모두를 위해: %d과(와) 함께 용감히 나아가라!]],
       },
 -- starting with 'pauper' option set, last paragraph differs from normal legacy
       pauper_legacy = {
-         synopsis = "[%dC has chosen you to recover the Amulet of Yendor for %dI.]",
+         synopsis = "[%d이(가) 옌더의 부적을 되찾도록 당신을 선택했다.]",
          output = "menu",
-         text = [[It is written in the Book of %d:
+         text = [[%d의 책에 기록되어 있으니:
 
-    After the Creation, the cruel god Moloch rebelled
-    against the authority of Marduk the Creator.
-    Moloch stole from Marduk the most powerful of all
-    the artifacts of the gods, the Amulet of Yendor,
-    and he hid it in the dark cavities of Gehennom, the
-    Under World, where he now lurks, and bides his time.
+    창조 이후, 잔인한 신 몰록이 창조주 마르둑의
+    권위에 반역하였다.
+    몰록은 마르둑으로부터 신들의 모든 유물 중
+    가장 강력한 옌더의 부적을 훔쳐,
+    지금 그가 숨어 때를 기다리고 있는
+    지하 세계 게헨놈의 어두운 동굴에 숨겼다.
 
-Your %G %d seeks to possess the Amulet, and with it
-to gain deserved ascendance over the other gods.
+당신의 %G %d은(는) 부적을 손에 넣어
+다른 신들 위에 마땅히 군림하고자 한다.
 
-You, an untrained %r, have been unable to adequately
-prepare to be the instrument of %d.  Nevertheless, you
-are destined to recover the Amulet for your deity, or die
-in the attempt.  Your hour of destiny has come.  For the
-sake of us all:  Go bravely with %d!]],
+수련받지 못한 %r인 당신은 %d의 도구가 되기 위한
+적절한 준비를 하지 못했다. 그럼에도 불구하고,
+당신은 신을 위해 부적을 되찾거나, 그 시도 중에
+죽을 운명이다. 당신의 운명의 시간이 왔다.
+우리 모두를 위해: %d과(와) 함께 용감히 나아가라!]],
       },
       quest_complete_no_bell = {
-         text = [["The silver bell which was hoarded by %n will be
-essential in locating the Amulet of Yendor."]],
+         text = [["%n이(가) 쌓아두었던 은종은
+옌더의 부적을 찾는 데 필수적일 것이다."]],
       },
       quest_portal = {
          output = "pline",
-         text = [[You receive a faint telepathic message from %l:
-Your help is urgently needed at %H!
-Look for a ...ic transporter.
-You couldn't quite make out that last message.]],
+         text = [[%l로부터 희미한 텔레파시 메시지를 받았다:
+%H에서 당신의 도움이 급히 필요합니다!
+...적 이동 장치를 찾으세요.
+마지막 메시지는 잘 들리지 않았다.]],
       },
       quest_portal_again = {
-         text = "You again sense %l pleading for help.",
+         text = "%l이(가) 다시 도움을 청하는 것을 느꼈다.",
       },
       quest_portal_demand = {
-         text = "You again sense %l demanding your attendance.",
+         text = "%l이(가) 당신의 참석을 요구하는 것을 느꼈다.",
       },
    },
    Arc = {
       assignquest = {
-         synopsis = "[%nC has stolen %o.  Locate %i, defeat %ni, and return %O.]",
+         synopsis = "[%n이(가) %o을(를) 훔쳤다. %i를 찾아 %n을(를) 물리치고 %o을(를) 되찾아오라.]",
          output = "text",
-         text = [["Grave times have befallen the college, for %na has
-stolen %o.  Without it, the board of directors of
-the university will soon have no choice but to revoke our research grants.
+         text = [["대학에 큰 위기가 닥쳤네. %n이(가)
+%o을(를) 훔쳐갔거든. 이것 없이는 대학 이사회가
+곧 우리의 연구 보조금을 취소할 수밖에 없을 거야.
 
-"You must locate the entrance to %i.  Within it,
-you will find %n.
+"%i의 입구를 찾아야 하네. 그 안에서
+%n을(를) 발견하게 될 걸세.
 
-"You must then defeat %n and return %o
-to me.
+"그런 다음 %n을(를) 물리치고 %o을(를)
+내게 되돌려주어야 하네.
 
-"Only in this way will we be able to prevent the budget cuts that could
-close this college.
+"오직 이 방법만이 이 대학을 폐교시킬 수 있는
+예산 삭감을 막을 수 있네.
 
-"May the wisdom of %d be your guide."]],
+"%d의 지혜가 자네를 인도하기를."]],
       },
       badalign = {
-         synopsis = "[\"%pC, you have strayed from the %a path.  Purify yourself!\"]",
+         synopsis = "[\"%p, 자네는 %a의 길에서 벗어났네. 스스로를 정화하게!\"]",
          output = "text",
-         text = [["%pC!  I've heard that you've been using sloppy techniques.  Your
-results lately can hardly be called suitable for %ra!
+         text = [["%p! 자네가 엉성한 기법을 쓰고 있다고 들었네. 최근 자네의
+결과물은 %r(이)라고 부르기에도 부적합하네!
 
-"How could you have strayed from the %a path?  Go from here, and come
-back only when you have purified yourself."]],
+"어떻게 %a의 길에서 벗어날 수가 있나? 여기서 떠나게, 그리고
+자신을 정화한 후에만 돌아오게."]],
       },
       badlevel = {
-         synopsis = "[%pC, a mere %r is too inexperienced.]",
+         synopsis = "[%p, 단순한 %r(은)는 너무 미숙하다.]",
          output = "text",
-         text = [["%p, you are yet too inexperienced to undertake such a demanding
-quest.  A mere %r could not possibly face the rigors demanded and
-survive.  Go forth, and come here again when your adventures have further
-taught you."]],
+         text = [["%p, 자네는 아직 그토록 힘든 임무를 맡기에는 너무 미숙하네.
+단순한 %r(으)로서는 요구되는 시련을 감당하고
+살아남을 수 없네. 떠나게, 그리고 모험이 자네를 더 가르친 후에
+다시 오게."]],
       },
       discourage = {
-         "\"Try your best, %p.  You cannot defeat me.\"",
-         "\"I shall rend the flesh from your body whilst you still breathe!\"",
-         "\"First you, %p, then I shall destroy your mentor, %l.\"",
-         "\"Tiring yet, %p?  I draw my power from my master and cannot falter!\"",
-         "\"I shall rend thy soul from thy body and consume it!\"",
-         "\"You are far too %a -- it weakens you.  You shall die in this place.\"",
-         "\"%d has forsaken you!  You are lost now!\"",
-         "\"A mere %r cannot hope to defeat me!\"",
-         "\"If you are the best %l can send, I have nothing to fear.\"",
-         "\"Die %c!  I shall exhibit your carcass as a trophy.\"",
+         "\"최선을 다해보게, %p. 나를 이길 수는 없을 테니.\"",
+         "\"네가 아직 숨 쉬는 동안 살을 발라내 주마!\"",
+         "\"먼저 너, %p, 그다음 네 스승 %l을(를) 파괴하겠다.\"",
+         "\"지쳤나, %p? 나는 내 주인에게서 힘을 얻어 흔들리지 않는다!\"",
+         "\"네 영혼을 몸에서 찢어내 삼켜버리겠다!\"",
+         "\"넌 너무 %a해 -- 그게 널 약하게 만들지. 넌 이곳에서 죽을 것이다.\"",
+         "\"%d이(가) 널 버렸다! 넌 이제 끝이다!\"",
+         "\"단순한 %r이(가) 나를 이기려 하다니!\"",
+         "\"네가 %l이(가) 보낼 수 있는 최고라면, 난 두려울 게 없다.\"",
+         "\"죽어라 %c! 네 시체를 트로피로 전시해 주마.\"",
       },
       encourage = {
-         "\"Beware, for %n is powerful and cunning.\"",
-         "\"To locate the entrance to %i, you must pass many traps.\"",
-         "\"A %nt may be vulnerable to attacks by magical cold.\"",
-         "\"Call upon %d when you encounter %n.\"",
-         "\"You must destroy %n.  It will pursue you otherwise.\"",
-         "\"%oC is a mighty talisman.  With it you can destroy %n.\"",
-         "\"Go forth with the blessings of %d.\"",
-         "\"I will have my %gP watch for your return.\"",
-         "\"Remember not to stray from the true %a path.\"",
-         "\"You may be able to sense %o when you are near.\"",
+         "\"%n은(는) 강력하고 교활하니 조심하게.\"",
+         "\"%i 입구를 찾으려면 많은 함정을 통과해야 하네.\"",
+         "\"%n은(는) 마법 냉기 공격에 취약할 수 있네.\"",
+         "\"%n을(를) 만나면 %d께 기도하게.\"",
+         "\"%n을(를) 반드시 파괴해야 하네. 그렇지 않으면 자네를 쫓아올 거야.\"",
+         "\"%o은(는) 강력한 부적이네. 이것으로 %n을(를) 파괴할 수 있네.\"",
+         "\"%d의 축복과 함께 떠나게.\"",
+         "\"내 %gP에게 자네의 귀환을 지켜보라고 하겠네.\"",
+         "\"진정한 %a의 길에서 벗어나지 말게.\"",
+         "\"가까이 가면 %o을(를) 감지할 수 있을 거네.\"",
       },
       firsttime = {
-         synopsis = "[You arrive at %H, but all is not well.]",
+         synopsis = "[%H에 도착했지만 뭔가 잘못되었다.]",
          output = "text",
-         text = [[You are suddenly in familiar surroundings.  The buildings in the distance
-seem to be those of your old alma mater, but something is wrong.  It feels
-as if there has been a riot recently, or %H has
-been under siege.
+         text = [[갑자기 익숙한 환경에 있게 되었다. 저 멀리 보이는 건물들은
+옛 모교의 것처럼 보이지만 뭔가 잘못되었다. 마치 최근에
+폭동이 일어났거나 %H이(가)
+포위당한 것 같다.
 
-All of the windows are boarded up, and there are objects scattered around
-the entrance.
+모든 창문은 판자로 막혀 있고, 입구 주변에는 물건들이
+흩어져 있다.
 
-Strange forbidding shapes seem to be moving in the distance.]],
+멀리서 이상하고 불길한 형체들이 움직이는 것 같다.]],
       },
       goal_alt = {
-         text = "You have returned to %ns lair.",
+         text = "%n의 소굴로 돌아왔다.",
       },
       goal_first = {
-         synopsis = "[This strange feeling must be the presence of %o.]",
+         synopsis = "[이 이상한 느낌은 %o의 존재일 것이다.]",
          output = "text",
-         text = [[A strange feeling washes over you, and you think back to things you
-learned during the many lectures of %l.
+         text = [[이상한 느낌이 밀려오고, %l의 많은 강의에서
+배웠던 것들을 떠올린다.
 
-You realize the feeling must be the presence of %o.]],
+이 느낌이 %o의 존재임을 깨닫는다.]],
       },
       goal_next = {
-         text = "The familiar presence of %o is in the ether.",
+         text = "%o의 익숙한 존재감이 공기 중에 느껴진다.",
       },
       gotit = {
-         synopsis = "[The power of %o flows through your body!  You must return it to %l.]",
+         synopsis = "[%o의 힘이 온몸에 흐른다! %l에게 돌려줘야 한다.]",
          output = "text",
-         text = [[The power of %o flows through your body!  You feel
-as if you could now take on the Wizard of Yendor himself and win, but
-you know you must return %o to %l.]],
+         text = [[%o의 힘이 온몸에 흐른다! 마치 지금
+옌더의 마법사 자신과 맞서 싸워 이길 수 있을 것 같지만,
+%o을(를) %l에게 돌려줘야 한다는 것을 안다.]],
       },
       guardtalk_after = {
-         "\"Did you see Lash LaRue in 'Song of Old Wyoming' the other night?\"",
-         "\"Hey man, got any potions of hallucination for sale?\"",
-         "\"I guess you are guaranteed to make full professor now.\"",
-         "\"So, what was worse, %n or your entrance exams?\"",
-         "\"%oC is impressive, but nothing like the bones I dug up!\"",
+         "\"어젯밤 '옛 와이오밍의 노래'에서 래쉬 라루 봤어?\"",
+         "\"이봐, 환각 물약 팔 거 있어?\"",
+         "\"이제 정교수 되는 건 확정이겠네.\"",
+         "\"그래서 뭐가 더 힘들었어, %n 아니면 입학 시험?\"",
+         "\"%o도 인상적이지만 내가 발굴한 뼈에 비할 바가 아니야!\"",
       },
       guardtalk_before = {
-         "\"Did you see Lash LaRue in 'Song of Old Wyoming' the other night?\"",
-         "\"Hey man, got any potions of hallucination for sale?\"",
-         "\"Did you see the artifact %l brought back from the last dig?\"",
-         "\"So what species do *you* think we evolved from?\"",
-         "\"So you're %ls prize pupil!  I don't know what he sees in you.\"",
+         "\"어젯밤 '옛 와이오밍의 노래'에서 래쉬 라루 봤어?\"",
+         "\"이봐, 환각 물약 팔 거 있어?\"",
+         "\"%l이(가) 지난 발굴에서 가져온 유물 봤어?\"",
+         "\"*너는* 우리가 어떤 종에서 진화했다고 생각해?\"",
+         "\"그래서 네가 %l의 수제자라고! 뭘 보고 그러는지 모르겠네.\"",
       },
       hasamulet = {
-         synopsis = "[Take the Amulet to the Astral Plane and sacrifice it at the altar of %d.]",
+         synopsis = "[아뮬렛을 아스트랄 계로 가져가 %d의 제단에 바쳐라.]",
          output = "text",
-         text = [["Congratulations, %p.  I wondered if anyone could prevail against
-the Wizard and the minions of Moloch.  Now, you must embark on one
-final adventure.
+         text = [["축하하네, %p. 마법사와 몰록의 하수인들을 이길 수 있을지
+궁금했네. 이제 마지막 모험을 떠나야 하네.
 
-"Take the Amulet, and find your way onto the Astral Plane.
-There you must find the altar of %d and sacrifice the
-Amulet on that altar to fulfill your destiny.
+"아뮬렛을 가지고 아스트랄 계로 가는 길을 찾게.
+거기서 %d의 제단을 찾아 그 제단에
+아뮬렛을 바쳐 자네의 운명을 완수해야 하네.
 
-"Remember, your path now should always be upwards."]],
+"기억하게, 이제 자네의 길은 항상 위로 향해야 하네."]],
       },
       killed_nemesis = {
-         text = "The body of %n dissipates in a cloud of noxious fumes.",
+         text = "%n의 시체가 유독한 연기 구름 속으로 사라진다.",
       },
       leader_first = {
-         synopsis = "[\"You have returned, %p, to a difficult task.\"]",
+         synopsis = "[\"돌아왔구나, %p, 어려운 임무를 위해.\"]",
          output = "text",
-         text = [["Finally you have returned, %p.  You were always
-my most promising student.  Allow me to see if you are ready for the
-most difficult task of your career."]],
+         text = [["드디어 돌아왔구나, %p. 자네는 항상
+내 가장 유망한 학생이었지. 자네가 경력 중 가장 어려운
+임무를 맡을 준비가 되었는지 보겠네."]],
       },
       leader_last = {
-         synopsis = "[\"%pC, you have failed us.  Begone!\"]",
+         synopsis = "[\"%p, 우리를 실망시켰구나. 떠나라!\"]",
          output = "text",
-         text = [["%p, you have failed us.  All of my careful training has been in
-vain.  Begone!  Your tenure at this college has been revoked!
+         text = [["%p, 우리를 실망시켰구나. 내 세심한 훈련이
+모두 허사였네. 떠나라! 이 대학에서의 자네 재직권은 취소되었네!
 
-"You are a disgrace to the profession!"]],
+"자네는 이 직업의 수치일세!"]],
       },
       leader_next = {
-         text = [["Again, %p, you stand before me.
-Let me see if you have gained experience in the interim."]],
+         text = [["또다시, %p, 내 앞에 서 있구나.
+그동안 경험을 쌓았는지 보겠네."]],
       },
       leader_other = {
-         text = [["Once more, %p, you have returned from the field.
-Are you finally ready for the task that must be accomplished?"]],
+         text = [["다시 한번, %p, 현장에서 돌아왔구나.
+마침내 완수해야 할 임무를 위한 준비가 되었나?"]],
       },
       locate_first = {
-         synopsis = "[This foreboding edifice must hide the entrance to %i.]",
+         synopsis = "[이 불길한 건물이 %i로의 입구를 숨기고 있는 것 같다.]",
          output = "text",
-         text = [[A plain opens before you.  Beyond the plain lies a foreboding edifice.
+         text = [[평원이 눈앞에 펼쳐진다. 평원 너머에 불길한 건물이 있다.
 
-You have the feeling that you will soon find the entrance to
-%i.]],
+곧 %i로의 입구를 찾게 될 것 같은
+느낌이 든다.]],
       },
       locate_next = {
-         text = "Once again, you are near the entrance to %i.",
+         text = "다시 한번, %i 입구 근처에 있다.",
       },
       nemesis_first = {
-         synopsis = "[\"Come, %p, I shall destroy you!\"]",
+         synopsis = "[\"덤벼라, %p, 널 파괴해 주마!\"]",
          output = "text",
-         text = [["So, %p, you think that you can succeed in recovering
-%o, when your teacher, %l, has already failed.
+         text = [["그래서, %p, 네 스승 %l도 실패한
+%o을(를) 되찾는 데 성공할 수 있다고 생각하나.
 
-"Come, try your best!  I shall destroy you, and gnaw on your bones."]],
+"덤벼라, 최선을 다해! 널 파괴하고 네 뼈를 갉아주마."]],
       },
       nemesis_next = {
-         synopsis = "[\"Again you try to best me, %p?  You shall never recover %o.\"]",
+         synopsis = "[\"또 나를 이기려 하나, %p? %o을(를) 절대 되찾지 못할 것이다.\"]",
          output = "text",
-         text = [["Again you try to best me, eh %p?  Well, you shall fail again.
+         text = [["또 나를 이기려 하나, %p? 자, 또 실패할 것이다.
 
-"You shall never recover %o.
+"%o을(를) 절대 되찾지 못할 것이다.
 
-"I shall bear your soul to the Plane of Origins for my master's pleasure."]],
+"네 영혼을 기원의 차원으로 데려가 내 주인을 즐겁게 해주마."]],
       },
       nemesis_other = {
-         text = "\"You persist yet %p!  Good.  Now, you shall die!\"",
+         text = "\"아직도 버티는구나 %p! 좋아. 이제 죽어라!\"",
       },
       nemesis_wantsit = {
-         text = [["I shall have %o from you, %p, then feast
-upon your entrails!"]],
+         text = [["%o을(를) 빼앗겠다, %p, 그리고 네 내장으로
+잔치를 벌이겠다!"]],
       },
       nexttime = {
-         text = "Once again, you are back at %H.",
+         text = "다시 한번, %H에 돌아왔다.",
       },
       offeredit = {
-         synopsis = "[%lC instructs you to guard %o from now on.]",
+         synopsis = "[%l이(가) 이제부터 %o을(를) 지키라고 지시한다.]",
          output = "text",
-         text = [[%lC touches %o briefly, gazes into it,
-then smiles at you and says:
+         text = [[%l이(가) %o을(를) 잠시 만지며 그 안을 들여다보더니
+미소를 지으며 말한다:
 
-"Well done, %p.  You have defeated %n and
-recovered %o.  But I fear that it shall never be safe
-here.
+"잘했네, %p. %n을(를) 물리치고
+%o을(를) 되찾았구나. 하지만 여기서는 결코 안전하지
+않을 것 같네.
 
-Please take %o with you.  You, %p, can
-guard it now far better than I.
+%o을(를) 가져가게. %p, 이제 자네가
+나보다 훨씬 더 잘 지킬 수 있네.
 
-May the blessings of %d follow you and guard you."]],
+%d의 축복이 자네를 따르고 지켜주기를."]],
       },
       offeredit2 = {
-         synopsis = "[\"Resume your search for the Amulet beyond the magic portal to %Z.\"]",
+         synopsis = "[\"%Z로 가는 마법 포탈 너머에서 아뮬렛 탐색을 재개하라.\"]",
          output = "text",
-         text = [["Careful, %p!  %oC might break, and that would be
-a tragic loss.  You are its keeper now, and the time has come to
-resume your search for the Amulet.  %Z await your
-return through the magic portal that brought you here."]],
+         text = [["조심하게, %p! %o이(가) 부서질 수 있네, 그러면
+비극적인 손실이 될 거야. 이제 자네가 그것의 수호자이고,
+아뮬렛 탐색을 재개할 시간이네. %Z이(가) 자네를
+여기로 데려온 마법 포탈을 통한 귀환을 기다리고 있네."]],
       },
       othertime = {
-         text = [[You are back at %H.
-You have an odd feeling this may be the last time you ever come here.]],
+         text = [[%H에 돌아왔다.
+이것이 마지막으로 여기 오는 것일지도 모른다는 이상한 느낌이 든다.]],
       },
       posthanks = {
-         synopsis = "[\"Have you progressed with your quest to regain the Amulet of Yendor for %d?\"]",
+         synopsis = "[\"옌더의 아뮬렛을 %d을(를) 위해 되찾는 임무는 잘 진행되고 있나?\"]",
          output = "text",
-         text = [["Welcome back, %p.  Have you progressed with your quest to
-regain the Amulet of Yendor for %d?"]],
+         text = [["다시 온 것을 환영하네, %p. 옌더의 아뮬렛을
+%d을(를) 위해 되찾는 임무는 잘 진행되고 있나?"]],
       },
    },
    Bar = {
       assignquest = {
-         synopsis = "[\"Find %n, defeat %ni, and return %o to us.\"]",
+         synopsis = "[\"%n을(를) 찾아 물리치고 %o을(를) 되찾아오라.\"]",
          output = "text",
-         text = [["The world is in great need of your assistance, %p.
+         text = [["세상이 자네의 도움을 절실히 필요로 하네, %p.
 
-"About six months ago, I learned that a mysterious sorcerer, known
-as %n, had begun to gather a large group of cutthroats and brigands
-about %ni.
+"약 6개월 전, %n(이)라고 알려진 신비로운 마법사가
+그의 주위에 살인자들과 도적떼를 모으기 시작했다는 것을 알게 되었네.
 
-"At about the same time, these people you once rode with `liberated' a
-potent magical talisman, %o, from a Turanian caravan.
+"거의 같은 시기에, 네가 한때 함께 달렸던 이 사람들이 투라니아 대상에서
+강력한 마법 부적 %o을(를) '해방'시켰네.
 
-"%nC and %nj Black Horde swept down upon %i and defeated
-the people there, driving them out into the desert.  He has taken
-%o, and seeks to bend it to %nj will.  I detected the
-subtle changes in the currents of fate, and joined these people.
-Then I sent forth a summons for you.
+"%n과(와) 그의 검은 무리가 %i로 쳐들어가
+그곳 사람들을 물리치고 사막으로 몰아냈네. 그가 %o을(를)
+가져갔고, 그것을 자신의 의지에 굴복시키려 하고 있네.
+나는 운명의 흐름에서 미묘한 변화를 감지하고 이 사람들과 합류했네.
+그리고 자네를 소환했지.
 
-"If %n can bend %o to %nj will, he will become
-almost indestructible.  He will then be able to enslave the minds of
-men across the world.  You are the only hope.  The gods smile upon you,
-and with %d behind you, you alone can defeat %n.
+"만약 %n이(가) %o을(를) 자신의 의지에 굴복시킨다면,
+거의 무적이 될 것이네. 그러면 전 세계 사람들의 마음을 노예로 삼을 수 있게 되지.
+자네가 유일한 희망이네. 신들이 자네에게 미소 짓고 있고,
+%d이(가) 자네 뒤에 있으니 자네만이 %n을(를) 물리칠 수 있네.
 
-"You must go to %i.  From there, you can track down
-%n, defeat %ni, and return %o to us.  Only
-then will the world be safe."]],
+"%i로 가야 하네. 거기서 %n을(를) 추적하여
+물리치고 %o을(를) 우리에게 되돌려주게. 오직 그래야만
+세상이 안전해질 것이네."]],
       },
       badalign = {
-         synopsis = "[\"You have wandered from the path of the %a.  Come back when you have atoned.\"]",
+         synopsis = "[\"자네는 %a의 길에서 벗어났네. 속죄한 후에 돌아오게.\"]",
          output = "text",
-         text = [["%pC!  You have wandered from the path of the %a!
-If you attempt to overcome %n in this state, he will surely
-enslave your soul.  Your only hope, and ours, lies in your purification.
-Go forth, and return when you feel ready."]],
+         text = [["%p! 자네는 %a의 길에서 벗어났네!
+이 상태로 %n을(를) 이기려 한다면, 그가 분명히
+자네의 영혼을 노예로 삼을 것이네. 자네와 우리의 유일한 희망은 자네의 정화에 달렸네.
+떠나게, 준비가 되었다고 느껴질 때 돌아오게."]],
       },
       badlevel = {
-         synopsis = "[\"You are too inexperienced.  Come back when you are %Ra.\"]",
+         synopsis = "[\"아직 너무 미숙하네. %R(이)가 되면 돌아오게.\"]",
          output = "text",
-         text = [["%p, I fear that you are as yet too inexperienced to face
-%n.  Only %Ra with the help of %d could ever hope to
-defeat %ni."]],
+         text = [["%p, 아직 %n을(를) 상대하기에는 너무 미숙한 것 같네.
+오직 %d의 도움을 받은 %R만이
+그를 물리칠 희망이 있네."]],
       },
       discourage = {
-         "\"My pets will dine on your carcass tonight!\"",
-         "\"You are a sorry excuse for %ra.\"",
-         "\"Run while you can, %c.  My next spell will be your last.\"",
-         "\"I shall use your very skin to bind my next grimoire.\"",
-         "\"%d cannot protect you now.  Here, you die.\"",
-         "\"Your %a nature makes you weak.  You cannot defeat me.\"",
-         "\"Come, %c.  I shall kill you, then unleash the horde on your tribe.\"",
-         "\"Once you are dead, my horde shall finish off %l, and your tribe.\"",
-         "\"Fight, %c, or are you afraid of the mighty %n?\"",
-         "\"You have failed, %c.  Now, my victory is complete.\"",
+         "\"내 애완동물들이 오늘 밤 네 시체로 잔치를 벌일 것이다!\"",
+         "\"넌 한심한 %r일 뿐이야.\"",
+         "\"도망칠 수 있을 때 도망쳐라, %c. 내 다음 주문이 네 마지막이 될 테니.\"",
+         "\"네 가죽으로 내 다음 마도서를 제본해 주마.\"",
+         "\"%d도 이제 널 보호할 수 없다. 여기서 죽어라.\"",
+         "\"네 %a한 본성이 널 약하게 만든다. 넌 나를 이길 수 없다.\"",
+         "\"덤벼라, %c. 널 죽인 다음 네 부족에게 무리를 풀어놓겠다.\"",
+         "\"네가 죽으면, 내 무리가 %l과(와) 네 부족을 끝장내 주마.\"",
+         "\"싸워라, %c, 아니면 강력한 %n이(가) 무섭나?\"",
+         "\"넌 실패했다, %c. 이제 내 승리가 완성되었다.\"",
       },
       encourage = {
-         "\"%nC is strong in the dark arts, but not immune to cold steel.\"",
-         "\"Remember that %n is a great sorcerer.  He lived in the time of Atlantis.\"",
-         "\"If you fail, %p, I will not be able to protect these people long.\"",
-         "\"To enter %i, you must be very stealthy.  The horde will be on guard.\"",
-         "\"Call upon %d in your time of need.\"",
-         "\"May %d protect you, and guide your steps.\"",
-         "\"If you can lay hands upon %o, carry it for good fortune.\"",
-         "\"I cannot stand against %ns sorcery.  But %d will help you.\"",
-         "\"Do not fear %n.  I know you can defeat %ni.\"",
-         "\"You have a great road to travel, %p, but only after you defeat %n.\"",
+         "\"%n은(는) 암흑 마법에 강하지만, 차가운 강철에는 면역이 아니네.\"",
+         "\"%n은(는) 위대한 마법사임을 기억하게. 그는 아틀란티스 시대에 살았네.\"",
+         "\"만약 자네가 실패하면, %p, 나는 이 사람들을 오래 보호할 수 없을 거네.\"",
+         "\"%i에 들어가려면 아주 은밀해야 하네. 무리가 경계를 서고 있을 거야.\"",
+         "\"필요할 때 %d께 도움을 청하게.\"",
+         "\"%d이(가) 자네를 보호하고 발걸음을 인도하시기를.\"",
+         "\"%o을(를) 손에 넣을 수 있다면, 행운을 위해 지니고 다니게.\"",
+         "\"나는 %n의 마법에 맞설 수 없네. 하지만 %d이(가) 자네를 도울 거야.\"",
+         "\"%n을(를) 두려워하지 말게. 자네가 그를 물리칠 수 있다는 걸 알고 있네.\"",
+         "\"자네는 긴 여정을 떠나야 하네, %p, 하지만 그건 %n을(를) 물리친 후의 일이야.\"",
       },
       firsttime = {
-         synopsis = "[You reach the vicinity of %H, but sense evil magic nearby.]",
+         synopsis = "[%H 근처에 도달했지만, 근처에서 사악한 마법을 감지한다.]",
          output = "text",
-         text = [[Warily you scan your surroundings, all of your senses alert for signs
-of possible danger.  Off in the distance, you can %x the familiar shapes
-of %H.
+         text = [[경계하며 주변을 살핀다. 모든 감각이 위험의 조짐에 대해 경계하고 있다.
+저 멀리 %H의 익숙한 형체가 %x.
 
-But why, you think, should %l be there?
+하지만 왜, %l이(가) 거기 있어야 하지?
 
-Suddenly, the hairs on your neck stand on end as you detect the aura of
-evil magic in the air.
+갑자기 공기 중에서 사악한 마법의 기운을 감지하며 목덜미의 털이 곤두선다.
 
-Without thought, you ready your weapon, and mutter under your breath:
+생각 없이 무기를 준비하며 속삭인다:
 
-    "By %d, there will be blood spilt today."]],
+    "%d의 이름으로, 오늘 피가 흐를 것이다."]],
       },
       goal_first = {
-         synopsis = "[This is surely the lair of %n.]",
+         synopsis = "[여기가 분명 %n의 소굴이다.]",
          output = "text",
-         text = [[The hairs on the nape of your neck lift as you sense an energy in the
-very air around you.  You fight down a primordial panic that seeks to
-make you turn and run.  This is surely the lair of %n.]],
+         text = [[주변 공기에서 에너지를 감지하며 목덜미의 털이 곤두선다.
+돌아서서 도망치게 만드는 원시적인 공포를 억누른다.
+여기가 분명 %n의 소굴이다.]],
       },
       goal_next = {
-         text = "Yet again you feel the air around you heavy with malevolent magical energy.",
+         text = "또다시 주변 공기가 악의적인 마법 에너지로 무겁게 느껴진다.",
       },
       gotit = {
-         synopsis = "[You feel the power of %o flowing through your hands.]",
+         synopsis = "[%o의 힘이 손을 통해 흐르는 것이 느껴진다.]",
          output = "text",
-         text = [[As you pick up %o, you feel the power of it
-flowing through your hands.  It seems to be in two or more places
-at once, even though you are holding it.]],
+         text = [[%o을(를) 집어 들자, 그 힘이 손을 통해
+흐르는 것이 느껴진다. 손에 들고 있는데도
+두 곳 이상에 동시에 있는 것 같다.]],
       },
       guardtalk_after = {
-         "\"The battles here have been good -- our enemies' blood soaks the soil!\"",
-         "\"Remember that glory is crushing your enemies beneath your feet!\"",
-         "\"Times will be good again, now that the horde is vanquished.\"",
-         "\"You have brought our clan much honor in defeating %n.\"",
-         "\"You will be a worthy successor to %l.\"",
+         "\"여기서의 전투는 좋았다 -- 적들의 피가 땅을 적셨지!\"",
+         "\"영광은 적들을 발밑에 짓밟는 것임을 기억하라!\"",
+         "\"이제 무리가 물러갔으니 좋은 시절이 다시 올 것이다.\"",
+         "\"%n을(를) 물리쳐 우리 부족에 큰 영예를 가져왔다.\"",
+         "\"넌 %l의 훌륭한 후계자가 될 것이다.\"",
       },
       guardtalk_before = {
-         "\"The battles here have been good -- our enemies' blood soaks the soil!\"",
-         "\"Remember that glory is crushing your enemies beneath your feet!\"",
-         "\"There has been little treasure to loot, since the horde arrived.\"",
-         "\"The horde is mighty in numbers, but they have little courage.\"",
-         "\"%lC is a strange one, but he has helped defend us.\"",
+         "\"여기서의 전투는 좋았다 -- 적들의 피가 땅을 적셨지!\"",
+         "\"영광은 적들을 발밑에 짓밟는 것임을 기억하라!\"",
+         "\"무리가 온 이후로 약탈할 보물이 별로 없었다.\"",
+         "\"무리는 수가 많지만, 용기는 별로 없다.\"",
+         "\"%l은(는) 이상한 자이지만, 우리를 방어하는 것을 도왔다.\"",
       },
       hasamulet = {
-         synopsis = "[\"Take the Amulet to the altar of %d on the Astral Plane and offer it.\"]",
+         synopsis = "[\"아뮬렛을 아스트랄 계에 있는 %d의 제단으로 가져가 바쳐라.\"]",
          output = "text",
-         text = [["This is wondrous, %p.  I feared that you could not possibly
-succeed in your quest, but here you are in possession of the Amulet
-of Yendor!
+         text = [["놀랍구나, %p. 자네가 임무에 성공할 수 있을지
+걱정했는데, 여기 옌더의 아뮬렛을 손에 들고 왔구나!
 
-"I have studied the texts of the magi constantly since you left.  In
-the Book of Skelos, I found this:
+"자네가 떠난 후로 마법사들의 문서를 계속 연구했네.
+스켈로스의 책에서 이것을 발견했네:
 
-    %d will cause a child to be sent into the world.  This child is to
-    be made strong by trial of battle and magic, for %d has willed it so.
-    It is said that the child of %d will recover the Amulet of Yendor
-    that was stolen from the Creator at the beginning of time.
+    %d이(가) 아이를 세상에 보낼 것이다. 이 아이는
+    전투와 마법의 시련으로 강해질 것이니, %d이(가) 그리 원했기 때문이다.
+    %d의 아이가 태초에 창조주에게서 도난당한
+    옌더의 아뮬렛을 되찾을 것이라 전해진다.
 
-"As you now possess the amulet, %p, I suspect that the Book
-speaks of you.
+"지금 자네가 아뮬렛을 소유하고 있으니, %p, 이 책이
+자네에 대해 말하고 있다고 생각하네.
 
-    The child of %d will take the Amulet, and travel to the Astral
-    Plane, where the Great Temple of %d is to be found.  The Amulet
-    will be sacrificed to %d, there on %dJ altar.  Then the child will
-    stand by %d as champion of all %cP for eternity.
+    %d의 아이는 아뮬렛을 가지고 아스트랄 계로 여행할 것이다.
+    그곳에서 %d의 대신전을 찾게 될 것이다. 아뮬렛은
+    그곳 %d의 제단에서 바쳐질 것이다. 그러면 그 아이는
+    영원히 모든 %c의 챔피언으로서 %d 곁에 서게 될 것이다.
 
-"This is all I know, %p.  I hope it will help you."]],
+"이것이 내가 아는 전부네, %p. 도움이 되길 바라네."]],
       },
       killed_nemesis = {
-         synopsis = "[%nC curses you, but you feel the overpowering aura of magic fading.]",
+         synopsis = "[%n이(가) 저주를 내뱉지만, 압도적인 마법의 기운이 사라지는 것을 느낀다.]",
          output = "text",
-         text = [[%nC falls to the ground, and utters a last curse at you.  Then %nj
-body fades slowly, seemingly dispersing into the air around you.  You
-slowly become aware that the overpowering aura of magic in the air has
-begun to fade.]],
+         text = [[%n이(가) 땅에 쓰러지며 마지막 저주를 내뱉는다. 그러고 나서
+그의 몸이 천천히 사라지며 주변 공기로 흩어지는 것 같다.
+천천히 공기 중의 압도적인 마법 기운이
+사라지기 시작하는 것을 느끼게 된다.]],
       },
       leader_first = {
-         synopsis = "[\"At last you have returned.  There is a great quest you must undertake.\"]",
+         synopsis = "[\"마침내 돌아왔구나. 해야 할 위대한 임무가 있다.\"]",
          output = "text",
-         text = [["Ah, %p.  You have returned at last.  The world is in dire
-need of your help.  There is a great quest you must undertake.
+         text = [["아, %p. 마침내 돌아왔구나. 세상이 자네의 도움을
+절실히 필요로 하네. 해야 할 위대한 임무가 있네.
 
-"But first, I must see if you are ready to take on such a challenge."]],
+"하지만 먼저, 그런 도전을 받아들일 준비가 되었는지 봐야겠네."]],
       },
       leader_last = {
-         synopsis = "[\"You have betrayed %d; soon %n will destroy us.  Begone!\"]",
+         synopsis = "[\"자네는 %d을(를) 배신했네; 곧 %n이(가) 우리를 파괴할 것이네. 떠나라!\"]",
          output = "text",
-         text = [["Pah!  You have betrayed the gods, %p.  You will never attain
-the glory which you aspire to.  Your failure to follow the true path has
-closed this future to you.
+         text = [["흥! 자네는 신들을 배신했네, %p. 자네가 열망하는
+영광을 절대 얻지 못할 것이네. 진정한 길을 따르지 못한 자네의 실패가
+이 미래를 닫아버렸네.
 
-"I will protect these people as best I can, but soon %n will overcome
-me and destroy all who once called you %s.  Now begone!"]],
+"최선을 다해 이 사람들을 보호하겠지만, 곧 %n이(가) 나를 이기고
+한때 자네를 %s(이)라 불렀던 모든 이들을 파괴할 것이네. 이제 떠나라!"]],
       },
       leader_next = {
-         text = "\"%p, you are back.  Are you ready now for the challenge?\"",
+         text = "\"%p, 돌아왔구나. 이제 도전을 받을 준비가 되었나?\"",
       },
       leader_other = {
-         text = "\"Again, you stand before me, %p.  Surely you have prepared yourself.\"",
+         text = "\"또다시 내 앞에 서 있구나, %p. 분명 준비를 했겠지.\"",
       },
       locate_first = {
-         synopsis = "[You have located %i.]",
+         synopsis = "[%i를 찾았다.]",
          output = "text",
-         text = [[The scent of water comes to you in the desert breeze.  You know that
-you have located %i.]],
+         text = [[사막 바람에 실린 물 냄새가 난다.
+%i를 찾았음을 알게 된다.]],
       },
       locate_next = {
-         text = "Yet again you have a chance to infiltrate %i.",
+         text = "또다시 %i에 잠입할 기회가 생겼다.",
       },
       nemesis_first = {
-         synopsis = "[%nC boasts that %nh has slain many.  \"Prepare to die, %c.\"]",
+         synopsis = "[%n이(가) 많은 이를 죽였다고 자랑한다. \"죽을 준비를 해라, %c.\"]",
          output = "text",
-         text = [["So.  This is what that second rate sorcerer %l sends to do %lj bidding.
-I have slain many before you.  You shall give me little sport.
+         text = [["그래서. 이것이 그 이류 마법사 %l이(가) 자기 일을 시키려고 보낸 자인가.
+나는 네 전에 많은 이를 죽였다. 넌 별로 재미도 안 될 거야.
 
-"Prepare to die, %c."]],
+"죽을 준비를 해라, %c."]],
       },
       nemesis_next = {
-         text = "\"I have wasted too much time on you already.  Now, you shall die.\"",
+         text = "\"이미 너에게 너무 많은 시간을 낭비했다. 이제 죽어라.\"",
       },
       nemesis_other = {
-         text = "\"You return yet again, %c!  Are you prepared for death now?\"",
+         text = "\"또다시 돌아왔나, %c! 이제 죽을 준비가 됐나?\"",
       },
       nemesis_wantsit = {
-         text = [["I shall have %o back, you pitiful excuse for %ca.
-And your life as well."]],
+         text = [["%o을(를) 되찾겠다, 이 한심한 %c 같은 놈.
+그리고 네 목숨도."]],
       },
       nexttime = {
-         text = [[Once again, you near %H.  You know that %l
-will be waiting.]],
+         text = [[다시 한번, %H 근처에 왔다. %l이(가)
+기다리고 있을 것이다.]],
       },
       offeredit = {
-         synopsis = "[%lC tells you to guard %o, and to return when you have triumphed.]",
+         synopsis = "[%l이(가) %o을(를) 지키라 하고, 승리한 후 돌아오라고 말한다.]",
          output = "text",
-         text = [[When %l sees %o, he smiles, and says:
+         text = [[%l이(가) %o을(를) 보고 미소 지으며 말한다:
 
-    Well done, %p.  You have saved the world from certain doom.
-    What, now, should be done with %o?
+    잘했네, %p. 자네가 세상을 확실한 파멸에서 구했네.
+    이제 %o을(를) 어떻게 할까?
 
-    These people, brave as they are, cannot hope to guard it from
-    other sorcerers who will detect it, as surely as %n did.
+    이 사람들이 아무리 용감해도, %n처럼 분명히 감지할
+    다른 마법사들로부터 이것을 지킬 수는 없네.
 
-    Take %o with you, %p.  It will guard you in
-    your adventures, and you can best guard it.  You embark on a
-    quest far greater than you realize.
+    %o을(를) 가져가게, %p. 모험에서 자네를 지켜줄 거고,
+    자네가 가장 잘 지킬 수 있네. 자네가 생각하는 것보다
+    훨씬 더 위대한 임무를 시작하는 것이네.
 
-    Remember me, %p, and return when you have triumphed.  I
-    will tell you then of what you must do.  You will understand when the
-    time comes.]],
+    나를 기억하게, %p, 그리고 승리한 후에 돌아오게.
+    그때 무엇을 해야 하는지 말해주겠네. 때가 되면 이해하게 될 거야.]],
       },
       offeredit2 = {
-         synopsis = "[\"You keep %o.  Return to %Z to search for the Amulet.\"]",
+         synopsis = "[\"자네가 %o을(를) 지키게. 아뮬렛을 찾으려면 %Z(으)로 돌아가게.\"]",
          output = "text",
-         text = [[%l gazes reverently at %o, then back at you.
+         text = [[%l이(가) %o을(를) 경건하게 바라보다가 다시 당신을 본다.
 
-"You are its keeper now, and the time has come to resume your search
-for the Amulet.  %Z await your return through the
-magic portal which brought you here."]],
+"이제 자네가 그것의 수호자이고, 아뮬렛 탐색을 재개할 시간이네.
+%Z이(가) 자네를 여기로 데려온
+마법 포탈을 통한 귀환을 기다리고 있네."]],
       },
       othertime = {
-         text = [[Again, and you think possibly for the last time, you approach
-%H.]],
+         text = [[다시, 아마도 마지막일지도 모른다고 생각하며
+%H에 접근한다.]],
       },
       posthanks = {
-         text = "\"Tell us, %p, have you fared well on your great quest?\"",
+         text = "\"말해주게, %p, 위대한 임무는 잘 되어가고 있나?\"",
       },
    },
    Cav = {
       assignquest = {
-         synopsis = "[Find and defeat %n, recover %o, and return with it.]",
+         synopsis = "[%n을(를) 찾아 물리치고 %o을(를) 되찾아 돌아오라.]",
          output = "text",
-         text = [["You are indeed ready now, %p.  I shall tell you a tale of
-great suffering among your people:
+         text = [["이제 정말 준비가 되었구나, %p. 우리 백성의
+큰 고통에 대한 이야기를 해주마:
 
-"Shortly after you left on your vision quest, the caves were invaded by
-the creatures sent against us by %n.
+"네가 환상 탐험을 떠난 직후, 동굴이 %n이(가)
+우리에게 보낸 생물들에게 침략당했단다.
 
-"She, herself, could not attack us due to her great size, but her minions
-have harassed us ever since.  In the first attacks, many died, and the
-minions of %n managed to steal %o.
-They took it to %i and there, none of our
-%g warriors have been able to go.
+"그녀 자신은 거대한 몸집 때문에 우리를 직접 공격할 수 없었지만,
+그녀의 부하들이 그 이후로 우리를 괴롭혀 왔다. 첫 번째 공격에서
+많은 이들이 죽었고, %n의 부하들이 %o을(를)
+훔쳐갔단다. 그것을 %i로 가져갔는데,
+거기는 우리 %g 전사들 중 아무도 갈 수 없었다.
 
-"You must find %i, and within it wrest
-%o from %n.  She guards it as
-jealously as she guards all treasures she attains.  But with it,
-we can make our caves safe once more.
+"%i를 찾아 그 안에서 %n에게서
+%o을(를) 빼앗아야 한다. 그녀는 얻는 모든 보물을
+질투심 가득하게 지키듯 그것도 지키고 있단다.
+하지만 그것이 있으면 우리 동굴을 다시 안전하게 만들 수 있다.
 
-"Please, %p, recover %o for us, and return it here."]],
+"부탁이다, %p, %o을(를) 되찾아 여기로 돌아오거라."]],
       },
       badalign = {
-         synopsis = "[\"You no longer follow the path of the %a.  Go, and purify yourself.\"]",
+         synopsis = "[\"더 이상 %a의 길을 따르지 않는구나. 가서 자신을 정화해라.\"]",
          output = "text",
-         text = [["%pC!  You have deviated from my teachings.  You no longer follow
-the path of the %a as you should.  I banish you from these caves, to
-go forth and purify yourself.  Then, you might be able to accomplish this
-quest."]],
+         text = [["%p! 내 가르침에서 벗어났구나. 더 이상 마땅히 따라야 할
+%a의 길을 따르지 않는구나. 이 동굴에서 추방하니,
+나가서 자신을 정화해라. 그러면 이 임무를 완수할 수 있을 것이다."]],
       },
       badlevel = {
-         synopsis = "[\"%rA is too inexperienced.  Come back when you have progressed.\"]",
+         synopsis = "[\"%r(은)는 너무 미숙하다. 성장한 후에 돌아오라.\"]",
          output = "text",
-         text = [["Alas, %p, you are as yet too inexperienced to embark upon such
-a difficult quest as that I propose to give you.
+         text = [["안타깝구나, %p, 아직 네게 주려는 것처럼 어려운
+임무를 맡기에는 너무 미숙하구나.
 
-"%rA could not possibly survive the rigors demanded to find
-%i, never mind to confront %n herself.
+"%r(이)라면 %i를 찾기 위해 요구되는 시련을
+견딜 수 없을 테고, 하물며 %n 자신과 대면하는 것은 말할 것도 없다.
 
-"Adventure some more, and you will learn the skills you will require.
-%d decrees it."]],
+"조금 더 모험하면 필요한 기술을 배우게 될 것이다.
+%d이(가) 그렇게 명하셨다."]],
       },
       discourage = {
-         "\"You are weak, %c.  No challenge for the Mother of all Dragons.\"",
-         "\"I grow hungry, %r.  You look like a nice appetizer!\"",
-         "\"Join me for lunch?  You're the main course, %c.\"",
-         "\"With %o, I am invincible!  You cannot succeed.\"",
-         "\"Your mentor, %l has failed.  You are nothing to fear.\"",
-         "\"You shall die here, %c.  %rA cannot hope to defeat me.\"",
-         "\"You, a mere %r challenge the might of %n?  Hah!\"",
-         "\"I am the Mother of all Dragons!  You cannot hope to defeat me.\"",
-         "\"My claws are sharp now.  I shall rip you to shreds!\"",
-         "\"%d has deserted you, %c.  This is my domain.\"",
+         "\"넌 약하다, %c. 모든 용의 어머니에게는 상대도 안 되지.\"",
+         "\"배가 고파지는군, %r. 네가 맛있는 전채 요리처럼 보여!\"",
+         "\"점심에 함께할래? 네가 메인 요리야, %c.\"",
+         "\"%o와(과) 함께라면 난 무적이다! 넌 성공할 수 없어.\"",
+         "\"네 스승 %l은(는) 실패했다. 넌 두려울 것이 없다.\"",
+         "\"넌 여기서 죽을 것이다, %c. %r 따위가 나를 이기길 바랄 수 없지.\"",
+         "\"너, 단순한 %r이(가) %n의 힘에 도전한다고? 하!\"",
+         "\"나는 모든 용의 어머니다! 넌 나를 이기길 바랄 수 없어.\"",
+         "\"내 발톱이 이제 날카롭다. 널 갈기갈기 찢어주마!\"",
+         "\"%d이(가) 널 버렸다, %c. 여기는 내 영역이다.\"",
       },
       encourage = {
-         "\"%nC is immune to her own breath weapons. You should use magic upon her that she does not use herself.\"",
-         "\"When you encounter %n, call upon %d for assistance.\"",
-         "\"There will be nowhere to hide inside %ns inner sanctum.\"",
-         "\"Your best chance with %n will be to keep moving.\"",
-         "\"Do not be distracted by the great treasures in %ns lair. Concentrate on %o.\"",
-         "\"%oC is the only object that %n truly fears.\"",
-         "\"Do not be fooled by %ns size.  She is fast, and it is rumored that she uses magic.\"",
-         "\"I would send a party of %gP with you, but we will need all of our strength to defend ourselves.\"",
-         "\"Remember, be %a at all times.  This is your strength.\"",
-         "\"If only we had an amulet of reflection, this would not have happened.\"",
+         "\"%n은(는) 자신의 브레스 무기에 면역이다. 그녀가 사용하지 않는 마법을 써야 하네.\"",
+         "\"%n을(를) 만나면 %d께 도움을 청하게.\"",
+         "\"%n의 성소 안에는 숨을 곳이 없을 것이네.\"",
+         "\"%n을(를) 상대하는 최선의 방법은 계속 움직이는 것이네.\"",
+         "\"%n의 소굴에 있는 큰 보물에 정신 팔리지 말게. %o에 집중하게.\"",
+         "\"%o은(는) %n이(가) 진정으로 두려워하는 유일한 물건이네.\"",
+         "\"%n의 크기에 속지 말게. 빠르고, 마법을 사용한다는 소문도 있네.\"",
+         "\"%gP을(를) 함께 보내고 싶지만, 우리를 방어하려면 모든 힘이 필요하네.\"",
+         "\"기억하게, 항상 %a하게. 이것이 네 힘이네.\"",
+         "\"반사의 아뮬렛이 있었다면, 이런 일은 일어나지 않았을 텐데.\"",
       },
       firsttime = {
-         synopsis = "[You arrive back at %H, but something is wrong here.]",
+         synopsis = "[%H에 돌아왔지만, 뭔가 잘못되었다.]",
          output = "text",
-         text = [[You descend through a barely familiar stairwell that you remember
-%l showing you when you embarked upon your vision quest.
+         text = [[환상 탐험을 떠날 때 %l이(가) 보여준
+희미하게 익숙한 계단을 내려간다.
 
-You arrive back at %H, but something seems
-wrong here.  The usual smoke and glowing light of the fires of the
-outer caves are absent, and an uneasy quiet fills the damp air.]],
+%H에 돌아왔지만 뭔가 잘못된 것 같다.
+외부 동굴 불의 평소 연기와 빛나는 불빛이 없고,
+축축한 공기에 불안한 고요함이 가득하다.]],
       },
       goal_first = {
-         synopsis = "[You enter a large cavern.  %nC is present.]",
+         synopsis = "[큰 동굴에 들어갔다. %n이(가) 있다.]",
          output = "text",
-         text = [[You find yourself in a large cavern, with neatly polished walls, that
-nevertheless show signs of being scorched by fire.
+         text = [[깔끔하게 닦인 벽이 있는 큰 동굴에 있게 되었다.
+그러나 벽에는 불에 그을린 흔적이 있다.
 
-Bones litter the floor, and there are objects scattered everywhere.
-The air is close with the stench of sulphurous fumes.
+바닥에 뼈가 흩어져 있고, 물건들이 사방에 흩어져 있다.
+공기는 유황 연기 냄새로 탁하다.
 
-%nC is clearly visible, but %nh seems to be asleep.]],
+%n이(가) 분명히 보이지만, 잠들어 있는 것 같다.]],
       },
       goal_next = {
-         text = "Once again, you find yourself in the lair of %n.",
+         text = "다시 한번, %n의 소굴에 있게 되었다.",
       },
       gotit = {
-         synopsis = "[%oC fills you with a feeling of power.]",
+         synopsis = "[%o이(가) 힘의 느낌으로 가득 채운다.]",
          output = "text",
-         text = [[As you pick up %o it seems heavy at first, but as you
-hold it strength flows into your arms.
+         text = [[%o을(를) 집어 들자 처음에는 무거워 보이지만,
+들고 있으니 팔에 힘이 흘러든다.
 
-You suddenly feel full of power, as if nothing could possibly stand
-in your path.]],
+갑자기 힘이 가득 찬 느낌이 든다. 마치 아무것도 네 앞길을
+막을 수 없을 것 같다.]],
       },
       guardtalk_after = {
-         "\"The rains have returned and the land grows lush again.\"",
-         "\"Peace has returned, give thanks to %d!\"",
-         "\"Welcome back!  Did you find %o?\"",
-         "\"So, %p, tell us the story of your fight with %n.\"",
-         "\"%lC grows old.  Perhaps you will guide us after he ascends.\"",
+         "\"비가 돌아왔고 땅이 다시 푸르러지고 있다.\"",
+         "\"평화가 돌아왔다, %d께 감사드리자!\"",
+         "\"돌아온 것을 환영한다! %o을(를) 찾았나?\"",
+         "\"그래서, %p, %n과(와) 싸운 이야기를 들려줘라.\"",
+         "\"%l이(가) 늙어가고 있다. 아마 그가 승천한 후에 네가 우리를 인도하겠지.\"",
       },
       guardtalk_before = {
-         "\"We have not been able to gather as much food since the Giants sealed off our access to the outer world.\"",
-         "\"Since %n sent her minions, we have been constantly fighting.\"",
-         "\"I have heard your vision quest was successful.  Is this so?\"",
-         "\"So, tell me, %p, how have you fared?\"",
-         "\"%lC grows old.  We know not who will guide us after he ascends.\"",
+         "\"거인들이 바깥 세계로의 접근을 막은 이후로 음식을 많이 모을 수 없었다.\"",
+         "\"%n이(가) 부하들을 보낸 이후로 계속 싸워왔다.\"",
+         "\"네 환상 탐험이 성공적이었다고 들었다. 그게 사실이냐?\"",
+         "\"그래서, 말해봐라, %p, 어떻게 지냈나?\"",
+         "\"%l이(가) 늙어가고 있다. 그가 승천한 후에 누가 우리를 인도할지 모르겠다.\"",
       },
       hasamulet = {
-         synopsis = "[\"Take the Amulet to the altar of %d on the Astral Plane and offer it.\"]",
+         synopsis = "[\"아뮬렛을 아스트랄 계에 있는 %d의 제단으로 가져가 바쳐라.\"]",
          output = "text",
-         text = [["You have been successful, I see, %p.
+         text = [["성공했구나, %p.
 
-"Now that the Amulet of Yendor is yours, here is what you must do:
+"이제 옌더의 아뮬렛이 네 것이니, 해야 할 일을 알려주마:
 
-"Journey upwards to the open air.  The Amulet you carry will then
-take you into the Astral Planes, where the Great Temple of %d
-casts its influence throughout our world.
+"위로 올라가 야외로 나가라. 네가 가진 아뮬렛이
+아스트랄 계로 데려갈 것이다. 그곳에서 %d의 대신전이
+온 세계에 영향을 미치고 있다.
 
-"Sacrifice the Amulet on the altar.  Thus shall %d become supreme!"]],
+"제단에 아뮬렛을 바쳐라. 그리하여 %d이(가) 최고가 되리라!"]],
       },
       killed_nemesis = {
-         text = [[%nC sinks to the ground, her heads flailing about.
-As she dies, a cloud of noxious fumes billows about her.]],
+         text = [[%n이(가) 땅에 가라앉으며 머리들이 휘둘린다.
+죽어가면서 유독한 연기 구름이 그녀 주위에 피어오른다.]],
       },
       leader_first = {
-         synopsis = "[\"You have returned.  We are in dire need of your help.\"]",
+         synopsis = "[\"돌아왔구나. 우리는 네 도움이 절실히 필요하다.\"]",
          output = "text",
-         text = [["You have returned from your vision quest, %p.  Thank %d.
+         text = [["환상 탐험에서 돌아왔구나, %p. %d께 감사하라.
 
-"We are in dire need of your help, my %S.
+"우리는 네 도움이 절실히 필요하단다, 내 %S야.
 
-"But first, I must see if you are yet capable of the quest I would
-ask you to undertake."]],
+"하지만 먼저, 네가 맡기려는 임무를 수행할 능력이 있는지 봐야겠다."]],
       },
       leader_last = {
-         synopsis = "[\"You have betrayed the %L.  Begone!\"]",
+         synopsis = "[\"%L을(를) 배신했구나. 떠나라!\"]",
          output = "text",
-         text = [["%pC!  You have sealed our fate.  You seem unable to reform yourself,
-so I must select another to take your place.
+         text = [["%p! 우리의 운명을 봉인했구나. 너는 스스로 개혁할 수 없는 것 같으니,
+네 자리를 대신할 다른 이를 선택해야겠다.
 
-"Begone from %H!  You have betrayed us by choosing
-the path of the %C over the true path of the %L.
+"%H에서 떠나라! %L의 진정한 길 대신
+%C의 길을 선택하여 우리를 배신했다.
 
-"You no longer live in our eyes."]],
+"우리 눈에 넌 더 이상 살아있지 않다."]],
       },
       leader_next = {
-         text = "\"Again, you return to us, %p.  Let me see if you are ready now.\"",
+         text = "\"또다시 우리에게 돌아왔구나, %p. 이제 준비가 되었는지 보자.\"",
       },
       leader_other = {
-         text = "\"Ah, %p.  Are you finally ready?\"",
+         text = "\"아, %p. 마침내 준비가 되었나?\"",
       },
       locate_first = {
-         synopsis = "[You %x many large claw marks, smell carrion, and notice bones.]",
+         synopsis = "[큰 발톱 자국이 %x, 썩은 고기 냄새가 나고, 뼈가 보인다.]",
          output = "text",
-         text = [[You %x many large claw marks on the ground.  The tunnels ahead
-of you are larger than most of those in any cave complex you have
-ever been in before.
+         text = [[땅에서 많은 큰 발톱 자국이 %x. 앞의 터널들은
+지금까지 들어가 본 어떤 동굴 단지보다도 크다.
 
-Your nose detects the smell of carrion from within, and bones litter
-the sides of the tunnels.]],
+안쪽에서 썩은 고기 냄새가 나고, 터널 옆에
+뼈가 흩어져 있다.]],
       },
       locate_next = {
-         text = "Once again, you approach %i.",
+         text = "다시 한번, %i에 접근한다.",
       },
       nemesis_first = {
-         synopsis = "[%nC threatens to eat you.]",
+         synopsis = "[%n이(가) 널 잡아먹겠다고 위협한다.]",
          output = "text",
-         text = [["So, follower of %l, you seek to invade the lair of
-%n.  Only my meals are allowed down here.  Prepare
-to be eaten!"]],
+         text = [["그래서, %l의 추종자야, %n의 소굴을
+침입하려 하는구나. 여기 아래는 내 먹이만 허용된다.
+잡아먹힐 준비를 해라!"]],
       },
       nemesis_next = {
-         text = [["So, again you face me, %c.  No one has ever before escaped me.
-Now I shall kill you."]],
+         text = [["그래서, 또다시 나와 마주하는구나, %c. 아무도 나에게서 도망친 적이 없다.
+이제 널 죽이겠다."]],
       },
       nemesis_other = {
-         text = "\"You are getting annoying, %c.  Prepare to die.\"",
+         text = "\"짜증나게 하는군, %c. 죽을 준비를 해라.\"",
       },
       nemesis_wantsit = {
-         text = "\"I'll have %o from you, %c.  You shall die.\"",
+         text = "\"너에게서 %o을(를) 빼앗겠다, %c. 넌 죽을 것이다.\"",
       },
       nexttime = {
-         text = "Once again, you arrive back at %H.",
+         text = "다시 한번, %H에 돌아왔다.",
       },
       offeredit = {
-         synopsis = "[\"Take %o with you.  It will help in your quest for the Amulet of Yendor.\"]",
+         synopsis = "[\"%o을(를) 가져가라. 옌더의 아뮬렛 탐색에 도움이 될 것이다.\"]",
          output = "text",
-         text = [[%lC glimpses %o in your possession.
-He smiles and says:
+         text = [[%l이(가) 네가 가진 %o을(를) 힐끗 본다.
+그는 미소 지으며 말한다:
 
-    You have done it!  We are saved.  But I fear that %o
-    will always be a target for %C forces who will want it for their
-    own.
+    해냈구나! 우리는 구원받았다. 하지만 %o은(는)
+    항상 자신들을 위해 원하는 %C 세력의 표적이 될 것이다.
 
-    To prevent further trouble, I would like you, %p,
-    to take %o away with you.  It will help you as you
-    quest for the Amulet of Yendor.]],
+    추가 문제를 방지하기 위해, %p,
+    %o을(를) 가져가길 바란다. 옌더의 아뮬렛을
+    탐색하는 데 도움이 될 것이다.]],
       },
       offeredit2 = {
-         synopsis = "[\"You are the keeper of %o now.  Return to %Z to search for the Amulet.]",
+         synopsis = "[\"이제 네가 %o의 수호자다. %Z(으)로 돌아가 아뮬렛을 찾아라.\"]",
          output = "text",
-         text = [[%l grasps %o proudly for a moment, then looks at you.
+         text = [[%l이(가) 잠시 자랑스럽게 %o을(를) 쥐더니 너를 바라본다.
 
-"You are its keeper now, and the time has come to resume your search
-for the Amulet.  %Z await your return through the
-magic portal which brought you here."]],
+"이제 네가 그것의 수호자이고, 아뮬렛 탐색을 재개할 시간이다.
+%Z이(가) 너를 여기로 데려온
+마법 포탈을 통한 귀환을 기다리고 있다."]],
       },
       othertime = {
-         text = [[For some reason, you think that this may be the last time you will
-enter %H.]],
+         text = [[왠지, 이것이 %H에 들어가는
+마지막일지도 모른다는 생각이 든다.]],
       },
       posthanks = {
-         text = [["%pC!  Welcome back.
-How goes your quest to recover the Amulet for %d?"]],
+         text = [["%p! 다시 온 것을 환영한다.
+%d을(를) 위해 아뮬렛을 되찾는 임무는 잘 되어가고 있나?"]],
       },
    },
    Hea = {
       assignquest = {
-         synopsis = "[Travel to %i on your way to recover %o from %n.]",
+         synopsis = "[%n에게서 %o을(를) 되찾으러 가는 길에 %i를 지나가라.]",
          output = "text",
-         text = [[For the first time, you sense a smile on %ls face.
+         text = [[처음으로, %l의 얼굴에서 미소를 느낀다.
 
-    "You have indeed learned as much as we can teach you in preparation
-    for this task.  Let me tell you what I know of the symptoms and hope
-    that you can provide a cure.
+    "이 임무를 준비하기 위해 우리가 가르칠 수 있는 만큼 배웠구나.
+    증상에 대해 아는 것을 말해주겠다.
+    치료법을 제공할 수 있기를 바란다.
 
-    "A short while ago, the dreaded %nt was fooled by the gods
-    into thinking that %nh could use %o to find a
-    cure for old age.  Think of it, eternal youth!  But %nj good
-    health is accomplished by drawing the health from those around %ni.
+    "얼마 전, 무서운 %n이(가) 신들에게 속아서
+    %o을(를) 사용하여 노화의 치료법을 찾을 수 있다고
+    생각하게 되었단다. 영원한 젊음을 생각해봐라! 하지만 그의 좋은 건강은
+    주변 사람들의 건강을 빨아들여 이루어지는 것이란다.
 
-    "He has exhausted %nj own supply of healthy people and now %nh seeks to
-    extend %nj influence into our world.  You must recover from %ni
-    %o and break the spell.
+    "그는 자신의 건강한 사람 공급을 다 써버렸고 이제 우리 세계로
+    영향력을 확장하려 한다. 그에게서 %o을(를) 되찾아
+    주문을 깨뜨려야 한다.
 
-    "You must travel into the swamps to %i, and from there
-    follow the trail to %ns island lair.  Be careful."]],
+    "%i로 늪을 지나 여행해야 하고, 거기서부터
+    %n의 섬 소굴로 가는 길을 따라가야 한다. 조심해라."]],
       },
       badalign = {
-         synopsis = "[Return when you are more %a.]",
+         synopsis = "[더 %a해지면 돌아오라.]",
          output = "text",
-         text = [["You have learned much of the remedies that benefit, but you must also
-know which physic for which ail.  That is why %ds teachings are a
-part of your training.
+         text = [["도움이 되는 치료법을 많이 배웠지만, 어떤 질병에 어떤 약을
+써야 하는지도 알아야 한다. 그래서 %d의 가르침이
+훈련의 일부인 것이다.
 
-"Return to us when you have healed thyself."]],
+"자신을 치유한 후에 돌아오라."]],
       },
       badlevel = {
-         synopsis = "[You are too inexperienced.  Return when you are %Ra.]",
+         synopsis = "[너무 미숙하다. %R(이)가 되면 돌아오라.]",
          output = "text",
-         text = [["Alas, %p, you are yet too inexperienced to deal with the rigors
-of such a task.  You must be able to draw on the knowledge of botany,
-alchemy and veterinary practices before I can send you on this quest 
-with good conscience.
+         text = [["안타깝구나, %p, 아직 그런 임무의 시련을 감당하기에는
+너무 미숙하구나. 식물학, 연금술, 수의학 지식을 활용할 수 있어야
+양심적으로 이 임무를 보낼 수 있단다.
 
-"Return when you wear %Ra's caduceus."]],
+"%R의 카두세우스를 들게 되면 돌아오거라."]],
       },
       discourage = {
-         "\"They might as well give scalpels to wizards as to let you try to use %o!\"",
-         "\"If I could strike %l, surrounded by %lj %gP, imagine what I can do to you here by yourself.\"",
-         "\"I will put my %Rp to work making a physic out of your ashes.\"",
-         "\"As we speak, Hades gathers your patients to join you.\"",
-         "\"After I'm done with you, I'll destroy %l as well.\"",
-         "\"You will have to kill me if you ever hope to leave this place.\"",
-         "\"I will impale your head on my caduceus for all to see.\"",
-         "\"There is no materia medica in your sack which will cure you of me!\"",
-         "\"Do not fight too hard, I want your soul strong, not weakened!\"",
-         "\"You should have stopped studying at veterinary.\"",
+         "\"마법사에게 메스를 주는 것이나 네가 %o을(를) 쓰게 하는 것이나 마찬가지다!\"",
+         "\"내가 %gP에 둘러싸인 %l을(를) 공격할 수 있었다면, 혼자인 너에게 여기서 뭘 할 수 있을지 상상해봐라.\"",
+         "\"내 %Rp들에게 네 재로 약을 만들게 하겠다.\"",
+         "\"우리가 말하는 동안, 하데스가 네 환자들을 모아 너와 합류시키고 있다.\"",
+         "\"널 처리한 후에, %l도 파괴하겠다.\"",
+         "\"이곳을 떠나고 싶다면 나를 죽여야 할 것이다.\"",
+         "\"네 머리를 내 카두세우스에 꿰어 모두에게 보여주겠다.\"",
+         "\"네 가방에는 나를 치료할 약재가 없다!\"",
+         "\"너무 열심히 싸우지 마라, 네 영혼이 강하길 원하지, 약해지길 원치 않아!\"",
+         "\"수의학에서 공부를 멈췄어야 했다.\"",
       },
       encourage = {
-         "\"Remember, %p, to always wash your hands before operating.\"",
-         "\"%nC has no real magic of %nj own.  To this %nh is vulnerable.\"",
-         "\"If you have been true to %d, you can draw on the power of %o.\"",
-         "\"Bring with you antidotes for poisons.\"",
-         "\"Remember this, %n can twist the powers of %o to hurt instead of heal.\"",
-         "\"I have sent for Chiron, but I am afraid he will come too late.\"",
-         "\"Maybe when you return the snakes will once again begin to shed.\"",
-         "\"The plague grows worse as we speak.  Hurry, %p!\"",
-         "\"Many times %n has caused trouble in these lands.  It is time that %nh was eradicated like the diseases %nh has caused.\"",
-         "\"With but one eye, %n should be easy to blind.  Remember this.\"",
+         "\"기억해라, %p, 수술 전에 항상 손을 씻어야 한다.\"",
+         "\"%n은(는) 진짜 자신만의 마법이 없다. 이것이 약점이다.\"",
+         "\"%d께 충실했다면, %o의 힘을 끌어올 수 있을 것이다.\"",
+         "\"독에 대한 해독제를 가져가거라.\"",
+         "\"이것을 기억해라, %n은(는) %o의 힘을 왜곡하여 치유 대신 해를 끼칠 수 있다.\"",
+         "\"케이론을 불렀지만, 너무 늦게 올까봐 걱정이다.\"",
+         "\"네가 돌아오면 뱀들이 다시 허물을 벗기 시작할지도 모른다.\"",
+         "\"우리가 말하는 동안 역병이 더 심해지고 있다. 서둘러라, %p!\"",
+         "\"%n은(는) 이 땅에 여러 번 문제를 일으켰다. 그가 일으킨 질병처럼 그를 박멸할 때가 되었다.\"",
+         "\"눈이 하나뿐인 %n은(는) 눈멀게 하기 쉬울 것이다. 이것을 기억해라.\"",
       },
       firsttime = {
-         synopsis = "[You arrive back at %H and must find %l.]",
+         synopsis = "[%H에 돌아왔고 %l을(를) 찾아야 한다.]",
          output = "text",
-         text = [[What sorcery has brought you back to %H?  The smell
-of fresh funeral pyres tells you that something is amiss with the healing
-powers that used to practice here.
+         text = [[무슨 마법이 %H로 데려온 것인가? 새로운 장작더미 냄새가
+여기서 행해지던 치유력에 뭔가 잘못되었음을 말해준다.
 
-No rhizotomists are tending the materia medica gardens, and where are the
-common folk who used to come for the cures?
+약초학자들이 약재 정원을 돌보지 않고 있고, 치료를 받으러 오던
+서민들은 어디 있는가?
 
-You know that you must quickly make your way to the collegium, and
-%ls iatreion, and find out what has happened in your absence.]],
+빨리 학교와 %l의 진료실로 가서
+네가 없는 동안 무슨 일이 있었는지 알아봐야 한다.]],
       },
       goal_first = {
-         synopsis = "[You have reached the lair of %n.  Take %o away from %ni.]",
+         synopsis = "[%n의 소굴에 도착했다. %n에게서 %o을(를) 빼앗아라.]",
          output = "text",
-         text = [[You stand within sight of the infamous Isle of %n.  Even
-the words of %l had not prepared you for this.
+         text = [[악명 높은 %n의 섬이 보이는 곳에 서 있다.
+%l의 말조차도 이것에 대비시키지 못했다.
 
-Steeling yourself against the wails of the ill that pierce your ears,
-you hurry on your task.  Maybe with %o you can
-heal them on your return, but not now.]],
+귀를 찌르는 병자들의 울음에 마음을 굳히며,
+임무를 서두른다. 아마 %o와(과) 함께라면
+돌아올 때 그들을 치유할 수 있을 것이다, 하지만 지금은 아니다.]],
       },
       goal_next = {
-         text = "Once again, you %x the Isle of %n in the distance.",
+         text = "다시 한번, 멀리서 %n의 섬이 %x.",
       },
       gotit = {
-         synopsis = "[You feel the healing power of %o and should return it to %l.]",
+         synopsis = "[%o의 치유력을 느끼며 %l에게 돌려줘야 한다.]",
          output = "text",
-         text = [[As you pick up %o, you feel its healing begin to
-warm your soul.  You curse Zeus for taking it from its rightful owner,
-but at least you hope that %l can put it to good use once
-again.]],
+         text = [[%o을(를) 집어 들자, 치유력이 영혼을
+따뜻하게 하기 시작하는 것을 느낀다. 제우스가 정당한 주인에게서
+그것을 빼앗은 것을 저주하지만, 적어도 %l이(가) 다시
+잘 사용할 수 있기를 바란다.]],
       },
       guardtalk_after = {
-         "\"Did you read that new treatise on the therapeutic use of leeches?\"",
-         "\"Paint a red caduceus on your shield and monsters won't hit you.\"",
-         "\"How are you feeling?  Perhaps a good bleeding will improve your spirits.\"",
-         "\"Have you heard the absurd new theory that diseases are caused by microscopic organisms, and not ill humors?\"",
-         "\"I see that you bring %o, now you can cure this plague!\"",
+         "\"거머리의 치료적 사용에 관한 새 논문 읽었어?\"",
+         "\"방패에 빨간 카두세우스를 그리면 괴물들이 공격하지 않아.\"",
+         "\"기분이 어때? 아마 피를 좀 빼면 기분이 나아질 거야.\"",
+         "\"질병이 나쁜 체액이 아니라 미세한 생물체에 의해 유발된다는 터무니없는 새 이론 들어봤어?\"",
+         "\"%o을(를) 가져왔구나, 이제 이 역병을 치료할 수 있겠다!\"",
       },
       guardtalk_before = {
-         "\"Did you read that new treatise on the therapeutic use of leeches?\"",
-         "\"Paint a red caduceus on your shield and monsters won't hit you.\"",
-         "\"I passed handwriting so they are demoting me a rank.\"",
-         "\"I've heard that even %l has not been able to cure Chiron.\"",
-         "\"We think %n has used %nj alchemists, and %o, to unleash a new disease we call 'the cold' on Gehennom.\"",
+         "\"거머리의 치료적 사용에 관한 새 논문 읽었어?\"",
+         "\"방패에 빨간 카두세우스를 그리면 괴물들이 공격하지 않아.\"",
+         "\"필기시험을 통과해서 강등당했어.\"",
+         "\"%l조차도 케이론을 치료할 수 없었다고 들었어.\"",
+         "\"%n이(가) 연금술사들과 %o을(를) 사용해서 게헨놈에 '감기'라는 새 질병을 퍼뜨렸다고 생각해.\"",
       },
       hasamulet = {
-         synopsis = "[\"You have recovered the Amulet.  Travel to the Astral Plane and return it to %d.\"]",
+         synopsis = "[\"아뮬렛을 되찾았구나. 아스트랄 계로 여행하여 %d께 돌려드려라.\"]",
          output = "text",
-         text = [["Ah, you have recovered the Amulet, %p.  Well done!
+         text = [["아, 아뮬렛을 되찾았구나, %p. 잘했다!
 
-"Now, you should know that you must travel through the Elemental Planes
-to the Astral, and there return the Amulet to %d.  Go forth and
-may our prayers be as a wind upon your back."]],
+"이제 원소의 계를 통해 아스트랄 계로 여행하여
+그곳에서 %d께 아뮬렛을 돌려드려야 한다는 것을 알아야 한다.
+나아가라, 우리의 기도가 네 등에 바람이 되기를."]],
       },
       killed_nemesis = {
-         synopsis = "[%nC curses you as %nh dies.]",
+         synopsis = "[%n이(가) 죽으며 저주를 내뱉는다.]",
          output = "text",
-         text = [[The battered body of %n slumps to the ground and gasps
-out one last curse:
+         text = [[만신창이가 된 %n의 몸이 땅에 쓰러지며
+마지막 저주를 내뱉는다:
 
-    "You have defeated me, %p, but I shall have my revenge.
-    How, I shall not say, but this curse shall be like a cancer
-    on you."
+    "네가 날 물리쳤다, %p, 하지만 복수를 하겠다.
+    어떻게인지는 말하지 않겠지만, 이 저주는
+    너에게 암처럼 붙어있을 것이다."
 
-With that %n dies.]],
+그 말과 함께 %n이(가) 죽는다.]],
       },
       leader_first = {
-         synopsis = "[%l is weak from the struggle with %n.  %lH wants to examine you.]",
+         synopsis = "[%l은(는) %n과(와)의 싸움으로 약해졌다. 그가 너를 검사하고 싶어한다.]",
          output = "text",
-         text = [[Feebly, %l raises %lj head to look at you.
+         text = [[힘없이, %l이(가) 고개를 들어 너를 바라본다.
 
-"It is good to see you again, %p.  I see the concern in your
-eyes, but do not worry for me.  I am not ready for Hades yet.  We have
-exhausted much of our healing powers holding off %n.
-I need your fresh strength to carry on our work.
+"다시 보게 되어 기쁘구나, %p. 네 눈에서 걱정이 보이지만,
+나를 걱정하지 마라. 아직 하데스에 갈 준비가 안 됐다.
+%n을(를) 막느라 치유력을 많이 소진했단다.
+우리 일을 계속하려면 네 신선한 힘이 필요하다.
 
-"Come closer and let me lay hands on you, and determine if you have
-the skills necessary to accomplish this mission."]],
+"가까이 와서 손을 얹게 해다오, 이 임무를 완수하는 데
+필요한 기술이 있는지 판단하겠다."]],
       },
       leader_last = {
-         synopsis = "[You are a failure as a healer.]",
+         synopsis = "[치료사로서 실패했다.]",
          output = "text",
-         text = [["You have failed us, %p.  You are a quack!  A charlatan!
+         text = [["우리를 실망시켰구나, %p. 넌 돌팔이다! 사기꾼이다!
 
-"Hades will be happy to hear that you are once again practicing your
-arts on the unsuspecting."]],
+"네가 다시 순진한 사람들에게 기술을 연습하고 있다는 소식을 들으면
+하데스가 기뻐할 것이다."]],
       },
       leader_next = {
-         text = [["Again you return to me, %p.  I sense that each trip back
-the pleurisy and maladies of our land begin to infect you.  Let us
-hope and pray to %d that you become ready for your task before
-you fall victim to the bad humors."]],
+         text = [["또 내게 돌아왔구나, %p. 돌아올 때마다
+우리 땅의 늑막염과 질병이 너를 감염시키기 시작하는 것을 느낀다.
+나쁜 체액의 희생자가 되기 전에 임무를 위한 준비가 되기를
+%d께 희망하고 기도하자."]],
       },
       leader_other = {
-         text = [["Chiron has fallen, Hermes has fallen, what else must I tell you to
-impress upon you the importance of your mission!  I hope that you
-have come prepared this time."]],
+         text = [["케이론이 쓰러졌고, 헤르메스도 쓰러졌다, 임무의 중요성을 새기려면
+또 뭘 말해야 하나! 이번에는 준비해서 왔기를 바란다."]],
       },
       locate_first = {
-         synopsis = "[You have reached %i but all is not well.]",
+         synopsis = "[%i에 도착했지만 모든 것이 좋지 않다.]",
          output = "text",
-         text = [[You stand before the entrance to %i.  Strange
-scratching noises come from within the building.
+         text = [[%i 입구 앞에 서 있다.
+건물 안에서 이상한 긁는 소리가 들린다.
 
-The swampy ground around you seems to stink with disease.]],
+주변의 늪지대가 질병으로 악취를 풍기는 것 같다.]],
       },
       locate_next = {
-         text = "Once again you stand at the entrance to %i.",
+         text = "다시 한번 %i 입구에 서 있다.",
       },
       nemesis_first = {
-         synopsis = "[\"I will take your life, then defeat %l.\"]",
+         synopsis = "[\"네 생명을 빼앗고 %l을(를) 물리치겠다.\"]",
          output = "text",
-         text = [["They have made a mistake in sending you, %p.
+         text = [["널 보낸 것은 실수였다, %p.
 
-"When I add your youth to mine, it will just make it easier for me
-to defeat %l."]],
+"네 젊음을 내 것에 더하면, %l을(를)
+물리치기가 더 쉬워질 뿐이다."]],
       },
       nemesis_next = {
-         text = "\"Unlike your patients, you seem to keep coming back, %p!\"",
+         text = "\"네 환자들과 달리, 넌 계속 돌아오는구나, %p!\"",
       },
       nemesis_other = {
-         text = "\"Which would you like, %p?  Boils, pleurisy, convulsions?\"",
+         text = "\"뭘 원하나, %p? 종기, 늑막염, 경련?\"",
       },
       nemesis_wantsit = {
-         text = [["I'll have %o back from you, %r.  You are
-not going to live to escape this place."]],
+         text = [["너에게서 %o을(를) 되찾겠다, %r.
+이곳을 살아서 빠져나가지 못할 것이다."]],
       },
       nexttime = {
-         text = [[After your last experience you expected to be here, but you certainly
-did not expect to see things so much worse.  This time you must succeed.]],
+         text = [[지난 경험 후에 여기 올 것을 예상했지만,
+상황이 훨씬 더 나빠진 것은 예상하지 못했다. 이번에는 성공해야 한다.]],
       },
       offeredit = {
-         synopsis = "[%l touches %o and tells %lj %gP to do so too, then tells you to take it with you.]",
+         synopsis = "[%l이(가) %o을(를) 만지고 %gP에게도 그렇게 하라고 한 뒤, 가져가라고 말한다.]",
          output = "text",
-         text = [[As soon as %l sees %o %lh summons %lj
-%gP.
+         text = [[%l이(가) %o을(를) 보자마자
+%gP을(를) 소환한다.
 
-Gently, %l reaches out and touches %o.
-He instructs each of the assembled to do the same.  When everyone
-has finished %lh speaks to you.
+부드럽게, %l이(가) 손을 뻗어 %o을(를) 만진다.
+모인 모든 이에게 똑같이 하라고 지시한다. 모두가
+마치면 너에게 말한다.
 
-    "Now that we have been replenished we can defeat this plague.  You must
-    take %o with you and replenish the worlds you have
-    been called upon to travel next.  I wish you could ride Chiron to the
-    end of your journey, but I need him to help me spread the cure.  Go
-    now and continue your journey."]],
+    "이제 보충되었으니 이 역병을 물리칠 수 있다. 다음에
+    여행하라고 부름받은 세계들을 보충하기 위해 %o을(를)
+    가져가야 한다. 여정의 끝까지 케이론을 태워 보내고 싶지만,
+    치료법을 퍼뜨리는 것을 돕게 해야 한다.
+    이제 가서 여정을 계속해라."]],
       },
       offeredit2 = {
-         synopsis = "[%l tells you to keep %o and return to %Z to search for the Amulet.]",
+         synopsis = "[%l이(가) %o을(를) 가지고 %Z(으)로 돌아가 아뮬렛을 찾으라고 말한다.]",
          output = "text",
-         text = [[%l cautiously handles %o while watching you.
+         text = [[%l이(가) 너를 바라보며 조심스럽게 %o을(를) 다룬다.
 
-"You are its keeper now, and the time has come to resume your search
-for the Amulet.  %Z await your return through the
-magic portal which brought you here."]],
+"이제 네가 그것의 수호자이고, 아뮬렛 탐색을 재개할 시간이다.
+%Z이(가) 너를 여기로 데려온
+마법 포탈을 통한 귀환을 기다리고 있다."]],
       },
       othertime = {
-         text = [[Again, you %x %H in the distance.
+         text = [[다시, 멀리서 %H이(가) %x.
 
-The smell of death and disease permeates the air.  You do not have
-to be %Ra to know that %n is on the verge of victory.]],
+죽음과 질병의 냄새가 공기에 스며든다. %n이(가) 승리 직전이라는 것을
+알기 위해 %R(이)가 될 필요는 없다.]],
       },
       posthanks = {
-         text = [["You have again returned to us, %p.  We have done well in your
-absence, yes?  How fare you upon your quest for the Amulet?"]],
+         text = [["또 우리에게 돌아왔구나, %p. 네가 없는 동안
+잘해왔지, 그렇지? 아뮬렛을 위한 임무는 어떻게 되어가고 있나?"]],
       },
    },
    Kni = {
       assignquest = {
-         synopsis = "[Pass through %i to reach %n.  Destroy %ni and return with %o.]",
+         synopsis = "[%i를 지나 %n에게 가라. 물리치고 %o을(를) 가져오라.]",
          output = "text",
-         text = [["Ah, %p.  Thou art truly ready, as no %c before thee hath
-been.  Hear now Our words:
+         text = [["아, %p. 그대 전의 어떤 %c도 그러하지 못했거늘,
+진정으로 준비가 되었도다. 이제 우리의 말을 들으라:
 
-"As thou noticed as thou approached %H, a great battle hath
-been fought recently in these fields.  Know thou that Merlin himself
-came to aid Us here as We battled the foul %n.  In the midst of that
-battle, %n struck Merlin a great blow, felling him.  Then, as Our
-forces were pressed back, %n stole %o.
+"그대가 %H에 접근하며 보았듯이, 이 들판에서 최근
+큰 전투가 벌어졌도다. 우리가 사악한 %n과(와) 싸울 때
+멀린 자신이 이곳에 와서 우리를 도왔음을 알라. 그 전투 중에
+%n이(가) 멀린에게 큰 일격을 가하여 쓰러뜨렸도다.
+그런 후 우리 군대가 밀려나자 %n이(가) %o을(를) 훔쳤도다.
 
-"We eventually turned the tide, but lost many %cP in doing so.
-Merlin was taken off by his apprentice, but hath not recovered.  We have
-been told that so long as %n possesseth %o,
-Merlin will not regain his health.
+"결국 전세를 뒤집었으나, 그 과정에서 많은 %cP을(를) 잃었도다.
+멀린은 그의 제자에게 이송되었으나 회복하지 못하였도다.
+%n이(가) %o을(를) 가지고 있는 한,
+멀린이 건강을 되찾지 못할 것이라 들었도다.
 
-"We hereby charge thee with this most important of duties:
+"이에 그대에게 가장 중요한 임무를 맡기노라:
 
-"Go forth from this place, to the fens, and there thou wilt find
-%i.  From there, thou must track down %n.  Destroy the
-beast, and return to Us %o.  Only then can
-We restore Merlin to health."]],
+"이곳을 떠나 늪지대로 가라, 거기서 %i를 찾을 것이다.
+거기서부터 %n을(를) 추적해야 하느니라.
+그 짐승을 파괴하고 %o을(를) 우리에게 돌려주라.
+오직 그래야만 멀린을 건강하게 되돌릴 수 있느니라."]],
       },
       badalign = {
-         synopsis = "[Go and do penance.  Return when you are truly %a.]",
+         synopsis = "[가서 참회하라. 진정으로 %a해지면 돌아오라.]",
          output = "text",
-         text = [["Thou dishonourest Us, %p!  Thou hast strayed from the path of
-chivalry! Go from Our presence and do penance.  Only when thou art again
-pure mayst thou return hence."]],
+         text = [["그대는 우리를 욕되게 하는도다, %p! 기사도의 길에서
+벗어났도다! 우리 앞에서 물러나 참회하라. 다시 순수해졌을 때에만
+이곳에 돌아올 수 있느니라."]],
       },
       badlevel = {
-         synopsis = "[You are not prepared to face %n.  Return when you are %Ra.]",
+         synopsis = "[%n을(를) 마주할 준비가 되지 않았다. %R(이)가 되면 돌아오라.]",
          output = "text",
-         text = [["Verily, %p, thou hast done well.  That thou hast survived thus
-far is a credit to thy valor, but thou art yet unprepared for
-the demands required as Our Champion.  %rA, no matter how
-pure, could never hope to defeat the foul %n.
+         text = [["진실로, %p, 그대는 잘해왔도다. 지금까지 살아남은 것은
+그대의 용맹의 증거이나, 아직 우리의 챔피언으로서 요구되는 것에
+준비가 되지 않았도다. 아무리 순수한 %r(이)라도
+사악한 %n을(를) 물리칠 희망이 없느니라.
 
-"Journey forth from this place, and hone thy skills.  Return to
-Our presence when thou hast attained the noble title of %R."]],
+"이곳을 떠나 그대의 기술을 연마하라. 고귀한 %R의 칭호를
+얻었을 때 우리 앞에 돌아오라."]],
       },
       discourage = {
-         "\"A mere %r can never withstand me!\"",
-         "\"I shall kill thee now, and feast!\"",
-         "\"Puny %c.  What manner of death dost thou wish?\"",
-         "\"First thee, %p, then I shall feast upon %l.\"",
-         "\"Hah!  Thou hast failed, %r.  Now thou shalt die.\"",
-         "\"Die, %c.  Thou art as nothing against my might.\"",
-         "\"I shall suck the marrow from thy bones, %c.\"",
-         "\"Let's see...  Baked?  No.  Fried?  Nay.  Broiled?  Yea verily, that is the way I like my %c for dinner.\"",
-         "\"Thy strength waneth, %p.  The time of thy death draweth near.\"",
-         "\"Call upon thy precious %d, %p.  It shall not avail thee.\"",
+         "\"고작 %r이(가) 나를 당해낼 수 없다!\"",
+         "\"지금 죽이고 잔치를 벌이겠다!\"",
+         "\"하찮은 %c. 어떤 죽음을 원하느냐?\"",
+         "\"먼저 너, %p, 그다음 %l을(를) 잡아먹겠다.\"",
+         "\"하! 실패했구나, %r. 이제 죽을 것이다.\"",
+         "\"죽어라, %c. 내 힘 앞에서 넌 아무것도 아니다.\"",
+         "\"네 뼈의 골수를 빨아먹겠다, %c.\"",
+         "\"어디 보자... 구워서? 아니. 튀겨서? 아니. 불에 구워서? 그래 바로 그거야, 저녁에 %c를 좋아하는 방식이지.\"",
+         "\"힘이 약해지는구나, %p. 죽음의 시간이 다가온다.\"",
+         "\"소중한 %d를 불러봐라, %p. 소용없을 것이다.\"",
       },
       encourage = {
-         "\"Remember, %p, follow always the path of %d.\"",
-         "\"Though %n is verily a mighty foe, We have confidence in thy victory.\"",
-         "\"Beware, for %n hath surrounded %niself with hordes of foul creatures.\"",
-         "\"Great treasure, 'tis said, is hoarded in the lair of %n.\"",
-         "\"If thou possessest %o, %p, %ns magic shall therewith be thwarted.\"",
-         "\"The gates of %i are guarded by forces unseen, %p. Go carefully.\"",
-         "\"Return %o to Us quickly, %p.\"",
-         "\"Destroy %n, %p, else %H shall surely fall.\"",
-         "\"Call upon %d when thou art in need.\"",
-         "\"To find %i, thou must keep thy heart pure.\"",
+         "\"기억하라, %p, 항상 %d의 길을 따르라.\"",
+         "\"%n은(는) 진실로 강력한 적이지만, 우리는 그대의 승리를 확신하노라.\"",
+         "\"조심하라, %n은(는) 사악한 생물 무리로 자신을 둘러쌌도다.\"",
+         "\"%n의 소굴에 큰 보물이 쌓여있다고 하더라.\"",
+         "\"그대가 %o을(를) 가지면, %p, %n의 마법이 좌절될 것이다.\"",
+         "\"%i의 문은 보이지 않는 힘에 의해 지켜지고 있다, %p. 조심히 가라.\"",
+         "\"%o을(를) 빨리 우리에게 돌려주라, %p.\"",
+         "\"%n을(를) 파괴하라, %p, 그렇지 않으면 %H이(가) 틀림없이 함락될 것이다.\"",
+         "\"필요할 때 %d를 부르라.\"",
+         "\"%i를 찾으려면 마음을 순수하게 유지해야 하느니라.\"",
       },
       firsttime = {
-         synopsis = "[Signs of battle include long gouges in the walls of %H.]",
+         synopsis = "[전투의 흔적으로 %H 벽에 긴 할퀸 자국이 있다.]",
          output = "text",
-         text = [[You materialize in the shadows of %H.  Immediately, you notice
-that something is wrong.  The fields around the castle are trampled and
-withered, as if some great battle has been recently fought.
+         text = [[%H의 그림자 속에 나타났다. 즉시 뭔가 잘못되었음을
+알아챈다. 성 주변의 들판은 밟히고 시들어 있다.
+마치 최근에 큰 전투가 벌어진 것처럼.
 
-Exploring further, you %x long gouges in the walls of %H.
-You know of only one creature that makes those kinds of marks...]],
+더 탐험하니, %H 벽에 긴 할퀸 자국이 %x.
+그런 자국을 만드는 생물은 하나밖에 모른다...]],
       },
       goal_first = {
-         synopsis = "[You %x the entrance to a cavern inside a hill.]",
+         synopsis = "[언덕 안의 동굴 입구가 %x.]",
          output = "text",
-         text = [[As you exit the swamps, you %x before you a huge, gaping hole in the
-side of a hill.  From within, you smell the foul stench of carrion.
+         text = [[늪을 빠져나오자, 앞에 언덕 옆구리에 거대하게 벌어진 구멍이 %x.
+안에서 썩은 고기의 악취가 난다.
 
-The pools on either side of the entrance are fouled with blood, and
-pieces of rusted metal and broken weapons show above the surface.]],
+입구 양쪽의 웅덩이는 피로 더럽혀져 있고,
+녹슨 금속 조각들과 부러진 무기들이 수면 위로 보인다.]],
       },
       goal_next = {
-         text = "Again, you stand at the entrance to %ns lair.",
+         text = "다시, %n의 소굴 입구에 서 있다.",
       },
       gotit = {
-         synopsis = "[You feel the magic of %o.]",
+         synopsis = "[%o의 마법을 느낀다.]",
          output = "text",
-         text = [[As you pick up %o, you feel its protective fields
-form around your body.  You also feel a faint stirring in your mind, as
-if you are in two places at once, and in the second, you are waking from
-a long sleep.]],
+         text = [[%o을(를) 집어 들자, 보호막이 몸 주위에
+형성되는 것을 느낀다. 또한 마음속에서 희미한 움직임을 느낀다.
+마치 동시에 두 곳에 있는 것처럼, 두 번째에서는
+긴 잠에서 깨어나는 것처럼.]],
       },
       guardtalk_after = {
-         "\"Hail, %p!  Verily, thou lookest well.\"",
-         "\"So, %p, didst thou find %n in the fens near %i?\"",
-         "\"Worthy %p, hast thou proven thy right purpose on the body of %n?\"",
-         "\"Verily, %l could have no better champion, %p.\"",
-         "\"Hast thou indeed recovered %o?\"",
+         "\"만세, %p! 진실로 좋아 보이는도다.\"",
+         "\"그래서, %p, %i 근처 늪지대에서 %n을(를) 찾았느냐?\"",
+         "\"존경받는 %p, %n의 시체에서 정당한 목적을 증명했느냐?\"",
+         "\"진실로, %l에게는 그대보다 나은 챔피언이 없을 것이다, %p.\"",
+         "\"정말로 %o을(를) 되찾았느냐?\"",
       },
       guardtalk_before = {
-         "\"Hail, %p!  Verily, thou lookest well.\"",
-         "\"There is word, %p, that %n hath been sighted in the fens near %i.\"",
-         "\"Thou art our only hope now, %p.\"",
-         "\"Verily, %l could have no better champion, %p.\"",
-         "\"Many brave %cP died when %n attacked.\"",
+         "\"만세, %p! 진실로 좋아 보이는도다.\"",
+         "\"소문이 있다, %p, %n이(가) %i 근처 늪지대에서 목격되었다고.\"",
+         "\"그대는 이제 우리의 유일한 희망이다, %p.\"",
+         "\"진실로, %l에게는 그대보다 나은 챔피언이 없을 것이다, %p.\"",
+         "\"%n이(가) 공격했을 때 많은 용감한 %cP이(가) 죽었다.\"",
       },
       hasamulet = {
-         synopsis = "[Take the Amulet to the Astral Plane and deliver it to %d.]",
+         synopsis = "[아뮬렛을 아스트랄 계로 가져가 %d께 바쳐라.]",
          output = "text",
-         text = [["Thou hast succeeded, We see, %p!  Now thou art commanded to take
-the Amulet to be sacrificed to %d in the Plane of the Astral.
+         text = [["그대가 성공했음을 보노라, %p! 이제 아뮬렛을 아스트랄 계에서
+%d께 바치라는 명을 받았도다.
 
-"Merlin hath counseled Us that thou must travel always upwards through
-the Planes of the Elements, to achieve this goal.
+"멀린이 우리에게 조언하기를, 이 목표를 이루려면 항상 원소의 계를
+통해 위로 여행해야 한다고 하였도다.
 
-"Go with %d, %p."]],
+"%d과(와) 함께 가라, %p."]],
       },
       killed_nemesis = {
-         synopsis = "[%nC curses you as %nh dies.]",
+         synopsis = "[%n이(가) 죽으며 저주를 내뱉는다.]",
          output = "text",
-         text = [[As %n sinks to the ground, blood gushing from %nj open mouth, %nh
-defiantly curses you and %l:
+         text = [[%n이(가) 땅에 가라앉으며, 벌어진 입에서 피가 솟구치며,
+반항적으로 너와 %l을(를) 저주한다:
 
-    "Thou hast not won yet, %r.  By the gods, I shall return
-    and dog thy steps to the grave!"
+    "아직 이긴 게 아니다, %r. 신들에 맹세코, 돌아와서
+    무덤까지 네 발걸음을 쫓겠다!"
 
-%nJ tail flailing madly, %n tries to crawl towards you, but slumps
-to the ground and dies in a pool of %nj own blood.]],
+꼬리를 미친 듯이 휘두르며, %n이(가) 너에게 기어오려 하지만,
+땅에 쓰러져 자신의 피 웅덩이에서 죽는다.]],
       },
       leader_first = {
-         synopsis = "[%lC checks whether you are ready for a great undertaking.]",
+         synopsis = "[%l이(가) 그대가 위대한 과업을 위한 준비가 되었는지 확인한다.]",
          output = "text",
-         text = [["Ah, %p.  We see thou hast received Our summons.
-We are in dire need of thy prowess.  But first, We must needs
-decide if thou art ready for this great undertaking."]],
+         text = [["아, %p. 그대가 우리의 소환을 받았음을 보노라.
+우리는 그대의 무용이 절실히 필요하도다. 하지만 먼저,
+그대가 이 위대한 과업을 위한 준비가 되었는지 결정해야 하느니라."]],
       },
       leader_last = {
-         synopsis = "[You are a disgrace as %ca.]",
+         synopsis = "[%c(으)로서 수치스럽다.]",
          output = "text",
-         text = [["Thou disgracest this noble court with thine impure presence.  We have been
-lenient with thee, but no more.  Thy name shall be spoken no more.  We
-hereby strip thee of thy title, thy lands, and thy standing as %ca.
-Begone from Our sight!"]],
+         text = [["그대는 불순한 존재로 이 고귀한 궁정을 욕되게 하는도다. 우리가
+그대에게 관대했으나, 더 이상은 아니다. 그대의 이름은 더 이상 언급되지 않으리라.
+이에 그대의 칭호, 영지, 그리고 %c(으)로서의 지위를 박탈하노라.
+우리 눈앞에서 사라지라!"]],
       },
       leader_next = {
-         text = "\"Welcome again, %p.  We hope thou art ready now.\"",
+         text = "\"다시 온 것을 환영하노라, %p. 이제 준비가 되었기를 바라노라.\"",
       },
       leader_other = {
-         text = "\"Once again, thou standest before Us, %p.  Art thou ready now?\"",
+         text = "\"다시 한번, 우리 앞에 서 있구나, %p. 이제 준비가 되었느냐?\"",
       },
       locate_first = {
-         synopsis = "[You have reached %i and can %x a shrine.]",
+         synopsis = "[%i에 도착했고 신전이 %x.]",
          output = "text",
-         text = [[You stand at the foot of %i.  Atop, you can %x a shrine.
-Strange energies seem to be focused here, and the hair on the back of
-your neck stands on end.]],
+         text = [[%i 기슭에 서 있다. 위에 신전이 %x.
+이상한 에너지가 여기에 집중된 것 같고, 목덜미의 털이 곤두선다.]],
       },
       locate_next = {
-         text = "Again, you stand at the foot of %i.",
+         text = "다시, %i 기슭에 서 있다.",
       },
       nemesis_first = {
-         synopsis = "[%nC taunts you and issues a threat against %H.]",
+         synopsis = "[%n이(가) 조롱하며 %H을(를) 위협한다.]",
          output = "text",
-         text = [["Hah!  Another puny %c seeks death.  I shall dine well tonight,
-then tomorrow, %H shall fall!"]],
+         text = [["하! 또 하찮은 %c이(가) 죽음을 원하는군. 오늘 밤 잘 먹고,
+내일은 %H이(가) 함락될 것이다!"]],
       },
       nemesis_next = {
-         text = "\"Again, thou challengest me, %r?  So be it.  Thou wilt die here.\"",
+         text = "\"또, 나에게 도전하느냐, %r? 그래라. 여기서 죽을 것이다.\"",
       },
       nemesis_other = {
-         text = "\"Thou art truly foolish, %r.  I shall dispatch thee anon.\"",
+         text = "\"진정으로 어리석구나, %r. 곧 처치해 주마.\"",
       },
       nemesis_wantsit = {
-         text = [["So, thou darest touch MY property!  I shall have that bauble back,
-puny %r.  Thou wilt die in agony!"]],
+         text = [["감히 내 재산에 손을 대느냐! 그 장신구를 되찾겠다,
+하찮은 %r. 고통 속에서 죽을 것이다!"]],
       },
       nexttime = {
-         text = "Once again you stand in the shadows of %H.",
+         text = "다시 한번 %H의 그림자 속에 서 있다.",
       },
       offeredit = {
-         synopsis = "[%oC is yours now.  It will aid in your search for the Amulet.]",
+         synopsis = "[%o은(는) 이제 그대의 것이다. 아뮬렛 탐색에 도움이 될 것이다.]",
          output = "text",
-         text = [[As you approach %l, %lh beams at you and says:
+         text = [[%l에게 다가가니 환하게 웃으며 말한다:
 
-    "Well done!  Thou art truly the Champion of %H.  We
-    have received word that Merlin is recovering, and shall soon
-    rejoin Us.
+    "잘했도다! 그대는 진정으로 %H의 챔피언이로다.
+    멀린이 회복 중이며 곧 우리와 합류할 것이라는
+    소식을 받았도다.
 
-    "He hath instructed Us that thou art now to be the guardian of
-    %o.  He feeleth that thou mayst have need of
-    its powers in thine adventures.  It is Our wish that thou keepest
-    %o with thee as thou searchest for the fabled
-    Amulet of Yendor."]],
+    "그가 우리에게 지시하기를, 이제 그대가 %o의
+    수호자가 되어야 한다고 하였도다. 그대가 모험에서
+    그 힘이 필요할 수 있다고 느끼시는도다. 전설의
+    옌더의 아뮬렛을 탐색하는 동안 %o을(를)
+    그대와 함께 지니는 것이 우리의 바람이로다."]],
       },
       offeredit2 = {
-         synopsis = "[You are the keeper of %o.  Return to %Z and find the Amulet.]",
+         synopsis = "[그대가 %o의 수호자다. %Z(으)로 돌아가 아뮬렛을 찾아라.]",
          output = "text",
-         text = [["Careful, %p!  %oC might break, and that would
-be a tragic loss.  Thou art its keeper now, and the time hath come
-to resume thy search for the Amulet.  %Z await thy
-return through the magic portal that brought thee here."]],
+         text = [["조심하라, %p! %o이(가) 부서질 수 있으니,
+그것은 비극적인 손실이 될 것이다. 이제 그대가 그것의 수호자이고,
+아뮬렛 탐색을 재개할 시간이 되었도다. %Z이(가) 그대를
+여기로 데려온 마법 포탈을 통한 귀환을 기다리고 있느니라."]],
       },
       othertime = {
-         text = [[Again, you stand before %H.  You vaguely sense that this
-may be the last time you stand before %l.]],
+         text = [[다시, %H 앞에 서 있다. 이것이 %l 앞에
+서는 마지막일지도 모른다는 희미한 느낌이 든다.]],
       },
       posthanks = {
-         text = "\"Well met, %p.  How goeth thy search for the Amulet of Yendor?\"",
+         text = "\"잘 만났도다, %p. 옌더의 아뮬렛 탐색은 어떻게 되어가느냐?\"",
       },
    },
    Mon = {
       assignquest = {
-         synopsis = "[Find %i, then continue to %ns lair.  Defeat %ni and return with %o.]",
+         synopsis = "[%i를 찾아 %n의 소굴로 가라. 물리치고 %o을(를) 가져오라.]",
          output = "text",
-         text = [["Yes, %p.  You are truly ready now.  Attend to me and I shall
-tell you of what has transpired:
+         text = [["그래, %p. 이제 진정으로 준비가 되었구나. 내 말을 들어라,
+무슨 일이 있었는지 말해주겠다:
 
-"During one of the Great Meditations a short time ago, %n and
-a legion of elementals invaded %H.  Many %gP
-were killed, including the one bearing %o.
+"얼마 전 대명상 중 하나에서, %n과(와) 정령 군단이
+%H을(를) 침략했다. 많은 %gP이(가) 죽었고,
+%o을(를) 지니고 있던 자도 포함되었다.
 
-Now, there are barely enough %gP left to keep the elementals
-at bay.
+이제 정령을 막을 %gP조차 겨우 남아있다.
 
-"We need you to find %i, then, from there,
-travel to %ns lair.  If you can manage to defeat %n and
-return %o here, we can then drive off the legions
-of elementals that slay our students.
+"너는 %i를 찾아야 한다, 거기서 %n의 소굴로
+가야 한다. %n을(를) 물리치고 %o을(를) 이곳에
+가져올 수 있다면, 우리 학생들을 죽이는 정령 군단을
+몰아낼 수 있다.
 
-"Go with %d as your guide, %p."]],
+"%d께서 인도하시길, %p."]],
       },
       badalign = {
-         synopsis = "[You must atone.  Come back when you are worthy of %d.]",
+         synopsis = "[속죄해야 한다. %d에게 합당해지면 돌아오라.]",
          output = "text",
-         text = [["This is terrible, %p.  You have deviated from the true path!
-You know that %d requires the most strident devotion of this
-order.  The %shood must stand for utmost piety.
+         text = [["끔찍하구나, %p. 진정한 길에서 벗어났구나!
+%d께서 이 교단에 가장 엄격한 헌신을 요구하신다는 것을
+알잖느냐. %s직은 최고의 경건함을 상징해야 한다.
 
-"Go from here, atone for your sins against %d.  Return only when
-you have purified yourself."]],
+"여기서 떠나라, %d께 죄를 속죄하라. 스스로를
+정화한 후에만 돌아오라."]],
       },
       badlevel = {
-         synopsis = "[You are not ready to face %n.  Come back when you are %Ra.]",
+         synopsis = "[%n을(를) 마주할 준비가 되지 않았다. %R(이)가 되면 돌아오라.]",
          output = "text",
-         text = [["Alas, %p, it is not yet to be.  A mere %r could never
-withstand the might of %n.  Go forth, again into the world, and
-return when you have attained the post of %R."]],
+         text = [["아아, %p, 아직 때가 아니구나. 고작 %r이(가)
+%n의 힘을 견딜 수는 없다. 다시 세상으로 나가라,
+그리고 %R의 직위에 오르면 돌아오라."]],
       },
       discourage = {
-         "\"Submit to my will, %c, and I shall spare you.\"",
-         "\"Your puny powers are no match for me, %c.\"",
-         "\"I shall have you turned into a zombie for my pleasure!\"",
-         "\"Despair now, %r.  %d cannot help you.\"",
-         "\"I shall feast upon your soul for many days, %c.\"",
-         "\"Your death will be slow and painful.  That I promise!\"",
-         "\"You cannot defeat %n, you fool.  I shall kill you now.\"",
-         "\"Your precious %lt will be my next victim.\"",
-         "\"I feel your powers failing you, %r.  You shall die now.\"",
-         "\"With %o, nothing can stand in my way.\"",
+         "\"내 뜻에 굴복하라, %c, 그러면 살려주마.\"",
+         "\"네 보잘것없는 힘은 나의 상대가 되지 않는다, %c.\"",
+         "\"내 즐거움을 위해 널 좀비로 만들어주지!\"",
+         "\"절망하라, %r. %d은(는) 널 도울 수 없다.\"",
+         "\"네 영혼을 며칠 동안 연회로 삼겠다, %c.\"",
+         "\"네 죽음은 느리고 고통스러울 것이다. 약속하지!\"",
+         "\"%n을(를) 물리칠 수 없다, 바보야. 이제 죽여주마.\"",
+         "\"네 소중한 %lt이(가) 내 다음 희생자가 될 것이다.\"",
+         "\"네 힘이 약해지고 있다, %r. 이제 죽어라.\"",
+         "\"%o이(가) 있으니, 아무것도 내 길을 막을 수 없다.\"",
       },
       encourage = {
-         "\"You can prevail, if you rely on %d.\"",
-         "\"Remember that %n has great magic at his command.\"",
-         "\"Be pure, my %S.\"",
-         "\"Beware, %i is surrounded by hordes of earth elementals.\"",
-         "\"Remember your studies, and you will prevail!\"",
-         "\"Acquire and wear %o if you can.  They will aid you against %n.\"",
-         "\"Call upon %d when your need is greatest.  You will be answered.\"",
-         "\"Remember to use the elementals' strength against them!\"",
-         "\"Do not lose faith, %p.  If you do so, %n will grow stronger.\"",
-         "\"Wear %o.  They will assist you in your efforts.\"",
+         "\"%d를 의지하면 승리할 수 있다.\"",
+         "\"%n이(가) 강력한 마법을 가지고 있다는 것을 기억하라.\"",
+         "\"순수하라, 나의 %S.\"",
+         "\"조심하라, %i는 대지 정령 무리로 둘러싸여 있다.\"",
+         "\"배운 것을 기억하면 승리할 것이다!\"",
+         "\"가능하면 %o을(를) 획득하고 착용하라. %n에 맞서 도움이 될 것이다.\"",
+         "\"가장 절실할 때 %d를 부르라. 응답이 있을 것이다.\"",
+         "\"정령들의 힘을 그들에게 사용하는 것을 기억하라!\"",
+         "\"믿음을 잃지 마라, %p. 그러면 %n이(가) 더 강해질 것이다.\"",
+         "\"%o을(를) 착용하라. 노력에 도움이 될 것이다.\"",
       },
       firsttime = {
-         synopsis = "[You have reached %H but something is wrong.  %lC needs your aid.]",
+         synopsis = "[%H에 도착했지만 무언가 잘못되었다. %l이(가) 도움이 필요하다.]",
          output = "text",
-         text = [[You find yourself standing in sight of %H.
-Something is obviously wrong here.  Strange shapes lumber around
-outside %H!
+         text = [[%H이(가) 보이는 곳에 서 있다.
+분명히 무언가 잘못되었다. 이상한 형체들이 %H
+바깥에서 느릿느릿 돌아다닌다!
 
-You realize that %l needs your assistance!]],
+%l이(가) 네 도움이 필요하다는 것을 깨닫는다!]],
       },
       goal_first = {
-         synopsis = "[You are surrounded by brimstone, lava, and elementals.]",
+         synopsis = "[유황, 용암, 정령들에 둘러싸여 있다.]",
          output = "text",
-         text = [[The stench of brimstone is all about you, and the elementals close in
-from all sides!
+         text = [[유황 냄새가 사방에 가득하고, 정령들이 사방에서
+다가온다!
 
-Ahead, there is a small clearing amidst the bubbling pits of lava...]],
+앞쪽에, 부글거리는 용암 구덩이 사이에 작은 공터가 있다...]],
       },
       goal_next = {
-         text = "Again, you have invaded %ns domain.",
+         text = "다시 한번, %n의 영역을 침입했다.",
       },
       gotit = {
-         synopsis = "[You feel the essence of %d and realize that you should take %o to %l.]",
+         synopsis = "[%d의 본질을 느끼고 %o을(를) %l에게 가져가야 함을 깨닫는다.]",
          output = "text",
-         text = [[As you pick up %o, you feel the essence of
-%d fill your soul.  You know now why %n stole %oi from
-%H, for with %oi, %ca of %d could
-easily defeat his plans.
+         text = [[%o을(를) 집어 들자, %d의 본질이
+영혼을 가득 채우는 것을 느낀다. 왜 %n이(가) %H에서
+그것을 훔쳤는지 이제 안다, 그것으로 %d의 %c이(가)
+쉽게 그의 계획을 물리칠 수 있기 때문이다.
 
-You sense a message from %d.  Though not verbal, you
-get the impression that you must return to %l as soon
-as possible.]],
+%d로부터 메시지를 감지한다. 말로는 아니지만,
+가능한 한 빨리 %l에게 돌아가야 한다는
+인상을 받는다.]],
       },
       guardtalk_after = {
-         "\"Greetings, honorable %r.  It is good to see you again.\"",
-         "\"Ah, %p!  Our deepest gratitude for all of your help.\"",
-         "\"Greetings, %s.  Perhaps you will take some time to meditate with us?\"",
-         "\"With this test behind you, may %d bring you enlightenment.\"",
-         "\"May %d be with you, %s.\"",
+         "\"안녕하시오, 존경하는 %r. 다시 보니 반갑소.\"",
+         "\"아, %p! 모든 도움에 깊이 감사드리오.\"",
+         "\"안녕하시오, %s. 잠시 우리와 함께 명상하시겠소?\"",
+         "\"이 시험을 뒤로하고, %d께서 깨달음을 주시길.\"",
+         "\"%d께서 함께 하시길, %s.\"",
       },
       guardtalk_before = {
-         "\"Greetings, honorable %r.  It is good to see you.\"",
-         "\"Ah, %p!  Surely you can help us in our hour of need.\"",
-         "\"Greetings, %s.  %lC has great need of your help.\"",
-         "\"Alas, it seems as if even %d has deserted us.\"",
-         "\"May %d be with you, %s.\"",
+         "\"안녕하시오, 존경하는 %r. 뵈어서 반갑소.\"",
+         "\"아, %p! 분명 이 위기의 시간에 도움을 주실 수 있겠지.\"",
+         "\"안녕하시오, %s. %l이(가) 당신의 도움이 절실히 필요하오.\"",
+         "\"아아, %d마저 우리를 버리신 것 같소.\"",
+         "\"%d께서 함께 하시길, %s.\"",
       },
       hasamulet = {
-         synopsis = "[Take the Amulet to the Astral Plane and deliver it to %d.]",
+         synopsis = "[아뮬렛을 아스트랄 차원으로 가져가 %d께 바쳐라.]",
          output = "text",
-         text = [["You have prevailed, %p!  %d is surely with you.  Now,
-you must take the Amulet, and sacrifice it on %ds altar on
-the Astral Plane.  I suspect that I shall never see you again in this
-life, but I hope to at %ds feet."]],
+         text = [["승리했구나, %p! %d께서 분명 함께 하셨다. 이제,
+아뮬렛을 가지고 아스트랄 차원의 %d의 제단에
+바쳐야 한다. 이 생에서 다시 만나지 못할 것 같지만,
+%d의 발 아래에서 만나기를 바란다."]],
       },
       killed_nemesis = {
-         synopsis = "[As %n dies, %nh threatens to return.]",
+         synopsis = "[%n이(가) 죽으면서 돌아오겠다고 위협한다.]",
          output = "text",
-         text = [[%nC gasps:
+         text = [[%n이(가) 헐떡이며 말한다:
 
-    "You have only defeated this mortal body.  Know this: my spirit
-    is strong.  I shall return and reclaim what is mine!"
+    "이 필멸의 육체만 물리친 것이다. 알아두어라: 내 영혼은
+    강하다. 돌아와서 내 것을 되찾겠다!"
 
-With that, %n expires.]],
+그 말과 함께, %n이(가) 숨을 거둔다.]],
       },
       leader_first = {
-         synopsis = "[%lC checks whether you are ready for the great challenge.]",
+         synopsis = "[%l이(가) 위대한 도전에 대비가 되었는지 확인한다.]",
          output = "text",
-         text = [["Ah, %p, my %S.  You have returned to us at last.
-A great blow has befallen our order; perhaps you can help us.
-First, however, I must determine if you are prepared for this
-great challenge."]],
+         text = [["아, %p, 나의 %S. 마침내 돌아왔구나.
+우리 교단에 큰 타격이 있었다; 아마도 네가 도울 수 있을 것이다.
+하지만 먼저, 이 위대한 도전에 대비가 되었는지
+확인해야 한다."]],
       },
       leader_last = {
-         synopsis = "[You are a heretic and have failed utterly.]",
+         synopsis = "[이단자이며 완전히 실패했다.]",
          output = "text",
-         text = [["You are a heretic, %p!  How can you, %ra, deviate so from the
-teachings of %d?  Begone from this temple.  You are no longer
-%sa to this order.  We will pray to %d for other assistance,
-as you have failed us utterly."]],
+         text = [["이단자로구나, %p! 어떻게 %r인 네가 %d의
+가르침에서 그토록 벗어날 수 있느냐? 이 신전에서 떠나라. 너는 더 이상
+이 교단의 %s이(가) 아니다. 네가 완전히 실패했으니
+%d께 다른 도움을 기도할 것이다."]],
       },
       leader_next = {
-         text = "\"Again, my %S, you stand before me.  Are you ready now to help us?\"",
+         text = "\"다시, 나의 %S, 내 앞에 섰군. 이제 우리를 도울 준비가 되었는가?\"",
       },
       leader_other = {
-         text = "\"Once more, %p, you stand within the sanctum.  Are you ready now?\"",
+         text = "\"다시 한번, %p, 성소 안에 섰군. 이제 준비가 되었는가?\"",
       },
       locate_first = {
-         synopsis = "[You have reached %i.  %nC lurks further ahead.]",
+         synopsis = "[%i에 도착했다. %n이(가) 더 앞에 숨어있다.]",
          output = "text",
-         text = [[You remember the descriptions of %i, given
-to you by %l.  It is ahead that you will find
-%n's trail.]],
+         text = [[%l이(가) 말해준 %i의 설명을 기억한다.
+앞으로 가면 %n의 흔적을 찾을 것이다.]],
       },
       locate_next = {
-         text = "Again, you stand before %i.",
+         text = "다시, %i 앞에 선다.",
       },
       nemesis_first = {
-         synopsis = "[You are no %g.  You shall never regain %o.]",
+         synopsis = "[넌 %g이(가) 아니다. %o을(를) 절대 되찾지 못할 것이다.]",
          output = "text",
-         text = [["Ah, so %l has sent another %g to retrieve
-%o.
+         text = [["아, 그래서 %l이(가) %o을(를) 되찾으러
+또 다른 %g을(를) 보냈군.
 
-"No, I see you are no %g.  Perhaps I shall have some fun today
-after all.  Prepare to die, %r!  You shall never regain
-%o."]],
+"아니, 넌 %g이(가) 아니군. 아마 오늘 재미 좀 볼 수 있겠군.
+죽을 준비를 해라, %r! %o을(를) 절대
+되찾지 못할 것이다."]],
       },
       nemesis_next = {
-         text = "\"So, %r.  Again you challenge me.\"",
+         text = "\"그래서, %r. 또다시 나에게 도전하는군.\"",
       },
       nemesis_other = {
-         text = "\"Die now, %r.  %d has no power here to aid you.\"",
+         text = "\"이제 죽어라, %r. %d은(는) 여기서 널 도울 힘이 없다.\"",
       },
       nemesis_wantsit = {
-         text = "\"You shall die, %r, and I will have %o back.\"",
+         text = "\"죽을 것이다, %r, 그리고 %o을(를) 되찾겠다.\"",
       },
       nexttime = {
-         text = "Once again, you stand before %H.",
+         text = "다시 한번, %H 앞에 선다.",
       },
       offeredit = {
-         synopsis = "[Keep %o.  %oH will help you recover the Amulet of Yendor.]",
+         synopsis = "[%o을(를) 가져라. 옌더의 아뮬렛을 되찾는 데 도움이 될 것이다.]",
          output = "text",
-         text = [["You have returned, %p.  And with %o, I see.
-Congratulations.
+         text = [["돌아왔구나, %p. 그리고 %o을(를) 가지고 왔군.
+축하한다.
 
-"I have been in meditation, and have received direction from
-a minion of %d.  %d commands that you retain
-%o.  With %oi, you must recover the Amulet
-of Yendor.
+"명상 중이었는데, %d의 사자로부터 지시를 받았다.
+%d께서 네가 %o을(를) 가지라고 명하셨다.
+그것으로 옌더의 아뮬렛을 되찾아야 한다.
 
-"Go forth, and let %d guide your steps."]],
+"나아가라, 그리고 %d께서 네 발걸음을 인도하시게 하라."]],
       },
       offeredit2 = {
-         synopsis = "[Keep %o and return to %Z to search for the Amulet.]",
+         synopsis = "[%o을(를) 가지고 %Z(으)로 돌아가 아뮬렛을 찾아라.]",
          output = "text",
-         text = [[%lC studies %o for a moment,
-then returns his gaze to you.
+         text = [[%l이(가) 잠시 %o을(를) 살펴보더니,
+시선을 네게 돌린다.
 
-"%oC must remain with you.  Use %oi
-as you resume your search for the Amulet.
-%Z await your return through the magic portal
-that brought you here."]],
+"%o은(는) 네게 남아있어야 한다. 아뮬렛 탐색을
+재개할 때 사용하라. %Z이(가) 너를 이곳으로 데려온
+마법의 포탈을 통해 네 귀환을 기다리고 있다."]],
       },
       othertime = {
-         text = [[Again you face %H.  Your intuition hints that this
-may be the final time you come here.]],
+         text = [[다시 %H을(를) 마주한다. 이번이 여기 오는
+마지막일지도 모른다는 직감이 든다.]],
       },
       posthanks = {
-         text = "\"Welcome back, %p.  How is your quest for the Amulet going?\"",
+         text = "\"돌아왔군, %p. 아뮬렛 탐색은 어떻게 되고 있느냐?\"",
       },
    },
    Pri = {
       assignquest = {
-         synopsis = "[%nC invaded %H and captured %o.  Defeat %ni and retrieve %oh.]",
+         synopsis = "[%n이(가) %H을(를) 침략하고 %o을(를) 탈취했다. 물리치고 되찾아라.]",
          output = "text",
-         text = [["Yes, %p.  You are truly ready now.  Attend to me and I shall
-tell you of what has transpired:
+         text = [["그래, %p. 이제 진정으로 준비가 되었구나. 내 말을 들어라,
+무슨 일이 있었는지 말해주겠다:
 
-"At one of the Great Festivals a short time ago, %n and a legion
-of undead invaded %H.  Many %gP were killed, including
-the one carrying %o.
+"얼마 전 대축제 중 하나에서, %n과(와) 언데드 군단이
+%H을(를) 침략했다. 많은 %gP이(가) 죽었고,
+%o을(를) 들고 있던 자도 포함되었다.
 
-"As a final act of vengefulness, %n desecrated the altar here.
-Without it, we could not mount a counter-attack.  Now, there are
-barely enough %gP left to keep the undead at bay.
+"마지막 복수 행위로, %n은(는) 이곳의 제단을 모독했다.
+그것 없이는 반격을 할 수 없었다. 이제 언데드를 막을
+%gP조차 겨우 남아있다.
 
-"We need you to find %i, then, from there, travel
-to %ns lair.  If you can manage to defeat %n and return
-%o here, we can then drive off the legions of
-undead that befoul the land.
+"너는 %i를 찾아야 한다, 거기서 %n의 소굴로
+가야 한다. %n을(를) 물리치고 %o을(를) 이곳에
+가져올 수 있다면, 땅을 더럽히는 언데드 군단을
+몰아낼 수 있다.
 
-"Go with %d as your guide, %p."]],
+"%d께서 인도하시길, %p."]],
       },
       badalign = {
-         synopsis = "[You have deviated from the path.  Return when you have purified yourself.]",
+         synopsis = "[길에서 벗어났다. 정화한 후 돌아오라.]",
          output = "text",
-         text = [["This is terrible, %p.  You have deviated from the true path!
-You know that %d requires the most strident devotion of this
-order.  The %shood must stand for utmost piety.
+         text = [["끔찍하구나, %p. 진정한 길에서 벗어났구나!
+%d께서 이 교단에 가장 엄격한 헌신을 요구하신다는 것을
+알잖느냐. %s직은 최고의 경건함을 상징해야 한다.
 
-"Go from here, atone for your sins against %d.  Return only when
-you have purified yourself."]],
+"여기서 떠나라, %d께 죄를 속죄하라. 스스로를
+정화한 후에만 돌아오라."]],
       },
       badlevel = {
-         synopsis = "[%rA cannot withstand %n.  Come back when you are %Ra.]",
+         synopsis = "[%r은(는) %n을(를) 견딜 수 없다. %R(이)가 되면 돌아오라.]",
          output = "text",
-         text = [["Alas, %p, it is not yet to be.  A mere %r could never
-withstand the might of %n.  Go forth, again into the world, and return
-when you have attained the post of %R."]],
+         text = [["아아, %p, 아직 때가 아니구나. 고작 %r이(가)
+%n의 힘을 견딜 수는 없다. 다시 세상으로 나가라, 그리고
+%R의 직위에 오르면 돌아오라."]],
       },
       discourage = {
-         "\"Submit to my will, %c, and I shall spare you.\"",
-         "\"Your puny powers are no match for me, %c.\"",
-         "\"I shall have you turned into a zombie for my pleasure!\"",
-         "\"Despair now, %r.  %d cannot help you.\"",
-         "\"I shall feast upon your soul for many days, %c.\"",
-         "\"Your death will be slow and painful.  That I promise!\"",
-         "\"You cannot defeat %n, you fool.  I shall kill you now.\"",
-         "\"Your precious %lt will be my next victim.\"",
-         "\"I feel your powers failing you, %r.  You shall die now.\"",
-         "\"With %o, nothing can stand in my way.\"",
+         "\"내 뜻에 굴복하라, %c, 그러면 살려주마.\"",
+         "\"네 보잘것없는 힘은 나의 상대가 되지 않는다, %c.\"",
+         "\"내 즐거움을 위해 널 좀비로 만들어주지!\"",
+         "\"절망하라, %r. %d은(는) 널 도울 수 없다.\"",
+         "\"네 영혼을 며칠 동안 연회로 삼겠다, %c.\"",
+         "\"네 죽음은 느리고 고통스러울 것이다. 약속하지!\"",
+         "\"%n을(를) 물리칠 수 없다, 바보야. 이제 죽여주마.\"",
+         "\"네 소중한 %lt이(가) 내 다음 희생자가 될 것이다.\"",
+         "\"네 힘이 약해지고 있다, %r. 이제 죽어라.\"",
+         "\"%o이(가) 있으니, 아무것도 내 길을 막을 수 없다.\"",
       },
       encourage = {
-         "\"You can prevail, if you rely on %d.\"",
-         "\"Remember that %n has great magic at his command.\"",
-         "\"Be pure, my %S.\"",
-         "\"Beware, %i is surrounded by a great graveyard.\"",
-         "\"You may be able to affect %n with magical cold.\"",
-         "\"Acquire and wear %o if you can.  It will aid you against %n.\"",
-         "\"Call upon %d when your need is greatest.  You will be answered.\"",
-         "\"The undead legions are weakest during the daylight hours.\"",
-         "\"Do not lose faith, %p.  If you do so, %n will grow stronger.\"",
-         "\"Wear %o.  It will assist you against the undead.\"",
+         "\"%d를 의지하면 승리할 수 있다.\"",
+         "\"%n이(가) 강력한 마법을 가지고 있다는 것을 기억하라.\"",
+         "\"순수하라, 나의 %S.\"",
+         "\"조심하라, %i는 거대한 묘지로 둘러싸여 있다.\"",
+         "\"마법의 냉기로 %n에게 영향을 줄 수 있을 것이다.\"",
+         "\"가능하면 %o을(를) 획득하고 착용하라. %n에 맞서 도움이 될 것이다.\"",
+         "\"가장 절실할 때 %d를 부르라. 응답이 있을 것이다.\"",
+         "\"언데드 군단은 낮 시간에 가장 약하다.\"",
+         "\"믿음을 잃지 마라, %p. 그러면 %n이(가) 더 강해질 것이다.\"",
+         "\"%o을(를) 착용하라. 언데드에 맞서 도움이 될 것이다.\"",
       },
       firsttime = {
-         synopsis = "[You are at %H; the doors are closed.  %lC needs your help!]",
+         synopsis = "[%H에 있다; 문이 닫혀 있다. %l이(가) 도움이 필요하다!]",
          output = "text",
-         text = [[You find yourself standing in sight of %H.  Something
-is obviously wrong here.  The doors to %H, which usually
-stand open, are closed.  Strange human shapes shamble around
-outside.
+         text = [[%H이(가) 보이는 곳에 서 있다. 분명히 무언가
+잘못되었다. 보통 열려 있는 %H의 문이 닫혀 있다.
+이상한 인간 형체들이 바깥에서 비틀거리며 돌아다닌다.
 
-You realize that %l needs your assistance!]],
+%l이(가) 네 도움이 필요하다는 것을 깨닫는다!]],
       },
       goal_first = {
-         synopsis = "[The stench of brimstone surrounds you, the shrieks and moans are endless.]",
+         synopsis = "[유황 냄새가 둘러싸고, 비명과 신음이 끝없이 들린다.]",
          output = "text",
-         text = [[The stench of brimstone is all about you, and the shrieks and moans
-of tortured souls assault your psyche.
+         text = [[유황 냄새가 사방에 가득하고, 고문받는 영혼들의 비명과 신음이
+정신을 공격한다.
 
-Ahead, there is a small clearing amidst the bubbling pits of lava...]],
+앞쪽에, 부글거리는 용암 구덩이 사이에 작은 공터가 있다...]],
       },
       goal_next = {
-         text = "Again, you have invaded %ns domain.",
+         text = "다시 한번, %n의 영역을 침입했다.",
       },
       gotit = {
-         synopsis = "[You feel %d as you pick up %o; return %oh to %l.]",
+         synopsis = "[%o을(를) 집어 들며 %d을(를) 느낀다; %l에게 돌려줘라.]",
          output = "text",
-         text = [[As you pick up %o, you feel the essence of
-%d fill your soul.  You know now why %n stole it from
-%H, for with it, %ca of %d could
-easily defeat his plans.
+         text = [[%o을(를) 집어 들자, %d의 본질이
+영혼을 가득 채우는 것을 느낀다. 왜 %n이(가) %H에서
+그것을 훔쳤는지 이제 안다, 그것으로 %d의 %c이(가)
+쉽게 그의 계획을 물리칠 수 있기 때문이다.
 
-You sense a message from %d.  Though not verbal, you
-get the impression that you must return to %l as soon
-as possible.]],
+%d로부터 메시지를 감지한다. 말로는 아니지만,
+가능한 한 빨리 %l에게 돌아가야 한다는
+인상을 받는다.]],
       },
       guardtalk_after = {
-         "\"Greetings, %r.  It is good to see you again.\"",
-         "\"Ah, %p!  Our deepest gratitude for all of your help.\"",
-         "\"Welcome back, %s!  With %o, no undead can stand against us.\"",
-         "\"Praise be to %d, for delivering us from %n.\"",
-         "\"May %d be with you, %s.\"",
+         "\"안녕하시오, %r. 다시 보니 반갑소.\"",
+         "\"아, %p! 모든 도움에 깊이 감사드리오.\"",
+         "\"돌아오셨군, %s! %o이(가) 있으니, 어떤 언데드도 우리를 막을 수 없소.\"",
+         "\"%n에게서 구해주신 %d께 찬양을.\"",
+         "\"%d께서 함께 하시길, %s.\"",
       },
       guardtalk_before = {
-         "\"Greetings, honored %r.  It is good to see you.\"",
-         "\"Ah, %p!  Surely you can help us in our hour of need.\"",
-         "\"Greetings, %s.  %lC has great need of your help.\"",
-         "\"Alas, it seems as if even %d has deserted us.\"",
-         "\"May %d be with you, %s.\"",
+         "\"안녕하시오, 존경하는 %r. 뵈어서 반갑소.\"",
+         "\"아, %p! 분명 이 위기의 시간에 도움을 주실 수 있겠지.\"",
+         "\"안녕하시오, %s. %l이(가) 당신의 도움이 절실히 필요하오.\"",
+         "\"아아, %d마저 우리를 버리신 것 같소.\"",
+         "\"%d께서 함께 하시길, %s.\"",
       },
       hasamulet = {
-         synopsis = "[Take the Amulet to the Astral Plane and offer it on %ds altar.]",
+         synopsis = "[아뮬렛을 아스트랄 차원으로 가져가 %d의 제단에 바쳐라.]",
          output = "text",
-         text = [["You have prevailed, %p!  %d is surely with you.  Now,
-you must take the amulet, and sacrifice it on %ds altar on
-the Astral Plane.  I suspect that I shall never see you again in this
-life, but I hope to at %ds feet."]],
+         text = [["승리했구나, %p! %d께서 분명 함께 하셨다. 이제,
+아뮬렛을 가지고 아스트랄 차원의 %d의 제단에
+바쳐야 한다. 이 생에서 다시 만나지 못할 것 같지만,
+%d의 발 아래에서 만나기를 바란다."]],
       },
       killed_nemesis = {
-         synopsis = "[%nC dies.  Moloch is aware of you and angry at %n.]",
+         synopsis = "[%n이(가) 죽는다. 몰록이 너를 인지하고 %n에게 분노한다.]",
          output = "text",
-         text = [[You feel a wrenching shift in the ether as %ns body dissolves
-into a cloud of noxious gas.
+         text = [[%n의 몸이 독한 가스 구름으로 녹아내리면서
+에테르에서 뒤틀리는 변화가 느껴진다.
 
-Suddenly, a voice booms out:
+갑자기, 목소리가 울려 퍼진다:
 
-    "Thou hast defeated the least of my minions, %r.
-    Know now that Moloch is aware of thy presence.
-    As for thee, %n, I shall deal with thy failure
-    at my leisure."
+    "나의 가장 보잘것없는 하수인을 물리쳤구나, %r.
+    이제 알아라, 몰록이 네 존재를 인지했다.
+    네게 말하노라, %n, 네 실패는 내가
+    여유로울 때 처리하겠다."
 
-You then hear the voice of %n, screaming in terror...]],
+그러고는 공포에 비명을 지르는 %n의 목소리가 들린다...]],
       },
       leader_first = {
-         synopsis = "[You have returned and we need your help.  Are you ready?]",
+         synopsis = "[돌아왔고 네 도움이 필요하다. 준비가 되었는가?]",
          output = "text",
-         text = [["Ah, %p, my %S.  You have returned to us at last.
-A great blow has befallen our order; perhaps you can help us.
-First, however, I must determine if you are prepared for this
-great challenge."]],
+         text = [["아, %p, 나의 %S. 마침내 돌아왔구나.
+우리 교단에 큰 타격이 있었다; 아마도 네가 도울 수 있을 것이다.
+하지만 먼저, 이 위대한 도전에 대비가 되었는지
+확인해야 한다."]],
       },
       leader_last = {
-         synopsis = "[You are a heretic who has deviated from the teachings of %d.]",
+         synopsis = "[%d의 가르침에서 벗어난 이단자다.]",
          output = "text",
-         text = [["You are a heretic, %p!  How can you, %ra, deviate so from the
-teachings of %d?  Begone from this temple.  You are no longer
-%sa to this order.  We will pray to %d for other assistance,
-as you have failed us utterly."]],
+         text = [["이단자로구나, %p! 어떻게 %r인 네가 %d의
+가르침에서 그토록 벗어날 수 있느냐? 이 신전에서 떠나라. 너는 더 이상
+이 교단의 %s이(가) 아니다. 네가 완전히 실패했으니
+%d께 다른 도움을 기도할 것이다."]],
       },
       leader_next = {
-         text = "\"Again, my %S, you stand before me.  Are you ready now to help us?\"",
+         text = "\"다시, 나의 %S, 내 앞에 섰군. 이제 우리를 도울 준비가 되었는가?\"",
       },
       leader_other = {
-         text = "\"Once more, %p, you stand within the sanctum.  Are you ready now?\"",
+         text = "\"다시 한번, %p, 성소 안에 섰군. 이제 준비가 되었는가?\"",
       },
       locate_first = {
-         synopsis = "[You have found %i.  The trail to %n lies ahead.]",
+         synopsis = "[%i를 찾았다. %n으로 가는 길이 앞에 있다.]",
          output = "text",
-         text = [[You stand facing a large graveyard.  The sky above is filled with clouds
-that seem to get thicker closer to the center.  You sense the presence of
-undead in larger numbers than you have ever encountered before.
+         text = [[거대한 묘지를 마주하고 서 있다. 위의 하늘은 중심에 가까워질수록
+두꺼워지는 구름으로 가득하다. 전에 만난 적 없는 수의
+언데드 존재를 감지한다.
 
-You remember the descriptions of %i, given to you by
-%l.  It is ahead that you will find %ns trail.]],
+%l이(가) 말해준 %i의 설명을 기억한다.
+앞으로 가면 %n의 흔적을 찾을 것이다.]],
       },
       locate_next = {
-         text = "Again, you stand before %i.",
+         text = "다시, %i 앞에 선다.",
       },
       nemesis_first = {
-         synopsis = "[%lC has sent you, but you are no %gC.  I shall destroy you.]",
+         synopsis = "[%l이(가) 보냈지만, 넌 %g이(가) 아니군. 파괴해주마.]",
          output = "text",
-         text = [["Ah, so %l has sent another %gC to retrieve
-%o.
+         text = [["아, 그래서 %l이(가) %o을(를) 되찾으러
+또 다른 %g을(를) 보냈군.
 
-"No, I see you are no %gC.  Perhaps I shall have some fun today
-after all.  Prepare to die, %r!  You shall never regain
-%o."]],
+"아니, 넌 %g이(가) 아니군. 아마 오늘 재미 좀 볼 수 있겠군.
+죽을 준비를 해라, %r! %o을(를) 절대
+되찾지 못할 것이다."]],
       },
       nemesis_next = {
-         text = "\"So, %r.  Again you challenge me.\"",
+         text = "\"그래서, %r. 또다시 나에게 도전하는군.\"",
       },
       nemesis_other = {
-         text = "\"Die now, %r.  %d has no power here to aid you.\"",
+         text = "\"이제 죽어라, %r. %d은(는) 여기서 널 도울 힘이 없다.\"",
       },
       nemesis_wantsit = {
-         text = "\"You shall die, %r, and I will have %o back.\"",
+         text = "\"죽을 것이다, %r, 그리고 %o을(를) 되찾겠다.\"",
       },
       nexttime = {
-         text = "Once again, you stand before %H.",
+         text = "다시 한번, %H 앞에 선다.",
       },
       offeredit = {
-         synopsis = "[Congratulations, %p.  Keep %o; go and recover the Amulet.]",
+         synopsis = "[축하한다, %p. %o을(를) 가져라; 가서 아뮬렛을 되찾아라.]",
          output = "text",
-         text = [["You have returned, %p.  And with %o, I see.
-Congratulations.
+         text = [["돌아왔구나, %p. 그리고 %o을(를) 가지고 왔군.
+축하한다.
 
-"I have been in meditation, and have received direction from
-a minion of %d.  %d commands that you retain
-%o.  With it, you must recover the Amulet
-of Yendor.
+"명상 중이었는데, %d의 사자로부터 지시를 받았다.
+%d께서 네가 %o을(를) 가지라고 명하셨다.
+그것으로 옌더의 아뮬렛을 되찾아야 한다.
 
-"Go forth, and let %d guide your steps."]],
+"나아가라, 그리고 %d께서 네 발걸음을 인도하시게 하라."]],
       },
       offeredit2 = {
-         synopsis = "[%oC is yours now.  Return to %Z and find the Amulet.]",
+         synopsis = "[%o은(는) 이제 네 것이다. %Z(으)로 돌아가 아뮬렛을 찾아라.]",
          output = "text",
-         text = [[%lC reiterates that %o is yours now.
+         text = [[%l이(가) %o이(가) 이제 네 것이라고 다시 말한다.
 
-"The time has come to resume your search for the Amulet.
-%Z await your return through the magic portal
-that brought you here."]],
+"아뮬렛 탐색을 재개할 때가 되었다.
+%Z이(가) 너를 이곳으로 데려온 마법의 포탈을 통해
+네 귀환을 기다리고 있다."]],
       },
       othertime = {
-         text = [[Again you face %H.  Your intuition hints that this may be
-the final time you come here.]],
+         text = [[다시 %H을(를) 마주한다. 이번이 여기 오는
+마지막일지도 모른다는 직감이 든다.]],
       },
       posthanks = {
-         text = "\"Welcome back, %p.  How is your quest for the Amulet going?\"",
+         text = "\"돌아왔군, %p. 아뮬렛 탐색은 어떻게 되고 있느냐?\"",
       },
    },
    Ran = {
       assignquest = {
-         synopsis = "[%nC has stolen %o.  Infiltrate %i and retrieve %oh for us.]",
+         synopsis = "[%n이(가) %o을(를) 훔쳤다. %i에 잠입하여 되찾아오라.]",
          output = "text",
-         text = [["You are indeed ready, %p.  I shall tell you what has transpired,
-and why we so desperately need your help:
+         text = [["참으로 준비가 되었구나, %p. 무슨 일이 일어났는지,
+왜 우리가 그토록 절실히 네 도움이 필요한지 말해주겠다:
 
-"A short time ago, the mountain centaurs to the east invaded
-and enslaved the plains centaurs in this area.  The local
-leader is now only a figurehead, and serves %n.
+"얼마 전, 동쪽의 산악 켄타우로스들이 침략하여
+이 지역의 평원 켄타우로스들을 노예로 삼았다. 지역 지도자는
+이제 허수아비에 불과하며, %n을(를) 섬긴다.
 
-"During our last gathering of worship here, we were beset by hordes of
-hostile centaurs, as you witnessed.  In the first onslaught a group,
-headed by %n %niself, managed to breach the grove and steal
-%o.
+"마지막 예배 모임에서, 네가 목격했듯이, 우리는 적대적인
+켄타우로스 무리에게 습격을 받았다. 첫 공격에서 %n이(가) 직접
+이끄는 무리가 숲을 뚫고 들어와 %o을(를) 훔쳐갔다.
 
-"Since then, we have been besieged.  We do not know how much longer
-we will be able to maintain our magical barriers.
+"그 이후로, 우리는 포위당해 있다. 마법 장벽을 얼마나 더
+유지할 수 있을지 모르겠다.
 
-"If we are to survive, you, %p, must infiltrate
-%i.  There, you will find a pathway down, to the
-underground cavern of %n.  He has always coveted
-%o, and will surely keep it.
+"살아남으려면, %p, 네가 %i에 잠입해야 한다.
+거기서 아래로 내려가는 길을 찾을 수 있을 것이다, %n의
+지하 동굴로. 그는 항상 %o을(를) 탐냈으니,
+분명히 가지고 있을 것이다.
 
-"Recover %o for us, %p!  Only then will %d be safe."]],
+"우리를 위해 %o을(를) 되찾아오라, %p! 그래야만 %d이(가) 안전할 것이다."]],
       },
       badalign = {
-         synopsis = "[You are not sufficiently %a.  Come back when you have purified yourself.]",
+         synopsis = "[충분히 %a하지 않다. 정화한 후 돌아오라.]",
          output = "text",
-         text = [["You have strayed, %p!  You know that %d requires that
-we maintain a pure devotion to things %a!
+         text = [["길을 잃었구나, %p! %d께서 우리가 %a한 것들에
+순수한 헌신을 유지해야 한다는 것을 알잖느냐!
 
-"You must go from us.  Return when you have purified yourself."]],
+"우리 곁을 떠나야 한다. 스스로를 정화한 후에 돌아오라."]],
       },
       badlevel = {
-         synopsis = "[You are too inexperienced.  Come back when you are %Ra.]",
+         synopsis = "[너무 미숙하다. %R(이)가 되면 돌아오라.]",
          output = "text",
-         text = [["%p, you are yet too inexperienced to withstand the demands of that
-which we need you to do.  %RA might just be able to do this thing.
+         text = [["%p, 아직 우리가 필요로 하는 것의 요구를 견디기에
+너무 미숙하다. %R(이)라면 해낼 수 있을 것이다.
 
-"Return to us when you have learned more, my %S."]],
+"더 배우고 돌아오라, 나의 %S."]],
       },
       discourage = {
-         "\"Your %d is nothing, %c.  You are mine now!\"",
-         "\"Run away little %c!  You can never hope to defeat %n!\"",
-         "\"My servants will rip you to shreds!\"",
-         "\"I shall display your head as a trophy.  What do you think about that wall?\"",
-         "\"I shall break your %ls grove, and destroy all the %gP!\"",
-         "\"%d has abandoned you, %c.  You are doomed.\"",
-         "\"%rA?  %lC sends a mere %r against me?  Hah!\"",
-         "\"%lC has failed, %c.  %oC will never leave here.\"",
-         "\"You really think you can defeat me, eh %c?  You are wrong!\"",
-         "\"You weaken, %c.  I shall kill you now.\"",
+         "\"네 %d은(는) 아무것도 아니다, %c. 넌 이제 내 것이다!\"",
+         "\"도망쳐라 꼬마 %c! %n을(를) 물리칠 희망은 없다!\"",
+         "\"내 하인들이 널 갈기갈기 찢어버릴 것이다!\"",
+         "\"네 머리를 트로피로 전시하겠다. 저 벽 어떻게 생각하느냐?\"",
+         "\"네 %l의 숲을 부수고, 모든 %gP을(를) 파괴하겠다!\"",
+         "\"%d께서 널 버리셨다, %c. 넌 끝났다.\"",
+         "\"%r라고? %l이(가) 고작 %r을(를) 나에게 보냈다고? 하!\"",
+         "\"%l은(는) 실패했다, %c. %o은(는) 여기서 절대 나가지 못한다.\"",
+         "\"정말 날 물리칠 수 있다고 생각하느냐, %c? 틀렸다!\"",
+         "\"약해지고 있군, %c. 이제 죽여주마.\"",
       },
       encourage = {
-         "\"It is rumored that the Forest and Mountain Centaurs have resolved their ancient feud and now band together against us.\"",
-         "\"%nC is strong, and very smart.\"",
-         "\"Use %o, when you find it.  It will help you survive to reach us.\"",
-         "\"Remember, let %d be your guide.\"",
-         "\"Call upon %d when you face %n. The very act of doing so will infuriate him, and give you advantage.\"",
-         "\"%n and his kind have always hated us.\"",
-         "\"We cannot hold the grove much longer, %p.  Hurry!\"",
-         "\"To infiltrate %i, you must be very stealthy.\"",
-         "\"Remember that %n is a braggart.  Trust not what he says.\"",
-         "\"You can triumph, %p, if you trust in %d.\"",
+         "\"숲 켄타우로스와 산악 켄타우로스가 오래된 불화를 해결하고 이제 우리에게 맞서 연합했다는 소문이 있다.\"",
+         "\"%n은(는) 강하고, 매우 영리하다.\"",
+         "\"%o을(를) 찾으면 사용해라. 우리에게 돌아올 때까지 살아남는 데 도움이 될 것이다.\"",
+         "\"기억하라, %d께서 인도하시게 해라.\"",
+         "\"%n을(를) 마주할 때 %d를 불러라. 그 행위 자체가 그를 격분시켜 네게 유리하게 할 것이다.\"",
+         "\"%n과(와) 그의 동족은 항상 우리를 미워했다.\"",
+         "\"숲을 더 이상 지킬 수 없다, %p. 서둘러라!\"",
+         "\"%i에 잠입하려면, 매우 은밀해야 한다.\"",
+         "\"%n은(는) 허풍쟁이임을 기억하라. 그가 말하는 것을 믿지 마라.\"",
+         "\"%d를 믿으면 승리할 수 있다, %p.\"",
       },
       firsttime = {
-         synopsis = "[The ancient forest grove is surrounded by centaurs.]",
+         synopsis = "[고대의 숲이 켄타우로스들에게 둘러싸여 있다.]",
          output = "text",
-         text = [[You arrive in familiar surroundings.  In the distance, you %x the
-ancient forest grove, the place of worship to %d.
+         text = [[익숙한 곳에 도착한다. 저 멀리 %d께 예배드리는 곳인
+고대의 숲이 %x.
 
-Something is wrong, though.  Surrounding the grove are centaurs!
-And they've noticed you!]],
+하지만 무언가 잘못되었다. 숲을 둘러싸고 있는 것은 켄타우로스들이다!
+그리고 그들이 널 알아챘다!]],
       },
       goal_first = {
-         synopsis = "[You descend into a subterranean complex.  Hooves clatter in the distance.]",
+         synopsis = "[지하 단지로 내려간다. 멀리서 발굽 소리가 들린다.]",
          output = "text",
-         text = [[You descend into a weird place, in which roughly cut cave-like walls
-join with smooth, finished ones, as if someone was in the midst of
-finishing off the construction of a subterranean complex.
+         text = [[이상한 곳으로 내려간다. 거칠게 깎인 동굴 같은 벽이
+매끄럽고 완성된 벽과 연결되어 있다, 마치 누군가가
+지하 단지 건설을 마무리하는 중인 것처럼.
 
-Off in the distance, you hear a sound like the clattering of many
-hooves on rock.]],
+저 멀리서, 바위 위로 많은 발굽이 달그락거리는
+소리가 들린다.]],
       },
       goal_next = {
-         text = "Once again, you enter the distorted castle of %n.",
+         text = "다시 한번, %n의 뒤틀린 성으로 들어간다.",
       },
       gotit = {
-         synopsis = "[You pick up %o and feel power.  It's time to return %oh to %l.]",
+         synopsis = "[%o을(를) 집어 들고 힘을 느낀다. %l에게 돌려줄 때가 되었다.]",
          output = "text",
-         text = [[As you pick up %o, it seems to glow, and a warmth
-fills you completely.  You realize that its power is what has protected
-your %sp against their enemies for so long.
+         text = [[%o을(를) 집어 들자, 빛나는 것 같고, 따뜻함이
+온몸을 가득 채운다. 그 힘이 네 %sp을(를) 오랫동안
+적으로부터 지켜온 것임을 깨닫는다.
 
-You must now return it to %l without delay -- their lives depend
-on your speed.]],
+이제 지체 없이 %l에게 돌려줘야 한다 -- 그들의 목숨이
+네 속도에 달려 있다.]],
       },
       guardtalk_after = {
-         "\"%pC!  I have not seen you in many moons.  How do you fare?\"",
-         "\"Birdsong has returned to the grove, surely this means you have defeated %n.\"",
-         "\"%lC seems to have regained some of his strength.\"",
-         "\"So, tell us how you entered %i, in case some new evil arises there.\"",
-         "\"Is that truly %o that I see you carrying?\"",
+         "\"%p! 오랜만에 보는군. 어떻게 지냈나?\"",
+         "\"숲에 새소리가 돌아왔으니, 분명 %n을(를) 물리쳤겠군.\"",
+         "\"%l이(가) 힘을 어느 정도 회복하신 것 같다.\"",
+         "\"그래, 새로운 악이 거기서 나타날 경우를 대비해 %i에 어떻게 들어갔는지 말해주게.\"",
+         "\"정말 네가 들고 있는 것이 %o인가?\"",
       },
       guardtalk_before = {
-         "\"%pC!  I have not seen you in many moons.  How do you fare?\"",
-         "\"%nC continues to threaten the grove.  But we hold fast.\"",
-         "\"%lC is growing weak.  The magic required to defend the grove drains us.\"",
-         "\"Remember %i is hard to enter.  Beware the distraction of leatherwings.\"",
-         "\"We must regain %o.  Without it we will be overrun.\"",
+         "\"%p! 오랜만에 보는군. 어떻게 지냈나?\"",
+         "\"%n이(가) 계속 숲을 위협하고 있다. 하지만 우리는 버티고 있다.\"",
+         "\"%l이(가) 약해지고 계신다. 숲을 지키는 데 필요한 마법이 우리를 소진시킨다.\"",
+         "\"%i는 들어가기 어렵다는 것을 기억하게. 박쥐의 방해를 조심하게.\"",
+         "\"%o을(를) 되찾아야 한다. 그것 없이는 제압당할 것이다.\"",
       },
       hasamulet = {
-         synopsis = "[You have the Amulet!  Take it to the Astral Plane and offer it to %d.]",
+         synopsis = "[아뮬렛을 가졌다! 아스트랄 차원으로 가져가 %d께 바쳐라.]",
          output = "text",
-         text = [["You have it!  You have recovered the Amulet of Yendor!
-Now attend to me, %p, and I will tell you what must be done:
+         text = [["가져왔구나! 옌더의 아뮬렛을 되찾았다!
+이제 내 말을 들어라, %p, 해야 할 일을 말해주겠다:
 
-"The Amulet has within it magic, the capability to transport you to
-the Astral Plane, where the primary circle of %d resides.
+"아뮬렛에는 마법이 있다, %d의 주요 원이 있는
+아스트랄 차원으로 널 이동시키는 능력이.
 
-"To activate this magic, you must travel upwards as far as you can.
-When you reach the temple, sacrifice the Amulet to %d.
+"이 마법을 활성화하려면, 가능한 한 높이 올라가야 한다.
+신전에 도착하면, 아뮬렛을 %d께 바쳐라.
 
-"Thus will you fulfill your destiny."]],
+"그렇게 하면 네 운명을 이룰 것이다."]],
       },
       killed_nemesis = {
-         synopsis = "[%nC curses you as %nh dies.]",
+         synopsis = "[%n이(가) 죽으면서 저주한다.]",
          output = "text",
-         text = [[%nC collapses to the ground, cursing you and %l, then says:
+         text = [[%n이(가) 너와 %l을(를) 저주하며 땅에 쓰러지고, 말한다:
 
-    "You have defeated me, %r!  But I curse you one final time, with
-    my dying breath!  You shall die before you leave my castle!"]],
+    "날 물리쳤구나, %r! 하지만 마지막 숨으로 마지막으로
+    저주한다! 내 성을 떠나기 전에 죽을 것이다!"]],
       },
       leader_first = {
-         synopsis = "[You have returned, %p.  We need your help.  Are you ready?]",
+         synopsis = "[돌아왔구나, %p. 네 도움이 필요하다. 준비가 되었는가?]",
          output = "text",
-         text = [["%pC!  You have returned!  Thank %d.
+         text = [["%p! 돌아왔구나! %d께 감사드린다.
 
-"We have great need of you.  But first, I must see if you have the
-required abilities to take on this responsibility."]],
+"네가 절실히 필요하다. 하지만 먼저, 이 책임을 맡을
+필요한 능력이 있는지 봐야겠다."]],
       },
       leader_last = {
-         synopsis = "[You are not sufficiently %a.  We renounce your %shood.]",
+         synopsis = "[충분히 %a하지 않다. 네 %s 자격을 박탈한다.]",
          output = "text",
-         text = [["%pC!  You have doomed us all.  You fairly radiate %L influences
-and weaken the power we have raised in this grove as a result!
+         text = [["%p! 우리 모두를 파멸시켰구나. 네게서 %L 영향이 뿜어나와
+결과적으로 이 숲에서 키운 힘을 약화시킨다!
 
-"Begone!  We renounce your %shood with us!  You are an outcast now!"]],
+"꺼져라! 우리와의 네 %s 자격을 박탈한다! 넌 이제 추방자다!"]],
       },
       leader_next = {
-         text = "\"Once again, %p, you stand in our midst.  Are you ready now?\"",
+         text = "\"다시 한번, %p, 우리 가운데 서 있군. 이제 준비가 되었는가?\"",
       },
       leader_other = {
-         text = "\"Ah, you are here again, %p.  Allow me to determine your readiness...\"",
+         text = "\"아, 다시 왔군, %p. 준비 상태를 확인해보겠다...\"",
       },
       locate_first = {
-         synopsis = "[This is %i.  There are bats nearby.  Beware the wumpus!]",
+         synopsis = "[여기가 %i이다. 근처에 박쥐가 있다. 웜퍼스를 조심하라!]",
          output = "text",
-         text = [[This must be %i.
+         text = [[여기가 %i임이 틀림없다.
 
-You are in a cave built of many different rooms, all interconnected
-by tunnels.  Your quest is to find and shoot the evil wumpus that
-resides elsewhere in the cave without running into any bottomless
-pits or using up your limited supply of arrows.  Good luck.
+터널로 모두 연결된 여러 방으로 이루어진 동굴에 있다.
+네 임무는 바닥 없는 구덩이에 빠지거나 제한된 화살을 다 쓰지 않고
+동굴 어딘가에 있는 사악한 웜퍼스를 찾아 쏘는 것이다.
+행운을 빈다.
 
-You are in room 9 of the cave.  There are tunnels to rooms
-5, 8, and 10.
-*rustle* *rustle* (must be bats nearby.)
-*sniff* (I can smell the evil wumpus nearby!)]],
+동굴의 9번 방에 있다. 5번, 8번, 10번 방으로 가는
+터널이 있다.
+*바스락* *바스락* (근처에 박쥐가 있는 것 같다.)
+*킁킁* (근처에서 사악한 웜퍼스 냄새가 난다!)]],
       },
       locate_next = {
-         synopsis = "[You are in %i.  There are pits.  There are bats nearby.]",
+         synopsis = "[%i에 있다. 구덩이가 있다. 근처에 박쥐가 있다.]",
          output = "text",
-         text = [[Once again, you descend into %i.
+         text = [[다시 한번, %i로 내려간다.
 
-*whoosh* (I feel a draft from some pits.)
-*rustle* *rustle* (must be bats nearby.)]],
+*휙* (구덩이에서 바람이 느껴진다.)
+*바스락* *바스락* (근처에 박쥐가 있는 것 같다.)]],
       },
       nemesis_first = {
-         synopsis = "[You have come to recover %o, but I shall keep %oh and you shall die.]",
+         synopsis = "[%o을(를) 되찾으러 왔지만, 내가 가지고 있을 것이고 넌 죽을 것이다.]",
          output = "text",
-         text = [["So, %c.  %lC has sent you to recover %o.
+         text = [["그래, %c. %l이(가) %o을(를) 되찾으러 보냈군.
 
-"Well, I shall keep that bauble.  It pleases me.  You, %c, shall die."]],
+"글쎄, 그 장신구는 내가 가지고 있겠다. 마음에 드니까. 넌, %c, 죽을 것이다."]],
       },
       nemesis_next = {
-         text = "\"Back again, eh?  Well, a mere %r is no threat to me!  Die, %c!\"",
+         text = "\"또 왔군, 응? 글쎄, 고작 %r은(는) 나에게 위협이 되지 않아! 죽어라, %c!\"",
       },
       nemesis_other = {
-         text = "\"You haven't learned your lesson, %c.  You can't kill me!  You shall die now.\"",
+         text = "\"교훈을 얻지 못했군, %c. 날 죽일 수 없어! 이제 죽어라.\"",
       },
       nemesis_wantsit = {
-         text = [["I shall have %o from you, %r.  Then I shall
-kill you."]],
+         text = [["%o을(를) 빼앗겠다, %r. 그런 다음
+죽여주마."]],
       },
       nexttime = {
-         text = "Once again, you stand before %H.",
+         text = "다시 한번, %H 앞에 선다.",
       },
       offeredit = {
-         synopsis = "[You have succeeded.  Take %o with you as you go to find the Amulet.]",
+         synopsis = "[성공했다. 아뮬렛을 찾으러 갈 때 %o을(를) 가져가라.]",
          output = "text",
-         text = [["%pC!  You have succeeded!  I feared it was not possible!
+         text = [["%p! 성공했구나! 불가능할까 두려웠다!
 
-"You have returned with %o!
+"%o을(를) 가지고 돌아왔다!
 
-"I fear, now, that the Centaurs will regroup and plot yet another raid.
-This will take some time, but if you can recover the Amulet of Yendor
-for %d before that happens, we will be eternally safe.
+"이제, 켄타우로스들이 재결집하여 또 다른 습격을 계획할까 두렵다.
+시간이 좀 걸리겠지만, 그 전에 %d를 위해 옌더의 아뮬렛을
+되찾을 수 있다면, 우리는 영원히 안전할 것이다.
 
-"Take %o with you.  It will aid in your quest for
-the Amulet."]],
+"%o을(를) 가져가라. 아뮬렛 탐색에 도움이 될 것이다."]],
       },
       offeredit2 = {
-         synopsis = "[You are the keeper of %o now.  Go and find the Amulet.]",
+         synopsis = "[이제 네가 %o의 수호자다. 가서 아뮬렛을 찾아라.]",
          output = "text",
-         text = [[%l flexes %o reverently.
+         text = [[%l이(가) %o을(를) 경건하게 당긴다.
 
-"With this wondrous bow, one need never run out of arrows.
-You are its keeper now, and the time has come to resume your
-search for the Amulet.  %Z await your return
-through the magic portal that brought you here."]],
+"이 놀라운 활로는, 화살이 떨어질 일이 없다.
+이제 네가 그 수호자이며, 아뮬렛 탐색을 재개할 때가 되었다.
+%Z이(가) 너를 이곳으로 데려온 마법의 포탈을 통해
+네 귀환을 기다리고 있다."]],
       },
       othertime = {
-         text = [[You have the oddest feeling that this may be the last time you
-are to enter %H.]],
+         text = [[이번이 %H에 들어가는 마지막일지도 모른다는
+이상한 느낌이 든다.]],
       },
       posthanks = {
-         text = [["Welcome, %p.  How have you fared on your quest for the Amulet
-of Yendor?"]],
+         text = [["환영한다, %p. 옌더의 아뮬렛 탐색은 어떻게 되고 있느냐?"]],
       },
    },
    Rog = {
       assignquest = {
-         synopsis = "[Get %o from %n and bring it to %l.]",
+         synopsis = "[%n에게서 %o을(를) 가져와 %l에게 바쳐라.]",
          output = "text",
-         text = [["Will everyone not going to retrieve %o from that
-jerk, %n, take one step backwards.  Good choice,
-%p, because I was going to send you anyway.  My other %gp
-are too valuable to me.
+         text = [["저 쓰레기, %n에게서 %o을(를) 되찾으러 가지 않을 자들은
+한 발 뒤로 물러서라. 잘 선택했다, %p, 어차피 너를 보낼 거였으니까.
+다른 %gP들은 나에게 너무 소중하거든.
 
-"Here's the deal.  I want %o, %n
-has %o.  You are going to get %o
-and bring it back to me.  So simple an assignment even you can understand
-it."]],
+"거래는 이렇다. 나는 %o을(를) 원하고, %n이(가)
+%o을(를) 가지고 있다. 너는 %o을(를) 가져와서
+나에게 돌려줄 거다. 너 같은 놈도 이해할 수 있을 만큼 간단한
+임무다."]],
       },
       badalign = {
-         synopsis = "[Come back when you are really %a.]",
+         synopsis = "[진짜 %a해지면 돌아와라.]",
          output = "text",
-         text = [["Maybe I should chain you to my perch here for a while.  Perhaps watching
-real %a men at work will bring some sense back to you.  I don't
-think I could stand the sight of you for that long though.  Come back
-when you can be trusted to act properly."]],
+         text = [["여기 횃대에 잠시 묶어놓을까 보다. 진짜 %a한 사내들이 일하는 걸
+보면 정신이 들지도 모르지. 하지만 그렇게 오래 네 꼴을
+볼 수 없을 것 같군. 제대로 행동할 수 있게 되면 돌아와라."]],
       },
       badlevel = {
-         synopsis = "[%rA is not adequately trained to handle this job.]",
+         synopsis = "[%r은(는) 이 일을 처리할 훈련이 부족하다.]",
          output = "text",
-         text = [["In the time that you've been gone you've only been able to master the
-arts of %ra?  I've trained ten times again as many %Rp
-in that time.  Maybe I should send one of them, no?  Where would that
-leave you, %p?  Oh yeah, I remember, I was going to kill you!"]],
+         text = [["네가 없는 동안 고작 %r의 기술밖에 익히지 못했다고?
+나는 그 시간에 %R을(를) 열 배는 더 훈련시켰다.
+그중 하나를 보낼까, 응? 그럼 넌 어떻게 되지, %p?
+아 맞다, 기억났다, 널 죽이려고 했지!"]],
       },
       discourage = {
-         "\"May I suggest a compromise.  Are you interested in gold or gems?\"",
-         "\"Please don't force me to kill you.\"",
-         "\"Grim times are upon us all.  Will you not see reason?\"",
-         "\"I knew %l, and you're no %lt, thankfully.\"",
-         "\"It is a shame that we are not meeting under more pleasant circumstances.\"",
-         "\"I was once like you are now, %p.  Believe in me -- our way is better.\"",
-         "\"Stay with me, and I will make you %os guardian.\"",
-         "\"When you return, with or without %o, %l will have you killed.\"",
-         "\"Do not be fooled; I am prepared to kill to defend %o.\"",
-         "\"I can reunite you with the Twain.  Oh, the stories you can swap.\"",
+         "\"타협을 제안해도 될까. 금이나 보석에 관심 있나?\"",
+         "\"제발 나를 강제로 널 죽이게 만들지 마.\"",
+         "\"암울한 시대가 우리 모두에게 닥쳤다. 이성적으로 생각하지 않겠나?\"",
+         "\"%l을(를) 알았는데, 다행히 넌 %lt 같지 않군.\"",
+         "\"더 즐거운 상황에서 만나지 못해 안타깝군.\"",
+         "\"나도 한때는 지금의 너 같았다, %p. 날 믿어 -- 우리 방식이 더 낫다.\"",
+         "\"나와 함께 있으면, 널 %o의 수호자로 만들어주지.\"",
+         "\"%o을(를) 가지고 오든 말든, 돌아가면 %l이(가) 널 죽일 거다.\"",
+         "\"속지 마라; 나는 %o을(를) 지키기 위해 죽일 준비가 되어 있다.\"",
+         "\"트웨인과 재회시켜줄 수 있다. 오, 나눌 이야기가 많겠군.\"",
       },
       encourage = {
-         "\"You don't seem to understand, %o isn't here so neither should you be!\"",
-         "\"May %d curse you with lead fingers.  Get going!\"",
-         "\"We don't have all year.  GET GOING!\"",
-         "\"How would you like a scar necklace?  I'm just the jeweler to do it!\"",
-         "\"Lazy S.O.B.  Maybe I should call up someone else...\"",
-         "\"Maybe I should open your skull and see if my instructions are inside?\"",
-         "\"This is not a task you can complete in the afterlife, you know.\"",
-         "\"Inside every living person is a dead person trying to get out, and I have your key!\"",
-         "\"We're almost out of hell-hound chow, so why don't you just get moving!\"",
-         "\"You know, %o isn't going to come when you whistle.  You must get it yourself.\"",
+         "\"이해를 못 하는 것 같군, %o이(가) 여기 없으니 너도 여기 있으면 안 돼!\"",
+         "\"%d께서 네 손가락을 납으로 저주하시길. 어서 가!\"",
+         "\"일 년 내내 있을 순 없어. 어서 가!\"",
+         "\"흉터 목걸이 어때? 내가 바로 그걸 만들 보석상이다!\"",
+         "\"게으른 놈. 다른 사람을 불러야 하나...\"",
+         "\"네 두개골을 열어서 내 지시가 안에 있는지 확인해볼까?\"",
+         "\"이건 저승에서 완수할 수 있는 임무가 아니란 거 알지.\"",
+         "\"살아있는 모든 사람 안에는 나오려는 죽은 사람이 있고, 내가 네 열쇠를 가지고 있다!\"",
+         "\"지옥견 먹이가 거의 다 떨어졌으니, 그냥 움직이는 게 어때!\"",
+         "\"알잖아, %o은(는) 휘파람 불어도 오지 않아. 직접 가져와야 해.\"",
       },
       firsttime = {
-         synopsis = "[You are in Ransmannsby, where you trained.  Find %l.]",
+         synopsis = "[훈련받던 란스만스비에 있다. %l을(를) 찾아라.]",
          output = "text",
-         text = [[Unexpectedly, you find yourself back in Ransmannsby, where you trained to
-be a thief.  Quickly you make the guild sign, hoping that you AND word
-of your arrival reach %ls den.]],
+         text = [[예상치 못하게, 도둑 훈련을 받던 란스만스비에 돌아왔다.
+재빨리 길드 신호를 보내며, 도착 소식이 너와 함께
+%l의 소굴에 도착하기를 바란다.]],
       },
       goal_first = {
-         synopsis = "[You sense %o.]",
+         synopsis = "[%o을(를) 감지한다.]",
          output = "text",
-         text = [[You feel a great swelling up of courage, sensing the presence of
-%o.  Or is it fear?]],
+         text = [[%o의 존재를 감지하며 큰 용기가 솟구치는 것을 느낀다.
+아니면 두려움인가?]],
       },
       goal_next = {
-         text = "The hairs on the back of your neck whisper -- it's fear.",
+         text = "목 뒤의 털이 속삭인다 -- 두려움이다.",
       },
       gotit = {
-         synopsis = "[You pick up %o and know that %l should not have it.]",
+         synopsis = "[%o을(를) 집어 들고 %l이(가) 가져서는 안 된다는 것을 안다.]",
          output = "text",
-         text = [[As you pick up %o, the hairs on the back of your
-neck fall out.  At once you realize why %n was
-willing to die to keep it out of %ls hands.  Somehow
-you know that you must do likewise.]],
+         text = [[%o을(를) 집어 들자, 목 뒤의 털이 빠진다.
+단번에 왜 %n이(가) %l의 손에
+들어가지 않게 하려고 죽을 각오를 했는지 깨닫는다.
+어쩐지 너도 그래야 한다는 것을 안다.]],
       },
       guardtalk_after = {
-         "\"I was sure wrong about Lady Tyvefelle's house; I barely got away with my life and lost my lock pick in the process.\"",
-         "\"You're back?  Even the Twain don't come back anymore.\"",
-         "\"Can you spare an old cutpurse a zorkmid for some grog?\"",
-         "\"Fritz tried to join the other side, and now he's hell-hound chow.\"",
-         "\"Be careful what you steal, I hear the boss has perfected turning rocks into worthless pieces of glass.\"",
+         "\"티베펠레 귀부인 집에 대해 완전히 틀렸어; 겨우 목숨만 건졌고 그 과정에서 락픽도 잃어버렸어.\"",
+         "\"돌아왔어? 트웨인도 더 이상 돌아오지 않는데.\"",
+         "\"그로그 살 조크미드 하나 있어, 늙은 소매치기한테?\"",
+         "\"프리츠가 반대편에 붙으려다 지금은 지옥견 먹이가 됐어.\"",
+         "\"뭘 훔치는지 조심해, 보스가 돌을 쓸모없는 유리 조각으로 바꾸는 기술을 완성했대.\"",
       },
       guardtalk_before = {
-         "\"I hear that Lady Tyvefelle's household is lightly guarded.\"",
-         "\"You're back?  Even the Twain don't come back anymore.\"",
-         "\"Can you spare an old cutpurse a zorkmid for some grog?\"",
-         "\"Fritz tried to join the other side, and now he's hell-hound chow.\"",
-         "\"Be careful what you steal, I hear the boss has perfected turning rocks into worthless pieces of glass.\"",
+         "\"티베펠레 귀부인 집이 경비가 허술하대.\"",
+         "\"돌아왔어? 트웨인도 더 이상 돌아오지 않는데.\"",
+         "\"그로그 살 조크미드 하나 있어, 늙은 소매치기한테?\"",
+         "\"프리츠가 반대편에 붙으려다 지금은 지옥견 먹이가 됐어.\"",
+         "\"뭘 훔치는지 조심해, 보스가 돌을 쓸모없는 유리 조각으로 바꾸는 기술을 완성했대.\"",
       },
       hasamulet = {
-         synopsis = "[Take the Amulet to the Astral Plane and find %ds temple.]",
+         synopsis = "[아뮬렛을 아스트랄 차원으로 가져가 %d의 신전을 찾아라.]",
          output = "text",
-         text = [["I see that with your abilities, and my brains, we could rule this world.
+         text = [["네 능력과 내 두뇌면, 이 세상을 지배할 수 있겠군.
 
-"All that we would need to be all-powerful is for you to take that little
-trinket you've got there up to the Astral Plane.  From there, %d will
-show you what to do with it.  Once that's done, we will be invincible!"]],
+"전지전능해지려면 네가 가진 그 작은 장신구를 아스트랄 차원으로
+가져가기만 하면 돼. 거기서 %d께서 그걸로 뭘 해야 할지 보여주실 거다.
+그게 끝나면, 우린 무적이 될 거야!"]],
       },
       killed_nemesis = {
-         synopsis = "[Before dying, %n tells you to use the %o wisely.]",
+         synopsis = "[죽기 전에, %n이(가) %o을(를) 현명하게 사용하라고 말한다.]",
          output = "text",
-         text = [["I know what you are thinking, %p.  It is not too late for you
-to use %o wisely.  For the sake of your guild
-%sp, do what is right."
+         text = [["네가 무슨 생각을 하는지 알아, %p. %o을(를) 현명하게 사용하기에
+아직 늦지 않았다. 길드 %sp을(를) 위해 옳은 일을 해라."
 
-You sit and wait for death to come for %n, and then you
-brace yourself for your next meeting with %l!]],
+%n에게 죽음이 오기를 앉아서 기다리고, 그런 다음
+%l과(와)의 다음 만남을 준비한다!]],
       },
       leader_first = {
-         synopsis = "[You owe back dues to your guild.  You can pay them off if you're up to the job.]",
+         synopsis = "[길드에 밀린 회비가 있다. 일을 해낼 수 있다면 갚을 수 있다.]",
          output = "text",
-         text = [["Well, look who it is boys -- %p has come home.  You seem to have
-fallen behind in your dues.  I should kill you as an example to these
-other worthless cutpurses, but I have a better plan.  If you are ready
-maybe you could work off your back dues by performing a little job for
-me.  Let us just see if you are ready..."]],
+         text = [["이게 누구야 얘들아 -- %p가 집에 왔군. 회비가 밀린 것 같은데.
+다른 쓸모없는 소매치기들에게 본보기로 널 죽여야 하지만,
+더 좋은 계획이 있어. 준비가 되었다면 나를 위해 작은 일을 하고
+밀린 회비를 갚을 수 있을 거야. 준비가 되었는지 보자..."]],
       },
       leader_last = {
-         synopsis = "[You must go.]",
+         synopsis = "[떠나야 한다.]",
          output = "text",
-         text = [["Well %gp, it looks like our friend has forgotten who is the boss
-around here.  Our friend seems to think that %rp have been put in
-charge.  Wrong.  DEAD WRONG!"
+         text = [["자 %gP들, 우리 친구가 누가 여기 보스인지 잊어버린 것 같군.
+우리 친구는 %rP들이 책임자가 된 줄 아나 봐.
+틀렸어. 죽도록 틀렸어!"
 
-Your sudden shift in surroundings prevents you from hearing the end
-of %ls curse.]],
+주변 환경의 갑작스러운 변화로 인해 %l의 저주의 끝을
+듣지 못한다.]],
       },
       leader_next = {
-         synopsis = "[Are you stupid or are you ready?]",
+         synopsis = "[바보인 건가 준비가 된 건가?]",
          output = "text",
-         text = [["Well, I didn't expect to see you back.  It shows that you are either stupid,
-or you are finally ready to accept my offer.  Let us hope for your sake it
-isn't stupidity that brings you back."]],
+         text = [["돌아올 줄 몰랐는데. 네가 바보이거나, 마침내 내 제안을 받아들일
+준비가 되었다는 뜻이군. 네 자신을 위해 바보라서
+돌아온 게 아니길 바라자."]],
       },
       leader_other = {
-         text = [["Did you perhaps mistake me for some other %lt?  You must
-think me as stupid as your behavior.  I warn you not to try my patience."]],
+         text = [["혹시 나를 다른 %lt로 착각했나? 네 행동만큼
+나를 바보로 보는 건가. 내 인내심을 시험하지 마라고 경고하지."]],
       },
       locate_first = {
-         text = "Those damn little hairs tell you that you are nearer to %o.",
+         text = "그 빌어먹을 작은 털들이 %o에 더 가까워졌다고 말한다.",
       },
       locate_next = {
-         text = "Not wanting to face %l without having stolen %o, you continue.",
+         text = "%o을(를) 훔치지 않고 %l을(를) 대면하고 싶지 않아 계속 간다.",
       },
       nemesis_first = {
-         text = "\"Ah!  You must be %ls ... er, `hero'.  A pleasure to meet you.\"",
+         text = "\"아! 너는 분명 %l의 ... 음, '영웅'이군. 만나서 반갑다.\"",
       },
       nemesis_next = {
-         text = "\"We meet again.  Please reconsider your actions.\"",
+         text = "\"다시 만났군. 행동을 다시 생각해 보게.\"",
       },
       nemesis_other = {
-         synopsis = "[You cannot trust %l.]",
+         synopsis = "[%l을(를) 믿을 수 없다.]",
          output = "text",
-         text = [["Surely, %p, you have learned that you cannot trust any bargains
-that %l has made.  I can show you how to continue on
-your quest without having to run into him again."]],
+         text = [["분명, %p, %l이(가) 한 어떤 거래도 믿을 수 없다는 것을
+배웠을 거다. 그를 다시 만나지 않고 퀘스트를 계속하는 방법을
+보여줄 수 있다."]],
       },
       nemesis_wantsit = {
-         synopsis = "[%lC should not have %o.]",
+         synopsis = "[%l이(가) %o을(를) 가져서는 안 된다.]",
          output = "text",
-         text = [["Please, think for a moment about what you are doing.  Do you truly
-believe that %d would want %l to have
-%o?"]],
+         text = [["제발, 네가 뭘 하고 있는지 잠시 생각해봐. 정말로
+%d께서 %l이(가) %o을(를) 갖기를
+원하신다고 믿는 거야?"]],
       },
       nexttime = {
-         text = [[Once again, you find yourself back in Ransmannsby.  Fond memories are
-replaced by fear, knowing that %l is waiting for you.]],
+         text = [[다시 한번, 란스만스비에 돌아온 것을 알게 된다. 정다운 기억은
+%l이(가) 널 기다리고 있다는 것을 알고 두려움으로 대체된다.]],
       },
       offeredit = {
-         synopsis = "[Take %o with you and go.]",
+         synopsis = "[%o을(를) 가지고 가라.]",
          output = "text",
-         text = [["Well, I'll be damned.  You got it.  I am proud of you, a fine %r
-you've turned out to be.
+         text = [["이런, 세상에. 가져왔군. 자랑스럽다, 훌륭한 %r이(가)
+되었군.
 
-"While you were gone I got to thinking, you and %o
-together could bring me more treasure than either of you apart, so why don't
-you take it with you.  All I ask is a cut of whatever loot you come by.
-That is a better deal than I offered %n.
+"네가 없는 동안 생각해봤는데, 너와 %o이(가)
+함께라면 따로일 때보다 더 많은 보물을 가져다 줄 수 있겠더군, 그러니
+가져가. 네가 얻는 전리품의 일부만 요구할 뿐이야.
+%n에게 제안한 것보다 더 나은 거래다.
 
-"But, you see what happened to %n when he refused.
-Don't make me find another to send after you this time."]],
+"하지만, %n이(가) 거절했을 때 어떻게 됐는지 봤지.
+이번에는 널 쫓아 다른 놈을 보내게 만들지 마."]],
       },
       offeredit2 = {
-         synopsis = "[Take %o and acquire the Amulet.]",
+         synopsis = "[%o을(를) 가지고 아뮬렛을 획득해라.]",
          output = "text",
-         text = [[%lC seems tempted to swap %o for
-the mundane one you detect in his pocket, but noticing your alertness,
-evidently chickens out.
+         text = [[%l이(가) %o을(를) 주머니에 있는
+평범한 것과 바꾸고 싶어 하는 것 같지만, 네 경계심을 알아채고
+분명히 포기한다.
 
-"Go filch the Amulet before someone else beats you to it.
-%Z are back the way you came, through the magic portal."]],
+"누가 먼저 가져가기 전에 아뮬렛을 훔쳐 와라.
+%Z은(는) 네가 온 길, 마법의 포탈을 통해 돌아가면 있다."]],
       },
       othertime = {
-         text = [[You rub your hands through your hair, hoping that the little ones on
-the back of your neck stay down, and prepare yourself for your meeting
-with %l.]],
+         text = [[머리카락 사이로 손을 비비며, 목 뒤의 작은 것들이 가라앉기를 바라며,
+%l과(와)의 만남을 준비한다.]],
       },
       posthanks = {
-         synopsis = "[How about trading %o for something?]",
+         synopsis = "[%o을(를) 다른 것과 교환하는 건 어때?]",
          output = "text",
-         text = [["Quite the little thief, aren't we, %p.  Can I interest you in a
-swap for %o?  Look around, anything in the keep
-is yours for the asking."]],
+         text = [["꽤 훌륭한 도둑이군, 그렇지, %p. %o을(를)
+교환하는 데 관심 있나? 둘러봐, 이 성채에 있는 건
+뭐든 네 것이다."]],
       },
    },
    Sam = {
       assignquest = {
-         synopsis = "[You must enter %i, then regain %o from %n.]",
+         synopsis = "[%i에 들어가 %n에게서 %o을(를) 되찾아야 한다.]",
          output = "text",
-         text = [["Domo %p-san, indeed you are ready.  I can now tell you what
-it is that I require of you.
+         text = [["도모 %p-산, 참으로 준비가 되었군. 이제 내가 그대에게
+요구하는 것이 무엇인지 말해주겠다.
 
-"The daimyo, %n, has betrayed us.  He has stolen from us
-%o and taken it to his donjon deep within
-%i.
+"다이묘 %n이(가) 우리를 배신했다. 그가 우리에게서
+%o을(를) 훔쳐 %i 깊숙이 있는
+그의 천수각으로 가져갔다.
 
-"If I cannot show the emperor %o when he comes
-for the festival he will know that I have failed in my duty, and
-request that I commit seppuku.
+"천황폐하께서 축제를 위해 오실 때 %o을(를)
+보여드리지 못하면, 내가 임무에 실패했음을 아시고
+할복을 요구하실 것이다.
 
-"You must gain entrance to %i and retrieve the
-emperor's property.  Be quick!  The emperor will be here for the
-cha-no-you in 5 sticks.
+"그대는 %i에 들어가 천황폐하의 물건을 되찾아야 한다.
+서둘러라! 천황폐하께서 5촉 후에 다도회를 위해 오신다.
 
-"Wakarimasu ka?"]],
+"와카리마스 카?"]],
       },
       badalign = {
-         synopsis = "[When you can think %a and act %a then return.]",
+         synopsis = "[%a하게 생각하고 %a하게 행동할 수 있을 때 돌아오라.]",
          output = "text",
-         text = [["%p-san, you would do better to join the kyokaku.
+         text = [["%p-산, 협객에 합류하는 것이 더 나을 것이다.
 
-"You have skills, but until you can call upon the bushido to know when and
-how to use them you are not samurai.  When you can think %a and
-act %a then return."]],
+"기술은 있지만, 무사도를 불러 언제 어떻게 사용해야 할지 알 때까지
+그대는 사무라이가 아니다. %a하게 생각하고
+%a하게 행동할 수 있을 때 돌아오라."]],
       },
       badlevel = {
-         synopsis = "[\"I require %Ra to defeat %n.  Return when you are ready.\"]",
+         synopsis = "[\"%n을(를) 물리치려면 %R의 기술이 필요하다. 준비가 되면 돌아오라.\"]",
          output = "text",
-         text = [["%p-san, you have learned well and honored your family.
-I require the skills of %Ra in order to defeat %n.
-Go and seek out teachers.  Learn what they have learned.  When you
-are ready, return to me."]],
+         text = [["%p-산, 잘 배웠고 가문에 영광을 안겼다.
+%n을(를) 물리치기 위해 %R의 기술이 필요하다.
+가서 스승들을 찾아라. 그들이 배운 것을 배워라.
+준비가 되면, 나에게 돌아오라."]],
       },
       discourage = {
-         "\"Ahh, I finally meet the daimyo of the kyokaku!\"",
-         "\"There is no honor for me in your death.\"",
-         "\"You know that I cannot resash my swords until they have killed.\"",
-         "\"Your presence only compounds the dishonor of %l in not coming %liself.\"",
-         "\"I will make tea with your hair and serve it to %l.\"",
-         "\"Your fear shows in your eyes, coward!\"",
-         "\"I have not heard of you, %p-san; has your life been that unworthy?\"",
-         "\"If you will not obey me, you will die.\"",
-         "\"Kneel now and make the two cuts of honor.  I will tell your %sp of your honorable death.\"",
-         "\"Your master was a poor teacher.  You will pay for his mistakes in your teaching.\"",
+         "\"아, 드디어 협객의 다이묘를 만나는군!\"",
+         "\"그대의 죽음에는 나에게 명예가 없다.\"",
+         "\"내 검은 사람을 죽이기 전까지 칼집에 넣을 수 없다는 것을 알 것이다.\"",
+         "\"그대의 존재는 %l이(가) 직접 오지 않은 불명예를 더할 뿐이다.\"",
+         "\"그대의 머리카락으로 차를 만들어 %l에게 대접하겠다.\"",
+         "\"눈에서 두려움이 보인다, 겁쟁이야!\"",
+         "\"그대에 대해 들어본 적이 없다, %p-산; 그대의 삶이 그렇게 가치 없었나?\"",
+         "\"나에게 복종하지 않으면 죽는다.\"",
+         "\"지금 무릎 꿇고 명예로운 두 번의 베기를 하라. 그대의 %sp에게 명예로운 죽음을 전하겠다.\"",
+         "\"그대의 스승은 형편없는 스승이었다. 그대는 그의 가르침의 실수에 대한 대가를 치르게 될 것이다.\"",
       },
       encourage = {
-         "\"To defeat %n you must overcome the seven emotions: hate, adoration, joy, anxiety, anger, grief, and fear.\"",
-         "\"Remember your honor is my honor, you perform in my name.\"",
-         "\"I will go to the temple and burn incense for your safe return.\"",
-         "\"Sayonara.\"",
-         "\"There can be honor in defeat, but no gain.\"",
-         "\"Your kami must be strong in order to succeed.\"",
-         "\"You are indeed a worthy %R, but now you must be a worthy samurai.\"",
-         "\"If you fail, %n will be like a tai-fun on the land.\"",
-         "\"If you are truly %a, %d will listen.\"",
-         "\"Sharpen your swords and your wits for the task before you.\"",
+         "\"%n을(를) 물리치려면 일곱 가지 감정을 극복해야 한다: 증오, 숭배, 기쁨, 불안, 분노, 슬픔, 그리고 두려움.\"",
+         "\"그대의 명예는 나의 명예임을 기억하라, 그대는 나의 이름으로 행하는 것이다.\"",
+         "\"절에 가서 그대의 무사 귀환을 위해 향을 피우겠다.\"",
+         "\"사요나라.\"",
+         "\"패배에도 명예가 있을 수 있지만, 이득은 없다.\"",
+         "\"그대의 가미가 강해야 성공할 수 있다.\"",
+         "\"그대는 참으로 훌륭한 %R이지만, 이제는 훌륭한 사무라이가 되어야 한다.\"",
+         "\"그대가 실패하면, %n은(는) 이 땅에 태풍과 같을 것이다.\"",
+         "\"그대가 진정으로 %a하다면, %d께서 들으실 것이다.\"",
+         "\"앞에 놓인 임무를 위해 검과 재치를 날카롭게 갈아라.\"",
       },
       firsttime = {
-         synopsis = "[The banner of %n flies above town.  What has happened to %l?]",
+         synopsis = "[%n의 깃발이 마을 위에 펄럭인다. %l에게 무슨 일이 있었나?]",
          output = "text",
-         text = [[Even before your senses adjust, you recognize the kami of
-%H.
+         text = [[감각이 적응하기도 전에, %H의 가미를 알아본다.
 
-You %x the standard of your teki, %n, flying above
-the town.  How could such a thing have happened?  Why are ninja
-wandering freely; where are the samurai of your daimyo, %l?
+마을 위로 적 %n의 깃발이 펄럭이는 것이 %x.
+어떻게 이런 일이 일어날 수 있었나? 왜 닌자들이
+자유롭게 돌아다니고; 다이묘 %l의 사무라이들은 어디 있는가?
 
-You quickly say a prayer to Izanagi and Izanami and walk towards
-town.]],
+서둘러 이자나기와 이자나미에게 기도를 올리고 마을을 향해 걷는다.]],
       },
       goal_alt = {
-         text = "As you arrive once again at the home of %n.",
+         text = "다시 한번 %n의 집에 도착한다.",
       },
       goal_first = {
-         synopsis = "[You feel the taunts %n, but after offering a prayer to %d, you proceed.]",
+         synopsis = "[%n의 조롱이 느껴지지만, %d께 기도를 올린 후 전진한다.]",
          output = "text",
-         text = [[In your mind, you hear the taunts of %n.
+         text = [[마음속에서 %n의 조롱이 들린다.
 
-You become like the rice plant and bend to the ground, offering a
-prayer to %d.  But when the wind has passed, you stand
-proudly again.  Putting your kami in the hands of fate, you advance.]],
+벼처럼 땅에 몸을 굽히며 %d께 기도를 올린다.
+하지만 바람이 지나가면, 다시 당당히 선다.
+가미를 운명의 손에 맡기고 전진한다.]],
       },
       goal_next = {
-         text = [[As you arrive once again at the home of %n, your thoughts
-turn only to %o.]],
+         text = [[다시 한번 %n의 집에 도착하자, 생각은
+오직 %o에게만 향한다.]],
       },
       gotit = {
-         synopsis = "[You feel the power of %o and are humbled.]",
+         synopsis = "[%o의 힘을 느끼고 겸허해진다.]",
          output = "text",
-         text = [[As you pick up %o, you feel the strength of its karma.
-You realize at once why so many good samurai had to die to defend it.
-You are humbled knowing that you hold one of the artifacts of the
-sun goddess.]],
+         text = [[%o을(를) 집어 들자, 그 카르마의 힘을 느낀다.
+왜 그토록 많은 훌륭한 사무라이들이 이것을 지키기 위해 죽어야 했는지
+단번에 깨닫는다. 태양의 여신의 유물 중 하나를 들고 있다는 것을 알고
+겸허해진다.]],
       },
       guardtalk_after = {
-         "\"Come, join us in celebrating with some sake.\"",
-         "\"Ikaga desu ka?\"",
-         "\"You have brought our clan and %l much honor.\"",
-         "\"Please %r, sit for a while and tell us how you overcame the Ninja.\"",
-         "\"%lC still lives!  You have saved us from becoming ronin.\"",
+         "\"자, 사케와 함께 축하합시다.\"",
+         "\"이카가 데스 카?\"",
+         "\"우리 가문과 %l에게 큰 영광을 안겼습니다.\"",
+         "\"%r, 잠시 앉아서 어떻게 닌자를 물리쳤는지 말씀해 주십시오.\"",
+         "\"%l이(가) 아직 살아계십니다! 우리가 낭인이 되는 것을 막으셨습니다.\"",
       },
       guardtalk_before = {
-         "\"To succeed, you must walk like a butterfly on the wind.\"",
-         "\"Ikaga desu ka?\"",
-         "\"I fear for The Land of The Gods.\"",
-         "\"%nC has hired the Ninja -- be careful.\"",
-         "\"If %o is not returned, we will all be ronin.\"",
+         "\"성공하려면 바람 위의 나비처럼 걸어야 합니다.\"",
+         "\"이카가 데스 카?\"",
+         "\"신들의 나라가 걱정됩니다.\"",
+         "\"%n이(가) 닌자를 고용했습니다 -- 조심하십시오.\"",
+         "\"%o이(가) 돌아오지 않으면, 우리 모두 낭인이 될 것입니다.\"",
       },
       hasamulet = {
-         synopsis = "[Take the Amulet to the Astral Plane to finish your task.]",
+         synopsis = "[아스트랄 차원으로 아뮬렛을 가져가 임무를 완수하라.]",
          output = "text",
-         text = [["Ah, %p-sama.  You have wasted your efforts returning home.
-Now that you are in possession of the Amulet, you are honor-bound to
-finish the quest you have undertaken.  There will be plenty of time
-for saki and stories when you have finished.
+         text = [["아, %p-사마. 집으로 돌아오느라 힘을 낭비했군.
+이제 아뮬렛을 소유했으니, 맡은 퀘스트를
+완수해야 할 의무가 있다. 끝낸 후에
+사케와 이야기를 나눌 시간은 충분할 것이다.
 
-"Go now, and may our prayers be a wind at your back."]],
+"이제 가라, 우리의 기도가 그대의 등 뒤에서 바람이 되기를."]],
       },
       killed_nemesis = {
-         synopsis = "[%nC dies without honor.]",
+         synopsis = "[%n이(가) 명예 없이 죽는다.]",
          output = "text",
-         text = [[Your healing skills tell you that %ns wounds are mortal.
+         text = [[치료 기술로 %n의 상처가 치명적임을 알 수 있다.
 
-You know that the bushido tells you to finish him and let his kami
-die with honor, but the thought of so many samurai dead due to this
-man's dishonor prevents you from giving the final blow.
+무사도는 그를 끝내고 그의 가미가 명예롭게 죽게 해야 한다고
+말하지만, 이 자의 불명예로 인해 죽은 수많은 사무라이들을 생각하면
+마지막 일격을 가할 수 없다.
 
-You order that his unwashed head be given to the crows and his body
-thrown into the sea.]],
+그의 씻지 않은 머리를 까마귀에게 주고 시체를
+바다에 던지라고 명한다.]],
       },
       leader_first = {
-         synopsis = "[%lC needs someone to lead %lj samurai against %n.  Are you ready?]",
+         synopsis = "[%l이(가) %n에 맞서 사무라이를 이끌 사람이 필요하다. 준비가 되었나?]",
          output = "text",
-         text = [["Ah, %p-san, it is good to see you again.  I need someone who can
-lead my samurai against %n.  If you are ready, you will be
-that person."]],
+         text = [["아, %p-산, 다시 보니 반갑군. %n에 맞서
+내 사무라이들을 이끌 수 있는 자가 필요하다. 준비가 되었다면,
+그대가 그 자가 될 것이다."]],
       },
       leader_last = {
-         synopsis = "[Leave and do not come back.]",
+         synopsis = "[떠나라 그리고 다시 돌아오지 마라.]",
          output = "text",
-         text = [["You are no longer my samurai, %p.
+         text = [["그대는 더 이상 나의 사무라이가 아니다, %p.
 
-"Hara-kiri is denied.  You are ordered to shave your head and then to
-become a monk.  Your fief and family are forfeit.  Wakarimasu ka?"]],
+"할복은 허락되지 않는다. 머리를 깎고 승려가 되라고 명한다.
+그대의 영지와 가족은 몰수된다. 와카리마스 카?"]],
       },
       leader_next = {
-         text = [["Once again, %p-san, you kneel before me.  Are you yet capable of
-being my vassal?"]],
+         text = [["다시 한번, %p-산, 내 앞에 무릎 꿇었군. 이제 나의 가신이
+될 수 있겠는가?"]],
       },
       leader_other = {
-         synopsis = "[Are you truly a samurai?]",
+         synopsis = "[그대는 진정한 사무라이인가?]",
          output = "text",
-         text = [["You begin to test my matsu, %p-san.
-If you cannot determine what I want in a samurai, how can I rely on you
-to figure out what I need from a samurai?"]],
+         text = [["내 인내심을 시험하기 시작하는군, %p-산.
+내가 사무라이에게 원하는 것이 무엇인지 파악할 수 없다면, 어떻게 내가
+사무라이에게 필요한 것이 무엇인지 파악하라고 믿을 수 있겠는가?"]],
       },
       locate_first = {
-         text = [[You instinctively reach for your swords.  You do not recognize the
-lay of this land, but you know that your teki are everywhere.]],
+         text = [[본능적으로 검에 손이 간다. 이 땅의 지형을 알 수 없지만,
+적이 어디에나 있다는 것은 안다.]],
       },
       locate_next = {
-         text = [[Thankful that your %sp at %H cannot see
-your fear, you prepare again to advance.]],
+         text = [[%H에 있는 %sp이(가) 그대의 두려움을
+볼 수 없음에 감사하며, 다시 전진할 준비를 한다.]],
       },
       nemesis_first = {
-         text = [["Ah, so it is to be you, %p-san.  I offer you seppuku.
-I will be your second if you wish."]],
+         text = [["아, 그대가 오는군, %p-산. 셉푸쿠를 권한다.
+원한다면 내가 개인이 되어주겠다."]],
       },
       nemesis_next = {
-         text = [["I have offered you the honorable exit.  Now I will have your
-head to send unwashed to %l."]],
+         text = [["명예로운 퇴장을 권했다. 이제 그대의 머리를
+씻지 않은 채 %l에게 보내겠다."]],
       },
       nemesis_other = {
-         text = "\"After I have dispatched you, I will curse your kami.\"",
+         text = "\"그대를 처리한 후, 그대의 가미를 저주하겠다.\"",
       },
       nemesis_wantsit = {
-         text = [["You have fought my samurai; surely you must know that you
-will not be able to take %o back to
-%H."]],
+         text = [["내 사무라이들과 싸웠으니, %o을(를)
+%H로 가져갈 수 없다는 것을
+분명히 알 것이다."]],
       },
       nexttime = {
-         text = "Once again, you are back at %H.",
+         text = "다시 한번, %H에 돌아왔다.",
       },
       offeredit = {
-         synopsis = "[The emperor wants you to take %o and recover the Amulet.]",
+         synopsis = "[천황폐하께서 그대가 %o을(를) 가지고 아뮬렛을 되찾기를 원하신다.]",
          output = "text",
-         text = [[As you bow before %l, he welcomes you:
+         text = [[%l 앞에서 절하자, 그가 환영한다:
 
-    "You have brought your family great honor, %p-sama.
+    "%p-사마, 가문에 큰 영광을 안겼군.
 
-    "While you have been gone the emperor's advisors have discovered in
-    the ancient texts that the karma of the samurai who seeks to recover
-    the Amulet and the karma of %o are joined
-    as the seasons join to make a year.
+    "그대가 없는 동안 천황폐하의 고문들이 고대 문헌에서
+    아뮬렛을 되찾으려는 사무라이의 카르마와 %o의 카르마가
+    계절이 합쳐져 한 해를 이루듯 연결되어 있음을 발견했다.
 
-    "Because you have shown such fidelity, the emperor requests
-    that you take leave of other obligations and continue on the
-    road that fate has set your feet upon.  I would consider it
-    an honor if you would allow me to watch your household until
-    you return with the Amulet."
+    "그대가 그러한 충성을 보였기에, 천황폐하께서
+    다른 의무를 내려놓고 운명이 그대의 발을 놓은
+    길을 계속 가기를 요청하신다. 그대가 아뮬렛을 가지고
+    돌아올 때까지 내가 그대의 가문을 돌보는 것을
+    영광으로 여기겠다."
 
-With that, %l bows, and places his sword atop
-%o.]],
+그렇게 말하며, %l이(가) 절하고, 자신의 검을
+%o 위에 올려놓는다.]],
       },
       offeredit2 = {
-         synopsis = "[Take %o, return to %Z, and recover the Amulet.]",
+         synopsis = "[%o을(를) 가지고, %Z(으)로 돌아가, 아뮬렛을 되찾아라.]",
          output = "text",
-         text = [[%l holds %o tightly for a moment, then returns
-his gaze to you.
+         text = [[%l이(가) 잠시 %o을(를) 꼭 잡더니,
+시선을 그대에게 돌린다.
 
-"The time is ripe to recover the Amulet.  Return to %Z
-through the magic portal that transported you here so that you may
-achieve the destiny which awaits you."]],
+"아뮬렛을 되찾을 때가 무르익었다. 그대를 이곳으로 데려온
+마법의 포탈을 통해 %Z(으)로 돌아가
+그대를 기다리는 운명을 이루어라."]],
       },
       othertime = {
-         synopsis = "[%HC is threatened by %n.]",
+         synopsis = "[%H이(가) %n에게 위협받고 있다.]",
          output = "text",
-         text = [[You are back at %H.
+         text = [[%H에 돌아왔다.
 
-Instantly you sense a subtle change in your karma.  You seem to know that
-if you do not succeed in your quest, %n will have destroyed
-the kami of %H before you return again.]],
+즉시 카르마에 미묘한 변화가 느껴진다. 퀘스트에 성공하지 못하면,
+다시 돌아오기 전에 %n이(가) %H의 가미를
+파괴할 것이라는 것을 알 것 같다.]],
       },
       posthanks = {
-         text = "%lC bows.  \"%p-sama, tell us of your search for the Amulet.\"",
+         text = "%l이(가) 절한다. \"%p-사마, 아뮬렛 탐색에 대해 말씀해 주십시오.\"",
       },
    },
    Tou = {
       assignquest = {
-         synopsis = "[Enter %i and recover %o from %n.]",
+         synopsis = "[%i에 들어가 %n에게서 %o을(를) 되찾아라.]",
          output = "text",
-         text = [["You have indeed proven yourself a worthy %c, %p.
+         text = [["참으로 훌륭한 %c임을 증명했구나, %p.
 
-"But now your kinfolk and I must ask you to put aside your travels and
-help us in our time of need.  After you left us we elected a new mayor,
-%n.  He proved to be a most heinous and vile creature.
+"하지만 이제 네 동족과 나는 여행을 잠시 멈추고
+어려운 시기에 우리를 도와달라고 부탁해야 하겠다. 네가 떠난 후 우리는
+새 시장을 선출했는데, %n이었다. 그는 가장 흉악하고 사악한 자로 드러났다.
 
-"Soon after taking office he absconded with %o
-and fled town, leaving behind his henchmen to rule over us.  In order
-for us to regain control of our town, you must enter %i
-and recover %o.
+"취임 직후 그는 %o을(를) 가지고 도망쳐
+마을을 떠났고, 부하들을 남겨 우리를 지배하게 했다. 우리 마을의
+통제권을 되찾으려면, 너는 %i에 들어가
+%o을(를) 되찾아야 한다.
 
-"Do not be distracted on your quest.  If you do not return quickly I fear
-that all will be lost.  Let us both pray now that %d will guide you
-and keep you safe."]],
+"퀘스트에서 딴 데 정신 팔리지 마라. 빨리 돌아오지 않으면
+모든 것을 잃을 것 같아 두렵다. %d께서 너를 인도하시고
+안전하게 지켜주시길 함께 기도하자."]],
       },
       badalign = {
-         synopsis = "[You are not sufficiently %a.  Return when you are.]",
+         synopsis = "[충분히 %a하지 않다. %a해지면 돌아오라.]",
          output = "text",
-         text = [["It would be an affront to %d to have one not true to the
-%a path undertake her bidding.
+         text = [["%a의 길에 진실하지 않은 자가 %d의 명을 수행하는 것은
+모욕이 될 것이다.
 
-"You must not return to us until you have purified yourself of these
-bad influences on your actions.  Remember, only by following the %a
-path can you hope to overcome the obstacles you will face."]],
+"행동에 미치는 이 나쁜 영향들을 정화할 때까지
+우리에게 돌아오지 마라. 기억해라, %a의 길을 따라야만
+앞으로 마주할 장애물을 극복할 희망이 있다."]],
       },
       badlevel = {
-         synopsis = "[Return when you are %Ra.]",
+         synopsis = "[%R(이)가 되면 돌아오라.]",
          output = "text",
-         text = [["There is still too much that you have to learn before you can undertake
-the next step.  Return to us as a proven %R, and perhaps then
-you will be ready.
+         text = [["다음 단계를 수행하기 전에 아직 배워야 할 것이 너무 많다.
+검증된 %R(으)로 우리에게 돌아오면, 아마도 그때는
+준비가 될 것이다.
 
-"Go back now, and may the teachings of %d serve you well."]],
+"이제 돌아가라, 그리고 %d의 가르침이 너를 잘 인도하길."]],
       },
       discourage = {
-         "\"I defeated %l and I will defeat you, %p.\"",
-         "\"Where is %d now!  You must realize no one can help you here.\"",
-         "\"Beg for mercy now and I may be lenient on you.\"",
-         "\"If you were not so %a, you might have stood a chance.\"",
-         "\"Vengeance is mine at last, %p.\"",
-         "\"I only wish that %l had a more worthy %r to send against me.\"",
-         "\"With %o in my possession you cannot hope to defeat me.\"",
-         "\"%nC has never been defeated, NEVER!\"",
-         "\"Are you truly the best %H has to send against me?  I pity %l.\"",
-         "\"How do you spell %p?  I want to ensure the marker on your grave is correct as a warning to your %sp.\"",
+         "\"%l을(를) 물리쳤고 너도 물리치겠다, %p.\"",
+         "\"%d는 지금 어디 있느냐! 여기서는 아무도 너를 도울 수 없다는 걸 알아야 한다.\"",
+         "\"지금 자비를 구걸하면 관대해질 수도 있다.\"",
+         "\"네가 그렇게 %a하지 않았다면, 승산이 있었을 텐데.\"",
+         "\"드디어 복수한다, %p.\"",
+         "\"%l이(가) 나에게 맞서 더 합당한 %r을(를) 보냈으면 좋았을 텐데.\"",
+         "\"%o이(가) 내 손에 있으니 나를 물리칠 희망은 없다.\"",
+         "\"%n은(는) 한 번도 패배한 적이 없다, 절대!\"",
+         "\"정말 네가 %H에서 나에게 맞서 보낼 수 있는 최고냐? %l이(가) 불쌍하군.\"",
+         "\"%p을(를) 어떻게 쓰지? 네 무덤의 표지가 네 %sp에게 경고로 올바르게 되어 있는지 확인하고 싶다.\"",
       },
       encourage = {
-         "\"Do not be fooled by the false promises of %n.\"",
-         "\"To enter %i you must pass many traps.\"",
-         "\"If you do not return with %o, your quest will be in vain.\"",
-         "\"Do not be afraid to call upon %d if you truly need help.\"",
-         "\"If you do not destroy %n, he will follow you back here!\"",
-         "\"Take %o from %n and you may be able to defeat him.\"",
-         "\"You must hurry, %p!\"",
-         "\"You are like %Sa to me, %p.  Do not let me down.\"",
-         "\"If you are %a at all times you may succeed, %p.\"",
-         "\"Let all who meet you on your journey know that you are on a quest for %l and grant safe passage.\"",
+         "\"%n의 거짓 약속에 속지 마라.\"",
+         "\"%i에 들어가려면 많은 함정을 통과해야 한다.\"",
+         "\"%o 없이 돌아오면 네 퀘스트는 헛수고가 될 것이다.\"",
+         "\"정말 도움이 필요하면 %d를 부르는 것을 두려워하지 마라.\"",
+         "\"%n을(를) 파괴하지 않으면, 여기까지 따라올 것이다!\"",
+         "\"%n에게서 %o을(를) 빼앗으면 그를 물리칠 수 있을 것이다.\"",
+         "\"서둘러야 한다, %p!\"",
+         "\"너는 나에게 %S 같다, %p. 실망시키지 마라.\"",
+         "\"항상 %a하면 성공할 수 있을 것이다, %p.\"",
+         "\"여정에서 만나는 모든 이에게 %l을(를) 위한 퀘스트 중이라고 알리고 안전한 통행을 받아라.\"",
       },
       firsttime = {
-         synopsis = "[You find yourself back at %H, but the quiet is ominous.]",
+         synopsis = "[%H에 돌아왔지만, 조용함이 불길하다.]",
          output = "text",
-         text = [[You breathe a sigh of relief as you find yourself back in the familiar
-surroundings of %H.
+         text = [[익숙한 %H의 환경에 돌아온 것을 알고 안도의 한숨을 쉰다.
 
-You quickly notice that things do not appear the way they did when you
-left.  The town is dark and quiet.  There are no sounds coming from
-behind the town walls, and no campfires burning in the fields.  As a
-matter of fact, you do not %x any movement in the fields at all, and
-the crops seem as though they have been untended for many weeks.]],
+떠날 때와는 상황이 다르다는 것을 금방 알아차린다.
+마을은 어둡고 조용하다. 마을 성벽 뒤에서 들려오는 소리도 없고,
+들판에서 타오르는 모닥불도 없다. 사실,
+들판에서 움직임이 전혀 %x지 않고,
+작물은 여러 주 동안 돌보지 않은 것처럼 보인다.]],
       },
       goal_alt = {
-         text = "You have returned to %ns lair.",
+         text = "%n의 소굴로 돌아왔다.",
       },
       goal_first = {
-         text = "You sense the presence of %o.",
+         text = "%o의 존재를 감지한다.",
       },
       goal_next = {
-         text = [[You gain confidence, knowing that you may soon be united with
-%o.]],
+         text = [[곧 %o와(과) 다시 만날 수 있다는 것을 알고
+자신감이 생긴다.]],
       },
       gotit = {
-         synopsis = "[You pick up %o and feel relief.  Return it to %l.]",
+         synopsis = "[%o을(를) 집어 들고 안도감을 느낀다. %l에게 가져다 주어라.]",
          output = "text",
-         text = [[As you pick up %o, you feel a great
-weight has been lifted from your shoulders.  Your only thoughts are
-to quickly return to %H and find %l.]],
+         text = [[%o을(를) 집어 들자, 어깨에서 큰 짐이
+내려간 느낌이 든다. 오직 빨리 %H로 돌아가
+%l을(를) 찾는 것만 생각한다.]],
       },
       guardtalk_after = {
-         "\"Gehennom on 5 zorkmids a day -- more like 500 a day if you ask me.\"",
-         "\"Do you know where I could find some nice postcards of The Gnomish Mines?\"",
-         "\"Have you tried the weird toilets?\"",
-         "\"If you stick around, I'll show you the pictures from my latest trip.\"",
-         "\"Did you bring me back any souvenirs?\"",
+         "\"하루 5 조크미드로 게헨놈 -- 내가 보기엔 하루 500은 될 것 같은데.\"",
+         "\"놈 광산의 예쁜 엽서를 어디서 찾을 수 있는지 아세요?\"",
+         "\"이상한 화장실 써봤어요?\"",
+         "\"여기 있으면, 최근 여행 사진 보여줄게요.\"",
+         "\"기념품 가져왔어요?\"",
       },
       guardtalk_before = {
-         "\"Gehennom on 5 zorkmids a day -- more like 500 a day if you ask me.\"",
-         "\"Do you know where I could find some nice postcards of The Gnomish Mines?\"",
-         "\"Have you tried the weird toilets?\"",
-         "\"Don't stay at the Inn, I hear the food is terrible and it has rats.\"",
-         "\"They told me that this was the off season!\"",
+         "\"하루 5 조크미드로 게헨놈 -- 내가 보기엔 하루 500은 될 것 같은데.\"",
+         "\"놈 광산의 예쁜 엽서를 어디서 찾을 수 있는지 아세요?\"",
+         "\"이상한 화장실 써봤어요?\"",
+         "\"여관에 묵지 마세요, 음식이 형편없고 쥐가 있다던데.\"",
+         "\"비수기라고 했는데!\"",
       },
       hasamulet = {
-         synopsis = "[You have the Amulet.  Take it to the Astral Plane to finish your task.]",
+         synopsis = "[아뮬렛이 있다. 아스트랄 차원으로 가져가 임무를 완수하라.]",
          output = "text",
-         text = [["Stand back and let me look at you, %p.
-Now that you have recovered the Amulet of Yendor, I'm afraid living
-out your days in %H would seem pretty tame.
+         text = [["물러서서 네 얼굴 좀 보자, %p.
+이제 옌더의 아뮬렛을 되찾았으니, %H에서
+남은 날들을 보내는 것은 꽤 지루해 보일 것 같구나.
 
-"You have come too far to stop now, for there are still more tasks that
-our oral history foretells for you.  Forever more, though, your name shall
-be spoken by the %gP with awe.  You are truly an inspiration to your
-%sp!"]],
+"이제 멈추기엔 너무 멀리 왔다, 우리 구전 역사가 너에게 예언하는
+더 많은 임무가 있기 때문이다. 하지만 이제부터 영원히, 네 이름은
+%gP들에게 경외심과 함께 언급될 것이다. 너는 정말 네 %sp에게
+영감이 되는구나!"]],
       },
       killed_nemesis = {
-         synopsis = "[%nC curses at you as %nh dies.]",
+         synopsis = "[%n이(가) 죽으면서 저주한다.]",
          output = "text",
-         text = [[You turn in the direction of %n.  As his earthly body begins
-to vanish before your eyes, you hear him curse:
+         text = [[%n 쪽을 돌아본다. 그의 육체가 눈앞에서
+사라지기 시작하자, 저주하는 소리가 들린다:
 
-    "You shall never be rid of me, %p!
-    I will find you where ever you go and regain what is rightly mine."]],
+    "너는 결코 나를 벗어나지 못할 것이다, %p!
+    네가 어디를 가든 찾아내서 정당히 내 것인 것을 되찾겠다."]],
       },
       leader_first = {
-         synopsis = "[Someone must defeat %n.  Are your ready?]",
+         synopsis = "[누군가가 %n을(를) 물리쳐야 한다. 준비가 되었나?]",
          output = "text",
-         text = [["Is it really you, %p!  I had given up hope for your return.
-As you can %x, we are desperately in need of your talents.  Someone must
-defeat %n if our town is to become what it once was.
+         text = [["정말 너냐, %p! 네가 돌아올 거라는 희망을 포기했었다.
+보다시피, 우리는 네 재능이 절실히 필요하다. 우리 마을이
+예전처럼 되려면 누군가가 %n을(를) 물리쳐야 한다.
 
-"Let me see if you are ready to be that someone."]],
+"네가 그 누군가가 될 준비가 되었는지 보자."]],
       },
       leader_last = {
-         synopsis = "[Leave %H and never return.]",
+         synopsis = "[%H을(를) 떠나고 다시는 돌아오지 마라.]",
          output = "text",
-         text = [["It is too late, %p.  You are not even worthy to die amongst us.
-Leave %H and never return."]],
+         text = [["너무 늦었다, %p. 너는 우리 사이에서 죽을 가치조차 없다.
+%H을(를) 떠나고 다시는 돌아오지 마라."]],
       },
       leader_next = {
-         text = "\"Things are getting worse, %p.  I hope that this time you are ready.\"",
+         text = "\"상황이 악화되고 있다, %p. 이번에는 준비가 되었기를 바란다.\"",
       },
       leader_other = {
-         text = "\"I hope that for the sake of %H you have prepared yourself this time.\"",
+         text = "\"%H을(를) 위해 이번에는 준비를 했기를 바란다.\"",
       },
       locate_first = {
-         synopsis = "[You %x the handiwork of %ns henchlings.]",
+         synopsis = "[%n의 부하들의 솜씨가 %x.]",
          output = "text",
-         text = [[Only your faith in %d keeps you from trembling.  You %x
-the handiwork of %ns henchlings everywhere.]],
+         text = [[오직 %d에 대한 믿음만이 떨리는 것을 막아준다.
+어디서나 %n의 부하들의 솜씨가 %x.]],
       },
       locate_next = {
-         text = "You know that this time you must find and destroy %n.",
+         text = "이번에는 %n을(를) 찾아 파괴해야 한다는 것을 안다.",
       },
       nemesis_first = {
-         synopsis = "[%rA will not defeat me.]",
+         synopsis = "[%r 따위가 나를 물리치지 못한다.]",
          output = "text",
-         text = [["So, %p, %l thinks that you can wrest
-%o from me!
+         text = [["그래서, %p, %l이(가) 네가 나에게서
+%o을(를) 빼앗을 수 있다고 생각하는군!
 
-"It only proves how desperate he has become that he sends %ra to
-try to defeat me.  When this day is over, I will have you enslaved
-in the mines where you will rue the day that you ever entered
-%i."]],
+"나를 물리치려고 %r을(를) 보내다니 얼마나 절박해졌는지 증명할 뿐이다.
+이 날이 끝나면, 너를 광산에 노예로 삼아
+%i에 들어온 날을 후회하게 하겠다."]],
       },
       nemesis_next = {
-         text = [["I let you live the last time because it gave me pleasure.
-This time I will destroy you, %p."]],
+         text = [["지난번에 살려준 건 그게 즐거웠기 때문이다.
+이번에는 파괴해주마, %p."]],
       },
       nemesis_other = {
-         synopsis = "[Run away or you will suffer severely.]",
+         synopsis = "[도망치지 않으면 심하게 고통받을 것이다.]",
          output = "text",
-         text = [["These meetings come to bore me.  You disturb my workings with
-%o.
+         text = [["이런 만남은 지겨워진다. %o에 대한 내 작업을
+방해하는군.
 
-"If you do not run away now, I will inflict so much suffering on you that
-%l will feel guilty for ever having sent his %S to me!"]],
+"지금 도망치지 않으면, %l이(가) 자신의 %S를 나에게
+보낸 것을 죄책감 느끼게 될 정도로 고통을 주겠다!"]],
       },
       nemesis_wantsit = {
-         synopsis = "[\"Return %o to me and we will rule %H.\"]",
+         synopsis = "[\"%o을(를) 돌려주면 함께 %H을(를) 지배하자.\"]",
          output = "text",
-         text = [["You fool.  You do not know how to call upon the powers of
-%o.
+         text = [["바보 같으니. %o의 힘을 불러내는 방법을
+모르는군.
 
-"Return it to me and I will teach you how to use it, and together we
-will rule %H.  But do so now, as my patience grows thin."]],
+"나에게 돌려주면 사용법을 가르쳐주고, 함께
+%H을(를) 지배하자. 하지만 지금 해라, 인내심이 바닥나고 있다."]],
       },
       nexttime = {
-         text = "Once again, you are back at %H.",
+         text = "다시 한번, %H에 돌아왔다.",
       },
       offeredit = {
-         synopsis = "[Take %o and with %ds guidance, recover the Amulet.]",
+         synopsis = "[%o을(를) 가져가고 %d의 인도로 아뮬렛을 되찾아라.]",
          output = "text",
-         text = [[As %l detects the presence of %o,
-he almost smiles for the first time in many a full moon.
+         text = [[%l이(가) %o의 존재를 감지하자,
+오랜만에 처음으로 거의 미소를 짓는다.
 
-As he looks up from %o he says:
+%o에서 눈을 떼며 말한다:
 
-    "You have recovered %o.  You are its
-    owner now, but not its master.  Let it work with you as you continue
-    your journey.  With its help, and %d to guide you on the
-    %a path, you may yet recover the Amulet of Yendor."]],
+    "%o을(를) 되찾았구나. 이제 네가 주인이지만,
+    아직 마스터는 아니다. 여정을 계속하면서 그것이 너와 함께
+    일하게 해라. 그것의 도움과 %a의 길에서 너를 인도하는
+    %d와(과) 함께, 옌더의 아뮬렛을 되찾을 수 있을 것이다."]],
       },
       offeredit2 = {
-         synopsis = "[Keep %o and return to %Z through the portal.]",
+         synopsis = "[%o을(를) 가지고 포탈을 통해 %Z(으)로 돌아가라.]",
          output = "text",
-         text = [["%oC is yours now.  %Z
-await your return through the magic portal that brought you here."]],
+         text = [["%o은(는) 이제 네 것이다. %Z이(가)
+너를 이곳으로 데려온 마법의 포탈을 통해 네 귀환을 기다리고 있다."]],
       },
       othertime = {
-         text = [[You are back at %H.
-Things appear to have become so bad that you fear that soon
-%H will not be here to return to.]],
+         text = [[%H에 돌아왔다.
+상황이 너무 나빠져서 곧 %H이(가) 돌아올 곳이
+없어질 것 같아 두렵다.]],
       },
       posthanks = {
-         text = [["I could not be more proud than if you were my own %S, %p!
-Tell me of your adventures in quest of the Amulet of Yendor."]],
+         text = [["내 친자식 %S였다 해도 이보다 더 자랑스러울 수 없을 것이다, %p!
+옌더의 아뮬렛 탐색에서의 모험을 들려주거라."]],
       },
    },
    Val = {
       assignquest = {
-         synopsis = "[Find %i; defeat %n; return with %o.]",
+         synopsis = "[%i를 찾아 %n을(를) 물리치고 %o을(를) 되찾아라.]",
          output = "text",
-         text = [["It is not clear, %p, for my sight is limited without our relic.
-But it is now likely that you can defeat %n, and recover
-%o.
+         text = [["%p, 확실하지 않다. 우리의 유물 없이는 나의 시야가 제한되어 있기 때문이다.
+하지만 이제 네가 %n을(를) 물리치고 %o을(를)
+되찾을 수 있을 것 같다.
 
-"A short time ago, %n and his minions attacked this place.  They
-opened the huge volcanic vents you %x about the hill, and attacked.  I knew
-that this was to come to pass, and had asked %d for a group of %gP
-to help defend this place.  The few you %x here are the mightiest of
-Valhalla's own, and are all that are left of one hundred %d sent.
+"얼마 전, %n과(와) 그의 부하들이 이곳을 공격했다. 그들은
+언덕 주변에 네가 %x 거대한 화산 분출구를 열고 공격했다. 나는
+이 일이 일어날 것을 알고 있었고, %d께 이곳을 지키기 위해
+%gP 무리를 보내달라고 요청했었다. 네가 여기서 %x 이들은
+발할라 최강의 전사들이며, %d이(가) 보낸 백 명 중 남은 전부다.
 
-"Despite the great and glorious battle we fought, %n managed at
-last to steal %o.  This has upset the balance of the universe,
-and unless %oh is returned into my care, %n may start Ragnarok.
+"우리가 치른 위대하고 영광스러운 전투에도 불구하고, %n은(는) 결국
+%o을(를) 훔쳐가는 데 성공했다. 이것은 우주의 균형을 깨뜨렸으며,
+그것이 내 손에 돌아오지 않으면 %n이(가) 라그나로크를 시작할 수도 있다.
 
-"You must find the entrance to %i.  Travel downward
-from there and you will find %ns lair.  Defeat him and
-return %o to me."]],
+"%i의 입구를 찾아야 한다. 그곳에서 아래로 내려가면
+%n의 소굴을 찾을 수 있을 것이다. 그를 물리치고
+%o을(를) 내게 가져와라."]],
       },
       badalign = {
-         synopsis = "[You have strayed from the %a path.  Return after you purify yourself.]",
+         synopsis = "[%a의 길에서 벗어났다. 정화한 후 돌아오라.]",
          output = "text",
-         text = [["NO!  This is terrible.  I see you becoming an ally of %n, and
-leading his armies in the final great battles.  This must not come to
-pass!  You have strayed from the %a path.  You must purge yourself,
-and return here only when you have regained a state of purity."]],
+         text = [["안 돼! 이건 끔찍하다. 네가 %n의 동맹이 되어 마지막 대전투에서
+그의 군대를 이끄는 모습이 보인다. 이런 일이 일어나서는 안 된다!
+너는 %a의 길에서 벗어났다. 스스로를 정화하고,
+순수한 상태를 되찾았을 때만 여기로 돌아와라."]],
       },
       badlevel = {
-         synopsis = "[Come back when you are %Ra.]",
+         synopsis = "[%Ra이(가) 되면 돌아오라.]",
          output = "text",
-         text = [["I see you and %n fighting, %p.  But you are not prepared and
-shall die at %ns hand if you proceed.  No.  This will not do.
-Go back out into the world, and grow more experienced at the ways of war.
-Only when you have returned %Ra will you be able to defeat %n."]],
+         text = [["너와 %n이(가) 싸우는 모습이 보인다, %p. 하지만 네가 준비되지 않았으며
+계속 진행하면 %n의 손에 죽을 것이다. 안 된다. 이대로는 안 된다.
+세상으로 돌아가 전쟁의 방식에 더 익숙해져라.
+%Ra이(가) 되어 돌아왔을 때만 %n을(를) 물리칠 수 있을 것이다."]],
       },
       discourage = {
-         "\"I am your death, %c.\"",
-         "\"You cannot prevail, %r.  I have foreseen your every move.\"",
-         "\"With you out of the way, Valhalla will be mine for the taking.\"",
-         "\"I killed scores of %ds best when I took %o. Do you really think that one %c can stand against me?\"",
-         "\"Who bears the souls of %cP to Valhalla, %r?\"",
-         "\"No, %d cannot help you here.\"",
-         "\"Some instrument of %d you are, %p.  You are a weakling!\"",
-         "\"Never have I seen %ca so clumsy in battle.\"",
-         "\"You die now, little %s.\"",
-         "\"Your body I destroy now, your soul when my hordes overrun Valhalla!\"",
+         "\"나는 네 죽음이다, %c.\"",
+         "\"네가 이길 수 없다, %r. 네 모든 움직임을 예견했다.\"",
+         "\"네가 없어지면, 발할라는 내 것이 될 것이다.\"",
+         "\"%o을(를) 훔칠 때 %d의 정예 수십 명을 죽였다. %c 하나가 나에게 맞설 수 있다고 생각하느냐?\"",
+         "\"누가 %cP의 영혼을 발할라로 데려가느냐, %r?\"",
+         "\"아니, %d은(는) 여기서 너를 도울 수 없다.\"",
+         "\"%d의 도구치고는 별 볼 일 없구나, %p. 넌 약골이야!\"",
+         "\"전투에서 이렇게 서투른 %c은(는) 처음 본다.\"",
+         "\"이제 죽어라, 작은 %s.\"",
+         "\"네 몸은 지금 파괴하고, 네 영혼은 내 군대가 발할라를 점령할 때 파괴하마!\"",
       },
       encourage = {
-         "\"Go with the blessings of %d.\"",
-         "\"Call upon %d when you are in need.\"",
-         "\"Use %o if you can.  It will protect you.\"",
-         "\"Magical cold is very effective against %n.\"",
-         "\"To face %n, you will need to be immune to fire.\"",
-         "\"May %d strengthen your sword-arm.\"",
-         "\"Trust in %d.  He will not desert you.\"",
-         "\"It becomes more likely that Ragnarok will come with every passing moment. You must hurry, %p.\"",
-         "\"If %n can master %o, he will be powerful enough to face %d far earlier than is fated.  This must not be!\"",
-         "\"Remember your training, %p.  You can succeed.\"",
+         "\"%d의 축복과 함께 가라.\"",
+         "\"필요할 때 %d을(를) 불러라.\"",
+         "\"가능하면 %o을(를) 사용해라. 널 보호해 줄 것이다.\"",
+         "\"마법 냉기는 %n에게 매우 효과적이다.\"",
+         "\"%n과(와) 맞서려면 화염에 면역이어야 한다.\"",
+         "\"%d께서 네 검팔에 힘을 주시길.\"",
+         "\"%d을(를) 믿어라. 널 버리지 않으실 것이다.\"",
+         "\"매 순간 라그나로크가 다가오고 있다. 서둘러야 한다, %p.\"",
+         "\"%n이(가) %o을(를) 마스터하면, 운명보다 훨씬 일찍 %d과(와) 맞설 만큼 강해질 것이다. 이래서는 안 된다!\"",
+         "\"훈련을 기억해라, %p. 넌 할 수 있다.\"",
       },
       firsttime = {
-         synopsis = "[You arrive below %H.  Something is wrong; there is lava present.]",
+         synopsis = "[%H 아래에 도착했다. 무언가 잘못되었다; 용암이 있다.]",
          output = "text",
-         text = [[You materialize at the base of a snowy hill.  Atop the hill sits
-a place you know well, %H.  You immediately realize
-that something here is very wrong!
+         text = [[눈 덮인 언덕 기슭에 나타났다. 언덕 위에는
+네가 잘 아는 곳, %H이(가) 있다. 무언가
+심각하게 잘못되었다는 것을 즉시 깨달았다!
 
-In places, the snow and ice have been melted into steaming pools of
-water.  Fumaroles and pools of bubbling lava surround the hill.
-The stench of sulphur is carried through the air, and you %x creatures
-that should not be able to live in this environment moving towards you.]],
+군데군데 눈과 얼음이 녹아 김이 나는 웅덩이가 되어 있다.
+분기공과 부글거리는 용암 웅덩이가 언덕을 둘러싸고 있다.
+유황 냄새가 공기 중에 퍼져 있고, 이 환경에서 살 수 없을 것 같은
+생물들이 너를 향해 움직이는 것이 %x다.]],
       },
       goal_first = {
-         synopsis = "[This is the lair of %n.]",
+         synopsis = "[여기가 %n의 소굴이다.]",
          output = "text",
-         text = [[Through clouds of sulphurous gasses, you %x a rock palisade
-surrounded with a moat of bubbling lava.  You remember the description
-from something that %l said.  This is the lair of %n.]],
+         text = [[유황 가스 구름 사이로, 부글거리는 용암 해자로 둘러싸인
+바위 방벽이 %x다. %l이(가) 말한 것에서
+설명을 기억해냈다. 여기가 %n의 소굴이다.]],
       },
       goal_next = {
-         text = "Once again, you stand in sight of %ns lair.",
+         text = "다시 한번 %n의 소굴이 보이는 곳에 서 있다.",
       },
       gotit = {
-         synopsis = "[You must return %o to %l.]",
+         synopsis = "[%o을(를) %l에게 돌려줘야 한다.]",
          output = "text",
-         text = [[As you pick up %o, your mind is suddenly filled with images,
-and you perceive all of the possibilities of each potential choice you
-could make.  As you begin to control and channel your thoughts, you
-realize that you must return %o to %l immediately.]],
+         text = [[%o을(를) 집어들자, 갑자기 마음속에 이미지들이 가득 차고,
+네가 선택할 수 있는 각각의 잠재적 선택의 모든 가능성을
+인지하게 된다. 생각을 제어하고 집중하기 시작하면서,
+즉시 %o을(를) %l에게 돌려줘야 한다는 것을 깨닫는다.]],
       },
       guardtalk_after = {
-         "\"Hail, and well met, brave %c.\"",
-         "\"May %d guide your steps, %p.\"",
-         "\"%lC told us you had succeeded!\"",
-         "\"You recovered %o just in time, %p.\"",
-         "\"Hail %d, for delivering %o back to us.\"",
+         "\"만나서 반갑소, 용감한 %c여.\"",
+         "\"%d께서 그대의 발걸음을 인도하시길, %p.\"",
+         "\"%l께서 그대가 성공했다고 말씀하셨소!\"",
+         "\"때맞춰 %o을(를) 되찾았구려, %p.\"",
+         "\"%o을(를) 되돌려주신 %d께 찬양을.\"",
       },
       guardtalk_before = {
-         "\"Hail, and well met, brave %c.\"",
-         "\"May %d guide your steps, %p.\"",
-         "\"%lC weakens.  Without %o, her foresight is dim.\"",
-         "\"You must hurry, %p, else Ragnarok may well come.\"",
-         "\"I would deal with this foul %n myself, but %d forbids it.\"",
+         "\"만나서 반갑소, 용감한 %c여.\"",
+         "\"%d께서 그대의 발걸음을 인도하시길, %p.\"",
+         "\"%l께서 약해지고 계시오. %o 없이는 예지력이 흐려지셨소.\"",
+         "\"서둘러야 하오, %p, 그렇지 않으면 라그나로크가 올지도 모르오.\"",
+         "\"이 사악한 %n을(를) 직접 처리하고 싶지만, %d께서 금하셨소.\"",
       },
       hasamulet = {
-         synopsis = "[Take the Amulet to %ds temple on the Astral Plane and offer it.]",
+         synopsis = "[아뮬렛을 아스트랄 차원의 %d 신전으로 가져가 바쳐라.]",
          output = "text",
-         text = [["Excellent, %p.  I see you have recovered the Amulet!
+         text = [["훌륭하오, %p. 아뮬렛을 되찾았군요!
 
-"You must take the Amulet to the Great Temple of %d, on the Astral
-Plane.  There you must offer the Amulet to %d.
+"아뮬렛을 아스트랄 차원에 있는 %d의 대신전으로 가져가야 하오.
+거기서 아뮬렛을 %d께 바쳐야 하오.
 
-"Go now, my %S.  I cannot tell you your fate, as the power of the
-Amulet interferes with mine.  I hope for your success."]],
+"이제 가시오, 나의 %S. 아뮬렛의 힘이 나의 힘과 간섭하여
+그대의 운명을 말해줄 수 없소. 그대의 성공을 바라오."]],
       },
       killed_nemesis = {
-         synopsis = "[%nC dies.]",
+         synopsis = "[%n이(가) 죽는다.]",
          output = "text",
-         text = [[A look of surprise and horror appears on %ns face.
+         text = [[%n의 얼굴에 놀라움과 공포의 표정이 떠오른다.
 
-    "No!!!  %o has lied to me!  I have been misled!"
+    "안 돼!!! %o이(가) 나에게 거짓말을 했다! 내가 속았다!"
 
-Suddenly, %n grasps his head and screams in agony, then dies.]],
+갑자기, %n이(가) 머리를 움켜쥐고 고통에 비명을 지르다가 죽는다.]],
       },
       leader_first = {
-         synopsis = "[We need your aid.  Are you ready?]",
+         synopsis = "[그대의 도움이 필요하오. 준비가 되었소?]",
          output = "text",
-         text = [["Ah, %p, my %S.  You have returned to %H
-at last.  We are in dire need of your aid, but I must determine if you
-are yet ready for such an undertaking.
+         text = [["아, %p, 나의 %S. 마침내 %H에
+돌아왔구려. 그대의 도움이 절실히 필요하지만, 먼저 그대가
+이 일을 맡을 준비가 되었는지 확인해야 하오.
 
-"Let me read your fate..."]],
+"그대의 운명을 읽어보겠소..."]],
       },
       leader_last = {
-         synopsis = "[\"Begone from my presence and never return.\"]",
+         synopsis = "[\"내 앞에서 사라지고 다시는 돌아오지 마시오.\"]",
          output = "text",
-         text = [["No, %p.  Your fate is sealed.  I must cast about for another
-champion.  Begone from my presence, and never return.  Know this, that
-you shall never succeed in this life, and Valhalla is denied to you."]],
+         text = [["안 되오, %p. 그대의 운명은 정해졌소. 다른 용사를 찾아야겠소.
+내 앞에서 사라지고, 다시는 돌아오지 마시오. 알아두시오, 그대는
+이 생에서 결코 성공하지 못할 것이며, 발할라의 문은 그대에게 닫혔소."]],
       },
       leader_next = {
-         text = [["Let me read the future for you now, %p, perhaps you have managed to
-change it enough..."]],
+         text = [["이제 그대의 미래를 읽어보겠소, %p, 아마도 충분히
+바꿀 수 있었을지도..."]],
       },
       leader_other = {
-         text = [["Again, I shall read your fate, my %S.  Let us both hope that you have
-made changes to become ready for this task..."]],
+         text = [["다시, 그대의 운명을 읽어보겠소, 나의 %S. 그대가 이 임무를 위해
+준비가 되도록 변화했기를 우리 둘 다 바라오..."]],
       },
       locate_first = {
-         synopsis = "[This is the entrance to %i.]",
+         synopsis = "[여기가 %i의 입구이다.]",
          output = "text",
-         text = [[The ice and snow gives way to a valley floor.  You %x ahead of you
-a huge round hill surrounded by pools of lava.  This then is the entrance
-to %i.  It looks like you're not going to get in without
-a fight though.]],
+         text = [[얼음과 눈이 계곡 바닥으로 이어진다. 앞쪽에 용암 웅덩이로 둘러싸인
+거대한 둥근 언덕이 %x. 이곳이 바로 %i의 입구로구나.
+하지만 싸우지 않고는 들어갈 수 없을 것 같다.]],
       },
       locate_next = {
-         text = "Once again, you stand before the entrance to %i.",
+         text = "다시 한번, %i의 입구 앞에 선다.",
       },
       nemesis_first = {
-         synopsis = "[\"%oC has shown me that I must kill you.\"]",
+         synopsis = "[\"%o이(가) 너를 죽여야 한다고 보여주었다.\"]",
          output = "text",
-         text = [["So!  %lC has finally sent %ca to challenge me!
+         text = [["그래! %l이(가) 마침내 나에게 도전할 %c을(를) 보냈군!
 
-"I thought that mastering %o would enable me to challenge
-%d, but it has shown me that first I must kill you!  So come, little
-%s.  Once I defeat you, I can at last begin the final battle with %d."]],
+"%o을(를) 마스터하면 %d에게 도전할 수 있을 줄 알았는데,
+먼저 너를 죽여야 한다고 보여주었다! 자, 어린 %s야.
+너를 물리치면, 마침내 %d와(과)의 최후의 전투를 시작할 수 있다."]],
       },
       nemesis_next = {
-         text = "\"Again you challenge me, %r.  Good.  I will kill you now.\"",
+         text = "\"또다시 나에게 도전하는가, %r. 좋다. 이제 죽여주마.\"",
       },
       nemesis_other = {
-         text = "\"Have you not learned yet?  You cannot defeat %n!\"",
+         text = "\"아직도 배우지 못했느냐? %n을(를) 이길 수 없다!\"",
       },
       nemesis_wantsit = {
-         text = "\"I will kill you, %c, and wrest %o from your mangled hands.\"",
+         text = "\"죽여주마, %c, 그리고 너의 찢긴 손에서 %o을(를) 빼앗겠다.\"",
       },
       nexttime = {
-         text = "Once again, you are near the abode of %l.",
+         text = "다시 한번, %l의 거처 근처에 왔다.",
       },
       offeredit = {
-         synopsis = "[Take %o.  Search for the Amulet.]",
+         synopsis = "[%o을(를) 가져가라. 아뮬렛을 찾아라.]",
          output = "text",
-         text = [[As you approach, %l rises and touches %o.
+         text = [[다가가자, %l이(가) 일어나 %o을(를) 만진다.
 
-"You may take %o with you, %p.  I have removed from
-it the power to foretell the future, for that power no mortal should
-have.  Its other abilities, however, you have at your disposal.
+"%o을(를) 가져가도 좋소, %p. 미래를 예견하는 힘은
+제거했소, 그 힘은 필멸자가 가져서는 안 되기 때문이오.
+하지만 다른 능력들은 그대가 사용할 수 있소.
 
-"You must now begin in %ds name to search for the Amulet of Yendor.
-May your steps be guided by %d, my %S."]],
+"이제 %d의 이름으로 옌더의 아뮬렛을 찾기 시작해야 하오.
+%d께서 그대의 발걸음을 인도하시길, 나의 %S."]],
       },
       offeredit2 = {
-         synopsis = "[You are %os keeper now.  Return through the portal and find the Amulet.]",
+         synopsis = "[이제 그대가 %o의 수호자이오. 포탈을 통해 돌아가 아뮬렛을 찾으시오.]",
          output = "text",
-         text = [["Careful, %p!  %oC might break, and that would be
-a tragic loss.  You are its keeper now, and the time has come to
-resume your search for the Amulet.  %Z await your
-return through the magic portal that brought you here."]],
+         text = [["조심하시오, %p! %o이(가) 부서지면
+큰 비극이 될 것이오. 이제 그대가 그것의 수호자이며, 아뮬렛을
+찾는 여정을 다시 시작할 때가 되었소. %Z이(가) 그대를 이곳으로
+데려온 마법의 포탈을 통해 그대의 귀환을 기다리고 있소."]],
       },
       othertime = {
-         text = [[Again you materialize near %ls abode.  You have a nagging feeling
-that this may be the last time you come here.]],
+         text = [[다시 %l의 거처 근처에 나타난다. 이번이 마지막으로
+이곳에 오는 것일지도 모른다는 찝찝한 느낌이 든다.]],
       },
       posthanks = {
-         text = [["Greetings, %p.  I have not been able to pay as much attention to
-your search for the Amulet as I have wished.  How do you fare?"]],
+         text = [["안녕하시오, %p. 바라던 만큼 그대의 아뮬렛 탐색에
+관심을 기울이지 못했소. 어떻게 지내고 있소?"]],
       },
    },
    Wiz = {
       assignquest = {
-         synopsis = "[Travel to %i; overcome %n; return with %o.]",
+         synopsis = "[%i로 가서 %n을(를) 물리치고 %o을(를) 가져오라.]",
          output = "text",
-         text = [["Yes, %p, you truly are ready for this dire task.  Listen,
-carefully, for what I tell you now will be of vital importance.
+         text = [["그래, %p, 이제 이 험난한 임무를 위한 준비가 되었구나. 잘 들어라,
+내가 지금 말하는 것은 매우 중요하다.
 
-"Since you left us to hone your skills in the world, we unexpectedly came
-under attack by the forces of %n.  As you know, we thought
-%n had perished at the end of the last age, but, alas, this was
-not the case.
+"네가 세상에서 기술을 연마하러 떠난 후, 우리는 예상치 못하게
+%n의 세력에게 공격을 받았다. 알다시피, 우리는 %n이(가)
+지난 시대 말에 사라졌다고 생각했지만, 아아, 그렇지 않았다.
 
-"%nC sent an army of abominations against us.  Among them was a
-minion, mindless and ensorcelled, and thus, in the confusion, it was
-able to penetrate our defenses.  Alas, this creature has stolen
-%o and I fear has delivered %oh to %n.
+"%n이(가) 괴물 군대를 우리에게 보냈다. 그 중에는 정신이 없고
+마법에 걸린 하수인이 있었고, 혼란 속에서 우리의 방어를
+뚫을 수 있었다. 아아, 이 생물이 %o을(를) 훔쳐서
+%n에게 전달한 것 같구나.
 
-"Over the years, I had woven most of my power into this amulet, and thus,
-without it, I have but a shadow of my former power, and I fear that I
-shall soon perish.
+"수년에 걸쳐, 나는 내 힘의 대부분을 이 아뮬렛에 엮어 넣었고,
+따라서 그것 없이는 예전 힘의 그림자만 남았을 뿐이며,
+곧 죽을 것 같구나.
 
-"You must travel to %i, and within its dungeons,
-find and overcome %n, and return %o to me.
+"너는 %i로 가서 그 던전 안에서 %n을(를) 찾아
+물리치고, %o을(를) 내게 가져와야 한다.
 
-"Go now, with %d, and complete this quest before it is too late."]],
+"이제 %d와(과) 함께 가거라, 너무 늦기 전에 이 퀘스트를 완수하라."]],
       },
       badalign = {
-         synopsis = "[Go; come back when you are worthy of %d.]",
+         synopsis = "[가거라; %d에게 합당해지면 돌아오라.]",
          output = "text",
-         text = [["You amaze me, %p!  How many times did I tell you that the way of a mage
-is an exacting one.  One must use the world with care, lest one leave it
-in ruins and simplify the task of %n.
+         text = [["놀랍구나, %p! 마법사의 길은 엄격하다고 몇 번이나 말했느냐.
+세상을 조심히 다뤄야 한다, 그렇지 않으면 폐허로 만들어
+%n의 일을 쉽게 만들어 줄 뿐이다.
 
-"You must go back and show your worthiness.  Do not return until you are
-truly ready for this quest.  May %d guide you in this task."]],
+"돌아가서 네 가치를 증명하거라. 이 퀘스트에 진정으로
+준비될 때까지 돌아오지 마라. %d께서 이 임무에서 너를 인도하시길."]],
       },
       badlevel = {
-         synopsis = "[Go; return when you are %Ra.]",
+         synopsis = "[가거라; %R(이)가 되면 돌아오라.]",
          output = "text",
-         text = [["Alas, %p, you have not yet shown your proficiency as a worthy
-spellcaster.  As %ra, you would surely be overcome in the challenge
-ahead.  Go, now, expand your horizons, and return when you have attained
-renown as %Ra."]],
+         text = [["아아, %p, 아직 합당한 주문시전자로서의 숙련도를 보여주지 못했구나.
+%r(으)로서는 앞으로의 도전에서 분명히 쓰러질 것이다.
+가거라, 지금, 시야를 넓히고, %R(으)로 명성을 얻으면 돌아오거라."]],
       },
       discourage = {
-         "\"Your puny powers are no match for me, fool!\"",
-         "\"When you are defeated, your torment will last for a thousand years.\"",
-         "\"After your downfall, %p, I shall devour %l for dessert!\"",
-         "\"Are you ready yet to beg for mercy?  I could be lenient...\"",
-         "\"Your soul shall join the enslaved multitude I command!\"",
-         "\"Your lack of will is evident, and you shall die as a result.\"",
-         "\"Your faith in %d is for naught!  Come, submit to me now!\"",
-         "\"A mere %r is nothing compared to my skill!\"",
-         "\"So, you are the best hope of %l?  How droll.\"",
-         "\"Feel my power, %c!  My victory is imminent!\"",
+         "\"네 보잘것없는 힘은 나의 상대가 되지 못한다, 바보야!\"",
+         "\"네가 패배하면, 네 고통은 천 년 동안 지속될 것이다.\"",
+         "\"네가 쓰러지면, %p, 후식으로 %l을(를) 삼켜버리겠다!\"",
+         "\"자비를 구걸할 준비가 되었느냐? 관대할 수도 있는데...\"",
+         "\"네 영혼은 내가 지배하는 노예 무리에 합류할 것이다!\"",
+         "\"네 의지의 부족함이 명백하고, 결과적으로 죽게 될 것이다.\"",
+         "\"%d에 대한 네 믿음은 허사다! 자, 지금 나에게 굴복하라!\"",
+         "\"고작 %r은(는) 내 실력에 비하면 아무것도 아니다!\"",
+         "\"그래서, 네가 %l의 최고의 희망이냐? 참 우습군.\"",
+         "\"내 힘을 느껴라, %c! 내 승리는 임박했다!\"",
       },
       encourage = {
-         "\"Beware, for %n is immune to most magical attacks.\"",
-         "\"To enter %i you must pass many traps.\"",
-         "\"%nC may be vulnerable to physical attacks.\"",
-         "\"%d will come to your aid when you call.\"",
-         "\"You must utterly destroy %n.  He will pursue you otherwise.\"",
-         "\"%oC is a mighty artifact.  With it you can destroy %n.\"",
-         "\"Go forth with the blessings of %d.\"",
-         "\"I will have my %gP watch for your return.\"",
-         "\"Feel free to take any items in that chest that might aid you.\"",
-         "\"You will know when %o is near.  Proceed with care!\"",
+         "\"%n은(는) 대부분의 마법 공격에 면역이니 조심하거라.\"",
+         "\"%i에 들어가려면 많은 함정을 통과해야 한다.\"",
+         "\"%n은(는) 물리 공격에 취약할 수도 있다.\"",
+         "\"%d께서 네가 부르면 도움을 주실 것이다.\"",
+         "\"%n을(를) 완전히 파괴해야 한다. 그렇지 않으면 너를 추격할 것이다.\"",
+         "\"%o은(는) 강력한 유물이다. 그것으로 %n을(를) 파괴할 수 있다.\"",
+         "\"%d의 축복과 함께 나아가거라.\"",
+         "\"내 %gP들이 네 귀환을 지켜보게 하겠다.\"",
+         "\"저 상자에 있는 물건 중 도움이 될 것은 자유롭게 가져가거라.\"",
+         "\"%o이(가) 가까워지면 알게 될 것이다. 조심해서 진행하거라!\"",
       },
       firsttime = {
-         synopsis = "[You have arrived at %ls tower but something is very wrong.]",
+         synopsis = "[%l의 탑에 도착했지만 무언가 매우 잘못되었다.]",
          output = "text",
-         text = [[You are suddenly in familiar surroundings.  You notice what appears to
-be a large, squat stone structure nearby.  Wait!  That looks like the
-tower of your former teacher, %l.
+         text = [[갑자기 익숙한 곳에 있다. 근처에 크고 낮은 석조 구조물처럼
+보이는 것이 있다. 잠깐! 저건 예전 스승인 %l의
+탑처럼 보인다.
 
-However, things are not the same as when you were last here.  Mists and
-areas of unexplained darkness surround the tower.  There is movement in
-the shadows.
+하지만, 마지막으로 여기 있을 때와는 다르다. 안개와
+설명할 수 없는 어둠이 탑을 둘러싸고 있다. 그림자 속에서
+움직임이 있다.
 
-Your teacher would never allow such unaesthetic forms to surround the
-tower...  unless something were dreadfully wrong!]],
+스승님은 이런 보기 흉한 것들이 탑을 둘러싸는 것을
+절대 허락하지 않으실 텐데... 무언가 끔찍하게 잘못된 게 아니라면!]],
       },
       goal_alt = {
-         text = "You have returned to %ns lair.",
+         text = "%n의 소굴로 돌아왔다.",
       },
       goal_first = {
-         text = "You feel your mentor's presence; perhaps %o is nearby.",
+         text = "스승님의 존재를 느낀다; 아마도 %o이(가) 근처에 있을 것이다.",
       },
       goal_next = {
-         text = "The aura of %o tingles at the edge of your perception.",
+         text = "%o의 기운이 인식의 가장자리에서 감지된다.",
       },
       gotit = {
-         synopsis = "[You feel %os power and know you should return %oh to %l.]",
+         synopsis = "[%o의 힘을 느끼고 %l에게 돌려줘야 한다는 것을 안다.]",
          output = "text",
-         text = [[As you touch %o, its comforting power infuses you
-with new energy.  You feel as if you can detect others' thoughts flowing
-through it.  Although you yearn to wear %o and
-attack the Wizard of Yendor, you know you must return it to its rightful
-owner, %l.]],
+         text = [[%o을(를) 만지자, 그 편안한 힘이 새로운 에너지로
+너를 채운다. 그것을 통해 다른 이들의 생각이 흐르는 것을
+감지할 수 있는 것 같다. %o을(를) 착용하고 옌더의 마법사를
+공격하고 싶지만, 정당한 주인인 %l에게
+돌려줘야 한다는 것을 안다.]],
       },
       guardtalk_after = {
-         "\"I have some eye of newt to trade, do you have a spare blind-worm's sting?\"",
-         "\"The magic portal now seems like it will remain stable for quite some time.\"",
-         "\"Have you noticed how much stronger %l is since %o was recovered?\"",
-         "\"Thank %d!  We weren't positive you would defeat %n.\"",
-         "\"I, too, will venture into the world, because %n was but one of many evils to be vanquished.\"",
+         "\"영원의 눈을 좀 교환하고 싶은데, 눈먼 벌레의 침이 여분으로 있나요?\"",
+         "\"마법의 포탈이 이제 꽤 오랫동안 안정될 것 같습니다.\"",
+         "\"%o을(를) 되찾은 후 %l이(가) 얼마나 강해졌는지 느끼셨나요?\"",
+         "\"%d께 감사드립니다! 당신이 %n을(를) 물리칠 거라고 확신하지 못했거든요.\"",
+         "\"저도 세상으로 모험을 떠날 겁니다, %n은(는) 물리쳐야 할 많은 악 중 하나일 뿐이니까요.\"",
       },
       guardtalk_before = {
-         "\"Would you happen to have some eye of newt in that overstuffed pack, %s?\"",
-         "\"Ah, the spell to create the magic portal worked.  Outstanding!\"",
-         "\"Hurry!  %lC may not survive that casting of the portal spell!\"",
-         "\"The spells of %n were just too powerful for us to withstand.\"",
-         "\"I, too, will venture into the world, because %n is but one of many evils to be vanquished.\"",
+         "\"혹시 그 가득 찬 배낭에 영원의 눈이 있나요, %s?\"",
+         "\"아, 마법의 포탈을 만드는 주문이 효과가 있었군요. 대단합니다!\"",
+         "\"서둘러요! %l이(가) 포탈 주문 시전을 버티지 못할 수도 있어요!\"",
+         "\"%n의 주문이 우리가 견디기엔 너무 강력했어요.\"",
+         "\"저도 세상으로 모험을 떠날 겁니다, %n은(는) 물리쳐야 할 많은 악 중 하나일 뿐이니까요.\"",
       },
       hasamulet = {
-         synopsis = "[Take the Amulet to %ds altar on the Astral Plane.]",
+         synopsis = "[아뮬렛을 아스트랄 차원의 %d 제단으로 가져가라.]",
          output = "text",
-         text = [["Congratulations, %p.  I always knew that if anyone could succeed
-in defeating the Wizard of Yendor and his minions, it would be you.
+         text = [["축하한다, %p. 옌더의 마법사와 그 하수인들을 물리칠 수 있는 자가
+있다면, 그것은 너일 것이라고 항상 알고 있었다.
 
-"Go now, and take the Amulet to the Astral Plane.  Once there, present
-the Amulet on the altar of %d.  Along the way you shall pass through
-the four Elemental Planes.  These planes are like nothing you have ever
-experienced before, so be prepared!
+"이제 가서 아뮬렛을 아스트랄 차원으로 가져가거라. 거기서
+%d의 제단에 아뮬렛을 바쳐라. 가는 길에 네 개의 원소 차원을
+지나게 될 것이다. 이 차원들은 네가 전에 경험한 것과는
+전혀 다르니, 준비하거라!
 
-"For this you were born, %s!  I am very proud of you."]],
+"이것을 위해 태어났다, %s! 매우 자랑스럽구나."]],
       },
       killed_nemesis = {
-         synopsis = "[%nC curses you as %nh dies.]",
+         synopsis = "[%n이(가) 죽으면서 너를 저주한다.]",
          output = "text",
-         text = [[%nC, whose body begins to shrivel up, croaks out:
+         text = [[몸이 쪼그라들기 시작하는 %n이(가) 쉰 목소리로 말한다:
 
-    "I shall haunt your progress until the end of time.  A thousand
-    curses on you and %l."
+    "시간의 끝까지 네 여정을 괴롭히겠다. 너와 %l에게
+    천 번의 저주를."
 
-Then, the body bursts into a cloud of choking dust, and blows away.]],
+그러고는, 몸이 질식할 것 같은 먼지 구름으로 터져 날아간다.]],
       },
       leader_first = {
-         synopsis = "[You have come a long way, but are you ready for the task I require?]",
+         synopsis = "[멀리 왔구나, 하지만 내가 요구하는 임무를 위한 준비가 되었느냐?]",
          output = "text",
-         text = [["Come closer, %p, for my voice falters in my old age.
-Yes, I see that you have come a long way since you went out into the
-world, leaving the safe confines of this tower.  However, I must first
-determine if you have all of the skills required to take on the task
-I require of you."]],
+         text = [["가까이 오너라, %p, 늙어서 목소리가 떨리는구나.
+그래, 이 탑의 안전한 곳을 떠나 세상으로 나간 이후로
+먼 길을 왔구나. 하지만, 먼저 내가 너에게 요구하는 임무를
+수행하는 데 필요한 모든 기술을 갖추었는지 확인해야 한다."]],
       },
       leader_last = {
-         synopsis = "[\"Get out of here!\"]",
+         synopsis = "[\"여기서 나가거라!\"]",
          output = "text",
-         text = [["You fool, %p!  Why did I waste all of those years teaching you
-the esoteric arts?  Get out of here!  I shall find another."]],
+         text = [["이 바보야, %p! 왜 그 모든 세월을 네게 비전 마법을
+가르치는 데 낭비했단 말이냐? 여기서 나가거라! 다른 자를 찾겠다."]],
       },
       leader_next = {
-         text = "\"Well, %p, you have returned.  Perhaps you are now ready...\"",
+         text = "\"음, %p, 돌아왔구나. 아마 이제 준비가 되었을지도...\"",
       },
       leader_other = {
-         text = [["This is getting tedious, %p, but perseverance is a sign of a true mage.
-I certainly hope that you are truly ready this time!"]],
+         text = [["지겨워지는구나, %p, 하지만 인내는 진정한 마법사의 표시다.
+이번에는 정말로 준비가 되었기를 바란다!"]],
       },
       locate_first = {
-         text = "Wisps of fog swirl nearby.  You feel that %ns lair is close.",
+         text = "안개 가닥이 근처에서 소용돌이친다. %n의 소굴이 가깝다고 느껴진다.",
       },
       locate_next = {
-         text = "You believe that you may once again invade %i.",
+         text = "다시 %i에 침입할 수 있을 것 같다.",
       },
       nemesis_first = {
-         synopsis = "[\"Your destruction should make for good sport.\"]",
+         synopsis = "[\"네 파멸은 좋은 오락거리가 되겠군.\"]",
          output = "text",
-         text = [["Ah, I recognize you, %p.  So, %l has sent you to steal
-%o from me, hmmm?  Well, %lh is a fool to send such
-a mental weakling against me.
+         text = [["아, 너를 알겠다, %p. 그래서, %l이(가) 나한테서
+%o을(를) 훔치라고 보냈군, 흠? 글쎄, 그런 정신적으로 약한 자를
+나에게 보내다니 바보로군.
 
-"Your destruction, however, should make for good sport.  In the end, you
-shall beg me to kill you!"]],
+"하지만 네 파멸은 좋은 오락거리가 되겠군. 결국, 너는
+죽여달라고 애원하게 될 것이다!"]],
       },
       nemesis_next = {
-         synopsis = "[\"Your soul shall soon be mine to command.\"]",
+         synopsis = "[\"네 영혼은 곧 내가 지배하게 될 것이다.\"]",
          output = "text",
-         text = [["How nice of you to return, %p!  I enjoyed our last meeting.  Are you
-still hungry for more pain?
+         text = [["돌아와줘서 고맙다, %p! 지난번 만남을 즐겼다. 아직도
+더 많은 고통에 굶주려 있느냐?
 
-"Come!  Your soul, like %o, shall soon be mine to command."]],
+"자! 네 영혼은, %o처럼, 곧 내가 지배하게 될 것이다."]],
       },
       nemesis_other = {
-         text = [["I'm sure that your perseverance shall be the subject of innumerable
-ballads, but you shall not be around to hear them, I fear!"]],
+         text = [["네 인내심은 분명히 수많은 노래의 주제가 되겠지만,
+안타깝게도 그것을 들을 수 없을 것 같구나!"]],
       },
       nemesis_wantsit = {
-         text = [["Thief!  %oC belongs to me, now.  I shall feed
-your living flesh to my minions."]],
+         text = [["도둑놈! %o은(는) 이제 내 것이다. 네 살아있는
+살점을 내 하수인들에게 먹이로 주겠다."]],
       },
       nexttime = {
-         text = "Once again, you are back at %H.",
+         text = "다시 한번, %H에 돌아왔다.",
       },
       offeredit = {
-         synopsis = "[Take %o with you in your quest for the Amulet.]",
+         synopsis = "[아뮬렛 탐색에 %o을(를) 가져가거라.]",
          output = "text",
-         text = [[%lC notices %o in your possession,
-beams at you and says:
+         text = [[%l이(가) 네가 가진 %o을(를) 알아채고,
+활짝 웃으며 말한다:
 
-    "I knew you could defeat %n and retrieve
-    %o.  We shall never forget this
-    brave service.
+    "%n을(를) 물리치고 %o을(를) 되찾을 수 있을 줄
+    알았다. 이 용감한 봉사를
+    절대 잊지 않겠다.
 
-    "Take %oh with you in your quest for the Amulet of Yendor.
-    I can sense that it has attuned %oiself to you already.
+    "옌더의 아뮬렛 탐색에 그것을 가져가거라.
+    이미 너에게 동조되었다는 것을 느낄 수 있다.
 
-    "May %d guide you in your quest, and keep you from harm."]],
+    "%d께서 네 탐색을 인도하시고, 해로부터 지켜주시길."]],
       },
       offeredit2 = {
-         synopsis = "[Keep %o, return through the portal to %Z; find the other Amulet.]",
+         synopsis = "[%o을(를) 가지고, 포탈을 통해 %Z(으)로 돌아가서 다른 아뮬렛을 찾아라.]",
          output = "text",
-         text = [["You are the keeper of %o now.  It is time to
-recover the /other/ Amulet.  %Z await your return through
-the magic portal which brought you here."]],
+         text = [["이제 네가 %o의 수호자다. 다른 아뮬렛을
+되찾을 때가 되었다. %Z이(가) 너를 이곳으로 데려온
+마법의 포탈을 통해 네 귀환을 기다리고 있다."]],
       },
       othertime = {
-         text = [[You are back at %H.
-You have an odd feeling this may be the last time you ever come here.]],
+         text = [[%H에 돌아왔다.
+이번이 여기 오는 마지막이 될지도 모른다는 이상한 느낌이 든다.]],
       },
       posthanks = {
-         text = [["Come near, my %S, and share your adventures with me.
-So, have you succeeded in your quest for the Amulet of Yendor?"]],
+         text = [["가까이 오너라, 나의 %S, 네 모험을 들려주거라.
+그래서, 옌더의 아뮬렛 탐색에 성공했느냐?"]],
       },
    },
 }

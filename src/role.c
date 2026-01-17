@@ -1584,12 +1584,50 @@ build_plselection_prompt(
     char *buf, int buflen,
     int rolenum, int racenum, int gendnum, int alignnum)
 {
-    const char *defprompt = "Shall I pick a character for you? [ynaq] ";
+    const char *defprompt = _("Shall I pick a character for you? [ynaq] ");
     int num_post_attribs = 0;
     char tmpbuf[BUFSZ], *p;
 
     if (buflen < QBUFSZ)
         return (char *) defprompt;
+
+#ifdef ENABLE_NLS
+    /* For Korean locale, use a simpler fixed prompt since Korean grammar
+       is very different from English (SOV vs SVO word order) */
+    if (is_korean_locale()) {
+        int need_race = (flags.initrace == ROLE_NONE);
+        int need_role = (flags.initrole == ROLE_NONE);
+        int need_gend = (flags.initgend == ROLE_NONE);
+        int need_align = (flags.initalign == ROLE_NONE);
+        int count = need_race + need_role + need_gend + need_align;
+
+        if (count == 0) {
+            Strcpy(buf, _("Shall I pick a character for you? [ynaq] "));
+        } else {
+            Strcpy(buf, _("Auto-select "));
+            if (need_race) {
+                Strcat(buf, _("race"));
+                if (--count > 1) Strcat(buf, ", ");
+                else if (count == 1) Strcat(buf, _(" and "));
+            }
+            if (need_role) {
+                Strcat(buf, _("role"));
+                if (--count > 1) Strcat(buf, ", ");
+                else if (count == 1) Strcat(buf, _(" and "));
+            }
+            if (need_gend) {
+                Strcat(buf, _("gender"));
+                if (--count > 1) Strcat(buf, ", ");
+                else if (count == 1) Strcat(buf, _(" and "));
+            }
+            if (need_align) {
+                Strcat(buf, _("alignment"));
+            }
+            Strcat(buf, _("? [ynaq] "));
+        }
+        return buf;
+    }
+#endif /* ENABLE_NLS */
 
     Strcpy(tmpbuf, "Shall I pick ");
     if (racenum != ROLE_NONE || validrole(rolenum))
@@ -1933,15 +1971,15 @@ role_menu_extra(int which, winid where, boolean preselect)
         add_menu_str(where, buf);
     } else if (what) {
         any.a_int = RS_menu_arg(which);
-        Sprintf(buf, "Pick%s %s first", (f >= 0) ? " another" : "", what);
+        Sprintf(buf, _("Pick%s %s first"), (f >= 0) ? _(" another") : "", what);
         add_menu(where, &nul_glyphinfo, &any, RS_menu_let[which], 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     } else if (which == RS_filter) {
         char setfiltering[40];
 
         any.a_int = RS_menu_arg(RS_filter);
-        Sprintf(setfiltering, "%s role/race/&c filtering",
-                gotrolefilter() ? "Reset" : "Set");
+        Sprintf(setfiltering, "%s %s",
+                gotrolefilter() ? _("Reset") : _("Set"), _("role/race/&c filtering"));
         add_menu(where, &nul_glyphinfo, &any, '~', 0, ATR_NONE,
                  clr, setfiltering, MENU_ITEMFLAGS_NONE);
     } else if (which == ROLE_RANDOM) {
@@ -2377,7 +2415,7 @@ genl_player_setup(int screenheight)
                 if (pick4u == 'y' || pick4u == 'a' || RACE == ROLE_RANDOM) {
                     k = pick_race(ROLE, GEND, ALGN, PICK_RANDOM);
                     if (k < 0) {
-                        pline("Incompatible race!");
+                        pline(_("Incompatible race!"));
                         k = randrace(ROLE);
                     }
                 } else { /* pick4u == 'n' */

@@ -831,7 +831,7 @@ cprefx(int pm)
     case PM_DEATH:
     case PM_PESTILENCE:
     case PM_FAMINE: {
-        pline("Eating that is instantly fatal.");
+        pline(_("Eating that is instantly fatal."));
         Sprintf(svk.killer.name, "unwisely ate the body of %s",
                 mons[pm].pmnames[NEUTRAL]);
         svk.killer.format = NO_KILLER_PREFIX;
@@ -1282,12 +1282,12 @@ cpostfx(int pm)
     case PM_MASTER_MIND_FLAYER:
         if (ABASE(A_INT) < ATTRMAX(A_INT)) {
             if (!rn2(2)) {
-                pline("Yum!  That was real brain food!");
+                pline(_("Yum!  That was real brain food!"));
                 (void) adjattrib(A_INT, 1, FALSE);
                 break; /* don't give them telepathy, too */
             }
         } else {
-            pline("For some reason, that tasted bland.");
+            pline(_("For some reason, that tasted bland."));
         }
         FALLTHROUGH;
     /*FALLTHRU*/
@@ -1302,7 +1302,7 @@ cpostfx(int pm)
 
         if (dmgtype(ptr, AD_STUN) || dmgtype(ptr, AD_HALU)
             || pm == PM_VIOLET_FUNGUS) {
-            pline("Oh wow!  Great stuff!");
+            pline(_("Oh wow!  Great stuff!"));
             (void) make_hallucinated((HHallucination & TIMEOUT) + 200L, FALSE,
                                      0L);
         }
@@ -1922,7 +1922,7 @@ eatcorpse(struct obj *otmp)
                KILLED_BY_AN); /* acid damage */
     } else if (poisonous(&mons[mnum]) && rn2(5)) {
         tp++;
-        pline("Ecch - that must have been poisonous!");
+        pline(_("Ecch - that must have been poisonous!"));
         if (!Poison_resistance) {
             poison_strdmg(rnd(4), rnd(15),
                           !glob ? "poisonous corpse" : "poisonous glob",
@@ -1965,7 +1965,7 @@ eatcorpse(struct obj *otmp)
             consume_oeaten(otmp, 2); /* oeaten >>= 2 */
     } else if ((mnum == PM_COCKATRICE || mnum == PM_CHICKATRICE)
                && (Stone_resistance || Hallucination)) {
-        pline("This tastes just like chicken!");
+        pline(_("This tastes just like chicken!"));
     } else if (mnum == PM_FLOATING_EYE && u.umonnum == PM_RAVEN) {
         You("peck the eyeball with delight.");
     } else if (tp) {
@@ -2103,7 +2103,7 @@ fprefx(struct obj *otmp)
             explode(u.ux, u.uy, -11, d(3, 6), 0, EXPL_FIERY);
             return FALSE;
         } else if (stale_egg(otmp)) {
-            pline("Ugh.  Rotten egg."); /* perhaps others like it */
+            pline(_("Ugh.  Rotten egg.")); /* perhaps others like it */
             /* increasing existing nausea means that it will take longer
                before eventual vomit, but also means that constitution
                will be abused more times before illness completes */
@@ -2125,12 +2125,12 @@ fprefx(struct obj *otmp)
         break;
     case TRIPE_RATION:
         if (carnivorous(gy.youmonst.data) && !humanoid(gy.youmonst.data)) {
-            pline("This tripe ration is surprisingly good!");
+            pline(_("This tripe ration is surprisingly good!"));
         } else if (maybe_polyd(is_orc(gy.youmonst.data), Race_if(PM_ORC))) {
             pline(Hallucination ? "Tastes great!  Less filling!"
                                 : "Mmm, tripe... not bad!");
         } else {
-            pline("Yak - dog food!");
+            pline(_("Yak - dog food!"));
             more_experienced(1, 0);
             newexplevel();
             /* not cannibalism, but we use similar criteria
@@ -2788,7 +2788,7 @@ doeat_nonfood(struct obj *otmp)
         nodelicious = TRUE;
 
     if (otmp->oclass == WEAPON_CLASS && otmp->opoisoned) {
-        pline("Ecch - that must have been poisonous!");
+        pline(_("Ecch - that must have been poisonous!"));
         if (!Poison_resistance) {
             poison_strdmg(rnd(4), rnd(15), xname(otmp), KILLED_BY_AN);
         } else

@@ -5,6 +5,7 @@
 #include "hack.h"
 #include <wchar.h>
 #include <wctype.h>
+#include <unistd.h>
 
 /*
  * UTF-8 width functions - always available regardless of ENABLE_NLS
@@ -87,17 +88,84 @@ static const char *
 get_locale_for_lang(const char *lang)
 {
     if (!lang || !*lang)
-        return "ko_KR.UTF-8";  /* Default to Korean for HanNetHack */
+        return "ko_KR.utf8";  /* Default to Korean for HanNetHack */
     if (strcmp(lang, "ko") == 0)
-        return "ko_KR.UTF-8";
+        return "ko_KR.utf8";
     if (strcmp(lang, "en") == 0)
-        return "en_US.UTF-8";
+        return "en_US.utf8";
     if (strcmp(lang, "ja") == 0)
-        return "ja_JP.UTF-8";
+        return "ja_JP.utf8";
     if (strcmp(lang, "zh") == 0)
-        return "zh_CN.UTF-8";
+        return "zh_CN.utf8";
     /* For other codes, try to construct a locale name */
-    return "en_US.UTF-8";  /* Fallback */
+    return "en_US.utf8";  /* Fallback */
+}
+
+/*
+ * Find locale directory by checking multiple paths
+ * The lang parameter specifies which language to look for (e.g., "ko", "ja", "en")
+ */
+static const char *
+find_locale_dir(const char *lang)
+{
+    static char localedir_buf[BUFSZ];
+    const char *env_dir;
+    char testpath[BUFSZ];
+
+    if (!lang || !*lang)
+        lang = "ko";  /* Default to Korean */
+
+    /* 1. Check environment variable first */
+    env_dir = getenv("NETHACK_LOCALE_DIR");
+    if (env_dir && env_dir[0]) {
+        snprintf(testpath, sizeof(testpath), "%s/%s/LC_MESSAGES/nethack.mo", env_dir, lang);
+        if (access(testpath, R_OK) == 0)
+            return env_dir;
+    }
+
+    /* 2. Check relative to executable (for development/portable installs) */
+#ifdef __linux__
+    {
+        char exe_path[BUFSZ];
+        ssize_t len = readlink("/proc/self/exe", exe_path, sizeof(exe_path) - 1);
+        if (len > 0) {
+            char *slash;
+            exe_path[len] = '\0';
+            slash = strrchr(exe_path, '/');
+            if (slash) {
+                *slash = '\0';
+                /* Try ../locale (if exe is in src/) */
+                snprintf(localedir_buf, sizeof(localedir_buf), "%s/../locale", exe_path);
+                snprintf(testpath, sizeof(testpath), "%s/%s/LC_MESSAGES/nethack.mo", localedir_buf, lang);
+                if (access(testpath, R_OK) == 0)
+                    return localedir_buf;
+                /* Try ./locale (if exe is in root) */
+                snprintf(localedir_buf, sizeof(localedir_buf), "%s/locale", exe_path);
+                snprintf(testpath, sizeof(testpath), "%s/%s/LC_MESSAGES/nethack.mo", localedir_buf, lang);
+                if (access(testpath, R_OK) == 0)
+                    return localedir_buf;
+            }
+        }
+    }
+#endif
+
+    /* 3. Check HACKDIR/locale */
+#ifdef HACKDIR
+    snprintf(localedir_buf, sizeof(localedir_buf), "%s/locale", HACKDIR);
+    snprintf(testpath, sizeof(testpath), "%s/%s/LC_MESSAGES/nethack.mo", localedir_buf, lang);
+    if (access(testpath, R_OK) == 0)
+        return localedir_buf;
+#endif
+
+    /* 4. Check compile-time LOCALEDIR */
+#ifdef LOCALEDIR
+    snprintf(testpath, sizeof(testpath), "%s/%s/LC_MESSAGES/nethack.mo", LOCALEDIR, lang);
+    if (access(testpath, R_OK) == 0)
+        return LOCALEDIR;
+#endif
+
+    /* 5. Fallback to system default */
+    return "/usr/share/locale";
 }
 
 /*
@@ -105,9 +173,9 @@ get_locale_for_lang(const char *lang)
  *
  * This function changes the locale and updates gettext settings.
  * For gettext to work, we need:
- * 1. LOCPATH pointing to the locale directory (for user-installed locales)
- * 2. A non-C locale set (glibc ignores LANGUAGE when LC_ALL=C)
- * 3. LANGUAGE set to the desired language code
+ * 1. A non-C locale set (glibc ignores LANGUAGE when LC_ALL=C)
+ * 2. LANGUAGE set to the desired language code
+ * 3. Correct locale directory for gettext message catalogs
  */
 void
 set_language(const char *lang)
@@ -119,18 +187,8 @@ set_language(const char *lang)
     if (!lang || !*lang)
         lang = "ko";  /* Default to Korean for HanNetHack */
 
-    /* Determine locale directory */
-    localedir = getenv("NETHACK_LOCALE_DIR");
-    if (!localedir) {
-#ifdef LOCALEDIR
-        localedir = LOCALEDIR;
-#else
-        localedir = "/usr/share/locale";
-#endif
-    }
-
-    /* Set LOCPATH so setlocale can find user-installed locales */
-    setenv("LOCPATH", localedir, 1);
+    /* Automatically find locale directory for the specified language */
+    localedir = find_locale_dir(lang);
 
     /* Set LANGUAGE for gettext message catalog lookup */
     setenv("LANGUAGE", lang, 1);
@@ -138,9 +196,11 @@ set_language(const char *lang)
     /* Get the full locale name for this language */
     locale_name = get_locale_for_lang(lang);
 
-    /* Try to set the locale - this requires locale data to exist in LOCPATH
-     * or system locale directories. If the locale is available, gettext
-     * will use LANGUAGE to find the message catalog. */
+    /* Try to set the locale - this requires locale data to exist in system
+     * locale directories. Note: We must NOT set LOCPATH before setlocale
+     * because LOCPATH affects where glibc looks for locale data, and our
+     * locale directory only contains gettext message catalogs, not locale
+     * data (LC_CTYPE, etc). */
     loc_result = setlocale(LC_ALL, locale_name);
     if (!loc_result) {
         /* Locale not available, try empty string (use environment) */

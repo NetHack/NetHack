@@ -2688,7 +2688,7 @@ dokeylist(void)
 
     /* directional keys */
     putstr(datawin, 0, "");
-    putstr(datawin, 0, "Directional keys:");
+    putstr(datawin, 0, _("Directional keys:"));
     show_direction_keys(datawin, '.', FALSE); /* '.'==self in direct'n grid */
 
     if (!iflags.num_pad) {
@@ -2710,7 +2710,7 @@ dokeylist(void)
     putstr(datawin, 0, buf);
 
     putstr(datawin, 0, "");
-    putstr(datawin, 0, "Miscellaneous keys:");
+    putstr(datawin, 0, _("Miscellaneous keys:"));
     for (i = 0; misc_keys[i].desc; ++i) {
         if (misc_keys[i].numpad && !iflags.num_pad)
             continue;
@@ -2759,14 +2759,14 @@ dokeylist(void)
 
     if (keylist_putcmds(datawin, TRUE, GENERALCMD, IGNORECMD, keys_used)) {
         putstr(datawin, 0, "");
-        putstr(datawin, 0, "General commands:");
+        putstr(datawin, 0, _("General commands:"));
         (void) keylist_putcmds(datawin, FALSE, GENERALCMD,
                                IGNORECMD, keys_used);
     }
 
     if (keylist_putcmds(datawin, TRUE, 0, GENERALCMD | IGNORECMD, keys_used)) {
         putstr(datawin, 0, "");
-        putstr(datawin, 0, "Game commands:");
+        putstr(datawin, 0, _("Game commands:"));
         (void) keylist_putcmds(datawin, FALSE, 0,
                                GENERALCMD | IGNORECMD,
                                keys_used);
@@ -2775,7 +2775,7 @@ dokeylist(void)
     if (wizard && keylist_putcmds(datawin, TRUE,
                                   WIZMODECMD, INTERNALCMD, keys_used)) {
         putstr(datawin, 0, "");
-        putstr(datawin, 0, "Debug mode commands:");
+        putstr(datawin, 0, _("Debug mode commands:"));
         (void) keylist_putcmds(datawin, FALSE,
                                WIZMODECMD, INTERNALCMD, keys_used);
     }
