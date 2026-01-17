@@ -276,10 +276,6 @@ msgid "You feel yourself moving faster."
 msgstr "빨라지는 것을 느꼈다."
 
 #: src/timeout.c
-msgid "You feel yourself slowing down."
-msgstr "느려지는 것을 느꼈다."
-
-#: src/timeout.c
 msgid "You feel less confused now."
 msgstr "덜 혼란스러워졌다."
 
@@ -466,3 +462,63 @@ msgstr "투명의 반지"
 #: src/objects.c
 msgid "amulet of life saving"
 msgstr "생명 보호의 부적"
+
+# ============================================================
+# Copyright 배너 (Copyright Banner)
+# ============================================================
+
+#: include/patchlevel.h
+msgid "NetHack, Copyright 1985-2026"
+msgstr "NetHack, 저작권 1985-2026"
+
+#: include/patchlevel.h
+msgid "         By Stichting Mathematisch Centrum and M. Stephenson."
+msgstr "         Stichting Mathematisch Centrum 및 M. Stephenson 제작."
+
+#: include/patchlevel.h
+msgid "         See license for details."
+msgstr "         자세한 내용은 라이선스를 참조하세요."
+
+# ============================================================
+# 역할 선택 메뉴 (Role Selection Menu)
+# ============================================================
+
+#: src/role.c
+msgid "Yes; start game"
+msgstr "예; 게임 시작"
+
+#: src/role.c
+msgid "No; choose role again"
+msgstr "아니오; 역할 다시 선택"
+
+#: src/role.c
+msgid "Not yet; choose another name"
+msgstr "아직; 다른 이름 선택"
+
+#: src/role.c
+msgid "Quit"
+msgstr "종료"
+
+#: src/role.c
+msgid "Is this ok? [yn%sq]"
+msgstr "이대로 진행할까요? [yn%sq]"
+
+#: src/role.c
+msgid "Random"
+msgstr "무작위"
+
+#: src/role.c
+msgid "Pick a role or profession"
+msgstr "역할 선택"
+
+#: src/role.c
+msgid "Pick a race or species"
+msgstr "종족 선택"
+
+#: src/role.c
+msgid "Pick a gender or sex"
+msgstr "성별 선택"
+
+#: src/role.c
+msgid "Pick an alignment or creed"
+msgstr "성향 선택"
