@@ -1565,6 +1565,9 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #include "nhlua.h"
 #endif
 
+/* Internationalization support */
+#include "i18n.h"
+
 #if !defined(RECOVER_C)
 
 #include "extern.h"

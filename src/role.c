@@ -1947,12 +1947,12 @@ role_menu_extra(int which, winid where, boolean preselect)
     } else if (which == ROLE_RANDOM) {
         any.a_int = ROLE_RANDOM;
         add_menu(where, &nul_glyphinfo, &any, '*', 0,
-                 ATR_NONE, clr, "Random",
+                 ATR_NONE, clr, _("Random"),
                  preselect ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     } else if (which == ROLE_NONE) {
         any.a_int = ROLE_NONE;
         add_menu(where, &nul_glyphinfo, &any, 'q', 0,
-                 ATR_NONE, clr, "Quit",
+                 ATR_NONE, clr, _("Quit"),
                  preselect ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     } else {
         impossible("role_menu_extra: bad arg (%d)", which);
@@ -2317,7 +2317,7 @@ genl_player_setup(int screenheight)
                     role_menu_extra(RS_ALGNMNT, win, FALSE);
                     role_menu_extra(RS_filter, win, FALSE);
                     role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
-                    Strcpy(pbuf, "Pick a role or profession");
+                    Strcpy(pbuf, _("Pick a role or profession"));
                     end_menu(win, pbuf);
                     n = select_menu(win, PICK_ONE, &selected);
                     /*
@@ -2411,7 +2411,7 @@ genl_player_setup(int screenheight)
                         role_menu_extra(RS_ALGNMNT, win, FALSE);
                         role_menu_extra(RS_filter, win, FALSE);
                         role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
-                        Strcpy(pbuf, "Pick a race or species");
+                        Strcpy(pbuf, _("Pick a race or species"));
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
                         if (n > 0) {
@@ -2499,7 +2499,7 @@ genl_player_setup(int screenheight)
                         role_menu_extra(RS_ALGNMNT, win, FALSE);
                         role_menu_extra(RS_filter, win, FALSE);
                         role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
-                        Strcpy(pbuf, "Pick a gender or sex");
+                        Strcpy(pbuf, _("Pick a gender or sex"));
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
                         if (n > 0) {
@@ -2585,7 +2585,7 @@ genl_player_setup(int screenheight)
                         role_menu_extra(RS_GENDER, win, FALSE);
                         role_menu_extra(RS_filter, win, FALSE);
                         role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
-                        Strcpy(pbuf, "Pick an alignment or creed");
+                        Strcpy(pbuf, _("Pick an alignment or creed"));
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
                         if (n > 0) {
@@ -2654,20 +2654,20 @@ genl_player_setup(int screenheight)
         /* [ynaq] menu choices */
         any.a_int = 1;
         add_menu(win, &nul_glyphinfo, &any, 'y', 0,
-                 ATR_NONE, clr, "Yes; start game", MENU_ITEMFLAGS_SELECTED);
+                 ATR_NONE, clr, _("Yes; start game"), MENU_ITEMFLAGS_SELECTED);
         any.a_int = 2;
         add_menu(win, &nul_glyphinfo, &any, 'n', 0,
-                 ATR_NONE, clr, "No; choose role again", MENU_ITEMFLAGS_NONE);
+                 ATR_NONE, clr, _("No; choose role again"), MENU_ITEMFLAGS_NONE);
         if (iflags.renameallowed) {
             any.a_int = 3;
             add_menu(win, &nul_glyphinfo, &any, 'a', 0, ATR_NONE,
-                     clr, "Not yet; choose another name",
+                     clr, _("Not yet; choose another name"),
                      MENU_ITEMFLAGS_NONE);
         }
         any.a_int = -1;
         add_menu(win, &nul_glyphinfo, &any, 'q', 0,
-                 ATR_NONE, clr, "Quit", MENU_ITEMFLAGS_NONE);
-        Sprintf(pbuf, "Is this ok? [yn%sq]", iflags.renameallowed ? "a" : "");
+                 ATR_NONE, clr, _("Quit"), MENU_ITEMFLAGS_NONE);
+        Sprintf(pbuf, _("Is this ok? [yn%sq]"), iflags.renameallowed ? "a" : "");
         end_menu(win, pbuf);
         n = select_menu(win, PICK_ONE, &selected);
         /* [pick-one menus with a preselected entry behave oddly...] */

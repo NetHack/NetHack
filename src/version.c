@@ -469,19 +469,19 @@ copyright_banner_line(int indx)
 {
 #ifdef COPYRIGHT_BANNER_A
     if (indx == 1)
-        return COPYRIGHT_BANNER_A;
+        return _(COPYRIGHT_BANNER_A);
 #endif
 #ifdef COPYRIGHT_BANNER_B
     if (indx == 2)
-        return COPYRIGHT_BANNER_B;
+        return _(COPYRIGHT_BANNER_B);
 #endif
 
     if (indx == 3)
-        return nomakedefs.copyright_banner_c;
+        return nomakedefs.copyright_banner_c;  /* runtime generated, not translated */
 
 #ifdef COPYRIGHT_BANNER_D
     if (indx == 4)
-        return COPYRIGHT_BANNER_D;
+        return _(COPYRIGHT_BANNER_D);
 #endif
     return "";
 }

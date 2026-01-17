@@ -36,6 +36,9 @@
 #define DEBUG
 #endif
 
+/* i18n: These banners are marked for translation extraction by xgettext.
+ * The actual translation happens at runtime via _() in copyright_banner_line()
+ * We use a simple wrapper that expands to the string itself at compile time. */
 #define COPYRIGHT_BANNER_A "NetHack, Copyright 1985-2026"
 #define COPYRIGHT_BANNER_B \
     "         By Stichting Mathematisch Centrum and M. Stephenson."
