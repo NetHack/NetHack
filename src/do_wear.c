@@ -3244,7 +3244,7 @@ destroy_arm(struct obj *atmp)
     wornarm_destroyed(otmp);
     /* glove loss means wielded weapon will be touched */
     if (losing_gloves)
-        selftouch("You");
+        selftouch(_("You"));
 
     stop_occupation();
     return 1;

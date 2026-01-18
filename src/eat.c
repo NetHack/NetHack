@@ -3423,7 +3423,7 @@ newuhs(boolean incr)
                 ga.afternmv = unfaint;
                 newhs = FAINTED;
                 if (!Levitation)
-                    selftouch("Falling, you");
+                    selftouch(_("Falling, you"));
             }
 
         /* this used to be -(200 + 20 * Con) but that was when being asleep

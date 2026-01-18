@@ -20771,6 +20771,16 @@ msgstr "용암 위로 이동한다."
 msgid "You are %s."
 msgstr "당신은 %s."
 
+# selftouch messages
+msgid "Falling, you"
+msgstr "떨어지며"
+
+msgid "After losing your gloves, you"
+msgstr "장갑을 잃은 후"
+
+msgid "As you fall, you"
+msgstr "떨어지면서"
+
 #~ msgid "You feel like someone is helping you."
 #~ msgstr "누군가 도와주는 것 같다."
 

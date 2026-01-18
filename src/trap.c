@@ -1937,7 +1937,7 @@ trapeffect_pit(
                 placebc();
             }
             if (!conj_pit)
-                selftouch("Falling, you");
+                selftouch(_("Falling, you"));
             gv.vision_full_recalc = 1; /* vision limits change */
             exercise(A_STR, FALSE);
             exercise(A_DEX, FALSE);
@@ -4038,7 +4038,7 @@ float_down(
                     losehp(rnd(2), "dangerous winds", KILLED_BY);
                     if (u.usteed)
                         dismount_steed(DISMOUNT_FELL);
-                    selftouch("As you fall, you");
+                    selftouch(_("As you fall, you"));
                 } else if (u.usteed && (is_floater(u.usteed->data)
                                         || is_flyer(u.usteed->data))) {
                     You(_("settle more firmly in the saddle."));

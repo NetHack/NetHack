@@ -1793,7 +1793,7 @@ goto_level(
                            ga.at_ladder ? "falling off a ladder"
                                      : "tumbling down a flight of stairs",
                            KILLED_BY);
-                selftouch("Falling, you");
+                selftouch(_("Falling, you"));
             } else { /* ordinary descent */
                 if (flags.verbose)
                     You(_("%s."), ga.at_ladder ? "climb down the ladder"
@@ -1805,7 +1805,7 @@ goto_level(
         if (falling) {
             if (Punished && !welded(uball))
                 ballfall();
-            selftouch("Falling, you");
+            selftouch(_("Falling, you"));
             do_fall_dmg = TRUE;
         }
     }

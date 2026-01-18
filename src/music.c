@@ -313,7 +313,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
             set_utrap(rn1(6, 2), TT_PIT);
             losehp(Maybe_Half_Phys(rnd(6)),
                    "fell into a chasm", NO_KILLER_PREFIX);
-            selftouch("Falling, you");
+            selftouch(_("Falling, you"));
         } else if (u.utrap && u.utraptype == TT_PIT) {
             boolean keepfooting =
                     (!(Fumbling && rn2(5))

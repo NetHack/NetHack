@@ -2698,7 +2698,7 @@ retouch_equipment(
     if (had_rings != (!!uleft + !!uright) && uarmg && uarmg->cursed)
         uncurse(uarmg); /* temporary? hack for ring removal plausibility */
     if (had_gloves && !uarmg)
-        selftouch("After losing your gloves, you");
+        selftouch(_("After losing your gloves, you"));
 
     if (!--nesting)
         clear_bypasses(); /* reset upon final exit */
