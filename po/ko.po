@@ -286,13 +286,8 @@ msgid "produce a %shigh-%s."
 msgstr "%s고음의 %s{을/를} 낸다."
 
 #: src/apply.c:508 src/potion.c:292 src/potion.c:318 src/potion.c:406
-#, fuzzy
 msgid "normal"
-msgstr ""
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"평범한\n"
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"정상이다"
+msgstr "정상적인"
 
 #: src/apply.c:509
 msgid "strange, high-pitched"
@@ -1674,13 +1669,9 @@ msgstr "%s:"
 # ============================================================
 #: src/artifact.c:2479 src/hack.c:1550 src/hack.c:1578 src/hack.c:1593
 #: src/wizcmds.c:323
-#, fuzzy, c-format
+#, c-format
 msgid "%s is %s."
-msgstr ""
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"%s{이/가} %s.\n"
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"%s{이} %s."
+msgstr "%s{이/가} %s."
 
 #: src/artifact.c:2494
 #, c-format
@@ -3229,13 +3220,9 @@ msgid "sink backs up, leaving %s."
 msgstr "싱크대가 역류하여 %s{을/를} 남겼다."
 
 #: src/do.c:669 src/pickup.c:2568
-#, fuzzy, c-format
+#, c-format
 msgid "You cannot %s %s you are wearing."
-msgstr ""
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"착용 중인 %s{을/를} %s할 수 없다.\n"
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"입고 있는 %s{을/를} %s 수 없다."
+msgstr "착용 중인 %s{을/를} %s할 수 없다."
 
 #: src/do.c:680
 #, c-format
@@ -4140,9 +4127,8 @@ msgid "Your %s crumbles away!"
 msgstr "당신의 %s{이/가} 부서져 사라졌다!"
 
 #: src/do_wear.c:3247
-#, fuzzy
 msgid "You"
-msgstr "당신의"
+msgstr "당신"
 
 #: src/dog.c:121
 msgid "... into a pile of dust."
@@ -4806,22 +4792,12 @@ msgid "%s back to you, landing %s your %s."
 msgstr "%s{이} 당신에게 돌아와 %s 당신의 %s 근처에 착지한다."
 
 #: src/dothrow.c:1723 src/zap.c:3361
-#, fuzzy
 msgid "beneath"
-msgstr ""
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"아래에\n"
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"아래"
+msgstr "아래에"
 
 #: src/dothrow.c:1723 src/zap.c:3361
-#, fuzzy
 msgid "at"
-msgstr ""
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"에\n"
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"근처"
+msgstr "근처에"
 
 #: src/dothrow.c:1727
 #, c-format
@@ -6488,19 +6464,17 @@ msgid "A wisp of vapor rises up..."
 msgstr "한 줄기 수증기가 피어오른다..."
 
 #: src/fountain.c:810
-#, fuzzy
 msgid "Muddy waste pops up from the drain"
-msgstr "%s 진흙이 배수구에서 솟아올랐다!"
+msgstr "진흙이 배수구에서 솟아올랐다"
 
 #: src/fountain.c:812
-#, fuzzy
 msgid "You hear a sloshing sound"
-msgstr "희미한 출렁거리는 소리."
+msgstr "출렁거리는 소리가 들린다"
 
 #: src/fountain.c:814
-#, fuzzy, c-format
+#, c-format
 msgid "Something splashes you in the %s"
-msgstr "머리에서 글씨가 사라졌다!"
+msgstr "무언가 당신의 %s{을/를} 튀겼다"
 
 #: src/fountain.c:815 src/mhitm.c:31 src/music.c:602 src/objnam.c:3566
 #, c-format
@@ -6512,9 +6486,8 @@ msgid "Flupp!  "
 msgstr ""
 
 #: src/fountain.c:819
-#, fuzzy
 msgid "a ring shining in its midst."
-msgstr "%s{으로/로} 두드리기 시작했다."
+msgstr "그 속에서 반지가 빛나고 있다."
 
 #: src/getpos.c:680
 #, c-format
@@ -8212,17 +8185,12 @@ msgstr "%s{이/가} 당신을 놓아줬다!"
 msgid "%s tries to move %s out of %s way."
 msgstr "%s{이/가} %s{을/를} %s 길에서 치우려 한다."
 
-# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 # brief_feeling messages
 #: src/mhitm.c:238 src/mhitm.c:1004 src/mhitm.c:1051 src/potion.c:626
 #: src/potion.c:1457 src/uhitm.c:3055 src/uhitm.c:3945 src/uhitm.c:4500
-#, fuzzy, c-format
+#, c-format
 msgid "have a %s feeling for a moment, then it passes."
-msgstr ""
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"잠시 %s 느낌이 들었다가, 지나갔다.\n"
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"잠시 %s 느낌이 들었다가 사라진다."
+msgstr "잠시 %s 느낌이 들었다가 지나갔다."
 
 #: src/mhitm.c:238 src/mhitm.c:1051 src/uhitm.c:3945
 msgid "peculiarly sad"
@@ -9322,26 +9290,13 @@ msgid "a door unlock and open."
 msgstr "문이 열리는 소리."
 
 # #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
-#
 #: src/monmove.c:1585 src/monmove.c:1587
-#, fuzzy
 msgid "a door open."
-msgstr ""
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"문이 열리는 소리.\n"
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"문이 열리는 것을."
+msgstr "문이 열리는 소리."
 
-# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
-#
 #: src/monmove.c:1610 src/monmove.c:1612
-#, fuzzy
 msgid "a door crash open."
-msgstr ""
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"문이 쾅 열리는 소리.\n"
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"문이 부서지며 열리는 것을."
+msgstr "문이 쾅 열리는 소리."
 
 #: src/monmove.c:1635
 #, c-format
@@ -11523,9 +11478,8 @@ msgid "being frightened to death"
 msgstr "무서워서 죽을 것 같음"
 
 #: src/potion.c:496 src/priest.c:535
-#, fuzzy
 msgid "You regain your composure."
-msgstr "질식하지만, 침착함을 되찾았다."
+msgstr "침착함을 되찾았다."
 
 #: src/potion.c:528
 msgid "If you can't breathe air, how can you drink liquid?"
@@ -12597,13 +12551,12 @@ msgid "Pilgrim, you enter a %s place!"
 msgstr ""
 
 #: src/priest.c:463
-#, fuzzy
 msgid "desecrated"
-msgstr "포자화된"
+msgstr "모독된"
 
 #: src/priest.c:463
 msgid "sacred"
-msgstr ""
+msgstr "신성한"
 
 #
 #: src/priest.c:506
@@ -14773,13 +14726,8 @@ msgid "Ebenezer Scrooge!"
 msgstr "에베네저 스크루지!"
 
 #: src/sounds.c:532 src/sounds.c:1048
-#, fuzzy
 msgid "I'm hungry."
-msgstr ""
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"배고프다.\n"
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"배고파."
+msgstr "배고프다."
 
 #: src/sounds.c:539
 #, c-format
@@ -15211,13 +15159,8 @@ msgid "Put that weapon away before you hurt someone!"
 msgstr "누군가 다치기 전에 그 무기를 치워!"
 
 #: src/sounds.c:1163 src/uhitm.c:4348
-#, fuzzy
 msgid "Doc, I can't help you unless you cooperate."
-msgstr ""
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"박사님, 협조하지 않으면 도울 수 없습니다.\n"
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"선생님, 협조해주시지 않으면 도와드릴 수 없어요."
+msgstr "선생님, 협조해주시지 않으면 도와드릴 수 없어요."
 
 #: src/sounds.c:1164
 msgid "Please undress so I can examine you."
@@ -15232,22 +15175,12 @@ msgid "Relax, this won't hurt a bit."
 msgstr "진정해요, 하나도 안 아플 거예요."
 
 #: src/sounds.c:1172 src/vault.c:582
-#, fuzzy
 msgid "Please drop that gold and follow me."
-msgstr ""
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"금화를 버리고 따라오시오.\n"
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"그 금화를 떨어뜨리고 따라오세요."
+msgstr "금화를 떨어뜨리고 따라오세요."
 
 #: src/sounds.c:1174 src/vault.c:558
-#, fuzzy
 msgid "Please follow me."
-msgstr ""
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"따라오시오.\n"
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"따라오세요."
+msgstr "따라오세요."
 
 #: src/sounds.c:1180
 msgid "What lousy pay we're getting here!"
@@ -16724,24 +16657,24 @@ msgid "are covered with rust!"
 msgstr "녹으로 뒤덮였다!"
 
 #: src/trap.c:1661
-#, fuzzy, c-format
+#, c-format
 msgid "%s %s on the %s!"
-msgstr "%s{이/가} %s{을/를} %s."
+msgstr "%s %s의 %s에!"
 
 #: src/trap.c:1669
-#, fuzzy, c-format
+#, c-format
 msgid "%s %s's left %s!"
-msgstr "%s{이/가} 왼쪽 %s{을/를}!"
+msgstr "%s %s의 왼쪽 %s에!"
 
 #: src/trap.c:1684
-#, fuzzy, c-format
+#, c-format
 msgid "%s %s's right %s!"
-msgstr "당신의 오른쪽 %s{을/를} %s!"
+msgstr "%s %s의 오른쪽 %s에!"
 
 #: src/trap.c:1742
-#, fuzzy, c-format
+#, c-format
 msgid "A %s erupts from the %s under %s!"
-msgstr "%s{이} %s에서 분출하는 것을!"
+msgstr "%s{이/가} %s 아래 %s에서 분출했다!"
 
 #: src/trap.c:1742 src/trap.c:1746 src/trap.c:4169
 msgid "tower of flame"

@@ -27,6 +27,12 @@ staticfn int kick_nondoor(coordxy, coordxy, int);
 staticfn void otransit_msg(struct obj *, boolean, boolean, long);
 staticfn void drop_to(coord *, schar, coordxy, coordxy) NONNULLARG1;
 
+/*
+ * Korean i18n notes (HanNetHack):
+ * - Removed static 'kick_passes_thru' string
+ * - Now inlined with _() at each usage for translation support
+ */
+
 /* kicking damage when not poly'd into a form with a kick attack */
 staticfn void
 kickdmg(struct monst *mon, boolean clumsy)

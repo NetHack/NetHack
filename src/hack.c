@@ -2204,7 +2204,12 @@ domove_swap_with_pet(
     return !didnt_move;
 }
 
-/* force-fight (x,y) which doesn't have anything to fight */
+/* force-fight (x,y) which doesn't have anything to fight
+ *
+ * Korean i18n notes (HanNetHack):
+ * - Removed static 'unknown_obstacle' string
+ * - Now inlined with _() at each usage for translation support
+ */
 staticfn boolean
 domove_fight_empty(coordxy x, coordxy y)
 {
