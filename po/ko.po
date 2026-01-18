@@ -1090,17 +1090,8 @@ msgstr "바위가 %s%s."
 msgid "a boulder %s."
 msgstr "바위가 %s."
 
-#: /home/jinhong_kim/workspace/HanNetHack/src/do.c:279
-#: /home/jinhong_kim/workspace/HanNetHack/src/dothrow.c:2637
-#: /home/jinhong_kim/workspace/HanNetHack/src/dig.c:1225
-#: /home/jinhong_kim/workspace/HanNetHack/src/dig.c:1227
-#, fuzzy
 msgid "Splash!"
-msgstr ""
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"첨벙!\n"
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-"철벅!"
+msgstr "첨벙!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:281
 msgid "Plop!"
@@ -14851,12 +14842,22 @@ msgid "pool"
 msgstr "고인다"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/zap.c:3361
+#, fuzzy
 msgid "beneath"
-msgstr "아래에"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"아래에\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"아래"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/zap.c:3361
+#, fuzzy
 msgid "at"
-msgstr "에"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"에\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"근처"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/zap.c:3413
 msgid "shuddering vibrations."
@@ -19847,6 +19848,144 @@ msgstr "%s{을/를} 밖에 두시오."
 msgid "doesn't want"
 msgstr "원하지 않는다"
 
+# New translations from additional source code review
+msgid "can hear again."
+msgstr "다시 들을 수 있게 되었다."
+
+msgid "are unable to hear anything."
+msgstr "아무것도 들을 수 없게 되었다."
+
+msgid "wobble unsteadily for a moment."
+msgstr "잠시 불안정하게 흔들린다."
+
+msgid "gain control of your flight."
+msgstr "비행을 통제하게 되었다."
+
+msgid "smell hamburgers."
+msgstr "햄버거 냄새를 맡는다."
+
+msgid "smell charred flesh."
+msgstr "타는 살 냄새를 맡는다."
+
+msgid "Wow, a double header!"
+msgstr "와, 더블 헤더!"
+
+msgid "The coin miraculously lands on its edge!"
+msgstr "동전이 기적적으로 모서리에 섰다!"
+
+msgid "heads"
+msgstr "앞면"
+
+msgid "tails"
+msgstr "뒷면"
+
+msgid "Unknown command '%s'."
+msgstr "알 수 없는 명령 '%s'."
+
+# dothrow.c translations
+msgid "%s lands %s your %s."
+msgstr "%s{이} %s 당신의 %s 근처에 떨어진다."
+
+msgid "%s back to you, landing %s your %s."
+msgstr "%s{이} 당신에게 돌아와 %s 당신의 %s 근처에 착지한다."
+
+msgid "%s your %s!"
+msgstr "%s{이} 당신의 %s{을} 맞혔다!"
+
+msgid "%s back toward you, hitting your %s!"
+msgstr "%s{이} 당신 쪽으로 돌아와 %s{을} 맞혔다!"
+
+# stairs.c translations
+msgid "ladder"
+msgstr "사다리"
+
+msgid "staircase"
+msgstr "계단"
+
+msgid "up"
+msgstr "위로"
+
+msgid "down"
+msgstr "아래로"
+
+msgid "branch "
+msgstr "분기 "
+
+msgid "out of the dungeon"
+msgstr "던전 밖으로"
+
+msgid "to the Elemental Planes"
+msgstr "원소의 평면으로"
+
+msgid "to the end game"
+msgstr "엔드게임으로"
+
+# end.c translations
+msgid "Demigoddess"
+msgstr "반신녀"
+
+msgid "Demigod"
+msgstr "반신"
+
+msgid "went to your reward"
+msgstr "보상을 받으러 갔다"
+
+msgid "escaped from the dungeon"
+msgstr "던전을 탈출했다"
+
+# windows.c translations
+msgid "Toggle off 'autopickup' to not pick up anything."
+msgstr "'autopickup'을 끄면 아무것도 줍지 않습니다."
+
+msgid "Toggle on 'autopickup' to automatically pick these things up."
+msgstr "'autopickup'을 켜면 이것들을 자동으로 줍습니다."
+
+# pager.c monster health descriptions
+msgid "uninjured"
+msgstr "부상없음"
+
+msgid "nearly "
+msgstr "거의 "
+
+msgid "deceased"
+msgstr "죽음"
+
+msgid "defunct"
+msgstr "작동안함"
+
+msgid "barely "
+msgstr "간신히 "
+
+msgid "slightly "
+msgstr "약간 "
+
+msgid "heavily "
+msgstr "심하게 "
+
+msgid "tail of "
+msgstr "꼬리: "
+
+msgid "tail of a "
+msgstr "꼬리: "
+
+msgid "tame "
+msgstr "길들인 "
+
+msgid "peaceful "
+msgstr "평화로운 "
+
+msgid ", swallowing you"
+msgstr ", 당신을 삼키는 중"
+
+msgid ", engulfing you"
+msgstr ", 당신을 감싸는 중"
+
+msgid ", being held"
+msgstr ", 붙잡힌 상태"
+
+msgid ", holding you"
+msgstr ", 당신을 붙잡는 중"
+
 #~ msgid "You feel like someone is helping you."
 #~ msgstr "누군가 도와주는 것 같다."
 
@@ -19996,156 +20135,3 @@ msgstr "원하지 않는다"
 # ============================================================
 #~ msgid "This food really hits the spot"
 #~ msgstr "이 음식 정말 맛있다"
-
-# New translations from additional source code review
-msgid "can hear again."
-msgstr "다시 들을 수 있게 되었다."
-
-msgid "are unable to hear anything."
-msgstr "아무것도 들을 수 없게 되었다."
-
-msgid "wobble unsteadily for a moment."
-msgstr "잠시 불안정하게 흔들린다."
-
-msgid "gain control of your flight."
-msgstr "비행을 통제하게 되었다."
-
-msgid "smell hamburgers."
-msgstr "햄버거 냄새를 맡는다."
-
-msgid "smell charred flesh."
-msgstr "타는 살 냄새를 맡는다."
-
-msgid "Wow, a double header!"
-msgstr "와, 더블 헤더!"
-
-msgid "The coin miraculously lands on its edge!"
-msgstr "동전이 기적적으로 모서리에 섰다!"
-
-msgid "heads"
-msgstr "앞면"
-
-msgid "tails"
-msgstr "뒷면"
-
-msgid "Splash!"
-msgstr "첨벙!"
-
-msgid "Plop!"
-msgstr "퐁당!"
-
-msgid "Unknown command '%s'."
-msgstr "알 수 없는 명령 '%s'."
-
-# dothrow.c translations
-msgid "%s lands %s your %s."
-msgstr "%s{이} %s 당신의 %s 근처에 떨어진다."
-
-msgid "%s back to you, landing %s your %s."
-msgstr "%s{이} 당신에게 돌아와 %s 당신의 %s 근처에 착지한다."
-
-msgid "beneath"
-msgstr "아래"
-
-msgid "at"
-msgstr "근처"
-
-msgid "%s your %s!"
-msgstr "%s{이} 당신의 %s{을} 맞혔다!"
-
-msgid "%s back toward you, hitting your %s!"
-msgstr "%s{이} 당신 쪽으로 돌아와 %s{을} 맞혔다!"
-
-# stairs.c translations
-msgid "ladder"
-msgstr "사다리"
-
-msgid "staircase"
-msgstr "계단"
-
-msgid "stairs"
-msgstr "계단"
-
-msgid "up"
-msgstr "위로"
-
-msgid "down"
-msgstr "아래로"
-
-msgid "branch "
-msgstr "분기 "
-
-msgid "out of the dungeon"
-msgstr "던전 밖으로"
-
-msgid "to the Elemental Planes"
-msgstr "원소의 평면으로"
-
-msgid "to the end game"
-msgstr "엔드게임으로"
-
-# end.c translations
-msgid "Demigoddess"
-msgstr "반신녀"
-
-msgid "Demigod"
-msgstr "반신"
-
-msgid "went to your reward"
-msgstr "보상을 받으러 갔다"
-
-msgid "escaped from the dungeon"
-msgstr "던전을 탈출했다"
-
-# windows.c translations
-msgid "Toggle off 'autopickup' to not pick up anything."
-msgstr "'autopickup'을 끄면 아무것도 줍지 않습니다."
-
-msgid "Toggle on 'autopickup' to automatically pick these things up."
-msgstr "'autopickup'을 켜면 이것들을 자동으로 줍습니다."
-
-# pager.c monster health descriptions
-msgid "uninjured"
-msgstr "부상없음"
-
-msgid "nearly "
-msgstr "거의 "
-
-msgid "deceased"
-msgstr "죽음"
-
-msgid "defunct"
-msgstr "작동안함"
-
-msgid "barely "
-msgstr "간신히 "
-
-msgid "slightly "
-msgstr "약간 "
-
-msgid "heavily "
-msgstr "심하게 "
-
-msgid "tail of "
-msgstr "꼬리: "
-
-msgid "tail of a "
-msgstr "꼬리: "
-
-msgid "tame "
-msgstr "길들인 "
-
-msgid "peaceful "
-msgstr "평화로운 "
-
-msgid ", swallowing you"
-msgstr ", 당신을 삼키는 중"
-
-msgid ", engulfing you"
-msgstr ", 당신을 감싸는 중"
-
-msgid ", being held"
-msgstr ", 붙잡힌 상태"
-
-msgid ", holding you"
-msgstr ", 당신을 붙잡는 중"
