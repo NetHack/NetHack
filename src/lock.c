@@ -378,18 +378,16 @@ pick_lock(
 
     /* check whether we're resuming an interrupted previous attempt */
     if (gx.xlock.usedtime && picktyp == gx.xlock.picktyp) {
-        static char no_longer[] = "Unfortunately, you can no longer %s %s.";
-
         if (nohands(gy.youmonst.data)) {
-            const char *what = (picktyp == LOCK_PICK) ? "pick" : "key";
+            const char *what = (picktyp == LOCK_PICK) ? _("pick") : _("key");
 
             if (picktyp == CREDIT_CARD)
-                what = "card";
-            pline(no_longer, "hold the", what);
+                what = _("card");
+            pline(_("Unfortunately, you can no longer %s %s."), _("hold the"), what);
             reset_pick();
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (u.uswallow || (gx.xlock.box && !can_reach_floor(TRUE))) {
-            pline(no_longer, "reach the", "lock");
+            pline(_("Unfortunately, you can no longer %s %s."), _("reach the"), _("lock"));
             reset_pick();
             return PICKLOCK_LEARNED_SOMETHING;
         } else {

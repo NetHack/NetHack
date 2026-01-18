@@ -1308,22 +1308,19 @@ pleased(aligntyp g_align)
             break;
         }
         case 5: {
-            static NEARDATA const char msg[] =
-                "\"and thus I grant thee the gift of %s!\"";
-
             godvoice(u.ualign.type,
-                     "Thou hast pleased me with thy progress,");
+                     _("Thou hast pleased me with thy progress,"));
             if (!(HTelepat & INTRINSIC)) {
                 HTelepat |= FROMOUTSIDE;
-                pline(msg, "Telepathy");
+                pline(_("\"and thus I grant thee the gift of %s!\""), _("Telepathy"));
                 if (Blind)
                     see_monsters();
             } else if (!(HFast & INTRINSIC)) {
                 HFast |= FROMOUTSIDE;
-                pline(msg, "Speed");
+                pline(_("\"and thus I grant thee the gift of %s!\""), _("Speed"));
             } else if (!(HStealth & INTRINSIC)) {
                 HStealth |= FROMOUTSIDE;
-                pline(msg, "Stealth");
+                pline(_("\"and thus I grant thee the gift of %s!\""), _("Stealth"));
             } else {
                 if (!(HProtection & INTRINSIC)) {
                     HProtection |= FROMOUTSIDE;
@@ -1331,7 +1328,7 @@ pleased(aligntyp g_align)
                         u.ublessed = rn1(3, 2);
                 } else
                     u.ublessed++;
-                pline(msg, "my protection");
+                pline(_("\"and thus I grant thee the gift of %s!\""), _("my protection"));
             }
             SetVoice((struct monst *) 0, 0, 80, voice_deity);
             verbalize(_("Use it wisely in my name!"));

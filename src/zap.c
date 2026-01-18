@@ -2101,9 +2101,9 @@ stone_to_flesh_obj(struct obj *obj) /* nonnull */
            non-eating, or something stranger) */
         if (Role_if(PM_MONK) || !u.uconduct.unvegetarian
             || !carnivorous(gy.youmonst.data))
-            Norep("You smell the odor of meat.");
+            Norep(_("You smell the odor of meat."));
         else
-            Norep("You smell a delicious smell.");
+            Norep(_("You smell a delicious smell."));
     }
     newsym(oox, ooy);
     return res;
@@ -5130,7 +5130,7 @@ zap_over_floor(
         if (t && t->ttyp == WEB) {
             /* a burning web is too flimsy to notice if you can't see it */
             if (see_it)
-                Norep("A web bursts into flames!");
+                Norep(_("A web bursts into flames!"));
             (void) delfloortrap(t), t = (struct trap *) 0;
             if (see_it)
                 newsym(x, y);
@@ -5140,9 +5140,9 @@ zap_over_floor(
         } else if (is_pool(x, y)) {
             boolean on_water_level = Is_waterlevel(&u.uz), msggiven = FALSE;
             const char *msgtxt = (!Deaf)
-                                 ? "You hear hissing gas." /* Deaf-aware */
+                                 ? _("You hear hissing gas.") /* Deaf-aware */
                                  : (type >= 0)
-                                   ? "That seemed remarkably uneventful."
+                                   ? _("That seemed remarkably uneventful.")
                                    : (char *) 0;
 
             /* don't create steam clouds on Plane of Water; air bubble
@@ -5156,9 +5156,9 @@ zap_over_floor(
             if (lev->typ != POOL) { /* MOAT or DRAWBRIDGE_UP or WATER */
                 t = (struct trap *) 0;
                 if (on_water_level)
-                    msgtxt = (see_it || !Deaf) ? "Some water boils." : 0;
+                    msgtxt = (see_it || !Deaf) ? _("Some water boils.") : 0;
                 else if (see_it)
-                    msgtxt = "Some water evaporates.";
+                    msgtxt = _("Some water evaporates.");
             } else {
                 rangemod -= 3;
                 lev->typ = ROOM, lev->flags = 0;
@@ -5166,7 +5166,7 @@ zap_over_floor(
                 /*if (t) -- this was before the vapor cloud was added --
                       t->tseen = 1;*/
                 if (see_it)
-                    msgtxt = "The water evaporates.";
+                    msgtxt = _("The water evaporates.");
             }
             if (msgtxt && !msggiven)
                 Norep("%s", msgtxt);
@@ -5245,12 +5245,12 @@ zap_over_floor(
                 }
                 if (see_it) {
                     if (lava)
-                        Norep("The %s cools and solidifies.",
+                        Norep(_("The %s cools and solidifies."),
                               hliquid("lava"));
                     else if (moat)
-                        Norep("The %s is bridged with ice!", buf);
+                        Norep(_("The %s is bridged with ice!"), buf);
                     else
-                        Norep("The %s freezes.", hliquid("water"));
+                        Norep(_("The %s freezes."), hliquid("water"));
                     newsym(x, y);
                 } else if (!lava) {
                     You_hear(_("a crackling sound."));

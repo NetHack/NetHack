@@ -20135,3 +20135,78 @@ msgstr ", 당신을 붙잡는 중"
 # ============================================================
 #~ msgid "This food really hits the spot"
 #~ msgstr "이 음식 정말 맛있다"
+
+# pray.c divine gift messages
+msgid "Thou hast pleased me with thy progress,"
+msgstr "네 진보에 기뻐하노라,"
+
+msgid "\"and thus I grant thee the gift of %s!\""
+msgstr "\"그리하여 %s의 선물을 내리노라!\""
+
+msgid "Telepathy"
+msgstr "텔레파시"
+
+msgid "Speed"
+msgstr "속도"
+
+msgid "Stealth"
+msgstr "은신"
+
+msgid "my protection"
+msgstr "나의 보호"
+
+# zap.c elemental messages
+msgid "You smell the odor of meat."
+msgstr "고기 냄새를 맡는다."
+
+msgid "You smell a delicious smell."
+msgstr "맛있는 냄새를 맡는다."
+
+msgid "A web bursts into flames!"
+msgstr "거미줄이 불길에 휩싸인다!"
+
+msgid "The %s cools and solidifies."
+msgstr "%s{이} 식어서 굳어진다."
+
+msgid "The %s is bridged with ice!"
+msgstr "%s{이} 얼음 다리로 연결되었다!"
+
+msgid "The %s freezes."
+msgstr "%s{이} 얼어붙는다."
+
+msgid "You hear hissing gas."
+msgstr "쉬익거리는 가스 소리가 들린다."
+
+msgid "That seemed remarkably uneventful."
+msgstr "놀랍도록 아무 일도 일어나지 않은 것 같다."
+
+msgid "Some water boils."
+msgstr "물이 끓는다."
+
+msgid "Some water evaporates."
+msgstr "물이 증발한다."
+
+msgid "The water evaporates."
+msgstr "물이 증발한다."
+
+# lock.c messages
+msgid "Unfortunately, you can no longer %s %s."
+msgstr "유감스럽게도 더 이상 %s %s 수 없다."
+
+msgid "hold the"
+msgstr "잡을"
+
+msgid "reach the"
+msgstr "닿을"
+
+msgid "pick"
+msgstr "자물쇠 따개"
+
+msgid "key"
+msgstr "열쇠"
+
+msgid "card"
+msgstr "카드"
+
+msgid "lock"
+msgstr "자물쇠에"
