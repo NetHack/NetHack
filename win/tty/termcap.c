@@ -671,6 +671,8 @@ term_clear_screen(void)
      */
     if (CL) {
         xputs(CL);
+        (void) fflush(stdout);  /* flush immediately to prevent ghost artifacts
+                                   when switching fullwidth/halfwidth symsets */
         home();
         /* set remembered data to all spaces */
         erase_tty_screen();

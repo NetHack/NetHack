@@ -242,6 +242,9 @@ static void status_sanity_check(void);
 #endif
 #ifdef ENHANCED_SYMBOLS
 void g_pututf8(uint8 *utf8str);
+#if defined(UNIX) || defined(VMS)
+void g_put_fullwidth_ascii(int ch);
+#endif
 #endif
 
 static boolean calling_from_update_inventory = FALSE;
@@ -3750,7 +3753,14 @@ g_putch(int in_ch)
 
 #if defined(ASCIIGRAPH)
     if (SYMHANDLING(H_UTF8)) {
-        (void) putchar(ch);
+#if defined(UNIX) || defined(VMS)
+        /* For fullwidth symsets, convert all ASCII to fullwidth */
+        if (gs.symset[gc.currentgraphics].fullwidth
+            && ch >= 0x20 && ch <= 0x7E) {
+            g_put_fullwidth_ascii(ch);
+        } else
+#endif
+            (void) putchar(ch);
     } else if (SYMHANDLING(H_IBM)
         /* for DECgraphics, lower-case letters with high bit set mean
            switch character set and render with high bit clear;
@@ -3806,6 +3816,42 @@ g_pututf8(uint8 *utf8str)
     return;
 }
 #endif /* ENHANCED_SYMBOLS */
+
+/*
+ * Convert ASCII character to fullwidth and output as UTF-8.
+ * Used when fullwidth symset is active to maintain consistent 2-column width.
+ * ASCII 0x21-0x7E -> Fullwidth ASCII U+FF01-U+FF5E (add 0xFEE0)
+ * Space 0x20 -> Ideographic Space U+3000
+ */
+void
+g_put_fullwidth_ascii(int ch)
+{
+    uint8 utf8buf[4];
+    uint32 codepoint;
+
+    HUPSKIP();
+
+    if (ch == ' ' || ch == 0x20) {
+        codepoint = 0x3000;  /* Ideographic space */
+    } else if (ch >= 0x21 && ch <= 0x7E) {
+        codepoint = ch + 0xFEE0;  /* Fullwidth ASCII */
+    } else {
+        /* Non-printable ASCII, output as-is */
+        (void) putchar(ch);
+        return;
+    }
+
+    /* Encode as UTF-8 (U+3000 and U+FF00-FF5E are all 3-byte sequences) */
+    utf8buf[0] = 0xE0 | (codepoint >> 12);
+    utf8buf[1] = 0x80 | ((codepoint >> 6) & 0x3F);
+    utf8buf[2] = 0x80 | (codepoint & 0x3F);
+    utf8buf[3] = '\0';
+
+    /* Output 3-byte UTF-8 sequence */
+    (void) putchar(utf8buf[0]);
+    (void) putchar(utf8buf[1]);
+    (void) putchar(utf8buf[2]);
+}
 #endif /* UNIX || VMS */
 
 #ifdef CLIPPING
@@ -3958,8 +4004,17 @@ tty_print_glyph(
         glyphdone = TRUE;
     }
 #endif
-    if (!glyphdone)
-        g_putch(ch); /* print the character */
+    if (!glyphdone) {
+#if (defined(UNIX) || defined(VMS)) && defined(ENHANCED_SYMBOLS)
+        /* For fullwidth symsets (Korean, Emoji, etc.), convert ASCII to
+           fullwidth ASCII to maintain consistent 2-column character width */
+        if (gs.symset[gc.currentgraphics].fullwidth && SYMHANDLING(H_UTF8)) {
+            g_put_fullwidth_ascii(ch);
+            char_width = 2;
+        } else
+#endif
+            g_putch(ch); /* print the character */
+    }
 
     if (inverse_on)
         term_end_attr(ATR_INVERSE);
@@ -3980,8 +4035,10 @@ tty_print_glyph(
     print_vt_code1(AVTC_GLYPH_END);
 
     /* Move cursor by the actual display width of the character.
-     * CJK/wide characters occupy 2 columns in the terminal. */
-    wins[window]->curx += char_width;
+     * CJK/wide characters occupy 2 columns in the terminal.
+     * wins[window]->curx is the logical tile position (always +1),
+     * while ttyDisplay->curx is the terminal column position (+char_width). */
+    wins[window]->curx += 1;
     ttyDisplay->curx += char_width;
 }
 
