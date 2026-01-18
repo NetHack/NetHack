@@ -758,64 +758,57 @@ domonnoise(struct monst *mtmp)
 
         if (mtmp->mtame) {
             if (kindred) {
-                Sprintf(verbuf, "Good %s to you Master%s",
-                        isnight ? "evening" : "day",
-                        isnight ? "!" : ".  Why do we not rest?");
+                Sprintf(verbuf, _("Good %s to you Master%s"),
+                        isnight ? _("evening") : _("day"),
+                        isnight ? "!" : _(".  Why do we not rest?"));
                 verbl_msg = verbuf;
             } else {
                 Sprintf(verbuf, "%s%s",
-                        nightchild ? "Child of the night, " : "",
+                        nightchild ? _("Child of the night, ") : "",
                         midnight()
-                         ? "I can stand this craving no longer!"
+                         ? _("I can stand this craving no longer!")
                          : isnight
-                          ? "I beg you, help me satisfy this growing craving!"
-                          : "I find myself growing a little weary.");
+                          ? _("I beg you, help me satisfy this growing craving!")
+                          : _("I find myself growing a little weary."));
                 verbl_msg = verbuf;
             }
         } else if (mtmp->mpeaceful) {
             if (kindred && isnight) {
-                Sprintf(verbuf, "Good feeding %s!",
-                        flags.female ? "sister" : "brother");
+                Sprintf(verbuf, _("Good feeding %s!"),
+                        flags.female ? _("sister") : _("brother"));
                 verbl_msg = verbuf;
             } else if (nightchild && isnight) {
-                Sprintf(verbuf, "How nice to hear you, child of the night!");
+                Sprintf(verbuf, _("How nice to hear you, child of the night!"));
                 verbl_msg = verbuf;
             } else
-                verbl_msg = "I only drink... potions.";
+                verbl_msg = _("I only drink... potions.");
         } else {
-            static const char *const vampmsg[] = {
-                /* These first two (0 and 1) are specially handled below */
-                "I vant to suck your %s!",
-                "I vill come after %s without regret!",
-                /* other famous vampire quotes can follow here if desired */
-            };
             int vampindex;
 
             if (kindred) {
-                verbl_msg = "This is my hunting ground"
-                            " that you dare to prowl!";
+                verbl_msg = _("This is my hunting ground"
+                            " that you dare to prowl!");
             } else if (gy.youmonst.data == &mons[PM_SILVER_DRAGON]
                        || gy.youmonst.data == &mons[PM_BABY_SILVER_DRAGON]) {
                 /* Silver dragons are silver in color, not made of silver */
                 Sprintf(verbuf,
-                        "%s!  Your silver sheen"" does not frighten me!",
+                        _("%s!  Your silver sheen does not frighten me!"),
                         (gy.youmonst.data == &mons[PM_SILVER_DRAGON])
-                            ? "Fool"
-                            : "Young Fool");
+                            ? _("Fool")
+                            : _("Young Fool"));
                 verbl_msg = verbuf;
             } else {
-                vampindex = rn2(SIZE(vampmsg));
+                vampindex = rn2(2);
                 if (vampindex == 0) {
-                    Sprintf(verbuf, vampmsg[vampindex], body_part(BLOOD));
+                    Sprintf(verbuf, _("I vant to suck your %s!"), body_part(BLOOD));
                     verbl_msg = verbuf;
-                } else if (vampindex == 1) {
-                    Sprintf(verbuf, vampmsg[vampindex],
+                } else {
+                    Sprintf(verbuf, _("I vill come after %s without regret!"),
                             Upolyd ? an(pmname(&mons[u.umonnum],
                                                flags.female ? FEMALE : MALE))
                                    : an(racenoun));
                     verbl_msg = verbuf;
-                } else
-                    verbl_msg = vampmsg[vampindex];
+                }
             }
         }
         break;
@@ -831,25 +824,25 @@ domonnoise(struct monst *mtmp)
             wake_nearto(mtmp->mx, mtmp->my, 11 * 11);
         } else {
             pline_msg =
-                "whispers inaudibly.  All you can make out is \"moon\".";
+                _("whispers inaudibly.  All you can make out is \"moon\".");
         }
         break;
     case MS_BARK:
         if (flags.moonphase == FULL_MOON && night()) {
-            pline_msg = "howls.";
+            pline_msg = _("howls.");
         } else if (mtmp->mpeaceful) {
             if (mtmp->mtame
                 && (mtmp->mconf || mtmp->mflee || mtmp->mtrapped
                     || svm.moves > EDOG(mtmp)->hungrytime || mtmp->mtame < 5))
-                pline_msg = "whines.";
+                pline_msg = _("whines.");
             else if (mtmp->mtame && EDOG(mtmp)->hungrytime > svm.moves + 1000)
-                pline_msg = "yips.";
+                pline_msg = _("yips.");
             else {
                 if (ptr != &mons[PM_DINGO]) /* dingos do not actually bark */
-                    pline_msg = "barks.";
+                    pline_msg = _("barks.");
             }
         } else {
-            pline_msg = "growls.";
+            pline_msg = _("growls.");
         }
         break;
     case MS_MEW:
@@ -857,16 +850,16 @@ domonnoise(struct monst *mtmp)
             if (mtmp->mconf || mtmp->mflee || mtmp->mtrapped
                 || mtmp->mtame < 5) {
                 Soundeffect(se_feline_yowl, 80);
-                pline_msg = "yowls.";
+                pline_msg = _("yowls.");
             } else if (svm.moves > EDOG(mtmp)->hungrytime) {
                 Soundeffect(se_feline_meow, 80);
-                pline_msg = "meows.";
+                pline_msg = _("meows.");
             } else if (EDOG(mtmp)->hungrytime > svm.moves + 1000) {
                 Soundeffect(se_feline_purr, 40);
-                pline_msg = "purrs.";
+                pline_msg = _("purrs.");
             } else {
                 Soundeffect(se_feline_mew, 60);
-                pline_msg = "mews.";
+                pline_msg = _("mews.");
             }
             break;
         }
@@ -874,133 +867,136 @@ domonnoise(struct monst *mtmp)
         /*FALLTHRU*/
     case MS_GROWL:
         Soundeffect((mtmp->mpeaceful ? se_snarl : se_growl), 80);
-        pline_msg = mtmp->mpeaceful ? "snarls." : "growls!";
+        pline_msg = mtmp->mpeaceful ? _("snarls.") : _("growls!");
         break;
     case MS_ROAR:
         Soundeffect((mtmp->mpeaceful ? se_snarl : se_roar), 80);
-        pline_msg = mtmp->mpeaceful ? "snarls." : "roars!";
+        pline_msg = mtmp->mpeaceful ? _("snarls.") : _("roars!");
         break;
     case MS_SQEEK:
         Soundeffect(se_squeak, 80);
-        pline_msg = "squeaks.";
+        pline_msg = _("squeaks.");
         break;
     case MS_SQAWK:
         if (ptr == &mons[PM_RAVEN] && !mtmp->mpeaceful) {
-            verbl_msg = "Nevermore!";
+            verbl_msg = _("Nevermore!");
         } else {
             Soundeffect(se_squawk, 80);
-            pline_msg = "squawks.";
+            pline_msg = _("squawks.");
         }
         break;
     case MS_HISS:
         if (!mtmp->mpeaceful) {
             Soundeffect(se_hiss, 80);
-            pline_msg = "hisses!";
+            pline_msg = _("hisses!");
         } else {
             return ECMD_OK; /* no sound */
         }
         break;
     case MS_BUZZ:
         Soundeffect((mtmp->mpeaceful ? se_buzz : se_angry_drone), 80);
-        pline_msg = mtmp->mpeaceful ? "drones." : "buzzes angrily.";
+        pline_msg = mtmp->mpeaceful ? _("drones.") : _("buzzes angrily.");
         break;
     case MS_GRUNT:
         Soundeffect(se_grunt, 60);
-        pline_msg = "grunts.";
+        pline_msg = _("grunts.");
         break;
     case MS_NEIGH:
         if (mtmp->mtame < 5) {
             Soundeffect(se_equine_neigh, 60);
-            pline_msg = "neighs.";
+            pline_msg = _("neighs.");
         } else if (svm.moves > EDOG(mtmp)->hungrytime) {
             Soundeffect(se_equine_whinny, 60);
-            pline_msg = "whinnies.";
+            pline_msg = _("whinnies.");
         } else {
             Soundeffect(se_equine_whicker, 60);
-            pline_msg = "whickers.";
+            pline_msg = _("whickers.");
         }
         break;
     case MS_MOO:
         Soundeffect(se_bovine_moo, 80);
-        pline_msg = "moos.";
+        pline_msg = _("moos.");
         break;
     case MS_BELLOW:
         Soundeffect((ptr->mlet == S_QUADRUPED) ? se_bovine_bellow
                                                : se_croc_bellow,
                     80);
-        pline_msg = "bellows!";
+        pline_msg = _("bellows!");
         break;
     case MS_CHIRP:
         Soundeffect(se_chirp, 60);
-        pline_msg = "chirps.";
+        pline_msg = _("chirps.");
         break;
     case MS_WAIL:
         Soundeffect(se_sad_wailing, 60);
-        pline_msg = "wails mournfully.";
+        pline_msg = _("wails mournfully.");
         break;
     case MS_GROAN:
         if (!rn2(3)) {
             Soundeffect(se_groan, 60);
-            pline_msg = "groans.";
+            pline_msg = _("groans.");
         }
         break;
     case MS_GURGLE:
         Soundeffect(se_gurgle, 60);
-        pline_msg = "gurgles.";
+        pline_msg = _("gurgles.");
         break;
     case MS_BURBLE:
         Soundeffect(se_jabberwock_burble, 60);
-        pline_msg = "burbles.";
+        pline_msg = _("burbles.");
         break;
     case MS_TRUMPET:
         Soundeffect(se_elephant_trumpet, 60);
-        pline_msg = "trumpets!";
+        pline_msg = _("trumpets!");
         wake_nearto(mtmp->mx, mtmp->my, 11 * 11);
         break;
     case MS_SHRIEK:
         Soundeffect(se_shriek, 60);
-        pline_msg = "shrieks.";
+        pline_msg = _("shrieks.");
         aggravate();
         break;
     case MS_IMITATE:
-        pline_msg = "imitates you.";
+        pline_msg = _("imitates you.");
         break;
     case MS_BONES:
         Soundeffect(se_bone_rattle, 60);
         pline(_("%s rattles noisily."), Monnam(mtmp));
         You(_("freeze for a moment."));
         nomul(-2);
-        gm.multi_reason = "scared by rattling";
+        gm.multi_reason = _("scared by rattling");
         gn.nomovemsg = 0;
         break;
     case MS_LAUGH: {
-        static const char *const laugh_msg[4] = {
-            "giggles.", "chuckles.", "snickers.", "laughs.",
-        };
+        int laugh_idx = rn2(4);
         Soundeffect(se_laughter, 60);
-        pline_msg = laugh_msg[rn2(4)];
+        switch (laugh_idx) {
+        case 0: pline_msg = _("giggles."); break;
+        case 1: pline_msg = _("chuckles."); break;
+        case 2: pline_msg = _("snickers."); break;
+        default: pline_msg = _("laughs."); break;
+        }
         break;
     }
     case MS_MUMBLE:
-        pline_msg = "mumbles incomprehensibly.";
+        pline_msg = _("mumbles incomprehensibly.");
         break;
     case MS_ORC: /* this used to be an alias for grunt, now it is distinct */
         Soundeffect(se_orc_grunt, 60);
-        pline_msg = "grunts.";
+        pline_msg = _("grunts.");
         break;
     case MS_DJINNI:
         if (mtmp->mtame) {
-            verbl_msg = "Sorry, I'm all out of wishes.";
+            verbl_msg = _("Sorry, I'm all out of wishes.");
         } else if (mtmp->mpeaceful) {
             if (ptr == &mons[PM_WATER_DEMON])
-                pline_msg = "gurgles.";
+                pline_msg = _("gurgles.");
             else
-                verbl_msg = "I'm free!";
+                verbl_msg = _("I'm free!");
         } else {
             if (ptr != &mons[PM_PRISONER])
-                verbl_msg = "This will teach you not to disturb me!";
+                verbl_msg = _("This will teach you not to disturb me!");
             else /* vague because prisoner might already be out of cell */
-                verbl_msg = "Get me out of here.";
+                verbl_msg = _("Get me out of here.");
         }
         break;
     case MS_BOAST: /* giants */
@@ -1011,10 +1007,10 @@ domonnoise(struct monst *mtmp)
                       mhis(mtmp));
                 break;
             case 1:
-                pline_msg = "complains about a diet of mutton.";
+                pline_msg = _("complains about a diet of mutton.");
                 break;
             default:
-                pline_msg = "shouts \"Fee Fie Foe Foo!\" and guffaws.";
+                pline_msg = _("shouts \"Fee Fie Foe Foo!\" and guffaws.");
                 wake_nearto(mtmp->mx, mtmp->my, 7 * 7);
                 break;
             }
@@ -1027,38 +1023,38 @@ domonnoise(struct monst *mtmp)
             if (In_endgame(&u.uz) && is_mplayer(ptr))
                 mplayer_talk(mtmp);
             else
-                pline_msg = "threatens you.";
+                pline_msg = _("threatens you.");
             break;
         }
         /* Generic peaceful humanoid behavior. */
         if (mtmp->mflee)
-            pline_msg = "wants nothing to do with you.";
+            pline_msg = _("wants nothing to do with you.");
         else if (mtmp->mhp < mtmp->mhpmax / 4)
-            pline_msg = "moans.";
+            pline_msg = _("moans.");
         else if (mtmp->mconf || mtmp->mstun)
-            verbl_msg = !rn2(3) ? "Huh?" : rn2(2) ? "What?" : "Eh?";
+            verbl_msg = !rn2(3) ? _("Huh?") : rn2(2) ? _("What?") : _("Eh?");
         else if (!mtmp->mcansee)
-            verbl_msg = "I can't see!";
+            verbl_msg = _("I can't see!");
         else if (mtmp->mtrapped) {
             struct trap *t = t_at(mtmp->mx, mtmp->my);
 
             if (t)
                 t->tseen = 1;
-            verbl_msg = "I'm trapped!";
+            verbl_msg = _("I'm trapped!");
         } else if (mtmp->mhp < mtmp->mhpmax / 2)
-            pline_msg = "asks for a potion of healing.";
+            pline_msg = _("asks for a potion of healing.");
         else if (mtmp->mtame && !mtmp->isminion
                  && svm.moves > EDOG(mtmp)->hungrytime)
-            verbl_msg = "I'm hungry.";
+            verbl_msg = _("I'm hungry.");
         /* Specific monsters' interests */
         else if (is_elf(ptr))
-            pline_msg = "curses orcs.";
+            pline_msg = _("curses orcs.");
         else if (is_dwarf(ptr))
-            pline_msg = "talks about mining.";
+            pline_msg = _("talks about mining.");
         else if (likes_magic(ptr))
-            pline_msg = "talks about spellcraft.";
+            pline_msg = _("talks about spellcraft.");
         else if (ptr->mlet == S_CENTAUR)
-            pline_msg = "discusses hunting.";
+            pline_msg = _("discusses hunting.");
         else if (is_gnome(ptr)) {
             if (Hallucination && (gnomeplan = rn2(4)) % 2) {
                 /* skipped for rn2(4) result of 0 or 2;
@@ -1071,11 +1067,11 @@ domonnoise(struct monst *mtmp)
                          Collect underpants       ?          Profit
                    and they never verbalize step 2 so we don't either */
                 verbl_msg = (gnomeplan == 1)
-                            ? "Phase one, collect underpants."
-                            : "Phase three, profit!";
+                            ? _("Phase one, collect underpants.")
+                            : _("Phase three, profit!");
             } else {
-                verbl_msg = "Many enter the dungeon,"
-                            " and few return to the sunlit lands.";
+                verbl_msg = _("Many enter the dungeon,"
+                            " and few return to the sunlit lands.");
             }
         } else
             switch (monsndx(ptr)) {
@@ -1087,18 +1083,18 @@ domonnoise(struct monst *mtmp)
                 pline_msg = (mtmp->mhp < mtmp->mhpmax
                              && (mtmp->mhpmax <= 10
                                  || mtmp->mhp <= mtmp->mhpmax - 10))
-                            ? "complains about unpleasant dungeon conditions."
-                            : "asks you about the One Ring.";
+                            ? _("complains about unpleasant dungeon conditions.")
+                            : _("asks you about the One Ring.");
                 break;
             case PM_ARCHEOLOGIST:
                 pline_msg =
-                "describes a recent article in \"Spelunker Today\" magazine.";
+                _("describes a recent article in \"Spelunker Today\" magazine.");
                 break;
             case PM_TOURIST:
-                verbl_msg = "Aloha.";
+                verbl_msg = _("Aloha.");
                 break;
             default:
-                pline_msg = "discusses dungeon exploration.";
+                pline_msg = _("discusses dungeon exploration.");
                 break;
             }
         break;
@@ -1117,25 +1113,26 @@ domonnoise(struct monst *mtmp)
             swval = ((poly_gender() == 0) ? rn2(3) : 0);
         switch (swval) {
         case 2:
-            verbl_msg = "Hello, sailor.";
+            verbl_msg = _("Hello, sailor.");
             break;
         case 1:
-            pline_msg = "comes on to you.";
+            pline_msg = _("comes on to you.");
             break;
         default:
-            pline_msg = "cajoles you.";
+            pline_msg = _("cajoles you.");
         }
     } break;
     case MS_ARREST:
         if (mtmp->mpeaceful) {
             SetVoice(mtmp, 0, 80, 0);
-            verbalize(_("Just the facts, %s."), flags.female ? "Ma'am" : "Sir");
+            verbalize(_("Just the facts, %s."), flags.female ? _("Ma'am") : _("Sir"));
         } else {
-            static const char *const arrest_msg[3] = {
-                "Anything you say can be used against you.",
-                "You're under arrest!", "Stop in the name of the Law!",
-            };
-            verbl_msg = arrest_msg[rn2(3)];
+            int arrest_idx = rn2(3);
+            switch (arrest_idx) {
+            case 0: verbl_msg = _("Anything you say can be used against you."); break;
+            case 1: verbl_msg = _("You're under arrest!"); break;
+            default: verbl_msg = _("Stop in the name of the Law!"); break;
+            }
         }
         break;
     case MS_BRIBE:
@@ -1149,45 +1146,48 @@ domonnoise(struct monst *mtmp)
         if (!mtmp->mpeaceful)
             cuss(mtmp);
         else if (is_lminion(mtmp))
-            verbl_msg = "It's not too late.";
+            verbl_msg = _("It's not too late.");
         else
-            verbl_msg = "We're all doomed.";
+            verbl_msg = _("We're all doomed.");
         break;
     case MS_SPELL:
         /* deliberately vague, since it's not actually casting any spell */
-        pline_msg = "seems to mutter a cantrip.";
+        pline_msg = _("seems to mutter a cantrip.");
         break;
     case MS_NURSE:
-        verbl_msg_mcan = "I hate this job!";
+        verbl_msg_mcan = _("I hate this job!");
         if (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
-            verbl_msg = "Put that weapon away before you hurt someone!";
+            verbl_msg = _("Put that weapon away before you hurt someone!");
         else if (uarmc || uarm || uarmh || uarms || uarmg || uarmf)
             verbl_msg = Role_if(PM_HEALER)
-                            ? "Doc, I can't help you unless you cooperate."
-                            : "Please undress so I can examine you.";
+                            ? _("Doc, I can't help you unless you cooperate.")
+                            : _("Please undress so I can examine you.");
         else if (uarmu)
-            verbl_msg = "Take off your shirt, please.";
+            verbl_msg = _("Take off your shirt, please.");
         else
-            verbl_msg = "Relax, this won't hurt a bit.";
+            verbl_msg = _("Relax, this won't hurt a bit.");
         break;
     case MS_GUARD:
         if (money_cnt(gi.invent))
-            verbl_msg = "Please drop that gold and follow me.";
+            verbl_msg = _("Please drop that gold and follow me.");
         else
-            verbl_msg = "Please follow me.";
+            verbl_msg = _("Please follow me.");
         break;
     case MS_SOLDIER: {
-        static const char
-            *const soldier_foe_msg[3] = {
-                "Resistance is useless!", "You're dog meat!", "Surrender!",
-            },
-            *const soldier_pax_msg[3] = {
-                "What lousy pay we're getting here!",
-                "The food's not fit for Orcs!",
-                "My feet hurt, I've been on them all day!",
-            };
-        verbl_msg = mtmp->mpeaceful ? soldier_pax_msg[rn2(3)]
-                                    : soldier_foe_msg[rn2(3)];
+        int soldier_idx = rn2(3);
+        if (mtmp->mpeaceful) {
+            switch (soldier_idx) {
+            case 0: verbl_msg = _("What lousy pay we're getting here!"); break;
+            case 1: verbl_msg = _("The food's not fit for Orcs!"); break;
+            default: verbl_msg = _("My feet hurt, I've been on them all day!"); break;
+            }
+        } else {
+            switch (soldier_idx) {
+            case 0: verbl_msg = _("Resistance is useless!"); break;
+            case 1: verbl_msg = _("You're dog meat!"); break;
+            default: verbl_msg = _("Surrender!"); break;
+            }
+        }
         break;
     }
     case MS_RIDER: {
@@ -1199,11 +1199,11 @@ domonnoise(struct monst *mtmp)
         if (ms_Death && !svc.context.tribute.Deathnotice
             && (book = u_have_novel()) != 0) {
             if ((tribtitle = noveltitle(&book->novelidx)) != 0) {
-                Sprintf(verbuf, "Ah, so you have a copy of /%s/.", tribtitle);
+                Sprintf(verbuf, _("Ah, so you have a copy of /%s/."), tribtitle);
                 /* no Death featured in these two, so exclude them */
                 if (strcmpi(tribtitle, "Snuff")
                     && strcmpi(tribtitle, "The Wee Free Men"))
-                    Strcat(verbuf, "  I may have been misquoted there.");
+                    Strcat(verbuf, _("  I may have been misquoted there."));
                 verbl_msg = verbuf;
             }
             svc.context.tribute.Deathnotice = 1;
@@ -1212,9 +1212,9 @@ domonnoise(struct monst *mtmp)
         /* end of tribute addition */
 
         } else if (ms_Death && !rn2(10)) {
-            pline_msg = "is busy reading a copy of Sandman #8.";
+            pline_msg = _("is busy reading a copy of Sandman #8.");
         } else
-            verbl_msg = "Who do you think you are, War?";
+            verbl_msg = _("Who do you think you are, War?");
         break;
     } /* case MS_RIDER */
     } /* switch */

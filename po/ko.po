@@ -5933,8 +5933,13 @@ msgid "You feel feverish."
 msgstr "열이 나는 것 같다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:4351
+#, fuzzy
 msgid "Doc, I can't help you unless you cooperate."
-msgstr "박사님, 협조하지 않으면 도울 수 없습니다."
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"박사님, 협조하지 않으면 도울 수 없습니다.\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"선생님, 협조해주시지 않으면 도와드릴 수 없어요."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:4375
 #: /home/jinhong_kim/workspace/HanNetHack/src/do_wear.c:479
@@ -6459,8 +6464,13 @@ msgid "%s stomps%s."
 msgstr "%s{이/가} 쿵쿵거린다%s."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:558
+#, fuzzy
 msgid "Please follow me."
-msgstr "따라오시오."
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"따라오시오.\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"따라오세요."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:564
 #, c-format
@@ -6476,8 +6486,13 @@ msgid "You have hidden gold."
 msgstr "숨긴 금화가 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:582
+#, fuzzy
 msgid "Please drop that gold and follow me."
-msgstr "금화를 버리고 따라오시오."
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"금화를 버리고 따라오시오.\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"그 금화를 떨어뜨리고 따라오세요."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:723
 #, c-format
@@ -7990,8 +8005,13 @@ msgid "Ebenezer Scrooge!"
 msgstr "에베네저 스크루지!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/sounds.c:532
+#, fuzzy
 msgid "I'm hungry."
-msgstr "배고프다."
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"배고프다.\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"배고파."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/sounds.c:539
 #, c-format
@@ -19986,6 +20006,417 @@ msgstr ", 붙잡힌 상태"
 msgid ", holding you"
 msgstr ", 당신을 붙잡는 중"
 
+# pray.c divine gift messages
+msgid "Thou hast pleased me with thy progress,"
+msgstr "네 진보에 기뻐하노라,"
+
+msgid "\"and thus I grant thee the gift of %s!\""
+msgstr "\"그리하여 %s의 선물을 내리노라!\""
+
+msgid "Telepathy"
+msgstr "텔레파시"
+
+msgid "Speed"
+msgstr "속도"
+
+msgid "Stealth"
+msgstr "은신"
+
+msgid "my protection"
+msgstr "나의 보호"
+
+# zap.c elemental messages
+msgid "You smell the odor of meat."
+msgstr "고기 냄새를 맡는다."
+
+msgid "You smell a delicious smell."
+msgstr "맛있는 냄새를 맡는다."
+
+msgid "A web bursts into flames!"
+msgstr "거미줄이 불길에 휩싸인다!"
+
+msgid "The %s cools and solidifies."
+msgstr "%s{이} 식어서 굳어진다."
+
+msgid "The %s is bridged with ice!"
+msgstr "%s{이} 얼음 다리로 연결되었다!"
+
+msgid "The %s freezes."
+msgstr "%s{이} 얼어붙는다."
+
+msgid "You hear hissing gas."
+msgstr "쉬익거리는 가스 소리가 들린다."
+
+msgid "That seemed remarkably uneventful."
+msgstr "놀랍도록 아무 일도 일어나지 않은 것 같다."
+
+msgid "Some water boils."
+msgstr "물이 끓는다."
+
+msgid "Some water evaporates."
+msgstr "물이 증발한다."
+
+msgid "The water evaporates."
+msgstr "물이 증발한다."
+
+# lock.c messages
+msgid "Unfortunately, you can no longer %s %s."
+msgstr "유감스럽게도 더 이상 %s %s 수 없다."
+
+msgid "hold the"
+msgstr "잡을"
+
+msgid "reach the"
+msgstr "닿을"
+
+msgid "pick"
+msgstr "자물쇠 따개"
+
+msgid "key"
+msgstr "열쇠"
+
+msgid "card"
+msgstr "카드"
+
+msgid "lock"
+msgstr "자물쇠에"
+
+# sounds.c vampire messages
+msgid "Good %s to you Master%s"
+msgstr "주인님, 좋은 %s입니다%s"
+
+msgid "evening"
+msgstr "저녁"
+
+msgid "day"
+msgstr "하루"
+
+msgid ".  Why do we not rest?"
+msgstr ".  왜 쉬지 않으시나요?"
+
+msgid "Child of the night, "
+msgstr "밤의 아이여, "
+
+msgid "I can stand this craving no longer!"
+msgstr "더 이상 이 갈망을 참을 수 없다!"
+
+msgid "I beg you, help me satisfy this growing craving!"
+msgstr "부디, 이 커져가는 갈망을 채워주십시오!"
+
+msgid "I find myself growing a little weary."
+msgstr "조금 지쳐가는 것 같습니다."
+
+msgid "Good feeding %s!"
+msgstr "%s, 좋은 식사!"
+
+msgid "sister"
+msgstr "자매"
+
+msgid "brother"
+msgstr "형제"
+
+msgid "How nice to hear you, child of the night!"
+msgstr "밤의 아이여, 네 목소리를 들으니 반갑구나!"
+
+msgid "I only drink... potions."
+msgstr "난 물약만... 마신다."
+
+msgid "This is my hunting ground that you dare to prowl!"
+msgstr "감히 내 사냥터에 발을 들이다니!"
+
+msgid "%s!  Your silver sheen does not frighten me!"
+msgstr "%s!  네 은빛 광채는 나를 두렵게 하지 못한다!"
+
+msgid "Fool"
+msgstr "어리석은 놈"
+
+msgid "Young Fool"
+msgstr "어린 바보"
+
+msgid "I vant to suck your %s!"
+msgstr "네 %s를 빨아먹겠다!"
+
+msgid "I vill come after %s without regret!"
+msgstr "%s{을/를} 후회 없이 쫓아가겠다!"
+
+# sounds.c were messages
+msgid "whispers inaudibly.  All you can make out is \"moon\"."
+msgstr "알아들을 수 없게 속삭인다.  \"달\"이라는 말만 겨우 알아들었다."
+
+# sounds.c animal sounds
+msgid "howls."
+msgstr "울부짖는다."
+
+msgid "whines."
+msgstr "낑낑거린다."
+
+msgid "yips."
+msgstr "깽깽거린다."
+
+msgid "barks."
+msgstr "짖는다."
+
+msgid "growls."
+msgstr "으르렁거린다."
+
+msgid "yowls."
+msgstr "야옹야옹 울어댄다."
+
+msgid "meows."
+msgstr "야옹하고 운다."
+
+msgid "purrs."
+msgstr "그르렁거린다."
+
+msgid "mews."
+msgstr "야옹거린다."
+
+msgid "snarls."
+msgstr "으르렁댄다."
+
+msgid "growls!"
+msgstr "으르렁거린다!"
+
+msgid "roars!"
+msgstr "포효한다!"
+
+msgid "squeaks."
+msgstr "찍찍거린다."
+
+msgid "Nevermore!"
+msgstr "다시는 안 돼!"
+
+msgid "squawks."
+msgstr "꽥꽥거린다."
+
+msgid "hisses!"
+msgstr "쉭쉭 소리를 낸다!"
+
+msgid "drones."
+msgstr "윙윙거린다."
+
+msgid "buzzes angrily."
+msgstr "화나서 윙윙거린다."
+
+msgid "grunts."
+msgstr "꿀꿀거린다."
+
+msgid "neighs."
+msgstr "히힝 운다."
+
+msgid "whinnies."
+msgstr "킁킁거린다."
+
+msgid "whickers."
+msgstr "부르릉거린다."
+
+msgid "moos."
+msgstr "음메 운다."
+
+msgid "bellows!"
+msgstr "우렁차게 운다!"
+
+msgid "chirps."
+msgstr "짹짹거린다."
+
+msgid "wails mournfully."
+msgstr "슬프게 울부짖는다."
+
+msgid "groans."
+msgstr "신음한다."
+
+msgid "gurgles."
+msgstr "꿀꺽꿀꺽 소리를 낸다."
+
+msgid "burbles."
+msgstr "졸졸 소리를 낸다."
+
+msgid "trumpets!"
+msgstr "뿌오하고 운다!"
+
+msgid "shrieks."
+msgstr "비명을 지른다."
+
+msgid "imitates you."
+msgstr "당신을 흉내낸다."
+
+msgid "scared by rattling"
+msgstr "덜커덕거리는 소리에 놀람"
+
+msgid "giggles."
+msgstr "킥킥거린다."
+
+msgid "chuckles."
+msgstr "킬킬거린다."
+
+msgid "snickers."
+msgstr "낄낄거린다."
+
+msgid "laughs."
+msgstr "웃는다."
+
+msgid "mumbles incomprehensibly."
+msgstr "알 수 없는 말을 중얼거린다."
+
+msgid "Sorry, I'm all out of wishes."
+msgstr "미안하지만 소원은 다 떨어졌어."
+
+msgid "I'm free!"
+msgstr "나는 자유다!"
+
+msgid "This will teach you not to disturb me!"
+msgstr "나를 방해하면 어떻게 되는지 가르쳐주마!"
+
+msgid "Get me out of here."
+msgstr "여기서 나가게 해줘."
+
+msgid "complains about a diet of mutton."
+msgstr "양고기 식단에 대해 불평한다."
+
+msgid "shouts \"Fee Fie Foe Foo!\" and guffaws."
+msgstr "\"피 파이 포 푸!\"라고 외치며 껄껄 웃는다."
+
+msgid "threatens you."
+msgstr "당신을 위협한다."
+
+msgid "wants nothing to do with you."
+msgstr "당신과 상관하고 싶지 않아한다."
+
+msgid "moans."
+msgstr "신음한다."
+
+msgid "Huh?"
+msgstr "엉?"
+
+msgid "What?"
+msgstr "뭐?"
+
+msgid "Eh?"
+msgstr "응?"
+
+msgid "I can't see!"
+msgstr "앞이 안 보여!"
+
+msgid "I'm trapped!"
+msgstr "갇혀버렸어!"
+
+msgid "asks for a potion of healing."
+msgstr "치료 물약을 달라고 한다."
+
+msgid "curses orcs."
+msgstr "오크를 저주한다."
+
+msgid "talks about mining."
+msgstr "채굴에 대해 이야기한다."
+
+msgid "talks about spellcraft."
+msgstr "주술에 대해 이야기한다."
+
+msgid "discusses hunting."
+msgstr "사냥에 대해 논한다."
+
+msgid "Phase one, collect underpants."
+msgstr "1단계, 속옷을 모아라."
+
+msgid "Phase three, profit!"
+msgstr "3단계, 이익!"
+
+msgid "Many enter the dungeon, and few return to the sunlit lands."
+msgstr "많은 이가 던전에 들어가지만, 햇빛이 비치는 땅으로 돌아오는 이는 적다."
+
+msgid "complains about unpleasant dungeon conditions."
+msgstr "불쾌한 던전 환경에 대해 불평한다."
+
+msgid "asks you about the One Ring."
+msgstr "절대반지에 대해 묻는다."
+
+msgid "describes a recent article in \"Spelunker Today\" magazine."
+msgstr "\"오늘의 탐험가\" 잡지의 최근 기사에 대해 설명한다."
+
+msgid "Aloha."
+msgstr "알로하."
+
+msgid "discusses dungeon exploration."
+msgstr "던전 탐험에 대해 논한다."
+
+msgid "Hello, sailor."
+msgstr "안녕, 뱃사람."
+
+msgid "comes on to you."
+msgstr "당신에게 접근한다."
+
+msgid "cajoles you."
+msgstr "당신을 꼬드긴다."
+
+msgid "Anything you say can be used against you."
+msgstr "당신이 하는 모든 말은 법정에서 불리하게 쓰일 수 있습니다."
+
+msgid "You're under arrest!"
+msgstr "체포한다!"
+
+msgid "Stop in the name of the Law!"
+msgstr "법의 이름으로 멈춰라!"
+
+msgid "It's not too late."
+msgstr "아직 늦지 않았다."
+
+msgid "We're all doomed."
+msgstr "우리 모두 끝장이야."
+
+msgid "seems to mutter a cantrip."
+msgstr "주문을 중얼거리는 것 같다."
+
+msgid "I hate this job!"
+msgstr "이 일이 싫어!"
+
+msgid "Put that weapon away before you hurt someone!"
+msgstr "누군가 다치기 전에 그 무기를 치워!"
+
+msgid "Please undress so I can examine you."
+msgstr "진찰할 수 있게 옷을 벗어주세요."
+
+msgid "Take off your shirt, please."
+msgstr "셔츠를 벗어주세요."
+
+msgid "Relax, this won't hurt a bit."
+msgstr "진정해요, 하나도 안 아플 거예요."
+
+msgid "What lousy pay we're getting here!"
+msgstr "여기 급여가 정말 형편없군!"
+
+msgid "The food's not fit for Orcs!"
+msgstr "이 음식은 오크도 안 먹어!"
+
+msgid "My feet hurt, I've been on them all day!"
+msgstr "발이 아파, 하루 종일 서있었다고!"
+
+msgid "Resistance is useless!"
+msgstr "저항은 쓸모없다!"
+
+msgid "You're dog meat!"
+msgstr "넌 개밥이다!"
+
+msgid "Surrender!"
+msgstr "항복해라!"
+
+msgid "Ah, so you have a copy of /%s/."
+msgstr "아, /%s/을 갖고 있군."
+
+msgid "  I may have been misquoted there."
+msgstr "  거기서 내 말이 잘못 인용됐을 수도 있어."
+
+msgid "is busy reading a copy of Sandman #8."
+msgstr "샌드맨 8호를 열심히 읽고 있다."
+
+msgid "Who do you think you are, War?"
+msgstr "네가 누구라고 생각하나, 전쟁?"
+
+msgid "Ma'am"
+msgstr "부인"
+
+msgid "Sir"
+msgstr "선생님"
+
 #~ msgid "You feel like someone is helping you."
 #~ msgstr "누군가 도와주는 것 같다."
 
@@ -20135,78 +20566,3 @@ msgstr ", 당신을 붙잡는 중"
 # ============================================================
 #~ msgid "This food really hits the spot"
 #~ msgstr "이 음식 정말 맛있다"
-
-# pray.c divine gift messages
-msgid "Thou hast pleased me with thy progress,"
-msgstr "네 진보에 기뻐하노라,"
-
-msgid "\"and thus I grant thee the gift of %s!\""
-msgstr "\"그리하여 %s의 선물을 내리노라!\""
-
-msgid "Telepathy"
-msgstr "텔레파시"
-
-msgid "Speed"
-msgstr "속도"
-
-msgid "Stealth"
-msgstr "은신"
-
-msgid "my protection"
-msgstr "나의 보호"
-
-# zap.c elemental messages
-msgid "You smell the odor of meat."
-msgstr "고기 냄새를 맡는다."
-
-msgid "You smell a delicious smell."
-msgstr "맛있는 냄새를 맡는다."
-
-msgid "A web bursts into flames!"
-msgstr "거미줄이 불길에 휩싸인다!"
-
-msgid "The %s cools and solidifies."
-msgstr "%s{이} 식어서 굳어진다."
-
-msgid "The %s is bridged with ice!"
-msgstr "%s{이} 얼음 다리로 연결되었다!"
-
-msgid "The %s freezes."
-msgstr "%s{이} 얼어붙는다."
-
-msgid "You hear hissing gas."
-msgstr "쉬익거리는 가스 소리가 들린다."
-
-msgid "That seemed remarkably uneventful."
-msgstr "놀랍도록 아무 일도 일어나지 않은 것 같다."
-
-msgid "Some water boils."
-msgstr "물이 끓는다."
-
-msgid "Some water evaporates."
-msgstr "물이 증발한다."
-
-msgid "The water evaporates."
-msgstr "물이 증발한다."
-
-# lock.c messages
-msgid "Unfortunately, you can no longer %s %s."
-msgstr "유감스럽게도 더 이상 %s %s 수 없다."
-
-msgid "hold the"
-msgstr "잡을"
-
-msgid "reach the"
-msgstr "닿을"
-
-msgid "pick"
-msgstr "자물쇠 따개"
-
-msgid "key"
-msgstr "열쇠"
-
-msgid "card"
-msgstr "카드"
-
-msgid "lock"
-msgstr "자물쇠에"
