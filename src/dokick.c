@@ -27,8 +27,6 @@ staticfn int kick_nondoor(coordxy, coordxy, int);
 staticfn void otransit_msg(struct obj *, boolean, boolean, long);
 staticfn void drop_to(coord *, schar, coordxy, coordxy) NONNULLARG1;
 
-static const char kick_passes_thru[] = "kick passes harmlessly through";
-
 /* kicking damage when not poly'd into a form with a kick attack */
 staticfn void
 kickdmg(struct monst *mon, boolean clumsy)
@@ -56,7 +54,7 @@ kickdmg(struct monst *mon, boolean clumsy)
     specialdmg = special_dmgval(&gy.youmonst, mon, W_ARMF, (long *) 0);
 
     if (mon->data == &mons[PM_SHADE] && !specialdmg) {
-        pline_The(_("%s."), kick_passes_thru);
+        pline_The(_("%s."), _("kick passes harmlessly through"));
         /* doesn't exercise skill or abuse alignment or frighten pet,
            and shades have no passive counterattack */
         return;
@@ -205,7 +203,7 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
             if (mon->data == &mons[PM_SHADE] && !specialdmg) {
                 /* doesn't matter whether it would have hit or missed,
                    and shades have no passive counterattack */
-                Your(_("%s %s."), kick_passes_thru, mon_nam(mon));
+                Your(_("%s %s."), _("kick passes harmlessly through"), mon_nam(mon));
                 break; /* skip any additional kicks */
             } else if (tmp > kickdieroll) {
                 You(_("kick %s."), mon_nam(mon));

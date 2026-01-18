@@ -2208,7 +2208,6 @@ domove_swap_with_pet(
 staticfn boolean
 domove_fight_empty(coordxy x, coordxy y)
 {
-    static const char unknown_obstacle[] = "an unknown obstacle";
     boolean off_edge = !isok(x, y);
     int glyph = !off_edge ? glyph_at(x, y) : GLYPH_UNEXPLORED;
 
@@ -2231,7 +2230,7 @@ domove_fight_empty(coordxy x, coordxy y)
 
         if (off_edge) {
             /* treat as if solid rock, even on planes' levels */
-            Strcpy(buf, unknown_obstacle);
+            Strcpy(buf, _("an unknown obstacle"));
             goto futile;
         }
 
@@ -2286,19 +2285,19 @@ domove_fight_empty(coordxy x, coordxy y)
                 glyph = back_to_glyph(x, y);
                 Strcpy(buf, the(defsyms[glyph_to_cmap(glyph)].explanation));
             } else {
-                Strcpy(buf, unknown_obstacle);
+                Strcpy(buf, _("an unknown obstacle"));
             }
             /* note: 'solid' is misleadingly named and catches pools
                of water and lava as well as rock and walls;
                3.7: furniture too */
         } else {
-            Strcpy(buf, "thin air");
+            Strcpy(buf, _("thin air"));
         }
 
  futile:
         You(_("%s%s %s."),
-            !(boulder || solid) ? "" : !explo ? "harmlessly " : "futilely ",
-            explo ? "explode at" : "attack", buf);
+            !(boulder || solid) ? "" : !explo ? _("harmlessly ") : _("futilely "),
+            explo ? _("explode at") : _("attack"), buf);
 
         nomul(0);
         if (explo) {

@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-18 22:52+0900\n"
+"POT-Creation-Date: 2026-01-18 22:55+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -129,7 +129,7 @@ msgstr "착용 중에는 사용할 수 없다!"
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
-#: src/apply.c:129 src/artifact.c:1414 src/hack.c:3062 src/lock.c:1315
+#: src/apply.c:129 src/artifact.c:1414 src/hack.c:3061 src/lock.c:1315
 #: src/mhitu.c:685 src/mhitu.c:1005 src/mhitu.c:1330 src/mon.c:3500
 #: src/polyself.c:801 src/polyself.c:1367 src/potion.c:1943 src/shk.c:1428
 #: src/sounds.c:416 src/sounds.c:467 src/trap.c:843 src/trap.c:1690
@@ -304,7 +304,7 @@ msgstr "이상한"
 
 #: src/apply.c:681 src/apply.c:1081 src/apply.c:1647 src/apply.c:2127
 #: src/detect.c:998 src/do.c:1799 src/do_wear.c:495 src/do_wear.c:1162
-#: src/dog.c:1205 src/dokick.c:59 src/eat.c:1085 src/eat.c:1092 src/eat.c:1259
+#: src/dog.c:1205 src/dokick.c:57 src/eat.c:1085 src/eat.c:1092 src/eat.c:1259
 #: src/eat.c:3469 src/explode.c:795 src/getpos.c:986 src/invent.c:2045
 #: src/invent.c:3141 src/invent.c:4528 src/mail.c:375 src/mhitu.c:1641
 #: src/mon.c:2954 src/mon.c:2956 src/muse.c:2900 src/music.c:616
@@ -410,8 +410,8 @@ msgstr "%s{이/가} 흐려져서 반사하지 않는다!"
 #: src/apply.c:1032 src/apply.c:1659 src/apply.c:1674 src/apply.c:2295
 #: src/apply.c:2383 src/apply.c:3652 src/apply.c:3671 src/artifact.c:2032
 #: src/artifact.c:2064 src/artifact.c:2077 src/artifact.c:2081 src/cmd.c:3988
-#: src/do.c:2027 src/eat.c:2145 src/engrave.c:1246 src/hack.c:3296
-#: src/hack.c:4060 src/nhlua.c:636 src/nhlua.c:652 src/pager.c:2696
+#: src/do.c:2027 src/eat.c:2145 src/engrave.c:1246 src/hack.c:3295
+#: src/hack.c:4059 src/nhlua.c:636 src/nhlua.c:652 src/pager.c:2696
 #: src/pickup.c:410 src/pline.c:677 src/pline.c:689 src/pline.c:744
 #: src/potion.c:207 src/potion.c:234 src/questpgr.c:434 src/sit.c:55
 #: src/sounds.c:1533 src/spell.c:2054 src/teleport.c:1145 src/timeout.c:147
@@ -856,7 +856,7 @@ msgstr "약간 휙휙거린다."
 msgid "This calls for swimming, not jumping!"
 msgstr "점프가 아니라 수영이 필요하다!"
 
-#: src/apply.c:2024 src/hack.c:2666
+#: src/apply.c:2024 src/hack.c:2665
 #, c-format
 msgid "pull free from %s."
 msgstr "%s에서 빠져나왔다."
@@ -866,7 +866,7 @@ msgstr "%s에서 빠져나왔다."
 msgid "writhe a little in the grasp of %s!"
 msgstr "%s의 손아귀에서 약간 몸부림친다!"
 
-#: src/apply.c:2031 src/hack.c:2655
+#: src/apply.c:2031 src/hack.c:2654
 #, c-format
 msgid "cannot escape from %s!"
 msgstr "%s에서 탈출할 수 없다!"
@@ -1348,7 +1348,7 @@ msgstr "현재 모습으로는 도구를 사용하거나 적용할 수 없다."
 msgid "are already %s."
 msgstr "이미 %s."
 
-#: src/apply.c:4313 src/attrib.c:661 src/dig.c:1307 src/dokick.c:208
+#: src/apply.c:4313 src/attrib.c:661 src/dig.c:1307 src/dokick.c:206
 #: src/dothrow.c:1948 src/dothrow.c:2501 src/eat.c:3038 src/engrave.c:861
 #: src/engrave.c:869 src/hack.c:1700 src/hack.c:2149 src/mcastu.c:769
 #: src/mhitm.c:701 src/mkobj.c:1601 src/mthrowu.c:749 src/muse.c:280
@@ -1747,7 +1747,7 @@ msgid "poison was deadly..."
 msgstr "독이 치명적이었다..."
 
 #: src/attrib.c:1049 src/attrib.c:1055 src/detect.c:1246 src/detect.c:1322
-#: src/dig.c:1068 src/dig.c:1074 src/dokick.c:704 src/dothrow.c:1499
+#: src/dig.c:1068 src/dig.c:1074 src/dokick.c:702 src/dothrow.c:1499
 #: src/eat.c:2117 src/mcastu.c:845 src/mthrowu.c:1439 src/muse.c:217
 #: src/pray.c:696 src/shk.c:3791 src/shk.c:5386 src/sit.c:605 src/sit.c:708
 #: src/spell.c:247 src/steed.c:429 src/timeout.c:255 src/trap.c:6281
@@ -2041,7 +2041,7 @@ msgstr "%s{으로/로} 계속한다."
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
-#: src/cmd.c:1287 src/dokick.c:1938 src/mhitm.c:81 src/mhitm.c:667
+#: src/cmd.c:1287 src/dokick.c:1936 src/mhitm.c:81 src/mhitm.c:667
 #: src/mhitm.c:859 src/steal.c:329 src/trap.c:4923 src/trap.c:4954
 #: src/uhitm.c:5556 src/zap.c:3561
 #, c-format
@@ -3284,7 +3284,7 @@ msgstr "%s 상태라 %s{으로/로} 갈 수 없다."
 # ============================================================
 # 두루마리 (Scrolls)
 # ============================================================
-#: src/do.c:1123 src/end.c:753 src/hack.c:2633 src/zap.c:596
+#: src/do.c:1123 src/end.c:753 src/hack.c:2632 src/zap.c:596
 #, c-format
 msgid "release %s."
 msgstr "%s{을/를} 놓았다."
@@ -3512,7 +3512,7 @@ msgstr "%s{이/가} 순간이동한다."
 msgid "%sless hassled."
 msgstr "%s덜 귀찮다."
 
-#: src/do.c:2326 src/dokick.c:1936 src/uhitm.c:981
+#: src/do.c:2326 src/dokick.c:1934 src/uhitm.c:981
 #, c-format
 msgid "%s%s"
 msgstr "%s%s"
@@ -4071,7 +4071,7 @@ msgstr "더 이상 어떤 무기도 장비하고 있지 않다."
 # ============================================================
 # 두루마리 (Scrolls)
 # ============================================================
-#: src/do_wear.c:2832 src/hack.c:4067 src/invent.c:4553 src/wield.c:173
+#: src/do_wear.c:2832 src/hack.c:4066 src/invent.c:4553 src/wield.c:173
 #, c-format
 msgid "are %s."
 msgstr "%s."
@@ -4212,370 +4212,374 @@ msgstr "%s{이/가} %s가 있던 곳에서 %s{을/를} %s!"
 msgid "sense that %s feels rather %s-ish."
 msgstr "%s{이/가} 다소 %s스럽다고 느껴진다."
 
-#: src/dokick.c:103
+#: src/dokick.c:57 src/dokick.c:206
+msgid "kick passes harmlessly through"
+msgstr "발길질{이/가} 해를 끼치지 않고 통과한다"
+
+#: src/dokick.c:101
 #, c-format
 msgid "%s reels from the blow."
 msgstr "%s{이/가} 타격에 비틀거렸다."
 
-#: src/dokick.c:156
+#: src/dokick.c:154
 msgid "Floating in the air, you miss wildly!"
 msgstr "공중에 떠 있어 크게 빗나갔다!"
 
-#: src/dokick.c:173
+#: src/dokick.c:171
 #, c-format
 msgid "is %s here."
 msgstr "여기에 %s{이/가} 있다."
 
-#: src/dokick.c:211 src/dokick.c:256 src/dokick.c:1070 src/dokick.c:1084
-#: src/dokick.c:1273
+#: src/dokick.c:209 src/dokick.c:254 src/dokick.c:1068 src/dokick.c:1082
+#: src/dokick.c:1271
 #, c-format
 msgid "kick %s."
 msgstr "%s{을/를} 찼다."
 
-#: src/dokick.c:240
+#: src/dokick.c:238
 msgid "clumsy kick does no damage."
 msgstr "서투른 발차기가 피해를 주지 못했다."
 
-#: src/dokick.c:263
+#: src/dokick.c:261
 #, c-format
 msgid "%s blocks your %skick."
 msgstr "%s{이/가} 당신의 %s발차기를 막았다."
 
-#: src/dokick.c:271
+#: src/dokick.c:269
 #, c-format
 msgid "%s %s, %s evading your %skick."
 msgstr "%s{이/가} %s, 당신의 %s발차기를 %s 피했다."
 
-#: src/dokick.c:305
+#: src/dokick.c:303
 #, c-format
 msgid "%s harmlessly %s %s."
 msgstr "%s{이/가} 해를 끼치지 않고 %s %s."
 
-#: src/dokick.c:321
+#: src/dokick.c:319
 #, c-format
 msgid "%s %scatches the gold."
 msgstr "%s{이/가} 금화를 %s 잡았다."
 
-#: src/dokick.c:332
+#: src/dokick.c:330
 #, c-format
 msgid "amount %scovers %s recent losses."
 msgstr "금액이 %s 최근 손실을 %s 커버한다."
 
-#: src/dokick.c:341
+#: src/dokick.c:339
 #, c-format
 msgid "have %ld %s in credit."
 msgstr "%ld %s 크레딧이 있다."
 
-#: src/dokick.c:344 src/dokick.c:351
+#: src/dokick.c:342 src/dokick.c:349
 msgid "Thanks, scum!"
 msgstr "고마워, 쓰레기!"
 
-#: src/dokick.c:349
+#: src/dokick.c:347
 msgid "Thank you for your contribution."
 msgstr "기부해 주셔서 감사합니다."
 
-#: src/dokick.c:389
+#: src/dokick.c:387
 msgid "That's not enough, coward!"
 msgstr "그것으로 충분하지 않아, 겁쟁이!"
 
-#: src/dokick.c:391
+#: src/dokick.c:389
 msgid "I don't take bribes from scum like you!"
 msgstr "너 같은 쓰레기에게 뇌물을 받지 않아!"
 
-#: src/dokick.c:394
+#: src/dokick.c:392
 msgid "That should do.  Now beat it!"
 msgstr "그 정도면 됐어. 이제 꺼져!"
 
-#: src/dokick.c:397
+#: src/dokick.c:395
 #, c-format
 msgid "Thanks for the tip, %s."
 msgstr "팁 고마워, %s."
 
-#: src/dokick.c:456 src/dokick.c:1737
+#: src/dokick.c:454 src/dokick.c:1735
 #, c-format
 msgid "a muffled %s."
 msgstr "희미한 %s."
 
-#: src/dokick.c:478 src/trap.c:6322
+#: src/dokick.c:476 src/trap.c:6322
 #, c-format
 msgid "caused %ld %s worth of damage!"
 msgstr "%ld %s 가치의 피해를 입혔다!"
 
-#: src/dokick.c:481
+#: src/dokick.c:479
 #, c-format
 msgid "owe %s %ld %s for objects destroyed."
 msgstr "파괴된 물건에 대해 %s{에게} %ld %s{을/를} 빚졌다."
 
-#: src/dokick.c:525
+#: src/dokick.c:523
 #, c-format
 msgid "kick %s that's in a %s!"
 msgstr "%s 안에 있는 %s{을/를} 찼다!"
 
-#: src/dokick.c:538
+#: src/dokick.c:536
 msgid "clumsy kick missed."
 msgstr "서투른 발차기가 빗나갔다."
 
-#: src/dokick.c:545
+#: src/dokick.c:543
 #, c-format
 msgid "kick %s with your bare %s."
 msgstr "맨 %s{으로/로} %s{을/를} 찼다."
 
-#: src/dokick.c:612
+#: src/dokick.c:610
 #, c-format
 msgid "You kick %s."
 msgstr "%s{을/를} 발로 찬다."
 
 #
-#: src/dokick.c:619
+#: src/dokick.c:617
 msgid "It doesn't come loose."
 msgstr "풀리지 않는다."
 
-#: src/dokick.c:621
+#: src/dokick.c:619
 #, c-format
 msgid "%s %sn't come loose."
 msgstr "%s{이/가} %s 느슨해지지 않았다."
 
-#: src/dokick.c:627
+#: src/dokick.c:625
 msgid "It comes loose."
 msgstr "느슨해졌다."
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
-#: src/dokick.c:629 src/mhitu.c:1348
+#: src/dokick.c:627 src/mhitu.c:1348
 #, c-format
 msgid "%s %s loose."
 msgstr "%s %s{이/가} 풀렸다."
 
-#: src/dokick.c:654
+#: src/dokick.c:652
 msgid "THUD!"
 msgstr "쿵!"
 
-#: src/dokick.c:658
+#: src/dokick.c:656
 msgid "break open the lock!"
 msgstr "자물쇠를 부수어 열었다!"
 
-#: src/dokick.c:666
+#: src/dokick.c:664
 msgid "lid slams open, then falls shut."
 msgstr "뚜껑이 쾅 열렸다가 닫혔다."
 
-#: src/dokick.c:688 src/dokick.c:711 src/trap.c:3476
+#: src/dokick.c:686 src/dokick.c:709 src/trap.c:3476
 msgid "Thump!"
 msgstr "쿵!"
 
-#: src/dokick.c:718
+#: src/dokick.c:716
 #, c-format
 msgid "Whee!  %s %s across the %s."
 msgstr "휘! %s{이/가} %s{을/를} 가로질러 %s."
 
-#: src/dokick.c:868
+#: src/dokick.c:866
 msgid "kick at empty space."
 msgstr "빈 공간을 찼다."
 
-#: src/dokick.c:872
+#: src/dokick.c:870
 msgid "Dumb move!  You strain a muscle."
 msgstr "멍청한 짓! 근육을 삐끗했다."
 
-#: src/dokick.c:886
+#: src/dokick.c:884
 msgid "Ouch!  That hurts!"
 msgstr "아야! 아프다!"
 
 #
-#: src/dokick.c:893
+#: src/dokick.c:891
 msgid "drawbridge is unaffected."
 msgstr "도개교는 영향을 받지 않았다."
 
-#: src/dokick.c:936
+#: src/dokick.c:934
 msgid "kick the door."
 msgstr "문을 찼다."
 
-#: src/dokick.c:942
+#: src/dokick.c:940
 msgid "As you kick the door, it shatters to pieces!"
 msgstr "문을 차자, 산산조각이 났다!"
 
-#: src/dokick.c:947
+#: src/dokick.c:945
 msgid "As you kick the door, it crashes open!"
 msgstr "문을 차자, 쾅 열렸다!"
 
-#: src/dokick.c:966
+#: src/dokick.c:964
 #, c-format
 msgid "%s!!"
 msgstr "%s!!"
 
-#: src/dokick.c:980
+#: src/dokick.c:978
 #, c-format
 msgid "Crash!  %s a secret door!"
 msgstr "쾅! %s 비밀문!"
 
-#: src/dokick.c:1005
+#: src/dokick.c:1003
 msgid "Crash!  You kick open a secret passage!"
 msgstr "쾅! 비밀 통로를 차서 열었다!"
 
 #
-#: src/dokick.c:1028
+#: src/dokick.c:1026
 msgid "CRASH!  You destroy it."
 msgstr "쿵! 그것을 파괴했다."
 
-#: src/dokick.c:1030
+#: src/dokick.c:1028
 msgid "CRASH!  You destroy the throne."
 msgstr "쾅! 왕좌를 파괴했다."
 
-#: src/dokick.c:1045
+#: src/dokick.c:1043
 #, c-format
 msgid "kick %s loose!"
 msgstr "%s{을/를} 차서 느슨하게 만들었다!"
 
-#: src/dokick.c:1047
+#: src/dokick.c:1045
 msgid "kick loose some ornamental coins and gems!"
 msgstr "장식용 동전과 보석을 차서 떨어뜨렸다!"
 
-#: src/dokick.c:1092
+#: src/dokick.c:1090
 msgid "boots get wet."
 msgstr "부츠가 젖었다."
 
-#: src/dokick.c:1123
+#: src/dokick.c:1121
 #, c-format
 msgid "Crack!  %s broke!"
 msgstr "쩍! %s{이/가} 부러졌다!"
 
-#: src/dokick.c:1125
+#: src/dokick.c:1123
 msgid "headstone topples over and breaks!"
 msgstr "묘비가 넘어져 부서졌다!"
 
-#: src/dokick.c:1141 src/sounds.c:71
+#: src/dokick.c:1139 src/sounds.c:71
 msgid "a low buzzing."
 msgstr "낮은 윙윙거림."
 
-#: src/dokick.c:1153
+#: src/dokick.c:1151
 #, c-format
 msgid "Some %s fall from the tree!"
 msgstr "나무에서 %s{이/가} 떨어졌다!"
 
-#: src/dokick.c:1155
+#: src/dokick.c:1153
 #, c-format
 msgid "%s falls from the tree!"
 msgstr "%s{이/가} 나무에서 떨어졌다!"
 
-#: src/dokick.c:1162
+#: src/dokick.c:1160
 #, c-format
 msgid "%ld %s got caught in the branches."
 msgstr "%ld %s{이/가} 가지에 걸렸다."
 
-#: src/dokick.c:1185
+#: src/dokick.c:1183
 msgid "You've attracted the tree's former occupants!"
 msgstr "나무의 이전 거주자들을 끌어들였다!"
 
-#: src/dokick.c:1187
+#: src/dokick.c:1185
 msgid "smell stale honey."
 msgstr "상한 꿀 냄새를 맡았다."
 
-#: src/dokick.c:1204
+#: src/dokick.c:1202
 msgid "Klunk!  The pipes vibrate noisily."
 msgstr "쿵! 파이프가 시끄럽게 진동한다."
 
-#: src/dokick.c:1206 src/lock.c:1063
+#: src/dokick.c:1204 src/lock.c:1063
 msgid "Klunk!"
 msgstr "딸깍!"
 
-#: src/dokick.c:1214
+#: src/dokick.c:1212
 msgid "a gushing sound."
 msgstr "콸콸 흐르는 소리."
 
-#: src/dokick.c:1216
+#: src/dokick.c:1214
 #, c-format
 msgid "A %s ooze gushes up from the drain!"
 msgstr "%s 진흙이 배수구에서 솟아올랐다!"
 
-#: src/dokick.c:1227
+#: src/dokick.c:1225
 #, c-format
 msgid "%s returns!"
 msgstr "%s{이/가} 돌아왔다!"
 
-#: src/dokick.c:1266
+#: src/dokick.c:1264
 msgid "have no legs to kick with."
 msgstr "찰 다리가 없다."
 
-#: src/dokick.c:1269
+#: src/dokick.c:1267
 msgid "are too small to do any kicking."
 msgstr "발로 차기에 너무 작다."
 
-#: src/dokick.c:1283
+#: src/dokick.c:1281
 msgid "load is too heavy to balance yourself for a kick."
 msgstr "짐이 너무 무거워 발차기를 위한 균형을 잡을 수 없다."
 
-#: src/dokick.c:1286
+#: src/dokick.c:1284
 msgid "legs cannot kick effectively."
 msgstr "다리로 효과적으로 찰 수 없다."
 
-#: src/dokick.c:1289
+#: src/dokick.c:1287
 msgid "slow motion kick doesn't hit anything."
 msgstr "느린 동작의 발차기가 아무것도 맞추지 못했다."
 
-#: src/dokick.c:1296
+#: src/dokick.c:1294
 msgid "There's not enough room to kick down here."
 msgstr "여기서는 발로 찰 공간이 충분하지 않다."
 
-#: src/dokick.c:1302 src/dokick.c:1336
+#: src/dokick.c:1300 src/dokick.c:1334
 #, c-format
 msgid "move your %s!"
 msgstr "%s{을/를} 움직일 수 없다!"
 
-#: src/dokick.c:1308
+#: src/dokick.c:1306
 msgid "There's not enough room to kick in here."
 msgstr "여기 안에서는 발로 찰 공간이 충분하지 않다."
 
-#: src/dokick.c:1340
+#: src/dokick.c:1338
 #, c-format
 msgid "%s burps loudly."
 msgstr "%s{이/가} 크게 트림했다."
 
-#: src/dokick.c:1346
+#: src/dokick.c:1344
 msgid "feeble kick has no effect."
 msgstr "약한 발차기가 효과가 없다."
 
-#: src/dokick.c:1352
+#: src/dokick.c:1350
 msgid "kick at the side of the pit."
 msgstr "구덩이 옆을 찼다."
 
-#: src/dokick.c:1367
+#: src/dokick.c:1365
 msgid "have nothing to brace yourself against."
 msgstr "지지할 것이 없다."
 
-#: src/dokick.c:1446
+#: src/dokick.c:1444
 #, c-format
 msgid "splash some %s around."
 msgstr "%s{을/를} 주변에 튀겼다."
 
-#: src/dokick.c:1599
+#: src/dokick.c:1597
 #, c-format
 msgid "From the impact, %sother %s."
 msgstr "충격으로 인해, %s다른 %s."
 
-#: src/dokick.c:1602 src/dokick.c:1605
+#: src/dokick.c:1600 src/dokick.c:1603
 #, c-format
 msgid "%s adjacent %s %s."
 msgstr "인접한 %s %s{이/가} %s."
 
-#: src/dokick.c:1612
+#: src/dokick.c:1610
 #, c-format
 msgid "removed %ld %s worth of goods!"
 msgstr "%ld %s 가치의 물건을 치웠다!"
 
-#: src/dokick.c:1617
+#: src/dokick.c:1615
 #, c-format
 msgid "%s is infuriated!"
 msgstr "%s{이/가} 격노했다!"
 
-#: src/dokick.c:1619
+#: src/dokick.c:1617
 #, c-format
 msgid "\"%s, you are a thief!\""
 msgstr "\"%s, 당신은 도둑이다!\""
 
-#: src/dokick.c:1621
+#: src/dokick.c:1619
 msgid "a scream, \"Thief!\""
 msgstr "\"도둑이야!\"라는 비명."
 
-#: src/dokick.c:1628
+#: src/dokick.c:1626
 #, c-format
 msgid "owe %s %ld %s for goods lost."
 msgstr "%s에게 잃어버린 물건에 대해 %ld %s{을/를} 빚졌다."
@@ -6893,318 +6897,342 @@ msgstr "멈춰. %s{은/는} 자리를 바꾸고 싶지 않다."
 msgid "guilty about losing your pet like this."
 msgstr "이렇게 애완동물을 잃어서 죄책감이 든다."
 
+#: src/hack.c:2233 src/hack.c:2288
+msgid "an unknown obstacle"
+msgstr "알 수 없는 장애물"
+
+#: src/hack.c:2294
+msgid "thin air"
+msgstr "허공"
+
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
-#: src/hack.c:2299
+#: src/hack.c:2298
 #, c-format
 msgid "%s%s %s."
 msgstr "%s%s %s."
 
-#: src/hack.c:2327 src/sit.c:413
+#: src/hack.c:2299
+msgid "harmlessly "
+msgstr "해를 끼치지 않고 "
+
+#: src/hack.c:2299
+msgid "futilely "
+msgstr "헛되이 "
+
+#: src/hack.c:2300
+msgid "explode at"
+msgstr "폭발을 시도한다"
+
+#: src/hack.c:2300
+msgid "attack"
+msgstr "공격한다"
+
+#: src/hack.c:2326 src/sit.c:413
 msgid "tumble in place."
 msgstr "제자리에서 굴렀다."
 
 #
-#: src/hack.c:2331
+#: src/hack.c:2330
 msgid "control your movements very well."
 msgstr "움직임을 잘 제어할 수 없다."
 
-#: src/hack.c:2334
+#: src/hack.c:2333
 msgid "It's hard to walk in thin air."
 msgstr "허공을 걷기 어렵다."
 
-#: src/hack.c:2367
+#: src/hack.c:2366
 msgid "are carrying too much to climb out of the water."
 msgstr "너무 많이 들고 있어서 물에서 나올 수 없다."
 
-#: src/hack.c:2434
+#: src/hack.c:2433
 #, c-format
 msgid "stop in front of %s."
 msgstr "%s 앞에서 멈춘다."
 
-#: src/hack.c:2464
+#: src/hack.c:2463
 #, c-format
 msgid "stop at the edge of the %s."
 msgstr "%s 가장자리에서 멈춘다."
 
-#: src/hack.c:2584
+#: src/hack.c:2583
 #, c-format
 msgid "have already gone as far %s as possible."
 msgstr "이미 가능한 한 %s까지 갔다."
 
-#: src/hack.c:2606
+#: src/hack.c:2605
 msgid "don't have enough stamina to move."
 msgstr "움직일 체력이 부족하다."
 
-#: src/hack.c:2609
+#: src/hack.c:2608
 msgid "collapse under your load."
 msgstr "짐 아래서 쓰러졌다."
 
-#: src/hack.c:2879
+#: src/hack.c:2878
 #, c-format
 msgid "%s swaps places with you..."
 msgstr "%s{이/가} 자리를 바꾼다..."
 
-#: src/hack.c:2966
+#: src/hack.c:2965
 msgid "dragging an iron ball"
 msgstr "철구를 끌고 가는 중"
 
-#: src/hack.c:3023
+#: src/hack.c:3022
 msgid "pass out from exertion!"
 msgstr "과로로 기절했다!"
 
-#: src/hack.c:3059
+#: src/hack.c:3058
 #, c-format
 msgid "a strange vibration %s."
 msgstr "이상한 진동 %s."
 
-#: src/hack.c:3082
+#: src/hack.c:3081
 msgid "levitate in here."
 msgstr "여기서 공중 부양할 수 없다."
 
-#: src/hack.c:3094
+#: src/hack.c:3093
 msgid "fly in here."
 msgstr "여기서 날 수 없다."
 
 #
-#: src/hack.c:3103
+#: src/hack.c:3102
 msgid "start flying."
 msgstr "날기 시작했다."
 
-#: src/hack.c:3129
+#: src/hack.c:3128
 msgid "pop into an air bubble."
 msgstr "공기 방울 속으로 들어갔다."
 
-#: src/hack.c:3132
+#: src/hack.c:3131
 #, c-format
 msgid "leave the %s..."
 msgstr "%s{을/를} 떠난다..."
 
-#: src/hack.c:3139
+#: src/hack.c:3138
 #, c-format
 msgid "pop out of the %s like a cork!"
 msgstr "코르크처럼 %s에서 튀어나왔다!"
 
-#: src/hack.c:3141
+#: src/hack.c:3140
 #, c-format
 msgid "fly out of the %s."
 msgstr "%s에서 날아 나왔다."
 
-#: src/hack.c:3143
+#: src/hack.c:3142
 msgid "slowly rise above the surface."
 msgstr "천천히 수면 위로 떠오른다."
 
-#: src/hack.c:3305
+#: src/hack.c:3304
 #, c-format
 msgid "%s suddenly drops from the %s!"
 msgstr "%s{이/가} 갑자기 %s에서 떨어졌다!"
 
-#: src/hack.c:3310
+#: src/hack.c:3309
 #, c-format
 msgid "Its blow glances off your %s."
 msgstr "그 공격이 %s에 스쳤다."
 
-#: src/hack.c:3313
+#: src/hack.c:3312
 #, c-format
 msgid "are almost hit by %s!"
 msgstr "%s에 거의 맞을 뻔했다!"
 
-#: src/hack.c:3318 src/read.c:2263
+#: src/hack.c:3317 src/read.c:2263
 #, c-format
 msgid "are hit by %s!"
 msgstr "%s에 맞았다!"
 
-#: src/hack.c:3328
+#: src/hack.c:3327
 #, c-format
 msgid "%s jumps near you from the %s."
 msgstr "%s{이/가} %s에서 가까이 뛰어왔다."
 
-#: src/hack.c:3331
+#: src/hack.c:3330
 #, c-format
 msgid "surprise %s!"
 msgstr "%s{을/를} 놀래켰다!"
 
-#: src/hack.c:3335
+#: src/hack.c:3334
 #, c-format
 msgid "%s attacks you by surprise!"
 msgstr "%s{이/가} 기습 공격했다!"
 
-#: src/hack.c:3555
+#: src/hack.c:3554
 msgid "Welcome to David's treasure zoo!"
 msgstr "데이빗의 보물 동물원에 온 것을 환영한다!"
 
-#: src/hack.c:3558
+#: src/hack.c:3557
 #, c-format
 msgid "It %s rather %s down here."
 msgstr "여기 아래는 다소 %s %s."
 
-#: src/hack.c:3562
+#: src/hack.c:3561
 #, c-format
 msgid "enter an opulent%s room!"
 msgstr "호화로운%s 방에 들어갔다!"
 
-#: src/hack.c:3567
+#: src/hack.c:3566
 msgid "enter a leprechaun hall!"
 msgstr "레프리콘 홀에 들어갔다!"
 
-#: src/hack.c:3573
+#: src/hack.c:3572
 #, c-format
 msgid "%s away!  %s away!"
 msgstr "%s 물러가라! %s 물러가라!"
 
-#: src/hack.c:3575
+#: src/hack.c:3574
 msgid "have an uncanny feeling..."
 msgstr "불길한 예감이 든다..."
 
-#: src/hack.c:3578
+#: src/hack.c:3577
 msgid "enter a giant beehive!"
 msgstr "거대한 벌집에 들어갔다!"
 
-#: src/hack.c:3581
+#: src/hack.c:3580
 msgid "enter a disgusting nest!"
 msgstr "역겨운 둥지에 들어갔다!"
 
-#: src/hack.c:3584
+#: src/hack.c:3583
 msgid "enter an anthole!"
 msgstr "개미굴에 들어갔다!"
 
-#: src/hack.c:3591
+#: src/hack.c:3590
 msgid "enter a military barracks!"
 msgstr "군 막사에 들어갔다!"
 
-#: src/hack.c:3593
+#: src/hack.c:3592
 msgid "enter an abandoned barracks."
 msgstr "버려진 막사에 들어갔다."
 
-#: src/hack.c:3601
+#: src/hack.c:3600
 #, c-format
 msgid "You're in Delphi, %s."
 msgstr "델피에 있다, %s."
 
-#: src/hack.c:3603
+#: src/hack.c:3602
 #, c-format
 msgid "%s, %s, welcome to Delphi!"
 msgstr "%s, %s, 델피에 온 것을 환영한다!"
 
-#: src/hack.c:3680
+#: src/hack.c:3679
 #, c-format
 msgid "pick up %s tongue."
 msgstr "%s 혀를 주웠다."
 
-#: src/hack.c:3681
+#: src/hack.c:3680
 msgid "But it's kind of slimy, so you drop it."
 msgstr "하지만 끈적거려서 떨어뜨렸다."
 
-#: src/hack.c:3683
+#: src/hack.c:3682
 #, c-format
 msgid "don't %s anything in here to pick up."
 msgstr "여기서 줍기 위해 %s할 것이 없다."
 
-#: src/hack.c:3693
+#: src/hack.c:3692
 #, c-format
 msgid "cannot dive into the %s to pick things up."
 msgstr "%s에 뛰어들어 물건을 주울 수 없다."
 
-#: src/hack.c:3697
+#: src/hack.c:3696
 #, c-format
 msgid "even see the bottom, let alone pick up %s."
 msgstr "바닥조차 보이지 않는데, %s{을/를} 줍는 것은 말할 것도 없다."
 
-#: src/hack.c:3704
+#: src/hack.c:3703
 msgid "reach the bottom to pick things up."
 msgstr "바닥에 닿아 물건을 줍는다."
 
-#: src/hack.c:3707
+#: src/hack.c:3706
 msgid "would burn to a crisp trying to pick things up."
 msgstr "물건을 주우려다 바삭하게 탈 것이다."
 
-#: src/hack.c:3715
+#: src/hack.c:3714
 #, c-format
 msgid "It must weigh%s a ton!"
 msgstr "%s 엄청나게 무거울 것이다!"
 
-#: src/hack.c:3717
+#: src/hack.c:3716
 msgid "plumbing connects it to the floor."
 msgstr "배관이 바닥에 연결되어 있다."
 
-#: src/hack.c:3719
+#: src/hack.c:3718
 msgid "don't need a gravestone.  Yet."
 msgstr "아직 비석은 필요 없다."
 
 # ============================================================
 # 물약 (Potions)
 # ============================================================
-#: src/hack.c:3721
+#: src/hack.c:3720
 #, c-format
 msgid "could drink the %s..."
 msgstr "%s{을/를} 마실 수 있다..."
 
-#: src/hack.c:3723
+#: src/hack.c:3722
 msgid "It won't come off the hinges."
 msgstr "경첩에서 떨어지지 않는다."
 
-#: src/hack.c:3725
+#: src/hack.c:3724
 msgid "Moving the altar would be a very bad idea."
 msgstr "제단을 옮기는 것은 매우 나쁜 생각이다."
 
-#: src/hack.c:3727
+#: src/hack.c:3726
 msgid "stairs are solidly affixed."
 msgstr "계단이 단단히 고정되어 있다."
 
-#: src/hack.c:3729
+#: src/hack.c:3728
 msgid "is nothing here to pick up."
 msgstr "여기에 주울 것이 없다."
 
-#: src/hack.c:3737
+#: src/hack.c:3736
 msgid "cannot reach the bottom of the pit."
 msgstr "구덩이 바닥에 닿을 수 없다."
 
-#: src/hack.c:3741
+#: src/hack.c:3740
 msgid "cannot reach anything here."
 msgstr "여기에서 아무것에도 닿을 수 없다."
 
-#: src/hack.c:3751
+#: src/hack.c:3750
 #, c-format
 msgid "cannot reach the %s."
 msgstr "%s에 닿을 수 없다."
 
-#: src/hack.c:3792
+#: src/hack.c:3791
 msgid "cannot move diagonally."
 msgstr "대각선으로 이동할 수 없다."
 
-#: src/hack.c:3854
+#: src/hack.c:3853
 msgid "stop in front of the door."
 msgstr "문 앞에서 멈췄다."
 
-#: src/hack.c:3911
+#: src/hack.c:3910
 msgid "corridor widens here."
 msgstr "복도가 여기서 넓어진다."
 
-#: src/hack.c:4102
+#: src/hack.c:4101
 #, c-format
 msgid "%s is about to die."
 msgstr "%s{이/가} 죽기 직전이다."
 
-#: src/hack.c:4108
+#: src/hack.c:4107
 #, c-format
 msgid "%s, all your powers will be lost..."
 msgstr "%s, 모든 힘을 잃게 될 것이다..."
 
-#: src/hack.c:4109
+#: src/hack.c:4108
 #, c-format
 msgid "%s, your life force is running out."
 msgstr "%s, 생명력이 고갈되고 있다."
 
-#: src/hack.c:4114
+#: src/hack.c:4113
 msgid "the wailing of the Banshee..."
 msgstr "밴시의 통곡을..."
 
-#: src/hack.c:4115
+#: src/hack.c:4114
 msgid "the howling of the CwnAnnwn..."
 msgstr "Cwn Annwn의 울부짖음을..."
 
-#: src/hack.c:4180
+#: src/hack.c:4179
 #, c-format
 msgid "[HP %i, %i left]"
 msgstr "[HP %i, %i 남음]"
@@ -7212,11 +7240,11 @@ msgstr "[HP %i, %i 남음]"
 # ============================================================
 # 사망 메시지 (Death Messages)
 # ============================================================
-#: src/hack.c:4216
+#: src/hack.c:4215
 msgid "You die..."
 msgstr "당신은 죽었다..."
 
-#: src/hack.c:4334 src/steed.c:249
+#: src/hack.c:4333 src/steed.c:249
 msgid "do that while carrying so much stuff."
 msgstr "그렇게 많은 짐을 들고는 그렇게 할 수 없다."
 
