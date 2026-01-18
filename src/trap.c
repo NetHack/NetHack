@@ -76,11 +76,20 @@ staticfn void maybe_finish_sokoban(void);
 
 static const char *const a_your[2] = { "a", "your" };
 static const char *const A_Your[2] = { "A", "Your" };
-static const char tower_of_flame[] = "tower of flame";
-static const char *const A_gush_of_water_hits = "A gush of water hits";
-static const char *const blindgas[6] = { "humid",   "odorless",
-                                         "pungent", "chilling",
-                                         "acrid",   "biting" };
+
+/* returns a random gas adjective for when the player is blind */
+static const char *
+random_blindgas(void)
+{
+    switch (rn2(6)) {
+    case 0: return _("humid");
+    case 1: return _("odorless");
+    case 2: return _("pungent");
+    case 3: return _("chilling");
+    case 4: return _("acrid");
+    default: return _("biting");
+    }
+}
 
 /* called when you're hit by fire (dofiretrap,buzz,zapyourself,explode);
    returns TRUE if hit on torso */
@@ -1594,11 +1603,11 @@ trapeffect_rust_trap(
          */
         switch (rn2(5)) {
         case 0:
-            pline(_("%s you on the %s!"), A_gush_of_water_hits, body_part(HEAD));
+            pline(_("%s you on the %s!"), _("A gush of water hits"), body_part(HEAD));
             (void) water_damage(uarmh, helm_simple_name(uarmh), TRUE);
             break;
         case 1:
-            pline(_("%s your left %s!"), A_gush_of_water_hits, body_part(ARM));
+            pline(_("%s your left %s!"), _("A gush of water hits"), body_part(ARM));
             if (water_damage(uarms, "shield", TRUE) != ER_NOTHING)
                 break;
             if (u.twoweap || (uwep && bimanual(uwep)))
@@ -1607,11 +1616,11 @@ trapeffect_rust_trap(
             (void) water_damage(uarmg, gloves_simple_name(uarmg), TRUE);
             break;
         case 2:
-            pline(_("%s your right %s!"), A_gush_of_water_hits, body_part(ARM));
+            pline(_("%s your right %s!"), _("A gush of water hits"), body_part(ARM));
             (void) water_damage(uwep, 0, TRUE);
             goto uglovecheck;
         default:
-            pline(_("%s you!"), A_gush_of_water_hits);
+            pline(_("%s you!"), _("A gush of water hits"));
             /* note: exclude primary and secondary weapons from splashing
                because cases 1 and 2 target them [via water_damage()] */
             for (otmp = gi.invent; otmp; otmp = nextobj) {
@@ -1649,7 +1658,7 @@ trapeffect_rust_trap(
         case 0:
             if (in_sight)
                 pline_mon(mtmp,
-                      "%s %s on the %s!", A_gush_of_water_hits,
+                      _("%s %s on the %s!"), _("A gush of water hits"),
                       mon_nam(mtmp), mbodypart(mtmp, HEAD));
             target = which_armor(mtmp, W_ARMH);
             (void) water_damage(target, helm_simple_name(target), TRUE);
@@ -1657,7 +1666,7 @@ trapeffect_rust_trap(
         case 1:
             if (in_sight)
                 pline_mon(mtmp,
-                      "%s %s's left %s!", A_gush_of_water_hits,
+                      _("%s %s's left %s!"), _("A gush of water hits"),
                       mon_nam(mtmp), mbodypart(mtmp, ARM));
             target = which_armor(mtmp, W_ARMS);
             if (water_damage(target, "shield", TRUE) != ER_NOTHING)
@@ -1672,13 +1681,13 @@ trapeffect_rust_trap(
         case 2:
             if (in_sight)
                 pline_mon(mtmp,
-                      "%s %s's right %s!", A_gush_of_water_hits,
+                      _("%s %s's right %s!"), _("A gush of water hits"),
                       mon_nam(mtmp), mbodypart(mtmp, ARM));
             (void) water_damage(MON_WEP(mtmp), 0, TRUE);
             goto mglovecheck;
         default:
             if (in_sight)
-                pline(_("%s %s!"), A_gush_of_water_hits, mon_nam(mtmp));
+                pline(_("%s %s!"), _("A gush of water hits"), mon_nam(mtmp));
             for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
                 if (otmp->lamplit
                     /* exclude weapon(s) because cases 1 and 2 do them */
@@ -1730,11 +1739,11 @@ trapeffect_fire_trap(
 
         if (in_sight)
             pline_mon(mtmp,
-                 "A %s erupts from the %s under %s!", tower_of_flame,
+                 _("A %s erupts from the %s under %s!"), _("tower of flame"),
                   surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
         else if (see_it) { /* evidently `mtmp' is invisible */
             set_msg_xy(mtmp->mx, mtmp->my);
-            You_see(_("a %s erupt from the %s!"), tower_of_flame,
+            You_see(_("a %s erupt from the %s!"), _("tower of flame"),
                     surface(mtmp->mx, mtmp->my));
         }
         if (resists_fire(mtmp)) {
@@ -4157,7 +4166,8 @@ dofiretrap(
             losehp(rnd(3), "boiling water", KILLED_BY);
         return;
     }
-    pline(_("A %s %s from %s!"), tower_of_flame, box ? "bursts" : "erupts",
+    pline(_("A %s %s from %s!"), _("tower of flame"),
+          box ? _("bursts") : _("erupts"),
           the(box ? xname(box) : surface(u.ux, u.uy)));
     if (Fire_resistance) {
         shieldeff(u.ux, u.uy);
@@ -4207,7 +4217,7 @@ dofiretrap(
     if (!num)
         You(_("are uninjured."));
     else
-        losehp(num, tower_of_flame, KILLED_BY_AN); /* fire damage */
+        losehp(num, "tower of flame", KILLED_BY_AN); /* fire damage */
     burn_away_slime();
 
     if (burnarmor(&gy.youmonst) || rn2(3)) {
@@ -6379,7 +6389,7 @@ chest_trap(
         case 1:
         case 0:
             pline(_("A cloud of %s gas billows from %s."),
-                  Blind ? ROLL_FROM(blindgas) : rndcolor(),
+                  Blind ? random_blindgas() : rndcolor(),
                   the(xname(obj)));
             if (!Stunned) {
                 if (Hallucination)
@@ -6387,8 +6397,8 @@ chest_trap(
                 else
                     You(_("%s%s..."), stagger(gy.youmonst.data, "stagger"),
                         Halluc_resistance ? ""
-                                          : Blind ? " and get dizzy"
-                                                  : " and your vision blurs");
+                                          : Blind ? _(" and get dizzy")
+                                                  : _(" and your vision blurs"));
             }
             make_stunned((HStun & TIMEOUT) + (long) rn1(7, 16), FALSE);
             (void) make_hallucinated(
