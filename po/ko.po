@@ -1276,9 +1276,13 @@ msgid "sink backs up, leaving %s."
 msgstr "싱크대가 역류하여 %s{을/를} 남겼다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:669
-#, c-format
+#, fuzzy, c-format
 msgid "You cannot %s %s you are wearing."
-msgstr "착용 중인 %s{을/를} %s할 수 없다."
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"착용 중인 %s{을/를} %s할 수 없다.\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"입고 있는 %s{을/를} %s 수 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:680
 #, c-format
@@ -7928,14 +7932,19 @@ msgstr "몸이 다시 나타나는 것 같다..."
 msgid "%s:"
 msgstr "%s:"
 
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:2479
 #: /home/jinhong_kim/workspace/HanNetHack/src/wizcmds.c:323
-#, c-format
+#, fuzzy, c-format
 msgid "%s is %s."
-msgstr "%s{이/가} %s."
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"%s{이/가} %s.\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"%s{이} %s."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:2494
 #, c-format
@@ -20700,6 +20709,67 @@ msgstr "%s 줄무늬가 %s에 있는 것을."
 
 msgid "the pages glow faintly %s."
 msgstr "페이지가 희미하게 %s 빛나는 것을."
+
+# Norep messages
+msgid "You %s an explosion!"
+msgstr "폭발 %s!"
+
+msgid "What are you looking for?  The exit?"
+msgstr "뭘 찾고 있는 거야? 출구?"
+
+msgid "You kick %s."
+msgstr "%s{을/를} 발로 찬다."
+
+msgid "The %s haze around you %s."
+msgstr "당신 주위의 %s 안개가 %s."
+
+msgid "%s is still in a pit."
+msgstr "%s{이} 아직 구덩이에 있다."
+
+msgid "You hear a %swhoosh!"
+msgstr "%s휘익 소리가 들린다!"
+
+msgid "%s %s %s the iron bars."
+msgstr "%s{이} %s 철창을 %s."
+
+msgid "You hear a mumbled curse."
+msgstr "중얼거리는 저주가 들린다."
+
+msgid "%s the rattle of battle gear being readied."
+msgstr "전투 장비가 준비되는 달그락 소리 %s."
+
+msgid "%s is furious!"
+msgstr "%s{이} 격노했다!"
+
+msgid "The %s %s somewhat but remain intact."
+msgstr "%s{이} 약간 %s지만 그대로 남아있다."
+
+msgid "The %s %s."
+msgstr "%s{이} %s."
+
+msgid "Double %s prefix, canceled."
+msgstr "%s 접두사 두 번, 취소됨."
+
+msgid "Double rush prefix, canceled."
+msgstr "돌진 접두사 두 번, 취소됨."
+
+msgid "Double run prefix, canceled."
+msgstr "달리기 접두사 두 번, 취소됨."
+
+msgid "Double fight prefix, canceled."
+msgstr "전투 접두사 두 번, 취소됨."
+
+msgid "There is no command available to repeat."
+msgstr "반복할 명령이 없다."
+
+msgid "You move over %s."
+msgstr "%s 위로 이동한다."
+
+msgid "You move over some lava."
+msgstr "용암 위로 이동한다."
+
+msgid "You are %s."
+msgstr "당신은 %s."
 
 #~ msgid "You feel like someone is helping you."
 #~ msgstr "누군가 도와주는 것 같다."

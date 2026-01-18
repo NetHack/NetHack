@@ -4128,7 +4128,7 @@ climb_pit(void)
            many times without further user intervention by using a run
            attempt to keep retrying to escape from the pit) */
         if (u.usteed)
-            Norep("%s is still in a pit.", YMonnam(u.usteed));
+            Norep(_("%s is still in a pit."), YMonnam(u.usteed));
         else
             Norep((Hallucination && !rn2(5))
                       ? "You've fallen, and you can't get up."

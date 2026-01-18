@@ -1632,7 +1632,7 @@ postmov(
                 dissolve_bars(mtmp->mx, mtmp->my);
                 return MMOVE_DONE;
             } else if (flags.verbose && canseemon(mtmp))
-                Norep("%s %s %s the iron bars.", Monnam(mtmp),
+                Norep(_("%s %s %s the iron bars."), Monnam(mtmp),
                       /* pluralization fakes verb conjugation */
                       makeplural(locomotion(ptr, "pass")),
                       passes_walls(ptr) ? "through" : "between");

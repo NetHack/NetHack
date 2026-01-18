@@ -1556,7 +1556,7 @@ int
 do_reqmenu(void)
 {
     if (iflags.menu_requested) {
-        Norep("Double %s prefix, canceled.",
+        Norep(_("Double %s prefix, canceled."),
               visctrl(cmd_from_func(do_reqmenu)));
         iflags.menu_requested = FALSE;
         return ECMD_CANCEL;
@@ -1571,7 +1571,7 @@ int
 do_rush(void)
 {
     if ((gd.domove_attempting & DOMOVE_RUSH)) {
-        Norep("Double rush prefix, canceled.");
+        Norep(_("Double rush prefix, canceled."));
         svc.context.run = 0;
         gd.domove_attempting = 0;
         return ECMD_CANCEL;
@@ -1587,7 +1587,7 @@ int
 do_run(void)
 {
     if ((gd.domove_attempting & DOMOVE_RUSH)) {
-        Norep("Double run prefix, canceled.");
+        Norep(_("Double run prefix, canceled."));
         svc.context.run = 0;
         gd.domove_attempting = 0;
         return ECMD_CANCEL;
@@ -1603,7 +1603,7 @@ int
 do_fight(void)
 {
     if (svc.context.forcefight) {
-        Norep("Double fight prefix, canceled.");
+        Norep(_("Double fight prefix, canceled."));
         svc.context.forcefight = 0;
         gd.domove_attempting = 0;
         return ECMD_CANCEL;
@@ -1624,7 +1624,7 @@ do_repeat(void)
         struct _cmd_queue *repeat_copy;
 
         if (!cmdq_peek(CQ_REPEAT)) {
-            Norep("There is no command available to repeat.");
+            Norep(_("There is no command available to repeat."));
             return ECMD_FAIL;
         }
         repeat_copy = cmdq_copy(CQ_REPEAT);

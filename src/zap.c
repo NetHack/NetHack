@@ -1979,7 +1979,7 @@ poly_obj(struct obj *obj, int id)
                     hot_pursuit(shkp);
                 }
             } else
-                Norep("%s is furious!", Shknam(shkp));
+                Norep(_("%s is furious!"), Shknam(shkp));
         }
     }
     delobj(obj);
@@ -5315,14 +5315,14 @@ zap_over_floor(
                 break;
             if ((lev->wall_info & W_NONDIGGABLE) != 0) {
                 if (see_it)
-                    Norep("The %s %s somewhat but remain intact.",
+                    Norep(_("The %s %s somewhat but remain intact."),
                           defsyms[S_bars].explanation,
                           (damgtype == ZT_ACID) ? "corrode" : "melt");
                 /* but nothing actually happens... */
             } else {
                 rangemod -= 3;
                 if (see_it)
-                    Norep("The %s %s.", defsyms[S_bars].explanation,
+                    Norep(_("The %s %s."), defsyms[S_bars].explanation,
                           (damgtype == ZT_ACID) ? "corrode away" : "melt");
                 dissolve_bars(x, y);
                 if (*in_rooms(x, y, SHOPBASE)) {

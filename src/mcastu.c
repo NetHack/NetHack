@@ -66,7 +66,7 @@ cursetxt(struct monst *mtmp, boolean undirected)
         pline_mon(mtmp, "%s points %s.", Monnam(mtmp), point_msg);
     } else if ((!(svm.moves % 4) || !rn2(4))) {
         if (!Deaf)
-            Norep("You hear a mumbled curse.");   /* Deaf-aware */
+            Norep(_("You hear a mumbled curse."));   /* Deaf-aware */
     }
 }
 

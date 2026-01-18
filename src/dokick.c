@@ -609,7 +609,7 @@ really_kick_object(coordxy x, coordxy y)
                                              && gk.kickedobj->unpaid)));
     /* 3.7: give feedback about the item being kicked; some follow-on
        messages refer to "it" */
-    Norep("You kick %s.",
+    Norep(_("You kick %s."),
           !isgold ? singular(gk.kickedobj, doname) : doname(gk.kickedobj));
 
     if (IS_OBSTRUCTED(levl[x][y].typ) || closed_door(x, y)) {

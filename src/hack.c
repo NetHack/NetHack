@@ -1547,9 +1547,9 @@ trapmove(
         if (flags.verbose) {
             predicament = "caught in a bear trap";
             if (u.usteed)
-                Norep("%s is %s.", upstart(steedname), predicament);
+                Norep(_("%s is %s."), upstart(steedname), predicament);
             else
-                Norep("You are %s.", predicament);
+                Norep(_("You are %s."), predicament);
         }
         /* [why does diagonal movement give quickest escape?] */
         if ((u.dx && u.dy) || !rn2(5))
@@ -1575,9 +1575,9 @@ trapmove(
             if (flags.verbose) {
                 predicament = "stuck to the web";
                 if (u.usteed)
-                    Norep("%s is %s.", upstart(steedname), predicament);
+                    Norep(_("%s is %s."), upstart(steedname), predicament);
                 else
-                    Norep("You are %s.", predicament);
+                    Norep(_("You are %s."), predicament);
             }
         } else {
             if (u.usteed)
@@ -1590,9 +1590,9 @@ trapmove(
         if (flags.verbose) {
             predicament = "stuck in the lava";
             if (u.usteed)
-                Norep("%s is %s.", upstart(steedname), predicament);
+                Norep(_("%s is %s."), upstart(steedname), predicament);
             else
-                Norep("You are %s.", predicament);
+                Norep(_("You are %s."), predicament);
         }
         if (!is_lava(x, y)) {
             u.utrap--;

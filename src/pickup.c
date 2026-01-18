@@ -2565,7 +2565,7 @@ in_container(struct obj *obj)
         pline(_("That would be an interesting topological exercise."));
         return 0;
     } else if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
-        Norep("You cannot %s %s you are wearing.",
+        Norep(_("You cannot %s %s you are wearing."),
               Icebox ? "refrigerate" : "stash", something);
         return 0;
     } else if ((obj->otyp == LOADSTONE) && obj->cursed) {

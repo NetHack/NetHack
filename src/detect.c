@@ -1752,7 +1752,7 @@ openone(coordxy zx, coordxy zy, genericptr_t num)
             if (distu(zx, zy) < 3)
                 b_trapped("door", NO_PART);
             else
-                Norep("You %s an explosion!",
+                Norep(_("You %s an explosion!"),
                       cansee(zx, zy) ? "see" : (!Deaf ? "hear"
                                                       : "feel the shock of"));
             wake_nearto(zx, zy, 11 * 11);
@@ -2021,7 +2021,7 @@ dosearch0(int aflag) /* intrinsic autosearch vs explicit searching */
 
     if (u.uswallow) {
         if (!aflag)
-            Norep("What are you looking for?  The exit?");
+            Norep(_("What are you looking for?  The exit?"));
     } else {
         int fund = (uwep && uwep->oartifact
                     && spec_ability(uwep, SPFX_SEARCH)) ? uwep->spe : 0;
