@@ -1040,13 +1040,13 @@ test_move(
                                                    : -1;
 
                     if (sym == S_stone)
-                        Strcpy(buf, "solid stone");
+                        Strcpy(buf, _("solid stone"));
                     else if (sym >= 0)
                         Strcpy(buf, an(defsyms[sym].explanation));
                     else
                         Sprintf(buf, "impossible [background glyph=%d]",
                                 glyph);
-                    pline_dir(xytod(dx, dy), "It's %s.", buf);
+                    pline_dir(xytod(dx, dy), _("It's %s."), buf);
                 }
             }
             return FALSE;
@@ -2146,7 +2146,7 @@ domove_swap_with_pet(
         newsym(x, y);
         newsym(u.ux0, u.uy0);
 
-        You(_("%s %s."), mtmp->mpeaceful ? "swap places with" : "frighten",
+        You(_("%s %s."), mtmp->mpeaceful ? _("swap places with") : _("frighten"),
             x_monnam(mtmp,
                      mtmp->mtame ? ARTICLE_YOUR
                      : (!has_mgivenname(mtmp)

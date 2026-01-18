@@ -1387,6 +1387,14 @@ msgstr "%s{이/가} 조여"
 msgid "%s hits"
 msgstr "%s{이/가} 때려"
 
+# Pet interaction verbs (hack.c)
+# Note: Korean word order differs from English, so these are adapted
+msgid "swap places with"
+msgstr "와(과) 자리를 바꿨다 -"
+
+msgid "frighten"
+msgstr "을(를) 겁먹게 했다 -"
+
 #: src/apply.c:4397
 msgid "It rings! ... But no-one answers."
 msgstr "벨이 울린다! ... 하지만 아무도 대답하지 않는다."
@@ -18030,7 +18038,7 @@ msgstr "%s{이/가} %s 산산조각났다!"
 
 #: src/uhitm.c:2359
 msgid "rot!"
-msgstr "썩다!"
+msgstr "썩어버렸다!"
 
 #: src/uhitm.c:2430
 #, c-format
