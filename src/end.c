@@ -1422,7 +1422,7 @@ really_done(int how)
                 ? (const char *) ((flags.female && gu.urole.name.f)
                     ? gu.urole.name.f
                     : gu.urole.name.m)
-                : (const char *) (flags.female ? "Demigoddess" : "Demigod"));
+                : (const char *) (flags.female ? _("Demigoddess") : _("Demigod")));
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     dump_forward_putstr(endwin, 0, "", done_stopprint);
 
@@ -1475,8 +1475,8 @@ really_done(int how)
             Strcat(pbuf, " ");
         }
         Sprintf(eos(pbuf), "%s with %ld point%s,",
-                (how == ASCENDED) ? "went to your reward"
-                                  : "escaped from the dungeon",
+                (how == ASCENDED) ? _("went to your reward")
+                                  : _("escaped from the dungeon"),
                 u.urexp, plur(u.urexp));
         dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
 

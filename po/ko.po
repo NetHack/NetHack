@@ -20036,3 +20036,63 @@ msgstr "퐁당!"
 
 msgid "Unknown command '%s'."
 msgstr "알 수 없는 명령 '%s'."
+
+# dothrow.c translations
+msgid "%s lands %s your %s."
+msgstr "%s{이} %s 당신의 %s 근처에 떨어진다."
+
+msgid "%s back to you, landing %s your %s."
+msgstr "%s{이} 당신에게 돌아와 %s 당신의 %s 근처에 착지한다."
+
+msgid "beneath"
+msgstr "아래"
+
+msgid "at"
+msgstr "근처"
+
+msgid "%s your %s!"
+msgstr "%s{이} 당신의 %s{을} 맞혔다!"
+
+msgid "%s back toward you, hitting your %s!"
+msgstr "%s{이} 당신 쪽으로 돌아와 %s{을} 맞혔다!"
+
+# stairs.c translations
+msgid "ladder"
+msgstr "사다리"
+
+msgid "staircase"
+msgstr "계단"
+
+msgid "stairs"
+msgstr "계단"
+
+msgid "up"
+msgstr "위로"
+
+msgid "down"
+msgstr "아래로"
+
+msgid "branch "
+msgstr "분기 "
+
+msgid "out of the dungeon"
+msgstr "던전 밖으로"
+
+msgid "to the Elemental Planes"
+msgstr "원소의 평면으로"
+
+msgid "to the end game"
+msgstr "엔드게임으로"
+
+# end.c translations
+msgid "Demigoddess"
+msgstr "반신녀"
+
+msgid "Demigod"
+msgstr "반신"
+
+msgid "went to your reward"
+msgstr "보상을 받으러 갔다"
+
+msgid "escaped from the dungeon"
+msgstr "던전을 탈출했다"

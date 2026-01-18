@@ -195,8 +195,8 @@ stairs_description(
     const char *stairs, *updown;
 
     tolev = sway->tolev;
-    stairs = sway->isladder ? "ladder" : stcase ? "staircase" : "stairs";
-    updown = sway->up ? "up" : "down";
+    stairs = sway->isladder ? _("ladder") : stcase ? _("staircase") : _("stairs");
+    updown = sway->up ? _("up") : _("down");
 
     if (!known_branch_stairs(sway)) {
         /* ordinary stairs or branch stairs to not-yet-visited branch */
@@ -214,16 +214,16 @@ stairs_description(
            the game by coming down them, but the remote side varies
            depending on whether the Amulet is being carried */
         Sprintf(outbuf, "%s%s %s %s",
-                !u.uhave.amulet ? "" : "branch ",
+                !u.uhave.amulet ? "" : _("branch "),
                 stairs, updown,
-                !u.uhave.amulet ? "out of the dungeon"
+                !u.uhave.amulet ? _("out of the dungeon")
                 /* minimize our expectations about what comes next */
                 : (on_level(&tolev, &earth_level)
                    || on_level(&tolev, &air_level)
                    || on_level(&tolev, &fire_level)
                    || on_level(&tolev, &water_level))
-                  ? "to the Elemental Planes"
-                  : "to the end game");
+                  ? _("to the Elemental Planes")
+                  : _("to the end game"));
     } else {
         /* known branch stairs; tacking on destination level is too verbose */
         Sprintf(outbuf, "branch %s %s to %s",

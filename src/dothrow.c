@@ -1717,15 +1717,15 @@ throwit(
                     int dmg = rn2(2);
 
                     if (!dmg) {
-                        pline(Blind ? "%s lands %s your %s."
-                                    : "%s back to you, landing %s your %s.",
+                        pline(Blind ? _("%s lands %s your %s.")
+                                    : _("%s back to you, landing %s your %s."),
                               Blind ? Something : Tobjnam(obj, "return"),
-                              Levitation ? "beneath" : "at",
+                              Levitation ? _("beneath") : _("at"),
                               makeplural(body_part(FOOT)));
                     } else {
                         dmg += rnd(3);
-                        pline(Blind ? "%s your %s!"
-                                    : "%s back toward you, hitting your %s!",
+                        pline(Blind ? _("%s your %s!")
+                                    : _("%s back toward you, hitting your %s!"),
                               Tobjnam(obj, Blind ? "hit" : "fly"),
                               body_part(ARM));
                         if (obj->oartifact)
