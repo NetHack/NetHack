@@ -254,9 +254,6 @@ make_vomiting(long xtime, boolean talk)
             You_feel(_("much less nauseated now."));
 }
 
-static const char vismsg[] = "vision seems to %s for a moment but is %s now.";
-static const char eyemsg[] = "%s momentarily %s.";
-
 void
 make_blinded(long xtime, boolean talk)
 {
@@ -290,9 +287,9 @@ make_blinded(long xtime, boolean talk)
                 eyes = body_part(EYE);
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
-                Your(eyemsg, eyes, vtense(eyes, "itch"));
+                Your(_("%s momentarily %s."), eyes, vtense(eyes, _("itch")));
             } else { /* Eyes of the Overworld */
-                Your(vismsg, "brighten", Hallucination ? "sadder" : "normal");
+                Your(_("vision seems to %s for a moment but is %s now."), _("brighten"), Hallucination ? _("sadder") : _("normal"));
             }
         }
     }
@@ -316,9 +313,9 @@ make_blinded(long xtime, boolean talk)
                 eyes = body_part(EYE);
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
-                Your(eyemsg, eyes, vtense(eyes, "twitch"));
+                Your(_("%s momentarily %s."), eyes, vtense(eyes, _("twitch")));
             } else { /* Eyes of the Overworld */
-                Your(vismsg, "dim", Hallucination ? "happier" : "normal");
+                Your(_("vision seems to %s for a moment but is %s now."), _("dim"), Hallucination ? _("happier") : _("normal"));
             }
         }
     }
@@ -404,9 +401,9 @@ make_hallucinated(
 
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
-                Your(eyemsg, eyes, vtense(eyes, "itch"));
+                Your(_("%s momentarily %s."), eyes, vtense(eyes, _("itch")));
             } else { /* Grayswandir */
-                Your(vismsg, "flatten", "normal");
+                Your(_("vision seems to %s for a moment but is %s now."), _("flatten"), _("normal"));
             }
         }
     }

@@ -5,9 +5,6 @@
 
 #include "hack.h"
 
-static const char brief_feeling[] =
-    "have a %s feeling for a moment, then it passes.";
-
 staticfn boolean mhitm_mgc_atk_negated(struct monst *, struct monst *,
                                      boolean) NONNULLPTRS;
 staticfn boolean known_hitum(struct monst *, struct obj *, int *, int, int,
@@ -3055,7 +3052,7 @@ mhitm_ad_curs(
                     mhm->done = TRUE;
                     return;
                 } else if (mdef->mtame && !gv.vis) {
-                    You(brief_feeling, "strangely sad");
+                    You(_("have a %s feeling for a moment, then it passes."), _("strangely sad"));
                 }
                 mhm->hitflags = (M_ATTK_DEF_DIED
                                  | (grow_up(magr, mdef) ? 0
@@ -3945,7 +3942,7 @@ do_stone_mon(
             mhm->done = TRUE;
             return;
         } else if (mdef->mtame && !gv.vis) {
-            You(brief_feeling, "peculiarly sad");
+            You(_("have a %s feeling for a moment, then it passes."), _("peculiarly sad"));
         }
         mhm->hitflags = (M_ATTK_DEF_DIED
                          | (grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED));
@@ -4500,7 +4497,7 @@ mhitm_ad_dgst(
                 mhm->done = TRUE;
                 return;
             } else if (magr->mtame && !gv.vis)
-                You(brief_feeling, "queasy");
+                You(_("have a %s feeling for a moment, then it passes."), _("queasy"));
             mhm->hitflags = M_ATTK_AGR_DIED;
             mhm->done = TRUE;
             return;

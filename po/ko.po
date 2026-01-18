@@ -3448,11 +3448,17 @@ msgstr "공기를 호흡할 수 없다면, 어떻게 액체를 마실 수 있어
 msgid "Do you know what lives in this water?"
 msgstr "이 물에 무엇이 사는지 아니?"
 
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
+# brief_feeling messages
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:629
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:1460
-#, c-format
+#, fuzzy, c-format
 msgid "have a %s feeling for a moment, then it passes."
-msgstr "잠시 %s 느낌이 들었다가, 지나갔다."
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"잠시 %s 느낌이 들었다가, 지나갔다.\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"잠시 %s 느낌이 들었다가 사라진다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:650
 msgid "Ulch!  This makes you feel mediocre!"
@@ -19740,8 +19746,13 @@ msgstr "날카로운"
 msgid "high"
 msgstr "높은"
 
+#, fuzzy
 msgid "normal"
-msgstr "평범한"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"평범한\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"정상이다"
 
 msgid "strange, high-pitched"
 msgstr "이상하고 높은"
@@ -20822,6 +20833,46 @@ msgstr "마력 흡수 칼날"
 
 msgid "you"
 msgstr "당신"
+
+msgid "peculiarly sad"
+msgstr "묘하게 슬픈"
+
+msgid "melancholy"
+msgstr "우울한"
+
+msgid "strangely sad"
+msgstr "이상하게 슬픈"
+
+msgid "queasy"
+msgstr "메스꺼운"
+
+# vision/eye messages
+msgid "%s momentarily %s."
+msgstr "%s{이} 잠시 %s."
+
+msgid "itch"
+msgstr "가렵다"
+
+msgid "twitch"
+msgstr "경련한다"
+
+msgid "vision seems to %s for a moment but is %s now."
+msgstr "시야가 잠시 %s지만 지금은 %s."
+
+msgid "brighten"
+msgstr "밝아진다"
+
+msgid "dim"
+msgstr "어두워진다"
+
+msgid "flatten"
+msgstr "평평해진다"
+
+msgid "sadder"
+msgstr "더 슬프다"
+
+msgid "happier"
+msgstr "더 행복하다"
 
 #~ msgid "You feel like someone is helping you."
 #~ msgstr "누군가 도와주는 것 같다."
