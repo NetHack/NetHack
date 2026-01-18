@@ -1714,23 +1714,24 @@ any_obj_ok(struct obj *obj)
     return GETOBJ_EXCLUDE;
 }
 
-/* return string describing your hands based on action. */
+/* return string describing your hands based on action.
+ * Korean i18n: hand/body part descriptions for item selection */
 staticfn char *
 getobj_hands_txt(const char *action, char *qbuf)
 {
     if (!strcmp(action, "grease")) {
-        Sprintf(qbuf, "your %s", fingers_or_gloves(FALSE));
+        Sprintf(qbuf, _("your %s"), fingers_or_gloves(FALSE));
     } else if (!strcmp(action, "write with")) {
-        Sprintf(qbuf, "your %s", body_part(FINGERTIP));
+        Sprintf(qbuf, _("your %s"), body_part(FINGERTIP));
     } else if (!strcmp(action, "wield")) {
-        Sprintf(qbuf, "your %s %s%s", uarmg ? "gloved" : "bare",
+        Sprintf(qbuf, _("your %s %s%s"), uarmg ? _("gloved") : _("bare"),
                 makeplural(body_part(HAND)),
-                !uwep ? " (wielded)" : "");
+                !uwep ? _(" (wielded)") : "");
     } else if (!strcmp(action, "ready")) {
-        Sprintf(qbuf, "empty quiver%s",
-                !uquiver ? " (nothing readied)" : "");
+        Sprintf(qbuf, _("empty quiver%s"),
+                !uquiver ? _(" (nothing readied)") : "");
     } else {
-        Sprintf(qbuf, "your %s", makeplural(body_part(HAND)));
+        Sprintf(qbuf, _("your %s"), makeplural(body_part(HAND)));
     }
     return qbuf;
 }
@@ -1916,7 +1917,7 @@ getobj(
     for (;;) {
         cnt = 0L;
         cntgiven = FALSE;
-        Sprintf(qbuf, "What do you want to %s?", word);
+        Sprintf(qbuf, _("What do you want to %s?"), word);
         if (gi.in_doagain) {
             ilet = readchar();
         } else if (iflags.force_invmenu) {
@@ -3311,8 +3312,8 @@ display_pickinv(
 
                 /* like doname() below, makeplural() returns an obuf[] */
                 formattedobj = makeplural(body_part(HAND));
-                Sprintf(barehands, "%s %s (no weapon)",
-                        uarmg ? "gloved" : "bare", formattedobj);
+                Sprintf(barehands, _("%s %s (no weapon)"),
+                        uarmg ? _("gloved") : _("bare"), formattedobj);
                 add_menu(win, &nul_glyphinfo, &any, ilet, 0,
                          ATR_NONE, clr, barehands, MENU_ITEMFLAGS_NONE);
             } else {
@@ -4107,7 +4108,7 @@ look_here(
 {
     struct obj *otmp;
     struct trap *trap;
-    const char *verb = Blind ? "feel" : "see";
+    const char *verb = Blind ? _("feel") : _("see");
     const char *dfeature = (char *) 0;
     char fbuf[BUFSZ], fbuf2[BUFSZ];
     winid tmpwin;

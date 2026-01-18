@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "ko_postpos.h"  /* for utf8_char_len */
 
 #ifdef TTY_GRAPHICS
 
@@ -258,10 +259,11 @@ update_topl(const char *bp)
 
     /* If there is room on the line, print message on same line */
     /* But messages like "You die..." deserve their own line */
-    n0 = strlen(bp);
+    /* Use display width instead of byte count for UTF-8 support */
+    n0 = utf8_display_width(bp);
     if ((ttyDisplay->toplin == TOPLINE_NEED_MORE || skip)
         && cw->cury == 0
-        && n0 + (int) strlen(gt.toplines) + 3 < CO - 8 /* room for --More-- */
+        && n0 + utf8_display_width(gt.toplines) + 3 < CO - 8 /* room for --More-- */
         && (notdied = strncmp(bp, "You die", 7)) != 0) {
         Strcat(gt.toplines, "  ");
         Strcat(gt.toplines, bp);
@@ -281,19 +283,33 @@ update_topl(const char *bp)
     (void) strncpy(gt.toplines, bp, TBUFSZ);
     gt.toplines[TBUFSZ - 1] = 0;
 
-    for (tl = gt.toplines; n0 >= CO; ) {
-        otl = tl;
-        for (tl += CO - 1; tl != otl; --tl)
-            if (*tl == ' ')
-                break;
-        if (tl == otl) {
-            /* Eek!  A huge token.  Try splitting after it. */
-            tl = strchr(otl, ' ');
+    /* UTF-8 aware line wrapping */
+    for (tl = gt.toplines; utf8_display_width(tl) >= CO; ) {
+        char *last_space = NULL;
+        char *p;
+        int col = 0;
+        int charlen;
+
+        /* Walk through characters counting display columns */
+        for (p = tl; *p && col < CO - 1; ) {
+            charlen = utf8_char_len((unsigned char)*p);
+            if (*p == ' ')
+                last_space = p;
+            col += utf8_char_width(p);
+            p += charlen;
+        }
+
+        /* Find where to break */
+        if (last_space && last_space > tl) {
+            /* Break at last space before column limit */
+            tl = last_space;
+        } else {
+            /* No space found, try to find one after current position */
+            tl = strchr(tl, ' ');
             if (!tl)
-                break; /* No choice but to spit it out whole. */
+                break; /* No choice but to spit it out whole */
         }
         *tl++ = '\n';
-        n0 = strlen(tl);
     }
     if (!notdied) /* double negative => "You die"; avoid suppressing mesg */
         cw->flags &= ~WIN_STOP, skip = FALSE;

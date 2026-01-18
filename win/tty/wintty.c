@@ -14,6 +14,7 @@
 
 #include "hack.h"
 #include "i18n.h"
+#include "ko_postpos.h"  /* for utf8_char_len */
 
 #ifdef TTY_GRAPHICS
 #include "dlb.h"
@@ -2415,14 +2416,34 @@ tty_putstr(winid window, int attr, const char *str)
             cw->maxcol = n0;
         if (++cw->cury > cw->maxrow)
             cw->maxrow = cw->cury;
-        if (n0 > CO) {
-            /* attempt to break the line */
-            for (i = CO - 1; i && str[i] != ' ' && str[i] != '\n';)
-                i--;
-            /* Skip back over any UTF-8 continuation bytes (0x80-0xBF)
-             * to avoid breaking in the middle of a multibyte character */
-            while (i > 0 && ((unsigned char) str[i] & 0xC0) == 0x80)
-                i--;
+        /* Use display width instead of byte count for UTF-8 support */
+        if (utf8_display_width(str) >= CO) {
+            /* UTF-8 aware line breaking: find break point by display columns */
+            const char *p;
+            const char *last_space = NULL;
+            int col = 0;
+            int charlen;
+
+            for (p = str; *p && col < CO - 1; ) {
+                charlen = utf8_char_len((unsigned char)*p);
+                if (*p == ' ')
+                    last_space = p;
+                col += utf8_char_width(p);
+                p += charlen;
+            }
+
+            if (last_space && last_space > str) {
+                /* Break at last space before column limit */
+                i = (int)(last_space - str);
+            } else {
+                /* No space found before limit, find next space */
+                const char *next_space = strchr(str, ' ');
+                if (next_space)
+                    i = (int)(next_space - str);
+                else
+                    i = 0;  /* No break possible */
+            }
+
             if (i) {
                 cw->data[cw->cury - 1][++i] = '\0';
                 tty_putstr(window, attr, &str[i]);

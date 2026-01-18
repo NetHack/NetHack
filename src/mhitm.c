@@ -670,31 +670,31 @@ hitmm(
             buf[0] = '\0';
             switch (mattk->aatyp) {
             case AT_BITE:
-                Snprintf(buf, sizeof buf, "%s bites", magr_name);
+                Snprintf(buf, sizeof buf, _("%s bites"), magr_name);
                 break;
             case AT_STNG:
-                Snprintf(buf, sizeof buf, "%s stings", magr_name);
+                Snprintf(buf, sizeof buf, _("%s stings"), magr_name);
                 break;
             case AT_BUTT:
-                Snprintf(buf, sizeof buf, "%s butts", magr_name);
+                Snprintf(buf, sizeof buf, _("%s butts"), magr_name);
                 break;
             case AT_TUCH:
-                Snprintf(buf, sizeof buf, "%s touches", magr_name);
+                Snprintf(buf, sizeof buf, _("%s touches"), magr_name);
                 break;
             case AT_TENT:
-                Snprintf(buf, sizeof buf, "%s tentacles suck",
+                Snprintf(buf, sizeof buf, _("%s tentacles suck"),
                          s_suffix(magr_name));
                 break;
             case AT_HUGS:
                 if (magr != u.ustuck) {
-                    Snprintf(buf, sizeof buf, "%s squeezes", magr_name);
+                    Snprintf(buf, sizeof buf, _("%s squeezes"), magr_name);
                     break;
                 }
                 FALLTHROUGH;
                 /*FALLTHRU*/
             default:
                 if (!weaponhit || !mwep || !mwep->oartifact)
-                    Snprintf(buf, sizeof buf, "%s hits", magr_name);
+                    Snprintf(buf, sizeof buf, _("%s hits"), magr_name);
                 break;
             }
             if (*buf)
