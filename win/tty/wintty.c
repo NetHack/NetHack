@@ -1077,6 +1077,21 @@ tty_clear_nhwindow(winid window)
     case NHW_MAP:
         /* cheap -- clear the whole thing and tell nethack to redraw botl */
         disp.botlx = TRUE;
+#if (defined(UNIX) || defined(VMS)) && defined(ENHANCED_SYMBOLS)
+        /* For fullwidth symset switching, explicitly clear map area with
+         * spaces to prevent ghost artifacts. Always clear 160 columns
+         * (fullwidth width) to handle fullwidth->halfwidth transitions. */
+        if (!erasing_tty_screen) {
+            int row;
+            int map_top = cw->offy;
+            int map_rows = ROWNO;
+            for (row = 0; row < map_rows; row++) {
+                tty_curs(BASE_WINDOW, 1, map_top + row);
+                cl_end();  /* clear to end of line */
+            }
+            (void) fflush(stdout);
+        }
+#endif
         FALLTHROUGH;
         /*FALLTHRU*/
     case NHW_BASE:
@@ -2116,9 +2131,6 @@ tty_curs(
     cw->curx = --x; /* column 0 is not used */
     cw->cury = y;
 
-    x += cw->offx;
-    y += cw->offy;
-
 #ifdef CLIPPING
     if (clipping && window == WIN_MAP) {
         x -= clipx;
@@ -2126,10 +2138,14 @@ tty_curs(
     }
 #endif
 
-    /* For fullwidth symbol sets (CJK), each map tile occupies 2 columns */
+    /* For fullwidth symbol sets (CJK), each map tile occupies 2 columns.
+     * Must multiply BEFORE adding offx, otherwise offx gets doubled too. */
     if (window == WIN_MAP && gs.symset[gc.currentgraphics].fullwidth) {
         x = x * 2;
     }
+
+    x += cw->offx;
+    y += cw->offy;
 
     if (y == cy && x == cx)
         return;
