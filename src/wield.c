@@ -405,7 +405,7 @@ dowield(void)
         /* offer to split stack if multiple are quivered */
         if (uquiver->quan > 1L && inv_cnt(FALSE) < invlet_basic
                                     && splittable(uquiver)) {
-            Sprintf(qbuf, "You have %ld %s readied.  Wield one?",
+            Sprintf(qbuf, _("You have %ld %s readied.  Wield one?"),
                     uquiver->quan, simpleonames(uquiver));
             switch (ynq(qbuf)) {
             case 'q':
@@ -418,13 +418,9 @@ dowield(void)
             default:
                 break;
             }
-            Strcpy(qbuf, "Wield all of them instead?");
+            Strcpy(qbuf, _("Wield all of them instead?"));
         } else {
-            boolean use_plural = (is_plural(uquiver) || pair_of(uquiver));
-
-            Sprintf(qbuf, "You have %s readied.  Wield %s instead?",
-                    !use_plural ? "that" : "those",
-                    !use_plural ? "it" : "them");
+            Strcpy(qbuf, _("You have that readied.  Wield it instead?"));
         }
         /* require confirmation to wield the quivered weapon */
         if (ynq(qbuf) != 'y') {
@@ -571,7 +567,7 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
         /* offer to split stack if wielding more than 1 */
         if (uwep->quan > 1L && inv_cnt(FALSE) < invlet_basic
                                     && splittable(uwep)) {
-            Sprintf(qbuf, "You are wielding %ld %s.  Ready %ld of them?",
+            Sprintf(qbuf, _("You are wielding %ld %s.  Ready %ld of them?"),
                     uwep->quan, simpleonames(uwep), uwep->quan - 1L);
             switch (ynq(qbuf)) {
             case 'q':
@@ -584,13 +580,9 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
             default:
                 break;
             }
-            Strcpy(qbuf, "Ready all of them instead?");
+            Strcpy(qbuf, _("Ready all of them instead?"));
         } else {
-            boolean use_plural = (is_plural(uwep) || pair_of(uwep));
-
-            Sprintf(qbuf, "You are wielding %s.  Ready %s instead?",
-                    !use_plural ? "that" : "those",
-                    !use_plural ? "it" : "them");
+            Strcpy(qbuf, _("You are wielding that.  Ready it instead?"));
         }
         /* require confirmation to ready the main weapon */
         if (ynq(qbuf) != 'y') {
@@ -606,9 +598,9 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
     } else if (newquiver == uswapwep) {
         if (uswapwep->quan > 1L && inv_cnt(FALSE) < invlet_basic
             && splittable(uswapwep)) {
-            Sprintf(qbuf, "%s %ld %s.  Ready %ld of them?",
-                    u.twoweap ? "You are dual wielding"
-                              : "Your alternate weapon is",
+            Sprintf(qbuf, _("%s %ld %s.  Ready %ld of them?"),
+                    u.twoweap ? _("You are dual wielding")
+                              : _("Your alternate weapon is"),
                     uswapwep->quan, simpleonames(uswapwep),
                     uswapwep->quan - 1L);
             switch (ynq(qbuf)) {
@@ -622,21 +614,18 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
             default:
                 break;
             }
-            Strcpy(qbuf, "Ready all of them instead?");
+            Strcpy(qbuf, _("Ready all of them instead?"));
         } else {
-            boolean use_plural = (is_plural(uswapwep) || pair_of(uswapwep));
-
-            Sprintf(qbuf, "%s your %s weapon.  Ready %s instead?",
-                    !use_plural ? "That is" : "Those are",
-                    u.twoweap ? "second" : "alternate",
-                    !use_plural ? "it" : "them");
+            Sprintf(qbuf, _("%s your %s weapon.  Ready it instead?"),
+                    _("That is"),
+                    u.twoweap ? _("second") : _("alternate"));
         }
         /* require confirmation to ready the alternate weapon */
         if (ynq(qbuf) != 'y') {
             (void) Shk_Your(qbuf, uswapwep); /* replace qbuf[] contents */
             pline(_("%s%s %s %s."), qbuf,
-                  simpleonames(uswapwep), otense(uswapwep, "remain"),
-                  u.twoweap ? "wielded" : "as secondary weapon");
+                  simpleonames(uswapwep), otense(uswapwep, _("remain")),
+                  u.twoweap ? _("wielded") : _("as secondary weapon"));
             return ECMD_OK;
         }
         /* quivering alternate weapon, so no more uswapwep */

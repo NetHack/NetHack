@@ -799,6 +799,8 @@ kickstr(char *buf, const char *kickobjnam)
 {
     const char *what;
 
+    /* Note: these strings are used as killer reasons for bones files,
+     * so they must remain in English */
     if (*kickobjnam)
         what = kickobjnam;
     else if (gm.maploc == &gn.nowhere)
@@ -839,7 +841,7 @@ watchman_thief_arrest(struct monst *mtmp)
 {
     if (is_watch(mtmp->data) && couldsee(mtmp->mx, mtmp->my)
         && mtmp->mpeaceful) {
-        mon_yells(mtmp, "Halt, thief!  You're under arrest!");
+        mon_yells(mtmp, _("Halt, thief!  You're under arrest!"));
         (void) angry_guards(FALSE);
         return TRUE;
     }

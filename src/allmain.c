@@ -872,6 +872,10 @@ welcome(boolean new_game) /* false => restoring an old game */
      * Sex is shown for new games except when it is redundant; for
      * restores it's only shown if different from its original value.
      */
+    /*
+     * Korean i18n note: gender, race, and role names are wrapped with _()
+     * for translation in the welcome message.
+     */
     *buf = '\0';
     if (new_game || u.ualignbase[A_ORIGINAL] != u.ualignbase[A_CURRENT])
         Sprintf(eos(buf), " %s", align_str(u.ualignbase[A_ORIGINAL]));
@@ -879,10 +883,10 @@ welcome(boolean new_game) /* false => restoring an old game */
         && (new_game
             ? (gu.urole.allow & ROLE_GENDMASK) == (ROLE_MALE | ROLE_FEMALE)
             : currentgend != flags.initgend))
-        Sprintf(eos(buf), " %s", genders[currentgend].adj);
-    Sprintf(eos(buf), " %s %s", gu.urace.adj,
-            (currentgend && gu.urole.name.f) ? gu.urole.name.f
-                                             : gu.urole.name.m);
+        Sprintf(eos(buf), " %s", _(genders[currentgend].adj));
+    Sprintf(eos(buf), " %s %s", _(gu.urace.adj),
+            _((currentgend && gu.urole.name.f) ? gu.urole.name.f
+                                               : gu.urole.name.m));
 
     pline(new_game ? _("%s %s, welcome to NetHack!  You are a%s.")
                    : _("%s %s, the%s, welcome back to NetHack!"),

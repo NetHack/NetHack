@@ -3203,20 +3203,24 @@ RESTORE_WARNING_FORMAT_NONLITERAL
  * fit better here.
  */
 
+/*
+ * Korean i18n note: alignment strings are wrapped with _() for translation.
+ * Used in welcome message, altar descriptions, etc.
+ */
 const char *
 align_str(aligntyp alignment)
 {
     switch ((int) alignment) {
     case A_CHAOTIC:
-        return "chaotic";
+        return _("chaotic");
     case A_NEUTRAL:
-        return "neutral";
+        return _("neutral");
     case A_LAWFUL:
-        return "lawful";
+        return _("lawful");
     case A_NONE:
-        return "unaligned";
+        return _("unaligned");
     }
-    return "unknown";
+    return _("unknown");
 }
 
 staticfn char *

@@ -85,17 +85,15 @@ do_statusline1(void)
     if ((i - j) > 0)
         Sprintf(nb = eos(nb), "%*s", i - j, " "); /* pad with spaces */
 
-    Sprintf(nb = eos(nb), "St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
+    /* Korean i18n: status line attribute abbreviations */
+    Sprintf(nb = eos(nb), _("St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d"),
             get_strength_str(),
             ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS),
             ACURR(A_CHA));
-    Sprintf(nb = eos(nb), "%s",
-            (u.ualign.type == A_CHAOTIC) ? "  Chaotic"
-              : (u.ualign.type == A_NEUTRAL) ? "  Neutral"
-                : "  Lawful");
+    Sprintf(nb = eos(nb), "  %s", align_str(u.ualign.type));
 #ifdef SCORE_ON_BOTL
     if (flags.showscore)
-        Sprintf(nb = eos(nb), " S:%ld", botl_score());
+        Sprintf(nb = eos(nb), _(" S:%ld"), botl_score());
 #endif
     return newbot1;
 }
@@ -138,28 +136,29 @@ do_statusline2(void)
     /* '$' encoded as \GXXXXNNNN is 9 chars longer than display will need */
     dx = strstri(dloc, "\\G") ? 9 : 0;
 
-    /* health and armor class (has trailing space for AC 0..9) */
+    /* health and armor class (has trailing space for AC 0..9)
+     * Korean i18n: status abbreviations HP, Pw, AC, Xp, HD, T */
     hp = Upolyd ? u.mh : u.uhp;
     hpmax = Upolyd ? u.mhmax : u.uhpmax;
     if (hp < 0)
         hp = 0;
-    Sprintf(hlth, "HP:%d(%d) Pw:%d(%d) AC:%-2d",
+    Sprintf(hlth, _("HP:%d(%d) Pw:%d(%d) AC:%-2d"),
             min(hp, 9999), min(hpmax, 9999),
             min(u.uen, 9999), min(u.uenmax, 9999), u.uac);
     hln = strlen(hlth);
 
     /* experience */
     if (Upolyd)
-        Sprintf(expr, "HD:%d", mons[u.umonnum].mlevel);
+        Sprintf(expr, _("HD:%d"), mons[u.umonnum].mlevel);
     else if (flags.showexp)
-        Sprintf(expr, "Xp:%d/%-1ld", u.ulevel, u.uexp);
+        Sprintf(expr, _("Xp:%d/%-1ld"), u.ulevel, u.uexp);
     else
-        Sprintf(expr, "Xp:%d", u.ulevel);
+        Sprintf(expr, _("Xp:%d"), u.ulevel);
     xln = strlen(expr);
 
     /* time/move counter */
     if (flags.time)
-        Sprintf(tmmv, "T:%ld", svm.moves);
+        Sprintf(tmmv, _("T:%ld"), svm.moves);
     else
         tmmv[0] = '\0';
     tln = strlen(tmmv);
@@ -331,6 +330,11 @@ rank_to_xlev(int rank)
            : (rank < 8) ? ((rank * 4) - 2) : 30;
 }
 
+/*
+ * Korean i18n note: rank_of() returns translated rank names using _()
+ * for display in status line and other UI elements.
+ * Original English strings are preserved in roles[] for game logic.
+ */
 const char *
 rank_of(int lev, short monnum, boolean female)
 {
@@ -347,17 +351,17 @@ rank_of(int lev, short monnum, boolean female)
     /* Find the rank */
     for (i = xlev_to_rank((int) lev); i >= 0; i--) {
         if (female && role->rank[i].f)
-            return role->rank[i].f;
+            return _(role->rank[i].f);
         if (role->rank[i].m)
-            return role->rank[i].m;
+            return _(role->rank[i].m);
     }
 
     /* Try the role name, instead */
     if (female && role->name.f)
-        return role->name.f;
+        return _(role->name.f);
     else if (role->name.m)
-        return role->name.m;
-    return "Player";
+        return _(role->name.m);
+    return _("Player");
 }
 
 staticfn const char *
@@ -767,26 +771,33 @@ bot_via_windowport(void)
 
     /*
      *  Player name and title.
+     *  Korean i18n note: Uses translateable format string for "Name the Rank"
+     *  pattern, allowing different word order in translations.
      */
     Strcpy(nb = buf, svp.plname);
     nb[0] = highc(nb[0]);
     titl = !Upolyd ? rank() : pmname(&mons[u.umonnum], Ugender);
-    i = (int) (strlen(buf) + sizeof " the " + strlen(titl) - sizeof "");
-    /* if "Name the Rank/monster" is too long, we truncate the name
-       but always keep at least 10 characters of it; when hitpointbar is
-       enabled, anything beyond 30 (long monster name) will be truncated */
-    if (i > 30) {
-        i = 30 - (int) (sizeof " the " + strlen(titl) - sizeof "");
-        nb[max(i, 10)] = '\0';
+    {
+        /* TRANSLATORS: %s the %s -> player name, rank/monster name
+           Korean example: "%s (%s)" for "Name (Rank)" format */
+        const char *title_fmt = _("%s the %s");
+        char titlebuf[MAXVALWIDTH];
+
+        if (Upolyd) {
+            /* capitalize monster name for poly'd form */
+            char mtitl[BUFSZ];
+            Strcpy(mtitl, titl);
+            for (i = 0; mtitl[i]; i++)
+                if (i == 0 || mtitl[i - 1] == ' ')
+                    mtitl[i] = highc(mtitl[i]);
+            Snprintf(titlebuf, sizeof titlebuf, title_fmt, buf, mtitl);
+        } else {
+            Snprintf(titlebuf, sizeof titlebuf, title_fmt, buf, titl);
+        }
+        /* truncate if too long (hitpointbar limit is 30) */
+        titlebuf[30] = '\0';
+        Sprintf(gb.blstats[idx][BL_TITLE].val, "%-30s", titlebuf);
     }
-    Strcpy(nb = eos(nb), " the ");
-    Strcpy(nb = eos(nb), titl);
-    if (Upolyd) { /* when poly'd, capitalize monster name */
-        for (i = 0; nb[i]; i++)
-            if (i == 0 || nb[i - 1] == ' ')
-                nb[i] = highc(nb[i]);
-    }
-    Sprintf(gb.blstats[idx][BL_TITLE].val, "%-30s", buf);
     gv.valset[BL_TITLE] = TRUE; /* indicate val already set */
 
     /* Strength */
@@ -803,10 +814,10 @@ bot_via_windowport(void)
 
     /* Alignment */
     Strcpy(gb.blstats[idx][BL_ALIGN].val, (u.ualign.type == A_CHAOTIC)
-                                          ? "Chaotic"
+                                          ? _("Chaotic")
                                           : (u.ualign.type == A_NEUTRAL)
-                                               ? "Neutral"
-                                               : "Lawful");
+                                               ? _("Neutral")
+                                               : _("Lawful"));
 
     /* Score */
     gb.blstats[idx][BL_SCORE].a.a_long =
@@ -1458,8 +1469,9 @@ status_initialize(
                              : TRUE;
 
         fieldname = initblstats[i].fldname;
+        /* Korean i18n: translate status format strings like " St:%s" */
         fieldfmt = (fld == BL_TITLE && iflags.wc2_hitpointbar) ? "%-30.30s"
-                   : initblstats[i].fldfmt;
+                   : _(initblstats[i].fldfmt);
         status_enablefield(fld, fieldname, fieldfmt, fldenabl);
     }
     gu.update_all = TRUE;

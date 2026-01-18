@@ -528,8 +528,8 @@ doc_extcmd_flagstr(
     if (!efp) {
         char qbuf[QBUFSZ];
 
-        add_menu_str(menuwin, "[A] Command autocompletes");
-        Sprintf(qbuf, "[m] Command accepts '%s' prefix",
+        add_menu_str(menuwin, _("[A] Command autocompletes"));
+        Sprintf(qbuf, _("[m] Command accepts '%s' prefix"),
                 visctrl(cmd_from_func(do_reqmenu)));
         add_menu_str(menuwin, qbuf);
         return (char *) 0;
@@ -681,7 +681,7 @@ doextlist(void)
                 add_menu_str(menuwin, "");
         }
         if (*searchbuf && !n)
-            add_menu_str(menuwin, "no matches");
+            add_menu_str(menuwin, _("no matches"));
         else
             (void) doc_extcmd_flagstr(menuwin, (struct ext_func_tab *) 0);
 
@@ -2149,12 +2149,13 @@ handler_rebind_keys_add(boolean keyfirst)
     start_menu(win, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
 
+    /* Korean i18n: key binding messages */
     if (key) {
         if (gc.Cmd.commands[key]) {
-            Sprintf(buf, "Key '%s' is currently bound to \"%s\".",
+            Sprintf(buf, _("Key '%s' is currently bound to \"%s\"."),
                     key2txt(key, buf2), gc.Cmd.commands[key]->ef_txt);
         } else {
-            Sprintf(buf, "Key '%s' is not bound to anything.",
+            Sprintf(buf, _("Key '%s' is not bound to anything."),
                     key2txt(key, buf2));
         }
         add_menu_str(win, buf);
@@ -2163,7 +2164,7 @@ handler_rebind_keys_add(boolean keyfirst)
 
     any.a_int = -1;
     add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
-             "nothing: unbind the key",
+             _("nothing: unbind the key"),
              MENU_ITEMFLAGS_NONE);
 
     add_menu_str(win, "");
@@ -2180,9 +2181,9 @@ handler_rebind_keys_add(boolean keyfirst)
              MENU_ITEMFLAGS_NONE);
     }
     if (key)
-        Sprintf(buf, "Bind '%s' to what command?", key2txt(key, buf2));
+        Sprintf(buf, _("Bind '%s' to what command?"), key2txt(key, buf2));
     else
-        Sprintf(buf, "Bind what command?");
+        Sprintf(buf, _("Bind what command?"));
     end_menu(win, buf);
     npick = select_menu(win, PICK_ONE, &picks);
     destroy_nhwindow(win);

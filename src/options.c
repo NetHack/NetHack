@@ -460,8 +460,8 @@ ask_do_tutorial(void)
         rc = nh_basename(get_configfile(), TRUE);
         norc = !strcmp(get_configfile(), "/dev/null");
         Snprintf(buf, sizeof buf,
-                 "Put \"OPTIONS=!tutorial\" in %s to skip this query.",
-                 (rc && *rc && !norc) ? rc : "your configuration file");
+                 _("Put \"OPTIONS=!tutorial\" in %s to skip this query."),
+                 (rc && *rc && !norc) ? rc : _("your configuration file"));
         do {
             win = create_nhwindow(NHW_MENU);
             start_menu(win, MENU_BEHAVE_STANDARD);
@@ -469,18 +469,18 @@ ask_do_tutorial(void)
             any.a_char = 'y';
             add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
                      ATR_NONE, NO_COLOR,
-                     "Yes, do a tutorial", MENU_ITEMFLAGS_NONE);
+                     _("Yes, do a tutorial"), MENU_ITEMFLAGS_NONE);
             any.a_char = 'n';
             add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
                      ATR_NONE, NO_COLOR,
-                     "No, just start play", MENU_ITEMFLAGS_NONE);
+                     _("No, just start play"), MENU_ITEMFLAGS_NONE);
 
             add_menu_str(win, "");
             add_menu_str(win, buf);
             if (pass++) /* we'll get here after <space> or <return> */
-                add_menu_str(win, "(Please choose 'y' or 'n'.)");
+                add_menu_str(win, _("(Please choose 'y' or 'n'.)"));
 
-            end_menu(win, "Do you want a tutorial?");
+            end_menu(win, _("Do you want a tutorial?"));
 
             n = select_menu(win, PICK_ONE, &sel);
             destroy_nhwindow(win);
@@ -5582,7 +5582,7 @@ handler_menustyle(void)
         Sprintf(buf, "%4s%-12.12s%c%.60s", "", "", sep, menutype[i][2]);
         add_menu_str(tmpwin, buf);
     }
-    end_menu(tmpwin, "Select menustyle:");
+    end_menu(tmpwin, _("Select menustyle:"));
     n = select_menu(tmpwin, PICK_ONE, &style_pick);
     if (n > 0) {
         i = style_pick[0].item.a_int - 1;
@@ -5719,7 +5719,7 @@ handler_disclose(void)
                  0, ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
         disc_cat[i] = 0;
     }
-    end_menu(tmpwin, "Change which disclosure options categories:");
+    end_menu(tmpwin, _("Change which disclosure options categories:"));
     pick_cnt = select_menu(tmpwin, PICK_ANY, &disclosure_pick);
     if (pick_cnt > 0) {
         for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
@@ -5832,7 +5832,7 @@ handler_menu_objsyms(void)
                  (j == iflags.menuobjsyms) ? MENU_ITEMFLAGS_SELECTED
                                            : MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Set object symbols in menus to what?");
+    end_menu(tmpwin, _("Set object symbols in menus to what?"));
     n = select_menu(tmpwin, PICK_ONE, &picklist);
     if (n > 0) {
         i = picklist[0].item.a_int - 1;
@@ -5882,7 +5882,7 @@ handler_msg_window(void)
             Sprintf(buf, "%4s%-12.12s%c%.60s", "", "", sep, msgwind[i][2]);
             add_menu_str(tmpwin, buf);
         }
-        end_menu(tmpwin, "Select message history display type:");
+        end_menu(tmpwin, _("Select message history display type:"));
         n = select_menu(tmpwin, PICK_ONE, &window_pick);
         if (n > 0) {
             c = window_pick[0].item.a_char;
@@ -5930,7 +5930,7 @@ handler_number_pad(void)
         add_menu(tmpwin, &nul_glyphinfo, &any, 'a' + i, '0' + i,
                  ATR_NONE, clr, npchoices[i], MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Select number_pad mode:");
+    end_menu(tmpwin, _("Select number_pad mode:"));
     if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
         switch (mode_pick->item.a_int - 1) {
         case 0:
@@ -6007,7 +6007,7 @@ handler_paranoid_confirmation(void)
                      ? MENU_ITEMFLAGS_SELECTED
                      : MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Actions requiring extra confirmation:");
+    end_menu(tmpwin, _("Actions requiring extra confirmation:"));
     i = select_menu(tmpwin, PICK_ANY, &paranoia_picks);
     if (i >= 0) {
         /* player didn't cancel; we reset all the paranoia options
@@ -6063,7 +6063,7 @@ handler_perminv_mode(void)
                  buf, (i == old_pi) ? MENU_ITEMFLAGS_SELECTED
                                     : MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Choose permanent inventory mode:");
+    end_menu(tmpwin, _("Choose permanent inventory mode:"));
     n = select_menu(tmpwin, PICK_ONE, &pi_pick);
     destroy_nhwindow(tmpwin);
     if (n > 0) {
@@ -6119,7 +6119,7 @@ handler_pickup_burden(void)
         add_menu(tmpwin, &nul_glyphinfo, &any, burden_letters[i],
                  0, ATR_NONE, clr, burden_name, MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Select encumbrance level:");
+    end_menu(tmpwin, _("Select encumbrance level:"));
     if (select_menu(tmpwin, PICK_ONE, &burden_pick) > 0) {
         flags.pickup_burden = burden_pick->item.a_int - 1;
         free((genericptr_t) burden_pick);
@@ -6157,7 +6157,7 @@ handler_runmode(void)
         add_menu(tmpwin, &nul_glyphinfo, &any, *mode_name,
                  0, ATR_NONE, clr, mode_name, MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Select run/travel display mode:");
+    end_menu(tmpwin, _("Select run/travel display mode:"));
     if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
         flags.runmode = mode_pick->item.a_int - 1;
         free((genericptr_t) mode_pick);
@@ -6203,7 +6203,7 @@ handler_sortloot(void)
                                 ? MENU_ITEMFLAGS_SELECTED
                                 : MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Select loot sorting type:");
+    end_menu(tmpwin, _("Select loot sorting type:"));
     n = select_menu(tmpwin, PICK_ONE, &sortl_pick);
     if (n > 0) {
         char c = sortl_pick[0].item.a_char;
@@ -6618,7 +6618,7 @@ handler_versinfo(void)
 #endif
               ), (vi & n) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
 
-    end_menu(tmpwin, "Select version information flags:");
+    end_menu(tmpwin, _("Select version information flags:"));
     n = select_menu(tmpwin, PICK_ANY, &vi_pick);
     if (n > 0) {
         int i, newval = 0;
@@ -6662,7 +6662,7 @@ handler_windowborders(void)
         add_menu(tmpwin, &nul_glyphinfo, &any, 'a' + i, '0' + i,
                  ATR_NONE, clr, mode_name, MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Select window borders mode:");
+    end_menu(tmpwin, _("Select window borders mode:"));
     if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
         iflags.wc2_windowborders = mode_pick->item.a_int - 1;
         free((genericptr_t) mode_pick);
@@ -7764,7 +7764,7 @@ query_msgtype(void)
                      ATR_NONE, clr,
                      msgtype_names[i].descr, MENU_ITEMFLAGS_NONE);
         }
-    end_menu(tmpwin, "How to show the message");
+    end_menu(tmpwin, _("How to show the message"));
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
     if (pick_cnt > 0) {
@@ -8687,7 +8687,7 @@ doset_simple_menu(void)
             }
         }
     }
-    end_menu(tmpwin, "Options");
+    end_menu(tmpwin, _("Options"));
 
     go.opt_need_redraw = FALSE;
     go.opt_need_glyph_reset = FALSE;
@@ -8975,7 +8975,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
     for (i = 0; i < PREFIX_COUNT; i++)
         doset_add_menu(tmpwin, fqn_prefix_names[i], fmtstr_doset, -1, 0);
 #endif
-    end_menu(tmpwin, "Set what options?");
+    end_menu(tmpwin, _("Set what options?"));
     go.opt_need_redraw = FALSE;
     go.opt_need_glyph_reset = FALSE;
 
@@ -9301,7 +9301,7 @@ handle_add_list_remove(const char *optname, int numtotal)
                  0, ATR_NONE, clr, tmpbuf,
                  (i == 3) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Do what?");
+    end_menu(tmpwin, _("Do what?"));
     if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &pick_list)) > 0) {
         opt_idx = pick_list[0].item.a_int - 1;
         if (pick_cnt > 1 && opt_idx == 3)
