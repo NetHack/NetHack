@@ -495,8 +495,8 @@ ghost_from_bottle(void)
     if (flags.verbose)
         You(_("are frightened to death, and unable to move."));
     nomul(-3);
-    gm.multi_reason = "being frightened to death";
-    gn.nomovemsg = "You regain your composure.";
+    gm.multi_reason = _("being frightened to death");
+    gn.nomovemsg = _("You regain your composure.");
 }
 
 /* getobj callback for object to drink from, which also does double duty as
@@ -784,7 +784,7 @@ peffect_booze(struct obj *otmp)
     if (otmp->cursed) {
         You(_("pass out."));
         gm.multi = -rnd(15);
-        gn.nomovemsg = "You awake with a headache.";
+        gn.nomovemsg = _("You awake with a headache.");
     }
 }
 
@@ -887,7 +887,7 @@ peffect_paralysis(struct obj *otmp)
             Your(_("%s are frozen to the %s!"), makeplural(body_part(FOOT)),
                  surface(u.ux, u.uy));
         nomul(-(rn1(10, 25 - 12 * bcsign(otmp))));
-        gm.multi_reason = "frozen by a potion";
+        gm.multi_reason = _("frozen by a potion");
         gn.nomovemsg = You_can_move_again;
         exercise(A_DEX, FALSE);
     }
@@ -2029,7 +2029,7 @@ potionbreathe(struct obj *obj)
         if (!Free_action) {
             pline(_("%s seems to be holding you."), Something);
             nomul(-rnd(5));
-            gm.multi_reason = "frozen by a potion";
+            gm.multi_reason = _("frozen by a potion");
             gn.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else
@@ -2040,7 +2040,7 @@ potionbreathe(struct obj *obj)
         if (!Free_action && !Sleep_resistance) {
             You_feel(_("rather tired."));
             nomul(-rnd(5));
-            gm.multi_reason = "sleeping off a magical draught";
+            gm.multi_reason = _("sleeping off a magical draught");
             gn.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else {

@@ -188,13 +188,13 @@ eatmupdate(void)
 
     if (is_obj_mappear(&gy.youmonst,ORANGE) && !Hallucination) {
         /* revert from hallucinatory to "normal" mimicking */
-        altmsg = "You now prefer mimicking yourself.";
+        altmsg = _("You now prefer mimicking yourself.");
         altapp = GOLD_PIECE;
     } else if (is_obj_mappear(&gy.youmonst,GOLD_PIECE) && Hallucination) {
         /* won't happen; anything which might make immobilized
            hero begin hallucinating (black light attack, theft
            of Grayswandir) will terminate the mimicry first */
-        altmsg = "Your rind escaped intact.";
+        altmsg = _("Your rind escaped intact.");
         altapp = ORANGE;
     }
 
@@ -1205,11 +1205,11 @@ cpostfx(int pm)
             if (u.usteed)
                 dismount_steed(DISMOUNT_FELL);
             nomul(-tmp);
-            gm.multi_reason = "pretending to be a pile of gold";
+            gm.multi_reason = _("pretending to be a pile of gold");
             Sprintf(buf,
                     Hallucination
-                       ? "You suddenly dread being peeled and mimic %s again!"
-                       : "You now prefer mimicking %s again.",
+                       ? _("You suddenly dread being peeled and mimic %s again!")
+                       : _("You now prefer mimicking %s again."),
                     an(Upolyd ? pmname(gy.youmonst.data, Ugender)
                               : gu.urace.noun));
             ge.eatmbuf = dupstr(buf);
@@ -1837,8 +1837,8 @@ rottenfood(struct obj *obj)
         incr_itimeout(&HDeaf, duration);
         disp.botl = TRUE;
         nomul(-duration);
-        gm.multi_reason = "unconscious from rotten food";
-        gn.nomovemsg = "You are conscious again.";
+        gm.multi_reason = _("unconscious from rotten food");
+        gn.nomovemsg = _("You are conscious again.");
         ga.afternmv = Hear_again;
         return 1;
     }
@@ -3307,7 +3307,7 @@ lesshungry(int num)
                 || (svc.context.victual.eating
                     && !svc.context.victual.fullwarn))) {
             pline(_("You're having a hard time getting all of it down."));
-            gn.nomovemsg = "You're finally finished.";
+            gn.nomovemsg = _("You're finally finished.");
             if (!svc.context.victual.eating) {
                 gm.multi = -2;
             } else {
@@ -3418,8 +3418,8 @@ newuhs(boolean incr)
                 incr_itimeout(&HDeaf, duration);
                 disp.botl = TRUE;
                 nomul(-duration);
-                gm.multi_reason = "fainted from lack of food";
-                gn.nomovemsg = "You regain consciousness.";
+                gm.multi_reason = _("fainted from lack of food");
+                gn.nomovemsg = _("You regain consciousness.");
                 ga.afternmv = unfaint;
                 newhs = FAINTED;
                 if (!Levitation)
@@ -3753,7 +3753,7 @@ vomit(void) /* A good idea from David Neves */
        be immobilized for some other reason at the time vomit() is called */
     if (gm.multi >= -2) {
         nomul(-2);
-        gm.multi_reason = "vomiting";
+        gm.multi_reason = _("vomiting");
         gn.nomovemsg = You_can_move_again;
     }
 

@@ -547,7 +547,7 @@ steal(struct monst *mtmp, char *objnambuf)
                 named++;
                 /* the following is to set multi for later on */
                 nomul(-armordelay);
-                gm.multi_reason = "taking off clothes";
+                gm.multi_reason = _("taking off clothes");
                 gn.nomovemsg = 0;
                 remove_worn_item(otmp, TRUE);
                 otmp->cursed = curssv;

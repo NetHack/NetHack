@@ -936,7 +936,7 @@ mattacku(struct monst *mtmp)
         if (sum[i] == M_ATTK_HIT) { /* successful attack */
             if (u.usleep && u.usleep < svm.moves && !rn2(10)) {
                 gm.multi = -1;
-                gn.nomovemsg = "The combat suddenly awakens you.";
+                gn.nomovemsg = _("The combat suddenly awakens you.");
             }
         }
         if ((sum[i] & M_ATTK_AGR_DIED))

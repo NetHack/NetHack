@@ -2985,7 +2985,7 @@ use_container(
         /* even if the trap fails, you've used up this turn */
         if (gm.multi >= 0) { /* in case we didn't become paralyzed */
             nomul(-1);
-            gm.multi_reason = "opening a container";
+            gm.multi_reason = _("opening a container");
             gn.nomovemsg = "";
         }
         ga.abort_looting = TRUE;
@@ -3965,7 +3965,7 @@ tipcontainer_checks(
         /* even if the trap fails, you've used up this turn */
         if (gm.multi >= 0) { /* in case we didn't become paralyzed */
             nomul(-1);
-            gm.multi_reason = "tipping a container";
+            gm.multi_reason = _("tipping a container");
             gn.nomovemsg = "";
         }
         return TIPCHECK_TRAPPED;

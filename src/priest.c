@@ -456,11 +456,11 @@ intemple(int roomno)
                 set_malign(priest);
             } else {
                 /* repeat visit, or attacked priest before entering */
-                msg1 = "You desecrate this place by your presence!";
+                msg1 = _("You desecrate this place by your presence!");
             }
         } else if (svm.moves >= epri_p->enter_time) {
-            Sprintf(buf, "Pilgrim, you enter a %s place!",
-                    !shrined ? "desecrated" : "sacred");
+            Sprintf(buf, _("Pilgrim, you enter a %s place!"),
+                    !shrined ? _("desecrated") : _("sacred"));
             msg1 = buf;
         }
         if (msg1 && can_speak && !Deaf) {
@@ -531,8 +531,8 @@ intemple(int roomno)
             if (flags.verbose)
                 You(_("are frightened to death, and unable to move."));
             nomul(-3);
-            gm.multi_reason = "being terrified of a ghost";
-            gn.nomovemsg = "You regain your composure.";
+            gm.multi_reason = _("being terrified of a ghost");
+            gn.nomovemsg = _("You regain your composure.");
         }
     }
 }

@@ -52,16 +52,16 @@ cursetxt(struct monst *mtmp, boolean undirected)
         const char *point_msg; /* spellcasting monsters are impolite */
 
         if (undirected)
-            point_msg = "all around, then curses";
+            point_msg = _("all around, then curses");
         else if ((Invis && !perceives(mtmp->data)
                   && (mtmp->mux != u.ux || mtmp->muy != u.uy))
                  || is_obj_mappear(&gy.youmonst, STRANGE_OBJECT)
                  || u.uundetected)
-            point_msg = "and curses in your general direction";
+            point_msg = _("and curses in your general direction");
         else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-            point_msg = "and curses at your displaced image";
+            point_msg = _("and curses at your displaced image");
         else
-            point_msg = "at you, then curses";
+            point_msg = _("at you, then curses");
 
         pline_mon(mtmp, "%s points %s.", Monnam(mtmp), point_msg);
     } else if ((!(svm.moves % 4) || !rn2(4))) {
@@ -825,7 +825,7 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
             monstunseesu(M_SEEN_MAGR);
         }
         nomul(-dmg);
-        gm.multi_reason = "paralyzed by a monster";
+        gm.multi_reason = _("paralyzed by a monster");
         gn.nomovemsg = 0;
         dmg = 0;
         break;

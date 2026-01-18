@@ -5063,7 +5063,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                         if (Slow_digestion)
                             tmp *= 2;
                         nomul(-tmp);
-                        gm.multi_reason = "digesting something";
+                        gm.multi_reason = _("digesting something");
                         gn.nomovemsg = msgbuf;
                         /* possible intrinsic once totally digested */
                         gc.corpsenm_digested = monsndx(pd);

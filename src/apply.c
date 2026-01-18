@@ -1046,7 +1046,7 @@ use_mirror(struct obj *obj)
                         pline(_("Yikes!  You've frozen yourself!"));
                     if (!Hallucination || !rn2(4)) {
                         nomul(-rnd(MAXULEV + 6 - u.ulevel));
-                        gm.multi_reason = "gazing into a mirror";
+                        gm.multi_reason = _("gazing into a mirror");
                     }
                     gn.nomovemsg = 0; /* default, "you can move again" */
                 }
@@ -2152,7 +2152,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
          */
         teleds(cc.x, cc.y, TELEDS_NO_FLAGS);
         nomul(-1);
-        gm.multi_reason = "jumping around";
+        gm.multi_reason = _("jumping around");
         gn.nomovemsg = "";
         morehungry(rnd(25));
         return ECMD_TIME;

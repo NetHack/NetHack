@@ -1924,7 +1924,7 @@ armoroff(struct obj *otmp)
        delays and which didn't; now both are handled for all types */
     if (delay) {
         nomul(delay);
-        gm.multi_reason = "disrobing";
+        gm.multi_reason = _("disrobing");
         switch (objects[otmp->otyp].oc_armcat) {
         case ARM_SUIT:
             what = suit_simple_name(otmp);
@@ -2390,8 +2390,8 @@ accessory_or_armor_on(struct obj *obj)
         delay = -objects[obj->otyp].oc_delay;
         if (delay) {
             nomul(delay);
-            gm.multi_reason = "dressing up";
-            gn.nomovemsg = "You finish your dressing maneuver.";
+            gm.multi_reason = _("dressing up");
+            gn.nomovemsg = _("You finish your dressing maneuver.");
         } else {
             unmul(""); /* call afternmv, clear it+nomovemsg+multi_reason */
             on_msg(obj);

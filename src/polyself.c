@@ -1726,7 +1726,7 @@ dogaze(void)
                                   ? -d((int) mtmp->m_lev + 1,
                                        (int) mtmp->data->mattk[0].damd)
                                   : -200);
-                        gm.multi_reason = "frozen by a monster's gaze";
+                        gm.multi_reason = _("frozen by a monster's gaze");
                         gn.nomovemsg = 0;
                         return ECMD_TIME;
                     } else

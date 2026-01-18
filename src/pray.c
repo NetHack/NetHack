@@ -1753,7 +1753,7 @@ sacrifice_your_race(
                 dmon->mpeaceful = TRUE;
             You(_("are terrified, and unable to move."));
             nomul(-3);
-            gm.multi_reason = "being terrified of a demon";
+            gm.multi_reason = _("being terrified of a demon");
             gn.nomovemsg = 0;
         } else
             pline_The(_("%s."), demonless_msg);
@@ -2255,8 +2255,8 @@ dopray(void)
         }
     }
     nomul(-3);
-    gm.multi_reason = "praying";
-    gn.nomovemsg = "You finish your prayer.";
+    gm.multi_reason = _("praying");
+    gn.nomovemsg = _("You finish your prayer.");
     ga.afternmv = prayer_done;
 
     if (gp.p_type == 3 && !Inhell) {
@@ -2478,7 +2478,7 @@ doturn(void)
      *  the brief paralysis?]
      */
     nomul(-(5 - ((u.ulevel - 1) / 6))); /* -5 .. -1 */
-    gm.multi_reason = "trying to turn the monsters";
+    gm.multi_reason = _("trying to turn the monsters");
     gn.nomovemsg = You_can_move_again;
     return ECMD_TIME;
 }

@@ -1216,8 +1216,8 @@ use_pick_axe2(struct obj *obj)
                 /* you ought to be able to let go; tough luck */
                 /* (maybe `move_into_trap()' would be better) */
                 nomul(-d(2, 2));
-                gm.multi_reason = "stuck in a spider web";
-                gn.nomovemsg = "You pull free.";
+                gm.multi_reason = _("stuck in a spider web");
+                gn.nomovemsg = _("You pull free.");
             } else if (lev->typ == IRONBARS) {
                 pline(_("Clang!"));
                 wake_nearby(FALSE);

@@ -2963,7 +2963,7 @@ domove_core(void)
     /* must come after we finished picking up, in spoteffects() */
     if (cause_delay) {
         nomul(-2);
-        gm.multi_reason = "dragging an iron ball";
+        gm.multi_reason = _("dragging an iron ball");
         gn.nomovemsg = "";
     }
 

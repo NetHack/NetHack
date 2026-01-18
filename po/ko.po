@@ -20417,6 +20417,166 @@ msgstr "부인"
 msgid "Sir"
 msgstr "선생님"
 
+# gm.multi_reason strings
+msgid "pretending to be a pile of gold"
+msgstr "금 더미인 척 하는 중"
+
+msgid "You suddenly dread being peeled and mimic %s again!"
+msgstr "껍질이 벗겨질까 봐 갑자기 두려워지며 다시 %s를 흉내낸다!"
+
+msgid "You now prefer mimicking %s again."
+msgstr "다시 %s를 흉내내고 싶어진다."
+
+msgid "unconscious from rotten food"
+msgstr "썩은 음식으로 기절함"
+
+msgid "You are conscious again."
+msgstr "다시 의식이 돌아왔다."
+
+msgid "You're finally finished."
+msgstr "드디어 다 먹었다."
+
+msgid "fainted from lack of food"
+msgstr "배고파서 기절함"
+
+msgid "You regain consciousness."
+msgstr "의식을 되찾았다."
+
+msgid "vomiting"
+msgstr "구토 중"
+
+msgid "You now prefer mimicking yourself."
+msgstr "이제 자신을 흉내내고 싶어진다."
+
+msgid "Your rind escaped intact."
+msgstr "껍질이 무사히 벗겨졌다."
+
+msgid "being frightened to death"
+msgstr "무서워서 죽을 것 같음"
+
+msgid "You awake with a headache."
+msgstr "두통과 함께 깨어났다."
+
+msgid "frozen by a potion"
+msgstr "물약에 의해 얼어붙음"
+
+msgid "sleeping off a magical draught"
+msgstr "마법 음료를 마시고 자는 중"
+
+msgid "gazing into a mirror"
+msgstr "거울을 응시하는 중"
+
+msgid "jumping around"
+msgstr "뛰어다니는 중"
+
+msgid "being scared stiff"
+msgstr "무서워서 굳어버림"
+
+msgid "gazing into a Magic 8-Ball (tm)"
+msgstr "매직 8볼을 응시하는 중"
+
+msgid "gazing into a crystal ball"
+msgstr "수정 구슬을 응시하는 중"
+
+msgid "stuck in a spider web"
+msgstr "거미줄에 걸림"
+
+msgid "You pull free."
+msgstr "빠져나왔다."
+
+msgid "disrobing"
+msgstr "옷 벗는 중"
+
+msgid "dressing up"
+msgstr "옷 입는 중"
+
+msgid "You finish your dressing maneuver."
+msgstr "옷 입기를 마쳤다."
+
+msgid "moving through the air"
+msgstr "공중을 이동하는 중"
+
+msgid "You survived that attempt on your life."
+msgstr "목숨을 노린 그 시도에서 살아남았다."
+
+msgid "dragging an iron ball"
+msgstr "철구를 끌고 가는 중"
+
+msgid "The combat suddenly awakens you."
+msgstr "전투가 갑자기 당신을 깨웠다."
+
+msgid "Aggravated, you are jolted into full consciousness."
+msgstr "짜증이 나서 완전히 깨어났다."
+
+msgid "opening a container"
+msgstr "용기를 여는 중"
+
+msgid "tipping a container"
+msgstr "용기를 기울이는 중"
+
+msgid "frozen by a monster's gaze"
+msgstr "몬스터의 시선에 얼어붙음"
+
+msgid "reading a book"
+msgstr "책을 읽는 중"
+
+msgid "taking off clothes"
+msgstr "옷을 벗는 중"
+
+msgid "getting stoned"
+msgstr "돌이 되어가는 중"
+
+msgid "fumbling"
+msgstr "더듬거리는 중"
+
+msgid "sleeping"
+msgstr "자는 중"
+
+msgid "hiding from thunderstorm"
+msgstr "천둥번개를 피하는 중"
+
+msgid "The explosion awakens you!"
+msgstr "폭발이 당신을 깨웠다!"
+
+msgid "frozen by a trap"
+msgstr "함정에 의해 얼어붙음"
+
+msgid "digesting something"
+msgstr "무언가를 소화하는 중"
+
+msgid "paralyzed by a monster"
+msgstr "몬스터에 의해 마비됨"
+
+msgid "all around, then curses"
+msgstr "주위를 둘러보고 저주한다"
+
+msgid "and curses in your general direction"
+msgstr "대충 네 방향으로 저주한다"
+
+msgid "and curses at your displaced image"
+msgstr "네 허상을 향해 저주한다"
+
+msgid "at you, then curses"
+msgstr "너를 보고 저주한다"
+
+msgid "being terrified of a demon"
+msgstr "악마에게 겁먹음"
+
+msgid "praying"
+msgstr "기도하는 중"
+
+msgid "You finish your prayer."
+msgstr "기도를 마쳤다."
+
+msgid "trying to turn the monsters"
+msgstr "몬스터를 퇴치하려는 중"
+
+msgid "being terrified of a ghost"
+msgstr "유령에게 겁먹음"
+
+msgid "Resuming regular play."
+msgstr "일반 플레이 재개."
+
 #~ msgid "You feel like someone is helping you."
 #~ msgstr "누군가 도와주는 것 같다."
 

@@ -2577,7 +2577,7 @@ trapeffect_landmine(
             trapkilled = TRUE;
         if (unconscious()) {
             gm.multi = -1;
-            gn.nomovemsg = "The explosion awakens you!";
+            gn.nomovemsg = _("The explosion awakens you!");
         }
         return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped
             ? Trap_Caught_Mon : Trap_Effect_Finished;
@@ -6369,7 +6369,7 @@ chest_trap(
             if (!Free_action) {
                 pline(_("Suddenly you are frozen in place!"));
                 nomul(-d(5, 6));
-                gm.multi_reason = "frozen by a trap";
+                gm.multi_reason = _("frozen by a trap");
                 exercise(A_DEX, FALSE);
                 gn.nomovemsg = You_can_move_again;
             } else

@@ -726,7 +726,7 @@ savelife(int how)
     if ((Sick & TIMEOUT) == 1L) {
         make_sick(0L, (char *) 0, FALSE, SICK_ALL);
     }
-    gn.nomovemsg = "You survived that attempt on your life.";
+    gn.nomovemsg = _("You survived that attempt on your life.");
     svc.context.move = 0;
 
     gm.multi = -1; /* can't move again during the current turn */

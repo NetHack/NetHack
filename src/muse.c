@@ -2608,7 +2608,7 @@ you_aggravate(struct monst *mtmp)
     docrt();
     if (unconscious()) {
         gm.multi = -1;
-        gn.nomovemsg = "Aggravated, you are jolted into full consciousness.";
+        gn.nomovemsg = _("Aggravated, you are jolted into full consciousness.");
     }
     newsym(mtmp->mx, mtmp->my);
     if (!canspotmon(mtmp))

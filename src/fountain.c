@@ -807,16 +807,16 @@ sink_backs_up(coordxy x, coordxy y)
     char buf[BUFSZ];
 
     if (!Blind)
-        Strcpy(buf, "Muddy waste pops up from the drain");
+        Strcpy(buf, _("Muddy waste pops up from the drain"));
     else if (!Deaf)
-        Strcpy(buf, "You hear a sloshing sound"); /* Deaf-aware */
+        Strcpy(buf, _("You hear a sloshing sound")); /* Deaf-aware */
     else
-        Sprintf(buf, "Something splashes you in the %s", body_part(FACE));
-    pline(_("%s%s."), !Deaf ? "Flupp!  " : "", buf);
+        Sprintf(buf, _("Something splashes you in the %s"), body_part(FACE));
+    pline(_("%s%s."), !Deaf ? _("Flupp!  ") : "", buf);
 
     if (!(levl[x][y].looted & S_LRING)) { /* once per sink */
         if (!Blind)
-            You_see("a ring shining in its midst.");
+            You_see(_("a ring shining in its midst."));
         (void) mkobj_at(RING_CLASS, x, y, TRUE);
         newsym(x, y);
         exercise(A_DEX, TRUE);

@@ -1258,7 +1258,7 @@ use_crystal_ball(struct obj **optr)
 
     if (Hallucination) {
         nomul(-rnd(charged ? 4 : 2));
-        gm.multi_reason = "gazing into a Magic 8-Ball (tm)";
+        gm.multi_reason = _("gazing into a Magic 8-Ball (tm)");
         gn.nomovemsg = "";
 
         if (!charged) {
@@ -1311,7 +1311,7 @@ use_crystal_ball(struct obj **optr)
 
     You(_("peer into %s..."), the(xname(obj)));
     nomul(-rnd(charged ? 10 : 2));
-    gm.multi_reason = "gazing into a crystal ball";
+    gm.multi_reason = _("gazing into a crystal ball");
     gn.nomovemsg = "";
 
     if (!charged) {
