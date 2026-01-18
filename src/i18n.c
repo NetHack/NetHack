@@ -69,6 +69,24 @@ utf8_char_width(const char *utf8str)
     return (w > 0) ? w : 1;
 }
 
+/*
+ * Translate an object name using gettext
+ *
+ * This function is used to translate item names like "gold piece",
+ * "long sword", etc. It simply wraps the name with gettext.
+ */
+const char *
+tr_obj_name(const char *name)
+{
+    if (!name || !*name)
+        return name;
+#ifdef ENABLE_NLS
+    return gettext(name);
+#else
+    return name;
+#endif
+}
+
 #ifdef ENABLE_NLS
 
 #include "i18n.h"

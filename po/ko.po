@@ -21178,44 +21178,18 @@ msgstr "그 설명에 맞는 것이 게임에 존재하지 않는다."
 # ============================================================
 # 아이템 이름 (Item Names) - 샘플
 # ============================================================
-#~ msgid "long sword"
-#~ msgstr "장검"
 
-#~ msgid "short sword"
-#~ msgstr "단검"
 
-#~ msgid "dagger"
-#~ msgstr "단도"
 
-#~ msgid "bow"
-#~ msgstr "활"
 
-#~ msgid "arrow"
-#~ msgstr "화살"
 
-#~ msgid "plate mail"
-#~ msgstr "판금 갑옷"
 
-#~ msgid "shield"
-#~ msgstr "방패"
 
-#~ msgid "helmet"
-#~ msgstr "투구"
 
-#~ msgid "potion of healing"
-#~ msgstr "치료 물약"
 
-#~ msgid "scroll of identify"
-#~ msgstr "감정의 두루마리"
 
-#~ msgid "wand of death"
-#~ msgstr "죽음의 지팡이"
 
-#~ msgid "ring of invisibility"
-#~ msgstr "투명의 반지"
 
-#~ msgid "amulet of life saving"
-#~ msgstr "생명 보호의 부적"
 
 # ============================================================
 # Copyright 배너 (Copyright Banner)
@@ -21948,3 +21922,1291 @@ msgstr "[m] '%s' 접두어 허용"
 
 msgid "no matches"
 msgstr "일치하는 항목 없음"
+
+# ============================================================
+# 아이템 이름 (Item Names)
+# ============================================================
+
+# 화폐
+msgid "gold piece"
+msgstr "금화"
+
+# 무기 - 원거리
+msgid "arrow"
+msgstr "화살"
+
+msgid "elven arrow"
+msgstr "엘프 화살"
+
+msgid "orcish arrow"
+msgstr "오크 화살"
+
+msgid "silver arrow"
+msgstr "은 화살"
+
+msgid "ya"
+msgstr "야(矢)"
+
+msgid "crossbow bolt"
+msgstr "석궁 화살"
+
+msgid "dart"
+msgstr "다트"
+
+msgid "shuriken"
+msgstr "수리검"
+
+msgid "boomerang"
+msgstr "부메랑"
+
+# 무기 - 창
+msgid "spear"
+msgstr "창"
+
+msgid "elven spear"
+msgstr "엘프 창"
+
+msgid "orcish spear"
+msgstr "오크 창"
+
+msgid "dwarvish spear"
+msgstr "드워프 창"
+
+msgid "silver spear"
+msgstr "은 창"
+
+msgid "javelin"
+msgstr "투창"
+
+msgid "trident"
+msgstr "삼지창"
+
+# 무기 - 단검
+msgid "dagger"
+msgstr "단검"
+
+msgid "elven dagger"
+msgstr "엘프 단검"
+
+msgid "orcish dagger"
+msgstr "오크 단검"
+
+msgid "silver dagger"
+msgstr "은 단검"
+
+msgid "athame"
+msgstr "아테메"
+
+msgid "scalpel"
+msgstr "메스"
+
+msgid "knife"
+msgstr "칼"
+
+msgid "stiletto"
+msgstr "스틸레토"
+
+# 무기 - 검
+msgid "short sword"
+msgstr "단검"
+
+msgid "elven short sword"
+msgstr "엘프 단검"
+
+msgid "orcish short sword"
+msgstr "오크 단검"
+
+msgid "dwarvish short sword"
+msgstr "드워프 단검"
+
+msgid "scimitar"
+msgstr "시미터"
+
+msgid "silver saber"
+msgstr "은 세이버"
+
+msgid "broadsword"
+msgstr "브로드소드"
+
+msgid "elven broadsword"
+msgstr "엘프 브로드소드"
+
+msgid "long sword"
+msgstr "장검"
+
+msgid "two-handed sword"
+msgstr "양손검"
+
+msgid "katana"
+msgstr "카타나"
+
+msgid "tsurugi"
+msgstr "츠루기"
+
+msgid "runesword"
+msgstr "룬검"
+
+# 무기 - 도끼
+msgid "axe"
+msgstr "도끼"
+
+msgid "battle-axe"
+msgstr "전투도끼"
+
+# 무기 - 둔기
+msgid "mace"
+msgstr "철퇴"
+
+msgid "morning star"
+msgstr "모닝스타"
+
+msgid "war hammer"
+msgstr "워해머"
+
+msgid "club"
+msgstr "곤봉"
+
+msgid "rubber hose"
+msgstr "고무 호스"
+
+msgid "quarterstaff"
+msgstr "육척봉"
+
+msgid "aklys"
+msgstr "아클리스"
+
+msgid "flail"
+msgstr "도리깨"
+
+# 무기 - 장대무기
+msgid "partisan"
+msgstr "파르티잔"
+
+msgid "ranseur"
+msgstr "란서"
+
+msgid "spetum"
+msgstr "스페텀"
+
+msgid "glaive"
+msgstr "글레이브"
+
+msgid "lance"
+msgstr "랜스"
+
+msgid "halberd"
+msgstr "할버드"
+
+msgid "bardiche"
+msgstr "바르디슈"
+
+msgid "voulge"
+msgstr "불지"
+
+msgid "dwarvish mattock"
+msgstr "드워프 곡괭이"
+
+msgid "fauchard"
+msgstr "포샤드"
+
+msgid "guisarme"
+msgstr "기사름"
+
+msgid "bill-guisarme"
+msgstr "빌 기사름"
+
+msgid "lucern hammer"
+msgstr "루체른 해머"
+
+msgid "bec de corbin"
+msgstr "베크 드 코르뱅"
+
+# 무기 - 채찍
+msgid "bullwhip"
+msgstr "채찍"
+
+# 활/석궁
+msgid "bow"
+msgstr "활"
+
+msgid "elven bow"
+msgstr "엘프 활"
+
+msgid "orcish bow"
+msgstr "오크 활"
+
+msgid "yumi"
+msgstr "유미"
+
+msgid "sling"
+msgstr "투석기"
+
+msgid "crossbow"
+msgstr "석궁"
+
+# 방어구 - 방패
+msgid "small shield"
+msgstr "소형 방패"
+
+msgid "elven shield"
+msgstr "엘프 방패"
+
+msgid "Uruk-hai shield"
+msgstr "우루크하이 방패"
+
+msgid "orcish shield"
+msgstr "오크 방패"
+
+msgid "large shield"
+msgstr "대형 방패"
+
+msgid "dwarvish roundshield"
+msgstr "드워프 원형방패"
+
+msgid "shield of reflection"
+msgstr "반사의 방패"
+
+# 방어구 - 투구
+msgid "elven helm"
+msgstr "엘프 투구"
+
+msgid "orcish helm"
+msgstr "오크 투구"
+
+msgid "dwarvish helm"
+msgstr "드워프 투구"
+
+msgid "helm of brilliance"
+msgstr "명석함의 투구"
+
+msgid "helm of opposite alignment"
+msgstr "성향 전환의 투구"
+
+msgid "helm of telepathy"
+msgstr "텔레파시의 투구"
+
+# 방어구 - 장갑
+msgid "leather gloves"
+msgstr "가죽 장갑"
+
+msgid "gauntlets of fumbling"
+msgstr "헛손질의 건틀릿"
+
+msgid "gauntlets of power"
+msgstr "힘의 건틀릿"
+
+msgid "gauntlets of dexterity"
+msgstr "민첩의 건틀릿"
+
+# 방어구 - 신발
+msgid "low boots"
+msgstr "낮은 부츠"
+
+msgid "high boots"
+msgstr "높은 부츠"
+
+msgid "iron shoes"
+msgstr "철제 신발"
+
+msgid "elven boots"
+msgstr "엘프 부츠"
+
+msgid "kicking boots"
+msgstr "발차기 부츠"
+
+msgid "fumble boots"
+msgstr "헛디딤 부츠"
+
+msgid "levitation boots"
+msgstr "부유의 부츠"
+
+msgid "jumping boots"
+msgstr "점프 부츠"
+
+msgid "speed boots"
+msgstr "신속의 부츠"
+
+msgid "water walking boots"
+msgstr "물 위를 걷는 부츠"
+
+# 방어구 - 망토
+msgid "mummy wrapping"
+msgstr "미라 붕대"
+
+msgid "elven cloak"
+msgstr "엘프 망토"
+
+msgid "orcish cloak"
+msgstr "오크 망토"
+
+msgid "dwarvish cloak"
+msgstr "드워프 망토"
+
+msgid "oilskin cloak"
+msgstr "기름종이 망토"
+
+msgid "alchemy smock"
+msgstr "연금술사 앞치마"
+
+msgid "cloak of protection"
+msgstr "보호의 망토"
+
+msgid "cloak of invisibility"
+msgstr "투명의 망토"
+
+msgid "cloak of magic resistance"
+msgstr "마법저항의 망토"
+
+msgid "cloak of displacement"
+msgstr "착란의 망토"
+
+# 방어구 - 갑옷
+msgid "leather armor"
+msgstr "가죽 갑옷"
+
+msgid "studded leather armor"
+msgstr "징박힌 가죽 갑옷"
+
+msgid "ring mail"
+msgstr "링 메일"
+
+msgid "scale mail"
+msgstr "스케일 메일"
+
+msgid "orcish ring mail"
+msgstr "오크 링 메일"
+
+msgid "orcish chain mail"
+msgstr "오크 체인 메일"
+
+msgid "chain mail"
+msgstr "체인 메일"
+
+msgid "elven chain mail"
+msgstr "엘프 체인 메일"
+
+msgid "splint mail"
+msgstr "스플린트 메일"
+
+msgid "banded mail"
+msgstr "밴디드 메일"
+
+msgid "dwarvish chain mail"
+msgstr "드워프 체인 메일"
+
+msgid "bronze plate mail"
+msgstr "청동 판금 갑옷"
+
+msgid "plate mail"
+msgstr "판금 갑옷"
+
+msgid "crystal plate mail"
+msgstr "수정 판금 갑옷"
+
+# 방어구 - 용 비늘
+msgid "gray dragon scales"
+msgstr "회색 용 비늘"
+
+msgid "silver dragon scales"
+msgstr "은색 용 비늘"
+
+msgid "red dragon scales"
+msgstr "붉은 용 비늘"
+
+msgid "white dragon scales"
+msgstr "흰 용 비늘"
+
+msgid "orange dragon scales"
+msgstr "주황 용 비늘"
+
+msgid "black dragon scales"
+msgstr "검은 용 비늘"
+
+msgid "blue dragon scales"
+msgstr "푸른 용 비늘"
+
+msgid "green dragon scales"
+msgstr "초록 용 비늘"
+
+msgid "yellow dragon scales"
+msgstr "노란 용 비늘"
+
+msgid "gray dragon scale mail"
+msgstr "회색 용 비늘 갑옷"
+
+msgid "silver dragon scale mail"
+msgstr "은색 용 비늘 갑옷"
+
+msgid "red dragon scale mail"
+msgstr "붉은 용 비늘 갑옷"
+
+msgid "white dragon scale mail"
+msgstr "흰 용 비늘 갑옷"
+
+msgid "orange dragon scale mail"
+msgstr "주황 용 비늘 갑옷"
+
+msgid "black dragon scale mail"
+msgstr "검은 용 비늘 갑옷"
+
+msgid "blue dragon scale mail"
+msgstr "푸른 용 비늘 갑옷"
+
+msgid "green dragon scale mail"
+msgstr "초록 용 비늘 갑옷"
+
+msgid "yellow dragon scale mail"
+msgstr "노란 용 비늘 갑옷"
+
+# 반지
+msgid "ring"
+msgstr "반지"
+
+msgid "ring of adornment"
+msgstr "장식의 반지"
+
+msgid "ring of gain strength"
+msgstr "힘 증가의 반지"
+
+msgid "ring of gain constitution"
+msgstr "체력 증가의 반지"
+
+msgid "ring of increase accuracy"
+msgstr "명중 증가의 반지"
+
+msgid "ring of increase damage"
+msgstr "피해 증가의 반지"
+
+msgid "ring of protection"
+msgstr "보호의 반지"
+
+msgid "ring of regeneration"
+msgstr "재생의 반지"
+
+msgid "ring of searching"
+msgstr "탐색의 반지"
+
+msgid "ring of stealth"
+msgstr "은신의 반지"
+
+msgid "ring of sustain ability"
+msgstr "능력 유지의 반지"
+
+msgid "ring of levitation"
+msgstr "부유의 반지"
+
+msgid "ring of hunger"
+msgstr "허기의 반지"
+
+msgid "ring of aggravate monster"
+msgstr "몬스터 자극의 반지"
+
+msgid "ring of conflict"
+msgstr "충돌의 반지"
+
+msgid "ring of warning"
+msgstr "경고의 반지"
+
+msgid "ring of poison resistance"
+msgstr "독 저항의 반지"
+
+msgid "ring of fire resistance"
+msgstr "화염 저항의 반지"
+
+msgid "ring of cold resistance"
+msgstr "냉기 저항의 반지"
+
+msgid "ring of shock resistance"
+msgstr "전기 저항의 반지"
+
+msgid "ring of free action"
+msgstr "자유 행동의 반지"
+
+msgid "ring of slow digestion"
+msgstr "느린 소화의 반지"
+
+msgid "ring of teleportation"
+msgstr "순간이동의 반지"
+
+msgid "ring of teleport control"
+msgstr "순간이동 제어의 반지"
+
+msgid "ring of polymorph"
+msgstr "변신의 반지"
+
+msgid "ring of polymorph control"
+msgstr "변신 제어의 반지"
+
+msgid "ring of invisibility"
+msgstr "투명의 반지"
+
+msgid "ring of see invisible"
+msgstr "투명 감지의 반지"
+
+msgid "ring of protection from shape changers"
+msgstr "변신술사 방호의 반지"
+
+# 부적
+msgid "amulet"
+msgstr "부적"
+
+msgid "Amulet of Yendor"
+msgstr "옌더의 부적"
+
+msgid "amulet of ESP"
+msgstr "ESP의 부적"
+
+msgid "amulet of life saving"
+msgstr "생명 구원의 부적"
+
+msgid "amulet of strangulation"
+msgstr "질식의 부적"
+
+msgid "amulet of restful sleep"
+msgstr "안식의 부적"
+
+msgid "amulet versus poison"
+msgstr "독 방호의 부적"
+
+msgid "amulet of change"
+msgstr "변화의 부적"
+
+msgid "amulet of unchanging"
+msgstr "불변의 부적"
+
+msgid "amulet of reflection"
+msgstr "반사의 부적"
+
+msgid "amulet of magical breathing"
+msgstr "마법 호흡의 부적"
+
+msgid "amulet of flying"
+msgstr "비행의 부적"
+
+msgid "amulet of guarding"
+msgstr "수호의 부적"
+
+# 도구
+msgid "large box"
+msgstr "큰 상자"
+
+msgid "chest"
+msgstr "보물 상자"
+
+msgid "ice box"
+msgstr "아이스박스"
+
+msgid "sack"
+msgstr "자루"
+
+msgid "bag of holding"
+msgstr "보관의 가방"
+
+msgid "bag of tricks"
+msgstr "속임수의 가방"
+
+msgid "oilskin sack"
+msgstr "기름종이 자루"
+
+msgid "skeleton key"
+msgstr "만능 열쇠"
+
+msgid "lock pick"
+msgstr "자물쇠 따개"
+
+msgid "credit card"
+msgstr "신용카드"
+
+msgid "tallow candle"
+msgstr "수지 초"
+
+msgid "wax candle"
+msgstr "밀랍 초"
+
+msgid "magic candle"
+msgstr "마법 초"
+
+msgid "brass lantern"
+msgstr "황동 랜턴"
+
+msgid "oil lamp"
+msgstr "기름 램프"
+
+msgid "magic lamp"
+msgstr "마법 램프"
+
+msgid "expensive camera"
+msgstr "고급 카메라"
+
+msgid "mirror"
+msgstr "거울"
+
+msgid "magic mirror"
+msgstr "마법 거울"
+
+msgid "crystal ball"
+msgstr "수정구"
+
+msgid "lenses"
+msgstr "렌즈"
+
+msgid "blindfold"
+msgstr "눈가리개"
+
+msgid "towel"
+msgstr "수건"
+
+msgid "saddle"
+msgstr "안장"
+
+msgid "leash"
+msgstr "목줄"
+
+msgid "stethoscope"
+msgstr "청진기"
+
+msgid "tinning kit"
+msgstr "통조림 도구"
+
+msgid "tin opener"
+msgstr "깡통 따개"
+
+msgid "can of grease"
+msgstr "그리스 통"
+
+msgid "figurine"
+msgstr "피규어"
+
+msgid "magic marker"
+msgstr "마법 마커"
+
+msgid "land mine"
+msgstr "지뢰"
+
+msgid "beartrap"
+msgstr "곰덫"
+
+msgid "tin whistle"
+msgstr "양철 호루라기"
+
+msgid "magic whistle"
+msgstr "마법 호루라기"
+
+msgid "wooden flute"
+msgstr "나무 플루트"
+
+msgid "magic flute"
+msgstr "마법 플루트"
+
+msgid "tooled horn"
+msgstr "장식 뿔피리"
+
+msgid "frost horn"
+msgstr "냉기의 뿔피리"
+
+msgid "fire horn"
+msgstr "화염의 뿔피리"
+
+msgid "horn of plenty"
+msgstr "풍요의 뿔"
+
+msgid "wooden harp"
+msgstr "나무 하프"
+
+msgid "magic harp"
+msgstr "마법 하프"
+
+msgid "bell"
+msgstr "종"
+
+msgid "Bell of Opening"
+msgstr "개봉의 종"
+
+msgid "bugle"
+msgstr "나팔"
+
+msgid "leather drum"
+msgstr "가죽 북"
+
+msgid "drum of earthquake"
+msgstr "지진의 북"
+
+msgid "pick-axe"
+msgstr "곡괭이"
+
+msgid "grappling hook"
+msgstr "갈고리"
+
+msgid "unicorn horn"
+msgstr "유니콘 뿔"
+
+msgid "candelabrum"
+msgstr "촛대"
+
+# 음식
+msgid "food ration"
+msgstr "식량"
+
+msgid "tripe ration"
+msgstr "내장 식량"
+
+msgid "corpse"
+msgstr "시체"
+
+msgid "egg"
+msgstr "알"
+
+msgid "meatball"
+msgstr "미트볼"
+
+msgid "meat stick"
+msgstr "고기 꼬치"
+
+msgid "meat ring"
+msgstr "고기 반지"
+
+msgid "huge chunk of meat"
+msgstr "거대한 고기 덩어리"
+
+msgid "kelp frond"
+msgstr "다시마"
+
+msgid "eucalyptus leaf"
+msgstr "유칼립투스 잎"
+
+msgid "apple"
+msgstr "사과"
+
+msgid "orange"
+msgstr "오렌지"
+
+msgid "pear"
+msgstr "배"
+
+msgid "melon"
+msgstr "멜론"
+
+msgid "banana"
+msgstr "바나나"
+
+msgid "carrot"
+msgstr "당근"
+
+msgid "sprig of wolfsbane"
+msgstr "늑대 쐐기풀 잎"
+
+msgid "clove of garlic"
+msgstr "마늘"
+
+msgid "slime mold"
+msgstr "슬라임 곰팡이"
+
+msgid "lump of royal jelly"
+msgstr "로열젤리 덩어리"
+
+msgid "cream pie"
+msgstr "크림파이"
+
+msgid "candy bar"
+msgstr "사탕바"
+
+msgid "fortune cookie"
+msgstr "포춘쿠키"
+
+msgid "pancake"
+msgstr "팬케이크"
+
+msgid "lembas wafer"
+msgstr "렘바스 웨이퍼"
+
+msgid "cram ration"
+msgstr "크램 식량"
+
+msgid "K-ration"
+msgstr "전투식량"
+
+msgid "C-ration"
+msgstr "보존식량"
+
+msgid "tin"
+msgstr "통조림"
+
+# 물약
+msgid "potion"
+msgstr "물약"
+
+msgid "potion of gain ability"
+msgstr "능력 상승의 물약"
+
+msgid "potion of restore ability"
+msgstr "능력 회복의 물약"
+
+msgid "potion of confusion"
+msgstr "혼란의 물약"
+
+msgid "potion of blindness"
+msgstr "실명의 물약"
+
+msgid "potion of paralysis"
+msgstr "마비의 물약"
+
+msgid "potion of speed"
+msgstr "신속의 물약"
+
+msgid "potion of levitation"
+msgstr "부유의 물약"
+
+msgid "potion of hallucination"
+msgstr "환각의 물약"
+
+msgid "potion of invisibility"
+msgstr "투명의 물약"
+
+msgid "potion of see invisible"
+msgstr "투명 감지의 물약"
+
+msgid "potion of healing"
+msgstr "치료의 물약"
+
+msgid "potion of extra healing"
+msgstr "추가 치료의 물약"
+
+msgid "potion of gain level"
+msgstr "레벨 상승의 물약"
+
+msgid "potion of enlightenment"
+msgstr "깨달음의 물약"
+
+msgid "potion of monster detection"
+msgstr "몬스터 탐지의 물약"
+
+msgid "potion of object detection"
+msgstr "물체 탐지의 물약"
+
+msgid "potion of gain energy"
+msgstr "마나 상승의 물약"
+
+msgid "potion of sleeping"
+msgstr "수면의 물약"
+
+msgid "potion of full healing"
+msgstr "완전 치료의 물약"
+
+msgid "potion of polymorph"
+msgstr "변신의 물약"
+
+msgid "potion of booze"
+msgstr "술"
+
+msgid "potion of sickness"
+msgstr "질병의 물약"
+
+msgid "potion of fruit juice"
+msgstr "과일 주스"
+
+msgid "potion of acid"
+msgstr "산성 물약"
+
+msgid "potion of oil"
+msgstr "기름"
+
+msgid "potion of water"
+msgstr "물"
+
+# 두루마리
+msgid "scroll"
+msgstr "두루마리"
+
+msgid "scroll of enchant armor"
+msgstr "갑옷 강화 두루마리"
+
+msgid "scroll of destroy armor"
+msgstr "갑옷 파괴 두루마리"
+
+msgid "scroll of confuse monster"
+msgstr "몬스터 혼란 두루마리"
+
+msgid "scroll of scare monster"
+msgstr "몬스터 공포 두루마리"
+
+msgid "scroll of remove curse"
+msgstr "저주 해제 두루마리"
+
+msgid "scroll of enchant weapon"
+msgstr "무기 강화 두루마리"
+
+msgid "scroll of create monster"
+msgstr "몬스터 소환 두루마리"
+
+msgid "scroll of taming"
+msgstr "길들이기 두루마리"
+
+msgid "scroll of genocide"
+msgstr "학살 두루마리"
+
+msgid "scroll of light"
+msgstr "빛의 두루마리"
+
+msgid "scroll of teleportation"
+msgstr "순간이동 두루마리"
+
+msgid "scroll of gold detection"
+msgstr "금 탐지 두루마리"
+
+msgid "scroll of food detection"
+msgstr "음식 탐지 두루마리"
+
+msgid "scroll of identify"
+msgstr "감정 두루마리"
+
+msgid "scroll of magic mapping"
+msgstr "마법 지도 두루마리"
+
+msgid "scroll of amnesia"
+msgstr "망각의 두루마리"
+
+msgid "scroll of fire"
+msgstr "화염 두루마리"
+
+msgid "scroll of earth"
+msgstr "대지 두루마리"
+
+msgid "scroll of punishment"
+msgstr "징벌의 두루마리"
+
+msgid "scroll of charging"
+msgstr "충전 두루마리"
+
+msgid "scroll of stinking cloud"
+msgstr "독구름 두루마리"
+
+# 마법서
+msgid "spellbook"
+msgstr "마법서"
+
+msgid "spellbook of dig"
+msgstr "굴착의 마법서"
+
+msgid "spellbook of magic missile"
+msgstr "마법 화살의 마법서"
+
+msgid "spellbook of fireball"
+msgstr "화염구의 마법서"
+
+msgid "spellbook of cone of cold"
+msgstr "냉기 원뿔의 마법서"
+
+msgid "spellbook of sleep"
+msgstr "수면의 마법서"
+
+msgid "spellbook of finger of death"
+msgstr "죽음의 손가락 마법서"
+
+msgid "spellbook of light"
+msgstr "빛의 마법서"
+
+msgid "spellbook of detect monsters"
+msgstr "몬스터 탐지의 마법서"
+
+msgid "spellbook of healing"
+msgstr "치료의 마법서"
+
+msgid "spellbook of knock"
+msgstr "열기의 마법서"
+
+msgid "spellbook of force bolt"
+msgstr "힘의 화살 마법서"
+
+msgid "spellbook of confuse monster"
+msgstr "몬스터 혼란의 마법서"
+
+msgid "spellbook of cure blindness"
+msgstr "실명 치료의 마법서"
+
+msgid "spellbook of drain life"
+msgstr "생명력 흡수의 마법서"
+
+msgid "spellbook of slow monster"
+msgstr "몬스터 감속의 마법서"
+
+msgid "spellbook of wizard lock"
+msgstr "마법사 자물쇠의 마법서"
+
+msgid "spellbook of create monster"
+msgstr "몬스터 소환의 마법서"
+
+msgid "spellbook of detect food"
+msgstr "음식 탐지의 마법서"
+
+msgid "spellbook of cause fear"
+msgstr "공포 유발의 마법서"
+
+msgid "spellbook of clairvoyance"
+msgstr "천리안의 마법서"
+
+msgid "spellbook of cure sickness"
+msgstr "질병 치료의 마법서"
+
+msgid "spellbook of charm monster"
+msgstr "몬스터 매혹의 마법서"
+
+msgid "spellbook of haste self"
+msgstr "자기 가속의 마법서"
+
+msgid "spellbook of detect unseen"
+msgstr "보이지 않는 것 탐지의 마법서"
+
+msgid "spellbook of levitation"
+msgstr "부유의 마법서"
+
+msgid "spellbook of extra healing"
+msgstr "추가 치료의 마법서"
+
+msgid "spellbook of restore ability"
+msgstr "능력 회복의 마법서"
+
+msgid "spellbook of invisibility"
+msgstr "투명의 마법서"
+
+msgid "spellbook of detect treasure"
+msgstr "보물 탐지의 마법서"
+
+msgid "spellbook of remove curse"
+msgstr "저주 해제의 마법서"
+
+msgid "spellbook of magic mapping"
+msgstr "마법 지도의 마법서"
+
+msgid "spellbook of identify"
+msgstr "감정의 마법서"
+
+msgid "spellbook of turn undead"
+msgstr "언데드 퇴치의 마법서"
+
+msgid "spellbook of polymorph"
+msgstr "변신의 마법서"
+
+msgid "spellbook of teleport away"
+msgstr "순간이동의 마법서"
+
+msgid "spellbook of create familiar"
+msgstr "소환수 생성의 마법서"
+
+msgid "spellbook of cancellation"
+msgstr "해제의 마법서"
+
+msgid "spellbook of protection"
+msgstr "보호의 마법서"
+
+msgid "spellbook of jumping"
+msgstr "점프의 마법서"
+
+msgid "spellbook of stone to flesh"
+msgstr "돌을 살로의 마법서"
+
+# 지팡이
+msgid "wand"
+msgstr "지팡이"
+
+msgid "wand of light"
+msgstr "빛의 지팡이"
+
+msgid "wand of nothing"
+msgstr "아무것도 없는 지팡이"
+
+msgid "wand of digging"
+msgstr "굴착의 지팡이"
+
+msgid "wand of enlightenment"
+msgstr "깨달음의 지팡이"
+
+msgid "wand of locking"
+msgstr "잠금의 지팡이"
+
+msgid "wand of magic missile"
+msgstr "마법 화살의 지팡이"
+
+msgid "wand of make invisible"
+msgstr "투명화의 지팡이"
+
+msgid "wand of opening"
+msgstr "열기의 지팡이"
+
+msgid "wand of slow monster"
+msgstr "몬스터 감속의 지팡이"
+
+msgid "wand of speed monster"
+msgstr "몬스터 가속의 지팡이"
+
+msgid "wand of striking"
+msgstr "강타의 지팡이"
+
+msgid "wand of undead turning"
+msgstr "언데드 퇴치의 지팡이"
+
+msgid "wand of cold"
+msgstr "냉기의 지팡이"
+
+msgid "wand of fire"
+msgstr "화염의 지팡이"
+
+msgid "wand of lightning"
+msgstr "번개의 지팡이"
+
+msgid "wand of sleep"
+msgstr "수면의 지팡이"
+
+msgid "wand of death"
+msgstr "죽음의 지팡이"
+
+msgid "wand of polymorph"
+msgstr "변신의 지팡이"
+
+msgid "wand of cancellation"
+msgstr "해제의 지팡이"
+
+msgid "wand of teleportation"
+msgstr "순간이동의 지팡이"
+
+msgid "wand of create monster"
+msgstr "몬스터 소환의 지팡이"
+
+msgid "wand of wishing"
+msgstr "소원의 지팡이"
+
+msgid "wand of probing"
+msgstr "탐색의 지팡이"
+
+msgid "wand of secret door detection"
+msgstr "비밀문 탐지의 지팡이"
+
+# 보석
+msgid "gem"
+msgstr "보석"
+
+msgid "dilithium crystal"
+msgstr "다이리튬 결정"
+
+msgid "diamond"
+msgstr "다이아몬드"
+
+msgid "ruby"
+msgstr "루비"
+
+msgid "jacinth"
+msgstr "히아신스"
+
+msgid "sapphire"
+msgstr "사파이어"
+
+msgid "black opal"
+msgstr "검은 오팔"
+
+msgid "emerald"
+msgstr "에메랄드"
+
+msgid "turquoise"
+msgstr "터키석"
+
+msgid "citrine"
+msgstr "황수정"
+
+msgid "aquamarine"
+msgstr "아쿠아마린"
+
+msgid "amber"
+msgstr "호박"
+
+msgid "topaz"
+msgstr "토파즈"
+
+msgid "jet"
+msgstr "흑옥"
+
+msgid "opal"
+msgstr "오팔"
+
+msgid "chrysoberyl"
+msgstr "금록석"
+
+msgid "garnet"
+msgstr "석류석"
+
+msgid "amethyst"
+msgstr "자수정"
+
+msgid "jasper"
+msgstr "벽옥"
+
+msgid "fluorite"
+msgstr "형석"
+
+msgid "obsidian"
+msgstr "흑요석"
+
+msgid "agate"
+msgstr "마노"
+
+msgid "jade"
+msgstr "비취"
+
+msgid "worthless piece of white glass"
+msgstr "가치 없는 흰 유리 조각"
+
+msgid "worthless piece of blue glass"
+msgstr "가치 없는 파란 유리 조각"
+
+msgid "worthless piece of red glass"
+msgstr "가치 없는 붉은 유리 조각"
+
+msgid "worthless piece of yellowish brown glass"
+msgstr "가치 없는 황갈색 유리 조각"
+
+msgid "worthless piece of orange glass"
+msgstr "가치 없는 주황 유리 조각"
+
+msgid "worthless piece of yellow glass"
+msgstr "가치 없는 노란 유리 조각"
+
+msgid "worthless piece of black glass"
+msgstr "가치 없는 검은 유리 조각"
+
+msgid "worthless piece of green glass"
+msgstr "가치 없는 초록 유리 조각"
+
+msgid "worthless piece of violet glass"
+msgstr "가치 없는 보라 유리 조각"
+
+msgid "luckstone"
+msgstr "행운의 돌"
+
+msgid "loadstone"
+msgstr "자석"
+
+msgid "touchstone"
+msgstr "시금석"
+
+msgid "flint"
+msgstr "부싯돌"
+
+msgid "rock"
+msgstr "돌"
+
+msgid "boulder"
+msgstr "바위"
+
+msgid "statue"
+msgstr "석상"
+
+msgid "heavy iron ball"
+msgstr "무거운 철구"
+
+msgid "iron chain"
+msgstr "쇠사슬"
+
+# 독액
+msgid "acid venom"
+msgstr "산성 독액"
+
+msgid "blinding venom"
+msgstr "실명 독액"

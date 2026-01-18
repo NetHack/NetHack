@@ -77,6 +77,13 @@ extern int utf8_display_width(const char *utf8str);
 extern int utf8_char_width(const char *utf8str);
 
 /*
+ * Object name translation function (defined in i18n.c)
+ * Translates item names like "gold piece", "long sword" via gettext.
+ * Returns the translated name, or the original if NLS is disabled.
+ */
+extern const char *tr_obj_name(const char *name);
+
+/*
  * Korean postposition markers for translation strings
  *
  * Usage in .po files:

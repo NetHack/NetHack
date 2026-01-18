@@ -202,8 +202,8 @@ obj_typename(int otyp)
 {
     char *buf = nextobuf();
     struct objclass *ocl = &objects[otyp];
-    const char *actualn = OBJ_NAME(*ocl);
-    const char *dn = OBJ_DESCR(*ocl);
+    const char *actualn = tr_obj_name(OBJ_NAME(*ocl));
+    const char *dn = tr_obj_name(OBJ_DESCR(*ocl));
     const char *un = ocl->oc_uname;
     int nn = ocl->oc_name_known;
 
@@ -588,8 +588,8 @@ xname_flags(
     int typ = obj->otyp;
     struct objclass *ocl = &objects[typ];
     int nn = ocl->oc_name_known, omndx = obj->corpsenm;
-    const char *actualn = OBJ_NAME(*ocl);
-    const char *dn = OBJ_DESCR(*ocl);
+    const char *actualn = tr_obj_name(OBJ_NAME(*ocl));
+    const char *dn = tr_obj_name(OBJ_DESCR(*ocl));
     const char *un = ocl->oc_uname;
     boolean pluralize = (obj->quan != 1L) && !(cxn_flags & CXN_SINGULAR);
     boolean known, dknown, bknown;
@@ -1837,7 +1837,7 @@ corpse_xname(
     nambuf = gx.xnamep + PREFIX;
 
     if (glob) {
-        mnam = OBJ_NAME(objects[otmp->otyp]); /* "glob of <monster>" */
+        mnam = tr_obj_name(OBJ_NAME(objects[otmp->otyp])); /* "glob of <monster>" */
     } else if (omndx == NON_PM) { /* paranoia */
         mnam = "thing";
     } else {
