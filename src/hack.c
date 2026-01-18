@@ -2146,14 +2146,24 @@ domove_swap_with_pet(
         newsym(x, y);
         newsym(u.ux0, u.uy0);
 
-        You(_("%s %s."), mtmp->mpeaceful ? _("swap places with") : _("frighten"),
-            x_monnam(mtmp,
-                     mtmp->mtame ? ARTICLE_YOUR
-                     : (!has_mgivenname(mtmp)
-                        && !type_is_pname(mtmp->data)) ? ARTICLE_THE
-                     : ARTICLE_NONE,
-                     (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
-                     has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
+        if (mtmp->mpeaceful) {
+            /* "You swap places with your kitten." -> Korean: "당신의 새끼 고양이와(과) 자리를 바꿨다." */
+            You(_("swap places with %s."),
+                x_monnam(mtmp,
+                         mtmp->mtame ? ARTICLE_YOUR
+                         : (!has_mgivenname(mtmp)
+                            && !type_is_pname(mtmp->data)) ? ARTICLE_THE
+                         : ARTICLE_NONE,
+                         (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
+                         has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
+        } else {
+            You(_("frighten %s."),
+                x_monnam(mtmp,
+                         (!has_mgivenname(mtmp)
+                          && !type_is_pname(mtmp->data)) ? ARTICLE_THE
+                         : ARTICLE_NONE,
+                         0, has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
+        }
 
         /* check for displacing it into pools and traps */
         switch (minliquid(mtmp) ? Trap_Killed_Mon

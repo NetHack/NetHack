@@ -1388,12 +1388,13 @@ msgid "%s hits"
 msgstr "%s{이/가} 때려"
 
 # Pet interaction verbs (hack.c)
-# Note: Korean word order differs from English, so these are adapted
-msgid "swap places with"
-msgstr "와(과) 자리를 바꿨다 -"
+#, c-format
+msgid "swap places with %s."
+msgstr "%s{와/과} 자리를 바꿨다."
 
-msgid "frighten"
-msgstr "을(를) 겁먹게 했다 -"
+#, c-format
+msgid "frighten %s."
+msgstr "%s{을/를} 겁먹게 했다."
 
 #: src/apply.c:4397
 msgid "It rings! ... But no-one answers."
@@ -21796,7 +21797,7 @@ msgid " Ch:%s"
 msgstr " 매력:%s"
 
 msgid " Pw:%s"
-msgstr " MP:%s"
+msgstr " Pw:%s"
 
 msgid " Xp:%s"
 msgstr " Lv:%s"
@@ -23195,18 +23196,35 @@ msgstr "돌"
 msgid "boulder"
 msgstr "바위"
 
-msgid "statue"
-msgstr "석상"
 
-msgid "heavy iron ball"
-msgstr "무거운 철구"
+# ============================================================
+# 펫 행동 메시지 (Pet Action Messages)
+# ============================================================
 
-msgid "iron chain"
-msgstr "쇠사슬"
+#, c-format
+msgid "%s drops %s."
+msgstr "%s{이/가} %s{을/를} 떨어뜨렸다."
 
-# 독액
-msgid "acid venom"
-msgstr "산성 독액"
+#, c-format
+msgid "%s digs in."
+msgstr "%s{이/가} 파고들었다."
 
-msgid "blinding venom"
-msgstr "실명 독액"
+msgid "devours"
+msgstr "먹어치웠다"
+
+#, c-format
+msgid "%s breaks loose of %s leash!"
+msgstr "%s{이/가} %s 목줄에서 벗어났다!"
+
+#, c-format
+msgid "%s %s reluctantly %s %s."
+msgstr "%s{이/가} 마지못해 %s{을/를} %s %s."
+
+msgid "step"
+msgstr "밟았다"
+
+msgid "over"
+msgstr "넘어서"
+
+msgid "onto"
+msgstr "위로"

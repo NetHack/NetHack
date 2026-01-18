@@ -2102,6 +2102,10 @@ just_an(char *outbuf, const char *str)
     char c0;
 
     *outbuf = '\0';
+    /* Korean/CJK strings don't use English articles.
+       Check for non-ASCII characters (UTF-8 high bit set). */
+    if (str && (unsigned char)*str > 127)
+        return outbuf;  /* no article for Korean/CJK */
     c0 = lowc(*str);
     if (!str[1] || str[1] == ' ') {
         /* single letter; might be used for named fruit or a musical note */
@@ -2838,6 +2842,19 @@ makeplural(const char *oldstr)
         Strcpy(str, "s");
         return str;
     }
+    /* Korean/CJK strings: don't apply English pluralization rules.
+       Korean doesn't mark plurals on inanimate objects. Check for
+       non-ASCII characters (UTF-8 high bit set). */
+    {
+        const char *p;
+        for (p = oldstr; *p; p++) {
+            if ((unsigned char)*p > 127) {
+                /* Contains non-ASCII (likely Korean/CJK), return unchanged */
+                Strcpy(str, oldstr);
+                return str;
+            }
+        }
+    }
     /* makeplural() is sometimes used on monsters rather than objects
        and sometimes pronouns are used for monsters, so check those;
        unfortunately, "her" (which matches genders[1].him and [1].his)
@@ -3037,6 +3054,17 @@ makesingular(const char *oldstr)
         impossible("singular of null?");
         str[0] = '\0';
         return str;
+    }
+    /* Korean/CJK strings: don't apply English singular rules.
+       Return unchanged. */
+    {
+        const char *cp;
+        for (cp = oldstr; *cp; cp++) {
+            if ((unsigned char)*cp > 127) {
+                Strcpy(str, oldstr);
+                return str;
+            }
+        }
     }
     /* makeplural() of pronouns isn't reversible but at least we can
        force a singular value */

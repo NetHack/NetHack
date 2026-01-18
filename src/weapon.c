@@ -763,7 +763,7 @@ possibly_unwield(struct monst *mon, boolean polyspot)
         mon->weapon_check = NO_WEAPON_WANTED;
         /* if we're going to call distant_name(), do so before extract_self */
         if (cansee(mon->mx, mon->my)) {
-            pline_mon(mon, "%s drops %s.", Monnam(mon), distant_name(obj, doname));
+            pline_mon(mon, _("%s drops %s."), Monnam(mon), distant_name(obj, doname));
             newsym(mon->mx, mon->my);
         }
         obj_extract_self(obj);

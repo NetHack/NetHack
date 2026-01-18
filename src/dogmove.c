@@ -284,10 +284,10 @@ dog_eat(struct monst *mtmp,
                result won't be printed */
             obj_name = distant_name(obj, doname);
             if (tunnels(mtmp->data))
-                pline_mon(mtmp, "%s digs in.", noit_Monnam(mtmp));
+                pline_mon(mtmp, _("%s digs in."), noit_Monnam(mtmp));
             else
-                pline_mon(mtmp, "%s %s %s.", noit_Monnam(mtmp),
-                      devour ? "devours" : "eats", obj_name);
+                pline_mon(mtmp, _("%s %s %s."), noit_Monnam(mtmp),
+                      devour ? _("devours") : _("eats"), obj_name);
         } else if (seeobj) {
             obj_name = distant_name(obj, doname);
             pline(_("It %s %s."), devour ? "devours" : "eats", obj_name);
@@ -450,7 +450,7 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
                             char *otmpname = distant_name(otmp, doname);
 
                             if (flags.verbose)
-                                pline_xy(omx, omy, "%s picks up %s.",
+                                pline_xy(omx, omy, _("%s picks up %s."),
                                       Monnam(mtmp), otmpname);
                         }
                         obj_extract_self(otmp);
@@ -1272,7 +1272,7 @@ dog_move(
 
         if (mfp.info[chi] & ALLOW_U) {
             if (mtmp->mleashed) { /* play it safe */
-                pline_mon(mtmp, "%s breaks loose of %s leash!",
+                pline_mon(mtmp, _("%s breaks loose of %s leash!"),
                          Monnam(mtmp), mhis(mtmp));
                 m_unleash(mtmp, FALSE);
             }
@@ -1297,10 +1297,10 @@ dog_move(
                                ? vobj_at(nix, niy) : 0;
             const char *what = o ? distant_name(o, doname) : something;
 
-            pline_mon(mtmp, "%s %s reluctantly %s %s.", noit_Monnam(mtmp),
-                  vtense((char *) 0, locomotion(mtmp->data, "step")),
-                  (is_flyer(mtmp->data) || is_floater(mtmp->data)) ? "over"
-                                                                   : "onto",
+            pline_mon(mtmp, _("%s %s reluctantly %s %s."), noit_Monnam(mtmp),
+                  vtense((char *) 0, locomotion(mtmp->data, _("step"))),
+                  (is_flyer(mtmp->data) || is_floater(mtmp->data)) ? _("over")
+                                                                   : _("onto"),
                   what);
         }
         mon_track_add(mtmp, omx, omy);
