@@ -938,7 +938,7 @@ merged(struct obj **potmp, struct obj **pobj)
         if (discovered && otmp->where == OBJ_INVENT
             && obj->how_lost != LOST_THROWN
             && otmp->how_lost != LOST_THROWN) {
-            pline("You learn more about your items by comparing them.");
+            pline(_("You learn more about your items by comparing them."));
         }
 
         obfree(obj, otmp); /* free(obj), bill->otmp */
@@ -1037,7 +1037,7 @@ addinv_core2(struct obj *obj)
         obj->otyp != SCR_BLANK_PAPER && !Blind &&
         !objects[obj->otyp].oc_name_known) {
         observe_object(obj);
-        pline("You decipher the label on %s.", yname(obj));
+        pline(_("You decipher the label on %s."), yname(obj));
         makeknown(obj->otyp);
 
         /* conduct: this is avoidable via not picking up / wishing for
@@ -1701,7 +1701,7 @@ mime_action(const char *word)
     } else
         bp = buf;
 
-    You("mime %s%s%s something%s%s.", ing_suffix(bp),
+    You(_("mime %s%s%s something%s%s."), ing_suffix(bp),
         pfx ? " " : "", pfx ? pfx : "", sfx ? " " : "", sfx ? sfx : "");
 }
 
@@ -1910,7 +1910,7 @@ getobj(
     *ap = '\0';
 
     if (suggested == 0 && !forceprompt && !allownone) {
-        You("don't have anything %sto %s.", inaccess ? "else " : "", word);
+        You(_("don't have anything %sto %s."), inaccess ? "else " : "", word);
         return (struct obj *) 0;
     }
     for (;;) {
@@ -1938,7 +1938,7 @@ getobj(
             long tmpcnt = 0L;
 
             if (!allowcnt) {
-                pline("No count allowed with this command.");
+                pline(_("No count allowed with this command."));
                 continue;
             }
             ilet = get_count(NULL, ilet, LARGEST_INT, &tmpcnt, GC_SAVEHIST);
@@ -2009,7 +2009,7 @@ getobj(
                than one invent slot of gold and picking the non-'$' one */
             || (otmp && otmp->oclass == COIN_CLASS)) {
             if (otmp && obj_ok(otmp) <= GETOBJ_EXCLUDE) {
-                You("cannot %s gold.", word);
+                You(_("cannot %s gold."), word);
                 return (struct obj *) 0;
             }
             /*
@@ -2020,8 +2020,8 @@ getobj(
              */
             if (cntgiven && cnt <= 0L) {
                 if (cnt < 0L)
-                    pline_The("LRS would be very interested to know"
-                              " you have that much.");
+                    pline_The(_("LRS would be very interested to know"
+                              " you have that much."));
                 return (struct obj *) 0;
             }
         }
@@ -2038,11 +2038,11 @@ getobj(
             coins = (otmp->oclass == COIN_CLASS);
             if (cnt > 1L && (!coins || cnt > otmp->quan)) {
                 if (cnt > otmp->quan)
-                    You("only have %ld%s%s.", otmp->quan,
+                    You(_("only have %ld%s%s."), otmp->quan,
                         (!coins && otmp->quan > 1L) ? " and " : "",
                         (!coins && otmp->quan > 1L) ? only_one : "");
                 else
-                    You("%s.", only_one);
+                    You(_("%s."), only_one);
                 continue;
             }
         }
@@ -2056,12 +2056,12 @@ getobj(
            that's been moved above so that otmp can be checked earlier] */
         /* verify the chosen object */
         if (!otmp) {
-            You("don't have that object.");
+            You(_("don't have that object."));
             if (gi.in_doagain)
                 return (struct obj *) 0;
             continue;
         } else if (cnt < 0L || otmp->quan < cnt) {
-            You("don't have that many!  You have only %ld.", otmp->quan);
+            You(_("don't have that many!  You have only %ld."), otmp->quan);
             if (gi.in_doagain)
                 return (struct obj *) 0;
             continue;
@@ -2116,7 +2116,7 @@ silly_thing(const char *word,
             s1 = "R", s2 = "remove", s3 = "";
     }
     if (s1)
-        pline("Use the '%s' command to %s %s%s.", s1, s2,
+        pline(_("Use the '%s' command to %s %s%s."), s1, s2,
               !(is_plural(otmp) || pair_of(otmp)) ? "that" : "those", s3);
     else
 #endif
@@ -2125,7 +2125,7 @@ silly_thing(const char *word,
     if (!strcmp(word, "call")
         && (otmp->otyp == AMULET_OF_YENDOR
             || (otmp->otyp == FAKE_AMULET_OF_YENDOR && !otmp->known)))
-        pline_The("Amulet doesn't like being called names.");
+        pline_The(_("Amulet doesn't like being called names."));
     else
         pline(silly_thing_to, word);
 }
@@ -2213,7 +2213,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
     char buf[BUFSZ] = DUMMY, qbuf[QBUFSZ];
 
     if (!gi.invent) {
-        You("have nothing to %s.", word);
+        You(_("have nothing to %s."), word);
         if (resultflags)
             *resultflags = ALL_FINISHED;
         return 0;
@@ -2304,23 +2304,23 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
             if (strchr(extra_removeables, oc_of_sym)) {
                 ; /* skip rest of takeoff checks */
             } else if (!strchr(removeables, oc_of_sym)) {
-                pline("Not applicable.");
+                pline(_("Not applicable."));
                 return 0;
             } else if (oc_of_sym == ARMOR_CLASS && !wearing_armor()) {
                 noarmor(FALSE);
                 return 0;
             } else if (oc_of_sym == WEAPON_CLASS && !uwep && !uswapwep
                        && !uquiver) {
-                You("are not wielding anything.");
+                You(_("are not wielding anything."));
                 return 0;
             } else if (oc_of_sym == RING_CLASS && !uright && !uleft) {
-                You("are not wearing rings.");
+                You(_("are not wearing rings."));
                 return 0;
             } else if (oc_of_sym == AMULET_CLASS && !uamul) {
-                You("are not wearing an amulet.");
+                You(_("are not wearing an amulet."));
                 return 0;
             } else if (oc_of_sym == TOOL_CLASS && !ublindf) {
-                You("are not wearing a blindfold.");
+                You(_("are not wearing a blindfold."));
                 return 0;
             }
         }
@@ -2338,7 +2338,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
         } else if (sym == 'm') {
             m_seen = TRUE;
         } else if (oc_of_sym == MAXOCLASSES) {
-            You("don't have any %c's.", sym);
+            You(_("don't have any %c's."), sym);
         } else {
             if (!strchr(olets, oc_of_sym)) {
                 add_valid_menu_class(oc_of_sym);
@@ -2528,9 +2528,9 @@ askchain(
         goto nextclass;
 
     if (!takeoff && (dud || cnt))
-        pline("That was all.");
+        pline(_("That was all."));
     else if (!dud && !cnt)
-        pline("No applicable objects.");
+        pline(_("No applicable objects."));
  ret:
     unsortloot(&sortedchn);
     /* can't just clear bypass bit of items in objchn because the action
@@ -2683,13 +2683,13 @@ menu_identify(int id_limit)
         } else if (n == -2) { /* player used ESC to quit menu */
             break;
         } else if (n == -1) { /* no eligible items found */
-            pline("That was all.");
+            pline(_("That was all."));
             break;
         } else if (!--tryct) { /* stop re-prompting */
             pline1(thats_enough_tries);
             break;
         } else { /* try again */
-            pline("Choose an item; use ESC to decline.");
+            pline(_("Choose an item; use ESC to decline."));
         }
     }
 }
@@ -2716,7 +2716,7 @@ identify_pack(
     int n, unid_cnt = count_unidentified(gi.invent);
 
     if (!unid_cnt) {
-        You("have already identified %s of your possessions.",
+        You(_("have already identified %s of your possessions."),
             !learning_id ? "all" : "the rest");
     } else if (!id_limit || id_limit >= unid_cnt) {
         /* identify everything */
@@ -2833,16 +2833,16 @@ doperminv(void)
     if ((windowprocs.wincap & WC_PERM_INVENT) == 0) {
         /* [TODO? perhaps omit "by <interface>" if all the window ports
            compiled into this binary lack support for perm_invent...] */
-        pline("Persistent inventory display is not supported by '%s'.",
+        pline(_("Persistent inventory display is not supported by '%s'."),
               windowprocs.name);
 
     } else if (!iflags.perm_invent) {
-        pline(
-     "Persistent inventory ('perm_invent' option) is not presently enabled.");
+        pline(_(
+     "Persistent inventory ('perm_invent' option) is not presently enabled."));
 
     } else if (!gi.invent) {
         /* [should this be left for the interface to decide?] */
-        pline("Persistent inventory display is empty.");
+        pline(_("Persistent inventory display is empty."));
 
     } else {
         /* note: we used to request a scrolling key here and pass that to
@@ -3138,7 +3138,7 @@ display_pickinv(
         ++n;
 
     if (n == 0) {
-        pline("%s.", not_carrying_anything);
+        pline(_("%s."), not_carrying_anything);
         return 0;
     }
 
@@ -3772,7 +3772,7 @@ dounpaid(
                        : "on or under the floor";
 
         if (!count) {
-            You("aren't carrying any unpaid items but there %s %d %s.",
+            You(_("aren't carrying any unpaid items but there %s %d %s."),
                 floorverb, xtracount, where);
         } else {
             putstr(win, 0, "");
@@ -3842,7 +3842,7 @@ dotypeinv(void)
     gt.this_type = 0;
     gt.this_title = NULL;
     if (!gi.invent && !billx) {
-        You("aren't carrying anything.");
+        You(_("aren't carrying anything."));
         goto doI_done;
     }
     title[0] = '\0';
@@ -3944,7 +3944,7 @@ dotypeinv(void)
         if (billx)
             (void) doinvbill(1);
         else
-            pline("No used-up objects%s.",
+            pline(_("No used-up objects%s."),
                   any_unpaid ? " on your shopping bill" : "");
         goto doI_done;
     }
@@ -3952,7 +3952,7 @@ dotypeinv(void)
         if (any_unpaid)
             dounpaid(u_carried, u_floor, u_buried);
         else
-            You("are not carrying any unpaid objects.");
+            You(_("are not carrying any unpaid objects."));
         goto doI_done;
     }
 
@@ -3999,7 +3999,7 @@ dotypeinv(void)
 
     if (traditional) {
         if (strchr(types, c) > strchr(types, '\033')) {
-            You("have no %sobjects%s.", before, after);
+            You(_("have no %sobjects%s."), before, after);
             goto doI_done;
         }
         gt.this_type = oclass; /* extra input for this_type_only() */
@@ -4140,7 +4140,7 @@ look_here(
         Sprintf(fbuf, "Contents of %s %s", s_suffix(mon_nam(mtmp)),
                 mbodypart(mtmp, STOMACH));
         /* Skip "Contents of " by using fbuf index 12 */
-        You("%s to %s what is lying in %s.", Blind ? "try" : "look around",
+        You(_("%s to %s what is lying in %s."), Blind ? "try" : "look around",
             verb, &fbuf[12]);
         otmp = mtmp->minvent;
         if (otmp) {
@@ -4155,7 +4155,7 @@ look_here(
             Strcat(fbuf, ":");
             (void) display_minventory(mtmp, MINV_ALL | PICK_NONE, fbuf);
         } else {
-            You("%s no objects here.", verb);
+            You(_("%s no objects here."), verb);
         }
         return (!!Blind ? ECMD_TIME : ECMD_OK);
     }
@@ -4187,7 +4187,7 @@ look_here(
 
         if (dfeature && !strncmp(dfeature, "altar ", 6)) {
             /* don't say "altar" twice, dfeature has more info */
-            You("try to feel what is here.");
+            You(_("try to feel what is here."));
         } else if (SURFACE_AT(u.ux, u.uy) == ICE) {
             /* using describe_decor() to handle ice is simpler than
                replicating it in the conditional message construction */
@@ -4195,7 +4195,7 @@ look_here(
                 force_decor(FALSE);
             /* plain "ice" if blind and levitating, otherwise "solid ice" &c;
               "There is [thin ]ice here.  You try to feel what is on it." */
-            You("try to feel what is on it.");
+            You(_("try to feel what is on it."));
             skip_dfeature = TRUE; /* ice already described */
         } else {
             boolean cant_reach = !can_reach_floor(TRUE);
@@ -4204,7 +4204,7 @@ look_here(
                                            : "lying here on the ",
                        *onwhat = cant_reach ? "" : surf;
 
-            You("try to feel what is %s%s.", drift ? "floating here" : where,
+            You(_("try to feel what is %s%s."), drift ? "floating here" : where,
                 drift ? "" : onwhat);
 
             if (dfeature && !drift && !strcmp(dfeature, surf))
@@ -4212,7 +4212,7 @@ look_here(
         }
         trap = t_at(u.ux, u.uy);
         if (!can_reach_floor(trap && is_pit(trap->ttyp))) {
-            pline("But you can't reach it!");
+            pline(_("But you can't reach it!"));
             return ECMD_OK;
         }
     }
@@ -4244,7 +4244,7 @@ look_here(
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (!skip_objects && (Blind || !dfeature))
-            You("%s no objects here.", verb);
+            You(_("%s no objects here."), verb);
         return (!!Blind ? ECMD_TIME : ECMD_OK);
     }
     /* we know there is something here */
@@ -4279,7 +4279,7 @@ look_here(
         if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
-        You("%s here %s.", verb, doname_with_price(otmp));
+        You(_("%s here %s."), verb, doname_with_price(otmp));
         iflags.last_msg = PLNMSG_ONE_ITEM_HERE;
         if (otmp->otyp == CORPSE)
             feel_cockatrice(otmp, FALSE);
@@ -4349,10 +4349,10 @@ feel_cockatrice(struct obj *otmp, boolean force_touch)
         Strcpy(kbuf, corpse_xname(otmp, (const char *) 0, CXN_PFX_THE));
 
         if (poly_when_stoned(gy.youmonst.data))
-            You("touched %s with your bare %s.", kbuf,
+            You(_("touched %s with your bare %s."), kbuf,
                 makeplural(body_part(HAND)));
         else
-            pline("Touching %s is a fatal mistake...", kbuf);
+            pline(_("Touching %s is a fatal mistake..."), kbuf);
         /* normalize body shape here; hand, not body_part(HAND) */
         Sprintf(kbuf, "touching %s bare-handed", killer_xname(otmp));
         /* will call polymon() for the poly_when_stoned() case */
@@ -4525,13 +4525,13 @@ doprgold(void)
                     umoney ? "and" : "but", hmoney,
                     umoney ? "more" : currency(hmoney));
         }
-        pline("%s.", buf);
+        pline(_("%s."), buf);
     } else {
         long total = umoney + hmoney;
         if (total)
-            You("are carrying a total of %ld %s.", total, currency(total));
+            You(_("are carrying a total of %ld %s."), total, currency(total));
         else
-            You("have no money.");
+            You(_("have no money."));
     }
     shopper_financial_report();
 
@@ -4550,7 +4550,7 @@ int
 doprwep(void)
 {
     if (!uwep) {
-        You("are %s.", empty_handed());
+        You(_("are %s."), empty_handed());
     } else if (!iflags.menu_requested) {
         prinv((char *) 0, uwep, 0L);
         if (u.twoweap)
@@ -4578,7 +4578,7 @@ staticfn void
 noarmor(boolean report_uskin)
 {
     if (!uskin || !report_uskin) {
-        You("are not wearing any armor.");
+        You(_("are not wearing any armor."));
     } else {
         char *p, *uskinname, buf[BUFSZ];
 
@@ -4591,7 +4591,7 @@ noarmor(boolean report_uskin)
             while ((p[1] = p[8]) != '\0')
                 ++p;
 
-        You("are not wearing armor but have %s embedded in your skin.",
+        You(_("are not wearing armor but have %s embedded in your skin."),
             uskinname);
     }
 }
@@ -4642,7 +4642,7 @@ int
 doprring(void)
 {
     if (!uleft && !uright) {
-        You("are not wearing any rings.");
+        You(_("are not wearing any rings."));
     } else {
         char lets[3]; /* 3: uright, uleft, terminator */
         boolean use_inuse_mode = FALSE;
@@ -4679,7 +4679,7 @@ int
 dopramulet(void)
 {
     if (!uamul) {
-        You("are not wearing an amulet.");
+        You(_("are not wearing an amulet."));
     } else {
         char lets[2];
 
@@ -4728,7 +4728,7 @@ doprtool(void)
         }
     lets[ct] = '\0';
     if (!ct)
-        You("are not using any tools.");
+        You(_("are not using any tools."));
     else
         (void) dispinv_with_action(lets, TRUE, NULL);
     return ECMD_OK;
@@ -4750,7 +4750,7 @@ doprinuse(void)
             break;
         }
     if (!ct)
-        You("are not wearing or wielding anything.");
+        You(_("are not wearing or wielding anything."));
     else
         (void) dispinv_with_action((char *) 0, TRUE, NULL);
     return ECMD_OK;
@@ -4986,7 +4986,7 @@ doorganize(void) /* inventory organizer by Del Lamb */
     /* when no invent, or just gold in '$' slot, there's nothing to adjust */
     if (!gi.invent || (gi.invent->oclass == COIN_CLASS
                       && gi.invent->invlet == GOLD_SYM && !gi.invent->nobj)) {
-        You("aren't carrying anything %s.",
+        You(_("aren't carrying anything %s."),
             !gi.invent ? "to adjust" : "adjustable");
         return ECMD_OK;
     }
@@ -5050,9 +5050,9 @@ adjust_split(void)
             Amount[] = "Amount to split from current stack must be";
 
         if (splitamount < 1L)
-            pline("%s at least 1.", Amount);
+            pline(_("%s at least 1."), Amount);
         else
-            pline("%s less than %ld.", Amount, obj->quan);
+            pline(_("%s less than %ld."), Amount, obj->quan);
         return ECMD_CANCEL;
     }
 
@@ -5161,7 +5161,7 @@ doorganize_core(struct obj *obj)
                 pline1(Never_mind);
             return ECMD_OK;
         } else if (let == GOLD_SYM && obj->oclass != COIN_CLASS) {
-            pline("Only gold coins may be moved into the '%c' slot.",
+            pline(_("Only gold coins may be moved into the '%c' slot."),
                   GOLD_SYM);
             ever_mind = TRUE;
             goto noadjust;
@@ -5173,7 +5173,7 @@ doorganize_core(struct obj *obj)
             break; /* got one */
         if (trycnt == 5)
             goto noadjust;
-        pline("Select an inventory slot letter."); /* else try again */
+        pline(_("Select an inventory slot letter.")); /* else try again */
     }
 
     collect = (let == obj->invlet);
@@ -5246,7 +5246,7 @@ doorganize_core(struct obj *obj)
                 } else if (inv_cnt(FALSE) >= invlet_basic) {
                     (void) merged(&splitting, &obj); /* undo split */
                     /* "knapsack cannot accommodate any more items" */
-                    Your("pack is too full.");
+                    Your(_("pack is too full."));
                     return ECMD_OK;
                 } else {
                     bumped = otmp;
@@ -5628,9 +5628,9 @@ sync_perminvent(void)
                         destroy_nhwindow(WIN_INVEN), WIN_INVEN = WIN_ERR;
                     wport_id = WINDOWPORT(tty) ? "tty perm_invent"
                                                : "perm_invent";
-                    pline("%s could not be enabled.", wport_id);
-                    pline("%s needs a terminal that is at least %dx%d, yours "
-                          "is %dx%d.",
+                    pline(_("%s could not be enabled."), wport_id);
+                    pline(_("%s needs a terminal that is at least %dx%d, yours "
+                          "is %dx%d."),
                           wport_id, wri->tocore.needrows,
                           wri->tocore.needcols, wri->tocore.haverows,
                           wri->tocore.havecols);
