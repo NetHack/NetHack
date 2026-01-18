@@ -899,78 +899,78 @@ finish
 # All characters are 2-column wide (fullwidth) for consistent CJK display
 # The fullwidth flag enables automatic 2x coordinate scaling in map rendering
 start: Korean
-	Description: Korean Hangul/Hanja symbols (fullwidth)
+	Description: Korean Hangul symbols (fullwidth)
 	Handling: UTF8
 	Fullwidth: Yes
-	# === Dungeon structure (fullwidth box drawing) ===
+	# === Dungeon structure (heavy box drawing for better visibility) ===
 	S_stone: U+3000                     # 　 ideographic space
-	S_vwall: U+2551                     # ║ double vertical
-	S_hwall: U+2550                     # ═ double horizontal
-	S_tlcorn: U+2554                    # ╔ double top left
-	S_trcorn: U+2557                    # ╗ double top right
-	S_blcorn: U+255A                    # ╚ double bottom left
-	S_brcorn: U+255D                    # ╝ double bottom right
-	S_crwall: U+256C                    # ╬ double cross
-	S_tuwall: U+2569                    # ╩ double T up
-	S_tdwall: U+2566                    # ╦ double T down
-	S_tlwall: U+2563                    # ╣ double T left
-	S_trwall: U+2560                    # ╠ double T right
-	S_room: U+3000                      # 　 ideographic space (floor)
+	S_vwall: U+2503                     # ┃ heavy vertical
+	S_hwall: U+2501                     # ━ heavy horizontal
+	S_tlcorn: U+250F                    # ┏ heavy top left
+	S_trcorn: U+2513                    # ┓ heavy top right
+	S_blcorn: U+2517                    # ┗ heavy bottom left
+	S_brcorn: U+251B                    # ┛ heavy bottom right
+	S_crwall: U+254B                    # ╋ heavy cross
+	S_tuwall: U+253B                    # ┻ heavy T up
+	S_tdwall: U+2533                    # ┳ heavy T down
+	S_tlwall: U+252B                    # ┫ heavy T left
+	S_trwall: U+2523                    # ┣ heavy T right
+	S_room: U+FF0E                      # ． fullwidth full stop (floor marker)
 	S_darkroom: U+3000                  # 　 ideographic space
-	S_corr: U+2593                      # ▓ dark shade
-	S_litcorr: U+2592                   # ▒ medium shade
-	# === Stairs and ladders (Hanja) ===
-	S_upstair: U+4E0A                   # 上 up (hanja)
-	S_dnstair: U+4E0B                   # 下 down (hanja)
-	S_upladder: U+4E0A                  # 上 up ladder
-	S_dnladder: U+4E0B                  # 下 down ladder
-	# === Furniture (Hanja) ===
-	S_altar: U+795E                     # 神 altar (god)
-	S_grave: U+5893                     # 墓 grave
-	S_throne: U+738B                    # 王 throne (king)
-	S_sink: U+6C34                      # 水 sink (water)
-	S_fountain: U+6CC9                  # 泉 fountain (spring)
-	# === Terrain (Hanja) ===
-	S_pool: U+6C60                      # 池 pool
+	S_corr: U+2588                      # █ full block (solid corridor)
+	S_litcorr: U+2592                   # ▒ medium shade (lit corridor)
+	# === Stairs and ladders ===
+	S_upstair: '<'                      # < up (ASCII)
+	S_dnstair: '>'                      # > down (ASCII)
+	S_upladder: '<'                     # < up ladder (ASCII)
+	S_dnladder: '>'                     # > down ladder (ASCII)
+	# === Furniture (한글) ===
+	S_altar: U+B2E8                     # 단 altar
+	S_grave: U+BBB4                     # 묘 grave
+	S_throne: U+C655                    # 왕 throne
+	S_sink: U+C218                      # 수 sink
+	S_fountain: U+C0D8                  # 샘 fountain
+	# === Terrain (한자) ===
+	S_pool: U+6C34                      # 水 water
 	S_ice: U+6C37                       # 氷 ice
-	S_lava: U+706B                      # 火 lava (fire)
-	S_lavawall: U+7194                  # 熔 lava wall
-	S_water: U+6D77                     # 海 water (sea)
-	S_air: U+98A8                       # 風 air (wind)
+	S_lava: U+706B                      # 火 fire/lava
+	S_lavawall: U+706B                  # 火 lava wall
+	S_water: U+6C34                     # 水 water
+	S_air: U+98A8                       # 風 wind/air
 	S_cloud: U+96F2                     # 雲 cloud
 	S_tree: U+6728                      # 木 tree
-	# === Doors (Hanja) ===
+	# === Doors (한자) ===
 	S_vodoor: U+9580                    # 門 open door
 	S_hodoor: U+9580                    # 門 open door
 	S_vcdoor: U+9589                    # 閉 closed door
 	S_hcdoor: U+9589                    # 閉 closed door
 	S_ndoor: U+3000                     # 　 no door
-	S_bars: U+7A97                      # 窗 bars (window)
-	# === Object classes (Hangul) ===
+	S_bars: U+53E3                      # 口 bars/window
+	# === Object classes (한글) ===
 	S_weapon: U+AC80                    # 검 sword
 	S_armor: U+AC11                     # 갑 armor
 	S_ring: U+BC18                      # 반 ring
 	S_amulet: U+BAA9                    # 목 necklace
-	S_potion: U+C57D                    # 약 medicine
-	S_scroll: U+AE00                    # 글 writing
+	S_potion: U+C57D                    # 약 potion
+	S_scroll: U+AE00                    # 글 scroll
 	S_book: U+CC45                      # 책 book
-	S_wand: U+BD09                      # 봉 staff
+	S_wand: U+BD09                      # 봉 wand
 	S_coin: U+AD08                      # 금 gold
-	S_gem: U+BCF4                       # 보 treasure
-	S_rock: U+B3CC                      # 돌 stone
+	S_gem: U+BCF4                       # 보 gem
+	S_rock: U+B3CC                      # 돌 rock
 	S_ball: U+AD6C                      # 구 ball
-	S_chain: U+C1E0                     # 쇠 iron
+	S_chain: U+C1E0                     # 쇠 chain
 	S_food: U+BC25                      # 밥 food
 	S_tool: U+AE30                      # 기 tool
-	# === Monster classes (Hangul/Hanja) ===
-	S_human: U+4EBA                     # 人 human
-	S_ghost: U+9B3C                     # 鬼 ghost
-	S_demon: U+9B54                     # 魔 demon
-	S_angel: U+5929                     # 天 angel
+	# === Monster classes (한글) ===
+	S_human: U+C0AC                     # 사 human
+	S_ghost: U+B839                     # 령 ghost
+	S_demon: U+B9C8                     # 마 demon
+	S_angel: U+CC9C                     # 천 angel
 	S_dragon: U+C6A9                    # 용 dragon
 	S_giant: U+AC70                     # 거 giant
 	S_snake: U+C0AC                     # 사 snake
-	S_rodent: U+C950                    # 쥐 mouse
+	S_rodent: U+C950                    # 쥐 rodent
 	S_spider: U+AC70                    # 거 spider
 	S_dog: U+AC1C                       # 개 dog
 	S_feline: U+ACE0                    # 고 cat
@@ -980,7 +980,7 @@ start: Korean
 	S_kobold: U+CF54                    # 코 kobold
 	S_troll: U+D2B8                     # 트 troll
 	S_eye: U+B208                       # 눈 eye
-	S_jelly: U+C810                     # 점 slime
+	S_jelly: U+C810                     # 점 jelly
 	S_zombie: U+C8BD                    # 좀 zombie
 	S_mummy: U+BBF8                     # 미 mummy
 	S_vampire: U+D761                   # 흡 vampire
@@ -988,63 +988,63 @@ start: Korean
 	S_nymph: U+B2D8                     # 님 nymph
 	S_ogre: U+C624                      # 오 ogre
 	S_golem: U+ACE8                     # 골 golem
-	# === Traps (Hangul) ===
-	S_arrow_trap: U+C0B4                # 살 arrow
-	S_dart_trap: U+C0B4                 # 살 dart
+	# === Traps (한글, 火만 한자) ===
+	S_arrow_trap: U+C0B4                # 살 arrow trap
+	S_dart_trap: U+C0B4                 # 살 dart trap
 	S_land_mine: U+AD11                 # 광 mine
-	S_fire_trap: U+706B                 # 火 fire
+	S_fire_trap: U+706B                 # 火 fire trap
 	S_pit: U+AD6C                       # 구 pit
 	S_hole: U+AD6C                      # 구 hole
 	S_web: U+AC70                       # 거 web
 	S_magic_portal: U+BB38              # 문 portal
-	# === Beams (fullwidth) ===
-	S_vbeam: U+2551                     # ║ vertical beam
-	S_hbeam: U+2550                     # ═ horizontal beam
+	# === Beams (heavy lines) ===
+	S_vbeam: U+2503                     # ┃ vertical beam
+	S_hbeam: U+2501                     # ━ horizontal beam
 	# === Branch colors ===
-	G_vwall_sokoban:  U+2551/blue
-	G_hwall_sokoban:  U+2550/blue
-	G_tlcorn_sokoban: U+2554/blue
-	G_trcorn_sokoban: U+2557/blue
-	G_blcorn_sokoban: U+255A/blue
-	G_brcorn_sokoban: U+255D/blue
-	G_crwall_sokoban: U+256C/blue
-	G_tuwall_sokoban: U+2569/blue
-	G_tdwall_sokoban: U+2566/blue
-	G_tlwall_sokoban: U+2563/blue
-	G_trwall_sokoban: U+2560/blue
-	G_vwall_gehennom:  U+2551/red
-	G_hwall_gehennom:  U+2550/red
-	G_tlcorn_gehennom: U+2554/red
-	G_trcorn_gehennom: U+2557/red
-	G_blcorn_gehennom: U+255A/red
-	G_brcorn_gehennom: U+255D/red
-	G_crwall_gehennom: U+256C/red
-	G_tuwall_gehennom: U+2569/red
-	G_tdwall_gehennom: U+2566/red
-	G_tlwall_gehennom: U+2563/red
-	G_trwall_gehennom: U+2560/red
-	G_vwall_knox:  U+2551/150-75-0
-	G_hwall_knox:  U+2550/150-75-0
-	G_tlcorn_knox: U+2554/150-75-0
-	G_trcorn_knox: U+2557/150-75-0
-	G_blcorn_knox: U+255A/150-75-0
-	G_brcorn_knox: U+255D/150-75-0
-	G_crwall_knox: U+256C/150-75-0
-	G_tuwall_knox: U+2569/150-75-0
-	G_tdwall_knox: U+2566/150-75-0
-	G_tlwall_knox: U+2563/150-75-0
-	G_trwall_knox: U+2560/150-75-0
-	G_vwall_mines:  U+2551/113-126-142
-	G_hwall_mines:  U+2550/113-126-142
-	G_tlcorn_mines: U+2554/113-126-142
-	G_trcorn_mines: U+2557/113-126-142
-	G_blcorn_mines: U+255A/113-126-142
-	G_brcorn_mines: U+255D/113-126-142
-	G_crwall_mines: U+256C/113-126-142
-	G_tuwall_mines: U+2569/113-126-142
-	G_tdwall_mines: U+2566/113-126-142
-	G_tlwall_mines: U+2563/113-126-142
-	G_trwall_mines: U+2560/113-126-142
+	G_vwall_sokoban:  U+2503/blue
+	G_hwall_sokoban:  U+2501/blue
+	G_tlcorn_sokoban: U+250F/blue
+	G_trcorn_sokoban: U+2513/blue
+	G_blcorn_sokoban: U+2517/blue
+	G_brcorn_sokoban: U+251B/blue
+	G_crwall_sokoban: U+254B/blue
+	G_tuwall_sokoban: U+253B/blue
+	G_tdwall_sokoban: U+2533/blue
+	G_tlwall_sokoban: U+252B/blue
+	G_trwall_sokoban: U+2523/blue
+	G_vwall_gehennom:  U+2503/red
+	G_hwall_gehennom:  U+2501/red
+	G_tlcorn_gehennom: U+250F/red
+	G_trcorn_gehennom: U+2513/red
+	G_blcorn_gehennom: U+2517/red
+	G_brcorn_gehennom: U+251B/red
+	G_crwall_gehennom: U+254B/red
+	G_tuwall_gehennom: U+253B/red
+	G_tdwall_gehennom: U+2533/red
+	G_tlwall_gehennom: U+252B/red
+	G_trwall_gehennom: U+2523/red
+	G_vwall_knox:  U+2503/150-75-0
+	G_hwall_knox:  U+2501/150-75-0
+	G_tlcorn_knox: U+250F/150-75-0
+	G_trcorn_knox: U+2513/150-75-0
+	G_blcorn_knox: U+2517/150-75-0
+	G_brcorn_knox: U+251B/150-75-0
+	G_crwall_knox: U+254B/150-75-0
+	G_tuwall_knox: U+253B/150-75-0
+	G_tdwall_knox: U+2533/150-75-0
+	G_tlwall_knox: U+252B/150-75-0
+	G_trwall_knox: U+2523/150-75-0
+	G_vwall_mines:  U+2503/113-126-142
+	G_hwall_mines:  U+2501/113-126-142
+	G_tlcorn_mines: U+250F/113-126-142
+	G_trcorn_mines: U+2513/113-126-142
+	G_blcorn_mines: U+2517/113-126-142
+	G_brcorn_mines: U+251B/113-126-142
+	G_crwall_mines: U+254B/113-126-142
+	G_tuwall_mines: U+253B/113-126-142
+	G_tdwall_mines: U+2533/113-126-142
+	G_tlwall_mines: U+252B/113-126-142
+	G_trwall_mines: U+2523/113-126-142
 finish
 
 # Emoji symbols for modern terminals with full Unicode support
@@ -1064,9 +1064,9 @@ start: Emoji
 	S_tdwall: U+252c                    # ┬ T down
 	S_tlwall: U+2524                    # ┤ T left
 	S_trwall: U+251c                    # ├ T right
-	S_room: U+00b7                      # · room floor
-	S_corr: U+2591                      # ░ corridor
-	S_litcorr: U+2592                   # ▒ lit corridor
+	S_room: U+30FB                      # ・ room floor (middle dot)
+	S_corr: U+2588                      # █ corridor (solid block)
+	S_litcorr: U+2593                   # ▓ lit corridor (dark shade)
 	S_upstair: U+2B06                   # ⬆ upstairs
 	S_dnstair: U+2B07                   # ⬇ downstairs
 	S_upladder: U+2B06                  # ⬆ up ladder

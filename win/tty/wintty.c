@@ -1082,12 +1082,17 @@ tty_clear_nhwindow(winid window)
          * spaces to prevent ghost artifacts. Always clear 160 columns
          * (fullwidth width) to handle fullwidth->halfwidth transitions. */
         if (!erasing_tty_screen) {
-            int row;
+            int row, col;
             int map_top = cw->offy;
             int map_rows = ROWNO;
+            int clear_cols = 160;  /* max width for fullwidth mode */
             for (row = 0; row < map_rows; row++) {
-                tty_curs(BASE_WINDOW, 1, map_top + row);
-                cl_end();  /* clear to end of line */
+                /* Move cursor to start of each map row using raw positioning */
+                cmov(0, map_top + row);
+                /* Output spaces to overwrite any previous characters */
+                for (col = 0; col < clear_cols; col++) {
+                    (void) putchar(' ');
+                }
             }
             (void) fflush(stdout);
         }
