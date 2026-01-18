@@ -6483,7 +6483,7 @@ msgstr "%s%s."
 
 #: src/fountain.c:815
 msgid "Flupp!  "
-msgstr ""
+msgstr "철퍽!  "
 
 #: src/fountain.c:819
 msgid "a ring shining in its midst."
@@ -12543,12 +12543,12 @@ msgstr "%s{이/가} 읊조린다:"
 
 #: src/priest.c:459
 msgid "You desecrate this place by your presence!"
-msgstr ""
+msgstr "당신의 존재로 이 장소를 모독하고 있다!"
 
 #: src/priest.c:462
 #, c-format
 msgid "Pilgrim, you enter a %s place!"
-msgstr ""
+msgstr "순례자여, %s 장소에 들어왔다!"
 
 #: src/priest.c:463
 msgid "desecrated"
@@ -13610,8 +13610,7 @@ msgstr "투명한 손님은 환영하지 않습니다!"
 #: src/shk.c:746
 #, c-format
 msgid "%s stands firm as if %s knows you are there."
-msgstr ""
-"%s{이/가} 마치 당신이 거기 있다는 것을 %s 알고 있는 것처럼 굳건히 서 있다."
+msgstr "%s{이/가} 마치 당신이 거기 있다는 것을 %s 알고 있는 것처럼 굳건히 서 있다."
 
 #: src/shk.c:757
 #, c-format
