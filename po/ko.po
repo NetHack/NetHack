@@ -53,59 +53,59 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/bones.c:425
 msgid "Cannot unlink old bones."
-msgstr ""
+msgstr "오래된 유골 파일을 삭제할 수 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/bones.c:662
 msgid "Discarding unusable bones; no need to panic..."
-msgstr ""
+msgstr "사용할 수 없는 유골을 버린다. 걱정할 필요 없다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/bones.c:797
 #, c-format
 msgid "make adjustments to %s to suit your %s hand."
-msgstr ""
+msgstr "%s{을/를} 당신의 %s손에 맞게 조정한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:138
 #: /home/jinhong_kim/workspace/HanNetHack/src/teleport.c:1494
 #: /home/jinhong_kim/workspace/HanNetHack/src/teleport.c:1543
 #: /home/jinhong_kim/workspace/HanNetHack/src/sit.c:190
 msgid "a wrenching sensation."
-msgstr ""
+msgstr "비틀리는 느낌이 든다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:142
 #: /home/jinhong_kim/workspace/HanNetHack/src/sit.c:187
 msgid "threatened."
-msgstr ""
+msgstr "위협을 느낀다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:152
 msgid "These runes were just too much to comprehend."
-msgstr ""
+msgstr "이 룬들은 이해하기에 너무 어려웠다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:156
 msgid "book was coated with contact poison!"
-msgstr ""
+msgstr "책에 접촉 독이 발라져 있었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:172
 #, c-format
 msgid "book %s, but you are unharmed!"
-msgstr ""
+msgstr "책이 %s했지만, 당신은 다치지 않았다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:174
 #, c-format
 msgid "As you read the book, it %s in your %s!"
-msgstr ""
+msgstr "책을 읽는 동안, 그것이 당신의 %s에서 %s!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:198
 msgid "accidentally tear the spellbook to pieces."
-msgstr ""
+msgstr "실수로 마법서를 갈기갈기 찢어버렸다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:203
 #, c-format
 msgid "find yourself reading the %s line over and over again."
-msgstr ""
+msgstr "같은 %s줄을 계속 반복해서 읽고 있는 자신을 발견했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:236
 msgid "turn the pages of the Book of the Dead..."
-msgstr ""
+msgstr "죽음의 책 페이지를 넘긴다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:247
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:429
@@ -135,44 +135,44 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:254
 #, c-format
 msgid "A chill runs down your %s."
-msgstr ""
+msgstr "등줄기에 오한이 흐른다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:257
 msgid "a faint chime..."
-msgstr ""
+msgstr "희미한 종소리..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:260
 msgid "Vlad's doppelganger is amused."
-msgstr ""
+msgstr "블라드의 도플갱어가 재미있어한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:282
 msgid "invocation fails!"
-msgstr ""
+msgstr "주문이 실패했다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:285
 msgid "At least one of your relics is cursed..."
-msgstr ""
+msgstr "유물 중 적어도 하나가 저주받았다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:299
 #, c-format
 msgid "have a feeling that %s is amiss..."
-msgstr ""
+msgstr "%s{이/가} 잘못되었다는 느낌이 든다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:309
 msgid "raised the dead!"
-msgstr ""
+msgstr "죽은 자를 일으켰다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:329
 msgid "ancestors are annoyed with you!"
-msgstr ""
+msgstr "조상들이 당신에게 짜증내고 있다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:332
 msgid "headstones in the cemetery begin to move!"
-msgstr ""
+msgstr "묘지의 비석들이 움직이기 시작한다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:335
 msgid "Oh my!  Your name appears in the book!"
-msgstr ""
+msgstr "이런! 당신의 이름이 책에 나타난다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:347
 #, c-format
@@ -181,16 +181,16 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:402
 msgid "This spellbook is too faint to be read any more."
-msgstr ""
+msgstr "이 마법서는 더 이상 읽을 수 없을 정도로 희미하다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:408
 #, c-format
 msgid "knowledge of %s is %s."
-msgstr ""
+msgstr "%s의 지식이 %s."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:420
 msgid "This spellbook is too faint to read even once."
-msgstr ""
+msgstr "이 마법서는 한 번 읽기에도 너무 희미하다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:432
 #, fuzzy, c-format
@@ -214,7 +214,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:507
 msgid "This spellbook is all blank."
-msgstr ""
+msgstr "이 마법서는 완전히 비어있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:566
 #, c-format
@@ -223,7 +223,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:614
 msgid "spellbook crumbles to dust!"
-msgstr ""
+msgstr "마법서가 먼지로 부서진다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:632
 #, c-format
@@ -232,28 +232,28 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:691
 msgid "are too impaired to cast a spell."
-msgstr ""
+msgstr "주문을 시전하기에 너무 손상되어 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:694
 msgid "are unable to chant the incantation."
-msgstr ""
+msgstr "주문을 외울 수 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:704
 msgid "arms are not free to cast!"
-msgstr ""
+msgstr "팔이 자유롭지 않아 시전할 수 없다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:723
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:2018
 msgid "don't know any spells right now."
-msgstr ""
+msgstr "지금은 아무 주문도 모른다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:761
 msgid "That's enough tries."
-msgstr ""
+msgstr "시도는 충분히 했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:774
 msgid "don't know that spell."
-msgstr ""
+msgstr "그 주문을 모른다."
 
 # ============================================================
 # 전투 메시지 (Combat Messages)
@@ -266,7 +266,7 @@ msgstr "%s{을/를} 때렸다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1059
 #, c-format
 msgid "%s resists."
-msgstr ""
+msgstr "%s{이/가} 저항한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1148
 #, c-format
@@ -280,60 +280,60 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1175
 msgid "skin feels warm for a moment."
-msgstr ""
+msgstr "잠시 피부가 따뜻해지는 느낌이 든다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1252
 msgid "knowledge of this spell is twisted."
-msgstr ""
+msgstr "이 주문의 지식이 왜곡되어 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1253
 msgid "It invokes nightmarish images in your mind..."
-msgstr ""
+msgstr "악몽같은 이미지가 마음속에 떠오른다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1262
 msgid "strain to recall the spell."
-msgstr ""
+msgstr "주문을 기억하려고 애쓴다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1264
 msgid "have difficulty remembering the spell."
-msgstr ""
+msgstr "주문을 기억하기 어렵다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1266
 msgid "knowledge of this spell is growing faint."
-msgstr ""
+msgstr "이 주문의 지식이 희미해지고 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1268
 msgid "recall of this spell is gradually fading."
-msgstr ""
+msgstr "이 주문의 기억이 점차 사라지고 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1272
 msgid "are too hungry to cast that spell."
-msgstr ""
+msgstr "그 주문을 시전하기에 너무 배고프다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1276
 msgid "lack the strength to cast spells."
-msgstr ""
+msgstr "주문을 시전할 힘이 부족하다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1291
 msgid "the amulet draining your energy away."
-msgstr ""
+msgstr "부적이 에너지를 빼앗아 가고 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1315
 #, c-format
 msgid "don't have enough energy to cast that spell%s."
-msgstr ""
+msgstr "그 주문을 시전할 에너지가 부족하다%s."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1373
 msgid "fail to cast the spell correctly."
-msgstr ""
+msgstr "주문을 올바르게 시전하지 못했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1498
 msgid "magical energy is released!"
-msgstr ""
+msgstr "마법 에너지가 방출됐다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1554
 msgid "are no longer ill."
-msgstr ""
+msgstr "더 이상 아프지 않다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1569
 #, c-format
@@ -342,11 +342,11 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1651
 msgid "You're joking!  In this weather?"
-msgstr ""
+msgstr "농담이지! 이 날씨에?"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1654
 msgid "had better wait for the sun to come out."
-msgstr ""
+msgstr "해가 뜨기를 기다리는 게 좋겠다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1658
 #, fuzzy
@@ -355,19 +355,19 @@ msgstr "무엇을 사용하겠습니까?"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1669
 msgid "spell dissipates over the distance!"
-msgstr ""
+msgstr "거리로 인해 주문이 흩어졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1672
 msgid "spell is cut short!"
-msgstr ""
+msgstr "주문이 끊겼다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:1680
 msgid "mind fails to lock onto that location!"
-msgstr ""
+msgstr "그 위치에 정신을 집중하지 못했다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:2053
 msgid "You didn't know any spells."
-msgstr ""
+msgstr "아무 주문도 몰랐다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:2054
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:2027
@@ -418,7 +418,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/spell.c:2056
 msgid "Spells:"
-msgstr ""
+msgstr "주문:"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/report.c:464
 #, c-format
@@ -458,27 +458,27 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/worn.c:1189
 msgid "a cracking sound."
-msgstr ""
+msgstr "금이 가는 소리."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/worn.c:1207
 #: /home/jinhong_kim/workspace/HanNetHack/src/worn.c:1216
 msgid "a ripping sound."
-msgstr ""
+msgstr "찢어지는 소리."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/worn.c:1229
 msgid "a thud."
-msgstr ""
+msgstr "쿵 하는 소리."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/worn.c:1273
 #: /home/jinhong_kim/workspace/HanNetHack/src/worn.c:1285
 msgid "a clank."
-msgstr ""
+msgstr "쨍그랑 소리."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/worn.c:1313
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:619
 #, c-format
 msgid "can no longer ride %s."
-msgstr ""
+msgstr "더 이상 %s{을/를} 탈 수 없다."
 
 # ============================================================
 # 전투 메시지 (Combat Messages)
@@ -562,7 +562,7 @@ msgstr "%s %s{이/가} %s!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/weapon.c:926
 #, c-format
 msgid "Light begins shining %s."
-msgstr ""
+msgstr "빛이 %s{을/를} 비추기 시작한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/weapon.c:1048
 #, fuzzy, c-format
@@ -751,20 +751,20 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:306
 msgid "A chasm opens up under you!"
-msgstr ""
+msgstr "당신 아래로 균열이 열렸다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:307
 #: /home/jinhong_kim/workspace/HanNetHack/src/trap.c:1842
 msgid "don't fall in!"
-msgstr ""
+msgstr "떨어지지 마라!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:312
 msgid "fall into a chasm!"
-msgstr ""
+msgstr "균열에 빠졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:323
 msgid "are jostled around violently!"
-msgstr ""
+msgstr "격렬하게 흔들렸다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:375
 #, c-format
@@ -773,7 +773,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:379
 msgid "a thump."
-msgstr ""
+msgstr "쿵 하는 소리."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:411
 #, c-format
@@ -802,20 +802,20 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:445
 msgid "A secret corridor is revealed."
-msgstr ""
+msgstr "비밀 통로가 드러났다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:455
 msgid "A secret door is revealed."
-msgstr ""
+msgstr "비밀문이 드러났다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:469
 msgid "door collapses."
-msgstr ""
+msgstr "문이 무너졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:554
 #, c-format
 msgid "start playing %s."
-msgstr ""
+msgstr "%s{을/를} 연주하기 시작한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:558
 msgid "radiate an obnoxious droning sound."
@@ -839,7 +839,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:578
 msgid "What you perform is quite far from music..."
-msgstr ""
+msgstr "연주하는 것이 음악과는 거리가 멀다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:592
 #, c-format
@@ -960,7 +960,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:644
 msgid "blow into the horn."
-msgstr ""
+msgstr "뿔피리를 불었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:651
 #, c-format
@@ -969,7 +969,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:654
 msgid "blow into the bugle."
-msgstr ""
+msgstr "나팔을 불었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:663
 #, c-format
@@ -978,15 +978,15 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:667
 msgid "very soothing vibrations."
-msgstr ""
+msgstr "매우 편안한 진동."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:682
 msgid "soothing vibrations."
-msgstr ""
+msgstr "편안한 진동."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:695
 msgid "produce a heavy, thunderous rolling!"
-msgstr ""
+msgstr "무겁고 천둥 같은 굴림음을 낸다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:697
 #, c-format
@@ -1000,11 +1000,11 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:711
 msgid "pound on the drum."
-msgstr ""
+msgstr "북을 두드린다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:767
 msgid "play music underwater!"
-msgstr ""
+msgstr "물속에서 음악을 연주한다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/music.c:773
 #, c-format
@@ -1033,7 +1033,7 @@ msgstr "멈췄다. %s{이/가} 길을 막고 있다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:106
 msgid "Now you can cross it!"
-msgstr ""
+msgstr "이제 건널 수 있다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:113
 #, c-format
@@ -1047,7 +1047,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:131
 msgid "find yourself on dry land again!"
-msgstr ""
+msgstr "다시 마른 땅에 있음을 발견했다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:135
 #, c-format
@@ -1056,7 +1056,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:143
 msgid "It sinks without a trace!"
-msgstr ""
+msgstr "흔적도 없이 가라앉았다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:194
 #, c-format
@@ -1095,11 +1095,11 @@ msgstr "%s{을/를} 내려놓았다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/dig.c:1225
 #: /home/jinhong_kim/workspace/HanNetHack/src/dig.c:1227
 msgid "Splash!"
-msgstr ""
+msgstr "첨벙!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:281
 msgid "Plop!"
-msgstr ""
+msgstr "퐁당!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:293
 #, c-format
@@ -1123,7 +1123,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:350
 msgid "a shattering noise."
-msgstr ""
+msgstr "산산이 부서지는 소리."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:380
 #, c-format
@@ -1142,7 +1142,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:453
 msgid "sink vanishes."
-msgstr ""
+msgstr "싱크대가 사라졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:504
 #, c-format
@@ -1174,7 +1174,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:528
 msgid "Static electricity surrounds the sink."
-msgstr ""
+msgstr "정전기가 싱크대를 둘러싸고 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:532
 #, fuzzy
@@ -1209,7 +1209,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:573
 msgid "Several flies buzz around the sink."
-msgstr ""
+msgstr "몇 마리의 파리가 싱크대 주위를 윙윙거린다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:579
 #, c-format
@@ -1222,11 +1222,11 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:599
 msgid "sink looks as good as new."
-msgstr ""
+msgstr "싱크대가 새것처럼 보인다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:602
 msgid "don't see anything happen to the sink."
-msgstr ""
+msgstr "싱크대에 아무 일도 일어나지 않는 것 같다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:605
 msgid "the ring slide right down the drain!"
@@ -1282,7 +1282,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:669
 #, c-format
 msgid "You cannot %s %s you are wearing."
-msgstr ""
+msgstr "착용 중인 %s{을/를} %s할 수 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:680
 #, c-format
@@ -1297,7 +1297,7 @@ msgstr "어쩐지 싱거운 맛이다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:702
 #, c-format
 msgid "leash is tied around your %s."
-msgstr ""
+msgstr "줄이 %s에 묶여 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:707
 #, c-format
@@ -1323,7 +1323,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:929
 msgid "have nothing to drop."
-msgstr ""
+msgstr "버릴 것이 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:1114
 #, c-format
@@ -1343,7 +1343,7 @@ msgstr "%s{을/를} 읽었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:1172
 msgid "latent levitation ceases."
-msgstr ""
+msgstr "잠재적 부양이 멈췄다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:1193
 #, c-format
@@ -1362,7 +1362,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:1209
 #, c-format
 msgid "drop to the %s."
-msgstr ""
+msgstr "%s{으로/로} 떨어졌다."
 
 # ============================================================
 # 던전 메시지 (Dungeon Messages)
@@ -1374,11 +1374,11 @@ msgstr "여기에 %s{이/가} 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:1243
 msgid "are standing at the gate to Gehennom."
-msgstr ""
+msgstr "게헨놈의 문 앞에 서 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:1244
 msgid "Unspeakable cruelty and harm lurk down there."
-msgstr ""
+msgstr "형언할 수 없는 잔인함과 해로움이 저 아래에 도사리고 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:1247
 msgid "So be it."
@@ -1580,7 +1580,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:2363
 #: /home/jinhong_kim/workspace/HanNetHack/src/apply.c:177
 msgid "You've got the glop off."
-msgstr ""
+msgstr "얼굴에서 끈적이는 것을 제거했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:2371
 #: /home/jinhong_kim/workspace/HanNetHack/src/apply.c:183
@@ -1591,7 +1591,7 @@ msgstr "덜 혼란스러워졌다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:2391
 #, c-format
 msgid "%s is already clean."
-msgstr ""
+msgstr "%s{은/는} 이미 깨끗하다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/do.c:2401
 #, c-format
@@ -1612,11 +1612,11 @@ msgstr "기분이 나아졌다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/lock.c:1226
 #, c-format
 msgid "a %s explosion."
-msgstr ""
+msgstr "%s 폭발."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/monmove.c:124
 msgid "someone yell:"
-msgstr ""
+msgstr "누군가 외친다:"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/monmove.c:152
 #, fuzzy, c-format
@@ -1626,28 +1626,28 @@ msgstr "%s{이/가} %s{을/를} 빗맞았다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/monmove.c:160
 #: /home/jinhong_kim/workspace/HanNetHack/src/zap.c:2281
 msgid "boulder falls apart."
-msgstr ""
+msgstr "바위가 부서졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/monmove.c:369
 #: /home/jinhong_kim/workspace/HanNetHack/src/dogmove.c:1052
 msgid "get released!"
-msgstr ""
+msgstr "풀려났다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/monmove.c:514
 msgid "Bright light!"
-msgstr ""
+msgstr "밝은 빛!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/monmove.c:590
 msgid "sense a faint wave of psychic energy."
-msgstr ""
+msgstr "희미한 정신 에너지의 파동을 감지했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/monmove.c:593
 msgid "A wave of psychic energy pours over you!"
-msgstr ""
+msgstr "정신 에너지의 파동이 당신에게 쏟아진다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/monmove.c:596
 msgid "It feels quite soothing."
-msgstr ""
+msgstr "꽤 편안하게 느껴진다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/monmove.c:615
 #, c-format
@@ -1668,11 +1668,11 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/zap.c:1978
 #, c-format
 msgid "%s gets angry!"
-msgstr ""
+msgstr "%s{이/가} 화났다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/monmove.c:1570
 msgid "a door unlock and open."
-msgstr ""
+msgstr "문이 열리는 소리."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/monmove.c:1587
 #, fuzzy
@@ -1686,7 +1686,7 @@ msgstr "문이 열리는 소리가 들린다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/monmove.c:1832
 msgid "I'm late!"
-msgstr ""
+msgstr "늦었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/mplayer.c:374
 #, c-format
@@ -1700,7 +1700,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:51
 msgid "Saddle yourself?  Very funny..."
-msgstr ""
+msgstr "자기 자신에게 안장을? 참 웃기는군..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:56
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:257
@@ -1715,13 +1715,13 @@ msgstr "%s{은/는} 움직이지 않는 것 같다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:78
 msgid "Shame on you!"
-msgstr ""
+msgstr "부끄러운 줄 알아라!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:84
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:297
 #, c-format
 msgid "I think %s would mind."
-msgstr ""
+msgstr "%s{이/가} 싫어할 것 같다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:88
 msgid "saddle such a creature."
@@ -1744,7 +1744,7 @@ msgstr "%s{을/를} 입었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:213
 msgid "Maybe you should find a designated driver."
-msgstr ""
+msgstr "대리 기사를 찾는 게 좋겠다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:245
 msgid "won't fit on a saddle."
@@ -1767,7 +1767,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:276
 msgid "are stuck here for now."
-msgstr ""
+msgstr "지금은 여기에 갇혀있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:283
 #, fuzzy, c-format
@@ -1837,7 +1837,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:377
 msgid "aren't stealthy anymore."
-msgstr ""
+msgstr "더 이상 은신 상태가 아니다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:425
 #: /home/jinhong_kim/workspace/HanNetHack/src/trap.c:5676
@@ -1848,7 +1848,7 @@ msgstr "%s{이/가} 당신을 쏘았다!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:431
 #, c-format
 msgid "%s does not respond."
-msgstr ""
+msgstr "%s{이/가} 반응하지 않는다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:447
 #, fuzzy, c-format
@@ -1867,7 +1867,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:641
 msgid "can't.  There isn't anywhere for you to stand."
-msgstr ""
+msgstr "불가능하다. 설 곳이 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:645
 #, c-format
@@ -1905,7 +1905,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:845
 #, c-format
 msgid "%s wakes up."
-msgstr ""
+msgstr "%s{이/가} 깨어났다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:868
 #, c-format
@@ -1920,7 +1920,7 @@ msgstr "%s{은/는} 움직이지 않는 것 같다!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/steed.c:890
 #, c-format
 msgid "%s is still eating."
-msgstr ""
+msgstr "%s{이/가} 아직 먹고 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/nhlua.c:1366
 #, c-format
@@ -1964,7 +1964,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:45
 #, c-format
 msgid "An endless stream of %s pours forth!"
-msgstr ""
+msgstr "끝없는 %s의 흐름이 쏟아져 나온다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:49
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:4204
@@ -1975,7 +1975,7 @@ msgstr "%s{이/가} %s{을/를} 맞췄다!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:58
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:88
 msgid "fountain bubbles furiously for a moment, then calms."
-msgstr ""
+msgstr "분수가 잠시 격렬하게 거품을 일으킨 후 잠잠해졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:72
 #, fuzzy, c-format
@@ -1984,7 +1984,7 @@ msgstr "%s{을/를} 태웠다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:74
 msgid "the presence of evil."
-msgstr ""
+msgstr "악의 존재를 느낀다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:79
 #, c-format
@@ -2002,11 +2002,11 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:111
 msgid "A large bubble rises to the surface and pops."
-msgstr ""
+msgstr "큰 거품이 표면으로 올라와 터졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:114
 msgid "a loud pop."
-msgstr ""
+msgstr "펑 하는 큰 소리."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:127
 #, fuzzy
@@ -2015,7 +2015,7 @@ msgstr "%s{이/가} 짓눌리고 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:129
 msgid "Water sprays all over you."
-msgstr ""
+msgstr "물이 온몸에 튀었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:148
 msgid "Water gushes forth from the overflowing fountain!"
@@ -2023,11 +2023,11 @@ msgstr "넘치는 분수에서 물이 솟아오른다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:168
 msgid "spot a gem in the sparkling waters!"
-msgstr ""
+msgstr "반짝이는 물속에서 보석을 발견했다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:170
 msgid "a gem here!"
-msgstr ""
+msgstr "여기에 보석이 있다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:184
 #, c-format
@@ -2036,7 +2036,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:185
 msgid "Hey, stop using that fountain!"
-msgstr ""
+msgstr "이봐, 그 분수 사용 좀 그만해!"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -2048,7 +2048,7 @@ msgstr "%s %s{이/가} %s!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:213
 msgid "flow reduces to a trickle."
-msgstr ""
+msgstr "흐름이 졸졸 흐르는 정도로 줄었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:227
 #, fuzzy
@@ -2074,12 +2074,12 @@ msgstr "시원한 물이 당신을 상쾌하게 한다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:288
 #: /home/jinhong_kim/workspace/HanNetHack/src/zap.c:2525
 msgid "self-knowledgeable..."
-msgstr ""
+msgstr "자기 자신을 알게 된 느낌..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:292
 #: /home/jinhong_kim/workspace/HanNetHack/src/zap.c:2528
 msgid "feeling subsides."
-msgstr ""
+msgstr "느낌이 가라앉는다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:295
 #, fuzzy
@@ -2102,11 +2102,11 @@ msgstr "이 물은 좋지 않다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:339
 msgid "feel transparent."
-msgstr ""
+msgstr "투명해진 느낌이 든다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:341
 msgid "feel very self-conscious."
-msgstr ""
+msgstr "매우 의식이 또렷해진 느낌이 든다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:342
 #, fuzzy
@@ -2115,7 +2115,7 @@ msgstr "%s{이/가} %s{을/를} 빗맞았다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:346
 msgid "But it disappears."
-msgstr ""
+msgstr "하지만 사라졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:354
 #, fuzzy, c-format
@@ -2125,7 +2125,7 @@ msgstr "%s 맛이 난다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:371
 #, c-format
 msgid "This %s gives you bad breath!"
-msgstr ""
+msgstr "이 %s{이/가} 입냄새를 나게 한다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:384
 #, fuzzy, c-format
@@ -2153,7 +2153,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:473
 msgid "A feeling of loss comes over you."
-msgstr ""
+msgstr "상실감이 엄습한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:496
 #, c-format
@@ -2162,20 +2162,20 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:499
 msgid "a sudden chill."
-msgstr ""
+msgstr "갑자기 한기가 든다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:502
 msgid "An urge to take a bath overwhelms you."
-msgstr ""
+msgstr "목욕하고 싶은 충동에 휩싸인다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:524
 msgid "lost some of your gold in the fountain!"
-msgstr ""
+msgstr "분수에서 금화 일부를 잃어버렸다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:542
 #, c-format
 msgid "Far below you, you see coins glistening in the %s."
-msgstr ""
+msgstr "저 아래에서 %s에 반짝이는 동전들이 보인다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:564
 #, fuzzy, c-format
@@ -2186,26 +2186,26 @@ msgstr "%2$s{으로/로} %1$s{을/를} 때렸다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:357
 #, c-format
 msgid "%s are no longer slippery."
-msgstr ""
+msgstr "%s{이/가} 더 이상 미끄럽지 않다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:584
 msgid "pipes break!  Water spurts out!"
-msgstr ""
+msgstr "파이프가 터졌다! 물이 분출한다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:606
 #, c-format
 msgid "take a sip of very cold %s."
-msgstr ""
+msgstr "매우 차가운 %s{을/를} 한 모금 마셨다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:609
 #, c-format
 msgid "take a sip of very warm %s."
-msgstr ""
+msgstr "매우 따뜻한 %s{을/를} 한 모금 마셨다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:612
 #, c-format
 msgid "take a sip of scalding hot %s."
-msgstr ""
+msgstr "뜨거운 %s{을/를} 한 모금 마셨다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:614
 #, fuzzy
@@ -2214,7 +2214,7 @@ msgstr "%s{에게} 해롭지 않은 것 같다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:624
 msgid "sink seems quite dirty."
-msgstr ""
+msgstr "싱크대가 꽤 더러워 보인다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:628
 #, c-format
@@ -2231,12 +2231,12 @@ msgstr "분수에서 증기가 피어오른다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:653
 msgid "find a ring in the sink!"
-msgstr ""
+msgstr "싱크대에서 반지를 발견했다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:659
 #, c-format
 msgid "Some dirty %s backs up in the drain."
-msgstr ""
+msgstr "더러운 %s{이/가} 배수구로 역류한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/fountain.c:665
 #, c-format
@@ -2584,7 +2584,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/wield.c:558
 msgid "That ammunition is already readied!"
-msgstr ""
+msgstr "그 탄약은 이미 준비되어 있다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/wield.c:561
 #, c-format
@@ -2687,17 +2687,17 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/wield.c:849
 msgid "begin two-weapon combat."
-msgstr ""
+msgstr "이도류 전투를 시작한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/wield.c:945
 #, c-format
 msgid "%s %s much sharper now."
-msgstr ""
+msgstr "%s{이/가} 훨씬 날카로워졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/wield.c:966
 #, c-format
 msgid "%s %s much duller now."
-msgstr ""
+msgstr "%s{이/가} 훨씬 무뎌졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/wield.c:993
 #, c-format
@@ -2725,32 +2725,32 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/wield.c:1063
 #, c-format
 msgid "%s welded to your %s!"
-msgstr ""
+msgstr "%s{이/가} %s에 융합되었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:410
 #, c-format
 msgid "notice some gold between your %s."
-msgstr ""
+msgstr "%s 사이에 금화가 있는 것을 발견했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:468
 msgid "very greedy, and sense gold!"
-msgstr ""
+msgstr "매우 탐욕스럽고, 금을 감지한다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:516
 #, c-format
 msgid "sense a lack of %s nearby."
-msgstr ""
+msgstr "근처에 %s{이/가} 없는 것을 감지했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:519
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:545
 #, c-format
 msgid "%s starts to tingle."
-msgstr ""
+msgstr "%s{이/가} 얼얼해지기 시작한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:542
 #, c-format
 msgid "%s %s nearby."
-msgstr ""
+msgstr "근처에 %s{이/가} %s."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:580
 #, c-format
@@ -2765,12 +2765,12 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:586
 #, c-format
 msgid "sense %s."
-msgstr ""
+msgstr "%s{을/를} 감지했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:692
 #, c-format
 msgid "sense %s nearby."
-msgstr ""
+msgstr "근처에 %s{을/를} 감지했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:780
 #, c-format
@@ -2779,34 +2779,34 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:844
 msgid "sense the presence of monsters."
-msgstr ""
+msgstr "괴물의 존재를 감지했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:846
 msgid "Monsters sense the presence of you."
-msgstr ""
+msgstr "괴물들이 당신의 존재를 감지했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1086
 #, c-format
 msgid "%s itch."
-msgstr ""
+msgstr "%s{이/가} 가렵다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1119
 msgid "seems to be nothing of interest on this level."
-msgstr ""
+msgstr "이 층에는 관심 있는 것이 없는 것 같다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1123
 msgid "map already shows all relevant locations."
-msgstr ""
+msgstr "지도가 이미 모든 관련 위치를 보여주고 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1214
 #, c-format
 msgid "Too bad you can't see %s."
-msgstr ""
+msgstr "%s{을/를} 볼 수 없어 안타깝다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1223
 #, c-format
 msgid "%s too much to comprehend!"
-msgstr ""
+msgstr "이해하기에 %s{이/가} 너무 많다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1226
 #: /home/jinhong_kim/workspace/HanNetHack/src/trap.c:1614
@@ -2817,12 +2817,12 @@ msgstr "%s{이/가} 당신을 때렸다!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1231
 #, c-format
 msgid "%s your vision!"
-msgstr ""
+msgstr "%s{이/가} 당신의 시야를 혼란시킨다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1236
 #, c-format
 msgid "%s your vision."
-msgstr ""
+msgstr "%s{이/가} 당신의 시야를 가린다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1237
 #, fuzzy
@@ -2832,12 +2832,12 @@ msgstr "영향을 받지 않았다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1241
 #, c-format
 msgid "%s your mind!"
-msgstr ""
+msgstr "%s{이/가} 당신의 정신을 공격한다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1265
 #, c-format
 msgid "All you see is funky %s haze."
-msgstr ""
+msgstr "보이는 것은 이상한 %s 안개뿐이다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1271
 msgid "grok some groovy globs of incandescent lava."
@@ -2855,11 +2855,11 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1289
 msgid "Oh wow... like a kaleidoscope!"
-msgstr ""
+msgstr "와... 만화경 같다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1299
 msgid "may look for an object, monster, or special map symbol."
-msgstr ""
+msgstr "물체, 괴물, 또는 특수 지도 기호를 찾을 수 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1312
 #, fuzzy, c-format
@@ -2869,11 +2869,11 @@ msgstr "%s{을/를} 익사시켰다..."
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1318
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1364
 msgid "vision is unclear."
-msgstr ""
+msgstr "시야가 불분명하다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1555
 msgid "sense your surroundings."
-msgstr ""
+msgstr "주변을 감지한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1865
 #, fuzzy, c-format
@@ -2883,7 +2883,7 @@ msgstr "%s!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1874
 #, c-format
 msgid "detect %s!"
-msgstr ""
+msgstr "%s{을/를} 탐지했다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1881
 #, c-format
@@ -2892,11 +2892,11 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1888
 msgid "don't find anything."
-msgstr ""
+msgstr "아무것도 찾지 못했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1910
 msgid "Its mouth opens!"
-msgstr ""
+msgstr "그것의 입이 열린다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1912
 #: /home/jinhong_kim/workspace/HanNetHack/src/zap.c:585
@@ -2907,13 +2907,13 @@ msgstr "%s{이/가} 당신을 때렸다!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1916
 #, c-format
 msgid "%s unfolds!"
-msgstr ""
+msgstr "%s{이/가} 펼쳐진다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1956
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:2008
 #, c-format
 msgid "find %s."
-msgstr ""
+msgstr "%s{을/를} 발견했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:1985
 #, c-format
@@ -2922,19 +2922,19 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:2005
 msgid "an unseen monster!"
-msgstr ""
+msgstr "보이지 않는 괴물!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:2051
 msgid "find a hidden door."
-msgstr ""
+msgstr "숨겨진 문을 발견했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:2061
 msgid "find a hidden passage."
-msgstr ""
+msgstr "숨겨진 통로를 발견했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:2363
 msgid "are too disoriented for this."
-msgstr ""
+msgstr "너무 혼란스러워서 이것을 할 수 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/detect.c:2404
 #, c-format
@@ -2949,12 +2949,12 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:332
 #, c-format
 msgid "%s is written here in the %s."
-msgstr ""
+msgstr "여기 %s에 %s{이/가} 쓰여 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:340
 #, c-format
 msgid "%s is engraved here on the %s."
-msgstr ""
+msgstr "여기 %s에 %s{이/가} 새겨져 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:346
 #, c-format
@@ -2984,36 +2984,36 @@ msgstr "%s에 의해 얼어붙었다!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:525
 #, c-format
 msgid "write in %s!"
-msgstr ""
+msgstr "%s에 글을 쓴다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:530
 msgid "write here."
-msgstr ""
+msgstr "여기에 글을 쓴다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:535
 msgid "even hold anything!"
-msgstr ""
+msgstr "아무것도 들 수 없다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:669
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:677
 #, c-format
 msgid "engraving on the %s vanishes!"
-msgstr ""
+msgstr "%s의 각인이 사라졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:688
 #, c-format
 msgid "This %s is a wand of digging!"
-msgstr ""
+msgstr "이 %s{은/는} 굴착 지팡이다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:711
 #, c-format
 msgid "This %s is a wand of fire!"
-msgstr ""
+msgstr "이 %s{은/는} 화염 지팡이다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:722
 #, c-format
 msgid "This %s is a wand of lightning!"
-msgstr ""
+msgstr "이 %s{은/는} 번개 지팡이다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:769
 msgid "engrave with such a large object!"
@@ -3026,7 +3026,7 @@ msgstr "%s{을/를} 먹었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:813
 msgid "wand is too worn out to engrave."
-msgstr ""
+msgstr "지팡이가 너무 낡아서 새길 수 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:825
 #, c-format
@@ -3040,11 +3040,11 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:845
 msgid "marker has dried out."
-msgstr ""
+msgstr "마커가 말라버렸다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:859
 msgid "wipe out the message here."
-msgstr ""
+msgstr "여기 메시지를 지웠다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:865
 #, c-format
@@ -3053,12 +3053,12 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:882
 msgid "Writing a poison pen letter?"
-msgstr ""
+msgstr "독설을 쓰고 있나?"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:993
 #, c-format
 msgid "have no free %s to write with!"
-msgstr ""
+msgstr "쓸 수 있는 빈 %s{이/가} 없다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:998
 #, fuzzy, c-format
@@ -3067,7 +3067,7 @@ msgstr "%2$s{으로/로} %1$s{을/를} 때렸다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:999
 msgid "message dissolves..."
-msgstr ""
+msgstr "메시지가 녹는다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:1007
 #, c-format
@@ -3129,12 +3129,12 @@ msgstr "%2$s{으로/로} %1$s{을/를} 때렸다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:1248
 msgid "are blinded by the flash!"
-msgstr ""
+msgstr "섬광에 눈이 멀었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:1287
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:1300
 msgid "are unable to continue engraving."
-msgstr ""
+msgstr "더 이상 새길 수 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:1346
 #, c-format
@@ -3148,11 +3148,11 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:1405
 msgid "marker dries out."
-msgstr ""
+msgstr "마커가 말랐다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:1442
 msgid "run out of room to write."
-msgstr ""
+msgstr "쓸 공간이 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:1451
 #, c-format
@@ -3161,7 +3161,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:1480
 msgid "cannot write any more."
-msgstr ""
+msgstr "더 이상 쓸 수 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/engrave.c:1483
 #: /home/jinhong_kim/workspace/HanNetHack/src/do_wear.c:2922
@@ -3392,7 +3392,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:282
 #: /home/jinhong_kim/workspace/HanNetHack/src/do_wear.c:1523
 msgid "can see again."
-msgstr ""
+msgstr "다시 볼 수 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:303
 msgid "Oh, bummer!  Everything is dark!  Help!"
@@ -3877,26 +3877,26 @@ msgstr "이 병은 비어 있었다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:2812
 #, c-format
 msgid "In a cloud of smoke, %s emerges!"
-msgstr ""
+msgstr "연기 속에서 %s{이/가} 나타났다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:2813
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:2816
 #: /home/jinhong_kim/workspace/HanNetHack/src/muse.c:112
 #, c-format
 msgid "%s speaks."
-msgstr ""
+msgstr "%s{이/가} 말한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:2815
 msgid "smell acrid fumes."
-msgstr ""
+msgstr "자극적인 연기 냄새가 난다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:2829
 msgid "I am in your debt.  I will grant one wish!"
-msgstr ""
+msgstr "당신에게 빚졌다. 소원 하나를 들어주겠다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:2834
 msgid "Thank you for freeing me!"
-msgstr ""
+msgstr "풀어줘서 고맙다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:2838
 #: /home/jinhong_kim/workspace/HanNetHack/src/muse.c:117
@@ -3906,11 +3906,11 @@ msgstr "얼어붙었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:2843
 msgid "It is about time!"
-msgstr ""
+msgstr "드디어!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:2849
 msgid "You disturbed me, fool!"
-msgstr ""
+msgstr "방해하다니, 이 바보야!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:2883
 #, c-format
@@ -3930,7 +3930,7 @@ msgstr "빨라지는 것을 느꼈다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/potion.c:2910
 #, c-format
 msgid "%s get new energy."
-msgstr ""
+msgstr "%s{이/가} 새 에너지를 얻었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/getpos.c:680
 #, fuzzy, c-format
@@ -3940,7 +3940,7 @@ msgstr "%s의 %s{을/를} 스쳤다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/getpos.c:844
 #, c-format
 msgid "(For instructions type a '%s')"
-msgstr ""
+msgstr "(사용법은 '%s' 입력)"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/getpos.c:861
 #, c-format
@@ -3974,7 +3974,7 @@ msgstr "알 수 없는 명령 '%s'."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/getpos.c:1136
 msgid "Done."
-msgstr ""
+msgstr "완료."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/sfstruct.c:580
 #, c-format
@@ -3987,7 +3987,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/rumors.c:546
 msgid "What a pity that you cannot read it!"
-msgstr ""
+msgstr "읽을 수 없다니 안타깝다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/rumors.c:557
 #, c-format
@@ -4000,11 +4000,11 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/read.c:470
 #: /home/jinhong_kim/workspace/HanNetHack/src/read.c:508
 msgid "It reads:"
-msgstr ""
+msgstr "적혀있기를:"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/rumors.c:707
 msgid "is no one here to consult."
-msgstr ""
+msgstr "상담할 사람이 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/rumors.c:710
 #, c-format
@@ -4021,18 +4021,18 @@ msgstr "금화가 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/rumors.c:725
 msgid "don't even have enough gold for that!"
-msgstr ""
+msgstr "그것을 살 금화조차 없다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:201
 #: /home/jinhong_kim/workspace/HanNetHack/src/shk.c:4833
 #, c-format
 msgid "displaced image doesn't fool %s!"
-msgstr ""
+msgstr "허상이 %s{을/를} 속이지 못했다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:440
 #, c-format
 msgid "%s intones:"
-msgstr ""
+msgstr "%s{이/가} 읊조린다:"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:506
 #, fuzzy
@@ -4047,7 +4047,7 @@ msgstr "짓눌리고 있다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:512
 #, c-format
 msgid "A shiver runs down your %s."
-msgstr ""
+msgstr "%s에 오한이 흐른다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:524
 #, c-format
@@ -4056,12 +4056,12 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:528
 msgid "sense a presence close by!"
-msgstr ""
+msgstr "가까이에 무언가의 존재를 감지했다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:576
 #, c-format
 msgid "%s doesn't want anything to do with you!"
-msgstr ""
+msgstr "%s{이/가} 당신과 상관하고 싶어하지 않는다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:590
 #, c-format
@@ -4086,35 +4086,35 @@ msgstr "%s{이/가} 짓눌리고 있다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:630
 #, c-format
 msgid "%s asks you for a contribution for the temple."
-msgstr ""
+msgstr "%s{이/가} 사원 헌금을 요청한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:634
 msgid "Thou shalt regret thine action!"
-msgstr ""
+msgstr "너의 행동을 후회하게 될 것이다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:640
 msgid "Cheapskate."
-msgstr ""
+msgstr "구두쇠 같으니라고."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:643
 msgid "I thank thee for thy contribution."
-msgstr ""
+msgstr "헌금에 감사드린다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:649
 msgid "Thou art indeed a pious individual."
-msgstr ""
+msgstr "참으로 경건한 자로다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:653
 msgid "I bestow upon thee a blessing."
-msgstr ""
+msgstr "축복을 내리노라."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:665
 msgid "Thou hast been rewarded for thy devotion."
-msgstr ""
+msgstr "헌신에 대한 보상을 받았노라."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:674
 msgid "Thy selfless generosity is deeply appreciated."
-msgstr ""
+msgstr "무욕의 관대함에 깊이 감사하노라."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/priest.c:816
 #, c-format
@@ -4134,11 +4134,11 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/o_init.c:810
 #: /home/jinhong_kim/workspace/HanNetHack/src/o_init.c:1107
 msgid "haven't discovered anything yet..."
-msgstr ""
+msgstr "아직 아무것도 발견하지 못했다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/o_init.c:1109
 msgid "None of your discoveries can be assigned names..."
-msgstr ""
+msgstr "발견한 것 중 이름을 붙일 수 있는 것이 없다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/attrib.c:131
 msgid "cap constricts briefly, then relaxes again."
@@ -4147,7 +4147,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/attrib.c:178
 #, c-format
 msgid "You're %s as %s as you can get."
-msgstr ""
+msgstr "당신은 최대한 %s %s 상태다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/attrib.c:183
 #, fuzzy, c-format
@@ -4193,7 +4193,7 @@ msgstr "%s %s{이/가} %s!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/attrib.c:1335
 #, c-format
 msgid "have a %ssense of a new direction."
-msgstr ""
+msgstr "새로운 방향에 대한 %s감각이 생겼다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/attrib.c:1342
 #, c-format
@@ -4208,11 +4208,11 @@ msgstr "%s{을/를} 빗맞았다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:390
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:898
 msgid "amulet vanishes!"
-msgstr ""
+msgstr "부적이 사라졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:393
 msgid "can breathe again."
-msgstr ""
+msgstr "다시 숨을 쉴 수 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:409
 #, fuzzy, c-format
@@ -4226,31 +4226,31 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:464
 msgid "surroundings change."
-msgstr ""
+msgstr "주변이 변한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:476
 msgid "much slimmer."
-msgstr ""
+msgstr "훨씬 날씬해졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:499
 msgid "shape becomes uncertain."
-msgstr ""
+msgstr "형체가 불확실해진다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:520
 msgid "chain disappears."
-msgstr ""
+msgstr "사슬이 사라졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:544
 msgid "There's a tiger in your tank."
-msgstr ""
+msgstr "탱크에 호랑이가 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:546
 msgid "in good health again."
-msgstr ""
+msgstr "다시 건강해졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:588
 msgid "Looks like you are back in Kansas."
-msgstr ""
+msgstr "캔자스로 돌아온 것 같다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:615
 #, fuzzy, c-format
@@ -4260,7 +4260,7 @@ msgstr "%s{을/를} 태웠다!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:617
 #, c-format
 msgid "%s fries to a crisp!"
-msgstr ""
+msgstr "%s{이/가} 바삭하게 튀겨졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:625
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:654
@@ -4270,7 +4270,7 @@ msgstr "영향을 받지 않았다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:627
 msgid "Suddenly, a bolt of lightning strikes you!"
-msgstr ""
+msgstr "갑자기 번개가 당신을 쳤다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:631
 #, fuzzy
@@ -4279,12 +4279,12 @@ msgstr "어쩐지 싱거운 맛이다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:637
 msgid "It seems not to affect you."
-msgstr ""
+msgstr "영향이 없는 것 같다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:646
 #, c-format
 msgid "%s is not deterred..."
-msgstr ""
+msgstr "%s{이/가} 막히지 않는다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:648
 #, c-format
@@ -4294,11 +4294,11 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:651
 #, c-format
 msgid "%s disintegrates into a pile of dust!"
-msgstr ""
+msgstr "%s{이/가} 먼지 더미로 분해되었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:656
 msgid "A wide-angle disintegration beam hits you!"
-msgstr ""
+msgstr "광각 분해 광선이 당신을 맞혔다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:676
 #, c-format
@@ -4307,12 +4307,12 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:683
 msgid "Thou cannot escape my wrath, mortal!"
-msgstr ""
+msgstr "필멸자여, 나의 분노를 피할 수 없다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:688
 #, c-format
 msgid "Destroy %s, my servants!"
-msgstr ""
+msgstr "나의 종들이여, %s{을/를} 파괴하라!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:728
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:1077
@@ -4327,17 +4327,17 @@ msgstr "%s{을/를} 빗맞았다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:740
 msgid "Thou must relearn thy lessons!"
-msgstr ""
+msgstr "너의 교훈을 다시 배워야 하리라!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:756
 #, c-format
 msgid "%s glow surrounds you."
-msgstr ""
+msgstr "%s 빛이 당신을 둘러싼다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:764
 #, c-format
 msgid "Thou durst %s me?"
-msgstr ""
+msgstr "감히 나를 %s하겠다고?"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:769
 #, fuzzy, c-format
@@ -4359,11 +4359,11 @@ msgstr "%s %s{이/가} %s!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:841
 msgid "I crown thee...  The Hand of Elbereth!"
-msgstr ""
+msgstr "그대에게 왕관을 씌우노라... 엘베레스의 손이여!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:852
 msgid "Thou shalt be my Envoy of Balance!"
-msgstr ""
+msgstr "그대는 나의 균형의 사절이 되리라!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:865
 #, c-format
@@ -4372,12 +4372,12 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:906
 msgid "sword shines brightly for a moment."
-msgstr ""
+msgstr "칼이 잠시 밝게 빛난다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:925
 #, c-format
 msgid "%s goes snicker-snack!"
-msgstr ""
+msgstr "%s{이/가} 쓱싹 베었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:951
 #, fuzzy, c-format
@@ -4386,7 +4386,7 @@ msgstr "%s{이/가} 당신을 때렸다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:988
 msgid "unworthy."
-msgstr ""
+msgstr "자격이 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:1045
 #, c-format
@@ -4462,7 +4462,7 @@ msgstr "%s에 의해 얼어붙었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:1337
 msgid "Use it wisely in my name!"
-msgstr ""
+msgstr "내 이름으로 현명하게 사용하라!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:1405
 #, c-format
@@ -4484,30 +4484,30 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:1462
 msgid "sacrifice disappears!"
-msgstr ""
+msgstr "제물이 사라졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:1464
 #, c-format
 msgid "sacrifice is consumed in a %s!"
-msgstr ""
+msgstr "제물이 %s에 소모되었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:1515
 msgid "the air around you grow charged..."
-msgstr ""
+msgstr "주변 공기가 충전되는 느낌이다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:1516
 #, c-format
 msgid "Suddenly, you realize that %s has noticed you..."
-msgstr ""
+msgstr "갑자기 %s{이/가} 당신을 알아차렸음을 깨달았다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:1542
 #, c-format
 msgid "offer the Amulet of Yendor to %s..."
-msgstr ""
+msgstr "%s에게 옌더의 부적을 바친다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:1548
 msgid "An invisible choir chants, and you are bathed in darkness..."
-msgstr ""
+msgstr "보이지 않는 합창단이 노래하고, 어둠에 감싸인다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pray.c:1550
 #, c-format
@@ -4867,33 +4867,33 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1175
 #, c-format
 msgid "clasp on your %s breaks open!"
-msgstr ""
+msgstr "%s의 걸쇠가 부러졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1180
 msgid "shirt rips to shreds!"
-msgstr ""
+msgstr "셔츠가 갈기갈기 찢어졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1187
 msgid "armor falls around you!"
-msgstr ""
+msgstr "갑옷이 당신 주변으로 떨어졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1199
 #, c-format
 msgid "%s falls, unsupported!"
-msgstr ""
+msgstr "%s{이/가} 지지되지 않아 떨어졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1201
 #, c-format
 msgid "shrink out of your %s!"
-msgstr ""
+msgstr "%s에서 줄어들어 빠져나왔다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1207
 msgid "seep right through your shirt!"
-msgstr ""
+msgstr "셔츠를 뚫고 스며든다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1209
 msgid "become much too small for your shirt!"
-msgstr ""
+msgstr "셔츠에 비해 너무 작아졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1221
 #, fuzzy, c-format
@@ -4904,20 +4904,20 @@ msgstr "%2$s{으로/로} %1$s{을/를} 때렸다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1252
 #, c-format
 msgid "%s falls to the %s!"
-msgstr ""
+msgstr "%s{이/가} %s{으로/로} 떨어졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1238
 #, c-format
 msgid "drop your gloves%s!"
-msgstr ""
+msgstr "장갑%s{을/를} 떨어뜨렸다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1245
 msgid "can no longer hold your shield!"
-msgstr ""
+msgstr "더 이상 방패를 들 수 없다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1264
 msgid "boots fall away!"
-msgstr ""
+msgstr "부츠가 떨어졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1266
 #, c-format
@@ -4939,7 +4939,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1385
 msgid "old form was not healthy enough to survive."
-msgstr ""
+msgstr "이전 형태가 생존하기에 충분히 건강하지 않았다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1397
 #, c-format
@@ -4948,25 +4948,25 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1410
 msgid "breathe.  Sorry."
-msgstr ""
+msgstr "숨쉬다. 미안."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1414
 msgid "don't have enough energy to breathe!"
-msgstr ""
+msgstr "숨쉴 에너지가 충분하지 않다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1469
 #, c-format
 msgid "ball and chain are buried firmly in the %s."
-msgstr ""
+msgstr "쇠구슬과 사슬이 %s에 단단히 묻혔다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1473
 msgid "are not chained to anything!"
-msgstr ""
+msgstr "아무것에도 묶여있지 않다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1492
 #, c-format
 msgid "must be on %s ground to spin a web."
-msgstr ""
+msgstr "거미줄을 치려면 %s 땅 위에 있어야 한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1497
 #, c-format
@@ -4997,11 +4997,11 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1555
 msgid "webbing vanishes!"
-msgstr ""
+msgstr "거미줄이 사라졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1558
 msgid "make the web thicker."
-msgstr ""
+msgstr "거미줄을 더 두껍게 만들었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1562
 #, c-format
@@ -5014,7 +5014,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1583
 msgid "have triggered a trap!"
-msgstr ""
+msgstr "함정을 작동시켰다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1592
 #, c-format
@@ -5023,15 +5023,15 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1598
 msgid "spin a web."
-msgstr ""
+msgstr "거미줄을 쳤다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1612
 msgid "lack the energy to send forth a call for help!"
-msgstr ""
+msgstr "도움을 요청할 에너지가 부족하다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1618
 msgid "call upon your brethren for help!"
-msgstr ""
+msgstr "동족에게 도움을 요청했다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1621
 #, fuzzy
@@ -5040,20 +5040,20 @@ msgstr "하지만 아무도 오지 않는다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1646
 msgid "see anything to gaze at."
-msgstr ""
+msgstr "응시할 것이 보이지 않는다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1649
 msgid "gaze at anything you can see."
-msgstr ""
+msgstr "보이는 것을 응시했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1653
 msgid "lack the energy to use your special gaze!"
-msgstr ""
+msgstr "특수 응시를 사용할 에너지가 부족하다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1665
 #, c-format
 msgid "%s seems not to notice your gaze."
-msgstr ""
+msgstr "%s{이/가} 당신의 응시를 알아차리지 못한 것 같다."
 
 # ============================================================
 # 던전 메시지 (Dungeon Messages)
@@ -5066,17 +5066,17 @@ msgstr "여기에 %s{이/가} 있다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1673
 #, c-format
 msgid "avoid gazing at %s."
-msgstr ""
+msgstr "%s{을/를} 응시하는 것을 피했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1693
 #, c-format
 msgid "gaze confuses %s!"
-msgstr ""
+msgstr "응시가 %s{을/를} 혼란시켰다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1695
 #, c-format
 msgid "%s is getting more and more confused."
-msgstr ""
+msgstr "%s{이/가} 점점 더 혼란스러워진다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1701
 #, c-format
@@ -5108,11 +5108,11 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/mhitu.c:1745
 #: /home/jinhong_kim/workspace/HanNetHack/src/trap.c:3757
 msgid "You turn to stone..."
-msgstr ""
+msgstr "돌로 변했다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1755
 msgid "gaze at no place in particular."
-msgstr ""
+msgstr "특별한 곳을 응시하지 않았다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1769
 #, c-format
@@ -5121,7 +5121,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1787
 msgid "fountain is not deep enough to hide in."
-msgstr ""
+msgstr "분수는 숨기에 충분히 깊지 않다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1789
 #, c-format
@@ -5130,7 +5130,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1798
 msgid "is nothing to hide under here."
-msgstr ""
+msgstr "여기 숨을 것이 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1819
 #, c-format
@@ -5139,11 +5139,11 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1830
 msgid "is nowhere to hide above you."
-msgstr ""
+msgstr "위에 숨을 곳이 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1836
 msgid "is nowhere to hide beneath you."
-msgstr ""
+msgstr "아래에 숨을 곳이 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1868
 #, fuzzy, c-format
@@ -5156,11 +5156,11 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1890
 msgid "concentrate."
-msgstr ""
+msgstr "집중한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1891
 msgid "A wave of psychic energy pours out."
-msgstr ""
+msgstr "정신 에너지의 파동이 쏟아져 나온다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1912
 #, c-format
@@ -5170,15 +5170,15 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1934
 #, c-format
 msgid "%s is no longer in your clutches."
-msgstr ""
+msgstr "%s{이/가} 더 이상 손아귀에 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:1944
 msgid "skin returns to its original form."
-msgstr ""
+msgstr "피부가 원래 형태로 돌아왔다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/polyself.c:2169
 msgid "Strangely, you feel better than before."
-msgstr ""
+msgstr "이상하게도 전보다 기분이 좋다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:91
 #, fuzzy
@@ -5188,12 +5188,12 @@ msgstr "해를 피했다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:93
 #, c-format
 msgid "%s avoids harm."
-msgstr ""
+msgstr "%s{이/가} 해를 피했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:232
 #, c-format
 msgid "Wait!  There's %s there you can't see!"
-msgstr ""
+msgstr "잠깐! 보이지 않는 %s{이/가} 거기 있다!"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -5225,7 +5225,7 @@ msgstr "나타났다"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:289
 msgid "Wait!  There's a hidden monster there!"
-msgstr ""
+msgstr "잠깐! 숨겨진 괴물이 거기 있다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:291
 #, c-format
@@ -5234,11 +5234,11 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:339
 msgid "caitiff!"
-msgstr ""
+msgstr "비열한 놈!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:343
 msgid "dishonorably attack the innocent!"
-msgstr ""
+msgstr "무고한 자를 비열하게 공격했다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:499
 #, c-format
@@ -5252,7 +5252,7 @@ msgstr "%s{은/는} 움직이지 않는 것 같다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:525
 msgid "have no way to attack monsters physically."
-msgstr ""
+msgstr "괴물을 물리적으로 공격할 방법이 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:530
 msgid "You cannot fight while so heavily loaded."
@@ -5278,11 +5278,11 @@ msgstr "맨"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:560
 msgid "miss wildly and stumble forwards."
-msgstr ""
+msgstr "크게 빗나가고 앞으로 비틀거린다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:605
 msgid "bloodthirsty blade attacks!"
-msgstr ""
+msgstr "피에 굶주린 칼날이 공격한다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:904
 #, c-format
@@ -5296,12 +5296,12 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:941
 #, c-format
 msgid "strike %s from behind!"
-msgstr ""
+msgstr "%s{을/를} 뒤에서 쳤다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:1110
 #, c-format
 msgid "break %s.  That's bad luck!"
-msgstr ""
+msgstr "%s{을/를} 부쉈다. 운이 나쁘군!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:1121
 #, c-format
@@ -5356,7 +5356,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:1229
 #: /home/jinhong_kim/workspace/HanNetHack/src/dothrow.c:2629
 msgid "Splat!"
-msgstr ""
+msgstr "철퍽!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:1255
 #, fuzzy, c-format
@@ -5383,21 +5383,21 @@ msgstr "독액이 %s{을/를} 태웠다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:1498
 msgid "dishonorably use a poisoned weapon!"
-msgstr ""
+msgstr "비열하게 독 무기를 사용했다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:1501
 msgid "like an evil coward for using a poisoned weapon."
-msgstr ""
+msgstr "독 무기를 사용한 비열한 겁쟁이 같다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:1525
 #, c-format
 msgid "joust %s%s"
-msgstr ""
+msgstr "%s{을/를} %s 찔렀다"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:1532
 #, c-format
 msgid "%s shatters on impact!"
-msgstr ""
+msgstr "%s{이/가} 충격에 산산조각났다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:1557
 #, c-format
@@ -5407,7 +5407,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:1607
 #, c-format
 msgid "%s divides as you hit it%s!"
-msgstr ""
+msgstr "%s{이/가} 맞고 분열했다%s!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:1627
 #, fuzzy
@@ -5439,7 +5439,7 @@ msgstr "혼란스러워졌다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:1898
 #, c-format
 msgid "%s %s no longer poisoned."
-msgstr ""
+msgstr "%s{이/가} 더 이상 독이 묻어있지 않다."
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -5469,11 +5469,11 @@ msgstr "%s %s{이/가} %s!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2065
 #: /home/jinhong_kim/workspace/HanNetHack/src/mhitu.c:1073
 msgid "grease wears off."
-msgstr ""
+msgstr "기름이 벗겨졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2117
 msgid "Some hell-p has arrived!"
-msgstr ""
+msgstr "지옥발 도움이 도착했다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2188
 #, c-format
@@ -5488,32 +5488,32 @@ msgstr "%s{을/를} 유혹했고 %s{이/가} %s 옷을 벗기 시작한다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2221
 #, c-format
 msgid "%s finishes taking off %s suit."
-msgstr ""
+msgstr "%s{이/가} 갑옷을 벗는 것을 마쳤다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2270
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2350
 #, c-format
 msgid "%s %s to pieces!"
-msgstr ""
+msgstr "%s{이/가} 산산조각났다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2284
 #: /home/jinhong_kim/workspace/HanNetHack/src/trap.c:4998
 msgid "rust!"
-msgstr ""
+msgstr "녹슬다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2362
 msgid "rot!"
-msgstr ""
+msgstr "썩다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2433
 #, c-format
 msgid "%s becomes weaker!"
-msgstr ""
+msgstr "%s{이/가} 약해졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2522
 #, c-format
 msgid "smell burning%s."
-msgstr ""
+msgstr "%s 타는 냄새가 난다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2532
 #, fuzzy, c-format
@@ -5527,7 +5527,7 @@ msgstr "%s!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2545
 msgid "go up in flames!"
-msgstr ""
+msgstr "불길에 휩싸였다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2551
 #: /home/jinhong_kim/workspace/HanNetHack/src/mhitu.c:1828
@@ -5566,7 +5566,7 @@ msgstr "서리가 차갑게 느껴지지 않는다!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2675
 #, c-format
 msgid "%s is zapped!"
-msgstr ""
+msgstr "%s{이/가} 감전되었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2678
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2710
@@ -5576,7 +5576,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2688
 msgid "get zapped!"
-msgstr ""
+msgstr "감전되었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2690
 #, fuzzy
@@ -5615,7 +5615,7 @@ msgstr "%s의 금화를 집었지만, 배낭에 공간이 없다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2821
 #, c-format
 msgid "%s steals some gold from %s."
-msgstr ""
+msgstr "%s{이/가} %s에게서 금화를 훔쳤다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2830
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2855
@@ -5624,7 +5624,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/teleport.c:1984
 #, c-format
 msgid "%s suddenly disappears!"
-msgstr ""
+msgstr "%s{이/가} 갑자기 사라졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:2846
 #: /home/jinhong_kim/workspace/HanNetHack/src/mhitm.c:1340
@@ -5664,7 +5664,7 @@ msgstr "%s 머리에서 글씨가 사라졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:3011
 msgid "chuckle."
-msgstr ""
+msgstr "킥킥 웃는다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:3024
 #: /home/jinhong_kim/workspace/HanNetHack/src/uhitm.c:3068
@@ -6385,33 +6385,33 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:108
 msgid "corridor disappears."
-msgstr ""
+msgstr "복도가 사라졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:114
 msgid "are encased in rock."
-msgstr ""
+msgstr "바위에 갇혔다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:269
 #, c-format
 msgid "%s becomes irate."
-msgstr ""
+msgstr "%s{이/가} 화났다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:445
 #, c-format
 msgid "Suddenly one of the Vault's %s enters!"
-msgstr ""
+msgstr "갑자기 금고의 %s{이/가} 들어왔다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:449
 msgid "Someone else has entered the Vault."
-msgstr ""
+msgstr "다른 누군가가 금고에 들어왔다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:460
 msgid "What's going on here?"
-msgstr ""
+msgstr "여기서 무슨 일이야?"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:463
 msgid "other presence vanishes."
-msgstr ""
+msgstr "다른 존재가 사라졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:472
 #, c-format
@@ -6421,7 +6421,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:476
 #, c-format
 msgid "Puzzled, %s turns around and leaves."
-msgstr ""
+msgstr "어리둥절한 %s{이/가} 돌아서 떠났다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:485
 #, c-format
@@ -6430,7 +6430,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:488
 msgid "I'll be back when you're ready to speak to me!"
-msgstr ""
+msgstr "말할 준비가 되면 다시 오겠다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:518
 #, fuzzy, c-format
@@ -6449,16 +6449,16 @@ msgstr "%s{은/는} 움직이지 않는 것 같다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:549
 msgid "I don't know you."
-msgstr ""
+msgstr "당신을 모르겠는데."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:554
 #, c-format
 msgid "%s stomps%s."
-msgstr ""
+msgstr "%s{이/가} 쿵쿵거린다%s."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:558
 msgid "Please follow me."
-msgstr ""
+msgstr "따라오시오."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:564
 #, fuzzy, c-format
@@ -6475,30 +6475,30 @@ msgstr "금화가 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:582
 msgid "Please drop that gold and follow me."
-msgstr ""
+msgstr "금화를 버리고 따라오시오."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:723
 #, c-format
 msgid "%s whispers an incantation."
-msgstr ""
+msgstr "%s{이/가} 주문을 속삭인다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:725
 msgid "a distant chant."
-msgstr ""
+msgstr "먼 곳에서 들리는 노랫소리."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:727
 msgid "A mysterious force moves the gold into the vault."
-msgstr ""
+msgstr "신비로운 힘이 금화를 금고로 옮긴다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:729
 msgid "damaged vault's walls are magically restored!"
-msgstr ""
+msgstr "손상된 금고의 벽이 마법으로 복원되었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:741
 #: /home/jinhong_kim/workspace/HanNetHack/src/shk.c:4314
 #: /home/jinhong_kim/workspace/HanNetHack/src/shk.c:5213
 msgid "Out of my way, scum!"
-msgstr ""
+msgstr "비켜라, 쓰레기!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:817
 #, fuzzy, c-format
@@ -6508,7 +6508,7 @@ msgstr "%s{을/를} 주웠다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:862
 #, c-format
 msgid "Suddenly, %s disappears."
-msgstr ""
+msgstr "갑자기 %s{이/가} 사라졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:936
 #, c-format
@@ -6522,26 +6522,26 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:968
 msgid "You've been warned, knave!"
-msgstr ""
+msgstr "경고했다, 악당!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:1001
 msgid "Well, begone."
-msgstr ""
+msgstr "그럼, 꺼져."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:1014
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:1177
 #, c-format
 msgid "%s, confused, disappears."
-msgstr ""
+msgstr "%s{이/가} 혼란스러워하며 사라졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:1028
 #, c-format
 msgid "%s holds out %s palm demandingly!"
-msgstr ""
+msgstr "%s{이/가} 손바닥을 내밀며 요구한다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:1032
 msgid "Drop all your gold, scoundrel!"
-msgstr ""
+msgstr "금화를 다 버려라, 악당!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:1038
 #, c-format
@@ -6550,16 +6550,16 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:1042
 msgid "So be it, rogue!"
-msgstr ""
+msgstr "그렇다면 어쩔 수 없지, 악당!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:1070
 msgid "Move along!"
-msgstr ""
+msgstr "비켜!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:1196
 #, c-format
 msgid "%s picks up some gold."
-msgstr ""
+msgstr "%s{이/가} 금화를 주웠다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:1218
 #, c-format
@@ -6569,7 +6569,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/vault.c:1228
 #, c-format
 msgid "%s remits your gold to the vault."
-msgstr ""
+msgstr "%s{이/가} 당신의 금화를 금고로 보낸다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/version.c:399
 #, c-format
@@ -6584,7 +6584,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:194
 #, c-format
 msgid "With %s effort you move %s."
-msgstr ""
+msgstr "%s 노력으로 %s{을/를} 옮겼다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:200
 #, fuzzy, c-format
@@ -6594,12 +6594,12 @@ msgstr "%s{이/가} %s{을/를} 빗맞았다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:253
 #, c-format
 msgid "%s tries to move %s, but cannot."
-msgstr ""
+msgstr "%s{이/가} %s{을/를} 옮기려 했지만 실패했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:256
 #, c-format
 msgid "try to move %s, but in vain."
-msgstr ""
+msgstr "%s{을/를} 옮기려 했지만 소용없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:279
 #, c-format
@@ -6614,16 +6614,16 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:318
 #, c-format
 msgid "%s pushes %s and suddenly it disappears!"
-msgstr ""
+msgstr "%s{이/가} %s{을/를} 밀자 갑자기 사라졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:321
 #, c-format
 msgid "push %s and suddenly it disappears!"
-msgstr ""
+msgstr "%s{을/를} 밀자 갑자기 사라졌다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:359
 msgid "That feels like a boulder."
-msgstr ""
+msgstr "바위 같은 느낌이다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:396
 #, c-format
@@ -6633,22 +6633,22 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:401
 #, c-format
 msgid "squeeze yourself %s the boulder."
-msgstr ""
+msgstr "바위 %s{으로/로} 비집고 들어갔다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:406
 #: /home/jinhong_kim/workspace/HanNetHack/src/trap.c:5364
 msgid "is a boulder in your way."
-msgstr ""
+msgstr "바위가 길을 막고 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:422
 #, c-format
 msgid "don't have enough leverage to push %s."
-msgstr ""
+msgstr "%s{을/를} 밀 힘이 충분하지 않다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:429
 #, c-format
 msgid "You're too small to push that %s."
-msgstr ""
+msgstr "%s{을/를} 밀기엔 너무 작다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:445
 #, c-format
@@ -6658,12 +6658,12 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:462
 #, c-format
 msgid "There's %s on the other side."
-msgstr ""
+msgstr "반대편에 %s{이/가} 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:466
 #, c-format
 msgid "a monster behind %s."
-msgstr ""
+msgstr "%s 뒤에 괴물이 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:476
 #, c-format
@@ -6688,11 +6688,11 @@ msgstr "멈췄다. %s{이/가} 길을 막고 있다!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:641
 #, c-format
 msgid "hurt your teeth on the %s."
-msgstr ""
+msgstr "%s에 이가 아프다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:652
 msgid "are too full to eat the bars."
-msgstr ""
+msgstr "너무 배불러서 철창을 먹을 수 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:668
 #, c-format
@@ -6706,40 +6706,40 @@ msgstr "%2$s{으로/로} %1$s{을/를} 때렸다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:714
 msgid "eat the boulder."
-msgstr ""
+msgstr "바위를 먹었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:842
 msgid "crash to the floor!"
-msgstr ""
+msgstr "바닥에 충돌했다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:849
 #, c-format
 msgid "fell on %s."
-msgstr ""
+msgstr "%s 위에 떨어졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1002
 msgid "is an obstacle there."
-msgstr ""
+msgstr "장애물이 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1014
 msgid "cannot pass through the bars."
-msgstr ""
+msgstr "철창을 통과할 수 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1031
 msgid "That drawbridge is up!"
-msgstr ""
+msgstr "도개교가 올라가 있다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1035
 msgid "Sokoban walls resist your ability."
-msgstr ""
+msgstr "소코반 벽이 당신의 능력을 저항한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1062
 msgid "ooze under the door."
-msgstr ""
+msgstr "문 아래로 스며든다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1065
 msgid "There is an obstacle there."
-msgstr ""
+msgstr "거기에 장애물이 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1075
 msgid "try to ooze under the door, but can't squeeze your possessions through."
@@ -6752,7 +6752,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1099
 msgid "Ouch!  You bump into a door."
-msgstr ""
+msgstr "아야! 문에 부딪혔다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1112
 #, fuzzy
@@ -6761,19 +6761,19 @@ msgstr "문이 닫히는 소리가 들린다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1127
 msgid "move diagonally into an intact doorway."
-msgstr ""
+msgstr "문틀로 대각선 이동할 수 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1139
 msgid "cannot pass that way."
-msgstr ""
+msgstr "그쪽으로 지나갈 수 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1143
 msgid "are carrying too much to get through."
-msgstr ""
+msgstr "지나가기에 너무 많이 들고 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1147
 msgid "body is too large to fit through."
-msgstr ""
+msgstr "몸이 너무 커서 통과할 수 없다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1155
 #, fuzzy, c-format
@@ -6786,40 +6786,40 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1391
 msgid "stop, unsure which way to go."
-msgstr ""
+msgstr "어느 쪽으로 갈지 몰라 멈췄다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1571
 msgid "Sting cuts through the web!"
-msgstr ""
+msgstr "스팅이 거미줄을 베었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1584
 #, c-format
 msgid "%s breaks out of the web."
-msgstr ""
+msgstr "%s{이/가} 거미줄에서 벗어났다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1586
 msgid "disentangle yourself."
-msgstr ""
+msgstr "몸을 빼냈다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1602
 #, c-format
 msgid "lead %s to the edge of the %s."
-msgstr ""
+msgstr "%s{을/를} %s의 가장자리로 이끌었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1605
 #, c-format
 msgid "pull yourself to the edge of the %s."
-msgstr ""
+msgstr "%s의 가장자리로 몸을 끌어당겼다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1653
 #, c-format
 msgid "%s finally %s free."
-msgstr ""
+msgstr "%s{이/가} 드디어 벗어났다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1656
 #, c-format
 msgid "finally %s free."
-msgstr ""
+msgstr "드디어 벗어났다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1677
 #, fuzzy, c-format
@@ -6828,7 +6828,7 @@ msgstr "%s에 의해 얼어붙었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1842
 msgid "(Tip: use the #enhance command to advance them.)"
-msgstr ""
+msgstr "(팁: #enhance 명령으로 향상시킬 수 있다.)"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1845
 #, c-format
@@ -6847,7 +6847,7 @@ msgstr "%2$s{으로/로} %1$s{을/를} 때렸다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:1922
 #, c-format
 msgid "Pardon me, %s."
-msgstr ""
+msgstr "실례합니다, %s."
 
 # ============================================================
 # 전투 메시지 (Combat Messages)
@@ -6865,7 +6865,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:2049
 #, c-format
 msgid "cut a web with %s%s%s!"
-msgstr ""
+msgstr "%s%s%s{으로/로} 거미줄을 잘랐다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:2058
 #, c-format
@@ -6875,7 +6875,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:2064
 #, c-format
 msgid "%s through the web."
-msgstr ""
+msgstr "거미줄을 %s."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:2106
 #, c-format
@@ -6904,7 +6904,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/hack.c:2194
 msgid "guilty about losing your pet like this."
-msgstr ""
+msgstr "이렇게 애완동물을 잃어서 죄책감이 든다."
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -7300,11 +7300,11 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/explode.c:780
 msgid "stone breaking."
-msgstr ""
+msgstr "돌이 부서지는 소리."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/explode.c:798
 msgid "stone crumbling."
-msgstr ""
+msgstr "돌이 부스러지는 소리."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:509
 #, fuzzy, c-format
@@ -7319,11 +7319,11 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:666
 #, c-format
 msgid "%s stops galloping."
-msgstr ""
+msgstr "%s{이/가} 질주를 멈췄다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:697
 msgid "have recovered from your illness."
-msgstr ""
+msgstr "병에서 회복했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:703
 #, fuzzy
@@ -7339,41 +7339,41 @@ msgstr "느려지는 것을 느꼈다."
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:788
 #: /home/jinhong_kim/workspace/HanNetHack/src/eat.c:2585
 msgid "fall asleep."
-msgstr ""
+msgstr "잠들었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:809
 msgid "land."
-msgstr ""
+msgstr "착지했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:823
 msgid "no longer feel safe from acid."
-msgstr ""
+msgstr "더 이상 산에서 안전하지 않다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:836
 msgid "no longer feel secure from petrification."
-msgstr ""
+msgstr "더 이상 석화에서 안전하지 않다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:851
 msgid "temporary ability to survive burning has ended."
-msgstr ""
+msgstr "화상 생존 능력이 끝났다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:856
 msgid "temporary ability to walk on liquid has ended."
-msgstr ""
+msgstr "액체 위를 걷는 능력이 끝났다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:870
 #, c-format
 msgid "are no longer warned about %s."
-msgstr ""
+msgstr "더 이상 %s에 대해 경고받지 않는다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:877
 msgid "hemmed in again."
-msgstr ""
+msgstr "다시 갇혔다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:879
 #, c-format
 msgid "You're back to your %s self again."
-msgstr ""
+msgstr "다시 %s 자신으로 돌아왔다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:886
 #, c-format
@@ -7382,7 +7382,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:916
 msgid "make a lot of noise!"
-msgstr ""
+msgstr "많은 소음을 냈다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1113
 #: /home/jinhong_kim/workspace/HanNetHack/src/apply.c:2447
@@ -7397,7 +7397,7 @@ msgstr "%s 맛이 난다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1126
 msgid "Gleep!"
-msgstr ""
+msgstr "끼익!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1251
 #, fuzzy, c-format
@@ -7407,7 +7407,7 @@ msgstr "%s{이/가} 당신을 물었다!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1254
 #, c-format
 msgid "trip over %s."
-msgstr ""
+msgstr "%s에 걸려 넘어졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1266
 #, c-format
@@ -7416,60 +7416,60 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1285
 msgid "lose your balance."
-msgstr ""
+msgstr "균형을 잃었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1304
 #, c-format
 msgid "trip over your own %s."
-msgstr ""
+msgstr "자신의 %s에 걸려 넘어졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1308
 #, c-format
 msgid "slip %s."
-msgstr ""
+msgstr "%s{을/를} 미끄러뜨렸다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1312
 msgid "flounder."
-msgstr ""
+msgstr "허우적거린다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1315
 msgid "stumble."
-msgstr ""
+msgstr "비틀거린다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1325
 #, c-format
 msgid "%s slip out of the stirrups."
-msgstr ""
+msgstr "%s{이/가} 등자에서 미끄러졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1329
 msgid "let go of the reins."
-msgstr ""
+msgstr "고삐를 놓쳤다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1332
 msgid "bang into the saddle-horn."
-msgstr ""
+msgstr "안장뿔에 부딪혔다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1335
 msgid "slide to one side of the saddle."
-msgstr ""
+msgstr "안장 한쪽으로 미끄러졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1350
 #, c-format
 msgid "%s flickers%s."
-msgstr ""
+msgstr "%s{이/가} 깜빡인다%s."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1365
 msgid "lantern is getting dim."
-msgstr ""
+msgstr "랜턴이 어두워지고 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1367
 msgid "Batteries have not been invented yet."
-msgstr ""
+msgstr "아직 배터리가 발명되지 않았다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1373
 #, c-format
 msgid "%s lantern is getting dim."
-msgstr ""
+msgstr "%s 랜턴이 어두워지고 있다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1452
 #, c-format
@@ -7479,7 +7479,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1497
 #, c-format
 msgid "%s seems about to go out."
-msgstr ""
+msgstr "%s{이/가} 꺼지려 한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1517
 #, c-format
@@ -7489,7 +7489,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1519
 #, c-format
 msgid "%s has gone out."
-msgstr ""
+msgstr "%s{이/가} 꺼졌다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1555
 #, c-format
@@ -7516,11 +7516,11 @@ msgstr "%s %s{이/가} %s!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1881
 msgid "Kaboom!!!  Boom!!  Boom!!"
-msgstr ""
+msgstr "콰광!!! 쾅!! 쾅!!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/timeout.c:1891
 msgid "a rumbling noise."
-msgstr ""
+msgstr "우르릉거리는 소리."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/role.c:1587
 #: /home/jinhong_kim/workspace/HanNetHack/src/role.c:1605
@@ -7645,17 +7645,17 @@ msgstr "이대로 진행할까요? [yn%sq]"
 #: /home/jinhong_kim/workspace/HanNetHack/src/dungeon.c:1562
 #, c-format
 msgid "sense something below your %s."
-msgstr ""
+msgstr "%s 아래에 무언가를 감지했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/dungeon.c:2488
 #, c-format
 msgid "remember this level as %s."
-msgstr ""
+msgstr "이 층을 %s{으로/로} 기억한다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/quest.c:160
 #, c-format
 msgid "are currently %s instead of %s."
-msgstr ""
+msgstr "현재 %s 대신 %s이다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/quest.c:163
 #, fuzzy
@@ -7670,31 +7670,31 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/quest.c:246
 #, c-format
 msgid "Ah, I see you've found %s."
-msgstr ""
+msgstr "아, %s{을/를} 찾았군요."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/quest.c:443
 #, c-format
 msgid "%s speaks:"
-msgstr ""
+msgstr "%s{이/가} 말한다:"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/quest.c:445
 msgid "I'm finally free!"
-msgstr ""
+msgstr "드디어 자유다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:951
 #, c-format
 msgid "are blasted by %s power!"
-msgstr ""
+msgstr "%s의 힘에 폭발당했다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:966
 #, c-format
 msgid "%s your grasp!"
-msgstr ""
+msgstr "%s{이/가} 손아귀에서 벗어났다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:968
 #, c-format
 msgid "%s beyond your control!"
-msgstr ""
+msgstr "%s{이/가} 통제 불능이다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1305
 #, c-format
@@ -7703,21 +7703,21 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1333
 msgid "lose magical energy!"
-msgstr ""
+msgstr "마법 에너지를 잃었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1348
 msgid "absorb magical energy!"
-msgstr ""
+msgstr "마법 에너지를 흡수했다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1364
 #, c-format
 msgid "release %s!"
-msgstr ""
+msgstr "%s{을/를} 풀어줬다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1383
 #, c-format
 msgid "%s is insightful."
-msgstr ""
+msgstr "%s{이/가} 통찰력이 있다."
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -7751,27 +7751,27 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1555
 #, c-format
 msgid "slice %s wide open!"
-msgstr ""
+msgstr "%s{을/를} 크게 베었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1566
 #, c-format
 msgid "slice deeply into %s!"
-msgstr ""
+msgstr "%s{을/를} 깊이 베었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1568
 #, c-format
 msgid "%s cuts deeply into %s!"
-msgstr ""
+msgstr "%s{이/가} %s{을/를} 깊이 베었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1574
 #, c-format
 msgid "%s cuts %s in half!"
-msgstr ""
+msgstr "%s{이/가} %s{을/를} 반으로 잘랐다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1579
 #, c-format
 msgid "%s cuts deeply into you!"
-msgstr ""
+msgstr "%s{이/가} 당신을 깊이 베었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1591
 #, fuzzy, c-format
@@ -7781,7 +7781,7 @@ msgstr "%s{이/가} 당신을 때렸다!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1606
 #, c-format
 msgid "Somehow, you miss %s wildly."
-msgstr ""
+msgstr "어쩐지 %s{을/를} 크게 빗나갔다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1608
 #, fuzzy, c-format
@@ -7834,7 +7834,7 @@ msgstr "%s{이/가} 당신을 쏘았다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1765
 msgid "a surge of power, but nothing seems to happen."
-msgstr ""
+msgstr "힘의 급증, 하지만 아무 일도 일어나지 않는 것 같다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1790
 #: /home/jinhong_kim/workspace/HanNetHack/src/zap.c:2901
@@ -7844,20 +7844,20 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1829
 msgid "re-energized."
-msgstr ""
+msgstr "재충전되었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1922
 #: /home/jinhong_kim/workspace/HanNetHack/src/teleport.c:1176
 msgid "very disoriented for a moment."
-msgstr ""
+msgstr "잠시 매우 혼란스러웠다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1925
 msgid "are surrounded by a shimmering sphere!"
-msgstr ""
+msgstr "반짝이는 구에 둘러싸였다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:1927
 msgid "weightless for a moment."
-msgstr ""
+msgstr "잠시 무중력 상태."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:2011
 #, c-format
@@ -7873,25 +7873,25 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:2120
 #: /home/jinhong_kim/workspace/HanNetHack/src/mcastu.c:383
 msgid "drained..."
-msgstr ""
+msgstr "빠져나간다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:2205
 msgid "like a rabble-rouser."
-msgstr ""
+msgstr "선동가처럼 느껴진다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:2207
 msgid "the tension decrease around you."
-msgstr ""
+msgstr "주변의 긴장이 줄어든다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:2223
 #: /home/jinhong_kim/workspace/HanNetHack/src/eat.c:2301
 #, c-format
 msgid "body takes on a %s transparency..."
-msgstr ""
+msgstr "몸이 %s 투명해진다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:2226
 msgid "body seems to unfade..."
-msgstr ""
+msgstr "몸이 다시 나타나는 것 같다..."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:2292
 #: /home/jinhong_kim/workspace/HanNetHack/src/wizcmds.c:256
@@ -7911,7 +7911,7 @@ msgstr "%s %s{이/가} %s!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:2494
 #, c-format
 msgid "%s %s slightly."
-msgstr ""
+msgstr "%s{이/가} 약간 %s."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/artifact.c:2498
 #, fuzzy, c-format
@@ -7940,7 +7940,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/exper.c:315
 msgid "more experienced."
-msgstr ""
+msgstr "더 경험이 쌓였다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/exper.c:350
 #, c-format
@@ -7950,11 +7950,11 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/sounds.c:71
 #: /home/jinhong_kim/workspace/HanNetHack/src/dokick.c:1141
 msgid "a low buzzing."
-msgstr ""
+msgstr "낮은 윙윙거림."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/sounds.c:75
 msgid "an angry drone."
-msgstr ""
+msgstr "화난 윙윙 소리."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/sounds.c:79
 #, c-format
@@ -7963,7 +7963,7 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/sounds.c:98
 msgid "suddenly realize it is unnaturally quiet."
-msgstr ""
+msgstr "갑자기 비정상적으로 조용하다는 것을 깨달았다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/sounds.c:101
 #, fuzzy, c-format
@@ -7977,15 +7977,15 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/sounds.c:261
 msgid "someone searching."
-msgstr ""
+msgstr "누군가 수색하는 소리."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/sounds.c:270
 msgid "the footsteps of a guard on patrol."
-msgstr ""
+msgstr "순찰 중인 경비병의 발소리."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/sounds.c:273
 msgid "Ebenezer Scrooge!"
-msgstr ""
+msgstr "에베네저 스크루지!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/sounds.c:532
 msgid "I'm hungry."
@@ -9653,7 +9653,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/pickup.c:2926
 #: /home/jinhong_kim/workspace/HanNetHack/src/apply.c:328
 msgid "have no hands!"
-msgstr ""
+msgstr "손이 없다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/pickup.c:2200
 msgid "Being confused, you find nothing to loot."
@@ -10767,17 +10767,17 @@ msgstr "%s에 의해 얼어붙었다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/apply.c:82
 msgid "Using your camera underwater would void the warranty."
-msgstr ""
+msgstr "카메라를 수중에서 사용하면 보증이 무효화된다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/apply.c:97
 #, c-format
 msgid "take a picture of %s %s."
-msgstr ""
+msgstr "%s의 %s{을/를} 촬영했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/apply.c:100
 #, c-format
 msgid "take a picture of the %s."
-msgstr ""
+msgstr "%s{을/를} 촬영했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/apply.c:117
 #, fuzzy, c-format
@@ -10786,7 +10786,7 @@ msgstr "독액이 %s{을/를} 태웠다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/apply.c:120
 msgid "cannot use it while you're wearing it!"
-msgstr ""
+msgstr "착용 중에는 사용할 수 없다!"
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/apply.c:138
 #, c-format
@@ -10806,7 +10806,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/apply.c:168
 #, c-format
 msgid "wipe off your %s."
-msgstr ""
+msgstr "%s{을/를} 닦는다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/apply.c:190
 #, c-format
@@ -13896,7 +13896,7 @@ msgstr ""
 #: /home/jinhong_kim/workspace/HanNetHack/src/shk.c:1374
 #, c-format
 msgid "%s calms down."
-msgstr ""
+msgstr "%s{이/가} 진정되었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/shk.c:1724
 msgid "appears to be no shopkeeper here to receive your payment."
@@ -17015,7 +17015,7 @@ msgstr "윽 - 독이 있었던 게 틀림없다!"
 #: /home/jinhong_kim/workspace/HanNetHack/src/eat.c:1931
 #: /home/jinhong_kim/workspace/HanNetHack/src/eat.c:2795
 msgid "seem unaffected by the poison."
-msgstr ""
+msgstr "독의 영향을 받지 않는 것 같다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/eat.c:1956
 msgid "corpse rots away completely."
@@ -17174,11 +17174,11 @@ msgstr ""
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/eat.c:3417
 msgid "faint from lack of food."
-msgstr ""
+msgstr "음식 부족으로 기절했다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/eat.c:3436
 msgid "die from starvation."
-msgstr ""
+msgstr "굶주림으로 죽었다."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/eat.c:3483
 #, c-format
