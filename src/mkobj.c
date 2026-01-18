@@ -3822,7 +3822,7 @@ pudding_merge_message(struct obj *otmp, struct obj *otmp2)
     if ((!Blind && visible) || inpack) {
         if (Hallucination) {
             if (onfloor) {
-                You_see("parts of the floor melting!");
+                You_see(_("parts of the floor melting!"));
             } else if (inpack) {
                 Your(_("pack reaches out and grabs something!"));
             }

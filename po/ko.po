@@ -1670,15 +1670,27 @@ msgstr "%s{이/가} 화났다!"
 msgid "a door unlock and open."
 msgstr "문이 열리는 소리."
 
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 #
 #: /home/jinhong_kim/workspace/HanNetHack/src/monmove.c:1587
+#, fuzzy
 msgid "a door open."
-msgstr "문이 열리는 소리."
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"문이 열리는 소리.\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"문이 열리는 것을."
 
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 #
 #: /home/jinhong_kim/workspace/HanNetHack/src/monmove.c:1612
+#, fuzzy
 msgid "a door crash open."
-msgstr "문이 쾅 열리는 소리."
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"문이 쾅 열리는 소리.\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"문이 부서지며 열리는 것을."
 
 #: /home/jinhong_kim/workspace/HanNetHack/src/monmove.c:1832
 msgid "I'm late!"
@@ -20576,6 +20588,118 @@ msgstr "유령에게 겁먹음"
 
 msgid "Resuming regular play."
 msgstr "일반 플레이 재개."
+
+# You_see and interrupt_multi messages
+msgid "You feel full of energy."
+msgstr "기운이 넘친다."
+
+msgid "You are in full health."
+msgstr "완전히 건강하다."
+
+msgid "%s %s out of your pack!"
+msgstr "%s{이} 가방에서 %s!"
+
+msgid "%s hatch."
+msgstr "%s{이} 부화했다."
+
+msgid "%s %s out of %s!"
+msgstr "%s{이} %s에서 %s!"
+
+msgid "%s flicker%s."
+msgstr "%s{이} 깜빡%s인다."
+
+msgid "a lantern getting dim."
+msgstr "랜턴이 어두워지는 것을."
+
+msgid "a burning potion of oil go out."
+msgstr "불타는 기름 물약이 꺼지는 것을."
+
+msgid "%s about to go out."
+msgstr "%s{이} 곧 꺼질 것 같다."
+
+msgid "a lantern run out of power."
+msgstr "랜턴의 전력이 다한 것을."
+
+msgid "%s go out."
+msgstr "%s{이} 꺼진다."
+
+msgid "%scandle%s getting short."
+msgstr "%s촛불%s이 짧아지는 것을."
+
+msgid "%scandle%s flame%s flicker low!"
+msgstr "%s촛불%s의 불꽃%s이 약해진다!"
+
+msgid "a candelabrum's flame%s die."
+msgstr "촛대의 불꽃%s이 꺼지는 것을."
+
+msgid "%s%s consumed!"
+msgstr "%s%s 다 탔다!"
+
+msgid "a %s erupt from the %s!"
+msgstr "%s{이} %s에서 분출하는 것을!"
+
+msgid "%s %spit below you."
+msgstr "%s %s구덩이가 아래에 있는 것을."
+
+msgid "a strange vibration beneath %s."
+msgstr "%s 아래에서 이상한 진동이."
+
+msgid "the ground vibrate %s."
+msgstr "땅이 %s 진동하는 것을."
+
+msgid "%s start to roll."
+msgstr "%s{이} 굴러가기 시작하는 것을."
+
+msgid "a flash of light!"
+msgstr "섬광이!"
+
+msgid "%s hit lava and burn up!"
+msgstr "%s{이} 용암에 닿아 타버리는 것을!"
+
+msgid "goldfish swimming above fluorescent rocks."
+msgstr "형광 바위 위에서 헤엄치는 금붕어를."
+
+msgid "tiny snowflakes spinning around a miniature farmhouse."
+msgstr "미니어처 농가 주위를 맴도는 작은 눈송이를."
+
+msgid "%s, %s."
+msgstr "%s, %s."
+
+msgid "the Wizard of Yendor gazing out at you."
+msgstr "옌도르의 마법사가 당신을 응시하는 것을."
+
+msgid "a drawbridge %s up!"
+msgstr "도개교가 %s 올라가는 것을!"
+
+msgid "a drawbridge %s down!"
+msgstr "도개교가 %s 내려가는 것을!"
+
+msgid "a message scrawled in blood here."
+msgstr "피로 휘갈겨 쓴 메시지를."
+
+msgid "parts of the floor melting!"
+msgstr "바닥의 일부가 녹는 것을!"
+
+msgid "%s %s under %s."
+msgstr "%s{이} %s 밑에서 %s."
+
+msgid "%s gas cloud%s dissipate."
+msgstr "%s 가스 구름%s이 흩어지는 것을."
+
+msgid "%s %s out of your pack%s!"
+msgstr "%s{이} 가방에서 %s%s!"
+
+msgid "a figurine transform into %s%s!"
+msgstr "조각상이 %s%s(으)로 변하는 것을!"
+
+msgid "%s %s out of %s%s!"
+msgstr "%s{이} %s에서 %s%s!"
+
+msgid "%s streaks on the %s."
+msgstr "%s 줄무늬가 %s에 있는 것을."
+
+msgid "the pages glow faintly %s."
+msgstr "페이지가 희미하게 %s 빛나는 것을."
 
 #~ msgid "You feel like someone is helping you."
 #~ msgstr "누군가 도와주는 것 같다."

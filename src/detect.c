@@ -1279,7 +1279,7 @@ use_crystal_ball(struct obj **optr)
                           hcolor((char *) 0));
                 break;
             case 4:
-                You_see("goldfish swimming above fluorescent rocks.");
+                You_see(_("goldfish swimming above fluorescent rocks."));
                 break;
             case 5:
                 You_see(
@@ -1352,14 +1352,14 @@ use_crystal_ball(struct obj **optr)
             ret = trap_detect((struct obj *) 0);
         } else {
             i = rn2(SIZE(level_detects));
-            You_see("%s, %s.", level_detects[i].what,
+            You_see(_("%s, %s."), level_detects[i].what,
                     level_distance(level_detects[i].where));
             ret = 0;
         }
 
         if (ret) {
             if (!rn2(100)) /* make them nervous */
-                You_see("the Wizard of Yendor gazing out at you.");
+                You_see(_("the Wizard of Yendor gazing out at you."));
             else
                 pline_The(_("vision is unclear."));
         }

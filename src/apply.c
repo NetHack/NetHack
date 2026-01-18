@@ -2447,7 +2447,7 @@ fig_transform(anything *arg, long timeout)
                 You_feel(_("%s %s from your pack!"), something,
                          locomotion(mtmp->data, "drop"));
             else
-                You_see("%s %s out of your pack%s!", monnambuf,
+                You_see(_("%s %s out of your pack%s!"), monnambuf,
                         locomotion(mtmp->data, "drop"), and_vanish);
             break;
 
@@ -2457,7 +2457,7 @@ fig_transform(anything *arg, long timeout)
                 if (suppress_see)
                     pline(_("%s suddenly vanishes!"), an(xname(figurine)));
                 else
-                    You_see("a figurine transform into %s%s!", monnambuf,
+                    You_see(_("a figurine transform into %s%s!"), monnambuf,
                             and_vanish);
                 redraw = TRUE; /* update figurine's map location */
             }
@@ -2476,7 +2476,7 @@ fig_transform(anything *arg, long timeout)
                     Strcpy(carriedby, "empty water");
                 else
                     Strcpy(carriedby, "thin air");
-                You_see("%s %s out of %s%s!", monnambuf,
+                You_see(_("%s %s out of %s%s!"), monnambuf,
                         locomotion(mtmp->data, "drop"), carriedby,
                         and_vanish);
             }
@@ -2799,7 +2799,7 @@ use_stone(struct obj *tstone)
             streak_color ? streak_color : (const char *) "",
             streak_color ? " " : "", stonebuf);
     else if (streak_color)
-        You_see("%s streaks on the %s.", streak_color, stonebuf);
+        You_see(_("%s streaks on the %s."), streak_color, stonebuf);
     else
         pline(scritch);
     return ECMD_TIME;
@@ -4483,7 +4483,7 @@ flip_through_book(struct obj *obj)
                      Hallucination ? "chuckling"
                                    : "rustling");
         } else if (!Blind) {
-            You_see("the pages glow faintly %s.", hcolor(NH_RED));
+            You_see(_("the pages glow faintly %s."), hcolor(NH_RED));
         } else {
             You_feel(_("the pages tremble."));
         }

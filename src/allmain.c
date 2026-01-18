@@ -611,7 +611,7 @@ regen_pw(int wtcap)
             u.uen = u.uenmax;
         disp.botl = TRUE;
         if (u.uen == u.uenmax)
-            interrupt_multi("You feel full of energy.");
+            interrupt_multi(_("You feel full of energy."));
     }
 }
 
@@ -672,7 +672,7 @@ regen_hp(int wtcap)
     }
 
     if (reached_full)
-        interrupt_multi("You are in full health.");
+        interrupt_multi(_("You are in full health."));
 }
 
 #undef U_CAN_REGEN

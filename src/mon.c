@@ -2953,7 +2953,7 @@ vamprises(struct monst *mtmp)
             if (!seeit)
                 You_hear(_("%s."), trapped ? "an explosion" : door_smashed);
             else if (!canspotmon(mtmp))
-                You_see("%s.", trapped ? door_go_boom : door_smashed);
+                You_see(_("%s."), trapped ? door_go_boom : door_smashed);
             else if (!Unaware)
                 pline_The(_("door is smashed%s"),
                           trapped ? " and it explodes!" : ".");
@@ -4785,7 +4785,7 @@ hideunder(struct monst *mtmp)
             if (!locomo)
                 locomo = locomotion(mtmp->data, "hide");
             set_msg_xy(mtmp->mx, mtmp->my); /* pline() will reset this */
-            You_see("%s %s under %s.", seenmon, locomo, seenobj);
+            You_see(_("%s %s under %s."), seenmon, locomo, seenobj);
             iflags.last_msg = PLNMSG_HIDE_UNDER;
             gl.last_hider = mtmp->m_id;
         }

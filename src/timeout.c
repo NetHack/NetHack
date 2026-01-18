@@ -1113,7 +1113,7 @@ hatch_egg(anything *arg, long timeout)
                 You_feel(_("%s %s from your pack!"), something,
                          locomotion(mon->data, "drop"));
             else
-                You_see("%s %s out of your pack!", monnambuf,
+                You_see(_("%s %s out of your pack!"), monnambuf,
                         locomotion(mon->data, "drop"));
             if (yours) {
                 pline(_("%s %s %s like \"%s%s\""),
@@ -1130,7 +1130,7 @@ hatch_egg(anything *arg, long timeout)
         case OBJ_FLOOR:
             if (cansee_hatchspot) {
                 knows_egg = TRUE;
-                You_see("%s hatch.", monnambuf);
+                You_see(_("%s hatch."), monnambuf);
                 redraw = TRUE; /* update egg's map location */
             }
             break;
@@ -1149,7 +1149,7 @@ hatch_egg(anything *arg, long timeout)
                 } else {
                     Strcpy(carriedby, "thin air");
                 }
-                You_see("%s %s out of %s!", monnambuf,
+                You_see(_("%s %s out of %s!"), monnambuf,
                         locomotion(mon->data, "drop"), carriedby);
             }
             break;
@@ -1350,7 +1350,7 @@ see_lamp_flicker(struct obj *obj, const char *tailer)
         pline(_("%s flickers%s."), Yname2(obj), tailer);
         break;
     case OBJ_FLOOR:
-        You_see("%s flicker%s.", an(xname(obj)), tailer);
+        You_see(_("%s flicker%s."), an(xname(obj)), tailer);
         break;
     }
 }
@@ -1367,7 +1367,7 @@ lantern_message(struct obj *obj)
             pline(_("Batteries have not been invented yet."));
         break;
     case OBJ_FLOOR:
-        You_see("a lantern getting dim.");
+        You_see(_("a lantern getting dim."));
         break;
     case OBJ_MINVENT:
         pline(_("%s lantern is getting dim."), s_suffix(Monnam(obj->ocarry)));
@@ -1452,7 +1452,7 @@ burn_object(anything *arg, long timeout)
                 pline(_("%spotion of oil has burnt away."), whose);
                 break;
             case OBJ_FLOOR:
-                You_see("a burning potion of oil go out.");
+                You_see(_("a burning potion of oil go out."));
                 need_newsym = TRUE;
                 break;
             }
@@ -1497,7 +1497,7 @@ burn_object(anything *arg, long timeout)
                         pline(_("%s seems about to go out."), Yname2(obj));
                         break;
                     case OBJ_FLOOR:
-                        You_see("%s about to go out.", an(xname(obj)));
+                        You_see(_("%s about to go out."), an(xname(obj)));
                         break;
                     }
                 }
@@ -1520,9 +1520,9 @@ burn_object(anything *arg, long timeout)
                     break;
                 case OBJ_FLOOR:
                     if (obj->otyp == BRASS_LANTERN)
-                        You_see("a lantern run out of power.");
+                        You_see(_("a lantern run out of power."));
                     else
-                        You_see("%s go out.", an(xname(obj)));
+                        You_see(_("%s go out."), an(xname(obj)));
                     break;
                 }
             }
@@ -1557,7 +1557,7 @@ burn_object(anything *arg, long timeout)
                           many ? "s are" : " is");
                     break;
                 case OBJ_FLOOR:
-                    You_see("%scandle%s getting short.",
+                    You_see(_("%scandle%s getting short."),
                             menorah ? "a candelabrum's " : many ? "some "
                                                                 : "a ",
                             many ? "s" : "");
@@ -1575,7 +1575,7 @@ burn_object(anything *arg, long timeout)
                           many ? "s" : "", many ? "" : "s");
                     break;
                 case OBJ_FLOOR:
-                    You_see("%scandle%s flame%s flicker low!",
+                    You_see(_("%scandle%s flame%s flicker low!"),
                             menorah ? "a candelabrum's " : many ? "some "
                                                                 : "a ",
                             many ? "s'" : "'s", many ? "s" : "");
@@ -1597,7 +1597,7 @@ burn_object(anything *arg, long timeout)
                               many ? "s die" : " dies");
                         break;
                     case OBJ_FLOOR:
-                        You_see("a candelabrum's flame%s die.",
+                        You_see(_("a candelabrum's flame%s die."),
                                 many ? "s" : "");
                         break;
                     }
@@ -1617,7 +1617,7 @@ burn_object(anything *arg, long timeout)
                           You see some wax candles consumed!
                           You see a wax candle consumed!
                          */
-                        You_see("%s%s consumed!", many ? "some " : "",
+                        You_see(_("%s%s consumed!"), many ? "some " : "",
                                 many ? xname(obj) : an(xname(obj)));
                         need_newsym = TRUE;
                         break;

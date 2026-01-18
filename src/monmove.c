@@ -1582,7 +1582,7 @@ postmov(
                         if (canseeit && canspotmon(mtmp)) {
                             pline_mon(mtmp, "%s opens a door.", Monnam(mtmp));
                         } else if (canseeit) {
-                            You_see("a door open.");
+                            You_see(_("a door open."));
                         } else if (!Deaf) {
                             You_hear(_("a door open."));
                         }
@@ -1607,7 +1607,7 @@ postmov(
                             pline_mon(mtmp, "%s smashes down a door.",
                                       Monnam(mtmp));
                         } else if (canseeit) {
-                            You_see("a door crash open.");
+                            You_see(_("a door crash open."));
                         } else if (!Deaf) {
                             You_hear(_("a door crash open."));
                         }

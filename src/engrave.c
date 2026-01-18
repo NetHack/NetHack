@@ -360,7 +360,7 @@ read_engr_at(coordxy x, coordxy y)
              */
             if (!Blind) {
                 sensed = 1;
-                You_see("a message scrawled in blood here.");
+                You_see(_("a message scrawled in blood here."));
             }
             break;
         default:

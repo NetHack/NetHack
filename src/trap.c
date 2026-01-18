@@ -1734,7 +1734,7 @@ trapeffect_fire_trap(
                   surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
         else if (see_it) { /* evidently `mtmp' is invisible */
             set_msg_xy(mtmp->mx, mtmp->my);
-            You_see("a %s erupt from the %s!", tower_of_flame,
+            You_see(_("a %s erupt from the %s!"), tower_of_flame,
                     surface(mtmp->mx, mtmp->my));
         }
         if (resists_fire(mtmp)) {
@@ -1834,7 +1834,7 @@ trapeffect_pit(
         feeltrap(trap);
         if (!Sokoban && is_clinger(gy.youmonst.data) && !plunged) {
             if (already_known) {
-                You_see("%s %spit below you.", a_your[trap->madeby_u],
+                You_see(_("%s %spit below you."), a_your[trap->madeby_u],
                         ttype == SPIKED_PIT ? "spiked " : "");
             } else {
                 pline(_("%s pit %sopens up under you!"), A_Your[trap->madeby_u],
@@ -2678,11 +2678,11 @@ trapeffect_vibrating_square(
                     /* avoid "beneath 'rear paws'" or 'rear hooves' */
                     (void) strsubst(p, "rear ", "");
                 }
-                You_see("a strange vibration beneath %s.", buf);
+                You_see(_("a strange vibration beneath %s."), buf);
             } else {
                 /* notice something (hearing uses a larger threshold
                    for 'nearby') */
-                You_see("the ground vibrate %s.",
+                You_see(_("the ground vibrate %s."),
                         (mdistu(mtmp) <= 2 * 2)
                            ? "nearby" : "in the distance");
             }
@@ -3245,7 +3245,7 @@ launch_obj(
     case ROLL | LAUNCH_UNSEEN:
         if (otyp == BOULDER) {
             if (cansee(x1, y1)) {
-                You_see("%s start to roll.", an(xname(singleobj)));
+                You_see(_("%s start to roll."), an(xname(singleobj)));
             } else if (Hallucination) {
                 Soundeffect(se_someone_bowling, 60);
                 You_hear(_("someone bowling."));
@@ -4238,7 +4238,7 @@ domagictrap(void)
             if (!Blind)
                 Your1(vision_clears);
         } else if (!Blind) {
-            You_see("a flash of light!");
+            You_see(_("a flash of light!"));
         }
 
         /* deafness effects */
@@ -4509,7 +4509,7 @@ lava_damage(struct obj *obj, coordxy x, coordxy y)
                 pline(_("%s %s up!"), is_plural(obj) ? "They" : "It",
                       otense(obj, "burn"));
             else
-                You_see("%s hit lava and burn up!", doname(obj));
+                You_see(_("%s hit lava and burn up!"), doname(obj));
         }
         if (carried(obj)) { /* shouldn't happen */
             remove_worn_item(obj, TRUE);

@@ -763,7 +763,7 @@ close_drawbridge(coordxy x, coordxy y)
     y2 = y;
     get_wall_for_db(&x2, &y2);
     if (cansee(x, y) || cansee(x2, y2)) {
-        You_see("a drawbridge %s up!",
+        You_see(_("a drawbridge %s up!"),
                 (((u.ux == x || u.uy == y) && !Underwater)
                  || distu(x2, y2) < distu(x, y))
                     ? "coming"
@@ -828,7 +828,7 @@ open_drawbridge(coordxy x, coordxy y)
     y2 = y;
     get_wall_for_db(&x2, &y2);
     if (cansee(x, y) || cansee(x2, y2)) {
-        You_see("a drawbridge %s down!",
+        You_see(_("a drawbridge %s down!"),
                 (distu(x2, y2) < distu(x, y)) ? "going" : "coming");
     } else { /* "5 gears turn" for castle drawbridge tune */
         Soundeffect(se_gears_turning_chains_rattling, 100);
