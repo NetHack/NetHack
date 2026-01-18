@@ -807,7 +807,7 @@ dodiscovered(void) /* free after Robert Viduya */
         }
     }
     if (ct == 0) {
-        You("haven't discovered anything yet...");
+        You(_("haven't discovered anything yet..."));
     } else {
         if (sorted_ct) {
             /* if we're alphabetizing by class, we've already shown the
@@ -1104,9 +1104,9 @@ rename_disco(void)
         }
     }
     if (ct == 0) {
-        You("haven't discovered anything yet...");
+        You(_("haven't discovered anything yet..."));
     } else if (mn == 0) {
-        pline("None of your discoveries can be assigned names...");
+        pline(_("None of your discoveries can be assigned names..."));
     } else {
         end_menu(tmpwin, "Pick an object type to name");
         dis = STRANGE_OBJECT;

@@ -218,26 +218,26 @@ cmdq_print(int q)
     char buf[QBUFSZ];
     struct _cmd_queue *cq = gc.command_queue[q];
 
-    pline("CQ:%i", q);
+    pline(_("CQ:%i"), q);
     while (cq) {
         switch (cq->typ) {
         case CMDQ_KEY:
-            pline("(key:%s)", key2txt(cq->key, buf));
+            pline(_("(key:%s)"), key2txt(cq->key, buf));
             break;
         case CMDQ_EXTCMD:
-            pline("(extcmd:#%s)", cq->ec_entry->ef_txt);
+            pline(_("(extcmd:#%s)"), cq->ec_entry->ef_txt);
             break;
         case CMDQ_DIR:
-            pline("(dir:%i,%i,%i)", cq->dirx, cq->diry, cq->dirz);
+            pline(_("(dir:%i,%i,%i)"), cq->dirx, cq->diry, cq->dirz);
             break;
         case CMDQ_USER_INPUT:
-            pline("(userinput)");
+            pline(_("(userinput)"));
             break;
         case CMDQ_INT:
-            pline("(int:%i)", cq->intval);
+            pline(_("(int:%i)"), cq->intval);
             break;
         default:
-            pline("(ERROR:%i)",cq->typ);
+            pline(_("(ERROR:%i)"),cq->typ);
             break;
         }
         cq = cq->next;
@@ -476,7 +476,7 @@ can_do_extcmd(const struct ext_func_tab *extcmd)
         pline(unavailcmd, extcmd->ef_txt);
         return FALSE;
     } else if (u.uburied && !(ecflags & IFBURIED)) {
-        You_cant("do that while you are buried!");
+        You_cant(_("do that while you are buried!"));
         return FALSE;
     } else if (iflags.debug_fuzzer && (ecflags & NOFUZZERCMD)) {
         return FALSE;
@@ -501,7 +501,7 @@ doextcmd(void)
         if (!can_do_extcmd(&extcmdlist[idx]))
             return ECMD_OK;
         if (iflags.menu_requested && !accept_menu_prefix(&extcmdlist[idx])) {
-            pline("'%s' prefix has no effect for the %s command.",
+            pline(_("'%s' prefix has no effect for the %s command."),
                   visctrl(cmd_from_func(do_reqmenu)),
                   extcmdlist[idx].ef_txt);
             iflags.menu_requested = FALSE;
@@ -920,15 +920,15 @@ domonability(void)
                magical breathing */
             (void) split_mon(&gy.youmonst, (struct monst *) 0);
         } else {
-            There("is no fountain here.");
+            There(_("is no fountain here."));
         }
     } else if (is_unicorn(uptr)) {
         use_unicorn_horn((struct obj **) 0);
         return ECMD_TIME;
     } else if (uptr->msound == MS_SHRIEK) {
-        You("shriek.");
+        You(_("shriek."));
         if (u.uburied)
-            pline("Unfortunately sound does not carry well through rock.");
+            pline(_("Unfortunately sound does not carry well through rock."));
         else
             aggravate();
     } else if (is_vampire(uptr) || is_vampshifter(&gy.youmonst)) {
@@ -937,9 +937,9 @@ domonability(void)
         (void) pet_ranged_attk(u.usteed, TRUE);
         return ECMD_TIME;
     } else if (Upolyd) {
-        pline("Any special ability you may have is purely reflexive.");
+        pline(_("Any special ability you may have is purely reflexive."));
     } else {
-        You("don't have a special ability in your normal form!");
+        You(_("don't have a special ability in your normal form!"));
     }
     return ECMD_OK;
 }
@@ -948,13 +948,13 @@ int
 enter_explore_mode(void)
 {
     if (discover) {
-        You("are already in explore mode.");
+        You(_("are already in explore mode."));
     } else {
         const char *oldmode = !wizard ? "normal game" : "debug mode";
 
         if (!authorize_explore_mode()) {
             if (!wizard) {
-                You("cannot access explore mode.");
+                You(_("cannot access explore mode."));
                 return ECMD_OK;
             } else {
                 pline(
@@ -962,17 +962,17 @@ enter_explore_mode(void)
                 /* keep going */
             }
         }
-        pline("Beware!  From explore mode there will be no return to %s,",
+        pline(_("Beware!  From explore mode there will be no return to %s,"),
               oldmode);
         if (paranoid_query(ParanoidQuit,
                            "Do you want to enter explore mode?")) {
             discover = TRUE;
             wizard = FALSE;
             clear_nhwindow(WIN_MESSAGE);
-            You("are now in non-scoring explore mode.");
+            You(_("are now in non-scoring explore mode."));
         } else {
             clear_nhwindow(WIN_MESSAGE);
-            pline("Continuing with %s.", oldmode);
+            pline(_("Continuing with %s."), oldmode);
         }
     }
     return ECMD_OK;
@@ -1284,18 +1284,18 @@ lookaround_known_room(coordxy x, coordxy y)
     if (u_have_seen_whole_selection(sel)) {
         boolean u_in = (boolean) selection_getpoint(x, y, sel);
 
-        You("%s %s %s.",
+        You(_("%s %s %s."),
             u_at(x, y) && u_in && u_can_see_whole_selection(sel) ? "are in"
             : (u_at(x, y)) ? "remember this as" : "remember that as",
             an(selection_size_description(sel, qbuf)),
             rmno >= 0 ? "room" : "area");
     } else if (u_have_seen_bounds_selection(sel)) {
-        You("guess %s to be %s %s.",
+        You(_("guess %s to be %s %s."),
             u_at(x, y) ? "this" : "that",
             an(selection_size_description(sel, qbuf)),
             rmno >= 0 ? "room" : "area");
     } else {
-        You("can't guess the size of %s area.",
+        You(_("can't guess the size of %s area."),
             u_at(x, y) ? "this" : "that");
     }
     selection_free(sel, TRUE);
@@ -2138,7 +2138,7 @@ handler_rebind_keys_add(boolean keyfirst)
     int clr = NO_COLOR;
 
     if (keyfirst) {
-        pline("Bind which key? ");
+        pline(_("Bind which key? "));
         key = pgetchar();
 
         if (!key || key == '\033')
@@ -2203,7 +2203,7 @@ handler_rebind_keys_add(boolean keyfirst)
         }
  bindit:
         if (!key) {
-            pline("Bind which key? ");
+            pline(_("Bind which key? "));
             key = pgetchar();
 
             if (!key || key == '\033')
@@ -2214,14 +2214,14 @@ handler_rebind_keys_add(boolean keyfirst)
 
         if (bind_key(key, cmdstr)) {
             if (prevec && prevec != ec) {
-                pline("Changed key '%s' from \"%s\" to \"%s\".",
+                pline(_("Changed key '%s' from \"%s\" to \"%s\"."),
                       key2txt(key, buf2), prevec->ef_txt, cmdstr);
             } else if (!prevec) {
-                pline("Bound key '%s' to \"%s\".",
+                pline(_("Bound key '%s' to \"%s\"."),
                       key2txt(key, buf2), cmdstr);
             }
         } else {
-            pline("Key binding failed?!");
+            pline(_("Key binding failed?!"));
         }
     }
 }
@@ -3478,7 +3478,7 @@ rhack(int key)
                  * the former call to help_dir() (for 'bad_command' below).
                  */
                 if (was_m_prefix) {
-                    pline("The %s command does not accept '%s' prefix.",
+                    pline(_("The %s command does not accept '%s' prefix."),
                           tlist->ef_txt, which);
                 } else {
                     uchar ch = tlist->key;
@@ -3550,7 +3550,7 @@ rhack(int key)
                              & (DOMOVE_RUSH | DOMOVE_WALK)) != 0L)
                            && !svc.context.travel && !dxdy_moveok()) {
                     /* trying to move diagonally as a grid bug */
-                    You_cant("get there from here...");
+                    You_cant(_("get there from here..."));
                     reset_cmd_vars(TRUE);
                     return;
                 } else if ((gd.domove_attempting & DOMOVE_WALK) != 0L) {
@@ -3875,11 +3875,11 @@ getdir(const char *s)
                     goto retry;
             }
             if (!did_help)
-                pline("What a strange direction!");
+                pline(_("What a strange direction!"));
         }
         return 0;
     } else if (is_mov && !dxdy_moveok()) {
-        You_cant("orient yourself that direction.");
+        You_cant(_("orient yourself that direction."));
         return 0;
     }
     if (!u.dz)
@@ -3985,7 +3985,7 @@ help_dir(
             if (!*buf)
                 Sprintf(buf, "Invalid direction for '%s' prefix.",
                         visctrl(spkey));
-            pline("%s", buf);
+            pline(_("%s"), buf);
             return TRUE;
         }
         /* when 'cmdassist' is off and caller doesn't insist, do nothing */
@@ -5097,7 +5097,7 @@ dotravel(void)
         }
         iflags.getloc_filter = gfilt;
     } else {
-        pline("Where do you want to travel to?");
+        pline(_("Where do you want to travel to?"));
         if (getpos(&cc, TRUE, "the desired destination") < 0) {
             /* user pressed ESC */
             iflags.getloc_travelmode = FALSE;
@@ -5116,12 +5116,12 @@ dotravel_target(void)
 {
     if (!isok(iflags.travelcc.x, iflags.travelcc.y)) {
         /* assume <0,0>, the value assigned when travel reaches destination */
-        pline("No travel destination set.");
+        pline(_("No travel destination set."));
         return ECMD_OK;
     } else if (u_at(iflags.travelcc.x, iflags.travelcc.y)) {
         /* maybe interrupted while traveling then just walked rest of way
            so destination hasn't been reset yet */
-        You("are already here.");
+        You(_("are already here."));
         iflags.travelcc.x = iflags.travelcc.y = 0;
         return ECMD_OK;
     }
@@ -5222,7 +5222,7 @@ yn_function_menu(
         } else {
             *res = def;
         }
-        pline("%s %s", query, key2txt(*res, keybuf));
+        pline(_("%s %s"), query, key2txt(*res, keybuf));
         clear_nhwindow(WIN_MESSAGE);
         return TRUE;
     }

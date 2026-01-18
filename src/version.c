@@ -157,7 +157,7 @@ doversion(void)
 {
     char buf[BUFSZ];
 
-    pline("%s", getversionstring(buf, sizeof buf));
+    pline(_("%s"), getversionstring(buf, sizeof buf));
     return ECMD_OK;
 }
 
@@ -380,7 +380,7 @@ check_version(
             impossible("check_version() called with"
                        " 'complain'=True but 'filename'=Null");
 #endif
-        complain = FALSE; /* 'complain' requires 'filename' for pline("%s") */
+        complain = FALSE; /* 'complain' requires 'filename' for pline(_("%s")) */
     }
     if ((version_data->feature_set & SFCTOOL_BIT) != 0) {
         gc.converted_savefile_loaded = TRUE;
@@ -396,7 +396,7 @@ check_version(
         ) {
 #ifndef SFCTOOL
         if (complain) {
-            pline("Version mismatch for file \"%s\".", filename);
+            pline(_("Version mismatch for file \"%s\"."), filename);
             if (WIN_MESSAGE != WIN_ERR)
                  display_nhwindow(WIN_MESSAGE, TRUE);
         }
@@ -410,7 +410,7 @@ check_version(
         ) {
 #ifndef SFCTOOL
         if (complain) {
-            pline("Configuration incompatibility for file \"%s\".", filename);
+            pline(_("Configuration incompatibility for file \"%s\"."), filename);
             display_nhwindow(WIN_MESSAGE, TRUE);
         }
 #endif

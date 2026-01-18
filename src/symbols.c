@@ -972,7 +972,7 @@ do_symset(boolean rogueflag)
                 big_desc = thissize;
         }
         if (!setcount) {
-            There("are no appropriate %s symbol sets available.",
+            There(_("are no appropriate %s symbol sets available."),
                   rogueflag ? "rogue level" : "primary");
             return TRUE;
         }
@@ -1054,11 +1054,11 @@ do_symset(boolean rogueflag)
             nothing_to_do = TRUE;
     } else if (!res) {
         /* The symbols file could not be accessed */
-        pline("Unable to access \"%s\" file.", SYMBOLS);
+        pline(_("Unable to access \"%s\" file."), SYMBOLS);
         return TRUE;
     } else if (!gs.symset_list) {
         /* The symbols file was empty */
-        There("were no symbol sets found in \"%s\".", SYMBOLS);
+        There(_("were no symbol sets found in \"%s\"."), SYMBOLS);
         return TRUE;
     }
 

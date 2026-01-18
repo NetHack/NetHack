@@ -107,7 +107,7 @@ m_initgrp(
     cnt /= (u.ulevel < 3) ? 4 : (u.ulevel < 5) ? 2 : 1;
 #if defined(__GNUC__) && (defined(HPUX) || defined(DGUX))
     if (cnt != (cnttmp / cntdiv)) {
-        pline("cnt=%d using %d, cnttmp=%d, cntdiv=%d", cnt,
+        pline(_("cnt=%d using %d, cnttmp=%d, cntdiv=%d"), cnt,
               (u.ulevel < 3) ? 4 : (u.ulevel < 5) ? 2 : 1, cnttmp, cntdiv);
     }
 #endif
@@ -2117,7 +2117,7 @@ grow_up(struct monst *mtmp, struct monst *victim)
 
         if (svm.mvitals[newtype].mvflags & G_GENOD) { /* allow G_EXTINCT */
             if (canspotmon(mtmp))
-                pline("As %s grows up into %s, %s %s!", mon_nam(mtmp),
+                pline(_("As %s grows up into %s, %s %s!"), mon_nam(mtmp),
                       an(pmname(ptr, Mgender(mtmp))), mhe(mtmp),
                       nonliving(ptr) ? "expires" : "dies");
             set_mon_data(mtmp, ptr); /* keep svm.mvitals[] accurate */

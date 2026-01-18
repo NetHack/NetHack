@@ -461,7 +461,7 @@ int
 dobugreport(void)
 {
     if (!submit_web_report(2, NULL, "#bugreport command")) {
-        pline("Unable to send bug report.  Please visit %s instead.",
+        pline(_("Unable to send bug report.  Please visit %s instead."),
               (sysopt.crashreporturl && *sysopt.crashreporturl)
               ? sysopt.crashreporturl
               : DEVTEAM_URL

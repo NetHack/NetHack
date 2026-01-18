@@ -1,0 +1,4 @@
+OPTIONS=language:ko                                                                                                                                                             
+OPTIONS=symset:Korean                                                                                                                                                           
+OPTIONS=color                                                                                                                                                                   
+OPTIONS=autopickup     

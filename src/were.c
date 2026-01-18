@@ -33,7 +33,7 @@ were_change(struct monst *mon)
                 }
                 if (howler) {
                     Soundeffect(se_canine_howl, 50);
-                    You_hear("a %s howling at the moon.", howler);
+                    You_hear(_("a %s howling at the moon."), howler);
                     wake_nearto(mon->mx, mon->my, 4 * 4);
                 }
             }
@@ -111,7 +111,7 @@ new_were(struct monst *mon)
     }
 
     if (canseemon(mon) && !Hallucination)
-        pline("%s changes into a %s.", Monnam(mon),
+        pline(_("%s changes into a %s."), Monnam(mon),
               is_human(&mons[pm]) ? "human"
                                   /* pmname()+4: skip past "were" prefix */
                                   : pmname(&mons[pm], Mgender(mon)) + 4);
@@ -215,7 +215,7 @@ you_unwere(boolean purify)
     boolean controllable_poly = Polymorph_control && !(Stunned || Unaware);
 
     if (purify) {
-        You_feel("purified.");
+        You_feel(_("purified."));
         set_ulycn(NON_PM); /* cure lycanthropy */
     }
     if (!Unchanging && is_were(gy.youmonst.data)

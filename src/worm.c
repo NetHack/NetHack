@@ -438,10 +438,10 @@ cutworm(struct monst *worm, coordxy x, coordxy y,
         place_worm_seg(worm, x, y); /* place the "head" segment back */
         if (svc.context.mon_moving) {
             if (canspotmon(worm))
-                pline("Part of %s tail has been cut off.",
+                pline(_("Part of %s tail has been cut off."),
                       s_suffix(mon_nam(worm)));
         } else
-            You("cut part of the tail off of %s.", mon_nam(worm));
+            You(_("cut part of the tail off of %s."), mon_nam(worm));
         toss_wsegs(new_tail, TRUE);
         if (worm->mhp > 1)
             worm->mhp /= 2;
@@ -471,9 +471,9 @@ cutworm(struct monst *worm, coordxy x, coordxy y,
     place_wsegs(new_worm, worm);
 
     if (svc.context.mon_moving)
-        pline("%s is cut in half.", Monnam(worm));
+        pline(_("%s is cut in half."), Monnam(worm));
     else
-        You("cut %s in half.", mon_nam(worm));
+        You(_("cut %s in half."), mon_nam(worm));
 }
 
 /*

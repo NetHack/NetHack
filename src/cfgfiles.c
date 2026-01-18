@@ -170,16 +170,16 @@ do_write_config_file(void)
     char tmp[BUFSZ];
 
     if (!configfile[0]) {
-        pline("Strange, could not figure out config file name.");
+        pline(_("Strange, could not figure out config file name."));
         return ECMD_OK;
     }
     if (flags.suppress_alert < FEATURE_NOTICE_VER(3,7,0)) {
-        pline("Warning: saveoptions is highly experimental!");
+        pline(_("Warning: saveoptions is highly experimental!"));
         wait_synch();
-        pline("Some settings are not saved!");
+        pline(_("Some settings are not saved!"));
         wait_synch();
-        pline("All manual customization and comments are removed"
-              " from the file!");
+        pline(_("All manual customization and comments are removed"
+              " from the file!"));
         wait_synch();
     }
 #define overwrite_prompt "Overwrite config file %.*s?"
@@ -201,7 +201,7 @@ do_write_config_file(void)
         fclose(fp);
         strbuf_empty(&buf);
         if (wrote != len)
-            pline("An error occurred, wrote only partial data (%zu/%zu).",
+            pline(_("An error occurred, wrote only partial data (%zu/%zu)."),
                   wrote, len);
     }
     return ECMD_OK;
@@ -1549,7 +1549,7 @@ config_erradd(const char *buf)
     if (!program_state.config_error_ready) {
         /* either very early, where pline() will use raw_print(), or
            player gave bad value when prompted by interactive 'O' command */
-        pline("%s%s%s", !iflags.window_inited ? "config_error_add: " : "",
+        pline(_("%s%s%s"), !iflags.window_inited ? "config_error_add: " : "",
               buf, punct);
         wait_synch();
         return;
@@ -1568,7 +1568,7 @@ config_erradd(const char *buf)
 
     config_error_data->num_errors++;
     if (!config_error_data->origline_shown && !config_error_data->secure) {
-        pline("\n%s", config_error_data->origline);
+        pline(_("\n%s"), config_error_data->origline);
         config_error_data->origline_shown = TRUE;
     }
     if (config_error_data->line_num > 0 && !config_error_data->secure) {
@@ -1576,7 +1576,7 @@ config_erradd(const char *buf)
     } else
         lineno[0] = '\0';
 
-    pline("%s %s%s%s", config_error_data->secure ? "Error:" : " *",
+    pline(_("%s %s%s%s"), config_error_data->secure ? "Error:" : " *",
           lineno, buf, punct);
 }
 
@@ -1601,7 +1601,7 @@ config_error_done(void)
     if (n) {
         boolean cmdline = !strcmp(config_error_data->source, "command line");
 
-        pline("\n%d error%s %s %s.\n", n, plur(n), cmdline ? "on" : "in",
+        pline(_("\n%d error%s %s %s.\n"), n, plur(n), cmdline ? "on" : "in",
               *config_error_data->source ? config_error_data->source
                                          : configfile);
         wait_synch();

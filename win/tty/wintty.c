@@ -1077,26 +1077,6 @@ tty_clear_nhwindow(winid window)
     case NHW_MAP:
         /* cheap -- clear the whole thing and tell nethack to redraw botl */
         disp.botlx = TRUE;
-#if (defined(UNIX) || defined(VMS)) && defined(ENHANCED_SYMBOLS)
-        /* For fullwidth symset switching, explicitly clear map area with
-         * spaces to prevent ghost artifacts. Always clear 160 columns
-         * (fullwidth width) to handle fullwidth->halfwidth transitions. */
-        if (!erasing_tty_screen) {
-            int row, col;
-            int map_top = cw->offy;
-            int map_rows = ROWNO;
-            int clear_cols = 160;  /* max width for fullwidth mode */
-            for (row = 0; row < map_rows; row++) {
-                /* Move cursor to start of each map row using raw positioning */
-                cmov(0, map_top + row);
-                /* Output spaces to overwrite any previous characters */
-                for (col = 0; col < clear_cols; col++) {
-                    (void) putchar(' ');
-                }
-            }
-            (void) fflush(stdout);
-        }
-#endif
         FALLTHROUGH;
         /*FALLTHRU*/
     case NHW_BASE:
@@ -1828,20 +1808,19 @@ process_text_window(winid window, struct WinDesc *cw)
                 ++ttyDisplay->curx;
             }
             term_start_attr(attr);
-            for (cp = &cw->data[i][1], linestart = TRUE;
-#ifndef WIN32CON
-                 *cp && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
-                 cp++
-#else
-                 *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
-                 cp++, ttyDisplay->curx++
-#endif
-                 ) {
+            for (cp = &cw->data[i][1], linestart = TRUE; *cp; cp++) {
+                /* For UTF-8 continuation bytes (0x80-0xBF), don't check
+                 * column limit - we must output the complete character */
+                if (((unsigned char) *cp & 0xC0) != 0x80) {
+                    /* This is a new character (ASCII or UTF-8 start byte) */
+                    if ((int) ttyDisplay->curx >= (int) ttyDisplay->cols)
+                        break;  /* stop before starting a new character */
+                    ttyDisplay->curx++;
+                }
                 /* message recall for msg_window:full/combination/reverse
                    might have output from '/' in it (see redotoplin()) */
                 if (linestart) {
                     if (SYMHANDLING(H_UTF8)) {
-                        /* FIXME: what is actually in that line? is it the \GNNNNNNNN or UTF-8? */
                         g_putch(*cp);
                     } else if ((*cp & 0x80) != 0) {
                         g_putch(*cp);
@@ -2439,6 +2418,10 @@ tty_putstr(winid window, int attr, const char *str)
         if (n0 > CO) {
             /* attempt to break the line */
             for (i = CO - 1; i && str[i] != ' ' && str[i] != '\n';)
+                i--;
+            /* Skip back over any UTF-8 continuation bytes (0x80-0xBF)
+             * to avoid breaking in the middle of a multibyte character */
+            while (i > 0 && ((unsigned char) str[i] & 0xC0) == 0x80)
                 i--;
             if (i) {
                 cw->data[cw->cury - 1][++i] = '\0';

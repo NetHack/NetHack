@@ -132,7 +132,7 @@ getmailstatus(void)
 
     if (mailbox && stat(mailbox, &omstat)) {
 #ifdef PERMANENT_MAILBOX
-        pline("Cannot get status of MAIL=\"%s\".", mailbox);
+        pline(_("Cannot get status of MAIL=\"%s\"."), mailbox);
         free_maildata(); /* set 'mailbox' to Null */
 #else
         omstat.st_mtime = 0;
@@ -339,7 +339,7 @@ md_rush(struct monst *md,
             if (mon)
                 verbalize1(md_exclamations());
             else if (u_at(fx, fy))
-                verbalize("Excuse me.");
+                verbalize(_("Excuse me."));
         }
 
         if (mon)
@@ -370,9 +370,9 @@ md_rush(struct monst *md,
         newsym(fx, fy);
         if (!Deaf) {
             SetVoice(md, 0, 80, 0);
-            verbalize("This place's too crowded.  I'm outta here.");
+            verbalize(_("This place's too crowded.  I'm outta here."));
         } else {
-            pline("%s.", Never_mind);
+            pline(_("%s."), Never_mind);
         }
         remove_monster(fx, fy);
 
@@ -415,9 +415,9 @@ newmail(struct mail_info *info)
     message_seen = TRUE;
     if (!Deaf) {
         SetVoice(md, 0, 80, 0);
-        verbalize("%s, %s!  %s.", Hello(md), svp.plname, info->display_txt);
+        verbalize(_("%s, %s!  %s."), Hello(md), svp.plname, info->display_txt);
     } else {
-        pline("Message:  %s.", info->display_txt);
+        pline(_("Message:  %s."), info->display_txt);
     }
 
     if (info->message_typ) {
@@ -431,7 +431,7 @@ newmail(struct mail_info *info)
         if (!m_next2u(md)) {
             if (!Deaf) {
                 SetVoice(md, 0, 80, 0);
-                verbalize("Catch!");
+                verbalize(_("Catch!"));
             } else {
                 /* don't bother with nonverbal alternative ... */
                 ;
@@ -452,7 +452,7 @@ newmail(struct mail_info *info)
  give_up:
     /* deliver some classes of messages even if no daemon ever shows up */
     if (!message_seen && info->message_typ == MSG_OTHER)
-        pline("Hark!  \"%s.\"", info->display_txt);
+        pline(_("Hark!  \"%s.\""), info->display_txt);
 }
 
 #if !defined(UNIX) && !defined(VMS)
@@ -531,12 +531,12 @@ readmail(struct obj *otmp UNUSED)
         }
     }
     if (Blind) {
-        pline("Unfortunately you cannot see what it says.");
+        pline(_("Unfortunately you cannot see what it says."));
     } else {
         if (delivery == subst_delivery)
             pline(junk_templates[i], it_reads, recipient, "\"");
         else if (delivery == normal_delivery)
-            pline("%s%s\"", it_reads, junk_templates[i]);
+            pline(_("%s%s\""), it_reads, junk_templates[i]);
     }
 }
 
@@ -561,7 +561,7 @@ ckmailstatus(void)
     laststattime = svm.moves;
     if (stat(mailbox, &nmstat)) {
 #ifdef PERMANENT_MAILBOX
-        pline("Cannot get status of MAIL=\"%s\" anymore.", mailbox);
+        pline(_("Cannot get status of MAIL=\"%s\" anymore."), mailbox);
         free_maildata();
 #else
         nmstat.st_mtime = 0;
@@ -623,7 +623,7 @@ read_simplemail(const char *mbox, boolean adminmsg)
             fl.l_type = F_UNLCK;
             fcntl(fileno(mb), F_UNLCK, &fl);
 #endif
-            There("is a%s message on this scroll.",
+            There(_("is a%s message on this scroll."),
                   seen_one_already ? "nother" : "");
         }
         msg = strchr(curline, ':');
@@ -643,13 +643,13 @@ read_simplemail(const char *mbox, boolean adminmsg)
             endpunct = ".";
 
         if (adminmsg) {
-            urgent_pline("The voice of %s booms through the caverns:",
+            urgent_pline(_("The voice of %s booms through the caverns:"),
                          curline);
         } else {
-            pline("This message is from '%s'.", curline);
-            pline("It reads:");
+            pline(_("This message is from '%s'."), curline);
+            pline(_("It reads:"));
         }
-        pline("\"%s\"%s", msg, endpunct);
+        pline(_("\"%s\"%s"), msg, endpunct);
 
         seen_one_already = TRUE;
 #ifdef SIMPLE_MAIL
@@ -676,7 +676,7 @@ read_simplemail(const char *mbox, boolean adminmsg)
  bail:
     /* bail out _professionally_ */
     if (!adminmsg)
-        pline("It appears to be all gibberish.");
+        pline(_("It appears to be all gibberish."));
 }
 
 #endif /* SIMPLE_MAIL */

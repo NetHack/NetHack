@@ -584,7 +584,7 @@ release_hold(void)
             if (!Blind)
                 pline(_("%s opens its mouth!"), Monnam(mtmp));
             else
-                You_feel("a sudden rush of air!");
+                You_feel(_("a sudden rush of air!"));
         }
         /* gives "you get regurgitated" or "you get expelled from <mon>" */
         expels(mtmp, mtmp->data, TRUE);
@@ -1225,7 +1225,7 @@ unturn_you(void)
     (void) unturn_dead(&gy.youmonst); /* hit carried corpses and eggs */
 
     if (is_undead(gy.youmonst.data)) {
-        You_feel("frightened and %sstunned.", Stunned ? "even more " : "");
+        You_feel(_("frightened and %sstunned."), Stunned ? "even more " : "");
         make_stunned((HStun & TIMEOUT) + (long) rnd(30), FALSE);
     } else {
         You(_("shudder in dread."));
@@ -2280,7 +2280,7 @@ bhito(struct obj *obj, struct obj *otmp)
                 if (cansee(obj->ox, obj->oy))
                     pline_The(_("boulder falls apart."));
                 else
-                    You_hear("a crumbling sound.");
+                    You_hear(_("a crumbling sound."));
                 fracture_rock(obj);
             } else if (obj->otyp == STATUE) {
                 if (break_statue(obj)) {
@@ -2290,7 +2290,7 @@ bhito(struct obj *obj, struct obj *otmp)
                         else
                             pline_The(_("statue shatters."));
                     } else
-                        You_hear("a crumbling sound.");
+                        You_hear(_("a crumbling sound."));
                 }
             } else {
                 int oox = obj->ox, ooy = obj->oy;
@@ -2372,9 +2372,9 @@ bhito(struct obj *obj, struct obj *otmp)
                             if (!type_is_pname(&mons[corpsenm]))
                                 corpsname = an(corpsname);
                             if (!Hallucination)
-                                You_hear("%s reviving.", corpsname);
+                                You_hear(_("%s reviving."), corpsname);
                             else
-                                You_hear("a defibrillator.");
+                                You_hear(_("a defibrillator."));
                             learn_it = by_u ? TRUE : gz.zap_oseen;
                         }
                         if (canspotmon(mtmp))
@@ -2522,7 +2522,7 @@ zappable(struct obj *wand)
 void
 do_enlightenment_effect(void)
 {
-    You_feel("self-knowledgeable...");
+    You_feel(_("self-knowledgeable..."));
     display_nhwindow(WIN_MESSAGE, FALSE);
     enlightenment(MAGICENLIGHTENMENT, ENL_GAMEINPROGRESS);
     pline_The(_("feeling subsides."));
@@ -2743,7 +2743,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         orig_dmg = d(12, 6);
         if (Fire_resistance) {
             shieldeff(u.ux, u.uy);
-            You_feel("rather warm.");
+            You_feel(_("rather warm."));
             monstseesu(M_SEEN_FIRE);
             ugolemeffects(AD_FIRE, orig_dmg);
         } else {
@@ -2764,7 +2764,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         orig_dmg = d(12, 6);
         if (Cold_resistance) {
             shieldeff(u.ux, u.uy);
-            You_feel("a little chill.");
+            You_feel(_("a little chill."));
             monstseesu(M_SEEN_COLD);
             ugolemeffects(AD_COLD, orig_dmg);
         } else {
@@ -2818,7 +2818,7 @@ zapyourself(struct obj *obj, boolean ordinary)
 
         if (BInvis && uarmc->otyp == MUMMY_WRAPPING) {
             /* A mummy wrapping absorbs it and protects you */
-            You_feel("rather itchy under %s.", yname(uarmc));
+            You_feel(_("rather itchy under %s."), yname(uarmc));
             break;
         }
         incr_itimeout(&HInvis, rn1(15, 31));
@@ -2898,7 +2898,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         learn_it = TRUE; /* (no effect for spells...) */
         healup(d(6, obj->otyp == SPE_EXTRA_HEALING ? 8 : 4), 0, FALSE,
                (obj->blessed || obj->otyp == SPE_EXTRA_HEALING));
-        You_feel("%sbetter.", obj->otyp == SPE_EXTRA_HEALING ? "much " : "");
+        You_feel(_("%sbetter."), obj->otyp == SPE_EXTRA_HEALING ? "much " : "");
         break;
     case WAN_LIGHT: /* (broken wand) */
         /* assert( !ordinary ); */
@@ -3173,7 +3173,7 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
                 if (!Blind)
                     pline(_(writing_vanishes), your);
                 else /* note: "dark" rather than "heavy" is intentional... */
-                    You_feel("%s headed.", Hallucination ? "dark" : "light");
+                    You_feel(_("%s headed."), Hallucination ? "dark" : "light");
                 u.mh = 0; /* fatal; death handled by rehumanize() */
             }
             if (Unchanging && u.mh > 0)
@@ -3410,7 +3410,7 @@ zapwrapup(void)
 {
     /* if do_osshock() set obj_zapped while polying, give a message now */
     if (go.obj_zapped)
-        You_feel("shuddering vibrations.");
+        You_feel(_("shuddering vibrations."));
     go.obj_zapped = FALSE;
 }
 
@@ -3938,7 +3938,7 @@ bhit(
                     pline(_("%s %s%s."), Yname2(obj), otense(obj, "skip"),
                           skipcount ? _(" again") : "");
                 else
-                    You_hear("%s skip.", yname(obj));
+                    You_hear(_("%s skip."), yname(obj));
                 skipcount++;
             } else if (skiprange_start > skiprange_end + 1) {
                 --skiprange_start;
@@ -5213,7 +5213,7 @@ zap_over_floor(
                     pline_The(_("%s freezes for a moment."),
                               hliquid(lavawall ? "lava" : "water"));
                 else
-                    You_hear("a soft crackling.");
+                    You_hear(_("a soft crackling."));
                 rangemod -= 1000; /* stop */
             } else {
                 char buf[BUFSZ];
@@ -5253,7 +5253,7 @@ zap_over_floor(
                         Norep("The %s freezes.", hliquid("water"));
                     newsym(x, y);
                 } else if (!lava) {
-                    You_hear("a crackling sound.");
+                    You_hear(_("a crackling sound."));
                 }
                 if (u_at(x, y)) {
                     if (u.uinwater) { /* not just `if (Underwater)' */
@@ -5424,7 +5424,7 @@ zap_over_floor(
                     pline_The(_("door absorbs %s %s!"), yourzap ? _("your") : _("the"),
                               zapverb);
             } else
-                You_feel("vibrations.");
+                You_feel(_("vibrations."));
             break;
         }
         if (new_doormask >= 0) { /* door gets broken */
@@ -5454,7 +5454,7 @@ zap_over_floor(
     if (OBJ_AT(x, y) && damgtype == ZT_FIRE)
         if (burn_floor_objects(x, y, FALSE, type > 0) && couldsee(x, y)) {
             newsym(x, y);
-            You("%s of smoke.", !Blind ? "see a puff" : "smell a whiff");
+            You(_("%s of smoke."), !Blind ? "see a puff" : "smell a whiff");
         }
     if (!ignoremon && (mon = m_at(x, y)) != 0)
         wakeup(mon, (type >= 0) ? TRUE : FALSE);
@@ -5561,7 +5561,7 @@ break_statue(struct obj *obj)
     }
     if (by_you && Role_if(PM_ARCHEOLOGIST)
         && (obj->spe & CORPSTAT_HISTORIC)) {
-        You_feel("guilty about damaging such a historic statue.");
+        You_feel(_("guilty about damaging such a historic statue."));
         adjalign(-1);
     }
     obj->spe = 0;

@@ -845,7 +845,7 @@ checkfile(
 
     fp = dlb_fopen(DATAFILE, "r");
     if (!fp) {
-        pline("Cannot open 'data' file!");
+        pline(_("Cannot open 'data' file!"));
         return res;
     }
     /* If someone passed us garbage, prevent fault. */
@@ -1070,7 +1070,7 @@ checkfile(
 
                 if (user_typed_name || without_asking || yes_to_moreinfo) {
                     if (dlb_fseek(fp, fseekoffset, SEEK_SET) < 0) {
-                        pline("? Seek error on 'data' file!");
+                        pline(_("? Seek error on 'data' file!"));
                         goto checkfile_done;
                     }
                     res = TRUE;
@@ -1113,7 +1113,7 @@ checkfile(
                     destroy_nhwindow(datawin), datawin = WIN_ERR;
                 }
             } else if (user_typed_name && pass == 0 && !pass1found_in_file) {
-                pline("You don't have any information on those things.");
+                pline(_("You don't have any information on those things."));
             }
         }
     }
@@ -1898,10 +1898,10 @@ do_look(int mode, coord *click_cc)
         if (from_screen || clicklook) {
             if (from_screen) {
                 if (flags.verbose)
-                    pline("Please move the cursor to %s.",
+                    pline(_("Please move the cursor to %s."),
                           what_is_a_location);
                 else
-                    pline("Pick %s.", what_is_a_location);
+                    pline(_("Pick %s."), what_is_a_location);
 
                 ans = getpos(&cc, quick, what_is_a_location);
                 if (ans < 0 || cc.x < 0)
@@ -1950,7 +1950,7 @@ do_look(int mode, coord *click_cc)
                                          (boolean) (ans == LOOK_VERBOSE));
             }
         } else {
-            pline("I've never heard of such things.");
+            pline(_("I've never heard of such things."));
         }
     } while (from_screen && !quick && ans != LOOK_ONCE && !clicklook);
 
@@ -2063,7 +2063,7 @@ look_all(
     if (count)
         display_nhwindow(win, TRUE);
     else
-        pline("No %s are currently shown %s.",
+        pline(_("No %s are currently shown %s."),
               do_mons ? "monsters" : "objects",
               nearby ? "nearby" : "on the map");
     destroy_nhwindow(win);
@@ -2130,7 +2130,7 @@ look_traps(boolean nearby)
     if (count)
         display_nhwindow(win, TRUE);
     else
-        pline("No traps seen or remembered%s.", nearby ? " nearby" : "");
+        pline(_("No traps seen or remembered%s."), nearby ? " nearby" : "");
     destroy_nhwindow(win);
 }
 
@@ -2219,7 +2219,7 @@ look_engrs(boolean nearby)
     if (count)
         display_nhwindow(win, TRUE);
     else
-        pline("No engravings seen or remembered%s.", nearby ? " nearby" : "");
+        pline(_("No engravings seen or remembered%s."), nearby ? " nearby" : "");
     destroy_nhwindow(win);
 }
 
@@ -2351,7 +2351,7 @@ doidtrap(void)
         boolean chesttrap = trapped_chest_at(tt, x, y);
 
         if (chesttrap || trapped_door_at(tt, x, y)) {
-            pline("That is a trapped %s.", chesttrap ? "chest" : "door");
+            pline(_("That is a trapped %s."), chesttrap ? "chest" : "door");
             return ECMD_OK; /* trap ID'd, but no time elapses */
         }
     }
@@ -2365,7 +2365,7 @@ doidtrap(void)
                 if (u.dz < 0 ? is_hole(tt) : tt == ROCKTRAP)
                     break;
             }
-            pline("That is %s%s%s.",
+            pline(_("That is %s%s%s."),
                   an(trapname(tt, FALSE)),
                   !trap->madeby_u
                      ? ""
@@ -2380,7 +2380,7 @@ doidtrap(void)
                   !trap->madeby_u ? "" : " by you");
             return ECMD_OK;
         }
-    pline("I can't see a trap there.");
+    pline(_("I can't see a trap there."));
     return ECMD_OK;
 }
 
@@ -2422,7 +2422,7 @@ whatdoes_help(void)
 
     fp = dlb_fopen(KEYHELP, "r");
     if (!fp) {
-        pline("Cannot open \"%s\" data file!", KEYHELP);
+        pline(_("Cannot open \"%s\" data file!"), KEYHELP);
         display_nhwindow(WIN_MESSAGE, TRUE);
         return;
     }
@@ -2594,7 +2594,7 @@ dowhatdoes_core(char q, char *cbuf)
 #if 0
     fp = dlb_fopen(CMDHELPFILE, "r");
     if (!fp) {
-        pline("Cannot open \"%s\" data file!", CMDHELPFILE);
+        pline(_("Cannot open \"%s\" data file!"), CMDHELPFILE);
         return 0;
     }
 
@@ -2659,7 +2659,7 @@ dowhatdoes(void)
     char q, *reslt;
 
     if (!once) {
-        pline("Ask about '&' or '?' to get more info.%s",
+        pline(_("Ask about '&' or '?' to get more info.%s"),
 #ifdef ALTMETA
               iflags.altmeta ? "  (For ESC, type it twice.)" :
 #endif
@@ -2693,18 +2693,18 @@ dowhatdoes(void)
         if (!p) {
             /* normal usage; 'reslt' starts with key, some indentation, and
                then explanation followed by '.' for sentence punctuation */
-            pline("%s", reslt);
+            pline(_("%s"), reslt);
         } else {
             /* for 'm' prefix, where 'reslt' has an embedded newline to
                indicate and separate two lines of output; we add a comma to
                first line so that the combination is a complete sentence */
             *p = '\0'; /* replace embedded newline with end of first line */
-            pline("%s,", reslt);
+            pline(_("%s,"), reslt);
             /* cheat by knowing how dowhatdoes_core() handles key portion */
-            pline("%8.8s%s", reslt, p + 1);
+            pline(_("%8.8s%s"), reslt, p + 1);
         }
     } else {
-        pline("No such command '%s', char code %d (0%03o or 0x%02x).",
+        pline(_("No such command '%s', char code %d (0%03o or 0x%02x)."),
               visctrl(q), (uchar) q, (uchar) q, (uchar) q);
     }
     return ECMD_OK;

@@ -625,15 +625,15 @@ nhl_impossible(lua_State *L)
     return 0;
 }
 
-/* pline("It hits!") */
-/* pline("It hits!", true) */
+/* pline(_("It hits!")) */
+/* pline(_("It hits!"), true) */
 staticfn int
 nhl_pline(lua_State *L)
 {
     int argc = lua_gettop(L);
 
     if (argc == 1 || argc == 2) {
-        pline("%s", luaL_checkstring(L, 1));
+        pline(_("%s"), luaL_checkstring(L, 1));
         if (lua_toboolean(L, 2))
             display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
     } else
@@ -642,14 +642,14 @@ nhl_pline(lua_State *L)
     return 0;
 }
 
-/* verbalize("Fool!") */
+/* verbalize(_("Fool!")) */
 staticfn int
 nhl_verbalize(lua_State *L)
 {
     int argc = lua_gettop(L);
 
     if (argc == 1)
-        verbalize("%s", luaL_checkstring(L, 1));
+        verbalize(_("%s"), luaL_checkstring(L, 1));
     else
         nhl_error(L, "Wrong args");
 
@@ -1214,7 +1214,7 @@ nhl_variable(lua_State *L)
         /* set nh_lua_variables[key] = value;
            nh.variable("key", value); */
         key = luaL_checkstring(L, 1);
-        //pline("SETVAR:%s", key);
+        //pline(_("SETVAR:%s"), key);
         typ = lua_type(L, -1);
 
         if (typ == LUA_TSTRING) {
@@ -1363,7 +1363,7 @@ nhl_test(lua_State *L)
     y = (coordxy) get_table_int(L, "y");
     name = get_table_str_opt(L, "name", Player);
 
-    pline("TEST:{ x=%i, y=%i, name=\"%s\" }", (int) x, (int) y, name);
+    pline(_("TEST:{ x=%i, y=%i, name=\"%s\" }"), (int) x, (int) y, name);
 
     free(name);
 
@@ -1662,7 +1662,7 @@ nhl_gamestate(lua_State *L)
 
         /* restore game state */
         svm.moves = gg.gmst_moves;
-        pline("Resetting time to move #%ld.", svm.moves);
+        pline(_("Resetting time to move #%ld."), svm.moves);
         gg.gmst_moves = 0L;
 
         gl.lastinvnr = 51;

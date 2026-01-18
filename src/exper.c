@@ -221,7 +221,7 @@ losexp(
        without reducing level and that isn't fatal so suppress the message
        in that situation */
     if (u.ulevel > 1 || drainer)
-        pline("%s level %d.", Goodbye(), u.ulevel);
+        pline(_("%s level %d."), Goodbye(), u.ulevel);
 
     if (u.ulevel > 1) {
         u.ulevel -= 1;
@@ -312,7 +312,7 @@ pluslvl(
     int hpinc, eninc;
 
     if (!incr)
-        You_feel("more experienced.");
+        You_feel(_("more experienced."));
 
     /* increase hit points (when polymorphed, do monster form first
        in order to retain normal human/whatever increase for later) */
@@ -347,7 +347,7 @@ pluslvl(
             u.uexp = newuexp(u.ulevel);
         }
         ++u.ulevel;
-        pline("Welcome %sto experience level %d.",
+        pline(_("Welcome %sto experience level %d."),
               (u.ulevelmax < u.ulevel) ? "" : "back ",
               u.ulevel);
         if (u.ulevelmax < u.ulevel)

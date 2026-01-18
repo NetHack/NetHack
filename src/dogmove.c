@@ -290,7 +290,7 @@ dog_eat(struct monst *mtmp,
                       devour ? "devours" : "eats", obj_name);
         } else if (seeobj) {
             obj_name = distant_name(obj, doname);
-            pline("It %s %s.", devour ? "devours" : "eats", obj_name);
+            pline(_("It %s %s."), devour ? "devours" : "eats", obj_name);
         }
     }
     if (obj->unpaid) {
@@ -306,7 +306,7 @@ dog_eat(struct monst *mtmp,
         if (canseemon(mtmp)) {
             obj_name = distant_name(obj, doname); /* (see above) */
             if (flags.verbose)
-                pline("%s spits %s out in disgust!",
+                pline(_("%s spits %s out in disgust!"),
                       Monnam(mtmp), obj_name);
         }
     } else {
@@ -326,7 +326,7 @@ dog_eat(struct monst *mtmp,
             /* edible item owned by shop has been thrown or kicked
                by hero and caught by tame or food-tameable monst */
             oprice = unpaid_cost(obj, COST_CONTENTS);
-            pline("That %s will cost you %ld %s.", objnambuf, oprice,
+            pline(_("That %s will cost you %ld %s."), objnambuf, oprice,
                   currency(oprice));
             /* m_consume_obj() -> delobj() -> obfree() will handle the shop
                billing update */
@@ -341,11 +341,11 @@ staticfn void
 dog_starve(struct monst *mtmp)
 {
     if (mtmp->mleashed && mtmp != u.usteed)
-        Your("leash goes slack.");
+        Your(_("leash goes slack."));
     else if (cansee(mtmp->mx, mtmp->my))
         pline_mon(mtmp, "%s starves.", Monnam(mtmp));
     else
-        You_feel("%s for a moment.",
+        You_feel(_("%s for a moment."),
                     Hallucination ? "bummed" : "sad");
     mondied(mtmp);
 }
@@ -375,7 +375,7 @@ dog_hunger(struct monst *mtmp, struct edog *edog)
             else if (couldsee(mtmp->mx, mtmp->my))
                 beg(mtmp);
             else
-                You_feel("worried about %s.", y_monnam(mtmp));
+                You_feel(_("worried about %s."), y_monnam(mtmp));
             stop_occupation();
         } else if (svm.moves > edog->hungrytime + DOG_STARVE
                    || DEADMONSTER(mtmp)) {
@@ -1049,7 +1049,7 @@ dog_move(
     if (!Conflict && !mtmp->mconf
         && mtmp == u.ustuck && !sticks(gy.youmonst.data)) {
         unstuck(mtmp); /* swallowed case handled above */
-        You("get released!");
+        You(_("get released!"));
     }
 #endif
     allowflags = mon_allowflags(mtmp);
@@ -1518,16 +1518,16 @@ quickmimic(struct monst *mtmp)
         if (was_leashed
             && (M_AP_TYPE(mtmp) != M_AP_MONSTER
                 || !mnum_leashable(mtmp->mappearance))) {
-            Your("leash goes slack.");
+            Your(_("leash goes slack."));
             m_unleash(mtmp, FALSE);
         }
         if (glyph_at(mtmp->mx, mtmp->my) != prev_glyph)
-            You("%s %s %s where %s was!",
+            You(_("%s %s %s where %s was!"),
                 seeloc ? "see" : "sense that",
                 (what != something) ? an(what) : what,
                 seeloc ? "appear" : "has appeared", buf);
         else
-            You("sense that %s feels rather %s-ish.", buf, what);
+            You(_("sense that %s feels rather %s-ish."), buf, what);
 
         display_nhwindow(WIN_MAP, TRUE);
     }

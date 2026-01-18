@@ -3102,7 +3102,7 @@ type_to_name(int type)
 staticfn void
 error4(coordxy x, coordxy y, int a, int b, int c, int dd)
 {
-    pline("set_wall_state: %s @ (%d,%d) %s%s%s%s",
+    pline(_("set_wall_state: %s @ (%d,%d) %s%s%s%s"),
           type_to_name(levl[x][y].typ), x, y,
           a ? "1" : "", b ? "2" : "", c ? "3" : "", dd ? "4" : "");
     bad_count[levl[x][y].typ]++;
@@ -3335,9 +3335,9 @@ set_wall_state(void)
         if (bad_count[x]) {
             if (y == 0) {
                 y = 1; /* only prcoordxy once */
-                pline("set_wall_type: wall mode problems with: ");
+                pline(_("set_wall_type: wall mode problems with: "));
             }
-            pline("%s %d;", type_names[x], bad_count[x]);
+            pline(_("%s %d;"), type_names[x], bad_count[x]);
         }
 #endif /* WA_VERBOSE */
 }

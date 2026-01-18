@@ -1770,7 +1770,7 @@ optfn_fruit(
                been created since the previous name was put in place */
             (void) fruitadd(svp.pl_fruit, forig);
             if (give_opt_msg)
-                pline("Fruit is now \"%s\".", svp.pl_fruit);
+                pline(_("Fruit is now \"%s\"."), svp.pl_fruit);
         }
         /* If initial, then initoptions is allowed to do it instead
          * of here (initoptions always has to do it even if there's
@@ -4038,7 +4038,7 @@ optfn_sortvanquished(
 
         /* return handler_sortvanquished(); */
         (void) set_vanq_order(TRUE); /* insight.c */
-        pline("'%s' %s \"%s: %s\".", optname,
+        pline(_("'%s' %s \"%s: %s\"."), optname,
               (flags.vanq_sortmode == prev_sortmode)
                  ? "not changed, still"
                  : "changed to",
@@ -4550,7 +4550,7 @@ optfn_versinfo(
     } else if (req == do_handler) {
         /* return handler_versinfo(); */
         (void) handler_versinfo();
-        pline("'%s' %s %u.", optname,
+        pline(_("'%s' %s %u."), optname,
               (flags.versinfo == vi) ? "not changed, still" : "changed to",
               flags.versinfo);
     } else if (req == get_val) {
@@ -5451,7 +5451,7 @@ optfn_boolean(
            still be pending at this point (mainly for opt_need_redraw);
            give the toggled message now regardless */
         if (give_opt_msg)
-            pline("'%s' option toggled %s.", allopt[optidx].name,
+            pline(_("'%s' option toggled %s."), allopt[optidx].name,
                   !negated ? "on" : "off");
 
         return optn_ok;
@@ -5595,7 +5595,7 @@ handler_menustyle(void)
     destroy_nhwindow(tmpwin);
     chngd = (flags.menu_style != old_menu_style);
     if (chngd || flags.verbose)
-        pline("'menustyle' %s \"%s\".", chngd ? "changed to" : "is still",
+        pline(_("'menustyle' %s \"%s\"."), chngd ? "changed to" : "is still",
               menutype[(int) flags.menu_style][0]);
     return optn_ok;
 }
@@ -5683,7 +5683,7 @@ handler_autounlock(int optidx)
     chngd = (flags.autounlock != oldflags);
     if ((chngd || flags.verbose) && give_opt_msg) {
         optfn_autounlock(optidx, get_val, FALSE, buf, (char *) NULL);
-        pline("'%s' %s '%s'.", optname,
+        pline(_("'%s' %s '%s'."), optname,
               chngd ? "changed to" : "is still", buf);
     }
     return res;
@@ -5897,12 +5897,12 @@ handler_msg_window(void)
         if (chngd || flags.verbose) {
             (void) optfn_msg_window(opt_msg_window, get_val,
                                     FALSE, buf, empty_optstr);
-            pline("'msg_window' %.20s \"%.20s\".",
+            pline(_("'msg_window' %.20s \"%.20s\"."),
                   chngd ? "changed to" : "is still", buf);
         }
     } else
 #endif /* PREV_MSGS (for tty or curses) */
-        pline("'%s' option is not supported for '%s'.",
+        pline(_("'%s' option is not supported for '%s'."),
               allopt[opt_msg_window].name, windowprocs.name);
     return optn_ok;
 }
@@ -6076,7 +6076,7 @@ handler_perminv_mode(void)
     if (n >= 0) { /* not ESC */
         buf[0] = '\0';
         (void) optfn_perminv_mode(opt_perm_invent, get_val, FALSE, buf, NULL);
-        pline("'perminv_mode' %s '%s' (%s).",
+        pline(_("'perminv_mode' %s '%s' (%s)."),
               (new_pi != old_pi) ? "changed to" : "is still",
               perminv_modes[new_pi][0], buf);
         if (new_pi != InvOptNone && !old_perm_invent)
@@ -6457,7 +6457,7 @@ handler_menu_colors(void)
             && (mcclr = query_color((char *) 0, NO_COLOR)) != -1
                 && (mcattr = query_attr((char *) 0, ATR_NONE)) != -1
             && !add_menu_coloring_parsed(mcbuf, mcclr, mcattr)) {
-            pline("Error adding the menu color.");
+            pline(_("Error adding the menu color."));
             wait_synch();
         }
         goto menucolors_again;
@@ -6538,7 +6538,7 @@ handler_msgtype(void)
             && test_regex_pattern(mtbuf, "MSGTYPE regex")
             && (mttyp = query_msgtype()) != -1
             && !msgtype_add(mttyp, mtbuf)) {
-            pline("Error adding the message type.");
+            pline(_("Error adding the message type."));
             wait_synch();
         }
         goto msgtypes_again;
@@ -6830,9 +6830,9 @@ staticfn void
 rejectoption(const char *optname)
 {
 #ifdef MICRO
-    pline("\"%s\" settable only from %s.", optname, get_configfile());
+    pline(_("\"%s\" settable only from %s."), optname, get_configfile());
 #else
-    pline("%s can be set only from NETHACKOPTIONS or %s.", optname,
+    pline(_("%s can be set only from NETHACKOPTIONS or %s."), optname,
           get_configfile());
 #endif
 }
@@ -7612,7 +7612,7 @@ feature_alert_opts(char *op, const char *optn)
         return 0;
     if (fnv > get_current_feature_ver()) {
         if (!go.opt_initial) {
-            You_cant("disable new feature alerts for future versions.");
+            You_cant(_("disable new feature alerts for future versions."));
         } else {
             config_error_add(
                         "%s=%s Invalid reference to a future version ignored",
@@ -8128,7 +8128,7 @@ void
 add_menu_cmd_alias(char from_ch, char to_ch)
 {
     if (gn.n_menu_mapped >= MAX_MENU_MAPPED_CMDS) {
-        pline("out of menu map space.");
+        pline(_("out of menu map space."));
     } else {
         gm.mapped_menu_cmds[gn.n_menu_mapped] = from_ch;
         gm.mapped_menu_op[gn.n_menu_mapped] = to_ch;
@@ -8511,7 +8511,7 @@ optfn_o_status_hilites(
     }
     if (req == do_handler) {
         if (!status_hilite_menu()) {
-            return optn_err; /*pline("Bad status hilite(s) specified.");*/
+            return optn_err; /*pline(_("Bad status hilite(s) specified."));*/
         } else {
             if (wc2_supported("hilite_status"))
                 preference_update("hilite_status");
@@ -9332,7 +9332,7 @@ dotogglepickup(void)
     } else {
         Strcpy(buf, "OFF");
     }
-    pline("Autopickup: %s.", buf);
+    pline(_("Autopickup: %s."), buf);
     return ECMD_OK;
 }
 

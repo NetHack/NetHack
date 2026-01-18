@@ -429,7 +429,7 @@ doread(void)
         if (scroll->o_id % 3) {
             /* no need to vary this when blind; "on this ___" is important
                because it suggests that there might be something on others */
-            You_cant("find anything to read on this %s.",
+            You_cant(_("find anything to read on this %s."),
                      simpleonames(scroll));
             return ECMD_OK;
         }
@@ -1356,7 +1356,7 @@ seffect_confuse_monster(struct obj **sobjp)
 
     if (gy.youmonst.data->mlet != S_HUMAN || scursed) {
         if (!HConfusion)
-            You_feel("confused.");
+            You_feel(_("confused."));
         make_confused(HConfusion + rnd(100), FALSE);
     } else if (confused) {
         if (!sblessed) {
@@ -1428,7 +1428,7 @@ seffect_scare_monster(struct obj **sobjp)
         } else {
             Soundeffect(se_maniacal_laughter, 50);
         }
-        You_hear("%s %s.", (confused || scursed) ? "sad wailing"
+        You_hear(_("%s %s."), (confused || scursed) ? "sad wailing"
                  : "maniacal laughter",
                  !ct ? "in the distance" : "close by");
     }
@@ -1745,10 +1745,10 @@ seffect_charging(struct obj **sobjp)
 
     if (confused) {
         if (scursed) {
-            You_feel("discharged.");
+            You_feel(_("discharged."));
             u.uen = 0;
         } else {
-            You_feel("charged up!");
+            You_feel(_("charged up!"));
             u.uen += d(sblessed ? 6 : 4, 4);
             if (u.uen > u.uenmax) /* if current energy is already at   */
                 u.uenmax = u.uen; /* or near maximum, increase maximum */
@@ -1824,7 +1824,7 @@ seffect_fire(struct obj **sobjp)
                 pline(_("Oh, look, what a pretty fire in your %s."),
                       makeplural(body_part(HAND)));
             else
-                You_feel("a pleasant warmth in your %s.",
+                You_feel(_("a pleasant warmth in your %s."),
                          makeplural(body_part(HAND)));
         } else {
             monstunseesu(M_SEEN_FIRE);
@@ -1878,7 +1878,7 @@ seffect_earth(struct obj **sobjp)
 
         /* Identify the scroll */
         if (u.uswallow) {
-            You_hear("rumbling.");
+            You_hear(_("rumbling."));
         } else {
             if (!avoid_ceiling(&u.uz)) {
                 pline_The(_("%s rumbles %s you!"), ceiling(u.ux, u.uy),
@@ -1928,7 +1928,7 @@ seffect_punishment(struct obj **sobjp)
 
     gk.known = TRUE;
     if (confused || sblessed) {
-        You_feel("guilty.");
+        You_feel(_("guilty."));
         return;
     }
     punish(sobj);
@@ -2309,7 +2309,7 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
             if (mtmp->minvis && !canspotmon(mtmp))
                 map_invisible(mtmp->mx, mtmp->my);
         } else if (engulfing_u(mtmp))
-            You_hear("something hit %s %s over your %s!",
+            You_hear(_("something hit %s %s over your %s!"),
                      s_suffix(mon_nam(mtmp)), mbodypart(mtmp, STOMACH),
                      body_part(HEAD));
 
@@ -2320,7 +2320,7 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
                     pline(_("Fortunately, %s is wearing a hard helmet."),
                           mon_nam(mtmp));
                 else if (!Deaf)
-                    You_hear("a clanging sound.");
+                    You_hear(_("a clanging sound."));
                 if (mdmg > 2)
                     mdmg = 2;
             } else {
@@ -2718,7 +2718,7 @@ do_class_genocide(void)
                         u.uhp = -1;
                         if (Upolyd) {
                             if (!feel_dead++)
-                                You_feel("%s inside.", udeadinside());
+                                You_feel(_("%s inside."), udeadinside());
                         } else {
                             if (!feel_dead++)
                                 urgent_pline(_("You die."));
@@ -2868,7 +2868,7 @@ do_genocide(
                               " through the caverns:"));
                     SetVoice((struct monst *) 0, 0, 80, voice_deity);
                     /* FIXME? shouldn't this override deafness? */
-                    verbalize("No, mortal!  That will not be done.");
+                    verbalize(_("No, mortal!  That will not be done."));
                 }
                 continue;
             }
@@ -2930,7 +2930,7 @@ do_genocide(
                KMH -- Unchanging prevents rehumanization. */
             if (Upolyd && ptr != gy.youmonst.data) {
                 delayed_killer(POLYMORPH, svk.killer.format, svk.killer.name);
-                You_feel("%s inside.", udeadinside());
+                You_feel(_("%s inside."), udeadinside());
             } else {
                 done(GENOCIDED);
             }

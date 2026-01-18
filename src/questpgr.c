@@ -431,7 +431,7 @@ deliver_by_pline(const char *str)
         msgp += strlen(in_line) + 1;
 
         convert_line(in_line, out_line);
-        pline("%s", out_line);
+        pline(_("%s"), out_line);
     }
 }
 

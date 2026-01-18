@@ -803,7 +803,7 @@ costly_alteration(struct obj *obj, int alter_type)
         if (shkp) {
             SetVoice(shkp, 0, 80, 0);
         }
-        verbalize("You %s %s %s, you pay for %s!",
+        verbalize(_("You %s %s %s, you pay for %s!"),
                   alteration_verbs[alter_type], those, simpleonames(obj),
                   them);
         bill_dummy_object(obj);
@@ -815,7 +815,7 @@ costly_alteration(struct obj *obj, int alter_type)
             if (shkp) {
                 SetVoice(shkp, 0, 80, 0);
             }
-            verbalize("You %s %s, you pay for %s!",
+            verbalize(_("You %s %s, you pay for %s!"),
                       alteration_verbs[alter_type], those, them);
             bill_dummy_object(obj);
         } else {
@@ -1598,7 +1598,7 @@ shrink_glob(
        inside-container-in-invent, and going away when can-see-on-floor */
     if (ininv) {
         if (shrink || gone)
-            pline("%s %s.", globnambuf,
+            pline(_("%s %s."), globnambuf,
                   /* globs always have quantity 1 so we don't need otense()
                      because the verb always references a singular item */
                   gone ? "dissolves completely" : "shrinks");
@@ -1625,7 +1625,7 @@ shrink_glob(
                however, always say the bag is lighter for the 'gone' case */
             if (gone || (shrink && topcontnr->owt != old_top_owt)
                 || near_capacity() != go.oldcap)
-                pline("%s %s%s lighter.", Yname2(topcontnr),
+                pline(_("%s %s%s lighter."), Yname2(topcontnr),
                       /* containers also always have quantity 1 */
                       (topcontnr->owt != old_top_owt) ? "becomes" : "seems",
                       /* TODO?  maybe also skip "slightly" if description
@@ -1652,7 +1652,7 @@ shrink_glob(
                 /* fortunately none of the glob adjectives warrant "An " */
                 (void) strsubst(globnambuf, "The ", "A ");
             /* again, quantity is always 1 so no need for otense()/vtense() */
-            pline("%s fades away.", globnambuf);
+            pline(_("%s fades away."), globnambuf);
         }
     } else {
         /* schedule next shrink ~25 turns from now */
@@ -1723,7 +1723,7 @@ maybe_adjust_light(struct obj *obj, int old_range)
                    when changing intensity, using "less brightly" is
                    straightforward for dimming, but we need "brighter"
                    rather than "more brightly" for brightening; ugh */
-                pline("%s %s %s%s.", buf, otense(obj, "shine"),
+                pline(_("%s %s %s%s."), buf, otense(obj, "shine"),
                       (abs(delta) > 1) ? "much " : "",
                       (delta > 0) ? "brighter" : "less brightly");
             }
@@ -2878,7 +2878,7 @@ hornoplenty(
             what = "Some food";
         }
         ++objcount;
-        pline("%s %s out.", what, vtense(what, "spill"));
+        pline(_("%s %s out."), what, vtense(what, "spill"));
         obj->blessed = horn->blessed;
         obj->cursed = horn->cursed;
         obj->owt = weight(obj);
@@ -2919,7 +2919,7 @@ hornoplenty(
                 if (IS_ALTAR(levl[u.ux][u.uy].typ))
                     doaltarobj(obj); /* does its own drop message */
                 else
-                    pline("%s %s to the %s.", Doname2(obj),
+                    pline(_("%s %s to the %s."), Doname2(obj),
                           otense(obj, "drop"), surface(u.ux, u.uy));
                 dropy(obj);
             }
@@ -3824,7 +3824,7 @@ pudding_merge_message(struct obj *otmp, struct obj *otmp2)
             if (onfloor) {
                 You_see("parts of the floor melting!");
             } else if (inpack) {
-                Your("pack reaches out and grabs something!");
+                Your(_("pack reaches out and grabs something!"));
             }
             /* even though we can see where they should be,
              * they'll be out of our view (minvent or container)
@@ -3833,14 +3833,14 @@ pudding_merge_message(struct obj *otmp, struct obj *otmp2)
             boolean adj = ((otmp->ox != u.ux || otmp->oy != u.uy)
                            && (otmp2->ox != u.ux || otmp2->oy != u.uy));
 
-            pline("The %s%s coalesce%s.",
+            pline(_("The %s%s coalesce%s."),
                   (onfloor && adj) ? "adjacent " : "",
                   makeplural(obj_typename(otmp->otyp)),
                   inpack ? " inside your pack" : "");
         }
     } else {
         Soundeffect(se_faint_sloshing, 25);
-        You_hear("a faint sloshing sound.");
+        You_hear(_("a faint sloshing sound."));
     }
 }
 

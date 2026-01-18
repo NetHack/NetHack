@@ -278,7 +278,7 @@ rumor_check(void)
        we didn't bother trying again this time */
     } else if (gt.true_rumor_size < 0L) {
  no_rumors: /* file could be opened but init_rumors() didn't like it */
-        pline("rumors not accessible.");
+        pline(_("rumors not accessible."));
         /* engravings, epitaphs, and bogus monsters will still be shown,
            and in tmpwin rather than via additional pline() calls */
         display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
@@ -543,7 +543,7 @@ outrumor(
         } else if (Blind) {
             if (mechanism == BY_COOKIE)
                 pline(fortune_msg);
-            pline("What a pity that you cannot read it!");
+            pline(_("What a pity that you cannot read it!"));
             return;
         }
     }
@@ -554,7 +554,7 @@ outrumor(
     switch (mechanism) {
     case BY_ORACLE:
         /* Oracle delivers the rumor */
-        pline("True to her word, the Oracle %ssays: ",
+        pline(_("True to her word, the Oracle %ssays: "),
               (!rn2(4) ? "offhandedly "
                        : (!rn2(3) ? "casually "
                                   : (rn2(2) ? "nonchalantly " : ""))));
@@ -567,7 +567,7 @@ outrumor(
         FALLTHROUGH;
     /* FALLTHRU */
     case BY_PAPER:
-        pline("It reads:");
+        pline(_("It reads:"));
         break;
     }
     pline1(line);
@@ -704,13 +704,13 @@ doconsult(struct monst *oracl)
     umoney = money_cnt(gi.invent);
 
     if (!oracl) {
-        There("is no one here to consult.");
+        There(_("is no one here to consult."));
         return ECMD_OK;
     } else if (!oracl->mpeaceful) {
-        pline("%s is in no mood for consultations.", Monnam(oracl));
+        pline(_("%s is in no mood for consultations."), Monnam(oracl));
         return ECMD_OK;
     } else if (!umoney) {
-        You("have no gold.");
+        You(_("have no gold."));
         return ECMD_OK;
     }
 
@@ -722,7 +722,7 @@ doconsult(struct monst *oracl)
         return ECMD_OK;
     case 'y':
         if (umoney < (long) minor_cost) {
-            You("don't even have enough gold for that!");
+            You(_("don't even have enough gold for that!"));
             return ECMD_OK;
         }
         u_pay = minor_cost;

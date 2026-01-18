@@ -2884,7 +2884,7 @@ prinv(const char *prefix, struct obj *obj, long quan)
     if (total_of)
         Snprintf(totalbuf, sizeof totalbuf,
                  " (%ld in total).", obj->quan);
-    pline("%s%s%s%s", prefix, *prefix ? " " : "",
+    pline(_("%s%s%s%s"), prefix, *prefix ? " " : "",
           xprname(obj, (char *) 0, obj_to_let(obj), !total_of, 0L, quan),
           flags.verbose ? totalbuf : "");
 }
@@ -4171,7 +4171,7 @@ look_here(
             trap = (struct trap *) NULL;
 
         if (reg || trap)
-            There("is %s%s%s here.",
+            There(_("is %s%s%s here."),
                   reg ? regbuf : "",
                   (reg && trap) ? " and " : "",
                   trap ? an(trapname(trap->ttyp, FALSE)) : "");
@@ -4254,9 +4254,9 @@ look_here(
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (obj_cnt == 1 && otmp->quan == 1L)
-            There("is %s object here.", picked_some ? "another" : "an");
+            There(_("is %s object here."), picked_some ? "another" : "an");
         else
-            There("are %s%s objects here.",
+            There(_("are %s%s objects here."),
                   (obj_cnt == 2) ? "two"
                   : (obj_cnt < 5) ? "a few"
                     : (obj_cnt < 10) ? "several"
@@ -4264,7 +4264,7 @@ look_here(
                   picked_some ? " more" : "");
         for (; otmp; otmp = otmp->nexthere)
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
-                pline("%s %s%s.",
+                pline(_("%s %s%s."),
                       (obj_cnt > 1) ? "Including"
                       : (otmp->quan > 1L) ? "They're"
                         : "It's",
@@ -5506,7 +5506,7 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
         if (!obj->nexthere) {
             boolean more_than_1 = is_plural(obj);
 
-            There("%s %s under the %s here.", more_than_1 ? "are" : "is",
+            There(_("%s %s under the %s here."), more_than_1 ? "are" : "is",
                   doname(obj), seen_liquid);
             n2 = 1;
             /* "pair of boots" is singular but "beneath it" sounds strange */

@@ -422,7 +422,7 @@ savebones(int how, time_t when, struct obj *corpse)
                 if (delete_bonesfile(&u.uz))
                     goto make_bones;
                 else
-                    pline("Cannot unlink old bones.");
+                    pline(_("Cannot unlink old bones."));
             }
         }
         /* compression can change the file's name, so must
@@ -659,7 +659,7 @@ getbones(void)
 
     if (validate(nhfp, gb.bones, FALSE) != SF_UPTODATE) {
         if (!wizard)
-            pline("Discarding unusable bones; no need to panic...");
+            pline(_("Discarding unusable bones; no need to panic..."));
         ok = FALSE;
     } else {
         ok = TRUE;
@@ -739,7 +739,7 @@ getbones(void)
          * So no point in a mysterious message for a normal event
          * -- just generate a new level for those N-1 games.
          */
-        /* pline("Cannot unlink bones."); */
+        /* pline(_("Cannot unlink bones.")); */
         return 0;
     }
     return ok;
@@ -794,7 +794,7 @@ fix_ghostly_obj(struct obj *obj)
         case ORCISH_BOW:
         case YUMI:
         case BOOMERANG:
-            You("make adjustments to %s to suit your %s hand.",
+            You(_("make adjustments to %s to suit your %s hand."),
                 the(xname(obj)),
                 URIGHTY ? "right" : "left");
             break;

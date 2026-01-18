@@ -144,7 +144,7 @@ stoned_dialogue(void)
         Strcpy(buf, stoned_texts[SIZE(stoned_texts) - i]);
         if (nolimbs(gy.youmonst.data) && strstri(buf, "limbs"))
             (void) strsubst(buf, "limbs", "extremities");
-        urgent_pline("%s", buf);
+        urgent_pline(_("%s"), buf);
     }
     switch ((int) i) {
     case 5: /* slowing down */
@@ -252,7 +252,7 @@ vomiting_dialogue(void)
                [vomit() issues its own message for the cantvomit() case
                and for the FAINTING-or-worse case where stomach is empty] */
             if (u.uhs < FAINTING)
-                You("%s!", !Hallucination ? "vomit" : "hurl chunks");
+                You(_("%s!"), !Hallucination ? "vomit" : "hurl chunks");
         }
         vomit();
         break;
@@ -270,7 +270,7 @@ sleep_dialogue(void)
     long i = (HSleepy & TIMEOUT);
 
     if (i == 4)
-        You("yawn.");
+        You(_("yawn."));
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL   /* RESTORE is after slime_dialogue */
@@ -306,7 +306,7 @@ choke_dialogue(void)
             if (strchr(str, '%'))
                 urgent_pline(str, hcolor(NH_BLUE));
             else
-                urgent_pline("%s", str);
+                urgent_pline(_("%s"), str);
             stop_occupation();
         }
     }
@@ -339,7 +339,7 @@ sickness_dialogue(void)
                        care whether or not that has already happened */
                     upstart(pronounbuf), vtense(pronounbuf, "are"));
         }
-        urgent_pline("%s", buf);
+        urgent_pline(_("%s"), buf);
     }
     exercise(A_CON, FALSE);
 }
@@ -417,7 +417,7 @@ slime_dialogue(void)
                                                    : "green slime"));
             }
         } else {
-            urgent_pline("%s", buf);
+            urgent_pline(_("%s"), buf);
         }
     }
 
@@ -506,10 +506,10 @@ slimed_to_death(struct kinfo *kptr)
         Strcpy(slimebuf, "green slime has been genocided...");
         if (iflags.last_msg == PLNMSG_OK_DONT_DIE)
             /* follows "OK, so you don't die." and arg is second sentence */
-            urgent_pline("Yes, you do.  %s", upstart(slimebuf));
+            urgent_pline(_("Yes, you do.  %s"), upstart(slimebuf));
         else
             /* follows "The medallion crumbles to dust." */
-            urgent_pline("Unfortunately, %s", slimebuf);
+            urgent_pline(_("Unfortunately, %s"), slimebuf);
         /* die again; no possibility of amulet this time */
         done(GENOCIDED); /* [should it be done_timeout(GENOCIDED, SLIMED)?] */
         /* could be life-saved again (only in explore or wizard mode)
@@ -539,7 +539,7 @@ phaze_dialogue(void)
         return;
 
     if (((HPasses_walls & TIMEOUT) % 2L) && i > 0L && i <= SIZE(phaze_texts))
-        pline("%s", phaze_texts[SIZE(phaze_texts) - i]);
+        pline(_("%s"), phaze_texts[SIZE(phaze_texts) - i]);
 }
 
 /* Similar to Passes_walls, if prayer tries to save hero from a poison
@@ -565,7 +565,7 @@ region_dialogue(void)
         return;
 
     if ((r % 2L) && i > 0L && i <= SIZE(region_texts))
-        pline("%s", region_texts[SIZE(region_texts) - i]);
+        pline(_("%s"), region_texts[SIZE(region_texts) - i]);
 }
 
 /* when a status timeout is fatal, keep the status line indicator shown
@@ -663,7 +663,7 @@ nh_timeout(void)
 
     if (u.ugallop) {
         if (--u.ugallop == 0L && u.usteed)
-            pline("%s stops galloping.", Monnam(u.usteed));
+            pline(_("%s stops galloping."), Monnam(u.usteed));
     }
 
     was_flying = Flying;
@@ -694,13 +694,13 @@ nh_timeout(void)
                    but not other forms of illness */
                 if ((u.usick_type & SICK_NONVOMITABLE) == 0
                     && rn2(100) < ACURR(A_CON)) {
-                    You("have recovered from your illness.");
+                    You(_("have recovered from your illness."));
                     make_sick(0, NULL, FALSE, SICK_ALL);
                     exercise(A_CON, FALSE);
                     adjattrib(A_CON, -1, 1);
                     break;
                 }
-                urgent_pline("You die from your illness.");
+                urgent_pline(_("You die from your illness."));
                 if (kptr && kptr->name[0]) {
                     svk.killer.format = kptr->format;
                     Strcpy(svk.killer.name, kptr->name);
@@ -724,7 +724,7 @@ nh_timeout(void)
                 break;
             case FAST:
                 if (!Very_fast)
-                    You_feel("yourself slow down%s.",
+                    You_feel(_("yourself slow down%s."),
                              Fast ? " a bit" : "");
                 break;
             case CONFUSION:
@@ -785,7 +785,7 @@ nh_timeout(void)
                 if (unconscious() || Sleep_resistance) {
                     incr_itimeout(&HSleepy, rnd(100));
                 } else if (Sleepy) {
-                    You("fall asleep.");
+                    You(_("fall asleep."));
                     sleeptime = rnd(20);
                     fall_asleep(-sleeptime, TRUE);
                     incr_itimeout(&HSleepy, sleeptime + rnd(100));
@@ -806,7 +806,7 @@ nh_timeout(void)
                 /* timed Flying is via #wizintrinsic only */
                 if (was_flying && !Flying) {
                     disp.botl = TRUE;
-                    You("land.");
+                    You(_("land."));
                     spoteffects(TRUE);
                 }
                 break;
@@ -820,7 +820,7 @@ nh_timeout(void)
                         break;
                     }
                     if (!Unaware)
-                        You("no longer feel safe from acid.");
+                        You(_("no longer feel safe from acid."));
                 }
                 break;
             case STONE_RES:
@@ -833,7 +833,7 @@ nh_timeout(void)
                         break;
                     }
                     if (!Unaware)
-                        You("no longer feel secure from petrification.");
+                        You(_("no longer feel secure from petrification."));
                     /* no-op if not wielding a cockatrice corpse;
                        uswapwep case is always a no-op because two-weapon
                        combat is only possible with two one-handed weapons
@@ -848,12 +848,12 @@ nh_timeout(void)
                    attempts fail to relocate hero; skip timeout message
                    if hero has acquired fire resistance in the meantime */
                 if (!Fire_resistance)
-                    Your("temporary ability to survive burning has ended.");
+                    Your(_("temporary ability to survive burning has ended."));
                 break;
             case WWALKING:
                 /* [see fire resistance] */
                 if (!Wwalking)
-                    Your("temporary ability to walk on liquid has ended.");
+                    Your(_("temporary ability to walk on liquid has ended."));
                 break;
             case DISPLACED:
                 if (!Displaced) /* give a message */
@@ -867,23 +867,23 @@ nh_timeout(void)
                     svc.context.warntype.species = (struct permonst *) 0;
                     svc.context.warntype.speciesidx = NON_PM;
                     if (wptr)
-                        You("are no longer warned about %s.",
+                        You(_("are no longer warned about %s."),
                             makeplural(wptr->pmnames[NEUTRAL]));
                 }
                 break;
             case PASSES_WALLS:
                 if (!Passes_walls) {
                     if (stuck_in_wall())
-                        You_feel("hemmed in again.");
+                        You_feel(_("hemmed in again."));
                     else
-                        pline("You're back to your %s self again.",
+                        pline(_("You're back to your %s self again."),
                               !Upolyd ? "normal" : "unusual");
                 }
                 break;
             case MAGICAL_BREATHING:
                 if (!Breathless) {
                     if (region_danger())
-                        You("cough%s",
+                        You(_("cough%s"),
                             Poison_resistance ? "." : " and spit blood!");
                 }
                 break;
@@ -895,7 +895,7 @@ nh_timeout(void)
                 /* must be declining to die in explore|wizard mode;
                    treat like being cured of strangulation by prayer */
                 if (uamul && uamul->otyp == AMULET_OF_STRANGULATION) {
-                    Your("amulet vanishes!");
+                    Your(_("amulet vanishes!"));
                     useup(uamul);
                 }
                 break;
@@ -913,7 +913,7 @@ nh_timeout(void)
                      */
                     if ((inv_weight() > (WT_NOISY_INV * -1))) {
                         if (!Deaf)
-                            You("make a lot of noise!");
+                            You(_("make a lot of noise!"));
                         wake_nearby(FALSE);
                     }
                 }
@@ -1110,20 +1110,20 @@ hatch_egg(anything *arg, long timeout)
         case OBJ_INVENT:
             knows_egg = TRUE; /* true even if you are blind */
             if (!cansee_hatchspot)
-                You_feel("%s %s from your pack!", something,
+                You_feel(_("%s %s from your pack!"), something,
                          locomotion(mon->data, "drop"));
             else
                 You_see("%s %s out of your pack!", monnambuf,
                         locomotion(mon->data, "drop"));
             if (yours) {
-                pline("%s %s %s like \"%s%s\"",
+                pline(_("%s %s %s like \"%s%s\""),
                       siblings ? "Their" : "Its",
                       ing_suffix(cry_sound(mon)),
                       (is_silent(mon->data) || Deaf) ? "seems" : "sounds",
                       flags.female ? "mommy" : "daddy", egg->spe ? "." : "?");
             } else if (mon->data->mlet == S_DRAGON && !Deaf) {
                 SetVoice(mon, 0, 80, 0);
-                verbalize("Gleep!"); /* Mything eggs :-) */
+                verbalize(_("Gleep!")); /* Mything eggs :-) */
             }
             break;
 
@@ -1248,10 +1248,10 @@ slip_or_trip(void)
         if (Hallucination) {
             what = strcpy(buf, what);
             buf[0] = highc(buf[0]);
-            pline("Egads!  %s bite%s your %s!", what,
+            pline(_("Egads!  %s bite%s your %s!"), what,
                   (!otmp || otmp->quan == 1L) ? "s" : "", body_part(FOOT));
         } else {
-            You("trip over %s.", what);
+            You(_("trip over %s."), what);
         }
         if (!uarmf && otmp->otyp == CORPSE
             && touch_petrifies(&mons[otmp->corpsenm]) && !Stone_resistance) {
@@ -1263,7 +1263,7 @@ slip_or_trip(void)
         /* is fumbling from ice alone? */
         boolean ice_only = !(EFumbling || (HFumbling & ~FROMOUTSIDE));
 
-        pline("%s %s %s the ice.",
+        pline(_("%s %s %s the ice."),
               u.usteed ? upstart(x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
                                           SUPPRESS_SADDLE, FALSE))
                        : "You",
@@ -1282,7 +1282,7 @@ slip_or_trip(void)
             && ((saddle = which_armor(u.usteed, W_SADDLE)) == 0
                 || !saddle->cursed)
             && (!ice_only || !rn2(3))) {
-            You("lose your balance.");
+            You(_("lose your balance."));
             dismount_steed(DISMOUNT_FELL);
         } else if (!rn2(10 + ACURR(A_DEX))) {
             /* Maybe slip in a random direction.  This takes place after
@@ -1301,18 +1301,18 @@ slip_or_trip(void)
         if (on_foot) {
             switch (rn2(4)) {
             case 1:
-                You("trip over your own %s.",
+                You(_("trip over your own %s."),
                     Hallucination ? "elbow" : makeplural(body_part(FOOT)));
                 break;
             case 2:
-                You("slip %s.",
+                You(_("slip %s."),
                     Hallucination ? "on a banana peel" : "and nearly fall");
                 break;
             case 3:
-                You("flounder.");
+                You(_("flounder."));
                 break;
             default:
-                You("stumble.");
+                You(_("stumble."));
                 break;
             }
 
@@ -1322,17 +1322,17 @@ slip_or_trip(void)
                    || !saddle->cursed) {
             switch (rn2(4)) {
             case 1:
-                Your("%s slip out of the stirrups.",
+                Your(_("%s slip out of the stirrups."),
                      makeplural(body_part(FOOT)));
                 break;
             case 2:
-                You("let go of the reins.");
+                You(_("let go of the reins."));
                 break;
             case 3:
-                You("bang into the saddle-horn.");
+                You(_("bang into the saddle-horn."));
                 break;
             default:
-                You("slide to one side of the saddle.");
+                You(_("slide to one side of the saddle."));
                 break;
             }
             dismount_steed(DISMOUNT_FELL);
@@ -1347,7 +1347,7 @@ see_lamp_flicker(struct obj *obj, const char *tailer)
     switch (obj->where) {
     case OBJ_INVENT:
     case OBJ_MINVENT:
-        pline("%s flickers%s.", Yname2(obj), tailer);
+        pline(_("%s flickers%s."), Yname2(obj), tailer);
         break;
     case OBJ_FLOOR:
         You_see("%s flicker%s.", an(xname(obj)), tailer);
@@ -1362,15 +1362,15 @@ lantern_message(struct obj *obj)
     /* from adventure */
     switch (obj->where) {
     case OBJ_INVENT:
-        Your("lantern is getting dim.");
+        Your(_("lantern is getting dim."));
         if (Hallucination)
-            pline("Batteries have not been invented yet.");
+            pline(_("Batteries have not been invented yet."));
         break;
     case OBJ_FLOOR:
         You_see("a lantern getting dim.");
         break;
     case OBJ_MINVENT:
-        pline("%s lantern is getting dim.", s_suffix(Monnam(obj->ocarry)));
+        pline(_("%s lantern is getting dim."), s_suffix(Monnam(obj->ocarry)));
         break;
     }
 }
@@ -1449,7 +1449,7 @@ burn_object(anything *arg, long timeout)
                 FALLTHROUGH;
                 /*FALLTHRU*/
             case OBJ_MINVENT:
-                pline("%spotion of oil has burnt away.", whose);
+                pline(_("%spotion of oil has burnt away."), whose);
                 break;
             case OBJ_FLOOR:
                 You_see("a burning potion of oil go out.");
@@ -1494,7 +1494,7 @@ burn_object(anything *arg, long timeout)
                     switch (obj->where) {
                     case OBJ_INVENT:
                     case OBJ_MINVENT:
-                        pline("%s seems about to go out.", Yname2(obj));
+                        pline(_("%s seems about to go out."), Yname2(obj));
                         break;
                     case OBJ_FLOOR:
                         You_see("%s about to go out.", an(xname(obj)));
@@ -1514,9 +1514,9 @@ burn_object(anything *arg, long timeout)
                     /*FALLTHRU*/
                 case OBJ_MINVENT:
                     if (obj->otyp == BRASS_LANTERN)
-                        pline("%slantern has run out of power.", whose);
+                        pline(_("%slantern has run out of power."), whose);
                     else
-                        pline("%s has gone out.", Yname2(obj));
+                        pline(_("%s has gone out."), Yname2(obj));
                     break;
                 case OBJ_FLOOR:
                     if (obj->otyp == BRASS_LANTERN)
@@ -1552,7 +1552,7 @@ burn_object(anything *arg, long timeout)
                 switch (obj->where) {
                 case OBJ_INVENT:
                 case OBJ_MINVENT:
-                    pline("%s%scandle%s getting short.", whose,
+                    pline(_("%s%scandle%s getting short."), whose,
                           menorah ? "candelabrum's " : "",
                           many ? "s are" : " is");
                     break;
@@ -1570,7 +1570,7 @@ burn_object(anything *arg, long timeout)
                 switch (obj->where) {
                 case OBJ_INVENT:
                 case OBJ_MINVENT:
-                    pline("%s%scandle%s flame%s flicker%s low!", whose,
+                    pline(_("%s%scandle%s flame%s flicker%s low!"), whose,
                           menorah ? "candelabrum's " : "", many ? "s'" : "'s",
                           many ? "s" : "", many ? "" : "s");
                     break;
@@ -1593,7 +1593,7 @@ burn_object(anything *arg, long timeout)
                         FALLTHROUGH;
                         /*FALLTHRU*/
                     case OBJ_MINVENT:
-                        pline("%scandelabrum's flame%s.", whose,
+                        pline(_("%scandelabrum's flame%s."), whose,
                               many ? "s die" : " dies");
                         break;
                     case OBJ_FLOOR:
@@ -1609,7 +1609,7 @@ burn_object(anything *arg, long timeout)
                            FALLTHROUGH;
                         /*FALLTHRU*/
                     case OBJ_MINVENT:
-                        pline("%s %s consumed!", Yname2(obj),
+                        pline(_("%s %s consumed!"), Yname2(obj),
                               many ? "are" : "is");
                         break;
                     case OBJ_FLOOR:
@@ -1878,7 +1878,7 @@ do_storms(void)
         /* Inside a cloud during a thunderstorm is deafening. */
         /* Even if already deaf, we sense the thunder's vibrations. */
         Soundeffect(se_kaboom_boom_boom, 80);
-        pline("Kaboom!!!  Boom!!  Boom!!");
+        pline(_("Kaboom!!!  Boom!!  Boom!!"));
         incr_itimeout(&HDeaf, rn1(20, 30));
         disp.botl = TRUE;
         if (!u.uinvulnerable) {
@@ -1888,7 +1888,7 @@ do_storms(void)
             gn.nomovemsg = 0;
         }
     } else
-        You_hear("a rumbling noise.");
+        You_hear(_("a rumbling noise."));
 }
 
 /* -------------------------------------------------------------------------

@@ -597,7 +597,7 @@ impossible(const char *s, ...)
         panic("%s", pbuf);
 
     gp.pline_flags = URGENT_MESSAGE;
-    pline("%s", pbuf);
+    pline(_("%s"), pbuf);
     gp.pline_flags = 0;
 
     if (program_state.in_sanity_check) {
@@ -609,10 +609,10 @@ impossible(const char *s, ...)
     Strcpy(pbuf2, "Program in disorder!");
     if (program_state.something_worth_saving)
         Strcat(pbuf2, "  (Saving and reloading may fix this problem.)");
-    pline("%s", pbuf2);
-    pline("Please report these messages to %s.", DEVTEAM_EMAIL);
+    pline(_("%s"), pbuf2);
+    pline(_("Please report these messages to %s."), DEVTEAM_EMAIL);
     if (sysopt.support) {
-        pline("Alternatively, contact local support: %s", sysopt.support);
+        pline(_("Alternatively, contact local support: %s"), sysopt.support);
     }
 
 #ifdef CRASHREPORT
@@ -664,7 +664,7 @@ execplinehandler(const char *line)
     } else if (f == -1) {
         perror((char *) 0);
         use_pline_handler = FALSE;
-        pline("%s", "Fork to message handler failed.");
+        pline(_("%s"), "Fork to message handler failed.");
     }
 #elif defined(WIN32)
     {

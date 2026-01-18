@@ -407,7 +407,7 @@ gold_detect(struct obj *sobj)
     /* only under me - no separate display required */
     if (stale)
         docrt();
-    You("notice some gold between your %s.", makeplural(body_part(FOOT)));
+    You(_("notice some gold between your %s."), makeplural(body_part(FOOT)));
     return 0;
 
  outgoldmap:
@@ -465,7 +465,7 @@ gold_detect(struct obj *sobj)
         newsym(u.ux, u.uy);
         ter_typ |= TER_MON; /* so autodescribe will recognize hero */
     }
-    You_feel("very greedy, and sense gold!");
+    You_feel(_("very greedy, and sense gold!"));
     exercise(A_WIS, TRUE);
 
     browse_map(ter_typ, "gold");
@@ -513,10 +513,10 @@ food_detect(struct obj *sobj)
         gk.known = stale && !confused;
         if (stale) {
             docrt();
-            You("sense a lack of %s nearby.", what);
+            You(_("sense a lack of %s nearby."), what);
             if (sobj && sobj->blessed) {
                 if (!u.uedibility)
-                    Your("%s starts to tingle.", body_part(NOSE));
+                    Your(_("%s starts to tingle."), body_part(NOSE));
                 u.uedibility = 1;
             }
         } else if (sobj) {
@@ -539,10 +539,10 @@ food_detect(struct obj *sobj)
         return !stale;
     } else if (!ct) {
         gk.known = TRUE;
-        You("%s %s nearby.", sobj ? "smell" : "sense", what);
+        You(_("%s %s nearby."), sobj ? "smell" : "sense", what);
         if (sobj && sobj->blessed) {
             if (!u.uedibility)
-                Your("%s starts to tingle.", body_part(NOSE));
+                Your(_("%s starts to tingle."), body_part(NOSE));
             u.uedibility = 1;
         }
     } else {
@@ -577,13 +577,13 @@ food_detect(struct obj *sobj)
         }
         if (sobj) {
             if (sobj->blessed) {
-                Your("%s %s to tingle and you smell %s.", body_part(NOSE),
+                Your(_("%s %s to tingle and you smell %s."), body_part(NOSE),
                      u.uedibility ? "continues" : "starts", what);
                 u.uedibility = 1;
             } else
-                Your("%s tingles and you smell %s.", body_part(NOSE), what);
+                Your(_("%s tingles and you smell %s."), body_part(NOSE), what);
         } else
-            You("sense %s.", what);
+            You(_("sense %s."), what);
         exercise(A_WIS, TRUE);
 
         browse_map(ter_typ, "food");
@@ -689,7 +689,7 @@ object_detect(struct obj *detector, /* object doing the detecting */
                 strange_feeling(detector, "You feel a lack of something.");
             return 1;
         }
-        You("sense %s nearby.", stuff);
+        You(_("sense %s nearby."), stuff);
         return 0;
     }
 
@@ -777,7 +777,7 @@ object_detect(struct obj *detector, /* object doing the detecting */
         newsym(u.ux, u.uy);
         ter_typ |= TER_MON;
     }
-    You("detect the %s of %s.", ct ? "presence" : "absence", stuff);
+    You(_("detect the %s of %s."), ct ? "presence" : "absence", stuff);
 
     if (!ct)
         display_nhwindow(WIN_MAP, TRUE);
@@ -841,9 +841,9 @@ monster_detect(struct obj *otmp, /* detecting object (if any) */
         }
         if (!swallowed)
             display_self();
-        You("sense the presence of monsters.");
+        You(_("sense the presence of monsters."));
         if (woken)
-            pline("Monsters sense the presence of you.");
+            pline(_("Monsters sense the presence of you."));
 
         if ((otmp && otmp->blessed) && !unconstrained) {
             /* persistent detection--just show updated map */
@@ -995,7 +995,7 @@ display_trap_map(int cursed_src)
         newsym(u.ux, u.uy);
         ter_typ |= TER_MON; /* for autodescribe at <u.ux,u.uy> */
     }
-    You_feel("%s.", cursed_src ? "very greedy" : "entrapped");
+    You_feel(_("%s."), cursed_src ? "very greedy" : "entrapped");
 
     browse_map(ter_typ, cursed_src ? "gold" : "trap of interest");
 
@@ -1083,7 +1083,7 @@ trap_detect(
         return 1;
     }
     /* traps exist, but only under me - no separate display required */
-    Your("%s itch.", makeplural(body_part(TOE)));
+    Your(_("%s itch."), makeplural(body_part(TOE)));
     return 0;
 }
 
@@ -1116,11 +1116,11 @@ furniture_detect(void)
         }
 
     if (!found)
-        There("seems to be nothing of interest on this level.");
+        There(_("seems to be nothing of interest on this level."));
     else if (!revealed)
         /* [what about clipped map with points of interest outside of the
             currently shown area?] */
-        Your("map already shows all relevant locations.");
+        Your(_("map already shows all relevant locations."));
 
     if (!revealed)
         display_nhwindow(WIN_MAP, TRUE);
@@ -1211,7 +1211,7 @@ use_crystal_ball(struct obj **optr)
     boolean charged = (obj->spe > 0);
 
     if (Blind) {
-        pline("Too bad you can't see %s.", the(xname(obj)));
+        pline(_("Too bad you can't see %s."), the(xname(obj)));
         return;
     }
     oops = is_quest_artifact(obj) ? 8 : obj->blessed ? 16 : 20;
@@ -1220,30 +1220,30 @@ use_crystal_ball(struct obj **optr)
 
         switch (rnd((obj->oartifact || obj->blessed) ? 4 : 5)) {
         case 1:
-            pline("%s too much to comprehend!", Tobjnam(obj, "are"));
+            pline(_("%s too much to comprehend!"), Tobjnam(obj, "are"));
             break;
         case 2:
-            pline("%s you!", Tobjnam(obj, "confuse"));
+            pline(_("%s you!"), Tobjnam(obj, "confuse"));
             make_confused((HConfusion & TIMEOUT) + impair, FALSE);
             break;
         case 3:
             if (!resists_blnd(&gy.youmonst)) {
-                pline("%s your vision!", Tobjnam(obj, "damage"));
+                pline(_("%s your vision!"), Tobjnam(obj, "damage"));
                 make_blinded(BlindedTimeout + impair, FALSE);
                 if (!Blind)
                     Your1(vision_clears);
             } else {
-                pline("%s your vision.", Tobjnam(obj, "assault"));
-                You("are unaffected!");
+                pline(_("%s your vision."), Tobjnam(obj, "assault"));
+                You(_("are unaffected!"));
             }
             break;
         case 4:
-            pline("%s your mind!", Tobjnam(obj, "zap"));
+            pline(_("%s your mind!"), Tobjnam(obj, "zap"));
             (void) make_hallucinated((HHallucination & TIMEOUT) + impair,
                                      FALSE, 0L);
             break;
         case 5:
-            pline("%s!", Tobjnam(obj, "explode"));
+            pline(_("%s!"), Tobjnam(obj, "explode"));
             useup(obj);
             *optr = obj = 0; /* it's gone */
             /* physical damage cause by the shards and force */
@@ -1262,20 +1262,20 @@ use_crystal_ball(struct obj **optr)
         gn.nomovemsg = "";
 
         if (!charged) {
-            pline("All you see is funky %s haze.", hcolor((char *) 0));
+            pline(_("All you see is funky %s haze."), hcolor((char *) 0));
             if (obj->spe < 0)
                 goto implode; /* destroy it when it has been cancelled */
         } else {
             switch (rnd(6)) {
             case 1:
-                You("grok some groovy globs of incandescent lava.");
+                You(_("grok some groovy globs of incandescent lava."));
                 break;
             case 2:
-                pline("Whoa!  Psychedelic colors, %s!",
+                pline(_("Whoa!  Psychedelic colors, %s!"),
                       poly_gender() == 1 ? "babe" : "dude");
                 break;
             case 3:
-                pline_The("crystal pulses with sinister %s light!",
+                pline_The(_("crystal pulses with sinister %s light!"),
                           hcolor((char *) 0));
                 break;
             case 4:
@@ -1286,7 +1286,7 @@ use_crystal_ball(struct obj **optr)
                     "tiny snowflakes spinning around a miniature farmhouse.");
                 break;
             default:
-                pline("Oh wow... like a kaleidoscope!");
+                pline(_("Oh wow... like a kaleidoscope!"));
                 break;
             }
             consume_obj_charge(obj, TRUE);
@@ -1296,7 +1296,7 @@ use_crystal_ball(struct obj **optr)
 
     /* read a single character */
     if (flags.verbose)
-        You("may look for an object, monster, or special map symbol.");
+        You(_("may look for an object, monster, or special map symbol."));
     ch = yn_function("What do you look for?", (char *) 0, '\0', TRUE);
     /* Don't filter out ' ' here; it has a use */
     if ((ch != def_monsyms[S_GHOST].sym) && strchr(quitchars, ch)) {
@@ -1309,17 +1309,17 @@ use_crystal_ball(struct obj **optr)
      *  for help in using the crystal ball.
      */
 
-    You("peer into %s...", the(xname(obj)));
+    You(_("peer into %s..."), the(xname(obj)));
     nomul(-rnd(charged ? 10 : 2));
     gm.multi_reason = "gazing into a crystal ball";
     gn.nomovemsg = "";
 
     if (!charged) {
-        pline_The("vision is unclear.");
+        pline_The(_("vision is unclear."));
 
         if (obj->spe < 0) { /* destroy ball if used after being cancelled */
  implode:   /* no damage to hero but 'multi' has a small negative value */
-            pline("%s!", Tobjnam(obj, "implode"));
+            pline(_("%s!"), Tobjnam(obj, "implode"));
             useup(obj);
             *optr = obj = (struct obj *) 0; /* it's gone */
             return;
@@ -1361,7 +1361,7 @@ use_crystal_ball(struct obj **optr)
             if (!rn2(100)) /* make them nervous */
                 You_see("the Wizard of Yendor gazing out at you.");
             else
-                pline_The("vision is unclear.");
+                pline_The(_("vision is unclear."));
         }
     }
     return;
@@ -1552,7 +1552,7 @@ do_vicinity_map(
         /* the getpos() prompt from browse_map() is only shown when
            flags.verbose is set, but make this unconditional so that
            not-verbose users become aware of the prompting situation */
-        You("sense your surroundings.");
+        You(_("sense your surroundings."));
         if (extended || glyph_is_monster(glyph_at(u.ux, u.uy)))
             ter_typ |= TER_MON;
         browse_map(ter_typ, "anything of interest");
@@ -1862,7 +1862,7 @@ findit(void)
         num += found.num_mons;
     }
     if (*buf)
-        You("reveal %s!", buf);
+        You(_("reveal %s!"), buf);
 
     if (found.num_invis) {
         if (found.num_invis > 1)
@@ -1871,21 +1871,21 @@ findit(void)
         else
             Sprintf(buf, "%s unseen monster",
                     found.num_kept_invis ? "another" : "an");
-        You("detect %s!", buf);
+        You(_("detect %s!"), buf);
         num += found.num_invis;
     }
 
     if (found.num_cleared_invis) {
         /* at least 1 "remembered, unseen monster" marker has been removed */
         if (!num)
-            You_feel("%sless paranoid.",
+            You_feel(_("%sless paranoid."),
                      found.num_kept_invis ? "somewhat " : "");
         num += found.num_cleared_invis;
     }
     /* note: num_kept_invis is not included in the final result */
 
     if (!num)
-        You("don't find anything.");
+        You(_("don't find anything."));
 #if FOUND_FLASH_COUNT == 0
     else if (tmp_num) {
         flush_screen(1);
@@ -1907,13 +1907,13 @@ openit(void)
         if (digests(u.ustuck->data)) {
             /* purple worm */
             if (Blind)
-                pline("Its mouth opens!");
+                pline(_("Its mouth opens!"));
             else
-                pline("%s opens its mouth!", Monnam(u.ustuck));
+                pline(_("%s opens its mouth!"), Monnam(u.ustuck));
 #if 0   /* expels() will take care of this */
         } else if (enfolds(u.ustuck->data)) {
             /* trapper or lurker above */
-            pline("%s unfolds!", Monnam(u.ustuck));
+            pline(_("%s unfolds!"), Monnam(u.ustuck));
 #endif
         }
         expels(u.ustuck, u.ustuck->data, TRUE);
@@ -1953,7 +1953,7 @@ find_trap(struct trap *trap)
     }
 
     set_msg_xy(trap->tx, trap->ty);
-    You("find %s.", an(trapname(trap->ttyp, FALSE)));
+    You(_("find %s."), an(trapname(trap->ttyp, FALSE)));
 
     if (cleared) {
         display_nhwindow(WIN_MAP, TRUE); /* wait */
@@ -1982,7 +1982,7 @@ mfind0(struct monst *mtmp, boolean via_warning)
                                   || mtmp->data->mlet == S_EEL)) {
             if (via_warning && found_something) {
                 set_msg_xy(x, y);
-                Your("danger sense causes you to take a second %s.",
+                Your(_("danger sense causes you to take a second %s."),
                      Blind ? "to check nearby" : "look close by");
                 display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
             }
@@ -2002,10 +2002,10 @@ mfind0(struct monst *mtmp, boolean via_warning)
         if (!canspotmon(mtmp)) {
             map_invisible(x, y);
             set_msg_xy(x, y);
-            You_feel("an unseen monster!");
+            You_feel(_("an unseen monster!"));
         } else if (!sensemon(mtmp)) {
             set_msg_xy(x, y);
-            You("find %s.", mtmp->mtame ? y_monnam(mtmp) : a_monnam(mtmp));
+            You(_("find %s."), mtmp->mtame ? y_monnam(mtmp) : a_monnam(mtmp));
         }
         return 1;
     }
@@ -2048,7 +2048,7 @@ dosearch0(int aflag) /* intrinsic autosearch vs explicit searching */
                     nomul(0);
                     feel_location(x, y); /* make sure it shows up */
                     set_msg_xy(x, y);
-                    You("find a hidden door.");
+                    You(_("find a hidden door."));
                 } else if (levl[x][y].typ == SCORR) {
                     if (rnl(7 - fund))
                         continue;
@@ -2058,7 +2058,7 @@ dosearch0(int aflag) /* intrinsic autosearch vs explicit searching */
                     nomul(0);
                     feel_newsym(x, y); /* make sure it shows up */
                     set_msg_xy(x, y);
-                    You("find a hidden passage.");
+                    You(_("find a hidden passage."));
                 } else {
                     /* Be careful not to find anything in an SCORR or SDOOR */
                     if ((mtmp = m_at(x, y)) != 0 && !aflag) {
@@ -2360,7 +2360,7 @@ reveal_terrain(
     boolean full = (which_subset & TER_FULL) != 0; /* show whole map */
 
     if ((Hallucination || Stunned || Confusion) && !full) {
-        You("are too disoriented for this.");
+        You(_("are too disoriented for this."));
     } else {
         coordxy x, y;
         int glyph, default_glyph;
@@ -2401,7 +2401,7 @@ reveal_terrain(
                 Sprintf(eos(buf), "%s and monsters",
                         (keep_traps || keep_objs) ? "," : "");
         }
-        pline("Showing %s only...", buf);
+        pline(_("Showing %s only..."), buf);
 
         /* allow player to move cursor around and get autodescribe feedback
            based on what is visible now rather than what is on 'real' map */

@@ -127,7 +127,7 @@ move_special(struct monst *mtmp, boolean in_his_shop, schar appr,
 #if 0 /* dead code; maybe someday someone will track down why... */
         if (ib) {
             if (cansee(mtmp->mx, mtmp->my))
-                pline("%s picks up %s.", Monnam(mtmp),
+                pline(_("%s picks up %s."), Monnam(mtmp),
                       distant_name(ib, doname));
             obj_extract_self(ib);
             (void) mpickobj(mtmp, ib);
@@ -198,7 +198,7 @@ pri_move(struct monst *priest)
         || (Conflict && !resist_conflict(priest))) {
         if (monnear(priest, u.ux, u.uy)) {
             if (Displaced)
-                Your("displaced image doesn't fool %s!", mon_nam(priest));
+                Your(_("displaced image doesn't fool %s!"), mon_nam(priest));
             (void) mattacku(priest);
             return 0;
         } else if (strchr(u.urooms, temple)) {
@@ -437,7 +437,7 @@ intemple(int roomno)
                Moloch so suppress the "of Moloch" for him here too */
             if (sanctum && !Hallucination)
                 priest->ispriest = 0;
-            pline("%s intones:",
+            pline(_("%s intones:"),
                   canseemon(priest) ? Monnam(priest) : "A nearby voice");
             priest->ispriest = save_priest;
             epri_p->intone_time = svm.moves + (long) d(10, 500); /* ~2505 */
@@ -503,13 +503,13 @@ intemple(int roomno)
 
         switch (rn2(4)) {
         case 0:
-            You("have an eerie feeling...");
+            You(_("have an eerie feeling..."));
             break;
         case 1:
-            You_feel("like you are being watched.");
+            You_feel(_("like you are being watched."));
             break;
         case 2:
-            pline("A shiver runs down your %s.", body_part(SPINE));
+            pline(_("A shiver runs down your %s."), body_part(SPINE));
             break;
         default:
             break; /* no message; unfortunately there's no
@@ -521,15 +521,15 @@ intemple(int roomno)
                    != 0) {
             int ngen = svm.mvitals[PM_GHOST].born;
             if (canspotmon(mtmp))
-                pline("A%s ghost appears next to you%c",
+                pline(_("A%s ghost appears next to you%c"),
                       ngen < 5 ? "n enormous" : "",
                       ngen < 10 ? '!' : '.');
             else
-                You("sense a presence close by!");
+                You(_("sense a presence close by!"));
             mtmp->mpeaceful = 0;
             set_malign(mtmp);
             if (flags.verbose)
-                You("are frightened to death, and unable to move.");
+                You(_("are frightened to death, and unable to move."));
             nomul(-3);
             gm.multi_reason = "being terrified of a ghost";
             gn.nomovemsg = "You regain your composure.";
@@ -573,7 +573,7 @@ priest_talk(struct monst *priest)
                        mon_nam(priest));
 
     if (priest->mflee || (!priest->ispriest && coaligned && strayed)) {
-        pline("%s doesn't want anything to do with you!", Monnam(priest));
+        pline(_("%s doesn't want anything to do with you!"), Monnam(priest));
         priest->mpeaceful = 0;
         return;
     }
@@ -587,7 +587,7 @@ priest_talk(struct monst *priest)
         };
 
         if (helpless(priest)) {
-            pline("%s breaks out of %s reverie!", Monnam(priest),
+            pline(_("%s breaks out of %s reverie!"), Monnam(priest),
                   mhis(priest));
             priest->mfrozen = priest->msleeping = 0;
             priest->mcanmove = 1;
@@ -615,42 +615,42 @@ priest_talk(struct monst *priest)
                 bits = (Hallucination) ? currency(pmoney)
                                        : (pmoney == 1L) ? "bit" : "bits";
                 /* Note: two bits is actually 25 cents.  Hmm. */
-                pline("%s gives you %s%s for an ale.", Monnam(priest),
+                pline(_("%s gives you %s%s for an ale."), Monnam(priest),
                       (pmoney == 1L) ? "one " : "two ", bits);
                 money2u(priest, pmoney > 1L ? 2 : 1);
             } else
-                pline("%s preaches the virtues of poverty.", Monnam(priest));
+                pline(_("%s preaches the virtues of poverty."), Monnam(priest));
             exercise(A_WIS, TRUE);
         } else
-            pline("%s is not interested.", Monnam(priest));
+            pline(_("%s is not interested."), Monnam(priest));
         return;
     } else {
         long offer;
 
-        pline("%s asks you for a contribution for the temple.",
+        pline(_("%s asks you for a contribution for the temple."),
               Monnam(priest));
         if ((offer = bribe(priest)) == 0) {
             SetVoice(priest, 0, 80, 0);
-            verbalize("Thou shalt regret thine action!");
+            verbalize(_("Thou shalt regret thine action!"));
             if (coaligned)
                 adjalign(-1);
         } else if (offer < (u.ulevel * 200)) {
             if (money_cnt(gi.invent) > (offer * 2L)) {
                 SetVoice(priest, 0, 80, 0);
-                verbalize("Cheapskate.");
+                verbalize(_("Cheapskate."));
             } else {
                 SetVoice(priest, 0, 80, 0);
-                verbalize("I thank thee for thy contribution.");
+                verbalize(_("I thank thee for thy contribution."));
                 /* give player some token */
                 exercise(A_WIS, TRUE);
             }
         } else if (offer < (u.ulevel * 400)) {
             SetVoice(priest, 0, 80, 0);
-            verbalize("Thou art indeed a pious individual.");
+            verbalize(_("Thou art indeed a pious individual."));
             if (money_cnt(gi.invent) < (offer * 2L)) {
                 if (coaligned && u.ualign.record <= ALGN_SINNED)
                     adjalign(1);
-                verbalize("I bestow upon thee a blessing.");
+                verbalize(_("I bestow upon thee a blessing."));
                 incr_itimeout(&HClairvoyant, rn1(500, 500));
             }
         } else if (offer < (u.ulevel * 600)
@@ -662,7 +662,7 @@ priest_talk(struct monst *priest)
                        || (u.ublessed < 20
                            && (u.ublessed < 9 || !rn2(u.ublessed))))) {
             SetVoice(priest, 0, 80, 0);
-            verbalize("Thou hast been rewarded for thy devotion.");
+            verbalize(_("Thou hast been rewarded for thy devotion."));
             if (!(HProtection & INTRINSIC)) {
                 HProtection |= FROMOUTSIDE;
                 if (!u.ublessed)
@@ -671,7 +671,7 @@ priest_talk(struct monst *priest)
                 u.ublessed++;
         } else {
             SetVoice(priest, 0, 80, 0);
-            verbalize("Thy selfless generosity is deeply appreciated.");
+            verbalize(_("Thy selfless generosity is deeply appreciated."));
             if (money_cnt(gi.invent) < (offer * 2L) && coaligned) {
                 if (strayed && (svm.moves - u.ucleansed) > 5000L) {
                     u.ualign.record = 0; /* cleanse thee */
@@ -813,15 +813,15 @@ ghod_hitsu(struct monst *priest)
 
     switch (rn2(3)) {
     case 0:
-        pline("%s roars in anger:  \"Thou shalt suffer!\"",
+        pline(_("%s roars in anger:  \"Thou shalt suffer!\""),
               a_gname_at(ax, ay));
         break;
     case 1:
-        pline("%s voice booms:  \"How darest thou harm my servant!\"",
+        pline(_("%s voice booms:  \"How darest thou harm my servant!\""),
               s_suffix(a_gname_at(ax, ay)));
         break;
     default:
-        pline("%s roars:  \"Thou dost profane my shrine!\"",
+        pline(_("%s roars:  \"Thou dost profane my shrine!\""),
               a_gname_at(ax, ay));
         break;
     }

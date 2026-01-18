@@ -157,12 +157,12 @@ is_pure(boolean talk)
 
     if (wizard && talk) {
         if (u.ualign.type != original_alignment) {
-            You("are currently %s instead of %s.", align_str(u.ualign.type),
+            You(_("are currently %s instead of %s."), align_str(u.ualign.type),
                 align_str(original_alignment));
         } else if (u.ualignbase[A_CURRENT] != original_alignment) {
-            You("have converted.");
+            You(_("have converted."));
         } else if (u.ualign.record < MIN_QUEST_ALIGN) {
-            You("are currently %d and require %d.", u.ualign.record,
+            You(_("are currently %d and require %d."), u.ualign.record,
                 MIN_QUEST_ALIGN);
             if (yn_function("adjust?", (char *) 0, 'y', TRUE) == 'y')
                 u.ualign.record = MIN_QUEST_ALIGN;
@@ -243,7 +243,7 @@ finish_quest(struct obj *obj) /* quest artifact or thrown unique item or faux
             verbalize(
       "Sorry to say, this is a mere imitation of the true Amulet of Yendor.");
         } else {
-            verbalize("Ah, I see you've found %s.", the(xname(obj)));
+            verbalize(_("Ah, I see you've found %s."), the(xname(obj)));
         }
         return;
     }
@@ -440,9 +440,9 @@ prisoner_speaks(struct monst *mtmp)
         && (mtmp->mstrategy & STRAT_WAITMASK)) {
         /* Awaken the prisoner */
         if (canseemon(mtmp))
-            pline("%s speaks:", Monnam(mtmp));
+            pline(_("%s speaks:"), Monnam(mtmp));
         SetVoice(mtmp, 0, 80, 0);
-        verbalize("I'm finally free!");
+        verbalize(_("I'm finally free!"));
         mtmp->mstrategy &= ~STRAT_WAITMASK;
         mtmp->mpeaceful = 1;
 

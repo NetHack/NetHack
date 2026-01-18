@@ -253,7 +253,7 @@ wiz_kill(void)
 
     cc.x = u.ux, cc.y = u.uy;
     for (;;) {
-        pline("%s:", prompt);
+        pline(_("%s:"), prompt);
         prompt = "Next monster";
 
         flags.verbose = FALSE;
@@ -311,7 +311,7 @@ wiz_kill(void)
 
             if (!iflags.menu_requested) {
                 /* normal case: hero is credited/blamed */
-                You("%s %s!", nonliving(mtmp->data) ? "destroy" : "kill", Mn);
+                You(_("%s %s!"), nonliving(mtmp->data) ? "destroy" : "kill", Mn);
                 xkilled(mtmp, XKILL_NOMSG);
             } else { /* 'm'-prefix */
                 /* we know that monsters aren't moving because player has
@@ -320,7 +320,7 @@ wiz_kill(void)
                    need to have the mon_moving flag be True in order to
                    avoid blaming or crediting hero for their deaths */
                 svc.context.mon_moving = TRUE;
-                pline("%s is %s.", upstart(Mn),
+                pline(_("%s is %s."), upstart(Mn),
                       nonliving(mtmp->data) ? "destroyed" : "killed");
                 /* Null second arg suppresses the usual message */
                 monkilled(mtmp, (char *) 0, AD_PHYS);
@@ -331,7 +331,7 @@ wiz_kill(void)
             if (u.utotype || !on_level(&u.uz, &uarehere))
                 break;
         } else {
-            There("is no monster there.");
+            There(_("is no monster there."));
             break;
         }
     }
@@ -435,7 +435,7 @@ wiz_flip_level(void)
 
             docrt();
         } else {
-            pline("%s", Never_mind);
+            pline(_("%s"), Never_mind);
         }
     }
     return ECMD_OK;
@@ -462,10 +462,10 @@ wiz_level_change(void)
         return ECMD_OK;
     }
     if (newlevel == u.ulevel) {
-        You("are already that experienced.");
+        You(_("are already that experienced."));
     } else if (newlevel < u.ulevel) {
         if (u.ulevel == 1) {
-            You("are already as inexperienced as you can get.");
+            You(_("are already as inexperienced as you can get."));
             return ECMD_OK;
         }
         if (newlevel < 1)
@@ -474,7 +474,7 @@ wiz_level_change(void)
             losexp("#levelchange");
     } else {
         if (u.ulevel >= MAXULEV) {
-            You("are already as experienced as you can get.");
+            You(_("are already as experienced as you can get."));
             return ECMD_OK;
         }
         if (newlevel > MAXULEV)
@@ -500,7 +500,7 @@ wiz_telekinesis(void)
     cc.x = u.ux;
     cc.y = u.uy;
 
-    pline("Pick a monster to hurtle.");
+    pline(_("Pick a monster to hurtle."));
     do {
         ans = getpos(&cc, TRUE, "a monster");
         if (ans < 0 || cc.x < 1)
@@ -549,8 +549,8 @@ int
 wiz_fuzzer(void)
 {
     if (flags.suppress_alert < FEATURE_NOTICE_VER(3,7,0)) {
-        pline("The fuzz tester will make NetHack execute random keypresses.");
-        There("is no conventional way out of this mode.");
+        pline(_("The fuzz tester will make NetHack execute random keypresses."));
+        There(_("is no conventional way out of this mode."));
     }
     if (paranoid_query(TRUE, "Do you want to start fuzz testing?")) {
         /* Thoth, take the reins */
@@ -893,13 +893,13 @@ wiz_smell(void)
     cc.x = u.ux;
     cc.y = u.uy;
     if (!olfaction(gy.youmonst.data)) {
-        You("are incapable of detecting odors in your present form.");
+        You(_("are incapable of detecting odors in your present form."));
         return ECMD_OK;
     }
 
-    You("can move the cursor to a monster that you want to smell.");
+    You(_("can move the cursor to a monster that you want to smell."));
     do {
-        pline("Pick a monster to smell.");
+        pline(_("Pick a monster to smell."));
         ans = getpos(&cc, TRUE, "a monster");
         if (ans < 0 || cc.x < 0) {
             return ECMD_CANCEL; /* done */
@@ -923,14 +923,14 @@ wiz_smell(void)
         /* Is it a monster? */
         if (mptr) {
             if (is_you)
-                You("surreptitiously sniff under your %s.", body_part(ARM));
+                You(_("surreptitiously sniff under your %s."), body_part(ARM));
             if (!usmellmon(mptr))
-                pline("%s to not give off any smell.",
+                pline(_("%s to not give off any smell."),
                       is_you ? "You seem" : "That monster seems");
             if (!glyph_is_monster(glyph))
                 map_invisible(cc.x, cc.y);
         } else {
-            You("don't smell any monster there.");
+            You(_("don't smell any monster there."));
             if (glyph_is_invisible(glyph))
                 unmap_invisible(cc.x, cc.y);
         }
@@ -1073,7 +1073,7 @@ wiz_intrinsic(void)
                 if (p != GLIB)
                     incr_itimeout(&u.uprops[p].intrinsic, amt);
                 disp.botl = TRUE; /* have pline() do a status update */
-                pline("Timeout for %s %s %d.", propname,
+                pline(_("Timeout for %s %s %d."), propname,
                       oldtimeout ? "increased by" : "set to", amt);
                 break;
             }
@@ -1524,7 +1524,7 @@ list_migrating_mons(
             ++other;
     }
     if (here + nxtlv + other == 0) {
-        pline("No monsters currently migrating.");
+        pline(_("No monsters currently migrating."));
     } else {
         pline(
       "%d mon%s pending for current level, %d for next level, %d for others.",
@@ -1603,7 +1603,7 @@ list_migrating_mons(
             display_nhwindow(win, FALSE);
             destroy_nhwindow(win);
         } else if (c != 'q') {
-            pline("None.");
+            pline(_("None."));
         }
 
     }
@@ -1850,7 +1850,7 @@ wiz_migrate_mons(void)
         getlin("How many random monsters to migrate to next level? [0]",
                inbuf);
     else
-        pline("Can't get there from here.");
+        pline(_("Can't get there from here."));
     if (*inbuf == '\033' || *inbuf == '\0')
         return ECMD_OK;
 

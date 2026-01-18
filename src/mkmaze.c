@@ -1710,7 +1710,7 @@ water_friction(void)
         eff = TRUE;
     }
     if (eff)
-        pline("Water turbulence affects your movements.");
+        pline(_("Water turbulence affects your movements."));
 }
 
 void
@@ -1953,7 +1953,7 @@ mv_bubble(struct bubble *b, coordxy dx, coordxy dy, boolean ini)
     if (!Is_airlevel(&u.uz) || !rn2(6)) {
         /* move bubble */
         if (dx < -1 || dx > 1 || dy < -1 || dy > 1) {
-            /* pline("mv_bubble: dx = %d, dy = %d", dx, dy); */
+            /* pline(_("mv_bubble: dx = %d, dy = %d"), dx, dy); */
             dx = sgn(dx);
             dy = sgn(dy);
         }
@@ -1972,20 +1972,20 @@ mv_bubble(struct bubble *b, coordxy dx, coordxy dy, boolean ini)
             colli |= 1;
 
         if (b->x < gbxmin) {
-            pline("bubble xmin: x = %d, xmin = %d", b->x, gbxmin);
+            pline(_("bubble xmin: x = %d, xmin = %d"), b->x, gbxmin);
             b->x = gbxmin;
         }
         if (b->y < gbymin) {
-            pline("bubble ymin: y = %d, ymin = %d", b->y, gbymin);
+            pline(_("bubble ymin: y = %d, ymin = %d"), b->y, gbymin);
             b->y = gbymin;
         }
         if ((int) (b->x + b->bm[0] - 1) > gbxmax) {
-            pline("bubble xmax: x = %d, xmax = %d", b->x + b->bm[0] - 1,
+            pline(_("bubble xmax: x = %d, xmax = %d"), b->x + b->bm[0] - 1,
                   gbxmax);
             b->x = gbxmax - b->bm[0] + 1;
         }
         if ((int) (b->y + b->bm[1] - 1) > gbymax) {
-            pline("bubble ymax: y = %d, ymax = %d", b->y + b->bm[1] - 1,
+            pline(_("bubble ymax: y = %d, ymax = %d"), b->y + b->bm[1] - 1,
                   gbymax);
             b->y = gbymax - b->bm[1] + 1;
         }

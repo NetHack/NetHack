@@ -1087,8 +1087,8 @@ done(int how)
         Your(_("medallion %s!"), !Blind ? _("begins to glow") : _("feels warm"));
         if (how == CHOKING)
             You(_("vomit ..."));
-        You_feel("much better!");
-        pline_The("medallion crumbles to dust!");
+        You_feel(_("much better!"));
+        pline_The(_("medallion crumbles to dust!"));
         if (uamul)
             useup(uamul);
 

@@ -118,7 +118,7 @@ pick_familiar_pm(struct obj *otmp, boolean quietly)
             if (!quietly)
                 /* have just been given "You <do something with>
                    the figurine and it transforms." message */
-                pline("... into a pile of dust.");
+                pline(_("... into a pile of dust."));
             return (struct permonst *) 0;
         }
     } else if (!rn2(3)) {
@@ -129,7 +129,7 @@ pick_familiar_pm(struct obj *otmp, boolean quietly)
 
         pm = rndmonst_adj(0, max);
         if (!pm && !quietly)
-            There("seems to be nothing available for a familiar.");
+            There(_("seems to be nothing available for a familiar."));
     }
     return pm;
 }
@@ -191,7 +191,7 @@ make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
             reallytame = FALSE; /* not tame after all */
             if (chance == 2) {  /* hostile (cursed figurine) */
                 if (!quietly)
-                    You("get a bad feeling about this.");
+                    You(_("get a bad feeling about this."));
                 mtmp->mpeaceful = 0;
                 set_malign(mtmp);
             }
@@ -832,13 +832,13 @@ keepdogs(
                 stay_behind = TRUE;
             } else if (mon_has_amulet(mtmp)) {
                 if (canseemon(mtmp))
-                    pline("%s seems very disoriented for a moment.",
+                    pline(_("%s seems very disoriented for a moment."),
                           Monnam(mtmp));
                 stay_behind = TRUE;
             }
             if (stay_behind) {
                 if (mtmp->mleashed) {
-                    pline("%s leash suddenly comes loose.",
+                    pline(_("%s leash suddenly comes loose."),
                           humanoid(mtmp->data)
                               ? (mtmp->female ? "Her" : "His")
                               : "Its");
@@ -873,7 +873,7 @@ keepdogs(
         } else if (mtmp->mleashed) {
             /* this can happen if your quest leader ejects you from the
                "home" level while a leashed pet isn't next to you */
-            pline("%s leash goes slack.", s_suffix(Monnam(mtmp)));
+            pline(_("%s leash goes slack."), s_suffix(Monnam(mtmp)));
             m_unleash(mtmp, FALSE);
         }
     }
@@ -1202,7 +1202,7 @@ tamedog(
                           Monnam(mtmp), the(xname(obj)),
                          !big_corpse ? "." : ", or vice versa!");
             } else if (cansee(mtmp->mx, mtmp->my))
-                pline("%s.", Tobjnam(obj, "stop"));
+                pline(_("%s."), Tobjnam(obj, "stop"));
             /* dog_eat expects a floor object */
             place_object(obj, mtmp->mx, mtmp->my);
             (void) dog_eat(mtmp, obj, mtmp->mx, mtmp->my, FALSE);

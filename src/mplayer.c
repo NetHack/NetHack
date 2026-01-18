@@ -371,7 +371,7 @@ mplayer_talk(struct monst *mtmp)
         return; /* will drop to humanoid talk */
 
     SetVoice(mtmp, 0, 80, 0);
-    verbalize("Talk? -- %s", mtmp->data == &mons[gu.urole.mnum]
+    verbalize(_("Talk? -- %s"), mtmp->data == &mons[gu.urole.mnum]
                                 ? same_class_msg[rn2(3)]
                                 : other_class_msg[rn2(3)]);
 }

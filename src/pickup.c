@@ -238,7 +238,7 @@ query_classes(
                         where = !strcmp(action, "pick up") ? "here"
                                 : !strcmp(action, "take out") ? "inside" : "";
                     if (*where)
-                        There("are no %c's %s.", sym, where);
+                        There(_("are no %c's %s."), sym, where);
                     else
                         You(_("have no %c's."), sym);
                     not_everything = TRUE;
@@ -407,7 +407,7 @@ describe_decor(void)
         if (ltyp == ICE && flags.mention_decor)
             Norep("%s", outbuf);
         else
-            pline("%s", outbuf);
+            pline(_("%s"), outbuf);
     } else if (!Underwater) {
         if (IS_POOL(iflags.prev_decor)
             || IS_LAVA(iflags.prev_decor)
@@ -819,7 +819,7 @@ pickup(int what) /* should be a long */
         } else if (ct >= 2) {
             int via_menu = 0;
 
-            There("are %s objects here.", (ct <= 10) ? "several" : "many");
+            There(_("are %s objects here."), (ct <= 10) ? "several" : "many");
             if (!query_classes(oclasses, &selective, &all_of_a_type,
                                "pick up", *objchain_p,
                                (traverse_how & BY_NEXTHERE) ? TRUE : FALSE,
@@ -1179,11 +1179,11 @@ query_objlist(const char *qstr,        /* query string */
                 /* this isn't actually possible; fake item representing
                    hero is only included for look here (':'), not pickup,
                    and that's PICK_NONE so we can't get here from there */
-                You_cant("pick yourself up!");
+                You_cant(_("pick yourself up!"));
                 continue;
             }
             if (engulfer_minvent && curr->owornmask != 0L) {
-                You_cant("pick %s up.", ysimple_name(curr));
+                You_cant(_("pick %s up."), ysimple_name(curr));
                 continue;
             }
             if (mi->count == -1L || mi->count > curr->quan)
@@ -1693,7 +1693,7 @@ carry_count(struct obj *obj,            /* object to pick up... */
         prefx2 = "is too heavy for you to ";
         suffx = "";
     }
-    There("%s %s %s, but %s%s%s%s.", otense(obj, "are"), obj_nambuf, where,
+    There(_("%s %s %s, but %s%s%s%s."), otense(obj, "are"), obj_nambuf, where,
           prefx1, prefx2, verb, suffx);
 
     /* *wt_after = iw; */
@@ -1821,7 +1821,7 @@ pickup_object(
         return 0;
     } else if (obj->where == OBJ_MINVENT && obj->owornmask != 0L
                && engulfing_u(obj->ocarry)) {
-        You_cant("pick %s up.", ysimple_name(obj));
+        You_cant(_("pick %s up."), ysimple_name(obj));
         return 0;
     } else if (obj->oartifact && !touch_artifact(obj, &gy.youmonst)) {
         return 0;
@@ -1851,7 +1851,7 @@ pickup_object(
         } else if (!obj->spe && !obj->cursed) {
             obj->spe = 1;
         } else {
-            pline_The("scroll%s %s to dust as you %s %s up.", plur(obj->quan),
+            pline_The(_("scroll%s %s to dust as you %s %s up."), plur(obj->quan),
                       otense(obj, "turn"), telekinesis ? "raise" : "pick",
                       (obj->quan == 1L) ? "it" : "them");
             trycall(obj);
@@ -2093,7 +2093,7 @@ do_loot_cont(
 
 #if 0
         if (ccount < 2 && (svl.level.objects[cobj->ox][cobj->oy] == cobj))
-            pline("%s locked.",
+            pline(_("%s locked."),
                   cobj->lknown ? "It is" : "Hmmm, it turns out to be");
         else
 #endif
@@ -2319,7 +2319,7 @@ doloot_core(void)
         if (!looted_mon) {
             if (!underfoot && container_at(cc.x, cc.y, FALSE)) {
                 if (mtmp) {
-                    You_cant("loot anything %sthere with %s in the way.",
+                    You_cant(_("loot anything %sthere with %s in the way."),
                              prev_inquiry ? "else " : "", mon_nam(mtmp));
                     return (timepassed ? ECMD_TIME : ECMD_OK);
                 } else {
@@ -2395,7 +2395,7 @@ reverse_loot(void)
 
         if (coffers) {
             SetVoice((struct monst *) 0, 0, 80, 0);
-            verbalize("Thank you for your contribution to reduce the debt.");
+            verbalize(_("Thank you for your contribution to reduce the debt."));
             freeinv(goldob);
             (void) add_to_container(coffers, goldob);
             coffers->owt = weight(coffers);
@@ -2441,7 +2441,7 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
                          SUPPRESS_SADDLE, FALSE));
         if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y') {
             if (nolimbs(gy.youmonst.data)) {
-                You_cant("do that without limbs."); /* not body_part(HAND) */
+                You_cant(_("do that without limbs.")); /* not body_part(HAND) */
                 return 0;
             }
             if (otmp->cursed) {
@@ -2570,7 +2570,7 @@ in_container(struct obj *obj)
         return 0;
     } else if ((obj->otyp == LOADSTONE) && obj->cursed) {
         set_bknown(obj, 1);
-        pline_The("stone%s won't leave your person.", plur(obj->quan));
+        pline_The(_("stone%s won't leave your person."), plur(obj->quan));
         return 0;
     } else if (obj->otyp == AMULET_OF_YENDOR
                || obj->otyp == CANDELABRUM_OF_INVOCATION
@@ -2869,7 +2869,7 @@ observe_quantum_cat(struct obj *box, boolean makecat, boolean givemsg)
             deadcat = oname(deadcat, sc, ONAME_NO_FLAGS);
         }
         if (givemsg)
-            pline_The("%s inside the box is dead!",
+            pline_The(_("%s inside the box is dead!"),
                       Hallucination ? rndmonnam((char *) 0) : "housecat");
     }
     nhUse(deadcat);
@@ -3646,7 +3646,7 @@ dotip(void)
     }
     /* anything not covered yet */
     if (cobj->oclass == POTION_CLASS) /* can't pour potions... */
-        pline_The("%s %s securely sealed.", xname(cobj), otense(cobj, "are"));
+        pline_The(_("%s %s securely sealed."), xname(cobj), otense(cobj, "are"));
     else if (uarmh && cobj == uarmh)
         return tiphat() ? ECMD_TIME : ECMD_OK;
     else if (cobj->otyp == STATUE)
