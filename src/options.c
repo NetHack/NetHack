@@ -165,68 +165,68 @@ static const struct paranoia_opts {
        if any entry or alias beginning with 'n' gets added, aside from "none",
        the parsing to accept "nofoo" to mean "!foo" will need fixing */
     { PARANOID_CONFIRM, "Confirm", 1, "Paranoia", 2,
-      "for \"yes\" confirmations, require \"no\" to reject" },
+      N_("for \"yes\" confirmations, require \"no\" to reject") },
     { PARANOID_QUIT, "quit", 1, "explore", 2,
-      "yes vs y to quit or to enter explore mode" },
+      N_("yes vs y to quit or to enter explore mode") },
     { PARANOID_DIE, "die", 1, "death", 2,
-      "yes vs y to die (explore mode or debug mode)" },
+      N_("yes vs y to die (explore mode or debug mode)") },
     { PARANOID_BONES, "bones", 1, 0, 0,
-      "yes vs y to save bones data when dying in debug mode" },
+      N_("yes vs y to save bones data when dying in debug mode") },
     { PARANOID_HIT, "attack", 1, "hit", 1,
-      "yes vs y to attack a peaceful monster" },
+      N_("yes vs y to attack a peaceful monster") },
     { PARANOID_BREAKWAND, "wand-break", 2, "break-wand", 2,
-      "yes vs y to break a wand via (a)pply" },
+      N_("yes vs y to break a wand via (a)pply") },
     { PARANOID_EATING, "eat", 1, "continue", 4,
-      "yes vs y to continue eating after first bite when satiated" },
+      N_("yes vs y to continue eating after first bite when satiated") },
     { PARANOID_WERECHANGE, "Were-change", 2, (const char *) 0, 0,
-      "yes vs y to change form when lycanthropy is controllable" },
+      N_("yes vs y to change form when lycanthropy is controllable") },
     /* extra y/n questions rather than changing y/n to yes/n[o];
        they switch to yes/no if paranoid:confirm is also set */
     { PARANOID_PRAY, "pray", 1, 0, 0,
-      "y required to pray (supersedes old \"prayconfirm\" option)" },
+      N_("y required to pray (supersedes old \"prayconfirm\" option)") },
     { PARANOID_TRAP, "trap", 1, "move-trap", 1,
-      "y required to enter known trap unless considered harmless" },
+      N_("y required to enter known trap unless considered harmless") },
     { PARANOID_AUTOALL, "Autoall", 2, "autoselect-all", 2,
-      "y required to pick filter choice 'A' for menustyle:Full" },
+      N_("y required to pick filter choice 'A' for menustyle:Full") },
     /* not a yes/n[o] vs y/n change nor a y/n addition */
     { PARANOID_SWIM, "swim", 1, 0, 0,
-      "'m' prefix necessary to deliberately walk into lava or water" },
+      N_("'m' prefix necessary to deliberately walk into lava or water") },
     { PARANOID_REMOVE, "Remove", 1, "Takeoff", 1,
       /* normally when there is only 1 candidate it's chosen automatically */
-      "always pick from inventory for Remove and Takeoff" },
+      N_("always pick from inventory for Remove and Takeoff") },
     /* for config file parsing; interactive menu skips these */
     { 0, "none", 4, 0, 0, 0 }, /* require full word match */
     { ~0, "all", 3, 0, 0, 0 }, /* ditto */
 };
 
 static NEARDATA const char *menutype[][3] = { /* 'menustyle' settings */
-    { "traditional",  "[prompt for object class(es), then",
-                      " ask y/n for each item in those classes]" },
-    { "combination",  "[prompt for object class(es), then",
-                      " use menu for items in those classes]" },
-    { "full",         "[use menu to choose class(es), then",
-                      " use another menu for items in those]" },
-    { "partial",      "[skip class filtering; always",
-                      " use menu of all available items]" }
+    { "traditional",  N_("[prompt for object class(es), then"),
+                      N_(" ask y/n for each item in those classes]") },
+    { "combination",  N_("[prompt for object class(es), then"),
+                      N_(" use menu for items in those classes]") },
+    { "full",         N_("[use menu to choose class(es), then"),
+                      N_(" use another menu for items in those]") },
+    { "partial",      N_("[skip class filtering; always"),
+                      N_(" use menu of all available items]") }
 };
 #if PREV_MSGS /* tty supports all four settings, curses just final two */
 static NEARDATA const char *msgwind[][3] = { /* 'msg_window' settings */
-    { "single",       "[show one old message at a time,",
-                      " most recent first]" },
-    { "combination",  "[for consecutive ^P requests, use",
-                      " 'single' for first two, then 'full']" },
-    { "full",         "[show all available messages,",
-                      " oldest first and most recent last]" },
-    { "reversed",     "[show all available messages,",
-                      " most recent first]" }
+    { "single",       N_("[show one old message at a time,"),
+                      N_(" most recent first]") },
+    { "combination",  N_("[for consecutive ^P requests, use"),
+                      N_(" 'single' for first two, then 'full']") },
+    { "full",         N_("[show all available messages,"),
+                      N_(" oldest first and most recent last]") },
+    { "reversed",     N_("[show all available messages,"),
+                      N_(" most recent first]") }
 };
 #endif
 /* autounlock settings */
 static NEARDATA const char *unlocktypes[][2] = {
-    { "untrap",    "(might fail)" },
+    { "untrap",    N_("(might fail)") },
     { "apply-key", "" },
-    { "kick",      "(doors only)" },
-    { "force",     "(chests/boxes only)" },
+    { "kick",      N_("(doors only)") },
+    { "force",     N_("(chests/boxes only)") },
 };
 static NEARDATA const char *burdentype[] = {
     "unencumbered", "burdened",     "stressed",
@@ -241,20 +241,20 @@ static NEARDATA const char *sortltype[] = {
 /* second column is an alias for the first; third is brief explanation;
    entries 5 and 6 are 1|4 and 2|4 (tty only) */
 static NEARDATA const char *perminv_modes[][3] = {
-  /*0*/ { "none",      "off",        "no permanent inventory window" },
-  /*1*/ { "all" ,      "on",         "all inventory except for gold" },
-  /*2*/ { "full",      "gold",       "full inventory including gold" },
+  /*0*/ { "none",      "off",        N_("no permanent inventory window") },
+  /*1*/ { "all" ,      "on",         N_("all inventory except for gold") },
+  /*2*/ { "full",      "gold",       N_("full inventory including gold") },
   /*3*/ { NULL,        NULL,         NULL },
   /*4*/ { NULL,        NULL,         NULL },
 #ifdef TTY_PERM_INVENT
-  /*5*/ { "on+grid",   "all+grid",   "all except gold, plus unused letters" },
-  /*6*/ { "gold+grid", "full+grid",  "full inventory, plus unused letters" },
+  /*5*/ { "on+grid",   "all+grid",   N_("all except gold, plus unused letters") },
+  /*6*/ { "gold+grid", "full+grid",  N_("full inventory, plus unused letters") },
 #else
   /*5*/ { NULL,        NULL,         NULL },
   /*6*/ { NULL,        NULL,         NULL },
 #endif
   /*7*/ { NULL,        NULL,         NULL },
-  /*8*/ { "in-use",    "inuse-only", "subset: items currently in use" },
+  /*8*/ { "in-use",    "inuse-only", N_("subset: items currently in use") },
 };
 
 struct objsymopt {
@@ -289,12 +289,12 @@ struct objsymopt {
  *        b [ Hawaiian shirt         b [ Hawaiian shirt
  */
 static const struct objsymopt objsymvals[] = {
-    { 0, "none",         "don't show object symbols in menus" },
-    { 1, "headers",      "show object symbols in menu header lines" },
-    { 2, "entries",      "show object symbols in individual menu entries" },
-    { 3, "both",         "show object symbols in headers and menu entries" },
-    { 4, "conditional",  "show objsyms in entries if no headers are shown" },
-    { 5, "one-or-other", "show objsyms in header, in entries if no header" },
+    { 0, "none",         N_("don't show object symbols in menus") },
+    { 1, "headers",      N_("show object symbols in menu header lines") },
+    { 2, "entries",      N_("show object symbols in individual menu entries") },
+    { 3, "both",         N_("show object symbols in headers and menu entries") },
+    { 4, "conditional",  N_("show objsyms in entries if no headers are shown") },
+    { 5, "one-or-other", N_("show objsyms in header, in entries if no header") },
 };
 
 /*
@@ -330,28 +330,28 @@ typedef struct {
 } menu_cmd_t;
 
 static const menu_cmd_t default_menu_cmd_info[] = {
-    { "menu_next_page",     MENU_NEXT_PAGE,     "Go to next page" },
-    { "menu_previous_page", MENU_PREVIOUS_PAGE, "Go to previous page" },
-    { "menu_first_page",    MENU_FIRST_PAGE,    "Go to first page" },
-    { "menu_last_page",     MENU_LAST_PAGE,     "Go to last page" },
+    { "menu_next_page",     MENU_NEXT_PAGE,     N_("Go to next page") },
+    { "menu_previous_page", MENU_PREVIOUS_PAGE, N_("Go to previous page") },
+    { "menu_first_page",    MENU_FIRST_PAGE,    N_("Go to first page") },
+    { "menu_last_page",     MENU_LAST_PAGE,     N_("Go to last page") },
     { "menu_select_all",    MENU_SELECT_ALL,
-                            "Select all items in entire menu" },
+                            N_("Select all items in entire menu") },
     { "menu_invert_all",    MENU_INVERT_ALL,
-                            "Invert selection for all items" },
+                            N_("Invert selection for all items") },
     { "menu_deselect_all",  MENU_UNSELECT_ALL,
-                            "Unselect all items in entire menu" },
+                            N_("Unselect all items in entire menu") },
     { "menu_select_page",   MENU_SELECT_PAGE,
-                            "Select all items on current page" },
+                            N_("Select all items on current page") },
     { "menu_invert_page",   MENU_INVERT_PAGE,
-                            "Invert current page's selections" },
+                            N_("Invert current page's selections") },
     { "menu_deselect_page", MENU_UNSELECT_PAGE,
-                            "Unselect all items on current page" },
+                            N_("Unselect all items on current page") },
     { "menu_search",        MENU_SEARCH,
-                            "Search and invert matching items" },
+                            N_("Search and invert matching items") },
     { "menu_shift_right",   MENU_SHIFT_RIGHT,
-                            "Pan current page to right (perm_invent only)" },
+                            N_("Pan current page to right (perm_invent only)") },
     { "menu_shift_left",    MENU_SHIFT_LEFT,
-                            "Pan current page to left (perm_invent only)" },
+                            N_("Pan current page to left (perm_invent only)") },
     { (char *) 0, '\0', (char *) 0 }
 };
 
@@ -8780,7 +8780,7 @@ doset_simple(void)
             check_gold_symbol();
             reglyph_darkroom();
             if (go.opt_symset_changed)
-                opt_crt_flags &= ~docrtRefresh;
+                opt_crt_flags &= ~(docrtRefresh | docrtNocls);
             docrt_flags(opt_crt_flags);
             flush_screen(1);
         }

@@ -577,11 +577,11 @@ doextlist(void)
         redisplay = FALSE;
         any = cg.zeroany;
         start_menu(menuwin, MENU_BEHAVE_STANDARD);
-        add_menu_str(menuwin, "Extended Commands List");
+        add_menu_str(menuwin, _("Extended Commands List"));
         add_menu_str(menuwin, "");
 
-        Sprintf(buf, "Switch to %s commands that don't autocomplete",
-                menumode ? "including" : "excluding");
+        Sprintf(buf, _("Switch to %s commands that don't autocomplete"),
+                menumode ? _("including") : _("excluding"));
         any.a_int = 1;
         add_menu(menuwin, &nul_glyphinfo, &any, 'a', 0, ATR_NONE, clr, buf,
                  MENU_ITEMFLAGS_NONE);
@@ -594,10 +594,10 @@ doextlist(void)
                having ':' as an explicit selector overrides the default
                menu behavior for it; we retain 's' as a group accelerator */
             add_menu(menuwin, &nul_glyphinfo, &any, ':', 's', ATR_NONE,
-                     clr, "Search extended commands",
+                     clr, _("Search extended commands"),
                      MENU_ITEMFLAGS_NONE);
         } else {
-            Strcpy(buf, "Switch back from search");
+            Strcpy(buf, _("Switch back from search"));
             if (strlen(buf) + strlen(searchbuf) + strlen(" (\"\")") < QBUFSZ)
                 Sprintf(eos(buf), " (\"%s\")", searchbuf);
             any.a_int = 3;
@@ -612,8 +612,8 @@ doextlist(void)
         if (wizard) {
             any.a_int = 4;
             add_menu(menuwin, &nul_glyphinfo, &any, 'z', 0, ATR_NONE, clr,
-          onelist ? "Switch to showing debugging commands in separate section"
-       : "Switch to showing all alphabetically, including debugging commands",
+          onelist ? _("Switch to showing debugging commands in separate section")
+       : _("Switch to showing all alphabetically, including debugging commands"),
                      MENU_ITEMFLAGS_NONE);
         }
         add_menu_str(menuwin, "");
