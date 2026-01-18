@@ -451,13 +451,13 @@ use_stethoscope(struct obj *obj)
     switch (lev->typ) {
     case SDOOR:
         Soundeffect(se_hollow_sound, 100);
-        You_hear(hollow_str, "door");
+        You_hear(_(hollow_str), _("door"));
         cvt_sdoor_to_door(lev); /* ->typ = DOOR */
         recalc_block_point(rx, ry);
         feel_newsym(rx, ry);
         return res;
     case SCORR:
-        You_hear(hollow_str, "passage");
+        You_hear(_(hollow_str), _("passage"));
         lev->typ = CORR, lev->flags = 0;
         unblock_point(rx, ry);
         feel_newsym(rx, ry);
@@ -483,7 +483,7 @@ use_whistle(struct obj *obj)
         if (Deaf)
             You_feel(_("rushing air tickle your %s."), body_part(NOSE));
         else
-            You(whistle_str, obj->cursed ? "shrill" : "high");
+            You(_(whistle_str), obj->cursed ? _("shrill") : _("high"));
         Soundeffect(se_shrill_whistle, 50);
         wake_nearby(TRUE);
         if (obj->cursed)
@@ -504,10 +504,10 @@ use_magic_whistle(struct obj *obj)
             tele_to_rnd_pet();
     } else {
         /* it's magic!  it works underwater too (at a higher pitch) */
-        You(Deaf ? alt_whistle_str : whistle_str,
-            Hallucination ? "normal"
-            : (Underwater && !Deaf) ? "strange, high-pitched"
-              : "strange");
+        You(Deaf ? _(alt_whistle_str) : _(whistle_str),
+            Hallucination ? _("normal")
+            : (Underwater && !Deaf) ? _("strange, high-pitched")
+              : _("strange"));
         Soundeffect(se_shrill_whistle, 80);
         magic_whistled(obj);
     }
@@ -1057,11 +1057,11 @@ use_mirror(struct obj *obj)
                 pline(_("Huh?  That doesn't look like you!"));
                 make_confused(HConfusion + d(3, 4), FALSE);
             } else if (Hallucination) {
-                You(look_str, hcolor((char *) 0));
+                You(_(look_str), hcolor((char *) 0));
             } else if (Sick) {
-                You(look_str, "peaked");
+                You(_(look_str), _("peaked"));
             } else if (u.uhs >= WEAK) {
-                You(look_str, "undernourished");
+                You(_(look_str), _("undernourished"));
             } else if (Upolyd) {
                 You(_("look like %s."), an(pmname(&mons[u.umonnum], Ugender)));
             } else {
@@ -2232,7 +2232,7 @@ use_tinning_kit(struct obj *obj)
                                                        u.ux, u.uy, SHOPBASE));
 
                 SetVoice(shkp, 0, 80, 0);
-                verbalize(you_buy_it);
+                verbalize(_(you_buy_it));
             }
             useup(corpse);
         } else {
@@ -2241,7 +2241,7 @@ use_tinning_kit(struct obj *obj)
                    = shop_keeper(*in_rooms(corpse->ox, corpse->oy, SHOPBASE));
 
                 SetVoice(shkp, 0, 80, 0);
-                verbalize(you_buy_it);
+                verbalize(_(you_buy_it));
             }
             useupf(corpse, 1L);
         }
@@ -4541,11 +4541,11 @@ flip_coin(struct obj *obj)
         return ECMD_TIME;
     }
     if (Hallucination) {
-        pline(rn2(100) ? "Wow, a double header!"
+        pline(rn2(100) ? _("Wow, a double header!")
                         /* edge case */
-                       : "The coin miraculously lands on its edge!");
+                       : _("The coin miraculously lands on its edge!"));
     } else {
-        pline(_("It comes up %s."), rn2(2) ? "heads" : "tails");
+        pline(_("It comes up %s."), rn2(2) ? _("heads") : _("tails"));
     }
     return ECMD_TIME;
 }

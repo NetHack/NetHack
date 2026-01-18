@@ -548,8 +548,8 @@ u_left_shop(char *leavestring, boolean newlev)
         boolean not_upset = !eshkp->surcharge;
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
-            verbalize(not_upset ? "%s!  Please pay before leaving."
-                                : "%s!  Don't you leave without paying!",
+            verbalize(not_upset ? _("%s!  Please pay before leaving.")
+                                : _("%s!  Don't you leave without paying!"),
                       svp.plname);
         } else {
             pline(_("%s %s that you need to pay before leaving%s"),
@@ -823,26 +823,26 @@ u_entered_shop(char *enterstring)
             if (!Deaf && !muteshk(shkp)) {
                 SetVoice(shkp, 0, 80, 0);
                 verbalize(not_upset
-                              ? "Will you please leave your %s%s outside?"
-                              : "Leave the %s%s outside.",
+                              ? _("Will you please leave your %s%s outside?")
+                              : _("Leave the %s%s outside."),
                           tool, plur(cnt));
             } else {
                 pline(_("%s %s to let you in with your %s%s."),
                       Shknam(shkp),
-                      not_upset ? "is hesitant" : "refuses",
+                      not_upset ? _("is hesitant") : _("refuses"),
                       tool, plur(cnt));
             }
             should_block = TRUE;
         } else if (u.usteed) {
             if (!Deaf && !muteshk(shkp)) {
                 SetVoice(shkp, 0, 80, 0);
-                verbalize(not_upset ? "Will you please leave %s outside?"
-                                    : "Leave %s outside.",
+                verbalize(not_upset ? _("Will you please leave %s outside?")
+                                    : _("Leave %s outside."),
                           y_monnam(u.usteed));
             } else {
                 pline(_("%s %s to let you in while you're riding %s."),
                       Shknam(shkp),
-                      not_upset ? "doesn't want" : "refuses",
+                      not_upset ? _("doesn't want") : _("refuses"),
                       y_monnam(u.usteed));
             }
             should_block = TRUE;

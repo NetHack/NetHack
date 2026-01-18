@@ -1,0 +1,548 @@
+# NetHack 3.7  bogusmon.txt.ko
+# Copyright (c) 2016 by Pasi Kallinen
+# NetHack may be freely redistributed.  See license for details.
+#
+# Korean translation of Hallucinatory monsters
+#
+#
+# prefix codes:
+# dash          -  female, personal name
+# underscore    _  female, general name
+# plus          +  male, personal name
+# vertical bar  |  male, general name
+# equals        =  gender not specified, personal name
+
+# misc.
+점보 새우
+거대 피그미
+누
+킬러 펭귄
+거대 바퀴벌레
+거대 민달팽이
+구더기
+익룡
+티라노사우루스 렉스
+바실리스크
+비홀더
+나이트메어
+에프리트
+마리드
+썩은 구더기
+책벌레
+마스터 이끼
+그림자
+홀로그램
+광대
+변호사
+사기꾼
+킬러 토마토
+아마존
+로봇
+배틀메크
+리노바이러스
+하피
+사자개
+쥐개미
+Y2K 버그
+화난 마리아치
+수석 학자
+행복의 파랑새
+골판지 골렘
+덕트 테이프 골렘
+대각선으로 움직이는 그리드 버그
+사악한 대군주
+뉴스그룹 트롤
+닌자 해적 좀비 로봇
+팔색용
+체크무늬 유니콘
+미친 저널리스트
+렉 몬스터
+고리대금업자
+빙의된 와플 다리미
+닭귀신
+박제 너구리 인형
+바이킹
+작은 초록 젤리
+웨어오리너구리
+굵은 글꼴 마녀
+블랑망제
+분노한 너드
+철자벌
+육지 문어
+개구리 왕자
+페가수 돼지
+_세미고르곤
+컨벤션 참가자
+큰 마이크로박쥐
+작은 메가박쥐
+위버헐크
+두부칠면조
++더들리
+수줍은 제비꽃
+얕은 자
+구형 소
+전기 기린
+증기 용
+옴니버스
+슬링키
+막소타우르
+밀리타우르
+팔면체
+던전 코어
+퀄리아
+홀로웨이
+교차대구
+거대 사지동물
+붓돌
+짖는 거미
+개구리 구름
+이빨점쟁이
+
+# Quendor (Zork, &c.)
+그루
+크리스마스트리 괴물
+운 빨아먹는 놈
+파스칼드
+브로그모이드
+돈비스트
+
+# Moria
+고대 다색용
++사악한 이기
+
+# Rogue V5
+방울뱀
+얼음 괴물
+유령
+콰가
+아쿠아터
+그리핀
+에뮤
+황조롱이
+제록
+파리지옥풀
+
+# Wizardry
+기어다니는 동전
+
+# Greek legend
+히드라
+세이렌
+
+# Monty Python
+킬러 토끼
+
+# The Princess Bride
+비정상적 크기의 설치류
+
+# Wallace & Gromit
+웨어토끼
+
+# "Only you can prevent forest fires!
++스모키 베어
+
+# Discworld
+트렁크
+흡혈 수박
+
+# Lord of the Rings
+엔트
+
+# Xanth
+덩굴나무
+니켈지네
+꿈틀이
+
+# Lewis Carroll
+흰 토끼
+스나크
+
+# Dr. Dolittle
+밀당말
+
+# The Smurfs
+스머프
+
+# Star Trek
+트리블
+클링온
+보그
+
+# Star Wars
+이워크
+
+# Tonari no Totoro
+토토로
+
+# Nausicaa
+오무
+
+# Sailor Moon
+요마
+
+# Pokemon (Meowth)
+냐옹이
+
+# monster movies
+-고질라
++킹콩
+
+# old L of SH
+지진 짐승
+
+# Robotech
+인비드
+
+# The Terminator
+터미네이터
+
+# Bubblegum Crisis
+부머
+
+# Dr. Who ("Exterminate!")
+달렉
+
+# HGttG
+미세 우주 함대
+트랄의 게걸스런 버그블래터 야수
+
+# The Tough Guide to Fantasyland
+가죽 날개 비행 생물
+
+# TMNT
+십대 돌연변이 닌자 거북이
+
+# Usagi Yojimbo
+사무라이 토끼
+
+# Cerebus
+땅돼지
+
+# Little Shop of Horrors
+=오드리 2세
+
+# 50's rock 'n' roll
+마녀 의사
+외눈 외뿔 비행 보라색 사람 먹는 괴물
+
+# saccharine kiddy TV
++공룡 바니
+
+# Angband
++모르고스
+
+# Babylon 5
+볼론
+
+# King Arthur
+탐색 야수
+
+# Movie
+프레데터
+
+# Harry Potter
+디멘터
+
+# common pest
+장모
+
+# Actual creatures
+사마귀
+벨루가 고래
+닭
+실러캔스
+별코두더지
+폐어
+느린로리스
+해삼
+촌충
+라이거
+벨로키랍토르
+통통한 돌고래
+쿼카
+포투
+레밍
+들개
+
+# european cryptids
+볼퍼팅거
+엘베드리체
+스크바더
++네시
+타첼부름
+다후
+
+# fictitious beasts
+드롭베어
+야생 하기스
+재칼롭
+날아다니는 원숭이
+날아다니는 돼지
+히포캄푸스
+히포그리프
+켈피
+카토블레파스
+불사조
+암피스바에나
+
+# Unusually animate body parts
+통통 튀는 눈
+떠다니는 코
+방황하는 눈
+
+# Computerese
+버퍼 오버플로
+댕글링 포인터
+걸어다니는 디스크 드라이브
+부동 소수점
+정규식 엔진
+네트분열
+위키
+피어
+코볼
+와이어샤크
+
+# bugs
+보어버그
+만델버그
+슈뢰딘버그
+하이젠버그
+
+# DooM
+카코데몬
+스크래그
+
+# MST3K
++크로우 T. 로봇
+
+# Items and stuff
+체스 폰
+초콜릿 푸딩
+우블렉
+병마용
+영구차
+룸바
+소형 비행선
+먼지 티끌
+
+# DnD monster
+가제보
+
+# SciFi elements
+회색 점액
+자기 홀극자
+제1종 영구기관
+크고 멍청한 물체
+
+# Ultima
++로드 브리티시
+
+# They Might Be Giants
+입자 맨
+
+# Robot Finds Kitten
+새끼고양이 탐사 로봇
+
+# Typography
+기예메
+솔리두스
+오벨루스
+딩뱃
+볼드체
+우경법
+합자
+레버스
+딩쿠스
+
+# Their actual character
+아포스트로피 골렘
+관능적인 앰퍼샌드
+
+# Web comics and animation
++화난 꽃 밥
++스트롱 배드
++매지컬 트레버
+
+# Girl Genius
+스마켄
+밈모스
+
+# KoL
+한쪽 날개 없는 찌르기박쥐
+
+# deities
+보이지 않는 분홍 유니콘
+날아다니는 스파게티 괴물
+
+# Monkey Island
+머리 셋 달린 원숭이
++악마 닭
+
+# modern folklore
+작은 초록 외계인
+
+# Portal
+무게추 동반자 큐브
+
+# /b/
+/b/충
+
+# South Park
+맨베어피그
+
+# internet memes
+분재 고양이
+타이툴루
++도모군
+기~~~~~~인 고양이
+냥캣
+
+# the Internet is made for cat pix
+천장 고양이
+지하실 고양이
+모노레일 고양이
+
+# POWDER
+트라이듀드
+
+# Radomir Dopieralski
+우주 오르쿠스
+
+# Angband
+이크
+퀼술그
+더 큰 지옥 야수
+
+# Souljazz
++위자드의 상인
+
+# Dungeon Crawl Stone Soup
++지그문트
+레르나이아 히드라
+-이지브
+=글룩스 블록
++오크 블로크
+
+# Wil Wheaton, John Scalzi
+유니콘 페가수스 새끼고양이
+
+# Minecraft
+엔더맨
+
+# Pun
+백인우월주의자 와이트
+
+# Starcraft 2
+저글링
+
+# Feelings
+실존적 불안
+상상의 조각
+번뜩이는 통찰
+
+# Fish
+고티
+
+# Roald Dahl
+버미셔스 크니드
+
+# Carcassonne
+미플
+
+# The Wombles
+웜블
+
+# Fraggle Rock
+프래글
+
+# Harry Harrison
+스테인리스 스틸 쥐
+
+# The Culture
+적대적 십일각현
+
+# Spoonerism
+역할 조롱
+
+# Truly scary things
+광대
+마임
+행상인
+흥정꾼
+
+# soundex and typos of monsters
+자랑하는 눈
+변기 골렘
+순교자 오크
+박격포 오크
+산성 블로그
+예각 젤리
+아리아 정령
+앨리어싱 사제
+정렬된 기생충
+정렬된 쪽마루
+정렬된 감시관
+아기 고집불통 용
+아기 우울 용
+아기 캐리커처
+아기 코바늘뜨기
+아기 거친 용
+아기 봉 벌레
+아기 긴 단어
+아기 비유 벌레
+토한 악마
+맥주 와이트
+무례한 와이트
+근육질 곰팡이
+레이브 거미
+실마리 골렘
+흉상 소용돌이
+오류 정령
+탄력 장어
+심전도 장어
+전나무 정령
+타이어 정령
+플라밍고 구체
+오류 골렘
+곱슬머리 켄타우로스
+숲 중앙 접지
+사나움 구체
+서리 거인
+노인 뱀
+모기 개미
+거대 목욕
+보조금 딱정벌레
+더 큰 뱀
+그라인드 버그
+거대 망고
+광택 골렘
+노움 수상자
+노움 더미
+더 끈적한 점액
+초록 미끄럼틀
+수호자 나초
+지옥 하운드 말장난
+고위 순수주의자
+헤어넷 악마
+얼음 흙손
+킬러 비트
+깃털 골렘
+라운지 벌레
+산 림프
+호출기 골렘
+파이 악마
+예방 벌레
+양말 두더지
+불량 피어서
+시소 구체
+직유 미믹
+더 곰팡이 개미
+얼룩 소용돌이
+스콘 거인
+우산 헐크
+뱀파이어 철퇴
+말 많은 재버워크
+물 레몬
+물 메론
+날개 달린 회색곰
+노란 와이트

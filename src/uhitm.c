@@ -1249,8 +1249,8 @@ hmon_hitmon_misc_obj(
                               : AT_WEAP),
                      obj)) {
             if (Blind) {
-                pline(obj->otyp == CREAM_PIE ? "Splat!"
-                      : "Splash!");
+                pline(obj->otyp == CREAM_PIE ? _("Splat!")
+                      : _("Splash!"));
             } else if (obj->otyp == BLINDING_VENOM) {
                 pline_The(_("venom blinds %s%s!"), mon_nam(mon),
                           mon->mcansee ? "" : " further");
@@ -1276,7 +1276,7 @@ hmon_hitmon_misc_obj(
             else
                 mon->mblinded += hmd->dmg;
         } else {
-            pline(obj->otyp == CREAM_PIE ? "Splat!" : "Splash!");
+            pline(obj->otyp == CREAM_PIE ? _("Splat!") : _("Splash!"));
             setmangry(mon, TRUE);
         }
         {

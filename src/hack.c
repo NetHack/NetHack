@@ -829,8 +829,8 @@ dosinkfall(void)
                      && !(HFlying || EFlying)); /* BFlying */
 
     if (!ufall) {
-        You((innate_lev || blockd_lev) ? "wobble unsteadily for a moment."
-                                       : "gain control of your flight.");
+        You((innate_lev || blockd_lev) ? _("wobble unsteadily for a moment.")
+                                       : _("gain control of your flight."));
     } else {
         long save_ELev = ELevitation, save_HLev = HLevitation;
 

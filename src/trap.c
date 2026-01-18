@@ -4315,7 +4315,7 @@ domagictrap(void)
             Your(_("pack shakes violently!"));
             break;
         case 17:
-            You(Hallucination ? "smell hamburgers." : "smell charred flesh.");
+            You(Hallucination ? _("smell hamburgers.") : _("smell charred flesh."));
             break;
         case 18:
             You_feel(_("tired."));

@@ -1,0 +1,375 @@
+특정 컴파일 플래그 없는 부울 옵션 (기본값은 []에 표시):
+(버전에 어떤 옵션이 있는지는 'O' 명령으로 현재 옵션 설정을 확인하여
+알 수 있습니다.)
+
+acoustics      캐릭터가 소리를 들을 수 있는지                         [True]
+autodescribe   커서 아래 지형 설명                                   [False]
+autodig        이동 시 땅파기 도구 장비 중이면 자동으로 파기          [False]
+autoopen       문으로 걸어가면 열기 시도                              [True]
+autopickup     이동할 때 자동으로 물건 줍기                           [True]
+autoquiver     빈 화살통으로 발사 시 적절한 인벤토리                  [False]
+               무기를 선택하여 화살통 채우기
+BIOS           IBM ROM BIOS 호출 사용 허용                           [False]
+blind          캐릭터가 영구적으로 시각 장애                         [False]
+bones          뼈 파일 로딩 허용                                      [True]
+clicklook      마우스 오른쪽 클릭으로 맵 보기                        [False]
+cmdassist      방향 및 기타 명령 오류에 대한 도움말 제공              [True]
+color          화면의 물건에 다른 색상 사용        [마이크로에서는 True]
+confirm        길들여진 또는 평화로운 괴물 공격 전 확인               [True]
+dark_room      시야에 없는 바닥을 다른 색으로 표시                    [True]
+dropped_nopick 버린 물건을 자동 줍기에서 제외                         [True]
+eight_bit_tty  8비트 문자를 터미널로 직접 전송                       [False]
+extmenu        tty, curses: # (확장 명령)에 메뉴 사용                [False]
+               X11: 메뉴에 모든 명령 (T) 또는 전통적 일부 (F)
+female         사용 중단; 복합 옵션 gender:female 사용               [False]
+fixinv         같은 물건에 같은 문자 유지 시도                        [True]
+force_invmenu  인벤토리 항목 요청 명령이 메뉴 표시                   [False]
+goldX          축복/저주 상태로 물건 필터링 시                       [False]
+               금을 X(미상) 또는 U(저주받지 않음)로 분류할지
+help           / 명령 사용 시 모든 가용 정보 출력                     [True]
+herecmd_menu   자신 또는 옆을 마우스로 클릭 시                       [False]
+               가능한 명령 메뉴 표시
+hilite_pet     펫을 강조 표시                                        [False]
+hilite_pile    물건 더미를 강조 표시                                 [False]
+ignintr        브레이크 포함 인터럽트 신호 무시                       [False]
+implicit_uncursed  가능하면 인벤토리에서 "저주받지 않음" 생략         [True]
+legacy         소개 메시지 출력                                       [True]
+lit_corridor   시야에 있으면 어두운 복도를 밝게 표시                 [False]
+lootabc        뒤지기 시 o/i/b 대신 a/b/c 사용                       [False]
+mail           메일 데몬 활성화                                       [True]
+mention_decor  계단, 제단, 분수 등을 지나갈 때                       [False]
+               물건에 가려지지 않아도 피드백 제공
+mention_walls  벽에 부딪힐 때 피드백 제공                            [False]
+menu_overlay   메뉴를 화면에 오버레이하고 오른쪽 정렬                  [True]
+menucolors     MENUCOLOR 패턴 매칭 활성화하여                        [False]
+               인벤토리 같은 물건 메뉴의 줄 강조;
+               색상 불가 또는 꺼져 있어도 굵게, 반전 등으로 강조 가능
+nudist         갑옷 없이 캐릭터 시작                                 [False]
+null           터미널에 널 전송 허용                                   [True]
+               움직이는 물건이 방을 가로질러 순간이동하는 것처럼
+               보이면 이 옵션을 끄세요 (자체 지연 코드 사용 강제)
+perm_invent    영구 창에 인벤토리 유지                               [False]
+pickup_stolen  훔친 물건에 대해 pickup_types 무시                      [True]
+pickup_thrown  던진 물건에 대해 pickup_types 무시                      [True]
+pushweapon     새 무기 장비 시 이전 무기를                           [False]
+               보조 무기 슬롯에 넣기
+quick_farsight 무작위로 발동된 천리안 시 맵 탐색                     [False]
+               기회 보통 건너뛰기
+rawio          raw I/O 사용 허용                                     [False]
+reroll         시작 인벤토리 재굴림 허용                              [False]
+rest_on_space  스페이스 바를 휴식 문자로 취급                        [False]
+safe_pet       (알면서) 펫 공격 방지                                  [True]
+safe_wait      적대적 괴물 옆에서 '.' 또는 's'로                      [True]
+               대기나 검색 전 'm' 접두사 필요
+sanity_check   데이터 정상성 검사 수행                               [False]
+showexp        누적 경험치 표시                                      [False]
+showrace       역할 대신 종족으로 표시                               [False]
+showvers       상태 줄에 버전 번호 표시                              [False]
+silent         터미널 벨 소리 사용 안 함                               [True]
+sortpack       인벤토리에서 비슷한 종류의 물건 그룹화                  [True]
+sparkle        저항된 마법 공격에 반짝임 효과 표시                     [True]
+               (예: 화염 저항 괴물에 대한 화염 공격)
+standout       메시지의 --더 보기--에 강조 모드 사용                 [False]
+status_updates 상태 줄 업데이트                                        [True]
+time           경과 게임 시간(턴 수) 표시                            [False]
+tips           게임 플레이 중 도움말 팁 표시                           [True]
+tombstone      죽을 때 묘비 출력                                       [True]
+toptenwin      stdout 대신 창에 상위 기록 출력                       [False]
+travel         지원되면 마우스 클릭으로 이동 활성화;                   [True]
+               맵 클릭이 영웅 이동 시도하는 것을 방지하려면 끄기;
+               '_'로 이동에는 영향 없음
+use_darkgray   검은 글리프에 파란색 대신 굵은 검정 사용               [True]
+use_inverse    감지된 괴물을 강조 방식으로 표시                      [False]
+verbose        게임 중 더 많은 설명 출력                               [True]
+whatis_menu    맵 위치 얻을 때 메뉴 표시                             [False]
+whatis_moveskip 맵 위치 얻을 때 같은 글리프 건너뛰기                  [False]
+
+
+컴파일 플래그로 제어되는 추가 부울 옵션이 있습니다.
+
+컴파일 시 INSURANCE가 설정된 경우 부울 옵션:
+checkpoint     각 레벨 변경 후 게임 상태 저장,                        [True]
+               프로그램 충돌 후 복구 가능하도록
+
+컴파일 시 NEWS가 설정된 경우 부울 옵션:
+news           시작 시 게임 관리자의 뉴스 출력                        [True]
+
+컴파일 시 SCORE_ON_BOTL이 설정된 경우 부울 옵션:
+showscore      대략적인 누적 점수 표시                               [False]
+
+컴파일 시 TIMED_DELAY가 설정된 경우 부울 옵션 (tty 또는 curses만):
+timed_delay    unix와 VMS에서 디스플레이 효과를 위해                  [True]
+               일시 정지할 때 추가 화면 출력 대신 타이머 사용.
+               termcap 라이브러리 없는 MSDOS에서는
+               시각 효과를 위해 일시 정지할지 여부.
+
+컴파일 시 ALTMETA가 설정된 경우 부울 옵션:
+altmeta        unix와 VMS에서 두 문자 시퀀스 "ESC c"를              [False]
+               M-c (Meta+c, 8번째 비트 설정)로 취급
+               nethack이 플레이어 키보드에서 명령을 얻을 때.
+
+컴파일 시 TILES_IN_GLYPHMAP이 설정된 경우 부울 옵션 (MSDOS):
+preload_tiles  게임 시작 시 타일을 RAM에 미리 로드할지 제어           [True]
+               이렇게 하면 타일 그래픽 성능이 향상되지만
+               더 많은 메모리를 사용합니다.
+
+컴파일 시 TTY_TILES_ESCCODES가 설정된 경우 부울 옵션 (tty만):
+vt_tiledata    출력에 추가 데이터 이스케이프 코드 마커 삽입         [False]
+
+컴파일 시 TTY_SOUND_ESCCODES가 설정된 경우 부울 옵션 (tty만):
+vt_sounddata   출력에 사운드 데이터 이스케이프 코드 마커 삽입       [False]
+
+프로그램이 지원하도록 빌드된 인터페이스에 따라 사용 가능할 수 있는
+부울 옵션. 여러 개를 지원하는 경우 일부는 설정 가능하게 표시되지만
+해당 인터페이스가 아닌 다른 것을 사용 중이면 아무 작동도 하지 않을 수 있습니다:
+ascii_map      맵을 텍스트로 표시, tiles_map 끔; Qt, X11
+guicolor       curses
+hitpointbar    curses, tty, statushilites 활성화된 Windows GUI;
+               statushilites 없는 Qt; 'fancy_status'가 비활성화되고
+               (X 애플리케이션 기본값을 통해) statushilites가 활성화된 X11
+popup_dialog   curses, Qt, Windows GUI
+selectsaved    tty (Qt와 Windows GUI는 무조건 이렇게 함)
+splash_screen  curses, Qt, Windows GUI
+tiled_map      맵을 타일로 표시, ascii_map 끔; Qt, X11
+
+디버그 모드 (위자드 모드라고도 함)에서 사용 가능한 부울 옵션:
+menu_tab_sep   메뉴 포맷팅--건드리지 마세요
+monpolycontrol 플레이어가 형태 변환 괴물의 새 형태 선택
+montelecontrol 플레이어가 순간이동된 괴물의 목적지 선택
+travel_debug   맵에 이동 경로 찾기 알고리즘 상태 표시
+wizweight      인벤토리 표시에 아이템 무게 포함
+
+모든 부울 옵션은 설정 중인 옵션에 포함하여 True로 설정하거나
+이름 앞에 '!' 또는 'no'를 붙여 False로 설정(부정)할 수 있습니다.
+또는 복합 옵션 구문 사용 가능: 'optname:true'와 'optname:false'.
+
+ - - - - -
+
+복합 옵션은 option_name:option_value로 작성합니다.
+
+게임 중 설정할 수 있는 복합 옵션:
+
+autounlock    잠긴 문을 열거나 잠긴 용기를 뒤지려 할 때,       [Apply-Key]
+              취할 행동 지정: None이거나 Untrap + Apply-Key + Kick +
+              Force 중 하나 이상; Untrap이 포함되면 먼저 처리됨;
+              "덫 확인?"에 "아니오"라고 답하면 나머지가 적용됨;
+              "예"라면 덫이 있어도 반드시 찾지 못할 수 있고
+              찾든 못 찾든 현재 턴의 나머지를 사용;
+              Kick은 문에만, Force는 용기에만 유용;
+              둘 다 Untrap이 생략되거나 건너뛰어지고 Apply-Key가
+              생략되거나 열쇠 도구가 없거나 사용을 거부할 때만 시도
+boulder       기본 바위 기호 재정의                                      [`]
+crash_email   충돌 보고서 작성 시 사용할 이메일 주소                      []
+crash_name    충돌 보고서 작성 시 사용할 이름                              []
+crash_urlmax  충돌 보고서용으로 생성할 수 있는 가장 긴 URL 길이           []
+disclose      게임 끝에서 제공받고 싶은               [ni na nv ng nc no]
+              정보 유형 (공백으로 구분된 두 문자 값 목록;
+              접두사: '+' 항상 공개, '-' 절대 공개 안 함,
+              'n' 기본 "아니오"로 프롬프트, 'y' 기본 "예"로 프롬프트,
+              'a' 정렬 순서 선택 프롬프트 (접미사 'v'에만);
+              접미사: 'i' 인벤토리, 'a' 능력치, 'v' 처치한
+              괴물, 'g' 학살 및 멸종 괴물, 'c' 행동과 업적,
+              'o' 던전 개요)
+fruit         먹는 걸 좋아하는 과일 이름                       [slime mold]
+              (기본적으로 NetHack이 가끔 사용하는 장난)
+hilite_status 상태 필드 강조 규칙 지정                                    []
+              (여러 인스턴스 허용)
+menustyle     여러 물건 선택을 위한 사용자 인터페이스:               [Full]
+              Traditional -- 관심 있는 종류를 프롬프트한 후
+                             그 종류에 대해 항목별로 프롬프트;
+              Combination -- 관심 있는 종류를 프롬프트한 후
+                             아이템 선택에 메뉴 사용;
+              Full        -- 관심 있는 종류에 메뉴, 그 다음 항목 메뉴;
+              Partial     -- 종류 필터링 건너뛰고 모든 항목 메뉴 사용;
+              첫 글자만 중요 ('T','C','F','P')
+              (Traditional에서는 많은 동작이 의사 종류 'm'을 허용하여
+              항목 선택 메뉴 요청: 일회용 Combination.)
+menu_objsyms  메뉴에 물건 종류 기호를 포함할지:                         [4]
+              0 - none    -- 메뉴에 물건 기호 추가 안 함;
+              1 - headers -- 메뉴 헤더 줄에 물건 종류 기호 추가;
+              2 - entries -- 각 메뉴 항목 줄에 물건 글리프 표시
+                             (ASCII 인터페이스에서는 종류 기호와 같음);
+              3 - both    -- 1과 2 결합;
+              4 - conditional -- 2와 같지만 헤더가 없을 때만;
+              5 - one-or-other -- 1과 4 결합;
+              선택 0과 1은 모든 인터페이스에서 작동해야 함; 2~5는
+              tty와 curses에서 지원
+msg_window    tty 인터페이스의 ^P 메시지 리콜 동작:                     [s]
+              single      -- 한 번에 한 메시지
+              full        -- 저장된 모든 상단 줄 메시지가 있는 전체 창
+              reverse     -- full이지만 가장 최근 것이 먼저 출력
+              combination -- 연속 ^P 명령의 처음 두 개는 단일 메시지,
+                             세 번째는 전체 세트 제공
+msg_window    curses 인터페이스의 ^P 메시지 리콜 동작:                  [r]
+              reverse     -- 전체 창, 가장 최근 것이 먼저
+              full        -- full이지만 가장 오래된 것이 먼저 출력,
+                             가장 최근 메시지부터 보도록 마지막 페이지에
+                             초기 위치
+number_pad    이동에 대한 알파벳 대 숫자 제어:                          [0]
+               0 -- 전통적 hjkl + yubn 이동 (기본값);
+               1 -- 숫자가 이동 제어, 숫자 키패드용;
+               2 -- 1과 같지만 '5'가 'G' 대신 'g' 접두사로 작동;
+               3 -- 전화 키패드용 숫자 (1,2,3이 위, 7,8,9가 아래);
+               4 -- 전화 키패드 (3)와 '5' 선호도 (2) 결합;
+              -1 -- "qwertz"; 알파벳 이동이지만 'z'와 'y' 교환.
+              number_pad 설정(양수 값으로)은 숫자 키패드의 숫자뿐만
+              아니라 모든 숫자 키 처리 방식에 영향을 줍니다.
+packorder     'sortpack' 옵션이 켜져 있을 때        [")[%?+!=/(*`0_]
+              인벤토리 (및 기타)가 표시되는 순서를 지정하는
+              물건 종류의 기본 기호 목록
+              (일부 종류만 지정하면 기본 순서의 나머지가 끝에 추가됨)
+paranoid_confirmation  대체 프롬프트를 원하는 상황의     [paranoid_confirm:pray swim]
+              공백으로 구분된 목록
+              Confirm -- "yes" 요구 시 거부에도 "no" 요구;
+                      pray, trap, Autoall에도 y 대신 yes 요구
+              quit    -- 종료 확인 또는 탐험 모드 진입에 y 대신 yes
+              die     -- 죽음 확인에 y 대신 yes (탐험 또는 디버그 모드용)
+              bones   -- 디버그 모드에서 뼈 데이터 저장 확인에 y 대신 yes
+              attack  -- 평화로운 괴물 공격 확인에 y 대신 yes
+              wand-break  -- 지팡이 부수기 확인에 y 대신 yes
+              eating  -- 계속 먹을지 확인에 y 대신 yes
+              Were-change -- 폴리모프 제어가 있을 때 늑대인간으로 인한
+                      형태 변경 확인에 y 대신 yes;
+              pray    -- 기도 시도 확인에 y; 기본적으로 켜짐
+              trap    -- 무해하지 않은 알려진 덫 진입에 y;
+              swim    -- 영웅이 보고 손상되지 않을 때 물이나 용암으로
+                      이동에 m 접두사 필요; 기본적으로 켜짐;
+              AutoAll -- menustyle:Full 사용 시 물건 종류 필터링
+                      메뉴에서 선택 'A'를 선택하면 확인에 y;
+              Remove  -- 적용 가능한 항목이 하나뿐이어도 'R'과 'T'에
+                      항상 인벤토리에서 선택
+perminv_mode  인터페이스가 영구 인벤토리 창을 지원하고                  [a]
+              perm_invent 옵션이 true이면 표시할 내용 제어:
+              none/off -- perm_invent가 false인 것처럼 동작
+              all/on   -- 금을 제외한 인벤토리 표시 (기본값)
+              full     -- 금을 포함한 인벤토리 표시
+              in-use   -- 착용 및 장비한 아이템만 표시
+              (tty 인터페이스의 선택적 perm_invent 지원에는
+              all과 full을 변형하는 몇 가지 추가 선택이 포함됨)
+pickup_burden 이 부담 수준을 초과하는 아이템을 주울 때                  [S]
+              (Unencumbered, Burdened, streSsed, straiNed, overTaxed,
+              또는 overLoaded), 계속할지 묻습니다.
+pickup_types  autopickup이 켜져 있을 때 자동으로 줍는                    []
+              물건 종류의 기본 기호 목록; 빈 목록은 "모두"를 의미
+pile_limit    바닥 물건 위를 걸을 때 피드백에서,                        [5]
+              목록 대신 "여기 물건이 있습니다"가 표시되는 임계값.
+              (0은 "항상 물건 나열"을 의미.)
+runmode       다단계 이동(다양한 달리기 모드 또는                   [run]
+              이동 명령)에 대해 맵 창이 업데이트되는 빈도 제어:
+              teleport -- 이동이 멈출 때까지 맵 업데이트 안 함;
+              run      -- 주기적으로 맵 업데이트 (간격은 7단계);
+              walk     -- 매 단계 후 맵 업데이트;
+              crawl    -- walk와 같지만 각 단계 후 지연.
+              (이것은 실제 이동이 아닌 화면 표시에만 영향.)
+scores        게임 종료 시 보고 싶은 점수 목록 부분 [!own/3 top/2 around]
+              상위 점수, 상위 점수 주변 점수, 자신의 모든 점수의
+              조합을 선택합니다.
+sortdiscoveries 발견한 물건 목록 볼 때 선호 순서                        [o]
+              o -- 각 종류 내에서 발견 순서
+              s -- sortloot의 "loot" 순서
+              c -- 각 종류 내에서 알파벳순
+              a -- 모든 종류에 걸쳐 알파벳순
+sortloot      물건 세트 검사 시 선호 순서                               [n]
+              none -- 정렬 안 함
+              loot -- 바닥과 용기의 물건 더미 정렬
+              full -- 'loot'와 인벤토리의 물건
+sortvanquished 처치한 괴물 목록 볼 때 선호 순서                         [t]
+              t -- 전통적, 괴물 레벨순
+              d -- 괴물 난이도 등급순
+              a -- 알파벳순, 먼저 고유 괴물 그 다음 나머지
+              c -- 종류순, 각 종류 내에서 낮은 레벨부터 높은 레벨
+              n -- 수량순, 높은 것부터 낮은 것
+              z -- 수량순, 낮은 것부터 높은 것
+statushilites 상태 강조 표시 여부 (0이 아닐 때)와                       [0]
+              임시 강조 표시 턴 수 ('up', 'down', 'changed'
+              hilite_status 규칙용)
+statuslines   확장 (3) 또는 압축 (2) 상태 사용 여부                     [2]
+              (tty와 curses용; 2가 전통적, 3 권장;
+              Qt용도 마찬가지, 3이 전통적이고 2 권장)
+suppress_alert 게임 플레이나 사용자 인터페이스 변경에 대한                []
+              다양한 버전별 경고 비활성화, 예를 들어 'Q' 명령에 대해
+              종료가 이제 #quit으로 된다는 알림
+              (예: suppress_alert:3.3.1을 사용하면 그 버전 이하에서
+              추가된 알림 중지)
+versinfo      showvers가 true일 때 표시되는 정보 선택              [1 또는 4]
+              (기본값은 프로그램 개발 상태에 따라 다름)
+whatis_coord  '/' 및 ';' 명령에 autodescribe가 활성화되어 있을 때       [n]
+              맵 좌표 포함 여부 제어.
+              값은 다음 중 하나의 첫 글자
+              compass      -- (당신 기준; 'east' 또는 '3s' 또는 '2n,4w')
+              full compass -- ('east' 또는 '3south' 또는 '2north,4west')
+              map          -- <x,y>        (맵 열 x=0은 사용 안 함)
+              screen       -- [행,열] (행은 tty 사용에 맞게 오프셋)
+              none         -- 좌표 표시 안 함.
+whatis_filter 예를 들어 이동 명령을 위해 맵 위치를 얻을 때              [n]
+              적격 맵 좌표 필터링 방법 제어.
+              값은 다음 중 하나
+              n - 필터링 안 함
+              v - 시야 내 위치만
+              a - 같은 영역 (방, 복도 등)의 위치
+
+시작 시에만 설정할 수 있는 복합 옵션:
+
+align      시작 성향 (lawful, neutral, chaotic,                   [random]
+           또는 random). 많은 역할이 선택을 일부로 제한.
+           첫 글자만 지정 가능.
+catname    시작 펫이 새끼고양이인 경우 이름                          [none]
+dogname    시작 펫이 강아지인 경우 이름                              [none]
+           개로 시작하는 여러 역할에는 미리 설정된 이름이 있음
+           (예: 사무라이의 "Hachi"), 하지만 dogname을 지정하면
+           그 이름이 재정의됨.
+gender     시작 성별 (male, female, 또는 random).                 [random]
+           첫 글자만 지정 가능. 예전 "male"과 "female"
+           부울 옵션으로도 성별 지정 가능하지만
+           "gender" 옵션이 우선함.
+horsename  시작 펫이 조랑말인 경우 이름                              [none]
+menu_*     메뉴 명령에 대한 단일 문자 가속기 지정.
+           다음은 기본 키 입력과 구현하는 창 포트 목록:
+           (t는 tty, c는 curses, w는 Windows GUI, x는 X11, q는 Qt)
+           menu_first_page    메뉴의 첫 페이지로 이동          [^](tcwxq)
+           menu_last_page     메뉴의 마지막 페이지로 이동      [|](tcwxq)
+           menu_next_page     다음 메뉴 페이지로 이동          [>](tcwxq)
+           menu_previous_page 이전 메뉴 페이지로 이동          [<](tcwxq)
+           menu_shift_left    왼쪽으로 보기 이동 (perm_invent만) [{](cx)
+           menu_shift_right   오른쪽으로 보기 이동 (perm_invent만) [}](cx)
+           menu_select_all    메뉴의 모든 항목 선택            [.](tcwxq)
+           menu_select_page   이 메뉴 페이지의 모든 항목 선택  [,](tcwq)
+           menu_deselect_all  메뉴의 모든 항목 선택 해제       [-](tcwxq)
+           menu_deselect_page 이 메뉴 페이지의 모든 항목 선택 해제 [\](tcwq)
+           menu_invert_all    메뉴의 모든 항목 반전            [@](tcwxq)
+           menu_invert_page   이 메뉴 페이지의 모든 항목 반전  [~](tcwq)
+           menu_search        대상 텍스트 프롬프트 후 일치하는 [:](tcwxq)
+                              항목 반전
+msghistory 저장할 상단 줄 메시지 수                                    [20]
+name       캐릭터 이름   [다중 사용자 시스템에서는 기본적으로 사용자명,
+           단일 사용자 시스템이나 사용자명이 "games" 같은 일반적인
+           것으로 분류되면 "who are you?" 질문]
+           MS Windows는 사용자명을 지원하지만 단일 사용자로 취급됨.
+           명령줄에서 캐릭터 이름이 지정되면 (보통 'nethack -u myname'으로
+           시스템 유형과 접근 방법에 따라 다름) 그 이름이
+           옵션의 'name'을 재정의.
+pettype    역할이 둘 이상의 유형을 허용하면 (또는 시작         [random]
+           펫을 피하고 싶으면) 선호하는 펫 유형 (cat, dog, horse,
+           random, 또는 none).
+           대부분의 역할은 dog 또는 cat은 허용하지만 horse는 안 함.
+           특정 유형을 강제하는 역할의 경우 'none'을 지정하지
+           않으면 pettype은 무시됨.
+playmode   일반 플레이 또는 점수 없는 탐험 모드 또는 디버그 모드 [normal]
+race       시작 종족 (예: race:Human, race:Elf).                  [random]
+           대부분의 역할이 종족 선택을 일부로 제한.
+role       시작 역할 (예: role:Barbarian, role:Valk).             [random]
+           첫 글자만 지정할 수 있지만 일치하는 첫 번째
+           역할만 선택; 따라서 역할 이름을 최대한 길게
+           쓰는 것이 좋음. "name" 옵션에 추가하여 역할을
+           지정할 수도 있지만 (예: name:Vic-V) "role" 옵션이 우선함.
+windowtype 사용할 창 시스템     [운영 체제와 컴파일 시 설정에 따름]
+           둘 이상의 선택이 가능한 경우.
+           일부 프로그램 인스턴스는 하나의 창 유형만 지원;
+           그 경우 아무것도 지정할 필요 없음.
+           프로그램에서 지원되는 창 유형 목록은 프로그램 실행 중
+           #version 명령으로 또는 프로그램 외부에서 빌드 시
+           생성되는 'options'라는 텍스트 파일을 검사하여 볼 수 있음.
+
+일부 샘플 옵션 목록:
+!autopickup,!tombstone,name:Gandalf,scores:own/3 top/2 around
+female,nonews,dogname:Rover,rest_on_space,!verbose,menustyle:traditional

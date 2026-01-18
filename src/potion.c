@@ -451,8 +451,8 @@ make_deaf(long xtime, boolean talk)
     if ((xtime != 0L) ^ (old != 0L)) {
         disp.botl = TRUE;
         if (talk)
-            You(old && !Deaf ? "can hear again."
-                             : "are unable to hear anything.");
+            You(old && !Deaf ? _("can hear again.")
+                             : _("are unable to hear anything."));
     }
 }
 

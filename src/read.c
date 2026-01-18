@@ -619,7 +619,7 @@ doread(void)
             pline(nodisappear
                       ? _("You %s the formula on the scroll.")
                       : _("As you %s the formula on it, the scroll disappears."),
-                  silently ? "cogitate" : "pronounce");
+                  silently ? _("cogitate") : _("pronounce"));
         else
             pline(nodisappear ? _("You read the scroll.")
                               : _("As you read the scroll, it disappears."));

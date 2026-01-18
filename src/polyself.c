@@ -2040,7 +2040,7 @@ mbodypart(struct monst *mon, int part)
 
     if (part <= NO_PART) {
         impossible("mbodypart: bad part %d", part);
-        return "mystery part";
+        return _("mystery part");
     }
 
     /* some special cases */
@@ -2048,79 +2048,79 @@ mbodypart(struct monst *mon, int part)
         || mptr->mlet == S_RODENT || mptr == &mons[PM_OWLBEAR]) {
         switch (part) {
         case HAND:
-            return "paw";
+            return _("paw");
         case HANDED:
-            return "pawed";
+            return _("pawed");
         case FOOT:
-            return "rear paw";
+            return _("rear paw");
         case ARM:
         case LEG:
-            return horse_parts[part]; /* "foreleg", "rear leg" */
+            return _(horse_parts[part]); /* "foreleg", "rear leg" */
         default:
             break; /* for other parts, use animal_parts[] below */
         }
     } else if (mptr->mlet == S_YETI) { /* excl. owlbear due to 'if' above */
         /* opposable thumbs, hence "hands", "arms", "legs", &c */
-        return humanoid_parts[part]; /* yeti/sasquatch, monkey/ape */
+        return _(humanoid_parts[part]); /* yeti/sasquatch, monkey/ape */
     }
     if ((part == HAND || part == HANDED)
         && (humanoid(mptr) && attacktype(mptr, AT_CLAW)
             && !strchr(not_claws, mptr->mlet) && mptr != &mons[PM_STONE_GOLEM]
             && mptr != &mons[PM_AMOROUS_DEMON]))
-        return (part == HAND) ? "claw" : "clawed";
+        return (part == HAND) ? _("claw") : _("clawed");
     if ((mptr == &mons[PM_MUMAK] || mptr == &mons[PM_MASTODON])
         && part == NOSE)
-        return "trunk";
+        return _("trunk");
     if (mptr == &mons[PM_SHARK] && part == HAIR)
-        return "skin"; /* sharks don't have scales */
+        return _("skin"); /* sharks don't have scales */
     if ((mptr == &mons[PM_JELLYFISH] || mptr == &mons[PM_KRAKEN])
         && (part == ARM || part == FINGER || part == HAND || part == FOOT
             || part == TOE))
-        return "tentacle";
+        return _("tentacle");
     if (mptr == &mons[PM_FLOATING_EYE] && part == EYE)
-        return "cornea";
+        return _("cornea");
     if (humanoid(mptr) && (part == ARM || part == FINGER || part == FINGERTIP
                            || part == HAND || part == HANDED))
-        return humanoid_parts[part];
+        return _(humanoid_parts[part]);
     if (mptr->mlet == S_COCKATRICE)
-        return (part == HAIR) ? snake_parts[part] : bird_parts[part];
+        return (part == HAIR) ? _(snake_parts[part]) : _(bird_parts[part]);
     if (mptr == &mons[PM_RAVEN])
-        return bird_parts[part];
+        return _(bird_parts[part]);
     if (mptr->mlet == S_CENTAUR || mptr->mlet == S_UNICORN
         || mptr == &mons[PM_KI_RIN]
         || (mptr == &mons[PM_ROTHE] && part != HAIR))
-        return horse_parts[part];
+        return _(horse_parts[part]);
     if (mptr->mlet == S_LIGHT) {
         if (part == HANDED)
-            return "rayed";
+            return _("rayed");
         else if (part == ARM || part == FINGER || part == FINGERTIP
                  || part == HAND)
-            return "ray";
+            return _("ray");
         else
-            return "beam";
+            return _("beam");
     }
     if (mptr == &mons[PM_STALKER] && part == HEAD)
-        return "head";
+        return _("head");
     if (mptr->mlet == S_EEL && mptr != &mons[PM_JELLYFISH])
-        return fish_parts[part];
+        return _(fish_parts[part]);
     if (mptr->mlet == S_WORM)
-        return worm_parts[part];
+        return _(worm_parts[part]);
     if (mptr->mlet == S_SPIDER)
-        return spider_parts[part];
+        return _(spider_parts[part]);
     if (slithy(mptr) || (mptr->mlet == S_DRAGON && part == HAIR))
-        return snake_parts[part];
+        return _(snake_parts[part]);
     if (mptr->mlet == S_EYE)
-        return sphere_parts[part];
+        return _(sphere_parts[part]);
     if (mptr->mlet == S_JELLY || mptr->mlet == S_PUDDING
         || mptr->mlet == S_BLOB || mptr == &mons[PM_JELLYFISH])
-        return jelly_parts[part];
+        return _(jelly_parts[part]);
     if (mptr->mlet == S_VORTEX || mptr->mlet == S_ELEMENTAL)
-        return vortex_parts[part];
+        return _(vortex_parts[part]);
     if (mptr->mlet == S_FUNGUS)
-        return fungus_parts[part];
+        return _(fungus_parts[part]);
     if (humanoid(mptr))
-        return humanoid_parts[part];
-    return animal_parts[part];
+        return _(humanoid_parts[part]);
+    return _(animal_parts[part]);
 }
 
 const char *

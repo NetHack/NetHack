@@ -1011,7 +1011,7 @@ givit(int type, struct permonst *ptr)
     case FIRE_RES:
         debugpline0("Trying to give fire resistance");
         if (!(HFire_resistance & FROMOUTSIDE)) {
-            You(Hallucination ? "be chillin'." : "feel a momentary chill.");
+            You(Hallucination ? _("be chillin'.") : _("feel a momentary chill."));
             HFire_resistance |= FROMOUTSIDE;
         }
         break;
@@ -2127,8 +2127,8 @@ fprefx(struct obj *otmp)
         if (carnivorous(gy.youmonst.data) && !humanoid(gy.youmonst.data)) {
             pline(_("This tripe ration is surprisingly good!"));
         } else if (maybe_polyd(is_orc(gy.youmonst.data), Race_if(PM_ORC))) {
-            pline(Hallucination ? "Tastes great!  Less filling!"
-                                : "Mmm, tripe... not bad!");
+            pline(Hallucination ? _("Tastes great!  Less filling!")
+                                : _("Mmm, tripe... not bad!"));
         } else {
             pline(_("Yak - dog food!"));
             more_experienced(1, 0);
@@ -2453,8 +2453,8 @@ eatspecial(void)
     /* KMH -- idea by "Tommy the Terrorist" */
     if (otmp->otyp == TRIDENT && !otmp->cursed) {
         /* sugarless chewing gum which used to be heavily advertised on TV */
-        pline(Hallucination ? "Four out of five dentists agree."
-                            : "That was pure chewing satisfaction!");
+        pline(Hallucination ? _("Four out of five dentists agree.")
+                            : _("That was pure chewing satisfaction!"));
         exercise(A_WIS, TRUE);
     }
     if (otmp->otyp == FLINT && !otmp->cursed) {
@@ -3463,12 +3463,12 @@ newuhs(boolean incr)
         switch (newhs) {
         case HUNGRY:
             if (Hallucination) {
-                You(!incr ? "now have a lesser case of the munchies."
-                    : "are getting the munchies.");
+                You(!incr ? _("now have a lesser case of the munchies.")
+                    : _("are getting the munchies."));
             } else
-                You(_("%s."), !incr ? "only feel hungry now"
-                           : (u.uhunger < 145) ? "feel hungry"
-                             : "are beginning to feel hungry");
+                You(_("%s."), !incr ? _("only feel hungry now")
+                           : (u.uhunger < 145) ? _("feel hungry")
+                             : _("are beginning to feel hungry"));
             if (incr && go.occupation
                 && (go.occupation != eatfood && go.occupation != opentin))
                 stop_occupation();
@@ -3476,8 +3476,8 @@ newuhs(boolean incr)
             break;
         case WEAK:
             if (Hallucination)
-                pline(!incr ? "You still have the munchies."
-              : "The munchies are interfering with your motor capabilities.");
+                pline(!incr ? _("You still have the munchies.")
+              : _("The munchies are interfering with your motor capabilities."));
             else if (incr && (Role_if(PM_WIZARD) || Race_if(PM_ELF)
                               || Role_if(PM_VALKYRIE)))
                 pline(_("%s needs food, badly!"),

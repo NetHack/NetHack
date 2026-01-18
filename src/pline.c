@@ -5,6 +5,11 @@
 
 #include "hack.h"
 
+#ifdef ENABLE_NLS
+#include "i18n.h"
+#include "ko_postpos.h"
+#endif
+
 #define BIGBUFSZ (5 * BUFSZ) /* big enough to format a 4*BUFSZ string (from
                               * config file parsing) with modest decoration;
                               * result will then be truncated to BUFSZ-1 */
@@ -220,6 +225,19 @@ vpline(const char *line, va_list the_args)
         pbuf[BUFSZ - 1] = '\0';
         line = pbuf;
     }
+
+#ifdef ENABLE_NLS
+    /* Process Korean postpositions after formatting */
+    if (is_korean_locale() && strchr(line, KO_PP_START)) {
+        static char ppbuf[BIGBUFSZ];
+        ko_process_string(ppbuf, sizeof ppbuf, line);
+        (void) strncpy(pbuf, ppbuf, sizeof pbuf - 1);
+        pbuf[sizeof pbuf - 1] = '\0';
+        line = pbuf;
+        ln = (int) strlen(line);
+    }
+#endif
+
     msgtyp = MSGTYP_NORMAL;
 
 #ifdef DUMPLOG_CORE
@@ -366,7 +384,15 @@ You(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
-    vpline(YouMessage(tmp, "You ", line), the_args);
+#ifdef ENABLE_NLS
+    if (is_korean_locale()) {
+        /* Korean: no "You " prefix needed, sentence structure is different */
+        vpline(line, the_args);
+    } else
+#endif
+    {
+        vpline(YouMessage(tmp, "You ", line), the_args);
+    }
     va_end(the_args);
 }
 
@@ -377,7 +403,15 @@ Your(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
-    vpline(YouMessage(tmp, "Your ", line), the_args);
+#ifdef ENABLE_NLS
+    if (is_korean_locale()) {
+        /* Korean: no "Your " prefix needed, sentence structure is different */
+        vpline(line, the_args);
+    } else
+#endif
+    {
+        vpline(YouMessage(tmp, "Your ", line), the_args);
+    }
     va_end(the_args);
 }
 
@@ -388,11 +422,18 @@ You_feel(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
-    if (Unaware)
-        YouPrefix(tmp, "You dream that you feel ", line);
-    else
-        YouPrefix(tmp, "You feel ", line);
-    vpline(strcat(tmp, line), the_args);
+#ifdef ENABLE_NLS
+    if (is_korean_locale()) {
+        vpline(line, the_args);
+    } else
+#endif
+    {
+        if (Unaware)
+            YouPrefix(tmp, "You dream that you feel ", line);
+        else
+            YouPrefix(tmp, "You feel ", line);
+        vpline(strcat(tmp, line), the_args);
+    }
     va_end(the_args);
 }
 
@@ -403,7 +444,14 @@ You_cant(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
-    vpline(YouMessage(tmp, "You can't ", line), the_args);
+#ifdef ENABLE_NLS
+    if (is_korean_locale()) {
+        vpline(line, the_args);
+    } else
+#endif
+    {
+        vpline(YouMessage(tmp, "You can't ", line), the_args);
+    }
     va_end(the_args);
 }
 
@@ -414,7 +462,14 @@ pline_The(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
-    vpline(YouMessage(tmp, "The ", line), the_args);
+#ifdef ENABLE_NLS
+    if (is_korean_locale()) {
+        vpline(line, the_args);
+    } else
+#endif
+    {
+        vpline(YouMessage(tmp, "The ", line), the_args);
+    }
     va_end(the_args);
 }
 
@@ -425,7 +480,14 @@ There(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
-    vpline(YouMessage(tmp, "There ", line), the_args);
+#ifdef ENABLE_NLS
+    if (is_korean_locale()) {
+        vpline(line, the_args);
+    } else
+#endif
+    {
+        vpline(YouMessage(tmp, "There ", line), the_args);
+    }
     va_end(the_args);
 }
 
@@ -438,13 +500,20 @@ You_hear(const char *line, ...)
     if ((Deaf && !Unaware) || !flags.acoustics)
         return;
     va_start(the_args, line);
-    if (Underwater)
-        YouPrefix(tmp, "You barely hear ", line);
-    else if (Unaware)
-        YouPrefix(tmp, "You dream that you hear ", line);
-    else
-        YouPrefix(tmp, "You hear ", line);  /* Deaf-aware */
-    vpline(strcat(tmp, line), the_args);
+#ifdef ENABLE_NLS
+    if (is_korean_locale()) {
+        vpline(line, the_args);
+    } else
+#endif
+    {
+        if (Underwater)
+            YouPrefix(tmp, "You barely hear ", line);
+        else if (Unaware)
+            YouPrefix(tmp, "You dream that you hear ", line);
+        else
+            YouPrefix(tmp, "You hear ", line);  /* Deaf-aware */
+        vpline(strcat(tmp, line), the_args);
+    }
     va_end(the_args);
 }
 
@@ -455,13 +524,21 @@ You_see(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
-    if (Unaware)
-        YouPrefix(tmp, "You dream that you see ", line);
-    else if (Blind) /* caller should have caught this... */
-        YouPrefix(tmp, "You sense ", line);
-    else
-        YouPrefix(tmp, "You see ", line);
-    vpline(strcat(tmp, line), the_args);
+#ifdef ENABLE_NLS
+    if (is_korean_locale()) {
+        /* Korean: no prefix needed, sentence structure is different */
+        vpline(line, the_args);
+    } else
+#endif
+    {
+        if (Unaware)
+            YouPrefix(tmp, "You dream that you see ", line);
+        else if (Blind) /* caller should have caught this... */
+            YouPrefix(tmp, "You sense ", line);
+        else
+            YouPrefix(tmp, "You see ", line);
+        vpline(strcat(tmp, line), the_args);
+    }
     va_end(the_args);
 }
 

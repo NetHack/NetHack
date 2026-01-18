@@ -2873,17 +2873,17 @@ dohelp(void)
             continue;
 
         if (help_menu_items[i].text[0] == '%') {
-            Sprintf(helpbuf, help_menu_items[i].text, PORT_ID);
+            Sprintf(helpbuf, _(help_menu_items[i].text), PORT_ID);
         } else if (help_menu_items[i].f == dispfile_optmenu) {
-            Sprintf(helpbuf, help_menu_items[i].text, setopt_cmd(tmpbuf));
+            Sprintf(helpbuf, _(help_menu_items[i].text), setopt_cmd(tmpbuf));
         } else {
-            Strcpy(helpbuf, help_menu_items[i].text);
+            Strcpy(helpbuf, _(help_menu_items[i].text));
         }
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  helpbuf, MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Select one item:");
+    end_menu(tmpwin, _("Select one item:"));
     n = select_menu(tmpwin, PICK_ONE, &selected);
     destroy_nhwindow(tmpwin);
     if (n > 0) {

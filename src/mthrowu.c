@@ -926,7 +926,7 @@ return_from_mtoss(
                 /* Some sound effects when item lands in water or lava */
                 if (is_pool(x, y) || (is_lava(x, y) && !is_flammable(otmp))) {
                     Soundeffect(se_splash, 50);
-                    pline((weight(otmp) > 9) ? "Splash!" : "Plop!");
+                    pline((weight(otmp) > 9) ? _("Splash!") : _("Plop!"));
                 }
             }
             if (obj_sheds_light(otmp))

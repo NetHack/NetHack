@@ -1461,8 +1461,8 @@ const char *
 hcolor(const char *colorpref)
 {
     return (Hallucination || !colorpref)
-        ? hcolors[rn2_on_display_rng(SIZE(hcolors))]
-        : colorpref;
+        ? _(hcolors[rn2_on_display_rng(SIZE(hcolors))])
+        : _(colorpref);
 }
 
 /* return a random real color unless hallucinating */
@@ -1472,8 +1472,8 @@ rndcolor(void)
     int k = rn2(CLR_MAX);
 
     return Hallucination ? hcolor((char *) 0)
-                         : (k == NO_COLOR) ? "colorless"
-                                           : c_obj_colors[k];
+                         : (k == NO_COLOR) ? _("colorless")
+                                           : _(c_obj_colors[k]);
 }
 
 static NEARDATA const char *const hliquids[] = {
@@ -1504,9 +1504,9 @@ hliquid(
             ++count;
         indx = rn2_on_display_rng(count);
         if (IndexOk(indx, hliquids))
-            return hliquids[indx];
+            return _(hliquids[indx]);
     }
-    return liquidpref;
+    return _(liquidpref);
 }
 
 /* Aliases for road-runner nemesis
