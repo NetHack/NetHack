@@ -20096,3 +20096,56 @@ msgstr "보상을 받으러 갔다"
 
 msgid "escaped from the dungeon"
 msgstr "던전을 탈출했다"
+
+# windows.c translations
+msgid "Toggle off 'autopickup' to not pick up anything."
+msgstr "'autopickup'을 끄면 아무것도 줍지 않습니다."
+
+msgid "Toggle on 'autopickup' to automatically pick these things up."
+msgstr "'autopickup'을 켜면 이것들을 자동으로 줍습니다."
+
+# pager.c monster health descriptions
+msgid "uninjured"
+msgstr "부상없음"
+
+msgid "nearly "
+msgstr "거의 "
+
+msgid "deceased"
+msgstr "죽음"
+
+msgid "defunct"
+msgstr "작동안함"
+
+msgid "barely "
+msgstr "간신히 "
+
+msgid "slightly "
+msgstr "약간 "
+
+msgid "heavily "
+msgstr "심하게 "
+
+msgid "tail of "
+msgstr "꼬리: "
+
+msgid "tail of a "
+msgstr "꼬리: "
+
+msgid "tame "
+msgstr "길들인 "
+
+msgid "peaceful "
+msgstr "평화로운 "
+
+msgid ", swallowing you"
+msgstr ", 당신을 삼키는 중"
+
+msgid ", engulfing you"
+msgstr ", 당신을 감싸는 중"
+
+msgid ", being held"
+msgstr ", 붙잡힌 상태"
+
+msgid ", holding you"
+msgstr ", 당신을 붙잡는 중"

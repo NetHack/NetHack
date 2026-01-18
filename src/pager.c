@@ -142,15 +142,15 @@ monhealthdescr(struct monst *mon, boolean addspace, char *outbuf)
         pct = (mon->mhp * 100) / mhp_max;
 
     if (mon->mhp >= mhp_max)
-        Strcpy(outbuf, "uninjured");
+        Strcpy(outbuf, _("uninjured"));
     else if (mon->mhp <= 1 || pct < 5)
-        Sprintf(outbuf, "%s%s", (mon->mhp > 0) ? "nearly " : "",
-                !nonliving(mon->data) ? "deceased" : "defunct");
+        Sprintf(outbuf, "%s%s", (mon->mhp > 0) ? _("nearly ") : "",
+                !nonliving(mon->data) ? _("deceased") : _("defunct"));
     else
         Sprintf(outbuf, "%swounded",
-                (pct >= 95) ? "barely "
-                : (pct >= 80) ? "slightly "
-                  : (pct < 20) ? "heavily "
+                (pct >= 95) ? _("barely ")
+                : (pct >= 80) ? _("slightly ")
+                  : (pct < 20) ? _("heavily ")
                     : "");
     if (addspace)
         (void) strkitten(outbuf, ' ');
@@ -432,22 +432,22 @@ look_at_monster(
               : distant_monnam(mtmp, ARTICLE_NONE, monnambuf);
     Sprintf(buf, "%s%s%s%s",
             (mtmp->mx != x || mtmp->my != y)
-                ? ((mtmp->isshk && accurate) ? "tail of " : "tail of a ")
+                ? ((mtmp->isshk && accurate) ? _("tail of ") : _("tail of a "))
                 : "",
             accurate ? monhealthdescr(mtmp, TRUE, healthbuf) : "",
             (mtmp->mtame && accurate)
-                ? "tame "
+                ? _("tame ")
                 : (mtmp->mpeaceful && accurate)
-                    ? "peaceful "
+                    ? _("peaceful ")
                     : "",
             name);
     if (u.ustuck == mtmp) {
         if (u.uswallow || iflags.save_uswallow) /* monster detection */
-            Strcat(buf, digests(mtmp->data) ? ", swallowing you"
-                                            : ", engulfing you");
+            Strcat(buf, digests(mtmp->data) ? _(", swallowing you")
+                                            : _(", engulfing you"));
         else
             Strcat(buf, (Upolyd && sticks(gy.youmonst.data))
-                          ? ", being held" : ", holding you");
+                          ? _(", being held") : _(", holding you"));
     }
     /* if mtmp isn't able to move (other than because it is a type of
        monster that never moves), say so [excerpt from mstatusline() for
