@@ -731,3 +731,555 @@ msgstr "이상한 기분이다!"
 msgid "That was smooth!"
 msgstr "부드러웠다!"
 
+# ============================================================
+# 전투 메시지 추가 (Additional Combat Messages)
+# ============================================================
+
+#: src/uhitm.c
+msgid "A %s %s %s!"
+msgstr "%s %s{이/가} %s!"
+
+#: src/uhitm.c
+msgid "tame"
+msgstr "길들여진"
+
+#: src/uhitm.c
+msgid "wild"
+msgstr "야생의"
+
+#: src/uhitm.c
+msgid "creature"
+msgstr "생물"
+
+#: src/uhitm.c
+msgid "is present"
+msgstr "있다"
+
+#: src/uhitm.c
+msgid "appears"
+msgstr "나타났다"
+
+#: src/uhitm.c
+msgid "stop.  %s is in the way!"
+msgstr "멈췄다. %s{이/가} 길을 막고 있다!"
+
+#: src/uhitm.c
+msgid "%s doesn't seem to move!"
+msgstr "%s{은/는} 움직이지 않는 것 같다!"
+
+#: src/uhitm.c
+msgid "You cannot fight while so heavily loaded."
+msgstr "이렇게 무거운 짐을 지고는 싸울 수 없다."
+
+#: src/uhitm.c
+msgid "begin bashing monsters with %s."
+msgstr "%s{으로/로} 몬스터를 때리기 시작했다."
+
+#: src/uhitm.c
+msgid "begin %s monsters with your %s %s."
+msgstr "%3$s %2$s{으로/로} 몬스터를 %1$s 시작했다."
+
+#: src/uhitm.c
+msgid "gloved"
+msgstr "장갑 낀"
+
+#: src/uhitm.c
+msgid "bare"
+msgstr "맨"
+
+#: src/uhitm.c
+msgid "As you hit %s, %s%s breaks into splinters."
+msgstr "%s{을/를} 때리자, %s%s{이/가} 산산조각이 났다."
+
+#: src/uhitm.c
+msgid "one of "
+msgstr ""
+
+#: src/uhitm.c
+msgid "succeed in destroying %s.  Congratulations!"
+msgstr "%s{을/를} 파괴했다. 축하한다!"
+
+#: src/uhitm.c
+msgid "hit %s with %s."
+msgstr "%2$s{으로/로} %1$s{을/를} 때렸다."
+
+#: src/uhitm.c
+msgid "Splat!  You hit %s with %s %s egg%s!"
+msgstr "철퍽! %2$s %3$s 알%4$s{으로/로} %1$s{을/를} 때렸다!"
+
+#: src/uhitm.c
+msgid "the"
+msgstr ""
+
+#: src/uhitm.c
+msgid "some"
+msgstr "몇 개의"
+
+#: src/uhitm.c
+msgid "a"
+msgstr ""
+
+#: src/uhitm.c
+msgid "petrifying"
+msgstr "석화"
+
+#: src/uhitm.c
+msgid "hit %s with %s egg%s."
+msgstr "%2$s 알%3$s{으로/로} %1$s{을/를} 때렸다."
+
+#: src/uhitm.c
+msgid "egg%s %s alive any more..."
+msgstr "알%s{은/는} 더 이상 살아있지 않다..."
+
+#: src/uhitm.c
+msgid "isn't"
+msgstr ""
+
+#: src/uhitm.c
+msgid "aren't"
+msgstr ""
+
+#: src/uhitm.c
+msgid "venom hits %s harmlessly."
+msgstr "독액이 %s{을/를} 해치지 못했다."
+
+#: src/uhitm.c
+msgid "venom burns %s!"
+msgstr "독액이 %s{을/를} 태웠다!"
+
+#: src/uhitm.c
+msgid "You're %s!"
+msgstr "%s!"
+
+#: src/uhitm.c
+msgid "You're covered in frost!"
+msgstr "서리에 뒤덮였다!"
+
+#: src/uhitm.c
+msgid "frost doesn't seem cold!"
+msgstr "서리가 차갑게 느껴지지 않는다!"
+
+#: src/uhitm.c
+msgid "You're covered in %s, but it seems harmless."
+msgstr "%s{으로/로} 뒤덮였지만, 해롭지 않은 것 같다."
+
+#: src/uhitm.c
+msgid "You're covered in %s!  It burns!"
+msgstr "%s{으로/로} 뒤덮였다! 타오른다!"
+
+#: src/uhitm.c
+msgid "It burns %s!"
+msgstr "%s{을/를} 태웠다!"
+
+#: src/uhitm.c
+msgid "purse feels heavier."
+msgstr "지갑이 무거워진 것 같다."
+
+#: src/uhitm.c
+msgid "grab %s's gold, but find no room in your knapsack."
+msgstr "%s의 금화를 집었지만, 배낭에 공간이 없다."
+
+#: src/uhitm.c
+msgid "position suddenly seems %suncertain!"
+msgstr "위치가 갑자기 %s불확실해진 것 같다!"
+
+#: src/uhitm.c
+msgid "very "
+msgstr "매우 "
+
+#: src/uhitm.c
+msgid "Some writing vanishes from %s head!"
+msgstr "%s 머리에서 글씨가 사라졌다!"
+
+#: src/uhitm.c
+msgid "Some writing vanishes from your head!"
+msgstr "머리에서 글씨가 사라졌다!"
+
+#: src/uhitm.c
+msgid "Yuck!"
+msgstr "윽!"
+
+#: src/uhitm.c
+msgid "The barbs stick to you!"
+msgstr "가시가 당신에게 박혔다!"
+
+#: src/uhitm.c
+msgid "barbs stick to %s!"
+msgstr "가시가 %s{에게} 박혔다!"
+
+#: src/uhitm.c
+msgid "Was that the touch of death?"
+msgstr "죽음의 손길이었나?"
+
+#: src/uhitm.c
+msgid "Lucky for you, it didn't work!"
+msgstr "다행히 효과가 없었다!"
+
+#: src/uhitm.c
+msgid "It seems harmless to %s."
+msgstr "%s{에게} 해롭지 않은 것 같다."
+
+#: src/uhitm.c
+msgid "Obviously, you didn't like %s taste."
+msgstr "분명히, %s의 맛은 별로였다."
+
+#: src/uhitm.c
+msgid "attempt to surround %s is harmless."
+msgstr "%s{을/를} 둘러싸려는 시도가 실패했다."
+
+#: src/uhitm.c
+msgid "That %s is really %s%c"
+msgstr "저 %s{은/는} 사실 %s%c"
+
+#: src/uhitm.c
+msgid "The flash of light shines on %s."
+msgstr "섬광이 %s{을/를} 비췄다."
+
+#: src/uhitm.c
+msgid "charm %s.  %s gladly hands over %s%s possessions."
+msgstr "%s{을/를} 매료시켰다. %s{이/가} 기꺼이 %s%s 소지품을 넘겨준다."
+
+#: src/uhitm.c
+msgid "seduce %s and %s starts to take off %s clothes."
+msgstr "%s{을/를} 유혹했고 %s{이/가} %s 옷을 벗기 시작한다."
+
+#: src/uhitm.c
+msgid "poison was deadly..."
+msgstr "독이 치명적이었다..."
+
+#: src/uhitm.c
+msgid "suck in some slime and don't feel very well."
+msgstr "슬라임을 빨아들여 기분이 좋지 않다."
+
+#: src/uhitm.c
+msgid "%s %s blocks your attack to %s head."
+msgstr "%s %s{이/가} %s 머리에 대한 공격을 막았다."
+
+#: src/uhitm.c
+msgid "%s blocks the attack to your head."
+msgstr "%s{이/가} 머리에 대한 공격을 막았다."
+
+#: src/uhitm.c
+msgid "drown %s..."
+msgstr "%s{을/를} 익사시켰다..."
+
+#: src/uhitm.c
+msgid "brush against %s."
+msgstr "%s{을/를} 스쳤다."
+
+#: src/uhitm.c
+msgid "brush against %s %s."
+msgstr "%s의 %s{을/를} 스쳤다."
+
+#: src/uhitm.c
+msgid "tail"
+msgstr "꼬리"
+
+#: src/uhitm.c
+msgid "%s is being crushed."
+msgstr "%s{이/가} 짓눌리고 있다."
+
+#: src/uhitm.c
+msgid "are being crushed."
+msgstr "짓눌리고 있다."
+
+#: src/uhitm.c
+msgid "are frozen!"
+msgstr "얼어붙었다!"
+
+#: src/uhitm.c
+msgid "are frozen by %s!"
+msgstr "%s에 의해 얼어붙었다!"
+
+#: src/uhitm.c
+msgid "are put to sleep!"
+msgstr "잠들어버렸다!"
+
+#: src/uhitm.c
+msgid "are put to sleep by %s!"
+msgstr "%s에 의해 잠들어버렸다!"
+
+#: src/uhitm.c
+msgid "turn %s into slime."
+msgstr "%s{을/를} 슬라임으로 만들었다."
+
+#: src/uhitm.c
+msgid "escape harm."
+msgstr "해를 피했다."
+
+#: src/uhitm.c
+msgid "are unaffected."
+msgstr "영향을 받지 않았다."
+
+#: src/uhitm.c
+msgid "don't feel very well."
+msgstr "기분이 좋지 않다."
+
+#: src/mhitu.c
+msgid "But none comes."
+msgstr "하지만 아무도 오지 않는다."
+
+# ============================================================
+# 옵션 설명 (Option Descriptions)
+# ============================================================
+
+#: src/options.c
+msgid "for \"yes\" confirmations, require \"no\" to reject"
+msgstr "\"yes\" 확인 시, 거부하려면 \"no\" 입력 필요"
+
+#: src/options.c
+msgid "yes vs y to quit or to enter explore mode"
+msgstr "종료나 탐험 모드 진입 시 yes vs y"
+
+#: src/options.c
+msgid "yes vs y to die (explore mode or debug mode)"
+msgstr "죽을 때 yes vs y (탐험 모드 또는 디버그 모드)"
+
+#: src/options.c
+msgid "yes vs y to save bones data when dying in debug mode"
+msgstr "디버그 모드에서 죽을 때 뼈 데이터 저장에 yes vs y"
+
+#: src/options.c
+msgid "yes vs y to attack a peaceful monster"
+msgstr "평화로운 몬스터 공격 시 yes vs y"
+
+#: src/options.c
+msgid "yes vs y to break a wand via (a)pply"
+msgstr "(a)pply로 지팡이 부러뜨릴 때 yes vs y"
+
+#: src/options.c
+msgid "yes vs y to continue eating after first bite when satiated"
+msgstr "포만 상태에서 첫 입 후 계속 먹을 때 yes vs y"
+
+#: src/options.c
+msgid "yes vs y to change form when lycanthropy is controllable"
+msgstr "수인증을 제어할 수 있을 때 변신에 yes vs y"
+
+#: src/options.c
+msgid "y required to pray (supersedes old \"prayconfirm\" option)"
+msgstr "기도에 y 필요 (이전 \"prayconfirm\" 옵션 대체)"
+
+#: src/options.c
+msgid "y required to enter known trap unless considered harmless"
+msgstr "무해하지 않은 알려진 함정에 들어갈 때 y 필요"
+
+#: src/options.c
+msgid "y required to pick filter choice 'A' for menustyle:Full"
+msgstr "menustyle:Full에서 필터 선택 'A'에 y 필요"
+
+#: src/options.c
+msgid "'m' prefix necessary to deliberately walk into lava or water"
+msgstr "용암이나 물에 일부러 걸어들어가려면 'm' 접두사 필요"
+
+#: src/options.c
+msgid "always pick from inventory for Remove and Takeoff"
+msgstr "제거와 벗기에서 항상 인벤토리에서 선택"
+
+#: src/options.c
+msgid "[prompt for object class(es), then"
+msgstr "[물건 종류 선택 후,"
+
+#: src/options.c
+msgid " ask y/n for each item in those classes]"
+msgstr " 해당 종류의 각 물건에 y/n 묻기]"
+
+#: src/options.c
+msgid " use menu for items in those classes]"
+msgstr " 해당 종류의 물건에 메뉴 사용]"
+
+#: src/options.c
+msgid "[use menu to choose class(es), then"
+msgstr "[메뉴로 종류 선택 후,"
+
+#: src/options.c
+msgid " use another menu for items in those]"
+msgstr " 해당 물건에 다른 메뉴 사용]"
+
+#: src/options.c
+msgid "[skip class filtering; always"
+msgstr "[종류 필터링 건너뛰기; 항상"
+
+#: src/options.c
+msgid " use menu of all available items]"
+msgstr " 모든 가능한 물건 메뉴 사용]"
+
+#: src/options.c
+msgid "[show one old message at a time,"
+msgstr "[이전 메시지를 한 번에 하나씩,"
+
+#: src/options.c
+msgid " most recent first]"
+msgstr " 최근 것부터]"
+
+#: src/options.c
+msgid "[for consecutive ^P requests, use"
+msgstr "[연속 ^P 요청 시,"
+
+#: src/options.c
+msgid " 'single' for first two, then 'full']"
+msgstr " 처음 두 개는 'single', 그 다음 'full']"
+
+#: src/options.c
+msgid "[show all available messages,"
+msgstr "[모든 가능한 메시지 표시,"
+
+#: src/options.c
+msgid " oldest first and most recent last]"
+msgstr " 오래된 것부터 최근 것까지]"
+
+#: src/options.c
+msgid "(might fail)"
+msgstr "(실패 가능)"
+
+#: src/options.c
+msgid "(doors only)"
+msgstr "(문만)"
+
+#: src/options.c
+msgid "(chests/boxes only)"
+msgstr "(상자만)"
+
+#: src/options.c
+msgid "no permanent inventory window"
+msgstr "영구 인벤토리 창 없음"
+
+#: src/options.c
+msgid "all inventory except for gold"
+msgstr "금화 제외 모든 인벤토리"
+
+#: src/options.c
+msgid "full inventory including gold"
+msgstr "금화 포함 전체 인벤토리"
+
+#: src/options.c
+msgid "all except gold, plus unused letters"
+msgstr "금화 제외 전부, 미사용 문자 포함"
+
+#: src/options.c
+msgid "full inventory, plus unused letters"
+msgstr "전체 인벤토리, 미사용 문자 포함"
+
+#: src/options.c
+msgid "subset: items currently in use"
+msgstr "하위 집합: 현재 사용 중인 물품"
+
+#: src/options.c
+msgid "don't show object symbols in menus"
+msgstr "메뉴에 물건 기호 표시 안 함"
+
+#: src/options.c
+msgid "show object symbols in menu header lines"
+msgstr "메뉴 헤더에 물건 기호 표시"
+
+#: src/options.c
+msgid "show object symbols in individual menu entries"
+msgstr "개별 메뉴 항목에 물건 기호 표시"
+
+#: src/options.c
+msgid "show object symbols in headers and menu entries"
+msgstr "헤더와 메뉴 항목에 물건 기호 표시"
+
+#: src/options.c
+msgid "show objsyms in entries if no headers are shown"
+msgstr "헤더가 없으면 항목에 기호 표시"
+
+#: src/options.c
+msgid "show objsyms in header, in entries if no header"
+msgstr "헤더에 기호 표시, 헤더 없으면 항목에"
+
+#: src/options.c
+msgid "Go to next page"
+msgstr "다음 페이지로"
+
+#: src/options.c
+msgid "Go to previous page"
+msgstr "이전 페이지로"
+
+#: src/options.c
+msgid "Go to first page"
+msgstr "첫 페이지로"
+
+#: src/options.c
+msgid "Go to last page"
+msgstr "마지막 페이지로"
+
+#: src/options.c
+msgid "Select all items in entire menu"
+msgstr "전체 메뉴의 모든 항목 선택"
+
+#: src/options.c
+msgid "Invert selection for all items"
+msgstr "모든 항목 선택 반전"
+
+#: src/options.c
+msgid "Unselect all items in entire menu"
+msgstr "전체 메뉴의 모든 항목 선택 해제"
+
+#: src/options.c
+msgid "Select all items on current page"
+msgstr "현재 페이지의 모든 항목 선택"
+
+#: src/options.c
+msgid "Invert current page's selections"
+msgstr "현재 페이지 선택 반전"
+
+#: src/options.c
+msgid "Unselect all items on current page"
+msgstr "현재 페이지의 모든 항목 선택 해제"
+
+#: src/options.c
+msgid "Search and invert matching items"
+msgstr "검색하고 일치하는 항목 반전"
+
+#: src/options.c
+msgid "Pan current page to right (perm_invent only)"
+msgstr "현재 페이지 오른쪽으로 이동 (perm_invent만)"
+
+#: src/options.c
+msgid "Pan current page to left (perm_invent only)"
+msgstr "현재 페이지 왼쪽으로 이동 (perm_invent만)"
+
+# ============================================================
+# 확장 명령 메뉴 (Extended Commands Menu)
+# ============================================================
+
+#: src/cmd.c
+msgid "Extended Commands List"
+msgstr "확장 명령 목록"
+
+#: src/cmd.c
+msgid "Switch to %s commands that don't autocomplete"
+msgstr "자동완성되지 않는 명령 %s로 전환"
+
+#: src/cmd.c
+msgid "including"
+msgstr "포함"
+
+#: src/cmd.c
+msgid "excluding"
+msgstr "제외"
+
+#: src/cmd.c
+msgid "Search extended commands"
+msgstr "확장 명령 검색"
+
+#: src/cmd.c
+msgid "Switch back from search"
+msgstr "검색에서 돌아가기"
+
+#: src/cmd.c
+msgid "Switch to showing debugging commands in separate section"
+msgstr "디버그 명령을 별도 섹션에 표시로 전환"
+
+#: src/cmd.c
+msgid "Switch to showing all alphabetically, including debugging commands"
+msgstr "디버그 명령 포함 알파벳순으로 전부 표시로 전환"
+
+# ============================================================
+# 분수/마법 메시지 (Fountain/Magic Messages)
+# ============================================================
+
+#: src/zap.c
+msgid "Steam billows from the fountain."
+msgstr "분수에서 증기가 피어오른다."
+
