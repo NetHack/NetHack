@@ -195,7 +195,7 @@ done_in_by(struct monst *mtmp, int how)
             mimicker = (M_AP_TYPE(mtmp) == M_AP_MONSTER),
             imitator = (mptr != champtr || mimicker);
 
-    You((how == STONING) ? "turn to stone..." : "die...");
+    You((how == STONING) ? _("turn to stone...") : _("die..."));
     mark_synch(); /* flush buffered screen output */
     buf[0] = '\0';
     svk.killer.format = KILLED_BY_AN;
@@ -750,9 +750,9 @@ savelife(int how)
         expels(u.ustuck, u.ustuck->data, TRUE);
     } else if (u.ustuck) {
         if (Upolyd && sticks(gy.youmonst.data))
-            You("release %s.", mon_nam(u.ustuck));
+            You(_("release %s."), mon_nam(u.ustuck));
         else
-            pline("%s releases you.", Monnam(u.ustuck));
+            pline(_("%s releases you."), Monnam(u.ustuck));
         unstuck(u.ustuck);
     }
 }
@@ -1029,7 +1029,7 @@ done(int how)
             svk.killer.name[0] = '\0';
         }
         if (wizard) {
-            You("are a very tricky wizard, it seems.");
+            You(_("are a very tricky wizard, it seems."));
             svk.killer.format = KILLED_BY_AN; /* reset to 0 */
             return;
         }
@@ -1081,12 +1081,12 @@ done(int how)
         }
     }
     if (Lifesaved && (how <= GENOCIDED)) {
-        pline("But wait...");
+        pline(_("But wait..."));
         /* assumes that only one type of item confers LifeSaved property */
         makeknown(AMULET_OF_LIFE_SAVING);
-        Your("medallion %s!", !Blind ? "begins to glow" : "feels warm");
+        Your(_("medallion %s!"), !Blind ? _("begins to glow") : _("feels warm"));
         if (how == CHOKING)
-            You("vomit ...");
+            You(_("vomit ..."));
         You_feel("much better!");
         pline_The("medallion crumbles to dust!");
         if (uamul)
@@ -1095,7 +1095,7 @@ done(int how)
         (void) adjattrib(A_CON, -1, TRUE);
         savelife(how);
         if (how == GENOCIDED) {
-            pline("Unfortunately you are still genocided...");
+            pline(_("Unfortunately you are still genocided..."));
         } else {
             char killbuf[BUFSZ];
             formatkiller(killbuf, BUFSZ, how, FALSE);
@@ -1112,7 +1112,7 @@ done(int how)
         && !(program_state.done_hup && gd.done_seq++ == gh.hero_seq)
 #endif
         && !paranoid_query(ParanoidDie, "Die?")) {
-        pline("OK, so you don't %s.", (how == CHOKING) ? "choke" : "die");
+        pline(_("OK, so you don't %s."), (how == CHOKING) ? _("choke") : _("die"));
         iflags.last_msg = PLNMSG_OK_DONT_DIE;
         savelife(how);
         survive = TRUE;
@@ -1186,7 +1186,7 @@ really_done(int how)
      * smiling... :-)  -3.
      */
     if (svm.moves <= 1 && how < PANICKED && !done_stopprint)
-        pline("Do not pass Go.  Do not collect 200 %s.", currency(200L));
+        pline(_("Do not pass Go.  Do not collect 200 %s."), currency(200L));
 
     if (have_windows)
         wait_synch(); /* flush screen output */
@@ -1354,10 +1354,10 @@ really_done(int how)
         /* give this feedback even if bones aren't going to be created,
            so that its presence or absence doesn't tip off the player to
            new bones or their lack; it might be a lie if makemon fails */
-        Your("%s as %s...",
+        Your(_("%s as %s..."),
              (u.ugrave_arise != PM_GREEN_SLIME)
-                 ? "body rises from the dead"
-                 : "revenant persists",
+                 ? _("body rises from the dead")
+                 : _("revenant persists"),
              an(pmname(&mons[u.ugrave_arise], Ugender)));
         display_nhwindow(WIN_MESSAGE, FALSE);
     }
@@ -1662,7 +1662,7 @@ container_contents(
                     container_contents(box->cobj, identified, TRUE,
                                        reportempty);
             } else if (reportempty) {
-                pline("%s is empty.", upstart(thesimpleoname(box)));
+                pline(_("%s is empty."), upstart(thesimpleoname(box)));
                 display_nhwindow(WIN_MESSAGE, FALSE);
             }
         }
