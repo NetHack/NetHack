@@ -803,8 +803,8 @@ do_play_instrument(struct obj *instr)
         }
     }
 
-    You(!Deaf ? "extract a strange sound from %s!"
-              : "can feel %s emitting vibrations.", the(xname(instr)));
+    You(!Deaf ? _("extract a strange sound from %s!")
+              : _("can feel %s emitting vibrations."), the(xname(instr)));
     Hero_playnotes(obj_to_instr(instr), buf, 50);
 
 

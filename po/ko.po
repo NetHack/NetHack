@@ -19936,6 +19936,7 @@ msgstr "%s{이} 당신의 %s{을} 맞혔다!"
 msgid "%s back toward you, hitting your %s!"
 msgstr "%s{이} 당신 쪽으로 돌아와 %s{을} 맞혔다!"
 
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 # stairs.c translations
 msgid "ladder"
 msgstr "사다리"
@@ -20780,6 +20781,47 @@ msgstr "장갑을 잃은 후"
 
 msgid "As you fall, you"
 msgstr "떨어지면서"
+
+# Ternary operator strings
+msgid "You take a walk on your web."
+msgstr "자신의 거미줄 위를 걸어간다."
+
+msgid "There is a spider web here."
+msgstr "여기에 거미줄이 있다."
+
+msgid "trigger a trap!"
+msgstr "함정을 발동시켰다!"
+
+msgid "extract a strange sound from %s!"
+msgstr "%s에서 이상한 소리를 뽑아낸다!"
+
+msgid "can feel %s emitting vibrations."
+msgstr "%s{이} 진동을 내는 것을 느낀다."
+
+msgid "struggle to keep your balance."
+msgstr "균형을 유지하려고 애쓴다."
+
+msgid "reel..."
+msgstr "휘청거린다..."
+
+msgid "You sink deeper into the lava."
+msgstr "용암 속으로 더 깊이 가라앉는다."
+
+# sit.c messages
+msgid "sit on the %s."
+msgstr "%s 위에 앉는다."
+
+msgid "drawbridge"
+msgstr "도개교"
+
+msgid "feel a malignant aura surround %s."
+msgstr "악의적인 기운이 %s{을/를} 감싸는 것을 느낀다."
+
+msgid "the magic-absorbing blade"
+msgstr "마력 흡수 칼날"
+
+msgid "you"
+msgstr "당신"
 
 #~ msgid "You feel like someone is helping you."
 #~ msgstr "누군가 도와주는 것 같다."

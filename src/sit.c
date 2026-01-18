@@ -395,7 +395,6 @@ lay_an_egg(void)
 int
 dosit(void)
 {
-    static const char sit_message[] = "sit on the %s.";
     struct trap *trap = t_at(u.ux, u.uy);
     int typ = levl[u.ux][u.uy].typ;
 
@@ -520,21 +519,21 @@ dosit(void)
                 (void) water_damage(uarm, "armor", TRUE);
         }
     } else if (IS_SINK(typ)) {
-        You(sit_message, defsyms[S_sink].explanation);
+        You(_("sit on the %s."), defsyms[S_sink].explanation);
         Your(_("%s gets wet."),
              humanoid(gy.youmonst.data) ? "rump" : "underside");
     } else if (IS_ALTAR(typ)) {
-        You(sit_message, defsyms[S_altar].explanation);
+        You(_("sit on the %s."), defsyms[S_altar].explanation);
         altar_wrath(u.ux, u.uy);
     } else if (IS_GRAVE(typ)) {
-        You(sit_message, defsyms[S_grave].explanation);
+        You(_("sit on the %s."), defsyms[S_grave].explanation);
     } else if (typ == STAIRS) {
-        You(sit_message, "stairs");
+        You(_("sit on the %s."), _("stairs"));
     } else if (typ == LADDER) {
-        You(sit_message, "ladder");
+        You(_("sit on the %s."), _("ladder"));
     } else if (is_lava(u.ux, u.uy)) {
         /* must be WWalking */
-        You(sit_message, hliquid("lava"));
+        You(_("sit on the %s."), hliquid("lava"));
         burn_away_slime();
         if (likes_lava(gy.youmonst.data)) {
             pline_The(_("%s feels warm."), hliquid("lava"));
@@ -544,13 +543,13 @@ dosit(void)
         losehp(d((Fire_resistance ? 2 : 10), 10), /* lava damage */
                "sitting on lava", KILLED_BY);
     } else if (is_ice(u.ux, u.uy)) {
-        You(sit_message, defsyms[S_ice].explanation);
+        You(_("sit on the %s."), defsyms[S_ice].explanation);
         if (!Cold_resistance)
             pline_The(_("ice feels cold."));
     } else if (typ == DRAWBRIDGE_DOWN) {
-        You(sit_message, "drawbridge");
+        You(_("sit on the %s."), _("drawbridge"));
     } else if (IS_THRONE(typ)) {
-        You(sit_message, defsyms[S_throne].explanation);
+        You(_("sit on the %s."), defsyms[S_throne].explanation);
         throne_sit_effect();
     } else if (lays_eggs(gy.youmonst.data)) {
         return lay_an_egg();
@@ -567,10 +566,9 @@ rndcurse(void)
     int nobj = 0;
     int cnt, onum;
     struct obj *otmp;
-    static const char mal_aura[] = "feel a malignant aura surround %s.";
 
     if (u_wield_art(ART_MAGICBANE) && rn2(20)) {
-        You(mal_aura, "the magic-absorbing blade");
+        You(_("feel a malignant aura surround %s."), _("the magic-absorbing blade"));
         return;
     }
 
@@ -578,7 +576,7 @@ rndcurse(void)
         shieldeff(u.ux, u.uy);
     }
 
-    You(mal_aura, "you");
+    You(_("feel a malignant aura surround %s."), _("you"));
 
     for (otmp = gi.invent; otmp; otmp = otmp->nobj) {
         /* gold isn't subject to being cursed or blessed */

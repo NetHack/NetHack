@@ -2103,8 +2103,8 @@ trapeffect_web(
             return Trap_Effect_Finished;
         if (webmaker(gy.youmonst.data)) {
             if (webmsgok)
-                pline(trap->madeby_u ? "You take a walk on your web."
-                      : "There is a spider web here.");
+                pline(trap->madeby_u ? _("You take a walk on your web.")
+                      : _("There is a spider web here."));
             return Trap_Effect_Finished;
         }
         if (webmsgok) {
@@ -6214,7 +6214,7 @@ chest_trap(
     otmp->tknown = 0;   /* for xname(); will be set to 1 below */
     otmp->otrapped = 0; /* trap is one-shot; clear flag first in case
                          * chest kills you and ends up in bones file */
-    You(disarm ? "set it off!" : "trigger a trap!");
+    You(disarm ? _("set it off!") : _("trigger a trap!"));
     display_nhwindow(WIN_MESSAGE, FALSE);
     if (Luck > -13 && rn2(13 + Luck) > 7) { /* saved by luck */
         /* trap went off, but good luck prevents damage */
@@ -6897,8 +6897,6 @@ lava_effects(void)
 void
 sink_into_lava(void)
 {
-    static const char sink_deeper[] = "You sink deeper into the lava.";
-
     if (!u.utrap || u.utraptype != TT_LAVA) {
         ; /* do nothing; this usually won't happen but could after
            * polymorphing from a flier into a ceiling hider and then hiding;
@@ -6930,10 +6928,10 @@ sink_into_lava(void)
             /* can't fully turn into slime while in lava, but might not
                have it be burned away until you've come awfully close */
             if (Slimed && rnd(10 - 1) >= (int) (Slimed & TIMEOUT)) {
-                pline(sink_deeper);
+                pline(_("You sink deeper into the lava."));
                 burn_away_slime();
             } else {
-                Norep(sink_deeper);
+                Norep(_("You sink deeper into the lava."));
             }
             u.utrap += rnd(4);
         }

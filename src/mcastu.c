@@ -581,7 +581,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
                 You_feel(_("momentarily disoriented."));
             make_stunned(1L, FALSE);
         } else {
-            You(Stunned ? "struggle to keep your balance." : "reel...");
+            You(Stunned ? _("struggle to keep your balance.") : _("reel..."));
             dmg = d(ACURR(A_DEX) < 12 ? 6 : 4, 4);
             if (Half_spell_damage)
                 dmg = (dmg + 1) / 2;
