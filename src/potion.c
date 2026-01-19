@@ -539,7 +539,7 @@ dodrink(void)
         if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)
             /* not as low as floor level but similar restrictions apply */
             && can_reach_floor(FALSE)) {
-            if (y_n("Drink from the fountain?") == 'y') {
+            if (y_n(_("Drink from the fountain?")) == 'y') {
                 drinkfountain();
                 return ECMD_TIME;
             }
@@ -549,7 +549,7 @@ dodrink(void)
         if (IS_SINK(levl[u.ux][u.uy].typ)
             /* not as low as floor level but similar restrictions apply */
             && can_reach_floor(FALSE)) {
-            if (y_n("Drink from the sink?") == 'y') {
+            if (y_n(_("Drink from the sink?")) == 'y') {
                 drinksink();
                 return ECMD_TIME;
             }

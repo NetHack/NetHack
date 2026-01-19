@@ -43,7 +43,7 @@ int
 dosave(void)
 {
     clear_nhwindow(WIN_MESSAGE);
-    if (y_n("Really save?") == 'n') {
+    if (y_n(_("Really save?")) == 'n') {
         clear_nhwindow(WIN_MESSAGE);
         if (gm.multi > 0)
             nomul(0);

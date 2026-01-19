@@ -42,39 +42,39 @@ hitmsg(struct monst *mtmp, struct attack *mattk)
     } else {
         switch (mattk->aatyp) {
         case AT_BITE:
-            verb = "bites";
+            verb = _("bites");
             break;
         case AT_KICK:
             if (thick_skinned(gy.youmonst.data))
                 punct = ".";
-            verb = "kicks";
+            verb = _("kicks");
             break;
         case AT_STNG:
-            verb = "stings";
+            verb = _("stings");
             break;
         case AT_BUTT:
-            verb = "butts";
+            verb = _("butts");
             break;
         case AT_TUCH:
-            verb = "touches you";
+            verb = _("touches you");
             break;
         case AT_TENT:
-            verb = "tentacles suck your brain";
+            verb = _("tentacles suck your brain");
             Monst_name = s_suffix(Monst_name);
             break;
         case AT_EXPL:
         case AT_BOOM:
-            verb = "explodes";
+            verb = _("explodes");
             break;
         default:
-            verb = "hits";
+            verb = _("hits");
         }
         /* if a monster hits more than once with similar attack, say so */
         again = (mtmp->m_id == gh.hitmsg_mid
                  && gh.hitmsg_prev != NULL
                  && mattk == gh.hitmsg_prev + 1
-                 && mattk->aatyp == gh.hitmsg_prev->aatyp) ? " again" : "";
-        pline_mon(mtmp, "%s %s%s%s", Monst_name, verb, again, punct);
+                 && mattk->aatyp == gh.hitmsg_prev->aatyp) ? _(" again") : "";
+        pline_mon(mtmp, _("%s %s%s%s"), Monst_name, verb, again, punct);
     }
     gh.hitmsg_mid = mtmp->m_id;
     gh.hitmsg_prev = mattk;

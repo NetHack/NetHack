@@ -1116,7 +1116,7 @@ doengrave(void)
         } else if (de->type == de->oep->engr_type
                    && (!Blind || de->oep->engr_type == BURN
                        || de->oep->engr_type == ENGRAVE)) {
-            c = yn_function("Do you want to add to the current engraving?",
+            c = yn_function(_("Do you want to add to the current engraving?"),
                             ynqchars, 'y', TRUE);
             if (c == 'q') {
                 pline1(Never_mind);

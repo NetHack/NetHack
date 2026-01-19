@@ -1275,7 +1275,7 @@ dokick(void)
         You(_("are too small to do any kicking."));
         no_kick = TRUE;
     } else if (u.usteed) {
-        if (yn_function("Kick your steed?", ynchars, 'y', TRUE) == 'y') {
+        if (yn_function(_("Kick your steed?"), ynchars, 'y', TRUE) == 'y') {
             You(_("kick %s."), mon_nam(u.usteed));
             kick_steed();
             return ECMD_TIME;

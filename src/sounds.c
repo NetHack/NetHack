@@ -212,16 +212,16 @@ dosounds(void)
 
     if (svl.level.flags.nfountains && !rn2(400)) {
         static const char *const fountain_msg[4] = {
-            "bubbling water.", "water falling on coins.",
-            "the splashing of a naiad.", "a soda fountain!",
+            N_("bubbling water."), N_("water falling on coins."),
+            N_("the splashing of a naiad."), N_("a soda fountain!"),
         };
-        You_hear1(fountain_msg[rn2(3) + hallu]);
+        You_hear1(_(fountain_msg[rn2(3) + hallu]));
     }
     if (svl.level.flags.nsinks && !rn2(300)) {
         static const char *const sink_msg[3] = {
-            "a slow drip.", "a gurgling noise.", "dishes being washed!",
+            N_("a slow drip."), N_("a gurgling noise."), N_("dishes being washed!"),
         };
-        You_hear1(sink_msg[rn2(2) + hallu]);
+        You_hear1(_(sink_msg[rn2(2) + hallu]));
     }
     if (svl.level.flags.has_court && !rn2(200)) {
         if (get_iter_mons(throne_mon_sound))
@@ -229,10 +229,10 @@ dosounds(void)
     }
     if (svl.level.flags.has_swamp && !rn2(200)) {
         static const char *const swamp_msg[3] = {
-            "hear mosquitoes!", "smell marsh gas!", /* so it's a smell...*/
-            "hear Donald Duck!",
+            N_("hear mosquitoes!"), N_("smell marsh gas!"), /* so it's a smell...*/
+            N_("hear Donald Duck!"),
         };
-        You1(swamp_msg[rn2(2) + hallu]);
+        You1(_(swamp_msg[rn2(2) + hallu]));
         return;
     }
     if (svl.level.flags.has_vault && !rn2(200)) {

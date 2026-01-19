@@ -1996,7 +1996,7 @@ msgstr ""
 #: src/cfgfiles.c:1579
 #, c-format
 msgid "%s %s%s%s"
-msgstr "%s %s%s%s"
+msgstr "%s{이/가} %s%s%s"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -23620,7 +23620,7 @@ msgstr " 매력:%s"
 
 #, c-format
 msgid " Pw:%s"
-msgstr " 마력:%s"
+msgstr " Pw:%s"
 
 #, c-format
 msgid " Xp:%s"
@@ -23971,6 +23971,96 @@ msgstr "함정에 빠짐"
 #, c-format
 msgid " in %s"
 msgstr " %s에"
+
+# === Monster attack verbs (mhitu.c) ===
+msgid "bites"
+msgstr "물었다"
+
+msgid "kicks"
+msgstr "찼다"
+
+msgid "stings"
+msgstr "쏘았다"
+
+msgid "butts"
+msgstr "들이받았다"
+
+msgid "touches you"
+msgstr "당신을 만졌다"
+
+msgid "tentacles suck your brain"
+msgstr "촉수가 당신의 뇌를 빨아들였다"
+
+msgid "explodes"
+msgstr "폭발했다"
+
+msgid "hits"
+msgstr "때렸다"
+
+# " again" - already defined at line 21554
+# "%s %s%s%s" - already defined at line 1998 (update existing entry for Korean word order)
+
+# === Sound descriptions (sounds.c) ===
+msgid "bubbling water."
+msgstr "물이 부글거리는 소리."
+
+msgid "water falling on coins."
+msgstr "동전 위로 물이 떨어지는 소리."
+
+msgid "the splashing of a naiad."
+msgstr "나이아드가 물을 튀기는 소리."
+
+msgid "a soda fountain!"
+msgstr "탄산수 분수!"
+
+msgid "a slow drip."
+msgstr "천천히 떨어지는 물방울 소리."
+
+msgid "a gurgling noise."
+msgstr "꼴꼴거리는 소리."
+
+msgid "dishes being washed!"
+msgstr "설거지하는 소리!"
+
+msgid "hear mosquitoes!"
+msgstr "모기 소리가 들린다!"
+
+msgid "smell marsh gas!"
+msgstr "습지 가스 냄새가 난다!"
+
+msgid "hear Donald Duck!"
+msgstr "도널드 덕 소리가 들린다!"
+
+# === Y/N prompts ===
+msgid "Do you want to add to the current engraving?"
+msgstr "현재 새긴 글에 추가하시겠습니까?"
+
+msgid "Do you want an account of creatures vanquished?"
+msgstr "처치한 생물 목록을 보시겠습니까?"
+
+msgid "Kick your steed?"
+msgstr "탈것을 차시겠습니까?"
+
+msgid "Do you want to remove the saddle from %s?"
+msgstr "%s에서 안장을 벗기시겠습니까?"
+
+msgid "Really save?"
+msgstr "정말로 저장하시겠습니까?"
+
+msgid "Are you sure you want to enter?"
+msgstr "정말로 들어가시겠습니까?"
+
+msgid "Beware, there will be no return!  Still climb?"
+msgstr "주의, 돌아올 수 없습니다! 그래도 올라가시겠습니까?"
+
+msgid "Eat it?"
+msgstr "먹으시겠습니까?"
+
+msgid "Drink from the fountain?"
+msgstr "분수에서 마시겠습니까?"
+
+msgid "Drink from the sink?"
+msgstr "싱크대에서 마시겠습니까?"
 
 #~ msgid "elven arrow"
 #~ msgstr "엘프 화살"

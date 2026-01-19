@@ -2436,7 +2436,7 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
     if (mtmp && mtmp != u.usteed && (otmp = which_armor(mtmp, W_SADDLE))) {
         if (passed_info)
             *passed_info = 1;
-        Sprintf(qbuf, "Do you want to remove the saddle from %s?",
+        Sprintf(qbuf, _("Do you want to remove the saddle from %s?"),
                 x_monnam(mtmp, ARTICLE_THE, (char *) 0,
                          SUPPRESS_SADDLE, FALSE));
         if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y') {

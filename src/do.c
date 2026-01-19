@@ -1242,7 +1242,7 @@ dodown(void)
     if (on_level(&valley_level, &u.uz) && !u.uevent.gehennom_entered) {
         You(_("are standing at the gate to Gehennom."));
         pline(_("Unspeakable cruelty and harm lurk down there."));
-        if (y_n("Are you sure you want to enter?") != 'y')
+        if (y_n(_("Are you sure you want to enter?")) != 'y')
             return ECMD_OK;
         pline(_("So be it."));
         u.uevent.gehennom_entered = 1; /* don't ask again */
@@ -1330,7 +1330,7 @@ doup(void)
     if (ledger_no(&u.uz) == 1) {
         if (iflags.debug_fuzzer)
             return ECMD_OK;
-        if (y_n("Beware, there will be no return!  Still climb?") != 'y')
+        if (y_n(_("Beware, there will be no return!  Still climb?")) != 'y')
             return ECMD_OK;
     }
     if (!next_to_u()) {

@@ -2849,7 +2849,7 @@ list_vanquished(char defquery, boolean ask)
                 if (defquery == 'a') /* potential default from 'disclose' */
                     defquery = 'y';
             }
-            c = yn_function("Do you want an account of creatures vanquished?",
+            c = yn_function(_("Do you want an account of creatures vanquished?"),
                             allow_yn, defquery, TRUE);
         } else {
             c = defquery;
