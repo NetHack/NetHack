@@ -1842,14 +1842,14 @@ dopay(void)
         if (!ltmp && NOTANGRY(shkp)) {
             You(_("do not owe %s anything."), shkname(shkp));
             if (!umoney)
-                pline(no_money, stashed_gold ? " seem to" : "");
+                pline(_(no_money), stashed_gold ? " seem to" : "");
         } else if (ltmp) {
             pline(_("%s is after blood, not gold!"), shkname(shkp));
             if (umoney < ltmp / 2L || (umoney < ltmp && stashed_gold)) {
                 if (!umoney)
-                    pline(no_money, stashed_gold ? " seem to" : "");
+                    pline(_(no_money), stashed_gold ? " seem to" : "");
                 else
-                    pline(not_enough_money, noit_mhim(shkp));
+                    pline(_(not_enough_money), noit_mhim(shkp));
                 return ECMD_TIME;
             }
             pline(_("But since %s shop has been robbed recently,"),
@@ -1865,9 +1865,9 @@ dopay(void)
             pline(_("%s is after your hide, not your gold!"), Shknam(shkp));
             if (umoney < 1000L) {
                 if (!umoney)
-                    pline(no_money, stashed_gold ? " seem to" : "");
+                    pline(_(no_money), stashed_gold ? " seem to" : "");
                 else
-                    pline(not_enough_money, noit_mhim(shkp));
+                    pline(_(not_enough_money), noit_mhim(shkp));
                 return ECMD_TIME;
             }
             You(_("try to appease %s by giving %s 1000 gold pieces."),

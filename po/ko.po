@@ -10684,120 +10684,112 @@ msgstr "유리"
 
 #: src/obj_descr_i18n.c:77
 msgid "aluminum"
-msgstr ""
+msgstr "알루미늄"
 
 #: src/obj_descr_i18n.c:78
 msgid "uranium"
-msgstr ""
+msgstr "우라늄"
 
 #: src/obj_descr_i18n.c:79
 msgid "long"
-msgstr ""
+msgstr "긴"
 
 # 무기 - 검
 #: src/obj_descr_i18n.c:80
-#, fuzzy
 msgid "short"
-msgstr "단검"
+msgstr "짧은"
 
 #: src/obj_descr_i18n.c:81
 msgid "curved"
-msgstr ""
+msgstr "휜"
 
 #: src/obj_descr_i18n.c:82
-#, fuzzy
 msgid "runed"
-msgstr "룬검"
+msgstr "룬문자가 새겨진"
 
 #: src/obj_descr_i18n.c:83
 msgid "oak"
-msgstr ""
+msgstr "참나무"
 
 #: src/obj_descr_i18n.c:84
 msgid "ebony"
-msgstr ""
+msgstr "흑단"
 
 #: src/obj_descr_i18n.c:85
 msgid "marble"
-msgstr ""
+msgstr "대리석"
 
 #: src/obj_descr_i18n.c:86 src/obj_descr_i18n.c:185
 msgid "tin"
-msgstr "통조림"
+msgstr "주석"
 
 #: src/obj_descr_i18n.c:87
 msgid "maple"
-msgstr ""
+msgstr "단풍나무"
 
 #: src/obj_descr_i18n.c:88
-#, fuzzy
 msgid "pine"
-msgstr "척추"
+msgstr "소나무"
 
 #: src/obj_descr_i18n.c:89
 msgid "zinc"
-msgstr ""
+msgstr "아연"
 
 #: src/obj_descr_i18n.c:90
 msgid "platinum"
-msgstr ""
+msgstr "백금"
 
 #: src/obj_descr_i18n.c:91
-#, fuzzy
 msgid "iridium"
-msgstr "녹청색"
+msgstr "이리듐"
 
 #: src/obj_descr_i18n.c:92
-#, fuzzy
 msgid "crystal"
-msgstr "수정구"
+msgstr "수정"
 
 #: src/obj_descr_i18n.c:93
 msgid "hexagonal"
-msgstr ""
+msgstr "육각형"
 
 #: src/obj_descr_i18n.c:96
 msgid "circular"
-msgstr ""
+msgstr "원형"
 
 #: src/obj_descr_i18n.c:97
 msgid "triangular"
-msgstr "삼각형의"
+msgstr "삼각형"
 
 #: src/obj_descr_i18n.c:98
 msgid "spherical"
-msgstr ""
+msgstr "구형"
 
 #: src/obj_descr_i18n.c:99
 msgid "oval"
-msgstr ""
+msgstr "타원형"
 
 #: src/obj_descr_i18n.c:100
-#, fuzzy
 msgid "octagonal"
-msgstr "회전하는"
+msgstr "팔각형"
 
 #: src/obj_descr_i18n.c:101
 msgid "pyramidal"
-msgstr ""
+msgstr "피라미드형"
 
 #: src/obj_descr_i18n.c:102
 msgid "square"
 msgstr "네모난"
 
 #: src/obj_descr_i18n.c:103
-#, fuzzy
 msgid "concave"
-msgstr "집중한다."
+msgstr "오목한"
 
 #: src/obj_descr_i18n.c:104
 msgid "cubical"
-msgstr ""
+msgstr "정육면체"
 
 #: src/obj_descr_i18n.c:105
-#, fuzzy
 msgid "perforated"
-msgstr "모독된"
+msgstr "구멍 뚫린"
 
 # 물약
 #: src/obj_descr_i18n.c:108
@@ -10867,38 +10859,33 @@ msgstr "판금 갑옷"
 
 #: src/obj_descr_i18n.c:124
 msgid "helmet"
-msgstr ""
+msgstr "투구"
 
 #: src/obj_descr_i18n.c:125
 msgid "helm"
-msgstr ""
+msgstr "투구"
 
 # 방어구 - 방패
 #: src/obj_descr_i18n.c:126
-#, fuzzy
 msgid "shield"
-msgstr "소형 방패"
+msgstr "방패"
 
 #: src/obj_descr_i18n.c:127
-#, fuzzy
 msgid "cloak"
-msgstr "엘프 망토"
+msgstr "망토"
 
 #: src/obj_descr_i18n.c:128
-#, fuzzy
 msgid "gloves"
-msgstr "장갑 낀"
+msgstr "장갑"
 
 # 방어구 - 신발
 #: src/obj_descr_i18n.c:129
-#, fuzzy
 msgid "boots"
-msgstr "낮은 부츠"
+msgstr "부츠"
 
 #: src/obj_descr_i18n.c:132
-#, fuzzy
 msgid "sword"
-msgstr "룬검"
+msgstr "검"
 
 # 무기 - 단검
 #: src/obj_descr_i18n.c:133
@@ -10943,18 +10930,16 @@ msgid "flail"
 msgstr "도리깨"
 
 #: src/obj_descr_i18n.c:142
-#, fuzzy
 msgid "hammer"
-msgstr "워해머"
+msgstr "망치"
 
 #: src/obj_descr_i18n.c:143
 msgid "staff"
-msgstr ""
+msgstr "지팡이"
 
 #: src/obj_descr_i18n.c:144
-#, fuzzy
 msgid "whip"
-msgstr "%s{을/를} 채찍질했다!"
+msgstr "채찍"
 
 #: src/obj_descr_i18n.c:145
 msgid "club"
@@ -10970,22 +10955,19 @@ msgstr "석궁"
 
 #: src/obj_descr_i18n.c:148
 msgid "bolt"
-msgstr ""
+msgstr "볼트"
 
 #: src/obj_descr_i18n.c:151
-#, fuzzy
 msgid "lamp"
-msgstr "기름 램프"
+msgstr "램프"
 
 #: src/obj_descr_i18n.c:152
-#, fuzzy
 msgid "lantern"
-msgstr "황동 랜턴"
+msgstr "랜턴"
 
 #: src/obj_descr_i18n.c:153
-#, fuzzy
 msgid "candle"
-msgstr "밀랍 초"
+msgstr "초"
 
 #: src/obj_descr_i18n.c:154
 msgid "mirror"
@@ -11001,40 +10983,35 @@ msgstr "자루"
 
 #: src/obj_descr_i18n.c:158
 msgid "bag"
-msgstr ""
+msgstr "가방"
 
 #: src/obj_descr_i18n.c:159
 msgid "chest"
-msgstr "보물 상자"
+msgstr "상자"
 
-# 활/석궁
 #: src/obj_descr_i18n.c:160
-#, fuzzy
 msgid "box"
-msgstr "활"
+msgstr "상자"
 
 #: src/obj_descr_i18n.c:161
-#, fuzzy
 msgid "horn"
-msgstr "화염의 뿔피리"
+msgstr "뿔피리"
 
 #: src/obj_descr_i18n.c:162
-#, fuzzy
 msgid "whistle"
-msgstr "양철 호루라기"
+msgstr "호루라기"
 
 #: src/obj_descr_i18n.c:163
-#, fuzzy
 msgid "flute"
-msgstr "마법 플루트"
+msgstr "플루트"
 
 #: src/obj_descr_i18n.c:164
 msgid "harp"
-msgstr ""
+msgstr "하프"
 
 #: src/obj_descr_i18n.c:165
 msgid "drum"
-msgstr ""
+msgstr "북"
 
 #: src/obj_descr_i18n.c:166
 msgid "bell"
@@ -11191,181 +11168,156 @@ msgid "flint stone"
 msgstr "단단한 돌"
 
 #: src/obj_descr_i18n.c:212
-#, fuzzy
 msgid "red"
-msgstr "광선을 내는"
+msgstr "빨간"
 
 #: src/obj_descr_i18n.c:213
 msgid "blue"
-msgstr ""
+msgstr "파란"
 
 #: src/obj_descr_i18n.c:214
 msgid "green"
-msgstr ""
+msgstr "초록"
 
 #: src/obj_descr_i18n.c:215
 msgid "gray"
-msgstr ""
+msgstr "회색"
 
 #: src/obj_descr_i18n.c:216
-#, fuzzy
 msgid "grey"
-msgstr "회색 점액"
+msgstr "회색"
 
 #: src/obj_descr_i18n.c:218
-#, fuzzy
 msgid "bright"
-msgstr "밝아진다"
+msgstr "밝은"
 
 #: src/obj_descr_i18n.c:219
-#, fuzzy
 msgid "light"
-msgstr "기사"
+msgstr "밝은"
 
 #: src/obj_descr_i18n.c:222
 msgid "drink"
-msgstr ""
+msgstr "마시다"
 
 #: src/obj_descr_i18n.c:223
-#, fuzzy
 msgid "eat"
-msgstr "먹었다"
+msgstr "먹다"
 
 #: src/obj_descr_i18n.c:224
 msgid "throw"
-msgstr ""
+msgstr "던지다"
 
 #: src/obj_descr_i18n.c:225
 msgid "wear"
-msgstr ""
+msgstr "입다"
 
 #: src/obj_descr_i18n.c:226
-#, fuzzy
 msgid "take off"
-msgstr "그것을 벗었다%s."
+msgstr "벗다"
 
 #: src/obj_descr_i18n.c:227
 msgid "put on"
-msgstr ""
+msgstr "착용하다"
 
 #: src/obj_descr_i18n.c:228
-#, fuzzy
 msgid "drop"
-msgstr "%s{을/를} 떨어뜨렸다!"
+msgstr "떨어뜨리다"
 
 #: src/obj_descr_i18n.c:229
-#, fuzzy
 msgid "rub"
-msgstr "루비"
+msgstr "문지르다"
 
 #: src/obj_descr_i18n.c:230
-#, fuzzy
 msgid "grease"
-msgstr "그리스 통"
+msgstr "기름칠하다"
 
 #: src/obj_descr_i18n.c:231
 msgid "use or apply"
-msgstr "사용 또는 적용"
+msgstr "사용하다"
 
-# ============================================================
-# 역할 계급 이름 (Role Rank Names)
-# ============================================================
-# Wizard ranks
 #: src/obj_descr_i18n.c:232
-#, fuzzy
 msgid "invoke"
-msgstr "환술사"
+msgstr "발동하다"
 
 #: src/obj_descr_i18n.c:233
-#, fuzzy
 msgid "charge"
-msgstr "무료다."
+msgstr "충전하다"
 
 #: src/obj_descr_i18n.c:234
 msgid "name"
-msgstr ""
+msgstr "이름 짓다"
 
 #: src/obj_descr_i18n.c:235
 msgid "call"
-msgstr ""
+msgstr "부르다"
 
 #: src/obj_descr_i18n.c:236
-#, fuzzy
 msgid "remove"
-msgstr "%s{이/가} %s{을/를} 벗었다."
+msgstr "벗다"
 
 #: src/obj_descr_i18n.c:237
 msgid "open"
-msgstr ""
+msgstr "열다"
 
 #: src/obj_descr_i18n.c:238
-#, fuzzy
 msgid "sacrifice"
-msgstr "신성한"
+msgstr "제물로 바치다"
 
 #: src/obj_descr_i18n.c:239
-#, fuzzy
 msgid "write with"
-msgstr "그것을 쓴다!"
+msgstr "쓰다"
 
 #: src/obj_descr_i18n.c:240
-#, fuzzy
 msgid "identify"
-msgstr "삼지창"
+msgstr "감정하다"
 
 #: src/obj_descr_i18n.c:241
 msgid "adjust"
-msgstr ""
+msgstr "조정하다"
 
 #: src/obj_descr_i18n.c:242
-#, fuzzy
 msgid "split"
-msgstr "스플린트 메일"
+msgstr "나누다"
 
 #: src/obj_descr_i18n.c:243
 msgid "stash"
-msgstr ""
+msgstr "보관하다"
 
 #: src/obj_descr_i18n.c:244
-#, fuzzy
 msgid "tip"
-msgstr "통조림"
+msgstr "기울이다"
 
 #: src/obj_descr_i18n.c:245
-#, fuzzy
 msgid "dip"
-msgstr "죽음"
+msgstr "담그다"
 
 #: src/obj_descr_i18n.c:246
-#, fuzzy
 msgid "read"
-msgstr "읽었다:"
+msgstr "읽다"
 
 #: src/obj_descr_i18n.c:247
 msgid "zap"
-msgstr ""
+msgstr "발사하다"
 
 #: src/obj_descr_i18n.c:248
-#, fuzzy
 msgid "quiver"
-msgstr "빈 화살통%s"
+msgstr "화살통에 넣다"
 
 #: src/obj_descr_i18n.c:249
 msgid "fire"
-msgstr ""
+msgstr "발사하다"
 
 #: src/obj_descr_i18n.c:250
 msgid "offer"
-msgstr ""
+msgstr "바치다"
 
 #: src/obj_descr_i18n.c:251
-#, fuzzy
 msgid "wield"
-msgstr "장비됨"
+msgstr "장비하다"
 
 #: src/obj_descr_i18n.c:252
 msgid "quaff"
-msgstr ""
+msgstr "마시다"
 
 # ============================================================
 # 아이템 이름 (Item Names)
@@ -12164,7 +12116,7 @@ msgstr "지원 정보."
 #: src/pager.c:2846
 #, c-format
 msgid "%s-specific help and commands."
-msgstr ""
+msgstr "%s 전용 도움말과 명령어."
 
 #: src/pager.c:2848
 msgid "List of wizard-mode commands."
@@ -15344,8 +15296,7 @@ msgstr "투명한 손님은 환영하지 않습니다!"
 #: src/shk.c:746
 #, c-format
 msgid "%s stands firm as if %s knows you are there."
-msgstr ""
-"%s{이/가} 마치 당신이 거기 있다는 것을 %s 알고 있는 것처럼 굳건히 서 있다."
+msgstr "%s{이/가} 마치 당신이 거기 있다는 것을 %s 알고 있는 것처럼 굳건히 서 있다."
 
 #: src/shk.c:757
 #, c-format
@@ -21925,6 +21876,119 @@ msgstr "%s{을/를} 열 수 없다. 미안."
 #, c-format
 msgid "Cannot open \"%s\" for reading!"
 msgstr "\"%s\"{을/를} 읽기용으로 열 수 없다!"
+
+# ============================================================
+# 추가 번역 - 정적 문자열 (Additional translations - static strings)
+# ============================================================
+
+#: src/cmd.c:153
+#, c-format
+msgid "Unavailable command '%s'."
+msgstr "'%s' 명령은 사용할 수 없다."
+
+#: src/cmd.c:156
+#, c-format
+msgid "'%s' command not available."
+msgstr "'%s' 명령은 사용할 수 없다."
+
+#: src/apply.c:58
+msgid "don't have enough elbow-room to maneuver."
+msgstr "움직일 공간이 충분하지 않다."
+
+#: src/apply.c:2678
+msgid "\"scritch, scritch\""
+msgstr "\"삐걱, 삐걱\""
+
+#: src/apply.c:3269
+msgid "There's not enough room here to use that."
+msgstr "여기서 그것을 쓰기에는 공간이 부족하다."
+
+#: src/apply.c:3270
+msgid "Where do you want to hit?"
+msgstr "어디를 치겠는가?"
+
+#: src/apply.c:3271
+msgid "won't hit anything if you can't see that spot."
+msgstr "그 지점을 볼 수 없으면 아무것도 칠 수 없다."
+
+#: src/apply.c:3272
+msgid "can't reach that spot from here."
+msgstr "여기서 그 지점에 닿을 수 없다."
+
+#: src/apply.c:3908
+msgid "But nothing else happens..."
+msgstr "그러나 아무 일도 일어나지 않았다..."
+
+#: src/apply.c:2957
+msgid "The bullwhip slips free."
+msgstr "채찍이 빠졌다."
+
+#: src/apply.c:2958
+msgid "Snap!"
+msgstr "찰칵!"
+
+#: src/apply.c:3424
+#, c-format
+msgid "Thump!  Your blow bounces harmlessly off the %s."
+msgstr "쿵! 당신의 공격이 %s에 튕겨나갔다."
+
+#: src/pray.c:1529
+#, c-format
+msgid "A cloud of %s smoke surrounds you..."
+msgstr "%s 연기 구름이 당신을 둘러쌌다..."
+
+#: src/do_wear.c:3284
+#, c-format
+msgid "need to take off %s to %s %s."
+msgstr "%s{을/를} 벗어야 %s{을/를} %s 수 있다."
+
+#: src/shk.c:1433
+#, c-format
+msgid "Moreover, you%s have no gold."
+msgstr "게다가, 당신은 금이%s 없다."
+
+#: src/shk.c:1434
+#, c-format
+msgid "Besides, you don't have enough to interest %s."
+msgstr "게다가, %s의 관심을 끌 만큼 충분하지 않다."
+
+#: src/o_init.c:846
+#, c-format
+msgid "haven't discovered any %s yet."
+msgstr "아직 %s{을/를} 발견하지 못했다."
+
+#: src/decl.c:40
+msgid "Nothing happens."
+msgstr "아무 일도 일어나지 않았다."
+
+#: src/decl.c:41
+msgid "Nothing seems to happen."
+msgstr "아무 일도 일어나지 않은 것 같다."
+
+#: src/decl.c:42
+msgid "That's enough tries!"
+msgstr "시도는 충분히 했다!"
+
+#: src/decl.c:43
+#, c-format
+msgid "That is a silly thing to %s."
+msgstr "%s하기엔 바보 같은 것이다."
+
+#: src/decl.c:44
+msgid "shudder for a moment."
+msgstr "잠시 몸을 떨었다."
+
+#: src/decl.c:47
+msgid "You can move again."
+msgstr "다시 움직일 수 있다."
+
+#: src/decl.c:48
+msgid "Never mind."
+msgstr "신경 쓰지 마라."
+
+#: src/decl.c:49
+msgid "vision quickly clears."
+msgstr "시야가 금방 맑아졌다."
 
 #, c-format
 #~ msgid "This door%s."

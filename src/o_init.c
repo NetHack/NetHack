@@ -925,7 +925,7 @@ doclassdisco(void)
 
     /* there might not be anything for us to do... */
     if (!discosyms[0]) {
-        You(havent_discovered_any, "items");
+        You(_(havent_discovered_any), "items");
         if (tmpwin != WIN_ERR)
             destroy_nhwindow(tmpwin);
         return ECMD_OK;
@@ -989,7 +989,7 @@ doclassdisco(void)
                 putstr(tmpwin, 0, buf);
             }
         if (!ct)
-            You(havent_discovered_any, unique_items);
+            You(_(havent_discovered_any), unique_items);
         break;
     case 'a':
         /* note: this will work all the time for menustyle traditional
@@ -1004,7 +1004,7 @@ doclassdisco(void)
         /* disp_artifact_discoveries() includes a header */
         ct = disp_artifact_discoveries(tmpwin);
         if (!ct)
-            You(havent_discovered_any, artifact_items);
+            You(_(havent_discovered_any), artifact_items);
         break;
     default:
         oclass = def_char_to_objclass(c);
@@ -1033,7 +1033,7 @@ doclassdisco(void)
             }
         }
         if (!ct) {
-            You(havent_discovered_any, oclass_to_name(oclass, buf));
+            You(_(havent_discovered_any), oclass_to_name(oclass, buf));
         } else if (sorted_ct) {
             qsort(sorted_lines, sorted_ct, sizeof (char *), discovered_cmp);
             for (i = 0; i < sorted_ct; ++i) {

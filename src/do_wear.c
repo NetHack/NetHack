@@ -3293,7 +3293,7 @@ inaccessible_equipment(
     if (obj == uarm && uarmc && BLOCKSACCESS(uarmc)) {
         if (verb) {
             Strcpy(buf, yname(uarmc));
-            You(need_to_take_off_outer_armor, buf, verb, yname(obj));
+            You(_(need_to_take_off_outer_armor), buf, verb, yname(obj));
         }
         return TRUE;
     }
@@ -3316,7 +3316,7 @@ inaccessible_equipment(
                 Strcat(buf, " and ");
             if (uarm)
                 Strcat(buf, sameprefix ? xname(uarm) : yname(uarm));
-            You(need_to_take_off_outer_armor, buf, verb, yname(obj));
+            You(_(need_to_take_off_outer_armor), buf, verb, yname(obj));
         }
         return TRUE;
     }
@@ -3324,7 +3324,7 @@ inaccessible_equipment(
     if ((obj == uleft || obj == uright) && uarmg && BLOCKSACCESS(uarmg)) {
         if (verb) {
             Strcpy(buf, yname(uarmg));
-            You(need_to_take_off_outer_armor, buf, verb, yname(obj));
+            You(_(need_to_take_off_outer_armor), buf, verb, yname(obj));
         }
         return TRUE;
     }

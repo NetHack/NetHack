@@ -1553,7 +1553,7 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
         pline(_("%s snarls and tries again..."), Moloch);
         fry_by_god(A_NONE, TRUE); /* wrath of Moloch */
         /* declined to die in wizard or explore mode */
-        pline(cloud_of_smoke, hcolor(NH_BLACK));
+        pline(_(cloud_of_smoke), hcolor(NH_BLACK));
         done(ESCAPED);
         /*NOTREACHED*/
     } else if (u.ualign.type != altaralign) {
@@ -1564,7 +1564,7 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
               a_gname(), u_gname());
         pline(_("%s is enraged..."), u_gname());
         pline(_("Fortunately, %s permits you to live..."), a_gname());
-        pline(cloud_of_smoke, hcolor(NH_ORANGE));
+        pline(_(cloud_of_smoke), hcolor(NH_ORANGE));
         done(ESCAPED);
         /*NOTREACHED*/
     } else {

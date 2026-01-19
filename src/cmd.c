@@ -473,7 +473,7 @@ can_do_extcmd(const struct ext_func_tab *extcmd)
     }
 
     if (!wizard && (ecflags & WIZMODECMD)) {
-        pline(unavailcmd, extcmd->ef_txt);
+        pline(_(unavailcmd), extcmd->ef_txt);
         return FALSE;
     } else if (u.uburied && !(ecflags & IFBURIED)) {
         You_cant(_("do that while you are buried!"));

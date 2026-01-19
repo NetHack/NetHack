@@ -39,7 +39,7 @@ wiz_wish(void) /* Unlimited wishes for debug mode by Paul Polderman */
         flags.verbose = save_verbose;
         encumber_msg();
     } else
-        pline(unavailcmd, ecname_from_fn(wiz_wish));
+        pline(_(unavailcmd), ecname_from_fn(wiz_wish));
     return ECMD_OK;
 }
 
@@ -61,7 +61,7 @@ wiz_identify(void)
         (void) display_inventory((char *) 0, FALSE);
         iflags.override_ID = 0;
     } else
-        pline(unavailcmd, ecname_from_fn(wiz_identify));
+        pline(_(unavailcmd), ecname_from_fn(wiz_identify));
     return ECMD_OK;
 }
 
@@ -165,7 +165,7 @@ wiz_makemap(void)
         mklev();
         makemap_prepost(FALSE, was_in_W_tower);
     } else {
-        pline(unavailcmd, ecname_from_fn(wiz_makemap));
+        pline(_(unavailcmd), ecname_from_fn(wiz_makemap));
     }
     return ECMD_OK;
 }
@@ -194,7 +194,7 @@ wiz_map(void)
         HConfusion = save_Hconf;
         HHallucination = save_Hhallu;
     } else
-        pline(unavailcmd, ecname_from_fn(wiz_map));
+        pline(_(unavailcmd), ecname_from_fn(wiz_map));
     return ECMD_OK;
 }
 
@@ -209,7 +209,7 @@ wiz_genesis(void)
         (void) create_particular();
         iflags.debug_mongen = mongen_saved;
     } else
-        pline(unavailcmd, ecname_from_fn(wiz_genesis));
+        pline(_(unavailcmd), ecname_from_fn(wiz_genesis));
     return ECMD_OK;
 }
 
@@ -220,7 +220,7 @@ wiz_where(void)
     if (wizard)
         (void) print_dungeon(FALSE, (schar *) 0, (xint16 *) 0);
     else
-        pline(unavailcmd, ecname_from_fn(wiz_where));
+        pline(_(unavailcmd), ecname_from_fn(wiz_where));
     return ECMD_OK;
 }
 
@@ -231,7 +231,7 @@ wiz_detect(void)
     if (wizard)
         (void) findit();
     else
-        pline(unavailcmd, ecname_from_fn(wiz_detect));
+        pline(_(unavailcmd), ecname_from_fn(wiz_detect));
     return ECMD_OK;
 }
 
@@ -367,7 +367,7 @@ wiz_load_lua(void)
             strcat(buf, ".lua");
         (void) load_lua(buf, &sbi);
     } else
-        pline(unavailcmd, ecname_from_fn(wiz_load_lua));
+        pline(_(unavailcmd), ecname_from_fn(wiz_load_lua));
     return ECMD_OK;
 }
 
@@ -390,7 +390,7 @@ wiz_load_splua(void)
         lspo_finalize_level(NULL);
 
     } else
-        pline(unavailcmd, ecname_from_fn(wiz_load_splua));
+        pline(_(unavailcmd), ecname_from_fn(wiz_load_splua));
     return ECMD_OK;
 }
 
@@ -401,7 +401,7 @@ wiz_level_tele(void)
     if (wizard)
         level_tele();
     else
-        pline(unavailcmd, ecname_from_fn(wiz_level_tele));
+        pline(_(unavailcmd), ecname_from_fn(wiz_level_tele));
     return ECMD_OK;
 }
 
@@ -1091,7 +1091,7 @@ wiz_intrinsic(void)
             free((genericptr_t) pick_list);
         docrt();
     } else
-        pline(unavailcmd, ecname_from_fn(wiz_intrinsic));
+        pline(_(unavailcmd), ecname_from_fn(wiz_intrinsic));
     return ECMD_OK;
 }
 
@@ -1930,7 +1930,7 @@ wiz_custom(void)
             free_glyphid_cache();
         docrt();
     } else
-        pline(unavailcmd, ecname_from_fn(wiz_custom));
+        pline(_(unavailcmd), ecname_from_fn(wiz_custom));
     return ECMD_OK;
 }
 

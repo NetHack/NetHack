@@ -1389,7 +1389,7 @@ use_candle(struct obj **optr)
     boolean was_lamplit;
 
     if (u.uswallow) {
-        You(no_elbow_room);
+        You(_(no_elbow_room));
         return;
     }
 
@@ -1703,7 +1703,7 @@ light_cocktail(struct obj **optr)
     boolean split1off;
 
     if (u.uswallow) {
-        You(no_elbow_room);
+        You(_(no_elbow_room));
         return;
     }
 
@@ -2715,7 +2715,7 @@ use_stone(struct obj *tstone)
     }
 
     if (Blind) {
-        pline(scritch);
+        pline(_(scritch));
         return ECMD_TIME;
     } else if (Hallucination) {
         pline(_("Oh wow, man: Fractals!"));
@@ -2801,7 +2801,7 @@ use_stone(struct obj *tstone)
     else if (streak_color)
         You_see(_("%s streaks on the %s."), streak_color, stonebuf);
     else
-        pline(scritch);
+        pline(_(scritch));
     return ECMD_TIME;
 }
 
@@ -3046,7 +3046,7 @@ use_whip(struct obj *obj)
                 You(_("wrap your bullwhip around %s on the %s."),
                     an(singular(otmp, xname)), surface(u.ux, u.uy));
                 if (rnl(6) || pickup_object(otmp, 1L, TRUE) < 1)
-                    pline1(msg_slipsfree);
+                    pline1(_(msg_slipsfree));
                 return ECMD_TIME;
             }
         }
@@ -3113,12 +3113,12 @@ use_whip(struct obj *obj)
                     gv.vision_full_recalc = 1;
                 }
             } else {
-                pline1(msg_slipsfree);
+                pline1(_(msg_slipsfree));
             }
             if (mtmp)
                 wakeup(mtmp, TRUE);
         } else
-            pline1(msg_snap);
+            pline1(_(msg_snap));
 
     } else if (mtmp) {
  whipattack:
@@ -3235,7 +3235,7 @@ use_whip(struct obj *obj)
                     break;
                 }
             } else {
-                pline1(msg_slipsfree);
+                pline1(_(msg_slipsfree));
             }
         } else { /* mtmp isn't wielding a weapon; attack it */
             boolean do_snap = TRUE;
@@ -3250,7 +3250,7 @@ use_whip(struct obj *obj)
             if (proficient && force_attack(mtmp, FALSE))
                 return ECMD_TIME;
             if (do_snap)
-                pline1(msg_snap);
+                pline1(_(msg_snap));
         }
         /* regardless of mtmp's weapon or hero's proficiency */
         wakeup(mtmp, TRUE);
@@ -3260,7 +3260,7 @@ use_whip(struct obj *obj)
         You(_("snap your whip through thin air."));
 
     } else {
-        pline1(msg_snap);
+        pline1(_(msg_snap));
     }
     return ECMD_TIME;
 }
@@ -3430,7 +3430,7 @@ use_pole(struct obj *obj, boolean autohit)
 
     /* Are you allowed to use the pole? */
     if (u.uswallow) {
-        pline(not_enough_room);
+        pline(_(not_enough_room));
         return ECMD_OK;
     }
     if (obj != uwep) {
@@ -3447,7 +3447,7 @@ use_pole(struct obj *obj, boolean autohit)
 
     /* Prompt for a location */
     if (!autohit)
-        pline(where_to_hit);
+        pline(_(where_to_hit));
     cc.x = u.ux;
     cc.y = u.uy;
     if (!find_poleable_mon(&cc, min_range, max_range) && hitm
@@ -3475,10 +3475,10 @@ use_pole(struct obj *obj, boolean autohit)
             pline(_("Too close!"));
         return ECMD_FAIL;
     } else if (!cansee(cc.x, cc.y) && !glyph_is_poleable(glyph)) {
-        You(cant_see_spot);
+        You(_(cant_see_spot));
         return ECMD_FAIL;
     } else if (!couldsee(cc.x, cc.y)) { /* Eyes of the Overworld */
-        You(cant_reach);
+        You(_(cant_reach));
         return ECMD_FAIL;
     }
 
@@ -3528,7 +3528,7 @@ use_pole(struct obj *obj, boolean autohit)
                Note:  we only do this when a statue is displayed here,
                because the player is probably attempting to attack it;
                other statues obscured by anything are just ignored. */
-            pline(thump, "statue");
+            pline(_(thump), "statue");
             wake_nearto(gb.bhitpos.x, gb.bhitpos.y, 25);
         }
     } else {
@@ -3537,7 +3537,7 @@ use_pole(struct obj *obj, boolean autohit)
 
         if (glyph_to_obj(glyph) == BOULDER
             && sobj_at(BOULDER, gb.bhitpos.x, gb.bhitpos.y)) {
-            pline(thump, "boulder");
+            pline(_(thump), "boulder");
             wake_nearto(gb.bhitpos.x, gb.bhitpos.y, 25);
         } else if (!accessible(gb.bhitpos.x, gb.bhitpos.y)
                    || IS_FURNITURE(levl[gb.bhitpos.x][gb.bhitpos.y].typ)) {
@@ -3732,7 +3732,7 @@ use_grapple(struct obj *obj)
 
     /* Are you allowed to use the hook? */
     if (u.uswallow) {
-        pline(not_enough_room);
+        pline(_(not_enough_room));
         return ECMD_OK;
     }
     if (obj != uwep) {
@@ -3747,7 +3747,7 @@ use_grapple(struct obj *obj)
     /* assert(obj == uwep); */
 
     /* Prompt for a location */
-    pline(where_to_hit);
+    pline(_(where_to_hit));
     cc.x = u.ux;
     cc.y = u.uy;
     getpos_sethilite(display_grapple_positions, can_grapple_location);
@@ -3761,10 +3761,10 @@ use_grapple(struct obj *obj)
         pline(_("Too far!"));
         return res;
     } else if (!cansee(cc.x, cc.y)) {
-        You(cant_see_spot);
+        You(_(cant_see_spot));
         return res;
     } else if (!couldsee(cc.x, cc.y)) { /* Eyes of the Overworld */
-        You(cant_reach);
+        You(_(cant_reach));
         return res;
     }
 
@@ -3948,7 +3948,7 @@ do_break_wand(struct obj *obj)
     setnotworn(obj);    /* so we need to do this ourselves */
 
     if (!zappable(obj)) {
-        pline(nothing_else_happens);
+        pline(_(nothing_else_happens));
         discard_broken_wand();
         return ECMD_TIME;
     }
@@ -3984,7 +3984,7 @@ do_break_wand(struct obj *obj)
     case WAN_PROBING:
     case WAN_ENLIGHTENMENT:
     case WAN_SECRET_DOOR_DETECTION:
-        pline(nothing_else_happens);
+        pline(_(nothing_else_happens));
         discard_broken_wand();
         return ECMD_TIME;
     case WAN_DEATH:
