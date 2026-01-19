@@ -23814,6 +23814,46 @@ msgstr " "
 msgid "heavy iron ball"
 msgstr "무거운 쇠구슬"
 
+# Item type format strings (note: scroll, wand, spellbook, ring, amulet, stone, gem are already defined elsewhere)
+msgid " scroll"
+msgstr " 두루마리"
+
+msgid " labeled "
+msgstr " "
+
+#, c-format
+msgid "wand of %s"
+msgstr "%s의 마법봉"
+
+#, c-format
+msgid "%s wand"
+msgstr "%s 마법봉"
+
+msgid "novel"
+msgstr "소설"
+
+#, c-format
+msgid "%s book"
+msgstr "%s 책"
+
+msgid "spellbook of "
+msgstr ""
+
+#, c-format
+msgid "%s spellbook"
+msgstr "%s 마법서"
+
+#, c-format
+msgid "ring of %s"
+msgstr "%s의 반지"
+
+#, c-format
+msgid "%s ring"
+msgstr "%s 반지"
+
+msgid "set of "
+msgstr ""
+
 #~ msgid "elven arrow"
 #~ msgstr "엘프 화살"
 

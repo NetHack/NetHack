@@ -339,6 +339,28 @@ obj_descr_strings_for_extraction(void)
     (void) N_(" potion");
     (void) N_(" of ");
     (void) N_("heavy iron ball");
+    (void) N_("scroll");
+    (void) N_(" scroll");
+    (void) N_(" labeled ");
+    (void) N_("wand");
+    (void) N_("wand of %s");
+    (void) N_("%s wand");
+    (void) N_("book");
+    (void) N_("novel");
+    (void) N_("%s book");
+    (void) N_("spellbook");
+    (void) N_("spellbook of ");
+    (void) N_("%s spellbook");
+    (void) N_("ring");
+    (void) N_("ring of %s");
+    (void) N_("%s ring");
+    (void) N_("amulet");
+    (void) N_("pair of ");
+    (void) N_("set of ");
+    (void) N_("stone");
+    (void) N_(" stone");
+    (void) N_("gem");
+    (void) N_("%s %s");
 
     /* === Monster names (pmnames) === */
     (void) N_("kitten");
