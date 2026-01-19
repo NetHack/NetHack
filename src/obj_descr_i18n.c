@@ -297,6 +297,49 @@ obj_descr_strings_for_extraction(void)
     (void) N_("Things that are under the %s here:");
     (void) N_("Things that are buried %s:");
 
+    /* === Common strings (decl.h macros) === */
+    (void) N_("Something");
+    (void) N_("something");
+
+    /* === Item state descriptors (objnam.c) === */
+    /* Erosion levels */
+    (void) N_("very ");
+    (void) N_("thoroughly ");
+    (void) N_("rusty ");
+    (void) N_("cracked ");
+    (void) N_("burnt ");
+    (void) N_("corroded ");
+    (void) N_("rotted ");
+    /* Erodeproof types */
+    (void) N_("fixed ");
+    (void) N_("rustproof ");
+    (void) N_("corrodeproof ");
+    (void) N_("fireproof ");
+    (void) N_("tempered ");
+    (void) N_("rotproof ");
+    /* Item states */
+    (void) N_("empty ");
+    (void) N_("cursed ");
+    (void) N_("blessed ");
+    (void) N_("uncursed ");
+    (void) N_("trapped ");
+    (void) N_("broken ");
+    (void) N_("locked ");
+    (void) N_("unlocked ");
+    (void) N_("greased ");
+    (void) N_("poisoned ");
+    (void) N_("pair of ");
+    (void) N_("moist ");
+    (void) N_("wet ");
+    (void) N_("diluted ");
+    (void) N_("holy ");
+    (void) N_("unholy ");
+    /* Item type names */
+    (void) N_("potion");
+    (void) N_(" potion");
+    (void) N_(" of ");
+    (void) N_("heavy iron ball");
+
     /* === Monster names (pmnames) === */
     (void) N_("kitten");
     (void) N_("little dog");

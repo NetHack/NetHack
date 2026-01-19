@@ -7147,7 +7147,7 @@ msgstr "멈춰. %s{은/는} 자리를 바꾸고 싶지 않다."
 #: src/hack.c:2151
 #, c-format
 msgid "swap places with %s."
-msgstr "%s{와/과} 자리를 바꿨다."
+msgstr "%s{과/와} 자리를 바꿨다."
 
 #: src/hack.c:2160
 #, c-format
@@ -15346,7 +15346,7 @@ msgstr "%s%s{을/를} 밖에 두시오."
 #: src/shk.c:830
 #, c-format
 msgid "%s %s to let you in with your %s%s."
-msgstr "%s{이/가} 당신의 %s%s{와/과} 함께 들어가게 %s."
+msgstr "%s{이/가} 당신의 %s%s{과/와} 함께 들어가게 %s."
 
 #: src/shk.c:832
 msgid "is hesitant"
@@ -23702,6 +23702,117 @@ msgstr "%s{이/가} 다가오는 것을 본다."
 #, c-format
 msgid "are confronted by %s."
 msgstr "%s{이/가} 당신과 대면한다."
+
+# ============================================================
+# 공통 문자열 (decl.h macros)
+# ============================================================
+msgid "Something"
+msgstr "무언가"
+
+msgid "something"
+msgstr "무언가"
+
+# ============================================================
+# 아이템 상태 설명 (objnam.c)
+# ============================================================
+# Erosion levels (note: "very " is already defined elsewhere)
+
+msgid "thoroughly "
+msgstr "완전히 "
+
+msgid "rusty "
+msgstr "녹슨 "
+
+msgid "cracked "
+msgstr "금이 간 "
+
+msgid "burnt "
+msgstr "탄 "
+
+msgid "corroded "
+msgstr "부식된 "
+
+msgid "rotted "
+msgstr "썩은 "
+
+# Erodeproof types
+msgid "fixed "
+msgstr "고정된 "
+
+msgid "rustproof "
+msgstr "녹슬지 않는 "
+
+msgid "corrodeproof "
+msgstr "부식 방지 "
+
+msgid "fireproof "
+msgstr "내화성 "
+
+msgid "tempered "
+msgstr "강화된 "
+
+msgid "rotproof "
+msgstr "부패 방지 "
+
+# Item states
+msgid "empty "
+msgstr "빈 "
+
+msgid "cursed "
+msgstr "저주받은 "
+
+msgid "blessed "
+msgstr "축복받은 "
+
+msgid "uncursed "
+msgstr "저주받지 않은 "
+
+msgid "trapped "
+msgstr "함정이 있는 "
+
+msgid "broken "
+msgstr "부서진 "
+
+msgid "locked "
+msgstr "잠긴 "
+
+msgid "unlocked "
+msgstr "잠기지 않은 "
+
+msgid "greased "
+msgstr "기름칠된 "
+
+msgid "poisoned "
+msgstr "독이 묻은 "
+
+msgid "pair of "
+msgstr ""
+
+msgid "moist "
+msgstr "촉촉한 "
+
+msgid "wet "
+msgstr "젖은 "
+
+msgid "diluted "
+msgstr "희석된 "
+
+msgid "holy "
+msgstr "성스러운 "
+
+msgid "unholy "
+msgstr "불경한 "
+
+# Item type names (note: "potion" is already defined elsewhere)
+
+msgid " potion"
+msgstr " 물약"
+
+msgid " of "
+msgstr " "
+
+msgid "heavy iron ball"
+msgstr "무거운 쇠구슬"
 
 #~ msgid "elven arrow"
 #~ msgstr "엘프 화살"

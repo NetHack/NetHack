@@ -684,7 +684,7 @@ xname_flags(
         break;
     case WEAPON_CLASS:
         if (is_poisonable(obj) && obj->opoisoned)
-            Strcpy(buf, "poisoned ");
+            Strcpy(buf, _("poisoned "));
         FALLTHROUGH;
         /*FALLTHRU*/
     case VENOM_CLASS:
@@ -692,9 +692,9 @@ xname_flags(
         /* note: lenses or towel prefix would overwrite poisoned weapon
            prefix if both were simultaneously possible, but they aren't */
         if (typ == LENSES)
-            Strcpy(buf, "pair of ");
+            Strcpy(buf, _("pair of "));
         else if (is_wet_towel(obj))
-            Strcpy(buf, (obj->spe < 3) ? "moist " : "wet ");
+            Strcpy(buf, (obj->spe < 3) ? _("moist ") : _("wet "));
 
         if (!dknown)
             Strcat(buf, dn);
@@ -826,21 +826,21 @@ xname_flags(
         }
         break;
     case BALL_CLASS:
-        Sprintf(buf, "%sheavy iron ball",
-                (obj->owt > ocl->oc_weight) ? "very " : "");
+        Sprintf(buf, "%s%s",
+                (obj->owt > ocl->oc_weight) ? _("very ") : "", _("heavy iron ball"));
         break;
     case POTION_CLASS:
         if (dknown && obj->odiluted)
-            Strcpy(buf, "diluted ");
+            Strcpy(buf, _("diluted "));
         if (nn || un || !dknown) {
-            Strcat(buf, "potion");
+            Strcat(buf, _("potion"));
             if (!dknown)
                 break;
             if (nn) {
-                Strcat(buf, " of ");
+                Strcat(buf, _(" of "));
                 if (typ == POT_WATER && bknown
                     && (obj->blessed || obj->cursed)) {
-                    Strcat(buf, obj->blessed ? "holy " : "unholy ");
+                    Strcat(buf, obj->blessed ? _("holy ") : _("unholy "));
                 }
                 Strcat(buf, actualn);
             } else {
@@ -848,7 +848,7 @@ xname_flags(
             }
         } else {
             Strcat(buf, dn);
-            Strcat(buf, " potion");
+            Strcat(buf, _(" potion"));
         }
         break;
     case SCROLL_CLASS:
@@ -1156,37 +1156,37 @@ add_erosion_words(struct obj *obj, char *prefix)
     if (obj->oeroded && !iscrys) {
         switch (obj->oeroded) {
         case 2:
-            Strcat(prefix, "very ");
+            Strcat(prefix, _("very "));
             break;
         case 3:
-            Strcat(prefix, "thoroughly ");
+            Strcat(prefix, _("thoroughly "));
             break;
         }
-        Strcat(prefix, is_rustprone(obj) ? "rusty "
-                       : is_crackable(obj) ? "cracked "
-                         : "burnt ");
+        Strcat(prefix, is_rustprone(obj) ? _("rusty ")
+                       : is_crackable(obj) ? _("cracked ")
+                         : _("burnt "));
     }
     if (obj->oeroded2 && !iscrys) {
         switch (obj->oeroded2) {
         case 2:
-            Strcat(prefix, "very ");
+            Strcat(prefix, _("very "));
             break;
         case 3:
-            Strcat(prefix, "thoroughly ");
+            Strcat(prefix, _("thoroughly "));
             break;
         }
-        Strcat(prefix, is_corrodeable(obj) ? "corroded " : "rotted ");
+        Strcat(prefix, is_corrodeable(obj) ? _("corroded ") : _("rotted "));
     }
     /* note: it is possible for an item to be both eroded and erodeproof
        (cursed scroll of destroy armor read while confused erodeproofs an
        item of armor without repairing existing erosion) */
     if (rknown && obj->oerodeproof)
-        Strcat(prefix, iscrys ? "fixed "
-                       : is_rustprone(obj) ? "rustproof "
-                         : is_corrodeable(obj) ? "corrodeproof "
-                           : is_flammable(obj) ? "fireproof "
-                             : is_crackable(obj) ? "tempered " /* hardened */
-                               : is_rottable(obj) ? "rotproof "
+        Strcat(prefix, iscrys ? _("fixed ")
+                       : is_rustprone(obj) ? _("rustproof ")
+                         : is_corrodeable(obj) ? _("corrodeproof ")
+                           : is_flammable(obj) ? _("fireproof ")
+                             : is_crackable(obj) ? _("tempered ") /* hardened */
+                               : is_rottable(obj) ? _("rotproof ")
                                  : "");
 }
 
@@ -1316,7 +1316,7 @@ doname_base(
                 it is a container that has no contents */
              : ((Is_container(obj) || obj->otyp == STATUE)
                 && !Has_contents(obj))))
-        Strcat(prefix, "empty ");
+        Strcat(prefix, _("empty "));
 
     if (bknown && obj->oclass != COIN_CLASS
         && (obj->otyp != POT_WATER || !objects[POT_WATER].oc_name_known
@@ -1325,9 +1325,9 @@ doname_base(
          * always allow "uncursed potion of water"
          */
         if (obj->cursed)
-            Strcat(prefix, "cursed ");
+            Strcat(prefix, _("cursed "));
         else if (obj->blessed)
-            Strcat(prefix, "blessed ");
+            Strcat(prefix, _("blessed "));
         else if (!flags.implicit_uncursed
             /* For most items with charges or +/-, if you know how many
              * charges are left or what the +/- is, then you must have
@@ -1348,7 +1348,7 @@ doname_base(
                      && obj->otyp != FAKE_AMULET_OF_YENDOR
                      && obj->otyp != AMULET_OF_YENDOR
                      && !Role_if(PM_CLERIC)))
-            Strcat(prefix, "uncursed ");
+            Strcat(prefix, _("uncursed "));
     }
 
     /* "a large trapped box" would perhaps be more correct; [no!]
@@ -1357,21 +1357,21 @@ doname_base(
        TODO: this should be ``(Is_box(obj) || obj->otyp == TIN) && ...''
        but at present there's no way to set obj->tknown for tins */
     if (Is_box(obj) && obj->otrapped && obj->tknown && obj->dknown)
-        Strcat(prefix,"trapped ");
+        Strcat(prefix, _("trapped "));
     if (lknown && Is_box(obj)) {
         if (obj->obroken)
             /* 3.6.0 used "unlockable" here but that could be misunderstood
                to mean "capable of being unlocked" rather than the intended
                "not capable of being locked" */
-            Strcat(prefix, "broken ");
+            Strcat(prefix, _("broken "));
         else if (obj->olocked)
-            Strcat(prefix, "locked ");
+            Strcat(prefix, _("locked "));
         else
-            Strcat(prefix, "unlocked ");
+            Strcat(prefix, _("unlocked "));
     }
 
     if (obj->greased)
-        Strcat(prefix, "greased ");
+        Strcat(prefix, _("greased "));
 
     if (cknown && Has_contents(obj) && bpspaceleft > 0) {
         /* we count the number of separate stacks, which corresponds
@@ -1420,7 +1420,7 @@ doname_base(
         /*FALLTHRU*/
     case WEAPON_CLASS:
         if (ispoisoned)
-            Strcat(prefix, "poisoned ");
+            Strcat(prefix, _("poisoned "));
         add_erosion_words(obj, prefix);
         if (known) {
             Sprintf(eos(prefix), "%+d ", obj->spe); /* sitoa(obj->spe)+" " */

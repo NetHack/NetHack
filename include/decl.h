@@ -33,8 +33,8 @@ extern const struct c_common_strings c_common_strings;
 #define thats_enough_tries c_common_strings.c_thats_enough_tries
 #define silly_thing_to c_common_strings.c_silly_thing_to
 #define shudder_for_moment c_common_strings.c_shudder_for_moment
-#define something c_common_strings.c_something
-#define Something c_common_strings.c_Something
+#define something _("something")
+#define Something _("Something")
 #define You_can_move_again c_common_strings.c_You_can_move_again
 #define Never_mind c_common_strings.c_Never_mind
 #define vision_clears c_common_strings.c_vision_clears
