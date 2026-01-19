@@ -10827,19 +10827,19 @@ msgid "gem"
 msgstr "보석"
 
 #: src/obj_descr_i18n.c:115
-#, fuzzy
+#
 msgid "stone"
-msgstr "묘비"
+msgstr "돌"
 
 #: src/obj_descr_i18n.c:118
-#, fuzzy
+#
 msgid "leather"
-msgstr "깃털"
+msgstr "가죽"
 
 #: src/obj_descr_i18n.c:119
-#, fuzzy
+#
 msgid "studded leather"
-msgstr "징박힌 가죽 갑옷"
+msgstr "징박힌 가죽"
 
 #: src/obj_descr_i18n.c:120
 msgid "ring mail"
@@ -11163,9 +11163,9 @@ msgid "touchstone"
 msgstr "시금석"
 
 #: src/obj_descr_i18n.c:209
-#, fuzzy
+#
 msgid "flint stone"
-msgstr "단단한 돌"
+msgstr "부싯돌"
 
 #: src/obj_descr_i18n.c:212
 msgid "red"
@@ -23594,41 +23594,114 @@ msgstr "투명한 "
 # initblstats 형식 문자열 (windowport mode)
 # HP, AC, HD 등은 영어 유지
 # ============================================================
-#~ msgid " St:%s"
-#~ msgstr " 근력:%s"
+#, c-format
+msgid " St:%s"
+msgstr " 근력:%s"
 
-#~ msgid " Dx:%s"
-#~ msgstr " 민첩:%s"
+#, c-format
+msgid " Dx:%s"
+msgstr " 민첩:%s"
 
-#~ msgid " Co:%s"
-#~ msgstr " 체력:%s"
+#, c-format
+msgid " Co:%s"
+msgstr " 체력:%s"
 
-#~ msgid " In:%s"
-#~ msgstr " 지능:%s"
+#, c-format
+msgid " In:%s"
+msgstr " 지능:%s"
 
-#~ msgid " Wi:%s"
-#~ msgstr " 지혜:%s"
+#, c-format
+msgid " Wi:%s"
+msgstr " 지혜:%s"
 
-#~ msgid " Ch:%s"
-#~ msgstr " 매력:%s"
+#, c-format
+msgid " Ch:%s"
+msgstr " 매력:%s"
 
-#~ msgid " Pw:%s"
-#~ msgstr " Pw:%s"
+#, c-format
+msgid " Pw:%s"
+msgstr " 마력:%s"
 
-#~ msgid " Xp:%s"
-#~ msgstr " Lv:%s"
+#, c-format
+msgid " Xp:%s"
+msgstr " 경험:%s"
 
-#~ msgid " AC:%s"
-#~ msgstr " AC:%s"
+#, c-format
+msgid " AC:%s"
+msgstr " AC:%s"
 
-#~ msgid " HP:%s"
-#~ msgstr " HP:%s"
+#, c-format
+msgid " HP:%s"
+msgstr " HP:%s"
 
-#~ msgid " HD:%s"
-#~ msgstr " HD:%s"
+#, c-format
+msgid " HD:%s"
+msgstr " HD:%s"
 
-#~ msgid " T:%s"
-#~ msgstr " T:%s"
+#, c-format
+msgid " T:%s"
+msgstr " 턴:%s"
+
+#, c-format
+msgid " S:%s"
+msgstr " 점수:%s"
+
+# ============================================================
+# UI 메시지 (invent.c - "here" 관련)
+# ============================================================
+# %1$s = "is"/"are", %2$s = object name
+#, c-format, no-c-format
+msgid "There %s %s here."
+msgstr "여기에 %2$s{이/가} 있다."
+
+msgid "Things that are here:"
+msgstr "여기에 있는 것들:"
+
+msgid "Other things that are here:"
+msgstr "여기에 있는 다른 것들:"
+
+msgid "Things that you feel here:"
+msgstr "여기서 느껴지는 것들:"
+
+msgid "Other things that you feel here:"
+msgstr "여기서 느껴지는 다른 것들:"
+
+#, c-format
+msgid "Things that are under the %s here:"
+msgstr "여기 %s 아래에 있는 것들:"
+
+# %s = "here", "under them", "beneath it"
+#, c-format
+msgid "Things that are buried %s:"
+msgstr "%s 묻혀있는 것들:"
+
+# ============================================================
+# 기타 UI 메시지
+# ============================================================
+msgid "Thwwpingg!"
+msgstr "텽그랑!"
+
+#, c-format
+msgid "see crabgrass at your %s.  A funny thing in a dungeon."
+msgstr "당신의 %s 옆에서 바랭이를 본다. 던전에서 보기 드문 것이다."
+
+#, c-format
+msgid "glimpse a four-leaf clover at your %s."
+msgstr "당신의 %s 옆에서 네잎클로버를 언뜻 본다."
+
+msgid "the shrill sound of a guard's whistle"
+msgstr "경비원 호루라기의 날카로운 소리"
+
+msgid "angry shouting"
+msgstr "화난 고함 소리"
+
+#, c-format
+msgid "see %s approaching."
+msgstr "%s{이/가} 다가오는 것을 본다."
+
+#, c-format
+msgid "are confronted by %s."
+msgstr "%s{이/가} 당신과 대면한다."
 
 #~ msgid "elven arrow"
 #~ msgstr "엘프 화살"

@@ -704,7 +704,7 @@ really_kick_object(coordxy x, coordxy y)
                 };
 
                 if (!Deaf)
-                    pline1("Thwwpingg!");
+                    pline1(_("Thwwpingg!"));
                 You(_("%s!"), ROLL_FROM(flyingcoinmsg));
                 (void) scatter(x, y, rnd(3), VIS_EFFECTS | MAY_HIT,
                                gk.kickedobj);

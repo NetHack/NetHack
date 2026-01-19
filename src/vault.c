@@ -871,12 +871,12 @@ gd_letknow(struct monst *grd)
     if (!cansee(grd->mx, grd->my) || !mon_visible(grd))
         You_hear(_("%s."),
                     m_carrying(grd, TIN_WHISTLE)
-                        ? "the shrill sound of a guard's whistle"
-                        : "angry shouting");
+                        ? _("the shrill sound of a guard's whistle")
+                        : _("angry shouting"));
     else
         You(um_dist(grd->mx, grd->my, 2)
-                ? "see %s approaching."
-                : "are confronted by %s.",
+                ? _("see %s approaching.")
+                : _("are confronted by %s."),
             /* "an angry guard" */
             x_monnam(grd, ARTICLE_A, "angry", 0, FALSE));
 }

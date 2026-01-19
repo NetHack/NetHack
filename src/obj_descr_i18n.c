@@ -273,6 +273,30 @@ obj_descr_strings_for_extraction(void)
     (void) N_("your large dog");
     (void) N_("your warhorse");
 
+    /* === Status line format strings (botl.c initblstats) === */
+    (void) N_(" St:%s");
+    (void) N_(" Dx:%s");
+    (void) N_(" Co:%s");
+    (void) N_(" In:%s");
+    (void) N_(" Wi:%s");
+    (void) N_(" Ch:%s");
+    (void) N_(" Pw:%s");
+    (void) N_(" Xp:%s");
+    (void) N_(" AC:%s");
+    (void) N_(" HP:%s");
+    (void) N_(" HD:%s");
+    (void) N_(" T:%s");
+    (void) N_(" S:%s");
+
+    /* === UI messages (invent.c) === */
+    (void) N_("There %s %s here.");
+    (void) N_("Things that are here:");
+    (void) N_("Other things that are here:");
+    (void) N_("Things that you feel here:");
+    (void) N_("Other things that you feel here:");
+    (void) N_("Things that are under the %s here:");
+    (void) N_("Things that are buried %s:");
+
     /* === Monster names (pmnames) === */
     (void) N_("kitten");
     (void) N_("little dog");

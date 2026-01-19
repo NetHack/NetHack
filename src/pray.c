@@ -2109,8 +2109,8 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
                     body_part(FOOT));
             else
                 You(Hallucination
-                ? "see crabgrass at your %s.  A funny thing in a dungeon."
-                        : "glimpse a four-leaf clover at your %s.",
+                ? _("see crabgrass at your %s.  A funny thing in a dungeon.")
+                        : _("glimpse a four-leaf clover at your %s."),
                     makeplural(body_part(FOOT)));
         }
     }

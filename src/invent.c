@@ -4236,7 +4236,7 @@ look_here(
 
         /* hardcoded "is" worked here because "iron bars" is actually
            "set of iron bars"; use vtense() instead of relying on that */
-        Sprintf(fbuf, "There %s %s here.", vtense(dfeature, "are"), dfeature);
+        Sprintf(fbuf, _("There %s %s here."), vtense(dfeature, "are"), dfeature);
     }
 
     if (!otmp || is_lava(u.ux, u.uy)
@@ -4293,9 +4293,11 @@ look_here(
             putstr(tmpwin, 0, fbuf);
             putstr(tmpwin, 0, "");
         }
-        Sprintf(buf, "%s that %s here:",
-                picked_some ? "Other things" : "Things",
-                Blind ? "you feel" : "are");
+        Sprintf(buf, picked_some
+                     ? (Blind ? _("Other things that you feel here:")
+                              : _("Other things that are here:"))
+                     : (Blind ? _("Things that you feel here:")
+                              : _("Things that are here:")));
         putstr(tmpwin, 0, buf);
         for (; otmp; otmp = otmp->nexthere) {
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
@@ -5515,7 +5517,7 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
                 more_than_1 = TRUE;
             underwhat = more_than_1 ? "under them" : "beneath it";
         } else {
-            Sprintf(qbuf, "Things that are under the %s here:", seen_liquid);
+            Sprintf(qbuf, _("Things that are under the %s here:"), seen_liquid);
             if (query_objlist(qbuf, &svl.level.objects[x][y], BY_NEXTHERE,
                               &selected, PICK_NONE, allow_all) > 0)
                 free((genericptr_t) selected), selected = 0;
@@ -5537,7 +5539,7 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
         go.only.x = x;
         go.only.y = y;
         /* "buried here", but vary if we've already shown underwater items */
-        Sprintf(qbuf, "Things that are buried %s:", underwhat);
+        Sprintf(qbuf, _("Things that are buried %s:"), underwhat);
         if (query_objlist(qbuf, &svl.level.buriedobjlist, INVORDER_SORT,
                           &selected, PICK_NONE, only_here) > 0)
             free((genericptr_t) selected);
