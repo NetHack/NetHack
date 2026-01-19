@@ -928,8 +928,8 @@ x_monnam(
             if (mdat != &mons[PM_SHOPKEEPER] || do_invis){
                 Strcat(buf, " the ");
                 if (do_invis)
-                    Strcat(buf, "invisible ");
-                Strcat(buf, pm_name);
+                    Strcat(buf, _("invisible "));
+                Strcat(buf, _(pm_name));
             }
         }
         return buf;
@@ -964,7 +964,7 @@ x_monnam(
             Sprintf(eos(buf), "%s ghost", s_suffix(name));
             name_at_start = TRUE;
         } else if (called) {
-            Sprintf(eos(buf), "%s called %s", pm_name, name);
+            Sprintf(eos(buf), _("%s called %s"), _(pm_name), name);
             name_at_start = (boolean) type_is_pname(mdat);
         } else if (is_mplayer(mdat) && (bp = strstri(name, " the ")) != 0) {
             /* <name> the <adjective> <invisible> <saddled> <rank> */
@@ -993,7 +993,7 @@ x_monnam(
         Strcat(buf, lcase(pbuf));
         name_at_start = FALSE;
     } else {
-        Strcat(buf, pm_name);
+        Strcat(buf, _(pm_name));
         name_at_start = (boolean) type_is_pname(mdat);
     }
 

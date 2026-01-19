@@ -2121,7 +2121,7 @@ msgstr "%s{으로/로} 계속한다."
 #: src/trap.c:4963 src/uhitm.c:5556 src/zap.c:3561
 #, c-format
 msgid "%s %s %s."
-msgstr "%s{이/가} %s{을/를} %s."
+msgstr "%1$s{이/가} %3$s{을/를} %2$s."
 
 #: src/cmd.c:1293
 #, c-format
@@ -11368,28 +11368,20 @@ msgstr "당신의 개"
 # 인벤토리 메시지 (Inventory Messages)
 # ============================================================
 #: src/obj_descr_i18n.c:271
-#, fuzzy
 msgid "your horse"
-msgstr "당신의 %s"
+msgstr "당신의 말"
 
 #: src/obj_descr_i18n.c:272
-#, fuzzy
 msgid "your large cat"
-msgstr "심장 박동."
+msgstr "당신의 큰 고양이"
 
-# 도구
 #: src/obj_descr_i18n.c:273
-#, fuzzy
 msgid "your large dog"
-msgstr "큰 상자"
+msgstr "당신의 큰 개"
 
-# ============================================================
-# 인벤토리 메시지 (Inventory Messages)
-# ============================================================
 #: src/obj_descr_i18n.c:274
-#, fuzzy
 msgid "your warhorse"
-msgstr "당신의 %s"
+msgstr "당신의 군마"
 
 #: src/objnam.c:3597
 #, c-format
@@ -21990,6 +21982,375 @@ msgstr "신경 쓰지 마라."
 msgid "vision quickly clears."
 msgstr "시야가 금방 맑아졌다."
 
+# ============================================================
+# 종족 형용사 (Race Adjectives)
+# ============================================================
+msgid "human"
+msgstr "인간"
+
+msgid "elven"
+msgstr "엘프"
+
+msgid "dwarven"
+msgstr "드워프"
+
+msgid "gnomish"
+msgstr "노움"
+
+msgid "orcish"
+msgstr "오크"
+
+# ============================================================
+# 성별 형용사 (Gender Adjectives)
+# ============================================================
+msgid "male"
+msgstr "남성"
+
+msgid "female"
+msgstr "여성"
+
+# ============================================================
+# 사제 계급 (Priest Ranks)
+# ============================================================
+msgid "Aspirant"
+msgstr "지망생"
+
+msgid "Acolyte"
+msgstr "시종"
+
+msgid "Adept"
+msgstr "숙련자"
+
+msgid "Priest"
+msgstr "사제"
+
+msgid "Priestess"
+msgstr "여사제"
+
+msgid "Curate"
+msgstr "보좌 사제"
+
+msgid "Canon"
+msgstr "참사회원"
+
+msgid "Canoness"
+msgstr "여참사회원"
+
+msgid "Lama"
+msgstr "라마"
+
+msgid "Patriarch"
+msgstr "총대주교"
+
+msgid "Matriarch"
+msgstr "여족장"
+
+msgid "High Priest"
+msgstr "대사제"
+
+msgid "High Priestess"
+msgstr "대여사제"
+
+# ============================================================
+# 도적 계급 (Rogue Ranks)
+# ============================================================
+msgid "Footpad"
+msgstr "소매치기"
+
+msgid "Cutpurse"
+msgstr "소도둑"
+
+msgid "Rogue"
+msgstr "도적"
+
+msgid "Pilferer"
+msgstr "좀도둑"
+
+msgid "Robber"
+msgstr "강도"
+
+msgid "Burglar"
+msgstr "도둑"
+
+msgid "Filcher"
+msgstr "절도범"
+
+msgid "Magsman"
+msgstr "사기꾼"
+
+msgid "Magswoman"
+msgstr "여사기꾼"
+
+msgid "Thief"
+msgstr "도둑"
+
+# ============================================================
+# 전사 계급 (Warrior Ranks)
+# ============================================================
+msgid "Stripling"
+msgstr "풋내기"
+
+msgid "Skirmisher"
+msgstr "척후병"
+
+msgid "Fighter"
+msgstr "전사"
+
+msgid "Man-at-arms"
+msgstr "종자"
+
+msgid "Woman-at-arms"
+msgstr "여종자"
+
+msgid "Warrior"
+msgstr "무사"
+
+msgid "Swashbuckler"
+msgstr "검객"
+
+msgid "Hero"
+msgstr "영웅"
+
+msgid "Heroine"
+msgstr "여영웅"
+
+msgid "Champion"
+msgstr "챔피언"
+
+msgid "Lord"
+msgstr "군주"
+
+msgid "Lady"
+msgstr "여군주"
+
+# ============================================================
+# 마법사 계급 (Wizard Ranks)
+# ============================================================
+msgid "Evoker"
+msgstr "소환사"
+
+msgid "Conjurer"
+msgstr "주술사"
+
+msgid "Thaumaturge"
+msgstr "기적술사"
+
+msgid "Magician"
+msgstr "마술사"
+
+msgid "Enchanter"
+msgstr "마법사"
+
+msgid "Enchantress"
+msgstr "여마법사"
+
+msgid "Sorcerer"
+msgstr "마법사"
+
+msgid "Sorceress"
+msgstr "여마법사"
+
+msgid "Wizard"
+msgstr "위자드"
+
+msgid "Mage"
+msgstr "마도사"
+
+# ============================================================
+# 레인저 계급 (Ranger Ranks)
+# ============================================================
+msgid "Tenderfoot"
+msgstr "초보자"
+
+msgid "Lookout"
+msgstr "감시자"
+
+msgid "Trailblazer"
+msgstr "개척자"
+
+msgid "Reconnoiterer"
+msgstr "정찰병"
+
+msgid "Scout"
+msgstr "척후"
+
+msgid "Arbalester"
+msgstr "석궁수"
+
+msgid "Archer"
+msgstr "궁수"
+
+msgid "Sharpshooter"
+msgstr "명사수"
+
+msgid "Marksman"
+msgstr "저격수"
+
+msgid "Markswoman"
+msgstr "여저격수"
+
+msgid "Ranger"
+msgstr "레인저"
+
+# ============================================================
+# 몬스터 이름 (Monster Names)
+# ============================================================
+msgid "kitten"
+msgstr "새끼 고양이"
+
+msgid "little dog"
+msgstr "강아지"
+
+msgid "pony"
+msgstr "조랑말"
+
+msgid "cat"
+msgstr "고양이"
+
+msgid "dog"
+msgstr "개"
+
+msgid "horse"
+msgstr "말"
+
+msgid "large cat"
+msgstr "큰 고양이"
+
+msgid "large dog"
+msgstr "큰 개"
+
+msgid "warhorse"
+msgstr "군마"
+
+msgid "newt"
+msgstr "영원"
+
+msgid "gecko"
+msgstr "도마뱀붙이"
+
+msgid "iguana"
+msgstr "이구아나"
+
+msgid "lizard"
+msgstr "도마뱀"
+
+msgid "jackal"
+msgstr "자칼"
+
+msgid "fox"
+msgstr "여우"
+
+msgid "coyote"
+msgstr "코요테"
+
+msgid "wolf"
+msgstr "늑대"
+
+msgid "warg"
+msgstr "와르그"
+
+msgid "winter wolf"
+msgstr "겨울 늑대"
+
+msgid "hell hound"
+msgstr "지옥 사냥개"
+
+msgid "goblin"
+msgstr "고블린"
+
+msgid "hobgoblin"
+msgstr "홉고블린"
+
+msgid "orc"
+msgstr "오크"
+
+msgid "hill orc"
+msgstr "언덕 오크"
+
+msgid "Mordor orc"
+msgstr "모르도르 오크"
+
+msgid "Uruk-hai"
+msgstr "우루크하이"
+
+msgid "orc shaman"
+msgstr "오크 주술사"
+
+msgid "orc-captain"
+msgstr "오크 대장"
+
+msgid "elf"
+msgstr "엘프"
+
+msgid "Woodland-elf"
+msgstr "숲 엘프"
+
+msgid "Green-elf"
+msgstr "녹색 엘프"
+
+msgid "Grey-elf"
+msgstr "회색 엘프"
+
+msgid "elf-lord"
+msgstr "엘프 군주"
+
+msgid "Elvenking"
+msgstr "엘프왕"
+
+msgid "dwarf"
+msgstr "드워프"
+
+msgid "dwarf lord"
+msgstr "드워프 군주"
+
+msgid "dwarf king"
+msgstr "드워프 왕"
+
+msgid "gnome"
+msgstr "노움"
+
+msgid "gnome lord"
+msgstr "노움 군주"
+
+msgid "gnome king"
+msgstr "노움 왕"
+
+msgid "gnomish wizard"
+msgstr "노움 마법사"
+
+msgid "kobold"
+msgstr "코볼트"
+
+msgid "large kobold"
+msgstr "큰 코볼트"
+
+msgid "kobold lord"
+msgstr "코볼트 군주"
+
+msgid "kobold shaman"
+msgstr "코볼트 주술사"
+
+msgid "rat"
+msgstr "쥐"
+
+msgid "sewer rat"
+msgstr "하수구 쥐"
+
+msgid "giant rat"
+msgstr "거대 쥐"
+
+msgid "bat"
+msgstr "박쥐"
+
+msgid "giant bat"
+msgstr "거대 박쥐"
+
+msgid "vampire bat"
+msgstr "흡혈 박쥐"
+
+msgid "invisible "
+msgstr "투명한 "
+
 #, c-format
 #~ msgid "This door%s."
 #~ msgstr "이 문%s."
@@ -22845,11 +23206,7 @@ msgstr "시야가 금방 맑아졌다."
 # ============================================================
 # 몬스터 이름 (Monster Names) - 샘플
 # ============================================================
-#~ msgid "goblin"
-#~ msgstr "고블린"
 
-#~ msgid "orc"
-#~ msgstr "오크"
 
 #~ msgid "troll"
 #~ msgstr "트롤"
@@ -22890,35 +23247,17 @@ msgstr "시야가 금방 맑아졌다."
 #~ msgid "This food really hits the spot"
 #~ msgstr "이 음식 정말 맛있다"
 
-#~ msgid "Conjurer"
-#~ msgstr "소환사"
 
-#~ msgid "Thaumaturge"
-#~ msgstr "기적사"
 
-#~ msgid "Magician"
-#~ msgstr "마술사"
 
-#~ msgid "Enchanter"
-#~ msgstr "부여술사"
 
-#~ msgid "Enchantress"
-#~ msgstr "부여술사"
 
-#~ msgid "Sorcerer"
-#~ msgstr "주술사"
 
-#~ msgid "Sorceress"
-#~ msgstr "주술사"
 
 #~ msgid "Necromancer"
 #~ msgstr "강령술사"
 
-#~ msgid "Wizard"
-#~ msgstr "마법사"
 
-#~ msgid "Mage"
-#~ msgstr "현자"
 
 # Archeologist ranks
 #~ msgid "Digger"
@@ -23095,106 +23434,42 @@ msgstr "시야가 금방 맑아졌다."
 #~ msgstr "스승"
 
 # Priest/Priestess ranks
-#~ msgid "Aspirant"
-#~ msgstr "지망생"
 
-#~ msgid "Acolyte"
-#~ msgstr "시종"
 
-#~ msgid "Adept"
-#~ msgstr "숙련자"
 
-#~ msgid "Priest"
-#~ msgstr "사제"
 
-#~ msgid "Priestess"
-#~ msgstr "여사제"
 
-#~ msgid "Curate"
-#~ msgstr "보좌 사제"
 
-#~ msgid "Canon"
-#~ msgstr "참사회원"
 
-#~ msgid "Canoness"
-#~ msgstr "참사회원"
 
-#~ msgid "Lama"
-#~ msgstr "라마"
 
-#~ msgid "Patriarch"
-#~ msgstr "총대주교"
 
-#~ msgid "Matriarch"
-#~ msgstr "여족장"
 
-#~ msgid "High Priest"
-#~ msgstr "대사제"
 
-#~ msgid "High Priestess"
-#~ msgstr "대여사제"
 
 # Rogue ranks
-#~ msgid "Footpad"
-#~ msgstr "소매치기"
 
-#~ msgid "Cutpurse"
-#~ msgstr "소도둑"
 
-#~ msgid "Rogue"
-#~ msgstr "악당"
 
-#~ msgid "Pilferer"
-#~ msgstr "좀도둑"
 
-#~ msgid "Robber"
-#~ msgstr "강도"
 
-#~ msgid "Burglar"
-#~ msgstr "도둑"
 
-#~ msgid "Filcher"
-#~ msgstr "절도범"
 
-#~ msgid "Magsman"
-#~ msgstr "사기꾼"
 
-#~ msgid "Magswoman"
-#~ msgstr "사기꾼"
 
-#~ msgid "Thief"
-#~ msgstr "도둑"
 
 # Ranger ranks
-#~ msgid "Tenderfoot"
-#~ msgstr "초보자"
 
-#~ msgid "Lookout"
-#~ msgstr "감시자"
 
-#~ msgid "Trailblazer"
-#~ msgstr "개척자"
 
-#~ msgid "Reconnoiterer"
-#~ msgstr "정찰병"
 
 #~ msgid "Reconnoiteress"
 #~ msgstr "정찰병"
 
-#~ msgid "Scout"
-#~ msgstr "척후병"
 
-#~ msgid "Arbalester"
-#~ msgstr "석궁수"
 
-#~ msgid "Archer"
-#~ msgstr "궁수"
 
-#~ msgid "Sharpshooter"
-#~ msgstr "저격수"
 
-#~ msgid "Ranger"
-#~ msgstr "레인저"
 
 # Samurai ranks
 #~ msgid "Hatamoto"
@@ -23259,41 +23534,17 @@ msgstr "시야가 금방 맑아졌다."
 #~ msgstr "모험가"
 
 # Valkyrie ranks
-#~ msgid "Stripling"
-#~ msgstr "신병"
 
-#~ msgid "Skirmisher"
-#~ msgstr "척후"
 
-#~ msgid "Fighter"
-#~ msgstr "전사"
 
-#~ msgid "Man-at-arms"
-#~ msgstr "무장병"
 
-#~ msgid "Woman-at-arms"
-#~ msgstr "무장병"
 
-#~ msgid "Warrior"
-#~ msgstr "전투사"
 
-#~ msgid "Swashbuckler"
-#~ msgstr "검객"
 
-#~ msgid "Hero"
-#~ msgstr "영웅"
 
-#~ msgid "Heroine"
-#~ msgstr "여영웅"
 
-#~ msgid "Champion"
-#~ msgstr "챔피언"
 
-#~ msgid "Lord"
-#~ msgstr "군주"
 
-#~ msgid "Lady"
-#~ msgstr "여군주"
 
 # Role names
 #~ msgid "Archeologist"
@@ -23326,11 +23577,7 @@ msgstr "시야가 금방 맑아졌다."
 # ============================================================
 # 성별 형용사 (Gender Adjectives)
 # ============================================================
-#~ msgid "male"
-#~ msgstr "남성"
 
-#~ msgid "female"
-#~ msgstr "여성"
 
 #~ msgid "neuter"
 #~ msgstr "중성"
@@ -23338,20 +23585,10 @@ msgstr "시야가 금방 맑아졌다."
 # ============================================================
 # 종족 형용사 (Race Adjectives)
 # ============================================================
-#~ msgid "human"
-#~ msgstr "인간"
 
-#~ msgid "elven"
-#~ msgstr "엘프"
 
-#~ msgid "dwarven"
-#~ msgstr "드워프"
 
-#~ msgid "gnomish"
-#~ msgstr "노움"
 
-#~ msgid "orcish"
-#~ msgstr "오크"
 
 # ============================================================
 # initblstats 형식 문자열 (windowport mode)

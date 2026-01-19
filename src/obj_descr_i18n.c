@@ -272,6 +272,61 @@ obj_descr_strings_for_extraction(void)
     (void) N_("your large cat");
     (void) N_("your large dog");
     (void) N_("your warhorse");
+
+    /* === Monster names (pmnames) === */
+    (void) N_("kitten");
+    (void) N_("little dog");
+    (void) N_("pony");
+    (void) N_("cat");
+    (void) N_("dog");
+    (void) N_("horse");
+    (void) N_("large cat");
+    (void) N_("large dog");
+    (void) N_("warhorse");
+    (void) N_("newt");
+    (void) N_("gecko");
+    (void) N_("iguana");
+    (void) N_("lizard");
+    (void) N_("jackal");
+    (void) N_("fox");
+    (void) N_("coyote");
+    (void) N_("wolf");
+    (void) N_("warg");
+    (void) N_("winter wolf");
+    (void) N_("hell hound");
+    (void) N_("goblin");
+    (void) N_("hobgoblin");
+    (void) N_("orc");
+    (void) N_("hill orc");
+    (void) N_("Mordor orc");
+    (void) N_("Uruk-hai");
+    (void) N_("orc shaman");
+    (void) N_("orc-captain");
+    (void) N_("elf");
+    (void) N_("Woodland-elf");
+    (void) N_("Green-elf");
+    (void) N_("Grey-elf");
+    (void) N_("elf-lord");
+    (void) N_("Elvenking");
+    (void) N_("dwarf");
+    (void) N_("dwarf lord");
+    (void) N_("dwarf king");
+    (void) N_("gnome");
+    (void) N_("gnome lord");
+    (void) N_("gnome king");
+    (void) N_("gnomish wizard");
+    (void) N_("kobold");
+    (void) N_("large kobold");
+    (void) N_("kobold lord");
+    (void) N_("kobold shaman");
+    (void) N_("rat");
+    (void) N_("sewer rat");
+    (void) N_("giant rat");
+    (void) N_("bat");
+    (void) N_("giant bat");
+    (void) N_("vampire bat");
+    (void) N_("human");
+    (void) N_("invisible ");
 }
 
 /*obj_descr_i18n.c*/
