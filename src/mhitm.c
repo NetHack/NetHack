@@ -668,38 +668,35 @@ hitmm(
             pline(_("%s %s %s."), buf, mon_nam(mdef),
                   (compat == 2) ? "engagingly" : "seductively");
         } else {
-            buf[0] = '\0';
+            const char *mdef_name = mon_nam_too(mdef, magr);
             switch (mattk->aatyp) {
             case AT_BITE:
-                Snprintf(buf, sizeof buf, _("%s bites"), magr_name);
+                pline(_("%s bites %s."), magr_name, mdef_name);
                 break;
             case AT_STNG:
-                Snprintf(buf, sizeof buf, _("%s stings"), magr_name);
+                pline(_("%s stings %s."), magr_name, mdef_name);
                 break;
             case AT_BUTT:
-                Snprintf(buf, sizeof buf, _("%s butts"), magr_name);
+                pline(_("%s butts %s."), magr_name, mdef_name);
                 break;
             case AT_TUCH:
-                Snprintf(buf, sizeof buf, _("%s touches"), magr_name);
+                pline(_("%s touches %s."), magr_name, mdef_name);
                 break;
             case AT_TENT:
-                Snprintf(buf, sizeof buf, _("%s tentacles suck"),
-                         s_suffix(magr_name));
+                pline(_("%s's tentacles suck %s."), magr_name, mdef_name);
                 break;
             case AT_HUGS:
                 if (magr != u.ustuck) {
-                    Snprintf(buf, sizeof buf, _("%s squeezes"), magr_name);
+                    pline(_("%s squeezes %s."), magr_name, mdef_name);
                     break;
                 }
                 FALLTHROUGH;
                 /*FALLTHRU*/
             default:
                 if (!weaponhit || !mwep || !mwep->oartifact)
-                    Snprintf(buf, sizeof buf, _("%s hits"), magr_name);
+                    pline(_("%s hits %s."), magr_name, mdef_name);
                 break;
             }
-            if (*buf)
-                pline(_("%s %s."), buf, mon_nam_too(mdef, magr));
 
             if (mon_hates_silver(mdef) && silverhit) {
                 char *mdef_name = mon_nam_too(mdef, magr);

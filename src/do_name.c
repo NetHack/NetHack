@@ -1320,9 +1320,21 @@ Mgender(struct monst *mtmp)
 const char *
 pmname(struct permonst *pm, int mgender)
 {
+    const char *name;
+
     if (mgender < MALE || mgender >= NUM_MGENDERS || !pm->pmnames[mgender])
         mgender = NEUTRAL;
-    return pm->pmnames[mgender];
+    name = pm->pmnames[mgender];
+
+#ifdef ENABLE_NLS
+    /* Translate monster name for Korean locale */
+    if (is_korean_locale() && name) {
+        const char *translated = _(name);
+        if (translated != name)
+            return translated;
+    }
+#endif
+    return name;
 }
 #endif /* PMNAME_MACROS */
 
