@@ -237,18 +237,18 @@ trap_predicament(char *outbuf, int final, boolean wizxtra)
     *outbuf = '\0';
     switch (u.utraptype) {
     case TT_BURIEDBALL:
-        Strcpy(outbuf, "tethered to something buried");
+        Strcpy(outbuf, _("tethered to something buried"));
         break;
     case TT_LAVA:
-        Sprintf(outbuf, "sinking into %s", final ? "lava" : hliquid("lava"));
+        Sprintf(outbuf, _("sinking into %s"), final ? _("lava") : hliquid("lava"));
         break;
     case TT_INFLOOR:
-        Sprintf(outbuf, "stuck in %s", the(surface(u.ux, u.uy)));
+        Sprintf(outbuf, _("stuck in %s"), the(surface(u.ux, u.uy)));
         break;
     default: /* TT_BEARTRAP, TT_PIT, or TT_WEB */
-        Strcpy(outbuf, "trapped");
+        Strcpy(outbuf, _("trapped"));
         if ((t = t_at(u.ux, u.uy)) != 0) /* should never be null */
-            Sprintf(eos(outbuf), " in %s", an(trapname(t->ttyp, FALSE)));
+            Sprintf(eos(outbuf), _(" in %s"), an(trapname(t->ttyp, FALSE)));
         break;
     }
     if (wizxtra) { /* give extra information for wizard mode enlightenment */
@@ -492,7 +492,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
         Sprintf(tmpbuf, "%s ", genders[innategend].adj);
     buf[0] = '\0';
     if (Upolyd)
-        Strcpy(buf, "actually "); /* "You are actually a ..." */
+        Strcpy(buf, _("actually ")); /* "You are actually a ..." */
     if (!strcmpi(rank_titl, role_titl)) {
         /* omit role when rank title matches it */
         Sprintf(eos(buf), "%s, level %d %s%s", an(rank_titl), u.ulevel,
@@ -942,7 +942,7 @@ status_enlightenment(int mode, int final)
     /* not a traditional status but inherently obvious to player; more
        detail given below (attributes section) for magic enlightenment */
     if (Upolyd) {
-        Strcpy(buf, "transformed");
+        Strcpy(buf, _("transformed"));
         if (ugenocided())
             Sprintf(eos(buf), " and %s %s inside",
                     final ? "felt" : "feel", udeadinside());
@@ -999,7 +999,7 @@ status_enlightenment(int mode, int final)
             if (final && (Strangled & I_SPECIAL)) {
                 enlght_out(" You died from strangulation.");
             } else {
-                Strcpy(buf, "being strangled");
+                Strcpy(buf, _("being strangled"));
                 if (wizard)
                     Sprintf(eos(buf), " (%ld)", (Strangled & TIMEOUT));
                 you_are(buf, from_what(STRANGLED));
@@ -1056,7 +1056,7 @@ status_enlightenment(int mode, int final)
             Sprintf(buf, "chained to %s", ansimpleoname(uball));
         } else {
             impossible("Punished without uball?");
-            Strcpy(buf, "punished");
+            Strcpy(buf, _("punished"));
         }
         you_are(buf, "");
     }
@@ -1079,7 +1079,7 @@ status_enlightenment(int mode, int final)
         if (!strcmp(heldmon, "it")
             && (!has_mgivenname(u.ustuck)
                 || strcmp(MGIVENNAME(u.ustuck), "it") != 0))
-            Strcpy(heldmon, "an unseen creature");
+            Strcpy(heldmon, _("an unseen creature"));
     }
     if (u.uswallow) {
         assert(u.ustuck != NULL); /* implied by u.uswallow */
@@ -1174,7 +1174,7 @@ status_enlightenment(int mode, int final)
     /* status line doesn't show hunger when state is "not hungry", we do;
        needed for wizard mode's reveal of u.uhunger but add it for everyone */
     if (!*buf)
-        Strcpy(buf, "not hungry");
+        Strcpy(buf, _("not hungry"));
     if (*buf) { /* (since "not hungry" was added, this will always be True) */
         *buf = lowc(*buf); /* override capitalization */
         if (!strcmp(buf, "weak"))
@@ -1217,7 +1217,7 @@ status_enlightenment(int mode, int final)
         /* last resort entry, guarantees Status section is non-empty
            (no longer needed for that purpose since weapon status added;
            still useful though) */
-        Strcpy(buf, "unencumbered");
+        Strcpy(buf, _("unencumbered"));
         if (wizard)
             Sprintf(eos(buf), " <%d>", inv_weight());
         you_are(buf, "");
@@ -1598,7 +1598,7 @@ attributes_enlightenment(
     if (Infravision)
         you_have("infravision", from_what(INFRAVISION));
     if (Detect_monsters) {
-        Strcpy(buf, "sensing the presence of monsters");
+        Strcpy(buf, _("sensing the presence of monsters"));
         if (wizard) {
             long detectmon_timeout = (HDetect_monsters & TIMEOUT);
 
@@ -1977,13 +1977,13 @@ attributes_enlightenment(
                 p = !final ? (char *) 0 : "survived";
                 break;
             case 1:
-                Strcpy(buf, "once");
+                Strcpy(buf, _("once"));
                 break;
             case 2:
-                Strcpy(buf, "twice");
+                Strcpy(buf, _("twice"));
                 break;
             case 3:
-                Strcpy(buf, "thrice");
+                Strcpy(buf, _("thrice"));
                 break;
             default:
                 Sprintf(buf, "%d times", u.umortality);
@@ -2029,7 +2029,7 @@ youhiding(boolean via_enlghtmt, /* enlightenment line vs topl message */
 {
     char *bp, buf[BUFSZ];
 
-    Strcpy(buf, "hiding");
+    Strcpy(buf, _("hiding"));
     if (U_AP_TYPE != M_AP_NOTHING) {
         /* mimic; hero is only able to mimic a strange object or gold
            or hallucinatory alternative to gold, so we skip the details
@@ -3230,22 +3230,22 @@ size_str(int msize)
 
     switch (msize) {
     case MZ_TINY:
-        Strcpy(outbuf, "tiny");
+        Strcpy(outbuf, _("tiny"));
         break;
     case MZ_SMALL:
-        Strcpy(outbuf, "small");
+        Strcpy(outbuf, _("small"));
         break;
     case MZ_MEDIUM:
-        Strcpy(outbuf, "medium");
+        Strcpy(outbuf, _("medium"));
         break;
     case MZ_LARGE:
-        Strcpy(outbuf, "large");
+        Strcpy(outbuf, _("large"));
         break;
     case MZ_HUGE:
-        Strcpy(outbuf, "huge");
+        Strcpy(outbuf, _("huge"));
         break;
     case MZ_GIGANTIC:
-        Strcpy(outbuf, "gigantic");
+        Strcpy(outbuf, _("gigantic"));
         break;
     default:
         Sprintf(outbuf, "unknown size (%d)", msize);

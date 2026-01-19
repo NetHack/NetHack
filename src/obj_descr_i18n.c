@@ -416,6 +416,52 @@ obj_descr_strings_for_extraction(void)
     (void) N_("vampire bat");
     (void) N_("human");
     (void) N_("invisible ");
+
+    /* === insight.c status descriptions === */
+    (void) N_("actually ");
+    (void) N_("transformed");
+    (void) N_("being strangled");
+    (void) N_("punished");
+    (void) N_("an unseen creature");
+    (void) N_("not hungry");
+    (void) N_("unencumbered");
+    (void) N_("sensing the presence of monsters");
+    (void) N_("once");
+    (void) N_("twice");
+    (void) N_("thrice");
+    (void) N_("hiding");
+
+    /* === Size descriptions (insight.c) === */
+    (void) N_("tiny");
+    (void) N_("small");
+    (void) N_("medium");
+    (void) N_("large");
+    (void) N_("huge");
+    (void) N_("gigantic");
+
+    /* === pager.c terrain descriptions === */
+    (void) N_("trapped chest");
+    (void) N_("trapped door");
+    (void) N_("dark part of a room");
+    (void) N_("land");
+    (void) N_("unknown");
+    (void) N_("unexplored area");
+    (void) N_("open drawbridge portcullis");
+    (void) N_("broken door");
+    (void) N_("doorway");
+    (void) N_("cloudy area");
+    (void) N_("fog/vapor cloud");
+    (void) N_("unexplored");
+    /* (void) N_("stone"); - already defined above */
+    (void) N_("engraving");
+
+    /* === trap_predicament (hack.c) === */
+    (void) N_("tethered to something buried");
+    (void) N_("sinking into %s");
+    (void) N_("lava");
+    (void) N_("stuck in %s");
+    (void) N_("trapped");
+    (void) N_(" in %s");
 }
 
 /*obj_descr_i18n.c*/

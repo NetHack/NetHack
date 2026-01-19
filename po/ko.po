@@ -23854,6 +23854,124 @@ msgstr "%s 반지"
 msgid "set of "
 msgstr ""
 
+msgid " stone"
+msgstr " 돌"
+
+# === insight.c status descriptions ===
+msgid "actually "
+msgstr "실제로 "
+
+msgid "transformed"
+msgstr "변신 상태"
+
+msgid "being strangled"
+msgstr "목이 졸리는 중"
+
+msgid "punished"
+msgstr "처벌받는 중"
+
+msgid "an unseen creature"
+msgstr "보이지 않는 생물"
+
+msgid "not hungry"
+msgstr "배고프지 않음"
+
+msgid "unencumbered"
+msgstr "짐이 없음"
+
+msgid "sensing the presence of monsters"
+msgstr "몬스터의 존재를 감지하는 중"
+
+msgid "once"
+msgstr "한 번"
+
+msgid "twice"
+msgstr "두 번"
+
+msgid "thrice"
+msgstr "세 번"
+
+msgid "hiding"
+msgstr "숨어 있음"
+
+# === Size descriptions (insight.c) ===
+msgid "tiny"
+msgstr "아주 작은"
+
+msgid "small"
+msgstr "작은"
+
+msgid "medium"
+msgstr "중간"
+
+msgid "large"
+msgstr "큰"
+
+msgid "huge"
+msgstr "거대한"
+
+msgid "gigantic"
+msgstr "초거대한"
+
+# === pager.c terrain descriptions ===
+msgid "trapped chest"
+msgstr "함정이 있는 상자"
+
+msgid "trapped door"
+msgstr "함정이 있는 문"
+
+msgid "dark part of a room"
+msgstr "어두운 방의 일부"
+
+msgid "land"
+msgstr "땅"
+
+# "unknown" - already defined at line 7571
+
+msgid "unexplored area"
+msgstr "탐험하지 않은 영역"
+
+msgid "open drawbridge portcullis"
+msgstr "열린 도개교 철문"
+
+msgid "broken door"
+msgstr "부서진 문"
+
+# "doorway" - already defined at line 5180
+
+msgid "cloudy area"
+msgstr "흐린 영역"
+
+msgid "fog/vapor cloud"
+msgstr "안개/수증기 구름"
+
+msgid "unexplored"
+msgstr "미탐험"
+
+msgid "engraving"
+msgstr "새겨진 글씨"
+
+# === trap_predicament (hack.c) ===
+msgid "tethered to something buried"
+msgstr "무언가 묻힌 것에 연결됨"
+
+#, c-format
+msgid "sinking into %s"
+msgstr "%s에 빠지는 중"
+
+# "lava" - already defined in obsolete section, will be reactivated
+
+#, c-format
+msgid "stuck in %s"
+msgstr "%s에 걸림"
+
+msgid "trapped"
+msgstr "함정에 빠짐"
+
+#, c-format
+msgid " in %s"
+msgstr " %s에"
+
 #~ msgid "elven arrow"
 #~ msgstr "엘프 화살"
 

@@ -172,9 +172,9 @@ trap_description(char *outbuf, int tnum, coordxy x, coordxy y)
      * traps now (defined trap types but not part of ftrap chain).
      */
     if (trapped_chest_at(tnum, x, y))
-        Strcpy(outbuf, "trapped chest"); /* might actually be a large box */
+        Strcpy(outbuf, _("trapped chest")); /* might actually be a large box */
     else if (trapped_door_at(tnum, x, y))
-        Strcpy(outbuf, "trapped door"); /* not "trap door"... */
+        Strcpy(outbuf, _("trapped door")); /* not "trap door"... */
     else
         Strcpy(outbuf, trapname(tnum, FALSE));
     return;
@@ -726,14 +726,14 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
     } else if (glyph_is_invisible(glyph)) {
         Strcpy(buf, invisexplain); /* redundant; handled by caller */
     } else if (glyph_is_nothing(glyph)) {
-        Strcpy(buf, "dark part of a room");
+        Strcpy(buf, _("dark part of a room"));
     } else if (glyph_is_unexplored(glyph)) {
         if (Underwater && !Is_waterlevel(&u.uz)) {
             /* "unknown" == previously mapped but not visible when
                submerged; better terminology appreciated... */
-            Strcpy(buf, (next2u(x, y)) ? "land" : "unknown");
+            Strcpy(buf, (next2u(x, y)) ? _("land") : _("unknown"));
         } else {
-            Strcpy(buf, "unexplored area");
+            Strcpy(buf, _("unexplored area"));
         }
     } else if (glyph_is_cmap(glyph)) {
         int amsk;
@@ -755,15 +755,15 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
             break;
         case S_ndoor:
             if (is_drawbridge_wall(x, y) >= 0)
-                Strcpy(buf, "open drawbridge portcullis");
+                Strcpy(buf, _("open drawbridge portcullis"));
             else if ((levl[x][y].doormask & ~D_TRAPPED) == D_BROKEN)
-                Strcpy(buf, "broken door");
+                Strcpy(buf, _("broken door"));
             else
-                Strcpy(buf, "doorway");
+                Strcpy(buf, _("doorway"));
             break;
         case S_cloud:
             Strcpy(buf,
-                   Is_airlevel(&u.uz) ? "cloudy area" : "fog/vapor cloud");
+                   Is_airlevel(&u.uz) ? _("cloudy area") : _("fog/vapor cloud"));
             break;
         case S_pool:
         case S_water: /* was Plane of Water, now that or "wall of water" */
@@ -774,19 +774,19 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
             break;
         case S_engroom:
         case S_engrcorr:
-            Strcpy(buf, "engraving");
+            Strcpy(buf, _("engraving"));
             break;
         case S_stone:
             if (!levl[x][y].seenv) {
-                Strcpy(buf, "unexplored");
+                Strcpy(buf, _("unexplored"));
                 break;
             } else if (Underwater && !Is_waterlevel(&u.uz)) {
                 /* "unknown" == previously mapped but not visible when
                    submerged; better terminology appreciated... */
-                Strcpy(buf, (next2u(x, y)) ? "land" : "unknown");
+                Strcpy(buf, (next2u(x, y)) ? _("land") : _("unknown"));
                 break;
             } else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR) {
-                Strcpy(buf, "stone");
+                Strcpy(buf, _("stone"));
                 break;
             }
             FALLTHROUGH;
@@ -796,7 +796,7 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
             break;
         }
     } else { /* not mon, obj, trap, or cmap */
-        Strcpy(buf, "unexplored area");
+        Strcpy(buf, _("unexplored area"));
     }
     return (pm && !Hallucination) ? pm : (struct permonst *) 0;
 }
