@@ -1294,8 +1294,11 @@ doname_base(
             bp += 4; /* doesn't affect bp_eos or bpspaceleft */
         Strcpy(prefix, "the ");
     } else if (!fake_arti) {
-        /* default prefix */
-        Strcpy(prefix, "a ");
+        /* default prefix: "a " for English, "1 " for Korean */
+        if (is_korean_locale())
+            Strcpy(prefix, "1 ");
+        else
+            Strcpy(prefix, "a ");
     }
 
     /* "empty" goes at the beginning, but item count goes at the end */
@@ -1864,11 +1867,7 @@ corpse_xname(
        Name causes it to assume a personal name and return Name as-is;
        that's usually the behavior wanted, but here we need to force "the"
        to precede capitalized unique monsters (pnames are handled above) */
-#ifdef ENABLE_NLS
-    if (the_prefix && !is_korean_locale())
-#else
     if (the_prefix)
-#endif
         Strcat(nambuf, "the ");
     /* note: over time, various instances of the(mon_name()) have crept
        into the code, so the() has been modified to deal with capitalized
@@ -1894,21 +1893,11 @@ corpse_xname(
     if (glob) {
         ; /* omit_corpse doesn't apply; quantity is always 1 */
     } else if (!omit_corpse) {
-#ifdef ENABLE_NLS
-        if (is_korean_locale()) {
-            Strcat(nambuf, " 시체");
-            if (otmp->quan > 1L && !ignore_quan) {
-                any_prefix = FALSE;
-            }
-        } else
-#endif
-        {
-            Strcat(nambuf, " corpse");
-            /* makeplural(nambuf) => append "s" to "corpse" */
-            if (otmp->quan > 1L && !ignore_quan) {
-                Strcat(nambuf, "s");
-                any_prefix = FALSE; /* avoid "a newt corpses" */
-            }
+        Strcat(nambuf, " corpse");
+        /* makeplural(nambuf) => append "s" to "corpse" */
+        if (otmp->quan > 1L && !ignore_quan) {
+            Strcat(nambuf, "s");
+            any_prefix = FALSE; /* avoid "a newt corpses" */
         }
     }
 
@@ -1916,16 +1905,10 @@ corpse_xname(
        old value into another buffer; and once _that_ has been copied,
        the obuf[] returned by an() can be made available for re-use */
     if (any_prefix) {
-#ifdef ENABLE_NLS
-        /* Skip article for Korean locale */
-        if (!is_korean_locale())
-#endif
-        {
-            char *obufp;
+        char *obufp;
 
-            Strcpy(nambuf, obufp = an(nambuf));
-            releaseobuf(obufp);
-        }
+        Strcpy(nambuf, obufp = an(nambuf));
+        releaseobuf(obufp);
     }
     return nambuf;
 }

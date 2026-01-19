@@ -668,6 +668,7 @@ hitmm(
             pline(_("%s %s %s."), buf, mon_nam(mdef),
                   (compat == 2) ? "engagingly" : "seductively");
         } else {
+            /* Combat messages - use complete sentences for proper i18n */
             const char *mdef_name = mon_nam_too(mdef, magr);
             switch (mattk->aatyp) {
             case AT_BITE:
@@ -699,7 +700,7 @@ hitmm(
             }
 
             if (mon_hates_silver(mdef) && silverhit) {
-                char *mdef_name = mon_nam_too(mdef, magr);
+                char *silver_mdef_name = mon_nam_too(mdef, magr);
 
                 /* note: mon_nam_too returns a modifiable buffer; so
                    does s_suffix, but it returns a single static buffer
@@ -707,17 +708,17 @@ hitmm(
                 Strcpy(magr_name, s_suffix(magr_name));
                 if (!noncorporeal(mdef->data) && !amorphous(mdef->data)) {
                     if (mdef != magr) {
-                        mdef_name = s_suffix(mdef_name);
+                        silver_mdef_name = s_suffix(silver_mdef_name);
                     } else {
-                        (void) strsubst(mdef_name, "himself", "his own");
-                        (void) strsubst(mdef_name, "herself", "her own");
-                        (void) strsubst(mdef_name, "itself", "its own");
+                        (void) strsubst(silver_mdef_name, "himself", "his own");
+                        (void) strsubst(silver_mdef_name, "herself", "her own");
+                        (void) strsubst(silver_mdef_name, "itself", "its own");
                     }
-                    Strcat(mdef_name, " flesh");
+                    Strcat(silver_mdef_name, " flesh");
                 }
 
                 pline(_("%s %s sears %s!"), magr_name, /* s_suffix(magr_name), */
-                      simpleonames(mwep), mdef_name);
+                      simpleonames(mwep), silver_mdef_name);
             }
         }
     } else

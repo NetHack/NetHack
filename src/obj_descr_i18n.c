@@ -147,32 +147,6 @@ obj_descr_strings_for_extraction(void)
     (void) N_("crossbow");
     (void) N_("bolt");
 
-    /* === Specific weapon names === */
-    (void) N_("long sword");
-    (void) N_("short sword");
-    (void) N_("broadsword");
-    (void) N_("two-handed sword");
-    (void) N_("scimitar");
-    (void) N_("katana");
-    (void) N_("elven broadsword");
-    (void) N_("orcish short sword");
-    (void) N_("dwarvish short sword");
-    (void) N_("silver saber");
-    (void) N_("battle-axe");
-    (void) N_("war hammer");
-    (void) N_("morning star");
-    (void) N_("elven dagger");
-    (void) N_("orcish dagger");
-    (void) N_("athame");
-    (void) N_("crysknife");
-    (void) N_("stiletto");
-    (void) N_("elven arrow");
-    (void) N_("orcish arrow");
-    (void) N_("silver arrow");
-    (void) N_("elven bow");
-    (void) N_("orcish bow");
-    (void) N_("yumi");
-
     /* === Tool descriptions === */
     (void) N_("lamp");
     (void) N_("lantern");
@@ -298,100 +272,6 @@ obj_descr_strings_for_extraction(void)
     (void) N_("your large cat");
     (void) N_("your large dog");
     (void) N_("your warhorse");
-
-    /* === Monster names === */
-    /* Pets and domestic animals */
-    (void) N_("kitten");
-    (void) N_("little dog");
-    (void) N_("pony");
-    (void) N_("cat");
-    (void) N_("dog");
-    (void) N_("horse");
-    (void) N_("large cat");
-    (void) N_("large dog");
-    (void) N_("warhorse");
-
-    /* Common early dungeon monsters */
-    (void) N_("lichen");
-    (void) N_("newt");
-    (void) N_("grid bug");
-    (void) N_("jackal");
-    (void) N_("fox");
-    (void) N_("sewer rat");
-    (void) N_("giant rat");
-    (void) N_("cave spider");
-    (void) N_("yellow mold");
-    (void) N_("acid blob");
-    (void) N_("goblin");
-    (void) N_("hobgoblin");
-    (void) N_("orc");
-    (void) N_("hill orc");
-    (void) N_("gnome");
-    (void) N_("dwarf");
-    (void) N_("kobold");
-    (void) N_("large kobold");
-    (void) N_("kobold lord");
-    (void) N_("floating eye");
-    (void) N_("giant bat");
-    (void) N_("monkey");
-    (void) N_("ape");
-
-    /* Undead */
-    (void) N_("zombie");
-    (void) N_("ghoul");
-    (void) N_("mummy");
-    (void) N_("skeleton");
-    (void) N_("ghost");
-    (void) N_("wraith");
-    (void) N_("vampire");
-    (void) N_("lich");
-
-    /* Common monsters */
-    (void) N_("giant");
-    (void) N_("troll");
-    (void) N_("ogre");
-    (void) N_("centaur");
-    (void) N_("minotaur");
-    (void) N_("dragon");
-    (void) N_("red dragon");
-    (void) N_("blue dragon");
-    (void) N_("green dragon");
-    (void) N_("white dragon");
-    (void) N_("black dragon");
-
-    /* Humanoids */
-    (void) N_("human");
-    (void) N_("elf");
-    (void) N_("soldier");
-    (void) N_("guard");
-    (void) N_("shopkeeper");
-    (void) N_("priest");
-    (void) N_("priestess");
-    (void) N_("wizard");
-    (void) N_("knight");
-    (void) N_("samurai");
-    (void) N_("ninja");
-    (void) N_("rogue");
-    (void) N_("ranger");
-
-    /* Special monsters */
-    (void) N_("Medusa");
-    (void) N_("mimic");
-    (void) N_("nymph");
-    (void) N_("cockatrice");
-    (void) N_("mind flayer");
-    (void) N_("demon");
-    (void) N_("succubus");
-    (void) N_("incubus");
-
-    /* Snakes and worms */
-    (void) N_("snake");
-    (void) N_("pit viper");
-    (void) N_("python");
-    (void) N_("cobra");
-    (void) N_("worm");
-    (void) N_("long worm");
-    (void) N_("purple worm");
 }
 
 /*obj_descr_i18n.c*/

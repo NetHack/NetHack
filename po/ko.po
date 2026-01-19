@@ -7147,7 +7147,7 @@ msgstr "멈춰. %s{은/는} 자리를 바꾸고 싶지 않다."
 #: src/hack.c:2151
 #, c-format
 msgid "swap places with %s."
-msgstr "%s{과/와} 자리를 바꿨다."
+msgstr "%s{와/과} 자리를 바꿨다."
 
 #: src/hack.c:2160
 #, c-format
@@ -8573,41 +8573,6 @@ msgstr "%s{이/가} %s{을/를} 빗맞혔다."
 msgid "%s pretends to be friendly to %s."
 msgstr "%s{이/가} %s에게 친근한 척 한다."
 
-#: src/mhitm.c:674
-#, c-format
-msgid "%s bites %s."
-msgstr "%s{이/가} %s{을/를} 물었다."
-
-#: src/mhitm.c:677
-#, c-format
-msgid "%s stings %s."
-msgstr "%s{이/가} %s{을/를} 쏘았다."
-
-#: src/mhitm.c:680
-#, c-format
-msgid "%s butts %s."
-msgstr "%s{이/가} %s{을/를} 들이받았다."
-
-#: src/mhitm.c:683
-#, c-format
-msgid "%s touches %s."
-msgstr "%s{이/가} %s{을/를} 만졌다."
-
-#: src/mhitm.c:686
-#, c-format
-msgid "%s's tentacles suck %s."
-msgstr "%s의 촉수가 %s{을/를} 빨아들였다."
-
-#: src/mhitm.c:690
-#, c-format
-msgid "%s squeezes %s."
-msgstr "%s{이/가} %s{을/를} 조였다."
-
-#: src/mhitm.c:697
-#, c-format
-msgid "%s hits %s."
-msgstr "%s{이/가} %s{을/를} 때렸다."
-
 #: src/mhitm.c:132
 #, c-format
 msgid "%s releases you!"
@@ -8699,6 +8664,42 @@ msgstr "%s{이/가} 조여"
 #, c-format
 msgid "%s hits"
 msgstr "%s{이/가} 때려"
+
+# Complete sentence combat messages (new format for proper Korean)
+#: src/mhitm.c:675
+#, c-format
+msgid "%s bites %s."
+msgstr "%s{이/가} %s{을/를} 물었다."
+
+#: src/mhitm.c:678
+#, c-format
+msgid "%s stings %s."
+msgstr "%s{이/가} %s{을/를} 쏘았다."
+
+#: src/mhitm.c:681
+#, c-format
+msgid "%s butts %s."
+msgstr "%s{이/가} %s{을/를} 들이받았다."
+
+#: src/mhitm.c:684
+#, c-format
+msgid "%s touches %s."
+msgstr "%s{이/가} %s{을/를} 만졌다."
+
+#: src/mhitm.c:687
+#, c-format
+msgid "%s's tentacles suck %s."
+msgstr "%s의 촉수가 %s{을/를} 빨았다."
+
+#: src/mhitm.c:691
+#, c-format
+msgid "%s squeezes %s."
+msgstr "%s{이/가} %s{을/를} 조였다."
+
+#: src/mhitm.c:698
+#, c-format
+msgid "%s hits %s."
+msgstr "%s{이/가} %s{을/를} 때렸다."
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -10683,76 +10684,81 @@ msgstr "유리"
 
 #: src/obj_descr_i18n.c:77
 msgid "aluminum"
-msgstr "알루미늄"
+msgstr ""
 
 #: src/obj_descr_i18n.c:78
 msgid "uranium"
-msgstr "우라늄"
+msgstr ""
 
 #: src/obj_descr_i18n.c:79
 msgid "long"
-msgstr "긴"
+msgstr ""
 
 # 무기 - 검
 #: src/obj_descr_i18n.c:80
+#, fuzzy
 msgid "short"
-msgstr "짧은"
+msgstr "단검"
 
 #: src/obj_descr_i18n.c:81
 msgid "curved"
-msgstr "휘어진"
+msgstr ""
 
 #: src/obj_descr_i18n.c:82
+#, fuzzy
 msgid "runed"
-msgstr "룬이 새겨진"
+msgstr "룬검"
 
 #: src/obj_descr_i18n.c:83
 msgid "oak"
-msgstr "참나무"
+msgstr ""
 
 #: src/obj_descr_i18n.c:84
 msgid "ebony"
-msgstr "흑단"
+msgstr ""
 
 #: src/obj_descr_i18n.c:85
 msgid "marble"
-msgstr "대리석"
+msgstr ""
 
 #: src/obj_descr_i18n.c:86 src/obj_descr_i18n.c:185
 msgid "tin"
-msgstr "주석"
+msgstr "통조림"
 
 #: src/obj_descr_i18n.c:87
 msgid "maple"
-msgstr "단풍나무"
+msgstr ""
 
 #: src/obj_descr_i18n.c:88
+#, fuzzy
 msgid "pine"
-msgstr "소나무"
+msgstr "척추"
 
 #: src/obj_descr_i18n.c:89
 msgid "zinc"
-msgstr "아연"
+msgstr ""
 
 #: src/obj_descr_i18n.c:90
 msgid "platinum"
-msgstr "백금"
+msgstr ""
 
 #: src/obj_descr_i18n.c:91
+#, fuzzy
 msgid "iridium"
-msgstr "이리듐"
+msgstr "녹청색"
 
 #: src/obj_descr_i18n.c:92
+#, fuzzy
 msgid "crystal"
-msgstr "수정"
+msgstr "수정구"
 
 #: src/obj_descr_i18n.c:93
 msgid "hexagonal"
-msgstr "육각형의"
+msgstr ""
 
 #: src/obj_descr_i18n.c:96
 msgid "circular"
-msgstr "원형의"
+msgstr ""
 
 #: src/obj_descr_i18n.c:97
 msgid "triangular"
@@ -10760,35 +10766,38 @@ msgstr "삼각형의"
 
 #: src/obj_descr_i18n.c:98
 msgid "spherical"
-msgstr "구형의"
+msgstr ""
 
 #: src/obj_descr_i18n.c:99
 msgid "oval"
-msgstr "타원형의"
+msgstr ""
 
 #: src/obj_descr_i18n.c:100
+#, fuzzy
 msgid "octagonal"
-msgstr "팔각형의"
+msgstr "회전하는"
 
 #: src/obj_descr_i18n.c:101
 msgid "pyramidal"
-msgstr "피라미드형의"
+msgstr ""
 
 #: src/obj_descr_i18n.c:102
 msgid "square"
 msgstr "네모난"
 
 #: src/obj_descr_i18n.c:103
+#, fuzzy
 msgid "concave"
-msgstr "오목한"
+msgstr "집중한다."
 
 #: src/obj_descr_i18n.c:104
 msgid "cubical"
-msgstr "정육면체의"
+msgstr ""
 
 #: src/obj_descr_i18n.c:105
+#, fuzzy
 msgid "perforated"
-msgstr "구멍 뚫린"
+msgstr "모독된"
 
 # 물약
 #: src/obj_descr_i18n.c:108
@@ -10826,16 +10835,19 @@ msgid "gem"
 msgstr "보석"
 
 #: src/obj_descr_i18n.c:115
+#, fuzzy
 msgid "stone"
-msgstr "돌"
+msgstr "묘비"
 
 #: src/obj_descr_i18n.c:118
+#, fuzzy
 msgid "leather"
-msgstr "가죽"
+msgstr "깃털"
 
 #: src/obj_descr_i18n.c:119
+#, fuzzy
 msgid "studded leather"
-msgstr "징박힌 가죽"
+msgstr "징박힌 가죽 갑옷"
 
 #: src/obj_descr_i18n.c:120
 msgid "ring mail"
@@ -10855,33 +10867,38 @@ msgstr "판금 갑옷"
 
 #: src/obj_descr_i18n.c:124
 msgid "helmet"
-msgstr "헬멧"
+msgstr ""
 
 #: src/obj_descr_i18n.c:125
 msgid "helm"
-msgstr "투구"
+msgstr ""
 
 # 방어구 - 방패
 #: src/obj_descr_i18n.c:126
+#, fuzzy
 msgid "shield"
-msgstr "방패"
+msgstr "소형 방패"
 
 #: src/obj_descr_i18n.c:127
+#, fuzzy
 msgid "cloak"
-msgstr "망토"
+msgstr "엘프 망토"
 
 #: src/obj_descr_i18n.c:128
+#, fuzzy
 msgid "gloves"
-msgstr "장갑"
+msgstr "장갑 낀"
 
 # 방어구 - 신발
 #: src/obj_descr_i18n.c:129
+#, fuzzy
 msgid "boots"
-msgstr "부츠"
+msgstr "낮은 부츠"
 
 #: src/obj_descr_i18n.c:132
+#, fuzzy
 msgid "sword"
-msgstr "검"
+msgstr "룬검"
 
 # 무기 - 단검
 #: src/obj_descr_i18n.c:133
@@ -10926,16 +10943,18 @@ msgid "flail"
 msgstr "도리깨"
 
 #: src/obj_descr_i18n.c:142
+#, fuzzy
 msgid "hammer"
-msgstr "해머"
+msgstr "워해머"
 
 #: src/obj_descr_i18n.c:143
 msgid "staff"
-msgstr "지팡이"
+msgstr ""
 
 #: src/obj_descr_i18n.c:144
+#, fuzzy
 msgid "whip"
-msgstr "채찍"
+msgstr "%s{을/를} 채찍질했다!"
 
 #: src/obj_descr_i18n.c:145
 msgid "club"
@@ -10951,19 +10970,22 @@ msgstr "석궁"
 
 #: src/obj_descr_i18n.c:148
 msgid "bolt"
-msgstr "볼트"
+msgstr ""
 
 #: src/obj_descr_i18n.c:151
+#, fuzzy
 msgid "lamp"
-msgstr "램프"
+msgstr "기름 램프"
 
 #: src/obj_descr_i18n.c:152
+#, fuzzy
 msgid "lantern"
-msgstr "랜턴"
+msgstr "황동 랜턴"
 
 #: src/obj_descr_i18n.c:153
+#, fuzzy
 msgid "candle"
-msgstr "초"
+msgstr "밀랍 초"
 
 #: src/obj_descr_i18n.c:154
 msgid "mirror"
@@ -10979,7 +11001,7 @@ msgstr "자루"
 
 #: src/obj_descr_i18n.c:158
 msgid "bag"
-msgstr "가방"
+msgstr ""
 
 #: src/obj_descr_i18n.c:159
 msgid "chest"
@@ -10987,28 +11009,32 @@ msgstr "보물 상자"
 
 # 활/석궁
 #: src/obj_descr_i18n.c:160
+#, fuzzy
 msgid "box"
-msgstr "상자"
+msgstr "활"
 
 #: src/obj_descr_i18n.c:161
+#, fuzzy
 msgid "horn"
-msgstr "뿔피리"
+msgstr "화염의 뿔피리"
 
 #: src/obj_descr_i18n.c:162
+#, fuzzy
 msgid "whistle"
-msgstr "호루라기"
+msgstr "양철 호루라기"
 
 #: src/obj_descr_i18n.c:163
+#, fuzzy
 msgid "flute"
-msgstr "플루트"
+msgstr "마법 플루트"
 
 #: src/obj_descr_i18n.c:164
 msgid "harp"
-msgstr "하프"
+msgstr ""
 
 #: src/obj_descr_i18n.c:165
 msgid "drum"
-msgstr "북"
+msgstr ""
 
 #: src/obj_descr_i18n.c:166
 msgid "bell"
@@ -11160,72 +11186,82 @@ msgid "touchstone"
 msgstr "시금석"
 
 #: src/obj_descr_i18n.c:209
+#, fuzzy
 msgid "flint stone"
-msgstr "부싯돌"
+msgstr "단단한 돌"
 
 #: src/obj_descr_i18n.c:212
+#, fuzzy
 msgid "red"
-msgstr "빨간"
+msgstr "광선을 내는"
 
 #: src/obj_descr_i18n.c:213
 msgid "blue"
-msgstr "파란"
+msgstr ""
 
 #: src/obj_descr_i18n.c:214
 msgid "green"
-msgstr "초록"
+msgstr ""
 
 #: src/obj_descr_i18n.c:215
 msgid "gray"
-msgstr "회색"
+msgstr ""
 
 #: src/obj_descr_i18n.c:216
+#, fuzzy
 msgid "grey"
-msgstr "회색"
+msgstr "회색 점액"
 
 #: src/obj_descr_i18n.c:218
+#, fuzzy
 msgid "bright"
-msgstr "밝은"
+msgstr "밝아진다"
 
 #: src/obj_descr_i18n.c:219
+#, fuzzy
 msgid "light"
-msgstr "연한"
+msgstr "기사"
 
 #: src/obj_descr_i18n.c:222
 msgid "drink"
-msgstr "마시다"
+msgstr ""
 
 #: src/obj_descr_i18n.c:223
+#, fuzzy
 msgid "eat"
-msgstr "먹다"
+msgstr "먹었다"
 
 #: src/obj_descr_i18n.c:224
 msgid "throw"
-msgstr "던지다"
+msgstr ""
 
 #: src/obj_descr_i18n.c:225
 msgid "wear"
-msgstr "입다"
+msgstr ""
 
 #: src/obj_descr_i18n.c:226
+#, fuzzy
 msgid "take off"
-msgstr "벗다"
+msgstr "그것을 벗었다%s."
 
 #: src/obj_descr_i18n.c:227
 msgid "put on"
-msgstr "착용하다"
+msgstr ""
 
 #: src/obj_descr_i18n.c:228
+#, fuzzy
 msgid "drop"
-msgstr "떨어뜨리다"
+msgstr "%s{을/를} 떨어뜨렸다!"
 
 #: src/obj_descr_i18n.c:229
+#, fuzzy
 msgid "rub"
-msgstr "문지르다"
+msgstr "루비"
 
 #: src/obj_descr_i18n.c:230
+#, fuzzy
 msgid "grease"
-msgstr "기름칠하다"
+msgstr "그리스 통"
 
 #: src/obj_descr_i18n.c:231
 msgid "use or apply"
@@ -11236,88 +11272,100 @@ msgstr "사용 또는 적용"
 # ============================================================
 # Wizard ranks
 #: src/obj_descr_i18n.c:232
+#, fuzzy
 msgid "invoke"
-msgstr "발동하다"
+msgstr "환술사"
 
 #: src/obj_descr_i18n.c:233
+#, fuzzy
 msgid "charge"
-msgstr "충전하다"
+msgstr "무료다."
 
 #: src/obj_descr_i18n.c:234
 msgid "name"
-msgstr "이름 붙이다"
+msgstr ""
 
 #: src/obj_descr_i18n.c:235
 msgid "call"
-msgstr "부르다"
+msgstr ""
 
 #: src/obj_descr_i18n.c:236
+#, fuzzy
 msgid "remove"
-msgstr "제거하다"
+msgstr "%s{이/가} %s{을/를} 벗었다."
 
 #: src/obj_descr_i18n.c:237
 msgid "open"
-msgstr "열다"
+msgstr ""
 
 #: src/obj_descr_i18n.c:238
+#, fuzzy
 msgid "sacrifice"
-msgstr "바치다"
+msgstr "신성한"
 
 #: src/obj_descr_i18n.c:239
+#, fuzzy
 msgid "write with"
-msgstr "쓰다"
+msgstr "그것을 쓴다!"
 
 #: src/obj_descr_i18n.c:240
+#, fuzzy
 msgid "identify"
-msgstr "감정하다"
+msgstr "삼지창"
 
 #: src/obj_descr_i18n.c:241
 msgid "adjust"
-msgstr "조정하다"
+msgstr ""
 
 #: src/obj_descr_i18n.c:242
+#, fuzzy
 msgid "split"
-msgstr "나누다"
+msgstr "스플린트 메일"
 
 #: src/obj_descr_i18n.c:243
 msgid "stash"
-msgstr "숨기다"
+msgstr ""
 
 #: src/obj_descr_i18n.c:244
+#, fuzzy
 msgid "tip"
-msgstr "기울이다"
+msgstr "통조림"
 
 #: src/obj_descr_i18n.c:245
+#, fuzzy
 msgid "dip"
-msgstr "담그다"
+msgstr "죽음"
 
 #: src/obj_descr_i18n.c:246
+#, fuzzy
 msgid "read"
-msgstr "읽다"
+msgstr "읽었다:"
 
 #: src/obj_descr_i18n.c:247
 msgid "zap"
-msgstr "발사하다"
+msgstr ""
 
 #: src/obj_descr_i18n.c:248
+#, fuzzy
 msgid "quiver"
-msgstr "화살통에 넣다"
+msgstr "빈 화살통%s"
 
 #: src/obj_descr_i18n.c:249
 msgid "fire"
-msgstr "쏘다"
+msgstr ""
 
 #: src/obj_descr_i18n.c:250
 msgid "offer"
-msgstr "제물로 바치다"
+msgstr ""
 
 #: src/obj_descr_i18n.c:251
+#, fuzzy
 msgid "wield"
-msgstr "휘두르다"
+msgstr "장비됨"
 
 #: src/obj_descr_i18n.c:252
 msgid "quaff"
-msgstr "들이켜다"
+msgstr ""
 
 # ============================================================
 # 아이템 이름 (Item Names)
@@ -11364,446 +11412,32 @@ msgstr "당신의 고양이"
 msgid "your dog"
 msgstr "당신의 개"
 
+# ============================================================
+# 인벤토리 메시지 (Inventory Messages)
+# ============================================================
 #: src/obj_descr_i18n.c:271
+#, fuzzy
 msgid "your horse"
-msgstr "당신의 말"
+msgstr "당신의 %s"
 
 #: src/obj_descr_i18n.c:272
+#, fuzzy
 msgid "your large cat"
-msgstr "당신의 큰 고양이"
+msgstr "심장 박동."
 
+# 도구
 #: src/obj_descr_i18n.c:273
+#, fuzzy
 msgid "your large dog"
-msgstr "당신의 큰 개"
+msgstr "큰 상자"
 
+# ============================================================
+# 인벤토리 메시지 (Inventory Messages)
+# ============================================================
 #: src/obj_descr_i18n.c:274
+#, fuzzy
 msgid "your warhorse"
-msgstr "당신의 군마"
-
-# ============================================================
-# 몬스터 이름 (Monster Names)
-# ============================================================
-# 펫/가축
-#: src/obj_descr_i18n.c:278
-msgid "kitten"
-msgstr "새끼 고양이"
-
-#: src/obj_descr_i18n.c:279
-msgid "little dog"
-msgstr "강아지"
-
-#: src/obj_descr_i18n.c:280
-msgid "pony"
-msgstr "조랑말"
-
-#: src/obj_descr_i18n.c:281
-msgid "cat"
-msgstr "고양이"
-
-#: src/obj_descr_i18n.c:282
-msgid "dog"
-msgstr "개"
-
-#: src/obj_descr_i18n.c:283
-msgid "horse"
-msgstr "말"
-
-#: src/obj_descr_i18n.c:284
-msgid "large cat"
-msgstr "큰 고양이"
-
-#: src/obj_descr_i18n.c:285
-msgid "large dog"
-msgstr "큰 개"
-
-#: src/obj_descr_i18n.c:286
-msgid "warhorse"
-msgstr "군마"
-
-# 초반 던전 몬스터
-#: src/obj_descr_i18n.c:289
-msgid "lichen"
-msgstr "이끼"
-
-#: src/obj_descr_i18n.c:290
-msgid "newt"
-msgstr "영원"
-
-#: src/obj_descr_i18n.c:291
-msgid "grid bug"
-msgstr "그리드 버그"
-
-#: src/obj_descr_i18n.c:292
-msgid "jackal"
-msgstr "자칼"
-
-#: src/obj_descr_i18n.c:293
-msgid "fox"
-msgstr "여우"
-
-#: src/obj_descr_i18n.c:294
-msgid "sewer rat"
-msgstr "하수구 쥐"
-
-#: src/obj_descr_i18n.c:295
-msgid "giant rat"
-msgstr "거대 쥐"
-
-#: src/obj_descr_i18n.c:296
-msgid "cave spider"
-msgstr "동굴 거미"
-
-#: src/obj_descr_i18n.c:297
-msgid "yellow mold"
-msgstr "노란 곰팡이"
-
-#: src/obj_descr_i18n.c:298
-msgid "acid blob"
-msgstr "산성 슬라임"
-
-#: src/obj_descr_i18n.c:299
-msgid "goblin"
-msgstr "고블린"
-
-#: src/obj_descr_i18n.c:300
-msgid "hobgoblin"
-msgstr "홉고블린"
-
-#: src/obj_descr_i18n.c:301
-msgid "orc"
-msgstr "오크"
-
-#: src/obj_descr_i18n.c:302
-msgid "hill orc"
-msgstr "언덕 오크"
-
-#: src/obj_descr_i18n.c:303
-msgid "gnome"
-msgstr "노움"
-
-#: src/obj_descr_i18n.c:304
-msgid "dwarf"
-msgstr "드워프"
-
-#: src/obj_descr_i18n.c:305
-msgid "kobold"
-msgstr "코볼트"
-
-#: src/obj_descr_i18n.c:306
-msgid "large kobold"
-msgstr "큰 코볼트"
-
-#: src/obj_descr_i18n.c:307
-msgid "kobold lord"
-msgstr "코볼트 군주"
-
-#: src/obj_descr_i18n.c:308
-msgid "floating eye"
-msgstr "떠다니는 눈"
-
-#: src/obj_descr_i18n.c:309
-msgid "giant bat"
-msgstr "거대 박쥐"
-
-#: src/obj_descr_i18n.c:310
-msgid "monkey"
-msgstr "원숭이"
-
-#: src/obj_descr_i18n.c:311
-msgid "ape"
-msgstr "유인원"
-
-# 언데드
-#: src/obj_descr_i18n.c:314
-msgid "zombie"
-msgstr "좀비"
-
-#: src/obj_descr_i18n.c:315
-msgid "ghoul"
-msgstr "구울"
-
-#: src/obj_descr_i18n.c:316
-msgid "mummy"
-msgstr "미라"
-
-#: src/obj_descr_i18n.c:317
-msgid "skeleton"
-msgstr "스켈레톤"
-
-#: src/obj_descr_i18n.c:318
-msgid "ghost"
-msgstr "유령"
-
-#: src/obj_descr_i18n.c:319
-msgid "wraith"
-msgstr "망령"
-
-#: src/obj_descr_i18n.c:320
-msgid "vampire"
-msgstr "뱀파이어"
-
-#: src/obj_descr_i18n.c:321
-msgid "lich"
-msgstr "리치"
-
-# 일반 몬스터
-#: src/obj_descr_i18n.c:324
-msgid "giant"
-msgstr "거인"
-
-#: src/obj_descr_i18n.c:325
-msgid "troll"
-msgstr "트롤"
-
-#: src/obj_descr_i18n.c:326
-msgid "ogre"
-msgstr "오거"
-
-#: src/obj_descr_i18n.c:327
-msgid "centaur"
-msgstr "켄타우로스"
-
-#: src/obj_descr_i18n.c:328
-msgid "minotaur"
-msgstr "미노타우로스"
-
-#: src/obj_descr_i18n.c:329
-msgid "dragon"
-msgstr "드래곤"
-
-#: src/obj_descr_i18n.c:330
-msgid "red dragon"
-msgstr "빨간 드래곤"
-
-#: src/obj_descr_i18n.c:331
-msgid "blue dragon"
-msgstr "파란 드래곤"
-
-#: src/obj_descr_i18n.c:332
-msgid "green dragon"
-msgstr "초록 드래곤"
-
-#: src/obj_descr_i18n.c:333
-msgid "white dragon"
-msgstr "하얀 드래곤"
-
-#: src/obj_descr_i18n.c:334
-msgid "black dragon"
-msgstr "검은 드래곤"
-
-# 인간형
-#: src/obj_descr_i18n.c:337
-msgid "human"
-msgstr "인간"
-
-#: src/obj_descr_i18n.c:338
-msgid "elf"
-msgstr "엘프"
-
-#: src/obj_descr_i18n.c:339
-msgid "soldier"
-msgstr "병사"
-
-#: src/obj_descr_i18n.c:340
-msgid "guard"
-msgstr "경비병"
-
-#: src/obj_descr_i18n.c:341
-msgid "shopkeeper"
-msgstr "상점 주인"
-
-#: src/obj_descr_i18n.c:342
-msgid "priest"
-msgstr "사제"
-
-#: src/obj_descr_i18n.c:343
-msgid "priestess"
-msgstr "여사제"
-
-#: src/obj_descr_i18n.c:344
-msgid "wizard"
-msgstr "마법사"
-
-#: src/obj_descr_i18n.c:345
-msgid "knight"
-msgstr "기사"
-
-#: src/obj_descr_i18n.c:346
-msgid "samurai"
-msgstr "사무라이"
-
-#: src/obj_descr_i18n.c:347
-msgid "ninja"
-msgstr "닌자"
-
-#: src/obj_descr_i18n.c:348
-msgid "rogue"
-msgstr "도적"
-
-#: src/obj_descr_i18n.c:349
-msgid "ranger"
-msgstr "레인저"
-
-# 특수 몬스터
-#: src/obj_descr_i18n.c:352
-msgid "Medusa"
-msgstr "메두사"
-
-#: src/obj_descr_i18n.c:353
-msgid "mimic"
-msgstr "미믹"
-
-#: src/obj_descr_i18n.c:354
-msgid "nymph"
-msgstr "님프"
-
-#: src/obj_descr_i18n.c:355
-msgid "cockatrice"
-msgstr "코카트리스"
-
-#: src/obj_descr_i18n.c:356
-msgid "mind flayer"
-msgstr "마인드 플레이어"
-
-#: src/obj_descr_i18n.c:357
-msgid "demon"
-msgstr "악마"
-
-#: src/obj_descr_i18n.c:358
-msgid "succubus"
-msgstr "서큐버스"
-
-#: src/obj_descr_i18n.c:359
-msgid "incubus"
-msgstr "인큐버스"
-
-# 뱀과 벌레
-#: src/obj_descr_i18n.c:362
-msgid "snake"
-msgstr "뱀"
-
-#: src/obj_descr_i18n.c:363
-msgid "pit viper"
-msgstr "구렁이"
-
-#: src/obj_descr_i18n.c:364
-msgid "python"
-msgstr "비단뱀"
-
-#: src/obj_descr_i18n.c:365
-msgid "cobra"
-msgstr "코브라"
-
-#: src/obj_descr_i18n.c:366
-msgid "worm"
-msgstr "벌레"
-
-#: src/obj_descr_i18n.c:367
-msgid "long worm"
-msgstr "긴 벌레"
-
-#: src/obj_descr_i18n.c:368
-msgid "purple worm"
-msgstr "보라색 벌레"
-
-# ============================================================
-# 무기 이름 (Weapon Names)
-# ============================================================
-#: src/obj_descr_i18n.c:151
-msgid "long sword"
-msgstr "장검"
-
-#: src/obj_descr_i18n.c:152
-msgid "short sword"
-msgstr "단검"
-
-#: src/obj_descr_i18n.c:153
-msgid "broadsword"
-msgstr "브로드소드"
-
-#: src/obj_descr_i18n.c:154
-msgid "two-handed sword"
-msgstr "양손검"
-
-#: src/obj_descr_i18n.c:155
-msgid "scimitar"
-msgstr "시미터"
-
-#: src/obj_descr_i18n.c:156
-msgid "katana"
-msgstr "카타나"
-
-#: src/obj_descr_i18n.c:157
-msgid "elven broadsword"
-msgstr "엘프 브로드소드"
-
-#: src/obj_descr_i18n.c:158
-msgid "orcish short sword"
-msgstr "오크 단검"
-
-#: src/obj_descr_i18n.c:159
-msgid "dwarvish short sword"
-msgstr "드워프 단검"
-
-#: src/obj_descr_i18n.c:160
-msgid "silver saber"
-msgstr "은 세이버"
-
-#: src/obj_descr_i18n.c:161
-msgid "battle-axe"
-msgstr "전투도끼"
-
-#: src/obj_descr_i18n.c:162
-msgid "war hammer"
-msgstr "워해머"
-
-#: src/obj_descr_i18n.c:163
-msgid "morning star"
-msgstr "모닝스타"
-
-#: src/obj_descr_i18n.c:164
-msgid "elven dagger"
-msgstr "엘프 단도"
-
-#: src/obj_descr_i18n.c:165
-msgid "orcish dagger"
-msgstr "오크 단도"
-
-#: src/obj_descr_i18n.c:166
-msgid "athame"
-msgstr "아타미"
-
-#: src/obj_descr_i18n.c:167
-msgid "crysknife"
-msgstr "크리스나이프"
-
-#: src/obj_descr_i18n.c:168
-msgid "stiletto"
-msgstr "스틸레토"
-
-#: src/obj_descr_i18n.c:169
-msgid "elven arrow"
-msgstr "엘프 화살"
-
-#: src/obj_descr_i18n.c:170
-msgid "orcish arrow"
-msgstr "오크 화살"
-
-#: src/obj_descr_i18n.c:171
-msgid "silver arrow"
-msgstr "은 화살"
-
-#: src/obj_descr_i18n.c:172
-msgid "elven bow"
-msgstr "엘프 활"
-
-#: src/obj_descr_i18n.c:173
-msgid "orcish bow"
-msgstr "오크 활"
-
-#: src/obj_descr_i18n.c:174
-msgid "yumi"
-msgstr "유미"
+msgstr "당신의 %s"
 
 #: src/objnam.c:3597
 #, c-format
@@ -12530,7 +12164,7 @@ msgstr "지원 정보."
 #: src/pager.c:2846
 #, c-format
 msgid "%s-specific help and commands."
-msgstr "%s 전용 도움말 및 명령어."
+msgstr ""
 
 #: src/pager.c:2848
 msgid "List of wizard-mode commands."
@@ -15710,7 +15344,8 @@ msgstr "투명한 손님은 환영하지 않습니다!"
 #: src/shk.c:746
 #, c-format
 msgid "%s stands firm as if %s knows you are there."
-msgstr "%s{이/가} 마치 %s 당신이 있다는 걸 아는 듯 굳건히 서 있다."
+msgstr ""
+"%s{이/가} 마치 당신이 거기 있다는 것을 %s 알고 있는 것처럼 굳건히 서 있다."
 
 #: src/shk.c:757
 #, c-format
@@ -15768,7 +15403,7 @@ msgstr "%s%s{을/를} 밖에 두시오."
 #: src/shk.c:830
 #, c-format
 msgid "%s %s to let you in with your %s%s."
-msgstr "%s{이/가} 당신의 %s%s{과/와} 함께 들어가게 %s."
+msgstr "%s{이/가} 당신의 %s%s{와/과} 함께 들어가게 %s."
 
 #: src/shk.c:832
 msgid "is hesitant"
@@ -23144,6 +22779,33 @@ msgstr "\"%s\"{을/를} 읽기용으로 열 수 없다!"
 #~ msgstr "아니오"
 
 # ============================================================
+# 몬스터 이름 (Monster Names) - 샘플
+# ============================================================
+#~ msgid "goblin"
+#~ msgstr "고블린"
+
+#~ msgid "orc"
+#~ msgstr "오크"
+
+#~ msgid "troll"
+#~ msgstr "트롤"
+
+#~ msgid "dragon"
+#~ msgstr "용"
+
+#~ msgid "lich"
+#~ msgstr "리치"
+
+#~ msgid "vampire"
+#~ msgstr "뱀파이어"
+
+#~ msgid "zombie"
+#~ msgstr "좀비"
+
+#~ msgid "ghost"
+#~ msgstr "유령"
+
+# ============================================================
 # 아이템 이름 (Item Names) - 샘플
 # ============================================================
 # ============================================================
@@ -23612,6 +23274,9 @@ msgstr "\"%s\"{을/를} 읽기용으로 열 수 없다!"
 # ============================================================
 # 종족 형용사 (Race Adjectives)
 # ============================================================
+#~ msgid "human"
+#~ msgstr "인간"
+
 #~ msgid "elven"
 #~ msgstr "엘프"
 
@@ -23664,6 +23329,15 @@ msgstr "\"%s\"{을/를} 읽기용으로 열 수 없다!"
 #~ msgid " T:%s"
 #~ msgstr " T:%s"
 
+#~ msgid "elven arrow"
+#~ msgstr "엘프 화살"
+
+#~ msgid "orcish arrow"
+#~ msgstr "오크 화살"
+
+#~ msgid "silver arrow"
+#~ msgstr "은 화살"
+
 #~ msgid "ya"
 #~ msgstr "야(矢)"
 
@@ -23694,17 +23368,62 @@ msgstr "\"%s\"{을/를} 읽기용으로 열 수 없다!"
 #~ msgid "javelin"
 #~ msgstr "투창"
 
+#~ msgid "elven dagger"
+#~ msgstr "엘프 단검"
+
+#~ msgid "orcish dagger"
+#~ msgstr "오크 단검"
+
 #~ msgid "silver dagger"
 #~ msgstr "은 단검"
+
+#~ msgid "athame"
+#~ msgstr "아테메"
 
 #~ msgid "scalpel"
 #~ msgstr "메스"
 
+#~ msgid "stiletto"
+#~ msgstr "스틸레토"
+
 #~ msgid "elven short sword"
 #~ msgstr "엘프 단검"
 
+#~ msgid "orcish short sword"
+#~ msgstr "오크 단검"
+
+#~ msgid "dwarvish short sword"
+#~ msgstr "드워프 단검"
+
+#~ msgid "scimitar"
+#~ msgstr "시미터"
+
+#~ msgid "silver saber"
+#~ msgstr "은 세이버"
+
+#~ msgid "broadsword"
+#~ msgstr "브로드소드"
+
+#~ msgid "elven broadsword"
+#~ msgstr "엘프 브로드소드"
+
+#~ msgid "long sword"
+#~ msgstr "장검"
+
+#~ msgid "two-handed sword"
+#~ msgstr "양손검"
+
+#~ msgid "katana"
+#~ msgstr "카타나"
+
 #~ msgid "tsurugi"
 #~ msgstr "츠루기"
+
+#~ msgid "battle-axe"
+#~ msgstr "전투도끼"
+
+#~ msgid "morning star"
+#~ msgstr "모닝스타"
 
 #~ msgid "rubber hose"
 #~ msgstr "고무 호스"
@@ -23755,6 +23474,15 @@ msgstr "\"%s\"{을/를} 읽기용으로 열 수 없다!"
 # 무기 - 채찍
 #~ msgid "bullwhip"
 #~ msgstr "채찍"
+
+#~ msgid "elven bow"
+#~ msgstr "엘프 활"
+
+#~ msgid "orcish bow"
+#~ msgstr "오크 활"
+
+#~ msgid "yumi"
+#~ msgstr "유미"
 
 #~ msgid "sling"
 #~ msgstr "투석기"
