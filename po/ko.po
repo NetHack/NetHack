@@ -11428,6 +11428,29 @@ msgid "For a moment, you feel %s in your %s, but it disappears!"
 msgstr "잠시 %s에서 %s{을/를} 느꼈지만, 사라졌다!"
 
 # ============================================================
+# 옵션 카테고리 (Option Categories)
+# ============================================================
+#: src/options.c:133
+msgid "General"
+msgstr "일반"
+
+#: src/options.c:133
+msgid "Behavior"
+msgstr "동작"
+
+#: src/options.c:133
+msgid "Map"
+msgstr "지도"
+
+#: src/options.c:133
+msgid "Status"
+msgstr "상태"
+
+#: src/options.c:133
+msgid "Advanced"
+msgstr "고급"
+
+# ============================================================
 # 옵션 설명 (Option Descriptions)
 # ============================================================
 #: src/options.c:168

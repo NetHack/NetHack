@@ -1340,6 +1340,10 @@ process_menu_window(winid window, struct WinDesc *cw)
     char *cp, *rp, resp[QBUFSZ], gacc[QBUFSZ], *msave, *morestr, really_morc;
 #define MENU_EXPLICIT_CHOICE 0x7f /* pseudo menu manipulation char */
 
+    /* Ensure graphics mode is off before displaying menu - important for
+     * UTF-8 text which could be corrupted if graphics mode is on */
+    end_glyphout();
+
     curr_page = page_lines = 0;
     page_start = page_end = 0;
     msave = cw->morestr; /* save the morestr */
@@ -1777,6 +1781,10 @@ process_text_window(winid window, struct WinDesc *cw)
     int i, n, attr;
     boolean linestart;
     char *cp;
+
+    /* Ensure graphics mode is off before displaying text - important for
+     * UTF-8 text which could be corrupted if graphics mode is on */
+    end_glyphout();
 
     for (n = 0, i = 0; i < cw->maxrow; i++) {
         HUPSKIP();

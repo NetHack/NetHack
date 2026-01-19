@@ -130,7 +130,7 @@ static boolean opt_set_in_config[OPTCOUNT];
 static char *roleoptvals[MAX_ROLEOPT][num_opt_phases];
 
 static NEARDATA const char *OptS_type[OptS_Advanced+1] = {
-    "General", "Behavior", "Map", "Status", "Advanced"
+    N_("General"), N_("Behavior"), N_("Map"), N_("Status"), N_("Advanced")
 };
 
 static const char def_inv_order[MAXOCLASSES] = {
@@ -8629,7 +8629,7 @@ doset_simple_menu(void)
     for (section = OptS_General; section < OptS_Advanced; section++) {
         any = cg.zeroany;
         add_menu_str(tmpwin, "");
-        Sprintf(buf, " %-30s ", OptS_type[section]);
+        Sprintf(buf, " %-30s ", _(OptS_type[section]));
         add_menu_heading(tmpwin, buf);
         for (i = 0; (name = allopt[i].name) != 0; i++) {
             if (allopt[i].section != section)
