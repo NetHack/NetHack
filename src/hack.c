@@ -469,15 +469,19 @@ moverock_core(coordxy sx, coordxy sy)
                     map_invisible(rx, ry);
                 }
                 if (flags.verbose) {
-                    char you_or_steed[BUFSZ];
-
-                    Strcpy(you_or_steed,
-                           u.usteed ? y_monnam(u.usteed) : "you");
-                    pline(_("%s%s cannot move %s."),
-                          deliver_part1 ? "Perhaps that's why " : "",
-                          deliver_part1 ? you_or_steed
-                                        : upstart(you_or_steed),
-                          deliver_part1 ? "it" : the(xname(otmp)));
+                    if (deliver_part1) {
+                        if (u.usteed)
+                            pline(_("Perhaps that's why %s cannot move it."),
+                                  y_monnam(u.usteed));
+                        else
+                            pline(_("Perhaps that's why you cannot move it."));
+                    } else {
+                        if (u.usteed)
+                            pline(_("%s cannot move %s."),
+                                  upstart(y_monnam(u.usteed)), the(xname(otmp)));
+                        else
+                            pline(_("You cannot move %s."), the(xname(otmp)));
+                    }
                 }
                 return cannot_push(otmp, sx, sy);
             }

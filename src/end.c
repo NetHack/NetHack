@@ -625,11 +625,13 @@ disclose(int how, boolean taken)
     boolean ask = FALSE;
 
     if (gi.invent && !done_stopprint) {
-        if (taken)
-            Sprintf(qbuf, "Do you want to see what you had when you %s?",
-                    (how == QUIT) ? "quit" : "died");
-        else
-            Strcpy(qbuf, "Do you want your possessions identified?");
+        if (taken) {
+            if (how == QUIT)
+                Strcpy(qbuf, _("Do you want to see what you had when you quit?"));
+            else
+                Strcpy(qbuf, _("Do you want to see what you had when you died?"));
+        } else
+            Strcpy(qbuf, _("Do you want your possessions identified?"));
 
         ask = should_query_disclose_option('i', &defquery);
         c = ask ? yn_function(qbuf, ynqchars, defquery, TRUE) : defquery;
@@ -646,7 +648,7 @@ disclose(int how, boolean taken)
 
     if (!done_stopprint) {
         ask = should_query_disclose_option('a', &defquery);
-        c = ask ? yn_function("Do you want to see your attributes?", ynqchars,
+        c = ask ? yn_function(_("Do you want to see your attributes?"), ynqchars,
                               defquery, TRUE)
                 : defquery;
         if (c == 'y')
@@ -671,14 +673,10 @@ disclose(int how, boolean taken)
         if (should_query_disclose_option('c', &defquery)) {
             int acnt = count_achievements();
 
-            Sprintf(qbuf, "Do you want to see your conduct%s?",
-                    /* this was distinguishing between one achievement and
-                       multiple achievements, but "conduct and achievement"
-                       looked strange if multiple conducts got shown (which
-                       is usual for an early game death); we could switch
-                       to plural vs singular for conducts but the less
-                       specific "conduct and achievements" is sufficient */
-                    (acnt > 0) ? " and achievements" : "");
+            if (acnt > 0)
+                Strcpy(qbuf, _("Do you want to see your conduct and achievements?"));
+            else
+                Strcpy(qbuf, _("Do you want to see your conduct?"));
             c = yn_function(qbuf, ynqchars, defquery, TRUE);
         } else {
             c = defquery;
@@ -691,7 +689,7 @@ disclose(int how, boolean taken)
 
     if (!done_stopprint) {
         ask = should_query_disclose_option('o', &defquery);
-        c = ask ? yn_function("Do you want to see the dungeon overview?",
+        c = ask ? yn_function(_("Do you want to see the dungeon overview?"),
                               ynqchars, defquery, TRUE)
                 : defquery;
         if (c == 'y')

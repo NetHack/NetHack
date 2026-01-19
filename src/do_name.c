@@ -1019,9 +1019,21 @@ x_monnam(
         Strcpy(buf2, "your ");
         break;
     case ARTICLE_THE:
+#ifdef ENABLE_NLS
+        if (is_korean_locale()) {
+            /* Korean: skip "the" article - it's not natural in Korean */
+            Strcpy(buf2, "");
+        } else
+#endif
         Strcpy(buf2, "the ");
         break;
     case ARTICLE_A:
+#ifdef ENABLE_NLS
+        if (is_korean_locale()) {
+            /* Korean: skip "a/an" article - it's not natural in Korean */
+            Strcpy(buf2, "");
+        } else
+#endif
         /* avoid an() here */
         (void) just_an(buf2, buf); /* copy "a " or "an " into buf2[] */
         break;

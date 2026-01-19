@@ -481,7 +481,7 @@ pick_lock(
                           && (flags.autounlock & AUTOUNLOCK_APPLY_KEY) != 0) {
                     c = 'q';
                     if (pick != &dummypick) {
-                        Sprintf(qbuf, "Unlock it with %s?", yname(pick));
+                        Sprintf(qbuf, _("Unlock it with %s?"), yname(pick));
                         c = ynq(qbuf);
                     }
                     if (c != 'y')

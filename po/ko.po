@@ -5799,7 +5799,38 @@ msgstr "스스로에게 산을 뿜었다..."
 
 #: src/end.c:98
 msgid "Switch from the tutorial back to regular play?"
-msgstr ""
+msgstr "튜토리얼에서 일반 게임으로 전환하시겠습니까?"
+
+# ============================================================
+# 게임 종료 질문 (Game End Questions)
+# ============================================================
+#: src/end.c:630
+msgid "Do you want to see what you had when you quit?"
+msgstr "종료했을 때 가지고 있던 것을 보시겠습니까?"
+
+#: src/end.c:632
+msgid "Do you want to see what you had when you died?"
+msgstr "죽었을 때 가지고 있던 것을 보시겠습니까?"
+
+#: src/end.c:634
+msgid "Do you want your possessions identified?"
+msgstr "소지품을 감정하시겠습니까?"
+
+#: src/end.c:651
+msgid "Do you want to see your attributes?"
+msgstr "능력치를 보시겠습니까?"
+
+#: src/end.c:677
+msgid "Do you want to see your conduct and achievements?"
+msgstr "행동 수칙과 업적을 보시겠습니까?"
+
+#: src/end.c:679
+msgid "Do you want to see your conduct?"
+msgstr "행동 수칙을 보시겠습니까?"
+
+#: src/end.c:692
+msgid "Do you want to see the dungeon overview?"
+msgstr "던전 개요를 보시겠습니까?"
 
 # ============================================================
 # 게임 UI 메시지 (Game UI Messages)
@@ -6817,10 +6848,24 @@ msgstr "반대편에 %s{이/가} 있다."
 msgid "a monster behind %s."
 msgstr "%s 뒤에 괴물이 있다."
 
-#: src/hack.c:476
+#: src/hack.c:474
 #, c-format
-msgid "%s%s cannot move %s."
-msgstr "%s%s{은/는} %s{을/를} 움직일 수 없다."
+msgid "Perhaps that's why %s cannot move it."
+msgstr "아마 그래서 %s{이/가} 그것을 움직일 수 없는 것 같다."
+
+#: src/hack.c:477
+msgid "Perhaps that's why you cannot move it."
+msgstr "아마 그래서 당신이 그것을 움직일 수 없는 것 같다."
+
+#: src/hack.c:480
+#, c-format
+msgid "%s cannot move %s."
+msgstr "%s{은/는} %s{을/를} 움직일 수 없다."
+
+#: src/hack.c:483
+#, c-format
+msgid "You cannot move %s."
+msgstr "%s{을/를} 움직일 수 없다."
 
 #: src/hack.c:510
 #, c-format
@@ -7940,6 +7985,11 @@ msgstr "%s%s{이/가} 부러졌다!"
 #: src/lock.c:247
 msgid "succeed in forcing the lock."
 msgstr "자물쇠 강제 열기에 성공했다."
+
+#: src/lock.c:484
+#, c-format
+msgid "Unlock it with %s?"
+msgstr "%s{으로/로} 열겠습니까?"
 
 #: src/lock.c:382
 msgid "pick"
@@ -11179,7 +11229,7 @@ msgstr "그리스 통"
 
 #: src/obj_descr_i18n.c:231
 msgid "use or apply"
-msgstr ""
+msgstr "사용 또는 적용"
 
 # ============================================================
 # 역할 계급 이름 (Role Rank Names)
@@ -22675,12 +22725,6 @@ msgstr "\"%s\"{을/를} 읽기용으로 열 수 없다!"
 
 #~ msgid "You were killed by %s."
 #~ msgstr "%s에게 죽었다."
-
-#~ msgid "Do you want your possessions identified?"
-#~ msgstr "소지품을 감정하겠습니까?"
-
-#~ msgid "Do you want to see your attributes?"
-#~ msgstr "능력치를 보시겠습니까?"
 
 # ============================================================
 # 시스템 메시지 (System Messages)
