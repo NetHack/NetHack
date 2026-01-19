@@ -1025,43 +1025,42 @@ polymon(int mntmp)
     /* the explanation of '#monster' used to be shown sooner, but there are
        possible fatalities above and it isn't useful unless hero survives */
     if (flags.verbose) {
-        static const char use_thec[] = "Use the command #%s to %s.";
-        static const char monsterc[] = "monster";
         struct permonst *uptr = gy.youmonst.data;
         boolean might_hide = (is_hider(uptr) || hides_under(uptr));
 
         if (can_breathe(uptr))
-            pline(use_thec, monsterc, "use your breath weapon");
+            pline(_("Use the command #monster to use your breath weapon."));
         if (attacktype(uptr, AT_SPIT))
-            pline(use_thec, monsterc, "spit venom");
+            pline(_("Use the command #monster to spit venom."));
         if (uptr->mlet == S_NYMPH)
-            pline(use_thec, monsterc, "remove an iron ball");
+            pline(_("Use the command #monster to remove an iron ball."));
         if (attacktype(uptr, AT_GAZE))
-            pline(use_thec, monsterc, "gaze at monsters");
+            pline(_("Use the command #monster to gaze at monsters."));
         if (might_hide && webmaker(uptr))
-            pline(use_thec, monsterc, "hide or to spin a web");
+            pline(_("Use the command #monster to hide or to spin a web."));
         else if (might_hide)
-            pline(use_thec, monsterc, "hide");
+            pline(_("Use the command #monster to hide."));
         else if (webmaker(uptr))
-            pline(use_thec, monsterc, "spin a web");
+            pline(_("Use the command #monster to spin a web."));
         if (is_were(uptr))
-            pline(use_thec, monsterc, "summon help");
+            pline(_("Use the command #monster to summon help."));
         if (u.umonnum == PM_GREMLIN)
-            pline(use_thec, monsterc, "multiply in a fountain");
+            pline(_("Use the command #monster to multiply in a fountain."));
         if (is_unicorn(uptr))
-            pline(use_thec, monsterc, "use your horn");
+            pline(_("Use the command #monster to use your horn."));
         if (is_mind_flayer(uptr))
-            pline(use_thec, monsterc, "emit a mental blast");
+            pline(_("Use the command #monster to emit a mental blast."));
         if (uptr->msound == MS_SHRIEK) /* worthless, actually */
-            pline(use_thec, monsterc, "shriek");
+            pline(_("Use the command #monster to shriek."));
         if (is_vampire(uptr) || is_vampshifter(&gy.youmonst))
-            pline(use_thec, monsterc, "change shape");
+            pline(_("Use the command #monster to change shape."));
 
         if (lays_eggs(uptr) && flags.female
             && !(uptr == &mons[PM_GIANT_EEL]
                  || uptr == &mons[PM_ELECTRIC_EEL]))
-            pline(use_thec, "sit",
-                  eggs_in_water(uptr) ? "spawn in the water" : "lay an egg");
+            pline(eggs_in_water(uptr)
+                  ? _("Use the command #sit to spawn in the water.")
+                  : _("Use the command #sit to lay an egg."));
     }
     return 1;
 }

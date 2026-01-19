@@ -3795,10 +3795,10 @@ stolen_value(
 
         if (!silent) {
             if (canseemon(shkp)) {
-                Norep("%s booms: \"%s, you are a thief!\"",
+                Norep(_("%s booms: \"%s, you are a thief!\""),
                       Shknam(shkp), svp.plname);
             } else if (!Deaf) {
-                Norep("You hear a scream, \"Thief!\"");  /* Deaf-aware */
+                Norep(_("You hear a scream, \"Thief!\""));  /* Deaf-aware */
             }
         }
         hot_pursuit(shkp);
@@ -4161,7 +4161,7 @@ doinvbill(
     }
 
     datawin = create_nhwindow(NHW_MENU);
-    putstr(datawin, 0, "Unpaid articles already used up:");
+    putstr(datawin, 0, _("Unpaid articles already used up:"));
     putstr(datawin, 0, "");
 
     totused = 0L;
@@ -4765,7 +4765,7 @@ repair_damage(
         if (inside_shop(u.ux, u.uy) == ESHK(shkp)->shoproom)
             You_feel(_("more claustrophobic than before."));
         else if (!Deaf && !rn2(10))
-            Norep("The dungeon acoustics noticeably change.");
+            Norep(_("The dungeon acoustics noticeably change."));
     }
 
     if (stop_picking)
@@ -5354,7 +5354,7 @@ price_quote(struct obj *first_obj)
         return;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    putstr(tmpwin, 0, "Fine goods for sale:");
+    putstr(tmpwin, 0, _("Fine goods for sale:"));
     putstr(tmpwin, 0, "");
     for (otmp = first_obj; otmp; otmp = otmp->nexthere) {
         if (otmp->oclass == COIN_CLASS)

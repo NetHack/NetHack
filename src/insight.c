@@ -2098,7 +2098,7 @@ show_conduct(int final)
 
     /* Create the conduct window */
     ge.en_win = create_nhwindow(NHW_MENU);
-    putstr(ge.en_win, 0, "Voluntary challenges:");
+    putstr(ge.en_win, 0, _("Voluntary challenges:"));
 
     if (u.uroleplay.blind)
         you_have_been("blind from birth");
@@ -2870,7 +2870,7 @@ list_vanquished(char defquery, boolean ask)
                             && ntypes > 1);
 
             klwin = create_nhwindow(NHW_MENU);
-            putstr(klwin, 0, "Vanquished creatures:");
+            putstr(klwin, 0, _("Vanquished creatures:"));
             if (!dumping)
                 putstr(klwin, 0, "");
 
@@ -2963,7 +2963,7 @@ list_vanquished(char defquery, boolean ask)
         pline(_("No creatures have been vanquished."));
 #ifdef DUMPLOG
     } else if (dumping) {
-        putstr(0, 0, "No creatures were vanquished."); /* not pline() */
+        putstr(0, 0, _("No creatures were vanquished.")); /* not pline() */
 #endif
     }
 }
@@ -3145,7 +3145,7 @@ list_genocided(char defquery, boolean ask)
         pline(_("No creatures have been genocided%s."), genoing ? " yet" : "");
 #ifdef DUMPLOG
     } else if (dumping) { /* 'gameover' is True if we make it here */
-        putstr(0, 0, "No species were genocided or became extinct.");
+        putstr(0, 0, _("No species were genocided or became extinct."));
 #endif
     }
 }

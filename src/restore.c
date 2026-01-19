@@ -855,7 +855,7 @@ dorecover(NHFILE *nhfp)
     dotcnt = 0;
     dotrow = 2;
     if (!WINDOWPORT(X11))
-        putstr(WIN_MAP, 0, "Restoring:");
+        putstr(WIN_MAP, 0, _("Restoring:"));
 #endif
     restoreinfo.mread_flags = 1; /* return despite error */
     while (1) {

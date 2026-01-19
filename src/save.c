@@ -151,7 +151,7 @@ dosave0(void)
     dotrow = 2;
     curs(WIN_MAP, 1, 1);
     if (!WINDOWPORT(X11))
-        putstr(WIN_MAP, 0, "Saving:");
+        putstr(WIN_MAP, 0, _("Saving:"));
 #endif
     nhfp->mode = WRITING | FREEING;
     store_version(nhfp);

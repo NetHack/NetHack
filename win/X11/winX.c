@@ -57,6 +57,7 @@
 #define X11_BUILD
 #include "hack.h"
 #undef X11_BUILD
+#include "i18n.h"
 
 #include "winX.h"
 #include "dlb.h"
@@ -2083,7 +2084,7 @@ X11_display_file(const char *str, boolean complain)
     fp = dlb_fopen(str, RDTMODE);
     if (!fp) {
         if (complain)
-            pline("Cannot open %s.  Sorry.", str);
+            pline(_("Cannot open %s.  Sorry."), str);
         return; /* it doesn't exist, ignore */
     }
 

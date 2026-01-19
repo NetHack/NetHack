@@ -850,12 +850,12 @@ cuss(struct monst *mtmp)
                       ROLL_FROM(random_insult));
         } else if (u.uhp < 5 && !rn2(2)) { /* Panic */
             SetVoice(mtmp, 0, 80, 0);
-            verbalize(rn2(2) ? "Even now thy life force ebbs, %s!"
-                             : "Savor thy breath, %s, it be thy last!",
+            verbalize(rn2(2) ? _("Even now thy life force ebbs, %s!")
+                             : _("Savor thy breath, %s, it be thy last!"),
                       ROLL_FROM(random_insult));
         } else if (mtmp->mhp < 5 && !rn2(2)) { /* Parthian shot */
             SetVoice(mtmp, 0, 80, 0);
-            verbalize(rn2(2) ? "I shall return." : "I'll be back.");
+            verbalize(rn2(2) ? _("I shall return.") : _("I'll be back."));
         } else {
             SetVoice(mtmp, 0, 80, 0);
             verbalize(_("%s %s!"),

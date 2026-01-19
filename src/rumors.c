@@ -671,10 +671,10 @@ outoracle(boolean special, boolean delphi)
         if (delphi)
             putstr(tmpwin, 0,
                    special
-                     ? "The Oracle scornfully takes all your gold and says:"
-                     : "The Oracle meditates for a moment and then intones:");
+                     ? _("The Oracle scornfully takes all your gold and says:")
+                     : _("The Oracle meditates for a moment and then intones:"));
         else
-            putstr(tmpwin, 0, "The message reads:");
+            putstr(tmpwin, 0, _("The message reads:"));
         putstr(tmpwin, 0, "");
 
         while (dlb_fgets(line, COLNO, oracles) && strcmp(line, "---\n")) {

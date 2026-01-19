@@ -5,6 +5,7 @@
 
 #include "hack.h"
 #include "ko_postpos.h"  /* for utf8_char_len */
+#include "i18n.h"        /* for utf8_char_width */
 
 #ifdef TTY_GRAPHICS
 
@@ -132,8 +133,11 @@ redotoplin(const char *str)
             g_putch((int) *str++);
             ttyDisplay->curx++;
         }
-        end_glyphout(); /* in case message printed during graphics output */
     }
+    /* Always call end_glyphout() to ensure graphics mode is off before
+     * outputting text - this is especially important for UTF-8 text
+     * which could be misinterpreted if graphics mode is still on */
+    end_glyphout();
     putsyms(str);
     cl_end();
     ttyDisplay->toplin = TOPLINE_NEED_MORE;
@@ -197,6 +201,7 @@ addtopl(const char *s)
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
     tty_curs(BASE_WINDOW, cw->curx + 1, cw->cury);
+    end_glyphout(); /* ensure graphics mode is off for UTF-8 text */
     putsyms(s);
     cl_end();
     ttyDisplay->toplin = TOPLINE_NEED_MORE;
@@ -362,8 +367,49 @@ topl_putsym(char c)
 void
 putsyms(const char *str)
 {
-    while (*str)
-        topl_putsym(*str++);
+    struct WinDesc *cw = wins[WIN_MESSAGE];
+    int charlen, charwidth;
+
+    if (cw == (struct WinDesc *) 0)
+        panic("Putsym window MESSAGE nonexistent");
+
+    while (*str) {
+        /* Handle special characters via topl_putsym */
+        if (*str == '\n' || *str == '\b') {
+            topl_putsym(*str++);
+            continue;
+        }
+
+        /* Get the UTF-8 character length and display width */
+        charlen = utf8_char_len((unsigned char)*str);
+        charwidth = utf8_char_width(str);
+
+        /* Check if we need to wrap to the next line */
+        if (ttyDisplay->curx + charwidth > CO - 1) {
+            /* Wrap to next line */
+            cl_end();
+            ttyDisplay->curx = 0;
+            ttyDisplay->cury++;
+            cw->cury = ttyDisplay->cury;
+#ifdef WIN32CON
+            (void) putchar('\n');
+#endif
+            cw->curx = ttyDisplay->curx;
+            cl_end();
+#ifndef WIN32CON
+            (void) putchar('\n');
+#endif
+        }
+
+        /* Output all bytes of the UTF-8 character */
+        while (charlen-- > 0 && *str) {
+            (void) putchar(*str++);
+        }
+
+        /* Increment curx by the display width */
+        ttyDisplay->curx += charwidth;
+        cw->curx = ttyDisplay->curx;
+    }
 }
 
 static void

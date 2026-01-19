@@ -361,12 +361,12 @@ ghitm(struct monst *mtmp, struct obj *gold)
                could try fighting, then weasel out of being
                killed by throwing his/her gold when losing. */
             SetVoice(mtmp, 0, 80, 0);
-            verbalize(umoney ? "Drop the rest and follow me."
+            verbalize(umoney ? _("Drop the rest and follow me.")
                       : hidden_gold(TRUE)
-                        ? "You still have hidden gold.  Drop it now."
+                        ? _("You still have hidden gold.  Drop it now.")
                         : mtmp->mpeaceful
-                          ? "I'll take care of that; please move along."
-                          : "I'll take that; now get moving.");
+                          ? _("I'll take care of that; please move along.")
+                          : _("I'll take that; now get moving."));
         } else if (is_mercenary(mtmp->data)) {
             boolean was_angry = !mtmp->mpeaceful;
             long goldreqd = 0L;

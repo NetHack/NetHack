@@ -1814,9 +1814,10 @@ process_text_window(winid window, struct WinDesc *cw)
                  * column limit - we must output the complete character */
                 if (((unsigned char) *cp & 0xC0) != 0x80) {
                     /* This is a new character (ASCII or UTF-8 start byte) */
-                    if ((int) ttyDisplay->curx >= (int) ttyDisplay->cols)
+                    int charwidth = utf8_char_width(cp);
+                    if ((int) ttyDisplay->curx + charwidth > (int) ttyDisplay->cols)
                         break;  /* stop before starting a new character */
-                    ttyDisplay->curx++;
+                    ttyDisplay->curx += charwidth;
                 }
                 /* message recall for msg_window:full/combination/reverse
                    might have output from '/' in it (see redotoplin()) */
@@ -2467,7 +2468,7 @@ tty_display_file(
 
         if (fd < 0) {
             if (complain)
-                pline("Cannot open %s.", fname);
+                pline(_("Cannot open %s."), fname);
             else /* [is this refresh actually necessary?] */
                 docrt();
             return;
@@ -2508,7 +2509,7 @@ tty_display_file(
                 tty_wait_synch(); /* "Hit <space> to continue: " */
                 if (u.ux) /* if hero is on map, refresh the screen */
                     docrt();
-                pline("Cannot open \"%s\".", fname);
+                pline(_("Cannot open \"%s\"."), fname);
             }
         } else {
             winid datawin = tty_create_nhwindow(NHW_TEXT);
@@ -2988,9 +2989,9 @@ ttyinv_create_window(int newid, struct WinDesc *newwin)
                    &newwin->maxrow)) {
         tty_destroy_nhwindow(newid);
         WIN_INVEN = WIN_ERR;
-        pline("%s.", "tty perm_invent could not be enabled");
-        pline("tty perm_invent needs a terminal that is at least %dx%d, "
-              "yours is %dx%d.",
+        pline(_("tty perm_invent could not be enabled."));
+        pline(_("tty perm_invent needs a terminal that is at least %dx%d, "
+              "yours is %dx%d."),
               (int) (minrow + 1 + ROWNO + StatusRows()), tty_perminv_mincol,
               ttyDisplay->rows, ttyDisplay->cols);
         tty_wait_synch();

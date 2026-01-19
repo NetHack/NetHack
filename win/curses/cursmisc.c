@@ -5,6 +5,7 @@
 
 #include "curses.h"
 #include "hack.h"
+#include "i18n.h"
 #include "wincurs.h"
 #include "cursmisc.h"
 #include "func_tab.h"
@@ -670,7 +671,7 @@ curses_view_file(const char *filename, boolean must_exist)
 
     if (fp == NULL) {
         if (must_exist)
-            pline("Cannot open \"%s\" for reading!", filename);
+            pline(_("Cannot open \"%s\" for reading!"), filename);
         return;
     }
 

@@ -140,7 +140,7 @@ genl_outrip(winid tmpwin, int how, time_t when)
 
 #ifdef DUMPLOG
     if (tmpwin == 0)
-        dump_forward_putstr(0, 0, "Game over:", TRUE);
+        dump_forward_putstr(0, 0, _("Game over:"), TRUE);
     else
 #endif
         putstr(tmpwin, 0, "");

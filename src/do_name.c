@@ -1010,6 +1010,12 @@ x_monnam(
     buf2[0] = '\0'; /* lint suppression */
     switch (article) {
     case ARTICLE_YOUR:
+#ifdef ENABLE_NLS
+        if (is_korean_locale()) {
+            /* Korean: "당신의 " prefix */
+            Strcpy(buf2, "당신의 ");
+        } else
+#endif
         Strcpy(buf2, "your ");
         break;
     case ARTICLE_THE:

@@ -220,8 +220,15 @@ ko_check_batchim_codepoint(unsigned int codepoint)
 
     /* Not a Hangul syllable - check if it's ASCII */
     if (codepoint < 0x80) {
-        /* For ASCII, we can't determine from the character alone
-         * This will be handled by ko_english_batchim() for full words */
+        /* For ASCII letters, use Korean pronunciation rules */
+        if (isalpha((int)codepoint)) {
+            return letter_batchim((char)codepoint);
+        }
+        /* For digits, use Korean number pronunciation */
+        if (isdigit((int)codepoint)) {
+            return number_batchim(codepoint - '0');
+        }
+        /* Other ASCII - default to no batchim */
         return KO_BATCHIM_NONE;
     }
 

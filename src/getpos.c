@@ -191,7 +191,7 @@ getpos_help(boolean force, const char *goal)
             visctrl(cmd_from_func(do_run)),
             visctrl(cmd_from_func(do_rush)));
     putstr(tmpwin, 0, sbuf);
-    putstr(tmpwin, 0, "Or enter a background symbol (ex. '<').");
+    putstr(tmpwin, 0, _("Or enter a background symbol (ex. '<')."));
     Sprintf(sbuf, "Use '%s' to move the cursor on yourself.",
             visctrl(gc.Cmd.spkeys[NHKF_GETPOS_SELF]));
     putstr(tmpwin, 0, sbuf);
@@ -300,7 +300,7 @@ getpos_help(boolean force, const char *goal)
         }
     }
     if (!force)
-        putstr(tmpwin, 0, "Type Space or Escape when you're done.");
+        putstr(tmpwin, 0, _("Type Space or Escape when you're done."));
     putstr(tmpwin, 0, "");
     display_nhwindow(tmpwin, TRUE);
     destroy_nhwindow(tmpwin);

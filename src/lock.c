@@ -851,26 +851,24 @@ doopen_indir(coordxy x, coordxy y)
     }
 
     if (!(door->doormask & D_CLOSED)) {
-        const char *mesg;
         boolean locked = FALSE;
 
+        set_msg_xy(cc.x, cc.y);
         switch (door->doormask) {
         case D_BROKEN:
-            mesg = " is broken";
+            pline(_("This door is broken."));
             break;
         case D_NODOOR:
-            mesg = "way has no door";
+            pline(_("This doorway has no door."));
             break;
         case D_ISOPEN:
-            mesg = " is already open";
+            pline(_("This door is already open."));
             break;
         default:
-            mesg = " is locked";
+            pline(_("This door is locked."));
             locked = TRUE;
             break;
         }
-        set_msg_xy(cc.x, cc.y);
-        pline(_("This door%s."), mesg);
         if (locked && flags.autounlock) {
             struct obj *unlocktool;
 

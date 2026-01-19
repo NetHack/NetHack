@@ -1624,7 +1624,7 @@ trapmove(
                    after this successful move would have its
                    can't-do-that message suppressed by Norep */
                 if (flags.verbose)
-                    Norep("You move within the chain's reach.");
+                    Norep(_("You move within the chain's reach."));
                 return TRUE;
             }
         }
@@ -1639,13 +1639,13 @@ trapmove(
                 }
                 if (u.usteed) {
                     if (anchored)
-                        Norep("You and %s are %s %s.", steedname, predicament,
+                        Norep(_("You and %s are %s %s."), steedname, predicament,
                               culprit);
                     else
-                        Norep("%s is %s %s.", upstart(steedname), predicament,
+                        Norep(_("%s is %s %s."), upstart(steedname), predicament,
                               culprit);
                 } else
-                    Norep("You are %s %s.", predicament, culprit);
+                    Norep(_("You are %s %s."), predicament, culprit);
             }
         } else {
  wriggle_free:
