@@ -8513,6 +8513,16 @@ msgstr "몸에 심각한 상처가 나타난다!"
 msgid "body is covered with painful wounds!"
 msgstr "몸이 고통스러운 상처로 덮였다!"
 
+#: src/mhitm.c:82
+#, c-format
+msgid "%s misses %s."
+msgstr "%s{이/가} %s{을/를} 빗맞혔다."
+
+#: src/mhitm.c:84
+#, c-format
+msgid "%s pretends to be friendly to %s."
+msgstr "%s{이/가} %s에게 친근한 척 한다."
+
 #: src/mhitm.c:132
 #, c-format
 msgid "%s releases you!"

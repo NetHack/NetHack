@@ -1817,7 +1817,7 @@ process_text_window(winid window, struct WinDesc *cw)
                 ++ttyDisplay->curx;
             }
             term_start_attr(attr);
-            for (cp = &cw->data[i][1], linestart = TRUE; *cp; cp++) {
+            for (cp = &cw->data[i][1]; *cp; cp++) {
                 /* For UTF-8 continuation bytes (0x80-0xBF), don't check
                  * column limit - we must output the complete character */
                 if (((unsigned char) *cp & 0xC0) != 0x80) {
@@ -1827,21 +1827,10 @@ process_text_window(winid window, struct WinDesc *cw)
                         break;  /* stop before starting a new character */
                     ttyDisplay->curx += charwidth;
                 }
-                /* message recall for msg_window:full/combination/reverse
-                   might have output from '/' in it (see redotoplin()) */
-                if (linestart) {
-                    if (SYMHANDLING(H_UTF8)) {
-                        g_putch(*cp);
-                    } else if ((*cp & 0x80) != 0) {
-                        g_putch(*cp);
-                        end_glyphout();
-                    } else {
-                        (void) putchar(*cp);
-                    }
-                    linestart = FALSE;
-                } else {
-                    (void) putchar(*cp);
-                }
+                /* Use putchar() directly for text windows - we've already
+                 * called end_glyphout() so graphics mode is off, and using
+                 * g_putch() would corrupt UTF-8 bytes when symset is not UTF-8 */
+                (void) putchar(*cp);
             }
             term_end_attr(attr);
         }

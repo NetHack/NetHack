@@ -78,10 +78,11 @@ missmm(
     pre_mm_attack(magr, mdef);
 
     if (gv.vis) {
-        pline(_("%s %s %s."), Monnam(magr),
-              (magr->mcan || !could_seduce(magr, mdef, mattk)) ? "misses"
-                  : "pretends to be friendly to",
-              mon_nam_too(mdef, magr));
+        if (magr->mcan || !could_seduce(magr, mdef, mattk))
+            pline(_("%s misses %s."), Monnam(magr), mon_nam_too(mdef, magr));
+        else
+            pline(_("%s pretends to be friendly to %s."), Monnam(magr),
+                  mon_nam_too(mdef, magr));
     } else {
         noises(magr, mattk);
     }
