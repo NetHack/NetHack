@@ -4142,7 +4142,7 @@ look_here(
         Sprintf(fbuf, "Contents of %s %s", s_suffix(mon_nam(mtmp)),
                 mbodypart(mtmp, STOMACH));
         /* Skip "Contents of " by using fbuf index 12 */
-        You(_("%s to %s what is lying in %s."), Blind ? "try" : "look around",
+        You(_("%s to %s what is lying in %s."), Blind ? _("try") : _("look around"),
             verb, &fbuf[12]);
         otmp = mtmp->minvent;
         if (otmp) {
@@ -4153,7 +4153,7 @@ look_here(
                     feel_cockatrice(otmp, FALSE);
             }
             if (Blind)
-                Strcpy(fbuf, "You feel");
+                Strcpy(fbuf, _("You feel"));
             Strcat(fbuf, ":");
             (void) display_minventory(mtmp, MINV_ALL | PICK_NONE, fbuf);
         } else {
@@ -4167,8 +4167,8 @@ look_here(
 
         regbuf[0] = '\0';
         if ((reg = visible_region_at(u.ux, u.uy)) != 0)
-            Sprintf(regbuf, "a %s cloud",
-                    reg_damg(reg) ? "poison gas" : "vapor");
+            Sprintf(regbuf, _("a %s cloud"),
+                    reg_damg(reg) ? _("poison gas") : _("vapor"));
         if ((trap = t_at(u.ux, u.uy)) != 0 && !trap->tseen)
             trap = (struct trap *) NULL;
 
@@ -4202,11 +4202,11 @@ look_here(
         } else {
             boolean cant_reach = !can_reach_floor(TRUE);
             const char *surf = surface(u.ux, u.uy),
-                       *where = cant_reach ? "lying beneath you"
-                                           : "lying here on the ",
+                       *where = cant_reach ? _("lying beneath you")
+                                           : _("lying here on the "),
                        *onwhat = cant_reach ? "" : surf;
 
-            You(_("try to feel what is %s%s."), drift ? "floating here" : where,
+            You(_("try to feel what is %s%s."), drift ? _("floating here") : where,
                 drift ? "" : onwhat);
 
             if (dfeature && !drift && !strcmp(dfeature, surf))
@@ -4256,23 +4256,23 @@ look_here(
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (obj_cnt == 1 && otmp->quan == 1L)
-            There(_("is %s object here."), picked_some ? "another" : "an");
+            There(_("is %s object here."), picked_some ? _("another") : _("an"));
         else
             There(_("are %s%s objects here."),
-                  (obj_cnt == 2) ? "two"
-                  : (obj_cnt < 5) ? "a few"
-                    : (obj_cnt < 10) ? "several"
-                      : "many",
-                  picked_some ? " more" : "");
+                  (obj_cnt == 2) ? _("two")
+                  : (obj_cnt < 5) ? _("a few")
+                    : (obj_cnt < 10) ? _("several")
+                      : _("many"),
+                  picked_some ? _(" more") : "");
         for (; otmp; otmp = otmp->nexthere)
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
                 pline(_("%s %s%s."),
-                      (obj_cnt > 1) ? "Including"
-                      : (otmp->quan > 1L) ? "They're"
-                        : "It's",
+                      (obj_cnt > 1) ? _("Including")
+                      : (otmp->quan > 1L) ? _("They're")
+                        : _("It's"),
                       corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
                       poly_when_stoned(gy.youmonst.data) ? ""
-                      : ", unfortunately");
+                      : _(", unfortunately"));
                 feel_cockatrice(otmp, FALSE);
                 break;
             }

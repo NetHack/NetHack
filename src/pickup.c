@@ -2036,7 +2036,7 @@ able_to_loot(
     coordxy x, coordxy y,
     boolean looting) /* loot vs tip */
 {
-    const char *verb = looting ? "loot" : "tip";
+    const char *verb = looting ? _("loot") : _("tip");
     struct trap *t = t_at(x, y);
 
     if (!can_reach_floor(t && is_pit(t->ttyp))) {
@@ -3248,7 +3248,7 @@ menu_loot(int retry, boolean put_in)
     boolean all_categories = TRUE, loot_everything = FALSE, autopick = FALSE;
     char buf[BUFSZ];
     boolean loot_justpicked = FALSE;
-    const char *action = put_in ? "Put in" : "Take out";
+    const char *action = put_in ? _("Put in") : _("Take out");
     struct obj *otmp, *otmp2;
     menu_item *pick_list;
     int mflags, res;

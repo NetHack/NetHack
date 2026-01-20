@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: hannethack@example.com\n"
-"POT-Creation-Date: 2026-01-21 01:31+0900\n"
+"POT-Creation-Date: 2026-01-21 01:32+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -11450,11 +11450,11 @@ msgstr ""
 msgid "%s into that %s cloud?"
 msgstr ""
 
-#: ../src/hack.c:2543 ../src/pager.c:278
+#: ../src/hack.c:2543 ../src/invent.c:4171 ../src/pager.c:278
 msgid "poison gas"
 msgstr ""
 
-#: ../src/hack.c:2543 ../src/pager.c:278
+#: ../src/hack.c:2543 ../src/invent.c:4171 ../src/pager.c:278
 msgid "vapor"
 msgstr ""
 
@@ -13614,9 +13614,26 @@ msgstr ""
 msgid "%s to %s what is lying in %s."
 msgstr ""
 
+#: ../src/invent.c:4145 ../src/write.c:221
+msgid "try"
+msgstr ""
+
+#: ../src/invent.c:4145
+msgid "look around"
+msgstr ""
+
+#: ../src/invent.c:4156
+msgid "You feel"
+msgstr ""
+
 #: ../src/invent.c:4160 ../src/invent.c:4249
 #, c-format
 msgid "%s no objects here."
+msgstr ""
+
+#: ../src/invent.c:4170
+#, c-format
+msgid "a %s cloud"
 msgstr ""
 
 #: ../src/invent.c:4176
@@ -13632,9 +13649,21 @@ msgstr ""
 msgid "try to feel what is on it."
 msgstr ""
 
+#: ../src/invent.c:4205
+msgid "lying beneath you"
+msgstr ""
+
+#: ../src/invent.c:4206
+msgid "lying here on the "
+msgstr ""
+
 #: ../src/invent.c:4209
 #, c-format
 msgid "try to feel what is %s%s."
+msgstr ""
+
+#: ../src/invent.c:4209
+msgid "floating here"
 msgstr ""
 
 #: ../src/invent.c:4217
@@ -15285,6 +15314,14 @@ msgstr ""
 msgid "Wait, %s!  That's a %s named %s!"
 msgstr ""
 
+#: ../src/mhitu.c:689
+msgid "tries to pick you up"
+msgstr ""
+
+#: ../src/mhitu.c:690
+msgid "disturbs you"
+msgstr ""
+
 #: ../src/mhitu.c:692
 #, c-format
 msgid "Wait, %s!  That %s is really %s named %s!"
@@ -15357,6 +15394,14 @@ msgstr ""
 #: ../src/mhitu.c:1063
 #, c-format
 msgid "%s %s your %s %s!"
+msgstr ""
+
+#: ../src/mhitu.c:1064
+msgid "slips off of"
+msgstr ""
+
+#: ../src/mhitu.c:1065
+msgid "grabs you, but cannot hold onto"
 msgstr ""
 
 #: ../src/mhitu.c:1066 ../src/uhitm.c:2055
@@ -15591,6 +15636,14 @@ msgstr ""
 msgid "Someone seems overdue for a serpent cut."
 msgstr ""
 
+#: ../src/mhitu.c:1710
+msgid "doesn't look all that ugly"
+msgstr ""
+
+#: ../src/mhitu.c:1711
+msgid "gazes ineffectually"
+msgstr ""
+
 #: ../src/mhitu.c:1719 ../src/uhitm.c:6003
 #, c-format
 msgid "%s gaze is reflected by your %s."
@@ -15743,6 +15796,14 @@ msgstr ""
 #: ../src/mhitu.c:2146
 #, c-format
 msgid "Well, then you owe me %s%s!"
+msgstr ""
+
+#: ../src/mhitu.c:2148
+msgid "twelve pairs of gloves"
+msgstr ""
+
+#: ../src/mhitu.c:2149
+msgid " and eleven more pairs of gloves"
 msgstr ""
 
 #: ../src/mhitu.c:2153
@@ -34036,10 +34097,6 @@ msgstr ""
 
 #: ../src/write.c:221
 msgid "prepare"
-msgstr ""
-
-#: ../src/write.c:221
-msgid "try"
 msgstr ""
 
 #: ../src/write.c:222
