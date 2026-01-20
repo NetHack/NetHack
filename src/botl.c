@@ -3481,7 +3481,7 @@ status_hilite_menu_choose_behavior(int fld)
     if (fld != BL_CONDITION) {
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_ALWAYS_HILITE;
-        Sprintf(buf, "Always highlight %s", initblstats[fld].fldname);
+        Sprintf(buf, _("Always highlight %s"), initblstats[fld].fldname);
         add_menu(tmpwin, &nul_glyphinfo, &any, 'a', 0, ATR_NONE,
                  clr, buf, MENU_ITEMFLAGS_NONE);
         nopts++;
@@ -3491,14 +3491,14 @@ status_hilite_menu_choose_behavior(int fld)
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_CONDITION;
         add_menu(tmpwin, &nul_glyphinfo, &any, 'b', 0, ATR_NONE,
-                 clr, "Bitmask of conditions", MENU_ITEMFLAGS_NONE);
+                 clr, _("Bitmask of conditions"), MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
     if (fld != BL_CONDITION && fld != BL_VERS) {
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_UPDOWN;
-        Sprintf(buf, "%s value changes", initblstats[fld].fldname);
+        Sprintf(buf, _("%s value changes"), initblstats[fld].fldname);
         add_menu(tmpwin, &nul_glyphinfo, &any, 'c', 0, ATR_NONE,
                  clr, buf, MENU_ITEMFLAGS_NONE);
         nopts++;
@@ -3509,7 +3509,7 @@ status_hilite_menu_choose_behavior(int fld)
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_VAL_ABSOLUTE;
         add_menu(tmpwin, &nul_glyphinfo, &any, 'n', 0, ATR_NONE,
-                 clr, "Number threshold", MENU_ITEMFLAGS_NONE);
+                 clr, _("Number threshold"), MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
@@ -3517,14 +3517,14 @@ status_hilite_menu_choose_behavior(int fld)
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_VAL_PERCENTAGE;
         add_menu(tmpwin, &nul_glyphinfo, &any, 'p', 0, ATR_NONE,
-                 clr, "Percentage threshold", MENU_ITEMFLAGS_NONE);
+                 clr, _("Percentage threshold"), MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
     if (fld == BL_HP) {
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_CRITICALHP;
-        Sprintf(buf,  "Highlight critically low %s",
+        Sprintf(buf,  _("Highlight critically low %s"),
                 initblstats[fld].fldname);
         add_menu(tmpwin, &nul_glyphinfo, &any, 'C', 0, ATR_NONE,
                  clr, buf, MENU_ITEMFLAGS_NONE);
@@ -3535,7 +3535,7 @@ status_hilite_menu_choose_behavior(int fld)
         || fld == BL_CAP || fld == BL_HUNGER) {
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_TEXTMATCH;
-        Sprintf(buf, "%s text match", initblstats[fld].fldname);
+        Sprintf(buf, _("%s text match"), initblstats[fld].fldname);
         add_menu(tmpwin, &nul_glyphinfo, &any, 't', 0, ATR_NONE,
                  clr, buf, MENU_ITEMFLAGS_NONE);
         nopts++;
@@ -3580,18 +3580,18 @@ status_hilite_menu_choose_updownboth(
 
     if (ltok) {
         if (str)
-            Sprintf(buf, "%s than %s",
-                    (fld == BL_AC) ? "Better (lower)" : "Less", str);
+            Sprintf(buf, _("%s than %s"),
+                    (fld == BL_AC) ? _("Better (lower)") : _("Less"), str);
         else
-            Sprintf(buf, "Value goes down");
+            Sprintf(buf, _("Value goes down"));
         any = cg.zeroany;
         any.a_int = 10 + LT_VALUE;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  clr, buf, MENU_ITEMFLAGS_NONE);
 
         if (str) {
-            Sprintf(buf, "%s or %s",
-                    str, (fld == BL_AC) ? "better (lower)" : "less");
+            Sprintf(buf, _("%s or %s"),
+                    str, (fld == BL_AC) ? _("better (lower)") : _("less"));
             any = cg.zeroany;
             any.a_int = 10 + LE_VALUE;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
@@ -3600,9 +3600,9 @@ status_hilite_menu_choose_updownboth(
     }
 
     if (str)
-        Sprintf(buf, "Exactly %s", str);
+        Sprintf(buf, _("Exactly %s"), str);
     else
-        Sprintf(buf, "Value changes");
+        Sprintf(buf, _("Value changes"));
     any = cg.zeroany;
     any.a_int = 10 + EQ_VALUE;
     add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
@@ -3610,8 +3610,8 @@ status_hilite_menu_choose_updownboth(
 
     if (gtok) {
         if (str) {
-            Sprintf(buf, "%s or %s",
-                    str, (fld == BL_AC) ? "worse (higher)" : "more");
+            Sprintf(buf, _("%s or %s"),
+                    str, (fld == BL_AC) ? _("worse (higher)") : _("more"));
             any = cg.zeroany;
             any.a_int = 10 + GE_VALUE;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
@@ -3619,16 +3619,16 @@ status_hilite_menu_choose_updownboth(
         }
 
         if (str)
-            Sprintf(buf, "%s than %s",
-                    (fld == BL_AC) ? "Worse (higher)" : "More", str);
+            Sprintf(buf, _("%s than %s"),
+                    (fld == BL_AC) ? _("Worse (higher)") : _("More"), str);
         else
-            Sprintf(buf, "Value goes up");
+            Sprintf(buf, _("Value goes up"));
         any = cg.zeroany;
         any.a_int = 10 + GT_VALUE;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  buf, MENU_ITEMFLAGS_NONE);
     }
-    Sprintf(buf, "Select field %s value:", initblstats[fld].fldname);
+    Sprintf(buf, _("Select field %s value:"), initblstats[fld].fldname);
     end_menu(tmpwin, buf);
 
     res = select_menu(tmpwin, PICK_ONE, &picks);
@@ -3698,8 +3698,8 @@ status_hilite_menu_add(int origfld)
 
         lt_gt_eq = NO_LTEQGT; /* not set up yet */
         inbuf[0] = '\0';
-        Sprintf(buf, "Enter %svalue for %s threshold:",
-                percent ? "percentage " : "",
+        Sprintf(buf, _("Enter %svalue for %s threshold:"),
+                percent ? _("percentage ") : "",
                 initblstats[fld].fldname);
         getlin(buf, inbuf);
         if (inbuf[0] == '\0' || inbuf[0] == '\033')
@@ -3810,23 +3810,23 @@ status_hilite_menu_add(int origfld)
                 goto choose_value;
         }
 
-        Sprintf(colorqry, "Choose a color for when %s is %s%s%s:",
+        Sprintf(colorqry, _("Choose a color for when %s is %s%s%s:"),
                 initblstats[fld].fldname,
-                (lt_gt_eq == LT_VALUE) ? "less than "
-                  : (lt_gt_eq == GT_VALUE) ? "more than "
+                (lt_gt_eq == LT_VALUE) ? _("less than ")
+                  : (lt_gt_eq == GT_VALUE) ? _("more than ")
                     : "",
                 numstart,
-                (lt_gt_eq == LE_VALUE) ? " or less"
-                  : (lt_gt_eq == GE_VALUE) ? " or more"
+                (lt_gt_eq == LE_VALUE) ? _(" or less")
+                  : (lt_gt_eq == GE_VALUE) ? _(" or more")
                     : "");
-        Sprintf(attrqry, "Choose attribute for when %s is %s%s%s:",
+        Sprintf(attrqry, _("Choose attribute for when %s is %s%s%s:"),
                 initblstats[fld].fldname,
-                (lt_gt_eq == LT_VALUE) ? "less than "
-                  : (lt_gt_eq == GT_VALUE) ? "more than "
+                (lt_gt_eq == LT_VALUE) ? _("less than ")
+                  : (lt_gt_eq == GT_VALUE) ? _("more than ")
                     : "",
                 numstart,
-                (lt_gt_eq == LE_VALUE) ? " or less"
-                  : (lt_gt_eq == GE_VALUE) ? " or more"
+                (lt_gt_eq == LE_VALUE) ? _(" or less")
+                  : (lt_gt_eq == GE_VALUE) ? _(" or more")
                     : "");
 
         hilite.rel = lt_gt_eq;
@@ -3848,16 +3848,16 @@ status_hilite_menu_add(int origfld)
                single choice, skip it altogether and just use 'changed' */
             lt_gt_eq = EQ_VALUE;
         }
-        Sprintf(colorqry, "Choose a color for when %s %s:",
+        Sprintf(colorqry, _("Choose a color for when %s %s:"),
                 initblstats[fld].fldname,
-                (lt_gt_eq == EQ_VALUE) ? "changes"
-                  : (lt_gt_eq == LT_VALUE) ? "decreases"
-                    : "increases");
-        Sprintf(attrqry, "Choose attribute for when %s %s:",
+                (lt_gt_eq == EQ_VALUE) ? _("changes")
+                  : (lt_gt_eq == LT_VALUE) ? _("decreases")
+                    : _("increases"));
+        Sprintf(attrqry, _("Choose attribute for when %s %s:"),
                 initblstats[fld].fldname,
-                (lt_gt_eq == EQ_VALUE) ? "changes"
-                  : (lt_gt_eq == LT_VALUE) ? "decreases"
-                    : "increases");
+                (lt_gt_eq == EQ_VALUE) ? _("changes")
+                  : (lt_gt_eq == LT_VALUE) ? _("decreases")
+                    : _("increases"));
         hilite.rel = lt_gt_eq;
     } else if (behavior == BL_TH_CONDITION) {
         cond = query_conditions();
@@ -3867,19 +3867,19 @@ status_hilite_menu_add(int origfld)
             return FALSE;
         }
         Snprintf(colorqry, sizeof(colorqry),
-                "Choose a color for conditions %s:",
+                _("Choose a color for conditions %s:"),
                 conditionbitmask2str(cond));
         Snprintf(attrqry, sizeof(attrqry),
-                "Choose attribute for conditions %s:",
+                _("Choose attribute for conditions %s:"),
                 conditionbitmask2str(cond));
     } else if (behavior == BL_TH_TEXTMATCH) {
         char qry_buf[BUFSZ];
 
-        Sprintf(qry_buf, "%s %s text value to match:",
+        Sprintf(qry_buf, _("%s %s text value to match:"),
                 (fld == BL_CAP
                  || fld == BL_ALIGN
                  || fld == BL_HUNGER
-                 || fld == BL_TITLE) ? "Choose" : "Enter",
+                 || fld == BL_TITLE) ? _("Choose") : _("Enter"),
                 initblstats[fld].fldname);
         if (fld == BL_CAP) {
             int rv = query_arrayvalue(qry_buf,
@@ -3969,14 +3969,14 @@ status_hilite_menu_add(int origfld)
             else
                 return FALSE;
         }
-        Sprintf(colorqry, "Choose a color for when %s is '%s':",
+        Sprintf(colorqry, _("Choose a color for when %s is '%s':"),
                 initblstats[fld].fldname, hilite.textmatch);
-        Sprintf(attrqry, "Choose attribute for when %s is '%s':",
+        Sprintf(attrqry, _("Choose attribute for when %s is '%s':"),
                 initblstats[fld].fldname, hilite.textmatch);
     } else if (behavior == BL_TH_ALWAYS_HILITE) {
-        Sprintf(colorqry, "Choose a color to always hilite %s:",
+        Sprintf(colorqry, _("Choose a color to always hilite %s:"),
                 initblstats[fld].fldname);
-        Sprintf(attrqry, "Choose attribute to always hilite %s:",
+        Sprintf(attrqry, _("Choose attribute to always hilite %s:"),
                 initblstats[fld].fldname);
     }
 
