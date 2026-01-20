@@ -116,10 +116,10 @@ mswings_verb(
         thrust = ((objects[otyp].oc_dir & PIERCE) != 0
                   && ((objects[otyp].oc_dir & ~PIERCE) == 0 || !rn2(2)));
 
-    verb = bash ? "bashes with" /*sigh*/
-           : lash ? "lashes"
-             : thrust ? "thrusts"
-               : "swings";
+    verb = bash ? _("bashes with") /*sigh*/
+           : lash ? _("lashes")
+             : thrust ? _("thrusts")
+               : _("swings");
     /* (might have caller also pass attacker's formatted name so that
        if hallucination makes that be plural, we could use vtense() to
        adjust the result to match) */
@@ -686,8 +686,8 @@ mattacku(struct monst *mtmp)
             pline(_("%s %s!"), Something,
                   (likes_gold(mtmp->data)
                    && gy.youmonst.mappearance == GOLD_PIECE)
-                  ? "tries to pick you up"
-                  : "disturbs you");
+                  ? _("tries to pick you up")
+                  : _("disturbs you"));
         else /* see note about m_monnam() above */
             pline(_("Wait, %s!  That %s is really %s named %s!"), m_monnam(mtmp),
                   mimic_obj_name(&gy.youmonst),
@@ -1061,8 +1061,8 @@ u_slip_free(struct monst *mtmp, struct attack *mattk)
     if (obj && (obj->greased || obj->otyp == OILSKIN_CLOAK)
         && (!obj->cursed || rn2(3))) {
         pline_mon(mtmp, _("%s %s your %s %s!"), Monnam(mtmp),
-              (mattk->adtyp == AD_WRAP) ? "slips off of"
-                                        : "grabs you, but cannot hold onto",
+              (mattk->adtyp == AD_WRAP) ? _("slips off of")
+                                        : _("grabs you, but cannot hold onto"),
               obj->greased ? _("greased") : _("slippery"),
               /* avoid "slippery slippery cloak"
                  for undiscovered oilskin cloak */
@@ -1707,8 +1707,8 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             else
                 pline_mon(mtmp, _("%s %s."), Monnam(mtmp),
                       (is_medusa && mtmp->mcan && !react)
-                          ? "doesn't look all that ugly"
-                          : "gazes ineffectually");
+                          ? _("doesn't look all that ugly")
+                          : _("gazes ineffectually"));
             break;
          }
         if (reflectable) {
@@ -2145,8 +2145,8 @@ doseduce(struct monst *mon)
                     observe_object(yourgloves);
                 verbalize(_("Well, then you owe me %s%s!"),
                           yourgloves ? yname(yourgloves)
-                                     : "twelve pairs of gloves",
-                          yourgloves ? " and eleven more pairs of gloves"
+                                     : _("twelve pairs of gloves"),
+                          yourgloves ? _(" and eleven more pairs of gloves")
                                      : "");
             }
         } else if (seewho)

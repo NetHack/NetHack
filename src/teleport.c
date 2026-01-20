@@ -1070,9 +1070,9 @@ dotele(
             castit = (knownsp >= spe_Fresh && !Confusion);
             if (!castit && !break_the_rules) {
                 You(_("%s."), (!Teleportation ? ((knownsp != spe_Unknown)
-                                              ? "can't cast that spell"
-                                              : "don't know that spell")
-                            : "are not able to teleport at will"));
+                                              ? _("can't cast that spell")
+                                              : _("don't know that spell"))
+                            : _("are not able to teleport at will")));
                 return 0;
             }
         }
