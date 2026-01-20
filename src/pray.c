@@ -562,15 +562,15 @@ fix_worst_trouble(int trouble)
         if (Blinded) {
             if (eyecount(gy.youmonst.data) != 1)
                 eyes = makeplural(eyes);
-            Sprintf(msgbuf, "Your %s %s better", eyes, vtense(eyes, "feel"));
+            Sprintf(msgbuf, _("Your %s %s better"), eyes, vtense(eyes, _("feel")));
             u.ucreamed = 0;
             make_blinded(0L, FALSE);
         }
         if (cure_deaf) {
             make_deaf(0L, FALSE);
             if (!Deaf)
-                Sprintf(eos(msgbuf), "%s can hear again",
-                        !*msgbuf ? "You" : " and you");
+                Sprintf(eos(msgbuf), _("%s can hear again"),
+                        !*msgbuf ? _("You") : _(" and you"));
         }
         if (*msgbuf)
             pline(_("%s."), msgbuf);
@@ -1513,8 +1513,8 @@ desecrate_altar(boolean highaltar, aligntyp altaralign)
     You_feel(_("the air around you grow charged..."));
     pline(_("Suddenly, you realize that %s has noticed you..."),
           align_gname(altaralign));
-    Sprintf(gvbuf, "So, mortal!  You dare desecrate my %s!",
-            highaltar ? "High Temple" : "altar");
+    Sprintf(gvbuf, _("So, mortal!  You dare desecrate my %s!"),
+            highaltar ? _("High Temple") : _("altar"));
     godvoice(altaralign, gvbuf);
     /* Throw everything we have at the player */
     god_zaps_you(altaralign);
@@ -1527,7 +1527,7 @@ staticfn void
 offer_real_amulet(struct obj *otmp, aligntyp altaralign)
 {
     static NEARDATA const char
-        cloud_of_smoke[] = "A cloud of %s smoke surrounds you...";
+        cloud_of_smoke[] = N_("A cloud of %s smoke surrounds you...");
 
     /* The final Test.  Did you win? */
     if (uamul == otmp)

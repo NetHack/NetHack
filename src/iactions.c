@@ -105,7 +105,7 @@ item_reading_classification(struct obj *obj, char *outbuf)
                                   || !objects[otyp].oc_name_known))
                              ? " to activate its magic" : "");
 
-        Sprintf(outbuf, "Read this scroll%s", magic);
+        Sprintf(outbuf, _("Read this scroll%s"), magic);
     } else if (obj->oclass == SPBOOK_CLASS) {
         boolean novel = (otyp == SPE_NOVEL),
                 blank = (otyp == SPE_BLANK_PAPER
@@ -113,10 +113,10 @@ item_reading_classification(struct obj *obj, char *outbuf)
                 tome = (otyp == SPE_BOOK_OF_THE_DEAD
                         && objects[otyp].oc_name_known);
 
-        Sprintf(outbuf, "%s this %s",
-                (novel || blank) ? "Read" : tome ? "Examine" : "Study",
+        Sprintf(outbuf, _("%s this %s"),
+                (novel || blank) ? _("Read") : tome ? _("Examine") : _("Study"),
                 novel ? simpleonames(obj) /* "novel" or "paperback book" */
-                      : tome ? "tome" : "spellbook");
+                      : tome ? _("tome") : _("spellbook"));
     } else {
         res = IA_NONE;
     }
@@ -308,96 +308,96 @@ itemactions(struct obj *otmp)
 
     /* a: apply */
     if (otmp->oclass == COIN_CLASS)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Flip a coin");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Flip a coin"));
     else if (otmp->otyp == CREAM_PIE)
         ia_addmenu(win, IA_APPLY_OBJ, 'a',
-                   "Hit yourself with this cream pie");
+                   _("Hit yourself with this cream pie"));
     else if (otmp->otyp == BULLWHIP)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Lash out with this whip");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Lash out with this whip"));
     else if (otmp->otyp == GRAPPLING_HOOK)
         ia_addmenu(win, IA_APPLY_OBJ, 'a',
-                   "Grapple something with this hook");
+                   _("Grapple something with this hook"));
     else if (otmp->otyp == BAG_OF_TRICKS && objects[otmp->otyp].oc_name_known)
         /* bag of tricks skips this unless discovered */
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Reach into this bag");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Reach into this bag"));
     else if (Is_container(otmp))
         /* bag of tricks gets here only if not yet discovered */
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Open this container");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Open this container"));
     else if (otmp->otyp == CAN_OF_GREASE)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Use the can to grease an item");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Use the can to grease an item"));
     else if (otmp->otyp == LOCK_PICK
              || otmp->otyp == CREDIT_CARD
              || otmp->otyp == SKELETON_KEY)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Use this tool to pick a lock");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Use this tool to pick a lock"));
     else if (otmp->otyp == TINNING_KIT)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Use this kit to tin a corpse");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Use this kit to tin a corpse"));
     else if (otmp->otyp == LEASH)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Tie a pet to this leash");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Tie a pet to this leash"));
     else if (otmp->otyp == SADDLE)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Place this saddle on a pet");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Place this saddle on a pet"));
     else if (otmp->otyp == MAGIC_WHISTLE
              || otmp->otyp == TIN_WHISTLE)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Blow this whistle");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Blow this whistle"));
     else if (otmp->otyp == EUCALYPTUS_LEAF)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Use this leaf as a whistle");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Use this leaf as a whistle"));
     else if (otmp->otyp == STETHOSCOPE)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Listen through the stethoscope");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Listen through the stethoscope"));
     else if (otmp->otyp == MIRROR)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Show something its reflection");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Show something its reflection"));
     else if (otmp->otyp == BELL || otmp->otyp == BELL_OF_OPENING)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Ring the bell");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Ring the bell"));
     else if (otmp->otyp == CANDELABRUM_OF_INVOCATION) {
-        Sprintf(buf, "%s the candelabrum", light);
+        Sprintf(buf, _("%s the candelabrum"), light);
         ia_addmenu(win, IA_APPLY_OBJ, 'a', buf);
     } else if (otmp->otyp == WAX_CANDLE || otmp->otyp == TALLOW_CANDLE) {
         boolean multiple = (otmp->quan == 1L) ? FALSE : TRUE;
-        const char *s = multiple ? "these" : "this";
+        const char *s = multiple ? _("these") : _("this");
         struct obj *o = carrying(CANDELABRUM_OF_INVOCATION);
 
         if (o && o->spe < 7)
-            Sprintf(buf, "Attach %s to your candelabrum, or %s %s", s,
-                    !otmp->lamplit ? "light" : "extinguish", /* [lowercase] */
-                    multiple ? "them" : "it");
+            Sprintf(buf, _("Attach %s to your candelabrum, or %s %s"), s,
+                    !otmp->lamplit ? _("light") : _("extinguish"), /* [lowercase] */
+                    multiple ? _("them") : _("it"));
         else
-            Sprintf(buf, "%s %s %s", light, s, simpleonames(otmp));
+            Sprintf(buf, _("%s %s %s"), light, s, simpleonames(otmp));
         ia_addmenu(win, IA_APPLY_OBJ, 'a', buf);
     } else if (otmp->otyp == OIL_LAMP || otmp->otyp == MAGIC_LAMP
                || otmp->otyp == BRASS_LANTERN) {
-        Sprintf(buf, "%s this light source", light);
+        Sprintf(buf, _("%s this light source"), light);
         ia_addmenu(win, IA_APPLY_OBJ, 'a', buf);
     } else if (otmp->otyp == POT_OIL && objects[otmp->otyp].oc_name_known) {
-        Sprintf(buf, "%s this oil", light);
+        Sprintf(buf, _("%s this oil"), light);
         ia_addmenu(win, IA_APPLY_OBJ, 'a', buf);
     } else if (otmp->oclass == POTION_CLASS) {
         /* FIXME? this should probably be moved to 'D' rather than be 'a' */
-        Sprintf(buf, "Dip something into %s potion%s",
-                is_plural(otmp) ? "one of these" : "this", plur(otmp->quan));
+        Sprintf(buf, _("Dip something into %s potion%s"),
+                is_plural(otmp) ? _("one of these") : _("this"), plur(otmp->quan));
         ia_addmenu(win, IA_DIP_OBJ, 'a', buf);
     } else if (otmp->otyp == EXPENSIVE_CAMERA)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Take a photograph");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Take a photograph"));
     else if (otmp->otyp == TOWEL)
         ia_addmenu(win, IA_APPLY_OBJ, 'a',
-                   "Clean yourself off with this towel");
+                   _("Clean yourself off with this towel"));
     else if (otmp->otyp == CRYSTAL_BALL)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Peer into this crystal ball");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Peer into this crystal ball"));
     else if (otmp->otyp == MAGIC_MARKER)
         ia_addmenu(win, IA_APPLY_OBJ, 'a',
-                   "Write on something with this marker");
+                   _("Write on something with this marker"));
     else if (otmp->otyp == FIGURINE)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Make this figurine transform");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Make this figurine transform"));
     else if (otmp->otyp == UNICORN_HORN)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Use this unicorn horn");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Use this unicorn horn"));
     else if (otmp->otyp == HORN_OF_PLENTY
              && objects[otmp->otyp].oc_name_known)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Blow into the horn of plenty");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Blow into the horn of plenty"));
     else if (otmp->otyp >= WOODEN_FLUTE && otmp->otyp <= DRUM_OF_EARTHQUAKE)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Play this musical instrument");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Play this musical instrument"));
     else if (otmp->otyp == LAND_MINE || otmp->otyp == BEARTRAP)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Arm this trap");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Arm this trap"));
     else if (otmp->otyp == PICK_AXE || otmp->otyp == DWARVISH_MATTOCK)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Dig with this digging tool");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Dig with this digging tool"));
     else if (otmp->oclass == WAND_CLASS)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Break this wand");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', _("Break this wand"));
 
     /* 'c', 'C' - call an item or its type something */
     if (item_naming_classification(otmp, buf, buf2)) {
@@ -411,19 +411,19 @@ itemactions(struct obj *otmp)
        always have a takeoff/remove choice so we don't have to worry
        about the menu maybe being empty when 'd' is suppressed */
     if (!already_worn) {
-        Sprintf(buf, "Drop this %s", (otmp->quan > 1L) ? "stack" : "item");
+        Sprintf(buf, _("Drop this %s"), (otmp->quan > 1L) ? _("stack") : _("item"));
         ia_addmenu(win, IA_DROP_OBJ, 'd', buf);
     }
 
     /* e: eat item */
     if (otmp->otyp == TIN) {
-        Sprintf(buf, "Open %s%s and eat the contents",
-                (otmp->quan > 1L) ? "one of these tins" : "this tin",
+        Sprintf(buf, _("Open %s%s and eat the contents"),
+                (otmp->quan > 1L) ? _("one of these tins") : _("this tin"),
                 (otmp->otyp == TIN && uwep && uwep->otyp == TIN_OPENER)
-                ? " with your tin opener" : "");
+                ? _(" with your tin opener") : "");
         ia_addmenu(win, IA_EAT_OBJ, 'e', buf);
     } else if (is_edible(otmp)) {
-        Sprintf(buf, "Eat %s", (otmp->quan > 1L) ? "one of these" : "this");
+        Sprintf(buf, _("Eat %s"), (otmp->quan > 1L) ? _("one of these") : _("this"));
         ia_addmenu(win, IA_EAT_OBJ, 'e', buf);
     }
 
