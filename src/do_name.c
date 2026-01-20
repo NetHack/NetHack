@@ -704,7 +704,7 @@ namefloorobj(void)
     if (!obj) {
         /* "under you" is safe here since there's no object to hide under */
         There(_("doesn't seem to be any object %s."),
-              u_at(cc.x, cc.y) ? "under you" : "there");
+              u_at(cc.x, cc.y) ? _("under you") : _("there"));
         return;
     }
     /* note well: 'obj' might be an instance of STRANGE_OBJECT if target

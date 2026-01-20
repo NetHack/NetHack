@@ -5500,12 +5500,12 @@ shk_chat(struct monst *shkp)
 
         pline(_("%s %s that your bill comes to %ld %s."),
               Shknam(shkp),
-              (!Deaf && !muteshk(shkp)) ? "says" : "indicates",
+              (!Deaf && !muteshk(shkp)) ? _("says") : _("indicates"),
               total, currency(total));
     } else if (eshk->debit) {
         pline(_("%s %s that you owe %s %ld %s."),
               Shknam(shkp),
-              (!Deaf && !muteshk(shkp)) ? "reminds you" : "indicates",
+              (!Deaf && !muteshk(shkp)) ? _("reminds you") : _("indicates"),
               noit_mhim(shkp), eshk->debit, currency(eshk->debit));
     } else if (eshk->credit) {
         pline(_("%s encourages you to use your %ld %s of credit."),
@@ -5513,19 +5513,19 @@ shk_chat(struct monst *shkp)
     } else if (eshk->robbed) {
         pline(_("%s %s about a recent robbery."),
               Shknam(shkp),
-              (!Deaf && !muteshk(shkp)) ? "complains" : "indicates concern");
+              (!Deaf && !muteshk(shkp)) ? _("complains") : _("indicates concern"));
     } else if (eshk->surcharge) {
         pline(_("%s %s that %s is watching you carefully."), Shknam(shkp),
-              (!Deaf && !muteshk(shkp)) ? "warns you" : "indicates",
+              (!Deaf && !muteshk(shkp)) ? _("warns you") : _("indicates"),
               noit_mhe(shkp));
     } else if ((shkmoney = money_cnt(shkp->minvent)) < 50L) {
         pline(_("%s %s that business is bad."),
               Shknam(shkp),
-              (!Deaf && !muteshk(shkp)) ? "complains" : "indicates");
+              (!Deaf && !muteshk(shkp)) ? _("complains") : _("indicates"));
     } else if (shkmoney > 4000) {
         pline(_("%s %s that business is good."),
               Shknam(shkp),
-              (!Deaf && !muteshk(shkp)) ? "says" : "indicates");
+              (!Deaf && !muteshk(shkp)) ? _("says") : _("indicates"));
     } else if (is_izchak(shkp, FALSE)) {
         if (!Deaf && !muteshk(shkp))
             pline(_(ROLL_FROM(Izchak_speaks)), shkname(shkp));
