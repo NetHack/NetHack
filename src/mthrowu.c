@@ -427,7 +427,7 @@ ohitmon(
                     m_name = strcat(s_suffix(m_name), " flesh");
                 pline_The(_("silver sears %s!"), m_name);
             } else if (verbose && !gm.mtarget) {
-                pline(_("%s is seared!"), flesh ? "Its flesh" : "It");
+                pline(_("%s is seared!"), flesh ? _("Its flesh") : _("It"));
             }
         }
         if (otmp->otyp == ACID_VENOM && cansee(mtmp->mx, mtmp->my)) {

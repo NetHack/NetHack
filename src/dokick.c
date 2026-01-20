@@ -1605,12 +1605,12 @@ impact_drop(
             pline(_("From the impact, %sother %s."),
                   dct == oct ? "the " : dct == 1L ? "an" : "", what);
         else if (oct == dct)
-            pline(_("%s adjacent %s %s."), dct == 1L ? "The" : "All the", what,
+            pline(_("%s adjacent %s %s."), dct == 1L ? _("The") : _("All the"), what,
                   gg.gate_str);
         else
             pline(_("%s adjacent %s %s."),
-                  dct == 1L ? "One of the" : "Some of the",
-                  dct == 1L ? "objects falls" : what, gg.gate_str);
+                  dct == 1L ? _("One of the") : _("Some of the"),
+                  dct == 1L ? _("objects falls") : what, gg.gate_str);
     }
 
     if (costly && shkp && price) {

@@ -1349,7 +1349,7 @@ use_candelabrum(struct obj *obj)
         There(_("%s only %d %s in %s."), vtense(s, "are"), obj->spe, s,
               the(xname(obj)));
         if (!Blind)
-            pline(_("%s lit.  %s dimly."), obj->spe == 1 ? "It is" : "They are",
+            pline(_("%s lit.  %s dimly."), obj->spe == 1 ? _("It is") : _("They are"),
                   Tobjnam(obj, "shine"));
     } else {
         pline(_("%s's %s burn%s"), The(xname(obj)), s,
@@ -1438,7 +1438,7 @@ use_candle(struct obj **optr)
         if (otmp->lamplit && !was_lamplit)
             pline_The(_("new %s magically %s!"), s, vtense(s, "ignite"));
         else if (!otmp->lamplit && was_lamplit)
-            pline(_("%s out."), (obj->quan > 1L) ? "They go" : "It goes");
+            pline(_("%s out."), (obj->quan > 1L) ? _("They go") : _("It goes"));
         if (obj->unpaid) {
             struct monst *shkp VOICEONLY
                                = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
