@@ -734,9 +734,9 @@ angrygods(aligntyp resp_god)
         godvoice(resp_god, (char *) 0);
         pline(_("\"Thou %s, %s.\""),
               (ugod_is_angry() && resp_god == u.ualign.type)
-                  ? "hast strayed from the path"
-                  : "art arrogant",
-              gy.youmonst.data->mlet == S_HUMAN ? "mortal" : "creature");
+                  ? _("hast strayed from the path")
+                  : _("art arrogant"),
+              gy.youmonst.data->mlet == S_HUMAN ? _("mortal") : _("creature"));
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize(_("Thou must relearn thy lessons!"));
         (void) adjattrib(A_WIS, -1, FALSE);
@@ -796,7 +796,7 @@ at_your_feet(const char *str)
               s_suffix(mon_nam(u.ustuck)), mbodypart(u.ustuck, STOMACH));
     } else {
         pline(_("%s %s %s your %s!"), str,
-              vtense(str, Blind ? "land" : "appear"),
+              vtense(str, Blind ? _("land") : _("appear")),
               Levitation ? _("beneath") : _("at"),
               makeplural(body_part(FOOT)));
     }
@@ -1211,7 +1211,7 @@ pleased(aligntyp g_align)
                        or uncurse (which has already given a message) */
                     if (*repair_buf)
                         pline(_("%s as good as new!"),
-                              Yobjnam2(uwep, Blind ? "feel" : "look"));
+                              Yobjnam2(uwep, Blind ? _("feel") : _("look")));
                 }
                 update_inventory();
             }
@@ -1401,9 +1401,9 @@ water_prayer(boolean bless_water)
     }
     if (!Blind && changed) {
         pline(_("%s potion%s on the altar glow%s %s for a moment."),
-              ((other && changed > 1L) ? "Some of the"
-                                       : (other ? "One of the" : "The")),
-              ((other || changed > 1L) ? "s" : ""), (changed > 1L ? "" : "s"),
+              ((other && changed > 1L) ? _("Some of the")
+                                       : (other ? _("One of the") : _("The"))),
+              ((other || changed > 1L) ? _("s") : ""), (changed > 1L ? "" : _("s")),
               (bless_water ? hcolor(NH_LIGHT_BLUE) : hcolor(NH_BLACK)));
     }
     return (boolean) (changed > 0L);
@@ -1922,8 +1922,8 @@ eval_offering(struct obj *otmp, aligntyp altaralign)
             /* When same as altar, always a very bad action.
              */
             pline(_("Such an action is an insult to %s!"),
-                  (unicalign == A_CHAOTIC) ? "chaos"
-                     : unicalign ? "law" : "balance");
+                  (unicalign == A_CHAOTIC) ? _("chaos")
+                     : unicalign ? _("law") : _("balance"));
             (void) adjattrib(A_WIS, -1, TRUE);
             return -1;
         } else if (u.ualign.type == altaralign) {
@@ -2130,7 +2130,7 @@ can_pray(boolean praying) /* false means no messages should be given */
         && (gp.p_aligntyp == A_LAWFUL || gp.p_aligntyp != A_NEUTRAL)) {
         if (praying)
             pline_The(_("very idea of praying to a %s god is repugnant to you."),
-                      gp.p_aligntyp ? "lawful" : "neutral");
+                      gp.p_aligntyp ? _("lawful") : _("neutral"));
         return FALSE;
     }
 
@@ -2430,7 +2430,7 @@ doturn(void)
     if (!can_chant(&gy.youmonst)) {
         /* "evilness": "demons and undead" is too verbose and too precise */
         You(_("are %s upon %s to turn aside evilness."),
-            Strangled ? "not able to call" : "incapable of calling", Gname);
+            Strangled ? _("not able to call") : _("incapable of calling"), Gname);
         /* violates agnosticism due to intent; conduct tracking is not
            supposed to affect play but we make an exception here:  use a
            move if this is the first time agnostic conduct has been broken */
@@ -2449,7 +2449,7 @@ doturn(void)
         pline(_("Since you are in Gehennom, %s %s help you."),
               /* not actually calling upon Moloch but use alternate
                  phrasing anyway if hallucinatory feedback says it's him */
-              Gname, !strcmp(Gname, Moloch) ? "won't" : "can't");
+              Gname, !strcmp(Gname, Moloch) ? _("won't") : _("can't"));
         aggravate();
         return ECMD_TIME;
     }

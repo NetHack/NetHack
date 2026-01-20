@@ -114,22 +114,22 @@ self_lookat(char *outbuf)
     race[0] = '\0';
     if (!Upolyd)
         Sprintf(race, "%s ", gu.urace.adj);
-    Sprintf(outbuf, "%s%s%s called %s",
+    Sprintf(outbuf, _("%s%s%s called %s"),
             /* being blinded may hide invisibility from self */
-            (Invis && (senseself() || !Blind)) ? "invisible " : "", race,
+            (Invis && (senseself() || !Blind)) ? _("invisible ") : "", race,
             pmname(&mons[u.umonnum], Ugender), svp.plname);
     if (u.usteed)
-        Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
+        Sprintf(eos(outbuf), _(", mounted on %s"), y_monnam(u.usteed));
     if (u.uundetected || (Upolyd && U_AP_TYPE)
         || visible_region_at(u.ux, u.uy))
         mhidden_description(&gy.youmonst,
                             MHID_PREFIX | MHID_ARTICLE | MHID_REGION,
                             eos(outbuf));
     if (Punished)
-        Sprintf(eos(outbuf), ", chained to %s",
-                uball ? ansimpleoname(uball) : "nothing?");
+        Sprintf(eos(outbuf), _(", chained to %s"),
+                uball ? ansimpleoname(uball) : _("nothing?"));
     if (u.utrap) /* bear trap, pit, web, in-floor, in-lava, tethered */
-        Sprintf(eos(outbuf), ", %s", trap_predicament(trapbuf, 0, FALSE));
+        Sprintf(eos(outbuf), _(", %s"), trap_predicament(trapbuf, 0, FALSE));
     return outbuf;
 }
 
@@ -235,16 +235,16 @@ mhidden_description(
     } else if (M_AP_TYPE(mon) == M_AP_MONSTER) {
         if (show_altmon) {
             if (incl_prefix)
-                Strcat(outbuf, ", masquerading as ");
+                Strcat(outbuf, _(", masquerading as "));
             what = pmname(&mons[mon->mappearance], Mgender(mon));
             if (incl_prefix)
                 what = an(what);
             Strcat(outbuf, what);
         }
     } else if (isyou ? u.uundetected : mon->mundetected) {
-        Strcpy(outbuf, ", hiding");
+        Strcpy(outbuf, _(", hiding"));
         if (hides_under(mon->data)) {
-            Strcat(outbuf, " under ");
+            Strcat(outbuf, _(" under "));
             /* remembered glyph, not glyph_at() which is 'mon' */
             if (glyph_is_object(glyph))
                 goto objfrommap;
@@ -255,7 +255,7 @@ mhidden_description(
                        : surface(x, y)); /* trapper */
         } else {
             if (mon->data->mlet == S_EEL && is_pool(x, y))
-                Strcat(outbuf, " in murky water");
+                Strcat(outbuf, _(" in murky water"));
         }
     }
 
@@ -456,23 +456,23 @@ look_at_monster(
     if (mtmp->mfrozen)
         /* unfortunately mfrozen covers temporary sleep and being busy
            (donning armor, for instance) as well as paralysis */
-        Strcat(buf, ", can't move (paralyzed or sleeping or busy)");
+        Strcat(buf, _(", can't move (paralyzed or sleeping or busy)"));
     else if (mtmp->msleeping)
         /* sleeping for an indeterminate duration */
-        Strcat(buf, ", asleep");
+        Strcat(buf, _(", asleep"));
     else if ((mtmp->mstrategy & STRAT_WAITMASK) != 0)
         /* arbitrary reason why it isn't moving */
-        Strcat(buf, ", meditating");
+        Strcat(buf, _(", meditating"));
 
     if (mtmp->mleashed)
-        Strcat(buf, ", leashed to you");
+        Strcat(buf, _(", leashed to you"));
     if (mtmp->mtrapped && cansee(mtmp->mx, mtmp->my)) {
         struct trap *t = t_at(mtmp->mx, mtmp->my);
         int tt = t ? t->ttyp : NO_TRAP;
 
         /* newsym lets you know of the trap, so mention it here */
         if (tt == BEAR_TRAP || is_pit(tt) || tt == WEB) {
-            Sprintf(eos(buf), ", trapped in %s", an(trapname(tt, FALSE)));
+            Sprintf(eos(buf), _(", trapped in %s"), an(trapname(tt, FALSE)));
             t->tseen = 1;
         }
     }
@@ -489,62 +489,62 @@ look_at_monster(
         monbuf[0] = '\0';
         if (how_seen != 0 && how_seen != MONSEEN_NORMAL) {
             if (how_seen & MONSEEN_NORMAL) {
-                Strcat(monbuf, "normal vision");
+                Strcat(monbuf, _("normal vision"));
                 how_seen &= ~MONSEEN_NORMAL;
                 /* how_seen can't be 0 yet... */
                 if (how_seen)
-                    Strcat(monbuf, ", ");
+                    Strcat(monbuf, _(", "));
             }
             if (how_seen & MONSEEN_SEEINVIS) {
-                Strcat(monbuf, "see invisible");
+                Strcat(monbuf, _("see invisible"));
                 how_seen &= ~MONSEEN_SEEINVIS;
                 if (how_seen)
-                    Strcat(monbuf, ", ");
+                    Strcat(monbuf, _(", "));
             }
             if (how_seen & MONSEEN_INFRAVIS) {
-                Strcat(monbuf, "infravision");
+                Strcat(monbuf, _("infravision"));
                 how_seen &= ~MONSEEN_INFRAVIS;
                 if (how_seen)
-                    Strcat(monbuf, ", ");
+                    Strcat(monbuf, _(", "));
             }
             if (how_seen & MONSEEN_TELEPAT) {
-                Strcat(monbuf, "telepathy");
+                Strcat(monbuf, _("telepathy"));
                 how_seen &= ~MONSEEN_TELEPAT;
                 if (how_seen)
-                    Strcat(monbuf, ", ");
+                    Strcat(monbuf, _(", "));
             }
             if (how_seen & MONSEEN_XRAYVIS) {
                 /* Eyes of the Overworld */
-                Strcat(monbuf, "astral vision");
+                Strcat(monbuf, _("astral vision"));
                 how_seen &= ~MONSEEN_XRAYVIS;
                 if (how_seen)
-                    Strcat(monbuf, ", ");
+                    Strcat(monbuf, _(", "));
             }
             if (how_seen & MONSEEN_DETECT) {
-                Strcat(monbuf, "monster detection");
+                Strcat(monbuf, _("monster detection"));
                 how_seen &= ~MONSEEN_DETECT;
                 if (how_seen)
-                    Strcat(monbuf, ", ");
+                    Strcat(monbuf, _(", "));
             }
             if (how_seen & MONSEEN_WARNMON) {
                 if (Hallucination) {
-                    Strcat(monbuf, "paranoid delusion");
+                    Strcat(monbuf, _("paranoid delusion"));
                 } else {
                     unsigned long mW = (svc.context.warntype.obj
                                         | svc.context.warntype.polyd),
                                   m2 = mtmp->data->mflags2;
-                    const char *whom = ((mW & M2_HUMAN & m2) ? "human"
-                                        : (mW & M2_ELF & m2) ? "elf"
-                                          : (mW & M2_ORC & m2) ? "orc"
-                                            : (mW & M2_DEMON & m2) ? "demon"
+                    const char *whom = ((mW & M2_HUMAN & m2) ? _("human")
+                                        : (mW & M2_ELF & m2) ? _("elf")
+                                          : (mW & M2_ORC & m2) ? _("orc")
+                                            : (mW & M2_DEMON & m2) ? _("demon")
                                               : pmname(mtmp->data,
                                                        Mgender(mtmp)));
 
-                    Sprintf(eos(monbuf), "warned of %s", makeplural(whom));
+                    Sprintf(eos(monbuf), _("warned of %s"), makeplural(whom));
                 }
                 how_seen &= ~MONSEEN_WARNMON;
                 if (how_seen)
-                    Strcat(monbuf, ", ");
+                    Strcat(monbuf, _(", "));
             }
             /* should have used up all the how_seen bits by now */
             if (how_seen) {
@@ -1522,7 +1522,7 @@ do_screen_description(
             /* Kludge: warning trumps boulders on the display.
                Reveal the boulder too or player can get confused */
             if (looked && sobj_at(BOULDER, cc.x, cc.y))
-                Strcat(out_str, " co-located with a boulder");
+                Strcat(out_str, _(" co-located with a boulder"));
             break; /* out of for loop*/
         }
     }
@@ -1652,12 +1652,12 @@ add_quoted_engraving(
         return FALSE;
 
     if (ep->eread)
-        Snprintf(temp_buf, sizeof temp_buf, " with %s: \"%s\"",
-                 headstone ? "headstone reading" : "remembered text",
+        Snprintf(temp_buf, sizeof temp_buf, _(" with %s: \"%s\""),
+                 headstone ? _("headstone reading") : _("remembered text"),
                  ep->engr_txt[remembered_text]);
     else
-        Snprintf(temp_buf, sizeof temp_buf, " %s you haven't read",
-                 headstone ? "whose headstone" : "that");
+        Snprintf(temp_buf, sizeof temp_buf, _(" %s you haven't read"),
+                 headstone ? _("whose headstone") : _("that"));
 
     (void) strncat(buf, temp_buf, BUFSZ - strlen(buf) - 1);
     return TRUE;
@@ -2023,13 +2023,13 @@ look_all(
                 if (count == 1) {
                     Strcpy(which, do_mons ? _("monsters") : _("objects"));
                     if (nearby)
-                        Sprintf(outbuf, "%s currently shown near %s:",
+                        Sprintf(outbuf, _("%s currently shown near %s:"),
                                 upstart(which),
                                 (cmode != GPCOORDS_COMPASS)
                                   ? coord_desc(u.ux, u.uy, coordbuf, cmode)
-                                  : !canspotself() ? "your position" : "you");
+                                  : !canspotself() ? _("your position") : _("you"));
                     else
-                        Sprintf(outbuf, "All %s currently shown on the map:",
+                        Sprintf(outbuf, _("All %s currently shown on the map:"),
                                 which);
                     putstr(win, 0, outbuf);
                     /* hack alert! Qt watches a text window for any line
@@ -2096,7 +2096,7 @@ look_traps(boolean nearby)
                        && ((!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz))
                            || couldsee(x, y))) {
                 Strcpy(lookbuf, trapname(t->ttyp, FALSE));
-                Sprintf(eos(lookbuf), ", obscured by %s", encglyph(glyph));
+                Sprintf(eos(lookbuf), _(", obscured by %s"), encglyph(glyph));
                 glyph = trap_to_glyph(t);
                 ++count;
             }
@@ -2106,9 +2106,9 @@ look_traps(boolean nearby)
                 cmode = (iflags.getpos_coords != GPCOORDS_NONE)
                            ? iflags.getpos_coords : GPCOORDS_MAP;
                 if (count == 1) {
-                    Sprintf(outbuf, "%sseen or remembered traps%s:",
-                            nearby ? "nearby " : "",
-                            nearby ? "" : " on this level");
+                    Sprintf(outbuf, _("%sseen or remembered traps%s:"),
+                            nearby ? _("nearby ") : "",
+                            nearby ? "" : _(" on this level"));
                     putstr(win, 0, upstart(outbuf));
                     /* hack alert! Qt watches a text window for any line
                        with 4 consecutive spaces and renders the window
@@ -2164,16 +2164,16 @@ look_engrs(boolean nearby)
             if (!e)
                 continue;
             is_headstone = IS_GRAVE(svl.lastseentyp[x][y]);
-            Sprintf(lookbuf, " (%s", is_headstone ? "grave" : "engraving");
+            Sprintf(lookbuf, _(" (%s"), is_headstone ? _("grave") : _("engraving"));
             (void) add_quoted_engraving(x, y, lookbuf, TRUE);
             /* the paren is used by farlook and add_quoted_engraving()
                expected to see it; we don't want it here */
             if (is_headstone) {
-                (void) strsubst(lookbuf, "(grave with ", "");
-                (void) strsubst(lookbuf, "(grave whose ", "");
+                (void) strsubst(lookbuf, _("(grave with "), "");
+                (void) strsubst(lookbuf, _("(grave whose "), "");
             } else {
-                (void) strsubst(lookbuf, "(engraving with ", "");
-                (void) strsubst(lookbuf, "(engraving ", "engraving ");
+                (void) strsubst(lookbuf, _("(engraving with "), "");
+                (void) strsubst(lookbuf, _("(engraving "), _("engraving "));
             }
 
             glyph = glyph_at(x, y);
@@ -2184,7 +2184,7 @@ look_engrs(boolean nearby)
             } else {
                 /* engraving or grave covered by object(s) */
                 Snprintf(eos(lookbuf), sizeof lookbuf - strlen(lookbuf),
-                         ", obscured by %s", encglyph(glyph));
+                         _(", obscured by %s"), encglyph(glyph));
                 glyph = is_headstone ? cmap_to_glyph(S_grave)
                                      : engraving_to_glyph(e);
                 ++count;
@@ -2195,9 +2195,9 @@ look_engrs(boolean nearby)
                 cmode = (iflags.getpos_coords != GPCOORDS_NONE)
                            ? iflags.getpos_coords : GPCOORDS_MAP;
                 if (count == 1) {
-                    Sprintf(outbuf, "%sseen or remembered engravings%s:",
-                            nearby ? "nearby " : "",
-                            nearby ? "" : " on this level");
+                    Sprintf(outbuf, _("%sseen or remembered engravings%s:"),
+                            nearby ? _("nearby ") : "",
+                            nearby ? "" : _(" on this level"));
                     putstr(win, 0, upstart(outbuf));
                     /* hack alert! Qt watches a text window for any line
                        with 4 consecutive spaces and renders the window

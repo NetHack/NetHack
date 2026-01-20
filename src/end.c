@@ -205,7 +205,7 @@ done_in_by(struct monst *mtmp, int how)
     if ((mptr->geno & G_UNIQ) != 0 && !(imitator && !mimicker)
         && !(mptr == &mons[PM_HIGH_CLERIC] && !mtmp->ispriest)) {
         if (!type_is_pname(mptr))
-            Strcat(buf, "the ");
+            Strcat(buf, _("the "));
         svk.killer.format = KILLED_BY;
     }
     /* _the_ <invisible> <distorted> ghost of Dudley */
@@ -215,14 +215,14 @@ done_in_by(struct monst *mtmp, int how)
 #else
     if (mptr == &mons[PM_GHOST] && has_mgivenname(mtmp)) {
 #endif
-        Strcat(buf, "the ");
+        Strcat(buf, _("the "));
         svk.killer.format = KILLED_BY;
     }
     (void) monhealthdescr(mtmp, TRUE, eos(buf));
     if (mtmp->minvis)
-        Strcat(buf, "invisible ");
+        Strcat(buf, _("invisible "));
     if (distorted)
-        Strcat(buf, "hallucinogen-distorted ");
+        Strcat(buf, _("hallucinogen-distorted "));
 
     if (imitator) {
         char shape[BUFSZ];
@@ -239,7 +239,7 @@ done_in_by(struct monst *mtmp, int how)
                    && !strcmp(fakenm, "vampire bat")) {
             /* special case: use "vampire in bat form" in preference
                to redundant looking "vampire in vampire bat form" */
-            fakenm = "bat";
+            fakenm = _("bat");
         }
         /* for the alternate format, always suppress any article;
            pname and the_unique should also have s_suffix() applied,
@@ -247,14 +247,14 @@ done_in_by(struct monst *mtmp, int how)
         if (alt || type_is_pname(mptr)) /* no article */
             Strcpy(shape, fakenm);
         else if (the_unique_pm(mptr)) /* "the"; don't use the() here */
-            Sprintf(shape, "the %s", fakenm);
+            Sprintf(shape, _("the %s"), fakenm);
         else /* "a"/"an" */
             Strcpy(shape, an(fakenm));
         /* omit "called" to avoid excessive verbosity */
         Sprintf(eos(buf),
-                alt ? "%s in %s form"
-                    : mimicker ? "%s disguised as %s"
-                               : "%s imitating %s",
+                alt ? _("%s in %s form")
+                    : mimicker ? _("%s disguised as %s")
+                               : _("%s imitating %s"),
                 realnm, shape);
         mptr = mtmp->data; /* reset for mimicker case */
 #if 0  /* hardfought */
@@ -262,15 +262,15 @@ done_in_by(struct monst *mtmp, int how)
         Strcpy(buf, m_monnam(mtmp));
 #endif
     } else if (mptr == &mons[PM_GHOST]) {
-        Strcat(buf, "ghost");
+        Strcat(buf, _("ghost"));
         if (has_mgivenname(mtmp))
-            Sprintf(eos(buf), " of %s", MGIVENNAME(mtmp));
+            Sprintf(eos(buf), _(" of %s"), MGIVENNAME(mtmp));
     } else if (mtmp->isshk) {
         const char *shknm = shkname(mtmp),
                    *honorific = shkname_is_pname(mtmp) ? ""
                                    : mtmp->female ? _("Ms. ") : _("Mr. ");
 
-        Sprintf(eos(buf), "%s%s, the shopkeeper", honorific, shknm);
+        Sprintf(eos(buf), _("%s%s, the shopkeeper"), honorific, shknm);
         svk.killer.format = KILLED_BY;
     } else if (mtmp->ispriest || mtmp->isminion) {
         /* m_monnam() suppresses "the" prefix plus "invisible", and
@@ -279,8 +279,8 @@ done_in_by(struct monst *mtmp, int how)
     } else {
         Strcat(buf, pmname(mptr, Mgender(mtmp)));
         if (has_mgivenname(mtmp)) {
-            Sprintf(eos(buf), " %s %s",
-                    has_ebones(mtmp) ? "of" : "called",
+            Sprintf(eos(buf), _(" %s %s"),
+                    has_ebones(mtmp) ? _("of") : _("called"),
                     MGIVENNAME(mtmp));
         }
     }
@@ -1407,12 +1407,12 @@ really_done(int how)
     }
 #endif
     if (u.uhave.amulet) {
-        Strcat(svk.killer.name, " (with the Amulet)");
+        Strcat(svk.killer.name, _(" (with the Amulet)"));
     } else if (how == ESCAPED) {
         if (Is_astralevel(&u.uz)) /* offered Amulet to wrong deity */
-            Strcat(svk.killer.name, " (in celestial disgrace)");
+            Strcat(svk.killer.name, _(" (in celestial disgrace)"));
         else if (carrying(FAKE_AMULET_OF_YENDOR))
-            Strcat(svk.killer.name, " (with a fake Amulet)");
+            Strcat(svk.killer.name, _(" (with a fake Amulet)"));
         /* don't bother counting to see whether it should be plural */
     }
 

@@ -1560,7 +1560,7 @@ dospinweb(void)
         case HOLE:
         case TRAPDOOR:
             You(_("web over the %s."),
-                (ttmp->ttyp == TRAPDOOR) ? "trap door" : "hole");
+                (ttmp->ttyp == TRAPDOOR) ? _("trap door") : _("hole"));
             deltrap(ttmp);
             newsym(x, y);
             return ECMD_TIME;

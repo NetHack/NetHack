@@ -932,7 +932,7 @@ chwepon(struct obj *otmp, int amount)
         multiple = (uwep->quan > 1L);
         /* order: message, transformation, shop handling */
         Your(_("%s %s much sharper now."), simpleonames(uwep),
-             multiple ? "fuse, and become" : "is");
+             multiple ? _("fuse, and become") : _("is"));
         uwep->otyp = CRYSKNIFE;
         uwep->oerodeproof = 0;
         if (multiple) {
@@ -953,7 +953,7 @@ chwepon(struct obj *otmp, int amount)
         multiple = (uwep->quan > 1L);
         /* order matters: message, shop handling, transformation */
         Your(_("%s %s much duller now."), simpleonames(uwep),
-             multiple ? "fuse, and become" : "is");
+             multiple ? _("fuse, and become") : _("is"));
         costly_alteration(uwep, COST_DEGRD); /* DECHNT? other? */
         uwep->otyp = WORM_TOOTH;
         uwep->oerodeproof = 0;
@@ -991,7 +991,7 @@ chwepon(struct obj *otmp, int amount)
     if (!Blind) {
         xtime = (amount * amount == 1) ? _("moment") : _("while");
         pline(_("%s %s for a %s."),
-              Yobjnam2(uwep, amount == 0 ? "violently glow" : "glow"), color,
+              Yobjnam2(uwep, amount == 0 ? _("violently glow") : _("glow")), color,
               xtime);
         if (otyp != STRANGE_OBJECT && uwep->known
             && (amount > 0 || (amount < 0 && otmp->bknown)))

@@ -1945,13 +1945,13 @@ first_weapon_hit(struct obj *weapon)
     buf[0] = '\0';
     /* include "cursed" if known but don't bother with blessed */
     if (weapon->cursed && weapon->bknown)
-        Strcat(buf, "cursed "); /* normally supplied by doname() */
+        Strcat(buf, _("cursed ")); /* normally supplied by doname() */
     if (obj_is_pname(weapon)) {
         Strcat(buf, ONAME(weapon)); /* fully IDed artifact */
     } else {
         Strcat(buf, simpleonames(weapon));
         if (weapon->oartifact && weapon->dknown)
-            Sprintf(eos(buf), " named %s", bare_artifactname(weapon));
+            Sprintf(eos(buf), _(" named %s"), bare_artifactname(weapon));
     }
 
     /* when a hit breaks the never-hit-with-wielded-weapon conduct
@@ -1961,7 +1961,7 @@ first_weapon_hit(struct obj *weapon)
          N : hit with a wielded weapon for the first time
        reported on the same turn (N) looks "suboptimal" */
     livelog_printf(LL_CONDUCT,
-                   "hit with a wielded weapon (%s) for the first time", buf);
+                   _("hit with a wielded weapon (%s) for the first time"), buf);
 }
 
 staticfn boolean

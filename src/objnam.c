@@ -1478,7 +1478,7 @@ doname_base(
                     Strcat(prefix, "partly used ");
             }
             if (obj->lamplit)
-                Concat(bp, 0, " (lit)");
+                Concat(bp, 0, _(" (lit)"));
             break;
         }
         if (objects[obj->otyp].oc_charged)
@@ -1487,20 +1487,20 @@ doname_base(
     case WAND_CLASS:
  charges:
         if (known)
-            ConcatF2(bp, 0, " (%d:%d)", (int) obj->recharged, obj->spe);
+            ConcatF2(bp, 0, _(" (%d:%d)"), (int) obj->recharged, obj->spe);
         break;
     case POTION_CLASS:
         if (obj->otyp == POT_OIL && obj->lamplit)
-            Concat(bp, 0, " (lit)");
+            Concat(bp, 0, _(" (lit)"));
         break;
     case RING_CLASS:
  ring:  /* normal rings reach here 'naturally'; meat ring jumps here */
         if (obj->owornmask & W_RINGR)
-            Concat(bp, 0, " (on right ");
+            Concat(bp, 0, _(" (on right "));
         if (obj->owornmask & W_RINGL)
-            Concat(bp, 0, " (on left ");
+            Concat(bp, 0, _(" (on left "));
         if (obj->owornmask & W_RING) /* either left or right */
-            ConcatF1(bp, 0,"%s)", body_part(HAND));
+            ConcatF1(bp, 0, _("%s)"), body_part(HAND));
         if (known && objects[obj->otyp].oc_charged) {
             Sprintf(eos(prefix), "%+d ", obj->spe); /* sitoa(obj->spe)+" " */
         }
@@ -1535,7 +1535,7 @@ doname_base(
                 Strcat(prefix, mons[omndx].pmnames[NEUTRAL]);
                 Strcat(prefix, " ");
                 if (obj->spe == 1)
-                    Concat(bp, 0, " (laid by you)");
+                    Concat(bp, 0, _(" (laid by you)"));
             }
         } else if (obj->otyp == MEAT_RING) {
             goto ring;
@@ -1577,7 +1577,7 @@ doname_base(
                  ? (is_ammo(obj) || is_missile(obj))
                  : !is_weptool(obj)))
             && !twoweap_primary) {
-            Concat(bp, 0, " (wielded)");
+            Concat(bp, 0, _(" (wielded)"));
         } else {
             const char *hand_s = body_part(HAND);
             char *obufp, handsbuf[40];
