@@ -2119,7 +2119,7 @@ silly_thing(const char *word,
     }
     if (s1)
         pline(_("Use the '%s' command to %s %s%s."), s1, s2,
-              !(is_plural(otmp) || pair_of(otmp)) ? "that" : "those", s3);
+              !(is_plural(otmp) || pair_of(otmp)) ? _("that") : _("those"), s3);
     else
 #endif
     /* see comment about Amulet of Yendor in objtyp_is_callable(do_name.c);

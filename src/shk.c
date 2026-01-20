@@ -2209,7 +2209,7 @@ dopayobj(
         Sprintf(qsfx, " for %ld %s.  Pay?", ltmp, currency(ltmp));
         (void) safe_qbuf(qbuf, (char *) 0, qsfx, obj,
                          (quan == 1L) ? Doname2 : doname, ansimpleoname,
-                         (quan == 1L) ? "that" : "those");
+                         (quan == 1L) ? _("that") : _("those"));
         if (y_n(qbuf) == 'n') {
             buy = PAY_SKIP;                         /* don't want to buy */
         }
@@ -3377,7 +3377,7 @@ shk_names_obj(
     if (was_unknown) {
         Sprintf(fmtbuf, "%%s; you %s", fmt);
         obj_name[0] = highc(obj_name[0]);
-        pline(fmtbuf, obj_name, (obj->quan > 1L) ? "them" : "it", amt,
+        pline(fmtbuf, obj_name, (obj->quan > 1L) ? _("them") : _("it"), amt,
               plur(amt), arg);
     } else {
         You(fmt, obj_name, amt, plur(amt), arg);
@@ -3782,12 +3782,12 @@ stolen_value(
             Sprintf(buf, "%sowe %s %ld %s", still, shkname(shkp),
                     value, currency(value));
             if (u_count) /* u_count > 0 implies Has_contents(obj) */
-                Sprintf(eos(buf), " for %s%sits contents",
-                        was_unpaid ? "it and " : "",
-                        (c_count > u_count) ? "some of " : "");
+                Sprintf(eos(buf), _(" for %s%sits contents"),
+                        was_unpaid ? _("it and ") : "",
+                        (c_count > u_count) ? _("some of ") : "");
             else if (obj->oclass != COIN_CLASS)
-                Sprintf(eos(buf), " for %s",
-                        (obj->quan > 1L) ? "them" : "it");
+                Sprintf(eos(buf), _(" for %s"),
+                        (obj->quan > 1L) ? _("them") : _("it"));
 
             You(_("%s!"), buf); /* "You owe <shk> N zorkmids for it!" */
         }
@@ -3992,7 +3992,7 @@ sellobj(
             Sprintf(qbuf, "Will you accept %ld %s in credit for ", tmpcr,
                     currency(tmpcr));
             c = ynaq(safe_qbuf(qbuf, qbuf, "?", obj, doname, thesimpleoname,
-                               (obj->quan == 1L) ? "that" : "those"));
+                               (obj->quan == 1L) ? _("that") : _("those")));
             if (c == 'a') {
                 c = 'y';
                 ga.auto_credit = TRUE;
@@ -4085,9 +4085,9 @@ sellobj(
                                                 : _(" and items inside"))
                                : _(and_its_contents))
                         : "",
-                    one ? "it" : "them");
+                    one ? _("it") : _("them"));
             (void) safe_qbuf(qbuf, qbuf, qsfx, obj, xname, simpleonames,
-                             one ? "that" : "those");
+                             one ? _("that") : _("those"));
         } else
             qbuf[0] = '\0'; /* just to pacify lint */
 
