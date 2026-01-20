@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 #define NEW_ENEXTO
 
 staticfn boolean goodpos_onscary(coordxy, coordxy, struct permonst *);
@@ -2068,10 +2069,10 @@ mlevel_tele_trap(
         }
 
         if (in_sight) {
-            pline_mon(mtmp, "Suddenly, %s %s.", mon_nam(mtmp),
-                     (tt == HOLE) ? "falls into a hole"
-                   : (tt == TRAPDOOR) ? "falls through a trap door"
-                   : "disappears out of sight");
+            pline_mon(mtmp, _("Suddenly, %s %s."), mon_nam(mtmp),
+                     (tt == HOLE) ? _("falls into a hole")
+                   : (tt == TRAPDOOR) ? _("falls through a trap door")
+                   : _("disappears out of sight"));
             if (trap)
                 seetrap(trap);
         }

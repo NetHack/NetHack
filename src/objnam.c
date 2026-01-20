@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 /* "an uncursed greased partly eaten guardian naga hatchling [corpse]" */
 #define PREFIX 80 /* (56) */
@@ -2105,6 +2106,9 @@ just_an(char *outbuf, const char *str)
     char c0;
 
     *outbuf = '\0';
+    /* Korean doesn't use articles like "a"/"an" */
+    if (is_korean_locale())
+        return outbuf;
     /* Korean/CJK strings don't use English articles.
        Check for non-ASCII characters (UTF-8 high bit set). */
     if (str && (unsigned char)*str > 127)
@@ -2175,6 +2179,10 @@ the(const char *str)
     if (!str || !*str) {
         impossible("Alphabet soup: 'the(%s)'.", str ? "\"\"" : "<null>");
         return strcpy(buf, "the []");
+    }
+    /* Korean doesn't use articles like "the" */
+    if (is_korean_locale()) {
+        return strcpy(buf, str);
     }
     if (!strncmpi(str, "the ", 4)) {
         buf[0] = lowc(*str);

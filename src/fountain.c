@@ -342,7 +342,7 @@ drinkfountain(void)
                     pline(_("Then it passes."));
                 }
             } else {
-                You_see("an image of someone stalking you.");
+                You_see(_("an image of someone stalking you."));
                 pline(_("But it disappears."));
             }
             HSee_invisible |= FROMOUTSIDE;

@@ -1409,8 +1409,8 @@ hit_bars(
                 pline_The(_("iron bars are dissolved!"));
             } else {
                 Soundeffect(se_angry_snakes, 100);
-                You_hear(Hallucination ? "angry snakes!"
-                                       : "a hissing noise.");
+                You_hear(Hallucination ? _("angry snakes!")
+                                       : _("a hissing noise."));
             }
             if (!nodissolve)
                 dissolve_bars(barsx, barsy);

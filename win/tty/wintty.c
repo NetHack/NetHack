@@ -2461,8 +2461,16 @@ tty_display_file(
     /* FIXME:  this won't work if fname is inside a dlb container */
     {
         /* use external pager; this may give security problems */
-        int fd = open(fname, O_RDONLY);
+        const char *localized_fname;
+        int fd;
 
+        /* Try localized filename first (e.g., hh.ko for Korean) */
+        localized_fname = get_localized_filename(fname);
+        fd = open(localized_fname, O_RDONLY);
+        if (fd < 0 && localized_fname != fname) {
+            /* Fall back to original filename */
+            fd = open(fname, O_RDONLY);
+        }
         if (fd < 0) {
             if (complain)
                 pline(_("Cannot open %s."), fname);
@@ -2494,9 +2502,17 @@ tty_display_file(
         dlb *f;
         char buf[BUFSZ];
         char *cr;
+        const char *localized_fname;
 
         tty_clear_nhwindow(WIN_MESSAGE);
-        f = dlb_fopen(fname, "r");
+
+        /* Try localized filename first (e.g., hh.ko for Korean) */
+        localized_fname = get_localized_filename(fname);
+        f = dlb_fopen(localized_fname, "r");
+        if (!f && localized_fname != fname) {
+            /* Fall back to original filename */
+            f = dlb_fopen(fname, "r");
+        }
         if (!f) {
             if (complain) {
                 home();

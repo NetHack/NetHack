@@ -6,6 +6,7 @@
 /* Contains code for 'd', 'D' (drop), '>', '<' (up, down) */
 
 #include "hack.h"
+#include "i18n.h"
 
 staticfn boolean teleport_sink(void);
 staticfn void dosinkring(struct obj *);
@@ -1448,26 +1449,26 @@ staticfn void
 familiar_level_msg(void)
 {
     static const char *const fam_msgs[4] = {
-        "You have a sense of deja vu.",
-        "You feel like you've been here before.",
-        "This place %s familiar...", 0 /* no message */
+        N_("You have a sense of deja vu."),
+        N_("You feel like you've been here before."),
+        N_("This place %s familiar..."), 0 /* no message */
     };
     static const char *const halu_fam_msgs[4] = {
-        "Whoa!  Everything %s different.",
-        "You are surrounded by twisty little passages, all alike.",
-        "Gee, this %s like uncle Conan's place...", 0 /* no message */
+        N_("Whoa!  Everything %s different."),
+        N_("You are surrounded by twisty little passages, all alike."),
+        N_("Gee, this %s like uncle Conan's place..."), 0 /* no message */
     };
     const char *mesg;
     char buf[BUFSZ];
     int which = rn2(4);
 
     if (Hallucination)
-        mesg = halu_fam_msgs[which];
+        mesg = halu_fam_msgs[which] ? _(halu_fam_msgs[which]) : 0;
     else
-        mesg = fam_msgs[which];
+        mesg = fam_msgs[which] ? _(fam_msgs[which]) : 0;
     if (mesg && strchr(mesg, '%')) {
         DISABLE_WARNING_FORMAT_NONLITERAL
-        Sprintf(buf, mesg, !Blind ? "looks" : "seems");
+        Sprintf(buf, mesg, !Blind ? _("looks") : _("seems"));
         RESTORE_WARNING_FORMAT_NONLITERAL
         mesg = buf;
     }

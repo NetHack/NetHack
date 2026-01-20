@@ -84,6 +84,20 @@ extern int utf8_char_width(const char *utf8str);
 extern const char *tr_obj_name(const char *name);
 
 /*
+ * Get localized filename for help/data files
+ * If Korean locale is active, returns "filename.ko" if it exists,
+ * otherwise returns the original filename.
+ *
+ * Example:
+ *   get_localized_filename("help") returns "help.ko" (Korean)
+ *   get_localized_filename("help") returns "help" (English)
+ *
+ * Note: The returned pointer points to a static buffer that is
+ * overwritten on each call. Copy the result if you need to keep it.
+ */
+extern const char *get_localized_filename(const char *fname);
+
+/*
  * Korean postposition markers for translation strings
  *
  * Usage in .po files:

@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 /*
  * FIXME:
@@ -5440,15 +5441,15 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* First 4 supplied by Ronen and Tamar, remainder by development team */
 static const char *Izchak_speaks[] = {
-    "%s says: 'These shopping malls give me a headache.'",
-    "%s says: 'Slow down.  Think clearly.'",
-    "%s says: 'You need to take things one at a time.'",
-    "%s says: 'I don't like poofy coffee... give me Colombian Supremo.'",
-    "%s says that getting the devteam's agreement on anything is difficult.",
-    "%s says that he has noticed those who serve their deity will prosper.",
-    "%s says: 'Don't try to steal from me - I have friends in high places!'",
-    "%s says: 'You may well need something from this shop in the future.'",
-    "%s comments about the Valley of the Dead as being a gateway."
+    N_("%s says: 'These shopping malls give me a headache.'"),
+    N_("%s says: 'Slow down.  Think clearly.'"),
+    N_("%s says: 'You need to take things one at a time.'"),
+    N_("%s says: 'I don't like poofy coffee... give me Colombian Supremo.'"),
+    N_("%s says that getting the devteam's agreement on anything is difficult."),
+    N_("%s says that he has noticed those who serve their deity will prosper."),
+    N_("%s says: 'Don't try to steal from me - I have friends in high places!'"),
+    N_("%s says: 'You may well need something from this shop in the future.'"),
+    N_("%s comments about the Valley of the Dead as being a gateway.")
 };
 
 void
@@ -5527,7 +5528,7 @@ shk_chat(struct monst *shkp)
               (!Deaf && !muteshk(shkp)) ? "says" : "indicates");
     } else if (is_izchak(shkp, FALSE)) {
         if (!Deaf && !muteshk(shkp))
-            pline(ROLL_FROM(Izchak_speaks), shkname(shkp));
+            pline(_(ROLL_FROM(Izchak_speaks)), shkname(shkp));
     } else {
         if (!Deaf && !muteshk(shkp))
             pline(_("%s talks about the problem of shoplifters."), Shknam(shkp));

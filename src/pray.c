@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 staticfn int prayer_done(void);
 staticfn void maybe_turn_mon_iter(struct monst *);
@@ -630,7 +631,7 @@ god_zaps_you(aligntyp resp_god)
             if (Blind)
                 pline(_("For some reason you're unaffected."));
             else
-                (void) ureflects("%s reflects from your %s.", "It");
+                (void) ureflects(_("%s reflects from your %s."), _("It"));
             monstseesu(M_SEEN_REFL);
         } else if (Shock_resistance) {
             shieldeff(u.ux, u.uy);

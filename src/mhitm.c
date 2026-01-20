@@ -5,6 +5,7 @@
 
 #include "hack.h"
 #include "artifact.h"
+#include "i18n.h"
 
 staticfn void noises(struct monst *, struct attack *);
 staticfn void pre_mm_attack(struct monst *, struct monst *);
@@ -761,12 +762,12 @@ gazemm(struct monst *magr, struct monst *mdef, struct attack *mattk)
     /* call mon_reflects 2x, first test, then, if visible, print message */
     if (magr->data == &mons[PM_MEDUSA] && mon_reflects(mdef, (char *) 0)) {
         if (canseemon(mdef))
-            (void) mon_reflects(mdef, "The gaze is reflected away by %s %s.");
+            (void) mon_reflects(mdef, _("The gaze is reflected away by %s %s."));
         if (mdef->mcansee) {
             if (mon_reflects(magr, (char *) 0)) {
                 if (canseemon(magr))
                     (void) mon_reflects(magr,
-                                      "The gaze is reflected away by %s %s.");
+                                      _("The gaze is reflected away by %s %s."));
                 return M_ATTK_MISS;
             }
             if (mdef->minvis && !perceives(magr->data)) {

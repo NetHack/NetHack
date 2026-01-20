@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 /* monster mage spells */
 enum mcast_mage_spells {
@@ -682,7 +683,7 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
 
         Soundeffect(se_bolt_of_lightning, 80);
         pline(_("A bolt of lightning strikes down at you from above!"));
-        reflects = ureflects("It bounces off your %s%s.", "");
+        reflects = ureflects(_("It bounces off your %s%s."), "");
         orig_dmg = dmg = d(8, 6);
         if (reflects || Shock_resistance) {
             shieldeff(u.ux, u.uy);

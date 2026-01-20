@@ -5,6 +5,7 @@
 
 #include "hack.h"
 #include "artifact.h"
+#include "i18n.h"
 
 static NEARDATA struct obj *mon_currwep = (struct obj *) 0;
 
@@ -1715,10 +1716,10 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             boolean useeit = canseemon(mtmp);
 
             if (useeit)
-                (void) ureflects("%s gaze is reflected by your %s.",
+                (void) ureflects(_("%s gaze is reflected by your %s."),
                                  s_suffix(Monnam(mtmp)));
             if (mon_reflects(mtmp, !useeit ? (char *) 0
-                                  : "The gaze is reflected away by %s %s!"))
+                                  : _("The gaze is reflected away by %s %s!")))
                 break;
             if (!m_canseeu(mtmp)) { /* probably you're invisible */
                 if (useeit)
@@ -2533,9 +2534,9 @@ passiveum(
                                      flags.female ? FEMALE : MALE));
                     } else {
                         if (mon_reflects(mtmp,
-                                         "Your gaze is reflected by %s %s."))
+                                         _("Your gaze is reflected by %s %s.")))
                             return 1;
-                        pline_mon(mtmp, "%s is frozen by your gaze!",
+                        pline_mon(mtmp, _("%s is frozen by your gaze!"),
                                   Monnam(mtmp));
                         paralyze_monst(mtmp, tmp);
                         return M_ATTK_AGR_DONE;

@@ -6,6 +6,7 @@
 #include "hack.h"
 #include "mfndpos.h"
 #include "artifact.h"
+#include "i18n.h"
 
 staticfn void msg_mon_movement(struct monst *, coordxy, coordxy) NONNULLARG1;
 staticfn void watch_on_duty(struct monst *);
@@ -55,10 +56,10 @@ mb_trapped(struct monst *mtmp, boolean canseeit)
 {
     if (flags.verbose) {
         if (canseeit && !Unaware)
-            pline_mon(mtmp, "KABOOM!!  You see a door explode.");
+            pline_mon(mtmp, _("KABOOM!!  You see a door explode."));
         else if (!Deaf)
             You_hear(_("a %s explosion."),
-                     (mdistu(mtmp) > 7 * 7) ? "distant" : "nearby");
+                     (mdistu(mtmp) > 7 * 7) ? _("distant") : _("nearby"));
     }
     wake_nearto(mtmp->mx, mtmp->my, 7 * 7);
     mtmp->mstun = 1;
@@ -402,7 +403,7 @@ bee_eat_jelly(struct monst *mon, struct obj *obj)
         if (obj->quan > 1L)
             obj = splitobj(obj, 1L);
         if (canseemon(mon))
-            pline_mon(mon, "%s eats %s.", Monnam(mon), an(xname(obj)));
+            pline_mon(mon, _("%s eats %s."), Monnam(mon), an(xname(obj)));
         delobj(obj);
 
         if ((int) mon->m_lev < mons[PM_QUEEN_BEE].mlevel - 1)
@@ -1565,7 +1566,7 @@ postmov(
                             pline_mon(mtmp, "%s unlocks and opens a door.",
                                   Monnam(mtmp));
                         } else if (canseeit) {
-                            You_see("a door unlock and open.");
+                            You_see(_("a door unlock and open."));
                         } else if (!Deaf) {
                             You_hear(_("a door unlock and open."));
                         }

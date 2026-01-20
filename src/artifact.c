@@ -6,6 +6,7 @@
 #include "hack.h"
 #include "artifact.h"
 #include "artilist.h"
+#include "i18n.h"
 
 #ifndef SFCTOOL
 
@@ -1594,8 +1595,8 @@ artifact_hit(
             }
         } else if (is_art(otmp, ART_VORPAL_BLADE)
                    && (dieroll == 1 || mdef->data == &mons[PM_JABBERWOCK])) {
-            static const char *const behead_msg[2] = { "%s beheads %s!",
-                                                       "%s decapitates %s!" };
+            static const char *const behead_msg[2] = { N_("%s beheads %s!"),
+                                                       N_("%s decapitates %s!") };
 
             if (youattack && engulfing_u(mdef))
                 return FALSE;
@@ -1615,7 +1616,7 @@ artifact_hit(
                     return TRUE;
                 }
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
-                pline(ROLL_FROM(behead_msg), wepdesc,
+                pline(_(ROLL_FROM(behead_msg)), wepdesc,
                       mon_nam(mdef));
                 if (Hallucination && !flags.female)
                     pline(_("Good job Henry, but that wasn't Anne."));
@@ -1635,7 +1636,7 @@ artifact_hit(
                     return TRUE;
                 }
                 *dmgptr = 2 * (Upolyd ? u.mh : u.uhp) + FATAL_DAMAGE_MODIFIER;
-                pline(ROLL_FROM(behead_msg), wepdesc, "you");
+                pline(_(ROLL_FROM(behead_msg)), wepdesc, _("you"));
                 observe_object(otmp);
                 /* Should amulets fall off? */
                 return TRUE;

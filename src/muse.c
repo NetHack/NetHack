@@ -7,6 +7,7 @@
  */
 
 #include "hack.h"
+#include "i18n.h"
 
 /* Let monsters use magic items.  Arbitrary assumptions: Monsters only use
  * scrolls when they can see, monsters know when wands have 0 charges,
@@ -108,7 +109,7 @@ precheck(struct monst *mon, struct obj *obj)
                     pline1(empty);
             } else {
                 if (vis)
-                    pline_mon(mtmp, "In a cloud of smoke, %s emerges!", a_monnam(mtmp));
+                    pline_mon(mtmp, _("In a cloud of smoke, %s emerges!"), a_monnam(mtmp));
                 pline(_("%s speaks."), vis ? Monnam(mtmp) : Something);
                 /* I suspect few players will be upset that monsters */
                 /* can't wish for wands of death here.... */

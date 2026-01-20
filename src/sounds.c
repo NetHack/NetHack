@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 staticfn boolean throne_mon_sound(struct monst *);
 staticfn boolean beehive_mon_sound(struct monst *);
@@ -33,10 +34,10 @@ throne_mon_sound(struct monst *mtmp)
          || is_prince(mtmp->data)) && !is_animal(mtmp->data)
         && mon_in_room(mtmp, COURT)) {
         static const char *const throne_msg[4] = {
-            "the tones of courtly conversation.",
-            "a sceptre pounded in judgment.",
-            "Someone shouts \"Off with %s head!\"",
-            "Queen Beruthiel's cats!",
+            N_("the tones of courtly conversation."),
+            N_("a sceptre pounded in judgment."),
+            N_("Someone shouts \"Off with %s head!\""),
+            N_("Queen Beruthiel's cats!"),
         };
         int which = rn2(3) + (Hallucination ? 1 : 0);
 
@@ -46,10 +47,10 @@ throne_mon_sound(struct monst *mtmp)
             } else if (which == 1) {
                 Soundeffect(se_sceptor_pounding, 100);
             }
-            You_hear1(throne_msg[which]);
+            You_hear1(_(throne_msg[which]));
         } else {
             DISABLE_WARNING_FORMAT_NONLITERAL
-            pline(throne_msg[2], uhis());
+            pline(_(throne_msg[2]), uhis());
             RESTORE_WARNING_FORMAT_NONLITERAL
         }
         return TRUE;

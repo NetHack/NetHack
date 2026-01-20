@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 staticfn int use_camera(struct obj *);
 staticfn int use_towel(struct obj *);
@@ -308,7 +309,7 @@ its_dead(coordxy rx, coordxy ry, int *resp)
     return FALSE; /* no corpse or statue */
 }
 
-static const char hollow_str[] = "a hollow sound.  This must be a secret %s!";
+static const char hollow_str[] = N_("a hollow sound.  This must be a secret %s!");
 
 /* Strictly speaking it makes no sense for usage of a stethoscope to
    not take any time; however, unless it did, the stethoscope would be
@@ -469,8 +470,8 @@ use_stethoscope(struct obj *obj)
     return res;
 }
 
-static const char whistle_str[] = "produce a %s whistling sound.",
-                  alt_whistle_str[] = "produce a %s, sharp vibration.";
+static const char whistle_str[] = N_("produce a %s whistling sound."),
+                  alt_whistle_str[] = N_("produce a %s, sharp vibration.");
 
 staticfn void
 use_whistle(struct obj *obj)
@@ -1008,7 +1009,7 @@ beautiful(void)
     return res;
 }
 
-static const char look_str[] = "look %s.";
+static const char look_str[] = N_("look %s.");
 
 staticfn int
 use_mirror(struct obj *obj)
@@ -1126,7 +1127,7 @@ use_mirror(struct obj *obj)
         if (vis)
             pline(_("%s doesn't have a reflection."), Monnam(mtmp));
     } else if (monable && mtmp->data == &mons[PM_MEDUSA]) {
-        if (mon_reflects(mtmp, "The gaze is reflected away by %s %s!"))
+        if (mon_reflects(mtmp, _("The gaze is reflected away by %s %s!")))
             return ECMD_TIME;
         if (vis)
             pline(_("%s is turned to stone!"), Monnam(mtmp));
@@ -2675,7 +2676,7 @@ touchstone_ok(struct obj *obj)
 staticfn int
 use_stone(struct obj *tstone)
 {
-    static const char scritch[] = "\"scritch, scritch\"";
+    static const char scritch[] = N_("\"scritch, scritch\"");
     struct obj *obj;
     boolean do_scratch;
     const char *streak_color;
@@ -4502,17 +4503,17 @@ flip_through_book(struct obj *obj)
         pline(_("This looks like it might be interesting to read."));
     } else {
         static const char *const fadeness[] = {
-            "fresh",
-            "slightly faded",
-            "very faded",
-            "extremely faded",
-            "barely visible"
+            N_("fresh"),
+            N_("slightly faded"),
+            N_("very faded"),
+            N_("extremely faded"),
+            N_("barely visible")
         };
         int findx = min(obj->spestudied, MAX_SPELL_STUDY);
 
         pline(_("The%s ink in this spellbook is %s."),
-              objects[obj->otyp].oc_magic ? " magical" : "",
-              fadeness[findx]);
+              objects[obj->otyp].oc_magic ? _(" magical") : "",
+              _(fadeness[findx]));
     }
 
     return ECMD_TIME;

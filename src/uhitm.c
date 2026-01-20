@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 staticfn boolean mhitm_mgc_atk_negated(struct monst *, struct monst *,
                                      boolean) NONNULLPTRS;
@@ -2290,8 +2291,8 @@ mhitm_ad_rust(
             return;
         if (completelyrusts(pd)) { /* PM_IRON_GOLEM */
             if (gv.vis && canseemon(mdef))
-                pline_mon(mdef, "%s %s to pieces!", Monnam(mdef),
-                      !mlifesaver(mdef) ? "falls" : "starts to fall");
+                pline_mon(mdef, _("%s %s to pieces!"), Monnam(mdef),
+                      !mlifesaver(mdef) ? _("falls") : _("starts to fall"));
             monkilled(mdef, (char *) 0, AD_RUST);
             if (!DEADMONSTER(mdef)) {
                 mhm->hitflags = M_ATTK_MISS;
@@ -2370,8 +2371,8 @@ mhitm_ad_dcay(
             /* note: the life-saved case is hypothetical because
                life-saving doesn't work for golems */
             if (gv.vis && canseemon(mdef))
-                pline_mon(mdef, "%s %s to pieces!", Monnam(mdef),
-                      !mlifesaver(mdef) ? "falls" : "starts to fall");
+                pline_mon(mdef, _("%s %s to pieces!"), Monnam(mdef),
+                      !mlifesaver(mdef) ? _("falls") : _("starts to fall"));
             monkilled(mdef, (char *) 0, AD_DCAY);
             if (!DEADMONSTER(mdef)) {
                 mhm->done = TRUE;
@@ -3044,7 +3045,7 @@ mhitm_ad_curs(
                 if (gv.vis && canseemon(mdef)) {
                     pline(_("Some writing vanishes from %s head!"),
                           s_suffix(mon_nam(mdef)));
-                    pline_mon(mdef, "%s is destroyed!", Monnam(mdef));
+                    pline_mon(mdef, _("%s is destroyed!"), Monnam(mdef));
                 }
                 mondied(mdef);
                 if (!DEADMONSTER(mdef)) {
@@ -5999,7 +6000,7 @@ passive(
                     break;
                 }
                 if (mon->mcansee) {
-                    if (ureflects("%s gaze is reflected by your %s.",
+                    if (ureflects(_("%s gaze is reflected by your %s."),
                                   s_suffix(Monnam(mon)))) {
                         ;
                     } else if (Hallucination && rn2(4)) {

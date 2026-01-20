@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 extern const char *const destroy_strings[][3]; /* from zap.c */
 
@@ -380,17 +381,17 @@ grease_protect(
     const char *ostr,
     struct monst *victim)
 {
-    static const char txt[] = "protected by the layer of grease!";
+    static const char txt[] = N_("protected by the layer of grease!");
     boolean vismon = victim && (victim != &gy.youmonst) && canseemon(victim);
 
     if (ostr) {
         if (victim == &gy.youmonst)
-            Your(_("%s %s %s"), ostr, vtense(ostr, "are"), txt);
+            Your(_("%s %s %s"), ostr, vtense(ostr, _("are")), _(txt));
         else if (vismon)
             pline(_("%s's %s %s %s"), Monnam(victim),
-                  ostr, vtense(ostr, "are"), txt);
+                  ostr, vtense(ostr, _("are")), _(txt));
     } else if (victim == &gy.youmonst || vismon) {
-        pline(_("%s %s"), Yobjnam2(otmp, "are"), txt);
+        pline(_("%s %s"), Yobjnam2(otmp, _("are")), _(txt));
     }
     if (!rn2(2)) {
         otmp->greased = 0;
@@ -4312,23 +4313,23 @@ domagictrap(void)
             pline(_("A shiver runs up and down your %s!"), body_part(SPINE));
             break;
         case 14:
-            You_hear(Hallucination ? "the moon howling at you."
-                                   : "distant howling.");
+            You_hear(Hallucination ? _("the moon howling at you.")
+                                   : _("distant howling."));
             break;
         case 15:
             if (on_level(&u.uz, &qstart_level))
                 You_feel(
-                    "%slike the prodigal son.",
+                    _("%slike the prodigal son."),
                     (flags.female || (Upolyd && is_neuter(gy.youmonst.data)))
-                        ? "oddly "
+                        ? _("oddly ")
                         : "");
             else
                 You(_("suddenly yearn for %s."),
                     Hallucination
-                        ? "Cleveland"
+                        ? _("Cleveland")
                         : (In_quest(&u.uz) || at_dgn_entrance("The Quest"))
-                              ? "your nearby homeland"
-                              : "your distant homeland");
+                              ? _("your nearby homeland")
+                              : _("your distant homeland"));
             break;
         case 16:
             Your(_("pack shakes violently!"));
@@ -4922,12 +4923,12 @@ back_on_ground(boolean rescued)
     } else { /* "cloud", "air", "air bubble", "wall", "fountain", "doorway" */
         /* "in a cloud", "in the air" */
         surf = !strcmp(surf, "air") ? the(surf) : an(surf);
-        preposit = "in";
+        preposit = _("in");
     }
     if (rescued) {
-        you_are_back = "You find yourself";
+        you_are_back = _("You find yourself");
     } else {
-        you_are_back = flags.verbose ? "You are back" : "Back";
+        you_are_back = flags.verbose ? _("You are back") : _("Back");
     }
     pline(_("%s %s %s."), you_are_back, preposit, surf);
     iflags.last_msg = PLNMSG_BACK_ON_GROUND;
@@ -4939,32 +4940,32 @@ back_on_ground(boolean rescued)
 void
 rescued_from_terrain(int how)
 {
-    static const char find_yourself[] = "find yourself";
+    static const char find_yourself[] = N_("find yourself");
     struct rm *lev = &levl[u.ux][u.uy];
     boolean mesggiven = FALSE;
 
     switch (how) {
     case DROWNING:
         if (is_pool(u.ux, u.uy)) {
-            You(_("%s %s of %s."), find_yourself,
+            You(_("%s %s of %s."), _(find_yourself),
                 (Is_waterlevel(&u.uz) || IS_WATERWALL(lev->typ))
-                  ? "in the midst" : "on top",
-                hliquid("water"));
+                  ? _("in the midst") : _("on top"),
+                hliquid(_("water")));
             mesggiven = TRUE;
         } else if (IS_AIR(lev->typ)) {
-            You(_("%s in %s."), find_yourself,
-                Is_waterlevel(&u.uz) ? "an air bubble" : "mid air");
+            You(_("%s in %s."), _(find_yourself),
+                Is_waterlevel(&u.uz) ? _("an air bubble") : _("mid air"));
             mesggiven = TRUE;
         }
         break;
     case BURNING: /* moved onto lava without fire resistance */
     case DISSOLVED: /* sunk into lava while fire resistant */
         if (is_pool(u.ux, u.uy)) {
-            You(_("%s %s %s."), find_yourself,
-                u.uinwater ? "in" : "on", hliquid("water"));
+            You(_("%s %s %s."), _(find_yourself),
+                u.uinwater ? _("in") : _("on"), hliquid(_("water")));
             mesggiven = TRUE;
         } else if (is_lava(u.ux, u.uy)) {
-            You(_("%s on top of %s."), find_yourself, hliquid("molten lava"));
+            You(_("%s on top of %s."), _(find_yourself), hliquid(_("molten lava")));
             mesggiven = TRUE;
         }
         break;

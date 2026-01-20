@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 /* Disintegration rays have special treatment; corpses are never left.
  * But the routine which calculates the damage is separate from the routine
@@ -58,7 +59,7 @@ staticfn void wishcmdassist(int);
 
 #define M_IN_WATER(ptr) ((ptr)->mlet == S_EEL || cant_drown(ptr))
 
-static const char are_blinded_by_the_flash[] = "are blinded by the flash!";
+static const char are_blinded_by_the_flash[] = N_("are blinded by the flash!");
 
 /*
  * A positive index means zapped/cast/breathed by hero.
@@ -67,19 +68,19 @@ static const char are_blinded_by_the_flash[] = "are blinded by the flash!";
  * use -39..-30 rather than -9..-0 because -0 is ambiguous (same as 0).
  */
 static const char *const flash_types[] = {
-    "magic missile", /* Wands must be 0-9 */
-    "bolt of fire", "bolt of cold", "sleep ray", "death ray",
-    "bolt of lightning", "", "", "", "",
+    N_("magic missile"), /* Wands must be 0-9 */
+    N_("bolt of fire"), N_("bolt of cold"), N_("sleep ray"), N_("death ray"),
+    N_("bolt of lightning"), "", "", "", "",
 
-    "magic missile", /* Spell equivalents must be 10-19 */
-    "fireball", "cone of cold", "sleep ray", "finger of death",
-    "bolt of lightning", /* there is no spell, used for retribution */
+    N_("magic missile"), /* Spell equivalents must be 10-19 */
+    N_("fireball"), N_("cone of cold"), N_("sleep ray"), N_("finger of death"),
+    N_("bolt of lightning"), /* there is no spell, used for retribution */
     "", "", "", "",
 
-    "blast of missiles", /* Dragon breath equivalents 20-29*/
-    "blast of fire", "blast of frost", "blast of sleep gas",
-    "blast of disintegration", "blast of lightning",
-    "blast of poison gas", "blast of acid", "", ""
+    N_("blast of missiles"), /* Dragon breath equivalents 20-29*/
+    N_("blast of fire"), N_("blast of frost"), N_("blast of sleep gas"),
+    N_("blast of disintegration"), N_("blast of lightning"),
+    N_("blast of poison gas"), N_("blast of acid"), "", ""
 };
 
 /* convert monster zap/spell/breath value to hero zap/spell/breath value */
@@ -4900,8 +4901,8 @@ dobuzz(
                           The(flash_str(fltyp, FALSE)));
                 if (Reflecting) {
                     if (!Blind) {
-                        (void) ureflects("But %s reflects from your %s!",
-                                         "it");
+                        (void) ureflects(_("But %s reflects from your %s!"),
+                                         _("it"));
                     } else
                         pline(_("For some reason you are not affected."));
                     monstseesu(M_SEEN_REFL);
@@ -6306,9 +6307,9 @@ flash_str(
         /* always return "blast of foo" for simplicity;
            this could be extended with hallucinatory rays, but probably
            not worth it at this time */
-        Sprintf(fltxt, "blast of %s", rnd_hallublast());
+        Sprintf(fltxt, _("blast of %s"), rnd_hallublast());
     } else {
-        Strcpy(fltxt, flash_types[typ]);
+        Strcpy(fltxt, _(flash_types[typ]));
     }
     return fltxt;
 }
