@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 15:02+0900\n"
+"POT-Creation-Date: 2026-01-20 15:05+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -155,9 +155,9 @@ msgstr ""
 msgid "determine that %s unfortunate being%s %s%s dead."
 msgstr ""
 
-#: src/apply.c:287 src/cmd.c:4376 src/cmd.c:5227 src/obj_descr_i18n.c:363
-#: src/objnam.c:924 src/potion.c:1660 src/sounds.c:1224 src/trap.c:394
-#: src/zap.c:504
+#: src/apply.c:287 src/cmd.c:4376 src/cmd.c:5227 src/iactions.c:453
+#: src/obj_descr_i18n.c:363 src/objnam.c:924 src/potion.c:1660
+#: src/sounds.c:1224 src/trap.c:394 src/zap.c:504
 #, c-format
 msgid "%s %s"
 msgstr ""
@@ -4353,12 +4353,12 @@ msgstr ""
 msgid "What do you want to name %s "
 msgstr ""
 
-#: src/do_name.c:303 src/iactions.c:354 src/iactions.c:694
+#: src/do_name.c:303 src/iactions.c:296 src/iactions.c:354 src/iactions.c:694
 msgid "these"
 msgstr ""
 
-#: src/do_name.c:303 src/iactions.c:354 src/iactions.c:374 src/iactions.c:426
-#: src/iactions.c:694 src/lock.c:476
+#: src/do_name.c:303 src/iactions.c:296 src/iactions.c:354 src/iactions.c:374
+#: src/iactions.c:426 src/iactions.c:454 src/iactions.c:694 src/lock.c:476
 msgid "this"
 msgstr ""
 
@@ -5352,9 +5352,25 @@ msgstr ""
 msgid "%s!!"
 msgstr ""
 
+#: src/dokick.c:972
+msgid "Thwack"
+msgstr ""
+
+#: src/dokick.c:972
+msgid "Whammm"
+msgstr ""
+
 #: src/dokick.c:986
 #, c-format
 msgid "Crash!  %s a secret door!"
+msgstr ""
+
+#: src/dokick.c:990
+msgid "Your kick uncovers"
+msgstr ""
+
+#: src/dokick.c:990
+msgid "You kick open"
 msgstr ""
 
 #: src/dokick.c:1011
@@ -5994,6 +6010,38 @@ msgstr ""
 
 #: src/dungeon.c:2522
 msgid "this dungeon level"
+msgstr ""
+
+#: src/dungeon.c:3389
+msgid "Sealed portal"
+msgstr ""
+
+#: src/dungeon.c:3389
+msgid "Portal"
+msgstr ""
+
+#: src/dungeon.c:3391
+msgid "Connection"
+msgstr ""
+
+#: src/dungeon.c:3393
+msgid "One way stairs up"
+msgstr ""
+
+#: src/dungeon.c:3393
+msgid "One way stairs down"
+msgstr ""
+
+#: src/dungeon.c:3395
+msgid "Stairs up"
+msgstr ""
+
+#: src/dungeon.c:3395
+msgid "Stairs down"
+msgstr ""
+
+#: src/dungeon.c:3398
+msgid "(unknown)"
 msgstr ""
 
 #: src/dungeon.c:3410
@@ -8977,6 +9025,39 @@ msgstr ""
 msgid "spellbook"
 msgstr ""
 
+#: src/iactions.c:285
+msgid "Extinguish"
+msgstr ""
+
+#: src/iactions.c:285
+msgid "Light"
+msgstr ""
+
+#: src/iactions.c:294
+msgid "Quiver"
+msgstr ""
+
+#: src/iactions.c:294
+msgid "Wield"
+msgstr ""
+
+#: src/iactions.c:295
+msgid "un-ready"
+msgstr ""
+
+#: src/iactions.c:295
+msgid "un-wield"
+msgstr ""
+
+#: src/iactions.c:298
+msgid "weapon"
+msgstr ""
+
+#: src/iactions.c:298 src/iactions.c:414 src/iactions.c:538 src/iactions.c:613
+#: src/iactions.c:623
+msgid "item"
+msgstr ""
+
 #: src/iactions.c:311
 msgid "Flip a coin"
 msgstr ""
@@ -9083,7 +9164,7 @@ msgstr ""
 msgid "Dip something into %s potion%s"
 msgstr ""
 
-#: src/iactions.c:374 src/iactions.c:426 src/iactions.c:578
+#: src/iactions.c:374 src/iactions.c:426 src/iactions.c:454 src/iactions.c:578
 msgid "one of these"
 msgstr ""
 
@@ -9140,10 +9221,6 @@ msgstr ""
 msgid "stack"
 msgstr ""
 
-#: src/iactions.c:414 src/iactions.c:538 src/iactions.c:613 src/iactions.c:623
-msgid "item"
-msgstr ""
-
 #: src/iactions.c:420
 #, c-format
 msgid "Open %s%s and eat the contents"
@@ -9159,6 +9236,48 @@ msgstr ""
 
 #: src/iactions.c:423
 msgid " with your tin opener"
+msgstr ""
+
+#: src/iactions.c:433
+msgid "Wipe the floor with this towel"
+msgstr ""
+
+#: src/iactions.c:436
+msgid "Scribble graffiti on the floor"
+msgstr ""
+
+#: src/iactions.c:439
+#, c-format
+msgid "%s on the %s with %s"
+msgstr ""
+
+#: src/iactions.c:442
+msgid "Engrave"
+msgstr ""
+
+#: src/iactions.c:442
+msgid "Write"
+msgstr ""
+
+#: src/iactions.c:444
+msgid "one of these items"
+msgstr ""
+
+#: src/iactions.c:444 src/iactions.c:576
+msgid "this item"
+msgstr ""
+
+#: src/iactions.c:453 src/iactions.c:575
+msgid "Shoot"
+msgstr ""
+
+#: src/iactions.c:453 src/iactions.c:575
+msgid "Throw"
+msgstr ""
+
+#: src/iactions.c:457
+#, c-format
+msgid " with your wielded %s"
 msgstr ""
 
 #: src/iactions.c:505
@@ -9256,18 +9375,6 @@ msgstr ""
 #: src/iactions.c:575 src/uhitm.c:1627 src/uhitm.c:5700
 #, c-format
 msgid "%s %s%s"
-msgstr ""
-
-#: src/iactions.c:575
-msgid "Shoot"
-msgstr ""
-
-#: src/iactions.c:575
-msgid "Throw"
-msgstr ""
-
-#: src/iactions.c:576
-msgid "this item"
 msgstr ""
 
 #: src/iactions.c:585
@@ -12008,6 +12115,14 @@ msgstr ""
 #: src/minion.c:301
 #, c-format
 msgid "%s says, \"Good hunting, %s.\""
+msgstr ""
+
+#: src/minion.c:302
+msgid "Sister"
+msgstr ""
+
+#: src/minion.c:302
+msgid "Brother"
 msgstr ""
 
 #: src/minion.c:304

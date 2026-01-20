@@ -5638,25 +5638,25 @@ check_unpaid_usage(struct obj *otmp, boolean altusage)
 
     arg1 = arg2 = "";
     if (otmp->oclass == SPBOOK_CLASS) {
-        fmt = "%sYou owe%s %ld %s.";
-        Sprintf(buf, "This is no free library, %s!  ", cad(FALSE));
+        fmt = _("%sYou owe%s %ld %s.");
+        Sprintf(buf, _("This is no free library, %s!  "), cad(FALSE));
         arg1 = rn2(2) ? buf : "";
-        arg2 = ESHK(shkp)->debit > 0L ? " an additional" : "";
+        arg2 = ESHK(shkp)->debit > 0L ? _(" an additional") : "";
     } else if (otmp->otyp == POT_OIL) {
-        fmt = "%s%sThat will cost you %ld %s (Yendorian Fuel Tax).";
+        fmt = _("%s%sThat will cost you %ld %s (Yendorian Fuel Tax).");
     } else if (altusage && (otmp->otyp == BAG_OF_TRICKS
                             || otmp->otyp == HORN_OF_PLENTY)) {
-        fmt = "%s%sEmptying that will cost you %ld %s.";
+        fmt = _("%s%sEmptying that will cost you %ld %s.");
         if (!rn2(3))
-            arg1 = "Whoa!  ";
+            arg1 = _("Whoa!  ");
         if (!rn2(3))
-            arg1 = "Watch it!  ";
+            arg1 = _("Watch it!  ");
     } else {
-        fmt = "%s%sUsage fee, %ld %s.";
+        fmt = _("%s%sUsage fee, %ld %s.");
         if (!rn2(3))
-            arg1 = "Hey!  ";
+            arg1 = _("Hey!  ");
         if (!rn2(3))
-            arg2 = "Ahem.  ";
+            arg2 = _("Ahem.  ");
     }
 
     if (!Deaf && !muteshk(shkp)) {

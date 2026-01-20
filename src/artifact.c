@@ -1550,7 +1550,7 @@ artifact_hit(
     /* reverse from AD&D. */
     if (spec_ability(otmp, SPFX_BEHEAD)) {
         if (is_art(otmp, ART_TSURUGI_OF_MURAMASA) && dieroll == 1) {
-            wepdesc = "The razor-sharp blade";
+            wepdesc = _("The razor-sharp blade");
             /* not really beheading, but so close, why add another SPFX */
             if (youattack && engulfing_u(mdef)) {
                 You(_("slice %s wide open!"), mon_nam(mdef));

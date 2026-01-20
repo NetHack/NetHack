@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 15:02+0900\n"
+"POT-Creation-Date: 2026-01-20 15:05+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -200,9 +200,9 @@ msgstr "%s 불행한 존재%s{이/가} %s%s 죽었다고 판단한다."
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
-#: src/apply.c:287 src/cmd.c:4376 src/cmd.c:5227 src/obj_descr_i18n.c:363
-#: src/objnam.c:924 src/potion.c:1660 src/sounds.c:1224 src/trap.c:394
-#: src/zap.c:504
+#: src/apply.c:287 src/cmd.c:4376 src/cmd.c:5227 src/iactions.c:453
+#: src/obj_descr_i18n.c:363 src/objnam.c:924 src/potion.c:1660
+#: src/sounds.c:1224 src/trap.c:394 src/zap.c:504
 #, c-format
 msgid "%s %s"
 msgstr "%s %s"
@@ -4616,12 +4616,12 @@ msgstr "%s{은/는} 이미 공식 이름이 있다."
 msgid "What do you want to name %s "
 msgstr "%s 것이 무엇입니까?"
 
-#: src/do_name.c:303 src/iactions.c:354 src/iactions.c:694
+#: src/do_name.c:303 src/iactions.c:296 src/iactions.c:354 src/iactions.c:694
 msgid "these"
 msgstr "이것들"
 
-#: src/do_name.c:303 src/iactions.c:354 src/iactions.c:374 src/iactions.c:426
-#: src/iactions.c:694 src/lock.c:476
+#: src/do_name.c:303 src/iactions.c:296 src/iactions.c:354 src/iactions.c:374
+#: src/iactions.c:426 src/iactions.c:454 src/iactions.c:694 src/lock.c:476
 msgid "this"
 msgstr "이것"
 
@@ -5659,10 +5659,29 @@ msgstr "문을 차자, 쾅 열렸다!"
 msgid "%s!!"
 msgstr "%s!!"
 
+#: src/dokick.c:972
+msgid "Thwack"
+msgstr ""
+
+#: src/dokick.c:972
+#, fuzzy
+msgid "Whammm"
+msgstr "망치"
+
 #: src/dokick.c:986
 #, c-format
 msgid "Crash!  %s a secret door!"
 msgstr "쾅! %s 비밀문!"
+
+#: src/dokick.c:990
+#, fuzzy
+msgid "Your kick uncovers"
+msgstr "%s{을/를} 발로 찬다."
+
+#: src/dokick.c:990
+#, fuzzy
+msgid "You kick open"
+msgstr "%s{을/를} 발로 찬다."
 
 #: src/dokick.c:1011
 msgid "Crash!  You kick open a secret passage!"
@@ -6322,6 +6341,48 @@ msgstr ""
 #, fuzzy
 msgid "this dungeon level"
 msgstr "로그 레벨 "
+
+#: src/dungeon.c:3389
+#, fuzzy
+msgid "Sealed portal"
+msgstr "찌그러진 냄비"
+
+#: src/dungeon.c:3389
+#, fuzzy
+msgid "Portal"
+msgstr "필멸자"
+
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
+# 물약
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
+# --- 포션 (Potions) ---
+#: src/dungeon.c:3391
+#, fuzzy
+msgid "Connection"
+msgstr "물약"
+
+#: src/dungeon.c:3393
+msgid "One way stairs up"
+msgstr ""
+
+#: src/dungeon.c:3393
+msgid "One way stairs down"
+msgstr ""
+
+#: src/dungeon.c:3395
+#, fuzzy
+msgid "Stairs up"
+msgstr "계단"
+
+#: src/dungeon.c:3395
+#, fuzzy
+msgid "Stairs down"
+msgstr "아래로 %s{을/를} 시작한다."
+
+#: src/dungeon.c:3398
+#, fuzzy
+msgid "(unknown)"
+msgstr "미지"
 
 #: src/dungeon.c:3410
 #, fuzzy
@@ -9470,6 +9531,46 @@ msgstr ""
 msgid "spellbook"
 msgstr "마법서"
 
+#: src/iactions.c:285
+#, fuzzy
+msgid "Extinguish"
+msgstr "쏘았다"
+
+#: src/iactions.c:285
+#, fuzzy
+msgid "Light"
+msgstr "가벼운"
+
+#: src/iactions.c:294
+#, fuzzy
+msgid "Quiver"
+msgstr "화살통에 넣을"
+
+#: src/iactions.c:294
+#, fuzzy
+msgid "Wield"
+msgstr "장비할"
+
+#: src/iactions.c:295
+#, fuzzy
+msgid "un-ready"
+msgstr "읽을"
+
+#: src/iactions.c:295
+#, fuzzy
+msgid "un-wield"
+msgstr "장비할"
+
+#: src/iactions.c:298
+msgid "weapon"
+msgstr ""
+
+#: src/iactions.c:298 src/iactions.c:414 src/iactions.c:538 src/iactions.c:613
+#: src/iactions.c:623
+#, fuzzy
+msgid "item"
+msgstr "아이템들"
+
 #: src/iactions.c:311
 #, fuzzy
 msgid "Flip a coin"
@@ -9590,7 +9691,7 @@ msgstr "%s %s{이/가} 기름지다."
 msgid "Dip something into %s potion%s"
 msgstr "분수에서 마시겠습니까?"
 
-#: src/iactions.c:374 src/iactions.c:426 src/iactions.c:578
+#: src/iactions.c:374 src/iactions.c:426 src/iactions.c:454 src/iactions.c:578
 #, fuzzy
 msgid "one of these"
 msgstr "하나의 "
@@ -9658,11 +9759,6 @@ msgstr "%s{이/가} %s{을/를} 때렸다."
 msgid "stack"
 msgstr "공격한다"
 
-#: src/iactions.c:414 src/iactions.c:538 src/iactions.c:613 src/iactions.c:623
-#, fuzzy
-msgid "item"
-msgstr "아이템들"
-
 #: src/iactions.c:420
 #, fuzzy, c-format
 msgid "Open %s%s and eat the contents"
@@ -9682,6 +9778,55 @@ msgstr " 물약"
 #: src/iactions.c:423
 #, fuzzy
 msgid " with your tin opener"
+msgstr "깡통 따개"
+
+#: src/iactions.c:433
+#, fuzzy
+msgid "Wipe the floor with this towel"
+msgstr "구덩이에서 스스로를 끌어냈다!"
+
+#: src/iactions.c:436
+#, fuzzy
+msgid "Scribble graffiti on the floor"
+msgstr "바닥에 충돌했다!"
+
+#: src/iactions.c:439
+#, fuzzy, c-format
+msgid "%s on the %s with %s"
+msgstr "%s%s{으로/로} %s{을/를} %s."
+
+#: src/iactions.c:442
+#, fuzzy
+msgid "Engrave"
+msgstr "새겨진 글씨"
+
+#: src/iactions.c:442
+#, fuzzy
+msgid "Write"
+msgstr "형석"
+
+#: src/iactions.c:444
+#, fuzzy
+msgid "one of these items"
+msgstr "순간이동의 반지"
+
+#: src/iactions.c:444 src/iactions.c:576
+#, fuzzy
+msgid "this item"
+msgstr "이것"
+
+#: src/iactions.c:453 src/iactions.c:575
+msgid "Shoot"
+msgstr ""
+
+#: src/iactions.c:453 src/iactions.c:575
+#, fuzzy
+msgid "Throw"
+msgstr "던질"
+
+#: src/iactions.c:457
+#, fuzzy, c-format
+msgid " with your wielded %s"
 msgstr "깡통 따개"
 
 #: src/iactions.c:505
@@ -9804,20 +9949,6 @@ msgstr "분수에서 마시겠습니까?"
 #, c-format
 msgid "%s %s%s"
 msgstr "%s %s%s"
-
-#: src/iactions.c:575
-msgid "Shoot"
-msgstr ""
-
-#: src/iactions.c:575
-#, fuzzy
-msgid "Throw"
-msgstr "던질"
-
-#: src/iactions.c:576
-#, fuzzy
-msgid "this item"
-msgstr "이것"
 
 #: src/iactions.c:585
 msgid " (same as 'f')"
@@ -12732,6 +12863,16 @@ msgstr "긴장이 고조된다."
 #, c-format
 msgid "%s says, \"Good hunting, %s.\""
 msgstr "%s{이/가} \"행운을 빌어, %s.\"라고 말했다."
+
+#: src/minion.c:302
+#, fuzzy
+msgid "Sister"
+msgstr "자매"
+
+#: src/minion.c:302
+#, fuzzy
+msgid "Brother"
+msgstr "형제"
 
 #: src/minion.c:304
 #, c-format
@@ -30112,9 +30253,6 @@ msgstr "%s 폭발"
 #~ msgid "visored helmet"
 #~ msgstr "가리개 투구"
 
-#~ msgid "dented pot"
-#~ msgstr "찌그러진 냄비"
-
 #~ msgid "hard hat"
 #~ msgstr "안전모"
 
@@ -31739,9 +31877,6 @@ msgstr "%s 폭발"
 
 #~ msgid "jasper"
 #~ msgstr "벽옥"
-
-#~ msgid "fluorite"
-#~ msgstr "형석"
 
 #~ msgid "obsidian"
 #~ msgstr "흑요석"

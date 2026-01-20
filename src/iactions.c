@@ -49,20 +49,20 @@ item_naming_classification(
     char *ocallbuf)
 {
     static const char
-        Name[] = "Name",
-        Rename[] = "Rename or un-name",
-        Call[] = "Call",
+        Name[] = N_("Name"),
+        Rename[] = N_("Rename or un-name"),
+        Call[] = N_("Call"),
         /* "re-call" seems a bit weird, but "recall" and
            "rename" don't fit for changing a type name */
-        Recall[] = "Re-call or un-call";
+        Recall[] = N_("Re-call or un-call");
 
     onamebuf[0] = ocallbuf[0] = '\0';
     if (name_ok(obj) == GETOBJ_SUGGEST) {
-        Sprintf(onamebuf, "%s %s %s",
-                (!has_oname(obj) || !*ONAME(obj)) ? Name : Rename,
-                the_unique_obj(obj) ? "the"
-                : !is_plural(obj) ? "this specific"
-                  : "this stack of", /*"these",*/
+        Sprintf(onamebuf, _("%s %s %s"),
+                (!has_oname(obj) || !*ONAME(obj)) ? _(Name) : _(Rename),
+                the_unique_obj(obj) ? _("the")
+                : !is_plural(obj) ? _("this specific")
+                  : _("this stack of"), /*"these",*/
                 simpleonames(obj));
     }
     if (call_ok(obj) == GETOBJ_SUGGEST) {
