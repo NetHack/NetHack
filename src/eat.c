@@ -2367,7 +2367,7 @@ eataccessory(struct obj *otmp)
             makeknown(typ);
             change_sex();
             You(_("are suddenly very %s!"),
-                flags.female ? "feminine" : "masculine");
+                flags.female ? _("feminine") : _("masculine"));
             disp.botl = TRUE;
             break;
         case AMULET_OF_UNCHANGING:

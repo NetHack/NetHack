@@ -797,7 +797,7 @@ at_your_feet(const char *str)
     } else {
         pline(_("%s %s %s your %s!"), str,
               vtense(str, Blind ? "land" : "appear"),
-              Levitation ? "beneath" : "at",
+              Levitation ? _("beneath") : _("at"),
               makeplural(body_part(FOOT)));
     }
 }
@@ -1577,9 +1577,9 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
         display_nhwindow(WIN_MESSAGE, FALSE);
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize(
-          "In return for thy service, I grant thee the gift of Immortality!");
+          _("In return for thy service, I grant thee the gift of Immortality!"));
         You(_("ascend to the status of Demigod%s..."),
-            flags.female ? "dess" : "");
+            flags.female ? _("dess") : "");
         done(ASCENDED);
         /*NOTREACHED*/
     }

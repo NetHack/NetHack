@@ -1470,8 +1470,8 @@ domagicportal(struct trap *ttmp)
         stunmsg = _("Resuming regular play.");
     } else {
         totype = UTOTYPE_PORTAL;
-        stunmsg = !Stunned ? "You feel slightly dizzy."
-                            : "You feel dizzier.";
+        stunmsg = !Stunned ? _("You feel slightly dizzy.")
+                            : _("You feel dizzier.");
         make_stunned((HStun & TIMEOUT) + 3L, FALSE);
     }
 

@@ -792,11 +792,11 @@ polymon(int mntmp)
 
     Strcpy(ustuckNam, u.ustuck ? Some_Monnam(u.ustuck) : "");
 
-    Strcpy(buf, (u.umonnum != mntmp) ? "" : "new ");
+    Strcpy(buf, (u.umonnum != mntmp) ? "" : _("new "));
     if (dochange) {
         flags.female = !flags.female;
         Strcat(buf, (is_male(&mons[mntmp]) || is_female(&mons[mntmp]))
-                       ? "" : flags.female ? "female " : "male ");
+                       ? "" : flags.female ? _("female ") : _("male "));
     }
     Strcat(buf, pmname(&mons[mntmp], flags.female ? FEMALE : MALE));
     You(_("%s %s!"), (u.umonnum != mntmp) ? _("turn into") : _("feel like"), an(buf));
@@ -804,7 +804,7 @@ polymon(int mntmp)
     if (Stoned && poly_when_stoned(&mons[mntmp])) {
         /* poly_when_stoned already checked stone golem genocide */
         mntmp = PM_STONE_GOLEM;
-        make_stoned(0L, "You turn to stone!", 0, (char *) 0);
+        make_stoned(0L, _("You turn to stone!"), 0, (char *) 0);
     }
 
     u.mtimedone = rn1(500, 500);

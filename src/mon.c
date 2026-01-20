@@ -3021,7 +3021,7 @@ logdeadmon(struct monst *mtmp, int mndx)
             Snprintf(shkdetail, sizeof shkdetail, ", the %s %s%s",
                      shtypes[ESHK(mtmp)->shoptype - SHOPBASE].name,
                      /* in case shk name doesn't include Mr or Ms honorific */
-                     mtmp->female ? "proprietrix" : "proprietor",
+                     mtmp->female ? _("proprietrix") : _("proprietor"),
                      herodidit ? "" : ",");
         } else if (mndx == PM_HIGH_CLERIC) {
             /* the high priest[ess] monster is not unique; we know that

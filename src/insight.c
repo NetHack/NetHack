@@ -1719,11 +1719,11 @@ attributes_enlightenment(
         if (has_lid && !u.uinwater) {
             you_can("cling to the ceiling", "");
         } else {
-            Sprintf(buf, " to the ceiling if %s%s%s",
-                    !has_lid ? "there was one" : "",
-                    (!has_lid && u.uinwater) ? " and " : "",
-                    u.uinwater ? (Underwater ? "you weren't underwater"
-                                  : "you weren't in the water") : "");
+            Sprintf(buf, _(" to the ceiling if %s%s%s"),
+                    !has_lid ? _("there was one") : "",
+                    (!has_lid && u.uinwater) ? _(" and ") : "",
+                    u.uinwater ? (Underwater ? _("you weren't underwater")
+                                  : _("you weren't in the water")) : "");
             /* past tense is applicable for death while Unchanging */
             enl_msg(You_, "could cling", "could have clung", buf, "");
         }

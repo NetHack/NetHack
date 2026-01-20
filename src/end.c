@@ -268,7 +268,7 @@ done_in_by(struct monst *mtmp, int how)
     } else if (mtmp->isshk) {
         const char *shknm = shkname(mtmp),
                    *honorific = shkname_is_pname(mtmp) ? ""
-                                   : mtmp->female ? "Ms. " : "Mr. ";
+                                   : mtmp->female ? _("Ms. ") : _("Mr. ");
 
         Sprintf(eos(buf), "%s%s, the shopkeeper", honorific, shknm);
         svk.killer.format = KILLED_BY;

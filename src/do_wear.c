@@ -1014,7 +1014,7 @@ Amulet_on(struct obj *amul)
             newsym(u.ux, u.uy); /* glyphmon flag and tile have changed */
             disp.botl = TRUE; /* role name or rank title might have changed */
             You(_("are suddenly very %s!"),
-                flags.female ? "feminine" : "masculine");
+                flags.female ? _("feminine") : _("masculine"));
         } else {
             /* already polymorphed into single-gender monster; only
                changed the character's base sex */

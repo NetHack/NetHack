@@ -243,7 +243,7 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
                   /* Note:  if you're both invisible and displaced, only
                    * monsters which see invisible will attack your displaced
                    * image, since the displaced image is also invisible. */
-                  Monst_name, Invis ? "invisible " : "");
+                  Monst_name, Invis ? _("invisible ") : "");
 
     } else if (usubmerged) { /* Underwater */
         /* monsters may miss especially on water level where
@@ -2135,7 +2135,7 @@ doseduce(struct monst *mon)
             if (!(ld() && mon->female)) {
                 SetVoice(mon, 0, 80, 0);
                 verbalize(_("You're such a %s; I wish..."),
-                          flags.female ? "sweet lady" : "nice guy");
+                          flags.female ? _("sweet lady") : _("nice guy"));
             } else {
                 struct obj *yourgloves = u_carried_gloves();
 
