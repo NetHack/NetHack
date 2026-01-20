@@ -1304,7 +1304,7 @@ dochat(void)
     }
 
     if (u.dz) {
-        pline(_("They won't hear you %s there."), u.dz < 0 ? "up" : "down");
+        pline(_("They won't hear you %s there."), u.dz < 0 ? _("up") : _("down"));
         return ECMD_OK;
     }
 
@@ -1456,7 +1456,7 @@ tiphat(void)
             else
                 (void) domonnoise(u.usteed);
         } else if (u.dz) {
-            pline(_("There's no one %s there."), (u.dz < 0) ? "up" : "down");
+            pline(_("There's no one %s there."), (u.dz < 0) ? _("up") : _("down"));
         } else {
             pline_The(_("lout here doesn't acknowledge you..."));
         }

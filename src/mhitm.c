@@ -257,7 +257,7 @@ mdisplacem(
 
     if (gv.vis && !quietly)
         pline(_("%s moves %s out of %s way!"), Monnam(magr), mon_nam(mdef),
-              is_rider(pa) ? "the" : mhis(magr));
+              is_rider(pa) ? _("the") : mhis(magr));
     newsym(fx, fy);  /* see it       */
     newsym(tx, ty);  /*   all happen */
     flush_screen(0); /* make sure it shows up */
@@ -747,7 +747,7 @@ gazemm(struct monst *magr, struct monst *mdef, struct attack *mattk)
     if (gv.vis) {
         Sprintf(buf, "%s gazes %s",
                 altmesg ? Adjmonnam(magr, "blinded") : Monnam(magr),
-                altmesg ? "toward" : "at");
+                altmesg ? _("toward") : _("at"));
         pline(_("%s %s..."), buf,
               canspotmon(mdef) ? mon_nam(mdef) : "something");
     }
@@ -873,7 +873,7 @@ gulpmm(
             /* 'it' -- previous form is no longer available and
                using that would be excessively verbose */
             pline(_("%s expels %s."), Monnam(magr),
-                  canspotmon(mdef) ? "it" : something);
+                  canspotmon(mdef) ? _("it") : something);
             if (canspotmon(mdef)) {
                 pline(_("It turns into %s."),
                       x_monnam(mdef, ARTICLE_A, (char *) 0,

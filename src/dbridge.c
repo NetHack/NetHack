@@ -421,7 +421,7 @@ e_died(struct entity *etmp, int xkill_flags, int how)
             if (!e_survives_at(etmp, etmp->ex, etmp->ey)) {
                 if (enexto(&xy, etmp->ex, etmp->ey, etmp->edata)) {
                     pline(_("A %s force teleports you away..."),
-                          Hallucination ? "normal" : "strange");
+                          Hallucination ? _("normal") : _("strange"));
                     teleds(xy.x, xy.y, TELEDS_NO_FLAGS);
                 }
                 /* otherwise on top of the drawbridge is the
@@ -548,7 +548,7 @@ do_entity(struct entity *etmp)
     if (automiss(etmp) && e_survives_at(etmp, oldx, oldy)) {
         if (e_inview && (at_portcullis || IS_DRAWBRIDGE(crm->typ)))
             pline_The(_("%s passes through %s!"),
-                      at_portcullis ? "portcullis" : "drawbridge",
+                      at_portcullis ? _("portcullis") : _("drawbridge"),
                       e_nam(etmp));
         if (is_u(etmp))
             spoteffects(FALSE);
@@ -720,7 +720,7 @@ do_entity(struct entity *etmp)
 
                 if (Hallucination)
                     pline(_("%s the %s and disappears."),
-                          E_phrase(etmp, "drink"), lava ? "lava" : "moat");
+                          E_phrase(etmp, "drink"), lava ? _("lava") : _("moat"));
                 else
                     pline(_("%s into the %s."), E_phrase(etmp, "fall"),
                           lava ? hliquid("lava") : "moat");
@@ -829,7 +829,7 @@ open_drawbridge(coordxy x, coordxy y)
     get_wall_for_db(&x2, &y2);
     if (cansee(x, y) || cansee(x2, y2)) {
         You_see(_("a drawbridge %s down!"),
-                (distu(x2, y2) < distu(x, y)) ? "going" : "coming");
+                (distu(x2, y2) < distu(x, y)) ? _("going") : _("coming"));
     } else { /* "5 gears turn" for castle drawbridge tune */
         Soundeffect(se_gears_turning_chains_rattling, 100);
         You_hear(_("gears turning and chains rattling."));
