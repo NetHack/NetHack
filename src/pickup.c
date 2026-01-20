@@ -849,7 +849,7 @@ pickup(int what) /* should be a long */
             if (!all_of_a_type) {
                 char qbuf[BUFSZ];
 
-                (void) safe_qbuf(qbuf, "Pick up ", "?", obj, doname,
+                (void) safe_qbuf(qbuf, _("Pick up "), "?", obj, doname,
                                  ansimpleoname, something);
                 switch ((obj->quan < 2L) ? ynaq(qbuf) : ynNaq(qbuf)) {
                 case 'q':

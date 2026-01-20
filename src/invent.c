@@ -5453,11 +5453,11 @@ display_cinventory(struct obj *obj)
     int n;
     menu_item *selected = 0;
 
-    (void) safe_qbuf(qbuf, "Contents of ", ":", obj,
+    (void) safe_qbuf(qbuf, _("Contents of "), ":", obj,
                      /* custom formatting routines to insert "trapped"
                         into the object's name when appropriate;
                         last resort "that" won't ever get used */
-                     cinv_doname, cinv_ansimpleoname, "that");
+                     cinv_doname, cinv_ansimpleoname, _("that"));
 
     if (obj->cobj) {
         n = query_objlist(qbuf, &(obj->cobj), INVORDER_SORT,

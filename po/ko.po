@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 12:36+0900\n"
+"POT-Creation-Date: 2026-01-20 12:37+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -4355,6 +4355,24 @@ msgstr "다른 것은 절대 알아보지 못할 것이다."
 msgid "know those as well as you ever will."
 msgstr "이미 그것들을 최대한 잘 알고 있다."
 
+#: src/do_name.c:648
+#, c-format
+msgid "Call a stream of %s fluid:"
+msgstr "%s 액체 흐름의 이름을 부여하기:"
+
+#: src/do_name.c:651
+#, fuzzy
+msgid "Call "
+msgstr "벽 %s"
+
+# ============================================================
+# 공통 문자열 (decl.h macros)
+# ============================================================
+#: src/do_name.c:652
+#, fuzzy
+msgid "thing"
+msgstr "무언가"
+
 #: src/do_name.c:706
 #, c-format
 msgid "doesn't seem to be any object %s."
@@ -6624,7 +6642,7 @@ msgstr "열 깡통이 없다."
 msgid "Really wield "
 msgstr "정말로 저장하시겠습니까?"
 
-#: src/eat.c:3108
+#: src/eat.c:3108 src/invent.c:5460
 #, fuzzy
 msgid "that"
 msgstr "그것을 %s!"
@@ -9132,6 +9150,11 @@ msgstr "인벤토리 슬롯 문자를 선택하세요."
 msgid "pack is too full."
 msgstr "배낭이 너무 가득 찼다."
 
+#: src/invent.c:5456
+#, fuzzy
+msgid "Contents of "
+msgstr "그 내용물이 쏟아졌다."
+
 #: src/invent.c:5512
 #, c-format
 msgid "%s %s under the %s here."
@@ -9311,10 +9334,51 @@ msgstr "%s{은/는} 자물쇠가 없다."
 msgid "reach %s from up here."
 msgstr "여기 위에서 %s에 닿는다."
 
+#: src/lock.c:474
+msgid "Check "
+msgstr "확인하기 "
+
+#: src/lock.c:474
+#, fuzzy
+msgid " for a trap?"
+msgstr "함정을 찾았다!"
+
+#: src/lock.c:475
+msgid "this"
+msgstr "이것"
+
 #: src/lock.c:486
 #, c-format
 msgid "Unlock it with %s?"
 msgstr "%s{으로/로} 열겠습니까?"
+
+#: src/lock.c:493
+#, fuzzy, c-format
+msgid " here; %s %s?"
+msgstr "%s %s{이다/다}."
+
+#: src/lock.c:494 src/pickup.c:3573 src/zap.c:4905
+msgid "it"
+msgstr "그것"
+
+#: src/lock.c:494
+#, fuzzy
+msgid "its lock"
+msgstr "%s{이/가} 잠겨있다."
+
+# ============================================================
+# UI 메시지 (invent.c - "here" 관련)
+# ============================================================
+# %1$s = "is"/"are", %2$s = object name
+#: src/lock.c:495 src/lock.c:729
+#, fuzzy
+msgid "There is "
+msgstr "여기에 %2$s{이/가} 있다.%1$.0s"
+
+#: src/lock.c:496 src/lock.c:730
+#, fuzzy
+msgid "a box"
+msgstr "큰 상자"
 
 #: src/lock.c:507
 #, c-format
@@ -9374,6 +9438,10 @@ msgstr "자물쇠 강제 열기 시도를 재개한다."
 #, c-format
 msgid "is %s here, but its lock is already %s."
 msgstr "여기에 %s{이/가} 있지만, 자물쇠가 이미 %s."
+
+#: src/lock.c:729
+msgid " here; force its lock?"
+msgstr "(이)가 있다; 자물쇠를 부술까?"
 
 #: src/lock.c:740
 #, c-format
@@ -14845,6 +14913,11 @@ msgstr "물리적으로 아무것도 주울 수 없다."
 msgid "are %s objects here."
 msgstr "여기에 %s 물체가 있다."
 
+#: src/pickup.c:852
+#, fuzzy
+msgid "Pick up "
+msgstr "%s{을/를} 선택하세요."
+
 #: src/pickup.c:1151
 #, fuzzy, c-format
 msgid "%s Creatures"
@@ -15232,10 +15305,6 @@ msgstr "용기를 여는 중"
 #, fuzzy
 msgid "one"
 msgstr "등뼈"
-
-#: src/pickup.c:3573 src/zap.c:4905
-msgid "it"
-msgstr "그것"
 
 #: src/pickup.c:3634
 #, c-format
@@ -26696,9 +26765,6 @@ msgstr "%s 폭발"
 
 #~ msgid "wooden harp"
 #~ msgstr "나무 하프"
-
-#~ msgid "large box"
-#~ msgstr "큰 상자"
 
 #~ msgid "ice box"
 #~ msgstr "아이스박스"

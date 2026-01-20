@@ -645,11 +645,11 @@ docall(struct obj *obj)
 
     if (obj->oclass == POTION_CLASS && obj->fromsink)
         /* fromsink: kludge, meaning it's sink water */
-        Sprintf(qbuf, "Call a stream of %s fluid:",
+        Sprintf(qbuf, _("Call a stream of %s fluid:"),
                 OBJ_DESCR(objects[obj->otyp]));
     else
-        (void) safe_qbuf(qbuf, "Call ", ":", obj,
-                         docall_xname, simpleonames, "thing");
+        (void) safe_qbuf(qbuf, _("Call "), ":", obj,
+                         docall_xname, simpleonames, _("thing"));
     /* pointer to old name */
     uname_p = &(objects[obj->otyp].oc_uname);
     /* use getlin() to get a name string from the player */

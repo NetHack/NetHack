@@ -471,8 +471,8 @@ pick_lock(
                 if (autounlock && (flags.autounlock & AUTOUNLOCK_UNTRAP) != 0
                     && could_untrap(FALSE, TRUE)
                     && (c = otmp->tknown ? (otmp->otrapped ? 'y' : 'n')
-                            : ynq(safe_qbuf(qbuf, "Check ", " for a trap?",
-                                          otmp, yname, ysimple_name, "this")))
+                            : ynq(safe_qbuf(qbuf, _("Check "), _(" for a trap?"),
+                                          otmp, yname, ysimple_name, _("this"))))
                        != 'n') {
                     if (c == 'q')
                         return PICKLOCK_DID_NOTHING; /* c == 'q' */
@@ -490,10 +490,10 @@ pick_lock(
                         return PICKLOCK_DID_NOTHING;
                 } else {
                     /* "There is <a box> here; <verb> <it|its lock>?" */
-                    Sprintf(qsfx, " here; %s %s?",
-                            verb, it ? "it" : "its lock");
-                    (void) safe_qbuf(qbuf, "There is ", qsfx, otmp, doname,
-                                     ansimpleoname, "a box");
+                    Sprintf(qsfx, _(" here; %s %s?"),
+                            verb, it ? _("it") : _("its lock"));
+                    (void) safe_qbuf(qbuf, _("There is "), qsfx, otmp, doname,
+                                     ansimpleoname, _("a box"));
                     otmp->lknown = 1;
 
                     c = ynq(qbuf);
@@ -726,8 +726,8 @@ doforce(void)
                 otmp->lknown = 1;
                 continue;
             }
-            (void) safe_qbuf(qbuf, "There is ", " here; force its lock?",
-                             otmp, doname, ansimpleoname, "a box");
+            (void) safe_qbuf(qbuf, _("There is "), _(" here; force its lock?"),
+                             otmp, doname, ansimpleoname, _("a box"));
             otmp->lknown = 1;
 
             c = ynq(qbuf);
