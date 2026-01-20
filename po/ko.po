@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 12:28+0900\n"
+"POT-Creation-Date: 2026-01-20 12:31+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -17909,6 +17909,10 @@ msgstr "누군가 여기서 속임수를 쓰고 있다..."
 msgid "This game is void."
 msgstr "이 게임은 무효다."
 
+#: src/restore.c:1532
+msgid "Select one of your saved games"
+msgstr "저장된 게임 중 하나를 선택하세요"
+
 #: src/rip.c:143
 msgid "Game over:"
 msgstr "게임 오버:"
@@ -18649,6 +18653,38 @@ msgstr "아직; 다른 이름 선택"
 msgid "Is this ok? [yn%sq]"
 msgstr "이대로 진행할까요? [yn%sq]"
 
+#
+#: src/role.c:2775
+#, fuzzy
+msgid "Unacceptable roles"
+msgstr "호환되지 않는 직업!"
+
+#: src/role.c:2779
+#, fuzzy
+msgid "Unacceptable races"
+msgstr "호환되지 않는 종족!"
+
+#
+#: src/role.c:2783
+#, fuzzy
+msgid "Unacceptable genders"
+msgstr "호환되지 않는 성별!"
+
+#
+#: src/role.c:2787
+#, fuzzy
+msgid "Unacceptable alignments"
+msgstr "호환되지 않는 성향!"
+
+#: src/role.c:2790
+#, c-format
+msgid "Pick all that apply%s"
+msgstr "해당하는 모든 것을 선택하세요%s"
+
+#: src/role.c:2791
+msgid " and/or unpick any that no longer apply"
+msgstr " 그리고/또는 더 이상 해당하지 않는 것을 선택 해제하세요"
+
 #: src/rumors.c:281
 msgid "rumors not accessible."
 msgstr "소문에 접근할 수 없다."
@@ -18817,8 +18853,9 @@ msgstr "투명한 손님은 환영하지 않습니다!"
 #: src/shk.c:747
 #, c-format
 msgid "%s stands firm as if %s knows you are there."
-msgstr "%s는 당신이 거기 있다는 것을 알듯이 꿋꿋하게 서 있다."
-"%s{이/가} 마치 당신이 거기 있다는 것을 %s 알고 있는 것처럼 굳건히 서 있다."
+msgstr ""
+"%s는 당신이 거기 있다는 것을 알듯이 꿋꿋하게 서 있다.%s{이/가} 마치 당신이 거"
+"기 있다는 것을 %s 알고 있는 것처럼 굳건히 서 있다."
 
 #: src/shk.c:758
 #, c-format
@@ -19544,8 +19581,9 @@ msgstr "%s{이/가} 신을 섬기는 자들이 번영한다는 것을 알아챘�
 #: src/shk.c:5450
 #, c-format
 msgid "%s says: 'Don't try to steal from me - I have friends in high places!'"
-msgstr "%s가 말한다: '나한테 훔치려 하지 마 - 높은 곳에 친구들이 있거든!'"
-"%s{이/가} 말한다: '나한테서 훔치려 하지 마세요 - 높은 곳에 친구가 있어요!'"
+msgstr ""
+"%s가 말한다: '나한테 훔치려 하지 마 - 높은 곳에 친구들이 있거든!'%s{이/가} 말"
+"한다: '나한테서 훔치려 하지 마세요 - 높은 곳에 친구가 있어요!'"
 
 #: src/shk.c:5451
 #, c-format
@@ -25273,8 +25311,8 @@ msgstr "겁쟁이"
 #: src/wizard.c:824
 #, fuzzy
 msgid "rattlepate"
-msgstr "멍청이"
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+msgstr ""
+"멍청이#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 "전투 도끼\n"
 "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 "전투도끼"

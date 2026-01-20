@@ -1529,7 +1529,7 @@ restore_menu(
                 add_menu_str(tmpwin, copyright_banner_line(k));
             add_menu_str(tmpwin, "");
         }
-        add_menu_str(tmpwin, "Select one of your saved games");
+        add_menu_str(tmpwin, _("Select one of your saved games"));
         /* if all the save files have a playmode of '-' then we'll just list
            their character name-role-race-gend-algn values, but if any are
            'X' or 'D', we'll list playmode along with name-role-&c values

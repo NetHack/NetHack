@@ -2772,23 +2772,23 @@ reset_role_filtering(void)
     start_menu(win, MENU_BEHAVE_STANDARD);
 
     /* no extra blank line preceding this entry; end_menu supplies one */
-    add_menu_str(win, "Unacceptable roles");
+    add_menu_str(win, _("Unacceptable roles"));
     setup_rolemenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
     add_menu_str(win, "");
-    add_menu_str(win, "Unacceptable races");
+    add_menu_str(win, _("Unacceptable races"));
     setup_racemenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
     add_menu_str(win, "");
-    add_menu_str(win, "Unacceptable genders");
+    add_menu_str(win, _("Unacceptable genders"));
     setup_gendmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
     add_menu_str(win, "");
-    add_menu_str(win, "Unacceptable alignments");
+    add_menu_str(win, _("Unacceptable alignments"));
     setup_algnmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
-    Sprintf(filterprompt, "Pick all that apply%s",
-            gotrolefilter() ? " and/or unpick any that no longer apply" : "");
+    Sprintf(filterprompt, _("Pick all that apply%s"),
+            gotrolefilter() ? _(" and/or unpick any that no longer apply") : "");
     end_menu(win, filterprompt);
     n = select_menu(win, PICK_ANY, &selected);
 
