@@ -1341,22 +1341,22 @@ use_candelabrum(struct obj *obj)
     }
     if (u.uswallow || obj->cursed) {
         if (!Blind)
-            pline_The(_("%s %s for a moment, then %s."), s, vtense(s, "flicker"),
-                      vtense(s, "die"));
+            pline_The(_("%s %s for a moment, then %s."), s, vtense(s, _("flicker")),
+                      vtense(s, _("die")));
         return;
     }
     if (obj->spe < 7) {
-        There(_("%s only %d %s in %s."), vtense(s, "are"), obj->spe, s,
+        There(_("%s only %d %s in %s."), vtense(s, _("are")), obj->spe, s,
               the(xname(obj)));
         if (!Blind)
             pline(_("%s lit.  %s dimly."), obj->spe == 1 ? _("It is") : _("They are"),
-                  Tobjnam(obj, "shine"));
+                  Tobjnam(obj, _("shine")));
     } else {
         pline(_("%s's %s burn%s"), The(xname(obj)), s,
-              (Blind ? "." : " brightly!"));
+              (Blind ? "." : _(" brightly!")));
     }
     if (!invocation_pos(u.ux, u.uy) || On_stairs(u.ux, u.uy)) {
-        pline_The(_("%s %s being rapidly consumed!"), s, vtense(s, "are"));
+        pline_The(_("%s %s being rapidly consumed!"), s, vtense(s, _("are")));
         /* this used to be obj->age /= 2, rounding down; an age of
            1 would yield 0, confusing begin_burn() and producing an
            unlightable, unrefillable candelabrum; round up instead */
@@ -1436,7 +1436,7 @@ use_candle(struct obj **optr)
             otmp->age = obj->age;
         otmp->spe += (int) obj->quan;
         if (otmp->lamplit && !was_lamplit)
-            pline_The(_("new %s magically %s!"), s, vtense(s, "ignite"));
+            pline_The(_("new %s magically %s!"), s, vtense(s, _("ignite")));
         else if (!otmp->lamplit && was_lamplit)
             pline(_("%s out."), (obj->quan > 1L) ? _("They go") : _("It goes"));
         if (obj->unpaid) {
