@@ -723,12 +723,12 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
             de->doknown = TRUE;
         }
         if (!Blind) {
-            Strcpy(de->post_engr_text, "Lightning arcs from the wand.");
+            Strcpy(de->post_engr_text, _("Lightning arcs from the wand."));
             de->doblind = TRUE;
         } else {
             Strcpy(de->post_engr_text, !Deaf
-                   ? "You hear crackling!"     /* Deaf-aware */
-                   : "Your hair stands up!");
+                   ? _("You hear crackling!")     /* Deaf-aware */
+                   : _("Your hair stands up!"));
         }
         break;
         /* type = MARK wands */

@@ -1058,7 +1058,7 @@ checkfile(
                     char *entrytext = pass ? alt : dbase_str;
                     char question[QBUFSZ];
 
-                    Strcpy(question, "More info about \"");
+                    Strcpy(question, _("More info about \""));
                     /* +2 => length of "\"?" */
                     copynchars(eos(question), entrytext,
                                (int) (sizeof question - 1
@@ -2272,7 +2272,7 @@ do_supplemental_info(
         if (bp || bp2) {
             Strcpy(fullname, name);
             if (!without_asking) {
-                Strcpy(question, "More info about \"");
+                Strcpy(question, _("More info about \""));
                 /* +2 => length of "\"?" */
                 copynchars(eos(question), entrytext,
                         (int) (sizeof question - 1 - (strlen(question) + 2)));

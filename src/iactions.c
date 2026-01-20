@@ -89,13 +89,13 @@ item_reading_classification(struct obj *obj, char *outbuf)
 
     *outbuf = '\0';
     if (otyp == FORTUNE_COOKIE) {
-        Strcpy(outbuf, "Read the message inside this cookie");
+        Strcpy(outbuf, _("Read the message inside this cookie"));
     } else if (otyp == T_SHIRT) {
-        Strcpy(outbuf, "Read the slogan on the shirt");
+        Strcpy(outbuf, _("Read the slogan on the shirt"));
     } else if (otyp == ALCHEMY_SMOCK) {
-        Strcpy(outbuf, "Read the slogan on the apron");
+        Strcpy(outbuf, _("Read the slogan on the apron"));
     } else if (otyp == HAWAIIAN_SHIRT) {
-        Strcpy(outbuf, "Look at the pattern on the shirt");
+        Strcpy(outbuf, _("Look at the pattern on the shirt"));
     } else if (obj->oclass == SCROLL_CLASS) {
         const char *magic = ((obj->dknown
 #ifdef MAIL_STRUCTURES

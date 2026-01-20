@@ -1765,7 +1765,7 @@ adj_pit_checks(coord *cc, char *msg)
     int ltyp;
     struct rm *room;
     const char *foundation_msg =
-                 "The foundation is too hard to dig through from this angle.";
+                 _("The foundation is too hard to dig through from this angle.");
 
     if (!cc)
         return FALSE;
@@ -1789,16 +1789,16 @@ adj_pit_checks(coord *cc, char *msg)
         return FALSE;
     } else if (IS_TREE(ltyp)) { /* check trees before stone */
         /* if (room->wall_info & W_NONDIGGABLE) */
-        Strcpy(msg, "The tree's roots glow then fade.");
+        Strcpy(msg, _("The tree's roots glow then fade."));
         return FALSE;
     } else if (ltyp == STONE || ltyp == SCORR) {
         if (room->wall_info & W_NONDIGGABLE) {
-            Strcpy(msg, "The rock glows then fades.");
+            Strcpy(msg, _("The rock glows then fades."));
             return FALSE;
         }
     } else if (ltyp == IRONBARS) {
         /* "set of iron bars" */
-        Strcpy(msg, "The bars go much deeper than your pit.");
+        Strcpy(msg, _("The bars go much deeper than your pit."));
         return FALSE;
 #if 0
     } else if (is_lava(cc->x, cc->y)) {

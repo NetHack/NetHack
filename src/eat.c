@@ -3631,17 +3631,17 @@ floorfood(
             boolean nodig = (levl[u.ux][u.uy].wall_info & W_NONDIGGABLE) != 0;
 
             c = 'n';
-            Strcpy(qbuf, "There are iron bars here");
+            Strcpy(qbuf, _("There are iron bars here"));
             if (nodig || u.uhunger > 1500) {
                 pline(_("%s but you %s eat them."), qbuf,
-                      nodig ? "cannot" : "are too full to");
+                      nodig ? _("cannot") : _("are too full to"));
             } else {
                 Strcat(qbuf, (!svc.context.digging.chew
                               || !u_at(svc.context.digging.pos.x,
                                        svc.context.digging.pos.y)
                               || !on_level(&svc.context.digging.level, &u.uz))
-                              ? "; eat them?"
-                              : "; resume eating them?");
+                              ? _("; eat them?")
+                              : _("; resume eating them?"));
                 c = yn_function(qbuf, ynqchars, 'n', TRUE);
             }
             if (c == 'y')

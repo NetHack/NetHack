@@ -1649,7 +1649,7 @@ container_contents(
                     }
                     unsortloot(&sortedcobj);
                 } else if (cat) {
-                    Strcpy(&buf[2], "Schroedinger's cat!");
+                    Strcpy(&buf[2], _("Schroedinger's cat!"));
                     putstr(tmpwin, 0, buf);
                 }
                 if (dumping)

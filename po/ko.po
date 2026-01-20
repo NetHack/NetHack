@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 13:10+0900\n"
+"POT-Creation-Date: 2026-01-20 13:14+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -2299,6 +2299,14 @@ msgstr "디버그 명령 포함 알파벳순으로 전부 표시로 전환"
 msgid "no matches"
 msgstr "일치하는 항목 없음"
 
+# ============================================================
+# 확장 명령 메뉴 (Extended Commands Menu)
+# ============================================================
+#: src/cmd.c:717
+#, fuzzy
+msgid "Extended command list search phrase"
+msgstr "확장 명령 목록"
+
 #: src/cmd.c:923
 msgid "is no fountain here."
 msgstr "여기에 샘이 없다."
@@ -3654,6 +3662,25 @@ msgstr "나무가 흔들리지만 다치지 않았다."
 #: src/dig.c:1708
 msgid "rock glows then fades."
 msgstr "바위가 빛났다가 사라진다."
+
+#: src/dig.c:1768
+#, fuzzy
+msgid "The foundation is too hard to dig through from this angle."
+msgstr "도개교는 너무 단단해서 뚫을 수 없는 것 같다."
+
+#: src/dig.c:1792
+#, fuzzy
+msgid "The tree's roots glow then fade."
+msgstr "바위가 빛났다가 사라진다."
+
+#: src/dig.c:1796
+#, fuzzy
+msgid "The rock glows then fades."
+msgstr "바위가 빛났다가 사라진다."
+
+#: src/dig.c:1801
+msgid "The bars go much deeper than your pit."
+msgstr "철창이 구덩이보다 훨씬 깊이 박혀 있습니다."
 
 #: src/dig.c:1995
 msgid "iron ball gets buried!"
@@ -6799,10 +6826,35 @@ msgstr "%s 약하다."
 msgid "die from hunger and exhaustion."
 msgstr "굶주림과 탈진으로 죽었다."
 
+#: src/eat.c:3634
+#, fuzzy
+msgid "There are iron bars here"
+msgstr "여기에 거미줄이 있다."
+
 #: src/eat.c:3636
 #, c-format
 msgid "%s but you %s eat them."
 msgstr "%s하지만 %s 먹는다."
+
+#: src/eat.c:3637
+#, fuzzy
+msgid "cannot"
+msgstr "%s{을/를} %s할 수 없다."
+
+#: src/eat.c:3637
+#, fuzzy
+msgid "are too full to"
+msgstr "너무 배불러서 철창을 먹을 수 없다."
+
+#: src/eat.c:3643
+#, fuzzy
+msgid "; eat them?"
+msgstr "닿을"
+
+#: src/eat.c:3644
+#, fuzzy
+msgid "; resume eating them?"
+msgstr "%s%s 설치를 재개한다."
 
 #: src/eat.c:3718
 #, c-format
@@ -6984,6 +7036,10 @@ msgstr "던전을 탈출했다"
 msgid "Contents of %s:"
 msgstr "그 내용물이 쏟아졌다."
 
+#: src/end.c:1652
+msgid "Schroedinger's cat!"
+msgstr "슈뢰딩거의 고양이!"
+
 #: src/end.c:1663 src/pickup.c:4029
 #, c-format
 msgid "%s is empty."
@@ -7064,6 +7120,19 @@ msgstr "이 %s{은/는} 화염 지팡이다!"
 #, c-format
 msgid "This %s is a wand of lightning!"
 msgstr "이 %s{은/는} 번개 지팡이다!"
+
+#: src/engrave.c:726
+msgid "Lightning arcs from the wand."
+msgstr "지팡이에서 번개가 뻗어 나옵니다."
+
+#: src/engrave.c:730
+#, fuzzy
+msgid "You hear crackling!"
+msgstr "다시"
+
+#: src/engrave.c:731
+msgid "Your hair stands up!"
+msgstr "머리카락이 곤두섭니다!"
 
 #: src/engrave.c:769
 msgid "engrave with such a large object!"
@@ -8661,6 +8730,24 @@ msgstr "당신은 죽었다..."
 #: src/hack.c:4352 src/steed.c:249
 msgid "do that while carrying so much stuff."
 msgstr "그렇게 많은 짐을 들고는 그렇게 할 수 없다."
+
+#: src/iactions.c:92
+msgid "Read the message inside this cookie"
+msgstr "이 쿠키 안의 메시지를 읽습니다"
+
+#: src/iactions.c:94
+msgid "Read the slogan on the shirt"
+msgstr "셔츠의 슬로건을 읽습니다"
+
+#: src/iactions.c:96
+#, fuzzy
+msgid "Read the slogan on the apron"
+msgstr "이것을 보조 무기로 준비"
+
+#: src/iactions.c:98
+#, fuzzy
+msgid "Look at the pattern on the shirt"
+msgstr "구덩이 옆을 찼다."
 
 #: src/iactions.c:505
 #, fuzzy
@@ -15504,6 +15591,10 @@ msgstr "높은"
 #: src/pager.c:848
 msgid "Cannot open 'data' file!"
 msgstr "'data' 파일을 열 수 없다!"
+
+#: src/pager.c:1061 src/pager.c:2275
+msgid "More info about \""
+msgstr ""
 
 #: src/pager.c:1073
 msgid "? Seek error on 'data' file!"
@@ -25503,6 +25594,11 @@ msgstr "약간의 저림."
 msgid "are jolted with electricity!"
 msgstr "전기에 감전됐다!"
 
+#: src/uhitm.c:6187
+#, fuzzy, c-format
+msgid "Wait!  That's %s!"
+msgstr "잠깐, %s! 그건 %s라는 이름의 %s{이다/다}!"
+
 #: src/uhitm.c:6303
 #, c-format
 msgid "%s stop tingling."
@@ -27436,25 +27532,22 @@ msgid "blast of %s"
 msgstr "%s 폭발"
 
 #
-#: win/tty/wintty.c:2476
 #, c-format
-msgid "Cannot open %s."
-msgstr "%s{을/를} 열 수 없다."
+#~ msgid "Cannot open %s."
+#~ msgstr "%s{을/를} 열 수 없다."
 
-#: win/tty/wintty.c:2525
 #, c-format
-msgid "Cannot open \"%s\"."
-msgstr "\"%s\"{을/를} 열 수 없다."
+#~ msgid "Cannot open \"%s\"."
+#~ msgstr "\"%s\"{을/를} 열 수 없다."
 
-#: win/tty/wintty.c:3005
-msgid "tty perm_invent could not be enabled."
-msgstr "tty perm_invent를 활성화할 수 없다."
+#~ msgid "tty perm_invent could not be enabled."
+#~ msgstr "tty perm_invent를 활성화할 수 없다."
 
-#: win/tty/wintty.c:3006
 #, c-format
-msgid ""
-"tty perm_invent needs a terminal that is at least %dx%d, yours is %dx%d."
-msgstr "tty perm_invent는 최소 %dx%d 터미널이 필요한데, 현재 터미널은 %dx%d다."
+#~ msgid ""
+#~ "tty perm_invent needs a terminal that is at least %dx%d, yours is %dx%d."
+#~ msgstr ""
+#~ "tty perm_invent는 최소 %dx%d 터미널이 필요한데, 현재 터미널은 %dx%d다."
 
 # Monster attack verbs (mhitm.c)
 #, c-format

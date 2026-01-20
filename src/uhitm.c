@@ -6184,7 +6184,7 @@ that_is_a_mimic(
     boolean reveal_it = (mimic_flags & MIM_REVEAL) != 0,
             omit_wait = (mimic_flags & MIM_OMIT_WAIT) != 0;
 
-    Strcpy(fmtbuf, "Wait!  That's %s!");
+    Strcpy(fmtbuf, _("Wait!  That's %s!"));
     if (Blind) {
         if (!Blind_telepat)
             what = generic; /* with default fmt */

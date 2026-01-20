@@ -714,7 +714,7 @@ doextlist(void)
             searchbuf[0] = '\0';
         }
         if (search) {
-            Strcpy(promptbuf, "Extended command list search phrase");
+            Strcpy(promptbuf, _("Extended command list search phrase"));
             Strcat(promptbuf, "?");
             getlin(promptbuf, searchbuf);
             (void) mungspaces(searchbuf);
