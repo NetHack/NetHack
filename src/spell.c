@@ -202,7 +202,7 @@ confused_book(struct obj *spellbook)
         gone = TRUE;
     } else {
         You(_("find yourself reading the %s line over and over again."),
-            spellbook == svc.context.spbook.book ? "next" : "first");
+            spellbook == svc.context.spbook.book ? _("next") : _("first"));
     }
     return gone;
 }

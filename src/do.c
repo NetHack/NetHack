@@ -1777,10 +1777,10 @@ goto_level(
             } else if (Flying) {
                 if (flags.verbose)
                     You(_("fly down %s."),
-                        ga.at_ladder ? "along the ladder" : "the stairs");
+                        ga.at_ladder ? _("along the ladder") : _("the stairs"));
             } else if (near_capacity() > UNENCUMBERED
                        || Punished || Fumbling) {
-                You(_("fall down the %s."), ga.at_ladder ? "ladder" : "stairs");
+                You(_("fall down the %s."), ga.at_ladder ? _("ladder") : _("stairs"));
                 if (Punished) {
                     drag_down();
                     if (!welded(uball))
@@ -1995,11 +1995,11 @@ hellish_smoke_mesg(void)
 {
     if (svl.level.flags.temperature)
         pline(_("It is %s here."),
-              svl.level.flags.temperature > 0 ? "hot" : "cold");
+              svl.level.flags.temperature > 0 ? _("hot") : _("cold"));
 
     if (In_hell(&u.uz) && svl.level.flags.temperature > 0)
         You(_("%s smoke..."),
-              olfaction(gy.youmonst.data) ? "smell" : "sense");
+              olfaction(gy.youmonst.data) ? _("smell") : _("sense"));
 }
 
 /* give a message when the level temperature is different from previous */

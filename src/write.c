@@ -320,11 +320,11 @@ dowrite(struct obj *pen)
         && rnl(((Role_if(PM_WIZARD) && paper->oclass != SPBOOK_CLASS)
                 || spell_knowledge == spe_GoingStale)
                ? 5 : 15)) {
-        You(_("%s to write that."), by_descr ? "fail" : "don't know how");
+        You(_("%s to write that."), by_descr ? _("fail") : _("don't know how"));
         /* scrolls disappear, spellbooks don't */
         if (paper->oclass == SPBOOK_CLASS) {
             You(
-      "write in your best handwriting:  \"My Diary\", but it quickly fades.");
+      _("write in your best handwriting:  \"My Diary\", but it quickly fades."));
             update_inventory(); /* pen charges */
         } else {
             if (by_descr) {

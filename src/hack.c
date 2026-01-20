@@ -1808,8 +1808,8 @@ u_locomotion(const char *def)
        its is_flyer() and is_floater() tests wouldn't work on hero except
        when hero is polymorphed and not wearing an amulet of flying
        or boots/ring/spell of levitation */
-    return Levitation ? (capitalize ? "Float" : "float")
-           : Flying ? (capitalize ? "Fly" : "fly")
+    return Levitation ? (capitalize ? _("Float") : _("float"))
+           : Flying ? (capitalize ? _("Fly") : _("fly"))
              : locomotion(gy.youmonst.data, def);
 }
 
