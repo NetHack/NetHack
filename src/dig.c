@@ -257,7 +257,7 @@ digcheck_fail_message(enum digcheck_result digresult, struct monst *madeby,
                       coordxy x, coordxy y)
 {
     const char *verb =
-        (madeby == BY_YOU && uwep && is_axe(uwep)) ? "chop" : "dig in";
+        (madeby == BY_YOU && uwep && is_axe(uwep)) ? _("chop") : _("dig in");
 
     if (digresult < DIGCHECK_FAILED)
         return;
@@ -330,7 +330,7 @@ dig(void)
         if (IS_OBSTRUCTED(lev->typ) && !may_dig(dpx, dpy)
             && dig_typ(uwep, dpx, dpy) == DIGTYP_ROCK) {
             pline(_("This %s is too hard to %s."),
-                  is_db_wall(dpx, dpy) ? "drawbridge" : "wall", verb);
+                  is_db_wall(dpx, dpy) ? _("drawbridge") : _("wall"), verb);
             return 0;
         }
     }
@@ -747,7 +747,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
             if (is_flyer(mtmp->data) || is_floater(mtmp->data)) {
                 if (canseemon(mtmp))
                     pline(_("%s %s over the pit."), Monnam(mtmp),
-                          (is_flyer(mtmp->data)) ? "flies" : "floats");
+                          (is_flyer(mtmp->data)) ? _("flies") : _("floats"));
             } else if (mtmp != madeby)
                 (void) mintrap(mtmp, NO_TRAP_FLAGS);
         }
@@ -1109,7 +1109,7 @@ use_pick_axe(struct obj *obj)
         return ECMD_OK;
     }
     ispick = is_pick(obj);
-    verb = ispick ? "dig" : "chop";
+    verb = ispick ? _("dig") : _("chop");
 
     if (u.utrap && u.utraptype == TT_WEB) {
         pline(_("%s you can't %s while entangled in a web."),
@@ -1305,7 +1305,7 @@ use_pick_axe2(struct obj *obj)
                 if (!svc.context.digging.quiet)
                     You(_("start %s."), d_action[dig_target]);
             } else {
-                You(_("%s %s."), svc.context.digging.chew ? "begin" : "continue",
+                You(_("%s %s."), svc.context.digging.chew ? _("begin") : _("continue"),
                     d_action[dig_target]);
                 svc.context.digging.chew = FALSE;
             }
@@ -1319,7 +1319,7 @@ use_pick_axe2(struct obj *obj)
     } else if (is_pool_or_lava(u.ux, u.uy)) {
         /* Monsters which swim also happen not to be able to dig */
         You(_("cannot stay under%s long enough."),
-            is_pool(u.ux, u.uy) ? "water" : " the lava");
+            is_pool(u.ux, u.uy) ? _("water") : _(" the lava"));
     } else if ((trap = t_at(u.ux, u.uy)) != 0
                && (uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
         dotrap(trap, FORCEBUNGLE);

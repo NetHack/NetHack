@@ -330,7 +330,7 @@ read_engr_at(coordxy x, coordxy y)
             if (!Blind) {
                 sensed = 1;
                 pline(_("%s is written here in the %s."), Something,
-                      is_ice(x, y) ? "frost" : "dust");
+                      is_ice(x, y) ? _("frost") : _("dust"));
             }
             break;
         case ENGRAVE:
@@ -344,7 +344,7 @@ read_engr_at(coordxy x, coordxy y)
             if (!Blind || can_reach_floor(TRUE)) {
                 sensed = 1;
                 pline(_("Some text has been %s into the %s here."),
-                      is_ice(x, y) ? "melted" : "burned", eloc);
+                      is_ice(x, y) ? _("melted") : _("burned"), eloc);
             }
             break;
         case MARK:
@@ -858,16 +858,16 @@ doengrave_sfx_item(struct _doengrave_ctx *de)
                     if (!Blind)
                         You(_("wipe out the message here."));
                     else
-                        pline(_("%s %s."), Yobjnam2(de->otmp, "get"),
-                              de->frosted ? "frosty" : "dusty");
+                        pline(_("%s %s."), Yobjnam2(de->otmp, _("get")),
+                              de->frosted ? _("frosty") : _("dusty"));
                     de->dengr = TRUE;
                 } else {
                     pline(_("%s can't wipe out this engraving."),
                           Yname2(de->otmp));
                 }
             } else {
-                pline(_("%s %s."), Yobjnam2(de->otmp, "get"),
-                      de->frosted ? "frosty" : "dusty");
+                pline(_("%s %s."), Yobjnam2(de->otmp, _("get")),
+                      de->frosted ? _("frosty") : _("dusty"));
             }
             break;
         default:
