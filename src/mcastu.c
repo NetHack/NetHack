@@ -843,9 +843,9 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
                 dmg = (dmg + 1) / 2;
             make_confused(HConfusion + dmg, TRUE);
             if (Hallucination)
-                You_feel(_("%s!"), oldprop ? "trippier" : "trippy");
+                You_feel(_("%s!"), oldprop ? _("trippier") : _("trippy"));
             else
-                You_feel(_("%sconfused!"), oldprop ? "more " : "");
+                You_feel(_("%sconfused!"), oldprop ? _("more ") : "");
             monstunseesu(M_SEEN_MAGR);
         }
         dmg = 0;

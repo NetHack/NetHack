@@ -1226,7 +1226,7 @@ unturn_you(void)
     (void) unturn_dead(&gy.youmonst); /* hit carried corpses and eggs */
 
     if (is_undead(gy.youmonst.data)) {
-        You_feel(_("frightened and %sstunned."), Stunned ? "even more " : "");
+        You_feel(_("frightened and %sstunned."), Stunned ? _("even more ") : "");
         make_stunned((HStun & TIMEOUT) + (long) rnd(30), FALSE);
     } else {
         You(_("shudder in dread."));

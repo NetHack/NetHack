@@ -5760,7 +5760,7 @@ hmonas(struct monst *mon)
                         && (mon->data->mlet == S_ZOMBIE
                             || mon->data->mlet == S_MUMMY)
                         && rn2(5) && !Sick_resistance) {
-                        You_feel(_("%ssick."), (Sick) ? "very " : "");
+                        You_feel(_("%ssick."), (Sick) ? _("very ") : "");
                         mdamageu(mon, rnd(8));
                     }
                 }

@@ -1083,15 +1083,15 @@ givit(int type, struct permonst *ptr)
     case ACID_RES:
         debugpline0("Giving timed acid resistance");
         if (!Acid_resistance)
-            You_feel(_("%s."), Hallucination ? "secure from flashbacks"
-                            : "less concerned about being harmed by acid");
+            You_feel(_("%s."), Hallucination ? _("secure from flashbacks")
+                            : _("less concerned about being harmed by acid"));
         incr_itimeout(&HAcid_resistance, d(3, 6));
         break;
     case STONE_RES:
         debugpline0("Giving timed stoning resistance");
         if (!Stone_resistance)
-            You_feel(_("%s."), Hallucination ? "unusually limber"
-                            : "less concerned about becoming petrified");
+            You_feel(_("%s."), Hallucination ? _("unusually limber")
+                            : _("less concerned about becoming petrified"));
         incr_itimeout(&HStone_resistance, d(3, 6));
         break;
     default:
@@ -1934,7 +1934,7 @@ eatcorpse(struct obj *otmp)
     /* now any corpse left too long will make you mildly ill */
     } else if ((rotted > 5L || (rotted > 3L && rn2(5))) && !Sick_resistance) {
         tp++;
-        You_feel(_("%ssick."), (Sick) ? "very " : "");
+        You_feel(_("%ssick."), (Sick) ? _("very ") : "");
         losehp(rnd(8), !glob ? "cadaver" : "rotted glob", KILLED_BY_AN);
     }
 

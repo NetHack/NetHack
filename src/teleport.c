@@ -1551,7 +1551,7 @@ level_tele_trap(struct trap *trap, unsigned int trflags)
     if (Hallucination || Teleport_control)
         You(_("briefly feel %s."), Hallucination ? _("oriented") : _("centered"));
     else
-        You_feel(_("%sdisoriented."), Confusion ? "even more " : "");
+        You_feel(_("%sdisoriented."), Confusion ? _("even more ") : "");
     /* magic portal traversal causes brief Stun; for level teleport, use
        confusion instead, and only when hero lacks control; do this after
        processing the level teleportation attempt because being confused

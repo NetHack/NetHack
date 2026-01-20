@@ -2273,7 +2273,7 @@ revive_mon(anything *arg, long timeout UNUSED)
             when = rider_revival_time(body, TRUE);
         } else { /* rot this corpse away */
             if (!obj_has_timer(body, ROT_CORPSE))
-                You_feel(_("%sless hassled."), is_rider(mptr) ? "much " : "");
+                You_feel(_("%sless hassled."), is_rider(mptr) ? _("much ") : "");
             action = ROT_CORPSE;
             when = (long) d(5, 50) - (svm.moves - body->age);
             if (when < 1L)
