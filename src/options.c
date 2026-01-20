@@ -6365,7 +6365,7 @@ handler_autopickup_exception(void)
         /* EDIT_GETLIN:  assume user doesn't user want previous
            exception used as default input string for this one... */
         apebuf[0] = apebuf[1] = '\0';
-        getlin("What new autopickup exception pattern?", &apebuf[1]);
+        getlin(_("What new autopickup exception pattern?"), &apebuf[1]);
         mungspaces(&apebuf[1]); /* regularize whitespace */
         if (apebuf[1] == '\033')
             return TRUE;
@@ -6449,7 +6449,7 @@ handler_menu_colors(void)
 
     } else if (opt_idx == 0) { /* add new */
         mcbuf[0] = '\0';
-        getlin("What new menucolor pattern?", mcbuf);
+        getlin(_("What new menucolor pattern?"), mcbuf);
         if (*mcbuf == '\033')
             goto menucolors_done;
         if (*mcbuf
@@ -6531,7 +6531,7 @@ handler_msgtype(void)
         return TRUE;
     } else if (opt_idx == 0) { /* add new */
         mtbuf[0] = '\0';
-        getlin("What new message pattern?", mtbuf);
+        getlin(_("What new message pattern?"), mtbuf);
         if (*mtbuf == '\033')
             return TRUE;
         if (*mtbuf

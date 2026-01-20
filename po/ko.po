@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 12:31+0900\n"
+"POT-Creation-Date: 2026-01-20 12:36+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -10841,6 +10841,10 @@ msgstr "%s{이/가} 위협적으로 노려보다가 사라졌다."
 msgid "%s gets angry..."
 msgstr "%s{이/가} 화났다..."
 
+#: src/minion.c:366
+msgid "How much will you offer?"
+msgstr "얼마를 제안하시겠습니까?"
+
 #: src/minion.c:373
 #, c-format
 msgid "try to shortchange %s, but fumble."
@@ -12437,6 +12441,10 @@ msgstr "물속에서 음악을 연주한다!"
 #, c-format
 msgid "are incapable of playing %s."
 msgstr "%s{을/를} 연주할 수 없다."
+
+#: src/music.c:793
+msgid "What tune are you playing? [5 notes, A-G]"
+msgstr "어떤 선율을 연주하시겠습니까? [5개의 음, A-G]"
 
 #: src/music.c:806
 #, c-format
@@ -14451,9 +14459,21 @@ msgstr "달리기/여행 화면 표시 모드 선택:"
 msgid "Select loot sorting type:"
 msgstr "전리품 정렬 방식 선택:"
 
+#: src/options.c:6368
+msgid "What new autopickup exception pattern?"
+msgstr "새 자동줍기 예외 패턴은?"
+
+#: src/options.c:6452
+msgid "What new menucolor pattern?"
+msgstr "새 메뉴색상 패턴은?"
+
 #: src/options.c:6460
 msgid "Error adding the menu color."
 msgstr "메뉴 색상 추가 오류."
+
+#: src/options.c:6534
+msgid "What new message pattern?"
+msgstr "새 메시지 패턴은?"
 
 #: src/options.c:6541
 msgid "Error adding the message type."
@@ -14611,6 +14631,10 @@ msgstr "그것들에 대한 정보가 없다."
 #, fuzzy
 msgid "What do you want to look at:"
 msgstr "무엇을 버리겠습니까?"
+
+#: src/pager.c:1840
+msgid "Specify what? (type the word)"
+msgstr "무엇을 지정하시겠습니까? (단어를 입력하세요)"
 
 #: src/pager.c:1901
 #, c-format
@@ -15309,6 +15333,10 @@ msgstr "몸이 변하지만, 여전히 슬라임이 묻어있다."
 #: src/polyself.c:480
 msgid "fail to transform!"
 msgstr "변신에 실패했다!"
+
+#: src/polyself.c:515
+msgid "Become what kind of monster? [type the name]"
+msgstr "어떤 종류의 괴물이 되시겠습니까? [이름을 입력하세요]"
 
 #: src/polyself.c:563 src/read.c:3339
 msgid "I've never heard of such monsters."
@@ -18853,9 +18881,10 @@ msgstr "투명한 손님은 환영하지 않습니다!"
 #: src/shk.c:747
 #, c-format
 msgid "%s stands firm as if %s knows you are there."
-msgstr "%s는 당신이 거기 있다는 것을 알듯이 굳건하게 서 있다."
-"%s는 당신이 거기 있다는 것을 알듯이 꿋꿋하게 서 있다.%s{이/가} 마치 당신이 거"
-"기 있다는 것을 %s 알고 있는 것처럼 굳건히 서 있다."
+msgstr ""
+"%s는 당신이 거기 있다는 것을 알듯이 굳건하게 서 있다.%s는 당신이 거기 있다는 "
+"것을 알듯이 꿋꿋하게 서 있다.%s{이/가} 마치 당신이 거기 있다는 것을 %s 알고 "
+"있는 것처럼 굳건히 서 있다."
 
 #: src/shk.c:758
 #, c-format
@@ -19581,9 +19610,10 @@ msgstr "%s{이/가} 신을 섬기는 자들이 번영한다는 것을 알아챘�
 #: src/shk.c:5450
 #, c-format
 msgid "%s says: 'Don't try to steal from me - I have friends in high places!'"
-msgstr "%s가 말한다: '나한테 훔치려 하지 마 - 높은 곳에 친구들이 있거든!'"
-"%s가 말한다: '나한테 훔치려 하지 마 - 높은 곳에 친구들이 있거든!'%s{이/가} 말"
-"한다: '나한테서 훔치려 하지 마세요 - 높은 곳에 친구가 있어요!'"
+msgstr ""
+"%s가 말한다: '나한테 훔치려 하지 마 - 높은 곳에 친구들이 있거든!'%s가 말한"
+"다: '나한테 훔치려 하지 마 - 높은 곳에 친구들이 있거든!'%s{이/가} 말한다: '나"
+"한테서 훔치려 하지 마세요 - 높은 곳에 친구가 있어요!'"
 
 #: src/shk.c:5451
 #, c-format
@@ -25311,8 +25341,8 @@ msgstr "겁쟁이"
 #: src/wizard.c:824
 #, fuzzy
 msgid "rattlepate"
-msgstr "멍청이"
-"멍청이#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+msgstr ""
+"멍청이멍청이#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 "전투 도끼\n"
 "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 "전투도끼"

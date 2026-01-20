@@ -512,7 +512,7 @@ polyself(int psflags)
 
         do {
             mntmp = NON_PM;
-            getlin("Become what kind of monster? [type the name]", buf);
+            getlin(_("Become what kind of monster? [type the name]"), buf);
             (void) mungspaces(buf);
             if (*buf == '\033') {
                 /* user is cancelling controlled poly */

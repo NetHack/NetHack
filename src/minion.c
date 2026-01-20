@@ -363,7 +363,7 @@ bribe(struct monst *mtmp)
     long offer;
     long umoney = money_cnt(gi.invent);
 
-    getlin("How much will you offer?", buf);
+    getlin(_("How much will you offer?"), buf);
     if (sscanf(buf, "%ld", &offer) != 1)
         offer = 0L;
 

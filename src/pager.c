@@ -1837,7 +1837,7 @@ do_look(int mode, coord *click_cc)
           }
         case '?':
             from_screen = FALSE;
-            getlin("Specify what? (type the word)", out_str);
+            getlin(_("Specify what? (type the word)"), out_str);
             if (strcmp(out_str, " ")) /* keep single space as-is */
                 /* remove leading and trailing whitespace and
                    condense consecutive internal whitespace */
