@@ -2610,7 +2610,7 @@ glibr(void)
             which = URIGHTY ? "right " : "left ";
         }
         pline(_("%s %s%s %s%s from your %s%s."),
-              !strncmp(thiswep, "corpse", 6) ? "The" : "Your",
+              !strncmp(thiswep, "corpse", 6) ? _("The") : _("Your"),
               otherwep ? "other " : "", thiswep, xfl ? "also " : "",
               otense(otmp, "slip"), which, hand);
         /* xfl++; */
@@ -2731,7 +2731,7 @@ select_off(struct obj *otmp)
             return 0;
         } else if (Glib) {
             pline(_("%s %s are too slippery to take off."),
-                  uarmg->unpaid ? "The" : "Your", /* simplified Shk_Your() */
+                  uarmg->unpaid ? _("The") : _("Your"), /* simplified Shk_Your() */
                   gloves_simple_name(uarmg));
             return 0;
         }

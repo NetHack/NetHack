@@ -1809,7 +1809,7 @@ staticfn int
 rottenfood(struct obj *obj)
 {
     pline(_("Blecch!  %s %s!"),
-          is_rottable(obj) ? "Rotten" : "Awful", foodword(obj));
+          is_rottable(obj) ? _("Rotten") : _("Awful"), foodword(obj));
     if (!rn2(4)) {
         if (Hallucination)
             You_feel(_("rather trippy."));

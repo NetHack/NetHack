@@ -2378,7 +2378,7 @@ reject_purchase(
 
         SetVoice(shkp, 0, 80, 0);
         verbalize(_("%s for the other %s before buying %s."),
-                  ANGRY(shkp) ? "Pay" : "Please pay",
+                  ANGRY(shkp) ? _("Pay") : _("Please pay"),
                   simpleonames(obj), /* short name suffices */
                   which);
     } else {

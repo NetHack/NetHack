@@ -4673,7 +4673,7 @@ doprring(void)
         (void) dispinv_with_action(lets, use_inuse_mode,
                                    /* note; alternate label will be ignored
                                       if 'use_inuse_mode' is False */
-                                   (ct == 1) ? "Ring" : "Rings");
+                                   (ct == 1) ? _("Ring") : _("Rings"));
     }
     return ECMD_OK;
 }

@@ -743,10 +743,10 @@ namefloorobj(void)
               unames[rn2_on_display_rng(SIZE(unames))]);
     } else if (call_ok(obj) == GETOBJ_EXCLUDE) {
         pline(_("%s %s can't be assigned a type name."),
-              use_plural ? "Those" : "That", buf);
+              use_plural ? _("Those") : _("That"), buf);
     } else if (!obj->dknown) {
         You(_("don't know %s %s well enough to name %s."),
-            use_plural ? "those" : "that", buf, use_plural ? "them" : "it");
+            use_plural ? _("those") : _("that"), buf, use_plural ? _("them") : _("it"));
     } else {
         docall(obj);
     }

@@ -1716,7 +1716,7 @@ maybe_adjust_light(struct obj *obj, int old_range)
             *buf = '\0';
             if (iflags.last_msg == PLNMSG_OBJ_GLOWS)
                 /* we just saw "The <obj> glows <color>." from dipping */
-                Strcpy(buf, (obj->quan == 1L) ? "It" : "They");
+                Strcpy(buf, (obj->quan == 1L) ? _("It") : _("They"));
             else if (carried(obj) || cansee(ox, oy))
                 Strcpy(buf, Yname2(obj));
             if (*buf) {

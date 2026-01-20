@@ -2577,7 +2577,7 @@ show_gamelog(int final)
     int eventcnt = 0;
 
     win = create_nhwindow(NHW_TEXT);
-    Sprintf(buf, "%s events:", final ? "Major" : "Logged");
+    Sprintf(buf, _("%s events:"), final ? _("Major") : _("Logged"));
     putstr(win, 0, buf);
     for (llmsg = gg.gamelog; llmsg; llmsg = llmsg->next) {
         if (final && !majorevent(llmsg))
@@ -3090,9 +3090,9 @@ list_genocided(char defquery, boolean ask)
             }
 
             klwin = create_nhwindow(NHW_MENU);
-            Sprintf(buf, "%s%s species:",
-                    (ngenocided) ? "Genocided" : "Extinct",
-                    (nextinct && ngenocided) ? " or extinct" : "");
+            Sprintf(buf, _("%s%s species:"),
+                    (ngenocided) ? _("Genocided") : _("Extinct"),
+                    (nextinct && ngenocided) ? _(" or extinct") : "");
             putstr(klwin, 0, buf);
             if (!dumping)
                 putstr(klwin, 0, "");

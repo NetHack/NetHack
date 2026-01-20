@@ -847,7 +847,7 @@ doopen_indir(coordxy x, coordxy y)
             pline_The(_("drawbridge is already open."));
         else if (container_at(cc.x, cc.y, TRUE))
             pline(_("%s like something lootable over there."),
-                  Blind ? "Feels" : "Seems");
+                  Blind ? _("Feels") : _("Seems"));
         else
             You(_("%s no door there."), Blind ? _("feel") : _("see"));
         return res;

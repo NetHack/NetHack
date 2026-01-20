@@ -2001,7 +2001,7 @@ doseduce(struct monst *mon)
     else
         You_feel(_("very attracted to %s."), mon_nam(mon));
     /* cache the seducer's name in a local buffer */
-    Strcpy(Who, (!seewho ? (fem ? "She" : "He") : Monnam(mon)));
+    Strcpy(Who, (!seewho ? (fem ? _("She") : _("He")) : Monnam(mon)));
 
     /* if in the process of putting armor on or taking armor off,
        interrupt that activity now */
