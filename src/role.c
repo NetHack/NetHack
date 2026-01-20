@@ -1630,11 +1630,11 @@ build_plselection_prompt(
     }
 #endif /* ENABLE_NLS */
 
-    Strcpy(tmpbuf, "Shall I pick ");
+    Strcpy(tmpbuf, _("Shall I pick "));
     if (racenum != ROLE_NONE || validrole(rolenum))
-        Strcat(tmpbuf, "your ");
+        Strcat(tmpbuf, _("your "));
     else
-        Strcat(tmpbuf, "a ");
+        Strcat(tmpbuf, _("a "));
     /* <your> */
 
     (void) root_plselection_prompt(eos(tmpbuf), buflen - Strlen(tmpbuf),

@@ -3407,19 +3407,19 @@ endgamelevelname(char *outbuf, int indx)
     *outbuf = '\0';
     switch (indx) {
     case -5:
-        Strcpy(outbuf, "Astral Plane");
+        Strcpy(outbuf, _("Astral Plane"));
         break;
     case -4:
-        planename = "Water";
+        planename = _("Water");
         break;
     case -3:
-        planename = "Fire";
+        planename = _("Fire");
         break;
     case -2:
-        planename = "Air";
+        planename = _("Air");
         break;
     case -1:
-        planename = "Earth";
+        planename = _("Earth");
         break;
     }
     if (planename)

@@ -6202,9 +6202,9 @@ makewish(void)
     if (flags.verbose)
         You(_("may wish for an object."));
  retry:
-    Strcpy(promptbuf, "For what do you wish");
+    Strcpy(promptbuf, _("For what do you wish"));
     if (iflags.cmdassist && tries > 0)
-        Strcat(promptbuf, " (enter 'help' for assistance)");
+        Strcat(promptbuf, _(" (enter 'help' for assistance)"));
     Strcat(promptbuf, "?");
     getlin(promptbuf, buf);
 
