@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 13:23+0900\n"
+"POT-Creation-Date: 2026-01-20 13:24+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -500,9 +500,9 @@ msgstr "%s{이/가} 흐려져서 반사하지 않는다!"
 #: src/nhlua.c:636 src/nhlua.c:652 src/pager.c:2696 src/pickup.c:410
 #: src/pline.c:677 src/pline.c:689 src/pline.c:744 src/potion.c:207
 #: src/potion.c:234 src/questpgr.c:434 src/sit.c:55 src/sounds.c:1534
-#: src/spell.c:2054 src/teleport.c:1146 src/timeout.c:147 src/timeout.c:342
-#: src/timeout.c:542 src/timeout.c:568 src/vault.c:959 src/version.c:160
-#: src/windows.c:455 src/windows.c:513 src/wizcmds.c:438
+#: src/spell.c:2054 src/teleport.c:1146 src/timeout.c:342 src/timeout.c:542
+#: src/timeout.c:568 src/vault.c:959 src/version.c:160 src/windows.c:455
+#: src/windows.c:513 src/wizcmds.c:438
 #, c-format
 msgid "%s"
 msgstr "%s"
@@ -6903,6 +6903,10 @@ msgstr "구토 중"
 #: src/eat.c:3766
 msgid "breathe acid on yourself..."
 msgstr "스스로에게 산을 뿜었다..."
+
+#: src/eat.c:3777
+msgid "Your stomach acid melts straight through the ice!"
+msgstr "당신의 위산이 얼음을 녹여버립니다!"
 
 #: src/end.c:98
 msgid "Switch from the tutorial back to regular play?"
@@ -22250,6 +22254,11 @@ msgstr "그 주문을 시전하기에 너무 배고프다."
 msgid "lack the strength to cast spells."
 msgstr "주문을 시전할 힘이 부족하다."
 
+#: src/spell.c:1280
+#, fuzzy
+msgid "Your concentration falters while carrying so much stuff."
+msgstr "그렇게 많은 짐을 들고는 그렇게 할 수 없다."
+
 #: src/spell.c:1291
 msgid "the amulet draining your energy away."
 msgstr "부적이 에너지를 빼앗아 가고 있다."
@@ -22749,6 +22758,11 @@ msgstr "이것은 금고 순간이동이며, 한 번만 사용할 수 있다."
 msgid "%s onto the teleportation trap."
 msgstr "순간이동 함정 위로 %s."
 
+#: src/teleport.c:1117
+#, fuzzy
+msgid "Your concentration falters from carrying so much."
+msgstr "그렇게 많은 짐을 들고는 그렇게 할 수 없다."
+
 #: src/teleport.c:1206
 msgid "Oops..."
 msgstr "이런..."
@@ -22925,6 +22939,45 @@ msgstr "%s{이/가} 당신의 마법에 저항했다!"
 msgid "are no longer inside %s!"
 msgstr "더 이상 %s 안에 없다!"
 
+#: src/timeout.c:129
+#, fuzzy
+msgid "You are slowing down."
+msgstr "느려지는 것을 느꼈다%s."
+
+#: src/timeout.c:130
+#, fuzzy
+msgid "Your limbs are stiffening."
+msgstr "사지가 질퍽해지고 있다."
+
+#: src/timeout.c:131
+#, fuzzy
+msgid "Your limbs have turned to stone."
+msgstr "%s{이/가} 돌로 변했다!"
+
+#: src/timeout.c:132
+#, fuzzy
+msgid "You have turned to stone."
+msgstr "돌로 변했다..."
+
+#: src/timeout.c:133
+#, fuzzy
+msgid "You are a statue."
+msgstr "당신은 %s."
+
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
+# animal_parts
+#: src/timeout.c:145 src/timeout.c:146 src/timeout.c:408 src/timeout.c:409
+#, fuzzy
+msgid "limbs"
+msgstr "앞다리"
+
+#: src/timeout.c:146 src/timeout.c:409
+msgid "extremities"
+msgstr "말단"
+
 #: src/timeout.c:166
 msgid "getting stoned"
 msgstr "돌이 되어가는 중"
@@ -23026,20 +23079,6 @@ msgstr "%s 안으로 곧장 들어갔다."
 #, fuzzy, c-format
 msgid "You have become %s."
 msgstr "%s 위로 이동한다."
-
-# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
-# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
-# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
-# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
-# animal_parts
-#: src/timeout.c:408 src/timeout.c:409
-#, fuzzy
-msgid "limbs"
-msgstr "앞다리"
-
-#: src/timeout.c:409
-msgid "extremities"
-msgstr "말단"
 
 #: src/timeout.c:417
 #, fuzzy

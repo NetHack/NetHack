@@ -1277,7 +1277,7 @@ spelleffects_check(int spell, int *res, int *energy)
         *res = ECMD_OK;
         return TRUE;
     } else if (check_capacity(
-                "Your concentration falters while carrying so much stuff.")) {
+                _("Your concentration falters while carrying so much stuff."))) {
         *res = ECMD_TIME;
         return TRUE;
     }

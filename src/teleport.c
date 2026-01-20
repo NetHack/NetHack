@@ -1114,7 +1114,7 @@ dotele(
                 castit ? "for a teleport spell" : "to teleport");
             return 0;
         } else if (check_capacity(
-                       "Your concentration falters from carrying so much.")) {
+                       _("Your concentration falters from carrying so much."))) {
             return 1; /* this failure in spelleffects() also uses the move */
         }
 

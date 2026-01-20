@@ -126,11 +126,11 @@ property_by_index(int idx, int *propertynum)
 
 /* He is being petrified - dialogue by inmet!tower */
 static NEARDATA const char *const stoned_texts[] = {
-    "You are slowing down.",            /* 5 */
-    "Your limbs are stiffening.",       /* 4 */
-    "Your limbs have turned to stone.", /* 3 */
-    "You have turned to stone.",        /* 2 */
-    "You are a statue."                 /* 1 */
+    N_("You are slowing down."),            /* 5 */
+    N_("Your limbs are stiffening."),       /* 4 */
+    N_("Your limbs have turned to stone."), /* 3 */
+    N_("You have turned to stone."),        /* 2 */
+    N_("You are a statue.")                 /* 1 */
 };
 
 staticfn void
@@ -141,10 +141,10 @@ stoned_dialogue(void)
     if (i > 0L && i <= SIZE(stoned_texts)) {
         char buf[BUFSZ];
 
-        Strcpy(buf, stoned_texts[SIZE(stoned_texts) - i]);
-        if (nolimbs(gy.youmonst.data) && strstri(buf, "limbs"))
-            (void) strsubst(buf, "limbs", "extremities");
-        urgent_pline(_("%s"), buf);
+        Strcpy(buf, _(stoned_texts[SIZE(stoned_texts) - i]));
+        if (nolimbs(gy.youmonst.data) && strstri(buf, _("limbs")))
+            (void) strsubst(buf, _("limbs"), _("extremities"));
+        urgent_pline("%s", buf);
     }
     switch ((int) i) {
     case 5: /* slowing down */
