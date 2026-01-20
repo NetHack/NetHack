@@ -2011,12 +2011,12 @@ shade_miss(
         what = (!obj || shade_aware(obj)) ? "attack" : cxname(obj);
         target = youdef ? "you" : mon_nam(mdef);
         if (!thrown) {
-            whose = youagr ? "Your" : s_suffix(Monnam(magr));
+            whose = youagr ? _("Your") : s_suffix(Monnam(magr));
             pline(_("%s %s %s%s%s."), whose, what,
-                  vtense(what, "pass"), harmlessly_thru, target);
+                  vtense(what, _("pass")), harmlessly_thru, target);
         } else {
             pline(_("%s %s%s%s."), The(what), /* note: not pline_The() */
-                  vtense(what, "pass"), harmlessly_thru, target);
+                  vtense(what, _("pass")), harmlessly_thru, target);
         }
         if (!youdef && !canspotmon(mdef))
             map_invisible(mdef->mx, mdef->my);
@@ -5346,7 +5346,7 @@ mhitm_knockback(
          * mhitm: The fire giant knocks the gnome back with a forceful strike!
          */
         pline(_("%s %s %s %s with a %s %s!"),
-              magrbuf, vtense(magrbuf, "knock"), mdefbuf, knockedhow,
+              magrbuf, vtense(magrbuf, _("knock")), mdefbuf, knockedhow,
               rn2(2) ? _("forceful") : _("powerful"), rn2(2) ? _("blow") : _("strike"));
     } else if (u_agr) {
         /* hero knocks unseen foe back; noticed by touch */
@@ -5621,7 +5621,7 @@ hmonas(struct monst *mon)
                         || (mattk->aatyp == AT_CLAW && humanoid(mon->data)))
                         verb = "attack";
                     Your(_("%s %s harmlessly through %s."),
-                         verb, vtense(verb, "pass"), mon_nam(mon));
+                         verb, vtense(verb, _("pass")), mon_nam(mon));
                 } else {
                     /* either not a shade or no special silver/blessed damage,
                        other unsolid monsters are immune to AT_TUCH+AD_WRAP */

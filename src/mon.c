@@ -4149,7 +4149,7 @@ qst_guardians_respond(void)
         if (got_mad > 1)
             who = makeplural(who);
         pline_The(_("%s %s to be angry too..."),
-                  who, vtense(who, "appear"));
+                  who, vtense(who, _("appear")));
     }
 }
 
@@ -5729,18 +5729,18 @@ angry_guards(boolean silent)
             char buf[BUFSZ];
 
             if (slct) { /* sleeping guard(s) */
-                Sprintf(buf, "guard%s", plur(slct));
-                pline_The(_("%s %s up."), buf, vtense(buf, "wake"));
+                Sprintf(buf, _("guard%s"), plur(slct));
+                pline_The(_("%s %s up."), buf, vtense(buf, _("wake")));
             }
 
             if (nct) { /* seen/sensed adjacent guard(s) */
-                Sprintf(buf, "guard%s", plur(nct));
-                pline_The(_("%s %s angry!"), buf, vtense(buf, "get"));
+                Sprintf(buf, _("guard%s"), plur(nct));
+                pline_The(_("%s %s angry!"), buf, vtense(buf, _("get")));
             } else if (sct) { /* seen/sensed non-adjacent guard(s) */
-                Sprintf(buf, "guard%s", plur(sct));
+                Sprintf(buf, _("guard%s"), plur(sct));
                 pline(_("%s %s %s approaching!"),
-                      (sct == 1) ? "An angry" : "Angry",
-                      buf, vtense(buf, "are"));
+                      (sct == 1) ? _("An angry") : _("Angry"),
+                      buf, vtense(buf, _("are")));
             } else {
                 Strcpy(buf, (ct == 1) ? "a guard's" : "guards'");
                 Soundeffect(se_shrill_whistle, 100);
