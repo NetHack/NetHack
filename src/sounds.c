@@ -1494,7 +1494,7 @@ tiphat(void)
     }
 
     if (unseen || (statue && Hallucination)) {
-        pline(_("That %screature is ignoring you!"), unseen ? "unseen " : "");
+        pline(_("That %screature is ignoring you!"), unseen ? _("unseen ") : "");
     } else if (!mtmp || !responsive_mon_at(x, y)) {
         if (vismon) /* 'vismon' is only True when 'mtmp' is non-Null */
             pline(_("%s seems not to notice you."), Monnam(mtmp));

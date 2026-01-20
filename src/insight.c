@@ -3142,7 +3142,7 @@ list_genocided(char defquery, boolean ask)
     } else if (!program_state.gameover) {
         /* #genocided rather than final disclosure, so pline() is ok and
            extinction has been ignored */
-        pline(_("No creatures have been genocided%s."), genoing ? " yet" : "");
+        pline(_("No creatures have been genocided%s."), genoing ? _(" yet") : "");
 #ifdef DUMPLOG
     } else if (dumping) { /* 'gameover' is True if we make it here */
         putstr(0, 0, _("No species were genocided or became extinct."));

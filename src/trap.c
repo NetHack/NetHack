@@ -6857,8 +6857,8 @@ lava_effects(void)
                because lifesaving resets them */
             svk.killer.format = KILLED_BY;
             Strcpy(svk.killer.name, lava_killer);
-            urgent_pline(_("You %s..."), boil_away ? "boil away"
-                                                : "burn to a crisp");
+            urgent_pline(_("You %s..."), boil_away ? _("boil away")
+                                                : _("burn to a crisp"));
             done(BURNING);
             if (safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT))
                 break; /* successful life-save */

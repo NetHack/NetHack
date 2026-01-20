@@ -2510,7 +2510,7 @@ litroom(
                 pline(_("%s glistens."), Monnam(u.ustuck));
         } else if (!Blind && (!Is_rogue_level(&u.uz)
                               || levl[u.ux][u.uy].typ != CORR)) {
-            pline(_("A lit field %ssurrounds you!"), no_op ? "briefly " : "");
+            pline(_("A lit field %ssurrounds you!"), no_op ? _("briefly ") : "");
         }
     }
 

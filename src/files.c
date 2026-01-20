@@ -1679,7 +1679,7 @@ docompress_file(const char *filename, boolean uncomp)
         nh_terminate(EXIT_FAILURE);
     } else if (f == -1) {
         perror((char *) 0);
-        pline(_("Fork to %scompress %s failed."), uncomp ? "un" : "", filename);
+        pline(_("Fork to %scompress %s failed."), uncomp ? _("un") : "", filename);
         free((genericptr_t) cfn);
         return;
     }

@@ -845,10 +845,10 @@ use_leash_core(struct obj *obj, struct monst *mtmp, coord *cc, int spotmon)
                 Sprintf(lmonbuf, "%s tail", s_suffix(lmonnam));
                 lmonnam = lmonbuf;
             }
-            pline(_("The leash won't fit onto %s%s."), spotmon ? "your " : "",
+            pline(_("The leash won't fit onto %s%s."), spotmon ? _("your ") : "",
                   lmonnam);
         } else {
-            You(_("slip the leash around %s%s."), spotmon ? "your " : "",
+            You(_("slip the leash around %s%s."), spotmon ? _("your ") : "",
                 l_monnam(mtmp));
             mtmp->mleashed = 1;
             obj->leashmon = (int) mtmp->m_id;

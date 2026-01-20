@@ -600,7 +600,7 @@ steal(struct monst *mtmp, char *objnambuf)
     if (iflags.last_msg == PLNMSG_MON_TAKES_OFF_ITEM
         && mtmp->data->mlet == S_NYMPH)
         ++named;
-    urgent_pline(_("%s stole %s."), named ? "She" : Monnambuf, doname(otmp));
+    urgent_pline(_("%s stole %s."), named ? _("She") : Monnambuf, doname(otmp));
     encumber_msg();
     could_petrify = (otmp->otyp == CORPSE
                      && touch_petrifies(&mons[otmp->corpsenm]));
