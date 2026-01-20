@@ -68,7 +68,7 @@ throne_sit_effect(void)
         switch (effect) {
         case 1:
             (void) adjattrib(rn2(A_MAX), -rn1(4, 3), FALSE);
-            losehp(rnd(10), "cursed throne", KILLED_BY_AN);
+            losehp(rnd(10), _("cursed throne"), KILLED_BY_AN);
             break;
         case 2:
             (void) adjattrib(rn2(A_MAX), 1, FALSE);
@@ -76,7 +76,7 @@ throne_sit_effect(void)
         case 3:
             pline(_("A%s electric shock shoots through your body!"),
                   (Shock_resistance) ? "n" : " massive");
-            losehp(Shock_resistance ? rnd(6) : rnd(30), "electric chair",
+            losehp(Shock_resistance ? rnd(6) : rnd(30), _("electric chair"),
                    KILLED_BY_AN);
             exercise(A_CON, FALSE);
             break;
@@ -332,7 +332,7 @@ special_throne_effect(int effect) {
     case 12:
         /* acid damage */
         pline(_("The throne is covered in acid!"));
-        losehp(Acid_resistance ? rnd(16) : rnd(80), "acidic chair",
+        losehp(Acid_resistance ? rnd(16) : rnd(80), _("acidic chair"),
                KILLED_BY_AN);
         exercise(A_CON, FALSE);
         break;

@@ -962,7 +962,7 @@ peffect_sickness(struct obj *otmp)
         pline(_("(But in fact it was mildly stale %s.)"), fruitname(TRUE));
         if (!Role_if(PM_HEALER)) {
             /* NB: blessed otmp->fromsink is not possible */
-            losehp(1, "mildly contaminated potion", KILLED_BY_AN);
+            losehp(1, _("mildly contaminated potion"), KILLED_BY_AN);
         }
     } else {
         if (Poison_resistance)
@@ -1195,7 +1195,7 @@ peffect_levitation(struct obj *otmp)
 
             You(_("hit your %s on the %s."), body_part(HEAD),
                 ceiling(u.ux, u.uy));
-            losehp(Maybe_Half_Phys(dmg), "colliding with the ceiling",
+            losehp(Maybe_Half_Phys(dmg), _("colliding with the ceiling"),
                    KILLED_BY);
             gp.potion_nothing = 0; /* not nothing after all */
         }
@@ -1300,7 +1300,7 @@ peffect_acid(struct obj *otmp)
               otmp->blessed ? _(" a little") : otmp->cursed ? _(" a lot")
                                                          : _(" like acid"));
         dmg = d(otmp->cursed ? 2 : 1, otmp->blessed ? 4 : 8);
-        losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(dmg), _("potion of acid"), KILLED_BY_AN);
         exercise(A_CON, FALSE);
     }
     if (Stoned)
@@ -1693,7 +1693,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                       obj->blessed ? " a little"
                                    : obj->cursed ? " a lot" : "");
                 dmg = d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
-                losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
+                losehp(Maybe_Half_Phys(dmg), _("potion of acid"), KILLED_BY_AN);
             }
             break;
         }

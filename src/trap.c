@@ -1376,7 +1376,7 @@ trapeffect_rocktrap(
             newsym(u.ux, u.uy); /* map the rock */
 
             if (!harmless) {
-                losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
+                losehp(Maybe_Half_Phys(dmg), _("falling rock"), KILLED_BY_AN);
                 exercise(A_STR, FALSE);
             }
         }
@@ -1523,7 +1523,7 @@ trapeffect_bear_trap(
             set_wounded_legs(rn2(2) ? RIGHT_SIDE : LEFT_SIDE, rn1(10, 10));
             if (u.umonnum == PM_OWLBEAR || u.umonnum == PM_BUGBEAR)
                 You(_("howl in anger!"));
-            losehp(Maybe_Half_Phys(dmg), "bear trap", KILLED_BY_AN);
+            losehp(Maybe_Half_Phys(dmg), _("bear trap"), KILLED_BY_AN);
         }
         exercise(A_DEX, FALSE);
     } else {
@@ -1652,7 +1652,7 @@ trapeffect_rust_trap(
             int dam = u.mhmax;
 
             You(_("are covered with rust!"));
-            losehp(Maybe_Half_Phys(dam), "rusting away", KILLED_BY);
+            losehp(Maybe_Half_Phys(dam), _("rusting away"), KILLED_BY);
         } else if (u.umonnum == PM_GREMLIN && rn2(3)) {
             (void) split_mon(&gy.youmonst, (struct monst *) 0);
         }
@@ -2298,7 +2298,7 @@ trapeffect_magic_trap(
             deltrap(trap);
             newsym(u.ux, u.uy); /* update position */
             You(_("are caught in a magical explosion!"));
-            losehp(rnd(10), "magical explosion", KILLED_BY_AN);
+            losehp(rnd(10), _("magical explosion"), KILLED_BY_AN);
             Your(_("body absorbs some of the magical energy!"));
             u.uen = (u.uenmax += 2);
             if (u.uenmax > u.uenpeak)
@@ -2354,7 +2354,7 @@ trapeffect_anti_magic(
                      : (dmgval2 >= hp / 4) ? "very lethargic."
                        : "sluggish.");
             /* opposite of magical explosion */
-            losehp(dmgval2, "anti-magic implosion", KILLED_BY_AN);
+            losehp(dmgval2, _("anti-magic implosion"), KILLED_BY_AN);
         }
 
         /* if the drain amount is more than hero's maximum energy then up
@@ -2534,7 +2534,7 @@ trapeffect_landmine(
            blow_up_landmine() will remove pit afterwards if inappropriate */
         trap->ttyp = PIT;
         trap->madeby_u = FALSE;
-        losehp(Maybe_Half_Phys(rnd(16)), "land mine", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(rnd(16)), _("land mine"), KILLED_BY_AN);
         blow_up_landmine(trap);
         if (steed_mid && saddle && !u.usteed)
             (void) keep_saddle_with_steedcorpse(steed_mid, fobj, saddle);
@@ -4054,7 +4054,7 @@ float_down(
                         pline(_("Bummer!  You've crashed."));
                     else
                         You(_("fall over."));
-                    losehp(rnd(2), "dangerous winds", KILLED_BY);
+                    losehp(rnd(2), _("dangerous winds"), KILLED_BY);
                     if (u.usteed)
                         dismount_steed(DISMOUNT_FELL);
                     selftouch(_("As you fall, you"));
@@ -4173,7 +4173,7 @@ dofiretrap(
         if (Fire_resistance)
             You(_("are uninjured."));
         else
-            losehp(rnd(3), "boiling water", KILLED_BY);
+            losehp(rnd(3), _("boiling water"), KILLED_BY);
         return;
     }
     pline(_("A %s %s from %s!"), _("tower of flame"),
@@ -4227,7 +4227,7 @@ dofiretrap(
     if (!num)
         You(_("are uninjured."));
     else
-        losehp(num, "tower of flame", KILLED_BY_AN); /* fire damage */
+        losehp(num, _("tower of flame"), KILLED_BY_AN); /* fire damage */
     burn_away_slime();
 
     if (burnarmor(&gy.youmonst) || rn2(3)) {
@@ -5019,7 +5019,7 @@ drown(void)
         i = Maybe_Half_Phys(d(2, 6));
         if (u.mhmax > i)
             u.mhmax -= i;
-        losehp(i, "rusting away", KILLED_BY);
+        losehp(i, _("rusting away"), KILLED_BY);
     }
     if (inpool_ok)
         return FALSE;
@@ -6380,7 +6380,7 @@ chest_trap(
             }
             (void) destroy_items(&gy.youmonst, AD_ELEC, orig_dmg);
             if (dmg)
-                losehp(dmg, "electric shock", KILLED_BY_AN);
+                losehp(dmg, _("electric shock"), KILLED_BY_AN);
             break;
         } /* case 6 */
         case 5:
@@ -6626,7 +6626,7 @@ b_trapped(const char *item, int bodypart)
     Soundeffect(se_kaboom, 80);
     pline(_("KABOOM!!  %s was booby-trapped!"), The(item));
     wake_nearby(FALSE);
-    losehp(Maybe_Half_Phys(dmg), "explosion", KILLED_BY_AN);
+    losehp(Maybe_Half_Phys(dmg), _("explosion"), KILLED_BY_AN);
     exercise(A_STR, FALSE);
     if (bodypart != NO_PART)
         exercise(A_CON, FALSE);

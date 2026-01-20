@@ -301,7 +301,7 @@ drinkfountain(void)
             if (Poison_resistance) {
                 pline(_("Perhaps it is runoff from the nearby %s farm."),
                       fruitname(FALSE));
-                losehp(rnd(4), "unrefrigerated sip of juice", KILLED_BY_AN);
+                losehp(rnd(4), _("unrefrigerated sip of juice"), KILLED_BY_AN);
                 break;
             }
             poison_strdmg(rn1(4, 3), rnd(10), "contaminated water",
@@ -614,7 +614,7 @@ drinksink(void)
             pline(_("It seems quite tasty."));
             monstseesu(M_SEEN_FIRE);
         } else {
-            losehp(rnd(6), "sipping boiling water", KILLED_BY);
+            losehp(rnd(6), _("sipping boiling water"), KILLED_BY);
             monstunseesu(M_SEEN_FIRE);
         }
         /* boiling water burns considered fire damage */

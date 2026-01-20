@@ -61,7 +61,7 @@ ballfall(void)
             } else if (flags.verbose)
                 pline(_("%s does not protect you."), Yname2(uarmh));
         }
-        losehp(Maybe_Half_Phys(dmg), "crunched in the head by an iron ball",
+        losehp(Maybe_Half_Phys(dmg), _("crunched in the head by an iron ball"),
                NO_KILLER_PREFIX);
     }
 }
@@ -1014,7 +1014,7 @@ drag_down(void)
         if (rn2(2)) {
             Soundeffect(se_iron_ball_hits_you, 25);
             pline_The(_("iron ball smacks into you!"));
-            losehp(Maybe_Half_Phys(rnd(20)), "iron ball collision",
+            losehp(Maybe_Half_Phys(rnd(20)), _("iron ball collision"),
                    KILLED_BY_AN);
             exercise(A_STR, FALSE);
             dragchance -= 2;

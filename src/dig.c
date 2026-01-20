@@ -1244,7 +1244,7 @@ use_pick_axe2(struct obj *obj)
                           vibrate ? "  The axe-handle vibrates violently!"
                                   : "");
                     if (vibrate)
-                        losehp(Maybe_Half_Phys(2), "axing a hard object",
+                        losehp(Maybe_Half_Phys(2), _("axing a hard object"),
                                KILLED_BY);
                     wake_nearby(FALSE);
                 } else {
@@ -1595,7 +1595,7 @@ zap_dig(void)
                 You(_("loosen a rock from the %s."), ceiling(u.ux, u.uy));
                 pline(_("It falls on your %s!"), body_part(HEAD));
                 dmg = rnd(hard_helmet(uarmh) ? 2 : 6);
-                losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
+                losehp(Maybe_Half_Phys(dmg), _("falling rock"), KILLED_BY_AN);
                 otmp = mksobj_at(ROCK, u.ux, u.uy, FALSE, FALSE);
                 if (otmp) {
                     (void) xname(otmp); /* set dknown, maybe bknown */

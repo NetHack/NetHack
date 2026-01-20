@@ -811,7 +811,7 @@ recharge(struct obj *obj, int curse_bless)
                 Ring_gone(obj);
             s = rnd(3 * abs(obj->spe)); /* amount of damage */
             useup(obj), obj = 0;
-            losehp(Maybe_Half_Phys(s), "exploding ring", KILLED_BY_AN);
+            losehp(Maybe_Half_Phys(s), _("exploding ring"), KILLED_BY_AN);
         } else {
             long mask = is_on ? (obj == uleft ? LEFT_RING : RIGHT_RING) : 0L;
 
@@ -1831,7 +1831,7 @@ seffect_fire(struct obj **sobjp)
             monstunseesu(M_SEEN_FIRE);
             pline_The(_("scroll catches fire and you burn your %s."),
                       makeplural(body_part(HAND)));
-            losehp(1, "scroll of fire", KILLED_BY_AN);
+            losehp(1, _("scroll of fire"), KILLED_BY_AN);
         }
         return;
     }
@@ -2282,7 +2282,7 @@ drop_boulder_on_player(
         newsym(u.ux, u.uy);
     }
     if (dmg)
-        losehp(Maybe_Half_Phys(dmg), "scroll of earth", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(dmg), _("scroll of earth"), KILLED_BY_AN);
 }
 
 boolean
@@ -2398,7 +2398,7 @@ wand_explode(struct obj *obj, int chg /* recharging */)
     dmg = d(n, k);
     obj->in_use = TRUE; /* in case losehp() is fatal (or --More--^C) */
     pline(_("%s %s explodes!"), Yname2(obj), expl);
-    losehp(Maybe_Half_Phys(dmg), "exploding wand", KILLED_BY_AN);
+    losehp(Maybe_Half_Phys(dmg), _("exploding wand"), KILLED_BY_AN);
     useup(obj);
     /* obscure side-effect */
     exercise(A_STR, FALSE);
