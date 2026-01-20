@@ -1213,7 +1213,7 @@ use_pick_axe2(struct obj *obj)
                     seetrap(trap);
                     There(_("is a spider web there!"));
                 }
-                pline(_("%s entangled in the web."), Yobjnam2(obj, "become"));
+                pline(_("%s entangled in the web."), Yobjnam2(obj, _("become")));
                 /* you ought to be able to let go; tough luck */
                 /* (maybe `move_into_trap()' would be better) */
                 nomul(-d(2, 2));

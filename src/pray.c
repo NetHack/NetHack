@@ -361,7 +361,7 @@ fix_curse_trouble(struct obj *otmp, const char *what)
     }
     if (!Blind || (otmp == ublindf && Blindfolded_only)) {
         pline(_("%s %s."),
-                what ? what : (const char *) Yobjnam2(otmp, "softly glow"),
+                what ? what : (const char *) Yobjnam2(otmp, _("softly glow")),
                 hcolor(NH_AMBER));
         iflags.last_msg = PLNMSG_OBJ_GLOWS;
         otmp->bknown = !Hallucination; /* ok to skip set_bknown() */
@@ -592,7 +592,7 @@ fix_worst_trouble(int trouble)
     case TROUBLE_SADDLE:
         otmp = which_armor(u.usteed, W_SADDLE);
         if (!Blind) {
-            pline(_("%s %s."), Yobjnam2(otmp, "softly glow"), hcolor(NH_AMBER));
+            pline(_("%s %s."), Yobjnam2(otmp, _("softly glow")), hcolor(NH_AMBER));
             set_bknown(otmp, 1);
         }
         uncurse(otmp);
@@ -1180,7 +1180,7 @@ pleased(aligntyp g_align)
 
                 if (uwep->cursed) {
                     if (!Blind) {
-                        pline(_("%s %s%s."), Yobjnam2(uwep, "softly glow"),
+                        pline(_("%s %s%s."), Yobjnam2(uwep, _("softly glow")),
                               hcolor(NH_AMBER), repair_buf);
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
                     } else
@@ -1192,7 +1192,7 @@ pleased(aligntyp g_align)
                 } else if (!uwep->blessed) {
                     if (!Blind) {
                         pline(_("%s with %s aura%s."),
-                              Yobjnam2(uwep, "softly glow"),
+                              Yobjnam2(uwep, _("softly glow")),
                               an(hcolor(NH_LIGHT_BLUE)), repair_buf);
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
                     } else
@@ -1295,7 +1295,7 @@ pleased(aligntyp g_align)
                     && (otmp != uarmh /* [see worst_cursed_item()] */
                         || uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT)) {
                     if (!Blind) {
-                        pline(_("%s %s."), Yobjnam2(otmp, "softly glow"),
+                        pline(_("%s %s."), Yobjnam2(otmp, _("softly glow")),
                               hcolor(NH_AMBER));
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
                         otmp->bknown = 1; /* ok to bypass set_bknown() */

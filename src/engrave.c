@@ -826,7 +826,7 @@ doengrave_sfx_item(struct _doengrave_ctx *de)
                       Yname2(de->otmp), surface(u.ux, u.uy));
             else if ((int) de->otmp->spe <= -3)
                 pline(_("%s too dull for engraving."),
-                      Yobjnam2(de->otmp, "are"));
+                      Yobjnam2(de->otmp, _("are")));
             else
                 de->type = ENGRAVE;
         }

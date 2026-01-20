@@ -6785,7 +6785,7 @@ lava_effects(void)
     if (uarmf && (uarmf->in_use
                   || (is_organic(uarmf) && !uarmf->oerodeproof))) {
         obj = uarmf;
-        pline(_("%s into flame!"), Yobjnam2(obj, "burst"));
+        pline(_("%s into flame!"), Yobjnam2(obj, _("burst")));
         ++burnmesgcount;
         iflags.in_lava_effects++; /* (see above) */
         (void) Boots_off();
@@ -6828,7 +6828,7 @@ lava_effects(void)
             } else if (obj->in_use) {
                 if (obj->owornmask) {
                     if (usurvive) {
-                        pline(_("%s into flame!"), Yobjnam2(obj, "burst"));
+                        pline(_("%s into flame!"), Yobjnam2(obj, _("burst")));
                         ++burnmesgcount;
                     }
                     remove_worn_item(obj, TRUE);

@@ -622,7 +622,7 @@ rndcurse(void)
         else
             curse(otmp);
         if (!Blind) {
-            pline(_("%s %s."), Yobjnam2(otmp, "glow"),
+            pline(_("%s %s."), Yobjnam2(otmp, _("glow")),
                   hcolor(otmp->cursed ? NH_BLACK : (const char *) "brown"));
             otmp->bknown = Hallucination ? 0 : 1; /* bypass set_bknown() */
         } else {

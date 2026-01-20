@@ -774,7 +774,7 @@ can_twoweapon(void)
         You_cant(_("use two weapons while wearing a shield."));
     } else if (uswapwep->oartifact) {
         pline(_("%s being held second to another weapon!"),
-              Yobjnam2(uswapwep, "resist"));
+              Yobjnam2(uswapwep, _("resist")));
     } else if (uswapwep->otyp == CORPSE && cant_wield_corpse(uswapwep)) {
         /* [Note: !TWOWEAPOK() check prevents ever getting here...] */
         ; /* must be life-saved to reach here; return FALSE */
@@ -972,7 +972,7 @@ chwepon(struct obj *otmp, int amount)
         wepname = ONAME(uwep);
     if (amount < 0 && uwep->oartifact && restrict_name(uwep, wepname)) {
         if (!Blind)
-            pline(_("%s %s."), Yobjnam2(uwep, "faintly glow"), color);
+            pline(_("%s %s."), Yobjnam2(uwep, _("faintly glow")), color);
         return 1;
     }
     /* there is a (soft) upper and lower limit to uwep->spe */
@@ -983,7 +983,7 @@ chwepon(struct obj *otmp, int amount)
                   Yobjnam2(uwep, _("violently glow")), color,
                   otense(uwep, _("evaporate")));
         else
-            pline(_("%s."), Yobjnam2(uwep, "evaporate"));
+            pline(_("%s."), Yobjnam2(uwep, _("evaporate")));
 
         useupall(uwep); /* let all of them disappear */
         return 1;
@@ -1022,7 +1022,7 @@ chwepon(struct obj *otmp, int amount)
     /* elven weapons vibrate warningly when enchanted beyond a limit */
     if ((uwep->spe > 5)
         && (is_elven_weapon(uwep) || uwep->oartifact || !rn2(7)))
-        pline(_("%s unexpectedly."), Yobjnam2(uwep, "suddenly vibrate"));
+        pline(_("%s unexpectedly."), Yobjnam2(uwep, _("suddenly vibrate")));
 
     return 1;
 }
@@ -1049,7 +1049,7 @@ weldmsg(struct obj *obj)
     obj->owornmask = 0L; /* suppress doname()'s "(weapon in hand)";
                           * Yobjnam2() doesn't actually need this because
                           * it is based on xname() rather than doname() */
-    pline(_("%s welded to your %s!"), Yobjnam2(obj, "are"), hand);
+    pline(_("%s welded to your %s!"), Yobjnam2(obj, _("are")), hand);
     obj->owornmask = savewornmask;
 }
 

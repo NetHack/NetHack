@@ -655,7 +655,7 @@ stripspe(struct obj *obj)
         pline1(nothing_happens);
     } else {
         /* order matters: message, shop handling, actual transformation */
-        pline(_("%s briefly."), Yobjnam2(obj, "vibrate"));
+        pline(_("%s briefly."), Yobjnam2(obj, _("vibrate")));
         costly_alteration(obj, COST_UNCHRG);
         obj->spe = 0;
         if (obj->otyp == OIL_LAMP || obj->otyp == BRASS_LANTERN)
@@ -924,7 +924,7 @@ recharge(struct obj *obj, int curse_bless)
                     p_glow2(obj, NH_BLACK);
                     curse(obj);
                 } else {
-                    pline(_("%s briefly."), Yobjnam2(obj, "vibrate"));
+                    pline(_("%s briefly."), Yobjnam2(obj, _("vibrate")));
                 }
                 if (obj->spe > 0)
                     costly_alteration(obj, COST_UNCHRG);
@@ -1139,10 +1139,10 @@ seffect_enchant_armor(struct obj **sobjp)
         otmp->oerodeproof = 0; /* for messages */
         if (Blind) {
             otmp->rknown = FALSE;
-            pline(_("%s warm for a moment."), Yobjnam2(otmp, "feel"));
+            pline(_("%s warm for a moment."), Yobjnam2(otmp, _("feel")));
         } else {
             otmp->rknown = TRUE;
-            pline(_("%s covered by a %s %s %s!"), Yobjnam2(otmp, "are"),
+            pline(_("%s covered by a %s %s %s!"), Yobjnam2(otmp, _("are")),
                   scursed ? _("mottled") : _("shimmering"),
                   hcolor(scursed ? NH_BLACK : NH_GOLDEN),
                   scursed ? _("glow")
@@ -1278,7 +1278,7 @@ seffect_enchant_armor(struct obj **sobjp)
 
     if ((otmp->spe > (special_armor ? 5 : 3))
         && (special_armor || !rn2(7)))
-        pline(_("%s %s."), Yobjnam2(otmp, "suddenly vibrate"),
+        pline(_("%s %s."), Yobjnam2(otmp, _("suddenly vibrate")),
               Blind ? _("again") : _("unexpectedly"));
 }
 
@@ -1336,7 +1336,7 @@ seffect_destroy_armor(struct obj **sobjp)
         } else
             gk.known = TRUE;
     } else { /* armor and scroll both cursed */
-        pline(_("%s."), Yobjnam2(otmp, "vibrate"));
+        pline(_("%s."), Yobjnam2(otmp, _("vibrate")));
         if (otmp->spe >= -6) {
             otmp->spe += -1;
             adj_abon(otmp, -1);
@@ -1536,7 +1536,7 @@ seffect_remove_curse(struct obj **sobjp)
                 /* like rndcurse(sit.c), effect on regular inventory
                    doesn't show things glowing but saddle does */
                 if (!Blind) {
-                    pline(_("%s %s."), Yobjnam2(obj, "glow"),
+                    pline(_("%s %s."), Yobjnam2(obj, _("glow")),
                               hcolor("amber"));
                     obj->bknown = Hallucination ? 0 : 1;
                 } else {
@@ -1595,7 +1595,7 @@ seffect_enchant_weapon(struct obj **sobjp)
             Your(_("weapon feels warm for a moment."));
         } else {
             uwep->rknown = TRUE;
-            pline(_("%s covered by a %s %s %s!"), Yobjnam2(uwep, "are"),
+            pline(_("%s covered by a %s %s %s!"), Yobjnam2(uwep, _("are")),
                   scursed ? _("mottled") : _("shimmering"),
                   hcolor(scursed ? NH_PURPLE : NH_GOLDEN),
                   scursed ? _("glow") : _("shield"));

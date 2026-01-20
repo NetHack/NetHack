@@ -970,7 +970,7 @@ hmon_hitmon_weapon_melee(
             /* Yobjnam2(X,"shatter") yields "Shk's X shatters" if X is owned
                by a shop or "Mon's X shatters" if X is carried by a monster
                (or "{Your|The} X shatters" if {carried by hero|last resort})*/
-            Strcpy(buf, Yobjnam2(monwep, "shatter"));
+            Strcpy(buf, Yobjnam2(monwep, _("shatter")));
         else /* hero is blind or can't see invisible mon */
             /* construct "Its weapon shatters"; not an exact replacement
                for Yobjnam2() if an unseen mon other than the shopkeeper
@@ -3615,7 +3615,7 @@ mhitm_ad_ench(
                 }
             }
             if (obj && drain_item(obj, FALSE)) {
-                pline(_("%s less effective."), Yobjnam2(obj, "seem"));
+                pline(_("%s less effective."), Yobjnam2(obj, _("seem")));
             }
         }
     } else {
@@ -6156,7 +6156,7 @@ passive_obj(
         if (!mon->mcan) {
             if (drain_item(obj, TRUE) && carried(obj)
                 && (obj->known || obj->oclass == ARMOR_CLASS)) {
-                pline(_("%s less effective."), Yobjnam2(obj, "seem"));
+                pline(_("%s less effective."), Yobjnam2(obj, _("seem")));
             }
             break;
         }

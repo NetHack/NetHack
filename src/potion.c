@@ -1604,7 +1604,7 @@ impact_arti_light(
         curse(otmp);
     else
         bless(otmp);
-    H2Opotion_dip(otmp, obj, seeit, seeit ? Yobjnam2(obj, "glow") : "");
+    H2Opotion_dip(otmp, obj, seeit, seeit ? Yobjnam2(obj, _("glow")) : "");
     dealloc_obj(otmp);
 #if 0   /* defer this until caller has used up the scroll so it won't be
          * visible; player was told that it disappeared as hero read it */
@@ -2443,7 +2443,7 @@ potion_dip(struct obj *obj, struct obj *potion)
     potion->in_use = TRUE; /* assume it will be used up */
     if (potion->otyp == POT_WATER) {
         boolean useeit = !Blind || (obj == ublindf && Blindfolded_only);
-        const char *obj_glows = Yobjnam2(obj, "glow");
+        const char *obj_glows = Yobjnam2(obj, _("glow"));
 
         if (H2Opotion_dip(potion, obj, useeit, obj_glows)) {
             poof(potion);
