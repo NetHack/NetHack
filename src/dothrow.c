@@ -1264,7 +1264,7 @@ toss_up(struct obj *obj, boolean hitsroof)
     /* note: obj->quan == 1 */
 
     if (!has_ceiling(&u.uz)) {
-        action = "flies up into"; /* into "the sky" or "the water above" */
+        action = _("flies up into"); /* into "the sky" or "the water above" */
     } else if (hitsroof) {
         if (breaktest(obj)) {
             pline(_("%s hits the %s."), Doname2(obj), ceiling(u.ux, u.uy));
@@ -1278,9 +1278,9 @@ toss_up(struct obj *obj, boolean hitsroof)
             }
             return FALSE;
         }
-        action = "hits";
+        action = _("hits");
     } else {
-        action = "almost hits";
+        action = _("almost hits");
     }
     pline(_("%s %s the %s, then falls back on top of your %s."), Doname2(obj),
           action, ceiling(u.ux, u.uy), body_part(HEAD));

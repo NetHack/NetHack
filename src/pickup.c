@@ -2819,7 +2819,7 @@ mbag_item_gone(boolean held, struct obj *item, boolean silent)
 void
 observe_quantum_cat(struct obj *box, boolean makecat, boolean givemsg)
 {
-    static NEARDATA const char sc[] = "Schroedinger's Cat";
+    static NEARDATA const char sc[] = N_("Schroedinger's Cat");
     struct obj *deadcat;
     struct monst *livecat = 0;
     coordxy ox, oy;
@@ -2870,7 +2870,7 @@ observe_quantum_cat(struct obj *box, boolean makecat, boolean givemsg)
         }
         if (givemsg)
             pline_The(_("%s inside the box is dead!"),
-                      Hallucination ? rndmonnam((char *) 0) : "housecat");
+                      Hallucination ? rndmonnam((char *) 0) : _("housecat"));
     }
     nhUse(deadcat);
     return;

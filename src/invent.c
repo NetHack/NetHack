@@ -3065,9 +3065,9 @@ display_pickinv(
     long *out_cnt) /* optional; count player entered when selecting an item */
 {
     static const char /* potential entries for perm_invent window */
-        not_carrying_anything[] = "Not carrying anything",
-        not_using_anything[] = "Not using any items",
-        only_carrying_gold[] = "Only carrying gold";
+        not_carrying_anything[] = N_("Not carrying anything"),
+        not_using_anything[] = N_("Not using any items"),
+        only_carrying_gold[] = N_("Only carrying gold");
     struct obj *otmp, wizid_fakeobj, inuse_fakeobj;
     char ilet, ret, *formattedobj;
     const char *invlet = flags.inv_order;
@@ -3372,9 +3372,9 @@ display_pickinv(
        there isn't anything applicable to list; the n==0 case above
        gets skipped for perm_invent), put something into the menu */
     if (doing_perm_invent && !lets && !gotsomething) {
-        add_menu_str(win, inuse_only ? not_using_anything
-                          : (!show_gold && skipped_gold) ? only_carrying_gold
-                            : not_carrying_anything);
+        add_menu_str(win, inuse_only ? _(not_using_anything)
+                          : (!show_gold && skipped_gold) ? _(only_carrying_gold)
+                            : _(not_carrying_anything));
         want_reply = FALSE;
     }
     end_menu(win, (query && *query) ? query : (char *) 0);

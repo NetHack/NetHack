@@ -376,8 +376,8 @@ fix_worst_trouble(int trouble)
     int i, maxhp;
     struct obj *otmp = 0;
     const char *what = (const char *) 0;
-    static NEARDATA const char leftglow[] = "Your left ring softly glows",
-                               rightglow[] = "Your right ring softly glows";
+    static NEARDATA const char leftglow[] = N_("Your left ring softly glows"),
+                               rightglow[] = N_("Your right ring softly glows");
 
     switch (trouble) {
     case TROUBLE_STONED:
@@ -447,11 +447,11 @@ fix_worst_trouble(int trouble)
         if (Fixed_abil) {
             if ((otmp = stuck_ring(uleft, RIN_SUSTAIN_ABILITY)) != 0) {
                 if (otmp == uleft)
-                    what = leftglow;
+                    what = _(leftglow);
             } else if ((otmp = stuck_ring(uright, RIN_SUSTAIN_ABILITY))
                        != 0) {
                 if (otmp == uright)
-                    what = rightglow;
+                    what = _(rightglow);
             }
             if (otmp) {
                 fix_curse_trouble(otmp, what);
@@ -482,10 +482,10 @@ fix_worst_trouble(int trouble)
             otmp = uarmf;
         } else if ((otmp = stuck_ring(uleft, RIN_LEVITATION)) != 0) {
             if (otmp == uleft)
-                what = leftglow;
+                what = _(leftglow);
         } else if ((otmp = stuck_ring(uright, RIN_LEVITATION)) != 0) {
             if (otmp == uright)
-                what = rightglow;
+                what = _(rightglow);
         }
         fix_curse_trouble(otmp, what);
         break;
@@ -534,9 +534,9 @@ fix_worst_trouble(int trouble)
     case TROUBLE_CURSED_ITEMS:
         otmp = worst_cursed_item();
         if (otmp == uright)
-            what = rightglow;
+            what = _(rightglow);
         else if (otmp == uleft)
-            what = leftglow;
+            what = _(leftglow);
         fix_curse_trouble(otmp, what);
         break;
     case TROUBLE_POISONED:

@@ -2250,7 +2250,7 @@ hold_potion(
 int
 dodip(void)
 {
-    static const char Dip_[] = "Dip ";
+    static const char Dip_[] = N_("Dip ");
     struct obj *potion, *obj;
     char qbuf[QBUFSZ], obuf[QBUFSZ];
     const char *shortestname; /* last resort obj name for prompt */
@@ -2296,7 +2296,7 @@ dodip(void)
         if (!can_reach_floor(FALSE)) {
             ; /* can't dip something into fountain or pool if can't reach */
         } else if (at_fountain) {
-            Snprintf(qbuf, sizeof(qbuf), "%s%s into the fountain?", Dip_,
+            Snprintf(qbuf, sizeof(qbuf), _("%s%s into the fountain?"), _(Dip_),
                      flags.verbose ? obuf : shortestname);
             /* "Dip <the object> into the fountain?" */
             if (y_n(qbuf) == 'y') {
@@ -2307,7 +2307,7 @@ dodip(void)
             }
             ++drink_ok_extra;
         } else if (at_sink) {
-            Snprintf(qbuf, sizeof(qbuf), "%s%s into the sink?", Dip_,
+            Snprintf(qbuf, sizeof(qbuf), _("%s%s into the sink?"), _(Dip_),
                      flags.verbose ? obuf : shortestname);
             if (y_n(qbuf) == 'y') {
                 if (!is_hands)
@@ -2319,7 +2319,7 @@ dodip(void)
         } else if (at_pool) {
             const char *pooltype = waterbody_name(u.ux, u.uy);
 
-            Snprintf(qbuf, sizeof(qbuf), "%s%s into the %s?", Dip_,
+            Snprintf(qbuf, sizeof(qbuf), _("%s%s into the %s?"), _(Dip_),
                      flags.verbose ? obuf : shortestname, pooltype);
             /* "Dip <the object> into the {pool, moat, &c}?" */
             if (y_n(qbuf) == 'y') {

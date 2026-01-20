@@ -450,8 +450,8 @@ intemple(int roomno)
         if (sanctum && Is_sanctum(&u.uz)) {
             if (priest->mpeaceful) {
                 /* first time inside */
-                msg1 = "Infidel, you have entered Moloch's Sanctum!";
-                msg2 = "Be gone!";
+                msg1 = _("Infidel, you have entered Moloch's Sanctum!");
+                msg2 = _("Be gone!");
                 priest->mpeaceful = 0;
                 /* became angry voluntarily; no penalty for attacking him */
                 set_malign(priest);
@@ -474,13 +474,13 @@ intemple(int roomno)
         if (!sanctum) {
             if (!shrined || !p_coaligned(priest)
                 || u.ualign.record <= ALGN_SINNED) {
-                msg1 = "have a%s forbidding feeling...";
-                msg2 = (!shrined || !p_coaligned(priest)) ? "" : " strange";
+                msg1 = _("have a%s forbidding feeling...");
+                msg2 = (!shrined || !p_coaligned(priest)) ? "" : _(" strange");
                 this_time = &epri_p->hostile_time;
                 other_time = &epri_p->peaceful_time;
             } else {
-                msg1 = "experience %s sense of peace.";
-                msg2 = (u.ualign.record >= ALGN_DEVOUT) ? "a" : "an unusual";
+                msg1 = _("experience %s sense of peace.");
+                msg2 = (u.ualign.record >= ALGN_DEVOUT) ? _("a") : _("an unusual");
                 this_time = &epri_p->peaceful_time;
                 other_time = &epri_p->hostile_time;
             }

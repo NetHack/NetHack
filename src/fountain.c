@@ -406,7 +406,7 @@ dipfountain(struct obj *obj)
         /* once upon a time it was possible to poly N daggers into N swords */
         && obj->quan == 1L && !obj->oartifact
         && !exist_artifact(LONG_SWORD, artiname(ART_EXCALIBUR))) {
-        static const char lady[] = "Lady of the Lake";
+        static const char lady[] = N_("Lady of the Lake");
 
         if (u.ualign.type != A_LAWFUL) {
             /* Ha!  Trying to cheat her. */
@@ -420,8 +420,8 @@ dipfountain(struct obj *obj)
             obj->oerodeproof = FALSE;
             exercise(A_WIS, FALSE);
             livelog_printf(LL_ARTIFACT,
-                           "was denied %s!  The %s has deemed %s unworthy",
-                           artiname(ART_EXCALIBUR), lady, uhim());
+                           _("was denied %s!  The %s has deemed %s unworthy"),
+                           artiname(ART_EXCALIBUR), _(lady), uhim());
         } else {
             /* The lady of the lake acts! - Eric Backus */
             /* Be *REAL* nice */
@@ -435,8 +435,8 @@ dipfountain(struct obj *obj)
             obj->oeroded = obj->oeroded2 = 0;
             obj->oerodeproof = TRUE;
             exercise(A_WIS, TRUE);
-            livelog_printf(LL_ARTIFACT, "was given %s by the %s",
-                           artiname(ART_EXCALIBUR), lady);
+            livelog_printf(LL_ARTIFACT, _("was given %s by the %s"),
+                           artiname(ART_EXCALIBUR), _(lady));
         }
         update_inventory();
         set_levltyp(u.ux, u.uy, ROOM); /* updates level.flags.nfountains */

@@ -3267,10 +3267,10 @@ use_whip(struct obj *obj)
 }
 
 static const char
-    not_enough_room[] = "There's not enough room here to use that.",
-    where_to_hit[] = "Where do you want to hit?",
-    cant_see_spot[] = "won't hit anything if you can't see that spot.",
-    cant_reach[] = "can't reach that spot from here.";
+    not_enough_room[] = N_("There's not enough room here to use that."),
+    where_to_hit[] = N_("Where do you want to hit?"),
+    cant_see_spot[] = N_("won't hit anything if you can't see that spot."),
+    cant_reach[] = N_("can't reach that spot from here.");
 
 #define glyph_is_poleable(G) \
     (glyph_is_monster(G) || glyph_is_invisible(G) || glyph_is_statue(G))

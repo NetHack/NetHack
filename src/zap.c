@@ -5383,26 +5383,26 @@ zap_over_floor(
         switch (damgtype) {
         case ZT_FIRE:
             new_doormask = D_NODOOR;
-            see_txt = "The door is consumed in flames!";
-            sense_txt = "smell smoke.";
+            see_txt = _("The door is consumed in flames!");
+            sense_txt = _("smell smoke.");
             break;
         case ZT_COLD:
             new_doormask = D_NODOOR;
-            see_txt = "The door freezes and shatters!";
-            hear_txt = "a deep cracking sound.";
+            see_txt = _("The door freezes and shatters!");
+            hear_txt = _("a deep cracking sound.");
             break;
         case ZT_DEATH:
             /* death spells/wands don't disintegrate */
             if (abs(type) != ZT_BREATH(ZT_DEATH))
                 goto def_case;
             new_doormask = D_NODOOR;
-            see_txt = "The door disintegrates!";
-            hear_txt = "crashing wood.";
+            see_txt = _("The door disintegrates!");
+            hear_txt = _("crashing wood.");
             break;
         case ZT_LIGHTNING:
             new_doormask = D_BROKEN;
-            see_txt = "The door splinters!";
-            hear_txt = "crackling.";
+            see_txt = _("The door splinters!");
+            hear_txt = _("crackling.");
             break;
         default:
  def_case:
@@ -5410,8 +5410,8 @@ zap_over_floor(
                 /* Magical explosion from misc exploding wand */
                 if (exploding_wand_typ == WAN_STRIKING) {
                     new_doormask = D_BROKEN;
-                    see_txt = "The door crashes open!";
-                    sense_txt = "feel a burst of cool air.";
+                    see_txt = _("The door crashes open!");
+                    sense_txt = _("feel a burst of cool air.");
                     break;
                 }
             }
