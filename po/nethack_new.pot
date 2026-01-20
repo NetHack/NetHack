@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 14:42+0900\n"
+"POT-Creation-Date: 2026-01-20 14:44+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21159,4 +21159,8 @@ msgid "Pilgrim, I would speak no longer with thee."
 msgstr ""
 
 msgid "studying"
+msgstr ""
+
+#, c-format
+msgid "%s rummages through %s."
 msgstr ""

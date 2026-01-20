@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 14:42+0900\n"
+"POT-Creation-Date: 2026-01-20 14:44+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -22567,6 +22567,10 @@ msgstr "순례자여, 더 이상 대화할 생각이 없다."
 
 msgid "studying"
 msgstr "공부하는 중"
+
+#, fuzzy, c-format
+msgid "%s rummages through %s."
+msgstr "%s{이/가} %s{을/를} %s 통과했다."
 
 # Monster attack verbs (mhitm.c)
 #, c-format

@@ -2322,7 +2322,7 @@ mloot_container(
         if (can_carry(mon, xobj)) {
             if (vismon) {
                 if (howfar > 2) /* not adjacent */
-                    Norep("%s rummages through %s.", Monnam(mon), contnr_nam);
+                    Norep(_("%s rummages through %s."), Monnam(mon), contnr_nam);
                 else if (takeout_indx == 0) /* adjacent, first item */
                     pline_mon(mon, _("%s removes %s from %s."), Monnam(mon),
                           doname(xobj), contnr_nam);
