@@ -380,11 +380,11 @@ doaltarobj(struct obj *obj)
     if (obj->blessed || obj->cursed) {
         There(_("is %s flash as %s %s the altar."),
               an(hcolor(obj->blessed ? NH_AMBER : NH_BLACK)), doname(obj),
-              otense(obj, "hit"));
+              otense(obj, _("hit")));
         if (!Hallucination)
             obj->bknown = 1; /* ok to bypass set_bknown() */
     } else {
-        pline(_("%s %s on the altar."), Doname2(obj), otense(obj, "land"));
+        pline(_("%s %s on the altar."), Doname2(obj), otense(obj, _("land")));
         if (obj->oclass != COIN_CLASS)
             obj->bknown = 1; /* ok to bypass set_bknown() */
     }
@@ -562,7 +562,7 @@ dosinkring(struct obj *obj)
                 && !obj_resists(otmp, 1, 99)) {
                 if (!Blind) {
                     pline(_("Suddenly, %s %s from the sink!"), doname(otmp),
-                          otense(otmp, "vanish"));
+                          otense(otmp, _("vanish")));
                     ideed = TRUE;
                 }
                 delobj(otmp);
@@ -577,7 +577,7 @@ dosinkring(struct obj *obj)
         nosink = teleport_sink();
         /* give message even if blind; we know we're not levitating,
            so can feel the outcome even if we can't directly see it */
-        pline_The(_("sink %svanishes."), nosink ? "" : "momentarily ");
+        pline_The(_("sink %svanishes."), nosink ? "" : _("momentarily "));
         ideed = FALSE;
         break;
     case RIN_POLYMORPH:

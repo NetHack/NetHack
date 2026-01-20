@@ -2516,7 +2516,7 @@ potion_dip(struct obj *obj, struct obj *potion)
         }
         /* [N of] the {obj(s)} mix(es) with [one of] {the potion}... */
         pline(_("%s %s %s with %s%s..."), qbuf, simpleonames(obj),
-              otense(obj, "mix"), (potion->quan > 1L) ? "one of " : "",
+              otense(obj, _("mix")), (potion->quan > 1L) ? _("one of ") : "",
               thesimpleoname(potion));
         /* get rid of 'dippee' before potential perm_invent updates */
         useup(potion); /* now gone */
@@ -2553,14 +2553,14 @@ potion_dip(struct obj *obj, struct obj *potion)
             default:
                 useupall(obj);
                 pline_The(_("mixture %sevaporates."),
-                          !Blind ? "glows brightly and " : "");
+                          !Blind ? _("glows brightly and ") : "");
                 return ECMD_TIME;
             }
         }
         obj->odiluted = (obj->otyp != POT_WATER);
 
         if (obj->otyp == POT_WATER && !Hallucination) {
-            pline_The(_("mixture bubbles%s."), Blind ? "" : ", then clears");
+            pline_The(_("mixture bubbles%s."), Blind ? "" : _(", then clears"));
         } else if (!Blind) {
             pline_The(_("mixture looks %s."),
                       hcolor(OBJ_DESCR(objects[obj->otyp])));
@@ -2580,7 +2580,7 @@ potion_dip(struct obj *obj, struct obj *potion)
     if (potion->otyp == POT_ACID && obj->otyp == CORPSE
         && obj->corpsenm == PM_LICHEN) {
         pline(_("%s %s %s around the edges."), The(cxname(obj)),
-              otense(obj, "turn"), Blind ? "wrinkled"
+              otense(obj, _("turn")), Blind ? _("wrinkled")
                                    : potion->odiluted ? hcolor(NH_ORANGE)
                                      : hcolor(NH_RED));
         potion->in_use = FALSE; /* didn't go poof */
@@ -2647,15 +2647,15 @@ potion_dip(struct obj *obj, struct obj *potion)
             /* uses up potion, doesn't set obj->greased */
             if (!Blind)
                 pline(_("%s %s with an oily sheen."), Yname2(obj),
-                      otense(obj, "gleam"));
+                      otense(obj, _("gleam")));
             else /*if (!uarmg)*/
-                pline(_("%s %s oily."), Yname2(obj), otense(obj, "feel"));
+                pline(_("%s %s oily."), Yname2(obj), otense(obj, _("feel")));
         } else {
             pline(_("%s %s less %s."), Yname2(obj),
-                  otense(obj, !Blind ? "are" : "feel"),
+                  otense(obj, !Blind ? _("are") : _("feel")),
                   (obj->oeroded && obj->oeroded2)
-                      ? "corroded and rusty"
-                      : obj->oeroded ? "rusty" : "corroded");
+                      ? _("corroded and rusty")
+                      : obj->oeroded ? _("rusty") : _("corroded"));
             if (obj->oeroded > 0)
                 obj->oeroded--;
             if (obj->oeroded2 > 0)
@@ -2686,7 +2686,7 @@ potion_dip(struct obj *obj, struct obj *potion)
             obj->age = 0;
         }
         if (obj->age > 1000L) {
-            pline(_("%s %s full."), Yname2(obj), otense(obj, "are"));
+            pline(_("%s %s full."), Yname2(obj), otense(obj, _("are")));
             potion->in_use = FALSE; /* didn't go poof */
         } else {
             You(_("fill %s with oil."), yname(obj));
