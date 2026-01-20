@@ -1409,25 +1409,25 @@ engrave(void)
 
     switch (svc.context.engraving.type) {
     default:
-        finishverb = "your weird engraving";
+        finishverb = _("your weird engraving");
         break;
     case DUST:
-        finishverb = is_ice(u.ux, u.uy) ? "writing in the frost"
-                     : "writing in the dust";
+        finishverb = is_ice(u.ux, u.uy) ? _("writing in the frost")
+                     : _("writing in the dust");
         break;
     case HEADSTONE:
     case ENGRAVE:
-        finishverb = "engraving";
+        finishverb = _("engraving");
         break;
     case BURN:
-        finishverb = is_ice(u.ux, u.uy) ? "melting your message into the ice"
-                     : "burning your message into the floor";
+        finishverb = is_ice(u.ux, u.uy) ? _("melting your message into the ice")
+                     : _("burning your message into the floor");
         break;
     case MARK:
-        finishverb = "defacing the dungeon";
+        finishverb = _("defacing the dungeon");
         break;
     case ENGR_BLOOD:
-        finishverb = "scrawling";
+        finishverb = _("scrawling");
     }
 
     /* actions that happen at the end of every engraving action go here */

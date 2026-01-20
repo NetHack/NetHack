@@ -833,11 +833,11 @@ animate_statue(
         set_malign(mon);
     }
 
-    comes_to_life = !canspotmon(mon) ? "disappears"
-                    : golem_xform ? "turns into flesh"
+    comes_to_life = !canspotmon(mon) ? _("disappears")
+                    : golem_xform ? _("turns into flesh")
                       : (nonliving(mon->data) || is_vampshifter(mon))
-                        ? "moves"
-                        : "comes to life";
+                        ? _("moves")
+                        : _("comes to life");
     if (u_at(x, y) || cause == ANIMATE_SPELL) {
         /* "the|your|Manlobbi's statue [of a wombat]" */
         shkp = shop_keeper(*in_rooms(mon->mx, mon->my, SHOPBASE));
@@ -849,7 +849,7 @@ animate_statue(
                     wasn't any living shk when statue was picked up) */
                  && (mon != shkp || carried(statue)))
                    ? xname(statue)
-                   : "statue");
+                   : _("statue"));
         pline(_("%s %s!"), upstart(statuename), comes_to_life);
     } else if (Hallucination) { /* They don't know it's a statue */
         pline_The(_("%s suddenly seems more animated."), rndmonnam((char *) 0));
@@ -858,7 +858,7 @@ animate_statue(
             Sprintf(statuename, "%s%s", shk_your(tmpbuf, statue),
                     xname(statue));
         else
-            Strcpy(statuename, "a statue");
+            Strcpy(statuename, _("a statue"));
         pline(_("Instead of shattering, %s suddenly %s!"), statuename,
               comes_to_life);
     } else { /* cause == ANIMATE_NORMAL */
@@ -1926,18 +1926,18 @@ trapeffect_pit(
                           death reason will be overridden with
                           "killed while stuck in creature form" */
                        plunged
-                       ? "deliberately plunged into a pit of iron spikes"
+                       ? _("deliberately plunged into a pit of iron spikes")
                        : (conj_pit || deliberate)
-                         ? "stepped into a pit of iron spikes"
+                         ? _("stepped into a pit of iron spikes")
                          : adj_pit
-                           ? "stumbled into a pit of iron spikes"
-                           : "fell into a pit of iron spikes",
+                           ? _("stumbled into a pit of iron spikes")
+                           : _("fell into a pit of iron spikes"),
                        NO_KILLER_PREFIX);
                 if (!rn2(6))
-                    poisoned("spikes", A_STR,
+                    poisoned(_("spikes"), A_STR,
                              (conj_pit || adj_pit || deliberate)
-                             ? "stepping on poison spikes"
-                             : "fall onto poison spikes",
+                             ? _("stepping on poison spikes")
+                             : _("fall onto poison spikes"),
                              /* if damage triggered life-saving,
                                 poison is limited to attrib loss */
                              (u.umortality > oldumort) ? 0 : 8, FALSE);
@@ -1946,8 +1946,8 @@ trapeffect_pit(
                 if (!conj_pit && !deliberate
                     && !(plunged && (Flying || is_clinger(gy.youmonst.data))))
                     losehp(Maybe_Half_Phys(rnd(adj_pit ? 3 : 6)),
-                           plunged ? "deliberately plunged into a pit"
-                           : "fell into a pit",
+                           plunged ? _("deliberately plunged into a pit")
+                           : _("fell into a pit"),
                            NO_KILLER_PREFIX);
             }
             if (Punished && !carried(uball)) {
@@ -4064,8 +4064,8 @@ float_down(
                 } else if (Hallucination) {
                     pline(_("Bummer!  You've %s."),
                           is_pool(u.ux, u.uy)
-                             ? "splashed down"
-                             : "hit the ground");
+                             ? _("splashed down")
+                             : _("hit the ground"));
                 } else {
                     You(_("float gently to the %s."), surface(u.ux, u.uy));
                 }
@@ -5493,7 +5493,7 @@ disarm_holdingtrap(struct trap *ttmp)
     if ((mtmp = m_at(ttmp->tx, ttmp->ty)) != 0) {
         mtmp->mtrapped = 0;
         You(_("extract %s from %s %s."), mon_nam(mtmp),
-            which, (ttmp->ttyp == BEAR_TRAP) ? "bear trap" : "web");
+            which, (ttmp->ttyp == BEAR_TRAP) ? _("bear trap") : _("web"));
         reward_untrap(ttmp, mtmp);
     } else if (ttmp->ttyp == BEAR_TRAP) {
         You(_("disarm %s bear trap."), which);

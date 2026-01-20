@@ -2457,7 +2457,7 @@ doputon(void)
         Your(_("%s%s are full, and you're already wearing an amulet and %s."),
              humanoid(gy.youmonst.data) ? "ring-" : "",
              fingers_or_gloves(FALSE),
-             (ublindf->otyp == LENSES) ? "some lenses" : "a blindfold");
+             (ublindf->otyp == LENSES) ? _("some lenses") : _("a blindfold"));
         return ECMD_OK;
     }
     otmp = getobj("put on", puton_ok, GETOBJ_NOFLAGS);
@@ -2543,7 +2543,7 @@ glibr(void)
     if (!uarmg && (leftfall || rightfall) && !nolimbs(gy.youmonst.data)) {
         /* changed so cursed rings don't fall off, GAN 10/30/86 */
         Your(_("%s off your %s."),
-             (leftfall && rightfall) ? "rings slip" : "ring slips",
+             (leftfall && rightfall) ? _("rings slip") : _("ring slips"),
              (leftfall && rightfall) ? fingers_or_gloves(FALSE)
                                      : body_part(FINGER));
         xfl++;
