@@ -2361,7 +2361,7 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
 void
 wand_explode(struct obj *obj, int chg /* recharging */)
 {
-    const char *expl = !chg ? "suddenly" : "vibrates violently and";
+    const char *expl = !chg ? _("suddenly") : _("vibrates violently and");
     int dmg, n, k;
 
     /* number of damage dice */

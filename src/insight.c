@@ -1124,8 +1124,8 @@ status_enlightenment(int mode, int final)
         if (whichleg == BOTH_SIDES)
             bp = makeplural(bp), article = "";
         else
-            leftright = (whichleg == LEFT_SIDE) ? "left " : "right ";
-        Sprintf(buf, "%swounded %s%s", article, leftright, bp);
+            leftright = (whichleg == LEFT_SIDE) ? _("left ") : _("right ");
+        Sprintf(buf, _("%swounded %s%s"), article, leftright, bp);
 
         /* when mounted, Wounded_legs applies to steed rather than to
            hero; we only report steed's wounded legs in wizard mode */

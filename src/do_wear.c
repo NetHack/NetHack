@@ -2572,7 +2572,7 @@ glibr(void)
         if (otmp->quan > 1L)
             otherwep = makeplural(otherwep);
         hand = body_part(HAND);
-        which = URIGHTY ? "left " : "right ";  /* text for the off hand */
+        which = URIGHTY ? _("left ") : _("right ");  /* text for the off hand */
         Your(_("%s %s%s from your %s%s."), otherwep, xfl ? _("also ") : "",
              otense(otmp, _("slip")), which, hand);
         xfl++;

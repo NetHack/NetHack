@@ -235,8 +235,8 @@ query_classes(
                     oclasses[oclassct] = '\0';
                 } else {
                     if (!where)
-                        where = !strcmp(action, "pick up") ? "here"
-                                : !strcmp(action, "take out") ? "inside" : "";
+                        where = !strcmp(action, "pick up") ? _("here")
+                                : !strcmp(action, "take out") ? _("inside") : "";
                     if (*where)
                         There(_("are no %c's %s."), sym, where);
                     else
