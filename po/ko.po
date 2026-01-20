@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 14:48+0900\n"
+"POT-Creation-Date: 2026-01-20 14:49+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -22652,6 +22652,9 @@ msgstr "%s %s{이/가} %s{을/를} 태웠다!"
 #, fuzzy
 msgid "The ice crackles and melts."
 msgstr "%s 주변의 공기가 탁탁거린다."
+
+msgid "NetHack rumors file closed for renovation."
+msgstr "NetHack 소문 파일이 수리를 위해 닫혔습니다."
 
 # Monster attack verbs (mhitm.c)
 #, c-format

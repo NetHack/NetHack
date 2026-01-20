@@ -2289,7 +2289,7 @@ arti_speak(struct obj *obj)
 
     line = getrumor(bcsign(obj), buf, TRUE);
     if (!*line)
-        line = "NetHack rumors file closed for renovation.";
+        line = _("NetHack rumors file closed for renovation.");
     pline(_("%s:"), Tobjnam(obj, "whisper"));
     SetVoice((struct monst *) 0, 0, 80, voice_talking_artifact);
     verbalize1(line);
