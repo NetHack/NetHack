@@ -3689,10 +3689,10 @@ floorfood(
             }
             /* "There is <an object> here; <verb> it?" or
                "There are <N objects> here; <verb> one?" */
-            Sprintf(qbuf, "There %s ", otense(otmp, "are"));
-            Sprintf(qsfx, " here; %s %s?", verb, one ? "it" : "one");
+            Sprintf(qbuf, _("There %s "), otense(otmp, _("are")));
+            Sprintf(qsfx, _(" here; %s %s?"), verb, one ? _("it") : _("one"));
             (void) safe_qbuf(qbuf, qbuf, qsfx, otmp, doname, ansimpleoname,
-                             one ? something : (const char *) "things");
+                             one ? something : (const char *) _("things"));
             if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y')
                 return  otmp;
             else if (c == 'q')

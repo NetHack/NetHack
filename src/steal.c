@@ -796,7 +796,7 @@ maybe_absorb_item(
             if (bimanual(obj))
                 hand_s = makeplural(hand_s);
             pline(_("%s %s pulled from your %s!"), upstart(yname(obj)),
-                  otense(obj, "are"), hand_s);
+                  otense(obj, _("are")), hand_s);
         }
         freeinv(obj);
         encumber_msg();

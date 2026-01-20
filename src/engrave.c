@@ -1198,8 +1198,8 @@ doengrave(void)
     if (de->len == 0 || strchr(de->ebuf, '\033')) {
         if (de->zapwand) {
             if (!Blind)
-                pline(_("%s, then %s."), Tobjnam(de->otmp, "glow"),
-                      otense(de->otmp, "fade"));
+                pline(_("%s, then %s."), Tobjnam(de->otmp, _("glow")),
+                      otense(de->otmp, _("fade")));
             de->ret = ECMD_TIME;
             goto doengr_exit;
         } else {
