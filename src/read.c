@@ -385,7 +385,7 @@ doread(void)
         if ((otyp == T_SHIRT || otyp == HAWAIIAN_SHIRT) && uarm
             && scroll == uarmu) {
             pline(_("%s shirt is obscured by %s%s."),
-                  scroll->unpaid ? "That" : "Your", shk_your(buf, uarm),
+                  scroll->unpaid ? _("That") : _("Your"), shk_your(buf, uarm),
                   suit_simple_name(uarm));
             return ECMD_OK;
         }
@@ -425,7 +425,7 @@ doread(void)
            rather than inked on or painted on, treat them as stitched
            or even separate pieces of fabric which have been attached
            (don't recall whether the books mention anything like that...) */
-        const char *cap_text = (otyp == DUNCE_CAP) ? "DUNCE" : "WIZZARD";
+        const char *cap_text = (otyp == DUNCE_CAP) ? _("DUNCE") : _("WIZZARD");
 
         if (scroll->o_id % 3) {
             /* no need to vary this when blind; "on this ___" is important
@@ -816,7 +816,7 @@ recharge(struct obj *obj, int curse_bless)
             long mask = is_on ? (obj == uleft ? LEFT_RING : RIGHT_RING) : 0L;
 
             pline(_("%s spins %sclockwise for a moment."), Yname2(obj),
-                  s < 0 ? "counter" : "");
+                  s < 0 ? _("counter") : "");
             if (s < 0)
                 costly_alteration(obj, COST_DECHNT);
             /* cause attributes and/or properties to be updated */
@@ -1368,7 +1368,7 @@ seffect_confuse_monster(struct obj **sobjp)
         } else {
             pline(_("A %s%s surrounds your %s."),
                   altfeedback ? "" : hcolor(NH_RED),
-                  altfeedback ? "faint buzz" : " glow", body_part(HEAD));
+                  altfeedback ? _("faint buzz") : _(" glow"), body_part(HEAD));
             make_confused(0L, TRUE);
         }
     } else {
@@ -1377,7 +1377,7 @@ seffect_confuse_monster(struct obj **sobjp)
 
         if (!sblessed) {
             if (altfeedback)
-                Your(_("%s tingle%s."), hands, u.umconf ? " even more" : "");
+                Your(_("%s tingle%s."), hands, u.umconf ? _(" even more") : "");
             else if (!u.umconf)
                 Your(_("%s begin to glow %s."), hands, hcolor(NH_RED));
             else
@@ -2112,7 +2112,7 @@ seffect_mail(struct obj **sobjp)
     case 2:
         /* "stamped scroll" created via magic marker--without a stamp */
         pline(_("This scroll is marked \"%s\"."),
-              odd ? "Postage Due" : "Return to Sender");
+              odd ? _("Postage Due") : _("Return to Sender"));
         break;
     case 1:
         /* scroll of mail obtained from bones file or from wishing;
@@ -3032,11 +3032,11 @@ do_stinking_cloud(struct obj *sobj, boolean mention_stinking)
     coord cc;
 
     pline(_("Where do you want to center the %scloud?"),
-          mention_stinking ? "stinking " : "");
+          mention_stinking ? _("stinking ") : "");
     cc.x = u.ux;
     cc.y = u.uy;
     getpos_sethilite(display_stinking_cloud_positions, can_center_cloud);
-    if (getpos(&cc, TRUE, "the desired position") < 0) {
+    if (getpos(&cc, TRUE, _("the desired position")) < 0) {
         pline1(Never_mind);
         return;
     } else if (!can_center_cloud(cc.x, cc.y)) {

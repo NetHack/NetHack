@@ -99,7 +99,7 @@ mkcavearea(boolean rockit)
         pline(_("Crash!  The ceiling collapses around you!"));
     } else {
         pline(_("A mysterious force %s cave around you!"),
-              (levl[u.ux][u.uy].typ == CORR) ? "creates a" : "extends the");
+              (levl[u.ux][u.uy].typ == CORR) ? _("creates a") : _("extends the"));
     }
     display_nhwindow(WIN_MESSAGE, TRUE);
 
@@ -303,7 +303,7 @@ dig(void)
     struct rm *lev;
     coordxy dpx = svc.context.digging.pos.x, dpy = svc.context.digging.pos.y;
     boolean ispick = uwep && is_pick(uwep);
-    const char *verb = (!uwep || is_pick(uwep)) ? "dig into" : "chop through";
+    const char *verb = (!uwep || is_pick(uwep)) ? _("dig into") : _("chop through");
     enum digcheck_result dcresult = DIGCHECK_PASSED;
 
     lev = &levl[dpx][dpy];
@@ -1167,7 +1167,7 @@ use_pick_axe2(struct obj *obj)
     struct trap *trap, *trap_with_u;
     int dig_target;
     boolean ispick = is_pick(obj);
-    const char *verbing = ispick ? "digging" : "chopping";
+    const char *verbing = ispick ? _("digging") : _("chopping");
 
     if (u.uswallow && do_attack(u.ustuck)) {
         ; /* return 1 */
@@ -1235,13 +1235,13 @@ use_pick_axe2(struct obj *obj)
                        || sobj_at(STATUE, rx, ry)) {
                 /* if both boulders and statues are present, the topmost
                    boulder will be shown on the map so treat it as target */
-                const char *what = boulder ? "boulder" : "statue";
+                const char *what = boulder ? _("boulder") : _("statue");
 
                 if (!ispick) {
                     boolean vibrate = !rn2(3);
 
                     pline(_("Sparks fly as you whack the %s.%s"), what,
-                          vibrate ? "  The axe-handle vibrates violently!"
+                          vibrate ? _("  The axe-handle vibrates violently!")
                                   : "");
                     if (vibrate)
                         losehp(Maybe_Half_Phys(2), _("axing a hard object"),
@@ -1858,7 +1858,7 @@ pit_flow(struct trap *trap, schar filltyp)
         levl[t.tx][t.ty].typ = filltyp, levl[t.tx][t.ty].flags = 0;
         liquid_flow(t.tx, t.ty, filltyp, trap,
                     u_at(t.tx, t.ty)
-                        ? "Suddenly %s flows in from the adjacent pit!"
+                        ? _("Suddenly %s flows in from the adjacent pit!")
                         : (char *) 0);
         for (idx = 0; idx < N_DIRS; ++idx) {
             if (t.conjoined & (1 << idx)) {
@@ -2256,10 +2256,10 @@ escape_tomb(void)
             || (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data))) {
             You(_("%s up through the %s."),
                 (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data))
-                   ? "try to tunnel"
+                   ? _("try to tunnel")
                    : (amorphous(gy.youmonst.data))
-                      ? "ooze"
-                      : "phase",
+                      ? _("ooze")
+                      : _("phase"),
                 surface(u.ux, u.uy));
 
             good = (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data))

@@ -275,9 +275,9 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
             map_invisible(mtmp->mx, mtmp->my);
         }
 
-        Snprintf(blindbuf, sizeof blindbuf, "reading %s", onambuf);
-        strsubst(blindbuf, "reading a scroll labeled",
-                 mtmp->mconf ? "attempting to incant" : "incant");
+        Snprintf(blindbuf, sizeof blindbuf, _("reading %s"), onambuf);
+        strsubst(blindbuf, _("reading a scroll labeled"),
+                 mtmp->mconf ? _("attempting to incant") : _("incant"));
         You_hear(_("%s %s."),
                  x_monnam(mtmp, ARTICLE_A, (char *) 0, mflags, FALSE),
                  blindbuf);
@@ -2517,7 +2517,7 @@ use_misc(struct monst *mtmp)
     case MUSE_BULLWHIP:
         /* attempt to disarm hero */
         {
-            const char *The_whip = vismon ? "The bullwhip" : "A whip";
+            const char *The_whip = vismon ? _("The bullwhip") : _("A whip");
             int where_to = rn2(4);
             struct obj *obj = uwep;
             const char *hand;
@@ -2821,11 +2821,11 @@ ureflects(const char *fmt, const char *str)
         return TRUE;
     } else if (EReflecting & W_ARM) {
         if (fmt && str)
-            pline(fmt, str, uskin ? "luster" : "armor");
+            pline(fmt, str, uskin ? _("luster") : _("armor"));
         return TRUE;
     } else if (gy.youmonst.data == &mons[PM_SILVER_DRAGON]) {
         if (fmt && str)
-            pline(fmt, str, "scales");
+            pline(fmt, str, _("scales"));
         return TRUE;
     }
     return FALSE;

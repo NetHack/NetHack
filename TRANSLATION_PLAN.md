@@ -1,10 +1,12 @@
 # HanNetHack 한국어 번역 계획
 
-## 현재 진행 상황 (2026-01-18)
+## 현재 진행 상황 (2026-01-21)
 
 ### 번역 통계
-- **PO 파일 번역 완료**: 3,953개 문자열
-- **조사 패턴 적용**: 1,296개 문자열에 `{은/는}`, `{이/가}`, `{을/를}` 등 적용
+- **PO 파일 번역 완료**: 5,469개 문자열
+- **Fuzzy (검토 필요)**: 925개 문자열
+- **미번역**: 131개 문자열
+- **총 문자열**: 6,525개
 
 ---
 
@@ -45,7 +47,29 @@
 - cogitate (마음속으로 읽다)
 - pronounce (발음하다)
 
-### 3. 조사 패턴 수정 (7개)
+### 3. 소스 코드 i18n 래퍼 적용 (대규모)
+
+다음 파일들에 `_()` i18n 래퍼를 적용하여 조건부 문자열을 번역 가능하게 변환:
+
+#### vtense/otense 동사 패턴
+- uhitm.c, mon.c, mcastu.c, do.c, polyself.c, sit.c
+- engrave.c, eat.c, mhitu.c, wield.c, zap.c
+
+#### 조건부 문자열 패턴
+- pager.c, end.c, pray.c, pickup.c
+- sounds.c, mthrowu.c, dothrow.c, do_wear.c
+- steal.c, insight.c, apply.c
+
+#### Hallucination/Blind/Deaf 조건 메시지
+- 환각 상태 메시지, 시각장애 메시지, 청각장애 메시지
+- 상점 주인 대화, 유혹 메시지, 삼킴 메시지
+
+#### 기타 패턴
+- losehp 사망 메시지
+- Yobjnam2/Tobjnam 동사 문자열
+- enlightenment 메시지 (insight.c)
+
+### 4. 조사 패턴 수정 (7개)
 | 원본 | 수정 |
 |------|------|
 | `%s를` | `%s{을/를}` |
@@ -58,7 +82,17 @@
 
 ## 남은 작업
 
-### 우선순위 1: 소스 코드 함수 수정
+### 우선순위 1: 번역 완성
+
+#### Fuzzy 문자열 검토 (925개)
+- [ ] fuzzy 표시된 번역 검토 및 확정
+- `./translate-tool.sh fuzzy`로 목록 확인
+
+#### 미번역 문자열 (131개)
+- [ ] 남은 미번역 문자열 번역 완료
+- `./translate-tool.sh untranslated`로 목록 확인
+
+### 우선순위 2: 소스 코드 함수 수정
 
 #### 아직 수정 안 된 pline 계열 함수
 - [ ] `You_see()` - 한국어일 때 접두사 제거 필요
@@ -73,23 +107,20 @@
 - [ ] `hliquid()` 함수 - "water", "lava" 등
 - [ ] 기타 지형/물체 이름 반환 함수들
 
-### 우선순위 2: 정적 문자열 번역 (81개)
+### 우선순위 3: 정적 문자열 번역
 
-`_()` 마크가 없는 정적 문자열들:
+`_()` 마크가 없는 정적 문자열들 일부 남아있음:
 ```c
 // src/apply.c:311
 static const char hollow_str[] = "a hollow sound.  This must be a secret %s!";
 
 // src/apply.c:2220
 static const char you_buy_it[] = "You tin it, you bought it!";
-
-// src/insight.c:43
-static const char You_[] = "You ", are[] = "are ", were[] = "were ";
 ```
 
 **해결 방법**: 사용 시점에서 `_()` 로 감싸거나, 정적 정의를 제거하고 직접 번역 문자열 사용
 
-### 우선순위 3: dat 폴더 데이터 파일
+### 우선순위 4: dat 폴더 데이터 파일
 
 | 파일 | 줄 수 | 설명 |
 |------|-------|------|
@@ -102,7 +133,7 @@ static const char You_[] = "You ", are[] = "are ", were[] = "were ";
 
 **총 약 8,000줄 번역 필요**
 
-### 우선순위 4: 복수형/관사 처리
+### 우선순위 5: 복수형/관사 처리
 
 영어의 복수형 "s" 접미사, 관사 "a/an/the" 등이 직접 문자열로 사용되는 곳:
 ```c

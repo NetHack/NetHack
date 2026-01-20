@@ -137,18 +137,18 @@ use_towel(struct obj *obj)
                 old = u.ucreamed;
                 u.ucreamed += rn1(10, 3);
                 pline(_("Yecch!  Your %s %s gunk on it!"), body_part(FACE),
-                      (old ? "has more" : "now has"));
+                      (old ? _("has more") : _("now has")));
                 make_blinded(BlindedTimeout + (long) u.ucreamed - old, TRUE);
             } else {
                 const char *what;
 
                 what = (ublindf->otyp == LENSES)
-                           ? "lenses"
-                           : (obj->otyp == ublindf->otyp) ? "other towel"
-                                                          : "blindfold";
+                           ? _("lenses")
+                           : (obj->otyp == ublindf->otyp) ? _("other towel")
+                                                          : _("blindfold");
                 if (ublindf->cursed) {
                     You(_("push your %s %s."), what,
-                        rn2(2) ? "cock-eyed" : "crooked");
+                        rn2(2) ? _("cock-eyed") : _("crooked"));
                 } else {
                     struct obj *saved_ublindf = ublindf;
                     You(_("push your %s off."), what);
@@ -631,18 +631,18 @@ magic_whistled(struct obj *obj)
     } else {
         /* could use array of cardinal number names like wishcmdassist() but
            extra precision above 3 or 4 seems pedantic; not used for 0 or 1 */
-#define HowMany(n) (((n) < 2) ? "sqrt(-1)"          \
-                    : ((n) == 2) ? "two"            \
-                      : ((n) == 3) ? "three"        \
-                        : ((n) == 4) ? "four"       \
-                          : ((n) <= 7) ? "several"  \
-                            : "many")
+#define HowMany(n) (((n) < 2) ? _("sqrt(-1)")          \
+                    : ((n) == 2) ? _("two")            \
+                      : ((n) == 3) ? _("three")        \
+                        : ((n) == 4) ? _("four")       \
+                          : ((n) <= 7) ? _("several")  \
+                            : _("many"))
         /* magic whistle is already discovered so rloc() message(s)
            were suppressed above; if any discernible relocation occurred,
            construct a message now and issue it below */
         if (shift > 0) {
             if (shift > 1)
-                Sprintf(shiftbuf, "%s creatures shift locations",
+                Sprintf(shiftbuf, _("%s creatures shift locations"),
                         HowMany(shift));
             copynchars(buf, upstart(shiftbuf), (int) sizeof buf - 1);
         }
@@ -651,10 +651,10 @@ magic_whistled(struct obj *obj)
                 /* shift==0: N creatures appear;
                    shift==1: Foo shifts location and N other creatures appear;
                    shift >1: M creatures shift locations and N others appear */
-                Sprintf(appearbuf, "%s %s appear", HowMany(appear),
-                        (shift == 0) ? "creatures"
-                        : (shift == 1) ? "other creatures"
-                          : "others");
+                Sprintf(appearbuf, _("%s %s appear"), HowMany(appear),
+                        (shift == 0) ? _("creatures")
+                        : (shift == 1) ? _("other creatures")
+                          : _("others"));
             if (shift == 0)
                 copynchars(buf, upstart(appearbuf), (int) sizeof buf - 1);
             else
@@ -663,14 +663,14 @@ magic_whistled(struct obj *obj)
                             so "shifters, appearers" if disappear != 0
                             with ", and disappearers" yet to be appended,
                             or "shifters and appearers" otherwise */
-                         disappear ? "," : " and", appearbuf);
+                         disappear ? "," : _(" and"), appearbuf);
         }
         if (disappear > 0) {
             if (disappear > 1)
-                Sprintf(disappearbuf, "%s %s disappear", HowMany(disappear),
-                        (shift == 0 && appear == 0) ? "creatures"
-                        : (shift < 2 && appear < 2) ? "other creatures"
-                          : "others");
+                Sprintf(disappearbuf, _("%s %s disappear"), HowMany(disappear),
+                        (shift == 0 && appear == 0) ? _("creatures")
+                        : (shift < 2 && appear < 2) ? _("other creatures")
+                          : _("others"));
             if (shift + appear == 0)
                 copynchars(buf, upstart(disappearbuf), (int) sizeof buf - 1);
             else
@@ -826,12 +826,12 @@ use_leash_core(struct obj *obj, struct monst *mtmp, coord *cc, int spotmon)
         map_invisible(cc->x, cc->y);
     } else if (!mtmp->mtame) {
         pline(_("%s %s leashed!"), Monnam(mtmp),
-              (!obj->leashmon) ? "cannot be" : "is not");
+              (!obj->leashmon) ? _("cannot be") : _("is not"));
     } else if (!obj->leashmon) {
         /* applying a leash which isn't currently in use */
         if (mtmp->mleashed) {
             pline(_("This %s is already leashed."),
-                  spotmon ? l_monnam(mtmp) : "creature");
+                  spotmon ? l_monnam(mtmp) : _("creature"));
         } else if (unsolid(mtmp->data)) {
             pline(_("The leash would just fall off."));
         } else if (nolimbs(mtmp->data) && !has_head(mtmp->data)) {
@@ -1479,8 +1479,8 @@ snuff_candle(struct obj *otmp)
         (void) get_obj_location(otmp, &x, &y, 0);
         if (otmp->where == OBJ_MINVENT ? cansee(x, y) : !Blind)
             pline(_("%s%scandle%s flame%s extinguished."), Shk_Your(buf, otmp),
-                  (candle ? "" : "candelabrum's "), (many ? "s'" : "'s"),
-                  (many ? "s are" : " is"));
+                  (candle ? "" : _("candelabrum's ")), (many ? _("s'") : _("'s")),
+                  (many ? _("s are") : _(" is")));
         end_burn(otmp, TRUE);
         return TRUE;
     }
@@ -1626,8 +1626,8 @@ use_lamp(struct obj *obj)
 {
     char buf[BUFSZ];
     const char *lamp = (obj->otyp == OIL_LAMP
-                        || obj->otyp == MAGIC_LAMP) ? "lamp"
-                       : (obj->otyp == BRASS_LANTERN) ? "lantern"
+                        || obj->otyp == MAGIC_LAMP) ? _("lamp")
+                       : (obj->otyp == BRASS_LANTERN) ? _("lantern")
                          : NULL;
 
     /*
@@ -1646,8 +1646,8 @@ use_lamp(struct obj *obj)
     }
     if (Underwater) {
         pline(_("%s."),
-              !Is_candle(obj) ? "This is not a diving lamp"
-                              : "Sorry, fire and water don't mix");
+              !Is_candle(obj) ? _("This is not a diving lamp")
+                              : _("Sorry, fire and water don't mix"));
         return;
     }
     /* magic lamps with an spe == 0 (wished for) cannot be lit */
@@ -2096,8 +2096,8 @@ jump(int magic) /* 0=Physical, otherwise skill level */
                 You(_("strain your %s, but you're still %s."),
                     makeplural(body_part(LEG)),
                     (u.utraptype == TT_INFLOOR)
-                        ? "stuck in the floor"
-                        : "attached to the buried ball");
+                        ? _("stuck in the floor")
+                        : _("attached to the buried ball"));
                 set_wounded_legs(LEFT_SIDE, rn1(10, 11));
                 set_wounded_legs(RIGHT_SIDE, rn1(10, 11));
                 return ECMD_TIME;
@@ -2525,7 +2525,7 @@ figurine_location_checks(struct obj *obj, coord *cc, boolean quietly)
         && !(passes_walls(&mons[obj->corpsenm]) && may_passwall(x, y))) {
         if (!quietly)
             You(_("cannot place a figurine in %s!"),
-                IS_TREE(levl[x][y].typ) ? "a tree" : "solid rock");
+                IS_TREE(levl[x][y].typ) ? _("a tree") : _("solid rock"));
         return FALSE;
     }
     if (sobj_at(BOULDER, x, y) && !passes_walls(&mons[obj->corpsenm])
@@ -2561,13 +2561,13 @@ use_figurine(struct obj **optr)
     if (!figurine_location_checks(obj, &cc, FALSE))
         return ECMD_TIME;
     You(_("%s and it %stransforms."),
-        (u.dx || u.dy) ? "set the figurine beside you"
+        (u.dx || u.dy) ? _("set the figurine beside you")
                        : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
                           || is_pool(cc.x, cc.y))
-                             ? "release the figurine"
-                             : (u.dz < 0 ? "toss the figurine into the air"
-                                         : "set the figurine on the ground"),
-        Blind ? "supposedly " : "");
+                             ? _("release the figurine")
+                             : (u.dz < 0 ? _("toss the figurine into the air")
+                                         : _("set the figurine on the ground")),
+        Blind ? _("supposedly ") : "");
     (void) make_familiar(obj, cc.x, cc.y, FALSE);
     (void) stop_timer(FIG_TRANSFORM, obj_to_any(obj));
     useup(obj);

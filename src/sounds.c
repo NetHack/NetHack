@@ -1397,11 +1397,11 @@ dochat(void)
     }
     if (Deaf) {
         const char *xresponse = humanoid(gy.youmonst.data)
-                    ? "falls on deaf ears"
-                    : "is inaudible";
+                    ? _("falls on deaf ears")
+                    : _("is inaudible");
 
         pline(_("Any response%s%s %s."),
-              canspotmon(mtmp) ? " from " : "",
+              canspotmon(mtmp) ? _(" from ") : "",
               canspotmon(mtmp) ? mon_nam(mtmp) : "",
               xresponse);
         return ECMD_OK;
