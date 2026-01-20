@@ -1008,9 +1008,9 @@ status_enlightenment(int mode, int final)
            puts TermIll before FoodPois and death due to timeout reports
            terminal illness if both are in effect, so do the same here */
         if (final && (Sick & I_SPECIAL)) {
-            Sprintf(buf, " %sdied from %s.", You_, /* has trailing space */
+            Sprintf(buf, _(" %sdied from %s."), You_, /* has trailing space */
                     (u.usick_type & SICK_NONVOMITABLE)
-                    ? "terminal illness" : "food poisoning");
+                    ? _("terminal illness") : _("food poisoning"));
             enlght_out(buf);
         } else {
             /* unlike death due to sickness, report the two cases separately
@@ -1098,8 +1098,8 @@ status_enlightenment(int mode, int final)
         boolean ustick = (Upolyd && sticks(gy.youmonst.data));
         int dx = u.ustuck->mx - u.ux, dy = u.ustuck->my - u.uy;
 
-        Snprintf(buf, sizeof buf, "%s %s (%s)",
-                 ustick ? "holding" : "held by",
+        Snprintf(buf, sizeof buf, _("%s %s (%s)"),
+                 ustick ? _("holding") : _("held by"),
                  heldmon, dxdy_to_dist_descr(dx, dy, TRUE));
         you_are(buf, "");
     }
@@ -1107,7 +1107,7 @@ status_enlightenment(int mode, int final)
         struct obj *saddle = which_armor(u.usteed, W_SADDLE);
 
         if (saddle && saddle->cursed) {
-            Sprintf(buf, "stuck to %s %s", s_suffix(steedname),
+            Sprintf(buf, _("stuck to %s %s"), s_suffix(steedname),
                     simpleonames(saddle));
             you_are(buf, "");
         }
@@ -1868,7 +1868,7 @@ attributes_enlightenment(
         you_are(_("harmed by silver"), "");
     /* movement and non-armor-based protection */
     if (Fast)
-        you_are(Very_fast ? "very fast" : "fast", from_what(FAST));
+        you_are(Very_fast ? _("very fast") : _("fast"), from_what(FAST));
     if (Reflecting)
         you_have(_("reflection"), from_what(REFLECTING));
     if (Free_action)
@@ -2073,7 +2073,7 @@ youhiding(boolean via_enlghtmt, /* enlightenment line vs topl message */
         you_are(buf, "");
     } else {
         /* for dohide(), when player uses '#monster' command */
-        You(_("are %s %s."), msgflag ? "already" : "now", buf);
+        You(_("are %s %s."), msgflag ? _("already") : _("now"), buf);
     }
 }
 

@@ -1191,11 +1191,11 @@ msgstr "%s촛대의 불꽃%s."
 
 #: ../src/apply.c:1482 ../src/timeout.c:1574 ../src/timeout.c:1581
 msgid "s'"
-msgstr ""
+msgstr "의"
 
 #: ../src/apply.c:1482 ../src/timeout.c:1574 ../src/timeout.c:1581
 msgid "'s"
-msgstr ""
+msgstr "의"
 
 #: ../src/apply.c:1483 ../src/timeout.c:1557
 #, fuzzy
@@ -1310,7 +1310,7 @@ msgstr "%s{을/를} 껐다."
 
 #: ../src/apply.c:1649
 msgid "This is not a diving lamp"
-msgstr ""
+msgstr "이것은 잠수용 램프가 아니다"
 
 #: ../src/apply.c:1650
 msgid "Sorry, fire and water don't mix"
@@ -1385,7 +1385,7 @@ msgstr "%s 연기."
 
 #: ../src/apply.c:1830
 msgid "see a puff of"
-msgstr ""
+msgstr "연기가 피어오르는 것을 보았다"
 
 #: ../src/apply.c:1830 ../src/detect.c:543 ../src/do.c:2002 ../src/eat.c:2636
 #, fuzzy
@@ -1551,7 +1551,7 @@ msgstr "날다"
 
 #: ../src/apply.c:2128
 msgid "hop up and down a bit"
-msgstr ""
+msgstr "조금 껑충껑충 뛰다"
 
 #: ../src/apply.c:2129
 #, fuzzy
@@ -1674,7 +1674,7 @@ msgstr "%s하고 %s변신한다."
 
 #: ../src/apply.c:2564
 msgid "set the figurine beside you"
-msgstr ""
+msgstr "조각상을 옆에 놓았다"
 
 #: ../src/apply.c:2567
 #, fuzzy
@@ -1695,7 +1695,7 @@ msgstr "바위 위에 조각상을 놓을 수 없다."
 
 #: ../src/apply.c:2570
 msgid "supposedly "
-msgstr ""
+msgstr "아마도 "
 
 #: ../src/apply.c:2606 ../src/apply.c:2618 ../src/write.c:92
 #, c-format
@@ -1809,7 +1809,7 @@ msgstr "손 없이 %s{을/를} 부술 수 없다!"
 
 #: ../src/apply.c:2829
 msgid "while stunned"
-msgstr ""
+msgstr "기절한 상태에서"
 
 #: ../src/apply.c:2831
 #, fuzzy
@@ -2294,7 +2294,7 @@ msgstr "전기빛의"
 
 #: ../src/apply.c:4494
 msgid "rough and dry"
-msgstr ""
+msgstr "거칠고 건조한"
 
 #: ../src/apply.c:4496
 #, c-format
@@ -2465,7 +2465,7 @@ msgstr "때렸다"
 
 #: ../src/artifact.c:1489
 msgid "vaporizes part of"
-msgstr ""
+msgstr "일부를 증발시켰다"
 
 #: ../src/artifact.c:1490 ../src/hack.c:2023 ../src/trap.c:1013
 #: ../src/trap.c:5509
@@ -2495,7 +2495,7 @@ msgstr "상상의 장치가 %s %s{을/를} 쳤다%c"
 
 #: ../src/artifact.c:1553
 msgid "The razor-sharp blade"
-msgstr ""
+msgstr "면도날처럼 날카로운 칼날"
 
 #: ../src/artifact.c:1556
 #, c-format
@@ -2821,7 +2821,7 @@ msgstr "신속의 물약"
 
 #: ../src/attrib.c:952
 msgid "worn equipment"
-msgstr ""
+msgstr "착용한 장비"
 
 #: ../src/attrib.c:964
 #, fuzzy, c-format
@@ -2884,7 +2884,7 @@ msgstr "정신이 %s."
 
 #: ../src/attrib.c:1351
 msgid "much of a muchness"
-msgstr ""
+msgstr "거기서 거기"
 
 #: ../src/attrib.c:1352
 #, fuzzy
@@ -3071,11 +3071,11 @@ msgstr ""
 
 #: ../src/botl.c:471
 msgid "Tutorial"
-msgstr ""
+msgstr "튜토리얼"
 
 #: ../src/botl.c:471
 msgid "Dlvl"
-msgstr ""
+msgstr "던전레벨"
 
 #. TRANSLATORS: %s the %s -> player name, rank/monster name
 #. Korean example: "%s (%s)" for "Name (Rank)" format
@@ -3126,7 +3126,7 @@ msgstr "변화의 부적"
 
 #: ../src/botl.c:3512
 msgid "Number threshold"
-msgstr ""
+msgstr "수치 임계값"
 
 #: ../src/botl.c:3520
 msgid "Percentage threshold"
@@ -30323,7 +30323,7 @@ msgstr "어떤 반응%s%s %s."
 
 #: ../src/sounds.c:1404
 msgid " from "
-msgstr ""
+msgstr "에서 "
 
 #: ../src/sounds.c:1450
 #, c-format
@@ -31963,7 +31963,7 @@ msgstr "%s{을/를} 미끄러뜨렸다."
 
 #: ../src/timeout.c:1309
 msgid "on a banana peel"
-msgstr ""
+msgstr "바나나 껍질 위에서"
 
 #: ../src/timeout.c:1309
 #, fuzzy
@@ -32179,7 +32179,7 @@ msgstr "상위 10위 안에 들었습니다!"
 
 #: ../src/topten.c:934
 msgid " No  Points     Name"
-msgstr ""
+msgstr " 번호  점수     이름"
 
 #: ../src/topten.c:938
 msgid "Hp [max]"
@@ -32228,7 +32228,7 @@ msgstr "원소의 평면으로"
 
 #: ../src/topten.c:1025
 msgid "Void"
-msgstr ""
+msgstr "공허"
 
 #: ../src/topten.c:1032
 #, fuzzy, c-format
@@ -32376,7 +32376,7 @@ msgstr "%s%s구멍을 따라 %s!"
 
 #: ../src/trap.c:707
 msgid "deep "
-msgstr ""
+msgstr "깊은 "
 
 #: ../src/trap.c:710
 #, fuzzy, c-format
@@ -33222,7 +33222,7 @@ msgstr "쓰러졌다."
 
 #: ../src/trap.c:4057
 msgid "dangerous winds"
-msgstr ""
+msgstr "위험한 바람"
 
 #: ../src/trap.c:4060
 msgid "As you fall, you"
@@ -33497,7 +33497,7 @@ msgstr " 다른"
 
 #: ../src/trap.c:4621
 msgid "More "
-msgstr ""
+msgstr "더 "
 
 #: ../src/trap.c:4667
 #, c-format
@@ -33841,7 +33841,7 @@ msgstr "%s{이/가} %s %s하지만 %s%s에 닿을 수 없다."
 
 #: ../src/trap.c:5848
 msgid " while mounted"
-msgstr ""
+msgstr " 탑승 중"
 
 #: ../src/trap.c:5856
 #, c-format
@@ -33850,7 +33850,7 @@ msgstr "%s%s에 대해 별로 할 수 없다."
 
 #: ../src/trap.c:5857
 msgid " that you're stuck in"
-msgstr ""
+msgstr "에 갇힌"
 
 #: ../src/trap.c:5858
 #, fuzzy
@@ -34011,7 +34011,7 @@ msgstr "영향을 받지 않은 것 같다."
 
 #: ../src/trap.c:6383
 msgid "electric shock"
-msgstr ""
+msgstr "전기 충격"
 
 #: ../src/trap.c:6390
 msgid "Suddenly you are frozen in place!"
@@ -34200,7 +34200,7 @@ msgstr "정수"
 #: ../src/trap.c:7034
 #, fuzzy
 msgid "owlbear trap"
-msgstr ""
+msgstr "아울베어 덫"
 "부엉이곰 함정#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 "곰 덫\n"
 "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
@@ -34364,7 +34364,7 @@ msgstr "달콤한 향기 가스 배출구"
 #: ../src/trap.c:7050
 #, fuzzy
 msgid "phone booth"
-msgstr ""
+msgstr "전화부스"
 "전화 부스#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 "신속의 장화\n"
 "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
@@ -34382,7 +34382,7 @@ msgstr "끝없는 엘리베이터"
 #: ../src/trap.c:7051
 #, fuzzy
 msgid "slime pit"
-msgstr ""
+msgstr "점액 구덩이"
 "점액 구덩이#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 "점균\n"
 "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
@@ -35443,11 +35443,11 @@ msgstr "%s에서 줄어들어 빠져나왔다!"
 
 #: ../src/uhitm.c:5333
 msgid "backward"
-msgstr ""
+msgstr "뒤로"
 
 #: ../src/uhitm.c:5334
 msgid "back"
-msgstr ""
+msgstr "뒤"
 
 #: ../src/uhitm.c:5348
 #, c-format
@@ -36018,7 +36018,7 @@ msgstr "기술:"
 
 #: ../src/weapon.c:1102
 msgid "Expert"
-msgstr ""
+msgstr "전문가"
 
 #: ../src/weapon.c:1109
 #, fuzzy
@@ -36037,7 +36037,7 @@ msgstr "이제 %s에서 %s 숙련되었다."
 
 #: ../src/weapon.c:1200
 msgid "most"
-msgstr ""
+msgstr "대부분"
 
 #: ../src/weapon.c:1306
 msgid "Skills:"
@@ -36331,7 +36331,7 @@ msgstr "아니다"
 
 #: ../src/wield.c:768
 msgid "primary"
-msgstr ""
+msgstr "주"
 
 #: ../src/wield.c:768
 #, fuzzy
@@ -36591,7 +36591,7 @@ msgstr "겁쟁이"
 #: ../src/wizard.c:824
 #, fuzzy
 msgid "rattlepate"
-msgstr ""
+msgstr "수다쟁이"
 "멍청이멍청이멍청이#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 "전투 도끼\n"
 "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
@@ -36916,7 +36916,7 @@ msgstr "무너지기 시작해"
 
 #: ../src/write.c:226
 msgid "lame"
-msgstr ""
+msgstr "절름발이"
 
 #: ../src/write.c:226
 #, fuzzy
@@ -37551,7 +37551,7 @@ msgstr "지쳤다."
 
 #: ../src/zap.c:4552
 msgid "imagined"
-msgstr ""
+msgstr "상상의"
 
 #: ../src/zap.c:4627
 #, c-format
