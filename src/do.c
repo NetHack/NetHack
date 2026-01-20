@@ -346,7 +346,7 @@ flooreffects(
         if (!obj_resists(obj, survival_chance, 100)) {
             if (cansee(x,y)) {
                 pline(_("%s from the heat!"),
-                      is_plural(obj) ? "They shatter" : "It shatters");
+                      is_plural(obj) ? _("They shatter") : _("It shatters"));
             } else {
                 You_hear(_("a shattering noise."));
             }
@@ -1759,10 +1759,10 @@ goto_level(
             great_effort = (Punished && !Levitation);
             if (flags.verbose || great_effort)
                 pline(_("%s %s up%s the %s."),
-                      great_effort ? "With great effort, you" : "You",
+                      great_effort ? _("With great effort, you") : _("You"),
                       u_locomotion("climb"),
-                      (Flying && ga.at_ladder) ? " along" : "",
-                      ga.at_ladder ? "ladder" : "stairs");
+                      (Flying && ga.at_ladder) ? _(" along") : "",
+                      ga.at_ladder ? _("ladder") : _("stairs"));
         } else { /* down */
             stairway *stway = stairway_find_from(&u.uz0, ga.at_ladder);
             if (stway) {

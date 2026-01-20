@@ -5182,9 +5182,9 @@ doorganize_core(struct obj *obj)
 
     collect = (let == obj->invlet);
     /* change the inventory and print the resulting item */
-    adj_type = collect ? "Collecting:"
-               : !splitting ? "Moving:"
-                 : "Splitting:";
+    adj_type = collect ? _("Collecting:")
+               : !splitting ? _("Moving:")
+                 : _("Splitting:");
 
     /*
      * don't use freeinv/addinv to avoid double-touching artifacts,

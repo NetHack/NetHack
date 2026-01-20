@@ -3727,11 +3727,11 @@ tipcontainer(struct obj *box) /* or bag */
          */
         if (targetbox)
             pline(_("%s into %s."),
-                  box->cobj->nobj ? "Objects tumble" : "An object tumbles",
+                  box->cobj->nobj ? _("Objects tumble") : _("An object tumbles"),
                   the(xname(targetbox)));
         else
             pline(_("%s out%c"),
-              box->cobj->nobj ? "Objects spill" : "An object spills",
+              box->cobj->nobj ? _("Objects spill") : _("An object spills"),
               terse ? ':' : '.');
 
         for (otmp = box->cobj; otmp; otmp = nobj) {

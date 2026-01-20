@@ -329,8 +329,8 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
             else
                 selftouch((Upolyd && (slithy(gy.youmonst.data)
                                     || nolimbs(gy.youmonst.data)))
-                          ? "Shaken, you"
-                          : "Falling down, you");
+                          ? _("Shaken, you")
+                          : _("Falling down, you"));
         }
     } else {
         newsym(x, y);
