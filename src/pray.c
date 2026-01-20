@@ -2657,10 +2657,10 @@ altar_wrath(coordxy x, coordxy y)
         u.ualign.record--;
     } else {
         pline(_("%s %s%s:"),
-              !Deaf ? "A voice (could it be"
-                    : "Despite your deafness, you seem to hear",
+              !Deaf ? _("A voice (could it be")
+                    : _("Despite your deafness, you seem to hear"),
               align_gname(altaralign),
-              !Deaf ? "?) whispers" : " say");
+              !Deaf ? _("?) whispers") : _(" say"));
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize(_("Thou shalt pay, infidel!"));
         /* higher luck is more likely to be reduced; as it approaches -5

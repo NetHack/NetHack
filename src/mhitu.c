@@ -2106,10 +2106,10 @@ doseduce(struct monst *mon)
 
     naked = (!uarmc && !uarmf && !uarmg && !uarms && !uarmh && !uarmu);
     urgent_pline(_("%s %s%s."), Who,
-                 Deaf ? "seems to murmur into your ear"
-                 : naked ? "murmurs sweet nothings into your ear"
-                   : "murmurs in your ear",
-                 naked ? "" : ", while helping you undress");
+                 Deaf ? _("seems to murmur into your ear")
+                 : naked ? _("murmurs sweet nothings into your ear")
+                   : _("murmurs in your ear"),
+                 naked ? "" : _(", while helping you undress"));
     mayberem(mon, Who, uarmc, cloak_simple_name(uarmc));
     if (!uarmc)
         mayberem(mon, Who, uarm, suit_simple_name(uarm));

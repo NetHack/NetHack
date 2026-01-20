@@ -4620,11 +4620,11 @@ mhitm_ad_sedu(
                       is disabled, it would be changed to another damage
                       type, but when defending, it remains as-is */
                    || dmgtype(gy.youmonst.data, AD_SSEX)) {
-            pline_mon(magr, "%s %s.", Monnam(magr),
-                  Deaf ? "says something but you can't hear it"
+            pline_mon(magr, _("%s %s."), Monnam(magr),
+                  Deaf ? _("says something but you can't hear it")
                   : magr->minvent
-                    ? "brags about the goods some dungeon explorer provided"
-                  : "makes some remarks about how difficult theft is lately");
+                    ? _("brags about the goods some dungeon explorer provided")
+                  : _("makes some remarks about how difficult theft is lately"));
             if (!tele_restrict(magr))
                 (void) rloc(magr, RLOC_MSG);
             mhm->hitflags = M_ATTK_AGR_DONE; /* return 3??? */
