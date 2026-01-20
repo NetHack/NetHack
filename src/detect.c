@@ -687,7 +687,7 @@ object_detect(struct obj *detector, /* object doing the detecting */
     if (!clear_stale_map(!class ? ALL_CLASSES : class, 0) && !ct) {
         if (!ctu) {
             if (detector)
-                strange_feeling(detector, "You feel a lack of something.");
+                strange_feeling(detector, _("You feel a lack of something."));
             return 1;
         }
         You(_("sense %s nearby."), stuff);

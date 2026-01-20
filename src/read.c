@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 #define Your_Own_Role(mndx)  ((mndx) == gu.urole.mnum)
 #define Your_Own_Race(mndx)  ((mndx) == gu.urace.mnum)
@@ -1292,7 +1293,7 @@ seffect_destroy_armor(struct obj **sobjp)
 
     if (confused) {
         if (!otmp) {
-            strange_feeling(sobj, "Your bones itch.");
+            strange_feeling(sobj, _("Your bones itch."));
             *sobjp = 0; /* useup() in strange_feeling() */
             exercise(A_STR, FALSE);
             exercise(A_CON, FALSE);
@@ -1327,7 +1328,7 @@ seffect_destroy_armor(struct obj **sobjp)
         }
 
         if (!destroy_arm(otmp)) {
-            strange_feeling(sobj, "Your skin itches.");
+            strange_feeling(sobj, _("Your skin itches."));
             *sobjp = 0; /* useup() in strange_feeling() */
             exercise(A_STR, FALSE);
             exercise(A_CON, FALSE);
@@ -2595,7 +2596,7 @@ do_class_genocide(void)
             pline1(thats_enough_tries);
             return;
         }
-        Strcpy(promptbuf, "What class of monsters do you want to genocide?");
+        Strcpy(promptbuf, _("What class of monsters do you want to genocide?"));
         if (j > 0)
             Snprintf(eos(promptbuf), sizeof promptbuf - strlen(promptbuf),
                      " [enter %s]",
@@ -3324,7 +3325,7 @@ create_particular(void)
     int  tryct = CP_TRYLIM, altmsg = 0;
 
     buf[0] = '\0'; /* for EDIT_GETLIN */
-    Strcpy(prompt, "Create what kind of monster?");
+    Strcpy(prompt, _("Create what kind of monster?"));
     do {
         getlin(prompt, buf);
         bufp = mungspaces(buf);

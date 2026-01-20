@@ -1262,7 +1262,7 @@ dodown(void)
             char qbuf[QBUFSZ];
 
             You(_("don't fit %s easily."), down_or_thru);
-            Sprintf(qbuf, "Try to squeeze %s?", down_or_thru);
+            Sprintf(qbuf, _("Try to squeeze %s?"), down_or_thru);
             if (y_n(qbuf) == 'y') {
                 if (!rn2(3)) {
                     actn = "manage to squeeze";

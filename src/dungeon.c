@@ -2418,7 +2418,7 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
                  || Is_firelevel(&u.uz) || Is_airlevel(&u.uz)
                  || Is_qstart(&u.uz) || at_dgn_entrance("The Quest")
                  || Is_knox(&u.uz))
-            Strcpy(buf, "No portal found.");
+            Strcpy(buf, _("No portal found."));
 
         /* only give output if we found a portal or expected one and didn't */
         if (*buf) {
@@ -2535,7 +2535,7 @@ query_annotation(d_level *lev)
                values will end up with one anyway; remove it */
             (void) trimspaces(lbuf);
         }
-        Snprintf(qbuf, sizeof qbuf, "What do you want to call %s?", lbuf);
+        Snprintf(qbuf, sizeof qbuf, _("What do you want to call %s?"), lbuf);
         getlin(qbuf, nbuf);
     }
 

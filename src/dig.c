@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 staticfn boolean rm_waslit(void);
 staticfn void mkcavepos(coordxy, coordxy, int, boolean, boolean);
@@ -1807,10 +1808,10 @@ adj_pit_checks(coord *cc, char *msg)
     } else if (IS_GRAVE(ltyp)) {
 #endif
     } else if (IS_SINK(ltyp)) {
-        Strcpy(msg, "A tangled mass of plumbing remains below the sink.");
+        Strcpy(msg, _("A tangled mass of plumbing remains below the sink."));
         return FALSE;
     } else if (On_ladder(cc->x, cc->y)) {
-        Strcpy(msg, "The ladder is unaffected.");
+        Strcpy(msg, _("The ladder is unaffected."));
         return FALSE;
     } else {
         const char *supporting = (const char *) 0;
