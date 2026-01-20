@@ -59,7 +59,7 @@ staticfn boolean blocked_boulder(int, int);
 static const char *const Moloch = "Moloch";
 
 static const char *const godvoices[] = {
-    "booms out", "thunders", "rings out", "booms",
+    N_("booms out"), N_("thunders"), N_("rings out"), N_("booms"),
 };
 
 #define PIOUS 20
@@ -1420,13 +1420,13 @@ godvoice(aligntyp g_align, const char *words)
         words = "";
 
     pline_The(_("voice of %s %s: %s%s%s"), align_gname(g_align),
-              ROLL_FROM(godvoices), quot, words, quot);
+              _(ROLL_FROM(godvoices)), quot, words, quot);
 }
 
 staticfn void
 gods_angry(aligntyp g_align)
 {
-    godvoice(g_align, "Thou hast angered me.");
+    godvoice(g_align, _("Thou hast angered me."));
 }
 
 /* The g_align god is upset with you. */

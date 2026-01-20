@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 13:32+0900\n"
+"POT-Creation-Date: 2026-01-20 13:34+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -496,12 +496,12 @@ msgstr "%s{이/가} 흐려져서 반사하지 않는다!"
 #: src/apply.c:1033 src/apply.c:1660 src/apply.c:1675 src/apply.c:2296
 #: src/apply.c:2384 src/apply.c:3653 src/apply.c:3672 src/artifact.c:2033
 #: src/artifact.c:2065 src/artifact.c:2078 src/artifact.c:2082 src/do.c:2028
-#: src/eat.c:2145 src/engrave.c:1246 src/hack.c:3314 src/hack.c:4078
-#: src/nhlua.c:636 src/nhlua.c:652 src/pager.c:2696 src/pickup.c:410
-#: src/pline.c:677 src/pline.c:689 src/pline.c:744 src/potion.c:207
-#: src/potion.c:234 src/questpgr.c:434 src/sit.c:55 src/sounds.c:1534
-#: src/spell.c:2054 src/teleport.c:1146 src/timeout.c:342 src/vault.c:959
-#: src/version.c:160 src/windows.c:455 src/windows.c:513 src/wizcmds.c:438
+#: src/eat.c:2145 src/engrave.c:1246 src/hack.c:4078 src/nhlua.c:636
+#: src/nhlua.c:652 src/pager.c:2696 src/pickup.c:410 src/pline.c:677
+#: src/pline.c:689 src/pline.c:744 src/potion.c:207 src/potion.c:234
+#: src/questpgr.c:434 src/sit.c:55 src/sounds.c:1534 src/spell.c:2054
+#: src/teleport.c:1146 src/timeout.c:342 src/vault.c:959 src/version.c:160
+#: src/windows.c:455 src/windows.c:513 src/wizcmds.c:438
 #, c-format
 msgid "%s"
 msgstr "%s"
@@ -10645,6 +10645,20 @@ msgstr "%s %s{이/가} 산산조각났다!"
 msgid "Cannot get status of MAIL=\"%s\"."
 msgstr "MAIL=\"%s\"의 상태를 가져올 수 없다."
 
+#: src/mail.c:277
+msgid "Gangway!"
+msgstr "비켜!"
+
+#: src/mail.c:277
+#, fuzzy
+msgid "Look out!"
+msgstr "감시자"
+
+#: src/mail.c:278
+#, fuzzy
+msgid "Pardon me!"
+msgstr "실례합니다, %s."
+
 #: src/mail.c:342
 msgid "Excuse me."
 msgstr "실례합니다."
@@ -17738,6 +17752,25 @@ msgstr "갑자기 %s더 빨리 움직인다."
 msgid "%s get new energy."
 msgstr "%s{이/가} 새 에너지를 얻었다."
 
+#: src/pray.c:62
+#, fuzzy
+msgid "booms out"
+msgstr "%s 나갔다."
+
+#: src/pray.c:62
+#, fuzzy
+msgid "thunders"
+msgstr "약탈자"
+
+#: src/pray.c:62
+#, fuzzy
+msgid "rings out"
+msgstr "%s의 반지"
+
+#: src/pray.c:62
+msgid "booms"
+msgstr "울립니다"
+
 #
 #: src/pray.c:384
 #, fuzzy
@@ -18045,6 +18078,11 @@ msgstr "제단의 %s 물약%s{이/가} 잠시 %s %s 빛난다."
 #, c-format
 msgid "voice of %s %s: %s%s%s"
 msgstr "%s의 목소리 %s: %s%s%s"
+
+#: src/pray.c:1429
+#, fuzzy
+msgid "Thou hast angered me."
+msgstr "나에게 합당한 자였도다!"
 
 #: src/pray.c:1449
 msgid "sacrifice sprouts wings and a propeller and roars away!"

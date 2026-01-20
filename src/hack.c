@@ -3311,9 +3311,9 @@ spoteffects(boolean pick)
         long time_left = spot_time_left(u.ux, u.uy, MELT_ICE_AWAY);
 
         if (time_left && time_left < 15L)
-            pline(_("%s"), icewarnings[(time_left < 5L) ? 2
+            pline("%s", _(icewarnings[(time_left < 5L) ? 2
                                     : (time_left < 10L) ? 1
-                                      : 0]);
+                                      : 0]));
     }
 
     if ((mtmp = m_at(u.ux, u.uy)) != 0 && !u.uswallow) {

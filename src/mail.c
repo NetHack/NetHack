@@ -274,9 +274,9 @@ md_stop(coord *stopp,  /* stopping position (we fill it in) */
 }
 
 /* Let the mail daemon have a larger vocabulary. */
-staticfn NEARDATA const char *mail_text[] = { "Gangway!", "Look out!",
-                                            "Pardon me!" };
-#define md_exclamations() (mail_text[rn2(3)])
+staticfn NEARDATA const char *mail_text[] = { N_("Gangway!"), N_("Look out!"),
+                                            N_("Pardon me!") };
+#define md_exclamations() (_(mail_text[rn2(3)]))
 
 /*
  * Make the mail daemon run through the dungeon.  The daemon will run over
