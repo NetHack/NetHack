@@ -37,30 +37,32 @@ picking_at(coordxy x, coordxy y)
 staticfn const char *
 lock_action(void)
 {
-    /* "unlocking"+2 == "locking" */
     static const char *const actions[] = {
-        "unlocking the door",   /* [0] */
-        "unlocking the chest",  /* [1] */
-        "unlocking the box",    /* [2] */
-        "picking the lock"      /* [3] */
+        N_("unlocking the door"),   /* [0] */
+        N_("unlocking the chest"),  /* [1] */
+        N_("unlocking the box"),    /* [2] */
+        N_("picking the lock"),     /* [3] */
+        N_("locking the door"),     /* [4] */
+        N_("locking the chest"),    /* [5] */
+        N_("locking the box")       /* [6] */
     };
 
     /* if the target is currently unlocked, we're trying to lock it now */
     if (gx.xlock.door && !(gx.xlock.door->doormask & D_LOCKED))
-        return actions[0] + 2; /* "locking the door" */
+        return _(actions[4]); /* "locking the door" */
     else if (gx.xlock.box && !gx.xlock.box->olocked)
-        return gx.xlock.box->otyp == CHEST ? actions[1] + 2 : actions[2] + 2;
+        return gx.xlock.box->otyp == CHEST ? _(actions[5]) : _(actions[6]);
     /* otherwise we're trying to unlock it */
     else if (gx.xlock.picktyp == LOCK_PICK)
-        return actions[3]; /* "picking the lock" */
+        return _(actions[3]); /* "picking the lock" */
     else if (gx.xlock.picktyp == CREDIT_CARD)
-        return actions[3]; /* same as lock_pick */
+        return _(actions[3]); /* same as lock_pick */
     else if (gx.xlock.door)
-        return actions[0]; /* "unlocking the door" */
+        return _(actions[0]); /* "unlocking the door" */
     else if (gx.xlock.box)
-        return gx.xlock.box->otyp == CHEST ? actions[1] : actions[2];
+        return gx.xlock.box->otyp == CHEST ? _(actions[1]) : _(actions[2]);
     else
-        return actions[3];
+        return _(actions[3]);
 }
 
 /* try to open/close a lock */

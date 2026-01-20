@@ -64,10 +64,10 @@ staticfn void tipcontainer(struct obj *);
 #define Icebox (gc.current_container->otyp == ICE_BOX)
 
 static const char
-    slightloadpfx[] = "You have a little trouble",
-    moderateloadpfx[] = "You have trouble",
-    nearloadpfx[] = "You have much trouble",
-    overloadpfx[] = "You have extreme difficulty";
+    slightloadpfx[] = N_("You have a little trouble"),
+    moderateloadpfx[] = N_("You have trouble"),
+    nearloadpfx[] = N_("You have much trouble"),
+    overloadpfx[] = N_("You have extreme difficulty");
 
 /* BUG: this lets you look at cockatrice corpses while blind without
    touching them */
@@ -1766,11 +1766,11 @@ lift_object(
 
                 obj->quan = *cnt_p;
                 Sprintf(qbuf, "%s %s ",
-                        (next_encumbr >= EXT_ENCUMBER) ? overloadpfx
-                        : (next_encumbr >= HVY_ENCUMBER) ? nearloadpfx
-                          : (next_encumbr >= MOD_ENCUMBER) ? moderateloadpfx
-                            : slightloadpfx,
-                        !container ? "lifting" : "removing");
+                        (next_encumbr >= EXT_ENCUMBER) ? _(overloadpfx)
+                        : (next_encumbr >= HVY_ENCUMBER) ? _(nearloadpfx)
+                          : (next_encumbr >= MOD_ENCUMBER) ? _(moderateloadpfx)
+                            : _(slightloadpfx),
+                        !container ? _("lifting") : _("removing"));
                 (void) safe_qbuf(qbuf, qbuf, ".  Continue?", obj, doname,
                                  ansimpleoname, something);
                 obj->quan = savequan;
@@ -1952,10 +1952,10 @@ pickup_prinv(
     if (nearload == gp.pickup_encumbrance) {
         prefix = (char *) 0;
     } else {
-        prefix = (nearload >= EXT_ENCUMBER) ? overloadpfx
-                 : (nearload >= HVY_ENCUMBER) ? nearloadpfx
-                   : (nearload >= MOD_ENCUMBER) ? moderateloadpfx
-                     : (nearload >= SLT_ENCUMBER) ? slightloadpfx
+        prefix = (nearload >= EXT_ENCUMBER) ? _(overloadpfx)
+                 : (nearload >= HVY_ENCUMBER) ? _(nearloadpfx)
+                   : (nearload >= MOD_ENCUMBER) ? _(moderateloadpfx)
+                     : (nearload >= SLT_ENCUMBER) ? _(slightloadpfx)
                        : (char *) 0;
         gp.pickup_encumbrance = nearload;
     }

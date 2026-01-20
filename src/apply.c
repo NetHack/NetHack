@@ -2218,7 +2218,7 @@ use_tinning_kit(struct obj *obj)
     consume_obj_charge(obj, TRUE);
 
     if ((can = mksobj(TIN, FALSE, FALSE)) != 0) {
-        static const char you_buy_it[] = "You tin it, you bought it!";
+        static const char you_buy_it[] = N_("You tin it, you bought it!");
 
         can->corpsenm = corpse->corpsenm;
         can->cursed = obj->cursed;
@@ -3906,7 +3906,7 @@ staticfn int
 do_break_wand(struct obj *obj)
 {
 #define BY_OBJECT ((struct monst *) 0)
-    static const char nothing_else_happens[] = "But nothing else happens...";
+    static const char nothing_else_happens[] = N_("But nothing else happens...");
     int i;
     coordxy x, y;
     struct monst *mon;

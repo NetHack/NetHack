@@ -117,7 +117,7 @@ throne_sit_effect(void)
                 pline(_("A voice echoes:"));
                 SetVoice((struct monst *) 0, 0, 80, voice_throne);
                 verbalize(_("Thine audience hath been summoned, %s!"),
-                          flags.female ? "Dame" : "Sire");
+                          flags.female ? _("Dame") : _("Sire"));
                 while (cnt--)
                     (void) makemon(courtmon(), tx, ty, NO_MM_FLAGS);
                 break;
@@ -127,7 +127,7 @@ throne_sit_effect(void)
             pline(_("A voice echoes:"));
             SetVoice((struct monst *) 0, 0, 80, voice_throne);
             verbalize(_("By thine Imperious order, %s..."),
-                      flags.female ? "Dame" : "Sire");
+                      flags.female ? _("Dame") : _("Sire"));
             do_genocide(5); /* REALLY|ONTHRONE, see do_genocide() */
             break;
         case 9:
@@ -135,7 +135,7 @@ throne_sit_effect(void)
             pline(_("A voice echoes:"));
             SetVoice((struct monst *) 0, 0, 80, voice_throne);
             verbalize(
-                 "A curse upon thee for sitting upon this most holy throne!");
+                 _("A curse upon thee for sitting upon this most holy throne!"));
             if (Luck > 0) {
                 make_blinded(BlindedTimeout + rn1(100, 250), TRUE);
                 change_luck((Luck > 1) ? -rnd(2) : -1);
@@ -294,7 +294,7 @@ special_throne_effect(int effect) {
         else
             schedule_goto(
                 &vs_level, UTOTYPE_NONE, (char *) 0,
-                "You feel extremely out of place.");
+                _("You feel extremely out of place."));
         break;
     }
     case 9:
@@ -358,8 +358,8 @@ lay_an_egg(void)
     if (!flags.female) {
         pline(_("%s can't lay eggs!"),
               Hallucination
-              ? "You may think you are a platypus, but a male still"
-              : "Males");
+              ? _("You may think you are a platypus, but a male still")
+              : _("Males"));
         return ECMD_OK;
     } else if (u.uhunger < (int) objects[EGG].oc_nutrition) {
         You(_("don't have enough energy to lay an egg."));
@@ -705,8 +705,8 @@ attrcurse(void)
                 /* might not be able to see self anymore */
                 newsym(u.ux, u.uy);
             }
-            You(_("%s!"), Hallucination ? "tawt you taw a puttie tat"
-                                     : "thought you saw something");
+            You(_("%s!"), Hallucination ? _("tawt you taw a puttie tat")
+                                     : _("thought you saw something"));
             ret = SEE_INVIS;
             break;
         }

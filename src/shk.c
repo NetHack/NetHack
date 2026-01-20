@@ -60,8 +60,8 @@ staticfn void kops_gone(boolean);
 
 extern const struct shclass shtypes[]; /* defined in shknam.c */
 
-static const char and_its_contents[] = " and its contents";
-static const char the_contents_of[] = "the contents of ";
+static const char and_its_contents[] = N_(" and its contents");
+static const char the_contents_of[] = N_("the contents of ");
 
 staticfn void append_honorific(char *);
 staticfn long addupbill(struct monst *);
@@ -138,7 +138,7 @@ staticfn const char *cad(boolean);
  */
 
 static const char *const angrytexts[] = {
-    "quite upset", "ticked off", "furious"
+    N_("quite upset"), N_("ticked off"), N_("furious")
 };
 
 /*
@@ -759,7 +759,7 @@ u_entered_shop(char *enterstring)
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
         } else {
             pline(_("%s seems %s over your return to %s %s!"),
-                  Shknam(shkp), ROLL_FROM(angrytexts),
+                  Shknam(shkp), _(ROLL_FROM(angrytexts)),
                   noit_mhis(shkp), shtypes[rt - SHOPBASE].name);
         }
     } else if (eshkp->surcharge) {
@@ -3054,15 +3054,15 @@ special_stock(
                 if (Deaf || muteshk(shkp)) {
                     pline(_("%s seems %s that you want to sell that."),
                           Shknam(shkp),
-                          (obj->spe < 7) ? "horrified" : "concerned");
+                          (obj->spe < 7) ? _("horrified") : _("concerned"));
                 } else {
                     SetVoice(shkp, 0, 80, 0);
                     verbalize(_("No thanks, I'd hang onto that if I were you."));
                     if (obj->spe < 7) {
                         SetVoice(shkp, 0, 80, 0);
                         verbalize(
-                             "You'll need %d%s candle%s to go along with it.",
-                                (7 - obj->spe), (obj->spe > 0) ? " more" : "",
+                             _("You'll need %d%s candle%s to go along with it."),
+                                (7 - obj->spe), (obj->spe > 0) ? _(" more") : "",
                                   plur(7 - obj->spe));
                     }
                     /* [what if hero is already carrying enough candles?
@@ -3518,16 +3518,16 @@ addtobill(
                                        ? "for the contents of this"
                                        : "for this",
                   xname(obj),
-                  (contentscount && obj->unpaid) ? and_its_contents : "");
+                  (contentscount && obj->unpaid) ? _(and_its_contents) : "");
             obj->quan = save_quan;
         }
     } else if (!silent) {
         if (ltmp) {
             set_voice(shkp, 0, 80, 0);
             pline_The(_("list price of %s%s%s is %ld %s%s."),
-                      (contentscount && !obj->unpaid) ? the_contents_of : "",
+                      (contentscount && !obj->unpaid) ? _(the_contents_of) : "",
                       the(xname(obj)),
-                      (contentscount && obj->unpaid) ? and_its_contents : "",
+                      (contentscount && obj->unpaid) ? _(and_its_contents) : "",
                       ltmp, currency(ltmp), (obj->quan > 1L) ? " each" : "");
         } else {
             pline(_("%s does not notice."), Shknam(shkp));
@@ -3943,7 +3943,7 @@ sellobj(
         if (offer && !Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
             verbalize(
-  "Thank you for your contribution to restock this recently plundered shop.");
+  _("Thank you for your contribution to restock this recently plundered shop."));
         }
         subfrombill(obj, shkp);
         return;
@@ -4081,9 +4081,9 @@ sellobj(
             Sprintf(qsfx, "%s.  Sell %s?",
                     (cltmp && ltmp)
                         ? (only_partially_your_contents
-                               ? ((yourc == 1L) ? " and item inside"
-                                                : " and items inside")
-                               : and_its_contents)
+                               ? ((yourc == 1L) ? _(" and item inside")
+                                                : _(" and items inside"))
+                               : _(and_its_contents))
                         : "",
                     one ? "it" : "them");
             (void) safe_qbuf(qbuf, qbuf, qsfx, obj, xname, simpleonames,
@@ -4981,11 +4981,11 @@ shopdig(int fall)
                 SetVoice(shkp, 0, 80, 0);
                 if (u.utraptype == TT_PIT) {
                     verbalize(
-                       "Be careful, %s, or you might fall through the floor.",
-                              flags.female ? "madam" : "sir");
+                       _("Be careful, %s, or you might fall through the floor."),
+                              flags.female ? _("madam") : _("sir"));
                 } else {
                     verbalize(_("%s, do not damage the floor here!"),
-                              flags.female ? "Madam" : "Sir");
+                              flags.female ? _("Madam") : _("Sir"));
                 }
             }
         }
@@ -5087,19 +5087,19 @@ getcad(
                         dugwall ? "shop" : "door");
         } else {
             pline(_("%s is %s that you decided to %s %s %s!"),
-                    Shknam(shkp), ROLL_FROM(angrytexts),
-                    dmgstr, noit_mhis(shkp), dugwall ? "shop" : "door");
+                    Shknam(shkp), _(ROLL_FROM(angrytexts)),
+                    dmgstr, noit_mhis(shkp), dugwall ? _("shop") : _("door"));
         }
     } else {
         if (!Deaf) {
             pline(_("%s shouts:"), Shknam(shkp));
             SetVoice(shkp, 0, 80, 0);
             verbalize(_("Who dared %s my %s?"), dmgstr,
-                        dugwall ? "shop" : "door");
+                        dugwall ? _("shop") : _("door"));
         } else {
             pline(_("%s is %s that someone decided to %s %s %s!"),
-                    Shknam(shkp), ROLL_FROM(angrytexts),
-                    dmgstr, noit_mhis(shkp), dugwall ? "shop" : "door");
+                    Shknam(shkp), _(ROLL_FROM(angrytexts)),
+                    dmgstr, noit_mhis(shkp), dugwall ? _("shop") : _("door"));
         }
     }
     hot_pursuit(shkp);
@@ -5374,7 +5374,7 @@ price_quote(struct obj *first_obj)
             Sprintf(price, "%ld %s%s", cost, currency(cost),
                     (otmp->quan) > 1L ? " each" : "");
         }
-        Sprintf(buf, "%s%s, %s", contentsonly ? the_contents_of : "",
+        Sprintf(buf, "%s%s, %s", contentsonly ? _(the_contents_of) : "",
                 doname(otmp), price);
         putstr(tmpwin, 0, buf), cnt++;
     }
@@ -5388,7 +5388,7 @@ price_quote(struct obj *first_obj)
         } else {
             /* print cost in slightly different format, so can't reuse buf;
                cost and contentsonly are already set up */
-            Sprintf(buf, "%s%s", contentsonly ? the_contents_of : "",
+            Sprintf(buf, "%s%s", contentsonly ? _(the_contents_of) : "",
                     doname(first_obj));
             SetVoice(shkp, 0, 80, 0);
             verbalize(_("%s, price %ld %s%s%s"), upstart(buf), cost,

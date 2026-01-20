@@ -603,7 +603,7 @@ priest_talk(struct monst *priest)
         && !has_shrine(priest)) {
         SetVoice(priest, 0, 80, 0);
         verbalize(
-              "Begone!  Thou desecratest this holy place with thy presence.");
+              _("Begone!  Thou desecratest this holy place with thy presence."));
         priest->mpeaceful = 0;
         return;
     }

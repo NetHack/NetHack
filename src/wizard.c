@@ -816,23 +816,23 @@ wizdeadorgone(void)
 }
 
 static const char *const random_insult[] = {
-    "antic",      "blackguard",   "caitiff",    "chucklehead",
-    "coistrel",   "craven",       "cretin",     "cur",
-    "dastard",    "demon fodder", "dimwit",     "dolt",
-    "fool",       "footpad",      "imbecile",   "knave",
-    "maledict",   "miscreant",    "niddering",  "poltroon",
-    "rattlepate", "reprobate",    "scapegrace", "varlet",
-    "villein", /* (sic.) */
-    "wittol",     "worm",         "wretch",
+    N_("antic"),      N_("blackguard"),   N_("caitiff"),    N_("chucklehead"),
+    N_("coistrel"),   N_("craven"),       N_("cretin"),     N_("cur"),
+    N_("dastard"),    N_("demon fodder"), N_("dimwit"),     N_("dolt"),
+    N_("fool"),       N_("footpad"),      N_("imbecile"),   N_("knave"),
+    N_("maledict"),   N_("miscreant"),    N_("niddering"),  N_("poltroon"),
+    N_("rattlepate"), N_("reprobate"),    N_("scapegrace"), N_("varlet"),
+    N_("villein"), /* (sic.) */
+    N_("wittol"),     N_("worm"),         N_("wretch"),
 };
 
 static const char *const random_malediction[] = {
-    "Hell shall soon claim thy remains,", "I chortle at thee, thou pathetic",
-    "Prepare to die, thou", "Resistance is useless,",
-    "Surrender or die, thou", "There shall be no mercy, thou",
-    "Thou shalt repent of thy cunning,", "Thou art as a flea to me,",
-    "Thou art doomed,", "Thy fate is sealed,",
-    "Verily, thou shalt be one dead"
+    N_("Hell shall soon claim thy remains,"), N_("I chortle at thee, thou pathetic"),
+    N_("Prepare to die, thou"), N_("Resistance is useless,"),
+    N_("Surrender or die, thou"), N_("There shall be no mercy, thou"),
+    N_("Thou shalt repent of thy cunning,"), N_("Thou art as a flea to me,"),
+    N_("Thou art doomed,"), N_("Thy fate is sealed,"),
+    N_("Verily, thou shalt be one dead")
 };
 
 /* Insult or intimidate the player */
@@ -847,20 +847,20 @@ cuss(struct monst *mtmp)
         } else if (u.uhave.amulet && !rn2(SIZE(random_insult))) {
             SetVoice(mtmp, 0, 80, 0);
             verbalize(_("Relinquish the amulet, %s!"),
-                      ROLL_FROM(random_insult));
+                      _(ROLL_FROM(random_insult)));
         } else if (u.uhp < 5 && !rn2(2)) { /* Panic */
             SetVoice(mtmp, 0, 80, 0);
             verbalize(rn2(2) ? _("Even now thy life force ebbs, %s!")
                              : _("Savor thy breath, %s, it be thy last!"),
-                      ROLL_FROM(random_insult));
+                      _(ROLL_FROM(random_insult)));
         } else if (mtmp->mhp < 5 && !rn2(2)) { /* Parthian shot */
             SetVoice(mtmp, 0, 80, 0);
             verbalize(rn2(2) ? _("I shall return.") : _("I'll be back."));
         } else {
             SetVoice(mtmp, 0, 80, 0);
             verbalize(_("%s %s!"),
-                      ROLL_FROM(random_malediction),
-                      ROLL_FROM(random_insult));
+                      _(ROLL_FROM(random_malediction)),
+                      _(ROLL_FROM(random_insult)));
         }
     } else if (is_lminion(mtmp)
                && !(mtmp->isminion && EMIN(mtmp)->renegade)) {

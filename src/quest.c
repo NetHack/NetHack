@@ -241,7 +241,7 @@ finish_quest(struct obj *obj) /* quest artifact or thrown unique item or faux
             qt_pager("hasamulet");
         } else if (obj->otyp == FAKE_AMULET_OF_YENDOR) {
             verbalize(
-      "Sorry to say, this is a mere imitation of the true Amulet of Yendor.");
+      _("Sorry to say, this is a mere imitation of the true Amulet of Yendor."));
         } else {
             verbalize(_("Ah, I see you've found %s."), the(xname(obj)));
         }

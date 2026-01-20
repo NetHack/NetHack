@@ -145,9 +145,9 @@ temple_priest_sound(struct monst *mtmp)
            care if telepathy or extended detection reveals that the
            priest is not currently standing on the altar; he's mobile). */
         static const char *const temple_msg[] = {
-            "*someone praising %s.", "*someone beseeching %s.",
-            "#an animal carcass being offered in sacrifice.",
-            "*a strident plea for donations.",
+            N_("*someone praising %s."), N_("*someone beseeching %s."),
+            N_("#an animal carcass being offered in sacrifice."),
+            N_("*a strident plea for donations."),
         };
         const char *msg;
         int hallu = Hallucination ? 1 : 0;
@@ -169,10 +169,10 @@ temple_priest_sound(struct monst *mtmp)
             ++msg; /* skip control flags */
         if (strchr(msg, '%')) {
             DISABLE_WARNING_FORMAT_NONLITERAL
-            You_hear(msg, halu_gname(EPRI(mtmp)->shralign));
+            You_hear(_(msg), halu_gname(EPRI(mtmp)->shralign));
             RESTORE_WARNING_FORMAT_NONLITERAL
         } else
-            You_hear1(msg);
+            You_hear1(_(msg));
         return TRUE;
     }
     return FALSE;
@@ -547,7 +547,7 @@ const char *
 maybe_gasp(struct monst *mon)
 {
     static const char *const Exclam[] = {
-        "Gasp!", "Uh-oh.", "Oh my!", "What?", "Why?",
+        N_("Gasp!"), N_("Uh-oh."), N_("Oh my!"), N_("What?"), N_("Why?"),
     };
     struct permonst *mptr = mon->data;
     int msound = mptr->msound;
@@ -605,7 +605,7 @@ maybe_gasp(struct monst *mon)
         break;
     }
     if (dogasp) {
-        return ROLL_FROM(Exclam); /* [mon->m_id % SIZE(Exclam)]; */
+        return _(ROLL_FROM(Exclam)); /* [mon->m_id % SIZE(Exclam)]; */
     }
     return (const char *) 0;
 }
@@ -1353,20 +1353,20 @@ dochat(void)
                 pline(_("It's like talking to a wall."));
             } else {
                 static const char *const walltalk[] = {
-                    "gripes about its job.",
-                    "tells you a funny joke!",
-                    "insults your heritage!",
-                    "chuckles.",
-                    "guffaws merrily!",
-                    "deprecates your exploration efforts.",
-                    "suggests a stint of rehab...",
-                    "doesn't seem to be interested.",
+                    N_("gripes about its job."),
+                    N_("tells you a funny joke!"),
+                    N_("insults your heritage!"),
+                    N_("chuckles."),
+                    N_("guffaws merrily!"),
+                    N_("deprecates your exploration efforts."),
+                    N_("suggests a stint of rehab..."),
+                    N_("doesn't seem to be interested."),
                 };
                 int idx = rn2(10);
 
                 if (idx >= SIZE(walltalk))
                     idx = SIZE(walltalk) - 1;
-                pline_The(_("wall %s"), walltalk[idx]);
+                pline_The(_("wall %s"), _(walltalk[idx]));
             }
             return ECMD_OK;
         }

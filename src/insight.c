@@ -55,35 +55,35 @@ struct ll_achieve_msg {
 /* take care to keep them in sync! */
 static struct ll_achieve_msg achieve_msg [] = {
     { 0, "" }, /* actual achievements are numbered from 1 */
-    { LL_ACHIEVE, "acquired the Bell of Opening" },
-    { LL_ACHIEVE, "entered Gehennom" },
-    { LL_ACHIEVE, "acquired the Candelabrum of Invocation" },
-    { LL_ACHIEVE, "acquired the Book of the Dead" },
-    { LL_ACHIEVE, "performed the invocation" },
-    { LL_ACHIEVE, "acquired The Amulet of Yendor" },
-    { LL_ACHIEVE, "entered the Elemental Planes" },
-    { LL_ACHIEVE, "entered the Astral Plane" },
-    { LL_ACHIEVE, "ascended" },
+    { LL_ACHIEVE, N_("acquired the Bell of Opening") },
+    { LL_ACHIEVE, N_("entered Gehennom") },
+    { LL_ACHIEVE, N_("acquired the Candelabrum of Invocation") },
+    { LL_ACHIEVE, N_("acquired the Book of the Dead") },
+    { LL_ACHIEVE, N_("performed the invocation") },
+    { LL_ACHIEVE, N_("acquired The Amulet of Yendor") },
+    { LL_ACHIEVE, N_("entered the Elemental Planes") },
+    { LL_ACHIEVE, N_("entered the Astral Plane") },
+    { LL_ACHIEVE, N_("ascended") },
     /* if the type of item isn't discovered yet, disclosing the event
        via #chronicle would be a spoiler (particularly for gray stone);
        the ID'd name for the type of item will be appended to the next
        two messages, for display via livelog and/or dumplog */
-    { LL_ACHIEVE | LL_SPOILER, "acquired the Mines' End" }, /* " luckstone" */
-    { LL_ACHIEVE | LL_SPOILER, "acquired the Sokoban" }, /* " <item>" */
-    { LL_ACHIEVE | LL_UMONST, "killed Medusa" },
+    { LL_ACHIEVE | LL_SPOILER, N_("acquired the Mines' End") }, /* " luckstone" */
+    { LL_ACHIEVE | LL_SPOILER, N_("acquired the Sokoban") }, /* " <item>" */
+    { LL_ACHIEVE | LL_UMONST, N_("killed Medusa") },
      /* these two are not logged */
-    { 0, "hero was always blond, no, blind" },
-    { 0, "hero never wore armor" },
+    { 0, N_("hero was always blond, no, blind") },
+    { 0, N_("hero never wore armor") },
      /* */
-    { LL_MINORAC | LL_DUMP, "entered the Gnomish Mines" },
-    { LL_ACHIEVE, "reached Mine Town" }, /* probably minor, but dnh logs it */
-    { LL_MINORAC, "entered a shop" },
-    { LL_MINORAC, "entered a temple" },
-    { LL_ACHIEVE, "consulted the Oracle" }, /* minor, but rare enough */
-    { LL_MINORAC | LL_DUMP, "read a Discworld novel" }, /* even more so */
-    { LL_ACHIEVE, "entered Sokoban" }, /* keep as major for turn comparison
+    { LL_MINORAC | LL_DUMP, N_("entered the Gnomish Mines") },
+    { LL_ACHIEVE, N_("reached Mine Town") }, /* probably minor, but dnh logs it */
+    { LL_MINORAC, N_("entered a shop") },
+    { LL_MINORAC, N_("entered a temple") },
+    { LL_ACHIEVE, N_("consulted the Oracle") }, /* minor, but rare enough */
+    { LL_MINORAC | LL_DUMP, N_("read a Discworld novel") }, /* even more so */
+    { LL_ACHIEVE, N_("entered Sokoban") }, /* keep as major for turn comparison
                                         * with completed sokoban */
-    { LL_ACHIEVE, "entered the Bigroom" },
+    { LL_ACHIEVE, N_("entered the Bigroom") },
     /* The following 8 are for advancing through the ranks
        and messages differ by role so are created on the fly;
        rank 0 (Xp 1 and 2) isn't an achievement */
@@ -95,7 +95,7 @@ static struct ll_achieve_msg achieve_msg [] = {
     { LL_ACHIEVE, "" }, /* Xp 22 */
     { LL_ACHIEVE, "" }, /* Xp 26 */
     { LL_ACHIEVE, "" }, /* Xp 30 */
-    { LL_MINORAC, "learned castle drawbridge's tune" }, /* achievement #31 */
+    { LL_MINORAC, N_("learned castle drawbridge's tune") }, /* achievement #31 */
     { 0, "" } /* keep this one at the end */
 };
 

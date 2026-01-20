@@ -108,7 +108,7 @@ staticfn void propagate_chain_lightning(struct chain_lightning_queue *,
 #define uarmfbon 2 /* All metal interferes to some degree */
 
 /* since the spellbook itself doesn't blow up, don't say just "explodes" */
-static const char explodes[] = "radiates explosive energy";
+static const char explodes[] = N_("radiates explosive energy");
 
 /* convert a letter into a number in the range 0..51, or -1 if not a letter */
 staticfn int

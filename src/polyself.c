@@ -419,7 +419,7 @@ newman(void)
         } else {
  dead:      /* we come directly here if experience level went to 0 or less */
             urgent_pline(
-                     "Your new form doesn't seem healthy enough to survive.");
+                     _("Your new form doesn't seem healthy enough to survive."));
             svk.killer.format = KILLED_BY_AN;
             Strcpy(svk.killer.name, "unsuccessful polymorph");
             done(DIED);

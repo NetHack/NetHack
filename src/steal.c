@@ -474,11 +474,11 @@ steal(struct monst *mtmp, char *objnambuf)
 
         if (ostuck || can_carry(mtmp, otmp) == 0) {
             static const char *const how[] = {
-                "steal", "snatch", "grab", "take"
+                N_("steal"), N_("snatch"), N_("grab"), N_("take")
             };
  cant_take:
             pline(_("%s tries to %s %s%s but gives up."), Monnambuf,
-                  ROLL_FROM(how),
+                  _(ROLL_FROM(how)),
                   (otmp->owornmask & W_ARMOR) ? "your " : "",
                   (otmp->owornmask & W_ARMOR) ? armor_simple_name(otmp)
                                               : yname(otmp));

@@ -699,13 +699,13 @@ really_kick_object(coordxy x, coordxy y)
         } else {
             if (rn2(20)) {
                 static NEARDATA const char *const flyingcoinmsg[] = {
-                    "scatter the coins", "knock coins all over the place",
-                    "send coins flying in all directions",
+                    N_("scatter the coins"), N_("knock coins all over the place"),
+                    N_("send coins flying in all directions"),
                 };
 
                 if (!Deaf)
                     pline1(_("Thwwpingg!"));
-                You(_("%s!"), ROLL_FROM(flyingcoinmsg));
+                You(_("%s!"), _(ROLL_FROM(flyingcoinmsg)));
                 (void) scatter(x, y, rnd(3), VIS_EFFECTS | MAY_HIT,
                                gk.kickedobj);
                 newsym(x, y);
@@ -855,10 +855,10 @@ watchman_door_damage(struct monst *mtmp, coordxy x, coordxy y)
         && couldsee(mtmp->mx, mtmp->my)) {
         if (levl[x][y].looted & D_WARNED) {
             mon_yells(mtmp,
-                      "Halt, vandal!  You're under arrest!");
+                      _("Halt, vandal!  You're under arrest!"));
             (void) angry_guards(FALSE);
         } else {
-            mon_yells(mtmp, "Hey, stop damaging that door!");
+            mon_yells(mtmp, _("Hey, stop damaging that door!"));
             levl[x][y].looted |= D_WARNED;
         }
         return TRUE;

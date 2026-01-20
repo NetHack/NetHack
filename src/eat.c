@@ -1986,7 +1986,7 @@ eatcorpse(struct obj *otmp)
         static const char *const palatable_msgs[] = {
             /* first char: T = tastes ... , I = is ... */
             /* veggies are always just "okay" */
-            "Tokay", "Istringy", "Igamey", "Ifatty", "Itough"
+            N_("Tokay"), N_("Istringy"), N_("Igamey"), N_("Ifatty"), N_("Itough")
         };
         int idx = vegetarian(&mons[mnum]) ? 0 : rn2(SIZE(palatable_msgs));
         const char *palat_msg = palatable_msgs[idx];
@@ -2483,21 +2483,21 @@ eatspecial(void)
 /* NOTE: the order of these words exactly corresponds to the
    order of oc_material values #define'd in objclass.h. */
 static const char *const foodwords[] = {
-    "meal",    "liquid",  "wax",       "food", "meat",     "paper",
-    "cloth",   "leather", "wood",      "bone", "scale",    "metal",
-    "metal",   "metal",   "silver",    "gold", "platinum", "mithril",
-    "plastic", "glass",   "rich food", "stone"
+    N_("meal"),    N_("liquid"),  N_("wax"),       N_("food"), N_("meat"),     N_("paper"),
+    N_("cloth"),   N_("leather"), N_("wood"),      N_("bone"), N_("scale"),    N_("metal"),
+    N_("metal"),   N_("metal"),   N_("silver"),    N_("gold"), N_("platinum"), N_("mithril"),
+    N_("plastic"), N_("glass"),   N_("rich food"), N_("stone")
 };
 
 staticfn const char *
 foodword(struct obj *otmp)
 {
     if (otmp->oclass == FOOD_CLASS)
-        return "food";
+        return _("food");
     if (otmp->oclass == GEM_CLASS && objects[otmp->otyp].oc_material == GLASS
         && otmp->dknown)
         makeknown(otmp->otyp);
-    return foodwords[objects[otmp->otyp].oc_material];
+    return _(foodwords[objects[otmp->otyp].oc_material]);
 }
 
 /* called after consuming (non-corpse) food */

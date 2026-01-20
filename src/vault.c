@@ -519,7 +519,7 @@ invault(void)
                 } else {
                     SetVoice(guard, 0, 80, 0);
                     verbalize(
-                         "Oh, yes, of course.  Sorry to have disturbed you.");
+                         _("Oh, yes, of course.  Sorry to have disturbed you."));
                 }
                 mongone(guard);
             } else {
@@ -531,7 +531,7 @@ invault(void)
                 } else {
                    SetVoice(guard, 0, 80, 0);
                    verbalize(
-                           "Back from the dead, are you?  I'll remedy that!");
+                           _("Back from the dead, are you?  I'll remedy that!"));
                 }
                 /* don't want guard to waste next turn wielding a weapon */
                 if (!MON_WEP(guard)) {
@@ -571,13 +571,13 @@ invault(void)
             if (Deaf) {
                 if (!Blind)
                     pline(
-                       "%s holds out %s palm and beckons with %s other hand.",
+                       _("%s holds out %s palm and beckons with %s other hand."),
                           noit_Monnam(guard), noit_mhis(guard),
                           noit_mhis(guard));
             } else {
                 SetVoice(guard, 0, 80, 0);
                 verbalize(
-                    "Most likely all your gold was stolen from this vault.");
+                    _("Most likely all your gold was stolen from this vault."));
                 SetVoice(guard, 0, 80, 0);
                 verbalize(_("Please drop that gold and follow me."));
             }

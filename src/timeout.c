@@ -276,19 +276,19 @@ sleep_dialogue(void)
 DISABLE_WARNING_FORMAT_NONLITERAL   /* RESTORE is after slime_dialogue */
 
 static NEARDATA const char *const choke_texts[] = {
-    "You find it hard to breathe.",
-    "You're gasping for air.",
-    "You can no longer breathe.",
-    "You're turning %s.",
-    "You suffocate."
+    N_("You find it hard to breathe."),
+    N_("You're gasping for air."),
+    N_("You can no longer breathe."),
+    N_("You're turning %s."),
+    N_("You suffocate.")
 };
 
 static NEARDATA const char *const choke_texts2[] = {
-    "Your %s is becoming constricted.",
-    "Your blood is having trouble reaching your brain.",
-    "The pressure on your %s increases.",
-    "Your consciousness is fading.",
-    "You suffocate."
+    N_("Your %s is becoming constricted."),
+    N_("Your blood is having trouble reaching your brain."),
+    N_("The pressure on your %s increases."),
+    N_("Your consciousness is fading."),
+    N_("You suffocate.")
 };
 
 staticfn void
@@ -298,15 +298,15 @@ choke_dialogue(void)
 
     if (i > 0 && i <= SIZE(choke_texts)) {
         if (Breathless || !rn2(50)) {
-            urgent_pline(choke_texts2[SIZE(choke_texts2) - i],
+            urgent_pline(_(choke_texts2[SIZE(choke_texts2) - i]),
                          body_part(NECK));
         } else {
-            const char *str = choke_texts[SIZE(choke_texts) - i];
+            const char *str = _(choke_texts[SIZE(choke_texts) - i]);
 
             if (strchr(str, '%'))
                 urgent_pline(str, hcolor(NH_BLUE));
             else
-                urgent_pline(_("%s"), str);
+                urgent_pline("%s", str);
             stop_occupation();
         }
     }
@@ -314,9 +314,9 @@ choke_dialogue(void)
 }
 
 static NEARDATA const char *const sickness_texts[] = {
-    "Your illness feels worse.",
-    "Your illness is severe.",
-    "You are at Death's door.",
+    N_("Your illness feels worse."),
+    N_("Your illness is severe."),
+    N_("You are at Death's door."),
 };
 
 staticfn void
@@ -327,7 +327,7 @@ sickness_dialogue(void)
     if (i > 0L && i <= SIZE(sickness_texts) && (j % 2) != 0) {
         char buf[BUFSZ], pronounbuf[40];
 
-        Strcpy(buf, sickness_texts[SIZE(sickness_texts) - i]);
+        Strcpy(buf, _(sickness_texts[SIZE(sickness_texts) - i]));
         /* change the message slightly for food poisoning */
         if ((u.usick_type & SICK_NONVOMITABLE) == 0)
             (void) strsubst(buf, "illness", "sickness");
@@ -345,8 +345,8 @@ sickness_dialogue(void)
 }
 
 static NEARDATA const char *const levi_texts[] = {
-    "You float slightly lower.",
-    "You wobble unsteadily %s the %s."
+    N_("You float slightly lower."),
+    N_("You wobble unsteadily %s the %s.")
 };
 
 staticfn void
@@ -363,14 +363,14 @@ levitation_dialogue(void)
         return;
 
     if (((HLevitation & TIMEOUT) % 2L) && i > 0L && i <= SIZE(levi_texts)) {
-        const char *s = levi_texts[SIZE(levi_texts) - i];
+        const char *s = _(levi_texts[SIZE(levi_texts) - i]);
 
         if (strchr(s, '%')) {
             boolean danger = (is_pool_or_lava(u.ux, u.uy)
                               && !Is_waterlevel(&u.uz));
 
-            urgent_pline(s, danger ? "over" : "in",
-                         danger ? surface(u.ux, u.uy) : "air");
+            urgent_pline(s, danger ? _("over") : _("in"),
+                         danger ? surface(u.ux, u.uy) : _("air"));
         } else
             pline1(s);
         stop_occupation();
@@ -378,11 +378,11 @@ levitation_dialogue(void)
 }
 
 static NEARDATA const char *const slime_texts[] = {
-    "You are turning a little %s.",   /* 5 */
-    "Your limbs are getting oozy.",   /* 4 */
-    "Your skin begins to peel away.", /* 3 */
-    "You are turning into %s.",       /* 2 */
-    "You have become %s."             /* 1 */
+    N_("You are turning a little %s."),   /* 5 */
+    N_("Your limbs are getting oozy."),   /* 4 */
+    N_("Your skin begins to peel away."), /* 3 */
+    N_("You are turning into %s."),       /* 2 */
+    N_("You have become %s.")             /* 1 */
 };
 
 staticfn void
@@ -404,9 +404,9 @@ slime_dialogue(void)
     if ((t % 2L) != 0L && i >= 0L && i < SIZE(slime_texts)) {
         char buf[BUFSZ];
 
-        Strcpy(buf, slime_texts[SIZE(slime_texts) - i - 1L]);
-        if (nolimbs(gy.youmonst.data) && strstri(buf, "limbs"))
-            (void) strsubst(buf, "limbs", "extremities");
+        Strcpy(buf, _(slime_texts[SIZE(slime_texts) - i - 1L]));
+        if (nolimbs(gy.youmonst.data) && strstri(buf, _("limbs")))
+            (void) strsubst(buf, _("limbs"), _("extremities"));
 
         if (strchr(buf, '%')) {
             if (i == 4L) {  /* "you are turning green" */
@@ -414,10 +414,10 @@ slime_dialogue(void)
                     urgent_pline(buf, hcolor(NH_GREEN));
             } else {
                 urgent_pline(buf, an(Hallucination ? rndmonnam(NULL)
-                                                   : "green slime"));
+                                                   : _("green slime")));
             }
         } else {
-            urgent_pline(_("%s"), buf);
+            urgent_pline("%s", buf);
         }
     }
 

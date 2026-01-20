@@ -150,10 +150,10 @@ static const char *readchar_queue = "";
 
 /* for rejecting attempts to use wizard mode commands
  * Also used in wizcmds.c  */
-const char unavailcmd[] = "Unavailable command '%s'.";
+const char unavailcmd[] = N_("Unavailable command '%s'.");
 
 /* for rejecting #if !SHELL, !SUSPEND */
-static const char cmdnotavail[] = "'%s' command not available.";
+static const char cmdnotavail[] = N_("'%s' command not available.");
 
 /* the #prevmsg command */
 staticfn int
@@ -5441,7 +5441,7 @@ dosuspend_core(void)
         urealtime.start_timing = getnow(); /* resume keeping track of time */
     } else
 #endif
-        Norep(cmdnotavail, "#suspend");
+        Norep(_(cmdnotavail), "#suspend");
     return ECMD_OK;
 }
 
@@ -5458,7 +5458,7 @@ dosh_core(void)
     dosh();
     urealtime.start_timing = getnow();
 #else
-    Norep(cmdnotavail, "#shell");
+    Norep(_(cmdnotavail), "#shell");
 #endif
     return ECMD_OK;
 }
