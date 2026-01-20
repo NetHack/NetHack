@@ -1625,7 +1625,7 @@ meatobj(struct monst *mtmp) /* for gelatinous cubes */
             pline1(buf);
         else if (flags.verbose)
             You_hear(_("%s slurping sound%s."),
-                     (ecount == 1) ? "a" : "several", plur(ecount));
+                     (ecount == 1) ? _("a") : _("several"), plur(ecount));
     }
     return (count > 0 || ecount > 0) ? 1 : 0;
 }
@@ -3049,7 +3049,7 @@ logdeadmon(struct monst *mtmp, int mndx)
             if (howmany > 1) /* "(2nd time)" or "(50th time)" */
                 Sprintf(xtra, " (%d%s time)", howmany, ordin(howmany));
 
-            mkilled = nonliving(mtmp->data) ? "destroyed" : "killed";
+            mkilled = nonliving(mtmp->data) ? _("destroyed") : _("killed");
             /* hero is responsible: "killed <monst>" */
             if (herodidit)
                 livelog_printf(llevent_type, "%s %s%s%s",

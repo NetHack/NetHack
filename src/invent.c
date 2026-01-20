@@ -3763,15 +3763,15 @@ dounpaid(
     if (xtracount > 0) { /* floorcount + buriedcount > 0 */
         char buf[BUFSZ];
         const char
-            *floorverb = (xtracount > 1) ? "are" : "is",
+            *floorverb = (xtracount > 1) ? _("are") : _("is"),
             /* "under the floor" might actually be "under the floor
                beneath a wall" when shop repair is involved but that seems
                too nit-picky to bother trying to handle here (even more
                extreme description-wise:  "under the floor beneath the
                door/doorway") */
-            *where = (buriedcount == 0) ? "on the floor"
-                     : (floorcount == 0) ? "under the floor"
-                       : "on or under the floor";
+            *where = (buriedcount == 0) ? _("on the floor")
+                     : (floorcount == 0) ? _("under the floor")
+                       : _("on or under the floor");
 
         if (!count) {
             You(_("aren't carrying any unpaid items but there %s %d %s."),
@@ -5504,19 +5504,19 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
        has already used bhitpile() which will have set dknown on all items) */
     if (is_pool_or_lava(x, y) && !Underwater
         && (obj = svl.level.objects[x][y]) != 0) {
-        const char *real_liquid = is_pool(x, y) ? "water" : "lava",
+        const char *real_liquid = is_pool(x, y) ? _("water") : _("lava"),
                    *seen_liquid = hliquid(real_liquid);
 
         if (!obj->nexthere) {
             boolean more_than_1 = is_plural(obj);
 
-            There(_("%s %s under the %s here."), more_than_1 ? "are" : "is",
+            There(_("%s %s under the %s here."), more_than_1 ? _("are") : _("is"),
                   doname(obj), seen_liquid);
             n2 = 1;
             /* "pair of boots" is singular but "beneath it" sounds strange */
             if (pair_of(obj))
                 more_than_1 = TRUE;
-            underwhat = more_than_1 ? "under them" : "beneath it";
+            underwhat = more_than_1 ? _("under them") : _("beneath it");
         } else {
             Sprintf(qbuf, _("Things that are under the %s here:"), seen_liquid);
             if (query_objlist(qbuf, &svl.level.objects[x][y], BY_NEXTHERE,
