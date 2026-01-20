@@ -247,7 +247,7 @@ do_mgivenname(void)
         return;
     }
     /* special case similar to the one in lookat() */
-    Sprintf(qbuf, "What do you want to call %s?",
+    Sprintf(qbuf, _("What do you want to call %s?"),
             distant_monnam(mtmp, ARTICLE_THE, monnambuf));
     /* use getlin() to get a name string from the player */
     if (!name_from_player(buf, qbuf,
@@ -299,8 +299,8 @@ do_oname(struct obj *obj)
         return;
     }
 
-    Sprintf(qbuf, "What do you want to name %s ",
-            is_plural(obj) ? "these" : "this");
+    Sprintf(qbuf, _("What do you want to name %s "),
+            is_plural(obj) ? _("these") : _("this"));
     (void) safe_qbuf(qbuf, qbuf, "?", obj, xname, simpleonames, "item");
     /* use getlin() to get a name string from the player */
     if (!name_from_player(buf, qbuf, safe_oname(obj)))

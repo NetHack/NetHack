@@ -4841,9 +4841,9 @@ get_count(
         if (cnt > 9 || backspaced || echoalways) {
             clear_nhwindow(WIN_MESSAGE);
             if (backspaced && !cnt && !showzero) {
-                Sprintf(qbuf, "Count: ");
+                Sprintf(qbuf, _("Count: "));
             } else {
-                Sprintf(qbuf, "Count: %ld", cnt);
+                Sprintf(qbuf, _("Count: %ld"), cnt);
                 backspaced = FALSE;
             }
             custompline(SUPPRESS_HISTORY, "%s", qbuf);
@@ -4852,7 +4852,7 @@ get_count(
     }
 
     if (historicmsg || (conditionalmsg && *count != first)) {
-        Sprintf(qbuf, "Count: %ld ", *count);
+        Sprintf(qbuf, _("Count: %ld "), *count);
         (void) key2txt((uchar) key, eos(qbuf));
         putmsghistory(qbuf, FALSE);
     }

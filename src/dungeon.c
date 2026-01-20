@@ -2510,7 +2510,7 @@ query_annotation(d_level *lev)
     if (mptr->custom) {
         char tmpbuf[BUFSZ];
 
-        Sprintf(tmpbuf, "Replace annotation \"%.30s%s\" with?", mptr->custom,
+        Sprintf(tmpbuf, _("Replace annotation \"%.30s%s\" with?"), mptr->custom,
                 (strlen(mptr->custom) > 30) ? "..." : "");
         getlin(tmpbuf, nbuf);
     } else
@@ -2519,7 +2519,7 @@ query_annotation(d_level *lev)
         char qbuf[QBUFSZ], lbuf[QBUFSZ]; /* level description */
 
         if (!lev || on_level(&u.uz, lev)) {
-            Strcpy(lbuf, "this dungeon level");
+            Strcpy(lbuf, _("this dungeon level"));
         } else {
             int dflgs = (lev->dnum == u.uz.dnum) ? 0 : 2;
             d_level save_uz = u.uz;
@@ -3423,9 +3423,9 @@ endgamelevelname(char *outbuf, int indx)
         break;
     }
     if (planename)
-        Sprintf(outbuf, "Plane of %s", planename);
+        Sprintf(outbuf, _("Plane of %s"), planename);
     else if (!*outbuf)
-        Sprintf(outbuf, "unknown plane #%d", indx);
+        Sprintf(outbuf, _("unknown plane #%d"), indx);
     return outbuf;
 }
 
