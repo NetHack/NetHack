@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 12:37+0900\n"
+"POT-Creation-Date: 2026-01-20 12:47+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -172,6 +172,11 @@ msgstr "%s{이/가} 이제 깨끗해진 느낌이다."
 #, c-format
 msgid "%s and %s are already clean."
 msgstr "%s{과/와} %s{은/는} 이미 깨끗하다."
+
+#: src/apply.c:230
+#, fuzzy
+msgid "You're both stoned"
+msgstr "돌로 변했다..."
 
 #: src/apply.c:247
 #, c-format
@@ -356,14 +361,13 @@ msgstr "이상한"
 #: src/detect.c:998 src/do.c:1800 src/do_wear.c:495 src/do_wear.c:1162
 #: src/dog.c:1206 src/dokick.c:63 src/eat.c:1085 src/eat.c:1092 src/eat.c:1259
 #: src/eat.c:3469 src/explode.c:795 src/getpos.c:986 src/invent.c:2046
-#: src/invent.c:3142 src/invent.c:4531 src/mail.c:375 src/mhitu.c:1642
-#: src/mon.c:2955 src/mon.c:2957 src/muse.c:2901 src/muse.c:3110
-#: src/music.c:616 src/objnam.c:3664 src/objnam.c:3713 src/objnam.c:3844
-#: src/potion.c:1674 src/pray.c:576 src/pray.c:1489 src/pray.c:1760
-#: src/read.c:1338 src/read.c:2609 src/read.c:2813 src/sit.c:497
-#: src/teleport.c:1072 src/teleport.c:1369 src/trap.c:4570 src/uhitm.c:2976
-#: src/vault.c:872 src/wield.c:230 src/wield.c:659 src/wield.c:889
-#: src/wield.c:986
+#: src/invent.c:3142 src/mail.c:375 src/mhitu.c:1642 src/mon.c:2955
+#: src/mon.c:2957 src/muse.c:2901 src/muse.c:3110 src/music.c:616
+#: src/objnam.c:3664 src/objnam.c:3713 src/objnam.c:3844 src/potion.c:1674
+#: src/pray.c:576 src/pray.c:1489 src/pray.c:1760 src/read.c:1338
+#: src/read.c:2609 src/read.c:2813 src/sit.c:497 src/teleport.c:1072
+#: src/teleport.c:1369 src/trap.c:4570 src/uhitm.c:2976 src/vault.c:872
+#: src/wield.c:230 src/wield.c:659 src/wield.c:889 src/wield.c:986
 #, c-format
 msgid "%s."
 msgstr "%s."
@@ -6893,6 +6897,11 @@ msgstr "보상을 받으러 갔다"
 msgid "escaped from the dungeon"
 msgstr "던전을 탈출했다"
 
+#: src/end.c:1627
+#, fuzzy, c-format
+msgid "Contents of %s:"
+msgstr "그 내용물이 쏟아졌다."
+
 #: src/end.c:1663 src/pickup.c:4029
 #, c-format
 msgid "%s is empty."
@@ -8493,6 +8502,252 @@ msgstr "당신은 죽었다..."
 msgid "do that while carrying so much stuff."
 msgstr "그렇게 많은 짐을 들고는 그렇게 할 수 없다."
 
+#: src/iactions.c:505
+#, fuzzy
+msgid "Put this amulet on"
+msgstr "%s에게 안장을 씌웠다."
+
+#
+#: src/iactions.c:506
+#, fuzzy
+msgid "[already wearing an amulet]"
+msgstr "부적을 걸고 있지 않다."
+
+#: src/iactions.c:509
+msgid "Put this ring on"
+msgstr ""
+
+#: src/iactions.c:511
+#, fuzzy, c-format
+msgid "[both ring %s in use]"
+msgstr "%s{을/를} 슬라임으로 만들었다."
+
+#: src/iactions.c:516
+#, fuzzy
+msgid "[already wearing eyewear]"
+msgstr "이미 %s{을/를} 입고 있다%c"
+
+#: src/iactions.c:518
+#, fuzzy
+msgid "Put these lenses on"
+msgstr "%s에게 안장을 씌웠다."
+
+#: src/iactions.c:520
+#, fuzzy, c-format
+msgid "Put this on%s"
+msgstr "%s에게 안장을 씌웠다."
+
+#: src/iactions.c:521
+#, fuzzy
+msgid " to blindfold yourself"
+msgstr "정신을 차리니"
+
+# ============================================================
+# 전투 메시지 추가 (Additional Combat Messages)
+# ============================================================
+#: src/iactions.c:529
+#, fuzzy, c-format
+msgid "Quaff (drink) %s"
+msgstr "%s{이/가} %s!"
+
+#: src/iactions.c:530
+#, fuzzy
+msgid "one of these potions"
+msgstr "순간이동의 반지"
+
+# Item type names (note: "potion" is already defined elsewhere)
+#: src/iactions.c:530
+#, fuzzy
+msgid "this potion"
+msgstr " 물약"
+
+#: src/iactions.c:537
+#, c-format
+msgid "Quiver this %s for easy %s with 'f'ire"
+msgstr ""
+
+#: src/iactions.c:538 src/iactions.c:613 src/iactions.c:623
+#, fuzzy
+msgid "stack"
+msgstr "공격한다"
+
+#: src/iactions.c:538 src/iactions.c:613 src/iactions.c:623
+#, fuzzy
+msgid "item"
+msgstr "아이템들"
+
+#: src/iactions.c:539
+#, fuzzy
+msgid "shooting"
+msgstr "쏘았다"
+
+#: src/iactions.c:539
+#, fuzzy
+msgid "throwing"
+msgstr "던질"
+
+#: src/iactions.c:549
+#, fuzzy, c-format
+msgid "Remove this %s"
+msgstr "%s{이/가} %s{을/를} 벗었다."
+
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
+# 부적
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
+# --- 부적 (Amulets) ---
+#: src/iactions.c:550 src/obj_descr_i18n.c:112 src/obj_descr_i18n.c:357
+#: src/objnam.c:249
+msgid "amulet"
+msgstr "부적"
+
+#: src/iactions.c:551 src/obj_descr_i18n.c:111 src/obj_descr_i18n.c:354
+#: src/objnam.c:243 src/objnam.c:907 src/objnam.c:911
+#, fuzzy
+msgid "ring"
+msgstr "%s 반지"
+
+#: src/iactions.c:552
+#, fuzzy
+msgid "eyewear"
+msgstr "입을"
+
+#: src/iactions.c:553
+msgid "accessory"
+msgstr ""
+
+#: src/iactions.c:558
+#, fuzzy, c-format
+msgid "Rub this %s"
+msgstr "%s{이/가} %s{을/를} 때렸다."
+
+#: src/iactions.c:561
+#, fuzzy
+msgid "Rub something on this stone"
+msgstr "분수에서 마시겠습니까?"
+
+# ============================================================
+# 전투 메시지 추가 (Additional Combat Messages)
+# ============================================================
+#: src/iactions.c:575 src/uhitm.c:1627 src/uhitm.c:5700
+#, c-format
+msgid "%s %s%s"
+msgstr "%s %s%s"
+
+#: src/iactions.c:575
+msgid "Shoot"
+msgstr ""
+
+#: src/iactions.c:575
+#, fuzzy
+msgid "Throw"
+msgstr "던질"
+
+#: src/iactions.c:576
+#, fuzzy
+msgid "this item"
+msgstr "이것"
+
+#: src/iactions.c:577
+msgid "them"
+msgstr ""
+
+#: src/iactions.c:578
+#, fuzzy
+msgid "one of these"
+msgstr "하나의 "
+
+#: src/iactions.c:585
+msgid " (same as 'f')"
+msgstr ""
+
+#: src/iactions.c:591
+msgid "Take off this armor"
+msgstr ""
+
+#: src/iactions.c:595
+msgid "Tip all the contents out of this container"
+msgstr ""
+
+#: src/iactions.c:604
+msgid "Try to invoke a unique power of this object"
+msgstr ""
+
+#: src/iactions.c:612
+#, fuzzy, c-format
+msgid "Wield this %s as your weapon"
+msgstr "입고 있는 %s{을/를} 먹는다."
+
+#: src/iactions.c:617
+msgid "Wield the tin opener to easily open tins"
+msgstr ""
+
+#: src/iactions.c:622
+#, fuzzy, c-format
+msgid "Wield this %s in your %s"
+msgstr "맨%s{으로/로} %s{을/를} 휘두른다."
+
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
+# 방어구 - 갑옷
+#: src/iactions.c:643
+#, fuzzy
+msgid "Wear this armor"
+msgstr "가죽 갑옷"
+
+#: src/iactions.c:645
+#, fuzzy, c-format
+msgid "[already wearing %s]"
+msgstr "이미 %s{을/를} 입고 있다%c"
+
+#: src/iactions.c:654
+#, fuzzy
+msgid "Swap this with your alternate weapon"
+msgstr "보조 무기는"
+
+#: src/iactions.c:657
+msgid "Ready this as an alternate weapon"
+msgstr "이것을 보조 무기로 준비"
+
+#: src/iactions.c:660
+#, fuzzy
+msgid "Swap this with your main weapon"
+msgstr "주무기로 전환한다."
+
+#: src/iactions.c:680
+#, fuzzy, c-format
+msgid "Toggle two-weapon combat %s"
+msgstr "이도류 전투를 시작한다."
+
+#: src/iactions.c:680
+#, fuzzy
+msgid "off"
+msgstr "바칠"
+
+#: src/iactions.c:680 src/trap.c:4965
+msgid "on"
+msgstr "위"
+
+#: src/iactions.c:689
+msgid "Zap this wand to release its magic"
+msgstr "이 지팡이를 휘둘러 마법을 발동"
+
+#: src/iactions.c:693
+#, c-format
+msgid "Look up information about %s"
+msgstr "%s에 대한 정보 조회"
+
+#: src/iactions.c:694
+msgid "these"
+msgstr "이것들"
+
+#: src/iactions.c:694 src/lock.c:475
+msgid "this"
+msgstr "이것"
+
+#: src/iactions.c:698
+#, fuzzy, c-format
+msgid "Do what with %s?"
+msgstr "%s{으로/로} 그것을 할 수 없다."
+
 #: src/insight.c:58
 #, fuzzy
 msgid "acquired the Bell of Opening"
@@ -9086,6 +9341,40 @@ msgstr "맨 %s{으로/로} %s{을/를} 만졌다."
 msgid "Touching %s is a fatal mistake..."
 msgstr "%s{을/를} 만지는 것은 치명적인 실수다..."
 
+#: src/invent.c:4520
+#, fuzzy
+msgid "Your wallet is empty"
+msgstr "병이 심각하다."
+
+#: src/invent.c:4522
+#, c-format
+msgid "Your wallet contains %ld %s"
+msgstr "지갑에 %ld %s이(가) 있습니다"
+
+#: src/invent.c:4527
+#, fuzzy, c-format
+msgid ", %s you have %ld %s stashed away in your pack"
+msgstr "%s{이/가} 배낭의 %s에서 %s 나왔다!"
+
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
+# 지팡이
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
+# --- 지팡이 (Wands) ---
+#: src/invent.c:4528
+#, fuzzy
+msgid "and"
+msgstr "지팡이"
+
+#: src/invent.c:4528
+#, fuzzy
+msgid "but"
+msgstr "들이받았다"
+
+#: src/invent.c:4529
+#, fuzzy
+msgid "more"
+msgstr "개 더"
+
 #: src/invent.c:4535
 #, c-format
 msgid "are carrying a total of %ld %s."
@@ -9342,10 +9631,6 @@ msgstr "확인하기 "
 #, fuzzy
 msgid " for a trap?"
 msgstr "함정을 찾았다!"
-
-#: src/lock.c:475
-msgid "this"
-msgstr "이것"
 
 #: src/lock.c:486
 #, c-format
@@ -10394,6 +10679,16 @@ msgstr "잠깐, %s! 그건 %s라는 이름의 %s{이다/다}!"
 #, c-format
 msgid "Wait, %s!  That %s is really %s named %s!"
 msgstr "잠깐, %s! 그 %s{은/는} 사실 %s라는 이름의 %s!"
+
+#: src/mhitu.c:698
+#, fuzzy, c-format
+msgid "You appear to be %s again."
+msgstr "다시 움직일 수 있다."
+
+#: src/mhitu.c:701
+#, fuzzy
+msgid "yourself"
+msgstr "정신을 차리니"
 
 #: src/mhitu.c:745
 #, fuzzy, c-format
@@ -12554,6 +12849,11 @@ msgstr "이동 시간을 #%ld로 재설정."
 msgid "Ordering of discoveries"
 msgstr "장식의 반지"
 
+#: src/o_init.c:751
+#, fuzzy, c-format
+msgid "Discoveries, %s"
+msgstr "발견한 물품"
+
 #: src/o_init.c:761
 msgid "Unique items"
 msgstr "고유 물품"
@@ -12565,6 +12865,24 @@ msgstr "아직 아무것도 발견하지 못했다..."
 #: src/o_init.c:818
 msgid "Discovered items"
 msgstr "발견한 물품"
+
+#: src/o_init.c:1014
+#, fuzzy, c-format
+msgid "Discovered %s in %s"
+msgstr "발견한 물품"
+
+#: src/o_init.c:1015
+#, fuzzy
+msgid "order of discovery"
+msgstr "장식의 반지"
+
+#: src/o_init.c:1016
+msgid "'sortloot' order"
+msgstr "'sortloot' 순서"
+
+#: src/o_init.c:1017
+msgid "alphabetical order"
+msgstr "알파벳 순"
 
 #: src/o_init.c:1109
 msgid "None of your discoveries can be assigned names..."
@@ -12912,20 +13230,6 @@ msgstr "두루마리"
 #: src/objnam.c:874 src/objnam.c:878
 msgid "wand"
 msgstr "지팡이"
-
-#: src/obj_descr_i18n.c:111 src/obj_descr_i18n.c:354 src/objnam.c:243
-#: src/objnam.c:907 src/objnam.c:911
-#, fuzzy
-msgid "ring"
-msgstr "%s 반지"
-
-# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
-# 부적
-# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
-# --- 부적 (Amulets) ---
-#: src/obj_descr_i18n.c:112 src/obj_descr_i18n.c:357 src/objnam.c:249
-msgid "amulet"
-msgstr "부적"
 
 # #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 # 마법서
@@ -13584,11 +13888,11 @@ msgstr " 점수:%s"
 # ============================================================
 # 공통 문자열 (decl.h macros)
 # ============================================================
-#: src/obj_descr_i18n.c:301 include/decl.h:37
+#: src/obj_descr_i18n.c:301
 msgid "Something"
 msgstr "무언가"
 
-#: src/obj_descr_i18n.c:302 include/decl.h:36
+#: src/obj_descr_i18n.c:302
 msgid "something"
 msgstr "무언가"
 
@@ -14468,6 +14772,11 @@ msgstr "통로"
 msgid "status"
 msgstr "상태"
 
+#: src/options.c:5666
+#, c-format
+msgid "Select '%.20s' actions:"
+msgstr "'%.20s' 동작 선택:"
+
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
@@ -14479,6 +14788,35 @@ msgstr "'%s' %s '%s'."
 #: src/options.c:5722
 msgid "Change which disclosure options categories:"
 msgstr "공개 옵션 범주 변경:"
+
+#: src/options.c:5737
+#, fuzzy, c-format
+msgid "Disclosure options for %s:"
+msgstr "공개 옵션 범주 변경:"
+
+#: src/options.c:5746
+msgid "Never disclose, without prompting"
+msgstr "묻지 않고 항상 비공개"
+
+#: src/options.c:5752
+msgid "Always disclose, without prompting"
+msgstr "묻지 않고 항상 공개"
+
+#: src/options.c:5759
+msgid "Always disclose, pick sort order from menu"
+msgstr "항상 공개, 메뉴에서 정렬 순서 선택"
+
+#: src/options.c:5766
+msgid "Prompt, with default answer of \"No\""
+msgstr "질문, 기본 답변 \"아니오\""
+
+#: src/options.c:5772
+msgid "Prompt, with default answer of \"Yes\""
+msgstr "질문, 기본 답변 \"예\""
+
+#: src/options.c:5779
+msgid "Prompt, with default answer of \"Ask\" to request sort menu"
+msgstr "질문, 기본 답변 \"정렬 메뉴\""
 
 #: src/options.c:5835
 msgid "Set object symbols in menus to what?"
@@ -14577,6 +14915,10 @@ msgstr "메시지 표시 방법"
 msgid "out of menu map space."
 msgstr "메뉴 맵 공간이 부족하다."
 
+#: src/options.c:8619
+msgid "Use command '#optionsfull' to get the complete options list."
+msgstr "'#optionsfull' 명령어를 사용하여 전체 옵션 목록을 확인하세요."
+
 #: src/options.c:8690
 msgid "Options"
 msgstr "옵션"
@@ -14588,6 +14930,29 @@ msgstr "어떤 옵션을 설정할까요?"
 #: src/options.c:9158
 msgid "Menu control keys:"
 msgstr "메뉴 조작 키:"
+
+#: src/options.c:9326
+#, fuzzy, c-format
+msgid "ON, for %s objects%s"
+msgstr "%s물건%s{이/가} 없다."
+
+#: src/options.c:9326
+#, fuzzy
+msgid "all"
+msgstr "벽"
+
+#: src/options.c:9329
+msgid ", with one exception"
+msgstr ", 예외 1개"
+
+#: src/options.c:9330
+#, fuzzy
+msgid ", with some exceptions"
+msgstr "게임 옵션 목록."
+
+#: src/options.c:9333
+msgid "OFF"
+msgstr ""
 
 #: src/options.c:9335
 #, c-format
@@ -18950,10 +19315,11 @@ msgstr "투명한 손님은 환영하지 않습니다!"
 #: src/shk.c:747
 #, c-format
 msgid "%s stands firm as if %s knows you are there."
-msgstr "%s는 당신이 거기 있다는 것을 알듯이 굳건하게 서 있다."
+msgstr ""
 "%s는 당신이 거기 있다는 것을 알듯이 굳건하게 서 있다.%s는 당신이 거기 있다는 "
-"것을 알듯이 꿋꿋하게 서 있다.%s{이/가} 마치 당신이 거기 있다는 것을 %s 알고 "
-"있는 것처럼 굳건히 서 있다."
+"것을 알듯이 굳건하게 서 있다.%s는 당신이 거기 있다는 것을 알듯이 꿋꿋하게 서 "
+"있다.%s{이/가} 마치 당신이 거기 있다는 것을 %s 알고 있는 것처럼 굳건히 서 있"
+"다."
 
 #: src/shk.c:758
 #, c-format
@@ -19679,10 +20045,11 @@ msgstr "%s{이/가} 신을 섬기는 자들이 번영한다는 것을 알아챘�
 #: src/shk.c:5450
 #, c-format
 msgid "%s says: 'Don't try to steal from me - I have friends in high places!'"
-msgstr "%s가 말한다: '나한테 훔치려 하지 마 - 높은 곳에 친구들이 있거든!'"
+msgstr ""
 "%s가 말한다: '나한테 훔치려 하지 마 - 높은 곳에 친구들이 있거든!'%s가 말한"
-"다: '나한테 훔치려 하지 마 - 높은 곳에 친구들이 있거든!'%s{이/가} 말한다: '나"
-"한테서 훔치려 하지 마세요 - 높은 곳에 친구가 있어요!'"
+"다: '나한테 훔치려 하지 마 - 높은 곳에 친구들이 있거든!'%s가 말한다: '나한테 "
+"훔치려 하지 마 - 높은 곳에 친구들이 있거든!'%s{이/가} 말한다: '나한테서 훔치"
+"려 하지 마세요 - 높은 곳에 친구가 있어요!'"
 
 #: src/shk.c:5451
 #, c-format
@@ -19821,6 +20188,11 @@ msgstr "doormax=%d doorct=%d fdoor=%d"
 #, c-format
 msgid "door [%d,%d]"
 msgstr "문 [%d,%d]"
+
+#: src/shknam.c:761
+#, fuzzy
+msgid "Closed for inventory"
+msgstr "영구 인벤토리 모드 선택:"
 
 #: src/sit.c:28
 msgid "a strange sensation."
@@ -21594,6 +21966,15 @@ msgstr "%s{이/가} 아직 먹고 있다."
 msgid "are no appropriate %s symbol sets available."
 msgstr "적절한 %s 기호 세트가 없다."
 
+#: src/symbols.c:1018
+#, fuzzy, c-format
+msgid "Select %ssymbol set:"
+msgstr "메뉴 스타일 선택:"
+
+#: src/symbols.c:1019
+msgid "rogue level "
+msgstr "로그 레벨 "
+
 #: src/symbols.c:1057
 #, c-format
 msgid "Unable to access \"%s\" file."
@@ -23226,10 +23607,6 @@ msgstr "공기 방울"
 msgid "mid air"
 msgstr "허공"
 
-#: src/trap.c:4965
-msgid "on"
-msgstr "위"
-
 #: src/trap.c:4968
 #, c-format
 msgid "%s on top of %s."
@@ -23533,6 +23910,25 @@ msgstr "이 문에는 함정이 없었다."
 #: src/trap.c:6020
 msgid "find no traps on the door."
 msgstr "문에서 함정을 발견하지 못했다."
+
+#: src/trap.c:6099
+#, fuzzy
+msgid "You are"
+msgstr "당신은 %s."
+
+#: src/trap.c:6101
+#, fuzzy, c-format
+msgid "You and %s are"
+msgstr "당신과 %s{이/가} %s %s에 빠져 있다."
+
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
+# ============================================================
+# 전투 메시지 추가 (Additional Combat Messages)
+# ============================================================
+#: src/trap.c:6103
+#, fuzzy, c-format
+msgid "%s is"
+msgstr "%s{이/가} %s."
 
 #: src/trap.c:6105
 #, c-format
@@ -23897,14 +24293,6 @@ msgstr "%s{이/가} 맞고 분열했다%s!"
 #: src/uhitm.c:1625
 msgid "hit it."
 msgstr "그것을 때렸다."
-
-# ============================================================
-# 전투 메시지 추가 (Additional Combat Messages)
-# ============================================================
-#: src/uhitm.c:1627 src/uhitm.c:5700
-#, c-format
-msgid "%s %s%s"
-msgstr "%s %s%s"
 
 #: src/uhitm.c:1892
 #, c-format
@@ -24855,6 +25243,11 @@ msgstr "%ld %s{이/가} 마법 기억 금고로 들어간다."
 msgid "%s remits your gold to the vault."
 msgstr "%s{이/가} 당신의 금화를 금고로 보낸다."
 
+#: src/vault.c:1231
+#, c-format
+msgid "To Croesus: here's the gold recovered from %s the %s."
+msgstr "크로이소스에게: %s %s(으)로부터 회수한 금입니다."
+
 #: src/version.c:399
 #, c-format
 msgid "Version mismatch for file \"%s\"."
@@ -25410,8 +25803,8 @@ msgstr "겁쟁이"
 #: src/wizard.c:824
 #, fuzzy
 msgid "rattlepate"
-msgstr "멍청이"
-"멍청이멍청이#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+msgstr ""
+"멍청이멍청이멍청이#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 "전투 도끼\n"
 "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 "전투도끼"
@@ -26528,22 +26921,25 @@ msgid "blast of %s"
 msgstr "%s 폭발"
 
 #
+#: win/tty/wintty.c:2476
 #, c-format
-#~ msgid "Cannot open %s."
-#~ msgstr "%s{을/를} 열 수 없다."
+msgid "Cannot open %s."
+msgstr "%s{을/를} 열 수 없다."
 
+#: win/tty/wintty.c:2525
 #, c-format
-#~ msgid "Cannot open \"%s\"."
-#~ msgstr "\"%s\"{을/를} 열 수 없다."
+msgid "Cannot open \"%s\"."
+msgstr "\"%s\"{을/를} 열 수 없다."
 
-#~ msgid "tty perm_invent could not be enabled."
-#~ msgstr "tty perm_invent를 활성화할 수 없다."
+#: win/tty/wintty.c:3005
+msgid "tty perm_invent could not be enabled."
+msgstr "tty perm_invent를 활성화할 수 없다."
 
+#: win/tty/wintty.c:3006
 #, c-format
-#~ msgid ""
-#~ "tty perm_invent needs a terminal that is at least %dx%d, yours is %dx%d."
-#~ msgstr ""
-#~ "tty perm_invent는 최소 %dx%d 터미널이 필요한데, 현재 터미널은 %dx%d다."
+msgid ""
+"tty perm_invent needs a terminal that is at least %dx%d, yours is %dx%d."
+msgstr "tty perm_invent는 최소 %dx%d 터미널이 필요한데, 현재 터미널은 %dx%d다."
 
 # Monster attack verbs (mhitm.c)
 #, c-format
@@ -26640,9 +27036,6 @@ msgstr "%s 폭발"
 #, c-format
 #~ msgid "That is a silly thing to %s."
 #~ msgstr "%s하기엔 바보 같은 것이다."
-
-#~ msgid "You can move again."
-#~ msgstr "다시 움직일 수 있다."
 
 #~ msgid "Never mind."
 #~ msgstr "신경 쓰지 마라."
@@ -27072,11 +27465,6 @@ msgstr "%s 폭발"
 
 #~ msgid "crude ring mail"
 #~ msgstr "조잡한 고리 갑옷"
-
-# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
-# 방어구 - 갑옷
-#~ msgid "leather armor"
-#~ msgstr "가죽 갑옷"
 
 #~ msgid "leather jacket"
 #~ msgstr "가죽 재킷"
@@ -27645,9 +28033,6 @@ msgstr "%s 폭발"
 
 #~ msgid "ring of slow digestion"
 #~ msgstr "느린 소화의 반지"
-
-#~ msgid "ring of teleportation"
-#~ msgstr "순간이동의 반지"
 
 #~ msgid "ring of teleport control"
 #~ msgstr "순간이동 제어의 반지"

@@ -695,10 +695,10 @@ mattacku(struct monst *mtmp)
         if (gm.multi < 0) { /* this should always be the case */
             char buf[BUFSZ];
 
-            Sprintf(buf, "You appear to be %s again.",
+            Sprintf(buf, _("You appear to be %s again."),
                     Upolyd ? (const char *) an(pmname(gy.youmonst.data,
                                                       flags.female))
-                           : (const char *) "yourself");
+                           : (const char *) _("yourself"));
             unmul(buf); /* immediately stop mimicking */
         }
         return 0;

@@ -227,7 +227,7 @@ its_dead(coordxy rx, coordxy ry, int *resp)
     } else if (Hallucination) {
         if (!corpse) {
             /* it's a statue */
-            Strcpy(buf, "You're both stoned");
+            Strcpy(buf, _("You're both stoned"));
         } else if (corpse->quan == 1L && !more_corpses) {
             int gndr = 2; /* neuter: "it" */
             struct monst *mtmp = get_mtraits(corpse, FALSE);

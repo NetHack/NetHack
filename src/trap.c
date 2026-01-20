@@ -6096,11 +6096,11 @@ openholdingtrap(
             return FALSE;
         *noticed = TRUE;
         if (!u.usteed)
-            Strcpy(buf, "You are");
+            Strcpy(buf, _("You are"));
         else if (u.utraptype == TT_BURIEDBALL)
-            Sprintf(buf, "You and %s are", y_monnam(u.usteed));
+            Sprintf(buf, _("You and %s are"), y_monnam(u.usteed));
         else
-            Sprintf(buf, "%s is", noit_Monnam(u.usteed));
+            Sprintf(buf, _("%s is"), noit_Monnam(u.usteed));
         /* give release message before untrap in case it triggers a message */
         pline(_("%s released from %s%s."), buf, which, trapdescr);
         /* might float up if Levitation is being unblocked */

@@ -1228,7 +1228,7 @@ paygd(boolean silently)
             pline(_("%s remits your gold to the vault."), Monnam(grd));
         gdx = svr.rooms[EGD(grd)->vroom].lx + rn2(2);
         gdy = svr.rooms[EGD(grd)->vroom].ly + rn2(2);
-        Sprintf(buf, "To Croesus: here's the gold recovered from %s the %s.",
+        Sprintf(buf, _("To Croesus: here's the gold recovered from %s the %s."),
                 svp.plname,
                 pmname(&mons[u.umonster], flags.female ? FEMALE : MALE));
         make_grave(gdx, gdy, buf);

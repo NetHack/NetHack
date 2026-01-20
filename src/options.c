@@ -5663,7 +5663,7 @@ handler_autounlock(int optidx)
                  ATR_NONE, clr, buf,
                  (presel ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE));
     }
-    Sprintf(buf, "Select '%.20s' actions:", optname);
+    Sprintf(buf, _("Select '%.20s' actions:"), optname);
     end_menu(tmpwin, buf);
     n = select_menu(tmpwin, PICK_ANY, &window_pick);
     if (n > 0) {
@@ -5734,7 +5734,7 @@ handler_disclose(void)
     for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
         if (disc_cat[i]) {
             c = flags.end_disclose[i];
-            Sprintf(buf, "Disclosure options for %s:",
+            Sprintf(buf, _("Disclosure options for %s:"),
                     disclosure_names[i]);
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin, MENU_BEHAVE_STANDARD);
@@ -5743,40 +5743,40 @@ handler_disclose(void)
             any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                      any.a_char, ATR_NONE, clr,
-                     "Never disclose, without prompting",
+                     _("Never disclose, without prompting"),
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_YES_WITHOUT_PROMPT;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                      any.a_char, ATR_NONE, clr,
-                     "Always disclose, without prompting",
+                     _("Always disclose, without prompting"),
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
             if (*disclosure_names[i] == 'v' || *disclosure_names[i] == 'g') {
                 any.a_char = DISCLOSE_SPECIAL_WITHOUT_PROMPT; /* '#' */
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                          any.a_char, ATR_NONE, clr,
-                         "Always disclose, pick sort order from menu",
+                         _("Always disclose, pick sort order from menu"),
                          (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                            : MENU_ITEMFLAGS_NONE);
             }
             any.a_char = DISCLOSE_PROMPT_DEFAULT_NO;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                      any.a_char, ATR_NONE, clr,
-                     "Prompt, with default answer of \"No\"",
+                     _("Prompt, with default answer of \"No\""),
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_PROMPT_DEFAULT_YES;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                      any.a_char, ATR_NONE, clr,
-                     "Prompt, with default answer of \"Yes\"",
+                     _("Prompt, with default answer of \"Yes\""),
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
             if (*disclosure_names[i] == 'v' || *disclosure_names[i] == 'g') {
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_SPECIAL; /* '?' */
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                          any.a_char, ATR_NONE, clr,
-                "Prompt, with default answer of \"Ask\" to request sort menu",
+                _("Prompt, with default answer of \"Ask\" to request sort menu"),
                          (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                            : MENU_ITEMFLAGS_NONE);
             }
@@ -8616,14 +8616,14 @@ doset_simple_menu(void)
            and show that, or whether #reqmenu and #options are both still
            bound to keys and show those, but if meta keys are involved
            the player might not know how to type them; keep this simple */
-        Strcpy(buf, "Use command '#optionsfull'"
-                    " to get the complete options list.");
+        Strcpy(buf, _("Use command '#optionsfull'"
+                    " to get the complete options list."));
         add_menu_str(tmpwin, buf);
     }
     any = cg.zeroany;
     any.a_int = -2 + 1;
     add_menu(tmpwin, &nul_glyphinfo, &any, '?', 0, ATR_NONE, NO_COLOR,
-             gs.simple_options_help ? "hide help" : "show help",
+             gs.simple_options_help ? _("hide help") : _("show help"),
              MENU_ITEMFLAGS_NONE);
 
     for (section = OptS_General; section < OptS_Advanced; section++) {
@@ -9323,14 +9323,14 @@ dotogglepickup(void)
     flags.pickup = !flags.pickup;
     if (flags.pickup) {
         oc_to_str(flags.pickup_types, ocl);
-        Sprintf(buf, "ON, for %s objects%s", ocl[0] ? ocl : "all",
+        Sprintf(buf, _("ON, for %s objects%s"), ocl[0] ? ocl : _("all"),
                 (ga.apelist)
                     ? ((count_apes() == 1)
-                           ? ", with one exception"
-                           : ", with some exceptions")
+                           ? _(", with one exception")
+                           : _(", with some exceptions"))
                     : "");
     } else {
-        Strcpy(buf, "OFF");
+        Strcpy(buf, _("OFF"));
     }
     pline(_("Autopickup: %s."), buf);
     return ECMD_OK;

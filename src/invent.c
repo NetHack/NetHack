@@ -4517,18 +4517,18 @@ doprgold(void)
         char buf[BUFSZ];
 
         if (!umoney) {
-            Strcpy(buf, "Your wallet is empty");
+            Strcpy(buf, _("Your wallet is empty"));
         } else {
-            Sprintf(buf, "Your wallet contains %ld %s",
+            Sprintf(buf, _("Your wallet contains %ld %s"),
                     umoney, currency(umoney));
         }
         if (hmoney) {
             Sprintf(eos(buf),
-                    ", %s you have %ld %s stashed away in your pack",
-                    umoney ? "and" : "but", hmoney,
-                    umoney ? "more" : currency(hmoney));
+                    _(", %s you have %ld %s stashed away in your pack"),
+                    umoney ? _("and") : _("but"), hmoney,
+                    umoney ? _("more") : currency(hmoney));
         }
-        pline(_("%s."), buf);
+        pline("%s.", buf);
     } else {
         long total = umoney + hmoney;
         if (total)
