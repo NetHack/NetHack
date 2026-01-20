@@ -567,9 +567,9 @@ background_enlightenment(int unused_mode UNUSED, int final)
 
     /* "You are left-handed." won't work well if polymorphed into something
        without hands; use "You are normally left-handed." in that situation */
-    Sprintf(buf, "%s%s-handed",
-            !strcmp(body_part(HANDED), "handed") ? "" : "normally ",
-            URIGHTY ? "right" : "left");
+    Sprintf(buf, _("%s%s-handed"),
+            !strcmp(body_part(HANDED), "handed") ? "" : _("normally "),
+            URIGHTY ? _("right") : _("left"));
     you_are(buf, "");
 
     /* As of 3.6.2: dungeon level, so that ^X really has all status info as

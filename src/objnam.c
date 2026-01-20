@@ -1380,13 +1380,13 @@ doname_base(
            everything out if no merges occur */
         long itemcount = count_contents(obj, FALSE, FALSE, TRUE, FALSE);
 
-        ConcatF2(bp, 0, " containing %ld item%s", itemcount, plur(itemcount));
+        ConcatF2(bp, 0, _(" containing %ld item%s"), itemcount, plur(itemcount));
     }
 
     switch (is_weptool(obj) ? WEAPON_CLASS : obj->oclass) {
     case AMULET_CLASS:
         if (obj->owornmask & W_AMUL)
-            Concat(bp, 0, " (being worn)");
+            Concat(bp, 0, _(" (being worn)"));
         break;
     case ARMOR_CLASS:
         if (obj->owornmask & W_ARMOR) {
@@ -1429,14 +1429,14 @@ doname_base(
         break;
     case TOOL_CLASS:
         if (obj->owornmask & (W_TOOL | W_SADDLE)) { /* blindfold */
-            Concat(bp, 0, " (being worn)");
+            Concat(bp, 0, _(" (being worn)"));
             break;
         }
         if (obj->otyp == LEASH && obj->leashmon != 0) {
             struct monst *mlsh = find_mid(obj->leashmon, FM_FMON);
 
             if (mlsh && !DEADMONSTER(mlsh)) {
-                ConcatF1(bp, 0, " (attached to %s)", noit_mon_nam(mlsh));
+                ConcatF1(bp, 0, _(" (attached to %s)"), noit_mon_nam(mlsh));
             } else {
                 if (mlsh) /*&& DEADMONSTER(mlsh)*/
                     impossible("leashed %s #%u is dead",
@@ -1453,8 +1453,8 @@ doname_base(
 
             /* separately formatted suffix avoids need for ConcatF3() */
             Sprintf(suffix, "%s%s", plur(obj->spe),
-                    !obj->lamplit ? " attached" : ", lit");
-            ConcatF2(bp, 0, " (%d of 7 candle%s)", obj->spe, suffix);
+                    !obj->lamplit ? _(" attached") : _(", lit"));
+            ConcatF2(bp, 0, _(" (%d of 7 candle%s)"), obj->spe, suffix);
             break;
         } else if (obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP
                    || obj->otyp == BRASS_LANTERN || Is_candle(obj)) {
@@ -1586,16 +1586,16 @@ doname_base(
                 hand_s = strcpy(handsbuf, obufp = makeplural(hand_s));
                 releaseobuf(obufp);
             } else { /* "right hand" or "left hand" */
-                Sprintf(handsbuf, "%s %s",
-                        URIGHTY ? "right" : "left", hand_s);
+                Sprintf(handsbuf, _("%s %s"),
+                        URIGHTY ? _("right") : _("left"), hand_s);
                 hand_s = handsbuf;
             }
             /* note: Sting's glow message, if added, will insert text
                in front of "(weapon in hand)"'s closing paren */
-            ConcatF2(bp, 0, " (%s %s)",
-                     tethered ? "tethered to"
-                     : twoweap_primary ? "wielded in"
-                       : "weapon in",
+            ConcatF2(bp, 0, _(" (%s %s)"),
+                     tethered ? _("tethered to")
+                     : twoweap_primary ? _("wielded in")
+                       : _("weapon in"),
                      hand_s);
 
             /* we just added a parenthesized phrase, but the right paren
@@ -1616,11 +1616,11 @@ doname_base(
     }
     if (obj->owornmask & W_SWAPWEP) {
         if (u.twoweap)
-            ConcatF2(bp, 0, " (wielded in %s %s)",
-                     URIGHTY ? "left" : "right", body_part(HAND));
+            ConcatF2(bp, 0, _(" (wielded in %s %s)"),
+                     URIGHTY ? _("left") : _("right"), body_part(HAND));
         else
             /* TODO: rephrase this when obj isn't a weapon or weptool */
-            ConcatF1(bp, 0, " (alternate weapon%s; not wielded)",
+            ConcatF1(bp, 0, _(" (alternate weapon%s; not wielded)"),
                      plur(obj->quan));
     }
     if (obj->owornmask & W_QUIVER) {
@@ -1643,10 +1643,10 @@ doname_base(
             Qtyp = 3; /* "at the ready" */
             break;
         }
-        ConcatF1(bp, 0, " (%s)",
-                 (Qtyp == 1) ? "in quiver"
-                 : (Qtyp == 2) ? "in quiver pouch"
-                   : "at the ready");
+        ConcatF1(bp, 0, _(" (%s)"),
+                 (Qtyp == 1) ? _("in quiver")
+                 : (Qtyp == 2) ? _("in quiver pouch")
+                   : _("at the ready"));
     }
 
     /* treat 'restoring' like suppress_price because shopkeeper and
@@ -1661,8 +1661,8 @@ doname_base(
 
         /* separately formatted suffix avoids need for ConcatF3() */
         Sprintf(pricebuf, "%ld %s", quotedprice, currency(quotedprice));
-        ConcatF2(bp, 0, " (%s, %s)",
-                 obj->unpaid ? "unpaid" : "contents", pricebuf);
+        ConcatF2(bp, 0, _(" (%s, %s)"),
+                 obj->unpaid ? _("unpaid") : _("contents"), pricebuf);
     } else if (with_price) { /* on floor or in container on floor */
         int nochrg = 0;
         long price = get_cost_of_shop_item(obj, &nochrg);
@@ -1671,10 +1671,10 @@ doname_base(
             char pricebuf[40];
 
             Sprintf(pricebuf, "%ld %s", price, currency(price));
-            ConcatF2(bp, 0, " (%s, %s)",
-                     nochrg ? "contents" : "for sale", pricebuf);
+            ConcatF2(bp, 0, _(" (%s, %s)"),
+                     nochrg ? _("contents") : _("for sale"), pricebuf);
         } else if (nochrg > 0) {
-            Concat(bp, 0, " (no charge)");
+            Concat(bp, 0, _(" (no charge)"));
         }
     }
 

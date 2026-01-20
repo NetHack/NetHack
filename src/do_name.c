@@ -688,9 +688,9 @@ namefloorobj(void)
     /* "dot for under/over you" only makes sense when the cursor hasn't
        been moved off the hero's '@' yet, but there's no way to adjust
        the help text once getpos() has started */
-    Sprintf(buf, "object on map (or '.' for one %s you)",
+    Sprintf(buf, _("object on map (or '.' for one %s you)"),
             (u.uundetected && hides_under(gy.youmonst.data))
-              ? "over" : "under");
+              ? _("over") : _("under"));
     if (getpos(&cc, FALSE, buf) < 0 || cc.x <= 0)
         return;
     if (u_at(cc.x, cc.y)) {
