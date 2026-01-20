@@ -896,29 +896,29 @@ doengrave_ctx_verb(struct _doengrave_ctx *de)
 {
     switch (de->type) {
     default:
-        de->everb = de->adding ? "add to the weird writing on"
-                               : "write strangely on";
+        de->everb = de->adding ? _("add to the weird writing on")
+                               : _("write strangely on");
         break;
     case DUST:
-        de->everb = de->adding ? "add to the writing in" : "write in";
-        de->eloc = de->frosted ? "frost" : "dust";
+        de->everb = de->adding ? _("add to the writing in") : _("write in");
+        de->eloc = de->frosted ? _("frost") : _("dust");
         break;
     case HEADSTONE:
-        de->everb = de->adding ? "add to the epitaph on" : "engrave on";
+        de->everb = de->adding ? _("add to the epitaph on") : _("engrave on");
         break;
     case ENGRAVE:
-        de->everb = de->adding ? "add to the engraving in" : "engrave in";
+        de->everb = de->adding ? _("add to the engraving in") : _("engrave in");
         break;
     case BURN:
-        de->everb = de->adding ? (de->frosted ? "add to the text melted into"
-                                  : "add to the text burned into")
-                       : (de->frosted ? "melt into" : "burn into");
+        de->everb = de->adding ? (de->frosted ? _("add to the text melted into")
+                                  : _("add to the text burned into"))
+                       : (de->frosted ? _("melt into") : _("burn into"));
         break;
     case MARK:
-        de->everb = de->adding ? "add to the graffiti on" : "scribble on";
+        de->everb = de->adding ? _("add to the graffiti on") : _("scribble on");
         break;
     case ENGR_BLOOD:
-        de->everb = de->adding ? "add to the scrawl on" : "scrawl on";
+        de->everb = de->adding ? _("add to the scrawl on") : _("scrawl on");
         break;
     }
 }
@@ -1085,11 +1085,11 @@ doengrave(void)
     }
     if (de->zapwand && (de->otmp->spe < 0)) {
         pline(_("%s %sturns to dust."), The(xname(de->otmp)),
-              Blind ? "" : "glows violently, then ");
+              Blind ? "" : _("glows violently, then "));
         if (!IS_GRAVE(levl[u.ux][u.uy].typ))
             You(
-    "are not going to get anywhere trying to write in the %s with your dust.",
-                de->frosted ? "frost" : "dust");
+    _("are not going to get anywhere trying to write in the %s with your dust."),
+                de->frosted ? _("frost") : _("dust"));
         useup(de->otmp);
         de->otmp = 0; /* wand is now gone */
         de->ptext = FALSE;
@@ -1132,11 +1132,11 @@ doengrave(void)
                     You(_("wipe out the message that was %s here."),
                         (de->oep->engr_type == DUST)
                             ? (de->frosted
-                                ? "written in the frost"
-                                : "written in the dust")
+                                ? _("written in the frost")
+                                : _("written in the dust"))
                             : (de->oep->engr_type == ENGR_BLOOD)
-                                ? "scrawled in blood"
-                                : "written");
+                                ? _("scrawled in blood")
+                                : _("written"));
                     del_engr(de->oep);
                     de->oep = (struct engr *) 0;
                     de->disprefresh = TRUE;
@@ -1148,8 +1148,8 @@ doengrave(void)
                        || de->type == ENGR_BLOOD) {
                 You(_("cannot wipe out the message that is %s the %s here."),
                     (de->oep->engr_type == BURN)
-                        ? (de->frosted ? "melted into" : "burned into")
-                        : "engraved in",
+                        ? (de->frosted ? _("melted into") : _("burned into"))
+                        : _("engraved in"),
                     surface(u.ux, u.uy));
                 de->ret = ECMD_TIME;
                 goto doengr_exit;
