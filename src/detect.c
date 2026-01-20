@@ -540,7 +540,7 @@ food_detect(struct obj *sobj)
         return !stale;
     } else if (!ct) {
         gk.known = TRUE;
-        You(_("%s %s nearby."), sobj ? "smell" : "sense", what);
+        You(_("%s %s nearby."), sobj ? _("smell") : _("sense"), what);
         if (sobj && sobj->blessed) {
             if (!u.uedibility)
                 Your(_("%s starts to tingle."), body_part(NOSE));
@@ -996,9 +996,9 @@ display_trap_map(int cursed_src)
         newsym(u.ux, u.uy);
         ter_typ |= TER_MON; /* for autodescribe at <u.ux,u.uy> */
     }
-    You_feel(_("%s."), cursed_src ? "very greedy" : "entrapped");
+    You_feel(_("%s."), cursed_src ? _("very greedy") : _("entrapped"));
 
-    browse_map(ter_typ, cursed_src ? "gold" : "trap of interest");
+    browse_map(ter_typ, cursed_src ? _("gold") : _("trap of interest"));
 
     map_redisplay();
 }
@@ -1273,7 +1273,7 @@ use_crystal_ball(struct obj **optr)
                 break;
             case 2:
                 pline(_("Whoa!  Psychedelic colors, %s!"),
-                      poly_gender() == 1 ? "babe" : "dude");
+                      poly_gender() == 1 ? _("babe") : _("dude"));
                 break;
             case 3:
                 pline_The(_("crystal pulses with sinister %s light!"),
@@ -1284,7 +1284,7 @@ use_crystal_ball(struct obj **optr)
                 break;
             case 5:
                 You_see(
-                    "tiny snowflakes spinning around a miniature farmhouse.");
+                    _("tiny snowflakes spinning around a miniature farmhouse."));
                 break;
             default:
                 pline(_("Oh wow... like a kaleidoscope!"));
@@ -1754,8 +1754,8 @@ openone(coordxy zx, coordxy zy, genericptr_t num)
                 b_trapped("door", NO_PART);
             else
                 Norep(_("You %s an explosion!"),
-                      cansee(zx, zy) ? "see" : (!Deaf ? "hear"
-                                                      : "feel the shock of"));
+                      cansee(zx, zy) ? _("see") : (!Deaf ? _("hear")
+                                                      : _("feel the shock of")));
             wake_nearto(zx, zy, 11 * 11);
             levl[zx][zy].doormask = D_NODOOR;
         } else
