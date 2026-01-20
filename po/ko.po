@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 13:24+0900\n"
+"POT-Creation-Date: 2026-01-20 13:32+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -500,9 +500,8 @@ msgstr "%s{이/가} 흐려져서 반사하지 않는다!"
 #: src/nhlua.c:636 src/nhlua.c:652 src/pager.c:2696 src/pickup.c:410
 #: src/pline.c:677 src/pline.c:689 src/pline.c:744 src/potion.c:207
 #: src/potion.c:234 src/questpgr.c:434 src/sit.c:55 src/sounds.c:1534
-#: src/spell.c:2054 src/teleport.c:1146 src/timeout.c:342 src/timeout.c:542
-#: src/timeout.c:568 src/vault.c:959 src/version.c:160 src/windows.c:455
-#: src/windows.c:513 src/wizcmds.c:438
+#: src/spell.c:2054 src/teleport.c:1146 src/timeout.c:342 src/vault.c:959
+#: src/version.c:160 src/windows.c:455 src/windows.c:513 src/wizcmds.c:438
 #, c-format
 msgid "%s"
 msgstr "%s"
@@ -6908,6 +6907,126 @@ msgstr "스스로에게 산을 뿜었다..."
 msgid "Your stomach acid melts straight through the ice!"
 msgstr "당신의 위산이 얼음을 녹여버립니다!"
 
+#: src/end.c:49 src/end.c:57
+msgid "died"
+msgstr "죽었습니다"
+
+#: src/end.c:49 src/end.c:57
+#, fuzzy
+msgid "choked"
+msgstr "질식"
+
+#: src/end.c:49
+#, fuzzy
+msgid "poisoned"
+msgstr "독이 묻은 "
+
+#: src/end.c:49
+#, fuzzy
+msgid "starvation"
+msgstr "굶주림으로 죽었다."
+
+#: src/end.c:49
+#, fuzzy
+msgid "drowning"
+msgstr "갈색"
+
+#: src/end.c:49
+#, fuzzy
+msgid "burning"
+msgstr "탄 "
+
+#: src/end.c:50
+msgid "dissolving under the heat and pressure"
+msgstr "열과 압력에 녹음"
+
+#: src/end.c:50
+#, fuzzy
+msgid "crushed"
+msgstr "처벌받는 중"
+
+#
+#: src/end.c:50 src/end.c:60
+#, fuzzy
+msgid "turned to stone"
+msgstr "돌로 변했다."
+
+#: src/end.c:51 src/end.c:61
+#, fuzzy
+msgid "turned into slime"
+msgstr "%s{을/를} 슬라임으로 만들었다."
+
+#: src/end.c:51
+msgid "genocided"
+msgstr "멸종됨"
+
+#: src/end.c:51
+msgid "panic"
+msgstr "패닉"
+
+#: src/end.c:51
+msgid "trickery"
+msgstr "속임"
+
+#: src/end.c:51 src/end.c:62
+msgid "quit"
+msgstr "포기"
+
+#: src/end.c:52 src/end.c:63
+#, fuzzy
+msgid "escaped"
+msgstr "해를 피했다."
+
+#: src/end.c:52 src/end.c:63 src/insight.c:66
+#, fuzzy
+msgid "ascended"
+msgstr "손잡이"
+
+#: src/end.c:57
+#, fuzzy
+msgid "were poisoned"
+msgstr "독이 묻은 "
+
+#: src/end.c:58
+#, fuzzy
+msgid "starved"
+msgstr "비겁한 놈"
+
+#: src/end.c:58
+#, fuzzy
+msgid "drowned"
+msgstr "갈색"
+
+#: src/end.c:58
+#, fuzzy
+msgid "burned"
+msgstr "탄 "
+
+#: src/end.c:59
+#, fuzzy
+msgid "dissolved in the lava"
+msgstr "거미줄이 %s{으로/로} 녹는다."
+
+#: src/end.c:60
+#, fuzzy
+msgid "were crushed"
+msgstr "짓눌리고 있다."
+
+#: src/end.c:61
+#, fuzzy
+msgid "were genocided"
+msgstr "학살 두루마리"
+
+#: src/end.c:62
+#, fuzzy
+msgid "panicked"
+msgstr "금이 간 "
+
+#: src/end.c:62
+#, fuzzy
+msgid "were tricked"
+msgstr "전기빛의"
+
 #: src/end.c:98
 msgid "Switch from the tutorial back to regular play?"
 msgstr "튜토리얼에서 일반 게임으로 전환하시겠습니까?"
@@ -9139,11 +9258,6 @@ msgstr "원소의 평면으로"
 #, fuzzy
 msgid "entered the Astral Plane"
 msgstr "원소의 평면으로"
-
-#: src/insight.c:66
-#, fuzzy
-msgid "ascended"
-msgstr "손잡이"
 
 #: src/insight.c:71
 msgid "acquired the Mines' End"
@@ -22982,6 +23096,50 @@ msgstr "말단"
 msgid "getting stoned"
 msgstr "돌이 되어가는 중"
 
+#
+#: src/timeout.c:189
+#, fuzzy
+msgid "are feeling mildly nauseated."
+msgstr "혼란스러워지고 있다."
+
+#: src/timeout.c:190
+#, fuzzy
+msgid "feel slightly confused."
+msgstr "약간 바랬다"
+
+#: src/timeout.c:191
+#, fuzzy
+msgid "can't seem to think straight."
+msgstr "%s{은/는} 지금 아무것도 볼 수 없다."
+
+#: src/timeout.c:192
+msgid "feel incredibly sick."
+msgstr "엄청나게 아픔을 느낍니다."
+
+#: src/timeout.c:193
+#, fuzzy
+msgid "are about to vomit."
+msgstr "%s{이} 곧 꺼질 것 같다."
+
+#: src/timeout.c:236
+#, fuzzy
+msgid "gag uncontrollably."
+msgstr " 통제할 수 없이"
+
+#: src/timeout.c:240
+#, fuzzy
+msgid "are about to hurl!"
+msgstr "잠들어버렸다!"
+
+#: src/timeout.c:255
+#, fuzzy
+msgid "vomit"
+msgstr "구토 중"
+
+#: src/timeout.c:255
+msgid "hurl chunks"
+msgstr "크게 토합니다"
+
 #: src/timeout.c:279
 #, fuzzy
 msgid "You find it hard to breathe."
@@ -23094,6 +23252,24 @@ msgstr "그래, 그렇다.  %s"
 #, c-format
 msgid "Unfortunately, %s"
 msgstr "불행히도, %s"
+
+#: src/timeout.c:529
+#, fuzzy
+msgid "You start to feel bloated."
+msgstr "%s{이} 굴러가기 시작하는 것을."
+
+#: src/timeout.c:530
+msgid "You are feeling rather flabby."
+msgstr "몸이 축 처지는 느낌입니다."
+
+#: src/timeout.c:549
+#, fuzzy
+msgid "You seem to have some trouble breathing."
+msgstr "%s보다 더 즐긴 것 같다..."
+
+#: src/timeout.c:550
+msgid "The air here seems foul."
+msgstr "여기 공기가 탁한 것 같습니다."
 
 #: src/timeout.c:659
 #, c-format
@@ -28712,9 +28888,6 @@ msgstr "%s 폭발"
 #~ msgid "scroll of taming"
 #~ msgstr "길들이기 두루마리"
 
-#~ msgid "scroll of genocide"
-#~ msgstr "학살 두루마리"
-
 #~ msgid "scroll of light"
 #~ msgstr "빛의 두루마리"
 
@@ -29293,9 +29466,6 @@ msgstr "%s 폭발"
 
 #~ msgid "mauve"
 #~ msgstr "연보라색"
-
-#~ msgid "electric"
-#~ msgstr "전기빛의"
 
 #~ msgid "neon"
 #~ msgstr "네온"

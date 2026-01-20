@@ -46,21 +46,21 @@ staticfn void bel_copy1(char **, char *);
  */
 static NEARDATA const char *deaths[] = {
     /* the array of death */
-    "died", "choked", "poisoned", "starvation", "drowning", "burning",
-    "dissolving under the heat and pressure", "crushed", "turned to stone",
-    "turned into slime", "genocided", "panic", "trickery", "quit",
-    "escaped", "ascended"
+    N_("died"), N_("choked"), N_("poisoned"), N_("starvation"), N_("drowning"), N_("burning"),
+    N_("dissolving under the heat and pressure"), N_("crushed"), N_("turned to stone"),
+    N_("turned into slime"), N_("genocided"), N_("panic"), N_("trickery"), N_("quit"),
+    N_("escaped"), N_("ascended")
 };
 
 static NEARDATA const char *ends[] = {
     /* "when you %s" */
-    "died", "choked", "were poisoned",
-    "starved", "drowned", "burned",
-    "dissolved in the lava",
-    "were crushed", "turned to stone",
-    "turned into slime", "were genocided",
-    "panicked", "were tricked", "quit",
-    "escaped", "ascended"
+    N_("died"), N_("choked"), N_("were poisoned"),
+    N_("starved"), N_("drowned"), N_("burned"),
+    N_("dissolved in the lava"),
+    N_("were crushed"), N_("turned to stone"),
+    N_("turned into slime"), N_("were genocided"),
+    N_("panicked"), N_("were tricked"), N_("quit"),
+    N_("escaped"), N_("ascended")
 };
 
 static boolean Schroedingers_cat = FALSE;
@@ -1524,14 +1524,14 @@ really_done(int how)
             /* level teleported out of the dungeon; `how' is DIED,
                due to falling or to "arriving at heaven prematurely" */
             Sprintf(pbuf, _("You %s beyond the confines of the dungeon"),
-                    (u.uz.dlevel < 0) ? _("passed away") : ends[how]);
+                    (u.uz.dlevel < 0) ? _("passed away") : _(ends[how]));
         } else {
             /* more conventional demise */
             const char *where = svd.dungeons[u.uz.dnum].dname;
 
             if (Is_astralevel(&u.uz))
                 where = _("The Astral Plane");
-            Sprintf(pbuf, _("You %s in %s"), ends[how], where);
+            Sprintf(pbuf, _("You %s in %s"), _(ends[how]), where);
             if (!In_endgame(&u.uz) && !single_level_branch(&u.uz))
                 Sprintf(eos(pbuf), _(" on dungeon level %d"),
                         In_quest(&u.uz) ? dunlev(&u.uz) : depth(&u.uz));
@@ -1546,7 +1546,7 @@ really_done(int how)
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     Sprintf(pbuf,
             _("You were level %d with a maximum of %d hit point%s when you %s."),
-            u.ulevel, u.uhpmax, plur(u.uhpmax), ends[how]);
+            u.ulevel, u.uhpmax, plur(u.uhpmax), _(ends[how]));
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     dump_forward_putstr(endwin, 0, "", done_stopprint);
     if (!done_stopprint)

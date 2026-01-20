@@ -186,11 +186,11 @@ stoned_dialogue(void)
 
 /* hero is getting sicker and sicker prior to vomiting */
 static NEARDATA const char *const vomiting_texts[] = {
-    "are feeling mildly nauseated.", /* 14 */
-    "feel slightly confused.",       /* 11 */
-    "can't seem to think straight.", /* 8 */
-    "feel incredibly sick.",         /* 5 */
-    "are about to vomit."            /* 2 */
+    N_("are feeling mildly nauseated."), /* 14 */
+    N_("feel slightly confused."),       /* 11 */
+    N_("can't seem to think straight."), /* 8 */
+    N_("feel incredibly sick."),         /* 5 */
+    N_("are about to vomit.")            /* 2 */
 };
 
 staticfn void
@@ -233,11 +233,11 @@ vomiting_dialogue(void)
     case 2:
         txt = vomiting_texts[4];
         if (cantvomit(gy.youmonst.data))
-            txt = "gag uncontrollably.";
+            txt = N_("gag uncontrollably.");
         else if (Hallucination)
             /* "hurl" is short for "hurl chunks" which is slang for
                relatively violent vomiting... */
-            txt = "are about to hurl!";
+            txt = N_("are about to hurl!");
         break;
     case 0:
         stop_occupation();
@@ -252,7 +252,7 @@ vomiting_dialogue(void)
                [vomit() issues its own message for the cantvomit() case
                and for the FAINTING-or-worse case where stomach is empty] */
             if (u.uhs < FAINTING)
-                You(_("%s!"), !Hallucination ? "vomit" : "hurl chunks");
+                You(_("%s!"), !Hallucination ? _("vomit") : _("hurl chunks"));
         }
         vomit();
         break;
@@ -260,7 +260,7 @@ vomiting_dialogue(void)
         break;
     }
     if (txt)
-        You1(txt);
+        You1(_(txt));
     exercise(A_CON, FALSE);
 }
 
@@ -526,8 +526,8 @@ slimed_to_death(struct kinfo *kptr)
    move between things which are closely packed--like the substance of
    solid rock! */
 static NEARDATA const char *const phaze_texts[] = {
-    "You start to feel bloated.",
-    "You are feeling rather flabby.",
+    N_("You start to feel bloated."),
+    N_("You are feeling rather flabby."),
 };
 
 staticfn void
@@ -539,15 +539,15 @@ phaze_dialogue(void)
         return;
 
     if (((HPasses_walls & TIMEOUT) % 2L) && i > 0L && i <= SIZE(phaze_texts))
-        pline(_("%s"), phaze_texts[SIZE(phaze_texts) - i]);
+        pline("%s", _(phaze_texts[SIZE(phaze_texts) - i]));
 }
 
 /* Similar to Passes_walls, if prayer tries to save hero from a poison
    gas region but can't, (HMagical_breathing & TIMEOUT) will be set to
    a small value.  Unlike Passes_walls, there's no joke message. */
 static NEARDATA const char *const region_texts[] = {
-    "You seem to have some trouble breathing.",
-    "The air here seems foul.",
+    N_("You seem to have some trouble breathing."),
+    N_("The air here seems foul."),
 };
 
 staticfn void
@@ -565,7 +565,7 @@ region_dialogue(void)
         return;
 
     if ((r % 2L) && i > 0L && i <= SIZE(region_texts))
-        pline(_("%s"), region_texts[SIZE(region_texts) - i]);
+        pline("%s", _(region_texts[SIZE(region_texts) - i]));
 }
 
 /* when a status timeout is fatal, keep the status line indicator shown
