@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 13:34+0900\n"
+"POT-Creation-Date: 2026-01-20 13:40+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -497,11 +497,11 @@ msgstr "%s{이/가} 흐려져서 반사하지 않는다!"
 #: src/apply.c:2384 src/apply.c:3653 src/apply.c:3672 src/artifact.c:2033
 #: src/artifact.c:2065 src/artifact.c:2078 src/artifact.c:2082 src/do.c:2028
 #: src/eat.c:2145 src/engrave.c:1246 src/hack.c:4078 src/nhlua.c:636
-#: src/nhlua.c:652 src/pager.c:2696 src/pickup.c:410 src/pline.c:677
-#: src/pline.c:689 src/pline.c:744 src/potion.c:207 src/potion.c:234
-#: src/questpgr.c:434 src/sit.c:55 src/sounds.c:1534 src/spell.c:2054
-#: src/teleport.c:1146 src/timeout.c:342 src/vault.c:959 src/version.c:160
-#: src/windows.c:455 src/windows.c:513 src/wizcmds.c:438
+#: src/nhlua.c:652 src/pager.c:2696 src/pline.c:677 src/pline.c:689
+#: src/pline.c:744 src/potion.c:207 src/potion.c:234 src/questpgr.c:434
+#: src/sit.c:55 src/sounds.c:1534 src/spell.c:2054 src/teleport.c:1146
+#: src/timeout.c:342 src/vault.c:959 src/version.c:160 src/windows.c:455
+#: src/windows.c:513 src/wizcmds.c:438
 #, c-format
 msgid "%s"
 msgstr "%s"
@@ -16090,6 +16090,15 @@ msgstr "%s{을/를} 만지는 것은 치명적인 실수다."
 msgid "At your %s, the corpse suddenly moves..."
 msgstr "%s하자, 시체가 갑자기 움직인다..."
 
+# ============================================================
+# UI 메시지 (invent.c - "here" 관련)
+# ============================================================
+# %1$s = "is"/"are", %2$s = object name
+#: src/pickup.c:401
+#, fuzzy, c-format
+msgid "There is %s here."
+msgstr "여기에 %2$s{이/가} 있다.%1$.0s"
+
 #: src/pickup.c:730
 msgid "are physically incapable of picking anything up."
 msgstr "물리적으로 아무것도 주울 수 없다."
@@ -25814,6 +25823,11 @@ msgstr "불행히도, 그것을 소화하는 것은 치명적이다."
 msgid "hurriedly regurgitate the sizzling in your %s."
 msgstr "급히 %s에서 지글거리는 것을 토해냈다."
 
+#: src/uhitm.c:5053
+#, fuzzy, c-format
+msgid "You totally digest %s."
+msgstr "%s{이/가} 당신을 완전히 소화시켰다!"
+
 #: src/uhitm.c:5060
 #, c-format
 msgid "digest %s."
@@ -25822,6 +25836,11 @@ msgstr "%s{을/를} 소화한다."
 #: src/uhitm.c:5064
 msgid "digesting something"
 msgstr "무언가를 소화하는 중"
+
+#: src/uhitm.c:5072
+#, fuzzy, c-format
+msgid "%s isn't sitting well with you."
+msgstr "%s{이/가} 당신과 상관하고 싶어하지 않는다!"
 
 #: src/uhitm.c:5085
 #, c-format

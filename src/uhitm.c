@@ -5050,7 +5050,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                     } else {
                         tmp = 0;
                     }
-                    Sprintf(msgbuf, "You totally digest %s.", mon_nam(mdef));
+                    Sprintf(msgbuf, _("You totally digest %s."), mon_nam(mdef));
                     if (tmp != 0) {
                         /* setting afternmv = end_engulf is tempting,
                          * but will cause problems if the player is
@@ -5069,7 +5069,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                     } else
                         pline1(msgbuf);
                     if (pd == &mons[PM_GREEN_SLIME]) {
-                        Sprintf(msgbuf, "%s isn't sitting well with you.",
+                        Sprintf(msgbuf, _("%s isn't sitting well with you."),
                                 The(pmname(pd, Mgender(mdef))));
                         if (!Unchanging) {
                             make_slimed(5L, (char *) 0);

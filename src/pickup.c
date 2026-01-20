@@ -398,7 +398,7 @@ describe_decor(void)
             dfeature = an(dfeature);
 
         if (flags.verbose) {
-            Sprintf(outbuf, "There is %s here.", dfeature);
+            Sprintf(outbuf, _("There is %s here."), dfeature);
         } else {
             if (dfeature != fbuf)
                 Strcpy(fbuf, dfeature);
@@ -407,7 +407,7 @@ describe_decor(void)
         if (ltyp == ICE && flags.mention_decor)
             Norep("%s", outbuf);
         else
-            pline(_("%s"), outbuf);
+            pline("%s", outbuf);
     } else if (!Underwater) {
         if (IS_POOL(iflags.prev_decor)
             || IS_LAVA(iflags.prev_decor)
