@@ -5475,8 +5475,8 @@ shk_chat(struct monst *shkp)
     if (ANGRY(shkp)) {
         pline(_("%s %s how much %s dislikes %s customers."),
               Shknam(shkp),
-              (!Deaf && !muteshk(shkp)) ? "mentions" : "indicates",
-              noit_mhe(shkp), eshk->robbed ? "non-paying" : "rude");
+              (!Deaf && !muteshk(shkp)) ? _("mentions") : _("indicates"),
+              noit_mhe(shkp), eshk->robbed ? _("non-paying") : _("rude"));
     } else if (eshk->following) {
         if (strncmp(eshk->customer, svp.plname, PL_NSIZ)) {
             if (!Deaf && !muteshk(shkp)) {

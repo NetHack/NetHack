@@ -527,9 +527,9 @@ really_kick_object(coordxy x, coordxy y)
             if (!trap->tseen)
                 find_trap(trap);
             You_cant(_("kick %s that's in a %s!"), something,
-                     Hallucination ? "tizzy"
-                         : (trap->ttyp == WEB) ? "web"
-                             : "pit");
+                     Hallucination ? _("tizzy")
+                         : (trap->ttyp == WEB) ? _("web")
+                             : _("pit"));
             return 1;
         }
         if (trap->ttyp == STATUE_TRAP) {

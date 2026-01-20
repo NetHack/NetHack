@@ -1610,7 +1610,7 @@ offer_fake_amulet(
     You_hear(_("a nearby thunderclap."));
     if (!otmp->known) {
         You(_("realize you have made a %s."),
-            Hallucination ? "boo-boo" : "mistake");
+            Hallucination ? _("boo-boo") : _("mistake"));
         otmp->known = TRUE;
         change_luck(-1);
     } else {
@@ -2035,14 +2035,14 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
         if (u.ugangr != saved_anger) {
             if (u.ugangr) {
                 pline(_("%s seems %s."), u_gname(),
-                      Hallucination ? "groovy" : "slightly mollified");
+                      Hallucination ? _("groovy") : _("slightly mollified"));
 
                 if ((int) u.uluck < 0)
                     change_luck(1);
             } else {
                 pline(_("%s seems %s."), u_gname(),
-                      Hallucination ? "cosmic (not a new fact)"
-                                    : "mollified");
+                      Hallucination ? _("cosmic (not a new fact)")
+                                    : _("mollified"));
 
                 if ((int) u.uluck < 0)
                     u.uluck = 0;

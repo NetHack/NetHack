@@ -2115,8 +2115,8 @@ fprefx(struct obj *otmp)
     case FOOD_RATION: /* nutrition 800 */
         /* 200+800 remains below 1000+1, the satiation threshold */
         if (u.uhunger <= 200)
-            pline(_("%s!"), Hallucination ? "Oh wow, like, superior, man"
-                                       : "This food really hits the spot");
+            pline(_("%s!"), Hallucination ? _("Oh wow, like, superior, man")
+                                       : _("This food really hits the spot"));
 
         /* 700-1+800 remains below 1500, the choking threshold which
            triggers "you're having a hard time getting it down" feedback */

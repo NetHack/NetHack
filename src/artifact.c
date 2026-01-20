@@ -2222,7 +2222,7 @@ arti_invoke(struct obj *obj)
             newsym(u.ux, u.uy);
             if (on)
                 Your(_("body takes on a %s transparency..."),
-                     Hallucination ? "normal" : "strange");
+                     Hallucination ? _("normal") : _("strange"));
             else
                 Your(_("body seems to unfade..."));
             break;
