@@ -274,8 +274,8 @@ mhidden_description(
             boolean poison_gas = (glyph_is_cmap(rglyph)
                                   && glyph_to_cmap(rglyph) == S_poisoncloud);
 
-            Snprintf(eos(outbuf), BUFSZ - buflen, ", in a cloud of %s",
-                     poison_gas ? "poison gas" : "vapor");
+            Snprintf(eos(outbuf), BUFSZ - buflen, _(", in a cloud of %s"),
+                     poison_gas ? _("poison gas") : _("vapor"));
         }
     }
 }
@@ -400,22 +400,22 @@ look_at_object(
     }
 
     if (otmp && otmp->where == OBJ_BURIED)
-        Strcat(buf, " (buried)");
+        Strcat(buf, _(" (buried)"));
     /* check TREE before STONE due to level.flags.arboreal */
     else if (IS_TREE(levl[x][y].typ))
         /* "dangling": "hanging" could imply that it's growing on this tree */
-        Snprintf(eos(buf), BUFSZ - strlen(buf), " %s in a tree",
-                 (otmp && is_treefruit(otmp)) ? "dangling" : "stuck");
+        Snprintf(eos(buf), BUFSZ - strlen(buf), _(" %s in a tree"),
+                 (otmp && is_treefruit(otmp)) ? _("dangling") : _("stuck"));
     else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
-        Strcat(buf, " embedded in stone");
+        Strcat(buf, _(" embedded in stone"));
     else if (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR)
-        Strcat(buf, " embedded in a wall");
+        Strcat(buf, _(" embedded in a wall"));
     else if (closed_door(x, y))
-        Strcat(buf, " embedded in a door");
+        Strcat(buf, _(" embedded in a door"));
     else if (is_pool(x, y))
-        Strcat(buf, " in water");
+        Strcat(buf, _(" in water"));
     else if (is_lava(x, y))
-        Strcat(buf, " in molten lava"); /* [can this ever happen?] */
+        Strcat(buf, _(" in molten lava")); /* [can this ever happen?] */
     return;
 }
 
