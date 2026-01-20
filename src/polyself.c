@@ -1218,7 +1218,7 @@ break_armor(void)
 
                 /* Future possibilities: This could damage/destroy helmet */
                 Sprintf(hornbuf, "horn%s", plur(num_horns(uptr)));
-                Your(_("%s %s through %s."), hornbuf, vtense(hornbuf, "pierce"),
+                Your(_("%s %s through %s."), hornbuf, vtense(hornbuf, _("pierce")),
                      yname(otmp));
             } else {
                 if (donning(otmp))
@@ -1279,7 +1279,7 @@ break_armor(void)
 
         if (!strncmp(eyewear, "pair of ", l = 8)) /* lenses */
             eyewear += l;
-        Your(_("%s %s off!"), eyewear, vtense(eyewear, "fall"));
+        Your(_("%s %s off!"), eyewear, vtense(eyewear, _("fall")));
         (void) Blindf_off((struct obj *) 0); /* Null: skip usual off mesg */
         dropp(otmp);
     }

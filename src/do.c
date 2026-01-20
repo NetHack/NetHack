@@ -102,7 +102,7 @@ boulder_hits_pool(
                 if (u.usteed)
                     Strcpy(whobuf, y_monnam(u.usteed));
                 pline(_("%s %s %s into the %s."), upstart(whobuf),
-                      vtense(whobuf, "push"), the(xname(otmp)), what);
+                      vtense(whobuf, _("push")), the(xname(otmp)), what);
                 if (flags.verbose && !Blind)
                     pline(_("Now you can cross it!"));
                 /* no splashing in this case */
@@ -2455,7 +2455,7 @@ heal_legs(
                 legs = makeplural(legs);
             /* this used to say "somewhat better" but that was
                misleading since legs are being fully healed */
-            Your(_("%s %s better."), legs, vtense(legs, "feel"));
+            Your(_("%s %s better."), legs, vtense(legs, _("feel")));
         }
 
         HWounded_legs = EWounded_legs = 0L;
