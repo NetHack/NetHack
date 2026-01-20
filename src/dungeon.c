@@ -3386,16 +3386,16 @@ br_string2(branch *br)
 
     switch (br->type) {
     case BR_PORTAL:
-        return closed_portal ? "Sealed portal" : "Portal";
+        return closed_portal ? _("Sealed portal") : _("Portal");
     case BR_NO_END1:
-        return "Connection";
+        return _("Connection");
     case BR_NO_END2:
-        return br->end1_up ? "One way stairs up" : "One way stairs down";
+        return br->end1_up ? _("One way stairs up") : _("One way stairs down");
     case BR_STAIR:
-        return br->end1_up ? "Stairs up" : "Stairs down";
+        return br->end1_up ? _("Stairs up") : _("Stairs down");
     }
 
-    return "(unknown)";
+    return _("(unknown)");
 }
 
 /* get the name of an endgame level; topten.c does something similar */

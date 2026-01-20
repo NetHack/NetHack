@@ -282,7 +282,7 @@ itemactions(struct obj *otmp)
     char buf[BUFSZ], buf2[BUFSZ];
     menu_item *selected;
     struct monst *mtmp;
-    const char *light = otmp->lamplit ? "Extinguish" : "Light";
+    const char *light = otmp->lamplit ? _("Extinguish") : _("Light");
     boolean already_worn = (otmp->owornmask & (W_ARMOR | W_ACCESSORY)) != 0;
 
     win = create_nhwindow(NHW_MENU);
@@ -291,11 +291,11 @@ itemactions(struct obj *otmp)
     /* -: unwield; picking current weapon offers an opportunity for 'w-'
        to wield bare/gloved hands; likewise for 'Q-' with quivered item(s) */
     if (otmp == uwep || otmp == uswapwep || otmp == uquiver) {
-        const char *verb = (otmp == uquiver) ? "Quiver" : "Wield",
-                   *action = (otmp == uquiver) ? "un-ready" : "un-wield",
-                   *which = is_plural(otmp) ? "these" : "this",
+        const char *verb = (otmp == uquiver) ? _("Quiver") : _("Wield"),
+                   *action = (otmp == uquiver) ? _("un-ready") : _("un-wield"),
+                   *which = is_plural(otmp) ? _("these") : _("this"),
                    *what = ((otmp->oclass == WEAPON_CLASS || is_weptool(otmp))
-                            ? "weapon" : "item");
+                            ? _("weapon") : _("item"));
         /*
          * TODO: if uwep is ammo, tell player that to shoot instead of toss,
          *       the corresponding launcher must be wielded;
@@ -430,18 +430,18 @@ itemactions(struct obj *otmp)
     /* E: engrave with item */
     if (otmp->otyp == TOWEL) {
         ia_addmenu(win, IA_ENGRAVE_OBJ, 'E',
-                   "Wipe the floor with this towel");
+                   _("Wipe the floor with this towel"));
     } else if (otmp->otyp == MAGIC_MARKER) {
         ia_addmenu(win, IA_ENGRAVE_OBJ, 'E',
-                   "Scribble graffiti on the floor");
+                   _("Scribble graffiti on the floor"));
     } else if (otmp->oclass == WEAPON_CLASS || otmp->oclass == WAND_CLASS
              || otmp->oclass == GEM_CLASS || otmp->oclass == RING_CLASS) {
-        Sprintf(buf, "%s on the %s with %s",
+        Sprintf(buf, _("%s on the %s with %s"),
                 (is_blade(otmp) || otmp->oclass == WAND_CLASS
                  || ((otmp->oclass == GEM_CLASS || otmp->oclass == RING_CLASS)
-                     && objects[otmp->otyp].oc_tough)) ? "Engrave" : "Write",
+                     && objects[otmp->otyp].oc_tough)) ? _("Engrave") : _("Write"),
                 surface(u.ux, u.uy),
-                (otmp->quan > 1L) ? "one of these items" : "this item");
+                (otmp->quan > 1L) ? _("one of these items") : _("this item"));
         ia_addmenu(win, IA_ENGRAVE_OBJ, 'E', buf);
     }
 
@@ -450,11 +450,11 @@ itemactions(struct obj *otmp)
         boolean shoot = ammo_and_launcher(otmp, uwep);
 
         /* FIXME: see the multi-shot FIXME about "one of" for 't: throw' */
-        Sprintf(buf, "%s %s", shoot ? "Shoot" : "Throw",
-                (otmp->quan > 1L) ? "one of these" : "this");
+        Sprintf(buf, _("%s %s"), shoot ? _("Shoot") : _("Throw"),
+                (otmp->quan > 1L) ? _("one of these") : _("this"));
         if (shoot) {
             assert(uwep != NULL);
-            Sprintf(eos(buf), " with your wielded %s", simpleonames(uwep));
+            Sprintf(eos(buf), _(" with your wielded %s"), simpleonames(uwep));
         }
         ia_addmenu(win, IA_FIRE_OBJ, 'f', buf);
     }

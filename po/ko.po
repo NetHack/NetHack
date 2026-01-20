@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 15:00+0900\n"
+"POT-Creation-Date: 2026-01-20 15:02+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -1364,6 +1364,11 @@ msgstr "그 지점을 볼 수 없으면 아무것도 칠 수 없다."
 #: src/apply.c:3273
 msgid "can't reach that spot from here."
 msgstr "여기서 그 지점에 닿을 수 없다."
+
+#: src/apply.c:3425
+#, c-format
+msgid "Thump!  Your blow bounces harmlessly off the %s."
+msgstr "쿵! 당신의 공격이 %s에 튕겨나갔다."
 
 #: src/apply.c:3474
 msgid "Don't know what to hit."
@@ -6317,6 +6322,31 @@ msgstr ""
 #, fuzzy
 msgid "this dungeon level"
 msgstr "로그 레벨 "
+
+#: src/dungeon.c:3410
+#, fuzzy
+msgid "Astral Plane"
+msgstr "원소의 평면으로"
+
+# #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
+# 액체
+#: src/dungeon.c:3413
+#, fuzzy
+msgid "Water"
+msgstr "물"
+
+#: src/dungeon.c:3416
+msgid "Fire"
+msgstr ""
+
+#: src/dungeon.c:3419
+#, fuzzy
+msgid "Air"
+msgstr "공기"
+
+#: src/dungeon.c:3422
+msgid "Earth"
+msgstr ""
 
 #: src/dungeon.c:3426
 #, fuzzy, c-format
@@ -21009,6 +21039,20 @@ msgstr "성향"
 msgid "? [ynaq] "
 msgstr "? [ynaq] "
 
+#: src/role.c:1633
+msgid "Shall I pick "
+msgstr ""
+
+#: src/role.c:1635
+#, fuzzy
+msgid "your "
+msgstr "당신의"
+
+#: src/role.c:1637
+#, fuzzy
+msgid "a "
+msgstr "하나의"
+
 #: src/role.c:1975
 #, c-format
 msgid "Pick%s %s first"
@@ -21437,6 +21481,16 @@ msgstr "만족한 %s{이/가} 갑자기 사라졌다!"
 #, c-format
 msgid "%s calms down."
 msgstr "%s{이/가} 진정되었다."
+
+#: src/shk.c:1434
+#, c-format
+msgid "Moreover, you%s have no gold."
+msgstr "게다가, 당신은 금이%s 없다."
+
+#: src/shk.c:1435
+#, c-format
+msgid "Besides, you don't have enough to interest %s."
+msgstr "게다가, %s의 관심을 끌 만큼 충분하지 않다."
 
 #: src/shk.c:1665
 msgid "Pay for which items?"
@@ -29446,6 +29500,15 @@ msgstr "다치지 않았다!"
 msgid "may wish for an object."
 msgstr "물건을 소원할 수 있다."
 
+#: src/zap.c:6205
+#, fuzzy
+msgid "For what do you wish"
+msgstr "%s{으로/로} 그것을 할 수 없다."
+
+#: src/zap.c:6207
+msgid " (enter 'help' for assistance)"
+msgstr ""
+
 #: src/zap.c:6234
 msgid "Nothing fitting that description exists in the game."
 msgstr "그 설명에 맞는 것이 게임에 존재하지 않는다."
@@ -29515,20 +29578,8 @@ msgstr "%s 폭발"
 #~ msgstr "움직일 공간이 충분하지 않다."
 
 #, c-format
-#~ msgid "Thump!  Your blow bounces harmlessly off the %s."
-#~ msgstr "쿵! 당신의 공격이 %s에 튕겨나갔다."
-
-#, c-format
 #~ msgid "need to take off %s to %s %s."
 #~ msgstr "%s{을/를} 벗어야 %s{을/를} %s 수 있다."
-
-#, c-format
-#~ msgid "Moreover, you%s have no gold."
-#~ msgstr "게다가, 당신은 금이%s 없다."
-
-#, c-format
-#~ msgid "Besides, you don't have enough to interest %s."
-#~ msgstr "게다가, %s의 관심을 끌 만큼 충분하지 않다."
 
 #, c-format
 #~ msgid "haven't discovered any %s yet."

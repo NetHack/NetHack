@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 15:00+0900\n"
+"POT-Creation-Date: 2026-01-20 15:02+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1278,6 +1278,11 @@ msgstr ""
 
 #: src/apply.c:3273
 msgid "can't reach that spot from here."
+msgstr ""
+
+#: src/apply.c:3425
+#, c-format
+msgid "Thump!  Your blow bounces harmlessly off the %s."
 msgstr ""
 
 #: src/apply.c:3474
@@ -5989,6 +5994,26 @@ msgstr ""
 
 #: src/dungeon.c:2522
 msgid "this dungeon level"
+msgstr ""
+
+#: src/dungeon.c:3410
+msgid "Astral Plane"
+msgstr ""
+
+#: src/dungeon.c:3413
+msgid "Water"
+msgstr ""
+
+#: src/dungeon.c:3416
+msgid "Fire"
+msgstr ""
+
+#: src/dungeon.c:3419
+msgid "Air"
+msgstr ""
+
+#: src/dungeon.c:3422
+msgid "Earth"
 msgstr ""
 
 #: src/dungeon.c:3426
@@ -19912,6 +19937,18 @@ msgstr ""
 msgid "? [ynaq] "
 msgstr ""
 
+#: src/role.c:1633
+msgid "Shall I pick "
+msgstr ""
+
+#: src/role.c:1635
+msgid "your "
+msgstr ""
+
+#: src/role.c:1637
+msgid "a "
+msgstr ""
+
 #: src/role.c:1975
 #, c-format
 msgid "Pick%s %s first"
@@ -20306,6 +20343,16 @@ msgstr ""
 #: src/shk.c:1375
 #, c-format
 msgid "%s calms down."
+msgstr ""
+
+#: src/shk.c:1434
+#, c-format
+msgid "Moreover, you%s have no gold."
+msgstr ""
+
+#: src/shk.c:1435
+#, c-format
+msgid "Besides, you don't have enough to interest %s."
 msgstr ""
 
 #: src/shk.c:1665
@@ -27953,6 +28000,14 @@ msgstr ""
 
 #: src/zap.c:6203
 msgid "may wish for an object."
+msgstr ""
+
+#: src/zap.c:6205
+msgid "For what do you wish"
+msgstr ""
+
+#: src/zap.c:6207
+msgid " (enter 'help' for assistance)"
 msgstr ""
 
 #: src/zap.c:6234
