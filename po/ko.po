@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 13:52+0900\n"
+"POT-Creation-Date: 2026-01-20 13:55+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -200,7 +200,7 @@ msgstr "%s 불행한 존재%s{이/가} %s%s 죽었다고 판단한다."
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
-#: src/apply.c:287 src/cmd.c:4375 src/cmd.c:5226 src/obj_descr_i18n.c:363
+#: src/apply.c:287 src/cmd.c:4376 src/cmd.c:5227 src/obj_descr_i18n.c:363
 #: src/objnam.c:924 src/potion.c:1659 src/sounds.c:1224 src/trap.c:394
 #: src/zap.c:504
 #, c-format
@@ -295,7 +295,7 @@ msgstr "거기에 %s{이/가} 있다."
 msgid "invisible monster must have moved."
 msgstr "투명 괴물이 이동한 것 같다."
 
-#: src/apply.c:455 src/pager.c:2354 src/shk.c:5091 src/shk.c:5098
+#: src/apply.c:455 src/pager.c:2355 src/shk.c:5091 src/shk.c:5098
 #: src/shk.c:5102
 msgid "door"
 msgstr "문"
@@ -361,8 +361,8 @@ msgstr "이상한"
 #: src/apply.c:682 src/apply.c:1082 src/apply.c:1648 src/apply.c:2128
 #: src/detect.c:999 src/do.c:1800 src/do_wear.c:495 src/do_wear.c:1162
 #: src/dog.c:1206 src/dokick.c:63 src/eat.c:1085 src/eat.c:1092 src/eat.c:1259
-#: src/eat.c:3469 src/explode.c:795 src/getpos.c:986 src/invent.c:2046
-#: src/invent.c:3142 src/mail.c:375 src/mhitu.c:1642 src/mon.c:2955
+#: src/eat.c:3469 src/explode.c:795 src/getpos.c:986 src/invent.c:2047
+#: src/invent.c:3143 src/mail.c:375 src/mhitu.c:1642 src/mon.c:2955
 #: src/mon.c:2957 src/muse.c:2901 src/muse.c:3110 src/music.c:616
 #: src/objnam.c:3664 src/objnam.c:3713 src/objnam.c:3844 src/potion.c:1674
 #: src/pray.c:576 src/pray.c:1489 src/pray.c:1760 src/read.c:1338
@@ -497,7 +497,7 @@ msgstr "%s{이/가} 흐려져서 반사하지 않는다!"
 #: src/apply.c:2384 src/apply.c:3653 src/apply.c:3672 src/artifact.c:2033
 #: src/artifact.c:2065 src/artifact.c:2078 src/artifact.c:2082 src/do.c:2028
 #: src/eat.c:2145 src/engrave.c:1246 src/hack.c:4078 src/nhlua.c:636
-#: src/nhlua.c:652 src/pager.c:2696 src/pline.c:677 src/pline.c:689
+#: src/nhlua.c:652 src/pager.c:2697 src/pline.c:677 src/pline.c:689
 #: src/pline.c:744 src/potion.c:207 src/potion.c:234 src/questpgr.c:434
 #: src/sit.c:55 src/sounds.c:1534 src/spell.c:2055 src/teleport.c:1146
 #: src/timeout.c:342 src/vault.c:959 src/version.c:160 src/windows.c:456
@@ -2256,30 +2256,30 @@ msgstr ""
 # ============================================================
 # 추가 번역 - 정적 문자열 (Additional translations - static strings)
 # ============================================================
-#: src/cmd.c:153
+#: src/cmd.c:154
 #, c-format
 msgid "Unavailable command '%s'."
 msgstr "'%s' 명령은 사용할 수 없다."
 
-#: src/cmd.c:156
+#: src/cmd.c:157
 #, c-format
 msgid "'%s' command not available."
 msgstr "'%s' 명령은 사용할 수 없다."
 
-#: src/cmd.c:479
+#: src/cmd.c:480
 msgid "do that while you are buried!"
 msgstr "묻혀 있는 동안 그것을 할 수 없다!"
 
-#: src/cmd.c:504
+#: src/cmd.c:505
 #, c-format
 msgid "'%s' prefix has no effect for the %s command."
 msgstr "'%s' 접두사는 %s 명령에 효과가 없다."
 
-#: src/cmd.c:531
+#: src/cmd.c:532
 msgid "[A] Command autocompletes"
 msgstr "[A] 명령 자동완성"
 
-#: src/cmd.c:532
+#: src/cmd.c:533
 #, c-format
 msgid "[m] Command accepts '%s' prefix"
 msgstr "[m] '%s' 접두어 허용"
@@ -2287,117 +2287,121 @@ msgstr "[m] '%s' 접두어 허용"
 # ============================================================
 # 확장 명령 메뉴 (Extended Commands Menu)
 # ============================================================
-#: src/cmd.c:580
+#: src/cmd.c:581
 msgid "Extended Commands List"
 msgstr "확장 명령 목록"
 
-#: src/cmd.c:583
+#: src/cmd.c:584
 #, c-format
 msgid "Switch to %s commands that don't autocomplete"
 msgstr "자동완성되지 않는 명령 %s{으로/로} 전환"
 
-#: src/cmd.c:584
+#: src/cmd.c:585
 msgid "including"
 msgstr "포함"
 
-#: src/cmd.c:584
+#: src/cmd.c:585
 msgid "excluding"
 msgstr "제외"
 
-#: src/cmd.c:597
+#: src/cmd.c:598
 msgid "Search extended commands"
 msgstr "확장 명령 검색"
 
-#: src/cmd.c:600
+#: src/cmd.c:601
 msgid "Switch back from search"
 msgstr "검색에서 돌아가기"
 
-#: src/cmd.c:615
+#: src/cmd.c:616
 msgid "Switch to showing debugging commands in separate section"
 msgstr "디버그 명령을 별도 섹션에 표시로 전환"
 
-#: src/cmd.c:616
+#: src/cmd.c:617
 msgid "Switch to showing all alphabetically, including debugging commands"
 msgstr "디버그 명령 포함 알파벳순으로 전부 표시로 전환"
 
-#: src/cmd.c:684
+#: src/cmd.c:685
 msgid "no matches"
 msgstr "일치하는 항목 없음"
 
 # ============================================================
 # 확장 명령 메뉴 (Extended Commands Menu)
 # ============================================================
-#: src/cmd.c:717
+#: src/cmd.c:718
 #, fuzzy
 msgid "Extended command list search phrase"
 msgstr "확장 명령 목록"
 
-#: src/cmd.c:923
+#: src/cmd.c:894
+msgid "Hide [h] or spin a web [s]?"
+msgstr "숨으시겠습니까 [h] 아니면 거미줄을 치시겠습니까 [s]?"
+
+#: src/cmd.c:924
 msgid "is no fountain here."
 msgstr "여기에 샘이 없다."
 
-#: src/cmd.c:929
+#: src/cmd.c:930
 msgid "shriek."
 msgstr "비명을 질렀다."
 
-#: src/cmd.c:931
+#: src/cmd.c:932
 msgid "Unfortunately sound does not carry well through rock."
 msgstr "불행히도 소리가 바위를 통해 잘 전달되지 않는다."
 
-#: src/cmd.c:940
+#: src/cmd.c:941
 msgid "Any special ability you may have is purely reflexive."
 msgstr "가지고 있는 특수 능력은 순전히 반사적이다."
 
-#: src/cmd.c:942
+#: src/cmd.c:943
 msgid "don't have a special ability in your normal form!"
 msgstr "정상적인 형태에서는 특수 능력이 없다!"
 
-#: src/cmd.c:951
+#: src/cmd.c:952
 msgid "are already in explore mode."
 msgstr "이미 탐험 모드에 있다."
 
-#: src/cmd.c:957
+#: src/cmd.c:958
 msgid "cannot access explore mode."
 msgstr "탐험 모드에 접근할 수 없다."
 
-#: src/cmd.c:965
+#: src/cmd.c:966
 #, c-format
 msgid "Beware!  From explore mode there will be no return to %s,"
 msgstr "주의! 탐험 모드에서는 %s(으)로 돌아갈 수 없다,"
 
-#: src/cmd.c:972
+#: src/cmd.c:973
 msgid "are now in non-scoring explore mode."
 msgstr "이제 점수가 기록되지 않는 탐험 모드에 있다."
 
 # ============================================================
 # 전투 메시지 (Combat Messages)
 # ============================================================
-#: src/cmd.c:975
+#: src/cmd.c:976
 #, c-format
 msgid "Continuing with %s."
 msgstr "%s{으로/로} 계속한다."
 
-#: src/cmd.c:991
+#: src/cmd.c:992
 #, c-format
 msgid "%s achievement revoked."
 msgstr "%s 업적이 취소되었다."
 
-#: src/cmd.c:998
+#: src/cmd.c:999
 msgid "Mine's-end"
 msgstr "광산 끝"
 
-#: src/cmd.c:1002
+#: src/cmd.c:1003
 msgid "Soko-prize"
 msgstr "소코반 보상"
 
-#: src/cmd.c:1148
+#: src/cmd.c:1149
 msgid "View which?"
 msgstr "무엇을 볼까요?"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
-#: src/cmd.c:1287 src/dogmove.c:290 src/dokick.c:1944 src/makemon.c:2141
+#: src/cmd.c:1288 src/dogmove.c:290 src/dokick.c:1944 src/makemon.c:2141
 #: src/mhitm.c:669 src/mhitm.c:859 src/mthrowu.c:1195 src/muse.c:2894
 #: src/steal.c:329 src/trap.c:4933 src/trap.c:4964 src/uhitm.c:5557
 #: src/zap.c:3562
@@ -2405,166 +2409,166 @@ msgstr "무엇을 볼까요?"
 msgid "%s %s %s."
 msgstr "%1$s{이/가} %3$s{을/를} %2$s."
 
-#: src/cmd.c:1293
+#: src/cmd.c:1294
 #, c-format
 msgid "guess %s to be %s %s."
 msgstr "%s{이/가} %s %s인 것 같다."
 
-#: src/cmd.c:1298
+#: src/cmd.c:1299
 #, c-format
 msgid "can't guess the size of %s area."
 msgstr "%s 지역의 크기를 추측할 수 없다."
 
-#: src/cmd.c:1559
+#: src/cmd.c:1560
 #, c-format
 msgid "Double %s prefix, canceled."
 msgstr "%s 접두사 두 번, 취소됨."
 
-#: src/cmd.c:1574
+#: src/cmd.c:1575
 msgid "Double rush prefix, canceled."
 msgstr "돌진 접두사 두 번, 취소됨."
 
-#: src/cmd.c:1590
+#: src/cmd.c:1591
 msgid "Double run prefix, canceled."
 msgstr "달리기 접두사 두 번, 취소됨."
 
-#: src/cmd.c:1606
+#: src/cmd.c:1607
 msgid "Double fight prefix, canceled."
 msgstr "전투 접두사 두 번, 취소됨."
 
-#: src/cmd.c:1627
+#: src/cmd.c:1628
 msgid "There is no command available to repeat."
 msgstr "반복할 명령이 없다."
 
-#: src/cmd.c:2141 src/cmd.c:2207
+#: src/cmd.c:2142 src/cmd.c:2208
 msgid "Bind which key? "
 msgstr "어떤 키를 바인딩하시겠습니까? "
 
 # ============================================================
 # 명령 UI 메시지 (Command UI Messages)
 # ============================================================
-#: src/cmd.c:2155
+#: src/cmd.c:2156
 #, c-format
 msgid "Key '%s' is currently bound to \"%s\"."
 msgstr "키 '%s'은(는) 현재 \"%s\"에 연결되어 있다."
 
-#: src/cmd.c:2158
+#: src/cmd.c:2159
 #, c-format
 msgid "Key '%s' is not bound to anything."
 msgstr "키 '%s'은(는) 아무것에도 연결되어 있지 않다."
 
-#: src/cmd.c:2167
+#: src/cmd.c:2168
 msgid "nothing: unbind the key"
 msgstr "없음: 키 연결 해제"
 
-#: src/cmd.c:2184
+#: src/cmd.c:2185
 #, c-format
 msgid "Bind '%s' to what command?"
 msgstr "'%s'을(를) 어떤 명령에 연결할까?"
 
-#: src/cmd.c:2186
+#: src/cmd.c:2187
 msgid "Bind what command?"
 msgstr "어떤 명령을 연결할까?"
 
-#: src/cmd.c:2218
+#: src/cmd.c:2219
 #, c-format
 msgid "Changed key '%s' from \"%s\" to \"%s\"."
 msgstr "키 '%s'를 \"%s\"에서 \"%s\"(으)로 변경했다."
 
-#: src/cmd.c:2221
+#: src/cmd.c:2222
 #, c-format
 msgid "Bound key '%s' to \"%s\"."
 msgstr "키 '%s'를 \"%s\"에 바인딩했다."
 
-#: src/cmd.c:2225
+#: src/cmd.c:2226
 msgid "Key binding failed?!"
 msgstr "키 바인딩 실패?!"
 
-#: src/cmd.c:2255 src/options.c:9304
+#: src/cmd.c:2256 src/options.c:9304
 msgid "Do what?"
 msgstr "무엇을 할까요?"
 
-#: src/cmd.c:2304
+#: src/cmd.c:2305
 #, fuzzy
 msgid "Which commands autocomplete?"
 msgstr "[A] 명령 자동완성"
 
-#: src/cmd.c:2680
+#: src/cmd.c:2681
 msgid "    Full Current Key Bindings List"
 msgstr "    현재 키 바인딩 전체 목록"
 
-#: src/cmd.c:2685
+#: src/cmd.c:2686
 msgid "(also commands with no key assignment)"
 msgstr "(키 할당이 없는 명령 포함)"
 
 # ============================================================
 # 도움말/키 목록 (Help/Key List)
 # ============================================================
-#: src/cmd.c:2692
+#: src/cmd.c:2693
 msgid "Directional keys:"
 msgstr "방향키:"
 
-#: src/cmd.c:2698
+#: src/cmd.c:2699
 msgid "Ctrl+<direction> will run in specified direction until something very"
 msgstr "Ctrl+<방향>은 매우 흥미로운 것을 발견할 때까지"
 
-#: src/cmd.c:2699
+#: src/cmd.c:2700
 #, fuzzy
 msgid "interesting is seen."
 msgstr "흥미로운 것이 %s 않았다."
 
-#: src/cmd.c:2701
+#: src/cmd.c:2702
 msgid "Shift"
 msgstr "Shift"
 
-#: src/cmd.c:2705
+#: src/cmd.c:2706
 msgid "Meta"
 msgstr "Meta"
 
-#: src/cmd.c:2708
+#: src/cmd.c:2709
 msgid "+<direction> will run in specified direction until you encounter"
 msgstr "+<방향>은 장애물을 만날 때까지 해당 방향으로 달립니다"
 
-#: src/cmd.c:2710
+#: src/cmd.c:2711
 #, fuzzy
 msgid "an obstacle."
 msgstr "장애물이 있다."
 
-#: src/cmd.c:2714
+#: src/cmd.c:2715
 msgid "Miscellaneous keys:"
 msgstr "기타 키:"
 
-#: src/cmd.c:2736
+#: src/cmd.c:2737
 msgid " interrupt: break out of NetHack (SIGINT)"
 msgstr " 인터럽트: 넷핵 중단 (SIGINT)"
 
-#: src/cmd.c:2763
+#: src/cmd.c:2764
 msgid "General commands:"
 msgstr "일반 명령어:"
 
-#: src/cmd.c:2770
+#: src/cmd.c:2771
 msgid "Game commands:"
 msgstr "게임 명령어:"
 
-#: src/cmd.c:2779
+#: src/cmd.c:2780
 msgid "Debug mode commands:"
 msgstr "디버그 모드 명령어:"
 
-#: src/cmd.c:3482
+#: src/cmd.c:3483
 #, c-format
 msgid "The %s command does not accept '%s' prefix."
 msgstr "%s 명령은 '%s' 접두사를 허용하지 않는다."
 
-#: src/cmd.c:3554
+#: src/cmd.c:3555
 msgid "get there from here..."
 msgstr "여기서 그곳에 갈 수 없다..."
 
-#: src/cmd.c:3606
+#: src/cmd.c:3607
 #, c-format
 msgid "Unknown command '%s'."
 msgstr "알 수 없는 명령 '%s'."
 
-#: src/cmd.c:3758
+#: src/cmd.c:3759
 #, fuzzy
 msgid "In what direction?"
 msgstr "어떤 옵션을 설정할까요?"
@@ -2573,7 +2577,7 @@ msgstr "어떤 옵션을 설정할까요?"
 # 프롬프트 (Prompts)
 # ============================================================
 #
-#: src/cmd.c:3879
+#: src/cmd.c:3880
 msgid "What a strange direction!"
 msgstr "이상한 방향이다!"
 
@@ -2581,107 +2585,107 @@ msgstr "이상한 방향이다!"
 # 프롬프트 (Prompts)
 # ============================================================
 #
-#: src/cmd.c:3883
+#: src/cmd.c:3884
 msgid "orient yourself that direction."
 msgstr "그 방향으로 몸을 돌릴 수 없다."
 
-#: src/cmd.c:3973
+#: src/cmd.c:3974
 #, fuzzy, c-format
 msgid "You can't %s%s yourself."
 msgstr "착용 중인 %s{을/를} %s할 수 없다."
 
-#: src/cmd.c:3976
+#: src/cmd.c:3977
 #, fuzzy, c-format
 msgid "You can't %s %s."
 msgstr "%s %s에 빠져 있다."
 
-#: src/cmd.c:3979
+#: src/cmd.c:3980
 msgid "upward"
 msgstr "위쪽으로"
 
-#: src/cmd.c:3979
+#: src/cmd.c:3980
 #, fuzzy
 msgid "downward"
 msgstr "아래로"
 
-#: src/cmd.c:3987
+#: src/cmd.c:3988
 #, c-format
 msgid "Invalid direction for '%s' prefix."
 msgstr "'%s' 접두사에 대한 잘못된 방향입니다."
 
-#: src/cmd.c:4008
+#: src/cmd.c:4009
 #, c-format
 msgid "cmdassist: %s"
 msgstr "cmdassist: %s"
 
-#: src/cmd.c:4019
+#: src/cmd.c:4020
 #, c-format
 msgid "Are you trying to use ^%c%s?"
 msgstr "^%c%s을(를) 사용하려고 하나요?"
 
-#: src/cmd.c:4021
+#: src/cmd.c:4022
 msgid " as specified in the Guidebook"
 msgstr " 가이드북에 명시된 대로"
 
-#: src/cmd.c:4027
+#: src/cmd.c:4028
 msgid "To use that command, hold down the <Ctrl> key as a shift"
 msgstr "해당 명령을 사용하려면 <Ctrl> 키를 누른 상태에서"
 
-#: src/cmd.c:4028
+#: src/cmd.c:4029
 #, c-format
 msgid "and press the <%c> key."
 msgstr "<%c> 키를 누르세요."
 
-#: src/cmd.c:4034
+#: src/cmd.c:4035
 #, c-format
 msgid "Valid direction keys%s%s%s are:"
 msgstr "유효한 방향키%s%s%s는:"
 
-#: src/cmd.c:4035
+#: src/cmd.c:4036
 msgid " to "
 msgstr " 및 "
 
-#: src/cmd.c:4036
+#: src/cmd.c:4037
 #, fuzzy
 msgid " in your current form"
 msgstr "현재 모습으로는 두 무기를 사용할 수 없다."
 
-#: src/cmd.c:4217
+#: src/cmd.c:4218
 #, fuzzy, c-format
 msgid "Drink from the %s"
 msgstr "싱크대에서 마시겠습니까?"
 
-#: src/cmd.c:4222
+#: src/cmd.c:4223
 #, fuzzy
 msgid "Dip something into the fountain"
 msgstr "분수에서 마시겠습니까?"
 
-#: src/cmd.c:4224
+#: src/cmd.c:4225
 #, fuzzy
 msgid "Sit on the throne"
 msgstr "서비스다!"
 
-#: src/cmd.c:4226
+#: src/cmd.c:4227
 msgid "Sacrifice something on the altar"
 msgstr "제단에 제물을 바치기"
 
-#: src/cmd.c:4229
+#: src/cmd.c:4230
 #, fuzzy, c-format
 msgid "Go up the %s"
 msgstr "%s (%s)"
 
 # #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 # stairs.c translations
-#: src/cmd.c:4230 src/cmd.c:4235 src/sit.c:533 src/stairs.c:198
+#: src/cmd.c:4231 src/cmd.c:4236 src/sit.c:533 src/stairs.c:198
 msgid "ladder"
 msgstr "사다리"
 
-#: src/cmd.c:4230 src/cmd.c:4235 src/dungeon.c:1774 src/sit.c:531
+#: src/cmd.c:4231 src/cmd.c:4236 src/dungeon.c:1774 src/sit.c:531
 #: src/stairs.c:198
 msgid "stairs"
 msgstr "계단"
 
-#: src/cmd.c:4234
+#: src/cmd.c:4235
 #, fuzzy, c-format
 msgid "Go down the %s"
 msgstr "%s{을/를} 따라 떨어진다."
@@ -2689,191 +2693,191 @@ msgstr "%s{을/를} 따라 떨어진다."
 # ============================================================
 # 전투 메시지 (Combat Messages)
 # ============================================================
-#: src/cmd.c:4239
+#: src/cmd.c:4240
 #, fuzzy, c-format
 msgid "Dismount %s"
 msgstr "%s{에서} 내렸다."
 
-#: src/cmd.c:4256
+#: src/cmd.c:4257
 #, fuzzy, c-format
 msgid "Pick up %s"
 msgstr "%s{을/를} 선택하세요."
 
-#: src/cmd.c:4256
+#: src/cmd.c:4257
 msgid "items"
 msgstr "아이템들"
 
 # ============================================================
 # 전투 메시지 (Combat Messages)
 # ============================================================
-#: src/cmd.c:4260
+#: src/cmd.c:4261
 #, fuzzy, c-format
 msgid "Loot %s"
 msgstr "%s{을/를} 탔다."
 
-#: src/cmd.c:4263
+#: src/cmd.c:4264
 #, fuzzy, c-format
 msgid "Tip %s"
 msgstr "%s{을/를} 채찍질했다!"
 
-#: src/cmd.c:4267
+#: src/cmd.c:4268
 #, fuzzy, c-format
 msgid "Eat %s"
 msgstr "%s{을/를} 시작했다."
 
-#: src/cmd.c:4274
+#: src/cmd.c:4275
 #, fuzzy
 msgid "Inventory"
 msgstr "소지품:"
 
-#: src/cmd.c:4275
+#: src/cmd.c:4276
 #, fuzzy
 msgid "Drop items"
 msgstr "발견한 물품"
 
-#: src/cmd.c:4277
+#: src/cmd.c:4278
 #, fuzzy
 msgid "Rest one turn"
 msgstr "%s{이/가} 돌아온다!"
 
-#: src/cmd.c:4278
+#: src/cmd.c:4279
 #, fuzzy
 msgid "Search around you"
 msgstr "갑옷이 당신 주변으로 떨어졌다!"
 
-#: src/cmd.c:4279
+#: src/cmd.c:4280
 #, fuzzy
 msgid "Look at what is here"
 msgstr "여기에 뭐가 있는지 느껴보려 한다."
 
-#: src/cmd.c:4282
+#: src/cmd.c:4283
 #, fuzzy
 msgid "Cast a spell"
 msgstr "%s{은/는} 알을 낳을 수 없다!"
 
-#: src/cmd.c:4287 src/cmd.c:4342
+#: src/cmd.c:4288 src/cmd.c:4343
 msgid "Attempt to disarm trap"
 msgstr "함정 해제 시도"
 
-#: src/cmd.c:4314
+#: src/cmd.c:4315
 #, fuzzy
 msgid "Open the door"
 msgstr "문을 찼다."
 
-#: src/cmd.c:4320
+#: src/cmd.c:4321
 #, fuzzy, c-format
 msgid "%sunlock the door"
 msgstr "문을 찼다."
 
-#: src/cmd.c:4321
+#: src/cmd.c:4322
 #, fuzzy
 msgid "lock or "
 msgstr "자물쇠에"
 
-#: src/cmd.c:4327
+#: src/cmd.c:4328
 #, fuzzy
 msgid "Search the door for a trap"
 msgstr "문틀에 부딪혔다!"
 
-#: src/cmd.c:4329
+#: src/cmd.c:4330
 #, fuzzy
 msgid "Kick the door"
 msgstr "문을 찼다."
 
-#: src/cmd.c:4331
+#: src/cmd.c:4332
 #, fuzzy
 msgid "Close the door"
 msgstr "문을 찼다."
 
-#: src/cmd.c:4336
+#: src/cmd.c:4337
 #, fuzzy
 msgid "Search for secret doors"
 msgstr "쾅! %s 비밀문!"
 
-#: src/cmd.c:4339
+#: src/cmd.c:4340
 msgid "Examine trap"
 msgstr "함정 살펴보기"
 
-#: src/cmd.c:4343
+#: src/cmd.c:4344
 #, fuzzy
 msgid "Move on the trap"
 msgstr "%s{이/가} 함정을 피했다."
 
-#: src/cmd.c:4347
+#: src/cmd.c:4348
 #, fuzzy
 msgid "Push the boulder"
 msgstr "바위를 먹었다."
 
-#: src/cmd.c:4357
+#: src/cmd.c:4358
 #, fuzzy, c-format
 msgid "Ride %s"
 msgstr "%s 같다."
 
-#: src/cmd.c:4360
+#: src/cmd.c:4361
 #, fuzzy, c-format
 msgid "Remove saddle from %s"
 msgstr "%s{이/가} %s{을/를} 벗었다."
 
-#: src/cmd.c:4365
+#: src/cmd.c:4366
 #, fuzzy, c-format
 msgid "Put saddle on %s"
 msgstr "%s에게 안장을 씌웠다."
 
-#: src/cmd.c:4369
+#: src/cmd.c:4370
 #, fuzzy, c-format
 msgid "Talk to %s"
 msgstr "대화? -- %s"
 
 # Pet interaction verbs (hack.c)
-#: src/cmd.c:4372
+#: src/cmd.c:4373
 #, fuzzy, c-format
 msgid "Swap places with %s"
 msgstr "%s{과/와} 자리를 바꿨다."
 
-#: src/cmd.c:4376 src/spell.c:2096
+#: src/cmd.c:4377 src/spell.c:2096
 msgid "Name"
 msgstr "이름 짓기"
 
-#: src/cmd.c:4376
+#: src/cmd.c:4377
 #, fuzzy
 msgid "Rename"
 msgstr "이름 지을"
 
-#: src/cmd.c:4383
+#: src/cmd.c:4384
 #, fuzzy, c-format
 msgid "Attack %s"
 msgstr "공격한다"
 
-#: src/cmd.c:4383
+#: src/cmd.c:4384
 #, fuzzy
 msgid "unseen creature"
 msgstr "보이지 않는 생물"
 
-#: src/cmd.c:4401
+#: src/cmd.c:4402
 #, fuzzy
 msgid "Throw something"
 msgstr "무언가"
 
-#: src/cmd.c:4403
+#: src/cmd.c:4404
 #, fuzzy
 msgid "Travel here"
 msgstr "여행자"
 
-#: src/cmd.c:4653
+#: src/cmd.c:4654
 #, fuzzy
 msgid "What do you want to do?"
 msgstr "무엇을 버리겠습니까?"
 
 #
-#: src/cmd.c:5101
+#: src/cmd.c:5102
 msgid "Where do you want to travel to?"
 msgstr "어디로 이동하시겠습니까?"
 
-#: src/cmd.c:5120
+#: src/cmd.c:5121
 msgid "No travel destination set."
 msgstr "이동 목적지가 설정되지 않았다."
 
-#: src/cmd.c:5125
+#: src/cmd.c:5126
 msgid "are already here."
 msgstr "이미 여기에 있다."
 
@@ -3175,6 +3179,11 @@ msgstr "와... 만화경 같다!"
 #: src/detect.c:1300
 msgid "may look for an object, monster, or special map symbol."
 msgstr "물체, 괴물, 또는 특수 지도 기호를 찾을 수 있다."
+
+#: src/detect.c:1301
+#, fuzzy
+msgid "What do you look for?"
+msgstr "무엇을 버리겠습니까?"
 
 #: src/detect.c:1313
 #, c-format
@@ -5001,7 +5010,7 @@ msgstr "더 이상 어떤 무기도 장비하고 있지 않다."
 # ============================================================
 # 두루마리 (Scrolls)
 # ============================================================
-#: src/do_wear.c:2832 src/hack.c:4085 src/invent.c:4556 src/wield.c:173
+#: src/do_wear.c:2832 src/hack.c:4085 src/invent.c:4557 src/wield.c:173
 #, c-format
 msgid "are %s."
 msgstr "%s."
@@ -6092,7 +6101,7 @@ msgstr "분수"
 msgid "wall"
 msgstr "벽"
 
-#: src/dungeon.c:1778 src/obj_descr_i18n.c:451 src/pager.c:762
+#: src/dungeon.c:1778 src/obj_descr_i18n.c:451 src/pager.c:763
 msgid "doorway"
 msgstr "출입구"
 
@@ -6817,7 +6826,7 @@ msgstr "고급 음식"
 
 #
 #: src/eat.c:2489 src/obj_descr_i18n.c:115 src/obj_descr_i18n.c:360
-#: src/objnam.c:916 src/pager.c:789
+#: src/objnam.c:916 src/pager.c:790
 msgid "stone"
 msgstr "돌"
 
@@ -6891,7 +6900,7 @@ msgstr "열 깡통이 없다."
 msgid "Really wield "
 msgstr "정말로 저장하시겠습니까?"
 
-#: src/eat.c:3108 src/invent.c:5460
+#: src/eat.c:3108 src/invent.c:5461
 #, fuzzy
 msgid "that"
 msgstr "그것을 %s!"
@@ -9826,7 +9835,7 @@ msgstr "질서"
 msgid "unaligned"
 msgstr "무정렬"
 
-#: src/insight.c:3223 src/obj_descr_i18n.c:447 src/pager.c:734 src/pager.c:786
+#: src/insight.c:3223 src/obj_descr_i18n.c:447 src/pager.c:735 src/pager.c:787
 msgid "unknown"
 msgstr "미지"
 
@@ -9865,19 +9874,19 @@ msgstr "%s (%s, %s)의 상태: 레벨 %d HP %d(%d) AC %d%s."
 msgid "Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s."
 msgstr "%s (%s)의 상태: 레벨 %d HP %d(%d) AC %d%s."
 
-#: src/invent.c:941
+#: src/invent.c:942
 msgid "You learn more about your items by comparing them."
 msgstr "물건을 비교하면 더 많이 알게 된다."
 
 # ============================================================
 # 던전 메시지 (Dungeon Messages)
 # ============================================================
-#: src/invent.c:1040
+#: src/invent.c:1041
 #, c-format
 msgid "You decipher the label on %s."
 msgstr "%s의 라벨을 해독했다."
 
-#: src/invent.c:1704
+#: src/invent.c:1705
 #, c-format
 msgid "mime %s%s%s something%s%s."
 msgstr "%s%s%s 무언가를%s%s 흉내낸다."
@@ -9885,246 +9894,246 @@ msgstr "%s%s%s 무언가를%s%s 흉내낸다."
 # ============================================================
 # 인벤토리 메시지 (Inventory Messages)
 # ============================================================
-#: src/invent.c:1723 src/invent.c:1725 src/invent.c:1734
+#: src/invent.c:1724 src/invent.c:1726 src/invent.c:1735
 #, c-format
 msgid "your %s"
 msgstr "당신의 %s"
 
-#: src/invent.c:1727
+#: src/invent.c:1728
 #, c-format
 msgid "your %s %s%s"
 msgstr "당신의 %s %s%s"
 
-#: src/invent.c:1727 src/invent.c:3316 src/uhitm.c:544
+#: src/invent.c:1728 src/invent.c:3317 src/uhitm.c:544
 msgid "gloved"
 msgstr "장갑 낀"
 
-#: src/invent.c:1727 src/invent.c:3316 src/uhitm.c:544
+#: src/invent.c:1728 src/invent.c:3317 src/uhitm.c:544
 msgid "bare"
 msgstr "맨"
 
-#: src/invent.c:1729
+#: src/invent.c:1730
 msgid " (wielded)"
 msgstr " (장비됨)"
 
-#: src/invent.c:1731
+#: src/invent.c:1732
 #, c-format
 msgid "empty quiver%s"
 msgstr "빈 화살통%s"
 
-#: src/invent.c:1732
+#: src/invent.c:1733
 msgid " (nothing readied)"
 msgstr " (준비된 것 없음)"
 
-#: src/invent.c:1914
+#: src/invent.c:1915
 #, c-format
 msgid "don't have anything %sto %s."
 msgstr "%1$s%2$s 것이 없다."
 
-#: src/invent.c:1914
+#: src/invent.c:1915
 msgid "else "
 msgstr "다른 "
 
-#: src/invent.c:1920 src/invent.c:1976
+#: src/invent.c:1921 src/invent.c:1977
 #, c-format
 msgid "What do you want to %s?"
 msgstr "%s 것이 무엇입니까?"
 
-#: src/invent.c:1942
+#: src/invent.c:1943
 msgid "No count allowed with this command."
 msgstr "이 명령에는 수량 지정이 허용되지 않는다."
 
-#: src/invent.c:2013
+#: src/invent.c:2014
 #, c-format
 msgid "cannot %s gold."
 msgstr "금화를 %s 수 없다."
 
-#: src/invent.c:2024
+#: src/invent.c:2025
 msgid "LRS would be very interested to know you have that much."
 msgstr "국세청이 그렇게 많이 가지고 있다는 것을 알면 매우 관심을 가질 것이다."
 
-#: src/invent.c:2042
+#: src/invent.c:2043
 #, c-format
 msgid "only have %ld%s%s."
 msgstr "%ld%s%s만 가지고 있다."
 
-#: src/invent.c:2060
+#: src/invent.c:2061
 msgid "don't have that object."
 msgstr "그 물건을 가지고 있지 않다."
 
-#: src/invent.c:2065
+#: src/invent.c:2066
 #, c-format
 msgid "don't have that many!  You have only %ld."
 msgstr "그렇게 많이 없다! %ld개만 가지고 있다."
 
-#: src/invent.c:2120
+#: src/invent.c:2121
 #, c-format
 msgid "Use the '%s' command to %s %s%s."
 msgstr "'%s' 명령으로 %s %s%s."
 
-#: src/invent.c:2129
+#: src/invent.c:2130
 msgid "Amulet doesn't like being called names."
 msgstr "부적은 이름으로 불리는 것을 좋아하지 않는다."
 
-#: src/invent.c:2217
+#: src/invent.c:2218
 #, c-format
 msgid "have nothing to %s."
 msgstr "%s 것이 없다."
 
-#: src/invent.c:2262
+#: src/invent.c:2263
 #, fuzzy, c-format
 msgid "What kinds of thing do you want to %s? [%s]"
 msgstr "%s 것이 무엇입니까?"
 
-#: src/invent.c:2308
+#: src/invent.c:2309
 msgid "Not applicable."
 msgstr "해당 없음."
 
 #
-#: src/invent.c:2315
+#: src/invent.c:2316
 msgid "are not wielding anything."
 msgstr "아무것도 들고 있지 않다."
 
 #
-#: src/invent.c:2318
+#: src/invent.c:2319
 msgid "are not wearing rings."
 msgstr "반지를 끼고 있지 않다."
 
 #
-#: src/invent.c:2321 src/invent.c:4685
+#: src/invent.c:2322 src/invent.c:4686
 msgid "are not wearing an amulet."
 msgstr "부적을 걸고 있지 않다."
 
 #
-#: src/invent.c:2324
+#: src/invent.c:2325
 msgid "are not wearing a blindfold."
 msgstr "눈가리개를 하고 있지 않다."
 
-#: src/invent.c:2342
+#: src/invent.c:2343
 #, c-format
 msgid "don't have any %c's."
 msgstr "%c를 가지고 있지 않다."
 
 #
-#: src/invent.c:2532 src/invent.c:2687
+#: src/invent.c:2533 src/invent.c:2688
 msgid "That was all."
 msgstr "그게 전부였다."
 
-#: src/invent.c:2534
+#: src/invent.c:2535
 msgid "No applicable objects."
 msgstr "해당하는 물건이 없다."
 
-#: src/invent.c:2600
+#: src/invent.c:2601
 msgid "Reroll this character?"
 msgstr "이 캐릭터를 다시 굴릴까요?"
 
-#: src/invent.c:2693
+#: src/invent.c:2694
 msgid "Choose an item; use ESC to decline."
 msgstr "항목을 선택하세요; ESC로 취소."
 
-#: src/invent.c:2720
+#: src/invent.c:2721
 #, c-format
 msgid "have already identified %s of your possessions."
 msgstr "이미 소지품 중 %s{을/를} 확인했다."
 
-#: src/invent.c:2837
+#: src/invent.c:2838
 #, c-format
 msgid "Persistent inventory display is not supported by '%s'."
 msgstr "'%s'는 지속적 인벤토리 표시를 지원하지 않는다."
 
-#: src/invent.c:2842
+#: src/invent.c:2843
 msgid "Persistent inventory ('perm_invent' option) is not presently enabled."
 msgstr "지속적 인벤토리('perm_invent' 옵션)가 현재 활성화되어 있지 않다."
 
-#: src/invent.c:2846
+#: src/invent.c:2847
 msgid "Persistent inventory display is empty."
 msgstr "지속적 인벤토리 표시가 비어 있다."
 
-#: src/invent.c:2888
+#: src/invent.c:2889
 #, c-format
 msgid "%s%s%s%s"
 msgstr "%s%s%s%s"
 
-#: src/invent.c:3257
+#: src/invent.c:3258
 #, fuzzy
 msgid "Miscellaneous"
 msgstr "기타 키:"
 
-#: src/invent.c:3315
+#: src/invent.c:3316
 #, c-format
 msgid "%s %s (no weapon)"
 msgstr "%s %s (무기 없음)"
 
-#: src/invent.c:3363
+#: src/invent.c:3364
 msgid "Special"
 msgstr "특수"
 
-#: src/invent.c:3509
+#: src/invent.c:3510
 #, fuzzy
 msgid "Inventory letters used:"
 msgstr "소지품:"
 
-#: src/invent.c:3776
+#: src/invent.c:3777
 #, c-format
 msgid "aren't carrying any unpaid items but there %s %d %s."
 msgstr "미결제 물건을 가지고 있지 않지만 %s %d %s 있다."
 
-#: src/invent.c:3846
+#: src/invent.c:3847
 msgid "aren't carrying anything."
 msgstr "아무것도 가지고 있지 않다."
 
-#: src/invent.c:3948
+#: src/invent.c:3949
 #, c-format
 msgid "No used-up objects%s."
 msgstr "사용된 물건%s 없다."
 
-#: src/invent.c:3956
+#: src/invent.c:3957
 msgid "are not carrying any unpaid objects."
 msgstr "미결제 물건을 가지고 있지 않다."
 
-#: src/invent.c:4003
+#: src/invent.c:4004
 #, c-format
 msgid "have no %sobjects%s."
 msgstr "%s물건%s{이/가} 없다."
 
-#: src/invent.c:4111
+#: src/invent.c:4112
 msgid "feel"
 msgstr "느껴지지 않습니다"
 
 # Verbs for look_here function (Blind: feel, otherwise: see)
-#: src/invent.c:4111
+#: src/invent.c:4112
 msgid "see"
 msgstr "보이지 않습니다"
 
-#: src/invent.c:4144
+#: src/invent.c:4145
 #, c-format
 msgid "%s to %s what is lying in %s."
 msgstr "%s{이/가} %s에 뭐가 있는지 %s."
 
-#: src/invent.c:4159 src/invent.c:4248
+#: src/invent.c:4160 src/invent.c:4249
 #, c-format
 msgid "%s no objects here."
 msgstr "여기에는 아무 물체도 %s"
 
-#: src/invent.c:4175
+#: src/invent.c:4176
 #, c-format
 msgid "is %s%s%s here."
 msgstr "여기에 %s%s%s 있다."
 
-#: src/invent.c:4191
+#: src/invent.c:4192
 msgid "try to feel what is here."
 msgstr "여기에 뭐가 있는지 느껴보려 한다."
 
-#: src/invent.c:4199
+#: src/invent.c:4200
 msgid "try to feel what is on it."
 msgstr "그 위에 뭐가 있는지 느껴보려 한다."
 
-#: src/invent.c:4208
+#: src/invent.c:4209
 #, c-format
 msgid "try to feel what is %s%s."
 msgstr "%s%s에 뭐가 있는지 느껴보려 한다."
 
-#: src/invent.c:4216
+#: src/invent.c:4217
 msgid "But you can't reach it!"
 msgstr "하지만 닿을 수 없다!"
 
@@ -10132,17 +10141,17 @@ msgstr "하지만 닿을 수 없다!"
 # UI 메시지 (invent.c - "here" 관련)
 # ============================================================
 # %1$s = "is"/"are", %2$s = object name
-#: src/invent.c:4239 src/obj_descr_i18n.c:292
+#: src/invent.c:4240 src/obj_descr_i18n.c:292
 #, c-format
 msgid "There %s %s here."
 msgstr "여기에 %2$s{이/가} 있다.%1$.0s"
 
-#: src/invent.c:4258
+#: src/invent.c:4259
 #, c-format
 msgid "is %s object here."
 msgstr "여기에 %s 물체가 있다."
 
-#: src/invent.c:4260
+#: src/invent.c:4261
 #, c-format
 msgid "are %s%s objects here."
 msgstr "여기에 %s%s 물체가 있다."
@@ -10150,7 +10159,7 @@ msgstr "여기에 %s%s 물체가 있다."
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
-#: src/invent.c:4268 src/mhitu.c:2108 src/pray.c:1183 src/zap.c:3939
+#: src/invent.c:4269 src/mhitu.c:2108 src/pray.c:1183 src/zap.c:3939
 #, c-format
 msgid "%s %s%s."
 msgstr "%s %s%s."
@@ -10158,48 +10167,48 @@ msgstr "%s %s%s."
 # ============================================================
 # 던전 메시지 (Dungeon Messages)
 # ============================================================
-#: src/invent.c:4283
+#: src/invent.c:4284
 #, c-format
 msgid "%s here %s."
 msgstr "여기에 %2$s{이/가} %1$s."
 
-#: src/invent.c:4297 src/obj_descr_i18n.c:296
+#: src/invent.c:4298 src/obj_descr_i18n.c:296
 msgid "Other things that you feel here:"
 msgstr "여기서 느껴지는 다른 것들:"
 
-#: src/invent.c:4298 src/obj_descr_i18n.c:294
+#: src/invent.c:4299 src/obj_descr_i18n.c:294
 msgid "Other things that are here:"
 msgstr "여기에 있는 다른 것들:"
 
-#: src/invent.c:4299 src/obj_descr_i18n.c:295
+#: src/invent.c:4300 src/obj_descr_i18n.c:295
 msgid "Things that you feel here:"
 msgstr "여기서 느껴지는 것들:"
 
-#: src/invent.c:4300 src/obj_descr_i18n.c:293
+#: src/invent.c:4301 src/obj_descr_i18n.c:293
 msgid "Things that are here:"
 msgstr "여기에 있는 것들:"
 
-#: src/invent.c:4355
+#: src/invent.c:4356
 #, c-format
 msgid "touched %s with your bare %s."
 msgstr "맨 %s{으로/로} %s{을/를} 만졌다."
 
-#: src/invent.c:4358
+#: src/invent.c:4359
 #, c-format
 msgid "Touching %s is a fatal mistake..."
 msgstr "%s{을/를} 만지는 것은 치명적인 실수다..."
 
-#: src/invent.c:4520
+#: src/invent.c:4521
 #, fuzzy
 msgid "Your wallet is empty"
 msgstr "병이 심각하다."
 
-#: src/invent.c:4522
+#: src/invent.c:4523
 #, c-format
 msgid "Your wallet contains %ld %s"
 msgstr "지갑에 %ld %s이(가) 있습니다"
 
-#: src/invent.c:4527
+#: src/invent.c:4528
 #, fuzzy, c-format
 msgid ", %s you have %ld %s stashed away in your pack"
 msgstr "%s{이/가} 배낭의 %s에서 %s 나왔다!"
@@ -10208,22 +10217,22 @@ msgstr "%s{이/가} 배낭의 %s에서 %s 나왔다!"
 # 지팡이
 # #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 # --- 지팡이 (Wands) ---
-#: src/invent.c:4528
+#: src/invent.c:4529
 #, fuzzy
 msgid "and"
 msgstr "지팡이"
 
-#: src/invent.c:4528
+#: src/invent.c:4529
 #, fuzzy
 msgid "but"
 msgstr "들이받았다"
 
-#: src/invent.c:4529
+#: src/invent.c:4530
 #, fuzzy
 msgid "more"
 msgstr "개 더"
 
-#: src/invent.c:4535
+#: src/invent.c:4536
 #, c-format
 msgid "are carrying a total of %ld %s."
 msgstr "총 %ld %s{을/를} 가지고 있다."
@@ -10232,88 +10241,92 @@ msgstr "총 %ld %s{을/를} 가지고 있다."
 # 아이템 메시지 (Item Messages)
 # ============================================================
 #
-#: src/invent.c:4537
+#: src/invent.c:4538
 msgid "have no money."
 msgstr "돈이 없다."
 
 #
-#: src/invent.c:4584
+#: src/invent.c:4585
 msgid "are not wearing any armor."
 msgstr "갑옷을 입고 있지 않다."
 
-#: src/invent.c:4597
+#: src/invent.c:4598
 #, c-format
 msgid "are not wearing armor but have %s embedded in your skin."
 msgstr "갑옷을 입고 있지 않지만 피부에 %s{이/가} 박혀 있다."
 
 #
-#: src/invent.c:4648
+#: src/invent.c:4649
 msgid "are not wearing any rings."
 msgstr "반지를 끼고 있지 않다."
 
-#: src/invent.c:4734
+#: src/invent.c:4735
 msgid "are not using any tools."
 msgstr "도구를 사용하고 있지 않다."
 
-#: src/invent.c:4756
+#: src/invent.c:4757
 msgid "are not wearing or wielding anything."
 msgstr "아무것도 입거나 장비하고 있지 않다."
 
-#: src/invent.c:4992
+#: src/invent.c:4993
 #, c-format
 msgid "aren't carrying anything %s."
 msgstr "%s{을/를} 가지고 있지 않다."
 
-#: src/invent.c:5056
+#: src/invent.c:5027
+msgid "Split off how many?"
+msgstr "몇 개를 분리하시겠습니까?"
+
+#: src/invent.c:5057
 #, c-format
 msgid "%s at least 1."
 msgstr "%s 최소 1."
 
-#: src/invent.c:5058
+#: src/invent.c:5059
 #, c-format
 msgid "%s less than %ld."
 msgstr "%s %ld 미만."
 
-#: src/invent.c:5167
+#: src/invent.c:5168
 #, c-format
 msgid "Only gold coins may be moved into the '%c' slot."
 msgstr "'%c' 슬롯에는 금화만 넣을 수 있다."
 
-#: src/invent.c:5179
+#: src/invent.c:5180
 msgid "Select an inventory slot letter."
 msgstr "인벤토리 슬롯 문자를 선택하세요."
 
-#: src/invent.c:5252
+#: src/invent.c:5253
 msgid "pack is too full."
 msgstr "배낭이 너무 가득 찼다."
 
-#: src/invent.c:5456
+#: src/invent.c:5457
 #, fuzzy
 msgid "Contents of "
 msgstr "그 내용물이 쏟아졌다."
 
-#: src/invent.c:5512
+#: src/invent.c:5513
 #, c-format
 msgid "%s %s under the %s here."
 msgstr "%s{이/가} 여기 %s 아래에 %s."
 
-#: src/invent.c:5520 src/obj_descr_i18n.c:297
+#: src/invent.c:5521 src/obj_descr_i18n.c:297
 #, c-format
 msgid "Things that are under the %s here:"
 msgstr "여기 %s 아래에 있는 것들:"
 
 # %s = "here", "under them", "beneath it"
-#: src/invent.c:5542 src/obj_descr_i18n.c:298
+#: src/invent.c:5543 src/obj_descr_i18n.c:298
 #, c-format
 msgid "Things that are buried %s:"
 msgstr "%s 묻혀있는 것들:"
 
-#: src/invent.c:5634
+#: src/invent.c:5635
 #, c-format
 msgid "%s could not be enabled."
 msgstr "%s{을/를} 활성화할 수 없다."
 
-#: src/invent.c:5635
+#: src/invent.c:5636
 #, c-format
 msgid "%s needs a terminal that is at least %dx%d, yours is %dx%d."
 msgstr "%s{은/는} 최소 %dx%d 터미널이 필요한데, 당신의 것은 %dx%d다."
@@ -14438,7 +14451,7 @@ msgstr "자루"
 msgid "bag"
 msgstr "가방"
 
-#: src/obj_descr_i18n.c:159 src/pager.c:2354
+#: src/obj_descr_i18n.c:159 src/pager.c:2355
 msgid "chest"
 msgstr "궤짝"
 
@@ -15339,49 +15352,49 @@ msgid "human"
 msgstr "인간"
 
 # === pager.c terrain descriptions ===
-#: src/obj_descr_i18n.c:443 src/pager.c:175
+#: src/obj_descr_i18n.c:443 src/pager.c:176
 msgid "trapped chest"
 msgstr "함정이 있는 상자"
 
-#: src/obj_descr_i18n.c:444 src/pager.c:177
+#: src/obj_descr_i18n.c:444 src/pager.c:178
 msgid "trapped door"
 msgstr "함정이 있는 문"
 
-#: src/obj_descr_i18n.c:445 src/pager.c:729
+#: src/obj_descr_i18n.c:445 src/pager.c:730
 msgid "dark part of a room"
 msgstr "어두운 방의 일부"
 
-#: src/obj_descr_i18n.c:446 src/pager.c:734 src/pager.c:786
+#: src/obj_descr_i18n.c:446 src/pager.c:735 src/pager.c:787
 msgid "land"
 msgstr "땅"
 
 # "unknown" - already defined at line 7571
-#: src/obj_descr_i18n.c:448 src/pager.c:736 src/pager.c:799
+#: src/obj_descr_i18n.c:448 src/pager.c:737 src/pager.c:800
 msgid "unexplored area"
 msgstr "탐험하지 않은 영역"
 
-#: src/obj_descr_i18n.c:449 src/pager.c:758
+#: src/obj_descr_i18n.c:449 src/pager.c:759
 msgid "open drawbridge portcullis"
 msgstr "열린 도개교 철문"
 
-#: src/obj_descr_i18n.c:450 src/pager.c:760
+#: src/obj_descr_i18n.c:450 src/pager.c:761
 msgid "broken door"
 msgstr "부서진 문"
 
 # "doorway" - already defined at line 5180
-#: src/obj_descr_i18n.c:452 src/pager.c:766
+#: src/obj_descr_i18n.c:452 src/pager.c:767
 msgid "cloudy area"
 msgstr "흐린 영역"
 
-#: src/obj_descr_i18n.c:453 src/pager.c:766
+#: src/obj_descr_i18n.c:453 src/pager.c:767
 msgid "fog/vapor cloud"
 msgstr "안개/수증기 구름"
 
-#: src/obj_descr_i18n.c:454 src/pager.c:781
+#: src/obj_descr_i18n.c:454 src/pager.c:782
 msgid "unexplored"
 msgstr "미탐험"
 
-#: src/obj_descr_i18n.c:456 src/pager.c:777
+#: src/obj_descr_i18n.c:456 src/pager.c:778
 msgid "engraving"
 msgstr "새겨진 글씨"
 
@@ -16009,263 +16022,268 @@ msgid "Compound options:"
 msgstr "복합 옵션:"
 
 # pager.c monster health descriptions
-#: src/pager.c:145
+#: src/pager.c:146
 msgid "uninjured"
 msgstr "부상없음"
 
-#: src/pager.c:147
+#: src/pager.c:148
 msgid "nearly "
 msgstr "거의 "
 
-#: src/pager.c:148
+#: src/pager.c:149
 msgid "deceased"
 msgstr "죽음"
 
-#: src/pager.c:148
+#: src/pager.c:149
 msgid "defunct"
 msgstr "작동안함"
 
-#: src/pager.c:151
+#: src/pager.c:152
 msgid "barely "
 msgstr "간신히 "
 
-#: src/pager.c:152
+#: src/pager.c:153
 msgid "slightly "
 msgstr "약간 "
 
-#: src/pager.c:153
+#: src/pager.c:154
 msgid "heavily "
 msgstr "심하게 "
 
-#: src/pager.c:435
+#: src/pager.c:436
 msgid "tail of "
 msgstr "꼬리: "
 
-#: src/pager.c:435
+#: src/pager.c:436
 msgid "tail of a "
 msgstr "꼬리: "
 
-#: src/pager.c:439
+#: src/pager.c:440
 msgid "tame "
 msgstr "길들인 "
 
-#: src/pager.c:441
+#: src/pager.c:442
 msgid "peaceful "
 msgstr "평화로운 "
 
-#: src/pager.c:446
+#: src/pager.c:447
 msgid ", swallowing you"
 msgstr ", 당신을 삼키는 중"
 
-#: src/pager.c:447
+#: src/pager.c:448
 msgid ", engulfing you"
 msgstr ", 당신을 감싸는 중"
 
-#: src/pager.c:450
+#: src/pager.c:451
 msgid ", being held"
 msgstr ", 붙잡힌 상태"
 
-#: src/pager.c:450
+#: src/pager.c:451
 msgid ", holding you"
 msgstr ", 당신을 붙잡는 중"
 
-#: src/pager.c:706
+#: src/pager.c:707
 #, fuzzy, c-format
 msgid "interior of %s"
 msgstr "내부"
 
-#: src/pager.c:747
+#: src/pager.c:748
 #, fuzzy, c-format
 msgid "%s %saltar"
 msgstr "%s 제단."
 
-#: src/pager.c:752
+#: src/pager.c:753
 #, fuzzy
 msgid "aligned"
 msgstr "무정렬"
 
-#: src/pager.c:754
+#: src/pager.c:755
 #, fuzzy
 msgid "high "
 msgstr "높은"
 
-#: src/pager.c:848
+#: src/pager.c:849
 msgid "Cannot open 'data' file!"
 msgstr "'data' 파일을 열 수 없다!"
 
-#: src/pager.c:1061 src/pager.c:2275
+#: src/pager.c:1062 src/pager.c:2276
 msgid "More info about \""
 msgstr ""
 
-#: src/pager.c:1073
+#: src/pager.c:1074
 msgid "? Seek error on 'data' file!"
 msgstr "? 'data' 파일 탐색 오류!"
 
-#: src/pager.c:1116
+#: src/pager.c:1117
 msgid "You don't have any information on those things."
 msgstr "그것들에 대한 정보가 없다."
 
-#: src/pager.c:1799
+#: src/pager.c:1800
 #, fuzzy
 msgid "What do you want to look at:"
 msgstr "무엇을 버리겠습니까?"
 
-#: src/pager.c:1840
+#: src/pager.c:1841
 msgid "Specify what? (type the word)"
 msgstr "무엇을 지정하시겠습니까? (단어를 입력하세요)"
 
-#: src/pager.c:1901
+#: src/pager.c:1902
 #, c-format
 msgid "Please move the cursor to %s."
 msgstr "커서를 %s(으)로 이동하세요."
 
-#: src/pager.c:1904
+#: src/pager.c:1905
 #, c-format
 msgid "Pick %s."
 msgstr "%s{을/를} 선택하세요."
 
-#: src/pager.c:1953
+#: src/pager.c:1954
 msgid "I've never heard of such things."
 msgstr "그런 것들에 대해 들어본 적이 없다."
 
-#: src/pager.c:2066
+#: src/pager.c:2067
 #, c-format
 msgid "No %s are currently shown %s."
 msgstr "현재 %s %s{이/가} 표시되지 않는다."
 
-#: src/pager.c:2133
+#: src/pager.c:2134
 #, c-format
 msgid "No traps seen or remembered%s."
 msgstr "함정이 보이거나 기억되지 않는다%s."
 
-#: src/pager.c:2133 src/pager.c:2222
+#: src/pager.c:2134 src/pager.c:2223
 #, fuzzy
 msgid " nearby"
 msgstr "가까이에서"
 
-#: src/pager.c:2222
+#: src/pager.c:2223
 #, c-format
 msgid "No engravings seen or remembered%s."
 msgstr "각인이 보이거나 기억되지 않는다%s."
 
-#: src/pager.c:2354
+#: src/pager.c:2355
 #, c-format
 msgid "That is a trapped %s."
 msgstr "저것은 함정이 있는 %s{이다/다}."
 
-#: src/pager.c:2368
+#: src/pager.c:2369
 #, c-format
 msgid "That is %s%s%s."
 msgstr "저것은 %s%s%s{이다/다}."
 
-#: src/pager.c:2383
+#: src/pager.c:2384
 msgid "I can't see a trap there."
 msgstr "거기에 함정이 보이지 않는다."
 
-#: src/pager.c:2425 src/pager.c:2597
+#: src/pager.c:2426 src/pager.c:2598
 #, c-format
 msgid "Cannot open \"%s\" data file!"
 msgstr "\"%s\" 데이터 파일을 열 수 없다!"
 
-#: src/pager.c:2662
+#: src/pager.c:2663
 #, c-format
 msgid "Ask about '&' or '?' to get more info.%s"
 msgstr "'&' 또는 '?'에 대해 물어보면 더 많은 정보를 얻을 수 있다.%s"
 
-#: src/pager.c:2702
+#: src/pager.c:2673
+#, fuzzy
+msgid "What command?"
+msgstr "어떤 명령을 연결할까?"
+
+#: src/pager.c:2703
 #, c-format
 msgid "%s,"
 msgstr "%s,"
 
-#: src/pager.c:2704
+#: src/pager.c:2705
 #, c-format
 msgid "%8.8s%s"
 msgstr "%8.8s%s"
 
-#: src/pager.c:2707
+#: src/pager.c:2708
 #, c-format
 msgid "No such command '%s', char code %d (0%03o or 0x%02x)."
 msgstr "그런 명령 '%s'가 없다, 문자 코드 %d (0%03o 또는 0x%02x)."
 
-#: src/pager.c:2730
+#: src/pager.c:2731
 msgid "To contact the NetHack development team directly,"
 msgstr "NetHack 개발팀에 직접 연락하려면,"
 
-#: src/pager.c:2736
+#: src/pager.c:2737
 msgid "For more information on NetHack, or to report a bug,"
 msgstr "NetHack에 대한 자세한 정보나 버그 신고는,"
 
-#: src/pager.c:2830
+#: src/pager.c:2831
 msgid "About NetHack (version information)."
 msgstr "NetHack 정보 (버전 정보)."
 
-#: src/pager.c:2831
+#: src/pager.c:2832
 msgid "Long description of the game and commands."
 msgstr "게임과 명령어의 자세한 설명."
 
-#: src/pager.c:2832
+#: src/pager.c:2833
 msgid "List of game commands."
 msgstr "게임 명령어 목록."
 
-#: src/pager.c:2833
+#: src/pager.c:2834
 msgid "Concise history of NetHack."
 msgstr "NetHack의 간략한 역사."
 
-#: src/pager.c:2834
+#: src/pager.c:2835
 msgid "Info on a character in the game display."
 msgstr "게임 화면의 문자에 대한 정보."
 
-#: src/pager.c:2835
+#: src/pager.c:2836
 msgid "Info on what a given key does."
 msgstr "특정 키의 기능에 대한 정보."
 
-#: src/pager.c:2836
+#: src/pager.c:2837
 msgid "List of game options."
 msgstr "게임 옵션 목록."
 
-#: src/pager.c:2837
+#: src/pager.c:2838
 msgid "Longer explanation of game options."
 msgstr "게임 옵션에 대한 자세한 설명."
 
-#: src/pager.c:2838
+#: src/pager.c:2839
 #, c-format
 msgid "Using the %s command to set options."
 msgstr "%s 명령으로 옵션 설정하기."
 
-#: src/pager.c:2839
+#: src/pager.c:2840
 msgid "Full list of keyboard commands."
 msgstr "키보드 명령어 전체 목록."
 
-#: src/pager.c:2840
+#: src/pager.c:2841
 msgid "List of extended commands."
 msgstr "확장 명령어 목록."
 
-#: src/pager.c:2841
+#: src/pager.c:2842
 msgid "List menu control keys."
 msgstr "메뉴 조작 키 목록."
 
-#: src/pager.c:2842
+#: src/pager.c:2843
 msgid "Description of NetHack's command line."
 msgstr "NetHack 명령줄 설명."
 
-#: src/pager.c:2843
+#: src/pager.c:2844
 msgid "The NetHack license."
 msgstr "NetHack 라이선스."
 
-#: src/pager.c:2844
+#: src/pager.c:2845
 msgid "Support information."
 msgstr "지원 정보."
 
-#: src/pager.c:2846
+#: src/pager.c:2847
 #, c-format
 msgid "%s-specific help and commands."
 msgstr "%s 전용 도움말과 명령어."
 
-#: src/pager.c:2848
+#: src/pager.c:2849
 msgid "List of wizard-mode commands."
 msgstr "마법사 모드 명령어 목록."
 
-#: src/pager.c:2886
+#: src/pager.c:2887
 msgid "Select one item:"
 msgstr "항목을 선택하세요:"
 
@@ -20804,6 +20822,11 @@ msgstr "%s 물건%s{을/를} 사기에 충분한 금화가 없다%s."
 #: src/shk.c:2020
 msgid "Maybe you have some gold stashed away?"
 msgstr "어딘가 숨겨둔 금화가 있을지도?"
+
+#: src/shk.c:2043
+#, fuzzy
+msgid "Itemized billing?"
+msgstr "사원 천장"
 
 #: src/shk.c:2075
 #, c-format

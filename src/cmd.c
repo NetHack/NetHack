@@ -5,6 +5,7 @@
 
 #include "hack.h"
 #include "func_tab.h"
+#include "i18n.h"
 
 #ifdef UNIX
 /*
@@ -890,7 +891,7 @@ domonability(void)
     char c = '\0';
 
     if (might_hide && webmaker(uptr)) {
-        c = yn_function("Hide [h] or spin a web [s]?",
+        c = yn_function(_("Hide [h] or spin a web [s]?"),
                         hidespinchars, 'q', TRUE);
         if (c == 'q' || c == '\033')
             return ECMD_OK;

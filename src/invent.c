@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 staticfn void inuse_classify(Loot *, struct obj *);
 staticfn char *loot_xname(struct obj *);
@@ -5023,7 +5024,7 @@ adjust_split(void)
         splitamount = 1L;
     } else {
         /* get first digit; doesn't wait for <return> */
-        dig = yn_function("Split off how many?", (char *) 0, '\0', TRUE);
+        dig = yn_function(_("Split off how many?"), (char *) 0, '\0', TRUE);
         if (!digit(dig)) {
             pline1(Never_mind);
             return ECMD_CANCEL;

@@ -2040,7 +2040,7 @@ pay_billed_items(
             via_menu = FALSE; /* reset so that we don't loop */
         } else {
             iprompt = !more_than_one ? 'y'
-                      : yn_function("Itemized billing?", "ynq m", 'q', TRUE);
+                      : yn_function(_("Itemized billing?"), "ynq m", 'q', TRUE);
             if (iprompt == 'q')
                 return TRUE;
             itemize = (iprompt == 'y');

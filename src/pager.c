@@ -10,6 +10,7 @@
 
 #include "hack.h"
 #include "dlb.h"
+#include "i18n.h"
 
 staticfn boolean is_swallow_sym(int);
 staticfn int append_str(char *, const char *) NONNULLPTRS;
@@ -2669,7 +2670,7 @@ dowhatdoes(void)
 #if defined(UNIX) || defined(VMS)
     introff(); /* disables ^C but not ^\ */
 #endif
-    q = yn_function("What command?", (char *) 0, '\0', TRUE);
+    q = yn_function(_("What command?"), (char *) 0, '\0', TRUE);
 #ifdef ALTMETA
     if (q == '\033' && iflags.altmeta) {
         /* in an ideal world, we would know whether another keystroke
