@@ -579,7 +579,7 @@ food_detect(struct obj *sobj)
         if (sobj) {
             if (sobj->blessed) {
                 Your(_("%s %s to tingle and you smell %s."), body_part(NOSE),
-                     u.uedibility ? "continues" : "starts", what);
+                     u.uedibility ? _("continues") : _("starts"), what);
                 u.uedibility = 1;
             } else
                 Your(_("%s tingles and you smell %s."), body_part(NOSE), what);
@@ -778,7 +778,7 @@ object_detect(struct obj *detector, /* object doing the detecting */
         newsym(u.ux, u.uy);
         ter_typ |= TER_MON;
     }
-    You(_("detect the %s of %s."), ct ? "presence" : "absence", stuff);
+    You(_("detect the %s of %s."), ct ? _("presence") : _("absence"), stuff);
 
     if (!ct)
         display_nhwindow(WIN_MAP, TRUE);

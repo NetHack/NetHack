@@ -332,7 +332,7 @@ mount_steed(
     }
     if (!force && uarm && is_metallic(uarm) && greatest_erosion(uarm)) {
         Your(_("%s armor is too stiff to be able to mount %s."),
-             uarm->oeroded ? "rusty" : "corroded", mon_nam(mtmp));
+             uarm->oeroded ? _("rusty") : _("corroded"), mon_nam(mtmp));
         return (FALSE);
     }
     if (!force
@@ -633,7 +633,7 @@ dismount_steed(
     default:
         if (otmp && otmp->cursed) {
             You(_("can't.  The saddle %s cursed."),
-                otmp->bknown ? "is" : "seems to be");
+                otmp->bknown ? _("is") : _("seems to be"));
             otmp->bknown = 1; /* ok to skip set_bknown() here */
             return;
         }

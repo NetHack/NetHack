@@ -1293,9 +1293,9 @@ mon_break_armor(struct monst *mon, boolean polyspot)
                     pline_mon(mon, "%s boots fall away!",
                               s_suffix(Monnam(mon)));
                 else
-                    pline_mon(mon, "%s boots %s off %s feet!",
+                    pline_mon(mon, _("%s boots %s off %s feet!"),
                               s_suffix(Monnam(mon)),
-                          verysmall(mdat) ? "slide" : "are pushed", ppronoun);
+                          verysmall(mdat) ? _("slide") : _("are pushed"), ppronoun);
             }
             m_lose_armor(mon, otmp, polyspot);
         }

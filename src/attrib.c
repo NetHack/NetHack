@@ -176,12 +176,12 @@ adjattrib(
         if (msgflg == 0 && flags.verbose) {
             if (ABASE(ndx) == old_abase && AMAX(ndx) == old_amax) {
                 pline(_("You're %s as %s as you can get."),
-                      abonflg ? "currently" : "already", attrstr);
+                      abonflg ? _("currently") : _("already"), attrstr);
             } else {
                 /* current stayed the same but base value changed, or
                    base is at minimum and reduction caused max to drop */
                 Your(_("innate %s has %s."), attrname[ndx],
-                     (incr > 0) ? "improved" : "declined");
+                     (incr > 0) ? _("improved") : _("declined"));
             }
         }
         return FALSE;
@@ -329,8 +329,8 @@ poisoned(
 
         /* avoid "The" Orcus's sting was poisoned... */
         pline(_("%s%s %s poisoned!"),
-              isupper((uchar) *reason) ? "" : "The ", reason,
-              plural ? "were" : "was");
+              isupper((uchar) *reason) ? "" : _("The "), reason,
+              plural ? _("were") : _("was"));
     }
     if (Poison_resistance) {
         if (blast)
@@ -1339,7 +1339,7 @@ uchangealign(
         u.ualign.type = (aligntyp) newalign;
         if (reason == A_CG_HELM_ON) {
             adjalign(-7); /* for abuse -- record will be cleared shortly */
-            Your(_("mind oscillates %s."), Hallucination ? "wildly" : "briefly");
+            Your(_("mind oscillates %s."), Hallucination ? _("wildly") : _("briefly"));
             make_confused(rn1(2, 3), FALSE);
             if (Is_astralevel(&u.uz) || ((unsigned) rn2(50) < u.ualign.abuse))
                 summon_furies(Is_astralevel(&u.uz) ? 0 : 1);

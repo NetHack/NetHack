@@ -180,8 +180,8 @@ ready_weapon(struct obj *wep)
         res = ECMD_TIME; /* corpse won't be wielded */
     } else if (uarms && bimanual(wep)) {
         You(_("cannot wield a two-handed %s while wearing a shield."),
-            is_sword(wep) ? "sword" : wep->otyp == BATTLE_AXE ? "axe"
-                                                              : "weapon");
+            is_sword(wep) ? _("sword") : wep->otyp == BATTLE_AXE ? _("axe")
+                                                              : _("weapon"));
         res = ECMD_FAIL;
     } else if (!retouch_object(&wep, FALSE)) {
         res = ECMD_TIME; /* takes a turn even though it doesn't get wielded */
@@ -195,10 +195,10 @@ ready_weapon(struct obj *wep)
                 tmp = thestr;
             else
                 tmp = "";
-            pline(_("%s%s %s to your %s%s!"), tmp, aobjnam(wep, "weld"),
-                  (wep->quan == 1L) ? "itself" : "themselves", /* a3 */
+            pline(_("%s%s %s to your %s%s!"), tmp, aobjnam(wep, _("weld")),
+                  (wep->quan == 1L) ? _("itself") : _("themselves"), /* a3 */
                   bimanual(wep) ? "" :
-                      (URIGHTY ? "dominant right " : "dominant left "),
+                      (URIGHTY ? _("dominant right ") : _("dominant left ")),
                   bimanual(wep) ? (const char *) makeplural(body_part(HAND))
                                 : body_part(HAND));
             set_bknown(wep, 1);
@@ -681,7 +681,7 @@ wield_tool(struct obj *obj,
 
     if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
         You_cant(_("%s %s while wearing %s."), verb, yname(obj),
-                 more_than_1 ? "them" : "it");
+                 more_than_1 ? _("them") : _("it"));
         return FALSE;
     }
     if (uwep && welded(uwep)) {
@@ -693,21 +693,21 @@ wield_tool(struct obj *obj,
             if (strstri(what, "pair of ") != 0)
                 more_than_1 = FALSE;
             pline(
-               "Since your weapon is welded to your %s, you cannot %s %s %s.",
-                  hand, verb, more_than_1 ? "those" : "that", xname(obj));
+               _("Since your weapon is welded to your %s, you cannot %s %s %s."),
+                  hand, verb, more_than_1 ? _("those") : _("that"), xname(obj));
         } else {
             You_cant(_("do that."));
         }
         return FALSE;
     }
     if (cantwield(gy.youmonst.data)) {
-        You_cant(_("hold %s strongly enough."), more_than_1 ? "them" : "it");
+        You_cant(_("hold %s strongly enough."), more_than_1 ? _("them") : _("it"));
         return FALSE;
     }
     /* check shield */
     if (uarms && bimanual(obj)) {
         You(_("cannot %s a two-handed %s while wearing a shield."), verb,
-            (obj->oclass == WEAPON_CLASS) ? "weapon" : "tool");
+            (obj->oclass == WEAPON_CLASS) ? _("weapon") : _("tool"));
         return FALSE;
     }
 
@@ -764,8 +764,8 @@ can_twoweapon(void)
     } else if (!TWOWEAPOK(uwep) || !TWOWEAPOK(uswapwep)) {
         otmp = !TWOWEAPOK(uwep) ? uwep : uswapwep;
         pline(_("%s %s suitable %s weapon%s."), Yname2(otmp),
-              is_plural(otmp) ? "aren't" : "isn't a",
-              (otmp == uwep) ? "primary" : "secondary",
+              is_plural(otmp) ? _("aren't") : _("isn't a"),
+              (otmp == uwep) ? _("primary") : _("secondary"),
               plur(otmp->quan));
     } else if (bimanual(uwep) || bimanual(uswapwep)) {
         otmp = bimanual(uwep) ? uwep : uswapwep;
@@ -989,7 +989,7 @@ chwepon(struct obj *otmp, int amount)
         return 1;
     }
     if (!Blind) {
-        xtime = (amount * amount == 1) ? "moment" : "while";
+        xtime = (amount * amount == 1) ? _("moment") : _("while");
         pline(_("%s %s for a %s."),
               Yobjnam2(uwep, amount == 0 ? "violently glow" : "glow"), color,
               xtime);
