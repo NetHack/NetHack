@@ -100,11 +100,11 @@ morgue_mon_sound(struct monst *mtmp)
             break;
         case 1:
             pline_The(_("%s on the back of your %s %s up."), hair,
-                      body_part(NECK), vtense(hair, "stand"));
+                      body_part(NECK), vtense(hair, _("stand")));
             break;
         case 2:
             pline_The(_("%s on your %s %s to stand up."), hair,
-                      body_part(HEAD), vtense(hair, "seem"));
+                      body_part(HEAD), vtense(hair, _("seem")));
             break;
         }
         return TRUE;

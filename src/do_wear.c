@@ -3221,7 +3221,7 @@ destroy_arm(struct obj *atmp)
             end_burn(otmp, FALSE);
         urgent_pline(_("Your %s %s to dust and %s to the %s!"),
                      /* suit might be "dragon scales" so vtense() is needed */
-                     suit, vtense(suit, "turn"), vtense(suit, "fall"),
+                     suit, vtense(suit, _("turn")), vtense(suit, _("fall")),
                      surface(u.ux, u.uy));
     } else if (!resistedc && !resistedsuit
              && (otmp = maybe_destroy_armor(uarmu, atmp, &resisted)) != 0) {

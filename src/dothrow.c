@@ -2499,7 +2499,7 @@ breakobj(
 
                         if (eyecount(gy.youmonst.data) != 1)
                             eyes = makeplural(eyes);
-                        Your(_("%s %s."), eyes, vtense(eyes, "water"));
+                        Your(_("%s %s."), eyes, vtense(eyes, _("water")));
                     }
                 }
                 potionbreathe(obj);

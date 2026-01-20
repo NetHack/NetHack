@@ -110,7 +110,7 @@ thitu(
         } else if (u.uac + tlev <= dieroll - 2) {
             if (onm != onmbuf)
                 Strcpy(onmbuf, onm); /* [modifiable buffer for upstart()] */
-            pline(_("%s %s you."), upstart(onmbuf), vtense(onmbuf, "miss"));
+            pline(_("%s %s you."), upstart(onmbuf), vtense(onmbuf, _("miss")));
         } else
             You(_("are almost hit by %s."), onm);
         return 0;
@@ -130,7 +130,7 @@ thitu(
                because missile stops and that wording would suggest that
                it should keep going */
             pline(_("It %s you."),
-                  named ? "passes harmlessly through" : "doesn't harm");
+                  named ? _("passes harmlessly through") : _("doesn't harm"));
         } else if (obj && obj->oclass == POTION_CLASS) {
             /* an explosion which scatters objects might hit hero with one
                (potions deliberately thrown at hero are handled by m_throw) */
@@ -747,7 +747,7 @@ m_throw(
                     if (!Blind)
                         pline_The(_("venom blinds you."));
                     else
-                        Your(_("%s %s."), eyes, vtense(eyes, "sting"));
+                        Your(_("%s %s."), eyes, vtense(eyes, _("sting")));
                 }
             }
             if (hitu && singleobj->otyp == EGG) {
