@@ -1672,8 +1672,8 @@ dogaze(void)
                 You(_("avoid gazing at %s."), y_monnam(mtmp));
             } else {
                 if (flags.confirm && mtmp->mpeaceful && !Confusion) {
-                    Sprintf(qbuf, "Really %s %s?",
-                            (adtyp == AD_CONF) ? "confuse" : "attack",
+                    Sprintf(qbuf, _("Really %s %s?"),
+                            (adtyp == AD_CONF) ? _("confuse") : _("attack"),
                             mon_nam(mtmp));
                     if (y_n(qbuf) != 'y')
                         continue;

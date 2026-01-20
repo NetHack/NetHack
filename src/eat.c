@@ -3104,8 +3104,8 @@ use_tin_opener(struct obj *obj)
         if (obj->cursed && obj->bknown) {
             char qbuf[QBUFSZ];
 
-            if (ynq(safe_qbuf(qbuf, "Really wield ", "?",
-                              obj, doname, thesimpleoname, "that")) != 'y')
+            if (ynq(safe_qbuf(qbuf, _("Really wield "), "?",
+                              obj, doname, thesimpleoname, _("that"))) != 'y')
                 return ECMD_OK;
         }
         if (!wield_tool(obj, "use"))

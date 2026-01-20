@@ -1462,7 +1462,7 @@ query_category(
                    just "y" to accept (and "no" rather than "n" to decline;
                    accepts "quit" and ESC without converting them to 'n') */
                 switch (paranoid_ynq(ParanoidConfirm,
-                                     "Really autoselect All?", TRUE)) {
+                                     _("Really autoselect All?"), TRUE)) {
                 case 'y':
                     /* yes => honor Auto-select All */
                     break;
