@@ -1000,7 +1000,7 @@ polymon(int mntmp)
             || (gy.youmonst.data->msize <= MZ_SMALL
                 && u.utraptype == TT_BEARTRAP))) {
         You(_("are no longer stuck in the %s."),
-            u.utraptype == TT_WEB ? "web" : "bear trap");
+            u.utraptype == TT_WEB ? _("web") : _("bear trap"));
         /* probably should burn webs too if PM_FIRE_ELEMENTAL */
         reset_utrap(TRUE);
     }
@@ -1264,7 +1264,7 @@ break_armor(void)
                 Your(_("boots fall away!"));
             else
                 Your(_("boots %s off your feet!"),
-                     verysmall(uptr) ? "slide" : "are pushed");
+                     verysmall(uptr) ? _("slide") : _("are pushed"));
             (void) Boots_off();
             dropp(otmp);
         }
@@ -1490,7 +1490,7 @@ dospinweb(void)
        became a possibility; at present hero can spin a web while flying] */
     if (Levitation || reject_terrain) {
         You(_("must be on %s ground to spin a web."),
-            reject_terrain ? "solid" : "the");
+            reject_terrain ? _("solid") : _("the"));
         return ECMD_OK;
     }
     if (u.uswallow) {

@@ -3327,7 +3327,7 @@ mhitm_ad_wrap(
                     mhm->damage = 0;
                 } else {
                     You(_("%s yourself around %s!"),
-                        coil ? "coil" : "swing", mon_nam(mdef));
+                        coil ? _("coil") : _("swing"), mon_nam(mdef));
                     set_ustuck(mdef);
                 }
             } else if (u.ustuck == mdef && !tailmiss) {
@@ -3359,7 +3359,7 @@ mhitm_ad_wrap(
                     set_ustuck(magr); /* before message, for botl update */
                     urgent_pline(_("%s %s itself around you!"),
                                  Some_Monnam(magr),
-                                 coil ? "coils" : "swings");
+                                 coil ? _("coils") : _("swings"));
                 }
             } else if (u.ustuck == magr) {
                 if (is_pool(magr->mx, magr->my) && !Swimming && !Amphibious
@@ -4009,7 +4009,7 @@ mhitm_ad_phys(
             } else if (u.ustuck == magr) {
                 exercise(A_STR, FALSE);
                 You(_("are being %s."),
-                    (pa == &mons[PM_ROPE_GOLEM]) ? "choked" : "crushed");
+                    (pa == &mons[PM_ROPE_GOLEM]) ? _("choked") : _("crushed"));
             }
         } else { /* hand to hand weapon */
             struct obj *otmp = MON_WEP(magr);
@@ -4416,7 +4416,7 @@ mhitm_ad_legs(
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
         long side = rn2(2) ? RIGHT_SIDE : LEFT_SIDE;
-        const char *sidestr = (side == RIGHT_SIDE) ? "right" : "left",
+        const char *sidestr = (side == RIGHT_SIDE) ? _("right") : _("left"),
                    *Monst_name = Monnam(magr), *leg = body_part(LEG);
 
         /* This case is too obvious to ignore, but Nethack is not in
@@ -4634,8 +4634,8 @@ mhitm_ad_sedu(
             if (!Blind)
                 pline(_("%s tries to %s you, but you seem %s."),
                       Adjmonnam(magr, "plain"),
-                      flags.female ? "charm" : "seduce",
-                      flags.female ? "unaffected" : "uninterested");
+                      flags.female ? _("charm") : _("seduce"),
+                      flags.female ? _("unaffected") : _("uninterested"));
             if (rn2(3)) {
                 if (!tele_restrict(magr))
                     (void) rloc(magr, RLOC_MSG);
@@ -4915,8 +4915,8 @@ start_engulf(struct monst *mdef)
         tmp_at(mdef->mx, mdef->my);
     }
     You(_("%s %s%s!"),
-        u_digest ? "swallow" : u_enfold ? "enclose" : "engulf",
-        mon_nam(mdef), u_digest ? " whole" : "");
+        u_digest ? _("swallow") : u_enfold ? _("enclose") : _("engulf"),
+        mon_nam(mdef), u_digest ? _(" whole") : "");
     nh_delay_output();
     nh_delay_output();
 }
@@ -4967,7 +4967,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
         if (is_vampshifter(mdef)
             && newcham(mdef, &mons[mdef->cham], NO_NC_FLAGS)) {
             You(_("%s it, then %s it."),
-                u_digest ? "swallow" : u_enfold ? "enclose" : "engulf",
+                u_digest ? _("swallow") : u_enfold ? _("enclose") : _("engulf"),
                 expel_verb);
             if (canspotmon(mdef)) {
                 /* Avoiding a_monnam here: if the target is named, it gives us
@@ -4998,7 +4998,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
 
             if (!type_is_pname(pd))
                 mnam = an(mnam);
-            You(_("%s %s."), u_digest ? "englut" : "engulf", mon_nam(mdef));
+            You(_("%s %s."), u_digest ? _("englut") : _("engulf"), mon_nam(mdef));
             Sprintf(kbuf, "%s %s%s",
                     u_digest ? "swallowing"
                     : u_enfold ? "enclosing"
@@ -5347,7 +5347,7 @@ mhitm_knockback(
          */
         pline(_("%s %s %s %s with a %s %s!"),
               magrbuf, vtense(magrbuf, "knock"), mdefbuf, knockedhow,
-              rn2(2) ? "forceful" : "powerful", rn2(2) ? "blow" : "strike");
+              rn2(2) ? _("forceful") : _("powerful"), rn2(2) ? _("blow") : _("strike"));
     } else if (u_agr) {
         /* hero knocks unseen foe back; noticed by touch */
         You_feel(_("%s be knocked %s!"), some_mon_nam(mdef), knockedhow);
@@ -5555,10 +5555,10 @@ hmonas(struct monst *mon)
                     && (compat = could_seduce(&gy.youmonst, mon, mattk))
                        != 0) {
                     You(_("%s %s %s."),
-                        (mon->mcansee && haseyes(mon->data)) ? "smile at"
-                                                             : "talk to",
+                        (mon->mcansee && haseyes(mon->data)) ? _("smile at")
+                                                             : _("talk to"),
                         mon_nam(mon),
-                        (compat == 2) ? "engagingly" : "seductively");
+                        (compat == 2) ? _("engagingly") : _("seductively"));
                     /* doesn't anger it; no wakeup() */
                     sum[i] = damageum(mon, mattk, 0);
                     break;
@@ -5713,7 +5713,7 @@ hmonas(struct monst *mon)
             /* hug attack against ordinary foe */
             if (mon == u.ustuck) {
                 pline(_("%s is being %s%s."), Monnam(mon),
-                      byhand ? "throttled" : "crushed",
+                      byhand ? _("throttled") : _("crushed"),
                       /* extra feedback for non-breather being choked */
                       unconcerned ? " but doesn't seem concerned" : "");
                 if (silverhit && flags.verbose)
@@ -6008,8 +6008,8 @@ passive(
                            and isn't; this message describes the monster's
                            reaction rather than the hero's escape] */
                         pline(_("%s looks %s%s."), Monnam(mon),
-                              !rn2(2) ? "" : "rather ",
-                              !rn2(2) ? "numb" : "stupefied");
+                              !rn2(2) ? "" : _("rather "),
+                              !rn2(2) ? _("numb") : _("stupefied"));
                     } else if (Free_action) {
                         You(_("momentarily stiffen under %s gaze!"),
                             s_suffix(mon_nam(mon)));
