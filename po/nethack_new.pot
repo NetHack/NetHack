@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 14:38+0900\n"
+"POT-Creation-Date: 2026-01-20 14:42+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21122,4 +21122,41 @@ msgid "Your bones itch."
 msgstr ""
 
 msgid "Your skin itches."
+msgstr ""
+
+#, c-format
+msgid "You stop %s %s."
+msgstr ""
+
+msgid "putting on"
+msgstr ""
+
+msgid "taking off"
+msgstr ""
+
+msgid "opening the tin"
+msgstr ""
+
+msgid "eating non-food"
+msgstr ""
+
+msgid "You revive."
+msgstr ""
+
+msgid "Suddenly you wake up!"
+msgstr ""
+
+msgid "forcing the lock"
+msgstr ""
+
+msgid "Thou wouldst have words, eh?  I'll give thee a word or two!"
+msgstr ""
+
+msgid "Talk?  Here is what I have to say!"
+msgstr ""
+
+msgid "Pilgrim, I would speak no longer with thee."
+msgstr ""
+
+msgid "studying"
 msgstr ""

@@ -4,6 +4,7 @@
 
 #include "hack.h"
 #include "mfndpos.h"
+#include "i18n.h"
 
 /* these match the categorizations shown by enlightenment */
 #define ALGN_SINNED (-4) /* worse than strayed (-1..-3) */
@@ -581,9 +582,9 @@ priest_talk(struct monst *priest)
     /* priests don't chat unless peaceful and in their own temple */
     if (!inhistemple(priest) || !priest->mpeaceful || helpless(priest)) {
         static const char *const cranky_msg[3] = {
-            "Thou wouldst have words, eh?  I'll give thee a word or two!",
-            "Talk?  Here is what I have to say!",
-            "Pilgrim, I would speak no longer with thee."
+            N_("Thou wouldst have words, eh?  I'll give thee a word or two!"),
+            N_("Talk?  Here is what I have to say!"),
+            N_("Pilgrim, I would speak no longer with thee.")
         };
 
         if (helpless(priest)) {
@@ -594,7 +595,7 @@ priest_talk(struct monst *priest)
         }
         priest->mpeaceful = 0;
         SetVoice(priest, 0, 80, 0);
-        verbalize1(cranky_msg[rn2(3)]);
+        verbalize1(_(cranky_msg[rn2(3)]));
         return;
     }
 

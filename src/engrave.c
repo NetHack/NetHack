@@ -1240,7 +1240,7 @@ doengrave(void)
     svc.context.engraving.pos.x = u.ux;
     svc.context.engraving.pos.y = u.uy;
     svc.context.engraving.actionct = 0;
-    set_occupation(engrave, "engraving", 0);
+    set_occupation(engrave, _("engraving"), 0);
 
     if (de->post_engr_text[0])
         pline(_("%s"), de->post_engr_text);

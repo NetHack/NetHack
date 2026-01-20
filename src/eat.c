@@ -1787,7 +1787,7 @@ start_tin(struct obj *otmp)
     } else {
         svc.context.tin.reqtime = tmp;
         svc.context.tin.usedtime = 0;
-        set_occupation(opentin, "opening the tin", 0);
+        set_occupation(opentin, _("opening the tin"), 0);
     }
     return;
 }
@@ -2412,7 +2412,7 @@ eatspecial(void)
     struct obj *otmp = svc.context.victual.piece;
 
     /* lesshungry wants an occupation to handle choke messages correctly */
-    set_occupation(eatfood, "eating non-food", 0);
+    set_occupation(eatfood, _("eating non-food"), 0);
     lesshungry(svc.context.victual.nmod);
     go.occupation = 0;
     svc.context.victual = zero_victual; /* victual.piece = 0, .o_id = 0 */
@@ -3350,7 +3350,7 @@ void
 reset_faint(void)
 {
     if (ga.afternmv == unfaint)
-        unmul("You revive.");
+        unmul(_("You revive."));
 }
 
 /* compute and comment on your (new?) hunger status */

@@ -708,7 +708,7 @@ doforce(void)
     picktyp = is_blade(uwep) && !is_pick(uwep);
     if (gx.xlock.usedtime && gx.xlock.box && picktyp == gx.xlock.picktyp) {
         You(_("resume your attempt to force the lock."));
-        set_occupation(forcelock, "forcing the lock", 0);
+        set_occupation(forcelock, _("forcing the lock"), 0);
         return ECMD_TIME;
     }
 
@@ -750,7 +750,7 @@ doforce(void)
         }
 
     if (gx.xlock.box)
-        set_occupation(forcelock, "forcing the lock", 0);
+        set_occupation(forcelock, _("forcing the lock"), 0);
     else
         You(_("decide not to force the issue."));
     return ECMD_TIME;

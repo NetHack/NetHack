@@ -5,6 +5,7 @@
 
 #include "hack.h"
 #include "extern.h"
+#include "i18n.h"
 
 /* #define DEBUG */ /* uncomment for debugging */
 
@@ -4181,7 +4182,7 @@ saving_grace(int dmg)
         gs.saving_grace_turn = TRUE;
         end_running(TRUE);
         if (u.usleep)
-            unmul("Suddenly you wake up!");
+            unmul(_("Suddenly you wake up!"));
         if (is_fainted())
             reset_faint();
     }

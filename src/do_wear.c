@@ -1704,8 +1704,8 @@ stop_donning(
        by unmul() since the on or off action isn't completing */
     ga.afternmv = (int (*)(void)) 0;
     if (putting_on || otmp != stolenobj) {
-        Sprintf(buf, "You stop %s %s.",
-                putting_on ? "putting on" : "taking off",
+        Sprintf(buf, _("You stop %s %s."),
+                putting_on ? _("putting on") : _("taking off"),
                 thesimpleoname(otmp));
     } else {
         buf[0] = '\0';   /* silently stop doffing stolenobj */

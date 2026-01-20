@@ -637,7 +637,7 @@ study_book(struct obj *spellbook)
     svc.context.spbook.book = spellbook;
     if (svc.context.spbook.book)
         svc.context.spbook.o_id = svc.context.spbook.book->o_id;
-    set_occupation(learn, "studying", 0);
+    set_occupation(learn, _("studying"), 0);
     return 1;
 }
 

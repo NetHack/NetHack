@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 14:38+0900\n"
+"POT-Creation-Date: 2026-01-20 14:42+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -22518,6 +22518,55 @@ msgstr "%s{이/가} %s{을/를} 잡았다."
 #, fuzzy
 msgid "Your skin itches."
 msgstr "피부가 가렵다."
+
+#, fuzzy, c-format
+msgid "You stop %s %s."
+msgstr "%s %s에 빠져 있다."
+
+#, fuzzy
+msgid "putting on"
+msgstr "돌이 되어가는 중"
+
+#, fuzzy
+msgid "taking off"
+msgstr "벗을"
+
+#, fuzzy
+msgid "opening the tin"
+msgstr "용기를 여는 중"
+
+#, fuzzy
+msgid "eating non-food"
+msgstr "돌이 되어가는 중"
+
+# ============================================================
+# 사망 메시지 (Death Messages)
+# ============================================================
+#
+#, fuzzy
+msgid "You revive."
+msgstr "당신은 죽었다."
+
+#, fuzzy
+msgid "Suddenly you wake up!"
+msgstr "갑자기 %s할 수 있게 되었다."
+
+#, fuzzy
+msgid "forcing the lock"
+msgstr "자물쇠 강제 열기에 성공했다."
+
+msgid "Thou wouldst have words, eh?  I'll give thee a word or two!"
+msgstr "말을 걸겠다고?  한마디 해주마!"
+
+#, fuzzy
+msgid "Talk?  Here is what I have to say!"
+msgstr "내가 할 말은 이거다!"
+
+msgid "Pilgrim, I would speak no longer with thee."
+msgstr "순례자여, 더 이상 대화할 생각이 없다."
+
+msgid "studying"
+msgstr "공부하는 중"
 
 # Monster attack verbs (mhitm.c)
 #, c-format

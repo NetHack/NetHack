@@ -5070,7 +5070,7 @@ drown(void)
        while still asleep; we can't do that the same way that waking
        due to combat is handled; note unmul() clears u.usleep */
     if (u.usleep)
-        unmul("Suddenly you wake up!");
+        unmul(_("Suddenly you wake up!"));
     /* being doused will revive from fainting */
     if (is_fainted())
         reset_faint();
