@@ -193,9 +193,9 @@ flooreffects(
             || (u.utrap && u_at(x,y))) {
             if (*verb && (cansee(x, y) || distu(x, y) == 0))
                 pline(_("%s boulder %s into the pit%s."),
-                      Blind ? "A" : "The",
+                      Blind ? _("A") : _("The"),
                       vtense((const char *) 0, verb),
-                      mtmp ? "" : " with you");
+                      mtmp ? "" : _(" with you"));
             if (mtmp) {
                 if (!passes_walls(mtmp->data) && !throws_rocks(mtmp->data)) {
                     /* dieroll was rnd(20); 1: maximum chance to hit

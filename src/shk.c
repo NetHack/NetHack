@@ -1772,7 +1772,7 @@ dopay(void)
         }
         mtmp = m_at(cx, cy);
         if (!cansee(cx, cy) && (!mtmp || !canspotmon(mtmp))) {
-            You(_("can't %s anyone there."), !Blind ? "see" : "sense");
+            You(_("can't %s anyone there."), !Blind ? _("see") : _("sense"));
             return ECMD_OK;
         }
         if (!mtmp) {

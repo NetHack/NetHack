@@ -1827,7 +1827,7 @@ dorub(void)
             makeknown(MAGIC_LAMP);
             update_inventory();
         } else if (rn2(2)) {
-            You(_("%s smoke."), !Blind ? "see a puff of" : "smell");
+            You(_("%s smoke."), !Blind ? _("see a puff of") : _("smell"));
         } else
             pline1(nothing_happens);
     } else if (obj->otyp == BRASS_LANTERN) {
@@ -3134,8 +3134,8 @@ use_whip(struct obj *obj)
             spotitnow = canspotmon(mtmp);
             if (spotitnow || !glyph_is_invisible(levl[rx][ry].glyph)) {
                 pline(_("%s is there that you %s."),
-                      !spotitnow ? "A monster" : Amonnam(mtmp),
-                      !Blind ? "couldn't see" : "hadn't noticed");
+                      !spotitnow ? _("A monster") : Amonnam(mtmp),
+                      !Blind ? _("couldn't see") : _("hadn't noticed"));
                 if (!spotitnow)
                     map_invisible(rx, ry);
                 else

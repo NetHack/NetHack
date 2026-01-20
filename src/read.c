@@ -435,7 +435,7 @@ doread(void)
             return ECMD_OK;
         }
         pline(_("%s on the %s.  It reads:  %s."),
-              !Blind ? "There is writing" : "You feel lettering",
+              !Blind ? _("There is writing") : _("You feel lettering"),
               simpleonames(scroll), cap_text);
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT, "became literate by reading %s",

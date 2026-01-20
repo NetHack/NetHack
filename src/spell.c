@@ -246,8 +246,8 @@ deadbook(struct obj *book2)
 
         if (book2->cursed) {
             pline_The(_("%s!"),
-                      Blind ? "Book seems to be ignoring you"
-                            : "runes appear scrambled.  You can't read them");
+                      Blind ? _("Book seems to be ignoring you")
+                            : _("runes appear scrambled.  You can't read them"));
             return;
         }
 
