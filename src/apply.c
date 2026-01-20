@@ -434,8 +434,8 @@ use_stethoscope(struct obj *obj)
             }
             seemimic(mtmp);
             pline(_("%s %s %s really %s."),
-                  use_plural ? "Those" : "That", what,
-                  use_plural ? "are" : "is", mnm);
+                  use_plural ? _("Those") : _("That"), what,
+                  use_plural ? _("are") : _("is"), mnm);
         } else if (flags.verbose && !canspotmon(mtmp)) {
             There(_("is %s there."), mnm);
         }
@@ -820,7 +820,7 @@ use_leash_core(struct obj *obj, struct monst *mtmp, coord *cc, int spotmon)
     if (!spotmon && !glyph_is_invisible(levl[cc->x][cc->y].glyph)) {
         /* for the unleash case, we don't verify whether this unseen
            monster is the creature attached to the current leash */
-        You(_("fail to %sleash something."), obj->leashmon ? "un" : "");
+        You(_("fail to %sleash something."), obj->leashmon ? _("un") : "");
         /* trying again will work provided the monster is tame
            (and also that it doesn't change location by retry time) */
         map_invisible(cc->x, cc->y);
@@ -1445,9 +1445,9 @@ use_candle(struct obj **optr)
 
             SetVoice(shkp, 0, 80, 0);
             verbalize(_("You %s %s, you bought %s!"),
-                      otmp->lamplit ? "burn" : "use",
-                      (obj->quan > 1L) ? "them" : "it",
-                      (obj->quan > 1L) ? "them" : "it");
+                      otmp->lamplit ? _("burn") : _("use"),
+                      (obj->quan > 1L) ? _("them") : _("it"),
+                      (obj->quan > 1L) ? _("them") : _("it"));
         }
         if (obj->quan < 7L && otmp->spe == 7)
             pline(_("%s now has seven%s candles attached."), The(xname(otmp)),
@@ -1551,9 +1551,9 @@ splash_lit(struct obj *obj)
 
         if (useeit || uhearit)
             pline(_("%s %s%s%s."), Yname2(obj),
-                  uhearit ? "crackles" : "",
-                  (uhearit && useeit) ? " and " : "",
-                  useeit ? "flickers" : "");
+                  uhearit ? _("crackles") : "",
+                  (uhearit && useeit) ? _(" and ") : "",
+                  useeit ? _("flickers") : "");
         if (!dunk && !snuff)
             return FALSE;
     }
@@ -1597,8 +1597,8 @@ catch_lit(struct obj *obj)
                 set_msg_xy(x, y);
             pline(_("%s %s %s"), Yname2(obj),
                   /* "catches light!" or "feels warm." */
-                  otense(obj, Blind ? "feel" : "catch"),
-                  Blind ? "warm." : "light!");
+                  otense(obj, Blind ? _("feel") : _("catch")),
+                  Blind ? _("warm.") : _("light!"));
         }
         if (obj->otyp == POT_OIL)
             makeknown(obj->otyp);
@@ -1611,7 +1611,7 @@ catch_lit(struct obj *obj)
             SetVoice(shkp, 0, 80, 0);
             verbalize(_("That's in addition to the cost of %s %s, of course."),
                       yname(obj),
-                      (obj->quan == 1L) ? "itself" : "themselves");
+                      (obj->quan == 1L) ? _("itself") : _("themselves"));
             bill_dummy_object(obj);
         }
         begin_burn(obj, FALSE);
@@ -2120,7 +2120,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
             }
             /* jumping in place on a trap will trigger it */
             if ((t = t_at(cc.x, cc.y)) != 0) {
-                You(_("jump up and %s back down."), !Flying ? "come" : "fly");
+                You(_("jump up and %s back down."), !Flying ? _("come") : _("fly"));
                 dotrap(t, FORCETRAP | TOOKPLUNGE);
                 return ECMD_TIME;
             }

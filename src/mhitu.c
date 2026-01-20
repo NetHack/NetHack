@@ -236,8 +236,8 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
         /* give 'displaced' message even if hero is Blind */
         if (compat)
             pline(_("%s smiles %s at your %sdisplaced image..."), Monst_name,
-                  (compat == 2) ? "engagingly" : "seductively",
-                  Invis ? "invisible " : "");
+                  (compat == 2) ? _("engagingly") : _("seductively"),
+                  Invis ? _("invisible ") : "");
         else
             pline(_("%s strikes at your %sdisplaced image and misses you!"),
                   /* Note:  if you're both invisible and displaced, only
@@ -1063,7 +1063,7 @@ u_slip_free(struct monst *mtmp, struct attack *mattk)
         pline_mon(mtmp, _("%s %s your %s %s!"), Monnam(mtmp),
               (mattk->adtyp == AD_WRAP) ? "slips off of"
                                         : "grabs you, but cannot hold onto",
-              obj->greased ? "greased" : "slippery",
+              obj->greased ? _("greased") : _("slippery"),
               /* avoid "slippery slippery cloak"
                  for undiscovered oilskin cloak */
               (obj->greased || objects[obj->otyp].oc_name_known)
@@ -1338,7 +1338,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
 
         if (u.utrap) {
             You(_("are released from the %s!"),
-                (u.utraptype == TT_WEB) ? "web" : "trap");
+                (u.utraptype == TT_WEB) ? _("web") : _("trap"));
             reset_utrap(FALSE);
         }
 
