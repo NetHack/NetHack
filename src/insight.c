@@ -204,16 +204,16 @@ enlght_halfdmg(int category, int final)
 
     switch (category) {
     case HALF_PHDAM:
-        category_name = "physical";
+        category_name = _("physical");
         break;
     case HALF_SPDAM:
-        category_name = "spell";
+        category_name = _("spell");
         break;
     default:
-        category_name = "unknown";
+        category_name = _("unknown");
         break;
     }
-    Sprintf(buf, " %s %s damage", (final || wizard) ? "half" : "reduced",
+    Sprintf(buf, _(" %s %s damage"), (final || wizard) ? _("half") : _("reduced"),
             category_name);
     enl_msg(You_, "take", "took", buf, from_what(category));
 }
