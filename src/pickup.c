@@ -1683,17 +1683,17 @@ carry_count(struct obj *obj,            /* object to pick up... */
     }
 
     if (!container)
-        Strcpy(where, "here"); /* slightly shorter form */
+        Strcpy(where, _("here")); /* slightly shorter form */
     if (gi.invent || umoney) {
-        prefx1 = "you cannot ";
+        prefx1 = _("you cannot ");
         prefx2 = "";
-        suffx = " any more";
+        suffx = _(" any more");
     } else {
-        prefx1 = (obj->quan == 1L) ? "it " : "even one ";
-        prefx2 = "is too heavy for you to ";
+        prefx1 = (obj->quan == 1L) ? _("it ") : _("even one ");
+        prefx2 = _("is too heavy for you to ");
         suffx = "";
     }
-    There(_("%s %s %s, but %s%s%s%s."), otense(obj, "are"), obj_nambuf, where,
+    There(_("%s %s %s, but %s%s%s%s."), otense(obj, _("are")), obj_nambuf, where,
           prefx1, prefx2, verb, suffx);
 
     /* *wt_after = iw; */
@@ -1852,7 +1852,7 @@ pickup_object(
             obj->spe = 1;
         } else {
             pline_The(_("scroll%s %s to dust as you %s %s up."), plur(obj->quan),
-                      otense(obj, "turn"), telekinesis ? _("raise") : _("pick"),
+                      otense(obj, _("turn")), telekinesis ? _("raise") : _("pick"),
                       (obj->quan == 1L) ? _("it") : _("them"));
             trycall(obj);
             useupf(obj, obj->quan);
@@ -2801,7 +2801,7 @@ mbag_item_gone(boolean held, struct obj *item, boolean silent)
 
     if (!silent) {
         if (item->dknown)
-            pline(_("%s %s vanished!"), Doname2(item), otense(item, "have"));
+            pline(_("%s %s vanished!"), Doname2(item), otense(item, _("have")));
         else
             You(_("%s %s disappear!"), Blind ? _("notice") : _("see"), doname(item));
     }
@@ -3631,12 +3631,12 @@ dotip(void)
     if (spillage) {
         buf[0] = '\0';
         if (is_pool(u.ux, u.uy))
-            Sprintf(buf, _(" and gradually %s"), vtense(spillage, "dissipate"));
+            Sprintf(buf, _(" and gradually %s"), vtense(spillage, _("dissipate")));
         else if (is_lava(u.ux, u.uy))
             Sprintf(buf, _(" and immediately %s away"),
-                    vtense(spillage, "burn"));
+                    vtense(spillage, _("burn")));
         pline(_("Some %s %s onto the %s%s."), spillage,
-              vtense(spillage, "spill"), surface(u.ux, u.uy), buf);
+              vtense(spillage, _("spill")), surface(u.ux, u.uy), buf);
         /* shop usage message comes after the spill message */
         if (cobj->otyp == CAN_OF_GREASE && cobj->spe > 0) {
             consume_obj_charge(cobj, TRUE);
@@ -3646,7 +3646,7 @@ dotip(void)
     }
     /* anything not covered yet */
     if (cobj->oclass == POTION_CLASS) /* can't pour potions... */
-        pline_The(_("%s %s securely sealed."), xname(cobj), otense(cobj, "are"));
+        pline_The(_("%s %s securely sealed."), xname(cobj), otense(cobj, _("are")));
     else if (uarmh && cobj == uarmh)
         return tiphat() ? ECMD_TIME : ECMD_OK;
     else if (cobj->otyp == STATUE)
@@ -3760,7 +3760,7 @@ tipcontainer(struct obj *box) /* or bag */
                     /* explicitly mention what item is triggering explosion */
                     urgent_pline(
                    _("As %s %s inside, you are blasted by a magical explosion!"),
-                                 doname(otmp), otense(otmp, "tumble"));
+                                 doname(otmp), otense(otmp, _("tumble")));
 
                     /* if putting one bag of holding into another, first
                        blow up the one going in, then (below) blow up the
