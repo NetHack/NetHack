@@ -291,7 +291,7 @@ dog_eat(struct monst *mtmp,
                       devour ? _("devours") : _("eats"), obj_name);
         } else if (seeobj) {
             obj_name = distant_name(obj, doname);
-            pline(_("It %s %s."), devour ? "devours" : "eats", obj_name);
+            pline(_("It %s %s."), devour ? _("devours") : _("eats"), obj_name);
         }
     }
     if (obj->unpaid) {
@@ -347,7 +347,7 @@ dog_starve(struct monst *mtmp)
         pline_mon(mtmp, _("%s starves."), Monnam(mtmp));
     else
         You_feel(_("%s for a moment."),
-                    Hallucination ? "bummed" : "sad");
+                    Hallucination ? _("bummed") : _("sad"));
     mondied(mtmp);
 }
 

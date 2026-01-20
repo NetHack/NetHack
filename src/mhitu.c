@@ -38,8 +38,8 @@ hitmsg(struct monst *mtmp, struct attack *mattk)
     if ((compat = could_seduce(mtmp, &gy.youmonst, mattk)) != 0
         && !mtmp->mcan && !mtmp->mspec_used) {
         pline_mon(mtmp, _("%s %s you %s."), Monst_name,
-              !Blind ? "smiles at" : !Deaf ? "talks to" : "touches",
-              (compat == 2) ? "engagingly" : "seductively");
+              !Blind ? _("smiles at") : !Deaf ? _("talks to") : _("touches"),
+              (compat == 2) ? _("engagingly") : _("seductively"));
     } else {
         switch (mattk->aatyp) {
         case AT_BITE:
@@ -2318,27 +2318,27 @@ mayberem(struct monst *mon,
         pline(_("%s takes off your %s."), seducer, str);
     } else if (rn2(20) < ACURR(A_CHA)) {
         SetVoice(mon, 0, 80, 0); /* y_n aka yn_function is set up for this */
-        Sprintf(qbuf, "\"Shall I remove your %s, %s?\"", str,
-                (!rn2(2) ? "lover" : !rn2(2) ? "dear" : "sweetheart"));
+        Sprintf(qbuf, _("\"Shall I remove your %s, %s?\""), str,
+                (!rn2(2) ? _("lover") : !rn2(2) ? _("dear") : _("sweetheart")));
         if (y_n(qbuf) == 'n')
             return;
     } else {
         char hairbuf[BUFSZ];
 
-        Sprintf(hairbuf, "let me run my fingers through your %s",
+        Sprintf(hairbuf, _("let me run my fingers through your %s"),
                 body_part(HAIR));
         SetVoice(mon, 0, 80, 0);
         verbalize(_("Take off your %s; %s."), str,
                   (obj == uarm)
-                     ? "let's get a little closer"
+                     ? _("let's get a little closer")
                      : (obj == uarmc || obj == uarms)
-                        ? "it's in the way"
+                        ? _("it's in the way")
                         : (obj == uarmf)
-                           ? "let me rub your feet"
+                           ? _("let me rub your feet")
                            : (obj == uarmg)
-                              ? "they're too clumsy"
+                              ? _("they're too clumsy")
                               : (obj == uarmu)
-                                 ? "let me massage you"
+                                 ? _("let me massage you")
                                  /* obj == uarmh */
                                  : hairbuf);
     }
