@@ -555,7 +555,7 @@ u_left_shop(char *leavestring, boolean newlev)
         } else {
             pline(_("%s %s that you need to pay before leaving%s"),
                   Shknam(shkp),
-                  not_upset ? "points out" : "makes it clear",
+                  not_upset ? _("points out") : _("makes it clear"),
                   not_upset ? "." : "!");
         }
         return;
@@ -880,8 +880,8 @@ pick_pick(struct obj *obj)
             } else {
                 pline(_("%s %s your pick!"),
                       Shknam(shkp),
-                      haseyes(shkp->data) ? "glares at"
-                                          : "is dismayed because of");
+                      haseyes(shkp->data) ? _("glares at")
+                                          : _("is dismayed because of"));
             }
         }
         pickmovetime = svm.moves;
@@ -2014,8 +2014,8 @@ pay_billed_items(
                      || ibill[0].usedup == UndisclosedContainer);
     if ((umoney + eshkp->credit) < cheapest_item(ibillct, ibill)) {
         You(_("don't have enough gold to buy%s the item%s %s."),
-            more_than_one ? " any of" : "", plur(more_than_one ? 2 : 1),
-            (ebillct > 1) ? "you've picked" : "on your bill");
+            more_than_one ? _(" any of") : "", plur(more_than_one ? 2 : 1),
+            (ebillct > 1) ? _("you've picked") : _("on your bill"));
         if (stashed_gold)
             pline(_("Maybe you have some gold stashed away?"));
         return TRUE;
@@ -2374,7 +2374,7 @@ reject_purchase(
             Snprintf(which, sizeof which, "the one%s in %s",
                      plur(intact_quan), thesimpleoname(obj->ocontainer));
         else
-            Sprintf(which, "%s", (intact_quan > 1L) ? "these" : "this one");
+            Sprintf(which, "%s", (intact_quan > 1L) ? _("these") : _("this one"));
 
         SetVoice(shkp, 0, 80, 0);
         verbalize(_("%s for the other %s before buying %s."),

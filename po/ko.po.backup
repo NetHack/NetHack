@@ -144,7 +144,7 @@ msgstr "%s %s!"
 
 #: ../src/apply.c:131
 msgid "are filthier than ever"
-msgstr "더욱 더러워졌다"
+msgstr ""
 
 #: ../src/apply.c:131
 #, fuzzy
@@ -163,7 +163,7 @@ msgstr "개 더"
 
 #: ../src/apply.c:140
 msgid "now has"
-msgstr "이제"
+msgstr ""
 
 #: ../src/apply.c:146
 msgid "lenses"
@@ -185,7 +185,7 @@ msgstr "%s{을/를} %s 밀었다."
 
 #: ../src/apply.c:151
 msgid "cock-eyed"
-msgstr "삐뚤어지게"
+msgstr ""
 
 #: ../src/apply.c:151
 #, fuzzy
@@ -297,7 +297,7 @@ msgstr "맨"
 
 #: ../src/apply.c:279
 msgid " mostly"
-msgstr " 대부분"
+msgstr ""
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -393,7 +393,7 @@ msgstr "%s %s{이/가} 정말로 %s %s."
 
 #: ../src/apply.c:437 ../src/do_name.c:746 ../src/uhitm.c:6213
 msgid "Those"
-msgstr "저것들"
+msgstr ""
 
 #: ../src/apply.c:440
 #, c-format

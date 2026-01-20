@@ -2607,7 +2607,7 @@ glibr(void)
             hand = makeplural(hand);
         } else if (wastwoweap) {
             /* preceding msg was about non-dominant hand */
-            which = URIGHTY ? "right " : "left ";
+            which = URIGHTY ? _("right ") : _("left ");
         }
         pline(_("%s %s%s %s%s from your %s%s."),
               !strncmp(thiswep, "corpse", 6) ? _("The") : _("Your"),

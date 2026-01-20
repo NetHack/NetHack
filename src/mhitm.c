@@ -30,8 +30,8 @@ noises(struct monst *magr, struct attack *mattk)
         gf.far_noise = farq;
         gn.noisetime = svm.moves;
         You_hear(_("%s%s."),
-                 (mattk->aatyp == AT_EXPL) ? "an explosion" : "some noises",
-                 farq ? " in the distance" : "");
+                 (mattk->aatyp == AT_EXPL) ? _("an explosion") : _("some noises"),
+                 farq ? _(" in the distance") : "");
     }
 }
 
@@ -609,9 +609,9 @@ failed_grab(
             || magr == &gy.youmonst || mdef == &gy.youmonst) {
             char magrnam[BUFSZ], mdefnam[BUFSZ];
             boolean tailmiss = gn.notonhead;
-            const char *verb = (mattk->adtyp == AD_DGST) ? "gulp"
-                               : (mattk->adtyp == AD_STCK) ? "adhere"
-                                 : "grab";
+            const char *verb = (mattk->adtyp == AD_DGST) ? _("gulp")
+                               : (mattk->adtyp == AD_STCK) ? _("adhere")
+                                 : _("grab");
 
             /* beware of "Foo's grab passes through Bar's ghost";
                mon_nam(x_monnam) calls s_suffix() for named ghosts and
@@ -857,9 +857,9 @@ gulpmm(
 
     if (gv.vis) {
         pline(_("%s %s %s."), Monnam(magr),
-              digests(magr->data) ? "swallows"
-              : enfolds(magr->data) ? "encloses"
-                : "engulfs",
+              digests(magr->data) ? _("swallows")
+              : enfolds(magr->data) ? _("encloses")
+                : _("engulfs"),
               mon_nam(mdef));
     }
     if (!flaming(magr->data)) {
