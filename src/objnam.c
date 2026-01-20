@@ -3684,7 +3684,7 @@ wizterrainwish(struct _readobjnam_data *d)
         del_engr_at(x, y);
         if (!is_dbridge) {
             pline(_("A %s of molten lava."),
-                  (lev->typ == LAVAPOOL) ? "pool" : "wall");
+                  (lev->typ == LAVAPOOL) ? _("pool") : _("wall"));
             if (!(Levitation || Flying) || lev->typ == LAVAWALL)
                 pooleffects(FALSE);
         } else {
@@ -5553,7 +5553,7 @@ helm_simple_name(struct obj *helmet)
      *      fedora, cornuthaum, dunce cap       -> hat
      *      all other types of helmets          -> helm
      */
-    return !hard_helmet(helmet) ? "hat" : "helm";
+    return !hard_helmet(helmet) ? _("hat") : _("helm");
 }
 
 /* gloves vs gauntlets; depends upon discovery state */

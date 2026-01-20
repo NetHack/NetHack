@@ -991,7 +991,7 @@ outentry(int rank, struct toptenentry *t1, boolean so)
             second_line = FALSE;
         } else if (!strncmp(t1->death, "choked", 6)) {
             Sprintf(eos(linebuf), _("choked on h%s food"),
-                    (t1->plgend[0] == 'F') ? "er" : "is");
+                    (t1->plgend[0] == 'F') ? _("er") : _("is"));
         } else if (!strncmp(t1->death, "poisoned", 8)) {
             Strcat(linebuf, _("was poisoned"));
         } else if (!strncmp(t1->death, "crushed", 7)) {
