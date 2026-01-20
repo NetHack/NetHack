@@ -362,7 +362,7 @@ erode_obj(
         if (flags.verbose && print) {
             if (uvictim)
                 Your(_("%s %s completely %s."),
-                     ostr, vtense(ostr, Blind ? "feel" : "look"), msg[type]);
+                     ostr, vtense(ostr, Blind ? _("feel") : _("look")), msg[type]);
             else if (vismon || visobj)
                 pline(_("%s %s %s completely %s."),
                       !vismon ? "The" : s_suffix(Monnam(victim)),
@@ -677,10 +677,10 @@ fall_through(
         if (Flying)
             controlled_flight = TRUE;
         You(_("%s down %s!"),
-            Flying ? "swoop" : "deliberately drop",
+            Flying ? _("swoop") : _("deliberately drop"),
             (t->ttyp == TRAPDOOR)
-                ? "through the trap door"
-                : "into the gaping hole");
+                ? _("through the trap door")
+                : _("into the gaping hole"));
     }
 
     if (*u.ushops)
@@ -702,9 +702,9 @@ fall_through(
         dist = depth(&dtmp) - depth(&u.uz);
         if (dist > 1)
             You(_("%s down a %s%sshaft!"),
-                controlled_flight ? "fly" : "fall",
-                dist > 3 ? "very " : "",
-                dist > 2 ? "deep " : "");
+                controlled_flight ? _("fly") : _("fall"),
+                dist > 3 ? _("very ") : "",
+                dist > 2 ? _("deep ") : "");
     }
     if (!td)
         Sprintf(msgbuf, _("The hole in the %s above you closes up."),
@@ -1005,7 +1005,7 @@ mu_maybe_destroy_web(
             if (domsg) {
                 if (isyou)
                     You(_("%s %s spider web!"),
-                        (flaming(mptr)) ? "burn" : "dissolve",
+                        (flaming(mptr)) ? _("burn") : _("dissolve"),
                         a_your[trap->madeby_u]);
                 else
                     pline_mon(mtmp,
@@ -1886,7 +1886,7 @@ trapeffect_pit(
                     !rn2(5) ? " between the pits" : "");
             } else {
                 Strcpy(verbbuf,
-                       !plunged ? "fall" : (Flying ? "dive" : "plunge"));
+                       !plunged ? _("fall") : (Flying ? _("dive") : _("plunge")));
             }
             if (*verbbuf)
                 You(_("%s into %s pit!"), verbbuf, a_your[trap->madeby_u]);
@@ -1904,11 +1904,11 @@ trapeffect_pit(
 
             if (u.usteed) {
                 pline(_("%s %s %s!"),
-                      upstart(x_monnam(u.usteed, steed_article, "poor",
+                      upstart(x_monnam(u.usteed, steed_article, _("poor"),
                                        SUPPRESS_SADDLE, FALSE)),
-                      conj_pit ? "steps" : "lands", predicament);
+                      conj_pit ? _("steps") : _("lands"), predicament);
             } else
-                You(_("%s %s!"), conj_pit ? "step" : "land", predicament);
+                You(_("%s %s!"), conj_pit ? _("step") : _("land"), predicament);
         }
         /* FIXME:
          * if hero gets killed here, setting u.utrap in advance will
