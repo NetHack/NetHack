@@ -690,17 +690,17 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
         }
         Strcpy(de->post_engr_text,
                (Blind && !Deaf)
-               ? "You hear drilling!"    /* Deaf-aware */
+               ? _("You hear drilling!")    /* Deaf-aware */
                : Blind
-                  ? "You feel tremors."
+                  ? _("You feel tremors.")
                   : IS_GRAVE(levl[u.ux][u.uy].typ)
-                     ? "Chips fly out from the headstone."
+                     ? _("Chips fly out from the headstone.")
                      : de->frosted
-                        ? "Ice chips fly up from the ice surface!"
+                        ? _("Ice chips fly up from the ice surface!")
                         : (svl.level.locations[u.ux][u.uy].typ
                           == DRAWBRIDGE_DOWN)
-                           ? "Splinters fly up from the bridge."
-                           : "Gravel flies up from the floor.");
+                           ? _("Splinters fly up from the bridge.")
+                           : _("Gravel flies up from the floor."));
         break;
         /* type = BURN wands */
     case WAN_FIRE:
@@ -711,8 +711,8 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
                 pline(_("This %s is a wand of fire!"), xname(de->otmp));
             de->doknown = TRUE;
         }
-        Strcpy(de->post_engr_text, Blind ? "You feel the wand heat up."
-                                         : "Flames fly from the wand.");
+        Strcpy(de->post_engr_text, Blind ? _("You feel the wand heat up.")
+                                         : _("Flames fly from the wand."));
         break;
     case WAN_LIGHTNING:
         de->ptext = TRUE;

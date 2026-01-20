@@ -1883,8 +1883,8 @@ gazemu(struct monst *mtmp, struct attack *mattk)
         /* cancelled/hallucinatory feedback; monster might look "confused",
            "stunned",&c but we don't actually set corresponding attribute */
         pline_mon(mtmp, _("%s looks %s%s."), Monnam(mtmp),
-              !rn2(3) ? "" : already ? "quite "
-                                     : (!rn2(2) ? "a bit " : "somewhat "),
+              !rn2(3) ? "" : already ? _("quite ")
+                                     : (!rn2(2) ? _("a bit ") : _("somewhat ")),
               reactions[react]);
     }
     return M_ATTK_MISS;

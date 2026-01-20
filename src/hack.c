@@ -672,17 +672,17 @@ still_chewing(coordxy x, coordxy y)
             (IS_OBSTRUCTED(lev->typ) && !IS_TREE(lev->typ) ? 30 : 60) + u.udaminc;
         You(_("start chewing %s %s."),
             (boulder || IS_TREE(lev->typ) || lev->typ == IRONBARS)
-                ? "on a"
-                : "a hole in the",
+                ? _("on a")
+                : _("a hole in the"),
             boulder
-                ? "boulder"
+                ? _("boulder")
                 : IS_TREE(lev->typ)
-                    ? "tree"
+                    ? _("tree")
                     : IS_OBSTRUCTED(lev->typ)
-                        ? "rock"
+                        ? _("rock")
                         : (lev->typ == IRONBARS)
-                            ? "bar"
-                            : "door");
+                            ? _("bar")
+                            : _("door"));
         watch_dig((struct monst *) 0, x, y, FALSE);
         return 1;
     } else if ((svc.context.digging.effort += (30 + u.udaminc)) <= 100) {
@@ -3731,7 +3731,7 @@ pickup_checks(void)
         struct rm *lev = &levl[u.ux][u.uy];
 
         if (IS_THRONE(lev->typ))
-            pline(_("It must weigh%s a ton!"), lev->looted ? " almost" : "");
+            pline(_("It must weigh%s a ton!"), lev->looted ? _(" almost") : "");
         else if (IS_SINK(lev->typ))
             pline_The(_("plumbing connects it to the floor."));
         else if (IS_GRAVE(lev->typ))

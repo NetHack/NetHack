@@ -479,7 +479,7 @@ steal(struct monst *mtmp, char *objnambuf)
  cant_take:
             pline(_("%s tries to %s %s%s but gives up."), Monnambuf,
                   _(ROLL_FROM(how)),
-                  (otmp->owornmask & W_ARMOR) ? "your " : "",
+                  (otmp->owornmask & W_ARMOR) ? _("your ") : "",
                   (otmp->owornmask & W_ARMOR) ? armor_simple_name(otmp)
                                               : yname(otmp));
             /* the fewer items you have, the less likely the thief

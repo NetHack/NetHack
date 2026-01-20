@@ -3622,7 +3622,7 @@ wizterrainwish(struct _readobjnam_data *d)
             svl.level.flags.nfountains++;
         lev->looted = d->looted ? F_LOOTED : 0; /* overlays 'flags' */
         lev->blessedftn = d->blessed || !strncmpi(bp, "magic ", 6);
-        pline(_("A %sfountain."), lev->blessedftn ? "magic " : "");
+        pline(_("A %sfountain."), lev->blessedftn ? _("magic ") : "");
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 6, "throne")) {
         lev->typ = THRONE;
@@ -3738,7 +3738,7 @@ wizterrainwish(struct _readobjnam_data *d)
         if (IS_GRAVE(lev->typ)) {
             lev->looted = 0; /* overlays 'flags' */
             lev->disturbed = d->looted ? 1 : 0;
-            pline(_("A %sgrave."), lev->disturbed ? "disturbed " : "");
+            pline(_("A %sgrave."), lev->disturbed ? _("disturbed ") : "");
             madeterrain = TRUE;
         } else {
             pline(_("Can't place a grave here."));

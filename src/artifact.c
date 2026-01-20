@@ -2064,7 +2064,7 @@ invoke_blinding_ray(struct obj *obj)
             litroom(TRUE, obj);
             pline(_("%s"), ((!Blind && levl[u.ux][u.uy].lit
                           && !levl[u.ux][u.uy].waslit)
-                         ? "It is lit here now."
+                         ? _("It is lit here now.")
                          : nothing_seems_to_happen));
         } else { /* zapyourself() */
             boolean vulnerable = (u.umonnum == PM_GREMLIN);

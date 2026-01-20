@@ -817,8 +817,8 @@ monster_detect(struct obj *otmp, /* detecting object (if any) */
     if (!mcnt) {
         if (otmp)
             strange_feeling(otmp, Hallucination
-                                      ? "You get the heebie jeebies."
-                                      : "You feel threatened.");
+                                      ? _("You get the heebie jeebies.")
+                                      : _("You feel threatened."));
         return 1;
     } else {
         boolean unconstrained, woken = FALSE;

@@ -2119,8 +2119,8 @@ seffect_mail(struct obj **sobjp)
            note to the puzzled: the game Larn actually sends you junk
            mail if you win! */
         pline(_("This seems to be %s."),
-              odd ? "a chain letter threatening your luck"
-              : "junk mail addressed to the finder of the Eye of Larn");
+              odd ? _("a chain letter threatening your luck")
+              : _("junk mail addressed to the finder of the Eye of Larn"));
         break;
     default:
 #ifdef MAIL
@@ -2956,7 +2956,7 @@ do_genocide(
             /* accumulated 'cnt' doesn't take groups into account;
                assume bringing in new mon(s) didn't remove any old ones */
             cnt = monster_census(FALSE) - census;
-            pline(_("Sent in %s%s."), (cnt > 1) ? "some " : "",
+            pline(_("Sent in %s%s."), (cnt > 1) ? _("some ") : "",
                   (cnt > 1) ? makeplural(buf) : an(buf));
         } else
             pline1(nothing_happens);

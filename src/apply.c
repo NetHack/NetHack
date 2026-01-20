@@ -867,7 +867,7 @@ use_leash_core(struct obj *obj, struct monst *mtmp, coord *cc, int spotmon)
             obj->leashmon = 0;
             update_inventory();
             You(_("remove the leash from %s%s."),
-                spotmon ? "your " : "", l_monnam(mtmp));
+                spotmon ? _("your ") : "", l_monnam(mtmp));
         }
     }
 }
@@ -2821,34 +2821,34 @@ use_trap(struct obj *otmp)
     const char *what = (char *) 0;
     char buf[BUFSZ];
     int levtyp = levl[u.ux][u.uy].typ;
-    const char *occutext = "setting the trap";
+    const char *occutext = _("setting the trap");
 
     if (nohands(gy.youmonst.data))
-        what = "without hands";
+        what = _("without hands");
     else if (Stunned)
-        what = "while stunned";
+        what = _("while stunned");
     else if (u.uswallow)
-        what = digests(u.ustuck->data) ? "while swallowed" : "while engulfed";
+        what = digests(u.ustuck->data) ? _("while swallowed") : _("while engulfed");
     else if (Underwater)
-        what = "underwater";
+        what = _("underwater");
     else if (Levitation)
-        what = "while levitating";
+        what = _("while levitating");
     else if (is_pool(u.ux, u.uy))
-        what = "in water";
+        what = _("in water");
     else if (is_lava(u.ux, u.uy))
-        what = "in lava";
+        what = _("in lava");
     else if (On_stairs(u.ux, u.uy)) {
         stairway *stway = stairway_at(u.ux, u.uy);
-        what = stway->isladder ? "on the ladder" : "on the stairs";
+        what = stway->isladder ? _("on the ladder") : _("on the stairs");
     } else if (IS_FURNITURE(levtyp) || IS_OBSTRUCTED(levtyp)
              || closed_door(u.ux, u.uy) || t_at(u.ux, u.uy))
-        what = "here";
+        what = _("here");
     else if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))
         what = (levtyp == AIR)
-                   ? "in midair"
+                   ? _("in midair")
                    : (levtyp == CLOUD)
-                         ? "in a cloud"
-                         : "in this place"; /* Air/Water Plane catch-all */
+                         ? _("in a cloud")
+                         : _("in this place"); /* Air/Water Plane catch-all */
     if (what) {
         You_cant(_("set a trap %s!"), what);
         reset_trapset();

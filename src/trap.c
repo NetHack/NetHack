@@ -2567,7 +2567,7 @@ trapeffect_landmine(
             if (in_sight) {
                 newsym(mtmp->mx, mtmp->my);
                 pline_The(_("air currents set %s off!"),
-                          already_seen ? "a land mine" : "it");
+                          already_seen ? _("a land mine") : _("it"));
             }
         } else if (in_sight) {
             newsym(mtmp->mx, mtmp->my);

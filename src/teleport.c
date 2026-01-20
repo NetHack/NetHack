@@ -540,7 +540,7 @@ teleds(coordxy nux, coordxy nuy, int teleds_flags)
        then the old map display was shown instead of the new one */
     if (is_teleport && flags.verbose)
         You(_("materialize in %s location!"),
-            (nux == u.ux0 && nuy == u.uy0) ? "the same" : "a different");
+            (nux == u.ux0 && nuy == u.uy0) ? _("the same") : _("a different"));
     /* if terrain type changes, levitation or flying might become blocked
        or unblocked; might issue message, so do this after map+vision has
        been updated for new location instead of right after u_on_newpos() */

@@ -970,7 +970,7 @@ fall_asleep(int how_long, boolean wakeup_msg)
 #endif
     /* early wakeup from combat won't be possible until next monster turn */
     u.usleep = svm.moves;
-    gn.nomovemsg = wakeup_msg ? "You wake up." : You_can_move_again;
+    gn.nomovemsg = wakeup_msg ? _("You wake up.") : You_can_move_again;
 }
 
 /* Attach an egg hatch timeout to the given egg.
@@ -1617,7 +1617,7 @@ burn_object(anything *arg, long timeout)
                           You see some wax candles consumed!
                           You see a wax candle consumed!
                          */
-                        You_see(_("%s%s consumed!"), many ? "some " : "",
+                        You_see(_("%s%s consumed!"), many ? _("some ") : "",
                                 many ? xname(obj) : an(xname(obj)));
                         need_newsym = TRUE;
                         break;
@@ -1625,9 +1625,9 @@ burn_object(anything *arg, long timeout)
 
                     /* post message */
                     pline(Hallucination
-                              ? (many ? "They shriek!" : "It shrieks!")
-                              : Blind ? "" : (many ? "Their flames die."
-                                                   : "Its flame dies."));
+                              ? (many ? _("They shriek!") : _("It shrieks!"))
+                              : Blind ? "" : (many ? _("Their flames die.")
+                                                   : _("Its flame dies.")));
                 }
             }
             end_burn(obj, FALSE);
