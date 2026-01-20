@@ -18853,7 +18853,7 @@ msgstr "투명한 손님은 환영하지 않습니다!"
 #: src/shk.c:747
 #, c-format
 msgid "%s stands firm as if %s knows you are there."
-msgstr ""
+msgstr "%s는 당신이 거기 있다는 것을 알듯이 굳건하게 서 있다."
 "%s는 당신이 거기 있다는 것을 알듯이 꿋꿋하게 서 있다.%s{이/가} 마치 당신이 거"
 "기 있다는 것을 %s 알고 있는 것처럼 굳건히 서 있다."
 
@@ -19581,7 +19581,7 @@ msgstr "%s{이/가} 신을 섬기는 자들이 번영한다는 것을 알아챘�
 #: src/shk.c:5450
 #, c-format
 msgid "%s says: 'Don't try to steal from me - I have friends in high places!'"
-msgstr ""
+msgstr "%s가 말한다: '나한테 훔치려 하지 마 - 높은 곳에 친구들이 있거든!'"
 "%s가 말한다: '나한테 훔치려 하지 마 - 높은 곳에 친구들이 있거든!'%s{이/가} 말"
 "한다: '나한테서 훔치려 하지 마세요 - 높은 곳에 친구가 있어요!'"
 
@@ -25311,7 +25311,7 @@ msgstr "겁쟁이"
 #: src/wizard.c:824
 #, fuzzy
 msgid "rattlepate"
-msgstr ""
+msgstr "멍청이"
 "멍청이#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 "전투 도끼\n"
 "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
