@@ -664,10 +664,10 @@ hitmm(
 
         Strcpy(magr_name, Monnam(magr));
         if (compat) {
-            Snprintf(buf, sizeof buf, "%s %s", magr_name,
-                    mdef->mcansee ? "smiles at" : "talks to");
+            Snprintf(buf, sizeof buf, _("%s %s"), magr_name,
+                    mdef->mcansee ? _("smiles at") : _("talks to"));
             pline(_("%s %s %s."), buf, mon_nam(mdef),
-                  (compat == 2) ? "engagingly" : "seductively");
+                  (compat == 2) ? _("engagingly") : _("seductively"));
         } else {
             /* Combat messages - use complete sentences for proper i18n */
             const char *mdef_name = mon_nam_too(mdef, magr);

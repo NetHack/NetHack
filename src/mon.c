@@ -3380,8 +3380,8 @@ monkilled(
     if (fltxt && (mdef->wormno ? worm_known(mdef)
                                : cansee(mdef->mx, mdef->my)))
         pline_mon(mdef, _("%s is %s%s%s!"), Monnam(mdef),
-              nonliving(mptr) ? "destroyed" : "killed",
-              *fltxt ? " by the " : "", fltxt);
+              nonliving(mptr) ? _("destroyed") : _("killed"),
+              *fltxt ? _(" by the ") : "", fltxt);
     else
         /* sad feeling is deferred until after potential life-saving */
         iflags.sad_feeling = mdef->mtame ? TRUE : FALSE;
@@ -3499,8 +3499,8 @@ xkilled(
         boolean namedpet = has_mgivenname(mtmp) && !Hallucination;
 
         You(_("%s %s!"),
-            nonliving(mtmp->data) ? "destroy" : "kill",
-            !(wasinside || canspotmon(mtmp)) ? "it"
+            nonliving(mtmp->data) ? _("destroy") : _("kill"),
+            !(wasinside || canspotmon(mtmp)) ? _("it")
               : !mtmp->mtame ? mon_nam(mtmp)
                 : x_monnam(mtmp, namedpet ? ARTICLE_NONE : ARTICLE_THE,
                            "poor", namedpet ? SUPPRESS_SADDLE : 0, FALSE));
