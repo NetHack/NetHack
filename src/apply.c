@@ -3422,7 +3422,7 @@ snickersnee_used_dist_attk(struct obj *obj)
 int
 use_pole(struct obj *obj, boolean autohit)
 {
-    const char thump[] = "Thump!  Your blow bounces harmlessly off the %s.";
+    const char thump[] = N_("Thump!  Your blow bounces harmlessly off the %s.");
     int res = ECMD_OK, max_range, min_range, glyph;
     coord cc;
     struct monst *mtmp;

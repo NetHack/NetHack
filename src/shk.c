@@ -1431,8 +1431,8 @@ make_angry_shk(
 }
 
 static const char
-        no_money[] = "Moreover, you%s have no gold.",
-        not_enough_money[] = "Besides, you don't have enough to interest %s.";
+        no_money[] = N_("Moreover, you%s have no gold."),
+        not_enough_money[] = N_("Besides, you don't have enough to interest %s.");
 
 /* if one item is used-up and the other isn't, the used-up one comes first;
    otherwise, if their costs differ, the more expensive one comes first;
