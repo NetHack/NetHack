@@ -1247,7 +1247,7 @@ level_tele(void)
             if (ynq(_("Go to Nowhere.  Are you sure?")) != 'y')
                 return;
             You(_("%s in agony as your body begins to warp..."),
-                is_silent(gy.youmonst.data) ? "writhe" : "scream");
+                is_silent(gy.youmonst.data) ? _("writhe") : _("scream"));
             display_nhwindow(WIN_MESSAGE, FALSE);
             You(_("cease to exist."));
             if (gi.invent)
@@ -1408,7 +1408,7 @@ level_tele(void)
 
         if (on_level(&newlevel, &u.uz) && newlev != depth(&u.uz)) {
             You_cant(get_there_from,
-                     (newlev > deepest) ? "anywhere" : "here");
+                     (newlev > deepest) ? _("anywhere") : _("here"));
             return;
         }
     }
@@ -1549,7 +1549,7 @@ level_tele_trap(struct trap *trap, unsigned int trflags)
     level_tele();
 
     if (Hallucination || Teleport_control)
-        You(_("briefly feel %s."), Hallucination ? "oriented" : "centered");
+        You(_("briefly feel %s."), Hallucination ? _("oriented") : _("centered"));
     else
         You_feel(_("%sdisoriented."), Confusion ? "even more " : "");
     /* magic portal traversal causes brief Stun; for level teleport, use
@@ -1710,8 +1710,8 @@ rloc_to_core(
         } else {
             pline(_("%s %s%s%s!"),
                   appearmsg ? Amonnam(mtmp) : Monnam(mtmp),
-                  appearmsg ? "suddenly " : "",
-                  !Blind ? "appears" : "arrives",
+                  appearmsg ? _("suddenly ") : "",
+                  !Blind ? _("appears") : _("arrives"),
                   next ? next : nearu ? nearu : "");
         }
         /* wand discovery only happens if a messaage is delivered (bug?);

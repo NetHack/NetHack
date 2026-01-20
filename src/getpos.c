@@ -678,7 +678,7 @@ getpos_menu(coord *ccp, int gloc)
     if (gcount < 2) { /* gcount always includes the hero */
         free((genericptr_t) garr);
         You(_("cannot %s %s."),
-            (iflags.getloc_filter == GFILTER_VIEW) ? "see" : "detect",
+            (iflags.getloc_filter == GFILTER_VIEW) ? _("see") : _("detect"),
             gloc_descr[gloc][0]);
         return FALSE;
     }
@@ -962,8 +962,8 @@ getpos(coord *ccp, boolean force, const char *goal)
         } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]) {
             iflags.autodescribe = !iflags.autodescribe;
             pline(_("Automatic description %sis %s."),
-                  flags.verbose ? "of features under cursor " : "",
-                  iflags.autodescribe ? "on" : "off");
+                  flags.verbose ? _("of features under cursor ") : "",
+                  iflags.autodescribe ? _("on") : _("off"));
             if (!iflags.autodescribe)
                 show_goal_msg = TRUE;
             msg_given = TRUE;

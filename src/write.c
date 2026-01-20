@@ -218,12 +218,12 @@ dowrite(struct obj *pen)
 
         if (!fanfic) {
             You(_("%s to write the Great Yendorian Novel, but %s inspiration."),
-                !tearup ? "prepare" : "try",
-                !Hallucination ? "lack" : "have too much");
+                !tearup ? _("prepare") : _("try"),
+                !Hallucination ? _("lack") : _("have too much"));
         } else {
             You(_("%sproduce really %s fan-fiction."),
-                !tearup ? "start to " : "",
-                !Hallucination ? "lame" : "awesome");
+                !tearup ? _("start to ") : "",
+                !Hallucination ? _("lame") : _("awesome"));
         }
         if (!tearup) {
             You(_("give up on the idea."));

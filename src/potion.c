@@ -376,9 +376,9 @@ make_hallucinated(
     if (Unaware)
         talk = FALSE;
 
-    message = (!xtime) ? "Everything %s SO boring now."
-                       : "Oh wow!  Everything %s so cosmic!";
-    verb = (!Blind) ? "looks" : "feels";
+    message = (!xtime) ? _("Everything %s SO boring now.")
+                       : _("Oh wow!  Everything %s so cosmic!");
+    verb = (!Blind) ? _("looks") : _("feels");
 
     if (mask) {
         if (HHallucination)
@@ -625,7 +625,7 @@ dopotion(struct obj *otmp)
     if (gp.potion_nothing) {
         gp.potion_unkn++;
         You(_("have a %s feeling for a moment, then it passes."),
-            Hallucination ? "normal" : "peculiar");
+            Hallucination ? _("normal") : _("peculiar"));
     }
     if (otmp->dknown && !objects[otmp->otyp].oc_name_known) {
         if (!gp.potion_unkn) {
@@ -840,7 +840,7 @@ peffect_see_invisible(struct obj *otmp)
     gp.potion_unkn++;
     if (otmp->cursed)
         pline(_("Yecch!  This tastes %s."),
-              Hallucination ? "overripe" : "rotten");
+              Hallucination ? _("overripe") : _("rotten"));
     else
         pline(
               Hallucination
@@ -1456,7 +1456,7 @@ strange_feeling(struct obj *obj, const char *txt)
 {
     if (flags.beginner || !txt)
         You(_("have a %s feeling for a moment, then it passes."),
-            Hallucination ? "normal" : "strange");
+            Hallucination ? _("normal") : _("strange"));
     else
         pline1(txt);
 
@@ -1817,7 +1817,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                 || is_were(mon->data) || is_vampshifter(mon)) {
                 if (obj->blessed) {
                     pline(_("%s %s in pain!"), Monnam(mon),
-                          is_silent(mon->data) ? "writhes" : "shrieks");
+                          is_silent(mon->data) ? _("writhes") : _("shrieks"));
                     if (!is_silent(mon->data))
                         wake_nearto(tx, ty, mon->data->mlevel * 10);
                     mon->mhp -= d(2, 6);
@@ -1854,7 +1854,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
         case POT_ACID:
             if (!resists_acid(mon) && !resist(mon, POTION_CLASS, 0, NOTELL)) {
                 pline(_("%s %s in pain!"), Monnam(mon),
-                      is_silent(mon->data) ? "writhes" : "shrieks");
+                      is_silent(mon->data) ? _("writhes") : _("shrieks"));
                 if (!is_silent(mon->data))
                     wake_nearto(tx, ty, mon->data->mlevel * 10);
                 mon->mhp -= d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);

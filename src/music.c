@@ -589,9 +589,9 @@ do_improvisation(struct obj *instr)
     case MAGIC_FLUTE: /* Make monster fall asleep */
         consume_obj_charge(instr, TRUE);
 
-        You(_("%sproduce %s%s music."), !Deaf ? "" : "seem to ",
-            Hallucination ? "piped" : "soft",
-            same_old_song ? ", familiar" : "");
+        You(_("%sproduce %s%s music."), !Deaf ? "" : _("seem to "),
+            Hallucination ? _("piped") : _("soft"),
+            same_old_song ? _(", familiar") : "");
         Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
         put_monsters_to_sleep(u.ulevel * 5);
         exercise(A_DEX, TRUE);
@@ -599,10 +599,10 @@ do_improvisation(struct obj *instr)
     case WOODEN_FLUTE: /* May charm snakes */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
         if (!Deaf)
-            pline(_("%s%s."), Tobjnam(instr, do_spec ? "trill" : "toot"),
-                  same_old_song ? " a familiar tune" : "");
+            pline(_("%s%s."), Tobjnam(instr, do_spec ? _("trill") : _("toot")),
+                  same_old_song ? _(" a familiar tune") : "");
         else
-            You_feel(_("%s %s."), yname(instr), do_spec ? "trill" : "toot");
+            You_feel(_("%s %s."), yname(instr), do_spec ? _("trill") : _("toot"));
         Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
         if (do_spec)
             charm_snakes(u.ulevel * 3);
@@ -714,7 +714,7 @@ do_improvisation(struct obj *instr)
         } else {
             /* TODO maybe: sound effects for these riffs */
             You(_("%s %s."),
-                rn2(2) ? "butcher" : rn2(2) ? "manage" : "pull off",
+                rn2(2) ? _("butcher") : rn2(2) ? _("manage") : _("pull off"),
                 an(ROLL_FROM(beats)));
             Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
         }

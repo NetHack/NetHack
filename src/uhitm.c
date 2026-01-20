@@ -1626,11 +1626,11 @@ hmon_hitmon_msg_hit(
         else /* hand_to_hand */
             You(_("%s %s%s"),
                 (obj && (is_shield(obj)
-                         || obj->otyp == HEAVY_IRON_BALL)) ? "bash"
+                         || obj->otyp == HEAVY_IRON_BALL)) ? _("bash")
                 : (obj && (objects[obj->otyp].oc_skill == P_WHIP
-                           || is_wet_towel(obj))) ? "lash"
-                  : Role_if(PM_BARBARIAN) ? "smite"
-                    : "hit",
+                           || is_wet_towel(obj))) ? _("lash")
+                  : Role_if(PM_BARBARIAN) ? _("smite")
+                    : _("hit"),
                 mon_nam(mon), canseemon(mon) ? exclam(hmd->dmg) : ".");
     }
 }

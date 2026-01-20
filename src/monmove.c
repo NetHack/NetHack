@@ -113,7 +113,7 @@ mon_yells(struct monst *mon, const char *shout)
              */
             pline_mon(mon, _("%s angrily %s %s %s!"),
                 Amonnam(mon),
-                nolimbs(mon->data) ? "shakes" : "waves",
+                nolimbs(mon->data) ? _("shakes") : _("waves"),
                 mhis(mon),
                 nolimbs(mon->data) ? mbodypart(mon, HEAD)
                                    : makeplural(mbodypart(mon, ARM)));
@@ -1549,7 +1549,7 @@ postmov(
                 if (flags.verbose && canseemon(mtmp))
                     pline_mon(mtmp, _("%s %s under the door."), YMonnam(mtmp),
                               (ptr == &mons[PM_FOG_CLOUD]
-                               || ptr->mlet == S_LIGHT) ? "flows" : "oozes");
+                               || ptr->mlet == S_LIGHT) ? _("flows") : _("oozes"));
             } else if ((here->doormask & D_LOCKED) != 0 && can_unlock) {
                 /* like the vampshift hack, there are sequencing
                    issues when the monster is moved to the door's spot
@@ -1635,8 +1635,8 @@ postmov(
             } else if (flags.verbose && canseemon(mtmp))
                 Norep(_("%s %s %s the iron bars."), Monnam(mtmp),
                       /* pluralization fakes verb conjugation */
-                      makeplural(locomotion(ptr, "pass")),
-                      passes_walls(ptr) ? "through" : "between");
+                      makeplural(locomotion(ptr, _("pass"))),
+                      passes_walls(ptr) ? _("through") : _("between"));
         } /* doors and bars */
 
         /* possibly dig */

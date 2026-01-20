@@ -2899,7 +2899,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         learn_it = TRUE; /* (no effect for spells...) */
         healup(d(6, obj->otyp == SPE_EXTRA_HEALING ? 8 : 4), 0, FALSE,
                (obj->blessed || obj->otyp == SPE_EXTRA_HEALING));
-        You_feel(_("%sbetter."), obj->otyp == SPE_EXTRA_HEALING ? "much " : "");
+        You_feel(_("%sbetter."), obj->otyp == SPE_EXTRA_HEALING ? _("much ") : "");
         break;
     case WAN_LIGHT: /* (broken wand) */
         /* assert( !ordinary ); */
@@ -3174,7 +3174,7 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
                 if (!Blind)
                     pline(_(writing_vanishes), your);
                 else /* note: "dark" rather than "heavy" is intentional... */
-                    You_feel(_("%s headed."), Hallucination ? "dark" : "light");
+                    You_feel(_("%s headed."), Hallucination ? _("dark") : _("light"));
                 u.mh = 0; /* fatal; death handled by rehumanize() */
             }
             if (Unchanging && u.mh > 0)
@@ -3552,16 +3552,16 @@ hit(
                              && (cansee(gb.bhitpos.x, gb.bhitpos.y)
                                  || canspotmon(mtmp) || engulfing_u(mtmp))));
 
-    pline(_("%s %s %s%s"), The(str), vtense(str, "hit"),
-          verbosely ? mon_nam(mtmp) : "it", force);
+    pline(_("%s %s %s%s"), The(str), vtense(str, _("hit")),
+          verbosely ? mon_nam(mtmp) : _("it"), force);
 }
 
 void
 miss(const char *str, struct monst *mtmp)
 {
-    pline(_("%s %s %s."), The(str), vtense(str, "miss"),
+    pline(_("%s %s %s."), The(str), vtense(str, _("miss")),
           ((cansee(gb.bhitpos.x, gb.bhitpos.y) || canspotmon(mtmp))
-           && flags.verbose) ? mon_nam(mtmp) : "it");
+           && flags.verbose) ? mon_nam(mtmp) : _("it"));
 }
 
 staticfn void

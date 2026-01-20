@@ -407,7 +407,7 @@ learn(void)
             book->spestudied = rn2(book->spestudied);
         } else {
             Your(_("knowledge of %s is %s."), splname,
-                 spellknow(i) ? "keener" : "restored");
+                 spellknow(i) ? _("keener") : _("restored"));
             incrnknow(i, 1);
             book->spestudied++;
             exercise(A_WIS, TRUE); /* extra study */
@@ -631,7 +631,7 @@ study_book(struct obj *spellbook)
         spellbook->in_use = FALSE;
 
         You(_("begin to %s the runes."),
-            spellbook->otyp == SPE_BOOK_OF_THE_DEAD ? "recite" : "memorize");
+            spellbook->otyp == SPE_BOOK_OF_THE_DEAD ? _("recite") : _("memorize"));
     }
 
     svc.context.spbook.book = spellbook;

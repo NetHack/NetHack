@@ -112,7 +112,7 @@ boulder_hits_pool(
             if (!u.uinwater) {
                 if (pushing ? !Blind : cansee(rx, ry)) {
                     There(_("is a large splash as %s %s the %s."),
-                          the(xname(otmp)), fills_up ? "fills" : "falls into",
+                          the(xname(otmp)), fills_up ? _("fills") : _("falls into"),
                           what);
                 } else if (!Deaf) {
                     if (lava) {
@@ -217,7 +217,7 @@ flooreffects(
                                 pline(_("%s is %s!"), Monnam(mtmp),
                                       (nonliving(mtmp->data)
                                        || is_vampshifter(mtmp))
-                                      ? "destroyed" : "killed");
+                                      ? _("destroyed") : _("killed"));
                             mondied(mtmp);
                         }
                     } else {
@@ -538,21 +538,21 @@ dosinkring(struct obj *obj)
     case RIN_GAIN_STRENGTH:
         pline_The(_("%s flow seems %ser now."),
                   hliquid("water"),
-                  (obj->spe < 0) ? "weak" : "strong");
+                  (obj->spe < 0) ? _("weak") : _("strong"));
         break;
     case RIN_GAIN_CONSTITUTION:
         pline_The(_("%s flow seems %ser now."),
                   hliquid("water"),
-                  (obj->spe < 0) ? "less" : "great");
+                  (obj->spe < 0) ? _("less") : _("great"));
         break;
     case RIN_INCREASE_ACCURACY: /* KMH */
         pline_The(_("%s flow %s the drain."),
                   hliquid("water"),
-                  (obj->spe < 0) ? "misses" : "hits");
+                  (obj->spe < 0) ? _("misses") : _("hits"));
         break;
     case RIN_INCREASE_DAMAGE:
         pline_The(_("water's force seems %ser now."),
-                  (obj->spe < 0) ? "small" : "great");
+                  (obj->spe < 0) ? _("small") : _("great"));
         break;
     case RIN_HUNGER:
         ideed = FALSE;
@@ -1255,8 +1255,8 @@ dodown(void)
     }
 
     if (trap) {
-        const char *down_or_thru = trap->ttyp == HOLE ? "down" : "through";
-        const char *actn = u_locomotion("jump");
+        const char *down_or_thru = trap->ttyp == HOLE ? _("down") : _("through");
+        const char *actn = u_locomotion(_("jump"));
 
         if (gy.youmonst.data->msize >= MZ_HUGE) {
             char qbuf[QBUFSZ];
@@ -1277,7 +1277,7 @@ dodown(void)
             }
         }
         You(_("%s %s the %s."), actn, down_or_thru,
-            trap->ttyp == HOLE ? "hole" : "trap door");
+            trap->ttyp == HOLE ? _("hole") : _("trap door"));
     }
     if (trap && Is_stronghold(&u.uz)) {
         goto_hell(FALSE, TRUE);
@@ -1325,7 +1325,7 @@ doup(void)
     if (near_capacity() > SLT_ENCUMBER) {
         /* No levitation check; inv_weight() already allows for it */
         Your(_("load is too heavy to climb the %s."),
-             levl[u.ux][u.uy].typ == STAIRS ? "stairs" : "ladder");
+             levl[u.ux][u.uy].typ == STAIRS ? _("stairs") : _("ladder"));
         return ECMD_TIME;
     }
     if (ledger_no(&u.uz) == 1) {
@@ -2176,7 +2176,7 @@ revive_corpse(struct obj *corpse)
                 if (mcarry && canseemon(mcarry))
                     pline(_("Startled, %s drops %s as it %s!"),
                           mon_nam(mcarry), an(cname),
-                          canspotmon(mtmp) ? "revives" : "disappears");
+                          canspotmon(mtmp) ? _("revives") : _("disappears"));
                 else if (canspotmon(mtmp))
                     pline(_("%s suddenly appears!"),
                           chewed ? Adjmonnam(mtmp, "bite-covered")
@@ -2407,8 +2407,8 @@ legs_in_no_shape(const char *for_what, /* jumping, kicking, riding */
         if (wl == BOTH_SIDES)
             bp = makeplural(bp);
         Your(_("%s%s %s in no shape for %s."),
-             (wl == LEFT_SIDE) ? "left " : (wl == RIGHT_SIDE) ? "right " : "",
-             bp, (wl == BOTH_SIDES) ? "are" : "is", for_what);
+             (wl == LEFT_SIDE) ? _("left ") : (wl == RIGHT_SIDE) ? _("right ") : "",
+             bp, (wl == BOTH_SIDES) ? _("are") : _("is"), for_what);
     }
 }
 

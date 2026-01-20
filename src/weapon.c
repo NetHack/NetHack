@@ -909,8 +909,8 @@ mon_wield_item(struct monst *mon)
 
                 if (bimanual(obj))
                     mon_hand = makeplural(mon_hand);
-                pline(_("%s %s to %s %s!"), Tobjnam(obj, "weld"),
-                      is_plural(obj) ? "themselves" : "itself",
+                pline(_("%s %s to %s %s!"), Tobjnam(obj, _("weld")),
+                      is_plural(obj) ? _("themselves") : _("itself"),
                       s_suffix(mon_nam(mon)), mon_hand);
                 obj->bknown = 1;
             }
@@ -924,7 +924,7 @@ mon_wield_item(struct monst *mon)
             /* 3.6.3: artifact might be getting wielded by invisible monst */
             else if (cansee(mon->mx, mon->my))
                 pline(_("Light begins shining %s."),
-                      (mdistu(mon) <= 5 * 5) ? "nearby" : "in the distance");
+                      (mdistu(mon) <= 5 * 5) ? _("nearby") : _("in the distance"));
         }
         obj->owornmask = W_WEP;
         return 1;
@@ -1041,8 +1041,8 @@ wet_a_towel(
     if (newspe > obj->spe) {
         if (verbose) {
             const char *wetness = (newspe < 3)
-                                     ? (!obj->spe ? "damp" : "damper")
-                                     : (!obj->spe ? "wet" : "wetter");
+                                     ? (!obj->spe ? _("damp") : _("damper"))
+                                     : (!obj->spe ? _("wet") : _("wetter"));
 
             if (carried(obj))
                 pline(_("%s gets %s."), Yobjnam2(obj, (const char *) 0),

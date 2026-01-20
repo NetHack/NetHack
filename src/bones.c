@@ -796,7 +796,7 @@ fix_ghostly_obj(struct obj *obj)
         case BOOMERANG:
             You(_("make adjustments to %s to suit your %s hand."),
                 the(xname(obj)),
-                URIGHTY ? "right" : "left");
+                URIGHTY ? _("right") : _("left"));
             break;
         default:
             break;
