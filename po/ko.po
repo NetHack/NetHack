@@ -16680,7 +16680,7 @@ msgstr "필멸자"
 
 #: src/pray.c:1233
 msgid "To enter the castle, thou must play the right tune!"
-msgstr ""
+msgstr "성에 들어가려면 올바른 선율을 연주해야 한다!"
 
 #: src/pray.c:1238
 msgid "a divine music..."
@@ -18817,7 +18817,7 @@ msgstr "투명한 손님은 환영하지 않습니다!"
 #: src/shk.c:747
 #, c-format
 msgid "%s stands firm as if %s knows you are there."
-msgstr ""
+msgstr "%s는 당신이 거기 있다는 것을 알듯이 꿋꿋하게 서 있다."
 "%s{이/가} 마치 당신이 거기 있다는 것을 %s 알고 있는 것처럼 굳건히 서 있다."
 
 #: src/shk.c:758
@@ -19193,7 +19193,7 @@ msgstr "괜찮아요, 제가 당신이라면 그것을 간직하겠어요."
 #: src/shk.c:3064
 #, c-format
 msgid "You'll need %d%s candle%s to go along with it."
-msgstr ""
+msgstr "이것과 함께 %d%s개의 양초%s가 필요합니다."
 
 #: src/shk.c:3065
 msgid " more"
@@ -19401,7 +19401,7 @@ msgstr "평범한 도둑처럼."
 #: src/shk.c:4984
 #, c-format
 msgid "Be careful, %s, or you might fall through the floor."
-msgstr ""
+msgstr "조심해, %s, 안 그러면 바닥에 빠질 수 있어."
 
 #: src/shk.c:4985
 msgid "madam"
@@ -19544,7 +19544,7 @@ msgstr "%s{이/가} 신을 섬기는 자들이 번영한다는 것을 알아챘�
 #: src/shk.c:5450
 #, c-format
 msgid "%s says: 'Don't try to steal from me - I have friends in high places!'"
-msgstr ""
+msgstr "%s가 말한다: '나한테 훔치려 하지 마 - 높은 곳에 친구들이 있거든!'"
 "%s{이/가} 말한다: '나한테서 훔치려 하지 마세요 - 높은 곳에 친구가 있어요!'"
 
 #: src/shk.c:5451
@@ -19731,7 +19731,7 @@ msgstr "권위있는 명령에 따라, %s..."
 
 #: src/sit.c:138
 msgid "A curse upon thee for sitting upon this most holy throne!"
-msgstr ""
+msgstr "이 가장 신성한 왕좌에 앉은 너에게 저주가 내리리라!"
 
 #: src/sit.c:148
 msgid "A terrible drone fills your head!"
@@ -19832,7 +19832,7 @@ msgstr "%s{은/는} 알을 낳을 수 없다!"
 
 #: src/sit.c:361
 msgid "You may think you are a platypus, but a male still"
-msgstr ""
+msgstr "당신은 오리너구리라고 생각할 수 있지만, 수컷은 여전히"
 
 #: src/sit.c:362
 #, fuzzy
@@ -20023,7 +20023,7 @@ msgstr "편집증적이다."
 
 #: src/sit.c:708
 msgid "tawt you taw a puttie tat"
-msgstr ""
+msgstr "고양이 본 것 같아"
 
 #: src/sit.c:709
 #, fuzzy
@@ -20098,7 +20098,7 @@ msgstr "누군가 수색하는 소리."
 
 #: src/sounds.c:149
 msgid "#an animal carcass being offered in sacrifice."
-msgstr ""
+msgstr "#제물로 바쳐지는 동물 사체."
 
 #: src/sounds.c:150
 #, fuzzy
@@ -20712,15 +20712,15 @@ msgstr "%s{이/가} 걱정된다."
 
 #: src/sounds.c:1357
 msgid "tells you a funny joke!"
-msgstr ""
+msgstr "재미있는 농담을 한다!"
 
 #: src/sounds.c:1358
 msgid "insults your heritage!"
-msgstr ""
+msgstr "당신의 가문을 모욕한다!"
 
 #: src/sounds.c:1360
 msgid "guffaws merrily!"
-msgstr ""
+msgstr "즐겁게 껄껄 웃는다!"
 
 #: src/sounds.c:1361
 #, fuzzy
@@ -20729,7 +20729,7 @@ msgstr "사다리가 노력에 저항한다."
 
 #: src/sounds.c:1362
 msgid "suggests a stint of rehab..."
-msgstr ""
+msgstr "재활 치료를 권한다..."
 
 #
 #: src/sounds.c:1363
@@ -21714,7 +21714,7 @@ msgstr "%s{이/가} 더 이상 조이지 않는다!"
 
 #: src/timeout.c:288
 msgid "Your blood is having trouble reaching your brain."
-msgstr ""
+msgstr "피가 뇌에 도달하는 데 문제가 있다."
 
 #: src/timeout.c:289
 #, fuzzy, c-format
@@ -21736,7 +21736,7 @@ msgstr "병이 심각하다."
 
 #: src/timeout.c:319
 msgid "You are at Death's door."
-msgstr ""
+msgstr "당신은 죽음의 문턱에 있다."
 
 #: src/timeout.c:348
 msgid "You float slightly lower."
@@ -23170,7 +23170,7 @@ msgstr "%s{을/를} 밀기엔 너무 작다."
 
 #: src/trap.c:5194
 msgid "And just how do you expect to do that?"
-msgstr ""
+msgstr "대체 어떻게 그걸 하려고 하는가?"
 
 #: src/trap.c:5196
 #, fuzzy, c-format
@@ -24564,7 +24564,7 @@ msgstr "%s{이/가} 작별 인사를 했다."
 
 #: src/vault.c:522
 msgid "Oh, yes, of course.  Sorry to have disturbed you."
-msgstr ""
+msgstr "아, 네, 물론이죠. 방해해서 죄송합니다."
 
 #: src/vault.c:529
 #, c-format
@@ -24573,7 +24573,7 @@ msgstr "%s{이/가} 뭐라고 중얼거리며 매우 화났다!"
 
 #: src/vault.c:534
 msgid "Back from the dead, are you?  I'll remedy that!"
-msgstr ""
+msgstr "죽음에서 돌아왔군? 그걸 바로잡아주지!"
 
 #: src/vault.c:545
 #, c-format
@@ -25082,7 +25082,7 @@ msgstr "이도류 전투를 시작한다."
 
 #: src/wield.c:911
 msgid "glow"
-msgstr ""
+msgstr "빛나다"
 
 #: src/wield.c:915
 #, fuzzy, c-format
@@ -25273,7 +25273,7 @@ msgstr "겁쟁이"
 #: src/wizard.c:824
 #, fuzzy
 msgid "rattlepate"
-msgstr ""
+msgstr "멍청이"
 "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 "전투 도끼\n"
 "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
@@ -25310,15 +25310,15 @@ msgstr "케첩"
 
 #: src/wizard.c:830
 msgid "Hell shall soon claim thy remains,"
-msgstr ""
+msgstr "지옥이 곧 네 시체를 가져갈 것이다,"
 
 #: src/wizard.c:830
 msgid "I chortle at thee, thou pathetic"
-msgstr ""
+msgstr "나는 너를 비웃노라, 이 불쌍한"
 
 #: src/wizard.c:831
 msgid "Prepare to die, thou"
-msgstr ""
+msgstr "죽을 준비를 해라, 이"
 
 #: src/wizard.c:831
 #, fuzzy
@@ -25327,11 +25327,11 @@ msgstr "저항은 쓸모없다!"
 
 #: src/wizard.c:832
 msgid "Surrender or die, thou"
-msgstr ""
+msgstr "항복하거나 죽어라, 이"
 
 #: src/wizard.c:832
 msgid "There shall be no mercy, thou"
-msgstr ""
+msgstr "자비는 없을 것이다, 이"
 
 #: src/wizard.c:833
 #, fuzzy
@@ -25340,7 +25340,7 @@ msgstr "너의 행동을 후회하게 될 것이다!"
 
 #: src/wizard.c:833
 msgid "Thou art as a flea to me,"
-msgstr ""
+msgstr "넌 나에게 벼룩 같은 존재다,"
 
 #: src/wizard.c:834
 #, fuzzy
@@ -25349,11 +25349,11 @@ msgstr "감히 나를 %s하겠다고?"
 
 #: src/wizard.c:834
 msgid "Thy fate is sealed,"
-msgstr ""
+msgstr "네 운명은 정해졌다,"
 
 #: src/wizard.c:835
 msgid "Verily, thou shalt be one dead"
-msgstr ""
+msgstr "진실로, 너는 하나의 죽은"
 
 #: src/wizard.c:846
 #, c-format
