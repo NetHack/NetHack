@@ -3254,7 +3254,7 @@ display_pickinv(
    } else if (usextra) {
         /* wizard override ID and xtra_choice are mutually exclusive */
         if (flags.sortpack)
-            add_menu_heading(win, "Miscellaneous");
+            add_menu_heading(win, _("Miscellaneous"));
         any.a_char = HANDS_SYM; /* '-' */
         add_menu(win, &nul_glyphinfo, &any, HANDS_SYM, 0, ATR_NONE,
                  clr, xtra_choice, MENU_ITEMFLAGS_NONE);
@@ -3360,7 +3360,7 @@ display_pickinv(
             menutext = "(list likely candidates)";
         }
         if (menutext) {
-            add_menu_heading(win, "Special");
+            add_menu_heading(win, _("Special"));
             add_menu(win, &nul_glyphinfo, &any, any.a_char, 0, ATR_NONE, clr,
                      menutext, MENU_ITEMFLAGS_NONE);
             gotsomething = TRUE; /* menu isn't empty */

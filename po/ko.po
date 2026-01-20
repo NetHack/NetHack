@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 12:47+0900\n"
+"POT-Creation-Date: 2026-01-20 12:49+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -2096,6 +2096,19 @@ msgstr "중립"
 msgid "Lawful"
 msgstr "질서"
 
+#: src/botl.c:1187
+msgid "Choose status conditions to toggle"
+msgstr "전환할 상태 조건 선택"
+
+#: src/botl.c:2883
+msgid "Choose status conditions"
+msgstr "상태 조건 선택"
+
+#: src/botl.c:3450
+#, fuzzy
+msgid "Select a hilite field:"
+msgstr "항목을 선택하세요:"
+
 #: src/botl.c:3737
 msgid "Not expecting a percentage."
 msgstr "백분율이 예상되지 않는다."
@@ -2138,6 +2151,10 @@ msgstr "hilite 조건/%s/%s 추가됨"
 #, c-format
 msgid "Added hilite %s"
 msgstr "hilite %s 추가됨"
+
+#: src/botl.c:4299
+msgid "Status hilites:"
+msgstr "상태 강조:"
 
 #: src/cfgfiles.c:173
 msgid "Strange, could not figure out config file name."
@@ -9206,10 +9223,19 @@ msgstr "지속적 인벤토리 표시가 비어 있다."
 msgid "%s%s%s%s"
 msgstr "%s%s%s%s"
 
+#: src/invent.c:3257
+#, fuzzy
+msgid "Miscellaneous"
+msgstr "기타 키:"
+
 #: src/invent.c:3315
 #, c-format
 msgid "%s %s (no weapon)"
 msgstr "%s %s (무기 없음)"
+
+#: src/invent.c:3363
+msgid "Special"
+msgstr "특수"
 
 #: src/invent.c:3509
 #, fuzzy
@@ -14919,9 +14945,30 @@ msgstr "메뉴 맵 공간이 부족하다."
 msgid "Use command '#optionsfull' to get the complete options list."
 msgstr "'#optionsfull' 명령어를 사용하여 전체 옵션 목록을 확인하세요."
 
+#: src/options.c:8626
+msgid "hide help"
+msgstr "도움말 숨기기"
+
+#: src/options.c:8626
+#, fuzzy
+msgid "show help"
+msgstr "오크 투구"
+
 #: src/options.c:8690
 msgid "Options"
 msgstr "옵션"
+
+#: src/options.c:8906
+msgid "Booleans (selecting will toggle value):"
+msgstr "불리언 (선택하면 값이 전환됩니다):"
+
+#: src/options.c:8956 src/options.c:9553
+msgid "Other settings:"
+msgstr "기타 설정:"
+
+#: src/options.c:8974
+msgid "Variable playground locations:"
+msgstr "가변 플레이그라운드 위치:"
 
 #: src/options.c:8978
 msgid "Set what options?"
@@ -14962,10 +15009,6 @@ msgstr "자동 줍기: %s."
 #: src/options.c:9533
 msgid "Compound options:"
 msgstr "복합 옵션:"
-
-#: src/options.c:9553
-msgid "Other settings:"
-msgstr "기타 설정:"
 
 # pager.c monster health descriptions
 #: src/pager.c:145
@@ -28979,9 +29022,6 @@ msgstr "tty perm_invent는 최소 %dx%d 터미널이 필요한데, 현재 터미
 # 방어구 - 투구
 #~ msgid "elven helm"
 #~ msgstr "엘프 투구"
-
-#~ msgid "orcish helm"
-#~ msgstr "오크 투구"
 
 #~ msgid "dwarvish helm"
 #~ msgstr "드워프 투구"

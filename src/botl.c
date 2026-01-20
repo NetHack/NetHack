@@ -1184,7 +1184,7 @@ cond_menu(void)
                         ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
         }
 
-        end_menu(tmpwin, "Choose status conditions to toggle");
+        end_menu(tmpwin, _("Choose status conditions to toggle"));
 
         res = select_menu(tmpwin, PICK_ANY, &picks);
         destroy_nhwindow(tmpwin);
@@ -2880,7 +2880,7 @@ query_conditions(void)
                  clr, conditions[i].text[0], MENU_ITEMFLAGS_NONE);
     }
 
-    end_menu(tmpwin, "Choose status conditions");
+    end_menu(tmpwin, _("Choose status conditions"));
 
     res = select_menu(tmpwin, PICK_ANY, &picks);
     destroy_nhwindow(tmpwin);
@@ -3447,7 +3447,7 @@ status_hilite_menu_choose_field(void)
                  clr, initblstats[i].fldname, MENU_ITEMFLAGS_NONE);
     }
 
-    end_menu(tmpwin, "Select a hilite field:");
+    end_menu(tmpwin, _("Select a hilite field:"));
 
     res = select_menu(tmpwin, PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
@@ -4296,7 +4296,7 @@ status_hilite_menu(void)
                  clr, buf, MENU_ITEMFLAGS_NONE);
     }
 
-    end_menu(tmpwin, "Status hilites:");
+    end_menu(tmpwin, _("Status hilites:"));
     if ((res = select_menu(tmpwin, PICK_ONE, &picks)) > 0) {
         fld = picks->item.a_int - 1;
         if (fld < 0) {

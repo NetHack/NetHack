@@ -8903,7 +8903,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
 
     indexoffset = 1;
     any = cg.zeroany;
-    add_menu_heading(tmpwin, "Booleans (selecting will toggle value):");
+    add_menu_heading(tmpwin, _("Booleans (selecting will toggle value):"));
     any.a_int = 0;
     /* first list any other non-modifiable booleans, then modifiable ones */
     for (pass = 0; pass <= 1; pass++)
@@ -8953,7 +8953,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
         }
 
     add_menu_str(tmpwin, "");
-    add_menu_heading(tmpwin, "Other settings:");
+    add_menu_heading(tmpwin, _("Other settings:"));
 
     for (pass = startpass; pass <= endpass; pass++)
         for (i = 0; (name = allopt[i].name) != 0; i++) {
@@ -8971,7 +8971,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
 
 #ifdef PREFIXES_IN_USE
     add_menu_str(tmpwin, "");
-    add_menu_heading(tmpwin, "Variable playground locations:");
+    add_menu_heading(tmpwin, _("Variable playground locations:"));
     for (i = 0; i < PREFIX_COUNT; i++)
         doset_add_menu(tmpwin, fqn_prefix_names[i], fmtstr_doset, -1, 0);
 #endif
