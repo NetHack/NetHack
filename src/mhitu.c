@@ -149,11 +149,11 @@ mpoisons_subj(struct monst *mtmp, struct attack *mattk)
         struct obj *mwep = (mtmp == &gy.youmonst) ? uwep : MON_WEP(mtmp);
         /* "Foo's attack was poisoned." is pretty lame, but at least
            it's better than "sting" when not a stinging attack... */
-        return (!mwep || !mwep->opoisoned) ? "attack" : "weapon";
+        return (!mwep || !mwep->opoisoned) ? _("attack") : _("weapon");
     } else {
-        return (mattk->aatyp == AT_TUCH) ? "contact"
-                  : (mattk->aatyp == AT_GAZE) ? "gaze"
-                       : (mattk->aatyp == AT_BITE) ? "bite" : "sting";
+        return (mattk->aatyp == AT_TUCH) ? _("contact")
+                  : (mattk->aatyp == AT_GAZE) ? _("gaze")
+                       : (mattk->aatyp == AT_BITE) ? _("bite") : _("sting");
     }
 }
 

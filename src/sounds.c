@@ -440,27 +440,27 @@ yelp(struct monst *mtmp)
         switch (mtmp->data->msound) {
         case MS_MEW:
             se = se_feline_yelp;
-            yelp_verb = (!Deaf) ? "yowl" : "arch";
+            yelp_verb = (!Deaf) ? _("yowl") : _("arch");
             break;
         case MS_BARK:
         case MS_GROWL:
             se = se_canine_yelp;
-            yelp_verb = (!Deaf) ? "yelp" : "recoil";
+            yelp_verb = (!Deaf) ? _("yelp") : _("recoil");
             break;
         case MS_ROAR:
-            yelp_verb = (!Deaf) ? "snarl" : "bluff";
+            yelp_verb = (!Deaf) ? _("snarl") : _("bluff");
             break;
         case MS_SQEEK:
             se = se_squeal;
-            yelp_verb = (!Deaf) ? "squeal" : "quiver";
+            yelp_verb = (!Deaf) ? _("squeal") : _("quiver");
             break;
         case MS_SQAWK:
             se = se_avian_screak;
-            yelp_verb = (!Deaf) ? "screak" : "thrash";
+            yelp_verb = (!Deaf) ? _("screak") : _("thrash");
             break;
         case MS_WAIL:
             se = se_wail;
-            yelp_verb = (!Deaf) ? "wail" : "cringe";
+            yelp_verb = (!Deaf) ? _("wail") : _("cringe");
             break;
         }
     if (yelp_verb) {
@@ -627,29 +627,29 @@ cry_sound(struct monst *mtmp)
     case MS_SILENT: /* insects, arthropods, worms, sea creatures */
         /* "chitter": have silent critters make some noise
            or the mommy/daddy gag when hatching doesn't work */
-        ret = (ptr->mlet == S_EEL) ? "gurgle" : "chitter";
+        ret = (ptr->mlet == S_EEL) ? _("gurgle") : _("chitter");
         break;
     case MS_HISS: /* chickatrice, pyrolisk, snakes */
-        ret = "hiss";
+        ret = _("hiss");
         break;
     case MS_ROAR: /* baby dragons; have them growl instead of roar */
     case MS_GROWL: /* (none) */
-        ret = "growl";
+        ret = _("growl");
         break;
     case MS_CHIRP: /* adult crocodiles bellow, babies chirp */
-        ret = "chirp";
+        ret = _("chirp");
         break;
     case MS_BUZZ: /* killer bees */
-        ret = "buzz";
+        ret = _("buzz");
         break;
     case MS_SQAWK: /* ravens */
-        ret = "screech";
+        ret = _("screech");
         break;
     case MS_GRUNT: /* gargoyles */
-        ret = "grunt";
+        ret = _("grunt");
         break;
     case MS_MUMBLE: /* naga hatchlingss */
-        ret = "mumble";
+        ret = _("mumble");
         break;
     }
     return ret;
@@ -818,7 +818,7 @@ domonnoise(struct monst *mtmp)
         if (flags.moonphase == FULL_MOON && (night() ^ !rn2(13))) {
             pline(_("%s throws back %s head and lets out a blood curdling %s!"),
                   Monnam(mtmp), mhis(mtmp),
-                  (ptr == &mons[PM_HUMAN_WERERAT]) ? "shriek" : "howl");
+                  (ptr == &mons[PM_HUMAN_WERERAT]) ? _("shriek") : _("howl"));
             Soundeffect((ptr == &mons[PM_HUMAN_WERERAT]) ? se_scream
                                                          : se_canine_howl,
                         80);

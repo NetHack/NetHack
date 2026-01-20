@@ -540,7 +540,7 @@ do_attack(struct monst *mtmp)
                 You(_("begin bashing monsters with %s."), yname(uwep));
             else if (!cantwield(gy.youmonst.data))
                 You(_("begin %s monsters with your %s %s."),
-                    ing_suffix(Role_if(PM_MONK) ? "strike" : "bash"),
+                    ing_suffix(Role_if(PM_MONK) ? _("strike") : _("bash")),
                     uarmg ? _("gloved") : _("bare"), /* Del Lamb */
                     makeplural(body_part(HAND)));
         }
@@ -1200,7 +1200,7 @@ hmon_hitmon_misc_obj(
             const char *eggp =
                 (ismnum(mnum) && obj->known)
                     ? the(mons[mnum].pmnames[NEUTRAL])
-                    : (cnt > 1L) ? "some" : "an";
+                    : (cnt > 1L) ? _("some") : _("an");
 
             You(_("hit %s with %s egg%s."), mon_nam(mon), eggp,
                 plur(cnt));
@@ -5570,7 +5570,7 @@ hmonas(struct monst *mon)
                 case AT_CLAW:
                 case AT_TUCH:
                     /* verb=="claws" may be overridden below */
-                    verb = (mattk->aatyp == AT_TUCH) ? "touch" : "claws";
+                    verb = (mattk->aatyp == AT_TUCH) ? _("touch") : _("claws");
                     /* decide if silver-hater will be hit by silver ring(s);
                        for 'multi_claw' where attacks alternate right/left,
                        assume 'even' claw or touch attacks use dominant hand
