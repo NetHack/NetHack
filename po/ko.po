@@ -9983,12 +9983,12 @@ msgstr "%s물건%s{이/가} 없다."
 
 #: src/invent.c:4111
 msgid "feel"
-msgstr "느껴지지 않는다"
+msgstr "느껴지지 않습니다"
 
 # Verbs for look_here function (Blind: feel, otherwise: see)
 #: src/invent.c:4111
 msgid "see"
-msgstr "보이지 않는다"
+msgstr "보이지 않습니다"
 
 #: src/invent.c:4144
 #, c-format
@@ -9998,7 +9998,7 @@ msgstr "%s{이/가} %s에 뭐가 있는지 %s."
 #: src/invent.c:4159 src/invent.c:4248
 #, c-format
 msgid "%s no objects here."
-msgstr "여기에는 아무 물체도 %s."
+msgstr "여기에는 아무 물체도 %s"
 
 #: src/invent.c:4175
 #, c-format
