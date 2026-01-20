@@ -5929,12 +5929,12 @@ untrap(
                 if (!Is_box(otmp))
                     continue;
                 if (otmp->tknown && otmp->dknown)
-                    (void) safe_qbuf(qbuf, "Disarm this ", NULL,
-                                     otmp, xname, ansimpleoname, "a box");
+                    (void) safe_qbuf(qbuf, _("Disarm this "), NULL,
+                                     otmp, xname, ansimpleoname, _("a box"));
                 else
-                    (void) safe_qbuf(qbuf, "There is ",
-                                     " here.  Check it for traps?", otmp,
-                                     doname, ansimpleoname, "a box");
+                    (void) safe_qbuf(qbuf, _("There is "),
+                                     _(" here.  Check it for traps?"), otmp,
+                                     doname, ansimpleoname, _("a box"));
                 switch (ynq(qbuf)) {
                     case 'q':
                         return 0;

@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 13:08+0900\n"
+"POT-Creation-Date: 2026-01-20 13:10+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -749,6 +749,11 @@ msgstr "%s 이상한 따뜻함!"
 #, c-format
 msgid "%s with a strange light!"
 msgstr "%s 이상한 빛과 함께!"
+
+#: src/apply.c:1407
+#, fuzzy
+msgid "Attach "
+msgstr "공격한다"
 
 #: src/apply.c:1433
 #, c-format
@@ -9248,8 +9253,8 @@ msgstr "당신은 %s."
 #: src/insight.c:1657
 #, fuzzy
 msgid " conflict"
-msgstr " 분쟁을"
-"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+msgstr ""
+" 분쟁을#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 "분쟁의 반지\n"
 "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 "충돌의 반지"
@@ -10060,7 +10065,7 @@ msgstr "%s{으로/로} 열겠습니까?"
 msgid " here; %s %s?"
 msgstr "%s %s{이다/다}."
 
-#: src/lock.c:494 src/pickup.c:3573 src/zap.c:4905
+#: src/lock.c:494 src/pickup.c:3062 src/pickup.c:3573 src/zap.c:4905
 msgid "it"
 msgstr "그것"
 
@@ -10073,12 +10078,12 @@ msgstr "%s{이/가} 잠겨있다."
 # UI 메시지 (invent.c - "here" 관련)
 # ============================================================
 # %1$s = "is"/"are", %2$s = object name
-#: src/lock.c:495 src/lock.c:729
+#: src/lock.c:495 src/lock.c:729 src/pickup.c:3587 src/trap.c:5935
 #, fuzzy
 msgid "There is "
 msgstr "여기에 %2$s{이/가} 있다.%1$.0s"
 
-#: src/lock.c:496 src/lock.c:730
+#: src/lock.c:496 src/lock.c:730 src/trap.c:5933 src/trap.c:5937
 #, fuzzy
 msgid "a box"
 msgstr "큰 상자"
@@ -16036,6 +16041,11 @@ msgstr "용기를 여는 중"
 msgid "owe %ld %s for lost merchandise."
 msgstr "잃어버린 상품에 대해 %ld %s{을/를} 빚진다."
 
+#: src/pickup.c:3061
+#, fuzzy
+msgid "Do what with "
+msgstr "%s{으로/로} 그것을 할 수 없다."
+
 #: src/pickup.c:3138
 #, c-format
 msgid "don't have anything%s to %s."
@@ -16123,6 +16133,20 @@ msgstr "용기를 여는 중"
 #, fuzzy
 msgid "one"
 msgstr "등뼈"
+
+# ============================================================
+# UI 메시지 (invent.c - "here" 관련)
+# ============================================================
+# %1$s = "is"/"are", %2$s = object name
+#: src/pickup.c:3587
+#, fuzzy
+msgid " here, tip it?"
+msgstr "여기에 %2$s{이/가} 있다.%1$.0s"
+
+#: src/pickup.c:3589
+#, fuzzy
+msgid "container"
+msgstr "용기를 여는 중"
 
 #: src/pickup.c:3634
 #, c-format
@@ -24363,6 +24387,16 @@ msgstr "대신 구덩이를 메워 보라."
 #, c-format
 msgid "cannot disable %s trap."
 msgstr "%s 함정을 해제할 수 없다."
+
+#: src/trap.c:5932
+#, fuzzy
+msgid "Disarm this "
+msgstr "해제했다!"
+
+#: src/trap.c:5936
+#, fuzzy
+msgid " here.  Check it for traps?"
+msgstr "문틀에 부딪혔다!"
 
 #: src/trap.c:5950
 msgid "are no other chests or boxes here."

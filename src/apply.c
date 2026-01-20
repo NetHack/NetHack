@@ -1404,7 +1404,7 @@ use_candle(struct obj **optr)
     /* first, minimal candelabrum suffix for formatting candles */
     Sprintf(qsfx, " to\033%s?", thesimpleoname(otmp));
     /* next, format the candles as a prefix for the candelabrum */
-    (void) safe_qbuf(qbuf, "Attach ", qsfx, obj, yname, thesimpleoname, s);
+    (void) safe_qbuf(qbuf, _("Attach "), qsfx, obj, yname, thesimpleoname, s);
     /* strip temporary candelabrum suffix */
     if ((q = strstri(qbuf, " to\033")) != 0)
         Strcpy(q, " to ");

@@ -3058,8 +3058,8 @@ use_container(
                              gc.current_container, Yname2, Ysimple_name2,
                              "This");
         else
-            (void) safe_qbuf(qbuf, "Do what with ", "?", gc.current_container,
-                             yname, ysimple_name, "it");
+            (void) safe_qbuf(qbuf, _("Do what with "), "?", gc.current_container,
+                             yname, ysimple_name, _("it"));
         /* ask player about what to do with this container */
         if (flags.menu_style == MENU_PARTIAL
             || flags.menu_style == MENU_FULL) {
@@ -3584,9 +3584,9 @@ dotip(void)
                     nobj = cobj->nexthere;
                     if (!Is_container(cobj))
                         continue;
-                    c = ynq(safe_qbuf(qbuf, "There is ", " here, tip it?",
+                    c = ynq(safe_qbuf(qbuf, _("There is "), _(" here, tip it?"),
                                       cobj,
-                                      doname, ansimpleoname, "container"));
+                                      doname, ansimpleoname, _("container")));
                     if (c == 'q')
                         return ECMD_OK;
                     if (c == 'n')
