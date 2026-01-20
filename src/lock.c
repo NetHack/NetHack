@@ -1104,8 +1104,8 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
     boolean res = TRUE;
     int loudness = 0;
     const char *msg = (const char *) 0;
-    const char *dustcloud = "A cloud of dust";
-    const char *quickly_dissipates = "quickly dissipates";
+    const char *dustcloud = _("A cloud of dust");
+    const char *quickly_dissipates = _("quickly dissipates");
     boolean mysterywand = (otmp->oclass == WAND_CLASS && !otmp->dknown);
 
     if (door->typ == SDOOR) {

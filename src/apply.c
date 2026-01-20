@@ -2955,8 +2955,8 @@ use_whip(struct obj *obj)
     struct monst *mtmp;
     struct obj *otmp;
     int rx, ry, proficient, res = ECMD_OK;
-    const char *msg_slipsfree = "The bullwhip slips free.";
-    const char *msg_snap = "Snap!";
+    const char *msg_slipsfree = _("The bullwhip slips free.");
+    const char *msg_snap = _("Snap!");
 
     if (obj != uwep) {
         if (wield_tool(obj, "lash")) {

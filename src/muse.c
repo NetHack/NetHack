@@ -66,7 +66,7 @@ precheck(struct monst *mon, struct obj *obj)
 
     if (obj->oclass == POTION_CLASS) {
         coord cc;
-        static const char *const empty = "The potion turns out to be empty.";
+        static const char *const empty = N_("The potion turns out to be empty.");
         struct monst *mtmp;
 
         if (objdescr_is(obj, "milky")) {
@@ -79,14 +79,14 @@ precheck(struct monst *mon, struct obj *obj)
                 mtmp = makemon(&mons[PM_GHOST], cc.x, cc.y, MM_NOMSG);
                 if (!mtmp) {
                     if (vis)
-                        pline1(empty);
+                        pline1(_(empty));
                 } else {
                     if (vis) {
                         pline(
-                            "As %s opens the bottle, an enormous %s emerges!",
+                            _("As %s opens the bottle, an enormous %s emerges!"),
                               mon_nam(mon),
                               Hallucination ? rndmonnam(NULL)
-                                            : (const char *) "ghost");
+                                            : (const char *) _("ghost"));
                         pline(_("%s is frightened to death,"
                               " and unable to move."),
                               Monnam(mon));
@@ -106,7 +106,7 @@ precheck(struct monst *mon, struct obj *obj)
             mtmp = makemon(&mons[PM_DJINNI], cc.x, cc.y, MM_NOMSG);
             if (!mtmp) {
                 if (vis)
-                    pline1(empty);
+                    pline1(_(empty));
             } else {
                 if (vis)
                     pline_mon(mtmp, _("In a cloud of smoke, %s emerges!"), a_monnam(mtmp));

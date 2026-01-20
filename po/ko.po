@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 13:19+0900\n"
+"POT-Creation-Date: 2026-01-20 13:21+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -1235,6 +1235,14 @@ msgstr "%s 설치를 완료했다."
 #: src/apply.c:2944
 msgid "trap setting attempt fails."
 msgstr "함정 설치 시도가 실패했다."
+
+#: src/apply.c:2958
+msgid "The bullwhip slips free."
+msgstr "채찍이 빠졌다."
+
+#: src/apply.c:2959
+msgid "Snap!"
+msgstr "찰칵!"
 
 #: src/apply.c:2981
 msgid "miss."
@@ -10439,6 +10447,15 @@ msgstr "문이 닫혔다."
 msgid "Klick!"
 msgstr "딸깍!"
 
+#: src/lock.c:1107
+#, fuzzy
+msgid "A cloud of dust"
+msgstr "구름."
+
+#: src/lock.c:1108
+msgid "quickly dissipates"
+msgstr "빠르게 흩어집니다"
+
 #: src/lock.c:1121
 msgid "A door appears in the wall!"
 msgstr "벽에 문이 나타났다!"
@@ -12777,6 +12794,23 @@ msgstr "쉬익거리는 소리."
 #: src/mthrowu.c:1459
 msgid "break the bars apart!"
 msgstr "철창을 부쉈다!"
+
+# ============================================================
+# 물약 메시지 (Potion Messages)
+# ============================================================
+#: src/muse.c:69
+#, fuzzy
+msgid "The potion turns out to be empty."
+msgstr "이 병은 비어 있었다."
+
+#: src/muse.c:86
+#, fuzzy, c-format
+msgid "As %s opens the bottle, an enormous %s emerges!"
+msgstr "병을 열자, 거대한 %s{이/가} 나타난다!"
+
+#: src/muse.c:89
+msgid "ghost"
+msgstr "유령"
 
 #: src/muse.c:90
 #, c-format
@@ -27714,12 +27748,6 @@ msgstr "%s 폭발"
 #~ msgid "can't reach that spot from here."
 #~ msgstr "여기서 그 지점에 닿을 수 없다."
 
-#~ msgid "The bullwhip slips free."
-#~ msgstr "채찍이 빠졌다."
-
-#~ msgid "Snap!"
-#~ msgstr "찰칵!"
-
 #, c-format
 #~ msgid "Thump!  Your blow bounces harmlessly off the %s."
 #~ msgstr "쿵! 당신의 공격이 %s에 튕겨나갔다."
@@ -29602,9 +29630,6 @@ msgstr "%s 폭발"
 
 #~ msgid "zombie"
 #~ msgstr "좀비"
-
-#~ msgid "ghost"
-#~ msgstr "유령"
 
 # ============================================================
 # 아이템 이름 (Item Names) - 샘플
