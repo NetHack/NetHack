@@ -1997,16 +1997,16 @@ eatcorpse(struct obj *otmp)
             pmxnam += 4;
         pline(_("%s%s %s %s%c"),
               type_is_pname(&mons[mnum])
-                 ? "" : the_unique_pm(&mons[mnum]) ? "The " : "This ",
+                 ? "" : the_unique_pm(&mons[mnum]) ? _("The ") : _("This "),
               pmxnam,
-              use_is ? "is" : "tastes",
+              use_is ? _("is") : _("tastes"),
                   /* tiger reference is to TV ads for "Frosted Flakes",
                      breakfast cereal targeted at kids by "Tony the tiger" */
               Hallucination
-                 ? (yummy ? ((u.umonnum == PM_TIGER) ? "gr-r-reat" : "gnarly")
-                          : palatable ? "copacetic" : "grody")
-              : (yummy ? "delicious" : palatable ?
-                 &palat_msg[1] : "terrible"),
+                 ? (yummy ? ((u.umonnum == PM_TIGER) ? _("gr-r-reat") : _("gnarly"))
+                          : palatable ? _("copacetic") : _("grody"))
+              : (yummy ? _("delicious") : palatable ?
+                 &palat_msg[1] : _("terrible")),
               (yummy || !palatable) ? '!' : '.');
     }
 
@@ -2200,12 +2200,12 @@ fprefx(struct obj *otmp)
  give_feedback:
             pline(_("This %s is %s"), singular(otmp, xname),
                   otmp->cursed
-                     ? (Hallucination ? "grody!" : "terrible!")
+                     ? (Hallucination ? _("grody!") : _("terrible!"))
                      : (otmp->otyp == CRAM_RATION
                         || otmp->otyp == K_RATION
                         || otmp->otyp == C_RATION)
-                        ? "bland."
-                        : Hallucination ? "gnarly!" : "delicious!");
+                        ? _("bland.")
+                        : Hallucination ? _("gnarly!") : _("delicious!"));
         }
         break; /* default */
     } /* switch */

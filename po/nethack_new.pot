@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 15:18+0900\n"
+"POT-Creation-Date: 2026-01-20 15:21+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -299,7 +299,7 @@ msgid "produce a %shigh-%s."
 msgstr ""
 
 #: ../src/apply.c:509 ../src/potion.c:293 ../src/potion.c:319
-#: ../src/potion.c:407
+#: ../src/potion.c:407 ../src/potion.c:1314 ../src/potion.c:1684
 msgid "normal"
 msgstr ""
 
@@ -307,7 +307,7 @@ msgstr ""
 msgid "strange, high-pitched"
 msgstr ""
 
-#: ../src/apply.c:511
+#: ../src/apply.c:511 ../src/potion.c:1314 ../src/potion.c:1684
 msgid "strange"
 msgstr ""
 
@@ -2744,13 +2744,13 @@ msgstr ""
 msgid "Go up the %s"
 msgstr ""
 
-#: ../src/cmd.c:4231 ../src/cmd.c:4236 ../src/do.c:1765 ../src/sit.c:533
-#: ../src/stairs.c:198
+#: ../src/cmd.c:4231 ../src/cmd.c:4236 ../src/do.c:1765 ../src/do.c:1783
+#: ../src/sit.c:533 ../src/stairs.c:198
 msgid "ladder"
 msgstr ""
 
-#: ../src/cmd.c:4231 ../src/cmd.c:4236 ../src/do.c:1765 ../src/dungeon.c:1774
-#: ../src/sit.c:531 ../src/stairs.c:198
+#: ../src/cmd.c:4231 ../src/cmd.c:4236 ../src/do.c:1765 ../src/do.c:1783
+#: ../src/dungeon.c:1774 ../src/sit.c:531 ../src/stairs.c:198
 msgid "stairs"
 msgstr ""
 
@@ -3120,11 +3120,11 @@ msgstr ""
 msgid "%s %s nearby."
 msgstr ""
 
-#: ../src/detect.c:543
+#: ../src/detect.c:543 ../src/do.c:2002
 msgid "smell"
 msgstr ""
 
-#: ../src/detect.c:543
+#: ../src/detect.c:543 ../src/do.c:2002
 msgid "sense"
 msgstr ""
 
@@ -4404,6 +4404,14 @@ msgstr ""
 msgid "fly down %s."
 msgstr ""
 
+#: ../src/do.c:1780
+msgid "along the ladder"
+msgstr ""
+
+#: ../src/do.c:1780
+msgid "the stairs"
+msgstr ""
+
 #: ../src/do.c:1783
 #, c-format
 msgid "fall down the %s."
@@ -4441,6 +4449,14 @@ msgstr ""
 #: ../src/do.c:1997
 #, c-format
 msgid "It is %s here."
+msgstr ""
+
+#: ../src/do.c:1998
+msgid "hot"
+msgstr ""
+
+#: ../src/do.c:1998
+msgid "cold"
 msgstr ""
 
 #: ../src/do.c:2001
@@ -8890,6 +8906,22 @@ msgstr ""
 #: ../src/hack.c:1682
 #, c-format
 msgid "are rooted %s."
+msgstr ""
+
+#: ../src/hack.c:1811
+msgid "Float"
+msgstr ""
+
+#: ../src/hack.c:1811
+msgid "float"
+msgstr ""
+
+#: ../src/hack.c:1812
+msgid "Fly"
+msgstr ""
+
+#: ../src/hack.c:1812
+msgid "fly"
 msgstr ""
 
 #: ../src/hack.c:1847
@@ -17790,9 +17822,25 @@ msgstr ""
 msgid "less %s now."
 msgstr ""
 
+#: ../src/potion.c:99
+msgid "trippy"
+msgstr ""
+
+#: ../src/potion.c:99
+msgid "confused"
+msgstr ""
+
 #: ../src/potion.c:117
 #, c-format
 msgid "%s now."
+msgstr ""
+
+#: ../src/potion.c:118
+msgid "less wobbly"
+msgstr ""
+
+#: ../src/potion.c:118
+msgid "a bit steadier"
 msgstr ""
 
 #: ../src/potion.c:123
@@ -17811,6 +17859,14 @@ msgstr ""
 #: ../src/potion.c:159
 #, c-format
 msgid "%s worse."
+msgstr ""
+
+#: ../src/potion.c:159
+msgid "much"
+msgstr ""
+
+#: ../src/potion.c:159
+msgid "even"
 msgstr ""
 
 #: ../src/potion.c:169
@@ -18131,9 +18187,29 @@ msgstr ""
 msgid "This tastes %s."
 msgstr ""
 
+#: ../src/potion.c:1295
+msgid "tangy"
+msgstr ""
+
+#: ../src/potion.c:1295
+msgid "sour"
+msgstr ""
+
 #: ../src/potion.c:1299 ../src/potion.c:1692
 #, c-format
 msgid "This burns%s!"
+msgstr ""
+
+#: ../src/potion.c:1300
+msgid " a little"
+msgstr ""
+
+#: ../src/potion.c:1300
+msgid " a lot"
+msgstr ""
+
+#: ../src/potion.c:1301
+msgid " like acid"
 msgstr ""
 
 #: ../src/potion.c:1314 ../src/potion.c:1684
@@ -22955,6 +23031,14 @@ msgstr ""
 #: ../src/spell.c:204
 #, c-format
 msgid "find yourself reading the %s line over and over again."
+msgstr ""
+
+#: ../src/spell.c:205
+msgid "next"
+msgstr ""
+
+#: ../src/spell.c:205
+msgid "first"
 msgstr ""
 
 #: ../src/spell.c:237
@@ -28069,6 +28153,18 @@ msgstr ""
 #: ../src/write.c:323
 #, c-format
 msgid "%s to write that."
+msgstr ""
+
+#: ../src/write.c:323
+msgid "fail"
+msgstr ""
+
+#: ../src/write.c:323
+msgid "don't know how"
+msgstr ""
+
+#: ../src/write.c:327
+msgid "write in your best handwriting:  \"My Diary\", but it quickly fades."
 msgstr ""
 
 #: ../src/write.c:335
