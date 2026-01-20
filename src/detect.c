@@ -1984,7 +1984,7 @@ mfind0(struct monst *mtmp, boolean via_warning)
             if (via_warning && found_something) {
                 set_msg_xy(x, y);
                 Your(_("danger sense causes you to take a second %s."),
-                     Blind ? "to check nearby" : "look close by");
+                     Blind ? _("to check nearby") : _("look close by"));
                 display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
             }
             mtmp->mundetected = 0;

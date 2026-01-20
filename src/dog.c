@@ -829,7 +829,7 @@ keepdogs(
             } else if (mtmp->meating || mtmp->mtrapped) {
                 if (canseemon(mtmp))
                     pline_mon(mtmp, _("%s is still %s."), Monnam(mtmp),
-                             mtmp->meating ? "eating" : "trapped");
+                             mtmp->meating ? _("eating") : _("trapped"));
                 stay_behind = TRUE;
             } else if (mon_has_amulet(mtmp)) {
                 if (canseemon(mtmp))
@@ -841,8 +841,8 @@ keepdogs(
                 if (mtmp->mleashed) {
                     pline(_("%s leash suddenly comes loose."),
                           humanoid(mtmp->data)
-                              ? (mtmp->female ? "Her" : "His")
-                              : "Its");
+                              ? (mtmp->female ? _("Her") : _("His"))
+                              : _("Its"));
                     m_unleash(mtmp, FALSE);
                 }
                 if (mtmp == u.usteed) {
@@ -1165,7 +1165,7 @@ tamedog(
     /* worst case, at least it'll be peaceful. */
     if (givemsg && !mtmp->mpeaceful && canspotmon(mtmp)) {
         pline_mon(mtmp, _("%s seems %s."), Monnam(mtmp),
-              Hallucination ? "really chill" : "more amiable");
+              Hallucination ? _("really chill") : _("more amiable"));
         givemsg = FALSE; /* don't give another message below */
     }
     mtmp->mpeaceful = 1;
@@ -1266,7 +1266,7 @@ tamedog(
 
     if (givemsg && canspotmon(mtmp))
         pline_mon(mtmp, _("%s seems quite %s."), Monnam(mtmp),
-              Hallucination ? "approachable" : "friendly");
+              Hallucination ? _("approachable") : _("friendly"));
 
     newsym(mtmp->mx, mtmp->my);
     if (mtmp->wormno)
@@ -1330,7 +1330,7 @@ wary_dog(struct monst *mtmp, boolean was_dead)
     if (!mtmp->mtame) {
         if (!quietly && canspotmon(mtmp))
             pline_mon(mtmp, _("%s %s."), Monnam(mtmp),
-                  mtmp->mpeaceful ? "is no longer tame" : "has become feral");
+                  mtmp->mpeaceful ? _("is no longer tame") : _("has become feral"));
         newsym(mtmp->mx, mtmp->my);
         /* a life-saved monster might be leashed;
            don't leave it that way if it's no longer tame */
