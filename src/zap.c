@@ -5212,7 +5212,7 @@ zap_over_floor(
                 Soundeffect(se_soft_crackling, 100);
                 if (see_it)
                     pline_The(_("%s freezes for a moment."),
-                              hliquid(lavawall ? "lava" : "water"));
+                              hliquid(lavawall ? _("lava") : _("water")));
                 else
                     You_hear(_("a soft crackling."));
                 rangemod -= 1000; /* stop */
@@ -5318,7 +5318,7 @@ zap_over_floor(
                 if (see_it)
                     Norep(_("The %s %s somewhat but remain intact."),
                           defsyms[S_bars].explanation,
-                          (damgtype == ZT_ACID) ? "corrode" : "melt");
+                          (damgtype == ZT_ACID) ? _("corrode") : _("melt"));
                 /* but nothing actually happens... */
             } else {
                 rangemod -= 3;

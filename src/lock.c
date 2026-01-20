@@ -125,11 +125,11 @@ picklock(void)
             } else {
                 gx.xlock.box->otrapped = 0;
                 gx.xlock.box->tknown = 0;
-                what = (gx.xlock.box->otyp == CHEST) ? "chest" : "box";
+                what = (gx.xlock.box->otyp == CHEST) ? _("chest") : _("box");
                 alreadyunlocked = !gx.xlock.box->olocked;
             }
             You(_("succeed in disarming the trap.  The %s is still %slocked."),
-                what, alreadyunlocked ? "un" : "");
+                what, alreadyunlocked ? _("un") : "");
             exercise(A_WIS, TRUE);
         } else {
             You(_("stop %s."), lock_action());
@@ -435,7 +435,7 @@ pick_lock(
 
         if (u.dz < 0 && !autounlock) { /* beware stale u.dz value */
             There(_("isn't any sort of lock up %s."),
-                  Levitation ? "here" : "there");
+                  Levitation ? _("here") : _("there"));
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (is_lava(u.ux, u.uy)) {
             pline(_("Doing that would probably melt %s."), yname(pick));
@@ -723,7 +723,7 @@ doforce(void)
                    remember and then reset its current value */
                 otmp->lknown = 0;
                 There(_("is %s here, but its lock is already %s."),
-                      doname(otmp), otmp->obroken ? "broken" : "unlocked");
+                      doname(otmp), otmp->obroken ? _("broken") : _("unlocked"));
                 otmp->lknown = 1;
                 continue;
             }

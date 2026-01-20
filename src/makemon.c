@@ -2120,7 +2120,7 @@ grow_up(struct monst *mtmp, struct monst *victim)
             if (canspotmon(mtmp))
                 pline(_("As %s grows up into %s, %s %s!"), mon_nam(mtmp),
                       an(pmname(ptr, Mgender(mtmp))), mhe(mtmp),
-                      nonliving(ptr) ? "expires" : "dies");
+                      nonliving(ptr) ? _("expires") : _("dies"));
             set_mon_data(mtmp, ptr); /* keep svm.mvitals[] accurate */
             mondied(mtmp);
             return (struct permonst *) 0;
