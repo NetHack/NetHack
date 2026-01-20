@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 15:05+0900\n"
+"POT-Creation-Date: 2026-01-20 15:06+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -731,7 +731,7 @@ msgstr ""
 msgid "%s %s%s%s."
 msgstr ""
 
-#: src/apply.c:1598 src/iactions.c:362 src/trap.c:389
+#: src/apply.c:1598 src/iactions.c:61 src/iactions.c:362 src/trap.c:389
 #, c-format
 msgid "%s %s %s"
 msgstr ""
@@ -1621,6 +1621,10 @@ msgstr ""
 #: src/artifact.c:1530
 #, c-format
 msgid "imaginary widget hits%s %s%c"
+msgstr ""
+
+#: src/artifact.c:1553
+msgid "The razor-sharp blade"
 msgstr ""
 
 #: src/artifact.c:1556
@@ -2669,7 +2673,7 @@ msgstr ""
 msgid "Swap places with %s"
 msgstr ""
 
-#: src/cmd.c:4377 src/spell.c:2096
+#: src/cmd.c:4377 src/iactions.c:52 src/spell.c:2096
 msgid "Name"
 msgstr ""
 
@@ -8976,6 +8980,30 @@ msgstr ""
 
 #: src/hack.c:4353 src/steed.c:249
 msgid "do that while carrying so much stuff."
+msgstr ""
+
+#: src/iactions.c:53
+msgid "Rename or un-name"
+msgstr ""
+
+#: src/iactions.c:54
+msgid "Call"
+msgstr ""
+
+#: src/iactions.c:57
+msgid "Re-call or un-call"
+msgstr ""
+
+#: src/iactions.c:63 src/uhitm.c:1184 src/zap.c:5425
+msgid "the"
+msgstr ""
+
+#: src/iactions.c:64
+msgid "this specific"
+msgstr ""
+
+#: src/iactions.c:65
+msgid "this stack of"
 msgstr ""
 
 #: src/iactions.c:92
@@ -21122,6 +21150,51 @@ msgstr ""
 msgid "Kop%s (disappointed) vanish%s into thin air."
 msgstr ""
 
+#: src/shk.c:5641
+#, c-format
+msgid "%sYou owe%s %ld %s."
+msgstr ""
+
+#: src/shk.c:5642
+#, c-format
+msgid "This is no free library, %s!  "
+msgstr ""
+
+#: src/shk.c:5644
+msgid " an additional"
+msgstr ""
+
+#: src/shk.c:5646
+#, c-format
+msgid "%s%sThat will cost you %ld %s (Yendorian Fuel Tax)."
+msgstr ""
+
+#: src/shk.c:5649
+#, c-format
+msgid "%s%sEmptying that will cost you %ld %s."
+msgstr ""
+
+#: src/shk.c:5651
+msgid "Whoa!  "
+msgstr ""
+
+#: src/shk.c:5653
+msgid "Watch it!  "
+msgstr ""
+
+#: src/shk.c:5655
+#, c-format
+msgid "%s%sUsage fee, %ld %s."
+msgstr ""
+
+#: src/shk.c:5657
+msgid "Hey!  "
+msgstr ""
+
+#: src/shk.c:5659
+msgid "Ahem.  "
+msgstr ""
+
 #: src/shk.c:5702
 #, c-format
 msgid "credit is reduced by %ld %s."
@@ -25425,10 +25498,6 @@ msgstr ""
 #: src/uhitm.c:1182
 #, c-format
 msgid "Splat!  You hit %s with %s %s egg%s!"
-msgstr ""
-
-#: src/uhitm.c:1184 src/zap.c:5425
-msgid "the"
 msgstr ""
 
 #: src/uhitm.c:1184

@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 15:05+0900\n"
+"POT-Creation-Date: 2026-01-20 15:06+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -803,7 +803,7 @@ msgstr "%s %s%s%s."
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
-#: src/apply.c:1598 src/iactions.c:362 src/trap.c:389
+#: src/apply.c:1598 src/iactions.c:61 src/iactions.c:362 src/trap.c:389
 #, c-format
 msgid "%s %s %s"
 msgstr "%s %s %s"
@@ -1715,6 +1715,10 @@ msgstr "거대한 망치가 %s %s{을/를} 쳤다%c"
 #, c-format
 msgid "imaginary widget hits%s %s%c"
 msgstr "상상의 장치가 %s %s{을/를} 쳤다%c"
+
+#: src/artifact.c:1553
+msgid "The razor-sharp blade"
+msgstr ""
 
 #: src/artifact.c:1556
 #, c-format
@@ -2859,7 +2863,7 @@ msgstr "대화? -- %s"
 msgid "Swap places with %s"
 msgstr "%s{과/와} 자리를 바꿨다."
 
-#: src/cmd.c:4377 src/spell.c:2096
+#: src/cmd.c:4377 src/iactions.c:52 src/spell.c:2096
 msgid "Name"
 msgstr "이름 짓기"
 
@@ -9471,6 +9475,31 @@ msgstr "당신은 죽었다..."
 #: src/hack.c:4353 src/steed.c:249
 msgid "do that while carrying so much stuff."
 msgstr "그렇게 많은 짐을 들고는 그렇게 할 수 없다."
+
+#: src/iactions.c:53
+msgid "Rename or un-name"
+msgstr ""
+
+#: src/iactions.c:54
+#, fuzzy
+msgid "Call"
+msgstr "벽 %s"
+
+#: src/iactions.c:57
+msgid "Re-call or un-call"
+msgstr ""
+
+#: src/iactions.c:63 src/uhitm.c:1184 src/zap.c:5425
+msgid "the"
+msgstr "그"
+
+#: src/iactions.c:64
+msgid "this specific"
+msgstr ""
+
+#: src/iactions.c:65
+msgid "this stack of"
+msgstr ""
 
 #: src/iactions.c:92
 msgid "Read the message inside this cookie"
@@ -22309,6 +22338,54 @@ msgstr "%s{이/가} 좀도둑 문제에 대해 이야기한다."
 msgid "Kop%s (disappointed) vanish%s into thin air."
 msgstr "경찰%s{이/가} (실망하며) 허공으로 사라진다%s."
 
+# ============================================================
+# 전투 메시지 추가 (Additional Combat Messages)
+# ============================================================
+#: src/shk.c:5641
+#, fuzzy, c-format
+msgid "%sYou owe%s %ld %s."
+msgstr "%s{에게} %ld %s{을/를} 빚졌다."
+
+#: src/shk.c:5642
+#, fuzzy, c-format
+msgid "This is no free library, %s!  "
+msgstr "이것은 당신을 %s 같은 느낌이 들게 한다!"
+
+#: src/shk.c:5644
+msgid " an additional"
+msgstr ""
+
+#: src/shk.c:5646
+#, fuzzy, c-format
+msgid "%s%sThat will cost you %ld %s (Yendorian Fuel Tax)."
+msgstr "그 %s{은/는} %ld %s{이다/다}."
+
+#: src/shk.c:5649
+#, fuzzy, c-format
+msgid "%s%sEmptying that will cost you %ld %s."
+msgstr "%s{은/는} %ld %s%s{이/가} 들 것이다."
+
+#: src/shk.c:5651
+msgid "Whoa!  "
+msgstr ""
+
+#: src/shk.c:5653
+msgid "Watch it!  "
+msgstr ""
+
+#: src/shk.c:5655
+#, fuzzy, c-format
+msgid "%s%sUsage fee, %ld %s."
+msgstr "%s{이/가} %ld %s."
+
+#: src/shk.c:5657
+msgid "Hey!  "
+msgstr ""
+
+#: src/shk.c:5659
+msgid "Ahem.  "
+msgstr ""
+
 #: src/shk.c:5702
 #, c-format
 msgid "credit is reduced by %ld %s."
@@ -26832,10 +26909,6 @@ msgstr "%2$s{으로/로} %1$s{을/를} 때렸다."
 #, c-format
 msgid "Splat!  You hit %s with %s %s egg%s!"
 msgstr "철퍽! %2$s %3$s 알%4$s{으로/로} %1$s{을/를} 때렸다!"
-
-#: src/uhitm.c:1184 src/zap.c:5425
-msgid "the"
-msgstr "그"
 
 #: src/uhitm.c:1184
 msgid "some"

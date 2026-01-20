@@ -793,7 +793,7 @@ doopen_indir(coordxy x, coordxy y)
 
     dirprompt = NULL; /* have get_adjacent_loc() -> getdir() use default */
     if (u.utrap && u.utraptype == TT_PIT && container_at(u.ux, u.uy, FALSE))
-        dirprompt = "Open where? [.>]";
+        dirprompt = _("Open where? [.>]");
 
     if (x > 0 && y >= 0) {
         /* nonzero <x,y> is used when hero in amorphous form tries to
