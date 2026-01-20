@@ -2167,7 +2167,7 @@ fprefx(struct obj *otmp)
         if (otmp->otyp == SLIME_MOLD && !otmp->cursed
             && otmp->spe == svc.context.current_fruit) {
             pline(_("My, this is a %s %s!"),
-                  Hallucination ? "primo" : "yummy",
+                  Hallucination ? _("primo") : _("yummy"),
                   singular(otmp, xname));
         } else if (otmp->otyp == APPLE && otmp->cursed && !Sleep_resistance) {
             ; /* skip core joke; feedback deferred til fpostfx() */

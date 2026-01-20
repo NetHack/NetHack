@@ -2125,8 +2125,8 @@ jump(int magic) /* 0=Physical, otherwise skill level */
                 return ECMD_TIME;
             }
             /* jumping in place takes no time and doesn't exercise anything */
-            You(_("%s."), Hallucination ? "hop up and down a bit"
-                                     : "decide not to jump after all");
+            You(_("%s."), Hallucination ? _("hop up and down a bit")
+                                     : _("decide not to jump after all"));
             return ECMD_OK;
         }
 
@@ -2275,7 +2275,7 @@ use_unicorn_horn(struct obj **optr)
         case 2:
             if (!Confusion)
                 You(_("suddenly feel %s."),
-                    Hallucination ? "trippy" : "confused");
+                    Hallucination ? _("trippy") : _("confused"));
             make_confused((HConfusion & TIMEOUT) + lcount, TRUE);
             break;
         case 3:
@@ -4481,8 +4481,8 @@ flip_through_book(struct obj *obj)
                 Soundeffect(se_rustling_paper, 50);
             }
             You_hear(_("the pages make an unpleasant %s sound."),
-                     Hallucination ? "chuckling"
-                                   : "rustling");
+                     Hallucination ? _("chuckling")
+                                   : _("rustling"));
         } else if (!Blind) {
             You_see(_("the pages glow faintly %s."), hcolor(NH_RED));
         } else {
@@ -4490,12 +4490,12 @@ flip_through_book(struct obj *obj)
         }
     } else if (Blind) {
         pline(_("The pages feel %s."),
-              Hallucination ? "freshly picked"
-                            : "rough and dry");
+              Hallucination ? _("freshly picked")
+                            : _("rough and dry"));
     } else if (obj->otyp == SPE_BLANK_PAPER) {
         pline(_("This spellbook %s."),
-              Hallucination ? "doesn't have much of a plot"
-                            : "has nothing written in it");
+              Hallucination ? _("doesn't have much of a plot")
+                            : _("has nothing written in it"));
         makeknown(obj->otyp);
     } else if (Hallucination) {
         You(_("enjoy the animated initials."));
