@@ -1126,8 +1126,8 @@ seffect_enchant_armor(struct obj **sobjp)
 
     if (!otmp) {
         strange_feeling(sobj, !Blind
-                        ? "Your skin glows then fades."
-                        : "Your skin feels warm for a moment.");
+                        ? _("Your skin glows then fades.")
+                        : _("Your skin feels warm for a moment."));
         *sobjp = 0; /* useup() in strange_feeling() */
         exercise(A_CON, !scursed);
         exercise(A_STR, !scursed);

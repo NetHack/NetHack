@@ -2498,16 +2498,16 @@ trapeffect_landmine(
                 return Trap_Effect_Finished;
             feeltrap(trap);
             pline(_("%s %s in a pile of soil below you."),
-                  already_seen ? "There is" : "You discover",
-                  trap->madeby_u ? "the trigger of your mine" : "a trigger");
+                  already_seen ? _("There is") : _("You discover"),
+                  trap->madeby_u ? _("the trigger of your mine") : _("a trigger"));
             if (already_seen && rn2(3))
                 return Trap_Effect_Finished;
             Soundeffect(se_kaablamm_of_mine, 80);
             pline(_("KAABLAMM!!!  %s %s%s off!"),
-                  forcebungle ? "Your inept attempt sets"
-                  : "The air currents set",
+                  forcebungle ? _("Your inept attempt sets")
+                  : _("The air currents set"),
                   already_seen ? a_your[trap->madeby_u] : "",
-                  already_seen ? " land mine" : "it");
+                  already_seen ? _(" land mine") : _("it"));
         } else {
             /* prevent landmine from killing steed, throwing you to
              * the ground, and then that same landmine affecting you
