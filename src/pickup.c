@@ -828,7 +828,7 @@ pickup(int what) /* should be a long */
                     goto pickupdone;
                 if (selective)
                     traverse_how |= INVORDER_SORT;
-                n = query_objlist("Pick up what?", objchain_p, traverse_how,
+                n = query_objlist(_("Pick up what?"), objchain_p, traverse_how,
                                   &pick_list, PICK_ANY,
                                   (via_menu == -2) ? allow_all
                                                    : allow_category);
