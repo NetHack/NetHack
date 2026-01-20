@@ -523,7 +523,7 @@ u_can_engrave(void)
     } else if (IS_AIR(levtyp)) {
         /* airlevel or inside bubble on waterlevel */
         You_cant(_("write in %s!"),
-                 (levtyp == CLOUD) ? "cloud vapor" : "thin air");
+                 (levtyp == CLOUD) ? _("cloud vapor") : _("thin air"));
         return FALSE;
     } else if (!ACCESSIBLE(levtyp)) {
         /* stone, tree, wall, secret corridor, pool, lava, bars */
@@ -774,7 +774,7 @@ doengrave_sfx_item(struct _doengrave_ctx *de)
     case SCROLL_CLASS:
     case SPBOOK_CLASS:
         pline(_("%s would get %s."), Yname2(de->otmp),
-              de->frosted ? "all frosty" : "too dirty");
+              de->frosted ? _("all frosty") : _("too dirty"));
         de->ptext = FALSE;
         break;
     case RANDOM_CLASS: /* This should mean fingers */

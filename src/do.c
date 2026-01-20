@@ -334,7 +334,7 @@ flooreffects(
             /* unconditional "ground" is safe as this only runs for
                room and corridor tiles */
             pline(_("%s up as %s the hot ground."), Tobjnam(obj, "heat"),
-                  is_plural(obj) ? "they hit" : "it hits");
+                  is_plural(obj) ? _("they hit") : _("it hits"));
         }
 
         int survival_chance = obj->blessed ? 70 : 50;
@@ -607,7 +607,7 @@ dosinkring(struct obj *obj)
             break;
         case RIN_SEE_INVISIBLE:
             You_see(_("some %s in the sink."),
-                    Hallucination ? "oxygen molecules" : "air");
+                    Hallucination ? _("oxygen molecules") : _("air"));
             break;
         case RIN_STEALTH:
             pline_The(_("sink seems to blend into the floor for a moment."));

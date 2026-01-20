@@ -1603,7 +1603,7 @@ shrink_glob(
             pline(_("%s %s."), globnambuf,
                   /* globs always have quantity 1 so we don't need otense()
                      because the verb always references a singular item */
-                  gone ? "dissolves completely" : "shrinks");
+                  gone ? _("dissolves completely") : _("shrinks"));
         updinv = TRUE;
     } else if (contnr) {
         /* when in a container, it might be nested so find outermost one */

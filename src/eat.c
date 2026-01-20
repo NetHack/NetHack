@@ -1637,7 +1637,7 @@ consume_tin(const char *mesg)
             make_glib(alreadyglib + rn1(11, 5)); /* 5..15 */
             pline(_("Eating %s food made your %s %s slippery."),
                   tintxts[r].txt, fingers_or_gloves(TRUE),
-                  alreadyglib ? "even more" : "very");
+                  alreadyglib ? _("even more") : _("very"));
         }
 
     } else { /* spinach... */

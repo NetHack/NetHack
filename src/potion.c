@@ -767,8 +767,8 @@ peffect_booze(struct obj *otmp)
 {
     gp.potion_unkn++;
     pline(_("Ooph!  This tastes like %s%s!"),
-          otmp->odiluted ? "watered down " : "",
-          Hallucination ? "dandelion wine" : "liquid fire");
+          otmp->odiluted ? _("watered down ") : "",
+          Hallucination ? _("dandelion wine") : _("liquid fire"));
     if (!otmp->blessed) {
         /* booze hits harder if drinking on an empty stomach */
         make_confused(itimeout_incr(HConfusion, d(2 + u.uhs, 8)), FALSE);

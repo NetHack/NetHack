@@ -179,7 +179,7 @@ check_strangling(boolean on)
             Strangled = 6L;
             disp.botl = TRUE;
             Your(_("%s %s your %s!"), simpleonames(uamul),
-                 was_strangled ? "still constricts" : "begins constricting",
+                 was_strangled ? _("still constricts") : _("begins constricting"),
                  body_part(NECK)); /* "throat" */
             makeknown(AMULET_OF_STRANGULATION);
         }
@@ -799,7 +799,7 @@ polymon(int mntmp)
                        ? "" : flags.female ? "female " : "male ");
     }
     Strcat(buf, pmname(&mons[mntmp], flags.female ? FEMALE : MALE));
-    You(_("%s %s!"), (u.umonnum != mntmp) ? "turn into" : "feel like", an(buf));
+    You(_("%s %s!"), (u.umonnum != mntmp) ? _("turn into") : _("feel like"), an(buf));
 
     if (Stoned && poly_when_stoned(&mons[mntmp])) {
         /* poly_when_stoned already checked stone golem genocide */
