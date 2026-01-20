@@ -448,7 +448,7 @@ dig(void)
         if (digtyp == DIGTYP_STATUE
             && (obj = sobj_at(STATUE, dpx, dpy)) != 0) {
             if (break_statue(obj))
-                digtxt = "The statue shatters.";
+                digtxt = _("The statue shatters.");
             else
                 /* it was a statue trap; break_statue()
                    printed a message and updated the screen */
@@ -462,7 +462,7 @@ dig(void)
                 obj_extract_self(bobj);
                 place_object(bobj, dpx, dpy);
             }
-            digtxt = "The boulder falls apart.";
+            digtxt = _("The boulder falls apart.");
         } else if (lev->typ == STONE || lev->typ == SCORR
                    || IS_TREE(lev->typ)) {
             if (Is_earthlevel(&u.uz)) {
@@ -476,14 +476,14 @@ dig(void)
                 }
             }
             if (digtyp == DIGTYP_TREE) {
-                digtxt = "You cut down the tree.";
+                digtxt = _("You cut down the tree.");
                 lev->typ = ROOM, lev->flags = 0;
                 if (!rn2(5))
                     (void) rnd_treefruit_at(dpx, dpy);
                 if (Race_if(PM_ELF) || Role_if(PM_RANGER))
                     adjalign(-1);
             } else {
-                digtxt = "You succeed in cutting away some rock.";
+                digtxt = _("You succeed in cutting away some rock.");
                 lev->typ = CORR, lev->flags = 0;
             }
         } else if (IS_WALL(lev->typ)) {
@@ -499,14 +499,14 @@ dig(void)
             } else {
                 lev->typ = DOOR, lev->doormask = D_NODOOR;
             }
-            digtxt = "You make an opening in the wall.";
+            digtxt = _("You make an opening in the wall.");
         } else if (lev->typ == SDOOR) {
             cvt_sdoor_to_door(lev); /* ->typ = DOOR */
-            digtxt = "You break through a secret door!";
+            digtxt = _("You break through a secret door!");
             if (!(lev->doormask & D_TRAPPED))
                 lev->doormask = D_BROKEN;
         } else if (closed_door(dpx, dpy)) {
-            Sprintf(digbuf, "You break through the door with your %s.",
+            Sprintf(digbuf, _("You break through the door with your %s."),
                     simpleonames(uwep));
             digtxt = digbuf;
             if (shopedge) {

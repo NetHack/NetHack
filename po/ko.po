@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 14:44+0900\n"
+"POT-Creation-Date: 2026-01-20 14:46+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -22572,6 +22572,64 @@ msgstr "공부하는 중"
 msgid "%s rummages through %s."
 msgstr "%s{이/가} %s{을/를} %s 통과했다."
 
+#, fuzzy
+msgid "The statue shatters."
+msgstr "조각상이 산산이 부서졌다."
+
+#, fuzzy
+msgid "The boulder falls apart."
+msgstr "바위가 부서졌다."
+
+# ============================================================
+# 던전 메시지 (Dungeon Messages)
+# ============================================================
+#, fuzzy
+msgid "You cut down the tree."
+msgstr "여기서 내려갈 수%s 없다."
+
+#, fuzzy
+msgid "You succeed in cutting away some rock."
+msgstr "자물쇠 강제 열기에 성공했다."
+
+#, fuzzy
+msgid "You make an opening in the wall."
+msgstr "새 %s의 구멍을 통해 %s."
+
+#, fuzzy
+msgid "You break through a secret door!"
+msgstr "바위가 문을 뚫고 나갔다."
+
+#, fuzzy, c-format
+msgid "You break through the door with your %s."
+msgstr "이름 없는 %s{을/를} 타고 던전을 통과했다."
+
+msgid "You bite right into the metal tin..."
+msgstr "금속 깡통을 바로 물어뜯습니다..."
+
+msgid "The tin opens like magic!"
+msgstr "깡통이 마법처럼 열립니다!"
+
+#, fuzzy
+msgid "You easily open the tin."
+msgstr "계단을 내려갔다."
+
+#, fuzzy
+msgid "The door locks!"
+msgstr "이 문은 잠겨있다."
+
+msgid "The door swings shut, and locks!"
+msgstr "문이 닫히면서 잠깁니다!"
+
+msgid "The broken door reassembles and locks!"
+msgstr "부서진 문이 재조립되어 잠깁니다!"
+
+msgid "A cloud of dust springs up and assembles itself into a door!"
+msgstr "먼지 구름이 일어나 문으로 모입니다!"
+
+#, fuzzy
+msgid "The door unlocks!"
+msgstr "이 문은 잠겨있다."
+
 # Monster attack verbs (mhitm.c)
 #, c-format
 #~ msgid "%s bites"
@@ -24396,9 +24454,6 @@ msgstr "%s{이/가} %s{을/를} %s 통과했다."
 
 #~ msgid "Your surroundings look very uncertain..."
 #~ msgstr "주변이 매우 불확실해 보인다..."
-
-#~ msgid "You descend the stairs."
-#~ msgstr "계단을 내려갔다."
 
 #~ msgid "You climb the stairs."
 #~ msgstr "계단을 올라갔다."

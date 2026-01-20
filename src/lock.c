@@ -1169,17 +1169,17 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
 
         switch (door->doormask & ~D_TRAPPED) {
         case D_CLOSED:
-            msg = "The door locks!";
+            msg = _("The door locks!");
             break;
         case D_ISOPEN:
-            msg = "The door swings shut, and locks!";
+            msg = _("The door swings shut, and locks!");
             break;
         case D_BROKEN:
-            msg = "The broken door reassembles and locks!";
+            msg = _("The broken door reassembles and locks!");
             break;
         case D_NODOOR:
             msg =
-               "A cloud of dust springs up and assembles itself into a door!";
+               _("A cloud of dust springs up and assembles itself into a door!");
             break;
         default:
             res = FALSE;
@@ -1192,7 +1192,7 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
     case WAN_OPENING:
     case SPE_KNOCK:
         if (door->doormask & D_LOCKED) {
-            msg = "The door unlocks!";
+            msg = _("The door unlocks!");
             door->doormask = D_CLOSED | (door->doormask & D_TRAPPED);
         } else
             res = FALSE;

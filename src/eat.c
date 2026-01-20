@@ -1722,7 +1722,7 @@ start_tin(struct obj *otmp)
     int tmp;
 
     if (metallivorous(gy.youmonst.data)) {
-        mesg = "You bite right into the metal tin...";
+        mesg = _("You bite right into the metal tin...");
         tmp = 0;
     } else if (cantwield(gy.youmonst.data)) { /* nohands || verysmall */
         You(_("cannot handle the tin properly to open it."));
@@ -1736,13 +1736,13 @@ start_tin(struct obj *otmp)
         tmp = (uwep && uwep->blessed && uwep->otyp == TIN_OPENER) ? 0
                                                                   : rn2(2);
         if (!tmp)
-            mesg = "The tin opens like magic!";
+            mesg = _("The tin opens like magic!");
         else
             pline_The(_("tin seems easy to open."));
     } else if (uwep) {
         switch (uwep->otyp) {
         case TIN_OPENER:
-            mesg = "You easily open the tin."; /* iff tmp==0 */
+            mesg = _("You easily open the tin."); /* iff tmp==0 */
             tmp = rn2(uwep->cursed ? 3 : !uwep->blessed ? 2 : 1);
             break;
         case DAGGER:

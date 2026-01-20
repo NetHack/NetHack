@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 14:44+0900\n"
+"POT-Creation-Date: 2026-01-20 14:46+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21163,4 +21163,50 @@ msgstr ""
 
 #, c-format
 msgid "%s rummages through %s."
+msgstr ""
+
+msgid "The statue shatters."
+msgstr ""
+
+msgid "The boulder falls apart."
+msgstr ""
+
+msgid "You cut down the tree."
+msgstr ""
+
+msgid "You succeed in cutting away some rock."
+msgstr ""
+
+msgid "You make an opening in the wall."
+msgstr ""
+
+msgid "You break through a secret door!"
+msgstr ""
+
+#, c-format
+msgid "You break through the door with your %s."
+msgstr ""
+
+msgid "You bite right into the metal tin..."
+msgstr ""
+
+msgid "The tin opens like magic!"
+msgstr ""
+
+msgid "You easily open the tin."
+msgstr ""
+
+msgid "The door locks!"
+msgstr ""
+
+msgid "The door swings shut, and locks!"
+msgstr ""
+
+msgid "The broken door reassembles and locks!"
+msgstr ""
+
+msgid "A cloud of dust springs up and assembles itself into a door!"
+msgstr ""
+
+msgid "The door unlocks!"
 msgstr ""
