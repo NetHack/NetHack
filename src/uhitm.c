@@ -5329,9 +5329,9 @@ mhitm_knockback(
     }
 
     /* subtly vary the message text if monster won't actually move */
-    knockedhow = dismount ? "out of your saddle"
-                 : will_hurtle(mdef, defx + dx, defy + dy) ? "backward"
-                   : "back";
+    knockedhow = dismount ? _("out of your saddle")
+                 : will_hurtle(mdef, defx + dx, defy + dy) ? _("backward")
+                   : _("back");
 
     /* give the message */
     if (u_def || canseemon(mdef)) {

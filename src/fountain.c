@@ -626,7 +626,7 @@ drinksink(void)
             mtmp = makemon(&mons[PM_SEWER_RAT], u.ux, u.uy, MM_NOMSG);
             if (mtmp)
                 pline(_("Eek!  There's %s in the sink!"),
-                      (Blind || !canspotmon(mtmp)) ? "something squirmy"
+                      (Blind || !canspotmon(mtmp)) ? _("something squirmy")
                                                    : a_monnam(mtmp));
         }
         break;

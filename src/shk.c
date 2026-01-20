@@ -4070,15 +4070,15 @@ sellobj(
                when container's contents are unknown, plural "items"
                should be used to not give away information.
              */
-            Sprintf(qbuf, "%s offers%s %ld gold piece%s for %s%s ",
-                    Shknam(shkp), short_funds ? " only" : "", offer,
+            Sprintf(qbuf, _("%s offers%s %ld gold piece%s for %s%s "),
+                    Shknam(shkp), short_funds ? _(" only") : "", offer,
                     plur(offer),
                     (cltmp && !ltmp)
-                        ? ((yourc == 1L) ? "your item in " : "your items in ")
+                        ? ((yourc == 1L) ? _("your item in ") : _("your items in "))
                         : "",
-                    obj->unpaid ? "the" : "your");
+                    obj->unpaid ? _("the") : _("your"));
             one = !ltmp ? (yourc == 1L) : (obj->quan == 1L && !cltmp);
-            Sprintf(qsfx, "%s.  Sell %s?",
+            Sprintf(qsfx, _("%s.  Sell %s?"),
                     (cltmp && ltmp)
                         ? (only_partially_your_contents
                                ? ((yourc == 1L) ? _(" and item inside")

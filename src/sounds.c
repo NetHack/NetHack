@@ -255,8 +255,8 @@ dosounds(void)
                     != (ROOM_INDEX(sroom) + ROOMOFFSET)) {
                     if (gold_in_vault) {
                         You_hear(!hallu
-                                     ? "someone counting gold coins."
-                                     : "the quarterback calling the play.");
+                                     ? _("someone counting gold coins.")
+                                     : _("the quarterback calling the play."));
                     } else {
                         Soundeffect(se_someone_searching, 30);
                         You_hear(_("someone searching."));

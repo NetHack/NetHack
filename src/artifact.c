@@ -1484,10 +1484,10 @@ artifact_hit(
         if (realizes_damage)
             pline_The(_("fiery blade %s %s%c"),
                       !gs.spec_dbon_applies
-                          ? "hits"
+                          ? _("hits")
                           : (mdef->data == &mons[PM_WATER_ELEMENTAL])
-                                ? "vaporizes part of"
-                                : "burns",
+                                ? _("vaporizes part of")
+                                : _("burns"),
                       hittee, !gs.spec_dbon_applies ? '.' : '!');
         if (!rn2(4)) {
             int itemdmg = destroy_items(mdef, AD_FIRE, *dmgptr);

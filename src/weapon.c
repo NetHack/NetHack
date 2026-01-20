@@ -1504,7 +1504,7 @@ drain_weapon_skill(int n) /* number of skills to drain */
     for (skill = 0; skill < P_NUM_SKILLS; skill++)
         if (tmpskills[skill]) {
             You(_("forget %syour training in %s."),
-                P_SKILL(skill) >= P_BASIC ? "some of " : "", P_NAME(skill));
+                P_SKILL(skill) >= P_BASIC ? _("some of ") : "", P_NAME(skill));
         }
 }
 

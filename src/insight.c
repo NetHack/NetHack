@@ -2189,15 +2189,15 @@ show_conduct(int final)
              *  N wishes (M for artifacts)
              */
             if (u.uconduct.wisharti == u.uconduct.wishes)
-                Sprintf(eos(buf), " (%s",
-                        (u.uconduct.wisharti > 2L) ? "all "
-                          : (u.uconduct.wisharti == 2L) ? "both " : "");
+                Sprintf(eos(buf), _(" (%s"),
+                        (u.uconduct.wisharti > 2L) ? _("all ")
+                          : (u.uconduct.wisharti == 2L) ? _("both ") : "");
             else
                 Sprintf(eos(buf), " (%ld ", u.uconduct.wisharti);
 
-            Sprintf(eos(buf), "for %s)",
-                    (u.uconduct.wisharti == 1L) ? "an artifact"
-                                                : "artifacts");
+            Sprintf(eos(buf), _("for %s)"),
+                    (u.uconduct.wisharti == 1L) ? _("an artifact")
+                                                : _("artifacts"));
         }
         you_have_X(buf);
 
