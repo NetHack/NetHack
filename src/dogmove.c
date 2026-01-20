@@ -1524,9 +1524,9 @@ quickmimic(struct monst *mtmp)
         }
         if (glyph_at(mtmp->mx, mtmp->my) != prev_glyph)
             You(_("%s %s %s where %s was!"),
-                seeloc ? "see" : "sense that",
+                seeloc ? _("see") : _("sense that"),
                 (what != something) ? an(what) : what,
-                seeloc ? "appear" : "has appeared", buf);
+                seeloc ? _("appear") : _("has appeared"), buf);
         else
             You(_("sense that %s feels rather %s-ish."), buf, what);
 

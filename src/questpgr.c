@@ -252,10 +252,10 @@ convert_arg(char c)
         str = rank_of(MIN_QUEST_LEVEL, Role_switch, flags.female);
         break;
     case 's':
-        str = (flags.female) ? "sister" : "brother";
+        str = (flags.female) ? _("sister") : _("brother");
         break;
     case 'S':
-        str = (flags.female) ? "daughter" : "son";
+        str = (flags.female) ? _("daughter") : _("son");
         break;
     case 'l':
         str = ldrname();
@@ -309,7 +309,7 @@ convert_arg(char c)
         str = "lawful";
         break;
     case 'x':
-        str = Blind ? "sense" : "see";
+        str = Blind ? _("sense") : _("see");
         break;
     case 'Z':
         str = svd.dungeons[0].dname;

@@ -275,8 +275,8 @@ its_dead(coordxy rx, coordxy ry, int *resp)
             } while (corpse && !reviver);
         }
         You(_("determine that %s unfortunate being%s %s%s dead."),
-            one ? (here ? "this" : "that") : (here ? "these" : "those"),
-            one ? "" : "s", one ? "is" : "are", reviver ? " mostly" : "");
+            one ? (here ? _("this") : _("that")) : (here ? _("these") : _("those")),
+            one ? "" : "s", one ? _("is") : _("are"), reviver ? _(" mostly") : "");
         return TRUE;
 
     } else { /* statue */

@@ -552,7 +552,7 @@ dig(void)
         if (IS_WALL(lev->typ) || dig_target == DIGTYP_DOOR) {
             if (*in_rooms(dpx, dpy, SHOPBASE)) {
                 pline(_("This %s seems too hard to %s."),
-                      IS_DOOR(lev->typ) ? "door" : "wall", verb);
+                      IS_DOOR(lev->typ) ? _("door") : _("wall"), verb);
                 return 0;
             }
         } else if (dig_target == DIGTYP_UNDIGGABLE
@@ -675,7 +675,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
     if (IS_FURNITURE(lev->typ)) {
         /* should mirror the word used by surface() for normal floor */
         surface_type = (IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz)
-                         ? "floor" : "ground");
+                         ? _("floor") : _("ground"));
         if (IS_ALTAR(lev->typ)) {
             old_aligntyp = Amask2align(levl[x][y].altarmask & AM_MASK);
             Strcpy(furniture, align_str(old_aligntyp));
@@ -700,7 +700,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
         feeltrap(ttmp);
 
     tname = trapname(ttyp, TRUE);
-    in_thru = (ttyp == HOLE ? "through" : "in");
+    in_thru = (ttyp == HOLE ? _("through") : _("in"));
     if (madeby_u) {
         if (x != u.ux || y != u.uy)
             You(_("dig an adjacent %s."), tname);
@@ -863,7 +863,7 @@ liquid_flow(
     unearth_objs(x, y);
 
     if (fillmsg)
-        pline(fillmsg, hliquid(typ == LAVAPOOL ? "lava" : "water"));
+        pline(fillmsg, hliquid(typ == LAVAPOOL ? _("lava") : _("water")));
     /* handle object damage before hero damage; affects potential bones */
     if ((objchain = svl.level.objects[x][y]) != 0) {
         if (typ == LAVAPOOL)
@@ -915,14 +915,14 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
         || (IS_OBSTRUCTED(old_typ) && old_typ != SDOOR
             && (lev->wall_info & W_NONDIGGABLE) != 0)) {
         pline_The(_("%s %shere is too hard to dig in."), surface(dig_x, dig_y),
-                  (dig_x != u.ux || dig_y != u.uy) ? "t" : "");
+                  (dig_x != u.ux || dig_y != u.uy) ? _("t") : "");
     } else if (ttmp && is_magical_trap(ttmp->ttyp)) {
         explode(dig_x, dig_y, 0, 20 + d(3, 6), TRAP_EXPLODE, EXPL_MAGICAL);
         deltrap(ttmp);
         newsym(dig_x, dig_y);
     } else if (is_pool_or_lava(dig_x, dig_y)) {
         pline_The(_("%s sloshes furiously for a moment, then subsides."),
-                  hliquid(is_lava(dig_x, dig_y) ? "lava" : "water"));
+                  hliquid(is_lava(dig_x, dig_y) ? _("lava") : _("water")));
         wake_nearby(FALSE); /* splashing */
 
     } else if (old_typ == DRAWBRIDGE_DOWN
@@ -1589,7 +1589,7 @@ zap_dig(void)
                 if (On_stairs(u.ux, u.uy)) {
                     stairway *stway = stairway_at(u.ux, u.uy);
                     pline_The(_("beam bounces off the %s and hits the %s."),
-                              stway->isladder ? "ladder" : "stairs",
+                              stway->isladder ? _("ladder") : _("stairs"),
                               ceiling(u.ux, u.uy));
                 }
                 You(_("loosen a rock from the %s."), ceiling(u.ux, u.uy));
@@ -1750,7 +1750,7 @@ zap_dig(void)
     }
 
     if (shopdoor || shopwall)
-        pay_for_damage(shopdoor ? "destroy" : "dig into", FALSE);
+        pay_for_damage(shopdoor ? _("destroy") : _("dig into"), FALSE);
     return;
 }
 

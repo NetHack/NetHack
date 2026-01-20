@@ -90,7 +90,7 @@ stealgold(struct monst *mtmp)
         if (!strncmp(what, "rear ", 5))
             what += 5;
         pline(_("%s quickly snatches some gold from %s %s %s!"), Monnam(mtmp),
-              (Levitation || Flying) ? "beneath" : "between", whose, what);
+              (Levitation || Flying) ? _("beneath") : _("between"), whose, what);
         if (!ygold || !rn2(5)) {
             if (!tele_restrict(mtmp))
                 (void) rloc(mtmp, RLOC_MSG);
@@ -789,7 +789,7 @@ maybe_absorb_item(
                if hero can see the location but not the monster */
             pline(_("%s pulls %s away from you and absorbs %s!"),
                   Some_Monnam(mon), /* Monnam() or "Something" */
-                  yname(obj), (obj->quan > 1L) ? "them" : "it");
+                  yname(obj), (obj->quan > 1L) ? _("them") : _("it"));
         } else {
             const char *hand_s = body_part(HAND);
 
@@ -884,7 +884,7 @@ relobj(
     if (mtmp->isgd && (otmp = findgold(mtmp->minvent)) != 0) {
         if (canspotmon(mtmp))
             pline(_("%s gold %s."), s_suffix(Monnam(mtmp)),
-                  canseemon(mtmp) ? "vanishes" : "seems to vanish");
+                  canseemon(mtmp) ? _("vanishes") : _("seems to vanish"));
         obj_extract_self(otmp);
         obfree(otmp, (struct obj *) 0);
     } /* isgd && has gold */

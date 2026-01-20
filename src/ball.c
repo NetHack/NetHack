@@ -913,7 +913,7 @@ drop_ball(coordxy x, coordxy y)
                 set_wounded_legs(side, rn1(1000, 500));
                 if (!u.usteed) {
                     Your(_("%s %s is severely damaged."),
-                         (side == LEFT_SIDE) ? "left" : "right",
+                         (side == LEFT_SIDE) ? _("left") : _("right"),
                          body_part(LEG));
                     losehp(Maybe_Half_Phys(2),
                            "leg damage from being pulled out of a bear trap",
@@ -971,7 +971,7 @@ litter(void)
         if (otmp != uball && rnd(capacity) <= (int) otmp->owt) {
             if (canletgo(otmp, "")) {
                 You(_("drop %s and %s %s down the stairs with you."),
-                    yname(otmp), (otmp->quan == 1L) ? "it" : "they",
+                    yname(otmp), (otmp->quan == 1L) ? _("it") : _("they"),
                     otense(otmp, "fall"));
                 setnotworn(otmp);
                 freeinv(otmp);
