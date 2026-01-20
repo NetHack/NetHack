@@ -1244,7 +1244,7 @@ level_tele(void)
         if (newlev == 0) {
             if (trycnt >= 10)
                 goto random_levtport;
-            if (ynq("Go to Nowhere.  Are you sure?") != 'y')
+            if (ynq(_("Go to Nowhere.  Are you sure?")) != 'y')
                 return;
             You(_("%s in agony as your body begins to warp..."),
                 is_silent(gy.youmonst.data) ? "writhe" : "scream");

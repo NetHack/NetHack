@@ -775,7 +775,7 @@ do_play_instrument(struct obj *instr)
     }
     if (instr->otyp != LEATHER_DRUM && instr->otyp != DRUM_OF_EARTHQUAKE
         && !(Stunned || Confusion || Hallucination)) {
-        c = ynq("Improvise?");
+        c = ynq(_("Improvise?"));
         if (c == 'q')
             goto nevermind;
     }
@@ -784,7 +784,7 @@ do_play_instrument(struct obj *instr)
         return do_improvisation(instr) ? ECMD_TIME : ECMD_OK;
 
     if (u.uevent.uheard_tune == 2)
-        c = ynq("Play the passtune?");
+        c = ynq(_("Play the passtune?"));
     if (c == 'q') {
         goto nevermind;
     } else if (c == 'y') {

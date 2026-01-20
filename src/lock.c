@@ -604,7 +604,7 @@ pick_lock(
         default:
             if ((flags.autounlock & AUTOUNLOCK_UNTRAP) != 0
                 && could_untrap(FALSE, FALSE)
-                && (c = ynq("Check this door for a trap?")) != 'n') {
+                && (c = ynq(_("Check this door for a trap?"))) != 'n') {
                 if (c == 'q')
                     return PICKLOCK_DID_NOTHING;
                 /* c == 'y' */
@@ -881,7 +881,7 @@ doopen_indir(coordxy x, coordxy y)
                                 (struct obj *) 0) ? ECMD_TIME : ECMD_OK;
             } else if ((flags.autounlock & AUTOUNLOCK_KICK) != 0
                        && !u.usteed /* kicking is different when mounted */
-                       && ynq("Kick it?") == 'y') {
+                       && ynq(_("Kick it?")) == 'y') {
                 cmdq_add_ec(CQ_CANNED, dokick);
                 cmdq_add_dir(CQ_CANNED,
                              sgn(cc.x - u.ux), sgn(cc.y - u.uy), 0);

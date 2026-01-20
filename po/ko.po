@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 12:49+0900\n"
+"POT-Creation-Date: 2026-01-20 12:50+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -9728,6 +9728,11 @@ msgstr "도개교에 자물쇠가 %s 없다."
 msgid "%s no door there."
 msgstr "거기에 문이 %s 없다."
 
+#: src/lock.c:607
+#, fuzzy
+msgid "Check this door for a trap?"
+msgstr "문틀에 부딪혔다!"
+
 #: src/lock.c:616
 msgid "lock a door with a credit card."
 msgstr "신용카드로 문을 잠글 수 없다."
@@ -9792,6 +9797,10 @@ msgstr "이 문은 이미 열려있다."
 #: src/lock.c:870
 msgid "This door is locked."
 msgstr "이 문은 잠겨있다."
+
+#: src/lock.c:884
+msgid "Kick it?"
+msgstr "발로 차시겠습니까?"
 
 #: src/lock.c:897
 msgid "You're too small to pull the door open."
@@ -12830,6 +12839,14 @@ msgstr "물속에서 음악을 연주한다!"
 #, c-format
 msgid "are incapable of playing %s."
 msgstr "%s{을/를} 연주할 수 없다."
+
+#: src/music.c:778
+msgid "Improvise?"
+msgstr "즉흥 연주하시겠습니까?"
+
+#: src/music.c:787
+msgid "Play the passtune?"
+msgstr "통과 선율을 연주하시겠습니까?"
 
 #: src/music.c:793
 msgid "What tune are you playing? [5 notes, A-G]"
@@ -22072,6 +22089,10 @@ msgstr "순간이동 함정 위로 %s."
 msgid "Oops..."
 msgstr "이런..."
 
+#: src/teleport.c:1247
+msgid "Go to Nowhere.  Are you sure?"
+msgstr "무(無)로 가시겠습니까. 정말입니까?"
+
 #: src/teleport.c:1249
 #, c-format
 msgid "%s in agony as your body begins to warp..."
@@ -23888,6 +23909,11 @@ msgstr "%s에서 함정을 발견했다!"
 #, c-format
 msgid "There's a trap on %s."
 msgstr "%s에 함정이 있다."
+
+#: src/trap.c:5766 src/trap.c:5995
+#, fuzzy
+msgid "Disarm it?"
+msgstr "해제했다!"
 
 #: src/trap.c:5769
 #, c-format

@@ -5763,7 +5763,7 @@ untrap_box(
         if (!confused)
             exercise(A_WIS, TRUE);
 
-        if (ynq("Disarm it?") == 'y')
+        if (ynq(_("Disarm it?")) == 'y')
             disarm_box(box, force, confused);
     } else {
         You(_("find no traps on %s."), the(xname(box)));
@@ -5992,7 +5992,7 @@ untrap(
         || (!force && confused && !rn2(3))) {
         You(_("find a trap on the door!"));
         exercise(A_WIS, TRUE);
-        if (ynq("Disarm it?") != 'y')
+        if (ynq(_("Disarm it?")) != 'y')
             return 1;
         if (levl[x][y].doormask & D_TRAPPED) {
             ch = 15 + (Role_if(PM_ROGUE) ? u.ulevel * 3 : u.ulevel);
