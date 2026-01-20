@@ -1647,9 +1647,9 @@ hmon_hitmon_msg_silver(
 
     if (canspotmon(mon)) {
         if (hmd->barehand_silver_rings == 1)
-            fmt = "Your silver ring sears %s!";
+            fmt = _("Your silver ring sears %s!");
         else if (hmd->barehand_silver_rings == 2)
-            fmt = "Your silver rings sear %s!";
+            fmt = _("Your silver rings sear %s!");
         else if (hmd->silverobj && hmd->saved_oname[0]) {
             /* guard constructed format string against '%' in
                saved_oname[] from xname(via cxname()) */
@@ -1661,10 +1661,10 @@ hmon_hitmon_msg_silver(
                     sizeof(silverobjbuf) - (strlen(silverobjbuf) + 1));
             fmt = silverobjbuf;
         } else
-            fmt = "The silver sears %s!";
+            fmt = _("The silver sears %s!");
     } else {
         *whom = highc(*whom); /* "it" -> "It" */
-        fmt = "%s is seared!";
+        fmt = _("%s is seared!");
     }
     /* note: s_suffix returns a modifiable buffer */
     if (!noncorporeal(hmd->mdat) && !amorphous(hmd->mdat))
@@ -1692,10 +1692,10 @@ hmon_hitmon_msg_lightobj(
             Strcat(emitlightobjbuf, " %s!");
             fmt = emitlightobjbuf;
         } else
-            fmt = "The light sears %s!";
+            fmt = _("The light sears %s!");
     } else {
         *whom = highc(*whom); /* "it" -> "It" */
-        fmt = "%s is seared!";
+        fmt = _("%s is seared!");
     }
     /* note: s_suffix returns a modifiable buffer */
     if (!noncorporeal(hmd->mdat) && !amorphous(hmd->mdat))

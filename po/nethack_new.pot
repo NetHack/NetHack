@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 14:46+0900\n"
+"POT-Creation-Date: 2026-01-20 14:48+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21209,4 +21209,23 @@ msgid "A cloud of dust springs up and assembles itself into a door!"
 msgstr ""
 
 msgid "The door unlocks!"
+msgstr ""
+
+#, c-format
+msgid "Your silver ring sears %s!"
+msgstr ""
+
+#, c-format
+msgid "Your silver rings sear %s!"
+msgstr ""
+
+#, c-format
+msgid "The silver sears %s!"
+msgstr ""
+
+#, c-format
+msgid "The light sears %s!"
+msgstr ""
+
+msgid "The ice crackles and melts."
 msgstr ""

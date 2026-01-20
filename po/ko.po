@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 14:46+0900\n"
+"POT-Creation-Date: 2026-01-20 14:48+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -22629,6 +22629,29 @@ msgstr "먼지 구름이 일어나 문으로 모입니다!"
 #, fuzzy
 msgid "The door unlocks!"
 msgstr "이 문은 잠겨있다."
+
+#, fuzzy, c-format
+msgid "Your silver ring sears %s!"
+msgstr "은이 %s{을/를} 지진다!"
+
+#, fuzzy, c-format
+msgid "Your silver rings sear %s!"
+msgstr "은이 %s{을/를} 지진다!"
+
+#, fuzzy, c-format
+msgid "The silver sears %s!"
+msgstr "은이 %s{을/를} 지진다!"
+
+# ============================================================
+# 전투 메시지 추가 (Additional Combat Messages)
+# ============================================================
+#, fuzzy, c-format
+msgid "The light sears %s!"
+msgstr "%s %s{이/가} %s{을/를} 태웠다!"
+
+#, fuzzy
+msgid "The ice crackles and melts."
+msgstr "%s 주변의 공기가 탁탁거린다."
 
 # Monster attack verbs (mhitm.c)
 #, c-format
