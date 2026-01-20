@@ -384,7 +384,7 @@ lay_an_egg(void)
     set_corpsenm(uegg, egg_type_from_parent(u.umonnum, FALSE));
     uegg->known = 1;
     observe_object(uegg);
-    You(_("%s an egg."), eggs_in_water(gy.youmonst.data) ? "spawn" : "lay");
+    You(_("%s an egg."), eggs_in_water(gy.youmonst.data) ? _("spawn") : _("lay"));
     dropy(uegg);
     stackobj(uegg);
     morehungry((int) objects[EGG].oc_nutrition);
@@ -521,7 +521,7 @@ dosit(void)
     } else if (IS_SINK(typ)) {
         You(_("sit on the %s."), defsyms[S_sink].explanation);
         Your(_("%s gets wet."),
-             humanoid(gy.youmonst.data) ? "rump" : "underside");
+             humanoid(gy.youmonst.data) ? _("rump") : _("underside"));
     } else if (IS_ALTAR(typ)) {
         You(_("sit on the %s."), defsyms[S_altar].explanation);
         altar_wrath(u.ux, u.uy);

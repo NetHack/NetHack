@@ -764,11 +764,11 @@ angrygods(aligntyp resp_god)
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize(_("Thou durst %s me?"),
                   (on_altar() && (a_align(u.ux, u.uy) != resp_god))
-                      ? "scorn"
-                      : "call upon");
+                      ? _("scorn")
+                      : _("call upon"));
         /* [why isn't this using verbalize()?] */
         pline(_("\"Then die, %s!\""),
-              (gy.youmonst.data->mlet == S_HUMAN) ? "mortal" : "creature");
+              (gy.youmonst.data->mlet == S_HUMAN) ? _("mortal") : _("creature"));
         summon_minion(resp_god, FALSE);
         break;
 
@@ -1857,7 +1857,7 @@ dosacrifice(void)
 
     if (!on_altar() || u.uswallow) {
         You(_("are not %s an altar."),
-            (Levitation || Flying) ? "over" : "on");
+            (Levitation || Flying) ? _("over") : _("on"));
         return ECMD_OK;
     } else if (Confusion || Stunned) {
         You(_("are too impaired to perform the rite."));

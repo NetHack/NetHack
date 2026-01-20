@@ -819,7 +819,7 @@ pickup(int what) /* should be a long */
         } else if (ct >= 2) {
             int via_menu = 0;
 
-            There(_("are %s objects here."), (ct <= 10) ? "several" : "many");
+            There(_("are %s objects here."), (ct <= 10) ? _("several") : _("many"));
             if (!query_classes(oclasses, &selective, &all_of_a_type,
                                "pick up", *objchain_p,
                                (traverse_how & BY_NEXTHERE) ? TRUE : FALSE,
@@ -1677,7 +1677,7 @@ carry_count(struct obj *obj,            /* object to pick up... */
     if (qq > 0) {
         if (qq < count)
             You(_("can only %s %s of the %s %s."), verb,
-                (qq == 1L) ? "one" : "some", obj_nambuf, where);
+                (qq == 1L) ? _("one") : _("some"), obj_nambuf, where);
         *wt_after = wt;
         return qq;
     }
@@ -1729,7 +1729,7 @@ lift_object(
            that's suboptimal for loadstones because it omits user-assigned
            type name which is something of interest for gray stones] */
         You(_("are carrying too much stuff to pick up %s %s."),
-            (obj->quan == 1L) ? "another" : "more", xname(obj));
+            (obj->quan == 1L) ? _("another") : _("more"), xname(obj));
         return -1;
     }
 

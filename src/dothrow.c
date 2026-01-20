@@ -615,7 +615,7 @@ hitfloor(
     if (IS_ALTAR(levl[u.ux][u.uy].typ)) {
         doaltarobj(obj);
     } else if (verbosely) {
-        const char *verb = (obj->otyp == WAN_STRIKING) ? "strike" : "hit";
+        const char *verb = (obj->otyp == WAN_STRIKING) ? _("strike") : _("hit");
         const char *surf = surface(u.ux, u.uy);
         struct trap *t = t_at(u.ux, u.uy);
 
@@ -1115,7 +1115,7 @@ hurtle(int dx, int dy, int range, boolean verbose)
     gn.nomovemsg = ""; /* it just happens */
     if (verbose)
         You(_("%s in the opposite direction."),
-            (range > 1) ? "hurtle" : "float");
+            (range > 1) ? _("hurtle") : _("float"));
     /* if we're in the midst of shooting multiple projectiles, stop */
     endmultishot(TRUE);
     uc.x = u.ux;

@@ -1702,13 +1702,13 @@ notice_mon(struct monst *mtmp)
         if (spot && !mtmp->mspotted && !DEADMONSTER(mtmp)) {
             mtmp->mspotted = TRUE;
             set_msg_xy(mtmp->mx, mtmp->my);
-            You(_("%s %s."), canseemon(mtmp) ? "see" : "notice",
+            You(_("%s %s."), canseemon(mtmp) ? _("see") : _("notice"),
                 x_monnam(mtmp,
                      mtmp->mtame ? ARTICLE_YOUR
                      : (!has_mgivenname(mtmp)
                         && !type_is_pname(mtmp->data)) ? ARTICLE_A
                      : ARTICLE_NONE,
-                     (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
+                     (mtmp->mpeaceful && !mtmp->mtame) ? _("peaceful") : 0,
                      has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
         } else if (!spot) {
             mtmp->mspotted = FALSE;
