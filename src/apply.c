@@ -1080,8 +1080,8 @@ use_mirror(struct obj *obj)
     if (Underwater) {
         if (useeit)
             You(_("%s."),
-                Hallucination ? "give the fish a chance to fix their makeup"
-                              : "reflect the murky water");
+                Hallucination ? _("give the fish a chance to fix their makeup")
+                              : _("reflect the murky water"));
         return ECMD_TIME;
     }
     if (u.dz) {

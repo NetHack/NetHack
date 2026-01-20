@@ -1194,8 +1194,8 @@ cpostfx(int pm)
         tmp += 20;
         if (gy.youmonst.data->mlet != S_MIMIC && !Unchanging) {
             char buf[BUFSZ];
-            const char *tempshape = !Hallucination ? "a pile of gold"
-                                                   : "an orange";
+            const char *tempshape = !Hallucination ? _("a pile of gold")
+                                                   : _("an orange");
 
             if (!u.uconduct.polyselfs++) /* you're changing form */
                 livelog_printf(LL_CONDUCT,
@@ -1668,15 +1668,15 @@ consume_tin(const char *mesg)
         if (!tin->cursed)
             pline(_("This makes you feel like %s!"),
                   /* "Swee'pea" is a character from the Popeye cartoons */
-                  Hallucination ? "Swee'pea"
+                  Hallucination ? _("Swee'pea")
                   /* "feel like Popeye" unless sustain ability suppresses
                      any attribute change; this slightly oversimplifies
                      things:  we want "Popeye" if no strength increase
                      occurs due to already being at maximum, but we won't
                      get it if at-maximum and fixed-abil both apply */
-                  : !Fixed_abil ? "Popeye"
+                  : !Fixed_abil ? _("Popeye")
                   /* no gain, feel like another character from Popeye */
-                  : (flags.female ? "Olive Oyl" : "Bluto"));
+                  : (flags.female ? _("Olive Oyl") : _("Bluto")));
         gainstr(tin, 0, FALSE);
 
         tin = svc.context.tin.tin = costly_tin(COST_OPEN);
