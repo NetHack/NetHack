@@ -1545,8 +1545,8 @@ doname_base(
     case CHAIN_CLASS:
         add_erosion_words(obj, prefix);
         if (obj->owornmask & (W_BALL | W_CHAIN))
-            ConcatF1(bp, 0, " (%s to you)",
-                     (obj->owornmask & W_BALL) ? "chained" : "attached");
+            ConcatF1(bp, 0, _(" (%s to you)"),
+                     (obj->owornmask & W_BALL) ? _("chained") : _("attached"));
         break;
     }
 

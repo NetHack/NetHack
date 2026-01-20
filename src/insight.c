@@ -1083,8 +1083,8 @@ status_enlightenment(int mode, int final)
     }
     if (u.uswallow) {
         assert(u.ustuck != NULL); /* implied by u.uswallow */
-        Snprintf(buf, sizeof buf, "%s by %s",
-                digests(u.ustuck->data) ? "swallowed" : "engulfed",
+        Snprintf(buf, sizeof buf, _("%s by %s"),
+                digests(u.ustuck->data) ? _("swallowed") : _("engulfed"),
                 heldmon);
         if (dmgtype(u.ustuck->data, AD_DGST)) {
             /* if final, death via digestion can be deduced by u.uswallow

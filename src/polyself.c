@@ -320,8 +320,8 @@ livelog_newform(boolean viapoly, int oldgend, int newgend)
             oldrank = rank_of(u.ulevel, Role_switch, oldgend);
             newrank = rank_of(u.ulevel, Role_switch, newgend);
             Sprintf(buf, "%.10s %.30s", genders[flags.female].adj, newrank);
-            livelog_printf(LL_MINORAC, "%s into %s",
-                           viapoly ? "polymorphed" : "transformed",
+            livelog_printf(LL_MINORAC, _("%s into %s"),
+                           viapoly ? _("polymorphed") : _("transformed"),
                            an(strcmp(newrole, oldrole) ? newrole
                               : strcmp(newrank, oldrank) ? newrank
                                 : buf));

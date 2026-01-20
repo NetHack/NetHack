@@ -727,7 +727,7 @@ angrygods(aligntyp resp_god)
     case 0:
     case 1:
         You_feel(_("that %s is %s."), align_gname(resp_god),
-                 Hallucination ? "bummed" : "displeased");
+                 Hallucination ? _("bummed") : _("displeased"));
         break;
     case 2:
     case 3:

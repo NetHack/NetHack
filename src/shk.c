@@ -684,8 +684,8 @@ deserted_shop(/*const*/ char *enterstring)
     if (Blind && !(Blind_telepat || Detect_monsters))
         ++n; /* force feedback to be less specific */
 
-    pline(_("This shop %s %s."), (m < n) ? "seems to be" : "is",
-          !n ? "deserted" : "untended");
+    pline(_("This shop %s %s."), (m < n) ? _("seems to be") : _("is"),
+          !n ? _("deserted") : _("untended"));
 }
 
 /* called from check_special_room(hack.c) */

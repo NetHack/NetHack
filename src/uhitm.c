@@ -2050,9 +2050,9 @@ m_slips_free(struct monst *mdef, struct attack *mattk)
     if (obj && (obj->greased || obj->otyp == OILSKIN_CLOAK)
         && (!obj->cursed || rn2(3))) {
         You(_("%s %s %s %s!"),
-            (mattk->adtyp == AD_WRAP) ? "slip off of"
-                                      : "grab, but cannot hold onto",
-            s_suffix(mon_nam(mdef)), obj->greased ? "greased" : "slippery",
+            (mattk->adtyp == AD_WRAP) ? _("slip off of")
+                                      : _("grab, but cannot hold onto"),
+            s_suffix(mon_nam(mdef)), obj->greased ? _("greased") : _("slippery"),
             /* avoid "slippery slippery cloak"
                for undiscovered oilskin cloak */
             (obj->greased || objects[obj->otyp].oc_name_known)
