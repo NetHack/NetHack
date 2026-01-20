@@ -119,10 +119,10 @@ zoo_mon_sound(struct monst *mtmp)
         && mon_in_room(mtmp, ZOO)) {
         int hallu = Hallucination ? 1 : 0, selection = rn2(2) + hallu;
         static const char *const zoo_msg[3] = {
-            "a sound reminiscent of an elephant stepping on a peanut.",
-            "a sound reminiscent of a seal barking.", "Doctor Dolittle!",
+            N_("a sound reminiscent of an elephant stepping on a peanut."),
+            N_("a sound reminiscent of a seal barking."), N_("Doctor Dolittle!"),
         };
-        You_hear1(zoo_msg[selection]);
+        You_hear1(_(zoo_msg[selection]));
         return TRUE;
     }
     return FALSE;

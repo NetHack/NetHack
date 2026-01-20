@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 staticfn boolean may_generate_eroded(struct obj *);
 staticfn void mkobj_erosions(struct obj *);
@@ -742,9 +743,10 @@ bill_dummy_object(struct obj *otmp)
 
 /* alteration types; must match COST_xxx macros in hack.h */
 static const char *const alteration_verbs[] = {
-    "cancel", "drain", "uncharge", "unbless", "uncurse", "disenchant",
-    "degrade", "dilute", "erase", "burn", "neutralize", "destroy", "splatter",
-    "bite", "open", "break the lock on", "rust", "rot", "tarnish", "crack",
+    N_("cancel"), N_("drain"), N_("uncharge"), N_("unbless"), N_("uncurse"),
+    N_("disenchant"), N_("degrade"), N_("dilute"), N_("erase"), N_("burn"),
+    N_("neutralize"), N_("destroy"), N_("splatter"), N_("bite"), N_("open"),
+    N_("break the lock on"), N_("rust"), N_("rot"), N_("tarnish"), N_("crack"),
 };
 
 /* possibly bill for an object which the player has just modified */
@@ -804,7 +806,7 @@ costly_alteration(struct obj *obj, int alter_type)
             SetVoice(shkp, 0, 80, 0);
         }
         verbalize(_("You %s %s %s, you pay for %s!"),
-                  alteration_verbs[alter_type], those, simpleonames(obj),
+                  _(alteration_verbs[alter_type]), those, simpleonames(obj),
                   them);
         bill_dummy_object(obj);
         break;
@@ -816,7 +818,7 @@ costly_alteration(struct obj *obj, int alter_type)
                 SetVoice(shkp, 0, 80, 0);
             }
             verbalize(_("You %s %s, you pay for %s!"),
-                      alteration_verbs[alter_type], those, them);
+                      _(alteration_verbs[alter_type]), those, them);
             bill_dummy_object(obj);
         } else {
             (void) stolen_value(obj, ox, oy, FALSE, FALSE);

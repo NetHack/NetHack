@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 /* spellmenu arguments; 0..n-1 used as svs.spl_book[] index when swapping */
 #define SPELLMENU_DUMP (-3)
@@ -2090,14 +2091,14 @@ dospellmenu(
      * need to be subtracted.
      */
     if (!iflags.menu_tab_sep) {
-        Sprintf(buf, "%s%-20s Level %-12s Fail Retention",
+        Sprintf(buf, _("%s%-20s Level %-12s Fail Retention"),
                 splaction == SPELLMENU_DUMP ? "" : "    ",
-                "Name",
-                "Category");
+                _("Name"),
+                _("Category"));
         fmt = "%-20s  %2d   %-12s %3d%% %9s";
         sep = ' ';
     } else {
-        Sprintf(buf, "Name\tLevel\tCategory\tFail\tRetention");
+        Sprintf(buf, _("Name\tLevel\tCategory\tFail\tRetention"));
         fmt = "%s\t%-d\t%s\t%-d%%\t%s";
         sep = '\t';
     }

@@ -2553,20 +2553,20 @@ align_gname(aligntyp alignment)
 }
 
 static const char *const hallu_gods[] = {
-    "the Flying Spaghetti Monster", /* Church of the FSM */
-    "Eris",                         /* Discordianism */
-    "the Martians",                 /* every science fiction ever */
-    "Xom",                          /* Crawl */
-    "AnDoR dRaKoN",                 /* ADOM */
-    "the Central Bank of Yendor",   /* economics */
-    "Tooth Fairy",                  /* real world(?) */
-    "Om",                           /* Discworld */
-    "Yawgmoth",                     /* Magic: the Gathering */
-    "Morgoth",                      /* LoTR */
-    "Cthulhu",                      /* Lovecraft */
-    "the Ori",                      /* Stargate */
-    "destiny",                      /* why not? */
-    "your Friend the Computer",     /* Paranoia */
+    N_("the Flying Spaghetti Monster"), /* Church of the FSM */
+    N_("Eris"),                         /* Discordianism */
+    N_("the Martians"),                 /* every science fiction ever */
+    N_("Xom"),                          /* Crawl */
+    N_("AnDoR dRaKoN"),                 /* ADOM */
+    N_("the Central Bank of Yendor"),   /* economics */
+    N_("Tooth Fairy"),                  /* real world(?) */
+    N_("Om"),                           /* Discworld */
+    N_("Yawgmoth"),                     /* Magic: the Gathering */
+    N_("Morgoth"),                      /* LoTR */
+    N_("Cthulhu"),                      /* Lovecraft */
+    N_("the Ori"),                      /* Stargate */
+    N_("destiny"),                      /* why not? */
+    N_("your Friend the Computer"),     /* Paranoia */
 };
 
 /* hallucination handling for priest/minion names: select a random god
@@ -2604,7 +2604,7 @@ halu_gname(aligntyp alignment)
         break;
     case 6:
     case 7:
-        gnam = hallu_gods[rn2_on_display_rng(SIZE(hallu_gods))];
+        gnam = _(hallu_gods[rn2_on_display_rng(SIZE(hallu_gods))]);
         break;
     case 8:
         gnam = Moloch;
@@ -2614,7 +2614,7 @@ halu_gname(aligntyp alignment)
     }
     if (!gnam) {
         impossible("No random god name?");
-        gnam = "your Friend the Computer"; /* Paranoia */
+        gnam = _("your Friend the Computer"); /* Paranoia */
     }
     if (*gnam == '_')
         ++gnam;

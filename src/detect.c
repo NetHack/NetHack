@@ -10,6 +10,7 @@
 
 #include "hack.h"
 #include "artifact.h"
+#include "i18n.h"
 
 #ifndef FOUND_FLASH_COUNT
 /* for screen alert shown to player when secret door detection or ^E
@@ -1866,11 +1867,11 @@ findit(void)
 
     if (found.num_invis) {
         if (found.num_invis > 1)
-            Sprintf(buf, "%d%s unseen monsters", found.num_invis,
-                    found.num_kept_invis ? " other" : "");
+            Sprintf(buf, _("%d%s unseen monsters"), found.num_invis,
+                    found.num_kept_invis ? _(" other") : "");
         else
-            Sprintf(buf, "%s unseen monster",
-                    found.num_kept_invis ? "another" : "an");
+            Sprintf(buf, _("%s unseen monster"),
+                    found.num_kept_invis ? _("another") : _("an"));
         You(_("detect %s!"), buf);
         num += found.num_invis;
     }

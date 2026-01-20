@@ -4,6 +4,7 @@
 
 #include "hack.h"
 #include "dlb.h"
+#include "i18n.h"
 #ifdef TTY_GRAPHICS
 #include "wintty.h"
 #endif
@@ -1717,7 +1718,7 @@ choose_classes_menu(const char *prompt,
         add_menu_str(win, "");
         any = cg.zeroany;
         any.a_int = (int) ' ';
-        Sprintf(buf, "%c  %s", (char) any.a_int, "All classes of objects");
+        Sprintf(buf, "%c  %s", (char) any.a_int, _("All classes of objects"));
         /* we won't preselect this even if the incoming list is empty;
            having it selected means that it would have to be explicitly
            de-selected in order to select anything else */
@@ -1725,7 +1726,7 @@ choose_classes_menu(const char *prompt,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_SKIPINVERT);
         if (!strcmp(prompt, "Autopickup what?")) {
             add_menu_str(win,
-                   "Note: when no choices are selected, \"all\" is implied.");
+                   _("Note: when no choices are selected, \"all\" is implied."));
             /* for 'O', "toggle" should be intuitive; for 'm O', it would
                probably be better to say "Set 'autopickup' to true|false" */
             add_menu_str(win, flags.pickup

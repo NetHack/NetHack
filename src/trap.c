@@ -7028,26 +7028,29 @@ trapname(
 {
     static const char *const halu_trapnames[] = {
         /* riffs on actual nethack traps */
-        "bottomless pit", "polymorphism trap", "devil teleporter",
-        "falling boulder trap", "anti-anti-magic field", "weeping gas trap",
-        "queasy board", "electrified web", "owlbear trap", "sand mine",
-        "vacillating triangle",
+        N_("bottomless pit"), N_("polymorphism trap"), N_("devil teleporter"),
+        N_("falling boulder trap"), N_("anti-anti-magic field"),
+        N_("weeping gas trap"), N_("queasy board"), N_("electrified web"),
+        N_("owlbear trap"), N_("sand mine"), N_("vacillating triangle"),
         /* some traps found in nethack variants */
-        "death trap", "disintegration trap", "ice trap", "monochrome trap",
+        N_("death trap"), N_("disintegration trap"), N_("ice trap"),
+        N_("monochrome trap"),
         /* plausible real-life traps */
-        "axeblade trap", "pool of boiling oil", "pool of quicksand",
-        "field of caltrops", "buzzsaw trap", "spiked floor", "revolving wall",
-        "uneven floor", "finger trap", "jack-in-a-box", "yellow snow",
-        "booby trap", "rat trap", "poisoned nail", "snare", "whirlpool",
-        "trip wire", "roach motel (tm)",
+        N_("axeblade trap"), N_("pool of boiling oil"), N_("pool of quicksand"),
+        N_("field of caltrops"), N_("buzzsaw trap"), N_("spiked floor"),
+        N_("revolving wall"), N_("uneven floor"), N_("finger trap"),
+        N_("jack-in-a-box"), N_("yellow snow"), N_("booby trap"),
+        N_("rat trap"), N_("poisoned nail"), N_("snare"), N_("whirlpool"),
+        N_("trip wire"), N_("roach motel (tm)"),
         /* sci-fi */
-        "negative space", "tensor field", "singularity", "imperial fleet",
-        "black hole", "thermal detonator", "event horizon",
-        "entoptic phenomenon",
+        N_("negative space"), N_("tensor field"), N_("singularity"),
+        N_("imperial fleet"), N_("black hole"), N_("thermal detonator"),
+        N_("event horizon"), N_("entoptic phenomenon"),
         /* miscellaneous suggestions */
-        "sweet-smelling gas vent", "phone booth", "exploding runes",
-        "never-ending elevator", "slime pit", "warp zone", "illusory floor",
-        "pile of poo", "honey trap", "tourist trap",
+        N_("sweet-smelling gas vent"), N_("phone booth"), N_("exploding runes"),
+        N_("never-ending elevator"), N_("slime pit"), N_("warp zone"),
+        N_("illusory floor"), N_("pile of poo"), N_("honey trap"),
+        N_("tourist trap"),
     };
     static char roletrap[33]; /* [17 + 5 + 1] should suffice */
 
@@ -7068,7 +7071,7 @@ trapname(
             return lcase(roletrap);
         } else if (nameidx >= TRAPNUM) {
             nameidx -= TRAPNUM;
-            return halu_trapnames[nameidx];
+            return _(halu_trapnames[nameidx]);
         } /* else use an actual trap type */
         if (nameidx != NO_TRAP)
             ttyp = nameidx;
