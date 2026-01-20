@@ -145,7 +145,7 @@ precheck(struct monst *mon, struct obj *obj)
             Soundeffect(se_zap_then_explosion, 100);
             You_hear(_("a zap and an explosion %s."),
                      (mdistu(mon) <= range * range)
-                        ? "nearby" : "in the distance");
+                        ? _("nearby") : _("in the distance"));
         }
         m_useup(mon, obj);
         mon->mhp -= dam;
@@ -206,7 +206,7 @@ mplayhorn(
         Soundeffect(se_horn_being_played, 50);
         You_hear(_("a horn being played %s."),
                  (mdistu(mtmp) <= range * range)
-                    ? "nearby" : "in the distance");
+                    ? _("nearby") : _("in the distance"));
         unknow_object(otmp); /* hero loses info when unseen obj is used */
     } else if (self) {
         observe_object(otmp);
@@ -958,7 +958,7 @@ use_defensive(struct monst *mtmp)
             pline_mon(mtmp, _("%s has made a hole in the %s."), Monnam(mtmp),
                   surface(mtmp->mx, mtmp->my));
             pline_mon(mtmp, _("%s %s through..."), Monnam(mtmp),
-                  is_flyer(mtmp->data) ? "dives" : "falls");
+                  is_flyer(mtmp->data) ? _("dives") : _("falls"));
         } else if (!Deaf) {
             Soundeffect(se_crash_through_floor, 100);
             You_hear(_("%s crash through the %s."), something,
@@ -1129,7 +1129,7 @@ use_defensive(struct monst *mtmp)
         }
         if (vismon)
             pline_mon(mtmp, _("%s escapes %sstairs!"), Monnam(mtmp),
-                  stway->up ? "up" : "down");
+                  stway->up ? _("up") : _("down"));
         /* going from the Valley to Castle (Stronghold) has no sstairs
            to target, but having gs.sstairs.<sx,sy> == <0,0> will work the
            same as specifying MIGR_RANDOM when mon_arrive() eventually
@@ -1881,7 +1881,7 @@ use_offensive(struct monst *mtmp)
         /* Identify the scroll */
         if (canspotmon(mtmp)) {
             pline_The(_("%s rumbles %s %s!"), ceiling(mtmp->mx, mtmp->my),
-                      otmp->blessed ? "around" : "above", mon_nam(mtmp));
+                      otmp->blessed ? _("around") : _("above"), mon_nam(mtmp));
             if (oseen)
                 makeknown(otmp->otyp);
         } else if (cansee(mtmp->mx, mtmp->my)) {
@@ -2432,7 +2432,7 @@ use_misc(struct monst *mtmp)
             if (canspotmon(mtmp)) {
                 pline(_("%s body takes on a %s transparency."),
                       upstart(s_suffix(nambuf)),
-                      Hallucination ? "normal" : "strange");
+                      Hallucination ? _("normal") : _("strange"));
             } else {
                 pline(_("Suddenly you cannot see %s."), nambuf);
                 if (vis)
@@ -3089,7 +3089,7 @@ muse_unslime(
         if (mon->mx == trap->tx && mon->my == trap->ty) {
             if (vis)
                 pline(_("%s triggers %s fire trap!"), Mnam,
-                      trap->tseen ? "the" : "a");
+                      trap->tseen ? _("the") : _("a"));
         } else {
             remove_monster(mon->mx, mon->my);
             newsym(mon->mx, mon->my);
@@ -3099,9 +3099,9 @@ muse_unslime(
             newsym(mon->mx, mon->my);
             if (vis)
                 pline(_("%s %s %s %s fire trap!"), Mnam,
-                      vtense(fakename[0], locomotion(mon->data, "move")),
-                      is_floater(mon->data) ? "over" : "onto",
-                      trap->tseen ? "the" : "a");
+                      vtense(fakename[0], locomotion(mon->data, _("move"))),
+                      is_floater(mon->data) ? _("over") : _("onto"),
+                      trap->tseen ? _("the") : _("a"));
         }
         (void) mintrap(mon, FORCETRAP);
     } else if (otyp == STRANGE_OBJECT) {
@@ -3185,7 +3185,7 @@ muse_unslime(
                    "You killed/destroyed <mon>" so give our own message */
                 if (vis)
                     pline_mon(mon, _("%s is %s by the fire!"), Monnam(mon),
-                          nonliving(mon->data) ? "destroyed" : "killed");
+                          nonliving(mon->data) ? _("destroyed") : _("killed"));
                 xkilled(mon, XKILL_NOMSG | XKILL_NOCONDUCT);
             } else
                 monkilled(mon, "fire", AD_FIRE);

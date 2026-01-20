@@ -692,14 +692,14 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
                 how |= 4;
 
             if (how)
-                Sprintf(eos(buf), " [seen: %s%s%s%s%s]",
-                        (how & 1) ? "infravision" : "",
+                Sprintf(eos(buf), _(" [seen: %s%s%s%s%s]"),
+                        (how & 1) ? _("infravision") : "",
                         /* add comma if telep and infrav */
                         ((how & 3) > 2) ? ", " : "",
-                        (how & 2) ? "telepathy" : "",
+                        (how & 2) ? _("telepathy") : "",
                         /* add comma if detect and (infrav or telep or both) */
                         ((how & 7) > 4) ? ", " : "",
-                        (how & 4) ? "monster detection" : "");
+                        (how & 4) ? _("monster detection") : "");
         }
     } else if (u.uswallow) {
         /* when swallowed, we're only called for spots adjacent to hero,
@@ -2065,8 +2065,8 @@ look_all(
         display_nhwindow(win, TRUE);
     else
         pline(_("No %s are currently shown %s."),
-              do_mons ? "monsters" : "objects",
-              nearby ? "nearby" : "on the map");
+              do_mons ? _("monsters") : _("objects"),
+              nearby ? _("nearby") : _("on the map"));
     destroy_nhwindow(win);
 }
 
