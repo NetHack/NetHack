@@ -702,7 +702,7 @@ topten(int how, time_t when)
 #ifdef LOGFILE /* used for debugging (who dies of what, where) */
     if (lock_file(LOGFILE, SCOREPREFIX, 10)) {
         if (!(lfile = fopen_datafile(LOGFILE, "a", SCOREPREFIX))) {
-            HUP raw_print("Cannot open log file!");
+            HUP raw_print(_("Cannot open log file!"));
         } else {
             writeentry(lfile, t0);
             (void) fclose(lfile);
@@ -713,7 +713,7 @@ topten(int how, time_t when)
 #ifdef XLOGFILE
     if (lock_file(XLOGFILE, SCOREPREFIX, 10)) {
         if (!(xlfile = fopen_datafile(XLOGFILE, "a", SCOREPREFIX))) {
-            HUP raw_print("Cannot open extended log file!");
+            HUP raw_print(_("Cannot open extended log file!"));
         } else {
             writexlentry(xlfile, t0, how);
             (void) fclose(xlfile);
@@ -746,7 +746,7 @@ topten(int how, time_t when)
 #endif
 
     if (!rfile) {
-        HUP raw_print("Cannot open record file!");
+        HUP raw_print(_("Cannot open record file!"));
         unlock_file(RECORD);
         goto destroywin;
     }
@@ -819,7 +819,7 @@ topten(int how, time_t when)
 #else
         (void) fclose(rfile);
         if (!(rfile = fopen_datafile(RECORD, "w", SCOREPREFIX))) {
-            HUP raw_print("Cannot write record file");
+            HUP raw_print(_("Cannot write record file"));
             unlock_file(RECORD);
             free_ttlist(tt_head);
             goto destroywin;
@@ -828,7 +828,7 @@ topten(int how, time_t when)
         if (!done_stopprint)
             if (rank0 > 0) {
                 if (rank0 <= 10) {
-                    topten_print("You made the top ten list!");
+                    topten_print(_("You made the top ten list!"));
                 } else {
                     char pbuf[BUFSZ];
 
@@ -1214,7 +1214,7 @@ prscore(int argc, char **argv)
 
     rfile = fopen_datafile(RECORD, "r", SCOREPREFIX);
     if (!rfile) {
-        raw_print("Cannot open record file!");
+        raw_print(_("Cannot open record file!"));
         return;
     }
 

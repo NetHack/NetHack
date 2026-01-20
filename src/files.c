@@ -2281,8 +2281,8 @@ lock_file(const char *filename, int whichprefix,
                            filename, retryct);
             sleep(1);
         } else {
-            HUP raw_print("I give up.  Sorry.");
-            HUP raw_printf("Some other process has an unnatural grip on %s.",
+            HUP raw_print(_("I give up.  Sorry."));
+            HUP raw_printf(_("Some other process has an unnatural grip on %s."),
                            filename);
             gn.nesting--;
             return FALSE;
@@ -2301,8 +2301,8 @@ lock_file(const char *filename, int whichprefix,
 #endif
                     sleep(1);
             } else {
-                HUP raw_print("I give up.  Sorry.");
-                HUP raw_printf("Perhaps there is an old %s around?",
+                HUP raw_print(_("I give up.  Sorry."));
+                HUP raw_printf(_("Perhaps there is an old %s around?"),
                                lockname);
                 gn.nesting--;
                 return FALSE;
@@ -3168,10 +3168,10 @@ reveal_paths(int code)
 #ifdef PREFIXES_IN_USE
     int i, maxlen = 0;
 
-    raw_print("Variable playground locations:");
+    raw_print(_("Variable playground locations:"));
     for (i = 0; i < PREFIX_COUNT; i++)
         raw_printf("    [%-10s]=\"%s\"", fqn_prefix_names[i],
-                   gf.fqn_prefix[i] ? gf.fqn_prefix[i] : "not set");
+                   gf.fqn_prefix[i] ? gf.fqn_prefix[i] : _("not set"));
 #endif
 
     /* sysconf file */
@@ -3204,7 +3204,7 @@ reveal_paths(int code)
         skip_sysopt = TRUE;
     }
 #else /* !SYSCF */
-    raw_printf("No system configuration file.");
+    raw_printf(_("No system configuration file."));
 #endif /* ?SYSCF */
 
     /* symbols file */
@@ -3221,13 +3221,13 @@ reveal_paths(int code)
     if (cstrp && (int) strlen(cstrp) < maxlen)
         Sprintf(buf, " (in %s)", cstrp);
 #endif /* PREFIXES_IN_USE */
-    raw_printf("The loadable symbols file%s:", buf);
+    raw_printf(_("The loadable symbols file%s:"), buf);
 #endif /* UNIX */
 
 #ifdef UNIX
     envp = getcwd(cwdbuf, PATH_MAX);
     if (envp) {
-        raw_print("The loadable symbols file:");
+        raw_print(_("The loadable symbols file:"));
         raw_printf("    \"%s/%s\"", envp, SYMBOLS);
     }
 #else /* UNIX */
@@ -3294,12 +3294,12 @@ reveal_paths(int code)
 #endif
 #endif /* ?SYSCF */
     if (fqn && *fqn) {
-        raw_print("Your end-of-game disclosure file:");
+        raw_print(_("Your end-of-game disclosure file:"));
         (void) dump_fmtstr(fqn, buf, FALSE);
         buf[sizeof buf - sizeof "    \"\""] = '\0';
         raw_printf("    \"%s\"", buf);
     } else {
-        raw_printf("No end-of-game disclosure file (%s).", nodumpreason);
+        raw_printf(_("No end-of-game disclosure file (%s)."), nodumpreason);
     }
 #endif /* ?DUMPLOG */
 

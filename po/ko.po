@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 12:50+0900\n"
+"POT-Creation-Date: 2026-01-20 13:00+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -7286,6 +7286,51 @@ msgstr "%s{을/를} 압축 해제할 수 없다."
 #: src/files.c:1944
 msgid "Failure writing uncompressed file"
 msgstr "비압축 파일 쓰기 실패"
+
+#: src/files.c:2284 src/files.c:2304
+msgid "I give up.  Sorry."
+msgstr "포기합니다. 죄송합니다."
+
+#: src/files.c:2285
+#, c-format
+msgid "Some other process has an unnatural grip on %s."
+msgstr "다른 프로세스가 %s을(를) 점유하고 있습니다."
+
+#: src/files.c:2305
+#, c-format
+msgid "Perhaps there is an old %s around?"
+msgstr "오래된 %s이(가) 남아있을 수 있습니다."
+
+#: src/files.c:3171 src/options.c:8974
+msgid "Variable playground locations:"
+msgstr "가변 플레이그라운드 위치:"
+
+#: src/files.c:3174
+msgid "not set"
+msgstr "설정 안됨"
+
+#: src/files.c:3207
+#, fuzzy
+msgid "No system configuration file."
+msgstr "설정 파일"
+
+#: src/files.c:3224
+#, c-format
+msgid "The loadable symbols file%s:"
+msgstr "로드 가능한 기호 파일%s:"
+
+#: src/files.c:3230
+msgid "The loadable symbols file:"
+msgstr "로드 가능한 기호 파일:"
+
+#: src/files.c:3297
+msgid "Your end-of-game disclosure file:"
+msgstr "게임 종료 공개 파일:"
+
+#: src/files.c:3302
+#, c-format
+msgid "No end-of-game disclosure file (%s)."
+msgstr "게임 종료 공개 파일이 없습니다 (%s)."
 
 #: src/files.c:3468
 #, c-format
@@ -14983,10 +15028,6 @@ msgstr "불리언 (선택하면 값이 전환됩니다):"
 msgid "Other settings:"
 msgstr "기타 설정:"
 
-#: src/options.c:8974
-msgid "Variable playground locations:"
-msgstr "가변 플레이그라운드 위치:"
-
 #: src/options.c:8978
 msgid "Set what options?"
 msgstr "어떤 옵션을 설정할까요?"
@@ -22659,6 +22700,30 @@ msgstr "천둥번개를 피하는 중"
 #: src/timeout.c:1891
 msgid "a rumbling noise."
 msgstr "우르릉거리는 소리."
+
+#: src/topten.c:705
+#, fuzzy
+msgid "Cannot open log file!"
+msgstr "라이브 로그 파일을 열 수 없다!"
+
+#: src/topten.c:716
+#, fuzzy
+msgid "Cannot open extended log file!"
+msgstr "라이브 로그 파일을 열 수 없다!"
+
+#: src/topten.c:749 src/topten.c:1217
+#, fuzzy
+msgid "Cannot open record file!"
+msgstr "라이브 로그 파일을 열 수 없다!"
+
+#: src/topten.c:822
+#, fuzzy
+msgid "Cannot write record file"
+msgstr "더 이상 쓸 수 없다."
+
+#: src/topten.c:831
+msgid "You made the top ten list!"
+msgstr "상위 10위 안에 들었습니다!"
 
 #: src/trap.c:95
 msgid "humid"
