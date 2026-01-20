@@ -193,7 +193,7 @@ dopush(
             easypush = throws_rocks(gy.youmonst.data);
             if (givemesg)
                 pline(_("With %s effort you move %s."),
-                      easypush ? "little" : "great", what);
+                      easypush ? _("little") : _("great"), what);
             if (!easypush)
                 exercise(A_STR, TRUE);
         } else {
@@ -400,7 +400,7 @@ moverock_core(coordxy sx, coordxy sy)
                 res = 0; /* move to <sx,sy> */
             } else if (could_move_onto_boulder(sx, sy)) {
                 You(_("squeeze yourself %s the boulder."),
-                    Flying ? "over" : "against");
+                    Flying ? _("over") : _("against"));
                 sokoban_guilt();
                 res = 0; /* move to <sx,sy> */
             } else {

@@ -587,9 +587,9 @@ pick_lock(
                 res = PICKLOCK_LEARNED_SOMETHING;
 
             if (is_drawbridge_wall(cc.x, cc.y) >= 0)
-                You(_("%s no lock on the drawbridge."), Blind ? "feel" : "see");
+                You(_("%s no lock on the drawbridge."), Blind ? _("feel") : _("see"));
             else
-                You(_("%s no door there."), Blind ? "feel" : "see");
+                You(_("%s no door there."), Blind ? _("feel") : _("see"));
             return res;
         }
         switch (door->doormask) {
@@ -849,7 +849,7 @@ doopen_indir(coordxy x, coordxy y)
             pline(_("%s like something lootable over there."),
                   Blind ? "Feels" : "Seems");
         else
-            You(_("%s no door there."), Blind ? "feel" : "see");
+            You(_("%s no door there."), Blind ? _("feel") : _("see"));
         return res;
     }
 
@@ -1279,7 +1279,7 @@ chest_shatter_msg(struct obj *otmp)
     long save_HBlinded, save_BBlinded;
 
     if (otmp->oclass == POTION_CLASS) {
-        You(_("%s %s shatter!"), Blind ? "hear" : "see", an(bottlename()));
+        You(_("%s %s shatter!"), Blind ? _("hear") : _("see"), an(bottlename()));
         if (!breathless(gy.youmonst.data) || haseyes(gy.youmonst.data))
             potionbreathe(otmp);
         return;

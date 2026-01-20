@@ -1438,9 +1438,9 @@ trapeffect_sqky_board(
                 Soundeffect(tsnds[trap->tnote], 50);
             }
             pline(_("A board beneath you %s%s%s."),
-                  Deaf ? "vibrates" : "squeaks ",
+                  Deaf ? _("vibrates") : _("squeaks "),
                   Deaf ? "" : trapnote(trap, FALSE),
-                  Deaf ? "" : " loudly");
+                  Deaf ? "" : _(" loudly"));
             wake_nearby(FALSE);
         }
     } else {
@@ -1716,7 +1716,7 @@ trapeffect_rust_trap(
         if (completelyrusts(mptr)) {
             if (in_sight)
                 pline_mon(mtmp, _("%s %s to pieces!"), Monnam(mtmp),
-                      !mlifesaver(mtmp) ? "falls" : "starts to fall");
+                      !mlifesaver(mtmp) ? _("falls") : _("starts to fall"));
             monkilled(mtmp, (const char *) 0, AD_RUST);
             if (DEADMONSTER(mtmp))
                 trapkilled = TRUE;
@@ -5003,11 +5003,11 @@ drown(void)
     }
 
     if (!u.uinwater) {
-        You(_("%s into the %s%c"), is_solid ? "plunge" : "fall",
+        You(_("%s into the %s%c"), is_solid ? _("plunge") : _("fall"),
             waterbody_name(u.ux, u.uy),
             (Amphibious || Swimming || Breathless) ? '.' : '!');
         if (!Swimming && !is_solid)
-            You(_("sink like %s."), Hallucination ? "the Titanic" : "a rock");
+            You(_("sink like %s."), Hallucination ? _("the Titanic") : _("a rock"));
     }
 
     water_damage_chain(gi.invent, FALSE);
