@@ -889,7 +889,6 @@ drop_ball(coordxy x, coordxy y)
     }
 
     if (x != u.ux || y != u.uy) {
-        static const char pullmsg[] = "The ball pulls you out of the ";
         struct trap *t;
         long side;
 
@@ -897,20 +896,20 @@ drop_ball(coordxy x, coordxy y)
             && u.utraptype != TT_INFLOOR && u.utraptype != TT_BURIEDBALL) {
             switch (u.utraptype) {
             case TT_PIT:
-                pline(_("%s%s!"), pullmsg, "pit");
+                pline(_("The ball pulls you out of the pit!"));
                 break;
             case TT_WEB:
-                pline(_("%s%s!"), pullmsg, "web");
+                pline(_("The ball pulls you out of the web!"));
                 Soundeffect(se_destroy_web, 30);
                 pline_The(_("web is destroyed!"));
                 deltrap(t_at(u.ux, u.uy));
                 break;
             case TT_LAVA:
-                pline(_("%s%s!"), pullmsg, hliquid("lava"));
+                pline(_("The ball pulls you out of the %s!"), hliquid("lava"));
                 break;
             case TT_BEARTRAP:
                 side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
-                pline(_("%s%s!"), pullmsg, "bear trap");
+                pline(_("The ball pulls you out of the bear trap!"));
                 set_wounded_legs(side, rn1(1000, 500));
                 if (!u.usteed) {
                     Your(_("%s %s is severely damaged."),

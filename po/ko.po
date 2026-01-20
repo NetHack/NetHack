@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 13:16+0900\n"
+"POT-Creation-Date: 2026-01-20 13:19+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -1909,8 +1909,7 @@ msgstr "당신은 최대한 %s %s 상태다."
 msgid "innate %s has %s."
 msgstr "선천적 %s{이/가} %s."
 
-#: src/attrib.c:192 src/ball.c:900 src/ball.c:903 src/ball.c:909 src/ball.c:913
-#: src/mhitu.c:1021
+#: src/attrib.c:192 src/mhitu.c:1021
 #, c-format
 msgid "%s%s!"
 msgstr "%s%s!"
@@ -1999,30 +1998,49 @@ msgstr "쇠공에서 당기는 힘."
 msgid "are jerked back by the iron ball!"
 msgstr "철구에 의해 뒤로 끌려갔다!"
 
-#: src/ball.c:905
+#: src/ball.c:899
+#, fuzzy
+msgid "The ball pulls you out of the pit!"
+msgstr "%s{을/를} 구덩이에서 꺼냈다."
+
+#: src/ball.c:902
+#, fuzzy
+msgid "The ball pulls you out of the web!"
+msgstr "%s{이/가} 거미줄에서 벗어났다."
+
+#: src/ball.c:904
 msgid "web is destroyed!"
 msgstr "거미줄이 파괴됐다!"
 
-#: src/ball.c:916
+#: src/ball.c:908
+#, fuzzy, c-format
+msgid "The ball pulls you out of the %s!"
+msgstr "%s에서 떠올랐다!"
+
+#: src/ball.c:912
+msgid "The ball pulls you out of the bear trap!"
+msgstr "공이 당신을 곰덫에서 끌어냅니다!"
+
+#: src/ball.c:915
 #, c-format
 msgid "%s %s is severely damaged."
 msgstr "%s %s{이/가} 심하게 손상됐다."
 
-#: src/ball.c:974
+#: src/ball.c:973
 #, c-format
 msgid "drop %s and %s %s down the stairs with you."
 msgstr "%s{을/를} 떨어뜨리고 %s{과/와} 함께 계단 아래로 %s."
 
-#: src/ball.c:1002
+#: src/ball.c:1001
 msgid "lose your grip on the iron ball."
 msgstr "철구에 대한 손아귀가 풀렸다."
 
-#: src/ball.c:1009 src/ball.c:1024
+#: src/ball.c:1008 src/ball.c:1023
 msgid "iron ball drags you downstairs!"
 msgstr "철구가 계단 아래로 끌어내린다!"
 
 #
-#: src/ball.c:1017
+#: src/ball.c:1016
 msgid "iron ball smacks into you!"
 msgstr "쇠공이 당신에게 부딪혔다!"
 
@@ -7747,6 +7765,11 @@ msgstr "얼어붙는 안개가 %s에서 올라와 검을 감싼다."
 #: src/fountain.c:416
 msgid "fountain disappears!"
 msgstr "분수가 사라졌다!"
+
+#: src/fountain.c:429
+#, fuzzy
+msgid "From the murky depths, a hand reaches up to bless the sword."
+msgstr "탁한 배수구에서 손이 올라온다... --이런--"
 
 #: src/fountain.c:430
 msgid "As the hand retreats, the fountain disappears!"
@@ -17552,6 +17575,17 @@ msgstr "갑자기 %s더 빨리 움직인다."
 #, c-format
 msgid "%s get new energy."
 msgstr "%s{이/가} 새 에너지를 얻었다."
+
+#
+#: src/pray.c:384
+#, fuzzy
+msgid "You feel more limber."
+msgstr "나를 풀어줬다!"
+
+#: src/pray.c:387
+#, fuzzy
+msgid "The slime disappears."
+msgstr "%s{이/가} 사라졌다."
 
 #: src/pray.c:391 src/timeout.c:898
 msgid "amulet vanishes!"

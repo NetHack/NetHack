@@ -426,7 +426,7 @@ dipfountain(struct obj *obj)
             /* The lady of the lake acts! - Eric Backus */
             /* Be *REAL* nice */
             pline(
-              "From the murky depths, a hand reaches up to bless the sword.");
+              _("From the murky depths, a hand reaches up to bless the sword."));
             pline(_("As the hand retreats, the fountain disappears!"));
             obj = oname(obj, artiname(ART_EXCALIBUR),
                         ONAME_VIA_DIP | ONAME_KNOW_ARTI);
