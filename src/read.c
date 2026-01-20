@@ -805,8 +805,8 @@ recharge(struct obj *obj, int curse_bless)
 
         /* destruction depends on current state, not adjustment */
         if (obj->spe > rn2(7) || obj->spe <= -5) {
-            pline(_("%s momentarily, then %s!"), Yobjnam2(obj, "pulsate"),
-                  otense(obj, "explode"));
+            pline(_("%s momentarily, then %s!"), Yobjnam2(obj, _("pulsate")),
+                  otense(obj, _("explode")));
             if (is_on)
                 Ring_gone(obj);
             s = rnd(3 * abs(obj->spe)); /* amount of damage */
@@ -1183,7 +1183,7 @@ seffect_enchant_armor(struct obj **sobjp)
               (!Blind && !same_color) ? " " : "",
               (Blind || same_color) ? "" : hcolor(scursed ? NH_BLACK
                                                   : NH_SILVER),
-              otense(otmp, "evaporate"));
+              otense(otmp, _("evaporate")));
         remove_worn_item(otmp, FALSE);
         useup(otmp);
         return;
@@ -1891,8 +1891,8 @@ seffect_earth(struct obj **sobjp)
                 Sprintf(matbuf, "%s",
                         sblessed ? makeplural(avalanche) : an(avalanche));
                 pline(_("%s of boulders %s %s you!"),
-                      upstart(matbuf), vtense(matbuf, "materialize"),
-                      sblessed ? "around" : "above");
+                      upstart(matbuf), vtense(matbuf, _("materialize")),
+                      sblessed ? _("around") : _("above"));
             }
         }
         gk.known = 1;

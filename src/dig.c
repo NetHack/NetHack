@@ -342,11 +342,11 @@ dig(void)
                 dropx(uwep);
             } else {
                 if (u.usteed)
-                    pline(_("%s and %s %s!"), Yobjnam2(uwep, "bounce"),
-                          otense(uwep, "hit"), mon_nam(u.usteed));
+                    pline(_("%s and %s %s!"), Yobjnam2(uwep, _("bounce")),
+                          otense(uwep, _("hit")), mon_nam(u.usteed));
                 else
-                    pline(_("Ouch!  %s and %s you!"), Yobjnam2(uwep, "bounce"),
-                          otense(uwep, "hit"));
+                    pline(_("Ouch!  %s and %s you!"), Yobjnam2(uwep, _("bounce")),
+                          otense(uwep, _("hit")));
                 set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
             }
             break;
@@ -2158,8 +2158,8 @@ rot_corpse(anything *arg, long timeout)
         if (flags.verbose) {
             char *cname = corpse_xname(obj, (const char *) 0, CXN_NO_PFX);
 
-            Your(_("%s%s %s away%c"), obj == uwep ? "wielded " : "", cname,
-                 otense(obj, "rot"), obj == uwep ? '!' : '.');
+            Your(_("%s%s %s away%c"), obj == uwep ? _("wielded ") : "", cname,
+                 otense(obj, _("rot")), obj == uwep ? '!' : '.');
         }
         if (obj->owornmask) {
             remove_worn_item(obj, TRUE);

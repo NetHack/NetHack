@@ -4527,7 +4527,7 @@ lava_damage(struct obj *obj, coordxy x, coordxy y)
                flooreffects() */
             if (obj == gt.thrownobj || obj == gk.kickedobj)
                 pline(_("%s %s up!"), is_plural(obj) ? _("They") : _("It"),
-                      otense(obj, "burn"));
+                      otense(obj, _("burn")));
             else
                 You_see(_("%s hit lava and burn up!"), doname(obj));
         }
@@ -4603,7 +4603,7 @@ pot_acid_damage(
             don't re-describe potion here; if we used "It explodes!"
             then "it" might be misconstrued as applying to "grease" */
         pline_The(_("potion%s %s!"),
-                    plur(obj->quan), otense(obj, "explode"));
+                    plur(obj->quan), otense(obj, _("explode")));
     } else {
         /* First message is
             * "a [potion|<color> potion|potion of acid] explodes"

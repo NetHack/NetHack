@@ -1500,7 +1500,7 @@ snuff_lit(struct obj *obj)
             || obj->otyp == BRASS_LANTERN || obj->otyp == POT_OIL) {
             (void) get_obj_location(obj, &x, &y, 0);
             if (obj->where == OBJ_MINVENT ? cansee(x, y) : !Blind)
-                pline(_("%s %s out!"), Yname2(obj), otense(obj, "go"));
+                pline(_("%s %s out!"), Yname2(obj), otense(obj, _("go")));
             end_burn(obj, TRUE);
             return TRUE;
         }
@@ -1669,8 +1669,8 @@ use_lamp(struct obj *obj)
                       fingers_or_gloves(TRUE));
             make_glib((int) (Glib & TIMEOUT) + d(2, 10));
         } else if (!Blind) {
-            pline(_("%s for a moment, then %s."), Tobjnam(obj, "flicker"),
-                  otense(obj, "die"));
+            pline(_("%s for a moment, then %s."), Tobjnam(obj, _("flicker")),
+                  otense(obj, _("die")));
         } else {
             pline(_("%s"), nothing_seems_to_happen);
         }
@@ -1680,7 +1680,7 @@ use_lamp(struct obj *obj)
             pline(_("%s%s is now on."), Shk_Your(buf, obj), lamp);
         } else { /* candle(s) */
             pline(_("%s flame%s %s%s"), s_suffix(Yname2(obj)), plur(obj->quan),
-                  otense(obj, "burn"), Blind ? "." : " brightly!");
+                  otense(obj, _("burn")), Blind ? "." : _(" brightly!"));
             if (obj->unpaid && costly_spot(u.ux, u.uy)
                 && obj->age == 20L * (long) objects[obj->otyp].oc_cost) {
                 const char *ithem = (obj->quan > 1L) ? _("them") : _("it");
@@ -3648,7 +3648,7 @@ use_royal_jelly(struct obj **optr)
 
     if (obj->cursed) {
         if (eobj->timed || eobj->corpsenm != oldcorpsenm)
-            pline(_("The %s %s feebly."), xname(eobj), otense(eobj, "quiver"));
+            pline(_("The %s %s feebly."), xname(eobj), otense(eobj, _("quiver")));
         else
             pline(_("%s"), nothing_seems_to_happen);
         kill_egg(eobj);
@@ -3667,7 +3667,7 @@ use_royal_jelly(struct obj **optr)
 
     if ((eobj->timed && !was_timed) || eobj->spe == 2
         || eobj->corpsenm != oldcorpsenm)
-        pline(_("The %s %s briefly."), xname(eobj), otense(eobj, "quiver"));
+        pline(_("The %s %s briefly."), xname(eobj), otense(eobj, _("quiver")));
     else
         pline(_("%s"), nothing_seems_to_happen);
 

@@ -940,7 +940,7 @@ m_dowear_type(
             pline_mon(mon, "%s%s puts on %s.", Monnam(mon), buf, newarm);
             if (autocurse)
                 pline(_("%s %s %s %s for a moment."), s_suffix(Monnam(mon)),
-                      simpleonames(best), otense(best, "glow"),
+                      simpleonames(best), otense(best, _("glow")),
                       hcolor(NH_BLACK));
         } /* can see it */
         m_delay += objects[best->otyp].oc_delay;
@@ -969,10 +969,10 @@ m_dowear_type(
 
             if (sawmon) /* could already see monster */
                 pline(_("%s %s to shine %s."), Yname2(best),
-                      otense(best, "begin"), adesc);
+                      otense(best, _("begin")), adesc);
             else if (canseemon(mon)) /* didn't see it until new light */
                 pline(_("%s %s shining %s."), Yname2(best),
-                      otense(best, "are"), adesc);
+                      otense(best, _("are")), adesc);
             else if (sawloc) /* saw location but not invisible monster */
                 pline(_("%s begins to shine %s."), Something, adesc);
             else /* didn't see location until new light */

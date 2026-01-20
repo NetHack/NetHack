@@ -2112,7 +2112,7 @@ arti_invoke_cost(struct obj *obj)
         if (pw_cost < 0 || u.uen < pw_cost) {
             /* the artifact is tired :-) */
             You_feel(_("that %s %s ignoring you."), the(xname(obj)),
-                     otense(obj, "are"));
+                     otense(obj, _("are")));
             /* and just got more so; patience is essential... */
             obj->age += (long) d(3, 10);
             return FALSE;
@@ -2185,7 +2185,7 @@ arti_invoke(struct obj *obj)
             /* the artifact is tired :-) */
             u.uprops[oart->inv_prop].extrinsic ^= W_ARTI;
             You_feel(_("that %s %s ignoring you."), the(xname(obj)),
-                     otense(obj, "are"));
+                     otense(obj, _("are")));
             /* can't just keep repeatedly trying */
             obj->age += (long) d(3, 10);
             return ECMD_TIME;

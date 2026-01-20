@@ -307,7 +307,7 @@ ghitm(struct monst *mtmp, struct obj *gold)
         /* too light to do real damage */
         if (canseemon(mtmp)) {
             pline_The(_("%s harmlessly %s %s."), xname(gold),
-                      otense(gold, "hit"), mon_nam(mtmp));
+                      otense(gold, _("hit")), mon_nam(mtmp));
             msg_given = TRUE;
         }
     } else {
@@ -624,14 +624,14 @@ really_kick_object(coordxy x, coordxy y)
             else
                 pline(_("%s %sn't come loose."),
                       The(distant_name(gk.kickedobj, xname)),
-                      otense(gk.kickedobj, "do"));
+                      otense(gk.kickedobj, _("do")));
             return (!rn2(3) || martial());
         }
         if (Blind)
             pline(_("It comes loose."));
         else
             pline(_("%s %s loose."), The(distant_name(gk.kickedobj, xname)),
-                  otense(gk.kickedobj, "come"));
+                  otense(gk.kickedobj, _("come")));
         obj_extract_self(gk.kickedobj);
         newsym(x, y);
         if (costly && (!costly_spot(u.ux, u.uy)
@@ -720,7 +720,7 @@ really_kick_object(coordxy x, coordxy y)
 
     if (slide && !Blind)
         pline(_("Whee!  %s %s across the %s."), Doname2(gk.kickedobj),
-              otense(gk.kickedobj, "slide"), surface(x, y));
+              otense(gk.kickedobj, _("slide")), surface(x, y));
 
 #if 0   /* now that 'costly' above includes no_charge items, this would
          * clear their no_charge state (while declining to add to bill)
@@ -1937,11 +1937,11 @@ otransit_msg(struct obj *otmp, boolean nodrop, boolean chainthere, long num)
         if (nodrop)
             Sprintf(eos(xbuf), ".");
         else
-            Sprintf(eos(xbuf), " and %s %s.",
-                    otense(otmp, "fall"), gg.gate_str);
+            Sprintf(eos(xbuf), _(" and %s %s."),
+                    otense(otmp, _("fall")), gg.gate_str);
         pline(_("%s%s"), obuf, xbuf);
     } else if (!nodrop)
-        pline(_("%s %s %s."), obuf, otense(otmp, "fall"), gg.gate_str);
+        pline(_("%s %s %s."), obuf, otense(otmp, _("fall")), gg.gate_str);
 }
 
 /* migration destination for objects which fall down to next level */

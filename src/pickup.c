@@ -3793,7 +3793,7 @@ tipcontainer(struct obj *box) /* or bag */
                     doaltarobj(otmp);
                 } else if (!terse) {
                     pline(_("%s %s to the %s."), Doname2(otmp),
-                          otense(otmp, "drop"), surface(ox, oy));
+                          otense(otmp, _("drop")), surface(ox, oy));
                 } else {
                     pline(_("%s%c"), doname(otmp), nobj ? ',' : '.');
                     iflags.last_msg = PLNMSG_OBJNAM_ONLY;

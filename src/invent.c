@@ -4237,7 +4237,7 @@ look_here(
 
         /* hardcoded "is" worked here because "iron bars" is actually
            "set of iron bars"; use vtense() instead of relying on that */
-        Sprintf(fbuf, _("There %s %s here."), vtense(dfeature, "are"), dfeature);
+        Sprintf(fbuf, _("There %s %s here."), vtense(dfeature, _("are")), dfeature);
     }
 
     if (!otmp || is_lava(u.ux, u.uy)

@@ -972,7 +972,7 @@ litter(void)
             if (canletgo(otmp, "")) {
                 You(_("drop %s and %s %s down the stairs with you."),
                     yname(otmp), (otmp->quan == 1L) ? _("it") : _("they"),
-                    otense(otmp, "fall"));
+                    otense(otmp, _("fall")));
                 setnotworn(otmp);
                 freeinv(otmp);
                 hitfloor(otmp, FALSE);

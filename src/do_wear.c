@@ -895,7 +895,7 @@ Armor_on(void)
         begin_burn(uarm, FALSE);
         if (!Blind)
             pline(_("%s %s to shine %s!"),
-                  Yname2(uarm), otense(uarm, "begin"),
+                  Yname2(uarm), otense(uarm, _("begin")),
                   arti_light_description(uarm));
     }
     return 0;
@@ -2573,8 +2573,8 @@ glibr(void)
             otherwep = makeplural(otherwep);
         hand = body_part(HAND);
         which = URIGHTY ? "left " : "right ";  /* text for the off hand */
-        Your(_("%s %s%s from your %s%s."), otherwep, xfl ? "also " : "",
-             otense(otmp, "slip"), which, hand);
+        Your(_("%s %s%s from your %s%s."), otherwep, xfl ? _("also ") : "",
+             otense(otmp, _("slip")), which, hand);
         xfl++;
         wastwoweap = TRUE;
         setuswapwep((struct obj *) 0); /* clears u.twoweap */
@@ -2611,8 +2611,8 @@ glibr(void)
         }
         pline(_("%s %s%s %s%s from your %s%s."),
               !strncmp(thiswep, "corpse", 6) ? _("The") : _("Your"),
-              otherwep ? "other " : "", thiswep, xfl ? "also " : "",
-              otense(otmp, "slip"), which, hand);
+              otherwep ? _("other ") : "", thiswep, xfl ? _("also ") : "",
+              otense(otmp, _("slip")), which, hand);
         /* xfl++; */
         otmp->quan = savequan;
         setuwep((struct obj *) 0);

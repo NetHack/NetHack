@@ -1941,7 +1941,7 @@ potionbreathe(struct obj *obj)
 
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
-                Your(_("%s %s!"), eyes, vtense(eyes, "sting"));
+                Your(_("%s %s!"), eyes, vtense(eyes, _("sting")));
             }
             break;
         } else {

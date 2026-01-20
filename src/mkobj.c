@@ -1725,7 +1725,7 @@ maybe_adjust_light(struct obj *obj, int old_range)
                    when changing intensity, using "less brightly" is
                    straightforward for dimming, but we need "brighter"
                    rather than "more brightly" for brightening; ugh */
-                pline(_("%s %s %s%s."), buf, otense(obj, "shine"),
+                pline(_("%s %s %s%s."), buf, otense(obj, _("shine")),
                       (abs(delta) > 1) ? _("much ") : "",
                       (delta > 0) ? _("brighter") : _("less brightly"));
             }
@@ -2922,7 +2922,7 @@ hornoplenty(
                     doaltarobj(obj); /* does its own drop message */
                 else
                     pline(_("%s %s to the %s."), Doname2(obj),
-                          otense(obj, "drop"), surface(u.ux, u.uy));
+                          otense(obj, _("drop")), surface(u.ux, u.uy));
                 dropy(obj);
             }
         }

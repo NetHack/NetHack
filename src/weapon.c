@@ -457,11 +457,11 @@ silver_sears(struct monst *magr UNUSED, struct monst *mdef,
         both = ((ltyp == rtyp && l_dknown == r_dknown) || (l_ag && r_ag));
         Sprintf(rings, "ring%s", both ? "s" : "");
         Your(_("%s%s %s %s!"),
-             (l_ag || r_ag) ? "silver "
+             (l_ag || r_ag) ? _("silver ")
              : both ? ""
-               : ((silverhit & W_RINGL) != 0L) ? "left "
-                 : "right ",
-             rings, vtense(rings, "sear"), mon_nam(mdef));
+               : ((silverhit & W_RINGL) != 0L) ? _("left ")
+                 : _("right "),
+             rings, vtense(rings, _("sear")), mon_nam(mdef));
     }
 }
 
@@ -865,8 +865,8 @@ mon_wield_item(struct monst *mon)
 
                 if (bimanual(mw_tmp))
                     mon_hand = makeplural(mon_hand);
-                Sprintf(welded_buf, "%s welded to %s %s",
-                        otense(mw_tmp, "are"), mhis(mon), mon_hand);
+                Sprintf(welded_buf, _("%s welded to %s %s"),
+                        otense(mw_tmp, _("are")), mhis(mon), mon_hand);
 
                 if (obj->otyp == PICK_AXE) {
                     pline(_("Since %s weapon%s %s,"), s_suffix(mon_nam(mon)),
@@ -1815,7 +1815,7 @@ setmnotwielded(struct monst *mon, struct obj *obj)
         if (canseemon(mon))
             pline(_("%s in %s %s %s shining."), The(xname(obj)),
                   s_suffix(mon_nam(mon)), mbodypart(mon, HAND),
-                  otense(obj, "stop"));
+                  otense(obj, _("stop")));
     }
     if (MON_WEP(mon) == obj)
         MON_NOWEP(mon);

@@ -1946,7 +1946,7 @@ tmiss(struct obj *obj, struct monst *mon, boolean maybe_wakeup)
        an arrow just landing short of any target (no message in that case),
        so will realize that there is a valid target here anyway. */
     if (!canseemon(mon) || (M_AP_TYPE(mon) && M_AP_TYPE(mon) != M_AP_MONSTER))
-        pline(_("%s %s."), The(missile), otense(obj, "miss"));
+        pline(_("%s %s."), The(missile), otense(obj, _("miss")));
     else
         miss(missile, mon);
     if (maybe_wakeup && !rn2(3))

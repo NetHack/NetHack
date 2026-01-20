@@ -3936,7 +3936,7 @@ bhit(
             if (is_pool(x, y) && !mtmp) {
                 in_skip = TRUE;
                 if (!Blind)
-                    pline(_("%s %s%s."), Yname2(obj), otense(obj, "skip"),
+                    pline(_("%s %s%s."), Yname2(obj), otense(obj, _("skip")),
                           skipcount ? _(" again") : "");
                 else
                     You_hear(_("%s skip."), yname(obj));
@@ -3952,7 +3952,7 @@ bhit(
                     skiprange(range, &skiprange_start, &skiprange_end);
             } else if (mtmp && M_IN_WATER(mtmp->data)) {
                 if (!Blind && canspotmon(mtmp))
-                    pline(_("%s %s over %s."), Yname2(obj), otense(obj, "pass"),
+                    pline(_("%s %s over %s."), Yname2(obj), otense(obj, _("pass")),
                           mon_nam(mtmp));
                 mtmp = (struct monst *) 0;
             }

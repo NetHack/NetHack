@@ -426,7 +426,7 @@ dowield(void)
         if (ynq(qbuf) != 'y') {
             (void) Shk_Your(qbuf, uquiver); /* replace qbuf[] contents */
             pline(_("%s%s %s readied."), qbuf,
-                  simpleonames(uquiver), otense(uquiver, "remain"));
+                  simpleonames(uquiver), otense(uquiver, _("remain")));
             return ECMD_OK;
         }
         /* wielding whole readied stack, so no longer quivered */
@@ -588,7 +588,7 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
         if (ynq(qbuf) != 'y') {
             (void) Shk_Your(qbuf, uwep); /* replace qbuf[] contents */
             pline(_("%s%s %s wielded."), qbuf,
-                  simpleonames(uwep), otense(uwep, "remain"));
+                  simpleonames(uwep), otense(uwep, _("remain")));
             return ECMD_OK;
         }
         /* quivering main weapon, so no longer wielding it */
@@ -806,7 +806,7 @@ drop_uswapwep(void)
     else if (!u.twoweap)
         /* attempting to two-weapon when uswapwep is cursed */
         pline(_("%s your grasp and %s from your %s!"),
-              Yobjnam2(obj, "evade"), otense(obj, "drop"), left_hand);
+              Yobjnam2(obj, _("evade")), otense(obj, _("drop")), left_hand);
     else
         /* already two-weaponing but can't anymore because uswapwep has
            become cursed */
@@ -980,8 +980,8 @@ chwepon(struct obj *otmp, int amount)
         && rn2(3)) {
         if (!Blind)
             pline(_("%s %s for a while and then %s."),
-                  Yobjnam2(uwep, "violently glow"), color,
-                  otense(uwep, "evaporate"));
+                  Yobjnam2(uwep, _("violently glow")), color,
+                  otense(uwep, _("evaporate")));
         else
             pline(_("%s."), Yobjnam2(uwep, "evaporate"));
 

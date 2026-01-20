@@ -555,11 +555,11 @@ moverock_core(coordxy sx, coordxy sy)
                     else
                         pline(_("%s%s and %s a %s in the %s!"),
                               Tobjnam(otmp, (ttmp->ttyp == TRAPDOOR)
-                                                ? "trigger"
-                                                : "fall"),
-                              (ttmp->ttyp == TRAPDOOR) ? "" : " into",
-                              otense(otmp, "plug"),
-                              (ttmp->ttyp == TRAPDOOR) ? "trap door" : "hole",
+                                                ? _("trigger")
+                                                : _("fall")),
+                              (ttmp->ttyp == TRAPDOOR) ? "" : _(" into"),
+                              otense(otmp, _("plug")),
+                              (ttmp->ttyp == TRAPDOOR) ? _("trap door") : _("hole"),
                               surface(rx, ry));
                     deltrap(ttmp);
                     useupf(otmp, 1L);

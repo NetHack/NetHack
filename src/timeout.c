@@ -334,10 +334,10 @@ sickness_dialogue(void)
         if (Hallucination && strstri(buf, "Death's door")) {
             /* youmonst: for Hallucination, mhe()'s mon argument isn't used */
             Strcpy(pronounbuf, mhe(&gy.youmonst));
-            Sprintf(eos(buf), "  %s %s inviting you in.",
+            Sprintf(eos(buf), _("  %s %s inviting you in."),
                     /* upstart() modifies its argument but vtense() doesn't
                        care whether or not that has already happened */
-                    upstart(pronounbuf), vtense(pronounbuf, "are"));
+                    upstart(pronounbuf), vtense(pronounbuf, _("are")));
         }
         urgent_pline(_("%s"), buf);
     }

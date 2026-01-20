@@ -976,8 +976,8 @@ hmon_hitmon_weapon_melee(
                for Yobjnam2() if an unseen mon other than the shopkeeper
                is wielding a shop-owned weapon; telepathy or extended
                monster detection will name mon but not its weapon */
-            Sprintf(buf, "%s weapon%s %s", s_suffix(Monnam(mon)),
-                    plur(monwep->quan), otense(monwep, "shatter"));
+            Sprintf(buf, _("%s weapon%s %s"), s_suffix(Monnam(mon)),
+                    plur(monwep->quan), otense(monwep, _("shatter")));
         buf[sizeof buf - sizeof from_your_blow] = '\0';
         pline(_("%s%s"), buf, from_your_blow);
         m_useupall(mon, monwep);
@@ -6211,7 +6211,7 @@ that_is_a_mimic(
                         ? simpleonames(otmp) : _("strange object");
             Snprintf(fmtbuf, sizeof fmtbuf, _("%s %s %s %%s!"),
                      (otmp && is_plural(otmp)) ? _("Those") : _("That"),
-                     otmp_name, otmp ? otense(otmp, "are") : _("is"));
+                     otmp_name, otmp ? otense(otmp, _("are")) : _("is"));
             if (fakeobj && otmp) {
                 otmp->where = OBJ_FREE; /* object_from_map set to OBJ_FLOOR */
                 dealloc_obj(otmp);
