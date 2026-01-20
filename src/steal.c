@@ -323,9 +323,9 @@ worn_item_removal(
     /* slightly iffy for alternate weapon that isn't actively dual-wielded,
        but it's better to alert the player to the change in equipment than
        to suppress the message for that case */
-    verb = ((obj->owornmask & W_WEAPONS) != 0L) ? "disarms"
-           : ((obj->owornmask & W_ACCESSORY) != 0L) ? "removes"
-             : "takes off";
+    verb = ((obj->owornmask & W_WEAPONS) != 0L) ? _("disarms")
+           : ((obj->owornmask & W_ACCESSORY) != 0L) ? _("removes")
+             : _("takes off");
     pline(_("%s %s %s."), Some_Monnam(mon), verb, objbuf);
     iflags.last_msg = PLNMSG_MON_TAKES_OFF_ITEM;
     /* removal might trigger more messages (due to loss of Lev|Fly;
@@ -530,19 +530,19 @@ steal(struct monst *mtmp, char *objnambuf)
                 slowly = (armordelay >= 1 || gm.multi < 0);
                 if (flags.female)
                     urgent_pline(_("%s charms you.  You gladly %s your %s."),
-                                 !seen ? "She" : Monnambuf,
-                                 curssv ? "let her take"
-                                 : !slowly ? "hand over"
-                                   : was_doffing ? "continue removing"
-                                     : "start removing",
+                                 !seen ? _("She") : Monnambuf,
+                                 curssv ? _("let her take")
+                                 : !slowly ? _("hand over")
+                                   : was_doffing ? _("continue removing")
+                                     : _("start removing"),
                                  armor_simple_name(otmp));
                 else
                     urgent_pline(_("%s seduces you and %s off your %s."),
-                                 !seen ? "She" : Adjmonnam(mtmp, "beautiful"),
-                                 curssv ? "helps you to take"
-                                 : !slowly ? "you take"
-                                   : was_doffing ? "you continue taking"
-                                     : "you start taking",
+                                 !seen ? _("She") : Adjmonnam(mtmp, _("beautiful")),
+                                 curssv ? _("helps you to take")
+                                 : !slowly ? _("you take")
+                                   : was_doffing ? _("you continue taking")
+                                     : _("you start taking"),
                                  armor_simple_name(otmp));
                 named++;
                 /* the following is to set multi for later on */

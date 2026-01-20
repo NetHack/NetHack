@@ -500,8 +500,8 @@ study_book(struct obj *spellbook)
            svc.context.spbook.book become erased somehow, resume reading it */
         && booktype != SPE_BLANK_PAPER) {
         You(_("continue your efforts to %s."),
-            (booktype == SPE_NOVEL) ? "read the novel"
-                                    : "memorize the spell");
+            (booktype == SPE_NOVEL) ? _("read the novel")
+                                    : _("memorize the spell"));
     } else {
         /* KMH -- Simplified this code */
         if (booktype == SPE_BLANK_PAPER) {
@@ -1151,16 +1151,16 @@ cast_protection(void)
 
                 rmtyp = levl[u.ux][u.uy].typ;
                 atmosphere = (pm && u.uswallow)
-                                ? ((pm == &mons[PM_FOG_CLOUD]) ? "mist"
-                                   : is_whirly(pm) ? "maelstrom"
-                                     : enfolds(pm) ? "folds"
-                                       : is_animal(pm) ? "maw"
-                                         : "ooze")
-                                : (u.uinwater ? hliquid("water")
-                                   : (rmtyp == CLOUD) ? "cloud"
-                                     : IS_TREE(rmtyp) ? "vegetation"
-                                       : IS_STWALL(rmtyp) ? "stone"
-                                         : "air");
+                                ? ((pm == &mons[PM_FOG_CLOUD]) ? _("mist")
+                                   : is_whirly(pm) ? _("maelstrom")
+                                     : enfolds(pm) ? _("folds")
+                                       : is_animal(pm) ? _("maw")
+                                         : _("ooze"))
+                                : (u.uinwater ? hliquid(_("water"))
+                                   : (rmtyp == CLOUD) ? _("cloud")
+                                     : IS_TREE(rmtyp) ? _("vegetation")
+                                       : IS_STWALL(rmtyp) ? _("stone")
+                                         : _("air"));
                 pline_The(_("%s around you begins to shimmer with %s haze."),
                           atmosphere, an(hgolden));
             }

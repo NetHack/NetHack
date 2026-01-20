@@ -313,34 +313,34 @@ explode(
 
         switch (abs(type) % 10) {
         case 0:
-            adstr = "magical blast";
+            adstr = _("magical blast");
             adtyp = AD_MAGM;
             break;
         case 1:
-            adstr = (olet == BURNING_OIL) ? "burning oil"
-                     : (olet == SCROLL_CLASS) ? "tower of flame" : "fireball";
+            adstr = (olet == BURNING_OIL) ? _("burning oil")
+                     : (olet == SCROLL_CLASS) ? _("tower of flame") : _("fireball");
             /* fire damage, not physical damage */
             adtyp = AD_FIRE;
             break;
         case 2:
-            adstr = "ball of cold";
+            adstr = _("ball of cold");
             adtyp = AD_COLD;
             break;
         case 4:
-            adstr = (olet == WAND_CLASS) ? "death field"
-                                         : "disintegration field";
+            adstr = (olet == WAND_CLASS) ? _("death field")
+                                         : _("disintegration field");
             adtyp = AD_DISN;
             break;
         case 5:
-            adstr = "ball of lightning";
+            adstr = _("ball of lightning");
             adtyp = AD_ELEC;
             break;
         case 6:
-            adstr = "poison gas cloud";
+            adstr = _("poison gas cloud");
             adtyp = AD_DRST;
             break;
         case 7:
-            adstr = "splash of acid";
+            adstr = _("splash of acid");
             adtyp = AD_ACID;
             break;
         default:
@@ -570,9 +570,9 @@ explode(
                          */
                         if (cansee(mtmp->mx, mtmp->my) || canspotmon(mtmp))
                             pline(_("%s is %s!"), Monnam(mtmp),
-                                  xkflg ? "burned completely"
-                                        : nonliving(mtmp->data) ? "destroyed"
-                                                                : "killed");
+                                  xkflg ? _("burned completely")
+                                        : nonliving(mtmp->data) ? _("destroyed")
+                                                                : _("killed"));
                         xkilled(mtmp, XKILL_NOMSG | XKILL_NOCONDUCT | xkflg);
                     } else {
                         if (xkflg)
@@ -679,10 +679,10 @@ explode(
     }
 
     if (shopdamage) {
-        pay_for_damage((adtyp == AD_FIRE) ? "burn away"
-                          : (adtyp == AD_COLD) ? "shatter"
-                             : (adtyp == AD_DISN) ? "disintegrate"
-                                : "destroy",
+        pay_for_damage((adtyp == AD_FIRE) ? _("burn away")
+                          : (adtyp == AD_COLD) ? _("shatter")
+                             : (adtyp == AD_DISN) ? _("disintegrate")
+                                : _("destroy"),
                        FALSE);
     }
 

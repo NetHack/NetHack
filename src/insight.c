@@ -1745,12 +1745,12 @@ attributes_enlightenment(
     if (u.uhitinc) {
         (void) enlght_combatinc("to hit", u.uhitinc, final, buf);
         if (iflags.tux_penalty && !Upolyd)
-            Sprintf(eos(buf), " %s your suit's penalty",
-                    (u.uhitinc < 0) ? "increasing"
+            Sprintf(eos(buf), _(" %s your suit's penalty"),
+                    (u.uhitinc < 0) ? _("increasing")
                     : (u.uhitinc < 4 * gu.urole.spelarmr / 5)
-                      ? "partly offsetting"
-                      : (u.uhitinc < gu.urole.spelarmr) ? "nearly offsetting"
-                        : "overcoming");
+                      ? _("partly offsetting")
+                      : (u.uhitinc < gu.urole.spelarmr) ? _("nearly offsetting")
+                        : _("overcoming"));
         you_have(buf, "");
     }
     if (u.udaminc)

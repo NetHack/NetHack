@@ -1475,7 +1475,7 @@ trapeffect_sqky_board(
             }
             You_hear(_("%s squeak %s."), trapnote(trap, FALSE),
                      (mdistu(mtmp) <= range * range)
-                        ? "nearby" : "in the distance");
+                        ? _("nearby") : _("in the distance"));
         }
         /* wake up nearby monsters */
         wake_nearto(mtmp->mx, mtmp->my, 40);
@@ -2703,7 +2703,7 @@ trapeffect_vibrating_square(
                    for 'nearby') */
                 You_see(_("the ground vibrate %s."),
                         (mdistu(mtmp) <= 2 * 2)
-                           ? "nearby" : "in the distance");
+                           ? _("nearby") : _("in the distance"));
             }
         }
     }
@@ -3689,7 +3689,7 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
                     set_msg_xy(mtmp->mx, mtmp->my);
                     if (is_pit(trap->ttyp))
                         pline(_("%s climbs %sout of the pit."), Monnam(mtmp),
-                              m_easy_escape_pit(mtmp) ? "easily " : "");
+                              m_easy_escape_pit(mtmp) ? _("easily ") : "");
                     else if (trap->ttyp == BEAR_TRAP || trap->ttyp == WEB)
                         pline(_("%s pulls free of the %s."), Monnam(mtmp),
                               trapname(trap->ttyp, FALSE));
@@ -3969,11 +3969,11 @@ float_down(
         float_vs_flight();
         if (trapped && u.utrap) /* u.utrap => paranoia */
             You(_("are no longer trying to float up from the %s."),
-                (u.utraptype == TT_BEARTRAP) ? "trap's jaws"
-                  : (u.utraptype == TT_WEB) ? "web"
-                      : (u.utraptype == TT_BURIEDBALL) ? "chain"
-                          : (u.utraptype == TT_LAVA) ? "lava"
-                              : "ground"); /* TT_INFLOOR */
+                (u.utraptype == TT_BEARTRAP) ? _("trap's jaws")
+                  : (u.utraptype == TT_WEB) ? _("web")
+                      : (u.utraptype == TT_BURIEDBALL) ? _("chain")
+                          : (u.utraptype == TT_LAVA) ? _("lava")
+                              : _("ground")); /* TT_INFLOOR */
         encumber_msg(); /* carrying capacity might have changed */
         return 0;
     }
@@ -4150,8 +4150,8 @@ climb_pit(void)
             Norep(_("%s is still in a pit."), YMonnam(u.usteed));
         else
             Norep((Hallucination && !rn2(5))
-                      ? "You've fallen, and you can't get up."
-                      : "You are still in a pit.");
+                      ? _("You've fallen, and you can't get up.")
+                      : _("You are still in a pit."));
     }
 }
 
@@ -5609,7 +5609,7 @@ try_lift(
 {
     if (calc_capacity(xtra_wt) >= HVY_ENCUMBER) {
         pline(_("%s is %s for you to lift."), Monnam(mtmp),
-              stuff ? "carrying too much" : "too heavy");
+              stuff ? _("carrying too much") : _("too heavy"));
         if (!ttmp->madeby_u && !mtmp->mpeaceful && mtmp->mcanmove
             && !mindless(mtmp->data) && mtmp->data->mlet != S_HUMAN
             && rnl(10) < 3) {

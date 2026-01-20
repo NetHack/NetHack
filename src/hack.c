@@ -278,7 +278,7 @@ cannot_push(struct obj *otmp, coordxy sx, coordxy sy)
 
         if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
             You(_("aren't skilled enough to %s %s from %s."),
-                willpickup ? "pick up" : "push aside",
+                willpickup ? _("pick up") : _("push aside"),
                 the(xname(otmp)), y_monnam(u.usteed));
         } else {
             /*
@@ -288,10 +288,10 @@ cannot_push(struct obj *otmp, coordxy sx, coordxy sy)
              *     by feedback from failed auto-pickup attempt)
              */
             pline(_("However, you %s%s."),
-                  willpickup ? "easily pick it up"
-                             : "maneuver over it",
+                  willpickup ? _("easily pick it up")
+                             : _("maneuver over it"),
                   (canpickup && !willpickup)
-                             ? " and could pick it up"
+                             ? _(" and could pick it up")
                              : "");
             /* similar to dropping everything and squeezing onto
                a Sokoban boulder's spot, moving to same breaks the
@@ -517,13 +517,13 @@ moverock_core(coordxy sx, coordxy sy)
                                  "kablooey", rather cartoonish descriptions
                                  of the sound of an explosion, but give it
                                  even when deaf if hero sees the explosion */
-                              (!Deaf || !Blind) ? "KAABLAMM!!"
+                              (!Deaf || !Blind) ? _("KAABLAMM!!")
                               /* use an alternate exclamation when feeling
                                  the floor/ground/whatever shake (or maybe
                                  a weak shockwave if levitating or flying) */
-                                                : "Gadzooks",
+                                                : _("Gadzooks"),
                               Tobjnam(otmp, "trigger"),
-                              ttmp->madeby_u ? "your" : "a");
+                              ttmp->madeby_u ? _("your") : _("a"));
                         blow_up_landmine(ttmp);
                         /* if the boulder remains, it should fill the pit */
                         fill_pit(u.ux, u.uy);
@@ -645,10 +645,10 @@ still_chewing(coordxy x, coordxy y)
             || (lev->typ == IRONBARS && (lev->wall_info & W_NONDIGGABLE)))) {
         You(_("hurt your teeth on the %s."),
             (lev->typ == IRONBARS)
-                ? "bars"
+                ? _("bars")
                 : IS_TREE(lev->typ)
-                    ? "tree"
-                    : "hard stone");
+                    ? _("tree")
+                    : _("hard stone"));
         nomul(0);
         return 1;
     } else if (lev->typ == IRONBARS
@@ -688,16 +688,16 @@ still_chewing(coordxy x, coordxy y)
     } else if ((svc.context.digging.effort += (30 + u.udaminc)) <= 100) {
         if (flags.verbose)
             You(_("%s chewing on the %s."),
-                svc.context.digging.chew ? "continue" : "begin",
+                svc.context.digging.chew ? _("continue") : _("begin"),
                 boulder
-                    ? "boulder"
+                    ? _("boulder")
                     : IS_TREE(lev->typ)
-                        ? "tree"
+                        ? _("tree")
                         : IS_OBSTRUCTED(lev->typ)
-                            ? "rock"
+                            ? _("rock")
                             : (lev->typ == IRONBARS)
-                                ? "bars"
-                                : "door");
+                                ? _("bars")
+                                : _("door"));
         svc.context.digging.chew = TRUE;
         watch_dig((struct monst *) 0, x, y, FALSE);
         return 1;
@@ -706,12 +706,12 @@ still_chewing(coordxy x, coordxy y)
     /* Okay, you've chewed through something */
     if (!u.uconduct.food++)
         livelog_printf(LL_CONDUCT,
-                       "ate for the first time, by chewing through %s",
-                       boulder ? "a boulder"
-                       : IS_TREE(lev->typ) ? "a tree"
-                         : IS_OBSTRUCTED(lev->typ) ? "rock"
-                           : (lev->typ == IRONBARS) ? "iron bars"
-                             : "a door");
+                       _("ate for the first time, by chewing through %s"),
+                       boulder ? _("a boulder")
+                       : IS_TREE(lev->typ) ? _("a tree")
+                         : IS_OBSTRUCTED(lev->typ) ? _("rock")
+                           : (lev->typ == IRONBARS) ? _("iron bars")
+                             : _("a door"));
     u.uhunger += rnd(20);
 
     if (boulder) {
@@ -764,15 +764,15 @@ still_chewing(coordxy x, coordxy y)
             morehungry(-nut);
         }
         digtxt = u_at(x, y)
-                 ? "devour the iron bars."
-                 : "eat through the bars.";
+                 ? _("devour the iron bars.")
+                 : _("eat through the bars.");
         dissolve_bars(x, y);
     } else if (lev->typ == SDOOR) {
         if (lev->doormask & D_TRAPPED) {
             lev->doormask = D_NODOOR;
-            b_trapped("secret door", NO_PART);
+            b_trapped(_("secret door"), NO_PART);
         } else {
-            digtxt = "chew through the secret door.";
+            digtxt = _("chew through the secret door.");
             lev->doormask = D_BROKEN;
         }
         lev->typ = DOOR;
@@ -1656,10 +1656,10 @@ trapmove(
  wriggle_free:
             if (u.usteed)
                 pline(_("%s finally %s free."), upstart(steedname),
-                      !anchored ? "lurches" : "wrenches the ball");
+                      !anchored ? _("lurches") : _("wrenches the ball"));
             else
                 You(_("finally %s free."),
-                    !anchored ? "wriggle" : "wrench the ball");
+                    !anchored ? _("wriggle") : _("wrench the ball"));
             if (anchored)
                 buried_ball_to_punishment();
         }
@@ -2061,12 +2061,12 @@ domove_fight_web(coordxy x, coordxy y)
                            + (uwep ? uwep->spe + wskill_minus_2 : 0))) {
             /* TODO: add failures, maybe make an occupation? */
             You(_("%s ineffectually at some of the strands."),
-                uwep ? "hack" : "thrash");
+                uwep ? _("hack") : _("thrash"));
             return TRUE;
 
         /* hit has succeeded */
         } else {
-            You(_("%s through the web."), uwep ? "cut" : "punch");
+            You(_("%s through the web."), uwep ? _("cut") : _("punch"));
             /* doesn't break "never hit with a wielded weapon" conduct */
             use_skill(wtype, 1);
         }
@@ -2292,8 +2292,8 @@ domove_fight_empty(coordxy x, coordxy y)
                assume he can't reach out far enough to distinguish terrain */
             Sprintf(buf, "%s",
                     (Is_waterlevel(&u.uz) && levl[x][y].typ == AIR)
-                         ? "an air bubble"
-                         : "nothing");
+                         ? _("an air bubble")
+                         : _("nothing"));
         } else if (solid) {
             /* glyph might indicate unseen terrain if hero is blind;
                unlike searching, this won't reveal what that terrain is;
@@ -2481,7 +2481,7 @@ avoid_moving_on_liquid(
         if (msg && flags.mention_walls) {
             set_msg_xy(x, y);
             You(_("stop at the edge of the %s."),
-                hliquid(is_pool(x,y) ? "water" : "lava"));
+                hliquid(is_pool(x,y) ? _("water") : _("lava")));
         }
         return TRUE;
     }
@@ -2538,9 +2538,9 @@ avoid_trap_andor_region(coordxy x, coordxy y)
         /* we don't override confirmation for poison resistance since the
            region also hinders hero's vision even if/when no damage is done */
     ) {
-        Snprintf(qbuf, sizeof qbuf, "%s into that %s cloud?",
-                 u_locomotion("step"),
-                 (reg_damg(newreg) > 0) ? "poison gas" : "vapor");
+        Snprintf(qbuf, sizeof qbuf, _("%s into that %s cloud?"),
+                 u_locomotion(_("step")),
+                 (reg_damg(newreg) > 0) ? _("poison gas") : _("vapor"));
         if (!paranoid_query(ParanoidConfirm, upstart(qbuf))) {
             nomul(0);
             svc.context.move = 0;

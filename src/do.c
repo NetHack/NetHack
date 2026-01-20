@@ -1791,14 +1791,14 @@ goto_level(
                     dismount_steed(DISMOUNT_FELL);
                 else
                     losehp(Maybe_Half_Phys(rnd(3)),
-                           ga.at_ladder ? "falling off a ladder"
-                                     : "tumbling down a flight of stairs",
+                           ga.at_ladder ? _("falling off a ladder")
+                                     : _("tumbling down a flight of stairs"),
                            KILLED_BY);
                 selftouch(_("Falling, you"));
             } else { /* ordinary descent */
                 if (flags.verbose)
-                    You(_("%s."), ga.at_ladder ? "climb down the ladder"
-                                         : "descend the stairs");
+                    You(_("%s."), ga.at_ladder ? _("climb down the ladder")
+                                         : _("descend the stairs"));
             }
         }
     } else { /* trap door or level_tele or In_endgame */

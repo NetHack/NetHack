@@ -614,9 +614,9 @@ mind_blast(struct monst *mtmp)
                 newsym(u.ux, u.uy);
             }
             pline(_("It locks on to your %s!"),
-                    m_sen ? "telepathy"
-                    : Blind_telepat ? "latent telepathy"
-                    : "mind"); /* note: hero is never mindless */
+                    m_sen ? _("telepathy")
+                    : Blind_telepat ? _("latent telepathy")
+                    : _("mind")); /* note: hero is never mindless */
             dmg = rnd(15);
             if (Half_spell_damage)
                 dmg = (dmg + 1) / 2;

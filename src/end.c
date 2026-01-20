@@ -415,10 +415,10 @@ panic VA_DECL(const char *, str)
     }
 
     raw_print(program_state.gameover
-                  ? "Postgame wrapup disrupted."
+                  ? _("Postgame wrapup disrupted.")
                   : !program_state.something_worth_saving
-                        ? "Program initialization has failed."
-                        : "Suddenly, the dungeon collapses.");
+                        ? _("Program initialization has failed.")
+                        : _("Suddenly, the dungeon collapses."));
 #ifndef MICRO
 #ifdef NOTIFY_NETHACK_BUGS
     if (!wizard)

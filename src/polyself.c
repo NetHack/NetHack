@@ -1767,12 +1767,12 @@ dohide(void)
        (except for floor hiders [trapper or mimic] in pits) */
     if (u.ustuck || (u.utrap && (u.utraptype != TT_PIT || on_ceiling))) {
         You_cant(_("hide while you're %s."),
-                 !u.ustuck ? "trapped"
-                   : u.uswallow ? (digests(u.ustuck->data) ? "swallowed"
-                                                           : "engulfed")
-                     : !sticks(gy.youmonst.data) ? "being held"
-                       : (humanoid(u.ustuck->data) ? "holding someone"
-                                                   : "holding that creature"));
+                 !u.ustuck ? _("trapped")
+                   : u.uswallow ? (digests(u.ustuck->data) ? _("swallowed")
+                                                           : _("engulfed"))
+                     : !sticks(gy.youmonst.data) ? _("being held")
+                       : (humanoid(u.ustuck->data) ? _("holding someone")
+                                                   : _("holding that creature")));
         if (u.uundetected || (ismimic && U_AP_TYPE != M_AP_NOTHING)) {
             u.uundetected = 0;
             gy.youmonst.m_ap_type = M_AP_NOTHING;
@@ -1910,9 +1910,9 @@ domindblast(void)
                would avoid the penalty for killing it while peaceful */
             wakeup(mtmp, (dmg > mtmp->mhp) ? TRUE : FALSE);
             You(_("lock in on %s %s."), s_suffix(mon_nam(mtmp)),
-                u_sen ? "telepathy"
-                : telepathic(mtmp->data) ? "latent telepathy"
-                  : "mind");
+                u_sen ? _("telepathy")
+                : telepathic(mtmp->data) ? _("latent telepathy")
+                  : _("mind"));
             mtmp->mhp -= dmg;
             if (DEADMONSTER(mtmp))
                 killed(mtmp);

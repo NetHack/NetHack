@@ -265,7 +265,7 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
         && mon->data->mmove >= 12) {
         if (!nohands(mon->data) && !rn2(martial() ? 5 : 3)) {
             pline(_("%s blocks your %skick."), Monnam(mon),
-                  clumsy ? "clumsy " : "");
+                  clumsy ? _("clumsy ") : "");
             (void) passive(mon, uarmf, FALSE, 1, AT_KICK, FALSE);
             return;
         } else {
@@ -323,7 +323,7 @@ ghitm(struct monst *mtmp, struct obj *gold)
         /* greedy monsters catch gold */
         if (cansee(mtmp->mx, mtmp->my))
             pline(_("%s %scatches the gold."), Monnam(mtmp),
-                  was_sleeping ? "awakens and " : "");
+                  was_sleeping ? _("awakens and ") : "");
         (void) mpickobj(mtmp, gold);
         gold = (struct obj *) 0; /* obj has been freed */
         if (mtmp->isshk) {
@@ -334,7 +334,7 @@ ghitm(struct monst *mtmp, struct obj *gold)
                 if (robbed < 0L)
                     robbed = 0L;
                 pline_The(_("amount %scovers %s recent losses."),
-                          !robbed ? "" : "partially ", mhis(mtmp));
+                          !robbed ? "" : _("partially "), mhis(mtmp));
                 ESHK(mtmp)->robbed = robbed;
                 if (!robbed)
                     make_happy_shk(mtmp, FALSE);
@@ -1450,7 +1450,7 @@ dokick(void)
     if ((is_pool(x, y) || gm.maploc->typ == LAVAWALL) ^ !!u.uinwater) {
         /* objects normally can't be removed from water by kicking */
         You(_("splash some %s around."),
-            hliquid(is_pool(x, y) ? "water" : "lava"));
+            hliquid(is_pool(x, y) ? _("water") : _("lava")));
         /* pretend the kick is fast enough for lava not to burn */
         return ECMD_TIME;
     }
@@ -1599,11 +1599,11 @@ impact_drop(
     }
 
     if (dct && cansee(x, y)) { /* at least one object fell */
-        const char *what = (dct == 1L ? "object falls" : "objects fall");
+        const char *what = (dct == 1L ? _("object falls") : _("objects fall"));
 
         if (missile)
             pline(_("From the impact, %sother %s."),
-                  dct == oct ? "the " : dct == 1L ? "an" : "", what);
+                  dct == oct ? _("the ") : dct == 1L ? _("an") : "", what);
         else if (oct == dct)
             pline(_("%s adjacent %s %s."), dct == 1L ? _("The") : _("All the"), what,
                   gg.gate_str);

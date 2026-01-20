@@ -555,8 +555,8 @@ done_eating(boolean message)
         gn.nomovemsg = 0;
     } else if (message) {
         You(_("finish %s %s."),
-            (gy.youmonst.data == &mons[PM_FIRE_ELEMENTAL]) ? "consuming"
-            : "eating",
+            (gy.youmonst.data == &mons[PM_FIRE_ELEMENTAL]) ? _("consuming")
+            : _("eating"),
             food_xname(piece, TRUE));
     }
 
@@ -1258,8 +1258,8 @@ cpostfx(int pm)
             }
 
             You(_("%s."), (pm == PM_GENETIC_ENGINEER)
-                          ? "undergo a freakish metamorphosis"
-                          : "feel a change coming over you");
+                          ? _("undergo a freakish metamorphosis")
+                          : _("feel a change coming over you"));
             polyself(POLY_NOFLAGS);
         }
         break;
@@ -1828,12 +1828,12 @@ rottenfood(struct obj *obj)
         int duration = rnd(10);
 
         if (!Blind)
-            what = "goes", where = "dark";
+            what = _("goes"), where = _("dark");
         else if (Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))
-            what = "you lose control of", where = "yourself";
+            what = _("you lose control of"), where = _("yourself");
         else
-            what = "you slap against the",
-            where = (u.usteed) ? "saddle" : surface(u.ux, u.uy);
+            what = _("you slap against the"),
+            where = (u.usteed) ? _("saddle") : surface(u.ux, u.uy);
         pline_The(_("world spins and %s %s."), what, where);
         incr_itimeout(&HDeaf, duration);
         disp.botl = TRUE;
@@ -1893,10 +1893,10 @@ eatcorpse(struct obj *otmp)
 
         /* tp++; -- early return makes this unnecessary */
         pline(_("Ulch - that %s was tainted%s!"),
-              (mons[mnum].mlet == S_FUNGUS) ? "fungoid vegetation"
-              : vegetarian(&mons[mnum]) ? "protoplasm"
-                : "meat",
-              cannibal ? ", you cannibal" : "");
+              (mons[mnum].mlet == S_FUNGUS) ? _("fungoid vegetation")
+              : vegetarian(&mons[mnum]) ? _("protoplasm")
+                : _("meat"),
+              cannibal ? _(", you cannibal") : "");
         if (Sick_resistance) {
             pline(_("It doesn't seem at all sickening, though..."));
         } else {
@@ -1906,7 +1906,7 @@ eatcorpse(struct obj *otmp)
             /* make sure new ill doesn't result in improvement */
             if (Sick && (sick_time > Sick))
                 sick_time = (Sick > 1L) ? Sick - 1L : 1L;
-            make_sick(sick_time, corpse_xname(otmp, "rotted", CXN_NORMAL),
+            make_sick(sick_time, corpse_xname(otmp, _("rotted"), CXN_NORMAL),
                       TRUE, SICK_VOMITABLE);
 
             pline(_("(It must have died too long ago to be safe to eat.)"));
@@ -1919,14 +1919,14 @@ eatcorpse(struct obj *otmp)
     } else if (acidic(&mons[mnum]) && !Acid_resistance) {
         tp++;
         You(_("have a very bad case of stomach acid."));   /* not body_part() */
-        losehp(rnd(15), !glob ? "acidic corpse" : "acidic glob",
+        losehp(rnd(15), !glob ? _("acidic corpse") : _("acidic glob"),
                KILLED_BY_AN); /* acid damage */
     } else if (poisonous(&mons[mnum]) && rn2(5)) {
         tp++;
         pline(_("Ecch - that must have been poisonous!"));
         if (!Poison_resistance) {
             poison_strdmg(rnd(4), rnd(15),
-                          !glob ? "poisonous corpse" : "poisonous glob",
+                          !glob ? _("poisonous corpse") : _("poisonous glob"),
                           KILLED_BY_AN);
         } else
             You(_("seem unaffected by the poison."));
@@ -1935,7 +1935,7 @@ eatcorpse(struct obj *otmp)
     } else if ((rotted > 5L || (rotted > 3L && rn2(5))) && !Sick_resistance) {
         tp++;
         You_feel(_("%ssick."), (Sick) ? _("very ") : "");
-        losehp(rnd(8), !glob ? "cadaver" : "rotted glob", KILLED_BY_AN);
+        losehp(rnd(8), !glob ? _("cadaver") : _("rotted glob"), KILLED_BY_AN);
     }
 
     /* delay is weight dependent */

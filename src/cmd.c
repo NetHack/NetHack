@@ -951,15 +951,15 @@ enter_explore_mode(void)
     if (discover) {
         You(_("are already in explore mode."));
     } else {
-        const char *oldmode = !wizard ? "normal game" : "debug mode";
+        const char *oldmode = !wizard ? _("normal game") : _("debug mode");
 
         if (!authorize_explore_mode()) {
             if (!wizard) {
                 You(_("cannot access explore mode."));
                 return ECMD_OK;
             } else {
-                pline(
-                 "Note: normally you wouldn't be allowed into explore mode.");
+                pline(_(
+                 "Note: normally you wouldn't be allowed into explore mode."));
                 /* keep going */
             }
         }
@@ -3872,7 +3872,7 @@ getdir(const char *s)
                 did_help = help_dir((s && *s == '^') ? dirsym : '\0',
                                     gc.Cmd.spkeys[NHKF_ESC],
                                     help_requested ? (const char *) 0
-                                    : "Invalid direction key!");
+                                    : _("Invalid direction key!"));
                 if (help_requested)
                     goto retry;
             }
@@ -4044,12 +4044,12 @@ help_dir(
            given but we include up and down for 'm'+invalid_direction;
            self is excluded as a viable direction for every prefix */
         putstr(win, 0, "");
-        putstr(win, 0, "          <  up");
-        putstr(win, 0, "          >  down");
+        putstr(win, 0, _("          <  up"));
+        putstr(win, 0, _("          >  down"));
         if (!prefixhandling) {
             int selfi = gc.Cmd.num_pad ? NHKF_GETDIR_SELF2 : NHKF_GETDIR_SELF;
 
-            Sprintf(buf,   "       %4s  direct at yourself",
+            Sprintf(buf,   _("       %4s  direct at yourself"),
                     visctrl(gc.Cmd.spkeys[selfi]));
             putstr(win, 0, buf);
         }
@@ -4059,7 +4059,7 @@ help_dir(
         /* non-null msg means that this wasn't an explicit user request */
         putstr(win, 0, "");
         putstr(win, 0,
-               "(Suppress this message with !cmdassist in config file.)");
+               _("(Suppress this message with !cmdassist in config file.)"));
     }
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);

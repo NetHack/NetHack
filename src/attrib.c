@@ -945,11 +945,11 @@ from_what(
                 Strcpy(buf, " from your creature form");
             else if (propidx == FAST && Very_fast)
                 Sprintf(buf, because_of,
-                        ((HFast & TIMEOUT) != 0L) ? "a potion or spell"
+                        ((HFast & TIMEOUT) != 0L) ? _("a potion or spell")
                           : ((EFast & W_ARMF) != 0L && uarmf->dknown
                              && objects[uarmf->otyp].oc_name_known)
                               ? ysimple_name(uarmf) /* speed boots */
-                                : EFast ? "worn equipment"
+                                : EFast ? _("worn equipment")
                                   : something);
             else if (wizard
                      && (obj = what_gives(&u.uprops[propidx].extrinsic)) != 0)
@@ -1333,7 +1333,7 @@ uchangealign(
         if (!uarmh || uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT)
             u.ualign.type = u.ualignbase[A_CURRENT];
         You(_("have a %ssense of a new direction."),
-            (u.ualign.type != oldalign) ? "sudden " : "");
+            (u.ualign.type != oldalign) ? _("sudden ") : "");
     } else {
         /* putting on or taking off a helm of opposite alignment */
         u.ualign.type = (aligntyp) newalign;
@@ -1344,12 +1344,12 @@ uchangealign(
             if (Is_astralevel(&u.uz) || ((unsigned) rn2(50) < u.ualign.abuse))
                 summon_furies(Is_astralevel(&u.uz) ? 0 : 1);
             /* don't livelog taking it back off */
-            livelog_printf(LL_ALIGNMENT, "used a helm to turn %s",
+            livelog_printf(LL_ALIGNMENT, _("used a helm to turn %s"),
                            aligns[1 - newalign].adj);
         } else if (reason == A_CG_HELM_OFF) {
             Your(_("mind is %s."), Hallucination
-                                    ? "much of a muchness"
-                                    : "back in sync with your body");
+                                    ? _("much of a muchness")
+                                    : _("back in sync with your body"));
         }
     }
     if (u.ualign.type != oldalign) {

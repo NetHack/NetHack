@@ -782,10 +782,10 @@ xname_flags(
             Concat(buf, 0, "partly eaten ");
         }
         if (obj->globby) { /* 3.7 added "medium" to replace no-prefix */
-            ConcatF2(buf, 0, "%s %s", (obj->owt <= 100) ? "small"
-                                      : (obj->owt <= 300) ? "medium"
-                                        : (obj->owt <= 500) ? "large"
-                                          : "very large",
+            ConcatF2(buf, 0, "%s %s", (obj->owt <= 100) ? _("small")
+                                      : (obj->owt <= 300) ? _("medium")
+                                        : (obj->owt <= 500) ? _("large")
+                                          : _("very large"),
                      actualn);
             break;
         }

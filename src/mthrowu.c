@@ -397,7 +397,7 @@ ohitmon(
                 hit(distant_name(otmp, mshot_xname), mtmp, how);
             }
         } else if (verbose && !gm.mtarget)
-            pline(_("%s%s is hit%s"), (otmp->otyp == EGG) ? "Splat!  " : "",
+            pline(_("%s%s is hit%s"), (otmp->otyp == EGG) ? _("Splat!  ") : "",
                   Monnam(mtmp), exclam(damage));
 
         if (otmp->opoisoned && is_poisonable(otmp)) {
@@ -478,8 +478,8 @@ ohitmon(
                    "The {splash of venom,cream pie} hits <mon>."
                    "<Mon> is blinded by the {venom,pie}." */
                 pline(_("%s is blinded by %s."), Monnam(mtmp),
-                      the((otmp->oclass == VENOM_CLASS) ? "venom"
-                          : (otmp->otyp == CREAM_PIE) ? "pie"
+                      the((otmp->oclass == VENOM_CLASS) ? _("venom")
+                          : (otmp->otyp == CREAM_PIE) ? _("pie")
                             : xname(otmp))); /* catchall; not used */
             mtmp->mcansee = 0;
             tmp = (int) mtmp->mblinded + rnd(25) + 20;

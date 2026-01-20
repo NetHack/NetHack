@@ -350,10 +350,10 @@ priestname(
 
     if (mon->ispriest || aligned_priest) {
         if (high_priest)
-            Strcat(pname, do_hallu ? "grand " : "high ");
+            Strcat(pname, do_hallu ? _("grand ") : _("high "));
     } else {
         if (mon->mtame && !strcmpi(what, "Angel"))
-            Strcat(pname, "guardian ");
+            Strcat(pname, _("guardian "));
     }
 
     Strcat(pname, what);

@@ -3539,7 +3539,7 @@ sanity_check_worn(struct obj *obj)
             break;
         case W_SWAPWEP:
             if (obj != uswapwep)
-                what = u.twoweap ? "secondary weapon" : "alternate weapon";
+                what = u.twoweap ? _("secondary weapon") : _("alternate weapon");
             break;
         case W_AMUL:
             if (obj != uamul)

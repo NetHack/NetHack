@@ -250,8 +250,8 @@ mhidden_description(
                 goto objfrommap;
             Strcat(outbuf, something);
         } else if (is_hider(mon->data)) {
-            Sprintf(eos(outbuf), " on the %s",
-                    ceiling_hider(mon->data) ? "ceiling"
+            Sprintf(eos(outbuf), _(" on the %s"),
+                    ceiling_hider(mon->data) ? _("ceiling")
                        : surface(x, y)); /* trapper */
         } else {
             if (mon->data->mlet == S_EEL && is_pool(x, y))
@@ -1152,10 +1152,10 @@ add_cmap_descr(
         if (!strcmp(x_str, "water")) {
             /* duplicate some transformations performed by waterbody_name() */
             if (idx == S_pool)
-                x_str = "pool of water";
+                x_str = _("pool of water");
             else if (idx == S_water)
-                x_str = !Is_waterlevel(&u.uz) ? "wall of water"
-                                              : "limitless water";
+                x_str = !Is_waterlevel(&u.uz) ? _("wall of water")
+                                              : _("limitless water");
         }
         if (absidx == S_pool)
             idx = S_pool;

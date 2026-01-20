@@ -2667,8 +2667,8 @@ menu_identify(int id_limit)
     /* assumptions:  id_limit > 0 and at least one unID'd item is present */
 
     while (id_limit) {
-        Sprintf(buf, "What would you like to identify %s?",
-                first ? "first" : "next");
+        Sprintf(buf, _("What would you like to identify %s?"),
+                first ? _("first") : _("next"));
         n = query_objlist(buf, &gi.invent, (SIGNAL_NOMENU | SIGNAL_ESCAPE
                                            | USE_INVLET | INVORDER_SORT),
                           &pick_list, PICK_ANY, not_fully_identified);
@@ -4075,8 +4075,8 @@ dfeature_at(coordxy x, coordxy y, char *buf)
     else if (IS_SINK(ltyp))
         cmap = S_sink; /* "sink" */
     else if (IS_ALTAR(ltyp)) {
-        Sprintf(altbuf, "%saltar to %s (%s)",
-                (lev->altarmask & AM_SANCTUM) ? "high " : "",
+        Sprintf(altbuf, _("%saltar to %s (%s)"),
+                (lev->altarmask & AM_SANCTUM) ? _("high ") : "",
                 a_gname(),
                 align_str(Amask2align(lev->altarmask & ~AM_SHRINE)));
         dfeature = altbuf;
