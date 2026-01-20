@@ -3829,7 +3829,7 @@ int
 dotypeinv(void)
 {
     static const char
-        prompt[] = "What type of object do you want an inventory of?";
+        prompt[] = N_("What type of object do you want an inventory of?");
     char c = '\0';
     int n, i = 0;
     char *extra_types, types[BUFSZ], title[QBUFSZ];
@@ -3872,7 +3872,7 @@ dotypeinv(void)
             if (jcnt)
                 i |= JUSTPICKED;
             i |= INCLUDE_VENOM;
-            n = query_category(prompt, gi.invent, i, &pick_list, PICK_ONE);
+            n = query_category(_(prompt), gi.invent, i, &pick_list, PICK_ONE);
             if (!n)
                 goto doI_done;
             gt.this_type = c = pick_list[0].item.a_int;
@@ -5051,12 +5051,12 @@ adjust_split(void)
     }
     if (splitamount < 1L || splitamount >= obj->quan) {
         static const char
-            Amount[] = "Amount to split from current stack must be";
+            Amount[] = N_("Amount to split from current stack must be");
 
         if (splitamount < 1L)
-            pline(_("%s at least 1."), Amount);
+            pline(_("%s at least 1."), _(Amount));
         else
-            pline(_("%s less than %ld."), Amount, obj->quan);
+            pline(_("%s less than %ld."), _(Amount), obj->quan);
         return ECMD_CANCEL;
     }
 
@@ -5217,7 +5217,7 @@ doorganize_core(struct obj *obj)
             /* Merging: when from and to are compatible */
             if ((!otmpname || (objname && !strcmp(objname, otmpname)))
                 && merged(&otmp, &obj)) {
-                adj_type = "Merging:";
+                adj_type = _("Merging:");
                 obj = otmp;
                 otmp = otmp->nobj;
                 extract_nobj(obj, &gi.invent);
@@ -5227,7 +5227,7 @@ doorganize_core(struct obj *obj)
                Found 'otmp' in destination slot; merge if compatible,
                otherwise bump whatever is there to an open slot. */
             if (!splitting) {
-                adj_type = "Swapping:";
+                adj_type = _("Swapping:");
                 otmp->invlet = obj->invlet;
             } else {
                 /* strip 'from' name if it has one */
@@ -5244,7 +5244,7 @@ doorganize_core(struct obj *obj)
                 }
 
                 if (merged(&otmp, &obj)) {
-                    adj_type = "Splitting and merging:";
+                    adj_type = _("Splitting and merging:");
                     obj = otmp;
                     extract_nobj(obj, &gi.invent);
                 } else if (inv_cnt(FALSE) >= invlet_basic) {

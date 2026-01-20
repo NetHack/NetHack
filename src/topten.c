@@ -987,51 +987,51 @@ outentry(int rank, struct toptenentry *t1, boolean so)
             Strcat(linebuf, "quit");
             second_line = FALSE;
         } else if (!strncmp(t1->death, "died of st", 10)) {
-            Strcat(linebuf, "starved to death");
+            Strcat(linebuf, _("starved to death"));
             second_line = FALSE;
         } else if (!strncmp(t1->death, "choked", 6)) {
-            Sprintf(eos(linebuf), "choked on h%s food",
+            Sprintf(eos(linebuf), _("choked on h%s food"),
                     (t1->plgend[0] == 'F') ? "er" : "is");
         } else if (!strncmp(t1->death, "poisoned", 8)) {
-            Strcat(linebuf, "was poisoned");
+            Strcat(linebuf, _("was poisoned"));
         } else if (!strncmp(t1->death, "crushed", 7)) {
-            Strcat(linebuf, "was crushed to death");
+            Strcat(linebuf, _("was crushed to death"));
         } else if (!strncmp(t1->death, "petrified by ", 13)) {
-            Strcat(linebuf, "turned to stone");
+            Strcat(linebuf, _("turned to stone"));
         } else
-            Strcat(linebuf, "died");
+            Strcat(linebuf, _("died"));
 
         if (t1->deathdnum == astral_level.dnum) {
-            const char *arg, *fmt = " on the Plane of %s";
+            const char *arg, *fmt = _(" on the Plane of %s");
 
             switch (t1->deathlev) {
             case -5:
-                fmt = " on the %s Plane";
-                arg = "Astral";
+                fmt = _(" on the %s Plane");
+                arg = _("Astral");
                 break;
             case -4:
-                arg = "Water";
+                arg = _("Water");
                 break;
             case -3:
-                arg = "Fire";
+                arg = _("Fire");
                 break;
             case -2:
-                arg = "Air";
+                arg = _("Air");
                 break;
             case -1:
-                arg = "Earth";
+                arg = _("Earth");
                 break;
             default:
-                arg = "Void";
+                arg = _("Void");
                 break;
             }
             Sprintf(eos(linebuf), fmt, arg);
         } else {
-            Sprintf(eos(linebuf), " in %s", svd.dungeons[t1->deathdnum].dname);
+            Sprintf(eos(linebuf), _(" in %s"), svd.dungeons[t1->deathdnum].dname);
             if (t1->deathdnum != knox_level.dnum)
-                Sprintf(eos(linebuf), " on level %d", t1->deathlev);
+                Sprintf(eos(linebuf), _(" on level %d"), t1->deathlev);
             if (t1->deathlev != t1->maxlvl)
-                Sprintf(eos(linebuf), " [max %d]", t1->maxlvl);
+                Sprintf(eos(linebuf), _(" [max %d]"), t1->maxlvl);
         }
 
         /* kludge for "quit while already on Charon's boat" */

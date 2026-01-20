@@ -1090,26 +1090,26 @@ skill_level_name(int skill, char *buf)
 
     switch (P_SKILL(skill)) {
     case P_UNSKILLED:
-        ptr = "Unskilled";
+        ptr = _("Unskilled");
         break;
     case P_BASIC:
-        ptr = "Basic";
+        ptr = _("Basic");
         break;
     case P_SKILLED:
-        ptr = "Skilled";
+        ptr = _("Skilled");
         break;
     case P_EXPERT:
-        ptr = "Expert";
+        ptr = _("Expert");
         break;
     /* these are for unarmed combat/martial arts only */
     case P_MASTER:
-        ptr = "Master";
+        ptr = _("Master");
         break;
     case P_GRAND_MASTER:
-        ptr = "Grand Master";
+        ptr = _("Grand Master");
         break;
     default:
-        ptr = "Unknown";
+        ptr = _("Unknown");
         break;
     }
     Strcpy(buf, ptr);
