@@ -2300,7 +2300,7 @@ eataccessory(struct obj *otmp)
                     && !Blind) {
                     newsym(u.ux, u.uy);
                     Your(_("body takes on a %s transparency..."),
-                         Hallucination ? "normal" : "strange");
+                         Hallucination ? _("normal") : _("strange"));
                     makeknown(typ);
                 }
                 break;

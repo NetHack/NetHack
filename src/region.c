@@ -987,8 +987,8 @@ enter_force_field(genericptr_t p1, genericptr_t p2)
     if (p2 == (genericptr_t) 0) { /* That means the player */
         if (!Blind)
             You(_("bump into %s.  Ouch!"),
-                Hallucination ? "an invisible tree"
-                              : "some kind of invisible wall");
+                Hallucination ? _("an invisible tree")
+                              : _("some kind of invisible wall"));
         else
             pline(_("Ouch!"));
     } else {
@@ -1199,7 +1199,7 @@ make_gas_cloud(
             /* FIXME: "steam" is wrong if this cloud is just the trail of
                a fog cloud's movement; changing to "vapor" would handle
                that but seems a step backward when it really is steam */
-            damage ? "noxious gas" : "steam");
+            damage ? _("noxious gas") : _("steam"));
         iflags.last_msg = PLNMSG_ENVELOPED_IN_GAS;
     }
 }

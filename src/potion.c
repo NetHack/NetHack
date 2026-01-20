@@ -469,10 +469,10 @@ void
 self_invis_message(void)
 {
     pline(_("%s %s."),
-          Hallucination ? "Far out, man!  You"
-                        : "Gee!  All of a sudden, you",
-          See_invisible ? "can see right through yourself"
-                        : "can't see yourself");
+          Hallucination ? _("Far out, man!  You")
+                        : _("Gee!  All of a sudden, you"),
+          See_invisible ? _("can see right through yourself")
+                        : _("can't see yourself"));
 }
 
 staticfn void
