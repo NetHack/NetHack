@@ -3033,7 +3033,7 @@ lightdamage(
            of death will always be "killed while stuck in creature form"] */
         if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS)
             ordinary = FALSE; /* say blasted rather than zapped */
-        how = (obj->oclass == SPBOOK_CLASS) ? "spell of light"
+        how = (obj->oclass == SPBOOK_CLASS) ? _("spell of light")
               : (!obj->oartifact) ? ansimpleoname(obj)
                 : bare_artifactname(obj);
         Sprintf(buf, _("%s %sself with %s"), ordinary ? _("zapped") : _("blasted"),
@@ -3657,8 +3657,8 @@ zap_map(
                 if (e->engr_type == ENGRAVE) {
                     /* only affects things in stone */
                     pline_The(Hallucination
-                                  ? "floor runs like butter!"
-                                  : "edges on the floor get smoother.");
+                                  ? _("floor runs like butter!")
+                                  : _("edges on the floor get smoother."));
                     wipe_engr_at(x, y, d(2, 4), TRUE);
                 }
                 break;
@@ -4545,11 +4545,11 @@ zhitu(
         struct obj *otmp = gc.current_wand;
         /* fire horn and frost horn get handled as wands by caller */
         const char *verb = (abstyp < 10) /* wand */
-                           ? ((otmp && otmp->oclass == TOOL_CLASS) ? "played"
-                              : "zapped")
-                           : (abstyp < 20) ? "cast"
-                             : (abstyp < 30) ? "exhaled"
-                               : "imagined"; /* should never happen */
+                           ? ((otmp && otmp->oclass == TOOL_CLASS) ? _("played")
+                              : _("zapped"))
+                           : (abstyp < 20) ? _("cast")
+                             : (abstyp < 30) ? _("exhaled")
+                               : _("imagined"); /* should never happen */
 
         if (type < 0 || (type == 0 && gb.buzzer != 0)) {
             /* if gb.buzzer is Null, kbuf[] will end up with just <fltxt> */
@@ -4992,12 +4992,12 @@ dobuzz(
     if (fireball)
         explode(sx, sy, type, d(12, 6), 0, EXPL_FIERY);
     if (shopdamage)
-        pay_for_damage(damgtype == ZT_FIRE ? "burn away"
-                       : damgtype == ZT_COLD ? "shatter"
+        pay_for_damage(damgtype == ZT_FIRE ? _("burn away")
+                       : damgtype == ZT_COLD ? _("shatter")
                          /* "damage" indicates wall rather than door */
-                         : damgtype == ZT_ACID ? "damage"
-                           : damgtype == ZT_DEATH ? "disintegrate"
-                             : "destroy",
+                         : damgtype == ZT_ACID ? _("damage")
+                           : damgtype == ZT_DEATH ? _("disintegrate")
+                             : _("destroy"),
                        FALSE);
     gb.bhitpos = save_bhitpos;
 }
