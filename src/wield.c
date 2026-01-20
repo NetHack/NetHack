@@ -907,18 +907,18 @@ chwepon(struct obj *otmp, int amount)
 
         if (amount >= 0 && uwep && will_weld(uwep)) { /* cursed tin opener */
             if (!Blind) {
-                Sprintf(buf, "%s with %s aura.",
-                        Yobjnam2(uwep, "glow"), an(hcolor(NH_AMBER)));
+                Sprintf(buf, _("%s with %s aura."),
+                        Yobjnam2(uwep, _("glow")), an(hcolor(NH_AMBER)));
                 uwep->bknown = !Hallucination; /* ok to bypass set_bknown() */
             } else {
                 /* cursed tin opener is wielded in right hand */
-                Sprintf(buf, "Your right %s tingles.", body_part(HAND));
+                Sprintf(buf, _("Your right %s tingles."), body_part(HAND));
             }
             uncurse(uwep);
             update_inventory();
         } else {
-            Sprintf(buf, "Your %s %s.", makeplural(body_part(HAND)),
-                    (amount >= 0) ? "twitch" : "itch");
+            Sprintf(buf, _("Your %s %s."), makeplural(body_part(HAND)),
+                    (amount >= 0) ? _("twitch") : _("itch"));
         }
         strange_feeling(otmp, buf); /* pline()+docall()+useup() */
         exercise(A_DEX, (boolean) (amount >= 0));

@@ -2647,7 +2647,7 @@ dozap(void)
         if ((damage = zapyourself(obj, TRUE)) != 0) {
             char buf[BUFSZ];
 
-            Sprintf(buf, "zapped %sself with %s",
+            Sprintf(buf, _("zapped %sself with %s"),
                     uhim(), killer_xname(obj));
             losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
         }
@@ -3036,7 +3036,7 @@ lightdamage(
         how = (obj->oclass == SPBOOK_CLASS) ? "spell of light"
               : (!obj->oartifact) ? ansimpleoname(obj)
                 : bare_artifactname(obj);
-        Sprintf(buf, "%s %sself with %s", ordinary ? "zapped" : "blasted",
+        Sprintf(buf, _("%s %sself with %s"), ordinary ? _("zapped") : _("blasted"),
                 uhim(), how);
         /* might rehumanize(); could be fatal, but only for Unchanging */
         losehp(Maybe_Half_Phys(dmg), buf, NO_KILLER_PREFIX);

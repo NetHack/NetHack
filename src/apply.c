@@ -244,10 +244,10 @@ its_dead(coordxy rx, coordxy ry, int *resp)
                 else if (is_male(mptr))
                     gndr = 0;
             }
-            Sprintf(buf, "%s's dead", genders[gndr].he); /* "he"/"she"/"it" */
+            Sprintf(buf, _("%s's dead"), genders[gndr].he); /* "he"/"she"/"it" */
             buf[0] = highc(buf[0]);
         } else { /* plural */
-            Strcpy(buf, "They're dead");
+            Strcpy(buf, _("They're dead"));
         }
         /* variations on "He's dead, Jim." (Star Trek's Dr McCoy) */
         You_hear(_("a voice say, \"%s, Jim.\""), buf);
@@ -284,9 +284,9 @@ its_dead(coordxy rx, coordxy ry, int *resp)
 
         mptr = &mons[statue->corpsenm];
         if (Blind) { /* ignore statue->dknown; it'll always be set */
-            Sprintf(buf, "%s %s",
-                    u_at(rx, ry) ? "This" : "That",
-                    humanoid(mptr) ? "person" : "creature");
+            Sprintf(buf, _("%s %s"),
+                    u_at(rx, ry) ? _("This") : _("That"),
+                    humanoid(mptr) ? _("person") : _("creature"));
             what = buf;
         } else {
             what = obj_pmname(statue);
@@ -2881,7 +2881,7 @@ use_trap(struct obj *otmp)
         else
             chance = (rnl(10) > 5);
         You(_("aren't very skilled at reaching from %s."), mon_nam(u.usteed));
-        Sprintf(buf, "Continue your attempt to set %s?",
+        Sprintf(buf, _("Continue your attempt to set %s?"),
                 the(trapname(ttyp, FALSE)));
         if (y_n(buf) == 'y') {
             if (chance) {
@@ -3055,7 +3055,7 @@ use_whip(struct obj *obj)
         if (dam <= 0)
             dam = 1;
         You(_("hit your %s with your bullwhip."), body_part(FOOT));
-        Sprintf(buf, "killed %sself with %s bullwhip", uhim(), uhis());
+        Sprintf(buf, _("killed %sself with %s bullwhip"), uhim(), uhis());
         losehp(Maybe_Half_Phys(dam), buf, NO_KILLER_PREFIX);
         return ECMD_TIME;
 
@@ -3782,17 +3782,17 @@ use_grapple(struct obj *obj)
         any.a_int = 1; /* use index+1 (can't use 0) as identifier */
         start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any.a_int++;
-        Sprintf(buf, "an object on the %s", surface(cc.x, cc.y));
+        Sprintf(buf, _("an object on the %s"), surface(cc.x, cc.y));
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  clr, buf, MENU_ITEMFLAGS_NONE);
         any.a_int++;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                 clr, "a monster", MENU_ITEMFLAGS_NONE);
+                 clr, _("a monster"), MENU_ITEMFLAGS_NONE);
         any.a_int++;
-        Sprintf(buf, "the %s", surface(cc.x, cc.y));
+        Sprintf(buf, _("the %s"), surface(cc.x, cc.y));
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  buf, MENU_ITEMFLAGS_NONE);
-        end_menu(tmpwin, "Aim for what?");
+        end_menu(tmpwin, _("Aim for what?"));
         tohit = rn2(4);
         if (select_menu(tmpwin, PICK_ONE, &selected) > 0
             && rn2(P_SKILL(typ) > P_SKILLED ? 20 : 2))
@@ -4117,7 +4117,7 @@ do_break_wand(struct obj *obj)
             }
             damage = zapyourself(obj, FALSE);
             if (damage) {
-                Sprintf(buf, "killed %sself by breaking a wand", uhim());
+                Sprintf(buf, _("killed %sself by breaking a wand"), uhim());
                 losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
             }
             if (disp.botl)

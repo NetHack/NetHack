@@ -2677,12 +2677,12 @@ dokeylist(void)
 
     datawin = create_nhwindow(NHW_TEXT);
     putstr(datawin, 0, "");
-    Sprintf(buf, "%7s %s", "", "    Full Current Key Bindings List");
+    Sprintf(buf, "%7s %s", "", _("    Full Current Key Bindings List"));
     putstr(datawin, 0, buf);
     for (extcmd = extcmdlist; extcmd->ef_txt; ++extcmd)
         if (spkey_gap || !keylist_func_has_key(extcmd, keys_used)) {
             Sprintf(buf, "%7s %s", "",
-                               "(also commands with no key assignment)");
+                               _("(also commands with no key assignment)"));
             putstr(datawin, 0, buf);
             break;
         }
@@ -2695,19 +2695,19 @@ dokeylist(void)
     if (!iflags.num_pad) {
         putstr(datawin, 0, "");
         putstr(datawin, 0,
-     "Ctrl+<direction> will run in specified direction until something very");
-        Sprintf(buf, "%7s %s", "", "interesting is seen.");
+     _("Ctrl+<direction> will run in specified direction until something very"));
+        Sprintf(buf, "%7s %s", "", _("interesting is seen."));
         putstr(datawin, 0, buf);
-        Strcpy(buf, "Shift"); /* append the rest below */
+        Strcpy(buf, _("Shift")); /* append the rest below */
     } else {
         /* num_pad */
         putstr(datawin, 0, "");
-        Strcpy(buf, "Meta"); /* append the rest next */
+        Strcpy(buf, _("Meta")); /* append the rest next */
     }
     Strcat(buf,
-          "+<direction> will run in specified direction until you encounter");
+          _("+<direction> will run in specified direction until you encounter"));
     putstr(datawin, 0, buf);
-    Sprintf(buf, "%7s %s", "", "an obstacle.");
+    Sprintf(buf, "%7s %s", "", _("an obstacle."));
     putstr(datawin, 0, buf);
 
     putstr(datawin, 0, "");
@@ -2733,7 +2733,7 @@ dokeylist(void)
     Sprintf(buf2, "[%s]", key2txt(key, buf));
     Sprintf(buf, "%-21s", buf2);
 #endif
-    Strcat(buf, " interrupt: break out of NetHack (SIGINT)");
+    Strcat(buf, _(" interrupt: break out of NetHack (SIGINT)"));
     putstr(datawin, 0, buf);
     /* keyless special key commands, if any */
     if (spkey_gap) {
@@ -3970,13 +3970,13 @@ help_dir(
     if (prefixhandling
         && (sym == gc.Cmd.spkeys[NHKF_GETDIR_SELF]
             || (gc.Cmd.num_pad && sym == gc.Cmd.spkeys[NHKF_GETDIR_SELF2]))) {
-        Sprintf(buf, "You can't %s%s yourself.", dothat, how);
+        Sprintf(buf, _("You can't %s%s yourself."), dothat, how);
     /* for movement prefix followed by up or down */
     } else if (prefixhandling && (sym == '<' || sym == '>')) {
-        Sprintf(buf, "You can't %s %s.", dothat,
+        Sprintf(buf, _("You can't %s %s."), dothat,
                 /* was "upwards" and "downwards", but they're considered
                    to be variants of canonical "upward" and "downward" */
-                (sym == '<') ? "upward" : "downward");
+                (sym == '<') ? _("upward") : _("downward"));
     }
 
     /* if '!cmdassist', display via pline() and we're done (note: asking
@@ -3984,9 +3984,9 @@ help_dir(
     if (!viawindow) {
         if (prefixhandling) {
             if (!*buf)
-                Sprintf(buf, "Invalid direction for '%s' prefix.",
+                Sprintf(buf, _("Invalid direction for '%s' prefix."),
                         visctrl(spkey));
-            pline(_("%s"), buf);
+            pline("%s", buf);
             return TRUE;
         }
         /* when 'cmdassist' is off and caller doesn't insist, do nothing */
@@ -4005,7 +4005,7 @@ help_dir(
         putstr(win, 0, buf);
         putstr(win, 0, "");
     } else if (msg) {
-        Sprintf(buf, "cmdassist: %s", msg);
+        Sprintf(buf, _("cmdassist: %s"), msg);
         putstr(win, 0, buf);
         putstr(win, 0, "");
     }
@@ -4016,24 +4016,24 @@ help_dir(
         ctrl = (sym - 'A') + 1; /* 0-27 (note: 28-31 aren't applicable) */
         if ((explain = dowhatdoes_core(ctrl, buf2)) != 0
             && (!strchr(wiz_only_list, sym) || wizard)) {
-            Sprintf(buf, "Are you trying to use ^%c%s?", sym,
+            Sprintf(buf, _("Are you trying to use ^%c%s?"), sym,
                     strchr(wiz_only_list, sym) ? ""
-                        : " as specified in the Guidebook");
+                        : _(" as specified in the Guidebook"));
             putstr(win, 0, buf);
             putstr(win, 0, "");
             putstr(win, 0, explain);
             putstr(win, 0, "");
             putstr(win, 0,
-                  "To use that command, hold down the <Ctrl> key as a shift");
-            Sprintf(buf, "and press the <%c> key.", sym);
+                  _("To use that command, hold down the <Ctrl> key as a shift"));
+            Sprintf(buf, _("and press the <%c> key."), sym);
             putstr(win, 0, buf);
             putstr(win, 0, "");
         }
     }
 
-    Sprintf(buf, "Valid direction keys%s%s%s are:",
-            prefixhandling ? " to " : "", prefixhandling ? dothat : "",
-            NODIAG(u.umonnum) ? " in your current form" : "");
+    Sprintf(buf, _("Valid direction keys%s%s%s are:"),
+            prefixhandling ? _(" to ") : "", prefixhandling ? dothat : "",
+            NODIAG(u.umonnum) ? _(" in your current form") : "");
     putstr(win, 0, buf);
     show_direction_keys(win, !prefixhandling ? '.' : ' ', NODIAG(u.umonnum));
 
@@ -4214,29 +4214,29 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
         return K;
 
     if ((IS_FOUNTAIN(typ) || IS_SINK(typ)) && can_reach_floor(FALSE)) {
-        Sprintf(buf, "Drink from the %s",
+        Sprintf(buf, _("Drink from the %s"),
                 defsyms[IS_FOUNTAIN(typ) ? S_fountain : S_sink].explanation);
         mcmd_addmenu(win, MCMD_QUAFF, buf), ++K;
     }
     if (IS_FOUNTAIN(typ) && can_reach_floor(FALSE))
-        mcmd_addmenu(win, MCMD_DIP, "Dip something into the fountain"), ++K;
+        mcmd_addmenu(win, MCMD_DIP, _("Dip something into the fountain")), ++K;
     if (IS_THRONE(typ))
-        mcmd_addmenu(win, MCMD_SIT, "Sit on the throne"), ++K;
+        mcmd_addmenu(win, MCMD_SIT, _("Sit on the throne")), ++K;
     if (IS_ALTAR(typ))
-        mcmd_addmenu(win, MCMD_OFFER, "Sacrifice something on the altar"), ++K;
+        mcmd_addmenu(win, MCMD_OFFER, _("Sacrifice something on the altar")), ++K;
 
     if (stway && stway->up) {
-        Sprintf(buf, "Go up the %s",
-                stway->isladder ? "ladder" : "stairs");
+        Sprintf(buf, _("Go up the %s"),
+                stway->isladder ? _("ladder") : _("stairs"));
         mcmd_addmenu(win, MCMD_UP, buf), ++K;
     }
     if (stway && !stway->up) {
-        Sprintf(buf, "Go down the %s",
-                stway->isladder ? "ladder" : "stairs");
+        Sprintf(buf, _("Go down the %s"),
+                stway->isladder ? _("ladder") : _("stairs"));
         mcmd_addmenu(win, MCMD_DOWN, buf), ++K;
     }
     if (u.usteed) { /* another movement choice */
-        Sprintf(buf, "Dismount %s",
+        Sprintf(buf, _("Dismount %s"),
                 x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
                          SUPPRESS_SADDLE, FALSE));
         mcmd_addmenu(win, MCMD_DISMOUNT, buf), ++K;
@@ -4253,38 +4253,38 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
     if (OBJ_AT(x, y)) {
         struct obj *otmp = svl.level.objects[x][y];
 
-        Sprintf(buf, "Pick up %s", otmp->nexthere ? "items" : doname(otmp));
+        Sprintf(buf, _("Pick up %s"), otmp->nexthere ? _("items") : doname(otmp));
         mcmd_addmenu(win, MCMD_PICKUP, buf), ++K;
 
         if (Is_container(otmp)) {
-            Sprintf(buf, "Loot %s", doname(otmp));
+            Sprintf(buf, _("Loot %s"), doname(otmp));
             mcmd_addmenu(win, MCMD_LOOT, buf), ++K;
 
-            Sprintf(buf, "Tip %s", doname(otmp));
+            Sprintf(buf, _("Tip %s"), doname(otmp));
             mcmd_addmenu(win, MCMD_TIP, buf), ++K;
         }
         if (otmp->oclass == FOOD_CLASS) {
-            Sprintf(buf, "Eat %s", doname(otmp));
+            Sprintf(buf, _("Eat %s"), doname(otmp));
             mcmd_addmenu(win, MCMD_EAT, buf), ++K;
         }
     }
 
 
     if (gi.invent) {
-        mcmd_addmenu(win, MCMD_INVENTORY, "Inventory"), ++K;
-        mcmd_addmenu(win, MCMD_DROP, "Drop items"), ++K;
+        mcmd_addmenu(win, MCMD_INVENTORY, _("Inventory")), ++K;
+        mcmd_addmenu(win, MCMD_DROP, _("Drop items")), ++K;
     }
-    mcmd_addmenu(win, MCMD_REST, "Rest one turn"), ++K;
-    mcmd_addmenu(win, MCMD_SEARCH, "Search around you"), ++K;
-    mcmd_addmenu(win, MCMD_LOOK_HERE, "Look at what is here"), ++K;
+    mcmd_addmenu(win, MCMD_REST, _("Rest one turn")), ++K;
+    mcmd_addmenu(win, MCMD_SEARCH, _("Search around you")), ++K;
+    mcmd_addmenu(win, MCMD_LOOK_HERE, _("Look at what is here")), ++K;
 
     if (num_spells() > 0)
-        mcmd_addmenu(win, MCMD_CAST_SPELL, "Cast a spell"), ++K;
+        mcmd_addmenu(win, MCMD_CAST_SPELL, _("Cast a spell")), ++K;
 
     if ((ttmp = t_at(x, y)) != 0 && ttmp->tseen) {
         if (ttmp->ttyp != VIBRATING_SQUARE)
             mcmd_addmenu(win, MCMD_UNTRAP_HERE,
-                         "Attempt to disarm trap"), ++K;
+                         _("Attempt to disarm trap")), ++K;
     }
     return K;
 }
@@ -4311,40 +4311,40 @@ there_cmd_menu_next2u(
         int dm = levl[x][y].doormask;
 
         if ((dm & (D_CLOSED | D_LOCKED))) {
-            mcmd_addmenu(win, MCMD_OPEN_DOOR, "Open the door"), ++K;
+            mcmd_addmenu(win, MCMD_OPEN_DOOR, _("Open the door")), ++K;
             /* unfortunately there's no lknown flag for doors to
                remember the locked/unlocked state */
             key_or_pick = (carrying(SKELETON_KEY) || carrying(LOCK_PICK));
             card = (carrying(CREDIT_CARD) != 0);
             if (key_or_pick || card) {
-                Sprintf(buf, "%sunlock the door",
-                        key_or_pick ? "lock or " : "");
+                Sprintf(buf, _("%sunlock the door"),
+                        key_or_pick ? _("lock or ") : "");
                 mcmd_addmenu(win, MCMD_LOCK_DOOR, upstart(buf)), ++K;
             }
             /* unfortunately there's no tknown flag for doors (or chests)
                to remember whether a trap had been found */
             mcmd_addmenu(win, MCMD_UNTRAP_DOOR,
-                         "Search the door for a trap"), ++K;
+                         _("Search the door for a trap")), ++K;
             /* [what about #force?] */
-            mcmd_addmenu(win, MCMD_KICK_DOOR, "Kick the door"), ++K;
+            mcmd_addmenu(win, MCMD_KICK_DOOR, _("Kick the door")), ++K;
         } else if ((dm & D_ISOPEN) && (mod == CLICK_2)) {
-            mcmd_addmenu(win, MCMD_CLOSE_DOOR, "Close the door"), ++K;
+            mcmd_addmenu(win, MCMD_CLOSE_DOOR, _("Close the door")), ++K;
         }
     }
 
     if (typ <= SCORR)
-        mcmd_addmenu(win, MCMD_SEARCH, "Search for secret doors"), ++K;
+        mcmd_addmenu(win, MCMD_SEARCH, _("Search for secret doors")), ++K;
 
     if ((ttmp = t_at(x, y)) != 0 && ttmp->tseen) {
-        mcmd_addmenu(win, MCMD_LOOK_TRAP, "Examine trap"), ++K;
+        mcmd_addmenu(win, MCMD_LOOK_TRAP, _("Examine trap")), ++K;
         if (ttmp->ttyp != VIBRATING_SQUARE)
             mcmd_addmenu(win, MCMD_UNTRAP_TRAP,
-                                 "Attempt to disarm trap"), ++K;
-        mcmd_addmenu(win, MCMD_MOVE_DIR, "Move on the trap"), ++K;
+                                 _("Attempt to disarm trap")), ++K;
+        mcmd_addmenu(win, MCMD_MOVE_DIR, _("Move on the trap")), ++K;
     }
 
     if (levl[x][y].glyph == objnum_to_glyph(BOULDER))
-        mcmd_addmenu(win, MCMD_MOVE_DIR, "Push the boulder"), ++K;
+        mcmd_addmenu(win, MCMD_MOVE_DIR, _("Push the boulder")), ++K;
 
     mtmp = m_at(x, y);
     if (mtmp && !canspotmon(mtmp))
@@ -4354,33 +4354,33 @@ there_cmd_menu_next2u(
                               SUPPRESS_SADDLE, FALSE);
 
         if (!u.usteed) {
-            Sprintf(buf, "Ride %s", mnam);
+            Sprintf(buf, _("Ride %s"), mnam);
             mcmd_addmenu(win, MCMD_RIDE, buf), ++K;
         }
-        Sprintf(buf, "Remove saddle from %s", mnam);
+        Sprintf(buf, _("Remove saddle from %s"), mnam);
         mcmd_addmenu(win, MCMD_REMOVE_SADDLE, buf), ++K;
     }
     if (mtmp && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)
         && carrying(SADDLE)) {
-        Sprintf(buf, "Put saddle on %s", mon_nam(mtmp));
+        Sprintf(buf, _("Put saddle on %s"), mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_APPLY_SADDLE, buf), ++K;
     }
     if (mtmp && (mtmp->mpeaceful || mtmp->mtame)) {
-        Sprintf(buf, "Talk to %s", mon_nam(mtmp));
+        Sprintf(buf, _("Talk to %s"), mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_TALK, buf), ++K;
 
-        Sprintf(buf, "Swap places with %s", mon_nam(mtmp));
+        Sprintf(buf, _("Swap places with %s"), mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_MOVE_DIR, buf), ++K;
 
-        Sprintf(buf, "%s %s",
-                !has_mgivenname(mtmp) ? "Name" : "Rename",
+        Sprintf(buf, _("%s %s"),
+                !has_mgivenname(mtmp) ? _("Name") : _("Rename"),
                 mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_NAME, buf), ++K;
     }
 
     if ((mtmp && !(mtmp->mpeaceful || mtmp->mtame))
         || glyph_is_invisible(glyph_at(x, y))) {
-        Sprintf(buf, "Attack %s", mtmp ? mon_nam(mtmp) : "unseen creature");
+        Sprintf(buf, _("Attack %s"), mtmp ? mon_nam(mtmp) : _("unseen creature"));
         mcmd_addmenu(win, MCMD_ATTACK_NEXT2U, buf), ++K;
         /* attacking overrides any other automatic action */
         *act = MCMD_ATTACK_NEXT2U;
@@ -4398,9 +4398,9 @@ there_cmd_menu_far(winid win, coordxy x, coordxy y, int mod)
     if (mod == CLICK_1) {
         if (linedup(u.ux, u.uy, x, y, 1)
             && dist2(u.ux, u.uy, x, y) < 18*18)
-            mcmd_addmenu(win, MCMD_THROW_OBJ, "Throw something"), ++K;
+            mcmd_addmenu(win, MCMD_THROW_OBJ, _("Throw something")), ++K;
 
-        mcmd_addmenu(win, MCMD_TRAVEL, "Travel here"), ++K;
+        mcmd_addmenu(win, MCMD_TRAVEL, _("Travel here")), ++K;
     }
     return K;
 }

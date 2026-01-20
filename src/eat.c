@@ -869,10 +869,10 @@ fix_petrification(void)
     char buf[BUFSZ];
 
     if (Hallucination)
-        Sprintf(buf, "What a pity--you just ruined a future piece of %sart!",
-                ACURR(A_CHA) > 15 ? "fine " : "");
+        Sprintf(buf, _("What a pity--you just ruined a future piece of %sart!"),
+                ACURR(A_CHA) > 15 ? _("fine ") : "");
     else
-        Strcpy(buf, "You feel limber!");
+        Strcpy(buf, _("You feel limber!"));
     make_stoned(0L, buf, 0, (char *) 0);
 }
 

@@ -1148,8 +1148,8 @@ query_objlist(const char *qstr,        /* query string */
 
         any = cg.zeroany;
         if (sorted && n > 1) {
-            Sprintf(buf, "%s Creatures",
-                    digests(u.ustuck->data) ? "Swallowed" : "Engulfed");
+            Sprintf(buf, _("%s Creatures"),
+                    digests(u.ustuck->data) ? _("Swallowed") : _("Engulfed"));
             add_menu_heading(win, buf);
         }
         fake_hero_object = cg.zeroobj;
@@ -3260,7 +3260,7 @@ menu_loot(int retry, boolean put_in)
         all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
-        Sprintf(buf, "%s what type of objects?", action);
+        Sprintf(buf, _("%s what type of objects?"), action);
         mflags = (ALL_TYPES | UNPAID_TYPES | BUCX_TYPES | CHOOSE_ALL
                   | JUSTPICKED );
         n = query_category(buf,
@@ -3397,35 +3397,35 @@ in_or_out_menu(
     start_menu(win, MENU_BEHAVE_STANDARD);
 
     any.a_int = 1; /* ':' */
-    Sprintf(buf, "Look inside %s", thesimpleoname(obj));
+    Sprintf(buf, _("Look inside %s"), thesimpleoname(obj));
     add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
              ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     if (outokay) {
         any.a_int = 2; /* 'o' */
-        Sprintf(buf, "take %s out", something);
+        Sprintf(buf, _("take %s out"), something);
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     }
     if (inokay) {
         any.a_int = 3; /* 'i' */
-        Sprintf(buf, "put %s in", something);
+        Sprintf(buf, _("put %s in"), something);
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     }
     if (outokay) {
         any.a_int = 4; /* 'b' */
-        Sprintf(buf, "%stake out, then put in", inokay ? "both; " : "");
+        Sprintf(buf, _("%stake out, then put in"), inokay ? _("both; ") : "");
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     }
     if (inokay) {
         any.a_int = 5; /* 'r' */
-        Sprintf(buf, "%sput in, then take out",
-                outokay ? "both reversed; " : "");
+        Sprintf(buf, _("%sput in, then take out"),
+                outokay ? _("both reversed; ") : "");
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
         any.a_int = 6; /* 's' */
-        Sprintf(buf, "stash one item into %s", thesimpleoname(obj));
+        Sprintf(buf, _("stash one item into %s"), thesimpleoname(obj));
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     }
@@ -3433,11 +3433,11 @@ in_or_out_menu(
     if (more_containers) {
         any.a_int = 7; /* 'n' */
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
-                 ATR_NONE, clr, "loot next container",
+                 ATR_NONE, clr, _("loot next container"),
                  MENU_ITEMFLAGS_SELECTED);
     }
     any.a_int = 8; /* 'q' */
-    Strcpy(buf, alreadyused ? "done" : "do nothing");
+    Strcpy(buf, alreadyused ? _("done") : _("do nothing"));
     add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
              ATR_NONE, clr, buf,
              more_containers ? MENU_ITEMFLAGS_NONE : MENU_ITEMFLAGS_SELECTED);
@@ -3569,8 +3569,8 @@ dotip(void)
     if (boxes > 0
         && (!iflags.menu_requested
             || (flags.menu_style == MENU_TRADITIONAL && boxes > 1))) {
-        Sprintf(buf, "You can't tip %s while carrying so much.",
-                !flags.verbose ? "a container" : (boxes > 1) ? "one" : "it");
+        Sprintf(buf, _("You can't tip %s while carrying so much."),
+                !flags.verbose ? _("a container") : (boxes > 1) ? _("one") : _("it"));
         if (!check_capacity(buf) && able_to_loot(cc.x, cc.y, FALSE)) {
             if (boxes > 1) {
                 int res;
@@ -3631,9 +3631,9 @@ dotip(void)
     if (spillage) {
         buf[0] = '\0';
         if (is_pool(u.ux, u.uy))
-            Sprintf(buf, " and gradually %s", vtense(spillage, "dissipate"));
+            Sprintf(buf, _(" and gradually %s"), vtense(spillage, "dissipate"));
         else if (is_lava(u.ux, u.uy))
-            Sprintf(buf, " and immediately %s away",
+            Sprintf(buf, _(" and immediately %s away"),
                     vtense(spillage, "burn"));
         pline(_("Some %s %s onto the %s%s."), spillage,
               vtense(spillage, "spill"), surface(u.ux, u.uy), buf);
@@ -3907,7 +3907,7 @@ tipcontainer_gettarget(
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     }
 
-    Sprintf(buf, "Where to tip the contents of %s", doname(box));
+    Sprintf(buf, _("Where to tip the contents of %s"), doname(box));
     end_menu(win, buf);
     n = select_menu(win, PICK_ONE, &pick_list);
     destroy_nhwindow(win);

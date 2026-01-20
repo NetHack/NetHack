@@ -5188,23 +5188,23 @@ could_untrap(boolean verbosely, boolean check_floor)
 
     buf[0] = '\0';
     if (near_capacity() >= HVY_ENCUMBER) {
-        Strcpy(buf, "You're too strained to do that.");
+        Strcpy(buf, _("You're too strained to do that."));
     } else if ((nohands(gy.youmonst.data) && !webmaker(gy.youmonst.data))
                || !gy.youmonst.data->mmove) {
-        Strcpy(buf, "And just how do you expect to do that?");
+        Strcpy(buf, _("And just how do you expect to do that?"));
     } else if (u.ustuck && sticks(gy.youmonst.data)) {
-        Sprintf(buf, "You'll have to let go of %s first.", mon_nam(u.ustuck));
+        Sprintf(buf, _("You'll have to let go of %s first."), mon_nam(u.ustuck));
     } else if (u.ustuck || (welded(uwep) && bimanual(uwep))) {
-        Sprintf(buf, "Your %s seem to be too busy for that.",
+        Sprintf(buf, _("Your %s seem to be too busy for that."),
                 makeplural(body_part(HAND)));
     } else if (check_floor && !can_reach_floor(FALSE)) {
         /* only checked here for autounlock of chest/box and that will
            be !verbosely so precise details of the message don't matter */
-        Sprintf(buf, "You can't reach the %s.", surface(u.ux, u.uy));
+        Sprintf(buf, _("You can't reach the %s."), surface(u.ux, u.uy));
     }
     if (buf[0]) {
         if (verbosely)
-            pline(_("%s"), buf);
+            pline("%s", buf);
         return 0;
     }
     return 1;

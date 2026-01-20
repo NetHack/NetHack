@@ -703,7 +703,7 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
     } else if (u.uswallow) {
         /* when swallowed, we're only called for spots adjacent to hero,
            and blindness doesn't prevent hero from feeling what holds him */
-        Sprintf(buf, "interior of %s", mon_nam(u.ustuck));
+        Sprintf(buf, _("interior of %s"), mon_nam(u.ustuck));
         pm = u.ustuck->data;
     } else if (glyph_is_monster(glyph)) {
         if ((mtmp = m_at(x, y)) != 0) {
@@ -744,14 +744,14 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
         case S_altar:
             amsk = altarmask_at(x, y);
             algn = Amask2align(amsk & AM_MASK);
-            Sprintf(buf, "%s %saltar",
+            Sprintf(buf, _("%s %saltar"),
                     /* like endgame high priests, endgame high altars
                        are only recognizable when immediately adjacent */
                     (Is_astralevel(&u.uz) && !next2u(x, y)
                      && (amsk & AM_SANCTUM))
-                        ? "aligned"
+                        ? _("aligned")
                         : align_str(algn),
-                    (amsk & AM_SANCTUM) ? "high " : "");
+                    (amsk & AM_SANCTUM) ? _("high ") : "");
             break;
         case S_ndoor:
             if (is_drawbridge_wall(x, y) >= 0)

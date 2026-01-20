@@ -387,19 +387,19 @@ gold_detect(struct obj *sobj)
         char buf[BUFSZ];
 
         if (gy.youmonst.data == &mons[PM_GOLD_GOLEM])
-            Sprintf(buf, "You feel like a million %s!", currency(2L));
+            Sprintf(buf, _("You feel like a million %s!"), currency(2L));
         else if (money_cnt(gi.invent) || hidden_gold(TRUE))
             Strcpy(buf,
-               "You feel worried about your future financial situation.");
+               _("You feel worried about your future financial situation."));
         else if (steedgold)
-            Sprintf(buf, "You feel interested in %s financial situation.",
+            Sprintf(buf, _("You feel interested in %s financial situation."),
                     s_suffix(x_monnam(u.usteed,
                                       u.usteed->mtame ? ARTICLE_YOUR
                                                       : ARTICLE_THE,
                                       (char *) 0,
                                       SUPPRESS_SADDLE, FALSE)));
         else
-            Strcpy(buf, "You feel materially poor.");
+            Strcpy(buf, _("You feel materially poor."));
 
         strange_feeling(sobj, buf);
         return 1;
@@ -522,9 +522,9 @@ food_detect(struct obj *sobj)
         } else if (sobj) {
             char buf[BUFSZ];
 
-            Sprintf(buf, "Your %s twitches%s.", body_part(NOSE),
+            Sprintf(buf, _("Your %s twitches%s."), body_part(NOSE),
                     (sobj->blessed && !u.uedibility)
-                        ? " then starts to tingle"
+                        ? _(" then starts to tingle")
                         : "");
             if (sobj->blessed && !u.uedibility) {
                 boolean savebeginner = flags.beginner;
@@ -1078,7 +1078,7 @@ trap_detect(
     if (!found) {
         char buf[BUFSZ];
 
-        Sprintf(buf, "Your %s stop itching.", makeplural(body_part(TOE)));
+        Sprintf(buf, _("Your %s stop itching."), makeplural(body_part(TOE)));
         strange_feeling(sobj, buf);
         return 1;
     }

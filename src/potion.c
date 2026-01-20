@@ -1651,13 +1651,13 @@ potionhit(struct monst *mon, struct obj *obj, int how)
             char buf[BUFSZ];
 
             if (hit_saddle && saddle) {
-                Sprintf(buf, "%s saddle",
+                Sprintf(buf, _("%s saddle"),
                         s_suffix(x_monnam(mon, ARTICLE_THE, (char *) 0,
                                           (SUPPRESS_IT | SUPPRESS_SADDLE),
                                           FALSE)));
             } else if (has_head(mon->data)) {
-                Sprintf(buf, "%s %s", s_suffix(mnam),
-                        (gn.notonhead ? "body" : "head"));
+                Sprintf(buf, _("%s %s"), s_suffix(mnam),
+                        (gn.notonhead ? _("body") : _("head")));
             } else {
                 Strcpy(buf, mnam);
             }
@@ -2600,7 +2600,7 @@ potion_dip(struct obj *obj, struct obj *potion)
             char buf[BUFSZ];
 
             if (potion->quan > 1L)
-                Sprintf(buf, "One of %s", the(xname(potion)));
+                Sprintf(buf, _("One of %s"), the(xname(potion)));
             else
                 Strcpy(buf, The(xname(potion)));
             pline(_("%s forms a coating on %s."), buf, the(xname(obj)));
