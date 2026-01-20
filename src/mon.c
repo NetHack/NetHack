@@ -1008,9 +1008,9 @@ minliquid_core(struct monst *mtmp)
                     const char *how = on_fire(mtmp->data, dummy);
 
                     pline_mon(mtmp, _("%s %s."), Monnam(mtmp),
-                          !strcmp(how, "boiling") ? "boils away"
-                             : !strcmp(how, "melting") ? "melts away"
-                                : "burns to a crisp");
+                          !strcmp(how, "boiling") ? _("boils away")
+                             : !strcmp(how, "melting") ? _("melts away")
+                                : _("burns to a crisp"));
                 }
                 /* unlike fire -> melt ice -> pool, there's no way for the
                    hero to create lava beneath a monster, so the !mon_moving
@@ -2906,8 +2906,8 @@ vamprises(struct monst *mtmp)
 
         /* construct a 'before' argument to pass to pline(); this used
            to construct a dynamic format string but that's overkill */
-        Snprintf(action, sizeof action, "%s%s %s%s and rises as",
-                 Unaware ? "you dream that " : "",
+        Snprintf(action, sizeof action, _("%s%s %s%s and rises as"),
+                 Unaware ? _("you dream that ") : "",
                  x_monnam(mtmp, ARTICLE_THE,
                           spec_mon ? (char *) 0 : _("seemingly dead"),
                           (SUPPRESS_INVISIBLE | AUGMENT_IT), FALSE),
@@ -2943,21 +2943,21 @@ vamprises(struct monst *mtmp)
         /* revived vampire is in normal shape, so can't be amorphous; if on
            a closed door spot, destroy the door and if trapped, blow it up */
         if (closed_door(x, y)) {
-            static const char
-                door_smashed[] = "a door being smashed",
-                door_go_boom[] = "a door exploding";
+            const char
+                *door_smashed = _("a door being smashed"),
+                *door_go_boom = _("a door exploding");
             struct rm *door = &levl[x][y];
             boolean trapped = (door->doormask & D_TRAPPED) != 0,
                     seeit = cansee(x, y);
 
             set_msg_xy(x, y); /* You()/pline() will reset this */
             if (!seeit)
-                You_hear(_("%s."), trapped ? "an explosion" : door_smashed);
+                You_hear(_("%s."), trapped ? _("an explosion") : door_smashed);
             else if (!canspotmon(mtmp))
                 You_see(_("%s."), trapped ? door_go_boom : door_smashed);
             else if (!Unaware)
                 pline_The(_("door is smashed%s"),
-                          trapped ? " and it explodes!" : ".");
+                          trapped ? _(" and it explodes!") : ".");
             set_msg_xy(0, 0); /* in case none of the messages was delivered */
 
             door->doormask = D_NODOOR;
@@ -3403,9 +3403,9 @@ monkilled(
     /* extra message if pet golem is completely destroyed;
        if not visible, this will follow "you have a sad feeling" */
     if (mdef->mtame) {
-        const char *rxt = (how == AD_FIRE && completelyburns(mptr)) ? "roast"
-                          : (how == AD_RUST && completelyrusts(mptr)) ? "rust"
-                            : (how == AD_DCAY && completelyrots(mptr)) ? "rot"
+        const char *rxt = (how == AD_FIRE && completelyburns(mptr)) ? _("roast")
+                          : (how == AD_RUST && completelyrusts(mptr)) ? _("rust")
+                            : (how == AD_DCAY && completelyrots(mptr)) ? _("rot")
                               :  0;
         if (rxt)
             pline(_("May %s %s in peace."), noit_mon_nam(mdef), rxt);
@@ -5420,7 +5420,7 @@ newcham(
                     /* Do this even if msg is FALSE */
                     You(_("%s %s%s!"),
                         (amorphous(olddata) || is_whirly(olddata))
-                            ? "emerge from" : "break out of",
+                            ? _("emerge from") : _("break out of"),
                         l_oldname, msgtrail);
                     msg = FALSE; /* message has been given */
                     mtmp->mhp = 1; /* almost dead */

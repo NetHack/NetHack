@@ -1553,13 +1553,13 @@ burn_object(anything *arg, long timeout)
                 case OBJ_INVENT:
                 case OBJ_MINVENT:
                     pline(_("%s%scandle%s getting short."), whose,
-                          menorah ? "candelabrum's " : "",
-                          many ? "s are" : " is");
+                          menorah ? _("candelabrum's ") : "",
+                          many ? _("s are") : _(" is"));
                     break;
                 case OBJ_FLOOR:
                     You_see(_("%scandle%s getting short."),
-                            menorah ? "a candelabrum's " : many ? "some "
-                                                                : "a ",
+                            menorah ? _("a candelabrum's ") : many ? _("some ")
+                                                                : _("a "),
                             many ? "s" : "");
                     break;
                 }
@@ -1571,14 +1571,14 @@ burn_object(anything *arg, long timeout)
                 case OBJ_INVENT:
                 case OBJ_MINVENT:
                     pline(_("%s%scandle%s flame%s flicker%s low!"), whose,
-                          menorah ? "candelabrum's " : "", many ? "s'" : "'s",
+                          menorah ? _("candelabrum's ") : "", many ? _("s'") : _("'s"),
                           many ? "s" : "", many ? "" : "s");
                     break;
                 case OBJ_FLOOR:
                     You_see(_("%scandle%s flame%s flicker low!"),
-                            menorah ? "a candelabrum's " : many ? "some "
-                                                                : "a ",
-                            many ? "s'" : "'s", many ? "s" : "");
+                            menorah ? _("a candelabrum's ") : many ? _("some ")
+                                                                : _("a "),
+                            many ? _("s'") : _("'s"), many ? "s" : "");
                     break;
                 }
             break;
@@ -1594,7 +1594,7 @@ burn_object(anything *arg, long timeout)
                         /*FALLTHRU*/
                     case OBJ_MINVENT:
                         pline(_("%scandelabrum's flame%s."), whose,
-                              many ? "s die" : " dies");
+                              many ? _("s die") : _(" dies"));
                         break;
                     case OBJ_FLOOR:
                         You_see(_("a candelabrum's flame%s die."),

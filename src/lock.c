@@ -234,7 +234,7 @@ forcelock(void)
             /* for a +0 weapon, probability that it survives an unsuccessful
              * attempt to force the lock is (.992)^50 = .67
              */
-            pline(_("%sour %s broke!"), (uwep->quan > 1L) ? "One of y" : "Y",
+            pline(_("%sour %s broke!"), (uwep->quan > 1L) ? _("One of y") : _("Y"),
                   xname(uwep));
             useup(uwep);
             You(_("give up your attempt to force the lock."));
@@ -1223,8 +1223,8 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
                         } else if (!Deaf) {
                             Soundeffect(se_explosion, 75);
                             You_hear(_("a %s explosion."),
-                                     (distu(x, y) > 7 * 7) ? "distant"
-                                                           : "nearby");
+                                     (distu(x, y) > 7 * 7) ? _("distant")
+                                                           : _("nearby"));
                         }
                     }
                 }
