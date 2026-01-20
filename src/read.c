@@ -328,7 +328,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 int
 doread(void)
 {
-    static const char find_any_braille[] = "feel any Braille writing.";
+    static const char find_any_braille[] = N_("feel any Braille writing.");
     struct obj *scroll;
     boolean confused, nodisappear;
     int otyp;
@@ -377,7 +377,7 @@ doread(void)
         const char *endpunct;
 
         if (Blind) {
-            You_cant(find_any_braille);
+            You_cant(_(find_any_braille));
             return ECMD_OK;
         }
         /* can't read shirt worn under suit (under cloak is ok though) */
@@ -501,7 +501,7 @@ doread(void)
         struct permonst *pm = &mons[red_mons[scroll->o_id % SIZE(red_mons)]];
 
         if (Blind) {
-            You_cant(find_any_braille);
+            You_cant(_(find_any_braille));
             return ECMD_OK;
         }
         if (flags.verbose)
@@ -540,7 +540,7 @@ doread(void)
         const char *wrapper = candy_wrapper_text(scroll);
 
         if (Blind) {
-            You_cant(find_any_braille);
+            You_cant(_(find_any_braille));
             return ECMD_OK;
         }
         if (!*wrapper) {

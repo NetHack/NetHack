@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 11:02+0900\n"
+"POT-Creation-Date: 2026-01-20 11:30+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -2232,6 +2232,19 @@ msgstr "이제 점수가 기록되지 않는 탐험 모드에 있다."
 #, c-format
 msgid "Continuing with %s."
 msgstr "%s{으로/로} 계속한다."
+
+#: src/cmd.c:991
+#, c-format
+msgid "%s achievement revoked."
+msgstr ""
+
+#: src/cmd.c:998
+msgid "Mine's-end"
+msgstr ""
+
+#: src/cmd.c:1002
+msgid "Soko-prize"
+msgstr ""
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -9034,6 +9047,58 @@ msgstr "받아라!"
 #, c-format
 msgid "Hark!  \"%s.\""
 msgstr "들어봐! \"%s.\""
+
+#: src/mail.c:493
+#, fuzzy, c-format
+msgid "%sReport bugs to <%s>.%s"
+msgstr "%s{이/가} %s%s 시작했다."
+
+#: src/mail.c:494
+msgid "Please disregard previous letter."
+msgstr ""
+
+#: src/mail.c:495
+#, fuzzy
+msgid "Welcome to NetHack."
+msgstr "%s %s, NetHack에 오신 것을 환영합니다! 당신은 %s입니다."
+
+#: src/mail.c:497
+msgid "Only Amiga makes it possible."
+msgstr ""
+
+#: src/mail.c:498
+msgid "CATS have all the answers."
+msgstr ""
+
+#: src/mail.c:500
+msgid "This mail complies with the Yendorian Anti-Spam Act (YASA)"
+msgstr ""
+
+#: src/mail.c:501
+msgid "Please find enclosed a small token to represent your Owlbear"
+msgstr ""
+
+#: src/mail.c:502
+msgid "**FR33 P0T10N 0F FULL H34L1NG**"
+msgstr ""
+
+#: src/mail.c:503
+msgid "Please return to sender (Asmodeus)"
+msgstr ""
+
+#: src/mail.c:509
+msgid "Buy a potion of gain level for only $19.99!  Guaranteed to be blessed!"
+msgstr ""
+
+#: src/mail.c:516
+#, c-format
+msgid "%sInvitation: Visit the NetHack web site at %s%s"
+msgstr ""
+
+#: src/mail.c:518
+#, fuzzy
+msgid "It reads:  \""
+msgstr "적혀있기를:"
 
 #: src/mail.c:534
 msgid "Unfortunately you cannot see what it says."
@@ -16188,6 +16253,10 @@ msgstr "%s 신에게 기도한다는 생각 자체가 불쾌하다."
 msgid "begin praying to %s."
 msgstr "%s{에게} 기도하기 시작했다."
 
+#: src/pray.c:2232
+msgid "Force the gods to be pleased?"
+msgstr ""
+
 #: src/pray.c:2259
 msgid "praying"
 msgstr "기도하는 중"
@@ -16428,6 +16497,10 @@ msgstr "%s{이/가} 말한다:"
 #: src/quest.c:445
 msgid "I'm finally free!"
 msgstr "드디어 자유다!"
+
+#: src/read.c:331
+msgid "feel any Braille writing."
+msgstr ""
 
 #: src/read.c:366
 msgid "break up the cookie and throw away the pieces."

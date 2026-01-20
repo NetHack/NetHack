@@ -490,32 +490,32 @@ readmail(struct obj *otmp UNUSED)
     enum delivery_types delivery = normal_delivery;
     const char *recipient = 0;
     static const char *const junk_templates[] = {
-        "%sReport bugs to <%s>.%s", /*** must be first entry ***/
-        "Please disregard previous letter.",
-        "Welcome to NetHack.",
+        N_("%sReport bugs to <%s>.%s"), /*** must be first entry ***/
+        N_("Please disregard previous letter."),
+        N_("Welcome to NetHack."),
 #ifdef AMIGA
-        "Only Amiga makes it possible.",
-        "CATS have all the answers.",
+        N_("Only Amiga makes it possible."),
+        N_("CATS have all the answers."),
 #endif
-        "This mail complies with the Yendorian Anti-Spam Act (YASA)",
-        "Please find enclosed a small token to represent your Owlbear",
-        "**FR33 P0T10N 0F FULL H34L1NG**",
-        "Please return to sender (Asmodeus)",
+        N_("This mail complies with the Yendorian Anti-Spam Act (YASA)"),
+        N_("Please find enclosed a small token to represent your Owlbear"),
+        N_("**FR33 P0T10N 0F FULL H34L1NG**"),
+        N_("Please return to sender (Asmodeus)"),
         /* when enclosed by "It reads:  \"...\"", this is too long
            for an ordinary 80-column display so wraps to a second line
            (suboptimal but works correctly);
            dollar sign and fractional zorkmids are inappropriate within
            nethack but are suitable for typical dysfunctional spam mail */
-        ("Buy a potion of gain level for only $19.99! "
+        N_("Buy a potion of gain level for only $19.99! "
          " Guaranteed to be blessed!"),
         /* DEVTEAM_URL will be substituted for 2nd "%s";
            terminating punctuation (formerly "!") has deliberately been
            omitted so that it can't be mistaken for part of the URL
            (unfortunately that is still followed by a closing quote--in
            the pline below, not the data here) */
-        "%sInvitation: Visit the NetHack web site at %s%s"
+        N_("%sInvitation: Visit the NetHack web site at %s%s")
     };
-    const char *const it_reads = "It reads:  \"";
+    const char *const it_reads = N_("It reads:  \"");
 
     i = rn2(SIZE(junk_templates));
     if (strchr(junk_templates[i], '%')) {
@@ -534,9 +534,9 @@ readmail(struct obj *otmp UNUSED)
         pline(_("Unfortunately you cannot see what it says."));
     } else {
         if (delivery == subst_delivery)
-            pline(junk_templates[i], it_reads, recipient, "\"");
+            pline(_(junk_templates[i]), _(it_reads), recipient, "\"");
         else if (delivery == normal_delivery)
-            pline(_("%s%s\""), it_reads, junk_templates[i]);
+            pline(_("%s%s\""), _(it_reads), _(junk_templates[i]));
     }
 }
 

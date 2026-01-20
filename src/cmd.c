@@ -988,18 +988,18 @@ makemap_prepost(boolean pre, boolean wiztower)
         makemap_remove_mons();
         rm_mapseen(ledger_no(&u.uz)); /* discard overview info for level */
         {
-            static const char Unachieve[] = "%s achievement revoked.";
+            static const char Unachieve[] = N_("%s achievement revoked.");
 
             /* achievement tracking; if replacing a level that has a
                special prize, lose credit for previously finding it and
                reset for the new instance of that prize */
             if (Is_mineend_level(&u.uz)) {
                 if (remove_achievement(ACH_MINE_PRIZE))
-                    pline(Unachieve, "Mine's-end");
+                    pline(_(Unachieve), _("Mine's-end"));
                 svc.context.achieveo.mines_prize_oid = 0;
             } else if (Is_sokoend_level(&u.uz)) {
                 if (remove_achievement(ACH_SOKO_PRIZE))
-                    pline(Unachieve, "Soko-prize");
+                    pline(_(Unachieve), _("Soko-prize"));
                 svc.context.achieveo.soko_prize_oid = 0;
             }
         }

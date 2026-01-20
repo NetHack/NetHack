@@ -2229,7 +2229,7 @@ dopray(void)
         return ECMD_OK;
 
     if (wizard && gp.p_type >= 0) {
-        static const char forcesuccess[] = "Force the gods to be pleased?";
+        static const char forcesuccess[] = N_("Force the gods to be pleased?");
 
         /* if we asked "are you sure?" above we suppressed the response
            from the do-again buffer, so need to suppress this response too;
@@ -2239,10 +2239,10 @@ dopray(void)
             boolean save_doagain = gi.in_doagain;
 
             gi.in_doagain = FALSE;
-            ok = (YN(forcesuccess) == 'y');
+            ok = (YN(_(forcesuccess)) == 'y');
             gi.in_doagain = save_doagain;
         } else {
-            ok = (y_n(forcesuccess) == 'y');
+            ok = (y_n(_(forcesuccess)) == 'y');
         }
         if (ok) {
             u.ublesscnt = 0;
