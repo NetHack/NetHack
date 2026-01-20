@@ -969,7 +969,7 @@ kick_door(coordxy x, coordxy y, int avrg_attrib)
         /* note: this used to be unconditional "WHAMMM!!!" but that has a
            fairly strong connotation of noise that a deaf hero shouldn't
            hear; we've kept the extra 'm's and one of the extra '!'s */
-        pline(_("%s!!"), (Deaf || !rn2(3)) ? "Thwack" : "Whammm");
+        pline(_("%s!!"), (Deaf || !rn2(3)) ? _("Thwack") : _("Whammm"));
         if (in_town(x, y))
             (void) get_iter_mons_xy(watchman_door_damage, x, y);
     }
@@ -987,7 +987,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
                   /* don't "kick open" when it's locked
                      unless it also happens to be trapped */
                   ((gm.maploc->doormask & (D_LOCKED | D_TRAPPED))
-                   == D_LOCKED) ? "Your kick uncovers" : "You kick open");
+                   == D_LOCKED) ? _("Your kick uncovers") : _("You kick open"));
             exercise(A_DEX, TRUE);
             if (gm.maploc->doormask & D_TRAPPED) {
                 gm.maploc->doormask = D_NODOOR;

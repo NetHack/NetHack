@@ -299,7 +299,7 @@ demon_talk(struct monst *mtmp)
     if (gy.youmonst.data->mlet == S_DEMON) { /* Won't blackmail their own. */
         if (!Deaf)
             pline(_("%s says, \"Good hunting, %s.\""), Amonnam(mtmp),
-                  flags.female ? "Sister" : "Brother");
+                  flags.female ? _("Sister") : _("Brother"));
         else if (canseemon(mtmp))
             pline(_("%s says something."), Amonnam(mtmp));
         if (!tele_restrict(mtmp))
