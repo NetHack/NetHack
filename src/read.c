@@ -390,7 +390,7 @@ doread(void)
             return ECMD_OK;
         }
         if (otyp == HAWAIIAN_SHIRT) {
-            pline(_("%s features %s."), flags.verbose ? "The design" : "It",
+            pline(_("%s features %s."), flags.verbose ? _("The design") : _("It"),
                   hawaiian_design(scroll, buf));
             return ECMD_TIME;
         }
@@ -1447,10 +1447,10 @@ seffect_remove_curse(struct obj **sobjp)
     long wornmask;
 
     You_feel(!Hallucination
-             ? (!confused ? "like someone is helping you."
-                : "like you need some help.")
-             : (!confused ? "in touch with the Universal Oneness."
-                : "the power of the Force against you!"));
+             ? (!confused ? _("like someone is helping you.")
+                : _("like you need some help."))
+             : (!confused ? _("in touch with the Universal Oneness.")
+                : _("the power of the Force against you!")));
 
     if (scursed) {
         pline_The(_("scroll disintegrates."));
@@ -1883,7 +1883,7 @@ seffect_earth(struct obj **sobjp)
         } else {
             if (!avoid_ceiling(&u.uz)) {
                 pline_The(_("%s rumbles %s you!"), ceiling(u.ux, u.uy),
-                          sblessed ? "around" : "above");
+                          sblessed ? _("around") : _("above"));
             } else {
                 char matbuf[BUFSZ];
                 const char *const avalanche = "avalanche";
@@ -3044,8 +3044,8 @@ do_stinking_cloud(struct obj *sobj, boolean mention_stinking)
             pline(_("Ugh... someone cut the cheese."));
         else
             pline(_("%s a whiff of rotten eggs."),
-                  sobj->oclass == SCROLL_CLASS ? "The scroll crumbles with"
-                                               : "You smell");
+                  sobj->oclass == SCROLL_CLASS ? _("The scroll crumbles with")
+                                               : _("You smell"));
         return;
     }
     (void) create_gas_cloud(cc.x, cc.y, 15 + 10 * bcsign(sobj),

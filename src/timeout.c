@@ -760,8 +760,8 @@ nh_timeout(void)
                 newsym(u.ux, u.uy);
                 if (!Invis && !BInvis && !Blind) {
                     You(!See_invisible
-                            ? "are no longer invisible."
-                            : "can no longer see through yourself.");
+                            ? _("are no longer invisible.")
+                            : _("can no longer see through yourself."));
                     stop_occupation();
                 }
                 break;

@@ -2018,8 +2018,8 @@ potionbreathe(struct obj *obj)
         if (!Blind && !Invis) {
             kn++;
             pline(_("For an instant you %s!"),
-                  See_invisible ? "could see right through yourself"
-                                : "couldn't see yourself");
+                  See_invisible ? _("could see right through yourself")
+                                : _("couldn't see yourself"));
         }
         break;
     case POT_PARALYSIS:

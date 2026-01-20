@@ -693,11 +693,11 @@ doforce(void)
         boolean use_plural = uwep && uwep->quan > 1;
 
         You_cant(_("force anything %s weapon%s."),
-                 !uwep ? "when not wielding a"
+                 !uwep ? _("when not wielding a")
                  : (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep))
-                   ? (use_plural ? "without proper" : "without a proper")
-                   : (use_plural ? "with those" : "with that"),
-                 use_plural ? "s" : "");
+                   ? (use_plural ? _("without proper") : _("without a proper"))
+                   : (use_plural ? _("with those") : _("with that")),
+                 use_plural ? _("s") : "");
         return ECMD_OK;
     }
     if (!can_reach_floor(TRUE)) {
@@ -1011,7 +1011,7 @@ doclose(void)
             There(_("is no obvious way to close the drawbridge."));
         else {
  nodoor:
-            You(_("%s no door there."), Blind ? "feel" : "see");
+            You(_("%s no door there."), Blind ? _("feel") : _("see"));
         }
         return res;
     }

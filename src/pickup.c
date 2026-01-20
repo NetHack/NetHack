@@ -1987,7 +1987,7 @@ encumber_msg(void)
             break;
         default:
             You(_("%s move a handspan with this load!"),
-                newcap == 4 ? "can barely" : "can't even");
+                newcap == 4 ? _("can barely") : _("can't even"));
             break;
         }
         disp.botl = TRUE;
@@ -2094,7 +2094,7 @@ do_loot_cont(
 #if 0
         if (ccount < 2 && (svl.level.objects[cobj->ox][cobj->oy] == cobj))
             pline(_("%s locked."),
-                  cobj->lknown ? "It is" : "Hmmm, it turns out to be");
+                  cobj->lknown ? _("It is") : _("Hmmm, it turns out to be"));
         else
 #endif
         if (cobj->lknown)

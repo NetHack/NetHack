@@ -4991,7 +4991,7 @@ doorganize(void) /* inventory organizer by Del Lamb */
     if (!gi.invent || (gi.invent->oclass == COIN_CLASS
                       && gi.invent->invlet == GOLD_SYM && !gi.invent->nobj)) {
         You(_("aren't carrying anything %s."),
-            !gi.invent ? "to adjust" : "adjustable");
+            !gi.invent ? _("to adjust") : _("adjustable"));
         return ECMD_OK;
     }
 

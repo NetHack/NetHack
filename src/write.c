@@ -414,7 +414,7 @@ new_book_description(int booktype, char *outbuf)
         if (!strcmpi(descr, *comp_p))
             break;
 
-    Sprintf(outbuf, "%s%s", *comp_p ? "into " : "", descr);
+    Sprintf(outbuf, "%s%s", *comp_p ? _("into ") : "", descr);
     return outbuf;
 }
 

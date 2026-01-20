@@ -588,9 +588,8 @@ study_book(struct obj *spellbook)
                 if (Role_if(PM_WIZARD) && read_ability < 20 && !confused) {
                     char qbuf[QBUFSZ];
 
-                    Sprintf(qbuf,
-                    "This spellbook is %sdifficult to comprehend.  Continue?",
-                            (read_ability < 12 ? "very " : ""));
+                    Sprintf(qbuf, "%s",
+                    _("This spellbook is difficult to comprehend.  Continue?"));
                     if (y_n(qbuf) != 'y') {
                         spellbook->in_use = FALSE;
                         return 1;

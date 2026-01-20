@@ -95,7 +95,7 @@ missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
         pline_mon(mtmp, _("%s pretends to be friendly."), Monnam(mtmp));
     else
         pline_mon(mtmp, _("%s %smisses!"), Monnam(mtmp),
-              (nearmiss && flags.verbose) ? "just " : "");
+              (nearmiss && flags.verbose) ? _("just ") : "");
 
     stop_occupation();
 }
@@ -1435,11 +1435,11 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
         if (mtmp->data == &mons[PM_FOG_CLOUD]) {
             You(_("are laden with moisture and %s"),
                 flaming(gy.youmonst.data)
-                    ? "are smoldering out!"
-                    : Breathless ? "find it mildly uncomfortable."
+                    ? _("are smoldering out!")
+                    : Breathless ? _("find it mildly uncomfortable.")
                                  : amphibious(gy.youmonst.data)
-                                       ? "feel comforted."
-                                       : "can barely breathe!");
+                                       ? _("feel comforted.")
+                                       : _("can barely breathe!"));
             if ((Amphibious || Breathless) && !flaming(gy.youmonst.data))
                 tmp = 0;
         } else {

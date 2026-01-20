@@ -1804,7 +1804,7 @@ dopay(void)
 
     if (helpless(shkp)) { /* still asleep/paralyzed */
         pline(_("%s %s."), Shknam(shkp),
-              rn2(2) ? "seems to be napping" : "doesn't respond");
+              rn2(2) ? _("seems to be napping") : _("doesn't respond"));
         return ECMD_OK;
     }
 
@@ -1813,7 +1813,7 @@ dopay(void)
         if (!ltmp) {
             You(_("do not owe %s anything."), shkname(shkp));
         } else if (!umoney) {
-            You(_("%shave no gold."), stashed_gold ? "seem to " : "");
+            You(_("%shave no gold."), stashed_gold ? _("seem to ") : "");
             if (stashed_gold)
                 pline(_("But you have some gold stashed away."));
         } else {
@@ -2002,7 +2002,7 @@ pay_billed_items(
     umoney = money_cnt(gi.invent);
     if (!umoney && !eshkp->credit) {
         You(_("%shave no gold or credit%s."),
-            stashed_gold ? "seem to " : "", *paid_p ? " left" : "");
+            stashed_gold ? _("seem to ") : "", *paid_p ? _(" left") : "");
         return TRUE;
     }
     bp = eshkp->bill_p;
@@ -2407,14 +2407,14 @@ insufficient_funds(
     if (!cost && umoney + ecredit == 0L) {
         stashed_gold = hidden_gold(TRUE);
         You(_("%shave no gold or credit left."),
-            (stashed_gold > 0) ? "seem to " : "");
+            (stashed_gold > 0) ? _("seem to ") : "");
         return TRUE;
     }
     if (cost && umoney + ecredit < cost) {
         stashed_gold = hidden_gold(TRUE);
         You(_("don't%s have gold%s enough to pay for %s."),
-            (stashed_gold > 0L) ? " seem to" : "",
-            (ecredit > 0L) ? " or credit" : "",
+            (stashed_gold > 0L) ? _(" seem to") : "",
+            (ecredit > 0L) ? _(" or credit") : "",
             paydoname(item));
         return TRUE;
     }
@@ -3513,10 +3513,10 @@ addtobill(
             obj->quan = 1L; /* fool xname() into giving singular */
             set_voice(shkp, 0, 80, 0);
             pline(_("%s %ld %s %s %s%s.\""), buf, ltmp, currency(ltmp),
-                  (save_quan > 1L) ? "per"
+                  (save_quan > 1L) ? _("per")
                                    : (contentscount && !obj->unpaid)
-                                       ? "for the contents of this"
-                                       : "for this",
+                                       ? _("for the contents of this")
+                                       : _("for this"),
                   xname(obj),
                   (contentscount && obj->unpaid) ? _(and_its_contents) : "");
             obj->quan = save_quan;

@@ -499,8 +499,8 @@ invault(void)
         buf[0] = '\0';
         trycount = 5;
         do {
-            getlin(Deaf ? "You are required to supply your name. -"
-                        : "\"Hello stranger, who are you?\" -", buf);
+            getlin(Deaf ? _("You are required to supply your name. -")
+                        : _("\"Hello stranger, who are you?\" -"), buf);
             (void) mungspaces(buf);
         } while (!buf[0] && --trycount > 0);
 

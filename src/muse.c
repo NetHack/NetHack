@@ -2545,7 +2545,7 @@ use_misc(struct monst *mtmp)
                          the_weapon);
             if (welded(obj)) {
                 pline(_("%s welded to your %s%c"),
-                      !is_plural(obj) ? "It is" : "They are", hand,
+                      !is_plural(obj) ? _("It is") : _("They are"), hand,
                       !obj->bknown ? '!' : '.');
                 /* obj->bknown = 1; */ /* welded() takes care of this */
                 where_to = 0;
@@ -3079,7 +3079,7 @@ muse_unslime(
 
     if (vis)
         pline_mon(mon, _("%s starts turning %s."), Monnam(mon),
-              green_mon(mon) ? "into ooze" : hcolor(NH_GREEN));
+              green_mon(mon) ? _("into ooze") : hcolor(NH_GREEN));
     /* -4 => sliming, causes quiet loss of enhanced speed */
     mon_adjust_speed(mon, -4, (struct obj *) 0);
 

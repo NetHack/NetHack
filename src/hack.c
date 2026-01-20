@@ -1681,8 +1681,8 @@ u_rooted(void)
     if (!gy.youmonst.data->mmove) {
         You(_("are rooted %s."),
             Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
-                ? "in place"
-                : "to the ground");
+                ? _("in place")
+                : _("to the ground"));
         nomul(0);
         return TRUE;
     }
@@ -3700,7 +3700,7 @@ pickup_checks(void)
                 pline(_("But it's kind of slimy, so you drop it."));
             } else
                 You(_("don't %s anything in here to pick up."),
-                    Blind ? "feel" : "see");
+                    Blind ? _("feel") : _("see"));
             return 1;
         } else {
             return -2; /* loot the monster inventory */

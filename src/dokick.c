@@ -1967,8 +1967,8 @@ down_gate(coordxy x, coordxy y)
     }
     /* hole will always be flagged as seen; trap drop might or might not */
     if ((ttmp = t_at(x, y)) != 0 && ttmp->tseen && is_hole(ttmp->ttyp)) {
-        gg.gate_str = (ttmp->ttyp == TRAPDOOR) ? "through the trap door"
-                                              : "through the hole";
+        gg.gate_str = (ttmp->ttyp == TRAPDOOR) ? _("through the trap door")
+                                              : _("through the hole");
         return MIGR_RANDOM;
     }
     return MIGR_NOWHERE;

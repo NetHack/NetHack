@@ -3951,7 +3951,7 @@ dbterrainmesg(
     coordxy x, coordxy y)
 {
     pline(_("%s %s the drawbridge."), newtype,
-          (levl[x][y].typ == DRAWBRIDGE_UP) ? "in front of" : "under");
+          (levl[x][y].typ == DRAWBRIDGE_UP) ? _("in front of") : _("under"));
 }
 
 #define TIN_UNDEFINED 0

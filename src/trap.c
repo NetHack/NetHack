@@ -2350,9 +2350,9 @@ trapeffect_anti_magic(
             if (Passes_walls)
                 dmgval2 = (dmgval2 + 3) / 4;
 
-            You_feel((dmgval2 >= hp) ? "unbearably torpid!"
-                     : (dmgval2 >= hp / 4) ? "very lethargic."
-                       : "sluggish.");
+            You_feel((dmgval2 >= hp) ? _("unbearably torpid!")
+                     : (dmgval2 >= hp / 4) ? _("very lethargic.")
+                       : _("sluggish."));
             /* opposite of magical explosion */
             losehp(dmgval2, _("anti-magic implosion"), KILLED_BY_AN);
         }
@@ -3148,7 +3148,7 @@ blow_up_landmine(struct trap *trap)
             if (typ != ROOM) {
                 lev->typ = typ;
                 liquid_flow(x, y, typ, trap,
-                            cansee(x, y) ? "The hole fills with %s!"
+                            cansee(x, y) ? _("The hole fills with %s!")
                                          : (char *) 0);
             } else {
                 trap->ttyp = PIT;       /* explosion creates a pit */
@@ -5854,18 +5854,18 @@ untrap(
             if (boxcnt) {
                 if (is_pit(ttmp->ttyp)) {
                     You_cant(_("do much about %s%s."), the_trap,
-                             u.utrap ? " that you're stuck in"
-                                     : " while standing on the edge of it");
+                             u.utrap ? _(" that you're stuck in")
+                                     : _(" while standing on the edge of it"));
                     trap_skipped = TRUE;
                     deal_with_floor_trap = FALSE;
                 } else {
                     Snprintf(qbuf, sizeof(qbuf),
-                             "There %s and %s here.  %s %s?",
-                             (boxcnt == 1) ? "is a container"
-                                           : "are containers",
+                             _("There %s and %s here.  %s %s?"),
+                             (boxcnt == 1) ? _("is a container")
+                                           : _("are containers"),
                              an(trapdescr),
-                             (ttmp->ttyp == WEB) ? "Remove"
-                                                 : "Disarm",
+                             (ttmp->ttyp == WEB) ? _("Remove")
+                                                 : _("Disarm"),
                              the_trap);
                     switch (ynq(qbuf)) {
                     case 'q':
@@ -5880,7 +5880,7 @@ untrap(
             if (deal_with_floor_trap) {
                 if (u.utrap) {
                     You(_("cannot deal with %s while trapped%s!"), the_trap,
-                        u_at(x, y) ? " in it" : "");
+                        u_at(x, y) ? _(" in it") : "");
                     return 1;
                 }
                 if ((mtmp = m_at(x, y)) != 0
@@ -5977,7 +5977,7 @@ untrap(
 
     switch (levl[x][y].doormask) {
     case D_NODOOR:
-        You(_("%s no door there."), Blind ? "feel" : "see");
+        You(_("%s no door there."), Blind ? _("feel") : _("see"));
         return 0;
     case D_ISOPEN:
         pline(_("This door is safely open."));

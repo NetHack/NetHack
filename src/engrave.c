@@ -220,10 +220,10 @@ cant_reach_floor(coordxy x, coordxy y, boolean up,
 {
     pline(_("%s can't reach the %s."),
           wand_engraving
-              ? "The wand does nothing more, and the tip of the wand"
-              : "You",
+              ? _("The wand does nothing more, and the tip of the wand")
+              : _("You"),
           up  ? ceiling(x, y)
-              : (check_pit && can_reach_floor(FALSE)) ? "bottom of the pit"
+              : (check_pit && can_reach_floor(FALSE)) ? _("bottom of the pit")
                                                       : surface(x, y));
 }
 
@@ -393,7 +393,7 @@ read_engr_at(coordxy x, coordxy y)
                      && strchr(".!?", et[elen - 1]))) {
                 endpunct = ".";
             }
-            You(_("%s: \"%s\"%s"), (Blind) ? "feel the words" : "read", et,
+            You(_("%s: \"%s\"%s"), (Blind) ? _("feel the words") : _("read"), et,
                 endpunct);
             Strcpy(ep->engr_txt[remembered_text], ep->engr_txt[actual_text]);
             ep->eread = 1;

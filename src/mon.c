@@ -1788,9 +1788,9 @@ mon_givit(struct monst *mtmp, struct permonst *ptr)
             mon_set_minvis(mtmp);
             if (vis)
                 pline_mon(mtmp, _("%s %s."), mtmpbuf,
-                      !canspotmon(mtmp) ? "vanishes"
-                      : mtmp->invis_blkd ? "seems to flicker"
-                        : "becomes invisible");
+                      !canspotmon(mtmp) ? _("vanishes")
+                      : mtmp->invis_blkd ? _("seems to flicker")
+                        : _("becomes invisible"));
         }
         mtmp->mstun = 1; /* no timeout but will eventually wear off */
         return;

@@ -652,12 +652,12 @@ background_enlightenment(int unused_mode UNUSED, int final)
            the start of the session and it might be past midnight (or
            days later if the game has been paused without save/restore),
            so phrase this similar to the start up message */
-        Sprintf(buf, " Bad things %s on Friday the 13th.",
-                !final ? "can happen"
-                : (final == ENL_GAMEOVERALIVE) ? "could have happened"
+        Sprintf(buf, _(" Bad things %s on Friday the 13th."),
+                !final ? _("can happen")
+                : (final == ENL_GAMEOVERALIVE) ? _("could have happened")
                   /* there's no may to tell whether -1 Luck made a
                      difference but hero has died... */
-                  : "happened");
+                  : _("happened"));
         enlght_out(buf);
     }
 
@@ -678,12 +678,8 @@ background_enlightenment(int unused_mode UNUSED, int final)
         if (ulvl < 30 && (final || wizard)) {
             long nxtlvl = newuexp(ulvl), delta = nxtlvl - u.uexp;
 
-            Sprintf(eos(buf), ", %ld %s%sneeded %s level %d",
-                    delta, (u.uexp > 0) ? "more " : "",
-                    /* present tense=="needed", past tense=="were needed" */
-                    !final ? "" : (delta == 1L) ? "was " : "were ",
-                    /* "for": grammatically iffy but less likely to wrap */
-                    (ulvl < 18) ? "to attain" : "for", (ulvl + 1));
+            Sprintf(eos(buf), _(" (%ld %smore experience needed for level %d)"),
+                    delta, (u.uexp > 0) ? "" : _("less "), (ulvl + 1));
         }
         you_have(buf, "");
     }
@@ -1066,10 +1062,10 @@ status_enlightenment(int mode, int final)
 
         (void) trap_predicament(predicament, final, wizard);
         if (u.usteed) { /* not `Riding' here */
-            Sprintf(buf, "%s%s ", anchored ? "you and " : "", steedname);
+            Sprintf(buf, "%s%s ", anchored ? _("you and ") : "", steedname);
             *buf = highc(*buf);
-            enl_msg(buf, (anchored ? "are " : "is "),
-                    (anchored ? "were " : "was "), predicament, "");
+            enl_msg(buf, (anchored ? _("are ") : _("is ")),
+                    (anchored ? _("were ") : _("was ")), predicament, "");
         } else
             you_are(predicament, "");
     } /* (u.utrap) */
@@ -1297,12 +1293,12 @@ weapon_insight(int final)
         /* "you have no/basic/expert/master/grand-master skill with <skill>"
            or "you are unskilled/skilled in <skill>" */
         Sprintf(buf, "%s %s %s", sklvlbuf,
-                hav ? "skill with" : "in", skill_name(wtype));
+                hav ? _("skill with") : _("in"), skill_name(wtype));
 
         if (!u.twoweap) {
             if (can_advance(wtype, FALSE))
-                Sprintf(eos(buf), " and %s that",
-                        !final ? "can enhance" : "could have enhanced");
+                Sprintf(eos(buf), _(" and %s that"),
+                        !final ? _("can enhance") : _("could have enhanced"));
             if (hav)
                 you_have(buf, "");
             else

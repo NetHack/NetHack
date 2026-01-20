@@ -1103,15 +1103,15 @@ dotele(
         } else
 #endif
         if (u.uhunger <= 10) {
-            cantdoit = "are too weak from hunger";
+            cantdoit = _("are too weak from hunger");
         } else if (ACURR(A_STR) < 4) {
-            cantdoit = "lack the strength";
+            cantdoit = _("lack the strength");
         } else if (energy > u.uen) {
-            cantdoit = "lack the energy";
+            cantdoit = _("lack the energy");
         }
         if (cantdoit) {
             You(_("%s %s."), cantdoit,
-                castit ? "for a teleport spell" : "to teleport");
+                castit ? _("for a teleport spell") : _("to teleport"));
             return 0;
         } else if (check_capacity(
                        _("Your concentration falters from carrying so much."))) {
@@ -1414,7 +1414,7 @@ level_tele(void)
     }
 
     schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0,
-                  flags.verbose ? "You materialize on a different level!"
+                  flags.verbose ? _("You materialize on a different level!")
                                 : (char *) 0);
 #if 0   /* always wait until end of turn to change level, otherwise code
          * that references monsters as this call stack unwinds won't be

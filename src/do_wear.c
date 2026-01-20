@@ -130,7 +130,7 @@ toggle_stealth(
         } else {
             boolean riding = (u.usteed != NULL);
 
-            You(_("%s%s are noisy."), riding ? "and " : "sure",
+            You(_("%s%s are noisy."), riding ? _("and ") : _("sure"),
                 riding ? x_monnam(u.usteed, ARTICLE_YOUR, (char *) NULL,
                                   (SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION),
                                   FALSE)
@@ -348,7 +348,7 @@ Cloak_on(void)
         /* Note: it's already being worn, so we have to cheat here. */
         if ((HInvis || EInvis) && !Blind) {
             newsym(u.ux, u.uy);
-            You(_("can %s!"), See_invisible ? "no longer see through yourself"
+            You(_("can %s!"), See_invisible ? _("no longer see through yourself")
                                          : see_yourself);
         }
         break;
@@ -359,7 +359,7 @@ Cloak_on(void)
             makeknown(uarmc->otyp);
             newsym(u.ux, u.uy);
             pline(_("Suddenly you can%s yourself."),
-                  See_invisible ? " see through" : "not see");
+                  See_invisible ? _(" see through") : _("not see"));
         }
         break;
     case OILSKIN_CLOAK:
@@ -416,7 +416,7 @@ Cloak_off(void)
             makeknown(CLOAK_OF_INVISIBILITY);
             newsym(u.ux, u.uy);
             pline(_("Suddenly you can %s."),
-                  See_invisible ? "no longer see through yourself"
+                  See_invisible ? _("no longer see through yourself")
                                 : see_yourself);
         }
         break;
@@ -2834,9 +2834,9 @@ do_takeoff(void)
         }
     } else if (doff->what == W_SWAPWEP) {
         setuswapwep((struct obj *) 0);
-        You(_("%sno longer %s."), was_twoweap ? "are " : "",
-            was_twoweap ? "wielding two weapons at once"
-                        : "have a second weapon readied");
+        You(_("%sno longer %s."), was_twoweap ? _("are ") : "",
+            was_twoweap ? _("wielding two weapons at once")
+                        : _("have a second weapon readied"));
     } else if (doff->what == W_QUIVER) {
         setuqwep((struct obj *) 0);
         You(_("no longer have ammunition readied."));

@@ -128,7 +128,7 @@ use_towel(struct obj *obj)
             old = (Glib & TIMEOUT);
             make_glib((int) old + rn1(10, 3)); /* + 3..12 */
             Your(_("%s %s!"), makeplural(body_part(HAND)),
-                 (old ? "are filthier than ever" : "get slimy"));
+                 (old ? _("are filthier than ever") : _("get slimy")));
             if (is_wet_towel(obj))
                 dry_a_towel(obj, -1, drying_feedback);
             return ECMD_TIME;
@@ -3163,7 +3163,7 @@ use_whip(struct obj *obj)
             You(_("wrap your bullwhip around %s."), yname(otmp));
             if (gotit && mwelded(otmp)) {
                 pline(_("%s welded to %s %s%c"),
-                      (otmp->quan == 1L) ? "It is" : "They are", mhis(mtmp),
+                      (otmp->quan == 1L) ? _("It is") : _("They are"), mhis(mtmp),
                       mon_hand, !otmp->bknown ? '!' : '.');
                 set_bknown(otmp, 1);
                 gotit = FALSE; /* can't pull it free */

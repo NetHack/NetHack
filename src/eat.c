@@ -3486,9 +3486,9 @@ newuhs(boolean incr)
                           ? gu.urole.name.m
                           : "Elf");
             else
-                You(_("%s weak."), !incr ? "are still"
-                                : (u.uhunger < 45) ? "feel"
-                                  : "are beginning to feel");
+                You(_("%s weak."), !incr ? _("are still")
+                                : (u.uhunger < 45) ? _("feel")
+                                  : _("are beginning to feel"));
             if (incr && go.occupation
                 && (go.occupation != eatfood && go.occupation != opentin))
                 stop_occupation();
