@@ -3885,7 +3885,7 @@ float_up(void)
                above that floor but not from enhancing carrying capacity */
             You(_("feel lighter, but your %s is still chained to the %s."),
                 body_part(LEG),
-                IS_ROOM(levl[cc.x][cc.y].typ) ? "floor" : "ground");
+                IS_ROOM(levl[cc.x][cc.y].typ) ? _("floor") : _("ground"));
         } else if (u.utraptype == WEB) {
             You(_("float up slightly, but you are still stuck in the %s."),
                 trapname(WEB, FALSE));
@@ -3991,7 +3991,7 @@ float_down(
     }
     if (u.uswallow) {
         You(_("float down, but you are still %s."),
-            digests(u.ustuck->data) ? "swallowed" : "engulfed");
+            digests(u.ustuck->data) ? _("swallowed") : _("engulfed"));
         encumber_msg();
         return 1;
     }
@@ -4136,8 +4136,8 @@ climb_pit(void)
         reset_utrap(FALSE);
         You(_("%s to the edge of the %s."),
             (Sokoban && Levitation)
-                ? "struggle against the air currents and float"
-                : u.usteed ? "ride" : "crawl",
+                ? _("struggle against the air currents and float")
+                : u.usteed ? _("ride") : _("crawl"),
             pitname);
         fill_pit(u.ux, u.uy);
         gv.vision_full_recalc = 1; /* vision limits change */
@@ -4299,7 +4299,7 @@ domagictrap(void)
             } else {
                 /* If we're invisible from another source */
                 You_feel(_("a little more %s now."),
-                         HInvis ? "obvious" : "hidden");
+                         HInvis ? _("obvious") : _("hidden"));
             }
             HInvis = HInvis ? 0 : HInvis | FROMOUTSIDE;
             newsym(u.ux, u.uy);
@@ -4902,7 +4902,7 @@ rnd_nextto_goodpos(coordxy *x, coordxy *y, struct monst *mtmp)
 void
 back_on_ground(boolean rescued)
 {
-    const char *preposit = (Levitation || Flying) ? "over" : "on",
+    const char *preposit = (Levitation || Flying) ? _("over") : _("on"),
                *surf = surface(u.ux, u.uy), *you_are_back;
     char icebuf[QBUFSZ];
 
@@ -5359,7 +5359,7 @@ move_into_trap(struct trap *ttmp)
         /* caller has just printed "Whoops..." so if hero is prevented from
            moving, a followup message is needed */
         pline(_("Fortunately, you don't move %s it."),
-              into_vs_onto(ttmp->ttyp) ? "into" : "onto");
+              into_vs_onto(ttmp->ttyp) ? _("into") : _("onto"));
     }
 }
 
@@ -5444,9 +5444,9 @@ try_disarm(
             }
         } else {
             pline(_("%s %s is difficult to %s."),
-                  ttmp->madeby_u ? "Your" : under_u ? "This" : "That",
+                  ttmp->madeby_u ? _("Your") : under_u ? _("This") : _("That"),
                   trapname(ttype, FALSE),
-                  (ttype == WEB) ? "remove" : "disarm");
+                  (ttype == WEB) ? _("remove") : _("disarm"));
         }
         return 1;
     }
@@ -5506,7 +5506,7 @@ disarm_holdingtrap(struct trap *ttmp)
         if (wep && wep->oartifact
             && (u_wield_art(ART_STING) || attacks(AD_FIRE, wep)))
             pline(_("%s %s through %s web!"), bare_artifactname(uwep),
-                  u_wield_art(ART_STING) ? "cuts" : "burns", which);
+                  u_wield_art(ART_STING) ? _("cuts") : _("burns"), which);
         else if (wep)
             You(_("cut through %s web."), which);
         else
@@ -5843,9 +5843,9 @@ untrap(
         /* note: boxcnt and useplural will always be 0 for !here case */
         if (ttmp || boxcnt)
             There(_("%s %s %s but you can't reach %s%s."),
-                  useplural ? "are" : "is", the_trap, here ? "here" : "there",
-                  useplural ? "them" : "it",
-                  u.usteed ? " while mounted" : "");
+                  useplural ? _("are") : _("is"), the_trap, here ? _("here") : _("there"),
+                  useplural ? _("them") : _("it"),
+                  u.usteed ? _(" while mounted") : "");
         trap_skipped = (ttmp != 0);
     } else { /* deal_with_floor_trap */
 
@@ -5913,7 +5913,7 @@ untrap(
                     }
                     return help_monster_out(mtmp, ttmp);
                 default:
-                    You(_("cannot disable %s trap."), !here ? "that" : "this");
+                    You(_("cannot disable %s trap."), !here ? _("that") : _("this"));
                     return 0;
                 }
             }

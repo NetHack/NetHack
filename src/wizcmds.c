@@ -311,7 +311,7 @@ wiz_kill(void)
 
             if (!iflags.menu_requested) {
                 /* normal case: hero is credited/blamed */
-                You(_("%s %s!"), nonliving(mtmp->data) ? "destroy" : "kill", Mn);
+                You(_("%s %s!"), nonliving(mtmp->data) ? _("destroy") : _("kill"), Mn);
                 xkilled(mtmp, XKILL_NOMSG);
             } else { /* 'm'-prefix */
                 /* we know that monsters aren't moving because player has
@@ -321,7 +321,7 @@ wiz_kill(void)
                    avoid blaming or crediting hero for their deaths */
                 svc.context.mon_moving = TRUE;
                 pline(_("%s is %s."), upstart(Mn),
-                      nonliving(mtmp->data) ? "destroyed" : "killed");
+                      nonliving(mtmp->data) ? _("destroyed") : _("killed"));
                 /* Null second arg suppresses the usual message */
                 monkilled(mtmp, (char *) 0, AD_PHYS);
                 svc.context.mon_moving = FALSE;

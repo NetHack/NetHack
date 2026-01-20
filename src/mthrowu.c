@@ -289,8 +289,8 @@ monshoot(struct monst *mtmp, struct obj *otmp, struct obj *mwep)
         Strcpy(trgbuf, mtarg ? some_mon_nam(mtarg) : "");
         set_msg_xy(mtmp->mx, mtmp->my);
         pline(_("%s %s %s%s%s!"), Monnam(mtmp),
-              gm.m_shot.s ? "shoots" : "throws", onm,
-              mtarg ? " at " : "", trgbuf);
+              gm.m_shot.s ? _("shoots") : _("throws"), onm,
+              mtarg ? _(" at ") : "", trgbuf);
         gm.m_shot.o = otmp->otyp;
     } else {
         gm.m_shot.o = STRANGE_OBJECT; /* don't give multishot feedback */
@@ -455,7 +455,7 @@ ohitmon(
                 if (vis || (verbose && !gm.mtarget))
                     pline(_("%s is %s!"), Monnam(mtmp),
                           (nonliving(mtmp->data) || is_vampshifter(mtmp)
-                           || !canspotmon(mtmp)) ? "destroyed" : "killed");
+                           || !canspotmon(mtmp)) ? _("destroyed") : _("killed"));
                 /* don't blame hero for unknown rolling boulder trap */
                 if (!svc.context.mon_moving
                    && (otmp->otyp != BOULDER || range >= 0 || otmp->otrapped))
@@ -778,7 +778,7 @@ m_throw(
                 if (range && cansee(gb.bhitpos.x, gb.bhitpos.y)
                     && IS_SINK(levl[gb.bhitpos.x][gb.bhitpos.y].typ))
                     pline(_("%s %s onto the sink."), The(mshot_xname(singleobj)),
-                          otense(singleobj, Hallucination ? "plop" : "drop"));
+                          otense(singleobj, Hallucination ? _("plop") : _("drop")));
                 else if (gm.m_shot.n > 1
                          && (!gm.mesg_given
                              || gb.bhitpos.x != u.ux || gb.bhitpos.y != u.uy)
@@ -878,7 +878,7 @@ return_from_mtoss(
                 if (canseemon(magr)) {
                     pline(_("%s back to %s, landing %s %s %s."),
                           Tobjnam(otmp, "return"), mon_nam(magr),
-                          mlevitating ? "beneath" : "at", mhis(magr),
+                          mlevitating ? _("beneath") : _("at"), mhis(magr),
                           makeplural(mbodypart(magr, FOOT)));
                 } else if (!Deaf) {
                     You_hear(_("%s land near %s."), Something, mon_nam(magr));
