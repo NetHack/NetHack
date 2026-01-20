@@ -1852,8 +1852,8 @@ pickup_object(
             obj->spe = 1;
         } else {
             pline_The(_("scroll%s %s to dust as you %s %s up."), plur(obj->quan),
-                      otense(obj, "turn"), telekinesis ? "raise" : "pick",
-                      (obj->quan == 1L) ? "it" : "them");
+                      otense(obj, "turn"), telekinesis ? _("raise") : _("pick"),
+                      (obj->quan == 1L) ? _("it") : _("them"));
             trycall(obj);
             useupf(obj, obj->quan);
             return 1; /* tried to pick something up and failed, but
@@ -2049,7 +2049,7 @@ able_to_loot(
         /* at present, can't loot in water even when Underwater;
            can tip underwater, but not when over--or stuck in--lava */
         You(_("cannot %s things that are deep in the %s."), verb,
-            hliquid(is_lava(x, y) ? "lava" : "water"));
+            hliquid(is_lava(x, y) ? _("lava") : _("water")));
         return FALSE;
     } else if (nolimbs(gy.youmonst.data)) {
         pline(_("Without limbs, you cannot %s anything."), verb);
@@ -2327,14 +2327,14 @@ doloot_core(void)
                 }
             } else {
                 You(_("%s %s%shere to loot."), dont_find_anything,
-                    (prev_inquiry || prev_loot) ? "else " : "",
-                    !underfoot ? "t" : "");
+                    (prev_inquiry || prev_loot) ? _("else ") : "",
+                    !underfoot ? _("t") : "");
                 return (timepassed ? ECMD_TIME : ECMD_OK);
             }
         }
     } else if (c != 'y' && c != 'n') {
         You(_("%s %s to loot."), dont_find_anything,
-            underfoot ? "here" : "there");
+            underfoot ? _("here") : _("there"));
     }
     return (timepassed ? ECMD_TIME : ECMD_OK);
 }
@@ -2566,7 +2566,7 @@ in_container(struct obj *obj)
         return 0;
     } else if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
         Norep(_("You cannot %s %s you are wearing."),
-              Icebox ? "refrigerate" : "stash", something);
+              Icebox ? _("refrigerate") : _("stash"), something);
         return 0;
     } else if ((obj->otyp == LOADSTONE) && obj->cursed) {
         set_bknown(obj, 1);
@@ -2803,7 +2803,7 @@ mbag_item_gone(boolean held, struct obj *item, boolean silent)
         if (item->dknown)
             pline(_("%s %s vanished!"), Doname2(item), otense(item, "have"));
         else
-            You(_("%s %s disappear!"), Blind ? "notice" : "see", doname(item));
+            You(_("%s %s disappear!"), Blind ? _("notice") : _("see"), doname(item));
     }
 
     if (*u.ushops && (shkp = shop_keeper(*u.ushops)) != 0) {
@@ -3135,8 +3135,8 @@ use_container(
     }
 
     if ((loot_in || stash_one) && !inokay) {
-        You(_("don't have anything%s to %s."), gi.invent ? " else" : "",
-            stash_one ? "stash" : "put in");
+        You(_("don't have anything%s to %s."), gi.invent ? _(" else") : "",
+            stash_one ? _("stash") : _("put in"));
         loot_in = stash_one = FALSE;
     }
 

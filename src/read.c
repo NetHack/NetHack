@@ -629,7 +629,7 @@ doread(void)
                 pline(_("Being so trippy, you screw up..."));
             else
                 pline(_("Being confused, you %s the magic words..."),
-                      silently ? "misunderstand" : "mispronounce");
+                      silently ? _("misunderstand") : _("mispronounce"));
         }
     }
     if (!seffects(scroll)) {
@@ -666,13 +666,13 @@ stripspe(struct obj *obj)
 staticfn void
 p_glow1(struct obj *otmp)
 {
-    pline(_("%s briefly."), Yobjnam2(otmp, Blind ? "vibrate" : "glow"));
+    pline(_("%s briefly."), Yobjnam2(otmp, Blind ? _("vibrate") : _("glow")));
 }
 
 staticfn void
 p_glow2(struct obj *otmp, const char *color)
 {
-    pline(_("%s%s%s for a moment."), Yobjnam2(otmp, Blind ? "vibrate" : "glow"),
+    pline(_("%s%s%s for a moment."), Yobjnam2(otmp, Blind ? _("vibrate") : _("glow")),
           Blind ? "" : " ", Blind ? "" : hcolor(color));
 }
 
@@ -680,7 +680,7 @@ staticfn void
 p_glow3(struct obj *otmp, const char *color)
 {
     pline(_("%s feebly%s%s for a moment."),
-          Yobjnam2(otmp, Blind ? "vibrate" : "glow"),
+          Yobjnam2(otmp, Blind ? _("vibrate") : _("glow")),
           Blind ? "" : " ", Blind ? "" : hcolor(color));
 }
 
@@ -1143,15 +1143,15 @@ seffect_enchant_armor(struct obj **sobjp)
         } else {
             otmp->rknown = TRUE;
             pline(_("%s covered by a %s %s %s!"), Yobjnam2(otmp, "are"),
-                  scursed ? "mottled" : "shimmering",
+                  scursed ? _("mottled") : _("shimmering"),
                   hcolor(scursed ? NH_BLACK : NH_GOLDEN),
-                  scursed ? "glow"
-                  : (is_shield(otmp) ? "layer" : "shield"));
+                  scursed ? _("glow")
+                  : (is_shield(otmp) ? _("layer") : _("shield")));
         }
         if (new_erodeproof && (otmp->oeroded || otmp->oeroded2)) {
             otmp->oeroded = otmp->oeroded2 = 0;
             pline(_("%s as good as new!"),
-                  Yobjnam2(otmp, Blind ? "feel" : "look"));
+                  Yobjnam2(otmp, Blind ? _("feel") : _("look")));
         }
         if (old_erodeproof && !new_erodeproof) {
             /* restore old_erodeproof before shop charges */
@@ -1179,7 +1179,7 @@ seffect_enchant_armor(struct obj **sobjp)
     if (s > (special_armor ? 5 : 3) && rn2(s)) {
         otmp->in_use = TRUE;
         pline(_("%s violently %s%s%s for a while, then %s."), Yname2(otmp),
-              otense(otmp, Blind ? "vibrate" : "glow"),
+              otense(otmp, Blind ? _("vibrate") : _("glow")),
               (!Blind && !same_color) ? " " : "",
               (Blind || same_color) ? "" : hcolor(scursed ? NH_BLACK
                                                   : NH_SILVER),
@@ -1244,12 +1244,12 @@ seffect_enchant_armor(struct obj **sobjp)
         return;
     }
     pline(_("%s %s%s%s%s for a %s."), Yname2(otmp),
-          (s == 0) ? "violently " : "",
-          otense(otmp, Blind ? "vibrate" : "glow"),
+          (s == 0) ? _("violently ") : "",
+          otense(otmp, Blind ? _("vibrate") : _("glow")),
           (!Blind && !same_color) ? " " : "",
           (Blind || same_color)
           ? "" : hcolor(scursed ? NH_BLACK : NH_SILVER),
-          (s * s > 1) ? "while" : "moment");
+          (s * s > 1) ? _("while") : _("moment"));
     /* [this cost handling will need updating if shop pricing is
        ever changed to care about curse/bless status of armor] */
     if (s < 0)
@@ -1279,7 +1279,7 @@ seffect_enchant_armor(struct obj **sobjp)
     if ((otmp->spe > (special_armor ? 5 : 3))
         && (special_armor || !rn2(7)))
         pline(_("%s %s."), Yobjnam2(otmp, "suddenly vibrate"),
-              Blind ? "again" : "unexpectedly");
+              Blind ? _("again") : _("unexpectedly"));
 }
 
 staticfn void
@@ -1362,7 +1362,7 @@ seffect_confuse_monster(struct obj **sobjp)
     } else if (confused) {
         if (!sblessed) {
             Your(_("%s begin to %s%s."), hands,
-                 altfeedback ? "tingle" : "glow ",
+                 altfeedback ? _("tingle") : _("glow "),
                  altfeedback ? "" : hcolor(NH_PURPLE));
             make_confused(HConfusion + rnd(100), FALSE);
         } else {
@@ -1596,14 +1596,14 @@ seffect_enchant_weapon(struct obj **sobjp)
         } else {
             uwep->rknown = TRUE;
             pline(_("%s covered by a %s %s %s!"), Yobjnam2(uwep, "are"),
-                  scursed ? "mottled" : "shimmering",
+                  scursed ? _("mottled") : _("shimmering"),
                   hcolor(scursed ? NH_PURPLE : NH_GOLDEN),
-                  scursed ? "glow" : "shield");
+                  scursed ? _("glow") : _("shield"));
         }
         if (new_erodeproof && (uwep->oeroded || uwep->oeroded2)) {
             uwep->oeroded = uwep->oeroded2 = 0;
             pline(_("%s as good as new!"),
-                  Yobjnam2(uwep, Blind ? "feel" : "look"));
+                  Yobjnam2(uwep, Blind ? _("feel") : _("look")));
         }
         if (old_erodeproof && !new_erodeproof) {
             /* restore old_erodeproof before shop charges */
@@ -1656,11 +1656,11 @@ seffect_taming(struct obj **sobjp)
     }
     if (!results) {
         pline(_("Nothing interesting %s."),
-              !candidates ? "happens" : "seems to happen");
+              !candidates ? _("happens") : _("seems to happen"));
     } else {
         pline_The(_("neighborhood %s %sfriendlier."),
-                  vis_results ? "is" : "seems",
-                  (results < 0) ? "un" : "");
+                  vis_results ? _("is") : _("seems"),
+                  (results < 0) ? _("un") : "");
         if (vis_results > 0)
             gk.known = TRUE;
     }
