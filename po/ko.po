@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 13:04+0900\n"
+"POT-Creation-Date: 2026-01-20 13:08+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -9032,10 +9032,87 @@ msgstr "함정에 빠짐"
 msgid " in %s"
 msgstr " %s에"
 
+#: src/insight.c:426
+msgid "Total elapsed playing time "
+msgstr "총 경과 플레이 시간 "
+
+#: src/insight.c:426 src/insight.c:1494 src/insight.c:1808 src/insight.c:1895
+#, fuzzy
+msgid "is"
+msgstr "촉촉한 "
+
+#: src/insight.c:426 src/insight.c:1494 src/insight.c:1808 src/insight.c:1895
+#, fuzzy
+msgid "was"
+msgstr "당시 "
+
 # === insight.c status descriptions ===
 #: src/insight.c:495 src/obj_descr_i18n.c:421
 msgid "actually "
 msgstr "실제로 "
+
+#: src/insight.c:625 src/insight.c:627
+#, fuzzy
+msgid "It "
+msgstr "그것"
+
+#: src/insight.c:625 src/insight.c:627 src/insight.c:647 src/insight.c:696
+#: src/insight.c:754 src/insight.c:799 src/insight.c:1948 src/insight.c:1950
+#, fuzzy
+msgid "is "
+msgstr "촉촉한 "
+
+#: src/insight.c:625 src/insight.c:627 src/insight.c:647 src/insight.c:696
+#: src/insight.c:754 src/insight.c:799 src/insight.c:1948 src/insight.c:1950
+msgid "was "
+msgstr "당시 "
+
+#: src/insight.c:625
+msgid "the midnight hour"
+msgstr "자정입니다"
+
+#: src/insight.c:627
+#, fuzzy
+msgid "nighttime"
+msgstr "기사"
+
+# ============================================================
+# UI 메시지 (invent.c - "here" 관련)
+# ============================================================
+# %1$s = "is"/"are", %2$s = object name
+#: src/insight.c:647
+#, fuzzy
+msgid "There "
+msgstr "여기에 %2$s{이/가} 있다.%1$.0s"
+
+# ============================================================
+# 인벤토리 메시지 (Inventory Messages)
+# ============================================================
+#: src/insight.c:696
+#, fuzzy
+msgid "Your score "
+msgstr "당신의 말"
+
+#: src/insight.c:713
+msgid "Basics:"
+msgstr "기본 정보:"
+
+#: src/insight.c:754
+#, fuzzy
+msgid "Your armor class "
+msgstr "당신의 군마"
+
+#: src/insight.c:777
+msgid "you "
+msgstr ""
+
+#: src/insight.c:777
+msgid "have "
+msgstr "가지고 있었습니다 "
+
+#: src/insight.c:777
+msgid "had "
+msgstr "가지고 있었습니다 "
 
 #: src/insight.c:787
 msgid ", but temporarily disabled while inside the shop"
@@ -9066,15 +9143,6 @@ msgstr "게임 옵션 목록."
 msgid "Autopickup "
 msgstr "자동 줍기: %s."
 
-#: src/insight.c:799
-#, fuzzy
-msgid "is "
-msgstr "촉촉한 "
-
-#: src/insight.c:799
-msgid "was "
-msgstr "당시 "
-
 #: src/insight.c:945 src/obj_descr_i18n.c:422
 msgid "transformed"
 msgstr "변신 상태"
@@ -9091,6 +9159,26 @@ msgstr "처벌받는 중"
 msgid "an unseen creature"
 msgstr "보이지 않는 생물"
 
+# ============================================================
+# 시스템 메시지 (System Messages)
+# ============================================================
+#: src/insight.c:1163
+msgid "You "
+msgstr "당신은 "
+
+#: src/insight.c:1163
+#, fuzzy
+msgid "fall"
+msgstr "무너져"
+
+#: src/insight.c:1163
+msgid "fell"
+msgstr "잠에 빠졌습니다"
+
+#: src/insight.c:1163
+msgid " asleep uncontrollably"
+msgstr " 통제할 수 없이"
+
 #: src/insight.c:1177 src/obj_descr_i18n.c:426
 msgid "not hungry"
 msgstr "배고프지 않음"
@@ -9099,9 +9187,137 @@ msgstr "배고프지 않음"
 msgid "unencumbered"
 msgstr "짐이 없음"
 
+#: src/insight.c:1455
+#, fuzzy
+msgid "Your items "
+msgstr "발견한 물품"
+
+#: src/insight.c:1456
+msgid "are somewhat"
+msgstr "은 어느 정도"
+
+#: src/insight.c:1456 src/trap.c:389 src/trap.c:392 src/trap.c:394
+#, fuzzy
+msgid "are"
+msgstr "맨"
+
+#: src/insight.c:1457
+msgid "were somewhat"
+msgstr "은 어느 정도"
+
+#: src/insight.c:1457
+msgid "were"
+msgstr "은"
+
+#: src/insight.c:1477
+msgid "Final Attributes:"
+msgstr "최종 속성:"
+
+#: src/insight.c:1477
+msgid "Attributes:"
+msgstr "속성:"
+
+#: src/insight.c:1494
+#, fuzzy
+msgid "Your alignment "
+msgstr "성향"
+
 #: src/insight.c:1601 src/obj_descr_i18n.c:428
 msgid "sensing the presence of monsters"
 msgstr "몬스터의 존재를 감지하는 중"
+
+#: src/insight.c:1654
+#, fuzzy
+msgid "You aggravate"
+msgstr "당신은 %s."
+
+#: src/insight.c:1654 src/insight.c:1657 src/insight.c:1746
+msgid "d"
+msgstr "했습니다"
+
+#: src/insight.c:1654
+#, fuzzy
+msgid " monsters"
+msgstr "보이지 않는 괴물!"
+
+#: src/insight.c:1657
+#, fuzzy
+msgid "You cause"
+msgstr "당신은 %s."
+
+#: src/insight.c:1657
+#, fuzzy
+msgid " conflict"
+msgstr " 분쟁을"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"분쟁의 반지\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"충돌의 반지"
+
+#: src/insight.c:1746
+#, fuzzy
+msgid "You regenerate"
+msgstr "재생의 반지"
+
+#: src/insight.c:1808
+#, fuzzy
+msgid "Your spell casting "
+msgstr "%s{이/가} 저림이 멈췄다."
+
+#: src/insight.c:1883
+#, fuzzy
+msgid "Your life "
+msgstr "당신의 강아지"
+
+#: src/insight.c:1883
+msgid "will be"
+msgstr "이 될 것입니다"
+
+#: src/insight.c:1883
+#, fuzzy
+msgid "would have been"
+msgstr "%s 위로 이동한다."
+
+#: src/insight.c:1883
+msgid " saved"
+msgstr " 구원받음"
+
+#: src/insight.c:1895
+msgid "Your luck "
+msgstr "당신의 행운 "
+
+#: src/insight.c:1895
+msgid " zero"
+msgstr " 0입니다"
+
+#: src/insight.c:1903
+msgid "Bad luck "
+msgstr "나쁜 행운 "
+
+#: src/insight.c:1903 src/insight.c:1905
+msgid "does"
+msgstr "은"
+
+#: src/insight.c:1903 src/insight.c:1905
+#, fuzzy
+msgid "did"
+msgstr "죽음"
+
+#: src/insight.c:1903 src/insight.c:1905
+msgid " not time out for you"
+msgstr " 시간 초과되지 않습니다"
+
+#: src/insight.c:1905
+msgid "Good luck "
+msgstr "좋은 행운 "
+
+#: src/insight.c:1948
+msgid "The current fruit "
+msgstr "현재 과일 "
+
+#: src/insight.c:1950
+msgid "The made fruit flag "
+msgstr "생성된 과일 플래그 "
 
 #: src/insight.c:1980 src/obj_descr_i18n.c:429
 msgid "once"
@@ -22926,11 +23142,6 @@ msgstr "%s %s %s{이/가} 완전히 %s."
 msgid "protected by the layer of grease!"
 msgstr "기름 층에 의해 보호되었다!"
 
-#: src/trap.c:389 src/trap.c:392 src/trap.c:394
-#, fuzzy
-msgid "are"
-msgstr "맨"
-
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
@@ -28251,9 +28462,6 @@ msgstr "tty perm_invent는 최소 %dx%d 터미널이 필요한데, 현재 터미
 #~ msgid "ring of protection"
 #~ msgstr "보호의 반지"
 
-#~ msgid "ring of regeneration"
-#~ msgstr "재생의 반지"
-
 #~ msgid "ring of searching"
 #~ msgstr "탐색의 반지"
 
@@ -28268,14 +28476,6 @@ msgstr "tty perm_invent는 최소 %dx%d 터미널이 필요한데, 현재 터미
 
 #~ msgid "ring of aggravate monster"
 #~ msgstr "몬스터 자극의 반지"
-
-#, fuzzy
-#~ msgid "ring of conflict"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "분쟁의 반지\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "충돌의 반지"
 
 #~ msgid "ring of warning"
 #~ msgstr "경고의 반지"
@@ -29133,12 +29333,6 @@ msgstr "tty perm_invent는 최소 %dx%d 터미널이 필요한데, 현재 터미
 
 #~ msgid "You were killed by %s."
 #~ msgstr "%s에게 죽었다."
-
-# ============================================================
-# 시스템 메시지 (System Messages)
-# ============================================================
-#~ msgid "You "
-#~ msgstr "당신은 "
 
 #~ msgid "What do you want to pick up?"
 #~ msgstr "무엇을 주우시겠습니까?"

@@ -423,7 +423,7 @@ enlightenment(
         }
     }
     (void) fmt_elapsed_time(buf, final);
-    enl_msg("Total elapsed playing time ", "is", "was", buf, "");
+    enl_msg(_("Total elapsed playing time "), _("is"), _("was"), buf, "");
 
     if (!ge.en_via_menu) {
         display_nhwindow(ge.en_win, TRUE);
@@ -622,9 +622,9 @@ background_enlightenment(int unused_mode UNUSED, int final)
        won't vary if user leaves a disclosure prompt or --More-- unanswered
        long enough for the dynamic value to change between then and now */
     if (final ? iflags.at_midnight : midnight()) {
-        enl_msg("It ", "is ", "was ", "the midnight hour", "");
+        enl_msg(_("It "), _("is "), _("was "), _("the midnight hour"), "");
     } else if (final ? iflags.at_night : night()) {
-        enl_msg("It ", "is ", "was ", "nighttime", "");
+        enl_msg(_("It "), _("is "), _("was "), _("nighttime"), "");
     }
     /* other environmental factors */
     if (flags.moonphase == FULL_MOON || flags.moonphase == NEW_MOON) {
@@ -644,7 +644,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
                 /* we don't have access to 'how' here--aside from survived
                    vs died--so settle for general platitude */
                 final ? " when your adventure ended" : "");
-        enl_msg("There ", "is ", "was ", buf, "");
+        enl_msg(_("There "), _("is "), _("was "), buf, "");
     }
     if (flags.friday13) {
         /* let player know that friday13 penalty is/was in effect;
@@ -693,7 +693,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
            only show it here if player has the 'showscore' option enabled */
         Sprintf(buf, "%ld%s", botl_score(),
                 !final ? "" : " before end-of-game adjustments");
-        enl_msg("Your score ", "is ", "was ", buf, "");
+        enl_msg(_("Your score "), _("is "), _("was "), buf, "");
     }
 #endif
 }
@@ -710,7 +710,7 @@ basics_enlightenment(int mode UNUSED, int final)
         pwmax = u.uenmax, hpmax = (Upolyd ? u.mhmax : u.uhpmax);
 
     enlght_out(""); /* separator after background */
-    enlght_out("Basics:");
+    enlght_out(_("Basics:"));
 
     if (hp < 0)
         hp = 0;
@@ -751,7 +751,7 @@ basics_enlightenment(int mode UNUSED, int final)
     if (abs(u.uac) == AC_MAX)
         Sprintf(eos(buf), ", the %s possible",
                 (u.uac < 0) ? "best" : "worst");
-    enl_msg("Your armor class ", "is ", "was ", buf, "");
+    enl_msg(_("Your armor class "), _("is "), _("was "), buf, "");
 
     /* gold; similar to doprgold (#showgold) but without shop billing info;
        includes container contents, unlike status line but like doprgold */
@@ -774,7 +774,7 @@ basics_enlightenment(int mode UNUSED, int final)
         if (hmoney) {
             Sprintf(buf, "%ld %s stashed away in your pack",
                     hmoney, umoney ? "more" : currency(hmoney));
-            enl_msg("you ", "have ", "had ", buf, "");
+            enl_msg(_("you "), _("have "), _("had "), buf, "");
         }
     }
 
@@ -1160,7 +1160,7 @@ status_enlightenment(int mode, int final)
             Strcpy(buf, from_what(SLEEPY));
             if (wizard)
                 Sprintf(eos(buf), " (%ld)", (HSleepy & TIMEOUT));
-            enl_msg("You ", "fall", "fell", " asleep uncontrollably", buf);
+            enl_msg(_("You "), _("fall"), _("fell"), _(" asleep uncontrollably"), buf);
         }
     }
     /* hunger/nutrition */
@@ -1452,9 +1452,9 @@ item_resistance_message(
     if (protection) {
         boolean somewhat = protection < 99;
 
-        enl_msg("Your items ",
-                somewhat ? "are somewhat" : "are",
-                somewhat ? "were somewhat" : "were",
+        enl_msg(_("Your items "),
+                somewhat ? _("are somewhat") : _("are"),
+                somewhat ? _("were somewhat") : _("were"),
                 prot_message, item_what(adtyp));
     }
 }
@@ -1474,7 +1474,7 @@ attributes_enlightenment(
      *  Attributes
     \*/
     enlght_out("");
-    enlght_out(final ? "Final Attributes:" : "Attributes:");
+    enlght_out(final ? _("Final Attributes:") : _("Attributes:"));
 
     if (u.uevent.uhand_of_elbereth) {
         static const char *const hofe_titles[3] = { "the Hand of Elbereth",
@@ -1491,7 +1491,7 @@ attributes_enlightenment(
 
     if (wizard) {
         Sprintf(buf, " %d", u.ualign.record);
-        enl_msg("Your alignment ", "is", "was", buf, "");
+        enl_msg(_("Your alignment "), _("is"), _("was"), buf, "");
     }
 
     /*** Resistances to troubles ***/
@@ -1651,10 +1651,10 @@ attributes_enlightenment(
         enl_msg(You_, "would be", "would have been", buf, "");
     }
     if (Aggravate_monster)
-        enl_msg("You aggravate", "", "d", " monsters",
+        enl_msg(_("You aggravate"), "", _("d"), _(" monsters"),
                 from_what(AGGRAVATE_MONSTER));
     if (Conflict)
-        enl_msg("You cause", "", "d", " conflict", from_what(CONFLICT));
+        enl_msg(_("You cause"), "", _("d"), _(" conflict"), from_what(CONFLICT));
 
     /*** Transportation ***/
     if (Jumping)
@@ -1743,7 +1743,7 @@ attributes_enlightenment(
 
     /*** Physical attributes ***/
     if (Regeneration)
-        enl_msg("You regenerate", "", "d", "", from_what(REGENERATION));
+        enl_msg(_("You regenerate"), "", _("d"), "", from_what(REGENERATION));
     if (Slow_digestion)
         you_have("slower digestion", from_what(SLOW_DIGESTION));
     if (u.uhitinc) {
@@ -1805,7 +1805,7 @@ attributes_enlightenment(
             Strcpy(cast_adj, " enhanced by wearing a robe");
 
         if (*cast_adj)
-            enl_msg("Your spell casting ", "is", "was", cast_adj, "");
+            enl_msg(_("Your spell casting "), _("is"), _("was"), cast_adj, "");
     }
     /* polymorph and other shape change */
     if (Protection_from_shape_changers)
@@ -1880,7 +1880,7 @@ attributes_enlightenment(
     if (Fixed_abil)
         you_have("fixed abilities", from_what(FIXED_ABIL));
     if (Lifesaved)
-        enl_msg("Your life ", "will be", "would have been", " saved", "");
+        enl_msg(_("Your life "), _("will be"), _("would have been"), _(" saved"), "");
 
     /*** Miscellany ***/
     if (Luck) {
@@ -1892,7 +1892,7 @@ attributes_enlightenment(
             Sprintf(eos(buf), " (%d)", Luck);
         you_are(buf, "");
     } else if (wizard)
-        enl_msg("Your luck ", "is", "was", " zero", "");
+        enl_msg(_("Your luck "), _("is"), _("was"), _(" zero"), "");
     if (u.moreluck > 0)
         you_have("extra luck", "");
     else if (u.moreluck < 0)
@@ -1900,9 +1900,9 @@ attributes_enlightenment(
     if (carrying(LUCKSTONE) || stone_luck(TRUE)) {
         ltmp = stone_luck(FALSE);
         if (ltmp <= 0)
-            enl_msg("Bad luck ", "does", "did", " not time out for you", "");
+            enl_msg(_("Bad luck "), _("does"), _("did"), _(" not time out for you"), "");
         if (ltmp >= 0)
-            enl_msg("Good luck ", "does", "did", " not time out for you", "");
+            enl_msg(_("Good luck "), _("does"), _("did"), _(" not time out for you"), "");
     }
 
     if (u.ugangr) {
@@ -1945,9 +1945,9 @@ attributes_enlightenment(
             Sprintf(buf, "Fruit #%d ", f->fid);
             enl_msg(buf, "is ", "was ", f->fname, "");
         }
-        enl_msg("The current fruit ", "is ", "was ", svp.pl_fruit, "");
+        enl_msg(_("The current fruit "), _("is "), _("was "), svp.pl_fruit, "");
         Sprintf(buf, "%d", flags.made_fruit);
-        enl_msg("The made fruit flag ", "is ", "was ", buf, "");
+        enl_msg(_("The made fruit flag "), _("is "), _("was "), buf, "");
     }
 #endif
 
