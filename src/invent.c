@@ -5139,11 +5139,11 @@ doorganize_core(struct obj *obj)
 
     /* get 'to' slot to use as destination */
     if (!splitting)
-        Strcpy(qbuf, "Adjust letter");
+        Strcpy(qbuf, _("Adjust letter"));
     else /* note: splitting->quan is the amount being left in original slot */
-        Sprintf(qbuf, "Split %ld", obj->quan);
-    Sprintf(eos(qbuf), " to what [%s]%s?", lets,
-            gi.invent ? " (? see used letters)" : "");
+        Sprintf(qbuf, _("Split %ld"), obj->quan);
+    Sprintf(eos(qbuf), _(" to what [%s]%s?"), lets,
+            gi.invent ? _(" (? see used letters)") : "");
     for (trycnt = 1; ; ++trycnt) {
         let = !isgold ? yn_function(qbuf, (char *) 0, '\0', TRUE) : GOLD_SYM;
         if (let == '?' || let == '*') {

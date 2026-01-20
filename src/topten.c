@@ -931,11 +931,11 @@ outheader(void)
     char linebuf[BUFSZ];
     char *bp;
 
-    Strcpy(linebuf, " No  Points     Name");
+    Strcpy(linebuf, _(" No  Points     Name"));
     bp = eos(linebuf);
     while (bp < linebuf + COLNO - 9)
         *bp++ = ' ';
-    Strcpy(bp, "Hp [max]");
+    Strcpy(bp, _("Hp [max]"));
     topten_print(linebuf);
 }
 

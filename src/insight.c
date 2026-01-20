@@ -1388,14 +1388,14 @@ weapon_insight(int final)
                        too; "you [also] have basic/expert/master/grand-master
                        skill with <skill>" or "you [also] are unskilled/
                        skilled in <skill> */
-                    Sprintf(buf, "%s %s %s", sklvlbuf2,
-                            hav2 ? "skill with" : "in", sknambuf2);
-                    Strcat(buf, " and two weapons");
+                    Sprintf(buf, _("%s %s %s"), sklvlbuf2,
+                            hav2 ? _("skill with") : _("in"), sknambuf2);
+                    Strcat(buf, _(" and two weapons"));
                     if (also3) {
-                        Strcpy(pfx, "You also ");
+                        Strcpy(pfx, _("You also "));
                         Snprintf(sfx, sizeof(sfx), " %s", buf), buf[0] = '\0';
-                        verb_present = hav2 ? "have" : "are";
-                        verb_past = hav2 ? "had" : "were";
+                        verb_present = hav2 ? _("have") : _("are");
+                        verb_past = hav2 ? _("had") : _("were");
                     }
                 }
                 if (*pfx)
@@ -2886,7 +2886,7 @@ list_vanquished(char defquery, boolean ask)
                         Strcpy(buf, def_monsyms[(int) mlet].explain);
                         special_hdr = FALSE;
                     } else {
-                        Strcpy(buf, "Rider");
+                        Strcpy(buf, _("Rider"));
                         special_hdr = TRUE;
                     }
                     /* 'ask' implies final disclosure, where highlighting
