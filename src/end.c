@@ -6,6 +6,7 @@
 #define NEED_VARARGS /* comment line for pre-compiled headers */
 
 #include "hack.h"
+#include "i18n.h"
 #ifndef NO_SIGNAL
 #include <signal.h>
 #endif
@@ -1109,7 +1110,7 @@ done(int how)
            accept it more than once if there's no user supplying it */
         && !(program_state.done_hup && gd.done_seq++ == gh.hero_seq)
 #endif
-        && !paranoid_query(ParanoidDie, "Die?")) {
+        && !paranoid_query(ParanoidDie, _("Die?"))) {
         pline(_("OK, so you don't %s."), (how == CHOKING) ? _("choke") : _("die"));
         iflags.last_msg = PLNMSG_OK_DONT_DIE;
         savelife(how);

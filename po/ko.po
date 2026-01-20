@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 14:27+0900\n"
+"POT-Creation-Date: 2026-01-20 14:29+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -360,8 +360,8 @@ msgstr "이상한"
 
 #: src/apply.c:682 src/apply.c:1082 src/apply.c:1648 src/apply.c:2128
 #: src/detect.c:999 src/do.c:1800 src/do_wear.c:495 src/do_wear.c:1162
-#: src/dog.c:1206 src/dokick.c:63 src/eat.c:1085 src/eat.c:1092 src/eat.c:1259
-#: src/eat.c:3469 src/explode.c:795 src/getpos.c:986 src/invent.c:2047
+#: src/dog.c:1206 src/dokick.c:63 src/eat.c:1086 src/eat.c:1093 src/eat.c:1260
+#: src/eat.c:3470 src/explode.c:795 src/getpos.c:986 src/invent.c:2047
 #: src/invent.c:3143 src/mail.c:375 src/mhitu.c:1642 src/mon.c:2955
 #: src/mon.c:2957 src/muse.c:2901 src/muse.c:3110 src/music.c:616
 #: src/objnam.c:3664 src/objnam.c:3713 src/objnam.c:3844 src/potion.c:1675
@@ -496,7 +496,7 @@ msgstr "%s{이/가} 흐려져서 반사하지 않는다!"
 #: src/apply.c:1033 src/apply.c:1660 src/apply.c:1675 src/apply.c:2296
 #: src/apply.c:2384 src/apply.c:3653 src/apply.c:3672 src/artifact.c:2033
 #: src/artifact.c:2065 src/artifact.c:2078 src/artifact.c:2082 src/do.c:2028
-#: src/eat.c:2145 src/engrave.c:1246 src/hack.c:4078 src/nhlua.c:636
+#: src/eat.c:2146 src/engrave.c:1246 src/hack.c:4078 src/nhlua.c:636
 #: src/nhlua.c:652 src/pager.c:2697 src/pline.c:677 src/pline.c:689
 #: src/pline.c:744 src/potion.c:208 src/potion.c:235 src/questpgr.c:434
 #: src/sit.c:55 src/sounds.c:1534 src/spell.c:2055 src/teleport.c:1146
@@ -1498,7 +1498,7 @@ msgid "are already %s."
 msgstr "이미 %s."
 
 #: src/apply.c:4314 src/attrib.c:661 src/dig.c:1307 src/dog.c:1332
-#: src/dokick.c:212 src/dothrow.c:1949 src/dothrow.c:2502 src/eat.c:3038
+#: src/dokick.c:212 src/dothrow.c:1949 src/dothrow.c:2502 src/eat.c:3039
 #: src/engrave.c:861 src/engrave.c:869 src/hack.c:1704 src/mcastu.c:770
 #: src/mhitu.c:1708 src/mhitu.c:2569 src/mkobj.c:1603 src/mon.c:1010
 #: src/mon.c:1790 src/mthrowu.c:750 src/muse.c:281 src/music.c:605
@@ -1849,7 +1849,7 @@ msgstr "선동가처럼 느껴진다."
 msgid "the tension decrease around you."
 msgstr "주변의 긴장이 줄어든다."
 
-#: src/artifact.c:2224 src/eat.c:2301
+#: src/artifact.c:2224 src/eat.c:2302
 #, c-format
 msgid "body takes on a %s transparency..."
 msgstr "몸이 %s 투명해진다..."
@@ -1943,7 +1943,7 @@ msgstr "%s 위에 그것을 입을 수 없다."
 
 #: src/attrib.c:1049 src/attrib.c:1055 src/detect.c:1247 src/detect.c:1323
 #: src/dig.c:1068 src/dig.c:1074 src/dokick.c:708 src/dothrow.c:1500
-#: src/eat.c:2117 src/mcastu.c:846 src/mon.c:3796 src/mthrowu.c:1440
+#: src/eat.c:2118 src/mcastu.c:846 src/mon.c:3796 src/mthrowu.c:1440
 #: src/muse.c:218 src/pray.c:697 src/shk.c:3792 src/shk.c:5387 src/sit.c:605
 #: src/sit.c:708 src/spell.c:248 src/steed.c:429 src/timeout.c:255
 #: src/trap.c:6291
@@ -4122,7 +4122,7 @@ msgstr "%s 상태라 %s{으로/로} 갈 수 없다."
 # ============================================================
 # 두루마리 (Scrolls)
 # ============================================================
-#: src/do.c:1124 src/end.c:751 src/hack.c:2651 src/zap.c:597
+#: src/do.c:1124 src/end.c:752 src/hack.c:2651 src/zap.c:597
 #, c-format
 msgid "release %s."
 msgstr "%s{을/를} 놓았다."
@@ -4272,7 +4272,7 @@ msgid "fall down the %s."
 msgstr "%s{을/를} 따라 떨어진다."
 
 # selftouch messages
-#: src/do.c:1797 src/do.c:1809 src/eat.c:3426 src/hack.c:850 src/music.c:316
+#: src/do.c:1797 src/do.c:1809 src/eat.c:3427 src/hack.c:850 src/music.c:316
 #: src/trap.c:1959
 msgid "Falling, you"
 msgstr "떨어지며"
@@ -4679,7 +4679,7 @@ msgstr "%s 빛나고 있다."
 msgid "are no longer bothered by the poison gas."
 msgstr "더 이상 독가스에 시달리지 않는다."
 
-#: src/do_wear.c:1015 src/eat.c:2368
+#: src/do_wear.c:1015 src/eat.c:2369
 #, c-format
 msgid "are suddenly very %s!"
 msgstr "갑자기 매우 %s!"
@@ -5855,7 +5855,7 @@ msgid "Unfortunately, you are wearing %s."
 msgstr "안타깝게도, %s{을/를} 입고 있다."
 
 #
-#: src/dothrow.c:1409 src/eat.c:805
+#: src/dothrow.c:1409 src/eat.c:806
 msgid "turn to stone."
 msgstr "돌로 변했다."
 
@@ -6215,32 +6215,32 @@ msgstr "%s{을/를} 소환한다!"
 msgid "Final resting place for"
 msgstr "최종 안식처:"
 
-#: src/eat.c:191
+#: src/eat.c:192
 msgid "You now prefer mimicking yourself."
 msgstr "이제 자신을 흉내내고 싶어진다."
 
-#: src/eat.c:197
+#: src/eat.c:198
 msgid "Your rind escaped intact."
 msgstr "껍질이 무사히 벗겨졌다."
 
-#: src/eat.c:253
+#: src/eat.c:254
 msgid "like a glutton!"
 msgstr "대식가처럼!"
 
-#: src/eat.c:261
+#: src/eat.c:262
 msgid "choke, but recover your composure."
 msgstr "질식하지만, 침착함을 되찾았다."
 
-#: src/eat.c:264
+#: src/eat.c:265
 msgid "stuff yourself and then vomit voluminously."
 msgstr "배를 채우고 많이 토했다."
 
-#: src/eat.c:274
+#: src/eat.c:275
 #, c-format
 msgid "choke over your %s."
 msgstr "%s에 질식한다."
 
-#: src/eat.c:282
+#: src/eat.c:283
 msgid "choke over it."
 msgstr "그것에 질식한다."
 
@@ -6248,230 +6248,230 @@ msgstr "그것에 질식한다."
 # 사망 메시지 (Death Messages)
 # ============================================================
 #
-#: src/eat.c:285 src/end.c:198
+#: src/eat.c:286 src/end.c:199
 msgid "die..."
 msgstr "죽었다..."
 
-#: src/eat.c:556
+#: src/eat.c:557
 #, c-format
 msgid "finish %s %s."
 msgstr "%s %s{을/를} 다 먹었다."
 
-#: src/eat.c:621
+#: src/eat.c:622
 #, c-format
 msgid "%s brain is unharmed."
 msgstr "%s 뇌는 다치지 않았다."
 
-#: src/eat.c:625
+#: src/eat.c:626
 #, c-format
 msgid "eat %s brain!"
 msgstr "%s 뇌를 먹었다!"
 
-#: src/eat.c:627
+#: src/eat.c:628
 msgid "brain is eaten!"
 msgstr "뇌를 먹었다!"
 
-#: src/eat.c:630
+#: src/eat.c:631
 #, c-format
 msgid "%s brain is eaten!"
 msgstr "%s 뇌를 먹었다!"
 
-#: src/eat.c:645 src/mhitm.c:234 src/mhitm.c:1046 src/mhitu.c:2489
+#: src/eat.c:646 src/mhitm.c:234 src/mhitm.c:1046 src/mhitu.c:2489
 #: src/mon.c:1419
 #, c-format
 msgid "%s turns to stone!"
 msgstr "%s{이/가} 돌로 변했다!"
 
-#: src/eat.c:653
+#: src/eat.c:654
 msgid "have a sad thought for a moment, then it passes."
 msgstr "잠시 슬픈 생각이 들었다가, 지나갔다."
 
-#: src/eat.c:665 src/eat.c:731 src/sounds.c:1455
+#: src/eat.c:666 src/eat.c:732 src/sounds.c:1455
 #, c-format
 msgid "%s doesn't notice."
 msgstr "%s{은/는} 눈치채지 못했다."
 
 #
-#: src/eat.c:669
+#: src/eat.c:670
 msgid "Ingesting that is fatal."
 msgstr "그것을 먹으면 즉사한다."
 
-#: src/eat.c:706
+#: src/eat.c:707
 msgid "Unfortunately your brain is still gone."
 msgstr "불행히도 뇌가 여전히 없다."
 
-#: src/eat.c:711
+#: src/eat.c:712
 msgid "last thought fades away."
 msgstr "마지막 생각이 사라진다."
 
-#: src/eat.c:719
+#: src/eat.c:720
 msgid "like a scarecrow."
 msgstr "허수아비처럼."
 
-#: src/eat.c:743
+#: src/eat.c:744
 #, c-format
 msgid "%s last thought fades away..."
 msgstr "%s 마지막 생각이 사라진다..."
 
-#: src/eat.c:780
+#: src/eat.c:781
 msgid "have a bad feeling deep inside."
 msgstr "깊은 곳에서 나쁜 느낌이 든다."
 
-#: src/eat.c:781
+#: src/eat.c:782
 msgid "cannibal!  You will regret this!"
 msgstr "식인종! 후회하게 될 거다!"
 
-#: src/eat.c:822
+#: src/eat.c:823
 #, c-format
 msgid "that eating the %s was a bad idea."
 msgstr "%s{을/를} 먹은 것은 나쁜 생각이었다."
 
-#: src/eat.c:834
+#: src/eat.c:835
 msgid "Eating that is instantly fatal."
 msgstr "그것을 먹으면 즉사한다."
 
-#: src/eat.c:853 src/uhitm.c:3545
+#: src/eat.c:854 src/uhitm.c:3545
 msgid "don't feel very well."
 msgstr "기분이 좋지 않다."
 
-#: src/eat.c:872
+#: src/eat.c:873
 #, fuzzy, c-format
 msgid "What a pity--you just ruined a future piece of %sart!"
 msgstr "안타깝다 - %s{이/가} 미래의 예술 작품을 망쳤다!"
 
-#: src/eat.c:873
+#: src/eat.c:874
 msgid "fine "
 msgstr "훌륭한 "
 
 #
-#: src/eat.c:875
+#: src/eat.c:876
 #, fuzzy
 msgid "You feel limber!"
 msgstr "나를 풀어줬다!"
 
 # 음식/배고픔 관련
-#: src/eat.c:1014
+#: src/eat.c:1015
 msgid "be chillin'."
 msgstr "쿨해졌다."
 
-#: src/eat.c:1014
+#: src/eat.c:1015
 msgid "feel a momentary chill."
 msgstr "순간적으로 오싹함을 느낀다."
 
-#: src/eat.c:1021 src/eat.c:2361
+#: src/eat.c:1022 src/eat.c:2362
 msgid "wide awake."
 msgstr "완전히 깨어있다."
 
-#: src/eat.c:1028
+#: src/eat.c:1029
 msgid "full of hot air."
 msgstr "허풍이 가득하다."
 
-#: src/eat.c:1035
+#: src/eat.c:1036
 msgid "totally together, man."
 msgstr "완전히 하나가 된 것 같다, 친구."
 
-#: src/eat.c:1035
+#: src/eat.c:1036
 msgid "very firm."
 msgstr "매우 단단해진 느낌이다."
 
-#: src/eat.c:1043
+#: src/eat.c:1044
 msgid "grounded in reality."
 msgstr "현실에 발을 딛고 있다."
 
-#: src/eat.c:1045
+#: src/eat.c:1046
 msgid "health currently feels amplified!"
 msgstr "건강이 현재 증폭된 느낌이다!"
 
-#: src/eat.c:1052
+#: src/eat.c:1053
 msgid "especially healthy."
 msgstr "특히 건강해진 느낌이다."
 
-#: src/eat.c:1052
+#: src/eat.c:1053
 msgid "healthy."
 msgstr "건강해진 느낌이다."
 
-#: src/eat.c:1059
+#: src/eat.c:1060
 msgid "diffuse."
 msgstr "흩어지는 느낌이다."
 
-#: src/eat.c:1059
+#: src/eat.c:1060
 msgid "very jumpy."
 msgstr "매우 불안정한 느낌이다."
 
-#: src/eat.c:1066
+#: src/eat.c:1067
 msgid "centered in your personal space."
 msgstr "자신만의 공간에 중심이 잡힌 느낌이다."
 
-#: src/eat.c:1067
+#: src/eat.c:1068
 msgid "in control of yourself."
 msgstr "자신을 통제할 수 있는 느낌이다."
 
-#: src/eat.c:1074
+#: src/eat.c:1075
 msgid "in touch with the cosmos."
 msgstr "우주와 연결된 느낌이다."
 
-#: src/eat.c:1075
+#: src/eat.c:1076
 msgid "a strange mental acuity."
 msgstr "이상한 정신적 명료함을 느낀다."
 
-#: src/eat.c:1119
+#: src/eat.c:1120
 msgid "a mild buzz."
 msgstr "약간의 기분 좋은 취기."
 
-#: src/eat.c:1169
+#: src/eat.c:1170
 msgid "hidden!"
 msgstr "숨었다!"
 
-#: src/eat.c:1203
+#: src/eat.c:1204
 #, c-format
 msgid "resist the temptation to mimic %s."
 msgstr "%s{을/를} 흉내내고 싶은 유혹에 저항한다."
 
 # gm.multi_reason strings
-#: src/eat.c:1208
+#: src/eat.c:1209
 msgid "pretending to be a pile of gold"
 msgstr "금 더미인 척 하는 중"
 
-#: src/eat.c:1211
+#: src/eat.c:1212
 #, c-format
 msgid "You suddenly dread being peeled and mimic %s again!"
 msgstr "껍질이 벗겨질까 봐 갑자기 두려워지며 다시 %s를 흉내낸다!"
 
-#: src/eat.c:1212
+#: src/eat.c:1213
 #, c-format
 msgid "You now prefer mimicking %s again."
 msgstr "다시 %s를 흉내내고 싶어진다."
 
 #
-#: src/eat.c:1228
+#: src/eat.c:1229
 msgid "velocity suddenly seems very uncertain!"
 msgstr "속도가 갑자기 매우 불확실해진 것 같다!"
 
-#: src/eat.c:1231
+#: src/eat.c:1232
 msgid "seem slower."
 msgstr "더 느린 것 같다."
 
-#: src/eat.c:1234
+#: src/eat.c:1235
 msgid "seem faster."
 msgstr "더 빠른 것 같다."
 
-#: src/eat.c:1249 src/trap.c:2459
+#: src/eat.c:1250 src/trap.c:2459
 msgid "momentarily different."
 msgstr "잠시 달라졌다."
 
-#: src/eat.c:1285
+#: src/eat.c:1286
 msgid "Yum!  That was real brain food!"
 msgstr "냠! 정말 머리에 좋은 음식이었다!"
 
-#: src/eat.c:1290
+#: src/eat.c:1291
 msgid "For some reason, that tasted bland."
 msgstr "어쩐지 싱거운 맛이다."
 
-#: src/eat.c:1305
+#: src/eat.c:1306
 msgid "Oh wow!  Great stuff!"
 msgstr "와! 대단하다!"
 
-#: src/eat.c:1380 src/read.c:1931
+#: src/eat.c:1381 src/read.c:1931
 msgid "guilty."
 msgstr "죄책감."
 
@@ -6479,70 +6479,70 @@ msgstr "죄책감."
 # 물약 메시지 (Potion Messages)
 # ============================================================
 #
-#: src/eat.c:1549 src/potion.c:2805
+#: src/eat.c:1550 src/potion.c:2805
 msgid "It turns out to be empty."
 msgstr "비어 있었다."
 
-#: src/eat.c:1579
+#: src/eat.c:1580
 #, c-format
 msgid "It smells like %s."
 msgstr "%s 냄새가 난다."
 
-#: src/eat.c:1580 src/eat.c:1652
+#: src/eat.c:1581 src/eat.c:1653
 msgid "Eat it?"
 msgstr "먹으시겠습니까?"
 
-#: src/eat.c:1582 src/eat.c:1654
+#: src/eat.c:1583 src/eat.c:1655
 msgid "discard the open tin."
 msgstr "열린 깡통을 버린다."
 
-#: src/eat.c:1596
+#: src/eat.c:1597
 #, c-format
 msgid "consume %s %s."
 msgstr "%s %s{을/를} 먹었다."
 
-#: src/eat.c:1637
+#: src/eat.c:1638
 #, c-format
 msgid "Eating %s food made your %s %s slippery."
 msgstr "%s 음식을 먹어서 %s %s{이/가} 미끄러워졌다."
 
-#: src/eat.c:1644
+#: src/eat.c:1645
 #, c-format
 msgid "It contains some decaying%s%s substance."
 msgstr "썩어가는%s%s 물질이 들어있다."
 
-#: src/eat.c:1647
+#: src/eat.c:1648
 msgid "It contains spinach."
 msgstr "시금치가 들어있다."
 
-#: src/eat.c:1668
+#: src/eat.c:1669
 #, c-format
 msgid "This makes you feel like %s!"
 msgstr "이것은 당신을 %s 같은 느낌이 들게 한다!"
 
-#: src/eat.c:1706
+#: src/eat.c:1707
 msgid "give up your attempt to open the tin."
 msgstr "깡통 열기를 포기한다."
 
-#: src/eat.c:1727
+#: src/eat.c:1728
 msgid "cannot handle the tin properly to open it."
 msgstr "깡통을 제대로 다루지 못해 열 수 없다."
 
 #
-#: src/eat.c:1740
+#: src/eat.c:1741
 msgid "tin seems easy to open."
 msgstr "통조림이 열기 쉬워 보인다."
 
-#: src/eat.c:1764
+#: src/eat.c:1765
 #, c-format
 msgid "Using %s you try to open the tin."
 msgstr "%s{을/를} 사용해 깡통을 열려고 한다."
 
-#: src/eat.c:1767
+#: src/eat.c:1768
 msgid "It is not so easy to open this tin."
 msgstr "이 깡통은 열기 쉽지 않다."
 
-#: src/eat.c:1769
+#: src/eat.c:1770
 #, c-format
 msgid "tin slips from your %s."
 msgstr "깡통이 %s에서 미끄러졌다."
@@ -6550,80 +6550,80 @@ msgstr "깡통이 %s에서 미끄러졌다."
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
-#: src/eat.c:1810
+#: src/eat.c:1811
 #, c-format
 msgid "Blecch!  %s %s!"
 msgstr "웩! %s %s!"
 
-#: src/eat.c:1814
+#: src/eat.c:1815
 msgid "rather trippy."
 msgstr "다소 환각적이다."
 
-#: src/eat.c:1816
+#: src/eat.c:1817
 #, c-format
 msgid "rather %s."
 msgstr "다소 %s."
 
-#: src/eat.c:1819
+#: src/eat.c:1820
 msgid "Everything suddenly goes dark."
 msgstr "갑자기 모든 것이 어두워졌다."
 
-#: src/eat.c:1836
+#: src/eat.c:1837
 #, c-format
 msgid "world spins and %s %s."
 msgstr "세계가 돌고 %s %s."
 
-#: src/eat.c:1840
+#: src/eat.c:1841
 msgid "unconscious from rotten food"
 msgstr "썩은 음식으로 기절함"
 
-#: src/eat.c:1841
+#: src/eat.c:1842
 msgid "You are conscious again."
 msgstr "다시 의식이 돌아왔다."
 
-#: src/eat.c:1894
+#: src/eat.c:1895
 #, c-format
 msgid "Ulch - that %s was tainted%s!"
 msgstr "윽 - 그 %s{은/는} 상했다%s!"
 
-#: src/eat.c:1900
+#: src/eat.c:1901
 msgid "It doesn't seem at all sickening, though..."
 msgstr "하지만, 전혀 역겹지 않은 것 같다..."
 
-#: src/eat.c:1911
+#: src/eat.c:1912
 msgid "(It must have died too long ago to be safe to eat.)"
 msgstr "(먹기에 안전하기엔 너무 오래 전에 죽은 것 같다.)"
 
-#: src/eat.c:1920
+#: src/eat.c:1921
 msgid "have a very bad case of stomach acid."
 msgstr "위산이 매우 심하다."
 
-#: src/eat.c:1925 src/eat.c:2791
+#: src/eat.c:1926 src/eat.c:2792
 msgid "Ecch - that must have been poisonous!"
 msgstr "윽 - 독이 있었던 게 틀림없다!"
 
-#: src/eat.c:1931 src/eat.c:2795
+#: src/eat.c:1932 src/eat.c:2796
 msgid "seem unaffected by the poison."
 msgstr "독의 영향을 받지 않는 것 같다."
 
-#: src/eat.c:1936 src/uhitm.c:5763
+#: src/eat.c:1937 src/uhitm.c:5763
 #, c-format
 msgid "%ssick."
 msgstr "%s아프다."
 
-#: src/eat.c:1956
+#: src/eat.c:1957
 msgid "corpse rots away completely."
 msgstr "시체가 완전히 썩었다."
 
-#: src/eat.c:1968
+#: src/eat.c:1969
 msgid "This tastes just like chicken!"
 msgstr "닭고기 맛이 난다!"
 
-#: src/eat.c:1970
+#: src/eat.c:1971
 msgid "peck the eyeball with delight."
 msgstr "기쁘게 안구를 쪼았다."
 
-#: src/eat.c:1989
+#: src/eat.c:1990
 msgid "Tokay"
 msgstr "도마뱀고기 맛"
 
@@ -6631,20 +6631,20 @@ msgstr "도마뱀고기 맛"
 # 반지
 # #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 # --- 반지 (Rings) ---
-#: src/eat.c:1989
+#: src/eat.c:1990
 #, fuzzy
 msgid "Istringy"
 msgstr "반지"
 
-#: src/eat.c:1989
+#: src/eat.c:1990
 msgid "Igamey"
 msgstr "사냥감 맛"
 
-#: src/eat.c:1989
+#: src/eat.c:1990
 msgid "Ifatty"
 msgstr "기름진 맛"
 
-#: src/eat.c:1989
+#: src/eat.c:1990
 #, fuzzy
 msgid "Itough"
 msgstr "기침을 했다!"
@@ -6652,229 +6652,229 @@ msgstr "기침을 했다!"
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
-#: src/eat.c:1997
+#: src/eat.c:1998
 #, c-format
 msgid "%s%s %s %s%c"
 msgstr "%s%s %s %s%c"
 
-#: src/eat.c:2106
+#: src/eat.c:2107
 msgid "Ugh.  Rotten egg."
 msgstr "윽. 썩은 달걀이다."
 
-#: src/eat.c:2123
+#: src/eat.c:2124
 #, c-format
 msgid "This satiates your %s!"
 msgstr "이것이 당신의 %s{을/를} 채웠다!"
 
-#: src/eat.c:2128
+#: src/eat.c:2129
 msgid "This tripe ration is surprisingly good!"
 msgstr "이 양 내장이 의외로 맛있다!"
 
-#: src/eat.c:2130
+#: src/eat.c:2131
 msgid "Tastes great!  Less filling!"
 msgstr "맛있다! 양도 적당하고!"
 
-#: src/eat.c:2131
+#: src/eat.c:2132
 msgid "Mmm, tripe... not bad!"
 msgstr "음, 내장... 나쁘지 않은데!"
 
-#: src/eat.c:2133
+#: src/eat.c:2134
 msgid "Yak - dog food!"
 msgstr "윽 - 개밥이잖아!"
 
-#: src/eat.c:2148
+#: src/eat.c:2149
 msgid "A little goes a long way."
 msgstr "조금이 많은 역할을 한다."
 
-#: src/eat.c:2168
+#: src/eat.c:2169
 #, c-format
 msgid "My, this is a %s %s!"
 msgstr "이런, 이것은 %s %s다!"
 
-#: src/eat.c:2179
+#: src/eat.c:2180
 msgid "Delicious!  Must be a Macintosh!"
 msgstr "맛있다! 매킨토시임에 틀림없다!"
 
-#: src/eat.c:2185
+#: src/eat.c:2186
 msgid "Core dumped."
 msgstr "코어가 덤프됐다."
 
-#: src/eat.c:2190
+#: src/eat.c:2191
 #, c-format
 msgid "%s -- core dumped."
 msgstr "%s -- 코어가 덤프됐다."
 
-#: src/eat.c:2200
+#: src/eat.c:2201
 #, c-format
 msgid "This %s is %s"
 msgstr "이 %s{은/는} %s"
 
-#: src/eat.c:2255
+#: src/eat.c:2256
 #, c-format
 msgid "Magic spreads through your body as you digest the %s."
 msgstr "%s{을/를} 소화하면서 마법이 몸 전체로 퍼진다."
 
-#: src/eat.c:2293
+#: src/eat.c:2294
 msgid "Suddenly you can see yourself."
 msgstr "갑자기 스스로를 볼 수 있다."
 
-#: src/eat.c:2431
+#: src/eat.c:2432
 msgid "This junk mail is less than satisfying."
 msgstr "이 정크 메일은 만족스럽지 않다."
 
-#: src/eat.c:2436
+#: src/eat.c:2437
 #, c-format
 msgid "Yuck%c"
 msgstr "윽%c"
 
-#: src/eat.c:2440 src/mon.c:1605
+#: src/eat.c:2441 src/mon.c:1605
 #, c-format
 msgid "Yum%c"
 msgstr "냠%c"
 
-#: src/eat.c:2442
+#: src/eat.c:2443
 msgid "Needs salt..."
 msgstr "소금이 필요하다..."
 
-#: src/eat.c:2456
+#: src/eat.c:2457
 msgid "Four out of five dentists agree."
 msgstr "5명 중 4명의 치과의사가 동의했다."
 
-#: src/eat.c:2457
+#: src/eat.c:2458
 msgid "That was pure chewing satisfaction!"
 msgstr "정말 씹는 만족감이 좋았다!"
 
-#: src/eat.c:2462
+#: src/eat.c:2463
 msgid "Yabba-dabba delicious!"
 msgstr "야바다바 맛있다!"
 
-#: src/eat.c:2486
+#: src/eat.c:2487
 msgid "meal"
 msgstr "음식"
 
-#: src/eat.c:2486
+#: src/eat.c:2487
 #, fuzzy
 msgid "liquid"
 msgstr "액체 무지개"
 
 # #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 # 무기 - 도끼
-#: src/eat.c:2486
+#: src/eat.c:2487
 #, fuzzy
 msgid "wax"
 msgstr "도끼"
 
-#: src/eat.c:2486 src/eat.c:2496
+#: src/eat.c:2487 src/eat.c:2497
 msgid "food"
 msgstr "먹을 것"
 
-#: src/eat.c:2486
+#: src/eat.c:2487
 #, fuzzy
 msgid "meat"
 msgstr "미트볼"
 
-#: src/eat.c:2486
+#: src/eat.c:2487
 msgid "paper"
 msgstr "종이"
 
-#: src/eat.c:2487
+#: src/eat.c:2488
 msgid "cloth"
 msgstr "천"
 
 #
-#: src/eat.c:2487 src/obj_descr_i18n.c:118
+#: src/eat.c:2488 src/obj_descr_i18n.c:118
 msgid "leather"
 msgstr "가죽"
 
-#: src/eat.c:2487
+#: src/eat.c:2488
 #, fuzzy
 msgid "wood"
 msgstr "나무"
 
-#: src/eat.c:2487
+#: src/eat.c:2488
 #, fuzzy
 msgid "bone"
 msgstr "등뼈"
 
-#: src/eat.c:2487
+#: src/eat.c:2488
 msgid "scale"
 msgstr "비늘"
 
-#: src/eat.c:2487 src/eat.c:2488
+#: src/eat.c:2488 src/eat.c:2489
 msgid "metal"
 msgstr "금속"
 
-#: src/eat.c:2488 src/obj_descr_i18n.c:68 src/obj_descr_i18n.c:217
+#: src/eat.c:2489 src/obj_descr_i18n.c:68 src/obj_descr_i18n.c:217
 msgid "silver"
 msgstr "은"
 
-#: src/eat.c:2488 src/obj_descr_i18n.c:69
+#: src/eat.c:2489 src/obj_descr_i18n.c:69
 msgid "gold"
 msgstr "금"
 
-#: src/eat.c:2488 src/obj_descr_i18n.c:90
+#: src/eat.c:2489 src/obj_descr_i18n.c:90
 msgid "platinum"
 msgstr "백금"
 
-#: src/eat.c:2488
+#: src/eat.c:2489
 #, fuzzy
 msgid "mithril"
 msgstr "날카로운"
 
-#: src/eat.c:2489
+#: src/eat.c:2490
 #, fuzzy
 msgid "plastic"
 msgstr "폭발"
 
-#: src/eat.c:2489 src/obj_descr_i18n.c:76
+#: src/eat.c:2490 src/obj_descr_i18n.c:76
 msgid "glass"
 msgstr "유리"
 
-#: src/eat.c:2489
+#: src/eat.c:2490
 msgid "rich food"
 msgstr "고급 음식"
 
 #
-#: src/eat.c:2489 src/obj_descr_i18n.c:115 src/obj_descr_i18n.c:360
+#: src/eat.c:2490 src/obj_descr_i18n.c:115 src/obj_descr_i18n.c:360
 #: src/objnam.c:916 src/pager.c:790
 msgid "stone"
 msgstr "돌"
 
-#: src/eat.c:2583
+#: src/eat.c:2584
 msgid "Heigh-ho, ho-hum, I think I'll skip work today."
 msgstr "하이호, 호험, 오늘은 일을 안 할 것 같다."
 
-#: src/eat.c:2585 src/timeout.c:788
+#: src/eat.c:2586 src/timeout.c:788
 msgid "fall asleep."
 msgstr "잠들었다."
 
-#: src/eat.c:2588
+#: src/eat.c:2589
 msgid "sinister laughter as you fall asleep..."
 msgstr "잠들면서 불길한 웃음소리..."
 
-#: src/eat.c:2797
+#: src/eat.c:2798
 #, c-format
 msgid "%s%s is delicious!"
 msgstr "%s%s{이/가} 맛있다!"
 
-#: src/eat.c:2821
+#: src/eat.c:2822
 msgid "If you can't breathe air, how can you consume solids?"
 msgstr "공기를 호흡할 수 없다면, 어떻게 고체를 소비할 수 있어?"
 
-#: src/eat.c:2850
+#: src/eat.c:2851
 msgid "pause to swallow."
 msgstr "삼키기 위해 멈춘다."
 
-#: src/eat.c:2860
+#: src/eat.c:2861
 msgid "cannot eat that!"
 msgstr "그것을 먹을 수 없다!"
 
-#: src/eat.c:2865
+#: src/eat.c:2866
 #, c-format
 msgid "eat %s you're wearing."
 msgstr "입고 있는 %s{을/를} 먹는다."
 
-#: src/eat.c:2880
+#: src/eat.c:2881
 #, c-format
 msgid "Ulch - that %s was rustproofed!"
 msgstr "윽 - 그 %s{은/는} 녹 방지 처리되어 있었다!"
@@ -6882,397 +6882,405 @@ msgstr "윽 - 그 %s{은/는} 녹 방지 처리되어 있었다!"
 # ============================================================
 # 전투 메시지 (Combat Messages)
 # ============================================================
-#: src/eat.c:2891
+#: src/eat.c:2892
 #, c-format
 msgid "spit out %s."
 msgstr "%s{을/를} 뱉어냈다."
 
-#: src/eat.c:2893
+#: src/eat.c:2894
 #, c-format
 msgid "spit %s out onto the %s."
 msgstr "%s{을/를} %s 위에 뱉어냈다."
 
-#: src/eat.c:2908
+#: src/eat.c:2909
 msgid "This ring is indigestible!"
 msgstr "이 반지는 소화가 안 된다!"
 
-#: src/eat.c:2941
+#: src/eat.c:2942
 #, c-format
 msgid "%s your meal."
 msgstr "식사를 %s."
 
-#: src/eat.c:3099
+#: src/eat.c:3100
 msgid "have no tin to open."
 msgstr "열 깡통이 없다."
 
-#: src/eat.c:3107
+#: src/eat.c:3108
 #, fuzzy
 msgid "Really wield "
 msgstr "정말로 저장하시겠습니까?"
 
-#: src/eat.c:3108 src/invent.c:5461
+#: src/eat.c:3109 src/invent.c:5461
 #, fuzzy
 msgid "that"
 msgstr "그것을 %s!"
 
-#: src/eat.c:3309
+#: src/eat.c:3310
 msgid "You're having a hard time getting all of it down."
 msgstr "전부 삼키기 어렵다."
 
-#: src/eat.c:3310
+#: src/eat.c:3311
 msgid "You're finally finished."
 msgstr "드디어 다 먹었다."
 
-#: src/eat.c:3417
+#: src/eat.c:3320
+msgid "Continue eating?"
+msgstr "계속 먹으시겠습니까?"
+
+#: src/eat.c:3418
 msgid "faint from lack of food."
 msgstr "음식 부족으로 기절했다."
 
-#: src/eat.c:3421
+#: src/eat.c:3422
 msgid "fainted from lack of food"
 msgstr "배고파서 기절함"
 
-#: src/eat.c:3422
+#: src/eat.c:3423
 msgid "You regain consciousness."
 msgstr "의식을 되찾았다."
 
-#: src/eat.c:3436
+#: src/eat.c:3437
 msgid "die from starvation."
 msgstr "굶주림으로 죽었다."
 
-#: src/eat.c:3466
+#: src/eat.c:3467
 msgid "now have a lesser case of the munchies."
 msgstr "허기가 약간 줄었다."
 
-#: src/eat.c:3467
+#: src/eat.c:3468
 msgid "are getting the munchies."
 msgstr "허기가 느껴지기 시작한다."
 
-#: src/eat.c:3469
+#: src/eat.c:3470
 msgid "only feel hungry now"
 msgstr "이제 배고픔만 느낀다"
 
-#: src/eat.c:3470
+#: src/eat.c:3471
 msgid "feel hungry"
 msgstr "배고프다"
 
-#: src/eat.c:3471
+#: src/eat.c:3472
 msgid "are beginning to feel hungry"
 msgstr "배고파지기 시작한다"
 
-#: src/eat.c:3479
+#: src/eat.c:3480
 msgid "You still have the munchies."
 msgstr "아직 허기가 남아있다."
 
-#: src/eat.c:3480
+#: src/eat.c:3481
 msgid "The munchies are interfering with your motor capabilities."
 msgstr "허기가 운동 능력을 방해하고 있다."
 
-#: src/eat.c:3483
+#: src/eat.c:3484
 #, c-format
 msgid "%s needs food, badly!"
 msgstr "%s{은/는} 음식이 매우 필요하다!"
 
-#: src/eat.c:3488
+#: src/eat.c:3489
 #, c-format
 msgid "%s weak."
 msgstr "%s 약하다."
 
-#: src/eat.c:3501
+#: src/eat.c:3502
 msgid "die from hunger and exhaustion."
 msgstr "굶주림과 탈진으로 죽었다."
 
-#: src/eat.c:3634
+#: src/eat.c:3635
 #, fuzzy
 msgid "There are iron bars here"
 msgstr "여기에 거미줄이 있다."
 
-#: src/eat.c:3636
+#: src/eat.c:3637
 #, c-format
 msgid "%s but you %s eat them."
 msgstr "%s하지만 %s 먹는다."
 
-#: src/eat.c:3637
+#: src/eat.c:3638
 #, fuzzy
 msgid "cannot"
 msgstr "%s{을/를} %s할 수 없다."
 
-#: src/eat.c:3637
+#: src/eat.c:3638
 #, fuzzy
 msgid "are too full to"
 msgstr "너무 배불러서 철창을 먹을 수 없다."
 
-#: src/eat.c:3643
+#: src/eat.c:3644
 #, fuzzy
 msgid "; eat them?"
 msgstr "닿을"
 
-#: src/eat.c:3644
+#: src/eat.c:3645
 #, fuzzy
 msgid "; resume eating them?"
 msgstr "%s%s 설치를 재개한다."
 
-#: src/eat.c:3718
+#: src/eat.c:3719
 #, c-format
 msgid "%s that!"
 msgstr "그것을 %s!"
 
-#: src/eat.c:3738
+#: src/eat.c:3739
 msgid "jaw gapes convulsively."
 msgstr "턱이 경련적으로 벌어진다."
 
-#: src/eat.c:3746
+#: src/eat.c:3747
 #, c-format
 msgid "%s heaves convulsively!"
 msgstr "%s{이/가} 경련적으로 들썩인다!"
 
-#: src/eat.c:3756
+#: src/eat.c:3757
 msgid "vomiting"
 msgstr "구토 중"
 
-#: src/eat.c:3766
+#: src/eat.c:3767
 msgid "breathe acid on yourself..."
 msgstr "스스로에게 산을 뿜었다..."
 
-#: src/eat.c:3777
+#: src/eat.c:3778
 msgid "Your stomach acid melts straight through the ice!"
 msgstr "당신의 위산이 얼음을 녹여버립니다!"
 
-#: src/end.c:49 src/end.c:57
+#: src/end.c:50 src/end.c:58
 msgid "died"
 msgstr "죽었습니다"
 
-#: src/end.c:49 src/end.c:57
+#: src/end.c:50 src/end.c:58
 #, fuzzy
 msgid "choked"
 msgstr "질식"
 
-#: src/end.c:49
+#: src/end.c:50
 #, fuzzy
 msgid "poisoned"
 msgstr "독이 묻은 "
 
-#: src/end.c:49
+#: src/end.c:50
 #, fuzzy
 msgid "starvation"
 msgstr "굶주림으로 죽었다."
 
-#: src/end.c:49
+#: src/end.c:50
 #, fuzzy
 msgid "drowning"
 msgstr "갈색"
 
-#: src/end.c:49
+#: src/end.c:50
 #, fuzzy
 msgid "burning"
 msgstr "탄 "
 
-#: src/end.c:50
+#: src/end.c:51
 msgid "dissolving under the heat and pressure"
 msgstr "열과 압력에 녹음"
 
-#: src/end.c:50
+#: src/end.c:51
 #, fuzzy
 msgid "crushed"
 msgstr "처벌받는 중"
 
 #
-#: src/end.c:50 src/end.c:60
+#: src/end.c:51 src/end.c:61
 #, fuzzy
 msgid "turned to stone"
 msgstr "돌로 변했다."
 
-#: src/end.c:51 src/end.c:61
+#: src/end.c:52 src/end.c:62
 #, fuzzy
 msgid "turned into slime"
 msgstr "%s{을/를} 슬라임으로 만들었다."
 
-#: src/end.c:51
+#: src/end.c:52
 msgid "genocided"
 msgstr "멸종됨"
 
-#: src/end.c:51
+#: src/end.c:52
 msgid "panic"
 msgstr "패닉"
 
-#: src/end.c:51
+#: src/end.c:52
 msgid "trickery"
 msgstr "속임"
 
-#: src/end.c:51 src/end.c:62
+#: src/end.c:52 src/end.c:63
 msgid "quit"
 msgstr "포기"
 
-#: src/end.c:52 src/end.c:63
+#: src/end.c:53 src/end.c:64
 #, fuzzy
 msgid "escaped"
 msgstr "해를 피했다."
 
-#: src/end.c:52 src/end.c:63 src/insight.c:66
+#: src/end.c:53 src/end.c:64 src/insight.c:66
 #, fuzzy
 msgid "ascended"
 msgstr "손잡이"
 
-#: src/end.c:57
+#: src/end.c:58
 #, fuzzy
 msgid "were poisoned"
 msgstr "독이 묻은 "
 
-#: src/end.c:58
+#: src/end.c:59
 #, fuzzy
 msgid "starved"
 msgstr "비겁한 놈"
 
-#: src/end.c:58
+#: src/end.c:59
 #, fuzzy
 msgid "drowned"
 msgstr "갈색"
 
-#: src/end.c:58
+#: src/end.c:59
 #, fuzzy
 msgid "burned"
 msgstr "탄 "
 
-#: src/end.c:59
+#: src/end.c:60
 #, fuzzy
 msgid "dissolved in the lava"
 msgstr "거미줄이 %s{으로/로} 녹는다."
 
-#: src/end.c:60
+#: src/end.c:61
 #, fuzzy
 msgid "were crushed"
 msgstr "짓눌리고 있다."
 
-#: src/end.c:61
+#: src/end.c:62
 #, fuzzy
 msgid "were genocided"
 msgstr "학살 두루마리"
 
-#: src/end.c:62
+#: src/end.c:63
 #, fuzzy
 msgid "panicked"
 msgstr "금이 간 "
 
-#: src/end.c:62
+#: src/end.c:63
 #, fuzzy
 msgid "were tricked"
 msgstr "전기빛의"
 
-#: src/end.c:98
+#: src/end.c:99
 msgid "Switch from the tutorial back to regular play?"
 msgstr "튜토리얼에서 일반 게임으로 전환하시겠습니까?"
 
 # ============================================================
 # 게임 UI 메시지 (Game UI Messages)
 # ============================================================
-#: src/end.c:102
+#: src/end.c:103
 msgid "Really quit without saving?"
 msgstr "저장하지 않고 정말 종료하시겠습니까?"
 
 #
-#: src/end.c:198
+#: src/end.c:199
 msgid "turn to stone..."
 msgstr "돌로 변했다..."
 
-#: src/end.c:527
+#: src/end.c:528
 msgid "Latest messages:"
 msgstr "최근 메시지:"
 
-#: src/end.c:593
+#: src/end.c:594
 msgid "Inventory:"
 msgstr "소지품:"
 
 # ============================================================
 # 게임 종료 질문 (Game End Questions)
 # ============================================================
-#: src/end.c:630
+#: src/end.c:631
 msgid "Do you want to see what you had when you quit?"
 msgstr "종료했을 때 가지고 있던 것을 보시겠습니까?"
 
-#: src/end.c:632
+#: src/end.c:633
 msgid "Do you want to see what you had when you died?"
 msgstr "죽었을 때 가지고 있던 것을 보시겠습니까?"
 
-#: src/end.c:634
+#: src/end.c:635
 msgid "Do you want your possessions identified?"
 msgstr "소지품을 감정하시겠습니까?"
 
-#: src/end.c:651
+#: src/end.c:652
 msgid "Do you want to see your attributes?"
 msgstr "능력치를 보시겠습니까?"
 
-#: src/end.c:677
+#: src/end.c:678
 msgid "Do you want to see your conduct and achievements?"
 msgstr "행동 수칙과 업적을 보시겠습니까?"
 
-#: src/end.c:679
+#: src/end.c:680
 msgid "Do you want to see your conduct?"
 msgstr "행동 수칙을 보시겠습니까?"
 
-#: src/end.c:692
+#: src/end.c:693
 msgid "Do you want to see the dungeon overview?"
 msgstr "던전 개요를 보시겠습니까?"
 
-#: src/end.c:727
+#: src/end.c:728
 msgid "You survived that attempt on your life."
 msgstr "목숨을 노린 그 시도에서 살아남았다."
 
-#: src/end.c:753
+#: src/end.c:754
 #, c-format
 msgid "%s releases you."
 msgstr "%s{이/가} 당신을 놓아줬다."
 
-#: src/end.c:1030
+#: src/end.c:1031
 msgid "are a very tricky wizard, it seems."
 msgstr "매우 교활한 마법사인 것 같다."
 
-#: src/end.c:1082 src/mon.c:2846
+#: src/end.c:1083 src/mon.c:2846
 msgid "But wait..."
 msgstr "하지만 잠깐..."
 
-#: src/end.c:1085
+#: src/end.c:1086
 #, c-format
 msgid "medallion %s!"
 msgstr "메달이 %s!"
 
-#: src/end.c:1085
+#: src/end.c:1086
 msgid "begins to glow"
 msgstr "빛나기 시작한다"
 
-#: src/end.c:1085
+#: src/end.c:1086
 msgid "feels warm"
 msgstr "따뜻해진다"
 
-#: src/end.c:1087
+#: src/end.c:1088
 msgid "vomit ..."
 msgstr "토한다..."
 
 #
-#: src/end.c:1088
+#: src/end.c:1089
 msgid "much better!"
 msgstr "훨씬 나아졌다!"
 
-#: src/end.c:1089 src/mon.c:2857
+#: src/end.c:1090 src/mon.c:2857
 msgid "medallion crumbles to dust!"
 msgstr "메달이 먼지로 부서졌다!"
 
-#: src/end.c:1096
+#: src/end.c:1097
 msgid "Unfortunately you are still genocided..."
 msgstr "불행히도 여전히 몰살 상태다..."
 
 #: src/end.c:1113
+msgid "Die?"
+msgstr "죽으시겠습니까?"
+
+#: src/end.c:1114
 #, c-format
 msgid "OK, so you don't %s."
 msgstr "좋아, 그래서 %s하지 않는다."
 
-#: src/end.c:1113
+#: src/end.c:1114
 msgid "choke"
 msgstr "질식"
 
-#: src/end.c:1113
+#: src/end.c:1114
 msgid "die"
 msgstr "죽음"
 
-#: src/end.c:1187
+#: src/end.c:1188
 #, c-format
 msgid "Do not pass Go.  Do not collect 200 %s."
 msgstr "Go를 지나가지 마라. 200 %s{을/를} 받지 마라."
@@ -7280,85 +7288,85 @@ msgstr "Go를 지나가지 마라. 200 %s{을/를} 받지 마라."
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
-#: src/end.c:1355
+#: src/end.c:1356
 #, c-format
 msgid "%s as %s..."
 msgstr "%s{(으)로서} %s..."
 
-#: src/end.c:1357
+#: src/end.c:1358
 msgid "body rises from the dead"
 msgstr "몸이 죽음에서 일어난다"
 
-#: src/end.c:1358
+#: src/end.c:1359
 msgid "revenant persists"
 msgstr "망령이 지속된다"
 
 # end.c translations
-#: src/end.c:1423
+#: src/end.c:1424
 msgid "Demigoddess"
 msgstr "반신녀"
 
-#: src/end.c:1423
+#: src/end.c:1424
 msgid "Demigod"
 msgstr "반신"
 
-#: src/end.c:1476
+#: src/end.c:1477
 msgid "went to your reward"
 msgstr "보상을 받으러 갔다"
 
-#: src/end.c:1477
+#: src/end.c:1478
 msgid "escaped from the dungeon"
 msgstr "던전을 탈출했다"
 
-#: src/end.c:1526
+#: src/end.c:1527
 #, fuzzy, c-format
 msgid "You %s beyond the confines of the dungeon"
 msgstr "던전 밖으로"
 
-#: src/end.c:1527
+#: src/end.c:1528
 msgid "passed away"
 msgstr "세상을 떠났습니다"
 
-#: src/end.c:1533
+#: src/end.c:1534
 #, fuzzy
 msgid "The Astral Plane"
 msgstr "원소의 평면으로"
 
-#: src/end.c:1534
+#: src/end.c:1535
 #, fuzzy, c-format
 msgid "You %s in %s"
 msgstr "%s %s에 빠져 있다."
 
-#: src/end.c:1536
+#: src/end.c:1537
 #, fuzzy, c-format
 msgid " on dungeon level %d"
 msgstr "로그 레벨 "
 
-#: src/end.c:1540
+#: src/end.c:1541
 #, c-format
 msgid " with %ld point%s,"
 msgstr " %ld 점%s으로,"
 
-#: src/end.c:1544
+#: src/end.c:1545
 #, c-format
 msgid "and %ld piece%s of gold, after %ld move%s."
 msgstr "%ld 골드%s를 가지고, %ld 턴%s 후에."
 
-#: src/end.c:1548
+#: src/end.c:1549
 #, c-format
 msgid "You were level %d with a maximum of %d hit point%s when you %s."
 msgstr "당신은 %4$s할 때 레벨 %1$d였고 최대 %2$d HP%3$s를 가졌습니다."
 
-#: src/end.c:1627
+#: src/end.c:1628
 #, fuzzy, c-format
 msgid "Contents of %s:"
 msgstr "그 내용물이 쏟아졌다."
 
-#: src/end.c:1652
+#: src/end.c:1653
 msgid "Schroedinger's cat!"
 msgstr "슈뢰딩거의 고양이!"
 
-#: src/end.c:1663 src/pickup.c:4029
+#: src/end.c:1664 src/pickup.c:4029
 #, c-format
 msgid "%s is empty."
 msgstr "%s{이/가} 비어 있다."
@@ -27014,19 +27022,23 @@ msgstr "%s의 훈련을 %s잊었다."
 msgid "%s in %s %s %s shining."
 msgstr "%s의 %s{이/가} %s %s 빛나고 있다."
 
-#: src/were.c:36
+#: src/were.c:37
 #, c-format
 msgid "a %s howling at the moon."
 msgstr "%s{이/가} 달을 향해 울부짖는다."
 
-#: src/were.c:114
+#: src/were.c:115
 #, c-format
 msgid "%s changes into a %s."
 msgstr "%s{이/가} %s{으로/로} 변했다."
 
-#: src/were.c:218
+#: src/were.c:219
 msgid "purified."
 msgstr "정화되었다."
+
+#: src/were.c:225
+msgid "Remain in beast form?"
+msgstr "짐승 모습으로 남아있으시겠습니까?"
 
 #: src/wield.c:142
 #, c-format

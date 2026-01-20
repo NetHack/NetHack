@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 staticfn int eatmdone(void);
 staticfn int eatfood(void);
@@ -3316,7 +3317,7 @@ lesshungry(int num)
                     && (svc.context.victual.reqtime
                         - svc.context.victual.usedtime) > 1) {
                     /* food with one bite left will not survive a stop */
-                    if (!paranoid_query(ParanoidEating, "Continue eating?")) {
+                    if (!paranoid_query(ParanoidEating, _("Continue eating?"))) {
                         reset_eat();
                         gn.nomovemsg = (char *) 0;
                     }
