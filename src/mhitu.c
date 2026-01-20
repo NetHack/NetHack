@@ -1344,7 +1344,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
 
         i = number_leashed();
         if (i > 0) {
-            const char *s = (i > 1) ? "leashes" : "leash";
+            const char *s = (i > 1) ? _("leashes") : _("leash");
 
             pline_The(_("%s %s loose."), s, vtense(s, "snap"));
             unleash_all();

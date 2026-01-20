@@ -1302,13 +1302,13 @@ drop_weapon(int alone)
             candropwep = canletgo(uwep, "");
             candropswapwep = !u.twoweap || canletgo(uswapwep, "");
             if (alone) {
-                what = (candropwep && candropswapwep) ? "drop" : "release";
-                which = is_sword(uwep) ? "sword" : weapon_descr(uwep);
+                what = (candropwep && candropswapwep) ? _("drop") : _("release");
+                which = is_sword(uwep) ? _("sword") : weapon_descr(uwep);
                 if (u.twoweap) {
                     whichtoo =
-                        is_sword(uswapwep) ? "sword" : weapon_descr(uswapwep);
+                        is_sword(uswapwep) ? _("sword") : weapon_descr(uswapwep);
                     if (strcmp(which, whichtoo))
-                        which = "weapon";
+                        which = _("weapon");
                 }
                 if (uwep->quan != 1L || u.twoweap)
                     which = makeplural(which);
@@ -1590,7 +1590,7 @@ dospinweb(void)
     } else if (On_stairs(x, y)) {
         /* cop out: don't let them hide the stairs */
         Your(_("web fails to impede access to the %s."),
-             (levl[x][y].typ == STAIRS) ? "stairs" : "ladder");
+             (levl[x][y].typ == STAIRS) ? _("stairs") : _("ladder"));
         return ECMD_TIME;
     }
     ttmp = maketrap(x, y, WEB);

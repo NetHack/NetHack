@@ -904,7 +904,7 @@ mleashed_next2u(struct monst *mtmp)
             otmp->leashmon = 0;
             update_inventory();
             You_feel(_("%s leash go slack."),
-                     (number_leashed() > 1) ? "a" : "the");
+                     (number_leashed() > 1) ? _("a") : _("the"));
         }
     }
     return FALSE;
@@ -1315,7 +1315,7 @@ use_bell(struct obj **optr)
 staticfn void
 use_candelabrum(struct obj *obj)
 {
-    const char *s = (obj->spe != 1) ? "candles" : "candle";
+    const char *s = (obj->spe != 1) ? _("candles") : _("candle");
 
     if (obj->lamplit) {
         You(_("snuff the %s."), s);
@@ -1385,7 +1385,7 @@ use_candle(struct obj **optr)
 {
     struct obj *obj = *optr;
     struct obj *otmp;
-    const char *s = (obj->quan != 1) ? "candles" : "candle";
+    const char *s = (obj->quan != 1) ? _("candles") : _("candle");
     char qbuf[QBUFSZ], qsfx[QBUFSZ], *q;
     boolean was_lamplit;
 
@@ -1418,7 +1418,7 @@ use_candle(struct obj **optr)
             obj = splitobj(obj, 7L - (long) otmp->spe);
             /* avoid a grammatical error if obj->quan gets
                reduced to 1 candle from more than one */
-            s = (obj->quan != 1) ? "candles" : "candle";
+            s = (obj->quan != 1) ? _("candles") : _("candle");
         } else
             *optr = 0;
 

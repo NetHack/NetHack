@@ -929,7 +929,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
             (void) drown();
             return FALSE;
         } else if (!Is_waterlevel(&u.uz) && !stopping_short) {
-            Norep(_("You move over %s."), an(is_moat(x, y) ? "moat" : "pool"));
+            Norep(_("You move over %s."), an(is_moat(x, y) ? _("moat") : _("pool")));
         }
     } else if (is_lava(x, y) && !stopping_short) {
         Norep(_("You move over some lava."));

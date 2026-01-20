@@ -2899,7 +2899,7 @@ mon_consume_unstone(
         obj->quan = save_quan;
     } else if (!Deaf)
         You_hear(_("%s."),
-                 (obj->oclass == POTION_CLASS) ? "drinking" : "chewing");
+                 (obj->oclass == POTION_CLASS) ? _("drinking") : _("chewing"));
 
     m_useup(mon, obj);
     /* obj is now gone */

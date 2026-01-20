@@ -467,7 +467,7 @@ run_regions(void)
     }
     if (gg.gas_cloud_diss_seen) {
         You_see(_("%s gas cloud%s dissipate."),
-                (gg.gas_cloud_diss_seen == 1) ? "a" : "some",
+                (gg.gas_cloud_diss_seen == 1) ? _("a") : _("some"),
                 plur(gg.gas_cloud_diss_seen));
         gg.gas_cloud_diss_seen = 0;
     }
