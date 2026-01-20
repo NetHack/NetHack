@@ -765,9 +765,9 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
                 if (!Deaf) {
                     Soundeffect(se_someone_summoning, 100);
                     You_hear(_("someone summoning something, and %s %s."), arg,
-                             vtense(arg, "appear"));
+                             vtense(arg, _("appear")));
                 } else {
-                    pline(_("%s %s."), upstart(arg), vtense(arg, "appear"));
+                    pline(_("%s %s."), upstart(arg), vtense(arg, _("appear")));
                 }
             }
 

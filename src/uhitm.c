@@ -1264,7 +1264,7 @@ hmon_hitmon_misc_obj(
                     whom = strcat(strcat(s_suffix(whom), " "),
                                   mbodypart(mon, FACE));
                 pline(_("%s %s over %s!"), what,
-                      vtense(what, "splash"), whom);
+                      vtense(what, _("splash")), whom);
             }
             setmangry(mon, TRUE);
             mon->mcansee = 0;
@@ -1653,9 +1653,9 @@ hmon_hitmon_msg_silver(
         else if (hmd->silverobj && hmd->saved_oname[0]) {
             /* guard constructed format string against '%' in
                saved_oname[] from xname(via cxname()) */
-            Snprintf(silverobjbuf, sizeof(silverobjbuf), "Your %s%s %s",
-                     strstri(hmd->saved_oname, "silver") ? "" : "silver ",
-                     hmd->saved_oname, vtense(hmd->saved_oname, "sear"));
+            Snprintf(silverobjbuf, sizeof(silverobjbuf), _("Your %s%s %s"),
+                     strstri(hmd->saved_oname, "silver") ? "" : _("silver "),
+                     hmd->saved_oname, vtense(hmd->saved_oname, _("sear")));
             (void) strNsubst(silverobjbuf, "%", "%%", 0);
             strncat(silverobjbuf, " %s!",
                     sizeof(silverobjbuf) - (strlen(silverobjbuf) + 1));
@@ -1894,7 +1894,7 @@ hmon_hitmon(
     }
     if (hmd.unpoisonmsg)
         Your(_("%s %s no longer poisoned."), hmd.saved_oname,
-             vtense(hmd.saved_oname, "are"));
+             vtense(hmd.saved_oname, _("are")));
 
     if (!hmd.destroyed && !hmd.offmap) {
         int hitflags = M_ATTK_HIT;
