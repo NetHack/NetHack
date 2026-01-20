@@ -934,7 +934,7 @@ gd_move(struct monst *grd)
         if (!Deaf) {
             SetVoice(grd, 0, 80, 0);
             verbalize(_("How dare you %s that gold, scoundrel!"),
-                      (egrd->witness & GD_EATGOLD) ? "consume" : "destroy");
+                      (egrd->witness & GD_EATGOLD) ? _("consume") : _("destroy"));
         }
         egrd->witness = 0;
         grd->mpeaceful = 0;

@@ -1197,7 +1197,7 @@ skill_advance(int skill)
     u.skill_record[u.skills_advanced++] = skill;
     /* subtly change the advance message to indicate no more advancement */
     You(_("are now %s skilled in %s."),
-        P_SKILL(skill) >= P_MAX_SKILL(skill) ? "most" : "more",
+        P_SKILL(skill) >= P_MAX_SKILL(skill) ? _("most") : _("more"),
         P_NAME(skill));
 
     /* wizards discover spellbook IDs depending on spell 'school' skill limits;

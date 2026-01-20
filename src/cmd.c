@@ -1286,18 +1286,18 @@ lookaround_known_room(coordxy x, coordxy y)
         boolean u_in = (boolean) selection_getpoint(x, y, sel);
 
         You(_("%s %s %s."),
-            u_at(x, y) && u_in && u_can_see_whole_selection(sel) ? "are in"
-            : (u_at(x, y)) ? "remember this as" : "remember that as",
+            u_at(x, y) && u_in && u_can_see_whole_selection(sel) ? _("are in")
+            : (u_at(x, y)) ? _("remember this as") : _("remember that as"),
             an(selection_size_description(sel, qbuf)),
-            rmno >= 0 ? "room" : "area");
+            rmno >= 0 ? _("room") : _("area"));
     } else if (u_have_seen_bounds_selection(sel)) {
         You(_("guess %s to be %s %s."),
-            u_at(x, y) ? "this" : "that",
+            u_at(x, y) ? _("this") : _("that"),
             an(selection_size_description(sel, qbuf)),
-            rmno >= 0 ? "room" : "area");
+            rmno >= 0 ? _("room") : _("area"));
     } else {
         You(_("can't guess the size of %s area."),
-            u_at(x, y) ? "this" : "that");
+            u_at(x, y) ? _("this") : _("that"));
     }
     selection_free(sel, TRUE);
 }
@@ -2405,7 +2405,7 @@ key2extcmddesc(uchar key)
             Strcpy(key2cmdbuf, "start of, or continuation of, a count");
         else if (key == '5' || key == M_5)
             Sprintf(key2cmdbuf, "%s prefix",
-                    (!!gc.Cmd.pcHack_compat ^ (key == M_5)) ? "run" : "rush");
+                    (!!gc.Cmd.pcHack_compat ^ (key == M_5)) ? _("run") : _("rush"));
         else if (key == '0' || (gc.Cmd.pcHack_compat && key == M_0))
             Strcpy(key2cmdbuf, "synonym for 'i'");
         if (*key2cmdbuf)

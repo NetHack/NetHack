@@ -1629,11 +1629,11 @@ shrink_glob(
                 || near_capacity() != go.oldcap)
                 pline(_("%s %s%s lighter."), Yname2(topcontnr),
                       /* containers also always have quantity 1 */
-                      (topcontnr->owt != old_top_owt) ? "becomes" : "seems",
+                      (topcontnr->owt != old_top_owt) ? _("becomes") : _("seems"),
                       /* TODO?  maybe also skip "slightly" if description
                          is changing (from "very large" to "large",
                          "large" to "medium", or "medium to "small") */
-                      !gone ? " slightly" : "");
+                      !gone ? _(" slightly") : "");
             updinv = TRUE;
         }
     }

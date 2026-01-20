@@ -2254,7 +2254,7 @@ staticfn void
 accessory_has_effect(struct obj *otmp)
 {
     pline(_("Magic spreads through your body as you digest the %s."),
-          (otmp->oclass == RING_CLASS) ? "ring" : "amulet");
+          (otmp->oclass == RING_CLASS) ? _("ring") : _("amulet"));
 }
 
 staticfn void
@@ -2634,7 +2634,7 @@ edibility_prompts(struct obj *otmp)
     long rotted = 0L;
 
     Strcpy(foodsmell, Tobjnam(otmp, "smell"));
-    Strcpy(it_or_they, (otmp->quan == 1L) ? "it" : "they");
+    Strcpy(it_or_they, (otmp->quan == 1L) ? _("it") : _("they"));
 
     if (cadaver || otmp->otyp == EGG || otmp->otyp == TIN
         || otmp->otyp == GLOB_OF_GREEN_SLIME) {
@@ -2720,7 +2720,7 @@ edibility_prompts(struct obj *otmp)
 
     if (*buf) {
         Snprintf(eos(buf), sizeof buf - strlen(buf), "  Eat %s anyway?",
-                 (otmp->quan == 1L) ? "it" : "one");
+                 (otmp->quan == 1L) ? _("it") : _("one"));
         return (yn_function(buf, ynchars, 'n', TRUE) == 'n') ? 1 : 2;
     }
     return 0;

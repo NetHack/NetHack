@@ -174,16 +174,16 @@ enlght_combatinc(
         absamt = (absamt * 2) / 3;
 
     if (absamt <= 3)
-        modif = "small";
+        modif = _("small");
     else if (absamt <= 6)
-        modif = "moderate";
+        modif = _("moderate");
     else if (absamt <= 12)
-        modif = "large";
+        modif = _("large");
     else
-        modif = "huge";
+        modif = _("huge");
 
-    modif = !incamt ? "no" : an(modif); /* ("no" case shouldn't happen) */
-    bonus = (incamt >= 0) ? "bonus" : "penalty";
+    modif = !incamt ? _("no") : an(modif); /* ("no" case shouldn't happen) */
+    bonus = (incamt >= 0) ? _("bonus") : _("penalty");
     /* "bonus <foo>" (to hit) vs "<bar> bonus" (damage, defense) */
     invrt = strcmp(inctyp, "to hit") ? TRUE : FALSE;
 
@@ -750,7 +750,7 @@ basics_enlightenment(int mode UNUSED, int final)
     Sprintf(buf, "%d", u.uac);
     if (abs(u.uac) == AC_MAX)
         Sprintf(eos(buf), ", the %s possible",
-                (u.uac < 0) ? "best" : "worst");
+                (u.uac < 0) ? _("best") : _("worst"));
     enl_msg(_("Your armor class "), _("is "), _("was "), buf, "");
 
     /* gold; similar to doprgold (#showgold) but without shop billing info;
