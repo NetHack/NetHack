@@ -620,7 +620,7 @@ mind_blast(struct monst *mtmp)
             dmg = rnd(15);
             if (Half_spell_damage)
                 dmg = (dmg + 1) / 2;
-            losehp(dmg, "psychic blast", KILLED_BY_AN);
+            losehp(dmg, _("psychic blast"), KILLED_BY_AN);
         }
     }
     for (m2 = fmon; m2; m2 = nmon) {

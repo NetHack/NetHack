@@ -1621,7 +1621,7 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
                 tmp = d(2, 12);
                 if (Half_spell_damage)
                     tmp = (tmp + 1) / 2;
-                losehp(tmp, "wand", KILLED_BY_AN);
+                losehp(tmp, _("wand"), KILLED_BY_AN);
                 learnit = TRUE;
             } else {
                 pline_The(_("wand misses you."));
@@ -1961,7 +1961,7 @@ use_offensive(struct monst *mtmp)
             if (Half_spell_damage)
                 num = (num + 1) / 2;
             else
-                losehp(num, "scroll of fire", KILLED_BY_AN);
+                losehp(num, _("scroll of fire"), KILLED_BY_AN);
             for (mtmp2 = fmon; mtmp2; mtmp2 = mtmp2->nmon) {
                 if (DEADMONSTER(mtmp2))
                     continue;

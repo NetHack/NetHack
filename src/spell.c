@@ -175,7 +175,7 @@ cursed_book(struct obj *bp)
             pline(_("As you read the book, it %s in your %s!"), explodes,
                   body_part(FACE));
             dmg = 2 * rnd(10) + 5;
-            losehp(Maybe_Half_Phys(dmg), "exploding rune", KILLED_BY_AN);
+            losehp(Maybe_Half_Phys(dmg), _("exploding rune"), KILLED_BY_AN);
         }
         return TRUE;
     default:

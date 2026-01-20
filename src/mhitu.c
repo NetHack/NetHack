@@ -2211,7 +2211,7 @@ doseduce(struct monst *mon)
             You_feel(_("exhausted."));
             exercise(A_STR, FALSE);
             tmp = rn1(10, 6);
-            losehp(Maybe_Half_Phys(tmp), "exhaustion", KILLED_BY);
+            losehp(Maybe_Half_Phys(tmp), _("exhaustion"), KILLED_BY);
             break;
         } /* case 4 */
         } /* switch */
