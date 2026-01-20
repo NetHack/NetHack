@@ -5324,7 +5324,7 @@ zap_over_floor(
                 rangemod -= 3;
                 if (see_it)
                     Norep(_("The %s %s."), defsyms[S_bars].explanation,
-                          (damgtype == ZT_ACID) ? "corrode away" : "melt");
+                          (damgtype == ZT_ACID) ? _("corrode away") : _("melt"));
                 dissolve_bars(x, y);
                 if (*in_rooms(x, y, SHOPBASE)) {
                     add_damage(x, y, (type >= 0) ? SHOP_BARS_COST : 0L);
@@ -5868,10 +5868,10 @@ maybe_destroy_item(
 
         if (u_carry || vis) {
             mult = (cnt == 1L) ? ((quan == 1L) ? "" /* 1 of 1 */
-                                  : "One of ")      /* 1 of N */
-                   : ((cnt < quan) ? "Some of "     /* n of N */
-                      : (quan == 2L) ? "Both of "   /* 2 of 2 */
-                        : "All of ");               /* N of N */
+                                  : _("One of "))      /* 1 of N */
+                   : ((cnt < quan) ? _("Some of ")     /* n of N */
+                      : (quan == 2L) ? _("Both of ")   /* 2 of 2 */
+                        : _("All of "));               /* N of N */
             pline(_("%s%s %s!"), mult,
                   (cnt == 1L && quan == 1L) ? Yname2(obj) : yname(obj),
                   destroy_strings[dindx][(cnt > 1L)]);
@@ -6272,18 +6272,18 @@ makewish(void)
         otmp->wishedfor = 1;
 
     const char *verb = ((Is_airlevel(&u.uz) || u.uinwater)
-                        ? "slip"
+                        ? _("slip")
                         : (otmp->otyp == CORPSE && otmp->wishedfor)
-                          ? "materialize" : "drop"),
+                          ? _("materialize") : _("drop")),
                *oops_msg = (u.uswallow
-                            ? "Oops!  %s out of your reach!"
+                            ? _("Oops!  %s out of your reach!")
                             : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
                                || levl[u.ux][u.uy].typ < IRONBARS
                                || levl[u.ux][u.uy].typ >= ICE)
-                               ? "Oops!  %s away from you!"
+                               ? _("Oops!  %s away from you!")
                                : !(otmp->otyp == CORPSE && otmp->wishedfor)
-                                 ? "Oops!  %s to the floor!"
-                                 : "Careful! %s on the floor!");
+                                 ? _("Oops!  %s to the floor!")
+                                 : _("Careful! %s on the floor!"));
 
     /* The(aobjnam()) is safe since otmp is unidentified -dlc */
     (void) hold_another_object(otmp, oops_msg, The(aobjnam(otmp, verb)),

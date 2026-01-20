@@ -803,22 +803,22 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
 
         if (IS_OBSTRUCTED(levl[x][y].typ)
             || closed_door(x, y) || odoor_diag) {
-            why = IS_TREE(ltyp) ? "bumping into a tree"
-                  : IS_OBSTRUCTED(ltyp) ? "bumping into a wall"
-                    : odoor_diag ? "bumping into a door frame"
-                      : "bumping into a closed door";
+            why = IS_TREE(ltyp) ? _("bumping into a tree")
+                  : IS_OBSTRUCTED(ltyp) ? _("bumping into a wall")
+                    : odoor_diag ? _("bumping into a door frame")
+                      : _("bumping into a closed door");
             if (odoor_diag)
                 You(_("hit the door frame!"));
             pline(_("Ouch!"));
         } else if (ltyp == IRONBARS) {
-            why = "crashing into iron bars";
+            why = _("crashing into iron bars");
             You(_("crash into some iron bars.  Ouch!"));
         } else if ((obj = sobj_at(BOULDER, x, y)) != 0) {
-            why = "bumping into a boulder";
+            why = _("bumping into a boulder");
             You(_("bump into a %s.  Ouch!"), xname(obj));
         }  else if (!may_pass) {
             /* did we hit a no-dig non-wall position? */
-            why = "touching the edge of the universe";
+            why = _("touching the edge of the universe");
             You(_("smack into something!"));
         } else if (diagonal
                    && bad_rock(gy.youmonst.data, u.ux, y)

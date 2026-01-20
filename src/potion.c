@@ -654,9 +654,9 @@ peffect_restore_ability(struct obj *otmp)
            does not recover temporary strength loss due to hunger
            or temporary dexterity loss due to wounded legs */
         pline(_("Wow!  This makes you feel %s!"),
-              (!otmp->blessed) ? "good"
-              : unfixable_trouble_count(FALSE) ? "better"
-                : "great");
+              (!otmp->blessed) ? _("good")
+              : unfixable_trouble_count(FALSE) ? _("better")
+                : _("great"));
         i = rn2(A_MAX); /* start at a random point */
         for (ii = 0; ii < A_MAX; ii++) {
             int lim = AMAX(i);
@@ -974,10 +974,10 @@ peffect_sickness(struct obj *otmp)
             char contaminant[BUFSZ];
             int typ = rn2(A_MAX);
 
-            Sprintf(contaminant, "%s%s",
-                    (Poison_resistance) ? "mildly " : "",
-                    (otmp->fromsink) ? "contaminated tap water"
-                    : "contaminated potion");
+            Sprintf(contaminant, _("%s%s"),
+                    (Poison_resistance) ? _("mildly ") : "",
+                    (otmp->fromsink) ? _("contaminated tap water")
+                    : _("contaminated potion"));
             if (!Fixed_abil) {
                 poisontell(typ, FALSE);
                 (void) adjattrib(typ, Poison_resistance ? -1 : -rn1(4, 3),
@@ -2903,7 +2903,7 @@ void
 speed_up(long duration)
 {
    if (!Very_fast)
-       You(_("are suddenly moving %sfaster."), Fast ? "" : "much ");
+       You(_("are suddenly moving %sfaster."), Fast ? "" : _("much "));
    else
        Your(_("%s get new energy."), makeplural(body_part(LEG)));
 

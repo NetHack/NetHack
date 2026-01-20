@@ -492,7 +492,7 @@ msgstr "이상한"
 
 #: ../src/apply.c:634
 msgid "sqrt(-1)"
-msgstr ""
+msgstr "허수"
 
 #: ../src/apply.c:635
 #, fuzzy
@@ -506,7 +506,7 @@ msgstr "위협을 느낀다."
 
 #: ../src/apply.c:637
 msgid "four"
-msgstr ""
+msgstr "네"
 
 #: ../src/apply.c:638 ../src/mon.c:1628 ../src/pickup.c:822
 #, fuzzy
@@ -515,7 +515,7 @@ msgstr "에메랄드"
 
 #: ../src/apply.c:639 ../src/pickup.c:822
 msgid "many"
-msgstr ""
+msgstr "많은"
 
 #: ../src/apply.c:645
 #, fuzzy, c-format
@@ -716,7 +716,7 @@ msgstr "끈을 당긴다."
 #: ../src/apply.c:1000
 #, fuzzy
 msgid "sublime"
-msgstr ""
+msgstr "숭고한"
 "점액 구덩이#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 "점균\n"
 "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
@@ -724,11 +724,11 @@ msgstr ""
 
 #: ../src/apply.c:1001
 msgid "splendorous"
-msgstr ""
+msgstr "화려한"
 
 #: ../src/apply.c:1002 ../src/steal.c:541
 msgid "beautiful"
-msgstr ""
+msgstr "아름다운"
 
 #: ../src/apply.c:1002
 #, fuzzy
@@ -742,11 +742,11 @@ msgstr "몇 개의"
 
 #: ../src/apply.c:1003
 msgid "amiable"
-msgstr ""
+msgstr "상냥한"
 
 #: ../src/apply.c:1004
 msgid "cute"
-msgstr ""
+msgstr "귀여운"
 
 #: ../src/apply.c:1005
 #, fuzzy
@@ -755,15 +755,15 @@ msgstr "타탄 체크"
 
 #: ../src/apply.c:1006
 msgid "homely"
-msgstr ""
+msgstr "수수한"
 
 #: ../src/apply.c:1007
 msgid "ugly"
-msgstr ""
+msgstr "못생긴"
 
 #: ../src/apply.c:1008
 msgid "hideous"
-msgstr ""
+msgstr "흉측한"
 
 #: ../src/apply.c:1012
 #, c-format
@@ -984,7 +984,7 @@ msgstr "%s 불안한 날카로운 소리..."
 
 #: ../src/apply.c:1268
 msgid "issue"
-msgstr ""
+msgstr "내뿜다"
 
 #: ../src/apply.c:1289
 #, c-format
@@ -1090,7 +1090,7 @@ msgstr "%s 이상한 따뜻함!"
 
 #: ../src/apply.c:1374
 msgid "radiate"
-msgstr ""
+msgstr "발산하다"
 
 #: ../src/apply.c:1376
 #, c-format
@@ -1132,11 +1132,11 @@ msgstr "%s 나갔다."
 
 #: ../src/apply.c:1441
 msgid "They go"
-msgstr ""
+msgstr "그들이 간다"
 
 #: ../src/apply.c:1441
 msgid "It goes"
-msgstr ""
+msgstr "그것이 간다"
 
 #: ../src/apply.c:1447
 #, c-format
@@ -1161,7 +1161,7 @@ msgstr "보이지 않습니다"
 #: ../src/steal.c:792 ../src/timeout.c:1242 ../src/trap.c:5847
 #: ../src/wield.c:684 ../src/wield.c:704
 msgid "them"
-msgstr ""
+msgstr "그것들"
 
 #: ../src/apply.c:1449 ../src/apply.c:1450 ../src/apply.c:1686
 #: ../src/ball.c:974 ../src/do_name.c:749 ../src/eat.c:2637 ../src/eat.c:2723
@@ -1284,11 +1284,11 @@ msgstr "물론, 그것은 %s %s 비용에 추가된다."
 
 #: ../src/apply.c:1614 ../src/weapon.c:913 ../src/wield.c:199
 msgid "itself"
-msgstr ""
+msgstr "그 자체"
 
 #: ../src/apply.c:1614 ../src/weapon.c:913 ../src/wield.c:199
 msgid "themselves"
-msgstr ""
+msgstr "그들 자체"
 
 #: ../src/apply.c:1629 ../src/obj_descr_i18n.c:151
 msgid "lamp"
@@ -1542,12 +1542,12 @@ msgstr "위로 뛰어올랐다가 %s 다시 내려온다."
 
 #: ../src/apply.c:2123 ../src/dokick.c:634
 msgid "come"
-msgstr ""
+msgstr "오다"
 
 #: ../src/apply.c:2123 ../src/dothrow.c:1730 ../src/hack.c:1812
 #: ../src/mthrowu.c:890 ../src/trap.c:705
 msgid "fly"
-msgstr ""
+msgstr "날다"
 
 #: ../src/apply.c:2128
 msgid "hop up and down a bit"
@@ -2396,7 +2396,7 @@ msgstr "%s{이/가} 손아귀에서 벗어났다!"
 
 #: ../src/artifact.c:967 ../src/wield.c:809
 msgid "evade"
-msgstr ""
+msgstr "회피하다"
 
 #: ../src/artifact.c:969
 #, c-format
@@ -2778,7 +2778,7 @@ msgstr "즉흥 연주하시겠습니까?"
 
 #: ../src/attrib.c:184
 msgid "declined"
-msgstr ""
+msgstr "거절했다"
 
 #: ../src/attrib.c:192 ../src/mhitu.c:1021
 #, c-format
@@ -2980,7 +2980,7 @@ msgstr "%s{을/를} 떨어뜨리고 %s{과/와} 함께 계단 아래로 %s."
 
 #: ../src/ball.c:974 ../src/eat.c:2637 ../src/timeout.c:1242
 msgid "they"
-msgstr ""
+msgstr "그들"
 
 #: ../src/ball.c:1001
 msgid "lose your grip on the iron ball."
@@ -30473,7 +30473,7 @@ msgstr "%s{이/가} 닫혔다!"
 
 #: ../src/spell.c:348
 msgid "slam"
-msgstr ""
+msgstr "세게 닫다"
 
 #: ../src/spell.c:374 ../src/spell.c:609 ../src/spell.c:625
 msgid "reading a book"
@@ -30498,7 +30498,7 @@ msgstr "일반"
 
 #: ../src/spell.c:410
 msgid "restored"
-msgstr ""
+msgstr "복구되었다"
 
 #: ../src/spell.c:421
 msgid "This spellbook is too faint to read even once."
@@ -30566,11 +30566,11 @@ msgstr "룬을 %s 시작한다."
 
 #: ../src/spell.c:633
 msgid "recite"
-msgstr ""
+msgstr "암송하다"
 
 #: ../src/spell.c:633
 msgid "memorize"
-msgstr ""
+msgstr "암기하다"
 
 #: ../src/spell.c:639
 msgid "studying"
@@ -30625,7 +30625,7 @@ msgstr "주변의 %s 안개가 더 짙어진다."
 
 #: ../src/spell.c:1154
 msgid "mist"
-msgstr ""
+msgstr "안개"
 
 #: ../src/spell.c:1155
 #, fuzzy
@@ -31489,7 +31489,7 @@ msgstr "%s %s%s%s!"
 
 #: ../src/teleport.c:1714
 msgid "arrives"
-msgstr ""
+msgstr "도착한다"
 
 #: ../src/teleport.c:1906
 #, c-format
@@ -31843,7 +31843,7 @@ msgstr "다시 %s 자신으로 돌아왔다."
 
 #: ../src/timeout.c:880
 msgid "unusual"
-msgstr ""
+msgstr "특이한"
 
 #: ../src/timeout.c:886
 #, c-format
@@ -31889,7 +31889,7 @@ msgstr "%s{이/가} \"%s%s\"처럼 %s %s"
 
 #: ../src/timeout.c:1120
 msgid "Their"
-msgstr ""
+msgstr "그들의"
 
 #: ../src/timeout.c:1122
 #, fuzzy
@@ -31898,11 +31898,11 @@ msgstr "동그란"
 
 #: ../src/timeout.c:1123
 msgid "mommy"
-msgstr ""
+msgstr "엄마"
 
 #: ../src/timeout.c:1123
 msgid "daddy"
-msgstr ""
+msgstr "아빠"
 
 #: ../src/timeout.c:1126
 msgid "Gleep!"
@@ -31954,7 +31954,7 @@ msgstr "자신의 %s에 걸려 넘어졌다."
 
 #: ../src/timeout.c:1305
 msgid "elbow"
-msgstr ""
+msgstr "팔꿈치"
 
 #: ../src/timeout.c:1308
 #, c-format
@@ -32357,7 +32357,7 @@ msgstr "%s{이/가} %s 아래로!"
 
 #: ../src/trap.c:680
 msgid "swoop"
-msgstr ""
+msgstr "급강하하다"
 
 #: ../src/trap.c:680
 #, fuzzy
@@ -32706,7 +32706,7 @@ msgstr "잔해 위에서 비틀거렸다%s."
 
 #: ../src/trap.c:1889
 msgid "dive"
-msgstr ""
+msgstr "잠수하다"
 
 #: ../src/trap.c:1889 ../src/trap.c:5006
 #, fuzzy
@@ -32728,7 +32728,7 @@ msgstr "얼마나 불쌍한가. 그게 함정이 아닌가?"
 
 #: ../src/trap.c:1907
 msgid "poor"
-msgstr ""
+msgstr "가난한"
 
 #: ../src/trap.c:1909
 #, fuzzy
@@ -32758,7 +32758,7 @@ msgstr ""
 
 #: ../src/trap.c:1937
 msgid "spikes"
-msgstr ""
+msgstr "가시"
 
 #: ../src/trap.c:1939
 #, fuzzy
@@ -33288,7 +33288,7 @@ msgstr "삼지창"
 
 #: ../src/trap.c:4140
 msgid "crawl"
-msgstr ""
+msgstr "기어가다"
 
 #: ../src/trap.c:4150
 #, c-format
@@ -33378,7 +33378,7 @@ msgstr "이제 조금 더 %s."
 
 #: ../src/trap.c:4302
 msgid "obvious"
-msgstr ""
+msgstr "명백한"
 
 #: ../src/trap.c:4302
 #, fuzzy
@@ -34498,7 +34498,7 @@ msgstr "%3$s %2$s{으로/로} 몬스터를 %1$s 시작했다."
 
 #: ../src/uhitm.c:543 ../src/uhitm.c:1629
 msgid "bash"
-msgstr ""
+msgstr "강타하다"
 
 #: ../src/uhitm.c:558
 msgid "miss wildly and stumble forwards."
@@ -34633,7 +34633,7 @@ msgstr "쨍!"
 
 #: ../src/uhitm.c:1632
 msgid "smite"
-msgstr ""
+msgstr "내리치다"
 
 #: ../src/uhitm.c:1650
 #, fuzzy, c-format
@@ -34657,7 +34657,7 @@ msgstr "은"
 
 #: ../src/uhitm.c:1658 ../src/weapon.c:464
 msgid "sear"
-msgstr ""
+msgstr "지지다"
 
 #: ../src/uhitm.c:1664
 #, fuzzy, c-format
@@ -34962,7 +34962,7 @@ msgstr "%s{을/를} 둘러 %s!"
 
 #: ../src/uhitm.c:3330
 msgid "coil"
-msgstr ""
+msgstr "똬리"
 
 # #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 # #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
@@ -35005,7 +35005,7 @@ msgstr "%s{이/가} 당신을 %s 감쌌다!"
 
 #: ../src/uhitm.c:3362
 msgid "coils"
-msgstr ""
+msgstr "똬리"
 
 #: ../src/uhitm.c:3372
 #, c-format
@@ -35226,7 +35226,7 @@ msgstr "충전할"
 
 #: ../src/uhitm.c:4637
 msgid "seduce"
-msgstr ""
+msgstr "유혹하다"
 
 #
 #: ../src/uhitm.c:4638
@@ -35270,7 +35270,7 @@ msgstr "벽"
 
 #: ../src/uhitm.c:4918 ../src/uhitm.c:4970
 msgid "enclose"
-msgstr ""
+msgstr "감싸다"
 
 #: ../src/uhitm.c:4918 ../src/uhitm.c:4970 ../src/uhitm.c:5001
 #, fuzzy
@@ -35289,7 +35289,7 @@ msgstr "토해졌다!"
 
 #: ../src/uhitm.c:4946
 msgid "expel"
-msgstr ""
+msgstr "내뱉다"
 
 #: ../src/uhitm.c:4969
 #, c-format
@@ -35298,7 +35298,7 @@ msgstr "%s, 그리고 %s."
 
 #: ../src/uhitm.c:5001
 msgid "englut"
-msgstr ""
+msgstr "삼키다"
 
 #: ../src/uhitm.c:5003
 #, fuzzy
@@ -35307,7 +35307,7 @@ msgstr ", 당신을 삼키는 중"
 
 #: ../src/uhitm.c:5004
 msgid "enclosing"
-msgstr ""
+msgstr "감싸는"
 
 #: ../src/uhitm.c:5005
 #, fuzzy
@@ -35456,19 +35456,19 @@ msgstr "%s{이/가} %s %s{으로/로} %s{을/를} %s %s 했다!"
 
 #: ../src/uhitm.c:5349
 msgid "knock"
-msgstr ""
+msgstr "두드리다"
 
 #: ../src/uhitm.c:5350
 msgid "forceful"
-msgstr ""
+msgstr "강력한"
 
 #: ../src/uhitm.c:5350
 msgid "powerful"
-msgstr ""
+msgstr "강한"
 
 #: ../src/uhitm.c:5350
 msgid "blow"
-msgstr ""
+msgstr "일격"
 
 #: ../src/uhitm.c:5353
 #, c-format
@@ -35548,11 +35548,11 @@ msgstr "다소 %s."
 
 #: ../src/uhitm.c:6012
 msgid "numb"
-msgstr ""
+msgstr "마비된"
 
 #: ../src/uhitm.c:6012
 msgid "stupefied"
-msgstr ""
+msgstr "멍해진"
 
 #: ../src/uhitm.c:6014
 #, c-format
@@ -35947,7 +35947,7 @@ msgstr "%s{이/가} %s %s %s!"
 
 #: ../src/weapon.c:912 ../src/wield.c:198
 msgid "weld"
-msgstr ""
+msgstr "녹여붙이다"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -35964,11 +35964,11 @@ msgstr "빛이 %s{을/를} 비추기 시작한다."
 
 #: ../src/weapon.c:1044
 msgid "damp"
-msgstr ""
+msgstr "축축한"
 
 #: ../src/weapon.c:1044
 msgid "damper"
-msgstr ""
+msgstr "더 축축한"
 
 #: ../src/weapon.c:1045
 #, fuzzy
@@ -36298,7 +36298,7 @@ msgstr "방패를 착용한 채 양손 %s{을/를} %s할 수 없다."
 
 #: ../src/wield.c:710
 msgid "tool"
-msgstr ""
+msgstr "도구"
 
 #: ../src/wield.c:728
 #, c-format
@@ -36889,7 +36889,7 @@ msgstr "위대한 옌도리안 소설을 쓰려 %s하지만, %s 영감이 없다
 
 #: ../src/write.c:221
 msgid "prepare"
-msgstr ""
+msgstr "준비하다"
 
 #: ../src/write.c:222
 #, fuzzy
@@ -37542,7 +37542,7 @@ msgstr "지친"
 
 #: ../src/zap.c:4550
 msgid "cast"
-msgstr ""
+msgstr "시전하다"
 
 #: ../src/zap.c:4551
 #, fuzzy
