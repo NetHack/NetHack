@@ -4526,7 +4526,7 @@ lava_damage(struct obj *obj, coordxy x, coordxy y)
                when former contents of a burned container get here via
                flooreffects() */
             if (obj == gt.thrownobj || obj == gk.kickedobj)
-                pline(_("%s %s up!"), is_plural(obj) ? "They" : "It",
+                pline(_("%s %s up!"), is_plural(obj) ? _("They") : _("It"),
                       otense(obj, "burn"));
             else
                 You_see(_("%s hit lava and burn up!"), doname(obj));

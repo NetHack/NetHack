@@ -2542,8 +2542,8 @@ inherits(
                 Sprintf(takes, ", shakes %s %s,", noit_mhis(shkp),
                         mbodypart(shkp, HEAD));
             pline(_("%s %slooks at your corpse%s and %s."), Shknam(shkp),
-                  helpless(shkp) ? "wakes up, " : "",
-                  takes, !inhishop(shkp) ? "disappears" : "sighs");
+                  helpless(shkp) ? _("wakes up, ") : "",
+                  takes, !inhishop(shkp) ? _("disappears") : _("sighs"));
         }
         taken = uinshop;
         goto skip;

@@ -618,9 +618,9 @@ pick_lock(
                 return PICKLOCK_LEARNED_SOMETHING;
             }
 
-            Sprintf(qbuf, "%s it%s%s?",
-                    (door->doormask & D_LOCKED) ? "Unlock" : "Lock",
-                    autounlock ? " with " : "",
+            Sprintf(qbuf, _("%s it%s%s?"),
+                    (door->doormask & D_LOCKED) ? _("Unlock") : _("Lock"),
+                    autounlock ? _(" with ") : "",
                     autounlock ? yname(pick) : "");
             c = ynq(qbuf);
             if (c != 'y')

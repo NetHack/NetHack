@@ -6208,10 +6208,10 @@ that_is_a_mimic(
 
             fakeobj = object_from_map(glyph, x, y, &otmp);
             otmp_name = (otmp && otmp->otyp != STRANGE_OBJECT)
-                        ? simpleonames(otmp) : "strange object";
-            Snprintf(fmtbuf, sizeof fmtbuf, "%s %s %s %%s!",
-                     (otmp && is_plural(otmp)) ? "Those" : "That",
-                     otmp_name, otmp ? otense(otmp, "are") : "is");
+                        ? simpleonames(otmp) : _("strange object");
+            Snprintf(fmtbuf, sizeof fmtbuf, _("%s %s %s %%s!"),
+                     (otmp && is_plural(otmp)) ? _("Those") : _("That"),
+                     otmp_name, otmp ? otense(otmp, "are") : _("is"));
             if (fakeobj && otmp) {
                 otmp->where = OBJ_FREE; /* object_from_map set to OBJ_FLOOR */
                 dealloc_obj(otmp);
