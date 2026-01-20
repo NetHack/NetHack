@@ -177,7 +177,7 @@ mzapwand(
 
         Soundeffect(se_zap, 100);
         You_hear(_("a %s zap."), (mdistu(mtmp) <= range * range)
-                                 ? "nearby" : "distant");
+                                 ? _("nearby") : _("distant"));
         unknow_object(otmp); /* hero loses info when unseen obj is used */
     } else if (self) {
         pline(_("%s with %s!"),

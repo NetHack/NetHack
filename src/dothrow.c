@@ -1786,7 +1786,7 @@ throwit(
                     && !is_flammable(obj))) {
                 Soundeffect(se_splash, 50);
                 pline((weight(obj) > WT_SPLASH_THRESHOLD)
-                      ? "Splash!" : "Plop!");
+                      ? _("Splash!") : _("Plop!"));
             }
         }
         if (flooreffects(obj, gb.bhitpos.x, gb.bhitpos.y, "fall")) {

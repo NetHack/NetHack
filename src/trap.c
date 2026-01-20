@@ -3270,8 +3270,8 @@ launch_obj(
                 You_hear(_("someone bowling."));
             } else {
                 Soundeffect(se_rumbling, 60);
-                You_hear(_("rumbling %s."), (distu(x1, y1) <= 4 * 4) ? "nearby"
-                                           : "in the distance");
+                You_hear(_("rumbling %s."), (distu(x1, y1) <= 4 * 4) ? _("nearby")
+                                           : _("in the distance"));
             }
         }
         style &= ~LAUNCH_UNSEEN;

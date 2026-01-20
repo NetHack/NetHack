@@ -1426,7 +1426,7 @@ make_angry_shk(
         setpaid(shkp);
     }
 
-    pline(_("%s %s!"), Shknam(shkp), !ANGRY(shkp) ? "gets angry" : "is furious");
+    pline(_("%s %s!"), Shknam(shkp), !ANGRY(shkp) ? _("gets angry") : _("is furious"));
     hot_pursuit(shkp);
 }
 

@@ -152,7 +152,7 @@ m_break_boulder(struct monst *mtmp, coordxy x, coordxy y)
                     set_msg_xy(mtmp->mx, mtmp->my);
                 pline(_("%s mutters %s."),
                       Monnam(mtmp),
-                      mtmp->ispriest ? "a prayer" : "an incantation");
+                      mtmp->ispriest ? _("a prayer") : _("an incantation"));
             }
             mtmp->mspec_used += rn1(20, 10);
         }

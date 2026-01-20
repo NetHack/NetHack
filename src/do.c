@@ -120,7 +120,7 @@ boulder_hits_pool(
                     } else {
                         Soundeffect(se_splash, 100);
                     }
-                    You_hear(_("a%s splash."), lava ? " sizzling" : "");
+                    You_hear(_("a%s splash."), lava ? _(" sizzling") : "");
                 }
                 wake_nearto(rx, ry, 40);
             }
@@ -1194,7 +1194,7 @@ dodown(void)
             You(_("are floating in the %s."), surface(u.ux, u.uy));
         else if (Is_waterlevel(&u.uz))
             You(_("are floating in %s."),
-                is_pool(u.ux, u.uy) ? "the water" : "a bubble of air");
+                is_pool(u.ux, u.uy) ? _("the water") : _("a bubble of air"));
         else
             floating_above(stairs_down ? "stairs"
                            : ladder_down ? "ladder"
