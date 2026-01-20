@@ -871,7 +871,7 @@ one_characteristic(int mode, int final, int attrindx)
 
     acurrent = ACURR(attrindx);
     (void) attrval(attrindx, acurrent, valubuf); /* Sprintf(valubuf,"%d",) */
-    Sprintf(subjbuf, "Your %s ", attrname[attrindx]);
+    Sprintf(subjbuf, _("Your %s "), attrname[attrindx]);
 
     if (!hide_innate_value) {
         /* show abase, amax, and/or attrmax if acurr doesn't match abase
@@ -1338,21 +1338,21 @@ weapon_insight(int final)
             pfx[0] = sfx[0] = '\0';
             if (twoskl < sklvl) {
                 /* twoskil won't be restricted so sklvl is at least basic */
-                Sprintf(pfx, "Your skill in %s ", skill_name(wtype));
-                Sprintf(sfx, " limited by being %s with two weapons", twobuf);
+                Sprintf(pfx, _("Your skill in %s "), skill_name(wtype));
+                Sprintf(sfx, _(" limited by being %s with two weapons"), twobuf);
                 also = also_;
             } else if (twoskl > sklvl) {
                 /* sklvl might be restricted */
-                Strcpy(pfx, "Your two weapon skill ");
-                Strcpy(sfx, " limited by ");
+                Strcpy(pfx, _("Your two weapon skill "));
+                Strcpy(sfx, _(" limited by "));
                 if (sklvl > P_ISRESTRICTED)
-                    Sprintf(eos(sfx), "being %s", sklvlbuf);
+                    Sprintf(eos(sfx), _("being %s"), sklvlbuf);
                 else
-                    Sprintf(eos(sfx), "having no skill");
-                Sprintf(eos(sfx), " with %s", skill_name(wtype));
+                    Sprintf(eos(sfx), _("having no skill"));
+                Sprintf(eos(sfx), _(" with %s"), skill_name(wtype));
                 also2 = also_;
             } else {
-                Strcat(buf, " and two weapons");
+                Strcat(buf, _(" and two weapons"));
                 also3 = also_;
             }
             if (*pfx)
@@ -1371,13 +1371,13 @@ weapon_insight(int final)
                 pfx[0] = sfx[0] = buf[0] = '\0';
                 if (twoskl < sklvl2) {
                     /* twoskil is at least unskilled, sklvl2 at least basic */
-                    Sprintf(pfx, "Your skill in %s ", sknambuf2);
-                    Sprintf(sfx, " %slimited by being %s with two weapons",
+                    Sprintf(pfx, _("Your skill in %s "), sknambuf2);
+                    Sprintf(sfx, _(" %slimited by being %s with two weapons"),
                             also, twobuf);
                 } else if (twoskl > sklvl2) {
                     /* sklvl2 might be restricted */
-                    Strcpy(pfx, "Your two weapon skill ");
-                    Sprintf(sfx, " %slimited by ", also2);
+                    Strcpy(pfx, _("Your two weapon skill "));
+                    Sprintf(sfx, _(" %slimited by "), also2);
                     if (sklvl2 > P_ISRESTRICTED)
                         Sprintf(eos(sfx), "being %s", sklvlbuf2);
                     else

@@ -3278,8 +3278,8 @@ display_pickinv(
             if (inuse_only) {
                 /* for inuse-only, start with an extra header */
                 if (!inusecount++)
-                    add_menu_heading(win, doing_perm_invent ? "In use"
-                                            : "Inventory in use");
+                    add_menu_heading(win, doing_perm_invent ? _("In use")
+                                            : _("Inventory in use"));
             } else if (doing_perm_invent && !show_gold) {
                 /* don't skip gold if it is quivered, even for !show_gold */
                 if (otmp->invlet == GOLD_SYM && !otmp->owornmask) {
