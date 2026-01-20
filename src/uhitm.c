@@ -2266,7 +2266,7 @@ mhitm_ad_rust(
             /* note: the life-saved case is hypothetical because
                life-saving doesn't work for golems */
             pline(_("%s %s to pieces!"), Monnam(mdef),
-                  !mlifesaver(mdef) ? "falls" : "starts to fall");
+                  !mlifesaver(mdef) ? _("falls") : _("starts to fall"));
             xkilled(mdef, XKILL_NOMSG);
             mhm->hitflags |= M_ATTK_DEF_DIED;
         }
@@ -2346,7 +2346,7 @@ mhitm_ad_dcay(
         /* uhitm */
         if (completelyrots(pd)) { /* wood golem or leather golem */
             pline(_("%s %s to pieces!"), Monnam(mdef),
-                  !mlifesaver(mdef) ? "falls" : "starts to fall");
+                  !mlifesaver(mdef) ? _("falls") : _("starts to fall"));
             xkilled(mdef, XKILL_NOMSG);
         }
         erode_armor(mdef, ERODE_ROT);
@@ -2514,12 +2514,12 @@ mhitm_ad_fire(
                 /* note: the life-saved case is hypothetical because
                    life-saving doesn't work for golems */
                 pline(_("%s %s!"), Monnam(mdef),
-                      !mlifesaver(mdef) ? "burns completely"
-                                        : "is totally engulfed in flames");
+                      !mlifesaver(mdef) ? _("burns completely")
+                                        : _("is totally engulfed in flames"));
             else
                 You(_("smell burning%s."),
-                    (pd == &mons[PM_PAPER_GOLEM]) ? " paper"
-                      : (pd == &mons[PM_STRAW_GOLEM]) ? " straw" : "");
+                    (pd == &mons[PM_PAPER_GOLEM]) ? _(" paper")
+                      : (pd == &mons[PM_STRAW_GOLEM]) ? _(" straw") : "");
             xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
             mhm->damage = 0;
             return;
@@ -2572,9 +2572,9 @@ mhitm_ad_fire(
             /* note: the life-saved case is hypothetical because
                life-saving doesn't work for golems */
             if (gv.vis && canseemon(mdef))
-                pline_mon(mdef, "%s %s!", Monnam(mdef),
-                      !mlifesaver(mdef) ? "burns completely"
-                                        : "is totally engulfed in flames");
+                pline_mon(mdef, _("%s %s!"), Monnam(mdef),
+                      !mlifesaver(mdef) ? _("burns completely")
+                                        : _("is totally engulfed in flames"));
             monkilled(mdef, (char *) 0, AD_FIRE);
             if (!DEADMONSTER(mdef)) {
                 mhm->hitflags = M_ATTK_MISS;
@@ -4486,12 +4486,12 @@ mhitm_ad_dgst(
         /* eating a Rider or its corpse is fatal */
         if (is_rider(pd)) {
             if (gv.vis && canseemon(magr))
-                pline_mon(magr, "%s %s!", Monnam(magr),
+                pline_mon(magr, _("%s %s!"), Monnam(magr),
                       (pd == &mons[PM_FAMINE])
-                          ? "belches feebly, shrivels up and dies"
+                          ? _("belches feebly, shrivels up and dies")
                           : (pd == &mons[PM_PESTILENCE])
-                                ? "coughs spasmodically and collapses"
-                                : "vomits violently and drops dead");
+                                ? _("coughs spasmodically and collapses")
+                                : _("vomits violently and drops dead"));
             mondied(magr);
             if (!DEADMONSTER(magr)) {
                 mhm->hitflags = M_ATTK_MISS; /* lifesaved */
@@ -4941,9 +4941,9 @@ gulpum(struct monst *mdef, struct attack *mattk)
             u_enfold = enfolds(gy.youmonst.data);
     struct obj *otmp;
     struct permonst *pd = mdef->data;
-    const char *expel_verb = u_digest ? "regurgitate"
-                             : u_enfold ? "release"
-                               : "expel";
+    const char *expel_verb = u_digest ? _("regurgitate")
+                             : u_enfold ? _("release")
+                               : _("expel");
 
     /* Not totally the same as for real monsters.  Specifically, these
      * don't take multiple moves.  (It's just too hard, for too little
@@ -4999,11 +4999,11 @@ gulpum(struct monst *mdef, struct attack *mattk)
             if (!type_is_pname(pd))
                 mnam = an(mnam);
             You(_("%s %s."), u_digest ? _("englut") : _("engulf"), mon_nam(mdef));
-            Sprintf(kbuf, "%s %s%s",
-                    u_digest ? "swallowing"
-                    : u_enfold ? "enclosing"
-                      : "engulfing",
-                    mnam, u_digest ? " whole" : "");
+            Sprintf(kbuf, _("%s %s%s"),
+                    u_digest ? _("swallowing")
+                    : u_enfold ? _("enclosing")
+                      : _("engulfing"),
+                    mnam, u_digest ? _(" whole") : "");
             instapetrify(kbuf);
         } else {
             start_engulf(mdef);
@@ -5089,8 +5089,8 @@ gulpum(struct monst *mdef, struct attack *mattk)
                     }
                 } else {
                     pline(_("%s is %s!"), Monnam(mdef),
-                          enfolds(gy.youmonst.data) ? "being squashed"
-                            : "pummeled with your debris");
+                          enfolds(gy.youmonst.data) ? _("being squashed")
+                            : _("pummeled with your debris"));
                 }
                 break;
             case AD_ACID:
