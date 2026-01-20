@@ -2023,7 +2023,7 @@ dovspell(void)
                 if (spellsortmenu())
                     sortspells();
             } else {
-                Sprintf(qbuf, "Reordering spells; swap '%c' with",
+                Sprintf(qbuf, _("Reordering spells; swap '%c' with"),
                         spellet(splnum));
                 if (!dospellmenu(qbuf, splnum, &othnum))
                     break;

@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 13:14+0900\n"
+"POT-Creation-Date: 2026-01-20 13:16+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -7031,6 +7031,45 @@ msgstr "보상을 받으러 갔다"
 msgid "escaped from the dungeon"
 msgstr "던전을 탈출했다"
 
+#: src/end.c:1526
+#, fuzzy, c-format
+msgid "You %s beyond the confines of the dungeon"
+msgstr "던전 밖으로"
+
+#: src/end.c:1527
+msgid "passed away"
+msgstr "세상을 떠났습니다"
+
+#: src/end.c:1533
+#, fuzzy
+msgid "The Astral Plane"
+msgstr "원소의 평면으로"
+
+#: src/end.c:1534
+#, fuzzy, c-format
+msgid "You %s in %s"
+msgstr "%s %s에 빠져 있다."
+
+#: src/end.c:1536
+#, fuzzy, c-format
+msgid " on dungeon level %d"
+msgstr "로그 레벨 "
+
+#: src/end.c:1540
+#, c-format
+msgid " with %ld point%s,"
+msgstr " %ld 점%s으로,"
+
+#: src/end.c:1544
+#, c-format
+msgid "and %ld piece%s of gold, after %ld move%s."
+msgstr "%ld 골드%s를 가지고, %ld 턴%s 후에."
+
+#: src/end.c:1548
+#, c-format
+msgid "You were level %d with a maximum of %d hit point%s when you %s."
+msgstr "당신은 %4$s할 때 레벨 %1$d였고 최대 %2$d HP%3$s를 가졌습니다."
+
 #: src/end.c:1627
 #, fuzzy, c-format
 msgid "Contents of %s:"
@@ -7100,6 +7139,35 @@ msgstr "여기에 글을 쓴다."
 #: src/engrave.c:535
 msgid "even hold anything!"
 msgstr "아무것도 들 수 없다!"
+
+#: src/engrave.c:603
+msgid "The wand unsuccessfully fights your attempt to write!"
+msgstr "지팡이가 당신의 쓰기 시도를 막으려 하지만 실패합니다!"
+
+#: src/engrave.c:607
+#, c-format
+msgid "The bugs on the %s slow down!"
+msgstr "%s 위의 벌레들이 느려집니다!"
+
+#: src/engrave.c:613
+#, c-format
+msgid "The bugs on the %s speed up!"
+msgstr "%s 위의 벌레들이 빨라집니다!"
+
+#: src/engrave.c:645
+#, fuzzy, c-format
+msgid "The %s is riddled by bullet holes!"
+msgstr "%s{이} 얼음 다리로 연결되었다!"
+
+#: src/engrave.c:653
+#, fuzzy, c-format
+msgid "The bugs on the %s stop moving!"
+msgstr "%s{이/가} 움직임을 멈춘다."
+
+#: src/engrave.c:660
+#, fuzzy
+msgid "A few ice cubes drop from the wand."
+msgstr "%s 진흙이 배수구에서 솟아올랐다!"
 
 #: src/engrave.c:669 src/engrave.c:677
 #, c-format
@@ -7245,6 +7313,11 @@ msgstr "%s%s{으로/로} %s{을/를} %s."
 #, c-format
 msgid "%s the %s with your %s."
 msgstr "%s{으로/로} %s{을/를} %s."
+
+#: src/engrave.c:1186
+#, fuzzy, c-format
+msgid "What do you want to %s the %s here?"
+msgstr "%s 것이 무엇입니까?"
 
 #: src/engrave.c:1201
 #, c-format
@@ -22153,6 +22226,11 @@ msgstr "그 위치에 정신을 집중하지 못했다!"
 #: src/spell.c:1993
 msgid "View known spells list sorted"
 msgstr "알려진 주문 목록 정렬 보기"
+
+#: src/spell.c:2026
+#, c-format
+msgid "Reordering spells; swap '%c' with"
+msgstr "주문 재정렬; '%c'을(를) 다음과 교환:"
 
 #: src/spell.c:2053
 msgid "You didn't know any spells."

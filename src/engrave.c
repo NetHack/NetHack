@@ -600,17 +600,17 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
          */
     case WAN_STRIKING:
         Strcpy(de->post_engr_text,
-               "The wand unsuccessfully fights your attempt to write!");
+               _("The wand unsuccessfully fights your attempt to write!"));
         break;
     case WAN_SLOW_MONSTER:
         if (!Blind) {
-            Sprintf(de->post_engr_text, "The bugs on the %s slow down!",
+            Sprintf(de->post_engr_text, _("The bugs on the %s slow down!"),
                     surface(u.ux, u.uy));
         }
         break;
     case WAN_SPEED_MONSTER:
         if (!Blind) {
-            Sprintf(de->post_engr_text, "The bugs on the %s speed up!",
+            Sprintf(de->post_engr_text, _("The bugs on the %s speed up!"),
                     surface(u.ux, u.uy));
         }
         break;
@@ -642,7 +642,7 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
         de->ptext = TRUE;
         if (!Blind) {
             Sprintf(de->post_engr_text,
-                    "The %s is riddled by bullet holes!",
+                    _("The %s is riddled by bullet holes!"),
                     surface(u.ux, u.uy));
         }
         break;
@@ -650,14 +650,14 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
     case WAN_SLEEP:
     case WAN_DEATH:
         if (!Blind) {
-            Sprintf(de->post_engr_text, "The bugs on the %s stop moving!",
+            Sprintf(de->post_engr_text, _("The bugs on the %s stop moving!"),
                     surface(u.ux, u.uy));
         }
         break;
     case WAN_COLD:
         if (!Blind)
             Strcpy(de->post_engr_text,
-                   "A few ice cubes drop from the wand.");
+                   _("A few ice cubes drop from the wand."));
         if (!de->oep || (de->oep->engr_type != BURN))
             break;
         FALLTHROUGH;
@@ -1183,7 +1183,7 @@ doengrave(void)
             de->everb, de->eloc, body_part(FINGERTIP));
 
     /* Prompt for engraving! */
-    Sprintf(de->qbuf, "What do you want to %s the %s here?",
+    Sprintf(de->qbuf, _("What do you want to %s the %s here?"),
             de->everb, de->eloc);
     getlin(de->qbuf, de->ebuf);
     /* convert tabs to spaces and condense consecutive spaces to one */
