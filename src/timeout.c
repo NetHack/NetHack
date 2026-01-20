@@ -877,7 +877,7 @@ nh_timeout(void)
                         You_feel(_("hemmed in again."));
                     else
                         pline(_("You're back to your %s self again."),
-                              !Upolyd ? "normal" : "unusual");
+                              !Upolyd ? _("normal") : _("unusual"));
                 }
                 break;
             case MAGICAL_BREATHING:
@@ -890,7 +890,7 @@ nh_timeout(void)
             case STRANGLED:
                 svk.killer.format = KILLED_BY;
                 Strcpy(svk.killer.name,
-                       (u.uburied) ? "suffocation" : "strangulation");
+                       (u.uburied) ? _("suffocation") : _("strangulation"));
                 done_timeout(DIED, STRANGLED);
                 /* must be declining to die in explore|wizard mode;
                    treat like being cured of strangulation by prayer */
@@ -1117,10 +1117,10 @@ hatch_egg(anything *arg, long timeout)
                         locomotion(mon->data, "drop"));
             if (yours) {
                 pline(_("%s %s %s like \"%s%s\""),
-                      siblings ? "Their" : "Its",
+                      siblings ? _("Their") : _("Its"),
                       ing_suffix(cry_sound(mon)),
-                      (is_silent(mon->data) || Deaf) ? "seems" : "sounds",
-                      flags.female ? "mommy" : "daddy", egg->spe ? "." : "?");
+                      (is_silent(mon->data) || Deaf) ? _("seems") : _("sounds"),
+                      flags.female ? _("mommy") : _("daddy"), egg->spe ? "." : "?");
             } else if (mon->data->mlet == S_DRAGON && !Deaf) {
                 SetVoice(mon, 0, 80, 0);
                 verbalize(_("Gleep!")); /* Mything eggs :-) */
@@ -1238,13 +1238,13 @@ slip_or_trip(void)
           anonymous "something" if there aren't any rocks.
         */
         what = (iflags.last_msg == PLNMSG_ONE_ITEM_HERE)
-                ? ((otmp->quan == 1L) ? "it"
-                      : Hallucination ? "they" : "them")
+                ? ((otmp->quan == 1L) ? _("it")
+                      : Hallucination ? _("they") : _("them"))
                 : (otmp->dknown || !Blind)
                       ? doname(otmp)
                       : ((otmp2 = sobj_at(ROCK, u.ux, u.uy)) == 0
                              ? something
-                             : (otmp2->quan == 1L ? "a rock" : "some rocks"));
+                             : (otmp2->quan == 1L ? _("a rock") : _("some rocks")));
         if (Hallucination) {
             what = strcpy(buf, what);
             buf[0] = highc(buf[0]);
@@ -1270,10 +1270,10 @@ slip_or_trip(void)
               /* "steed": arbitrary value that will use third person verb
                  regardless of what u.usteed might be named, as opposed to
                  "you" (second person, which won't have final 's' added) */
-              vtense(u.usteed ? "steed" : "you", rn2(2) ? "slip" : "slide"),
+              vtense(u.usteed ? "steed" : "you", rn2(2) ? _("slip") : _("slide")),
               /* sometimes slipping due to ice occurs during turn that hero
                  has just moved off the ice; phrase things differently then */
-              is_ice(u.ux, u.uy) ? "on" : "off");
+              is_ice(u.ux, u.uy) ? _("on") : _("off"));
         /* fumbling outside of ice while mounted always causes the hero to
            fall from the saddle (unless it is cursed), so to avoid a
            counterintuitive effect where ice makes riding _less_ hazardous,
@@ -1302,11 +1302,11 @@ slip_or_trip(void)
             switch (rn2(4)) {
             case 1:
                 You(_("trip over your own %s."),
-                    Hallucination ? "elbow" : makeplural(body_part(FOOT)));
+                    Hallucination ? _("elbow") : makeplural(body_part(FOOT)));
                 break;
             case 2:
                 You(_("slip %s."),
-                    Hallucination ? "on a banana peel" : "and nearly fall");
+                    Hallucination ? _("on a banana peel") : _("and nearly fall"));
                 break;
             case 3:
                 You(_("flounder."));
@@ -1610,7 +1610,7 @@ burn_object(anything *arg, long timeout)
                         /*FALLTHRU*/
                     case OBJ_MINVENT:
                         pline(_("%s %s consumed!"), Yname2(obj),
-                              many ? "are" : "is");
+                              many ? _("are") : _("is"));
                         break;
                     case OBJ_FLOOR:
                         /*

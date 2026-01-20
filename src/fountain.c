@@ -186,7 +186,7 @@ watchman_warn_fountain(struct monst *mtmp)
         } else {
             pline(_("%s earnestly %s %s %s!"),
                   Amonnam(mtmp),
-                  nolimbs(mtmp->data) ? "shakes" : "waves",
+                  nolimbs(mtmp->data) ? _("shakes") : _("waves"),
                   mhis(mtmp),
                   nolimbs(mtmp->data)
                   ? mbodypart(mtmp, HEAD)
@@ -640,7 +640,7 @@ drinksink(void)
         }
         otmp->cursed = otmp->blessed = 0;
         pline(_("Some %s liquid flows from the faucet."),
-              Blind ? "odd" : hcolor(OBJ_DESCR(objects[otmp->otyp])));
+              Blind ? _("odd") : hcolor(OBJ_DESCR(objects[otmp->otyp])));
         if(!(Blind || Hallucination))
             observe_object(otmp);
         otmp->quan++;       /* Avoid panic upon useup() */
@@ -706,7 +706,7 @@ drinksink(void)
         /*FALLTHRU*/
     default:
         You(_("take a sip of %s %s."),
-            rn2(3) ? (rn2(2) ? "cold" : "warm") : "hot",
+            rn2(3) ? (rn2(2) ? _("cold") : _("warm")) : _("hot"),
             hliquid("water"));
     }
 }

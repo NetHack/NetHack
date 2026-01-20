@@ -274,15 +274,15 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
                 (void) unmap_invisible(x, y);
                 pline(_("%s %s, %s evading your %skick."), Monnam(mon),
                       (can_teleport(mon->data) && !noteleport_level(mon))
-                          ? "teleports"
+                          ? _("teleports")
                           : is_floater(mon->data)
-                                ? "floats"
-                                : is_flyer(mon->data) ? "swoops"
+                                ? _("floats")
+                                : is_flyer(mon->data) ? _("swoops")
                                                       : (nolimbs(mon->data)
                                                          || slithy(mon->data))
-                                                            ? "slides"
-                                                            : "jumps",
-                      clumsy ? "easily" : "nimbly", clumsy ? "clumsy " : "");
+                                                            ? _("slides")
+                                                            : _("jumps"),
+                      clumsy ? _("easily") : _("nimbly"), clumsy ? _("clumsy ") : "");
                 (void) passive(mon, uarmf, FALSE, 1, AT_KICK, FALSE);
                 return;
             }
@@ -399,7 +399,7 @@ ghitm(struct monst *mtmp, struct obj *gold)
             } else {
                 SetVoice(mtmp, 0, 80, 0);
                 verbalize(_("Thanks for the tip, %s."),
-                          flags.female ? "lady" : "buddy");
+                          flags.female ? _("lady") : _("buddy"));
             }
         }
         return TRUE;
@@ -1929,10 +1929,10 @@ otransit_msg(struct obj *otmp, boolean nodrop, boolean chainthere, long num)
         /* As of 3.6.2: use a separate buffer for the suffix to avoid risk of
            overrunning obuf[] (let pline() handle truncation if necessary) */
         if (num) { /* means: other objects are impacted */
-            Sprintf(xbuf, " %s %s object%s", otense(otmp, "hit"),
-                    (num == 1L) ? "another" : "other", (num > 1L) ? "s" : "");
+            Sprintf(xbuf, _(" %s %s object%s"), otense(otmp, _("hit")),
+                    (num == 1L) ? _("another") : _("other"), (num > 1L) ? "s" : "");
         } else { /* chain-only msg */
-            Sprintf(xbuf, " %s your chain", otense(otmp, "rattle"));
+            Sprintf(xbuf, _(" %s your chain"), otense(otmp, _("rattle")));
         }
         if (nodrop)
             Sprintf(eos(xbuf), ".");

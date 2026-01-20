@@ -318,7 +318,7 @@ priestname(
     /* for high priest(ess), "high" (or "grand" for poohbah) will be inserted
        [this was done near the end but we want 'what' to be updated sooner] */
     if (mon->ispriest || aligned_priest || high_priest)
-        what = do_hallu ? "poohbah" : mon->female ? "priestess" : "priest";
+        what = do_hallu ? _("poohbah") : mon->female ? _("priestess") : _("priest");
 
     *pname = '\0';
     if (article != ARTICLE_NONE && (!do_hallu || !bogon_is_pname(whatcode))) {
@@ -614,10 +614,10 @@ priest_talk(struct monst *priest)
             if (pmoney > 0L) {
                 const char *bits;
                 bits = (Hallucination) ? currency(pmoney)
-                                       : (pmoney == 1L) ? "bit" : "bits";
+                                       : (pmoney == 1L) ? _("bit") : _("bits");
                 /* Note: two bits is actually 25 cents.  Hmm. */
                 pline(_("%s gives you %s%s for an ale."), Monnam(priest),
-                      (pmoney == 1L) ? "one " : "two ", bits);
+                      (pmoney == 1L) ? _("one ") : _("two "), bits);
                 money2u(priest, pmoney > 1L ? 2 : 1);
             } else
                 pline(_("%s preaches the virtues of poverty."), Monnam(priest));
