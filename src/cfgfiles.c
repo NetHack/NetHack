@@ -182,8 +182,8 @@ do_write_config_file(void)
               " from the file!"));
         wait_synch();
     }
-#define overwrite_prompt "Overwrite config file %.*s?"
-    Sprintf(tmp, overwrite_prompt,
+#define overwrite_prompt N_("Overwrite config file %.*s?")
+    Sprintf(tmp, _(overwrite_prompt),
             (int) (BUFSZ - sizeof overwrite_prompt - 2), configfile);
 #undef overwrite_prompt
     if (!paranoid_query(TRUE, tmp))

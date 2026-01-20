@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 11:30+0900\n"
+"POT-Creation-Date: 2026-01-20 12:01+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -2077,6 +2077,11 @@ msgstr "일부 설정이 저장되지 않았다!"
 #: src/cfgfiles.c:181
 msgid "All manual customization and comments are removed from the file!"
 msgstr "모든 수동 설정과 주석이 파일에서 제거된다!"
+
+#: src/cfgfiles.c:185
+#, fuzzy, c-format
+msgid "Overwrite config file %.*s?"
+msgstr "%s에 쓸 수 없다!"
 
 #: src/cfgfiles.c:204
 #, c-format
@@ -6774,6 +6779,16 @@ msgstr "\"%s\"의 %s인 것 같다!"
 #: src/files.c:3651
 msgid "Cannot open live log file!"
 msgstr "라이브 로그 파일을 열 수 없다!"
+
+#: src/fountain.c:23
+#, fuzzy, c-format
+msgid "are floating high above the %s."
+msgstr "%s에 떠 있다."
+
+#: src/fountain.c:28
+#, fuzzy, c-format
+msgid "are trapped in the %s."
+msgstr "%s{이/가} %s에 나타났다."
 
 #: src/fountain.c:45
 #, c-format

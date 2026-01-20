@@ -20,15 +20,15 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 void
 floating_above(const char *what)
 {
-    const char *umsg = "are floating high above the %s.";
+    const char *umsg = N_("are floating high above the %s.");
 
     if (u.utrap && (u.utraptype == TT_INFLOOR || u.utraptype == TT_LAVA)) {
         /* when stuck in floor (not possible at fountain or sink location,
            so must be attempting to move down), override the usual message */
-        umsg = "are trapped in the %s.";
+        umsg = N_("are trapped in the %s.");
         what = surface(u.ux, u.uy); /* probably redundant */
     }
-    You(umsg, what);
+    You(_(umsg), what);
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
