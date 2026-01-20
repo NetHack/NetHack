@@ -2020,7 +2020,7 @@ domove_fight_web(coordxy x, coordxy y)
                      || (uwep->oartifact && attacks(AD_FIRE, uwep)))) {
             /* guaranteed success */
             pline(_("%s %s through the web!"), bare_artifactname(uwep),
-                  u_wield_art(ART_STING) ? "cuts" : "burns");
+                  u_wield_art(ART_STING) ? _("cuts") : _("burns"));
 
         /* is_blade() includes daggers (which are classified as PIERCE)
            but doesn't include axes and slashing polearms */
@@ -3574,8 +3574,8 @@ check_special_room(boolean newlev)
             pline(_("Welcome to David's treasure zoo!"));
             break;
         case SWAMP:
-            pline(_("It %s rather %s down here."), Blind ? "feels" : "looks",
-                  Blind ? "humid" : "muddy");
+            pline(_("It %s rather %s down here."), Blind ? _("feels") : _("looks"),
+                  Blind ? _("humid") : _("muddy"));
             break;
         case COURT:
             You(_("enter an opulent%s room!"),

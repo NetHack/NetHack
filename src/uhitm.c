@@ -2443,7 +2443,7 @@ mhitm_ad_drli(
                (golems, vortices) are subject to life-drain */
             if (DEADMONSTER(mdef) || !mdef->m_lev) {
                 pline(_("%s %s!"), Monnam(mdef),
-                      nonliving(mdef->data) ? "expires" : "dies");
+                      nonliving(mdef->data) ? _("expires") : _("dies"));
                 xkilled(mdef, XKILL_NOMSG);
             } else
                 mdef->m_lev--;

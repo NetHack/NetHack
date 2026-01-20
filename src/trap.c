@@ -6840,10 +6840,10 @@ lava_effects(void)
         if (usurvive && burncount > burnmesgcount)
             pline(_("%s item%s in your inventory %s been destroyed."),
                   (burnmesgcount > 0)
-                    ? ((burncount - burnmesgcount == 1) ? "Another" : "Other")
-                    : ((burncount == 1) ? "An" : "Some"),
+                    ? ((burncount - burnmesgcount == 1) ? _("Another") : _("Other"))
+                    : ((burncount == 1) ? _("An") : _("Some")),
                   plur(burncount - burnmesgcount),
-                  (burncount - burnmesgcount == 1) ? "has" : "have");
+                  (burncount - burnmesgcount == 1) ? _("has") : _("have"));
 
         /* s/he died... */
         boil_away = (u.umonnum == PM_WATER_ELEMENTAL

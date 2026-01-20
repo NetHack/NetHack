@@ -2021,7 +2021,7 @@ look_all(
                 cmode = (iflags.getpos_coords != GPCOORDS_NONE)
                            ? iflags.getpos_coords : GPCOORDS_MAP;
                 if (count == 1) {
-                    Strcpy(which, do_mons ? "monsters" : "objects");
+                    Strcpy(which, do_mons ? _("monsters") : _("objects"));
                     if (nearby)
                         Sprintf(outbuf, "%s currently shown near %s:",
                                 upstart(which),

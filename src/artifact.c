@@ -1502,7 +1502,7 @@ artifact_hit(
     if (attacks(AD_COLD, otmp)) {
         if (realizes_damage)
             pline_The(_("ice-cold blade %s %s%c"),
-                      !gs.spec_dbon_applies ? "hits" : "freezes", hittee,
+                      !gs.spec_dbon_applies ? _("hits") : _("freezes"), hittee,
                       !gs.spec_dbon_applies ? '.' : '!');
         if (!rn2(4)) {
             int itemdmg = destroy_items(mdef, AD_COLD, *dmgptr);

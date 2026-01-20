@@ -744,7 +744,7 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
 
         /* not canspotmon() which includes unseen things sensed via warning */
         seecaster = canseemon(mtmp) || tp_sensemon(mtmp) || Detect_monsters;
-        what = (let == S_SNAKE) ? "snakes" : "insects";
+        what = (let == S_SNAKE) ? _("snakes") : _("insects");
         if (Hallucination)
             what = makeplural(bogusmon(whatbuf, (char *) 0));
 

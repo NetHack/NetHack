@@ -2125,7 +2125,7 @@ thitmonst(
 
                 finish_quest(obj); /* acknowledge quest completion */
                 pline(_("%s %s %s back to you."), Some_Monnam(mon),
-                      (next2u ? "hands" : "tosses"), the(xname(obj)));
+                      (next2u ? _("hands") : _("tosses")), the(xname(obj)));
                 if (!next2u)
                     sho_obj_return_to_u(obj);
                 obj = addinv(obj); /* back into your inventory */
