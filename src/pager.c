@@ -2130,7 +2130,7 @@ look_traps(boolean nearby)
     if (count)
         display_nhwindow(win, TRUE);
     else
-        pline(_("No traps seen or remembered%s."), nearby ? " nearby" : "");
+        pline(_("No traps seen or remembered%s."), nearby ? _(" nearby") : "");
     destroy_nhwindow(win);
 }
 
@@ -2219,7 +2219,7 @@ look_engrs(boolean nearby)
     if (count)
         display_nhwindow(win, TRUE);
     else
-        pline(_("No engravings seen or remembered%s."), nearby ? " nearby" : "");
+        pline(_("No engravings seen or remembered%s."), nearby ? _(" nearby") : "");
     destroy_nhwindow(win);
 }
 
@@ -2351,7 +2351,7 @@ doidtrap(void)
         boolean chesttrap = trapped_chest_at(tt, x, y);
 
         if (chesttrap || trapped_door_at(tt, x, y)) {
-            pline(_("That is a trapped %s."), chesttrap ? "chest" : "door");
+            pline(_("That is a trapped %s."), chesttrap ? _("chest") : _("door"));
             return ECMD_OK; /* trap ID'd, but no time elapses */
         }
     }

@@ -3068,17 +3068,17 @@ invocation_message(void)
 
         nomul(0); /* stop running or travelling */
         if (u.usteed)
-            Sprintf(buf, "beneath %s", y_monnam(u.usteed));
+            Sprintf(buf, _("beneath %s"), y_monnam(u.usteed));
         else if (Levitation || Flying)
-            Strcpy(buf, "beneath you");
+            Strcpy(buf, _("beneath you"));
         else
-            Sprintf(buf, "under your %s", makeplural(body_part(FOOT)));
+            Sprintf(buf, _("under your %s"), makeplural(body_part(FOOT)));
 
         You_feel(_("a strange vibration %s."), buf);
         u.uevent.uvibrated = 1;
         if (otmp && otmp->spe == 7 && otmp->lamplit)
             pline(_("%s %s!"), The(xname(otmp)),
-                  Blind ? "throbs palpably" : "glows with a strange light");
+                  Blind ? _("throbs palpably") : _("glows with a strange light"));
     }
 }
 

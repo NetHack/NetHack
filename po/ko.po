@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 13:00+0900\n"
+"POT-Creation-Date: 2026-01-20 13:02+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -295,7 +295,8 @@ msgstr "거기에 %s{이/가} 있다."
 msgid "invisible monster must have moved."
 msgstr "투명 괴물이 이동한 것 같다."
 
-#: src/apply.c:455 src/shk.c:5091 src/shk.c:5098 src/shk.c:5102
+#: src/apply.c:455 src/pager.c:2354 src/shk.c:5091 src/shk.c:5098
+#: src/shk.c:5102
 msgid "door"
 msgstr "문"
 
@@ -1923,6 +1924,11 @@ msgstr "독이 영향을 미치지 않는 것 같다."
 #: src/uhitm.c:3113
 msgid "poison was deadly..."
 msgstr "독이 치명적이었다..."
+
+#: src/attrib.c:964
+#, fuzzy, c-format
+msgid "due to goop covering your %s"
+msgstr "%s 위에 그것을 입을 수 없다."
 
 #: src/attrib.c:1049 src/attrib.c:1055 src/detect.c:1246 src/detect.c:1322
 #: src/dig.c:1068 src/dig.c:1074 src/dokick.c:708 src/dothrow.c:1500
@@ -4818,6 +4824,21 @@ msgstr "%s{이/가} %s%s %s%s에서 %s%s."
 msgid "ring is stuck."
 msgstr "반지가 빠지지 않는다."
 
+#: src/do_wear.c:2711
+#, fuzzy, c-format
+msgid "free a weapon %s"
+msgstr "%s 무기%s{으로/로} 아무것도 강제로 열 수 없다."
+
+#: src/do_wear.c:2714
+#, fuzzy, c-format
+msgid "take off your %s%s"
+msgstr "%s{을/를} 벗어라; %s."
+
+#: src/do_wear.c:2715
+#, fuzzy
+msgid "slippery "
+msgstr "미끄러운 망토"
+
 #: src/do_wear.c:2719
 #, c-format
 msgid "cannot %s to remove the ring."
@@ -4842,6 +4863,16 @@ msgstr "곰 덫이 %s{을/를} 빼는 것을 막는다."
 #, c-format
 msgid "are stuck in the %s, and cannot pull your %s out."
 msgstr "%s에 갇혀서 %s{을/를} 뺄 수 없다."
+
+#: src/do_wear.c:2756 src/do_wear.c:2759
+#, fuzzy, c-format
+msgid "remove your %s"
+msgstr "%s{을/를} 움직일 수 없다!"
+
+#: src/do_wear.c:2762
+#, fuzzy, c-format
+msgid "release your %s"
+msgstr "%s{을/를} 빼냈다."
 
 #: src/do_wear.c:2769
 #, c-format
@@ -7754,6 +7785,15 @@ msgstr "또는 배경 기호를 입력하세요 (예: '<')."
 msgid "Type Space or Escape when you're done."
 msgstr "완료되면 스페이스 또는 Escape를 누르세요."
 
+# ============================================================
+# UI 메시지 (invent.c - "here" 관련)
+# ============================================================
+# %1$s = "is"/"are", %2$s = object name
+#: src/getpos.c:563
+#, fuzzy
+msgid "here"
+msgstr "여기에 %2$s{이/가} 있다.%1$.0s"
+
 #: src/getpos.c:680
 #, c-format
 msgid "cannot %s %s."
@@ -8285,10 +8325,34 @@ msgstr "철구를 끌고 가는 중"
 msgid "pass out from exertion!"
 msgstr "과로로 기절했다!"
 
+#: src/hack.c:3071
+#, fuzzy, c-format
+msgid "beneath %s"
+msgstr "아래에"
+
+#: src/hack.c:3073
+#, fuzzy
+msgid "beneath you"
+msgstr "아래에"
+
+#: src/hack.c:3075
+#, fuzzy, c-format
+msgid "under your %s"
+msgstr "%s{을/를} 태웠다."
+
 #: src/hack.c:3077
 #, c-format
 msgid "a strange vibration %s."
 msgstr "이상한 진동 %s."
+
+#: src/hack.c:3081
+msgid "throbs palpably"
+msgstr "뚜렷하게 진동합니다"
+
+#: src/hack.c:3081
+#, fuzzy
+msgid "glows with a strange light"
+msgstr "%s 이상한 빛과 함께!"
 
 #: src/hack.c:3100
 msgid "levitate in here."
@@ -13494,7 +13558,7 @@ msgstr "자루"
 msgid "bag"
 msgstr "가방"
 
-#: src/obj_descr_i18n.c:159
+#: src/obj_descr_i18n.c:159 src/pager.c:2354
 msgid "chest"
 msgstr "궤짝"
 
@@ -15193,6 +15257,11 @@ msgstr "현재 %s %s{이/가} 표시되지 않는다."
 #, c-format
 msgid "No traps seen or remembered%s."
 msgstr "함정이 보이거나 기억되지 않는다%s."
+
+#: src/pager.c:2133 src/pager.c:2222
+#, fuzzy
+msgid " nearby"
+msgstr "가까이에서"
 
 #: src/pager.c:2222
 #, c-format
@@ -27639,9 +27708,6 @@ msgstr "tty perm_invent는 최소 %dx%d 터미널이 필요한데, 현재 터미
 #~ "방수 망토\n"
 #~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 #~ "기름종이 망토"
-
-#~ msgid "slippery cloak"
-#~ msgstr "미끄러운 망토"
 
 #~ msgid "robe"
 #~ msgstr "로브"
