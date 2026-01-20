@@ -224,8 +224,8 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
             case 2:
                 pline(_("%s strikes at %s!"), Monst_name,
                       is_waterwall(mtmp->mux,mtmp->muy)
-                        ? "empty water"
-                        : "thin air");
+                        ? _("empty water")
+                        : _("thin air"));
                 break;
             default:
                 pline(_("%s %s wildly!"), Monst_name, swings);
@@ -1598,9 +1598,9 @@ explmu(struct monst *mtmp, struct attack *mattk, boolean ufound)
 
     if (!ufound) {
         pline(_("%s explodes at a spot in %s!"),
-              canseemon(mtmp) ? Monnam(mtmp) : "It",
-              is_waterwall(mtmp->mux,mtmp->muy) ? "empty water"
-                                                : "thin air");
+              canseemon(mtmp) ? Monnam(mtmp) : _("It"),
+              is_waterwall(mtmp->mux,mtmp->muy) ? _("empty water")
+                                                : _("thin air"));
     } else {
         hitmsg(mtmp, mattk);
     }

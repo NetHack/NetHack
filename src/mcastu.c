@@ -248,9 +248,9 @@ castmu(
     if (!foundyou && thinks_it_foundyou
         && !is_undirected_spell(mattk->adtyp, spellnum)) {
         pline_mon(mtmp, _("%s casts a spell at %s!"),
-                 canseemon(mtmp) ? Monnam(mtmp) : "Something",
-                 is_waterwall(mtmp->mux, mtmp->muy) ? "empty water"
-                                                    : "thin air");
+                 canseemon(mtmp) ? Monnam(mtmp) : _("Something"),
+                 is_waterwall(mtmp->mux, mtmp->muy) ? _("empty water")
+                                                    : _("thin air"));
         return M_ATTK_MISS;
     }
 

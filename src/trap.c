@@ -1854,10 +1854,10 @@ trapeffect_pit(
         if (!Sokoban && is_clinger(gy.youmonst.data) && !plunged) {
             if (already_known) {
                 You_see(_("%s %spit below you."), a_your[trap->madeby_u],
-                        ttype == SPIKED_PIT ? "spiked " : "");
+                        ttype == SPIKED_PIT ? _("spiked ") : "");
             } else {
                 pline(_("%s pit %sopens up under you!"), A_Your[trap->madeby_u],
-                      ttype == SPIKED_PIT ? "full of spikes " : "");
+                      ttype == SPIKED_PIT ? _("full of spikes ") : "");
                 You(_("don't fall in!"));
             }
             return Trap_Effect_Finished;

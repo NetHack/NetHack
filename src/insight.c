@@ -634,16 +634,16 @@ background_enlightenment(int unused_mode UNUSED, int final)
            have dragged on for an arbitrary amount of time.  We want to
            report the values that currently affect play--or affected
            play when game ended--rather than actual outside situation.] */
-        Sprintf(buf, "a %s moon in effect%s",
-                (flags.moonphase == FULL_MOON) ? "full"
-                : (flags.moonphase == NEW_MOON) ? "new"
+        Sprintf(buf, _("a %s moon in effect%s"),
+                (flags.moonphase == FULL_MOON) ? _("full")
+                : (flags.moonphase == NEW_MOON) ? _("new")
                   /* showing these would probably just lead to confusion
                      since they have no effect on game play... */
-                  : (flags.moonphase < FULL_MOON) ? "first quarter"
-                    : "last quarter",
+                  : (flags.moonphase < FULL_MOON) ? _("first quarter")
+                    : _("last quarter"),
                 /* we don't have access to 'how' here--aside from survived
                    vs died--so settle for general platitude */
-                final ? " when your adventure ended" : "");
+                final ? _(" when your adventure ended") : "");
         enl_msg(_("There "), _("is "), _("was "), buf, "");
     }
     if (flags.friday13) {

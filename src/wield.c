@@ -152,12 +152,12 @@ cant_wield_corpse(struct obj *obj)
 const char *
 empty_handed(void)
 {
-    return uarmg ? "empty handed" /* gloves imply hands */
+    return uarmg ? _("empty handed") /* gloves imply hands */
            : humanoid(gy.youmonst.data)
              /* hands but no weapon and no gloves */
-             ? "bare handed"
+             ? _("bare handed")
                /* alternate phrasing for paws or lack of hands */
-               : "not wielding anything";
+               : _("not wielding anything");
 }
 
 staticfn int

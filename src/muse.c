@@ -2892,9 +2892,9 @@ mon_consume_unstone(
 
         obj->quan = 1L;
         pline_mon(mon, _("%s %s %s."), Monnam(mon),
-              ((obj->oclass == POTION_CLASS) ? "quaffs"
-               : (obj->otyp == TIN) ? "opens and eats the contents of"
-                 : "eats"),
+              ((obj->oclass == POTION_CLASS) ? _("quaffs")
+               : (obj->otyp == TIN) ? _("opens and eats the contents of")
+                 : _("eats")),
               distant_name(obj, doname));
         obj->quan = save_quan;
     } else if (!Deaf)
