@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 13:21+0900\n"
+"POT-Creation-Date: 2026-01-20 13:23+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -9228,6 +9228,11 @@ msgstr "함정에 빠짐"
 msgid " in %s"
 msgstr " %s에"
 
+#: src/insight.c:403
+#, fuzzy
+msgid "Miscellaneous:"
+msgstr "기타 키:"
+
 #: src/insight.c:426
 msgid "Total elapsed playing time "
 msgstr "총 경과 플레이 시간 "
@@ -9241,6 +9246,11 @@ msgstr "촉촉한 "
 #, fuzzy
 msgid "was"
 msgstr "당시 "
+
+#: src/insight.c:459
+#, fuzzy
+msgid "Background:"
+msgstr "땅"
 
 # === insight.c status descriptions ===
 #: src/insight.c:495 src/obj_descr_i18n.c:421

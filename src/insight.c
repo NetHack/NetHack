@@ -400,7 +400,7 @@ enlightenment(
     }
 
     enlght_out(""); /* separator */
-    enlght_out("Miscellaneous:");
+    enlght_out(_("Miscellaneous:"));
     /* reminder to player and/or information for dumplog */
     if ((mode & BASICENLIGHTENMENT) != 0 && (wizard || discover || final)) {
         if (wizard || discover) {
@@ -456,7 +456,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
     rank_titl = rank_of(u.ulevel, Role_switch, innategend);
 
     enlght_out(""); /* separator after title */
-    enlght_out("Background:");
+    enlght_out(_("Background:"));
 
     /* if polymorphed, report current shape before underlying role;
        will be repeated as first status: "you are transformed" and also
