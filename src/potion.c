@@ -96,7 +96,7 @@ make_confused(long xtime, boolean talk)
 
     if (!xtime && old) {
         if (talk)
-            You_feel(_("less %s now."), Hallucination ? "trippy" : "confused");
+            You_feel(_("less %s now."), Hallucination ? _("trippy") : _("confused"));
     }
     if ((xtime && !old) || (!xtime && old))
         disp.botl = TRUE;
@@ -115,7 +115,7 @@ make_stunned(long xtime, boolean talk)
     if (!xtime && old) {
         if (talk)
             You_feel(_("%s now."),
-                     Hallucination ? "less wobbly" : "a bit steadier");
+                     Hallucination ? _("less wobbly") : _("a bit steadier"));
     }
     if (xtime && !old) {
         if (talk) {
@@ -156,7 +156,7 @@ make_sick(long xtime,
         } else {
             /* already sick */
             if (talk)
-                You_feel(_("%s worse."), xtime <= Sick / 2L ? "much" : "even");
+                You_feel(_("%s worse."), xtime <= Sick / 2L ? _("much") : _("even"));
         }
         set_itimeout(&Sick, xtime);
         u.usick_type |= type;
@@ -1292,13 +1292,13 @@ peffect_acid(struct obj *otmp)
 {
     if (Acid_resistance) {
         /* Not necessarily a creature who _likes_ acid */
-        pline(_("This tastes %s."), Hallucination ? "tangy" : "sour");
+        pline(_("This tastes %s."), Hallucination ? _("tangy") : _("sour"));
     } else {
         int dmg;
 
         pline(_("This burns%s!"),
-              otmp->blessed ? " a little" : otmp->cursed ? " a lot"
-                                                         : " like acid");
+              otmp->blessed ? _(" a little") : otmp->cursed ? _(" a lot")
+                                                         : _(" like acid"));
         dmg = d(otmp->cursed ? 2 : 1, otmp->blessed ? 4 : 8);
         losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
         exercise(A_CON, FALSE);
@@ -1311,7 +1311,7 @@ peffect_acid(struct obj *otmp)
 staticfn void
 peffect_polymorph(struct obj *otmp)
 {
-    You_feel(_("a little %s."), Hallucination ? "normal" : "strange");
+    You_feel(_("a little %s."), Hallucination ? _("normal") : _("strange"));
     if (!Unchanging) {
         if (!otmp->blessed || (u.umonnum != u.umonster))
             polyself(POLY_NOFLAGS);
@@ -1681,7 +1681,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                 explode_oil(obj, u.ux, u.uy);
             break;
         case POT_POLYMORPH:
-            You_feel(_("a little %s."), Hallucination ? "normal" : "strange");
+            You_feel(_("a little %s."), Hallucination ? _("normal") : _("strange"));
             if (!Unchanging && !Antimagic)
                 polyself(POLY_NOFLAGS);
             break;
