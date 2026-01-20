@@ -1316,22 +1316,22 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
             urgent_pline(_("%s %s forward and plucks you off %s!"),
                          Some_Monnam(mtmp),
                          /* 't', purple 'w' */
-                         is_animal(mtmp->data) ? "lunges"
+                         is_animal(mtmp->data) ? _("lunges")
                            /* 'v', air 'E' */
-                           : is_whirly(mtmp->data) ? "whirls"
+                           : is_whirly(mtmp->data) ? _("whirls")
                              /* none (some 'v', already whirling) */
-                             : unsolid(mtmp->data) ? "flows"
+                             : unsolid(mtmp->data) ? _("flows")
                                /* ochre 'j', Juiblex */
-                               : amorphous(mtmp->data) ? "oozes"
+                               : amorphous(mtmp->data) ? _("oozes")
                                  /* none (all AT_ENGL are already covered) */
-                                 : "surges",
+                                 : _("surges"),
                          buf);
             dismount_steed(DISMOUNT_ENGULFED);
         } else {
             urgent_pline(_("%s %s!"), Monnam(mtmp),
-                         digests(mtmp->data) ? "swallows you whole"
-                         : enfolds(mtmp->data) ? "folds itself around you"
-                           : "engulfs you");
+                         digests(mtmp->data) ? _("swallows you whole")
+                         : enfolds(mtmp->data) ? _("folds itself around you")
+                           : _("engulfs you"));
         }
         stop_occupation();
         reset_occupations(); /* behave as if you had moved */
@@ -1443,8 +1443,8 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
             if ((Amphibious || Breathless) && !flaming(gy.youmonst.data))
                 tmp = 0;
         } else {
-            You(_("are %s!"), enfolds(mtmp->data) ? "being squashed"
-                                               : "pummeled with debris");
+            You(_("are %s!"), enfolds(mtmp->data) ? _("being squashed")
+                                               : _("pummeled with debris"));
             exercise(A_STR, FALSE);
         }
         break;
@@ -1562,18 +1562,18 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
         ; /* life-saving has already expelled swallowed hero */
     } else if (touch_petrifies(gy.youmonst.data) && !resists_ston(mtmp)) {
         pline(_("%s very hurriedly %s you!"), Monnam(mtmp),
-              digests(mtmp->data) ? "regurgitates"
-              : enfolds(mtmp->data) ? "releases"
-                : "expels");
+              digests(mtmp->data) ? _("regurgitates")
+              : enfolds(mtmp->data) ? _("releases")
+                : _("expels"));
         expels(mtmp, mtmp->data, FALSE);
     } else if (!u.uswldtim || gy.youmonst.data->msize >= MZ_HUGE) {
         /* As of 3.6.2: u.uswldtim used to be set to 0 by life-saving but it
            expels now so the !u.uswldtim case is no longer possible;
            however, polymorphing into a huge form while already
            swallowed is still possible */
-        You(_("get %s!"), digests(mtmp->data) ? "regurgitated"
-                       : enfolds(mtmp->data) ? "released"
-                         : "expelled");
+        You(_("get %s!"), digests(mtmp->data) ? _("regurgitated")
+                       : enfolds(mtmp->data) ? _("released")
+                         : _("expelled"));
         if (flags.verbose
             && (digests(mtmp->data) && Slow_digestion))
             pline(_("Obviously %s doesn't like your taste."), mon_nam(mtmp));
