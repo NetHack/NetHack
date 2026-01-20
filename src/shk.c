@@ -1326,7 +1326,7 @@ rouse_shk(struct monst *shkp, boolean verbosely)
         /* greed induced recovery... */
         if (verbosely && canspotmon(shkp))
             pline(_("%s %s."), Shknam(shkp),
-                  shkp->msleeping ? "wakes up" : "can move again");
+                  shkp->msleeping ? _("wakes up") : _("can move again"));
         shkp->msleeping = 0;
         shkp->mfrozen = 0;
         shkp->mcanmove = 1;
@@ -1856,7 +1856,7 @@ dopay(void)
             pline(_("But since %s shop has been robbed recently,"),
                   noit_mhis(shkp));
             pline(_("you %scompensate %s for %s losses."),
-                  (umoney < ltmp) ? "partially " : "", shkname(shkp),
+                  (umoney < ltmp) ? _("partially ") : "", shkname(shkp),
                   noit_mhis(shkp));
             pay(umoney < ltmp ? umoney : ltmp, shkp);
             make_happy_shk(shkp, FALSE);
@@ -5084,7 +5084,7 @@ getcad(
         if (!Deaf) {
             SetVoice(shkp, 0, 80, 0);
             verbalize(_("How dare you %s my %s?"), dmgstr,
-                        dugwall ? "shop" : "door");
+                        dugwall ? _("shop") : _("door"));
         } else {
             pline(_("%s is %s that you decided to %s %s %s!"),
                     Shknam(shkp), _(ROLL_FROM(angrytexts)),
@@ -5982,7 +5982,7 @@ globby_bill_fixup(struct obj *obj_absorber, struct obj *obj_absorbed)
                 eshkp->debit -= amount;
                 pline_The(_("donated %s %spays off your debt."),
                           obj_typename(obj_absorbed->otyp),
-                          eshkp->debit ? "partially " : "");
+                          eshkp->debit ? _("partially ") : "");
             } else {
                 long delta = amount - eshkp->debit;
 
@@ -6020,8 +6020,8 @@ globby_bill_fixup(struct obj *obj_absorber, struct obj *obj_absorbed)
         SetVoice(shkp, 0, 80, 0);
         verbalize(_("You owe me %ld %s for my %s that you %s with your%s"),
                   amount, currency(amount), obj_typename(obj_absorbed->otyp),
-                  ANGRY(shkp) ? "had the audacity to mix" : "just mixed",
-                  ANGRY(shkp) ? " stinking batch!" : "s.");
+                  ANGRY(shkp) ? _("had the audacity to mix") : _("just mixed"),
+                  ANGRY(shkp) ? _(" stinking batch!") : _("s."));
         return;
     }
     /**************************************************************
