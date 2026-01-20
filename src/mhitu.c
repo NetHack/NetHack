@@ -204,12 +204,12 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
 
     set_msg_xy(mtmp->mx, mtmp->my);
     if (unotseen) { /* !mtmp->cansee || (Invis && !perceives(mtmp->data)) */
-        const char *swings = (mattk->aatyp == AT_BITE) ? "snaps"
-                             : (mattk->aatyp == AT_KICK) ? "kicks"
+        const char *swings = (mattk->aatyp == AT_BITE) ? _("snaps")
+                             : (mattk->aatyp == AT_KICK) ? _("kicks")
                                : (mattk->aatyp == AT_STNG
                                   || mattk->aatyp == AT_BUTT
-                                  || nolimbs(mtmp->data)) ? "lunges"
-                                 : "swings";
+                                  || nolimbs(mtmp->data)) ? _("lunges")
+                                 : _("swings");
 
         if (compat)
             pline(_("%s tries to touch you and misses!"), Monst_name);
@@ -863,8 +863,8 @@ mattacku(struct monst *mtmp)
                             Soundeffect(se_rushing_wind_noise, 60);
                         }
                         You_hear(_("a %s nearby."),
-                                 is_whirly(mtmp->data) ? "rushing noise"
-                                                       : "splat");
+                                 is_whirly(mtmp->data) ? _("rushing noise")
+                                                       : _("splat"));
                     }
                 }
             }
