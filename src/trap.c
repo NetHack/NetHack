@@ -270,17 +270,17 @@ erode_obj(
     } else if (!vulnerable || (otmp->oerodeproof && otmp->rknown)) {
         if (flags.verbose && print && (uvictim || vismon))
             pline(_("%s %s %s not affected by %s."),
-                  uvictim ? "Your" : s_suffix(Monnam(victim)),
-                  ostr, vtense(ostr, "are"), bythe[type]);
+                  uvictim ? _("Your") : s_suffix(Monnam(victim)),
+                  ostr, vtense(ostr, _("are")), bythe[type]);
         return ER_NOTHING;
     } else if (otmp->oerodeproof || (otmp->blessed && !rnl(4))) {
         if (flags.verbose && (print || otmp->oerodeproof)
             && (uvictim || vismon || visobj))
             pline(_("Somehow, %s %s %s not affected by the %s."),
-                  uvictim ? "your"
-                  : !vismon ? "the" /* visobj */
+                  uvictim ? _("your")
+                  : !vismon ? _("the") /* visobj */
                     : s_suffix(mon_nam(victim)),
-                  ostr, vtense(ostr, "are"), bythe[type]);
+                  ostr, vtense(ostr, _("are")), bythe[type]);
         /* We assume here that if the object is protected because it
          * is blessed, it still shows some minor signs of wear, and
          * the hero can distinguish this from an object that is
@@ -294,14 +294,14 @@ erode_obj(
 
         return ER_NOTHING;
     } else if (erosion < MAX_ERODE) {
-        const char *adverb = (erosion + 1 == MAX_ERODE) ? " completely"
-                             : erosion ? " further"
+        const char *adverb = (erosion + 1 == MAX_ERODE) ? _(" completely")
+                             : erosion ? _(" further")
                                : "";
 
         if (uvictim || vismon || visobj)
             pline(_("%s %s %s%s!"),
-                  uvictim ? "Your"
-                  : !vismon ? "The" /* visobj */
+                  uvictim ? _("Your")
+                  : !vismon ? _("The") /* visobj */
                     : s_suffix(Monnam(victim)),
                   ostr, vtense(ostr, action[type]), adverb);
 
@@ -323,12 +323,12 @@ erode_obj(
             char actbuf[BUFSZ];
 
             if (!crackers)
-                Sprintf(actbuf, "%s away", vtense(ostr, action[type]));
+                Sprintf(actbuf, _("%s away"), vtense(ostr, action[type]));
             else
-                Sprintf(actbuf, "shatters");
+                Sprintf(actbuf, _("shatters"));
             pline(_("%s %s %s!"),
-                  uvictim ? "Your"
-                  : !vismon ? "The" /* visobj */
+                  uvictim ? _("Your")
+                  : !vismon ? _("The") /* visobj */
                     : s_suffix(Monnam(victim)),
                   ostr, actbuf);
         }
@@ -365,8 +365,8 @@ erode_obj(
                      ostr, vtense(ostr, Blind ? _("feel") : _("look")), msg[type]);
             else if (vismon || visobj)
                 pline(_("%s %s %s completely %s."),
-                      !vismon ? "The" : s_suffix(Monnam(victim)),
-                      ostr, vtense(ostr, "look"), msg[type]);
+                      !vismon ? _("The") : s_suffix(Monnam(victim)),
+                      ostr, vtense(ostr, _("look")), msg[type]);
         }
         return ER_NOTHING;
     }
@@ -4617,9 +4617,9 @@ pot_acid_damage(
             */
         bufp = simpleonames(obj);
         pline(_("%s%s %s!"), /* "A potion explodes!" */
-                !exploded ? (one ? "A " : "Some ")
-                        : (one ? "Another " : "More "),
-            bufp, vtense(bufp, "explode"));
+                !exploded ? (one ? _("A ") : _("Some "))
+                        : (one ? _("Another ") : _("More ")),
+            bufp, vtense(bufp, _("explode")));
     }
     if (ga.acid_ctx.ctx_valid) {
         if (obj->dknown)
@@ -4709,7 +4709,7 @@ water_damage(
 #endif
            ) return 0;
         if (in_invent)
-            Your(_("%s %s."), ostr, vtense(ostr, "fade"));
+            Your(_("%s %s."), ostr, vtense(ostr, _("fade")));
 
         obj->otyp = SCR_BLANK_PAPER;
         obj->dknown = 0;
@@ -4733,7 +4733,7 @@ water_damage(
             return 0;
         }
         if (in_invent)
-            Your(_("%s %s."), ostr, vtense(ostr, "fade"));
+            Your(_("%s %s."), ostr, vtense(ostr, _("fade")));
 
         obj->otyp = SPE_BLANK_PAPER;
         /* same re-init as over-reading or polymorph; matters if it gets
@@ -4754,7 +4754,7 @@ water_damage(
             return ER_DESTROYED;
         } else if (obj->odiluted) {
             if (in_invent)
-                Your(_("%s %s further."), ostr, vtense(ostr, "dilute"));
+                Your(_("%s %s further."), ostr, vtense(ostr, _("dilute")));
 
             obj->otyp = POT_WATER;
             obj->dknown = 0;
@@ -4765,7 +4765,7 @@ water_damage(
             return ER_DAMAGED;
         } else if (obj->otyp != POT_WATER) {
             if (in_invent)
-                Your(_("%s %s."), ostr, vtense(ostr, "dilute"));
+                Your(_("%s %s."), ostr, vtense(ostr, _("dilute")));
 
             obj->odiluted++;
             if (in_invent)

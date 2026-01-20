@@ -925,7 +925,7 @@ doclassdisco(void)
 
     /* there might not be anything for us to do... */
     if (!discosyms[0]) {
-        You(_(havent_discovered_any), "items");
+        You(_(havent_discovered_any), _("items"));
         if (tmpwin != WIN_ERR)
             destroy_nhwindow(tmpwin);
         return ECMD_OK;

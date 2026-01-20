@@ -1412,7 +1412,7 @@ Mb_hit(struct monst *magr, /* attacker */
     if (youattack || youdefend || vis) {
         (void) upstart(hittee); /* capitalize */
         if (resisted) {
-            pline(_("%s %s!"), hittee, vtense(fakename[fakeidx], "resist"));
+            pline(_("%s %s!"), hittee, vtense(fakename[fakeidx], _("resist")));
             shieldeff(youdefend ? u.ux : mdef->mx,
                       youdefend ? u.uy : mdef->my);
         }
@@ -1421,12 +1421,12 @@ Mb_hit(struct monst *magr, /* attacker */
 
             buf[0] = '\0';
             if (do_stun)
-                Strcat(buf, "stunned");
+                Strcat(buf, _("stunned"));
             if (do_stun && do_confuse)
-                Strcat(buf, " and ");
+                Strcat(buf, _(" and "));
             if (do_confuse)
-                Strcat(buf, "confused");
-            pline(_("%s %s %s%c"), hittee, vtense(fakename[fakeidx], "are"), buf,
+                Strcat(buf, _("confused"));
+            pline(_("%s %s %s%c"), hittee, vtense(fakename[fakeidx], _("are")), buf,
                   (do_stun && do_confuse) ? '!' : '.');
         }
     }
@@ -2011,10 +2011,10 @@ invoke_banish(struct obj *obj UNUSED)
             *(eos(subject) - 1) = '\0'; /* remove 's' */
         pline(_("%s %s %s in a cloud of brimstone!"),
               nstayed ? ((nvanished > nstayed)
-                         ? "Most of the"
-                         : "Some of the")
-              : "The",
-              subject, vtense(subject, "disappear"));
+                         ? _("Most of the")
+                         : _("Some of the"))
+              : _("The"),
+              subject, vtense(subject, _("disappear")));
     }
     return ECMD_TIME;
 }

@@ -759,8 +759,8 @@ can_twoweapon(void)
         if (!uwep && !uswapwep)
             hand_s = makeplural(hand_s);
         /* "your hands are empty" or "your {left|right} hand is empty" */
-        Your(_("%s%s %s empty."), uwep ? "left " : uswapwep ? "right " : "",
-             hand_s, vtense(hand_s, "are"));
+        Your(_("%s%s %s empty."), uwep ? _("left ") : uswapwep ? _("right ") : "",
+             hand_s, vtense(hand_s, _("are")));
     } else if (!TWOWEAPOK(uwep) || !TWOWEAPOK(uswapwep)) {
         otmp = !TWOWEAPOK(uwep) ? uwep : uswapwep;
         pline(_("%s %s suitable %s weapon%s."), Yname2(otmp),
