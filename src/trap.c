@@ -6288,7 +6288,7 @@ chest_trap(
             insider = (*u.ushops && inside_shop(u.ux, u.uy)
                        && *in_rooms(ox, oy, SHOPBASE) == *u.ushops);
 
-            pline(_("%s!"), Tobjnam(obj, "explode"));
+            pline(_("%s!"), Tobjnam(obj, _("explode")));
             Sprintf(buf, "exploding %s", xname(obj));
 
             if (costly)

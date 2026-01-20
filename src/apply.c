@@ -1227,7 +1227,7 @@ use_bell(struct obj **optr)
                                NO_MINVENT | MM_NOMSG)) != 0) {
             You(_("summon %s!"), a_monnam(mtmp));
             if (!obj_resists(obj, 93, 100)) {
-                pline(_("%s shattered!"), Tobjnam(obj, "have"));
+                pline(_("%s shattered!"), Tobjnam(obj, _("have")));
                 useup(obj);
                 *optr = 0;
             } else
@@ -1265,7 +1265,7 @@ use_bell(struct obj **optr)
             wakem = TRUE;
 
         } else if (invoking) {
-            pline(_("%s an unsettling shrill sound..."), Tobjnam(obj, "issue"));
+            pline(_("%s an unsettling shrill sound..."), Tobjnam(obj, _("issue")));
             obj->age = svm.moves;
             learno = TRUE;
             wakem = TRUE;
@@ -1371,9 +1371,9 @@ use_candelabrum(struct obj *obj)
     } else {
         if (obj->spe == 7) {
             if (Blind)
-                pline(_("%s a strange warmth!"), Tobjnam(obj, "radiate"));
+                pline(_("%s a strange warmth!"), Tobjnam(obj, _("radiate")));
             else
-                pline(_("%s with a strange light!"), Tobjnam(obj, "glow"));
+                pline(_("%s with a strange light!"), Tobjnam(obj, _("glow")));
         }
         obj->known = 1;
     }
@@ -2603,7 +2603,7 @@ use_grease(struct obj *obj)
     struct obj *otmp;
 
     if (Glib) {
-        pline(_("%s from your %s."), Tobjnam(obj, "slip"),
+        pline(_("%s from your %s."), Tobjnam(obj, _("slip")),
               fingers_or_gloves(FALSE));
         dropx(obj);
         return ECMD_TIME;
@@ -2615,7 +2615,7 @@ use_grease(struct obj *obj)
         if ((obj->cursed || Fumbling) && !rn2(2)) {
             consume_obj_charge(obj, TRUE);
 
-            pline(_("%s from your %s."), Tobjnam(obj, "slip"),
+            pline(_("%s from your %s."), Tobjnam(obj, _("slip")),
                   fingers_or_gloves(FALSE));
             dropx(obj);
             return ECMD_TIME;
@@ -2642,9 +2642,9 @@ use_grease(struct obj *obj)
         }
     } else {
         if (obj->known)
-            pline(_("%s empty."), Tobjnam(obj, "are"));
+            pline(_("%s empty."), Tobjnam(obj, _("are")));
         else
-            pline(_("%s to be empty."), Tobjnam(obj, "seem"));
+            pline(_("%s to be empty."), Tobjnam(obj, _("seem")));
     }
     update_inventory();
     return ECMD_TIME;
@@ -2759,13 +2759,13 @@ use_stone(struct obj *tstone)
     default:
         switch (objects[obj->otyp].oc_material) {
         case CLOTH:
-            pline(_("%s a little more polished now."), Tobjnam(tstone, "look"));
+            pline(_("%s a little more polished now."), Tobjnam(tstone, _("look")));
             return ECMD_TIME;
         case LIQUID:
             if (!obj->known) /* note: not "whetstone" */
                 You(_("must think this is a wetstone, do you?"));
             else
-                pline(_("%s a little wetter now."), Tobjnam(tstone, "are"));
+                pline(_("%s a little wetter now."), Tobjnam(tstone, _("are")));
             return ECMD_TIME;
         case WAX:
             streak_color = "waxy";

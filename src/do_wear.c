@@ -363,7 +363,7 @@ Cloak_on(void)
         }
         break;
     case OILSKIN_CLOAK:
-        pline(_("%s very tightly."), Tobjnam(uarmc, "fit"));
+        pline(_("%s very tightly."), Tobjnam(uarmc, _("fit")));
         break;
     /* Alchemy smock gives poison _and_ acid resistance */
     case ALCHEMY_SMOCK:
@@ -475,9 +475,9 @@ Helmet_on(void)
     case DUNCE_CAP:
         if (uarmh && !uarmh->cursed) {
             if (Blind)
-                pline(_("%s for a moment."), Tobjnam(uarmh, "vibrate"));
+                pline(_("%s for a moment."), Tobjnam(uarmh, _("vibrate")));
             else
-                pline(_("%s %s for a moment."), Tobjnam(uarmh, "glow"),
+                pline(_("%s %s for a moment."), Tobjnam(uarmh, _("glow")),
                       hcolor(NH_BLACK));
             curse(uarmh);
             /* curse() doesn't touch bknown so doesn't update persistent
@@ -918,7 +918,7 @@ Armor_off(void)
     if (was_arti_light && !artifact_light(otmp)) {
         end_burn(otmp, FALSE);
         if (!Blind)
-            pline(_("%s shining."), Tobjnam(otmp, "stop"));
+            pline(_("%s shining."), Tobjnam(otmp, _("stop")));
     }
     dragon_armor_handling(otmp, FALSE, TRUE);
 
@@ -948,7 +948,7 @@ Armor_gone(void)
     if (was_arti_light && !artifact_light(otmp)) {
         end_burn(otmp, FALSE);
         if (!Blind)
-            pline(_("%s shining."), Tobjnam(otmp, "stop"));
+            pline(_("%s shining."), Tobjnam(otmp, _("stop")));
     }
     dragon_armor_handling(otmp, FALSE, FALSE);
 

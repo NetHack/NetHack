@@ -293,7 +293,7 @@ flooreffects(
                 Soundeffect(se_item_tumble_downwards, 50);
                 You_hear(_("%s tumble downwards."), the(xname(obj)));
             } else {
-                pline(_("%s into %s pit."), Tobjnam(obj, "tumble"),
+                pline(_("%s into %s pit."), Tobjnam(obj, _("tumble")),
                       the_your[t->madeby_u]);
             }
         } else if (ship_object(obj, x, y, FALSE)) {
@@ -333,7 +333,7 @@ flooreffects(
         if (cansee(x,y)) {
             /* unconditional "ground" is safe as this only runs for
                room and corridor tiles */
-            pline(_("%s up as %s the hot ground."), Tobjnam(obj, "heat"),
+            pline(_("%s up as %s the hot ground."), Tobjnam(obj, _("heat")),
                   is_plural(obj) ? _("they hit") : _("it hits"));
         }
 
@@ -868,7 +868,7 @@ engulfer_digests_food(struct obj *obj)
             could_slime = TRUE;
         }
         /* see or feel the effect */
-        pline(_("%s instantly digested!"), Tobjnam(obj, "are"));
+        pline(_("%s instantly digested!"), Tobjnam(obj, _("are")));
 
         if (could_poly || could_slime) {
             (void) newcham(u.ustuck, could_slime ? &mons[PM_GREEN_SLIME] : 0,

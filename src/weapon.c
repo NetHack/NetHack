@@ -918,7 +918,7 @@ mon_wield_item(struct monst *mon)
         if (artifact_light(obj) && !obj->lamplit) {
             begin_burn(obj, FALSE);
             if (canseemon(mon))
-                pline(_("%s %s in %s %s!"), Tobjnam(obj, "shine"),
+                pline(_("%s %s in %s %s!"), Tobjnam(obj, _("shine")),
                       arti_light_description(obj), s_suffix(mon_nam(mon)),
                       mbodypart(mon, HAND));
             /* 3.6.3: artifact might be getting wielded by invisible monst */

@@ -647,7 +647,7 @@ mpickobj(struct monst *mtmp, struct obj *otmp)
     if (obj_sheds_light(otmp) && attacktype(mtmp->data, AT_ENGL)) {
         /* this is probably a burning object that you dropped or threw */
         if (engulfing_u(mtmp) && !Blind)
-            pline(_("%s out."), Tobjnam(otmp, "go"));
+            pline(_("%s out."), Tobjnam(otmp, _("go")));
         snuff_otmp = TRUE;
     }
     /* for hero owned object on shop floor, mtmp is taking possession

@@ -964,9 +964,9 @@ touch_artifact(struct obj *obj, struct monst *mon)
     if (badclass && badalign && self_willed) {
         if (yours) {
             if (!carried(obj))
-                pline(_("%s your grasp!"), Tobjnam(obj, "evade"));
+                pline(_("%s your grasp!"), Tobjnam(obj, _("evade")));
             else
-                pline(_("%s beyond your control!"), Tobjnam(obj, "are"));
+                pline(_("%s beyond your control!"), Tobjnam(obj, _("are")));
         }
         return 0;
     }
@@ -2290,7 +2290,7 @@ arti_speak(struct obj *obj)
     line = getrumor(bcsign(obj), buf, TRUE);
     if (!*line)
         line = _("NetHack rumors file closed for renovation.");
-    pline(_("%s:"), Tobjnam(obj, "whisper"));
+    pline(_("%s:"), Tobjnam(obj, _("whisper")));
     SetVoice((struct monst *) 0, 0, 80, voice_talking_artifact);
     verbalize1(line);
     return ECMD_TIME;
@@ -2582,7 +2582,7 @@ retouch_object(
             /* dropx gives a message if a dropped item lands on an altar;
                we provide one for other terrain */
             if (!IS_ALTAR(levl[u.ux][u.uy].typ))
-                pline(_("%s to the %s."), Tobjnam(obj, "fall"),
+                pline(_("%s to the %s."), Tobjnam(obj, _("fall")),
                       surface(u.ux, u.uy));
             dropx(obj);
         }

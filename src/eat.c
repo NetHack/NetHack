@@ -2633,7 +2633,7 @@ edibility_prompts(struct obj *otmp)
     int material = objects[otmp->otyp].oc_material, mnum = otmp->corpsenm;
     long rotted = 0L;
 
-    Strcpy(foodsmell, Tobjnam(otmp, "smell"));
+    Strcpy(foodsmell, Tobjnam(otmp, _("smell")));
     Strcpy(it_or_they, (otmp->quan == 1L) ? _("it") : _("they"));
 
     if (cadaver || otmp->otyp == EGG || otmp->otyp == TIN

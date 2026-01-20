@@ -1672,7 +1672,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
 
     /* oil doesn't instantly evaporate; Neither does a saddle hit */
     if (obj->otyp != POT_OIL && !hit_saddle && cansee(tx, ty))
-        pline(_("%s."), Tobjnam(obj, "evaporate"));
+        pline(_("%s."), Tobjnam(obj, _("evaporate")));
 
     if (isyou) {
         switch (obj->otyp) {

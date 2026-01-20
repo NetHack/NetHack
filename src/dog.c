@@ -1203,7 +1203,7 @@ tamedog(
                           Monnam(mtmp), the(xname(obj)),
                          !big_corpse ? "." : ", or vice versa!");
             } else if (cansee(mtmp->mx, mtmp->my))
-                pline(_("%s."), Tobjnam(obj, "stop"));
+                pline(_("%s."), Tobjnam(obj, _("stop")));
             /* dog_eat expects a floor object */
             place_object(obj, mtmp->mx, mtmp->my);
             (void) dog_eat(mtmp, obj, mtmp->mx, mtmp->my, FALSE);

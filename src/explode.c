@@ -774,7 +774,7 @@ scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
             && rn2(10)) {
             if (otmp->otyp == BOULDER) {
                 if (cansee(sx, sy)) {
-                    pline(_("%s apart."), Tobjnam(otmp, "break"));
+                    pline(_("%s apart."), Tobjnam(otmp, _("break")));
                 } else {
                     Soundeffect(se_stone_breaking, 100);
                     You_hear(_("stone breaking."));
@@ -792,7 +792,7 @@ scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
                 if ((trap = t_at(sx, sy)) && trap->ttyp == STATUE_TRAP)
                     deltrap(trap);
                 if (cansee(sx, sy)) {
-                    pline(_("%s."), Tobjnam(otmp, "crumble"));
+                    pline(_("%s."), Tobjnam(otmp, _("crumble")));
                 } else {
                     Soundeffect(se_stone_crumbling, 100);
                     You_hear(_("stone crumbling."));

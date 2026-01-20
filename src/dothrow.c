@@ -1497,13 +1497,13 @@ throwit(
         boolean slipok = TRUE;
 
         if (ammo_and_launcher(obj, uwep)) {
-            pline(_("%s!"), Tobjnam(obj, "misfire"));
+            pline(_("%s!"), Tobjnam(obj, _("misfire")));
         } else {
             /* only slip if it's greased or meant to be thrown */
             if (obj->greased || throwing_weapon(obj))
                 /* BUG: this message is grammatically incorrect if obj has
                    a plural name; greased gloves or boots for instance. */
-                pline(_("%s as you throw it!"), Tobjnam(obj, "slip"));
+                pline(_("%s as you throw it!"), Tobjnam(obj, _("slip")));
             else
                 slipok = FALSE;
         }
@@ -1552,7 +1552,7 @@ throwit(
                aklys must we wielded as primary to return when thrown */
             && iflags.returning_missile
             && !impaired) {
-            pline(_("%s the %s and returns to your hand!"), Tobjnam(obj, "hit"),
+            pline(_("%s the %s and returns to your hand!"), Tobjnam(obj, _("hit")),
                   ceiling(u.ux, u.uy));
             obj = return_throw_to_inv(obj, wep_mask, twoweap, oldslot);
         } else if (u.dz < 0) {
@@ -1703,7 +1703,7 @@ throwit(
                     sho_obj_return_to_u(obj); /* display its flight */
 
                 if (!impaired && rn2(100)) {
-                    pline(_("%s to your hand!"), Tobjnam(obj, "return"));
+                    pline(_("%s to your hand!"), Tobjnam(obj, _("return")));
                     obj = addinv_before(obj, oldslot);
                     encumber_msg();
                     /* addinv autoquivers an aklys if quiver is empty;
@@ -1720,14 +1720,14 @@ throwit(
                     if (!dmg) {
                         pline(Blind ? _("%s lands %s your %s.")
                                     : _("%s back to you, landing %s your %s."),
-                              Blind ? Something : Tobjnam(obj, "return"),
+                              Blind ? Something : Tobjnam(obj, _("return")),
                               Levitation ? _("beneath") : _("at"),
                               makeplural(body_part(FOOT)));
                     } else {
                         dmg += rnd(3);
                         pline(Blind ? _("%s your %s!")
                                     : _("%s back toward you, hitting your %s!"),
-                              Tobjnam(obj, Blind ? "hit" : "fly"),
+                              Tobjnam(obj, Blind ? _("hit") : _("fly")),
                               body_part(ARM));
                         if (obj->oartifact)
                             (void) artifact_hit((struct monst *) 0,
@@ -1755,7 +1755,7 @@ throwit(
                    that slot is empty at the time; since hero will need to
                    explicitly rewield the weapon to get throw-and-return
                    capability back anyway, quivered or not shouldn't matter */
-                pline(_("%s to return!"), Tobjnam(obj, "fail"));
+                pline(_("%s to return!"), Tobjnam(obj, _("fail")));
 
                 if (u.uswallow) {
                     swallowit(obj);
@@ -2283,7 +2283,7 @@ thitmonst(
         monname = mon_nam(mon);
         if (*trail)
             monname = s_suffix(monname);
-        pline(_("%s into %s%s."), Tobjnam(obj, "vanish"), monname, trail);
+        pline(_("%s into %s%s."), Tobjnam(obj, _("vanish")), monname, trail);
     } else {
         tmiss(obj, mon, TRUE);
     }

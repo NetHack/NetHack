@@ -1221,30 +1221,30 @@ use_crystal_ball(struct obj **optr)
 
         switch (rnd((obj->oartifact || obj->blessed) ? 4 : 5)) {
         case 1:
-            pline(_("%s too much to comprehend!"), Tobjnam(obj, "are"));
+            pline(_("%s too much to comprehend!"), Tobjnam(obj, _("are")));
             break;
         case 2:
-            pline(_("%s you!"), Tobjnam(obj, "confuse"));
+            pline(_("%s you!"), Tobjnam(obj, _("confuse")));
             make_confused((HConfusion & TIMEOUT) + impair, FALSE);
             break;
         case 3:
             if (!resists_blnd(&gy.youmonst)) {
-                pline(_("%s your vision!"), Tobjnam(obj, "damage"));
+                pline(_("%s your vision!"), Tobjnam(obj, _("damage")));
                 make_blinded(BlindedTimeout + impair, FALSE);
                 if (!Blind)
                     Your1(vision_clears);
             } else {
-                pline(_("%s your vision."), Tobjnam(obj, "assault"));
+                pline(_("%s your vision."), Tobjnam(obj, _("assault")));
                 You(_("are unaffected!"));
             }
             break;
         case 4:
-            pline(_("%s your mind!"), Tobjnam(obj, "zap"));
+            pline(_("%s your mind!"), Tobjnam(obj, _("zap")));
             (void) make_hallucinated((HHallucination & TIMEOUT) + impair,
                                      FALSE, 0L);
             break;
         case 5:
-            pline(_("%s!"), Tobjnam(obj, "explode"));
+            pline(_("%s!"), Tobjnam(obj, _("explode")));
             useup(obj);
             *optr = obj = 0; /* it's gone */
             /* physical damage cause by the shards and force */
@@ -1320,7 +1320,7 @@ use_crystal_ball(struct obj **optr)
 
         if (obj->spe < 0) { /* destroy ball if used after being cancelled */
  implode:   /* no damage to hero but 'multi' has a small negative value */
-            pline(_("%s!"), Tobjnam(obj, "implode"));
+            pline(_("%s!"), Tobjnam(obj, _("implode")));
             useup(obj);
             *optr = obj = (struct obj *) 0; /* it's gone */
             return;

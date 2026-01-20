@@ -2583,7 +2583,7 @@ in_container(struct obj *obj)
         pline(_("%s cannot be confined in such trappings."), The(xname(obj)));
         return 0;
     } else if (obj->otyp == LEASH && obj->leashmon != 0) {
-        pline(_("%s attached to your pet."), Tobjnam(obj, "are"));
+        pline(_("%s attached to your pet."), Tobjnam(obj, _("are")));
         return 0;
     } else if (obj == uwep) {
         if (welded(obj)) {
@@ -2974,7 +2974,7 @@ use_container(
             update_inventory();
     }
     if (obj->olocked) {
-        pline(_("%s locked."), Tobjnam(obj, "are"));
+        pline(_("%s locked."), Tobjnam(obj, _("are")));
         if (held)
             You(_("must put it down to unlock."));
         return ECMD_OK;

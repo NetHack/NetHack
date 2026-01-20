@@ -110,7 +110,7 @@ setuwep(struct obj *obj)
     if (uwep == obj && artifact_light(olduwep) && olduwep->lamplit) {
         end_burn(olduwep, FALSE);
         if (!Blind)
-            pline(_("%s shining."), Tobjnam(olduwep, "stop"));
+            pline(_("%s shining."), Tobjnam(olduwep, _("stop")));
     }
     if (uwep == obj
         && (u_wield_art(ART_OGRESMASHER)
@@ -240,7 +240,7 @@ ready_weapon(struct obj *wep)
         if (artifact_light(wep) && !wep->lamplit) {
             begin_burn(wep, FALSE);
             if (!Blind)
-                pline(_("%s to shine %s!"), Tobjnam(wep, "begin"),
+                pline(_("%s to shine %s!"), Tobjnam(wep, _("begin")),
                       arti_light_description(wep));
         }
 #if 0
@@ -856,7 +856,7 @@ uwepgone(void)
         if (artifact_light(uwep) && uwep->lamplit) {
             end_burn(uwep, FALSE);
             if (!Blind)
-                pline(_("%s shining."), Tobjnam(uwep, "stop"));
+                pline(_("%s shining."), Tobjnam(uwep, _("stop")));
         }
         setworn((struct obj *) 0, W_WEP);
         gu.unweapon = TRUE;

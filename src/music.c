@@ -613,7 +613,7 @@ do_improvisation(struct obj *instr)
         consume_obj_charge(instr, TRUE);
 
         if (!getdir((char *) 0)) {
-            pline(_("%s."), Tobjnam(instr, "vibrate"));
+            pline(_("%s."), Tobjnam(instr, _("vibrate")));
             break;
         } else if (!u.dx && !u.dy && !u.dz) {
             if ((damage = zapyourself(instr, TRUE)) != 0) {
@@ -661,8 +661,8 @@ do_improvisation(struct obj *instr)
 
         if (!Deaf)
             pline(_("%s very attractive%s music."),
-                  Tobjnam(instr, "produce"),
-                  same_old_song ? " and familiar" : "");
+                  Tobjnam(instr, _("produce")),
+                  same_old_song ? _(" and familiar") : "");
         else
             You_feel(_("very soothing vibrations."));
         Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);

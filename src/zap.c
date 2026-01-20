@@ -2229,12 +2229,12 @@ bhito(struct obj *obj, struct obj *otmp)
                        statues; plural handling here and the "empty" case
                        below are superfluous because containers don't stack */
                     if (obj->otrapped)
-                        pline(_("%s trapped!"), Tobjnam(obj, "are"));
+                        pline(_("%s trapped!"), Tobjnam(obj, _("are")));
                     obj->tknown = 1;
                 }
 
                 if (!obj->cobj) {
-                    pline(_("%s empty."), Tobjnam(obj, "are"));
+                    pline(_("%s empty."), Tobjnam(obj, _("are")));
                 } else if (SchroedingersBox(obj)) {
                     /* we don't want to force alive vs dead
                        determination for Schroedinger's Cat here,
@@ -2664,7 +2664,7 @@ dozap(void)
         gc.current_wand = 0;
     }
     if (obj && obj->spe < 0) {
-        pline(_("%s to dust."), Tobjnam(obj, "turn"));
+        pline(_("%s to dust."), Tobjnam(obj, _("turn")));
         useupall(obj); /* calls freeinv() -> update_inventory() */
     } else
         update_inventory(); /* maybe used a charge */

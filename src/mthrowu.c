@@ -603,7 +603,7 @@ m_throw(
             if (is_ammo(singleobj))
                 pline(_("%s misfires!"), Monnam(mon));
             else
-                pline(_("%s as %s throws it!"), Tobjnam(singleobj, "slip"),
+                pline(_("%s as %s throws it!"), Tobjnam(singleobj, _("slip")),
                       mon_nam(mon));
         }
         dx = rn2(3) - 1;
@@ -857,7 +857,7 @@ return_from_mtoss(
             static long do_not_annoy = 0;
 
             if (!do_not_annoy || (svm.moves - do_not_annoy) > 500L) {
-                pline(_("%s to %s %s!"), Tobjnam(otmp, "return"),
+                pline(_("%s to %s %s!"), Tobjnam(otmp, _("return")),
                       s_suffix(mon_nam(magr)), mbodypart(magr, HAND));
                 do_not_annoy = svm.moves;
             }
@@ -877,7 +877,7 @@ return_from_mtoss(
             if (!dmg) {
                 if (canseemon(magr)) {
                     pline(_("%s back to %s, landing %s %s %s."),
-                          Tobjnam(otmp, "return"), mon_nam(magr),
+                          Tobjnam(otmp, _("return")), mon_nam(magr),
                           mlevitating ? _("beneath") : _("at"), mhis(magr),
                           makeplural(mbodypart(magr, FOOT)));
                 } else if (!Deaf) {
@@ -887,7 +887,7 @@ return_from_mtoss(
                 dmg += rnd(3);
                 if (canseemon(magr)) {
                     pline(_("%s back toward %s, hitting %s %s!"),
-                          Tobjnam(otmp, "fly"), mon_nam(magr),
+                          Tobjnam(otmp, _("fly")), mon_nam(magr),
                           mhis(magr), body_part(ARM));
                 } else if (!Deaf) {
                     You_hear(_("%s hit %s with a thud!"), something,
