@@ -609,7 +609,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
 
     /* this is shown even if the 'time' option is off */
     if (svm.moves == 1L) {
-        you_have("just started your adventure", "");
+        you_have(_("just started your adventure"), "");
     } else {
         /* 'turns' grates on the nerves in this context... */
         Sprintf(buf, "the dungeon %ld turn%s ago",
@@ -958,16 +958,16 @@ status_enlightenment(int mode, int final)
     /* other movement situations that hero should always know */
     if (Levitation) {
         if (Lev_at_will && magic)
-            you_are("levitating, at will", "");
+            you_are(_("levitating, at will"), "");
         else
-            enl_msg(youtoo, are, were, "levitating", from_what(LEVITATION));
+            enl_msg(youtoo, are, were, _("levitating"), from_what(LEVITATION));
     } else if (Flying) { /* can only fly when not levitating */
-        enl_msg(youtoo, are, were, "flying", from_what(FLYING));
+        enl_msg(youtoo, are, were, _("flying"), from_what(FLYING));
     }
     if (Underwater) {
-        you_are("underwater", "");
+        you_are(_("underwater"), "");
     } else if (u.uinwater) {
-        you_are(Swimming ? "swimming" : "in water", from_what(SWIMMING));
+        you_are(Swimming ? _("swimming") : _("in water"), from_what(SWIMMING));
     } else if (walking_on_water()) {
         /* show active Wwalking here, potential Wwalking elsewhere */
         Sprintf(buf, "walking on %s",
@@ -984,17 +984,17 @@ status_enlightenment(int mode, int final)
         if (final && (Stoned & I_SPECIAL))
             enlght_out(" You turned into stone.");
         else
-            you_are("turning to stone", "");
+            you_are(_("turning to stone"), "");
     }
     if (Slimed) {
         if (final && (Slimed & I_SPECIAL))
             enlght_out(" You turned into slime.");
         else
-            you_are("turning into slime", "");
+            you_are(_("turning into slime"), "");
     }
     if (Strangled) {
         if (u.uburied) {
-            you_are("buried", "");
+            you_are(_("buried"), "");
         } else {
             if (final && (Strangled & I_SPECIAL)) {
                 enlght_out(" You died from strangulation.");
@@ -1020,19 +1020,19 @@ status_enlightenment(int mode, int final)
             /* unlike death due to sickness, report the two cases separately
                because it is possible to cure one without curing the other */
             if (u.usick_type & SICK_NONVOMITABLE)
-                you_are("terminally sick from illness", "");
+                you_are(_("terminally sick from illness"), "");
             if (u.usick_type & SICK_VOMITABLE)
-                you_are("terminally sick from food poisoning", "");
+                you_are(_("terminally sick from food poisoning"), "");
         }
     }
     if (Vomiting)
-        you_are("nauseated", "");
+        you_are(_("nauseated"), "");
     if (Stunned)
-        you_are("stunned", "");
+        you_are(_("stunned"), "");
     if (Confusion)
-        you_are("confused", "");
+        you_are(_("confused"), "");
     if (Hallucination)
-        you_are("hallucinating", "");
+        you_are(_("hallucinating"), "");
     if (Blind) {
         /* check the reasons in same order as from_what() */
         Sprintf(buf, "%s blind",
@@ -1048,7 +1048,7 @@ status_enlightenment(int mode, int final)
         you_are(buf, !haseyes(gy.youmonst.data) ? "" : from_what(BLINDED));
     }
     if (Deaf)
-        you_are("deaf", from_what(DEAF));
+        you_are(_("deaf"), from_what(DEAF));
 
     /* external troubles, more or less */
     if (Punished) {
@@ -1153,7 +1153,7 @@ status_enlightenment(int mode, int final)
     }
     if (Fumbling) {
         if (magic || cause_known(FUMBLING))
-            enl_msg(You_, "fumble", "fumbled", "", from_what(FUMBLING));
+            enl_msg(You_, _("fumble"), _("fumbled"), "", from_what(FUMBLING));
     }
     if (Sleepy) {
         if (magic || cause_known(SLEEPY)) {
@@ -1166,7 +1166,7 @@ status_enlightenment(int mode, int final)
     /* hunger/nutrition */
     if (Hunger) {
         if (magic || cause_known(HUNGER))
-            enl_msg(You_, "hunger", "hungered", " rapidly",
+            enl_msg(You_, _("hunger"), _("hungered"), _(" rapidly"),
                     from_what(HUNGER));
     }
     Strcpy(buf, hu_stat[u.uhs]); /* hunger status; omitted if "normal" */
@@ -1238,7 +1238,7 @@ status_enlightenment(int mode, int final)
         if (u.uroleplay.nudist)
             enl_msg(You_, "do", "did", " not wear any armor", "");
         else
-            you_are("not wearing any armor", "");
+            you_are(_("not wearing any armor"), "");
     }
 }
 
@@ -1257,7 +1257,7 @@ weapon_insight(int final)
     /* two-weaponing implies hands and
        a weapon or wep-tool (not other odd stuff) in each hand */
     } else if (u.twoweap) {
-        you_are("wielding two weapons at once", "");
+        you_are(_("wielding two weapons at once"), "");
 
     /* report most weapons by their skill class (so a katana will be
        described as a long sword, for instance; mattock, hook, and aklys
@@ -1496,26 +1496,26 @@ attributes_enlightenment(
 
     /*** Resistances to troubles ***/
     if (Invulnerable)
-        you_are("invulnerable", from_what(INVULNERABLE));
+        you_are(_("invulnerable"), from_what(INVULNERABLE));
     if (Antimagic)
-        you_are("magic-protected", from_what(ANTIMAGIC));
+        you_are(_("magic-protected"), from_what(ANTIMAGIC));
     if (Fire_resistance)
-        you_are("fire resistant", from_what(FIRE_RES));
+        you_are(_("fire resistant"), from_what(FIRE_RES));
     item_resistance_message(AD_FIRE, " protected from fire", final);
     if (Cold_resistance)
-        you_are("cold resistant", from_what(COLD_RES));
+        you_are(_("cold resistant"), from_what(COLD_RES));
     item_resistance_message(AD_COLD, " protected from cold", final);
     if (Sleep_resistance)
-        you_are("sleep resistant", from_what(SLEEP_RES));
+        you_are(_("sleep resistant"), from_what(SLEEP_RES));
     if (Disint_resistance)
-        you_are("disintegration resistant", from_what(DISINT_RES));
+        you_are(_("disintegration resistant"), from_what(DISINT_RES));
     item_resistance_message(AD_DISN, " protected from disintegration", final);
     if (Shock_resistance)
-        you_are("shock resistant", from_what(SHOCK_RES));
+        you_are(_("shock resistant"), from_what(SHOCK_RES));
     item_resistance_message(AD_ELEC, " protected from electric shocks",
                             final);
     if (Poison_resistance)
-        you_are("poison resistant", from_what(POISON_RES));
+        you_are(_("poison resistant"), from_what(POISON_RES));
     if (Acid_resistance) {
         Sprintf(buf, "%.20s%.30s",
                 temp_resist(ACID_RES) ? "temporarily " : "",
@@ -1524,9 +1524,9 @@ attributes_enlightenment(
     }
     item_resistance_message(AD_ACID, " protected from acid", final);
     if (Drain_resistance)
-        you_are("level-drain resistant", from_what(DRAIN_RES));
+        you_are(_("level-drain resistant"), from_what(DRAIN_RES));
     if (Sick_resistance)
-        you_are("immune to sickness", from_what(SICK_RES));
+        you_are(_("immune to sickness"), from_what(SICK_RES));
     if (Stone_resistance) {
         Sprintf(buf, "%.20s%.30s",
                 temp_resist(STONE_RES) ? "temporarily " : "",
@@ -1534,31 +1534,31 @@ attributes_enlightenment(
         you_are(buf, from_what(STONE_RES));
     }
     if (Halluc_resistance)
-        enl_msg(You_, "resist", "resisted", " hallucinations",
+        enl_msg(You_, _("resist"), _("resisted"), _(" hallucinations"),
                 from_what(HALLUC_RES));
     if (u.uedibility)
-        you_can("recognize detrimental food", "");
+        you_can(_("recognize detrimental food"), "");
 
     /*** Vision and senses ***/
     if ((HBlinded || EBlinded) && BBlinded) /* blind w/ blindness blocked */
-        you_can("see", from_what(-BLINDED)); /* Eyes of the Overworld */
+        you_can(_("see"), from_what(-BLINDED)); /* Eyes of the Overworld */
     if (Blnd_resist && !Blind) /* skip if no eyes or blindfolded */
-        you_are("not subject to light-induced blindness",
+        you_are(_("not subject to light-induced blindness"),
                 from_what(BLND_RES));
     if (See_invisible) {
         if (!Blind)
-            enl_msg(You_, "see", "saw", " invisible", from_what(SEE_INVIS));
+            enl_msg(You_, _("see"), _("saw"), _(" invisible"), from_what(SEE_INVIS));
         else if (!PermaBlind)
-            enl_msg(You_, "will see", "would have seen",
-                    " invisible when not blind", "");
+            enl_msg(You_, _("will see"), _("would have seen"),
+                    _(" invisible when not blind"), "");
         else
-            enl_msg(You_, "would see", "would have seen",
-                    " invisible if not blind", "");
+            enl_msg(You_, _("would see"), _("would have seen"),
+                    _(" invisible if not blind"), "");
     }
     if (Blind_telepat)
-        you_are("telepathic", from_what(TELEPAT));
+        you_are(_("telepathic"), from_what(TELEPAT));
     if (Warning)
-        you_are("warned", from_what(WARNING));
+        you_are(_("warned"), from_what(WARNING));
     if (Warn_of_mon && svc.context.warntype.obj) {
         Sprintf(buf, "aware of the presence of %s",
                 (svc.context.warntype.obj & M2_ORC) ? "orcs"
@@ -1585,18 +1585,18 @@ attributes_enlightenment(
         you_are(buf, from_what(WARN_OF_MON));
     }
     if (Undead_warning)
-        you_are("warned of undead", from_what(WARN_UNDEAD));
+        you_are(_("warned of undead"), from_what(WARN_UNDEAD));
     if (Searching)
-        you_have("automatic searching", from_what(SEARCHING));
+        you_have(_("automatic searching"), from_what(SEARCHING));
     if (Clairvoyant) {
-        you_are("clairvoyant", from_what(CLAIRVOYANT));
+        you_are(_("clairvoyant"), from_what(CLAIRVOYANT));
     } else if ((HClairvoyant || EClairvoyant) && BClairvoyant) {
         Strcpy(buf, from_what(-CLAIRVOYANT));
         (void) strsubst(buf, " because of ", " if not for ");
         enl_msg(You_, "could be", "could have been", " clairvoyant", buf);
     }
     if (Infravision)
-        you_have("infravision", from_what(INFRAVISION));
+        you_have(_("infravision"), from_what(INFRAVISION));
     if (Detect_monsters) {
         Strcpy(buf, _("sensing the presence of monsters"));
         if (wizard) {
@@ -1634,17 +1634,17 @@ attributes_enlightenment(
         you_are(buf, from_what(ADORNED));
     }
     if (Invisible)
-        you_are("invisible", from_what(INVIS));
+        you_are(_("invisible"), from_what(INVIS));
     else if (Invis)
-        you_are("invisible to others", from_what(INVIS));
+        you_are(_("invisible to others"), from_what(INVIS));
     /* ordinarily "visible" is redundant; this is a special case for
        the situation when invisibility would be an expected attribute */
     else if ((HInvis || EInvis) && BInvis)
-        you_are("visible", from_what(-INVIS));
+        you_are(_("visible"), from_what(-INVIS));
     if (Displaced)
-        you_are("displaced", from_what(DISPLACED));
+        you_are(_("displaced"), from_what(DISPLACED));
     if (Stealth) {
-        you_are("stealthy", from_what(STEALTH));
+        you_are(_("stealthy"), from_what(STEALTH));
     } else if (BStealth && (HStealth || EStealth)) {
         Sprintf(buf, " stealthy%s",
                 (BStealth == FROMOUTSIDE) ? " if not mounted" : "");
@@ -1658,11 +1658,11 @@ attributes_enlightenment(
 
     /*** Transportation ***/
     if (Jumping)
-        you_can("jump", from_what(JUMPING));
+        you_can(_("jump"), from_what(JUMPING));
     if (Teleportation)
-        you_can("teleport", from_what(TELEPORT));
+        you_can(_("teleport"), from_what(TELEPORT));
     if (Teleport_control)
-        you_have("teleport control", from_what(TELEPORT_CONTROL));
+        you_have(_("teleport control"), from_what(TELEPORT_CONTROL));
     /* actively levitating handled earlier as a status condition */
     if (BLevitation) { /* levitation is blocked */
         long save_BLev = BLevitation;
@@ -1717,7 +1717,7 @@ attributes_enlightenment(
         boolean has_lid = has_ceiling(&u.uz);
 
         if (has_lid && !u.uinwater) {
-            you_can("cling to the ceiling", "");
+            you_can(_("cling to the ceiling"), "");
         } else {
             Sprintf(buf, _(" to the ceiling if %s%s%s"),
                     !has_lid ? _("there was one") : "",
@@ -1730,22 +1730,22 @@ attributes_enlightenment(
     }
     /* actively walking on water handled earlier as a status condition */
     if (Wwalking && !walking_on_water())
-        you_can("walk on water", from_what(WWALKING));
+        you_can(_("walk on water"), from_what(WWALKING));
     /* actively swimming (in water but not under it) handled earlier */
     if (Swimming && (Underwater || !u.uinwater))
-        you_can("swim", from_what(SWIMMING));
+        you_can(_("swim"), from_what(SWIMMING));
     if (Breathless)
-        you_can("survive without air", from_what(MAGICAL_BREATHING));
+        you_can(_("survive without air"), from_what(MAGICAL_BREATHING));
     else if (Amphibious)
-        you_can("breathe water", from_what(MAGICAL_BREATHING));
+        you_can(_("breathe water"), from_what(MAGICAL_BREATHING));
     if (Passes_walls)
-        you_can("walk through walls", from_what(PASSES_WALLS));
+        you_can(_("walk through walls"), from_what(PASSES_WALLS));
 
     /*** Physical attributes ***/
     if (Regeneration)
         enl_msg(_("You regenerate"), "", _("d"), "", from_what(REGENERATION));
     if (Slow_digestion)
-        you_have("slower digestion", from_what(SLOW_DIGESTION));
+        you_have(_("slower digestion"), from_what(SLOW_DIGESTION));
     if (u.uhitinc) {
         (void) enlght_combatinc("to hit", u.uhitinc, final, buf);
         if (iflags.tux_penalty && !Upolyd)
@@ -1809,13 +1809,13 @@ attributes_enlightenment(
     }
     /* polymorph and other shape change */
     if (Protection_from_shape_changers)
-        you_are("protected from shape changers",
+        you_are(_("protected from shape changers"),
                 from_what(PROT_FROM_SHAPE_CHANGERS));
     if (Unchanging) {
         const char *what = 0;
 
         if (!Upolyd) /* Upolyd handled below after current form */
-            you_can("not change from your current form",
+            you_can(_("not change from your current form"),
                     from_what(UNCHANGING));
         /* blocked shape changes */
         if (Polymorph)
@@ -1829,10 +1829,10 @@ attributes_enlightenment(
                     "");
         }
     } else if (Polymorph) {
-        you_are("polymorphing periodically", from_what(POLYMORPH));
+        you_are(_("polymorphing periodically"), from_what(POLYMORPH));
     }
     if (Polymorph_control)
-        you_have("polymorph control", from_what(POLYMORPH_CONTROL));
+        you_have(_("polymorph control"), from_what(POLYMORPH_CONTROL));
     if (Upolyd && u.umonnum != u.ulycn
         /* if we've died from turning into slime, we're polymorphed
            right now but don't want to list it as a temporary attribute
@@ -1854,7 +1854,7 @@ attributes_enlightenment(
         you_are(buf, "");
     }
     if (lays_eggs(gy.youmonst.data) && flags.female) /* Upolyd */
-        you_can("lay eggs", "");
+        you_can(_("lay eggs"), "");
     if (ismnum(u.ulycn)) {
         /* "you are a werecreature [in beast form]" */
         Strcpy(buf, an(pmname(&mons[u.ulycn],
@@ -1867,18 +1867,18 @@ attributes_enlightenment(
         you_are(buf, "");
     }
     if (Unchanging && Upolyd) /* !Upolyd handled above */
-        you_can("not change from your current form", from_what(UNCHANGING));
+        you_can(_("not change from your current form"), from_what(UNCHANGING));
     if (Hate_silver)
-        you_are("harmed by silver", "");
+        you_are(_("harmed by silver"), "");
     /* movement and non-armor-based protection */
     if (Fast)
         you_are(Very_fast ? "very fast" : "fast", from_what(FAST));
     if (Reflecting)
-        you_have("reflection", from_what(REFLECTING));
+        you_have(_("reflection"), from_what(REFLECTING));
     if (Free_action)
-        you_have("free action", from_what(FREE_ACTION));
+        you_have(_("free action"), from_what(FREE_ACTION));
     if (Fixed_abil)
-        you_have("fixed abilities", from_what(FIXED_ABIL));
+        you_have(_("fixed abilities"), from_what(FIXED_ABIL));
     if (Lifesaved)
         enl_msg(_("Your life "), _("will be"), _("would have been"), _(" saved"), "");
 
@@ -1894,9 +1894,9 @@ attributes_enlightenment(
     } else if (wizard)
         enl_msg(_("Your luck "), _("is"), _("was"), _(" zero"), "");
     if (u.moreluck > 0)
-        you_have("extra luck", "");
+        you_have(_("extra luck"), "");
     else if (u.moreluck < 0)
-        you_have("reduced luck", "");
+        you_have(_("reduced luck"), "");
     if (carrying(LUCKSTONE) || stone_luck(TRUE)) {
         ltmp = stone_luck(FALSE);
         if (ltmp <= 0)
