@@ -2872,15 +2872,15 @@ hornoplenty(
                 if (obj->otyp == POT_OIL)
                     fixup_oil(obj, (struct obj *) NULL);
             }
-            what = (obj->quan > 1L) ? "Some potions" : "A potion";
+            what = (obj->quan > 1L) ? _("Some potions") : _("A potion");
         } else {
             obj = mkobj(FOOD_CLASS, FALSE);
             if (obj->otyp == FOOD_RATION && !rn2(7))
                 obj->otyp = LUMP_OF_ROYAL_JELLY;
-            what = "Some food";
+            what = _("Some food");
         }
         ++objcount;
-        pline(_("%s %s out."), what, vtense(what, "spill"));
+        pline(_("%s %s out."), what, vtense(what, _("spill")));
         obj->blessed = horn->blessed;
         obj->cursed = horn->cursed;
         obj->owt = weight(obj);
