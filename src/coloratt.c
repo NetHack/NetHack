@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 struct color_names {
     const char *name;
@@ -403,7 +404,7 @@ query_attr(const char *prompt, int dflt_attr)
                  (attrnames[i].attr == dflt_attr) ? MENU_ITEMFLAGS_SELECTED
                                                   : MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, (prompt && *prompt) ? prompt : "Pick an attribute");
+    end_menu(tmpwin, (prompt && *prompt) ? prompt : _("Pick an attribute"));
     pick_cnt = select_menu(tmpwin, allow_many ? PICK_ANY : PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
     if (pick_cnt > 0) {
@@ -483,7 +484,7 @@ query_color(const char *prompt, int dflt_color)
                  (colornames[i].color == dflt_color) ? MENU_ITEMFLAGS_SELECTED
                                                      : MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, (prompt && *prompt) ? prompt : "Pick a color");
+    end_menu(tmpwin, (prompt && *prompt) ? prompt : _("Pick a color"));
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
 

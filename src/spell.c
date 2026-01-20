@@ -569,7 +569,7 @@ study_book(struct obj *spellbook)
             /* hero has just been told what spell this book is for; it may
                have been undiscovered if spell was learned via divine gift */
             makeknown(booktype);
-            if (y_n("Refresh your memory anyway?") == 'n')
+            if (y_n(_("Refresh your memory anyway?")) == 'n')
                 return 0;
         }
 

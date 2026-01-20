@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 staticfn long itimeout(long);
 staticfn long itimeout_incr(long, int);
@@ -557,7 +558,7 @@ dodrink(void)
         }
         /* Or are you surrounded by water? */
         if (Underwater && !u.uswallow) {
-            if (y_n("Drink the water around you?") == 'y') {
+            if (y_n(_("Drink the water around you?")) == 'y') {
                 pline(_("Do you know what lives in this water?"));
                 return ECMD_TIME;
             }

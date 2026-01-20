@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 /* occupation callbacks */
 staticfn int picklock(void);
@@ -112,7 +113,7 @@ picklock(void)
                 You(_("find a trap!"));
             gx.xlock.box->tknown = 1;
         }
-        if (y_n("Do you want to try to disarm it?") == 'y') {
+        if (y_n(_("Do you want to try to disarm it?")) == 'y') {
             const char *what;
             boolean alreadyunlocked;
 

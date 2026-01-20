@@ -1034,7 +1034,7 @@ dotele(
 
     if (trap) {
         if (trap->ttyp == LEVEL_TELEP && trap->tseen) {
-            if (y_n("There is a level teleporter here. Trigger it?") == 'y') {
+            if (y_n(_("There is a level teleporter here. Trigger it?")) == 'y') {
                 level_tele_trap(trap, FORCETRAP);
                 /* deliberate jumping will always take time even if it doesn't
                  * work */
@@ -1045,7 +1045,7 @@ dotele(
             trap_once = trap->once; /* trap may get deleted, save this */
             if (trap->once) {
                 pline(_("This is a vault teleport, usable once only."));
-                if (y_n("Jump in?") == 'n') {
+                if (y_n(_("Jump in?")) == 'n') {
                     trap = 0;
                 } else {
                     deltrap(trap);

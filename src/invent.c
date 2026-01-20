@@ -2606,7 +2606,7 @@ reroll_menu(void)
         /* user closed the menu without selecting; unclear what their choice
            is here so ask again; but (e.g. for hangup handling) stop asking if
            the user cancels out again */
-        option = y_n("Reroll this character?");
+        option = y_n(_("Reroll this character?"));
     }
     destroy_nhwindow(win);
 
