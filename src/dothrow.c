@@ -6,6 +6,7 @@
 /* Contains code for 't' (throw) */
 
 #include "hack.h"
+#include "i18n.h"
 
 staticfn int throw_obj(struct obj *, int);
 staticfn boolean ok_to_throw(int *);
@@ -2111,7 +2112,7 @@ thitmonst(
                     verbalize(_("%s part in this is finished."),
                               s_suffix(The(xname(obj))));
                     verbalize(
-               "We will guard it in case it is ever needed again, %s forbid.",
+               _("We will guard it in case it is ever needed again, %s forbid."),
                               align_gname(u.ualignbase[A_ORIGINAL]));
                 }
                 if (*u.ushops || obj->unpaid) /* not very likely... */

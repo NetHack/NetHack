@@ -726,7 +726,7 @@ m_unleash(struct monst *mtmp, boolean feedback)
 
     if (feedback) {
         if (canseemon(mtmp))
-            pline_mon(mtmp, "%s pulls free of %s leash!",
+            pline_mon(mtmp, _("%s pulls free of %s leash!"),
                       Monnam(mtmp), mhis(mtmp));
         else
             Your(_("leash falls slack."));
@@ -775,10 +775,10 @@ use_leash(struct obj *obj)
            (note: the two in-use cases can't actually occur; all
            leashes are released when the hero gets engulfed) */
         You_cant((!obj->leashmon
-                  ? "leash %s from inside."
+                  ? _("leash %s from inside.")
                   : (obj->leashmon == (int) u.ustuck->m_id)
-                    ? "unleash %s from inside."
-                    : "unleash anything from inside %s."),
+                    ? _("unleash %s from inside.")
+                    : _("unleash anything from inside %s.")),
                  noit_mon_nam(u.ustuck));
         return ECMD_OK;
     }
@@ -958,7 +958,7 @@ check_leash(coordxy x, coordxy y)
                     if (!DEADMONSTER(mtmp))
                         u.uconduct.killer = save_pacifism;
                 } else {
-                    pline_mon(mtmp, "%s is choked by the leash!",
+                    pline_mon(mtmp, _("%s is choked by the leash!"),
                               Monnam(mtmp));
                     /* tameness eventually drops to 1 here (never 0) */
                     if (mtmp->mtame && rn2(mtmp->mtame))

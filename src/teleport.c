@@ -2009,9 +2009,9 @@ mlevel_tele_trap(
                 assign_level(&tolevel, &valley_level);
             } else if (Is_botlevel(&u.uz)) {
                 if (in_sight && trap->tseen)
-                    pline_mon(mtmp, "%s avoids the %s.",
+                    pline_mon(mtmp, _("%s avoids the %s."),
                               Monnam(mtmp),
-                             (tt == HOLE) ? "hole" : "trap");
+                             (tt == HOLE) ? _("hole") : _("trap"));
                 return Trap_Effect_Finished;
             } else {
                 assign_level(&tolevel, &trap->dst);
@@ -2023,7 +2023,7 @@ mlevel_tele_trap(
                                       || rn2(7))) {
                 if (in_sight && mtmp->data->mlet != S_ELEMENTAL) {
                     pline_mon(mtmp,
-                              "%s seems to shimmer for a moment.",
+                              _("%s seems to shimmer for a moment."),
                               Monnam(mtmp));
                     seetrap(trap);
                 }
@@ -2043,7 +2043,7 @@ mlevel_tele_trap(
                 || (tt == NO_TRAP && onscary(0, 0, mtmp))) {
                 if (in_sight)
                     pline_mon(mtmp,
-                             "%s seems very disoriented for a moment.",
+                             _("%s seems very disoriented for a moment."),
                              Monnam(mtmp));
                 return Trap_Effect_Finished;
             }
@@ -2057,7 +2057,7 @@ mlevel_tele_trap(
                 nlev = random_teleport_level();
                 if (nlev == depth(&u.uz)) {
                     if (in_sight)
-                        pline_mon(mtmp, "%s shudders for a moment.",
+                        pline_mon(mtmp, _("%s shudders for a moment."),
                                   Monnam(mtmp));
                     return Trap_Effect_Finished;
                 }

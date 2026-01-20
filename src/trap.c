@@ -1009,8 +1009,8 @@ mu_maybe_destroy_web(
                         a_your[trap->madeby_u]);
                 else
                     pline_mon(mtmp,
-                          "%s %s %s spider web!", Monnam(mtmp),
-                          (flaming(mptr)) ? "burns" : "dissolves",
+                          _("%s %s %s spider web!"), Monnam(mtmp),
+                          (flaming(mptr)) ? _("burns") : _("dissolves"),
                           a_your[trap->madeby_u]);
             }
             deltrap(trap);
@@ -1022,7 +1022,7 @@ mu_maybe_destroy_web(
                 You(_("flow through %s spider web."), a_your[trap->madeby_u]);
             } else {
                 pline_mon(mtmp,
-                      "%s flows through %s spider web.", Monnam(mtmp),
+                      _("%s flows through %s spider web."), Monnam(mtmp),
                       a_your[trap->madeby_u]);
                 seetrap(trap);
             }
@@ -1237,7 +1237,7 @@ trapeffect_arrow_trap(
         if (trap->once && trap->tseen && !rn2(15)) {
             if (in_sight && see_it)
                 pline_mon(mtmp,
-                      "%s triggers a trap but nothing happens.",
+                      _("%s triggers a trap but nothing happens."),
                       Monnam(mtmp));
             deltrap(trap);
             newsym(mtmp->mx, mtmp->my);
@@ -1307,7 +1307,7 @@ trapeffect_dart_trap(
         if (trap->once && trap->tseen && !rn2(15)) {
             if (in_sight && see_it)
                 pline_mon(mtmp,
-                      "%s triggers a trap but nothing happens.",
+                      _("%s triggers a trap but nothing happens."),
                       Monnam(mtmp));
             deltrap(trap);
             newsym(mtmp->mx, mtmp->my);
@@ -1388,7 +1388,7 @@ trapeffect_rocktrap(
         if (trap->once && trap->tseen && !rn2(15)) {
             if (in_sight && see_it)
                 pline_mon(mtmp,
-                      "A trap door above %s opens, but nothing falls out!",
+                      _("A trap door above %s opens, but nothing falls out!"),
                       mon_nam(mtmp));
             deltrap(trap);
             newsym(mtmp->mx, mtmp->my);
@@ -1455,12 +1455,12 @@ trapeffect_sqky_board(
                     Soundeffect(tsnds[trap->tnote], 50);
                 }
                 pline_mon(mtmp,
-                      "A board beneath %s squeaks %s loudly.",
+                      _("A board beneath %s squeaks %s loudly."),
                       mon_nam(mtmp), trapnote(trap, FALSE));
                 seetrap(trap);
             } else if (!mindless(mtmp->data)) {
                 pline_mon(mtmp,
-                      "%s stops momentarily and appears to cringe.",
+                      _("%s stops momentarily and appears to cringe."),
                       Monnam(mtmp));
             }
         } else {
@@ -1536,7 +1536,7 @@ trapeffect_bear_trap(
             mtmp->mtrapped = 1;
             if (in_sight) {
                 pline_mon(mtmp,
-                      "%s is caught in %s bear trap!", Monnam(mtmp),
+                      _("%s is caught in %s bear trap!"), Monnam(mtmp),
                       a_your[trap->madeby_u]);
                 seetrap(trap);
             } else {
@@ -1549,7 +1549,7 @@ trapeffect_bear_trap(
         } else if (forcetrap) {
             if (in_sight) {
                 pline_mon(mtmp,
-                      "%s evades %s bear trap!", Monnam(mtmp),
+                      _("%s evades %s bear trap!"), Monnam(mtmp),
                       a_your[trap->madeby_u]);
                 seetrap(trap);
             }
@@ -1587,7 +1587,7 @@ trapeffect_slp_gas_trap(
             && !helpless(mtmp)) {
             if (sleep_monst(mtmp, rnd(25), -1) && in_sight) {
                 pline_mon(mtmp,
-                          "%s suddenly falls asleep!", Monnam(mtmp));
+                          _("%s suddenly falls asleep!"), Monnam(mtmp));
                 seetrap(trap);
             }
         }
@@ -1715,7 +1715,7 @@ trapeffect_rust_trap(
 
         if (completelyrusts(mptr)) {
             if (in_sight)
-                pline_mon(mtmp, "%s %s to pieces!", Monnam(mtmp),
+                pline_mon(mtmp, _("%s %s to pieces!"), Monnam(mtmp),
                       !mlifesaver(mtmp) ? "falls" : "starts to fall");
             monkilled(mtmp, (const char *) 0, AD_RUST);
             if (DEADMONSTER(mtmp))
@@ -1976,7 +1976,7 @@ trapeffect_pit(
                 if (in_sight) {
                     seetrap(trap);
                     pline_mon(mtmp,
-                             "%s doesn't fall into the pit.", Monnam(mtmp));
+                             _("%s doesn't fall into the pit."), Monnam(mtmp));
                 }
                 return Trap_Effect_Finished;
             }
@@ -1988,7 +1988,7 @@ trapeffect_pit(
             mtmp->mtrapped = 1;
         if (in_sight) {
             pline_mon(mtmp,
-                     "%s %s into %s pit!", Monnam(mtmp), fallverb,
+                     _("%s %s into %s pit!"), Monnam(mtmp), fallverb,
                      a_your[trap->madeby_u]);
             if (mptr == &mons[PM_PIT_VIPER]
                 || mptr == &mons[PM_PIT_FIEND])
@@ -2040,11 +2040,11 @@ trapeffect_hole(
                     seetrap(trap);
                     if (tt == TRAPDOOR)
                         pline_mon(mtmp,
-                            "A trap door opens, but %s doesn't fall through.",
+                            _("A trap door opens, but %s doesn't fall through."),
                               mon_nam(mtmp));
                     else /* (tt == HOLE) */
                         pline_mon(mtmp,
-                                 "%s doesn't fall through the hole.",
+                                 _("%s doesn't fall through the hole."),
                                  Monnam(mtmp));
                 }
                 return Trap_Effect_Finished; /* inescapable = FALSE; */
@@ -2052,7 +2052,7 @@ trapeffect_hole(
             if (inescapable) { /* sokoban hole */
                 if (in_sight) {
                     pline_mon(mtmp,
-                             "%s seems to be yanked down!", Monnam(mtmp));
+                             _("%s seems to be yanked down!"), Monnam(mtmp));
                     seetrap(trap);
                 }
             } else
@@ -2229,7 +2229,7 @@ trapeffect_web(
                 tear_web = TRUE;
             } else if (in_sight) {
                 pline_mon(mtmp,
-                      "%s is caught in %s spider web.", Monnam(mtmp),
+                      _("%s is caught in %s spider web."), Monnam(mtmp),
                       a_your[trap->madeby_u]);
                 seetrap(trap);
             }
@@ -2255,14 +2255,14 @@ trapeffect_web(
         if (tear_web) {
             if (in_sight)
                 pline_mon(mtmp,
-                     "%s tears through %s spider web!", Monnam(mtmp),
+                     _("%s tears through %s spider web!"), Monnam(mtmp),
                       a_your[trap->madeby_u]);
             deltrap(trap);
             newsym(mtmp->mx, mtmp->my);
         } else if (forcetrap && !mtmp->mtrapped) {
             if (in_sight) {
                 pline_mon(mtmp,
-                      "%s avoids %s spider web!", Monnam(mtmp),
+                      _("%s avoids %s spider web!"), Monnam(mtmp),
                       a_your[trap->madeby_u]);
                 seetrap(trap);
             }
@@ -2388,7 +2388,7 @@ trapeffect_anti_magic(
                 mtmp->mspec_used += d(2, 6);
                 if (in_sight) {
                     seetrap(trap);
-                    pline_mon(mtmp, "%s seems lethargic.",
+                    pline_mon(mtmp, _("%s seems lethargic."),
                               Monnam(mtmp));
                 }
             }
@@ -2558,7 +2558,7 @@ trapeffect_landmine(
 
             if (in_sight && !already_seen) {
                 pline_mon(mtmp,
-                     "A trigger appears in a pile of soil below %s.",
+                     _("A trigger appears in a pile of soil below %s."),
                       mon_nam(mtmp));
                 seetrap(trap);
             }
@@ -2572,8 +2572,8 @@ trapeffect_landmine(
         } else if (in_sight) {
             newsym(mtmp->mx, mtmp->my);
             pline_mon(mtmp,
-                  "%s%s triggers %s land mine!",
-                  !Deaf ? "KAABLAMM!!!  " : "", Monnam(mtmp),
+                  _("%s%s triggers %s land mine!"),
+                  !Deaf ? _("KAABLAMM!!!  ") : "", Monnam(mtmp),
                   a_your[trap->madeby_u]);
         }
         if (!in_sight && !Deaf)
@@ -2633,7 +2633,7 @@ trapeffect_rolling_boulder_trap(
 
             newsym(mtmp->mx, mtmp->my);
             if (in_sight)
-                pline_mon(mtmp, "%s%s triggers %s.",
+                pline_mon(mtmp, _("%s%s triggers %s."),
                       !Deaf ? "Click!  " : "", Monnam(mtmp),
                       trap->tseen ? "a rolling boulder trap" : something);
             if (launch_obj(BOULDER, trap->launch.x, trap->launch.y,
@@ -3324,7 +3324,7 @@ launch_obj(
             if (otyp == BOULDER && throws_rocks(mtmp->data)) {
                 if (rn2(3)) {
                     if (cansee(x, y))
-                        pline_mon(mtmp, "%s snatches the boulder.",
+                        pline_mon(mtmp, _("%s snatches the boulder."),
                                   Monnam(mtmp));
                     singleobj->otrapped = 0;
                     (void) mpickobj(mtmp, singleobj);
@@ -3680,7 +3680,7 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
                 if (!rn2(2)) {
                     mtmp->mtrapped = 0;
                     if (canseemon(mtmp))
-                        pline_mon(mtmp, "%s pulls free...",
+                        pline_mon(mtmp, _("%s pulls free..."),
                                  Monnam(mtmp));
                     fill_pit(mtmp->mx, mtmp->my);
                 }
@@ -3699,14 +3699,14 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
         } else if (metallivorous(mptr)) {
             if (trap->ttyp == BEAR_TRAP) {
                 if (canseemon(mtmp))
-                    pline_mon(mtmp, "%s eats a bear trap!",
+                    pline_mon(mtmp, _("%s eats a bear trap!"),
                               Monnam(mtmp));
                 deltrap(trap);
                 mtmp->meating = 5;
                 mtmp->mtrapped = 0;
             } else if (trap->ttyp == SPIKED_PIT) {
                 if (canseemon(mtmp))
-                    pline_mon(mtmp, "%s munches on some spikes!",
+                    pline_mon(mtmp, _("%s munches on some spikes!"),
                               Monnam(mtmp));
                 trap->ttyp = PIT;
                 mtmp->meating = 5;
@@ -3759,7 +3759,7 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
 
             maybe_unhide_at(mtmp->mx, mtmp->my);
             if (!alreadyspotted && canseemon(mtmp))
-                pline_mon(mtmp, "%s appears.", Amonnam(mtmp));
+                pline_mon(mtmp, _("%s appears."), Amonnam(mtmp));
         }
     }
     return trap_result;
@@ -3797,7 +3797,7 @@ minstapetrify(struct monst *mon, boolean byplayer)
     mon_adjust_speed(mon, -3, (struct obj *) 0);
 
     if (cansee(mon->mx, mon->my))
-        pline_mon(mon, "%s turns to stone.", Monnam(mon));
+        pline_mon(mon, _("%s turns to stone."), Monnam(mon));
     if (byplayer) {
         gs.stoned = TRUE;
         xkilled(mon, XKILL_NOMSG);
@@ -3846,7 +3846,7 @@ mselftouch(
     if (mwep && mwep->otyp == CORPSE && touch_petrifies(&mons[mwep->corpsenm])
         && !resists_ston(mon)) {
         if (cansee(mon->mx, mon->my)) {
-            pline_mon(mon, "%s%s touches %s.", arg ? arg : "",
+            pline_mon(mon, _("%s%s touches %s."), arg ? arg : "",
                   arg ? mon_nam(mon) : Monnam(mon),
                   corpse_xname(mwep, (const char *) 0, CXN_PFX_THE));
         }
@@ -6657,7 +6657,7 @@ thitm(
      */
     if (!strike) {
         if (obj && cansee(mon->mx, mon->my))
-            pline_mon(mon, "%s is almost hit by %s!",
+            pline_mon(mon, _("%s is almost hit by %s!"),
                       Monnam(mon), doname(obj));
     } else {
         int dam = 1;
@@ -6665,7 +6665,7 @@ thitm(
                             && passes_rocks(mon->data));
 
         if (obj && cansee(mon->mx, mon->my))
-            pline_mon(mon, "%s is hit by %s%s",
+            pline_mon(mon, _("%s is hit by %s%s"),
                       Monnam(mon), doname(obj),
                       harmless ? " but is not harmed." : "!");
         if (d_override) {

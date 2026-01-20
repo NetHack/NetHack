@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 #include "mfndpos.h"
 
@@ -343,7 +344,7 @@ dog_starve(struct monst *mtmp)
     if (mtmp->mleashed && mtmp != u.usteed)
         Your(_("leash goes slack."));
     else if (cansee(mtmp->mx, mtmp->my))
-        pline_mon(mtmp, "%s starves.", Monnam(mtmp));
+        pline_mon(mtmp, _("%s starves."), Monnam(mtmp));
     else
         You_feel(_("%s for a moment."),
                     Hallucination ? "bummed" : "sad");
@@ -371,7 +372,7 @@ dog_hunger(struct monst *mtmp, struct edog *edog)
                 return TRUE;
             }
             if (cansee(mtmp->mx, mtmp->my))
-                pline_mon(mtmp, "%s is confused from hunger.", Monnam(mtmp));
+                pline_mon(mtmp, _("%s is confused from hunger."), Monnam(mtmp));
             else if (couldsee(mtmp->mx, mtmp->my))
                 beg(mtmp);
             else

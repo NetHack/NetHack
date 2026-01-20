@@ -1226,11 +1226,11 @@ pleased(aligntyp g_align)
                     godvoice(g_align, (char *) 0);
                     SetVoice((struct monst *) 0, 0, 80, voice_deity);
                     verbalize(_("Hark, %s!"), is_human(gy.youmonst.data)
-                                               ? "mortal"
-                                               : "creature");
+                                               ? _("mortal")
+                                               : _("creature"));
                     SetVoice((struct monst *) 0, 0, 80, voice_deity);
                     verbalize(
-                       "To enter the castle, thou must play the right tune!");
+                       _("To enter the castle, thou must play the right tune!"));
                     u.uevent.uheard_tune++;
                     break;
                 } else if (u.uevent.uheard_tune < 2) {

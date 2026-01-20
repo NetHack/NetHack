@@ -111,7 +111,7 @@ mon_yells(struct monst *mon, const char *shout)
             /* Sidenote on "A watchman angrily waves her arms!"
              * Female being called watchman is correct (career name).
              */
-            pline_mon(mon, "%s angrily %s %s %s!",
+            pline_mon(mon, _("%s angrily %s %s %s!"),
                 Amonnam(mon),
                 nolimbs(mon->data) ? "shakes" : "waves",
                 mhis(mon),
@@ -119,7 +119,7 @@ mon_yells(struct monst *mon, const char *shout)
                                    : makeplural(mbodypart(mon, ARM)));
     } else {
         if (canspotmon(mon)) {
-            pline_mon(mon, "%s yells:", Amonnam(mon));
+            pline_mon(mon, _("%s yells:"), Amonnam(mon));
         } else {
             /* Soundeffect(se_someone_yells, 75); */
             You_hear(_("someone yell:"));
@@ -491,12 +491,12 @@ monflee(
                sleep and temporary paralysis, so both conditions
                receive the same alternate message */
             if (!mtmp->mcanmove || !mtmp->data->mmove) {
-                pline_mon(mtmp, "%s seems to flinch.",
+                pline_mon(mtmp, _("%s seems to flinch."),
                           Adjmonnam(mtmp, "immobile"));
             } else if (flees_light(mtmp)) {
                 if (Unaware) {
                     /* tell the player even if the hero is unconscious */
-                    pline_mon(mtmp, "%s is frightened.", Monnam(mtmp));
+                    pline_mon(mtmp, _("%s is frightened."), Monnam(mtmp));
                 } else if (rn2(10) || Deaf) {
                     /* via flees_light(), will always be either via uwep
                        (Sunsword) or uarm (gold dragon scales/mail) or both;
@@ -508,14 +508,14 @@ monflee(
                                          ? yname(uarm)
                                          : "[its imagination?]";
 
-                    pline_mon(mtmp, "%s flees from the painful light of %s.",
+                    pline_mon(mtmp, _("%s flees from the painful light of %s."),
                           Monnam(mtmp), lsrc);
                 } else {
                     SetVoice(mtmp, 0, 80, 0);
                     verbalize(_("Bright light!"));
                 }
             } else {
-                pline_mon(mtmp, "%s turns to flee.", Monnam(mtmp));
+                pline_mon(mtmp, _("%s turns to flee."), Monnam(mtmp));
             }
         }
 
@@ -586,7 +586,7 @@ mind_blast(struct monst *mtmp)
     struct monst *m2, *nmon = (struct monst *) 0;
 
     if (canseemon(mtmp))
-        pline_mon(mtmp, "%s concentrates.", Monnam(mtmp));
+        pline_mon(mtmp, _("%s concentrates."), Monnam(mtmp));
     if (mdistu(mtmp) > BOLT_LIM * BOLT_LIM) {
         You(_("sense a faint wave of psychic energy."));
         return;
@@ -1054,7 +1054,7 @@ boolean
 itsstuck(struct monst *mtmp)
 {
     if (sticks(gy.youmonst.data) && mtmp == u.ustuck && !u.uswallow) {
-        pline_mon(mtmp, "%s cannot escape from you!", Monnam(mtmp));
+        pline_mon(mtmp, _("%s cannot escape from you!"), Monnam(mtmp));
         return TRUE;
     }
     return FALSE;
@@ -1284,7 +1284,7 @@ maybe_spin_web(struct monst *mtmp)
                 char mbuf[BUFSZ];
 
                 Strcpy(mbuf, canspotmon(mtmp) ? y_monnam(mtmp) : something);
-                pline_mon(mtmp, "%s spins a web.", upstart(mbuf));
+                pline_mon(mtmp, _("%s spins a web."), upstart(mbuf));
                 trap->tseen = 1;
             }
             if (*in_rooms(mtmp->mx, mtmp->my, SHOPBASE))
@@ -1547,7 +1547,7 @@ postmov(
             if ((here->doormask & (D_LOCKED | D_CLOSED)) != 0
                 && amorphous(ptr)) {
                 if (flags.verbose && canseemon(mtmp))
-                    pline_mon(mtmp, "%s %s under the door.", YMonnam(mtmp),
+                    pline_mon(mtmp, _("%s %s under the door."), YMonnam(mtmp),
                               (ptr == &mons[PM_FOG_CLOUD]
                                || ptr->mlet == S_LIGHT) ? "flows" : "oozes");
             } else if ((here->doormask & D_LOCKED) != 0 && can_unlock) {
@@ -1563,7 +1563,7 @@ postmov(
                     Soundeffect(se_door_unlock_and_open, 50);
                     if (flags.verbose) {
                         if (canseeit && canspotmon(mtmp)) {
-                            pline_mon(mtmp, "%s unlocks and opens a door.",
+                            pline_mon(mtmp, _("%s unlocks and opens a door."),
                                   Monnam(mtmp));
                         } else if (canseeit) {
                             You_see(_("a door unlock and open."));
@@ -1581,7 +1581,7 @@ postmov(
                     Soundeffect(se_door_open, 100);
                     if (flags.verbose) {
                         if (canseeit && canspotmon(mtmp)) {
-                            pline_mon(mtmp, "%s opens a door.", Monnam(mtmp));
+                            pline_mon(mtmp, _("%s opens a door."), Monnam(mtmp));
                         } else if (canseeit) {
                             You_see(_("a door open."));
                         } else if (!Deaf) {
@@ -1605,7 +1605,7 @@ postmov(
                     Soundeffect(se_door_crash_open, 50);
                     if (flags.verbose) {
                         if (canseeit && canspotmon(mtmp)) {
-                            pline_mon(mtmp, "%s smashes down a door.",
+                            pline_mon(mtmp, _("%s smashes down a door."),
                                       Monnam(mtmp));
                         } else if (canseeit) {
                             You_see(_("a door crash open."));
@@ -1628,7 +1628,7 @@ postmov(
                 && (dmgtype(ptr, AD_RUST) || dmgtype(ptr, AD_CORR)
                     || metallivorous(ptr))) {
                 if (canseemon(mtmp))
-                    pline_mon(mtmp, "%s eats through the iron bars.",
+                    pline_mon(mtmp, _("%s eats through the iron bars."),
                               Monnam(mtmp));
                 dissolve_bars(mtmp->mx, mtmp->my);
                 return MMOVE_DONE;

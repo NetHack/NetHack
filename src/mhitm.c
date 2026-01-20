@@ -231,7 +231,7 @@ mdisplacem(
                     pline(_("%s tries to move %s out of %s way."), Monnam(magr),
                           mon_nam(mdef), is_rider(pa) ? "the" : mhis(magr));
                 }
-                pline_mon(magr, "%s turns to stone!", Monnam(magr));
+                pline_mon(magr, _("%s turns to stone!"), Monnam(magr));
             }
             monstone(magr);
             if (!DEADMONSTER(magr))
@@ -340,7 +340,7 @@ mattackm(
             } else {
                 if (iflags.last_msg == PLNMSG_HIDE_UNDER
                     && mdef->m_id == gl.last_hider)
-                    pline_mon(mdef, "%s emerges from hiding.", Monnam(mdef));
+                    pline_mon(mdef, _("%s emerges from hiding."), Monnam(mdef));
                 else if (mdef->m_id == gl.last_hider)
                     You(_("notice %s."), mon_nam(mdef));
                 else
@@ -779,7 +779,7 @@ gazemm(struct monst *magr, struct monst *mdef, struct attack *mattk)
                 return M_ATTK_MISS;
             }
             if (canseemon(magr))
-                pline_mon(magr, "%s is turned to stone!", Monnam(magr));
+                pline_mon(magr, _("%s is turned to stone!"), Monnam(magr));
             monstone(magr);
             if (!DEADMONSTER(magr))
                 return M_ATTK_MISS;
@@ -972,7 +972,7 @@ explmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
         return M_ATTK_MISS;
 
     if (cansee(magr->mx, magr->my))
-        pline_mon(magr, "%s explodes!", Monnam(magr));
+        pline_mon(magr, _("%s explodes!"), Monnam(magr));
     else
         noises(magr, mattk);
 
@@ -1043,7 +1043,7 @@ mdamagem(
                 return M_ATTK_HIT; /* no damage during the polymorph */
             }
             if (gv.vis && canspotmon(magr))
-                pline_mon(magr, "%s turns to stone!", Monnam(magr));
+                pline_mon(magr, _("%s turns to stone!"), Monnam(magr));
             monstone(magr);
             if (!DEADMONSTER(magr))
                 return M_ATTK_HIT; /* lifesaved */
@@ -1248,7 +1248,7 @@ slept_monst(struct monst *mon)
 {
     if (helpless(mon) && mon == u.ustuck
         && !sticks(gy.youmonst.data) && !u.uswallow) {
-        pline_mon(mon, "%s grip relaxes.", s_suffix(Monnam(mon)));
+        pline_mon(mon, _("%s grip relaxes."), s_suffix(Monnam(mon)));
         unstuck(mon);
     }
 }
@@ -1392,14 +1392,14 @@ passivemm(
         case AD_COLD:
             if (resists_cold(magr)) {
                 if (canseemon(magr)) {
-                    pline_mon(magr, "%s is mildly chilly.", Monnam(magr));
+                    pline_mon(magr, _("%s is mildly chilly."), Monnam(magr));
                     golemeffects(magr, AD_COLD, tmp);
                 }
                 tmp = 0;
                 break;
             }
             if (canseemon(magr))
-                pline_mon(magr, "%s is suddenly very cold!", Monnam(magr));
+                pline_mon(magr, _("%s is suddenly very cold!"), Monnam(magr));
             healmon(mdef, tmp/2, tmp/2);
             if (mdef->mhpmax > ((int) (mdef->m_lev + 1) * 8))
                 (void) split_mon(mdef, magr);
@@ -1408,7 +1408,7 @@ passivemm(
             if (!magr->mstun) {
                 magr->mstun = 1;
                 if (canseemon(magr))
-                    pline_mon(magr, "%s %s...", Monnam(magr),
+                    pline_mon(magr, _("%s %s..."), Monnam(magr),
                           makeplural(stagger(magr->data, "stagger")));
             }
             tmp = 0;
@@ -1416,26 +1416,26 @@ passivemm(
         case AD_FIRE:
             if (resists_fire(magr)) {
                 if (canseemon(magr)) {
-                    pline_mon(magr, "%s is mildly warmed.", Monnam(magr));
+                    pline_mon(magr, _("%s is mildly warmed."), Monnam(magr));
                     golemeffects(magr, AD_FIRE, tmp);
                 }
                 tmp = 0;
                 break;
             }
             if (canseemon(magr))
-                pline_mon(magr, "%s is suddenly very hot!", Monnam(magr));
+                pline_mon(magr, _("%s is suddenly very hot!"), Monnam(magr));
             break;
         case AD_ELEC:
             if (resists_elec(magr)) {
                 if (canseemon(magr)) {
-                    pline_mon(magr, "%s is mildly tingled.", Monnam(magr));
+                    pline_mon(magr, _("%s is mildly tingled."), Monnam(magr));
                     golemeffects(magr, AD_ELEC, tmp);
                 }
                 tmp = 0;
                 break;
             }
             if (canseemon(magr))
-                pline_mon(magr, "%s is jolted with electricity!",
+                pline_mon(magr, _("%s is jolted with electricity!"),
                           Monnam(magr));
             break;
         default:
@@ -1462,7 +1462,7 @@ xdrainenergym(struct monst *mon, boolean givemsg)
             || attacktype(mon->data, AT_BREA))) {
         mon->mspec_used += d(2, 2);
         if (givemsg)
-            pline_mon(mon, "%s seems lethargic.", Monnam(mon));
+            pline_mon(mon, _("%s seems lethargic."), Monnam(mon));
     }
 }
 

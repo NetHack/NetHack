@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 #include "mfndpos.h"
 
 staticfn void sanity_check_single_mon(struct monst *, boolean, const char *);
@@ -588,7 +589,7 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
         if (mtmp->mrevived && rn2(2)) {
             if (canseemon(mtmp))
                 pline_mon(mtmp,
-                      "%s recently regrown horn crumbles to dust.",
+                      _("%s recently regrown horn crumbles to dust."),
                       s_suffix(Monnam(mtmp)));
         } else {
             obj = mksobj_at(UNICORN_HORN, x, y, TRUE, FALSE);
@@ -975,7 +976,7 @@ minliquid_core(struct monst *mtmp)
         int dam = d(2, 6);
 
         if (cansee(mtmp->mx, mtmp->my))
-            pline_mon(mtmp, "%s rusts.", Monnam(mtmp));
+            pline_mon(mtmp, _("%s rusts."), Monnam(mtmp));
         mtmp->mhp -= dam;
         if (mtmp->mhpmax > dam)
             mtmp->mhpmax -= dam;
@@ -1006,7 +1007,7 @@ minliquid_core(struct monst *mtmp)
                     struct attack *dummy = &mtmp->data->mattk[0];
                     const char *how = on_fire(mtmp->data, dummy);
 
-                    pline_mon(mtmp, "%s %s.", Monnam(mtmp),
+                    pline_mon(mtmp, _("%s %s."), Monnam(mtmp),
                           !strcmp(how, "boiling") ? "boils away"
                              : !strcmp(how, "melting") ? "melts away"
                                 : "burns to a crisp");
@@ -1023,11 +1024,11 @@ minliquid_core(struct monst *mtmp)
                 mtmp->mhp -= 1;
                 if (DEADMONSTER(mtmp)) {
                     if (cansee(mtmp->mx, mtmp->my))
-                        pline_mon(mtmp, "%s surrenders to the fire.",
+                        pline_mon(mtmp, _("%s surrenders to the fire."),
                                   Monnam(mtmp));
                     mondead(mtmp); /* no corpse */
                 } else if (cansee(mtmp->mx, mtmp->my)) {
-                    pline_mon(mtmp, "%s burns slightly.", Monnam(mtmp));
+                    pline_mon(mtmp, _("%s burns slightly."), Monnam(mtmp));
                 }
             }
             if (!DEADMONSTER(mtmp)) {
@@ -1061,7 +1062,7 @@ minliquid_core(struct monst *mtmp)
             }
             if (cansee(mtmp->mx, mtmp->my)) {
                 if (svc.context.mon_moving)
-                    pline_mon(mtmp, "%s drowns.", Monnam(mtmp));
+                    pline_mon(mtmp, _("%s drowns."), Monnam(mtmp));
                 else
                     /* hero used fire to melt ice that monster was on */
                     You(_("drown %s."), mon_nam(mtmp));
@@ -1415,7 +1416,7 @@ m_consume_obj(struct monst *mtmp, struct obj *otmp)
                 mon_to_stone(mtmp);
             } else if (!resists_ston(mtmp)) {
                 if (vis)
-                    pline_mon(mtmp, "%s turns to stone!",
+                    pline_mon(mtmp, _("%s turns to stone!"),
                               Monnam(mtmp));
                 monstone(mtmp);
             }
@@ -1786,7 +1787,7 @@ mon_givit(struct monst *mtmp, struct permonst *ptr)
             Strcpy(mtmpbuf, Monnam(mtmp));
             mon_set_minvis(mtmp);
             if (vis)
-                pline_mon(mtmp, "%s %s.", mtmpbuf,
+                pline_mon(mtmp, _("%s %s."), mtmpbuf,
                       !canspotmon(mtmp) ? "vanishes"
                       : mtmp->invis_blkd ? "seems to flicker"
                         : "becomes invisible");
@@ -1816,7 +1817,7 @@ mpickgold(struct monst *mtmp)
         add_to_minv(mtmp, gold);
         if (cansee(mtmp->mx, mtmp->my)) {
             if (flags.verbose && !mtmp->isgd)
-                pline_mon(mtmp, "%s picks up some %s.", Monnam(mtmp),
+                pline_mon(mtmp, _("%s picks up some %s."), Monnam(mtmp),
                          mat_idx == GOLD ? "gold" : "money");
             newsym(mtmp->mx, mtmp->my);
         }
@@ -1876,7 +1877,7 @@ mpickstuff(struct monst *mtmp)
                 char *otmpname = distant_name(otmp, doname);
 
                 if (flags.verbose)
-                    pline_mon(mtmp, "%s picks up %s.",
+                    pline_mon(mtmp, _("%s picks up %s."),
                               Monnam(mtmp), otmpname);
             }
             obj_extract_self(otmp3);      /* remove from floor */
@@ -2933,7 +2934,7 @@ vamprises(struct monst *mtmp)
             /* 3.6.0 used a_monnam(mtmp); that was weird if mtmp was
                named: "Dracula suddenly transforms and rises as Dracula";
                3.6.1 used mtmp->data->mname; that ignored hallucination */
-            pline_mon(mtmp, "%s %s!", upstart(action),
+            pline_mon(mtmp, _("%s %s!"), upstart(action),
                       x_monnam(mtmp, ARTICLE_A, (char *) 0,
                            (SUPPRESS_NAME | SUPPRESS_IT | SUPPRESS_INVISIBLE),
                                FALSE));
@@ -3186,7 +3187,7 @@ corpse_chance(
 
     if (mdat == &mons[PM_VLAD_THE_IMPALER] || mdat->mlet == S_LICH) {
         if (cansee(mon->mx, mon->my) && !was_swallowed)
-            pline_mon(mon, "%s body crumbles into dust.",
+            pline_mon(mon, _("%s body crumbles into dust."),
                       s_suffix(Monnam(mon)));
         return FALSE;
     }
@@ -3217,9 +3218,9 @@ corpse_chance(
                         mondied(magr);
                     if (DEADMONSTER(magr)) { /* maybe lifesaved */
                         if (canspotmon(magr))
-                            pline_mon(magr, "%s rips open!", Monnam(magr));
+                            pline_mon(magr, _("%s rips open!"), Monnam(magr));
                     } else if (canseemon(magr))
-                        pline_mon(magr, "%s seems to have indigestion.",
+                        pline_mon(magr, _("%s seems to have indigestion."),
                                   Monnam(magr));
                 }
                 return FALSE;
@@ -3378,7 +3379,7 @@ monkilled(
 
     if (fltxt && (mdef->wormno ? worm_known(mdef)
                                : cansee(mdef->mx, mdef->my)))
-        pline_mon(mdef, "%s is %s%s%s!", Monnam(mdef),
+        pline_mon(mdef, _("%s is %s%s%s!"), Monnam(mdef),
               nonliving(mptr) ? "destroyed" : "killed",
               *fltxt ? " by the " : "", fltxt);
     else
@@ -3744,7 +3745,7 @@ mon_to_stone(struct monst *mtmp)
     if (mtmp->data->mlet == S_GOLEM) {
         /* it's a golem, and not a stone golem */
         if (canseemon(mtmp))
-            pline_mon(mtmp, "%s solidifies...", Monnam(mtmp));
+            pline_mon(mtmp, _("%s solidifies..."), Monnam(mtmp));
         if (newcham(mtmp, &mons[PM_STONE_GOLEM], NO_NC_FLAGS)) {
             if (canseemon(mtmp))
                 pline(_("Now it's %s."), an(pmname(mtmp->data, Mgender(mtmp))));
@@ -3792,7 +3793,7 @@ vamp_stone(struct monst *mtmp)
                 }
             }
             if (canspotmon(mtmp)) {
-                pline_mon(mtmp, "%s!", buf);
+                pline_mon(mtmp, _("%s!"), buf);
                 display_nhwindow(WIN_MESSAGE, FALSE);
             }
             (void) newcham(mtmp, &mons[mndx], NO_NC_FLAGS);
@@ -3802,7 +3803,7 @@ vamp_stone(struct monst *mtmp)
                 mtmp->cham = mndx;
             if (canspotmon(mtmp)) {
                 pline_mon(mtmp,
-                      "%s rises from the %s with renewed agility!",
+                      _("%s rises from the %s with renewed agility!"),
                       Amonnam(mtmp), surface(mtmp->mx, mtmp->my));
             }
             newsym(mtmp->mx, mtmp->my);
@@ -4200,7 +4201,7 @@ peacefuls_respond(struct monst *mtmp)
                         || (mon->data == &mons[quest_info(MS_LEADER)]
                             && mtmp->data != &mons[gu.urole.guardnum])) {
                         if (exclaimed)
-                            pline_mon(mon, "%s%s", buf, " then shrugs.");
+                            pline_mon(mon, _("%s%s"), buf, " then shrugs.");
                         continue;
                     }
 
@@ -4218,7 +4219,7 @@ peacefuls_respond(struct monst *mtmp)
                             exclaimed = TRUE; /* got msg from monflee() */
                     }
                     if (*buf)
-                        pline_mon(mon, "%s%s", buf, needpunct ? "." : "");
+                        pline_mon(mon, _("%s%s"), buf, needpunct ? "." : "");
                     if (mon->mtame) {
                         ; /* mustn't set mpeaceful to 0 as below;
                            * perhaps reduce tameness? */
@@ -4227,7 +4228,7 @@ peacefuls_respond(struct monst *mtmp)
                         mon->mstrategy &= ~STRAT_WAITMASK;
                         adjalign(-1);
                         if (!exclaimed)
-                            pline_mon(mon, "%s gets angry!", Monnam(mon));
+                            pline_mon(mon, _("%s gets angry!"), Monnam(mon));
                     }
                 }
             } else if (mon->data->mlet == mtmp->data->mlet
@@ -4297,7 +4298,7 @@ setmangry(struct monst *mtmp, boolean via_attack)
         adjalign(-1); /* attacking peaceful monsters is bad */
     if (humanoid(mtmp->data) || mtmp->isshk || mtmp->isgd) {
         if (couldsee(mtmp->mx, mtmp->my))
-            pline_mon(mtmp, "%s gets angry!", Monnam(mtmp));
+            pline_mon(mtmp, _("%s gets angry!"), Monnam(mtmp));
     } else {
         growl(mtmp);
     }
@@ -4316,7 +4317,7 @@ void
 wake_msg(struct monst *mtmp, boolean interesting)
 {
     if (mtmp->msleeping && canseemon(mtmp)) {
-        pline_mon(mtmp, "%s wakes up%s%s",
+        pline_mon(mtmp, _("%s wakes up%s%s"),
               Monnam(mtmp), interesting ? "!" : ".",
               mtmp->data == &mons[PM_FLESH_GOLEM] ? " It's alive!" : "");
     }
@@ -5453,15 +5454,15 @@ newcham(
         /* oldname is capitalized and might be an assigned name */
         if (!canspotmon(mtmp)) { /* can't see or sense it now */
             if (seenorsensed) /* could see or sense it before */
-                pline_mon(mtmp, "%s disappears!", oldname);
+                pline_mon(mtmp, _("%s disappears!"), oldname);
             (void) usmellmon(mdat);
         } else if (!seenorsensed) { /* couldn't see/sense before, can now */
             char *mnm = x_monnam(mtmp, mtmp->mtame ? ARTICLE_YOUR : ARTICLE_A,
                                  (char *) 0, 0, FALSE);
 
-            pline_mon(mtmp, "%s appears!", upstart(mnm));
+            pline_mon(mtmp, _("%s appears!"), upstart(mnm));
         } else { /* saw/sensed it before, still see/sense it now */
-            pline_mon(mtmp, "%s turns into %s!", oldname,
+            pline_mon(mtmp, _("%s turns into %s!"), oldname,
                       /* "a <monster type>" even if it has a name assigned */
                       noname_monnam(mtmp, ARTICLE_A));
         }
@@ -5693,7 +5694,7 @@ golemeffects(struct monst *mon, int damtype, int dam)
     if (heal) {
         if (healmon(mon, heal, 0)) {
             if (cansee(mon->mx, mon->my))
-                pline_mon(mon, "%s seems healthier.", Monnam(mon));
+                pline_mon(mon, _("%s seems healthier."), Monnam(mon));
         }
     }
 }
@@ -5776,7 +5777,7 @@ mimic_hit_msg(struct monst *mtmp, short otyp)
         break;
     case M_AP_OBJECT:
         if (otyp == SPE_HEALING || otyp == SPE_EXTRA_HEALING) {
-            pline_mon(mtmp, "%s seems a more vivid %s than before.",
+            pline_mon(mtmp, _("%s seems a more vivid %s than before."),
                   The(simple_typename(ap)),
                   c_obj_colors[objects[ap].oc_color]);
         }
@@ -6052,7 +6053,7 @@ shieldeff_mon(struct monst *mtmp)
     shieldeff(mtmp->mx, mtmp->my);
     /* does not depend on seeing the monster; the shield effect is visible */
     if (cansee(mtmp->mx, mtmp->my))
-        pline_mon(mtmp, "%s resists!", Monnam(mtmp));
+        pline_mon(mtmp, _("%s resists!"), Monnam(mtmp));
 }
 
 void

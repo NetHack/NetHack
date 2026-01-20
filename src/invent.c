@@ -1911,13 +1911,13 @@ getobj(
     *ap = '\0';
 
     if (suggested == 0 && !forceprompt && !allownone) {
-        You(_("don't have anything %sto %s."), inaccess ? "else " : "", word);
+        You(_("don't have anything %sto %s."), inaccess ? _("else ") : "", _(word));
         return (struct obj *) 0;
     }
     for (;;) {
         cnt = 0L;
         cntgiven = FALSE;
-        Sprintf(qbuf, _("What do you want to %s?"), word);
+        Sprintf(qbuf, _("What do you want to %s?"), _(word));
         if (gi.in_doagain) {
             ilet = readchar();
         } else if (iflags.force_invmenu) {
@@ -1973,7 +1973,7 @@ getobj(
             menuquery[0] = qbuf[0] = '\0';
             if (iflags.force_invmenu)
                 Snprintf(menuquery, sizeof menuquery,
-                         "What do you want to %s?", word);
+                         _("What do you want to %s?"), _(word));
             if (!allowed_choices || *allowed_choices == HANDS_SYM
                 || *buf == HANDS_SYM)
                 handsbuf = getobj_hands_txt(word, qbuf);
@@ -2010,7 +2010,7 @@ getobj(
                than one invent slot of gold and picking the non-'$' one */
             || (otmp && otmp->oclass == COIN_CLASS)) {
             if (otmp && obj_ok(otmp) <= GETOBJ_EXCLUDE) {
-                You(_("cannot %s gold."), word);
+                You(_("cannot %s gold."), _(word));
                 return (struct obj *) 0;
             }
             /*
@@ -2128,7 +2128,7 @@ silly_thing(const char *word,
             || (otmp->otyp == FAKE_AMULET_OF_YENDOR && !otmp->known)))
         pline_The(_("Amulet doesn't like being called names."));
     else
-        pline(_(silly_thing_to), word);
+        pline(_(silly_thing_to), _(word));
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
@@ -2214,7 +2214,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
     char buf[BUFSZ] = DUMMY, qbuf[QBUFSZ];
 
     if (!gi.invent) {
-        You(_("have nothing to %s."), word);
+        You(_("have nothing to %s."), _(word));
         if (resultflags)
             *resultflags = ALL_FINISHED;
         return 0;
@@ -2259,8 +2259,8 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
     ilets[iletct] = '\0';
 
     for (;;) {
-        Sprintf(qbuf, "What kinds of thing do you want to %s? [%s]",
-                word, ilets);
+        Sprintf(qbuf, _("What kinds of thing do you want to %s? [%s]"),
+                _(word), ilets);
         getlin(qbuf, buf);
         if (buf[0] == '\033')
             return 0;
@@ -2457,7 +2457,7 @@ askchain(
                    class of objects is involved, so prefix the first
                    object being queried here with an explanation why */
                 if (take_out || put_in)
-                    Sprintf(qpfx, "%s: ", word), *qpfx = highc(*qpfx);
+                    Sprintf(qpfx, "%s: ", _(word)), *qpfx = highc(*qpfx);
                 first = FALSE;
             }
             (void) safe_qbuf(qbuf, qpfx, "?", otmp,

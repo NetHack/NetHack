@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 /* this assumes that a human quest leader or nemesis is an archetype
    of the corresponding role; that isn't so for some roles (tourist
@@ -2137,7 +2138,7 @@ grow_up(struct monst *mtmp, struct monst *victim)
                            slightly less sexist if prepared for it...) */
                       : (fem && !mtmp->female) ? "female " : "",
                     pmname(ptr, fem));
-            pline_mon(mtmp, "%s %s %s.", YMonnam(mtmp),
+            pline_mon(mtmp, _("%s %s %s."), YMonnam(mtmp),
                       (fem != mtmp->female) ? "changes into"
                                             : humanoid(ptr) ? "becomes"
                                                             : "grows up into",

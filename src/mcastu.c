@@ -64,7 +64,7 @@ cursetxt(struct monst *mtmp, boolean undirected)
         else
             point_msg = _("at you, then curses");
 
-        pline_mon(mtmp, "%s points %s.", Monnam(mtmp), point_msg);
+        pline_mon(mtmp, _("%s points %s."), Monnam(mtmp), point_msg);
     } else if ((!(svm.moves % 4) || !rn2(4))) {
         if (!Deaf)
             Norep(_("You hear a mumbled curse."));   /* Deaf-aware */
@@ -247,7 +247,7 @@ castmu(
      */
     if (!foundyou && thinks_it_foundyou
         && !is_undirected_spell(mattk->adtyp, spellnum)) {
-        pline_mon(mtmp, "%s casts a spell at %s!",
+        pline_mon(mtmp, _("%s casts a spell at %s!"),
                  canseemon(mtmp) ? Monnam(mtmp) : "Something",
                  is_waterwall(mtmp->mux, mtmp->muy) ? "empty water"
                                                     : "thin air");
@@ -264,7 +264,7 @@ castmu(
         return M_ATTK_MISS;
     }
     if (canspotmon(mtmp) || !is_undirected_spell(mattk->adtyp, spellnum)) {
-        pline_mon(mtmp, "%s casts a spell%s!",
+        pline_mon(mtmp, _("%s casts a spell%s!"),
                  canspotmon(mtmp) ? Monnam(mtmp) : "Something",
                  is_undirected_spell(mattk->adtyp, spellnum) ? ""
                  : (Invis && !perceives(mtmp->data)
@@ -362,7 +362,7 @@ m_cure_self(struct monst *mtmp, int dmg)
 {
     if (mtmp->mhp < mtmp->mhpmax) {
         if (canseemon(mtmp))
-            pline_mon(mtmp, "%s looks better.", Monnam(mtmp));
+            pline_mon(mtmp, _("%s looks better."), Monnam(mtmp));
         /* note: player healing does 6d4; this used to do 1d8 */
         healmon(mtmp, d(3, 6), 0);
         dmg = 0;
@@ -565,7 +565,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
     case MGC_DISAPPEAR: /* makes self invisible */
         if (!mtmp->minvis && !mtmp->invis_blkd) {
             if (canseemon(mtmp))
-                pline_mon(mtmp, "%s suddenly %s!", Monnam(mtmp),
+                pline_mon(mtmp, _("%s suddenly %s!"), Monnam(mtmp),
                       !See_invisible ? "disappears" : "becomes transparent");
             mon_set_minvis(mtmp);
             if (cansee(mtmp->mx, mtmp->my) && !canspotmon(mtmp))
@@ -993,7 +993,7 @@ buzzmu(struct monst *mtmp, struct attack *mattk)
     if (lined_up(mtmp) && rn2(3)) {
         nomul(0);
         if (canseemon(mtmp))
-            pline_mon(mtmp, "%s zaps you with a %s!", Monnam(mtmp),
+            pline_mon(mtmp, _("%s zaps you with a %s!"), Monnam(mtmp),
                   flash_str(BZ_OFS_AD(mattk->adtyp), FALSE));
         gb.buzzer = mtmp;
         buzz(BZ_M_SPELL(BZ_OFS_AD(mattk->adtyp)), (int) mattk->damn,
