@@ -630,7 +630,7 @@ failed_grab(
             /* unsolid grab misses are actually somewhat iffy--how come
                ordinary attacks don't also pass right through? */
             pline(_("%.99s %s attempt %s %.99s!"), magrnam, verb,
-                  !tailmiss ? "passes right through" : "fails to hold",
+                  !tailmiss ? _("passes right through") : _("fails to hold"),
                   mdefnam);
         }
         return TRUE;

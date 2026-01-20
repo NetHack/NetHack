@@ -657,7 +657,7 @@ nh_timeout(void)
             find_ac();
             if (!Blind)
                 Norep(_("The %s haze around you %s."), hcolor(NH_GOLDEN),
-                      u.uspellprot ? "becomes less dense" : "disappears");
+                      u.uspellprot ? _("becomes less dense") : _("disappears"));
         }
     }
 

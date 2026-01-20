@@ -1077,10 +1077,10 @@ pleased(aligntyp g_align)
 
     You_feel(_("that %s is %s."), align_gname(g_align),
              (u.ualign.record >= DEVOUT)
-                 ? Hallucination ? "pleased as punch" : "well-pleased"
+                 ? Hallucination ? _("pleased as punch") : _("well-pleased")
                  : (u.ualign.record >= STRIDENT)
-                       ? Hallucination ? "ticklish" : "pleased"
-                       : Hallucination ? "full" : "satisfied");
+                       ? Hallucination ? _("ticklish") : _("pleased")
+                       : Hallucination ? _("full") : _("satisfied"));
 
     /* not your deity */
     if (on_altar() && gp.p_aligntyp != u.ualign.type) {

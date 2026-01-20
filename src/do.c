@@ -2012,7 +2012,7 @@ temperature_change_msg(schar prev_temperature)
         else if (prev_temperature > 0)
             pline_The(_("heat %s gone."),
                       In_hell(&u.uz0)
-                      ? "and smoke are" : "is");
+                      ? _("and smoke are") : _("is"));
         else if (prev_temperature < 0)
             You(_("are out of the cold."));
     }

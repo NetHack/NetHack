@@ -1387,10 +1387,10 @@ seffect_confuse_monster(struct obj **sobjp)
         } else {
             if (altfeedback)
                 Your(_("%s tingle %s sharply."), hands,
-                     u.umconf ? "even more" : "very");
+                     u.umconf ? _("even more") : _("very"));
             else
                 Your(_("%s glow %s brilliant %s."), hands,
-                     u.umconf ? "an even more" : "a", hcolor(NH_RED));
+                     u.umconf ? _("an even more") : _("a"), hcolor(NH_RED));
             incr += rn1(8, 2);
         }
         /* after a while, repeated uses become less effective */
@@ -1429,9 +1429,9 @@ seffect_scare_monster(struct obj **sobjp)
         } else {
             Soundeffect(se_maniacal_laughter, 50);
         }
-        You_hear(_("%s %s."), (confused || scursed) ? "sad wailing"
-                 : "maniacal laughter",
-                 !ct ? "in the distance" : "close by");
+        You_hear(_("%s %s."), (confused || scursed) ? _("sad wailing")
+                 : _("maniacal laughter"),
+                 !ct ? _("in the distance") : _("close by"));
     }
 }
 

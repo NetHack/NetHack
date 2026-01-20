@@ -5455,7 +5455,7 @@ zap_over_floor(
     if (OBJ_AT(x, y) && damgtype == ZT_FIRE)
         if (burn_floor_objects(x, y, FALSE, type > 0) && couldsee(x, y)) {
             newsym(x, y);
-            You(_("%s of smoke."), !Blind ? "see a puff" : "smell a whiff");
+            You(_("%s of smoke."), !Blind ? _("see a puff") : _("smell a whiff"));
         }
     if (!ignoremon && (mon = m_at(x, y)) != 0)
         wakeup(mon, (type >= 0) ? TRUE : FALSE);

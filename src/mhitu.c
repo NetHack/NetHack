@@ -1639,7 +1639,7 @@ explmu(struct monst *mtmp, struct attack *mattk, boolean ufound)
             kill_agr = FALSE; /* already killed (maybe lifesaved) */
             chg =
                 make_hallucinated(HHallucination + (long) tmp, FALSE, 0L);
-            You(_("%s."), chg ? "are freaked out" : "seem unaffected");
+            You(_("%s."), chg ? _("are freaked out") : _("seem unaffected"));
         }
         break;
     default:
