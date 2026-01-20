@@ -3585,7 +3585,7 @@ use_cream_pie(struct obj *obj)
         make_blinded(BlindedTimeout + (long) blindinc, FALSE);
         if (!Blind || (Blind && wasblind))
             pline(_("There's %ssticky goop all over your %s."),
-                  wascreamed ? "more " : "", body_part(FACE));
+                  wascreamed ? _("more ") : "", body_part(FACE));
         else /* Blind  && !wasblind */
             You_cant(_("see through all the sticky goop on your %s."),
                      body_part(FACE));

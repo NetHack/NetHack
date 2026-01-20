@@ -2261,10 +2261,10 @@ udeadinside(void)
        monkilled() distinguishes between living (killed) and non (destroyed)
        for monster death message; we refine the nonliving aspect a bit */
     return !nonliving(gy.youmonst.data)
-             ? "dead"          /* living, including demons */
+             ? _("dead")          /* living, including demons */
              : !weirdnonliving(gy.youmonst.data)
-                 ? "condemned" /* undead plus manes */
-                 : "empty";    /* golems plus vortices */
+                 ? _("condemned") /* undead plus manes */
+                 : _("empty");    /* golems plus vortices */
 }
 
 /*polyself.c*/

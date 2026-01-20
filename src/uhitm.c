@@ -3887,8 +3887,8 @@ mhitm_ad_halu(
         /* mhitm */
         if (!magr->mcan && haseyes(pd) && mdef->mcansee) {
             if (gv.vis && canseemon(mdef))
-                pline_mon(mdef, "%s looks %sconfused.", Monnam(mdef),
-                      mdef->mconf ? "more " : "");
+                pline_mon(mdef, _("%s looks %sconfused."), Monnam(mdef),
+                      mdef->mconf ? _("more ") : "");
             mdef->mconf = 1;
             mdef->mstrategy &= ~STRAT_WAITFORU;
         }

@@ -1625,8 +1625,8 @@ attributes_enlightenment(
         /* the sum might be 0 (+0 ring or two which negate each other);
            that yields "you are charismatic" (which isn't pointless
            because it potentially impacts seduction attacks) */
-        Sprintf(buf, "%scharismatic",
-                (adorn > 0) ? "more " : (adorn < 0) ? "less " : "");
+        Sprintf(buf, _("%scharismatic"),
+                (adorn > 0) ? _("more ") : (adorn < 0) ? _("less ") : "");
         you_are(buf, from_what(ADORNED));
     }
     if (Invisible)
