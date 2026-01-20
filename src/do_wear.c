@@ -407,8 +407,8 @@ Cloak_off(void)
     case MUMMY_WRAPPING:
         if (Invis && !Blind) {
             newsym(u.ux, u.uy);
-            You(_("can %s."), See_invisible ? "see through yourself"
-                                         : "no longer see yourself");
+            You(_("can %s."), See_invisible ? _("see through yourself")
+                                         : _("no longer see yourself"));
         }
         break;
     case CLOAK_OF_INVISIBILITY:
@@ -496,8 +496,8 @@ Helmet_on(void)
             You_feel(_("%s."), /* track INT change; ignore WIS */
                      ACURR(A_INT)
                              <= (ABASE(A_INT) + ABON(A_INT) + ATEMP(A_INT))
-                         ? "like sitting in a corner"
-                         : "giddy");
+                         ? _("like sitting in a corner")
+                         : _("giddy"));
         } else {
             /* [message formerly given here moved to uchangealign()] */
             makeknown(HELM_OF_OPPOSITE_ALIGNMENT);
@@ -621,17 +621,17 @@ wielding_corpse(
         char kbuf[BUFSZ], hbuf[BUFSZ];
 
         You(_("%s %s in your bare %s."),
-            (how && is_gloves(how)) ? "now wield" : "are wielding",
+            (how && is_gloves(how)) ? _("now wield") : _("are wielding"),
             corpse_xname(obj, (const char *) 0, CXN_ARTICLE),
             makeplural(body_part(HAND)));
         /* "removing" ought to be "taking off" but that makes the
            tombstone text more likely to be truncated */
         if (how)
-            Sprintf(hbuf, "%s %s", voluntary ? "removing" : "losing",
+            Sprintf(hbuf, _("%s %s"), voluntary ? _("removing") : _("losing"),
                     is_gloves(how) ? gloves_simple_name(how)
                     : strsubst(simpleonames(how), "set of ", ""));
         else
-            Strcpy(hbuf, "resistance timing out");
+            Strcpy(hbuf, _("resistance timing out"));
         Snprintf(kbuf, sizeof kbuf, "%s while wielding %s",
                  hbuf, killer_xname(obj));
         instapetrify(kbuf);
@@ -1162,8 +1162,8 @@ Amulet_off(void)
             disp.botl = TRUE; /* status: 'Fly' Off */
             You(_("%s."), (is_pool_or_lava(u.ux, u.uy)
                         || Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
-                          ? "stop flying"
-                          : "land");
+                          ? _("stop flying")
+                          : _("land"));
             mkn = TRUE; /* makeknown(AMULET_OF_FLYING) */
             spoteffects(TRUE);
         }
@@ -1836,8 +1836,8 @@ dotakeoff(void)
         if (uskin)
             pline_The(_("%s merged with your skin!"),
                       uskin->otyp >= GRAY_DRAGON_SCALES
-                          ? "dragon scales are"
-                          : "dragon scale mail is");
+                          ? _("dragon scales are")
+                          : _("dragon scale mail is"));
         else
             pline(_("Not wearing any armor or accessories."));
         return ECMD_OK;
@@ -1905,7 +1905,7 @@ cursed(struct obj *otmp)
             pline(_("Despite your slippery %s, you can't."),
                   fingers_or_gloves(TRUE));
         else
-            You(_("can't.  %s cursed."), use_plural ? "They are" : "It is");
+            You(_("can't.  %s cursed."), use_plural ? _("They are") : _("It is"));
         set_bknown(otmp, 1);
         return 1;
     }

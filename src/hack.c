@@ -820,7 +820,7 @@ movobj(struct obj *obj, coordxy ox, coordxy oy)
 staticfn void
 dosinkfall(void)
 {
-    static const char fell_on_sink[] = "fell onto a sink";
+    const char *fell_on_sink = _("fell onto a sink");
     struct obj *obj;
     int dmg;
     boolean lev_boots = (uarmf && uarmf->otyp == LEVITATION_BOOTS),

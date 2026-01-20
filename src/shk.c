@@ -2384,8 +2384,8 @@ reject_purchase(
     } else {
         pline(_("%s %s%s your bill for the other %s first."),
               Shknam(shkp),
-              ANGRY(shkp) ? "angrily " : "",
-              nolimbs(shkp->data) ? "motions to" : "points out",
+              ANGRY(shkp) ? _("angrily ") : "",
+              nolimbs(shkp->data) ? _("motions to") : _("points out"),
               simpleonames(obj));
     }
     obj->quan = intact_quan;
@@ -3826,7 +3826,7 @@ donate_gold(
                 eshkp->loan = 0L;
         }
         eshkp->debit -= gltmp;
-        Your(_("debt is %spaid off."), eshkp->debit ? "partially " : "");
+        Your(_("debt is %spaid off."), eshkp->debit ? _("partially ") : "");
     } else {
         long delta = gltmp - eshkp->debit;
 
@@ -3838,10 +3838,10 @@ donate_gold(
         }
         if (eshkp->credit == delta)
             You(_("have %sestablished %ld %s credit."),
-                !selling ? "re-" : "", delta, currency(delta));
+                !selling ? _("re-") : "", delta, currency(delta));
         else
             pline(_("%ld %s added%s to your credit; total is now %ld %s."),
-                  delta, currency(delta), !selling ? " back" : "",
+                  delta, currency(delta), !selling ? _(" back") : "",
                   eshkp->credit, currency(eshkp->credit));
     }
 }
@@ -4500,7 +4500,7 @@ shk_fixes_damage(struct monst *shkp)
 
     if (canseemon(shkp)) {
         pline(_("%s whispers %s."), Shknam(shkp),
-              shk_closeby ? "an incantation" : "something");
+              shk_closeby ? _("an incantation") : _("something"));
     } else if (!Deaf && shk_closeby) {
         Soundeffect(se_mutter_incantation, 100);
         You_hear(_("someone muttering an incantation."));
@@ -5259,9 +5259,9 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
                 pline(_("%s returns to %s shop."), Shknam(shkp),
                       noit_mhis(shkp));
             else if ((is_seen = canseemon(shkp)) == TRUE || was_seen)
-                pline(_("%s %s."), Shknam(shkp), !was_seen ? "appears"
-                                              : is_seen ? "shifts location"
-                                                : "disappears");
+                pline(_("%s %s."), Shknam(shkp), !was_seen ? _("appears")
+                                              : is_seen ? _("shifts location")
+                                                : _("disappears"));
         }
     } else {
         if (!animal) {

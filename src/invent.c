@@ -2028,7 +2028,7 @@ getobj(
             }
         }
         if (cntgiven && !strcmp(word, "throw")) {
-            static const char only_one[] = "can only throw one at a time";
+            const char *only_one = _("can only throw one at a time");
             boolean coins;
 
             /* permit counts for throwing gold, but don't accept counts
@@ -2041,7 +2041,7 @@ getobj(
             if (cnt > 1L && (!coins || cnt > otmp->quan)) {
                 if (cnt > otmp->quan)
                     You(_("only have %ld%s%s."), otmp->quan,
-                        (!coins && otmp->quan > 1L) ? " and " : "",
+                        (!coins && otmp->quan > 1L) ? _(" and ") : "",
                         (!coins && otmp->quan > 1L) ? only_one : "");
                 else
                     You(_("%s."), only_one);

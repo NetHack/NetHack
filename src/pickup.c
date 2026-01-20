@@ -306,7 +306,7 @@ rider_corpse_revival(struct obj *obj, boolean remotely)
         return FALSE;
 
     pline(_("At your %s, the corpse suddenly moves..."),
-          remotely ? "attempted acquisition" : "touch");
+          remotely ? _("attempted acquisition") : _("touch"));
     (void) revive_corpse(obj);
     exercise(A_WIS, FALSE);
     return TRUE;
@@ -1662,11 +1662,11 @@ carry_count(struct obj *obj,            /* object to pick up... */
         /* some message will be given */
         Strcpy(obj_nambuf, doname(obj));
         if (container) {
-            Sprintf(where, "in %s", the(xname(container)));
-            verb = "carry";
+            Sprintf(where, _("in %s"), the(xname(container)));
+            verb = _("carry");
         } else {
-            Strcpy(where, "lying here");
-            verb = telekinesis ? "acquire" : "lift";
+            Strcpy(where, _("lying here"));
+            verb = telekinesis ? _("acquire") : _("lift");
         }
     } else {
         /* lint suppression */

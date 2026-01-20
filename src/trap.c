@@ -6712,7 +6712,7 @@ unconscious(void)
                     || !strncmp(gn.nomovemsg, "You are consci", 14))));
 }
 
-static const char lava_killer[] = "molten lava";
+static const char *lava_killer = _("molten lava");
 
 /* hero enters pool of molten lava; returns True if hero is killed and
    then life-saved (with teleport to safe spot), False for other survival;

@@ -61,8 +61,8 @@ enum checkfileflags {
     chkfilIaCheck  = 4,
 };
 
-static const char invisexplain[] = "remembered, unseen, creature",
-           altinvisexplain[] = "unseen creature"; /* for clairvoyance */
+static const char *invisexplain = _("remembered, unseen, creature"),
+           *altinvisexplain = _("unseen creature"); /* for clairvoyance */
 
 /* Returns "true" for characters that could represent a monster's stomach. */
 staticfn boolean
@@ -1250,8 +1250,8 @@ do_screen_description(
     const char **firstmatch,
     struct permonst **for_supplement)
 {
-    static const char mon_interior[] = "the interior of a monster",
-                      unreconnoitered[] = "unreconnoitered";
+    const char *mon_interior = _("the interior of a monster"),
+               *unreconnoitered = _("unreconnoitered");
     static char look_buf[BUFSZ];
     char prefix[BUFSZ];
     int i, j, alt_i, glyph = NO_GLYPH,

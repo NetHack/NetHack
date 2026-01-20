@@ -1154,7 +1154,7 @@ dotele(
 void
 level_tele(void)
 {
-    static const char get_there_from[] = "get there from %s.";
+    const char *get_there_from = _("get there from %s.");
     int newlev;
     d_level newlevel;
     const char *escape_by_flying = 0; /* when surviving dest of -N */
