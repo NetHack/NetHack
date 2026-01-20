@@ -1145,7 +1145,7 @@ doterrain(void)
                      MENU_ITEMFLAGS_NONE);
         }
     }
-    end_menu(men, "View which?");
+    end_menu(men, _("View which?"));
 
     n = select_menu(men, PICK_ONE, &sel);
     destroy_nhwindow(men);
@@ -2252,7 +2252,7 @@ handler_rebind_keys(void)
         add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
                  "view changed key binds", MENU_ITEMFLAGS_NONE);
     }
-    end_menu(win, "Do what?");
+    end_menu(win, _("Do what?"));
     npick = select_menu(win, PICK_ONE, &picks);
     destroy_nhwindow(win);
     if (npick > 0) {
@@ -2301,7 +2301,7 @@ handler_change_autocompletions(void)
                  MENU_ITEMFLAGS_NONE);
     }
 
-    end_menu(win, "Which commands autocomplete?");
+    end_menu(win, _("Which commands autocomplete?"));
     n = select_menu(win, PICK_ANY, &picks);
     if (n >= 0) {
         int j;
@@ -4650,7 +4650,7 @@ there_cmd_menu(coordxy x, coordxy y, int mod)
         act_on_act(act, dx, dy);
         return '\0';
     } else {
-        end_menu(win, "What do you want to do?");
+        end_menu(win, _("What do you want to do?"));
         npick = select_menu(win, PICK_ONE, &picks);
         ch = '\033';
     }

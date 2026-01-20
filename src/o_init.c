@@ -629,7 +629,7 @@ choose_disco_sort(
         add_menu_str(tmpwin,
                     "      will matter for future use of total discoveries.");
     }
-    end_menu(tmpwin, "Ordering of discoveries");
+    end_menu(tmpwin, _("Ordering of discoveries"));
 
     n = select_menu(tmpwin, PICK_ONE, &selected);
     destroy_nhwindow(tmpwin);
@@ -1108,7 +1108,7 @@ rename_disco(void)
     } else if (mn == 0) {
         pline(_("None of your discoveries can be assigned names..."));
     } else {
-        end_menu(tmpwin, "Pick an object type to name");
+        end_menu(tmpwin, _("Pick an object type to name"));
         dis = STRANGE_OBJECT;
         sl = select_menu(tmpwin, PICK_ONE, &selected);
         if (sl > 0) {

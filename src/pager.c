@@ -1796,7 +1796,7 @@ do_look(int mode, coord *click_cc)
                          clr, "all seen or remembered engravings",
                          MENU_ITEMFLAGS_NONE);
             }
-            end_menu(win, "What do you want to look at:");
+            end_menu(win, _("What do you want to look at:"));
             if (select_menu(win, PICK_ONE, &pick_list) > 0) {
                 i = pick_list->item.a_char;
                 free((genericptr_t) pick_list);

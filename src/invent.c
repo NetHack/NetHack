@@ -2597,7 +2597,7 @@ reroll_menu(void)
     add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
              buf, MENU_ITEMFLAGS_NONE);
 
-    end_menu(win, "Reroll this character?");
+    end_menu(win, _("Reroll this character?"));
     if (select_menu(win, PICK_ONE, &pick_list) > 0) {
         option = pick_list[0].item.a_char;
         free((genericptr_t) pick_list);
@@ -3506,7 +3506,7 @@ display_used_invlets(char avoidlet)
                 continue;
             invdone = 1;
         }
-        end_menu(win, "Inventory letters used:");
+        end_menu(win, _("Inventory letters used:"));
 
         n = select_menu(win, PICK_ONE, &selected);
         if (n > 0) {

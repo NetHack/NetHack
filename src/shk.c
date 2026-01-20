@@ -1662,7 +1662,7 @@ menu_pick_pay_items(
                  MENU_ITEMFLAGS_NONE);
     }
 
-    end_menu(win, "Pay for which items?");
+    end_menu(win, _("Pay for which items?"));
     n = select_menu(win, PICK_ANY, &pick_list);
     destroy_nhwindow(win);
 

@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 12:23+0900\n"
+"POT-Creation-Date: 2026-01-20 12:28+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -1794,6 +1794,10 @@ msgstr "%s좋아졌다."
 msgid "re-energized."
 msgstr "재충전되었다."
 
+#: src/artifact.c:1891
+msgid "Open a portal to which dungeon?"
+msgstr "어느 던전으로 포탈을 열까요?"
+
 #: src/artifact.c:1923 src/teleport.c:1177
 msgid "very disoriented for a moment."
 msgstr "잠시 매우 혼란스러웠다."
@@ -2321,6 +2325,10 @@ msgstr "광산 끝"
 msgid "Soko-prize"
 msgstr "소코반 보상"
 
+#: src/cmd.c:1148
+msgid "View which?"
+msgstr "무엇을 볼까요?"
+
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
@@ -2406,6 +2414,15 @@ msgstr "키 '%s'를 \"%s\"에 바인딩했다."
 #: src/cmd.c:2225
 msgid "Key binding failed?!"
 msgstr "키 바인딩 실패?!"
+
+#: src/cmd.c:2255 src/options.c:9304
+msgid "Do what?"
+msgstr "무엇을 할까요?"
+
+#: src/cmd.c:2304
+#, fuzzy
+msgid "Which commands autocomplete?"
+msgstr "[A] 명령 자동완성"
 
 #: src/cmd.c:2680
 msgid "    Full Current Key Bindings List"
@@ -2776,6 +2793,11 @@ msgstr "무언가"
 #, fuzzy
 msgid "Travel here"
 msgstr "여행자"
+
+#: src/cmd.c:4653
+#, fuzzy
+msgid "What do you want to do?"
+msgstr "무엇을 버리겠습니까?"
 
 #
 #: src/cmd.c:5101
@@ -4320,6 +4342,11 @@ msgstr "각인하는 동안 %s{이/가} 미끄러졌다."
 msgid "engrave: \"%s\"."
 msgstr "각인: \"%s\"."
 
+#: src/do_name.c:550
+#, fuzzy
+msgid "What do you want to name?"
+msgstr "%s 것이 무엇입니까?"
+
 #: src/do_name.c:580
 msgid "would never recognize another one."
 msgstr "다른 것은 절대 알아보지 못할 것이다."
@@ -5852,7 +5879,7 @@ msgstr "구름"
 msgid "air"
 msgstr "공기"
 
-#: src/dungeon.c:1759
+#: src/dungeon.c:1759 src/options.c:5619
 msgid "bottom"
 msgstr "바닥"
 
@@ -5891,6 +5918,11 @@ msgstr "바닥"
 #: src/dungeon.c:1781
 msgid "ground"
 msgstr "땅"
+
+#: src/dungeon.c:2363
+#, fuzzy
+msgid "Level teleport to where:"
+msgstr "층 순간이동 함정을 %s!"
 
 #: src/dungeon.c:2488
 #, c-format
@@ -8870,6 +8902,10 @@ msgstr "그게 전부였다."
 msgid "No applicable objects."
 msgstr "해당하는 물건이 없다."
 
+#: src/invent.c:2600
+msgid "Reroll this character?"
+msgstr "이 캐릭터를 다시 굴릴까요?"
+
 #: src/invent.c:2693
 msgid "Choose an item; use ESC to decline."
 msgstr "항목을 선택하세요; ESC로 취소."
@@ -8901,6 +8937,11 @@ msgstr "%s%s%s%s"
 #, c-format
 msgid "%s %s (no weapon)"
 msgstr "%s %s (무기 없음)"
+
+#: src/invent.c:3509
+#, fuzzy
+msgid "Inventory letters used:"
+msgstr "소지품:"
 
 #: src/invent.c:3776
 #, c-format
@@ -12432,6 +12473,11 @@ msgstr "TEST:{ x=%i, y=%i, name=\"%s\" }"
 msgid "Resetting time to move #%ld."
 msgstr "이동 시간을 #%ld로 재설정."
 
+#: src/o_init.c:632
+#, fuzzy
+msgid "Ordering of discoveries"
+msgstr "장식의 반지"
+
 #: src/o_init.c:761
 msgid "Unique items"
 msgstr "고유 물품"
@@ -12447,6 +12493,12 @@ msgstr "발견한 물품"
 #: src/o_init.c:1109
 msgid "None of your discoveries can be assigned names..."
 msgstr "발견한 것 중 이름을 붙일 수 있는 것이 없다..."
+
+#
+#: src/o_init.c:1111
+#, fuzzy
+msgid "Pick an object type to name"
+msgstr "냄새 맡을 몬스터를 선택하세요."
 
 #: src/obj_descr_i18n.c:20
 msgid "ruby"
@@ -14311,6 +14363,35 @@ msgstr "메뉴 스타일 선택:"
 msgid "'menustyle' %s \"%s\"."
 msgstr "'menustyle' %s \"%s\"."
 
+#: src/options.c:5616
+#, fuzzy
+msgid "top"
+msgstr "토파즈"
+
+#: src/options.c:5622
+msgid "left"
+msgstr "왼쪽"
+
+#: src/options.c:5625
+#, fuzzy
+msgid "right"
+msgstr "밝은"
+
+#: src/options.c:5627
+#, c-format
+msgid "Select %s window placement relative to the map:"
+msgstr "지도에 대한 %s 창 위치 선택:"
+
+#: src/options.c:5628
+#, fuzzy
+msgid "message"
+msgstr "통로"
+
+#: src/options.c:5628
+#, fuzzy
+msgid "status"
+msgstr "상태"
+
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
@@ -14420,10 +14501,6 @@ msgstr "어떤 옵션을 설정할까요?"
 msgid "Menu control keys:"
 msgstr "메뉴 조작 키:"
 
-#: src/options.c:9304
-msgid "Do what?"
-msgstr "무엇을 할까요?"
-
 #: src/options.c:9335
 #, c-format
 msgid "Autopickup: %s."
@@ -14529,6 +14606,11 @@ msgstr "? 'data' 파일 탐색 오류!"
 #: src/pager.c:1116
 msgid "You don't have any information on those things."
 msgstr "그것들에 대한 정보가 없다."
+
+#: src/pager.c:1799
+#, fuzzy
+msgid "What do you want to look at:"
+msgstr "무엇을 버리겠습니까?"
 
 #: src/pager.c:1901
 #, c-format
@@ -14891,6 +14973,11 @@ msgstr "거대한 이빨이 자라나 물었다!"
 msgid "Being confused, you find nothing to loot."
 msgstr "혼란스러워서 약탈할 것을 찾지 못했다."
 
+#: src/pickup.c:2249
+#, fuzzy
+msgid "Loot which containers?"
+msgstr "용기를 여는 중"
+
 #: src/pickup.c:2283
 msgid "need to dig up the grave to effectively loot it..."
 msgstr "효과적으로 약탈하려면 무덤을 파야 한다..."
@@ -15101,6 +15188,11 @@ msgstr "완료"
 #, fuzzy
 msgid "do nothing"
 msgstr "아무것도 없는 지팡이"
+
+#: src/pickup.c:3516
+#, fuzzy
+msgid "Tip which container?"
+msgstr "용기를 기울이는 중"
 
 #: src/pickup.c:3572
 #, fuzzy, c-format
@@ -18867,6 +18959,10 @@ msgstr "만족한 %s{이/가} 갑자기 사라졌다!"
 msgid "%s calms down."
 msgstr "%s{이/가} 진정되었다."
 
+#: src/shk.c:1665
+msgid "Pay for which items?"
+msgstr "어떤 물건의 대금을 지불할까요?"
+
 #: src/shk.c:1725
 msgid "appears to be no shopkeeper here to receive your payment."
 msgstr "지불을 받을 상점 주인이 여기 없는 것 같다."
@@ -20862,6 +20958,11 @@ msgstr "시도는 충분히 했다."
 msgid "don't know that spell."
 msgstr "그 주문을 모른다."
 
+#: src/spell.c:806
+#, fuzzy
+msgid "Cast which spell?"
+msgstr "%s{은/는} 알을 낳을 수 없다!"
+
 # ============================================================
 # 전투 메시지 (Combat Messages)
 # ============================================================
@@ -20971,6 +21072,10 @@ msgstr "주문이 끊겼다!"
 #: src/spell.c:1680
 msgid "mind fails to lock onto that location!"
 msgstr "그 위치에 정신을 집중하지 못했다!"
+
+#: src/spell.c:1993
+msgid "View known spells list sorted"
+msgstr "알려진 주문 목록 정렬 보기"
 
 #: src/spell.c:2053
 msgid "You didn't know any spells."
@@ -21387,6 +21492,11 @@ msgstr "%s 어디로 순간이동하겠습니까?"
 #: src/teleport.c:893 src/teleport.c:1398
 msgid "Sorry..."
 msgstr "미안..."
+
+#: src/teleport.c:970
+#, fuzzy
+msgid "Which way do you want to teleport?"
+msgstr "무엇을 버리겠습니까?"
 
 #: src/teleport.c:1047
 msgid "This is a vault teleport, usable once only."
@@ -27340,9 +27450,6 @@ msgstr "%s 폭발"
 #~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 #~ "독구름 두루마리"
 
-#~ msgid "ring of adornment"
-#~ msgstr "장식의 반지"
-
 #~ msgid "ring of gain strength"
 #~ msgstr "힘 증가의 반지"
 
@@ -28249,9 +28356,6 @@ msgstr "%s 폭발"
 # ============================================================
 #~ msgid "You "
 #~ msgstr "당신은 "
-
-#~ msgid "What do you want to drop?"
-#~ msgstr "무엇을 버리겠습니까?"
 
 #~ msgid "What do you want to pick up?"
 #~ msgstr "무엇을 주우시겠습니까?"

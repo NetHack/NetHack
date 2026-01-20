@@ -2246,7 +2246,7 @@ doloot_core(void)
                     add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                              doname(cobj), MENU_ITEMFLAGS_NONE);
                 }
-            end_menu(win, "Loot which containers?");
+            end_menu(win, _("Loot which containers?"));
             n = select_menu(win, PICK_ANY, &pick_list);
             destroy_nhwindow(win);
 
@@ -3513,7 +3513,7 @@ choose_tip_container_menu(void)
                  clr, "tip something being carried",
                  MENU_ITEMFLAGS_SELECTED);
     }
-    end_menu(win, "Tip which container?");
+    end_menu(win, _("Tip which container?"));
     n = select_menu(win, PICK_ONE, &pick_list);
     destroy_nhwindow(win);
     /*
