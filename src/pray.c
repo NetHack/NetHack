@@ -2279,7 +2279,7 @@ prayer_done(void) /* M. Stephenson (1.0.3b) */
     if (gp.p_type == -2) {
         /* praying at an unaligned altar, not necessarily in Gehennom */
         You(_("%s diabolical laughter all around you..."),
-            !Deaf ? "hear" : "intuit");
+            !Deaf ? _("hear") : _("intuit"));
         wake_nearby(FALSE);
         adjalign(-2);
         exercise(A_WIS, FALSE);

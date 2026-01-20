@@ -498,8 +498,8 @@ use_magic_whistle(struct obj *obj)
     if (!can_blow(&gy.youmonst)) {
         You(_("are incapable of using the whistle."));
     } else if (obj->cursed && !rn2(2)) {
-        You(_("produce a %shigh-%s."), Underwater ? "very " : "",
-            Deaf ? "frequency vibration" : "pitched humming noise");
+        You(_("produce a %shigh-%s."), Underwater ? _("very ") : "",
+            Deaf ? _("frequency vibration") : _("pitched humming noise"));
         wake_nearby(TRUE);
         if (!rn2(2))
             tele_to_rnd_pet();

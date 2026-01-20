@@ -2616,7 +2616,7 @@ trapeffect_rolling_boulder_trap(
 
         feeltrap(trap);
         pline(_("%sYou trigger a rolling boulder trap!"),
-              !Deaf ? "Click!  " : "");
+              !Deaf ? _("Click!  ") : "");
         if (!launch_obj(BOULDER, trap->launch.x, trap->launch.y,
                         trap->launch2.x, trap->launch2.y, style)) {
             deltrap(trap);
@@ -2634,8 +2634,8 @@ trapeffect_rolling_boulder_trap(
             newsym(mtmp->mx, mtmp->my);
             if (in_sight)
                 pline_mon(mtmp, _("%s%s triggers %s."),
-                      !Deaf ? "Click!  " : "", Monnam(mtmp),
-                      trap->tseen ? "a rolling boulder trap" : something);
+                      !Deaf ? _("Click!  ") : "", Monnam(mtmp),
+                      trap->tseen ? _("a rolling boulder trap") : something);
             if (launch_obj(BOULDER, trap->launch.x, trap->launch.y,
                            trap->launch2.x, trap->launch2.y, style)) {
                 if (in_sight)
