@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 13:02+0900\n"
+"POT-Creation-Date: 2026-01-20 13:04+0900\n"
 "PO-Revision-Date: 2026-01-17 00:00+0900\n"
 "Last-Translator: HanNetHack Project\n"
 "Language-Team: Korean\n"
@@ -3232,6 +3232,35 @@ msgstr "숨겨진 통로를 발견했다."
 #: src/detect.c:2363
 msgid "are too disoriented for this."
 msgstr "너무 혼란스러워서 이것을 할 수 없다."
+
+#: src/detect.c:2390
+#, fuzzy
+msgid "underlying terrain"
+msgstr "조잡한 고리 갑옷"
+
+#: src/detect.c:2392
+msgid "known terrain"
+msgstr "알려진 지형"
+
+#: src/detect.c:2394
+#, fuzzy, c-format
+msgid "%s traps"
+msgstr "%s{이/가} 갇혔다!"
+
+#: src/detect.c:2395 src/detect.c:2399
+#, fuzzy
+msgid " and"
+msgstr ", "
+
+#: src/detect.c:2397
+#, fuzzy, c-format
+msgid "%s%s objects"
+msgstr "여기에 %s%s 물체가 있다."
+
+#: src/detect.c:2401
+#, fuzzy, c-format
+msgid "%s and monsters"
+msgstr "보이지 않는 괴물!"
 
 #: src/detect.c:2404
 #, c-format
@@ -8843,12 +8872,12 @@ msgstr "주무기로 전환한다."
 msgid "Toggle two-weapon combat %s"
 msgstr "이도류 전투를 시작한다."
 
-#: src/iactions.c:680
+#: src/iactions.c:680 src/insight.c:798
 #, fuzzy
 msgid "off"
 msgstr "바칠"
 
-#: src/iactions.c:680 src/trap.c:4965
+#: src/iactions.c:680 src/insight.c:784 src/trap.c:4965
 msgid "on"
 msgstr "위"
 
@@ -9007,6 +9036,44 @@ msgstr " %s에"
 #: src/insight.c:495 src/obj_descr_i18n.c:421
 msgid "actually "
 msgstr "실제로 "
+
+#: src/insight.c:787
+msgid ", but temporarily disabled while inside the shop"
+msgstr ", 하지만 상점 내에서는 일시적으로 비활성화됨"
+
+#: src/insight.c:790
+#, fuzzy, c-format
+msgid " for %s%s%s"
+msgstr "당신의 %s %s%s"
+
+#: src/insight.c:791
+#, fuzzy
+msgid "all types"
+msgstr "벽 %s"
+
+#: src/insight.c:793
+#, fuzzy
+msgid " plus thrown"
+msgstr "던질"
+
+#: src/insight.c:795
+#, fuzzy
+msgid ", with exceptions"
+msgstr "게임 옵션 목록."
+
+#: src/insight.c:799
+#, fuzzy
+msgid "Autopickup "
+msgstr "자동 줍기: %s."
+
+#: src/insight.c:799
+#, fuzzy
+msgid "is "
+msgstr "촉촉한 "
+
+#: src/insight.c:799
+msgid "was "
+msgstr "당시 "
 
 #: src/insight.c:945 src/obj_descr_i18n.c:422
 msgid "transformed"
@@ -27665,9 +27732,6 @@ msgstr "tty perm_invent는 최소 %dx%d 터미널이 필요한데, 현재 터미
 #~ "오크 고리 갑옷\n"
 #~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
 #~ "오크 링 메일"
-
-#~ msgid "crude ring mail"
-#~ msgstr "조잡한 고리 갑옷"
 
 #~ msgid "leather jacket"
 #~ msgstr "가죽 재킷"

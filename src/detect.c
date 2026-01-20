@@ -2387,18 +2387,18 @@ reveal_terrain(
            cursor there, and after moving it anywhere '@' moves it back */
         flush_screen(1);
         if (full) {
-            Strcpy(buf, "underlying terrain");
+            Strcpy(buf, _("underlying terrain"));
         } else {
-            Strcpy(buf, "known terrain");
+            Strcpy(buf, _("known terrain"));
             if (keep_traps)
-                Sprintf(eos(buf), "%s traps",
-                        (keep_objs || keep_mons) ? "," : " and");
+                Sprintf(eos(buf), _("%s traps"),
+                        (keep_objs || keep_mons) ? "," : _(" and"));
             if (keep_objs)
-                Sprintf(eos(buf), "%s%s objects",
+                Sprintf(eos(buf), _("%s%s objects"),
                         (keep_traps || keep_mons) ? "," : "",
-                        keep_mons ? "" : " and");
+                        keep_mons ? "" : _(" and"));
             if (keep_mons)
-                Sprintf(eos(buf), "%s and monsters",
+                Sprintf(eos(buf), _("%s and monsters"),
                         (keep_traps || keep_objs) ? "," : "");
         }
         pline(_("Showing %s only..."), buf);

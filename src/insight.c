@@ -781,22 +781,22 @@ basics_enlightenment(int mode UNUSED, int final)
     if (flags.pickup) {
         char ocl[MAXOCLASSES + 1];
 
-        Strcpy(buf, "on");
+        Strcpy(buf, _("on"));
         if (costly_spot(u.ux, u.uy)) {
             /* being in a shop inhibits autopickup, even 'pickup_thrown' */
-            Strcat(buf, ", but temporarily disabled while inside the shop");
+            Strcat(buf, _(", but temporarily disabled while inside the shop"));
         } else {
             oc_to_str(flags.pickup_types, ocl);
-            Sprintf(eos(buf), " for %s%s%s", *ocl ? "'" : "",
-                    *ocl ? ocl : "all types", *ocl ? "'" : "");
+            Sprintf(eos(buf), _(" for %s%s%s"), *ocl ? "'" : "",
+                    *ocl ? ocl : _("all types"), *ocl ? "'" : "");
             if (flags.pickup_thrown && *ocl)
-                Strcat(buf, " plus thrown"); /* show when not 'all types' */
+                Strcat(buf, _(" plus thrown")); /* show when not 'all types' */
             if (ga.apelist)
-                Strcat(buf, ", with exceptions");
+                Strcat(buf, _(", with exceptions"));
         }
     } else
-        Strcpy(buf, "off");
-    enl_msg("Autopickup ", "is ", "was ", buf, "");
+        Strcpy(buf, _("off"));
+    enl_msg(_("Autopickup "), _("is "), _("was "), buf, "");
 }
 
 /* characteristics: expanded version of bottom line strength, dexterity, &c */
