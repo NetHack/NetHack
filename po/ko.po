@@ -1945,7 +1945,7 @@ msgstr "%s에서 닿는 것에 능숙하지 않다."
 #: ../src/apply.c:2884
 #, c-format
 msgid "Continue your attempt to set %s?"
-msgstr "%s 설치 시도를 계속할까요?"
+msgstr "%s 설치 시도를 계속하시겠습니까?"
 
 #: ../src/apply.c:2895
 #, c-format
@@ -2102,7 +2102,7 @@ msgstr "여기서 그것을 쓰기에는 공간이 부족하다."
 
 #: ../src/apply.c:3271
 msgid "Where do you want to hit?"
-msgstr "어디를 치겠는가?"
+msgstr "어디를 치겠습니까?"
 
 #: ../src/apply.c:3272
 msgid "won't hit anything if you can't see that spot."
@@ -2213,7 +2213,7 @@ msgstr "%s"
 
 #: ../src/apply.c:3795
 msgid "Aim for what?"
-msgstr "무엇을 겨냥할까요?"
+msgstr "무엇을 겨냥하시겠습니까?"
 
 #: ../src/apply.c:3816
 #, c-format
@@ -2264,7 +2264,7 @@ msgstr "%s{을/를} 부술 힘이 없다!"
 
 #: ../src/apply.c:3933
 msgid "Are you really sure you want to break "
-msgstr "정말로 들어가겠는가?"
+msgstr "정말로 들어가겠습니까?"
 
 #: ../src/apply.c:3934
 msgid "the wand"
@@ -3757,7 +3757,7 @@ msgstr "모든 수동 설정과 주석이 파일에서 제거된다!"
 #: ../src/cfgfiles.c:185
 #, c-format
 msgid "Overwrite config file %.*s?"
-msgstr "설정 파일 %.*s{을/를} 덮어쓰겠는가?"
+msgstr "설정 파일 %.*s{을/를} 덮어쓰겠습니까?"
 
 #: ../src/cfgfiles.c:204
 #, c-format
@@ -3949,7 +3949,7 @@ msgstr "주의! 탐험 모드에서는 %s(으)로 돌아갈 수 없다,"
 
 #: ../src/cmd.c:969
 msgid "Do you want to enter explore mode?"
-msgstr "행동 수칙을 보겠는가?"
+msgstr "행동 수칙을 보겠습니까?"
 
 #: ../src/cmd.c:973
 msgid "are now in non-scoring explore mode."
@@ -3978,7 +3978,7 @@ msgstr "소코반 보상"
 
 #: ../src/cmd.c:1149
 msgid "View which?"
-msgstr "무엇을 볼까요?"
+msgstr "무엇을 보시겠습니까?"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -4052,7 +4052,7 @@ msgstr "접두사: 명령 앞에 횟수를 지정할 때 숫자용"
 
 #: ../src/cmd.c:2142 ../src/cmd.c:2208
 msgid "Bind which key? "
-msgstr "어떤 키를 바인딩하겠는가? "
+msgstr "어떤 키를 바인딩하시겠습니까? "
 
 # ============================================================
 # 명령 UI 메시지 (Command UI Messages)
@@ -4074,11 +4074,11 @@ msgstr "없음: 키 연결 해제"
 #: ../src/cmd.c:2185
 #, c-format
 msgid "Bind '%s' to what command?"
-msgstr "'%s'을(를) 어떤 명령에 연결할까?"
+msgstr "'%s'을(를) 어떤 명령에 연결하시겠습니까?"
 
 #: ../src/cmd.c:2187
 msgid "Bind what command?"
-msgstr "어떤 명령을 연결할까?"
+msgstr "어떤 명령을 연결하시겠습니까?"
 
 #: ../src/cmd.c:2219
 #, c-format
@@ -4096,11 +4096,11 @@ msgstr "키 바인딩 실패?!"
 
 #: ../src/cmd.c:2256 ../src/options.c:9304
 msgid "Do what?"
-msgstr "무엇을 할까요?"
+msgstr "무엇을 하시겠습니까?"
 
 #: ../src/cmd.c:2305
 msgid "Which commands autocomplete?"
-msgstr "어떤 명령을 자동완성할까요?"
+msgstr "어떤 명령을 자동완성하시겠습니까?"
 
 #: ../src/cmd.c:2397 ../src/monmove.c:43 ../src/muse.c:3102
 msgid "move"
@@ -4507,7 +4507,7 @@ msgstr "지도 기호 보기"
 
 #: ../src/cmd.c:4654
 msgid "What do you want to do?"
-msgstr "무엇을 하겠는가?"
+msgstr "무엇을 하시겠습니까?"
 
 # ============================================================
 # 전투 메시지 (Combat Messages)
@@ -4535,7 +4535,7 @@ msgstr "횟수: %ld "
 #
 #: ../src/cmd.c:5102
 msgid "Where do you want to travel to?"
-msgstr "어디로 이동하겠는가?"
+msgstr "어디로 이동하시겠습니까?"
 
 #: ../src/cmd.c:5121
 msgid "No travel destination set."
@@ -5082,7 +5082,7 @@ msgstr "물체, 괴물, 또는 특수 지도 기호를 찾을 수 있다."
 
 #: ../src/detect.c:1301
 msgid "What do you look for?"
-msgstr "무엇을 찾겠는가?"
+msgstr "무엇을 찾겠습니까?"
 
 #: ../src/detect.c:1313
 #, c-format
@@ -5708,7 +5708,7 @@ msgstr "블루토"
 #: ../src/dig.c:1152
 #, c-format
 msgid "In what direction do you want to %s? [%s]"
-msgstr "어느 방향으로 %s하겠는가? [%s]"
+msgstr "어느 방향으로 %s하시겠습니까? [%s]"
 
 #: ../src/dig.c:1170 ../src/dig.c:1277
 msgid "digging"
@@ -6596,7 +6596,7 @@ msgstr "형언할 수 없는 잔인함과 해로움이 저 아래에 도사리�
 
 #: ../src/do.c:1246
 msgid "Are you sure you want to enter?"
-msgstr "정말로 들어가겠는가?"
+msgstr "정말로 들어가겠습니까?"
 
 #: ../src/do.c:1248
 msgid "So be it."
@@ -6665,7 +6665,7 @@ msgstr "짐이 너무 무거워서 %s{을/를} 오를 수 없다."
 
 #: ../src/do.c:1334
 msgid "Beware, there will be no return!  Still climb?"
-msgstr "주의, 돌아올 수 없습니다! 그래도 올라가겠는가?"
+msgstr "주의, 돌아올 수 없습니다! 그래도 올라가겠습니까?"
 
 #: ../src/do.c:1441
 msgid "(monster in hero's way)"
@@ -8695,7 +8695,7 @@ msgstr "발로 차기에 너무 작다."
 
 #: ../src/dokick.c:1278
 msgid "Kick your steed?"
-msgstr "탈것을 차겠는가?"
+msgstr "탈것을 차겠습니까?"
 
 #: ../src/dokick.c:1286
 msgid "kicking"
@@ -9463,7 +9463,7 @@ msgstr "이 층을 %s{으로/로} 기억한다."
 #: ../src/dungeon.c:2513
 #, c-format
 msgid "Replace annotation \"%.30s%s\" with?"
-msgstr "주석 \"%.30s%s\"을 무엇으로 바꾸겠는가?"
+msgstr "주석 \"%.30s%s\"을 무엇으로 바꾸겠습니까?"
 
 #: ../src/dungeon.c:2522
 msgid "this dungeon level"
@@ -9956,7 +9956,7 @@ msgstr "%s 냄새가 난다."
 
 #: ../src/eat.c:1581 ../src/eat.c:1653
 msgid "Eat it?"
-msgstr "먹으겠는가?"
+msgstr "먹으겠습니까?"
 
 #: ../src/eat.c:1583 ../src/eat.c:1655
 msgid "discard the open tin."
@@ -10601,7 +10601,7 @@ msgstr "열 깡통이 없다."
 
 #: ../src/eat.c:3108
 msgid "Really wield "
-msgstr "정말로 저장하겠는가?"
+msgstr "정말로 저장하시겠습니까?"
 
 #: ../src/eat.c:3310
 msgid "You're having a hard time getting all of it down."
@@ -10613,7 +10613,7 @@ msgstr "드디어 다 먹었다."
 
 #: ../src/eat.c:3320
 msgid "Continue eating?"
-msgstr "계속 먹으겠는가?"
+msgstr "계속 먹으겠습니까?"
 
 # ============================================================
 # 사망 메시지 (Death Messages)
@@ -10758,7 +10758,7 @@ msgstr "여기에 층 이동 장치가 있다. 작동시키겠습니까?"
 #: ../src/eat.c:3659
 #, c-format
 msgid "There are %ld gold pieces here; eat them?"
-msgstr "여기에 금화 %ld닢이 있습니다; 먹으겠는가?"
+msgstr "여기에 금화 %ld닢이 있습니다; 먹으겠습니까?"
 
 # ============================================================
 # UI 메시지 (invent.c - "here" 관련)
@@ -10906,14 +10906,14 @@ msgstr "속았다"
 
 #: ../src/end.c:99
 msgid "Switch from the tutorial back to regular play?"
-msgstr "튜토리얼에서 일반 게임으로 전환하겠는가?"
+msgstr "튜토리얼에서 일반 게임으로 전환하시겠습니까?"
 
 # ============================================================
 # 게임 UI 메시지 (Game UI Messages)
 # ============================================================
 #: ../src/end.c:103
 msgid "Really quit without saving?"
-msgstr "저장하지 않고 정말 종료하겠는가?"
+msgstr "저장하지 않고 정말 종료하시겠습니까?"
 
 #
 #: ../src/end.c:199
@@ -11006,31 +11006,31 @@ msgstr "소지품:"
 # ============================================================
 #: ../src/end.c:631
 msgid "Do you want to see what you had when you quit?"
-msgstr "종료했을 때 가지고 있던 것을 보겠는가?"
+msgstr "종료했을 때 가지고 있던 것을 보겠습니까?"
 
 #: ../src/end.c:633
 msgid "Do you want to see what you had when you died?"
-msgstr "죽었을 때 가지고 있던 것을 보겠는가?"
+msgstr "죽었을 때 가지고 있던 것을 보겠습니까?"
 
 #: ../src/end.c:635
 msgid "Do you want your possessions identified?"
-msgstr "소지품을 감정하겠는가?"
+msgstr "소지품을 감정하시겠습니까?"
 
 #: ../src/end.c:652
 msgid "Do you want to see your attributes?"
-msgstr "능력치를 보겠는가?"
+msgstr "능력치를 보겠습니까?"
 
 #: ../src/end.c:678
 msgid "Do you want to see your conduct and achievements?"
-msgstr "행동 수칙과 업적을 보겠는가?"
+msgstr "행동 수칙과 업적을 보겠습니까?"
 
 #: ../src/end.c:680
 msgid "Do you want to see your conduct?"
-msgstr "행동 수칙을 보겠는가?"
+msgstr "행동 수칙을 보겠습니까?"
 
 #: ../src/end.c:693
 msgid "Do you want to see the dungeon overview?"
-msgstr "던전 개요를 보겠는가?"
+msgstr "던전 개요를 보겠습니까?"
 
 #: ../src/end.c:728
 msgid "You survived that attempt on your life."
@@ -11089,7 +11089,7 @@ msgstr "불행히도 여전히 몰살 상태다..."
 
 #: ../src/end.c:1113
 msgid "Die?"
-msgstr "죽으겠는가?"
+msgstr "죽으겠습니까?"
 
 #: ../src/end.c:1114
 #, c-format
@@ -11301,7 +11301,7 @@ msgstr "읽을"
 
 #: ../src/engrave.c:509
 msgid "What would you write?  \"Jonah was here\"?"
-msgstr "무엇을 쓰겠는가? \"요나가 여기 있었다\"?"
+msgstr "무엇을 쓰겠습니까? \"요나가 여기 있었다\"?"
 
 #: ../src/engrave.c:518 ../src/engrave.c:521
 #, c-format
@@ -11604,7 +11604,7 @@ msgstr "먼지로 %s에 쓰려고 해봤자 소용없다."
 # === Y/N prompts ===
 #: ../src/engrave.c:1119
 msgid "Do you want to add to the current engraving?"
-msgstr "현재 새긴 글에 추가하겠는가?"
+msgstr "현재 새긴 글에 추가하시겠습니까?"
 
 #: ../src/engrave.c:1132
 #, c-format
@@ -13675,7 +13675,7 @@ msgstr "이 채찍으로 휘두르기"
 
 #: ../src/iactions.c:319
 msgid "Grapple something with this hook"
-msgstr "분수에서 마겠는가?"
+msgstr "분수에서 마겠습니까?"
 
 #: ../src/iactions.c:322
 msgid "Reach into this bag"
@@ -13757,7 +13757,7 @@ msgstr "%s %s{이/가} 기름지다."
 #: ../src/iactions.c:373
 #, c-format
 msgid "Dip something into %s potion%s"
-msgstr "분수에서 마겠는가?"
+msgstr "분수에서 마겠습니까?"
 
 #: ../src/iactions.c:374 ../src/iactions.c:426 ../src/iactions.c:454
 #: ../src/iactions.c:578
@@ -13986,7 +13986,7 @@ msgstr "%s{이/가} %s{을/를} 때렸다."
 
 #: ../src/iactions.c:561
 msgid "Rub something on this stone"
-msgstr "분수에서 마겠는가?"
+msgstr "분수에서 마겠습니까?"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -15110,7 +15110,7 @@ msgstr "기록됨"
 
 #: ../src/insight.c:2848
 msgid "Do you want an account of creatures vanquished?"
-msgstr "처치한 생물 목록을 보겠는가?"
+msgstr "처치한 생물 목록을 보겠습니까?"
 
 #: ../src/insight.c:2869
 msgid "Vanquished creatures:"
@@ -15449,7 +15449,7 @@ msgstr "%s{을/를} 선택하여 영구적으로 확인"
 
 #: ../src/invent.c:3242
 msgid "any or all of them"
-msgstr "대신 전부 준비할까?"
+msgstr "대신 전부 준비하시겠습니까?"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -15797,7 +15797,7 @@ msgstr "조정할"
 
 #: ../src/invent.c:5027
 msgid "Split off how many?"
-msgstr "몇 개를 분리하겠는가?"
+msgstr "몇 개를 분리하시겠습니까?"
 
 #: ../src/invent.c:5054
 msgid "Amount to split from current stack must be"
@@ -15976,7 +15976,7 @@ msgstr "함정을 찾았다!"
 
 #: ../src/lock.c:116
 msgid "Do you want to try to disarm it?"
-msgstr "튜토리얼을 진행하겠는가?"
+msgstr "튜토리얼을 진행하시겠습니까?"
 
 #: ../src/lock.c:128 ../src/obj_descr_i18n.c:159 ../src/pager.c:2355
 msgid "chest"
@@ -16306,7 +16306,7 @@ msgstr "이 문은 잠겨있다."
 
 #: ../src/lock.c:885
 msgid "Kick it?"
-msgstr "발로 차겠는가?"
+msgstr "발로 차겠습니까?"
 
 #: ../src/lock.c:898
 msgid "You're too small to pull the door open."
@@ -16671,7 +16671,7 @@ msgstr "여마법사"
 
 #: ../src/makemon.c:2143 ../src/mkobj.c:1632
 msgid "becomes"
-msgstr "%s{이/가} 되겠는가?"
+msgstr "%s{이/가} 되겠습니까?"
 
 #: ../src/makemon.c:2144
 msgid "grows up into"
@@ -18395,7 +18395,7 @@ msgstr "조크미드"
 
 #: ../src/minion.c:366
 msgid "How much will you offer?"
-msgstr "얼마를 제안하겠는가?"
+msgstr "얼마를 제안하시겠습니까?"
 
 #: ../src/minion.c:373
 #, c-format
@@ -19099,7 +19099,7 @@ msgstr "그것을 %s할 수 없다!"
 
 #: ../src/mon.c:5099
 msgid " kind of monster?"
-msgstr "어떤 종류의 괴물이 되겠는가? [이름을 입력하세요]"
+msgstr "어떤 종류의 괴물이 되겠습니까? [이름을 입력하세요]"
 
 #: ../src/mon.c:5129
 msgid "It can't become that."
@@ -20810,15 +20810,15 @@ msgstr "%s{을/를} 연주할 수 없다."
 
 #: ../src/music.c:778
 msgid "Improvise?"
-msgstr "즉흥 연주하겠는가?"
+msgstr "즉흥 연주하시겠습니까?"
 
 #: ../src/music.c:787
 msgid "Play the passtune?"
-msgstr "통과 선율을 연주하겠는가?"
+msgstr "통과 선율을 연주하시겠습니까?"
 
 #: ../src/music.c:793
 msgid "What tune are you playing? [5 notes, A-G]"
-msgstr "어떤 선율을 연주하겠는가? [5개의 음, A-G]"
+msgstr "어떤 선율을 연주하시겠습니까? [5개의 음, A-G]"
 
 #: ../src/music.c:806
 #, c-format
@@ -22733,7 +22733,7 @@ msgstr "('y' 또는 'n'을 선택해.)"
 
 #: ../src/options.c:483
 msgid "Do you want a tutorial?"
-msgstr "튜토리얼을 진행하겠는가?"
+msgstr "튜토리얼을 진행하시겠습니까?"
 
 #: ../src/options.c:1755
 msgid "Doing that so many times isn't very fruitful."
@@ -22855,7 +22855,7 @@ msgstr "메뉴 제목 강조 표시 방법:"
 
 #: ../src/options.c:5835
 msgid "Set object symbols in menus to what?"
-msgstr "메뉴의 물건 기호를 어떻게 설정할까요?"
+msgstr "메뉴의 물건 기호를 어떻게 설정하시겠습니까?"
 
 #: ../src/options.c:5885
 msgid "Select message history display type:"
@@ -22993,7 +22993,7 @@ msgstr "기타 설정:"
 
 #: ../src/options.c:8978
 msgid "Set what options?"
-msgstr "어떤 옵션을 설정할까요?"
+msgstr "어떤 옵션을 설정하시겠습니까?"
 
 #: ../src/options.c:9158
 msgid "Menu control keys:"
@@ -23415,7 +23415,7 @@ msgstr "무엇을 버리겠습니까?"
 
 #: ../src/pager.c:1841
 msgid "Specify what? (type the word)"
-msgstr "무엇을 지정하겠는가? (단어를 입력하세요)"
+msgstr "무엇을 지정하시겠습니까? (단어를 입력하세요)"
 
 #: ../src/pager.c:1902
 #, c-format
@@ -23565,7 +23565,7 @@ msgstr "'&' 또는 '?'에 대해 물어보면 더 많은 정보를 얻을 수 �
 
 #: ../src/pager.c:2673
 msgid "What command?"
-msgstr "어떤 명령을 연결할까?"
+msgstr "어떤 명령을 연결하시겠습니까?"
 
 #: ../src/pager.c:2703
 #, c-format
@@ -23742,7 +23742,7 @@ msgstr "물리적으로 아무것도 주울 수 없다."
 #: ../src/pickup.c:766
 #, c-format
 msgid "Pick %d of what?"
-msgstr "무엇을 할까요?"
+msgstr "무엇을 하시겠습니까?"
 
 #: ../src/pickup.c:774 ../src/pickup.c:831
 msgid "Pick up what?"
@@ -24100,7 +24100,7 @@ msgstr "재무부가 기부금을 받아들인다."
 #: ../src/pickup.c:2439
 #, c-format
 msgid "Do you want to remove the saddle from %s?"
-msgstr "%s에서 안장을 벗기겠는가?"
+msgstr "%s에서 안장을 벗기겠습니까?"
 
 #: ../src/pickup.c:2444
 msgid "do that without limbs."
@@ -24534,7 +24534,7 @@ msgstr "시스템 쇼크"
 
 #: ../src/polyself.c:516
 msgid "Become what kind of monster? [type the name]"
-msgstr "어떤 종류의 괴물이 되겠는가? [이름을 입력하세요]"
+msgstr "어떤 종류의 괴물이 되겠습니까? [이름을 입력하세요]"
 
 #: ../src/polyself.c:564 ../src/read.c:3340
 msgid "I've never heard of such monsters."
@@ -24561,7 +24561,7 @@ msgstr "합쳐지면서 %s{이/가} 비늘로 돌아간다."
 #: ../src/polyself.c:679
 #, c-format
 msgid "Become %s?"
-msgstr "%s{이/가} 되겠는가?"
+msgstr "%s{이/가} 되겠습니까?"
 
 #: ../src/polyself.c:741
 #, c-format
@@ -24966,7 +24966,7 @@ msgstr "%s{을/를} 응시하는 것을 피했다."
 #: ../src/polyself.c:1676
 #, c-format
 msgid "Really %s %s?"
-msgstr "정말로 저장하겠는가?"
+msgstr "정말로 저장하시겠습니까?"
 
 #: ../src/polyself.c:1693
 #, c-format
@@ -25947,11 +25947,11 @@ msgstr "공기를 호흡할 수 없다면, 어떻게 액체를 마실 수 있어
 
 #: ../src/potion.c:543
 msgid "Drink from the fountain?"
-msgstr "분수에서 마겠는가?"
+msgstr "분수에서 마겠습니까?"
 
 #: ../src/potion.c:553
 msgid "Drink from the sink?"
-msgstr "싱크대에서 마겠는가?"
+msgstr "싱크대에서 마겠습니까?"
 
 #: ../src/potion.c:561
 msgid "Drink the water around you?"
@@ -26531,7 +26531,7 @@ msgstr "담그기 "
 #: ../src/potion.c:2299
 #, c-format
 msgid "%s%s into the fountain?"
-msgstr "분수에서 마겠는가?"
+msgstr "분수에서 마겠습니까?"
 
 #: ../src/potion.c:2310
 #, c-format
@@ -27539,7 +27539,7 @@ msgstr "%s{에게} 기도하기 시작했다."
 
 #: ../src/pray.c:2232
 msgid "Force the gods to be pleased?"
-msgstr "신들을 억지로 기쁘게 할까요?"
+msgstr "신들을 억지로 기쁘게 하시겠습니까?"
 
 #: ../src/pray.c:2259
 msgid "praying"
@@ -28491,7 +28491,7 @@ msgstr "이것은 불의 두루마리다!"
 #
 #: ../src/read.c:1845
 msgid "Where do you want to center the explosion?"
-msgstr "어디를 폭발의 중심으로 하겠는가?"
+msgstr "어디를 폭발의 중심으로 하시겠습니까?"
 
 #: ../src/read.c:1882
 msgid "rumbling."
@@ -28850,7 +28850,7 @@ msgstr "공과 사슬이 나타났다가 떨어졌다."
 #: ../src/read.c:3034
 #, c-format
 msgid "Where do you want to center the %scloud?"
-msgstr "%s구름의 중심을 어디로 하겠는가?"
+msgstr "%s구름의 중심을 어디로 하시겠습니까?"
 
 #: ../src/read.c:3035
 msgid "stinking "
@@ -28885,7 +28885,7 @@ msgstr "현재 %s 대신 %s{이다/다}."
 
 #: ../src/read.c:3328
 msgid "Create what kind of monster?"
-msgstr "어떤 종류의 괴물이 되겠는가? [이름을 입력하세요]"
+msgstr "어떤 종류의 괴물이 되겠습니까? [이름을 입력하세요]"
 
 #: ../src/read.c:3342
 msgid "Try again (type * for random, ESC to cancel)."
@@ -29644,7 +29644,7 @@ msgstr "마도사"
 
 #: ../src/role.c:1588 ../src/role.c:1606
 msgid "Shall I pick a character for you? [ynaq] "
-msgstr "캐릭터를 자동으로 선택할까요? [ynaq] "
+msgstr "캐릭터를 자동으로 선택하시겠습니까? [ynaq] "
 
 #: ../src/role.c:1608
 msgid "Auto-select "
@@ -29756,7 +29756,7 @@ msgstr "아직; 다른 이름 선택"
 #: ../src/role.c:2709
 #, c-format
 msgid "Is this ok? [yn%sq]"
-msgstr "이대로 진행할까요? [yn%sq]"
+msgstr "이대로 진행하시겠습니까? [yn%sq]"
 
 #
 #: ../src/role.c:2775
@@ -29847,7 +29847,7 @@ msgstr "금화가 없다."
 #: ../src/rumors.c:717
 #, c-format
 msgid "\"Wilt thou settle for a minor consultation?\" (%d %s)"
-msgstr "\"소규모 상담으로 만족하겠는가?\" (%d %s)"
+msgstr "\"소규모 상담으로 만족하시겠습니까?\" (%d %s)"
 
 #: ../src/rumors.c:725
 msgid "don't even have enough gold for that!"
@@ -29860,7 +29860,7 @@ msgstr "\"그렇다면 대규모 상담을 원하시나요?\" (%d %s)"
 
 #: ../src/save.c:46
 msgid "Really save?"
-msgstr "정말로 저장하겠는가?"
+msgstr "정말로 저장하시겠습니까?"
 
 #: ../src/save.c:52
 msgid "Saving..."
@@ -29877,7 +29877,7 @@ msgstr "오래된 저장 파일인 것 같다."
 
 #: ../src/save.c:118
 msgid "Overwrite the old file?"
-msgstr "기존 파일을 덮어쓰겠는가?"
+msgstr "기존 파일을 덮어쓰겠습니까?"
 
 #
 #: ../src/save.c:130
@@ -30201,7 +30201,7 @@ msgstr "고유 물품"
 
 #: ../src/shk.c:1665
 msgid "Pay for which items?"
-msgstr "어떤 물건의 대금을 지불할까요?"
+msgstr "어떤 물건의 대금을 지불하시겠습니까?"
 
 #: ../src/shk.c:1725
 msgid "appears to be no shopkeeper here to receive your payment."
@@ -30430,7 +30430,7 @@ msgstr "그 %s에서 미지불 물건을 제거하고 따로 사야 한다."
 #: ../src/shk.c:2209
 #, c-format
 msgid " for %ld %s.  Pay?"
-msgstr " %ld %s에. 지불하겠는가?"
+msgstr " %ld %s에. 지불하시겠습니까?"
 
 #: ../src/shk.c:2233
 #, c-format
@@ -31850,7 +31850,7 @@ msgstr "이상한 감각."
 
 #: ../src/sounds.c:192
 msgid "convulsive ravings."
-msgstr "계속 먹으겠는가?"
+msgstr "계속 먹으겠습니까?"
 
 #: ../src/sounds.c:193
 msgid "snoring snakes."
@@ -33040,7 +33040,7 @@ msgstr "\"%s\"{을/를} 이미 잘 알고 있다."
 
 #: ../src/spell.c:572
 msgid "Refresh your memory anyway?"
-msgstr "그래도 기억을 새로 하겠는가?"
+msgstr "그래도 기억을 새로 하시겠습니까?"
 
 #: ../src/spell.c:592
 msgid "This spellbook is difficult to comprehend.  Continue?"
@@ -33250,7 +33250,7 @@ msgstr "해가 뜨기를 기다리는 게 좋겠다."
 #
 #: ../src/spell.c:1658
 msgid "Where do you want to cast the spell?"
-msgstr "어디에 주문을 시전하겠는가?"
+msgstr "어디에 주문을 시전하시겠습니까?"
 
 #: ../src/spell.c:1669
 msgid "spell dissipates over the distance!"
@@ -33458,7 +33458,7 @@ msgstr "게임 오버:"
 
 #: ../src/steal.c:536
 msgid "continue removing"
-msgstr "계속 먹으겠는가?"
+msgstr "계속 먹으겠습니까?"
 
 #: ../src/steal.c:537
 msgid "start removing"
@@ -33479,7 +33479,7 @@ msgstr "벗을"
 
 #: ../src/steal.c:544
 msgid "you continue taking"
-msgstr "계속 먹으겠는가?"
+msgstr "계속 먹으겠습니까?"
 
 #
 #: ../src/steal.c:545
@@ -33582,7 +33582,7 @@ msgstr "%s에게 안장을 씌웠다."
 
 #: ../src/steed.c:186
 msgid "Force the mount to succeed?"
-msgstr "신들을 억지로 기쁘게 할까요?"
+msgstr "신들을 억지로 기쁘게 하시겠습니까?"
 
 #: ../src/steed.c:208
 #, c-format
@@ -34108,7 +34108,7 @@ msgstr "%s{이/가} 순간이동한다."
 #: ../src/teleport.c:1916
 #, c-format
 msgid "<%d,%d> is not considered viable; force anyway?"
-msgstr "<%d,%d>은(는) 유효하지 않은 것으로 간주됩니다; 그래도 강제하겠는가?"
+msgstr "<%d,%d>은(는) 유효하지 않은 것으로 간주됩니다; 그래도 강제하시겠습니까?"
 
 #: ../src/teleport.c:1922
 #, c-format
@@ -39272,7 +39272,7 @@ msgstr "정화되었다."
 
 #: ../src/were.c:225
 msgid "Remain in beast form?"
-msgstr "짐승 모습으로 남아있으겠는가?"
+msgstr "짐승 모습으로 남아있으겠습니까?"
 
 #: ../src/wield.c:81
 msgid "are no longer using two weapons at once"
@@ -39360,15 +39360,15 @@ msgstr "이미 그것을 휘두르고 있다!"
 #: ../src/wield.c:408
 #, c-format
 msgid "You have %ld %s readied.  Wield one?"
-msgstr "%ld개의 %s{이/가} 준비되어 있다. 하나를 장비할까?"
+msgstr "%ld개의 %s{이/가} 준비되어 있다. 하나를 장비하시겠습니까?"
 
 #: ../src/wield.c:421
 msgid "Wield all of them instead?"
-msgstr "대신 전부 장비할까?"
+msgstr "대신 전부 장비하시겠습니까?"
 
 #: ../src/wield.c:423
 msgid "You have that readied.  Wield it instead?"
-msgstr "그것이 준비되어 있다. 대신 장비할까?"
+msgstr "그것이 준비되어 있다. 대신 장비하시겠습니까?"
 
 #: ../src/wield.c:428
 #, c-format
@@ -39415,15 +39415,15 @@ msgstr "그것을 %s할 수 없다!"
 #: ../src/wield.c:570
 #, c-format
 msgid "You are wielding %ld %s.  Ready %ld of them?"
-msgstr "%ld개의 %s{을/를} 장비하고 있다. %ld개를 준비할까?"
+msgstr "%ld개의 %s{을/를} 장비하고 있다. %ld개를 준비하시겠습니까?"
 
 #: ../src/wield.c:583 ../src/wield.c:617
 msgid "Ready all of them instead?"
-msgstr "대신 전부 준비할까?"
+msgstr "대신 전부 준비하시겠습니까?"
 
 #: ../src/wield.c:585
 msgid "You are wielding that.  Ready it instead?"
-msgstr "그것을 장비하고 있다. 대신 준비할까?"
+msgstr "그것을 장비하고 있다. 대신 준비하시겠습니까?"
 
 #: ../src/wield.c:590
 #, c-format
@@ -39433,7 +39433,7 @@ msgstr "%s%s{이/가} %s 휘둘러졌다."
 #: ../src/wield.c:601
 #, c-format
 msgid "%s %ld %s.  Ready %ld of them?"
-msgstr "%s %ld개의 %s. %ld개를 준비할까?"
+msgstr "%s %ld개의 %s. %ld개를 준비하시겠습니까?"
 
 #: ../src/wield.c:602
 msgid "You are dual wielding"
@@ -39446,7 +39446,7 @@ msgstr "보조 무기는"
 #: ../src/wield.c:619
 #, c-format
 msgid "%s your %s weapon.  Ready it instead?"
-msgstr "%s 당신의 %s 무기다. 대신 준비할까?"
+msgstr "%s 당신의 %s 무기다. 대신 준비하시겠습니까?"
 
 #: ../src/wield.c:620
 msgid "That is"
@@ -43233,7 +43233,7 @@ msgstr "철 마법봉"
 #~ msgstr "%s에게 죽었다."
 
 #~ msgid "What do you want to pick up?"
-#~ msgstr "무엇을 주우겠는가?"
+#~ msgstr "무엇을 주우겠습니까?"
 
 #~ msgid "Really quit?"
 #~ msgstr "정말 종료하겠습니까?"
