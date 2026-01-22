@@ -90,7 +90,7 @@ tr_obj_name(const char *name)
 /*
  * Get localized filename for help/data files
  *
- * If Korean locale is active, tries to return "filename.ko".
+ * If a non-English locale is active, returns "locale/<lang>/<filename>".
  * The caller should use dlb_fopen to check if the file exists.
  */
 const char *
@@ -102,9 +102,10 @@ get_localized_filename(const char *fname)
         return fname;
 
 #ifdef ENABLE_NLS
-    /* For Korean locale, append .ko suffix */
-    if (is_korean_locale()) {
-        snprintf(buf, sizeof(buf), "%s.ko", fname);
+    /* For non-English locales, use locale directory */
+    const char *lang = get_current_language();
+    if (lang && *lang && strcmp(lang, "en") != 0) {
+        snprintf(buf, sizeof(buf), "locale/%s/%s", lang, fname);
         return buf;
     }
 #endif

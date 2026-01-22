@@ -9,6 +9,10 @@
 #include <string.h>
 #endif
 
+#ifdef I18N_GETTEXT
+#include "i18n.h"
+#endif
+
 #define DATAPREFIX 4        /* see decl.h */
 
 #ifdef DLB
@@ -457,6 +461,10 @@ dlb_fopen(const char *name, const char *mode)
 {
     FILE *fp;
     dlb *dp;
+#ifdef I18N_GETTEXT
+    char locale_name[BUFSZ];
+    const char *lang;
+#endif
 
     if (!dlb_initialized)
         return (dlb *) 0;
@@ -466,6 +474,23 @@ dlb_fopen(const char *name, const char *mode)
         return (dlb *) 0;
 
     dp = (dlb *) alloc(sizeof(dlb));
+
+#ifdef I18N_GETTEXT
+    /* Try locale-specific file first (e.g., "locale/ko/help") */
+    lang = get_current_language();
+    if (lang && *lang && strcmp(lang, "en") != 0) {
+        snprintf(locale_name, sizeof(locale_name), "locale/%s/%s", lang, name);
+        if (do_dlb_fopen(dp, locale_name, mode)) {
+            dp->fp = (FILE *) 0;
+            return dp;
+        }
+        if ((fp = fopen_datafile(locale_name, mode, DATAPREFIX)) != 0) {
+            dp->fp = fp;
+            return dp;
+        }
+    }
+#endif
+
     if (do_dlb_fopen(dp, name, mode))
         dp->fp = (FILE *) 0;
     else if ((fp = fopen_datafile(name, mode, DATAPREFIX)) != 0)

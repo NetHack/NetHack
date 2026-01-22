@@ -85,11 +85,10 @@ extern const char *tr_obj_name(const char *name);
 
 /*
  * Get localized filename for help/data files
- * If Korean locale is active, returns "filename.ko" if it exists,
- * otherwise returns the original filename.
+ * If a non-English locale is active, returns "locale/<lang>/<filename>".
  *
  * Example:
- *   get_localized_filename("help") returns "help.ko" (Korean)
+ *   get_localized_filename("help") returns "locale/ko/help" (Korean)
  *   get_localized_filename("help") returns "help" (English)
  *
  * Note: The returned pointer points to a static buffer that is
