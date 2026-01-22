@@ -2104,17 +2104,34 @@ nhl_loadlua(lua_State *L, const char *fname)
 {
 #define LOADCHUNKSIZE (1L << 13) /* 8K */
     boolean ret = TRUE;
-    dlb *fh;
+    dlb *fh = (dlb *) 0;
     char *buf = (char *) 0, *bufin, *bufout, *p, *nl, *altfname;
     long buflen, ct, cnt;
     int llret;
+    const char *actual_fname = fname;
+#ifdef I18N_GETTEXT
+    char *locale_fname = (char *) 0;
+    const char *lang = get_current_language();
 
-    altfname = (char *) alloc(Strlen(fname) + 3); /* 3: '('...')\0' */
+    /* Try locale-specific file first (e.g., "locale/ko/quest.lua") */
+    if (lang && *lang && strcmp(lang, "en") != 0) {
+        /* Build locale path: "locale/<lang>/<fname>" */
+        locale_fname = (char *) alloc(Strlen(fname) + Strlen(lang) + 10);
+        Sprintf(locale_fname, "locale/%s/%s", lang, fname);
+        fh = dlb_fopen(locale_fname, RDBMODE);
+        if (fh) {
+            actual_fname = locale_fname;
+        }
+    }
+#endif
+
+    altfname = (char *) alloc(Strlen(actual_fname) + 3); /* 3: '('...')\0' */
     /* don't know whether 'fname' is inside a dlb container;
        if we did, we could choose between "nhdat(<fname>)" and "<fname>"
        but since we don't, compromise */
-    Sprintf(altfname, "(%s)", fname);
-    fh = dlb_fopen(fname, RDBMODE);
+    Sprintf(altfname, "(%s)", actual_fname);
+    if (!fh)
+        fh = dlb_fopen(fname, RDBMODE);
     if (!fh) {
         impossible("nhl_loadlua: Error opening %s", altfname);
         ret = FALSE;
@@ -2204,6 +2221,10 @@ nhl_loadlua(lua_State *L, const char *fname)
         free((genericptr_t) altfname);
     if (buf)
         free((genericptr_t) buf);
+#ifdef I18N_GETTEXT
+    if (locale_fname)
+        free((genericptr_t) locale_fname);
+#endif
     return ret;
 #undef LOADCHUNKSIZE
 }

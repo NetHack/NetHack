@@ -410,6 +410,12 @@ obj_descr_strings_for_extraction(void)
     (void) N_("large kobold");
     (void) N_("kobold lord");
     (void) N_("kobold shaman");
+    (void) N_("kobold zombie");
+    (void) N_("zombie");
+    (void) N_("gnome zombie");
+    (void) N_("orc zombie");
+    (void) N_("elf zombie");
+    (void) N_("human zombie");
     (void) N_("rat");
     (void) N_("sewer rat");
     (void) N_("giant rat");
@@ -464,6 +470,49 @@ obj_descr_strings_for_extraction(void)
     (void) N_("stuck in %s");
     (void) N_("trapped");
     (void) N_(" in %s");
+
+    /* dungeon names */
+    (void) N_("The Dungeons of Doom");
+    (void) N_("The Gnomish Mines");
+    (void) N_("Sokoban");
+    (void) N_("The Quest");
+    (void) N_("Fort Ludios");
+    (void) N_("Gehennom");
+    (void) N_("The Elemental Planes");
+    (void) N_("Vlad's Tower");
+    (void) N_("The Tutorial");
+
+    /* spellbook descriptions (colors and textures) */
+    (void) N_("parchment");
+    (void) N_("vellum");
+    (void) N_("ragged");
+    (void) N_("dog eared");
+    (void) N_("stained");
+    (void) N_("leathery");
+    (void) N_("velvet");
+    (void) N_("light green");
+    (void) N_("dark green");
+    (void) N_("turquoise");
+    (void) N_("light blue");
+    (void) N_("dark blue");
+    (void) N_("indigo");
+    (void) N_("purple");
+    (void) N_("violet");
+    (void) N_("tan");
+    (void) N_("plaid");
+    (void) N_("light brown");
+    (void) N_("dark brown");
+    (void) N_("wrinkled");
+    (void) N_("dusty");
+    (void) N_("glittering");
+    (void) N_("shining");
+    (void) N_("dull");
+    (void) N_("thin");
+    (void) N_("thick");
+    (void) N_("checkered");
+    (void) N_("canvas");
+    (void) N_("hardcover");
+    (void) N_("plain");
 }
 
 /*obj_descr_i18n.c*/

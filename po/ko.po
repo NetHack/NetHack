@@ -4147,11 +4147,11 @@ msgstr "해당 방향으로 달린다."
 
 #: ../src/cmd.c:2702
 msgid "Shift"
-msgstr "Shift"
+msgstr "시프트"
 
 #: ../src/cmd.c:2706
 msgid "Meta"
-msgstr "Meta"
+msgstr "메타"
 
 #: ../src/cmd.c:2709
 msgid "+<direction> will run in specified direction until you encounter"
@@ -4254,7 +4254,7 @@ msgstr "'%s' 접두사에 대한 잘못된 방향이다."
 #: ../src/cmd.c:4009
 #, c-format
 msgid "cmdassist: %s"
-msgstr "cmdassist: %s"
+msgstr "명령어 도움: %s"
 
 #: ../src/cmd.c:4020
 #, c-format
@@ -6842,7 +6842,7 @@ msgstr "추위를 벗어났다."
 #
 #: ../src/do.c:2123 ../src/do.c:2165 ../src/do.c:2182
 msgid "bite-covered"
-msgstr "당신은 죽었다."
+msgstr "물린 자국 투성이"
 
 #: ../src/do.c:2147
 #, c-format
@@ -9467,15 +9467,15 @@ msgstr "주석 \"%.30s%s\"을 무엇으로 바꾸겠습니까?"
 
 #: ../src/dungeon.c:2522
 msgid "this dungeon level"
-msgstr "로그 레벨 "
+msgstr "이 던전 층"
 
 #: ../src/dungeon.c:3389
 msgid "Sealed portal"
-msgstr "찌그러진 냄비"
+msgstr "봉인된 포탈"
 
 #: ../src/dungeon.c:3389
 msgid "Portal"
-msgstr "필멸자"
+msgstr "포탈"
 
 # #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 # 물약
@@ -9530,7 +9530,7 @@ msgstr "땅"
 #: ../src/dungeon.c:3426
 #, c-format
 msgid "Plane of %s"
-msgstr "Plane of %s"
+msgstr "%s의 평면"
 
 #: ../src/dungeon.c:3428
 #, c-format
@@ -9578,7 +9578,7 @@ msgstr " (돌아갈 방법 없음...)"
 #: ../src/dungeon.c:3646
 #, c-format
 msgid "%sCompleted quest for %s."
-msgstr "%sCompleted quest for %s."
+msgstr "%s%s의 퀘스트를 완료함."
 
 #: ../src/dungeon.c:3648
 #, c-format
@@ -9598,7 +9598,7 @@ msgstr "%s{이/가} 얼얼하다%s."
 #: ../src/dungeon.c:3658
 #, c-format
 msgid "%sValley of the Dead."
-msgstr "%sValley of the Dead."
+msgstr "%s죽음의 계곡."
 
 #: ../src/dungeon.c:3660
 #, c-format
@@ -9613,7 +9613,7 @@ msgstr "%s몰록의 성소."
 #: ../src/dungeon.c:3669
 #, c-format
 msgid "%sSummoned by %s."
-msgstr "%sSummoned by %s."
+msgstr "%s%s에 의해 소환됨."
 
 #: ../src/dungeon.c:3697
 msgid "Final resting place for"
@@ -10621,7 +10621,7 @@ msgstr "계속 먹으겠습니까?"
 #
 #: ../src/eat.c:3353
 msgid "You revive."
-msgstr "당신은 죽었다."
+msgstr "부활했다."
 
 #: ../src/eat.c:3418
 msgid "faint from lack of food."
@@ -10703,7 +10703,7 @@ msgstr "지쳤다."
 #: ../src/eat.c:3608
 #, c-format
 msgid "There is a bear trap here (%s); eat it?"
-msgstr "There is a bear trap here (%s); eat it?"
+msgstr "여기에 곰 덫이 있다 (%s); 먹겠습니까?"
 
 #: ../src/eat.c:3609
 msgid "holding you"
@@ -10711,16 +10711,16 @@ msgstr ", 당신을 붙잡는 중"
 
 #: ../src/eat.c:3609
 msgid "armed"
-msgstr "더 따뜻하다."
+msgstr "활성화됨"
 
 #: ../src/eat.c:3617
 #, c-format
 msgid "You only manage to %s the bear trap."
-msgstr "곰 덫에 %s{을/를} 둔 채 앉았다."
+msgstr "곰 덫을 %s하는 데 그쳤다."
 
 #: ../src/eat.c:3618
 msgid "free yourself from"
-msgstr "%s{을/를} 빼냈다."
+msgstr "에서 빠져나오기"
 
 #: ../src/eat.c:3618 ../src/trap.c:5449
 msgid "disarm"
@@ -10728,7 +10728,7 @@ msgstr "해제했다!"
 
 #: ../src/eat.c:3635
 msgid "There are iron bars here"
-msgstr "여기에 거미줄이 있다."
+msgstr "여기에 철창이 있다"
 
 #: ../src/eat.c:3637
 #, c-format
@@ -10745,15 +10745,15 @@ msgstr "너무 배불러서 철창을 먹을 수 없다."
 
 #: ../src/eat.c:3644
 msgid "; eat them?"
-msgstr "닿을"
+msgstr "; 먹겠습니까?"
 
 #: ../src/eat.c:3645
 msgid "; resume eating them?"
-msgstr "%s%s 설치를 재개한다."
+msgstr "; 계속 먹겠습니까?"
 
 #: ../src/eat.c:3657
 msgid "There is 1 gold piece here; eat it?"
-msgstr "여기에 층 이동 장치가 있다. 작동시키겠습니까?"
+msgstr "여기에 금화 1개가 있다; 먹겠습니까?"
 
 #: ../src/eat.c:3659
 #, c-format
@@ -10772,7 +10772,7 @@ msgstr "%s "
 #: ../src/eat.c:3693 ../src/lock.c:494
 #, c-format
 msgid " here; %s %s?"
-msgstr "%s %s{이다/다}."
+msgstr " 여기에 있다; %s %s?"
 
 # ============================================================
 # 공통 문자열 (decl.h macros)
@@ -10817,7 +10817,7 @@ msgstr "질식했다"
 
 #: ../src/end.c:50
 msgid "poisoned"
-msgstr "독이 묻은 "
+msgstr "중독됨"
 
 #: ../src/end.c:50
 msgid "drowning"
@@ -10825,7 +10825,7 @@ msgstr "익사"
 
 #: ../src/end.c:50
 msgid "burning"
-msgstr "탄 "
+msgstr "화염"
 
 #: ../src/end.c:51
 msgid "dissolving under the heat and pressure"
@@ -10833,7 +10833,7 @@ msgstr "열과 압력에 녹음"
 
 #: ../src/end.c:51 ../src/uhitm.c:4012 ../src/uhitm.c:5716
 msgid "crushed"
-msgstr "처벌받는 중"
+msgstr "압사됨"
 
 #
 #: ../src/end.c:51 ../src/end.c:61 ../src/topten.c:1000
@@ -10842,7 +10842,7 @@ msgstr "돌로 변했다."
 
 #: ../src/end.c:52 ../src/end.c:62
 msgid "turned into slime"
-msgstr "%s{을/를} 슬라임으로 만들었다."
+msgstr "슬라임으로 변했다"
 
 #: ../src/end.c:52
 msgid "genocided"
@@ -11186,7 +11186,7 @@ msgstr "%8ld개의 쓸모없는 색유리 조각%s,"
 #: ../src/end.c:1527
 #, c-format
 msgid "You %s beyond the confines of the dungeon"
-msgstr "You %s beyond the confines of the dungeon"
+msgstr "당신은 던전의 경계를 넘어 %s"
 
 #: ../src/end.c:1528
 msgid "passed away"
@@ -11194,7 +11194,7 @@ msgstr "세상을 떠났다"
 
 #: ../src/end.c:1534
 msgid "The Astral Plane"
-msgstr "원소의 평면으로"
+msgstr "천상의 평면"
 
 #: ../src/end.c:1535
 #, c-format
@@ -11204,7 +11204,7 @@ msgstr "%s %s에 빠져 있다."
 #: ../src/end.c:1537
 #, c-format
 msgid " on dungeon level %d"
-msgstr " on dungeon level %d"
+msgstr " 던전 %d층에서"
 
 #: ../src/end.c:1541
 #, c-format
@@ -11224,7 +11224,7 @@ msgstr "당신은 %4$s할 때 레벨 %1$d였고 최대 %2$d HP%3$s를 가졌다.
 #: ../src/end.c:1628
 #, c-format
 msgid "Contents of %s:"
-msgstr "Contents of %s:"
+msgstr "%s의 내용물:"
 
 #: ../src/end.c:1653
 msgid "Schroedinger's cat!"
@@ -11251,7 +11251,7 @@ msgstr "바닥"
 #: ../src/engrave.c:332
 #, c-format
 msgid "%s is written here in the %s."
-msgstr "여기 %s에 %s{이/가} 쓰여 있다."
+msgstr "여기 %2$s에 %1$s{이/가} 쓰여 있다."
 
 #: ../src/engrave.c:333 ../src/engrave.c:904 ../src/engrave.c:1092
 #: ../src/zap.c:3333
@@ -11266,12 +11266,12 @@ msgstr "먼지"
 #: ../src/engrave.c:340
 #, c-format
 msgid "%s is engraved here on the %s."
-msgstr "여기 %s에 %s{이/가} 새겨져 있다."
+msgstr "여기 %2$s에 %1$s{이/가} 새겨져 있다."
 
 #: ../src/engrave.c:346
 #, c-format
 msgid "Some text has been %s into the %s here."
-msgstr "여기 %s에 텍스트가 %s되어 있다."
+msgstr "여기 %2$s에 텍스트가 %1$s되어 있다."
 
 #: ../src/engrave.c:347
 msgid "melted"
@@ -11297,7 +11297,7 @@ msgstr "돋을새김된 단어를 느꼈다:"
 
 #: ../src/engrave.c:396 ../src/obj_descr_i18n.c:246
 msgid "read"
-msgstr "읽을"
+msgstr "읽다"
 
 #: ../src/engrave.c:509
 msgid "What would you write?  \"Jonah was here\"?"
@@ -11672,7 +11672,7 @@ msgstr "%s{으로/로} %s{을/를} %s."
 #: ../src/engrave.c:1186
 #, c-format
 msgid "What do you want to %s the %s here?"
-msgstr "What do you want to %s the %s here?"
+msgstr "여기 %s에 무엇을 %s하시겠습니까?"
 
 #: ../src/engrave.c:1201
 #, c-format
@@ -12018,7 +12018,7 @@ msgstr "%s에 떠 있다."
 #: ../src/fountain.c:28
 #, c-format
 msgid "are trapped in the %s."
-msgstr "are trapped in the %s."
+msgstr "%s에 갇혀 있다."
 
 #: ../src/fountain.c:45
 #, c-format
@@ -12233,7 +12233,7 @@ msgstr "손이 물러가자, 분수가 사라진다!"
 #: ../src/fountain.c:438
 #, c-format
 msgid "was given %s by the %s"
-msgstr "was given %s by the %s"
+msgstr "%s에게 %s를 받았다"
 
 #: ../src/fountain.c:470
 #, c-format
@@ -13208,7 +13208,7 @@ msgstr "과로로 기절했다!"
 #: ../src/hack.c:3072
 #, c-format
 msgid "beneath %s"
-msgstr "beneath %s"
+msgstr "%s 아래"
 
 #: ../src/hack.c:3074
 msgid "beneath you"
@@ -13482,7 +13482,7 @@ msgstr "대각선으로 이동할 수 없다."
 #: ../src/hack.c:3839
 #, c-format
 msgid "%s blocks your path."
-msgstr "%s blocks your path."
+msgstr "%s이(가) 길을 막고 있다."
 
 #: ../src/hack.c:3873
 msgid "stop in front of the door."
@@ -13562,7 +13562,7 @@ msgstr "이 더미의"
 #: ../src/iactions.c:76
 #, c-format
 msgid "%s the type for %s"
-msgstr "%s the type for %s"
+msgstr "%2$s의 유형을 %1$s"
 
 #: ../src/iactions.c:92
 msgid "Read the message inside this cookie"
@@ -13591,12 +13591,12 @@ msgstr "마법 포털을 활성화했다!"
 #: ../src/iactions.c:108
 #, c-format
 msgid "Read this scroll%s"
-msgstr "Read this scroll%s"
+msgstr "이 두루마리를 읽기%s"
 
 #: ../src/iactions.c:116
 #, c-format
 msgid "%s this %s"
-msgstr "%s{이/가} %s{을/를} 때렸다."
+msgstr "이 %2$s{을/를} %1$s"
 
 #: ../src/iactions.c:117
 msgid "Read"
@@ -13604,11 +13604,11 @@ msgstr "읽기"
 
 #: ../src/iactions.c:117
 msgid "Examine"
-msgstr "함정 살펴보기"
+msgstr "살펴보기"
 
 #: ../src/iactions.c:117
 msgid "Study"
-msgstr "공부하는 중"
+msgstr "공부하기"
 
 #: ../src/iactions.c:119
 msgid "tome"
@@ -13626,11 +13626,11 @@ msgstr "마법서"
 
 #: ../src/iactions.c:285
 msgid "Extinguish"
-msgstr "쏘았다"
+msgstr "끄기"
 
 #: ../src/iactions.c:285
 msgid "Light"
-msgstr "가벼운"
+msgstr "켜기"
 
 #: ../src/iactions.c:294
 msgid "Quiver"
@@ -13642,16 +13642,16 @@ msgstr "장비할"
 
 #: ../src/iactions.c:295
 msgid "un-ready"
-msgstr "읽을"
+msgstr "준비 해제"
 
 #: ../src/iactions.c:295
 msgid "un-wield"
-msgstr "장비할"
+msgstr "장비 해제"
 
 #: ../src/iactions.c:298 ../src/iactions.c:414 ../src/iactions.c:492
 #: ../src/iactions.c:538 ../src/iactions.c:613 ../src/iactions.c:623
 msgid "item"
-msgstr "아이템들"
+msgstr "아이템"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -13663,11 +13663,11 @@ msgstr "'%2$c' %1$s{이/가} %3$s %4$s %5$s"
 
 #: ../src/iactions.c:311
 msgid "Flip a coin"
-msgstr "용기를 기울이는 중"
+msgstr "동전 던지기"
 
 #: ../src/iactions.c:314
 msgid "Hit yourself with this cream pie"
-msgstr "%s{으로/로} 스스로를 맞았다."
+msgstr "이 크림 파이로 자신을 때리기"
 
 #: ../src/iactions.c:316
 msgid "Lash out with this whip"
@@ -13728,7 +13728,7 @@ msgstr "상자를 잠그는 중"
 #: ../src/iactions.c:350
 #, c-format
 msgid "%s the candelabrum"
-msgstr "%s the candelabrum"
+msgstr "촛대를 %s"
 
 #: ../src/iactions.c:358
 #, c-format
@@ -13747,17 +13747,17 @@ msgstr "쏘았다"
 #: ../src/iactions.c:366
 #, c-format
 msgid "%s this light source"
-msgstr "%s this light source"
+msgstr "이 광원 %s"
 
 #: ../src/iactions.c:369
 #, c-format
 msgid "%s this oil"
-msgstr "%s this oil"
+msgstr "이 기름 %s"
 
 #: ../src/iactions.c:373
 #, c-format
 msgid "Dip something into %s potion%s"
-msgstr "Dip something into %s potion%s"
+msgstr "%s 물약%s에 무언가를 담그기"
 
 #: ../src/iactions.c:374 ../src/iactions.c:426 ../src/iactions.c:454
 #: ../src/iactions.c:578
@@ -13770,11 +13770,11 @@ msgstr "사진 찍기"
 
 #: ../src/iactions.c:380
 msgid "Clean yourself off with this towel"
-msgstr "구덩이에서 스스로를 끌어냈다!"
+msgstr "이 수건으로 닦기"
 
 #: ../src/iactions.c:382
 msgid "Peer into this crystal ball"
-msgstr "수정 구슬을 응시하는 중"
+msgstr "이 수정 구슬 들여다보기"
 
 #: ../src/iactions.c:385
 msgid "Write on something with this marker"
@@ -13782,15 +13782,15 @@ msgstr "이 마커로 무언가에 쓰기"
 
 #: ../src/iactions.c:387
 msgid "Make this figurine transform"
-msgstr "조각상이 %s%s(으)로 변하는 것을!"
+msgstr "이 조각상 변신시키기"
 
 #: ../src/iactions.c:389
 msgid "Use this unicorn horn"
-msgstr "유니콘 뿔"
+msgstr "이 유니콘 뿔 사용하기"
 
 #: ../src/iactions.c:392
 msgid "Blow into the horn of plenty"
-msgstr "뿔피리를 불었다."
+msgstr "풍요의 뿔 불기"
 
 #: ../src/iactions.c:394
 msgid "Play this musical instrument"
@@ -13798,7 +13798,7 @@ msgstr "이 악기 연주하기"
 
 #: ../src/iactions.c:396
 msgid "Arm this trap"
-msgstr "함정을 찾았다!"
+msgstr "이 함정 작동시키기"
 
 #: ../src/iactions.c:398
 msgid "Dig with this digging tool"
@@ -13808,60 +13808,60 @@ msgstr "이 도구로 파기"
 # 방어구 - 갑옷
 #: ../src/iactions.c:400
 msgid "Break this wand"
-msgstr "가죽 갑옷"
+msgstr "이 지팡이 부러뜨리기"
 
 #: ../src/iactions.c:414
 #, c-format
 msgid "Drop this %s"
-msgstr "Drop this %s"
+msgstr "이 %s 버리기"
 
 #: ../src/iactions.c:414 ../src/iactions.c:492 ../src/iactions.c:538
 #: ../src/iactions.c:613 ../src/iactions.c:623
 msgid "stack"
-msgstr "공격한다"
+msgstr "더미"
 
 #: ../src/iactions.c:420
 #, c-format
 msgid "Open %s%s and eat the contents"
-msgstr "Open %s%s and eat the contents"
+msgstr "%s%s 열어서 내용물 먹기"
 
 #: ../src/iactions.c:421
 msgid "one of these tins"
-msgstr "순간이동의 반지"
+msgstr "이 깡통들 중 하나"
 
 # Item type names (note: "potion" is already defined elsewhere)
 #: ../src/iactions.c:421
 msgid "this tin"
-msgstr " 물약"
+msgstr "이 깡통"
 
 #: ../src/iactions.c:423
 msgid " with your tin opener"
-msgstr "깡통 따개"
+msgstr " 깡통 따개로"
 
 #: ../src/iactions.c:433
 msgid "Wipe the floor with this towel"
-msgstr "구덩이에서 스스로를 끌어냈다!"
+msgstr "이 수건으로 바닥 닦기"
 
 #: ../src/iactions.c:436
 msgid "Scribble graffiti on the floor"
-msgstr "바닥에 충돌했다!"
+msgstr "바닥에 낙서하기"
 
 #: ../src/iactions.c:439
 #, c-format
 msgid "%s on the %s with %s"
-msgstr "%s on the %s with %s"
+msgstr "%3$s(으)로 %2$s에 %1$s"
 
 #: ../src/iactions.c:442
 msgid "Engrave"
-msgstr "새겨진 글씨"
+msgstr "새기기"
 
 #: ../src/iactions.c:442
 msgid "Write"
-msgstr "형석"
+msgstr "쓰기"
 
 #: ../src/iactions.c:444
 msgid "one of these items"
-msgstr "순간이동의 반지"
+msgstr "이것들 중 하나"
 
 #: ../src/iactions.c:444 ../src/iactions.c:576
 msgid "this item"
@@ -13878,11 +13878,11 @@ msgstr "던질"
 #: ../src/iactions.c:457
 #, c-format
 msgid " with your wielded %s"
-msgstr " with your wielded %s"
+msgstr " 장비한 %s(으)로"
 
 #: ../src/iactions.c:466
 msgid "Adjust inventory by assigning new letter"
-msgstr "전체 인벤토리, 미사용 문자 포함"
+msgstr "새 문자 할당으로 소지품 조정"
 
 #: ../src/iactions.c:470
 msgid "Adjust inventory by splitting this stack"
@@ -13899,16 +13899,16 @@ msgstr "이 부적을 이 제단에 제물로 바치기"
 #: ../src/iactions.c:491
 #, c-format
 msgid "Buy this unpaid %s"
-msgstr "%s에게 안장을 씌웠다."
+msgstr "미지불 %s 구매하기"
 
 #: ../src/iactions.c:505
 msgid "Put this amulet on"
-msgstr "%s에게 안장을 씌웠다."
+msgstr "이 부적 착용하기"
 
 #
 #: ../src/iactions.c:506
 msgid "[already wearing an amulet]"
-msgstr "부적을 걸고 있지 않다."
+msgstr "[이미 부적을 착용 중]"
 
 #: ../src/iactions.c:509
 msgid "Put this ring on"
@@ -13917,24 +13917,24 @@ msgstr "이 반지 끼기"
 #: ../src/iactions.c:511
 #, c-format
 msgid "[both ring %s in use]"
-msgstr "%s{을/를} 슬라임으로 만들었다."
+msgstr "[양쪽 반지 %s 사용 중]"
 
 #: ../src/iactions.c:516
 msgid "[already wearing eyewear]"
-msgstr "이미 %s{을/를} 입고 있다%c"
+msgstr "[이미 안경류 착용 중]"
 
 #: ../src/iactions.c:518
 msgid "Put these lenses on"
-msgstr "%s에게 안장을 씌웠다."
+msgstr "이 렌즈 착용하기"
 
 #: ../src/iactions.c:520
 #, c-format
 msgid "Put this on%s"
-msgstr "%s에게 안장을 씌웠다."
+msgstr "이것 착용하기%s"
 
 #: ../src/iactions.c:521
 msgid " to blindfold yourself"
-msgstr "정신을 차리니"
+msgstr " (눈가리개)"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -13942,16 +13942,16 @@ msgstr "정신을 차리니"
 #: ../src/iactions.c:529
 #, c-format
 msgid "Quaff (drink) %s"
-msgstr "Quaff (drink) %s"
+msgstr "%s 마시기"
 
 #: ../src/iactions.c:530
 msgid "one of these potions"
-msgstr "순간이동의 반지"
+msgstr "이 물약들 중 하나"
 
 # Item type names (note: "potion" is already defined elsewhere)
 #: ../src/iactions.c:530
 msgid "this potion"
-msgstr " 물약"
+msgstr "이 물약"
 
 #: ../src/iactions.c:537
 #, c-format
@@ -13969,7 +13969,7 @@ msgstr "던질"
 #: ../src/iactions.c:549
 #, c-format
 msgid "Remove this %s"
-msgstr "Remove this %s"
+msgstr "이 %s 벗기"
 
 #: ../src/iactions.c:552
 msgid "eyewear"
@@ -13982,7 +13982,7 @@ msgstr "액세서리"
 #: ../src/iactions.c:558
 #, c-format
 msgid "Rub this %s"
-msgstr "Rub this %s"
+msgstr "이 %s 문지르기"
 
 #: ../src/iactions.c:561
 msgid "Rub something on this stone"
@@ -14053,7 +14053,7 @@ msgstr "주무기로 전환한다."
 #: ../src/iactions.c:680
 #, c-format
 msgid "Toggle two-weapon combat %s"
-msgstr "Toggle two-weapon combat %s"
+msgstr "쌍수 전투 전환 %s"
 
 #: ../src/iactions.c:689
 msgid "Zap this wand to release its magic"
@@ -14256,7 +14256,7 @@ msgstr "실제로 "
 #: ../src/insight.c:570
 #, c-format
 msgid "%s%s-handed"
-msgstr "%s%s-handed"
+msgstr "%s%s손"
 
 #: ../src/insight.c:571
 msgid "normally "
@@ -14326,7 +14326,7 @@ msgstr "여기에 %2$s{이/가} 있다.%1$.0s"
 #: ../src/insight.c:655
 #, c-format
 msgid " Bad things %s on Friday the 13th."
-msgstr " Bad things %s on Friday the 13th."
+msgstr " 13일의 금요일에는 나쁜 일이 %s."
 
 #: ../src/insight.c:656
 msgid "can happen"
@@ -14413,7 +14413,7 @@ msgstr "자동 줍기: %s."
 #: ../src/insight.c:870
 #, c-format
 msgid "Your %s "
-msgstr "Your %s "
+msgstr "당신의 %s "
 
 #: ../src/insight.c:941 ../src/obj_descr_i18n.c:422 ../src/polyself.c:324
 msgid "transformed"
@@ -14531,12 +14531,12 @@ msgstr "~에게 붙잡힘"
 #: ../src/insight.c:1110
 #, c-format
 msgid "stuck to %s %s"
-msgstr "stuck to %s %s"
+msgstr "%s %s에 달라붙었다"
 
 #: ../src/insight.c:1128
 #, c-format
 msgid "%swounded %s%s"
-msgstr "%swounded %s%s"
+msgstr "%s부상당함 %s%s"
 
 #: ../src/insight.c:1152
 msgid "fumble"
@@ -14606,7 +14606,7 @@ msgstr "%s 위로 이동한다."
 #: ../src/insight.c:1337 ../src/insight.c:1370
 #, c-format
 msgid "Your skill in %s "
-msgstr "Your skill in %s "
+msgstr "%s의 숙련도 "
 
 #: ../src/insight.c:1338
 #, c-format
@@ -14633,7 +14633,7 @@ msgstr "기술이 없음"
 #: ../src/insight.c:1348 ../src/uhitm.c:1604
 #, c-format
 msgid " with %s"
-msgstr " with %s"
+msgstr " %s(으)로"
 
 #: ../src/insight.c:1351 ../src/insight.c:1389
 msgid " and two weapons"
@@ -14647,7 +14647,7 @@ msgstr " %s쌍수 무기로 %s에 제한됨"
 #: ../src/insight.c:1376
 #, c-format
 msgid " %slimited by "
-msgstr " %slimited by "
+msgstr " %s제한됨 "
 
 #: ../src/insight.c:1391
 msgid "You also "
@@ -14801,7 +14801,7 @@ msgstr "몬스터의 존재를 감지하는 중"
 #: ../src/insight.c:1628
 #, c-format
 msgid "%scharismatic"
-msgstr "%scharismatic"
+msgstr "%s매력적"
 
 #: ../src/insight.c:1633 ../src/timeout.c:53
 msgid "invisible"
@@ -14854,7 +14854,7 @@ msgstr "상자를 잠그는 중"
 #: ../src/insight.c:1718
 #, c-format
 msgid " to the ceiling if %s%s%s"
-msgstr " to the ceiling if %s%s%s"
+msgstr " %s%s%s(이)면 천장에"
 
 # ============================================================
 # UI 메시지 (invent.c - "here" 관련)
@@ -15132,7 +15132,7 @@ msgstr "처치된 생물이 없다."
 #: ../src/insight.c:3089
 #, c-format
 msgid "%s%s species:"
-msgstr "%s%s species:"
+msgstr "%s%s종:"
 
 #: ../src/insight.c:3090
 msgid "Genocided"
@@ -15318,7 +15318,7 @@ msgstr "%s 것이 없다."
 #: ../src/invent.c:2263 ../src/pickup.c:202
 #, c-format
 msgid "What kinds of thing do you want to %s? [%s]"
-msgstr "What kinds of thing do you want to %s? [%s]"
+msgstr "어떤 종류의 물건을 %s하시겠습니까? [%s]"
 
 #: ../src/invent.c:2309
 msgid "Not applicable."
@@ -15373,7 +15373,7 @@ msgstr "이 캐릭터를 다시 굴릴까요?"
 #: ../src/invent.c:2670
 #, c-format
 msgid "What would you like to identify %s?"
-msgstr "What would you like to identify %s?"
+msgstr "%s 무엇을 확인하시겠습니까?"
 
 #: ../src/invent.c:2671 ../src/spell.c:205
 msgid "first"
@@ -15458,7 +15458,7 @@ msgstr "대신 전부 준비하시겠습니까?"
 #: ../src/invent.c:3249
 #, c-format
 msgid " (%s for all)"
-msgstr " (%s for all)"
+msgstr " (전부는 %s)"
 
 #: ../src/invent.c:3258
 msgid "Miscellaneous"
@@ -15586,7 +15586,7 @@ msgstr "여기에는 아무 물체도 %s"
 #: ../src/invent.c:4170
 #, c-format
 msgid "a %s cloud"
-msgstr "a %s cloud"
+msgstr "%s 구름"
 
 #: ../src/invent.c:4176
 #, c-format
@@ -16735,7 +16735,7 @@ msgstr "%s 주변의 공기가 탁탁거린다."
 #: ../src/mcastu.c:267
 #, c-format
 msgid "%s casts a spell%s!"
-msgstr "%s casts a spell%s!"
+msgstr "%s이(가) 주문을 시전했다%s!"
 
 #: ../src/mcastu.c:272
 msgid " at a spot near you"
@@ -16774,7 +16774,7 @@ msgstr "미사일이 튕겨나갔다!"
 #: ../src/mcastu.c:365 ../src/muse.c:1170
 #, c-format
 msgid "%s looks better."
-msgstr "%s looks better."
+msgstr "%s이(가) 좋아 보인다."
 
 #: ../src/mcastu.c:464
 #, c-format
@@ -16862,7 +16862,7 @@ msgstr "갑자기 약해졌다!"
 #: ../src/mcastu.c:568
 #, c-format
 msgid "%s suddenly %s!"
-msgstr "%s suddenly %s!"
+msgstr "%s이(가) 갑자기 %s!"
 
 #: ../src/mcastu.c:569
 msgid "becomes transparent"
@@ -16937,12 +16937,12 @@ msgstr "누군가 무언가를 소환하고, %s %s."
 #: ../src/mcastu.c:780
 #, c-format
 msgid "%s casts at a clump of sticks, but nothing happens.%s"
-msgstr "%s casts at a clump of sticks, but nothing happens.%s"
+msgstr "%s이(가) 나뭇가지 더미에 주문을 걸었지만 아무 일도 일어나지 않았다.%s"
 
 #: ../src/mcastu.c:783
 #, c-format
 msgid "%s transforms a clump of sticks into %s!"
-msgstr "%s transforms a clump of sticks into %s!"
+msgstr "%s이(가) 나뭇가지 더미를 %s(으)로 변형시켰다!"
 
 #: ../src/mcastu.c:786
 #, c-format
@@ -16957,7 +16957,7 @@ msgstr "%s{이/가} 이동한 이미지를 %s!"
 #: ../src/mcastu.c:790
 #, c-format
 msgid "%s summons %s!"
-msgstr "%s summons %s!"
+msgstr "%s이(가) %s을(를) 소환했다!"
 
 #: ../src/mcastu.c:803
 #, c-format
@@ -17235,7 +17235,7 @@ msgstr "%s{으로/로} 변했다."
 #: ../src/mhitm.c:975
 #, c-format
 msgid "%s explodes!"
-msgstr "%s explodes!"
+msgstr "%s이(가) 폭발했다!"
 
 #: ../src/mhitm.c:1004
 msgid "melancholy"
@@ -17306,17 +17306,17 @@ msgstr "%s{이/가} 약간 추워하는 것 같다."
 #: ../src/mhitm.c:1402 ../src/mhitu.c:2559
 #, c-format
 msgid "%s is suddenly very cold!"
-msgstr "%s is suddenly very cold!"
+msgstr "%s이(가) 갑자기 매우 차가워졌다!"
 
 #: ../src/mhitm.c:1419
 #, c-format
 msgid "%s is mildly warmed."
-msgstr "%s is mildly warmed."
+msgstr "%s이(가) 약간 따뜻해졌다."
 
 #: ../src/mhitm.c:1426 ../src/mhitu.c:2582
 #, c-format
 msgid "%s is suddenly very hot!"
-msgstr "%s is suddenly very hot!"
+msgstr "%s이(가) 갑자기 매우 뜨거워졌다!"
 
 #: ../src/mhitm.c:1431
 #, c-format
@@ -17326,7 +17326,7 @@ msgstr "%s{이/가} 아직 먹고 있다."
 #: ../src/mhitm.c:1438
 #, c-format
 msgid "%s is jolted with electricity!"
-msgstr "%s is jolted with electricity!"
+msgstr "%s이(가) 전기 충격을 받았다!"
 
 #: ../src/mhitm.c:1465 ../src/trap.c:2391
 #, c-format
@@ -17381,12 +17381,12 @@ msgstr " 다시"
 #: ../src/mhitu.c:95
 #, c-format
 msgid "%s pretends to be friendly."
-msgstr "%s pretends to be friendly."
+msgstr "%s이(가) 친근한 척한다."
 
 #: ../src/mhitu.c:97
 #, c-format
 msgid "%s %smisses!"
-msgstr "%s %smisses!"
+msgstr "%s이(가) %s빗나갔다!"
 
 #: ../src/mhitu.c:98
 msgid "just "
@@ -17584,7 +17584,7 @@ msgstr "잠깐, %s! 그 %s{은/는} 사실 %s라는 이름의 %s!"
 #: ../src/mhitu.c:698
 #, c-format
 msgid "You appear to be %s again."
-msgstr "You appear to be %s again."
+msgstr "다시 %s(으)로 보인다."
 
 #: ../src/mhitu.c:745
 #, c-format
@@ -17609,7 +17609,7 @@ msgstr "%s{이/가} 공기를 들이마신다!"
 #: ../src/mhitu.c:859
 #, c-format
 msgid "%s lunges forward and recoils!"
-msgstr "%s lunges forward and recoils!"
+msgstr "%s이(가) 앞으로 돌진했다가 물러났다!"
 
 #: ../src/mhitu.c:865
 #, c-format
@@ -17660,7 +17660,7 @@ msgstr "약간의 질병."
 #: ../src/mhitu.c:1063
 #, c-format
 msgid "%s %s your %s %s!"
-msgstr "%s %s your %s %s!"
+msgstr "%s이(가) %s 당신의 %s %s!"
 
 #: ../src/mhitu.c:1064
 msgid "slips off of"
@@ -17968,7 +17968,7 @@ msgstr "점점 더 혼란스러워지고 있다."
 #: ../src/mhitu.c:1780
 #, c-format
 msgid "%s stares piercingly at you!"
-msgstr "%s stares piercingly at you!"
+msgstr "%s이(가) 당신을 날카롭게 응시한다!"
 
 #: ../src/mhitu.c:1799
 #, c-format
@@ -18010,7 +18010,7 @@ msgstr "은 어느 정도"
 #: ../src/mhitu.c:1989
 #, c-format
 msgid "%s acts as though %s has got a %sheadache."
-msgstr "%s acts as though %s has got a %sheadache."
+msgstr "%s이(가) %s 머리가 %s아픈 것처럼 행동한다."
 
 #: ../src/mhitu.c:1990
 msgid "severe "
@@ -18019,7 +18019,7 @@ msgstr "여러"
 #: ../src/mhitu.c:1994
 #, c-format
 msgid "%s seems dismayed at your lack of response."
-msgstr "%s seems dismayed at your lack of response."
+msgstr "%s이(가) 당신의 무반응에 실망한 것 같다."
 
 #: ../src/mhitu.c:2000
 msgid "Someone caresses you..."
@@ -18126,7 +18126,7 @@ msgstr " 그리고 11켤레의 장갑 더"
 #: ../src/mhitu.c:2153
 #, c-format
 msgid "%s appears to sigh."
-msgstr "%s appears to sigh."
+msgstr "%s이(가) 한숨을 쉬는 것 같다."
 
 #: ../src/mhitu.c:2165
 #, c-format
@@ -18237,7 +18237,7 @@ msgstr "단"
 #: ../src/mhitu.c:2328
 #, c-format
 msgid "let me run my fingers through your %s"
-msgstr "let me run my fingers through your %s"
+msgstr "당신의 %s을(를) 만져보게 해줘요"
 
 #: ../src/mhitu.c:2331
 #, c-format
@@ -18267,7 +18267,7 @@ msgstr "내가 마사지해 줄게"
 #: ../src/mhitu.c:2352 ../src/muse.c:2912
 #, c-format
 msgid "%s dies!"
-msgstr "%s dies!"
+msgstr "%s이(가) 죽었다!"
 
 #: ../src/mhitu.c:2456
 #, c-format
@@ -18305,17 +18305,17 @@ msgstr "%s{이/가} 당신에 의해 얼어붙었다!"
 #: ../src/mhitu.c:2577
 #, c-format
 msgid "%s is mildly warm."
-msgstr "%s is mildly warm."
+msgstr "%s이(가) 약간 따뜻하다."
 
 #: ../src/mhitu.c:2587
 #, c-format
 msgid "%s is slightly tingled."
-msgstr "%s is slightly tingled."
+msgstr "%s이(가) 약간 찌릿하다."
 
 #: ../src/mhitu.c:2592
 #, c-format
 msgid "%s is jolted with your electricity!"
-msgstr "%s is jolted with your electricity!"
+msgstr "%s이(가) 당신의 전기 충격을 받았다!"
 
 #: ../src/minion.c:72
 #, c-format
@@ -18687,7 +18687,7 @@ msgstr "희미한 출렁거리는 소리."
 #: ../src/mon.c:592
 #, c-format
 msgid "%s recently regrown horn crumbles to dust."
-msgstr "%s recently regrown horn crumbles to dust."
+msgstr "%s의 최근에 자란 뿔이 먼지로 부서졌다."
 
 #: ../src/mon.c:979 ../src/potion.c:1843
 #, c-format
@@ -18710,12 +18710,12 @@ msgstr "바삭하게 타고 있다!"
 #: ../src/mon.c:1027
 #, c-format
 msgid "%s surrenders to the fire."
-msgstr "%s surrenders to the fire."
+msgstr "%s이(가) 불에 굴복했다."
 
 #: ../src/mon.c:1031
 #, c-format
 msgid "%s burns slightly."
-msgstr "%s burns slightly."
+msgstr "%s이(가) 약간 탔다."
 
 #: ../src/mon.c:1065
 #, c-format
@@ -18784,7 +18784,7 @@ msgstr "투명화의 지팡이"
 #: ../src/mon.c:1820
 #, c-format
 msgid "%s picks up some %s."
-msgstr "%s picks up some %s."
+msgstr "%s이(가) %s을(를) 집었다."
 
 #: ../src/mon.c:1821
 msgid "money"
@@ -18813,7 +18813,7 @@ msgstr "불행히도, %s{은/는} 여전히 몰살 상태다..."
 #: ../src/mon.c:2909
 #, c-format
 msgid "%s%s %s%s and rises as"
-msgstr "%s%s %s%s and rises as"
+msgstr "%s%s %s%s (으)로 다시 일어났다"
 
 #: ../src/mon.c:2910
 msgid "you dream that "
@@ -18892,7 +18892,7 @@ msgstr "잠시 슬픈 감정이 들었다가 사라졌다."
 #: ../src/mon.c:3190
 #, c-format
 msgid "%s body crumbles into dust."
-msgstr "%s body crumbles into dust."
+msgstr "%s의 몸이 먼지로 부서졌다."
 
 #: ../src/mon.c:3209
 #, c-format
@@ -18906,7 +18906,7 @@ msgstr "폭발."
 #: ../src/mon.c:3221
 #, c-format
 msgid "%s rips open!"
-msgstr "%s rips open!"
+msgstr "%s이(가) 찢어졌다!"
 
 #: ../src/mon.c:3223
 #, c-format
@@ -19076,7 +19076,7 @@ msgstr "아래 각인이 희미해졌다."
 #: ../src/mon.c:4320
 #, c-format
 msgid "%s wakes up%s%s"
-msgstr "%s wakes up%s%s"
+msgstr "%s이(가) 깨어났다%s%s"
 
 #: ../src/mon.c:4321 ../src/sounds.c:764 ../src/zap.c:3541 ../src/zap.c:4671
 msgid "!"
@@ -19099,7 +19099,7 @@ msgstr "%s{이} %s 밑에서 %s."
 #: ../src/mon.c:5077
 #, c-format
 msgid "Change %s"
-msgstr "Change %s"
+msgstr "%s 변경"
 
 #: ../src/mon.c:5078
 #, c-format
@@ -19142,7 +19142,7 @@ msgstr "갑옷을 부수고 나왔다!"
 #: ../src/mon.c:5457
 #, c-format
 msgid "%s disappears!"
-msgstr "%s disappears!"
+msgstr "%s이(가) 사라졌다!"
 
 #: ../src/mon.c:5463
 #, c-format
@@ -19152,7 +19152,7 @@ msgstr "%s{이/가} 나타났다."
 #: ../src/mon.c:5465
 #, c-format
 msgid "%s turns into %s!"
-msgstr "%s turns into %s!"
+msgstr "%s이(가) %s(으)로 변했다!"
 
 #: ../src/mon.c:5697
 #, c-format
@@ -19213,7 +19213,7 @@ msgstr "%s 호루라기%s의 날카로운 소리."
 #: ../src/mon.c:5780
 #, c-format
 msgid "%s seems a more vivid %s than before."
-msgstr "%s seems a more vivid %s than before."
+msgstr "%s이(가) 전보다 더 선명한 %s(으)로 보인다."
 
 #: ../src/mon.c:5802
 msgid "notice a bovine smell."
@@ -19476,7 +19476,7 @@ msgstr "%s{이/가} 눈이 멀었다."
 #: ../src/monmove.c:511
 #, c-format
 msgid "%s flees from the painful light of %s."
-msgstr "%s flees from the painful light of %s."
+msgstr "%s이(가) %s의 고통스러운 빛을 피해 도망쳤다."
 
 #: ../src/monmove.c:515
 msgid "Bright light!"
@@ -19490,7 +19490,7 @@ msgstr "%s{이/가} 돌로 변했다!"
 #: ../src/monmove.c:589
 #, c-format
 msgid "%s concentrates."
-msgstr "%s concentrates."
+msgstr "%s이(가) 집중한다."
 
 #: ../src/monmove.c:591
 msgid "sense a faint wave of psychic energy."
@@ -19544,17 +19544,17 @@ msgstr "%s에서 탈출할 수 없다!"
 #: ../src/monmove.c:1287
 #, c-format
 msgid "%s spins a web."
-msgstr "%s spins a web."
+msgstr "%s이(가) 거미줄을 친다."
 
 #: ../src/monmove.c:1550
 #, c-format
 msgid "%s %s under the door."
-msgstr "%s %s under the door."
+msgstr "%s이(가) 문 아래로 %s."
 
 #: ../src/monmove.c:1566
 #, c-format
 msgid "%s unlocks and opens a door."
-msgstr "%s unlocks and opens a door."
+msgstr "%s이(가) 문을 열고 잠금을 해제했다."
 
 #: ../src/monmove.c:1569 ../src/monmove.c:1571
 msgid "a door unlock and open."
@@ -19573,7 +19573,7 @@ msgstr "문이 열리는 소리."
 #: ../src/monmove.c:1608
 #, c-format
 msgid "%s smashes down a door."
-msgstr "%s smashes down a door."
+msgstr "%s이(가) 문을 부쉈다."
 
 #: ../src/monmove.c:1611 ../src/monmove.c:1613
 msgid "a door crash open."
@@ -19582,7 +19582,7 @@ msgstr "문이 쾅 열리는 소리."
 #: ../src/monmove.c:1631
 #, c-format
 msgid "%s eats through the iron bars."
-msgstr "%s eats through the iron bars."
+msgstr "%s이(가) 철창을 먹어치웠다."
 
 #: ../src/monmove.c:1636
 #, c-format
@@ -19919,7 +19919,7 @@ msgstr "이 병은 비어 있었다."
 #: ../src/muse.c:86
 #, c-format
 msgid "As %s opens the bottle, an enormous %s emerges!"
-msgstr "As %s opens the bottle, an enormous %s emerges!"
+msgstr "%s이(가) 병을 열자, 거대한 %s이(가) 나타났다!"
 
 #: ../src/muse.c:90
 #, c-format
@@ -19948,7 +19948,7 @@ msgstr "이제 때가 됐다."
 #: ../src/muse.c:138
 #, c-format
 msgid "%s zaps %s, which suddenly explodes!"
-msgstr "%s zaps %s, which suddenly explodes!"
+msgstr "%s이(가) %s을(를) 쏘자, 갑자기 폭발했다!"
 
 #: ../src/muse.c:146
 #, c-format
@@ -19978,7 +19978,7 @@ msgstr "%s에서 뿔피리 연주 소리."
 #: ../src/muse.c:216
 #, c-format
 msgid "a %s directed at"
-msgstr "a %s directed at"
+msgstr "%s(이)가 향하는"
 
 #: ../src/muse.c:225
 #, c-format
@@ -20039,12 +20039,12 @@ msgstr "%s{이/가} 잠시 매우 혼란스러워 보인다."
 #: ../src/muse.c:786
 #, c-format
 msgid "%s escapes the dungeon!"
-msgstr "%s escapes the dungeon!"
+msgstr "%s이(가) 던전에서 탈출했다!"
 
 #: ../src/muse.c:824
 #, c-format
 msgid "%s uses a unicorn horn!"
-msgstr "%s uses a unicorn horn!"
+msgstr "%s이(가) 유니콘 뿔을 사용했다!"
 
 #: ../src/muse.c:826
 #, c-format
@@ -20054,7 +20054,7 @@ msgstr "%s의 뿔피리 끝이 빛난다!"
 #: ../src/muse.c:833 ../src/muse.c:2934
 #, c-format
 msgid "%s seems steadier now."
-msgstr "%s seems steadier now."
+msgstr "%s이(가) 이제 더 안정적이다."
 
 #: ../src/muse.c:842
 #, c-format
@@ -20068,7 +20068,7 @@ msgstr "기상 나팔 소리!"
 #: ../src/muse.c:900 ../src/teleport.c:2060
 #, c-format
 msgid "%s shudders for a moment."
-msgstr "%s shudders for a moment."
+msgstr "%s이(가) 잠시 떨었다."
 
 #: ../src/muse.c:928
 msgid "digging ray is ineffective."
@@ -20087,12 +20087,12 @@ msgstr "%s{이/가} %s에 나타났다."
 #: ../src/muse.c:958
 #, c-format
 msgid "%s has made a hole in the %s."
-msgstr "%s has made a hole in the %s."
+msgstr "%s이(가) %s에 구멍을 뚫었다."
 
 #: ../src/muse.c:960
 #, c-format
 msgid "%s %s through..."
-msgstr "%s %s through..."
+msgstr "%s이(가) 통과해서 %s..."
 
 #: ../src/muse.c:961
 msgid "dives"
@@ -20111,7 +20111,7 @@ msgstr "%s{이/가} %s{을/를} 부수고 지나간다."
 #: ../src/muse.c:1047
 #, c-format
 msgid "%s %s into a %s!"
-msgstr "%s %s into a %s!"
+msgstr "%s이(가) %s(으)로 %s!"
 
 #: ../src/muse.c:1076
 #, c-format
@@ -20121,22 +20121,22 @@ msgstr "%s{이/가} 계단을 오르자, 신비로운 힘이 잠시 %s{을/를} 
 #: ../src/muse.c:1087
 #, c-format
 msgid "%s escapes upstairs!"
-msgstr "%s escapes upstairs!"
+msgstr "%s이(가) 위층으로 도망쳤다!"
 
 #: ../src/muse.c:1098
 #, c-format
 msgid "%s escapes downstairs!"
-msgstr "%s escapes downstairs!"
+msgstr "%s이(가) 아래층으로 도망쳤다!"
 
 #: ../src/muse.c:1108
 #, c-format
 msgid "%s escapes up the ladder!"
-msgstr "%s escapes up the ladder!"
+msgstr "%s이(가) 사다리를 타고 위로 도망쳤다!"
 
 #: ../src/muse.c:1118
 #, c-format
 msgid "%s escapes down the ladder!"
-msgstr "%s escapes down the ladder!"
+msgstr "%s이(가) 사다리를 타고 아래로 도망쳤다!"
 
 #: ../src/muse.c:1131
 #, c-format
@@ -20154,7 +20154,7 @@ msgstr "위로"
 #: ../src/muse.c:1144
 #, c-format
 msgid "%s %s onto a %s!"
-msgstr "%s %s onto a %s!"
+msgstr "%s이(가) %s 위로 %s!"
 
 #: ../src/muse.c:1184
 #, c-format
@@ -20165,7 +20165,7 @@ msgstr "%s{이/가} 훨씬 나아 보인다!"
 #: ../src/muse.c:1199
 #, c-format
 msgid "%s looks completely healed."
-msgstr "%s looks completely healed."
+msgstr "%s이(가) 완전히 회복된 것 같다."
 
 #: ../src/muse.c:1616 ../src/muse.c:1634 ../src/zap.c:199 ../src/zap.c:2706
 msgid "Boing!"
@@ -20256,12 +20256,12 @@ msgstr "%s{이/가} %s{을/를} 태웠다!"
 #: ../src/muse.c:2325
 #, c-format
 msgid "%s rummages through %s."
-msgstr "%s rummages through %s."
+msgstr "%s이(가) %s을(를) 뒤적인다."
 
 #: ../src/muse.c:2327
 #, c-format
 msgid "%s removes %s from %s."
-msgstr "%s removes %s from %s."
+msgstr "%s이(가) %s에서 %s을(를) 꺼냈다."
 
 #: ../src/muse.c:2330
 #, c-format
@@ -20271,7 +20271,7 @@ msgstr "%s{이/가} %s{을/를} 벗었다."
 #: ../src/muse.c:2392
 #, c-format
 msgid "%s rises up, through the %s!"
-msgstr "%s rises up, through the %s!"
+msgstr "%s이(가) %s을(를) 통해 위로 올라갔다!"
 
 #: ../src/muse.c:2404
 #, c-format
@@ -20281,7 +20281,7 @@ msgstr "%s{이/가} 다치지 않아 보인다."
 #: ../src/muse.c:2412
 #, c-format
 msgid "%s seems more experienced."
-msgstr "%s seems more experienced."
+msgstr "%s이(가) 더 숙련된 것 같다."
 
 #: ../src/muse.c:2433
 #, c-format
@@ -20320,7 +20320,7 @@ msgstr "채찍"
 #: ../src/muse.c:2538
 #, c-format
 msgid "%s flicks a bullwhip towards your %s!"
-msgstr "%s flicks a bullwhip towards your %s!"
+msgstr "%s이(가) 당신의 %s을(를) 향해 채찍을 휘둘렀다!"
 
 #: ../src/muse.c:2541
 #, c-format
@@ -20344,12 +20344,12 @@ msgstr "채찍이 빠져나갔다."
 #: ../src/muse.c:2566
 #, c-format
 msgid "%s yanks %s from your %s!"
-msgstr "%s yanks %s from your %s!"
+msgstr "%s이(가) 당신의 %s에서 %s을(를) 빼앗았다!"
 
 #: ../src/muse.c:2571
 #, c-format
 msgid "%s yanks %s to the %s!"
-msgstr "%s yanks %s to the %s!"
+msgstr "%s이(가) %s을(를) %s(으)로 끌어당겼다!"
 
 #: ../src/muse.c:2576
 #, c-format
@@ -20386,7 +20386,7 @@ msgstr "생기가 없다."
 #: ../src/muse.c:2844
 #, c-format
 msgid "%s can see again."
-msgstr "%s can see again."
+msgstr "%s이(가) 다시 볼 수 있다."
 
 #: ../src/muse.c:2895
 msgid "quaffs"
@@ -20412,7 +20412,7 @@ msgstr "날개"
 #: ../src/muse.c:2910
 #, c-format
 msgid "%s has a very bad case of stomach acid."
-msgstr "%s has a very bad case of stomach acid."
+msgstr "%s이(가) 심한 위산 과다 증상이 있다."
 
 #: ../src/muse.c:2925
 #, c-format
@@ -20427,7 +20427,7 @@ msgstr "%s{이/가} 찡그리는 것 같다."
 #: ../src/muse.c:3081
 #, c-format
 msgid "%s starts turning %s."
-msgstr "%s starts turning %s."
+msgstr "%s이(가) %s(으)로 변하기 시작했다."
 
 #: ../src/muse.c:3082
 msgid "into ooze"
@@ -20460,7 +20460,7 @@ msgstr "%s{이/가} 타오르는 %s{을/를} 마신다"
 #: ../src/muse.c:3187
 #, c-format
 msgid "%s is %s by the fire!"
-msgstr "%s is %s by the fire!"
+msgstr "%s이(가) 불에 의해 %s!"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -20468,12 +20468,12 @@ msgstr "%s is %s by the fire!"
 #: ../src/muse.c:3195
 #, c-format
 msgid "%s is burned%s"
-msgstr "%s is burned%s"
+msgstr "%s이(가) %s 불에 탔다"
 
 #: ../src/muse.c:3200
 #, c-format
 msgid "%s slime is burned away!"
-msgstr "%s slime is burned away!"
+msgstr "%s의 슬라임이 불에 타버렸다!"
 
 #: ../src/music.c:124
 #, c-format
@@ -20887,7 +20887,7 @@ msgstr "장식의 반지"
 #: ../src/o_init.c:752
 #, c-format
 msgid "Discoveries, %s"
-msgstr "Discoveries, %s"
+msgstr "발견, %s"
 
 #: ../src/o_init.c:762
 msgid "Unique items"
@@ -20904,7 +20904,7 @@ msgstr "발견한 물품"
 #: ../src/o_init.c:1015
 #, c-format
 msgid "Discovered %s in %s"
-msgstr "Discovered %s in %s"
+msgstr "%s을(를) %s에서 발견함"
 
 #: ../src/o_init.c:1016
 msgid "order of discovery"
@@ -22170,7 +22170,31 @@ msgstr "코볼트 군주"
 msgid "kobold shaman"
 msgstr "코볼트 주술사"
 
-#: ../src/obj_descr_i18n.c:411
+#: ../src/obj_descr_i18n.c:413
+msgid "kobold zombie"
+msgstr "코볼트 좀비"
+
+#: ../src/obj_descr_i18n.c:414
+msgid "zombie"
+msgstr "좀비"
+
+#: ../src/obj_descr_i18n.c:415
+msgid "gnome zombie"
+msgstr "노움 좀비"
+
+#: ../src/obj_descr_i18n.c:416
+msgid "orc zombie"
+msgstr "오크 좀비"
+
+#: ../src/obj_descr_i18n.c:417
+msgid "elf zombie"
+msgstr "엘프 좀비"
+
+#: ../src/obj_descr_i18n.c:418
+msgid "human zombie"
+msgstr "인간 좀비"
+
+#: ../src/obj_descr_i18n.c:419
 msgid "rat"
 msgstr "쥐"
 
@@ -22246,7 +22270,7 @@ msgstr "많이 바랬다"
 #: ../src/objnam.c:1383
 #, c-format
 msgid " containing %ld item%s"
-msgstr " containing %ld item%s"
+msgstr " %ld개 아이템 포함%s"
 
 #: ../src/objnam.c:1389 ../src/objnam.c:1432
 msgid " (being worn)"
@@ -22332,12 +22356,12 @@ msgstr "무기 사용"
 #: ../src/objnam.c:1619
 #, c-format
 msgid " (wielded in %s %s)"
-msgstr " (wielded in %s %s)"
+msgstr " (%s %s에 장착)"
 
 #: ../src/objnam.c:1623
 #, c-format
 msgid " (alternate weapon%s; not wielded)"
-msgstr " (alternate weapon%s; not wielded)"
+msgstr " (보조 무기%s; 미장착)"
 
 #: ../src/objnam.c:1646
 #, c-format
@@ -22832,7 +22856,7 @@ msgstr "공개 옵션 범주 변경:"
 #: ../src/options.c:5737
 #, c-format
 msgid "Disclosure options for %s:"
-msgstr "Disclosure options for %s:"
+msgstr "%s의 공개 옵션:"
 
 #: ../src/options.c:5746
 msgid "Never disclose, without prompting"
@@ -22920,7 +22944,7 @@ msgstr "항상 '<' 줍기; 절대 '>' 안 줍기"
 #: ../src/options.c:6404
 #, c-format
 msgid "%s autopickup exceptions"
-msgstr "%s autopickup exceptions"
+msgstr "%s 자동 줍기 예외"
 
 #: ../src/options.c:6405
 msgid "List of"
@@ -23037,7 +23061,7 @@ msgstr "복합 옵션:"
 #: ../src/pager.c:117
 #, c-format
 msgid "%s%s%s called %s"
-msgstr "%s%s%s called %s"
+msgstr "%s(이)라 불리는 %s%s%s"
 
 # ============================================================
 # 전투 메시지 (Combat Messages)
@@ -23050,7 +23074,7 @@ msgstr "%s{을/를} 탔다."
 #: ../src/pager.c:129
 #, c-format
 msgid ", chained to %s"
-msgstr ", chained to %s"
+msgstr ", %s에 사슬로 묶여"
 
 #: ../src/pager.c:130
 msgid "nothing?"
@@ -23202,7 +23226,7 @@ msgstr "%s{이/가} 당신에게 뛰어들었다!"
 #: ../src/pager.c:475
 #, c-format
 msgid ", trapped in %s"
-msgstr ", trapped in %s"
+msgstr ", %s에 갇혀"
 
 #: ../src/pager.c:492
 msgid "normal vision"
@@ -23260,22 +23284,22 @@ msgstr "단단한"
 
 #: ../src/pager.c:619
 msgid "sturdy"
-msgstr "언데드를 방해했다!"
+msgstr "튼튼한"
 
 #: ../src/pager.c:620
 msgid "steady"
-msgstr "은신"
+msgstr "안정적인"
 
 #: ../src/pager.c:621
 msgid "unsteady"
-msgstr "읽을"
+msgstr "불안정한"
 
 # ============================================================
 # 공통 문자열 (decl.h macros)
 # ============================================================
 #: ../src/pager.c:622
 msgid "thin"
-msgstr "물건"
+msgstr "얇은"
 
 #: ../src/pager.c:623
 msgid "slushy"
@@ -23292,12 +23316,12 @@ msgstr "%s %s %s%s%s!"
 #: ../src/pager.c:707
 #, c-format
 msgid "interior of %s"
-msgstr "interior of %s"
+msgstr "%s 내부"
 
 #: ../src/pager.c:748
 #, c-format
 msgid "%s %saltar"
-msgstr "%s %saltar"
+msgstr "%s %s제단"
 
 #: ../src/pager.c:753
 msgid "aligned"
@@ -23460,7 +23484,7 @@ msgstr "당신의 조랑말"
 #: ../src/pager.c:2032
 #, c-format
 msgid "All %s currently shown on the map:"
-msgstr "All %s currently shown on the map:"
+msgstr "현재 지도에 표시된 모든 %s:"
 
 #: ../src/pager.c:2067
 #, c-format
@@ -23474,12 +23498,12 @@ msgstr "%s{이/가} 함정을 피했다."
 #: ../src/pager.c:2099 ../src/pager.c:2187
 #, c-format
 msgid ", obscured by %s"
-msgstr ", obscured by %s"
+msgstr ", %s에 가려져"
 
 #: ../src/pager.c:2109
 #, c-format
 msgid "%sseen or remembered traps%s:"
-msgstr "%sseen or remembered traps%s:"
+msgstr "%s보거나 기억한 함정%s:"
 
 #: ../src/pager.c:2110 ../src/pager.c:2199
 msgid "nearby "
@@ -23525,7 +23549,7 @@ msgstr "새겨진 글씨"
 #: ../src/pager.c:2198
 #, c-format
 msgid "%sseen or remembered engravings%s:"
-msgstr "%sseen or remembered engravings%s:"
+msgstr "%s보거나 기억한 새김글%s:"
 
 #: ../src/pager.c:2223
 #, c-format
@@ -23751,7 +23775,7 @@ msgstr "물리적으로 아무것도 주울 수 없다."
 #: ../src/pickup.c:766
 #, c-format
 msgid "Pick %d of what?"
-msgstr "Pick %d of what?"
+msgstr "%d개의 무엇을 고르시겠습니까?"
 
 #: ../src/pickup.c:774 ../src/pickup.c:831
 msgid "Pick up what?"
@@ -23769,7 +23793,7 @@ msgstr "%s{을/를} 선택해."
 #: ../src/pickup.c:1151
 #, c-format
 msgid "%s Creatures"
-msgstr "%s Creatures"
+msgstr "%s 생물"
 
 #: ../src/pickup.c:1152
 msgid "Swallowed"
@@ -24312,17 +24336,17 @@ msgstr "%s{처럼} 보인다."
 #: ../src/pickup.c:3405
 #, c-format
 msgid "take %s out"
-msgstr "take %s out"
+msgstr "%s 꺼내기"
 
 #: ../src/pickup.c:3411
 #, c-format
 msgid "put %s in"
-msgstr "put %s in"
+msgstr "%s 넣기"
 
 #: ../src/pickup.c:3417
 #, c-format
 msgid "%stake out, then put in"
-msgstr "%stake out, then put in"
+msgstr "%s꺼낸 후 넣기"
 
 #: ../src/pickup.c:3417
 msgid "both; "
@@ -24331,7 +24355,7 @@ msgstr "둘 다; "
 #: ../src/pickup.c:3423
 #, c-format
 msgid "%sput in, then take out"
-msgstr "%sput in, then take out"
+msgstr "%s넣은 후 꺼내기"
 
 #: ../src/pickup.c:3424
 msgid "both reversed; "
@@ -24361,7 +24385,7 @@ msgstr "용기를 기울이는 중"
 #: ../src/pickup.c:3572
 #, c-format
 msgid "You can't tip %s while carrying so much."
-msgstr "You can't tip %s while carrying so much."
+msgstr "너무 많이 들고 있어서 %s을(를) 기울일 수 없다."
 
 #: ../src/pickup.c:3573 ../src/trap.c:5841
 msgid "a container"
@@ -24450,7 +24474,7 @@ msgstr "바닥에만 내용물을 쏟는다..."
 #: ../src/pickup.c:3910
 #, c-format
 msgid "Where to tip the contents of %s"
-msgstr "Where to tip the contents of %s"
+msgstr "%s의 내용물을 어디에 쏟으시겠습니까"
 
 #: ../src/pickup.c:3968
 msgid "tipping a container"
@@ -24975,7 +24999,7 @@ msgstr "%s{을/를} 응시하는 것을 피했다."
 #: ../src/polyself.c:1676
 #, c-format
 msgid "Really %s %s?"
-msgstr "Really %s %s?"
+msgstr "정말 %s을(를) %s하시겠습니까?"
 
 #: ../src/polyself.c:1693
 #, c-format
@@ -25890,7 +25914,7 @@ msgstr "모든 것이 이제 정말 %s 지루하다."
 #: ../src/potion.c:380
 #, c-format
 msgid "Oh wow!  Everything %s so cosmic!"
-msgstr "Oh wow!  Everything %s so cosmic!"
+msgstr "와우! 모든 게 정말 %s 우주적이야!"
 
 #: ../src/potion.c:407
 msgid "flatten"
@@ -26424,7 +26448,7 @@ msgstr "쾅!"
 #: ../src/potion.c:1655
 #, c-format
 msgid "%s saddle"
-msgstr "%s saddle"
+msgstr "%s 안장"
 
 #: ../src/potion.c:1666
 #, c-format
@@ -26540,7 +26564,7 @@ msgstr "담그기 "
 #: ../src/potion.c:2299
 #, c-format
 msgid "%s%s into the fountain?"
-msgstr "%s%s into the fountain?"
+msgstr "%s%s을(를) 분수에?"
 
 #: ../src/potion.c:2310
 #, c-format
@@ -26550,7 +26574,7 @@ msgstr "%s{이/가} 싱크대 위로 %s."
 #: ../src/potion.c:2322
 #, c-format
 msgid "%s%s into the %s?"
-msgstr "%s%s into the %s?"
+msgstr "%s%s을(를) %s에?"
 
 #: ../src/potion.c:2411
 #, c-format
@@ -26614,7 +26638,7 @@ msgstr "%s %s{이/가} 가장자리 주위로 %s."
 
 #: ../src/potion.c:2583
 msgid "wrinkled"
-msgstr "짜증났다."
+msgstr "주름졌다"
 
 #: ../src/potion.c:2593
 msgid "towel soaks it up!"
@@ -26623,7 +26647,7 @@ msgstr "타월이 흡수했다!"
 #: ../src/potion.c:2604
 #, c-format
 msgid "One of %s"
-msgstr "One of %s"
+msgstr "%s 중 하나"
 
 #: ../src/potion.c:2607
 #, c-format
@@ -26842,7 +26866,7 @@ msgstr "%s{이/가} %s 나아졌다."
 #: ../src/pray.c:572
 #, c-format
 msgid "%s can hear again"
-msgstr "%s can hear again"
+msgstr "%s이(가) 다시 들을 수 있다"
 
 #: ../src/pray.c:573
 msgid " and you"
@@ -27043,7 +27067,7 @@ msgstr "검"
 #: ../src/pray.c:948
 #, c-format
 msgid "%s sword"
-msgstr "%s sword"
+msgstr "%s 검"
 
 #: ../src/pray.c:952
 #, c-format
@@ -27284,7 +27308,7 @@ msgstr "그리고 무자비하게 목숨을 꺼버린다."
 #: ../src/pray.c:1550
 #, c-format
 msgid "%s indifference"
-msgstr "%s indifference"
+msgstr "%s 무관심"
 
 #: ../src/pray.c:1554
 #, c-format
@@ -27433,7 +27457,7 @@ msgstr "%s굴러가는 바위 함정을 작동시켰다!"
 #: ../src/pray.c:1811 ../src/uhitm.c:1954
 #, c-format
 msgid " named %s"
-msgstr " named %s"
+msgstr " %s(이)라는 이름의"
 
 #: ../src/pray.c:1815
 msgid "Use my gift wisely!"
@@ -27802,7 +27826,7 @@ msgstr "신성한"
 #: ../src/priest.c:477
 #, c-format
 msgid "have a%s forbidding feeling..."
-msgstr "have a%s forbidding feeling..."
+msgstr "불길한 느낌이%s 든다..."
 
 #: ../src/priest.c:478
 msgid " strange"
@@ -28706,7 +28730,7 @@ msgstr "%s 것이 무엇입니까?"
 #: ../src/read.c:2602 ../src/read.c:2806
 #, c-format
 msgid " [enter %s]"
-msgstr " [enter %s]"
+msgstr " [%s 입력]"
 
 #: ../src/read.c:2604
 msgid "the symbol or name representing a class, or '?'"
@@ -30022,7 +30046,7 @@ msgstr "투명한 손님은 환영하지 않습니다!"
 #: ../src/shk.c:747
 #, c-format
 msgid "%s stands firm as if %s knows you are there."
-msgstr "%s stands firm as if %s knows you are there."
+msgstr "%s이(가) %s 당신이 거기 있다는 것을 아는 것처럼 굳건히 서 있다."
 
 
 #: ../src/shk.c:758
@@ -30206,7 +30230,7 @@ msgstr "%s 빨라졌다."
 #: ../src/shk.c:1648
 #, c-format
 msgid "Unpaid item%s:"
-msgstr "Unpaid item%s:"
+msgstr "미지불 아이템%s:"
 
 #: ../src/shk.c:1665
 msgid "Pay for which items?"
@@ -30504,7 +30528,7 @@ msgstr "개 더"
 #: ../src/shk.c:2542
 #, c-format
 msgid ", shakes %s %s,"
-msgstr ", shakes %s %s,"
+msgstr ", %s %s을(를) 흔들며,"
 
 #: ../src/shk.c:2544
 #, c-format
@@ -30703,12 +30727,12 @@ msgstr "%s."
 #: ../src/shk.c:3782
 #, c-format
 msgid "%sowe %s %ld %s"
-msgstr "%sowe %s %ld %s"
+msgstr "%s%s에게 %ld %s 빚짐"
 
 #: ../src/shk.c:3785
 #, c-format
 msgid " for %s%sits contents"
-msgstr " for %s%sits contents"
+msgstr " %s%s 내용물"
 
 #: ../src/shk.c:3786
 msgid "it and "
@@ -30721,7 +30745,7 @@ msgstr "하나의 "
 #: ../src/shk.c:3789
 #, c-format
 msgid " for %s"
-msgstr " for %s"
+msgstr " %s에 대해"
 
 #: ../src/shk.c:3799
 #, c-format
@@ -30804,7 +30828,7 @@ msgstr "?"
 #: ../src/shk.c:4006
 #, c-format
 msgid "traded %s for %ld zorkmid%s in %scredit."
-msgstr "traded %s for %ld zorkmid%s in %scredit."
+msgstr "%s을(를) %ld 조크미드의 %s신용으로 교환함%s."
 
 #: ../src/shk.c:4007
 #, c-format
@@ -30818,7 +30842,7 @@ msgstr " 추가로"
 #: ../src/shk.c:4073
 #, c-format
 msgid "%s offers%s %ld gold piece%s for %s%s "
-msgstr "%s offers%s %ld gold piece%s for %s%s "
+msgstr "%s이(가)%s %ld 골드%s를 %s%s에 대해 제안한다 "
 
 #: ../src/shk.c:4074
 msgid " only"
@@ -30838,7 +30862,7 @@ msgstr "발견한 물품"
 #: ../src/shk.c:4081
 #, c-format
 msgid "%s.  Sell %s?"
-msgstr "%s.  Sell %s?"
+msgstr "%s.  %s을(를) 팔겠습니까?"
 
 #: ../src/shk.c:4084
 msgid " and item inside"
@@ -31044,7 +31068,7 @@ msgstr "투명화가 %s{을/를} 속이지 못한다!"
 #: ../src/shk.c:5239
 #, c-format
 msgid "%sYou did %ld %s worth of damage!%s  Pay?"
-msgstr "%sYou did %ld %s worth of damage!%s  Pay?"
+msgstr "%s당신은 %ld %s 가치의 피해를 입혔습니다!%s  지불하시겠습니까?"
 
 #: ../src/shk.c:5252
 #, c-format
@@ -31123,7 +31147,7 @@ msgstr "%s{이/가} 신을 섬기는 자들이 번영한다는 것을 알아챘�
 #: ../src/shk.c:5450
 #, c-format
 msgid "%s says: 'Don't try to steal from me - I have friends in high places!'"
-msgstr "%s says: 'Don't try to steal from me - I have friends in high places!'"
+msgstr "%s이(가) 말한다: '나한테서 훔치려고 하지 마 - 나는 높은 곳에 친구가 있어!'"
 
 
 #: ../src/shk.c:5451
@@ -31251,7 +31275,7 @@ msgstr "경찰%s{이/가} (실망하며) 허공으로 사라진다%s."
 #: ../src/shk.c:5641
 #, c-format
 msgid "%sYou owe%s %ld %s."
-msgstr "%sYou owe%s %ld %s."
+msgstr "%s당신은%s %ld %s을(를) 빚지고 있습니다."
 
 #: ../src/shk.c:5642
 #, c-format
@@ -31265,7 +31289,7 @@ msgstr " 추가로"
 #: ../src/shk.c:5646
 #, c-format
 msgid "%s%sThat will cost you %ld %s (Yendorian Fuel Tax)."
-msgstr "%s%sThat will cost you %ld %s (Yendorian Fuel Tax)."
+msgstr "%s%s그것은 %ld %s가 들 것입니다 (옌도리안 연료세)."
 
 #: ../src/shk.c:5649
 #, c-format
@@ -31283,7 +31307,7 @@ msgstr "조심해! "
 #: ../src/shk.c:5655
 #, c-format
 msgid "%s%sUsage fee, %ld %s."
-msgstr "%s%sUsage fee, %ld %s."
+msgstr "%s%s사용료, %ld %s."
 
 #: ../src/shk.c:5657
 msgid "Hey!  "
@@ -31843,7 +31867,7 @@ msgstr "누군가 %s{을/를} 소환한다."
 #: ../src/sounds.c:148
 #, c-format
 msgid "*someone beseeching %s."
-msgstr "*someone beseeching %s."
+msgstr "*누군가가 %s에게 간청하고 있다."
 
 #: ../src/sounds.c:149
 msgid "#an animal carcass being offered in sacrifice."
@@ -33350,7 +33374,7 @@ msgstr "계단"
 #: ../src/stairs.c:209
 #, c-format
 msgid " to level %d"
-msgstr " to level %d"
+msgstr " %d층으로"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -33379,7 +33403,7 @@ msgstr "엔드게임으로"
 #: ../src/stairs.c:229
 #, c-format
 msgid "branch %s %s to %s"
-msgstr "branch %s %s to %s"
+msgstr "분기 %s에서 %s로 %s"
 
 #: ../src/steal.c:92
 #, c-format
@@ -33805,7 +33829,7 @@ msgstr "적절한 %s 기호 세트가 없다."
 #: ../src/symbols.c:1018
 #, c-format
 msgid "Select %ssymbol set:"
-msgstr "Select %ssymbol set:"
+msgstr "%s기호 세트 선택:"
 
 #: ../src/symbols.c:1019
 msgid "rogue level "
@@ -33915,7 +33939,7 @@ msgstr "그렇게 많은 짐을 들고는 그렇게 할 수 없다."
 #: ../src/teleport.c:1157
 #, c-format
 msgid "get there from %s."
-msgstr "get there from %s."
+msgstr "%s에서 거기로 갈 수 있다."
 
 #: ../src/teleport.c:1184
 msgid "To what level do you want to teleport?"
@@ -34151,7 +34175,7 @@ msgstr "%s{이/가} 갑자기 사라졌다!"
 #: ../src/teleport.c:2012
 #, c-format
 msgid "%s avoids the %s."
-msgstr "%s avoids the %s."
+msgstr "%s이(가) %s을(를) 피했다."
 
 #: ../src/teleport.c:2026
 #, c-format
@@ -34496,7 +34520,7 @@ msgstr "더 이상 %s{을/를} 탈 수 없다."
 #: ../src/timeout.c:283
 #, c-format
 msgid "You're turning %s."
-msgstr "You're turning %s."
+msgstr "당신은 %s(으)로 변하고 있다."
 
 #: ../src/timeout.c:284 ../src/timeout.c:292
 msgid "You suffocate."
@@ -34558,12 +34582,12 @@ msgstr "조금 더 낮게 떠 있다."
 #: ../src/timeout.c:350
 #, c-format
 msgid "You wobble unsteadily %s the %s."
-msgstr "You wobble unsteadily %s the %s."
+msgstr "당신은 불안정하게 %s %s을(를) 흔들거린다."
 
 #: ../src/timeout.c:382
 #, c-format
 msgid "You are turning a little %s."
-msgstr "You are turning a little %s."
+msgstr "당신은 약간 %s(으)로 변하고 있다."
 
 #: ../src/timeout.c:383
 msgid "Your limbs are getting oozy."
@@ -35045,24 +35069,24 @@ msgstr "에게 석화: "
 
 #: ../src/topten.c:102
 msgid "turned to slime by "
-msgstr "%s{을/를} 슬라임으로 만들었다."
+msgstr "에 의해 슬라임화: "
 
 #: ../src/topten.c:156
 #, c-format
 msgid ", while %s"
-msgstr "hilite %s 추가됨"
+msgstr ", %s 상태에서"
 
 #: ../src/topten.c:159
 msgid ", while helpless"
-msgstr "도움말 숨기기"
+msgstr ", 무기력한 상태에서"
 
 #: ../src/topten.c:705
 msgid "Cannot open log file!"
-msgstr "라이브 로그 파일을 열 수 없다!"
+msgstr "로그 파일을 열 수 없다!"
 
 #: ../src/topten.c:716
 msgid "Cannot open extended log file!"
-msgstr "라이브 로그 파일을 열 수 없다!"
+msgstr "확장 로그 파일을 열 수 없다!"
 
 #: ../src/topten.c:732
 #, c-format
@@ -35079,11 +35103,11 @@ msgstr "마법사"
 #
 #: ../src/topten.c:733
 msgid "discover"
-msgstr "당신은 죽었다."
+msgstr "발견"
 
 #: ../src/topten.c:749 ../src/topten.c:1217
 msgid "Cannot open record file!"
-msgstr "라이브 로그 파일을 열 수 없다!"
+msgstr "기록 파일을 열 수 없다!"
 
 #: ../src/topten.c:795
 #, c-format
@@ -35092,7 +35116,7 @@ msgstr "이전 점수 %ld점을 넘지 못했다."
 
 #: ../src/topten.c:822
 msgid "Cannot write record file"
-msgstr "더 이상 쓸 수 없다."
+msgstr "기록 파일을 쓸 수 없다."
 
 #: ../src/topten.c:831
 msgid "You made the top ten list!"
@@ -35101,7 +35125,7 @@ msgstr "상위 10위 안에 들었습니다!"
 #: ../src/topten.c:836
 #, c-format
 msgid "You reached the %d%s place on the top %d list."
-msgstr "You reached the %d%s place on the top %d list."
+msgstr "상위 %3$d위 목록에서 %1$d%2$s위에 올랐습니다."
 
 #: ../src/topten.c:934
 msgid " No  Points     Name"
@@ -35114,7 +35138,7 @@ msgstr "HP [최대]"
 #: ../src/topten.c:974
 #, c-format
 msgid "escaped the dungeon %s[max level %d]"
-msgstr "escaped the dungeon %s[max level %d]"
+msgstr "던전을 탈출했다 %s[최대 레벨 %d]"
 
 #: ../src/topten.c:982
 #, c-format
@@ -35123,7 +35147,7 @@ msgstr "반신%s의 지위로 승천한다..."
 
 #: ../src/topten.c:990
 msgid "starved to death"
-msgstr "건강이 회복됐다!"
+msgstr "굶어 죽었다"
 
 #: ../src/topten.c:993
 #, c-format
@@ -35132,30 +35156,29 @@ msgstr "%s 음식에 질식했다"
 
 #: ../src/topten.c:994
 msgid "er"
-msgstr "넘어서"
+msgstr "그녀의"
 
 #: ../src/topten.c:996
 msgid "was poisoned"
-msgstr "%s{이/가} 중독됐다!"
+msgstr "중독됐다"
 
 #: ../src/topten.c:998
 msgid "was crushed to death"
-msgstr "끈이 %s{을/를} 질식시켜 죽였다!"
+msgstr "압사당했다"
 
 #: ../src/topten.c:1005
 #, c-format
 msgid " on the Plane of %s"
-msgstr " on the Plane of %s"
+msgstr " %s의 평면에서"
 
-# sit.c messages
 #: ../src/topten.c:1009
 #, c-format
 msgid " on the %s Plane"
-msgstr "%s 위에 앉는다."
+msgstr " %s 평면에서"
 
 #: ../src/topten.c:1010
 msgid "Astral"
-msgstr "원소의 평면으로"
+msgstr "천상"
 
 #: ../src/topten.c:1025
 msgid "Void"
@@ -35164,7 +35187,7 @@ msgstr "공허"
 #: ../src/topten.c:1032
 #, c-format
 msgid " on level %d"
-msgstr " on level %d"
+msgstr " %d층에서"
 
 #: ../src/topten.c:1034
 #, c-format
@@ -35178,12 +35201,11 @@ msgstr "%s 항목을 찾을 수 없습니다 - "
 
 #: ../src/topten.c:1301
 msgid "current "
-msgstr "흐름"
+msgstr "현재 "
 
-#
 #: ../src/topten.c:1308
 msgid "any of "
-msgstr "더 이상 볼 수 없다."
+msgstr "다음 중 "
 
 #: ../src/trap.c:96
 msgid "odorless"
@@ -35238,7 +35260,7 @@ msgstr "%s %s %s%s!"
 #: ../src/trap.c:326
 #, c-format
 msgid "%s away"
-msgstr "%s away"
+msgstr "%s 떨어져"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -35332,7 +35354,7 @@ msgstr "깊은 "
 #: ../src/trap.c:710
 #, c-format
 msgid "The hole in the %s above you closes up."
-msgstr "The hole in the %s above you closes up."
+msgstr "당신 위의 %s에 있는 구멍이 닫힌다."
 
 #: ../src/trap.c:837
 msgid "turns into flesh"
@@ -35390,7 +35412,7 @@ msgstr "녹이다"
 #: ../src/trap.c:1012
 #, c-format
 msgid "%s %s %s spider web!"
-msgstr "%s %s %s spider web!"
+msgstr "%s이(가) %s 거미줄을 %s!"
 
 #: ../src/trap.c:1013
 msgid "dissolves"
@@ -35404,7 +35426,7 @@ msgstr "%s 거미줄을 통과한다."
 #: ../src/trap.c:1025
 #, c-format
 msgid "%s flows through %s spider web."
-msgstr "%s flows through %s spider web."
+msgstr "%s이(가) %s 거미줄을 통과해 흘러간다."
 
 #: ../src/trap.c:1074
 msgid "can fly."
@@ -35426,7 +35448,7 @@ msgstr "화살이 당신에게 날아왔다!"
 #: ../src/trap.c:1240 ../src/trap.c:1310
 #, c-format
 msgid "%s triggers a trap but nothing happens."
-msgstr "%s triggers a trap but nothing happens."
+msgstr "%s이(가) 함정을 작동시켰지만 아무 일도 일어나지 않았다."
 
 #: ../src/trap.c:1272
 msgid "a soft click."
@@ -35484,12 +35506,12 @@ msgstr "시끄러운"
 #: ../src/trap.c:1458
 #, c-format
 msgid "A board beneath %s squeaks %s loudly."
-msgstr "A board beneath %s squeaks %s loudly."
+msgstr "%s 아래의 널빤지가 %s 크게 삐걱거린다."
 
 #: ../src/trap.c:1463
 #, c-format
 msgid "%s stops momentarily and appears to cringe."
-msgstr "%s stops momentarily and appears to cringe."
+msgstr "%s이(가) 잠시 멈추고 움츠리는 것 같다."
 
 #: ../src/trap.c:1476
 #, c-format
@@ -35532,7 +35554,7 @@ msgstr "성난 곰의 포효!"
 #: ../src/trap.c:1552
 #, c-format
 msgid "%s evades %s bear trap!"
-msgstr "%s evades %s bear trap!"
+msgstr "%s이(가) %s 곰 덫을 피했다!"
 
 #: ../src/trap.c:1575
 msgid "are enveloped in a cloud of gas!"
@@ -35743,12 +35765,12 @@ msgstr "구멍에 빠졌다"
 #: ../src/trap.c:1979
 #, c-format
 msgid "%s doesn't fall into the pit."
-msgstr "%s doesn't fall into the pit."
+msgstr "%s이(가) 구덩이에 빠지지 않았다."
 
 #: ../src/trap.c:1991
 #, c-format
 msgid "%s %s into %s pit!"
-msgstr "%s %s into %s pit!"
+msgstr "%s이(가) %s 구덩이에 %s!"
 
 #: ../src/trap.c:2018
 #, c-format
@@ -35791,12 +35813,12 @@ msgstr "%s에 맞았다!"
 #: ../src/trap.c:2135
 #, c-format
 msgid "lead %s into"
-msgstr "lead %s into"
+msgstr "%s을(를) 유도"
 
 #: ../src/trap.c:2139
 #, c-format
 msgid "%s into"
-msgstr "%s into"
+msgstr "%s(으)로"
 
 #: ../src/trap.c:2139
 msgid "stumble"
@@ -35819,7 +35841,7 @@ msgstr "%s %s 거미줄!"
 #: ../src/trap.c:2258
 #, c-format
 msgid "%s tears through %s spider web!"
-msgstr "%s tears through %s spider web!"
+msgstr "%s이(가) %s 거미줄을 찢었다!"
 
 #: ../src/trap.c:2265
 #, c-format
@@ -35879,16 +35901,15 @@ msgstr "여기에 %2$s{이/가} 있다.%1$.0s"
 #
 #: ../src/trap.c:2501
 msgid "You discover"
-msgstr "당신은 죽었다."
+msgstr "발견했다"
 
 #: ../src/trap.c:2502
 msgid "the trigger of your mine"
-msgstr "탱크에 호랑이가 있다."
+msgstr "당신 지뢰의 방아쇠를"
 
-# Archeologist ranks
 #: ../src/trap.c:2502
 msgid "a trigger"
-msgstr "발굴자"
+msgstr "방아쇠를"
 
 #: ../src/trap.c:2506
 #, c-format
@@ -35919,7 +35940,7 @@ msgstr "보이지 않는 괴물!"
 #: ../src/trap.c:2561
 #, c-format
 msgid "A trigger appears in a pile of soil below %s."
-msgstr "A trigger appears in a pile of soil below %s."
+msgstr "%s 아래 흙더미에서 방아쇠가 나타났다."
 
 #: ../src/trap.c:2569
 #, c-format
@@ -36027,7 +36048,7 @@ msgstr "존재하지 않는 다트에 맞은 탈것?"
 #: ../src/trap.c:3151
 #, c-format
 msgid "The hole fills with %s!"
-msgstr "The hole fills with %s!"
+msgstr "구멍이 %s(으)로 채워진다!"
 
 #: ../src/trap.c:3267
 #, c-format
@@ -36046,7 +36067,7 @@ msgstr "우르릉거리는 %s."
 #: ../src/trap.c:3327
 #, c-format
 msgid "%s snatches the boulder."
-msgstr "%s snatches the boulder."
+msgstr "%s이(가) 바위를 낚아챘다."
 
 #: ../src/trap.c:3367
 #, c-format
@@ -36081,7 +36102,7 @@ msgstr "바위가 문을 뚫고 나갔다."
 #: ../src/trap.c:3683
 #, c-format
 msgid "%s pulls free..."
-msgstr "%s pulls free..."
+msgstr "%s이(가) 빠져나왔다..."
 
 #: ../src/trap.c:3691
 #, c-format
@@ -36125,7 +36146,7 @@ msgstr "%s 시체"
 #: ../src/trap.c:3849
 #, c-format
 msgid "%s%s touches %s."
-msgstr "%s%s touches %s."
+msgstr "%s%s이(가) %s을(를) 만진다."
 
 #: ../src/trap.c:3869
 #, c-format
@@ -36664,17 +36685,17 @@ msgstr "대체 어떻게 그걸 하려고 하는가?"
 #: ../src/trap.c:5196
 #, c-format
 msgid "You'll have to let go of %s first."
-msgstr "You'll have to let go of %s first."
+msgstr "먼저 %s을(를) 놓아야 한다."
 
 #: ../src/trap.c:5198
 #, c-format
 msgid "Your %s seem to be too busy for that."
-msgstr "Your %s seem to be too busy for that."
+msgstr "당신의 %s이(가) 그러기에는 너무 바쁜 것 같다."
 
 #: ../src/trap.c:5203
 #, c-format
 msgid "You can't reach the %s."
-msgstr "You can't reach the %s."
+msgstr "%s에 손이 닿지 않는다."
 
 #: ../src/trap.c:5361
 #, c-format
@@ -36880,7 +36901,7 @@ msgstr "이미 구덩이 가장자리에 있다."
 #: ../src/trap.c:5863
 #, c-format
 msgid "There %s and %s here.  %s %s?"
-msgstr "There %s and %s here.  %s %s?"
+msgstr "여기 %s와 %s이 있다.  %s %s?"
 
 #: ../src/trap.c:5864
 msgid "is a container"
@@ -36963,7 +36984,7 @@ msgstr "당신은 %s."
 #: ../src/trap.c:6101
 #, c-format
 msgid "You and %s are"
-msgstr "You and %s are"
+msgstr "당신과 %s은(는)"
 
 # #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 # ============================================================
@@ -37025,7 +37046,7 @@ msgstr "하지만 다행히 %s!"
 #: ../src/trap.c:6292
 #, c-format
 msgid "exploding %s"
-msgstr "exploding %s"
+msgstr "폭발하는 %s"
 
 #: ../src/trap.c:6345
 #, c-format
@@ -37106,7 +37127,7 @@ msgstr "%s{이/가} %s에 맞았다!"
 #: ../src/trap.c:6668
 #, c-format
 msgid "%s is hit by %s%s"
-msgstr "%s is hit by %s%s"
+msgstr "%s이(가) %s%s에 맞았다"
 
 #
 #: ../src/trap.c:6670
@@ -37688,7 +37709,7 @@ msgstr "은이 %s{을/를} 지진다!"
 #: ../src/uhitm.c:1656
 #, c-format
 msgid "Your %s%s %s"
-msgstr "Your %s%s %s"
+msgstr "당신의 %s%s %s"
 
 #: ../src/uhitm.c:1657 ../src/weapon.c:461
 msgid "silver "
@@ -37726,7 +37747,7 @@ msgstr " %s!"
 #: ../src/uhitm.c:1695
 #, c-format
 msgid "The light sears %s!"
-msgstr "The light sears %s!"
+msgstr "빛이 %s을(를) 태웠다!"
 
 #: ../src/uhitm.c:1892
 #, c-format
@@ -37793,7 +37814,7 @@ msgstr "%s{이/가} %s 갑옷을 벗는 것을 마쳤다."
 #: ../src/uhitm.c:2222
 #, c-format
 msgid "You snatched but dropped %s."
-msgstr "You snatched but dropped %s."
+msgstr "당신은 %s을(를) 낚아챘지만 떨어뜨렸다."
 
 #: ../src/uhitm.c:2223
 msgid "You steal: "
@@ -38169,7 +38190,7 @@ msgstr "생명력이 빠져나가고 있다..."
 #: ../src/uhitm.c:3890
 #, c-format
 msgid "%s looks %sconfused."
-msgstr "%s looks %sconfused."
+msgstr "%s이(가) %s혼란스러워 보인다."
 
 #: ../src/uhitm.c:3969
 msgid "bad shade attack function flow?"
@@ -38646,7 +38667,7 @@ msgstr "전기에 감전됐다!"
 #: ../src/uhitm.c:6187
 #, c-format
 msgid "Wait!  That's %s!"
-msgstr "Wait!  That's %s!"
+msgstr "잠깐!  저건 %s이다!"
 
 #: ../src/uhitm.c:6202
 #, c-format
@@ -38668,7 +38689,7 @@ msgstr "%s %s %s %%s!"
 #: ../src/uhitm.c:6226
 #, c-format
 msgid "Wait!  That %s is really %%s!"
-msgstr "Wait!  That %s is really %%s!"
+msgstr "잠깐!  저 %s은(는) 사실 %%s이다!"
 
 #: ../src/uhitm.c:6303
 #, c-format
@@ -38838,7 +38859,7 @@ msgstr "하지만 숨긴 금화가 있다!"
 #: ../src/vault.c:574
 #, c-format
 msgid "%s holds out %s palm and beckons with %s other hand."
-msgstr "%s holds out %s palm and beckons with %s other hand."
+msgstr "%s이(가) %s 손바닥을 내밀고 %s 다른 손으로 손짓한다."
 
 #: ../src/vault.c:580
 msgid "Most likely all your gold was stolen from this vault."
@@ -38909,7 +38930,7 @@ msgstr "%s %s{을/를} 먹었다."
 #: ../src/vault.c:951
 #, c-format
 msgid "%sfollow me!"
-msgstr "%sfollow me!"
+msgstr "%s나를 따라와!"
 
 # ============================================================
 # 아이템 메시지 (Item Messages)
@@ -39093,17 +39114,17 @@ msgstr "%s{은/는} 그 %s{을/를} 휘두를 수 없다."
 #: ../src/weapon.c:878
 #, c-format
 msgid "%s tries to wield %s."
-msgstr "%s tries to wield %s."
+msgstr "%s이(가) %s을(를) 휘두르려 한다."
 
 #: ../src/weapon.c:893
 #, c-format
 msgid "%s wields %s%c"
-msgstr "%s wields %s%c"
+msgstr "%s이(가) %s을(를) 휘두른다%c"
 
 #: ../src/weapon.c:897
 #, c-format
 msgid "%s secures the tether on %s."
-msgstr "%s secures the tether on %s."
+msgstr "%s이(가) %s에 줄을 묶었다."
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -39920,7 +39941,7 @@ msgstr "%s{이/가} 조상을 욕한다."
 #: ../src/wizcmds.c:280
 #, c-format
 msgid "%s own player"
-msgstr "%s own player"
+msgstr "%s의 플레이어"
 
 #: ../src/wizcmds.c:334
 msgid "is no monster there."
@@ -40059,7 +40080,7 @@ msgstr "쨍그랑 소리."
 #: ../src/worn.c:1296
 #, c-format
 msgid "%s boots %s off %s feet!"
-msgstr "%s boots %s off %s feet!"
+msgstr "%s이(가) %s의 발에서 %s을(를) 벗겼다!"
 
 #: ../src/write.c:89
 msgid "need hands to be able to write!"
@@ -40211,7 +40232,7 @@ msgstr "마법서가 이상하게 뒤틀리더니 %s{으로/로} 변했다."
 #: ../src/write.c:381
 #, c-format
 msgid "Oops!  %s out of your grasp!"
-msgstr "Oops!  %s out of your grasp!"
+msgstr "이런!  %s이(가) 손에서 빠져나갔다!"
 
 #: ../src/write.c:417
 msgid "into "
@@ -40456,7 +40477,7 @@ msgstr "일부 %s물체가 합쳐지고, %s{이/가} 더미에서 일어났다!"
 #: ../src/zap.c:1983
 #, c-format
 msgid "%s is furious!"
-msgstr "%s is furious!"
+msgstr "%s이(가) 격분했다!"
 
 #: ../src/zap.c:2047
 #, c-format
@@ -41306,7 +41327,7 @@ msgstr "그 설명에 맞는 것이 게임에 존재하지 않는다."
 #: ../src/zap.c:6279
 #, c-format
 msgid "Oops!  %s out of your reach!"
-msgstr "Oops!  %s out of your reach!"
+msgstr "이런!  %s이(가) 손이 닿지 않는 곳으로 갔다!"
 
 #: ../src/zap.c:6283
 #, c-format
@@ -41316,12 +41337,12 @@ msgstr "%s{이/가} 미끄러져 빠져나갔다."
 #: ../src/zap.c:6285
 #, c-format
 msgid "Oops!  %s to the floor!"
-msgstr "Oops!  %s to the floor!"
+msgstr "이런!  %s이(가) 바닥으로 떨어졌다!"
 
 #: ../src/zap.c:6286
 #, c-format
 msgid "Careful! %s on the floor!"
-msgstr "Careful! %s on the floor!"
+msgstr "조심해! %s이(가) 바닥에 있다!"
 
 #: ../src/zap.c:6310
 #, c-format
@@ -41838,1305 +41859,1437 @@ msgstr "노움족"
 msgid "orcdom"
 msgstr "오크족"
 
-#~ msgid "remembered, unseen, creature"
-#~ msgstr "보이지 않는 생물"
+# dungeon names
+#: ../src/obj_descr_i18n.c:475
+msgid "The Dungeons of Doom"
+msgstr "파멸의 던전"
+
+#: ../src/obj_descr_i18n.c:476
+msgid "The Gnomish Mines"
+msgstr "노움 광산"
+
+#: ../src/obj_descr_i18n.c:477
+msgid "Sokoban"
+msgstr "소코반"
+
+#: ../src/obj_descr_i18n.c:478
+msgid "The Quest"
+msgstr "퀘스트"
+
+#: ../src/obj_descr_i18n.c:479
+msgid "Fort Ludios"
+msgstr "루디오스 요새"
+
+#: ../src/obj_descr_i18n.c:480
+msgid "Gehennom"
+msgstr "게헨놈"
+
+#: ../src/obj_descr_i18n.c:481
+msgid "The Elemental Planes"
+msgstr "원소의 차원"
+
+#: ../src/obj_descr_i18n.c:482
+msgid "Vlad's Tower"
+msgstr "블라드의 탑"
+
+#: ../src/obj_descr_i18n.c:483
+msgid "The Tutorial"
+msgstr "튜토리얼"
+
+# spellbook descriptions (colors and textures)
+#: ../src/obj_descr_i18n.c:486
+msgid "parchment"
+msgstr "양피지"
+
+#: ../src/obj_descr_i18n.c:487
+msgid "vellum"
+msgstr "송아지 가죽"
+
+#: ../src/obj_descr_i18n.c:488
+msgid "ragged"
+msgstr "너덜너덜한"
+
+#: ../src/obj_descr_i18n.c:489
+msgid "dog eared"
+msgstr "귀퉁이가 접힌"
+
+#: ../src/obj_descr_i18n.c:490
+msgid "stained"
+msgstr "얼룩진"
+
+#: ../src/obj_descr_i18n.c:491
+msgid "leathery"
+msgstr "가죽 같은"
+
+#: ../src/obj_descr_i18n.c:492
+msgid "velvet"
+msgstr "벨벳"
+
+#: ../src/obj_descr_i18n.c:493
+msgid "light green"
+msgstr "연두색"
+
+#: ../src/obj_descr_i18n.c:495
+msgid "turquoise"
+msgstr "청록색"
+
+#: ../src/obj_descr_i18n.c:496
+msgid "light blue"
+msgstr "하늘색"
+
+#: ../src/obj_descr_i18n.c:497
+msgid "dark blue"
+msgstr "짙은 파랑"
+
+#: ../src/obj_descr_i18n.c:498
+msgid "indigo"
+msgstr "남색"
+
+#: ../src/obj_descr_i18n.c:499
+msgid "purple"
+msgstr "보라색"
+
+#: ../src/obj_descr_i18n.c:500
+msgid "violet"
+msgstr "제비꽃색"
+
+#: ../src/obj_descr_i18n.c:501
+msgid "tan"
+msgstr "황갈색"
+
+#: ../src/obj_descr_i18n.c:502
+msgid "plaid"
+msgstr "격자무늬"
+
+#: ../src/obj_descr_i18n.c:503
+msgid "light brown"
+msgstr "연한 갈색"
+
+#: ../src/obj_descr_i18n.c:504
+msgid "dark brown"
+msgstr "짙은 갈색"
+
+#: ../src/obj_descr_i18n.c:507
+msgid "glittering"
+msgstr "반짝이는"
+
+#: ../src/obj_descr_i18n.c:508
+msgid "shining"
+msgstr "빛나는"
+
+#: ../src/obj_descr_i18n.c:509
+msgid "dull"
+msgstr "칙칙한"
+
+#: ../src/obj_descr_i18n.c:511
+msgid "thick"
+msgstr "두꺼운"
+
+#: ../src/obj_descr_i18n.c:512
+msgid "checkered"
+msgstr "체크무늬"
+
+#: ../src/obj_descr_i18n.c:513
+msgid "canvas"
+msgstr "캔버스"
+
+#: ../src/obj_descr_i18n.c:514
+msgid "hardcover"
+msgstr "양장"
+
+msgid "remembered, unseen, creature"
+msgstr "보이지 않는 생물"
 
 # Object names extracted from include/objects.h
 #
-#~ msgid "ANDOVA BEGARIN"
-#~ msgstr "안도바 베가린"
+msgid "ANDOVA BEGARIN"
+msgstr "안도바 베가린"
 
-#~ msgid "DAIYEN FOOELS"
-#~ msgstr "다이엔 풀스"
+msgid "DAIYEN FOOELS"
+msgstr "다이엔 풀스"
 
-#~ msgid "DUAM XNAHT"
-#~ msgstr "두암 크나트"
+msgid "DUAM XNAHT"
+msgstr "두암 크나트"
 
-#~ msgid "ELAM EBOW"
-#~ msgstr "엘람 에보우"
+msgid "ELAM EBOW"
+msgstr "엘람 에보우"
 
-#~ msgid "ELBIB YLOH"
-#~ msgstr "엘빕 일로"
+msgid "ELBIB YLOH"
+msgstr "엘빕 일로"
 
-#~ msgid "HACKEM MUCHE"
-#~ msgstr "하켐 무체"
+msgid "HACKEM MUCHE"
+msgstr "하켐 무체"
 
-#~ msgid "Hawaiian shirt"
-#~ msgstr "하와이안 셔츠"
+msgid "Hawaiian shirt"
+msgstr "하와이안 셔츠"
 
-#~ msgid "JUYED AWK YACC"
-#~ msgstr "주예드 아우크 야크"
+msgid "JUYED AWK YACC"
+msgstr "주예드 아우크 야크"
 
-#~ msgid "KERNOD WEL"
-#~ msgstr "케르노드 웰"
+msgid "KERNOD WEL"
+msgstr "케르노드 웰"
 
-#~ msgid "KIRJE"
-#~ msgstr "키르제"
+msgid "KIRJE"
+msgstr "키르제"
 
-#~ msgid "LEP GEX VEN ZEA"
-#~ msgstr "렙 겍스 벤 제아"
+msgid "LEP GEX VEN ZEA"
+msgstr "렙 겍스 벤 제아"
 
-#~ msgid "NR 9"
-#~ msgstr "NR 9"
+msgid "NR 9"
+msgstr "NR 9"
 
-#~ msgid "PRATYAVAYAH"
-#~ msgstr "프라챠바야"
+msgid "PRATYAVAYAH"
+msgstr "프라챠바야"
 
-#~ msgid "PRIRUTSENIE"
-#~ msgstr "프리루체니에"
+msgid "PRIRUTSENIE"
+msgstr "프리루체니에"
 
-#~ msgid "THARR"
-#~ msgstr "타르"
+msgid "THARR"
+msgstr "타르"
 
-#~ msgid "VE FORBRYDERNE"
-#~ msgstr "베 포르브리데르네"
+msgid "VE FORBRYDERNE"
+msgstr "베 포르브리데르네"
 
-#~ msgid "VELOX NEB"
-#~ msgstr "벨록스 네브"
+msgid "VELOX NEB"
+msgstr "벨록스 네브"
 
-#~ msgid "VENZAR BORGAVVE"
-#~ msgstr "벤자르 보르가베"
+msgid "VENZAR BORGAVVE"
+msgstr "벤자르 보르가베"
 
-#~ msgid "VERR YED HORRE"
-#~ msgstr "베르 예드 호레"
+msgid "VERR YED HORRE"
+msgstr "베르 예드 호레"
 
-#~ msgid "XIXAXA XOXAXA XUXAXA"
-#~ msgstr "시샤샤 소샤샤 수샤샤"
+msgid "XIXAXA XOXAXA XUXAXA"
+msgstr "시샤샤 소샤샤 수샤샤"
 
-#~ msgid "YUM YUM"
-#~ msgstr "냠냠"
+msgid "YUM YUM"
+msgstr "냠냠"
 
-#~ msgid "ZELGO MER"
-#~ msgstr "젤고 메르"
+msgid "ZELGO MER"
+msgstr "젤고 메르"
 
-#~ msgid "adornment"
-#~ msgstr "성향"
+msgid "adornment"
+msgstr "성향"
 
-#~ msgid "aggravate monster"
-#~ msgstr "몬스터 자극의 반지"
+msgid "aggravate monster"
+msgstr "몬스터 자극의 반지"
 
-#~ msgid "aklys"
-#~ msgstr "아클리스"
+msgid "aklys"
+msgstr "아클리스"
 
-#~ msgid "amber"
-#~ msgstr "호박"
+msgid "amber"
+msgstr "호박"
 
-#~ msgid "amethyst"
-#~ msgstr "자수정"
+msgid "amethyst"
+msgstr "자수정"
 
-#~ msgid "amnesia"
-#~ msgstr "건망증"
+msgid "amnesia"
+msgstr "건망증"
 
-#~ msgid "amulet of ESP"
-#~ msgstr ""
-#~ "투시의 부적#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "정신감응의 부적\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "ESP의 부적"
+msgid "amulet of ESP"
+msgstr ""
+"투시의 부적#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"정신감응의 부적\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"ESP의 부적"
 
-#~ msgid "amulet of change"
-#~ msgstr "불변의 부적"
+msgid "amulet of change"
+msgstr "불변의 부적"
 
-#~ msgid "amulet of flying"
-#~ msgstr "비행의 부적"
+msgid "amulet of flying"
+msgstr "비행의 부적"
 
-#~ msgid "amulet of guarding"
-#~ msgstr "수호의 부적"
+msgid "amulet of guarding"
+msgstr "수호의 부적"
 
-#~ msgid "amulet of life saving"
-#~ msgstr "생명 구원의 부적"
+msgid "amulet of life saving"
+msgstr "생명 구원의 부적"
 
-#~ msgid "amulet of reflection"
-#~ msgstr "반사의 부적"
+msgid "amulet of reflection"
+msgstr "반사의 부적"
 
-#~ msgid "amulet of restful sleep"
-#~ msgstr ""
-#~ "안식의 수면 부적#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "평화로운 수면의 부적\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "안식의 부적"
+msgid "amulet of restful sleep"
+msgstr ""
+"안식의 수면 부적#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"평화로운 수면의 부적\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"안식의 부적"
 
-#~ msgid "amulet of strangulation"
-#~ msgstr "반사의 부적"
+msgid "amulet of strangulation"
+msgstr "반사의 부적"
 
-#~ msgid "amulet of unchanging"
-#~ msgstr "불변의 부적"
+msgid "amulet of unchanging"
+msgstr "불변의 부적"
 
-#~ msgid "amulet versus poison"
-#~ msgstr ""
-#~ "독 방호의 부적#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "독 방어의 부적\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "독 방호의 부적"
+msgid "amulet versus poison"
+msgstr ""
+"독 방호의 부적#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"독 방어의 부적\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"독 방호의 부적"
 
-#~ msgid "angled poleaxe"
-#~ msgstr "꺾인 장창도끼"
+msgid "angled poleaxe"
+msgstr "꺾인 장창도끼"
 
-#~ msgid "aquamarine"
-#~ msgstr "아쿠아마린"
+msgid "aquamarine"
+msgstr "아쿠아마린"
 
-#~ msgid "balsa"
-#~ msgstr "발사나무"
+msgid "balsa"
+msgstr "발사나무"
 
-#~ msgid "banded mail"
-#~ msgstr ""
-#~ "밴디드 메일#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "대갑\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "밴디드 메일"
+msgid "banded mail"
+msgstr ""
+"밴디드 메일#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"대갑\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"밴디드 메일"
 
-#~ msgid "bardiche"
-#~ msgstr "바르디슈"
+msgid "bardiche"
+msgstr "바르디슈"
 
-#~ msgid "battle-axe"
-#~ msgstr ""
-#~ "전투 도끼수다쟁이멍청이멍청이멍청이#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-"
-#~ "#-#\n"
-#~ "전투 도끼\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "전투도끼"
+msgid "battle-axe"
+msgstr ""
+"전투 도끼수다쟁이멍청이멍청이멍청이#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-"
+"#-#\n"
+"전투 도끼\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"전투도끼"
 
-#~ msgid "beaked polearm"
-#~ msgstr "부리형 장창"
+msgid "beaked polearm"
+msgstr "부리형 장창"
 
-#~ msgid "beartrap"
-#~ msgstr ""
-#~ "곰 덫부엉이곰 함정#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "곰 덫\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "곰덫"
+msgid "beartrap"
+msgstr ""
+"곰 덫부엉이곰 함정#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"곰 덫\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"곰덫"
 
-#~ msgid "bec de corbin"
-#~ msgstr "베크 드 코르뱅"
+msgid "bec de corbin"
+msgstr "베크 드 코르뱅"
 
-#~ msgid "bill-guisarme"
-#~ msgstr "빌 기사름"
+msgid "bill-guisarme"
+msgstr "빌 기사름"
 
-#~ msgid "black opal"
-#~ msgstr "검은 오닉스"
+msgid "black opal"
+msgstr "검은 오닉스"
 
-#~ msgid "blank paper"
-#~ msgstr "종이"
+msgid "blank paper"
+msgstr "종이"
 
-#~ msgid "blindness"
-#~ msgstr "실명의 물약"
+msgid "blindness"
+msgstr "실명의 물약"
 
-#~ msgid "booze"
-#~ msgstr "스며나오다"
+msgid "booze"
+msgstr "스며나오다"
 
 # ============================================================
 # 아이템 이름 (Item Names)
 # ============================================================
 # --- 도구 (Tools) ---
-#~ msgid "brass lantern"
-#~ msgstr "황동 랜턴"
+msgid "brass lantern"
+msgstr "황동 랜턴"
 
-#~ msgid "broad pick"
-#~ msgstr "자물쇠 따개"
+msgid "broad pick"
+msgstr "자물쇠 따개"
 
-#~ msgid "broad short sword"
-#~ msgstr "넓은 단검"
+msgid "broad short sword"
+msgstr "넓은 단검"
 
-#~ msgid "broadsword"
-#~ msgstr "브로드소드"
+msgid "broadsword"
+msgstr "브로드소드"
 
-#~ msgid "bronze plate mail"
-#~ msgstr "청동 판금 갑옷"
+msgid "bronze plate mail"
+msgstr "청동 판금 갑옷"
 
-#~ msgid "bugle"
-#~ msgstr "나팔"
+msgid "bugle"
+msgstr "나팔"
 
 # #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 # 무기 - 채찍
-#~ msgid "bullwhip"
-#~ msgstr "채찍"
+msgid "bullwhip"
+msgstr "채찍"
 
-#~ msgid "can of grease"
-#~ msgstr "윤활유 통"
+msgid "can of grease"
+msgstr "윤활유 통"
 
-#~ msgid "cancellation"
-#~ msgstr "해제의 지팡이"
+msgid "cancellation"
+msgstr "해제의 지팡이"
 
-#~ msgid "chrysoberyl"
-#~ msgstr "금록석"
+msgid "chrysoberyl"
+msgstr "금록석"
 
-#~ msgid "citrine"
-#~ msgstr "황수정"
+msgid "citrine"
+msgstr "황수정"
 
-#~ msgid "confuse monster"
-#~ msgstr "몬스터 혼란 두루마리"
+msgid "confuse monster"
+msgstr "몬스터 혼란 두루마리"
 
 #
-#~ msgid "confusion"
-#~ msgstr "혼란스러워졌다."
+msgid "confusion"
+msgstr "혼란스러워졌다."
 
-#~ msgid "create monster"
-#~ msgstr "보이지 않는 괴물!"
+msgid "create monster"
+msgstr "보이지 않는 괴물!"
 
-#~ msgid "credit card"
-#~ msgstr "신용카드"
+msgid "credit card"
+msgstr "신용카드"
 
-#~ msgid "crude chain mail"
-#~ msgstr "조잡한 사슬 갑옷"
+msgid "crude chain mail"
+msgstr "조잡한 사슬 갑옷"
 
-#~ msgid "crude dagger"
-#~ msgstr "조잡한 단검"
+msgid "crude dagger"
+msgstr "조잡한 단검"
 
-#~ msgid "crude ring mail"
-#~ msgstr "조잡한 사슬 갑옷"
+msgid "crude ring mail"
+msgstr "조잡한 사슬 갑옷"
 
-#~ msgid "crude short sword"
-#~ msgstr "조잡한 단검"
+msgid "crude short sword"
+msgstr "조잡한 단검"
 
-#~ msgid "crude spear"
-#~ msgstr "조잡한 창"
+msgid "crude spear"
+msgstr "조잡한 창"
 
-#~ msgid "crysknife"
-#~ msgstr "크리스나이프"
+msgid "crysknife"
+msgstr "크리스나이프"
 
-#~ msgid "crystal ball"
-#~ msgstr "수정"
+msgid "crystal ball"
+msgstr "수정"
 
-#~ msgid "crystal plate mail"
-#~ msgstr "수정 판금 갑옷"
+msgid "crystal plate mail"
+msgstr "수정 판금 갑옷"
 
-#~ msgid "curved sword"
-#~ msgstr "곡검"
+msgid "curved sword"
+msgstr "곡검"
 
-#~ msgid "dart"
-#~ msgstr "다트"
+msgid "dart"
+msgstr "다트"
 
-#~ msgid "death"
-#~ msgstr "죽음 광선"
+msgid "death"
+msgstr "죽음 광선"
 
-#~ msgid "destroy armor"
-#~ msgstr "갑옷 파괴 두루마리"
+msgid "destroy armor"
+msgstr "갑옷 파괴 두루마리"
 
-#~ msgid "double-headed axe"
-#~ msgstr "양날 도끼"
+msgid "double-headed axe"
+msgstr "양날 도끼"
 
-#~ msgid "drum of earthquake"
-#~ msgstr "지진의 북"
+msgid "drum of earthquake"
+msgstr "지진의 북"
 
-#~ msgid "dwarvish mattock"
-#~ msgstr "드워프 곡괭이"
+msgid "dwarvish mattock"
+msgstr "드워프 곡괭이"
 
-#~ msgid "dwarvish mithril-coat"
-#~ msgstr "드워프 미스릴 갑옷"
+msgid "dwarvish mithril-coat"
+msgstr "드워프 미스릴 갑옷"
 
-#~ msgid "dwarvish short sword"
-#~ msgstr "드워프 단검"
+msgid "dwarvish short sword"
+msgstr "드워프 단검"
 
-#~ msgid "dwarvish spear"
-#~ msgstr "드워프 창"
+msgid "dwarvish spear"
+msgstr "드워프 창"
 
-#~ msgid "earth"
-#~ msgstr "땅"
+msgid "earth"
+msgstr "땅"
 
-#~ msgid "elven broadsword"
-#~ msgstr "엘프 브로드소드"
+msgid "elven broadsword"
+msgstr "엘프 브로드소드"
 
-#~ msgid "elven dagger"
-#~ msgstr "엘프 단검"
+msgid "elven dagger"
+msgstr "엘프 단검"
 
-#~ msgid "elven mithril-coat"
-#~ msgstr "엘프 미스릴 갑옷"
+msgid "elven mithril-coat"
+msgstr "엘프 미스릴 갑옷"
 
-#~ msgid "elven short sword"
-#~ msgstr "엘프 단검"
+msgid "elven short sword"
+msgstr "엘프 단검"
 
-#~ msgid "elven spear"
-#~ msgstr "엘프 창"
+msgid "elven spear"
+msgstr "엘프 창"
 
-#~ msgid "enchant armor"
-#~ msgstr "갑옷 강화 두루마리"
+msgid "enchant armor"
+msgstr "갑옷 강화 두루마리"
 
-#~ msgid "enlightenment"
-#~ msgstr "깨달음의 지팡이"
+msgid "enlightenment"
+msgstr "깨달음의 지팡이"
 
-#~ msgid "expensive camera"
-#~ msgstr "고급 카메라"
+msgid "expensive camera"
+msgstr "고급 카메라"
 
-#~ msgid "extra healing"
-#~ msgstr "추가 치료의 물약"
+msgid "extra healing"
+msgstr "추가 치료의 물약"
 
-#~ msgid "figurine"
-#~ msgstr ""
-#~ "조각상#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "조각상\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "피규어"
+msgid "figurine"
+msgstr ""
+"조각상#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"조각상\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"피규어"
 
-#~ msgid "fire horn"
-#~ msgstr "냉기의 뿔피리"
+msgid "fire horn"
+msgstr "냉기의 뿔피리"
 
-#~ msgid "fluorite"
-#~ msgstr "형석"
+msgid "fluorite"
+msgstr "형석"
 
-#~ msgid "food detection"
-#~ msgstr "음식 탐지 두루마리"
+msgid "food detection"
+msgstr "음식 탐지 두루마리"
 
-#~ msgid "frost horn"
-#~ msgstr "냉기의 뿔피리"
+msgid "frost horn"
+msgstr "냉기의 뿔피리"
 
-#~ msgid "fruit juice"
-#~ msgstr "과일 주스"
+msgid "fruit juice"
+msgstr "과일 주스"
 
-#~ msgid "full healing"
-#~ msgstr "완전 치료의 물약"
+msgid "full healing"
+msgstr "완전 치료의 물약"
 
-#~ msgid "gain ability"
-#~ msgstr ""
-#~ "능력 상승#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "능력 향상의 물약\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "능력 상승의 물약"
+msgid "gain ability"
+msgstr ""
+"능력 상승#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"능력 향상의 물약\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"능력 상승의 물약"
 
-#~ msgid "gain energy"
-#~ msgstr "에너지가 빠졌다."
+msgid "gain energy"
+msgstr "에너지가 빠졌다."
 
-#~ msgid "gain level"
-#~ msgstr "레벨 상승의 물약"
+msgid "gain level"
+msgstr "레벨 상승의 물약"
 
-#~ msgid "garnet"
-#~ msgstr "석류석"
+msgid "garnet"
+msgstr "석류석"
 
-#~ msgid "glaive"
-#~ msgstr "글레이브"
+msgid "glaive"
+msgstr "글레이브"
 
-#~ msgid "glass orb"
-#~ msgstr "유리 구슬"
+msgid "glass orb"
+msgstr "유리 구슬"
 
-#~ msgid "gold detection"
-#~ msgstr "금 탐지 두루마리"
+msgid "gold detection"
+msgstr "금 탐지 두루마리"
 
-#~ msgid "grappling hook"
-#~ msgstr "갈고리"
+msgid "grappling hook"
+msgstr "갈고리"
 
-#~ msgid "guisarme"
-#~ msgstr "기사름"
+msgid "guisarme"
+msgstr "기사름"
 
-#~ msgid "halberd"
-#~ msgstr "할버드"
+msgid "halberd"
+msgstr "할버드"
 
-#~ msgid "hallucination"
-#~ msgstr "환각의 물약"
+msgid "hallucination"
+msgstr "환각의 물약"
 
-#~ msgid "hilted polearm"
-#~ msgstr "손잡이형 장창"
+msgid "hilted polearm"
+msgstr "손잡이형 장창"
 
-#~ msgid "hooked polearm"
-#~ msgstr "갈고리형 장창"
+msgid "hooked polearm"
+msgstr "갈고리형 장창"
 
-#~ msgid "horn of plenty"
-#~ msgstr "풍요의 뿔"
+msgid "horn of plenty"
+msgstr "풍요의 뿔"
 
-#~ msgid "increase accuracy"
-#~ msgstr "명중 증가의 반지"
+msgid "increase accuracy"
+msgstr "명중 증가의 반지"
 
-#~ msgid "invisibility"
-#~ msgstr "투명한 "
+msgid "invisibility"
+msgstr "투명한 "
 
-#~ msgid "jacinth"
-#~ msgstr "히아신스"
+msgid "jacinth"
+msgstr "히아신스"
 
-#~ msgid "jasper"
-#~ msgstr "벽옥"
+msgid "jasper"
+msgstr "벽옥"
 
-#~ msgid "javelin"
-#~ msgstr "투창"
+msgid "javelin"
+msgstr "투창"
 
-#~ msgid "jet"
-#~ msgstr "흑옥"
+msgid "jet"
+msgstr "흑옥"
 
-#~ msgid "katana"
-#~ msgstr "카타나"
+msgid "katana"
+msgstr "카타나"
 
-#~ msgid "leather armor"
-#~ msgstr "가죽 북"
+msgid "leather armor"
+msgstr "가죽 북"
 
-#~ msgid "leather drum"
-#~ msgstr "가죽 북"
+msgid "leather drum"
+msgstr "가죽 북"
 
-#~ msgid "leather jacket"
-#~ msgstr "가죽 재킷"
+msgid "leather jacket"
+msgstr "가죽 재킷"
 
-#~ msgid "lightning"
-#~ msgstr "가벼운"
+msgid "lightning"
+msgstr "가벼운"
 
-#~ msgid "long poleaxe"
-#~ msgstr "장궁"
+msgid "long poleaxe"
+msgstr "장궁"
 
-#~ msgid "long samurai sword"
-#~ msgstr "긴 사무라이 검"
+msgid "long samurai sword"
+msgstr "긴 사무라이 검"
 
-#~ msgid "long sword"
-#~ msgstr "장검"
+msgid "long sword"
+msgstr "장검"
 
-#~ msgid "looking glass"
-#~ msgstr "거울"
+msgid "looking glass"
+msgstr "거울"
 
-#~ msgid "lucern hammer"
-#~ msgstr "루체른 해머"
+msgid "lucern hammer"
+msgstr "루체른 해머"
 
-#~ msgid "magic flute"
-#~ msgstr "마법 램프"
+msgid "magic flute"
+msgstr "마법 램프"
 
-#~ msgid "magic harp"
-#~ msgstr "마법 하프"
+msgid "magic harp"
+msgstr "마법 하프"
 
-#~ msgid "magic lamp"
-#~ msgstr "마법 하프"
+msgid "magic lamp"
+msgstr "마법 하프"
 
-#~ msgid "magic mapping"
-#~ msgstr "마법 지도 두루마리"
+msgid "magic mapping"
+msgstr "마법 지도 두루마리"
 
-#~ msgid "magic marker"
-#~ msgstr "마법 마커"
+msgid "magic marker"
+msgstr "마법 마커"
 
-#~ msgid "magic whistle"
-#~ msgstr "마법 화살"
+msgid "magic whistle"
+msgstr "마법 화살"
 
-#~ msgid "mail"
-#~ msgstr "고리 갑옷"
+msgid "mail"
+msgstr "고리 갑옷"
 
-#~ msgid "make invisible"
-#~ msgstr "투명한 "
+msgid "make invisible"
+msgstr "투명한 "
 
-#~ msgid "morning star"
-#~ msgstr "모닝스타"
+msgid "morning star"
+msgstr "모닝스타"
 
-#~ msgid "object detection"
-#~ msgstr "물체 탐지의 물약"
+msgid "object detection"
+msgstr "물체 탐지의 물약"
 
-#~ msgid "obsidian"
-#~ msgstr "흑요석"
+msgid "obsidian"
+msgstr "흑요석"
 
-#~ msgid "oil"
-#~ msgstr "기름"
+msgid "oil"
+msgstr "기름"
 
-#~ msgid "oil lamp"
-#~ msgstr "기름 램프"
+msgid "oil lamp"
+msgstr "기름 램프"
 
-#~ msgid "opening"
-#~ msgstr "열"
+msgid "opening"
+msgstr "열"
 
-#~ msgid "orcish chain mail"
-#~ msgstr ""
-#~ "오크 사슬 갑옷#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "오크 사슬 갑옷\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "오크 체인 메일"
+msgid "orcish chain mail"
+msgstr ""
+"오크 사슬 갑옷#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"오크 사슬 갑옷\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"오크 체인 메일"
 
-#~ msgid "orcish dagger"
-#~ msgstr "오크 단검"
+msgid "orcish dagger"
+msgstr "오크 단검"
 
-#~ msgid "orcish ring mail"
-#~ msgstr ""
-#~ "오크 링 메일#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "오크 고리 갑옷\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "오크 링 메일"
+msgid "orcish ring mail"
+msgstr ""
+"오크 링 메일#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"오크 고리 갑옷\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"오크 링 메일"
 
-#~ msgid "orcish short sword"
-#~ msgstr "오크 단검"
+msgid "orcish short sword"
+msgstr "오크 단검"
 
-#~ msgid "orcish spear"
-#~ msgstr "오크 창"
+msgid "orcish spear"
+msgstr "오크 창"
 
-#~ msgid "paralysis"
-#~ msgstr "마비의 물약"
+msgid "paralysis"
+msgstr "마비의 물약"
 
 # === insight.c status descriptions ===
-#~ msgid "partisan"
-#~ msgstr "실제로 "
+msgid "partisan"
+msgstr "실제로 "
 
-#~ msgid "pick-axe"
-#~ msgstr "곡괭이"
+msgid "pick-axe"
+msgstr "곡괭이"
 
-#~ msgid "pole cleaver"
-#~ msgstr "바위 동굴"
+msgid "pole cleaver"
+msgstr "바위 동굴"
 
-#~ msgid "probing"
-#~ msgstr "옷 벗는 중"
+msgid "probing"
+msgstr "옷 벗는 중"
 
-#~ msgid "pronged polearm"
-#~ msgstr "갈래형 장창"
+msgid "pronged polearm"
+msgstr "갈래형 장창"
 
-#~ msgid "pruning hook"
-#~ msgstr "갈고리"
+msgid "pruning hook"
+msgstr "갈고리"
 
-#~ msgid "punishment"
-#~ msgstr "처벌받는 중"
+msgid "punishment"
+msgstr "처벌받는 중"
 
-#~ msgid "ranseur"
-#~ msgstr "란서"
+msgid "ranseur"
+msgstr "란서"
 
-#~ msgid "remove curse"
-#~ msgstr "%s{을/를} 움직일 수 없다!"
+msgid "remove curse"
+msgstr "%s{을/를} 움직일 수 없다!"
 
-#~ msgid "restore ability"
-#~ msgstr "능력 회복의 물약"
+msgid "restore ability"
+msgstr "능력 회복의 물약"
 
-#~ msgid "rubber hose"
-#~ msgstr "고무 호스"
+msgid "rubber hose"
+msgstr "고무 호스"
 
-#~ msgid "runed broadsword"
-#~ msgstr "룬 브로드소드"
+msgid "runed broadsword"
+msgstr "룬 브로드소드"
 
-#~ msgid "runed dagger"
-#~ msgstr "룬 단검"
+msgid "runed dagger"
+msgstr "룬 단검"
 
-#~ msgid "runed short sword"
-#~ msgstr "룬 단검"
+msgid "runed short sword"
+msgstr "룬 단검"
 
-#~ msgid "runed spear"
-#~ msgstr "룬 창"
+msgid "runed spear"
+msgstr "룬 창"
 
-#~ msgid "runesword"
-#~ msgstr "룬 검"
+msgid "runesword"
+msgstr "룬 검"
 
-#~ msgid "samurai sword"
-#~ msgstr "사무라이 검"
+msgid "samurai sword"
+msgstr "사무라이 검"
 
-#~ msgid "scalpel"
-#~ msgstr "메스"
+msgid "scalpel"
+msgstr "메스"
 
-#~ msgid "scare monster"
-#~ msgstr "보이지 않는 괴물!"
+msgid "scare monster"
+msgstr "보이지 않는 괴물!"
 
-#~ msgid "scimitar"
-#~ msgstr "시미터"
+msgid "scimitar"
+msgstr "시미터"
 
-#~ msgid "secret door detection"
-#~ msgstr "비밀문 탐지의 지팡이"
+msgid "secret door detection"
+msgstr "비밀문 탐지의 지팡이"
 
-#~ msgid "short sword"
-#~ msgstr "단검"
+msgid "short sword"
+msgstr "단검"
 
-#~ msgid "shuriken"
-#~ msgstr "수리검"
+msgid "shuriken"
+msgstr "수리검"
 
-#~ msgid "silver dagger"
-#~ msgstr "은 단검"
+msgid "silver dagger"
+msgstr "은 단검"
 
-#~ msgid "silver mace"
-#~ msgstr "은 철퇴"
+msgid "silver mace"
+msgstr "은 철퇴"
 
-#~ msgid "silver saber"
-#~ msgstr ""
-#~ "은 세이버#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "은 사벨\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "은 세이버"
+msgid "silver saber"
+msgstr ""
+"은 세이버#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"은 사벨\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"은 세이버"
 
-#~ msgid "silver spear"
-#~ msgstr "은 창"
+msgid "silver spear"
+msgstr "은 창"
 
-#~ msgid "single-edged polearm"
-#~ msgstr "외날 장창"
+msgid "single-edged polearm"
+msgstr "외날 장창"
 
-#~ msgid "skeleton key"
-#~ msgstr "만능 열쇠"
+msgid "skeleton key"
+msgstr "만능 열쇠"
 
-#~ msgid "slow monster"
-#~ msgstr "보이지 않는 괴물!"
+msgid "slow monster"
+msgstr "보이지 않는 괴물!"
 
-#~ msgid "speed"
-#~ msgstr "속도"
+msgid "speed"
+msgstr "속도"
 
-#~ msgid "speed monster"
-#~ msgstr "몬스터 가속의 지팡이"
+msgid "speed monster"
+msgstr "몬스터 가속의 지팡이"
 
-#~ msgid "spetum"
-#~ msgstr "스페텀"
+msgid "spetum"
+msgstr "스페텀"
 
-#~ msgid "splint mail"
-#~ msgstr "찰갑"
+msgid "splint mail"
+msgstr "찰갑"
 
-#~ msgid "stamped"
-#~ msgstr "더 축축한"
+msgid "stamped"
+msgstr "더 축축한"
 
-#~ msgid "stealth"
-#~ msgstr "건강해진 느낌이다."
+msgid "stealth"
+msgstr "건강해진 느낌이다."
 
-#~ msgid "stethoscope"
-#~ msgstr "청진기"
+msgid "stethoscope"
+msgstr "청진기"
 
-#~ msgid "stiletto"
-#~ msgstr "스틸레토"
+msgid "stiletto"
+msgstr "스틸레토"
 
-#~ msgid "stinking cloud"
-#~ msgstr "통조림 도구"
+msgid "stinking cloud"
+msgstr "통조림 도구"
 
-#~ msgid "stout spear"
-#~ msgstr "튼튼한 창"
+msgid "stout spear"
+msgstr "튼튼한 창"
 
-#~ msgid "striking"
-#~ msgstr "통조림 도구"
+msgid "striking"
+msgstr "통조림 도구"
 
-#~ msgid "studded leather armor"
-#~ msgstr "징박이 가죽 갑옷"
+msgid "studded leather armor"
+msgstr "징박이 가죽 갑옷"
 
-#~ msgid "sustain ability"
-#~ msgstr "능력 유지의 반지"
+msgid "sustain ability"
+msgstr "능력 유지의 반지"
 
-#~ msgid "tallow candle"
-#~ msgstr ""
-#~ "동물 기름 양초#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "수지 양초\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "수지 초"
+msgid "tallow candle"
+msgstr ""
+"동물 기름 양초#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"수지 양초\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"수지 초"
 
-#~ msgid "taming"
-#~ msgstr "다가오는"
+msgid "taming"
+msgstr "다가오는"
 
-#~ msgid "teleportation"
-#~ msgstr "순간이동의 지팡이"
+msgid "teleportation"
+msgstr "순간이동의 지팡이"
 
-#~ msgid "thonged club"
-#~ msgstr "끈 달린 곤봉"
+msgid "thonged club"
+msgstr "끈 달린 곤봉"
 
-#~ msgid "throwing spear"
-#~ msgstr "투척 창"
+msgid "throwing spear"
+msgstr "투척 창"
 
-#~ msgid "throwing star"
-#~ msgstr "표창"
+msgid "throwing star"
+msgstr "표창"
 
-#~ msgid "tin opener"
-#~ msgstr "깡통 따개"
+msgid "tin opener"
+msgstr "깡통 따개"
 
-#~ msgid "tin whistle"
-#~ msgstr "호루라기"
+msgid "tin whistle"
+msgstr "호루라기"
 
-#~ msgid "tinning kit"
-#~ msgstr "통조림 도구"
+msgid "tinning kit"
+msgstr "통조림 도구"
 
-#~ msgid "tooled horn"
-#~ msgstr ""
-#~ "세공 뿔피리#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "뿔피리\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "장식 뿔피리"
+msgid "tooled horn"
+msgstr ""
+"세공 뿔피리#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"뿔피리\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"장식 뿔피리"
 
-#~ msgid "trident"
-#~ msgstr "삼지창"
+msgid "trident"
+msgstr "삼지창"
 
-#~ msgid "tsurugi"
-#~ msgstr "츠루기"
+msgid "tsurugi"
+msgstr "츠루기"
 
-#~ msgid "turquoise"
-#~ msgstr "터키석"
+msgid "two-handed sword"
+msgstr "양손검"
 
-#~ msgid "two-handed sword"
-#~ msgstr "양손검"
+msgid "undead turning"
+msgstr "언데드 퇴치의 지팡이"
 
-#~ msgid "undead turning"
-#~ msgstr "언데드 퇴치의 지팡이"
+msgid "unicorn horn"
+msgstr "유니콘 뿔"
 
-#~ msgid "unicorn horn"
-#~ msgstr "유니콘 뿔"
+msgid "unlabeled"
+msgstr "라벨 없는"
 
-#~ msgid "unlabeled"
-#~ msgstr "라벨 없는"
+msgid "voulge"
+msgstr "불지"
 
-#~ msgid "violet"
-#~ msgstr "난폭한"
+msgid "vulgar polearm"
+msgstr "일반 장창"
 
-#~ msgid "voulge"
-#~ msgstr "불지"
+msgid "war hammer"
+msgstr "전쟁 망치"
 
-#~ msgid "vulgar polearm"
-#~ msgstr "일반 장창"
+msgid "wax candle"
+msgstr "밀랍 양초"
 
-#~ msgid "war hammer"
-#~ msgstr "전쟁 망치"
+msgid "wishing"
+msgstr "반짝이는"
 
-#~ msgid "wax candle"
-#~ msgstr "밀랍 양초"
+msgid "wooden flute"
+msgstr ""
+"나무 플룻#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"나무 피리\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"나무 플루트"
 
-#~ msgid "wishing"
-#~ msgstr "반짝이는"
+msgid "wooden harp"
+msgstr "나무 하프"
 
-#~ msgid "wooden flute"
-#~ msgstr ""
-#~ "나무 플룻#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "나무 피리\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "나무 플루트"
+msgid "worm tooth"
+msgstr "벌레 이빨"
 
-#~ msgid "wooden harp"
-#~ msgstr "나무 하프"
+msgid "worthless piece of black glass"
+msgstr "가치 없는 검은 유리 조각"
 
-#~ msgid "worm tooth"
-#~ msgstr "벌레 이빨"
+msgid "worthless piece of yellowish brown glass"
+msgstr "가치 없는 황갈색 유리 조각"
 
-#~ msgid "worthless piece of black glass"
-#~ msgstr "가치 없는 검은 유리 조각"
-
-#~ msgid "worthless piece of yellowish brown glass"
-#~ msgstr "가치 없는 황갈색 유리 조각"
-
-#~ msgid "yellowish brown"
-#~ msgstr "노란색"
+msgid "yellowish brown"
+msgstr "노란색"
 
 # Monster attack verbs (mhitm.c)
 #, c-format
-#~ msgid "%s bites"
-#~ msgstr "%s{이/가} 물어"
+msgid "%s bites"
+msgstr "%s{이/가} 물어"
 
 #, c-format
-#~ msgid "%s stings"
-#~ msgstr "%s{이/가} 찔러"
+msgid "%s stings"
+msgstr "%s{이/가} 찔러"
 
 #, c-format
-#~ msgid "%s butts"
-#~ msgstr "%s{이/가} 들이받아"
+msgid "%s butts"
+msgstr "%s{이/가} 들이받아"
 
 #, c-format
-#~ msgid "%s tentacles suck"
-#~ msgstr "%s의 촉수가 빨아"
+msgid "%s tentacles suck"
+msgstr "%s의 촉수가 빨아"
 
 #, c-format
-#~ msgid "%s squeezes"
-#~ msgstr "%s{이/가} 조여"
+msgid "%s squeezes"
+msgstr "%s{이/가} 조여"
 
 #, c-format
-#~ msgid "%s hits"
-#~ msgstr "%s{이/가} 때려"
+msgid "%s hits"
+msgstr "%s{이/가} 때려"
 
 #
 #, c-format
-#~ msgid "Cannot open %s.  Sorry."
-#~ msgstr "%s{을/를} 열 수 없다. 미안."
+msgid "Cannot open %s.  Sorry."
+msgstr "%s{을/를} 열 수 없다. 미안."
 
 #, c-format
-#~ msgid "need to take off %s to %s %s."
-#~ msgstr "%s{을/를} 벗어야 %s{을/를} %s 수 있다."
+msgid "need to take off %s to %s %s."
+msgstr "%s{을/를} 벗어야 %s{을/를} %s 수 있다."
 
 #, c-format
-#~ msgid "haven't discovered any %s yet."
-#~ msgstr "아직 %s{을/를} 발견하지 못했다."
+msgid "haven't discovered any %s yet."
+msgstr "아직 %s{을/를} 발견하지 못했다."
 
-#~ msgid "Nothing happens."
-#~ msgstr "아무 일도 일어나지 않았다."
+msgid "Nothing happens."
+msgstr "아무 일도 일어나지 않았다."
 
-#~ msgid "That's enough tries!"
-#~ msgstr "시도는 충분히 했다!"
+msgid "That's enough tries!"
+msgstr "시도는 충분히 했다!"
 
 #, c-format
-#~ msgid "That is a silly thing to %s."
-#~ msgstr "%s하기엔 바보 같은 것이다."
+msgid "That is a silly thing to %s."
+msgstr "%s하기엔 바보 같은 것이다."
 
-#~ msgid "Never mind."
-#~ msgstr "신경 쓰지 마라."
+msgid "Never mind."
+msgstr "신경 쓰지 마라."
 
-#~ msgid "vision quickly clears."
-#~ msgstr "시야가 금방 맑아졌다."
+msgid "vision quickly clears."
+msgstr "시야가 금방 맑아졌다."
 
-#~ msgid "elven"
-#~ msgstr "엘프"
+msgid "elven"
+msgstr "엘프"
 
-#~ msgid "dwarven"
-#~ msgstr "드워프"
+msgid "dwarven"
+msgstr "드워프"
 
-#~ msgid "gnomish"
-#~ msgstr "노움"
+msgid "gnomish"
+msgstr "노움"
 
-#~ msgid "orcish"
-#~ msgstr "오크"
-
-#, fuzzy
-#~ msgid "oilskin sack"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "방수 자루\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "기름종이 자루"
+msgid "orcish"
+msgstr "오크"
 
 #, fuzzy
-#~ msgid "bag of holding"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "보관 가방\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "보관의 가방"
+msgid "oilskin sack"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"방수 자루\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"기름종이 자루"
 
 #, fuzzy
-#~ msgid "bag of tricks"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "속임수 가방\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "속임수의 가방"
-
-#~ msgid "elven arrow"
-#~ msgstr "엘프 화살"
-
-#~ msgid "runed arrow"
-#~ msgstr "룬 화살"
-
-#~ msgid "orcish arrow"
-#~ msgstr "오크 화살"
-
-#~ msgid "crude arrow"
-#~ msgstr "조잡한 화살"
-
-#~ msgid "silver arrow"
-#~ msgstr "은 화살"
+msgid "bag of holding"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"보관 가방\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"보관의 가방"
 
 #, fuzzy
-#~ msgid "ya"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "야(화살)\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "야(矢)"
+msgid "bag of tricks"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"속임수 가방\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"속임수의 가방"
 
-#~ msgid "bamboo arrow"
-#~ msgstr "대나무 화살"
+msgid "elven arrow"
+msgstr "엘프 화살"
+
+msgid "runed arrow"
+msgstr "룬 화살"
+
+msgid "orcish arrow"
+msgstr "오크 화살"
+
+msgid "crude arrow"
+msgstr "조잡한 화살"
+
+msgid "silver arrow"
+msgstr "은 화살"
 
 #, fuzzy
-#~ msgid "crossbow bolt"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "쇠뇌 화살\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "석궁 화살"
+msgid "ya"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"야(화살)\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"야(矢)"
 
-#~ msgid "runed bow"
-#~ msgstr "룬 활"
+msgid "bamboo arrow"
+msgstr "대나무 화살"
 
-#~ msgid "orcish bow"
-#~ msgstr "오크 활"
+#, fuzzy
+msgid "crossbow bolt"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"쇠뇌 화살\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"석궁 화살"
 
-#~ msgid "yumi"
-#~ msgstr "유미"
+msgid "runed bow"
+msgstr "룬 활"
+
+msgid "orcish bow"
+msgstr "오크 활"
+
+msgid "yumi"
+msgstr "유미"
 
 # #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 # 방어구 - 망토
-#~ msgid "mummy wrapping"
-#~ msgstr "미라 붕대"
+msgid "mummy wrapping"
+msgstr "미라 붕대"
 
-#~ msgid "faded pall"
-#~ msgstr "바랜 덮개"
+msgid "faded pall"
+msgstr "바랜 덮개"
 
-#~ msgid "orcish cloak"
-#~ msgstr "오크 망토"
+msgid "orcish cloak"
+msgstr "오크 망토"
 
-#~ msgid "coarse mantelet"
-#~ msgstr "거친 망토"
+msgid "coarse mantelet"
+msgstr "거친 망토"
 
-#~ msgid "dwarvish cloak"
-#~ msgstr "드워프 망토"
+msgid "dwarvish cloak"
+msgstr "드워프 망토"
 
-#~ msgid "hooded cloak"
-#~ msgstr "후드 망토"
-
-#, fuzzy
-#~ msgid "oilskin cloak"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "방수 망토\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "기름종이 망토"
-
-#~ msgid "robe"
-#~ msgstr "로브"
+msgid "hooded cloak"
+msgstr "후드 망토"
 
 #, fuzzy
-#~ msgid "alchemy smock"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "연금술 작업복\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "연금술사 앞치마"
+msgid "oilskin cloak"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"방수 망토\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"기름종이 망토"
 
-#~ msgid "apron"
-#~ msgstr "앞치마"
-
-#~ msgid "leather cloak"
-#~ msgstr "가죽 망토"
-
-#~ msgid "cloak of protection"
-#~ msgstr "보호의 망토"
-
-#~ msgid "tattered cape"
-#~ msgstr "낡은 망토"
+msgid "robe"
+msgstr "로브"
 
 #, fuzzy
-#~ msgid "cloak of invisibility"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "투명 망토\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "투명의 망토"
+msgid "alchemy smock"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"연금술 작업복\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"연금술사 앞치마"
 
-#~ msgid "opera cloak"
-#~ msgstr "오페라 망토"
+msgid "apron"
+msgstr "앞치마"
 
-#~ msgid "ornamental cope"
-#~ msgstr "장식 망토"
+msgid "leather cloak"
+msgstr "가죽 망토"
 
-#, fuzzy
-#~ msgid "cloak of displacement"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "변위 망토\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "착란의 망토"
+msgid "cloak of protection"
+msgstr "보호의 망토"
 
-#~ msgid "plumed helmet"
-#~ msgstr "깃털 투구"
-
-#~ msgid "etched helmet"
-#~ msgstr "새김 투구"
-
-#~ msgid "visored helmet"
-#~ msgstr "가리개 투구"
-
-#~ msgid "hard hat"
-#~ msgstr "안전모"
-
-#~ msgid "fedora"
-#~ msgstr "페도라"
-
-#~ msgid "cornuthaum"
-#~ msgstr "마법사 모자"
-
-#~ msgid "conical hat"
-#~ msgstr "원뿔 모자"
-
-#~ msgid "dunce cap"
-#~ msgstr "바보 모자"
-
-#~ msgid "old gloves"
-#~ msgstr "낡은 장갑"
-
-#~ msgid "padded gloves"
-#~ msgstr "솜 장갑"
-
-#~ msgid "riding gloves"
-#~ msgstr "승마용 장갑"
-
-#~ msgid "fencing gloves"
-#~ msgstr "펜싱 장갑"
+msgid "tattered cape"
+msgstr "낡은 망토"
 
 #, fuzzy
-#~ msgid "gauntlets of fumbling"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "실수의 건틀릿\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "헛손질의 건틀릿"
+msgid "cloak of invisibility"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"투명 망토\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"투명의 망토"
 
-#~ msgid "gauntlets of power"
-#~ msgstr "힘의 건틀릿"
+msgid "opera cloak"
+msgstr "오페라 망토"
 
-#~ msgid "gauntlets of dexterity"
-#~ msgstr "민첩의 건틀릿"
-
-#~ msgid "small shield"
-#~ msgstr "소형 방패"
-
-#~ msgid "elven shield"
-#~ msgstr "엘프 방패"
-
-#~ msgid "blue and green shield"
-#~ msgstr "파랑과 초록 방패"
+msgid "ornamental cope"
+msgstr "장식 망토"
 
 #, fuzzy
-#~ msgid "Uruk-hai shield"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "우르크하이 방패\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "우루크하이 방패"
+msgid "cloak of displacement"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"변위 망토\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"착란의 망토"
 
-#~ msgid "white-handed shield"
-#~ msgstr "흰손 방패"
+msgid "plumed helmet"
+msgstr "깃털 투구"
 
-#~ msgid "orcish shield"
-#~ msgstr "오크 방패"
+msgid "etched helmet"
+msgstr "새김 투구"
 
-#~ msgid "red-eyed shield"
-#~ msgstr "붉은 눈 방패"
+msgid "visored helmet"
+msgstr "가리개 투구"
 
-#, fuzzy
-#~ msgid "dwarvish roundshield"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "드워프 원형 방패\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "드워프 원형방패"
+msgid "hard hat"
+msgstr "안전모"
 
-#~ msgid "large round shield"
-#~ msgstr "큰 원형 방패"
+msgid "fedora"
+msgstr "페도라"
 
-#~ msgid "large shield"
-#~ msgstr "대형 방패"
+msgid "cornuthaum"
+msgstr "마법사 모자"
 
-#~ msgid "polished silver shield"
-#~ msgstr "광택 은 방패"
+msgid "conical hat"
+msgstr "원뿔 모자"
 
-#~ msgid "smooth shield"
-#~ msgstr "매끄러운 방패"
+msgid "dunce cap"
+msgstr "바보 모자"
 
-#~ msgid "low boots"
-#~ msgstr "단화"
+msgid "old gloves"
+msgstr "낡은 장갑"
 
-#~ msgid "iron shoes"
-#~ msgstr "철제 신발"
+msgid "padded gloves"
+msgstr "솜 장갑"
 
-#~ msgid "hard shoes"
-#~ msgstr "딱딱한 신발"
+msgid "riding gloves"
+msgstr "승마용 장갑"
+
+msgid "fencing gloves"
+msgstr "펜싱 장갑"
 
 #, fuzzy
-#~ msgid "high boots"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "장화\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "높은 부츠"
+msgid "gauntlets of fumbling"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"실수의 건틀릿\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"헛손질의 건틀릿"
 
-#~ msgid "jackboots"
-#~ msgstr "군화"
+msgid "gauntlets of power"
+msgstr "힘의 건틀릿"
 
-#~ msgid "combat boots"
-#~ msgstr "전투화"
+msgid "gauntlets of dexterity"
+msgstr "민첩의 건틀릿"
 
-#~ msgid "jungle boots"
-#~ msgstr "정글화"
+msgid "small shield"
+msgstr "소형 방패"
 
-#, fuzzy
-#~ msgid "jumping boots"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "점프의 장화\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "점프 부츠"
+msgid "elven shield"
+msgstr "엘프 방패"
 
-#~ msgid "hiking boots"
-#~ msgstr "등산화"
-
-#~ msgid "mud boots"
-#~ msgstr "진흙 장화"
+msgid "blue and green shield"
+msgstr "파랑과 초록 방패"
 
 #, fuzzy
-#~ msgid "kicking boots"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "발차기 장화\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "발차기 부츠"
+msgid "Uruk-hai shield"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"우르크하이 방패\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"우루크하이 방패"
+
+msgid "white-handed shield"
+msgstr "흰손 방패"
+
+msgid "orcish shield"
+msgstr "오크 방패"
+
+msgid "red-eyed shield"
+msgstr "붉은 눈 방패"
 
 #, fuzzy
-#~ msgid "fumble boots"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "실수의 장화\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "헛디딤 부츠"
+msgid "dwarvish roundshield"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"드워프 원형 방패\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"드워프 원형방패"
 
-#~ msgid "riding boots"
-#~ msgstr "승마 장화"
+msgid "large round shield"
+msgstr "큰 원형 방패"
 
-#~ msgid "snow boots"
-#~ msgstr "설상화"
+msgid "large shield"
+msgstr "대형 방패"
 
-#~ msgid "enormous meatball"
-#~ msgstr "거대한 미트볼"
+msgid "polished silver shield"
+msgstr "광택 은 방패"
 
-#, fuzzy
-#~ msgid "sprig of wolfsbane"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "늑대풀\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "늑대 쐐기풀 잎"
+msgid "smooth shield"
+msgstr "매끄러운 방패"
 
-#~ msgid "lump of royal jelly"
-#~ msgstr "로열젤리 덩어리"
+msgid "low boots"
+msgstr "단화"
 
-#~ msgid "potion of confusion"
-#~ msgstr "혼란의 물약"
+msgid "iron shoes"
+msgstr "철제 신발"
 
-#~ msgid "potion of levitation"
-#~ msgstr "부유의 물약"
+msgid "hard shoes"
+msgstr "딱딱한 신발"
 
 #, fuzzy
-#~ msgid "potion of invisibility"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "투명화의 물약\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "투명의 물약"
+msgid "high boots"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"장화\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"높은 부츠"
 
-#~ msgid "potion of enlightenment"
-#~ msgstr "깨달음의 물약"
+msgid "jackboots"
+msgstr "군화"
 
-#, fuzzy
-#~ msgid "potion of gain energy"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "에너지 획득의 물약\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "마나 상승의 물약"
+msgid "combat boots"
+msgstr "전투화"
 
-#~ msgid "potion of sleeping"
-#~ msgstr "수면의 물약"
-
-#~ msgid "potion of polymorph"
-#~ msgstr "변신의 물약"
-
-#~ msgid "potion of fruit juice"
-#~ msgstr "과일 주스"
-
-#~ msgid "scroll of scare monster"
-#~ msgstr "몬스터 공포 두루마리"
-
-#~ msgid "scroll of remove curse"
-#~ msgstr "저주 해제 두루마리"
-
-#~ msgid "scroll of create monster"
-#~ msgstr "몬스터 소환 두루마리"
-
-#~ msgid "scroll of taming"
-#~ msgstr "길들이기 두루마리"
-
-#~ msgid "scroll of light"
-#~ msgstr "빛의 두루마리"
-
-#~ msgid "scroll of teleportation"
-#~ msgstr "순간이동 두루마리"
-
-#~ msgid "scroll of identify"
-#~ msgstr "감정 두루마리"
+msgid "jungle boots"
+msgstr "정글화"
 
 #, fuzzy
-#~ msgid "scroll of amnesia"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "기억상실 두루마리\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "망각의 두루마리"
+msgid "jumping boots"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"점프의 장화\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"점프 부츠"
+
+msgid "hiking boots"
+msgstr "등산화"
+
+msgid "mud boots"
+msgstr "진흙 장화"
 
 #, fuzzy
-#~ msgid "scroll of punishment"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "형벌 두루마리\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "징벌의 두루마리"
-
-#~ msgid "scroll of charging"
-#~ msgstr "충전 두루마리"
+msgid "kicking boots"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"발차기 장화\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"발차기 부츠"
 
 #, fuzzy
-#~ msgid "scroll of stinking cloud"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "악취 구름 두루마리\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "독구름 두루마리"
+msgid "fumble boots"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"실수의 장화\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"헛디딤 부츠"
 
-#~ msgid "ring of protection"
-#~ msgstr "보호의 반지"
+msgid "riding boots"
+msgstr "승마 장화"
 
-#~ msgid "ring of warning"
-#~ msgstr "경고의 반지"
+msgid "snow boots"
+msgstr "설상화"
 
-#~ msgid "ring of fire resistance"
-#~ msgstr "화염 저항의 반지"
-
-#, fuzzy
-#~ msgid "ring of invisibility"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "투명화의 반지\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "투명의 반지"
+msgid "enormous meatball"
+msgstr "거대한 미트볼"
 
 #, fuzzy
-#~ msgid "ring of see invisible"
-#~ msgstr ""
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "투명 보기의 반지\n"
-#~ "#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
-#~ "투명 감지의 반지"
+msgid "sprig of wolfsbane"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"늑대풀\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"늑대 쐐기풀 잎"
 
-#~ msgid "iron chain"
-#~ msgstr "쇠사슬"
+msgid "lump of royal jelly"
+msgstr "로열젤리 덩어리"
 
-#~ msgid "blinding venom"
-#~ msgstr "눈멀게 하는 독"
+msgid "potion of confusion"
+msgstr "혼란의 물약"
+
+msgid "potion of levitation"
+msgstr "부유의 물약"
+
+#, fuzzy
+msgid "potion of invisibility"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"투명화의 물약\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"투명의 물약"
+
+msgid "potion of enlightenment"
+msgstr "깨달음의 물약"
+
+#, fuzzy
+msgid "potion of gain energy"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"에너지 획득의 물약\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"마나 상승의 물약"
+
+msgid "potion of sleeping"
+msgstr "수면의 물약"
+
+msgid "potion of polymorph"
+msgstr "변신의 물약"
+
+msgid "potion of fruit juice"
+msgstr "과일 주스"
+
+msgid "scroll of scare monster"
+msgstr "몬스터 공포 두루마리"
+
+msgid "scroll of remove curse"
+msgstr "저주 해제 두루마리"
+
+msgid "scroll of create monster"
+msgstr "몬스터 소환 두루마리"
+
+msgid "scroll of taming"
+msgstr "길들이기 두루마리"
+
+msgid "scroll of light"
+msgstr "빛의 두루마리"
+
+msgid "scroll of teleportation"
+msgstr "순간이동 두루마리"
+
+msgid "scroll of identify"
+msgstr "감정 두루마리"
+
+#, fuzzy
+msgid "scroll of amnesia"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"기억상실 두루마리\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"망각의 두루마리"
+
+#, fuzzy
+msgid "scroll of punishment"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"형벌 두루마리\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"징벌의 두루마리"
+
+msgid "scroll of charging"
+msgstr "충전 두루마리"
+
+#, fuzzy
+msgid "scroll of stinking cloud"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"악취 구름 두루마리\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"독구름 두루마리"
+
+msgid "ring of protection"
+msgstr "보호의 반지"
+
+msgid "ring of warning"
+msgstr "경고의 반지"
+
+msgid "ring of fire resistance"
+msgstr "화염 저항의 반지"
+
+#, fuzzy
+msgid "ring of invisibility"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"투명화의 반지\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"투명의 반지"
+
+#, fuzzy
+msgid "ring of see invisible"
+msgstr ""
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"투명 보기의 반지\n"
+"#-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#\n"
+"투명 감지의 반지"
+
+msgid "iron chain"
+msgstr "쇠사슬"
+
+msgid "blinding venom"
+msgstr "눈멀게 하는 독"
 
 #, c-format
-#~ msgid "This door%s."
-#~ msgstr "이 문%s."
+msgid "This door%s."
+msgstr "이 문%s."
 
-#~ msgid "oobleck"
-#~ msgstr "우블렉"
+msgid "oobleck"
+msgstr "우블렉"
 
-#~ msgid "clotted blood"
-#~ msgstr "응고된 피"
+msgid "clotted blood"
+msgstr "응고된 피"
 
-#~ msgid "instant coffee"
-#~ msgstr "인스턴트 커피"
+msgid "instant coffee"
+msgstr "인스턴트 커피"
 
-#~ msgid "tea"
-#~ msgstr "차"
+msgid "tea"
+msgstr "차"
 
-#~ msgid "creamy foam"
-#~ msgstr "크림 거품"
+msgid "creamy foam"
+msgstr "크림 거품"
 
-#~ msgid "mulled wine"
-#~ msgstr "뜨거운 포도주"
+msgid "mulled wine"
+msgstr "뜨거운 포도주"
 
-#~ msgid "bouillon"
-#~ msgstr "부용"
+msgid "bouillon"
+msgstr "부용"
 
-#~ msgid "nectar"
-#~ msgstr "넥타"
+msgid "nectar"
+msgstr "넥타"
 
-#~ msgid "grog"
-#~ msgstr "그로그"
+msgid "grog"
+msgstr "그로그"
 
-#~ msgid "flubber"
-#~ msgstr "플러버"
+msgid "flubber"
+msgstr "플러버"
 
-#~ msgid "slow light"
-#~ msgstr "느린 빛"
+msgid "slow light"
+msgstr "느린 빛"
 
-#~ msgid "vinaigrette"
-#~ msgstr "비네그렛"
+msgid "vinaigrette"
+msgstr "비네그렛"
 
-#~ msgid "liquid crystal"
-#~ msgstr "액정"
+msgid "liquid crystal"
+msgstr "액정"
 
-#~ msgid "caramel sauce"
-#~ msgstr "캐러멜 소스"
+msgid "caramel sauce"
+msgstr "캐러멜 소스"
 
-#~ msgid "ink"
-#~ msgstr "잉크"
+msgid "ink"
+msgstr "잉크"
 
-#~ msgid "aqueous humour"
-#~ msgstr "방수"
+msgid "aqueous humour"
+msgstr "방수"
 
-#~ msgid "milk substitute"
-#~ msgstr "대용유"
+msgid "milk substitute"
+msgstr "대용유"
 
-#~ msgid "gastric acid"
-#~ msgstr "위산"
+msgid "gastric acid"
+msgstr "위산"
 
-#~ msgid "cough syrup"
-#~ msgstr "기침 시럽"
+msgid "cough syrup"
+msgstr "기침 시럽"
 
-#~ msgid "sweet vitriol"
-#~ msgstr "에테르"
+msgid "sweet vitriol"
+msgstr "에테르"
 
-#~ msgid "cosmic latte"
-#~ msgstr "코스믹 라테"
+msgid "cosmic latte"
+msgstr "코스믹 라테"
 
 # #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
 # #-#-#-#-#  ko.po (NetHack 3.7)  #-#-#-#-#
@@ -43151,155 +43304,152 @@ msgstr "오크족"
 # ============================================================
 # 색상 (Colors)
 # ============================================================
-#~ msgid "ultraviolet"
-#~ msgstr "자외선"
+msgid "ultraviolet"
+msgstr "자외선"
 
-#~ msgid "infrared"
-#~ msgstr "적외선"
+msgid "infrared"
+msgstr "적외선"
 
-#~ msgid "bluish-orange"
-#~ msgstr "푸른 주황색"
+msgid "bluish-orange"
+msgstr "푸른 주황색"
 
-#~ msgid "reddish-green"
-#~ msgstr "붉은 녹색"
+msgid "reddish-green"
+msgstr "붉은 녹색"
 
-#~ msgid "light black"
-#~ msgstr "밝은 검은색"
+msgid "light black"
+msgstr "밝은 검은색"
 
-#~ msgid "pinkish-cyan"
-#~ msgstr "분홍빛 청록색"
+msgid "pinkish-cyan"
+msgstr "분홍빛 청록색"
 
-#~ msgid "umami"
-#~ msgstr "감칠맛의"
+msgid "umami"
+msgstr "감칠맛의"
 
-#~ msgid "spiral"
-#~ msgstr "소용돌이"
+msgid "spiral"
+msgstr "소용돌이"
 
-#~ msgid "argyle"
-#~ msgstr "아가일 무늬"
+msgid "argyle"
+msgstr "아가일 무늬"
 
-#~ msgid "paisley"
-#~ msgstr "페이즐리"
+msgid "paisley"
+msgstr "페이즐리"
 
-#~ msgid "blotchy"
-#~ msgstr "얼룩덜룩한"
+msgid "blotchy"
+msgstr "얼룩덜룩한"
 
-#~ msgid "guernsey-spotted"
-#~ msgstr "건지 반점"
+msgid "guernsey-spotted"
+msgstr "건지 반점"
 
-#~ msgid "polka-dotted"
-#~ msgstr "물방울 무늬"
+msgid "polka-dotted"
+msgstr "물방울 무늬"
 
-#~ msgid "fuchsia"
-#~ msgstr "자홍색"
+msgid "fuchsia"
+msgstr "자홍색"
 
-#~ msgid "lemon-lime"
-#~ msgstr "레몬라임"
+msgid "lemon-lime"
+msgstr "레몬라임"
 
-#~ msgid "strawberry-banana"
-#~ msgstr "딸기바나나"
+msgid "strawberry-banana"
+msgstr "딸기바나나"
 
-#~ msgid "peppermint"
-#~ msgstr "페퍼민트"
+msgid "peppermint"
+msgstr "페퍼민트"
 
-#~ msgid "romantic"
-#~ msgstr "로맨틱한"
+msgid "romantic"
+msgstr "로맨틱한"
 
-#~ msgid "octarine"
-#~ msgstr "옥타린"
+msgid "octarine"
+msgstr "옥타린"
 
-#~ msgid "excitingly dull"
-#~ msgstr "흥미롭게 따분한"
+msgid "excitingly dull"
+msgstr "흥미롭게 따분한"
 
-#~ msgid "mauve"
-#~ msgstr "연보라색"
+msgid "mauve"
+msgstr "연보라색"
 
-#~ msgid "neon"
-#~ msgstr "네온"
+msgid "neon"
+msgstr "네온"
 
-#~ msgid "phosphorescent"
-#~ msgstr "인광의"
+msgid "phosphorescent"
+msgstr "인광의"
 
-#~ msgid "translucent"
-#~ msgstr "반투명한"
+msgid "translucent"
+msgstr "반투명한"
 
-#~ msgid "opaque"
-#~ msgstr "불투명한"
+msgid "opaque"
+msgstr "불투명한"
 
-#~ msgid "psychedelic"
-#~ msgstr "환각적인"
+msgid "psychedelic"
+msgstr "환각적인"
 
-#~ msgid "iridescent"
-#~ msgstr "무지개빛의"
+msgid "iridescent"
+msgstr "무지개빛의"
 
-#~ msgid "rainbow-colored"
-#~ msgstr "무지개색의"
+msgid "rainbow-colored"
+msgstr "무지개색의"
 
-#~ msgid "colorless green"
-#~ msgstr "무색의 녹색"
+msgid "colorless green"
+msgstr "무색의 녹색"
 
-#~ msgid "dancing"
-#~ msgstr "춤추는"
+msgid "dancing"
+msgstr "춤추는"
 
-#~ msgid "noisy"
-#~ msgstr "소란스러운"
+msgid "noisy"
+msgstr "소란스러운"
 
-#~ msgid "silent"
-#~ msgstr "조용한"
+msgid "silent"
+msgstr "조용한"
 
-#~ msgid "aureolin"
-#~ msgstr "금빛 노란색"
+msgid "aureolin"
+msgstr "금빛 노란색"
 
-#~ msgid "cinnabar"
-#~ msgstr "진사색"
+msgid "cinnabar"
+msgstr "진사색"
 
-#~ msgid "purpurin"
-#~ msgstr "퍼퓨린"
+msgid "purpurin"
+msgstr "퍼퓨린"
 
-#~ msgid "gamboge"
-#~ msgstr "등황색"
+msgid "gamboge"
+msgstr "등황색"
 
-#~ msgid "madder"
-#~ msgstr "꼭두서니"
+msgid "madder"
+msgstr "꼭두서니"
 
-#~ msgid "ecru"
-#~ msgstr "엷은 베이지색"
+msgid "ecru"
+msgstr "엷은 베이지색"
 
-#~ msgid "fulvous"
-#~ msgstr "황갈색의"
+msgid "fulvous"
+msgstr "황갈색의"
 
-#~ msgid "tekhelet"
-#~ msgstr "테켈렛"
+msgid "tekhelet"
+msgstr "테켈렛"
 
-#~ msgid "selective yellow"
-#~ msgstr "선택적 노란색"
+msgid "selective yellow"
+msgstr "선택적 노란색"
 
-#~ msgid "Your surroundings look very uncertain..."
-#~ msgstr "주변이 매우 불확실해 보인다..."
+msgid "Your surroundings look very uncertain..."
+msgstr "주변이 매우 불확실해 보인다..."
 
-#~ msgid "You climb the stairs."
-#~ msgstr "계단을 올라갔다."
+msgid "You climb the stairs."
+msgstr "계단을 올라갔다."
 
-#~ msgid "The water is cool and refreshing."
-#~ msgstr "물이 시원하고 상쾌하다."
+msgid "The water is cool and refreshing."
+msgstr "물이 시원하고 상쾌하다."
 
-#~ msgid "You were killed by %s."
-#~ msgstr "%s에게 죽었다."
+msgid "You were killed by %s."
+msgstr "%s에게 죽었다."
 
-#~ msgid "What do you want to pick up?"
-#~ msgstr "무엇을 주우겠습니까?"
+msgid "What do you want to pick up?"
+msgstr "무엇을 주우겠습니까?"
 
-#~ msgid "Really quit?"
-#~ msgstr "정말 종료하겠습니까?"
+msgid "Really quit?"
+msgstr "정말 종료하겠습니까?"
 
-#~ msgid "lich"
-#~ msgstr "리치"
+msgid "lich"
+msgstr "리치"
 
-#~ msgid "vampire"
-#~ msgstr "뱀파이어"
-
-#~ msgid "zombie"
-#~ msgstr "좀비"
+msgid "vampire"
+msgstr "뱀파이어"
 
 # ============================================================
 # 아이템 이름 (Item Names) - 샘플
@@ -43307,229 +43457,229 @@ msgstr "오크족"
 # ============================================================
 # Copyright 배너 (Copyright Banner)
 # ============================================================
-#~ msgid "NetHack, Copyright 1985-2026"
-#~ msgstr "NetHack, 저작권 1985-2026"
+msgid "NetHack, Copyright 1985-2026"
+msgstr "NetHack, 저작권 1985-2026"
 
-#~ msgid "         By Stichting Mathematisch Centrum and M. Stephenson."
-#~ msgstr "         Stichting Mathematisch Centrum 및 M. Stephenson 제작."
+msgid "         By Stichting Mathematisch Centrum and M. Stephenson."
+msgstr "         Stichting Mathematisch Centrum 및 M. Stephenson 제작."
 
-#~ msgid "         See license for details."
-#~ msgstr "         자세한 내용은 라이선스를 참조해."
+msgid "         See license for details."
+msgstr "         자세한 내용은 라이선스를 참조해."
 
 # ============================================================
 # 성별 형용사 (Gender Adjectives)
 # ============================================================
-#~ msgid "neuter"
-#~ msgstr "중성"
+msgid "neuter"
+msgstr "중성"
 
 # 방어구 - 투구
-#~ msgid "elven helm"
-#~ msgstr "엘프 투구"
+msgid "elven helm"
+msgstr "엘프 투구"
 
-#~ msgid "dwarvish helm"
-#~ msgstr "드워프 투구"
+msgid "dwarvish helm"
+msgstr "드워프 투구"
 
-#~ msgid "helm of brilliance"
-#~ msgstr "명석함의 투구"
+msgid "helm of brilliance"
+msgstr "명석함의 투구"
 
-#~ msgid "helm of opposite alignment"
-#~ msgstr "성향 전환의 투구"
+msgid "helm of opposite alignment"
+msgstr "성향 전환의 투구"
 
-#~ msgid "elven chain mail"
-#~ msgstr "엘프 체인 메일"
+msgid "elven chain mail"
+msgstr "엘프 체인 메일"
 
-#~ msgid "dwarvish chain mail"
-#~ msgstr "드워프 체인 메일"
+msgid "dwarvish chain mail"
+msgstr "드워프 체인 메일"
 
 # 방어구 - 용 비늘
-#~ msgid "gray dragon scales"
-#~ msgstr "회색 용 비늘"
+msgid "gray dragon scales"
+msgstr "회색 용 비늘"
 
-#~ msgid "silver dragon scales"
-#~ msgstr "은색 용 비늘"
+msgid "silver dragon scales"
+msgstr "은색 용 비늘"
 
-#~ msgid "white dragon scales"
-#~ msgstr "흰 용 비늘"
+msgid "white dragon scales"
+msgstr "흰 용 비늘"
 
-#~ msgid "orange dragon scales"
-#~ msgstr "주황 용 비늘"
+msgid "orange dragon scales"
+msgstr "주황 용 비늘"
 
-#~ msgid "black dragon scales"
-#~ msgstr "검은 용 비늘"
+msgid "black dragon scales"
+msgstr "검은 용 비늘"
 
-#~ msgid "blue dragon scales"
-#~ msgstr "푸른 용 비늘"
+msgid "blue dragon scales"
+msgstr "푸른 용 비늘"
 
-#~ msgid "green dragon scales"
-#~ msgstr "초록 용 비늘"
+msgid "green dragon scales"
+msgstr "초록 용 비늘"
 
-#~ msgid "yellow dragon scales"
-#~ msgstr "노란 용 비늘"
+msgid "yellow dragon scales"
+msgstr "노란 용 비늘"
 
-#~ msgid "gray dragon scale mail"
-#~ msgstr "회색 용 비늘 갑옷"
+msgid "gray dragon scale mail"
+msgstr "회색 용 비늘 갑옷"
 
-#~ msgid "silver dragon scale mail"
-#~ msgstr "은색 용 비늘 갑옷"
+msgid "silver dragon scale mail"
+msgstr "은색 용 비늘 갑옷"
 
-#~ msgid "white dragon scale mail"
-#~ msgstr "흰 용 비늘 갑옷"
+msgid "white dragon scale mail"
+msgstr "흰 용 비늘 갑옷"
 
-#~ msgid "orange dragon scale mail"
-#~ msgstr "주황 용 비늘 갑옷"
+msgid "orange dragon scale mail"
+msgstr "주황 용 비늘 갑옷"
 
-#~ msgid "black dragon scale mail"
-#~ msgstr "검은 용 비늘 갑옷"
+msgid "black dragon scale mail"
+msgstr "검은 용 비늘 갑옷"
 
-#~ msgid "blue dragon scale mail"
-#~ msgstr "푸른 용 비늘 갑옷"
+msgid "blue dragon scale mail"
+msgstr "푸른 용 비늘 갑옷"
 
-#~ msgid "green dragon scale mail"
-#~ msgstr "초록 용 비늘 갑옷"
+msgid "green dragon scale mail"
+msgstr "초록 용 비늘 갑옷"
 
-#~ msgid "yellow dragon scale mail"
-#~ msgstr "노란 용 비늘 갑옷"
+msgid "yellow dragon scale mail"
+msgstr "노란 용 비늘 갑옷"
 
-#~ msgid "magic mirror"
-#~ msgstr "마법 거울"
+msgid "magic mirror"
+msgstr "마법 거울"
 
-#~ msgid "spellbook of magic missile"
-#~ msgstr "마법 화살의 마법서"
+msgid "spellbook of magic missile"
+msgstr "마법 화살의 마법서"
 
-#~ msgid "spellbook of fireball"
-#~ msgstr "화염구의 마법서"
+msgid "spellbook of fireball"
+msgstr "화염구의 마법서"
 
-#~ msgid "spellbook of cone of cold"
-#~ msgstr "냉기 원뿔의 마법서"
+msgid "spellbook of cone of cold"
+msgstr "냉기 원뿔의 마법서"
 
-#~ msgid "spellbook of finger of death"
-#~ msgstr "죽음의 손가락 마법서"
+msgid "spellbook of finger of death"
+msgstr "죽음의 손가락 마법서"
 
-#~ msgid "spellbook of detect monsters"
-#~ msgstr "몬스터 탐지의 마법서"
+msgid "spellbook of detect monsters"
+msgstr "몬스터 탐지의 마법서"
 
-#~ msgid "spellbook of healing"
-#~ msgstr "치료의 마법서"
+msgid "spellbook of healing"
+msgstr "치료의 마법서"
 
-#~ msgid "spellbook of knock"
-#~ msgstr "열기의 마법서"
+msgid "spellbook of knock"
+msgstr "열기의 마법서"
 
-#~ msgid "spellbook of force bolt"
-#~ msgstr "힘의 화살 마법서"
+msgid "spellbook of force bolt"
+msgstr "힘의 화살 마법서"
 
-#~ msgid "spellbook of confuse monster"
-#~ msgstr "몬스터 혼란의 마법서"
+msgid "spellbook of confuse monster"
+msgstr "몬스터 혼란의 마법서"
 
-#~ msgid "spellbook of cure blindness"
-#~ msgstr "실명 치료의 마법서"
+msgid "spellbook of cure blindness"
+msgstr "실명 치료의 마법서"
 
-#~ msgid "spellbook of drain life"
-#~ msgstr "생명력 흡수의 마법서"
+msgid "spellbook of drain life"
+msgstr "생명력 흡수의 마법서"
 
-#~ msgid "spellbook of slow monster"
-#~ msgstr "몬스터 감속의 마법서"
+msgid "spellbook of slow monster"
+msgstr "몬스터 감속의 마법서"
 
-#~ msgid "spellbook of wizard lock"
-#~ msgstr "마법사 자물쇠의 마법서"
+msgid "spellbook of wizard lock"
+msgstr "마법사 자물쇠의 마법서"
 
-#~ msgid "spellbook of create monster"
-#~ msgstr "몬스터 소환의 마법서"
+msgid "spellbook of create monster"
+msgstr "몬스터 소환의 마법서"
 
-#~ msgid "spellbook of detect food"
-#~ msgstr "음식 탐지의 마법서"
+msgid "spellbook of detect food"
+msgstr "음식 탐지의 마법서"
 
-#~ msgid "spellbook of cause fear"
-#~ msgstr "공포 유발의 마법서"
+msgid "spellbook of cause fear"
+msgstr "공포 유발의 마법서"
 
-#~ msgid "spellbook of clairvoyance"
-#~ msgstr "천리안의 마법서"
+msgid "spellbook of clairvoyance"
+msgstr "천리안의 마법서"
 
-#~ msgid "spellbook of cure sickness"
-#~ msgstr "질병 치료의 마법서"
+msgid "spellbook of cure sickness"
+msgstr "질병 치료의 마법서"
 
-#~ msgid "spellbook of charm monster"
-#~ msgstr "몬스터 매혹의 마법서"
+msgid "spellbook of charm monster"
+msgstr "몬스터 매혹의 마법서"
 
-#~ msgid "spellbook of haste self"
-#~ msgstr "자기 가속의 마법서"
+msgid "spellbook of haste self"
+msgstr "자기 가속의 마법서"
 
-#~ msgid "spellbook of detect unseen"
-#~ msgstr "보이지 않는 것 탐지의 마법서"
+msgid "spellbook of detect unseen"
+msgstr "보이지 않는 것 탐지의 마법서"
 
-#~ msgid "spellbook of levitation"
-#~ msgstr "부유의 마법서"
+msgid "spellbook of levitation"
+msgstr "부유의 마법서"
 
-#~ msgid "spellbook of extra healing"
-#~ msgstr "추가 치료의 마법서"
+msgid "spellbook of extra healing"
+msgstr "추가 치료의 마법서"
 
-#~ msgid "spellbook of restore ability"
-#~ msgstr "능력 회복의 마법서"
+msgid "spellbook of restore ability"
+msgstr "능력 회복의 마법서"
 
-#~ msgid "spellbook of invisibility"
-#~ msgstr "투명의 마법서"
+msgid "spellbook of invisibility"
+msgstr "투명의 마법서"
 
-#~ msgid "spellbook of detect treasure"
-#~ msgstr "보물 탐지의 마법서"
+msgid "spellbook of detect treasure"
+msgstr "보물 탐지의 마법서"
 
-#~ msgid "spellbook of remove curse"
-#~ msgstr "저주 해제의 마법서"
+msgid "spellbook of remove curse"
+msgstr "저주 해제의 마법서"
 
-#~ msgid "spellbook of magic mapping"
-#~ msgstr "마법 지도의 마법서"
+msgid "spellbook of magic mapping"
+msgstr "마법 지도의 마법서"
 
-#~ msgid "spellbook of identify"
-#~ msgstr "감정의 마법서"
+msgid "spellbook of identify"
+msgstr "감정의 마법서"
 
-#~ msgid "spellbook of turn undead"
-#~ msgstr "언데드 퇴치의 마법서"
+msgid "spellbook of turn undead"
+msgstr "언데드 퇴치의 마법서"
 
-#~ msgid "spellbook of polymorph"
-#~ msgstr "변신의 마법서"
+msgid "spellbook of polymorph"
+msgstr "변신의 마법서"
 
-#~ msgid "spellbook of teleport away"
-#~ msgstr "순간이동의 마법서"
+msgid "spellbook of teleport away"
+msgstr "순간이동의 마법서"
 
-#~ msgid "spellbook of create familiar"
-#~ msgstr "소환수 생성의 마법서"
+msgid "spellbook of create familiar"
+msgstr "소환수 생성의 마법서"
 
-#~ msgid "spellbook of cancellation"
-#~ msgstr "해제의 마법서"
+msgid "spellbook of cancellation"
+msgstr "해제의 마법서"
 
-#~ msgid "spellbook of protection"
-#~ msgstr "보호의 마법서"
+msgid "spellbook of protection"
+msgstr "보호의 마법서"
 
-#~ msgid "spellbook of jumping"
-#~ msgstr "점프의 마법서"
+msgid "spellbook of jumping"
+msgstr "점프의 마법서"
 
-#~ msgid "spellbook of stone to flesh"
-#~ msgstr "돌을 살로의 마법서"
+msgid "spellbook of stone to flesh"
+msgstr "돌을 살로의 마법서"
 
-#~ msgid "wand of light"
-#~ msgstr "빛의 지팡이"
+msgid "wand of light"
+msgstr "빛의 지팡이"
 
-#~ msgid "wand of digging"
-#~ msgstr "굴착의 지팡이"
+msgid "wand of digging"
+msgstr "굴착의 지팡이"
 
-#~ msgid "wand of locking"
-#~ msgstr "잠금의 지팡이"
+msgid "wand of locking"
+msgstr "잠금의 지팡이"
 
-#~ msgid "wand of opening"
-#~ msgstr "열기의 지팡이"
+msgid "wand of opening"
+msgstr "열기의 지팡이"
 
-#~ msgid "wand of slow monster"
-#~ msgstr "몬스터 감속의 지팡이"
+msgid "wand of slow monster"
+msgstr "몬스터 감속의 지팡이"
 
-#~ msgid "wand of striking"
-#~ msgstr "강타의 지팡이"
+msgid "wand of striking"
+msgstr "강타의 지팡이"
 
-#~ msgid "wand of polymorph"
-#~ msgstr "변신의 지팡이"
+msgid "wand of polymorph"
+msgstr "변신의 지팡이"
 
-#~ msgid "wand of create monster"
-#~ msgstr "몬스터 소환의 지팡이"
+msgid "wand of create monster"
+msgstr "몬스터 소환의 지팡이"
 
-#~ msgid "wand of wishing"
-#~ msgstr "소원의 지팡이"
+msgid "wand of wishing"
+msgstr "소원의 지팡이"
 
-#~ msgid "wand of probing"
-#~ msgstr "탐색의 지팡이"
+msgid "wand of probing"
+msgstr "탐색의 지팡이"

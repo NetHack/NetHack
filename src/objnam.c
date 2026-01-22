@@ -801,17 +801,15 @@ xname_flags(
     case ROCK_CLASS:
         if (typ == STATUE && omndx != NON_PM) {
             char anbuf[10];
-            const char *statue_pmname = obj_pmname(obj);
+            const char *statue_pmname = _(obj_pmname(obj));
 
-            Snprintf(buf, bufspaceleft, "%s%s of %s%s",
+            /* Korean: "X 석상" instead of "statue of X" */
+            Snprintf(buf, bufspaceleft, "%s %s%s",
+                     statue_pmname,
                      (Role_if(PM_ARCHEOLOGIST)
-                      && (obj->spe & CORPSTAT_HISTORIC) != 0) ? "historic "
+                      && (obj->spe & CORPSTAT_HISTORIC) != 0) ? _("historic ")
                        : "",
-                     actualn,
-                     type_is_pname(&mons[omndx]) ? ""
-                       : the_unique_pm(&mons[omndx]) ? "the "
-                         : just_an(anbuf, statue_pmname),
-                     statue_pmname);
+                     _(actualn));
         } else if (typ == BOULDER && obj->next_boulder == 1) {
             /* sometimes caller wants "next boulder" rather than just
                "boulder" (when pushing against a pile of more than one);

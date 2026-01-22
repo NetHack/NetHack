@@ -1027,7 +1027,7 @@ outentry(int rank, struct toptenentry *t1, boolean so)
             }
             Sprintf(eos(linebuf), fmt, arg);
         } else {
-            Sprintf(eos(linebuf), _(" in %s"), svd.dungeons[t1->deathdnum].dname);
+            Sprintf(eos(linebuf), _(" in %s"), _(svd.dungeons[t1->deathdnum].dname));
             if (t1->deathdnum != knox_level.dnum)
                 Sprintf(eos(linebuf), _(" on level %d"), t1->deathlev);
             if (t1->deathlev != t1->maxlvl)
