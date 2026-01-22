@@ -437,7 +437,7 @@ invault(void)
             } while (otmp);
             /* You_hear() will handle Deaf/!Deaf */
             func = !Blind ? You_see : You_hear;
-            (*func)("%s shatter.",
+            (*func)(_("%s shatter."),
                     (bcnt == 1) ? an(bname) : makeplural(bname));
         }
         spotted = canspotmon(guard);
@@ -816,8 +816,8 @@ gd_pick_corridor_gold(struct monst *grd, int goldx, int goldy)
     if (see_it) { /* cansee(goldx, goldy) */
         pline(_("%s%s picks up the gold%s."), Some_Monnam(grd),
               (grd->mpeaceful && EGD(grd)->warncnt > 5)
-                 ? " calms down and" : "",
-              under_u ? " from beneath you" : "");
+                 ? _(" calms down and") : "",
+              under_u ? _(" from beneath you") : "");
     }
 
     /* if guard was moved to get the gold, move him back */

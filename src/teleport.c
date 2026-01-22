@@ -866,9 +866,9 @@ scrolltele(struct obj *scroll)
         } else {
             char whobuf[BUFSZ];
 
-            Strcpy(whobuf, "you");
+            Strcpy(whobuf, _("you"));
             if (u.usteed)
-                Sprintf(eos(whobuf), " and %s", mon_nam(u.usteed));
+                Sprintf(eos(whobuf), _(" and %s"), mon_nam(u.usteed));
             pline(_("Where do %s want to be teleported?"), whobuf);
             if (scroll)
                 learnscroll(scroll);
@@ -879,7 +879,7 @@ scrolltele(struct obj *scroll)
                  * pre-suggest this coordinate. */
                 cc = iflags.travelcc;
             }
-            if (getpos(&cc, TRUE, "the desired position") < 0)
+            if (getpos(&cc, TRUE, _("the desired position")) < 0)
                 return; /* abort */
             /* possible extensions: introduce a small error if
                magic power is low; allow transfer to solid rock */
@@ -1143,7 +1143,7 @@ dotele(
         }
         (void) next_to_u();
     } else {
-        You(_("%s"), shudder_for_moment);
+        You1(shudder_for_moment);
         return 0;
     }
     if (!trap)
@@ -1254,7 +1254,7 @@ level_tele(void)
                 Your(_("possessions land on the %s with a thud."),
                      surface(u.ux, u.uy));
             svk.killer.format = NO_KILLER_PREFIX;
-            Strcpy(svk.killer.name, "committed suicide");
+            Strcpy(svk.killer.name, _("committed suicide"));
             done(DIED);
             pline(_("An energized cloud of dust begins to coalesce."));
             Your(_("body rematerializes%s."),
@@ -1326,7 +1326,7 @@ level_tele(void)
             SetVoice((struct monst *) 0, 0, 80, voice_deity);
             verbalize(_("Thou art early, but we'll admit thee."));
             svk.killer.format = NO_KILLER_PREFIX;
-            Strcpy(svk.killer.name, "went to heaven prematurely");
+            Strcpy(svk.killer.name, _("went to heaven prematurely"));
         } else if (newlev == -9) {
             You_feel(_("deliriously happy."));
             pline(_("(In fact, you're on Cloud 9!)"));
@@ -1337,14 +1337,14 @@ level_tele(void)
         if (svk.killer.name[0]) {
             ; /* arrival in heaven is pending */
         } else if (Levitation) {
-            escape_by_flying = "float gently down to earth";
+            escape_by_flying = _("float gently down to earth");
         } else if (Flying) {
-            escape_by_flying = "fly down to the ground";
+            escape_by_flying = _("fly down to the ground");
         } else {
             pline(_("Unfortunately, you don't know how to fly."));
             You(_("plummet a few thousand feet to your death."));
             Sprintf(svk.killer.name,
-                    "teleported out of the dungeon and fell to %s death",
+                    _("teleported out of the dungeon and fell to %s death"),
                     uhis());
             svk.killer.format = NO_KILLER_PREFIX;
         }
@@ -1360,7 +1360,7 @@ level_tele(void)
         done(DIED);
         /* can only get here via life-saving (or declining to die in
            explore|debug mode); the hero has now left the dungeon... */
-        escape_by_flying = "find yourself back on the surface";
+        escape_by_flying = _("find yourself back on the surface");
         u.uz = lsav; /* restore u.uz so escape code works */
     }
 
@@ -1531,10 +1531,10 @@ level_tele_trap(struct trap *trap, unsigned int trflags)
     boolean intentional = FALSE;
 
     if ((trflags & (VIASITTING | FORCETRAP)) != 0) {
-        Strcpy(verbbuf, "trigger"); /* follows "You sit down." */
+        Strcpy(verbbuf, _("trigger")); /* follows "You sit down." */
         intentional = TRUE;
     } else
-        Sprintf(verbbuf, "%s onto", u_locomotion("step"));
+        Sprintf(verbbuf, _("%s onto"), u_locomotion(_("step")));
     You(_("%s a level teleport trap!"), verbbuf);
 
     if (Antimagic && !intentional) {
@@ -1692,8 +1692,8 @@ rloc_to_core(
     set_apparxy(mtmp); /* orient monster */
     if (domsg && (canspotmon(mtmp) || appearmsg || mtmp == u.ustuck)) {
         int du = distu(x, y), olddu;
-        const char *next = (du <= 2) ? " next to you" : 0, /* next2u() */
-                   *nearu = (du <= BOLT_LIM * BOLT_LIM) ? " close by" : 0;
+        const char *next = (du <= 2) ? _(" next to you") : 0, /* next2u() */
+                   *nearu = (du <= BOLT_LIM * BOLT_LIM) ? _(" close by") : 0;
 
         set_msg_xy(x, y);
         mtmp->mstrategy &= ~STRAT_APPEARMSG; /* one chance only */
@@ -1705,8 +1705,8 @@ rloc_to_core(
                   next ? next
                   : nearu ? nearu
                     : ((olddu = distu(oldx, oldy)) == du) ? ""
-                      : (du < olddu) ? " closer to you"
-                        : " farther away");
+                      : (du < olddu) ? _(" closer to you")
+                        : _(" farther away"));
         } else {
             pline(_("%s %s%s%s!"),
                   appearmsg ? Amonnam(mtmp) : Monnam(mtmp),
@@ -1906,20 +1906,20 @@ control_mon_tele(
     pline(_("Teleport %s @ <%d,%d> where?"),
           noit_mon_nam(mon), mon->mx, mon->my);
     /* getpos '?' will show "Move the cursor to <where to teleport Foo>:" */
-    Sprintf(tcbuf, "where to teleport %s", noit_mon_nam(mon));
+    Sprintf(tcbuf, _("where to teleport %s"), noit_mon_nam(mon));
     if (getpos(cc_p, FALSE, tcbuf) >= 0 && !u_at(cc_p->x, cc_p->y)) {
         if (via_rloc
               ? rloc_pos_ok(cc_p->x, cc_p->y, mon)
               : goodpos(cc_p->x, cc_p->y, mon, rlocflags))
             return TRUE;
         if (!iflags.debug_fuzzer) {
-            Sprintf(tcbuf, "<%d,%d> is not considered viable; force anyway?",
+            Sprintf(tcbuf, _("<%d,%d> is not considered viable; force anyway?"),
                     mon->mx, mon->my);
             if (y_n(tcbuf) == 'y')
                 return TRUE;
         }
     }
-    pline(_("%s destination."), via_rloc ? "Picking random" : "Using derived");
+    pline(_("%s destination."), via_rloc ? _("Picking random") : _("Using derived"));
     return FALSE;
 }
 
@@ -2125,7 +2125,7 @@ rloco(struct obj *obj)
                                            svd.dndest.nlx, svd.dndest.nly,
                                            svd.dndest.nhx, svd.dndest.nhy)));
 
-    if (flooreffects(obj, tx, ty, "fall")) {
+    if (flooreffects(obj, tx, ty, _("fall"))) {
         /* update old location since flooreffects() couldn't;
            unblock_point() for boulder handled by obj_extract_self() */
         newsym(otx, oty);

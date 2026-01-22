@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 #ifndef SFCTOOL
 staticfn void stoned_dialogue(void);
@@ -28,88 +29,88 @@ static const struct propname {
     int prop_num;
     const char *prop_name;
 } propertynames[] = {
-    { INVULNERABLE, "invulnerable" },
-    { STONED, "petrifying" },
-    { SLIMED, "becoming slime" },
-    { STRANGLED, "strangling" },
-    { SICK, "fatally sick" },
-    { STUNNED, "stunned" },
-    { CONFUSION, "confused" },
-    { HALLUC, "hallucinating" },
-    { BLINDED, "blinded" },
-    { DEAF, "deafness" },
-    { VOMITING, "vomiting" },
-    { GLIB, "slippery fingers" },
-    { WOUNDED_LEGS, "wounded legs" },
-    { SLEEPY, "sleepy" },
-    { TELEPORT, "teleporting" },
-    { POLYMORPH, "polymorphing" },
-    { LEVITATION, "levitating" },
-    { FAST, "very fast" }, /* timed 'FAST' is very fast */
-    { CLAIRVOYANT, "clairvoyant" },
-    { DETECT_MONSTERS, "monster detection" },
-    { SEE_INVIS, "see invisible" },
-    { INVIS, "invisible" },
+    { INVULNERABLE, N_("invulnerable") },
+    { STONED, N_("petrifying") },
+    { SLIMED, N_("becoming slime") },
+    { STRANGLED, N_("strangling") },
+    { SICK, N_("fatally sick") },
+    { STUNNED, N_("stunned") },
+    { CONFUSION, N_("confused") },
+    { HALLUC, N_("hallucinating") },
+    { BLINDED, N_("blinded") },
+    { DEAF, N_("deafness") },
+    { VOMITING, N_("vomiting") },
+    { GLIB, N_("slippery fingers") },
+    { WOUNDED_LEGS, N_("wounded legs") },
+    { SLEEPY, N_("sleepy") },
+    { TELEPORT, N_("teleporting") },
+    { POLYMORPH, N_("polymorphing") },
+    { LEVITATION, N_("levitating") },
+    { FAST, N_("very fast") }, /* timed 'FAST' is very fast */
+    { CLAIRVOYANT, N_("clairvoyant") },
+    { DETECT_MONSTERS, N_("monster detection") },
+    { SEE_INVIS, N_("see invisible") },
+    { INVIS, N_("invisible") },
     /* temporary acid resistance and stone resistance can come from eating */
-    { ACID_RES, "acid resistance" },
-    { STONE_RES, "stoning resistance" },
+    { ACID_RES, N_("acid resistance") },
+    { STONE_RES, N_("stoning resistance") },
     /* timed displacement is possible via eating a displacer beast corpse */
-    { DISPLACED, "displaced" },
+    { DISPLACED, N_("displaced") },
     /* timed pass-walls is a potential prayer result if surrounded by stone
        with nowhere to be safely teleported to */
-    { PASSES_WALLS, "pass thru walls" },
+    { PASSES_WALLS, N_("pass thru walls") },
     /* likewise for magical breathing vs poison gas regions */
-    { MAGICAL_BREATHING, "magical breathing" },
+    { MAGICAL_BREATHING, N_("magical breathing") },
     /* timed fire resistance and water walking are possible in explore mode
        (as well as in wizard mode) after life-saving in lava if it fails to
        teleport the hero to safety and player declines to die */
-    { WWALKING, "water walking" },
-    { FIRE_RES, "fire resistance" },
+    { WWALKING, N_("water walking") },
+    { FIRE_RES, N_("fire resistance") },
     /*
      * Properties beyond here don't have timed values during normal play,
      * so there's not much point in trying to order them sensibly.
      * They're either on or off based on equipment, role, actions, &c,
      * but in wizard mode, #wizintrinsic can give them as timed effects.
      */
-    { COLD_RES, "cold resistance" },
-    { SLEEP_RES, "sleep resistance" },
-    { DISINT_RES, "disintegration resistance" },
-    { SHOCK_RES, "shock resistance" },
-    { POISON_RES, "poison resistance" },
-    { DRAIN_RES, "drain resistance" },
-    { SICK_RES, "sickness resistance" },
-    { ANTIMAGIC, "magic resistance" },
-    { HALLUC_RES, "hallucination resistance" },
-    { BLND_RES, "light-induced blindness resistance" },
-    { FUMBLING, "fumbling" },
-    { HUNGER, "voracious hunger" },
-    { TELEPAT, "telepathic" },
-    { WARNING, "warning" },
-    { WARN_OF_MON, "warn: monster type or class" },
-    { WARN_UNDEAD, "warn: undead" },
-    { SEARCHING, "searching" },
-    { INFRAVISION, "infravision" },
-    { ADORNED, "adorned (+/- Cha)" },
-    { STEALTH, "stealthy" },
-    { AGGRAVATE_MONSTER, "monster aggravation" },
-    { CONFLICT, "conflict" },
-    { JUMPING, "jumping" },
-    { TELEPORT_CONTROL, "teleport control" },
-    { FLYING, "flying" },
-    { SWIMMING, "swimming" },
-    { SLOW_DIGESTION, "slow digestion" },
-    { HALF_SPDAM, "half spell damage" },
-    { HALF_PHDAM, "half physical damage" },
-    { REGENERATION, "HP regeneration" },
-    { ENERGY_REGENERATION, "energy regeneration" },
-    { PROTECTION, "extra protection" },
-    { PROT_FROM_SHAPE_CHANGERS, "protection from shape changers" },
-    { POLYMORPH_CONTROL, "polymorph control" },
-    { UNCHANGING, "unchanging" },
-    { REFLECTING, "reflecting" },
-    { FREE_ACTION, "free action" },
-    { FIXED_ABIL, "fixed abilities" },
-    { LIFESAVED, "life will be saved" },
+    { COLD_RES, N_("cold resistance") },
+    { SLEEP_RES, N_("sleep resistance") },
+    { DISINT_RES, N_("disintegration resistance") },
+    { SHOCK_RES, N_("shock resistance") },
+    { POISON_RES, N_("poison resistance") },
+    { DRAIN_RES, N_("drain resistance") },
+    { SICK_RES, N_("sickness resistance") },
+    { ANTIMAGIC, N_("magic resistance") },
+    { HALLUC_RES, N_("hallucination resistance") },
+    { BLND_RES, N_("light-induced blindness resistance") },
+    { FUMBLING, N_("fumbling") },
+    { HUNGER, N_("voracious hunger") },
+    { TELEPAT, N_("telepathic") },
+    { WARNING, N_("warning") },
+    { WARN_OF_MON, N_("warn: monster type or class") },
+    { WARN_UNDEAD, N_("warn: undead") },
+    { SEARCHING, N_("searching") },
+    { INFRAVISION, N_("infravision") },
+    { ADORNED, N_("adorned (+/- Cha)") },
+    { STEALTH, N_("stealthy") },
+    { AGGRAVATE_MONSTER, N_("monster aggravation") },
+    { CONFLICT, N_("conflict") },
+    { JUMPING, N_("jumping") },
+    { TELEPORT_CONTROL, N_("teleport control") },
+    { FLYING, N_("flying") },
+    { SWIMMING, N_("swimming") },
+    { SLOW_DIGESTION, N_("slow digestion") },
+    { HALF_SPDAM, N_("half spell damage") },
+    { HALF_PHDAM, N_("half physical damage") },
+    { REGENERATION, N_("HP regeneration") },
+    { ENERGY_REGENERATION, N_("energy regeneration") },
+    { PROTECTION, N_("extra protection") },
+    { PROT_FROM_SHAPE_CHANGERS, N_("protection from shape changers") },
+    { POLYMORPH_CONTROL, N_("polymorph control") },
+    { UNCHANGING, N_("unchanging") },
+    { REFLECTING, N_("reflecting") },
+    { FREE_ACTION, N_("free action") },
+    { FIXED_ABIL, N_("fixed abilities") },
+    { LIFESAVED, N_("life will be saved") },
     {  0, 0 },
 };
 
@@ -208,8 +209,8 @@ vomiting_dialogue(void)
         break;
     case 11:
         txt = vomiting_texts[1];
-        if (strstri(txt, " confused") && Confusion)
-            txt = strsubst(strcpy(buf, txt), " confused", " more confused");
+        if (strstri(txt, _(" confused")) && Confusion)
+            txt = strsubst(strcpy(buf, txt), _(" confused"), _(" more confused"));
         break;
     case 6:
         make_stunned((HStun & TIMEOUT) + (long) d(2, 4), FALSE);
@@ -224,8 +225,8 @@ vomiting_dialogue(void)
         break;
     case 8:
         txt = vomiting_texts[2];
-        if (strstri(txt, " think") && Stunned)
-            txt = strsubst(strcpy(buf, txt), "can't seem to ", "can't ");
+        if (strstri(txt, _(" think")) && Stunned)
+            txt = strsubst(strcpy(buf, txt), _("can't seem to "), _("can't "));
         break;
     case 5:
         txt = vomiting_texts[3];
@@ -330,8 +331,8 @@ sickness_dialogue(void)
         Strcpy(buf, _(sickness_texts[SIZE(sickness_texts) - i]));
         /* change the message slightly for food poisoning */
         if ((u.usick_type & SICK_NONVOMITABLE) == 0)
-            (void) strsubst(buf, "illness", "sickness");
-        if (Hallucination && strstri(buf, "Death's door")) {
+            (void) strsubst(buf, _("illness"), _("sickness"));
+        if (Hallucination && strstri(buf, _("Death's door"))) {
             /* youmonst: for Hallucination, mhe()'s mon argument isn't used */
             Strcpy(pronounbuf, mhe(&gy.youmonst));
             Sprintf(eos(buf), _("  %s %s inviting you in."),
@@ -448,7 +449,7 @@ void
 burn_away_slime(void)
 {
     if (Slimed) {
-        make_slimed(0L, "The slime that covers you is burned away!");
+        make_slimed(0L, _("The slime that covers you is burned away!"));
     }
 }
 
@@ -469,7 +470,7 @@ slimed_to_death(struct kinfo *kptr)
         Strcpy(svk.killer.name, kptr->name);
     } else {
         svk.killer.format = NO_KILLER_PREFIX;
-        Strcpy(svk.killer.name, "turned into green slime");
+        Strcpy(svk.killer.name, _("turned into green slime"));
     }
     dealloc_killer(kptr);
 
@@ -500,10 +501,10 @@ slimed_to_death(struct kinfo *kptr)
         char slimebuf[BUFSZ];
 
         svk.killer.format = KILLED_BY;
-        Strcpy(svk.killer.name, "slimicide");
+        Strcpy(svk.killer.name, _("slimicide"));
         /* vary the message depending upon whether life-save was due to
            amulet or due to declining to die in explore or wizard mode */
-        Strcpy(slimebuf, "green slime has been genocided...");
+        Strcpy(slimebuf, _("green slime has been genocided..."));
         if (iflags.last_msg == PLNMSG_OK_DONT_DIE)
             /* follows "OK, so you don't die." and arg is second sentence */
             urgent_pline(_("Yes, you do.  %s"), upstart(slimebuf));
@@ -677,7 +678,7 @@ nh_timeout(void)
                     Strcpy(svk.killer.name, kptr->name);
                 } else {
                     svk.killer.format = NO_KILLER_PREFIX;
-                    Strcpy(svk.killer.name, "killed by petrification");
+                    Strcpy(svk.killer.name, _("killed by petrification"));
                 }
                 dealloc_killer(kptr);
                 /* (unlike sliming, you aren't changing form here) */
@@ -1097,7 +1098,7 @@ hatch_egg(anything *arg, long timeout)
         if (cansee_hatchspot) {
             /* [bug?  m_monnam() yields accurate monster type
                regardless of hallucination] */
-            Sprintf(monnambuf, "%s%s", siblings ? "some " : "",
+            Sprintf(monnambuf, "%s%s", siblings ? _("some ") : "",
                     siblings ? makeplural(m_monnam(mon)) : an(m_monnam(mon)));
             /* we don't learn the egg type here because learning
                an egg type requires either seeing the egg hatch
@@ -1111,10 +1112,10 @@ hatch_egg(anything *arg, long timeout)
             knows_egg = TRUE; /* true even if you are blind */
             if (!cansee_hatchspot)
                 You_feel(_("%s %s from your pack!"), something,
-                         locomotion(mon->data, "drop"));
+                         locomotion(mon->data, _("drop")));
             else
                 You_see(_("%s %s out of your pack!"), monnambuf,
-                        locomotion(mon->data, "drop"));
+                        locomotion(mon->data, _("drop")));
             if (yours) {
                 pline(_("%s %s %s like \"%s%s\""),
                       siblings ? _("Their") : _("Its"),
@@ -1141,16 +1142,16 @@ hatch_egg(anything *arg, long timeout)
                 mon2 = egg->ocarry;
                 if (canseemon(mon2)
                     && (!mon2->wormno || cansee(mon2->mx, mon2->my))) {
-                    Sprintf(carriedby, "%s pack",
+                    Sprintf(carriedby, _("%s pack"),
                             s_suffix(a_monnam(mon2)));
                     knows_egg = TRUE;
                 } else if (is_pool(mon->mx, mon->my)) {
-                    Strcpy(carriedby, "empty water");
+                    Strcpy(carriedby, _("empty water"));
                 } else {
-                    Strcpy(carriedby, "thin air");
+                    Strcpy(carriedby, _("thin air"));
                 }
                 You_see(_("%s %s out of %s!"), monnambuf,
-                        locomotion(mon->data, "drop"), carriedby);
+                        locomotion(mon->data, _("drop")), carriedby);
             }
             break;
 #if 0
@@ -1255,7 +1256,7 @@ slip_or_trip(void)
         }
         if (!uarmf && otmp->otyp == CORPSE
             && touch_petrifies(&mons[otmp->corpsenm]) && !Stone_resistance) {
-            Sprintf(svk.killer.name, "tripping over %s corpse",
+            Sprintf(svk.killer.name, _("tripping over %s corpse"),
                     an(mons[otmp->corpsenm].pmnames[NEUTRAL]));
             instapetrify(svk.killer.name);
         }
@@ -1266,7 +1267,7 @@ slip_or_trip(void)
         pline(_("%s %s %s the ice."),
               u.usteed ? upstart(x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
                                           SUPPRESS_SADDLE, FALSE))
-                       : "You",
+                       : _("You"),
               /* "steed": arbitrary value that will use third person verb
                  regardless of what u.usteed might be named, as opposed to
                  "you" (second person, which won't have final 's' added) */
@@ -1482,7 +1483,7 @@ burn_object(anything *arg, long timeout)
                     lantern_message(obj);
                 else
                     see_lamp_flicker(obj,
-                                     obj->age == 50L ? " considerably" : "");
+                                     obj->age == 50L ? _(" considerably") : "");
             }
             break;
 

@@ -443,18 +443,18 @@ find_artifact(struct obj *otmp)
          */
         where = ((otmp->where == OBJ_FLOOR)
                  ?  ((inside_shop(otmp->ox, otmp->oy) != NO_ROOM)
-                     ? " in a shop"
-                     : " on the floor")
+                     ? _(" in a shop")
+                     : _(" on the floor"))
                  /* artifacts aren't created in containers but could be
                     inside one if it comes from a bones level */
-                 : (otmp->where == OBJ_CONTAINED) ? " in a container"
+                 : (otmp->where == OBJ_CONTAINED) ? _(" in a container")
                    /* perhaps probing, or seeing monster wield artifact */
-                   : (otmp->where == OBJ_MINVENT) ? " carried by a monster"
+                   : (otmp->where == OBJ_MINVENT) ? _(" carried by a monster")
                      /* catchall: probably in inventory, picked up while
                         blind but now seen; there's no previous_where to
                         figure out how it got here */
                      : "");
-        livelog_printf(LL_ARTIFACT, "found %s%s",
+        livelog_printf(LL_ARTIFACT, _("found %s%s"),
                        bare_artifactname(otmp), where);
     }
 }
@@ -955,7 +955,7 @@ touch_artifact(struct obj *obj, struct monst *mon)
         /* add half (maybe quarter) of the usual silver damage bonus */
         if (objects[obj->otyp].oc_material == SILVER && Hate_silver)
             tmp = rnd(10), dmg += Maybe_Half_Phys(tmp);
-        Sprintf(buf, "touching %s", oart->name);
+        Sprintf(buf, _("touching %s"), oart->name);
         losehp(dmg, buf, KILLED_BY); /* magic damage, not physical */
         exercise(A_WIS, FALSE);
     }
@@ -1166,7 +1166,7 @@ disp_artifact_discoveries(
         if (!strcmp(algnstr, "unaligned"))
             algnstr = "non-aligned";
 
-        Sprintf(buf, "  %s [%s %s]", artiname(m),
+        Sprintf(buf, _("  %s [%s %s]"), artiname(m),
                 algnstr, simple_typename(otyp));
         putstr(tmpwin, 0, buf);
     }
@@ -1646,7 +1646,7 @@ artifact_hit(
     if (spec_ability(otmp, SPFX_DRLI)) {
         /* some non-living creatures (golems, vortices) are vulnerable to
            life drain effects so can get "<Arti> draws the <life>" feedback */
-        const char *life = nonliving(mdef->data) ? "animating force" : "life";
+        const char *life = nonliving(mdef->data) ? _("animating force") : _("life");
 
         if (!youdefend) {
             int m_lev = (int) mdef->m_lev, /* will be 0 for 1d4 mon */
@@ -1697,8 +1697,8 @@ artifact_hit(
             if (Blind) {
                 You_feel(_("an %s drain your %s!"),
                          is_art(otmp, ART_STORMBRINGER)
-                            ? "unholy blade"
-                            : "object",
+                            ? _("unholy blade")
+                            : _("object"),
                          life);
             } else {
                 /* call distant_name() for possible side-effects even if
@@ -1794,7 +1794,7 @@ invoke_healing(struct obj *obj)
                      goop covering face), might still be blind
                      due to PermaBlind or eyeless polymorph;
                      vary the message in that situation */
-                  && (HBlinded & ~TIMEOUT) != 0L) ? "slightly " : "");
+                  && (HBlinded & ~TIMEOUT) != 0L) ? _("slightly ") : "");
     else {
         nothing_special(obj);
         return ECMD_TIME;
@@ -2030,7 +2030,7 @@ invoke_fling_poison(struct obj *obj)
         throwit(otmp, 0L, FALSE, (struct obj *) 0);
     } else {
         /* no direction picked */
-        pline(_("%s"), Never_mind);
+        pline1(Never_mind);
         obj->age = svm.moves;
         return ECMD_CANCEL;
     }
@@ -2075,11 +2075,11 @@ invoke_blinding_ray(struct obj *obj)
 
             if (!flashburn((long) (damg + rnd(damg)), FALSE)
                 && !vulnerable)
-                pline(_("%s"), nothing_seems_to_happen);
+                pline1(nothing_seems_to_happen);
         }
     } else {
         /* no direction picked */
-        pline(_("%s"), Never_mind);
+        pline1(Never_mind);
         obj->age = svm.moves;
         return ECMD_CANCEL;
     }
@@ -2435,7 +2435,7 @@ glow_color(int arti_indx)
 
 /* glow verb; [0] holds the value used when blind */
 static const char *const glow_verbs[] = {
-    "quiver", "flicker", "glimmer", "gleam"
+    N_("quiver"), N_("flicker"), N_("glimmer"), N_("gleam")
 };
 
 /* relative strength that Sting is glowing (0..3), to select verb */
@@ -2454,11 +2454,11 @@ glow_verb(int count, /* 0 means blind rather than no applicable creatures */
 {
     static char resbuf[20];
 
-    Strcpy(resbuf, glow_verbs[glow_strength(count)]);
+    Strcpy(resbuf, _(glow_verbs[glow_strength(count)]));
     /* ing_suffix() will double the last consonant for all the words
        we're using and none of them should have that, so bypass it */
     if (ingsfx)
-        Strcat(resbuf, "ing");
+        Strcat(resbuf, _("ing"));
     return resbuf;
 }
 
@@ -2553,7 +2553,7 @@ retouch_object(
                 tmp = rnd(10), dmg += Maybe_Half_Phys(tmp);
             if (bane)
                 dmg += rnd(10);
-            Sprintf(buf, "handling %s", what);
+            Sprintf(buf, _("handling %s"), what);
             losehp(dmg, buf, KILLED_BY);
             exercise(A_CON, FALSE);
         }

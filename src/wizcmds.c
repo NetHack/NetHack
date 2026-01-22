@@ -277,7 +277,7 @@ wiz_kill(void)
                 Sprintf(qbuf, "%s?", Role_if(PM_SAMURAI) ? "Perform seppuku"
                                                          : "Commit suicide");
                 if (paranoid_query(TRUE, qbuf)) {
-                    Sprintf(svk.killer.name, "%s own player", uhis());
+                    Sprintf(svk.killer.name, _("%s own player"), uhis());
                     svk.killer.format = KILLED_BY;
                     done(DIED);
                 }
@@ -435,7 +435,7 @@ wiz_flip_level(void)
 
             docrt();
         } else {
-            pline(_("%s"), Never_mind);
+            pline1(Never_mind);
         }
     }
     return ECMD_OK;

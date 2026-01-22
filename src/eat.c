@@ -274,14 +274,14 @@ choke(struct obj *food)
         if (food) {
             You(_("choke over your %s."), foodword(food));
             if (food->oclass == COIN_CLASS) {
-                Strcpy(svk.killer.name, "very rich meal");
+                Strcpy(svk.killer.name, _("very rich meal"));
             } else {
                 svk.killer.format = KILLED_BY;
                 Strcpy(svk.killer.name, killer_xname(food));
             }
         } else {
             You(_("choke over it."));
-            Strcpy(svk.killer.name, "quick snack");
+            Strcpy(svk.killer.name, _("quick snack"));
         }
         You(_("die..."));
         done(CHOKING);
@@ -620,7 +620,7 @@ eat_brains(
     if (noncorporeal(pd)) {
         if (visflag)
             pline(_("%s brain is unharmed."),
-                  (mdef == &gy.youmonst) ? "Your" : s_suffix(Monnam(mdef)));
+                  (mdef == &gy.youmonst) ? _("Your") : s_suffix(Monnam(mdef)));
         return M_ATTK_MISS; /* side-effects can't occur */
     } else if (magr == &gy.youmonst) {
         You(_("eat %s brain!"), s_suffix(mon_nam(mdef)));
@@ -668,7 +668,7 @@ eat_brains(
             return M_ATTK_MISS;
         } else if (is_rider(pd)) {
             pline(_("Ingesting that is fatal."));
-            Sprintf(svk.killer.name, "unwisely ate the brain of %s",
+            Sprintf(svk.killer.name, _("unwisely ate the brain of %s"),
                     pmname(pd, Mgender(mdef)));
             svk.killer.format = NO_KILLER_PREFIX;
             done(DIED);
@@ -800,7 +800,7 @@ cprefx(int pm)
             if (svc.context.tin.tin)
                 use_up_tin(svc.context.tin.tin);
 
-            Sprintf(svk.killer.name, "tasting %s meat",
+            Sprintf(svk.killer.name, _("tasting %s meat"),
                     mons[pm].pmnames[NEUTRAL]);
             svk.killer.format = KILLED_BY;
             You(_("turn to stone."));
@@ -833,7 +833,7 @@ cprefx(int pm)
     case PM_PESTILENCE:
     case PM_FAMINE: {
         pline(_("Eating that is instantly fatal."));
-        Sprintf(svk.killer.name, "unwisely ate the body of %s",
+        Sprintf(svk.killer.name, _("unwisely ate the body of %s"),
                 mons[pm].pmnames[NEUTRAL]);
         svk.killer.format = NO_KILLER_PREFIX;
         done(DIED);
@@ -1560,7 +1560,7 @@ consume_tin(const char *mesg)
         which = 0; /* 0=>plural, 1=>as-is, 2=>"the" prefix */
         if ((mnum == PM_COCKATRICE || mnum == PM_CHICKATRICE)
             && (Stone_resistance || Hallucination)) {
-            what = "chicken";
+            what = _("chicken");
             which = 1; /* suppress pluralization */
         } else if (Hallucination) {
             what = rndmonnam(NULL);
@@ -1710,7 +1710,7 @@ opentin(void)
     if (svc.context.tin.usedtime < svc.context.tin.reqtime)
         return 1; /* still busy */
 
-    consume_tin("You succeed in opening the tin.");
+    consume_tin(_("You succeed in opening the tin."));
     return 0;
 }
 
@@ -2065,7 +2065,7 @@ start_eating(struct obj *otmp, boolean already_partly_eaten)
         return;
     }
 
-    Sprintf(msgbuf, "eating %s", food_xname(otmp, TRUE));
+    Sprintf(msgbuf, _("eating %s"), food_xname(otmp, TRUE));
     set_occupation(eatfood, msgbuf, 0);
 }
 
@@ -2546,7 +2546,7 @@ fpostfx(struct obj *otmp)
                 u.uhp = u.uhpmax;
             } else if (u.uhp <= 0) {
                 svk.killer.format = KILLED_BY_AN;
-                Strcpy(svk.killer.name, "rotten lump of royal jelly");
+                Strcpy(svk.killer.name, _("rotten lump of royal jelly"));
                 done(POISONING);
             }
         }
@@ -2560,7 +2560,7 @@ fpostfx(struct obj *otmp)
                 && !(poly_when_stoned(gy.youmonst.data)
                      && polymon(PM_STONE_GOLEM))) {
                 if (!Stoned) {
-                    Sprintf(svk.killer.name, "%s egg",
+                    Sprintf(svk.killer.name, _("%s egg"),
                             mons[otmp->corpsenm].pmnames[NEUTRAL]);
                     make_stoned(5L, (char *) 0, KILLED_BY_AN,
                                 svk.killer.name);
@@ -2832,7 +2832,7 @@ doeat(void)
 
         if (res) {
             Your(
-               "%s stops tingling and your sense of smell returns to normal.",
+               _("%s stops tingling and your sense of smell returns to normal."),
                  body_part(NOSE));
             u.uedibility = 0;
             if (res == 1)
@@ -2940,7 +2940,7 @@ doeat(void)
            for resuming with one bite remaining instead of trying to
            determine whether or not "you finish" is going to be given */
         You(_("%s your meal."),
-            !one_bite_left ? "resume" : "consume the last bite of");
+            !one_bite_left ? _("resume") : _("consume the last bite of"));
         if (otmp)
             start_eating(otmp, FALSE);
         return ECMD_TIME;
@@ -3037,7 +3037,7 @@ doeat(void)
             }
         } else {
             You(_("%s %s."),
-                (svc.context.victual.reqtime == 1) ? "eat" : "begin eating",
+                (svc.context.victual.reqtime == 1) ? _("eat") : _("begin eating"),
                 doname(otmp));
         }
     }
@@ -3436,7 +3436,7 @@ newuhs(boolean incr)
             bot();
             You(_("die from starvation."));
             svk.killer.format = KILLED_BY;
-            Strcpy(svk.killer.name, "starvation");
+            Strcpy(svk.killer.name, _("starvation"));
             done(STARVING);
             /* if we return, we lifesaved, and that calls newuhs */
             return;
@@ -3501,7 +3501,7 @@ newuhs(boolean incr)
         if ((Upolyd ? u.mh : u.uhp) < 1) {
             You(_("die from hunger and exhaustion."));
             svk.killer.format = KILLED_BY;
-            Strcpy(svk.killer.name, "exhaustion");
+            Strcpy(svk.killer.name, _("exhaustion"));
             done(STARVING);
             return;
         }

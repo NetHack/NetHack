@@ -449,7 +449,7 @@ moverock_core(coordxy sx, coordxy sy)
             }
 
             if (revive_nasty(rx, ry,
-                             "You sense movement on the other side.")) {
+                             _("You sense movement on the other side."))) {
                 return -1;
             }
 
@@ -522,7 +522,7 @@ moverock_core(coordxy sx, coordxy sy)
                                  the floor/ground/whatever shake (or maybe
                                  a weak shockwave if levitating or flying) */
                                                 : _("Gadzooks"),
-                              Tobjnam(otmp, "trigger"),
+                              Tobjnam(otmp, _("trigger")),
                               ttmp->madeby_u ? _("your") : _("a"));
                         blow_up_landmine(ttmp);
                         /* if the boulder remains, it should fill the pit */
@@ -540,7 +540,7 @@ moverock_core(coordxy sx, coordxy sy)
                        if this is one among multiple boulders */
                     if (!Blind)
                         gv.viz_array[ry][rx] |= IN_SIGHT;
-                    if (!flooreffects(otmp, rx, ry, "fall")) {
+                    if (!flooreffects(otmp, rx, ry, _("fall"))) {
                         place_object(otmp, rx, ry);
                     }
                     if (mtmp && !Blind)
@@ -1202,7 +1202,7 @@ test_move(
         if (mode != TEST_TRAV && svc.context.run >= 2
             && !(Blind || Hallucination) && !could_move_onto_boulder(x, y)) {
             if (mode == DO_MOVE && flags.mention_walls)
-                pline_dir(xytod(dx,dy), "A boulder blocks your path.");
+                pline_dir(xytod(dx,dy), _("A boulder blocks your path."));
             return FALSE;
         }
         if (mode == DO_MOVE) {
@@ -2052,7 +2052,7 @@ domove_fight_web(coordxy x, coordxy y)
                                                  : makeplural(scndbuf);
             }
             You_cant(_("cut a web with %s%s%s!"), uwepstr,
-                     !onewep ? " or " : "", !onewep ? scndstr : "");
+                     !onewep ? _(" or ") : "", !onewep ? scndstr : "");
             return TRUE;
 
         /* weapon is ok; check whether hit is successful */
@@ -2159,7 +2159,7 @@ domove_swap_with_pet(
                          : (!has_mgivenname(mtmp)
                             && !type_is_pname(mtmp->data)) ? ARTICLE_THE
                          : ARTICLE_NONE,
-                         (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
+                         (mtmp->mpeaceful && !mtmp->mtame) ? _("peaceful") : 0,
                          has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
         } else {
             You(_("frighten %s."),
@@ -3330,12 +3330,12 @@ spoteffects(boolean pick)
                       helm_simple_name(uarmh));
             } else if (u.uac + 3 <= rnd(20)) {
                 You(_("are almost hit by %s!"),
-                    x_monnam(mtmp, ARTICLE_A, "falling", 0, TRUE));
+                    x_monnam(mtmp, ARTICLE_A, _("falling"), 0, TRUE));
             } else {
                 int dmg;
 
                 You(_("are hit by %s!"),
-                    x_monnam(mtmp, ARTICLE_A, "falling", 0, TRUE));
+                    x_monnam(mtmp, ARTICLE_A, _("falling"), 0, TRUE));
                 dmg = d(4, 6);
                 if (Half_physical_damage)
                     dmg = (dmg + 1) / 2;
@@ -3836,7 +3836,7 @@ lookaround(void)
                 if ((svc.context.run != 1 && !is_safemon(mtmp))
                     || (infront && !svc.context.travel)) {
                     if (flags.mention_walls)
-                        pline_xy(x, y, "%s blocks your path.",
+                        pline_xy(x, y, _("%s blocks your path."),
                                  upstart(a_monnam(mtmp)));
                     goto stop;
                 }
@@ -4116,7 +4116,7 @@ maybe_wail(void)
         int i, powercnt;
 
         who = (Role_if(PM_WIZARD) || Role_if(PM_VALKYRIE)) ? gu.urole.name.m
-                                                           : "Elf";
+                                                           : _("Elf");
         if (u.uhp == 1) {
             pline(_("%s is about to die."), who);
         } else {

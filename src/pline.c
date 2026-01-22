@@ -683,10 +683,10 @@ impossible(const char *s, ...)
         return;
     }
 
-    Strcpy(pbuf2, "Program in disorder!");
+    Strcpy(pbuf2, _("Program in disorder!"));
     if (program_state.something_worth_saving)
-        Strcat(pbuf2, "  (Saving and reloading may fix this problem.)");
-    pline(_("%s"), pbuf2);
+        Strcat(pbuf2, _("  (Saving and reloading may fix this problem.)"));
+    pline("%s", pbuf2);
     pline(_("Please report these messages to %s."), DEVTEAM_EMAIL);
     if (sysopt.support) {
         pline(_("Alternatively, contact local support: %s"), sysopt.support);

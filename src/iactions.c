@@ -73,9 +73,9 @@ item_naming_classification(
             callname = the(callname);
         else if (!is_plural(obj))
             callname = makeplural(callname);
-        Sprintf(ocallbuf, "%s the type for %s",
+        Sprintf(ocallbuf, _("%s the type for %s"),
                 (!objects[obj->otyp].oc_uname
-                 || !*objects[obj->otyp].oc_uname) ? Call : Recall,
+                 || !*objects[obj->otyp].oc_uname) ? _(Call) : _(Recall),
                 callname);
     }
     return (*onamebuf || *ocallbuf) ? TRUE : FALSE;
@@ -103,7 +103,7 @@ item_reading_classification(struct obj *obj, char *outbuf)
 #endif
                               && (otyp != SCR_BLANK_PAPER
                                   || !objects[otyp].oc_name_known))
-                             ? " to activate its magic" : "");
+                             ? _(" to activate its magic") : "");
 
         Sprintf(outbuf, _("Read this scroll%s"), magic);
     } else if (obj->oclass == SPBOOK_CLASS) {
@@ -300,7 +300,7 @@ itemactions(struct obj *otmp)
          * TODO: if uwep is ammo, tell player that to shoot instead of toss,
          *       the corresponding launcher must be wielded;
          */
-        Sprintf(buf,  "%s '%c' to %s %s %s",
+        Sprintf(buf, _("%s '%c' to %s %s %s"),
                 verb, HANDS_SYM, action, which,
                 is_plural(otmp) ? makeplural(what) : what);
         ia_addmenu(win, IA_UNWIELD, '-', buf);
@@ -463,11 +463,11 @@ itemactions(struct obj *otmp)
        is some in a slot other than '$' (which shouldn't be possible) */
     if (otmp->oclass != COIN_CLASS || check_invent_gold("item-action"))
         ia_addmenu(win, IA_ADJUST_OBJ, 'i',
-                   "Adjust inventory by assigning new letter");
+                   _("Adjust inventory by assigning new letter"));
     /* I: #adjust inventory item by splitting its stack  */
     if (otmp->quan > 1L && otmp->oclass != COIN_CLASS)
         ia_addmenu(win, IA_ADJUST_STACK, 'I',
-                   "Adjust inventory by splitting this stack");
+                   _("Adjust inventory by splitting this stack"));
 
     /* O: offer sacrifice */
     if (IS_ALTAR(levl[u.ux][u.uy].typ) && !u.uswallow) {
@@ -475,11 +475,11 @@ itemactions(struct obj *otmp)
            include corpses on Astral and don't include amulets off Astral */
         if (otmp->otyp == CORPSE)
             ia_addmenu(win, IA_SACRIFICE, 'O',
-                       "Offer this corpse as a sacrifice at this altar");
+                       _("Offer this corpse as a sacrifice at this altar"));
         else if (otmp->otyp == AMULET_OF_YENDOR
                  || otmp->otyp == FAKE_AMULET_OF_YENDOR)
             ia_addmenu(win, IA_SACRIFICE, 'O',
-                       "Offer this amulet as a sacrifice at this altar");
+                       _("Offer this amulet as a sacrifice at this altar"));
     }
 
     /* p: pay for unpaid utems */

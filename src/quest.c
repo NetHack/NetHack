@@ -164,7 +164,7 @@ is_pure(boolean talk)
         } else if (u.ualign.record < MIN_QUEST_ALIGN) {
             You(_("are currently %d and require %d."), u.ualign.record,
                 MIN_QUEST_ALIGN);
-            if (yn_function("adjust?", (char *) 0, 'y', TRUE) == 'y')
+            if (yn_function(_("adjust?"), (char *) 0, 'y', TRUE) == 'y')
                 u.ualign.record = MIN_QUEST_ALIGN;
         }
     }

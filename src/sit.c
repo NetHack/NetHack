@@ -50,9 +50,9 @@ throne_sit_effect(void)
             int which;
 
             buf[0] = '\0';
-            getlin("Throne sit effect (1..13) [0=random]", buf);
+            getlin(_("Throne sit effect (1..13) [0=random]"), buf);
             if (buf[0] == '\033') {
-                pline(_("%s"), Never_mind);
+                pline1(Never_mind);
                 return; /* caller will still cause a move to elapse */
             }
             which = atoi(buf);
@@ -258,7 +258,7 @@ special_throne_effect(int effect) {
         /* permanent level drain */
         pline(_("Sitting on the throne was a terrible experience."));
         if (!Drain_resistance) {
-            losexp("a bad experience sitting on a throne");
+            losexp(_("a bad experience sitting on a throne"));
             if (u.ulevelmax > u.ulevel)
                 u.ulevelmax -= 1;
         }
@@ -469,7 +469,7 @@ dosit(void)
                 if (trap && trap->ttyp == SPIKED_PIT) {
                     You(_("sit down on a spike.  Ouch!"));
                     losehp(Half_physical_damage ? rn2(2) : 1,
-                           "sitting on an iron spike", KILLED_BY);
+                           _("sitting on an iron spike"), KILLED_BY);
                     exercise(A_STR, FALSE);
                 } else
                     You(_("sit down in the pit."));
@@ -483,7 +483,7 @@ dosit(void)
                 if (Slimed)
                     burn_away_slime();
                 u.utrap += rnd(4);
-                losehp(d(2, 10), "sitting in lava",
+                losehp(d(2, 10), _("sitting in lava"),
                        KILLED_BY); /* lava damage */
             } else if (u.utraptype == TT_INFLOOR
                        || u.utraptype == TT_BURIEDBALL) {
@@ -541,7 +541,7 @@ dosit(void)
         }
         pline_The(_("%s burns you!"), hliquid("lava"));
         losehp(d((Fire_resistance ? 2 : 10), 10), /* lava damage */
-               "sitting on lava", KILLED_BY);
+               _("sitting on lava"), KILLED_BY);
     } else if (is_ice(u.ux, u.uy)) {
         You(_("sit on the %s."), defsyms[S_ice].explanation);
         if (!Cold_resistance)

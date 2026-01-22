@@ -188,13 +188,13 @@ oracle_sound(struct monst *mtmp)
     if (Hallucination || !canseemon(mtmp)) {
         int hallu = Hallucination ? 1 : 0;
         static const char *const ora_msg[5] = {
-            "a strange wind.",     /* Jupiter at Dodona */
-            "convulsive ravings.", /* Apollo at Delphi */
-            "snoring snakes.",     /* AEsculapius at Epidaurus */
-            "someone say \"No more woodchucks!\"",
-            "a loud ZOT!" /* both rec.humor.oracle */
+            N_("a strange wind."),     /* Jupiter at Dodona */
+            N_("convulsive ravings."), /* Apollo at Delphi */
+            N_("snoring snakes."),     /* AEsculapius at Epidaurus */
+            N_("someone say \"No more woodchucks!\""),
+            N_("a loud ZOT!") /* both rec.humor.oracle */
         };
-        You_hear1(ora_msg[rn2(3) + hallu * 2]);
+        You_hear1(_(ora_msg[rn2(3) + hallu * 2]));
     }
     return TRUE;
 }
@@ -286,8 +286,8 @@ dosounds(void)
     }
     if (svl.level.flags.has_barracks && !rn2(200)) {
         static const char *const barracks_msg[4] = {
-            "blades being honed.", "loud snoring.", "dice being thrown.",
-            "General MacArthur!",
+            N_("blades being honed."), N_("loud snoring."), N_("dice being thrown."),
+            N_("General MacArthur!"),
         };
         int count = 0;
 
@@ -302,7 +302,7 @@ dosounds(void)
                 && mon_in_room(mtmp, BARRACKS)
                 /* sleeping implies not-yet-disturbed (usually) */
                 && (mtmp->msleeping || ++count > 5)) {
-                You_hear1(barracks_msg[rn2(3) + hallu]);
+                You_hear1(_(barracks_msg[rn2(3) + hallu]));
                 return;
             }
         }
@@ -320,10 +320,10 @@ dosounds(void)
         if (tended_shop(sroom)
             && !strchr(u.ushops, (int) (ROOM_INDEX(sroom) + ROOMOFFSET))) {
             static const char *const shop_msg[3] = {
-                "someone cursing shoplifters.",
-                "the chime of a cash register.", "Neiman and Marcus arguing!",
+                N_("someone cursing shoplifters."),
+                N_("the chime of a cash register."), N_("Neiman and Marcus arguing!"),
             };
-            You_hear1(shop_msg[rn2(2) + hallu]);
+            You_hear1(_(shop_msg[rn2(2) + hallu]));
             noisy_shop(sroom);
         }
         return;
@@ -340,12 +340,12 @@ dosounds(void)
 }
 
 static const char *const h_sounds[] = {
-    "beep",   "boing",   "sing",   "belche", "creak",   "cough",
-    "rattle", "ululate", "pop",    "jingle", "sniffle", "tinkle",
-    "eep",    "clatter", "hum",    "sizzle", "twitter", "wheeze",
-    "rustle", "honk",    "lisp",   "yodel",  "coo",     "burp",
-    "moo",    "boom",    "murmur", "oink",   "quack",   "rumble",
-    "twang",  "toot",    "gargle", "hoot",    "warble"
+    N_("beep"),   N_("boing"),   N_("sing"),   N_("belche"), N_("creak"),   N_("cough"),
+    N_("rattle"), N_("ululate"), N_("pop"),    N_("jingle"), N_("sniffle"), N_("tinkle"),
+    N_("eep"),    N_("clatter"), N_("hum"),    N_("sizzle"), N_("twitter"), N_("wheeze"),
+    N_("rustle"), N_("honk"),    N_("lisp"),   N_("yodel"),  N_("coo"),     N_("burp"),
+    N_("moo"),    N_("boom"),    N_("murmur"), N_("oink"),   N_("quack"),   N_("rumble"),
+    N_("twang"),  N_("toot"),    N_("gargle"), N_("hoot"),   N_("warble")
 };
 
 const char *
@@ -356,44 +356,44 @@ growl_sound(struct monst *mtmp)
     switch (mtmp->data->msound) {
     case MS_MEW:
     case MS_HISS:
-        ret = "hiss";
+        ret = _("hiss");
         break;
     case MS_BARK:
     case MS_GROWL:
-        ret = "growl";
+        ret = _("growl");
         break;
     case MS_ROAR:
-        ret = "roar";
+        ret = _("roar");
         break;
     case MS_BELLOW:
-        ret = "bellow";
+        ret = _("bellow");
         break;
     case MS_BUZZ:
-        ret = "buzz";
+        ret = _("buzz");
         break;
     case MS_SQEEK:
-        ret = "squeal";
+        ret = _("squeal");
         break;
     case MS_SQAWK:
-        ret = "screech";
+        ret = _("screech");
         break;
     case MS_NEIGH:
-        ret = "neigh";
+        ret = _("neigh");
         break;
     case MS_WAIL:
-        ret = "wail";
+        ret = _("wail");
         break;
     case MS_GROAN:
-        ret = "groan";
+        ret = _("groan");
         break;
     case MS_MOO:
-        ret = "low";
+        ret = _("low");
         break;
     case MS_SILENT:
-        ret = "commotion";
+        ret = _("commotion");
         break;
     default:
-        ret = "scream";
+        ret = _("scream");
     }
     return ret;
 }
@@ -409,7 +409,7 @@ growl(struct monst *mtmp)
 
     /* presumably nearness and soundok checks have already been made */
     if (Hallucination)
-        growl_verb = ROLL_FROM(h_sounds);
+        growl_verb = _(ROLL_FROM(h_sounds));
     else
         growl_verb = growl_sound(mtmp);
     if (growl_verb) {
@@ -435,7 +435,7 @@ yelp(struct monst *mtmp)
 
     /* presumably nearness and soundok checks have already been made */
     if (Hallucination)
-        yelp_verb = ROLL_FROM(h_sounds);
+        yelp_verb = _(ROLL_FROM(h_sounds));
     else
         switch (mtmp->data->msound) {
         case MS_MEW:
@@ -486,19 +486,19 @@ whimper(struct monst *mtmp)
 
     /* presumably nearness and soundok checks have already been made */
     if (Hallucination)
-        whimper_verb = ROLL_FROM(h_sounds);
+        whimper_verb = _(ROLL_FROM(h_sounds));
     else
         switch (mtmp->data->msound) {
         case MS_MEW:
         case MS_GROWL:
-            whimper_verb = "whimper";
+            whimper_verb = _("whimper");
             break;
         case MS_BARK:
-            whimper_verb = "whine";
+            whimper_verb = _("whine");
             break;
         case MS_SQEEK:
             se = se_squeal;
-            whimper_verb = "squeal";
+            whimper_verb = _("squeal");
             break;
         }
     if (whimper_verb) {
@@ -761,7 +761,7 @@ domonnoise(struct monst *mtmp)
             if (kindred) {
                 Sprintf(verbuf, _("Good %s to you Master%s"),
                         isnight ? _("evening") : _("day"),
-                        isnight ? "!" : _(".  Why do we not rest?"));
+                        isnight ? _("!") : _(".  Why do we not rest?"));
                 verbl_msg = verbuf;
             } else {
                 Sprintf(verbuf, "%s%s",
@@ -1337,7 +1337,7 @@ dochat(void)
             if (!Blind)
                 pline_The(_("%s seems not to notice you."),
                           /* if hallucinating, you can't tell it's a statue */
-                          Hallucination ? rndmonnam((char *) 0) : "statue");
+                          Hallucination ? rndmonnam((char *) 0) : _("statue"));
             return ECMD_OK;
         }
         if (!Deaf && (IS_WALL(levl[tx][ty].typ)
@@ -1517,13 +1517,13 @@ tiphat(void)
             }
         } else if (vismon && humanoid(mtmp->data)) {
             static const char *const reaction[3] = {
-                "curses", "gestures rudely", "gestures offensively",
+                N_("curses"), N_("gestures rudely"), N_("gestures offensively"),
             };
             int which = !Deaf ? rn2(3) : rn1(2, 1),
                 twice = (Deaf || which > 0 || rn2(3)) ? 0 : rn1(2, 1);
 
-            pline(_("%s %s%s%s at you..."), Monnam(mtmp), reaction[which],
-                  twice ? " and " : "", twice ? reaction[twice] : "");
+            pline(_("%s %s%s%s at you..."), Monnam(mtmp), _(reaction[which]),
+                  twice ? _(" and ") : "", twice ? _(reaction[twice]) : "");
         } else if (next2u(x, y) && !Deaf && domonnoise(mtmp)) {
             if (!vismon)
                 map_invisible(x, y);
@@ -1531,7 +1531,7 @@ tiphat(void)
             pline(_("%s doesn't respond."), Monnam(mtmp));
         } else {
  nada:
-            pline(_("%s"), nothing_happens);
+            pline1(nothing_happens);
         }
     }
     return res;

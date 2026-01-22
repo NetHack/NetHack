@@ -9,6 +9,7 @@
  *      code for monsters.
  */
 #include "hack.h"
+#include "i18n.h"
 
 staticfn void give_may_advance_msg(int);
 staticfn void finish_towel_change(struct obj *obj, int) NONNULLARG1;
@@ -50,22 +51,22 @@ static NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
 
 /* note: entry [0] isn't used */
 static NEARDATA const char *const odd_skill_names[] = {
-    "no skill", "bare hands", /* use barehands_or_martial[] instead */
-    "two weapon combat", "riding", "polearms", "saber", "hammer", "whip",
-    "attack spells", "healing spells", "divination spells",
-    "enchantment spells", "clerical spells", "escape spells", "matter spells",
+    N_("no skill"), N_("bare hands"), /* use barehands_or_martial[] instead */
+    N_("two weapon combat"), N_("riding"), N_("polearms"), N_("saber"), N_("hammer"), N_("whip"),
+    N_("attack spells"), N_("healing spells"), N_("divination spells"),
+    N_("enchantment spells"), N_("clerical spells"), N_("escape spells"), N_("matter spells"),
 };
 /* indexed via is_martial() */
 static NEARDATA const char *const barehands_or_martial[] = {
-    "bare handed combat", "martial arts"
+    N_("bare handed combat"), N_("martial arts")
 };
 
 #define P_NAME(type)                                    \
     ((skill_names_indices[type] > 0)                    \
          ? OBJ_NAME(objects[skill_names_indices[type]]) \
          : (type == P_BARE_HANDED_COMBAT)               \
-               ? barehands_or_martial[martial_bonus()]  \
-               : odd_skill_names[-skill_names_indices[type]])
+               ? _(barehands_or_martial[martial_bonus()])  \
+               : _(odd_skill_names[-skill_names_indices[type]]))
 
 /* targets that provide attacker with small to-hit bonus when using a spear */
 static NEARDATA const char kebabable[] = {
@@ -455,7 +456,7 @@ silver_sears(struct monst *magr UNUSED, struct monst *mdef,
            rtyp will always be STRANGE_OBJECT) even if both rings are known
            silver [see hmonas(uhitm.c) for explanation of 'multi_claw'] */
         both = ((ltyp == rtyp && l_dknown == r_dknown) || (l_ag && r_ag));
-        Sprintf(rings, "ring%s", both ? "s" : "");
+        Sprintf(rings, _("ring%s"), both ? "s" : "");
         Your(_("%s%s %s %s!"),
              (l_ag || r_ag) ? _("silver ")
              : both ? ""
@@ -768,7 +769,7 @@ possibly_unwield(struct monst *mon, boolean polyspot)
         }
         obj_extract_self(obj);
         /* might be dropping object into water or lava */
-        if (!flooreffects(obj, mon->mx, mon->my, "drop")) {
+        if (!flooreffects(obj, mon->mx, mon->my, _("drop"))) {
             if (polyspot)
                 bypass_obj(obj);
             place_object(obj, mon->mx, mon->my);
@@ -874,7 +875,7 @@ mon_wield_item(struct monst *mon)
                     pline(_("%s cannot wield that %s."), mon_nam(mon),
                           xname(obj));
                 } else {
-                    pline_mon(mon, "%s tries to wield %s.", Monnam(mon), doname(obj));
+                    pline_mon(mon, _("%s tries to wield %s."), Monnam(mon), doname(obj));
                     pline(_("%s %s!"), Yname2(mw_tmp), welded_buf);
                 }
                 mw_tmp->bknown = 1;
@@ -889,11 +890,11 @@ mon_wield_item(struct monst *mon)
             boolean newly_welded;
             const struct throw_and_return_weapon *arw;
 
-            pline_mon(mon, "%s wields %s%c",
+            pline_mon(mon, _("%s wields %s%c"),
                       Monnam(mon), doname(obj),
                       exclaim ? '!' : '.');
             if ((arw = autoreturn_weapon(obj)) != 0 && arw->tethered != 0)
-                pline_mon(mon, "%s secures the tether on %s.", Monnam(mon),
+                pline_mon(mon, _("%s secures the tether on %s."), Monnam(mon),
                           the(xname(obj)));
 
             /* 3.6.3: mwelded() predicate expects the object to have its
@@ -1211,9 +1212,9 @@ static const struct skill_range {
     short first, last;
     const char *name;
 } skill_ranges[] = {
-    { P_FIRST_H_TO_H, P_LAST_H_TO_H, "Fighting Skills" },
-    { P_FIRST_WEAPON, P_LAST_WEAPON, "Weapon Skills" },
-    { P_FIRST_SPELL, P_LAST_SPELL, "Spellcasting Skills" },
+    { P_FIRST_H_TO_H, P_LAST_H_TO_H, N_("Fighting Skills") },
+    { P_FIRST_WEAPON, P_LAST_WEAPON, N_("Weapon Skills") },
+    { P_FIRST_SPELL, P_LAST_SPELL, N_("Spellcasting Skills") },
 };
 
 /* write a list of skills onto the given menu
@@ -1247,7 +1248,7 @@ add_skills_to_menu(winid win, boolean selectable, boolean speedy)
             /* Print headings for skill types */
             any = cg.zeroany;
             if (i == skill_ranges[pass].first)
-                add_menu_heading(win, skill_ranges[pass].name);
+                add_menu_heading(win, _(skill_ranges[pass].name));
 
             if (P_RESTRICTED(i))
                 continue;
@@ -1332,7 +1333,7 @@ enhance_weapon_skill(void)
     /* player knows about #enhance, don't show tip anymore */
     svc.context.tips[TIP_ENHANCE] = TRUE;
 
-    if (wizard && y_n("Advance skills without practice?") == 'y')
+    if (wizard && y_n(_("Advance skills without practice?")) == 'y')
         speedy = TRUE;
 
     do {
@@ -1356,16 +1357,16 @@ enhance_weapon_skill(void)
            with "*" or "#" below */
         if (eventually_advance > 0 || maxxed_cnt > 0) {
             if (eventually_advance > 0) {
-                Sprintf(buf, "(Skill%s flagged by \"*\" may be enhanced %s.)",
+                Sprintf(buf, _("(Skill%s flagged by \"*\" may be enhanced %s.)"),
                         plur(eventually_advance),
                         (u.ulevel < MAXULEV)
-                            ? "when you're more experienced"
-                            : "if skill slots become available");
+                            ? _("when you're more experienced")
+                            : _("if skill slots become available"));
                 add_menu_str(win, buf);
             }
             if (maxxed_cnt > 0) {
                 Sprintf(buf,
-                 "(Skill%s flagged by \"#\" cannot be enhanced any further.)",
+                 _("(Skill%s flagged by \"#\" cannot be enhanced any further.)"),
                         plur(maxxed_cnt));
                 add_menu_str(win, buf);
             }
@@ -1375,10 +1376,10 @@ enhance_weapon_skill(void)
         add_skills_to_menu(
             win, to_advance + eventually_advance + maxxed_cnt > 0, speedy);
 
-        Strcpy(buf, (to_advance > 0) ? "Pick a skill to advance:"
-                                     : "Current skills:");
+        Strcpy(buf, (to_advance > 0) ? _("Pick a skill to advance:")
+                                     : _("Current skills:"));
         if (wizard && !speedy)
-            Sprintf(eos(buf), "  (%d slot%s available)", u.weapon_slots,
+            Sprintf(eos(buf), _("  (%d slot%s available)"), u.weapon_slots,
                     plur(u.weapon_slots));
         end_menu(win, buf);
         n = select_menu(win, to_advance ? PICK_ONE : PICK_NONE, &selected);

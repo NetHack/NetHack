@@ -494,11 +494,11 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             /* turn stone golem into flesh golem */
             if (monsndx(mtmp->data) == PM_STONE_GOLEM
                 && newcham(mtmp, &mons[PM_FLESH_GOLEM], NO_NC_FLAGS))
-                mesg = "turns to flesh!";
+                mesg = _("turns to flesh!");
             else if (monsndx(mtmp->data) == PM_FLESH_GOLEM)
-                mesg = "seems fleshier...";
+                mesg = _("seems fleshier...");
             else
-                mesg = "looks rather fleshy for a moment.";
+                mesg = _("looks rather fleshy for a moment.");
 
             if (canseemon(mtmp))
                 pline(_("%s %s"), name, mesg);
@@ -1176,7 +1176,7 @@ unturn_dead(struct monst *mon)
             Strcpy(corpse, corpse_xname(otmp, (const char *) 0, CXN_NORMAL));
             /* shk_your/Shk_Your produces a value with a trailing space */
             if (otmp->quan > 1L) {
-                Strcpy(owner, "One of ");
+                Strcpy(owner, _("One of "));
                 (void) shk_your(eos(owner), otmp);
             } else
                 (void) Shk_Your(owner, otmp);
@@ -1199,7 +1199,7 @@ unturn_dead(struct monst *mon)
                    and owner names to say "It comes alive" [note: we did
                    earlier setup because corpse gets used up but need to
                    do the override here after revive() sets 'last_msg'] */
-                Strcpy(corpse, "It");
+                Strcpy(corpse, _("It"));
                 owner[0] = '\0';
             }
             if (youseeit)
@@ -1568,7 +1568,7 @@ create_polymon(struct obj *obj, int okind)
     case METAL:
     case MITHRIL:
         pm_index = PM_IRON_GOLEM;
-        material = "metal ";
+        material = _("metal ");
         break;
     case COPPER:
     case SILVER:
@@ -1576,41 +1576,41 @@ create_polymon(struct obj *obj, int okind)
     case GEMSTONE:
     case MINERAL:
         pm_index = rn2(2) ? PM_STONE_GOLEM : PM_CLAY_GOLEM;
-        material = "lithic ";
+        material = _("lithic ");
         break;
     case 0:
     case FLESH:
         /* there is no flesh type, but all food is type 0, so we use it */
         pm_index = PM_FLESH_GOLEM;
-        material = "organic ";
+        material = _("organic ");
         break;
     case WOOD:
         pm_index = PM_WOOD_GOLEM;
-        material = "wood ";
+        material = _("wood ");
         break;
     case LEATHER:
         pm_index = PM_LEATHER_GOLEM;
-        material = "leather ";
+        material = _("leather ");
         break;
     case CLOTH:
         pm_index = PM_ROPE_GOLEM;
-        material = "cloth ";
+        material = _("cloth ");
         break;
     case BONE:
         pm_index = PM_SKELETON; /* nearest thing to "bone golem" */
-        material = "bony ";
+        material = _("bony ");
         break;
     case GOLD:
         pm_index = PM_GOLD_GOLEM;
-        material = "gold ";
+        material = _("gold ");
         break;
     case GLASS:
         pm_index = PM_GLASS_GOLEM;
-        material = "glassy ";
+        material = _("glassy ");
         break;
     case PAPER:
         pm_index = PM_PAPER_GOLEM;
-        material = "paper ";
+        material = _("paper ");
         break;
     default:
         /* if all else fails... */
@@ -2806,7 +2806,7 @@ zapyourself(struct obj *obj, boolean ordinary)
     case SPE_DRAIN_LIFE:
         if (!Drain_resistance) {
             learn_it = TRUE; /* (no effect for spells...) */
-            losexp("life drainage");
+            losexp(_("life drainage"));
         }
         damage = 0; /* No additional damage */
         break;
@@ -2880,7 +2880,7 @@ zapyourself(struct obj *obj, boolean ordinary)
             break;
         }
         learn_it = TRUE;
-        Sprintf(svk.killer.name, "shot %sself with a death ray", uhim());
+        Sprintf(svk.killer.name, _("shot %sself with a death ray"), uhim());
         svk.killer.format = NO_KILLER_PREFIX;
         /* probably don't need these to be urgent; player just gave input
            without subsequent opportunity to dismiss --More-- with ESC */
@@ -3140,8 +3140,8 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
              boolean allow_cancel_kill, boolean self_cancel)
 {
     static const char
-        writing_vanishes[] = "Some writing vanishes from %s head!",
-        your[] = "your"; /* should be extern */
+        writing_vanishes[] = N_("Some writing vanishes from %s head!"),
+        your[] = N_("your"); /* should be extern */
     boolean youdefend = (mdef == &gy.youmonst);
 
     if (youdefend ? (!youattack && Antimagic)
@@ -3172,7 +3172,7 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
              */
             if (u.umonnum == PM_CLAY_GOLEM) {
                 if (!Blind)
-                    pline(_(writing_vanishes), your);
+                    pline(_(writing_vanishes), _(your));
                 else /* note: "dark" rather than "heavy" is intentional... */
                     You_feel(_("%s headed."), Hallucination ? _("dark") : _("light"));
                 u.mh = 0; /* fatal; death handled by rehumanize() */
@@ -3538,7 +3538,7 @@ exclam(int force)
     /* force == 0 occurs e.g. with sleep ray */
     /* note that large force is usual with wands so that !! would
             require information about hand/weapon/wand */
-    return (const char *) ((force < 0) ? "?" : (force <= 4) ? "." : "!");
+    return (const char *) ((force < 0) ? _("?") : (force <= 4) ? _(".") : _("!"));
 }
 
 void
@@ -4116,7 +4116,7 @@ bhit(
         tmp_at(DISP_END, 0);
 
     if (shopdoor)
-        pay_for_damage("destroy", FALSE);
+        pay_for_damage(_("destroy"), FALSE);
 
  bhit_done:
     /* note: for FLASHED_LIGHT, _caller_ must call transient_light_cleanup()
@@ -4187,7 +4187,7 @@ boomhit(struct obj *obj, coordxy dx, coordxy dy)
             if (Fumbling || rn2(20) >= ACURR(A_DEX)) {
                 /* we hit ourselves */
                 (void) thitu(10 + obj->spe, dmgval(obj, &gy.youmonst), &obj,
-                             "boomerang");
+                             _("boomerang"));
                 endmultishot(TRUE);
                 break;
             } else { /* we catch it */
@@ -4668,7 +4668,7 @@ disintegrate_mon(
         if (!m_amulet)
             pline(_("%s is disintegrated!"), Monnam(mon));
         else
-            hit(fltxt, mon, "!");
+            hit(fltxt, mon, _("!"));
     }
 
 /* note: worn amulet of life saving must be preserved in order to operate */
@@ -4811,7 +4811,7 @@ dobuzz(
                         hit(flash_str(fltyp, FALSE), mon, exclam(0));
                         shieldeff(mon->mx, mon->my);
                         (void) mon_reflects(mon,
-                                            "But it reflects from %s %s!");
+                                            _("But it reflects from %s %s!"));
                         gas_hit = FALSE;
                     }
                     dx = -dx;
@@ -4823,7 +4823,7 @@ dobuzz(
                     if (is_rider(mon->data)
                         && abs(type) == ZT_BREATH(ZT_DEATH)) {
                         if (canseemon(mon)) {
-                            hit(flash_str(fltyp, FALSE), mon, ".");
+                            hit(flash_str(fltyp, FALSE), mon, _("."));
                             pline(_("%s disintegrates."), Monnam(mon));
                             pline(_("%s body reintegrates before your %s!"),
                                   s_suffix(Monnam(mon)),
@@ -4837,7 +4837,7 @@ dobuzz(
                     }
                     if (mon->data == &mons[PM_DEATH] && damgtype == ZT_DEATH) {
                         if (canseemon(mon)) {
-                            hit(flash_str(fltyp, FALSE), mon, ".");
+                            hit(flash_str(fltyp, FALSE), mon, _("."));
                             pline(_("%s absorbs the deadly %s!"), Monnam(mon),
                                   type == ZT_BREATH(ZT_DEATH) ? _("blast")
                                                               : _("ray"));
@@ -5093,7 +5093,7 @@ melt_ice_away(anything *arg, long timeout UNUSED)
     y = (coordxy) (where & 0xFFFF);
     x = (coordxy) ((where >> 16) & 0xFFFF);
     /* melt_ice does newsym when appropriate */
-    melt_ice(x, y, "Some ice melts away.");
+    melt_ice(x, y, _("Some ice melts away."));
     svc.context.mon_moving = save_mon_moving;
 }
 
@@ -5743,13 +5743,13 @@ item_what(int dmgtyp)
  */
 const char *const destroy_strings[][3] = {
     /* also used in trap.c */
-    { "freezes and shatters", "freeze and shatter", "shattered potion" },
-    { "boils and explodes", "boil and explode", "boiling potion" },
-    { "ignites and explodes", "ignite and explode", "exploding potion" },
-    { "catches fire and burns", "catch fire and burn", "burning scroll" },
-    { "catches fire and burns", "", "burning book" },
-    { "turns to dust and vanishes", "", "" },
-    { "breaks apart and explodes", "", "exploding wand" },
+    { N_("freezes and shatters"), N_("freeze and shatter"), N_("shattered potion") },
+    { N_("boils and explodes"), N_("boil and explode"), N_("boiling potion") },
+    { N_("ignites and explodes"), N_("ignite and explode"), N_("exploding potion") },
+    { N_("catches fire and burns"), N_("catch fire and burn"), N_("burning scroll") },
+    { N_("catches fire and burns"), "", N_("burning book") },
+    { N_("turns to dust and vanishes"), "", "" },
+    { N_("breaks apart and explodes"), "", N_("exploding wand") },
 };
 
 /* guts of destroy_items();
@@ -5874,7 +5874,7 @@ maybe_destroy_item(
                         : _("All of "));               /* N of N */
             pline(_("%s%s %s!"), mult,
                   (cnt == 1L && quan == 1L) ? Yname2(obj) : yname(obj),
-                  destroy_strings[dindx][(cnt > 1L)]);
+                  _(destroy_strings[dindx][(cnt > 1L)]));
         }
         if (u_carry) { /* effects that happen only to the player */
             if (osym == POTION_CLASS && dmgtyp != AD_COLD
@@ -5905,11 +5905,11 @@ maybe_destroy_item(
             if (xresist) {
                 You(_("aren't hurt!"));
             } else {
-                const char *how = destroy_strings[dindx][2];
+                const char *how = _(destroy_strings[dindx][2]);
                 boolean one = (cnt == 1L);
 
                 if (dmgtyp == AD_FIRE && osym == FOOD_CLASS)
-                    how = "exploding glob of slime";
+                    how = _("exploding glob of slime");
                 losehp(dmg, one ? how : (const char *) makeplural(how),
                        one ? KILLED_BY_AN : KILLED_BY);
                 exercise(A_STR, FALSE);
@@ -6132,31 +6132,31 @@ wishcmdassist(int triesleft)
 {
     static NEARDATA const char *
         wishinfo[] = {
-  "Wish details:",
+  N_("Wish details:"),
   "",
-  "Enter the name of an object, such as \"potion of monster detection\",",
-  "\"scroll labeled README\", \"elven mithril-coat\", or \"Grimtooth\"",
-  "(without the quotes).",
+  N_("Enter the name of an object, such as \"potion of monster detection\","),
+  N_("\"scroll labeled README\", \"elven mithril-coat\", or \"Grimtooth\""),
+  N_("(without the quotes)."),
   "",
-  "For object types which come in stacks, you may specify a plural name",
-  "such as \"potions of healing\", or specify a count, such as \"1000 gold",
-  "pieces\", although that aspect of your wish might not be granted.",
+  N_("For object types which come in stacks, you may specify a plural name"),
+  N_("such as \"potions of healing\", or specify a count, such as \"1000 gold"),
+  N_("pieces\", although that aspect of your wish might not be granted."),
   "",
-  "You may also specify various prefix values which might be used to",
-  "modify the item, such as \"uncursed\" or \"rustproof\" or \"+1\".",
-  "Most modifiers shown when viewing your inventory can be specified.",
+  N_("You may also specify various prefix values which might be used to"),
+  N_("modify the item, such as \"uncursed\" or \"rustproof\" or \"+1\"."),
+  N_("Most modifiers shown when viewing your inventory can be specified."),
   "",
-  "You may specify 'nothing' to explicitly decline this wish.",
+  N_("You may specify 'nothing' to explicitly decline this wish."),
   0,
     },
-        preserve_wishless[] = "Doing so will preserve 'wishless' conduct.",
+        preserve_wishless[] = N_("Doing so will preserve 'wishless' conduct."),
         retry_info[] =
-                    "If you specify an unrecognized object name %s%s time%s,",
-        retry_too[] = "a randomly chosen item will be granted.",
+                    N_("If you specify an unrecognized object name %s%s time%s,"),
+        retry_too[] = N_("a randomly chosen item will be granted."),
         suppress_cmdassist[] =
-            "(Suppress this assistance with !cmdassist in your config file.)",
-        *cardinals[] = { "zero",  "one",  "two", "three", "four", "five" },
-        too_many[] = "too many";
+            N_("(Suppress this assistance with !cmdassist in your config file.)"),
+        *cardinals[] = { N_("zero"), N_("one"), N_("two"), N_("three"), N_("four"), N_("five") },
+        too_many[] = N_("too many");
     int i;
     winid win;
     char buf[BUFSZ];
@@ -6165,21 +6165,21 @@ wishcmdassist(int triesleft)
     if (!win)
         return;
     for (i = 0; i < SIZE(wishinfo) - 1; ++i)
-        putstr(win, 0, wishinfo[i]);
+        putstr(win, 0, _(wishinfo[i]));
     if (!u.uconduct.wishes)
-        putstr(win, 0, preserve_wishless);
+        putstr(win, 0, _(preserve_wishless));
     putstr(win, 0, "");
-    Sprintf(buf, retry_info,
+    Sprintf(buf, _(retry_info),
             (triesleft >= 0 && triesleft < SIZE(cardinals))
-               ? cardinals[triesleft]
-               : too_many,
-            (triesleft < MAXWISHTRY) ? " more" : "",
+               ? _(cardinals[triesleft])
+               : _(too_many),
+            (triesleft < MAXWISHTRY) ? _(" more") : "",
             plur(triesleft));
     putstr(win, 0, buf);
-    putstr(win, 0, retry_too);
+    putstr(win, 0, _(retry_too));
     putstr(win, 0, "");
     if (iflags.cmdassist)
-        putstr(win, 0, suppress_cmdassist);
+        putstr(win, 0, _(suppress_cmdassist));
     display_nhwindow(win, TRUE);
     destroy_nhwindow(win);
 }

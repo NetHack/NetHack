@@ -39,12 +39,12 @@ msg_mon_movement(struct monst *mtmp, coordxy omx, coordxy omy)
             close = !n2u && (distu(nix, niy) <= (BOLT_LIM * BOLT_LIM)),
             closer = !n2u && (distu(nix, niy) <= distu(omx, omy));
 
-        pline_xy(nix, niy, "%s %s%s.", Monnam(mtmp),
-                 vtense((char *) 0, locomotion(mtmp->data, "move")),
-                 n2u ? " next to you"
-                 : (close && closer) ? " closer"
-                 : (close && !closer) ? " further away"
-                 : " in the distance");
+        pline_xy(nix, niy, _("%s %s%s."), Monnam(mtmp),
+                 vtense((char *) 0, locomotion(mtmp->data, _("move"))),
+                 n2u ? _(" next to you")
+                 : (close && closer) ? _(" closer")
+                 : (close && !closer) ? _(" further away")
+                 : _(" in the distance"));
     }
 }
 

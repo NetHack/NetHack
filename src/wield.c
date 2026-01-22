@@ -78,8 +78,8 @@ staticfn void finish_splitting(struct obj *);
      : is_weptool(obj))
 
 static const char
-    are_no_longer_twoweap[] = "are no longer using two weapons at once",
-    can_no_longer_twoweap[] = "can no longer wield two weapons at once";
+    are_no_longer_twoweap[] = N_("are no longer using two weapons at once"),
+    can_no_longer_twoweap[] = N_("can no longer wield two weapons at once");
 
 /*** Functions that place a given item in a slot ***/
 /* Proper usage includes:
@@ -142,7 +142,7 @@ cant_wield_corpse(struct obj *obj)
     You(_("wield %s in your bare %s."),
         corpse_xname(obj, (const char *) 0, CXN_PFX_THE),
         makeplural(body_part(HAND)));
-    Sprintf(kbuf, "wielding %s bare-handed", killer_xname(obj));
+    Sprintf(kbuf, _("wielding %s bare-handed"), killer_xname(obj));
     instapetrify(kbuf);
     return TRUE;
 }
@@ -227,7 +227,7 @@ ready_weapon(struct obj *wep)
             /* skip this message if we already got "empty handed" one above;
                also, Null is not safe for neither TWOWEAPOK() or bimanual() */
             if (uwep)
-                You(_("%s."), ((TWOWEAPOK(uwep) && !bimanual(uwep))
+                You(_("%s."), _((TWOWEAPOK(uwep) && !bimanual(uwep))
                             ? are_no_longer_twoweap
                             : can_no_longer_twoweap));
         }
@@ -656,7 +656,7 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
         You(_("are now %s."), empty_handed());
         res = 1;
     } else if (was_twoweap && !u.twoweap) {
-        You(_("%s."), are_no_longer_twoweap);
+        You(_("%s."), _(are_no_longer_twoweap));
         res = 1;
     }
     return res ? ECMD_TIME : ECMD_OK;
@@ -799,10 +799,10 @@ drop_uswapwep(void)
        dual-wielded, or to get this far attempting to achieve that,
        uswapwep must be one-handed; since it's secondary, the hand must
        be the left one */
-    Sprintf(left_hand, "left %s", body_part(HAND));
+    Sprintf(left_hand, _("left %s"), body_part(HAND));
     if (!obj->cursed)
         /* attempting to two-weapon while Glib */
-        pline(_("%s from your %s!"), Yobjnam2(obj, "slip"), left_hand);
+        pline(_("%s from your %s!"), Yobjnam2(obj, _("slip")), left_hand);
     else if (!u.twoweap)
         /* attempting to two-weapon when uswapwep is cursed */
         pline(_("%s your grasp and %s from your %s!"),
@@ -886,7 +886,7 @@ void
 untwoweapon(void)
 {
     if (u.twoweap) {
-        You(_("%s."), can_no_longer_twoweap);
+        You(_("%s."), _(can_no_longer_twoweap));
         set_twoweap(FALSE); /* u.twoweap = FALSE */
         update_inventory();
     }

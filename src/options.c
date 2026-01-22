@@ -1752,7 +1752,7 @@ optfn_fruit(
 
                 if (!forig && fnum >= 100) {
                     config_error_add(
-                        "Doing that so many times isn't very fruitful.");
+                        _("Doing that so many times isn't very fruitful."));
                     return optn_ok;
                 }
             }
@@ -3378,8 +3378,8 @@ optfn_pickup_types(
                 boolean wasspace;
 
                 use_menu = FALSE;
-                Sprintf(qbuf, "New %s: [%s am] (%s)", allopt[optidx].name,
-                        ocl, *tbuf ? tbuf : "all");
+                Sprintf(qbuf, _("New %s: [%s am] (%s)"), allopt[optidx].name,
+                        ocl, *tbuf ? tbuf : _("all"));
                 abuf[0] = '\0';
                 getlin(qbuf, abuf);
                 wasspace = (abuf[0] == ' '); /* before mungspaces */
@@ -3396,7 +3396,7 @@ optfn_pickup_types(
             if (use_menu) {
                 if (wizard && !strchr(ocl, VENOM_SYM))
                     strkitten(ocl, VENOM_SYM);
-                (void) choose_classes_menu("Autopickup what?",
+                (void) choose_classes_menu(_("Autopickup what?"),
                                            1, TRUE, ocl, tbuf);
                 op = tbuf;
             }
@@ -5798,7 +5798,7 @@ staticfn int
 handler_menu_headings(void)
 {
     boolean gotca = query_color_attr(&iflags.menu_headings,
-                                     "How to highlight menu headings:");
+                                     _("How to highlight menu headings:"));
 
     if (gotca) {
         /* header highlighting affects persistent inventory display */
@@ -6389,7 +6389,7 @@ handler_autopickup_exception(void)
             ape = ga.apelist;
             any = cg.zeroany;
             add_menu_heading(tmpwin,
-                             "Always pickup '<'; never pickup '>'");
+                             _("Always pickup '<'; never pickup '>'"));
             for (i = 0; i < numapes && ape; i++) {
                 any.a_void = (opt_idx == 1) ? 0 : ape;
                 /* length of pattern plus quotes (plus '<'/'>') is
@@ -6401,8 +6401,8 @@ handler_autopickup_exception(void)
                 ape = ape->next;
             }
         }
-        Sprintf(apebuf, "%s autopickup exceptions",
-                (opt_idx == 1) ? "List of" : "Remove which");
+        Sprintf(apebuf, _("%s autopickup exceptions"),
+                (opt_idx == 1) ? _("List of") : _("Remove which"));
         end_menu(tmpwin, apebuf);
         pick_cnt = select_menu(tmpwin,
                                (opt_idx == 1) ? PICK_NONE : PICK_ANY,

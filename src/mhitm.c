@@ -745,11 +745,11 @@ gazemm(struct monst *magr, struct monst *mdef, struct attack *mattk)
     mdef->mundetected = 0;
 
     if (gv.vis) {
-        Sprintf(buf, "%s gazes %s",
+        Sprintf(buf, _("%s gazes %s"),
                 altmesg ? Adjmonnam(magr, "blinded") : Monnam(magr),
                 altmesg ? _("toward") : _("at"));
         pline(_("%s %s..."), buf,
-              canspotmon(mdef) ? mon_nam(mdef) : "something");
+              canspotmon(mdef) ? mon_nam(mdef) : _("something"));
     }
 
     if (magr->mcan || !mdef->mcansee
@@ -773,7 +773,7 @@ gazemm(struct monst *magr, struct monst *mdef, struct attack *mattk)
             if (mdef->minvis && !perceives(magr->data)) {
                 if (canseemon(magr)) {
                     pline(
-                      "%s doesn't seem to notice that %s gaze was reflected.",
+                      _("%s doesn't seem to notice that %s gaze was reflected."),
                           Monnam(magr), mhis(magr));
                 }
                 return M_ATTK_MISS;

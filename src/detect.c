@@ -469,7 +469,7 @@ gold_detect(struct obj *sobj)
     You_feel(_("very greedy, and sense gold!"));
     exercise(A_WIS, TRUE);
 
-    browse_map(ter_typ, "gold");
+    browse_map(ter_typ, _("gold"));
 
     map_redisplay();
     return 0;
@@ -587,7 +587,7 @@ food_detect(struct obj *sobj)
             You(_("sense %s."), what);
         exercise(A_WIS, TRUE);
 
-        browse_map(ter_typ, "food");
+        browse_map(ter_typ, _("food"));
 
         map_redisplay();
     }
@@ -783,7 +783,7 @@ object_detect(struct obj *detector, /* object doing the detecting */
     if (!ct)
         display_nhwindow(WIN_MAP, TRUE);
     else
-        browse_map(ter_typ, "object");
+        browse_map(ter_typ, _("object"));
 
     map_redisplay();
     return 0;
@@ -853,7 +853,7 @@ monster_detect(struct obj *otmp, /* detecting object (if any) */
             /* one-shot detection--allow player to move cursor around and
                get autodescribe feedback */
             EDetect_monsters |= I_SPECIAL;
-            browse_map(TER_DETECT | TER_MON, "monster of interest");
+            browse_map(TER_DETECT | TER_MON, _("monster of interest"));
             EDetect_monsters &= ~I_SPECIAL;
         }
 
@@ -1128,7 +1128,7 @@ furniture_detect(void)
     else /* we need to browse all types because we haven't redrawn the map
           * with only points of interest */
         browse_map(TER_DETECT | TER_MAP | TER_TRP | TER_OBJ | TER_MON,
-                   "location");
+                   _("location"));
 
     map_redisplay();
     return 0;
@@ -1149,38 +1149,38 @@ level_distance(d_level *where)
     if (ll < 0) {
         if (ll < (-8 - rn2(3)))
             if (!indun)
-                res = "far away";
+                res = _("far away");
             else
-                res = "far below";
+                res = _("far below");
         else if (ll < -1)
             if (!indun)
-                res = "away below you";
+                res = _("away below you");
             else
-                res = "below you";
+                res = _("below you");
         else if (!indun)
-            res = "in the distance";
+            res = _("in the distance");
         else
-            res = "just below";
+            res = _("just below");
     } else if (ll > 0) {
         if (ll > (8 + rn2(3)))
             if (!indun)
-                res = "far away";
+                res = _("far away");
             else
-                res = "far above";
+                res = _("far above");
         else if (ll > 1)
             if (!indun)
-                res = "away above you";
+                res = _("away above you");
             else
-                res = "above you";
+                res = _("above you");
         else if (!indun)
-            res = "in the distance";
+            res = _("in the distance");
         else
-            res = "just above";
+            res = _("just above");
     } else { /* l1 == 0 */
         if (!indun)
-            res = "in the distance";
+            res = _("in the distance");
         else
-            res = "near you";
+            res = _("near you");
     }
     return res;
 }
@@ -1434,7 +1434,7 @@ do_mapping(void)
         flush_screen(1);                 /* flush temp screen */
         /* browse_map() instead of display_nhwindow(WIN_MAP, TRUE) */
         browse_map(TER_DETECT | TER_MAP | TER_TRP | TER_OBJ,
-                   "anything of interest");
+                   _("anything of interest"));
         map_redisplay(); /* calls reconstrain_map() and docrt() */
     } else {
         /* we only get here when unconstrained is False, so reconstrain_map
@@ -1556,7 +1556,7 @@ do_vicinity_map(
         You(_("sense your surroundings."));
         if (extended || glyph_is_monster(glyph_at(u.ux, u.uy)))
             ter_typ |= TER_MON;
-        browse_map(ter_typ, "anything of interest");
+        browse_map(ter_typ, _("anything of interest"));
         refresh = TRUE;
     }
     reconstrain_map();
@@ -1751,7 +1751,7 @@ openone(coordxy zx, coordxy zy, genericptr_t num)
             cvt_sdoor_to_door(&levl[zx][zy]); /* .typ = DOOR */
         if (levl[zx][zy].doormask & D_TRAPPED) {
             if (distu(zx, zy) < 3)
-                b_trapped("door", NO_PART);
+                b_trapped(_("door"), NO_PART);
             else
                 Norep(_("You %s an explosion!"),
                       cansee(zx, zy) ? _("see") : (!Deaf ? _("hear")
@@ -1821,30 +1821,30 @@ findit(void)
     buf[0] = '\0';
     if (found.num_sdoors) {
         if (found.num_sdoors > 1)
-            Sprintf(eos(buf), "%d secret doors", found.num_sdoors);
+            Sprintf(eos(buf), _("%d secret doors"), found.num_sdoors);
         else
-            Strcat(buf, "a secret door");
+            Strcat(buf, _("a secret door"));
         num += found.num_sdoors;
     }
     /* note: non-\0 *buf implies that at least one previous type is present */
     if (found.num_scorrs) {
         if (*buf) /* "doors and corrs" or "doors, corrs ..." */
-            Strcat(buf, (k == 2) ? " and " : ", ");
+            Strcat(buf, (k == 2) ? _(" and ") : ", ");
         if (found.num_scorrs > 1)
-            Sprintf(eos(buf), "%d secret corridors", found.num_scorrs);
+            Sprintf(eos(buf), _("%d secret corridors"), found.num_scorrs);
         else
-            Strcat(buf, "a secret corridor");
+            Strcat(buf, _("a secret corridor"));
         num += found.num_scorrs;
     }
     if (found.num_traps) {
         if (*buf) /* "doors, corrs, and traps" or "{doors|corrs} and traps"
                    * or "..., traps ..." */
-            Strcat(buf, (k == 3 && !found.num_mons) ? ", and "
-                        : (k == 2) ? " and " : ", ");
+            Strcat(buf, (k == 3 && !found.num_mons) ? _(", and ")
+                        : (k == 2) ? _(" and ") : ", ");
         if (found.num_traps > 1)
-            Sprintf(eos(buf), "%d traps", found.num_traps);
+            Sprintf(eos(buf), _("%d traps"), found.num_traps);
         else
-            Strcat(buf, "a trap");
+            Strcat(buf, _("a trap"));
         num += found.num_traps;
     }
 
@@ -1855,11 +1855,11 @@ findit(void)
 
     if (found.num_mons) {
         if (*buf)
-            Strcat(buf, (k > 2) ? ", and " : " and ");
+            Strcat(buf, (k > 2) ? _(", and ") : _(" and "));
         if (found.num_mons > 1)
-            Sprintf(eos(buf), "%d hidden monsters", found.num_mons);
+            Sprintf(eos(buf), _("%d hidden monsters"), found.num_mons);
         else
-            Strcat(buf, "a hidden monster");
+            Strcat(buf, _("a hidden monster"));
         num += found.num_mons;
     }
     if (*buf)
@@ -2097,8 +2097,8 @@ dosearch0(int aflag) /* intrinsic autosearch vs explicit searching */
 int
 dosearch(void)
 {
-    if (cmd_safety_prevention("Searching", "another search",
-                          "You already found a monster.",
+    if (cmd_safety_prevention(_("Searching"), _("another search"),
+                          _("You already found a monster."),
                           &ga.already_found_flag))
         return ECMD_OK;
     return dosearch0(0) ? ECMD_TIME : ECMD_OK;
@@ -2407,7 +2407,7 @@ reveal_terrain(
         /* allow player to move cursor around and get autodescribe feedback
            based on what is visible now rather than what is on 'real' map */
         which_subset |= TER_MAP; /* guarantee non-zero */
-        browse_map(which_subset, "anything of interest");
+        browse_map(which_subset, _("anything of interest"));
 
         map_redisplay();
     }

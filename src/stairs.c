@@ -206,14 +206,14 @@ stairs_description(
                                     || single_level_branch(&tolev)); /* knox */
             int to_dlev = specialdepth ? dunlev(&tolev) : depth(&tolev);
 
-            Sprintf(eos(outbuf), " to level %d", to_dlev);
+            Sprintf(eos(outbuf), _(" to level %d"), to_dlev);
         }
     } else if (u.uz.dnum == 0 && u.uz.dlevel == 1 && sway->up) {
         /* stairs up from level one are a special case; they are marked
            as having been traversed because the hero obviously started
            the game by coming down them, but the remote side varies
            depending on whether the Amulet is being carried */
-        Sprintf(outbuf, "%s%s %s %s",
+        Sprintf(outbuf, _("%s%s %s %s"),
                 !u.uhave.amulet ? "" : _("branch "),
                 stairs, updown,
                 !u.uhave.amulet ? _("out of the dungeon")
@@ -226,7 +226,7 @@ stairs_description(
                   : _("to the end game"));
     } else {
         /* known branch stairs; tacking on destination level is too verbose */
-        Sprintf(outbuf, "branch %s %s to %s",
+        Sprintf(outbuf, _("branch %s %s to %s"),
                 stairs, updown, svd.dungeons[tolev.dnum].dname);
         /* dungeons[].dname is capitalized; undo that for "The <Branch>" */
         (void) strsubst(outbuf, "The ", "the ");

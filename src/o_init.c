@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 #ifndef SFCTOOL
 staticfn void setgemprobs(d_level *);
@@ -586,10 +587,10 @@ sortloot_descr(int otyp, char *outbuf)
 /* also used in options.c (optfn_sortdiscoveries) */
 static const char disco_order_let[] = "osca";
 static const char *const disco_orders_descr[] = {
-    "by order of discovery within each class",
-    "sortloot order (by class with some sub-class groupings)",
-    "alphabetical within each class",
-    "alphabetical across all classes",
+    N_("by order of discovery within each class"),
+    N_("sortloot order (by class with some sub-class groupings)"),
+    N_("alphabetical within each class"),
+    N_("alphabetical across all classes"),
     (char *) 0
 };
 
@@ -612,7 +613,7 @@ choose_disco_sort(
         any.a_int = disco_order_let[i];
         add_menu(tmpwin, &nul_glyphinfo, &any, (char) any.a_int,
                  0, ATR_NONE, clr,
-                 disco_orders_descr[i],
+                 _(disco_orders_descr[i]),
                  (disco_order_let[i] == flags.discosort)
                     ? MENU_ITEMFLAGS_SELECTED
                     : MENU_ITEMFLAGS_NONE);

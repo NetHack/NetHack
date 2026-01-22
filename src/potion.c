@@ -730,7 +730,7 @@ peffect_water(struct obj *otmp)
                     you_unwere(FALSE);
                 set_ulycn(NON_PM); /* cure lycanthropy */
             }
-            losehp(Maybe_Half_Phys(d(2, 6)), "potion of holy water",
+            losehp(Maybe_Half_Phys(d(2, 6)), _("potion of holy water"),
                    KILLED_BY_AN);
         } else if (otmp->cursed) {
             You_feel(_("quite proud of yourself."));
@@ -751,7 +751,7 @@ peffect_water(struct obj *otmp)
         } else {
             if (u.ualign.type == A_LAWFUL) {
                 pline(_("This burns like %s!"), hliquid("acid"));
-                losehp(Maybe_Half_Phys(d(2, 6)), "potion of unholy water",
+                losehp(Maybe_Half_Phys(d(2, 6)), _("potion of unholy water"),
                        KILLED_BY_AN);
             } else
                 You_feel(_("full of dread."));
@@ -844,9 +844,9 @@ peffect_see_invisible(struct obj *otmp)
     else
         pline(
               Hallucination
-              ? "This tastes like 10%% real %s%s all-natural beverage."
-              : "This tastes like %s%s.",
-              otmp->odiluted ? "reconstituted " : "", fruitname(TRUE));
+              ? _("This tastes like 10%% real %s%s all-natural beverage.")
+              : _("This tastes like %s%s."),
+              otmp->odiluted ? _("reconstituted ") : "", fruitname(TRUE));
     if (otmp->otyp == POT_FRUIT_JUICE) {
         u.uhunger += (otmp->odiluted ? 5 : 10) * (2 + bcsign(otmp));
         newuhs(FALSE);
@@ -1469,22 +1469,22 @@ strange_feeling(struct obj *obj, const char *txt)
     useup(obj);
 }
 
-static const char *bottlenames[] = { "bottle", "phial", "flagon", "carafe",
-                              "flask",  "jar",   "vial" };
+static const char *bottlenames[] = { N_("bottle"), N_("phial"), N_("flagon"), N_("carafe"),
+                              N_("flask"),  N_("jar"),   N_("vial") };
 static const char *hbottlenames[] = {
-    "jug", "pitcher", "barrel", "tin", "bag", "box", "glass", "beaker",
-    "tumbler", "vase", "flowerpot", "pan", "thingy", "mug", "teacup",
-    "teapot", "keg", "bucket", "thermos", "amphora", "wineskin", "parcel",
-    "bowl", "ampoule"
+    N_("jug"), N_("pitcher"), N_("barrel"), N_("tin"), N_("bag"), N_("box"), N_("glass"), N_("beaker"),
+    N_("tumbler"), N_("vase"), N_("flowerpot"), N_("pan"), N_("thingy"), N_("mug"), N_("teacup"),
+    N_("teapot"), N_("keg"), N_("bucket"), N_("thermos"), N_("amphora"), N_("wineskin"), N_("parcel"),
+    N_("bowl"), N_("ampoule")
 };
 
 const char *
 bottlename(void)
 {
     if (Hallucination)
-        return ROLL_FROM(hbottlenames);
+        return _(ROLL_FROM(hbottlenames));
     else
-        return ROLL_FROM(bottlenames);
+        return _(ROLL_FROM(bottlenames));
 }
 
 /* handle item dipped into water potion or steed saddle splashed by same */
@@ -1519,7 +1519,7 @@ H2Opotion_dip(
     } else if (potion->cursed) {
         if (targobj->blessed) {
             func = unbless;
-            glowcolor = "brown";
+            glowcolor = N_("brown");
             costchange = COST_UNBLSS;
         } else if (!targobj->cursed) {
             func = curse;
@@ -2492,7 +2492,7 @@ potion_dip(struct obj *obj, struct obj *potion)
 
         magic = (mixture != STRANGE_OBJECT) ? objects[mixture].oc_magic
             : (objects[obj->otyp].oc_magic || objects[potion->otyp].oc_magic);
-        Strcpy(qbuf, "The"); /* assume full stack */
+        Strcpy(qbuf, _("The")); /* assume full stack */
         if (amt > (obj->odiluted ? 2 : magic ? 3 : 7)) {
             /* Trying to dip multiple potions will usually affect only a
                subset; pick an amount between 3 and 8, inclusive, for magic
@@ -2511,7 +2511,7 @@ potion_dip(struct obj *obj, struct obj *potion)
 
             if ((long) amt < obj->quan) {
                 obj = splitobj(obj, (long) amt);
-                Sprintf(qbuf, "%ld of the", obj->quan);
+                Sprintf(qbuf, _("%ld of the"), obj->quan);
             }
         }
         /* [N of] the {obj(s)} mix(es) with [one of] {the potion}... */
@@ -2573,7 +2573,7 @@ potion_dip(struct obj *obj, struct obj *potion)
            been made in order to get the merge result for both cases;
            as a consequence, mixing while Fumbling drops the mixture */
         freeinv(obj);
-        hold_potion(obj, "You drop %s!", doname(obj), (const char *) 0);
+        hold_potion(obj, _("You drop %s!"), doname(obj), (const char *) 0);
         return ECMD_TIME;
     }
 
@@ -2741,13 +2741,13 @@ potion_dip(struct obj *obj, struct obj *potion)
                 observe_object(singlepotion);
             *newbuf = '\0';
             if (mixture == POT_WATER && singlepotion->dknown)
-                Sprintf(newbuf, "clears");
+                Sprintf(newbuf, _("clears"));
             else if (!Blind)
-                Sprintf(newbuf, "turns %s",
+                Sprintf(newbuf, _("turns %s"),
                         hcolor(OBJ_DESCR(objects[mixture])));
             if (*newbuf)
                 pline_The(_("%spotion%s %s."), oldbuf,
-                          more_than_one ? " that you dipped into" : "",
+                          more_than_one ? _(" that you dipped into") : "",
                           newbuf);
             else
                 pline(_("Something happens."));
@@ -2766,7 +2766,7 @@ potion_dip(struct obj *obj, struct obj *potion)
         }
         /* remove potion from inventory and re-insert it, possibly stacking
            with compatible ones; override 'pickup_burden' while doing so */
-        hold_potion(singlepotion, "You juggle and drop %s!",
+        hold_potion(singlepotion, _("You juggle and drop %s!"),
                     doname(singlepotion), (const char *) 0);
         return ECMD_TIME;
     }
@@ -2863,7 +2863,7 @@ split_mon(
 
     reason[0] = '\0';
     if (mtmp)
-        Sprintf(reason, " from %s heat",
+        Sprintf(reason, _(" from %s heat"),
                 (mtmp == &gy.youmonst) ? the_your[1]
                                     : (const char *) s_suffix(mon_nam(mtmp)));
 

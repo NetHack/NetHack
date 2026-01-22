@@ -144,7 +144,7 @@ throw_obj(struct obj *obj, int shotlimit)
             /* throwing with one hand, but pluralize since the
                expression "with your bare hands" sounds better */
             makeplural(body_part(HAND)));
-        Sprintf(svk.killer.name, "throwing %s bare-handed",
+        Sprintf(svk.killer.name, _("throwing %s bare-handed"),
                 killer_xname(obj));
         instapetrify(svk.killer.name);
     }
@@ -624,14 +624,14 @@ hitfloor(
         if (t && t->tseen) {
             switch (t->ttyp) {
             case TRAPDOOR:
-                surf = "trap door";
+                surf = _("trap door");
                 break;
             case HOLE:
-                surf = "edge of the hole";
+                surf = _("edge of the hole");
                 break;
             case PIT:
             case SPIKED_PIT:
-                surf = "edge of the pit";
+                surf = _("edge of the pit");
                 break;
             default:
                 break;
@@ -871,7 +871,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
         if (touch_petrifies(mon->data)
             /* this is a bodily collision, so check for body armor */
             && !uarmu && !uarm && !uarmc) {
-            Sprintf(svk.killer.name, "bumping into %s",
+            Sprintf(svk.killer.name, _("bumping into %s"),
                     an(pmname(mon->data, NEUTRAL)));
             instapetrify(svk.killer.name);
         }
@@ -1055,7 +1055,7 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
         /* and whether hero is turned to stone by being touched by 'mon' */
         if (touch_petrifies(mon->data) && !(uarmu || uarm || uarmc)) {
             Snprintf(svk.killer.name, sizeof svk.killer.name,
-                     "being hit by %s",
+                     _("being hit by %s"),
                      /* combine m_monnam() and noname_monnam():
                         "{your,a} hurtling cockatrice" w/o assigned name */
                      x_monnam(mon, mon->mtame ? ARTICLE_YOUR : ARTICLE_A,
@@ -1094,11 +1094,11 @@ hurtle(int dx, int dy, int range, boolean verbose)
         return;
     } else if (u.utrap) {
         You(_("are anchored by the %s."),
-            (u.utraptype == TT_WEB) ? "web"
-            : (u.utraptype == TT_LAVA) ? hliquid("lava")
+            (u.utraptype == TT_WEB) ? _("web")
+            : (u.utraptype == TT_LAVA) ? hliquid(_("lava"))
               : (u.utraptype == TT_INFLOOR) ? surface(u.ux, u.uy)
-                : (u.utraptype == TT_BURIEDBALL) ? "buried ball"
-                  : "trap");
+                : (u.utraptype == TT_BURIEDBALL) ? _("buried ball")
+                  : _("trap"));
         nomul(0);
         return;
     }
@@ -1405,7 +1405,7 @@ toss_up(struct obj *obj, boolean hitsroof)
  petrify:
             svk.killer.format = KILLED_BY;
             /* what goes up... */
-            Strcpy(svk.killer.name, "elementary physics");
+            Strcpy(svk.killer.name, _("elementary physics"));
             You(_("turn to stone."));
             if (obj)
                 dropy(obj); /* bypass most of hitfloor() */
@@ -1416,7 +1416,7 @@ toss_up(struct obj *obj, boolean hitsroof)
         if (is_silver && Hate_silver)
             pline_The(_("silver sears you!"));
         if (harmless)
-            hit(thesimpleoname(obj), &gy.youmonst, " but doesn't hurt.");
+            hit(thesimpleoname(obj), &gy.youmonst, _(" but doesn't hurt."));
 
         hitfloor(obj, TRUE);
         gt.thrownobj = 0;
@@ -1789,7 +1789,7 @@ throwit(
                       ? _("Splash!") : _("Plop!"));
             }
         }
-        if (flooreffects(obj, gb.bhitpos.x, gb.bhitpos.y, "fall")) {
+        if (flooreffects(obj, gb.bhitpos.x, gb.bhitpos.y, _("fall"))) {
             throwit_return(TRUE);
             return;
         }
@@ -2279,7 +2279,7 @@ thitmonst(
             }
         }
         Strcpy(trail,
-               digests(md) ? " entrails" : is_whirly(md) ? " currents" : "");
+               digests(md) ? _(" entrails") : is_whirly(md) ? _(" currents") : _(""));
         monname = mon_nam(mon);
         if (*trail)
             monname = s_suffix(monname);
@@ -2297,11 +2297,11 @@ staticfn int
 gem_accept(struct monst *mon, struct obj *obj)
 {
     static NEARDATA const char
-        nogood[]     = " is not interested in your junk.",
-        acceptgift[] = " accepts your gift.",
-        maybeluck[]  = " hesitatingly",
-        noluck[]     = " graciously",
-        addluck[]    = " gratefully";
+        nogood[]     = N_(" is not interested in your junk."),
+        acceptgift[] = N_(" accepts your gift."),
+        maybeluck[]  = N_(" hesitatingly"),
+        noluck[]     = N_(" graciously"),
+        addluck[]    = N_(" gratefully");
     char buf[BUFSZ];
     boolean is_buddy = sgn(mon->data->maligntyp) == sgn(u.ualign.type);
     boolean is_gem = objects[obj->otyp].oc_material == GEMSTONE;
@@ -2315,14 +2315,14 @@ gem_accept(struct monst *mon, struct obj *obj)
     if (obj->dknown && objects[obj->otyp].oc_name_known) {
         if (is_gem) {
             if (is_buddy) {
-                Strcat(buf, addluck);
+                Strcat(buf, _(addluck));
                 change_luck(5);
             } else {
-                Strcat(buf, maybeluck);
+                Strcat(buf, _(maybeluck));
                 change_luck(rn2(7) - 3);
             }
         } else {
-            Strcat(buf, nogood);
+            Strcat(buf, _(nogood));
             goto nopick;
         }
 
@@ -2330,14 +2330,14 @@ gem_accept(struct monst *mon, struct obj *obj)
     } else if (has_oname(obj) || objects[obj->otyp].oc_uname) {
         if (is_gem) {
             if (is_buddy) {
-                Strcat(buf, addluck);
+                Strcat(buf, _(addluck));
                 change_luck(2);
             } else {
-                Strcat(buf, maybeluck);
+                Strcat(buf, _(maybeluck));
                 change_luck(rn2(3) - 1);
             }
         } else {
-            Strcat(buf, nogood);
+            Strcat(buf, _(nogood));
             goto nopick;
         }
 
@@ -2345,17 +2345,17 @@ gem_accept(struct monst *mon, struct obj *obj)
     } else {
         if (is_gem) {
             if (is_buddy) {
-                Strcat(buf, addluck);
+                Strcat(buf, _(addluck));
                 change_luck(1);
             } else {
-                Strcat(buf, maybeluck);
+                Strcat(buf, _(maybeluck));
                 change_luck(rn2(3) - 1);
             }
         } else {
-            Strcat(buf, noluck);
+            Strcat(buf, _(noluck));
         }
     }
-    Strcat(buf, acceptgift);
+    Strcat(buf, _(acceptgift));
     if (*u.ushops || obj->unpaid)
         check_shop_obj(obj, mon->mx, mon->my, TRUE);
     (void) mpickobj(mon, obj); /* may merge and free obj */
@@ -2451,7 +2451,7 @@ release_camera_demon(struct obj *obj, coordxy x, coordxy y)
         if (canspotmon(mtmp))
             pline(_("%s is released!"), Hallucination
                                          ? An(rndmonnam(NULL))
-                                         : "The picture-painting demon");
+                                         : _("The picture-painting demon"));
         mtmp->mpeaceful = !obj->cursed;
         set_malign(mtmp);
     }
@@ -2604,7 +2604,7 @@ breakmsg(struct obj *obj, boolean in_view)
     if (is_crackable(obj)) /* breakobj() will call erode_obj() for message */
         return;
 
-    to_pieces = "";
+    to_pieces = _("");
     switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
     default: /* glass or crystal wand */
         if (obj->oclass != WAND_CLASS)
@@ -2615,7 +2615,7 @@ breakmsg(struct obj *obj, boolean in_view)
     case MIRROR:
     case CRYSTAL_BALL:
     case EXPENSIVE_CAMERA:
-        to_pieces = " into a thousand pieces";
+        to_pieces = _(" into a thousand pieces");
         FALLTHROUGH;
     /*FALLTHRU*/
     case POT_WATER: /* really, all potions */
@@ -2623,7 +2623,7 @@ breakmsg(struct obj *obj, boolean in_view)
             You_hear(_("%s shatter!"), something);
         else
             pline(_("%s shatter%s%s!"), Doname2(obj),
-                  (obj->quan == 1L) ? "s" : "", to_pieces);
+                  (obj->quan == 1L) ? _("s") : _(""), to_pieces);
         break;
     case EGG:
     case MELON:
@@ -2661,7 +2661,7 @@ throw_gold(struct obj *obj)
 
         if (digests(u.ustuck->data))
             /* note: s_suffix() returns a modifiable buffer */
-            swallower = strcat(s_suffix(swallower), " entrails");
+            swallower = strcat(s_suffix(swallower), _(" entrails"));
         pline_The(_("gold disappears into %s."), swallower);
         add_to_minv(u.ustuck, obj);
         return ECMD_TIME;
@@ -2706,7 +2706,7 @@ throw_gold(struct obj *obj)
         }
     }
 
-    if (flooreffects(obj, gb.bhitpos.x, gb.bhitpos.y, "fall"))
+    if (flooreffects(obj, gb.bhitpos.x, gb.bhitpos.y, _("fall")))
         return ECMD_TIME;
     if (u.dz > 0)
         pline_The(_("gold hits the %s."), surface(gb.bhitpos.x, gb.bhitpos.y));

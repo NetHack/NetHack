@@ -8,83 +8,83 @@
 
 /* part of the output on gain or loss of attribute */
 static const char
-    *const plusattr[] = { "strong", "smart", "wise",
-                          "agile",  "tough", "charismatic" },
-    *const minusattr[] = { "weak",    "stupid",
-                           "foolish", "clumsy",
-                           "fragile", "repulsive" };
+    *const plusattr[] = { N_("strong"), N_("smart"), N_("wise"),
+                          N_("agile"),  N_("tough"), N_("charismatic") },
+    *const minusattr[] = { N_("weak"),    N_("stupid"),
+                           N_("foolish"), N_("clumsy"),
+                           N_("fragile"), N_("repulsive") };
 /* also used by enlightenment in insight.c for non-abbreviated status info */
 extern const char *const attrname[6];
 
 const char
-    *const attrname[] = { "strength", "intelligence", "wisdom",
-                          "dexterity", "constitution", "charisma" };
+    *const attrname[] = { N_("strength"), N_("intelligence"), N_("wisdom"),
+                          N_("dexterity"), N_("constitution"), N_("charisma") };
 
 static const struct innate {
     schar ulevel;
     long *ability;
     const char *gainstr, *losestr;
 } arc_abil[] = { { 1, &(HSearching), "", "" },
-                 { 5, &(HStealth), "stealthy", "" },
-                 { 10, &(HFast), "quick", "slow" },
+                 { 5, &(HStealth), N_("stealthy"), "" },
+                 { 10, &(HFast), N_("quick"), N_("slow") },
                  { 0, 0, 0, 0 } },
 
   bar_abil[] = { { 1, &(HPoison_resistance), "", "" },
-                 { 7, &(HFast), "quick", "slow" },
-                 { 15, &(HStealth), "stealthy", "" },
+                 { 7, &(HFast), N_("quick"), N_("slow") },
+                 { 15, &(HStealth), N_("stealthy"), "" },
                  { 0, 0, 0, 0 } },
 
-  cav_abil[] = { { 7, &(HFast), "quick", "slow" },
-                 { 15, &(HWarning), "sensitive", "" },
+  cav_abil[] = { { 7, &(HFast), N_("quick"), N_("slow") },
+                 { 15, &(HWarning), N_("sensitive"), "" },
                  { 0, 0, 0, 0 } },
 
   hea_abil[] = { { 1, &(HPoison_resistance), "", "" },
-                 { 15, &(HWarning), "sensitive", "" },
+                 { 15, &(HWarning), N_("sensitive"), "" },
                  { 0, 0, 0, 0 } },
 
-  kni_abil[] = { { 7, &(HFast), "quick", "slow" }, { 0, 0, 0, 0 } },
+  kni_abil[] = { { 7, &(HFast), N_("quick"), N_("slow") }, { 0, 0, 0, 0 } },
 
   mon_abil[] = { { 1, &(HFast), "", "" },
                  { 1, &(HSleep_resistance), "", "" },
                  { 1, &(HSee_invisible), "", "" },
-                 { 3, &(HPoison_resistance), "healthy", "" },
-                 { 5, &(HStealth), "stealthy", "" },
-                 { 7, &(HWarning), "sensitive", "" },
-                 { 9, &(HSearching), "perceptive", "unaware" },
-                 { 11, &(HFire_resistance), "cool", "warmer" },
-                 { 13, &(HCold_resistance), "warm", "cooler" },
-                 { 15, &(HShock_resistance), "insulated", "conductive" },
-                 { 17, &(HTeleport_control), "controlled", "uncontrolled" },
+                 { 3, &(HPoison_resistance), N_("healthy"), "" },
+                 { 5, &(HStealth), N_("stealthy"), "" },
+                 { 7, &(HWarning), N_("sensitive"), "" },
+                 { 9, &(HSearching), N_("perceptive"), N_("unaware") },
+                 { 11, &(HFire_resistance), N_("cool"), N_("warmer") },
+                 { 13, &(HCold_resistance), N_("warm"), N_("cooler") },
+                 { 15, &(HShock_resistance), N_("insulated"), N_("conductive") },
+                 { 17, &(HTeleport_control), N_("controlled"), N_("uncontrolled") },
                  { 0, 0, 0, 0 } },
 
-  pri_abil[] = { { 15, &(HWarning), "sensitive", "" },
-                 { 20, &(HFire_resistance), "cool", "warmer" },
+  pri_abil[] = { { 15, &(HWarning), N_("sensitive"), "" },
+                 { 20, &(HFire_resistance), N_("cool"), N_("warmer") },
                  { 0, 0, 0, 0 } },
 
   ran_abil[] = { { 1, &(HSearching), "", "" },
-                 { 7, &(HStealth), "stealthy", "" },
+                 { 7, &(HStealth), N_("stealthy"), "" },
                  { 15, &(HSee_invisible), "", "" },
                  { 0, 0, 0, 0 } },
 
   rog_abil[] = { { 1, &(HStealth), "", "" },
-                 { 10, &(HSearching), "perceptive", "" },
+                 { 10, &(HSearching), N_("perceptive"), "" },
                  { 0, 0, 0, 0 } },
 
   sam_abil[] = { { 1, &(HFast), "", "" },
-                 { 15, &(HStealth), "stealthy", "" },
+                 { 15, &(HStealth), N_("stealthy"), "" },
                  { 0, 0, 0, 0 } },
 
-  tou_abil[] = { { 10, &(HSearching), "perceptive", "" },
-                 { 20, &(HPoison_resistance), "hardy", "" },
+  tou_abil[] = { { 10, &(HSearching), N_("perceptive"), "" },
+                 { 20, &(HPoison_resistance), N_("hardy"), "" },
                  { 0, 0, 0, 0 } },
 
   val_abil[] = { { 1, &(HCold_resistance), "", "" },
-                 { 3, &(HStealth), "stealthy", "" },
-                 { 7, &(HFast), "quick", "slow" },
+                 { 3, &(HStealth), N_("stealthy"), "" },
+                 { 7, &(HFast), N_("quick"), N_("slow") },
                  { 0, 0, 0, 0 } },
 
-  wiz_abil[] = { { 15, &(HWarning), "sensitive", "" },
-                 { 17, &(HTeleport_control), "controlled", "uncontrolled" },
+  wiz_abil[] = { { 15, &(HWarning), N_("sensitive"), "" },
+                 { 17, &(HTeleport_control), N_("controlled"), N_("uncontrolled") },
                  { 0, 0, 0, 0 } },
 
   /* Intrinsics conferred by race */
@@ -92,7 +92,7 @@ static const struct innate {
                  { 0, 0, 0, 0 } },
 
   elf_abil[] = { { 1, &HInfravision, "", "" },
-                 { 4, &HSleep_resistance, "awake", "tired" },
+                 { 4, &HSleep_resistance, N_("awake"), N_("tired") },
                  { 0, 0, 0, 0 } },
 
   gno_abil[] = { { 1, &HInfravision, "", "" },
@@ -176,11 +176,11 @@ adjattrib(
         if (msgflg == 0 && flags.verbose) {
             if (ABASE(ndx) == old_abase && AMAX(ndx) == old_amax) {
                 pline(_("You're %s as %s as you can get."),
-                      abonflg ? _("currently") : _("already"), attrstr);
+                      abonflg ? _("currently") : _("already"), _(attrstr));
             } else {
                 /* current stayed the same but base value changed, or
                    base is at minimum and reduction caused max to drop */
-                Your(_("innate %s has %s."), attrname[ndx],
+                Your(_("innate %s has %s."), _(attrname[ndx]),
                      (incr > 0) ? _("improved") : _("declined"));
             }
         }
@@ -189,7 +189,7 @@ adjattrib(
 
     disp.botl = TRUE;
     if (msgflg <= 0)
-        You_feel(_("%s%s!"), (incr > 1 || incr < -1) ? _("very ") : "", attrstr);
+        You_feel(_("%s%s!"), (incr > 1 || incr < -1) ? _("very ") : "", _(attrstr));
     if (program_state.in_moveloop && (ndx == A_STR || ndx == A_CON))
         encumber_msg();
     return TRUE;
@@ -278,12 +278,12 @@ static const struct poison_effect_message {
     void (*delivery_func)(const char *, ...);
     const char *effect_msg;
 } poiseff[] = {
-    { You_feel, "weaker" },             /* A_STR */
-    { Your, "brain is on fire" },       /* A_INT */
-    { Your, "judgement is impaired" },  /* A_WIS */
-    { Your, "muscles won't obey you" }, /* A_DEX */
-    { You_feel, "very sick" },          /* A_CON */
-    { You, "break out in hives" }       /* A_CHA */
+    { You_feel, N_("weaker") },             /* A_STR */
+    { Your, N_("brain is on fire") },       /* A_INT */
+    { Your, N_("judgement is impaired") },  /* A_WIS */
+    { Your, N_("muscles won't obey you") }, /* A_DEX */
+    { You_feel, N_("very sick") },          /* A_CON */
+    { You, N_("break out in hives") }       /* A_CHA */
 };
 
 /* feedback for attribute loss due to poisoning */
@@ -292,7 +292,7 @@ poisontell(int typ,         /* which attribute */
            boolean exclaim) /* emphasis */
 {
     void (*func)(const char *, ...) = poiseff[typ].delivery_func;
-    const char *msg_txt = poiseff[typ].effect_msg;
+    const char *msg_txt = _(poiseff[typ].effect_msg);
 
     /*
      * "You feel weaker" or "you feel very sick" aren't appropriate when
@@ -302,9 +302,9 @@ poisontell(int typ,         /* which attribute */
      * (dunce cap) is such that we don't need message fixups for them.
      */
     if (typ == A_STR && ACURR(A_STR) == STR19(25))
-        msg_txt = "innately weaker";
+        msg_txt = _("innately weaker");
     else if (typ == A_CON && ACURR(A_CON) == 25)
-        msg_txt = "sick inside";
+        msg_txt = _("sick inside");
 
     (*func)("%s%c", msg_txt, exclaim ? '!' : '.');
 }
@@ -583,11 +583,11 @@ exerper(void)
 /* exercise/abuse text (must be in attribute order, not botl order);
    phrased as "You must have been [][0]." or "You haven't been [][1]." */
 static NEARDATA const char *const exertext[A_MAX][2] = {
-    { "exercising diligently", "exercising properly" },           /* Str */
+    { N_("exercising diligently"), N_("exercising properly") },           /* Str */
     { 0, 0 },                                                     /* Int */
-    { "very observant", "paying attention" },                     /* Wis */
-    { "working on your reflexes", "working on reflexes lately" }, /* Dex */
-    { "leading a healthy life-style", "watching your health" },   /* Con */
+    { N_("very observant"), N_("paying attention") },                     /* Wis */
+    { N_("working on your reflexes"), N_("working on reflexes lately") }, /* Dex */
+    { N_("leading a healthy life-style"), N_("watching your health") },   /* Con */
     { 0, 0 },                                                     /* Cha */
 };
 
@@ -659,8 +659,8 @@ exerchk(void)
                 AEXE(i) = ax = 0;
                 /* then print an explanation */
                 You(_("%s %s."),
-                    (mod_val > 0) ? "must have been" : "haven't been",
-                    exertext[i][(mod_val > 0) ? 0 : 1]);
+                    (mod_val > 0) ? _("must have been") : _("haven't been"),
+                    _(exertext[i][(mod_val > 0) ? 0 : 1]));
             }
  nextattrib:
             /* this used to be ``AEXE(i) /= 2'' but that would produce
@@ -932,17 +932,17 @@ from_what(
              */
             if ((propidx == BLINDED && u.uroleplay.blind)
                 || (propidx == DEAF && u.uroleplay.deaf))
-                Sprintf(buf, " from birth");
+                Sprintf(buf, _(" from birth"));
             else if (innateness == FROM_ROLE || innateness == FROM_RACE)
-                Strcpy(buf, " innately");
+                Strcpy(buf, _(" innately"));
             else if (innateness == FROM_INTR) /* [].intrinsic & FROMOUTSIDE */
-                Strcpy(buf, " intrinsically");
+                Strcpy(buf, _(" intrinsically"));
             else if (innateness == FROM_EXP)
-                Strcpy(buf, " because of your experience");
+                Strcpy(buf, _(" because of your experience"));
             else if (innateness == FROM_LYCN)
-                Strcpy(buf, " due to your lycanthropy");
+                Strcpy(buf, _(" due to your lycanthropy"));
             else if (innateness == FROM_FORM)
-                Strcpy(buf, " from your creature form");
+                Strcpy(buf, _(" from your creature form"));
             else if (propidx == FAST && Very_fast)
                 Sprintf(buf, because_of,
                         ((HFast & TIMEOUT) != 0L) ? _("a potion or spell")
@@ -1046,15 +1046,15 @@ adjabil(int oldlevel, int newlevel)
                 *(abil->ability) |= mask;
             if (!(*(abil->ability) & INTRINSIC & ~mask)) {
                 if (*(abil->gainstr))
-                    You_feel(_("%s!"), abil->gainstr);
+                    You_feel(_("%s!"), _(abil->gainstr));
             }
         } else if (oldlevel >= abil->ulevel && newlevel < abil->ulevel) {
             *(abil->ability) &= ~mask;
             if (!(*(abil->ability) & INTRINSIC)) {
                 if (*(abil->losestr))
-                    You_feel(_("%s!"), abil->losestr);
+                    You_feel(_("%s!"), _(abil->losestr));
                 else if (*(abil->gainstr))
-                    You_feel(_("less %s!"), abil->gainstr);
+                    You_feel(_("less %s!"), _(abil->gainstr));
             }
         }
         if (prevabil != *(abil->ability)) /* it changed */

@@ -265,14 +265,14 @@ castmu(
     }
     if (canspotmon(mtmp) || !is_undirected_spell(mattk->adtyp, spellnum)) {
         pline_mon(mtmp, _("%s casts a spell%s!"),
-                 canspotmon(mtmp) ? Monnam(mtmp) : "Something",
+                 canspotmon(mtmp) ? Monnam(mtmp) : _("Something"),
                  is_undirected_spell(mattk->adtyp, spellnum) ? ""
                  : (Invis && !perceives(mtmp->data)
                     && !u_at(mtmp->mux, mtmp->muy))
-                   ? " at a spot near you"
+                   ? _(" at a spot near you")
                    : (Displaced && !u_at(mtmp->mux, mtmp->muy))
-                     ? " at your displaced image"
-                     : " at you");
+                     ? _(" at your displaced image")
+                     : _(" at you"));
     }
 
     /*
@@ -498,18 +498,18 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
             verbalize(_("Destroy the thief, my pet%s!"), plur(count));
         } else {
             boolean one = (count == 1);
-            const char *mappear = one ? "A monster appears"
-                                      : "Monsters appear";
+            const char *mappear = one ? _("A monster appears")
+                                      : _("Monsters appear");
 
             /* messages not quite right if plural monsters created but
                only a single monster is seen */
             if (Invis && !perceives(mtmp->data)
                 && (mtmp->mux != u.ux || mtmp->muy != u.uy))
                 pline(_("%s %s a spot near you!"), mappear,
-                      one ? "at" : "around");
+                      one ? _("at") : _("around"));
             else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
                 pline(_("%s %s your displaced image!"), mappear,
-                      one ? "by" : "around");
+                      one ? _("by") : _("around"));
             else
                 pline(_("%s from nowhere!"), mappear);
         }
@@ -566,7 +566,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
         if (!mtmp->minvis && !mtmp->invis_blkd) {
             if (canseemon(mtmp))
                 pline_mon(mtmp, _("%s suddenly %s!"), Monnam(mtmp),
-                      !See_invisible ? "disappears" : "becomes transparent");
+                      !See_invisible ? _("disappears") : _("becomes transparent"));
             mon_set_minvis(mtmp);
             if (cansee(mtmp->mx, mtmp->my) && !canspotmon(mtmp))
                 map_invisible(mtmp->mx, mtmp->my);
@@ -777,17 +777,17 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
            words, no need to fuss with visibility or singularization;
            player is told what's happening even if hero is unconscious) */
         } else if (!success) {
-            fmt = "%s casts at a clump of sticks, but nothing happens.%s";
+            fmt = _("%s casts at a clump of sticks, but nothing happens.%s");
             what = "";
         } else if (let == S_SNAKE) {
-            fmt = "%s transforms a clump of sticks into %s!";
+            fmt = _("%s transforms a clump of sticks into %s!");
         } else if (Invis && !perceives(mtmp->data)
                    && (mtmp->mux != u.ux || mtmp->muy != u.uy)) {
-            fmt = "%s summons %s around a spot near you!";
+            fmt = _("%s summons %s around a spot near you!");
         } else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy)) {
-            fmt = "%s summons %s around your displaced image!";
+            fmt = _("%s summons %s around your displaced image!");
         } else {
-            fmt = "%s summons %s!";
+            fmt = _("%s summons %s!");
         }
         if (fmt)
             pline_mon(mtmp, fmt, Monnam(mtmp), what);

@@ -136,7 +136,7 @@ mswings(
     if (flags.verbose && !Blind && mon_visible(mtmp)) {
         pline_mon(mtmp, _("%s %s %s%s %s."), Monnam(mtmp),
                   mswings_verb(otemp, bash),
-                  (otemp->quan > 1L) ? "one of " : "",
+                  (otemp->quan > 1L) ? _("one of ") : "",
                   mhis(mtmp), xname(otemp));
     }
 }
@@ -282,14 +282,14 @@ expels(
                 if (is_whirly(mdat)) {
                     switch (attk->adtyp) {
                     case AD_ELEC:
-                        Strcpy(blast, " in a shower of sparks");
+                        Strcpy(blast, _(" in a shower of sparks"));
                         break;
                     case AD_COLD:
-                        Strcpy(blast, " in a blast of frost");
+                        Strcpy(blast, _(" in a blast of frost"));
                         break;
                     }
                 } else {
-                    Strcpy(blast, " with a squelch");
+                    Strcpy(blast, _(" with a squelch"));
                 }
                 You(_("get expelled from %s%s!"), mon_nam(mtmp), blast);
             }
@@ -638,12 +638,12 @@ mattacku(struct monst *mtmp)
                     if (gy.youmonst.data->mlet == S_EEL
                         || u.umonnum == PM_TRAPPER)
                         pline(
-                             "Wait, %s!  There's a hidden %s named %s there!",
+                             _("Wait, %s!  There's a hidden %s named %s there!"),
                               m_monnam(mtmp),
                               pmname(gy.youmonst.data, Ugender), svp.plname);
                     else
                         pline(
-                          "Wait, %s!  There's a %s named %s hiding under %s!",
+                          _("Wait, %s!  There's a %s named %s hiding under %s!"),
                               m_monnam(mtmp),
                               pmname(gy.youmonst.data, Ugender),
                               svp.plname,
@@ -988,7 +988,7 @@ summonmu(struct monst *mtmp, boolean youseeit)
             int numseen, numhelp;
             char buf[BUFSZ], genericwere[BUFSZ];
 
-            Strcpy(genericwere, "creature");
+            Strcpy(genericwere, _("creature"));
             if (youseeit)
                 pline_mon(mtmp, _("%s summons help!"), Monnam(mtmp));
             numhelp = were_summon(mdat, FALSE, &numseen, genericwere);
@@ -1007,16 +1007,16 @@ summonmu(struct monst *mtmp, boolean youseeit)
                           makeplural(growl_sound(mtmp)));
                     from_nowhere = "";
                 } else {
-                    from_nowhere = " from nowhere";
+                    from_nowhere = _(" from nowhere");
                 }
                 if (numhelp > 0) {
                     if (numseen < 1) {
                         You_feel(_("hemmed in."));
                     } else {
                         if (numseen == 1)
-                            Sprintf(buf, "%s appears", an(genericwere));
+                            Sprintf(buf, _("%s appears"), an(genericwere));
                         else
-                            Sprintf(buf, "%s appear",
+                            Sprintf(buf, _("%s appear"),
                                     makeplural(genericwere));
                         pline(_("%s%s!"), upstart(buf), from_nowhere);
                     }
@@ -1165,7 +1165,7 @@ hitmu(struct monst *mtmp, struct attack *mattk)
                 if (Blind && !obj->dknown)
                     what = something;
                 else if (is_pool(mtmp->mx, mtmp->my) && !Underwater)
-                    what = "the water";
+                    what = _("the water");
                 else
                     what = doname(obj);
 
@@ -1425,8 +1425,8 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
                 tmp *= 2; /* sorry */
         } else {
             pline(_("%s%s digests you!"), Monnam(mtmp),
-                  (u.uswldtim == 2) ? " thoroughly"
-                                    : (u.uswldtim == 1) ? " utterly" : "");
+                  (u.uswldtim == 2) ? _(" thoroughly")
+                                    : (u.uswldtim == 1) ? _(" utterly") : "");
             exercise(A_STR, FALSE);
         }
         break;
@@ -1661,12 +1661,12 @@ int
 gazemu(struct monst *mtmp, struct attack *mattk)
 {
     static const char *const reactions[] = {
-        "confused",              /* [0] */
-        "stunned",               /* [1] */
-        "puzzled",   "dazzled",  /* [2,3] */
-        "irritated", "inflamed", /* [4,5] */
-        "tired",                 /* [6] */
-        "dulled",                /* [7] */
+        N_("confused"),              /* [0] */
+        N_("stunned"),               /* [1] */
+        N_("puzzled"),   N_("dazzled"),  /* [2,3] */
+        N_("irritated"), N_("inflamed"), /* [4,5] */
+        N_("tired"),                 /* [6] */
+        N_("dulled"),                /* [7] */
     };
     int react = -1;
     boolean is_medusa, reflectable,
@@ -1724,7 +1724,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             if (!m_canseeu(mtmp)) { /* probably you're invisible */
                 if (useeit)
                     pline(
-                      "%s doesn't seem to notice that %s gaze was reflected.",
+                      _("%s doesn't seem to notice that %s gaze was reflected."),
                           Monnam(mtmp), mhis(mtmp));
                 break;
             }
@@ -1885,7 +1885,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
         pline_mon(mtmp, _("%s looks %s%s."), Monnam(mtmp),
               !rn2(3) ? "" : already ? _("quite ")
                                      : (!rn2(2) ? _("a bit ") : _("somewhat ")),
-              reactions[react]);
+              _(reactions[react]));
     }
     return M_ATTK_MISS;
 }
@@ -1987,7 +1987,7 @@ doseduce(struct monst *mon)
 
     if (mon->mcan || mon->mspec_used) {
         pline_mon(mon, _("%s acts as though %s has got a %sheadache."),
-                  Monnam(mon), mhe(mon), mon->mcan ? "severe " : "");
+                  Monnam(mon), mhe(mon), mon->mcan ? _("severe ") : "");
         return 0;
     }
     if (unresponsive()) {
@@ -2018,15 +2018,15 @@ doseduce(struct monst *mon)
             if (ring->owornmask && uarmg) {
                 /* don't take off worn ring if gloves are in the way */
                 if (!tried_gloves++)
-                    mayberem(mon, Who, uarmg, "gloves");
+                    mayberem(mon, Who, uarmg, _("gloves"));
                 if (uarmg)
                     continue; /* next ring might not be worn */
             }
             /* confirmation prompt when charisma is high bypassed if deaf */
             if (!Deaf && rn2(20) < ACURR(A_CHA)) {
-                (void) safe_qbuf(qbuf, "\"That ",
-                                 " looks pretty.  May I have it?\"", ring,
-                                 xname, simpleonames, "ring");
+                (void) safe_qbuf(qbuf, _("\"That "),
+                                 _(" looks pretty.  May I have it?\""), ring,
+                                 xname, simpleonames, _("ring"));
                 makeknown(RIN_ADORNMENT);
                 SetVoice(mon, 0, 80, 0);
                 if (y_n(qbuf) == 'n')
@@ -2049,15 +2049,15 @@ doseduce(struct monst *mon)
             if (uarmg) {
                 /* don't put on ring if gloves are in the way */
                 if (!tried_gloves++)
-                    mayberem(mon, Who, uarmg, "gloves");
+                    mayberem(mon, Who, uarmg, _("gloves"));
                 if (uarmg)
                     break; /* no point trying further rings */
             }
             /* confirmation prompt when charisma is high bypassed if deaf */
             if (!Deaf && rn2(20) < ACURR(A_CHA)) {
-                (void) safe_qbuf(qbuf, "\"That ",
-                                " looks pretty.  Would you wear it for me?\"",
-                                 ring, xname, simpleonames, "ring");
+                (void) safe_qbuf(qbuf, _("\"That "),
+                                _(" looks pretty.  Would you wear it for me?\""),
+                                 ring, xname, simpleonames, _("ring"));
                 makeknown(RIN_ADORNMENT);
                 SetVoice(mon, 0, 80, 0);
                 if (y_n(qbuf) == 'n')
@@ -2113,13 +2113,13 @@ doseduce(struct monst *mon)
     mayberem(mon, Who, uarmc, cloak_simple_name(uarmc));
     if (!uarmc)
         mayberem(mon, Who, uarm, suit_simple_name(uarm));
-    mayberem(mon, Who, uarmf, "boots");
+    mayberem(mon, Who, uarmf, _("boots"));
     if (!tried_gloves)
-        mayberem(mon, Who, uarmg, "gloves");
-    mayberem(mon, Who, uarms, "shield");
+        mayberem(mon, Who, uarmg, _("gloves"));
+    mayberem(mon, Who, uarms, _("shield"));
     mayberem(mon, Who, uarmh, helm_simple_name(uarmh));
     if (!uarmc && !uarm)
-        mayberem(mon, Who, uarmu, "shirt");
+        mayberem(mon, Who, uarmu, _("shirt"));
 
     /* removing armor (levitation boots, or levitation ring to make
        room for adornment ring with incubus case) might result in the
@@ -2457,7 +2457,7 @@ passiveum(
                   /* temporary? hack for sequencing issue:  "your acid"
                      looks strange coming immediately after player has
                      been told that hero has reverted to normal form */
-                  !Upolyd ? "" : "your ", hliquid("acid"));
+                  !Upolyd ? "" : _("your "), hliquid(_("acid")));
             if (resists_acid(mtmp)) {
                 pline_mon(mtmp, _("%s is not affected."), Monnam(mtmp));
                 tmp = 0;

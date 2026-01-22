@@ -139,7 +139,7 @@ getrumor(
             if (gt.true_rumor_size == 0L) { /* if this is 1st outrumor() */
                 init_rumors(rumors);
                 if (gt.true_rumor_size < 0L) { /* init failed */
-                    Sprintf(rumor_buf, "Error reading \"%.80s\".", RUMORFILE);
+                    Sprintf(rumor_buf, _("Error reading \"%.80s\"."), RUMORFILE);
                     return rumor_buf;
                 }
             }
@@ -161,7 +161,7 @@ getrumor(
                 break;
             default:
                 impossible("strange truth value for rumor");
-                return strcpy(rumor_buf, "Oops...");
+                return strcpy(rumor_buf, _("Oops..."));
             }
             Strcpy(rumor_buf,
                    get_rnd_line(rumors, line, (unsigned) sizeof line, rn2,
@@ -531,7 +531,7 @@ outrumor(
     int mechanism)
 {
     static const char fortune_msg[] =
-        "This cookie has a scrap of paper inside.";
+        N_("This cookie has a scrap of paper inside.");
     const char *line;
     char buf[BUFSZ];
     boolean reading = (mechanism == BY_COOKIE || mechanism == BY_PAPER);
@@ -542,7 +542,7 @@ outrumor(
             return;
         } else if (Blind) {
             if (mechanism == BY_COOKIE)
-                pline(fortune_msg);
+                pline("%s", _(fortune_msg));
             pline(_("What a pity that you cannot read it!"));
             return;
         }
@@ -563,7 +563,7 @@ outrumor(
         /* [WIS exercised by getrumor()] */
         return;
     case BY_COOKIE:
-        pline(fortune_msg);
+        pline("%s", _(fortune_msg));
         FALLTHROUGH;
     /* FALLTHRU */
     case BY_PAPER:
@@ -714,7 +714,7 @@ doconsult(struct monst *oracl)
         return ECMD_OK;
     }
 
-    Sprintf(qbuf, "\"Wilt thou settle for a minor consultation?\" (%d %s)",
+    Sprintf(qbuf, _("\"Wilt thou settle for a minor consultation?\" (%d %s)"),
             minor_cost, currency((long) minor_cost));
     switch (ynq(qbuf)) {
     default:
@@ -731,7 +731,7 @@ doconsult(struct monst *oracl)
         if (umoney <= (long) minor_cost /* don't even ask */
             || (svo.oracle_cnt == 1 || go.oracle_flg < 0))
             return ECMD_OK;
-        Sprintf(qbuf, "\"Then dost thou desire a major one?\" (%d %s)",
+        Sprintf(qbuf, _("\"Then dost thou desire a major one?\" (%d %s)"),
                 major_cost, currency((long) major_cost));
         if (y_n(qbuf) != 'y')
             return ECMD_OK;

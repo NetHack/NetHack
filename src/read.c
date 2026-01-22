@@ -588,7 +588,7 @@ doread(void)
            scroll didn't come from bones, ask for confirmation */
         if (!u.uconduct.literate) {
             if (!scroll->spe && y_n(
-             "Reading mail will violate \"illiterate\" conduct.  Read anyway?"
+             _("Reading mail will violate \"illiterate\" conduct.  Read anyway?")
                                    ) != 'y')
                 return ECMD_OK;
         }
@@ -2599,20 +2599,20 @@ do_class_genocide(void)
         Strcpy(promptbuf, _("What class of monsters do you want to genocide?"));
         if (j > 0)
             Snprintf(eos(promptbuf), sizeof promptbuf - strlen(promptbuf),
-                     " [enter %s]",
+                     _(" [enter %s]"),
                      iflags.cmdassist
-                       ? "the symbol or name representing a class, or '?'"
-                       : "'?' to see previous genocides");
+                       ? _("the symbol or name representing a class, or '?'")
+                       : _("'?' to see previous genocides"));
         getlin(promptbuf, buf);
         (void) mungspaces(buf);
         /* avoid 'that does not represent any monster' for empty input */
         if (!*buf) {
             pline(_("%s."), (j + 1 < 5)
-                         ? "Type letter (or punctuation)"
-                           " or name used for a class of monsters or 'none'"
+                         ? _("Type letter (or punctuation)"
+                           " or name used for a class of monsters or 'none'")
                          /* next iteration gives "that's enough tries"
                             so don't suggest typing anything this time */
-                         : "No class of monsters specified");
+                         : _("No class of monsters specified"));
             continue; /* try again */
         }
         /* choosing "none" preserves genocideless conduct */
@@ -2665,7 +2665,7 @@ do_class_genocide(void)
                 return;
             } else
                 pline(_("That %s does not represent any monster."),
-                      strlen(buf) == 1 ? "symbol" : "response");
+                      strlen(buf) == 1 ? _("symbol") : _("response"));
             continue;
         }
 
@@ -2759,7 +2759,7 @@ do_class_genocide(void)
         }
         if (gameover || u.uhp == -1) {
             svk.killer.format = KILLED_BY_AN;
-            Strcpy(svk.killer.name, "scroll of genocide");
+            Strcpy(svk.killer.name, _("scroll of genocide"));
             if (gameover)
                 done(GENOCIDED);
         }
@@ -2800,22 +2800,22 @@ do_genocide(
                 return;
             }
             Strcpy(promptbuf,
-                   "What type of monster do you want to genocide?");
+                   _("What type of monster do you want to genocide?"));
             if (i > 0)
                 Snprintf(eos(promptbuf), sizeof promptbuf - strlen(promptbuf),
-                         " [enter %s]",
+                         _(" [enter %s]"),
                          iflags.cmdassist
-                           ? "the name of a type of monster, or '?'"
-                           : "'?' to see previous genocides");
+                           ? _("the name of a type of monster, or '?'")
+                           : _("'?' to see previous genocides"));
             getlin(promptbuf, buf);
             (void) mungspaces(buf);
             /* avoid 'such creatures do not exist' for empty input */
             if (!*buf) {
                 pline(_("%s."), (i + 1 < 5)
-                             ? "Type the name of a type of monster or 'none'"
+                             ? _("Type the name of a type of monster or 'none'")
                              /* next iteration gives "that's enough tries"
                                 so don't suggest typing anything this time */
-                             : "No type of monster specified");
+                             : _("No type of monster specified"));
                 continue; /* try again */
             }
             /* choosing "none" preserves genocideless conduct */
@@ -2838,7 +2838,7 @@ do_genocide(
             mndx = name_to_mon(buf, (int *) 0);
             if (mndx == NON_PM || (svm.mvitals[mndx].mvflags & G_GENOD)) {
                 pline(_("Such creatures %s exist in this world."),
-                      (mndx == NON_PM) ? "do not" : "no longer");
+                      (mndx == NON_PM) ? _("do not") : _("no longer"));
                 continue;
             }
             ptr = &mons[mndx];
@@ -2881,7 +2881,7 @@ do_genocide(
         mndx = monsndx(ptr); /* needed for the 'no free pass' cases */
     }
 
-    which = "all ";
+    which = _("all ");
     Strcpy(realbuf, ptr->pmnames[NEUTRAL]); /* standard singular */
     if (Hallucination) {
         /* hallucinate hero's type */
@@ -2897,7 +2897,7 @@ do_genocide(
         /* use actual type */
         Strcpy(buf, realbuf);
         if ((ptr->geno & G_UNIQ) && ptr != &mons[PM_HIGH_CLERIC])
-            which = !type_is_pname(ptr) ? "the " : "";
+            which = !type_is_pname(ptr) ? _("the ") : "";
     }
 
     if (how & REALLY) {
@@ -2917,14 +2917,14 @@ do_genocide(
             u.uhp = -1;
             if (how & PLAYER) {
                 svk.killer.format = KILLED_BY;
-                Strcpy(svk.killer.name, "genocidal confusion");
+                Strcpy(svk.killer.name, _("genocidal confusion"));
             } else if (how & ONTHRONE) {
                 /* player selected while on a throne */
                 svk.killer.format = KILLED_BY_AN;
-                Strcpy(svk.killer.name, "imperious order");
+                Strcpy(svk.killer.name, _("imperious order"));
             } else { /* selected player deliberately, not confused */
                 svk.killer.format = KILLED_BY_AN;
-                Strcpy(svk.killer.name, "scroll of genocide");
+                Strcpy(svk.killer.name, _("scroll of genocide"));
             }
 
             /* Polymorphed characters will die as soon as they're rehumanized.
@@ -3212,7 +3212,7 @@ create_particular_creation(
             /* wizard mode can override handling of special monsters */
             char buf[BUFSZ];
 
-            Sprintf(buf, "Creating %s instead; force %s?",
+            Sprintf(buf, _("Creating %s instead; force %s?"),
                     mons[d->which].pmnames[NEUTRAL],
                     mons[firstchoice].pmnames[NEUTRAL]);
             if (y_n(buf) == 'y')
@@ -3344,7 +3344,7 @@ create_particular(void)
         }
         /* when a second try is needed, expand the prompt */
         if (tryct == CP_TRYLIM)
-            Strcat(prompt, " [type name or symbol]");
+            Strcat(prompt, _(" [type name or symbol]"));
     } while (--tryct > 0);
 
     if (!tryct)

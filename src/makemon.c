@@ -2139,9 +2139,9 @@ grow_up(struct monst *mtmp, struct monst *victim)
                       : (fem && !mtmp->female) ? "female " : "",
                     pmname(ptr, fem));
             pline_mon(mtmp, _("%s %s %s."), YMonnam(mtmp),
-                      (fem != mtmp->female) ? "changes into"
-                                            : humanoid(ptr) ? "becomes"
-                                                            : "grows up into",
+                      (fem != mtmp->female) ? _("changes into")
+                                            : humanoid(ptr) ? _("becomes")
+                                                            : _("grows up into"),
                       an(buf));
         }
         set_mon_data(mtmp, ptr);
@@ -2556,7 +2556,7 @@ bagotricks(
         impossible("bad bag o' tricks");
     } else if (bag->spe < 1) {
         /* if tipping known empty bag, give normal empty container message */
-        pline1((tipping && bag->cknown) ? "It's empty." : nothing_happens);
+        pline1((tipping && bag->cknown) ? _("It's empty.") : nothing_happens);
         /* now known to be empty if sufficiently discovered */
         if (bag->dknown && objects[bag->otyp].oc_name_known) {
             bag->cknown = 1;

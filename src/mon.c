@@ -1818,7 +1818,7 @@ mpickgold(struct monst *mtmp)
         if (cansee(mtmp->mx, mtmp->my)) {
             if (flags.verbose && !mtmp->isgd)
                 pline_mon(mtmp, _("%s picks up some %s."), Monnam(mtmp),
-                         mat_idx == GOLD ? "gold" : "money");
+                         mat_idx == GOLD ? _("gold") : _("money"));
             newsym(mtmp->mx, mtmp->my);
         }
     }
@@ -2957,7 +2957,7 @@ vamprises(struct monst *mtmp)
                 You_see(_("%s."), trapped ? door_go_boom : door_smashed);
             else if (!Unaware)
                 pline_The(_("door is smashed%s"),
-                          trapped ? _(" and it explodes!") : ".");
+                          trapped ? _(" and it explodes!") : _("."));
             set_msg_xy(0, 0); /* in case none of the messages was delivered */
 
             door->doormask = D_NODOOR;
@@ -3018,11 +3018,11 @@ logdeadmon(struct monst *mtmp, int mndx)
             /* ", the <shoptype> proprietor" needs a trailing comma for
                the alternate phrasing "<shk>, shkdetails, has been killed"
                when hero isn't directly responsible */
-            Snprintf(shkdetail, sizeof shkdetail, ", the %s %s%s",
+            Snprintf(shkdetail, sizeof shkdetail, _(", the %s %s%s"),
                      shtypes[ESHK(mtmp)->shoptype - SHOPBASE].name,
                      /* in case shk name doesn't include Mr or Ms honorific */
                      mtmp->female ? _("proprietrix") : _("proprietor"),
-                     herodidit ? "" : ",");
+                     herodidit ? "" : _(","));
         } else if (mndx == PM_HIGH_CLERIC) {
             /* the high priest[ess] monster is not unique; we know that
                this is the first death for this particular high priest
@@ -3047,7 +3047,7 @@ logdeadmon(struct monst *mtmp, int mndx)
                 llevent_type |= LL_ACHIEVE;
             xtra[0] = '\0';
             if (howmany > 1) /* "(2nd time)" or "(50th time)" */
-                Sprintf(xtra, " (%d%s time)", howmany, ordin(howmany));
+                Sprintf(xtra, _(" (%d%s time)"), howmany, ordin(howmany));
 
             mkilled = nonliving(mtmp->data) ? _("destroyed") : _("killed");
             /* hero is responsible: "killed <monst>" */
@@ -3207,7 +3207,7 @@ corpse_chance(
                    engulfer; suppress usual explosion since it's contained */
                 if (magr == &gy.youmonst) {
                     There(_("is an explosion in your %s!"), body_part(STOMACH));
-                    Sprintf(svk.killer.name, "%s explosion",
+                    Sprintf(svk.killer.name, _("%s explosion"),
                             s_suffix(pmname(mdat, Mgender(mon))));
                     losehp(Maybe_Half_Phys(tmp), svk.killer.name,
                            KILLED_BY_AN);
@@ -3604,7 +3604,7 @@ xkilled(
                     artifact_exists(otmp, safe_oname(otmp), FALSE,
                                     ONAME_NO_FLAGS);
                 delobj(otmp);
-            } else if (!flooreffects(otmp, x, y, nomsg ? "" : "fall")) {
+            } else if (!flooreffects(otmp, x, y, nomsg ? "" : _("fall"))) {
                 place_object(otmp, x, y);
                 stackobj(otmp);
             }
@@ -3674,7 +3674,7 @@ xkilled(
         u.ugangr += 7; /* instantly become "extremely" angry */
         change_luck(-20);
         pline(_("That was %sa bad idea..."),
-              u.uevent.qcompleted ? "probably " : "");
+              u.uevent.qcompleted ? _("probably ") : "");
         if (!svc.context.mon_moving)
             iter_mons(anger_quest_guardians);
     } else if (mdat->msound == MS_NEMESIS) { /* Real good! */
@@ -4184,10 +4184,10 @@ peacefuls_respond(struct monst *mtmp)
 
                         if (gasp) {
                             if (!strncmpi(gasp, "gasp", 4)) {
-                                Sprintf(buf, "%s gasps", Monnam(mon));
+                                Sprintf(buf, _("%s gasps"), Monnam(mon));
                                 needpunct = TRUE;
                             } else {
-                                Sprintf(buf, "%s exclaims \"%s\"",
+                                Sprintf(buf, _("%s exclaims \"%s\""),
                                         Monnam(mon), gasp);
                             }
                             exclaimed = TRUE;
@@ -4212,14 +4212,14 @@ peacefuls_respond(struct monst *mtmp)
                         monflee(mon, rn2(50) + 25, TRUE, !exclaimed);
                         if (exclaimed) {
                             if (flags.verbose && !alreadyfleeing) {
-                                Strcat(buf, " and then turns to flee.");
+                                Strcat(buf, _(" and then turns to flee."));
                                 needpunct = FALSE;
                             }
                         } else
                             exclaimed = TRUE; /* got msg from monflee() */
                     }
                     if (*buf)
-                        pline_mon(mon, _("%s%s"), buf, needpunct ? "." : "");
+                        pline_mon(mon, _("%s%s"), buf, needpunct ? _(".") : "");
                     if (mon->mtame) {
                         ; /* mustn't set mpeaceful to 0 as below;
                            * perhaps reduce tameness? */
@@ -4318,8 +4318,8 @@ wake_msg(struct monst *mtmp, boolean interesting)
 {
     if (mtmp->msleeping && canseemon(mtmp)) {
         pline_mon(mtmp, _("%s wakes up%s%s"),
-              Monnam(mtmp), interesting ? "!" : ".",
-              mtmp->data == &mons[PM_FLESH_GOLEM] ? " It's alive!" : "");
+              Monnam(mtmp), interesting ? _("!") : _("."),
+              mtmp->data == &mons[PM_FLESH_GOLEM] ? _(" It's alive!") : "");
     }
 }
 
@@ -5074,8 +5074,8 @@ wiz_force_cham_form(struct monst *mon)
     int monclass, len, tryct, mndx = NON_PM;
 
     /* construct prompt in pieces */
-    Sprintf(pprompt, "Change %s", noit_mon_nam(mon));
-    Sprintf(parttwo, " @ %s into what?",
+    Sprintf(pprompt, _("Change %s"), noit_mon_nam(mon));
+    Sprintf(parttwo, _(" @ %s into what?"),
             coord_desc((int) mon->mx, (int) mon->my, buf,
                        (iflags.getpos_coords != GPCOORDS_NONE)
                        ? iflags.getpos_coords : GPCOORDS_MAP));
@@ -5096,7 +5096,7 @@ wiz_force_cham_form(struct monst *mon)
         if (tryct == TRYLIMIT - 1) { /* first retry */
             /* change "into what?" to "into what kind of monster?" */
             if (strlen(pprompt) + sizeof " kind of monster" - 1 < QBUFSZ)
-                Strcpy(eos(pprompt) - 1, " kind of monster?");
+                Strcpy(eos(pprompt) - 1, _(" kind of monster?"));
         }
 #undef TRYLIMIT
         monclass = 0;
@@ -5410,10 +5410,10 @@ newcham(
                     char msgtrail[BUFSZ];
 
                     if (is_vampshifter(mtmp)) {
-                        Sprintf(msgtrail, " which was a shapeshifted %s",
+                        Sprintf(msgtrail, _(" which was a shapeshifted %s"),
                                 noname_monnam(mtmp, ARTICLE_NONE));
                     } else if (digests(mdat)) {
-                        Strcpy(msgtrail, "'s stomach");
+                        Strcpy(msgtrail, _("'s stomach"));
                     } else {
                         msgtrail[0] = '\0';
                     }
@@ -5742,7 +5742,7 @@ angry_guards(boolean silent)
                       (sct == 1) ? _("An angry") : _("Angry"),
                       buf, vtense(buf, _("are")));
             } else {
-                Strcpy(buf, (ct == 1) ? "a guard's" : "guards'");
+                Strcpy(buf, (ct == 1) ? _("a guard's") : _("guards'"));
                 Soundeffect(se_shrill_whistle, 100);
                 You_hear(_("the shrill sound of %s whistle%s."), buf, plur(ct));
             }
@@ -5876,7 +5876,7 @@ usmellmon(struct permonst *mdat)
                 break;
             case S_UNICORN:
                 You(_("detect a%s odor reminiscent of a stable."),
-                    (mndx == PM_PONY) ? "n" : " strong");
+                    (mndx == PM_PONY) ? _("n") : _(" strong"));
                 msg_given = TRUE;
                 break;
             case S_ZOMBIE:

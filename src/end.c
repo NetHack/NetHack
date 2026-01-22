@@ -928,7 +928,7 @@ artifact_score(
                 otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
                 /* assumes artifacts don't have quan > 1 */
                 Sprintf(pbuf, "%s%s (worth %ld %s and %ld points)",
-                        the_unique_obj(otmp) ? "The " : "",
+                        the_unique_obj(otmp) ? _("The ") : "",
                         otmp->oartifact ? artiname(otmp->oartifact)
                                         : OBJ_NAME(objects[otmp->otyp]),
                         value, currency(value), points);
@@ -1224,7 +1224,7 @@ really_done(int how)
         if (u.uhp < 1) {
             how = DIED;
             u.umortality++; /* skipped above when how==QUIT */
-            Strcpy(svk.killer.name, "quit while already on Charon's boat");
+            Strcpy(svk.killer.name, _("quit while already on Charon's boat"));
         }
     }
     if (how == ESCAPED || how == PANICKED)
@@ -1416,7 +1416,7 @@ really_done(int how)
         /* don't bother counting to see whether it should be plural */
     }
 
-    Sprintf(pbuf, "%s %s the %s...", Goodbye(), svp.plname,
+    Sprintf(pbuf, _("%s %s the %s..."), Goodbye(), svp.plname,
             (how != ASCENDED)
                 ? (const char *) ((flags.female && gu.urole.name.f)
                     ? gu.urole.name.f
@@ -1451,10 +1451,10 @@ really_done(int how)
 
         gv.viz_array[0][0] |= IN_SIGHT; /* need visibility for naming */
         mtmp = gm.mydogs;
-        Strcpy(pbuf, "You");
+        Strcpy(pbuf, _("You"));
         if (mtmp || Schroedingers_cat) {
             while (mtmp) {
-                Sprintf(eos(pbuf), " and %s", mon_nam(mtmp));
+                Sprintf(eos(pbuf), _(" and %s"), mon_nam(mtmp));
                 if (mtmp->mtame)
                     u.urexp = nowrap_add(u.urexp, mtmp->mhp);
                 mtmp = mtmp->nmon;
@@ -1466,14 +1466,14 @@ really_done(int how)
 
                 mhp = d(m_lev, 8);
                 u.urexp = nowrap_add(u.urexp, mhp);
-                Strcat(eos(pbuf), " and Schroedinger's cat");
+                Strcat(eos(pbuf), _(" and Schroedinger's cat"));
             }
             dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
             pbuf[0] = '\0';
         } else {
             Strcat(pbuf, " ");
         }
-        Sprintf(eos(pbuf), "%s with %ld point%s,",
+        Sprintf(eos(pbuf), _("%s with %ld point%s,"),
                 (how == ASCENDED) ? _("went to your reward")
                                   : _("escaped from the dungeon"),
                 u.urexp, plur(u.urexp));
@@ -1507,12 +1507,12 @@ really_done(int how)
                     if (has_oname(otmp))
                         free_oname(otmp);
                     otmp->quan = count;
-                    Sprintf(pbuf, "%8ld %s (worth %ld %s),", count,
+                    Sprintf(pbuf, _("%8ld %s (worth %ld %s),"), count,
                             xname(otmp), count * (long) objects[typ].oc_cost,
                             currency(2L));
                     obfree(otmp, (struct obj *) 0);
                 } else {
-                    Sprintf(pbuf, "%8ld worthless piece%s of colored glass,",
+                    Sprintf(pbuf, _("%8ld worthless piece%s of colored glass,"),
                             count, plur(count));
                 }
                 dump_forward_putstr(endwin, 0, pbuf, 0);

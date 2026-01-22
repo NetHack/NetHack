@@ -414,7 +414,7 @@ e_died(struct entity *etmp, int xkill_flags, int how)
             /* use more specific killer if specified */
             if (!svk.killer.name[0]) {
                 svk.killer.format = KILLED_BY_AN;
-                Strcpy(svk.killer.name, "falling drawbridge");
+                Strcpy(svk.killer.name, _("falling drawbridge"));
             }
             done(how);
             /* So, you didn't die */
@@ -693,7 +693,7 @@ do_entity(struct entity *etmp)
         }
         if (!e_survives_at(etmp, etmp->ex, etmp->ey)) {
             svk.killer.format = KILLED_BY_AN;
-            Strcpy(svk.killer.name, "closing drawbridge");
+            Strcpy(svk.killer.name, _("closing drawbridge"));
             e_died(etmp, XKILL_NOMSG, CRUSHING);
             return;
         }
@@ -726,7 +726,7 @@ do_entity(struct entity *etmp)
                           lava ? hliquid("lava") : "moat");
             }
         svk.killer.format = NO_KILLER_PREFIX;
-        Strcpy(svk.killer.name, "fell from a drawbridge");
+        Strcpy(svk.killer.name, _("fell from a drawbridge"));
         e_died(etmp, /* CRUSHING is arbitrary */
                XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                is_pool(etmp->ex, etmp->ey) ? DROWNING
@@ -950,7 +950,7 @@ destroy_drawbridge(coordxy x, coordxy y)
                 pline(_("%s blown apart by flying debris."),
                       E_phrase(etmp2, "are"));
             svk.killer.format = KILLED_BY_AN;
-            Strcpy(svk.killer.name, "exploding drawbridge");
+            Strcpy(svk.killer.name, _("exploding drawbridge"));
             e_died(etmp2,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                    CRUSHING); /*no corpse*/
@@ -983,7 +983,7 @@ destroy_drawbridge(coordxy x, coordxy y)
                 }
             }
             svk.killer.format = KILLED_BY_AN;
-            Strcpy(svk.killer.name, "collapsing drawbridge");
+            Strcpy(svk.killer.name, _("collapsing drawbridge"));
             e_died(etmp1,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                    CRUSHING); /*no corpse*/

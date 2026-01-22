@@ -586,11 +586,11 @@ credit_report(struct monst *shkp, int idx, boolean silent)
 
     if (idx && !silent) {
         long amt = 0L;
-        const char *msg = "debt has increased";
+        const char *msg = _("debt has increased");
 
         if (credit_snap[NOW][0] < credit_snap[BEFORE][0]) {
             amt = credit_snap[BEFORE][0] - credit_snap[NOW][0];
-            msg = "credit has been reduced";
+            msg = _("credit has been reduced");
         } else if (credit_snap[NOW][1] > credit_snap[BEFORE][1]) {
             amt = credit_snap[NOW][1] - credit_snap[BEFORE][1];
         } else if (credit_snap[NOW][2] > credit_snap[BEFORE][2]) {
@@ -784,13 +784,13 @@ u_entered_shop(char *enterstring)
         if (!Deaf && !muteshk(shkp)) {
             set_voice(shkp, 0, 80, 0);
             verbalize(_("%s, %s!  Welcome%s to %s %s!"), Hello(shkp), svp.plname,
-                      eshkp->visitct++ ? " again" : "",
+                      eshkp->visitct++ ? _(" again") : "",
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
         } else {
             You(_("enter %s %s%s!"),
                 s_suffix(shkname(shkp)),
                 shtypes[rt - SHOPBASE].name,
-                eshkp->visitct++ ? " again" : "");
+                eshkp->visitct++ ? _(" again") : "");
         }
     }
     /* can't do anything about blocking if teleported in */
@@ -1636,7 +1636,7 @@ menu_pick_pay_items(
        the bill, no matter whether there are also any intact items;
        note: ibill[] has been sorted to hold used-up items first */
     if (ibill[0].usedup <= PartlyUsedUp) {
-        Sprintf(buf, "Used up item%s:",
+        Sprintf(buf, _("Used up item%s:"),
                 (ibillct > 1 && ibill[1].usedup <= PartlyUsedUp) ? "s" : "");
         add_menu_heading(win, buf);
     }
@@ -1645,7 +1645,7 @@ menu_pick_pay_items(
            one was shown before the first menu entry */
         if (i > 0 && ibill[i - 1].usedup <= PartlyUsedUp
             && ibill[i].usedup >= PartlyIntact) {
-            Sprintf(buf, "Unpaid item%s:", (i < ibillct - 1) ? "s" : "");
+            Sprintf(buf, _("Unpaid item%s:"), (i < ibillct - 1) ? "s" : "");
             add_menu_heading(win, buf);
         }
         otmp = ibill[i].obj;
@@ -1823,7 +1823,7 @@ dopay(void)
                 pay(ltmp, shkp);
             } else {
                 You(_("give %s all your%s gold."), shkname(shkp),
-                    stashed_gold ? " openly kept" : "");
+                    stashed_gold ? _(" openly kept") : "");
                 pay(umoney, shkp);
                 if (stashed_gold)
                     pline(_("But you have hidden gold!"));
@@ -1897,16 +1897,16 @@ dopay(void)
         char sbuf[BUFSZ];
 
         umoney = money_cnt(gi.invent);
-        Sprintf(sbuf, "You owe %s %ld %s ", shkname(shkp), dtmp,
+        Sprintf(sbuf, _("You owe %s %ld %s "), shkname(shkp), dtmp,
                 currency(dtmp));
         if (loan) {
             if (loan == dtmp)
-                Strcat(sbuf, "you picked up in the store.");
+                Strcat(sbuf, _("you picked up in the store."));
             else
                 Strcat(sbuf,
-                       "for gold picked up and the use of merchandise.");
+                       _("for gold picked up and the use of merchandise."));
         } else {
-            Strcat(sbuf, "for the use of merchandise.");
+            Strcat(sbuf, _("for the use of merchandise."));
         }
         pline1(sbuf);
         if (umoney + eshkp->credit < dtmp) {
@@ -2206,7 +2206,7 @@ dopayobj(
          *  'a' to buy the rest without asking, 'q' to just stop.
          */
 
-        Sprintf(qsfx, " for %ld %s.  Pay?", ltmp, currency(ltmp));
+        Sprintf(qsfx, _(" for %ld %s.  Pay?"), ltmp, currency(ltmp));
         (void) safe_qbuf(qbuf, (char *) 0, qsfx, obj,
                          (quan == 1L) ? Doname2 : doname, ansimpleoname,
                          (quan == 1L) ? _("that") : _("those"));
@@ -2230,8 +2230,8 @@ dopayobj(
         if (!unseen)
             shk_names_obj(shkp, obj,
                           consumed
-                              ? "paid for %s at a cost of %ld gold piece%s.%s"
-                              : "bought %s for %ld gold piece%s.%s",
+                              ? _("paid for %s at a cost of %ld gold piece%s.%s")
+                              : _("bought %s for %ld gold piece%s.%s"),
                           ltmp, "");
     }
 
@@ -2343,7 +2343,7 @@ buy_container(
         if (unpaidcontainer)
             container->unpaid = container->no_charge = 1;
         shk_names_obj(shkp, container,
-                      "bought %s for %ld gold piece%s.%s",
+                      _("bought %s for %ld gold piece%s.%s"),
                       totalcost, "");
         container->unpaid = container->no_charge = 0;
     }
@@ -2539,7 +2539,7 @@ inherits(
         if (cansee(shkp->mx, shkp->my) && croaked && !silently) {
             takes[0] = '\0';
             if (has_head(shkp->data) && !rn2(2))
-                Sprintf(takes, ", shakes %s %s,", noit_mhis(shkp),
+                Sprintf(takes, _(", shakes %s %s,"), noit_mhis(shkp),
                         mbodypart(shkp, HEAD));
             pline(_("%s %slooks at your corpse%s and %s."), Shknam(shkp),
                   helpless(shkp) ? _("wakes up, ") : "",
@@ -2575,10 +2575,10 @@ inherits(
         umoney = money_cnt(gi.invent);
         takes[0] = '\0';
         if (helpless(shkp))
-            Strcat(takes, "wakes up and ");
+            Strcat(takes, _("wakes up and "));
         if (!m_next2u(shkp))
-            Strcat(takes, "comes and ");
-        Strcat(takes, "takes");
+            Strcat(takes, _("comes and "));
+        Strcat(takes, _("takes"));
 
         if (loss > umoney || !loss || uinshop) {
             eshkp->robbed -= umoney;
@@ -3498,17 +3498,17 @@ addtobill(
         }
         if (!ininv) {
             pline(_("%s will cost you %ld %s%s."), The(xname(obj)), ltmp,
-                  currency(ltmp), (obj->quan > 1L) ? " each" : "");
+                  currency(ltmp), (obj->quan > 1L) ? _(" each") : "");
         } else {
             long save_quan = obj->quan;
 
-            Strcpy(buf, "\"For you,");
+            Strcpy(buf, _("\"For you,"));
             if (ANGRY(shkp)) {
-                Strcat(buf, " scum;");
+                Strcat(buf, _(" scum;"));
             } else if (!ESHK(shkp)->surcharge) {
                 Strcat(buf, " ");
                 append_honorific(buf);
-                Strcat(buf, "; only");
+                Strcat(buf, _("; only"));
             }
             obj->quan = 1L; /* fool xname() into giving singular */
             set_voice(shkp, 0, 80, 0);
@@ -3528,7 +3528,7 @@ addtobill(
                       (contentscount && !obj->unpaid) ? _(the_contents_of) : "",
                       the(xname(obj)),
                       (contentscount && obj->unpaid) ? _(and_its_contents) : "",
-                      ltmp, currency(ltmp), (obj->quan > 1L) ? " each" : "");
+                      ltmp, currency(ltmp), (obj->quan > 1L) ? _(" each") : "");
         } else {
             pline(_("%s does not notice."), Shknam(shkp));
         }
@@ -3541,19 +3541,19 @@ append_honorific(char *buf)
     /* (chooses among [0]..[3] normally; [1]..[4] after the
        Wizard has been killed or invocation ritual performed) */
     static const char *const honored[] = {
-        "good", "honored", "most gracious", "esteemed",
-        "most renowned and sacred"
+        N_("good"), N_("honored"), N_("most gracious"), N_("esteemed"),
+        N_("most renowned and sacred")
     };
 
-    Strcat(buf, honored[rn2(SIZE(honored) - 1) + u.uevent.udemigod]);
+    Strcat(buf, _(honored[rn2(SIZE(honored) - 1) + u.uevent.udemigod]));
     if (is_vampire(gy.youmonst.data))
-        Strcat(buf, (flags.female) ? " dark lady" : " dark lord");
+        Strcat(buf, (flags.female) ? _(" dark lady") : _(" dark lord"));
     else if (maybe_polyd(is_elf(gy.youmonst.data), Race_if(PM_ELF)))
-        Strcat(buf, (flags.female) ? " hiril" : " hir");
+        Strcat(buf, (flags.female) ? _(" hiril") : _(" hir"));
     else
-        Strcat(buf, !is_human(gy.youmonst.data) ? " creature"
-                      : (flags.female) ? " lady"
-                        : " sir");
+        Strcat(buf, !is_human(gy.youmonst.data) ? _(" creature")
+                      : (flags.female) ? _(" lady")
+                        : _(" sir"));
 }
 
 void
@@ -3777,9 +3777,9 @@ stolen_value(
                     You(_("have no credit remaining."));
                     return 0;
                 }
-                still = "still ";
+                still = _("still ");
             }
-            Sprintf(buf, "%sowe %s %ld %s", still, shkname(shkp),
+            Sprintf(buf, _("%sowe %s %ld %s"), still, shkname(shkp),
                     value, currency(value));
             if (u_count) /* u_count > 0 implies Has_contents(obj) */
                 Sprintf(eos(buf), _(" for %s%sits contents"),
@@ -3973,7 +3973,7 @@ sellobj(
         || (Is_candle(obj)
             && obj->age < 20L * (long) objects[obj->otyp].oc_cost)) {
         pline(_("%s seems uninterested%s."), Shknam(shkp),
-              cgold ? " in the rest" : "");
+              cgold ? _(" in the rest") : "");
         if (container)
             dropped_container(obj, shkp, FALSE);
         obj->no_charge = 1;
@@ -3989,9 +3989,9 @@ sellobj(
             c = gs.sell_response = 'y';
         } else if (gs.sell_response != 'n') {
             pline(_("%s cannot pay you at present."), Shknam(shkp));
-            Sprintf(qbuf, "Will you accept %ld %s in credit for ", tmpcr,
+            Sprintf(qbuf, _("Will you accept %ld %s in credit for "), tmpcr,
                     currency(tmpcr));
-            c = ynaq(safe_qbuf(qbuf, qbuf, "?", obj, doname, thesimpleoname,
+            c = ynaq(safe_qbuf(qbuf, qbuf, _("?"), obj, doname, thesimpleoname,
                                (obj->quan == 1L) ? _("that") : _("those")));
             if (c == 'a') {
                 c = 'y';
@@ -4003,9 +4003,9 @@ sellobj(
         if (c == 'y') {
             shk_names_obj(shkp, obj,
                           ((gs.sell_how != SELL_NORMAL)
-                           ? "traded %s for %ld zorkmid%s in %scredit."
-                    : "relinquish %s and acquire %ld zorkmid%s in %scredit."),
-                          tmpcr, (eshkp->credit > 0L) ? "additional " : "");
+                           ? _("traded %s for %ld zorkmid%s in %scredit.")
+                    : _("relinquish %s and acquire %ld zorkmid%s in %scredit.")),
+                          tmpcr, (eshkp->credit > 0L) ? _("additional ") : "");
             eshkp->credit += tmpcr;
             if (container)
                 dropped_container(obj, shkp, TRUE);
@@ -4117,9 +4117,9 @@ sellobj(
             shk_names_obj(shkp, obj,
                           (gs.sell_how != SELL_NORMAL)
                            ? ((!ltmp && cltmp && only_partially_your_contents)
-                         ? "sold some items inside %s for %ld gold piece%s.%s"
-                         : "sold %s for %ld gold piece%s.%s")
-            : "relinquish %s and receive %ld gold piece%s in compensation.%s",
+                         ? _("sold some items inside %s for %ld gold piece%s.%s")
+                         : _("sold %s for %ld gold piece%s.%s"))
+            : _("relinquish %s and receive %ld gold piece%s in compensation.%s"),
                           offer, "");
             break;
         default:
@@ -4192,11 +4192,11 @@ doinvbill(
         if (totused)
             putstr(datawin, 0, "");
         totused += eshkp->debit;
-        buf_p = xprname((struct obj *) 0, "usage charges and/or other fees",
+        buf_p = xprname((struct obj *) 0, _("usage charges and/or other fees"),
                         GOLD_SYM, FALSE, eshkp->debit, 0L);
         putstr(datawin, 0, buf_p);
     }
-    buf_p = xprname((struct obj *) 0, "Total:", '*', FALSE, totused, 0L);
+    buf_p = xprname((struct obj *) 0, _("Total:"), '*', FALSE, totused, 0L);
     putstr(datawin, 0, "");
     putstr(datawin, 0, buf_p);
     display_nhwindow(datawin, FALSE);
@@ -5236,7 +5236,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
 
     if (Invis)
         Your(_("invisibility does not fool %s!"), shkname(shkp));
-    Sprintf(qbuf, "%sYou did %ld %s worth of damage!%s  Pay?",
+    Sprintf(qbuf, _("%sYou did %ld %s worth of damage!%s  Pay?"),
             !animal ? cad(TRUE) : "", cost_of_damage,
             currency(cost_of_damage), !animal ? "\"" : "");
     if (y_n(qbuf) != 'n') {
@@ -5368,11 +5368,11 @@ price_quote(struct obj *first_obj)
         if (otmp->globby)
             cost *= get_pricing_units(otmp);  /* always quan 1, vary by wt */
         if (!cost) {
-            Strcpy(price, "no charge");
+            Strcpy(price, _("no charge"));
             contentsonly = FALSE;
         } else {
-            Sprintf(price, "%ld %s%s", cost, currency(cost),
-                    (otmp->quan) > 1L ? " each" : "");
+            Sprintf(price, _("%ld %s%s"), cost, currency(cost),
+                    (otmp->quan) > 1L ? _(" each") : "");
         }
         Sprintf(buf, "%s%s, %s", contentsonly ? _(the_contents_of) : "",
                 doname(otmp), price);
@@ -5392,7 +5392,7 @@ price_quote(struct obj *first_obj)
                     doname(first_obj));
             SetVoice(shkp, 0, 80, 0);
             verbalize(_("%s, price %ld %s%s%s"), upstart(buf), cost,
-                      currency(cost), (first_obj->quan > 1L) ? " each" : "",
+                      currency(cost), (first_obj->quan > 1L) ? _(" each") : "",
                       contentsonly ? "." : shk_embellish(first_obj, cost));
         }
     }
@@ -5749,7 +5749,7 @@ block_door(coordxy x, coordxy y)
         && !helpless(shkp)
         && (ESHK(shkp)->debit || ESHK(shkp)->billct || ESHK(shkp)->robbed)) {
         pline(_("%s%s blocks your way!"), Shknam(shkp),
-              Invis ? " senses your motion and" : "");
+              Invis ? _(" senses your motion and") : "");
         return TRUE;
     }
     return FALSE;
@@ -5786,7 +5786,7 @@ block_entry(coordxy x, coordxy y)
         && (Invis || carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK)
             || u.usteed)) {
         pline(_("%s%s blocks your way!"), Shknam(shkp),
-              Invis ? " senses your motion and" : "");
+              Invis ? _(" senses your motion and") : "");
         return TRUE;
     }
     return FALSE;
@@ -5802,7 +5802,7 @@ shk_your(char *buf, struct obj *obj)
     if (chk_pm && type_is_pname(&mons[obj->corpsenm]))
         return buf; /* skip ownership prefix and space: "Medusa's corpse" */
     else if (chk_pm && the_unique_pm(&mons[obj->corpsenm]))
-        Strcpy(buf, "the"); /* override ownership: "the Oracle's corpse" */
+        Strcpy(buf, _("the")); /* override ownership: "the Oracle's corpse" */
     else if (!shk_owns(buf, obj) && !mon_owns(buf, obj))
         Strcpy(buf, the_your[carried(obj) ? 1 : 0]);
     return strcat(buf, " ");

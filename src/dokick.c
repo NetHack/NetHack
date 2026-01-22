@@ -175,7 +175,7 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
         else
             newsym(x, y);
         There(_("is %s here."),
-              canspotmon(mon) ? a_monnam(mon) : "something hidden");
+              canspotmon(mon) ? a_monnam(mon) : _("something hidden"));
     }
 
     /* Kick attacks by kicking monsters are normal attacks, not special.
@@ -265,7 +265,7 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
         && mon->data->mmove >= 12) {
         if (!nohands(mon->data) && !rn2(martial() ? 5 : 3)) {
             pline(_("%s blocks your %skick."), Monnam(mon),
-                  clumsy ? _("clumsy ") : "");
+                  clumsy ? _("clumsy ") : _(""));
             (void) passive(mon, uarmf, FALSE, 1, AT_KICK, FALSE);
             return;
         } else {
@@ -282,7 +282,7 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
                                                          || slithy(mon->data))
                                                             ? _("slides")
                                                             : _("jumps"),
-                      clumsy ? _("easily") : _("nimbly"), clumsy ? _("clumsy ") : "");
+                      clumsy ? _("easily") : _("nimbly"), clumsy ? _("clumsy ") : _(""));
                 (void) passive(mon, uarmf, FALSE, 1, AT_KICK, FALSE);
                 return;
             }
@@ -323,7 +323,7 @@ ghitm(struct monst *mtmp, struct obj *gold)
         /* greedy monsters catch gold */
         if (cansee(mtmp->mx, mtmp->my))
             pline(_("%s %scatches the gold."), Monnam(mtmp),
-                  was_sleeping ? _("awakens and ") : "");
+                  was_sleeping ? _("awakens and ") : _(""));
         (void) mpickobj(mtmp, gold);
         gold = (struct obj *) 0; /* obj has been freed */
         if (mtmp->isshk) {
@@ -334,7 +334,7 @@ ghitm(struct monst *mtmp, struct obj *gold)
                 if (robbed < 0L)
                     robbed = 0L;
                 pline_The(_("amount %scovers %s recent losses."),
-                          !robbed ? "" : _("partially "), mhis(mtmp));
+                          !robbed ? _("") : _("partially "), mhis(mtmp));
                 ESHK(mtmp)->robbed = robbed;
                 if (!robbed)
                     make_happy_shk(mtmp, FALSE);
@@ -440,9 +440,9 @@ container_impact_dmg(
         otmp2 = otmp->nobj;
         if (objects[otmp->otyp].oc_material == GLASS
             && otmp->oclass != GEM_CLASS && !obj_resists(otmp, 33, 100)) {
-            result = "shatter";
+            result = N_("shatter");
         } else if (otmp->otyp == EGG && !rn2(3)) {
-            result = "cracking";
+            result = N_("cracking");
         }
         if (result) {
             if (otmp->otyp == MIRROR)
@@ -457,7 +457,7 @@ container_impact_dmg(
             } else {
                 Soundeffect(se_glass_shattering, 25);
             }
-            You_hear(_("a muffled %s."), result);
+            You_hear(_("a muffled %s."), _(result));
             if (costly) {
                 if (frominv && !otmp->unpaid)
                     otmp->no_charge = 1;
@@ -553,7 +553,7 @@ really_kick_object(coordxy x, coordxy y)
             ; /* hero has been transformed but kick continues */
         } else {
             /* normalize body shape here; foot, not body_part(FOOT) */
-            Sprintf(svk.killer.name, "kicking %s barefoot",
+            Sprintf(svk.killer.name, _("kicking %s barefoot"),
                     killer_xname(gk.kickedobj));
             instapetrify(svk.killer.name);
         }
@@ -641,7 +641,7 @@ really_kick_object(coordxy x, coordxy y)
             else /* don't leave no_charge set when outside shop */
                 gk.kickedobj->no_charge = 0;
         }
-        if (!flooreffects(gk.kickedobj, u.ux, u.uy, "fall")) {
+        if (!flooreffects(gk.kickedobj, u.ux, u.uy, _("fall"))) {
             place_object(gk.kickedobj, u.ux, u.uy);
             impact_disturbs_zombies(gk.kickedobj, TRUE);
             stackobj(gk.kickedobj);
@@ -772,7 +772,7 @@ really_kick_object(coordxy x, coordxy y)
         costly = FALSE; /* already billed */
     }
 
-    if (flooreffects(gk.kickedobj, gb.bhitpos.x, gb.bhitpos.y, "fall"))
+    if (flooreffects(gk.kickedobj, gb.bhitpos.x, gb.bhitpos.y, _("fall")))
         return 1;
     if (costly) {
         long gtg = 0L;
@@ -958,7 +958,7 @@ kick_door(coordxy x, coordxy y, int avrg_attrib)
         recalc_block_point(x, y); /* vision */
         if (shopdoor) {
             add_damage(x, y, SHOP_DOOR_COST);
-            pay_for_damage("break", FALSE);
+            pay_for_damage(_("break"), FALSE);
         }
         if (in_town(x, y))
             (void) get_iter_mons(watchman_thief_arrest);
@@ -1094,7 +1094,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
         }
         /* make metal boots rust */
         if (uarmf && rn2(3))
-            if (water_damage(uarmf, "metal boots", TRUE) == ER_NOTHING) {
+            if (water_damage(uarmf, _("metal boots"), TRUE) == ER_NOTHING) {
                 Your(_("boots get wet."));
                 /* could cause short-lived fumbling here */
             }
@@ -1283,7 +1283,7 @@ dokick(void)
             return ECMD_OK;
         }
     } else if (Wounded_legs) {
-        legs_in_no_shape("kicking", FALSE);
+        legs_in_no_shape(_("kicking"), FALSE);
         no_kick = TRUE;
     } else if (near_capacity() > SLT_ENCUMBER) {
         Your(_("load is too heavy to balance yourself for a kick."));
@@ -1603,7 +1603,7 @@ impact_drop(
 
         if (missile)
             pline(_("From the impact, %sother %s."),
-                  dct == oct ? _("the ") : dct == 1L ? _("an") : "", what);
+                  dct == oct ? _("the ") : dct == 1L ? _("an") : _(""), what);
         else if (oct == dct)
             pline(_("%s adjacent %s %s."), dct == 1L ? _("The") : _("All the"), what,
                   gg.gate_str);

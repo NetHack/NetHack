@@ -213,7 +213,7 @@ mplayhorn(
         objnamp = xname(otmp);
         if (strlen(objnamp) >= QBUFSZ)
             objnamp = simpleonames(otmp);
-        Sprintf(objbuf, "a %s directed at", objnamp);
+        Sprintf(objbuf, _("a %s directed at"), objnamp);
         /* "<mon> plays a <horn> directed at himself!" */
         pline(_("%s!"), monverbself(mtmp, Monnam(mtmp), "play", objbuf));
         makeknown(otmp->otyp); /* (wands handle this slightly differently) */
@@ -225,7 +225,7 @@ mplayhorn(
         pline(_("%s %s %s directed at you!"),
               /* monverbself() would adjust the verb if hallucination made
                  subject plural; stick with singular here, at least for now */
-              Monnam(mtmp), "plays", an(objnamp));
+              Monnam(mtmp), _("plays"), an(objnamp));
         makeknown(otmp->otyp);
         stop_occupation();
     }
@@ -1045,7 +1045,7 @@ use_defensive(struct monst *mtmp)
         t = t_at(gt.trapx, gt.trapy);
         if (vis) {
             pline_mon(mtmp, _("%s %s into a %s!"), Monnam(mtmp),
-                  vtense(fakename[0], locomotion(mtmp->data, "jump")),
+                  vtense(fakename[0], locomotion(mtmp->data, _("jump"))),
                   trapname(t->ttyp, FALSE));
         }
         /* if trap was in a concealed niche, it's no longer concealed */
@@ -1142,7 +1142,7 @@ use_defensive(struct monst *mtmp)
         t = t_at(gt.trapx, gt.trapy);
         if (vis) {
             pline_mon(mtmp, _("%s %s onto a %s!"), Monnam(mtmp),
-                  vtense(fakename[0], locomotion(mtmp->data, "jump")),
+                  vtense(fakename[0], locomotion(mtmp->data, _("jump"))),
                   trapname(t->ttyp, FALSE));
         }
         /* if trap was in a concealed niche, it's no longer concealed */
@@ -1635,11 +1635,11 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
             learnit = TRUE;
         } else if (rnd(20) < 10 + find_mac(mtmp)) {
             tmp = d(2, 12);
-            hit("wand", mtmp, exclam(tmp));
+            hit(_("wand"), mtmp, exclam(tmp));
             (void) resist(mtmp, otmp->oclass, tmp, TELL);
             learnit = TRUE;
         } else {
-            miss("wand", mtmp);
+            miss(_("wand"), mtmp);
         }
         /* need to see the wand being zapped and also the spot where the
            target is hit; don't have to see the target itself though */
@@ -2491,8 +2491,8 @@ use_misc(struct monst *mtmp)
             seetrap(t);
         if (vismon || vistrapspot) {
             pline_mon(mtmp, _("%s deliberately %s onto a %s!"), Some_Monnam(mtmp),
-                  vtense(fakename[0], locomotion(mtmp->data, "jump")),
-                  t->tseen ? trapname(t->ttyp, FALSE) : "hidden trap");
+                  vtense(fakename[0], locomotion(mtmp->data, _("jump"))),
+                  t->tseen ? trapname(t->ttyp, FALSE) : _("hidden trap"));
             /* note: if mtmp is unseen because it is invisible, its new
                shape will also be invisible and could produce "Its armor
                falls off" messages during the transformation; those make
@@ -2766,19 +2766,19 @@ mon_reflects(struct monst *mon, const char *str)
 
     if (orefl && orefl->otyp == SHIELD_OF_REFLECTION) {
         if (str) {
-            pline(str, s_suffix(mon_nam(mon)), "shield");
+            pline(str, s_suffix(mon_nam(mon)), _("shield"));
             makeknown(SHIELD_OF_REFLECTION);
         }
         return TRUE;
     } else if (arti_reflects(MON_WEP(mon))) {
         /* due to wielded artifact weapon */
         if (str)
-            pline(str, s_suffix(mon_nam(mon)), "weapon");
+            pline(str, s_suffix(mon_nam(mon)), _("weapon"));
         return TRUE;
     } else if ((orefl = which_armor(mon, W_AMUL))
                && orefl->otyp == AMULET_OF_REFLECTION) {
         if (str) {
-            pline(str, s_suffix(mon_nam(mon)), "amulet");
+            pline(str, s_suffix(mon_nam(mon)), _("amulet"));
             makeknown(AMULET_OF_REFLECTION);
         }
         return TRUE;
@@ -2786,13 +2786,13 @@ mon_reflects(struct monst *mon, const char *str)
                && (orefl->otyp == SILVER_DRAGON_SCALES
                    || orefl->otyp == SILVER_DRAGON_SCALE_MAIL)) {
         if (str)
-            pline(str, s_suffix(mon_nam(mon)), "armor");
+            pline(str, s_suffix(mon_nam(mon)), _("armor"));
         return TRUE;
     } else if (mon->data == &mons[PM_SILVER_DRAGON]
                || mon->data == &mons[PM_CHROMATIC_DRAGON]) {
         /* Silver dragons only reflect when mature; babies do not */
         if (str)
-            pline(str, s_suffix(mon_nam(mon)), "scales");
+            pline(str, s_suffix(mon_nam(mon)), _("scales"));
         return TRUE;
     }
     return FALSE;
@@ -2804,18 +2804,18 @@ ureflects(const char *fmt, const char *str)
     /* Check from outermost to innermost objects */
     if (EReflecting & W_ARMS) {
         if (fmt && str) {
-            pline(fmt, str, "shield");
+            pline(fmt, str, _("shield"));
             makeknown(SHIELD_OF_REFLECTION);
         }
         return TRUE;
     } else if (EReflecting & W_WEP) {
         /* Due to wielded artifact weapon */
         if (fmt && str)
-            pline(fmt, str, "weapon");
+            pline(fmt, str, _("weapon"));
         return TRUE;
     } else if (EReflecting & W_AMUL) {
         if (fmt && str) {
-            pline(fmt, str, "medallion");
+            pline(fmt, str, _("medallion"));
             makeknown(AMULET_OF_REFLECTION);
         }
         return TRUE;

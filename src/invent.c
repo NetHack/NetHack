@@ -1548,7 +1548,7 @@ currency(long amount)
 {
     const char *res;
 
-    res = Hallucination ? ROLL_FROM(currencies) : "zorkmid";
+    res = Hallucination ? ROLL_FROM(currencies) : _("zorkmid");
     if (amount != 1L)
         res = makeplural(res);
     return res;
@@ -2568,11 +2568,11 @@ reroll_menu(void)
 
     any.a_char = 'n';
     add_menu(win, &nul_glyphinfo, &any, flags.lootabc ? 0 : 'p', 0,
-             ATR_NONE, NO_COLOR, "start the game with this character",
+             ATR_NONE, NO_COLOR, _("start the game with this character"),
              MENU_ITEMFLAGS_NONE);
     any.a_char = 'y';
     add_menu(win, &nul_glyphinfo, &any, flags.lootabc ? 0 : 'r', 0,
-             ATR_NONE, NO_COLOR, "reroll another character",
+             ATR_NONE, NO_COLOR, _("reroll another character"),
              MENU_ITEMFLAGS_NONE);
     any.a_char = 0;
     add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR, "",
@@ -2719,7 +2719,7 @@ identify_pack(
 
     if (!unid_cnt) {
         You(_("have already identified %s of your possessions."),
-            !learning_id ? "all" : "the rest");
+            !learning_id ? _("all") : _("the rest"));
     } else if (!id_limit || id_limit >= unid_cnt) {
         /* identify everything */
         /* TODO:  use fully_identify_obj and cornline/menu/whatever here */
@@ -3226,27 +3226,27 @@ display_pickinv(
         char prompt[QBUFSZ];
 
         unid_cnt = count_unidentified(gi.invent);
-        Sprintf(prompt, "Debug Identify"); /* 'title' rather than 'prompt' */
+        Sprintf(prompt, _("Debug Identify")); /* 'title' rather than 'prompt' */
         if (unid_cnt)
             Sprintf(eos(prompt),
-                    " -- unidentified or partially identified item%s",
+                    _(" -- unidentified or partially identified item%s"),
                     plur(unid_cnt));
         add_menu_str(win, prompt);
         if (!unid_cnt) {
             add_menu_str(win,
-                         "(all items are permanently identified already)");
+                         _("(all items are permanently identified already)"));
             gotsomething = TRUE;
         } else {
             any.a_obj = &wizid_fakeobj;
-            Sprintf(prompt, "select %s to permanently identify",
-                    (unid_cnt == 1) ? "it": "any or all of them");
+            Sprintf(prompt, _("select %s to permanently identify"),
+                    (unid_cnt == 1) ? _("it"): _("any or all of them"));
             /* wiz_identify stuffed the wiz_identify command character (^I)
                into iflags.override_ID for our use as an accelerator;
                it could be ambiguous if player has assigned a letter to
                the #wizidentify command, so include it as a group accelerator
                but use '_' as the primary selector */
             if (unid_cnt > 1)
-                Sprintf(eos(prompt), " (%s for all)",
+                Sprintf(eos(prompt), _(" (%s for all)"),
                         visctrl(iflags.override_ID));
             add_menu(win, &nul_glyphinfo, &any, '_', iflags.override_ID,
                      ATR_NONE, clr, prompt, MENU_ITEMFLAGS_SKIPINVERT);
@@ -3740,7 +3740,7 @@ dounpaid(
                     char contbuf[BUFSZ];
 
                     /* Shopkeeper knows what to charge for contents */
-                    Sprintf(contbuf, "%s contents", s_suffix(xname(otmp)));
+                    Sprintf(contbuf, _("%s contents"), s_suffix(xname(otmp)));
                     putstr(win, 0,
                            xprname((struct obj *) 0, contbuf, CONTAINED_SYM,
                                    TRUE, contcost, 0L));
@@ -3778,7 +3778,7 @@ dounpaid(
                 floorverb, xtracount, where);
         } else {
             putstr(win, 0, "");
-            Sprintf(buf, "(There %s %d more unpaid object%s %s.)",
+            Sprintf(buf, _("(There %s %d more unpaid object%s %s.)"),
                     floorverb, xtracount, plur(xtracount), where);
             putstr(win, 0, buf);
         }
@@ -3947,7 +3947,7 @@ dotypeinv(void)
             (void) doinvbill(1);
         else
             pline(_("No used-up objects%s."),
-                  any_unpaid ? " on your shopping bill" : "");
+                  any_unpaid ? _(" on your shopping bill") : "");
         goto doI_done;
     }
     if (c == 'u' || (c == 'U' && any_unpaid && !ucnt)) {
@@ -4009,7 +4009,7 @@ dotypeinv(void)
     if (strchr("BUCXP", c)) {
         /* the before and after phrases for "you have no..." can both be
            treated as mutually-exclusive suffices when creating a title */
-        Sprintf(title, "Items %s", (before && *before) ? before : after);
+        Sprintf(title, _("Items %s"), (before && *before) ? before : after);
         /* get rid of trailing space from 'before' and double-space from
            'after's leading space */
         (void) mungspaces(title);
@@ -4139,7 +4139,7 @@ look_here(
          *  something along the lines of "because it's worn on the outside
          *  so is unreachable from in here...").
          */
-        Sprintf(fbuf, "Contents of %s %s", s_suffix(mon_nam(mtmp)),
+        Sprintf(fbuf, _("Contents of %s %s"), s_suffix(mon_nam(mtmp)),
                 mbodypart(mtmp, STOMACH));
         /* Skip "Contents of " by using fbuf index 12 */
         You(_("%s to %s what is lying in %s."), Blind ? _("try") : _("look around"),
@@ -4175,7 +4175,7 @@ look_here(
         if (reg || trap)
             There(_("is %s%s%s here."),
                   reg ? regbuf : "",
-                  (reg && trap) ? " and " : "",
+                  (reg && trap) ? _(" and ") : "",
                   trap ? an(trapname(trap->ttyp, FALSE)) : "");
     }
 
@@ -4358,7 +4358,7 @@ feel_cockatrice(struct obj *otmp, boolean force_touch)
         else
             pline(_("Touching %s is a fatal mistake..."), kbuf);
         /* normalize body shape here; hand, not body_part(HAND) */
-        Sprintf(kbuf, "touching %s bare-handed", killer_xname(otmp));
+        Sprintf(kbuf, _("touching %s bare-handed"), killer_xname(otmp));
         /* will call polymon() for the poly_when_stoned() case */
         instapetrify(kbuf);
     }
@@ -4529,7 +4529,7 @@ doprgold(void)
                     umoney ? _("and") : _("but"), hmoney,
                     umoney ? _("more") : currency(hmoney));
         }
-        pline("%s.", buf);
+        pline(_("%s."), buf);
     } else {
         long total = umoney + hmoney;
         if (total)
@@ -4826,7 +4826,7 @@ let_to_name(char let, boolean unpaid, boolean showsym)
         gi.invbuf = (char *) alloc(gi.invbufsiz);
     }
     if (unpaid)
-        Strcat(strcpy(gi.invbuf, "Unpaid "), class_name);
+        Strcat(strcpy(gi.invbuf, _("Unpaid ")), class_name);
     else
         Strcpy(gi.invbuf, class_name);
     if ((oclass != 0) && showsym) {
@@ -5357,8 +5357,8 @@ display_minventory(
         have_any = (have_inv || incl_hero),
         pickings = (dflags & MINV_PICKMASK);
 
-    Sprintf(tmp, "%s %s:", s_suffix(noit_Monnam(mon)),
-            do_all ? "possessions" : "armament");
+    Sprintf(tmp, _("%s %s:"), s_suffix(noit_Monnam(mon)),
+            do_all ? _("possessions") : _("armament"));
 
     if (do_all ? have_any : (mon->misc_worn_check || MON_WEP(mon))) {
         /* Fool the 'weapon in hand' routine into

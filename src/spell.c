@@ -164,7 +164,7 @@ cursed_book(struct obj *bp)
         bp->in_use = FALSE;
         poison_strdmg(Poison_resistance ? rn1(2, 1) : rn1(4, 3),
                       rnd(Poison_resistance ? 6 : 10),
-                      "contact-poisoned spellbook", KILLED_BY_AN);
+                      _("contact-poisoned spellbook"), KILLED_BY_AN);
         bp->in_use = was_in_use;
         break;
     case 6:
@@ -194,7 +194,7 @@ confused_book(struct obj *spellbook)
     if (!rn2(3) && spellbook->otyp != SPE_BOOK_OF_THE_DEAD) {
         spellbook->in_use = TRUE; /* in case called from learn() */
         pline(
-         "Being confused you have difficulties in controlling your actions.");
+         _("Being confused you have difficulties in controlling your actions."));
         display_nhwindow(WIN_MESSAGE, FALSE);
         You(_("accidentally tear the spellbook to pieces."));
         trycall(spellbook);
@@ -752,7 +752,7 @@ getspell(int *spell_no)
         else
             Sprintf(lets, "a-zA-%c", 'A' + nspells - 27);
 
-        Snprintf(qbuf, sizeof qbuf, "Cast which spell? [%s *?]", lets);
+        Snprintf(qbuf, sizeof qbuf, _("Cast which spell? [%s *?]"), lets);
         for (retry_limit = 0; ; ++retry_limit) {
             if (retry_limit == 10) {
                 /* limit is mainly to prevent the fuzzer from getting stuck
@@ -833,19 +833,19 @@ spelltypemnemonic(int skill)
 {
     switch (skill) {
     case P_ATTACK_SPELL:
-        return "attack";
+        return _("attack");
     case P_HEALING_SPELL:
-        return "healing";
+        return _("healing");
     case P_DIVINATION_SPELL:
-        return "divination";
+        return _("divination");
     case P_ENCHANTMENT_SPELL:
-        return "enchantment";
+        return _("enchantment");
     case P_CLERIC_SPELL:
-        return "clerical";
+        return _("clerical");
     case P_ESCAPE_SPELL:
-        return "escape";
+        return _("escape");
     case P_MATTER_SPELL:
-        return "matter";
+        return _("matter");
     default:
         impossible("Unknown spell skill, %d;", skill);
         return "";
@@ -1427,7 +1427,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
                     if (!u.dx && !u.dy && !u.dz) {
                         if ((damage = zapyourself(pseudo, TRUE)) != 0) {
                             char buf[BUFSZ];
-                            Sprintf(buf, "zapped %sself with a spell",
+                            Sprintf(buf, _("zapped %sself with a spell"),
                                     uhim());
                             losehp(damage, buf, NO_KILLER_PREFIX);
                         }
@@ -1501,7 +1501,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
                 if ((damage = zapyourself(pseudo, TRUE)) != 0) {
                     char buf[BUFSZ];
 
-                    Sprintf(buf, "zapped %sself with a spell", uhim());
+                    Sprintf(buf, _("zapped %sself with a spell"), uhim());
                     if (physical_damage)
                         damage = Maybe_Half_Phys(damage);
                     losehp(damage, buf, NO_KILLER_PREFIX);
@@ -1553,7 +1553,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
         if (Sick)
             You(_("are no longer ill."));
         if (Slimed)
-            make_slimed(0L, "The slime disappears!");
+            make_slimed(0L, _("The slime disappears!"));
         healup(0, 0, TRUE, FALSE);
         break;
     case SPE_CREATE_FAMILIAR:
@@ -1843,16 +1843,16 @@ enum spl_sort_types {
 };
 
 static const char *const spl_sortchoices[NUM_SPELL_SORTBY] = {
-    "by casting letter",
-    "alphabetically",
-    "by level, low to high",
-    "by level, high to low",
-    "by skill group, alphabetized within each group",
-    "by skill group, low to high level within group",
-    "by skill group, high to low level within group",
-    "maintain current ordering",
+    N_("by casting letter"),
+    N_("alphabetically"),
+    N_("by level, low to high"),
+    N_("by level, high to low"),
+    N_("by skill group, alphabetized within each group"),
+    N_("by skill group, low to high level within group"),
+    N_("by skill group, high to low level within group"),
+    N_("maintain current ordering"),
     /* a menu choice rather than a sort choice */
-    "reassign casting letters to retain current order",
+    N_("reassign casting letters to retain current order"),
 };
 
 /* qsort callback routine */
@@ -1986,7 +1986,7 @@ spellsortmenu(void)
         }
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, let, 0,
-                 ATR_NONE, clr, spl_sortchoices[i],
+                 ATR_NONE, clr, _(spl_sortchoices[i]),
                  (i == gs.spl_sortmode) ? MENU_ITEMFLAGS_SELECTED
                                         : MENU_ITEMFLAGS_NONE);
     }
@@ -2294,7 +2294,7 @@ spellretention(int idx, char * outbuf)
 
     if (turnsleft < 1L) {
         /* spell has expired; hero can't successfully cast it anymore */
-        Strcpy(outbuf, "(gone)");
+        Strcpy(outbuf, _("(gone)"));
     } else if (turnsleft >= (long) KEEN) {
         /* full retention, first turn or immediately after reading book */
         Strcpy(outbuf, "100%");

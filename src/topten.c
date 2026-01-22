@@ -95,11 +95,11 @@ formatkiller(
 {
     static NEARDATA const char *const killed_by_prefix[] = {
         /* DIED, CHOKING, POISONING, STARVING, */
-        "killed by ", "choked on ", "poisoned by ", "died of ",
+        N_("killed by "), N_("choked on "), N_("poisoned by "), N_("died of "),
         /* DROWNING, BURNING, DISSOLVED, CRUSHING, */
-        "drowned in ", "burned by ", "dissolved in ", "crushed to death by ",
+        N_("drowned in "), N_("burned by "), N_("dissolved in "), N_("crushed to death by "),
         /* STONING, TURNED_SLIME, GENOCIDED, */
-        "petrified by ", "turned to slime by ", "killed by ",
+        N_("petrified by "), N_("turned to slime by "), N_("killed by "),
         /* PANICKED, TRICKED, QUIT, ESCAPED, ASCENDED */
         "", "", "", "", ""
     };
@@ -119,7 +119,7 @@ formatkiller(
         FALLTHROUGH;
         /*FALLTHRU*/
     case KILLED_BY:
-        (void) strncat(buf, killed_by_prefix[how], siz - 1);
+        (void) strncat(buf, _(killed_by_prefix[how]), siz - 1);
         l = Strlen(buf);
         buf += l, siz -= l;
         break;
@@ -153,10 +153,10 @@ formatkiller(
         /* X <= siz: 'sizeof "string"' includes 1 for '\0' terminator */
         if (gm.multi_reason
             && strlen(gm.multi_reason) + sizeof ", while " <= siz)
-            Sprintf(buf, ", while %s", gm.multi_reason);
+            Sprintf(buf, _(", while %s"), gm.multi_reason);
         /* either gm.multi_reason wasn't specified or wouldn't fit */
         else if (sizeof ", while helpless" <= siz)
-            Strcpy(buf, ", while helpless");
+            Strcpy(buf, _(", while helpless"));
         /* else extra death info won't fit, so leave it out */
     }
 }
@@ -729,8 +729,8 @@ topten(int how, time_t when)
 
                 topten_print("");
                 Sprintf(pbuf,
-             "Since you were in %s mode, the score list will not be checked.",
-                        wizard ? "wizard" : "discover");
+             _("Since you were in %s mode, the score list will not be checked."),
+                        wizard ? _("wizard") : _("discover"));
                 topten_print(pbuf);
             }
         goto showwin;
@@ -792,7 +792,7 @@ topten(int how, time_t when)
                     char pbuf[BUFSZ];
 
                     Sprintf(pbuf,
-                         "You didn't beat your previous score of %ld points.",
+                         _("You didn't beat your previous score of %ld points."),
                             t1->points);
                     topten_print(pbuf);
                     topten_print("");
@@ -833,7 +833,7 @@ topten(int how, time_t when)
                     char pbuf[BUFSZ];
 
                     Sprintf(pbuf,
-                            "You reached the %d%s place on the top %d list.",
+                            _("You reached the %d%s place on the top %d list."),
                             rank0, ordin(rank0), sysopt.entrymax);
                     topten_print(pbuf);
                 }
@@ -971,7 +971,7 @@ outentry(int rank, struct toptenentry *t1, boolean so)
     else
         Strcat(linebuf, " ");
     if (!strncmp("escaped", t1->death, 7)) {
-        Sprintf(eos(linebuf), "escaped the dungeon %s[max level %d]",
+        Sprintf(eos(linebuf), _("escaped the dungeon %s[max level %d]"),
                 !strncmp(" (", t1->death + 7, 2) ? t1->death + 7 + 2 : "",
                 t1->maxlvl);
         /* fixup for closing paren in "escaped... with...Amulet)[max..." */
@@ -979,12 +979,12 @@ outentry(int rank, struct toptenentry *t1, boolean so)
             *bp = (t1->deathdnum == astral_level.dnum) ? '\0' : ' ';
         second_line = FALSE;
     } else if (!strncmp("ascended", t1->death, 8)) {
-        Sprintf(eos(linebuf), "ascended to demigod%s-hood",
-                (t1->plgend[0] == 'F') ? "dess" : "");
+        Sprintf(eos(linebuf), _("ascended to demigod%s-hood"),
+                (t1->plgend[0] == 'F') ? _("dess") : "");
         second_line = FALSE;
     } else {
         if (!strncmp(t1->death, "quit", 4)) {
-            Strcat(linebuf, "quit");
+            Strcat(linebuf, _("quit"));
             second_line = FALSE;
         } else if (!strncmp(t1->death, "died of st", 10)) {
             Strcat(linebuf, _("starved to death"));
@@ -1297,15 +1297,15 @@ prscore(int argc, char **argv)
                 (void) outentry(rank, t1, FALSE);
         }
     } else {
-        Sprintf(pbuf, "Cannot find any %sentries for ",
-                current_ver ? "current " : "");
+        Sprintf(pbuf, _("Cannot find any %sentries for "),
+                current_ver ? _("current ") : "");
         if (playerct < 1) {
-            Strcat(pbuf, "you");
+            Strcat(pbuf, _("you"));
         } else {
             /* minor bug: 'nethack -s -u ziggy' will say "any of"
                even though the '-u' doesn't indicate multiple names */
             if (playerct > 1)
-                Strcat(pbuf, "any of ");
+                Strcat(pbuf, _("any of "));
             for (i = 0; i < playerct; i++) {
                 /* accept '-u name' and '-uname' as well as just 'name'
                    so skip '-u' for the none-found feedback */

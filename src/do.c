@@ -98,7 +98,7 @@ boulder_hits_pool(
             if (pushing) {
                 char whobuf[BUFSZ];
 
-                Strcpy(whobuf, "you");
+                Strcpy(whobuf, _("you"));
                 if (u.usteed)
                     Strcpy(whobuf, y_monnam(u.usteed));
                 pline(_("%s %s %s into the %s."), upstart(whobuf),
@@ -231,7 +231,7 @@ flooreffects(
             } else {
                 if (!Passes_walls && !throws_rocks(gy.youmonst.data)) {
                     losehp(Maybe_Half_Phys(rnd(15)),
-                           "squished under a boulder", NO_KILLER_PREFIX);
+                           _("squished under a boulder"), NO_KILLER_PREFIX);
                     goto deletedwithboulder;
                 } else
                     reset_utrap(TRUE);
@@ -243,10 +243,10 @@ flooreffects(
                 You_hear(_("a CRASH! beneath you."));
             } else if (!Blind && cansee(x, y)) {
                 pline_The(_("boulder %s%s."),
-                          (ttyp == TRAPDOOR && !tseen) ? "triggers and " : "",
-                          (ttyp == TRAPDOOR) ? "plugs a trap door"
-                          : (ttyp == HOLE) ? "plugs a hole"
-                            : "fills a pit");
+                          (ttyp == TRAPDOOR && !tseen) ? _("triggers and ") : "",
+                          (ttyp == TRAPDOOR) ? _("plugs a trap door")
+                          : (ttyp == HOLE) ? _("plugs a hole")
+                            : _("fills a pit"));
             } else {
                 Soundeffect(se_boulder_drop, 100);
                 You_hear(_("a boulder %s."), verb);
@@ -523,7 +523,7 @@ dosinkring(struct obj *obj)
         break;
     case RIN_AGGRAVATE_MONSTER:
         pline(_("Several %s buzz angrily around the sink."),
-              Hallucination ? makeplural(rndmonnam(NULL)) : "flies");
+              Hallucination ? makeplural(rndmonnam(NULL)) : _("flies"));
         break;
     case RIN_SHOCK_RESISTANCE:
         pline(_("Static electricity surrounds the sink."));
@@ -825,7 +825,7 @@ dropz(struct obj *obj, boolean with_impact)
                 (void) mpickobj(u.ustuck, obj);
         }
     } else {
-        if (flooreffects(obj, u.ux, u.uy, "drop"))
+        if (flooreffects(obj, u.ux, u.uy, _("drop")))
             return;
         place_object(obj, u.ux, u.uy);
         if (with_impact)
@@ -955,7 +955,7 @@ better_not_try_to_drop_that(struct obj *otmp)
     if (otmp->otyp == CORPSE && !u_safe_from_fatal_corpse(otmp, st_all)) {
         Snprintf(
             buf, sizeof buf,
-            "Drop the %s corpse without %s protection on?",
+            _("Drop the %s corpse without %s protection on?"),
             obj_pmname(otmp), body_part(HAND));
         return (paranoid_ynq(TRUE, buf, FALSE) != 'y');
     }
@@ -1113,9 +1113,9 @@ u_stuck_cannot_go(const char *updn)
     if (u.ustuck) {
         if (u.uswallow || !sticks(gy.youmonst.data)) {
             You(_("are %s, and cannot go %s."),
-                !u.uswallow ? "being held"
-                : digests(u.ustuck->data) ? "swallowed"
-                : "engulfed", updn);
+                !u.uswallow ? _("being held")
+                : digests(u.ustuck->data) ? _("swallowed")
+                : _("engulfed"), updn);
             return TRUE;
         } else {
             struct monst *mtmp = u.ustuck;
@@ -1196,8 +1196,8 @@ dodown(void)
             You(_("are floating in %s."),
                 is_pool(u.ux, u.uy) ? _("the water") : _("a bubble of air"));
         else
-            floating_above(stairs_down ? "stairs"
-                           : ladder_down ? "ladder"
+            floating_above(stairs_down ? _("stairs")
+                           : ladder_down ? _("ladder")
                              : surface(u.ux, u.uy));
         return ECMD_OK; /* didn't move */
     }
@@ -1265,9 +1265,9 @@ dodown(void)
             Sprintf(qbuf, _("Try to squeeze %s?"), down_or_thru);
             if (y_n(qbuf) == 'y') {
                 if (!rn2(3)) {
-                    actn = "manage to squeeze";
+                    actn = _("manage to squeeze");
                     losehp(Maybe_Half_Phys(rnd(4)),
-                           "contusion from a small passage", KILLED_BY);
+                           _("contusion from a small passage"), KILLED_BY);
                 } else {
                     You(_("were unable to fit %s."), down_or_thru);
                     return ECMD_OK;
@@ -2120,7 +2120,7 @@ revive_corpse(struct obj *corpse)
     is_uwep = (corpse == uwep);
     chewed = (corpse->oeaten != 0);
     Strcpy(cname, corpse_xname(corpse,
-                               chewed ? "bite-covered" : (const char *) 0,
+                               chewed ? _("bite-covered") : (const char *) 0,
                                CXN_SINGULAR));
     mcarry = (where == OBJ_MINVENT) ? corpse->ocarry : 0;
     /* mcarry is NULL for (where == OBJ_BURIED and OBJ_CONTAINED) now */
@@ -2154,15 +2154,15 @@ revive_corpse(struct obj *corpse)
                 const char *effect = "";
 
                 if (mtmp->data == &mons[PM_DEATH])
-                    effect = " in a whirl of spectral skulls";
+                    effect = _(" in a whirl of spectral skulls");
                 else if (mtmp->data == &mons[PM_PESTILENCE])
-                    effect = " in a churning pillar of flies";
+                    effect = _(" in a churning pillar of flies");
                 else if (mtmp->data == &mons[PM_FAMINE])
-                    effect = " in a ring of withered crops";
+                    effect = _(" in a ring of withered crops");
 
                 if (canseemon(mtmp)) {
                     pline(_("%s rises from the dead%s!"),
-                          chewed ? Adjmonnam(mtmp, "bite-covered")
+                          chewed ? Adjmonnam(mtmp, _("bite-covered"))
                                  : Monnam(mtmp),
                           effect);
                 } else {
@@ -2179,7 +2179,7 @@ revive_corpse(struct obj *corpse)
                           canspotmon(mtmp) ? _("revives") : _("disappears"));
                 else if (canspotmon(mtmp))
                     pline(_("%s suddenly appears!"),
-                          chewed ? Adjmonnam(mtmp, "bite-covered")
+                          chewed ? Adjmonnam(mtmp, _("bite-covered"))
                                  : Monnam(mtmp));
             }
             break;
@@ -2340,8 +2340,8 @@ cmd_safety_prevention(const char *ucverb, const char *cmddesc,
 int
 donull(void)
 {
-    if (cmd_safety_prevention("Waiting", "a no-op (to rest)",
-                          "Are you waiting to get hit?",
+    if (cmd_safety_prevention(_("Waiting"), _("a no-op (to rest)"),
+                          _("Are you waiting to get hit?"),
                           &gd.did_nothing_flag))
         return ECMD_OK;
     return ECMD_TIME; /* Do nothing, but let other things happen */

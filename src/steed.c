@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "i18n.h"
 
 /* Monsters that might be ridden */
 static NEARDATA const char steeds[] = { S_QUADRUPED, S_UNICORN, S_ANGEL,
@@ -69,7 +70,7 @@ use_saddle(struct obj *otmp)
 
         You(_("touch %s."), mon_nam(mtmp));
         if (!(poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM))) {
-            Sprintf(kbuf, "attempting to saddle %s",
+            Sprintf(kbuf, _("attempting to saddle %s"),
                     an(pmname(mtmp->data, Mgender(mtmp))));
             instapetrify(kbuf);
         }
@@ -182,7 +183,7 @@ doride(void)
     if (u.usteed) {
         dismount_steed(DISMOUNT_BYCHOICE);
     } else if (getdir((char *) 0) && isok(u.ux + u.dx, u.uy + u.dy)) {
-        if (wizard && y_n("Force the mount to succeed?") == 'y')
+        if (wizard && y_n(_("Force the mount to succeed?")) == 'y')
             forcemount = TRUE;
         return (mount_steed(m_at(u.ux + u.dx, u.uy + u.dy), forcemount)
                 ? ECMD_TIME : ECMD_OK);
@@ -229,7 +230,7 @@ mount_steed(
     if (Wounded_legs) {
         char qbuf[QBUFSZ];
 
-        legs_in_no_shape("riding", FALSE);
+        legs_in_no_shape(_("riding"), FALSE);
         Sprintf(qbuf, _("Heal your leg%s?"),
                 ((HWounded_legs & BOTH_SIDES) == BOTH_SIDES) ? "s" : "");
         if (force && wizard && y_n(qbuf) == 'y')
@@ -289,7 +290,7 @@ mount_steed(
         char kbuf[BUFSZ];
 
         You(_("touch %s."), mon_nam(mtmp));
-        Sprintf(kbuf, "attempting to ride %s",
+        Sprintf(kbuf, _("attempting to ride %s"),
                 an(pmname(mtmp->data, Mgender(mtmp))));
         instapetrify(kbuf);
     }
@@ -345,7 +346,7 @@ mount_steed(
         }
         You(_("slip while trying to get on %s."), mon_nam(mtmp));
 
-        Sprintf(buf, "slipped while mounting %s",
+        Sprintf(buf, _("slipped while mounting %s"),
                 /* "a saddled mumak" or "a saddled pony called Dobbin" */
                 x_monnam(mtmp, ARTICLE_A, (char *) 0,
                          SUPPRESS_IT | SUPPRESS_INVISIBLE
@@ -600,7 +601,7 @@ dismount_steed(
     otmp = which_armor(mtmp, W_SADDLE);
     switch (reason) {
     case DISMOUNT_THROWN:
-        verb = "are thrown";
+        verb = _("are thrown");
         FALLTHROUGH;
         /*FALLTHRU*/
     case DISMOUNT_KNOCKED:
@@ -609,7 +610,7 @@ dismount_steed(
         if (!have_spot)
             have_spot = landing_spot(&cc, reason, 1);
         if (!ulev && !ufly) {
-            losehp(Maybe_Half_Phys(rn1(10, 10)), "riding accident",
+            losehp(Maybe_Half_Phys(rn1(10, 10)), _("riding accident"),
                    KILLED_BY_AN);
             set_wounded_legs(BOTH_SIDES, (int) HWounded_legs + rn1(5, 5));
             repair_leg_damage = FALSE;

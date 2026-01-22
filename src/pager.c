@@ -61,8 +61,8 @@ enum checkfileflags {
     chkfilIaCheck  = 4,
 };
 
-static const char *invisexplain = _("remembered, unseen, creature"),
-           *altinvisexplain = _("unseen creature"); /* for clairvoyance */
+static const char *invisexplain = "remembered, unseen, creature",
+           *altinvisexplain = "unseen creature"; /* for clairvoyance */
 
 /* Returns "true" for characters that could represent a monster's stomach. */
 staticfn boolean
@@ -566,7 +566,7 @@ waterbody_name(coordxy x, coordxy y)
     boolean hallucinate = Hallucination && !program_state.gameover;
 
     if (!isok(x, y))
-        return "drink"; /* should never happen */
+        return _("drink"); /* should never happen */
     ltyp = SURFACE_AT(x, y);
 
     if (ltyp == LAVAPOOL) {
@@ -574,7 +574,7 @@ waterbody_name(coordxy x, coordxy y)
         return pooltype;
     } else if (ltyp == ICE) {
         if (!hallucinate)
-            return "ice";
+            return _("ice");
         Snprintf(pooltype, sizeof pooltype, "frozen %s", hliquid("water"));
         return pooltype;
     } else if (ltyp == POOL) {
@@ -588,19 +588,19 @@ waterbody_name(coordxy x, coordxy y)
         } else if (Is_medusa_level(&u.uz)) {
             /* somewhat iffy since ordinary stairs can take you beneath,
                but previous generic "water" was rather anti-climactic */
-            return "shallow sea";
+            return _("shallow sea");
         } else if (Is_juiblex_level(&u.uz)) {
-            return "swamp";
+            return _("swamp");
         } else if (Role_if(PM_SAMURAI) && Is_qstart(&u.uz)) {
             /* samurai quest home level has two isolated moat spots;
                they sound silly if farlook describes them as such */
-            return "pond";
+            return _("pond");
         } else {
-            return "moat";
+            return _("moat");
         }
     } else if (IS_WATERWALL(ltyp)) {
         if (Is_waterlevel(&u.uz))
-            return "limitless water"; /* even if hallucinating */
+            return _("limitless water"); /* even if hallucinating */
         Snprintf(pooltype, sizeof pooltype, "wall of %s", hliquid("water"));
         return pooltype;
     } else if (ltyp == LAVAWALL) {
@@ -608,19 +608,19 @@ waterbody_name(coordxy x, coordxy y)
         return pooltype;
     }
     /* default; should be unreachable */
-    return "water"; /* don't hallucinate this as some other liquid */
+    return _("water"); /* don't hallucinate this as some other liquid */
 }
 
 char *
 ice_descr(coordxy x, coordxy y, char *outbuf)
 {
     static const char *const icetyp[] = {
-        "solid",    /* 0: not melting */
-        "sturdy",   /* 1: more than 1000 turns left */
-        "steady",   /* 2: 101..1000 turns left */
-        "unsteady", /* 3:  51..100 turns left */
-        "thin",     /* 4:  15..50 turns left */
-        "slushy",   /* 5:   1..14 turns left; matches Warning on ice */
+        N_("solid"),    /* 0: not melting */
+        N_("sturdy"),   /* 1: more than 1000 turns left */
+        N_("steady"),   /* 2: 101..1000 turns left */
+        N_("unsteady"), /* 3:  51..100 turns left */
+        N_("thin"),     /* 4:  15..50 turns left */
+        N_("slushy"),   /* 5:   1..14 turns left; matches Warning on ice */
     };
     /* same formula as is used in distant_name() for objects */
     int r = (u.xray_range > 2) ? u.xray_range : 2,
@@ -644,7 +644,7 @@ ice_descr(coordxy x, coordxy y, char *outbuf)
                                 : (time_left > 50L) ? 3   /* unsteady */
                                   : (time_left > 14L) ? 4 /* thin */
                                     : 5;                  /* slushy */
-        Sprintf(outbuf, "%s %s", icetyp[(int) iflags.ice_rating],
+        Sprintf(outbuf, "%s %s", _(icetyp[(int) iflags.ice_rating]),
                 waterbody_name(x, y));
     }
     return outbuf;
@@ -725,7 +725,7 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
 
         Strcpy(buf, def_warnsyms[warnindx].explanation);
     } else if (glyph_is_invisible(glyph)) {
-        Strcpy(buf, invisexplain); /* redundant; handled by caller */
+        Strcpy(buf, _(invisexplain)); /* redundant; handled by caller */
     } else if (glyph_is_nothing(glyph)) {
         Strcpy(buf, _("dark part of a room"));
     } else if (glyph_is_unexplored(glyph)) {
@@ -1350,7 +1350,7 @@ do_screen_description(
                        && u_at(cc.x, cc.y))
                     : (sym == def_monsyms[S_HUMAN].sym && !flags.showrace))
             && !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
-            found += append_str(out_str, "you"); /* tack on "or you" */
+            found += append_str(out_str, _("you")); /* tack on "or you" */
     }
 
     /* Now check for objects */
@@ -1406,8 +1406,8 @@ do_screen_description(
     if (sym == DEF_INVISIBLE) {
         /* for active clairvoyance, use alternate "unseen creature" */
         boolean usealt = (EDetect_monsters & I_SPECIAL) != 0L;
-        const char *unseen_explain = (usealt || Blind) ? altinvisexplain
-                                                       : invisexplain;
+        const char *unseen_explain = (usealt || Blind) ? _(altinvisexplain)
+                                                       : _(invisexplain);
 
         if (!found) {
             Sprintf(out_str, "%s%s", prefix, an(unseen_explain));
@@ -1419,7 +1419,7 @@ do_screen_description(
     }
     if ((glyph && glyph_is_nothing(glyph))
         || (looked && sym == gs.showsyms[SYM_NOTHING + SYM_OFF_X])) {
-        x_str = "the dark part of a room";
+        x_str = _("the dark part of a room");
         if (!found) {
             Sprintf(out_str, "%s%s", prefix, x_str);
             *firstmatch = x_str;
@@ -1430,9 +1430,9 @@ do_screen_description(
     }
     if ((glyph && glyph_is_unexplored(glyph))
         || (looked && sym == gs.showsyms[SYM_UNEXPLORED + SYM_OFF_X])) {
-        x_str = "unexplored";
+        x_str = _("unexplored");
         if (submerged)
-            x_str = "land"; /* replace "unexplored" */
+            x_str = _("land"); /* replace "unexplored" */
         if (!found) {
             Sprintf(out_str, "%s%s", prefix, x_str);
             *firstmatch = x_str;
@@ -1586,7 +1586,7 @@ do_screen_description(
         /* 3.6.3: this used to be "That can be many things" (without prefix)
            which turned it into a sentence that lacked its terminating period;
            we could add one below but reinstating the prefix here is better */
-        Sprintf(out_str, "%scan be many things", prefix);
+        Sprintf(out_str, _("%scan be many things"), prefix);
 
  didlook:
     if (looked) {
@@ -1664,7 +1664,7 @@ add_quoted_engraving(
 }
 
 /* also used by getpos hack in getpos.c */
-const char what_is_a_location[] = "a monster, object or location";
+const char what_is_a_location[] = N_("a monster, object or location");
 
 int
 do_look(int mode, coord *click_cc)
@@ -1729,18 +1729,18 @@ do_look(int mode, coord *click_cc)
             add_menu(win, &nul_glyphinfo, &any,
                      flags.lootabc ? 0 : any.a_char,
                      flags.lootabc ? '/' : 'y', ATR_NONE,
-                     clr, "something on the map", MENU_ITEMFLAGS_NONE);
+                     clr, _("something on the map"), MENU_ITEMFLAGS_NONE);
             any.a_char = 'i';
             add_menu(win, &nul_glyphinfo, &any,
                      /* [don't use 'i' as lootabc group accelerator because
                         it will make the regular 'i' choice inaccessible] */
                      flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                     clr, "something you're carrying", MENU_ITEMFLAGS_NONE);
+                     clr, _("something you're carrying"), MENU_ITEMFLAGS_NONE);
             any.a_char = '?';
             add_menu(win, &nul_glyphinfo, &any,
                      flags.lootabc ? 0 : any.a_char,
                      flags.lootabc ? '?' : 'n', ATR_NONE,
-                     clr, "something else (by symbol or name)",
+                     clr, _("something else (by symbol or name)"),
                      MENU_ITEMFLAGS_NONE);
             if (!u.uswallow && !Hallucination) {
                 any = cg.zeroany;
@@ -1755,46 +1755,46 @@ do_look(int mode, coord *click_cc)
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
-                         clr, "nearby monsters", MENU_ITEMFLAGS_NONE);
+                         clr, _("nearby monsters"), MENU_ITEMFLAGS_NONE);
                 any.a_char = 'M';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
-                         clr, "all monsters shown on map",
+                         clr, _("all monsters shown on map"),
                          MENU_ITEMFLAGS_NONE);
                 any.a_char = 'o';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
-                         clr, "nearby objects", MENU_ITEMFLAGS_NONE);
+                         clr, _("nearby objects"), MENU_ITEMFLAGS_NONE);
                 any.a_char = 'O';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : 0, ATR_NONE,
-                         clr, "all objects shown on map",
+                         clr, _("all objects shown on map"),
                          MENU_ITEMFLAGS_NONE);
                 any.a_char = 't';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : '^', ATR_NONE,
-                         clr, "nearby traps", MENU_ITEMFLAGS_NONE);
+                         clr, _("nearby traps"), MENU_ITEMFLAGS_NONE);
                 any.a_char = 'T';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : '\"', ATR_NONE,
-                         clr, "all seen or remembered traps",
+                         clr, _("all seen or remembered traps"),
                          MENU_ITEMFLAGS_NONE);
                 any.a_char = 'e';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          /* [don't use 'e' as lootabc group accelerator] */
                          flags.lootabc ? 0 : '`', ATR_NONE,
-                         clr, "nearby engravings", MENU_ITEMFLAGS_NONE);
+                         clr, _("nearby engravings"), MENU_ITEMFLAGS_NONE);
                 any.a_char = 'E';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char,
                          flags.lootabc ? any.a_char : '|', ATR_NONE,
-                         clr, "all seen or remembered engravings",
+                         clr, _("all seen or remembered engravings"),
                          MENU_ITEMFLAGS_NONE);
             }
             end_menu(win, _("What do you want to look at:"));
@@ -1900,9 +1900,9 @@ do_look(int mode, coord *click_cc)
             if (from_screen) {
                 if (flags.verbose)
                     pline(_("Please move the cursor to %s."),
-                          what_is_a_location);
+                          _(what_is_a_location));
                 else
-                    pline(_("Pick %s."), what_is_a_location);
+                    pline(_("Pick %s."), _(what_is_a_location));
 
                 ans = getpos(&cc, quick, what_is_a_location);
                 if (ans < 0 || cc.x < 0)
@@ -2001,7 +2001,7 @@ look_all(
                     }
                 } else if (glyph_is_invisible(glyph)) {
                     /* remembered, unseen, creature */
-                    Strcpy(lookbuf, invisexplain);
+                    Strcpy(lookbuf, _(invisexplain));
                     ++count;
                 } else if (glyph_is_warning(glyph)) {
                     int warnindx = glyph_to_warning(glyph);
@@ -2371,14 +2371,14 @@ doidtrap(void)
                   !trap->madeby_u
                      ? ""
                      : (tt == WEB)
-                        ? " woven"
+                        ? _(" woven")
                         /* trap doors & spiked pits can't be made by
                            player, and should be considered at least
                            as much "set" as "dug" anyway */
                         : (tt == HOLE || tt == PIT)
-                           ? " dug"
-                           : " set",
-                  !trap->madeby_u ? "" : " by you");
+                           ? _(" dug")
+                           : _(" set"),
+                  !trap->madeby_u ? "" : _(" by you"));
             return ECMD_OK;
         }
     pline(_("I can't see a trap there."));

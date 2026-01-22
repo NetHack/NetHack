@@ -151,7 +151,7 @@ calm_nymphs(int distance)
             mtmp->mstrategy &= ~STRAT_WAITMASK;
             if (canseemon(mtmp))
                 pline(
-                    "%s listens cheerfully to the music, then seems quieter.",
+                    _("%s listens cheerfully to the music, then seems quieter."),
                       Monnam(mtmp));
         }
     }
@@ -181,7 +181,7 @@ awaken_soldiers(struct monst *bugler  /* monster that played instrument */)
                 pline(_("%s is now ready for battle!"), Monnam(mtmp));
             else if (!Deaf)
                 Norep(_("%s the rattle of battle gear being readied."),
-                      "You hear");  /* Deaf-aware */
+                      _("You hear"));  /* Deaf-aware */
         } else if ((distm = ((bugler == &gy.youmonst)
                                  ? mdistu(mtmp)
                                  : dist2(bugler->mx, bugler->my, mtmp->mx,
@@ -234,7 +234,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
     if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
         if (cansee(x, y))
             pline(_("KADOOM!  The boulder falls into a chasm%s!"),
-                  u_at(x, y) ? " below you" : "");
+                  u_at(x, y) ? _(" below you") : "");
         if (mtmp)
             mtmp->mtrapped = 0;
         obj_extract_self(otmp);
@@ -271,7 +271,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
             }
             /* Falling is okay for falling down
                within a pit from jostling too */
-            mselftouch(mtmp, "Falling, ", TRUE);
+            mselftouch(mtmp, _("Falling, "), TRUE);
             if (!DEADMONSTER(mtmp)) {
                 mtmp->mhp -= rnd(m_already_trapped ? 4 : 6);
                 if (DEADMONSTER(mtmp)) {
@@ -312,7 +312,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
             You(_("fall into a chasm!"));
             set_utrap(rn1(6, 2), TT_PIT);
             losehp(Maybe_Half_Phys(rnd(6)),
-                   "fell into a chasm", NO_KILLER_PREFIX);
+                   _("fell into a chasm"), NO_KILLER_PREFIX);
             selftouch(_("Falling, you"));
         } else if (u.utrap && u.utraptype == TT_PIT) {
             boolean keepfooting =
@@ -323,7 +323,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
             You(_("are jostled around violently!"));
             set_utrap(rn1(6, 2), TT_PIT);
             losehp(Maybe_Half_Phys(rnd(keepfooting ? 2 : 4)),
-                   "hurt in a chasm", NO_KILLER_PREFIX);
+                   _("hurt in a chasm"), NO_KILLER_PREFIX);
             if (keepfooting)
                 exercise(A_DEX, TRUE);
             else
@@ -478,17 +478,17 @@ staticfn const char *
 generic_lvl_desc(void)
 {
     if (Is_astralevel(&u.uz))
-        return "astral plane";
+        return _("astral plane");
     else if (In_endgame(&u.uz))
-        return "plane";
+        return _("plane");
     else if (Is_sanctum(&u.uz))
-        return "sanctum";
+        return _("sanctum");
     else if (In_sokoban(&u.uz))
-        return "puzzle";
+        return _("puzzle");
     else if (In_V_tower(&u.uz))
-        return "tower";
+        return _("tower");
     else
-        return "dungeon";
+        return _("dungeon");
 }
 
 static const char *beats[] = {
@@ -619,7 +619,7 @@ do_improvisation(struct obj *instr)
             if ((damage = zapyourself(instr, TRUE)) != 0) {
                 char buf[BUFSZ];
 
-                Sprintf(buf, "using a magical horn on %sself", uhim());
+                Sprintf(buf, _("using a magical horn on %sself"), uhim());
                 Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
                 losehp(damage, buf, KILLED_BY); /* fire or frost damage */
             }
@@ -639,7 +639,7 @@ do_improvisation(struct obj *instr)
     case TOOLED_HORN: /* Awaken or scare monsters */
         if (!Deaf)
             You(_("produce a frightful, grave%s sound."),
-                same_old_song ? ", yet familiar," : "");
+                same_old_song ? _(", yet familiar,") : "");
         else
             You(_("blow into the horn."));
         Hero_playnotes(obj_to_instr(&itmp), improvisation, 80);
@@ -649,7 +649,7 @@ do_improvisation(struct obj *instr)
     case BUGLE: /* Awaken & attract soldiers */
         if (!Deaf)
             You(_("extract a loud%s noise from %s."),
-                same_old_song ? ", familiar" : "", yname(instr));
+                same_old_song ? _(", familiar") : "", yname(instr));
         else
             You(_("blow into the bugle."));
         Hero_playnotes(obj_to_instr(&itmp), improvisation, 80);
@@ -674,10 +674,10 @@ do_improvisation(struct obj *instr)
         if (!Deaf)
             pline(_("%s %s."), Yname2(instr),
                   (do_spec && same_old_song)
-                  ? "produces a familiar, lilting melody"
-                  : (do_spec) ? "produces a lilting melody"
-                    : (same_old_song) ? "twangs a familiar tune"
-                      : "twangs");
+                  ? _("produces a familiar, lilting melody")
+                  : (do_spec) ? _("produces a lilting melody")
+                    : (same_old_song) ? _("twangs a familiar tune")
+                      : _("twangs"));
         else
             You_feel(_("soothing vibrations."));
         Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
@@ -704,7 +704,7 @@ do_improvisation(struct obj *instr)
         if (!mundane) {
             if (!Deaf) {
                 You(_("beat a %sdeafening row!"),
-                    same_old_song ? "familiar " : "");
+                    same_old_song ? _("familiar ") : "");
                 Hero_playnotes(obj_to_instr(&itmp), "CCC", 100);
                 incr_itimeout(&HDeaf, rn1(20, 30));
             } else {

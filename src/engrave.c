@@ -835,7 +835,7 @@ doengrave_sfx_item(struct _doengrave_ctx *de)
     case TOOL_CLASS:
         if (de->otmp == ublindf) {
             pline(
-                "That is a bit difficult to engrave with, don't you think?");
+                _("That is a bit difficult to engrave with, don't you think?"));
             de->ret = ECMD_FAIL;
             return FALSE;
         }
@@ -973,14 +973,14 @@ doengrave(void)
      * Edited by GAN 10/20/86 so as not to change weapon wielded.
      */
 
-    de->otmp = getobj("write with", stylus_ok, GETOBJ_PROMPT);
+    de->otmp = getobj(_("write with"), stylus_ok, GETOBJ_PROMPT);
     if (!de->otmp) {/* otmp == &hands_obj if fingers */
         de->ret = ECMD_CANCEL;
         goto doengr_exit;
     }
 
     if (de->otmp == &hands_obj) {
-        Strcat(strcpy(de->fbuf, "your "), body_part(FINGERTIP));
+        Strcat(strcpy(de->fbuf, _("your ")), body_part(FINGERTIP));
         de->writer = de->fbuf;
     } else {
         de->writer = yname(de->otmp);
@@ -1176,7 +1176,7 @@ doengrave(void)
             /* since doname() yields "N items" when quantity is more than
                one, match that by using "1 of" rather than "one of" when
                informing the player that the stack will be split */
-            (de->type == ENGRAVE && de->otmp->quan > 1L) ? "1 of " : "",
+            (de->type == ENGRAVE && de->otmp->quan > 1L) ? _("1 of ") : "",
             doname(de->otmp));
     else
         You(_("%s the %s with your %s."),

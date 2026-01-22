@@ -120,7 +120,7 @@ picklock(void)
             /* disarming while using magic key always succeeds */
             if (gx.xlock.door) {
                 gx.xlock.door->doormask &= ~D_TRAPPED;
-                what = "door";
+                what = _("door");
                 alreadyunlocked = !(gx.xlock.door->doormask & D_LOCKED);
             } else {
                 gx.xlock.box->otrapped = 0;
@@ -422,7 +422,7 @@ pick_lock(
     if (rx != 0) { /* autounlock; caller has provided coordinates */
         cc.x = rx;
         cc.y = ry;
-    } else if (!get_adjacent_loc((char *) 0, "Invalid location!",
+    } else if (!get_adjacent_loc((char *) 0, _("Invalid location!"),
                                  u.ux, u.uy, &cc)) {
         return PICKLOCK_DID_NOTHING;
     }
@@ -461,13 +461,13 @@ pick_lock(
                 }
                 it = 0;
                 if (otmp->obroken)
-                    verb = "fix";
+                    verb = _("fix");
                 else if (!otmp->olocked)
-                    verb = "lock", it = 1;
+                    verb = _("lock"), it = 1;
                 else if (picktyp != LOCK_PICK)
-                    verb = "unlock", it = 1;
+                    verb = _("unlock"), it = 1;
                 else
-                    verb = "pick";
+                    verb = _("pick");
 
                 if (autounlock && (flags.autounlock & AUTOUNLOCK_UNTRAP) != 0
                     && could_untrap(FALSE, TRUE)
@@ -1292,25 +1292,25 @@ chest_shatter_msg(struct obj *otmp)
     HBlinded = save_HBlinded,  BBlinded = save_BBlinded;
     switch (objects[otmp->otyp].oc_material) {
     case PAPER:
-        disposition = "is torn to shreds";
+        disposition = _("is torn to shreds");
         break;
     case WAX:
-        disposition = "is crushed";
+        disposition = _("is crushed");
         break;
     case VEGGY:
-        disposition = "is pulped";
+        disposition = _("is pulped");
         break;
     case FLESH:
-        disposition = "is mashed";
+        disposition = _("is mashed");
         break;
     case GLASS:
-        disposition = "shatters";
+        disposition = _("shatters");
         break;
     case WOOD:
-        disposition = "splinters to fragments";
+        disposition = _("splinters to fragments");
         break;
     default:
-        disposition = "is destroyed";
+        disposition = _("is destroyed");
         break;
     }
     pline(_("%s %s!"), An(thing), disposition);

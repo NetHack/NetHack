@@ -32,7 +32,7 @@ staticfn void newman(void);
 staticfn void polysense(void);
 
 static const char no_longer_petrify_resistant[] =
-    "No longer petrify-resistant, you";
+    N_("No longer petrify-resistant, you");
 
 /* update the gy.youmonst.data structure pointer and intrinsics */
 void
@@ -240,7 +240,7 @@ polyman(const char *fmt, const char *arg)
             Strcpy(svk.killer.name, kptr->name);
         } else {
             svk.killer.format = KILLED_BY;
-            Strcpy(svk.killer.name, "self-genocide");
+            Strcpy(svk.killer.name, _("self-genocide"));
         }
         dealloc_killer(kptr);
         done(GENOCIDED);
@@ -422,7 +422,7 @@ newman(void)
             urgent_pline(
                      _("Your new form doesn't seem healthy enough to survive."));
             svk.killer.format = KILLED_BY_AN;
-            Strcpy(svk.killer.name, "unsuccessful polymorph");
+            Strcpy(svk.killer.name, _("unsuccessful polymorph"));
             done(DIED);
             /* must have been life-saved to get here */
             newuhs(FALSE);
@@ -437,7 +437,7 @@ newman(void)
                 : (gu.urace.individual.m)
                    ? gu.urace.individual.m
                    : gu.urace.noun;
-    polyman("You feel like a new %s!", newform);
+    polyman(_("You feel like a new %s!"), newform);
 
     newgend = poly_gender();
     /* note: newman() bypasses achievements for new ranks attained and
@@ -829,7 +829,7 @@ polymon(int mntmp)
     }
 
     if (Stone_resistance && Stoned) { /* parnes@eniac.seas.upenn.edu */
-        make_stoned(0L, "You no longer seem to be petrifying.", 0,
+        make_stoned(0L, _("You no longer seem to be petrifying."), 0,
                     (char *) 0);
     }
     if (Sick_resistance && Sick) {
@@ -838,7 +838,7 @@ polymon(int mntmp)
     }
     if (Slimed) {
         if (flaming(gy.youmonst.data)) {
-            make_slimed(0L, "The slime burns away!");
+            make_slimed(0L, _("The slime burns away!"));
         } else if (mntmp == PM_GREEN_SLIME) {
             /* do it silently */
             make_slimed(0L, (char *) 0);
@@ -1357,7 +1357,7 @@ rehumanize(void)
     if (Unchanging) {
         if (u.mh < 1) {
             svk.killer.format = NO_KILLER_PREFIX;
-            Strcpy(svk.killer.name, "killed while stuck in creature form");
+            Strcpy(svk.killer.name, _("killed while stuck in creature form"));
             done(DIED);
             /* can get to here if declining to die in explore or wizard
                mode; since we're wearing an amulet of unchanging we can't
@@ -1377,13 +1377,13 @@ rehumanize(void)
 
     if (emits_light(gy.youmonst.data))
         del_light_source(LS_MONSTER, monst_to_any(&gy.youmonst));
-    polyman("You return to %s form!", gu.urace.adj);
+    polyman(_("You return to %s form!"), gu.urace.adj);
 
     if (u.uhp < 1) {
         /* can only happen if some bit of code reduces u.uhp
            instead of u.mh while poly'd */
         Your(_("old form was not healthy enough to survive."));
-        Sprintf(svk.killer.name, "reverting to unhealthy %s form",
+        Sprintf(svk.killer.name, _("reverting to unhealthy %s form"),
                 gu.urace.adj);
         svk.killer.format = KILLED_BY;
         done(DIED);
@@ -1513,13 +1513,13 @@ dospinweb(void)
                 sweep[0] = '\0';
                 switch (u.ustuck->data->mattk[i].adtyp) {
                 case AD_FIRE:
-                    Strcpy(sweep, "ignites and ");
+                    Strcpy(sweep, _("ignites and "));
                     break;
                 case AD_ELEC:
-                    Strcpy(sweep, "fries and ");
+                    Strcpy(sweep, _("fries and "));
                     break;
                 case AD_COLD:
-                    Strcpy(sweep, "freezes, shatters and ");
+                    Strcpy(sweep, _("freezes, shatters and "));
                     break;
                 }
                 pline_The(_("web %sis swept away!"), sweep);
@@ -1818,7 +1818,7 @@ dohide(void)
                turn into stone golems instead of becoming petrified */
             pline(_("Hiding under %s%s is a fatal mistake..."),
                   corpse_name, plur(ct));
-            Sprintf(kbuf, "hiding under %s%s", corpse_name, plur(ct));
+            Sprintf(kbuf, _("hiding under %s%s"), corpse_name, plur(ct));
             instapetrify(kbuf);
             /* only reach here if life-saved */
             u.uundetected = 0;
@@ -1956,79 +1956,79 @@ const char *
 mbodypart(struct monst *mon, int part)
 {
     static NEARDATA const char
-        *humanoid_parts[] = { "arm",       "eye",  "face",         "finger",
-                              "fingertip", "foot", "hand",         "handed",
-                              "head",      "leg",  "light headed", "neck",
-                              "spine",     "toe",  "hair",         "blood",
-                              "lung",      "nose", "stomach" },
-        *jelly_parts[] = { "pseudopod", "dark spot", "front",
-                           "pseudopod extension", "pseudopod extremity",
-                           "pseudopod root", "grasp", "grasped",
-                           "cerebral area", "lower pseudopod", "viscous",
-                           "middle", "surface", "pseudopod extremity",
-                           "ripples", "juices", "surface", "sensor",
-                           "stomach" },
-        *animal_parts[] = { "forelimb",  "eye",           "face",
-                            "foreclaw",  "claw tip",      "rear claw",
-                            "foreclaw",  "clawed",        "head",
-                            "rear limb", "light headed",  "neck",
-                            "spine",     "rear claw tip", "fur",
-                            "blood",     "lung",          "nose",
-                            "stomach" },
-        *bird_parts[] = { "wing",     "eye",  "face",         "wing",
-                          "wing tip", "foot", "wing",         "winged",
-                          "head",     "leg",  "light headed", "neck",
-                          "spine",    "toe",  "feathers",     "blood",
-                          "lung",     "bill", "stomach" },
-        *horse_parts[] = { "foreleg",  "eye",           "face",
-                           "forehoof", "hoof tip",      "rear hoof",
-                           "forehoof", "hooved",        "head",
-                           "rear leg", "light headed",  "neck",
-                           "backbone", "rear hoof tip", "mane",
-                           "blood",    "lung",          "nose",
-                           "stomach" },
-        *sphere_parts[] = { "appendage", "optic nerve", "body", "tentacle",
-                            "tentacle tip", "lower appendage", "tentacle",
-                            "tentacled", "body", "lower tentacle",
-                            "rotational", "equator", "body",
-                            "lower tentacle tip", "cilia", "life force",
-                            "retina", "olfactory nerve", "interior" },
-        *fungus_parts[] = { "mycelium", "visual area", "front",
-                            "hypha",    "hypha",       "root",
-                            "strand",   "stranded",    "cap area",
-                            "rhizome",  "sporulated",  "stalk",
-                            "root",     "rhizome tip", "spores",
-                            "juices",   "gill",        "gill",
-                            "interior" },
-        *vortex_parts[] = { "region",        "eye",           "front",
-                            "minor current", "minor current", "lower current",
-                            "swirl",         "swirled",       "central core",
-                            "lower current", "addled",        "center",
-                            "currents",      "edge",          "currents",
-                            "life force",    "center",        "leading edge",
-                            "interior" },
-        *snake_parts[] = { "vestigial limb", "eye", "face", "large scale",
-                           "large scale tip", "rear region", "scale gap",
-                           "scale gapped", "head", "rear region",
-                           "light headed", "neck", "length", "rear scale",
-                           "scales", "blood", "lung", "forked tongue",
-                           "stomach" },
-        *worm_parts[] = { "anterior segment", "light sensitive cell",
-                          "clitellum", "setae", "setae", "posterior segment",
-                          "segment", "segmented", "anterior segment",
-                          "posterior", "over stretched", "clitellum",
-                          "length", "posterior setae", "setae", "blood",
-                          "skin", "prostomium", "stomach" },
-        *spider_parts[] = { "pedipalp", "eye", "face", "pedipalp", "tarsus",
-                            "claw", "pedipalp", "palped", "cephalothorax",
-                            "leg", "spun out", "cephalothorax", "abdomen",
-                            "claw", "hair", "hemolymph", "book lung",
-                            "labrum", "digestive tract" },
-        *fish_parts[] = { "fin", "eye", "premaxillary", "pelvic axillary",
-                          "pelvic fin", "anal fin", "pectoral fin", "finned",
-                          "head", "peduncle", "played out", "gills",
-                          "dorsal fin", "caudal fin", "scales", "blood",
-                          "gill", "nostril", "stomach" };
+        *humanoid_parts[] = { N_("arm"),       N_("eye"),  N_("face"),         N_("finger"),
+                              N_("fingertip"), N_("foot"), N_("hand"),         N_("handed"),
+                              N_("head"),      N_("leg"),  N_("light headed"), N_("neck"),
+                              N_("spine"),     N_("toe"),  N_("hair"),         N_("blood"),
+                              N_("lung"),      N_("nose"), N_("stomach") },
+        *jelly_parts[] = { N_("pseudopod"), N_("dark spot"), N_("front"),
+                           N_("pseudopod extension"), N_("pseudopod extremity"),
+                           N_("pseudopod root"), N_("grasp"), N_("grasped"),
+                           N_("cerebral area"), N_("lower pseudopod"), N_("viscous"),
+                           N_("middle"), N_("surface"), N_("pseudopod extremity"),
+                           N_("ripples"), N_("juices"), N_("surface"), N_("sensor"),
+                           N_("stomach") },
+        *animal_parts[] = { N_("forelimb"),  N_("eye"),           N_("face"),
+                            N_("foreclaw"),  N_("claw tip"),      N_("rear claw"),
+                            N_("foreclaw"),  N_("clawed"),        N_("head"),
+                            N_("rear limb"), N_("light headed"),  N_("neck"),
+                            N_("spine"),     N_("rear claw tip"), N_("fur"),
+                            N_("blood"),     N_("lung"),          N_("nose"),
+                            N_("stomach") },
+        *bird_parts[] = { N_("wing"),     N_("eye"),  N_("face"),         N_("wing"),
+                          N_("wing tip"), N_("foot"), N_("wing"),         N_("winged"),
+                          N_("head"),     N_("leg"),  N_("light headed"), N_("neck"),
+                          N_("spine"),    N_("toe"),  N_("feathers"),     N_("blood"),
+                          N_("lung"),     N_("bill"), N_("stomach") },
+        *horse_parts[] = { N_("foreleg"),  N_("eye"),           N_("face"),
+                           N_("forehoof"), N_("hoof tip"),      N_("rear hoof"),
+                           N_("forehoof"), N_("hooved"),        N_("head"),
+                           N_("rear leg"), N_("light headed"),  N_("neck"),
+                           N_("backbone"), N_("rear hoof tip"), N_("mane"),
+                           N_("blood"),    N_("lung"),          N_("nose"),
+                           N_("stomach") },
+        *sphere_parts[] = { N_("appendage"), N_("optic nerve"), N_("body"), N_("tentacle"),
+                            N_("tentacle tip"), N_("lower appendage"), N_("tentacle"),
+                            N_("tentacled"), N_("body"), N_("lower tentacle"),
+                            N_("rotational"), N_("equator"), N_("body"),
+                            N_("lower tentacle tip"), N_("cilia"), N_("life force"),
+                            N_("retina"), N_("olfactory nerve"), N_("interior") },
+        *fungus_parts[] = { N_("mycelium"), N_("visual area"), N_("front"),
+                            N_("hypha"),    N_("hypha"),       N_("root"),
+                            N_("strand"),   N_("stranded"),    N_("cap area"),
+                            N_("rhizome"),  N_("sporulated"),  N_("stalk"),
+                            N_("root"),     N_("rhizome tip"), N_("spores"),
+                            N_("juices"),   N_("gill"),        N_("gill"),
+                            N_("interior") },
+        *vortex_parts[] = { N_("region"),        N_("eye"),           N_("front"),
+                            N_("minor current"), N_("minor current"), N_("lower current"),
+                            N_("swirl"),         N_("swirled"),       N_("central core"),
+                            N_("lower current"), N_("addled"),        N_("center"),
+                            N_("currents"),      N_("edge"),          N_("currents"),
+                            N_("life force"),    N_("center"),        N_("leading edge"),
+                            N_("interior") },
+        *snake_parts[] = { N_("vestigial limb"), N_("eye"), N_("face"), N_("large scale"),
+                           N_("large scale tip"), N_("rear region"), N_("scale gap"),
+                           N_("scale gapped"), N_("head"), N_("rear region"),
+                           N_("light headed"), N_("neck"), N_("length"), N_("rear scale"),
+                           N_("scales"), N_("blood"), N_("lung"), N_("forked tongue"),
+                           N_("stomach") },
+        *worm_parts[] = { N_("anterior segment"), N_("light sensitive cell"),
+                          N_("clitellum"), N_("setae"), N_("setae"), N_("posterior segment"),
+                          N_("segment"), N_("segmented"), N_("anterior segment"),
+                          N_("posterior"), N_("over stretched"), N_("clitellum"),
+                          N_("length"), N_("posterior setae"), N_("setae"), N_("blood"),
+                          N_("skin"), N_("prostomium"), N_("stomach") },
+        *spider_parts[] = { N_("pedipalp"), N_("eye"), N_("face"), N_("pedipalp"), N_("tarsus"),
+                            N_("claw"), N_("pedipalp"), N_("palped"), N_("cephalothorax"),
+                            N_("leg"), N_("spun out"), N_("cephalothorax"), N_("abdomen"),
+                            N_("claw"), N_("hair"), N_("hemolymph"), N_("book lung"),
+                            N_("labrum"), N_("digestive tract") },
+        *fish_parts[] = { N_("fin"), N_("eye"), N_("premaxillary"), N_("pelvic axillary"),
+                          N_("pelvic fin"), N_("anal fin"), N_("pectoral fin"), N_("finned"),
+                          N_("head"), N_("peduncle"), N_("played out"), N_("gills"),
+                          N_("dorsal fin"), N_("caudal fin"), N_("scales"), N_("blood"),
+                          N_("gill"), N_("nostril"), N_("stomach") };
     /* claw attacks are overloaded in mons[]; most humanoids with
        such attacks should still reference hands rather than claws */
     static const char not_claws[] = {

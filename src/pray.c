@@ -441,7 +441,7 @@ fix_worst_trouble(int trouble)
     case TROUBLE_COLLAPSING:
         /* override Fixed_abil; uncurse that if feasible */
         You_feel(_("%sstronger."),
-                 (AMAX(A_STR) - ABASE(A_STR) > 6) ? "much " : "");
+                 (AMAX(A_STR) - ABASE(A_STR) > 6) ? _("much ") : "");
         ABASE(A_STR) = AMAX(A_STR);
         disp.botl = TRUE;
         if (Fixed_abil) {
@@ -612,7 +612,7 @@ god_zaps_you(aligntyp resp_god)
 {
     if (u.uswallow) {
         pline(
-          "Suddenly a bolt of lightning comes down at you from the heavens!");
+          _("Suddenly a bolt of lightning comes down at you from the heavens!"));
         pline(_("It strikes %s!"), mon_nam(u.ustuck));
         if (!resists_elec(u.ustuck)) {
             pline(_("%s fries to a crisp!"), Monnam(u.ustuck));
@@ -675,7 +675,7 @@ god_zaps_you(aligntyp resp_god)
             monstunseesu(M_SEEN_DISINT);
         } else {
             You(_("bask in its %s glow for a minute..."), NH_BLACK);
-            godvoice(resp_god, "I believe it not!");
+            godvoice(resp_god, _("I believe it not!"));
             monstseesu(M_SEEN_DISINT);
         }
         if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) {
@@ -694,10 +694,10 @@ god_zaps_you(aligntyp resp_god)
 staticfn void
 fry_by_god(aligntyp resp_god, boolean via_disintegration)
 {
-    You(_("%s!"), !via_disintegration ? "fry to a crisp"
-                                   : "disintegrate into a pile of dust");
+    You(_("%s!"), !via_disintegration ? _("fry to a crisp")
+                                   : _("disintegrate into a pile of dust"));
     svk.killer.format = KILLED_BY;
-    Sprintf(svk.killer.name, "the wrath of %s", align_gname(resp_god));
+    Sprintf(svk.killer.name, _("the wrath of %s"), align_gname(resp_god));
     done(DIED);
 }
 
@@ -792,7 +792,7 @@ at_your_feet(const char *str)
         str = Something;
     if (u.uswallow) {
         /* barrier between you and the floor */
-        pline(_("%s %s into %s %s."), str, vtense(str, "drop"),
+        pline(_("%s %s into %s %s."), str, vtense(str, _("drop")),
               s_suffix(mon_nam(u.ustuck)), mbodypart(u.ustuck, STOMACH));
     } else {
         pline(_("%s %s %s your %s!"), str,
@@ -860,8 +860,8 @@ gcrownu(void)
         already_exists = exist_artifact(RUNESWORD,
                                         artiname(ART_STORMBRINGER));
         what = (((already_exists && !in_hand) || class_gift != STRANGE_OBJECT)
-                ? "take lives"
-                : "steal souls");
+                ? _("take lives")
+                : _("steal souls"));
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize(_("Thou art chosen to %s for My Glory!"), what);
         livelog_printf(LL_DIVINEGIFT, "was chosen to %s for the Glory of %s",
@@ -930,7 +930,7 @@ gcrownu(void)
             obj = oname(obj, artiname(ART_VORPAL_BLADE),
                         ONAME_GIFT | ONAME_KNOW_ARTI);
             obj->spe = 1;
-            at_your_feet("A sword");
+            at_your_feet(_("A sword"));
             dropy(obj);
             u.ugifts++;
             livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
@@ -945,7 +945,7 @@ gcrownu(void)
     case A_CHAOTIC: {
         char swordbuf[BUFSZ];
 
-        Sprintf(swordbuf, "%s sword", hcolor(NH_BLACK));
+        Sprintf(swordbuf, _("%s sword"), hcolor(NH_BLACK));
         if (class_gift != STRANGE_OBJECT) {
             ; /* already got bonus above */
         } else if (obj && in_hand) {
@@ -1048,8 +1048,8 @@ give_spell(void)
             else
                 Your(_("knowledge of spell '%c' - %s is %s."),
                      spe_let, spe_name,
-                     (spe_knowledge == spe_Forgotten) ? "restored"
-                                                      : "refreshed");
+                     (spe_knowledge == spe_Forgotten) ? _("restored")
+                                                      : _("refreshed"));
         }
         obfree(otmp, (struct obj *) 0); /* discard the book */
     } else {
@@ -1453,7 +1453,7 @@ consume_offering(struct obj *otmp)
             break;
         case 2:
             Your(
-     "sacrifice collapses into a cloud of dancing particles and fades away!");
+     _("sacrifice collapses into a cloud of dancing particles and fades away!"));
             break;
         }
     else if (Blind && u.ualign.type == A_LAWFUL)
@@ -1461,10 +1461,10 @@ consume_offering(struct obj *otmp)
     else
         Your(_("sacrifice is consumed in a %s!"),
              (u.ualign.type == A_LAWFUL)
-                ? "flash of light"
+                ? _("flash of light")
                 : (u.ualign.type == A_NEUTRAL)
-                    ? "plume of smoke"
-                    : "burst of flame");
+                    ? _("plume of smoke")
+                    : _("burst of flame"));
     if (carried(otmp))
         useup(otmp);
     else
@@ -1487,12 +1487,12 @@ offer_too_soon(aligntyp altaralign)
         return;
     }
     You_feel(_("%s."), Hallucination
-                    ? "homesick"
+                    ? _("homesick")
                     /* if on track, give a big hint */
                     : (altaralign == u.ualign.type)
-                        ? "an urge to return to the surface"
+                        ? _("an urge to return to the surface")
                         /* else headed towards celestial disgrace */
-                        : "ashamed");
+                        : _("ashamed"));
 }
 
 void
@@ -1547,7 +1547,7 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
         /*[apparently shrug/snarl can be sensed without being seen]*/
         pline(_("%s shrugs and retains dominion over %s,"), Moloch, u_gname());
         pline(_("then mercilessly snuffs out your life."));
-        Sprintf(svk.killer.name, "%s indifference", s_suffix(Moloch));
+        Sprintf(svk.killer.name, _("%s indifference"), s_suffix(Moloch));
         svk.killer.format = KILLED_BY;
         done(DIED);
         /* life-saved (or declined to die in wizard/explore mode) */
@@ -1573,7 +1573,7 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
         u.uevent.ascended = 1;
         adjalign(10);
         pline(_("An invisible choir sings, and you are bathed in radiance..."));
-        godvoice(altaralign, "Mortal, thou hast done well!");
+        godvoice(altaralign, _("Mortal, thou hast done well!"));
         display_nhwindow(WIN_MESSAGE, FALSE);
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize(
@@ -1647,7 +1647,7 @@ offer_different_alignment_altar(
             u.ugangr += 3;
             adjalign(-5);
             pline(_("%s rejects your sacrifice!"), a_gname());
-            godvoice(altaralign, "Suffer, infidel!");
+            godvoice(altaralign, _("Suffer, infidel!"));
             change_luck(-5);
             (void) adjattrib(A_WIS, -2, TRUE);
             if (!Inhell)
@@ -1726,7 +1726,7 @@ sacrifice_your_race(
         /* is equivalent to demon summoning */
         if (altaralign == A_CHAOTIC && u.ualign.type != A_CHAOTIC) {
             pline(
-            "The blood floods the altar, which vanishes in %s cloud!",
+            _("The blood floods the altar, which vanishes in %s cloud!"),
                     an(hcolor(NH_BLACK)));
             levl[u.ux][u.uy].typ = ROOM;
             levl[u.ux][u.uy].altarmask = 0;
@@ -1804,15 +1804,15 @@ bestow_artifact(uchar max_giftvalue)
             if (otmp->cursed)
                 uncurse(otmp);
             otmp->oerodeproof = TRUE;
-            Strcpy(buf, (Hallucination ? "a doodad"
-                            : Blind ? "an object"
+            Strcpy(buf, (Hallucination ? _("a doodad")
+                            : Blind ? _("an object")
                             : ansimpleoname(otmp)));
             if (!Blind)
-                Sprintf(eos(buf), " named %s",
+                Sprintf(eos(buf), _(" named %s"),
                         bare_artifactname(otmp));
             at_your_feet(upstart(buf));
             dropy(otmp);
-            godvoice(u.ualign.type, "Use my gift wisely!");
+            godvoice(u.ualign.type, _("Use my gift wisely!"));
             u.ugifts++;
             u.ublesscnt = rnz(300 + (50 * nartifacts));
             exercise(A_WIS, TRUE);
@@ -2292,8 +2292,8 @@ prayer_done(void) /* M. Stephenson (1.0.3b) */
         /* praying while poly'd into an undead creature while non-chaotic */
         godvoice(alignment,
                  (alignment == A_LAWFUL)
-                    ? "Vile creature, thou durst call upon me?"
-                    : "Walk no more, perversion of nature!");
+                    ? _("Vile creature, thou durst call upon me?")
+                    : _("Walk no more, perversion of nature!"));
         You_feel(_("like you are falling apart."));
         /* KMH -- Gods have mastery over unchanging */
         rehumanize();
@@ -2544,7 +2544,7 @@ align_gname(aligntyp alignment)
         break;
     default:
         impossible("unknown alignment.");
-        gnam = "someone";
+        gnam = N_("someone");
         break;
     }
     if (*gnam == '_')
@@ -2625,7 +2625,7 @@ halu_gname(aligntyp alignment)
 const char *
 align_gtitle(aligntyp alignment)
 {
-    const char *gnam, *result = "god";
+    const char *gnam, *result = N_("god");
 
     switch (alignment) {
     case A_LAWFUL:
@@ -2642,7 +2642,7 @@ align_gtitle(aligntyp alignment)
         break;
     }
     if (gnam && *gnam == '_')
-        result = "goddess";
+        result = N_("goddess");
     return result;
 }
 
@@ -2652,7 +2652,7 @@ altar_wrath(coordxy x, coordxy y)
     aligntyp altaralign = a_align(x, y);
 
     if (u.ualign.type == altaralign && u.ualign.record > -rn2(4)) {
-        godvoice(altaralign, "How darest thou desecrate my altar!");
+        godvoice(altaralign, _("How darest thou desecrate my altar!"));
         (void) adjattrib(A_WIS, -1, FALSE);
         u.ualign.record--;
     } else {

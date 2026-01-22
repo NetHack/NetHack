@@ -4,6 +4,7 @@
 
 #include "hack.h"
 #include "dlb.h"
+#include "i18n.h"
 
 /*  quest-specific pager routines. */
 
@@ -300,13 +301,13 @@ convert_arg(char c)
         str = align_gname(A_LAWFUL);
         break;
     case 'C':
-        str = "chaotic";
+        str = _("chaotic");
         break;
     case 'N':
-        str = "neutral";
+        str = _("neutral");
         break;
     case 'L':
-        str = "lawful";
+        str = _("lawful");
         break;
     case 'x':
         str = Blind ? _("sense") : _("see");

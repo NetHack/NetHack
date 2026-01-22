@@ -113,9 +113,9 @@ dynamic_multi_reason(struct monst *mon, const char *verb, boolean by_gaze)
     /* prefix info for done_in_by() */
     Sprintf(p, "%u:", mon->m_id);
     p = eos(p);
-    Sprintf(p, "%s by %s%s", verb,
+    Sprintf(p, _("%s by %s%s"), verb,
             !by_gaze ? who : s_suffix(who),
-            !by_gaze ? "" : " gaze");
+            !by_gaze ? "" : _(" gaze"));
     gm.multi_reason = p;
 }
 
@@ -663,7 +663,7 @@ hitum_cleave(
     /* find the direction toward primary target */
     i = xytod(u.dx, u.dy);
     if (i == DIR_ERR) {
-        impossible("hitum_cleave: unknown target direction [%d,%d,%d]?",
+        impossible(_("hitum_cleave: unknown target direction [%d,%d,%d]?"),
                    u.dx, u.dy, u.dz);
         return TRUE; /* target hasn't been killed */
     }
@@ -952,7 +952,7 @@ hmon_hitmon_weapon_melee(
                                    50 + 15 * (greatest_erosion(obj)
                                               - greatest_erosion(monwep)),
                                    100))) {
-        static const char from_your_blow[] = " from the force of your blow!";
+        const char *from_your_blow = _(" from the force of your blow!");
         char buf[BUFSZ];
         /*
          * 2.5% chance of shattering defender's weapon when
@@ -1251,7 +1251,7 @@ hmon_hitmon_misc_obj(
                       : _("Splash!"));
             } else if (obj->otyp == BLINDING_VENOM) {
                 pline_The(_("venom blinds %s%s!"), mon_nam(mon),
-                          mon->mcansee ? "" : " further");
+                          mon->mcansee ? "" : _(" further"));
             } else {
                 char *whom = mon_nam(mon);
                 char *what = The(xname(obj));
@@ -1261,7 +1261,7 @@ hmon_hitmon_misc_obj(
                 /* note: s_suffix returns a modifiable buffer */
                 if (haseyes(hmd->mdat)
                     && hmd->mdat != &mons[PM_FLOATING_EYE])
-                    whom = strcat(strcat(s_suffix(whom), " "),
+                    whom = strcat(strcat(s_suffix(whom), _(" ")),
                                   mbodypart(mon, FACE));
                 pline(_("%s %s over %s!"), what,
                       vtense(what, _("splash")), whom);
@@ -1601,7 +1601,7 @@ hmon_hitmon_splitmon(
         if ((mclone = clone_mon(mon, 0, 0)) != 0) {
             withwhat[0] = '\0';
             if (u.twoweap && flags.verbose)
-                Sprintf(withwhat, " with %s", yname(obj));
+                Sprintf(withwhat, _(" with %s"), yname(obj));
             pline(_("%s divides as you hit it%s!"), Monnam(mon), withwhat);
             hmd->hittxt = TRUE;
             (void) mintrap(mclone, NO_TRAP_FLAGS);
@@ -1668,7 +1668,7 @@ hmon_hitmon_msg_silver(
     }
     /* note: s_suffix returns a modifiable buffer */
     if (!noncorporeal(hmd->mdat) && !amorphous(hmd->mdat))
-        whom = strcat(s_suffix(whom), " flesh");
+        whom = strcat(s_suffix(whom), _(" flesh"));
     DISABLE_WARNING_FORMAT_NONLITERAL
     pline(fmt, whom);
     RESTORE_WARNING_FORMAT_NONLITERAL
@@ -1687,9 +1687,9 @@ hmon_hitmon_msg_lightobj(
     if (canspotmon(mon)) {
         if (hmd->saved_oname[0]) {
             Sprintf(emitlightobjbuf,
-                    "%s radiance penetrates deep into",
+                    _("%s radiance penetrates deep into"),
                     s_suffix(hmd->saved_oname));
-            Strcat(emitlightobjbuf, " %s!");
+            Strcat(emitlightobjbuf, _(" %s!"));
             fmt = emitlightobjbuf;
         } else
             fmt = _("The light sears %s!");
@@ -1699,7 +1699,7 @@ hmon_hitmon_msg_lightobj(
     }
     /* note: s_suffix returns a modifiable buffer */
     if (!noncorporeal(hmd->mdat) && !amorphous(hmd->mdat))
-        whom = strcat(s_suffix(whom), " flesh");
+        whom = strcat(s_suffix(whom), _(" flesh"));
     DISABLE_WARNING_FORMAT_NONLITERAL
     pline(fmt, whom);
     RESTORE_WARNING_FORMAT_NONLITERAL
@@ -2006,10 +2006,10 @@ shade_miss(
     if (verbose
         && ((youdef || cansee(mdef->mx, mdef->my) || sensemon(mdef))
             || (magr == &gy.youmonst && m_next2u(mdef)))) {
-        static const char harmlessly_thru[] = " harmlessly through ";
+        const char *harmlessly_thru = _(" harmlessly through ");
 
-        what = (!obj || shade_aware(obj)) ? "attack" : cxname(obj);
-        target = youdef ? "you" : mon_nam(mdef);
+        what = (!obj || shade_aware(obj)) ? _("attack") : cxname(obj);
+        target = youdef ? _("you") : mon_nam(mdef);
         if (!thrown) {
             whose = youagr ? _("Your") : s_suffix(Monnam(magr));
             pline(_("%s %s %s%s%s."), whose, what,
@@ -2219,8 +2219,8 @@ steal_it(struct monst *mdef, struct attack *mattk)
             pline(_("%s finishes taking off %s suit."), Monnam(mdef),
                   mhis(mdef));
         /* give the object to the character */
-        otmp = hold_another_object(otmp, "You snatched but dropped %s.",
-                                   doname(otmp), "You steal: ");
+        otmp = hold_another_object(otmp, _("You snatched but dropped %s."),
+                                   doname(otmp), _("You steal: "));
         /* might have dropped otmp, and it might have broken or left level */
         if (!otmp || otmp->where != OBJ_INVENT)
             continue;
@@ -3128,7 +3128,7 @@ mhitm_ad_drst(
         }
         hitmsg(magr, mattk);
         if (!negated && !rn2(8)) {
-            Sprintf(buf, "%s %s", s_suffix(Monnam(magr)),
+            Sprintf(buf, _("%s %s"), s_suffix(Monnam(magr)),
                     mpoisons_subj(magr, mattk));
             poisoned(buf, ptmp, pmname(pa, Mgender(magr)), 30, FALSE);
         }
@@ -3371,8 +3371,8 @@ mhitm_ad_wrap(
 
                     urgent_pline(_("%s drowns you..."), Monnam(magr));
                     svk.killer.format = KILLED_BY_AN;
-                    Sprintf(svk.killer.name, "%s by %s",
-                            moat ? "moat" : "pool of water",
+                    Sprintf(svk.killer.name, _("%s by %s"),
+                            moat ? _("moat") : _("pool of water"),
                             an(pmname(magr->data, Mgender(magr))));
                     done(DROWNING);
                 } else if (mattk->aatyp == AT_HUGS) {
@@ -3966,7 +3966,7 @@ mhitm_ad_phys(
         if (pd == &mons[PM_SHADE]) {
             mhm->damage = 0;
             if (!mhm->specialdmg)
-                impossible("bad shade attack function flow?");
+                impossible(_("bad shade attack function flow?"));
         }
         mhm->damage += mhm->specialdmg;
 
@@ -4086,7 +4086,7 @@ mhitm_ad_phys(
                     /* similar to mhitm_really_poison, but we don't use the
                      * exact same values, nor do we want same 1/8 chance of
                      * poison taking (use 1/4, same as in the mhitm case). */
-                    Sprintf(buf, "%s %s", s_suffix(Monnam(magr)),
+                    Sprintf(buf, _("%s %s"), s_suffix(Monnam(magr)),
                             mpoisons_subj(magr, mattk));
                     /* arbitrary, but most poison sources in the game are
                      * strength-based. With hpdamchance = 10, HP damage occurs
@@ -5013,7 +5013,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                 if (is_rider(pd)) {
                     pline(_("Unfortunately, digesting any of it is fatal."));
                     end_engulf();
-                    Sprintf(svk.killer.name, "unwisely tried to eat %s",
+                    Sprintf(svk.killer.name, _("unwisely tried to eat %s"),
                             pmname(pd, Mgender(mdef)));
                     svk.killer.format = NO_KILLER_PREFIX;
                     done(DIED);
@@ -5335,11 +5335,11 @@ mhitm_knockback(
 
     /* give the message */
     if (u_def || canseemon(mdef)) {
-        Strcpy(magrbuf, u_agr ? "You" : Monnam(magr));
-        Strcpy(mdefbuf, (u_def || was_u) ? "you" : y_monnam(mdef));
+        Strcpy(magrbuf, u_agr ? _("You") : Monnam(magr));
+        Strcpy(mdefbuf, (u_def || was_u) ? _("you") : y_monnam(mdef));
         if (was_u)
             Snprintf(eos(mdefbuf), sizeof mdefbuf - strlen(mdefbuf),
-                     " and %s", y_monnam(u.usteed));
+                     _(" and %s"), y_monnam(u.usteed));
         /*
          * uhitm: You knock the gnome back with a powerful blow!
          * mhitu: The red dragon knocks you back with a forceful blow!
@@ -5691,7 +5691,7 @@ hmonas(struct monst *mon)
                     unconcerned = FALSE;
             }
             if (mon->data == &mons[PM_SHADE]) {
-                const char *verb = byhand ? "grasp" : "hug";
+                const char *verb = byhand ? _("grasp") : _("hug");
 
                 /* hugging a shade; successful if blessed outermost armor
                    for normal hug, or blessed gloves or silver ring(s) for
@@ -5715,7 +5715,7 @@ hmonas(struct monst *mon)
                 pline(_("%s is being %s%s."), Monnam(mon),
                       byhand ? _("throttled") : _("crushed"),
                       /* extra feedback for non-breather being choked */
-                      unconcerned ? " but doesn't seem concerned" : "");
+                      unconcerned ? _(" but doesn't seem concerned") : "");
                 if (silverhit && flags.verbose)
                     silver_sears(&gy.youmonst, mon, silverhit);
                 sum[i] = damageum(mon, mattk, specialdmg);
@@ -5792,7 +5792,7 @@ hmonas(struct monst *mon)
             break;
 
         default: /* Strange... */
-            impossible("strange attack of yours (%d)", mattk->aatyp);
+            impossible(_("strange attack of yours (%d)"), mattk->aatyp);
         }
         if (dhit == -1) {
             u.mh = -1; /* dead in the current form */
@@ -6178,7 +6178,7 @@ that_is_a_mimic(
     struct monst *mtmp, /* a hidden mimic (nonnull) */
     unsigned mimic_flags) /* 0, MIM_REVEAL, MIM_OMIT_WAIT, REVEAL+OMIT */
 {
-    static char generic[] = "a monster";
+    const char *generic = _("a monster");
     char fmtbuf[BUFSZ];
     const char *what = NULL;
     boolean reveal_it = (mimic_flags & MIM_REVEAL) != 0,
@@ -6199,7 +6199,7 @@ that_is_a_mimic(
 
             if (M_AP_TYPE(mtmp) == M_AP_FURNITURE
                 || (M_AP_TYPE(mtmp) == M_AP_OBJECT && sym == S_trapped_chest))
-                Snprintf(fmtbuf, sizeof fmtbuf, "That %s actually is %%s!",
+                Snprintf(fmtbuf, sizeof fmtbuf, _("That %s actually is %%s!"),
                          defsyms[sym].explanation);
         } else if (glyph_is_object(glyph)) {
             boolean fakeobj;
@@ -6223,7 +6223,7 @@ that_is_a_mimic(
             assert(mndx >= LOW_PM && mndx <= HIGH_PM);
             mtmp_name = pmname(&mons[mndx], Mgender(mtmp));
             Snprintf(fmtbuf, sizeof fmtbuf,
-                     "Wait!  That %s is really %%s!", mtmp_name);
+                     _("Wait!  That %s is really %%s!"), mtmp_name);
         }
 
         /* cloned Wiz starts out mimicking some other monster and
@@ -6237,7 +6237,7 @@ that_is_a_mimic(
                      || M_AP_TYPE(mtmp) == M_AP_FURNITURE)
                  && (mtmp->msleeping || mtmp->mfrozen))
             /* BUG: this will misclassify a paralyzed mimic as sleeping */
-            what = x_monnam(mtmp, ARTICLE_A, "sleeping", 0, FALSE);
+            what = x_monnam(mtmp, ARTICLE_A, _("sleeping"), 0, FALSE);
         else
             what = a_monnam(mtmp);
     }
@@ -6402,11 +6402,11 @@ light_hits_gremlin(struct monst *mon, int dmg)
 {
     if (!Deaf && mdistu(mon) <= 90) {
         /* cry of pain can be heard somewhat farther than the waking radius */
-        pline_mon(mon, "%s %s!", Monnam(mon),
-                  (dmg > mon->mhp / 2) ? "wails in agony"
-                                       : "cries out in pain");
+        pline_mon(mon, _("%s %s!"), Monnam(mon),
+                  (dmg > mon->mhp / 2) ? _("wails in agony")
+                                       : _("cries out in pain"));
     } else if (canseemon(mon)) {
-        pline_mon(mon, "%s recoils from the light!", Monnam(mon));
+        pline_mon(mon, _("%s recoils from the light!"), Monnam(mon));
     }
     mon->mhp -= dmg;
     wake_nearto(mon->mx, mon->my, 30);

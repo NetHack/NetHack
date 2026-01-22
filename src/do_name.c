@@ -164,8 +164,8 @@ alreadynamed(struct monst *mtmp, char *monnambuf, char *usrbuf)
                                   || type_is_pname(mtmp->data)
                                   || mtmp->isshk);
         pline(_("%s would rather keep %s existing %s."), upstart(monnambuf),
-              is_rider(mtmp->data) ? "its" : mhis(mtmp),
-              name_not_title ? "name" : "title");
+              is_rider(mtmp->data) ? _("its") : mhis(mtmp),
+              name_not_title ? _("name") : _("title"));
         return TRUE;
     } else if (fuzzymatch(usrbuf, monnambuf, " -_", TRUE)
                /* catch trying to name "the Oracle" as "Oracle" */
@@ -210,7 +210,7 @@ do_mgivenname(void)
     }
     cc.x = u.ux;
     cc.y = u.uy;
-    if (getpos(&cc, FALSE, "the monster you want to name") < 0
+    if (getpos(&cc, FALSE, _("the monster you want to name")) < 0
         || !isok(cc.x, cc.y))
         return;
     cx = cc.x, cy = cc.y;
@@ -522,30 +522,30 @@ docallcmd(void)
     any = cg.zeroany;
     any.a_char = 'm'; /* group accelerator 'C' */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'C',
-             ATR_NONE, clr, "a monster", MENU_ITEMFLAGS_NONE);
+             ATR_NONE, clr, _("a monster"), MENU_ITEMFLAGS_NONE);
     if (gi.invent) {
         /* we use y and n as accelerators so that we can accept user's
            response keyed to old "name an individual object?" prompt */
         any.a_char = 'i'; /* group accelerator 'y' */
         add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'y',
-                 ATR_NONE, clr, "a particular object in inventory",
+                 ATR_NONE, clr, _("a particular object in inventory"),
                  MENU_ITEMFLAGS_NONE);
         any.a_char = 'o'; /* group accelerator 'n' */
         add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'n',
-                 ATR_NONE, clr, "the type of an object in inventory",
+                 ATR_NONE, clr, _("the type of an object in inventory"),
                  MENU_ITEMFLAGS_NONE);
     }
     any.a_char = 'f'; /* group accelerator ',' (or ':' instead?) */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, ',',
-             ATR_NONE, clr, "the type of an object upon the floor",
+             ATR_NONE, clr, _("the type of an object upon the floor"),
              MENU_ITEMFLAGS_NONE);
     any.a_char = 'd'; /* group accelerator '\' */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, '\\',
-             ATR_NONE, clr, "the type of an object on discoveries list",
+             ATR_NONE, clr, _("the type of an object on discoveries list"),
              MENU_ITEMFLAGS_NONE);
     any.a_char = 'a'; /* group accelerator 'l' */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'l',
-             ATR_NONE, clr, "record an annotation for the current level",
+             ATR_NONE, clr, _("record an annotation for the current level"),
              MENU_ITEMFLAGS_NONE);
     end_menu(win, _("What do you want to name?"));
     if (select_menu(win, PICK_ONE, &pick_list) > 0) {
@@ -564,12 +564,12 @@ docallcmd(void)
         do_mgivenname();
         break;
     case 'i': /* name an individual object in inventory */
-        obj = getobj("name", name_ok, GETOBJ_PROMPT);
+        obj = getobj(_("name"), name_ok, GETOBJ_PROMPT);
         if (obj)
             do_oname(obj);
         break;
     case 'o': /* name a type of object in inventory */
-        obj = getobj("call", call_ok, GETOBJ_NOFLAGS);
+        obj = getobj(_("call"), call_ok, GETOBJ_NOFLAGS);
         if (obj) {
             /* behave as if examining it in inventory;
                this might set dknown if it was picked up
@@ -841,7 +841,7 @@ x_monnam(
     char *bp, buf2[BUFSZ];
 
     if (mtmp == &gy.youmonst)
-        return strcpy(buf, "you"); /* ignore article, "invisible", &c */
+        return strcpy(buf, _("you")); /* ignore article, "invisible", &c */
 
     if (program_state.gameover)
         suppress |= SUPPRESS_HALLUCINATION;
@@ -877,9 +877,9 @@ x_monnam(
         /* !is_animal excludes all Y; !mindless excludes Z, M, \' */
         boolean s_one = humanoid(mdat) && !is_animal(mdat) && !mindless(mdat);
 
-        Strcpy(buf, !augment_it ? "it"
-                    : (!do_hallu ? s_one : !rn2(2)) ? "someone"
-                      : "something");
+        Strcpy(buf, !augment_it ? _("it")
+                    : (!do_hallu ? s_one : !rn2(2)) ? _("someone")
+                      : _("something"));
         return buf;
     }
 
@@ -939,10 +939,10 @@ x_monnam(
     if (adjective)
         Strcat(strcat(buf, adjective), " ");
     if (do_invis)
-        Strcat(buf, "invisible ");
+        Strcat(buf, _("invisible "));
     if (do_saddle && (mtmp->misc_worn_check & W_SADDLE) && !Blind
         && !Hallucination)
-        Strcat(buf, "saddled ");
+        Strcat(buf, _("saddled "));
     has_adjectives = (buf[0] != '\0');
 
     /* Put the actual monster name or type into the buffer now.
@@ -1013,10 +1013,10 @@ x_monnam(
 #ifdef ENABLE_NLS
         if (is_korean_locale()) {
             /* Korean: "당신의 " prefix */
-            Strcpy(buf2, "당신의 ");
+            Strcpy(buf2, _("your "));
         } else
 #endif
-        Strcpy(buf2, "your ");
+        Strcpy(buf2, _("your "));
         break;
     case ARTICLE_THE:
 #ifdef ENABLE_NLS
@@ -1025,7 +1025,7 @@ x_monnam(
             Strcpy(buf2, "");
         } else
 #endif
-        Strcpy(buf2, "the ");
+        Strcpy(buf2, _("the "));
         break;
     case ARTICLE_A:
 #ifdef ENABLE_NLS
@@ -1216,17 +1216,17 @@ mon_nam_too(struct monst *mon, struct monst *other_mon)
         outbuf = nextmbuf();
         switch (pronoun_gender(mon, PRONOUN_HALLU)) {
         case 0:
-            Strcpy(outbuf, "himself");
+            Strcpy(outbuf, _("himself"));
             break;
         case 1:
-            Strcpy(outbuf, "herself");
+            Strcpy(outbuf, _("herself"));
             break;
         default:
         case 2:
-            Strcpy(outbuf, "itself");
+            Strcpy(outbuf, _("itself"));
             break;
         case 3: /* could happen when hallucinating */
-            Strcpy(outbuf, "themselves");
+            Strcpy(outbuf, _("themselves"));
             break;
         }
     }
@@ -1322,7 +1322,7 @@ pmname(struct permonst *pm, int mgender)
 {
     if (mgender < MALE || mgender >= NUM_MGENDERS || !pm->pmnames[mgender])
         mgender = NEUTRAL;
-    return pm->pmnames[mgender];
+    return _(pm->pmnames[mgender]);
 }
 #endif /* PMNAME_MACROS */
 

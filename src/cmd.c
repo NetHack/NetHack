@@ -567,8 +567,8 @@ doextlist(void)
     int n, pass;
     int menumode = 0, menushown[2], onelist = 0;
     boolean redisplay = TRUE, search = FALSE;
-    static const char *const headings[] = { "Extended commands",
-                                      "Debugging Extended Commands" };
+    static const char *const headings[] = { N_("Extended commands"),
+                                      N_("Debugging Extended Commands") };
     int clr = NO_COLOR;
 
     searchbuf[0] = '\0';
@@ -850,7 +850,7 @@ extcmd_via_menu(void)
             add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
                      ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
         }
-        Snprintf(prompt, sizeof(prompt), "Extended Command: %s", cbuf);
+        Snprintf(prompt, sizeof(prompt), _("Extended Command: %s"), cbuf);
         end_menu(win, prompt);
         n = select_menu(win, PICK_ONE, &pick_list);
         destroy_nhwindow(win);
@@ -966,7 +966,7 @@ enter_explore_mode(void)
         pline(_("Beware!  From explore mode there will be no return to %s,"),
               oldmode);
         if (paranoid_query(ParanoidQuit,
-                           "Do you want to enter explore mode?")) {
+                           _("Do you want to enter explore mode?"))) {
             discover = TRUE;
             wizard = FALSE;
             clear_nhwindow(WIN_MESSAGE);
@@ -2062,9 +2062,9 @@ static const struct {
     const char *desc;
     boolean numpad;
 } misc_keys[] = {
-    { NHKF_ESC, "cancel current prompt or pending prefix", FALSE },
+    { NHKF_ESC, N_("cancel current prompt or pending prefix"), FALSE },
     { NHKF_COUNT,
-      "Prefix: for digits when preceding a command with a count", TRUE },
+      N_("Prefix: for digits when preceding a command with a count"), TRUE },
     { 0, (const char *) 0, FALSE }
 };
 
@@ -2394,20 +2394,20 @@ key2extcmddesc(uchar key)
        that match !number_pad movement (like 'j' for "jump") */
     key2cmdbuf[0] = '\0';
     if (movecmd(k = key, MV_WALK))
-        Strcpy(key2cmdbuf, "move"); /* "move or attack"? */
+        Strcpy(key2cmdbuf, _("move")); /* "move or attack"? */
     else if (movecmd(k = key, MV_RUSH))
-        Strcpy(key2cmdbuf, "rush");
+        Strcpy(key2cmdbuf, _("rush"));
     else if (movecmd(k = key, MV_RUN))
-        Strcpy(key2cmdbuf, "run");
+        Strcpy(key2cmdbuf, _("run"));
     if (digit(key) || (gc.Cmd.num_pad && digit(unmeta(key)))) {
         key2cmdbuf[0] = '\0';
         if (!gc.Cmd.num_pad)
-            Strcpy(key2cmdbuf, "start of, or continuation of, a count");
+            Strcpy(key2cmdbuf, _("start of, or continuation of, a count"));
         else if (key == '5' || key == M_5)
             Sprintf(key2cmdbuf, "%s prefix",
                     (!!gc.Cmd.pcHack_compat ^ (key == M_5)) ? _("run") : _("rush"));
         else if (key == '0' || (gc.Cmd.pcHack_compat && key == M_0))
-            Strcpy(key2cmdbuf, "synonym for 'i'");
+            Strcpy(key2cmdbuf, _("synonym for 'i'"));
         if (*key2cmdbuf)
             return key2cmdbuf;
     }
@@ -3488,9 +3488,9 @@ rhack(int key)
                             down = (ch == '>' || tlist->ef_funct == dodown);
 
                     pline(
-                "The '%s' prefix should be followed by a movement command%s.",
+                _("The '%s' prefix should be followed by a movement command%s."),
                           which,
-                          (up || down) ? " other than up or down" : "");
+                          (up || down) ? _(" other than up or down") : "");
                 }
                 res = ECMD_FAIL;
                 prefix_seen = 0;
@@ -4419,7 +4419,7 @@ there_cmd_menu_common(
         /* for self, only include "look at map symbol" if it isn't the
            ordinary hero symbol (steed, invisible w/o see invisible, ?) */
         if (!u_at(x, y) || Upolyd || glyph_at(x, y) != hero_glyph)
-            mcmd_addmenu(win, MCMD_LOOK_AT, "Look at map symbol"), ++K;
+            mcmd_addmenu(win, MCMD_LOOK_AT, _("Look at map symbol")), ++K;
     }
     return K;
 }
@@ -5199,19 +5199,19 @@ yn_function_menu(
 
         start_menu(win, MENU_BEHAVE_STANDARD);
         if (resp == rightleftchars) {
-            yn_func_menu_opt(win, 'r', "Right", def);
-            yn_func_menu_opt(win, 'l', "Left", def);
+            yn_func_menu_opt(win, 'r', _("Right"), def);
+            yn_func_menu_opt(win, 'l', _("Left"), def);
         } else if (resp == hidespinchars) {
-            yn_func_menu_opt(win, 'h', "Hide", def);
-            yn_func_menu_opt(win, 's', "Spin a web", def);
+            yn_func_menu_opt(win, 'h', _("Hide"), def);
+            yn_func_menu_opt(win, 's', _("Spin a web"), def);
         } else {
-            yn_func_menu_opt(win, 'y', "Yes", def);
-            yn_func_menu_opt(win, 'n', "No", def);
+            yn_func_menu_opt(win, 'y', _("Yes"), def);
+            yn_func_menu_opt(win, 'n', _("No"), def);
         }
         if (resp == ynaqchars)
-            yn_func_menu_opt(win, 'a', "All", def);
+            yn_func_menu_opt(win, 'a', _("All"), def);
         if (resp == ynqchars || resp == ynaqchars || resp == hidespinchars)
-            yn_func_menu_opt(win, 'q', "Quit", def);
+            yn_func_menu_opt(win, 'q', _("Quit"), def);
         end_menu(win, query);
         n = select_menu(win, PICK_ONE, &sel);
         destroy_nhwindow(win);
@@ -5403,7 +5403,7 @@ paranoid_ynq(
                 break;
             }
             /* we don't bother adding "or \"Quit\"" for the accept_q case */
-            promptprefix = "\"Yes\" or \"No\": ";
+            promptprefix = _("\"Yes\" or \"No\": ");
             /* for empty input, return value c will already be 'n' */
         } while (ParanoidConfirm && strcmpi(ans, "no") && --trylimit);
     } else if (accept_q) {

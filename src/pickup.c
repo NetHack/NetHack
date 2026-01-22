@@ -1320,18 +1320,18 @@ query_category(
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
                  /* note: menu_remarm() doesn't pass the CHOOSE_ALL flag,
                     so do_worn handling here is moot */
-                 do_worn ? "Auto-select every item being worn or wielded"
-                         : "Auto-select every relevant item",
+                 do_worn ? _("Auto-select every item being worn or wielded")
+                         : _("Auto-select every relevant item"),
                  MENU_ITEMFLAGS_SKIPINVERT);
         verify_All = (how == PICK_ANY) && ParanoidAutoAll;
         if (!verify_All) {
             if (!ga.A_first_hint++ || iflags.cmdassist)
                 add_menu_str(win,
-                   "    (ignored unless some other choices are also picked)");
+                   _("    (ignored unless some other choices are also picked)"));
         } else if (show_a) {
             if (!ga.A_second_hint++ || iflags.cmdassist)
                 add_menu_str(win,
-                      "    (if no other choices are picked, 'a' is implied)");
+                      _("    (if no other choices are picked, 'a' is implied)"));
         }
         /* blank separator */
         add_menu_str(win, "");
@@ -1342,7 +1342,7 @@ query_category(
         any = cg.zeroany;
         any.a_int = ALL_TYPES_SELECTED;
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 do_worn ? "All worn and wielded types" : "All types",
+                 do_worn ? _("All worn and wielded types") : _("All types"),
                  MENU_ITEMFLAGS_SKIPINVERT);
         ++invlet; /* invlet = 'b'; */
     }
@@ -1388,7 +1388,7 @@ query_category(
         any = cg.zeroany;
         any.a_int = 'u';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0,
-                 ATR_NONE, clr, "Unpaid items", MENU_ITEMFLAGS_SKIPINVERT);
+                 ATR_NONE, clr, _("Unpaid items"), MENU_ITEMFLAGS_SKIPINVERT);
     }
     /* billed items: checked by caller, so always include if BILLED_TYPES */
     if (do_usedup) {
@@ -1396,7 +1396,7 @@ query_category(
         any = cg.zeroany;
         any.a_int = 'x';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Unpaid items already used up", MENU_ITEMFLAGS_SKIPINVERT);
+                 _("Unpaid items already used up"), MENU_ITEMFLAGS_SKIPINVERT);
     }
 
     /* items with b/u/c/unknown if there are any;
@@ -1407,28 +1407,28 @@ query_category(
         any = cg.zeroany;
         any.a_int = 'B';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Items known to be Blessed", MENU_ITEMFLAGS_SKIPINVERT);
+                 _("Items known to be Blessed"), MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (do_cursed) {
         invlet = 'C';
         any = cg.zeroany;
         any.a_int = 'C';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Items known to be Cursed", MENU_ITEMFLAGS_SKIPINVERT);
+                 _("Items known to be Cursed"), MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (do_uncursed) {
         invlet = 'U';
         any = cg.zeroany;
         any.a_int = 'U';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Items known to be Uncursed", MENU_ITEMFLAGS_SKIPINVERT);
+                 _("Items known to be Uncursed"), MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (do_buc_unknown) {
         invlet = 'X';
         any = cg.zeroany;
         any.a_int = 'X';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Items of unknown Bless/Curse status",
+                 _("Items of unknown Bless/Curse status"),
                  MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (num_justpicked) {
@@ -1749,7 +1749,7 @@ lift_object(
         Your(_("knapsack cannot accommodate any more items%s."),
              /* floor follows by nexthere, otherwise container so by nobj */
              nxtobj(obj, GOLD_PIECE, (boolean) (obj->where == OBJ_FLOOR))
-                 ? " (except gold)" : "");
+                 ? _(" (except gold)") : "");
         result = -1; /* nothing lifted */
     } else {
         result = 1;
@@ -2176,7 +2176,7 @@ doloot_core(void)
     int timepassed = 0;
     coord cc;
     boolean underfoot = TRUE;
-    const char *dont_find_anything = "don't find anything";
+    const char *dont_find_anything = N_("don't find anything");
     struct monst *mtmp;
     int prev_inquiry = 0;
     boolean prev_loot = FALSE;
@@ -2289,14 +2289,14 @@ doloot_core(void)
  lootmon:
     if (c != 'y' && (mon_beside(u.ux, u.uy) || iflags.menu_requested)) {
         boolean looted_mon = FALSE;
-        if (!get_adjacent_loc("Loot in what direction?",
-                              "Invalid loot location", u.ux, u.uy, &cc))
+        if (!get_adjacent_loc(_("Loot in what direction?"),
+                              _("Invalid loot location"), u.ux, u.uy, &cc))
             return ECMD_OK;
         underfoot = u_at(cc.x, cc.y);
         if (underfoot && container_at(cc.x, cc.y, FALSE))
             goto lootcont;
         if (u.dz < 0) {
-            You(_("%s to loot on the %s."), dont_find_anything,
+            You(_("%s to loot on the %s."), _(dont_find_anything),
                 ceiling(cc.x, cc.y));
             return ECMD_TIME;
         }
@@ -2326,14 +2326,14 @@ doloot_core(void)
                     You(_("have to be at a container to loot it."));
                 }
             } else {
-                You(_("%s %s%shere to loot."), dont_find_anything,
+                You(_("%s %s%shere to loot."), _(dont_find_anything),
                     (prev_inquiry || prev_loot) ? _("else ") : "",
                     !underfoot ? _("t") : "");
                 return (timepassed ? ECMD_TIME : ECMD_OK);
             }
         }
     } else if (c != 'y' && c != 'n') {
-        You(_("%s %s to loot."), dont_find_anything,
+        You(_("%s %s to loot."), _(dont_find_anything),
             underfoot ? _("here") : _("there"));
     }
     return (timepassed ? ECMD_TIME : ECMD_OK);
@@ -2353,7 +2353,7 @@ reverse_loot(void)
         for (n = inv_cnt(TRUE), otmp = gi.invent; otmp;
              --n, otmp = otmp->nobj)
             if (!rn2(n + 1)) {
-                prinv("You find old loot:", otmp, 0L);
+                prinv(_("You find old loot:"), otmp, 0L);
                 return TRUE;
             }
         return FALSE;
@@ -2455,7 +2455,7 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
             if (flags.verbose)
                 You(_("take %s off of %s."),
                     thesimpleoname(otmp), mon_nam(mtmp));
-            otmp = hold_another_object(otmp, "You drop %s!", doname(otmp),
+            otmp = hold_another_object(otmp, _("You drop %s!"), doname(otmp),
                                        (const char *) 0);
             nhUse(otmp);
             timepassed = rnd(3);
@@ -2683,7 +2683,7 @@ in_container(struct obj *obj)
         else
             panic("in_container:  bag not found.");
 
-        losehp(d(6, 6), "magical explosion", KILLED_BY_AN);
+        losehp(d(6, 6), _("magical explosion"), KILLED_BY_AN);
         gc.current_container = 0; /* baggone = TRUE; */
     }
 
@@ -2891,17 +2891,17 @@ staticfn void
 explain_container_prompt(boolean more_containers)
 {
     static const char *const explaintext[] = {
-        "Container actions:",
+        N_("Container actions:"),
         "",
-        " : -- Look: examine contents",
-        " o -- Out: take things out",
-        " i -- In: put things in",
-        " b -- Both: first take things out, then put things in",
-        " r -- Reversed: put things in, then take things out",
-        " s -- Stash: put one item in", "",
-        " n -- Next: loot next selected container",
-        " q -- Quit: finished",
-        " ? -- Help: display this text.",
+        N_(" : -- Look: examine contents"),
+        N_(" o -- Out: take things out"),
+        N_(" i -- In: put things in"),
+        N_(" b -- Both: first take things out, then put things in"),
+        N_(" r -- Reversed: put things in, then take things out"),
+        N_(" s -- Stash: put one item in"), "",
+        N_(" n -- Next: loot next selected container"),
+        N_(" q -- Quit: finished"),
+        N_(" ? -- Help: display this text."),
         "", 0
     };
     const char *const *txtpp;
@@ -2912,7 +2912,7 @@ explain_container_prompt(boolean more_containers)
         for (txtpp = explaintext; *txtpp; ++txtpp) {
             if (!more_containers && !strncmp(*txtpp, " n ", 3))
                 continue;
-            putstr(win, 0, *txtpp);
+            putstr(win, 0, _(*txtpp));
         }
         display_nhwindow(win, FALSE);
         destroy_nhwindow(win);
@@ -3780,7 +3780,7 @@ tipcontainer(struct obj *box) /* or bag */
                     targetbox = 0; /* it's gone */
                     nobj = 0; /* stop tipping; want loop to exit 'normally' */
 
-                    losehp(d(6, 6), "magical explosion", KILLED_BY_AN);
+                    losehp(d(6, 6), _("magical explosion"), KILLED_BY_AN);
                 } else {
                     (void) add_to_container(targetbox, otmp);
                 }
@@ -3882,7 +3882,7 @@ tipcontainer_gettarget(
     /* tip to floor does not require free hands */
     add_menu(win, &nul_glyphinfo, &any, '-', 0, ATR_NONE, clr,
              /* [TODO? vary destination string depending on surface()] */
-             "on the floor", MENU_ITEMFLAGS_SELECTED);
+             _("on the floor"), MENU_ITEMFLAGS_SELECTED);
     add_menu_str(win, "");
 
     n_conts = 0;

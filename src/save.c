@@ -61,7 +61,7 @@ dosave(void)
 
             /* make sure they see the Saving message */
             display_nhwindow(WIN_MESSAGE, TRUE);
-            exit_nhwindows("Be seeing you...");
+            exit_nhwindows(_("Be seeing you..."));
             nh_terminate(EXIT_SUCCESS);
         } else
             docrt();
@@ -115,7 +115,7 @@ dosave0(void)
             close_nhfile(nhfp);
             clear_nhwindow(WIN_MESSAGE);
             There(_("seems to be an old save file."));
-            if (y_n("Overwrite the old file?") == 'n') {
+            if (y_n(_("Overwrite the old file?")) == 'n') {
                 nh_sfconvert(fq_save);
                 nh_compress(fq_save);
                 goto done;

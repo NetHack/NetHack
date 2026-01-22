@@ -1364,17 +1364,17 @@ raceptr(struct monst *mtmp)
 }
 
 typedef const char *const locoverbs[4];
-static locoverbs levitate = { "float", "Float", "wobble", "Wobble" },
-                 flys = { "fly", "Fly", "flutter", "Flutter" },
-                 flyl = { "fly", "Fly", "stagger", "Stagger" },
-                 slither = { "slither", "Slither", "falter", "Falter" },
+static locoverbs levitate = { N_("float"), N_("Float"), N_("wobble"), N_("Wobble") },
+                 flys = { N_("fly"), N_("Fly"), N_("flutter"), N_("Flutter") },
+                 flyl = { N_("fly"), N_("Fly"), N_("stagger"), N_("Stagger") },
+                 slither = { N_("slither"), N_("Slither"), N_("falter"), N_("Falter") },
                  /* it would be useful to incorporate "swim" but we lack
                   * sufficient information to know whether water is involved
-                 swim = { "swim", "Swim", "flop", "Flop" },
+                 swim = { N_("swim"), N_("Swim"), N_("flop"), N_("Flop") },
                   */
-                 ooze = { "ooze", "Ooze", "tremble", "Tremble" },
-                 immobile = { "wiggle", "Wiggle", "pulsate", "Pulsate" },
-                 crawl = { "crawl", "Crawl", "falter", "Falter" };
+                 ooze = { N_("ooze"), N_("Ooze"), N_("tremble"), N_("Tremble") },
+                 immobile = { N_("wiggle"), N_("Wiggle"), N_("pulsate"), N_("Pulsate") },
+                 crawl = { N_("crawl"), N_("Crawl"), N_("falter"), N_("Falter") };
 
 const char *
 locomotion(const struct permonst *ptr, const char *def)
@@ -1453,7 +1453,7 @@ msummon_environ(struct permonst *mptr, const char **cloud)
                 : (mptr->mlet == S_LIGHT) ? PM_YELLOW_LIGHT
                   : monsndx(mptr));
 
-    *cloud = "cloud"; /* default is "cloud of <something>" */
+    *cloud = _("cloud"); /* default is "cloud of <something>" */
     switch (mndx) {
     case PM_WATER_DEMON:
     case PM_AIR_ELEMENTAL:
@@ -1461,34 +1461,34 @@ msummon_environ(struct permonst *mptr, const char **cloud)
     case PM_FOG_CLOUD:
     case PM_ICE_VORTEX:
     case PM_FREEZING_SPHERE:
-        what = "vapor";
+        what = _("vapor");
         break;
     case PM_STEAM_VORTEX:
-        what = "steam";
+        what = _("steam");
         break;
     case PM_ENERGY_VORTEX:
     case PM_SHOCKING_SPHERE:
-        *cloud = "shower"; /* "shower of sparks" instead of "cloud of..." */
-        what = "sparks";
+        *cloud = _("shower"); /* "shower of sparks" instead of "cloud of..." */
+        what = _("sparks");
         break;
     case PM_EARTH_ELEMENTAL:
     case PM_DUST_VORTEX:
-        what = "dust";
+        what = _("dust");
         break;
     case PM_FIRE_ELEMENTAL:
     case PM_FIRE_VORTEX:
     case PM_FLAMING_SPHERE:
     /*case PM_SALAMANDER:*/
-        *cloud = "ball"; /* "ball of flame" instead of "cloud of..." */
-        what = "flame";
+        *cloud = _("ball"); /* "ball of flame" instead of "cloud of..." */
+        what = _("flame");
         break;
     case PM_ANGEL: /* actually any 'A'-class */
     case PM_YELLOW_LIGHT: /* any 'y'-class */
-        *cloud = "flash"; /* "flash of light" instead of "cloud of..." */
-        what = "light";
+        *cloud = _("flash"); /* "flash of light" instead of "cloud of..." */
+        what = _("light");
         break;
     default:
-        what = "smoke";
+        what = _("smoke");
         break;
     }
     return what;

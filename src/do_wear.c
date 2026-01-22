@@ -6,14 +6,14 @@
 #include "hack.h"
 #include "i18n.h"
 
-static NEARDATA const char see_yourself[] = "see yourself";
+static NEARDATA const char see_yourself[] = N_("see yourself");
 static NEARDATA const char unknown_type[] = "Unknown type of %s (%d)";
-static NEARDATA const char c_armor[] = "armor", c_suit[] = "suit",
-                           c_shirt[] = "shirt", c_cloak[] = "cloak",
-                           c_gloves[] = "gloves", c_boots[] = "boots",
-                           c_helmet[] = "helmet", c_shield[] = "shield",
-                           c_weapon[] = "weapon", c_sword[] = "sword",
-                           c_axe[] = "axe", c_that_[] = "that";
+static NEARDATA const char c_armor[] = N_("armor"), c_suit[] = N_("suit"),
+                           c_shirt[] = N_("shirt"), c_cloak[] = N_("cloak"),
+                           c_gloves[] = N_("gloves"), c_boots[] = N_("boots"),
+                           c_helmet[] = N_("helmet"), c_shield[] = N_("shield"),
+                           c_weapon[] = N_("weapon"), c_sword[] = N_("sword"),
+                           c_axe[] = N_("axe"), c_that_[] = N_("that");
 
 static NEARDATA const long takeoff_order[] = {
     WORN_BLINDF, W_WEP,      WORN_SHIELD, WORN_GLOVES, LEFT_RING,
@@ -92,7 +92,7 @@ on_msg(struct obj *otmp)
 
         how[0] = '\0';
         if (otmp->otyp == TOWEL)
-            Sprintf(how, " around your %s", body_part(HEAD));
+            Sprintf(how, _(" around your %s"), body_part(HEAD));
         You(_("are now wearing %s%s."),
             obj_is_pname(otmp) ? the(otmp_name) : an(otmp_name), how);
     }
@@ -349,7 +349,7 @@ Cloak_on(void)
         if ((HInvis || EInvis) && !Blind) {
             newsym(u.ux, u.uy);
             You(_("can %s!"), See_invisible ? _("no longer see through yourself")
-                                         : see_yourself);
+                                         : _(see_yourself));
         }
         break;
     case CLOAK_OF_INVISIBILITY:
@@ -417,7 +417,7 @@ Cloak_off(void)
             newsym(u.ux, u.uy);
             pline(_("Suddenly you can %s."),
                   See_invisible ? _("no longer see through yourself")
-                                : see_yourself);
+                                : _(see_yourself));
         }
         break;
     /* Alchemy smock gives poison _and_ acid resistance */
@@ -2006,13 +2006,13 @@ armoroff(struct obj *otmp)
 staticfn void
 already_wearing(const char *cc)
 {
-    You(_("are already wearing %s%c"), cc, (cc == c_that_) ? '!' : '.');
+    You(_("are already wearing %s%c"), _(cc), (cc == c_that_) ? '!' : '.');
 }
 
 staticfn void
 already_wearing2(const char *cc1, const char *cc2)
 {
-    You_cant(_("wear %s because you're wearing %s there already."), cc1, cc2);
+    You_cant(_("wear %s because you're wearing %s there already."), _(cc1), _(cc2));
 }
 
 /*
@@ -2048,7 +2048,7 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
                 : !WrappingAllowed(gy.youmonst.data)))
         && (racial_exception(&gy.youmonst, otmp) < 1)) {
         if (noisy)
-            pline_The(_("%s will not fit on your body."), which);
+            pline_The(_("%s will not fit on your body."), _(which));
         return 0;
     } else if (otmp->owornmask & W_ARMOR) {
         if (noisy)
@@ -2059,7 +2059,7 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
     if (welded(uwep) && bimanual(uwep) && (is_suit(otmp) || is_shirt(otmp))) {
         if (noisy)
             You(_("cannot do that while holding your %s."),
-                is_sword(uwep) ? c_sword : c_weapon);
+                is_sword(uwep) ? _(c_sword) : _(c_weapon));
         return 0;
     }
 
@@ -2080,14 +2080,14 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
     } else if (is_shield(otmp)) {
         if (uarms) {
             if (noisy)
-                already_wearing(an(c_shield));
+                already_wearing(an(_(c_shield)));
             err++;
         } else if (uwep && bimanual(uwep)) {
             if (noisy)
                 You(_("cannot wear a shield while wielding a two-handed %s."),
-                    is_sword(uwep) ? c_sword : (uwep->otyp == BATTLE_AXE)
-                                                   ? c_axe
-                                                   : c_weapon);
+                    is_sword(uwep) ? _(c_sword) : (uwep->otyp == BATTLE_AXE)
+                                                   ? _(c_axe)
+                                                   : _(c_weapon));
             err++;
         } else if (u.twoweap) {
             if (noisy)
@@ -2098,7 +2098,7 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
     } else if (is_boots(otmp)) {
         if (uarmf) {
             if (noisy)
-                already_wearing(c_boots);
+                already_wearing(_(c_boots));
             err++;
         } else if (Upolyd && slithy(gy.youmonst.data)) {
             if (noisy)
@@ -2110,7 +2110,7 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
                makeplural(body_part(FOOT)) would yield "rear hooves" here,
                which sounds odd, so use hard-coded "hooves" */
             if (noisy)
-                You(_("have too many hooves to wear %s."), c_boots);
+                You(_("have too many hooves to wear %s."), _(c_boots));
             err++;
         } else if (u.utrap
                    && (u.utraptype == TT_BEARTRAP || u.utraptype == TT_INFLOOR
@@ -2134,12 +2134,12 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
     } else if (is_gloves(otmp)) {
         if (uarmg) {
             if (noisy)
-                already_wearing(c_gloves);
+                already_wearing(_(c_gloves));
             err++;
         } else if (welded(uwep)) {
             if (noisy)
                 You(_("cannot wear gloves over your %s."),
-                    is_sword(uwep) ? c_sword : c_weapon);
+                    is_sword(uwep) ? _(c_sword) : _(c_weapon));
             err++;
         } else if (Glib) {
             /* prevent slippery bare fingers from transferring to
@@ -2154,11 +2154,11 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
         if (uarm || uarmc || uarmu) {
             if (uarmu) {
                 if (noisy)
-                    already_wearing(an(c_shirt));
+                    already_wearing(an(_(c_shirt)));
             } else {
                 if (noisy)
                     You_cant(_("wear that over your %s."),
-                             (uarm && !uarmc) ? c_armor
+                             (uarm && !uarmc) ? _(c_armor)
                                               : cloak_simple_name(uarmc));
             }
             err++;
@@ -2178,7 +2178,7 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
             err++;
         } else if (uarm) {
             if (noisy)
-                already_wearing("some armor");
+                already_wearing(_("some armor"));
             err++;
         } else
             *mask = W_ARM;
@@ -2291,7 +2291,7 @@ accessory_or_armor_on(struct obj *obj)
             if (uarmg && uarmg->cursed) {
                 res = !uarmg->bknown;
                 set_bknown(uarmg, 1);
-                You(_("cannot remove your %s to put on the ring."), c_gloves);
+                You(_("cannot remove your %s to put on the ring."), _(c_gloves));
                 /* uses move iff we learned gloves are cursed */
                 return res ? ECMD_TIME : ECMD_OK;
             }
@@ -2313,7 +2313,7 @@ accessory_or_armor_on(struct obj *obj)
             }
         } else if (amulet) {
             if (uamul) {
-                already_wearing("an amulet");
+                already_wearing(_("an amulet"));
                 return ECMD_OK;
             }
         } else if (eyewear) {
@@ -2328,14 +2328,14 @@ accessory_or_armor_on(struct obj *obj)
                          body_part(FACE));
                 else if (ublindf->otyp == BLINDFOLD) {
                     if (obj->otyp == LENSES)
-                        already_wearing2("lenses", "a blindfold");
+                        already_wearing2(N_("lenses"), N_("a blindfold"));
                     else
-                        already_wearing("a blindfold");
+                        already_wearing(_("a blindfold"));
                 } else if (ublindf->otyp == LENSES) {
                     if (obj->otyp == BLINDFOLD)
-                        already_wearing2("a blindfold", "some lenses");
+                        already_wearing2(N_("a blindfold"), N_("some lenses"));
                     else
-                        already_wearing("some lenses");
+                        already_wearing(_("some lenses"));
                 } else {
                     already_wearing(something); /* ??? */
                 }
@@ -2726,7 +2726,7 @@ select_off(struct obj *otmp)
     if (otmp == uarmg) {
         if (welded(uwep)) {
             You(_("are unable to take off your %s while wielding that %s."),
-                c_gloves, is_sword(uwep) ? c_sword : c_weapon);
+                _(c_gloves), is_sword(uwep) ? _(c_sword) : _(c_weapon));
             set_bknown(uwep, 1);
             return 0;
         } else if (Glib) {
@@ -2757,13 +2757,13 @@ select_off(struct obj *otmp)
             Sprintf(buf, _("remove your %s"), cloak_simple_name(uarmc));
             why = uarmc;
         } else if (otmp == uarmu && uarm && uarm->cursed) {
-            Sprintf(buf, _("remove your %s"), c_suit);
+            Sprintf(buf, _("remove your %s"), _(c_suit));
             why = uarm;
         } else if (welded(uwep) && bimanual(uwep)) {
             Sprintf(buf, _("release your %s"),
-                    is_sword(uwep) ? c_sword : (uwep->otyp == BATTLE_AXE)
-                                                   ? c_axe
-                                                   : c_weapon);
+                    is_sword(uwep) ? _(c_sword) : (uwep->otyp == BATTLE_AXE)
+                                                   ? _(c_axe)
+                                                   : _(c_weapon));
             why = uwep;
         }
         if (why) {
