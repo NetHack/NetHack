@@ -2157,21 +2157,21 @@ Hello(struct monst *mtmp)
 {
     switch (Role_switch) {
     case PM_KNIGHT:
-        return "Salutations"; /* Olde English */
+        return _("Salutations"); /* Olde English */
     case PM_SAMURAI:
         return (mtmp && mtmp->data == &mons[PM_SHOPKEEPER])
-                    ? "Irasshaimase"
-                    : "Konnichi wa"; /* Japanese */
+                    ? _("Irasshaimase")
+                    : _("Konnichi wa"); /* Japanese */
     case PM_TOURIST:
-        return "Aloha"; /* Hawaiian */
+        return _("Aloha"); /* Hawaiian */
     case PM_VALKYRIE:
         return
 #ifdef MAIL_STRUCTURES
-               (mtmp && mtmp->data == &mons[PM_MAIL_DAEMON]) ? "Hallo" :
+               (mtmp && mtmp->data == &mons[PM_MAIL_DAEMON]) ? _("Hallo") :
 #endif
-               "Velkommen"; /* Norse */
+               _("Velkommen"); /* Norse */
     default:
-        return "Hello";
+        return _("Hello");
     }
 }
 

@@ -158,6 +158,8 @@ obj_descr_strings_for_extraction(void)
     (void) N_("bag");
     (void) N_("chest");
     (void) N_("box");
+    (void) N_("large box");
+    (void) N_("ice box");
     (void) N_("horn");
     (void) N_("whistle");
     (void) N_("flute");
