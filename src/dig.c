@@ -400,7 +400,7 @@ dig(void)
                 else if (uarmf)
                     dmg = (dmg + 1) / 2;
                 You(_("hit yourself in the %s."), body_part(FOOT));
-                Sprintf(kbuf, "chopping off %s own %s", uhis(),
+                Sprintf(kbuf, _("chopping off %s own %s"), uhis(),
                         body_part(FOOT));
                 losehp(Maybe_Half_Phys(dmg), kbuf, KILLED_BY);
             } else {
@@ -489,7 +489,7 @@ dig(void)
         } else if (IS_WALL(lev->typ)) {
             if (shopedge) {
                 add_damage(dpx, dpy, SHOP_WALL_DMG);
-                dmgtxt = "damage";
+                dmgtxt = _("damage");
             }
             if (svl.level.flags.is_maze_lev) {
                 lev->typ = ROOM, lev->flags = 0;
@@ -511,7 +511,7 @@ dig(void)
             digtxt = digbuf;
             if (shopedge) {
                 add_damage(dpx, dpy, SHOP_DOOR_COST);
-                dmgtxt = "break";
+                dmgtxt = _("break");
             }
             if (!(lev->doormask & D_TRAPPED))
                 lev->doormask = D_BROKEN;
@@ -534,7 +534,7 @@ dig(void)
         }
         if (IS_DOOR(lev->typ) && (lev->doormask & D_TRAPPED)) {
             lev->doormask = D_NODOOR;
-            b_trapped("door", NO_PART);
+            b_trapped(_("door"), NO_PART);
             recalc_block_point(dpx, dpy);
             newsym(dpx, dpy);
         }
@@ -545,8 +545,8 @@ dig(void)
         svc.context.digging.level.dlevel = -1;
         return 0;
     } else { /* not enough effort has been spent yet */
-        static const char *const d_target[6] = { "",        "rock", "statue",
-                                                 "boulder", "door", "tree" };
+        static const char *const d_target[6] = { "",        N_("rock"), N_("statue"),
+                                                 N_("boulder"), N_("door"), N_("tree") };
         int dig_target = dig_typ(uwep, dpx, dpy);
 
         if (IS_WALL(lev->typ) || dig_target == DIGTYP_DOOR) {
@@ -560,7 +560,7 @@ dig(void)
             return 0; /* statue or boulder got taken */
 
         if (!gd.did_dig_msg) {
-            You(_("hit the %s with all your might."), d_target[dig_target]);
+            You(_("hit the %s with all your might."), _(d_target[dig_target]));
             wake_nearby(FALSE);
             gd.did_dig_msg = TRUE;
         }
@@ -724,7 +724,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
     /* now deal with actual post-trap creation effects */
     if (ttyp == PIT) {
         if (shopdoor && heros_fault)
-            pay_for_damage("ruin", FALSE);
+            pay_for_damage(_("ruin"), FALSE);
         else
             add_damage(x, y, heros_fault ? SHOP_PIT_COST : 0L);
         if (madeby_u)
@@ -775,14 +775,14 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
                 if (oldobjs != newobjs)
                     (void) pickup(1);
                 if (shopdoor && heros_fault)
-                    pay_for_damage("ruin", FALSE);
+                    pay_for_damage(_("ruin"), FALSE);
             } else {
                 d_level newlevel;
 
                 if (*u.ushops && heros_fault)
                     shopdig(1); /* shk might snatch pack */
                 else /* handle any earlier hero-caused damage */
-                    pay_for_damage("dig into", TRUE);
+                    pay_for_damage(_("dig into"), TRUE);
                 You(_("fall through..."));
                 /* Earlier checks must ensure that the destination
                  * level exists and is in the present dungeon.
@@ -795,7 +795,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
             }
         } else {
             if (shopdoor && heros_fault)
-                pay_for_damage("ruin", FALSE);
+                pay_for_damage(_("ruin"), FALSE);
             if (newobjs)
                 impact_drop((struct obj *) 0, x, y, 0);
             if (mtmp) {
@@ -1100,7 +1100,7 @@ use_pick_axe(struct obj *obj)
 
     /* Check tool */
     if (obj != uwep) {
-        if (wield_tool(obj, "swing")) {
+        if (wield_tool(obj, _("swing"))) {
             /* we're now wielding it. next turn, apply to dig. */
             cmdq_add_ec(CQ_CANNED, doapply);
             cmdq_add_key(CQ_CANNED, obj->invlet);
@@ -1115,7 +1115,7 @@ use_pick_axe(struct obj *obj)
         pline(_("%s you can't %s while entangled in a web."),
               /* res==0 => no prior message;
                  res==1 => just got "You now wield a pick-axe." message */
-              !res ? "Unfortunately," : "But", verb);
+              !res ? _("Unfortunately,") : _("But"), verb);
         return res;
     }
 
@@ -1186,7 +1186,7 @@ use_pick_axe2(struct obj *obj)
         if (dam <= 0)
             dam = 1;
         You(_("hit yourself with %s."), yname(uwep));
-        Sprintf(buf, "%s own %s", uhis(), OBJ_NAME(objects[obj->otyp]));
+        Sprintf(buf, _("%s own %s"), uhis(), OBJ_NAME(objects[obj->otyp]));
         losehp(Maybe_Half_Phys(dam), buf, KILLED_BY);
         disp.botl = TRUE;
         return ECMD_TIME;
@@ -1274,11 +1274,11 @@ use_pick_axe2(struct obj *obj)
                 You(_("swing %s through thin air."), yobjnam(obj, (char *) 0));
             }
         } else {
-            static const char *const d_action[6] = { "swinging", "digging",
-                                                     "chipping the statue",
-                                                     "hitting the boulder",
-                                                     "chopping at the door",
-                                                     "cutting the tree" };
+            static const char *const d_action[6] = { N_("swinging"), N_("digging"),
+                                                     N_("chipping the statue"),
+                                                     N_("hitting the boulder"),
+                                                     N_("chopping at the door"),
+                                                     N_("cutting the tree") };
 
             gd.did_dig_msg = FALSE;
             svc.context.digging.quiet = FALSE;
@@ -1303,10 +1303,10 @@ use_pick_axe2(struct obj *obj)
                 assign_level(&svc.context.digging.level, &u.uz);
                 svc.context.digging.effort = 0;
                 if (!svc.context.digging.quiet)
-                    You(_("start %s."), d_action[dig_target]);
+                    You(_("start %s."), _(d_action[dig_target]));
             } else {
                 You(_("%s %s."), svc.context.digging.chew ? _("begin") : _("continue"),
-                    d_action[dig_target]);
+                    _(d_action[dig_target]));
                 svc.context.digging.chew = FALSE;
             }
             set_occupation(dig, verbing, 0);
@@ -1394,13 +1394,13 @@ watch_dig(struct monst *mtmp, coordxy x, coordxy y, boolean zap)
                 const char *str;
 
                 if (IS_DOOR(lev->typ))
-                    str = "door";
+                    str = _("door");
                 else if (IS_TREE(lev->typ))
-                    str = "tree";
+                    str = _("tree");
                 else if (IS_OBSTRUCTED(lev->typ))
-                    str = "wall";
+                    str = _("wall");
                 else
-                    str = "fountain";
+                    str = _("fountain");
                 verbalize(_("Hey, stop damaging that %s!"), str);
                 svc.context.digging.warned = TRUE;
             }
@@ -1530,7 +1530,7 @@ draft_message(boolean unexpected)
             /* "marching" is deliberately ambiguous; it might mean drills
                 after entering military service or mean engaging in protests */
             static const char *const draft_reaction[] = {
-                "enlisting", "marching", "protesting", "fleeing",
+                N_("enlisting"), N_("marching"), N_("protesting"), N_("fleeing"),
             };
             int dridx;
 
@@ -1539,7 +1539,7 @@ draft_message(boolean unexpected)
             if (u.ualign.record < STRIDENT)
                 /* L: +(0..2), N: +(-1..1), C: +(-2..0); all: 0..3 */
                 dridx += rn1(3, sgn(u.ualign.type) - 1);
-            You_feel(_("like %s."), draft_reaction[dridx]);
+            You_feel(_("like %s."), _(draft_reaction[dridx]));
         }
     }
 }
@@ -1817,17 +1817,17 @@ adj_pit_checks(coord *cc, char *msg)
         const char *supporting = (const char *) 0;
 
         if (IS_FOUNTAIN(ltyp))
-            supporting = "fountain";
+            supporting = _("fountain");
         else if (IS_THRONE(ltyp))
-            supporting = "throne";
+            supporting = _("throne");
         else if (IS_ALTAR(ltyp))
-            supporting = "altar";
+            supporting = _("altar");
         else if (On_stairs(cc->x, cc->y))
             /* staircase up or down. On_ladder handled above. */
-            supporting = "stairs";
+            supporting = _("stairs");
         else if (ltyp == DRAWBRIDGE_DOWN   /* "lowered drawbridge" */
                  || ltyp == DBWALL)        /* "raised drawbridge" */
-            supporting = "drawbridge";
+            supporting = _("drawbridge");
 
         if (supporting) {
             Sprintf(msg, _("The %s supporting structures remain intact."),
