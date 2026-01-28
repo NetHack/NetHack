@@ -177,13 +177,13 @@ find_locale_dir(const char *lang)
             slash = strrchr(exe_path, '/');
             if (slash) {
                 *slash = '\0';
-                /* Try ../locale (if exe is in src/) */
-                snprintf(localedir_buf, sizeof(localedir_buf), "%s/../locale", exe_path);
+                /* Try ../dat/locale (if exe is in src/) */
+                snprintf(localedir_buf, sizeof(localedir_buf), "%s/../dat/locale", exe_path);
                 snprintf(testpath, sizeof(testpath), "%s/%s/LC_MESSAGES/nethack.mo", localedir_buf, lang);
                 if (access(testpath, R_OK) == 0)
                     return localedir_buf;
-                /* Try ./locale (if exe is in root) */
-                snprintf(localedir_buf, sizeof(localedir_buf), "%s/locale", exe_path);
+                /* Try ./dat/locale (if exe is in root) */
+                snprintf(localedir_buf, sizeof(localedir_buf), "%s/dat/locale", exe_path);
                 snprintf(testpath, sizeof(testpath), "%s/%s/LC_MESSAGES/nethack.mo", localedir_buf, lang);
                 if (access(testpath, R_OK) == 0)
                     return localedir_buf;
