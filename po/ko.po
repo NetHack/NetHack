@@ -18884,7 +18884,7 @@ msgstr "불행히도, %s{은/는} 여전히 몰살 상태다..."
 #: ../src/mon.c:2909
 #, c-format
 msgid "%s%s %s%s and rises as"
-msgstr "%s%s %s%s {으로/로} 다시 일어났다"
+msgstr "%s%s%s%s{으로/로} 변신했다"
 
 #: ../src/mon.c:2910
 msgid "you dream that "
@@ -40459,7 +40459,7 @@ msgstr "살아난다"
 
 #: ../src/zap.c:1208
 msgid " as "
-msgstr " {으로/로}서 "
+msgstr "{으로/로} "
 
 #: ../src/zap.c:1229
 #, c-format
