@@ -1496,13 +1496,13 @@ root_plselection_prompt(
                 && !roles[rolenum].name.f) {
                 if (donefirst)
                     Strcat(buf, " ");
-                Strcat(buf, genders[gendnum].adj);
+                Strcat(buf, _(genders[gendnum].adj));
                 donefirst = TRUE;
             }
         } else {
             if (donefirst)
                 Strcat(buf, " ");
-            Strcat(buf, genders[gendnum].adj);
+            Strcat(buf, _(genders[gendnum].adj));
             donefirst = TRUE;
         }
     } else {
@@ -1836,17 +1836,17 @@ role_selection_prolog(int which, winid where)
                   : (c == ROLE_RANDOM) ? rand_choice
                     : races[c].noun);
     putstr(where, 0, buf);
-    Sprintf(buf, "%12s ", "gender:");
+    Sprintf(buf, "%12s ", _("gender:"));
     Strcat(buf, (which == RS_GENDER) ? choosing
                 : (gend == ROLE_NONE) ? not_yet
                   : (gend == ROLE_RANDOM) ? rand_choice
-                    : genders[gend].adj);
+                    : _(genders[gend].adj));
     putstr(where, 0, buf);
-    Sprintf(buf, "%12s ", "alignment:");
+    Sprintf(buf, "%12s ", _("alignment:"));
     Strcat(buf, (which == RS_ALGNMNT) ? choosing
                 : (a == ROLE_NONE) ? not_yet
                   : (a == ROLE_RANDOM) ? rand_choice
-                    : aligns[a].adj);
+                    : _(aligns[a].adj));
     putstr(where, 0, buf);
 }
 
@@ -2857,14 +2857,14 @@ plsel_startmenu(int ttyrows, int aspect)
         Sprintf(qbuf, "%.20s %.20s %.20s %.20s",
                 rolename,
                 (RACE < 0) ? "<race>" : races[RACE].noun,
-                (GEND < 0) ? "<gender>" : genders[GEND].adj,
-                (ALGN < 0) ? "<alignment>" : aligns[ALGN].adj);
+                (GEND < 0) ? "<gender>" : _(genders[GEND].adj),
+                (ALGN < 0) ? "<alignment>" : _(aligns[ALGN].adj));
     } else {
         /* "<name> the <alignment> <gender> <race.adjective> <role>" */
         Sprintf(qbuf, "%.20s the %.20s %.20s %.20s %.20s",
                 svp.plname,
-                aligns[ALGN].adj,
-                genders[GEND].adj,
+                _(aligns[ALGN].adj),
+                _(genders[GEND].adj),
                 races[RACE].adj,
                 rolename);
     }
@@ -3005,7 +3005,7 @@ setup_gendmenu(
         add_menu(win, &nul_glyphinfo, &any,
                  filtering ? this_ch : highc(this_ch),
                  filtering ? highc(this_ch) : 0,
-                 ATR_NONE, clr, genders[i].adj,
+                 ATR_NONE, clr, _(genders[i].adj),
                  (!filtering && !gend_ok)
                     ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
@@ -3041,7 +3041,7 @@ setup_algnmenu(
         add_menu(win, &nul_glyphinfo, &any,
                  filtering ? this_ch : highc(this_ch),
                  filtering ? highc(this_ch) : 0,
-                 ATR_NONE, clr, aligns[i].adj,
+                 ATR_NONE, clr, _(aligns[i].adj),
                  (!filtering && !algn_ok)
                     ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }

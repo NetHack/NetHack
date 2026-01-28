@@ -472,7 +472,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
         tmpbuf[0] = '\0';
         /* here we always use current gender, not saved role gender */
         if (!is_male(uasmon) && !is_female(uasmon) && !is_neuter(uasmon))
-            Sprintf(tmpbuf, "%s ", genders[flags.female ? 1 : 0].adj);
+            Sprintf(tmpbuf, "%s ", _(genders[flags.female ? 1 : 0].adj));
         if (altphrasing)
             Sprintf(eos(tmpbuf), "%s in ",
                     pmname(&mons[gy.youmonst.cham],
@@ -489,7 +489,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
     if (!gu.urole.name.f
         && ((gu.urole.allow & ROLE_GENDMASK) == (ROLE_MALE | ROLE_FEMALE)
             || innategend != flags.initgend))
-        Sprintf(tmpbuf, "%s ", genders[innategend].adj);
+        Sprintf(tmpbuf, "%s ", _(genders[innategend].adj));
     buf[0] = '\0';
     if (Upolyd)
         Strcpy(buf, _("actually ")); /* "You are actually a ..." */
@@ -558,9 +558,9 @@ background_enlightenment(int unused_mode UNUSED, int final)
         difalgn &= ~1; /* suppress helm from "started out <foo>" message */
     }
     if (difgend || difalgn) { /* sex change or perm align change or both */
-        Sprintf(buf, " You started out %s%s%s.",
-                difgend ? genders[flags.initgend].adj : "",
-                (difgend && difalgn) ? " and " : "",
+        Sprintf(buf, _(" You started out %s%s%s."),
+                difgend ? _(genders[flags.initgend].adj) : "",
+                (difgend && difalgn) ? _(" and ") : "",
                 difalgn ? align_str(u.ualignbase[A_ORIGINAL]) : "");
         enlght_out(buf);
     }

@@ -43310,8 +43310,23 @@ msgstr "         자세한 내용은 라이선스를 참조해."
 # ============================================================
 # 성별 형용사 (Gender Adjectives)
 # ============================================================
+msgid "male"
+msgstr "남성"
+
+msgid "female"
+msgstr "여성"
+
 msgid "neuter"
 msgstr "중성"
+
+msgid "gender:"
+msgstr "성별:"
+
+msgid "alignment:"
+msgstr "성향:"
+
+msgid " You started out %s%s%s."
+msgstr " 당신은 원래 %s%s%s(이)었다."
 
 # 방어구 - 투구
 msgid "elven helm"
