@@ -12188,7 +12188,7 @@ msgstr "%s{을/를} 거부당했다! %s{이/가} %s{을/를} 자격 없다고 �
 
 #: ../src/fountain.c:429
 msgid "From the murky depths, a hand reaches up to bless the sword."
-msgstr "탁한 배수구에서 손이 올라온다... --이런--"
+msgstr "탁한 깊은 곳에서 손이 올라와 검을 축복한다."
 
 #: ../src/fountain.c:430
 msgid "As the hand retreats, the fountain disappears!"
@@ -14414,7 +14414,7 @@ msgstr "목이 졸리는 중"
 #: ../src/insight.c:1011
 #, c-format
 msgid " %sdied from %s."
-msgstr "%s{이/가} %s에서."
+msgstr " %s%s{으로/로} 죽었다."
 
 #: ../src/insight.c:1013
 msgid "terminal illness"
@@ -20645,27 +20645,27 @@ msgstr "쿵 하는 소리."
 #: ../src/music.c:411
 #, c-format
 msgid "fountain falls%s."
-msgstr "분수가 무너진%s."
+msgstr "분수가 무너졌다%s."
 
 #: ../src/music.c:416
 #, c-format
 msgid "kitchen sink falls%s."
-msgstr "싱크대가 무너진%s."
+msgstr "싱크대가 무너졌다%s."
 
 #: ../src/music.c:426
 #, c-format
 msgid "%s altar falls%s."
-msgstr "%s 제단이 무너진%s."
+msgstr "%s 제단이 무너졌다%s."
 
 #: ../src/music.c:433
 #, c-format
 msgid "headstone topples%s."
-msgstr "비석이 쓰러진%s."
+msgstr "비석이 쓰러졌다%s."
 
 #: ../src/music.c:438
 #, c-format
 msgid "throne falls%s."
-msgstr "왕좌가 무너진%s."
+msgstr "왕좌가 무너졌다%s."
 
 #: ../src/music.c:445
 msgid "A secret corridor is revealed."
@@ -33818,7 +33818,7 @@ msgstr "%s{이/가} 질주한다!"
 
 #: ../src/steed.c:604
 msgid "are thrown"
-msgstr "저주받은 "
+msgstr "던져졌다"
 
 #: ../src/steed.c:609
 #, c-format
@@ -36171,7 +36171,7 @@ msgstr "%s{이/가} %s에서 빠져나왔다."
 #: ../src/trap.c:3702
 #, c-format
 msgid "%s eats a bear trap!"
-msgstr "%s 곰 덫을 해제했다."
+msgstr "%s{이/가} 곰 덫을 먹었다!"
 
 #: ../src/trap.c:3709
 #, c-format
