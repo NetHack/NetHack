@@ -2017,7 +2017,7 @@ msgstr "채찍으로 %s{을/를} 때렸다."
 #: ../src/apply.c:3058
 #, c-format
 msgid "killed %sself with %s bullwhip"
-msgstr "%s 채찍으로 %s 죽었다"
+msgstr "자신의 채찍으로 자살"
 
 #: ../src/apply.c:3063
 #, c-format
@@ -2527,7 +2527,7 @@ msgstr "  %s [%s %s]"
 #: ../src/artifact.c:1306
 #, c-format
 msgid "magic-absorbing blade %s %s!"
-msgstr "마력 흡수 검이 %s %s!"
+msgstr "마력 흡수 검이 %2$s{을/를} %1$s!"
 
 #: ../src/artifact.c:1334
 msgid "lose magical energy!"
@@ -24336,7 +24336,7 @@ msgstr "잃어버린 상품에 대해 %ld %s{을/를} 빚진다."
 
 #: ../src/pickup.c:3061
 msgid "Do what with "
-msgstr "~{으로/로} 뭘 할까 "
+msgstr "뭘 할까: "
 
 #: ../src/pickup.c:3138
 #, c-format
@@ -35626,7 +35626,7 @@ msgstr "%s{이/가} 갑자기 잠들었다!"
 #: ../src/trap.c:1616
 #, c-format
 msgid "%s you on the %s!"
-msgstr "당신의 %s{을/를} %s!"
+msgstr "%s 당신의 %s{을/를} 때렸다!"
 
 #: ../src/trap.c:1616 ../src/trap.c:1620 ../src/trap.c:1629 ../src/trap.c:1633
 #: ../src/trap.c:1671 ../src/trap.c:1679 ../src/trap.c:1694 ../src/trap.c:1700
