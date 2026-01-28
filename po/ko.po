@@ -7022,7 +7022,7 @@ msgstr "%s{은/는} 이미 그렇게 불린다."
 #: ../src/do_name.c:184
 #, c-format
 msgid "%s is already called %s."
-msgstr "%s{은/는} 이미 %s{(이)라고} 불린다."
+msgstr "%s{은/는} 이미 %s(이)라고 불린다."
 
 #: ../src/do_name.c:191
 #, c-format
