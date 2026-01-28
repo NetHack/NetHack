@@ -92,8 +92,14 @@ LUA_VERSION = 5.4.8
 #
 
 DATHELP = help hh cmdhelp keyhelp history opthelp optmenu usagehlp wizhelp
-# Korean localized help files
-DATHELP_KO = help.ko hh.ko cmdhelp.ko opthelp.ko
+# Korean localized files (in locale/ko/ directory)
+LOCALE_KO = locale/ko/help locale/ko/hh locale/ko/cmdhelp locale/ko/keyhelp \
+	locale/ko/history locale/ko/opthelp locale/ko/optmenu locale/ko/usagehlp locale/ko/wizhelp \
+	locale/ko/bogusmon.txt locale/ko/engrave.txt locale/ko/epitaph.txt \
+	locale/ko/oracles.txt locale/ko/rumors.tru locale/ko/rumors.fal \
+	locale/ko/quest.lua locale/ko/themerms.lua locale/ko/tut-1.lua locale/ko/tut-2.lua \
+	locale/ko/air.lua locale/ko/astral.lua locale/ko/earth.lua locale/ko/water.lua \
+	locale/ko/minend-2.lua locale/ko/Arc-loca.lua
 
 SPEC_LEVS = asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua \
 	juiblex.lua knox.lua medusa-?.lua minend-?.lua minefill.lua \
@@ -103,7 +109,7 @@ SPEC_LEVS = asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua \
 QUEST_LEVS = ???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua
 
 DATNODLB = $(VARDATND) license symbols
-DATDLB = $(DATHELP) $(DATHELP_KO) dungeon.lua tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
+DATDLB = $(DATHELP) $(LOCALE_KO) dungeon.lua tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
 DAT = $(DATNODLB) $(DATDLB)
 
 # These get set only if they weren't already set above or in a hints file
@@ -474,6 +480,10 @@ install: rootcheck $(PRECHECK) $(GAME) recover $(VARDAT) spec_levs sys/unix/sysc
 			chmod $(VARFILEPERM) perm record logfile xlogfile livelog )
 # sysconf
 	true; $(SYSCONFINSTALL)
+# install Korean locale files
+	-mkdir -p $(INSTDIR)/locale/ko/LC_MESSAGES
+	-cp dat/locale/ko/LC_MESSAGES/nethack.mo $(INSTDIR)/locale/ko/LC_MESSAGES/
+	-chmod $(FILEPERM) $(INSTDIR)/locale/ko/LC_MESSAGES/nethack.mo
 # other steps from hints file
 	true; $(POSTINSTALL)
 # and a reminder

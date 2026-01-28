@@ -20,7 +20,7 @@
 /* Standard gettext macros */
 #define _(String)       gettext(String)
 #define N_(String)      gettext_noop(String)
-#define gettext_noop(String) (String)
+#define gettext_noop(String) String
 
 /* Plural forms */
 #define P_(Singular, Plural, N) ngettext(Singular, Plural, N)
@@ -57,7 +57,7 @@ extern char *process_korean_postpositions(char *buf, const char *format, ...);
 
 /* Fallback macros when NLS is disabled */
 #define _(String)       (String)
-#define N_(String)      (String)
+#define N_(String)      String
 #define P_(Singular, Plural, N) ((N) == 1 ? (Singular) : (Plural))
 #define C_(Context, String) (String)
 

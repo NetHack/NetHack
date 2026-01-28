@@ -2097,16 +2097,16 @@ show_conduct(int final)
     putstr(ge.en_win, 0, _("Voluntary challenges:"));
 
     if (u.uroleplay.blind)
-        you_have_been("blind from birth");
+        you_have_been(_("blind from birth"));
     if (u.uroleplay.deaf)
-        you_have_been("deaf from birth");
+        you_have_been(_("deaf from birth"));
     /* note: we don't report "you are without possessions" unless the
        game started with the pauper option set */
     if (u.uroleplay.pauper)
-        enl_msg(You_, gi.invent ? "started" : "are", "started out",
-                " without possessions", "");
+        enl_msg(You_, gi.invent ? _("started") : _("are"), _("started out"),
+                _(" without possessions"), "");
     if (u.uroleplay.reroll) {
-        Sprintf(buf, "rerolled your character %ld time%s",
+        Sprintf(buf, _("rerolled your character %ld time%s"),
                 u.uroleplay.numrerolls, plur(u.uroleplay.numrerolls));
         you_have_X(buf);
     }
@@ -2115,67 +2115,67 @@ show_conduct(int final)
        more impressive accomplishment, but showing "started out without
        possessions" before "faithfully nudist" looks more logical */
     if (u.uroleplay.nudist)
-        you_have_been("faithfully nudist");
+        you_have_been(_("faithfully nudist"));
 
     if (!u.uconduct.food)
-        enl_msg(You_, "have gone", "went", " without food", "");
+        enl_msg(You_, _("have gone"), _("went"), _(" without food"), "");
         /* but beverages are okay */
     else if (!u.uconduct.unvegan)
-        you_have_X("followed a strict vegan diet");
+        you_have_X(_("followed a strict vegan diet"));
     else if (!u.uconduct.unvegetarian)
-        you_have_been("vegetarian");
+        you_have_been(_("vegetarian"));
 
     if (!u.uconduct.gnostic)
-        you_have_been("an atheist");
+        you_have_been(_("an atheist"));
 
     if (!u.uconduct.weaphit) {
-        you_have_never("hit with a wielded weapon");
+        you_have_never(_("hit with a wielded weapon"));
     } else if (wizard) {
-        Sprintf(buf, "hit with a wielded weapon %ld time%s",
+        Sprintf(buf, _("hit with a wielded weapon %ld time%s"),
                 u.uconduct.weaphit, plur(u.uconduct.weaphit));
         you_have_X(buf);
     }
     if (!u.uconduct.killer)
-        you_have_been("a pacifist");
+        you_have_been(_("a pacifist"));
 
     if (!u.uconduct.literate) {
-        you_have_been("illiterate");
+        you_have_been(_("illiterate"));
     } else if (wizard) {
-        Sprintf(buf, "read items or engraved %ld time%s", u.uconduct.literate,
+        Sprintf(buf, _("read items or engraved %ld time%s"), u.uconduct.literate,
                 plur(u.uconduct.literate));
         you_have_X(buf);
     }
 
     if (!u.uconduct.pets)
-        you_have_never("had a pet");
+        you_have_never(_("had a pet"));
 
     ngenocided = num_genocides();
     if (ngenocided == 0) {
-        you_have_never("genocided any monsters");
+        you_have_never(_("genocided any monsters"));
     } else {
-        Sprintf(buf, "genocided %d type%s of monster%s", ngenocided,
+        Sprintf(buf, _("genocided %d type%s of monster%s"), ngenocided,
                 plur(ngenocided), plur(ngenocided));
         you_have_X(buf);
     }
 
     if (!u.uconduct.polypiles) {
-        you_have_never("polymorphed an object");
+        you_have_never(_("polymorphed an object"));
     } else if (wizard) {
-        Sprintf(buf, "polymorphed %ld item%s", u.uconduct.polypiles,
+        Sprintf(buf, _("polymorphed %ld item%s"), u.uconduct.polypiles,
                 plur(u.uconduct.polypiles));
         you_have_X(buf);
     }
 
     if (!u.uconduct.polyselfs) {
-        you_have_never("changed form");
+        you_have_never(_("changed form"));
     } else if (wizard) {
-        Sprintf(buf, "changed form %ld time%s", u.uconduct.polyselfs,
+        Sprintf(buf, _("changed form %ld time%s"), u.uconduct.polyselfs,
                 plur(u.uconduct.polyselfs));
         you_have_X(buf);
     }
 
     if (!u.uconduct.wishes) {
-        you_have_X("used no wishes");
+        you_have_X(_("used no wishes"));
     } else {
         Sprintf(buf, "used %ld wish%s", u.uconduct.wishes,
                 (u.uconduct.wishes > 1L) ? "es" : "");
@@ -2202,32 +2202,32 @@ show_conduct(int final)
         you_have_X(buf);
 
         if (!u.uconduct.wisharti)
-            enl_msg(You_, "have not wished", "did not wish",
-                    " for any artifacts", "");
+            enl_msg(You_, _("have not wished"), _("did not wish"),
+                    _(" for any artifacts"), "");
     }
 
     /* only report Sokoban conduct if the Sokoban branch has been entered */
     if (sokoban_in_play()) {
-        const char *presentverb = "have violated", *pastverb = "violated";
+        const char *presentverb = _("have violated"), *pastverb = _("violated");
 
-        Strcpy(buf, " the special Sokoban rules ");
+        Strcpy(buf, _(" the special Sokoban rules "));
         switch (u.uconduct.sokocheat) {
         case 0L:
-            presentverb = "have not violated";
-            pastverb = "did not violate";
-            Strcpy(buf, " any of the special Sokoban rules");
+            presentverb = _("have not violated");
+            pastverb = _("did not violate");
+            Strcpy(buf, _(" any of the special Sokoban rules"));
             break;
         case 1L:
-            Strcat(buf, "once");
+            Strcat(buf, _("once"));
             break;
         case 2L:
-            Strcat(buf, "twice");
+            Strcat(buf, _("twice"));
             break;
         case 3L:
-            Strcat(buf, "thrice");
+            Strcat(buf, _("thrice"));
             break;
         default:
-            Sprintf(eos(buf), "%ld times", u.uconduct.sokocheat);
+            Sprintf(eos(buf), _("%ld times"), u.uconduct.sokocheat);
             break;
         }
         enl_msg(You_, presentverb, pastverb, buf, "");

@@ -492,9 +492,10 @@ com_pager_core(
         goto compagerdone;
     }
 
-    if (!nhl_loadlua(L, QTEXT_FILE)) {
+    /* Try localized quest.lua first (e.g., locale/ko/quest.lua) */
+    if (!nhl_loadlua(L, get_localized_filename(QTEXT_FILE))) {
         if (showerror)
-            impossible("com_pager: %s not found.", QTEXT_FILE);
+            impossible("com_pager: %s not found.", get_localized_filename(QTEXT_FILE));
         goto compagerdone;
     }
 
@@ -503,7 +504,7 @@ com_pager_core(
     if (!lua_istable(L, -1)) {
         if (showerror)
             impossible("com_pager: questtext in %s is not a lua table",
-                       QTEXT_FILE);
+                       get_localized_filename(QTEXT_FILE));
         goto compagerdone;
     }
 
@@ -511,7 +512,7 @@ com_pager_core(
     if (!lua_istable(L, -1)) {
         if (showerror)
             impossible("com_pager: questtext[%s] in %s is not a lua table",
-                       section, QTEXT_FILE);
+                       section, get_localized_filename(QTEXT_FILE));
         goto compagerdone;
     }
 
@@ -532,11 +533,11 @@ com_pager_core(
             if (!fallback_msgid)
                 impossible(
                       "com_pager: questtext[%s][%s] in %s is not a lua table",
-                           section, msgid, QTEXT_FILE);
+                           section, msgid, get_localized_filename(QTEXT_FILE));
             else
                 impossible(
            "com_pager: questtext[%s][%s] and [][%s] in %s are not lua tables",
-                           section, msgid, fallback_msgid, QTEXT_FILE);
+                           section, msgid, fallback_msgid, get_localized_filename(QTEXT_FILE));
         }
         goto compagerdone;
     }
@@ -561,7 +562,7 @@ com_pager_core(
                 impossible(
               "com_pager: questtext[%s][%s] in %s is not an array of strings",
                            section, fallback_msgid ? fallback_msgid : msgid,
-                           QTEXT_FILE);
+                           get_localized_filename(QTEXT_FILE));
             goto compagerdone;
         }
         nelems = rn2(nelems) + 1;

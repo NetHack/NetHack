@@ -2180,15 +2180,15 @@ Goodbye(void)
 {
     switch (Role_switch) {
     case PM_KNIGHT:
-        return "Fare thee well"; /* Olde English */
+        return _("Fare thee well"); /* Olde English */
     case PM_SAMURAI:
-        return "Sayonara"; /* Japanese */
+        return _("Sayonara"); /* Japanese */
     case PM_TOURIST:
-        return "Aloha"; /* Hawaiian */
+        return _("Aloha"); /* Hawaiian */
     case PM_VALKYRIE:
-        return "Farvel"; /* Norse */
+        return _("Farvel"); /* Norse */
     default:
-        return "Goodbye";
+        return _("Goodbye");
     }
 }
 
