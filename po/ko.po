@@ -35636,12 +35636,12 @@ msgstr "물줄기{이/가}"
 #: ../src/trap.c:1620
 #, c-format
 msgid "%s your left %s!"
-msgstr "%s{이/가} 왼쪽 %s{을/를}!"
+msgstr "%s 당신의 왼쪽 %s{을/를} 때렸다!"
 
 #: ../src/trap.c:1629
 #, c-format
 msgid "%s your right %s!"
-msgstr "당신의 오른쪽 %s{을/를} %s!"
+msgstr "%s 당신의 오른쪽 %s{을/를} 때렸다!"
 
 #
 #: ../src/trap.c:1654
