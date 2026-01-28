@@ -2572,7 +2572,7 @@ msgstr "%s %s %s%c"
 #: ../src/artifact.c:1485
 #, c-format
 msgid "fiery blade %s %s%c"
-msgstr "불타는 검이 %s %s%c"
+msgstr "불타는 검이 %2$s{을/를} %1$s%3$c"
 
 #: ../src/artifact.c:1487 ../src/artifact.c:1505 ../src/do.c:551
 #: ../src/dothrow.c:1281 ../src/mhitu.c:71
@@ -2586,16 +2586,16 @@ msgstr "일부를 증발시켰다"
 #: ../src/artifact.c:1490 ../src/hack.c:2023 ../src/trap.c:1013
 #: ../src/trap.c:5509
 msgid "burns"
-msgstr "타다"
+msgstr "태웠다"
 
 #: ../src/artifact.c:1504
 #, c-format
 msgid "ice-cold blade %s %s%c"
-msgstr "얼음장 같은 검이 %s %s%c"
+msgstr "얼음장 같은 검이 %2$s{을/를} %1$s%3$c"
 
 #: ../src/artifact.c:1505
 msgid "freezes"
-msgstr "얼어붙는다"
+msgstr "얼렸다"
 
 #: ../src/artifact.c:1516
 #, c-format
@@ -9260,19 +9260,19 @@ msgstr "{은/는} 당신의 쓰레기에 관심이 없다."
 
 #: ../src/dothrow.c:2301
 msgid " accepts your gift."
-msgstr "{이/가} 당신의 선물을 받았다."
+msgstr " 당신의 선물을 받았다."
 
 #: ../src/dothrow.c:2302
 msgid " hesitatingly"
-msgstr " 망설이며"
+msgstr "{이/가} 망설이며"
 
 #: ../src/dothrow.c:2303
 msgid " graciously"
-msgstr " 공손하게"
+msgstr "{이/가} 공손하게"
 
 #: ../src/dothrow.c:2304
 msgid " gratefully"
-msgstr " 감사하게"
+msgstr "{이/가} 감사하게"
 
 #: ../src/dothrow.c:2452
 #, c-format
@@ -14232,7 +14232,7 @@ msgstr "그것"
 #: ../src/insight.c:692 ../src/insight.c:750 ../src/insight.c:795
 #: ../src/insight.c:1067 ../src/insight.c:1944 ../src/insight.c:1946
 msgid "is "
-msgstr "촉촉한 "
+msgstr "{은/는} "
 
 #: ../src/insight.c:625 ../src/insight.c:627 ../src/insight.c:647
 #: ../src/insight.c:692 ../src/insight.c:750 ../src/insight.c:795
@@ -16265,19 +16265,19 @@ msgstr "신용카드로 문을 잠글 수 없다."
 #: ../src/lock.c:621
 #, c-format
 msgid "%s it%s%s?"
-msgstr "%s %s%s"
+msgstr "%3$s%2$s %1$s?"
 
 #: ../src/lock.c:622
 msgid "Unlock"
-msgstr "열기"
+msgstr "열까"
 
 #: ../src/lock.c:622
 msgid "Lock"
-msgstr "잠금"
+msgstr "잠글까"
 
 #: ../src/lock.c:623
 msgid " with "
-msgstr "{으로/로} "
+msgstr "{으로/로}"
 
 #: ../src/lock.c:689
 msgid "force anything from inside here."
@@ -24440,7 +24440,7 @@ msgstr "용기"
 # %1$s = "is"/"are", %2$s = object name
 #: ../src/pickup.c:3587
 msgid " here, tip it?"
-msgstr "{이/가} 여기 있는데, 기울일까?"
+msgstr "{이/가} 있는데, 기울일까?"
 
 #: ../src/pickup.c:3589
 msgid "container"
@@ -35098,7 +35098,7 @@ msgstr "에게 중독됨: "
 
 #: ../src/topten.c:98
 msgid "died of "
-msgstr "{으로/로} 사망: "
+msgstr "사망원인: "
 
 #: ../src/topten.c:100
 msgid "drowned in "
