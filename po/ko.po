@@ -10079,7 +10079,7 @@ msgstr "당신 자신"
 
 #: ../src/eat.c:1835
 msgid "you slap against the"
-msgstr "~에 부딪히다"
+msgstr "에 부딪힌다"
 
 #: ../src/eat.c:1836
 msgid "saddle"
@@ -10088,7 +10088,7 @@ msgstr "안장"
 #: ../src/eat.c:1837
 #, c-format
 msgid "world spins and %s %s."
-msgstr "세계가 돌고 %s %s."
+msgstr "세계가 돌고 %2$s%1$s."
 
 #: ../src/eat.c:1841
 msgid "unconscious from rotten food"
@@ -11601,15 +11601,15 @@ msgstr "여기 %s에 %s되어 있는 메시지를 지울 수 없다."
 
 #: ../src/engrave.c:1151
 msgid "melted into"
-msgstr "녹아 들어갔다"
+msgstr "녹여 새겨진"
 
 #: ../src/engrave.c:1151
 msgid "burned into"
-msgstr "불로 새긴"
+msgstr "불로 새겨진"
 
 #: ../src/engrave.c:1152
 msgid "engraved in"
-msgstr "~에 새긴"
+msgstr "새겨진"
 
 #: ../src/engrave.c:1158
 msgid "will overwrite the current message."
