@@ -772,7 +772,7 @@ msgstr "흉측한"
 #: ../src/apply.c:1012
 #, c-format
 msgid "look %s."
-msgstr "%s{처럼} 보인다."
+msgstr "%s처럼 보인다."
 
 #: ../src/apply.c:1031
 #, c-format
@@ -823,7 +823,7 @@ msgstr "영양실조로"
 #: ../src/apply.c:1067
 #, c-format
 msgid "look like %s."
-msgstr "%s{처럼} 보인다."
+msgstr "%s처럼 보인다."
 
 #: ../src/apply.c:1069
 #, c-format
@@ -1003,7 +1003,7 @@ msgstr "%s{을/를} 끈다."
 #: ../src/apply.c:1328
 #, c-format
 msgid "This %s has no %s."
-msgstr "이 %s{에는} %s{이/가} 없다."
+msgstr "이 %s에는 %s{이/가} 없다."
 
 #: ../src/apply.c:1334
 #, c-format
@@ -1325,7 +1325,7 @@ msgstr "%s"
 #: ../src/apply.c:1662
 #, c-format
 msgid "This %s has no oil."
-msgstr "이 %s{에는} 기름이 없다."
+msgstr "이 %s에는 기름이 없다."
 
 #: ../src/apply.c:1668
 #, c-format
@@ -7075,7 +7075,7 @@ msgstr "%s{은/는} 이미 공식 이름이 있다."
 #: ../src/do_name.c:302
 #, c-format
 msgid "What do you want to name %s "
-msgstr "%s{에게} 어떤 이름을 붙이겠습니까? "
+msgstr "%s에게 어떤 이름을 붙이겠습니까? "
 
 #: ../src/do_name.c:322
 #, c-format
@@ -7185,7 +7185,7 @@ msgstr "%1$s{이/가} 당신을 \"%3$s\"(이)라고 부르기로 %2$s."
 #: ../src/do_name.c:745
 #, c-format
 msgid "%s %s can't be assigned a type name."
-msgstr "%2$s{에는} 유형 이름을 할당할 수 없다.%1$.0s"
+msgstr "%2$s에는 유형 이름을 할당할 수 없다.%1$.0s"
 
 #: ../src/do_name.c:748
 #, c-format
@@ -7933,11 +7933,11 @@ msgstr "%s더 이상 %s."
 # ============================================================
 #: ../src/do_wear.c:2837 ../src/insight.c:1067
 msgid "are "
-msgstr "있다 "
+msgstr ""
 
 #: ../src/do_wear.c:2838 ../src/insight.c:1256
 msgid "wielding two weapons at once"
-msgstr "한 번에 두 무기를 휘두르기"
+msgstr "한 번에 두 무기를 휘두르고 있다"
 
 #: ../src/do_wear.c:2839
 msgid "have a second weapon readied"
@@ -8409,7 +8409,7 @@ msgstr "%ld %s 가치의 피해를 입혔다!"
 #: ../src/dokick.c:485
 #, c-format
 msgid "owe %s %ld %s for objects destroyed."
-msgstr "파괴된 물건에 대해 %s{에게} %ld %s{을/를} 빚졌다."
+msgstr "파괴된 물건에 대해 %s에게 %ld %s{을/를} 빚졌다."
 
 #: ../src/dokick.c:529
 #, c-format
@@ -17466,7 +17466,7 @@ msgstr "막 "
 
 #: ../src/mhitu.c:119
 msgid "bashes with"
-msgstr "~으로 강타한다"
+msgstr "강타한다"
 
 #: ../src/mhitu.c:120
 msgid "lashes"
@@ -17732,7 +17732,7 @@ msgstr "약간의 질병."
 #: ../src/mhitu.c:1063
 #, c-format
 msgid "%s %s your %s %s!"
-msgstr "%1$s{이/가} 당신의 %3$s%4$s{에서/서} %2$s!"
+msgstr "%1$s{이/가} 당신의 %3$s%4$s에서 %2$s!"
 
 #: ../src/mhitu.c:1064
 msgid "slips off of"
@@ -18497,7 +18497,7 @@ msgstr "%s에게 모든 금화를 준다."
 #: ../src/minion.c:382
 #, c-format
 msgid "give %s %ld %s."
-msgstr "%s{에게} %ld %s{을/를} 주었다."
+msgstr "%s에게 %ld %s{을/를} 주었다."
 
 #: ../src/minion.c:476
 #, c-format
@@ -19777,7 +19777,7 @@ msgstr "던진다"
 
 #: ../src/mthrowu.c:293
 msgid " at "
-msgstr " ~에서 "
+msgstr "에게 "
 
 #
 #: ../src/mthrowu.c:355
@@ -19803,7 +19803,7 @@ msgstr "철퍽!"
 #: ../src/uhitm.c:3110
 #, c-format
 msgid "poison doesn't seem to affect %s."
-msgstr "독이 %s{에게} 효과가 없는 것 같다."
+msgstr "독이 %s에게 효과가 없는 것 같다."
 
 #: ../src/mthrowu.c:428
 #, c-format
@@ -20739,7 +20739,7 @@ msgstr "%s%s 음악을 %s연주한다."
 
 #: ../src/music.c:592 ../src/shk.c:1816 ../src/shk.c:2005 ../src/shk.c:2410
 msgid "seem to "
-msgstr "~인 것 같다 "
+msgstr ""
 
 #: ../src/music.c:593
 msgid "piped"
@@ -21979,7 +21979,7 @@ msgstr " 두루마리"
 
 #: ../src/obj_descr_i18n.c:344 ../src/objnam.c:865
 msgid " labeled "
-msgstr " ~라고 적힌 "
+msgstr "라고 적힌 "
 
 #: ../src/obj_descr_i18n.c:346 ../src/objnam.c:876
 #, c-format
@@ -22384,19 +22384,19 @@ msgstr "부착된"
 #: ../src/objnam.c:1595
 #, c-format
 msgid " (%s %s)"
-msgstr " (%s %s)"
+msgstr " (%2$s%1$s)"
 
 #: ../src/objnam.c:1596
 msgid "tethered to"
-msgstr "~에 연결된"
+msgstr "에 연결됨"
 
 #: ../src/objnam.c:1597
 msgid "wielded in"
-msgstr "장비됨"
+msgstr "에 장착"
 
 #: ../src/objnam.c:1598
 msgid "weapon in"
-msgstr "무기 사용"
+msgstr "의 무기"
 
 #: ../src/objnam.c:1619
 #, c-format
@@ -27583,7 +27583,7 @@ msgstr "%s 신에게 기도한다는 생각 자체가 불쾌하다."
 #: ../src/pray.c:2138
 #, c-format
 msgid "begin praying to %s."
-msgstr "%s{에게} 기도하기 시작했다."
+msgstr "%s에게 기도하기 시작했다."
 
 #: ../src/pray.c:2232
 msgid "Force the gods to be pleased?"
@@ -28171,7 +28171,7 @@ msgstr "\"%d0%d %ld%d1 0%d%d0\"%s"
 #: ../src/read.c:492
 #, c-format
 msgid "This %s has no label."
-msgstr "이 %s{에는} 라벨이 없다."
+msgstr "이 %s에는 라벨이 없다."
 
 #: ../src/read.c:511
 #, c-format
@@ -30215,7 +30215,7 @@ msgstr "노려본다"
 
 #: ../src/shk.c:884
 msgid "is dismayed because of"
-msgstr "~때문에 낙담하다"
+msgstr "보고 낙담했다"
 
 #: ../src/shk.c:954
 msgid "have no credit or debt in here."
@@ -30236,7 +30236,7 @@ msgstr "여기에 크레딧이 없다."
 #: ../src/shk.c:973 ../src/shk.c:5715
 #, c-format
 msgid "owe %s %ld %s."
-msgstr "%s{에게} %ld %s{을/를} 빚졌다."
+msgstr "%s에게 %ld %s{을/를} 빚졌다."
 
 #: ../src/shk.c:975
 msgid "don't owe any gold here."
@@ -30377,7 +30377,7 @@ msgstr "하지만 숨겨둔 금화가 있다."
 #: ../src/shk.c:1821
 #, c-format
 msgid "give %s the %ld gold piece%s %s asked for."
-msgstr "%1$s{에게} %4$s{이/가} 요청한 금화 %2$ld%3$s{을/를} 주었다."
+msgstr "%1$s에게 %4$s{이/가} 요청한 금화 %2$ld%3$s{을/를} 주었다."
 
 #: ../src/shk.c:1825
 #, c-format
@@ -30437,7 +30437,7 @@ msgstr "하지만 %s{은/는} 여전히 화나있다."
 #: ../src/shk.c:1900
 #, c-format
 msgid "You owe %s %ld %s "
-msgstr "%s{에게} %ld %s{을/를} 빚졌다."
+msgstr "%s에게 %ld %s{을/를} 빚졌다."
 
 # ============================================================
 # 던전 메시지 (Dungeon Messages)
@@ -33725,7 +33725,7 @@ msgstr "지금은 여기에 갇혀있다."
 #: ../src/steed.c:284
 #, c-format
 msgid "%s is not saddled."
-msgstr "%s{에게는} 안장이 없다."
+msgstr "%s에게는 안장이 없다."
 
 #: ../src/steed.c:293
 #, c-format
@@ -33757,7 +33757,7 @@ msgstr "그런 생물을 탄다."
 #: ../src/steed.c:331
 #, c-format
 msgid "cannot reach %s."
-msgstr "%s{에게} 닿을 수 없다."
+msgstr "%s에게 닿을 수 없다."
 
 #: ../src/steed.c:335
 #, c-format
@@ -33858,7 +33858,7 @@ msgstr "비를 피하니 기분이 좋다."
 #: ../src/steed.c:651
 #, c-format
 msgid "dismount %s."
-msgstr "%s{에서} 내렸다."
+msgstr "%s에서 내렸다."
 
 #
 #: ../src/steed.c:666
@@ -36758,7 +36758,7 @@ msgstr "%s{이/가} 길을 막고 있다."
 #: ../src/trap.c:5393 ../src/trap.c:5402
 #, c-format
 msgid "are unable to reach the %s!"
-msgstr "%s{에} 닿을 수 없다!"
+msgstr "%s에 닿을 수 없다!"
 
 #: ../src/trap.c:5409
 msgid "Whoops..."
@@ -37818,7 +37818,7 @@ msgstr "%s %s %s%s%s."
 #: ../src/uhitm.c:2052
 #, c-format
 msgid "%s %s %s %s!"
-msgstr "%2$s %3$s %4$s{에서/서} %1$s!"
+msgstr "%2$s %3$s %4$s에서 %1$s!"
 
 #: ../src/uhitm.c:2053
 msgid "slip off of"
@@ -38065,7 +38065,7 @@ msgstr "%s의 투구가 %s의 머리를 향한 %s 공격을 막았다."
 #: ../src/uhitm.c:3295
 #, c-format
 msgid "barbs stick to %s!"
-msgstr "가시가 %s{에게} 박혔다!"
+msgstr "가시가 %s에게 박혔다!"
 
 #: ../src/uhitm.c:3303
 msgid "The barbs stick to you!"
@@ -38469,7 +38469,7 @@ msgstr "%s{이/가} 끈적이로 덮였다!"
 #: ../src/uhitm.c:5099
 #, c-format
 msgid "It seems harmless to %s."
-msgstr "%s{에게} 해롭지 않은 것 같다."
+msgstr "%s에게 해롭지 않은 것 같다."
 
 #: ../src/uhitm.c:5107
 #, c-format
@@ -38644,7 +38644,7 @@ msgstr "물보라를 맞았다!"
 #: ../src/uhitm.c:5887
 #, c-format
 msgid "are splashed by %s %s!"
-msgstr "%s %s{에} 튀었다!"
+msgstr "%s %s에 튀었다!"
 
 #: ../src/uhitm.c:5961
 msgid "A hail of magic missiles narrowly misses you!"
