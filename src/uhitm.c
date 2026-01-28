@@ -6402,9 +6402,13 @@ light_hits_gremlin(struct monst *mon, int dmg)
 {
     if (!Deaf && mdistu(mon) <= 90) {
         /* cry of pain can be heard somewhat farther than the waking radius */
-        pline_mon(mon, _("%s %s!"), Monnam(mon),
-                  (dmg > mon->mhp / 2) ? _("wails in agony")
-                                       : _("cries out in pain"));
+        const char *cry = (dmg > mon->mhp / 2) ? _("wails in agony")
+                                                : _("cries out in pain");
+        if (is_korean_locale()) {
+            pline_mon(mon, "%s{이/가} %s!", Monnam(mon), cry);
+        } else {
+            pline_mon(mon, _("%s %s!"), Monnam(mon), cry);
+        }
     } else if (canseemon(mon)) {
         pline_mon(mon, _("%s recoils from the light!"), Monnam(mon));
     }

@@ -3783,7 +3783,7 @@ msgstr ""
 #: ../src/cfgfiles.c:1579 ../src/mhitu.c:78
 #, c-format
 msgid "%s %s%s%s"
-msgstr "%s{이/가} %s%s%s"
+msgstr "%1$s{이/가}%3$s %2$s%4$s"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
