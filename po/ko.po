@@ -1795,7 +1795,7 @@ msgstr "\"삐걱, 삐걱\""
 #: ../src/apply.c:2692
 #, c-format
 msgid "rub on the stone%s"
-msgstr "시금석%s에 문지르다"
+msgstr "시금석에 문지르다%.0s"
 
 #: ../src/apply.c:2700
 #, c-format
@@ -13719,7 +13719,7 @@ msgstr "이 기름 %s"
 #: ../src/iactions.c:373
 #, c-format
 msgid "Dip something into %s potion%s"
-msgstr "%s 물약%s에 무언가를 담그기"
+msgstr "%1$s 물약에 무언가를 담그기%2$.0s"
 
 #: ../src/iactions.c:374 ../src/iactions.c:426 ../src/iactions.c:454
 #: ../src/iactions.c:578
@@ -19279,7 +19279,7 @@ msgstr "경비병들의"
 #: ../src/mon.c:5747
 #, c-format
 msgid "the shrill sound of %s whistle%s."
-msgstr "%s 호루라기%s의 날카로운 소리."
+msgstr "%1$s 호루라기의 날카로운 소리.%2$.0s"
 
 #: ../src/mon.c:5780
 #, c-format
@@ -20902,17 +20902,17 @@ msgstr "%s{이/가} 진동을 내는 것을 느낀다."
 #: ../src/music.c:873
 #, c-format
 msgid "%d tumbler%s click and %d gear%s turn."
-msgstr "%d개의 텀블러%s가 딸깍거리고 %d개의 기어%s가 돈다."
+msgstr "%1$d개의 텀블러가 딸깍거리고 %3$d개의 기어가 돈다.%2$.0s%4$.0s"
 
 #: ../src/music.c:878
 #, c-format
 msgid "%d tumbler%s click."
-msgstr "%d개의 텀블러%s가 딸깍거린다."
+msgstr "%1$d개의 텀블러가 딸깍거린다.%2$.0s"
 
 #: ../src/music.c:882
 #, c-format
 msgid "%d gear%s turn."
-msgstr "%d개의 기어%s가 돈다."
+msgstr "%1$d개의 기어가 돈다.%2$.0s"
 
 #: ../src/nhlua.c:1366
 #, c-format
@@ -29008,7 +29008,7 @@ msgstr "주변의 가스 구름이 흩어졌다."
 #: ../src/region.c:469
 #, c-format
 msgid "%s gas cloud%s dissipate."
-msgstr "%s 가스 구름%s이 흩어지는 것을."
+msgstr "%1$s 가스 구름이 흩어지는 것을.%2$.0s"
 
 #: ../src/region.c:989
 #, c-format
@@ -30537,12 +30537,12 @@ msgstr " %ld %s에. 지불하시겠습니까?"
 #: ../src/shk.c:2233
 #, c-format
 msgid "paid for %s at a cost of %ld gold piece%s.%s"
-msgstr "%s{을/를} %ld 금화%s에 지불했다.%s"
+msgstr "%1$s{을/를} %2$ld 금화에 지불했다.%3$.0s%4$s"
 
 #: ../src/shk.c:2234 ../src/shk.c:2346
 #, c-format
 msgid "bought %s for %ld gold piece%s.%s"
-msgstr "%1$s{을/를} %2$ld 금화%3$s에 샀다.%4$s"
+msgstr "%1$s{을/를} %2$ld 금화에 샀다.%3$.0s%4$s"
 
 # Item type names (note: "potion" is already defined elsewhere)
 #: ../src/shk.c:2377
@@ -30659,7 +30659,7 @@ msgstr "괜찮아요, 제가 당신이라면 그것을 간직하겠어요."
 #: ../src/shk.c:3064
 #, c-format
 msgid "You'll need %d%s candle%s to go along with it."
-msgstr "이것과 함께 %d%s개의 양초%s가 필요한다."
+msgstr "이것과 함께 양초가 %1$d%2$s 필요하다.%3$.0s"
 
 #: ../src/shk.c:3074
 msgid "I won't stock that.  Take it out of here!"
@@ -34861,7 +34861,7 @@ msgstr "돌"
 #: ../src/timeout.c:1252
 #, c-format
 msgid "Egads!  %s bite%s your %s!"
-msgstr "이런! %s{이/가} 당신의 %s{을/를} 물%s었다!"
+msgstr "이런! %1$s{이/가} 당신의 %3$s{을/를} 물었다!%2$.0s"
 
 #: ../src/timeout.c:1255
 #, c-format
