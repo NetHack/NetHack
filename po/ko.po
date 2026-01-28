@@ -14471,15 +14471,15 @@ msgstr "%2$s에 의해 %1$s"
 #: ../src/insight.c:1101
 #, c-format
 msgid "%s %s (%s)"
-msgstr "%s %s %s"
+msgstr "%2$s%1$s (%3$s)"
 
 #: ../src/insight.c:1102
 msgid "holding"
-msgstr "붙잡는 중"
+msgstr "{을/를} 붙잡는 중"
 
 #: ../src/insight.c:1102
 msgid "held by"
-msgstr "~에게 붙잡힘"
+msgstr "에게 붙잡혀 있음"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
