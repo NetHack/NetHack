@@ -244,7 +244,7 @@ msgstr "\"%s, 짐.\"이라고 말하는 목소리."
 #: ../src/apply.c:277
 #, c-format
 msgid "determine that %s unfortunate being%s %s%s dead."
-msgstr "%s 불행한 존재%s{이/가} %s%s 죽었다고 판단한다."
+msgstr "%1$s 불행한 존재%2$s{이/가}%4$s 죽었다고 판단한다.%3$.0s"
 
 #: ../src/apply.c:278 ../src/cmd.c:1295 ../src/cmd.c:1300 ../src/do_name.c:303
 #: ../src/iactions.c:296 ../src/iactions.c:354 ../src/iactions.c:374
@@ -1057,7 +1057,7 @@ msgstr "빛나다"
 #: ../src/apply.c:1355
 #, c-format
 msgid "%s's %s burn%s"
-msgstr "%s의 %s{이/가} 타다%s"
+msgstr "%1$s의 %2$s{이/가} 탄다%3$.0s"
 
 #: ../src/apply.c:1356 ../src/apply.c:1683 ../src/mon.c:2960 ../src/mon.c:4222
 #: ../src/mon.c:4321 ../src/zap.c:3541 ../src/zap.c:4826 ../src/zap.c:4840
@@ -1177,7 +1177,7 @@ msgstr ", 불 붙은"
 #: ../src/apply.c:1481
 #, c-format
 msgid "%s%scandle%s flame%s extinguished."
-msgstr "%s%s양초%s 불꽃%s{이/가} 꺼졌다."
+msgstr "%s%s양초%s 불꽃%s 꺼졌다."
 
 #: ../src/apply.c:1482 ../src/timeout.c:1557 ../src/timeout.c:1575
 msgid "candelabrum's "
@@ -2017,7 +2017,7 @@ msgstr "채찍으로 %s{을/를} 때렸다."
 #: ../src/apply.c:3058
 #, c-format
 msgid "killed %sself with %s bullwhip"
-msgstr "자신의 채찍으로 자살"
+msgstr "자신의 채찍으로 자살%.0s%.0s"
 
 #: ../src/apply.c:3063
 #, c-format
@@ -2057,7 +2057,7 @@ msgstr "눈치채지 못했던"
 #: ../src/apply.c:3165
 #, c-format
 msgid "%s welded to %s %s%c"
-msgstr "%s{이/가} %s %s에 붙어있다%c"
+msgstr "%s %s %s에 붙어있다%c"
 
 #: ../src/apply.c:3179
 #, c-format
@@ -2277,12 +2277,12 @@ msgstr "%s{을/를} %s 위로 높이 들어 올려, 둘로 %s!"
 
 #: ../src/apply.c:3937 ../src/mhitu.c:1349
 msgid "snap"
-msgstr "덥석 물다"
+msgstr "뚝 부러뜨렸다"
 
 #: ../src/apply.c:3937 ../src/dig.c:514 ../src/dokick.c:961
 #: ../src/explode.c:777
 msgid "break"
-msgstr "부러지다"
+msgstr "부수다"
 
 #: ../src/apply.c:4007
 msgid "A wall of force smashes down around you!"
@@ -31094,7 +31094,7 @@ msgstr "%1$s{이/가} 배낭을 %2$s!"
 #: ../src/shk.c:5086
 #, c-format
 msgid "How dare you %s my %s?"
-msgstr "감히 내 %s{을/를} %s하다니?"
+msgstr "감히 내 %2$s{을/를} %1$s니?"
 
 #: ../src/shk.c:5087 ../src/shk.c:5091 ../src/shk.c:5098 ../src/shk.c:5102
 msgid "shop"
