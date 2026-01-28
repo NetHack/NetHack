@@ -17629,7 +17629,7 @@ msgstr "잠깐, %s! 거기 숨어있는 %s 이름이 %s(이)다!"
 #: ../src/mhitu.c:646
 #, c-format
 msgid "Wait, %s!  There's a %s named %s hiding under %s!"
-msgstr "잠깐, %1$s! %4$s 아래에 %3$s{이라는/라는} 이름의 %2$s{이/가} 숨어있다!"
+msgstr "잠깐, %1$s! %4$s 아래에 %3$s(이)라는 이름의 %2$s{이/가} 숨어있다!"
 
 #: ../src/mhitu.c:669
 msgid "It gets stuck on you."
@@ -17638,7 +17638,7 @@ msgstr "그것이 당신에게 달라붙었다."
 #: ../src/mhitu.c:671
 #, c-format
 msgid "Wait, %s!  That's a %s named %s!"
-msgstr "잠깐, %1$s! 그건 %3$s{이라는/라는} 이름의 %2$s{이다/다}!"
+msgstr "잠깐, %1$s! 그건 %3$s(이)라는 이름의 %2$s{이다/다}!"
 
 #: ../src/mhitu.c:689
 msgid "tries to pick you up"
@@ -17651,7 +17651,7 @@ msgstr "당신을 방해한다"
 #: ../src/mhitu.c:692
 #, c-format
 msgid "Wait, %s!  That %s is really %s named %s!"
-msgstr "잠깐, %1$s! 그 %2$s{은/는} 사실 %4$s{이라는/라는} 이름의 %3$s!"
+msgstr "잠깐, %1$s! 그 %2$s{은/는} 사실 %4$s(이)라는 이름의 %3$s!"
 
 #: ../src/mhitu.c:698
 #, c-format
