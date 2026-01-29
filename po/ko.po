@@ -16722,6 +16722,11 @@ msgstr "실례한다."
 msgid "This place's too crowded.  I'm outta here."
 msgstr "이곳은 너무 붐빈다. 나 간다."
 
+#: ../src/mail.c:781
+#, c-format
+msgid "System command (%s)"
+msgstr "시스템 명령어 (%s)"
+
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
 # ============================================================
@@ -39506,6 +39511,11 @@ msgstr "%s{이/가} 달을 향해 울부짖는다."
 msgid "%s changes into a %s."
 msgstr "%s{이/가} %s{으로/로} 변했다."
 
+#: ../src/were.c:202
+#, c-format
+msgid "Do you want to change into %s?"
+msgstr "%s{으로/로} 변하시겠습니까?"
+
 #: ../src/were.c:219
 msgid "purified."
 msgstr "정화되었다."
@@ -40254,6 +40264,11 @@ msgstr "'다른' 층"
 #: ../src/wizcmds.c:1557
 msgid "All migrating monsters:"
 msgstr "모든 이동 중인 괴물:"
+
+#: ../src/wizcmds.c:270
+#, c-format
+msgid "Kill %.110s?"
+msgstr "%.110s{을/를} 죽이겠습니까?"
 
 #: ../src/wizcmds.c:363
 msgid "Load which lua file?"
