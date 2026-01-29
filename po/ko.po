@@ -1102,11 +1102,11 @@ msgstr "붙이다 "
 #: ../src/apply.c:1433
 #, c-format
 msgid "attach %ld%s %s to %s."
-msgstr "%ld%s %s{을/를} %s에 붙인다."
+msgstr "%3$s %1$ld개%2$s{을/를} %4$s에 붙인다."
 
 #: ../src/apply.c:1433 ../src/invent.c:4266 ../src/shk.c:3065 ../src/zap.c:6176
 msgid " more"
-msgstr "개 더"
+msgstr " 더"
 
 #: ../src/apply.c:1439
 #, c-format
@@ -30659,7 +30659,7 @@ msgstr "괜찮아요, 제가 당신이라면 그것을 간직하겠어요."
 #: ../src/shk.c:3064
 #, c-format
 msgid "You'll need %d%s candle%s to go along with it."
-msgstr "이것과 함께 양초가 %1$d%2$s 필요하다.%3$.0s"
+msgstr "이것과 함께 양초가 %1$d개%2$s 필요하다.%3$.0s"
 
 #: ../src/shk.c:3074
 msgid "I won't stock that.  Take it out of here!"
@@ -30682,7 +30682,7 @@ msgstr "%s{은/는} %s에 관심이 없다."
 #: ../src/shk.c:3500
 #, c-format
 msgid "%s will cost you %ld %s%s."
-msgstr "%s{은/는} %ld %s%s{이/가} 들 것이다."
+msgstr "%1$s{은/는}%4$s %2$ld %3$s{이/가} 들 것이다."
 
 #: ../src/shk.c:3501 ../src/shk.c:3531 ../src/shk.c:5375 ../src/shk.c:5395
 msgid " each"
@@ -41310,7 +41310,7 @@ msgstr "그렇게 하면 '소원 없음' 행동을 유지할 수 있다."
 #: ../src/zap.c:6154
 #, c-format
 msgid "If you specify an unrecognized object name %s%s time%s,"
-msgstr "인식되지 않는 물건 이름을 %s%s번%s 지정하면,"
+msgstr "인식되지 않는 물건 이름을 %1$s번%2$s 지정하면,%3$.0s"
 
 #: ../src/zap.c:6155
 msgid "a randomly chosen item will be granted."
