@@ -1168,7 +1168,7 @@ msgstr "그것"
 #: ../src/apply.c:1453
 #, c-format
 msgid "%s now has seven%s candles attached."
-msgstr "%s에 이제 일곱%s 양초가 붙어있다."
+msgstr "%1$s에 이제%2$s 양초 일곱 개가 붙어있다."
 
 #: ../src/apply.c:1454
 msgid " lit"
@@ -1177,7 +1177,7 @@ msgstr ", 불 붙은"
 #: ../src/apply.c:1481
 #, c-format
 msgid "%s%scandle%s flame%s extinguished."
-msgstr "%s%s양초%s 불꽃%s 꺼졌다."
+msgstr "%1$s%2$s양초 불꽃이 꺼졌다.%3$.0s%4$.0s"
 
 #: ../src/apply.c:1482 ../src/timeout.c:1557 ../src/timeout.c:1575
 msgid "candelabrum's "
@@ -6084,7 +6084,7 @@ msgstr "묻힌 물체가 없다."
 #: ../src/dig.c:2319
 #, c-format
 msgid "%d object%s buried."
-msgstr "%d개의 물체%s{이/가} 묻혔다."
+msgstr "%1$d개의 물체{이/가} 묻혔다.%2$.0s"
 
 #: ../src/display.c:3105
 #, c-format
@@ -24209,7 +24209,7 @@ msgstr "냉동하다"
 #: ../src/pickup.c:2573
 #, c-format
 msgid "stone%s won't leave your person."
-msgstr "돌%s{이/가} 몸에서 떨어지지 않는다."
+msgstr "돌{이/가} 몸에서 떨어지지 않는다.%.0s"
 
 #: ../src/pickup.c:2583
 #, c-format
@@ -27223,7 +27223,7 @@ msgstr "내 이름으로 현명하게 사용하라!"
 #: ../src/pray.c:1403
 #, c-format
 msgid "%s potion%s on the altar glow%s %s for a moment."
-msgstr "제단의 %s 물약%s{이/가} 잠시 %s %s 빛난다."
+msgstr "제단의 %1$s 물약{이/가} 잠시 %4$s 빛난다.%2$.0s%3$.0s"
 
 #: ../src/pray.c:1422
 #, c-format
@@ -28833,7 +28833,7 @@ msgstr "그런 괴물을 학살하는 것은 허용되지 않는다."
 #: ../src/read.c:2664
 #, c-format
 msgid "Eliminated %d monster%s."
-msgstr "%d마리의 괴물%s{을/를} 제거했다."
+msgstr "%1$d마리의 괴물{을/를} 제거했다.%2$.0s"
 
 #: ../src/read.c:2667
 #, c-format
@@ -30584,7 +30584,7 @@ msgstr "%s금화나 신용이 남아있지 않다."
 #: ../src/shk.c:2415
 #, c-format
 msgid "don't%s have gold%s enough to pay for %s."
-msgstr "%s{을/를} 지불하기에 충분한 금화%s{이/가} 없다%s."
+msgstr "%3$s{을/를} 지불하기에 충분한 금화%2$s{이/가} 없다.%1$.0s"
 
 #: ../src/shk.c:2416
 msgid " seem to"
@@ -30902,7 +30902,7 @@ msgstr "%s{을/를} %ld 조크미드의 %s신용으로 교환함%s."
 #: ../src/shk.c:4007
 #, c-format
 msgid "relinquish %s and acquire %ld zorkmid%s in %scredit."
-msgstr "%s{을/를} 포기하고 %ld 조크미드%s{을/를} %s외상으로 얻다."
+msgstr "%1$s{을/를} 포기하고 %2$ld 조크미드를 %4$s외상으로 얻다.%3$.0s"
 
 #: ../src/shk.c:4008
 msgid "additional "
@@ -30911,7 +30911,7 @@ msgstr " 추가로"
 #: ../src/shk.c:4073
 #, c-format
 msgid "%s offers%s %ld gold piece%s for %s%s "
-msgstr "%s{이/가}%s %ld 골드%s를 %s%s에 대해 제안한다 "
+msgstr "%1$s{이/가}%2$s %5$s%6$s에 대해 %3$ld 골드를 제안한다 %4$.0s"
 
 #: ../src/shk.c:4074
 msgid " only"
@@ -30944,17 +30944,17 @@ msgstr " 그리고 안에 있는 물건들"
 #: ../src/shk.c:4120
 #, c-format
 msgid "sold some items inside %s for %ld gold piece%s.%s"
-msgstr "%s 안의 일부 물품을 %ld 금화%s에 팔았다.%s"
+msgstr "%1$s 안의 일부 물품을 %2$ld 금화에 팔았다.%3$.0s%4$s"
 
 #: ../src/shk.c:4121
 #, c-format
 msgid "sold %s for %ld gold piece%s.%s"
-msgstr "%1$s{을/를} %2$ld 금화%3$s에 팔았다.%4$s"
+msgstr "%1$s{을/를} %2$ld 금화에 팔았다.%3$.0s%4$s"
 
 #: ../src/shk.c:4122
 #, c-format
 msgid "relinquish %s and receive %ld gold piece%s in compensation.%s"
-msgstr "%s{을/를} 포기하고 보상으로 %ld 금화%s{을/를} 받다.%s"
+msgstr "%1$s{을/를} 포기하고 보상으로 %2$ld 금화를 받다.%3$.0s%4$s"
 
 #: ../src/shk.c:4165
 msgid "Unpaid articles already used up:"
@@ -34937,7 +34937,7 @@ msgstr "%s{이/가} 깜빡인다%s."
 #: ../src/timeout.c:1354
 #, c-format
 msgid "%s flicker%s."
-msgstr "%s{이/가} 깜빡%s인다."
+msgstr "%1$s{이/가} 깜빡인다.%2$.0s"
 
 #: ../src/timeout.c:1366
 msgid "lantern is getting dim."
@@ -35001,12 +35001,12 @@ msgstr "%s{이/가} 꺼진다."
 #: ../src/timeout.c:1556
 #, c-format
 msgid "%s%scandle%s getting short."
-msgstr "%s%s촛불%s 짧아지고 있다."
+msgstr "%1$s%2$s촛불이 짧아지고 있다.%3$.0s"
 
 #: ../src/timeout.c:1561
 #, c-format
 msgid "%scandle%s getting short."
-msgstr "%s촛불%s이 짧아지는 것을."
+msgstr "%1$s촛불이 짧아지는 것을.%2$.0s"
 
 #: ../src/timeout.c:1562 ../src/timeout.c:1580
 msgid "a candelabrum's "
@@ -35015,17 +35015,17 @@ msgstr "촛대의 "
 #: ../src/timeout.c:1574
 #, c-format
 msgid "%s%scandle%s flame%s flicker%s low!"
-msgstr "%s%s촛불%s 불꽃%s 약하게 깜빡%s!"
+msgstr "%1$s%2$s촛불 불꽃이 약하게 깜빡인다!%3$.0s%4$.0s%5$.0s"
 
 #: ../src/timeout.c:1579
 #, c-format
 msgid "%scandle%s flame%s flicker low!"
-msgstr "%s촛불%s의 불꽃%s이 약해진다!"
+msgstr "%1$s촛불의 불꽃이 약해진다!%2$.0s%3$.0s"
 
 #: ../src/timeout.c:1597
 #, c-format
 msgid "%scandelabrum's flame%s."
-msgstr "%s촛대의 불꽃%s."
+msgstr "%1$s촛대의 불꽃이 꺼졌다.%2$.0s"
 
 #: ../src/timeout.c:1598
 msgid "s die"
@@ -35038,7 +35038,7 @@ msgstr " 꺼졌다"
 #: ../src/timeout.c:1601
 #, c-format
 msgid "a candelabrum's flame%s die."
-msgstr "촛대의 불꽃%s이 꺼지는 것을."
+msgstr "촛대의 불꽃이 꺼지는 것을.%.0s"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -38921,7 +38921,7 @@ msgstr "손상된 금고의 벽이 마법으로 복원되었다!"
 #: ../src/vault.c:817
 #, c-format
 msgid "%s%s picks up the gold%s."
-msgstr "%s%s{이/가} 금화%s{을/를} 주웠다."
+msgstr "%1$s%2$s{이/가}%3$s 금화{을/를} 주웠다."
 
 #: ../src/vault.c:819
 msgid " calms down and"
