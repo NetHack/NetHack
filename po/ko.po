@@ -30552,7 +30552,7 @@ msgstr "이것"
 #: ../src/shk.c:2380
 #, c-format
 msgid "%s for the other %s before buying %s."
-msgstr "%s{을/를} 사기 전에 다른 %s에 대해 %s."
+msgstr "%3$s{을/를} 사기 전에 다른 %2$s 값을 %1$s해."
 
 #: ../src/shk.c:2381
 msgid "Pay"
