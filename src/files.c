@@ -2371,7 +2371,7 @@ lock_file(const char *filename, int whichprefix,
         }
     }
     if (!retryct) {
-        raw_printf("I give up.  Sorry.");
+        raw_printf(_("I give up.  Sorry."));
         gn.nesting--;
         return FALSE;
     }
