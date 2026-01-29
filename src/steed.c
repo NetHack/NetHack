@@ -310,7 +310,7 @@ mount_steed(
         /* no longer tame */
         newsym(mtmp->mx, mtmp->my);
         pline(_("%s resists%s!"), Monnam(mtmp),
-              mtmp->mleashed ? " and its leash comes off" : "");
+              mtmp->mleashed ? _(" and its leash comes off") : "");
         if (mtmp->mleashed)
             m_unleash(mtmp, FALSE);
         return (FALSE);

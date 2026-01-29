@@ -222,7 +222,7 @@ Boots_on(void)
         if (!oldprop && !(HFast & TIMEOUT)) {
             makeknown(uarmf->otyp);
             You_feel(_("yourself speed up%s."),
-                     (oldprop || HFast) ? " a bit more" : "");
+                     (oldprop || HFast) ? _(" a bit more") : "");
         }
         break;
     case ELVEN_BOOTS:
@@ -814,7 +814,7 @@ dragon_armor_handling(
     case BLUE_DRAGON_SCALE_MAIL:
         if (puton) {
             if (!Very_fast)
-                You(_("speed up%s."), Fast ? " a bit more" : "");
+                You(_("speed up%s."), Fast ? _(" a bit more") : "");
             EFast |= W_ARM;
         } else {
             EFast &= ~W_ARM;

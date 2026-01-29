@@ -6497,8 +6497,9 @@ handler_menu_colors(void)
                      ATR_NONE, clr, mcbuf, MENU_ITEMFLAGS_NONE);
             tmp = tmp->next;
         }
-        Sprintf(mcbuf, "%s menu colors",
-                (opt_idx == 1) ? "List of" : "Remove which");
+        Sprintf(mcbuf, "%s %s",
+                (opt_idx == 1) ? _("List of") : _("Remove which"),
+                _("menu colors"));
         end_menu(tmpwin, mcbuf);
         pick_cnt = select_menu(tmpwin,
                                (opt_idx == 1) ? PICK_NONE : PICK_ANY,
@@ -6568,8 +6569,9 @@ handler_msgtype(void)
                      ATR_NONE, clr, mtbuf, MENU_ITEMFLAGS_NONE);
             tmp = tmp->next;
         }
-        Sprintf(mtbuf, "%s message types",
-                (opt_idx == 1) ? "List of" : "Remove which");
+        Sprintf(mtbuf, "%s %s",
+                (opt_idx == 1) ? _("List of") : _("Remove which"),
+                _("message types"));
         end_menu(tmpwin, mtbuf);
         pick_cnt = select_menu(tmpwin,
                                (opt_idx == 1) ? PICK_NONE : PICK_ANY,

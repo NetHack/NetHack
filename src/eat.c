@@ -2143,7 +2143,7 @@ fprefx(struct obj *otmp)
         break;
     case LEMBAS_WAFER:
         if (maybe_polyd(is_orc(gy.youmonst.data), Race_if(PM_ORC))) {
-            pline(_("%s"), "!#?&* elf kibble!");
+            pline(_("!#?&* elf kibble!"));
             break;
         } else if (maybe_polyd(is_elf(gy.youmonst.data), Race_if(PM_ELF))) {
             pline(_("A little goes a long way."));
@@ -2190,10 +2190,10 @@ fprefx(struct obj *otmp)
 
                 pline(_("%s -- core dumped."),
                       (x <= 75)
-                         ? "Segmentation fault"
+                         ? _("Segmentation fault")
                          : (x <= 99)
-                            ? "Bus error"
-                            : "Yo' mama");
+                            ? _("Bus error")
+                            : _("Yo' mama"));
             }
 #endif
         } else {

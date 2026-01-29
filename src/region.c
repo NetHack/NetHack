@@ -685,7 +685,7 @@ visible_region_summary(winid win)
 
         if (!hdr_done++) {
             putstr(win, 0, "");
-            putstr(win, 0, "Visible regions");
+            putstr(win, 0, _("Visible regions"));
         }
         /*
          * TODO? sort the regions by time-to-live or by bounding box.

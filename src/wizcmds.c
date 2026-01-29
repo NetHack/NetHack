@@ -274,8 +274,8 @@ wiz_kill(void)
                     mtmp = u.usteed;
             }
             if (!mtmp) {
-                Sprintf(qbuf, "%s?", Role_if(PM_SAMURAI) ? "Perform seppuku"
-                                                         : "Commit suicide");
+                Sprintf(qbuf, "%s?", Role_if(PM_SAMURAI) ? _("Perform seppuku")
+                                                         : _("Commit suicide"));
                 if (paranoid_query(TRUE, qbuf)) {
                     Sprintf(svk.killer.name, _("%s own player"), uhis());
                     svk.killer.format = KILLED_BY;
@@ -1623,7 +1623,7 @@ wiz_show_stats(void)
          total_misc_size, total_misc_count;
 
     win = create_nhwindow(NHW_TEXT);
-    putstr(win, 0, "Current memory statistics:");
+    putstr(win, 0, _("Current memory statistics:"));
 
     total_obj_count = total_obj_size = 0L;
     putstr(win, 0, stats_hdr);
@@ -1771,7 +1771,7 @@ wiz_display_macros(void)
         }
     }
     if (!trouble)
-        putstr(win, 0, "No display macro issues detected.");
+        putstr(win, 0, _("No display macro issues detected."));
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
     return ECMD_OK;
@@ -1815,7 +1815,7 @@ wiz_mon_diff(void)
         }
     }
     if (!trouble)
-        putstr(win, 0, "No monster difficulty discrepancies were detected.");
+        putstr(win, 0, _("No monster difficulty discrepancies were detected."));
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
     return ECMD_OK;

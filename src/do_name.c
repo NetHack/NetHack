@@ -322,7 +322,7 @@ do_oname(struct obj *obj)
         pline(_("%s resists the attempt."),
               /* any artifact should always pass the has_oname() test
                  but be careful just in case */
-              has_oname(obj) ? ONAME(obj) : "The artifact");
+              has_oname(obj) ? ONAME(obj) : _("The artifact"));
         return;
     }
 

@@ -2236,15 +2236,15 @@ br_string(int type)
 {
     switch (type) {
     case BR_PORTAL:
-        return "Portal";
+        return _("Portal");
     case BR_NO_END1:
-        return "Connection";
+        return _("Connection");
     case BR_NO_END2:
-        return "One way stair";
+        return _("One way stair");
     case BR_STAIR:
-        return "Stair";
+        return _("Stair");
     }
-    return " (unknown)";
+    return _(" (unknown)");
 }
 
 staticfn char
@@ -2381,7 +2381,7 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
         if (br->end1.dnum == svn.n_dgns) {
             if (first) {
                 putstr(win, 0, "");
-                putstr(win, 0, "Floating branches");
+                putstr(win, 0, _("Floating branches"));
                 first = FALSE;
             }
             Sprintf(buf, "   %s to %s", br_string(br->type),

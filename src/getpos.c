@@ -989,9 +989,9 @@ getpos(coord *ccp, boolean force, const char *goal)
         } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_MENU]) {
             iflags.getloc_usemenu = !iflags.getloc_usemenu;
             pline(_("%s a menu to show possible targets%s."),
-                  iflags.getloc_usemenu ? "Using" : "Not using",
+                  iflags.getloc_usemenu ? _("Using") : _("Not using"),
                   iflags.getloc_usemenu
-                      ? " for 'm|M', 'o|O', 'd|D', and 'x|X'" : "");
+                      ? _(" for 'm|M', 'o|O', 'd|D', and 'x|X'") : "");
             msg_given = TRUE;
             goto nxtc;
         } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_SELF]) {
@@ -1005,7 +1005,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_MOVESKIP]) {
             iflags.getloc_moveskip = !iflags.getloc_moveskip;
             pline(_("%skipping over similar terrain when fastmoving the cursor."),
-                  iflags.getloc_moveskip ? "S" : "Not s");
+                  iflags.getloc_moveskip ? _("S") : _("Not s"));
             msg_given = TRUE;
             goto nxtc;
         } else if ((cp = strchr(mMoOdDxX, c)) != 0) { /* 'm|M', 'o|O', &c */

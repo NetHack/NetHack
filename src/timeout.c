@@ -2051,10 +2051,10 @@ wiz_timeout_queue(void)
     if (win == WIN_ERR)
         return ECMD_OK;
 
-    Sprintf(buf, "Current time = %ld.", svm.moves);
+    Sprintf(buf, _("Current time = %ld."), svm.moves);
     putstr(win, 0, buf);
     putstr(win, 0, "");
-    putstr(win, 0, "Active timeout queue:");
+    putstr(win, 0, _("Active timeout queue:"));
     putstr(win, 0, "");
     print_queue(win, gt.timer_base);
 
@@ -2076,9 +2076,9 @@ wiz_timeout_queue(void)
     }
     putstr(win, 0, "");
     if (!count) {
-        putstr(win, 0, "No timed properties.");
+        putstr(win, 0, _("No timed properties."));
     } else {
-        putstr(win, 0, "Timed properties:");
+        putstr(win, 0, _("Timed properties:"));
         putstr(win, 0, "");
         for (i = 0; (propname = propertynames[i].prop_name) != 0; ++i) {
             p = propertynames[i].prop_num;

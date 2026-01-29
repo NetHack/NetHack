@@ -582,11 +582,11 @@ background_enlightenment(int unused_mode UNUSED, int final)
         int egdepth = observable_depth(&u.uz);
 
         (void) endgamelevelname(tmpbuf, egdepth);
-        Snprintf(buf, sizeof(buf), "in the endgame, on the %s%s",
-                 !strncmp(tmpbuf, "Plane", 5) ? "Elemental " : "", tmpbuf);
+        Snprintf(buf, sizeof(buf), _("in the endgame, on the %s%s"),
+                 !strncmp(tmpbuf, "Plane", 5) ? _("Elemental ") : "", tmpbuf);
     } else if (Is_knox(&u.uz)) {
         /* this gives away the fact that the knox branch is only 1 level */
-        Sprintf(buf, "on the %s level", svd.dungeons[u.uz.dnum].dname);
+        Sprintf(buf, _("on the %s level"), svd.dungeons[u.uz.dnum].dname);
         /* TODO? maybe phrase it differently when actually inside the fort,
            if we're able to determine that (not trivial) */
     } else {
@@ -802,7 +802,7 @@ characteristics_enlightenment(int mode, int final)
     char buf[BUFSZ];
 
     enlght_out("");
-    Sprintf(buf, "%sCharacteristics:", !final ? "" : "Final ");
+    Sprintf(buf, "%s%s", !final ? "" : _("Final "), _("Characteristics:"));
     enlght_out(buf);
 
     /* bottom line order */
@@ -932,7 +932,7 @@ status_enlightenment(int mode, int final)
      *     should be discernible to the hero hence to the player)
     \*/
     enlght_out(""); /* separator after title or characteristics */
-    enlght_out(final ? "Final Status:" : "Status:");
+    enlght_out(final ? _("Final Status:") : _("Status:"));
 
     Strcpy(youtoo, You_);
     /* not a traditional status but inherently obvious to player; more
@@ -940,8 +940,8 @@ status_enlightenment(int mode, int final)
     if (Upolyd) {
         Strcpy(buf, _("transformed"));
         if (ugenocided())
-            Sprintf(eos(buf), " and %s %s inside",
-                    final ? "felt" : "feel", udeadinside());
+            Sprintf(eos(buf), _(" and %s %s inside"),
+                    final ? _("felt") : _("feel"), udeadinside());
         you_are(buf, "");
     }
     /* not a trouble, but we want to display riding status before maybe

@@ -741,7 +741,7 @@ execplinehandler(const char *line)
     } else if (f == -1) {
         perror((char *) 0);
         use_pline_handler = FALSE;
-        pline(_("%s"), "Fork to message handler failed.");
+        pline(_("Fork to message handler failed."));
     }
 #elif defined(WIN32)
     {
