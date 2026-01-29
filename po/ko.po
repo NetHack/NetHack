@@ -10929,6 +10929,18 @@ msgstr "튜토리얼에서 일반 게임으로 전환하시겠습니까?"
 msgid "Really quit without saving?"
 msgstr "저장하지 않고 정말 종료하시겠습니까?"
 
+#: ../src/end.c:129
+msgid "Enter debugger?"
+msgstr "디버거 시작?"
+
+#: ../src/end.c:132
+msgid "Create SnapShot?"
+msgstr "스냅샷 생성?"
+
+#: ../src/end.c:134
+msgid "Dump core?"
+msgstr "코어 덤프?"
+
 #
 #: ../src/end.c:199
 msgid "turn to stone..."
@@ -24674,6 +24686,10 @@ msgstr "%s에게 이 메시지를 보고해 줘."
 #, c-format
 msgid "Alternatively, contact local support: %s"
 msgstr "또는 현지 지원에 연락하세요: %s"
+
+#: ../src/pline.c:697
+msgid "Report now?"
+msgstr "지금 보고?"
 
 #: ../src/pline.c:744
 msgid "Fork to message handler failed."
@@ -40238,6 +40254,10 @@ msgstr "'다른' 층"
 #: ../src/wizcmds.c:1557
 msgid "All migrating monsters:"
 msgstr "모든 이동 중인 괴물:"
+
+#: ../src/wizcmds.c:1539
+msgid "List which?"
+msgstr "어떤 것을 나열?"
 
 #: ../src/wizcmds.c:1606
 msgid "None."

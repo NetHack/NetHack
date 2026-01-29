@@ -694,7 +694,7 @@ impossible(const char *s, ...)
 
 #ifdef CRASHREPORT
     if (sysopt.crashreporturl) {
-        boolean report = ('y' == yn_function("Report now?", ynchars,
+        boolean report = ('y' == yn_function(_("Report now?"), ynchars,
                                              'n', FALSE));
 
         raw_print(""); /* prove to the user the character was accepted */

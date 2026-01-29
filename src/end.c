@@ -126,12 +126,12 @@ done2(void)
 #ifdef VMS
         extern int debuggable; /* sys/vms/vmsmisc.c, vmsunix.c */
 
-        c = !debuggable ? 'n' : ynq("Enter debugger?");
+        c = !debuggable ? 'n' : ynq(_("Enter debugger?"));
 #else
 #ifdef LATTICE
-        c = ynq("Create SnapShot?");
+        c = ynq(_("Create SnapShot?"));
 #else
-        c = ynq("Dump core?");
+        c = ynq(_("Dump core?"));
 #endif
 #endif
         if (c == 'y') {
