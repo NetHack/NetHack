@@ -3201,6 +3201,11 @@ msgstr " 본질적으로"
 msgid " because of your experience"
 msgstr " 당신의 경험 덕분에"
 
+#: ../src/attrib.c:912
+#, c-format
+msgid " because of %s"
+msgstr " %s 때문에"
+
 #: ../src/attrib.c:943
 msgid " due to your lycanthropy"
 msgstr " 수인화 때문에"
