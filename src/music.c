@@ -343,7 +343,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
 staticfn void
 do_earthquake(int force)
 {
-    static const char into_a_chasm[] = " into a chasm";
+    const char *into_a_chasm = _(" into a chasm");
     coordxy x, y;
     struct monst *mtmp;
     struct trap *trap_at_u = t_at(u.ux, u.uy);

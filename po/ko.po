@@ -20642,30 +20642,34 @@ msgstr "%s{이/가} 천장에서 떨어졌다!"
 msgid "a thump."
 msgstr "쿵 하는 소리."
 
+#: ../src/music.c:346
+msgid " into a chasm"
+msgstr " 틈새로"
+
 #: ../src/music.c:411
 #, c-format
 msgid "fountain falls%s."
-msgstr "분수가 틈새로 무너졌다.%.0s"
+msgstr "분수가%s 무너졌다."
 
 #: ../src/music.c:416
 #, c-format
 msgid "kitchen sink falls%s."
-msgstr "싱크대가 틈새로 무너졌다.%.0s"
+msgstr "싱크대가%s 무너졌다."
 
 #: ../src/music.c:426
 #, c-format
 msgid "%s altar falls%s."
-msgstr "%1$s 제단이 틈새로 무너졌다.%2$.0s"
+msgstr "%1$s 제단이%2$s 무너졌다."
 
 #: ../src/music.c:433
 #, c-format
 msgid "headstone topples%s."
-msgstr "비석이 틈새로 쓰러졌다.%.0s"
+msgstr "비석이%s 쓰러졌다."
 
 #: ../src/music.c:438
 #, c-format
 msgid "throne falls%s."
-msgstr "왕좌가 틈새로 무너졌다.%.0s"
+msgstr "왕좌가%s 무너졌다."
 
 #: ../src/music.c:445
 msgid "A secret corridor is revealed."
