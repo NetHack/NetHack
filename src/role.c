@@ -1764,9 +1764,9 @@ plnamesuffix(void)
 void
 role_selection_prolog(int which, winid where)
 {
-    static const char NEARDATA choosing[] = " choosing now",
-                               not_yet[] = " not yet specified",
-                               rand_choice[] = " random";
+    const char *choosing = _(" choosing now"),
+               *not_yet = _(" not yet specified"),
+               *rand_choice = _(" random");
     char buf[BUFSZ];
     int r, c, gend, a, allowmask;
 
@@ -1807,11 +1807,11 @@ role_selection_prolog(int which, winid where)
     /* [g and a don't constrain anything sufficiently
        to narrow something done to a single choice] */
 
-    Sprintf(buf, "%12s ", "name:");
+    Sprintf(buf, "%12s ", _("name:"));
     Strcat(buf, (which == RS_NAME) ? choosing
                 : !*svp.plname ? not_yet : svp.plname);
     putstr(where, 0, buf);
-    Sprintf(buf, "%12s ", "role:");
+    Sprintf(buf, "%12s ", _("role:"));
     assert(which == RS_ROLE || r == ROLE_NONE || r == ROLE_RANDOM
            || IndexOkT(r, roles));
     Strcat(buf, (which == RS_ROLE) ? choosing
@@ -1828,7 +1828,7 @@ role_selection_prolog(int which, winid where)
             Sprintf(eos(buf), "/%s", roles[r].name.f);
     }
     putstr(where, 0, buf);
-    Sprintf(buf, "%12s ", "race:");
+    Sprintf(buf, "%12s ", _("race:"));
     assert(which == RS_RACE || c == ROLE_NONE || c == ROLE_RANDOM
            || IndexOkT(c, races));
     Strcat(buf, (which == RS_RACE) ? choosing

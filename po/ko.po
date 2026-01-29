@@ -43528,6 +43528,30 @@ msgstr "성별:"
 msgid "alignment:"
 msgstr "성향:"
 
+#: ../src/role.c:1767
+msgid " choosing now"
+msgstr " 선택 중"
+
+#: ../src/role.c:1768
+msgid " not yet specified"
+msgstr " 아직 지정되지 않음"
+
+#: ../src/role.c:1769
+msgid " random"
+msgstr " 무작위"
+
+#: ../src/role.c:1810
+msgid "name:"
+msgstr "이름:"
+
+#: ../src/role.c:1814
+msgid "role:"
+msgstr "직업:"
+
+#: ../src/role.c:1831
+msgid "race:"
+msgstr "종족:"
+
 msgid " You started out %s%s%s."
 msgstr " 당신은 원래 %s%s%s(이)었다."
 
