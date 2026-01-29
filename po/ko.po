@@ -5556,7 +5556,7 @@ msgstr "%s{을/를} %s %s{을/를} 팠다."
 #: ../src/dig.c:710
 #, c-format
 msgid "%s digs %s %s the %s."
-msgstr "%s{이/가} %s{을/를} %s %s{을/를} 팠다."
+msgstr "%1$s{이/가} %4$s에 %2$s{을/를} 팠다.%3$.0s"
 
 #: ../src/dig.c:714
 #, c-format
@@ -6467,7 +6467,7 @@ msgstr "%s에 달라붙은 %s{을/를} %s할 수 없다."
 #: ../src/do.c:694
 #, c-format
 msgid "For some reason, you cannot %s%s the stone%s!"
-msgstr "어떤 이유로 돌%s{을/를} %s%s할 수 없다!"
+msgstr "어떤 이유로 돌%2$s{을/를} %1$s 수 없다!%3$.0s"
 
 #: ../src/do.c:703
 #, c-format
@@ -12233,7 +12233,7 @@ msgstr "저 아래에서 %s에 반짝이는 동전들이 보인다."
 #: ../src/fountain.c:564
 #, c-format
 msgid "wash your %s%s in the %s."
-msgstr "%s{을/를}%s %s에서 씻었다."
+msgstr "%1$s%2$s{을/를} %3$s에서 씻었다."
 
 #: ../src/fountain.c:568 ../src/pray.c:358
 #, c-format
@@ -15511,7 +15511,7 @@ msgstr "감정할"
 #: ../src/invent.c:3232
 #, c-format
 msgid " -- unidentified or partially identified item%s"
-msgstr " -- 미확인 또는 부분 확인 물품%s"
+msgstr " -- 미확인 또는 부분 확인 물품%.0s"
 
 #: ../src/invent.c:3237
 msgid "(all items are permanently identified already)"
@@ -15579,12 +15579,12 @@ msgstr "바닥 위 또는 아래에"
 #: ../src/invent.c:3777
 #, c-format
 msgid "aren't carrying any unpaid items but there %s %d %s."
-msgstr "미결제 물건을 가지고 있지 않지만 %s %d %s 있다."
+msgstr "미결제 물건을 가지고 있지 않지만 %3$s %2$d개가 있다.%1$.0s"
 
 #: ../src/invent.c:3781
 #, c-format
 msgid "(There %s %d more unpaid object%s %s.)"
-msgstr "(미지불 물건이 %s %d개 더 %s%s.)"
+msgstr "(미지불 물건이 %4$s %2$d개 더 있다.%1$.0s%3$.0s)"
 
 #: ../src/invent.c:3832
 msgid "What type of object do you want an inventory of?"
@@ -19233,7 +19233,7 @@ msgstr "%s{은/는} 충분히 건강해 보인다."
 #: ../src/mon.c:5732 ../src/mon.c:5737 ../src/mon.c:5740
 #, c-format
 msgid "guard%s"
-msgstr "경비병%s"
+msgstr "경비병%.0s"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -19724,7 +19724,7 @@ msgstr "%s에 거의 맞을 뻔했다."
 #: ../src/mthrowu.c:119
 #, c-format
 msgid "are hit%s"
-msgstr "%s 맞았다"
+msgstr "맞았다%s"
 
 #: ../src/mthrowu.c:121
 #, c-format
@@ -22315,7 +22315,7 @@ msgstr "매우 큰"
 #: ../src/objnam.c:1383
 #, c-format
 msgid " containing %ld item%s"
-msgstr " %ld개 아이템 포함%s"
+msgstr " %ld개 아이템 포함%.0s"
 
 #: ../src/objnam.c:1389 ../src/objnam.c:1432
 msgid " (being worn)"
@@ -22337,7 +22337,7 @@ msgstr ", 불 붙은"
 #: ../src/objnam.c:1457
 #, c-format
 msgid " (%d of 7 candle%s)"
-msgstr " (7개의 초 중 %d개%s)"
+msgstr " (7개의 초 중 %d개%.0s)"
 
 #: ../src/objnam.c:1481 ../src/objnam.c:1494
 msgid " (lit)"
@@ -28435,11 +28435,11 @@ msgstr "빛나다"
 #: ../src/read.c:1380
 #, c-format
 msgid "%s tingle%s."
-msgstr "%s{이/가} 얼얼하다%s."
+msgstr "%1$s{이/가}%2$s 얼얼하다."
 
 #: ../src/read.c:1380
 msgid " even more"
-msgstr "다시는 안 돼!"
+msgstr " 더욱"
 
 #: ../src/read.c:1382
 #, c-format
@@ -33312,7 +33312,7 @@ msgstr "부적이 에너지를 빼앗아 가고 있다."
 #: ../src/spell.c:1315
 #, c-format
 msgid "don't have enough energy to cast that spell%s."
-msgstr "그 주문을 시전할 에너지가 부족하다%s."
+msgstr "그 주문을 시전할 에너지가%s 부족하다."
 
 #: ../src/spell.c:1373
 msgid "fail to cast the spell correctly."
@@ -33702,7 +33702,7 @@ msgstr "타기"
 #: ../src/steed.c:234
 #, c-format
 msgid "Heal your leg%s?"
-msgstr "다리%s{을/를} 치료할까요?"
+msgstr "다리{을/를} 치료할까요?%.0s"
 
 #: ../src/steed.c:246
 msgid "won't fit on a saddle."
@@ -39119,7 +39119,7 @@ msgstr "%s기술에 더 자신감이 생겼다."
 #: ../src/weapon.c:459
 #, c-format
 msgid "ring%s"
-msgstr "%s{을/를} 울렸다."
+msgstr "반지%.0s"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -39306,7 +39306,7 @@ msgstr "현재 기술:"
 #: ../src/weapon.c:1382
 #, c-format
 msgid "  (%d slot%s available)"
-msgstr "  (사용 가능한 슬롯 %d개%s)"
+msgstr "  (사용 가능한 슬롯 %d개%.0s)"
 
 #: ../src/weapon.c:1395
 msgid "you could be more dangerous!"
