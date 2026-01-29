@@ -40255,9 +40255,25 @@ msgstr "'다른' 층"
 msgid "All migrating monsters:"
 msgstr "모든 이동 중인 괴물:"
 
+#: ../src/wizcmds.c:363
+msgid "Load which lua file?"
+msgstr "어떤 lua 파일을 로드?"
+
+#: ../src/wizcmds.c:382
+msgid "Load which des lua file?"
+msgstr "어떤 des lua 파일을 로드?"
+
+#: ../src/wizcmds.c:453
+msgid "To what experience level do you want to be set?"
+msgstr "어떤 경험 레벨로 설정하시겠습니까?"
+
 #: ../src/wizcmds.c:1539
 msgid "List which?"
 msgstr "어떤 것을 나열?"
+
+#: ../src/wizcmds.c:1850
+msgid "How many random monsters to migrate to next level? [0]"
+msgstr "다음 층으로 이동시킬 무작위 괴물 수? [0]"
 
 #: ../src/wizcmds.c:1606
 msgid "None."
