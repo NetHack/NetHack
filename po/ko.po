@@ -1847,7 +1847,7 @@ msgstr "%s{이/가} 이제 조금 더 젖었다."
 #: ../src/apply.c:2797
 #, c-format
 msgid "stone%s"
-msgstr "돌%s"
+msgstr "돌%.0s"
 
 #: ../src/apply.c:2799
 #, c-format
@@ -8790,7 +8790,7 @@ msgstr "%s에게 잃어버린 물건에 대해 %ld %s{을/를} 빚졌다."
 #: ../src/dokick.c:1932
 #, c-format
 msgid " %s %s object%s"
-msgstr " %s %s 물체%s"
+msgstr " %1$s %2$s 물체%3$.0s"
 
 #: ../src/dokick.c:1933
 msgid "other"
@@ -16286,7 +16286,7 @@ msgstr "여기 안에서는 아무것도 강제로 열 수 없다."
 #: ../src/lock.c:695
 #, c-format
 msgid "force anything %s weapon%s."
-msgstr "%s 무기%s{으로/로} 아무것도 강제로 열 수 없다."
+msgstr "%1$s 무기{으로/로} 아무것도 강제로 열 수 없다.%2$.0s"
 
 #
 #: ../src/lock.c:696
@@ -22406,7 +22406,7 @@ msgstr " (%s %s에 장착)"
 #: ../src/objnam.c:1623
 #, c-format
 msgid " (alternate weapon%s; not wielded)"
-msgstr " (보조 무기%s; 미장착)"
+msgstr " (보조 무기; 미장착)%.0s"
 
 #: ../src/objnam.c:1646
 #, c-format
@@ -30500,7 +30500,7 @@ msgstr "왼쪽"
 #: ../src/shk.c:2016
 #, c-format
 msgid "don't have enough gold to buy%s the item%s %s."
-msgstr "%s 물건%s{을/를} 사기에 충분한 금화가 없다%s."
+msgstr "%3$s 물건%1$s{을/를} 사기에 충분한 금화가 없다.%2$.0s"
 
 #
 #: ../src/shk.c:2017
@@ -37620,7 +37620,7 @@ msgstr " 당신의 타격의 힘으로!"
 #: ../src/uhitm.c:979
 #, c-format
 msgid "%s weapon%s %s"
-msgstr "%s 무기%s{이/가} %s"
+msgstr "%1$s 무기{이/가} %3$s%2$.0s"
 
 #: ../src/uhitm.c:1108
 #, c-format
@@ -39137,7 +39137,7 @@ msgstr "%s{이/가} %s %s에 붙어있다"
 #: ../src/weapon.c:873
 #, c-format
 msgid "Since %s weapon%s %s,"
-msgstr "%s 무기%s %s,"
+msgstr "%1$s 무기{이/가} %3$s,%2$.0s"
 
 #: ../src/weapon.c:875
 #, c-format
@@ -39597,7 +39597,7 @@ msgstr "%s%s{이/가} %s 비었다."
 #: ../src/wield.c:766
 #, c-format
 msgid "%s %s suitable %s weapon%s."
-msgstr "%s{이/가} 적합한 %s 무기%s %s."
+msgstr "%1$s{은/는} 적합한 %3$s 무기{이/가} %2$s.%4$.0s"
 
 #: ../src/wield.c:767
 msgid "isn't a"
