@@ -40197,6 +40197,10 @@ msgstr "%s{은/는} 냄새가 나지 않는 것 같다."
 msgid "don't smell any monster there."
 msgstr "거기서 괴물 냄새가 나지 않는다."
 
+#: ../src/wizcmds.c:996
+msgid "Which intrinsics?"
+msgstr "어떤 고유 능력?"
+
 #: ../src/wizcmds.c:1076
 #, c-format
 msgid "Timeout for %s %s %d."

@@ -993,7 +993,7 @@ wiz_intrinsic(void)
             add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
                      MENU_ITEMFLAGS_NONE);
         }
-        end_menu(win, "Which intrinsics?");
+        end_menu(win, _("Which intrinsics?"));
         n = select_menu(win, PICK_ANY, &pick_list);
         destroy_nhwindow(win);
 
