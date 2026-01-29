@@ -1548,13 +1548,13 @@ list_migrating_mons(
             case 'c':
             case 'n':
             case 'o':
-                Sprintf(buf, "Monster%s migrating to %s:", plur(n),
-                        (c == 'c') ? "current level"
-                        : (c == 'n') ? "next level"
-                          : "'other' levels");
+                Sprintf(buf, _("Monster%s migrating to %s:"), plur(n),
+                        (c == 'c') ? _("current level")
+                        : (c == 'n') ? _("next level")
+                          : _("'other' levels"));
                 break;
             default:
-                Strcpy(buf, "All migrating monsters:");
+                Strcpy(buf, _("All migrating monsters:"));
                 break;
             }
             putstr(win, 0, buf);

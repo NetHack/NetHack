@@ -6751,6 +6751,11 @@ msgstr "%s{을/를} 따라 떨어진다."
 msgid "falling off a ladder"
 msgstr "사다리에서 떨어지다"
 
+#: ../src/worn.c:1322
+#, c-format
+msgid "falling off %s"
+msgstr "%s에서 떨어지다"
+
 #: ../src/do.c:1795
 msgid "tumbling down a flight of stairs"
 msgstr "계단을 굴러 떨어지다"
@@ -11956,6 +11961,14 @@ msgstr "%s{을/를} 압축 해제할 수 없다."
 #: ../src/files.c:1944
 msgid "Failure writing uncompressed file"
 msgstr "비압축 파일 쓰기 실패"
+
+#: ../src/files.c:2893
+msgid "Checkpoint data incompletely written or subsequently clobbered."
+msgstr "체크포인트 데이터가 불완전하게 기록되었거나 덮어씌워졌다."
+
+#: ../src/files.c:2895
+msgid "Recovery impossible."
+msgstr "복구 불가능."
 
 #: ../src/files.c:2284 ../src/files.c:2304
 msgid "I give up.  Sorry."
@@ -40192,6 +40205,27 @@ msgstr "%s %s 타임아웃 %d."
 #: ../src/wizcmds.c:1527
 msgid "No monsters currently migrating."
 msgstr "현재 이동 중인 괴물이 없다."
+
+#: ../src/wizcmds.c:1551
+#, c-format
+msgid "Monster%s migrating to %s:"
+msgstr "%2$s(으)로 이동 중인 괴물%1$s:"
+
+#: ../src/wizcmds.c:1552
+msgid "current level"
+msgstr "현재 층"
+
+#: ../src/wizcmds.c:1553
+msgid "next level"
+msgstr "다음 층"
+
+#: ../src/wizcmds.c:1554
+msgid "'other' levels"
+msgstr "'다른' 층"
+
+#: ../src/wizcmds.c:1557
+msgid "All migrating monsters:"
+msgstr "모든 이동 중인 괴물:"
 
 #: ../src/wizcmds.c:1606
 msgid "None."

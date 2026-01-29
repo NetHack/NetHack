@@ -2890,9 +2890,9 @@ recover_savefile(void)
     }
     if (read(gnhfp->fd, (genericptr_t) &hpid, sizeof hpid) != sizeof hpid) {
         raw_printf("\n%s\n%s\n",
-                   "Checkpoint data incompletely written"
-                   " or subsequently clobbered.",
-                   "Recovery impossible.");
+                   _("Checkpoint data incompletely written"
+                   " or subsequently clobbered."),
+                   _("Recovery impossible."));
         close_nhfile(gnhfp);
         return FALSE;
     }

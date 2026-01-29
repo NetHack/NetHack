@@ -1319,7 +1319,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
             char buf[BUFSZ];
 
             You(_("touch %s."), mon_nam(u.usteed));
-            Sprintf(buf, "falling off %s",
+            Sprintf(buf, _("falling off %s"),
                     an(pmname(u.usteed->data, Mgender(u.usteed))));
             instapetrify(buf);
         }
