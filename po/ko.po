@@ -7668,7 +7668,7 @@ msgstr "%s{을/를} 들고 있는 동안 그것을 할 수 없다."
 #: ../src/do_wear.c:2074
 #, c-format
 msgid "%s won't fit over your horn%s."
-msgstr "%s{이/가} 뿔%s 위에 맞지 않는다."
+msgstr "%1$s{이/가} 뿔 위에 맞지 않는다.%2$.0s"
 
 #: ../src/do_wear.c:2087
 #, c-format
@@ -9299,7 +9299,7 @@ msgstr "%s{이/가} 산산조각났다!"
 #: ../src/dothrow.c:2625
 #, c-format
 msgid "%s shatter%s%s!"
-msgstr "%s{이/가} 산산조각%s%s!"
+msgstr "%1$s{이/가} 산산조각%3$s났다!%2$.0s"
 
 #: ../src/dothrow.c:2626 ../src/lock.c:700 ../src/pray.c:1406
 msgid "s"
@@ -11145,7 +11145,7 @@ msgstr "%8ld개의 %s (%ld %s 가치),"
 #: ../src/end.c:1515
 #, c-format
 msgid "%8ld worthless piece%s of colored glass,"
-msgstr "%8ld개의 쓸모없는 색유리 조각%s,"
+msgstr "%1$8ld개의 쓸모없는 색유리 조각,%2$.0s"
 
 #: ../src/end.c:1527
 #, c-format
@@ -36554,7 +36554,7 @@ msgstr "%s{이/가} 용암에 닿아 타버리는 것을!"
 #: ../src/trap.c:4605
 #, c-format
 msgid "potion%s %s!"
-msgstr "물약%s{이/가} %s!"
+msgstr "물약{이/가} %2$s!%1$.0s"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
