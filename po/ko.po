@@ -5551,7 +5551,7 @@ msgstr "인접한 %s{을/를} 판다."
 #: ../src/dig.c:708
 #, c-format
 msgid "dig %s %s the %s."
-msgstr "%s{을/를} %s %s{을/를} 팠다."
+msgstr "%3$s에 %1$s{을/를} 팠다.%2$.0s"
 
 #: ../src/dig.c:710
 #, c-format
