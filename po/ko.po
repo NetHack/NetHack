@@ -6860,7 +6860,7 @@ msgstr "%s{이/가} 죽음에서 일어났다%s!"
 #: ../src/do.c:2169
 #, c-format
 msgid "%s disappears%s!"
-msgstr "%s{이/가} 사라졌다%s!"
+msgstr "%1$s{이/가}%2$s 사라졌다!"
 
 #: ../src/do.c:2177
 #, c-format
@@ -15105,7 +15105,7 @@ msgstr " 또는 멸종"
 #: ../src/insight.c:3141
 #, c-format
 msgid "No creatures have been genocided%s."
-msgstr "학살된 생물이 없다%s."
+msgstr "학살된 생물이%s 없다."
 
 #: ../src/insight.c:3141
 msgid " yet"
@@ -20567,7 +20567,7 @@ msgstr "들린다"
 #: ../src/music.c:236
 #, c-format
 msgid "KADOOM!  The boulder falls into a chasm%s!"
-msgstr "쿵! 바위가 틈새로 떨어진다%s!"
+msgstr "쿵! 바위가%s 틈새로 떨어진다!"
 
 #: ../src/music.c:237
 msgid " below you"
@@ -20645,27 +20645,27 @@ msgstr "쿵 하는 소리."
 #: ../src/music.c:411
 #, c-format
 msgid "fountain falls%s."
-msgstr "분수가 무너졌다%s."
+msgstr "분수가 틈새로 무너졌다.%.0s"
 
 #: ../src/music.c:416
 #, c-format
 msgid "kitchen sink falls%s."
-msgstr "싱크대가 무너졌다%s."
+msgstr "싱크대가 틈새로 무너졌다.%.0s"
 
 #: ../src/music.c:426
 #, c-format
 msgid "%s altar falls%s."
-msgstr "%s 제단이 무너졌다%s."
+msgstr "%1$s 제단이 틈새로 무너졌다.%2$.0s"
 
 #: ../src/music.c:433
 #, c-format
 msgid "headstone topples%s."
-msgstr "비석이 쓰러졌다%s."
+msgstr "비석이 틈새로 쓰러졌다.%.0s"
 
 #: ../src/music.c:438
 #, c-format
 msgid "throne falls%s."
-msgstr "왕좌가 무너졌다%s."
+msgstr "왕좌가 틈새로 무너졌다.%.0s"
 
 #: ../src/music.c:445
 msgid "A secret corridor is revealed."
@@ -23561,7 +23561,7 @@ msgstr " 이 층에서"
 #: ../src/pager.c:2134
 #, c-format
 msgid "No traps seen or remembered%s."
-msgstr "함정이 보이거나 기억되지 않는다%s."
+msgstr "%s 함정이 보이거나 기억되지 않는다."
 
 #: ../src/pager.c:2134 ../src/pager.c:2223
 msgid " nearby"
@@ -23599,7 +23599,7 @@ msgstr "%s보거나 기억한 새김글%s:"
 #: ../src/pager.c:2223
 #, c-format
 msgid "No engravings seen or remembered%s."
-msgstr "각인이 보이거나 기억되지 않는다%s."
+msgstr "%s 각인이 보이거나 기억되지 않는다."
 
 #: ../src/pager.c:2355
 #, c-format
@@ -24027,7 +24027,7 @@ msgstr "무거운 짐 아래서 %s. 이동이 매우 어렵다."
 #: ../src/pickup.c:1989
 #, c-format
 msgid "%s move a handspan with this load!"
-msgstr "이 짐으로는 한 뼘도 움직일 수 없다%s!"
+msgstr "이 짐으로는%s 한 뼘도 움직일 수 없다!"
 
 #: ../src/pickup.c:1990
 msgid "can barely"
@@ -31336,7 +31336,7 @@ msgstr "%s{이/가} 좀도둑 문제에 대해 이야기한다."
 #: ../src/shk.c:5557
 #, c-format
 msgid "Kop%s (disappointed) vanish%s into thin air."
-msgstr "경찰%s{이/가} (실망하며) 허공으로 사라진다%s."
+msgstr "경찰%.0s{이/가} (실망하며) 허공으로 사라진다%.0s."
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -36970,7 +36970,7 @@ msgstr "해제"
 #: ../src/trap.c:5882
 #, c-format
 msgid "cannot deal with %s while trapped%s!"
-msgstr "갇힌 상태로 %s{을/를} 처리할 수 없다%s!"
+msgstr "%2$s 갇힌 상태로 %1$s{을/를} 처리할 수 없다!"
 
 #: ../src/trap.c:5883
 msgid " in it"
