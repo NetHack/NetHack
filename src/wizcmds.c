@@ -246,15 +246,15 @@ wiz_kill(void)
     coord cc;
     int ans;
     char c, qbuf[QBUFSZ];
-    const char *prompt = "Pick first monster to slay";
+    const char *prompt = _("Pick first monster to slay");
     boolean save_verbose = flags.verbose,
             save_autodescribe = iflags.autodescribe;
     d_level uarehere = u.uz;
 
     cc.x = u.ux, cc.y = u.uy;
     for (;;) {
-        pline(_("%s:"), prompt);
-        prompt = "Next monster";
+        pline("%s:", prompt);
+        prompt = _("Next monster");
 
         flags.verbose = FALSE;
         iflags.autodescribe = TRUE;

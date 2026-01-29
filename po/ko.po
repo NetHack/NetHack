@@ -40174,6 +40174,14 @@ msgstr "이 모드에서 빠져나가는 일반적인 방법이 없다."
 msgid "are incapable of detecting odors in your present form."
 msgstr "현재 형태로는 냄새를 감지할 수 없다."
 
+#: ../src/wizcmds.c:249
+msgid "Pick first monster to slay"
+msgstr "처치할 첫 번째 괴물 선택"
+
+#: ../src/wizcmds.c:257
+msgid "Next monster"
+msgstr "다음 괴물"
+
 #: ../src/wizcmds.c:900
 msgid "can move the cursor to a monster that you want to smell."
 msgstr "냄새 맡고 싶은 괴물에 커서를 이동할 수 있다."
