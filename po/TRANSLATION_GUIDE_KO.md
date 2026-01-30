@@ -332,61 +332,100 @@ enl_msg(You_, verb, verb, suffix, "");  // 마지막 ""
 
 ## 6. 번역 파일 관리
 
-### 6.1 POT 파일 생성
+### ⚠️ 6.1 핵심 정책: ko_manual.po를 편집하세요!
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  파일 구조 및 역할                                          │
+├─────────────────────────────────────────────────────────────┤
+│  ko_manual.po  →  ⭐ 수동 번역 (이 파일을 편집!)            │
+│  ko.po         →  ❌ 자동 추출 (편집 금지!)                 │
+│  ko_merged.po  →  병합 결과 (자동 생성)                     │
+│  ko.mo         →  컴파일된 바이너리 (자동 생성)             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+| 파일 | 편집 | update-po 영향 | 설명 |
+|------|------|----------------|------|
+| `ko_manual.po` | ⭐ O | 없음 | 안전! 항상 이 파일 편집 |
+| `ko.po` | ❌ X | 덮어쓰기 가능 | 위험! 편집 비권장 |
+
+### 6.2 왜 ko.po를 직접 편집하면 안 되나요?
+
+1. **덮어쓰기 위험**: `make update-po` 실행 시 소스에서 다시 추출
+2. **데이터 손실**: 구조 변경 시 수동 편집 내용 손실 가능
+3. **병합 충돌**: ko_manual.po와 중복 시 혼란 발생
+
+### 6.3 병합 우선순위
+
+```
+ko_manual.po (우선) + ko.po (보조) → ko_merged.po
+```
+
+**동일한 msgid가 있으면 ko_manual.po의 번역이 사용됩니다.**
+
+### 6.4 안전한 워크플로우
+
+#### 일반 번역 작업
 
 ```bash
-cd /home/jinhong_kim/workspace/HanNetHack/po
+cd po
+
+# 1. ko_manual.po 편집
+vi ko_manual.po
+
+# 2. 병합 + 컴파일 + 설치
+make compile && make install DESTDIR=../dat
+```
+
+#### 소스에서 새 문자열 추출
+
+```bash
+cd po
+
+# 1. POT 템플릿 생성
 make pot
+
+# 2. 안전하게 ko.po 업데이트 (백업 자동 생성)
+make safe-update
+
+# 3. 새 문자열을 ko_manual.po에 번역 추가
+vi ko_manual.po
+
+# 4. 병합 + 컴파일
+make compile
 ```
 
-### 6.2 PO 파일 업데이트
+### 6.5 ko_manual.po에 추가할 항목들
 
-```bash
-msgmerge -U ko.po nethack.pot
-```
+- 몬스터 이름 (`newt` → `도롱뇽`)
+- 아이템 이름 (`long sword` → `장검`)
+- 역할/종족 이름
+- **포맷 문자열 어순 수정** (위치 지정자 `%1$s`, `%2$s` 사용)
+- ko.po의 잘못된 번역 수정 (덮어쓰기)
+- 자동 추출되지 않는 문자열
 
-결과:
-- 새 문자열: `msgstr ""` 추가
-- 변경된 문자열: `#, fuzzy` 표시
-- 삭제된 문자열: `#~` 주석 처리
-
-### 6.3 PO 파일 구조
+### 6.6 PO 파일 구조
 
 ```
 # 주석
-#: ../src/file.c:123     # 소스 위치
+#: src/file.c:123        # 소스 위치
 #, c-format              # 포맷 플래그
-#, fuzzy                 # 검토 필요
-msgid "English"          # 원문
-msgstr "한국어"           # 번역
+msgid "English"          # 원문 (영어)
+msgstr "한국어"          # 번역
 ```
 
-### 6.4 fuzzy 처리
-
-```bash
-# fuzzy 찾기
-grep -n "^#, fuzzy" ko.po
-
-# fuzzy 개수
-grep -c "^#, fuzzy" ko.po
-```
-
-처리: 번역 확인 후 `#, fuzzy` 줄 삭제
-
-### 6.5 MO 파일 컴파일
-
-```bash
-msgfmt -c -v -o messages.mo ko.po
-```
-
-### 6.6 상태 확인
+### 6.7 상태 확인
 
 ```bash
 # 전체 통계
-msgfmt -c -v -o /dev/null ko.po
+make stats
 
-# 미번역 보기
-msgattrib --untranslated ko.po
+# 미번역 목록
+make untranslated
+
+# fuzzy 목록
+make fuzzy
 ```
 
 ---

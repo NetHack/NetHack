@@ -288,7 +288,6 @@ ko_parse_postposition_pattern(const char *pattern,
                               ko_postpos_type *pp_type,
                               int *pattern_len)
 {
-    const char *p;
     const char *slash_pos;
     const char *end_pos;
     int i;

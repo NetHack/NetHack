@@ -1047,7 +1047,7 @@ test_move(
                     if (sym == S_stone)
                         Strcpy(buf, _("solid stone"));
                     else if (sym >= 0)
-                        Strcpy(buf, an(defsyms[sym].explanation));
+                        Strcpy(buf, an(_(defsyms[sym].explanation)));
                     else
                         Sprintf(buf, "impossible [background glyph=%d]",
                                 glyph);
@@ -2303,7 +2303,7 @@ domove_fight_empty(coordxy x, coordxy y)
             if (levl[x][y].seenv || IS_STWALL(levl[x][y].typ)
                 || levl[x][y].typ == SDOOR || levl[x][y].typ == SCORR) {
                 glyph = back_to_glyph(x, y);
-                Strcpy(buf, the(defsyms[glyph_to_cmap(glyph)].explanation));
+                Strcpy(buf, the(_(defsyms[glyph_to_cmap(glyph)].explanation)));
             } else {
                 Strcpy(buf, _("an unknown obstacle"));
             }
@@ -2566,7 +2566,7 @@ avoid_trap_andor_region(coordxy x, coordxy y)
 
         Snprintf(qbuf, sizeof qbuf, _("Really %s %s that %s?"),
                  u_locomotion(_("step")), into ? _("into") : _("onto"),
-                 defsyms[trap_to_defsym(traptype)].explanation);
+                 _(defsyms[trap_to_defsym(traptype)].explanation));
         /* handled like paranoid_confirm:pray; when paranoid_confirm:trap
            isn't set, don't ask at all but if it is set (checked above),
            ask via y/n if parnoid_confirm:confirm isn't also set or via

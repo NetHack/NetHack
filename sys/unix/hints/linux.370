@@ -400,6 +400,10 @@ POSTINSTALL+= test -f $(TESTGDBPATH) || \
 POSTUPDATE+= test -f $(TESTGDBPATH) || \
 		sed -i -e 's;^GDBPATH=/usr/bin/gdb;\#GDBPATH=/usr/bin/gdb;' \
 		-e 's;PANICTRACE_GDB=1;PANICTRACE_GDB=0;' $(INSTDIR)/sysconf;
+# Install Korean translation mo file
+POSTINSTALL+= mkdir -p $(INSTDIR)/locale/ko/LC_MESSAGES; \
+		( cd po && $(MAKE) compile 2>/dev/null ); \
+		test -f po/ko.mo && cp po/ko.mo $(INSTDIR)/locale/ko/LC_MESSAGES/nethack.mo;
 endif  #MAKEFILE_TOP
 
 ifeq '$(USE_NONOSTATICFN)' '1'

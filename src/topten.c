@@ -983,56 +983,81 @@ outentry(int rank, struct toptenentry *t1, boolean so)
                 (t1->plgend[0] == 'F') ? _("dess") : "");
         second_line = FALSE;
     } else {
+        char death_action[BUFSZ];
+        char location_info[BUFSZ];
+
+        death_action[0] = '\0';
+        location_info[0] = '\0';
+
+        /* Build death action string */
         if (!strncmp(t1->death, "quit", 4)) {
-            Strcat(linebuf, _("quit"));
+            Strcpy(death_action, _("quit"));
             second_line = FALSE;
         } else if (!strncmp(t1->death, "died of st", 10)) {
-            Strcat(linebuf, _("starved to death"));
+            Strcpy(death_action, _("starved to death"));
             second_line = FALSE;
         } else if (!strncmp(t1->death, "choked", 6)) {
-            Sprintf(eos(linebuf), _("choked on h%s food"),
+            Sprintf(death_action, _("choked on h%s food"),
                     (t1->plgend[0] == 'F') ? _("er") : _("is"));
         } else if (!strncmp(t1->death, "poisoned", 8)) {
-            Strcat(linebuf, _("was poisoned"));
+            Strcpy(death_action, _("was poisoned"));
         } else if (!strncmp(t1->death, "crushed", 7)) {
-            Strcat(linebuf, _("was crushed to death"));
+            Strcpy(death_action, _("was crushed to death"));
         } else if (!strncmp(t1->death, "petrified by ", 13)) {
-            Strcat(linebuf, _("turned to stone"));
-        } else
-            Strcat(linebuf, _("died"));
+            Strcpy(death_action, _("turned to stone"));
+        } else {
+            Strcpy(death_action, _("died"));
+        }
 
+        /* Build location info string */
         if (t1->deathdnum == astral_level.dnum) {
-            const char *arg, *fmt = _(" on the Plane of %s");
+            const char *arg;
 
             switch (t1->deathlev) {
             case -5:
-                fmt = _(" on the %s Plane");
-                arg = _("Astral");
+                Sprintf(location_info, _("on the %s Plane"), _("Astral"));
                 break;
             case -4:
                 arg = _("Water");
+                Sprintf(location_info, _("on the Plane of %s"), arg);
                 break;
             case -3:
                 arg = _("Fire");
+                Sprintf(location_info, _("on the Plane of %s"), arg);
                 break;
             case -2:
                 arg = _("Air");
+                Sprintf(location_info, _("on the Plane of %s"), arg);
                 break;
             case -1:
                 arg = _("Earth");
+                Sprintf(location_info, _("on the Plane of %s"), arg);
                 break;
             default:
                 arg = _("Void");
+                Sprintf(location_info, _("on the Plane of %s"), arg);
                 break;
             }
-            Sprintf(eos(linebuf), fmt, arg);
         } else {
-            Sprintf(eos(linebuf), _(" in %s"), _(svd.dungeons[t1->deathdnum].dname));
-            if (t1->deathdnum != knox_level.dnum)
-                Sprintf(eos(linebuf), _(" on level %d"), t1->deathlev);
+            const char *dname = _(svd.dungeons[t1->deathdnum].dname);
+            DISABLE_WARNING_FORMAT  /* positional params for i18n reordering */
+            if (t1->deathdnum != knox_level.dnum) {
+                /* Positional: %1$s=dungeon, %2$d=level */
+                Sprintf(location_info, _("in %1$s on level %2$d"), dname, t1->deathlev);
+            } else {
+                Sprintf(location_info, _("in %s"), dname);
+            }
+            RESTORE_WARNING_FORMAT
             if (t1->deathlev != t1->maxlvl)
-                Sprintf(eos(linebuf), _(" [max %d]"), t1->maxlvl);
+                Sprintf(eos(location_info), _(" [max %d]"), t1->maxlvl);
         }
+
+        /* Combine: positional params allow reordering for different languages */
+        /* English: "%1$s %2$s" = "died in Dungeon on level 5" */
+        /* Korean:  "%2$s %1$s" = "던전 5층에서 죽었다" */
+        DISABLE_WARNING_FORMAT
+        Sprintf(eos(linebuf), _("%1$s %2$s"), death_action, location_info);
+        RESTORE_WARNING_FORMAT
 
         /* kludge for "quit while already on Charon's boat" */
         if (!strncmp(t1->death, "quit ", 5))

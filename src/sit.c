@@ -519,14 +519,14 @@ dosit(void)
                 (void) water_damage(uarm, "armor", TRUE);
         }
     } else if (IS_SINK(typ)) {
-        You(_("sit on the %s."), defsyms[S_sink].explanation);
+        You(_("sit on the %s."), _(defsyms[S_sink].explanation));
         Your(_("%s gets wet."),
              humanoid(gy.youmonst.data) ? _("rump") : _("underside"));
     } else if (IS_ALTAR(typ)) {
-        You(_("sit on the %s."), defsyms[S_altar].explanation);
+        You(_("sit on the %s."), _(defsyms[S_altar].explanation));
         altar_wrath(u.ux, u.uy);
     } else if (IS_GRAVE(typ)) {
-        You(_("sit on the %s."), defsyms[S_grave].explanation);
+        You(_("sit on the %s."), _(defsyms[S_grave].explanation));
     } else if (typ == STAIRS) {
         You(_("sit on the %s."), _("stairs"));
     } else if (typ == LADDER) {
@@ -543,13 +543,13 @@ dosit(void)
         losehp(d((Fire_resistance ? 2 : 10), 10), /* lava damage */
                _("sitting on lava"), KILLED_BY);
     } else if (is_ice(u.ux, u.uy)) {
-        You(_("sit on the %s."), defsyms[S_ice].explanation);
+        You(_("sit on the %s."), _(defsyms[S_ice].explanation));
         if (!Cold_resistance)
             pline_The(_("ice feels cold."));
     } else if (typ == DRAWBRIDGE_DOWN) {
         You(_("sit on the %s."), _("drawbridge"));
     } else if (IS_THRONE(typ)) {
-        You(_("sit on the %s."), defsyms[S_throne].explanation);
+        You(_("sit on the %s."), _(defsyms[S_throne].explanation));
         throne_sit_effect();
     } else if (lays_eggs(gy.youmonst.data)) {
         return lay_an_egg();

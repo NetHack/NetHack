@@ -4,66 +4,84 @@
 
 이 디렉토리는 NetHack의 한국어 번역 파일들을 관리합니다.
 
-### 현재 번역 현황 (2026-01-21)
-- **번역 완료**: 5,469개 (83.8%)
-- **검토 필요 (Fuzzy)**: 925개 (14.2%)
-- **미번역**: 131개 (2.0%)
-- **총 문자열**: 6,525개
-
 ## 파일 구조
 
 ```
 po/
-├── Makefile           # 번역 빌드 규칙
-├── translate-tool.sh  # 번역 관리 도구
+├── ko_manual.po       # ⭐ 수동 번역 (이 파일을 편집!)
+├── ko.po              # 자동 추출 (편집 금지!)
+├── ko_merged.po       # 병합 결과 (자동 생성)
+├── ko.mo              # 컴파일된 바이너리 (자동 생성)
 ├── nethack.pot        # 원문 템플릿 (자동 생성)
-├── ko.po              # 한국어 번역 파일
-├── ko.mo              # 컴파일된 번역 파일 (자동 생성)
+├── Makefile           # 번역 빌드 규칙
 └── README.md          # 이 문서
 ```
 
+## ⚠️ 중요: 번역 파일 정책
+
+### 반드시 `ko_manual.po`를 편집하세요!
+
+| 파일 | 역할 | 편집 | 위험성 |
+|------|------|------|--------|
+| `ko_manual.po` | 수동 번역 | ⭐ **O** | 없음 (안전) |
+| `ko.po` | 자동 추출 | ❌ **X** | `update-po` 시 덮어쓰기 가능 |
+| `ko_merged.po` | 병합 결과 | ❌ X | 자동 생성됨 |
+
+### 왜 ko.po를 편집하면 안 되나요?
+
+1. `make update-po` 실행 시 소스에서 문자열을 다시 추출
+2. 기존 번역이 보존되지만, 구조가 바뀌면 손실 가능
+3. `ko_manual.po`는 절대 덮어쓰이지 않음!
+
+### 병합 우선순위
+
+```
+ko_manual.po (우선) + ko.po (보조) → ko_merged.po → ko.mo
+```
+
+동일한 msgid가 있으면 `ko_manual.po`의 번역이 사용됩니다.
+
+---
+
 ## 번역 워크플로우
 
-### 1. POT 템플릿 생성
-
-소스 코드에서 번역 대상 문자열을 추출합니다:
+### 일반 번역 작업 (권장)
 
 ```bash
 cd po
+
+# 1. ko_manual.po 편집 (수동 번역 추가/수정)
+vi ko_manual.po
+
+# 2. 병합 + 컴파일
+make compile
+
+# 3. 설치
+make install DESTDIR=../dat
+```
+
+### 소스에서 새 문자열 추출할 때
+
+```bash
+cd po
+
+# 1. POT 템플릿 생성
 make pot
-```
 
-### 2. PO 파일 업데이트
+# 2. 안전하게 ko.po 업데이트 (백업 자동 생성)
+make safe-update
 
-POT 템플릿에서 새로운 문자열을 ko.po에 병합합니다:
+# 3. 새 문자열을 ko_manual.po에 번역 추가
+vi ko_manual.po
 
-```bash
-make update-po
-```
-
-### 3. 번역 작업
-
-ko.po 파일을 편집하여 번역합니다. 추천 도구:
-
-- **poedit** (GUI): https://poedit.net/
-- **lokalize** (KDE)
-- **gtranslator** (GNOME)
-- 텍스트 에디터 (VSCode + gettext 확장)
-
-### 4. 번역 컴파일
-
-ko.mo 파일을 생성합니다:
-
-```bash
+# 4. 병합 + 컴파일
 make compile
 ```
 
-### 5. 통계 확인
+### 번역 통계 확인
 
 ```bash
 make stats
-# 또는
-./translate-tool.sh stats
 ```
 
 ## 번역 규칙
@@ -176,10 +194,18 @@ msgstr "%2$s{을/를} %1$s{이/가} 때렸다."
 
 ## 기여 방법
 
-1. `ko.po` 파일 수정
-2. `./translate-tool.sh validate`로 검증
-3. `make compile`로 컴파일 테스트
+1. `ko_manual.po` 파일 편집 (ko.po가 아님!)
+2. `make compile`로 컴파일 테스트
+3. `make stats`로 통계 확인
 4. Pull Request 제출
+
+### ko_manual.po에 추가할 항목들
+
+- 몬스터 이름 (`newt` → `도롱뇽`)
+- 아이템 이름 (`long sword` → `장검`)
+- 역할/종족 이름
+- 포맷 문자열 어순 수정 (위치 지정자 사용)
+- ko.po의 잘못된 번역 수정 (덮어쓰기)
 
 ## 테스트
 

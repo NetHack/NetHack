@@ -1521,33 +1521,48 @@ really_done(int how)
 
     } else {
         /* did not escape or ascend */
+        DISABLE_WARNING_FORMAT  /* positional params for i18n reordering */
         if (u.uz.dnum == 0 && u.uz.dlevel <= 0) {
             /* level teleported out of the dungeon; `how' is DIED,
                due to falling or to "arriving at heaven prematurely" */
-            Sprintf(pbuf, _("You %s beyond the confines of the dungeon"),
-                    (u.uz.dlevel < 0) ? _("passed away") : _(ends[how]));
+            const char *death_verb = (u.uz.dlevel < 0) ? _("passed away") : _(ends[how]);
+            /* Positional params: %1$s=action, %2$ld=points, %3$s=plural */
+            Sprintf(pbuf, _("You %1$s beyond the confines of the dungeon with %2$ld point%3$s,"),
+                    death_verb, u.urexp, plur(u.urexp));
         } else {
             /* more conventional demise */
-            const char *where = svd.dungeons[u.uz.dnum].dname;
+            const char *where = _(svd.dungeons[u.uz.dnum].dname);
+            int dlev = In_quest(&u.uz) ? dunlev(&u.uz) : depth(&u.uz);
+            const char *death_action = _(ends[how]);
 
             if (Is_astralevel(&u.uz))
                 where = _("The Astral Plane");
-            Sprintf(pbuf, _("You %s in %s"), _(ends[how]), _(where));
-            if (!In_endgame(&u.uz) && !single_level_branch(&u.uz))
-                Sprintf(eos(pbuf), _(" on dungeon level %d"),
-                        In_quest(&u.uz) ? dunlev(&u.uz) : depth(&u.uz));
-        }
 
-        Sprintf(eos(pbuf), _(" with %ld point%s,"), u.urexp, plur(u.urexp));
+            if (!In_endgame(&u.uz) && !single_level_branch(&u.uz)) {
+                /* Positional params: %1$s=action, %2$s=location, %3$d=level, %4$ld=points, %5$s=plural */
+                Sprintf(pbuf, _("You %1$s in %2$s on dungeon level %3$d with %4$ld point%5$s,"),
+                        death_action, where, dlev, u.urexp, plur(u.urexp));
+            } else {
+                /* Positional params: %1$s=action, %2$s=location, %3$ld=points, %4$s=plural */
+                Sprintf(pbuf, _("You %1$s in %2$s with %3$ld point%4$s,"),
+                        death_action, where, u.urexp, plur(u.urexp));
+            }
+        }
+        RESTORE_WARNING_FORMAT
+
         dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     }
 
-    Sprintf(pbuf, _("and %ld piece%s of gold, after %ld move%s."), umoney,
-            plur(umoney), svm.moves, plur(svm.moves));
+    DISABLE_WARNING_FORMAT  /* positional params for i18n reordering */
+    /* Positional params: %1$ld=gold, %2$s=plural, %3$ld=moves, %4$s=plural */
+    Sprintf(pbuf, _("and %1$ld piece%2$s of gold, after %3$ld move%4$s."),
+            umoney, plur(umoney), svm.moves, plur(svm.moves));
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
-    Sprintf(pbuf,
-            _("You were level %d with a maximum of %d hit point%s when you %s."),
+
+    /* Positional params: %1$d=level, %2$d=maxhp, %3$s=plural, %4$s=action */
+    Sprintf(pbuf, _("You were level %1$d with a maximum of %2$d hit point%3$s when you %4$s."),
             u.ulevel, u.uhpmax, plur(u.uhpmax), _(ends[how]));
+    RESTORE_WARNING_FORMAT
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     dump_forward_putstr(endwin, 0, "", done_stopprint);
     if (!done_stopprint)

@@ -449,7 +449,7 @@ polymorph_sink(void)
     /* give message even if blind; we know we're not levitating,
        so can feel the outcome even if we can't directly see it */
     if (levl[u.ux][u.uy].typ != ROOM)
-        pline_The(_("sink transforms into %s!"), an(defsyms[sym].explanation));
+        pline_The(_("sink transforms into %s!"), an(_(defsyms[sym].explanation)));
     else
         pline_The(_("sink vanishes."));
     newsym(u.ux, u.uy);

@@ -633,6 +633,7 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)were.o $(TARGETPFX)wield.o $(TARGETPFX)windows.o \
 	$(TARGETPFX)wizard.o $(TARGETPFX)wizcmds.o $(TARGETPFX)worm.o \
 	$(TARGETPFX)worn.o $(TARGETPFX)write.o $(TARGETPFX)zap.o \
+	$(TARGETPFX)i18n.o $(TARGETPFX)ko_postpos.o \
 	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) $(HINTOBJ) $(SNDLIBOBJ) \
 	$(TARGETPFX)version.o 
 

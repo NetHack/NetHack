@@ -208,7 +208,7 @@ mhidden_description(
         if (incl_prefix)
             Strcpy(outbuf, ", mimicking ");
         if (M_AP_TYPE(mon) == M_AP_FURNITURE) {
-            what = defsyms[mon->mappearance].explanation;
+            what = _(defsyms[mon->mappearance].explanation);
             if (incl_article)
                 what = an(what);
             Strcat(outbuf, what);
@@ -793,7 +793,7 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
             FALLTHROUGH;
             /*FALLTHRU*/
         default:
-            Strcpy(buf, defsyms[symidx].explanation);
+            Strcpy(buf, _(defsyms[symidx].explanation));
             break;
         }
     } else { /* not mon, obj, trap, or cmap */

@@ -47,9 +47,13 @@
 #define DISABLE_WARNING_FORMAT_NONLITERAL \
     _Pragma("clang diagnostic push")                                    \
     _Pragma("clang diagnostic ignored \"-Wformat-nonliteral\"")
+#define DISABLE_WARNING_FORMAT \
+    _Pragma("clang diagnostic push")                                    \
+    _Pragma("clang diagnostic ignored \"-Wformat\"")
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_FORMAT_NONLITERAL _Pragma("clang diagnostic pop")
+#define RESTORE_WARNING_FORMAT _Pragma("clang diagnostic pop")
 #define RESTORE_WARNING_UNREACHABLE_CODE _Pragma("clang diagnostic pop")
 #define RESTORE_WARNINGS _Pragma("clang diagnostic pop")
 #define STDC_Pragma_AVAILABLE
@@ -63,9 +67,13 @@
 #define DISABLE_WARNING_FORMAT_NONLITERAL \
     _Pragma("GCC diagnostic push")                                      \
     _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"")
+#define DISABLE_WARNING_FORMAT \
+    _Pragma("GCC diagnostic push")                                      \
+    _Pragma("GCC diagnostic ignored \"-Wformat=\"")
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_FORMAT_NONLITERAL _Pragma("GCC diagnostic pop")
+#define RESTORE_WARNING_FORMAT _Pragma("GCC diagnostic pop")
 #define RESTORE_WARNING_UNREACHABLE_CODE _Pragma("GCC diagnostic pop")
 #define RESTORE_WARNINGS _Pragma("GCC diagnostic pop")
 #define STDC_Pragma_AVAILABLE
@@ -114,9 +122,11 @@
 #if !defined(STDC_Pragma_AVAILABLE)
 #define DISABLE_WARNING_UNREACHABLE_CODE
 #define DISABLE_WARNING_FORMAT_NONLITERAL
+#define DISABLE_WARNING_FORMAT
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_FORMAT_NONLITERAL
+#define RESTORE_WARNING_FORMAT
 #define RESTORE_WARNING_UNREACHABLE_CODE
 #define RESTORE_WARNINGS
 #endif

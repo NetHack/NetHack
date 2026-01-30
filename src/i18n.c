@@ -151,9 +151,9 @@ get_locale_for_lang(const char *lang)
 static const char *
 find_locale_dir(const char *lang)
 {
-    static char localedir_buf[BUFSZ];
+    static char localedir_buf[BUFSZ * 2];
     const char *env_dir;
-    char testpath[BUFSZ];
+    char testpath[BUFSZ * 2];
 
     if (!lang || !*lang)
         lang = "ko";  /* Default to Korean */
@@ -168,8 +168,12 @@ find_locale_dir(const char *lang)
 
     /* 2. Check relative to executable (for development/portable installs) */
 #ifdef __linux__
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
     {
-        char exe_path[BUFSZ];
+        char exe_path[BUFSZ * 2];
         ssize_t len = readlink("/proc/self/exe", exe_path, sizeof(exe_path) - 1);
         if (len > 0) {
             char *slash;
@@ -190,12 +194,22 @@ find_locale_dir(const char *lang)
             }
         }
     }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 #endif
 
     /* 3. Check HACKDIR/locale */
 #ifdef HACKDIR
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
     snprintf(localedir_buf, sizeof(localedir_buf), "%s/locale", HACKDIR);
     snprintf(testpath, sizeof(testpath), "%s/%s/LC_MESSAGES/nethack.mo", localedir_buf, lang);
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
     if (access(testpath, R_OK) == 0)
         return localedir_buf;
 #endif
@@ -332,7 +346,6 @@ process_korean_postpositions(char *buf, const char *format, ...)
     char temp[BUFSZ * 2];
     char *outp;
     const char *inp;
-    const char *pp_start;
     ko_postpos_type pp_type;
     int pp_len;
     const char *last_char_pos;
