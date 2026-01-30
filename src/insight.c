@@ -40,11 +40,16 @@ staticfn void item_resistance_message(int, const char *, int);
 extern const char *const hu_stat[];  /* hunger status from eat.c */
 extern const char *const enc_stat[]; /* encumbrance status from botl.c */
 
-static const char You_[] = "You ", are[] = "are ", were[] = "were ",
-                  have[] = "have ", had[] = "had ", can[] = "can ",
-                  could[] = "could ";
-static const char have_been[] = "have been ", have_never[] = "have never ",
-                  never[] = "never ";
+#define You_ _("You ")
+#define are _("are ")
+#define were _("were ")
+#define have _("have ")
+#define had _("had ")
+#define can _("can ")
+#define could _("could ")
+#define have_been _("have been ")
+#define have_never _("have never ")
+#define never _("never ")
 
 /* for livelogging: */
 struct ll_achieve_msg {
@@ -215,7 +220,7 @@ enlght_halfdmg(int category, int final)
     }
     Sprintf(buf, _(" %s %s damage"), (final || wizard) ? _("half") : _("reduced"),
             category_name);
-    enl_msg(You_, "take", "took", buf, from_what(category));
+    enl_msg(You_, _("take"), _("took"), buf, from_what(category));
 }
 
 /* is hero actively using water walking capability on water (or lava)? */
@@ -414,8 +419,8 @@ enlightenment(
                     (final == ENL_GAMEOVERDEAD) ? " and storing" : "");
             you_have_X(buf);
         } else if (!u.uroleplay.numbones) {
-            enl_msg(You_, "haven't encountered", "didn't encounter",
-                    " any bones levels", "");
+            enl_msg(You_, _("haven't encountered"), _("didn't encounter"),
+                    _(" any bones levels"), "");
         } else {
             Sprintf(buf, "encountered %ld bones level%s",
                     u.uroleplay.numbones, plur(u.uroleplay.numbones));
@@ -1156,7 +1161,7 @@ status_enlightenment(int mode, int final)
             Strcpy(buf, from_what(SLEEPY));
             if (wizard)
                 Sprintf(eos(buf), " (%ld)", (HSleepy & TIMEOUT));
-            enl_msg(_("You "), _("fall"), _("fell"), _(" asleep uncontrollably"), buf);
+            enl_msg(_("You "), _("fall asleep"), _("fell asleep"), _(" uncontrollably"), buf);
         }
     }
     /* hunger/nutrition */
@@ -1232,7 +1237,7 @@ status_enlightenment(int mode, int final)
     /* report 'nudity' */
     if (!uarm && !uarmu && !uarmc && !uarms && !uarmg && !uarmf && !uarmh) {
         if (u.uroleplay.nudist)
-            enl_msg(You_, "do", "did", " not wear any armor", "");
+            enl_msg(You_, _("do"), _("did"), _(" not wear any armor"), "");
         else
             you_are(_("not wearing any armor"), "");
     }
@@ -1431,7 +1436,7 @@ weapon_insight(int final)
                         ((a1 && a2 && ab) ? ", and "
                          : (a2 && ab) ? also_wik_ : ""),
                         ab ? "two weapons" : "");
-                enl_msg(You_, "can enhance", "could have enhanced", sfx, "");
+                enl_msg(You_, _("can enhance"), _("could have enhanced"), sfx, "");
             }
         } /* two-weapon */
     } /* skill applies */
@@ -1589,7 +1594,7 @@ attributes_enlightenment(
     } else if ((HClairvoyant || EClairvoyant) && BClairvoyant) {
         Strcpy(buf, from_what(-CLAIRVOYANT));
         (void) strsubst(buf, " because of ", " if not for ");
-        enl_msg(You_, "could be", "could have been", " clairvoyant", buf);
+        enl_msg(You_, _("could be"), _("could have been"), _(" clairvoyant"), buf);
     }
     if (Infravision)
         you_have(_("infravision"), from_what(INFRAVISION));
@@ -1611,7 +1616,7 @@ attributes_enlightenment(
             else /* u.umconf > 1 */
                 Sprintf(eos(buf), " (next %u hits)", u.umconf);
         }
-        enl_msg(You_, "will confuse", "would have confused", buf, "");
+        enl_msg(You_, _("will confuse"), _("would have confused"), buf, "");
     }
 
     /*** Appearance and behavior ***/
@@ -1642,9 +1647,9 @@ attributes_enlightenment(
     if (Stealth) {
         you_are(_("stealthy"), from_what(STEALTH));
     } else if (BStealth && (HStealth || EStealth)) {
-        Sprintf(buf, " stealthy%s",
-                (BStealth == FROMOUTSIDE) ? " if not mounted" : "");
-        enl_msg(You_, "would be", "would have been", buf, "");
+        Sprintf(buf, _(" stealthy%s"),
+                (BStealth == FROMOUTSIDE) ? _(" if not mounted") : "");
+        enl_msg(You_, _("would be"), _("would have been"), buf, "");
     }
     if (Aggravate_monster)
         enl_msg(_("You aggravate"), "", _("d"), _(" monsters"),
@@ -1672,10 +1677,10 @@ attributes_enlightenment(
                     terrain = (save_BLev & FROMOUTSIDE) != 0L;
 
             Sprintf(buf, "%s%s%s",
-                    trapped ? " if not trapped" : "",
-                    (trapped && terrain) ? " and" : "",
+                    trapped ? _(" if not trapped") : "",
+                    (trapped && terrain) ? _(" and") : "",
                     terrain ? if_surroundings_permitted : "");
-            enl_msg(You_, "would levitate", "would have levitated", buf, "");
+            enl_msg(You_, _("would levitate"), _("would have levitated"), buf, "");
         }
         BLevitation = save_BLev;
     }
@@ -1685,24 +1690,24 @@ attributes_enlightenment(
 
         BFlying = 0L;
         if (Flying) {
-            enl_msg(You_, "would fly", "would have flown",
+            enl_msg(You_, _("would fly"), _("would have flown"),
                     /* wording quibble: for past tense, "hadn't been"
                        would sound better than "weren't" (and
                        "had permitted" better than "permitted"), but
                        "weren't" and "permitted" are adequate so the
                        extra complexity to handle that isn't worth it */
                     Levitation
-                       ? " if you weren't levitating"
+                       ? _(" if you weren't levitating")
                        : (save_BFly == I_SPECIAL)
                           /* this is an oversimplification; being trapped
                              might also be blocking levitation so flight
                              would still be blocked after escaping trap */
-                          ? " if you weren't trapped"
+                          ? _(" if you weren't trapped")
                           : (save_BFly == FROMOUTSIDE)
                              ? if_surroundings_permitted
                              /* two or more of levitation, surroundings,
                                 and being trapped in the floor */
-                             : " if circumstances permitted",
+                             : _(" if circumstances permitted"),
                     "");
         }
         BFlying = save_BFly;
@@ -1721,7 +1726,7 @@ attributes_enlightenment(
                     u.uinwater ? (Underwater ? _("you weren't underwater")
                                   : _("you weren't in the water")) : "");
             /* past tense is applicable for death while Unchanging */
-            enl_msg(You_, "could cling", "could have clung", buf, "");
+            enl_msg(You_, _("could cling"), _("could have clung"), buf, "");
         }
     }
     /* actively walking on water handled earlier as a status condition */
@@ -1785,7 +1790,7 @@ attributes_enlightenment(
     if (Half_spell_damage)
         enlght_halfdmg(HALF_SPDAM, final);
     if (Half_gas_damage)
-        enl_msg(You_, "take", "took", " reduced poison gas damage", "");
+        enl_msg(You_, _("take"), _("took"), _(" reduced poison gas damage"), "");
     if (spellid(0) > NO_SPELL) { /* skip if no spells are known yet */
         /* greatly simplified edition of percent_success(spell.c)--may need
            to be suppressed if oversimplification leads to player confusion */
@@ -1815,13 +1820,13 @@ attributes_enlightenment(
                     from_what(UNCHANGING));
         /* blocked shape changes */
         if (Polymorph)
-            what = !final ? "polymorph" : "have polymorphed";
+            what = !final ? _("polymorph") : _("have polymorphed");
         else if (ismnum(u.ulycn))
-            what = !final ? "change shape" : "have changed shape";
+            what = !final ? _("change shape") : _("have changed shape");
         if (what) {
-            Sprintf(buf, "would %s periodically", what);
+            Sprintf(buf, _("would %s periodically"), what);
             /* omit from_what(UNCHANGING); too verbose */
-            enl_msg(You_, buf, buf, " if not locked into your current form",
+            enl_msg(You_, buf, buf, _(" if not locked into your current form"),
                     "");
         }
     } else if (Polymorph) {
@@ -1950,16 +1955,16 @@ attributes_enlightenment(
     /* saving-grace: show during final disclosure, hide during normal play */
     if (final || wizard || discover) {
         static const char *verbchoices[2][2] = {
-            { "might avoid", "have avoided" },
-            { "could have avoided", "avoided" },
+            { N_("might avoid"), N_("have avoided") },
+            { N_("could have avoided"), N_("avoided") },
         };
         /* u.usaving_grace will always be 0 or 1; final is 0 (game in
            progress), 1 (game over, survived), or 2 (game over, died) */
-        const char *verb = verbchoices[!!final][u.usaving_grace];
+        const char *verb = _(verbchoices[!!final][u.usaving_grace]);
 
         /* 'verb' has already been set for present or past but enl_msg()
            needs it twice, one for in progress, the other for game over */
-        enl_msg(You_, verb, verb, " a one-shot death via saving-grace", "");
+        enl_msg(You_, verb, verb, _(" a one-shot death via saving-grace"), "");
     }
 
     {
@@ -1967,10 +1972,10 @@ attributes_enlightenment(
 
         buf[0] = '\0';
         if (final < 2) { /* still in progress, or quit/escaped/ascended */
-            p = "survived after being killed ";
+            p = _("survived after being killed ");
             switch (u.umortality) {
             case 0:
-                p = !final ? (char *) 0 : "survived";
+                p = !final ? (char *) 0 : _("survived");
                 break;
             case 1:
                 Strcpy(buf, _("once"));
@@ -1982,11 +1987,11 @@ attributes_enlightenment(
                 Strcpy(buf, _("thrice"));
                 break;
             default:
-                Sprintf(buf, "%d times", u.umortality);
+                Sprintf(buf, _("%d times"), u.umortality);
                 break;
             }
         } else { /* game ended in character's death */
-            p = "are dead";
+            p = _("are dead");
             switch (u.umortality) {
             case 0:
                 impossible("dead without dying?");
@@ -1995,13 +2000,13 @@ attributes_enlightenment(
             case 1:
                 break; /* just "are dead" */
             default:
-                Sprintf(buf, " (%d%s time!)", u.umortality,
+                Sprintf(buf, _(" (%d%s time!)"), u.umortality,
                         ordin(u.umortality));
                 break;
             }
         }
         if (p)
-            enl_msg(You_, "have been killed ", p, buf, "");
+            enl_msg(You_, _("have been killed "), p, buf, "");
     }
 }
 
@@ -2177,8 +2182,8 @@ show_conduct(int final)
     if (!u.uconduct.wishes) {
         you_have_X(_("used no wishes"));
     } else {
-        Sprintf(buf, "used %ld wish%s", u.uconduct.wishes,
-                (u.uconduct.wishes > 1L) ? "es" : "");
+        Sprintf(buf, _("used %ld wish%s"), u.uconduct.wishes,
+                (u.uconduct.wishes > 1L) ? _("es") : "");
         if (u.uconduct.wisharti) {
             /* if wisharti == wishes
              *  1 wish (for an artifact)
@@ -2193,7 +2198,7 @@ show_conduct(int final)
                         (u.uconduct.wisharti > 2L) ? _("all ")
                           : (u.uconduct.wisharti == 2L) ? _("both ") : "");
             else
-                Sprintf(eos(buf), " (%ld ", u.uconduct.wisharti);
+                Sprintf(eos(buf), _(" (%ld "), u.uconduct.wisharti);
 
             Sprintf(eos(buf), _("for %s)"),
                     (u.uconduct.wisharti == 1L) ? _("an artifact")
@@ -2293,110 +2298,110 @@ show_achievements(
 
         switch (absidx) {
         case ACH_BLND:
-            enl_msg(You_, "are exploring", "explored",
-                    " without being able to see", "");
+            enl_msg(You_, _("are exploring"), _("explored"),
+                    _(" without being able to see"), "");
             break;
         case ACH_NUDE:
-            enl_msg(You_, "have gone", "went", " without any armor", "");
+            enl_msg(You_, _("have gone"), _("went"), _(" without any armor"), "");
             break;
         case ACH_MINE:
-            you_have_X("entered the Gnomish Mines");
+            you_have_X(_("entered the Gnomish Mines"));
             break;
         case ACH_TOWN:
-            you_have_X("entered Minetown");
+            you_have_X(_("entered Minetown"));
             break;
         case ACH_SHOP:
-            you_have_X("entered a shop");
+            you_have_X(_("entered a shop"));
             break;
         case ACH_TMPL:
-            you_have_X("entered a temple");
+            you_have_X(_("entered a temple"));
             break;
         case ACH_ORCL:
-            you_have_X("consulted the Oracle of Delphi");
+            you_have_X(_("consulted the Oracle of Delphi"));
             break;
         case ACH_NOVL:
-            you_have_X("read from a Discworld novel");
+            you_have_X(_("read from a Discworld novel"));
             break;
         case ACH_SOKO:
-            you_have_X("entered Sokoban");
+            you_have_X(_("entered Sokoban"));
             break;
         case ACH_SOKO_PRIZE: /* hard to reach guaranteed bag or amulet */
-            you_have_X("completed Sokoban");
+            you_have_X(_("completed Sokoban"));
             break;
         case ACH_MINE_PRIZE: /* hidden guaranteed luckstone */
-            you_have_X("completed the Gnomish Mines");
+            you_have_X(_("completed the Gnomish Mines"));
             break;
         case ACH_BGRM:
-            you_have_X("entered the Big Room");
+            you_have_X(_("entered the Big Room"));
             break;
         case ACH_MEDU:
-            you_have_X("defeated Medusa");
+            you_have_X(_("defeated Medusa"));
             break;
         case ACH_TUNE:
             you_have_X(
-                "learned the tune to open and close the Castle's drawbridge");
+                _("learned the tune to open and close the Castle's drawbridge"));
             break;
         case ACH_BELL:
             /* alternate phrasing for present vs past and also for
                possessing the item vs once held it */
             enl_msg(You_,
-                    u.uhave.bell ? "have" : "have handled",
-                    u.uhave.bell ? "had" : "handled",
-                    " the Bell of Opening", "");
+                    u.uhave.bell ? _("have") : _("have handled"),
+                    u.uhave.bell ? _("had") : _("handled"),
+                    _(" the Bell of Opening"), "");
             break;
         case ACH_HELL:
-            enl_msg(You_, "have ", "", "entered Gehennom", "");
+            enl_msg(You_, _("have "), "", _("entered Gehennom"), "");
             break;
         case ACH_CNDL:
             enl_msg(You_,
-                    u.uhave.menorah ? "have" : "have handled",
-                    u.uhave.menorah ? "had" : "handled",
-                    " the Candelabrum of Invocation", "");
+                    u.uhave.menorah ? _("have") : _("have handled"),
+                    u.uhave.menorah ? _("had") : _("handled"),
+                    _(" the Candelabrum of Invocation"), "");
             break;
         case ACH_BOOK:
             enl_msg(You_,
-                    u.uhave.book ? "have" : "have handled",
-                    u.uhave.book ? "had" : "handled",
-                    " the Book of the Dead", "");
+                    u.uhave.book ? _("have") : _("have handled"),
+                    u.uhave.book ? _("had") : _("handled"),
+                    _(" the Book of the Dead"), "");
             break;
         case ACH_INVK:
-            you_have_X("gained access to Moloch's Sanctum");
+            you_have_X(_("gained access to Moloch's Sanctum"));
             break;
         case ACH_AMUL:
             /* alternate wording for ascended (always past tense) since
                hero had it until #offer forced it to be relinquished */
             enl_msg(You_,
-                    u.uhave.amulet ? "have" : "have obtained",
-                    u.uevent.ascended ? "delivered"
-                     : u.uhave.amulet ? "had" : "had obtained",
-                    " the Amulet of Yendor", "");
+                    u.uhave.amulet ? _("have") : _("have obtained"),
+                    u.uevent.ascended ? _("delivered")
+                     : u.uhave.amulet ? _("had") : _("had obtained"),
+                    _(" the Amulet of Yendor"), "");
             break;
 
         /* reaching Astral makes feedback about reaching the Planes
            be redundant and ascending makes both be redundant, but
            we display all that apply */
         case ACH_ENDG:
-            you_have_X("reached the Elemental Planes");
+            you_have_X(_("reached the Elemental Planes"));
             break;
         case ACH_ASTR:
-            you_have_X("reached the Astral Plane");
+            you_have_X(_("reached the Astral Plane"));
             break;
         case ACH_UWIN:
             /* the ultimate achievement... */
-            enlght_out(" You ascended!");
+            enlght_out(_(" You ascended!"));
             break;
 
         /* rank 0 is the starting condition, not an achievement; 8 is Xp 30 */
         case ACH_RNK1: case ACH_RNK2: case ACH_RNK3: case ACH_RNK4:
         case ACH_RNK5: case ACH_RNK6: case ACH_RNK7: case ACH_RNK8:
-            Sprintf(buf, "attained the rank of %s",
+            Sprintf(buf, _("attained the rank of %s"),
                     rank_of(rank_to_xlev(absidx - (ACH_RNK1 - 1)),
                             Role_switch, (achidx < 0) ? TRUE : FALSE));
             you_have_X(buf);
             break;
 
         default:
-            Sprintf(buf, " [Unexpected achievement #%d.]", achidx);
+            Sprintf(buf, _(" [Unexpected achievement #%d.]"), achidx);
             enlght_out(buf);
             break;
         } /* switch */

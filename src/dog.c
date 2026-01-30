@@ -239,13 +239,13 @@ makedog(void)
     if (!*petname && pettype == PM_LITTLE_DOG) {
         /* All of these names were for dogs. */
         if (Role_if(PM_CAVE_DWELLER))
-            petname = "Slasher"; /* The Warrior */
+            petname = _("Slasher"); /* The Warrior */
         if (Role_if(PM_SAMURAI))
-            petname = "Hachi"; /* Shibuya Station */
+            petname = _("Hachi"); /* Shibuya Station */
         if (Role_if(PM_BARBARIAN))
-            petname = "Idefix"; /* Obelix */
+            petname = _("Idefix"); /* Obelix */
         if (Role_if(PM_RANGER))
-            petname = "Sirius"; /* Orion's dog */
+            petname = _("Sirius"); /* Orion's dog */
     }
 
     /* specifying NO_MINVENT prevents makemon() from having a 1% chance

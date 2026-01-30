@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: hannethack@example.com\n"
-"POT-Creation-Date: 2026-01-22 22:59+0900\n"
+"POT-Creation-Date: 2026-01-30 08:57+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -106,7 +106,7 @@ msgstr ""
 #: ../src/shk.c:1429 ../src/sounds.c:417 ../src/sounds.c:468 ../src/trap.c:853
 #: ../src/trap.c:1700 ../src/trap.c:1911 ../src/uhitm.c:2445
 #: ../src/uhitm.c:2516 ../src/uhitm.c:2575 ../src/uhitm.c:4489
-#: ../src/uhitm.c:5163 ../src/uhitm.c:6405 ../src/weapon.c:879
+#: ../src/uhitm.c:5163 ../src/uhitm.c:6410 ../src/weapon.c:879
 #: ../src/wizard.c:861 ../src/wizcmds.c:314
 #, c-format
 msgid "%s %s!"
@@ -230,8 +230,8 @@ msgid "those"
 msgstr ""
 
 #: ../src/apply.c:279 ../src/apply.c:438 ../src/do.c:2015 ../src/do.c:2411
-#: ../src/eat.c:2002 ../src/insight.c:426 ../src/insight.c:1490
-#: ../src/insight.c:1804 ../src/insight.c:1891 ../src/invent.c:3766
+#: ../src/eat.c:2002 ../src/insight.c:431 ../src/insight.c:1495
+#: ../src/insight.c:1809 ../src/insight.c:1896 ../src/invent.c:3766
 #: ../src/invent.c:5513 ../src/read.c:1662 ../src/shk.c:687 ../src/steed.c:637
 #: ../src/timeout.c:1614 ../src/topten.c:994 ../src/trap.c:5846
 #: ../src/uhitm.c:6214 ../src/wield.c:935 ../src/wield.c:956
@@ -242,16 +242,16 @@ msgstr ""
 #: ../src/apply.c:1359 ../src/apply.c:2645 ../src/apply.c:2768
 #: ../src/artifact.c:969 ../src/artifact.c:1429 ../src/artifact.c:2115
 #: ../src/artifact.c:2188 ../src/detect.c:1224 ../src/do.c:871 ../src/do.c:2411
-#: ../src/eat.c:3692 ../src/engrave.c:829 ../src/insight.c:1393
-#: ../src/insight.c:1452 ../src/invent.c:3766 ../src/invent.c:4240
-#: ../src/invent.c:5513 ../src/mon.c:5743 ../src/pickup.c:1696
-#: ../src/pickup.c:2586 ../src/pickup.c:2977 ../src/pickup.c:3649
-#: ../src/potion.c:2655 ../src/potion.c:2689 ../src/pray.c:1179
-#: ../src/read.c:1145 ../src/read.c:1598 ../src/steal.c:799
+#: ../src/eat.c:3692 ../src/engrave.c:829 ../src/insight.c:1398
+#: ../src/insight.c:1457 ../src/insight.c:2111 ../src/invent.c:3766
+#: ../src/invent.c:4240 ../src/invent.c:5513 ../src/mon.c:5743
+#: ../src/pickup.c:1696 ../src/pickup.c:2586 ../src/pickup.c:2977
+#: ../src/pickup.c:3649 ../src/potion.c:2655 ../src/potion.c:2689
+#: ../src/pray.c:1179 ../src/read.c:1145 ../src/read.c:1598 ../src/steal.c:799
 #: ../src/timeout.c:341 ../src/timeout.c:1614 ../src/trap.c:274
 #: ../src/trap.c:283 ../src/trap.c:389 ../src/trap.c:392 ../src/trap.c:394
 #: ../src/trap.c:5846 ../src/uhitm.c:1897 ../src/uhitm.c:6214
-#: ../src/weapon.c:870 ../src/wield.c:763 ../src/wield.c:1052 ../src/worn.c:975
+#: ../src/weapon.c:870 ../src/wield.c:763 ../src/wield.c:1052 ../src/worn.c:979
 #: ../src/zap.c:2232 ../src/zap.c:2237
 msgid "are"
 msgstr ""
@@ -261,8 +261,8 @@ msgid " mostly"
 msgstr ""
 
 #: ../src/apply.c:287 ../src/cmd.c:4376 ../src/cmd.c:5227 ../src/do_wear.c:630
-#: ../src/iactions.c:453 ../src/mhitm.c:667 ../src/obj_descr_i18n.c:363
-#: ../src/objnam.c:924 ../src/objnam.c:1589 ../src/potion.c:1660
+#: ../src/iactions.c:453 ../src/mhitm.c:667 ../src/obj_descr_i18n.c:365
+#: ../src/objnam.c:922 ../src/objnam.c:1587 ../src/potion.c:1660
 #: ../src/sounds.c:1224 ../src/trap.c:137 ../src/trap.c:394 ../src/uhitm.c:3131
 #: ../src/uhitm.c:4089 ../src/zap.c:504
 #, c-format
@@ -412,8 +412,8 @@ msgid "produce a %shigh-%s."
 msgstr ""
 
 #: ../src/apply.c:501 ../src/attrib.c:192 ../src/eat.c:1937
-#: ../src/obj_descr_i18n.c:306 ../src/objnam.c:831 ../src/objnam.c:1160
-#: ../src/objnam.c:1173 ../src/trap.c:706 ../src/uhitm.c:2871
+#: ../src/obj_descr_i18n.c:308 ../src/objnam.c:829 ../src/objnam.c:1158
+#: ../src/objnam.c:1171 ../src/trap.c:706 ../src/uhitm.c:2871
 #: ../src/uhitm.c:5763
 msgid "very "
 msgstr ""
@@ -506,6 +506,7 @@ msgid "others"
 msgstr ""
 
 #: ../src/apply.c:666 ../src/detect.c:2396 ../src/detect.c:2400
+#: ../src/insight.c:1681
 msgid " and"
 msgstr ""
 
@@ -522,7 +523,7 @@ msgstr ""
 #: ../src/invent.c:2047 ../src/invent.c:3143 ../src/invent.c:4532
 #: ../src/mail.c:375 ../src/mhitu.c:1642 ../src/mon.c:2955 ../src/mon.c:2957
 #: ../src/muse.c:2901 ../src/muse.c:3110 ../src/music.c:616
-#: ../src/objnam.c:3664 ../src/objnam.c:3713 ../src/objnam.c:3844
+#: ../src/objnam.c:3662 ../src/objnam.c:3711 ../src/objnam.c:3842
 #: ../src/potion.c:1675 ../src/pray.c:576 ../src/pray.c:1489 ../src/pray.c:1760
 #: ../src/read.c:1339 ../src/read.c:2610 ../src/read.c:2814 ../src/sit.c:497
 #: ../src/teleport.c:1072 ../src/teleport.c:1369 ../src/trap.c:4570
@@ -703,7 +704,7 @@ msgstr ""
 msgid "cute"
 msgstr ""
 
-#: ../src/apply.c:1005
+#: ../src/apply.c:1005 ../src/obj_descr_i18n.c:515
 msgid "plain"
 msgstr ""
 
@@ -907,8 +908,9 @@ msgstr ""
 msgid "%s shattered!"
 msgstr ""
 
-#: ../src/apply.c:1230 ../src/insight.c:1393 ../src/pickup.c:2804
-#: ../src/trap.c:6846
+#: ../src/apply.c:1230 ../src/insight.c:1398 ../src/insight.c:2348
+#: ../src/insight.c:2357 ../src/insight.c:2363 ../src/insight.c:2374
+#: ../src/pickup.c:2804 ../src/trap.c:6846
 msgid "have"
 msgstr ""
 
@@ -1032,7 +1034,7 @@ msgstr ""
 #: ../src/engrave.c:1201 ../src/potion.c:1607 ../src/potion.c:2446
 #: ../src/read.c:669 ../src/read.c:675 ../src/read.c:683 ../src/read.c:1148
 #: ../src/read.c:1182 ../src/read.c:1248 ../src/read.c:1539 ../src/read.c:1601
-#: ../src/sit.c:625 ../src/wield.c:911 ../src/wield.c:994 ../src/worn.c:943
+#: ../src/sit.c:625 ../src/wield.c:911 ../src/wield.c:994 ../src/worn.c:947
 msgid "glow"
 msgstr ""
 
@@ -1158,10 +1160,10 @@ msgid "crackles"
 msgstr ""
 
 #: ../src/apply.c:1555 ../src/artifact.c:1426 ../src/detect.c:1832
-#: ../src/detect.c:1843 ../src/detect.c:1858 ../src/insight.c:1720
-#: ../src/invent.c:2044 ../src/invent.c:4178 ../src/role.c:1612
-#: ../src/role.c:1617 ../src/role.c:1622 ../src/sounds.c:1526
-#: ../src/trap.c:5839
+#: ../src/detect.c:1843 ../src/detect.c:1858 ../src/insight.c:568
+#: ../src/insight.c:1725 ../src/invent.c:2044 ../src/invent.c:4178
+#: ../src/role.c:1612 ../src/role.c:1617 ../src/role.c:1622
+#: ../src/sounds.c:1526 ../src/trap.c:5839
 msgid " and "
 msgstr ""
 
@@ -1170,17 +1172,17 @@ msgid "flickers"
 msgstr ""
 
 #: ../src/apply.c:1598 ../src/iactions.c:61 ../src/iactions.c:362
-#: ../src/insight.c:1387 ../src/trap.c:389
+#: ../src/insight.c:1392 ../src/trap.c:389
 #, c-format
 msgid "%s %s %s"
 msgstr ""
 
 #: ../src/apply.c:1600 ../src/do.c:2458 ../src/eat.c:3490 ../src/hack.c:3703
-#: ../src/invent.c:4112 ../src/lock.c:590 ../src/lock.c:592 ../src/lock.c:852
-#: ../src/lock.c:1014 ../src/potion.c:2652 ../src/potion.c:2655
-#: ../src/pray.c:565 ../src/pray.c:1214 ../src/read.c:1142 ../src/read.c:1154
-#: ../src/read.c:1606 ../src/trap.c:365 ../src/trap.c:5980 ../src/wizard.c:78
-#: ../src/wizard.c:80 ../src/wizard.c:82
+#: ../src/insight.c:949 ../src/invent.c:4112 ../src/lock.c:590
+#: ../src/lock.c:592 ../src/lock.c:852 ../src/lock.c:1014 ../src/potion.c:2652
+#: ../src/potion.c:2655 ../src/pray.c:565 ../src/pray.c:1214 ../src/read.c:1142
+#: ../src/read.c:1154 ../src/read.c:1606 ../src/trap.c:365 ../src/trap.c:5980
+#: ../src/wizard.c:78 ../src/wizard.c:80 ../src/wizard.c:82
 msgid "feel"
 msgstr ""
 
@@ -1243,12 +1245,12 @@ msgstr ""
 
 #: ../src/apply.c:1660 ../src/apply.c:1675 ../src/apply.c:2296
 #: ../src/apply.c:2384 ../src/apply.c:3653 ../src/apply.c:3672
-#: ../src/artifact.c:2065 ../src/do.c:2028 ../src/eat.c:2146
-#: ../src/engrave.c:1246 ../src/hack.c:4079 ../src/nhlua.c:636
-#: ../src/nhlua.c:652 ../src/pager.c:2697 ../src/pline.c:677 ../src/pline.c:744
-#: ../src/potion.c:208 ../src/potion.c:235 ../src/questpgr.c:435
-#: ../src/spell.c:2054 ../src/timeout.c:343 ../src/vault.c:959
-#: ../src/version.c:160 ../src/windows.c:456 ../src/windows.c:514
+#: ../src/artifact.c:2065 ../src/do.c:2028 ../src/engrave.c:1246
+#: ../src/hack.c:4079 ../src/nhlua.c:636 ../src/nhlua.c:652 ../src/pager.c:2697
+#: ../src/pline.c:677 ../src/potion.c:208 ../src/potion.c:235
+#: ../src/questpgr.c:435 ../src/spell.c:2054 ../src/timeout.c:343
+#: ../src/vault.c:959 ../src/version.c:160 ../src/windows.c:456
+#: ../src/windows.c:514
 #, c-format
 msgid "%s"
 msgstr ""
@@ -1547,7 +1549,7 @@ msgstr ""
 msgid "trippy"
 msgstr ""
 
-#: ../src/apply.c:2278 ../src/artifact.c:1428 ../src/insight.c:1029
+#: ../src/apply.c:2278 ../src/artifact.c:1428 ../src/insight.c:1034
 #: ../src/mhitu.c:1664 ../src/potion.c:99 ../src/timeout.c:38
 msgid "confused"
 msgstr ""
@@ -1571,7 +1573,7 @@ msgid "%s %s from your pack!"
 msgstr ""
 
 #: ../src/apply.c:2449 ../src/apply.c:2452 ../src/apply.c:2481 ../src/do.c:828
-#: ../src/mkobj.c:2925 ../src/mthrowu.c:781 ../src/obj_descr_i18n.c:228
+#: ../src/mkobj.c:2925 ../src/mthrowu.c:781 ../src/obj_descr_i18n.c:230
 #: ../src/pickup.c:3796 ../src/polyself.c:1305 ../src/pray.c:795
 #: ../src/timeout.c:1115 ../src/timeout.c:1118 ../src/timeout.c:1154
 #: ../src/weapon.c:772 ../src/wield.c:809 ../src/zap.c:6277
@@ -1796,7 +1798,7 @@ msgstr ""
 msgid "while engulfed"
 msgstr ""
 
-#: ../src/apply.c:2833 ../src/insight.c:964
+#: ../src/apply.c:2833 ../src/insight.c:969
 msgid "underwater"
 msgstr ""
 
@@ -1804,7 +1806,7 @@ msgstr ""
 msgid "while levitating"
 msgstr ""
 
-#: ../src/apply.c:2837 ../src/insight.c:966
+#: ../src/apply.c:2837 ../src/insight.c:971
 msgid "in water"
 msgstr ""
 
@@ -2047,7 +2049,7 @@ msgid "uselessly attack %s."
 msgstr ""
 
 #: ../src/apply.c:3550 ../src/eat.c:2490 ../src/obj_descr_i18n.c:115
-#: ../src/obj_descr_i18n.c:360 ../src/objnam.c:916 ../src/pager.c:790
+#: ../src/obj_descr_i18n.c:362 ../src/objnam.c:914 ../src/pager.c:790
 #: ../src/spell.c:1162
 msgid "stone"
 msgstr ""
@@ -2074,7 +2076,7 @@ msgstr ""
 msgid "There's %ssticky goop all over your %s."
 msgstr ""
 
-#: ../src/apply.c:3588 ../src/insight.c:1629 ../src/mcastu.c:848
+#: ../src/apply.c:3588 ../src/insight.c:1634 ../src/mcastu.c:848
 #: ../src/uhitm.c:3891
 msgid "more "
 msgstr ""
@@ -2095,7 +2097,7 @@ msgid "The %s %s feebly."
 msgstr ""
 
 #: ../src/apply.c:3651 ../src/apply.c:3670 ../src/artifact.c:2438
-#: ../src/obj_descr_i18n.c:248 ../src/sounds.c:455
+#: ../src/obj_descr_i18n.c:250 ../src/sounds.c:455
 msgid "quiver"
 msgstr ""
 
@@ -2453,12 +2455,12 @@ msgstr ""
 msgid "%s is insightful."
 msgstr ""
 
-#: ../src/artifact.c:1415 ../src/insight.c:1533 ../src/sit.c:605
+#: ../src/artifact.c:1415 ../src/insight.c:1538 ../src/sit.c:605
 #: ../src/wield.c:777
 msgid "resist"
 msgstr ""
 
-#: ../src/artifact.c:1424 ../src/insight.c:1027 ../src/mhitu.c:1665
+#: ../src/artifact.c:1424 ../src/insight.c:1032 ../src/mhitu.c:1665
 #: ../src/timeout.c:37
 msgid "stunned"
 msgstr ""
@@ -2722,7 +2724,7 @@ msgstr ""
 msgid "NetHack rumors file closed for renovation."
 msgstr ""
 
-#: ../src/artifact.c:2293 ../src/wizcmds.c:256
+#: ../src/artifact.c:2293
 #, c-format
 msgid "%s:"
 msgstr ""
@@ -2777,10 +2779,9 @@ msgstr ""
 #: ../src/artifact.c:2585 ../src/ball.c:975 ../src/do_wear.c:3224
 #: ../src/dokick.c:644 ../src/dokick.c:775 ../src/dokick.c:1941
 #: ../src/dokick.c:1944 ../src/dothrow.c:1792 ../src/dothrow.c:2709
-#: ../src/hack.c:543 ../src/hack.c:559 ../src/insight.c:1159 ../src/mon.c:3607
-#: ../src/polyself.c:1282 ../src/steal.c:837 ../src/teleport.c:2128
-#: ../src/trap.c:705 ../src/trap.c:1889 ../src/trap.c:3422 ../src/trap.c:3435
-#: ../src/trap.c:5006
+#: ../src/hack.c:543 ../src/hack.c:559 ../src/mon.c:3607 ../src/polyself.c:1282
+#: ../src/steal.c:837 ../src/teleport.c:2128 ../src/trap.c:705
+#: ../src/trap.c:1889 ../src/trap.c:3422 ../src/trap.c:3435 ../src/trap.c:5006
 msgid "fall"
 msgstr ""
 
@@ -2866,7 +2867,7 @@ msgid "charisma"
 msgstr ""
 
 #: ../src/attrib.c:28 ../src/attrib.c:34 ../src/attrib.c:51 ../src/attrib.c:65
-#: ../src/attrib.c:74 ../src/attrib.c:82 ../src/insight.c:1643
+#: ../src/attrib.c:74 ../src/attrib.c:82 ../src/insight.c:1648
 #: ../src/timeout.c:94
 msgid "stealthy"
 msgstr ""
@@ -2955,7 +2956,7 @@ msgstr ""
 msgid "currently"
 msgstr ""
 
-#: ../src/attrib.c:179 ../src/insight.c:2076
+#: ../src/attrib.c:179 ../src/insight.c:2081
 msgid "already"
 msgstr ""
 
@@ -3018,12 +3019,12 @@ msgstr ""
 msgid "The "
 msgstr ""
 
-#: ../src/attrib.c:333 ../src/insight.c:1394 ../src/insight.c:1453
+#: ../src/attrib.c:333 ../src/insight.c:1399 ../src/insight.c:1458
 msgid "were"
 msgstr ""
 
-#: ../src/attrib.c:333 ../src/insight.c:426 ../src/insight.c:1490
-#: ../src/insight.c:1804 ../src/insight.c:1891
+#: ../src/attrib.c:333 ../src/insight.c:431 ../src/insight.c:1495
+#: ../src/insight.c:1809 ../src/insight.c:1896
 msgid "was"
 msgstr ""
 
@@ -3074,6 +3075,11 @@ msgstr ""
 
 #: ../src/attrib.c:662
 msgid "haven't been"
+msgstr ""
+
+#: ../src/attrib.c:912
+#, c-format
+msgid " because of %s"
 msgstr ""
 
 #: ../src/attrib.c:935
@@ -3234,14 +3240,14 @@ msgstr ""
 msgid "%s %s is severely damaged."
 msgstr ""
 
-#: ../src/ball.c:916 ../src/bones.c:799 ../src/insight.c:572
-#: ../src/objnam.c:1590 ../src/objnam.c:1620 ../src/options.c:5622
+#: ../src/ball.c:916 ../src/bones.c:799 ../src/insight.c:577
+#: ../src/objnam.c:1588 ../src/objnam.c:1618 ../src/options.c:5622
 #: ../src/uhitm.c:4419
 msgid "left"
 msgstr ""
 
-#: ../src/ball.c:916 ../src/bones.c:799 ../src/insight.c:572
-#: ../src/objnam.c:1590 ../src/objnam.c:1620 ../src/options.c:5625
+#: ../src/ball.c:916 ../src/bones.c:799 ../src/insight.c:577
+#: ../src/objnam.c:1588 ../src/objnam.c:1618 ../src/options.c:5625
 #: ../src/uhitm.c:4419
 msgid "right"
 msgstr ""
@@ -3930,7 +3936,7 @@ msgstr ""
 msgid "Key binding failed?!"
 msgstr ""
 
-#: ../src/cmd.c:2256 ../src/options.c:9304
+#: ../src/cmd.c:2256 ../src/options.c:9306
 msgid "Do what?"
 msgstr ""
 
@@ -4472,8 +4478,8 @@ msgid "%s the %s and disappears."
 msgstr ""
 
 #: ../src/dbridge.c:723 ../src/dig.c:866 ../src/dig.c:925 ../src/dokick.c:1453
-#: ../src/dothrow.c:1098 ../src/hack.c:2484 ../src/insight.c:243
-#: ../src/invent.c:5507 ../src/obj_descr_i18n.c:461 ../src/pickup.c:2052
+#: ../src/dothrow.c:1098 ../src/hack.c:2484 ../src/insight.c:248
+#: ../src/invent.c:5507 ../src/obj_descr_i18n.c:469 ../src/pickup.c:2052
 #: ../src/trap.c:3975 ../src/zap.c:5215
 msgid "lava"
 msgstr ""
@@ -4822,7 +4828,7 @@ msgstr ""
 msgid "%s your mind!"
 msgstr ""
 
-#: ../src/detect.c:1242 ../src/obj_descr_i18n.c:247
+#: ../src/detect.c:1242 ../src/obj_descr_i18n.c:249
 msgid "zap"
 msgstr ""
 
@@ -4926,8 +4932,8 @@ msgid "You %s an explosion!"
 msgstr ""
 
 #: ../src/detect.c:1757 ../src/dogmove.c:1527 ../src/getpos.c:681
-#: ../src/hack.c:1705 ../src/hack.c:3703 ../src/insight.c:1540
-#: ../src/insight.c:1546 ../src/invent.c:4112 ../src/lock.c:590
+#: ../src/hack.c:1705 ../src/hack.c:3703 ../src/insight.c:1545
+#: ../src/insight.c:1551 ../src/invent.c:4112 ../src/lock.c:590
 #: ../src/lock.c:592 ../src/lock.c:852 ../src/lock.c:1014 ../src/lock.c:1282
 #: ../src/pickup.c:2806 ../src/questpgr.c:313 ../src/shk.c:1775
 #: ../src/trap.c:5980
@@ -5197,7 +5203,7 @@ msgid "This %s is too hard to %s."
 msgstr ""
 
 #: ../src/dig.c:333 ../src/dig.c:555 ../src/dig.c:1401 ../src/dungeon.c:1776
-#: ../src/objnam.c:3687
+#: ../src/objnam.c:3685
 msgid "wall"
 msgstr ""
 
@@ -5289,7 +5295,7 @@ msgid "debris from your digging comes to life!"
 msgstr ""
 
 #: ../src/dig.c:548 ../src/hack.c:682 ../src/hack.c:697 ../src/hack.c:712
-#: ../src/obj_descr_i18n.c:205 ../src/obj_descr_i18n.c:257
+#: ../src/obj_descr_i18n.c:207 ../src/obj_descr_i18n.c:259
 msgid "rock"
 msgstr ""
 
@@ -5328,7 +5334,7 @@ msgstr ""
 msgid "through"
 msgstr ""
 
-#: ../src/dig.c:703 ../src/insight.c:1296 ../src/insight.c:1388
+#: ../src/dig.c:703 ../src/insight.c:1301 ../src/insight.c:1393
 #: ../src/timeout.c:373 ../src/trap.c:4926 ../src/trap.c:4965
 msgid "in"
 msgstr ""
@@ -5617,7 +5623,7 @@ msgid "start %s."
 msgstr ""
 
 #: ../src/dig.c:1308 ../src/do_wear.c:898 ../src/hack.c:691 ../src/wield.c:243
-#: ../src/worn.c:972
+#: ../src/worn.c:976
 msgid "begin"
 msgstr ""
 
@@ -5943,7 +5949,7 @@ msgid " with you"
 msgstr ""
 
 #: ../src/do.c:217 ../src/explode.c:572 ../src/mhitm.c:950 ../src/mthrowu.c:456
-#: ../src/uhitm.c:2511 ../src/uhitm.c:5091
+#: ../src/uhitm.c:2511 ../src/uhitm.c:2570 ../src/uhitm.c:5091
 #, c-format
 msgid "%s is %s!"
 msgstr ""
@@ -6054,7 +6060,7 @@ msgstr ""
 msgid "%s %s on the altar."
 msgstr ""
 
-#: ../src/do.c:387 ../src/do_wear.c:1166 ../src/obj_descr_i18n.c:446
+#: ../src/do.c:387 ../src/do_wear.c:1166 ../src/obj_descr_i18n.c:454
 #: ../src/pager.c:735 ../src/pager.c:787 ../src/pager.c:1435 ../src/pray.c:799
 #: ../src/trap.c:1911
 msgid "land"
@@ -6133,8 +6139,8 @@ msgstr ""
 msgid "water's force seems %ser now."
 msgstr ""
 
-#: ../src/do.c:555 ../src/insight.c:177 ../src/insight.c:3232
-#: ../src/obj_descr_i18n.c:436 ../src/objnam.c:785
+#: ../src/do.c:555 ../src/insight.c:182 ../src/insight.c:3237
+#: ../src/obj_descr_i18n.c:444 ../src/objnam.c:785
 msgid "small"
 msgstr ""
 
@@ -6292,12 +6298,12 @@ msgstr ""
 msgid "being held"
 msgstr ""
 
-#: ../src/do.c:1117 ../src/insight.c:1083 ../src/polyself.c:1771
+#: ../src/do.c:1117 ../src/insight.c:1088 ../src/polyself.c:1771
 #: ../src/trap.c:3994
 msgid "swallowed"
 msgstr ""
 
-#: ../src/do.c:1118 ../src/insight.c:1083 ../src/polyself.c:1772
+#: ../src/do.c:1118 ../src/insight.c:1088 ../src/polyself.c:1772
 #: ../src/trap.c:3994
 msgid "engulfed"
 msgstr ""
@@ -6368,7 +6374,7 @@ msgstr ""
 msgid "down"
 msgstr ""
 
-#: ../src/do.c:1259 ../src/insight.c:1657 ../src/muse.c:1048 ../src/muse.c:1145
+#: ../src/do.c:1259 ../src/insight.c:1662 ../src/muse.c:1048 ../src/muse.c:1145
 #: ../src/muse.c:2494
 msgid "jump"
 msgstr ""
@@ -6741,12 +6747,12 @@ msgid "%s%s %s in no shape for %s."
 msgstr ""
 
 #: ../src/do.c:2410 ../src/do_wear.c:2575 ../src/do_wear.c:2610
-#: ../src/insight.c:1127 ../src/weapon.c:463 ../src/wield.c:762
+#: ../src/insight.c:1132 ../src/weapon.c:463 ../src/wield.c:762
 msgid "left "
 msgstr ""
 
 #: ../src/do.c:2410 ../src/do_wear.c:2575 ../src/do_wear.c:2610
-#: ../src/insight.c:1127 ../src/weapon.c:464 ../src/wield.c:762
+#: ../src/insight.c:1132 ../src/weapon.c:464 ../src/wield.c:762
 msgid "right "
 msgstr ""
 
@@ -6764,7 +6770,7 @@ msgstr ""
 msgid "its"
 msgstr ""
 
-#: ../src/do_name.c:168 ../src/do_name.c:567 ../src/obj_descr_i18n.c:234
+#: ../src/do_name.c:168 ../src/do_name.c:567 ../src/obj_descr_i18n.c:236
 msgid "name"
 msgstr ""
 
@@ -6839,6 +6845,10 @@ msgstr ""
 msgid "%s resists the attempt."
 msgstr ""
 
+#: ../src/do_name.c:325
+msgid "The artifact"
+msgstr ""
+
 #: ../src/do_name.c:351
 #, c-format
 msgid "While engraving, your %s slips."
@@ -6873,7 +6883,7 @@ msgstr ""
 msgid "What do you want to name?"
 msgstr ""
 
-#: ../src/do_name.c:572 ../src/obj_descr_i18n.c:235
+#: ../src/do_name.c:572 ../src/obj_descr_i18n.c:237
 msgid "call"
 msgstr ""
 
@@ -6909,7 +6919,7 @@ msgstr ""
 msgid "over"
 msgstr ""
 
-#: ../src/do_name.c:693 ../src/objnam.c:3954
+#: ../src/do_name.c:693 ../src/objnam.c:3952
 msgid "under"
 msgstr ""
 
@@ -6946,13 +6956,13 @@ msgstr ""
 msgid "someone"
 msgstr ""
 
-#: ../src/do_name.c:882 ../src/mhitm.c:752 ../src/obj_descr_i18n.c:302
+#: ../src/do_name.c:882 ../src/mhitm.c:752 ../src/obj_descr_i18n.c:304
 #: ../src/shk.c:4503
 msgid "something"
 msgstr ""
 
 #: ../src/do_name.c:931 ../src/do_name.c:942 ../src/end.c:223
-#: ../src/mhitu.c:240 ../src/mhitu.c:246 ../src/obj_descr_i18n.c:418
+#: ../src/mhitu.c:240 ../src/mhitu.c:246 ../src/obj_descr_i18n.c:426
 #: ../src/pager.c:119
 msgid "invisible "
 msgstr ""
@@ -7095,6 +7105,10 @@ msgstr ""
 msgid "yourself speed up%s."
 msgstr ""
 
+#: ../src/do_wear.c:225 ../src/do_wear.c:817
+msgid " a bit more"
+msgstr ""
+
 #: ../src/do_wear.c:277 ../src/timeout.c:728
 #, c-format
 msgid "yourself slow down%s."
@@ -7160,7 +7174,7 @@ msgstr ""
 msgid "vibrate"
 msgstr ""
 
-#: ../src/do_wear.c:480 ../src/uhitm.c:4373
+#: ../src/do_wear.c:480 ../src/uhitm.c:4373 ../src/uhitm.c:4391
 #, c-format
 msgid "%s %s for a moment."
 msgstr ""
@@ -7652,11 +7666,11 @@ msgstr ""
 msgid "%sno longer %s."
 msgstr ""
 
-#: ../src/do_wear.c:2837 ../src/insight.c:1067
+#: ../src/do_wear.c:2837 ../src/insight.c:44 ../src/insight.c:1072
 msgid "are "
 msgstr ""
 
-#: ../src/do_wear.c:2838 ../src/insight.c:1256
+#: ../src/do_wear.c:2838 ../src/insight.c:1261
 msgid "wielding two weapons at once"
 msgstr ""
 
@@ -7742,6 +7756,22 @@ msgstr ""
 msgid "get a bad feeling about this."
 msgstr ""
 
+#: ../src/dog.c:242
+msgid "Slasher"
+msgstr ""
+
+#: ../src/dog.c:244
+msgid "Hachi"
+msgstr ""
+
+#: ../src/dog.c:246
+msgid "Idefix"
+msgstr ""
+
+#: ../src/dog.c:248
+msgid "Sirius"
+msgstr ""
+
 #: ../src/dog.c:831
 #, c-format
 msgid "%s is still %s."
@@ -7751,7 +7781,7 @@ msgstr ""
 msgid "eating"
 msgstr ""
 
-#: ../src/dog.c:832 ../src/insight.c:249 ../src/obj_descr_i18n.c:463
+#: ../src/dog.c:832 ../src/insight.c:254 ../src/obj_descr_i18n.c:471
 #: ../src/polyself.c:1770
 msgid "trapped"
 msgstr ""
@@ -8166,7 +8196,7 @@ msgstr ""
 msgid "%s %sn't come loose."
 msgstr ""
 
-#: ../src/dokick.c:627
+#: ../src/dokick.c:627 ../src/insight.c:1240
 msgid "do"
 msgstr ""
 
@@ -8217,7 +8247,7 @@ msgid "Whee!  %s %s across the %s."
 msgstr ""
 
 #: ../src/dokick.c:723 ../src/polyself.c:1267 ../src/timeout.c:1274
-#: ../src/worn.c:1298
+#: ../src/worn.c:1302
 msgid "slide"
 msgstr ""
 
@@ -8669,7 +8699,7 @@ msgstr ""
 msgid "You move over %s."
 msgstr ""
 
-#: ../src/dothrow.c:932 ../src/objnam.c:3687 ../src/zap.c:3361
+#: ../src/dothrow.c:932 ../src/objnam.c:3685 ../src/zap.c:3361
 msgid "pool"
 msgstr ""
 
@@ -9090,12 +9120,36 @@ msgstr ""
 msgid "headstone"
 msgstr ""
 
-#: ../src/dungeon.c:1778 ../src/obj_descr_i18n.c:451 ../src/pager.c:763
+#: ../src/dungeon.c:1778 ../src/obj_descr_i18n.c:459 ../src/pager.c:763
 msgid "doorway"
+msgstr ""
+
+#: ../src/dungeon.c:2239 ../src/dungeon.c:3389
+msgid "Portal"
+msgstr ""
+
+#: ../src/dungeon.c:2241 ../src/dungeon.c:3391
+msgid "Connection"
+msgstr ""
+
+#: ../src/dungeon.c:2243
+msgid "One way stair"
+msgstr ""
+
+#: ../src/dungeon.c:2245
+msgid "Stair"
+msgstr ""
+
+#: ../src/dungeon.c:2247
+msgid " (unknown)"
 msgstr ""
 
 #: ../src/dungeon.c:2364
 msgid "Level teleport to where:"
+msgstr ""
+
+#: ../src/dungeon.c:2384
+msgid "Floating branches"
 msgstr ""
 
 #: ../src/dungeon.c:2421
@@ -9118,14 +9172,6 @@ msgstr ""
 
 #: ../src/dungeon.c:3389
 msgid "Sealed portal"
-msgstr ""
-
-#: ../src/dungeon.c:3389
-msgid "Portal"
-msgstr ""
-
-#: ../src/dungeon.c:3391
-msgid "Connection"
 msgstr ""
 
 #: ../src/dungeon.c:3393
@@ -9184,7 +9230,7 @@ msgid "%sOracle of Delphi."
 msgstr ""
 
 #: ../src/dungeon.c:3636 ../src/fountain.c:815 ../src/mhitm.c:32
-#: ../src/music.c:602 ../src/objnam.c:3605
+#: ../src/music.c:602 ../src/objnam.c:3603
 #, c-format
 msgid "%s%s."
 msgstr ""
@@ -9330,7 +9376,7 @@ msgid "%s brain is eaten!"
 msgstr ""
 
 #: ../src/eat.c:646 ../src/mhitm.c:234 ../src/mhitm.c:1046 ../src/mhitu.c:2489
-#: ../src/mon.c:1419
+#: ../src/mon.c:1419 ../src/uhitm.c:3938
 #, c-format
 msgid "%s turns to stone!"
 msgstr ""
@@ -9928,6 +9974,10 @@ msgstr ""
 msgid "Yak - dog food!"
 msgstr ""
 
+#: ../src/eat.c:2146
+msgid "!#?&* elf kibble!"
+msgstr ""
+
 #: ../src/eat.c:2149
 msgid "A little goes a long way."
 msgstr ""
@@ -9956,6 +10006,18 @@ msgstr ""
 #: ../src/eat.c:2191
 #, c-format
 msgid "%s -- core dumped."
+msgstr ""
+
+#: ../src/eat.c:2193
+msgid "Segmentation fault"
+msgstr ""
+
+#: ../src/eat.c:2195
+msgid "Bus error"
+msgstr ""
+
+#: ../src/eat.c:2196
+msgid "Yo' mama"
 msgstr ""
 
 #: ../src/eat.c:2201
@@ -9989,13 +10051,13 @@ msgid "Magic spreads through your body as you digest the %s."
 msgstr ""
 
 #: ../src/eat.c:2257 ../src/iactions.c:551 ../src/mhitu.c:2029
-#: ../src/mhitu.c:2060 ../src/obj_descr_i18n.c:111 ../src/obj_descr_i18n.c:354
-#: ../src/objnam.c:243 ../src/objnam.c:907 ../src/objnam.c:911
+#: ../src/mhitu.c:2060 ../src/obj_descr_i18n.c:111 ../src/obj_descr_i18n.c:356
+#: ../src/objnam.c:243 ../src/objnam.c:905 ../src/objnam.c:909
 msgid "ring"
 msgstr ""
 
 #: ../src/eat.c:2257 ../src/iactions.c:550 ../src/muse.c:2781
-#: ../src/obj_descr_i18n.c:112 ../src/obj_descr_i18n.c:357 ../src/objnam.c:249
+#: ../src/obj_descr_i18n.c:112 ../src/obj_descr_i18n.c:359 ../src/objnam.c:249
 msgid "amulet"
 msgstr ""
 
@@ -10077,7 +10139,7 @@ msgstr ""
 msgid "metal"
 msgstr ""
 
-#: ../src/eat.c:2489 ../src/obj_descr_i18n.c:68 ../src/obj_descr_i18n.c:217
+#: ../src/eat.c:2489 ../src/obj_descr_i18n.c:68 ../src/obj_descr_i18n.c:219
 msgid "silver"
 msgstr ""
 
@@ -10186,7 +10248,7 @@ msgstr ""
 msgid "consume the last bite of"
 msgstr ""
 
-#: ../src/eat.c:3040 ../src/obj_descr_i18n.c:223
+#: ../src/eat.c:3040 ../src/obj_descr_i18n.c:225
 msgid "eat"
 msgstr ""
 
@@ -10448,7 +10510,7 @@ msgstr ""
 msgid "escaped"
 msgstr ""
 
-#: ../src/end.c:53 ../src/end.c:64 ../src/insight.c:66
+#: ../src/end.c:53 ../src/end.c:64 ../src/insight.c:71
 msgid "ascended"
 msgstr ""
 
@@ -10496,6 +10558,22 @@ msgstr ""
 msgid "Really quit without saving?"
 msgstr ""
 
+#: ../src/end.c:119 ../src/teleport.c:1470
+msgid "Resuming regular play."
+msgstr ""
+
+#: ../src/end.c:129
+msgid "Enter debugger?"
+msgstr ""
+
+#: ../src/end.c:132
+msgid "Create SnapShot?"
+msgstr ""
+
+#: ../src/end.c:134
+msgid "Dump core?"
+msgstr ""
+
 #: ../src/end.c:199
 msgid "turn to stone..."
 msgstr ""
@@ -10504,7 +10582,7 @@ msgstr ""
 msgid "hallucinogen-distorted "
 msgstr ""
 
-#: ../src/end.c:242 ../src/obj_descr_i18n.c:414
+#: ../src/end.c:242 ../src/obj_descr_i18n.c:422
 msgid "bat"
 msgstr ""
 
@@ -10864,7 +10942,7 @@ msgstr ""
 msgid "feel the words"
 msgstr ""
 
-#: ../src/engrave.c:396 ../src/obj_descr_i18n.c:246
+#: ../src/engrave.c:396 ../src/obj_descr_i18n.c:248
 msgid "read"
 msgstr ""
 
@@ -11037,7 +11115,7 @@ msgstr ""
 msgid "frosty"
 msgstr ""
 
-#: ../src/engrave.c:862 ../src/engrave.c:870
+#: ../src/engrave.c:862 ../src/engrave.c:870 ../src/obj_descr_i18n.c:506
 msgid "dusty"
 msgstr ""
 
@@ -11114,7 +11192,7 @@ msgstr ""
 msgid "scrawl on"
 msgstr ""
 
-#: ../src/engrave.c:976 ../src/obj_descr_i18n.c:239
+#: ../src/engrave.c:976 ../src/obj_descr_i18n.c:241
 msgid "write with"
 msgstr ""
 
@@ -11244,7 +11322,7 @@ msgstr ""
 msgid "fade"
 msgstr ""
 
-#: ../src/engrave.c:1243 ../src/engrave.c:1420 ../src/obj_descr_i18n.c:456
+#: ../src/engrave.c:1243 ../src/engrave.c:1420 ../src/obj_descr_i18n.c:464
 #: ../src/pager.c:778 ../src/pager.c:2167
 msgid "engraving"
 msgstr ""
@@ -11505,7 +11583,7 @@ msgstr ""
 msgid "Failure writing uncompressed file"
 msgstr ""
 
-#: ../src/files.c:2284 ../src/files.c:2304
+#: ../src/files.c:2284 ../src/files.c:2304 ../src/files.c:2374
 msgid "I give up.  Sorry."
 msgstr ""
 
@@ -11519,7 +11597,15 @@ msgstr ""
 msgid "Perhaps there is an old %s around?"
 msgstr ""
 
-#: ../src/files.c:3171 ../src/options.c:8974
+#: ../src/files.c:2893
+msgid "Checkpoint data incompletely written or subsequently clobbered."
+msgstr ""
+
+#: ../src/files.c:2895
+msgid "Recovery impossible."
+msgstr ""
+
+#: ../src/files.c:3171 ../src/options.c:8976
 msgid "Variable playground locations:"
 msgstr ""
 
@@ -12018,13 +12104,13 @@ msgstr ""
 msgid "of features under cursor "
 msgstr ""
 
-#: ../src/getpos.c:966 ../src/iactions.c:680 ../src/insight.c:780
+#: ../src/getpos.c:966 ../src/iactions.c:680 ../src/insight.c:785
 #: ../src/pray.c:1860 ../src/timeout.c:1277 ../src/trap.c:4905
 #: ../src/trap.c:4965
 msgid "on"
 msgstr ""
 
-#: ../src/getpos.c:966 ../src/iactions.c:680 ../src/insight.c:794
+#: ../src/getpos.c:966 ../src/iactions.c:680 ../src/insight.c:799
 #: ../src/timeout.c:1277
 msgid "off"
 msgstr ""
@@ -12034,9 +12120,29 @@ msgstr ""
 msgid "%s a menu to show possible targets%s."
 msgstr ""
 
+#: ../src/getpos.c:992
+msgid "Using"
+msgstr ""
+
+#: ../src/getpos.c:992
+msgid "Not using"
+msgstr ""
+
+#: ../src/getpos.c:994
+msgid " for 'm|M', 'o|O', 'd|D', and 'x|X'"
+msgstr ""
+
 #: ../src/getpos.c:1007
 #, c-format
 msgid "%skipping over similar terrain when fastmoving the cursor."
+msgstr ""
+
+#: ../src/getpos.c:1008
+msgid "S"
+msgstr ""
+
+#: ../src/getpos.c:1008
+msgid "Not s"
 msgstr ""
 
 #: ../src/getpos.c:1114
@@ -13120,8 +13226,8 @@ msgid "tome"
 msgstr ""
 
 #: ../src/iactions.c:119 ../src/obj_descr_i18n.c:113
-#: ../src/obj_descr_i18n.c:351 ../src/objnam.c:236 ../src/objnam.c:895
-#: ../src/objnam.c:901 ../src/write.c:105
+#: ../src/obj_descr_i18n.c:353 ../src/objnam.c:236 ../src/objnam.c:893
+#: ../src/objnam.c:899 ../src/write.c:105
 msgid "spellbook"
 msgstr ""
 
@@ -13233,7 +13339,7 @@ msgstr ""
 msgid "Attach %s to your candelabrum, or %s %s"
 msgstr ""
 
-#: ../src/iactions.c:359 ../src/mondata.c:1488 ../src/obj_descr_i18n.c:219
+#: ../src/iactions.c:359 ../src/mondata.c:1488 ../src/obj_descr_i18n.c:221
 #: ../src/zap.c:3177
 msgid "light"
 msgstr ""
@@ -13554,1086 +13660,1602 @@ msgstr ""
 msgid "Do what with %s?"
 msgstr ""
 
-#: ../src/insight.c:58
-msgid "acquired the Bell of Opening"
+#: ../src/insight.c:43 ../src/insight.c:1164
+msgid "You "
 msgstr ""
 
-#: ../src/insight.c:59
-msgid "entered Gehennom"
+#: ../src/insight.c:45 ../src/insight.c:1073
+msgid "were "
 msgstr ""
 
-#: ../src/insight.c:60
-msgid "acquired the Candelabrum of Invocation"
+#: ../src/insight.c:46 ../src/insight.c:778 ../src/insight.c:2353
+msgid "have "
 msgstr ""
 
-#: ../src/insight.c:61
-msgid "acquired the Book of the Dead"
+#: ../src/insight.c:47 ../src/insight.c:778
+msgid "had "
 msgstr ""
 
-#: ../src/insight.c:62
-msgid "performed the invocation"
+#: ../src/insight.c:48
+msgid "can "
+msgstr ""
+
+#: ../src/insight.c:49
+msgid "could "
+msgstr ""
+
+#: ../src/insight.c:50
+msgid "have been "
+msgstr ""
+
+#: ../src/insight.c:51
+msgid "have never "
+msgstr ""
+
+#: ../src/insight.c:52
+msgid "never "
 msgstr ""
 
 #: ../src/insight.c:63
-msgid "acquired The Amulet of Yendor"
+msgid "acquired the Bell of Opening"
 msgstr ""
 
-#: ../src/insight.c:64
-msgid "entered the Elemental Planes"
+#: ../src/insight.c:64 ../src/insight.c:2353
+msgid "entered Gehennom"
 msgstr ""
 
 #: ../src/insight.c:65
+msgid "acquired the Candelabrum of Invocation"
+msgstr ""
+
+#: ../src/insight.c:66
+msgid "acquired the Book of the Dead"
+msgstr ""
+
+#: ../src/insight.c:67
+msgid "performed the invocation"
+msgstr ""
+
+#: ../src/insight.c:68
+msgid "acquired The Amulet of Yendor"
+msgstr ""
+
+#: ../src/insight.c:69
+msgid "entered the Elemental Planes"
+msgstr ""
+
+#: ../src/insight.c:70
 msgid "entered the Astral Plane"
 msgstr ""
 
-#: ../src/insight.c:71
+#: ../src/insight.c:76
 msgid "acquired the Mines' End"
 msgstr ""
 
-#: ../src/insight.c:72
+#: ../src/insight.c:77
 msgid "acquired the Sokoban"
 msgstr ""
 
-#: ../src/insight.c:73
+#: ../src/insight.c:78
 msgid "killed Medusa"
 msgstr ""
 
-#: ../src/insight.c:75
+#: ../src/insight.c:80
 msgid "hero was always blond, no, blind"
 msgstr ""
 
-#: ../src/insight.c:76
+#: ../src/insight.c:81
 msgid "hero never wore armor"
 msgstr ""
 
-#: ../src/insight.c:78
+#: ../src/insight.c:83 ../src/insight.c:2308
 msgid "entered the Gnomish Mines"
 msgstr ""
 
-#: ../src/insight.c:79
+#: ../src/insight.c:84
 msgid "reached Mine Town"
 msgstr ""
 
-#: ../src/insight.c:80
+#: ../src/insight.c:85 ../src/insight.c:2314
 msgid "entered a shop"
 msgstr ""
 
-#: ../src/insight.c:81
+#: ../src/insight.c:86 ../src/insight.c:2317
 msgid "entered a temple"
 msgstr ""
 
-#: ../src/insight.c:82
+#: ../src/insight.c:87
 msgid "consulted the Oracle"
 msgstr ""
 
-#: ../src/insight.c:83
+#: ../src/insight.c:88
 msgid "read a Discworld novel"
 msgstr ""
 
-#: ../src/insight.c:84
+#: ../src/insight.c:89 ../src/insight.c:2326
 msgid "entered Sokoban"
 msgstr ""
 
-#: ../src/insight.c:86
+#: ../src/insight.c:91
 msgid "entered the Bigroom"
 msgstr ""
 
-#: ../src/insight.c:98
+#: ../src/insight.c:103
 msgid "learned castle drawbridge's tune"
 msgstr ""
 
-#: ../src/insight.c:179
+#: ../src/insight.c:184
 msgid "moderate"
 msgstr ""
 
-#: ../src/insight.c:181 ../src/insight.c:3238 ../src/obj_descr_i18n.c:438
+#: ../src/insight.c:186 ../src/insight.c:3243 ../src/obj_descr_i18n.c:446
 #: ../src/objnam.c:787
 msgid "large"
 msgstr ""
 
-#: ../src/insight.c:183 ../src/insight.c:3241 ../src/obj_descr_i18n.c:439
+#: ../src/insight.c:188 ../src/insight.c:3246 ../src/obj_descr_i18n.c:447
 msgid "huge"
 msgstr ""
 
-#: ../src/insight.c:185
+#: ../src/insight.c:190
 msgid "no"
 msgstr ""
 
-#: ../src/insight.c:186
+#: ../src/insight.c:191
 msgid "bonus"
 msgstr ""
 
-#: ../src/insight.c:186
+#: ../src/insight.c:191
 msgid "penalty"
 msgstr ""
 
-#: ../src/insight.c:207
+#: ../src/insight.c:212
 msgid "physical"
 msgstr ""
 
-#: ../src/insight.c:210
+#: ../src/insight.c:215
 msgid "spell"
 msgstr ""
 
-#: ../src/insight.c:213 ../src/insight.c:3219 ../src/obj_descr_i18n.c:447
+#: ../src/insight.c:218 ../src/insight.c:3224 ../src/obj_descr_i18n.c:455
 #: ../src/pager.c:735 ../src/pager.c:787
 msgid "unknown"
 msgstr ""
 
-#: ../src/insight.c:216
+#: ../src/insight.c:221
 #, c-format
 msgid " %s %s damage"
 msgstr ""
 
-#: ../src/insight.c:216
+#: ../src/insight.c:221
 msgid "half"
 msgstr ""
 
-#: ../src/insight.c:216
+#: ../src/insight.c:221
 msgid "reduced"
 msgstr ""
 
-#: ../src/insight.c:240 ../src/obj_descr_i18n.c:459
+#: ../src/insight.c:223 ../src/insight.c:1793 ../src/steal.c:477
+msgid "take"
+msgstr ""
+
+#: ../src/insight.c:223 ../src/insight.c:1793
+msgid "took"
+msgstr ""
+
+#: ../src/insight.c:245 ../src/obj_descr_i18n.c:467
 msgid "tethered to something buried"
 msgstr ""
 
-#: ../src/insight.c:243 ../src/obj_descr_i18n.c:460
+#: ../src/insight.c:248 ../src/obj_descr_i18n.c:468
 #, c-format
 msgid "sinking into %s"
 msgstr ""
 
-#: ../src/insight.c:246 ../src/obj_descr_i18n.c:462
+#: ../src/insight.c:251 ../src/obj_descr_i18n.c:470
 #, c-format
 msgid "stuck in %s"
 msgstr ""
 
-#: ../src/insight.c:251 ../src/obj_descr_i18n.c:464 ../src/topten.c:1030
+#: ../src/insight.c:256 ../src/obj_descr_i18n.c:472 ../src/topten.c:1030
 #, c-format
 msgid " in %s"
 msgstr ""
 
-#: ../src/insight.c:403
+#: ../src/insight.c:408
 msgid "Miscellaneous:"
 msgstr ""
 
-#: ../src/insight.c:426
+#: ../src/insight.c:422
+msgid "haven't encountered"
+msgstr ""
+
+#: ../src/insight.c:422
+msgid "didn't encounter"
+msgstr ""
+
+#: ../src/insight.c:423
+msgid " any bones levels"
+msgstr ""
+
+#: ../src/insight.c:431
 msgid "Total elapsed playing time "
 msgstr ""
 
-#: ../src/insight.c:459
+#: ../src/insight.c:464
 msgid "Background:"
 msgstr ""
 
-#: ../src/insight.c:495 ../src/obj_descr_i18n.c:421
+#: ../src/insight.c:500 ../src/obj_descr_i18n.c:429
 msgid "actually "
 msgstr ""
 
-#: ../src/insight.c:570
+#: ../src/insight.c:566
+#, c-format
+msgid " You started out %s%s%s."
+msgstr ""
+
+#: ../src/insight.c:575
 #, c-format
 msgid "%s%s-handed"
 msgstr ""
 
-#: ../src/insight.c:571
+#: ../src/insight.c:576
 msgid "normally "
 msgstr ""
 
-#: ../src/insight.c:612
+#: ../src/insight.c:590
+#, c-format
+msgid "in the endgame, on the %s%s"
+msgstr ""
+
+#: ../src/insight.c:591
+msgid "Elemental "
+msgstr ""
+
+#: ../src/insight.c:594
+#, c-format
+msgid "on the %s level"
+msgstr ""
+
+#: ../src/insight.c:617
 msgid "just started your adventure"
 msgstr ""
 
-#: ../src/insight.c:625 ../src/insight.c:627
+#: ../src/insight.c:630 ../src/insight.c:632
 msgid "It "
 msgstr ""
 
-#: ../src/insight.c:625 ../src/insight.c:627 ../src/insight.c:647
-#: ../src/insight.c:692 ../src/insight.c:750 ../src/insight.c:795
-#: ../src/insight.c:1067 ../src/insight.c:1944 ../src/insight.c:1946
+#: ../src/insight.c:630 ../src/insight.c:632 ../src/insight.c:652
+#: ../src/insight.c:697 ../src/insight.c:755 ../src/insight.c:800
+#: ../src/insight.c:1072 ../src/insight.c:1949 ../src/insight.c:1951
 msgid "is "
 msgstr ""
 
-#: ../src/insight.c:625 ../src/insight.c:627 ../src/insight.c:647
-#: ../src/insight.c:692 ../src/insight.c:750 ../src/insight.c:795
-#: ../src/insight.c:1068 ../src/insight.c:1944 ../src/insight.c:1946
+#: ../src/insight.c:630 ../src/insight.c:632 ../src/insight.c:652
+#: ../src/insight.c:697 ../src/insight.c:755 ../src/insight.c:800
+#: ../src/insight.c:1073 ../src/insight.c:1949 ../src/insight.c:1951
 msgid "was "
 msgstr ""
 
-#: ../src/insight.c:625
+#: ../src/insight.c:630
 msgid "the midnight hour"
 msgstr ""
 
-#: ../src/insight.c:627
+#: ../src/insight.c:632
 msgid "nighttime"
 msgstr ""
 
-#: ../src/insight.c:637
+#: ../src/insight.c:642
 #, c-format
 msgid "a %s moon in effect%s"
 msgstr ""
 
-#: ../src/insight.c:638 ../src/pray.c:1083
+#: ../src/insight.c:643 ../src/pray.c:1083
 msgid "full"
 msgstr ""
 
-#: ../src/insight.c:639
+#: ../src/insight.c:644
 msgid "new"
 msgstr ""
 
-#: ../src/insight.c:642
+#: ../src/insight.c:647
 msgid "first quarter"
 msgstr ""
 
-#: ../src/insight.c:643
+#: ../src/insight.c:648
 msgid "last quarter"
 msgstr ""
 
-#: ../src/insight.c:646
+#: ../src/insight.c:651
 msgid " when your adventure ended"
 msgstr ""
 
-#: ../src/insight.c:647
+#: ../src/insight.c:652
 msgid "There "
 msgstr ""
 
-#: ../src/insight.c:655
+#: ../src/insight.c:660
 #, c-format
 msgid " Bad things %s on Friday the 13th."
 msgstr ""
 
-#: ../src/insight.c:656
+#: ../src/insight.c:661
 msgid "can happen"
 msgstr ""
 
-#: ../src/insight.c:657
+#: ../src/insight.c:662
 msgid "could have happened"
 msgstr ""
 
-#: ../src/insight.c:660
+#: ../src/insight.c:665
 msgid "happened"
 msgstr ""
 
-#: ../src/insight.c:681
+#: ../src/insight.c:686
 #, c-format
 msgid " (%ld %smore experience needed for level %d)"
 msgstr ""
 
-#: ../src/insight.c:682 ../src/insight.c:1629
+#: ../src/insight.c:687 ../src/insight.c:1634
 msgid "less "
 msgstr ""
 
-#: ../src/insight.c:692
+#: ../src/insight.c:697
 msgid "Your score "
 msgstr ""
 
-#: ../src/insight.c:709
+#: ../src/insight.c:714
 msgid "Basics:"
 msgstr ""
 
-#: ../src/insight.c:749
+#: ../src/insight.c:754
 msgid "best"
 msgstr ""
 
-#: ../src/insight.c:749
+#: ../src/insight.c:754
 msgid "worst"
 msgstr ""
 
-#: ../src/insight.c:750
+#: ../src/insight.c:755
 msgid "Your armor class "
 msgstr ""
 
-#: ../src/insight.c:773
+#: ../src/insight.c:778
 msgid "you "
 msgstr ""
 
-#: ../src/insight.c:773
-msgid "have "
-msgstr ""
-
-#: ../src/insight.c:773
-msgid "had "
-msgstr ""
-
-#: ../src/insight.c:783
+#: ../src/insight.c:788
 msgid ", but temporarily disabled while inside the shop"
 msgstr ""
 
-#: ../src/insight.c:786
+#: ../src/insight.c:791
 #, c-format
 msgid " for %s%s%s"
 msgstr ""
 
-#: ../src/insight.c:787
+#: ../src/insight.c:792
 msgid "all types"
 msgstr ""
 
-#: ../src/insight.c:789
+#: ../src/insight.c:794
 msgid " plus thrown"
 msgstr ""
 
-#: ../src/insight.c:791
+#: ../src/insight.c:796
 msgid ", with exceptions"
 msgstr ""
 
-#: ../src/insight.c:795
+#: ../src/insight.c:800
 msgid "Autopickup "
 msgstr ""
 
-#: ../src/insight.c:870
+#: ../src/insight.c:810
+msgid "Final "
+msgstr ""
+
+#: ../src/insight.c:810
+msgid "Characteristics:"
+msgstr ""
+
+#: ../src/insight.c:875
 #, c-format
 msgid "Your %s "
 msgstr ""
 
-#: ../src/insight.c:941 ../src/obj_descr_i18n.c:422 ../src/polyself.c:324
+#: ../src/insight.c:940
+msgid "Final Status:"
+msgstr ""
+
+#: ../src/insight.c:940
+msgid "Status:"
+msgstr ""
+
+#: ../src/insight.c:946 ../src/obj_descr_i18n.c:430 ../src/polyself.c:324
 msgid "transformed"
 msgstr ""
 
-#: ../src/insight.c:957
+#: ../src/insight.c:948
+#, c-format
+msgid " and %s %s inside"
+msgstr ""
+
+#: ../src/insight.c:949
+msgid "felt"
+msgstr ""
+
+#: ../src/insight.c:962
 msgid "levitating, at will"
 msgstr ""
 
-#: ../src/insight.c:959 ../src/timeout.c:48
+#: ../src/insight.c:964 ../src/timeout.c:48
 msgid "levitating"
 msgstr ""
 
-#: ../src/insight.c:961 ../src/timeout.c:99
+#: ../src/insight.c:966 ../src/timeout.c:99
 msgid "flying"
 msgstr ""
 
-#: ../src/insight.c:966 ../src/timeout.c:100
+#: ../src/insight.c:971 ../src/timeout.c:100
 msgid "swimming"
 msgstr ""
 
-#: ../src/insight.c:983
+#: ../src/insight.c:988
 msgid "turning to stone"
 msgstr ""
 
-#: ../src/insight.c:989
+#: ../src/insight.c:994
 msgid "turning into slime"
 msgstr ""
 
-#: ../src/insight.c:993
+#: ../src/insight.c:998
 msgid "buried"
 msgstr ""
 
-#: ../src/insight.c:998 ../src/obj_descr_i18n.c:423
+#: ../src/insight.c:1003 ../src/obj_descr_i18n.c:431
 msgid "being strangled"
 msgstr ""
 
-#: ../src/insight.c:1011
+#: ../src/insight.c:1016
 #, c-format
 msgid " %sdied from %s."
 msgstr ""
 
-#: ../src/insight.c:1013
+#: ../src/insight.c:1018
 msgid "terminal illness"
 msgstr ""
 
-#: ../src/insight.c:1013
+#: ../src/insight.c:1018
 msgid "food poisoning"
 msgstr ""
 
-#: ../src/insight.c:1019
+#: ../src/insight.c:1024
 msgid "terminally sick from illness"
 msgstr ""
 
-#: ../src/insight.c:1021
+#: ../src/insight.c:1026
 msgid "terminally sick from food poisoning"
 msgstr ""
 
-#: ../src/insight.c:1025
+#: ../src/insight.c:1030
 msgid "nauseated"
 msgstr ""
 
-#: ../src/insight.c:1031 ../src/timeout.c:39
+#: ../src/insight.c:1036 ../src/timeout.c:39
 msgid "hallucinating"
 msgstr ""
 
-#: ../src/insight.c:1047
+#: ../src/insight.c:1052
 msgid "deaf"
 msgstr ""
 
-#: ../src/insight.c:1055 ../src/obj_descr_i18n.c:424
+#: ../src/insight.c:1060 ../src/obj_descr_i18n.c:432
 msgid "punished"
 msgstr ""
 
-#: ../src/insight.c:1065
+#: ../src/insight.c:1070
 msgid "you and "
 msgstr ""
 
-#: ../src/insight.c:1068
-msgid "were "
-msgstr ""
-
-#: ../src/insight.c:1078 ../src/obj_descr_i18n.c:425
+#: ../src/insight.c:1083 ../src/obj_descr_i18n.c:433
 msgid "an unseen creature"
 msgstr ""
 
-#: ../src/insight.c:1082 ../src/uhitm.c:3374
+#: ../src/insight.c:1087 ../src/uhitm.c:3374
 #, c-format
 msgid "%s by %s"
 msgstr ""
 
-#: ../src/insight.c:1101
+#: ../src/insight.c:1106
 #, c-format
 msgid "%s %s (%s)"
 msgstr ""
 
-#: ../src/insight.c:1102
+#: ../src/insight.c:1107
 msgid "holding"
 msgstr ""
 
-#: ../src/insight.c:1102
+#: ../src/insight.c:1107
 msgid "held by"
 msgstr ""
 
-#: ../src/insight.c:1110
+#: ../src/insight.c:1115
 #, c-format
 msgid "stuck to %s %s"
 msgstr ""
 
-#: ../src/insight.c:1128
+#: ../src/insight.c:1133
 #, c-format
 msgid "%swounded %s%s"
 msgstr ""
 
-#: ../src/insight.c:1152
+#: ../src/insight.c:1157
 msgid "fumble"
 msgstr ""
 
-#: ../src/insight.c:1152
+#: ../src/insight.c:1157
 msgid "fumbled"
 msgstr ""
 
-#: ../src/insight.c:1159
-msgid "You "
+#: ../src/insight.c:1164
+msgid "fall asleep"
 msgstr ""
 
-#: ../src/insight.c:1159
-msgid "fell"
+#: ../src/insight.c:1164
+msgid "fell asleep"
 msgstr ""
 
-#: ../src/insight.c:1159
-msgid " asleep uncontrollably"
+#: ../src/insight.c:1164
+msgid " uncontrollably"
 msgstr ""
 
-#: ../src/insight.c:1165
+#: ../src/insight.c:1170
 msgid "hunger"
 msgstr ""
 
-#: ../src/insight.c:1165
+#: ../src/insight.c:1170
 msgid "hungered"
 msgstr ""
 
-#: ../src/insight.c:1165
+#: ../src/insight.c:1170
 msgid " rapidly"
 msgstr ""
 
-#: ../src/insight.c:1173 ../src/obj_descr_i18n.c:426
+#: ../src/insight.c:1178 ../src/obj_descr_i18n.c:434
 msgid "not hungry"
 msgstr ""
 
-#: ../src/insight.c:1216 ../src/obj_descr_i18n.c:427
+#: ../src/insight.c:1221 ../src/obj_descr_i18n.c:435
 msgid "unencumbered"
 msgstr ""
 
-#: ../src/insight.c:1237
+#: ../src/insight.c:1240 ../src/insight.c:1904 ../src/insight.c:1906
+msgid "did"
+msgstr ""
+
+#: ../src/insight.c:1240
+msgid " not wear any armor"
+msgstr ""
+
+#: ../src/insight.c:1242
 msgid "not wearing any armor"
 msgstr ""
 
-#: ../src/insight.c:1296 ../src/insight.c:1388
+#: ../src/insight.c:1301 ../src/insight.c:1393
 msgid "skill with"
 msgstr ""
 
-#: ../src/insight.c:1300
+#: ../src/insight.c:1305
 #, c-format
 msgid " and %s that"
 msgstr ""
 
-#: ../src/insight.c:1301
+#: ../src/insight.c:1306 ../src/insight.c:1439
 msgid "can enhance"
 msgstr ""
 
-#: ../src/insight.c:1301
+#: ../src/insight.c:1306 ../src/insight.c:1439
 msgid "could have enhanced"
 msgstr ""
 
-#: ../src/insight.c:1337 ../src/insight.c:1370
+#: ../src/insight.c:1342 ../src/insight.c:1375
 #, c-format
 msgid "Your skill in %s "
 msgstr ""
 
-#: ../src/insight.c:1338
+#: ../src/insight.c:1343
 #, c-format
 msgid " limited by being %s with two weapons"
 msgstr ""
 
-#: ../src/insight.c:1342 ../src/insight.c:1375
+#: ../src/insight.c:1347 ../src/insight.c:1380
 msgid "Your two weapon skill "
 msgstr ""
 
-#: ../src/insight.c:1343
+#: ../src/insight.c:1348
 msgid " limited by "
 msgstr ""
 
-#: ../src/insight.c:1345
+#: ../src/insight.c:1350
 #, c-format
 msgid "being %s"
 msgstr ""
 
-#: ../src/insight.c:1347
+#: ../src/insight.c:1352
 msgid "having no skill"
 msgstr ""
 
-#: ../src/insight.c:1348 ../src/uhitm.c:1604
+#: ../src/insight.c:1353 ../src/uhitm.c:1604
 #, c-format
 msgid " with %s"
 msgstr ""
 
-#: ../src/insight.c:1351 ../src/insight.c:1389
+#: ../src/insight.c:1356 ../src/insight.c:1394
 msgid " and two weapons"
-msgstr ""
-
-#: ../src/insight.c:1371
-#, c-format
-msgid " %slimited by being %s with two weapons"
 msgstr ""
 
 #: ../src/insight.c:1376
 #, c-format
+msgid " %slimited by being %s with two weapons"
+msgstr ""
+
+#: ../src/insight.c:1381
+#, c-format
 msgid " %slimited by "
 msgstr ""
 
-#: ../src/insight.c:1391
+#: ../src/insight.c:1396
 msgid "You also "
 msgstr ""
 
-#: ../src/insight.c:1394
+#: ../src/insight.c:1399 ../src/insight.c:2349 ../src/insight.c:2358
+#: ../src/insight.c:2364 ../src/insight.c:2376
 msgid "had"
 msgstr ""
 
-#: ../src/insight.c:1451
+#: ../src/insight.c:1456
 msgid "Your items "
 msgstr ""
 
-#: ../src/insight.c:1452
+#: ../src/insight.c:1457
 msgid "are somewhat"
 msgstr ""
 
-#: ../src/insight.c:1453
+#: ../src/insight.c:1458
 msgid "were somewhat"
 msgstr ""
 
-#: ../src/insight.c:1473
+#: ../src/insight.c:1478
 msgid "Final Attributes:"
 msgstr ""
 
-#: ../src/insight.c:1473
+#: ../src/insight.c:1478
 msgid "Attributes:"
 msgstr ""
 
-#: ../src/insight.c:1490
+#: ../src/insight.c:1495
 msgid "Your alignment "
 msgstr ""
 
-#: ../src/insight.c:1495 ../src/timeout.c:32
+#: ../src/insight.c:1500 ../src/timeout.c:32
 msgid "invulnerable"
 msgstr ""
 
-#: ../src/insight.c:1497
+#: ../src/insight.c:1502
 msgid "magic-protected"
 msgstr ""
 
-#: ../src/insight.c:1499
+#: ../src/insight.c:1504
 msgid "fire resistant"
 msgstr ""
 
-#: ../src/insight.c:1502
+#: ../src/insight.c:1507
 msgid "cold resistant"
 msgstr ""
 
-#: ../src/insight.c:1505
+#: ../src/insight.c:1510
 msgid "sleep resistant"
 msgstr ""
 
-#: ../src/insight.c:1507
+#: ../src/insight.c:1512
 msgid "disintegration resistant"
 msgstr ""
 
-#: ../src/insight.c:1510
+#: ../src/insight.c:1515
 msgid "shock resistant"
 msgstr ""
 
-#: ../src/insight.c:1514
+#: ../src/insight.c:1519
 msgid "poison resistant"
 msgstr ""
 
-#: ../src/insight.c:1523
+#: ../src/insight.c:1528
 msgid "level-drain resistant"
 msgstr ""
 
-#: ../src/insight.c:1525
+#: ../src/insight.c:1530
 msgid "immune to sickness"
 msgstr ""
 
-#: ../src/insight.c:1533
+#: ../src/insight.c:1538
 msgid "resisted"
 msgstr ""
 
-#: ../src/insight.c:1533
+#: ../src/insight.c:1538
 msgid " hallucinations"
 msgstr ""
 
-#: ../src/insight.c:1536
+#: ../src/insight.c:1541
 msgid "recognize detrimental food"
 msgstr ""
 
-#: ../src/insight.c:1542
+#: ../src/insight.c:1547
 msgid "not subject to light-induced blindness"
 msgstr ""
 
-#: ../src/insight.c:1546
+#: ../src/insight.c:1551
 msgid "saw"
 msgstr ""
 
-#: ../src/insight.c:1546
+#: ../src/insight.c:1551
 msgid " invisible"
 msgstr ""
 
-#: ../src/insight.c:1548
+#: ../src/insight.c:1553
 msgid "will see"
 msgstr ""
 
-#: ../src/insight.c:1548 ../src/insight.c:1551
+#: ../src/insight.c:1553 ../src/insight.c:1556
 msgid "would have seen"
 msgstr ""
 
-#: ../src/insight.c:1549
+#: ../src/insight.c:1554
 msgid " invisible when not blind"
 msgstr ""
 
-#: ../src/insight.c:1551
+#: ../src/insight.c:1556
 msgid "would see"
 msgstr ""
 
-#: ../src/insight.c:1552
+#: ../src/insight.c:1557
 msgid " invisible if not blind"
 msgstr ""
 
-#: ../src/insight.c:1555 ../src/timeout.c:87
+#: ../src/insight.c:1560 ../src/timeout.c:87
 msgid "telepathic"
 msgstr ""
 
-#: ../src/insight.c:1557
+#: ../src/insight.c:1562
 msgid "warned"
 msgstr ""
 
-#: ../src/insight.c:1584
+#: ../src/insight.c:1589
 msgid "warned of undead"
 msgstr ""
 
-#: ../src/insight.c:1586
+#: ../src/insight.c:1591
 msgid "automatic searching"
 msgstr ""
 
-#: ../src/insight.c:1588 ../src/timeout.c:50
+#: ../src/insight.c:1593 ../src/timeout.c:50
 msgid "clairvoyant"
 msgstr ""
 
-#: ../src/insight.c:1595 ../src/pager.c:505 ../src/pager.c:696
+#: ../src/insight.c:1597
+msgid "could be"
+msgstr ""
+
+#: ../src/insight.c:1597
+msgid "could have been"
+msgstr ""
+
+#: ../src/insight.c:1597
+msgid " clairvoyant"
+msgstr ""
+
+#: ../src/insight.c:1600 ../src/pager.c:505 ../src/pager.c:696
 #: ../src/timeout.c:92
 msgid "infravision"
 msgstr ""
 
-#: ../src/insight.c:1597 ../src/obj_descr_i18n.c:428
+#: ../src/insight.c:1602 ../src/obj_descr_i18n.c:436
 msgid "sensing the presence of monsters"
 msgstr ""
 
-#: ../src/insight.c:1628
+#: ../src/insight.c:1619
+msgid "will confuse"
+msgstr ""
+
+#: ../src/insight.c:1619
+msgid "would have confused"
+msgstr ""
+
+#: ../src/insight.c:1633
 #, c-format
 msgid "%scharismatic"
 msgstr ""
 
-#: ../src/insight.c:1633 ../src/timeout.c:53
+#: ../src/insight.c:1638 ../src/timeout.c:53
 msgid "invisible"
 msgstr ""
 
-#: ../src/insight.c:1635
+#: ../src/insight.c:1640
 msgid "invisible to others"
 msgstr ""
 
-#: ../src/insight.c:1639
+#: ../src/insight.c:1644
 msgid "visible"
 msgstr ""
 
-#: ../src/insight.c:1641 ../src/timeout.c:58
+#: ../src/insight.c:1646 ../src/timeout.c:58
 msgid "displaced"
 msgstr ""
 
 #: ../src/insight.c:1650
+#, c-format
+msgid " stealthy%s"
+msgstr ""
+
+#: ../src/insight.c:1651
+msgid " if not mounted"
+msgstr ""
+
+#: ../src/insight.c:1652
+msgid "would be"
+msgstr ""
+
+#: ../src/insight.c:1652 ../src/insight.c:1884
+msgid "would have been"
+msgstr ""
+
+#: ../src/insight.c:1655
 msgid "You aggravate"
 msgstr ""
 
-#: ../src/insight.c:1650 ../src/insight.c:1653 ../src/insight.c:1742
+#: ../src/insight.c:1655 ../src/insight.c:1658 ../src/insight.c:1747
 msgid "d"
 msgstr ""
 
-#: ../src/insight.c:1650
+#: ../src/insight.c:1655
 msgid " monsters"
 msgstr ""
 
-#: ../src/insight.c:1653
+#: ../src/insight.c:1658
 msgid "You cause"
 msgstr ""
 
-#: ../src/insight.c:1653
+#: ../src/insight.c:1658
 msgid " conflict"
 msgstr ""
 
-#: ../src/insight.c:1659
+#: ../src/insight.c:1664
 msgid "teleport"
 msgstr ""
 
-#: ../src/insight.c:1661 ../src/timeout.c:98
+#: ../src/insight.c:1666 ../src/timeout.c:98
 msgid "teleport control"
 msgstr ""
 
-#: ../src/insight.c:1716
+#: ../src/insight.c:1680
+msgid " if not trapped"
+msgstr ""
+
+#: ../src/insight.c:1683
+msgid "would levitate"
+msgstr ""
+
+#: ../src/insight.c:1683
+msgid "would have levitated"
+msgstr ""
+
+#: ../src/insight.c:1693
+msgid "would fly"
+msgstr ""
+
+#: ../src/insight.c:1693
+msgid "would have flown"
+msgstr ""
+
+#: ../src/insight.c:1700
+msgid " if you weren't levitating"
+msgstr ""
+
+#: ../src/insight.c:1705
+msgid " if you weren't trapped"
+msgstr ""
+
+#: ../src/insight.c:1710
+msgid " if circumstances permitted"
+msgstr ""
+
+#: ../src/insight.c:1721
 msgid "cling to the ceiling"
 msgstr ""
 
-#: ../src/insight.c:1718
+#: ../src/insight.c:1723
 #, c-format
 msgid " to the ceiling if %s%s%s"
 msgstr ""
 
-#: ../src/insight.c:1719
+#: ../src/insight.c:1724
 msgid "there was one"
 msgstr ""
 
-#: ../src/insight.c:1721
+#: ../src/insight.c:1726
 msgid "you weren't underwater"
 msgstr ""
 
-#: ../src/insight.c:1722
+#: ../src/insight.c:1727
 msgid "you weren't in the water"
 msgstr ""
 
 #: ../src/insight.c:1729
-msgid "walk on water"
+msgid "could cling"
 msgstr ""
 
-#: ../src/insight.c:1732
-msgid "swim"
+#: ../src/insight.c:1729
+msgid "could have clung"
 msgstr ""
 
 #: ../src/insight.c:1734
+msgid "walk on water"
+msgstr ""
+
+#: ../src/insight.c:1737
+msgid "swim"
+msgstr ""
+
+#: ../src/insight.c:1739
 msgid "survive without air"
 msgstr ""
 
-#: ../src/insight.c:1736
+#: ../src/insight.c:1741
 msgid "breathe water"
 msgstr ""
 
-#: ../src/insight.c:1738
+#: ../src/insight.c:1743
 msgid "walk through walls"
 msgstr ""
 
-#: ../src/insight.c:1742
+#: ../src/insight.c:1747
 msgid "You regenerate"
 msgstr ""
 
-#: ../src/insight.c:1744
+#: ../src/insight.c:1749
 msgid "slower digestion"
 msgstr ""
 
-#: ../src/insight.c:1748
+#: ../src/insight.c:1753
 #, c-format
 msgid " %s your suit's penalty"
 msgstr ""
 
-#: ../src/insight.c:1749
+#: ../src/insight.c:1754
 msgid "increasing"
 msgstr ""
 
-#: ../src/insight.c:1751
+#: ../src/insight.c:1756
 msgid "partly offsetting"
 msgstr ""
 
-#: ../src/insight.c:1752
+#: ../src/insight.c:1757
 msgid "nearly offsetting"
 msgstr ""
 
-#: ../src/insight.c:1753
+#: ../src/insight.c:1758
 msgid "overcoming"
 msgstr ""
 
-#: ../src/insight.c:1804
+#: ../src/insight.c:1793
+msgid " reduced poison gas damage"
+msgstr ""
+
+#: ../src/insight.c:1809
 msgid "Your spell casting "
 msgstr ""
 
-#: ../src/insight.c:1808
+#: ../src/insight.c:1813
 msgid "protected from shape changers"
 msgstr ""
 
-#: ../src/insight.c:1814 ../src/insight.c:1866
+#: ../src/insight.c:1819 ../src/insight.c:1871
 msgid "not change from your current form"
 msgstr ""
 
-#: ../src/insight.c:1828
+#: ../src/insight.c:1823
+msgid "polymorph"
+msgstr ""
+
+#: ../src/insight.c:1823
+msgid "have polymorphed"
+msgstr ""
+
+#: ../src/insight.c:1825
+msgid "change shape"
+msgstr ""
+
+#: ../src/insight.c:1825
+msgid "have changed shape"
+msgstr ""
+
+#: ../src/insight.c:1827
+#, c-format
+msgid "would %s periodically"
+msgstr ""
+
+#: ../src/insight.c:1829
+msgid " if not locked into your current form"
+msgstr ""
+
+#: ../src/insight.c:1833
 msgid "polymorphing periodically"
 msgstr ""
 
-#: ../src/insight.c:1831 ../src/timeout.c:108
+#: ../src/insight.c:1836 ../src/timeout.c:108
 msgid "polymorph control"
 msgstr ""
 
-#: ../src/insight.c:1853
+#: ../src/insight.c:1858
 msgid "lay eggs"
 msgstr ""
 
-#: ../src/insight.c:1868
+#: ../src/insight.c:1873
 msgid "harmed by silver"
 msgstr ""
 
-#: ../src/insight.c:1871 ../src/timeout.c:49
+#: ../src/insight.c:1876 ../src/timeout.c:49
 msgid "very fast"
 msgstr ""
 
-#: ../src/insight.c:1871
+#: ../src/insight.c:1876
 msgid "fast"
 msgstr ""
 
-#: ../src/insight.c:1873
+#: ../src/insight.c:1878
 msgid "reflection"
 msgstr ""
 
-#: ../src/insight.c:1875 ../src/timeout.c:111
+#: ../src/insight.c:1880 ../src/timeout.c:111
 msgid "free action"
 msgstr ""
 
-#: ../src/insight.c:1877 ../src/timeout.c:112
+#: ../src/insight.c:1882 ../src/timeout.c:112
 msgid "fixed abilities"
 msgstr ""
 
-#: ../src/insight.c:1879
+#: ../src/insight.c:1884
 msgid "Your life "
 msgstr ""
 
-#: ../src/insight.c:1879
+#: ../src/insight.c:1884
 msgid "will be"
 msgstr ""
 
-#: ../src/insight.c:1879
-msgid "would have been"
-msgstr ""
-
-#: ../src/insight.c:1879
+#: ../src/insight.c:1884
 msgid " saved"
 msgstr ""
 
-#: ../src/insight.c:1891
+#: ../src/insight.c:1896
 msgid "Your luck "
 msgstr ""
 
-#: ../src/insight.c:1891
+#: ../src/insight.c:1896
 msgid " zero"
 msgstr ""
 
-#: ../src/insight.c:1893
+#: ../src/insight.c:1898
 msgid "extra luck"
 msgstr ""
 
-#: ../src/insight.c:1895
+#: ../src/insight.c:1900
 msgid "reduced luck"
 msgstr ""
 
-#: ../src/insight.c:1899
+#: ../src/insight.c:1904
 msgid "Bad luck "
 msgstr ""
 
-#: ../src/insight.c:1899 ../src/insight.c:1901
+#: ../src/insight.c:1904 ../src/insight.c:1906
 msgid "does"
 msgstr ""
 
-#: ../src/insight.c:1899 ../src/insight.c:1901
-msgid "did"
-msgstr ""
-
-#: ../src/insight.c:1899 ../src/insight.c:1901
+#: ../src/insight.c:1904 ../src/insight.c:1906
 msgid " not time out for you"
 msgstr ""
 
-#: ../src/insight.c:1901
+#: ../src/insight.c:1906
 msgid "Good luck "
 msgstr ""
 
-#: ../src/insight.c:1944
+#: ../src/insight.c:1949
 msgid "The current fruit "
 msgstr ""
 
-#: ../src/insight.c:1946
+#: ../src/insight.c:1951
 msgid "The made fruit flag "
 msgstr ""
 
-#: ../src/insight.c:1976 ../src/obj_descr_i18n.c:429
+#: ../src/insight.c:1958
+msgid "might avoid"
+msgstr ""
+
+#: ../src/insight.c:1958
+msgid "have avoided"
+msgstr ""
+
+#: ../src/insight.c:1959
+msgid "could have avoided"
+msgstr ""
+
+#: ../src/insight.c:1959
+msgid "avoided"
+msgstr ""
+
+#: ../src/insight.c:1967
+msgid " a one-shot death via saving-grace"
+msgstr ""
+
+#: ../src/insight.c:1975
+msgid "survived after being killed "
+msgstr ""
+
+#: ../src/insight.c:1978
+msgid "survived"
+msgstr ""
+
+#: ../src/insight.c:1981 ../src/insight.c:2226 ../src/obj_descr_i18n.c:437
 msgid "once"
 msgstr ""
 
-#: ../src/insight.c:1979 ../src/obj_descr_i18n.c:430
+#: ../src/insight.c:1984 ../src/insight.c:2229 ../src/obj_descr_i18n.c:438
 msgid "twice"
 msgstr ""
 
-#: ../src/insight.c:1982 ../src/obj_descr_i18n.c:431
+#: ../src/insight.c:1987 ../src/insight.c:2232 ../src/obj_descr_i18n.c:439
 msgid "thrice"
 msgstr ""
 
-#: ../src/insight.c:2028 ../src/obj_descr_i18n.c:432
+#: ../src/insight.c:1990
+#, c-format
+msgid "%d times"
+msgstr ""
+
+#: ../src/insight.c:1994
+msgid "are dead"
+msgstr ""
+
+#: ../src/insight.c:2003
+#, c-format
+msgid " (%d%s time!)"
+msgstr ""
+
+#: ../src/insight.c:2009
+msgid "have been killed "
+msgstr ""
+
+#: ../src/insight.c:2033 ../src/obj_descr_i18n.c:440
 msgid "hiding"
 msgstr ""
 
-#: ../src/insight.c:2076
+#: ../src/insight.c:2081
 #, c-format
 msgid "are %s %s."
 msgstr ""
 
-#: ../src/insight.c:2076
+#: ../src/insight.c:2081
 msgid "now"
 msgstr ""
 
-#: ../src/insight.c:2097
+#: ../src/insight.c:2102
 msgid "Voluntary challenges:"
 msgstr ""
 
-#: ../src/insight.c:2192 ../src/pager.c:2167
+#: ../src/insight.c:2105
+msgid "blind from birth"
+msgstr ""
+
+#: ../src/insight.c:2107
+msgid "deaf from birth"
+msgstr ""
+
+#: ../src/insight.c:2111
+msgid "started"
+msgstr ""
+
+#: ../src/insight.c:2111
+msgid "started out"
+msgstr ""
+
+#: ../src/insight.c:2112
+msgid " without possessions"
+msgstr ""
+
+#: ../src/insight.c:2114
+#, c-format
+msgid "rerolled your character %ld time%s"
+msgstr ""
+
+#: ../src/insight.c:2123
+msgid "faithfully nudist"
+msgstr ""
+
+#: ../src/insight.c:2126 ../src/insight.c:2305
+msgid "have gone"
+msgstr ""
+
+#: ../src/insight.c:2126 ../src/insight.c:2305
+msgid "went"
+msgstr ""
+
+#: ../src/insight.c:2126
+msgid " without food"
+msgstr ""
+
+#: ../src/insight.c:2129
+msgid "followed a strict vegan diet"
+msgstr ""
+
+#: ../src/insight.c:2131
+msgid "vegetarian"
+msgstr ""
+
+#: ../src/insight.c:2134
+msgid "an atheist"
+msgstr ""
+
+#: ../src/insight.c:2137
+msgid "hit with a wielded weapon"
+msgstr ""
+
+#: ../src/insight.c:2139
+#, c-format
+msgid "hit with a wielded weapon %ld time%s"
+msgstr ""
+
+#: ../src/insight.c:2144
+msgid "a pacifist"
+msgstr ""
+
+#: ../src/insight.c:2147
+msgid "illiterate"
+msgstr ""
+
+#: ../src/insight.c:2149
+#, c-format
+msgid "read items or engraved %ld time%s"
+msgstr ""
+
+#: ../src/insight.c:2155
+msgid "had a pet"
+msgstr ""
+
+#: ../src/insight.c:2159
+msgid "genocided any monsters"
+msgstr ""
+
+#: ../src/insight.c:2161
+#, c-format
+msgid "genocided %d type%s of monster%s"
+msgstr ""
+
+#: ../src/insight.c:2167
+msgid "polymorphed an object"
+msgstr ""
+
+#: ../src/insight.c:2169
+#, c-format
+msgid "polymorphed %ld item%s"
+msgstr ""
+
+#: ../src/insight.c:2175
+msgid "changed form"
+msgstr ""
+
+#: ../src/insight.c:2177
+#, c-format
+msgid "changed form %ld time%s"
+msgstr ""
+
+#: ../src/insight.c:2183
+msgid "used no wishes"
+msgstr ""
+
+#: ../src/insight.c:2185
+#, c-format
+msgid "used %ld wish%s"
+msgstr ""
+
+#: ../src/insight.c:2186
+msgid "es"
+msgstr ""
+
+#: ../src/insight.c:2197 ../src/pager.c:2167
 #, c-format
 msgid " (%s"
 msgstr ""
 
-#: ../src/insight.c:2193 ../src/read.c:2884
+#: ../src/insight.c:2198 ../src/read.c:2884
 msgid "all "
 msgstr ""
 
-#: ../src/insight.c:2194
+#: ../src/insight.c:2199
 msgid "both "
 msgstr ""
 
-#: ../src/insight.c:2198
+#: ../src/insight.c:2201
+#, c-format
+msgid " (%ld "
+msgstr ""
+
+#: ../src/insight.c:2203
 #, c-format
 msgid "for %s)"
 msgstr ""
 
-#: ../src/insight.c:2199
+#: ../src/insight.c:2204
 msgid "an artifact"
 msgstr ""
 
-#: ../src/insight.c:2200
+#: ../src/insight.c:2205
 msgid "artifacts"
 msgstr ""
 
-#: ../src/insight.c:2544
+#: ../src/insight.c:2210
+msgid "have not wished"
+msgstr ""
+
+#: ../src/insight.c:2210
+msgid "did not wish"
+msgstr ""
+
+#: ../src/insight.c:2211
+msgid " for any artifacts"
+msgstr ""
+
+#: ../src/insight.c:2216
+msgid "have violated"
+msgstr ""
+
+#: ../src/insight.c:2216
+msgid "violated"
+msgstr ""
+
+#: ../src/insight.c:2218
+msgid " the special Sokoban rules "
+msgstr ""
+
+#: ../src/insight.c:2221
+msgid "have not violated"
+msgstr ""
+
+#: ../src/insight.c:2222
+msgid "did not violate"
+msgstr ""
+
+#: ../src/insight.c:2223
+msgid " any of the special Sokoban rules"
+msgstr ""
+
+#: ../src/insight.c:2235
+#, c-format
+msgid "%ld times"
+msgstr ""
+
+#: ../src/insight.c:2301
+msgid "are exploring"
+msgstr ""
+
+#: ../src/insight.c:2301
+msgid "explored"
+msgstr ""
+
+#: ../src/insight.c:2302
+msgid " without being able to see"
+msgstr ""
+
+#: ../src/insight.c:2305
+msgid " without any armor"
+msgstr ""
+
+#: ../src/insight.c:2311
+msgid "entered Minetown"
+msgstr ""
+
+#: ../src/insight.c:2320
+msgid "consulted the Oracle of Delphi"
+msgstr ""
+
+#: ../src/insight.c:2323
+msgid "read from a Discworld novel"
+msgstr ""
+
+#: ../src/insight.c:2329
+msgid "completed Sokoban"
+msgstr ""
+
+#: ../src/insight.c:2332
+msgid "completed the Gnomish Mines"
+msgstr ""
+
+#: ../src/insight.c:2335
+msgid "entered the Big Room"
+msgstr ""
+
+#: ../src/insight.c:2338
+msgid "defeated Medusa"
+msgstr ""
+
+#: ../src/insight.c:2342
+msgid "learned the tune to open and close the Castle's drawbridge"
+msgstr ""
+
+#: ../src/insight.c:2348 ../src/insight.c:2357 ../src/insight.c:2363
+msgid "have handled"
+msgstr ""
+
+#: ../src/insight.c:2349 ../src/insight.c:2358 ../src/insight.c:2364
+msgid "handled"
+msgstr ""
+
+#: ../src/insight.c:2350
+msgid " the Bell of Opening"
+msgstr ""
+
+#: ../src/insight.c:2359
+msgid " the Candelabrum of Invocation"
+msgstr ""
+
+#: ../src/insight.c:2365
+msgid " the Book of the Dead"
+msgstr ""
+
+#: ../src/insight.c:2368
+msgid "gained access to Moloch's Sanctum"
+msgstr ""
+
+#: ../src/insight.c:2374
+msgid "have obtained"
+msgstr ""
+
+#: ../src/insight.c:2375
+msgid "delivered"
+msgstr ""
+
+#: ../src/insight.c:2376
+msgid "had obtained"
+msgstr ""
+
+#: ../src/insight.c:2377
+msgid " the Amulet of Yendor"
+msgstr ""
+
+#: ../src/insight.c:2384
+msgid "reached the Elemental Planes"
+msgstr ""
+
+#: ../src/insight.c:2387
+msgid "reached the Astral Plane"
+msgstr ""
+
+#: ../src/insight.c:2391
+msgid " You ascended!"
+msgstr ""
+
+#: ../src/insight.c:2397
+#, c-format
+msgid "attained the rank of %s"
+msgstr ""
+
+#: ../src/insight.c:2404
+#, c-format
+msgid " [Unexpected achievement #%d.]"
+msgstr ""
+
+#: ../src/insight.c:2549
 msgid "No chronicled events."
 msgstr ""
 
-#: ../src/insight.c:2547
+#: ../src/insight.c:2552
 msgid "Chronicle was turned off during compile-time."
 msgstr ""
 
-#: ../src/insight.c:2576
+#: ../src/insight.c:2581
 #, c-format
 msgid "%s events:"
 msgstr ""
 
-#: ../src/insight.c:2576
+#: ../src/insight.c:2581
 msgid "Major"
 msgstr ""
 
-#: ../src/insight.c:2576
+#: ../src/insight.c:2581
 msgid "Logged"
 msgstr ""
 
-#: ../src/insight.c:2848
+#: ../src/insight.c:2853
 msgid "Do you want an account of creatures vanquished?"
 msgstr ""
 
-#: ../src/insight.c:2869
+#: ../src/insight.c:2874
 msgid "Vanquished creatures:"
 msgstr ""
 
-#: ../src/insight.c:2885
+#: ../src/insight.c:2890
 msgid "Rider"
 msgstr ""
 
-#: ../src/insight.c:2959
+#: ../src/insight.c:2964
 msgid "No creatures have been vanquished."
 msgstr ""
 
-#: ../src/insight.c:2962
+#: ../src/insight.c:2967
 msgid "No creatures were vanquished."
 msgstr ""
 
-#: ../src/insight.c:3089
+#: ../src/insight.c:3094
 #, c-format
 msgid "%s%s species:"
 msgstr ""
 
-#: ../src/insight.c:3090
+#: ../src/insight.c:3095
 msgid "Genocided"
 msgstr ""
 
-#: ../src/insight.c:3090
+#: ../src/insight.c:3095
 msgid "Extinct"
 msgstr ""
 
-#: ../src/insight.c:3091
+#: ../src/insight.c:3096
 msgid " or extinct"
 msgstr ""
 
-#: ../src/insight.c:3141
+#: ../src/insight.c:3146
 #, c-format
 msgid "No creatures have been genocided%s."
 msgstr ""
 
-#: ../src/insight.c:3141
+#: ../src/insight.c:3146
 msgid " yet"
 msgstr ""
 
-#: ../src/insight.c:3144
+#: ../src/insight.c:3149
 msgid "No species were genocided or became extinct."
 msgstr ""
 
-#: ../src/insight.c:3211 ../src/questpgr.c:304
+#: ../src/insight.c:3216 ../src/questpgr.c:304
 msgid "chaotic"
 msgstr ""
 
-#: ../src/insight.c:3213 ../src/pray.c:2133 ../src/questpgr.c:307
+#: ../src/insight.c:3218 ../src/pray.c:2133 ../src/questpgr.c:307
 msgid "neutral"
 msgstr ""
 
-#: ../src/insight.c:3215 ../src/pray.c:2133 ../src/questpgr.c:310
+#: ../src/insight.c:3220 ../src/pray.c:2133 ../src/questpgr.c:310
 msgid "lawful"
 msgstr ""
 
-#: ../src/insight.c:3217
+#: ../src/insight.c:3222
 msgid "unaligned"
 msgstr ""
 
-#: ../src/insight.c:3229 ../src/obj_descr_i18n.c:435
+#: ../src/insight.c:3234 ../src/obj_descr_i18n.c:443
 msgid "tiny"
 msgstr ""
 
-#: ../src/insight.c:3235 ../src/obj_descr_i18n.c:437 ../src/objnam.c:786
+#: ../src/insight.c:3240 ../src/obj_descr_i18n.c:445 ../src/objnam.c:786
 msgid "medium"
 msgstr ""
 
-#: ../src/insight.c:3244 ../src/obj_descr_i18n.c:440
+#: ../src/insight.c:3249 ../src/obj_descr_i18n.c:448
 msgid "gigantic"
 msgstr ""
 
-#: ../src/insight.c:3415
+#: ../src/insight.c:3420
 #, c-format
 msgid "Status of %s (%s, %s):  Level %d  HP %d(%d)  AC %d%s."
 msgstr ""
 
-#: ../src/insight.c:3505
+#: ../src/insight.c:3510
 #, c-format
 msgid "Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s."
 msgstr ""
@@ -14674,7 +15296,7 @@ msgstr ""
 msgid "bare"
 msgstr ""
 
-#: ../src/invent.c:1730 ../src/objnam.c:1580
+#: ../src/invent.c:1730 ../src/objnam.c:1578
 msgid " (wielded)"
 msgstr ""
 
@@ -14818,7 +15440,7 @@ msgstr ""
 msgid "have already identified %s of your possessions."
 msgstr ""
 
-#: ../src/invent.c:2722 ../src/options.c:3382 ../src/options.c:9326
+#: ../src/invent.c:2722 ../src/options.c:3382 ../src/options.c:9328
 msgid "all"
 msgstr ""
 
@@ -15041,7 +15663,7 @@ msgstr ""
 msgid "But you can't reach it!"
 msgstr ""
 
-#: ../src/invent.c:4240 ../src/obj_descr_i18n.c:292
+#: ../src/invent.c:4240 ../src/obj_descr_i18n.c:294
 #, c-format
 msgid "There %s %s here."
 msgstr ""
@@ -15087,19 +15709,19 @@ msgstr ""
 msgid "%s here %s."
 msgstr ""
 
-#: ../src/invent.c:4298 ../src/obj_descr_i18n.c:296
+#: ../src/invent.c:4298 ../src/obj_descr_i18n.c:298
 msgid "Other things that you feel here:"
 msgstr ""
 
-#: ../src/invent.c:4299 ../src/obj_descr_i18n.c:294
+#: ../src/invent.c:4299 ../src/obj_descr_i18n.c:296
 msgid "Other things that are here:"
 msgstr ""
 
-#: ../src/invent.c:4300 ../src/obj_descr_i18n.c:295
+#: ../src/invent.c:4300 ../src/obj_descr_i18n.c:297
 msgid "Things that you feel here:"
 msgstr ""
 
-#: ../src/invent.c:4301 ../src/obj_descr_i18n.c:293
+#: ../src/invent.c:4301 ../src/obj_descr_i18n.c:295
 msgid "Things that are here:"
 msgstr ""
 
@@ -15298,12 +15920,12 @@ msgstr ""
 msgid "beneath it"
 msgstr ""
 
-#: ../src/invent.c:5521 ../src/obj_descr_i18n.c:297
+#: ../src/invent.c:5521 ../src/obj_descr_i18n.c:299
 #, c-format
 msgid "Things that are under the %s here:"
 msgstr ""
 
-#: ../src/invent.c:5543 ../src/obj_descr_i18n.c:298
+#: ../src/invent.c:5543 ../src/obj_descr_i18n.c:300
 #, c-format
 msgid "Things that are buried %s:"
 msgstr ""
@@ -15999,6 +16621,11 @@ msgstr ""
 msgid "It appears to be all gibberish."
 msgstr ""
 
+#: ../src/mail.c:781
+#, c-format
+msgid "System command (%s)"
+msgstr ""
+
 #: ../src/makemon.c:111
 #, c-format
 msgid "cnt=%d using %d, cnttmp=%d, cntdiv=%d"
@@ -16080,7 +16707,7 @@ msgstr ""
 msgid "%s casts a spell at %s!"
 msgstr ""
 
-#: ../src/mcastu.c:251 ../src/mcastu.c:268 ../src/obj_descr_i18n.c:301
+#: ../src/mcastu.c:251 ../src/mcastu.c:268 ../src/obj_descr_i18n.c:303
 msgid "Something"
 msgstr ""
 
@@ -16513,7 +17140,7 @@ msgstr ""
 msgid "%s squeezes %s."
 msgstr ""
 
-#: ../src/mhitm.c:699 ../src/zap.c:4092
+#: ../src/mhitm.c:699 ../src/uhitm.c:4143 ../src/zap.c:4092
 #, c-format
 msgid "%s hits %s."
 msgstr ""
@@ -16625,6 +17252,7 @@ msgid "%s is splashed by %s %s!"
 msgstr ""
 
 #: ../src/mhitm.c:1337 ../src/mhitu.c:2462 ../src/uhitm.c:2844
+#: ../src/uhitm.c:2910
 #, c-format
 msgid "%s is not affected."
 msgstr ""
@@ -17870,7 +18498,7 @@ msgstr ""
 msgid "splatter"
 msgstr ""
 
-#: ../src/mkobj.c:748 ../src/obj_descr_i18n.c:237
+#: ../src/mkobj.c:748 ../src/obj_descr_i18n.c:239
 msgid "open"
 msgstr ""
 
@@ -19418,8 +20046,8 @@ msgid "wand hits you!"
 msgstr ""
 
 #: ../src/muse.c:1624 ../src/muse.c:1638 ../src/muse.c:1642
-#: ../src/obj_descr_i18n.c:110 ../src/obj_descr_i18n.c:345 ../src/objnam.c:232
-#: ../src/objnam.c:874 ../src/objnam.c:878
+#: ../src/obj_descr_i18n.c:110 ../src/obj_descr_i18n.c:347 ../src/objnam.c:232
+#: ../src/objnam.c:872 ../src/objnam.c:876
 msgid "wand"
 msgstr ""
 
@@ -19520,7 +20148,7 @@ msgstr ""
 msgid "%s body takes on a %s transparency."
 msgstr ""
 
-#: ../src/muse.c:2437 ../src/worn.c:986
+#: ../src/muse.c:2437 ../src/worn.c:990
 #, c-format
 msgid "Suddenly you cannot see %s."
 msgstr ""
@@ -19787,6 +20415,10 @@ msgstr ""
 
 #: ../src/music.c:333
 msgid "Falling down, you"
+msgstr ""
+
+#: ../src/music.c:346
+msgid " into a chasm"
 msgstr ""
 
 #: ../src/music.c:375
@@ -20150,7 +20782,7 @@ msgstr ""
 msgid "pink"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:22 ../src/obj_descr_i18n.c:171
+#: ../src/obj_descr_i18n.c:22 ../src/obj_descr_i18n.c:173
 msgid "orange"
 msgstr ""
 
@@ -20162,7 +20794,7 @@ msgstr ""
 msgid "emerald"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:25
+#: ../src/obj_descr_i18n.c:25 ../src/obj_descr_i18n.c:494
 msgid "dark green"
 msgstr ""
 
@@ -20374,7 +21006,7 @@ msgstr ""
 msgid "marble"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:86 ../src/obj_descr_i18n.c:185 ../src/potion.c:1475
+#: ../src/obj_descr_i18n.c:86 ../src/obj_descr_i18n.c:187 ../src/potion.c:1475
 msgid "tin"
 msgstr ""
 
@@ -20442,18 +21074,18 @@ msgstr ""
 msgid "perforated"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:108 ../src/obj_descr_i18n.c:338 ../src/objnam.c:226
-#: ../src/objnam.c:837
+#: ../src/obj_descr_i18n.c:108 ../src/obj_descr_i18n.c:340 ../src/objnam.c:226
+#: ../src/objnam.c:835
 msgid "potion"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:109 ../src/obj_descr_i18n.c:342 ../src/objnam.c:229
-#: ../src/objnam.c:856 ../src/write.c:106
+#: ../src/obj_descr_i18n.c:109 ../src/obj_descr_i18n.c:344 ../src/objnam.c:229
+#: ../src/objnam.c:854 ../src/write.c:106
 msgid "scroll"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:114 ../src/obj_descr_i18n.c:262
-#: ../src/obj_descr_i18n.c:362 ../src/objnam.c:916
+#: ../src/obj_descr_i18n.c:114 ../src/obj_descr_i18n.c:264
+#: ../src/obj_descr_i18n.c:364 ../src/objnam.c:914
 msgid "gem"
 msgstr ""
 
@@ -20477,7 +21109,7 @@ msgstr ""
 msgid "plate mail"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:125 ../src/objnam.c:5556
+#: ../src/obj_descr_i18n.c:125 ../src/objnam.c:5554
 msgid "helm"
 msgstr ""
 
@@ -20493,7 +21125,7 @@ msgstr ""
 msgid "bow"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:137 ../src/obj_descr_i18n.c:259
+#: ../src/obj_descr_i18n.c:137 ../src/obj_descr_i18n.c:261
 msgid "arrow"
 msgstr ""
 
@@ -20558,1062 +21190,1242 @@ msgid "bag"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:161
-msgid "horn"
+msgid "large box"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:162
-msgid "whistle"
+msgid "ice box"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:163
-msgid "flute"
+msgid "horn"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:164
-msgid "harp"
+msgid "whistle"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:165
-msgid "drum"
+msgid "flute"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:166
+msgid "harp"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:167
+msgid "drum"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:168
 msgid "bell"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:169
+#: ../src/obj_descr_i18n.c:171
 msgid "food ration"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:170
+#: ../src/obj_descr_i18n.c:172
 msgid "apple"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:172
+#: ../src/obj_descr_i18n.c:174
 msgid "pear"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:173
+#: ../src/obj_descr_i18n.c:175
 msgid "melon"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:174
+#: ../src/obj_descr_i18n.c:176
 msgid "banana"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:175
+#: ../src/obj_descr_i18n.c:177
 msgid "carrot"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:176
+#: ../src/obj_descr_i18n.c:178
 msgid "clove of garlic"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:177
+#: ../src/obj_descr_i18n.c:179
 msgid "cream pie"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:178
+#: ../src/obj_descr_i18n.c:180
 msgid "candy bar"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:179
+#: ../src/obj_descr_i18n.c:181
 msgid "fortune cookie"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:180
+#: ../src/obj_descr_i18n.c:182
 msgid "pancake"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:181
+#: ../src/obj_descr_i18n.c:183
 msgid "lembas wafer"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:182
+#: ../src/obj_descr_i18n.c:184
 msgid "cram ration"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:183
+#: ../src/obj_descr_i18n.c:185
 msgid "K-ration"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:184
+#: ../src/obj_descr_i18n.c:186
 msgid "C-ration"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:186
+#: ../src/obj_descr_i18n.c:188
 msgid "egg"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:187 ../src/obj_descr_i18n.c:261
+#: ../src/obj_descr_i18n.c:189 ../src/obj_descr_i18n.c:263
 msgid "corpse"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:188
+#: ../src/obj_descr_i18n.c:190
 msgid "tripe ration"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:189
+#: ../src/obj_descr_i18n.c:191
 msgid "meatball"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:190
+#: ../src/obj_descr_i18n.c:192
 msgid "meat stick"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:191
+#: ../src/obj_descr_i18n.c:193
 msgid "huge chunk of meat"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:192
+#: ../src/obj_descr_i18n.c:194
 msgid "kelp frond"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:193
+#: ../src/obj_descr_i18n.c:195
 msgid "eucalyptus leaf"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:196
+#: ../src/obj_descr_i18n.c:198
 msgid "dilithium crystal"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:197
+#: ../src/obj_descr_i18n.c:199
 msgid "worthless piece of blue glass"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:198
+#: ../src/obj_descr_i18n.c:200
 msgid "worthless piece of red glass"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:199
+#: ../src/obj_descr_i18n.c:201
 msgid "worthless piece of yellow glass"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:200
+#: ../src/obj_descr_i18n.c:202
 msgid "worthless piece of green glass"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:201
+#: ../src/obj_descr_i18n.c:203
 msgid "worthless piece of white glass"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:202
+#: ../src/obj_descr_i18n.c:204
 msgid "worthless piece of orange glass"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:203
+#: ../src/obj_descr_i18n.c:205
 msgid "worthless piece of violet glass"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:204
+#: ../src/obj_descr_i18n.c:206
 msgid "flint"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:206
+#: ../src/obj_descr_i18n.c:208
 msgid "loadstone"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:207
+#: ../src/obj_descr_i18n.c:209
 msgid "luckstone"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:208
+#: ../src/obj_descr_i18n.c:210
 msgid "touchstone"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:209
+#: ../src/obj_descr_i18n.c:211
 msgid "flint stone"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:212
+#: ../src/obj_descr_i18n.c:214
 msgid "red"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:213
+#: ../src/obj_descr_i18n.c:215
 msgid "blue"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:214
+#: ../src/obj_descr_i18n.c:216
 msgid "green"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:215
+#: ../src/obj_descr_i18n.c:217
 msgid "gray"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:216
+#: ../src/obj_descr_i18n.c:218
 msgid "grey"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:218
+#: ../src/obj_descr_i18n.c:220
 msgid "bright"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:222 ../src/pager.c:569
+#: ../src/obj_descr_i18n.c:224 ../src/pager.c:569
 msgid "drink"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:224
+#: ../src/obj_descr_i18n.c:226
 msgid "throw"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:225
+#: ../src/obj_descr_i18n.c:227
 msgid "wear"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:226
+#: ../src/obj_descr_i18n.c:228
 msgid "take off"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:227
+#: ../src/obj_descr_i18n.c:229
 msgid "put on"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:229
+#: ../src/obj_descr_i18n.c:231
 msgid "rub"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:230
+#: ../src/obj_descr_i18n.c:232
 msgid "grease"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:231
+#: ../src/obj_descr_i18n.c:233
 msgid "use or apply"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:232
+#: ../src/obj_descr_i18n.c:234
 msgid "invoke"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:233
+#: ../src/obj_descr_i18n.c:235
 msgid "charge"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:236 ../src/trap.c:5449
+#: ../src/obj_descr_i18n.c:238 ../src/trap.c:5449
 msgid "remove"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:238
+#: ../src/obj_descr_i18n.c:240
 msgid "sacrifice"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:240
+#: ../src/obj_descr_i18n.c:242
 msgid "identify"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:241
+#: ../src/obj_descr_i18n.c:243
 msgid "adjust"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:242
+#: ../src/obj_descr_i18n.c:244
 msgid "split"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:243 ../src/pickup.c:2569 ../src/pickup.c:3139
+#: ../src/obj_descr_i18n.c:245 ../src/pickup.c:2569 ../src/pickup.c:3139
 msgid "stash"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:244 ../src/pickup.c:2039
+#: ../src/obj_descr_i18n.c:246 ../src/pickup.c:2039
 msgid "tip"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:245
+#: ../src/obj_descr_i18n.c:247
 msgid "dip"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:249
+#: ../src/obj_descr_i18n.c:251
 msgid "fire"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:250
+#: ../src/obj_descr_i18n.c:252
 msgid "offer"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:251
+#: ../src/obj_descr_i18n.c:253
 msgid "wield"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:252
+#: ../src/obj_descr_i18n.c:254
 msgid "quaff"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:255
+#: ../src/obj_descr_i18n.c:257
 msgid "gold piece"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:256
+#: ../src/obj_descr_i18n.c:258
 msgid "gold pieces"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:258
+#: ../src/obj_descr_i18n.c:260
 msgid "rocks"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:260
+#: ../src/obj_descr_i18n.c:262
 msgid "arrows"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:263
+#: ../src/obj_descr_i18n.c:265
 msgid "gems"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:266
+#: ../src/obj_descr_i18n.c:268
 msgid "your kitten"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:267
+#: ../src/obj_descr_i18n.c:269
 msgid "your little dog"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:268
+#: ../src/obj_descr_i18n.c:270
 msgid "your pony"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:269
+#: ../src/obj_descr_i18n.c:271
 msgid "your cat"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:270
+#: ../src/obj_descr_i18n.c:272
 msgid "your dog"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:271
+#: ../src/obj_descr_i18n.c:273
 msgid "your horse"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:272
+#: ../src/obj_descr_i18n.c:274
 msgid "your large cat"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:273
+#: ../src/obj_descr_i18n.c:275
 msgid "your large dog"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:274
+#: ../src/obj_descr_i18n.c:276
 msgid "your warhorse"
-msgstr ""
-
-#: ../src/obj_descr_i18n.c:277
-#, c-format
-msgid " St:%s"
-msgstr ""
-
-#: ../src/obj_descr_i18n.c:278
-#, c-format
-msgid " Dx:%s"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:279
 #, c-format
-msgid " Co:%s"
+msgid " St:%s"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:280
 #, c-format
-msgid " In:%s"
+msgid " Dx:%s"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:281
 #, c-format
-msgid " Wi:%s"
+msgid " Co:%s"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:282
 #, c-format
-msgid " Ch:%s"
+msgid " In:%s"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:283
 #, c-format
-msgid " Pw:%s"
+msgid " Wi:%s"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:284
 #, c-format
-msgid " Xp:%s"
+msgid " Ch:%s"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:285
 #, c-format
-msgid " AC:%s"
+msgid " Pw:%s"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:286
 #, c-format
-msgid " HP:%s"
+msgid " Xp:%s"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:287
 #, c-format
-msgid " HD:%s"
+msgid " AC:%s"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:288
 #, c-format
-msgid " T:%s"
+msgid " HP:%s"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:289
 #, c-format
+msgid " HD:%s"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:290
+#, c-format
+msgid " T:%s"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:291
+#, c-format
 msgid " S:%s"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:307 ../src/objnam.c:1163 ../src/objnam.c:1176
+#: ../src/obj_descr_i18n.c:309 ../src/objnam.c:1161 ../src/objnam.c:1174
 msgid "thoroughly "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:308 ../src/objnam.c:1166
+#: ../src/obj_descr_i18n.c:310 ../src/objnam.c:1164
 msgid "rusty "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:309 ../src/objnam.c:1167
+#: ../src/obj_descr_i18n.c:311 ../src/objnam.c:1165
 msgid "cracked "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:310 ../src/objnam.c:1168
+#: ../src/obj_descr_i18n.c:312 ../src/objnam.c:1166
 msgid "burnt "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:311 ../src/objnam.c:1179
+#: ../src/obj_descr_i18n.c:313 ../src/objnam.c:1177
 msgid "corroded "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:312 ../src/objnam.c:1179
+#: ../src/obj_descr_i18n.c:314 ../src/objnam.c:1177
 msgid "rotted "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:314 ../src/objnam.c:1185
+#: ../src/obj_descr_i18n.c:316 ../src/objnam.c:1183
 msgid "fixed "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:315 ../src/objnam.c:1186
+#: ../src/obj_descr_i18n.c:317 ../src/objnam.c:1184
 msgid "rustproof "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:316 ../src/objnam.c:1187
+#: ../src/obj_descr_i18n.c:318 ../src/objnam.c:1185
 msgid "corrodeproof "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:317 ../src/objnam.c:1188
+#: ../src/obj_descr_i18n.c:319 ../src/objnam.c:1186
 msgid "fireproof "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:318 ../src/objnam.c:1189
+#: ../src/obj_descr_i18n.c:320 ../src/objnam.c:1187
 msgid "tempered "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:319 ../src/objnam.c:1190
+#: ../src/obj_descr_i18n.c:321 ../src/objnam.c:1188
 msgid "rotproof "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:321 ../src/objnam.c:1320
+#: ../src/obj_descr_i18n.c:323 ../src/objnam.c:1318
 msgid "empty "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:322 ../src/objnam.c:1329 ../src/uhitm.c:1948
+#: ../src/obj_descr_i18n.c:324 ../src/objnam.c:1327 ../src/uhitm.c:1948
 msgid "cursed "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:323 ../src/objnam.c:1331
+#: ../src/obj_descr_i18n.c:325 ../src/objnam.c:1329
 msgid "blessed "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:324 ../src/objnam.c:1352
+#: ../src/obj_descr_i18n.c:326 ../src/objnam.c:1350
 msgid "uncursed "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:325 ../src/objnam.c:1361
+#: ../src/obj_descr_i18n.c:327 ../src/objnam.c:1359
 msgid "trapped "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:326 ../src/objnam.c:1367
+#: ../src/obj_descr_i18n.c:328 ../src/objnam.c:1365
 msgid "broken "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:327 ../src/objnam.c:1369
+#: ../src/obj_descr_i18n.c:329 ../src/objnam.c:1367
 msgid "locked "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:328 ../src/objnam.c:1371
+#: ../src/obj_descr_i18n.c:330 ../src/objnam.c:1369
 msgid "unlocked "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:329 ../src/objnam.c:1375
+#: ../src/obj_descr_i18n.c:331 ../src/objnam.c:1373
 msgid "greased "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:330 ../src/objnam.c:688 ../src/objnam.c:1424
+#: ../src/obj_descr_i18n.c:332 ../src/objnam.c:688 ../src/objnam.c:1422
 msgid "poisoned "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:331 ../src/obj_descr_i18n.c:358 ../src/objnam.c:258
+#: ../src/obj_descr_i18n.c:333 ../src/obj_descr_i18n.c:360 ../src/objnam.c:258
 #: ../src/objnam.c:696
 msgid "pair of "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:332 ../src/objnam.c:698
+#: ../src/obj_descr_i18n.c:334 ../src/objnam.c:698
 msgid "moist "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:333 ../src/objnam.c:698
+#: ../src/obj_descr_i18n.c:335 ../src/objnam.c:698
 msgid "wet "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:334 ../src/objnam.c:835
+#: ../src/obj_descr_i18n.c:336 ../src/objnam.c:833
 msgid "diluted "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:335 ../src/objnam.c:844
+#: ../src/obj_descr_i18n.c:337 ../src/objnam.c:842
 msgid "holy "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:336 ../src/objnam.c:844
+#: ../src/obj_descr_i18n.c:338 ../src/objnam.c:842
 msgid "unholy "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:339 ../src/objnam.c:852
+#: ../src/obj_descr_i18n.c:341 ../src/objnam.c:850
 msgid " potion"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:340 ../src/objnam.c:841 ../src/objnam.c:860
+#: ../src/obj_descr_i18n.c:342 ../src/objnam.c:839 ../src/objnam.c:858
 msgid " of "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:341 ../src/objnam.c:831
+#: ../src/obj_descr_i18n.c:343 ../src/objnam.c:829
 msgid "heavy iron ball"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:343 ../src/objnam.c:869
+#: ../src/obj_descr_i18n.c:345 ../src/objnam.c:867
 msgid " scroll"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:344 ../src/objnam.c:865
+#: ../src/obj_descr_i18n.c:346 ../src/objnam.c:863
 msgid " labeled "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:346 ../src/objnam.c:876
+#: ../src/obj_descr_i18n.c:348 ../src/objnam.c:874
 #, c-format
 msgid "wand of %s"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:347 ../src/objnam.c:880
+#: ../src/obj_descr_i18n.c:349 ../src/objnam.c:878
 #, c-format
 msgid "%s wand"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:348 ../src/objnam.c:238 ../src/objnam.c:885
+#: ../src/obj_descr_i18n.c:350 ../src/objnam.c:238 ../src/objnam.c:883
 #: ../src/write.c:104
 msgid "book"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:349 ../src/objnam.c:238 ../src/objnam.c:889
+#: ../src/obj_descr_i18n.c:351 ../src/objnam.c:238 ../src/objnam.c:887
 msgid "novel"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:350 ../src/objnam.c:891
+#: ../src/obj_descr_i18n.c:352 ../src/objnam.c:889
 #, c-format
 msgid "%s book"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:352 ../src/objnam.c:898
+#: ../src/obj_descr_i18n.c:354 ../src/objnam.c:896
 msgid "spellbook of "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:353 ../src/objnam.c:903
+#: ../src/obj_descr_i18n.c:355 ../src/objnam.c:901
 #, c-format
 msgid "%s spellbook"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:355 ../src/objnam.c:909
+#: ../src/obj_descr_i18n.c:357 ../src/objnam.c:907
 #, c-format
 msgid "ring of %s"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:356 ../src/objnam.c:913
+#: ../src/obj_descr_i18n.c:358 ../src/objnam.c:911
 #, c-format
 msgid "%s ring"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:359 ../src/objnam.c:260
+#: ../src/obj_descr_i18n.c:361 ../src/objnam.c:260
 msgid "set of "
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:361 ../src/objnam.c:267 ../src/objnam.c:928
+#: ../src/obj_descr_i18n.c:363 ../src/objnam.c:267 ../src/objnam.c:926
 msgid " stone"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:366
+#: ../src/obj_descr_i18n.c:368
 msgid "kitten"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:367
+#: ../src/obj_descr_i18n.c:369
 msgid "little dog"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:368
+#: ../src/obj_descr_i18n.c:370
 msgid "pony"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:369
+#: ../src/obj_descr_i18n.c:371
 msgid "cat"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:370
+#: ../src/obj_descr_i18n.c:372
 msgid "dog"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:371
+#: ../src/obj_descr_i18n.c:373
 msgid "horse"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:372
+#: ../src/obj_descr_i18n.c:374
 msgid "large cat"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:373
+#: ../src/obj_descr_i18n.c:375
 msgid "large dog"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:374
+#: ../src/obj_descr_i18n.c:376
 msgid "warhorse"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:375
+#: ../src/obj_descr_i18n.c:377
 msgid "newt"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:376
+#: ../src/obj_descr_i18n.c:378
 msgid "gecko"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:377
+#: ../src/obj_descr_i18n.c:379
 msgid "iguana"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:378
+#: ../src/obj_descr_i18n.c:380
 msgid "lizard"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:379
+#: ../src/obj_descr_i18n.c:381
 msgid "jackal"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:380
+#: ../src/obj_descr_i18n.c:382
 msgid "fox"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:381
+#: ../src/obj_descr_i18n.c:383
 msgid "coyote"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:382
+#: ../src/obj_descr_i18n.c:384
 msgid "wolf"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:383
+#: ../src/obj_descr_i18n.c:385
 msgid "warg"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:384
+#: ../src/obj_descr_i18n.c:386
 msgid "winter wolf"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:385
+#: ../src/obj_descr_i18n.c:387
 msgid "hell hound"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:386
+#: ../src/obj_descr_i18n.c:388
 msgid "goblin"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:387
+#: ../src/obj_descr_i18n.c:389
 msgid "hobgoblin"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:388 ../src/pager.c:538
+#: ../src/obj_descr_i18n.c:390 ../src/pager.c:538
 msgid "orc"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:389
+#: ../src/obj_descr_i18n.c:391
 msgid "hill orc"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:390
+#: ../src/obj_descr_i18n.c:392
 msgid "Mordor orc"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:391
+#: ../src/obj_descr_i18n.c:393
 msgid "Uruk-hai"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:392
+#: ../src/obj_descr_i18n.c:394
 msgid "orc shaman"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:393
+#: ../src/obj_descr_i18n.c:395
 msgid "orc-captain"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:394 ../src/pager.c:537
+#: ../src/obj_descr_i18n.c:396 ../src/pager.c:537
 msgid "elf"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:395
+#: ../src/obj_descr_i18n.c:397
 msgid "Woodland-elf"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:396
+#: ../src/obj_descr_i18n.c:398
 msgid "Green-elf"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:397
+#: ../src/obj_descr_i18n.c:399
 msgid "Grey-elf"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:398
+#: ../src/obj_descr_i18n.c:400
 msgid "elf-lord"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:399
+#: ../src/obj_descr_i18n.c:401
 msgid "Elvenking"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:400
+#: ../src/obj_descr_i18n.c:402
 msgid "dwarf"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:401
+#: ../src/obj_descr_i18n.c:403
 msgid "dwarf lord"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:402
+#: ../src/obj_descr_i18n.c:404
 msgid "dwarf king"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:403
+#: ../src/obj_descr_i18n.c:405
 msgid "gnome"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:404
+#: ../src/obj_descr_i18n.c:406
 msgid "gnome lord"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:405
+#: ../src/obj_descr_i18n.c:407
 msgid "gnome king"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:406
+#: ../src/obj_descr_i18n.c:408
 msgid "gnomish wizard"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:407
+#: ../src/obj_descr_i18n.c:409
 msgid "kobold"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:408
+#: ../src/obj_descr_i18n.c:410
 msgid "large kobold"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:409
+#: ../src/obj_descr_i18n.c:411
 msgid "kobold lord"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:410
+#: ../src/obj_descr_i18n.c:412
 msgid "kobold shaman"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:411
-msgid "rat"
-msgstr ""
-
-#: ../src/obj_descr_i18n.c:412
-msgid "sewer rat"
-msgstr ""
-
 #: ../src/obj_descr_i18n.c:413
-msgid "giant rat"
+msgid "kobold zombie"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:414
+msgid "zombie"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:415
-msgid "giant bat"
+msgid "gnome zombie"
 msgstr ""
 
 #: ../src/obj_descr_i18n.c:416
+msgid "orc zombie"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:417
+msgid "elf zombie"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:418
+msgid "human zombie"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:419
+msgid "rat"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:420
+msgid "sewer rat"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:421
+msgid "giant rat"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:423
+msgid "giant bat"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:424
 msgid "vampire bat"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:417 ../src/pager.c:536
+#: ../src/obj_descr_i18n.c:425 ../src/pager.c:536
 msgid "human"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:443 ../src/pager.c:176
+#: ../src/obj_descr_i18n.c:451 ../src/pager.c:176
 msgid "trapped chest"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:444 ../src/pager.c:178
+#: ../src/obj_descr_i18n.c:452 ../src/pager.c:178
 msgid "trapped door"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:445 ../src/pager.c:730
+#: ../src/obj_descr_i18n.c:453 ../src/pager.c:730
 msgid "dark part of a room"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:448 ../src/pager.c:737 ../src/pager.c:800
+#: ../src/obj_descr_i18n.c:456 ../src/pager.c:737 ../src/pager.c:800
 msgid "unexplored area"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:449 ../src/pager.c:759
+#: ../src/obj_descr_i18n.c:457 ../src/pager.c:759
 msgid "open drawbridge portcullis"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:450 ../src/pager.c:761
+#: ../src/obj_descr_i18n.c:458 ../src/pager.c:761
 msgid "broken door"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:452 ../src/pager.c:767
+#: ../src/obj_descr_i18n.c:460 ../src/pager.c:767
 msgid "cloudy area"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:453 ../src/pager.c:767
+#: ../src/obj_descr_i18n.c:461 ../src/pager.c:767
 msgid "fog/vapor cloud"
 msgstr ""
 
-#: ../src/obj_descr_i18n.c:454 ../src/pager.c:782 ../src/pager.c:1433
+#: ../src/obj_descr_i18n.c:462 ../src/pager.c:782 ../src/pager.c:1433
 msgid "unexplored"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:475
+msgid "The Dungeons of Doom"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:476
+msgid "The Gnomish Mines"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:477
+msgid "Sokoban"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:478
+msgid "The Quest"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:479
+msgid "Fort Ludios"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:480
+msgid "Gehennom"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:481
+msgid "The Elemental Planes"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:482
+msgid "Vlad's Tower"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:483
+msgid "The Tutorial"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:486
+msgid "parchment"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:487
+msgid "vellum"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:488
+msgid "ragged"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:489
+msgid "dog eared"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:490
+msgid "stained"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:491
+msgid "leathery"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:492
+msgid "velvet"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:493
+msgid "light green"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:495
+msgid "turquoise"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:496
+msgid "light blue"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:497
+msgid "dark blue"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:498
+msgid "indigo"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:499
+msgid "purple"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:500
+msgid "violet"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:501
+msgid "tan"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:502
+msgid "plaid"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:503
+msgid "light brown"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:504
+msgid "dark brown"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:505 ../src/potion.c:2583
+msgid "wrinkled"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:507
+msgid "glittering"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:508
+msgid "shining"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:509
+msgid "dull"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:510 ../src/pager.c:622
+msgid "thin"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:511
+msgid "thick"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:512
+msgid "checkered"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:513
+msgid "canvas"
+msgstr ""
+
+#: ../src/obj_descr_i18n.c:514
+msgid "hardcover"
 msgstr ""
 
 #: ../src/objnam.c:788
 msgid "very large"
 msgstr ""
 
-#: ../src/objnam.c:1383
+#: ../src/objnam.c:810
+msgid "historic "
+msgstr ""
+
+#: ../src/objnam.c:1381
 #, c-format
 msgid " containing %ld item%s"
 msgstr ""
 
-#: ../src/objnam.c:1389 ../src/objnam.c:1432
+#: ../src/objnam.c:1387 ../src/objnam.c:1430
 msgid " (being worn)"
 msgstr ""
 
-#: ../src/objnam.c:1439
+#: ../src/objnam.c:1437
 #, c-format
 msgid " (attached to %s)"
 msgstr ""
 
-#: ../src/objnam.c:1456
+#: ../src/objnam.c:1454
 msgid " attached"
 msgstr ""
 
-#: ../src/objnam.c:1456
+#: ../src/objnam.c:1454
 msgid ", lit"
 msgstr ""
 
-#: ../src/objnam.c:1457
+#: ../src/objnam.c:1455
 #, c-format
 msgid " (%d of 7 candle%s)"
 msgstr ""
 
-#: ../src/objnam.c:1481 ../src/objnam.c:1494
+#: ../src/objnam.c:1479 ../src/objnam.c:1492
 msgid " (lit)"
 msgstr ""
 
-#: ../src/objnam.c:1490
+#: ../src/objnam.c:1488
 #, c-format
 msgid " (%d:%d)"
 msgstr ""
 
-#: ../src/objnam.c:1499
+#: ../src/objnam.c:1497
 msgid " (on right "
 msgstr ""
 
-#: ../src/objnam.c:1501
+#: ../src/objnam.c:1499
 msgid " (on left "
 msgstr ""
 
-#: ../src/objnam.c:1503
+#: ../src/objnam.c:1501
 #, c-format
 msgid "%s)"
 msgstr ""
 
-#: ../src/objnam.c:1538
+#: ../src/objnam.c:1536
 msgid " (laid by you)"
 msgstr ""
 
-#: ../src/objnam.c:1548
+#: ../src/objnam.c:1546
 #, c-format
 msgid " (%s to you)"
 msgstr ""
 
-#: ../src/objnam.c:1549
+#: ../src/objnam.c:1547
 msgid "chained"
 msgstr ""
 
-#: ../src/objnam.c:1549
+#: ../src/objnam.c:1547
 msgid "attached"
 msgstr ""
 
-#: ../src/objnam.c:1595
+#: ../src/objnam.c:1593
 #, c-format
 msgid " (%s %s)"
 msgstr ""
 
-#: ../src/objnam.c:1596
+#: ../src/objnam.c:1594
 msgid "tethered to"
 msgstr ""
 
-#: ../src/objnam.c:1597
+#: ../src/objnam.c:1595
 msgid "wielded in"
 msgstr ""
 
-#: ../src/objnam.c:1598
+#: ../src/objnam.c:1596
 msgid "weapon in"
 msgstr ""
 
-#: ../src/objnam.c:1619
+#: ../src/objnam.c:1617
 #, c-format
 msgid " (wielded in %s %s)"
 msgstr ""
 
-#: ../src/objnam.c:1623
+#: ../src/objnam.c:1621
 #, c-format
 msgid " (alternate weapon%s; not wielded)"
 msgstr ""
 
-#: ../src/objnam.c:1646
+#: ../src/objnam.c:1644
 #, c-format
 msgid " (%s)"
 msgstr ""
 
-#: ../src/objnam.c:1647
+#: ../src/objnam.c:1645
 msgid "in quiver"
 msgstr ""
 
-#: ../src/objnam.c:1648
+#: ../src/objnam.c:1646
 msgid "in quiver pouch"
 msgstr ""
 
-#: ../src/objnam.c:1649
+#: ../src/objnam.c:1647
 msgid "at the ready"
 msgstr ""
 
-#: ../src/objnam.c:1664 ../src/objnam.c:1674
+#: ../src/objnam.c:1662 ../src/objnam.c:1672
 #, c-format
 msgid " (%s, %s)"
 msgstr ""
 
-#: ../src/objnam.c:1665
+#: ../src/objnam.c:1663
 msgid "unpaid"
 msgstr ""
 
-#: ../src/objnam.c:1665 ../src/objnam.c:1675
+#: ../src/objnam.c:1663 ../src/objnam.c:1673
 msgid "contents"
 msgstr ""
 
-#: ../src/objnam.c:1675
+#: ../src/objnam.c:1673
 msgid "for sale"
 msgstr ""
 
-#: ../src/objnam.c:1677
+#: ../src/objnam.c:1675
 msgid " (no charge)"
 msgstr ""
 
-#: ../src/objnam.c:3608
+#: ../src/objnam.c:3606
 #, c-format
 msgid "Creation of %s failed."
 msgstr ""
 
-#: ../src/objnam.c:3625
+#: ../src/objnam.c:3623
 #, c-format
 msgid "A %sfountain."
 msgstr ""
 
-#: ../src/objnam.c:3625
+#: ../src/objnam.c:3623
 msgid "magic "
 msgstr ""
 
-#: ../src/objnam.c:3630
+#: ../src/objnam.c:3628
 msgid "A throne."
 msgstr ""
 
-#: ../src/objnam.c:3637
+#: ../src/objnam.c:3635
 msgid "A sink."
 msgstr ""
 
-#: ../src/objnam.c:3686
+#: ../src/objnam.c:3684
 #, c-format
 msgid "A %s of molten lava."
 msgstr ""
 
-#: ../src/objnam.c:3733
+#: ../src/objnam.c:3731
 #, c-format
 msgid "%s altar."
 msgstr ""
 
-#: ../src/objnam.c:3741
+#: ../src/objnam.c:3739
 #, c-format
 msgid "A %sgrave."
 msgstr ""
 
-#: ../src/objnam.c:3741
+#: ../src/objnam.c:3739
 msgid "disturbed "
 msgstr ""
 
-#: ../src/objnam.c:3744
+#: ../src/objnam.c:3742
 msgid "Can't place a grave here."
 msgstr ""
 
-#: ../src/objnam.c:3751
+#: ../src/objnam.c:3749
 msgid "A tree."
 msgstr ""
 
-#: ../src/objnam.c:3761
+#: ../src/objnam.c:3759
 msgid "Iron bars."
 msgstr ""
 
-#: ../src/objnam.c:3766
+#: ../src/objnam.c:3764
 msgid "A cloud."
 msgstr ""
 
-#: ../src/objnam.c:3848
+#: ../src/objnam.c:3846
 #, c-format
 msgid "%s requires door or wall location."
 msgstr ""
 
-#: ../src/objnam.c:3864
+#: ../src/objnam.c:3862
 msgid "A wall."
 msgstr ""
 
-#: ../src/objnam.c:3869
+#: ../src/objnam.c:3867
 msgid "Secret corridor."
 msgstr ""
 
-#: ../src/objnam.c:3872
+#: ../src/objnam.c:3870
 msgid "Secret corridor requires corridor location."
 msgstr ""
 
-#: ../src/objnam.c:3884
+#: ../src/objnam.c:3882
 msgid "Room floor."
 msgstr ""
 
-#: ../src/objnam.c:3896
+#: ../src/objnam.c:3894
 msgid "Room|floor|ground not allowed here."
 msgstr ""
 
-#: ../src/objnam.c:3953
+#: ../src/objnam.c:3951
 #, c-format
 msgid "%s %s the drawbridge."
 msgstr ""
 
-#: ../src/objnam.c:3954
+#: ../src/objnam.c:3952
 msgid "in front of"
 msgstr ""
 
-#: ../src/objnam.c:5407
+#: ../src/objnam.c:5405
 #, c-format
 msgid "For a moment, you feel %s in your %s, but it disappears!"
 msgstr ""
 
-#: ../src/objnam.c:5556
+#: ../src/objnam.c:5554
 msgid "hat"
 msgstr ""
 
@@ -22044,11 +22856,11 @@ msgstr ""
 msgid "%s autopickup exceptions"
 msgstr ""
 
-#: ../src/options.c:6405
+#: ../src/options.c:6405 ../src/options.c:6501 ../src/options.c:6573
 msgid "List of"
 msgstr ""
 
-#: ../src/options.c:6405
+#: ../src/options.c:6405 ../src/options.c:6501 ../src/options.c:6573
 msgid "Remove which"
 msgstr ""
 
@@ -22060,99 +22872,107 @@ msgstr ""
 msgid "Error adding the menu color."
 msgstr ""
 
-#: ../src/options.c:6534
+#: ../src/options.c:6502
+msgid "menu colors"
+msgstr ""
+
+#: ../src/options.c:6535
 msgid "What new message pattern?"
 msgstr ""
 
-#: ../src/options.c:6541
+#: ../src/options.c:6542
 msgid "Error adding the message type."
 msgstr ""
 
-#: ../src/options.c:6621
+#: ../src/options.c:6574
+msgid "message types"
+msgstr ""
+
+#: ../src/options.c:6623
 msgid "Select version information flags:"
 msgstr ""
 
-#: ../src/options.c:6665
+#: ../src/options.c:6667
 msgid "Select window borders mode:"
-msgstr ""
-
-#: ../src/options.c:6833
-#, c-format
-msgid "\"%s\" settable only from %s."
 msgstr ""
 
 #: ../src/options.c:6835
 #, c-format
+msgid "\"%s\" settable only from %s."
+msgstr ""
+
+#: ../src/options.c:6837
+#, c-format
 msgid "%s can be set only from NETHACKOPTIONS or %s."
 msgstr ""
 
-#: ../src/options.c:7615
+#: ../src/options.c:7617
 msgid "disable new feature alerts for future versions."
 msgstr ""
 
-#: ../src/options.c:7767
+#: ../src/options.c:7769
 msgid "How to show the message"
 msgstr ""
 
-#: ../src/options.c:8131
+#: ../src/options.c:8133
 msgid "out of menu map space."
 msgstr ""
 
-#: ../src/options.c:8619
+#: ../src/options.c:8621
 msgid "Use command '#optionsfull' to get the complete options list."
 msgstr ""
 
-#: ../src/options.c:8626
+#: ../src/options.c:8628
 msgid "hide help"
 msgstr ""
 
-#: ../src/options.c:8626
+#: ../src/options.c:8628
 msgid "show help"
 msgstr ""
 
-#: ../src/options.c:8690
+#: ../src/options.c:8692
 msgid "Options"
 msgstr ""
 
-#: ../src/options.c:8906
+#: ../src/options.c:8908
 msgid "Booleans (selecting will toggle value):"
 msgstr ""
 
-#: ../src/options.c:8956 ../src/options.c:9553
+#: ../src/options.c:8958 ../src/options.c:9555
 msgid "Other settings:"
 msgstr ""
 
-#: ../src/options.c:8978
+#: ../src/options.c:8980
 msgid "Set what options?"
 msgstr ""
 
-#: ../src/options.c:9158
+#: ../src/options.c:9160
 msgid "Menu control keys:"
 msgstr ""
 
-#: ../src/options.c:9326
+#: ../src/options.c:9328
 #, c-format
 msgid "ON, for %s objects%s"
 msgstr ""
 
-#: ../src/options.c:9329
+#: ../src/options.c:9331
 msgid ", with one exception"
 msgstr ""
 
-#: ../src/options.c:9330
+#: ../src/options.c:9332
 msgid ", with some exceptions"
 msgstr ""
 
-#: ../src/options.c:9333
+#: ../src/options.c:9335
 msgid "OFF"
 msgstr ""
 
-#: ../src/options.c:9335
+#: ../src/options.c:9337
 #, c-format
 msgid "Autopickup: %s."
 msgstr ""
 
-#: ../src/options.c:9533
+#: ../src/options.c:9535
 msgid "Compound options:"
 msgstr ""
 
@@ -22384,10 +23204,6 @@ msgstr ""
 
 #: ../src/pager.c:621
 msgid "unsteady"
-msgstr ""
-
-#: ../src/pager.c:622
-msgid "thin"
 msgstr ""
 
 #: ../src/pager.c:623
@@ -23548,6 +24364,14 @@ msgstr ""
 msgid "Alternatively, contact local support: %s"
 msgstr ""
 
+#: ../src/pline.c:697
+msgid "Report now?"
+msgstr ""
+
+#: ../src/pline.c:744
+msgid "Fork to message handler failed."
+msgstr ""
+
 #: ../src/polyself.c:35
 msgid "No longer petrify-resistant, you"
 msgstr ""
@@ -23855,7 +24679,7 @@ msgstr ""
 msgid "boots %s off your feet!"
 msgstr ""
 
-#: ../src/polyself.c:1267 ../src/worn.c:1298
+#: ../src/polyself.c:1267 ../src/worn.c:1302
 msgid "are pushed"
 msgstr ""
 
@@ -25585,10 +26409,6 @@ msgstr ""
 #: ../src/potion.c:2582
 #, c-format
 msgid "%s %s %s around the edges."
-msgstr ""
-
-#: ../src/potion.c:2583
-msgid "wrinkled"
 msgstr ""
 
 #: ../src/potion.c:2593
@@ -27832,6 +28652,10 @@ msgstr ""
 msgid "%s gas cloud%s dissipate."
 msgstr ""
 
+#: ../src/region.c:688
+msgid "Visible regions"
+msgstr ""
+
 #: ../src/region.c:989
 #, c-format
 msgid "bump into %s.  Ouch!"
@@ -28573,6 +29397,38 @@ msgstr ""
 msgid "a "
 msgstr ""
 
+#: ../src/role.c:1767
+msgid " choosing now"
+msgstr ""
+
+#: ../src/role.c:1768
+msgid " not yet specified"
+msgstr ""
+
+#: ../src/role.c:1769
+msgid " random"
+msgstr ""
+
+#: ../src/role.c:1810
+msgid "name:"
+msgstr ""
+
+#: ../src/role.c:1814
+msgid "role:"
+msgstr ""
+
+#: ../src/role.c:1831
+msgid "race:"
+msgstr ""
+
+#: ../src/role.c:1839
+msgid "gender:"
+msgstr ""
+
+#: ../src/role.c:1845
+msgid "alignment:"
+msgstr ""
+
 #: ../src/role.c:1975
 #, c-format
 msgid "Pick%s %s first"
@@ -28596,6 +29452,50 @@ msgstr ""
 
 #: ../src/role.c:1989
 msgid "Random"
+msgstr ""
+
+#: ../src/role.c:2160
+msgid "Salutations"
+msgstr ""
+
+#: ../src/role.c:2163
+msgid "Irasshaimase"
+msgstr ""
+
+#: ../src/role.c:2164
+msgid "Konnichi wa"
+msgstr ""
+
+#: ../src/role.c:2166 ../src/role.c:2187
+msgid "Aloha"
+msgstr ""
+
+#: ../src/role.c:2170
+msgid "Hallo"
+msgstr ""
+
+#: ../src/role.c:2172
+msgid "Velkommen"
+msgstr ""
+
+#: ../src/role.c:2174
+msgid "Hello"
+msgstr ""
+
+#: ../src/role.c:2183
+msgid "Fare thee well"
+msgstr ""
+
+#: ../src/role.c:2185
+msgid "Sayonara"
+msgstr ""
+
+#: ../src/role.c:2189
+msgid "Farvel"
+msgstr ""
+
+#: ../src/role.c:2191
+msgid "Goodbye"
 msgstr ""
 
 #: ../src/role.c:2338
@@ -32219,10 +33119,6 @@ msgstr ""
 msgid "snatch"
 msgstr ""
 
-#: ../src/steal.c:477
-msgid "take"
-msgstr ""
-
 #: ../src/steal.c:480
 #, c-format
 msgid "%s tries to %s %s%s but gives up."
@@ -32326,7 +33222,7 @@ msgstr ""
 msgid "%s doesn't need another one."
 msgstr ""
 
-#: ../src/steed.c:71 ../src/steed.c:292 ../src/worn.c:1317
+#: ../src/steed.c:71 ../src/steed.c:292 ../src/worn.c:1321
 #, c-format
 msgid "touch %s."
 msgstr ""
@@ -32414,6 +33310,10 @@ msgstr ""
 msgid "%s resists%s!"
 msgstr ""
 
+#: ../src/steed.c:313
+msgid " and its leash comes off"
+msgstr ""
+
 #: ../src/steed.c:319
 #, c-format
 msgid "ride that creature while under %s."
@@ -32495,7 +33395,7 @@ msgstr ""
 msgid "riding accident"
 msgstr ""
 
-#: ../src/steed.c:620 ../src/worn.c:1313
+#: ../src/steed.c:620 ../src/worn.c:1317
 #, c-format
 msgid "can no longer ride %s."
 msgstr ""
@@ -32774,10 +33674,6 @@ msgstr ""
 
 #: ../src/teleport.c:1460
 msgid "dizzy for a moment, but nothing happens..."
-msgstr ""
-
-#: ../src/teleport.c:1470
-msgid "Resuming regular play."
 msgstr ""
 
 #: ../src/teleport.c:1473
@@ -33714,6 +34610,23 @@ msgstr ""
 
 #: ../src/timeout.c:1892
 msgid "a rumbling noise."
+msgstr ""
+
+#: ../src/timeout.c:2054
+#, c-format
+msgid "Current time = %ld."
+msgstr ""
+
+#: ../src/timeout.c:2057
+msgid "Active timeout queue:"
+msgstr ""
+
+#: ../src/timeout.c:2079
+msgid "No timed properties."
+msgstr ""
+
+#: ../src/timeout.c:2081
+msgid "Timed properties:"
 msgstr ""
 
 #: ../src/topten.c:98 ../src/topten.c:102
@@ -36408,7 +37321,7 @@ msgstr ""
 msgid "rot!"
 msgstr ""
 
-#: ../src/uhitm.c:2431
+#: ../src/uhitm.c:2431 ../src/uhitm.c:2476
 #, c-format
 msgid "%s becomes weaker!"
 msgstr ""
@@ -36453,7 +37366,7 @@ msgstr ""
 msgid "fire doesn't seem to burn %s!"
 msgstr ""
 
-#: ../src/uhitm.c:2615
+#: ../src/uhitm.c:2615 ../src/uhitm.c:2647
 #, c-format
 msgid "%s is covered in frost!"
 msgstr ""
@@ -36494,6 +37407,11 @@ msgstr ""
 msgid "zap doesn't shock you!"
 msgstr ""
 
+#: ../src/uhitm.c:2705
+#, c-format
+msgid "%s gets zapped!"
+msgstr ""
+
 #: ../src/uhitm.c:2731
 #, c-format
 msgid "You're covered in %s, but it seems harmless."
@@ -36507,6 +37425,11 @@ msgstr ""
 #: ../src/uhitm.c:2750
 #, c-format
 msgid "%s is covered in %s, but it seems harmless."
+msgstr ""
+
+#: ../src/uhitm.c:2754
+#, c-format
+msgid "%s is covered in %s!"
 msgstr ""
 
 #: ../src/uhitm.c:2755
@@ -36560,6 +37483,11 @@ msgstr ""
 msgid "laughter."
 msgstr ""
 
+#: ../src/uhitm.c:3024 ../src/uhitm.c:3068
+#, c-format
+msgid "%s chuckles."
+msgstr ""
+
 #: ../src/uhitm.c:3028
 msgid "Some writing vanishes from your head!"
 msgstr ""
@@ -36578,7 +37506,7 @@ msgstr ""
 msgid "%s was poisoned!"
 msgstr ""
 
-#: ../src/uhitm.c:3166
+#: ../src/uhitm.c:3166 ../src/uhitm.c:3254
 #, c-format
 msgid "%s doesn't seem harmed."
 msgstr ""
@@ -36666,6 +37594,16 @@ msgstr ""
 msgid "are being crushed."
 msgstr ""
 
+#: ../src/uhitm.c:3385
+#, c-format
+msgid "%s brushes against you."
+msgstr ""
+
+#: ../src/uhitm.c:3388
+#, c-format
+msgid "%s brushes against your %s."
+msgstr ""
+
 #: ../src/uhitm.c:3400
 #, c-format
 msgid "%s brushes against %s."
@@ -36730,12 +37668,12 @@ msgstr ""
 msgid "%s less effective."
 msgstr ""
 
-#: ../src/uhitm.c:3645
+#: ../src/uhitm.c:3645 ../src/uhitm.c:3660
 #, c-format
 msgid "%s slows down."
 msgstr ""
 
-#: ../src/uhitm.c:3674
+#: ../src/uhitm.c:3674 ../src/uhitm.c:3697
 #, c-format
 msgid "%s looks confused."
 msgstr ""
@@ -36757,6 +37695,21 @@ msgstr ""
 msgid "aren't transformed."
 msgstr ""
 
+#: ../src/uhitm.c:3767
+#, c-format
+msgid "%s reaches out, and your body shrivels."
+msgstr ""
+
+#: ../src/uhitm.c:3798
+#, c-format
+msgid "%s reaches out, and you feel fever and chills."
+msgstr ""
+
+#: ../src/uhitm.c:3827
+#, c-format
+msgid "%s reaches out with its deadly touch."
+msgstr ""
+
 #: ../src/uhitm.c:3831
 msgid "Was that the touch of death?"
 msgstr ""
@@ -36774,9 +37727,19 @@ msgstr ""
 msgid "bad shade attack function flow?"
 msgstr ""
 
+#: ../src/uhitm.c:4006
+#, c-format
+msgid "%s grabs you!"
+msgstr ""
+
 #: ../src/uhitm.c:4011
 #, c-format
 msgid "are being %s."
+msgstr ""
+
+#: ../src/uhitm.c:4026
+#, c-format
+msgid "%s hits you with the %s corpse."
 msgstr ""
 
 #: ../src/uhitm.c:4080
@@ -36807,9 +37770,19 @@ msgstr ""
 msgid "You feel feverish."
 msgstr ""
 
+#: ../src/uhitm.c:4297
+#, c-format
+msgid "%s hits!  (I hope you don't mind.)"
+msgstr ""
+
 #: ../src/uhitm.c:4427
 #, c-format
 msgid "%s tries to reach your %s %s!"
+msgstr ""
+
+#: ../src/uhitm.c:4430
+#, c-format
+msgid "%s nuzzles against your %s %s!"
 msgstr ""
 
 #: ../src/uhitm.c:4437
@@ -36883,6 +37856,11 @@ msgstr ""
 
 #: ../src/uhitm.c:4638
 msgid "uninterested"
+msgstr ""
+
+#: ../src/uhitm.c:4661
+#, c-format
+msgid "%s tries to %s away with %s."
 msgstr ""
 
 #: ../src/uhitm.c:4700
@@ -37307,15 +38285,15 @@ msgstr ""
 msgid "%s is illuminated."
 msgstr ""
 
-#: ../src/uhitm.c:6406
+#: ../src/uhitm.c:6405
 msgid "wails in agony"
 msgstr ""
 
-#: ../src/uhitm.c:6407
+#: ../src/uhitm.c:6406
 msgid "cries out in pain"
 msgstr ""
 
-#: ../src/uhitm.c:6409
+#: ../src/uhitm.c:6413
 #, c-format
 msgid "%s recoils from the light!"
 msgstr ""
@@ -37839,6 +38817,11 @@ msgstr ""
 #: ../src/were.c:115
 #, c-format
 msgid "%s changes into a %s."
+msgstr ""
+
+#: ../src/were.c:202
+#, c-format
+msgid "Do you want to change into %s?"
 msgstr ""
 
 #: ../src/were.c:219
@@ -38457,6 +39440,27 @@ msgstr ""
 msgid "%s casts aspersions on your ancestry."
 msgstr ""
 
+#: ../src/wizcmds.c:249
+msgid "Pick first monster to slay"
+msgstr ""
+
+#: ../src/wizcmds.c:257
+msgid "Next monster"
+msgstr ""
+
+#: ../src/wizcmds.c:270
+#, c-format
+msgid "Kill %.110s?"
+msgstr ""
+
+#: ../src/wizcmds.c:277
+msgid "Perform seppuku"
+msgstr ""
+
+#: ../src/wizcmds.c:278
+msgid "Commit suicide"
+msgstr ""
+
 #: ../src/wizcmds.c:280
 #, c-format
 msgid "%s own player"
@@ -38464,6 +39468,18 @@ msgstr ""
 
 #: ../src/wizcmds.c:334
 msgid "is no monster there."
+msgstr ""
+
+#: ../src/wizcmds.c:363
+msgid "Load which lua file?"
+msgstr ""
+
+#: ../src/wizcmds.c:382
+msgid "Load which des lua file?"
+msgstr ""
+
+#: ../src/wizcmds.c:453
+msgid "To what experience level do you want to be set?"
 msgstr ""
 
 #: ../src/wizcmds.c:465
@@ -38516,6 +39532,10 @@ msgstr ""
 msgid "don't smell any monster there."
 msgstr ""
 
+#: ../src/wizcmds.c:996
+msgid "Which intrinsics?"
+msgstr ""
+
 #: ../src/wizcmds.c:1076
 #, c-format
 msgid "Timeout for %s %s %d."
@@ -38525,8 +39545,49 @@ msgstr ""
 msgid "No monsters currently migrating."
 msgstr ""
 
+#: ../src/wizcmds.c:1539
+msgid "List which?"
+msgstr ""
+
+#: ../src/wizcmds.c:1551
+#, c-format
+msgid "Monster%s migrating to %s:"
+msgstr ""
+
+#: ../src/wizcmds.c:1552
+msgid "current level"
+msgstr ""
+
+#: ../src/wizcmds.c:1553
+msgid "next level"
+msgstr ""
+
+#: ../src/wizcmds.c:1554
+msgid "'other' levels"
+msgstr ""
+
+#: ../src/wizcmds.c:1557
+msgid "All migrating monsters:"
+msgstr ""
+
 #: ../src/wizcmds.c:1606
 msgid "None."
+msgstr ""
+
+#: ../src/wizcmds.c:1626
+msgid "Current memory statistics:"
+msgstr ""
+
+#: ../src/wizcmds.c:1774
+msgid "No display macro issues detected."
+msgstr ""
+
+#: ../src/wizcmds.c:1818
+msgid "No monster difficulty discrepancies were detected."
+msgstr ""
+
+#: ../src/wizcmds.c:1850
+msgid "How many random monsters to migrate to next level? [0]"
 msgstr ""
 
 #: ../src/wizcmds.c:1853
@@ -38553,50 +39614,154 @@ msgstr ""
 msgid "cut %s in half."
 msgstr ""
 
-#: ../src/worn.c:942
+#: ../src/worn.c:542
+#, c-format
+msgid "%s is slowing down."
+msgstr ""
+
+#: ../src/worn.c:544
+#, c-format
+msgid "%s is suddenly moving %sfaster."
+msgstr ""
+
+#: ../src/worn.c:547
+#, c-format
+msgid "%s seems to be moving %sslower."
+msgstr ""
+
+#: ../src/worn.c:940
+#, c-format
+msgid "%s removes %s and puts on %s."
+msgstr ""
+
+#: ../src/worn.c:943
+#, c-format
+msgid "%s puts on %s."
+msgstr ""
+
+#: ../src/worn.c:946
 #, c-format
 msgid "%s %s %s %s for a moment."
 msgstr ""
 
-#: ../src/worn.c:971
+#: ../src/worn.c:975
 #, c-format
 msgid "%s %s to shine %s."
 msgstr ""
 
-#: ../src/worn.c:974
+#: ../src/worn.c:978
 #, c-format
 msgid "%s %s shining %s."
 msgstr ""
 
-#: ../src/worn.c:977
+#: ../src/worn.c:981
 #, c-format
 msgid "%s begins to shine %s."
 msgstr ""
 
-#: ../src/worn.c:979
+#: ../src/worn.c:983
 #, c-format
 msgid "%s is shining %s."
 msgstr ""
 
-#: ../src/worn.c:1189
+#: ../src/worn.c:1190
+#, c-format
+msgid "%s breaks out of %s armor!"
+msgstr ""
+
+#: ../src/worn.c:1193
 msgid "a cracking sound."
 msgstr ""
 
-#: ../src/worn.c:1207 ../src/worn.c:1216
+#: ../src/worn.c:1202
+#, c-format
+msgid "%s %s falls off!"
+msgstr ""
+
+#: ../src/worn.c:1208
+#, c-format
+msgid "%s %s tears apart!"
+msgstr ""
+
+#: ../src/worn.c:1211 ../src/worn.c:1220
 msgid "a ripping sound."
 msgstr ""
 
-#: ../src/worn.c:1229
+#: ../src/worn.c:1217
+#, c-format
+msgid "%s shirt rips to shreds!"
+msgstr ""
+
+#: ../src/worn.c:1230
+#, c-format
+msgid "%s armor falls around %s!"
+msgstr ""
+
+#: ../src/worn.c:1233
 msgid "a thud."
 msgstr ""
 
-#: ../src/worn.c:1273 ../src/worn.c:1285
+#: ../src/worn.c:1241
+#, c-format
+msgid "%s %s falls, unsupported!"
+msgstr ""
+
+#: ../src/worn.c:1244
+#, c-format
+msgid "%s shrinks out of %s %s!"
+msgstr ""
+
+#: ../src/worn.c:1253
+#, c-format
+msgid "%s seeps right through %s shirt!"
+msgstr ""
+
+#: ../src/worn.c:1256
+#, c-format
+msgid "%s becomes much too small for %s shirt!"
+msgstr ""
+
+#: ../src/worn.c:1266
+#, c-format
+msgid "%s drops %s gloves%s!"
+msgstr ""
+
+#: ../src/worn.c:1268
+msgid " and weapon"
+msgstr ""
+
+#: ../src/worn.c:1274
+#, c-format
+msgid "%s can no longer hold %s shield!"
+msgstr ""
+
+#: ../src/worn.c:1277 ../src/worn.c:1289
 msgid "a clank."
 msgstr ""
 
-#: ../src/worn.c:1296
+#: ../src/worn.c:1286
+#, c-format
+msgid "%s helmet falls to the %s!"
+msgstr ""
+
+#: ../src/worn.c:1297
+#, c-format
+msgid "%s boots fall away!"
+msgstr ""
+
+#: ../src/worn.c:1300
 #, c-format
 msgid "%s boots %s off %s feet!"
+msgstr ""
+
+#: ../src/worn.c:1311
+#, c-format
+msgid "%s saddle falls off."
+msgstr ""
+
+#: ../src/worn.c:1322
+#, c-format
+msgid "falling off %s"
 msgstr ""
 
 #: ../src/write.c:89
