@@ -404,7 +404,7 @@ msgstr "거기에 %s{이/가} 있다."
 
 #: ../src/apply.c:449
 msgid "invisible monster must have moved."
-msgstr "투명 괴물이 이동한 것 같다."
+msgstr "투명 몬스터이 이동한 것 같다."
 
 #: ../src/apply.c:455 ../src/detect.c:1754 ../src/dig.c:537 ../src/dig.c:549
 #: ../src/dig.c:555 ../src/dig.c:1397 ../src/hack.c:685 ../src/hack.c:700
@@ -606,7 +606,7 @@ msgstr "%s 안에서는 아무것도 끈을 풀 수 없다."
 
 #: ../src/apply.c:786
 msgid "cannot leash any more pets."
-msgstr "더 이상 애완동물에게 끈을 맬 수 없다."
+msgstr "더 이상 펫에게 끈을 맬 수 없다."
 
 #: ../src/apply.c:799
 msgid "Leash yourself?  Very funny..."
@@ -2046,7 +2046,7 @@ msgstr "%s{이/가} 거기에 있어서 당신이 %s."
 
 #: ../src/apply.c:3137
 msgid "A monster"
-msgstr "괴물이"
+msgstr "몬스터이"
 
 #: ../src/apply.c:3138
 msgid "couldn't see"
@@ -2206,7 +2206,7 @@ msgstr "%s 위의 물체"
 
 #: ../src/apply.c:3790 ../src/do_name.c:525 ../src/uhitm.c:6181
 msgid "a monster"
-msgstr "괴물"
+msgstr "몬스터"
 
 #: ../src/apply.c:3792 ../src/end.c:250
 #, c-format
@@ -4892,15 +4892,15 @@ msgstr "위협을 느낀다."
 
 #: ../src/detect.c:845
 msgid "sense the presence of monsters."
-msgstr "괴물의 존재를 감지했다."
+msgstr "몬스터의 존재를 감지했다."
 
 #: ../src/detect.c:847
 msgid "Monsters sense the presence of you."
-msgstr "괴물들이 당신의 존재를 감지했다."
+msgstr "몬스터들이 당신의 존재를 감지했다."
 
 #: ../src/detect.c:856
 msgid "monster of interest"
-msgstr "관심 있는 괴물"
+msgstr "관심 있는 몬스터"
 
 #: ../src/detect.c:999
 msgid "very greedy"
@@ -5088,7 +5088,7 @@ msgstr "와... 만화경 같다!"
 
 #: ../src/detect.c:1300
 msgid "may look for an object, monster, or special map symbol."
-msgstr "물체, 괴물, 또는 특수 지도 기호를 찾을 수 있다."
+msgstr "물체, 몬스터, 또는 특수 지도 기호를 찾을 수 있다."
 
 #: ../src/detect.c:1301
 msgid "What do you look for?"
@@ -5186,11 +5186,11 @@ msgstr "함정"
 #: ../src/detect.c:1860
 #, c-format
 msgid "%d hidden monsters"
-msgstr "%d마리의 숨겨진 괴물"
+msgstr "%d마리의 숨겨진 몬스터"
 
 #: ../src/detect.c:1862
 msgid "a hidden monster"
-msgstr "괴물"
+msgstr "몬스터"
 
 #: ../src/detect.c:1866
 #, c-format
@@ -5200,7 +5200,7 @@ msgstr "%s{을/를} 드러냈다!"
 #: ../src/detect.c:1870
 #, c-format
 msgid "%d%s unseen monsters"
-msgstr "%d마리의%s 보이지 않는 괴물"
+msgstr "%d마리의%s 보이지 않는 몬스터"
 
 #: ../src/detect.c:1871
 msgid " other"
@@ -5209,7 +5209,7 @@ msgstr " 다른"
 #: ../src/detect.c:1873
 #, c-format
 msgid "%s unseen monster"
-msgstr "%s 보이지 않는 괴물"
+msgstr "%s 보이지 않는 몬스터"
 
 #: ../src/detect.c:1874 ../src/dokick.c:1933 ../src/invent.c:4259
 #: ../src/pickup.c:1732
@@ -5271,7 +5271,7 @@ msgstr "가까이 살펴보기"
 
 #: ../src/detect.c:2006
 msgid "an unseen monster!"
-msgstr "보이지 않는 괴물!"
+msgstr "보이지 않는 몬스터!"
 
 #: ../src/detect.c:2025
 msgid "What are you looking for?  The exit?"
@@ -5295,7 +5295,7 @@ msgstr "또 다른 탐색"
 
 #: ../src/detect.c:2101
 msgid "You already found a monster."
-msgstr "이미 괴물을 찾았다."
+msgstr "이미 몬스터을 찾았다."
 
 #: ../src/detect.c:2364
 msgid "are too disoriented for this."
@@ -5322,7 +5322,7 @@ msgstr "%s%s 물체"
 #: ../src/detect.c:2402
 #, c-format
 msgid "%s and monsters"
-msgstr "%s{과/와} 괴물"
+msgstr "%s{과/와} 몬스터"
 
 #: ../src/detect.c:2405
 #, c-format
@@ -5604,7 +5604,7 @@ msgstr "떠간다"
 
 #: ../src/dig.c:764 ../src/trap.c:663
 msgid "are jerked back by your pet!"
-msgstr "애완동물이 뒤로 잡아당겼다!"
+msgstr "펫이 뒤로 잡아당겼다!"
 
 #: ../src/dig.c:786
 msgid "fall through..."
@@ -6603,7 +6603,7 @@ msgstr "그렇게 되리라."
 
 #: ../src/do.c:1253 ../src/do.c:1338
 msgid "are held back by your pet!"
-msgstr "애완동물이 막고 있다!"
+msgstr "펫이 막고 있다!"
 
 #: ../src/do.c:1258 ../src/muse.c:1132 ../src/sounds.c:1307
 #: ../src/sounds.c:1459 ../src/stairs.c:199
@@ -6668,7 +6668,7 @@ msgstr "주의, 돌아올 수 없습니다! 그래도 올라가겠습니까?"
 
 #: ../src/do.c:1441
 msgid "(monster in hero's way)"
-msgstr "(괴물이 영웅의 길을 막고 있음)"
+msgstr "(몬스터이 영웅의 길을 막고 있음)"
 
 #: ../src/do.c:1452
 msgid "You have a sense of deja vu."
@@ -7358,7 +7358,7 @@ msgstr "확실한"
 #: ../src/do_wear.c:175
 #, c-format
 msgid "that monsters%s have difficulty pinpointing your location."
-msgstr "괴물들이%s 당신의 위치를 파악하기 어려워한다."
+msgstr "몬스터들이%s 당신의 위치를 파악하기 어려워한다."
 
 #: ../src/do_wear.c:224
 #, c-format
@@ -12711,7 +12711,7 @@ msgstr "반대편에 %s{이/가} 있다."
 #: ../src/hack.c:467
 #, c-format
 msgid "a monster behind %s."
-msgstr "%s 뒤에 괴물이 있다."
+msgstr "%s 뒤에 몬스터이 있다."
 
 #: ../src/hack.c:475
 #, c-format
@@ -13169,7 +13169,7 @@ msgstr "%s{을/를} 겁먹게 했다."
 
 #: ../src/hack.c:2209
 msgid "guilty about losing your pet like this."
-msgstr "이렇게 애완동물을 잃어서 죄책감이 든다."
+msgstr "이렇게 펫을 잃어서 죄책감이 든다."
 
 #: ../src/hack.c:2295 ../src/trap.c:4957
 msgid "an air bubble"
@@ -13775,11 +13775,11 @@ msgstr "이 도구로 시체를 통조림하기"
 
 #: ../src/iactions.c:335
 msgid "Tie a pet to this leash"
-msgstr "이 끈에 애완동물 묶기"
+msgstr "이 끈에 펫 묶기"
 
 #: ../src/iactions.c:337
 msgid "Place this saddle on a pet"
-msgstr "애완동물에게 안장 씌우기"
+msgstr "펫에게 안장 씌우기"
 
 #: ../src/iactions.c:340
 msgid "Blow this whistle"
@@ -14178,14 +14178,29 @@ msgstr ""
 msgid "could "
 msgstr ""
 
+# ============================================================
+# [동사 접두어] "have been " - you_have_been() 매크로용
+# 예: "You have been invisible" → "당신은 투명 상태였다"
+# 한국어는 동사가 끝에 오므로 빈 문자열이 정상
+# ============================================================
 #: ../src/insight.c:50
 msgid "have been "
 msgstr ""
 
+# ============================================================
+# [동사 접두어] "have never " - you_have_never() 매크로용
+# 예: "You have never hit with a weapon" → "당신은 무기로 공격한 적이 없다"
+# 한국어: "당신은" + "" + "무기로 공격한 적이 없다"
+# 의미는 suffix에서 "~한 적이 없다"로 표현
+# ============================================================
 #: ../src/insight.c:51
 msgid "have never "
 msgstr ""
 
+# ============================================================
+# [동사 접두어] "never " - you_have_never()의 과거형 매크로용
+# 한국어는 동사가 끝에 오므로 빈 문자열이 정상
+# ============================================================
 #: ../src/insight.c:52
 msgid "never "
 msgstr ""
@@ -15120,7 +15135,7 @@ msgstr ""
 
 #: ../src/insight.c:1655
 msgid " monsters"
-msgstr " 괴물"
+msgstr " 몬스터"
 
 #: ../src/insight.c:1658
 msgid "You cause"
@@ -15485,17 +15500,17 @@ msgstr "자발적 도전:"
 
 #: ../src/insight.c:2105
 msgid "blind from birth"
-msgstr "선천적 맹인이었습니다"
+msgstr "선천적 맹인이었다"
 
 #: ../src/insight.c:2107
 msgid "deaf from birth"
-msgstr "선천적 청각 장애였습니다"
+msgstr "선천적 청각 장애였다"
 
 # ============================================================
 # [조합 메시지] insight.c:2111-2112 - "You started/are/started out without possessions"
 # 영어: You_ + ("started" | "are") / "started out" + " without possessions"
-# 한국어: 당신은 + "무소유로" + " 시작했습니다"
-# 결과: "당신은 무소유로 시작했습니다"
+# 한국어: 당신은 + "무소유로" + " 시작했다"
+# 결과: "당신은 무소유로 시작했다"
 # 주의: 인벤토리가 있으면 "started", 없으면 "are" 사용 (현재형)
 #       "are"는 공유 문자열이므로 "started"만 여기서 제어 가능
 # ============================================================
@@ -15509,22 +15524,22 @@ msgstr "무소유로"
 
 #: ../src/insight.c:2112
 msgid " without possessions"
-msgstr " 시작했습니다"
+msgstr " 시작했다"
 
 #: ../src/insight.c:2114
 #, c-format
 msgid "rerolled your character %ld time%s"
-msgstr "캐릭터를 %ld번%s 다시 굴렸습니다"
+msgstr "캐릭터를 %ld번%s 다시 굴렸다"
 
 #: ../src/insight.c:2123
 msgid "faithfully nudist"
-msgstr "철저히 나체주의자였습니다"
+msgstr "철저히 나체주의자였다"
 
 # ============================================================
 # [조합 메시지] insight.c:2126 - "You have gone/went without food"
 # 영어: You_ + "have gone"/"went" + " without food"
-# 한국어: 당신은 + "음식 없이" + " 지냈습니다"
-# 결과: "당신은 음식 없이 지냈습니다"
+# 한국어: 당신은 + "음식 없이" + " 지냈다"
+# 결과: "당신은 음식 없이 지냈다"
 # 주의: 영어와 한국어 어순이 달라서 의미를 재배치함. 개별 문자열만 보면 오역처럼 보임
 # ============================================================
 #: ../src/insight.c:2126 ../src/insight.c:2305
@@ -15537,84 +15552,90 @@ msgstr "음식 없이"
 
 #: ../src/insight.c:2126
 msgid " without food"
-msgstr " 지냈습니다"
+msgstr " 지냈다"
 
 # ============================================================
 # 자발적 도전 (Conducts) - insight.c:2120-2200
 # ============================================================
 #: ../src/insight.c:2129
 msgid "followed a strict vegan diet"
-msgstr "엄격한 비건 식단을 따랐습니다"
+msgstr "엄격한 비건 식단을 따랐다"
 
 #: ../src/insight.c:2131
 msgid "vegetarian"
-msgstr "채식주의자였습니다"
+msgstr "채식주의자였다"
 
 #: ../src/insight.c:2134
 msgid "an atheist"
-msgstr "무신론자였습니다"
+msgstr "무신론자였다"
 
+# ============================================================
+# [행동 규범 메시지] conduct - you_have_never() 매크로와 함께 사용
+# 영어: "You have never " + [action]
+# 한국어: "당신은 " + "" + [action + "한 적이 없다"]
+# 문체: '-다' 체 사용
+# ============================================================
 #: ../src/insight.c:2137
 msgid "hit with a wielded weapon"
-msgstr "장비한 무기로 공격한 적이 없습니다"
+msgstr "장비한 무기로 공격한 적이 없다"
 
 #: ../src/insight.c:2139
 #, c-format
 msgid "hit with a wielded weapon %ld time%s"
-msgstr "장비한 무기로 %ld번%s 공격했습니다"
+msgstr "장비한 무기로 %ld번%s 공격했다"
 
 #: ../src/insight.c:2144
 msgid "a pacifist"
-msgstr "평화주의자였습니다"
+msgstr "평화주의자였다"
 
 #: ../src/insight.c:2147
 msgid "illiterate"
-msgstr "문맹이었습니다"
+msgstr "문맹이었다"
 
 #: ../src/insight.c:2149
 #, c-format
 msgid "read items or engraved %ld time%s"
-msgstr "아이템을 읽거나 각인을 %ld번%s 했습니다"
+msgstr "아이템을 읽거나 각인을 %ld번%s 했다"
 
 #: ../src/insight.c:2155
 msgid "had a pet"
-msgstr "애완동물을 가진 적이 없습니다"
+msgstr "펫을 가진 적이 없다"
 
 #: ../src/insight.c:2159
 msgid "genocided any monsters"
-msgstr "괴물을 학살한 적이 없습니다"
+msgstr "몬스터를 학살한 적이 없다"
 
 #: ../src/insight.c:2161
 #, c-format
 msgid "genocided %d type%s of monster%s"
-msgstr "%d종%s의 괴물%s을 학살했습니다"
+msgstr "%d종%s의 몬스터%s를 학살했다"
 
 #: ../src/insight.c:2167
 msgid "polymorphed an object"
-msgstr "물건을 변이시킨 적이 없습니다"
+msgstr "물건을 변이시킨 적이 없다"
 
 #: ../src/insight.c:2169
 #, c-format
 msgid "polymorphed %ld item%s"
-msgstr "%ld개%s의 아이템을 변이시켰습니다"
+msgstr "%ld개%s의 아이템을 변이시켰다"
 
 #: ../src/insight.c:2175
 msgid "changed form"
-msgstr "형태를 바꾼 적이 없습니다"
+msgstr "형태를 바꾼 적이 없다"
 
 #: ../src/insight.c:2177
 #, c-format
 msgid "changed form %ld time%s"
-msgstr "%ld번%s 형태를 바꿨습니다"
+msgstr "%ld번%s 형태를 바꿨다"
 
 #: ../src/insight.c:2183
 msgid "used no wishes"
-msgstr "소원을 사용하지 않았습니다"
+msgstr "소원을 사용하지 않았다"
 
 #: ../src/insight.c:2185
 #, c-format
 msgid "used %ld wish%s"
-msgstr "%ld번%s의 소원을 사용했습니다"
+msgstr "%ld번%s의 소원을 사용했다"
 
 #: ../src/insight.c:2186
 msgid "es"
@@ -15657,8 +15678,8 @@ msgstr "아티팩트"
 # ============================================================
 # [조합 메시지] insight.c:2210-2211 - "You have not wished/did not wish for any artifacts"
 # 영어: You_ + "have not wished"/"did not wish" + " for any artifacts"
-# 한국어: 당신은 + "아티팩트를" + " 소원하지 않았습니다"
-# 결과: "당신은 아티팩트를 소원하지 않았습니다"
+# 한국어: 당신은 + "아티팩트를" + " 소원하지 않았다"
+# 결과: "당신은 아티팩트를 소원하지 않았다"
 # 주의: 영어와 한국어 어순이 달라서 의미를 재배치함
 # ============================================================
 #: ../src/insight.c:2210
@@ -15671,7 +15692,7 @@ msgstr "아티팩트를"
 
 #: ../src/insight.c:2211
 msgid " for any artifacts"
-msgstr " 소원하지 않았습니다"
+msgstr " 소원하지 않았다"
 
 # ============================================================
 # [조합 메시지] insight.c:2216-2218 - "You have violated/violated the special Sokoban rules"
@@ -17543,15 +17564,15 @@ msgstr "이중 문제..."
 #: ../src/mcastu.c:498
 #, c-format
 msgid "Destroy the thief, my pet%s!"
-msgstr "도둑을 처치해라, 내 애완동물%s!"
+msgstr "도둑을 처치해라, 내 펫%s!"
 
 #: ../src/mcastu.c:501
 msgid "A monster appears"
-msgstr "괴물이 나타난다"
+msgstr "몬스터이 나타난다"
 
 #: ../src/mcastu.c:502
 msgid "Monsters appear"
-msgstr "괴물들이 나타난다"
+msgstr "몬스터들이 나타난다"
 
 #: ../src/mcastu.c:508
 #, c-format
@@ -17579,7 +17600,7 @@ msgstr "어디선가 %s!"
 
 #: ../src/mcastu.c:520
 msgid "that monsters are aware of your presence."
-msgstr "괴물들이 존재를 알아챘다."
+msgstr "몬스터들이 존재를 알아챘다."
 
 #
 #: ../src/mcastu.c:525 ../src/mcastu.c:713
@@ -19851,7 +19872,7 @@ msgstr " @ %s{을/를} 무엇으로?"
 
 #: ../src/mon.c:5099
 msgid " kind of monster?"
-msgstr "어떤 종류의 괴물이 되겠습니까? [이름을 입력하세요]"
+msgstr "어떤 종류의 몬스터이 되겠습니까? [이름을 입력하세요]"
 
 #: ../src/mon.c:5129
 msgid "It can't become that."
@@ -21413,6 +21434,13 @@ msgstr "연주하는 것이 음악과는 거리가 멀다..."
 msgid "%sproduce %s%s music."
 msgstr "%s%s 음악을 %s연주한다."
 
+# ============================================================
+# [조건부 접두어] "seem to " - 불확실성 표현
+# 예: "You seem to have no gold" (금이 숨겨져 있을 때)
+# 예: "You seem to produce music" (귀머거리일 때)
+# 한국어: 문맥에 따라 "~인 것 같다"는 suffix에서 처리하거나 생략
+# 대부분의 경우 빈 문자열로 두고 자연스러운 한국어 표현 사용
+# ============================================================
 #: ../src/music.c:592 ../src/shk.c:1816 ../src/shk.c:2005 ../src/shk.c:2410
 msgid "seem to "
 msgstr ""
@@ -24137,7 +24165,7 @@ msgstr "영적 시야"
 
 #: ../src/pager.c:524 ../src/pager.c:702 ../src/timeout.c:51
 msgid "monster detection"
-msgstr "괴물 탐지"
+msgstr "몬스터 탐지"
 
 #: ../src/pager.c:531
 msgid "paranoid delusion"
@@ -24236,7 +24264,7 @@ msgstr "물의 벽"
 
 #: ../src/pager.c:1253
 msgid "the interior of a monster"
-msgstr "괴물의 내부"
+msgstr "몬스터의 내부"
 
 #: ../src/pager.c:1254
 msgid "unreconnoitered"
@@ -24279,7 +24307,7 @@ msgstr "비문"
 
 #: ../src/pager.c:1667
 msgid "a monster, object or location"
-msgstr "괴물, 물체 또는 위치"
+msgstr "몬스터, 물체 또는 위치"
 
 #: ../src/pager.c:1732
 msgid "something on the map"
@@ -24295,11 +24323,11 @@ msgstr "다른 것 (기호 또는 이름으로)"
 
 #: ../src/pager.c:1758
 msgid "nearby monsters"
-msgstr "근처 괴물"
+msgstr "근처 몬스터"
 
 #: ../src/pager.c:1763
 msgid "all monsters shown on map"
-msgstr "지도에 표시된 모든 괴물"
+msgstr "지도에 표시된 모든 몬스터"
 
 #: ../src/pager.c:1769
 msgid "nearby objects"
@@ -24349,7 +24377,7 @@ msgstr "그런 것들에 대해 들어본 적이 없다."
 
 #: ../src/pager.c:2024 ../src/pager.c:2068
 msgid "monsters"
-msgstr "괴물"
+msgstr "몬스터"
 
 #: ../src/pager.c:2024 ../src/pager.c:2068
 msgid "objects"
@@ -25057,7 +25085,7 @@ msgstr "%s{은/는} 그런 장식에 가둘 수 없다."
 #: ../src/pickup.c:2586
 #, c-format
 msgid "%s attached to your pet."
-msgstr "%s{이/가} 당신의 애완동물에 붙어 있다."
+msgstr "%s{이/가} 당신의 펫에 붙어 있다."
 
 #: ../src/pickup.c:2614
 #, c-format
@@ -25456,11 +25484,11 @@ msgstr "시스템 쇼크"
 
 #: ../src/polyself.c:516
 msgid "Become what kind of monster? [type the name]"
-msgstr "어떤 종류의 괴물이 되겠습니까? [이름을 입력하세요]"
+msgstr "어떤 종류의 몬스터이 되겠습니까? [이름을 입력하세요]"
 
 #: ../src/polyself.c:564 ../src/read.c:3340
 msgid "I've never heard of such monsters."
-msgstr "그런 괴물은 들어본 적이 없다."
+msgstr "그런 몬스터은 들어본 적이 없다."
 
 #: ../src/polyself.c:566
 msgid "polymorph into any of those."
@@ -28527,7 +28555,7 @@ msgstr "몬스터를 퇴치하려는 중"
 
 #: ../src/pray.c:2556
 msgid "the Flying Spaghetti Monster"
-msgstr "날아다니는 스파게티 괴물"
+msgstr "날아다니는 스파게티 몬스터"
 
 #: ../src/pray.c:2557
 msgid "Eris"
@@ -29577,7 +29605,7 @@ msgstr "잠시 "
 
 #: ../src/read.c:2599
 msgid "What class of monsters do you want to genocide?"
-msgstr "어떤 종류의 괴물을 학살하시겠습니까?"
+msgstr "어떤 종류의 몬스터을 학살하시겠습니까?"
 
 # ============================================================
 # 전투 메시지 추가 (Additional Combat Messages)
@@ -29598,29 +29626,29 @@ msgstr "이전 페이지로"
 #: ../src/read.c:2611
 msgid ""
 "Type letter (or punctuation) or name used for a class of monsters or 'none'"
-msgstr "괴물 종류의 문자(또는 구두점)나 이름을 입력하거나 'none'을 입력해"
+msgstr "몬스터 종류의 문자(또는 구두점)나 이름을 입력하거나 'none'을 입력해"
 
 #: ../src/read.c:2615
 msgid "No class of monsters specified"
-msgstr "괴물 종류가 지정되지 않았다"
+msgstr "몬스터 종류가 지정되지 않았다"
 
 #: ../src/read.c:2650
 msgid "All such monsters are already nonexistent."
-msgstr "그런 괴물은 이미 모두 사라졌다."
+msgstr "그런 몬스터은 이미 모두 사라졌다."
 
 #: ../src/read.c:2652
 msgid "aren't permitted to genocide such monsters."
-msgstr "그런 괴물을 학살하는 것은 허용되지 않는다."
+msgstr "그런 몬스터을 학살하는 것은 허용되지 않는다."
 
 #: ../src/read.c:2664
 #, c-format
 msgid "Eliminated %d monster%s."
-msgstr "%1$d마리의 괴물{을/를} 제거했다.%2$.0s"
+msgstr "%1$d마리의 몬스터{을/를} 제거했다.%2$.0s"
 
 #: ../src/read.c:2667
 #, c-format
 msgid "That %s does not represent any monster."
-msgstr "그 %s{은/는} 어떤 괴물도 나타내지 않는다."
+msgstr "그 %s{은/는} 어떤 몬스터도 나타내지 않는다."
 
 #: ../src/read.c:2668
 msgid "symbol"
@@ -29664,19 +29692,19 @@ msgstr "학살 두루마리"
 
 #: ../src/read.c:2803
 msgid "What type of monster do you want to genocide?"
-msgstr "어떤 종류의 괴물을 학살하겠습니까?"
+msgstr "어떤 종류의 몬스터을 학살하겠습니까?"
 
 #: ../src/read.c:2808
 msgid "the name of a type of monster, or '?'"
-msgstr "괴물 종류의 이름, 또는 '?'"
+msgstr "몬스터 종류의 이름, 또는 '?'"
 
 #: ../src/read.c:2815
 msgid "Type the name of a type of monster or 'none'"
-msgstr "괴물 유형의 이름을 입력하거나 'none' 입력"
+msgstr "몬스터 유형의 이름을 입력하거나 'none' 입력"
 
 #: ../src/read.c:2818
 msgid "No type of monster specified"
-msgstr "괴물 유형이 지정되지 않았다"
+msgstr "몬스터 유형이 지정되지 않았다"
 
 #: ../src/read.c:2840
 #, c-format
@@ -29773,7 +29801,7 @@ msgstr "%s 대신 %s{을/를} 생성 중; 강제하시겠습니까?"
 
 #: ../src/read.c:3328
 msgid "Create what kind of monster?"
-msgstr "어떤 종류의 괴물이 되겠습니까? [이름을 입력하세요]"
+msgstr "어떤 종류의 몬스터이 되겠습니까? [이름을 입력하세요]"
 
 #: ../src/read.c:3342
 msgid "Try again (type * for random, ESC to cancel)."
@@ -36946,7 +36974,7 @@ msgstr "%s{이/가} 유형 %d의 이상한 함정을 만났다."
 
 #: ../src/trap.c:2934
 msgid "Some monster"
-msgstr "괴물이"
+msgstr "몬스터이"
 
 #: ../src/trap.c:2966
 #, c-format
@@ -38417,7 +38445,7 @@ msgstr "있다"
 
 #: ../src/uhitm.c:287
 msgid "Wait!  There's a hidden monster there!"
-msgstr "잠깐! 숨겨진 괴물이 거기 있다!"
+msgstr "잠깐! 숨겨진 몬스터이 거기 있다!"
 
 #: ../src/uhitm.c:289
 #, c-format
@@ -38449,7 +38477,7 @@ msgstr "%s{은/는} 움직이지 않는 것 같다!"
 
 #: ../src/uhitm.c:523
 msgid "have no way to attack monsters physically."
-msgstr "괴물을 물리적으로 공격할 방법이 없다."
+msgstr "몬스터을 물리적으로 공격할 방법이 없다."
 
 #: ../src/uhitm.c:528
 msgid "You cannot fight while so heavily loaded."
@@ -40922,11 +40950,11 @@ msgstr "%s{이/가} 조상을 욕한다."
 
 #: ../src/wizcmds.c:249
 msgid "Pick first monster to slay"
-msgstr "처치할 첫 번째 괴물 선택"
+msgstr "처치할 첫 번째 몬스터 선택"
 
 #: ../src/wizcmds.c:257
 msgid "Next monster"
-msgstr "다음 괴물"
+msgstr "다음 몬스터"
 
 #: ../src/wizcmds.c:270
 #, c-format
@@ -40948,7 +40976,7 @@ msgstr "%s의 플레이어"
 
 #: ../src/wizcmds.c:334
 msgid "is no monster there."
-msgstr "거기에 괴물이 없다."
+msgstr "거기에 몬스터이 없다."
 
 #: ../src/wizcmds.c:363
 msgid "Load which lua file?"
@@ -40993,7 +41021,7 @@ msgstr "현재 형태로는 냄새를 감지할 수 없다."
 
 #: ../src/wizcmds.c:900
 msgid "can move the cursor to a monster that you want to smell."
-msgstr "냄새 맡고 싶은 괴물에 커서를 이동할 수 있다."
+msgstr "냄새 맡고 싶은 몬스터에 커서를 이동할 수 있다."
 
 #
 #: ../src/wizcmds.c:902
@@ -41012,7 +41040,7 @@ msgstr "%s{은/는} 냄새가 나지 않는 것 같다."
 
 #: ../src/wizcmds.c:933
 msgid "don't smell any monster there."
-msgstr "거기서 괴물 냄새가 나지 않는다."
+msgstr "거기서 몬스터 냄새가 나지 않는다."
 
 #: ../src/wizcmds.c:996
 msgid "Which intrinsics?"
@@ -41025,7 +41053,7 @@ msgstr "%s %s 타임아웃 %d."
 
 #: ../src/wizcmds.c:1527
 msgid "No monsters currently migrating."
-msgstr "현재 이동 중인 괴물이 없다."
+msgstr "현재 이동 중인 몬스터이 없다."
 
 #: ../src/wizcmds.c:1539
 msgid "List which?"
@@ -41034,7 +41062,7 @@ msgstr "어떤 것을 나열?"
 #: ../src/wizcmds.c:1551
 #, c-format
 msgid "Monster%s migrating to %s:"
-msgstr "%2$s(으)로 이동 중인 괴물%1$s:"
+msgstr "%2$s(으)로 이동 중인 몬스터%1$s:"
 
 #: ../src/wizcmds.c:1552
 msgid "current level"
@@ -41050,7 +41078,7 @@ msgstr "'다른' 층"
 
 #: ../src/wizcmds.c:1557
 msgid "All migrating monsters:"
-msgstr "모든 이동 중인 괴물:"
+msgstr "모든 이동 중인 몬스터:"
 
 #: ../src/wizcmds.c:1606
 msgid "None."
@@ -41066,11 +41094,11 @@ msgstr "디스플레이 매크로 문제가 감지되지 않았다."
 
 #: ../src/wizcmds.c:1818
 msgid "No monster difficulty discrepancies were detected."
-msgstr "괴물 난이도 불일치가 감지되지 않았다."
+msgstr "몬스터 난이도 불일치가 감지되지 않았다."
 
 #: ../src/wizcmds.c:1850
 msgid "How many random monsters to migrate to next level? [0]"
-msgstr "다음 층으로 이동시킬 무작위 괴물 수? [0]"
+msgstr "다음 층으로 이동시킬 무작위 몬스터 수? [0]"
 
 #: ../src/wizcmds.c:1853
 msgid "Can't get there from here."
@@ -42387,7 +42415,7 @@ msgstr "소원 세부사항:"
 
 #: ../src/zap.c:6137
 msgid "Enter the name of an object, such as \"potion of monster detection\","
-msgstr "물건의 이름을 입력하세요, 예: \"괴물 탐지의 물약\","
+msgstr "물건의 이름을 입력하세요, 예: \"몬스터 탐지의 물약\","
 
 #: ../src/zap.c:6138
 msgid "\"scroll labeled README\", \"elven mithril-coat\", or \"Grimtooth\""
@@ -42630,10 +42658,10 @@ msgstr "\"%s\"{을/를} 읽기용으로 열 수 없다!"
 #~ msgstr "격자 벌레"
 
 #~ msgid "acid blob"
-#~ msgstr "산성 점액괴물"
+#~ msgstr "산성 점액몬스터"
 
 #~ msgid "quivering blob"
-#~ msgstr "떨리는 점액괴물"
+#~ msgstr "떨리는 점액몬스터"
 
 #~ msgid "gelatinous cube"
 #~ msgstr "젤라틴 큐브"
@@ -43172,7 +43200,7 @@ msgstr "\"%s\"{을/를} 읽기용으로 열 수 없다!"
 #~ msgstr "혼란"
 
 #~ msgid "create monster"
-#~ msgstr "괴물 소환"
+#~ msgstr "몬스터 소환"
 
 #~ msgid "credit card"
 #~ msgstr "신용카드"
@@ -43488,7 +43516,7 @@ msgstr "\"%s\"{을/를} 읽기용으로 열 수 없다!"
 #~ msgstr "메스"
 
 #~ msgid "scare monster"
-#~ msgstr "괴물 공포"
+#~ msgstr "몬스터 공포"
 
 #~ msgid "scimitar"
 #~ msgstr "시미터"
@@ -43521,7 +43549,7 @@ msgstr "\"%s\"{을/를} 읽기용으로 열 수 없다!"
 #~ msgstr "만능 열쇠"
 
 #~ msgid "slow monster"
-#~ msgstr "괴물 둔화"
+#~ msgstr "몬스터 둔화"
 
 #~ msgid "speed"
 #~ msgstr "속도"
