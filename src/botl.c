@@ -457,7 +457,7 @@ describe_level(
         Sprintf(buf, "%s", svd.dungeons[u.uz.dnum].dname);
         addbranch = FALSE;
     } else if (In_quest(&u.uz)) {
-        Sprintf(buf, "Home %d", dunlev(&u.uz));
+        Sprintf(buf, _("Home %d"), dunlev(&u.uz));
     } else if (In_endgame(&u.uz)) {
         /* [3.6.2: this used to be "Astral Plane" or generic "End Game"] */
         (void) endgamelevelname(buf, depth(&u.uz));
@@ -470,7 +470,7 @@ describe_level(
             Sprintf(buf, _("%s:%-2d"), /* "Dlvl:n" (grep fodder) */
                     In_tutorial(&u.uz) ? _("Tutorial") : _("Dlvl"), depth(&u.uz));
         else
-            Sprintf(buf, "level %d", depth(&u.uz));
+            Sprintf(buf, _("level %d"), depth(&u.uz));
         ret = 0;
     }
     if (addbranch) {

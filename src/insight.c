@@ -409,20 +409,20 @@ enlightenment(
     /* reminder to player and/or information for dumplog */
     if ((mode & BASICENLIGHTENMENT) != 0 && (wizard || discover || final)) {
         if (wizard || discover) {
-            Sprintf(buf, "running in %s mode", wizard ? "debug" : "explore");
+            Sprintf(buf, _("running in %s mode"), wizard ? _("debug") : _("explore"));
             you_are(buf, "");
         }
 
         if (!flags.bones) {
             /* mention not saving bones iff hero just died */
-            Sprintf(buf, "disabled loading%s of bones levels",
-                    (final == ENL_GAMEOVERDEAD) ? " and storing" : "");
+            Sprintf(buf, _("disabled loading%s of bones levels"),
+                    (final == ENL_GAMEOVERDEAD) ? _(" and storing") : "");
             you_have_X(buf);
         } else if (!u.uroleplay.numbones) {
             enl_msg(You_, _("haven't encountered"), _("didn't encounter"),
                     _(" any bones levels"), "");
         } else {
-            Sprintf(buf, "encountered %ld bones level%s",
+            Sprintf(buf, _("encountered %ld bones level%s"),
                     u.uroleplay.numbones, plur(u.uroleplay.numbones));
             you_have_X(buf);
         }
@@ -717,31 +717,31 @@ basics_enlightenment(int mode UNUSED, int final)
         hp = 0;
     /* "1 out of 1" rather than "all" if max is only 1; should never happen */
     if (hp == hpmax && hpmax > 1)
-        Sprintf(buf, "all %d hit points", hpmax);
+        Sprintf(buf, _("all %d hit points"), hpmax);
     else
-        Sprintf(buf, "%d out of %d hit point%s", hp, hpmax, plur(hpmax));
+        Sprintf(buf, _("%d out of %d hit point%s"), hp, hpmax, plur(hpmax));
     you_have(buf, "");
 
     /* low max energy is feasible, so handle couple of extra special cases */
     if (pwmax == 0 || (pw == pwmax && pwmax == 2)) /* both: not "all 2" */
-        Sprintf(buf, "%s %s", !pwmax ? "no" : "both", Power);
+        Sprintf(buf, _("%s %s"), !pwmax ? _("no") : _("both"), Power);
     else if (pw == pwmax && pwmax > 2)
-        Sprintf(buf, "all %d %s", pwmax, Power);
+        Sprintf(buf, _("all %d %s"), pwmax, Power);
     else
-        Sprintf(buf, "%d out of %d %s", pw, pwmax, Power);
+        Sprintf(buf, _("%d out of %d %s"), pw, pwmax, Power);
     you_have(buf, "");
 
     if (Upolyd) {
         switch (mons[u.umonnum].mlevel) {
         case 0:
             /* status line currently being explained shows "HD:0" */
-            Strcpy(buf, "0 hit dice (actually 1/2)");
+            Strcpy(buf, _("0 hit dice (actually 1/2)"));
             break;
         case 1:
-            Strcpy(buf, "1 hit die");
+            Strcpy(buf, _("1 hit die"));
             break;
         default:
-            Sprintf(buf, "%d hit dice", mons[u.umonnum].mlevel);
+            Sprintf(buf, _("%d hit dice"), mons[u.umonnum].mlevel);
             break;
         }
         you_have(buf, "");
@@ -760,21 +760,21 @@ basics_enlightenment(int mode UNUSED, int final)
         long umoney = money_cnt(gi.invent), hmoney = hidden_gold(final);
 
         if (!umoney) {
-            Sprintf(buf, " Your wallet %s empty", !final ? "is" : "was");
+            Sprintf(buf, _(" Your wallet %s empty"), !final ? _("is") : _("was"));
         } else {
-            Sprintf(buf, " Your wallet contain%s %ld %s", !final ? "s" : "ed",
+            Sprintf(buf, _(" Your wallet contain%s %ld %s"), !final ? _("s") : _("ed"),
                     umoney, currency(umoney));
         }
         /* terminate the wallet line if appropriate, otherwise add an
            introduction to subsequent continuation; output now either way */
-        Strcat(buf, !hmoney ? "." : !umoney ? ", but" : ", and");
+        Strcat(buf, !hmoney ? "." : !umoney ? _(", but") : _(", and"));
         enlght_out(buf);
 
         /* put contained gold on its own line to avoid excessive width; it's
            phrased as a continuation of the wallet line so not capitalized */
         if (hmoney) {
-            Sprintf(buf, "%ld %s stashed away in your pack",
-                    hmoney, umoney ? "more" : currency(hmoney));
+            Sprintf(buf, _("%ld %s stashed away in your pack"),
+                    hmoney, umoney ? _("more") : currency(hmoney));
             enl_msg(_("you "), _("have "), _("had "), buf, "");
         }
     }
@@ -910,7 +910,7 @@ one_characteristic(int mode, int final, int attrindx)
         if (acurrent != abase || abase != apeak || interesting_alimit)
             Strcat(valubuf, ")");
     }
-    enl_msg(subjbuf, "is ", "was ", valubuf, "");
+    enl_msg(subjbuf, _("is "), _("was "), valubuf, "");
 }
 
 /* status: selected obvious capabilities, assorted troubles */
@@ -1140,7 +1140,7 @@ status_enlightenment(int mode, int final)
 
                 Strcpy(steednambuf, steedname);
                 *steednambuf = highc(*steednambuf);
-                enl_msg(steednambuf, " has ", " had ", buf, "");
+                enl_msg(steednambuf, _(" has "), _(" had "), buf, "");
             }
         } else {
             you_have(buf, "");
@@ -1357,7 +1357,7 @@ weapon_insight(int final)
                 also3 = also_;
             }
             if (*pfx)
-                enl_msg(pfx, "is", "was", sfx, "");
+                enl_msg(pfx, _("is"), _("was"), sfx, "");
             else if (hav)
                 you_have(buf, "");
             else
@@ -1911,7 +1911,7 @@ attributes_enlightenment(
                 u.ugangr > 6 ? "extremely " : u.ugangr > 3 ? "very " : "");
         if (wizard)
             Sprintf(eos(buf), " (%d)", u.ugangr);
-        enl_msg(u_gname(), " is", " was", buf, "");
+        enl_msg(u_gname(), _(" is"), _(" was"), buf, "");
     } else {
         /*
          * We need to suppress this when the game is over, because death
@@ -1943,8 +1943,8 @@ attributes_enlightenment(
                               * possibly mask or even introduce a problem,
                               * but it does useful sanity checking */
         for (f = gf.ffruit; f; f = f->nextf) {
-            Sprintf(buf, "Fruit #%d ", f->fid);
-            enl_msg(buf, "is ", "was ", f->fname, "");
+            Sprintf(buf, _("Fruit #%d "), f->fid);
+            enl_msg(buf, _("is "), _("was "), f->fname, "");
         }
         enl_msg(_("The current fruit "), _("is "), _("was "), svp.pl_fruit, "");
         Sprintf(buf, "%d", flags.made_fruit);
@@ -2757,9 +2757,9 @@ set_vanq_order(boolean for_vanq)
                  (i == flags.vanq_sortmode) ? MENU_ITEMFLAGS_SELECTED
                                             : MENU_ITEMFLAGS_NONE);
     }
-    Sprintf(buf, "Sort order for %s",
-            for_vanq ? "vanquished monster counts (also genocided types)"
-                     : "genocided monster types (also vanquished counts)");
+    Sprintf(buf, _("Sort order for %s"),
+            for_vanq ? _("vanquished monster counts (also genocided types)")
+                     : _("genocided monster types (also vanquished counts)"));
     end_menu(tmpwin, buf);
 
     n = select_menu(tmpwin, PICK_ONE, &selected);
@@ -3054,10 +3054,10 @@ list_genocided(char defquery, boolean ask)
 
     /* genocided or extinct species list */
     if (ngone > 0) {
-        Sprintf(buf, "Do you want a list of %sspecies%s%s?",
-                (nextinct && !ngenocided) ? "extinct " : "",
-                (ngenocided) ? " genocided" : "",
-                (nextinct && ngenocided) ? " and extinct" : "");
+        Sprintf(buf, _("Do you want a list of %sspecies%s%s?"),
+                (nextinct && !ngenocided) ? _("extinct ") : "",
+                (ngenocided) ? _(" genocided") : "",
+                (nextinct && ngenocided) ? _(" and extinct") : "");
         c = ask ? yn_function(buf, (ngone > 1) ? "ynaq" : "ynq\033a",
                               defquery, TRUE)
                 : defquery;

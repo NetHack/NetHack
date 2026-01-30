@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NetHack 3.7\n"
 "Report-Msgid-Bugs-To: hannethack@example.com\n"
-"POT-Creation-Date: 2026-01-30 08:57+0900\n"
+"POT-Creation-Date: 2026-01-30 09:56+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -230,11 +230,12 @@ msgid "those"
 msgstr ""
 
 #: ../src/apply.c:279 ../src/apply.c:438 ../src/do.c:2015 ../src/do.c:2411
-#: ../src/eat.c:2002 ../src/insight.c:431 ../src/insight.c:1495
-#: ../src/insight.c:1809 ../src/insight.c:1896 ../src/invent.c:3766
-#: ../src/invent.c:5513 ../src/read.c:1662 ../src/shk.c:687 ../src/steed.c:637
-#: ../src/timeout.c:1614 ../src/topten.c:994 ../src/trap.c:5846
-#: ../src/uhitm.c:6214 ../src/wield.c:935 ../src/wield.c:956
+#: ../src/eat.c:2002 ../src/insight.c:431 ../src/insight.c:763
+#: ../src/insight.c:1360 ../src/insight.c:1495 ../src/insight.c:1809
+#: ../src/insight.c:1896 ../src/invent.c:3766 ../src/invent.c:5513
+#: ../src/read.c:1662 ../src/shk.c:687 ../src/steed.c:637 ../src/timeout.c:1614
+#: ../src/topten.c:994 ../src/trap.c:5846 ../src/uhitm.c:6214
+#: ../src/wield.c:935 ../src/wield.c:956
 msgid "is"
 msgstr ""
 
@@ -261,10 +262,10 @@ msgid " mostly"
 msgstr ""
 
 #: ../src/apply.c:287 ../src/cmd.c:4376 ../src/cmd.c:5227 ../src/do_wear.c:630
-#: ../src/iactions.c:453 ../src/mhitm.c:667 ../src/obj_descr_i18n.c:365
-#: ../src/objnam.c:922 ../src/objnam.c:1587 ../src/potion.c:1660
-#: ../src/sounds.c:1224 ../src/trap.c:137 ../src/trap.c:394 ../src/uhitm.c:3131
-#: ../src/uhitm.c:4089 ../src/zap.c:504
+#: ../src/iactions.c:453 ../src/insight.c:727 ../src/mhitm.c:667
+#: ../src/obj_descr_i18n.c:365 ../src/objnam.c:922 ../src/objnam.c:1587
+#: ../src/potion.c:1660 ../src/sounds.c:1224 ../src/trap.c:137
+#: ../src/trap.c:394 ../src/uhitm.c:3131 ../src/uhitm.c:4089 ../src/zap.c:504
 #, c-format
 msgid "%s %s"
 msgstr ""
@@ -1137,7 +1138,7 @@ msgstr ""
 msgid "s are"
 msgstr ""
 
-#: ../src/apply.c:1483 ../src/timeout.c:1558
+#: ../src/apply.c:1483 ../src/insight.c:1914 ../src/timeout.c:1558
 msgid " is"
 msgstr ""
 
@@ -3023,8 +3024,9 @@ msgstr ""
 msgid "were"
 msgstr ""
 
-#: ../src/attrib.c:333 ../src/insight.c:431 ../src/insight.c:1495
-#: ../src/insight.c:1809 ../src/insight.c:1896
+#: ../src/attrib.c:333 ../src/insight.c:431 ../src/insight.c:763
+#: ../src/insight.c:1360 ../src/insight.c:1495 ../src/insight.c:1809
+#: ../src/insight.c:1896
 msgid "was"
 msgstr ""
 
@@ -3290,7 +3292,7 @@ msgstr ""
 msgid "make adjustments to %s to suit your %s hand."
 msgstr ""
 
-#: ../src/botl.c:89
+#: ../src/botl.c:89 ../src/invent.c:2594
 #, c-format
 msgid "St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d"
 msgstr ""
@@ -3329,6 +3331,11 @@ msgstr ""
 msgid "Player"
 msgstr ""
 
+#: ../src/botl.c:460
+#, c-format
+msgid "Home %d"
+msgstr ""
+
 #: ../src/botl.c:470
 #, c-format
 msgid "%s:%-2d"
@@ -3340,6 +3347,11 @@ msgstr ""
 
 #: ../src/botl.c:471
 msgid "Dlvl"
+msgstr ""
+
+#: ../src/botl.c:473
+#, c-format
+msgid "level %d"
 msgstr ""
 
 #. TRANSLATORS: %s the %s -> player name, rank/monster name
@@ -3448,8 +3460,8 @@ msgstr ""
 msgid "worse (higher)"
 msgstr ""
 
-#: ../src/botl.c:3614 ../src/invent.c:4530 ../src/pickup.c:1732
-#: ../src/weapon.c:1201
+#: ../src/botl.c:3614 ../src/insight.c:777 ../src/invent.c:4530
+#: ../src/pickup.c:1732 ../src/weapon.c:1201
 msgid "more"
 msgstr ""
 
@@ -9002,7 +9014,8 @@ msgstr ""
 msgid "%s shatter%s%s!"
 msgstr ""
 
-#: ../src/dothrow.c:2626 ../src/lock.c:700 ../src/pray.c:1406
+#: ../src/dothrow.c:2626 ../src/insight.c:765 ../src/lock.c:700
+#: ../src/pray.c:1406
 msgid "s"
 msgstr ""
 
@@ -10650,6 +10663,16 @@ msgstr ""
 
 #: ../src/end.c:528
 msgid "Latest messages:"
+msgstr ""
+
+#: ../src/end.c:567
+#, c-format
+msgid "Game began %4.4s-%2.2s-%2.2s %2.2s:%2.2s:%2.2s"
+msgstr ""
+
+#: ../src/end.c:571
+#, c-format
+msgid ", ended %4.4s-%2.2s-%2.2s %2.2s:%2.2s:%2.2s."
 msgstr ""
 
 #: ../src/end.c:594
@@ -13797,7 +13820,7 @@ msgstr ""
 msgid "huge"
 msgstr ""
 
-#: ../src/insight.c:190
+#: ../src/insight.c:190 ../src/insight.c:727
 msgid "no"
 msgstr ""
 
@@ -13866,6 +13889,28 @@ msgstr ""
 msgid "Miscellaneous:"
 msgstr ""
 
+#: ../src/insight.c:412
+#, c-format
+msgid "running in %s mode"
+msgstr ""
+
+#: ../src/insight.c:412
+msgid "debug"
+msgstr ""
+
+#: ../src/insight.c:412
+msgid "explore"
+msgstr ""
+
+#: ../src/insight.c:418
+#, c-format
+msgid "disabled loading%s of bones levels"
+msgstr ""
+
+#: ../src/insight.c:419
+msgid " and storing"
+msgstr ""
+
 #: ../src/insight.c:422
 msgid "haven't encountered"
 msgstr ""
@@ -13876,6 +13921,11 @@ msgstr ""
 
 #: ../src/insight.c:423
 msgid " any bones levels"
+msgstr ""
+
+#: ../src/insight.c:425
+#, c-format
+msgid "encountered %ld bones level%s"
 msgstr ""
 
 #: ../src/insight.c:431
@@ -13928,13 +13978,15 @@ msgstr ""
 
 #: ../src/insight.c:630 ../src/insight.c:632 ../src/insight.c:652
 #: ../src/insight.c:697 ../src/insight.c:755 ../src/insight.c:800
-#: ../src/insight.c:1072 ../src/insight.c:1949 ../src/insight.c:1951
+#: ../src/insight.c:913 ../src/insight.c:1072 ../src/insight.c:1947
+#: ../src/insight.c:1949 ../src/insight.c:1951
 msgid "is "
 msgstr ""
 
 #: ../src/insight.c:630 ../src/insight.c:632 ../src/insight.c:652
 #: ../src/insight.c:697 ../src/insight.c:755 ../src/insight.c:800
-#: ../src/insight.c:1073 ../src/insight.c:1949 ../src/insight.c:1951
+#: ../src/insight.c:913 ../src/insight.c:1073 ../src/insight.c:1947
+#: ../src/insight.c:1949 ../src/insight.c:1951
 msgid "was "
 msgstr ""
 
@@ -14009,6 +14061,43 @@ msgstr ""
 msgid "Basics:"
 msgstr ""
 
+#: ../src/insight.c:720
+#, c-format
+msgid "all %d hit points"
+msgstr ""
+
+#: ../src/insight.c:722
+#, c-format
+msgid "%d out of %d hit point%s"
+msgstr ""
+
+#: ../src/insight.c:727
+msgid "both"
+msgstr ""
+
+#: ../src/insight.c:729
+#, c-format
+msgid "all %d %s"
+msgstr ""
+
+#: ../src/insight.c:731
+#, c-format
+msgid "%d out of %d %s"
+msgstr ""
+
+#: ../src/insight.c:738
+msgid "0 hit dice (actually 1/2)"
+msgstr ""
+
+#: ../src/insight.c:741
+msgid "1 hit die"
+msgstr ""
+
+#: ../src/insight.c:744
+#, c-format
+msgid "%d hit dice"
+msgstr ""
+
 #: ../src/insight.c:754
 msgid "best"
 msgstr ""
@@ -14019,6 +14108,33 @@ msgstr ""
 
 #: ../src/insight.c:755
 msgid "Your armor class "
+msgstr ""
+
+#: ../src/insight.c:763
+#, c-format
+msgid " Your wallet %s empty"
+msgstr ""
+
+#: ../src/insight.c:765
+#, c-format
+msgid " Your wallet contain%s %ld %s"
+msgstr ""
+
+#: ../src/insight.c:765
+msgid "ed"
+msgstr ""
+
+#: ../src/insight.c:770
+msgid ", but"
+msgstr ""
+
+#: ../src/insight.c:770
+msgid ", and"
+msgstr ""
+
+#: ../src/insight.c:776
+#, c-format
+msgid "%ld %s stashed away in your pack"
 msgstr ""
 
 #: ../src/insight.c:778
@@ -14187,6 +14303,14 @@ msgstr ""
 #: ../src/insight.c:1133
 #, c-format
 msgid "%swounded %s%s"
+msgstr ""
+
+#: ../src/insight.c:1143
+msgid " has "
+msgstr ""
+
+#: ../src/insight.c:1143
+msgid " had "
 msgstr ""
 
 #: ../src/insight.c:1157
@@ -14767,6 +14891,15 @@ msgstr ""
 msgid "Good luck "
 msgstr ""
 
+#: ../src/insight.c:1914
+msgid " was"
+msgstr ""
+
+#: ../src/insight.c:1946
+#, c-format
+msgid "Fruit #%d "
+msgstr ""
+
 #: ../src/insight.c:1949
 msgid "The current fruit "
 msgstr ""
@@ -15172,6 +15305,19 @@ msgstr ""
 msgid "Logged"
 msgstr ""
 
+#: ../src/insight.c:2760
+#, c-format
+msgid "Sort order for %s"
+msgstr ""
+
+#: ../src/insight.c:2761
+msgid "vanquished monster counts (also genocided types)"
+msgstr ""
+
+#: ../src/insight.c:2762
+msgid "genocided monster types (also vanquished counts)"
+msgstr ""
+
 #: ../src/insight.c:2853
 msgid "Do you want an account of creatures vanquished?"
 msgstr ""
@@ -15190,6 +15336,23 @@ msgstr ""
 
 #: ../src/insight.c:2967
 msgid "No creatures were vanquished."
+msgstr ""
+
+#: ../src/insight.c:3057
+#, c-format
+msgid "Do you want a list of %sspecies%s%s?"
+msgstr ""
+
+#: ../src/insight.c:3058
+msgid "extinct "
+msgstr ""
+
+#: ../src/insight.c:3059
+msgid " genocided"
+msgstr ""
+
+#: ../src/insight.c:3060
+msgid " and extinct"
 msgstr ""
 
 #: ../src/insight.c:3094
@@ -23517,8 +23680,23 @@ msgstr ""
 msgid "No such command '%s', char code %d (0%03o or 0x%02x)."
 msgstr ""
 
+#: ../src/pager.c:2722
+#, c-format
+msgid "To contact local support, %s"
+msgstr ""
+
+#: ../src/pager.c:2726
+#, c-format
+msgid "To contact local support, contact %s."
+msgstr ""
+
 #: ../src/pager.c:2731
 msgid "To contact the NetHack development team directly,"
+msgstr ""
+
+#: ../src/pager.c:2733
+#, c-format
+msgid "see the 'Contact' form on our website or email <%s>."
 msgstr ""
 
 #: ../src/pager.c:2737
