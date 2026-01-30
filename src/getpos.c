@@ -153,9 +153,9 @@ getpos_help_keyxhelp(
             filtertxt = strsubst(strcpy(fbuf, filtertxt),
                                  "this area", "area");
     }
-    Sprintf(sbuf, "Use '%s'/'%s' to %s%s%s.",
+    Sprintf(sbuf, _("Use '%s'/'%s' to %s%s%s."),
             k1, k2,
-            iflags.getloc_usemenu ? "get a menu of " : move_cursor_to,
+            iflags.getloc_usemenu ? _("get a menu of ") : move_cursor_to,
             gloc_descr[gloc][2 + iflags.getloc_usemenu], filtertxt);
     putstr(tmpwin, 0, sbuf);
 }
@@ -166,33 +166,33 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 staticfn void
 getpos_help(boolean force, const char *goal)
 {
-    static const char *const fastmovemode[2] = { "8 units at a time",
-                                                 "skipping same glyphs" };
+    static const char *const fastmovemode[2] = { N_("8 units at a time"),
+                                                 N_("skipping same glyphs") };
     char sbuf[BUFSZ];
     boolean doing_what_is;
     winid tmpwin = create_nhwindow(NHW_MENU);
 
     Sprintf(sbuf,
-            "Use '%s', '%s', '%s', '%s' to move the cursor to %s.", /* hjkl */
+            _("Use '%s', '%s', '%s', '%s' to move the cursor to %s."), /* hjkl */
             visctrl(cmd_from_func(do_move_west)),
             visctrl(cmd_from_func(do_move_south)),
             visctrl(cmd_from_func(do_move_north)),
             visctrl(cmd_from_func(do_move_east)), goal);
     putstr(tmpwin, 0, sbuf);
     Sprintf(sbuf,
-            "Use '%s', '%s', '%s', '%s' to fast-move the cursor, %s.",
+            _("Use '%s', '%s', '%s', '%s' to fast-move the cursor, %s."),
             visctrl(cmd_from_func(do_run_west)),
             visctrl(cmd_from_func(do_run_south)),
             visctrl(cmd_from_func(do_run_north)),
             visctrl(cmd_from_func(do_run_east)),
-            fastmovemode[iflags.getloc_moveskip]);
+            _(fastmovemode[iflags.getloc_moveskip]));
     putstr(tmpwin, 0, sbuf);
-    Sprintf(sbuf, "(or prefix normal move with '%s' or '%s' to fast-move)",
+    Sprintf(sbuf, _("(or prefix normal move with '%s' or '%s' to fast-move)"),
             visctrl(cmd_from_func(do_run)),
             visctrl(cmd_from_func(do_rush)));
     putstr(tmpwin, 0, sbuf);
     putstr(tmpwin, 0, _("Or enter a background symbol (ex. '<')."));
-    Sprintf(sbuf, "Use '%s' to move the cursor on yourself.",
+    Sprintf(sbuf, _("Use '%s' to move the cursor on yourself."),
             visctrl(gc.Cmd.spkeys[NHKF_GETPOS_SELF]));
     putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
@@ -225,16 +225,16 @@ getpos_help(boolean force, const char *goal)
                           visctrl(gc.Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]),
                              GLOC_INTERESTING);
     }
-    Sprintf(sbuf, "Use '%s' to change fast-move mode to %s.",
+    Sprintf(sbuf, _("Use '%s' to change fast-move mode to %s."),
             visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MOVESKIP]),
-            fastmovemode[!iflags.getloc_moveskip]);
+            _(fastmovemode[!iflags.getloc_moveskip]));
     putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode || (iflags.terrainmode & TER_DETECT) == 0) {
-        Sprintf(sbuf, "Use '%s' to toggle menu listing for possible targets.",
+        Sprintf(sbuf, _("Use '%s' to toggle menu listing for possible targets."),
                 visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MENU]));
         putstr(tmpwin, 0, sbuf);
         Sprintf(sbuf,
-                "Use '%s' to change the mode of limiting possible targets.",
+                _("Use '%s' to change the mode of limiting possible targets."),
                 visctrl(gc.Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
         putstr(tmpwin, 0, sbuf);
     }
@@ -242,24 +242,24 @@ getpos_help(boolean force, const char *goal)
         char kbuf[BUFSZ];
 
         if (getpos_getvalid) {
-            Sprintf(sbuf, "Use '%s' or '%s' to move to valid locations.",
+            Sprintf(sbuf, _("Use '%s' or '%s' to move to valid locations."),
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_VALID_NEXT]),
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_VALID_PREV]));
             putstr(tmpwin, 0, sbuf);
         }
         if (getpos_hilitefunc) {
-            Sprintf(sbuf, "Use '%s' to toggle marking of valid locations.",
+            Sprintf(sbuf, _("Use '%s' to toggle marking of valid locations."),
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]));
             putstr(tmpwin, 0, sbuf);
         }
-        Sprintf(sbuf, "Use '%s' to toggle automatic description.",
+        Sprintf(sbuf, _("Use '%s' to toggle automatic description."),
                 visctrl(gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
         putstr(tmpwin, 0, sbuf);
         if (iflags.cmdassist) { /* assisting the '/' command, I suppose... */
             Sprintf(sbuf,
                     (iflags.getpos_coords == GPCOORDS_NONE)
-        ? "(Set 'whatis_coord' option to include coordinates with '%s' text.)"
-        : "(Reset 'whatis_coord' option to omit coordinates from '%s' text.)",
+        ? _("(Set 'whatis_coord' option to include coordinates with '%s' text.)")
+        : _("(Reset 'whatis_coord' option to omit coordinates from '%s' text.)"),
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
         }
  skip_non_mons:
@@ -277,24 +277,24 @@ getpos_help(boolean force, const char *goal)
             Sprintf(kbuf, "'%s'", visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]));
         }
         Snprintf(sbuf, sizeof(sbuf),
-                 "Type a %s when you are at the right place.", kbuf);
+                 _("Type a %s when you are at the right place."), kbuf);
         putstr(tmpwin, 0, sbuf);
         if (doing_what_is) {
             Sprintf(sbuf,
-      "  '%s' describe current spot, show 'more info', move to another spot.",
+      _("  '%s' describe current spot, show 'more info', move to another spot."),
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_V]));
             putstr(tmpwin, 0, sbuf);
             Sprintf(sbuf,
-                    "  '%s' describe current spot,%s move to another spot;",
+                    _("  '%s' describe current spot,%s move to another spot;"),
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]),
-                    flags.help && !force ? " prompt if 'more info'," : "");
+                    flags.help && !force ? _(" prompt if 'more info',") : "");
             putstr(tmpwin, 0, sbuf);
             Sprintf(sbuf,
-                    "  '%s' describe current spot, move to another spot;",
+                    _("  '%s' describe current spot, move to another spot;"),
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_Q]));
             putstr(tmpwin, 0, sbuf);
             Sprintf(sbuf,
-                    "  '%s' describe current spot, stop looking at things;",
+                    _("  '%s' describe current spot, stop looking at things;"),
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_O]));
             putstr(tmpwin, 0, sbuf);
         }
@@ -708,10 +708,10 @@ getpos_menu(coord *ccp, int gloc)
         }
     }
 
-    Sprintf(tmpbuf, "Pick %s%s%s",
+    Sprintf(tmpbuf, _("Pick %s%s%s"),
             an(gloc_descr[gloc][1]),
             gloc_filtertxt[iflags.getloc_filter],
-            iflags.getloc_travelmode ? " for travel destination" : "");
+            iflags.getloc_travelmode ? _(" for travel destination") : "");
     end_menu(tmpwin, tmpbuf);
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
