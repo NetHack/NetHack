@@ -2780,7 +2780,7 @@ do_genocide(
     int i, killplayer = 0;
     int mndx;
     struct permonst *ptr;
-    const char *which;
+    const char *which, *rem;
 
     if (how & PLAYER) {
         mndx = u.umonster; /* non-polymorphed mon num */
@@ -2834,7 +2834,24 @@ do_genocide(
                 continue;
             }
 
-            mndx = name_to_mon(buf, (int *) 0);
+            mndx = name_to_monplus(buf, &rem, (int *) 0);
+
+            /* ensure that the monster name encompasses the full string. without
+             * this check, "master mnd flayer" would be parsed as "master" and
+             * eliminate monks, with rem set to " mnd flayer"
+             *
+             * the first check is there because name_to_monplus sets rem based
+             * on the singular form of the name, so "energy vortices" is parsed
+             * as "energy vortex" and rem is set to "es" */
+            if (rem) {
+                while (*rem && *rem != ' ' && *rem != '\'')
+                    ++rem;
+                while (*rem && (*rem == ' ' || *rem == '\''))
+                    ++rem;
+                if (*rem)
+                    mndx = NON_PM;
+            }
+
             if (mndx == NON_PM || (svm.mvitals[mndx].mvflags & G_GENOD)) {
                 pline("Such creatures %s exist in this world.",
                       (mndx == NON_PM) ? "do not" : "no longer");
