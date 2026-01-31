@@ -1868,6 +1868,7 @@ extern boolean same_race(struct permonst *, struct permonst *) NONNULLARG12;
 extern int name_to_mon(const char *, int *) NONNULLARG1;
 extern int name_to_monplus(const char *, const char **, int *) NONNULLARG1;
 extern int name_to_monclass(const char *, int *);
+extern int name_to_monclass_plus(const char *, int *, boolean);
 extern int gender(struct monst *) NONNULLARG1;
 extern int pronoun_gender(struct monst *, unsigned) NONNULLARG1;
 extern boolean levl_follower(struct monst *) NONNULLARG1;

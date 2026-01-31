@@ -2629,9 +2629,7 @@ do_class_genocide(void)
             continue;
         }
 
-        class = name_to_monclass(buf, (int *) 0);
-        if (class == 0 && (i = name_to_mon(buf, (int *) 0)) != NON_PM)
-            class = mons[i].mlet;
+        class = name_to_monclass_plus(buf, (int *) 0, FALSE);
         immunecnt = gonecnt = goodcnt = 0;
         for (i = LOW_PM; i < NUMMONS; i++) {
             if (mons[i].mlet == class) {
@@ -2663,7 +2661,7 @@ do_class_genocide(void)
                 pline("Eliminated %d monster%s.", gonecnt, plur(gonecnt));
                 return;
             } else
-                pline("That %s does not represent any monster.",
+                pline("That %s does not represent any monster class.",
                       strlen(buf) == 1 ? "symbol" : "response");
             continue;
         }
