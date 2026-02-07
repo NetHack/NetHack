@@ -279,8 +279,7 @@ I died laughing
 I disbelieved in reincarnation in my last life, too.
 I hacked myself to death
 I have all the time in the world
-#"reached Mine's End": not necessarily true; sounds like "reached my end"
-I have reached Mine's End
+I have reached Mine's End ## not necessarily true; sounds like "reached my end"
 I knew I'd find a use for this gravestone!
 I know my mind.  And it's around here someplace.
 I lied!  I'll never be alright!

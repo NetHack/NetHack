@@ -867,19 +867,19 @@ $(O)dat.tag: $(DAT)/nhdat
 $(DAT)/data: $(O)utility.tag	$(DATABASE)
 	@$(subst /,\,$(U)makedefs.exe -d)
 
-$(DAT)/rumors:	     $(O)utility.tag    $(DAT)/rumors.tru	$(DAT)/rumors.fal
+$(DAT)/rumors_f $(DAT)/rumors_f.idx $(DAT)/rumors_t $(DAT)/rumors_t.idx:	     $(O)utility.tag    $(DAT)/rumors_t.txt	$(DAT)/rumors_f.txt
 	@$(subst /,\,$(U)makedefs.exe -r)
 
 $(DAT)/oracles:	     $(O)utility.tag    $(DAT)/oracles.txt
 	@$(subst /,\,$(U)makedefs.exe -h)
 
-$(DAT)/bogusmon:     $(O)utility.tag    $(DAT)/bogusmon.txt
+$(DAT)/bogusmon $(DAT)/bogusmon.idx:     $(O)utility.tag    $(DAT)/bogusmon.txt
 	@$(subst /,\,$(U)makedefs.exe -s)
 
-$(DAT)/engrave:	     $(O)utility.tag    $(DAT)/engrave.txt
+$(DAT)/engrave $(DAT)/engrave.idx:	     $(O)utility.tag    $(DAT)/engrave.txt
 	@$(subst /,\,$(U)makedefs.exe -s)
 
-$(DAT)/epitaph:	     $(O)utility.tag    $(DAT)/epitaph.txt
+$(DAT)/epitaph $(DAT)/epitaph.idx:	     $(O)utility.tag    $(DAT)/epitaph.txt
 	@$(subst /,\,$(U)makedefs.exe -s)
 
 $(O)sp_lev.tag: $(O)utility.tag
@@ -891,7 +891,9 @@ $(O)sp_lev.tag: $(O)utility.tag
 
 #note that dir below assumes bin/dir.exe from djgpp distribution
 #
-$(DAT)/nhdat:	$(U)dlb_main.exe $(DAT)/data $(DAT)/rumors \
+$(DAT)/nhdat:	$(U)dlb_main.exe $(DAT)/data \
+	   $(DAT)/rumors_t $(DAT)/rumors_t.idx \
+	   $(DAT)/rumors_f $(DAT)/rumors_f.idx \
 		$(DAT)/oracles \
 		$(QUEST_DAT) \
 		$(O)sp_lev.tag \
@@ -899,9 +901,9 @@ $(DAT)/nhdat:	$(U)dlb_main.exe $(DAT)/data $(DAT)/rumors \
 	@$(subst /,\,echo dat done >$(O)dat.tag)
 	@$(subst /,\,cd $(DAT))
 	@$(subst /,\,copy $(MSYS)/msdoshlp.txt .)
-	@$(LS) data oracles options rumors help hh >dlb.lst
+	@$(LS) data oracles options rumors_t rumors_t.idx rumors_f rumors_f.idx help hh >dlb.lst
 	@$(LS) cmdhelp history opthelp optmenu wizhelp license msdoshlp.txt >>dlb.lst
-	@$(LS) bogusmon engrave epitaph tribute >>dlb.lst
+	@$(LS) bogusmon bogusmon.idx engrave engrave.idx epitaph epitaph.idx tribute >>dlb.lst
 	$(LS) $(subst /,\,*.lua) >>dlb.lst
 	@$(subst /,\,$(U)dlb_main cvIf dlb.lst nhdat)
 	@$(subst /,\,cd $(SRC))
@@ -978,14 +980,20 @@ spotless: clean
 	$(subst /,\,if exist $(SRC)/tile.c del $(SRC)/tile.c)
 	$(subst /,\,if exist $(DAT)/options del $(DAT)/options)
 	$(subst /,\,if exist $(DAT)/data del $(DAT)/data)
-	$(subst /,\,if exist $(DAT)/rumors del $(DAT)/rumors)
+	$(subst /,\,if exist $(DAT)/rumors_t del $(DAT)/rumors_t)
+	$(subst /,\,if exist $(DAT)/rumors_t.idx del $(DAT)/rumors_t.idx)
+	$(subst /,\,if exist $(DAT)/rumors_f del $(DAT)/rumors_f)
+	$(subst /,\,if exist $(DAT)/rumors_f.idx del $(DAT)/rumors_f.idx)
 	$(subst /,\,if exist $(DAT)/oracles del $(DAT)/oracles)
 ifndef LUA_QTEXT_FILE
 	$(subst /,\,if exist $(DAT)/quest.dat del $(DAT)/quest.dat)
 endif
 	$(subst /,\,if exist $(DAT)/bogusmon del $(DAT)/bogusmon)
+	$(subst /,\,if exist $(DAT)/bogusmon.idx del $(DAT)/bogusmon.idx)
 	$(subst /,\,if exist $(DAT)/engrave del $(DAT)/engrave)
+	$(subst /,\,if exist $(DAT)/engrave.idx del $(DAT)/engrave.idx)
 	$(subst /,\,if exist $(DAT)/epitaph del $(DAT)/epitaph)
+	$(subst /,\,if exist $(DAT)/epitaph.idx del $(DAT)/epitaph.idx)
 	$(subst /,\,if exist $(DAT)/dlb.lst del $(DAT)/dlb.lst)
 	$(subst /,\,if exist $(DAT)/nhdat del $(DAT)/nhdat)
 	$(subst /,\,if exist $(TILE_BMP) del $(TILE_BMP))

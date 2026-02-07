@@ -16,7 +16,8 @@
 #define SHELP "hh"              /* abbreviated form of the same */
 #define KEYHELP "keyhelp"       /* explanatory text for 'whatdoes' command */
 #define DEBUGHELP "wizhelp"     /* file containing debug mode cmds */
-#define RUMORFILE "rumors"      /* file with fortune cookies */
+#define RUMORSTFILE "rumors_t"  /* file with true fortune cookies */
+#define RUMORSFFILE "rumors_f"  /* file with false fortune cookies */
 #define ORACLEFILE "oracles"    /* file with oracular information */
 #define DATAFILE "data"         /* file giving the meaning of symbols used */
 #define CMDHELPFILE "cmdhelp"   /* file telling what commands do */
@@ -32,14 +33,6 @@
 #define BOGUSMONFILE "bogusmon" /* hallucinatory monsters */
 #define TRIBUTEFILE "tribute"   /* 3.6 tribute to Terry Pratchett */
 #define LEV_EXT ".lua"          /* extension for special level files */
-
-/* padding amounts for files that have lines chosen by fseek to random spot,
-   advancing to the next line, and using that line; makedefs forces shorter
-   lines to be padded to these lengths; value of 0 will inhibit any padding,
-   avoiding an increase in files' sizes, but resulting in biased selection;
-   used by makedefs while building and by core's callers of get_rnd_text() */
-#define MD_PAD_RUMORS 60u /* for RUMORFILE, EPITAPHFILE, and ENGRAVEFILE */
-#define MD_PAD_BOGONS 20u /* for BOGUSMONFILE */
 
 /* Assorted definitions that may depend on selections in config.h. */
 

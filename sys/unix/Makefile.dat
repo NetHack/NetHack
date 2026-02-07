@@ -9,7 +9,8 @@ NHSROOT=..
 # SHELL=E:/GEMINI2/MUPFEL.TTP
 # UUDECODE=uudecode
 
-VARDAT = bogusmon data engrave epitaph rumors oracles
+VARDAT = bogusmon bogusmon.idx data engrave engrave.idx epitaph epitaph.idx \
+   rumors_t rumors_t.idx rumors_f rumors_f.idx oracles
 
 all:	$(VARDAT) spec_levs quest_levs
 
@@ -97,19 +98,19 @@ GEM_RSC.RSC:
 data:	data.base ../util/makedefs
 	../util/makedefs -d
 
-rumors:	rumors.tru rumors.fal ../util/makedefs
+rumors_t rumors_t.idx rumors_f rumors_f.idx:	rumors_t.txt rumors_f.txt ../util/makedefs
 	../util/makedefs -r
 
 oracles:	oracles.txt ../util/makedefs
 	../util/makedefs -h
 
-engrave:	engrave.txt ../util/makedefs
+engrave engrave.idx:	engrave.txt ../util/makedefs
 	../util/makedefs -2
 
-epitaph:	epitaph.txt ../util/makedefs
+epitaph epitaph.idx:	epitaph.txt ../util/makedefs
 	../util/makedefs -1
 
-bogusmon:	bogusmon.txt ../util/makedefs
+bogusmon bogusmon.idx:	bogusmon.txt ../util/makedefs
 	../util/makedefs -3
 
 options:	../util/makedefs

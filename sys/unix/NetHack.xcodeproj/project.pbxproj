@@ -1178,9 +1178,9 @@
 				317E7C4B21A35F0500F6E4E5 /* Copy makedefs */,
 				059660C02C80B07100398EDE /* Codesign makedefs */,
 				319CBA3821A3458100150830 /* Build data */,
-				317E7C4521A3548F00F6E4E5 /* Build rumors */,
+				317E7C4521A3548F00F6E4E5 /* Build rumors and index */,
 				317E7C4E21A3697300F6E4E5 /* Build options */,
-				317E7C4F21A36A5700F6E4E5 /* Build engrave, epitaph and bogusmon */,
+				317E7C4F21A36A5700F6E4E5 /* Build engrave, epitaph, bogusmon, and their indices */,
 				3192867F21A3AF8000325BEB /* Build oracles */,
 			);
 			buildRules = (
@@ -1419,7 +1419,7 @@
 			shellPath = /bin/sh;
 			shellScript = "codesign --force --deep -s - \"${NH_UTIL_DIR}\"/recover\n";
 		};
-		317E7C4521A3548F00F6E4E5 /* Build rumors */ = {
+		317E7C4521A3548F00F6E4E5 /* Build rumors and index*/ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1427,15 +1427,18 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(NH_DAT_DIR)/rumors.tru",
-				"$(NH_DAT_DIR)/rumors.fal",
+				"$(NH_DAT_DIR)/rumors_t.txt",
+				"$(NH_DAT_DIR)/rumors_f.txt
 				"$(NH_UTIL_DIR)/makedefs",
 			);
 			name = "Build rumors";
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(NH_DAT_DIR)/rumors",
+				"$(NH_DAT_DIR)/rumors_t",
+				"$(NH_DAT_DIR)/rumors_t.idx",
+				"$(NH_DAT_DIR)/rumors_f",
+				"$(NH_DAT_DIR)/rumors_f.idx",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1481,7 +1484,7 @@
 			shellPath = /bin/sh;
 			shellScript = "cd \"${NH_DAT_DIR}\"\n\"${NH_UTIL_DIR}\"/makedefs -v\n";
 		};
-		317E7C4F21A36A5700F6E4E5 /* Build engrave, epitaph and bogusmon */ = {
+		317E7C4F21A36A5700F6E4E5 /* Build engrave, epitaph, bogusmon, and their indices */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1493,13 +1496,16 @@
 				"$(NH_DAT_DIR)/epitaph.txt",
 				"$(NH_DAT_DIR)/bogusmon.txt",
 			);
-			name = "Build engrave, epitaph and bogusmon";
+			name = "Build engrave, epitaph, bogusmon, and their indices";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 				"$(NH_DAT_DIR)/engrave",
+				"$(NH_DAT_DIR)/engrave.idx",
 				"$(NH_DAT_DIR)/epitaph",
+				"$(NH_DAT_DIR)/epitaph.idx",
 				"$(NH_DAT_DIR)/bogusmon",
+				"$(NH_DAT_DIR)/bogusmon.idx",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1537,10 +1543,13 @@
 			);
 			inputPaths = (
 				"$(NH_DAT_DIR)/bogusmon",
+				"$(NH_DAT_DIR)/bogusmon.idx",
 				"$(NH_DAT_DIR)/cmdhelp",
 				"$(NH_DAT_DIR)/data",
 				"$(NH_DAT_DIR)/engrave",
+				"$(NH_DAT_DIR)/engrave.idx",
 				"$(NH_DAT_DIR)/epitaph",
+				"$(NH_DAT_DIR)/epitaph.idx",
 				"$(NH_DAT_DIR)/help",
 				"$(NH_DAT_DIR)/hh",
 				"$(NH_DAT_DIR)/history",
@@ -1549,7 +1558,10 @@
 				"$(NH_DAT_DIR)/optmenu",
 				"$(NH_DAT_DIR)/options",
 				"$(NH_DAT_DIR)/oracles",
-				"$(NH_DAT_DIR)/rumors",
+				"$(NH_DAT_DIR)/rumors_t",
+				"$(NH_DAT_DIR)/rumors_t.idx",
+				"$(NH_DAT_DIR)/rumors_f",
+				"$(NH_DAT_DIR)/rumors_f.idx",
 				"$(NH_DAT_DIR)/tribute",
 				"$(NH_DAT_DIR)/wizhelp",
 				"$(NH_DAT_DIR)/air.lua",
@@ -1692,7 +1704,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"${NH_DAT_DIR}\"\n\"${NH_UTIL_DIR}\"/dlb cf nhdat help hh cmdhelp keyhelp history opthelp optmenu wizhelp dungeon.lua tribute asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua juiblex.lua knox.lua medusa-?.lua minend-?.lua minefill.lua minetn-?.lua oracle.lua orcus.lua sanctum.lua soko?-?.lua tower?.lua tut-?.lua valley.lua wizard?.lua nhcore.lua nhlib.lua themerms.lua hellfill.lua astral.lua air.lua earth.lua fire.lua water.lua ???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua bogusmon data engrave epitaph oracles options quest.lua rumors\n";
+			shellScript = "cd \"${NH_DAT_DIR}\"\n\"${NH_UTIL_DIR}\"/dlb cf nhdat help hh cmdhelp keyhelp history opthelp optmenu wizhelp dungeon.lua tribute asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua juiblex.lua knox.lua medusa-?.lua minend-?.lua minefill.lua minetn-?.lua oracle.lua orcus.lua sanctum.lua soko?-?.lua tower?.lua tut-?.lua valley.lua wizard?.lua nhcore.lua nhlib.lua themerms.lua hellfill.lua astral.lua air.lua earth.lua fire.lua water.lua ???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua bogusmon bogusmon.idx data engrave engrave.idx epitaph epitaph.idx oracles options quest.lua rumors_t rumors_t.idx rumors_f rumors_f.idx\n";
 		};
 		3192867021A39F6A00325BEB /* Install */ = {
 			isa = PBXShellScriptBuildPhase;

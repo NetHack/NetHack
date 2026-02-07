@@ -6,6 +6,16 @@
 #include "hack.h"
 #include "dlb.h"
 
+/*      3.7
+ * The files rumors, engrave, epitaph, and bogusmon now include an
+ * index file (*.idx) with 16 byte records, one per valid line in the
+ * file.  Access now consists of randomly seeking the INDEX file,
+ * reading the record there, and then reading the real entry.  This
+ * once and for all fixes "bias based on length" and removes the need
+ * for padding short entries.  Additionally, we've split rumors into
+ * two files, rumorst and rumorsf, for ease of access.
+ */
+
 /*      [Note:  this comment is fairly old, but still accurate for 3.1;
  *       it's no longer accurate for 3.7 but may still be of interest.]
  * Rumors have been entirely rewritten to speed up the access.  This is
@@ -42,10 +52,7 @@
  */
 
 #ifndef SFCTOOL
-staticfn void unpadline(char *);
 staticfn void init_rumors(dlb *);
-staticfn char *get_rnd_line(dlb *, char *, unsigned, int (*)(int),
-                          long, long, unsigned);
 staticfn void init_oracles(dlb *);
 staticfn void others_check(const char *ftype, const char *, winid *);
 staticfn void couldnt_open_file(const char *);
@@ -60,24 +67,6 @@ static const char **CapMons = 0;
 /* list of bogusmons prefixes used to indicate special monster type such as
    unique or always a particular gender; see dat/bogusmon.txt */
 extern const char bogon_codes[]; /* from do_name.c */
-
-/* makedefs pads short rumors, epitaphs, engravings, and hallucinatory
-   monster names with trailing underscores; strip those off */
-staticfn void
-unpadline(char *line)
-{
-    char *p = eos(line);
-
-    /* remove newline if still present; caller should have stripped it */
-    if (p > line && p[-1] == '\n')
-        --p;
-
-    /* remove padding */
-    while (p > line && p[-1] == '_')
-        --p;
-
-    *p = '\0';
-}
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
@@ -119,64 +108,37 @@ getrumor(
     char *rumor_buf,
     boolean exclude_cookie)
 {
-    dlb *rumors;
-    long beginning, ending;
-    char line[BUFSZ];
     static const char *cookie_marker = "[cookie] ";
     const int marklen = strlen(cookie_marker);
+    int count = 0;
+    int adjtruth;
 
-    rumor_buf[0] = '\0';
-    if (gt.true_rumor_size < 0L) /* a previous try failed to open RUMORFILE */
-        return rumor_buf;
+    *rumor_buf = 0;
 
-    rumors = dlb_fopen(RUMORFILE, "r");
-    if (rumors) {
-        int count = 0;
-        int adjtruth;
+    do {
+        switch(adjtruth = truth + rn2(2)) {
+        case 2:
+        case 1:
+            /* find a true rumor */
+            get_rnd_text(RUMORSTFILE, rumor_buf, rn2);
+            break;
+        case 0:
+        case -1:
+            /* find a false rumor */
+            get_rnd_text(RUMORSFFILE, rumor_buf, rn2);
+            break;
+        default:
+            impossible("strange truth value for rumor");
+            return strcpy(rumor_buf, "Oops...");
+        }
+        count++;
+    } while (count < 50 && exclude_cookie && !strncmp(rumor_buf, cookie_marker, marklen));
 
-        do {
-            rumor_buf[0] = '\0';
-            if (gt.true_rumor_size == 0L) { /* if this is 1st outrumor() */
-                init_rumors(rumors);
-                if (gt.true_rumor_size < 0L) { /* init failed */
-                    Sprintf(rumor_buf, "Error reading \"%.80s\".", RUMORFILE);
-                    return rumor_buf;
-                }
-            }
-            /*
-             *  input:      1    0   -1
-             *   rn2 \ +1  2=T  1=T  0=F
-             *   adj./ +0  1=T  0=F -1=F
-             */
-            switch (adjtruth = truth + rn2(2)) {
-            case 2: /*(might let a bogus input arg sneak thru)*/
-            case 1:
-                beginning = (long) gt.true_rumor_start;
-                ending = gt.true_rumor_end;
-                break;
-            case 0: /* once here, 0 => false rather than "either"*/
-            case -1:
-                beginning = (long) gf.false_rumor_start;
-                ending = gf.false_rumor_end;
-                break;
-            default:
-                impossible("strange truth value for rumor");
-                return strcpy(rumor_buf, "Oops...");
-            }
-            Strcpy(rumor_buf,
-                   get_rnd_line(rumors, line, (unsigned) sizeof line, rn2,
-                                beginning, ending, MD_PAD_RUMORS));
-        } while (count++ < 50 && exclude_cookie
-                 && !strncmp(rumor_buf, cookie_marker, marklen));
-        (void) dlb_fclose(rumors);
-        if (count >= 50)
-            impossible("Can't find non-cookie rumor?");
-        else if (!gi.in_mklev) /* avoid exercising wisdom for graffiti */
-            exercise(A_WIS, (adjtruth > 0));
-    } else {
-        couldnt_open_file(RUMORFILE);
-        gt.true_rumor_size = -1; /* don't try to open it again */
-    }
+    if (count >= 50)
+        impossible("Can't find non-cookie rumor?");
+    else if (!gi.in_mklev) /* avoid exercising wisdom for graffiti */
+        exercise(A_WIS, (adjtruth > 0));
+
     if (!exclude_cookie
         && !strncmp(rumor_buf, cookie_marker, marklen)) {
         /* remove cookie_marker from the string */
@@ -190,107 +152,17 @@ getrumor(
     return rumor_buf;
 }
 
-/* test that the true/false rumor boundaries are valid and show the first
-   two and very last epitaphs, engravings, and bogus monsters */
+/* show the first two and very last rumors, epitaphs, engravings, and bogus monsters */
 void
 rumor_check(void)
 {
-    dlb *rumors;
     winid tmpwin = WIN_ERR;
-    char *endp, line[BUFSZ], xbuf[BUFSZ], rumor_buf[BUFSZ];
-
-    rumors = (gt.true_rumor_size >= 0) ? dlb_fopen(RUMORFILE, "r") : 0;
-    if (rumors) {
-        long ftell_rumor_start = 0L;
-
-        rumor_buf[0] = '\0';
-        if (gt.true_rumor_size == 0L) { /* if this is 1st outrumor() */
-            init_rumors(rumors);
-            if (gt.true_rumor_size < 0L) {
-                rumors = (dlb *) 0; /* init_rumors() closes it upon failure */
-                goto no_rumors; /* init failed */
-            }
-        }
-        tmpwin = create_nhwindow(NHW_TEXT);
-
-        /*
-         * reveal the values.
-         */
-        Sprintf(rumor_buf,
-               "T start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
-            (long) gt.true_rumor_start, gt.true_rumor_start,
-            gt.true_rumor_end, (unsigned long) gt.true_rumor_end,
-            gt.true_rumor_size,(unsigned long) gt.true_rumor_size);
-        putstr(tmpwin, 0, rumor_buf);
-        Sprintf(rumor_buf,
-               "F start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
-            (long) gf.false_rumor_start, gf.false_rumor_start,
-            gf.false_rumor_end, (unsigned long) gf.false_rumor_end,
-            gf.false_rumor_size, (unsigned long) gf.false_rumor_size);
-        putstr(tmpwin, 0, rumor_buf);
-
-        /*
-         * check the first rumor (start of true rumors) by
-         * skipping the first two lines.
-         *
-         * Then seek to the start of the false rumors (based on
-         * the value read in rumors, and display it.
-         */
-        rumor_buf[0] = '\0';
-        (void) dlb_fseek(rumors, (long) gt.true_rumor_start, SEEK_SET);
-        ftell_rumor_start = dlb_ftell(rumors);
-        (void) dlb_fgets(line, sizeof line, rumors);
-        if ((endp = strchr(line, '\n')) != 0)
-            *endp = 0;
-        Sprintf(rumor_buf, "T %06ld %s", ftell_rumor_start,
-                xcrypt(line, xbuf));
-        putstr(tmpwin, 0, rumor_buf);
-        /* find last true rumor */
-        while (dlb_fgets(line, sizeof line, rumors)
-               && dlb_ftell(rumors) < gt.true_rumor_end)
-            continue;
-        if ((endp = strchr(line, '\n')) != 0)
-            *endp = 0;
-        Sprintf(rumor_buf, "  %6s %s", "", xcrypt(line, xbuf));
-        putstr(tmpwin, 0, rumor_buf);
-
-        rumor_buf[0] = '\0';
-        (void) dlb_fseek(rumors, (long) gf.false_rumor_start, SEEK_SET);
-        ftell_rumor_start = dlb_ftell(rumors);
-        (void) dlb_fgets(line, sizeof line, rumors);
-        if ((endp = strchr(line, '\n')) != 0)
-            *endp = 0;
-        Sprintf(rumor_buf, "F %06ld %s", ftell_rumor_start,
-                xcrypt(line, xbuf));
-        putstr(tmpwin, 0, rumor_buf);
-        /* find last false rumor */
-        while (dlb_fgets(line, sizeof line, rumors)
-               && dlb_ftell(rumors) < gf.false_rumor_end)
-            continue;
-        if ((endp = strchr(line, '\n')) != 0)
-            *endp = 0;
-        Sprintf(rumor_buf, "  %6s %s", "", xcrypt(line, xbuf));
-        putstr(tmpwin, 0, rumor_buf);
-
-        (void) dlb_fclose(rumors);
-
-    /* if a previous attempt couldn't open file or rejected its contents,
-       we didn't bother trying again this time */
-    } else if (gt.true_rumor_size < 0L) {
- no_rumors: /* file could be opened but init_rumors() didn't like it */
-        pline("rumors not accessible.");
-        /* engravings, epitaphs, and bogus monsters will still be shown,
-           and in tmpwin rather than via additional pline() calls */
-        display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
-
-    /* first attempt to open file has just failed */
-    } else {
-        couldnt_open_file(RUMORFILE);
-        gt.true_rumor_size = -1; /* don't try to open it again */
-    }
+    tmpwin = create_nhwindow(NHW_TEXT);
 
     /* initial implementation of default epitaph/engraving/bogusmon
        contained an error; check those along with rumors */
+    others_check("Tru Rumors:", RUMORSTFILE, &tmpwin);
+    others_check("Fal Rumors:", RUMORSFFILE, &tmpwin);
     others_check("Engravings:", ENGRAVEFILE, &tmpwin);
     others_check("Epitaphs:", EPITAPHFILE, &tmpwin);
     others_check("Bogus monsters:", BOGUSMONFILE, &tmpwin);
@@ -409,119 +281,43 @@ others_check(
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
-/* load one randomly chosen line from a section of a file; undoes
-   decryption and strips trailing underscore padding and final newline;
-   if padlength is non-zero, every line is expected to be at least that
-   long and every line in the file will have an equal chance of being
-   chosen; however, if padlength is 0, lines following long lines are
-   more likely than average to be picked, and lines after short lines
-   are less likely */
-staticfn char *
-get_rnd_line(
-    dlb *fh,            /* already opened file */
-    char *buf,          /* output buffer */
-    unsigned bufsiz,    /* (unsigned) sizeof buf */
-    int (*rng)(int),    /* random number routine; rn2(N) or similar, 0..N-1 */
-    long startpos,      /* location in file of first line of interest */
-    long endpos,        /* location one byte past last line of interest;
-                         * if 0, end-of-file will be used */
-    unsigned padlength) /* expected line length; 0 if no expectations */
-{
-    char *newl, *xbufp, xbuf[BUFSZ];
-    long filechunksize, chunkoffset;
-    int trylimit;
-
-    *buf = '\0';
-    if (!endpos) {
-        (void) dlb_fseek(fh, 0L, SEEK_END);
-        endpos = dlb_ftell(fh);
-    }
-    filechunksize = endpos - startpos;
-
-    /* might be zero (only if file is empty); should complain in that
-       case but it could happen over and over, also the suggestion
-       that save and restore might fix the problem wouldn't be useful */
-    if (filechunksize < 1L)
-        return buf;
-    /* 'rumors' is about 3/4 of the way to the limit on a 16-bit config
-       for the whole, roughly 3/8 of the way for either half; all active
-       configurations these days are at least 32-bits anyway */
-    nhassert(filechunksize <= INT_MAX); /* essential for rn2() */
-
-    /*
-     * Position randomly which will probably be in the middle of a line.
-     * (Occasionally by chance it will happen to be at the very start of
-     * a line, but we'll have no way of knowing that so have to behave
-     * as if it were positioned in the middle.)
-     * Read the rest of that line, then use the next one.  If there's no
-     * next line (ie, end of file), go back to beginning and use first.
-     *
-     * When short lines have been padded to length N, only accept long
-     * lines if we land within last N+1 characters (+1 is for newline
-     * which hasn't been stripped away yet), effectively shortening
-     * them to normal length.  That yields even selection distribution.
-     */
-    for (trylimit = 10; trylimit > 0; --trylimit) {
-        chunkoffset = (long) (*rng)((int) filechunksize);
-        (void) dlb_fseek(fh, startpos + chunkoffset, SEEK_SET);
-        (void) dlb_fgets(buf, bufsiz, fh);
-        /* if padlength is 0, accept any position; when non-zero,
-           padlength does not count the newline but strlen(buf) does */
-        if (!padlength || (unsigned) strlen(buf) <= padlength + 1)
-            break;
-    }
-    /* use next line; for rumors, caller takes care of whether startpos
-       and endpos cover just true rumors or just false rumors; reaching
-       endpos is equivalent to end-of-file in order to avoid using the
-       first false rumor if fseek for a true one lands within the last one */
-    if (dlb_ftell(fh) >= endpos || !dlb_fgets(buf, bufsiz, fh)) {
-        /* assume failure is due to end-of-file; go back to start */
-        (void) dlb_fseek(fh, startpos, SEEK_SET);
-        (void) dlb_fgets(buf, bufsiz, fh);
-    }
-    if ((newl = strchr(buf, '\n')) != 0)
-        *newl = '\0';
-    /* decrypt line; make sure that our intermediate buffer is big enough */
-    xbufp = (strlen(buf) <= sizeof xbuf - 1) ? &xbuf[0]
-            : (char *) alloc((unsigned) strlen(buf) + 1);
-    Strcpy(buf, xcrypt(buf, xbufp));
-    if (xbufp != &xbuf[0])
-        free((genericptr_t) xbufp);
-    /* strip padding that makedefs adds to short lines */
-    if (padlength)
-        unpadline(buf);
-    return buf;
-}
-
 /* Gets a random line of text from file 'fname', and returns it.
    rng is the random number generator to use, and should act like rn2 does. */
 char *
 get_rnd_text(
     const char *fname,
     char *buf,
-    int (*rng)(int),
-    unsigned padlength)
+    int (*rng)(int))
 {
-    dlb *fh = dlb_fopen(fname, "r");
+    char tmp[BUFSZ] = { 0 };
 
     buf[0] = '\0';
+
+    sprintf(tmp, "%s.idx", fname);
+
+    dlb *fh = dlb_fopen(tmp, "r");
     if (fh) {
-        long starttxt = 0L;
-        char line[BUFSZ];
+        dlb_fseek(fh, 0, SEEK_END);
+        unsigned long size = dlb_ftell(fh);
+        dlb_fseek(fh, rng(size / 16) * 16, SEEK_SET);
+        (void) dlb_fgets(tmp, sizeof tmp, fh);
+        dlb_fclose(fh);
 
-        /* skip "don't edit" comment */
-        (void) dlb_fgets(line, sizeof line, fh);
-        /* obtain current file position */
-        (void) dlb_fseek(fh, 0L, SEEK_CUR);
-        starttxt = dlb_ftell(fh);
-
-        /* get a randomly chosen line; it comes back decrypted and unpadded */
-        Strcpy(buf, get_rnd_line(fh, line, (unsigned) sizeof line, rng,
-                                 starttxt, 0L, padlength));
-        (void) dlb_fclose(fh);
+        fh = dlb_fopen(fname, "r");
+        if (fh) {
+            dlb_fseek(fh, atoi(tmp), SEEK_SET);
+            (void) dlb_fgets(tmp, sizeof tmp, fh);
+            dlb_fclose(fh);
+        } else {
+            couldnt_open_file(fname);
+        }
     } else {
-        couldnt_open_file(fname);
+        couldnt_open_file(tmp);
     }
+
+    (void) strip_newline(tmp);
+    (void) xcrypt(tmp, buf);
+
     return buf;
 }
 
@@ -880,7 +676,6 @@ init_CapMons(void)
                 if ((endp = strchr(hline, '\n')) != 0)
                     *endp = '\0'; /* strip newline */
                 (void) xcrypt(hline, xbuf);
-                unpadline(xbuf);
 
                 if (!xbuf[0] || !strchr(bogon_codes, xbuf[0]))
                     code = '\0', startp = &xbuf[0]; /* ordinary */
