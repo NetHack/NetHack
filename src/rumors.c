@@ -13,7 +13,7 @@
  * reading the record there, and then reading the real entry.  This
  * once and for all fixes "bias based on length" and removes the need
  * for padding short entries.  Additionally, we've split rumors into
- * two files, rumorst and rumorsf, for ease of access.
+ * two files, rumors_t and rumors_f, for ease of access.
  */
 
 /*      [Note:  this comment is fairly old, but still accurate for 3.1;
