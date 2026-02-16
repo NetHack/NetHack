@@ -1432,20 +1432,20 @@ do_date()
         Fprintf(ofp, "#define BUILD_TIME (%lu%s)\n",
                 (unsigned long) clocktim, ul_sfx);
     Fprintf(ofp, "\n");
-    Fprintf(ofp, "#define VERSION_NUMBER 0x%08lx%s\n", version.incarnation,
-            ul_sfx);
-    Fprintf(ofp, "#define VERSION_FEATURES 0x%08lx%s\n", version.feature_set,
-            ul_sfx);
+    Fprintf(ofp, "#define VERSION_NUMBER 0x%08lx%s\n",
+            (unsigned long) version.incarnation, ul_sfx);
+    Fprintf(ofp, "#define VERSION_FEATURES 0x%08lx%s\n",
+            (unsigned long) version.feature_set, ul_sfx);
 #ifdef IGNORED_FEATURES
     Fprintf(ofp, "#define IGNORED_FEATURES 0x%08lx%s\n",
             (unsigned long) IGNORED_FEATURES, ul_sfx);
 #endif
-    Fprintf(ofp, "#define VERSION_SANITY1 0x%08lx%s\n", version.entity_count,
-            ul_sfx);
-    Fprintf(ofp, "#define VERSION_SANITY2 0x%08lx%s\n", version.struct_sizes1,
-            ul_sfx);
-    Fprintf(ofp, "#define VERSION_SANITY3 0x%08lx%s\n", version.struct_sizes2,
-            ul_sfx);
+    Fprintf(ofp, "#define VERSION_SANITY1 0x%08lx%s\n",
+            (unsigned long) version.entity_count, ul_sfx);
+    Fprintf(ofp, "#define VERSION_SANITY2 0x%08lx%s\n",
+            (unsigned long) version.struct_sizes1, ul_sfx);
+    Fprintf(ofp, "#define VERSION_SANITY3 0x%08lx%s\n",
+            (unsigned long) version.struct_sizes2, ul_sfx);
     Fprintf(ofp, "\n");
     Fprintf(ofp, "#define VERSION_STRING \"%s\"\n", version_string(buf, "."));
     Fprintf(ofp, "#define VERSION_ID \\\n \"%s\"\n",
@@ -1801,6 +1801,9 @@ static struct win_info window_opts[] = {
 #endif
 #ifdef BEOS_GRAPHICS /* unmaintained/defunct */
     { "BeOS", "BeOS InterfaceKit" },
+#endif
+#ifdef SHIM_GRAPHICS
+    { "shim", "shim callback graphics" },
 #endif
     { 0, 0 }
 };
@@ -2655,7 +2658,7 @@ adjust_qt_hdrs()
 {
     int i, j;
     long count = 0L, hdr_offset = sizeof(int)
-                                  + (sizeof(char) * LEN_HDR + sizeof(long))
+                                  + (sizeof(char) * LEN_HDR + sizeof(nhdata_long))
                                         * qt_hdr.n_hdr;
 
     for (i = 0; i < qt_hdr.n_hdr; i++) {
@@ -2685,7 +2688,7 @@ put_qt_hdrs()
     (void) fwrite((genericptr_t) & (qt_hdr.n_hdr), sizeof(int), 1, ofp);
     (void) fwrite((genericptr_t) & (qt_hdr.id[0][0]), sizeof(char) * LEN_HDR,
                   qt_hdr.n_hdr, ofp);
-    (void) fwrite((genericptr_t) & (qt_hdr.offset[0]), sizeof(long),
+    (void) fwrite((genericptr_t) & (qt_hdr.offset[0]), sizeof(nhdata_long),
                   qt_hdr.n_hdr, ofp);
     if (debug) {
         for (i = 0; i < qt_hdr.n_hdr; i++)

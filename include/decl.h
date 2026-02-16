@@ -414,7 +414,7 @@ struct opvar {
     xchar spovartyp; /* one of SPOVAR_foo */
     union {
         char *str;
-        long l;
+        nhdata_long l;
     } vardata;
 };
 

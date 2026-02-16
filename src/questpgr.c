@@ -20,7 +20,7 @@ extern char *lev_message;
 
 static void NDECL(dump_qtlist);
 static void FDECL(Fread, (genericptr_t, int, int, dlb *));
-STATIC_DCL struct qtmsg *FDECL(construct_qtlist, (long));
+STATIC_DCL struct qtmsg *FDECL(construct_qtlist, (nhdata_long));
 STATIC_DCL const char *NDECL(intermed);
 STATIC_DCL struct obj *FDECL(find_qarti, (struct obj *));
 STATIC_DCL const char *NDECL(neminame);
@@ -76,7 +76,7 @@ dlb *stream;
 
 STATIC_OVL struct qtmsg *
 construct_qtlist(hdr_offset)
-long hdr_offset;
+nhdata_long hdr_offset;
 {
     struct qtmsg *msg_list;
     int n_msgs;
@@ -101,7 +101,7 @@ load_qtlist()
 {
     int n_classes, i;
     char qt_classes[N_HDR][LEN_HDR];
-    long qt_offsets[N_HDR];
+    nhdata_long qt_offsets[N_HDR];
 
     msg_file = dlb_fopen(QTEXT_FILE, RDBMODE);
     if (!msg_file)
@@ -114,7 +114,7 @@ load_qtlist()
 
     Fread(&n_classes, sizeof (int), 1, msg_file);
     Fread(&qt_classes[0][0], sizeof (char) * LEN_HDR, n_classes, msg_file);
-    Fread(qt_offsets, sizeof (long), n_classes, msg_file);
+    Fread(qt_offsets, sizeof (nhdata_long), n_classes, msg_file);
 
     /*
      * Now construct the message lists for quick reference later

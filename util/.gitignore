@@ -27,3 +27,7 @@ heaputil.c
 #address san
 *.exp
 *.lib
+
+# WASM build artifacts
+makedefs-nomail
+makedefs.wasm

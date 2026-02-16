@@ -1,0 +1,83 @@
+#
+# NetHack 3.6  linux-wasm
+# Copyright (c) Adam Powers, 2020.
+# NetHack may be freely redistributed.  See license for details.
+#
+#-PRE
+# WASM cross-compilation hints file for NetHack 3.6
+# Builds nethack.js + nethack.wasm using Emscripten (emcc).
+#
+# Single hints file for the entire build. Native utilities are built
+# with CC=cc overrides; the game is built with CC=emcc (the default).
+# This ensures makedefs sees the same -D flags as the game, preventing
+# index mismatches in generated headers (onames.h, pm.h).
+# See build-wasm.sh for the full build process.
+
+HACKDIR=/
+
+CC=emcc
+AR=emar
+LINK=emcc
+
+CFLAGS=-O3 -I../include -DNOTPARMDECL
+CFLAGS+=-Wall
+CFLAGS+=-DDLB
+CFLAGS+=-DNO_SIGNAL
+CFLAGS+=-DNOMAIL
+CFLAGS+=-DSYSCF -DSYSCF_FILE=\"/sysconf\" -DSECURE
+CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
+CFLAGS+=-DDEFAULT_WINDOW_SYS=\"shim\"
+CFLAGS+=-DNOTTYGRAPHICS -DSHIM_GRAPHICS
+CFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
+CFLAGS+=-DCROSS_TO_WASM
+CFLAGS+=-DSCORE_ON_BOTL
+
+LFLAGS=-s WASM=1
+LFLAGS+=-s ALLOW_TABLE_GROWTH
+LFLAGS+=-s ASYNCIFY -s ASYNCIFY_IMPORTS='["local_callback"]'
+LFLAGS+=-O3
+LFLAGS+=-s MODULARIZE
+LFLAGS+=-s EXPORTED_FUNCTIONS='["_main", "_shim_graphics_set_callback", "_malloc", "_free", "_mapglyph"]'
+LFLAGS+=-s EXPORTED_RUNTIME_METHODS='["cwrap", "ccall", "addFunction", "removeFunction", "UTF8ToString", "stringToUTF8", "getValue", "setValue", "ENV", "FS", "IDBFS"]'
+LFLAGS+=-s ERROR_ON_UNDEFINED_SYMBOLS=0
+# ^^^ Required: EM_JS functions (js_helpers_init, create_global, local_callback) are
+# resolved during JS generation, not at wasm-ld link time. Emscripten 3.1.x treats
+# them as undefined symbols without this flag.
+LFLAGS+=-s EXPORT_ES6=1
+LFLAGS+=-lidbfs.js
+LFLAGS+=--embed-file ../wasm-data@/
+
+WINSRC = ../win/shim/winshim.c
+WINOBJ = winshim.o
+WINLIB =
+
+CHOWN=true
+CHGRP=true
+
+VARDIRPERM = 0755
+VARFILEPERM = 0600
+GAMEPERM = 0755
+
+#-POST
+# Override GAME to produce .js output (emcc uses extension to determine format)
+GAME = nethack.js
+
+# Override SYSSRC and SYSOBJ to use libnhmain.c instead of unixmain.c
+SYSSRC = ../sys/libnh/libnhmain.c \
+	../sys/share/ioctl.c ../sys/share/unixtty.c \
+	../sys/unix/unixunix.c ../sys/unix/unixres.c
+SYSOBJ = libnhmain.o ioctl.o unixtty.o unixunix.o unixres.o
+
+# NOTE: No-op rules for preventing utility rebuilds are NOT included here
+# because the #-POST section is appended to ALL Makefiles (src, util, dat, top).
+# The build script (build-wasm.sh) appends them only to src/Makefile, where
+# they prevent the game build from trying to rebuild utilities with emcc.
+
+# Compile rules for source files in non-standard locations.
+Sysunix: libnhmain.o winshim.o
+
+libnhmain.o: ../sys/libnh/libnhmain.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+winshim.o: ../win/shim/winshim.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o $@ $<

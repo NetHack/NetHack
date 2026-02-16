@@ -292,18 +292,37 @@ extern char *FDECL(dupstr, (const char *)); /* ditto */
 
 /* Used for consistency checks of various data files; declare it here so
    that utility programs which include config.h but not hack.h can see it. */
+/*
+ * WASM cross-compilation: binary data files (dungeon, levels, quest text)
+ * are written by native utilities and read by the WASM game. On LP64 hosts
+ * (Linux/macOS x86_64), long/unsigned long is 8 bytes, but on WASM it is
+ * 4 bytes -- causing struct layout mismatches in the binary format.
+ *
+ * These typedefs use int/unsigned int (4 bytes on all NetHack platforms)
+ * when CROSS_TO_WASM is defined, ensuring consistent binary format between
+ * native utilities (CC=cc) and the WASM game (CC=emcc). CROSS_TO_WASM is
+ * set in CFLAGS so both sides see it. On non-WASM builds these are
+ * long/unsigned long, preserving original behavior.
+ */
+#ifdef CROSS_TO_WASM
+typedef int nhdata_long;
+typedef unsigned int version_uint;
+#else
+typedef long nhdata_long;
+typedef unsigned long version_uint;
+#endif
 struct version_info {
-    unsigned long incarnation;   /* actual version number */
-    unsigned long feature_set;   /* bitmask of config settings */
-    unsigned long entity_count;  /* # of monsters and objects */
-    unsigned long struct_sizes1; /* size of key structs */
-    unsigned long struct_sizes2; /* size of more key structs */
+    version_uint incarnation;   /* actual version number */
+    version_uint feature_set;   /* bitmask of config settings */
+    version_uint entity_count;  /* # of monsters and objects */
+    version_uint struct_sizes1; /* size of key structs */
+    version_uint struct_sizes2; /* size of more key structs */
 };
 
 struct savefile_info {
-    unsigned long sfi1; /* compression etc. */
-    unsigned long sfi2; /* miscellaneous */
-    unsigned long sfi3; /* thirdparty */
+    version_uint sfi1; /* compression etc. */
+    version_uint sfi2; /* miscellaneous */
+    version_uint sfi3; /* thirdparty */
 };
 #ifdef NHSTDC
 #define SFI1_EXTERNALCOMP (1UL)

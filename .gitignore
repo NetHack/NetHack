@@ -56,3 +56,5 @@ Makefile.gcc-orig
 # Win32-specific ignores end
 .DS_Store
 
+# WASM build artifacts
+wasm-data/

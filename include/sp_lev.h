@@ -444,7 +444,7 @@ typedef struct {
 
 typedef struct {
     _opcode *opcodes;
-    long n_opcodes;
+    nhdata_long n_opcodes;
 } sp_lev;
 
 typedef struct {

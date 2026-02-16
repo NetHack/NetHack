@@ -15,3 +15,8 @@ nhdat*
 #address san
 *.exp
 *.lib
+
+# WASM build artifacts
+nethack.js
+nethack.wasm
+test-objects-layout.c
