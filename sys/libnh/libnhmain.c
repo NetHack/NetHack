@@ -646,6 +646,20 @@ sys_random_seed(void)
 
 
 #ifdef __EMSCRIPTEN__
+
+#ifdef USE_TILES
+extern short glyph2tile[];
+
+int
+glyph_to_tile(glyph)
+int glyph;
+{
+    if (glyph < 0 || glyph >= MAX_GLYPH)
+        return -1;
+    return (int)glyph2tile[glyph];
+}
+#endif /* USE_TILES */
+
 /***
  * Helpers
  ***/
@@ -656,6 +670,7 @@ EM_JS(void, js_helpers_init, (), {
     installHelper(getPointerValue, "getPointerValue");
     installHelper(setPointerValue, "setPointerValue");
     installHelper(mapglyphHelper, "mapglyphHelper");
+    installHelper(tileIndexForGlyph, "tileIndexForGlyph");
 
     function mapglyphHelper(glyph, x, y, mgflags) {
         let ochar = _malloc(4);
@@ -668,7 +683,11 @@ EM_JS(void, js_helpers_init, (), {
         _free(ochar);
         _free(ocolor);
         _free(ospecial);
-        return { glyph, ch, color, special, x, y, mgflags };
+        return { glyph, ch, color, special, tileIdx: _glyph_to_tile(glyph), x, y, mgflags };
+    }
+
+    function tileIndexForGlyph(glyph) {
+        return _glyph_to_tile(glyph);
     }
 
     // convert 'ptr' to the type indicated by 'type'

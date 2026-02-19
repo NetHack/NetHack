@@ -123,6 +123,7 @@ The `Module` object provides Emscripten runtime methods:
 |----------|-------------|
 | `_main(argc, argv)` | Start the game. Call with `(0, 0)` for defaults. |
 | `shim_graphics_set_callback(name)` | Register a callback by name. Must be called before `_main`. |
+| `_glyph_to_tile(glyph)` | Return the tile index for a glyph. See [Tile System](#tile-system). |
 | `_malloc(size)` | Allocate WASM heap memory (for advanced use). |
 
 ### Pointer Helpers
@@ -284,6 +285,71 @@ Common cmap symbols (glyph = symbol index + 2359):
 | `S_dnstair` | 24 | `>` | Downstairs |
 | `S_fountain` | 31 | `{` | Fountain |
 
+### Tile System
+
+When rendering with graphical tiles instead of ASCII, you need to map each glyph to a tile index in your tileset. The WASM build exposes NetHack's internal `glyph2tile[]` array through a helper function.
+
+#### Why not compute tile indices from offsets?
+
+The glyph offset constants (`GLYPH_MON_OFF`, `GLYPH_OBJ_OFF`, etc.) identify *what* a glyph represents, but they do not map directly to tile indices. NetHack's tilesets include conditional extra tiles for variant monsters (Cerberus, vampire mage, etc.) that shift the tile numbering. For example, the first 28 monster glyphs map to these tile indices:
+
+```
+glyph  0 -> tile  0    glyph 14 -> tile 14
+glyph  1 -> tile  1    glyph 15 -> tile 15
+...                     ...
+glyph 26 -> tile 26    glyph 27 -> tile 28  (tile 27 is a conditional monster)
+```
+
+The only reliable way to get the correct tile index is to use NetHack's precomputed `glyph2tile[]` lookup, which accounts for all conditional tiles.
+
+#### tileIndexForGlyph(glyph)
+
+After the game initializes (once `_main` is called and helpers are registered), use:
+
+```js
+const helpers = globalThis.nethackGlobal.helpers;
+const tileIndex = helpers.tileIndexForGlyph(glyph);
+```
+
+This is equivalent to `glyph2tile[glyph]` in C -- a direct lookup into NetHack's authoritative glyph-to-tile mapping. Returns `-1` for out-of-range glyphs.
+
+#### Example: rendering tiles in shim_print_glyph
+
+```js
+const TILE_WIDTH = 16;
+const TILE_HEIGHT = 16;
+const TILES_PER_ROW = 40; // depends on your tileset image layout
+
+globalThis.nethackCallback = async (name, ...args) => {
+    if (name === "shim_print_glyph") {
+        const [winid, x, y, glyph, bkglyph] = args;
+        const helpers = globalThis.nethackGlobal.helpers;
+
+        const tileIndex = helpers.tileIndexForGlyph(glyph);
+        const srcX = (tileIndex % TILES_PER_ROW) * TILE_WIDTH;
+        const srcY = Math.floor(tileIndex / TILES_PER_ROW) * TILE_HEIGHT;
+
+        // Draw from tileset image at (srcX, srcY) to map position (x, y)
+        ctx.drawImage(tilesetImage, srcX, srcY, TILE_WIDTH, TILE_HEIGHT,
+                      x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+        return;
+    }
+    // ... other callbacks
+};
+```
+
+#### mapglyphHelper
+
+The `mapglyphHelper` also returns a `tileIdx` field alongside the ASCII character and color:
+
+```js
+const helpers = globalThis.nethackGlobal.helpers;
+const info = helpers.mapglyphHelper(glyph, x, y, 0);
+// info = { glyph, ch, color, special, tileIdx, x, y, mgflags }
+```
+
+This is useful when you need both tile and ASCII information for the same glyph in a single call.
+
 ### Status Fields
 
 `shim_status_update` receives a field index and a pointer. For most fields, the pointer is a `char *` to a pre-formatted string. Read it with `Module.UTF8ToString(ptr)`.
@@ -342,4 +408,5 @@ If you're porting a 3.7 client to 3.6:
 | `shim_get_nh_event` | Called periodically | Not present |
 | `shim_display_file` | Called for NEWS | Not present |
 | `shim_update_inventory` | No-op in WASM (reentrancy) | Has parameter |
+| Tile lookup | `tileIndexForGlyph(glyph)` returns `int` | `mapGlyphInfoHelper(glyph, x, y, mgflags).tileidx` |
 | Global variables | Direct (`plname`) | Prefixed (`g.plname`) |

@@ -31,13 +31,15 @@ CFLAGS+=-DNOTTYGRAPHICS -DSHIM_GRAPHICS
 CFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
 CFLAGS+=-DCROSS_TO_WASM
 CFLAGS+=-DSCORE_ON_BOTL
+CFLAGS+=-DUSE_TILES
+CFLAGS+=-DSTATUES_LOOK_LIKE_MONSTERS
 
 LFLAGS=-s WASM=1
 LFLAGS+=-s ALLOW_TABLE_GROWTH
 LFLAGS+=-s ASYNCIFY -s ASYNCIFY_IMPORTS='["local_callback"]'
 LFLAGS+=-O3
 LFLAGS+=-s MODULARIZE
-LFLAGS+=-s EXPORTED_FUNCTIONS='["_main", "_shim_graphics_set_callback", "_malloc", "_free", "_mapglyph"]'
+LFLAGS+=-s EXPORTED_FUNCTIONS='["_main", "_shim_graphics_set_callback", "_malloc", "_free", "_mapglyph", "_glyph_to_tile"]'
 LFLAGS+=-s EXPORTED_RUNTIME_METHODS='["cwrap", "ccall", "addFunction", "removeFunction", "UTF8ToString", "stringToUTF8", "getValue", "setValue", "ENV", "FS", "IDBFS"]'
 LFLAGS+=-s ERROR_ON_UNDEFINED_SYMBOLS=0
 # ^^^ Required: EM_JS functions (js_helpers_init, create_global, local_callback) are
@@ -47,8 +49,8 @@ LFLAGS+=-s EXPORT_ES6=1
 LFLAGS+=-lidbfs.js
 LFLAGS+=--embed-file ../wasm-data@/
 
-WINSRC = ../win/shim/winshim.c
-WINOBJ = winshim.o
+WINSRC = ../win/shim/winshim.c tile.c
+WINOBJ = winshim.o tile.o
 WINLIB =
 
 CHOWN=true
