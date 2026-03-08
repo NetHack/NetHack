@@ -493,12 +493,8 @@ port_help(void)
 boolean
 authorize_wizard_mode(void)
 {
-    struct passwd *pw = get_unix_pw();
-
-    if (pw && sysopt.wizards && sysopt.wizards[0]) {
-        if (check_user_string(sysopt.wizards))
-            return TRUE;
-    }
+    if (sysopt.wizards && sysopt.wizards[0] && check_user_string(sysopt.wizards))
+        return TRUE;
     wiz_error_flag = TRUE;
     return FALSE;
 }
