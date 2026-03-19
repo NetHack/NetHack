@@ -1330,8 +1330,6 @@ long flag;
     poolok = ((!Is_waterlevel(&u.uz)
                && (is_flyer(mdat) || is_floater(mdat) || is_clinger(mdat)))
               || (is_swimmer(mdat) && !wantpool));
-    /* note: floating eye is the only is_floater() so this could be
-       simplified, but then adding another floater would be error prone */
     lavaok = (is_flyer(mdat) || is_floater(mdat) || is_clinger(mdat)
               || likes_lava(mdat));
     if (mdat == &mons[PM_FLOATING_EYE]) /* prefers to avoid heat */
@@ -2341,9 +2339,9 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
             noconduct = (xkill_flags & XKILL_NOCONDUCT) != 0;
 
     mtmp->mhp = 0; /* caller will usually have already done this */
-    if (!noconduct) /* KMH, conduct */
+    if (!noconduct) { /* KMH, conduct */
         u.uconduct.killer++;
-
+    }
     if (!nomsg) {
         boolean namedpet = has_mname(mtmp) && !Hallucination;
 
