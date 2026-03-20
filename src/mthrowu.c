@@ -1094,7 +1094,8 @@ breamm(struct monst *mtmp, struct attack *mattk, struct monst *mtarg)
                           Monnam(mtmp), breathwep_name(typ));
                 gb.buzzer = mtmp;
                 dobuzz(BZ_M_BREATH(BZ_OFS_AD(typ)), (int) mattk->damn,
-                       mtmp->mx, mtmp->my, sgn(gt.tbx), sgn(gt.tby), utarget, utarget);
+                       mtmp->mx, mtmp->my, sgn(gt.tbx), sgn(gt.tby),
+                       utarget, utarget, FALSE);
                 gb.buzzer = 0;
                 nomul(0);
                 /* breath runs out sometimes. Also, give monster some

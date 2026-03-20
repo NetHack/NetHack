@@ -5334,6 +5334,7 @@ optfn_boolean(
             disp.botl = TRUE;
             break;
         case opt_fixinv:
+        case opt_price_quotes:
         case opt_sortpack:
         case opt_implicit_uncursed:
         case opt_wizweight:

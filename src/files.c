@@ -3139,11 +3139,6 @@ debugcore(const char *filename, boolean wildcards)
 #endif /*DEBUG*/
 
 #ifndef SFCTOOL
-#ifdef UNIX
-#ifndef PATH_MAX
-#include <limits.h>
-#endif
-#endif
 
 #define SYSCONFFILE "system configuration file"
 

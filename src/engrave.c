@@ -589,6 +589,7 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
         /* NODIR wands */
     case WAN_LIGHT:
     case WAN_SECRET_DOOR_DETECTION:
+    case WAN_STASIS:
     case WAN_CREATE_MONSTER:
     case WAN_WISHING:
     case WAN_ENLIGHTENMENT:

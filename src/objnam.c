@@ -1659,6 +1659,8 @@ doname_base(
         Sprintf(pricebuf, "%ld %s", quotedprice, currency(quotedprice));
         ConcatF2(bp, 0, " (%s, %s)",
                  obj->unpaid ? "unpaid" : "contents", pricebuf);
+
+        record_price_quote(obj->otyp, quotedprice / obj->quan, TRUE);
     } else if (with_price) { /* on floor or in container on floor */
         int nochrg = 0;
         long price = get_cost_of_shop_item(obj, &nochrg);
@@ -1672,6 +1674,11 @@ doname_base(
         } else if (nochrg > 0) {
             Concat(bp, 0, " (no charge)");
         }
+
+        if (price)
+            record_price_quote(obj->otyp, price / obj->quan, TRUE);
+    } else if (iflags.pricequotes && !objects[obj->otyp].oc_name_known) {
+        append_price_quote(bp, &bp_eos, obj->otyp);
     }
 
     if (!strncmp(prefix, "a ", 2)) {

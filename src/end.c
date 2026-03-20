@@ -9,9 +9,6 @@
 #ifndef NO_SIGNAL
 #include <signal.h>
 #endif
-#ifndef LONG_MAX
-#include <limits.h>
-#endif
 #include "dlb.h"
 
 #ifndef SFCTOOL

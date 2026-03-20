@@ -40,9 +40,14 @@ To add an entirely new option macro type:
           iii) an initialization of an element in the allopt[] array, at
                index opt_xxxx from step ii (xxxx is the option name).
 
-    2. Create the optfn_xxxx() function in options.c. Failure to do that will
-       result in a link error of "undefined function optfn_xxxx." The functions are
-       in options.c in alphabetical sequence by function name.
+    2. If you are adding a boolean option, link it to a global variable
+       (e.g. in flags or iflags) and update optfn_boolean in options.c if
+       necessary.
+
+    3. If you are not adding a boolean option, create the optfn_xxxx()
+       function in options.c. Failure to do that will result in a link error
+       of "undefined function optfn_xxxx." The functions are in options.c in
+       alphabetical sequence by function name.
 
        The skeletal template for an optn_xxxx() function is:
 
@@ -83,7 +88,7 @@ To add an entirely new option macro type:
                 return optn_ok;
             }
 
-    3. NOTE:  If you add (or delete) an option, please update the short
+    4. NOTE:  If you add (or delete) an option, please update the short
        options help (option_help()), the long options help (dat/opthelp)
        and also the Guidebooks.
 

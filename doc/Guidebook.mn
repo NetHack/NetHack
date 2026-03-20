@@ -4592,6 +4592,15 @@ user name (on multi-user systems) or specifying a particular character
 name (on single-user systems) or it might be disabled entirely.  Requesting
 it when not allowed or not possible results in explore mode instead.
 Default is normal play.
+.lp price_quotes
+Whenever the game mentions the name of an object you haven't identified yet,
+it also mentions the range of buy and sell prices you have seen for that
+item (to help narrow down what it could be).
+The price shown is the unit price for one item (even when you are looking at
+a stack of multiple items).
+Many players may want to turn this on while identifying objects, and then
+turn it back off again for general play.
+Default is off.
 .lp pushweapon
 Using the \(oqw\(cq (wield) command when already wielding
 something pushes the old item into your alternate weapon slot (default off).

@@ -51,6 +51,7 @@ null           allow nulls to be sent to your terminal             [True]
 perm_invent    keep inventory in a permanent window               [False]
 pickup_stolen  override pickup_types for stolen objects            [True]
 pickup_thrown  override pickup_types for thrown objects            [True]
+price_quotes   show remembered price quotes for unIDed items      [False]
 pushweapon     when wielding a new weapon, put your previously    [False]
                wielded weapon into the secondary weapon slot
 quick_farsight usually skip the chance to browse the map when     [False]

@@ -41,10 +41,14 @@
    the second zero is oc_spare1 for padding between oc_tough and oc_dir */
 #define BITS(nmkn,mrg,uskn,ctnr,mgc,chrg,uniq,nwsh,big,tuf,dir,sub,mtrl) \
     nmkn,mrg,uskn,0,mgc,chrg,uniq,nwsh,big,tuf,0,dir,mtrl,sub /*cpp fodder*/
+/* note: 0UL-1UL is a method of expressing the largest possible
+   unsigned long value whilst working around a false-positive warning
+   in Microsoft Visual C (which assumes that a negative number was
+   intended despite the explicit U suffix) */
 #define OBJECT(obj,bits,prp,sym,prob,dly,wt,        \
                cost,sdam,ldam,oc1,oc2,nut,color,sn) \
   { 0, 0, (char *) 0, bits, prp, sym, dly, color, prob, wt, \
-    cost, sdam, ldam, oc1, oc2, nut }
+    cost, sdam, ldam, oc1, oc2, nut, (0UL-1UL), 0, (0UL-1UL), 0 }
 #define MARKER(tag,sn) /*empty*/
 
 #elif defined(OBJECTS_ENUM)
@@ -646,9 +650,15 @@ CLOAK("cloak of displacement", "piece of cloth",
                                                         CLOAK_OF_DISPLACEMENT),
 
 /* shields */
-SHIELD("small shield", NoDes,
-       1, 0, 0,          0, 6, 0,  30,  3, 9, 0,  WOOD, HI_WOOD,
+SHIELD("small shield", "wooden shield",
+       0, 0, 0,          0, 4, 0,  30,  3, 9, 0,  WOOD, HI_WOOD,
                                                         SMALL_SHIELD),
+SHIELD("shield of drain resistance", "wooden shield",
+       0, 1, 0,  DRAIN_RES, 3, 0,  30, 50, 9, 0,  WOOD, HI_WOOD,
+                                                  SHIELD_OF_DRAIN_RESISTANCE),
+SHIELD("shield of shock resistance", "wooden shield",
+       0, 1, 0,  SHOCK_RES, 3, 0,  30, 50, 9, 0,  WOOD, HI_WOOD,
+                                                  SHIELD_OF_SHOCK_RESISTANCE),
 SHIELD("elven shield", "blue and green shield",
        0, 0, 0,          0, 2, 0,  40,  7, 8, 0,  WOOD, CLR_GREEN,
                                                         ELVEN_SHIELD),
@@ -659,10 +669,10 @@ SHIELD("orcish shield", "red-eyed shield",
        0, 0, 0,          0, 2, 0,  50,  7, 9, 0,  IRON, CLR_RED,
                                                         ORCISH_SHIELD),
 SHIELD("large shield", NoDes,
-       1, 0, 1,          0, 7, 0, 100, 10, 8, 0,  IRON, HI_METAL,
+       1, 0, 1,          0, 4, 0, 100, 10, 8, 0,  IRON, HI_METAL,
                                                         LARGE_SHIELD),
 SHIELD("dwarvish roundshield", "large round shield",
-       0, 0, 0,          0, 4, 0, 100, 10, 8, 0,  IRON, HI_METAL,
+       0, 0, 0,          0, 3, 0, 100, 10, 8, 0,  IRON, HI_METAL,
                                                         DWARVISH_ROUNDSHIELD),
 SHIELD("shield of reflection", "polished silver shield",
        0, 1, 0, REFLECTING, 3, 0,  50, 50, 8, 0,  SILVER, HI_SILVER,
@@ -1447,9 +1457,11 @@ WAND("create monster",  "maple", 45, 200, 1, NODIR, WOOD, HI_WOOD,
                                                     WAN_CREATE_MONSTER),
 WAND("wishing",          "pine",  5, 500, 1, NODIR, WOOD, HI_WOOD,
                                                     WAN_WISHING),
+WAND("stasis",        "redwood", 45, 150, 1, NODIR, WOOD, CLR_RED,
+                                                    WAN_STASIS),
 WAND("nothing",           "oak", 25, 100, 0, IMMEDIATE, WOOD, HI_WOOD,
                                                     WAN_NOTHING),
-WAND("striking",        "ebony", 75, 150, 1, IMMEDIATE, WOOD, HI_WOOD,
+WAND("striking",        "ebony", 30, 150, 1, IMMEDIATE, WOOD, HI_WOOD,
                                                     WAN_STRIKING),
 WAND("make invisible", "marble", 45, 150, 1, IMMEDIATE, MINERAL, HI_MINERAL,
                                                     WAN_MAKE_INVISIBLE),

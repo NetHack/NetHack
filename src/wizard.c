@@ -386,10 +386,12 @@ tactics(struct monst *mtmp)
         mtmp->mavenge = 1; /* covetous monsters attack while fleeing */
         if (In_W_tower(mx, my, &u.uz)
             || (mtmp->iswiz && !sx && !mon_has_amulet(mtmp))) {
-            if (!rn2(3 + mtmp->mhp / 10))
+            if (!noteleport_level(mtmp) &&
+                !rn2(3 + mtmp->mhp / 10))
                 (void) rloc(mtmp, RLOC_MSG);
         } else if (sx && (mx != sx || my != sy)) {
-            if (!mnearto(mtmp, sx, sy, TRUE, RLOC_MSG)) {
+            if (!noteleport_level(mtmp) &&
+                !mnearto(mtmp, sx, sy, TRUE, RLOC_MSG)) {
                 /* couldn't move to the target spot for some reason,
                    so stay where we are (don't actually need rloc_to()
                    because mtmp is still on the map at <mx,my>... */
@@ -408,7 +410,7 @@ tactics(struct monst *mtmp)
         /*FALLTHRU*/
 
     case STRAT_NONE: /* harass */
-        if (!rn2(!mtmp->mflee ? 5 : 33))
+        if (!noteleport_level(mtmp) && !rn2(!mtmp->mflee ? 5 : 33))
             mnexto(mtmp, RLOC_MSG);
         return 0;
 
@@ -419,13 +421,16 @@ tactics(struct monst *mtmp)
         int targ = (int) (strat & STRAT_GOAL);
         struct obj *otmp;
 
-        if (!targ) { /* simply wants you to close */
+        if (!targ || !isok(tx, ty)) { /* simply wants you to close */
             return 0;
         }
+        if (noteleport_level(mtmp) && !monnear(mtmp, tx, ty))
+            return 0;
         if (u_at(tx, ty) || where == STRAT_PLAYER) {
             /* player is standing on it (or has it) */
             mx = mtmp->mx, my = mtmp->my;
-            if (!mnearto(mtmp, tx, ty, FALSE, RLOC_MSG))
+            if (noteleport_level(mtmp) ||
+                !mnearto(mtmp, tx, ty, FALSE, RLOC_MSG))
                 rloc_to(mtmp, mx, my); /* no room? stay put */
             return 0;
         }
@@ -445,13 +450,14 @@ tactics(struct monst *mtmp)
                     return 0;
             } else {
                 /* a monster is standing on it - cause some trouble */
-                if (!rn2(5))
+                if (!rn2(5) && !noteleport_level(mtmp))
                     mnexto(mtmp, RLOC_MSG);
                 return 0;
             }
         } else { /* a monster has it - 'port beside it. */
             mx = mtmp->mx, my = mtmp->my;
-            if (!mnearto(mtmp, tx, ty, FALSE, RLOC_MSG))
+            if (!noteleport_level(mtmp) &&
+                !mnearto(mtmp, tx, ty, FALSE, RLOC_MSG))
                 rloc_to(mtmp, mx, my); /* no room? stay put */
             return 0;
         }

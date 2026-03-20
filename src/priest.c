@@ -559,6 +559,8 @@ priest_talk(struct monst *priest)
 {
     boolean coaligned = p_coaligned(priest);
     boolean strayed = (u.ualign.record < 0);
+    unsigned *cheapskate = NULL;
+    if (EPRI(priest)) cheapskate = &EPRI(priest)->cheapskate_count;
 
     /*
      * Note: we won't be called if hero is Deaf [since dochat() will
@@ -625,53 +627,87 @@ priest_talk(struct monst *priest)
             pline("%s is not interested.", Monnam(priest));
         return;
     } else {
+        /* there's now some randomization in how much you need to donate, but
+           you are given suggested donation values that will guarantee
+           clairvoyance and protection respectively; with more gold visible
+           you need to donate more but get a greater effect; and if you
+           cheapskate out to rerandomize the donation amounts they will be
+           higher next time */
         long offer;
+        long suggested = (u.ulevelpeak ? u.ulevelpeak : 1 ) *
+            rn1(101, 150 + (cheapskate ? *cheapskate : 0) * 40);
+        long quan = money_cnt(gi.invent) / (suggested * 3);
+        char buf[BUFSZ];
 
-        pline("%s asks you for a contribution for the temple.",
-              Monnam(priest));
-        if ((offer = bribe(priest)) == 0) {
+        if (quan < 1)
+            quan = 1;
+
+        Sprintf(buf, "How much will you offer (suggested: %ld or %ld)?",
+                suggested * quan, suggested * quan * 2);
+
+        if (flags.debug)
+            pline("%s asks you for a contribution for the temple (base %ld).",
+                  Monnam(priest), suggested);
+        else
+            pline("%s asks you for a contribution for the temple.",
+                  Monnam(priest));
+        if ((offer = bribe(priest, buf)) == 0) {
             SetVoice(priest, 0, 80, 0);
             verbalize("Thou shalt regret thine action!");
             if (coaligned)
                 adjalign(-1);
-        } else if (offer < (u.ulevel * 200)) {
+            if (cheapskate) ++*cheapskate;
+        } else if (offer < suggested * quan) {
             if (money_cnt(gi.invent) > (offer * 2L)) {
                 SetVoice(priest, 0, 80, 0);
                 verbalize("Cheapskate.");
+                if (cheapskate) ++*cheapskate;
             } else {
                 SetVoice(priest, 0, 80, 0);
                 verbalize("I thank thee for thy contribution.");
                 /* give player some token */
                 exercise(A_WIS, TRUE);
             }
-        } else if (offer < (u.ulevel * 400)) {
+        } else if (offer < suggested * quan * 2) {
             SetVoice(priest, 0, 80, 0);
             verbalize("Thou art indeed a pious individual.");
             if (money_cnt(gi.invent) < (offer * 2L)) {
                 if (coaligned && u.ualign.record <= ALGN_SINNED)
                     adjalign(1);
-                verbalize("I bestow upon thee a blessing.");
-                incr_itimeout(&HClairvoyant, rn1(500, 500));
             }
-        } else if (offer < (u.ulevel * 600)
-                   /* u.ublessed is only active when Protection is
-                      enabled via something other than worn gear
-                      (theft by gremlin clears the intrinsic but not
-                      its former magnitude, making it recoverable) */
-                   && (!(HProtection & INTRINSIC)
-                       || (u.ublessed < 20
-                           && (u.ublessed < 9 || !rn2(u.ublessed))))) {
-            SetVoice(priest, 0, 80, 0);
-            verbalize("Thou hast been rewarded for thy devotion.");
+            verbalize("I bestow upon thee a blessing.");
+            incr_itimeout(&HClairvoyant, rn1(500 * offer / suggested,
+                                             500 * offer / suggested));
+        } else if (offer < suggested * quan * 3) {
+            int orig_ublessed = u.ublessed;
+
+            /* u.ublessed is only active when Protection is enabled via
+               something other than worn gear (theft by gremlin clears the
+               intrinsic but not its former magnitude, making it
+               recoverable) */
             if (!(HProtection & INTRINSIC)) {
                 HProtection |= FROMOUTSIDE;
+                orig_ublessed = -1; /* force "rewarded" message */
+            }
+
+            for (; offer >= (2 * suggested); offer -= (2 * suggested)) {
                 if (!u.ublessed)
                     u.ublessed = rn1(3, 2);
-            } else
-                u.ublessed++;
+                else if (u.ublessed < 20 &&
+                         (u.ublessed < 9 || !rn2(u.ublessed)))
+                    u.ublessed++;
+            }
+            SetVoice(priest, 0, 80, 0);
+            if (u.ublessed > orig_ublessed) {
+                verbalize("Thou hast been rewarded for thy devotion.");
+            } else {
+                verbalize("Thy selfless generosity is deeply appreciated.");
+            }
         } else {
             SetVoice(priest, 0, 80, 0);
             verbalize("Thy selfless generosity is deeply appreciated.");
+            /* money_cnt check is preserved for futureproofing but probably
+               can't fail in the current code */
             if (money_cnt(gi.invent) < (offer * 2L) && coaligned) {
                 if (strayed && (svm.moves - u.ucleansed) > 5000L) {
                     u.ualign.record = 0; /* cleanse thee */

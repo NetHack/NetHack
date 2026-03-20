@@ -98,6 +98,7 @@ struct epri {
     schar shroom;      /* index in rooms */
     coord shrpos;      /* position of shrine */
     d_level shrlevel;  /* level (& dungeon) of shrine */
+    unsigned cheapskate_count; /* number of cheapskate donations */
     long intone_time,  /* used to limit verbosity  +*/
         enter_time,    /*+ of temple entry messages */
         hostile_time,  /* forbidding feeling */

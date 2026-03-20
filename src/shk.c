@@ -433,6 +433,65 @@ setpaid(struct monst *shkp)
     }
 }
 
+/* Remembers that a shopkeeper has quoted a particular price for a
+   particular type of object. */
+void
+record_price_quote(int otyp, unsigned long price, boolean buyprice) {
+    struct objclass *oc = &objects[otyp];
+    if (buyprice) {
+        if (price > oc->oc_buy_maxseen) oc->oc_buy_maxseen = price;
+        if (price < oc->oc_buy_minseen) oc->oc_buy_minseen = price;
+    } else {
+        if (price > oc->oc_sell_maxseen) oc->oc_sell_maxseen = price;
+        if (price < oc->oc_sell_minseen) oc->oc_sell_minseen = price;
+    }
+}
+
+/* Appends price-quote information to the given buffer, updating the
+   given end of string position. *eos mut be buf + strlen(buf). If the
+   update would make bug longer than BUFSZ, instead does nothing. */
+void
+append_price_quote(char *buf, char **eos, int otyp) {
+    char buf2[BUFSZ];
+    char *eos2 = buf2;
+    const char *sep = "";
+    size_t len = *eos - buf;
+    size_t len2;
+
+    if (objects[otyp].oc_sell_minseen > objects[otyp].oc_sell_maxseen &&
+        objects[otyp].oc_buy_minseen > objects[otyp].oc_buy_maxseen)
+        return;
+
+    eos2 += sprintf(eos2, " {");
+
+    if (objects[otyp].oc_buy_minseen < objects[otyp].oc_buy_maxseen) {
+        eos2 += sprintf(eos2, "buy %lu-%lu",
+                        objects[otyp].oc_buy_minseen,
+                        objects[otyp].oc_buy_maxseen);
+        sep = " ";
+    } else if (objects[otyp].oc_buy_minseen == objects[otyp].oc_buy_maxseen) {
+        eos2 += sprintf(eos2, "buy %lu",
+                        objects[otyp].oc_buy_minseen);
+        sep = " ";
+    }
+
+    if (objects[otyp].oc_sell_minseen < objects[otyp].oc_sell_maxseen) {
+        eos2 += sprintf(eos2, "%ssell %lu-%lu", sep,
+                        objects[otyp].oc_sell_minseen,
+                        objects[otyp].oc_sell_maxseen);
+    } else if (objects[otyp].oc_sell_minseen == objects[otyp].oc_sell_maxseen) {
+        eos2 += sprintf(eos2, "%ssell %lu", sep,
+                        objects[otyp].oc_sell_minseen);
+    }
+
+    eos2 += sprintf(eos2, "}");
+    len2 = eos2 - buf2;
+    if (len2 < BUFSZ - len - 1) {
+        Strcpy(*eos, buf2);
+        *eos += len2;
+    }
+}
+
 staticfn long
 addupbill(struct monst *shkp)
 {
@@ -3285,7 +3344,7 @@ add_one_tobill(
     bp->bo_id = obj->o_id;
     bp->bquan = obj->quan;
     if (dummy) {              /* a dummy object must be inserted into  */
-        bp->useup = TRUE;        /* the gb.billobjs chain here.  crucial for */
+        bp->useup = TRUE;     /* the gb.billobjs chain here.  crucial for */
         add_to_billobjs(obj); /* eating floorfood in shop.  see eat.c  */
     } else
         bp->useup = FALSE;
@@ -3300,6 +3359,7 @@ add_one_tobill(
     }
     eshkp->billct++;
     obj->unpaid = 1;
+    record_price_quote(obj->otyp, bp->price, TRUE);
 }
 
 staticfn void
@@ -3491,6 +3551,9 @@ addtobill(
 
     if (!Deaf && !muteshk(shkp) && !silent) {
         char buf[BUFSZ];
+
+        /* no need to update price quotes here; it was done by
+           add_one_tobill above */
 
         if (!ltmp) {
             pline("%s has no interest in %s.", Shknam(shkp), the(xname(obj)));
@@ -3991,6 +4054,7 @@ sellobj(
             pline("%s cannot pay you at present.", Shknam(shkp));
             Sprintf(qbuf, "Will you accept %ld %s in credit for ", tmpcr,
                     currency(tmpcr));
+            record_price_quote(obj->otyp, tmpcr / obj->quan, FALSE);
             c = ynaq(safe_qbuf(qbuf, qbuf, "?", obj, doname, thesimpleoname,
                                (obj->quan == 1L) ? "that" : "those"));
             if (c == 'a') {
@@ -4086,6 +4150,7 @@ sellobj(
                                : and_its_contents)
                         : "",
                     one ? "it" : "them");
+            record_price_quote(obj->otyp, offer / obj->quan, FALSE);
             (void) safe_qbuf(qbuf, qbuf, qsfx, obj, xname, simpleonames,
                              one ? "that" : "those");
         } else

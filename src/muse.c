@@ -31,6 +31,7 @@ staticfn boolean hero_behind_chokepoint(struct monst *);
 staticfn boolean mon_has_friends(struct monst *);
 staticfn boolean mon_likes_objpile_at(struct monst *mtmp, coordxy x, coordxy y) NONNULLARG1;
 staticfn int mbhitm(struct monst *, struct obj *);
+staticfn void buzz_force_miss(int, int, coordxy, coordxy, int, int);
 staticfn boolean fhito_loc(struct obj *obj, coordxy x, coordxy y,
                            int (*fhito)(OBJ_P, OBJ_P));
 staticfn void mbhit(struct monst *, int, int (*)(MONST_P, OBJ_P),
@@ -1614,7 +1615,8 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
                 Soundeffect(se_boing, 40);
                 pline("Boing!");
                 learnit = TRUE;
-            } else if (rnd(20) < 10 + u.uac) {
+            } else if (rnd(20) < 10 + u.uac &&
+                       !(gb.buzzer && !gb.buzzer->mwandexp)) {
                 monstunseesu(M_SEEN_MAGR); /* mons see hero not resisting */
                 pline_The("wand hits you!");
                 tmp = d(2, 12);
@@ -1809,6 +1811,12 @@ mbhit(
     }
 }
 
+staticfn void
+buzz_force_miss(int type, int nd, coordxy sx, coordxy sy, int dx, int dy)
+{
+    dobuzz(type, nd, sx, sy, dx, dy, TRUE, FALSE, TRUE);
+}
+
 /* Perform an offensive action for a monster.  Must be called immediately
  * after find_offensive().  Return values are same as use_defensive().
  */
@@ -1818,6 +1826,12 @@ use_offensive(struct monst *mtmp)
     int i;
     struct obj *otmp = gm.m.offensive;
     boolean oseen;
+
+    /* if a monster has never used an attack wand before, it takes them some
+       time to get used to holding that much power, so the first shot always
+       misses */
+    void (*buzzfn)(int, int, coordxy, coordxy, int, int) =
+        mtmp->mwandexp ? buzz : buzz_force_miss;
 
     /* offensive potions are not drunk, they're thrown */
     if (otmp->oclass != POTION_CLASS && (i = precheck(mtmp, otmp)) != 0)
@@ -1837,12 +1851,13 @@ use_offensive(struct monst *mtmp)
         gm.m_using = TRUE;
         gc.current_wand = otmp;
         gb.buzzer = mtmp;
-        buzz(BZ_M_WAND(BZ_OFS_WAN(otmp->otyp)),
-             (otmp->otyp == WAN_MAGIC_MISSILE) ? 2 : 6, mtmp->mx, mtmp->my,
-             sgn(mtmp->mux - mtmp->mx), sgn(mtmp->muy - mtmp->my));
+        buzzfn(BZ_M_WAND(BZ_OFS_WAN(otmp->otyp)),
+               (otmp->otyp == WAN_MAGIC_MISSILE) ? 2 : 6, mtmp->mx, mtmp->my,
+               sgn(mtmp->mux - mtmp->mx), sgn(mtmp->muy - mtmp->my));
         gb.buzzer = 0;
         gc.current_wand = 0;
         gm.m_using = FALSE;
+        mtmp->mwandexp = TRUE;
         return (DEADMONSTER(mtmp)) ? 1 : 2;
     case MUSE_FIRE_HORN:
     case MUSE_FROST_HORN:
@@ -1850,13 +1865,14 @@ use_offensive(struct monst *mtmp)
         gm.m_using = TRUE;
         gb.buzzer = mtmp;
         gc.current_wand = otmp; /* needed by zhitu() */
-        buzz(BZ_M_WAND(BZ_OFS_AD((otmp->otyp == FROST_HORN) ? AD_COLD
-                                                            : AD_FIRE)),
+        buzzfn(BZ_M_WAND(BZ_OFS_AD(
+                             (otmp->otyp == FROST_HORN) ? AD_COLD : AD_FIRE)),
              rn1(6, 6), mtmp->mx, mtmp->my, sgn(mtmp->mux - mtmp->mx),
              sgn(mtmp->muy - mtmp->my));
         gb.buzzer = 0;
         gc.current_wand = 0;
         gm.m_using = FALSE;
+        mtmp->mwandexp = TRUE;
         return (DEADMONSTER(mtmp)) ? 1 : 2;
     case MUSE_WAN_TELEPORTATION:
     case MUSE_WAN_UNDEAD_TURNING:
@@ -1864,9 +1880,13 @@ use_offensive(struct monst *mtmp)
         gz.zap_oseen = oseen;
         mzapwand(mtmp, otmp, FALSE);
         gm.m_using = TRUE;
+        gb.buzzer = mtmp;
         mbhit(mtmp, rn1(8, 6), mbhitm, bhito, otmp);
+        gb.buzzer = 0;
         /* note: 'otmp' might have been destroyed (drawbridge destruction) */
         gm.m_using = FALSE;
+        if (gm.m.has_offense == MUSE_WAN_STRIKING)
+            mtmp->mwandexp = TRUE;
         return 2;
     case MUSE_SCR_EARTH: {
         /* TODO: handle steeds */

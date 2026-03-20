@@ -1582,6 +1582,9 @@ healers may get tiny damage increase when attacking with knives
 allow rogues to also backstab sleeping or paralyzed monsters
 rogues cannot backstab monsters that have no backside
 give experience if opening Schroedinger's Box causes death of the cat inside
+priest donation amounts are explicitly stated, randomized slightly, based on
+       peak rather than current level, and allow for bulk donations (buying
+       larger amounts of clairvoyance/protection) if you have a lot of gold
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
@@ -2210,6 +2213,8 @@ when reading an engraving, suppress the addition of a trailing period if the
 	text already has one
 cursed magic whistle could teleport hero on no-teleport levels
 give a brief explanation when receiving a wish for acquiring the Amulet
+teleportation traps no longer teleport you on levels made temporarily
+        no-teleport by the presence of a monster
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
@@ -2899,6 +2904,14 @@ add "make fetch-docs" to download pre-formatted documentation
 monsters will use throw-and-return weapons such as an aklys
 archeologists can identify scrolls by deciphering their labels
 monster destroy armor -spell first erodes armor
+iron shoes protect the wearer against certain floor-based traps
+ring of stealth prevents hero from leaving tracks
+the game now automatically tracks which sell prices and buy prices you have
+        seen for each type of item; these are visible in the discoveries list,
+        and can also be shown elsewhere using the new 'price_quotes' option
+new shields: shield of shock resistance, shield of drain resistance
+new wand: wand of stasis
+early-game monsters always miss with their first use of an attack wand
 
 
 Platform- and/or Interface-Specific New Features

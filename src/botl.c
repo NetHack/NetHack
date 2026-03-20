@@ -4,9 +4,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#ifndef LONG_MAX
-#include <limits.h>
-#endif
 
 extern const char *const hu_stat[]; /* defined in eat.c */
 

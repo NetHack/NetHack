@@ -688,16 +688,20 @@ disco_typename(int otyp)
     return result;
 }
 
-/* append typename(dis) to buf[], possibly truncating in the process */
+/* append typename(dis) to buf[], possibly truncating in the process;
+   also append price quote information if it fits */
 staticfn void
 disco_append_typename(char *buf, int dis)
 {
-    unsigned len = (unsigned) strlen(buf);
+    size_t len = strlen(buf);
     char *p, *typnm = disco_typename(dis);
+    size_t typnm_len = strlen(typnm);
+    char *eos;
 
-    if (len + (unsigned) strlen(typnm) < BUFSZ) {
+    if (len + typnm_len < BUFSZ) {
         /* ordinary */
         Strcat(buf, typnm);
+        eos = buf + len + typnm_len;
     } else if ((p = strrchr(typnm, '(')) != 0
                && p > typnm && p[-1] == ' ' && strchr(p, ')') != 0) {
         /* typename() returned "really long user-applied name (actual type)"
@@ -706,10 +710,14 @@ disco_append_typename(char *buf, int dis)
         --p; /* back up to space in front of open paren */
         (void) strncat(buf, typnm, BUFSZ - 1 - (len + (unsigned) strlen(p)));
         Strcat(buf, p);
+        eos = buf + strlen(buf);
     } else {
         /* unexpected; just truncate from end of typename */
         (void) strncat(buf, typnm, BUFSZ - 1 - len);
+        eos = buf + strlen(buf);
     }
+
+    append_price_quote(buf, &eos, dis);
 }
 
 /* minor fixup for Book of the Dead needed in more than one place */
@@ -1125,6 +1133,7 @@ rename_disco(void)
     anything any;
     menu_item *selected = 0;
     int clr = NO_COLOR;
+    char buf[BUFSZ];
 
     any = cg.zeroany;
     tmpwin = create_nhwindow(NHW_MENU);
@@ -1158,9 +1167,10 @@ rename_disco(void)
                 prev_class = oclass;
             }
             any.a_int = dis;
+            *buf = '\0';
+            disco_append_typename(buf, dis);
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                     ATR_NONE, clr,
-                     disco_typename(dis), MENU_ITEMFLAGS_NONE);
+                     ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
         }
     }
     if (ct == 0) {

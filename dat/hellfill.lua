@@ -413,14 +413,16 @@ hells = {
 
    -- 7: open cavern, "mines" with more space
    function ()
+      -- walls are either stone or lava
+      local wter = percent(50) and " " or "L";
       des.level_init({ style = "solidfill", fg = " ", lit = 0 });
       des.level_flags("mazelevel", "noflip");
-      des.level_init({ style="mines", fg=".", smoothed=true ,joined=true, lit=0 });
+      des.level_init({ style="mines", fg=".", bg = wter, smoothed=true ,joined=true, lit=0 });
       local sel = selection.match("."):grow();
-      des.terrain({ selection = sel, typ = "." });
+      des.terrain({ selection = sel, typ = ".", lit = 0 });
 
       local border = selection.rect(0,0, 78, 20);
-      des.terrain({ selection = border, typ = " " });
+      des.terrain({ selection = border, typ = wter, lit = 0 });
       des.wallify();
    end,
 

@@ -332,7 +332,8 @@ demon_talk(struct monst *mtmp)
         else if (canseemon(mtmp))
             pline("%s seems to be demanding something.", Amonnam(mtmp));
         offer = 0L;
-        if (!Deaf && ((offer = bribe(mtmp)) >= demand)) {
+        if (!Deaf &&
+            ((offer = bribe(mtmp, "How much will you offer?")) >= demand)) {
             pline("%s vanishes, laughing about cowardly mortals.",
                   Amonnam(mtmp));
         } else if (offer > 0L
@@ -357,13 +358,13 @@ demon_talk(struct monst *mtmp)
 }
 
 long
-bribe(struct monst *mtmp)
+bribe(struct monst *mtmp, const char *prompt)
 {
     char buf[BUFSZ] = DUMMY;
     long offer;
     long umoney = money_cnt(gi.invent);
 
-    getlin("How much will you offer?", buf);
+    getlin(prompt, buf);
     if (sscanf(buf, "%ld", &offer) != 1)
         offer = 0L;
 

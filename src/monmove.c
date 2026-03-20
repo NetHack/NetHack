@@ -1794,11 +1794,10 @@ m_move(struct monst *mtmp, int after)
             if (covetousattack & M_ATTK_AGR_DIED)
                 return MMOVE_DIED;
             mmoved = MMOVE_MOVED;
-        } else {
-            mmoved = MMOVE_NOTHING;
+            return postmov(mtmp, ptr, omx, omy, mmoved,
+                           seenflgs, can_tunnel, can_unlock, can_open);
         }
-        return postmov(mtmp, ptr, omx, omy, mmoved,
-                       seenflgs, can_tunnel, can_unlock, can_open);
+        /* otherwise continue with normal AI routine */
     }
 
     /* likewise for shopkeeper, guard, or priest */

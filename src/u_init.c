@@ -603,8 +603,10 @@ knows_class(char sym)
      */
 
     for (ct = svb.bases[(uchar) sym]; ct < svb.bases[(uchar) sym + 1]; ct++) {
-        /* not flagged as magic but shouldn't be pre-discovered */
-        if (ct == CORNUTHAUM || ct == DUNCE_CAP)
+        /* not flagged as magic but shouldn't be pre-discovered
+           (small shields look the same as two types of magical shield;
+           cornuthaum / dunce cap look the same as each other) */
+        if (ct == CORNUTHAUM || ct == DUNCE_CAP || ct == SMALL_SHIELD)
             continue;
         if (sym == WEAPON_CLASS) {
             odummy.otyp = ct; /* update 'o' */
