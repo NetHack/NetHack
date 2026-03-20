@@ -37,9 +37,12 @@ This creates the working Makefiles in the root, `src/`, `util/`, `dat/`, and `do
 
 ### 2. Build with Qt
 
-Choose one of the following based on your Qt version:
+**Run from the root NetHack directory** (where the top-level Makefile was created by setup.sh):
 
 ```bash
+# Navigate to root directory (if not already there)
+cd /path/to/NetHack
+
 # For Qt5 (default)
 make WANT_WIN_QT=1
 
@@ -60,6 +63,14 @@ make WANT_WIN_QT=1 WANT_WIN_TTY=1 WANT_WIN_CURSES=1
 ```bash
 make install
 ```
+
+## Summary - Which Folder to Run Commands In
+
+| Step | Folder | Command |
+|------|--------|---------|
+| 1. setup.sh | `sys/unix/` | `sh setup.sh hints/linux` |
+| 2. make | **Root NetHack folder** (e.g., `~/NetHack/`) | `make WANT_WIN_QT=1` |
+| 3. install | Root NetHack folder | `make install` |
 
 ## Custom Qt Location
 
