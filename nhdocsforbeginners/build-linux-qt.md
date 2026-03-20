@@ -1,4 +1,5 @@
 # Building NetHack for Linux with Qt
+Details summarised from file: NetHack\sys\unix\NewInstall.unx
 
 This document describes how to build NetHack for Linux with the Qt graphical interface.
 
