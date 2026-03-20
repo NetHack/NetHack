@@ -333,3 +333,285 @@ To add a new window system:
 - `include/wintype.h` - Window types and constants
 - `include/decl.h` - Global declarations including window-related
 - `win/share/` - Shared utilities for window systems (tile handling, etc.)
+
+---
+
+## How NetHack Uses Window Procedures (Code Examples)
+
+This section shows actual code from the NetHack source that demonstrates how the window procedures are called.
+
+### Output/Drawing Operations
+
+#### print_glyph - Drawing Map Tiles
+
+**File:** `src/display.c`
+```c
+/* Drawing the dungeon map - from show_glyph() in display.c */
+print_glyph(WIN_MAP, x, y,
+            Glyphinfo_at(x, y, glyph), &bkglyphinfo);
+```
+
+The `print_glyph()` function draws a single tile at position (x,y) on the map window.
+
+#### putstr - Outputting Text
+
+**File:** `src/pline.c` (main message output)
+```c
+/* Output a message to the message window */
+putstr(WIN_MESSAGE, attr, line);
+```
+
+**File:** `src/cmd.c` (key bindings help display)
+```c
+/* Displaying help text in a window */
+putstr(datawin, 0, "");
+putstr(datawin, 0, "Directional keys:");
+Sprintf(buf, "%-7s %s", key2txt(key, buf2), misc_keys[i].desc);
+putstr(datawin, 0, buf);
+```
+
+#### Menu Operations
+
+**File:** `src/windows.c` (wrapper functions)
+```c
+/* add_menu() - adds an item to a menu */
+void
+add_menu(winid window, const glyph_info *glyphinfo,
+         const anything *identifier, char ch, char gch,
+         int attr, int color, const char *str, unsigned int itemflags)
+{
+    /* Apply menu color filtering if enabled */
+    if (iflags.use_menu_color) {
+        if ((itemflags & MENU_ITEMFLAGS_SKIPMENUCOLORS) == 0)
+            (void) get_menu_coloring(str, &color, &attr);
+    }
+    /* Call the actual window procedure */
+    (*windowprocs.win_add_menu)(window, glyphinfo, identifier,
+                                ch, gch, attr, color, str, itemflags);
+}
+
+/* select_menu() - displays menu and gets user selection */
+int
+select_menu(winid window, int how, menu_item **menu_list)
+{
+    int reslt;
+    boolean old_bot_disabled = gb.bot_disabled;
+
+    gb.bot_disabled = TRUE;  /* Disable status updates during menu */
+    reslt = (*windowprocs.win_select_menu)(window, how, menu_list);
+    gb.bot_disabled = old_bot_disabled;
+    return reslt;
+}
+```
+
+### Input Operations
+
+#### yn_function - Yes/No Queries
+
+**File:** `src/cmd.c`
+```c
+/* yn_function() - ask a yes/no question */
+char
+yn_function(const char *query, const char *resp, char def, boolean addcmdq)
+{
+    char res = '\033';  /* Default to ESC */
+    /* ... command queue handling ... */
+    
+    /* Try menu-based response first, fall back to window procedure */
+    if (!yn_function_menu(query, resp, def, &res)) {
+        res = (*windowprocs.win_yn_function)(query, resp, def);
+    }
+    /* ... */
+    return res;
+}
+```
+
+**Usage Example:** `src/dokick.c`
+```c
+if (yn_function("Kick your steed?", ynchars, 'y', TRUE) == 'y') {
+    You("kick %s.", mon_nam(u.usteed));
+}
+```
+
+**Usage Example:** `src/eat.c`
+```c
+c = yn_function("Continue eating?", ynqchars, 'n', TRUE);
+```
+
+#### nhgetch/nh_poskey - Reading Keystrokes
+
+**File:** `src/cmd.c`
+```c
+/* pgetchar() - gets a character, used for replaying commands */
+char
+pgetchar(void)
+{
+    int ch = '\0';
+
+    if (iflags.debug_fuzzer)
+        return randomkey();
+    ch = nhgetch();  /* Calls windowprocs.win_nhgetch */
+    return (char) ch;
+}
+
+/* readchar_core() - core input reading function */
+staticfn char
+readchar_core(coordxy *x, coordxy *y, int *mod)
+{
+    int sym;
+    
+    if (*readchar_queue)
+        sym = *readchar_queue++;  /* From command queue */
+    else if (gi.in_doagain)
+        sym = pgetchar();          /* Replay */
+    else
+        sym = nh_poskey(x, y, mod); /* Get from window system */
+    
+    /* Handle mouse clicks and special keys */
+    if (sym == 0) {
+        /* Mouse click event - convert to command */
+        click_to_cmd(*x, *y, *mod);
+    }
+    /* ... */
+    return (char) sym;
+}
+
+/* readchar() - public interface to get a character */
+char
+readchar(void)
+{
+    char ch;
+    coordxy x = u.ux, y = u.uy;
+    int mod = 0;
+
+    ch = readchar_core(&x, &y, &mod);
+    return ch;
+}
+```
+
+#### getlin - Line Input
+
+**File:** `src/windows.c`
+```c
+/* getlin() - get a line of text from user */
+void
+getlin(const char *query, char *bufp)
+{
+    boolean old_bot_disabled = gb.bot_disabled;
+    /* ... command queue handling for scripted input ... */
+    
+    program_state.in_getlin = 1;
+    gb.bot_disabled = TRUE;
+    (*windowprocs.win_getlin)(query, bufp);
+    gb.bot_disabled = old_bot_disabled;
+    program_state.in_getlin = 0;
+}
+```
+
+**Usage Example:** `src/do_name.c` (naming monsters/items)
+```c
+getlin(prompt, outbuf);
+if (!*outbuf || *outbuf == '\033')
+    return;  /* Cancelled */
+```
+
+**Usage Example:** `src/engrave.c` (engraving text)
+```c
+getlin(de->qbuf, de->ebuf);
+(void) mungspaces(de->ebuf);  /* Clean up whitespace */
+```
+
+**Usage Example:** `src/options.c` (autopickup patterns)
+```c
+getlin("What new autopickup exception pattern?", &apebuf[1]);
+mungspaces(&apebuf[1]);
+```
+
+### Direct Windowprocs Calls
+
+Some functions call `windowprocs` directly without wrappers:
+
+**File:** `src/botl.c` (status line management)
+```c
+(*windowprocs.win_status_init)();
+(*windowprocs.win_status_finish)();
+```
+
+**File:** `src/coloratt.c` (color management)
+```c
+(*windowprocs.win_change_color)(clridx, rgb, 0);
+```
+
+**File:** `src/invent.c` (inventory display updates)
+```c
+(*windowprocs.win_update_inventory)(0);  /* Full update */
+(*windowprocs.win_update_inventory)(1);  /* Partial update */
+```
+
+### Complete Input Flow
+
+**Main Game Loop** (`src/allmain.c`):
+```c
+/* Main turn loop */
+for (;;) {
+    cliparound(u.ux, u.uy);  /* Ensure player is visible */
+    rhack(gc.cmd_key);       /* Get and execute player command */
+    /* ... */
+}
+```
+
+**Command Processing** (`src/cmd.c`):
+```c
+/* rhack() - main command dispatcher */
+void
+rhack(int key)
+{
+    boolean firsttime = (key == 0);
+    
+    if (firsttime) {
+        key = parse();  /* Parse user input */
+    }
+    /* ... dispatch to command handlers based on key ... */
+}
+
+/* parse() - read and interpret user input */
+staticfn int
+parse(void)
+{
+    program_state.input_state = commandInp;
+    flush_screen(1);  /* Flush display buffer */
+    
+    /* Get first character (possibly a repeat count prefix) */
+    if (!gc.Cmd.num_pad || (foo = readchar()) == gc.Cmd.spkeys[NHKF_COUNT]) {
+        foo = get_count((char *) 0, '\0', LARGEST_INT,
+                        &gc.command_count, GC_NOFLAGS);
+    }
+    /* ... */
+    return gc.cmd_key;
+}
+```
+
+### Summary of Calling Conventions
+
+| Operation | Wrapper Function | Direct Windowprocs Call | Common Usage |
+|-----------|------------------|------------------------|--------------|
+| Draw map tile | `print_glyph()` | `(*windowprocs.win_print_glyph)()` | Dungeon display |
+| Output text | `putstr()` | `(*windowprocs.win_putstr)()` | Messages, menus |
+| Yes/No prompt | `yn_function()` | `(*windowprocs.win_yn_function)()` | Confirmations |
+| Get character | `readchar()` | `(*windowprocs.win_nh_poskey)()` | Command input |
+| Get line | `getlin()` | `(*windowprocs.win_getlin)()` | Text entry |
+| Add menu item | `add_menu()` | `(*windowprocs.win_add_menu)()` | Inventory, etc. |
+| Show menu | `select_menu()` | `(*windowprocs.win_select_menu)()` | Selection |
+| Update status | - | `(*windowprocs.win_status_update)()` | Status line |
+| Clear window | `clear_nhwindow()` | `(*windowprocs.win_clear_nhwindow)()` | Screen clear |
+| Display window | `display_nhwindow()` | `(*windowprocs.win_display_nhwindow)()` | Show dialog |
+
+### Key Insight
+
+Most game code uses **wrapper functions** defined in `src/windows.c` (like `getlin()`, `add_menu()`, `putstr()`) rather than calling `windowprocs` directly. These wrappers:
+
+1. Add common functionality (command queue handling, status disable, color filtering)
+2. Provide a stable API regardless of window system
+3. Handle special cases (debug fuzzer, hangup recovery)
+
+The `windowprocs` structure is the **polymorphic dispatch table** that routes these calls to the active window system (TTY, Curses, Qt, etc.).
