@@ -174,28 +174,28 @@ term_curs_set(int visibility)
         return;
 
     if (!visibility) {
-	if (!iflags.grmode) {
+        if (!iflags.grmode) {
             txt_hide_cursor();
 #ifdef SCREEN_VGA
-	} else if (iflags.usevga) {
-	    vga_hide_cursor();
+        } else if (iflags.usevga) {
+            vga_hide_cursor();
 #endif
 #ifdef SCREEN_VESA
-	} else if (iflags.usevesa) {
-	    vesa_hide_cursor();
-	}
+        } else if (iflags.usevesa) {
+            vesa_hide_cursor();
+        }
 #endif
     } else if (visibility) {
-	if (!iflags.grmode) {
+        if (!iflags.grmode) {
             txt_show_cursor();
 #ifdef SCREEN_VGA
-	} else if (iflags.usevga) {
+        } else if (iflags.usevga) {
             vga_show_cursor();
 #endif
 #ifdef SCREEN_VESA
-	} else if (iflags.usevesa) {
+        } else if (iflags.usevesa) {
             vesa_show_cursor();
-	}
+        }
 #endif
     }
     vis = visibility;

@@ -1338,8 +1338,8 @@ printf("E2: M=%s e=%d\n",msg,errnum);
 
 int
 win32_cr_gettrace(int maxframes USED_IF_BACKTRACE,
-		  char *out USED_IF_BACKTRACE,
-		  int outsize USED_IF_BACKTRACE)
+                  char *out USED_IF_BACKTRACE,
+                  int outsize USED_IF_BACKTRACE)
 {
 #ifdef USE_BACKTRACE
     userstate.error_count = 0;

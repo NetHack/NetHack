@@ -98,22 +98,22 @@ cell_t undefined_cell = { CONSOLE_UNDEFINED_CHARACTER,
                           CONSOLE_UNDEFINED_ATTRIBUTE };
 #else /* VIRTUAL_TERMINAL_SEQUENCES */
 cell_t clear_cell = {
-	        { CONSOLE_CLEAR_CHARACTER, 0, 0, 0, 0, 0, 0 },
+                { CONSOLE_CLEAR_CHARACTER, 0, 0, 0, 0, 0, 0 },
                 CONSOLE_CLEAR_CHARACTER,         /* wcharacter */
-		0,                               /* attr */
-		0L,                              /* color24 */
-		0,                               /* color256idx */
-		"\x1b[0m",                       /* bkcolorseq */
-		0                                /* colorseq */
+                0,                               /* attr */
+                0L,                              /* color24 */
+                0,                               /* color256idx */
+                "\x1b[0m",                       /* bkcolorseq */
+                0                                /* colorseq */
 };
 cell_t undefined_cell = {
-		{ CONSOLE_UNDEFINED_CHARACTER, 0, 0, 0, 0, 0, 0 },
+               { CONSOLE_UNDEFINED_CHARACTER, 0, 0, 0, 0, 0, 0 },
                 CONSOLE_UNDEFINED_CHARACTER,     /* wcharacter */
-		0,                               /* attr */
-		0L,                              /* color24 */
-		0,                               /* color256idx */
-		(const char *) 0,                /* bkcolorseq */
-		(const char *) 0                 /* colorseq */
+                0,                               /* attr */
+                0L,                              /* color24 */
+                0,                               /* color256idx */
+                (const char *) 0,                /* bkcolorseq */
+                (const char *) 0                 /* colorseq */
 };
 #if 0
 static const uint8 empty_utf8str[MAX_UTF8_SEQUENCE] = { 0 };
@@ -1146,7 +1146,7 @@ CtrlHandler(DWORD ctrltype)
     case CTRL_BREAK_EVENT:
         term_clear_screen();
         FALLTHROUGH;
-	/* FALLTHRU */
+        /* FALLTHRU */
     case CTRL_CLOSE_EVENT:
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
@@ -1308,8 +1308,8 @@ really_move_cursor(void)
             oldtitle[39] = '\0';
         }
         Snprintf(newtitle, sizeof newtitle,
-		 "%-55s tty=(%02d,%02d) consoletty=(%02d,%02d)",
-		 oldtitle,
+                 "%-55s tty=(%02d,%02d) consoletty=(%02d,%02d)",
+                 oldtitle,
                  ttyDisplay->curx, ttyDisplay->cury,
                  console.cursor.X, console.cursor.Y);
         (void) SetConsoleTitle(newtitle);

@@ -1762,7 +1762,7 @@ save_killers(NHFILE *nhfp)
 
     if (update_file(nhfp)) {
         for (kptr = &svk.killer; kptr; kptr = kptr->next) {
-	    Sfo_kinfo(nhfp, kptr, "kinfo");
+            Sfo_kinfo(nhfp, kptr, "kinfo");
         }
     }
     if (release_data(nhfp)) {

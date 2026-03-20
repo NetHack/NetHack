@@ -1097,7 +1097,7 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
     for (c = 0; c < COLNO; ++c) {
         for (r = 0; r < ROWNO; ++r) {
             Sfi_schar(nhfp, &svl.lastseentyp[c][r], "lastseentyp");
-	}
+        }
     }
     Sfi_long(nhfp, &svo.omoves, "lev-timestmp");
     elapsed = (svm.moves - svo.omoves);

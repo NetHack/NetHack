@@ -1174,7 +1174,7 @@ create_savefile(void)
         if (nhfp->fd >= 0)
             (void) setmode(nhfp->fd, O_BINARY);
 #endif
-	}
+        }
     }
 #if defined(VMS) && !defined(SECURE)
     /*
@@ -1218,7 +1218,7 @@ open_savefile(void)
 #ifdef SAVEFILE_DEBUGGING
             nhfp->fplog = fopen("open-savefile.log", "w");
 #endif
-	}
+        }
 #ifdef MAC
         nhfp->fd = macopen(fq_save, O_RDONLY | O_BINARY, SAVE_TYPE);
 #else
