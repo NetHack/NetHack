@@ -25,7 +25,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7.0 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{Date(%B %-d, %Y)}
-\date{February 11, 2026}
+\date{March 21, 2026}
 
 \maketitle
 
@@ -1321,7 +1321,7 @@ Cast a spell. Default key is `\texttt{Z}'.
 Talk to someone. Default key is `\texttt{M-c}'.
 %.lp
 \item[\#chronicle]
-Show a list of important game events.
+Show a list of important game events. Default key is `\texttt{v}'.
 %.lp
 \item[\#close]
 Close a door. Default key is `\texttt{c}'.
@@ -1425,7 +1425,7 @@ option is On, clicking on the hero (or steed when mounted) will
 execute this command.
 %.lp
 \item[\#history]
-Show long version and game history. Default key is `\texttt{V}'.
+Show long version and game history.
 %.lp
 \item[\#inventory]
 Show your inventory. Default key is `\texttt{i}'.
@@ -1827,6 +1827,21 @@ floor container menu.
 %.lp ""
 Autocompletes. Default key is `\texttt{M-T}'.
 %.lp
+\item[\#toggle]
+Toggle a boolean option on or off.
+Requires a parameter in parenthesis, the name of the option to toggle.
+The option must be settable in-game.
+
+%.lp ""
+For example:
+%.sd
+\begin{verbatim}
+    BIND=':toggle(price_quotes)
+    BIND=@:toggle(autopickup)
+\end{verbatim}
+%.ed
+
+%.lp
 \item[\#travel]
 Travel to a specific location on the map.
 Default key is `\texttt{\textunderscore }'.
@@ -1898,7 +1913,7 @@ Autocompletes. Default key is `\texttt{M-v}'.
 \item[\#versionshort]
 Show the program's version number, plus the date and time that the
 running copy was built from sources (not the version's release date).
-Default key is `\texttt{v}'.
+Default key is `\texttt{V}'.
 %.lp
 \item[\#vision]
 Show vision array.

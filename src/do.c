@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1737287889 2025/01/19 03:58:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.399 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1774269965 2026/03/23 04:46:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.404 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1942,8 +1942,18 @@ goto_level(
     if (new) {
         char dloc[QBUFSZ];
         /* Astral is excluded as a major event here because entry to it
-           is already one due to that being an achievement */
-        boolean major = In_endgame(&u.uz) && !Is_astralevel(&u.uz);
+           is already one such due to that being an achievement;
+           for the quest, listing the start, locate, and goal levels would
+           seem reasonable but all quest levels are included for simplicity--
+           level 2 (or 3 if hero level teleports after obtaining permission
+           to enter) is useful to show since it indicates that hero has
+           actually entered the quest rather than just received permission
+           to do so, and listing the goal level could be used to figure out
+           whether level 5 is the end or there's another level (ESP reveals
+           the same thing, but is part of normal game play as opposed to
+           #chronicle leaking information that hero hasn't discovered yet) */
+        boolean major = ((In_endgame(&u.uz) && !Is_astralevel(&u.uz))
+                         || In_quest(&u.uz));
 
         (void) describe_level(dloc, 2);
         livelog_printf(major ? LL_ACHIEVE : LL_DEBUG, "entered %s", dloc);
@@ -2248,7 +2258,8 @@ revive_mon(anything *arg, long timeout UNUSED)
     /* corpse will revive somewhere else if there is a monster in the way;
        Riders get a chance to try to bump the obstacle out of their way */
     if (is_displacer(mptr) && body->where == OBJ_FLOOR
-        && get_obj_location(body, &x, &y, 0) && (mtmp = m_at(x, y)) != 0) {
+        && get_obj_location(body, &x, &y, 0) && (mtmp = m_at(x, y)) != 0 &&
+        svl.level.flags.stasis_until < svm.moves) {
         boolean notice_it = canseemon(mtmp); /* before rloc() */
         char *monname = Monnam(mtmp);
 

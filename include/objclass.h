@@ -104,6 +104,11 @@ struct objclass {
 #define oc_level oc_oc2 /* books: spell level */
 
     unsigned short oc_nutrition; /* food value */
+
+    unsigned long oc_sell_minseen;
+    unsigned long oc_sell_maxseen;
+    unsigned long oc_buy_minseen;
+    unsigned long oc_buy_maxseen;
 };
 
 struct class_sym {

@@ -1776,9 +1776,7 @@ wiz_display_macros(void)
     destroy_nhwindow(win);
     return ECMD_OK;
 }
-#endif /* (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG) */
 
-#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
 /* the #wizmondiff command */
 int
 wiz_mon_diff(void)
@@ -1818,6 +1816,46 @@ wiz_mon_diff(void)
         putstr(win, 0, "No monster difficulty discrepancies were detected.");
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
+    return ECMD_OK;
+}
+
+/* the #wizobjprobs command */
+int
+wiz_objprobs(void)
+{
+    int win;
+    char buf[BUFSZ];
+    int probsum[MAXOCLASSES];
+    int otyp;
+    int oclass = objects[FIRST_OBJECT].oc_class;
+    memset(probsum, 0, sizeof probsum);
+
+    for (otyp = FIRST_OBJECT; otyp < NUM_OBJECTS; otyp++) {
+        probsum[(int) objects[otyp].oc_class] += objects[otyp].oc_prob;
+    }
+
+    win = create_nhwindow(NHW_TEXT);
+    for (otyp = FIRST_OBJECT; otyp < NUM_OBJECTS; otyp++) {
+        /* placeholders for extra descriptions aren't generatable objects */
+        if (!OBJ_NAME(objects[otyp]))
+            continue;
+
+        if ((int) objects[otyp].oc_class != oclass) {
+            putstr(win, 0, "");
+        }
+        oclass = objects[otyp].oc_class;
+
+        Snprintf(buf, sizeof buf, "%4d / %4d (%6.2f%%): %s",
+                 objects[otyp].oc_prob,
+                 probsum[oclass],
+                 (float) objects[otyp].oc_prob * 100.f /
+                 (float) probsum[oclass],
+                 OBJ_NAME(objects[otyp]));
+        putstr(win, 0, buf);
+    }
+    display_nhwindow(win, FALSE);
+    destroy_nhwindow(win);
+
     return ECMD_OK;
 }
 #endif /* (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG) */

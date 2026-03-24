@@ -247,6 +247,7 @@ static const struct instance_globals_c g_init_c = {
     /* decl.c */
     UNDEFINED_VALUES, /* chosen_windowtype */
     0, /* cmd_key */
+    NULL, /* cmd_bind */
     0L, /* command_count */
     UNDEFINED_PTR, /* current_wand */
 #ifdef DEF_PAGER

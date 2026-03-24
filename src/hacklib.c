@@ -936,11 +936,17 @@ case_insensitive_comp(const char *s1, const char *s2)
     return u1 - u2;
 }
 
+#if defined(MACOS)
+#define RETTYPE ssize_t
+#else
+#define RETTYPE int
+#endif
+
 boolean
 copy_bytes(int ifd, int ofd)
 {
     char buf[BUFSIZ];
-    int nfrom, nto;
+    RETTYPE nfrom, nto;
 
     do {
         nto = 0;
@@ -950,9 +956,11 @@ copy_bytes(int ifd, int ofd)
             nto = write(ofd, buf, nfrom);
         if (nto != nfrom || nfrom < 0)
             return FALSE;
-    } while (nfrom == BUFSIZ);
+    } while (nfrom == (RETTYPE) BUFSIZ);
     return TRUE;
 }
+#undef RETTYPE
+
 #define MAX_D 5
 struct datamodel_information {
     int sz[MAX_D];

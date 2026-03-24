@@ -60,7 +60,7 @@
 .ds f0 \*(vr
 .ds f1 \" empty
 .\"DO NOT REMOVE NH_DATESUB .ds f2 Date(%B %-d, %Y)
-.ds f2 February 11, 2026
+.ds f2 March 21, 2026
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -1282,6 +1282,7 @@ Talk to someone.
 Default key is \(oqM-c\(cq.
 .lp "#chronicle"
 Show a list of important game events.
+Default key is \(oqv\(cq.
 .lp "#close   "
 Close a door.
 Default key is \(oqc\(cq.
@@ -1382,7 +1383,6 @@ option is On, clicking on the hero (or steed when mounted) will
 execute this command.
 .lp "#history "
 Show long version and game history.
-Default key is \(oqV\(cq.
 .lp #inventory
 Show your inventory.
 Default key is \(oqi\(cq.
@@ -1754,6 +1754,18 @@ floor container menu.
 .lp ""
 Autocompletes.
 Default key is \(oqM-T\(cq.
+.lp "#toggle  "
+Toggle a boolean option on or off.
+Requires a parameter in parenthesis, the name of the option to toggle.
+The option must be settable in-game.
+.lp ""
+For example:
+.sd
+.ft CR
+BIND=':toggle(price_quotes)
+BIND=@:toggle(autopickup)
+.ft
+.ed
 .lp "#travel  "
 Travel to a specific location on the map.
 Default key is \(oq_\(cq. \" underscore
@@ -1823,7 +1835,7 @@ Default key is \(oqM-v\(cq.
 .lp #versionshort
 Show the program's version number, plus the date and time that the
 running copy was built from sources (not the version's release date).
-Default key is \(oqv\(cq.
+Default key is \(oqV\(cq.
 .lp "#vision  "
 Show vision array.
 Autocompletes.
@@ -4592,6 +4604,15 @@ user name (on multi-user systems) or specifying a particular character
 name (on single-user systems) or it might be disabled entirely.  Requesting
 it when not allowed or not possible results in explore mode instead.
 Default is normal play.
+.lp price_quotes
+Whenever the game mentions the name of an object you haven't identified yet,
+it also mentions the range of buy and sell prices you have seen for that
+item (to help narrow down what it could be).
+The price shown is the unit price for one item (even when you are looking at
+a stack of multiple items).
+Many players may want to turn this on while identifying objects, and then
+turn it back off again for general play.
+Default is off.
 .lp pushweapon
 Using the \(oqw\(cq (wield) command when already wielding
 something pushes the old item into your alternate weapon slot (default off).

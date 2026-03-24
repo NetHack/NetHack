@@ -608,6 +608,9 @@ regen_pw(int wtcap)
                               / 6)))) || Energy_regeneration)) {
         int upper = (int) (ACURR(A_WIS) + ACURR(A_INT)) / 15 + 1;
 
+        if (EMagical_breathing)
+            upper += 2;
+
         u.uen += rn1(upper, 1);
         if (u.uen > u.uenmax)
             u.uen = u.uenmax;

@@ -130,8 +130,10 @@ for i=1,5 + math.random(1 - 1,1*10) do
    end
 end
 -- shamans can be hanging out in/near the temple
-for i=1,math.random(2 - 1,2*3) do
-   des.monster({ id = "orc shaman", coord = near_temple:rndcoord(0), peaceful=0 });
+-- one of the shamans is higher level
+for i=1,math.random(1,6) do
+   des.monster({ id = "orc shaman", coord = near_temple:rndcoord(0), peaceful=0,
+                 m_lev_adj = (i == 1) and 3 or 0 });
 end
 -- these are not such a big deal
 -- to run into outside the bars

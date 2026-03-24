@@ -22,12 +22,22 @@
 #define MOUSECMD     0x0800 /* cmd allowed to be bound to mouse button */
 #define CMD_INSANE   0x1000 /* suppress sanity check (for ^P and ^R) */
 #define AUTOCOMP_ADJ 0x2000 /* user changed command autocompletion */
+#define CMD_PARAM    0x4000 /* command requires a param from key bind */
 
 /* flags for extcmds_match() */
 #define ECM_NOFLAGS       0
 #define ECM_IGNOREAC   0x01 /* ignore !autocomplete commands */
 #define ECM_EXACTMATCH 0x02 /* needs exact match of findstr */
 #define ECM_NO1CHARCMD 0x04 /* ignore commands like '?' and '#' */
+
+/* a key bound to ext_func_tab */
+struct Cmd_bind {
+    uchar key;
+    boolean userbind; /* added by user */
+    char *param;
+    const struct ext_func_tab *cmd;
+    struct Cmd_bind *next;
+};
 
 struct ext_func_tab {
     uchar key;

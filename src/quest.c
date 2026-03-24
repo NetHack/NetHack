@@ -1,4 +1,4 @@
-/* NetHack 3.7	quest.c	$NHDT-Date: 1687036547 2023/06/17 21:15:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.7	quest.c	$NHDT-Date: 1774269965 2026/03/23 04:46:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
 /*      Copyright 1991, M. Stephenson             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -339,6 +339,12 @@ chat_with_leader(struct monst *mtmp)
                 com_pager("banished");
                 Qstat(pissed_off) = TRUE;
                 expulsion(FALSE);
+
+                /* being expelled is hardly an achievement but none of the
+                   other livelog classifications fit */
+                livelog_printf(LL_ACHIEVE,
+                               "%s has expelled you from the quest",
+                               noit_mon_nam(mtmp));
             }
         } else if (purity == 0) {
             qt_pager("badalign");
@@ -349,6 +355,14 @@ chat_with_leader(struct monst *mtmp)
             qt_pager("assignquest");
             exercise(A_WIS, TRUE);
             Qstat(got_quest) = TRUE;
+
+            /* phrasing is a bit clumsy but allows #chronicle to provide a
+               clue to players who are reaching the quest for first time;
+               matters most for Home 1 that has stairs down which aren't
+               easily found */
+            livelog_printf(LL_ACHIEVE,
+                     "%s has granted access to proceed deeper into the quest",
+                           noit_mon_nam(mtmp));
         }
     }
 }

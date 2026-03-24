@@ -240,6 +240,7 @@ struct instance_globals_c {
     /* decl.c */
     char chosen_windowtype[WINTYPELEN];
     int cmd_key; /* parse() / rhack() */
+    struct Cmd_bind *cmd_bind;
     cmdcount_nht command_count;
     /* some objects need special handling during destruction or placement */
     struct obj *current_wand;  /* wand currently zapped/applied */

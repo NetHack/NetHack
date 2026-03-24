@@ -390,6 +390,7 @@ staticfn boolean parse_role_opt(int, boolean, const char *, char *, char **);
 staticfn char *get_cnf_role_opt(int);
 staticfn unsigned int longest_option_name(int, int);
 staticfn int doset_simple_menu(void);
+staticfn void reset_needed_visuals(void);
 staticfn void doset_add_menu(winid, const char *, const char *, int, int);
 staticfn int handle_add_list_remove(const char *, int);
 staticfn void all_options_conds(strbuf_t *);
@@ -5334,6 +5335,7 @@ optfn_boolean(
             disp.botl = TRUE;
             break;
         case opt_fixinv:
+        case opt_price_quotes:
         case opt_sortpack:
         case opt_implicit_uncursed:
         case opt_wizweight:
@@ -7681,7 +7683,7 @@ parsebindings(char *bindings)
     }
 
     /* extended command? */
-    if (!bind_key(key, bind)) {
+    if (!bind_key(key, bind, TRUE)) {
         config_error_add("Unknown key binding command '%s'", bind);
         return FALSE;
     }
@@ -9011,6 +9013,15 @@ doset(void) /* changing options via menu by Per Liboriussen */
         goto rerun;
     }
 
+    reset_needed_visuals();
+    return ECMD_OK;
+}
+
+#undef HELP_IDX
+
+staticfn void
+reset_needed_visuals(void)
+{
     if (go.opt_need_glyph_reset) {
         reset_glyphmap(gm_optionchange);
     }
@@ -9038,10 +9049,12 @@ doset(void) /* changing options via menu by Per Liboriussen */
     if (disp.botl || disp.botlx) {
         bot();
     }
-    return ECMD_OK;
+    go.opt_need_redraw = FALSE;
+    go.opt_need_glyph_reset = FALSE;
+    go.opt_reset_customcolors = FALSE;
+    go.opt_reset_customsymbols = FALSE;
+    go.opt_update_basic_palette = FALSE;
 }
-
-#undef HELP_IDX
 
 /* doset(#optionsfull command) menu entries for compound options */
 staticfn void
@@ -9301,6 +9314,29 @@ dotogglepickup(void)
     }
     pline("Autopickup: %s.", buf);
     return ECMD_OK;
+}
+
+/* toggle any (settable in-game) boolean option by name */
+int
+toggle_bool_option(const char *p)
+{
+    int i;
+    int ret = ECMD_FAIL;
+
+    for (i = 0; i < OPTCOUNT; i++)
+        if (!strncmpi(allopt[i].name, p, strlen(p))
+            && allopt[i].opttyp == BoolOpt
+            && allopt[i].setwhere == set_in_game
+            && allopt[i].addr != 0) {
+            char buf[BUFSZ];
+
+            Sprintf(buf, "%s%s", *allopt[i].addr ? "!" : "", allopt[i].name);
+            if (parseoptions(buf, FALSE, FALSE))
+                ret = ECMD_OK;
+
+            reset_needed_visuals();
+        }
+    return ret;
 }
 
 int

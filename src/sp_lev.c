@@ -2165,6 +2165,14 @@ create_monster(monster *m, struct mkroom *croom)
             if (vampshifted(mtmp) && m->appear != M_AP_MONSTER)
                 (void) newcham(mtmp, &mons[mtmp->cham], NO_NC_FLAGS);
         }
+        if (m->m_lev_adj) {
+            if (mtmp->m_lev + m->m_lev_adj > 49)
+                mtmp->m_lev = 49;
+            else if (mtmp->m_lev + m->m_lev_adj < 0)
+                mtmp->m_lev = 0;
+            else
+                mtmp->m_lev += m->m_lev_adj;
+        }
         if (!(m->has_invent & DEFAULT_INVENT)) {
             /* guard against someone accidentally specifying e.g. quest nemesis
              * with custom inventory that lacks Bell or quest artifact but
@@ -3298,6 +3306,7 @@ lspo_monster(lua_State *L)
         tmpmons.stunned = get_table_boolean_opt(L, "stunned", FALSE);
         tmpmons.confused = get_table_boolean_opt(L, "confused", FALSE);
         tmpmons.waiting = get_table_boolean_opt(L, "waiting", FALSE);
+        tmpmons.m_lev_adj = get_table_int_opt(L, "m_lev_adj", 0);
         tmpmons.seentraps = 0; /* TODO: list of trap names to bitfield */
         keep_default_invent =
             get_table_boolean_opt(L, "keep_default_invent", -1);

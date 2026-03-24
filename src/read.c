@@ -1188,7 +1188,8 @@ seffect_enchant_armor(struct obj **sobjp)
         useup(otmp);
         return;
     }
-    if (s < -100) s = -100; /* avoid integer overflow with very negative armor */
+    if (s < -100)
+        s = -100; /* avoid integer overflow with very negative armor */
 
     /* Base power of the enchantment:
 
@@ -1201,19 +1202,25 @@ seffect_enchant_armor(struct obj **sobjp)
 
     /* Elven/artifact and nonmagical armor is easier to enchant;
        blessed scrolls are more effective. */
-    if (special_armor) ++s;
-    if (!objects[otmp->otyp].oc_magic) ++s;
-    if (sblessed) ++s;
+    if (special_armor)
+        ++s;
+    if (!objects[otmp->otyp].oc_magic)
+        ++s;
+    if (sblessed)
+        ++s;
 
     if (s <= 0) {
         s = 0;
-        if (otmp->spe > 0 && !rn2(otmp->spe)) s = 1;
+        if (otmp->spe > 0 && !rn2(otmp->spe))
+            s = 1;
     } else {
         s = rnd(s);
     }
-    if (s > 11) s = 11;    /* unlikely but possible: avoids an overflow later */
+    if (s > 11)
+        s = 11;    /* unlikely but possible: avoids an overflow later */
 
-    if (scursed) s = -s;
+    if (scursed)
+        s = -s;
 
     if (s >= 0 && Is_dragon_scales(otmp)) {
         unsigned was_lit = otmp->lamplit;
@@ -1286,16 +1293,24 @@ seffect_enchant_armor(struct obj **sobjp)
 staticfn boolean
 disintegrate_cursed_armor(void)
 {
-    struct obj *armors[7] = { NULL };
+    struct obj *armors[10];
     int idx = 0;
 
-    if (uarm && uarm->cursed) armors[idx++] = uarm;
-    if (uarmc && uarmc->cursed) armors[idx++] = uarmc;
-    if (uarmh && uarmh->cursed) armors[idx++] = uarmh;
-    if (uarms && uarms->cursed) armors[idx++] = uarms;
-    if (uarmg && uarmg->cursed) armors[idx++] = uarmg;
-    if (uarmf && uarmf->cursed) armors[idx++] = uarmf;
-    if (uarmu && uarmu->cursed) armors[idx++] = uarmu;
+    armors[0] = NULL;
+    if (uarm && uarm->cursed)
+        armors[idx++] = uarm;
+    if (uarmc && uarmc->cursed)
+        armors[idx++] = uarmc;
+    if (uarmh && uarmh->cursed)
+        armors[idx++] = uarmh;
+    if (uarms && uarms->cursed)
+        armors[idx++] = uarms;
+    if (uarmg && uarmg->cursed)
+        armors[idx++] = uarmg;
+    if (uarmf && uarmf->cursed)
+        armors[idx++] = uarmf;
+    if (uarmu && uarmu->cursed)
+        armors[idx++] = uarmu;
     if (!idx)
         return FALSE;
 
@@ -1616,6 +1631,7 @@ seffect_enchant_weapon(struct obj **sobjp)
     boolean scursed = sobj->cursed;
     boolean confused = (Confusion != 0);
     boolean old_erodeproof, new_erodeproof;
+    int s;
 
     /* [What about twoweapon mode?  Proofing/repairing/enchanting both
        would be too powerful, but shouldn't we choose randomly between
@@ -1648,11 +1664,12 @@ seffect_enchant_weapon(struct obj **sobjp)
         uwep->oerodeproof = new_erodeproof ? 1 : 0;
         return;
     }
-    if (!chwepon(sobj, scursed ? -1
-                 : !uwep ? 1
-                 : (uwep->spe >= 9) ? !rn2(uwep->spe)
-                 : sblessed ? rnd(3 - uwep->spe / 3)
-                 : 1))
+    s = scursed ? -1
+        : !uwep ? 1 /* guard further tests against null pointer */
+          : (uwep->spe >= 9) ? (rn2(uwep->spe) == 0) /* usually 0, maybe  1 */
+            : sblessed ? rnd(3 - uwep->spe / 3) /* >= 9 case prevents rnd(0) */
+              : 1; /* uncursed */
+    if (!chwepon(sobj, s))
         *sobjp = 0; /* nothing enchanted: strange_feeling -> useup */
     if (uwep)
         cap_spe(uwep);

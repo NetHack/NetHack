@@ -59,6 +59,7 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <time.h>
+#include <limits.h>
 
 #else /* !__cplusplus */
 /* for FILE */

@@ -145,6 +145,7 @@ typedef struct {
     schar peaceful, asleep;
     short female, invis, cancelled, revived, avenge, fleeing, blinded,
         paralyzed, stunned, confused, waiting;
+    short m_lev_adj;
     long seentraps;
     short has_invent;
     mmflags_nht mm_flags; /* makemon flags */

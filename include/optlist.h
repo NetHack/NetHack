@@ -589,6 +589,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(preload_tiles, Advanced, 0, opt_out, set_in_config, /* MSDOS only */
            On, Yes, No, No, NoAlias, &iflags.wc_preload_tiles, Term_False,
            (char *)0)
+    NHOPTB(price_quotes, General, 0, opt_in, set_in_game,
+           Off, Yes, No, No, NoAlias, &iflags.pricequotes, Term_False,
+           "display prices you have seen for unidentified objects")
     NHOPTB(pushweapon, Behavior, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &flags.pushweapon, Term_False,
            "previous weapon goes to secondary slot")

@@ -202,6 +202,7 @@
 		BAE8015627B99CAE002B3786 /* lstrlib.c in Sources */ = {isa = PBXBuildFile; fileRef = BAE8013427B99CAD002B3786 /* lstrlib.c */; };
 		BAE8015727B99CAE002B3786 /* lzio.c in Sources */ = {isa = PBXBuildFile; fileRef = BAE8013527B99CAD002B3786 /* lzio.c */; };
 		BAE8015A27B9C872002B3786 /* date.c in Sources */ = {isa = PBXBuildFile; fileRef = 5439B3BB275AADC600B8FB2F /* date.c */; };
+		F50818312F6F564300D2AAFA /* iactions.c in Sources */ = {isa = PBXBuildFile; fileRef = F50818302F6F564300D2AAFA /* iactions.c */; };
 		F5457B212DED146B00039D83 /* hacklib.c in Sources */ = {isa = PBXBuildFile; fileRef = F5457B202DED146B00039D83 /* hacklib.c */; };
 		F5457B2C2DED16F200039D83 /* libhacklib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5457B1C2DED143E00039D83 /* libhacklib.a */; };
 		F5457B2D2DED171800039D83 /* libhacklib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5457B1C2DED143E00039D83 /* libhacklib.a */; };
@@ -595,6 +596,7 @@
 		BAE8013327B99CAD002B3786 /* lmathlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lmathlib.c; path = "../../lib/lua-5.4.8/src/lmathlib.c"; sourceTree = "<group>"; };
 		BAE8013427B99CAD002B3786 /* lstrlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lstrlib.c; path = "../../lib/lua-5.4.8/src/lstrlib.c"; sourceTree = "<group>"; };
 		BAE8013527B99CAD002B3786 /* lzio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lzio.c; path = "../../lib/lua-5.4.8/src/lzio.c"; sourceTree = "<group>"; };
+		F50818302F6F564300D2AAFA /* iactions.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = iactions.c; path = ../../src/iactions.c; sourceTree = "<group>"; };
 		F515A6F32DED074D006E1F63 /* sfctool.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = sfctool.c; path = ../../util/sfctool.c; sourceTree = "<group>"; };
 		F515A6F52DED0916006E1F63 /* date.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = date.c; path = ../../src/date.c; sourceTree = "<group>"; };
 		F515A6F62DED0916006E1F63 /* sfbase.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = sfbase.c; path = ../../src/sfbase.c; sourceTree = "<group>"; };
@@ -691,6 +693,7 @@
 		3189576821A1FCC100FB2ABE = {
 			isa = PBXGroup;
 			children = (
+				F50818302F6F564300D2AAFA /* iactions.c */,
 				F515A73B2DED0B47006E1F63 /* hacklib.c */,
 				F5457B202DED146B00039D83 /* hacklib.c */,
 				F515A72A2DED0A7C006E1F63 /* sftags.c */,
@@ -1980,6 +1983,7 @@
 				31B8A38421A238060055BD01 /* do_name.c in Sources */,
 				31B8A3C421A238060055BD01 /* apply.c in Sources */,
 				31B8A3F721A23DD10055BD01 /* unixres.c in Sources */,
+				F50818312F6F564300D2AAFA /* iactions.c in Sources */,
 				31B8A3BD21A238060055BD01 /* files.c in Sources */,
 				31B8A39221A238060055BD01 /* do_wear.c in Sources */,
 				31B8A3E521A238B30055BD01 /* dlb.c in Sources */,

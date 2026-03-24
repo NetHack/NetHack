@@ -98,8 +98,6 @@ void sf_log(NHFILE *, const char *, size_t, int, char *);
 #define Sfvalue_uint16(a) sfvalue(a)
 #define Sfvalue_uint32(a) sfvalue(a)
 #define Sfvalue_uint64(a) sfvalue(a)
-#define Sfvalue_size_t(a) sfvalue(a)
-#define Sfvalue_time_t(a) sfvalue(a)
 #define Sfvalue_short(a) sfvalue(a)
 #define Sfvalue_ushort(a) sfvalue(a)
 #define Sfvalue_int(a) sfvalue(a)
@@ -115,6 +113,8 @@ void sf_log(NHFILE *, const char *, size_t, int, char *);
 #define Sfvalue_boolean(a) sfvalue_boolean(a)
 #define Sfvalue_schar(a) sfvalue_schar(a)
 #define Sfvalue_bitfield(a) sfvalue_bitfield(a)
+#define Sfvalue_time_t(a) sfvalue_time_t(a)
+#define Sfvalue_size_t(a) sfvalue_size_t(a)
 
 #define SF_A(dtyp) \
 void sfo_##dtyp(NHFILE *nhfp, dtyp *d_##dtyp, const char *myname)               \

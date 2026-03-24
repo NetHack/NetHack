@@ -23,6 +23,10 @@ initrack(void)
 void
 settrack(void)
 {
+    if ((uleft && uleft->otyp == RIN_STEALTH)
+        || (uright && uright->otyp == RIN_STEALTH))
+        return;
+
     if (utcnt < UTSZ)
         utcnt++;
     if (utpnt == UTSZ)

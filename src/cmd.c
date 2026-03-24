@@ -94,6 +94,10 @@ extern int dozap(void);              /**/
 extern int doorganize(void);         /**/
 #endif /* DUMB */
 
+staticfn struct Cmd_bind *cmdbind_get(uchar);
+staticfn void cmdbind_add(uchar, const struct ext_func_tab *, boolean);
+staticfn void cmdbind_remove(uchar);
+staticfn void cmdbind_swapkeys(uchar, uchar);
 staticfn int dosuspend_core(void);
 staticfn int dosh_core(void);
 staticfn int doherecmdmenu(void);
@@ -1364,6 +1368,21 @@ dolookaround(void)
     return ECMD_OK;
 }
 
+/* #toggle extended command
+
+   BIND=':toggle(price_quotes)
+   BIND=@:toggle(autopickup) */
+int
+dotoggleoption(void)
+{
+    if (gc.cmd_bind && gc.cmd_bind->param) {
+        return toggle_bool_option(gc.cmd_bind->param);
+    } else {
+        pline("Use #optionsfull to set any option instead.");
+        return ECMD_OK;
+    }
+}
+
 void
 set_move_cmd(int dir, int run)
 {
@@ -1671,7 +1690,7 @@ struct ext_func_tab extcmdlist[] = {
               docast, IFBURIED, NULL },
     { M('c'), "chat", "talk to someone",
               dotalk, IFBURIED | AUTOCOMPLETE, NULL },
-    { '\0',   "chronicle", "show journal of major events",
+    { 'v',    "chronicle", "show journal of major events",
               do_gamelog, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
     { 'c',    "close", "close a door",
               doclose, 0, NULL },
@@ -1716,7 +1735,7 @@ struct ext_func_tab extcmdlist[] = {
               dohelp, IFBURIED | GENERALCMD, NULL },
     { '\0',   "herecmdmenu", "show menu of commands you can do here",
               doherecmdmenu, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { 'V',    "history", "show long version and game history",
+    { '\0',    "history", "show long version and game history",
               dohistory, IFBURIED | GENERALCMD, NULL },
     { 'i',    "inventory", "show your inventory",
               ddoinv, IFBURIED | GENERALCMD, NULL },
@@ -1885,6 +1904,8 @@ struct ext_func_tab extcmdlist[] = {
               wiz_timeout_queue, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { M('T'), "tip", "empty a container",
               dotip, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
+    { '\0',   "toggle", "toggle boolean option",
+              dotoggleoption, IFBURIED | GENERALCMD | CMD_PARAM, NULL },
     { '_',    "travel", "travel to a specific location on the map",
               dotravel, CMD_M_PREFIX, NULL },
     { M('t'), "turn", "turn undead away",
@@ -1902,8 +1923,8 @@ struct ext_func_tab extcmdlist[] = {
     { M('v'), "version",
               "list compile time options for this version of NetHack",
               doextversion, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { 'v',    "versionshort", "show version and date+time program was built",
-              doversion, IFBURIED | GENERALCMD, NULL },
+    { 'V',    "versionshort", "show version and date+time program was built",
+              doversion, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
     { '\0',   "vision", "show vision array",
               wiz_show_vision, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { '.',    "wait", "rest one move while doing nothing",
@@ -1952,6 +1973,10 @@ struct ext_func_tab extcmdlist[] = {
               wiz_load_splua, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
     { '\0',   "wizloadlua", "load and execute a lua script",
               wiz_load_lua, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
+    { '\0',   "wizobjprobs", "list object generation probabilities",
+              wiz_objprobs, IFBURIED | WIZMODECMD, NULL },
+#endif
     { '\0',   "wizmakemap", "recreate the current level",
               wiz_makemap, IFBURIED | WIZMODECMD, NULL },
     { C('f'), "wizmap", "map the level",
@@ -2078,17 +2103,128 @@ extcmds_getentry(int i)
     return &extcmdlist[i];
 }
 
+/* get the command bound to a key */
+staticfn struct Cmd_bind *
+cmdbind_get(uchar key)
+{
+    struct Cmd_bind *bind = gc.Cmd.cmdbinds;
+
+    if (!key)
+        return NULL;
+
+    while (bind) {
+        if (bind->key == key)
+            return bind;
+        bind = bind->next;
+    }
+    return bind;
+}
+
+staticfn void
+cmdbind_add(uchar key, const struct ext_func_tab *extcmd, boolean user)
+{
+    struct Cmd_bind *bind = cmdbind_get(key);
+
+    if (!key)
+        return;
+    if (!extcmd && bind) {
+        cmdbind_remove(key);
+        return;
+    }
+
+    /* binding exists, set it to this command */
+    if (bind) {
+        bind->cmd = extcmd;
+        bind->userbind = user;
+        if (bind->param) {
+            free(bind->param);
+            bind->param = NULL;
+        }
+        return;
+    } else {
+        bind = (struct Cmd_bind *) alloc(sizeof(struct Cmd_bind));
+        bind->key = key;
+        bind->userbind = user;
+        bind->param = NULL;
+        bind->cmd = extcmd;
+        bind->next = gc.Cmd.cmdbinds;
+        gc.Cmd.cmdbinds = bind;
+    }
+}
+
+staticfn void
+cmdbind_remove(uchar key)
+{
+    struct Cmd_bind *bind = gc.Cmd.cmdbinds;
+    struct Cmd_bind *prev = (struct Cmd_bind *) 0;
+
+    while (bind) {
+        if (bind->key == key) {
+            if (prev)
+                prev->next = bind->next;
+            else
+                gc.Cmd.cmdbinds = bind->next;
+            if (bind->param)
+                free(bind->param);
+            free(bind);
+            return;
+        }
+        prev = bind;
+        bind = bind->next;
+    }
+}
+
+void
+cmdbind_freeall(void)
+{
+    struct Cmd_bind *next;
+
+    while (gc.Cmd.cmdbinds) {
+        next = gc.Cmd.cmdbinds->next;
+        if (gc.Cmd.cmdbinds->param)
+            free(gc.Cmd.cmdbinds->param);
+        free(gc.Cmd.cmdbinds);
+        gc.Cmd.cmdbinds = next;
+    }
+}
+
+/* swap key bindings for key1 and key2. both bindings must exist. */
+staticfn void
+cmdbind_swapkeys(uchar key1, uchar key2)
+{
+    struct Cmd_bind *bind1 = cmdbind_get(key1);
+    struct Cmd_bind *bind2 = cmdbind_get(key2);
+
+    if (bind1 && bind2) {
+        bind1->key = key2;
+        bind2->key = key1;
+    }
+}
+
 /* return number of extended commands bound to a non-default key */
 int
 count_bind_keys(void)
 {
-    int nbinds = 0;
-    int i;
+    struct Cmd_bind *bind = gc.Cmd.cmdbinds;
+    int i, nbinds = 0;
+    uchar keys[256];
 
-    for (i = 0; i < extcmdlist_length; i++)
-        if (extcmdlist[i].key
-            && gc.Cmd.commands[extcmdlist[i].key] != &extcmdlist[i])
+    (void) memset(keys, 0, sizeof(uchar) * 256);
+
+    /* commands bound to different key */
+    while (bind) {
+        keys[bind->key] = 1;
+        if (bind->userbind && bind->cmd && bind->cmd->key != bind->key) {
             nbinds++;
+        }
+        bind = bind->next;
+    }
+
+    /* commands which should be bound to a key, but aren't */
+    for (i = 0; i < extcmdlist_length; i++)
+        if (extcmdlist[i].key && !keys[extcmdlist[i].key])
+            nbinds++;
+
     return nbinds;
 }
 
@@ -2100,16 +2236,41 @@ get_changed_key_binds(strbuf_t *sbuf)
     int i;
     char buf[BUFSZ];
     char buf2[QBUFSZ];
+    struct Cmd_bind *bind = gc.Cmd.cmdbinds;
+    uchar keys[256];
+
+    (void) memset(keys, 0, sizeof(uchar) * 256);
 
     if (!sbuf)
         win = create_nhwindow(NHW_TEXT);
+
+    /* commands bound to different key */
+    while (bind) {
+        keys[bind->key] = 1;
+        if (bind->userbind && bind->cmd && bind->cmd->key != bind->key) {
+            if ((bind->cmd->flags & CMD_PARAM) != 0)
+                Sprintf(buf, "BIND=%s:%s(%s)%s", key2txt(bind->key, buf2),
+                        bind->cmd->ef_txt,
+                        bind->param,
+                        sbuf ? "\n" : "");
+            else
+                Sprintf(buf, "BIND=%s:%s%s", key2txt(bind->key, buf2),
+                        bind->cmd->ef_txt,
+                        sbuf ? "\n" : "");
+            if (sbuf)
+                strbuf_append(sbuf, buf);
+            else
+                putstr(win, 0, buf);
+        }
+        bind = bind->next;
+    }
+
+    /* commands which should be bound to a key, but aren't */
     for (i = 0; i < extcmdlist_length; i++) {
         struct ext_func_tab *ec = &extcmdlist[i];
 
-        if (ec->key && gc.Cmd.commands[ec->key]
-            && gc.Cmd.commands[ec->key] != ec) {
-            Sprintf(buf, "BIND=%s:%s%s", key2txt(ec->key, buf2),
-                    gc.Cmd.commands[ec->key]->ef_txt,
+        if (ec->key && !keys[ec->key]) {
+            Sprintf(buf, "BIND=%s:nothing%s", key2txt(ec->key, buf2),
                     sbuf ? "\n" : "");
             if (sbuf)
                 strbuf_append(sbuf, buf);
@@ -2136,6 +2297,7 @@ handler_rebind_keys_add(boolean keyfirst)
     char buf2[QBUFSZ];
     uchar key = '\0';
     int clr = NO_COLOR;
+    struct Cmd_bind *bind;
 
     if (keyfirst) {
         pline("Bind which key? ");
@@ -2150,9 +2312,10 @@ handler_rebind_keys_add(boolean keyfirst)
     any = cg.zeroany;
 
     if (key) {
-        if (gc.Cmd.commands[key]) {
+        bind = cmdbind_get(key);
+        if (bind) {
             Sprintf(buf, "Key '%s' is currently bound to \"%s\".",
-                    key2txt(key, buf2), gc.Cmd.commands[key]->ef_txt);
+                    key2txt(key, buf2), bind->cmd->ef_txt);
         } else {
             Sprintf(buf, "Key '%s' is not bound to anything.",
                     key2txt(key, buf2));
@@ -2187,19 +2350,32 @@ handler_rebind_keys_add(boolean keyfirst)
     npick = select_menu(win, PICK_ONE, &picks);
     destroy_nhwindow(win);
     if (npick > 0) {
-        const struct ext_func_tab *prevec;
-        const char *cmdstr;
+        struct Cmd_bind *prevcmd;
+        char cmdstr[BUFSZ];
 
         i = picks->item.a_int;
         free((genericptr_t) picks);
 
         if (i == -1) {
             ec = NULL;
-            cmdstr = "nothing";
+            Strcat(cmdstr, "nothing");
             goto bindit;
         } else {
             ec = &extcmdlist[i-1];
-            cmdstr = ec->ef_txt;
+
+            if ((ec->flags & CMD_PARAM) != 0) {
+                char parambuf[BUFSZ];
+                char querybuf[BUFSZ];
+
+                parambuf[0] = '\0';
+                Sprintf(querybuf, "Command %s requires a parameter:", ec->ef_txt);
+                getlin(querybuf, parambuf);
+                (void) mungspaces(parambuf);
+                Snprintf(cmdstr, BUFSZ-1, "%s(%s)", ec->ef_txt, parambuf);
+                cmdstr[BUFSZ-1] = '\0';
+            } else {
+                Strcat(cmdstr, ec->ef_txt);
+            }
         }
  bindit:
         if (!key) {
@@ -2210,13 +2386,13 @@ handler_rebind_keys_add(boolean keyfirst)
                 return;
         }
 
-        prevec = gc.Cmd.commands[key];
+        prevcmd = cmdbind_get(key);
 
-        if (bind_key(key, cmdstr)) {
-            if (prevec && prevec != ec) {
+        if (bind_key(key, cmdstr, TRUE)) {
+            if (prevcmd && prevcmd->cmd != ec) {
                 pline("Changed key '%s' from \"%s\" to \"%s\".",
-                      key2txt(key, buf2), prevec->ef_txt, cmdstr);
-            } else if (!prevec) {
+                      key2txt(key, buf2), prevcmd->cmd->ef_txt, cmdstr);
+            } else if (!prevcmd) {
                 pline("Bound key '%s' to \"%s\".",
                       key2txt(key, buf2), cmdstr);
             }
@@ -2386,6 +2562,7 @@ key2extcmddesc(uchar key)
     const char *txt;
     int k, i, j;
     uchar M_5 = (uchar) M('5'), M_0 = (uchar) M('0');
+    struct Cmd_bind *cmdbind;
 
     /* need to check for movement commands before checking the extended
        commands table because it contains entries for number_pad commands
@@ -2418,8 +2595,10 @@ key2extcmddesc(uchar key)
             return misc_keys[i].desc;
     }
     /* finally, check whether 'key' is a command */
-    if (gc.Cmd.commands[key] && (txt = gc.Cmd.commands[key]->ef_txt) != 0) {
-        Sprintf(key2cmdbuf, "%s (#%s)", gc.Cmd.commands[key]->ef_desc, txt);
+    if ((cmdbind = cmdbind_get(key)) != 0
+        && cmdbind->cmd
+        && (txt = cmdbind->cmd->ef_txt) != 0) {
+        Sprintf(key2cmdbuf, "%s (#%s)", cmdbind->cmd->ef_desc, txt);
 
         /* special case: for reqmenu prefix (normally 'm'), replace
            "prefix: request menu or modify command (#reqmenu)"
@@ -2478,22 +2657,58 @@ bind_mousebtn(int btn, const char *command)
 }
 
 boolean
-bind_key(uchar key, const char *command)
+bind_key(uchar key, const char *command, boolean user)
 {
     struct ext_func_tab *extcmd;
+    long len;
+    char *buf, *p = NULL, *lastp = NULL;
 
     /* special case: "nothing" is reserved for unbinding */
     if (!strcmpi(command, "nothing")) {
-        gc.Cmd.commands[key] = (struct ext_func_tab *) 0;
+        cmdbind_remove(key);
         return TRUE;
     }
 
+    /* copy command to buf for modification */
+    len = strlen(command) + 1;
+    buf = (char *)alloc(len);
+    (void) strncpy(buf, command, len);
+
+    /* does buf have a parameter in parenthesis? */
+    if ((p = strchr(buf, '(')) != 0
+        && (lastp = strrchr(buf, ')')) != 0
+        && (lastp > p)) {
+        *p = '\0';
+        *lastp = '\0';
+        /* p points to the parameter */
+        p++;
+    }
+
     for (extcmd = extcmdlist; extcmd->ef_txt; extcmd++) {
-        if (strcmpi(command, extcmd->ef_txt))
+        if (strcmpi(buf, extcmd->ef_txt))
             continue;
         if ((extcmd->flags & INTERNALCMD) != 0)
             continue;
-        gc.Cmd.commands[key] = extcmd;
+        cmdbind_add(key, extcmd, user);
+
+        if ((extcmd->flags & CMD_PARAM) != 0) {
+            if (!p) {
+                config_error_add("'%s' requires a parameter", buf);
+            } else {
+                struct Cmd_bind *bind = cmdbind_get(key);
+                int maxlen = min(30, strlen(p)) + 1;
+
+                if (maxlen <= 1) {
+                    config_error_add("Required parameter cannot be empty");
+                } else {
+                    bind->param = (char *) alloc(maxlen);
+                    (void) strncpy(bind->param, p, maxlen);
+                    bind->param[maxlen-1] = '\0';
+                }
+            }
+        } else if (p && strlen(p) > 0)
+            config_error_add("'%s' does not take a parameter", buf);
+
 #if 0 /* silently accept key binding for unavailable command (!SHELL,&c) */
         if ((extcmd->flags & CMD_NOT_AVAILABLE) != 0) {
             char buf[BUFSZ];
@@ -2502,9 +2717,11 @@ bind_key(uchar key, const char *command)
             config_error_add("%s", buf);
         }
 #endif
+        free(buf);
         return TRUE;
     }
 
+    free(buf);
     return FALSE;
 }
 
@@ -2519,7 +2736,7 @@ bind_key_fn(uchar key, int (*fn)(void))
             continue;
         if ((extcmd->flags & INTERNALCMD) != 0)
             continue;
-        gc.Cmd.commands[key] = extcmd;
+        cmdbind_add(key, extcmd, FALSE);
         return TRUE;
     }
 
@@ -2534,31 +2751,31 @@ commands_init(void)
 
     for (extcmd = extcmdlist; extcmd->ef_txt; extcmd++)
         if (extcmd->key)
-            gc.Cmd.commands[extcmd->key] = extcmd;
+            cmdbind_add(extcmd->key, extcmd, FALSE);
 
     (void) bind_mousebtn(1, "therecmdmenu");
     (void) bind_mousebtn(2, "clicklook");
 
     /* number_pad */
-    (void) bind_key(C('l'), "redraw");
-    (void) bind_key('h',    "help");
-    (void) bind_key('j',    "jump");
-    (void) bind_key('k',    "kick");
-    (void) bind_key('l',    "loot");
-    (void) bind_key(C('n'), "annotate");
-    (void) bind_key('N',    "name");
-    (void) bind_key('u',    "untrap");
-    (void) bind_key('5',    "run");
-    (void) bind_key(M('5'), "rush");
-    (void) bind_key('-',    "fight");
+    (void) bind_key(C('l'), "redraw", FALSE);
+    (void) bind_key('h',    "help", FALSE);
+    (void) bind_key('j',    "jump", FALSE);
+    (void) bind_key('k',    "kick", FALSE);
+    (void) bind_key('l',    "loot", FALSE);
+    (void) bind_key(C('n'), "annotate", FALSE);
+    (void) bind_key('N',    "name", FALSE);
+    (void) bind_key('u',    "untrap", FALSE);
+    (void) bind_key('5',    "run", FALSE);
+    (void) bind_key(M('5'), "rush", FALSE);
+    (void) bind_key('-',    "fight", FALSE);
 
     /* alt keys: */
-    (void) bind_key(M('O'), "overview");
-    (void) bind_key(M('2'), "twoweapon");
-    (void) bind_key(M('N'), "name");
+    (void) bind_key(M('O'), "overview", FALSE);
+    (void) bind_key(M('2'), "twoweapon", FALSE);
+    (void) bind_key(M('N'), "name", FALSE);
 #if 0
     /* don't do this until the rest_on_space option is set or cleared */
-    (void) bind_key(' ',    "wait");
+    (void) bind_key(' ',    "wait", FALSE);
 #endif
 }
 
@@ -2567,12 +2784,13 @@ keylist_func_has_key(const struct ext_func_tab *extcmd,
                      boolean *skip_keys_used) /* boolean keys_used[256] */
 {
     int i;
+    struct Cmd_bind *bind;
 
     for (i = 0; i < 256; ++i) {
         if (skip_keys_used[i])
             continue;
 
-        if (gc.Cmd.commands[i] == extcmd)
+        if (((bind = cmdbind_get(i)) != 0) && (bind->cmd == extcmd))
             return TRUE;
     }
     return FALSE;
@@ -2588,6 +2806,7 @@ keylist_putcmds(winid datawin, boolean docount,
     char buf[BUFSZ], buf2[QBUFSZ];
     boolean keys_already_used[256]; /* copy of keys_used[] before updates */
     int count = 0;
+    struct Cmd_bind *bind;
 
     for (i = 0; i < 256; i++) {
         uchar key = (uchar) i;
@@ -2597,16 +2816,22 @@ keylist_putcmds(winid datawin, boolean docount,
             continue;
         if (key == ' ' && !flags.rest_on_space)
             continue;
-        if ((extcmd = gc.Cmd.commands[i]) != (struct ext_func_tab *) 0) {
-            if ((incl_flags && !(extcmd->flags & incl_flags))
-                || (excl_flags && (extcmd->flags & excl_flags)))
+        bind = cmdbind_get(key);
+        if (bind && bind->cmd != (struct ext_func_tab *) 0) {
+            if ((incl_flags && !(bind->cmd->flags & incl_flags))
+                || (excl_flags && (bind->cmd->flags & excl_flags)))
                 continue;
             if (docount) {
                 count++;
                 continue;
             }
-            Sprintf(buf, "%-7s %-13s %s", key2txt(key, buf2),
-                    extcmd->ef_txt, extcmd->ef_desc);
+            if ((bind->cmd->flags & CMD_PARAM) != 0)
+                Sprintf(buf, "%-7s %-13s %s \"%s\"", key2txt(key, buf2),
+                        bind->cmd->ef_txt, bind->cmd->ef_desc,
+                        bind->param);
+            else
+                Sprintf(buf, "%-7s %-13s %s", key2txt(key, buf2),
+                        bind->cmd->ef_txt, bind->cmd->ef_desc);
             putstr(datawin, 0, buf);
             keys_used[i] = TRUE;
         }
@@ -2810,9 +3035,10 @@ cmd_from_func(int (*fn)(void))
 {
     int i;
     char ret = '\0';
+    struct Cmd_bind *bind;
 
-    /* skip NUL; allowing it would wreak havoc */
-    for (i = 1; i < 256; ++i) {
+    for (bind = gc.Cmd.cmdbinds; bind; bind = bind->next) {
+        i = bind->key;
         /* skip space; we'll use it below as last resort if no other
            keystroke invokes space's command */
         if (i == ' ')
@@ -2823,7 +3049,7 @@ cmd_from_func(int (*fn)(void))
             && !gc.Cmd.num_pad)
             continue;
 
-        if (gc.Cmd.commands[i] && gc.Cmd.commands[i]->ef_funct == fn) {
+        if (bind->cmd && bind->cmd->ef_funct == fn) {
             if (i >= ' ' && i <= '~')
                 return (char) i;
             else {
@@ -2831,7 +3057,8 @@ cmd_from_func(int (*fn)(void))
             }
         }
     }
-    if (gc.Cmd.commands[' '] && gc.Cmd.commands[' ']->ef_funct == fn)
+    if ((bind = cmdbind_get(' ')) != 0 && bind->cmd
+        && bind->cmd->ef_funct == fn)
         return ' ';
     return ret;
 }
@@ -3124,7 +3351,6 @@ reset_commands(boolean initial)
     static struct ext_func_tab *back_dir_cmd[N_DIRS][N_MOVEMODES];
     static uchar back_dir_key[N_DIRS][N_MOVEMODES];
     static boolean backed_dir_cmd = FALSE;
-    const struct ext_func_tab *cmdtmp;
     boolean flagtemp;
     int c, i, updated = 0;
     int dir, mode;
@@ -3140,8 +3366,7 @@ reset_commands(boolean initial)
         if (backed_dir_cmd) {
             for (dir = 0; dir < N_DIRS; dir++) {
                 for (mode = 0; mode < N_MOVEMODES; mode++) {
-                    gc.Cmd.commands[back_dir_key[dir][mode]]
-                        = back_dir_cmd[dir][mode];
+                    cmdbind_add(back_dir_key[dir][mode], back_dir_cmd[dir][mode], FALSE);
                 }
             }
         }
@@ -3163,9 +3388,7 @@ reset_commands(boolean initial)
                perform the swap (or reverse previous one) */
             for (i = 0; i < SIZE(ylist); i++) {
                 c = ylist[i] & 0xff;
-                cmdtmp = gc.Cmd.commands[c];                /* tmp = [y] */
-                gc.Cmd.commands[c] = gc.Cmd.commands[c + 1]; /* [y] = [z] */
-                gc.Cmd.commands[c + 1] = cmdtmp;            /* [z] = tmp */
+                cmdbind_swapkeys(c, c + 1);
             }
         }
         /* MSDOS compatibility mode (only applicable for num_pad) */
@@ -3182,8 +3405,10 @@ reset_commands(boolean initial)
 #endif
             /* FIXME: NHKF_DOINV2 ought to be implemented instead of this */
             c = M('0') & 0xff;
-            gc.Cmd.commands[c] = gc.Cmd.pcHack_compat ? gc.Cmd.commands['I']
-                                                      : 0;
+            if (gc.Cmd.pcHack_compat)
+                cmdbind_add(c, ext_func_tab_from_func(dotypeinv), FALSE);
+            else
+                cmdbind_remove(c);
         }
         /* phone keypad layout (only applicable for num_pad) */
         flagtemp = (iflags.num_pad_mode & 2) ? gc.Cmd.num_pad : FALSE;
@@ -3193,13 +3418,9 @@ reset_commands(boolean initial)
             /* phone_layout has been toggled */
             for (i = 0; i < 3; i++) {
                 c = '1' + i;             /* 1,2,3 <-> 7,8,9 */
-                cmdtmp = gc.Cmd.commands[c];                 /* tmp = [1] */
-                gc.Cmd.commands[c] = gc.Cmd.commands[c + 6]; /* [1] = [7] */
-                gc.Cmd.commands[c + 6] = cmdtmp;             /* [7] = tmp */
+                cmdbind_swapkeys(c, c + 6);
                 c = (M('1') & 0xff) + i; /* M-1,M-2,M-3 <-> M-7,M-8,M-9 */
-                cmdtmp = gc.Cmd.commands[c];                 /* tmp = [M-1] */
-                gc.Cmd.commands[c] = gc.Cmd.commands[c + 6]; /* [M-1]=[M-7] */
-                gc.Cmd.commands[c + 6] = cmdtmp;             /* [M-7] = tmp */
+                cmdbind_swapkeys(c, c + 6);
             }
         }
     } /*?initial*/
@@ -3216,6 +3437,7 @@ reset_commands(boolean initial)
     for (dir = 0; dir < N_DIRS; dir++) {
         for (mode = MV_WALK; mode < N_MOVEMODES; mode++) {
             uchar di = (uchar) gc.Cmd.dirchars[dir];
+            struct Cmd_bind *bind;
 
             if (!gc.Cmd.num_pad) {
                 if (mode == MV_RUN) di = highc(di);
@@ -3225,9 +3447,11 @@ reset_commands(boolean initial)
                 else if (mode == MV_RUSH) di = M(di);
             }
             back_dir_key[dir][mode] = di;
-            back_dir_cmd[dir][mode]
-                = (struct ext_func_tab *) gc.Cmd.commands[di];
-            gc.Cmd.commands[di] = (struct ext_func_tab *) 0;
+            if ((bind = cmdbind_get(di)) != 0)
+                back_dir_cmd[dir][mode] = (struct ext_func_tab *) bind->cmd;
+            else
+                back_dir_cmd[dir][mode] = (struct ext_func_tab *) 0;
+            cmdbind_remove(di);
         }
     }
     backed_dir_cmd = TRUE;
@@ -3265,15 +3489,15 @@ update_rest_on_space(void)
         donull, (IFBURIED | CMD_M_PREFIX), "waiting"
     };
     static const struct ext_func_tab *unrestonspace = 0;
-    const struct ext_func_tab *bound_f = gc.Cmd.commands[' '];
+    struct Cmd_bind *bind = cmdbind_get(' ');
 
     /* when 'rest_on_space' is On, <space> will run the #wait command;
        when it is Off, <space> will use 'unrestonspace' which will either
        be Null and elicit "Unknown command ' '." or have some non-Null
        command bound in player's RC file */
-    if (bound_f != 0 && bound_f != &restonspace)
-        unrestonspace = bound_f;
-    gc.Cmd.commands[' '] = flags.rest_on_space ? &restonspace : unrestonspace;
+    if (bind && bind->cmd != &restonspace)
+        unrestonspace = bind->cmd;
+    cmdbind_add(' ', flags.rest_on_space ? &restonspace : unrestonspace, FALSE);
 }
 
 /* commands which accept 'm' prefix to request menu operation or other
@@ -3450,11 +3674,13 @@ rhack(int key)
         const struct ext_func_tab *tlist;
         int res;
 
+        gc.cmd_bind = cmdbind_get(key & 0xFF);
+
  do_cmdq_extcmd:
         if (cmdq_ec)
             tlist = cmdq_ec;
         else
-            tlist = gc.Cmd.commands[key & 0xff];
+            tlist = gc.cmd_bind ? gc.cmd_bind->cmd : NULL;
 
         /* current - use key to directly index cmdlist array */
         if (tlist != 0) {
@@ -3640,9 +3866,10 @@ int
 movecmd(char sym, int mode)
 {
     int d = DIR_ERR;
+    struct Cmd_bind *bind = cmdbind_get(sym);
 
-    if (gc.Cmd.commands[(uchar) sym]) {
-        int (*fnc)(void) = gc.Cmd.commands[(uchar) sym]->ef_funct;
+    if (bind && bind->cmd) {
+        int (*fnc)(void) = bind->cmd->ef_funct;
 
         if (mode == MV_ANY) {
             for (d = N_DIRS_Z - 1; d > DIR_ERR; d--)
@@ -3681,9 +3908,10 @@ boolean
 redraw_cmd(char c)
 {
     uchar uc = (uchar) c;
-    const struct ext_func_tab *cmd = gc.Cmd.commands[uc];
+    struct Cmd_bind *bind = cmdbind_get(uc);
 
-    return (boolean) (cmd && cmd->ef_funct == doredraw);
+    return (boolean) (bind && bind->cmd
+                      && bind->cmd->ef_funct == doredraw);
 }
 
 /*
@@ -4865,6 +5093,7 @@ staticfn int
 parse(void)
 {
     int foo;
+    struct Cmd_bind *bind;
 
     iflags.in_parse = TRUE;
     gc.command_count = 0;
@@ -4894,13 +5123,14 @@ parse(void)
         gl.last_command_count = 0;
     } else if (gi.in_doagain) {
         gc.command_count = gl.last_command_count;
-    } else if (foo && gc.Cmd.commands[foo & 0xff]
+    } else if (foo && (bind = cmdbind_get(foo & 0xFF)) != 0
                /* these shouldn't go into the do-again buffer */
-               && (gc.Cmd.commands[foo & 0xff]->ef_funct == do_repeat
-                   || gc.Cmd.commands[foo & 0xff]->ef_funct == doprev_message
+               && bind && bind->cmd
+               && (bind->cmd->ef_funct == do_repeat
+                   || bind->cmd->ef_funct == doprev_message
                    /* this one might get put into the do-again buffer but
                       only if the interface code tells the core to do it */
-                   || gc.Cmd.commands[foo & 0xff]->ef_funct == doextcmd)) {
+                   || bind->cmd->ef_funct == doextcmd)) {
         /* gc.command_count will be set again when we
            re-enter with gi.in_doagain set true */
         gc.command_count = gl.last_command_count;

@@ -55,6 +55,7 @@ CFLAGS+=-Wall -Wextra  \
 CFLAGS+=-pedantic
 CFLAGS+=-Wmissing-declarations
 #CFLAGS+=-Wformat=2
+#CFLAGS+=-Wdiscarded-qualifiers
 
 # these are left out of the C++ flags
 CFLAGS+=-Wformat-nonliteral
@@ -232,6 +233,20 @@ HAVECSTD=c2x
 endif
 ifeq "$(C23)" "1"
 HAVECSTD=c2x
+endif
+
+ifeq "$(c2x)" "1"
+HAVECSTD=c2x
+endif
+ifeq "$(C2X)" "1"
+HAVECSTD=c2x
+endif
+
+ifeq "$(c2y)" "1"
+HAVECSTD=c2y
+endif
+ifeq "$(C2Y)" "1"
+HAVECSTD=c2y
 endif
 
 ifneq "$(HAVECSTD)" ""

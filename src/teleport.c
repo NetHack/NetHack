@@ -34,8 +34,13 @@ noteleport_level(struct monst *mon)
         if (get_iter_mons(m_blocks_teleporting))
             return TRUE;
 
-    /* natural no-teleport level */
-    if (svl.level.flags.noteleport)
+    /* natural no-teleport level; covetous monsters can bypass these */
+    if (svl.level.flags.noteleport && !is_covetous(mon->data))
+        return TRUE;
+
+    /* wand of stasis prevents teleportation while the effect is active
+       (even for covetous monsters) */
+    if (svl.level.flags.stasis_until >= svm.moves)
         return TRUE;
 
     return FALSE;
@@ -1494,7 +1499,7 @@ tele_trap(struct trap *trap)
         return;
 
     in_tele_trap = TRUE;
-    if (In_endgame(&u.uz) || Antimagic) {
+    if (In_endgame(&u.uz) || Antimagic || noteleport_level(&gy.youmonst)) {
         if (Antimagic)
             shieldeff(u.ux, u.uy);
         You_feel("a wrenching sensation.");
@@ -1958,8 +1963,11 @@ mtele_trap(struct monst *mtmp, struct trap *trap, int in_sight)
 {
     char *monname;
 
-    if (tele_restrict(mtmp))
+    /* don't print feedback here: a monster stepping on a trap and not
+       teleporting from it isn't visible */
+    if (noteleport_level(mtmp))
         return;
+
     if (teleport_pet(mtmp, FALSE)) {
         /* save name with pre-movement visibility */
         monname = Monnam(mtmp);
@@ -2257,7 +2265,12 @@ u_teleport_mon(
 {
     coord cc;
 
-    if (mtmp->ispriest && *in_rooms(mtmp->mx, mtmp->my, TEMPLE)) {
+    if (svl.level.flags.stasis_until >= svm.moves) {
+        if (give_feedback)
+            pline("A mysterious force prevents you teleporting %s!",
+                  mon_nam(mtmp));
+        return FALSE;
+    } else if (mtmp->ispriest && *in_rooms(mtmp->mx, mtmp->my, TEMPLE)) {
         if (give_feedback)
             pline("%s resists your magic!", Monnam(mtmp));
         return FALSE;

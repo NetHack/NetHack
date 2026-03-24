@@ -9,9 +9,6 @@
 #ifndef NO_SIGNAL
 #include <signal.h>
 #endif
-#ifndef LONG_MAX
-#include <limits.h>
-#endif
 #include "dlb.h"
 
 #ifndef SFCTOOL
@@ -1765,7 +1762,7 @@ save_killers(NHFILE *nhfp)
 
     if (update_file(nhfp)) {
         for (kptr = &svk.killer; kptr; kptr = kptr->next) {
-	    Sfo_kinfo(nhfp, kptr, "kinfo");
+            Sfo_kinfo(nhfp, kptr, "kinfo");
         }
     }
     if (release_data(nhfp)) {
