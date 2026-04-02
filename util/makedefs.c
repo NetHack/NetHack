@@ -165,12 +165,9 @@ extern void objects_globals_init(void); /* objects.c */
 static char *name_file(const char *, const char *);
 static FILE *getfp(const char *, const char *, const char *, int);
 static void do_ext_makedefs(int, char **);
-static char *padline(char *, unsigned);
-static unsigned long read_rumors_file(const char *, int *,
-                                      long *, unsigned long, unsigned);
 static void rafile(int);
 static void do_rnd_access_file(const char *, const char *,
-                               const char *, unsigned);
+                               const char *);
 static boolean d_filter(char *);
 static boolean h_filter(char *);
 static void opt_out_words(char *, int *);
@@ -196,7 +193,7 @@ struct ascii_filter {
 };
 static struct ascii_filter ascii_ctx;
 
-/* input, output, tmp */
+/* input, output, tmp, index */
 static FILE *ifp, *ofp, *tfp;
 
 #if defined(__BORLANDC__) && !defined(_WIN32)
@@ -331,10 +328,14 @@ do_makedefs(char *options)
             rafile('1');
             rafile('2');
             rafile('3');
+            rafile('4');
+            rafile('5');
             break;
         case '1':
         case '2':
         case '3':
+        case '4':
+        case '5':
             rafile(*options);
             break;
 #if defined(OLD_MAKEDEFS_OPTIONS)
@@ -420,21 +421,29 @@ rafile(int whichone)
     case '1':
             do_rnd_access_file(EPITAPHFILE, "epitaph",
                 /* default epitaph:  parody of the default engraving */
-                               "No matter where I went, here I am.",
-                               MD_PAD_RUMORS); /* '_RUMORS' is correct here */
+                               "No matter where I went, here I am.");
             break;
     case '2':
             do_rnd_access_file(ENGRAVEFILE, "engrave",
                 /* default engraving:  popularized by "The Adventures of
                    Buckaroo Bonzai Across the 8th Dimension" but predates
                    that 1984 movie; some attribute it to Confucius */
-                               "No matter where you go, there you are.",
-                               MD_PAD_RUMORS); /* '_RUMORS' used here too */
+                               "No matter where you go, there you are.");
             break;
     case '3':
             do_rnd_access_file(BOGUSMONFILE, "bogusmon",
                 /* default bogusmon:  iconic monster that isn't in nethack */
-                               "grue", MD_PAD_BOGONS);
+                               "grue");
+            break;
+    case '4':
+            do_rnd_access_file(RUMORSTFILE, "rumors_t",
+                /* default true rumor:  based on classic logic puzzle */
+                               "This rumor is true");
+            break;
+    case '5':
+            do_rnd_access_file(RUMORSFFILE, "rumors_f",
+                /* default false rumoe:  based on classic logic puzzle */
+                               "This rumor is false");
             break;
     }
 }
@@ -996,94 +1005,17 @@ grep0(FILE *inputfp0, FILE* outputfp0, int flg)
     return;
 }
 
-static char *
-padline(char *line, unsigned padlength)
-{
-    /*
-     * Rumor selection is accomplished by seeking to a random
-     * position in the file, advancing to newline, and taking
-     * the next line.  Therefore, rumors which follow long-line
-     * rumors are most likely to be chosen and rumors which
-     * follow short-line rumors are least likely to be chosen.
-     * We ameliorate the latter by padding the shortest lines,
-     * increasing the chance of the random seek landing in them.
-     * The core's get_rnd_text() handles long lines in a way
-     * that results in even selection distribution.
-     *
-     * Random epitaphs, engravings, and hallucinatory monster
-     * names are in the same boat.
-     */
-    char *endp;
-    unsigned len = (unsigned) strlen(line); /* includes newline */
-
-    if (len <= padlength) {
-        endp = strchr(line, '\n'); /* fgetline() guarantees a newline even if
-                                   * the input file's last line lacks one */
-
-        /* this is safe provided that padlength+1 is less than the allocation
-           amount used in fgetline(); currently 144 (BUFSZ/2+16) */
-        while (len++ < padlength) {
-            *endp++ = '_';
-        }
-        *endp++ = '\n';
-        *endp = '\0';
-    }
-    return line;
-}
-
-/* common code for do_rumors().  Return 0 on error. */
-static unsigned long
-read_rumors_file(
-    const char *file_ext,
-    int *rumor_count,
-    long *rumor_size,
-    unsigned long old_rumor_offset,
-    unsigned padlength)
-{
-    char infile[MAXFNAMELEN], xbuf[BUFSZ];
-    char *line;
-    unsigned long rumor_offset;
-
-    Sprintf(infile, DATA_IN_TEMPLATE, RUMOR_FILE);
-    Strcat(infile, file_ext);
-    if (!(ifp = fopen(infile, RDTMODE))) {
-        perror(infile);
-        return 0L;
-    }
-    set_fgetline_context(infile, TRUE, FALSE);
-
-    /* copy the rumors */
-    while ((line = fgetline(ifp)) != 0) {
-        (void) padline(line, padlength); /* make shortest lines be longer */
-
-        (*rumor_count)++;
-#if 0
-        /*[if we forced binary output, this would be sufficient]*/
-        *rumor_size += strlen(line); /* includes newline */
-#endif
-        (void) fputs(xcrypt(line, xbuf), tfp);
-        free((genericptr_t) line);
-    }
-    /* record the current position; next rumors section will start here */
-    rumor_offset = (unsigned long) ftell(tfp);
-    Fclose(ifp); /* all done with rumors.file_ext */
-
-    /* the calculated value for *_rumor_count assumes that
-       a single-byte line terminator is in use; for platforms
-       which use two byte CR+LF, we need to override that value
-       [it's much simpler to do so unconditionally, rendering
-       the loop's accumulation above obsolete] */
-    *rumor_size = (long) (rumor_offset - old_rumor_offset);
-    return rumor_offset;
-}
-
 static void
 do_rnd_access_file(
     const char *fname,
     const char *basefname,
-    const char *deflt_content,
-    unsigned padlength)
+    const char *deflt_content)
 {
+    FILE *idxfp; /* TODO why is ifp global?  should this be global too??? */
+    unsigned long offset;
+    char deflt_wnl[BUFSZ]; /* default with newline */
+    char *comment;
+
     char *line, buf[BUFSZ], xbuf[BUFSZ],
          greptmp[8 + 1 + 3 + 1];
 
@@ -1105,15 +1037,24 @@ do_rnd_access_file(
         makedefs_exit(EXIT_FAILURE);
         /*NOTREACHED*/
     }
+    Strcat(filename, ".idx");
+    if (!(idxfp = fopen(filename, WRTMODE))) {
+        perror(filename);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
+    }
     Fprintf(ofp, "%s", Dont_Edit_Data);
     /* write out the default content entry unconditionally instead of
-       waiting to see whether there are no regular output lines; if it
-       matches a regular entry (bogusmon "grue"), that entry will become
-       more likely to be picked than normal but it's nothing to worry about */
+       waiting to see whether there are no regular output lines */
+    offset = (unsigned long) ftell(ofp);
+    Fprintf(idxfp, "%15ld\n", offset); /* 16 chars total */
     Strcpy(buf, deflt_content);
-    if (!strchr(buf, '\n')) /* lines from the file include trailing newline +*/
+    Strcpy(deflt_wnl, deflt_content);
+    if (!strchr(buf, '\n')) { /* lines from the file include trailing newline +*/
         Strcat(buf, "\n"); /* so make sure that the default one does too    */
-    (void) fputs(xcrypt(padline(buf, padlength), xbuf), ofp);
+        Strcat(deflt_wnl, "\n");
+    }
+    (void) fputs(xcrypt(buf, xbuf), ofp);
 
     tfp = getfp(DATA_TEMPLATE, greptmp, WRTMODE, FLG_TEMPFILE);
     grep0(ifp, tfp, FLG_TEMPFILE);
@@ -1125,14 +1066,26 @@ do_rnd_access_file(
     set_fgetline_context(NULL, FALSE, FALSE);
 
     while ((line = fgetline(ifp)) != 0) {
-        if (line[0] != '#' && line[0] != '\n') {
-            (void) padline(line, padlength);
-            (void) fputs(xcrypt(line, xbuf), ofp);
+        /* allow "##" to begin a midline comment */
+        if ((comment = /* ASSIGNMENT */ strstr(line, "##")) != NULL) {
+            while (comment > line && (comment[-1] == ' ' || comment[-1] == '\t')) {
+                comment--;
+            }
+            comment[0] = '\n';
+            comment[1] = 0;
+        }
+        if (line[0] && line[0] != '#' && line[0] != '\n') {
+            if (strcmp(line, deflt_wnl)) { /* don't duplicate deflt_content */
+                offset = (unsigned long) ftell(ofp);
+                Fprintf(idxfp, "%15ld\n", offset); /* 16 chars total */
+                (void) fputs(xcrypt(line, xbuf), ofp);
+            }
         }
         free((genericptr_t) line);
     }
     Fclose(ifp);
     Fclose(ofp);
+    Fclose(idxfp);
 
 #ifdef HAS_NO_MKSTEMP
     delete_file(DATA_TEMPLATE, greptmp);
@@ -1145,101 +1098,8 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 void
 do_rumors(void)
 {
-    char *line;
-    static const char rumors_header[] =
-        "%s%04d,%06ld,%06lx;%04d,%06ld,%06lx;0,0,%06lx\n";
-    char tempfile[MAXFNAMELEN];
-    int true_rumor_count, false_rumor_count;
-    long true_rumor_size, false_rumor_size;
-    unsigned long true_rumor_offset, false_rumor_offset, eof_offset;
-
-    Sprintf(tempfile, DATA_TEMPLATE, "rumors.tmp");
-    filename[0] = '\0';
-#ifdef FILE_PREFIX
-    Strcat(filename, file_prefix);
-#endif
-    Sprintf(eos(filename), DATA_TEMPLATE, RUMOR_FILE);
-    if (!(ofp = fopen(filename, WRTMODE))) {
-        perror(filename);
-        makedefs_exit(EXIT_FAILURE);
-        /*NOTREACHED*/
-    }
-    if (!(tfp = fopen(tempfile, WRTMODE))) {
-        perror(tempfile);
-        Fclose(ofp);
-        makedefs_exit(EXIT_FAILURE);
-        /*NOTREACHED*/
-    }
-
-    true_rumor_count = false_rumor_count = 0;
-    true_rumor_size = false_rumor_size = 0L;
-    true_rumor_offset = false_rumor_offset = eof_offset = 0L;
-
-    /* output a dummy header record; we'll replace it in final output */
-    Fprintf(tfp, rumors_header, Dont_Edit_Data, true_rumor_count,
-            true_rumor_size, true_rumor_offset, false_rumor_count,
-            false_rumor_size, false_rumor_offset, eof_offset);
-    /* record the current position; true rumors will start here */
-    true_rumor_offset = (unsigned long) ftell(tfp);
-
-    false_rumor_offset
-        = (unsigned long) read_rumors_file(".tru", &true_rumor_count,
-                                           &true_rumor_size, true_rumor_offset,
-                                           MD_PAD_RUMORS);
-    if (!false_rumor_offset)
-        goto rumors_failure;
-
-    eof_offset = read_rumors_file(".fal", &false_rumor_count,
-                                  &false_rumor_size, false_rumor_offset,
-                                  MD_PAD_RUMORS);
-    if (!eof_offset)
-        goto rumors_failure;
-
-    /* get ready to transfer the contents of temp file to output file */
-    line = (char *) alloc(BUFSZ + MAXFNAMELEN);
-    Sprintf(line, "rewind of \"%s\"", tempfile);
-    if (rewind(tfp) != 0) {
-        perror(line);
-        free((genericptr_t) line);
-        goto rumors_failure;
-    }
-    free((genericptr_t) line);
-
-    /* output the header record */
-    Fprintf(ofp, rumors_header, Dont_Edit_Data, true_rumor_count,
-            true_rumor_size, true_rumor_offset, false_rumor_count,
-            false_rumor_size, false_rumor_offset, eof_offset);
-
-    set_fgetline_context(NULL, FALSE, FALSE);
-    /* skip the temp file's dummy header */
-    if (!(line = fgetline(tfp))) { /* "Don't Edit" */
-        perror(tempfile);
-        goto rumors_failure;
-    }
-    free((genericptr_t) line);
-    if (!(line = fgetline(tfp))) { /* count,size,offset */
-        perror(tempfile);
-        goto rumors_failure;
-    }
-    free((genericptr_t) line);
-    /* copy the rest of the temp file into the final output file */
-    while ((line = fgetline(tfp)) != 0) {
-        (void) fputs(line, ofp);
-        free((genericptr_t) line);
-    }
-    /* all done; delete temp file */
-    Fclose(tfp);
-    Unlink(tempfile);
-    Fclose(ofp);
-    return;
-
- rumors_failure:
-    Fclose(ofp);
-    Unlink(filename); /* kill empty or incomplete output file */
-    Fclose(tfp);
-    Unlink(tempfile); /* and temporary file */
-    makedefs_exit(EXIT_FAILURE);
-    /*NOTREACHED*/
+    rafile('4');
+    rafile('5');
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL

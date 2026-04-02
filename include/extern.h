@@ -2779,8 +2779,7 @@ extern int genl_player_setup(int);
 /* ### rumors.c ### */
 
 extern char *getrumor(int, char *, boolean) NONNULLARG2;
-extern char *get_rnd_text(const char *, char *, int(*)(int),
-                          unsigned) NONNULLPTRS;
+extern char *get_rnd_text(const char *, char *, int(*)(int)) NONNULLPTRS;
 extern void outrumor(int, int);
 extern void outoracle(boolean, boolean);
 extern void save_oracles(NHFILE *) NONNULLARG1;

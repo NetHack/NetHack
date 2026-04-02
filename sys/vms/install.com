@@ -29,8 +29,8 @@ $	!	to avoid inadvertent logical name interaction
 $	play_files = "PERM.,RECORD.,LOGFILE.,XLOGFILE.,PANICLOG."
 $	help_files = "HELP.,HH.,CMDHELP.,KEYHELP.,WIZHELP.,OPTHELP.," -
 		   + "HISTORY.,LICENSE."
-$	data_files = "DATA.,RUMORS.,ORACLES.,OPTIONS.,TRIBUTE.," -
-		   + "ENGRAVE.,EPITAPH.,BOGUSMON."
+$	data_files = "DATA.,RUMORS_T.,RUMORS_T.IDX,RUMORS_F.,RUMORS_F.IDX,ORACLES.,OPTIONS.,TRIBUTE.," -
+		   + "ENGRAVE.,ENGRAVE.IDX,EPITAPH.,EPITAPH.IDX,BOGUSMON.,BOGUSMON.IDX"
 $	sysconf_file = "[.sys.vms]sysconf"
 $	guidebook  = "[.doc]Guidebook.txt"
 $	invoc_proc = "[.sys.vms]nethack.com"
@@ -97,7 +97,7 @@ $	set default [-.-.dat]	!move to data directory
 $	milestone "(data)"
 $ makedefs -d	!data.base -> data
 $	milestone "(rumors)"
-$ makedefs -r	!rumors.tru + rumors.fal -> rumors
+$ makedefs -r	!rumors_t.txt + rumors_f.txt -> rumors
 $	milestone "(oracles)"
 $ makedefs -h	!oracles.txt -> oracles
 $	milestone "(dungeon preprocess)"

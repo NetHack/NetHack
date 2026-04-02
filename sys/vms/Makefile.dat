@@ -107,7 +107,7 @@ rip.xpm : $(WINX11)rip.xpm
 data.; :	data.base $(MAKEDEFS)
 	$(RUN) $(MAKEDEFS) -d
 
-rumors.; :	rumors.tru rumors.fal $(MAKEDEFS)
+rumors.; :	rumors_t.txt rumors_f.txt $(MAKEDEFS)
 	$(RUN) $(MAKEDEFS) -r
 
 engrave.; epitaph.; bogusmon.; : engrave.txt epitaph.txt bogusmon.txt

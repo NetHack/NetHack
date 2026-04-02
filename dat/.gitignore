@@ -5,10 +5,16 @@ rip.xpm
 pet_mark.xbm
 pilemark.xbm
 quest.dat
-rumors
+rumors_t
+rumors_t.idx
+rumors_f
+rumors_f.idx
 bogusmon
+bogusmon.idx
 engrave
+engrave.idx
 epitaph
+epitaph.idx
 x11tiles
 nhtiles.bmp
 *.lev

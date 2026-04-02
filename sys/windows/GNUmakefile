@@ -975,9 +975,12 @@ CLEAN_FILE += $(SFCTARGETS) $(SFCTOOLOBJS) $(U)sf.tags $(U)sfdata.c $(INCL)/sfpr
 #==========================================
 ODLB = $(O)dlb
 DLBOBJS = $(addprefix $(ODLB)/, alloc.o dlb.o dlb_main.o panic.o)
-DAT_CLEAN = $(addprefix $(DAT)/, data oracles options porthelp rumors engrave epitaph bogusmon)
+DAT_CLEAN = $(addprefix $(DAT)/, data oracles options porthelp \
+         rumors_t rumors_f \
+         rumors_t.idx rumors_f.idx \
+	      engrave engrave.idx epitaph epitaph.idx bogusmon bogusmon.idx)
 DAT_NOCLEAN = $(addprefix $(DAT)/, help hh cmdhelp keyhelp history opthelp optmenu \
-	      wizhelp license engrave epitaph bogusmon tribute)
+	      wizhelp license engrave engrave.idx epitaph epitaph.idx bogusmon bogusmon.idx tribute)
 DLBLST = $(DAT)/dlb.lst
 DLB = $(GAMEDIR)/nhdat$(NHV)
 DTARGETS = $(U)dlb.exe $(DAT_CLEAN) $(DLBLST) $(DLB)
@@ -1008,14 +1011,14 @@ $(DAT)/options $(INCL)/date.h: $(U)makedefs.exe
 $(DAT)/porthelp: $(MSWSYS)/porthelp
 	cp $< $@
 
-$(DAT)/rumors: $(U)makedefs.exe $(DAT)/rumors.tru $(DAT)/rumors.fal
+$(DAT)/rumors_t $(DAT)/rumors_f $(DAT)/rumors_t.idx $(DAT)/rumors_f.idx : $(U)makedefs.exe $(DAT)/rumors_t.txt $(DAT)/rumors_f.txt
 	$< -r
 
-$(DAT)/engrave: $(DAT)/bogusmon
+$(DAT)/engrave $DAT/engrave.idx: $(DAT)/bogusmon
 
-$(DAT)/epitaph: $(DAT)/bogusmon
+$(DAT)/epitaph $DAT/epitaph.idx: $(DAT)/bogusmon
 
-$(DAT)/bogusmon: $(U)makedefs.exe $(DAT)/bogusmon.txt $(DAT)/engrave.txt $(DAT)/epitaph.txt
+$(DAT)/bogusmon $DAT/bogusmon.idx: $(U)makedefs.exe $(DAT)/bogusmon.txt $(DAT)/engrave.txt $(DAT)/epitaph.txt
 	$< -s
 
 $(DLBLST): $(LUAFILES) | $(DAT_CLEAN) $(DAT_NOCLEAN)
@@ -1025,7 +1028,10 @@ $(DLBLST): $(LUAFILES) | $(DAT_CLEAN) $(DAT_NOCLEAN)
 	if [ -f $(DAT)/ttyoptions ] ; then echo ttyoptions >> $(DLBLST) ; fi
 	if [ -f $(DAT)/guioptions ] ; then echo guioptions >> $(DLBLST) ; fi
 	echo porthelp >> $(DLBLST)
-	echo rumors >> $(DLBLST)
+	echo rumors_t >> $(DLBLST)
+	echo rumors_t.idx >> $(DLBLST)
+	echo rumors_f >> $(DLBLST)
+	echo rumors_f.idx >> $(DLBLST)
 	echo help >> $(DLBLST)
 	echo hh >> $(DLBLST)
 	echo cmdhelp >> $(DLBLST)
@@ -1036,8 +1042,11 @@ $(DLBLST): $(LUAFILES) | $(DAT_CLEAN) $(DAT_NOCLEAN)
 	echo wizhelp >> $(DLBLST)
 	echo license >> $(DLBLST)
 	echo engrave >> $(DLBLST)
+	echo engrave.idx >> $(DLBLST)
 	echo epitaph >> $(DLBLST)
+	echo epitaph.idx >> $(DLBLST)
 	echo bogusmon >> $(DLBLST)
+	echo bogusmon.idx >> $(DLBLST)
 	echo tribute >> $(DLBLST)
 	cd $(DAT) ; ls -1 *.lua >> $(DLBLST)
 
