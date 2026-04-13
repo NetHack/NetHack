@@ -221,7 +221,7 @@ endif
 
 # although not currently doing anything for macOS, this is
 # kept in for consistency with layout of linux.370
-ifeq "$(CCISCLANG)" "1"
+ifneq "$(CCISCLANG)" ""
 # clang-specific starts
 # clang-specific ends
 else

@@ -192,7 +192,7 @@ endif   #WANT_WIN_CURSES
 #-INCLUDE multisnd1-pre.370
 #
 
-ifeq "$(CCISCLANG)" "1"
+ifneq "$(CCISCLANG)" ""
 # clang-specific starts
 # clang-specific ends
 else
