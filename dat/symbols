@@ -807,6 +807,11 @@ start: Enhanced1
 	Description: Enhanced with Unicode glyphs and 24-bit color
 	Restrictions: primary
 	Handling: UTF8
+	S_corr: U+2591
+	S_litcorr: U+2592
+	S_engrcorr: U+2591
+	S_amulet: U+2299                    # ☉
+	S_cloud: U+2601                     # ☁
 	S_vwall: U+2502                     # BOX DRAWINGS LIGHT VERTICAL
 	S_hwall: U+2500                     # BOX DRAWINGS LIGHT HORIZONTAL
 	S_tlcorn: U+250c                    # BOX DRAWINGS LIGHT DOWN AND RIGHT
@@ -821,8 +826,11 @@ start: Enhanced1
 	S_ndoor: U+00b7                     # MIDDLE DOT
 	S_vodoor: U+2592                    # MEDIUM SHADE
 	S_hodoor: U+2592                    # MEDIUM SHADE
-	S_bars: U+2261                      # IDENTICAL TO
-	S_tree: U+03a8                      # GREEK CAPITAL LETTER PSI
+#	S_bars: U+2261                      # IDENTICAL TO
+	S_bars: U+2551                      # ║
+#	S_tree: U+03a8                      # GREEK CAPITAL LETTER PSI
+#	S_tree: U+1F332                     # 🌲
+	S_tree: U+2660                      # ♠
 	S_room: U+00b7                      # MIDDLE DOT
 	S_engroom: U+03BE                   # Greek Small Letter Xi
 	S_darkroom: U+00b7                  # MIDDLE DOT
@@ -833,6 +841,7 @@ start: Enhanced1
 	G_fountain: U+2320/0-150-255        # TOP HALF INTEGRAL
 	S_pool: U+224b                      # TRIPLE TILDE
 	S_ice: U+00b7                       # MIDDLE DOT
+#	S_ice: U+2744                       # ❄️
 	S_lava: U+224b                      # TRIPLE TILDE
 	S_lavawall: U+2248                  # ALMOST EQUAL TO
 	S_vodbridge: U+00b7                 # MIDDLE DOT
