@@ -2203,7 +2203,7 @@ mounted hero was able to deliver joust hits when trapped
 timer sanity check for melting ice gave false complaint about non-ice for
 	frozen moat under open drawbridge
 mhitm_ad_phys() was not applying Half_physical_damage when hero was target
-callers of thitu() were not applyibg Half_physical_damage either
+callers of thitu() were not applying Half_physical_damage either
 throwing crystal plate mail or helm of brilliance up against the ceiling could
 	result in the item being cracked and then vanishing
 yn_function (used all over the place) sometimes triggered an impossible()

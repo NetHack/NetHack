@@ -737,7 +737,8 @@ m_throw(
                     hitv += 8 + singleobj->spe;
                     if (dam < 1)
                         dam = 1;
-                    hitu = thitu(hitv, dam, &singleobj, (char *) 0);
+                    hitu = thitu(hitv, Maybe_Half_Phys(dam),
+                                 &singleobj, (char *) 0);
                 }
             }
             if (hitu && singleobj->opoisoned && is_poisonable(singleobj)) {
@@ -1233,7 +1234,7 @@ thrwmu(struct monst *mtmp)
         if (dam < 1)
             dam = 1;
 
-        (void) thitu(hitv, dam, &otmp, (char *) 0);
+        (void) thitu(hitv, Maybe_Half_Phys(dam), &otmp, (char *) 0);
         stop_occupation();
         return;
     } else if ((arw = autoreturn_weapon(otmp)) != 0 && !mwelded(otmp)) {
