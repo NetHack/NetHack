@@ -737,8 +737,9 @@ m_throw(
                     hitv += 8 + singleobj->spe;
                     if (dam < 1)
                         dam = 1;
-                    hitu = thitu(hitv, Maybe_Half_Phys(dam),
-                                 &singleobj, (char *) 0);
+                    if (singleobj->otyp != ACID_VENOM)
+                        dam = Maybe_Half_Phys(dam);
+                    hitu = thitu(hitv, dam, &singleobj, (char *) 0);
                 }
             }
             if (hitu && singleobj->opoisoned && is_poisonable(singleobj)) {

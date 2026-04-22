@@ -4251,12 +4251,12 @@ saving_grace(int dmg)
         impossible("saving_grace check for negative damage? (%d)", dmg);
         return 0;
     }
-
+#if 0   /* saving grace _does_ protect hero during own actions */
     if (!svc.context.mon_moving) {
         /* saving grace doesn't protect you from your own actions */
         return dmg;
     }
-
+#endif
     if (dmg < u.uhp || u.uhp <= 0) {
         /* no need for saving grace */
         return dmg;
