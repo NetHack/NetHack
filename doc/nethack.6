@@ -605,34 +605,70 @@ In a perfect world,
 .I paniclog
 would remain empty.
 .SH ENVIRONMENT
-.DT
-.ta \w'NETHACKDIR or HACKDIR\ \ \ 'u
-USER or LOGNAME	Your login name.
-.br
-HOME		Your home directory.
-.br
-SHELL		Your shell.
-.br
-TERM		The type of your terminal.
-.br
-HACKPAGER or PAGER	Replacement for default pager.
-.br
-MAIL	Mailbox file.
-.br
-MAILREADER	Replacement for default reader
-.br
-\ 	(probably /bin/mail or /usr/ucb/mail).
-.br
-NETHACKDIR or HACKDIR	Playground.
-.br
-NETHACKOPTIONS	String predefining several NetHack options.
+In some cases,
+.I NetHack
+attempts to access multiple environment variables in sequence
+(via
+.IR getenv (3)
+or similar)
+to determine information.
+.TP 16n \" "NETHACKOPTIONS" + 2n
+.I USER
+.TQ
+.I
+LOGNAME
+Your login name.
+.TP
+.I HOME
+Your home directory.
+.TP
+.I SHELL
+Your login shell
+(not necessarily the one running when you started
+.IR NetHack ).
+.TP
+.I TERM
+Your terminal type.
+.TP
+.I HACKPAGER
+.TQ
+.I PAGER
+Replacement for default pager.
+.TP
+.I MAIL
+Mailbox file.
+.TP
+.I MAILREADER
+Replacement for default reader
+(probably
+.I /bin/\*:mail
+or
+.IR /usr/\*:ucb/\*:mail ).
+.TP
+.I NETHACKDIR
+.TQ
+.I HACKDIR
+Playground.
+.TP
+.I NETHACKOPTIONS
+Predefined
+.I NetHack
+options.
 .PP
-If the same option is specified in both NETHACKOPTIONS and .nethackrc,
-the value assigned in NETHACKOPTIONS takes precedence.
+If the same option is specified in both
+.I \%NETHACKOPTIONS
+and
+.IR \%.nethackrc ,
+the value assigned in
+.I \%NETHACKOPTIONS
+takes precedence.
 .PP
-SHOPTYPE and SPLEVTYPE can be used in debugging (wizard) mode.
-.br
-DEBUGFILES can be used if the program was built with 'DEBUG' enabled.
+.I SHOPTYPE
+and
+.I \%SPLEVTYPE
+can be used in debugging (wizard) mode.
+.I \%DEBUGFILES
+can be used if the program was built with 'DEBUG' enabled.
 .SH "SEE ALSO"
 .PP
 recover(6)
