@@ -21,30 +21,30 @@ makedefs \- NetHack miscellaneous build-time functions
 .SH SYNOPSIS
 .B makedefs
 {
-.B -o
+.B \-o
 |
-.B -d
+.B \-d
 |
-.B -e
+.B \-e
 |
-.B -m
+.B \-m
 |
-.B -v
+.B \-v
 |
-.B -p
+.B \-p
 |
-.B -q
+.B \-q
 |
-.B -r
+.B \-r
 |
-.B -h
+.B \-h
 }
 .P
-.B makedefs --input
+.B makedefs \-\-input
 .I file
-.B --output
+.B \-\-output
 .I file
-.BI -- command
+.BI \-\- command
 .SH DESCRIPTION
 .PP
 .B Makedefs
@@ -60,39 +60,39 @@ the files operated on are determined when
 is compiled.
 When invoked with a long option,
 the
-.B --input
+.B \-\-input
 and
-.B --output
+.B \-\-output
 options are used to specify the files for the
-.BI -- command.
+.BI \-\- command.
 Each command is only available in one of the two formats.
 .SH SHORT COMMANDS
 Upper and lower case are both accepted for the short commands.
 .TP
-.B -o
+.B \-o
 Generate
 .I onames.h.
 .br
 .TP
-.B -d
+.B \-d
 Generate
 .I data.base.
 .br
 .TP
-.B -e
+.B \-e
 Generate
 .I dungeon.pdf.
 The input file
 .I dungeon.def
 is passed through the
 same logic as that used by the
-.B --grep
+.B \-\-grep
 command; see the
 .B MDGREP FUNCTIONS
 section below for details.
 .br
 .TP
-.B -m
+.B \-m
 Generate
 .I date.h
 and
@@ -108,78 +108,78 @@ info and include related preprocessor #defines in
 file.
 .br
 .TP
-.B -p
+.B \-p
 Generate
 .I pm.h
 .br
 .TP
-.B -q
+.B \-q
 Generate the
 .I rumors
 file.
 .br
 .TP
-.B -s
+.B \-s
 Generate the
 .IR bogusmon ", " engrave ", and " epitaph " files."
 .br
 .TP
-.B -1
+.B \-1
 Generate the
 .I epitaph
 file.
 .br
 .TP
-.B -2
+.B \-2
 Generate the
 .I engrave
 file.
 .br
 .TP
-.B -3
+.B \-3
 Generate the
 .I bogusmon
 file.
 .br
 .TP
-.B -h
+.B \-h
 Generate the
 .B oracles
 file.
 .br
 .SH LONG COMMANDS
 .TP
-.B --debug
+.B \-\-debug
 Show debugging output.
 .br
 .TP
-.B --make \fR[\fIcommand\fR]
+.B \-\-make \fR[\fIcommand\fR]
 Execute a short command.
 .I Command
 is given without preceding dash.
 .TP
-.BI --input " file"
+.BI \-\-input " file"
 Specify the input
 .I file
 for the command (if needed).
-If the file is - standard
+If the file is \- standard
 input is read.
 .br
 .TP
-.BI --output " file"
+.BI \-\-output " file"
 Specify the output
 .I file
 for the command (if needed).
-If the file is - standard
+If the file is \- standard
 output is written.
 .br
 .TP
-.B --svs \fR[\fIdelimiter\fR]
+.B \-\-svs \fR[\fIdelimiter\fR]
 Generate a version string to standard output without a trailing newline.
 If specified, the delimiter is used between each part of the version string.
 .br
 .TP
-.B --grep
+.B \-\-grep
 Filter the input
 .I file to the output
 .IR file .
@@ -188,22 +188,22 @@ See the
 section below for information on controlling the filtering operation.
 .br
 .TP
-.B --grep-showvars
+.B \-\-grep\-showvars
 Show the name and value for each variable known to the grep option.
 .br
 .TP
-.B --grep-trace
+.B \-\-grep\-trace
 Turn on debug tracing for the grep function (
-.B --grep
+.B \-\-grep
 must be specified as well).
 .br
 .TP
-.BI --grep-defined " symbol"
+.BI \-\-grep\-defined " symbol"
 Exit shell true (0) if
 .I symbol
 is known and defined, otherwise exit shell false (1).
 .TP
-.BI --grep-define " symbol"
+.BI \-\-grep\-define " symbol"
 Force the value of
 .I symbol
 to be "defined."
@@ -212,7 +212,7 @@ must already be known to
 .BR makedefs .
 .br
 .TP
-.BI --grep-undef " symbol"
+.BI \-\-grep\-undef " symbol"
 Force the definition of
 .I symbol
 to be "undefined."
@@ -221,7 +221,7 @@ must already be known to
 .BR makedefs .
 .SH MDGREP FUNCTIONS
 The
-.B --grep
+.B \-\-grep
 command (and certain other commands) filter their input, on a line-by-line
 basis, according to control lines embedded in the input and on information
 gleaned from the
@@ -252,7 +252,7 @@ continue (if it can) to allow as many errors as possible to be detected.
 .IP - 4
 Unknown identifiers are treated as both TRUE and as an error.
 Note that
-.BR --undef " or " #undef
+.BR \-\-undef " or " #undef
 in the
 .BR NetHack (6)
 configuration are different from unknown.
