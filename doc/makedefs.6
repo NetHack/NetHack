@@ -50,14 +50,18 @@ makedefs \- NetHack miscellaneous build-time functions
 .B Makedefs
 is a build-time tool used for a variety of
 .BR NetHack (6)
-source file creation and modification tasks.  For historical reasons,
+source file creation and modification tasks.
+For historical reasons,
 .B makedefs
-takes two types of command lines.  When invoked with a short option, the
-files operated on are determined when
+takes two types of command lines.
+When invoked with a short option,
+the files operated on are determined when
 .B makedefs
-is compiled.  When invoked with a long option, the
+is compiled.
+When invoked with a long option,
+the
 .B --input
-and 
+and
 .B --output
 options are used to specify the files for the
 .BI -- command.
@@ -150,20 +154,23 @@ Show debugging output.
 .br
 .TP
 .B --make \fR[\fIcommand\fR]
-Execute a short command.  Command is given without preceding dash.
-.br
+Execute a short command.
+.I Command
+is given without preceding dash.
 .TP
 .BI --input " file"
 Specify the input
 .I file
-for the command (if needed).  If the file is - standard
+for the command (if needed).
+If the file is - standard
 input is read.
 .br
 .TP
 .BI --output " file"
 Specify the output
 .I file
-for the command (if needed).  If the file is - standard
+for the command (if needed).
+If the file is - standard
 output is written.
 .br
 .TP
@@ -219,7 +226,8 @@ command (and certain other commands) filter their input, on a line-by-line
 basis, according to control lines embedded in the input and on information
 gleaned from the
 .BR NetHack (6)
-configuration.  This allows certain changes such as embedding platform-specific
+configuration.
+This allows certain changes such as embedding platform-specific
 documentation into the master documentation files.
 .P
 Rules:
@@ -242,7 +250,8 @@ Conditionals may be nested.
 will exit with an error code if any errors are detected; processing will
 continue (if it can) to allow as many errors as possible to be detected.
 .IP - 4
-Unknown identifiers are treated as both TRUE and as an error.  Note that
+Unknown identifiers are treated as both TRUE and as an error.
+Note that
 .BR --undef " or " #undef
 in the
 .BR NetHack (6)
@@ -279,4 +288,5 @@ The NetHack Development Team
 .ds co \(co
 .if !\n(.g .if n .ds co (C)\" in principle, should be just "c"
 This file is Copyright \*(co \*(Na, \*(Nd for version \*(Nb:\*(Nr.
-NetHack may be freely redistributed.  See license for details.
+NetHack may be freely redistributed.
+See license for details.
