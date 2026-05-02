@@ -1,0 +1,21 @@
+name: NetHack (Linux build)
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Unix setup
+        run: (cd sys/unix && ./setup.sh hints/linux.370)
+
+      - name: Fetch Lua
+        run: make fetch-lua
+
+      - name: Build
+        run: make
