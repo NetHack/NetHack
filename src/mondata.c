@@ -1087,7 +1087,18 @@ name_to_monplus(
 /* monster class from user input; used for genocide and controlled polymorph;
    returns 0 rather than MAXMCLASSES if no match is found */
 int
-name_to_monclass(const char *in_str, int * mndx_p)
+name_to_monclass(const char *in_str, int *mndx_p)
+{
+    return name_to_monclass_plus(in_str, mndx_p, TRUE);
+}
+
+int
+name_to_monclass_plus(
+    const char *in_str,
+    int *mndx_p,
+    boolean allow_mname) /* if true, allows for a single monster to represent
+                            its whole class. for example, "dwarf" for all "h".
+                            */
 {
     /* Single letters are matched against def_monsyms[].sym; words
        or phrases are first matched against def_monsyms[].explain
@@ -1117,7 +1128,7 @@ name_to_monclass(const char *in_str, int * mndx_p)
         { 0, NON_PM, NEUTRAL}
     };
     const char *p, *x;
-    int i, len;
+    int i, ret, len;
 
     if (mndx_p)
         *mndx_p = NON_PM; /* haven't [yet] matched a specific type */
@@ -1148,12 +1159,14 @@ name_to_monclass(const char *in_str, int * mndx_p)
                 return 0;
         for (i = 0; truematch[i].name; i++)
             if (!strcmpi(in_str, truematch[i].name)) {
-                i = truematch[i].pm_val;
-                if (i < 0)
-                    return -i; /* class */
+                ret = truematch[i].pm_val;
+                if (ret < 0)
+                    return -ret; /* class */
+                if (!allow_mname)
+                    continue;
                 if (mndx_p)
-                    *mndx_p = i; /* monster */
-                return mons[i].mlet;
+                    *mndx_p = ret; /* monster */
+                return mons[ret].mlet;
             }
         /* check monster class descriptions */
         len = (int) strlen(in_str);
@@ -1163,6 +1176,9 @@ name_to_monclass(const char *in_str, int * mndx_p)
                 && ((int) strlen(p) >= len
                     && (p[len] == '\0' || p[len] == ' ')))
                 return i;
+        }
+        if (!allow_mname) {
+            return 0;
         }
         /* check individual species names */
         i = name_to_mon(in_str, (int *) 0);
