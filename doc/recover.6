@@ -148,5 +148,11 @@ determine.
 should be taught to use the nethack playground locking mechanism to
 avoid conflicts.
 .SH COPYRIGHT
-This file is Copyright (C) \*(Na, \*(Nd for version \*(Nb:\*(Nr.
+.\" All troffs and nroffs support `\(co` except Plan 9 nroff, but Plan 9
+.\" offers no test for special character availability, and its feature
+.\" set too closely resembles DWB 3.3 to test for it.  Use a string with
+.\" any nroff-mode formatter not claiming groff compatiblity.
+.ds co \(co
+.if !\n(.g .if n .ds co (C)\" in principle, should be just "c"
+This file is Copyright \*(co \*(Na, \*(Nd for version \*(Nb:\*(Nr.
 NetHack may be freely redistributed.  See license for details.
