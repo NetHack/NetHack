@@ -16,6 +16,22 @@
 .ie \n(.g .hy 12
 .el       .hy 14
 .ds Na Robert Patrick Rankin
+.\" Define string to exercise groff's hyphenless break point feature.
+.ie \n(.g .ds : \:
+.el       .ds : \" empty
+.\" Define local versions of groff's "an-ext.tmac" macros if needed.
+.ds %% \" empty
+.if \n(.g .ig %%
+.\" Add supplementary paragraph tag on its own line after TP.
+.de TQ
+.  br
+.  ns
+.  \" Do not quote the argument to `TP`; the user might specify
+.  \" their own quotes for multi-word tags or to exercise AT&T troff
+.  \" quoting rules.
+.  TP \\$1\"
+..
+.%%
 .SH NAME
 nethack \- Exploring The Mazes of Menace
 .SH SYNOPSIS
@@ -319,7 +335,8 @@ option, which must be the first argument if it appears,
 supplies a directory which is to serve as the playground.
 It overrides the value from NETHACKDIR, HACKDIR,
 or the directory specified by the game administrator during compilation
-(usually /usr/games/lib/nethackdir).
+(usually
+.IR /usr/\*:games/\*:lib/\*:nethackdir ).
 This option is usually only useful to the game administrator.
 The playground must contain several auxiliary files such as help files,
 the list of top scorers, and a subdirectory
@@ -429,117 +446,164 @@ development by the Usenet.
 Andries Brouwer has made this request for the
 distinction, as he may eventually release a new version of his own.
 .SH FILES
-.PP
 Run-time configuration options were discussed above and use a platform
 specific name for a file in a platform specific location.
 For Unix, the
-name is '.nethackrc' in the user's home directory.
+name is
+.I .nethackrc
+in the user's home directory.
 .PP
 All other files are in the playground directory,
-normally /usr/games/lib/nethackdir.
-If DLB was defined during the compile, the data files and special levels
-will be inside a larger file, normally nhdat, instead of being separate
-files.
-.PP
-.DT
-.\" continuation lines begin with <backslash><space><tab>
-.ta \w'cmdhelp, opthelp, wizhelp\ \ \ 'u
-nethack		The program itself.
-.br
-Guidebook\ |\ Guidebook.txt	NetHack's user manual.
-.br
-data, oracles, rumors	Data files used by NetHack.
-.br
-bogusmon 	Another data file.
-.br
-engrave, epitaph, tribute	Still more data files.
-.br
-symbols	Data file holding sets of specifications
-.br
-\ 	for how to display monsters, objects, and
-.br
-\ 	map features.
-.br
-options	Data file containing a description of the
-.br
-\ 	build-time option settings.
-.br
-help,\ hh,\ cmdhelp	Help data files.
-('cmdhelp' is obsolete.)
-.br
-opthelp,\ optmenu,\ wizhelp	More help data files.
-.br
-keyhelp,\ usagehlp	Even more help data files.
-.br
-*.lua	Predefined special levels, dungeon control
-.br
-\ 	for special levels, quest texts.
-.br
-history	A short history of NetHack.
-.br
-license	Rules governing redistribution.
-.br
-record	The list of top scorers.
-.br
-logfile	An extended list of games played
-.br
-\ 	(optional).
-.br
-xlogfile	A more detailed version of 'logfile'
-.br
-\ 	(also optional).
-.br
-paniclog	Record of exceptional conditions
-.br
-\ 	discovered during program execution.
-.br
-xlock.nn	Description of dungeon level 'nn' of
-.br
-\ 	active game 'x' if there's a limit on the
-.br
-\ 	number of simultaneously active games.
-.br
-UUcccccc.nn	Alternate form for dungeon level 'nn'
-.br
-\ 	of active game by user 'UU' playing
-.br
-\ 	character named 'cccccc' when there's no
-.br
-\ 	limit on number of active games.
-.br
-perm	Lock file for xlock.0 or UUcccccc.0.
-.br
-bonD0.nn	Descriptions of the ghost and belongings
-.br
-\ 	of a deceased adventurer who met his or
-.br
-\ 	her demise on level 'nn'.
+normally
+.IR /usr/\*:games/\*:lib/\*:nethackdir .
+If DLB was defined during the compile,
+the data files and special levels will be inside a larger file,
+normally
+.IR nhdat ,
+instead of being separate files.
+.TP
+.I nethack
+The program itself.
+.TP
+.I Guidebook
+.TQ
+.I Guidebook.txt
+NetHack's user manual.
+.TP
+.I data
+.TQ
+.I oracles
+.TQ
+.I rumors
+Data files used by NetHack.
+.TP
+.I bogusmon
+Another data file.
+.TP
+.I engrave
+.TQ
+.I epitaph
+.TQ
+.I tribute
+Still more data files.
+.TP
+.I symbols
+Data file holding sets of specifications
+for how to display monsters, objects, and
+map features.
+.TP
+.I options
+Data file containing a description of the
+build-time option settings.
+.TP
+.I help
+.TQ
+.I hh
+.TQ
+.I cmdhelp
+Help data files.
+.RI ( cmdhelp
+is obsolete.)
+.TP
+.I opthelp
+.TQ
+.I optmenu
+.TQ
+.I wizhelp
+More help data files.
+.TP
+.I keyhelp
+.TQ
+.I usagehlp
+Even more help data files.
+.TP
+.RI * .lua
+Predefined special levels, dungeon control
+for special levels, quest texts.
+.TP
+.I history
+A short history of NetHack.
+.TP
+.I license
+Rules governing redistribution.
+.TP
+.I record
+The list of top scorers.
+.TP
+.I logfile
+An extended list of games played
+(optional).
+.TP
+.I xlogfile
+A more detailed version of
+.I logfile
+(also optional).
+.TP
+.I paniclog
+Record of exceptional conditions
+discovered during program execution.
+.TP
+.RI x lock. nn
+Description of dungeon level
+.I nn
+of active game
+.I x
+if there's a limit on the
+number of simultaneously active games.
+.TP
+.RI UUcccccc . nn
+Alternate form for dungeon level
+.I nn
+of active game by user
+.I UU
+playing character named
+.I cccccc
+when there's no
+limit on number of active games.
+.TP
+.I perm
+Lock file for
+.RI x lock.0
+or
+.RI UUcccccc .0 .
+.TP
+.IR bonD0. nn
+Descriptions of the ghost and belongings
+of a deceased adventurer who met his or
+her demise on level
+.IR nn .
 A subsequent
-.br
-\ 	character might encounter this old level.
-.br
-.\"following line should contain <backslash><space><tab>
-\ 	
-.br
-save/	A subdirectory containing saved games.
-.br
-.\"following line should contain <backslash><space><tab>
-\ 	
-.br
-sysconf	System-wide options.
+character might encounter this old level.
+.TP
+.I save/
+Subdirectory containing saved games.
+.TP
+.I sysconf
+System-wide options.
 Required if
-.br
-\ 	program is built with 'SYSCF' option
-.br
-\ 	enabled, ignored if not.
+program is built with 'SYSCF' option
+enabled, ignored if not.
 .PP
-The location of 'sysconf' is specified at build time and can't be changed
-except by updating source file "config.h" and rebuilding the program.
+The location of
+.I sysconf
+is specified at build time and can't be changed
+except by updating source file
+.\" We do the following in an ugly and non-idiomatic way to work around
+.\" a DWB 3.3 nroff bug.
+.\"   troff: if-else overflow.; doc/nethack.6:623
+.\"   stack: }S }S }S }S }S }S }S }S }S }S }S }S }S }S }S }S RI
+.\" Even at that, DWB insists on setting the period in roman.
+"\c
+.I config.h\c
+"
+and rebuilding the program.
 .PP
 NetHack's Guidebook might not be present if whoever packaged or installed
 the program distribution neglected to include it.
 .PP
-In a perfect world, 'paniclog' would remain empty.
+In a perfect world,
+.I paniclog
+would remain empty.
 .SH ENVIRONMENT
 .DT
 .ta \w'NETHACKDIR or HACKDIR\ \ \ 'u
