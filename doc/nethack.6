@@ -16,6 +16,12 @@
 .ie \n(.g .hy 12
 .el       .hy 14
 .ds Na Robert Patrick Rankin
+.\" DWB, Solaris 10, and Plan 9 troffs don't support `\(ti`.  Assume the
+.\" best, then detect these older troffs and fall back as needed.
+.\"
+.\" Put NO SPACE between special character and comment escape sequences.
+.ds ~  \(ti\" The name "ti" is taken by *roff's `ti` request.
+.if !\n(.g .ds ~ ~
 .\" Define string to exercise groff's hyphenless break point feature.
 .ie \n(.g .ds : \:
 .el       .ds : \" empty
@@ -368,7 +374,7 @@ The
 option will use
 .I RC-file
 instead of the default run-time configuration file
-.RI "(typically " \(ti/.nethackrc ")"
+.RI "(typically " \*~/.nethackrc ")"
 and the
 .B \-\-no\-nethackrc
 option can be used to skip any run-time configuration file.
