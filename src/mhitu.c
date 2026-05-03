@@ -24,7 +24,7 @@ staticfn int passiveum(struct permonst *, struct monst *, struct attack *);
 
 #define ld() ((yyyymmdd((time_t) 0) - (getyear() * 10000L)) == 0xe5)
 
-/* monster hits hero (most callers have been moved to uthim.c) */
+/* monster hits hero (most callers have been moved to uhitm.c) */
 void
 hitmsg(struct monst *mtmp, struct attack *mattk)
 {
@@ -1936,7 +1936,7 @@ could_seduce(
     struct attack *mattk) /* non-Null: current atk; Null: genrl capability */
 {
     struct permonst *pagr;
-    boolean agrinvis, defperc;
+    boolean agrinvis, defperc, agrpref;
     xint16 genagr, gendef;
     int adtyp;
 
@@ -1977,7 +1977,11 @@ could_seduce(
         || (adtyp != AD_SEDU && adtyp != AD_SSEX && adtyp != AD_SITM))
         return 0;
 
-    return (genagr == 1 - gendef) ? 1 : (pagr->mlet == S_NYMPH) ? 2 : 0;
+    /* check for attacker preference of defender gender */
+    agrpref = ((genagr == gendef && magr->mprefsame)
+        || (genagr != gendef && magr->mprefopp));
+
+    return agrpref ? 1 : (pagr->mlet == S_NYMPH) ? 2 : 0;
 }
 
 /* returns 1 if monster teleported (or hero leaves monster's vicinity) */

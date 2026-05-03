@@ -161,11 +161,13 @@ struct monst {
     Bitfield(wormno, 5);    /* at most 31 worms on any level */
     Bitfield(mtemplit, 1);  /* temporarily seen; only valid during bhit() */
     Bitfield(meverseen, 1); /* mon has been seen at some point */
-
     Bitfield(mspotted, 1);  /* mon is currently seen by hero */
     Bitfield(mwandexp, 1);  /* mon has experience with wands */
     Bitfield(mgenmklev, 1); /* made by the level generation */
     /* 5 spare bits */
+
+    Bitfield(mprefopp, 1);  /* mon has preference for opposite sex */
+    Bitfield(mprefsame, 1); /* mon has preference for same sex */
 
     unsigned long mstrategy; /* for monsters with mflag3: current strategy */
 #ifdef NHSTDC

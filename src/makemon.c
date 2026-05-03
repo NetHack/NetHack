@@ -1279,6 +1279,11 @@ makemon(
     else
         mtmp->female = femaleok ? rn2(2) : 0;
 
+    /* 90% chance of preferring opposite sex
+       and 10% chance of preferring same */
+    mtmp->mprefopp = (rn2(10) < 9);
+    mtmp->mprefsame = (rn2(10) < 1);
+
     if (In_sokoban(&u.uz) && !mindless(ptr)) { /* know about traps here */
         mon_learns_traps(mtmp, PIT);
         mon_learns_traps(mtmp, HOLE);
