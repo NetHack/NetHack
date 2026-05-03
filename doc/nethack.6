@@ -216,7 +216,7 @@ below).
 On other systems, the default may be different, possibly NetHack.cnf.
 On MS-DOS, the name is defaults.nh in NetHack's directory (folder),
 while
-.\" on the Macintosh or BeOS, it is \(lqNetHack Defaults\(rq, and
+.\" on the Macintosh or BeOS, it is \*(lqNetHack Defaults\*(rq, and
 on VMS|OpenVMS it is nethack.ini in your home directory.
 The default configuration file may be overridden via the
 .BI \-\-nethackrc: "rc-file"
@@ -322,11 +322,22 @@ option will start the game in a special non-scoring discovery mode
 (also known as explore mode).
 .B \-D
 will start the game in debug mode (also known as wizard mode) after
-changing the character name to \(lqwizard\(rq, if the player is allowed.
+changing the character name to \*(lqwizard\*(rq,
+if the player is allowed.
 Otherwise it will switch to
 .BR \-X .
 Control of who is allowed to use debug mode is done via the
-.RI "\(lq" WIZARDS= "\(rq line in NetHack's " sysconf " file."
+.\" The `lq` and `rq` strings are not reliable in macro calls, because
+.\" some nroffs interpolate `"` for them, messing up macro argument
+.\" delimitation.  Use an (initially) uglier method than `RI`.
+.\".RI "\*(lq" WIZARDS= "\*(rq line in NetHack's " sysconf " file."
+\*(lq\c
+.I WIZARDS=\c
+\*(rq
+line in
+NetHack's
+.I sysconf
+file.
 .PP
 The
 .BR \-d " or " \-\-directory
