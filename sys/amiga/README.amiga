@@ -1,5 +1,5 @@
                         NetHack 5.0 for Amiga
-                        ====================
+                        =====================
 
 Requirements
 ------------
@@ -13,7 +13,7 @@ tile rendering. Native AGA/OCS/ECS chipsets are supported.
 
 Installation
 ------------
-Extract NH370AMI.ZIP to a directory and assign it:
+Extract NH500AMI2.ZIP to a directory and assign it:
 
     assign NetHack: <path>
 
