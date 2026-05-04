@@ -837,11 +837,14 @@ static char amii_glyph_buffer[GLYPH_BUFFER_SIZE];
  * See winami.c for the amiga specific colormap.
  */
 
+/* CLR_BLACK (slot 0) renders as the dim blue pen on black background,
+   CLR_WHITE (slot 15) uses white on black.  Slots 9-14 use the inverse-
+   video trick (fg=black, bg=color) to fit 16 logical colors into 8 pens. */
 int foreg[AMII_MAXCOLORS] = {
-    0, 7, 4, 2, 6, 5, 3, 1, 1, 0, 0, 0, 0, 0, 0, 0
+    6, 7, 4, 2, 6, 5, 3, 1, 1, 0, 0, 0, 0, 0, 0, 1
 };
 int backg[AMII_MAXCOLORS] = {
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 7, 4, 1, 6, 5, 3, 1
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 4, 1, 6, 5, 3, 0
 };
 #if 0
 #define CLR_BLACK 0
