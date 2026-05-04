@@ -20,6 +20,8 @@ OPTIONS=time,showexp,lit_corridor
 OPTIONS=boulder:0
 OPTIONS=autopickup,pickup_types:$"=/!?+
 OPTIONS=catname:Kaori
+# Numpad for movement; '5' is the run prefix, ALT+5 the rush prefix.
+OPTIONS=number_pad:1
 
 # *** MENU COLORS ***
 # Colour-code inventory items by BUC status and value.
