@@ -310,24 +310,27 @@ UUDECODE = ../util/uudecode
 	$(CC) $(CFLAGS) -o $@ $<
 
 amigapkg: $(AMITILES) ../util/uudecode
-	mkdir -p $(TARGETPFX)pkg/tiles $(TARGETPFX)pkg/hack
-	cp $(GAMEBIN) $(TARGETPFX)pkg/nethack
-	cp ../dat/nhdat $(TARGETPFX)pkg/nhdat
-	cp ../dat/license $(TARGETPFX)pkg/license
-	cp ../dat/symbols $(TARGETPFX)pkg/symbols
-	cp $(TARGETPFX)tiles16.iff $(TARGETPFX)pkg/tiles/tiles16.iff
-	cp $(TARGETPFX)tiles32.iff $(TARGETPFX)pkg/tiles/tiles32.iff
-	cp $(TARGETPFX)tomb.iff $(TARGETPFX)pkg/tomb.iff
-	cp ../doc/nethack.txt $(TARGETPFX)pkg/nethack.txt
-	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/amifont8.uu && mv 8 hack/8 )
-	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/amifont.uu )
-	cp $(AMISRC)/nethack.cnf $(TARGETPFX)pkg/nethack.cnf
-	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/NHinfo.uu )
-	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/cnf-info.uu )
-	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/license-info.uu )
-	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/txt-info.uu )
-	touch $(TARGETPFX)pkg/record
-	( cd $(TARGETPFX)pkg && zip -9r ../NH$(NHV)AMI.ZIP * )
+	mkdir -p $(TARGETPFX)pkg/NetHack/tiles $(TARGETPFX)pkg/NetHack/hack
+	cp $(GAMEBIN) $(TARGETPFX)pkg/NetHack/nethack
+	cp ../dat/nhdat $(TARGETPFX)pkg/NetHack/nhdat
+	cp ../dat/license $(TARGETPFX)pkg/NetHack/license
+	cp ../dat/symbols $(TARGETPFX)pkg/NetHack/symbols
+	cp $(TARGETPFX)tiles16.iff $(TARGETPFX)pkg/NetHack/tiles/tiles16.iff
+	cp $(TARGETPFX)tiles32.iff $(TARGETPFX)pkg/NetHack/tiles/tiles32.iff
+	cp $(TARGETPFX)tomb.iff $(TARGETPFX)pkg/NetHack/tomb.iff
+	cp ../doc/nethack.txt $(TARGETPFX)pkg/NetHack/nethack.txt
+	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/amifont8.uu && mv 8 hack/8 )
+	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/amifont.uu )
+	cp $(AMISRC)/nethack.cnf $(TARGETPFX)pkg/NetHack/nethack.cnf
+	cp $(AMISRC)/README.amiga $(TARGETPFX)pkg/NetHack/README.amiga
+	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/NHinfo.uu )
+	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/cnf-info.uu )
+	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/license-info.uu )
+	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/txt-info.uu )
+	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/readme-info.uu )
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/drawer-info.uu )
+	touch $(TARGETPFX)pkg/NetHack/record
+	( cd $(TARGETPFX)pkg && zip -9r ../NH$(NHV)AMI.ZIP NetHack NetHack.info )
 	@echo amiga package zip file $(TARGETPFX)NH$(NHV)AMI.ZIP
 endif  # CROSS_TO_AMIGA
 
