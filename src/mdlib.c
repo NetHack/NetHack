@@ -142,6 +142,10 @@ static struct win_information window_opts[] = {
 #ifdef SHIM_GRAPHICS
     { "shim", "NetHack Library Windowing Shim", TRUE },
 #endif
+#ifdef AMIGA_INTUITION
+    { "amii", "Amiga Intuition (text)", TRUE },
+    { "amiv", "Amiga Intuition (tiles)", TRUE },
+#endif
 
 #if 0  /* remainder have been retired */
 #ifdef GNOME_GRAPHICS /* unmaintained/defunct */
@@ -149,9 +153,6 @@ static struct win_information window_opts[] = {
 #endif
 #ifdef MACOS9 /* defunct OS 9 interface */
     { "mac", "Mac", TRUE },
-#endif
-#ifdef AMIGA_INTUITION /* unmaintained/defunct */
-    { "amii", "Amiga Intuition", TRUE },
 #endif
 #ifdef GEM_GRAPHICS /* defunct Atari interface */
     { "Gem", "Gem", TRUE },
