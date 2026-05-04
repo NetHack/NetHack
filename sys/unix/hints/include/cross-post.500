@@ -322,14 +322,10 @@ amigapkg: $(AMITILES) ../util/uudecode
 	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/amifont8.uu && mv 8 hack/8 )
 	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/amifont.uu )
 	cp $(AMISRC)/nethack.cnf $(TARGETPFX)pkg/nethack.cnf
-	-( cd $(TARGETPFX)pkg && test -f ../../../sys/amiga/dflticon.uu && \
-		../../../util/uudecode ../../../sys/amiga/dflticon.uu )
-	-( cd $(TARGETPFX)pkg && test -f ../../../sys/amiga/NHinfo.uu && \
-		../../../util/uudecode ../../../sys/amiga/NHinfo.uu )
-	-( cd $(TARGETPFX)pkg && test -f ../../../sys/amiga/NewGame.uu && \
-		../../../util/uudecode ../../../sys/amiga/NewGame.uu )
-	-( cd $(TARGETPFX)pkg && test -f ../../../sys/amiga/HackWB.uu && \
-		../../../util/uudecode ../../../sys/amiga/HackWB.uu )
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/NHinfo.uu )
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/cnf-info.uu )
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/license-info.uu )
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/txt-info.uu )
 	touch $(TARGETPFX)pkg/record
 	( cd $(TARGETPFX)pkg && zip -9r ../NH$(NHV)AMI.ZIP * )
 	@echo amiga package zip file $(TARGETPFX)NH$(NHV)AMI.ZIP
