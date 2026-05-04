@@ -159,6 +159,10 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(altmeta, Advanced, 0, opt_out, set_in_game,
            Off, Yes, No, No, NoAlias, &iflags.altmeta, Term_False,
            "treat \"ESC c\" as M-c (Meta+c, 8th bit set)")
+#elif defined(AMIGA_INTUITION)
+    NHOPTB(altmeta, Advanced, 0, opt_out, set_in_game,
+           On, Yes, No, No, NoAlias, &sysflags.altmeta, Term_False,
+           "treat ALT+c as M-c (Meta+c, 8th bit set)")
 #else
     NHOPTB(altmeta, Advanced, 0, opt_out, set_in_config,
            Off, Yes, No, No, NoAlias, (boolean *) 0, Term_False,
