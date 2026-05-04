@@ -255,6 +255,8 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #endif
     }
 #ifdef AMIGA
+    /* Point NetHack: at our program directory; covers CLI and WB launch. */
+    amiga_self_assign();
 #ifdef CHDIR
     /*
      * If we're dealing with workbench, change the directory.  Otherwise

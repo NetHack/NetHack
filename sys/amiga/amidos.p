@@ -18,6 +18,7 @@ int abs(int );
 #endif
 int tgetch (void);
 int dosh (void);
+void amiga_self_assign (void);
 long freediskspace(char *);
 long filesize(char *);
 void eraseall(const char * , const char *);

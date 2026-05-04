@@ -42,6 +42,7 @@ ifdef CROSS_TO_AMIGA
 CROSS=1
 BUILD_TARGET_LUA=1
 CROSS_SHARED=1
+HACKDIR=NetHack:
 override TARGET = amiga
 override TARGETDIR=../targets/$(TARGET)
 override TARGETPFX = $(TARGETDIR)/

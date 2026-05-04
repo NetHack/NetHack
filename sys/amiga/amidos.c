@@ -30,6 +30,23 @@
 int getpid(void) { return (int)FindTask(NULL); }
 #endif
 
+/* Point NetHack: at the directory we were launched from.  Works for both
+   CLI ("nethack") and Workbench (icon double-click) launches, since
+   GetProgramDir() (V37+) resolves both.  Any existing assign is replaced;
+   it would just be stale state from a previous install or session. */
+void
+amiga_self_assign(void)
+{
+    BPTR dup;
+
+    if (GetProgramDir() == 0)
+        return;
+    if ((dup = DupLock(GetProgramDir())) == 0)
+        return;
+    if (!AssignLock("NetHack", dup))
+        UnLock(dup);
+}
+
 #ifdef AZTEC_50
 #include <functions.h>
 #undef strcmpi
