@@ -886,8 +886,7 @@ int
     return 0;
 }
 
-/* Fall back from AMIV (tile) to AMII (text) if this machine can't
- * run tile mode.  Probes in order of reliability. */
+/* Switch from AMIV (tile) to AMII (text) and tell the player why. */
 static void
 amii_fall_back(const char *why1, const char *why2)
 {
@@ -895,8 +894,8 @@ amii_fall_back(const char *why1, const char *why2)
 
     raw_print(why1);
     raw_print(why2);
-    raw_print("Falling back to text mode.  Set windowtype:amiv in");
-    raw_print("nethack.cnf to override.");
+    raw_print("Falling back to text mode.  Set windowtype:amii in");
+    raw_print("nethack.cnf to suppress this warning.");
     windowprocs = amii_procs;
     ami_wininit_data(WININIT);
 }
