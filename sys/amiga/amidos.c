@@ -47,6 +47,55 @@ amiga_self_assign(void)
         UnLock(dup);
 }
 
+/* Generate an RFC 4122 v4 UUID for this game.  Entropy comes from
+   DateStamp + the running task's address mixed through a small LCG. */
+void
+get_nhuuid(void)
+{
+    uchar bytes[16];
+    struct DateStamp ds;
+    unsigned long x;
+    int i;
+
+    if (svn.nhuuid[0])
+        return;
+
+    DateStamp(&ds);
+    x = (unsigned long) ds.ds_Days
+      ^ ((unsigned long) ds.ds_Minute << 16)
+      ^ ((unsigned long) ds.ds_Tick << 8)
+      ^ (unsigned long) FindTask(NULL);
+    /* Classic glibc/POSIX rand() LCG (Knuth, C99 7.22.2.1).  Full period
+       2^32; we read bits 16-23 to skip the LCG's bad low bits. */
+    for (i = 0; i < 16; i++) {
+        x = x * 1103515245u + 12345u;
+        bytes[i] = (uchar) (x >> 16);
+    }
+    /* RFC 4122: version=4 (random), variant=10. */
+    bytes[6] = (bytes[6] & 0x0F) | 0x40;
+    bytes[8] = (bytes[8] & 0x3F) | 0x80;
+
+    Snprintf(svn.nhuuid, sizeof svn.nhuuid,
+             "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-"
+             "%02x%02x%02x%02x%02x%02x",
+             bytes[0], bytes[1], bytes[2], bytes[3],
+             bytes[4], bytes[5],
+             bytes[6], bytes[7],
+             bytes[8], bytes[9],
+             bytes[10], bytes[11], bytes[12], bytes[13],
+             bytes[14], bytes[15]);
+}
+
+void
+free_nhuuid(void)
+{
+    int i;
+
+    for (i = 0; i < SIZE(svn.nhuuid); i++) {
+        svn.nhuuid[i] = 0;
+    }
+}
+
 #ifdef AZTEC_50
 #include <functions.h>
 #undef strcmpi

@@ -35,6 +35,7 @@ long _stksize = 16 * 1024;
 #ifdef AMIGA
 extern int bigscreen;
 void preserve_icon(void);
+void amiga_self_assign(void);
 #endif
 
 static void process_options(int argc, char **argv);
@@ -751,7 +752,7 @@ exepath(char *str)
 }
 #endif /* EXEPATH */
 
-#if defined(CROSS_TO_AMIGA) || defined(CROSS_TO_MSDOS)
+#if defined(CROSS_TO_MSDOS)
 
 void
 get_nhuuid(void)
