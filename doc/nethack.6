@@ -51,54 +51,29 @@
 .SH NAME
 nethack \- Exploring The Mazes of Menace
 .SH SYNOPSIS
+.HP
+.nr sA \n(.j \" Save the adjustment mode.
 .na
-.hy 0
-.\" Some options ordering is explicit (-d first, -u before -D), others
-.\" have been arranged to fit within an 80-column page with nearly full
-.\" lines while avoiding splitting "[" and "-opt ]" or "[ -opt" and "]"
-.\" across line boundaries.  It would be better to do that with 'roff magic.
 .B nethack
-[
-.BR \-d | \-\-directory
-.I directory
+.RB [ \-d | \-\-directory\*_\c
+.IR directory ]
+.RB [ \-w | \-\-windowtype\*_\c
+.IR interface ]
+\%[\c
+.BI \-\-nethackrc: rc-file\c
+|\c
+.B \-\-no\-nethackrc\c
 ]
-.\" '.B token newline .I token' will include a space between the two tokens;
-.\" '.BI token token' will not.  Likewise for .BR, .RB, &c.
-[
-.BR \-w | \-\-windowtype
-.I interface
-]
-.br
-[
-.BI \-\-nethackrc: rc-file
-|
-.B \-\-no\-nethackrc
-]
-[
-.B \-n
-]
-[
-.BR \-dec " | " \-ibm
-]
-.br
-[
-.B \-u
-.I player-name
-]
-[
-.BR \-X " | " \-D
-]
-[
-.B \-p
-.I profession
-]
-[
-.B \-r
-.I race
-]
-[
-.B \-@
-]
+.RB [ \-n ]
+.RB [ \-dec | \-ibm ]
+.RB [ \-u\*_\c
+.IR player-name ]
+.RB [ \-X | \-D ]
+.RB [ \-p\*_\c
+.IR profession ]
+.RB [ \-r\*_\c
+.IR race ]
+.RB [ \-@ ]
 .PP
 Also
 [
@@ -150,8 +125,7 @@ Also
 .B nethack
 .BR \-\-version [ :copy | :dump\c
 .RB | :show ]
-.ad
-.hy 14
+.ad \n(sA \" Restore the adjustment mode.
 .\" Make sure path is not hyphenated below
 .hw nethackdir
 .SH DESCRIPTION
