@@ -170,7 +170,7 @@
 #ifdef AMS
 #define AMS_MAILBOX "/Mailbox"
 #else
-#if defined(__FreeBSD__) || defined(__OpenBSD__)
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
 #define DEF_MAILREADER "/usr/bin/mail"
 #else
 #define DEF_MAILREADER "/usr/ucb/Mail"
@@ -332,7 +332,12 @@
 #endif
 
 #if defined(BSD) || defined(ULTRIX)
-#if !defined(DGUX) && !defined(SUNOS4)
+#if defined(__NetBSD__)
+#define tparm2(s, x)	tparm(s,x,0,0,0,0,0,0,0,0);
+#else
+#define tparm2(s, x)	tparm(s,x);
+#endif
+#if !defined(DGUX) && !defined(SUNOS4) && !defined(__NetBSD__)
 #define memcpy(d, s, n) bcopy(s, d, n)
 #define memcmp(s1, s2, n) bcmp(s2, s1, n)
 #endif

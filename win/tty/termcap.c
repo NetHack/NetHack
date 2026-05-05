@@ -41,7 +41,12 @@ static char *nh_VE = (char *) 0; /* cursor_normal */
 /*static char *nh_VS = (char *) 0;*/ /* cursor_visible (highlighted cursor) */
 static char *nh_Ic = (char *) 0; /* initialize_color */
 
-static char *HO, *CL, *CE, *UP, *XD, *BC, *SO, *SE, *TI, *TE;
+#if !defined(__NetBSD__)
+static char *UP, *BC;
+static char PC = '\0';
+#endif
+
+static char *HO, *CL, *CE, *XD, *SO, *SE, *TI, *TE;
 static char *VS, *VE;
 static char *ME, *MR, *MB, *MH, *MD;
 static char *ZH, *ZR;
@@ -49,7 +54,6 @@ static char *ZH, *ZR;
 #ifdef TERMLIB
 boolean dynamic_HIHE = FALSE;
 static int SG;
-static char PC = '\0';
 static char tbuf[512];
 #endif /*TERMLIB*/
 
@@ -973,10 +977,10 @@ init_hilite(void)
     if (colors >= 16) {
         for (c = 0; c < SIZE(ti_map); c++) {
             /* system colors */
-            scratch = tparm(setf, ti_map[c].nh_color);
+            scratch = tparm2(setf, ti_map[c].nh_color);
             hilites[ti_map[c].nh_color] = dupstr(scratch);
             /* bright colors */
-            scratch = tparm(setf, ti_map[c].nh_bright_color);
+            scratch = tparm2(setf, ti_map[c].nh_bright_color);
             hilites[ti_map[c].nh_bright_color] = dupstr(scratch);
         }
     } else {
@@ -987,7 +991,7 @@ init_hilite(void)
         while (c--) {
             char *work;
 
-            scratch = tparm(setf, ti_map[c].ti_color);
+            scratch = tparm2(setf, ti_map[c].ti_color);
             work = (char *) alloc(strlen(scratch) + md_len + 1);
             Strcpy(work, MD);
             hilites[ti_map[c].nh_bright_color] = work;
@@ -998,10 +1002,10 @@ init_hilite(void)
     }
 
     if (colors >= 16) {
-        scratch = tparm(setf, COLOR_WHITE | BRIGHT);
+        scratch = tparm2(setf, COLOR_WHITE | BRIGHT);
         hilites[CLR_WHITE] = dupstr(scratch);
     } else {
-        scratch = tparm(setf, COLOR_WHITE);
+        scratch = tparm2(setf, COLOR_WHITE);
         hilites[CLR_WHITE] = (char *) alloc(strlen(scratch) + md_len + 1);
         Strcpy(hilites[CLR_WHITE], MD);
         Strcat(hilites[CLR_WHITE], scratch);
@@ -1012,7 +1016,7 @@ init_hilite(void)
 
     if (iflags.wc2_darkgray) {
         if (colors >= 16) {
-            scratch = tparm(setf, COLOR_BLACK|BRIGHT);
+            scratch = tparm2(setf, COLOR_BLACK|BRIGHT);
             hilites[CLR_BLACK] = dupstr(scratch);
         } else {
             /* On many terminals, esp. those using classic PC CGA/EGA/VGA
@@ -1020,7 +1024,7 @@ init_hilite(void)
             * produces a dark shade of gray that is visible against a
             * black background.  We can use it to represent black objects.
             */
-            scratch = tparm(setf, COLOR_BLACK);
+            scratch = tparm2(setf, COLOR_BLACK);
             hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + md_len + 1);
             Strcpy(hilites[CLR_BLACK], MD);
             Strcat(hilites[CLR_BLACK], scratch);
