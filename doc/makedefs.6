@@ -146,15 +146,21 @@ is given without preceding dash.
 Specify the input
 .I file
 for the command (if needed).
-If the file is \- standard
-input is read.
+If
+.I file
+is \*(lq\-\*(rq,
+.B makedefs
+reads the standard input stream.
 .TP
 .BI \-\-output " file"
 Specify the output
 .I file
 for the command (if needed).
-If the file is \- standard
-output is written.
+If
+.I file
+is \*(lq\-\*(rq,
+.B makedefs
+writes to the standard input stream.
 .TP
 .B \-\-svs \fR[\fIdelimiter\fR]
 Generate a version string to standard output without a trailing newline.
