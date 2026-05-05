@@ -83,7 +83,7 @@ nethack \- Exploring The Mazes of Menace
 .br
 [
 .B \-u
-.I playername
+.I player-name
 ]
 [
 .BR \-X " | " \-D
@@ -148,8 +148,8 @@ Also
 .I race
 ]
 [
-.I playernames
-]
+.I player-name\*_\c
+\&.\|.\|.]
 .PP
 .B nethack
 [
@@ -241,7 +241,7 @@ to a string consisting of an @ character followed by the path and filename.
 .PP
 The
 .B \-u
-.I playername
+.I player-name
 option supplies the answer to the question "Who are you?".
 It overrides any name from the options or configuration file, USER, LOGNAME,
 or getlogin(), which will otherwise be tried in order.
@@ -251,11 +251,12 @@ so you can have several saved games under different names.
 Conversely, you must use the appropriate player name to restore a saved game.
 .PP
 A
-.I playername
+.I player-name
 suffix can be used to specify the profession, race, alignment and/or gender
 of the character.
-The full syntax of the playername that includes a
-suffix is "name\-ppp\-rrr\-aaa\-ggg".
+The full syntax of a
+.I player-name
+including a suffix is "name\-ppp\-rrr\-aaa\-ggg".
 "ppp" are at least the first three letters
 of the profession (this can also be specified using a separate
 .B \-p
