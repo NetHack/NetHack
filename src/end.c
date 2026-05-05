@@ -110,9 +110,12 @@ done2(void)
             u.usleep = 0;
         }
 
-        if (abandon_tutorial)
+        if (abandon_tutorial) {
+            /* mention_decor can be processed now */
+            rcfile_only_this_option(opt_mention_decor);
             schedule_goto(&u.ucamefrom, UTOTYPE_ATSTAIRS,
                           "Resuming regular play.", (char *) 0);
+        }
         return ECMD_OK;
     }
 

@@ -339,6 +339,7 @@ extern char *get_configfile(void);
 extern const char *get_default_configfile(void);
 extern void rcfile(void);
 extern void rcfile_interface_options(void);
+extern void rcfile_only_this_option(enum opt);
 extern void heed_all_config_statements(void);
 extern void disregard_all_config_statements(void);
 extern void heed_this_config_statement(int);

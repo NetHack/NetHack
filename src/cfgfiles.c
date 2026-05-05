@@ -1976,6 +1976,22 @@ rcfile_interface_options(void)
 }
 
 void
+rcfile_only_this_option(enum opt heeded_option)
+{
+    allopt_array_init();
+    disregard_all_options();
+    disregard_all_config_statements();
+    heed_this_option(heeded_option);
+    set_ignore_errors_on_unmatched();
+    ignore_statement_errors = TRUE;
+    rcfile();
+    heed_all_config_statements();
+    heed_all_options();
+    clear_ignore_errors_on_unmatched();
+    ignore_statement_errors = FALSE;
+}
+
+void
 heed_all_config_statements(void)
 {
     int i;
