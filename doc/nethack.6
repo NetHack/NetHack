@@ -16,12 +16,19 @@
 .ie \n(.g .hy 12
 .el       .hy 14
 .ds Na Robert Patrick Rankin
-.\" DWB, Solaris 10, and Plan 9 troffs don't support `\(ti`.  Assume the
-.\" best, then detect these older troffs and fall back as needed.
+.\" DWB, Solaris 10, and Plan 9 troffs don't support `\(ti`, `\(oq`, or
+.\" `\(cq`.  Assume the best, then detect these older troffs and fall
+.\" back as needed.
 .\"
 .\" Put NO SPACE between special character and comment escape sequences.
 .ds ~  \(ti\" The name "ti" is taken by *roff's `ti` request.
-.if !\n(.g .ds ~ ~
+.ds oq \(oq
+.ds cq \(cq
+.if !\n(.g \{\
+.  ds ~  ~
+.  ds oq `
+.  ds cq '
+.\}
 .\" Define string to exercise groff's hyphenless break point feature.
 .ie \n(.g .ds : \:
 .el       .ds : \" empty
@@ -390,7 +397,7 @@ option alone will print out the list of your scores on the current version.
 An immediately following
 .B \-v
 reports on all versions present in the score file.
-.RB \(oq \-s | \-s\*_\-v \(cq
+.RB \*(oq \-s | \-s\*_\-v \*(cq
 may also be followed by arguments
 .B \-p
 .I profession
@@ -402,7 +409,7 @@ Either can be specified multiple times to include more than one role
 or more than one race.
 When both are specified, score entries which match either the role or the
 race (or both) are printed rather than just entries which match both.
-.RB \(oq \-s | \-s\*_\-v \(cq
+.RB \*(oq \-s | \-s\*_\-v \*(cq
 may be followed by one or more player names to print the scores of the
 players mentioned, by 'all' to print out all scores, or by a number to print
 that many top scores.
@@ -441,7 +448,7 @@ customize aspects of how the game operates.
 .BR \-\-usage " or " \-\-help
 will display information similar to this manual page, then exit.
 Use
-.RB \(oq "nethack \-\-usage | more" \(cq
+.RB \*(oq "nethack \-\-usage | more" \*(cq
 to read it a page at a time.
 .SH AUTHORS
 Jay Fenlason (+ Kenny Woodland, Mike Thome and Jon Payne) wrote the
