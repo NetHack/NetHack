@@ -25,6 +25,9 @@
 .\" Define string to exercise groff's hyphenless break point feature.
 .ie \n(.g .ds : \:
 .el       .ds : \" empty
+.\" Define string to exercise groff's adjustable, unbreakable space.
+.ie \n(.g .ds _ \~
+.el       .ds _ \ \" backslash, space
 .\" Define local versions of groff's "an-ext.tmac" macros if needed.
 .ds %% \" empty
 .if \n(.g .ig %%
@@ -387,7 +390,7 @@ option alone will print out the list of your scores on the current version.
 An immediately following
 .B \-v
 reports on all versions present in the score file.
-.RB \(oq \-s | \-s\~\-v \(cq
+.RB \(oq \-s | \-s\*_\-v \(cq
 may also be followed by arguments
 .B \-p
 .I profession
@@ -399,7 +402,7 @@ Either can be specified multiple times to include more than one role
 or more than one race.
 When both are specified, score entries which match either the role or the
 race (or both) are printed rather than just entries which match both.
-.RB \(oq \-s | \-s\~\-v \(cq
+.RB \(oq \-s | \-s\*_\-v \(cq
 may be followed by one or more player names to print the scores of the
 players mentioned, by 'all' to print out all scores, or by a number to print
 that many top scores.
