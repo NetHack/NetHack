@@ -6716,7 +6716,7 @@ and had not gone through the process of debugging it as a suitable release,
 it was decided that the version numbers present on that code snapshot would
 be retired and never used in an official NetHack release.
 An announcement was posted on the NetHack Development Team's official
-.UR nethack.org
+.UR https://www.nethack.org
 website to that effect,
 stating that there would never be a 3.4.4, 3.5, or 3.5.0 official release
 version.
