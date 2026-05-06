@@ -10,7 +10,9 @@
 ..
 .NB $NHDT-Branch: NetHack-5 $
 .NR $NHDT-Revision: 1.12 $
-.\" groff and AT&T-descended troffs use different hyphenation patterns. 
+.ie \n(.g .ds ^ \(ha
+.el       .ds ^ ^
+.\" groff and AT&T-descended troffs use different hyphenation patterns.
 .\" Don't hyphenate the last word on a page or column, or
 .\" before/after last/first 2 characters of a word.
 .ie \n(.g .hy 12
@@ -49,26 +51,26 @@ specified by the game administrator during compilation
 (usually /usr/games/lib/nethackdir).
 .ig
 .PP
-^?ALLDOCS
+\*^?ALLDOCS
 For recovery to be possible,
 .I nethack
 must have been compiled with the INSURANCE option, and the run-time option
 .I checkpoint
 must also have been on.
-^:
-^?INSURANCE
+\*^:
+\*^?INSURANCE
 For recovery to be possible,
 .I nethack
 must have been compiled with the INSURANCE option (this configuration was),
 and the run-time option
 .I checkpoint
 must also have been on.
-^:
+\*^:
 This configuration of
 .I nethack
 was created without support for recovery.
-^.
-^.
+\*^.
+\*^.
 ..
 NetHack normally writes out files for levels as the player leaves them,
 so they will be ready for return visits.

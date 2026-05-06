@@ -10,6 +10,8 @@
 ..
 .NB $NHDT-Branch: NetHack-5 $
 .NR $NHDT-Revision: 1.22 $
+.ie \n(.g .ds ^ \(ha
+.el       .ds ^ ^
 .\" groff and AT&T-descended troffs use different hyphenation patterns.
 .\" Don't hyphenate the last word on a page or column, or
 .\" before/after last/first 2 characters of a word.
@@ -220,7 +222,7 @@ The default conditional state is printing enabled.
 .IP - 4
 Any line
 .I NOT
-starting with a caret (^) is either suppressed or passed through unchanged
+starting with a caret (\*^) is either suppressed or passed through unchanged
 depending on the current conditional state.
 .IP - 4
 Any line starting with a caret is a control line; as in C, zero or more spaces
@@ -243,21 +245,21 @@ configuration are different from unknown.
 .P
 Control lines:
 .RS
-.IP ^^ 4
+.IP \*^\*^ 4
 a line starting with a (single) literal caret
-.IP ^#
+.IP \*^#
 a comment
-.IP ^?\fIID
+.IP \*^?\fIID
 if the
 .I ID
 is defined set the conditional state to TRUE
-.IP ^!\fIID
+.IP \*^!\fIID
 if the
 .I ID
 is not defined set the conditional state to TRUE
-.IP ^:
+.IP \*^:
 else; invert the conditional state
-.IP ^.
+.IP \*^.
 end the most recent conditional
 .RE
 .\".SH EXAMPLES
