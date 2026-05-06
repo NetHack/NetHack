@@ -27,32 +27,38 @@ recover \- recover a NetHack game interrupted by disaster
 .I base
 \&.\|.\|.
 .SH DESCRIPTION
-Occasionally, a NetHack game will be interrupted by disaster
-when the game or the system crashes.
-Prior to NetHack v3.1, these games were lost because various information
+Occasionally, a NetHack game is interrupted by disaster
+when the program or the system crashes.
+Prior to NetHack v3.1, these games were lost because information
 like the player's inventory was kept only in memory.
 Now, all pertinent information can be written out to disk,
 so such games can be recovered at the point of the last level change.
 .PP
-The
-.I base
-options tell
+.I Base
+operands tell
 .I recover
 which files to process.
-Each base option specifies recovery of a separate game.
+Each
+.I base
+specifies recovery of a separate game.
 .PP
 The
 .B \-d
 option, which must be the first argument if it appears,
-supplies a directory which is the NetHack playground.
-It overrides the value from NETHACKDIR, HACKDIR, or the directory
+supplies the directory housing the NetHack playground.
+It overrides the value of the environment variables
+.I NETHACKDIR
+and
+.IR HACKDIR ,
+and the directory
 specified by the game administrator during compilation
-(usually /usr/games/lib/nethackdir).
+(usually
+.IR /usr/games/lib/nethackdir ).
 .ig
 .PP
 \*^?ALLDOCS
 For recovery to be possible,
-.I nethack
+.IR nethack (6)
 must have been compiled with the INSURANCE option, and the run-time option
 .I checkpoint
 must also have been on.
@@ -71,26 +77,34 @@ was created without support for recovery.
 \*^.
 \*^.
 ..
-NetHack normally writes out files for levels as the player leaves them,
+.IR nethack (6)
+normally writes out files for levels as the player leaves them,
 so they will be ready for return visits.
-When checkpointing, NetHack also writes out the level entered and
+When checkpointing, it also writes out the level entered and
 the current game state on every level change.
-This naturally slows level changes down somewhat.
+This procedure slows level changes.
 .PP
-The level file names are of the form base.nn, where nn is an internal
-bookkeeping number for the level.
-The file base.0 is used for game identity, locking, and, when checkpointing,
+The level file names are of the form
+.IR base. nn, where
+.I nn
+is an internal bookkeeping number for the level.
+The file
+.I base.0
+is used for game identity, locking, and, when checkpointing,
 for the game state.
 Various OSes use different strategies for constructing the base name.
-Microcomputers use the character name, possibly truncated and modified
+Single-user systems use the character name,
+possibly truncated and modified
 to be a legal filename on that system.
 Multi-user systems use the (modified) character name prefixed
 by a user number to avoid conflicts,
-or "xlock" if the number of concurrent players is being limited.
+or
+.I xlock
+if the number of concurrent players is being limited.
 It may be necessary to look in the playground to find the correct
 base name of the interrupted game.
 .I recover
-will transform these level files into a save file of the same name as
+transforms these level files into a save file of the same name that
 .I nethack
 would have used.
 .PP
@@ -105,13 +119,16 @@ through setuid or setgid is tantamount to leaving the playground
 world-writable,
 with respect to both cheating and messing up other players.
 For a single-user system, this of course does not change anything,
-so some of the microcomputer ports install
+so some of these ports install
 .I recover
 by default.
 .PP
 For a multi-user system,
-the game administrator may want to arrange for all .0 files in the
-playground to be fed to recover when the host machine boots,
+the game administrator may want to arrange for all
+.I .0
+files in the playground to be fed to
+.I recover
+when the host machine boots,
 and handle game crashes individually.
 If the user population is sufficiently trustworthy,
 .I recover
@@ -126,7 +143,7 @@ Like
 .I nethack
 itself,
 .I recover
-will overwrite existing savefiles of the same name.
+will overwrite existing save files of the same name.
 Savefiles created by
 .I recover
 are uncompressed;
@@ -143,8 +160,9 @@ If multiple machines share a playground, this would be impossible to
 determine.
 .PP
 .I recover
-should be taught to use the nethack playground locking mechanism to
-avoid conflicts.
+should be taught to use the
+.I nethack
+playground locking mechanism to avoid conflicts.
 .SH COPYRIGHT
 .\" All troffs and nroffs support `\(co` except Plan 9 nroff, but Plan 9
 .\" offers no test for special character availability, and its feature
