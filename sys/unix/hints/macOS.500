@@ -345,6 +345,12 @@ LIBNHSYSOBJ = $(TARGETPFX)libnhmain.o $(TARGETPFX)ioctl.o \
 #without winshim
 override GAME=
 MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) $(TARGETPFX)libnh.a )
+# With $(GAME) empty, the regular `recover: $(GAME)` chain no longer
+# triggers lua_support, but recover.c still pulls in hack.h -> nhlua.h
+# transitively.  Make recover depend on lua_support explicitly.
+ifdef MAKEFILE_TOP
+recover: lua_support
+endif
 endif  # WANT_LIBNH
 
 # Lua
@@ -568,8 +574,20 @@ $(TARGETPFX)macuuid.o: ../sys/unix/macuuid.m
 endif
 
 ifdef WANT_LIBNH
-$(TARGETPFX)libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua-$(LUA_VERSION).a
-	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua-$(LUA_VERSION).a
+# Build libnh.a by merging the engine objects, the shim windowport,
+# date.o (separate from $(HOBJ) per Makefile.src), hacklib.a, and Lua's
+# static archive.  Use libtool -static rather than ar so hacklib.a and
+# liblua-$(LUA_VERSION).a have their members merged in -- ar would archive
+# them as opaque .a members and macOS ld can't dereference those.
+# Depending on $(LUALIB) triggers the lua_support build (which generates
+# include/nhlua.h); without it, $(HOBJ) won't compile.
+# filter-out drops $(SYSOBJ) (which carries unixmain.o) and $(WINOBJ) (the
+# tty windowport) from $(HOBJ); $(LIBNHSYSOBJ) supplies libnhmain.o and
+# winshim.o in their place.
+$(TARGETPFX)libnh.a: $(LUALIB) $(HOBJ) $(LIBNHSYSOBJ) $(DATE_O) $(TARGET_HACKLIB)
+	libtool -static -o $@ \
+		$(filter-out $(SYSOBJ) $(WINOBJ),$(HOBJ)) \
+		$(LIBNHSYSOBJ) $(DATE_O) $(TARGET_HACKLIB) $(LUALIB)
 	@echo "$@ built."
 $(TARGETPFX)libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o$@ $<
