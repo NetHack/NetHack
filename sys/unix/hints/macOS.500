@@ -176,8 +176,8 @@ HAVE_HOMEBREW_NCURSES := $(shell expr `brew ls --versions ncurses > /dev/null; e
 ifeq "$(HAVE_HOMEBREW_NCURSES)" "1"
 # Newer versions of ncurses are commonly installed via homebrew, but intentionally unlinked.
 HOMEBREW_LFLAGS := -L$(shell brew --prefix)/opt/ncurses/lib
-HOMEBREW_WINLIB := -I$(shell brew --prefix)/opt/ncurses/include
-HOMEBREW_CFLAGS =
+HOMEBREW_WINLIB :=
+HOMEBREW_CFLAGS = -I$(shell brew --prefix)/opt/ncurses/include
 endif   #HAVE_HOMEBREW_NCURSES
 endif   #HAVE_HOMEBREW
 ifeq "$(HAVE_MACPORTS)" "1"
