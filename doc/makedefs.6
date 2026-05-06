@@ -42,7 +42,7 @@ makedefs \- NetHack miscellaneous build-time functions
 .SH DESCRIPTION
 .B Makedefs
 is a build-time tool used for a variety of
-.BR NetHack (6)
+.IR nethack (6)
 source file creation and modification tasks.
 For historical reasons,
 .B makedefs
@@ -210,58 +210,61 @@ The
 command (and certain other commands) filter their input, on a line-by-line
 basis, according to control lines embedded in the input and on information
 gleaned from the
-.IR NetHack (6)
+.I nethack
 configuration.
 This allows certain changes such as embedding platform-specific
 documentation into the master documentation files.
 .P
 Rules:
-.RS
-.IP - 4
+.IP \(bu
 The default conditional state is printing enabled.
-.IP - 4
+.IP \(bu
 Any line
 .I NOT
 starting with a caret (\*^) is either suppressed or passed through unchanged
 depending on the current conditional state.
-.IP - 4
+.IP \(bu
 Any line starting with a caret is a control line; as in C, zero or more spaces
 may be embedded in the line almost anywhere (except immediately after the
 caret); however the caret must be in column 1.
-.IP - 4
+.IP \(bu
 Conditionals may be nested.
-.IP - 4
+.IP \(bu
 .I Makedefs
 will exit with an error code if any errors are detected; processing will
 continue (if it can) to allow as many errors as possible to be detected.
-.IP - 4
+.IP \(bu
 Unknown identifiers are treated as both TRUE and as an error.
 Note that
 .BR \-\-undef " or " #undef
 in the
-.IR NetHack (6)
+.I nethack
 configuration are different from unknown.
-.RE
 .P
 Control lines:
-.RS
-.IP \*^\*^ 4
+.TP
+.B
+\*^\*^
 a line starting with a (single) literal caret
-.IP \*^#
+.TP
+.B \*^#
 a comment
-.IP \*^?\fIID
+.TP
+.B \*^?\fIID
 if the
 .I ID
 is defined set the conditional state to TRUE
-.IP \*^!\fIID
+.TP
+.B \*^!\fIID
 if the
 .I ID
 is not defined set the conditional state to TRUE
-.IP \*^:
+.TP
+.B \*^:
 else; invert the conditional state
-.IP \*^.
+.TP
+.B \*^.
 end the most recent conditional
-.RE
 .\".SH EXAMPLES
 .SH AUTHOR
 The NetHack Development Team
