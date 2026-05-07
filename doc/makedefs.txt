@@ -6,12 +6,12 @@ NAME
        makedefs - NetHack miscellaneous build-time functions
 
 SYNOPSIS
-       makedefs { -o | -d | -e | -m | -v | -p | -q | -r | -h }
+       makedefs {-o|-d|-e|-m|-v|-p|-q|-r|-h}
 
        makedefs --input file --output file --command
 
 DESCRIPTION
-       Makedefs  is  a build-time tool used for a variety of NetHack(6) source
+       Makedefs  is  a build-time tool used for a variety of nethack(6) source
        file creation and modification tasks.  For historical reasons, makedefs
        takes  two  types  of command lines.  When invoked with a short option,
        the files operated on are determined when makedefs is  compiled.   When
@@ -30,11 +30,11 @@ SHORT COMMANDS
               through the same logic as that used by the --grep  command;  see
               the MDGREP FUNCTIONS section below for details.
 
-       -m     Generate  date.h and options file. It will read dat/gitinfo.txt,
+       -m     Generate date.h and options file.  It will read dat/gitinfo.txt,
               only if it is present, to obtain githash=  and  gitbranch=  info
               and include related preprocessor #defines in date.h file.
 
-       -p     Generate pm.h
+       -p     Generate pm.h.
 
        -q     Generate the rumors file.
 
@@ -57,12 +57,12 @@ LONG COMMANDS
               dash.
 
        --input file
-              Specify the input file for the command (if needed).  If the file
-              is - standard input is read.
+              Specify the input file for the command (if needed).  If file  is
+              "-", makedefs reads the standard input stream.
 
        --output file
-              Specify  the  output  file  for the command (if needed).  If the
-              file is - standard output is written.
+              Specify the output file for the command (if needed).  If file is
+              "-", makedefs writes to the standard input stream.
 
        --svs [delimiter]
               Generate a version string to standard output without a  trailing
@@ -96,48 +96,46 @@ LONG COMMANDS
 MDGREP FUNCTIONS
        The  --grep command (and certain other commands) filter their input, on
        a line-by-line basis, according to control lines embedded in the  input
-       and  on  information  gleaned  from the NetHack(6) configuration.  This
-       allows certain changes such as embedding  platform-specific  documenta-
-       tion into the master documentation files.
+       and on information gleaned from the nethack configuration.  This allows
+       certain changes such as embedding platform-specific documentation  into
+       the master documentation files.
 
        Rules:
 
-              -   The default conditional state is printing enabled.
+       o      The default conditional state is printing enabled.
 
-              -   Any  line NOT starting with a caret (^) is either suppressed
-                  or passed through unchanged depending on the current  condi-
-                  tional state.
+       o      Any  line  NOT starting with a caret (^) is either suppressed or
+              passed through unchanged depending on  the  current  conditional
+              state.
 
-              -   Any  line  starting with a caret is a control line; as in C,
-                  zero or more spaces may be embedded in the line almost  any-
-                  where  (except  immediately  after  the  caret); however the
-                  caret must be in column 1.
+       o      Any  line starting with a caret is a control line; as in C, zero
+              or more spaces may be  embedded  in  the  line  almost  anywhere
+              (except  immediately after the caret); however the caret must be
+              in column 1.
 
-              -   Conditionals may be nested.
+       o      Conditionals may be nested.
 
-              -   Makedefs will exit with an error  code  if  any  errors  are
-                  detected;  processing  will continue (if it can) to allow as
-                  many errors as possible to be detected.
+       o      Makedefs will  exit  with  an  error  code  if  any  errors  are
+              detected;  processing will continue (if it can) to allow as many
+              errors as possible to be detected.
 
-              -   Unknown identifiers are treated  as  both  TRUE  and  as  an
-                  error.   Note  that --undef or #undef in the NetHack(6) con-
-                  figuration are different from unknown.
+       o      Unknown identifiers are treated as both TRUE and  as  an  error.
+              Note  that  --undef  or  #undef in the nethack configuration are
+              different from unknown.
 
        Control lines:
 
-              ^^  a line starting with a (single) literal caret
+       ^^     a line starting with a (single) literal caret
 
-              ^#  a comment
+       ^#     a comment
 
-              ^?ID
-                  if the ID is defined set the conditional state to TRUE
+       ^?ID   if the ID is defined set the conditional state to TRUE
 
-              ^!ID
-                  if the ID is not defined set the conditional state to TRUE
+       ^!ID   if the ID is not defined set the conditional state to TRUE
 
-              ^:  else; invert the conditional state
+       ^:     else; invert the conditional state
 
-              ^.  end the most recent conditional
+       ^.     end the most recent conditional
 
 AUTHOR
        The NetHack Development Team
