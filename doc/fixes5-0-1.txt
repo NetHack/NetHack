@@ -1,0 +1,80 @@
+NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.0 $ $NHDT-Date: 1777000050 2026/05/06 11:30:00 $
+
+General Fixes and Modified Features
+-----------------------------------
+fix some cross-compile package filenames that still referenced 370 instead
+	of 500
+Use NHV macro (NHV=500) for filenames in Makefiles and/or hints files to make
+	it less likely to overlook or miss them next time
+early startup options such as --showpaths could be run non-interactively, so 
+	ensure that getret() doesn't prompt and wait for user input
+fix issue where the new game startup message was stating 'Work-in-progress'
+	even when NH_DEVEL_STATUS was set to NH_STATUS_POSTRELEASE
+if 'mention_decor' was set in config file or NETHACKOPTIONS,
+	starting the game told you that "you are standing on stairs which lead
+	out of the dungeon", even when the player entered the tutorial where that
+	wasn't true
+doc: use full URL for nethack.org in Guidebook.mn
+doc: fix a paste error in Guidebook.tex
+doc: fix spelling correction in nethack.6
+
+Platform- and/or Interface-Specific Fixes
+-----------------------------------------
+Amiga: fall back to text mode when tile mode is not viable
+Amiga: Detect Workbench depth, display-database MaxDepth, and free chip RAM
+	if any signals AMIV can't run (e.g. A1000 with 4-colour WB)
+Amiga: swap windowprocs to amii_procs before opening any screens
+Amiga: disable SYSCF, drop sysconf from package; assure_syscf_file() was
+	killing the binary when run outside NetHack: was breaking normal
+	launches
+Amiga: honor __stack under libnix; reference __stkinit so the linker pulls
+	swapstack.o from libnix.a; without it the program runs on the
+	inherited shell stack and crashes inside Lua / level-gen
+Amiga: provide a real v4 UUID via get_nhuuid
+Amiga: ship as a NetHack drawer with drawer icon and README
+Amiga: ship Workbench icons for the binary and text files
+Amiga: fix misleading fallback warning and stale comment
+Amiga: stop rendering CLR_BLACK and CLR_WHITE as inverse video
+Amiga: default number_pad:1 in shipped nethack.cnf
+Amiga: promote AMIGA_INTUITION to supported so it shows up in version info
+Amiga: wire altmeta option to sysflags.altmeta
+libnh: update get_nhuuid() for libnhmain
+libnh: sys/libnh/libnhmain.c: drop `static` on `whoami()`
+libnh: rewrote sys/unix/hints/macOS.500: rewrote the libnh.a rule. The
+	`ar rcs libnh.a $(HOBJ) $(LIBNHSYSOBJ) liblua-$(LUA_VERSION).a` had
+	four problems: (a) ar archives liblua.a as a single opaque member
+	that macOS ld can't dereference, (b) date.o (DATE_O, kept separate
+	from HOBJ) was never archived, so `populate_nomakedefs` and
+	`nomakedefs` were missing, (c) hacklib.a was likewise omitted, and
+	(d) HOBJ already contains $(SYSOBJ) (with unixmain.o) and $(WINOBJ)
+	(the tty windowport), which duplicated symbols from libnhmain.o /
+	winshim.o.
+libnh: sys/libnh/libnhmain.c: gate the emscripten-only code in get_nhuuid
+       with `#ifdef __EMSCRIPTEN__` instead of `#ifdef NHUUID`
+libnh: sys/unix/hints/macOS.500 in the WANT_LIBNH block, add an explicit
+	`recover: lua_support` dependency (gated by MAKEFILE_TOP).  When 
+	$(GAME) is overridden to empty, the regular `recover: $(GAME)` chain
+	no longer triggers `lua_support`, so include/nhlua.h never gets
+	generated and recover.c's transitive #include of hack.h fails.
+macOS: fix ncurses build with Homebrew
+WASM: resolve some build failures in 'make CROSS_TO_WASM=1'
+WASM: hints file cross-pre2.500 update to CFLAGS to include -DNHUUID
+
+
+
+General New Features
+--------------------
+
+
+Platform- and/or Interface-Specific New Features
+------------------------------------------------
+
+
+NetHack Community Patches (or Variation) Included
+-------------------------------------------------
+
+
+Code Cleanup and Reorganization
+-------------------------------
+
+
