@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.0 $ $NHDT-Date: 1777000050 2026/05/06 11:30:00 $
+NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.0 $ $NHDT-Date: 1778152494 2026/05/07 11:14:54 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -76,5 +76,6 @@ NetHack Community Patches (or Variation) Included
 
 Code Cleanup and Reorganization
 -------------------------------
-
+add Contributing.md with some guidelines for making a pull request that
+	is in an acceptable format
 
