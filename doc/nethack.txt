@@ -6,24 +6,44 @@ NAME
        nethack - Exploring The Mazes of Menace
 
 SYNOPSIS
-       nethack [ -d|--directory directory ] [ -w|--windowtype interface ]
-       [ --nethackrc:RC-file | --no-nethackrc ] [ -n ] [ -dec | -ibm ]
-       [ -u playername ] [ -X | -D ] [ -p profession ] [ -r race ] [ -@ ]
+       nethack [role-option] [-d|--directory directory] [-w|--window-
+              type interface] [--nethackrc:rc-file|--no-nethackrc] [-n]
+              [-dec|-ibm] [-u player-name] [-X|-D] [-p profession] [-r race]
+              [-@]
 
-       Also [ -A|-Arc | -B|-Bar | -C|-Cav | -H|-Hea | -K|-Kni | -M|-Mon |
-       -P|-Pri | -R|-Rog | -Ran | -S|-Sam | -T|-Tou | -V|-Val | -W|-Wiz ]
+       role-option can be any of the following.
 
-       nethack [ -d|--directory directory ] -s|--scores [ -v ]
-       [ -p profession ] [ -r race ] [ playernames ]
+              -A|-Arc
+              -B|-Bar
+              -C|-Cav
+              -H|-Hea
+              -K|-Kni
+              -M|-Mon
+              -P|-Pri
+              -R|-Rog
+              -Ran
+              -S|-Sam
+              -T|-Tou
+              -V|-Val
+              -W|-Wiz
 
-       nethack [ --usage | --help ] [ --showpaths ]
-       [ --version[:copy|:dump|:show] ]
+       nethack {-s|--scores} [-d|--directory directory] [-v] [-p profession]
+              [-r race] [player-name ...]
+
+       nethack {--usage|--help}
+
+       nethack --showpaths
+
+       nethack --version[:copy|:dump|:show]
 
 DESCRIPTION
-       NetHack is a display oriented Dungeons & Dragons(tm) - like game.   The
-       standard tty display and command structure resemble rogue.
+       NetHack  is  a fantasy-themed game of survival, exploration, and combat
+       set in the Mazes of Menace, an elaborate underground complex.
 
-       Other, more graphical display options exist for most platforms.
+       Traditionally, the game's interface uses a  Unix  terminal  connection,
+       depicting  the interface on a grid of character cells and responding to
+       keyboard-entered commands.  Other  interface  options  exist  for  most
+       platforms.
 
        To  get started you really only need to know two commands.  The command
        ?  will give you a list of the available commands  (as  well  as  other
@@ -65,7 +85,7 @@ DESCRIPTION
        setting NETHACKOPTIONS in your environment to a string consisting of an
        @ character followed by the path and filename.
 
-       The  -u  playername option supplies the answer to the question "Who are
+       The  -u player-name option supplies the answer to the question "Who are
        you?".  It overrides any name from the options or  configuration  file,
        USER,  LOGNAME,  or getlogin(), which will otherwise be tried in order.
        If none of these provides a useful name, the player will be  asked  for
@@ -74,9 +94,9 @@ DESCRIPTION
        versely,  you  must  use the appropriate player name to restore a saved
        game.
 
-       A playername suffix can be used to specify the profession, race, align-
-       ment and/or gender of the character.  The full syntax of the playername
-       that includes a suffix is "name-ppp-rrr-aaa-ggg".  "ppp" are  at  least
+       A player-name suffix can be  used  to  specify  the  profession,  race,
+       alignment and/or gender of the character.  The full syntax of a player-
+       name including a suffix is "name-ppp-rrr-aaa-ggg".  "ppp" are at  least
        the  first  three letters of the profession (this can also be specified
        using a separate -p profession option).  "rrr" are at least  the  first
        three letters of the character's race (this can also be specified using
@@ -100,7 +120,7 @@ DESCRIPTION
        must  be  uppercase.   Ranger has no single-letter choice because -R is
        already used for the Rogue role.
 
-       -@  tells  nethack  to  choose  any  omitted  characteristics  (profes-
+       -@  tells  NetHack  to  choose  any  omitted  characteristics  (profes-
        sion/role, race, gender, alignment) randomly without prompting.  Other-
        wise, leaving out any of these characteristics will result in you being
        prompted during game startup for the information.
@@ -113,16 +133,16 @@ DESCRIPTION
        mode (also known as wizard mode) after changing the character  name  to
        "wizard",  if  the  player is allowed.  Otherwise it will switch to -X.
        Control of who is allowed to use debug mode is done via the  "WIZARDS="
-       line in nethack's sysconf file.
+       line in NetHack's sysconf file.
 
        The  -d  or  --directory option, which must be the first argument if it
        appears, supplies a directory which is to serve as the playground.   It
        overrides  the  value from NETHACKDIR, HACKDIR, or the directory speci-
-       fied  by   the   game   administrator   during   compilation   (usually
-       /usr/games/lib/nethackdir).   This option is usually only useful to the
-       game administrator.  The  playground  must  contain  several  auxiliary
-       files  such  as help files, the list of top scorers, and a subdirectory
-       save where games are saved.
+       fied by the game administrator during compilation (usually  /usr/games/
+       lib/nethackdir).  This option is usually only useful to the game admin-
+       istrator.  The playground must contain several auxiliary files such  as
+       help  files,  the  list  of  top scorers, and a subdirectory save where
+       games are saved.
 
        The -w or --windowtype interface option can be used  to  specify  which
        interface  to  use  if the program has been built with support for more
@@ -130,7 +150,7 @@ DESCRIPTION
        specified  in the run-time configuration file.  NetHack's #version com-
        mand shows available interfaces.
 
-       The --nethackrc:RC-file option will use RC-file instead of the  default
+       The --nethackrc:rc-file option will use rc-file instead of the  default
        run-time   configuration   file   (typically   ~/.nethackrc)   and  the
        --no-nethackrc option can be used to skip  any  run-time  configuration
        file.
@@ -194,81 +214,136 @@ AUTHORS
 FILES
        Run-time configuration options were discussed above and use a  platform
        specific  name  for  a file in a platform specific location.  For Unix,
-       the name is '.nethackrc' in the user's home directory.
+       the name is .nethackrc in the user's home directory.
 
-       All  other  files   are   in   the   playground   directory,   normally
-       /usr/games/lib/nethackdir.   If DLB was defined during the compile, the
-       data files and special levels will be inside a  larger  file,  normally
-       nhdat, instead of being separate files.
+       All other files are in the playground directory,  normally  /usr/games/
+       lib/nethackdir.   If DLB was defined during the compile, the data files
+       and special levels will  be  inside  a  larger  file,  normally  nhdat,
+       instead of being separate files.
 
-       nethack                     The program itself.
-       Guidebook | Guidebook.txt   NetHack's user manual.
-       data, oracles, rumors       Data files used by NetHack.
-       bogusmon                    Another data file.
-       engrave, epitaph, tribute   Still more data files.
-       symbols                     Data file holding sets of specifications
-                                   for how to display monsters, objects, and
-                                   map features.
-       options                     Data file containing a description of the
-                                   build-time option settings.
-       help, hh, cmdhelp           Help data files.  ('cmdhelp' is obsolete.)
-       opthelp, optmenu, wizhelp   More help data files.
-       keyhelp, usagehlp           Even more help data files.
-       *.lua                       Predefined special levels, dungeon control
-                                   for special levels, quest texts.
-       history                     A short history of NetHack.
-       license                     Rules governing redistribution.
-       record                      The list of top scorers.
-       logfile                     An extended list of games played
-                                   (optional).
-       xlogfile                    A more detailed version of 'logfile'
-                                   (also optional).
-       paniclog                    Record of exceptional conditions
-                                   discovered during program execution.
-       xlock.nn                    Description of dungeon level 'nn' of
-                                   active game 'x' if there's a limit on the
-                                   number of simultaneously active games.
-       UUcccccc.nn                 Alternate form for dungeon level 'nn'
-                                   of active game by user 'UU' playing
-                                   character named 'cccccc' when there's no
-                                   limit on number of active games.
-       perm                        Lock file for xlock.0 or UUcccccc.0.
-       bonD0.nn                    Descriptions of the ghost and belongings
-                                   of a deceased adventurer who met his or
-                                   her demise on level 'nn'.  A subsequent
-                                   character might encounter this old level.
+       nethack
+              The program itself.
 
-       save/                       A subdirectory containing saved games.
+       Guidebook
+       Guidebook.txt
+              NetHack's user manual.
 
-       sysconf                     System-wide options.  Required if
-                                   program is built with 'SYSCF' option
-                                   enabled, ignored if not.
+       data
+       oracles
+       rumors Data files used by NetHack.
 
-       The  location  of  'sysconf'  is  specified  at build time and can't be
-       changed except by updating source file "config.h"  and  rebuilding  the
-       program.
+       bogusmon
+              Another data file.
 
-       NetHack's  Guidebook  might  not  be  present  if  whoever  packaged or
+       engrave
+       epitaph
+       tribute
+              Still more data files.
+
+       symbols
+              Data file holding sets of specifications for how to display mon-
+              sters, objects, and map features.
+
+       options
+              Data file containing a description of the build-time option set-
+              tings.
+
+       help
+       hh
+       cmdhelp
+              Help data files.  (cmdhelp is obsolete.)
+
+       opthelp
+       optmenu
+       wizhelp
+              More help data files.
+
+       keyhelp
+       usagehlp
+              Even more help data files.
+
+       *.lua  Predefined  special  levels, dungeon control for special levels,
+              quest texts.
+
+       history
+              A short history of NetHack.
+
+       license
+              Rules governing redistribution.
+
+       record The list of top scorers.
+
+       logfile
+              An extended list of games played (optional).
+
+       xlogfile
+              A more detailed version of logfile (also optional).
+
+       paniclog
+              Record of exceptional conditions discovered during program  exe-
+              cution.
+
+       xlock.nn
+              Description  of  dungeon  level nn of active game x if there's a
+              limit on the number of simultaneously active games.
+
+       UUcccccc.nn
+              Alternate form for dungeon level nn of active game  by  user  UU
+              playing  character  named cccccc when there's no limit on number
+              of active games.
+
+       perm   Lock file for xlock.0 or UUcccccc.0.
+
+       bonD0.nn
+              Descriptions of the ghost and belongings of  a  deceased  adven-
+              turer who met his or her demise on level nn.  A subsequent char-
+              acter might encounter this old level.
+
+       save/  Subdirectory containing saved games.
+
+       sysconf
+              System-wide options.  Required if program is built with  'SYSCF'
+              option enabled, ignored if not.
+
+       The location of sysconf is specified at build time and can't be changed
+       except by updating source file "config.h" and rebuilding the program.
+
+       NetHack's Guidebook  might  not  be  present  if  whoever  packaged  or
        installed the program distribution neglected to include it.
 
-       In a perfect world, 'paniclog' would remain empty.
+       In a perfect world, paniclog would remain empty.
 
 ENVIRONMENT
-       USER or LOGNAME         Your login name.
-       HOME                    Your home directory.
-       SHELL                   Your shell.
-       TERM                    The type of your terminal.
-       HACKPAGER or PAGER      Replacement for default pager.
-       MAIL                    Mailbox file.
-       MAILREADER              Replacement for default reader
-                               (probably /bin/mail or /usr/ucb/mail).
-       NETHACKDIR or HACKDIR   Playground.
-       NETHACKOPTIONS          String predefining several NetHack options.
+       In  some  cases,  NetHack attempts to access multiple environment vari-
+       ables in sequence (via getenv(3) or similar) to determine information.
+
+       USER
+       LOGNAME         Your login name.
+
+       HOME            Your home directory.
+
+       SHELL           Your login shell (not necessarily the one running  when
+                       you started NetHack).
+
+       TERM            Your terminal type.
+
+       HACKPAGER
+       PAGER           Replacement for default pager.
+
+       MAIL            Mailbox file.
+
+       MAILREADER      Replacement  for  default reader (probably /bin/mail or
+                       /usr/ucb/mail).
+
+       NETHACKDIR
+       HACKDIR         Playground.
+
+       NETHACKOPTIONS  Predefined NetHack options.
 
        If the same option is specified in both NETHACKOPTIONS and  .nethackrc,
        the value assigned in NETHACKOPTIONS takes precedence.
 
-       SHOPTYPE and SPLEVTYPE can be used in debugging (wizard) mode.
+       SHOPTYPE  and  SPLEVTYPE  can  be  used  in  debugging  (wizard)  mode.
        DEBUGFILES can be used if the program was built with 'DEBUG' enabled.
 
 SEE ALSO
@@ -278,11 +353,9 @@ BUGS
        Probably infinite.
 
 COPYRIGHT
-       This  file  is  Copyright  (C)  Robert Patrick Rankin, 2024 for version
-       NetHack-5:1.31.  NetHack may be freely redistributed.  See license  for
+       This file is Copyright (C) Robert  Patrick  Rankin,  2024  for  version
+       NetHack-5:1.31.   NetHack may be freely redistributed.  See license for
        details.
-
-       Dungeons & Dragons is a Trademark of Wizards of the Coast, Inc.
 
 
 
