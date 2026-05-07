@@ -7417,39 +7417,39 @@
      as a suitable release, it was decided that the version numbers present
      on that code snapshot would be retired and never used in  an  official
      NetHack  release.   An announcement was posted on the NetHack Develop-
-     ment Team's official nethack.org website to that effect, stating  that
-     there would never be a 3.4.4, 3.5, or 3.5.0 official release version.
+     ment Team's official https://www.nethack.org website to  that  effect,
+     stating  that  there  would  never  be a 3.4.4, 3.5, or 3.5.0 official
+     release version.
 
-          In  January  2015,  preparation  began for the release of NetHack
+          In January 2015, preparation began for  the  release  of  NetHack
      3.6.
 
-          At the beginning of development for  what  would  eventually  get
-     released  as  3.6.0, the NetHack Development Team consisted of Warwick
-     Allison, Michael Allison, Ken Arromdee, David  Cohrs,  Jessie  Collet,
-     Ken  Lorber,  Dean Luick, Pat Rankin, Mike Stephenson, Janet Walz, and
-     Paul Winner.  In early 2015, ahead of the release of 3.6.0,  new  mem-
-     bers  Sean  Hunt,  Pasi  Kallinen, and Derek S. Ray joined the NetHack
+          At  the  beginning  of  development for what would eventually get
+     released as 3.6.0, the NetHack Development Team consisted  of  Warwick
+     Allison,  Michael  Allison,  Ken Arromdee, David Cohrs, Jessie Collet,
+     Ken Lorber, Dean Luick, Pat Rankin, Mike Stephenson, Janet  Walz,  and
+     Paul  Winner.   In early 2015, ahead of the release of 3.6.0, new mem-
+     bers Sean Hunt, Pasi Kallinen, and Derek S.  Ray  joined  the  NetHack
      Development Team.
 
-          Near the end of the development of 3.6.0, one of the  significant
-     inspirations  for  many  of the humorous and fun features found in the
+          Near  the end of the development of 3.6.0, one of the significant
+     inspirations for many of the humorous and fun features  found  in  the
      game, author Terry Pratchett, passed away.  NetHack 3.6.0 introduced a
      tribute to him.
 
-          3.6.0  was released in December 2015, and merged work done by the
-     development team since the release of 3.4.3 with some of  the  beloved
-     community  patches.  Many  bugs  were fixed and some code was restruc-
+          3.6.0 was released in December 2015, and merged work done by  the
+     development  team  since the release of 3.4.3 with some of the beloved
+     community patches. Many bugs were fixed and  some  code  was  restruc-
      tured.
 
-          The NetHack Development Team, as well as  Steve  VanDevender  and
-     Kevin  Smolkowski,  ensured  that  NetHack 3.6 continued to operate on
+          The  NetHack  Development  Team, as well as Steve VanDevender and
+     Kevin Smolkowski, ensured that NetHack 3.6  continued  to  operate  on
      various UNIX flavors and maintained the X11 interface.
 
-          Ken Lorber, Haoyang Wang, Pat Rankin, and Dean  Luick  maintained
+          Ken  Lorber,  Haoyang Wang, Pat Rankin, and Dean Luick maintained
      the port of NetHack 3.6 for MacOS.
 
-          Michael  Allison,  David  Cohrs,  Bart House, Pasi Kallinen, Alex
-     Kompel, Dion Nicolaas, Derek S. Ray and Yitzhak Sapir  maintained  the
+
 
 
      NetHack 5.0.0                                              May 2, 2026
@@ -7462,60 +7462,60 @@
 
 
 
+          Michael Allison, David Cohrs, Bart  House,  Pasi  Kallinen,  Alex
+     Kompel,  Dion  Nicolaas, Derek S. Ray and Yitzhak Sapir maintained the
      port of NetHack 3.6 for Microsoft Windows.
 
-          Pat  Rankin  attempted  to  keep the VMS port running for NetHack
-     3.6, hindered by limited access.  Kevin  Smolkowski  has  updated  and
-     tested  it  for  the  most  recent version of OpenVMS (V8.4 as of this
+          Pat Rankin attempted to keep the VMS  port  running  for  NetHack
+     3.6,  hindered  by  limited  access.  Kevin Smolkowski has updated and
+     tested it for the most recent version of  OpenVMS  (V8.4  as  of  this
      writing) on Alpha and Integrity (aka Itanium aka IA64) but not VAX.
 
-          Ray Chason resurrected the MS-DOS port for  3.6  and  contributed
+          Ray  Chason  resurrected  the MS-DOS port for 3.6 and contributed
      the necessary updates to the community at large.
 
-          In  late April 2018, several hundred bug fixes for 3.6.0 and some
-     new features were  assembled  and  released  as  NetHack  3.6.1.   The
-     NetHack  Development Team at the time of release of 3.6.1 consisted of
-     Warwick Allison, Michael Allison, Ken Arromdee,  David  Cohrs,  Jessie
-     Collet,  Pasi  Kallinen,  Ken  Lorber, Dean Luick, Patric Mueller, Pat
-     Rankin, Derek S. Ray, Alex Smith, Mike  Stephenson,  Janet  Walz,  and
+          In late April 2018, several hundred bug fixes for 3.6.0 and  some
+     new  features  were  assembled  and  released  as  NetHack 3.6.1.  The
+     NetHack Development Team at the time of release of 3.6.1 consisted  of
+     Warwick  Allison,  Michael  Allison, Ken Arromdee, David Cohrs, Jessie
+     Collet, Pasi Kallinen, Ken Lorber, Dean  Luick,  Patric  Mueller,  Pat
+     Rankin,  Derek  S.  Ray,  Alex Smith, Mike Stephenson, Janet Walz, and
      Paul Winner.
 
           In early May 2019, another 320 bug fixes along with some enhance-
      ments and the adopted curses window port, were released as 3.6.2.
 
-          Bart House, who had contributed to the game  as  a  porting  team
-     participant  for  decades, joined the NetHack Development Team in late
+          Bart  House,  who  had  contributed to the game as a porting team
+     participant for decades, joined the NetHack Development Team  in  late
      May 2019.
 
-          NetHack 3.6.3 was released on December 5,  2019  containing  over
+          NetHack  3.6.3  was  released on December 5, 2019 containing over
      190 bug fixes to NetHack 3.6.2.
 
-          NetHack  3.6.4  was  released  on  December 18, 2019 containing a
+          NetHack 3.6.4 was released on  December  18,  2019  containing  a
      security fix and a few bug fixes.
 
-          NetHack 3.6.5 was released on January 27,  2020  containing  some
+          NetHack  3.6.5  was  released on January 27, 2020 containing some
      security fixes and a small number of bug fixes.
 
           NetHack 3.6.6 was released on March 8, 2020 containing a security
      fix and some bug fixes.
 
-          NetHack 3.6.7 was released on  February  16,  2023  containing  a
+          NetHack  3.6.7  was  released  on  February 16, 2023 containing a
      security fix and some bug fixes.
 
-          Development  work  for  the  major  release to follow NetHack 3.6
-     began in 2015  around  the  same  time  as  NetHack  3.6.0  was  being
-     released.  That  development work continued in parallel to each of the
-     NetHack 3.6 releases from 2015 through 2023, and continued  until  the
-     end  of  April  2026.  For the first time, that development was shared
-     publicly on GitHub and SourceForge as it occurred.  It was done  under
-     the  label  NetHack-3.7  work-in-progress  (WIP), although the version
+          Development work for the major  release  to  follow  NetHack  3.6
+     began  in  2015  around  the  same  time  as  NetHack  3.6.0 was being
+     released. That development work continued in parallel to each  of  the
+     NetHack  3.6  releases from 2015 through 2023, and continued until the
+     end of April 2026.  For the first time, that  development  was  shared
+     publicly  on GitHub and SourceForge as it occurred.  It was done under
+     the label NetHack-3.7 work-in-progress  (WIP),  although  the  version
      number for the next release had not yet been solidified.
 
-          Exposure of the development  to  the  public  brought  many  good
+          Exposure  of  the  development  to  the  public brought many good
      things, and some challenges. People were able to observe and criticize
-     changes and new features almost immediately, and they often  did.  The
-     GitHub  pull request system made it straightforward for people to con-
-     tribute directly to development.  Contributions  resolved  many,  many
+     changes  and  new features almost immediately, and they often did. The
 
 
      NetHack 5.0.0                                              May 2, 2026
@@ -7528,60 +7528,60 @@
 
 
 
+     GitHub pull request system made it straightforward for people to  con-
+     tribute  directly  to  development.  Contributions resolved many, many
      bugs in the game and we thank all the contributors.
 
           In early 2026, with the game development getting stable enough to
-     consider initiating an official  release,  the  devteam  reviewed  the
-     nature  and number of changes in the game. It was clear that there was
-     sufficient depth and breadth to warrant a major  release  and  version
-     5.0  was  decided  on.   That's  a new major release over 3.x, without
-     opening up any ambiguity or  confusion  with  existing  variants  that
+     consider  initiating  an  official  release,  the devteam reviewed the
+     nature and number of changes in the game. It was clear that there  was
+     sufficient  depth  and  breadth to warrant a major release and version
+     5.0 was decided on.  That's a new  major  release  over  3.x,  without
+     opening  up  any  ambiguity  or  confusion with existing variants that
      there might have been had it been released as version 4.0.
 
           NetHack 5.0.0 was released on May 2, 2026.
 
-          The  source code for NetHack 5.0.0 was modified and modernized to
-     be compliant with the C99 standard. The 5.0.0 release  contained  over
+          The source code for NetHack 5.0.0 was modified and modernized  to
+     be  compliant  with the C99 standard. The 5.0.0 release contained over
      3100 fixes, changes, and updated features.
 
-          NetHack  5.0  was  the  first version to replace the lex and yacc
-     level and dungeon compilers of past versions, with a  new  Lua  inter-
-     preter-based  approach to provide those elements. Lua is also used for
+          NetHack 5.0 was the first version to replace  the  lex  and  yacc
+     level  and  dungeon  compilers of past versions, with a new Lua inter-
+     preter-based approach to provide those elements. Lua is also used  for
      the quest texts in NetHack 5.0.0. The entire development team acknowl-
      edges the work done by Pasi Kallinen to make that happen.
 
-          At  the  time  of  the  NetHack 5.0 release, the core development
+          At the time of the NetHack  5.0  release,  the  core  development
      team, active and erstwhile, included Warwick Allison, Michael Allison,
      Ken Arromdee, David Cohrs, Jessie Collet, Bart House, Kevin Hugo, Pasi
-     Kallinen, Ken Lorber, Dean Luick,  Pat  Rankin,  Derek  S.  Ray,  Alex
+     Kallinen,  Ken  Lorber,  Dean  Luick,  Pat  Rankin, Derek S. Ray, Alex
      Smith, Patric Mueller, Mike Stephenson, Janet Walz, Paul Winner.
 
-          Ken  Lorber,  Pat  Rankin,  Patrick  Mueller  and Michael Allison
+          Ken Lorber, Pat  Rankin,  Patrick  Mueller  and  Michael  Allison
      helped ensure that NetHack 5.0 would run on macOS.
 
           Ingo Paschke somehow managed to revive a NetHack 5.0 port for the
-     Amiga,  using a cross-compiler on a modern platform to do so. His work
+     Amiga, using a cross-compiler on a modern platform to do so. His  work
      was shared so others can straightforwardly produce NetHack 5.0 for the
      Amiga thanks to his efforts.
 
-          Ray  Chason  contributed the majority of maintenance work for the
+          Ray Chason contributed the majority of maintenance work  for  the
      NetHack 5.0 MS-DOS port, including porting the curses interface to it.
-     Michael  Allison  ensured  that  NetHack 5.0 core changes continued to
-     work with the msdos port and keep it alive.  Cross-compiling  the  MS-
+     Michael Allison ensured that NetHack 5.0  core  changes  continued  to
+     work  with  the msdos port and keep it alive.  Cross-compiling the MS-
      DOS port has helped make that possible and mostly painless.
 
-          People  that contributed to the Windows port of NetHack 5.0 since
-     the development of NetHack 5.0 begain over eleven years ago,  included
-     Michael  Allison, David Cohrs, Bart House, Pasi Kallinen, Alex Kompel,
+          People that contributed to the Windows port of NetHack 5.0  since
+     the  development  of NetHack 5.0 began over eleven years ago, included
+     Michael Allison, David Cohrs, Bart House, Pasi Kallinen, Alex  Kompel,
      Dion Nicolaas, Derek S. Ray and Yitzhak Sapir.
 
-          With sadness, the devteam would like to acknowledge and  remember
-     the  past  contributions  from  the late Ron Van Iwaarden, who was the
+          With  sadness, the devteam would like to acknowledge and remember
+     the past contributions from the late Ron Van  Iwaarden,  who  was  the
      sole maintainer of NetHack for OS/2 for several past NetHack releases.
      Ron will be missed.
 
-          The  official  NetHack  web  site  is maintained by Ken Lorber at
-     https://www.nethack.org/.
 
 
      NetHack 5.0.0                                              May 2, 2026
@@ -7594,60 +7594,60 @@
 
 
 
+          The official NetHack web site is  maintained  by  Ken  Lorber  at
+     https://www.nethack.org/.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
      12.1.  Special Thanks
 
-          On behalf of the NetHack community,  thank  you  very  much  once
-     again  to  M.  Drew  Streib  and  Pasi Kallinen for providing a public
-     NetHack server at nethack.alt.org. Thanks to Keith  Simpson  and  Andy
-     Thomson  for  hardfought.org.  Thanks to all those unnamed dungeoneers
-     who invest their time and effort into annual NetHack tournaments  such
-     as  Junethack,  The  November  NetHack  Tournament,  and in days past,
+          On  behalf  of  the  NetHack  community, thank you very much once
+     again to M. Drew Streib and  Pasi  Kallinen  for  providing  a  public
+     NetHack  server  at  nethack.alt.org. Thanks to Keith Simpson and Andy
+     Thomson for hardfought.org. Thanks to all  those  unnamed  dungeoneers
+     who  invest their time and effort into annual NetHack tournaments such
+     as Junethack, The November  NetHack  Tournament,  and  in  days  past,
      devnull.net (gone for now, but not forgotten).
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     12.2.  Dungeoneers
-
-          From time to time, some depraved individual out there in  netland
-     sends  a  particularly  intriguing  modification  to help out with the
 
 
      NetHack 5.0.0                                              May 2, 2026
@@ -7660,7 +7660,11 @@
 
 
 
-     game.  The NetHack Development Team sometimes makes note of the  names
+     12.2.  Dungeoneers
+
+          From  time to time, some depraved individual out there in netland
+     sends a particularly intriguing modification  to  help  out  with  the
+     game.   The NetHack Development Team sometimes makes note of the names
      of the worst of these miscreants in this, the list of Dungeoneers:
 
 
@@ -7709,10 +7713,6 @@
            Andy Church          Janne Salmijarvi         Nathan Eady
           Andy Swanson       Jean-Christophe Collet      Norm Meluch
           Andy Thomson            Jeff Bailey            Olaf Seibert
-          Ari Huttunen           Jochen Erwied          Pasi Kallinen
-           Bart House             John Kallen             Pat Rankin
-       Benson I. Margulies        John Rupley           Patric Mueller
-            Bill Dyer             John S. Bien           Paul Winner
 
 
 
@@ -7726,6 +7726,10 @@
 
 
 
+          Ari Huttunen           Jochen Erwied          Pasi Kallinen
+           Bart House             John Kallen             Pat Rankin
+       Benson I. Margulies        John Rupley           Patric Mueller
+            Bill Dyer             John S. Bien           Paul Winner
         Boudewijn Waijers          Johnny Lee          Pierre Martineau
             Bruce Cox              Jon W{tte              Ralf Brown
          Bruce Holloway         Jonathan Handler          Ray Chason
@@ -7778,10 +7782,6 @@
 
 
 
-
-
-
-
      NetHack 5.0.0                                              May 2, 2026
 
 
@@ -7792,7 +7792,7 @@
 
 
 
-          Brand  and  product names are trademarks or registered trademarks
+          Brand and product names are trademarks or  registered  trademarks
      of their respective holders.
 
 
