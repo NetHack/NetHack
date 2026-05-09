@@ -47,6 +47,7 @@ amii_start_menu(winid window, unsigned long mbehavior UNUSED)
     cw->menu.items = 0;
     cw->menu.count = 0;
     cw->menu.chr = 'a';
+    cw->menu.has_glyphs = FALSE;
 
     if (cw->morestr)
         free(cw->morestr);
@@ -85,6 +86,8 @@ amii_add_menu(winid window, const glyph_info *glyphinfo, const anything *id,
     mip->attr = attr;
     mip->color = clr;
     mip->glyph = Is_rogue_level(&u.uz) ? NO_GLYPH : (glyphinfo ? glyphinfo->glyph : NO_GLYPH);
+    if (mip->glyph != NO_GLYPH)
+        cw->menu.has_glyphs = TRUE;
     mip->selector = 0;
     mip->gselector = gch;
     mip->count = -1;
@@ -255,12 +258,9 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
 
     /*  Initial guess at window sizing values */
     txwd = txwidth;
-    if (WINVERS_AMIV) {
-        if (win == WIN_INVEN)
-            txh = max(txheight, pictdata.ysize + 3); /* interline space */
-        else
-            txh = txheight; /* interline space */
-    } else
+    if (WINVERS_AMIV && cw->menu.has_glyphs)
+        txh = max(txheight, pictdata.ysize + 3); /* interline space */
+    else
         txh = txheight; /* interline space */
 
     /* Check to see if we should open the window, should need to for
@@ -280,10 +280,8 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
         if (!alwaysinvent || win != WIN_INVEN) {
             xsize = scrn->WBorLeft + scrn->WBorRight + MenuScroll.Width + 1
                     + (txwd * cw->maxcol);
-            if (WINVERS_AMIV) {
-                if (win == WIN_INVEN)
-                    xsize += pictdata.xsize + 4;
-            }
+            if (WINVERS_AMIV && cw->menu.has_glyphs)
+                xsize += pictdata.xsize + 4;
             if (xsize > amiIDisplay->xpix)
                 xsize = amiIDisplay->xpix;
 
@@ -322,7 +320,7 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
 
             /* Make space for the glyph to appear at the left of the
              * description */
-            if (WINVERS_AMIV)
+            if (WINVERS_AMIV && cw->menu.has_glyphs)
                 xsize += pictdata.xsize + 4;
 
             if (xsize > amiIDisplay->xpix)
@@ -394,52 +392,36 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
             SetFont(w->RPort, HackFont);
 #endif
         txwd = w->RPort->TxWidth;
-        if (WINVERS_AMIV) {
-            if (win == WIN_INVEN)
-                txh = max(w->RPort->TxHeight,
-                          pictdata.ysize + 3); /* interline space */
-            else
-                txh = w->RPort->TxHeight; /* interline space */
-        } else
+        if (WINVERS_AMIV && cw->menu.has_glyphs)
+            txh = max(w->RPort->TxHeight,
+                      pictdata.ysize + 3); /* interline space */
+        else
             txh = w->RPort->TxHeight; /* interline space */
 
         /* subtract 2 to account for spacing away from border (1 on each side)
          */
         wheight = (w->Height - w->BorderTop - w->BorderBottom - 2) / txh;
-        if (WINVERS_AMIV) {
-            if (win == WIN_INVEN) {
-                cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4
-                            - pictdata.xsize - 3) / txwd;
-            } else {
-                cw->cols =
-                    (w->Width - w->BorderLeft - w->BorderRight - 4) / txwd;
-            }
+        if (WINVERS_AMIV && cw->menu.has_glyphs) {
+            cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4
+                        - pictdata.xsize - 3) / txwd;
         } else {
             cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4) / txwd;
         }
         totalvis = CountLines(win);
     } else {
         txwd = w->RPort->TxWidth;
-        if (WINVERS_AMIV) {
-            if (win == WIN_INVEN)
-                txh = max(w->RPort->TxHeight,
-                          pictdata.ysize + 3); /* interline space */
-            else
-                txh = w->RPort->TxHeight; /* interline space */
-        } else {
+        if (WINVERS_AMIV && cw->menu.has_glyphs)
+            txh = max(w->RPort->TxHeight,
+                      pictdata.ysize + 3); /* interline space */
+        else
             txh = w->RPort->TxHeight; /* interline space */
-        }
 
         /* subtract 2 to account for spacing away from border (1 on each side)
          */
         wheight = (w->Height - w->BorderTop - w->BorderBottom - 2) / txh;
-        if (WINVERS_AMIV) {
-            if (win == WIN_INVEN) {
-                cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4
-                            - pictdata.xsize - 3) / txwd;
-            } else
-                cw->cols =
-                    (w->Width - w->BorderLeft - w->BorderRight - 4) / txwd;
+        if (WINVERS_AMIV && cw->menu.has_glyphs) {
+            cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4
+                        - pictdata.xsize - 3) / txwd;
         } else {
             cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4) / txwd;
         }
@@ -551,13 +533,9 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                 totalvis = CountLines(win);
                 wheight =
                     (w->Height - w->BorderTop - w->BorderBottom - 2) / txh;
-                if (WINVERS_AMIV) {
-                    if (win == WIN_INVEN) {
-                        cw->cols = (w->Width - w->BorderLeft - w->BorderRight
-                                    - 4 - pictdata.xsize - 3) / txwd;
-                    } else
-                        cw->cols = (w->Width - w->BorderLeft - w->BorderRight
-                                    - 4) / txwd;
+                if (WINVERS_AMIV && cw->menu.has_glyphs) {
+                    cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4
+                                - pictdata.xsize - 3) / txwd;
                 } else {
                     cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4)
                                / txwd;
@@ -1126,12 +1104,9 @@ FindLine(winid win, int line)
         panic(winpanicstr, win, "No Window in FindLine");
     }
     txwd = w->RPort->TxWidth;
-    if (WINVERS_AMIV) {
-        if (win == WIN_INVEN) {
-            cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4
-                        - pictdata.xsize - 3) / txwd;
-        } else
-            cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4) / txwd;
+    if (WINVERS_AMIV && cw->menu.has_glyphs) {
+        cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4
+                    - pictdata.xsize - 3) / txwd;
     } else {
         cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4) / txwd;
     }
@@ -1189,12 +1164,9 @@ CountLines(winid win)
     }
 
     txwd = w->RPort->TxWidth;
-    if (WINVERS_AMIV) {
-        if (win == WIN_INVEN) {
-            cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4
-                        - pictdata.xsize - 3) / txwd;
-        } else
-            cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4) / txwd;
+    if (WINVERS_AMIV && cw->menu.has_glyphs) {
+        cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4
+                    - pictdata.xsize - 3) / txwd;
     } else {
         cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4) / txwd;
     }
@@ -1255,7 +1227,7 @@ DisplayData(winid win, int start)
 
     rp = w->RPort;
     SetDrMd(rp, JAM2);
-    if (WINVERS_AMIV && win == WIN_INVEN) {
+    if (WINVERS_AMIV && cw->menu.has_glyphs) {
         wheight = (w->Height - w->BorderTop - w->BorderBottom - 2)
                   / max(rp->TxHeight, pictdata.ysize + 3);
     } else {
@@ -1265,12 +1237,9 @@ DisplayData(winid win, int start)
 
     cw->rows = wheight;
     txwd = rp->TxWidth;
-    if (WINVERS_AMIV) {
-        if (win == WIN_INVEN) {
-            cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4
-                        - pictdata.xsize - 3) / txwd;
-        } else
-            cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4) / txwd;
+    if (WINVERS_AMIV && cw->menu.has_glyphs) {
+        cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4
+                    - pictdata.xsize - 3) / txwd;
     } else {
         cw->cols = (w->Width - w->BorderLeft - w->BorderRight - 4) / txwd;
     }
@@ -1292,7 +1261,7 @@ DisplayData(winid win, int start)
     for (disprow = i = start; disprow < wheight + start; i++) {
         /* Just erase unused lines in the window */
         if (i >= cw->maxrow) {
-            if (WINVERS_AMIV && win == WIN_INVEN) {
+            if (WINVERS_AMIV && cw->menu.has_glyphs) {
                 amii_curs(win, 0, disprow - start);
                 amiga_print_glyph(win, 0, NO_GLYPH);
             }
@@ -1312,7 +1281,7 @@ DisplayData(winid win, int start)
          * current line */
         if (cw->type != NHW_MESSAGE || cw->data[i][SEL_ITEM] >= 0) {
             amii_curs(win, 1, disprow - start);
-            if (WINVERS_AMIV && win == WIN_INVEN) {
+            if (WINVERS_AMIV && cw->menu.has_glyphs) {
                 if (mip)
                     amiga_print_glyph(win, 0, mip->glyph);
                 amii_curs(win, 1, disprow - start);
@@ -1389,7 +1358,7 @@ DisplayData(winid win, int start)
                 while (*t == ' ')
                     ++t;
                 amii_curs(win, 1, disprow - start - 1);
-                if (mip && win == WIN_INVEN && WINVERS_AMIV) {
+                if (mip && WINVERS_AMIV && cw->menu.has_glyphs) {
                     /* Erase any previous glyph drawn here. */
                     amiga_print_glyph(win, 0, NO_GLYPH);
                     amii_curs(win, 1, disprow - start - 1);

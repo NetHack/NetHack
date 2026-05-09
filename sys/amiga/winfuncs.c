@@ -1695,17 +1695,12 @@ amii_curs(winid window, int x, int y)
 
     rp = w->RPort;
     if (cw->type == NHW_MENU) {
-        if (WINVERS_AMIV) {
-            if (window == WIN_INVEN) {
-                Move(rp, (x * rp->TxWidth) + w->BorderLeft + 1
-                             + pictdata.xsize + 4,
-                     (y * max(rp->TxHeight, pictdata.ysize + 3))
-                         + rp->TxBaseline + pictdata.ysize - rp->TxHeight
-                         + w->BorderTop + 4);
-            } else {
-                Move(rp, (x * rp->TxWidth) + w->BorderLeft + 1,
-                     (y * rp->TxHeight) + rp->TxBaseline + w->BorderTop + 1);
-            }
+        if (WINVERS_AMIV && cw->menu.has_glyphs) {
+            Move(rp, (x * rp->TxWidth) + w->BorderLeft + 1
+                         + pictdata.xsize + 4,
+                 (y * max(rp->TxHeight, pictdata.ysize + 3))
+                     + rp->TxBaseline + pictdata.ysize - rp->TxHeight
+                     + w->BorderTop + 4);
         } else {
             Move(rp, (x * rp->TxWidth) + w->BorderLeft + 1,
                  (y * rp->TxHeight) + rp->TxBaseline + w->BorderTop + 1);

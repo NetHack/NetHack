@@ -32,6 +32,7 @@ struct amii_menu {
     const char *query;     /* Query string */
     int count;             /* Number of strings. */
     char chr;              /* Character to assign for accelerator */
+    boolean has_glyphs;    /* Any item carries a real glyph (AMIV) */
 };
 
 /* descriptor for Amiga Intuition-based windows.  If we decide to cope with
