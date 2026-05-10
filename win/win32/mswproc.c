@@ -883,7 +883,8 @@ mswin_display_nhwindow(winid wid, boolean block)
             } else {
                 if ((GetNHApp()->windowlist[wid].type == NHW_MAP)
                     || (GetNHApp()->windowlist[wid].type == NHW_MESSAGE)) {
-                    (void) mswin_nhgetch();
+                    if (!program_state.savefile_completed)
+                        (void) mswin_nhgetch();
                 }
             }
         }

@@ -260,6 +260,9 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     early_options(&argc, &argv, &dir);
 
     program_state.early_options = 0;
+#ifdef MSWIN_GRAPHICS
+    disregard_some_mswin_options();
+#endif
     initoptions();
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
     chdir(gf.fqn_prefix[HACKPREFIX]);
@@ -325,7 +328,9 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #elif defined(SND_LIB_WINDSOUND)
     assign_soundlib(soundlib_windsound);
 #endif
-
+#ifdef MSWIN_GRAPHICS
+    rcfile_only_some_mswin_options();
+#endif
     u.uhp = 1; /* prevent RIP on early quits */
     u.ux = 0;  /* prevent flush_screen() */
 

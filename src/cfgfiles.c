@@ -1956,40 +1956,6 @@ rcfile(void)
     /*[end of nethackrc handling]*/
 }
 
-void
-rcfile_interface_options(void)
-{
-    allopt_array_init();
-    disregard_all_options();
-    disregard_all_config_statements();
-    heed_this_option(opt_windowtype);
-    heed_this_option(opt_soundlib);
-    set_ignore_errors_on_unmatched();
-    ignore_statement_errors = TRUE;
-    rcfile();
-    heed_all_config_statements();
-    heed_all_options();
-    disregard_this_option(opt_windowtype);
-    disregard_this_option(opt_soundlib);
-    clear_ignore_errors_on_unmatched();
-    ignore_statement_errors = FALSE;
-}
-
-void
-rcfile_only_this_option(enum opt heeded_option)
-{
-    allopt_array_init();
-    disregard_all_options();
-    disregard_all_config_statements();
-    heed_this_option(heeded_option);
-    set_ignore_errors_on_unmatched();
-    ignore_statement_errors = TRUE;
-    rcfile();
-    heed_all_config_statements();
-    heed_all_options();
-    clear_ignore_errors_on_unmatched();
-    ignore_statement_errors = FALSE;
-}
 
 void
 heed_all_config_statements(void)
@@ -2039,6 +2005,84 @@ config_unmatched_ignored(void)
         return TRUE;
     return FALSE;
 }
+void
+rcfile_interface_options(void)
+{
+    allopt_array_init();
+    disregard_all_options();
+    disregard_all_config_statements();
+    heed_this_option(opt_windowtype);
+    heed_this_option(opt_soundlib);
+    set_ignore_errors_on_unmatched();
+    ignore_statement_errors = TRUE;
+    rcfile();
+    heed_all_config_statements();
+    heed_all_options();
+    disregard_this_option(opt_windowtype);
+    disregard_this_option(opt_soundlib);
+    clear_ignore_errors_on_unmatched();
+    ignore_statement_errors = FALSE;
+}
+
+void
+rcfile_only_this_option(enum opt heeded_option)
+{
+    allopt_array_init();
+    disregard_all_options();
+    disregard_all_config_statements();
+    heed_this_option(heeded_option);
+    set_ignore_errors_on_unmatched();
+    ignore_statement_errors = TRUE;
+    rcfile();
+    heed_all_config_statements();
+    heed_all_options();
+    clear_ignore_errors_on_unmatched();
+    ignore_statement_errors = FALSE;
+}
+
+#ifdef MSWIN_GRAPHICS
+void
+disregard_some_mswin_options(void)
+{
+    /* later for these */
+    disregard_this_option(opt_map_mode);
+    disregard_this_option(opt_font_map);
+    disregard_this_option(opt_font_menu);
+    disregard_this_option(opt_font_message);
+    disregard_this_option(opt_font_status);
+
+    disregard_this_option(opt_font_size_map);
+    disregard_this_option(opt_font_size_menu);
+    disregard_this_option(opt_font_size_message);
+    disregard_this_option(opt_font_size_status);
+}
+
+void
+rcfile_only_some_mswin_options(void)
+{
+    allopt_array_init();
+    disregard_all_options();
+    disregard_all_config_statements();
+    heed_this_option(opt_map_mode);
+    heed_this_option(opt_font_map);
+    heed_this_option(opt_font_menu);
+    heed_this_option(opt_font_message);
+    heed_this_option(opt_font_status);
+
+    heed_this_option(opt_font_size_map);
+    heed_this_option(opt_font_size_menu);
+    heed_this_option(opt_font_size_message);
+    heed_this_option(opt_font_size_status);
+    set_ignore_errors_on_unmatched();
+    ignore_statement_errors = TRUE;
+    rcfile();
+    heed_all_config_statements();
+    heed_all_options();
+    clear_ignore_errors_on_unmatched();
+    ignore_statement_errors = FALSE;
+}
+#endif /* MSWIN_GRAPHICS */
+
 #endif /* SFCTOOL */
 
 #ifdef SYSCF

@@ -1193,6 +1193,11 @@ mswin_select_map_mode(int mode)
     data =
         (PNHMainWindow) GetWindowLongPtr(GetNHApp()->hMainWnd, GWLP_USERDATA);
 
+    if (!data) {
+        impossible("data is null in %s:%d", __func__, __LINE__);
+        return;
+    }
+
     /* override for Rogue level */
     if (Is_rogue_level(&u.uz) && !IS_MAP_ASCII(mode))
         return;
@@ -1266,6 +1271,22 @@ mapmode2menuid(int map_mode)
         if (p->mapMode == map_mode)
             return p->menuID;
     return -1;
+}
+
+
+void
+only_some_mswin_options(void)
+{
+    disregard_this_option(opt_map_mode); /* later */
+    disregard_this_option(opt_font_map);
+    disregard_this_option(opt_font_menu);
+    disregard_this_option(opt_font_message);
+    disregard_this_option(opt_font_status);
+
+    disregard_this_option(opt_font_size_map);
+    disregard_this_option(opt_font_size_menu);
+    disregard_this_option(opt_font_size_message);
+    disregard_this_option(opt_font_size_status);
 }
 
 void
