@@ -13,8 +13,9 @@ tile rendering. Native AGA/OCS/ECS chipsets are supported.
 
 Installation
 ------------
-Extract NH500AMI.ZIP somewhere on your hard drive (e.g. into Work:).
-You'll get a NetHack drawer with everything inside.
+Extract NH500AMI.ZIP (or NH500AMIn.ZIP if there's a an updated
+binary, where 'n' is a digit suffix) somewhere on your hard drive
+(e.g. into Work:). You'll get a NetHack drawer with everything inside.
 
 To play from Workbench, open the NetHack drawer and double-click the
 nethack icon.
