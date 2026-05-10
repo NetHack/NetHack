@@ -65,12 +65,13 @@ default: packageall
 # packaging
 #===============================================================================
 
+NHDATFILEBASE=nhdat$(NHV)
 PKGFILES=Guidebook.txt license NetHack.exe NetHack.txt \
-	 NetHackW.exe opthelp nhdat370 record symbols.template sysconf.template \
-	nethackrc.template
+	 NetHackW.exe opthelp $(NHDATFILEBASE) record symbols.template \
+	sysconf.template nethackrc.template
 FILESTOZIP=$(VSBINDIR)\Guidebook.txt $(VSBINDIR)\license \
 	$(VSBINDIR)\NetHack.exe $(VSBINDIR)\NetHack.txt $(VSBINDIR)\NetHackW.exe \
-	$(VSBINDIR)\opthelp $(VSBINDIR)\nhdat370 $(VSBINDIR)\record \
+	$(VSBINDIR)\opthelp $(VSBINDIR)\$(NHDATFILEBASE) $(VSBINDIR)\record \
 	$(VSBINDIR)\symbols.template $(VSBINDIR)\sysconf.template $(VSBINDIR)\nethackrc.template
 DBGSYMS = NetHack.PDB NetHackW.PDB
 PDBTOZIP = ..\NetHack\symbols\$(Configuration)\$(Platform)\NetHack.PDB \
