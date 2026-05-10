@@ -1273,22 +1273,6 @@ mapmode2menuid(int map_mode)
     return -1;
 }
 
-
-void
-only_some_mswin_options(void)
-{
-    disregard_this_option(opt_map_mode); /* later */
-    disregard_this_option(opt_font_map);
-    disregard_this_option(opt_font_menu);
-    disregard_this_option(opt_font_message);
-    disregard_this_option(opt_font_status);
-
-    disregard_this_option(opt_font_size_map);
-    disregard_this_option(opt_font_size_menu);
-    disregard_this_option(opt_font_size_message);
-    disregard_this_option(opt_font_size_status);
-}
-
 void
 nhlock_windows(BOOL lock)
 {
