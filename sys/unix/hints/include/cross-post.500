@@ -330,8 +330,8 @@ amigapkg: $(AMITILES) ../util/uudecode
 	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/readme-info.uu )
 	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/drawer-info.uu )
 	touch $(TARGETPFX)pkg/NetHack/record
-	( cd $(TARGETPFX)pkg && zip -9r ../NH$(NHV)AMI.ZIP NetHack NetHack.info )
-	@echo amiga package zip file $(TARGETPFX)NH$(NHV)AMI.ZIP
+	( cd $(TARGETPFX)pkg && zip -9r ../NH$(NHV)AMI$(AMIPKGSEQ).ZIP NetHack NetHack.info )
+	@echo amiga package zip file $(TARGETPFX)NH$(NHV)AMI$(AMIPKGSEQ).ZIP
 endif  # CROSS_TO_AMIGA
 
 ifdef CROSS_SHARED
