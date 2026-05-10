@@ -518,7 +518,7 @@ nethack_exit(int code)
      * GUILaunched is defined and set in consoletty.c.
      */
 
-    if (getreturn_enabled) {
+    if (getreturn_enabled && !program_state.exiting) {
         raw_print("\n");
         if (iflags.window_inited)
             wait_synch();
