@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.4 $ $NHDT-Date: 1778535379 2026/05/11 21:36:19 $
+NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $ $NHDT-Date: 1778535648 2026/05/11 21:40:48 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -50,7 +50,7 @@ Amiga: `NHW_BASE`/`NHW_OVER` collided with `NHW_PERMINVENT=6`; renumbered
 Amiga: `make_menu_items` sized its output array by
 	`sizeof(amii_menu_item)` instead of `sizeof(menu_item)`
 Amiga: `DoMenuScroll` could deref a NULL `amip` on the `SELECTUP` path
-Amiga: `GlyphToIcon`&#39;s ASCII passthrough used `> 10000` instead of `>=`
+Amiga: `GlyphToIcon`'s ASCII passthrough used `> 10000` instead of `>=`
 Amiga: `fopenp`'s buffer-bound check fired one byte too late
 Amiga: fix port_help double-prefix path
 Amiga: replace WINVERS_AMI* strcmp with WINDOWPORT() id compare
