@@ -9,14 +9,10 @@
 #include <graphics/scale.h>
 #include <proto/iffparse.h>
 
-#ifdef TESTING
-#include "hack.h"
-#else
 #ifndef CROSS_TO_AMIGA
 #include "NH:src/tile.c"
 #else
 #include "../src/tile.c"
-#endif
 #endif
 
 #ifndef CROSS_TO_AMIGA
@@ -93,85 +89,6 @@ struct PDAT pictdata;
 /* Single tile image file, set at runtime by amii_init_nhwindows */
 char *tilefile;
 struct BitMap *tileimg, *tile;
-
-#ifdef TESTING
-short pens[NUMDRIPENS] = { 8, 3, 15, 0, 15, 7, 7, 8, 0 };
-main(int argc, char **argv)
-{
-    BitMapHeader bmhd;
-    struct IntuiMessage *imsg;
-    long code, class;
-    char buf[100];
-    int i, x, y, tbl, done = 0, num;
-    struct Window *w;
-    struct Screen *scr;
-
-    bmhd = ReadTileImageFiles();
-
-    scr = OpenScreenTags(
-        NULL, SA_Depth, pictdata.nplanes + amii_extraplanes, SA_DisplayID,
-        DBLNTSC_MONITOR_ID | HIRESLACE_KEY, SA_Overscan, OSCAN_TEXT, SA_Top,
-        0, SA_Left, 0, SA_Width, STDSCREENWIDTH, SA_Height, STDSCREENHEIGHT,
-        SA_Type, CUSTOMSCREEN, SA_DetailPen, 0, SA_BlockPen, 1, SA_Title,
-        "NetHack Chars", SA_Pens, pens, TAG_DONE);
-    if (scr == NULL) {
-        printf("no screen\n");
-#undef exit
-        exit(1);
-    }
-
-    w = OpenWindowTags(
-        0, WA_CustomScreen, scr, WA_Flags,
-        WFLG_DRAGBAR | WFLG_SIZEGADGET | WFLG_DEPTHGADGET | WFLG_CLOSEGADGET,
-        WA_IDCMP, IDCMP_CLOSEWINDOW | IDCMP_NEWSIZE | IDCMP_MOUSEBUTTONS,
-        WA_Left, 0, WA_Top, scr->WBorTop + 1 + 13, WA_MinWidth, 100,
-        WA_MinHeight, 100, WA_MaxWidth, 700, WA_MaxHeight, 1000, WA_Width,
-        640, WA_Height, 340, WA_SmartRefresh, TRUE, TAG_DONE);
-    if (w) {
-        while (!done) {
-            for (i = 0; i < NUMTILEIMAGES * IMGPAGESIZE; ++i) {
-                int dx, dy;
-                tbl = i / IMGPAGESIZE;
-                x = i % IMGPAGESIZE;
-                y = x / IMGCOLUMNS;
-                x = x % IMGCOLUMNS;
-                dx = i % (IMGCOLUMNS * 2);
-                dy = i / (IMGCOLUMNS * 2);
-                BltBitMapRastPort(tileimg, x * pictdata.xsize,
-                                  y * pictdata.ysize, w->RPort,
-                                  w->BorderLeft + 1 + dx * pictdata.xsize,
-                                  w->BorderTop + 1 + dy * pictdata.ysize,
-                                  pictdata.xsize, pictdata.ysize, 0xc0);
-            }
-            WaitPort(w->UserPort);
-            while (imsg = (struct IntuiMessage *) GetMsg(w->UserPort)) {
-                class = imsg->Class;
-                code = imsg->Code;
-                ReplyMsg((struct Message *) imsg);
-                switch (class) {
-                case IDCMP_MOUSEBUTTONS: {
-                    x = imsg->MouseX - w->BorderLeft;
-                    y = imsg->MouseY - w->BorderTop;
-                    num = ((y / pictdata.ysize) * IMGCOLUMNS * 2)
-                          + (x / pictdata.xsize);
-                    sprintf(buf, "Char #%d", num);
-                    SetWindowTitles(w, buf, buf);
-                } break;
-                case IDCMP_CLOSEWINDOW:
-                    done = 1;
-                    break;
-                }
-            }
-        }
-        CloseWindow(w);
-        CloseScreen(scr);
-    }
-
-    FreeTileImageFiles();
-
-    return (0);
-}
-#endif
 
 /*
  * Read a single BMAP IFF file into a BitMap.
@@ -327,25 +244,6 @@ MyFreeBitMap(struct BitMap *bmp)
     free(bm);
 }
 
-#ifdef TESTING
-void
-panic(char *s, long a1, long a2, long a3, long a4)
-{
-    printf(s, a1, a2, a3, a4);
-    putchar('\n');
-}
-long *
-alloc(unsigned int x)
-{
-    long *p = (long *) malloc(x);
-    if (!p) {
-        panic("malloc failed");
-        exit(1);
-    }
-    return p;
-}
-#endif
-
 void
 FreeTileImageFiles(void)
 {
@@ -353,7 +251,6 @@ FreeTileImageFiles(void)
     FreeImageFile(&tile);
 }
 
-#ifndef TESTING
 /*
  * Define some stuff for our special glyph drawing routines
  */
@@ -807,17 +704,8 @@ GlyphToIcon(int glyph)
         return glyph;
     return (gi.gm.tileidx);
 }
-#endif
 
 #ifdef AMII_GRAPHICS
-#ifdef TESTING
-/*
- * Define some stuff for our special glyph drawing routines
- */
-static unsigned short glyph_node_index, glyph_buffer_index;
-#define NUMBER_GLYPH_NODES 80
-#define GLYPH_BUFFER_SIZE 512
-#endif /* TESTING */
 
 struct amii_glyph_node {
     short x;
@@ -864,7 +752,6 @@ int backg[AMII_MAXCOLORS] = {
 #define CLR_MAX 16
 #endif
 
-#ifndef TESTING
 /*
  * Begin Revamped Text display routines
  *
@@ -1002,18 +889,14 @@ amii_lprint_glyph(winid window, int color_index, int glyph)
         ++glyph_node_index;
     }
 }
-#endif /* !TESTING */
 
-#ifdef TESTING
 /*
- * Define some variables which will be used to save context when toggling
- * back and forth between low level text and console I/O.
+ * Variables used to save context when toggling between low level text
+ * and console I/O.
  */
 static long xsave, ysave, modesave, apensave, bpensave;
 static int usecolor;
-#endif /* TESTING */
 
-#ifndef TESTING
 /*
  * The function is called before any glyphs are driven to the screen.  It
  * removes the cursor, saves internal state of the window, then returns.
@@ -1050,7 +933,6 @@ amii_start_glyphout(winid window)
     iflags.use_color = FALSE;
     cw->wflags |= FLMAP_INGLYPH;
 }
-#endif /* !TESTING */
 
 #if 0
 /*
@@ -1090,7 +972,6 @@ amii_end_glyphout(window)
 #endif
 #endif
 
-#ifndef TESTING
 #ifdef OPT_DISPMAP
 /* don't use dispmap unless x & y are 8,16,24,32,48 and equal */
 void
@@ -1108,4 +989,3 @@ dispmap_sanity1(int x)
     return !strchr((char *)valid, x);
 }
 #endif /* OPT_DISPMAP */
-#endif /* TESTING */
