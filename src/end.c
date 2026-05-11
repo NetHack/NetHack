@@ -1896,7 +1896,7 @@ build_english_list(char *in)
 # endif
 
 void
-NH_abort(char *why USED_FOR_CRASHREPORT)
+NH_abort(const char *why USED_FOR_CRASHREPORT)
 {
 #ifdef PANICTRACE
     int gdb_prio = SYSOPT_PANICTRACE_GDB;
@@ -1912,7 +1912,7 @@ NH_abort(char *why USED_FOR_CRASHREPORT)
 
 #ifdef PANICTRACE
 #ifdef CRASHREPORT
-    if(!submit_web_report(1, "Panic", why))
+    if (!submit_web_report(1, "Panic", why))
 #endif
     {
 #ifndef VMS

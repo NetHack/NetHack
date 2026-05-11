@@ -1653,7 +1653,9 @@ postmov(
             u_on_newpos(mtmp->mx, mtmp->my);
             swallowed(0);
         } else {
-            newsym(mtmp->mx, mtmp->my);
+            /* only call newsym() when not a vault guard moving to <0,0> */
+            if (mtmp->mx)
+                newsym(mtmp->mx, mtmp->my);
         }
     } /* mmoved==MMOVE_MOVED */
 

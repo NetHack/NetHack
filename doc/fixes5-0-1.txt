@@ -12,8 +12,10 @@ fix issue where the new game startup message was stating 'Work-in-progress'
 	even when NH_DEVEL_STATUS was set to NH_STATUS_POSTRELEASE
 if 'mention_decor' was set in config file or NETHACKOPTIONS,
 	starting the game told you that "you are standing on stairs which lead
-	out of the dungeon", even when the player entered the tutorial where that
-	wasn't true
+	out of the dungeon", even when the player entered the tutorial where
+	that wasn't true
+when a vault guard was moved off the map, an impossible about trying to update
+	map location <0,0> was issued
 doc: use full URL for nethack.org in Guidebook.mn
 doc: fix a paste error in Guidebook.tex
 doc: fix spelling correction in nethack.6
