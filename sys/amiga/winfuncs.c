@@ -136,9 +136,6 @@ ami_wininit_data(int dir)
 
         memcpy(amii_initmap, amiv_init_map, sizeof(amii_initmap));
     }
-#ifdef OPT_DISPMAP
-    dispmap_sanity();
-#endif
     memcpy(sysflags.amii_dripens, amii_defpens,
            sizeof(sysflags.amii_dripens));
 }
@@ -1886,12 +1883,7 @@ cursor_on(winid window)
 
 /* Save the current information */
 
-#ifdef DISPMAP
-    if (WINVERS_AMIV && cw->type == NHW_MAP && !Is_rogue_level(&u.uz))
-        x = cw->cursx = (rp->cp_x & -8) + 8;
-    else
-#endif
-        x = cw->cursx = rp->cp_x;
+    x = cw->cursx = rp->cp_x;
     y = cw->cursy = rp->cp_y;
     apen = rp->FgPen;
     bpen = rp->BgPen;

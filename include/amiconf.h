@@ -154,7 +154,6 @@ extern char *gets(char *);
 #define MAIL      /* Get mail at unexpected occasions */
 #define DEFAULT_ICON "NetHack:default.icon" /* private icon */
 #define AMIFLUSH /* toss typeahead (select flush in .cnf) */
-/* #define OPT_DISPMAP		/* enable fast_map option */
 
 /* new window system options */
 /* WRONG - AMIGA_INTUITION should go away */
@@ -200,9 +199,6 @@ struct ami_sysflags {
     int numcols;
     unsigned short amii_dripens[20]; /* DrawInfo Pens currently there are 13 in v39 */
     AMII_COLOR_TYPE amii_curmap[AMII_MAXCOLORS]; /* colormap */
-#endif
-#ifdef OPT_DISPMAP
-    boolean fast_map; /* use optimized, less flexible map display */
 #endif
 #ifdef MFLOPPY
     boolean asksavedisk;

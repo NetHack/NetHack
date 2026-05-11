@@ -27,10 +27,6 @@
 #include "winproto.h"
 #endif
 
-#ifdef OPT_DISPMAP
-#define DISPMAP /* use display_map() from dispmap.s */
-#endif
-
 /* NH:sys/amiga/winvchar.c */
 int main(int, char **);
 struct BitMap *MyAllocBitMap(int, int, int, long);
@@ -53,10 +49,6 @@ extern int reclip;
 
 struct BitMap *MyAllocBitMap(int xsize, int ysize, int depth, long mflags);
 void MyFreeBitMap(struct BitMap *bmp);
-
-#ifdef DISPMAP
-extern void display_map(struct Window *);
-#endif
 
 #ifdef TILES_IN_GLYPHMAP
 extern int maxmontile, maxobjtile, maxothtile; /* from tile.c */
@@ -280,7 +272,6 @@ flush_glyph_buffer(struct Window *vw)
 void
 amiv_flush_glyph_buffer(struct Window *vw)
 {
-#if !defined(DISPMAP) || defined(OPT_DISPMAP)
     int xsize, ysize, x, y;
     struct BitScaleArgs bsa;
     struct BitScaleArgs bsm;
@@ -290,7 +281,6 @@ amiv_flush_glyph_buffer(struct Window *vw)
     int i, k;
     int scaling_needed;
     struct RastPort *rp = vw->RPort;
-#endif
 
     /* If nothing is buffered, return before we do anything */
     if (glyph_node_index == 0)
@@ -299,20 +289,8 @@ amiv_flush_glyph_buffer(struct Window *vw)
     cursor_off(WIN_MAP);
     amiv_start_glyphout(WIN_MAP);
 
-#ifdef OPT_DISPMAP
-    if (sysflags.fast_map) {
-#endif
-#ifdef DISPMAP
-        display_map(vw);
-#endif
-#ifdef OPT_DISPMAP
-    } else {
-#endif
-#if !defined(DISPMAP) || defined(OPT_DISPMAP)
-        /* XXX fix indent */
-        /* This is a dynamic value based on this relationship. */
-        scaling_needed =
-            (pictdata.xsize != mxsize || pictdata.ysize != mysize);
+    /* This is a dynamic value based on this relationship. */
+    scaling_needed = (pictdata.xsize != mxsize || pictdata.ysize != mysize);
 
         /* If overview window is up, set up to render the correct scale there
          */
@@ -441,10 +419,6 @@ amiv_flush_glyph_buffer(struct Window *vw)
             MyFreeBitMap(imgbm);
         if (bm)
             MyFreeBitMap(bm);
-#endif /* DISPMAP */
-#ifdef OPT_DISPMAP
-    }
-#endif
 
     amii_end_glyphout(WIN_MAP);
 
@@ -520,27 +494,8 @@ amiv_lprint_glyph(winid window, int color_index, int glyph)
         amiv_g_nodes[glyph_node_index].dsty =
             min(w->BorderTop + (cury * mysize), w->Height - 1);
 
-#ifdef OPT_DISPMAP
-        if (sysflags.fast_map) {
-#endif /* keni */
-#ifdef DISPMAP
-            /* display_map() needs byte-aligned destinations, and we don't
-             * want to
-             * overwrite the window border.
-             */
-            amiv_g_nodes[glyph_node_index].dstx =
-                (w->BorderLeft + 8 + (curx * mxsize)) & -8;
-#endif
-#ifdef OPT_DISPMAP
-        } else {
-#endif
-#if !defined(DISPMAP) || defined(OPT_DISPMAP)
-            amiv_g_nodes[glyph_node_index].dstx =
-                min(w->BorderLeft + (curx * mxsize), w->Width - 1);
-#endif
-#ifdef OPT_DISPMAP
-        }
-#endif
+        amiv_g_nodes[glyph_node_index].dstx =
+            min(w->BorderLeft + (curx * mxsize), w->Width - 1);
         amiv_g_nodes[glyph_node_index].odsty = cw->cury;
         amiv_g_nodes[glyph_node_index].odstx = cw->curx;
         amiv_g_nodes[glyph_node_index].srcx = xoff;
@@ -552,17 +507,6 @@ amiv_lprint_glyph(winid window, int color_index, int glyph)
         int j, k, x, y, apen;
         struct RastPort *rp = w->RPort;
         x = rp->cp_x - pictdata.xsize - 3;
-#ifdef OPT_DISPMAP
-        if (sysflags.fast_map) {
-#endif
-#ifdef DISPMAP
-            x &= -8;
-            if (x == 0)
-                x = 8;
-#endif
-#ifdef OPT_DISPMAP
-        }
-#endif
 
         y = rp->cp_y - pictdata.ysize + 1;
 
@@ -915,21 +859,3 @@ amii_start_glyphout(winid window)
 }
 
 #endif
-
-#ifdef OPT_DISPMAP
-/* don't use dispmap unless x & y are 8,16,24,32,48 and equal */
-void
-dispmap_sanity(void)
-{
-    if (mxsize != mysize || dispmap_sanity1(mxsize)
-        || dispmap_sanity1(mysize)) {
-        sysflags.fast_map = 0;
-    }
-}
-int
-dispmap_sanity1(int x)
-{
-    static unsigned char valid[] = { 8, 16, 24, 32, 48, 0 };
-    return !strchr((char *)valid, x);
-}
-#endif /* OPT_DISPMAP */

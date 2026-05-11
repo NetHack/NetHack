@@ -460,9 +460,6 @@ EditClipping(void)
                         yclipbord = aidx + 2;
                     }
                     ShowClipValues(nw);
-#ifdef OPT_DISPMAP
-                    dispmap_sanity();
-#endif
                 } else if (gd->GadgetID == GADOKAY) {
                     done = 1;
                     okay = 1;
@@ -508,9 +505,6 @@ EditClipping(void)
                 SetBPen(nw->RPort, amii_otherBPen);
                 SetDrMd(nw->RPort, JAM2);
                 Text(nw->RPort, buf, strlen(buf));
-#ifdef OPT_DISPMAP
-                dispmap_sanity();
-#endif
                 break;
             }
         }

@@ -129,7 +129,3 @@ void amii_outrip(winid tmpwin, int how, time_t when);
 /* winchar.c */
 void SetMazeType(MazeType);
 int GlyphToIcon(int glyph);
-#ifdef OPT_DISPMAP
-void dispmap_sanity(void);
-int dispmap_sanity1(int);
-#endif

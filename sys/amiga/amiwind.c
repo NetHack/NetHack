@@ -328,9 +328,6 @@ ConvertKey(struct IntuiMessage *message)
                 got = 0;
                 break;
             }
-#ifdef OPT_DISPMAP
-            dispmap_sanity();
-#endif
 
             if (got) {
                 CO = (w->Width - w->BorderLeft - w->BorderRight) / mxsize;
