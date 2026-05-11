@@ -690,13 +690,6 @@ amii_cleanup(void)
         IntuitionBase = NULL;
     }
 
-#ifdef SHAREDLIB
-    if (DOSBase) {
-        CloseLibrary((struct Library *) DOSBase);
-        DOSBase = NULL;
-    }
-#endif
-
     ((struct Process *) FindTask(NULL))->pr_WindowPtr = (APTR) pr_WindowPtr;
 
     Initialized = 0;
@@ -704,7 +697,6 @@ amii_cleanup(void)
 
 #endif /* AMII_GRAPHICS */
 
-#ifndef SHAREDLIB
 void
 Abort(long rc)
 {
@@ -733,7 +725,6 @@ CleanUp(void)
 {
     amii_cleanup();
 }
-#endif
 
 #ifdef AMII_GRAPHICS
 
@@ -849,7 +840,6 @@ amii_number_pad(int state)
 }
 #endif /* AMII_GRAPHICS */
 
-#ifndef SHAREDLIB
 void
 amiv_loadlib(void)
 {
@@ -879,4 +869,3 @@ VA_DECL(const char *, s)
     VA_END();
     Abort(0L);
 }
-#endif

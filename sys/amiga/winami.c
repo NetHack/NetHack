@@ -159,8 +159,7 @@ unsigned short amiv_init_map[AMII_MAXCOLORS] = {
     0x0fff, /* color #31 */
 };
 
-#if !defined(TTY_GRAPHICS) \
-    || defined(SHAREDLIB) /* this should be shared better */
+#ifndef TTY_GRAPHICS
 char morc; /* the character typed in response to a --more-- prompt */
 #endif
 char spaces[76] = "                                                          "

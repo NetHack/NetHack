@@ -53,10 +53,6 @@ CLIPPING must be defined for the AMIGA version
 #include <proto/graphics.h>
 #include <proto/intuition.h>
 
-#ifdef SHAREDLIB
-#include "NH:sys/amiga/lib/libmacs.h"
-#endif
-
 #include <utility/tagitem.h>
 
 #define WINVERS_AMII (strcmp("amii", windowprocs.name) == 0)
