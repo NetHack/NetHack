@@ -9,23 +9,12 @@
 #include <graphics/scale.h>
 #include <proto/iffparse.h>
 
-#ifndef CROSS_TO_AMIGA
-#include "NH:src/tile.c"
-#else
 #include "../src/tile.c"
-#endif
 
-#ifndef CROSS_TO_AMIGA
-#include "NH:win/share/tile.h"
-#include "NH:sys/amiga/windefs.h"
-#include "NH:sys/amiga/winext.h"
-#include "NH:sys/amiga/winproto.h"
-#else
 #include "tile.h"
 #include "windefs.h"
 #include "winext.h"
 #include "winproto.h"
-#endif
 
 /* NH:sys/amiga/winvchar.c */
 int main(int, char **);

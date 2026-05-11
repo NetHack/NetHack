@@ -3,28 +3,18 @@
  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifndef CROSS_TO_AMIGA
-#include "NH:sys/amiga/windefs.h"
-#include "NH:sys/amiga/winext.h"
-#include "NH:sys/amiga/winproto.h"
-#else
 #include "windefs.h"
 #include "winext.h"
 #include "winproto.h"
-#endif
 
 #include "patchlevel.h"
 
 extern struct TagItem scrntags[];
-#ifndef CROSS_TO_AMIGA
-extern struct Library *ConsoleDevice;
-#else
 extern struct Device *
 # ifdef __CONSTLIBBASEDECL__
      __CONSTLIBBASEDECL__
 # endif /* __CONSTLIBBASEDECL__ */
        ConsoleDevice;
-#endif
 static BitMapHeader amii_bmhd;
 static void cursor_common(struct RastPort *, int, int);
 
