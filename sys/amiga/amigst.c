@@ -21,14 +21,8 @@
 #include "winprocs.h"
 #include "winami.h"
 
-#ifndef CROSS_TO_AMIGA
-#include "NH:sys/amiga/winami.p"
-#include "NH:sys/amiga/amiwind.p"
-#include "NH:sys/amiga/amidos.p"
-#else
-#include "winami.p"
-#include "amiwind.p"
-#include "amidos.p"
-#endif
+#include "windefs.h"
+#include "winext.h"
+#include "winproto.h"
 
 /* end amigst.c */

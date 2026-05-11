@@ -83,16 +83,8 @@ free_nhuuid(void)
     }
 }
 
-/* Prototypes */
-#ifndef CROSS_TO_AMIGA
-#include "NH:sys/amiga/amiwind.p"
-#include "NH:sys/amiga/winami.p"
-#include "NH:sys/amiga/amidos.p"
-#else
-#include "amiwind.p"
-#include "winami.p"
-#include "amidos.p"
-#endif
+#include "winext.h"
+#include "winproto.h"
 
 
 extern char Initialized;
