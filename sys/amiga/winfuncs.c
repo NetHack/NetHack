@@ -1354,6 +1354,7 @@ amii_sethipens(struct Window *w, int type, int attr)
     case NHW_TEXT:
         SetAPen(w->RPort, attr ? C_BLACK : amii_textAPen);
         SetBPen(w->RPort, amii_textBPen);
+        break;
     case -2:
         SetBPen(w->RPort, amii_otherBPen);
         SetAPen(w->RPort, attr ? C_RED : amii_otherAPen);
@@ -1445,7 +1446,7 @@ amii_clear_nhwindow(winid win)
 
     /* Clear the overview window too if it is displayed */
     if (WINVERS_AMIV
-        && (cw->type == WIN_MAP && WIN_OVER != WIN_ERR && reclip == 0)) {
+        && (cw->type == NHW_MAP && WIN_OVER != WIN_ERR && reclip == 0)) {
         amii_clear_nhwindow(WIN_OVER);
     }
 

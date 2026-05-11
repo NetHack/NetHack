@@ -563,7 +563,7 @@ amiv_flush_glyph_buffer(struct Window *vw)
 void
 amiv_lprint_glyph(winid window, int color_index, int glyph)
 {
-    int base;
+    int base = 0;
     struct amii_WinDesc *cw;
     struct Window *w;
     int curx;
