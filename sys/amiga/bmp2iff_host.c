@@ -409,6 +409,10 @@ main(int argc, char **argv)
     /* read pixel data */
     rowstride = (img_w + 3) & ~3;
     bmpdata = malloc(rowstride * img_h);
+    if (!bmpdata) {
+       printf("%s\n", "malloc failure on bmpdata");
+       return 1;
+    }
     fseek(bmpfp, fhdr.bfOffBits, SEEK_SET);
     if (fread(bmpdata, 1, rowstride * img_h, bmpfp)
         != (size_t)(rowstride * img_h)) {
@@ -419,6 +423,10 @@ main(int argc, char **argv)
 
     /* flip bottom-up to top-down */
     pixels = malloc(img_w * img_h);
+    if (!pixels) {
+       printf("%s\n", "malloc failure on pixels");
+       return 1;
+    }
     if (ihdr.biHeight > 0) {
         for (y = 0; y < img_h; y++)
             memcpy(pixels + y * img_w,
@@ -441,6 +449,10 @@ main(int argc, char **argv)
                   maxcol, outpal, remap);
 
     remapped = malloc(img_w * img_h);
+    if (!remapped) {
+       printf("%s\n", "malloc failure on remapped");
+       return 1;
+    }
     for (i = 0; i < img_w * img_h; i++)
         remapped[i] = (uint8_t)remap[pixels[i]];
 
