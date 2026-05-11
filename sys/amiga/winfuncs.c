@@ -1106,10 +1106,6 @@ amii_init_nhwindows(int *argcp, char **argv)
                 PATCHLEVEL);
         NewHackScreen.DefaultTitle = fname;
     }
-#if 0
-    NewHackScreen.BlockPen = C_BLACK;
-    NewHackScreen.DetailPen = C_WHITE;
-#endif
     if (IntuitionBase->LibNode.lib_Version >= 37) {
         int i;
         struct DimensionInfo dims;
@@ -1687,11 +1683,6 @@ amii_curs(winid window, int x, int y)
         if (WINVERS_AMIV) {
             if (cw->type == NHW_MAP) {
                 if (Is_rogue_level(&u.uz)) {
-#if 0
-int qqx= (x * w->RPort->TxWidth) + w->BorderLeft;
-int qqy= w->BorderTop + ( (y+1) * w->RPort->TxHeight ) + 1;
-printf("pos: (%d,%d)->(%d,%d)\n",x,y,qqx,qqy);
-#endif
                     SetAPen(w->RPort,
                             C_WHITE); /* XXX should be elsewhere (was 4)*/
                     Move(rp, (x * w->RPort->TxWidth) + w->BorderLeft,
@@ -2038,15 +2029,6 @@ amii_print_glyph(winid win, coordxy x, coordxy y,
         panic(winpanicstr, win, "amii_print_glyph");
     }
 
-#if 0
-{
-static int x=-1;
-if(u.uz.dlevel != x){
- fprintf(stderr,"lvlchg: %d (%d)\n",u.uz.dlevel,Is_rogue_level(&u.uz));
- x = u.uz.dlevel;
-}
-}
-#endif
     if (WINVERS_AMIV && !Is_rogue_level(&u.uz)) {
         amii_curs(win, x, y);
         amiga_print_glyph(win, 0, glyph);

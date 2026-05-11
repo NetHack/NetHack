@@ -732,26 +732,6 @@ int foreg[AMII_MAXCOLORS] = {
 int backg[AMII_MAXCOLORS] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 4, 1, 6, 5, 3, 0
 };
-#if 0
-#define CLR_BLACK 0
-#define CLR_RED 1
-#define CLR_GREEN 2
-#define CLR_BROWN 3 /* on IBM, low-intensity yellow is brown */
-#define CLR_BLUE 4
-#define CLR_MAGENTA 5
-#define CLR_CYAN 6
-#define CLR_GRAY 7 /* low-intensity white */
-#define NO_COLOR 8
-#define CLR_ORANGE 9
-#define CLR_BRIGHT_GREEN 10
-#define CLR_YELLOW 11
-#define CLR_BRIGHT_BLUE 12
-#define CLR_BRIGHT_MAGENTA 13
-#define CLR_BRIGHT_CYAN 14
-#define CLR_WHITE 15
-#define CLR_MAX 16
-#endif
-
 /*
  * Begin Revamped Text display routines
  *
@@ -934,42 +914,6 @@ amii_start_glyphout(winid window)
     cw->wflags |= FLMAP_INGLYPH;
 }
 
-#if 0
-/*
- * General cleanup routine -- flushes and restores cursor
- */
-void
-amii_end_glyphout(window)
-    winid window;
-{
-    struct amii_WinDesc *cw;
-    struct Window *w;
-
-    if( ( cw = amii_wins[ window ] ) == (struct amii_WinDesc *)NULL )
-	panic("bad window id %d in amii_end_glyphout()", window );
-
-    if( ( cw->wflags & FLMAP_INGLYPH ) == 0 )
-	return;
-    cw->wflags &= ~(FLMAP_INGLYPH);
-
-    if( !(w = cw->win ) )
-	panic( "bad winid %d, no window ptr set", window );
-
-    /*
-     * Clean up whatever is left in the buffer
-     */
-    iflags.use_color = usecolor;
-
-    /*
-     * Reset internal data structs
-     */
-    SetAPen(w->RPort, apensave);
-    SetBPen(w->RPort, bpensave);
-    SetDrMd(w->RPort, modesave);
-
-    Move(w->RPort, xsave, ysave);
-}
-#endif
 #endif
 
 #ifdef OPT_DISPMAP

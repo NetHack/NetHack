@@ -144,12 +144,6 @@ amii_putstr(winid window, int attr, const char *str)
                     p++;
                 str = p;
 
-#if 0
-		if( str != ostr ) {
-		    outsubstr( cw, "+", 1, fudge );
-		    cw->curx+=2;
-		}
-#endif
                 if (*str)
                     amii_scrollmsg(w, cw);
                 amii_cl_end(cw, cw->curx);

@@ -445,13 +445,6 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
     morc = 0;
     oidx = -1;
 
-#if 0
-    /* Make sure there are no selections left over from last time. */
-/* XXX potential problem for preselection if this is really needed */
-  for( amip = cw->menu.items; amip; amip = amip->next )
-	amip->selected = 0;
-#endif
-
     DisplayData(win, topidx);
 
     /* Make the prop gadget the right size and place */
