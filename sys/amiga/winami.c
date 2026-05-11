@@ -32,76 +32,35 @@ long amii_scrnmode;
 /* Interface definition, for use by windows.c and winprocs.h to provide
  * the intuition interface for the amiga...
  */
-struct window_procs amii_procs = {
-    WPID(amii),
-    WC_COLOR | WC_HILITE_PET | WC_INVERSE,
-    0L,
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
-    amii_init_nhwindows,
-    amii_player_selection, amii_askname, amii_get_nh_event,
-    amii_exit_nhwindows, amii_suspend_nhwindows, amii_resume_nhwindows,
-    amii_create_nhwindow, amii_clear_nhwindow, amii_display_nhwindow,
-    amii_destroy_nhwindow, amii_curs, amii_putstr, genl_putmixed,
-    amii_display_file, amii_start_menu, amii_add_menu, amii_end_menu,
-    amii_select_menu, genl_message_menu,
-    amii_mark_synch, amii_wait_synch,
-#ifdef CLIPPING
-    amii_cliparound,
-#endif
-#ifdef POSITIONBAR
-    donull,
-#endif
-    amii_print_glyph, amii_raw_print, amii_raw_print_bold, amii_nhgetch,
-    amii_nh_poskey, amii_bell, amii_doprev_message, amii_yn_function,
-    amii_getlin, amii_get_ext_cmd, amii_number_pad, amii_delay_output,
-#ifdef CHANGE_COLOR /* only a Mac option currently */
-    amii_change_color, amii_get_color_string,
-#endif
-    amii_outrip, genl_preference_update,
-    genl_getmsghistory, genl_putmsghistory,
-    genl_status_init, genl_status_finish, genl_status_enablefield,
-    genl_status_update,
-    genl_can_suspend_yes,
-    amii_update_inventory,
-    amii_ctrl_nhwindow,
-};
+/* Both windowports share the same function table -- the AMII (text) /
+ * AMIV (tile) split happens at runtime based on WINVERS_AMIV checks. */
+#define AMI_WIN_PROCS_BODY                                              \
+    WC_COLOR | WC_HILITE_PET | WC_INVERSE,                              \
+    0L,                                                                 \
+    { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, /* has_color */ \
+    amii_init_nhwindows,                                                \
+    amii_player_selection, amii_askname, amii_get_nh_event,             \
+    amii_exit_nhwindows, amii_suspend_nhwindows, amii_resume_nhwindows, \
+    amii_create_nhwindow, amii_clear_nhwindow, amii_display_nhwindow,   \
+    amii_destroy_nhwindow, amii_curs, amii_putstr, genl_putmixed,       \
+    amii_display_file, amii_start_menu, amii_add_menu, amii_end_menu,   \
+    amii_select_menu, genl_message_menu,                                \
+    amii_mark_synch, amii_wait_synch,                                   \
+    amii_cliparound,                                                    \
+    amii_print_glyph, amii_raw_print, amii_raw_print_bold, amii_nhgetch,\
+    amii_nh_poskey, amii_bell, amii_doprev_message, amii_yn_function,   \
+    amii_getlin, amii_get_ext_cmd, amii_number_pad, amii_delay_output,  \
+    amii_change_color, amii_get_color_string,                           \
+    amii_outrip, genl_preference_update,                                \
+    genl_getmsghistory, genl_putmsghistory,                             \
+    genl_status_init, genl_status_finish, genl_status_enablefield,      \
+    genl_status_update,                                                 \
+    genl_can_suspend_yes,                                               \
+    amii_update_inventory,                                              \
+    amii_ctrl_nhwindow
 
-/* The view window layout uses the same function names so we can use
- * a shared library to allow the executable to be smaller.
- */
-struct window_procs amiv_procs = {
-    WPID(amiv),
-    WC_COLOR | WC_HILITE_PET | WC_INVERSE,
-    0L,
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
-    amii_init_nhwindows,
-    amii_player_selection, amii_askname, amii_get_nh_event,
-    amii_exit_nhwindows, amii_suspend_nhwindows, amii_resume_nhwindows,
-    amii_create_nhwindow, amii_clear_nhwindow, amii_display_nhwindow,
-    amii_destroy_nhwindow, amii_curs, amii_putstr, genl_putmixed,
-    amii_display_file, amii_start_menu, amii_add_menu, amii_end_menu,
-    amii_select_menu, genl_message_menu,
-    amii_mark_synch, amii_wait_synch,
-#ifdef CLIPPING
-    amii_cliparound,
-#endif
-#ifdef POSITIONBAR
-    donull,
-#endif
-    amii_print_glyph, amii_raw_print, amii_raw_print_bold, amii_nhgetch,
-    amii_nh_poskey, amii_bell, amii_doprev_message, amii_yn_function,
-    amii_getlin, amii_get_ext_cmd, amii_number_pad, amii_delay_output,
-#ifdef CHANGE_COLOR /* only a Mac option currently */
-    amii_change_color, amii_get_color_string,
-#endif
-    amii_outrip, genl_preference_update,
-    genl_getmsghistory, genl_putmsghistory,
-    genl_status_init, genl_status_finish, genl_status_enablefield,
-    genl_status_update,
-    genl_can_suspend_yes,
-    amii_update_inventory,
-    amii_ctrl_nhwindow,
-};
+struct window_procs amii_procs = { WPID(amii), AMI_WIN_PROCS_BODY };
+struct window_procs amiv_procs = { WPID(amiv), AMI_WIN_PROCS_BODY };
 
 unsigned short amii_initmap[AMII_MAXCOLORS];
 /* Default pens used unless user overides in nethack.cnf. */
