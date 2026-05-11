@@ -347,6 +347,10 @@ extern void disregard_this_config_statement(int);
 extern boolean config_unmatched_ignored(void);
 extern void clear_ignore_errors_on_unmatched(void);
 extern void set_ignore_errors_on_unmatched(void);
+extern void rcfile_only_this_statement(int);
+#ifdef WIN32
+extern boolean check_for_portable_config(void);
+#endif
 #ifdef MSWIN_GRAPHICS
 extern void disregard_some_mswin_options(void);
 extern void rcfile_only_some_mswin_options(void);

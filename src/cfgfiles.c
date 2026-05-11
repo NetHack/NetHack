@@ -35,6 +35,9 @@ staticfn char *is_config_section(char *);
 staticfn boolean handle_config_section(char *);
 boolean parse_config_line(char *);
 staticfn char *find_optparam(char *);
+#ifdef WIN32
+staticfn boolean portable_sysconf_only_this_statement(int);
+#endif
 #ifndef SFCTOOL
 staticfn boolean cnf_line_OPTIONS(char *);
 staticfn boolean cnf_line_AUTOPICKUP_EXCEPTION(char *);
@@ -108,7 +111,7 @@ staticfn void cnf_parser_init(struct _cnf_parser_state *parser);
 staticfn void cnf_parser_done(struct _cnf_parser_state *parser);
 staticfn void parse_conf_buf(struct _cnf_parser_state *parser,
                            boolean (*proc)(char *arg));
-/* next one is in extern.h; why here too? */
+    /* next one is in extern.h; why here too? */
 boolean parse_conf_str(const char *str, boolean (*proc)(char *arg));
 static boolean ignore_errors_on_unmatched = FALSE,
                ignore_statement_errors = FALSE;
@@ -2039,6 +2042,84 @@ rcfile_only_this_option(enum opt heeded_option)
     clear_ignore_errors_on_unmatched();
     ignore_statement_errors = FALSE;
 }
+
+void
+rcfile_only_this_statement(int statementid)
+{
+    allopt_array_init();
+    disregard_all_options();
+    disregard_all_config_statements();
+    heed_this_config_statement(statementid);
+    set_ignore_errors_on_unmatched();
+    ignore_statement_errors = TRUE;
+    rcfile();
+    heed_all_config_statements();
+    heed_all_options();
+    clear_ignore_errors_on_unmatched();
+    ignore_statement_errors = FALSE;
+}
+
+#ifdef WIN32
+extern char portable_device_path[_MAX_PATH]; /* windsys.c */
+extern boolean portable;
+
+staticfn boolean
+portable_sysconf_only_this_statement(int statementid)
+{
+    const char *exepath;
+    char portable_sysconf[_MAX_PATH];
+
+    exepath = windows_exepath();
+    if (exepath) {
+        Snprintf(portable_sysconf, sizeof portable_sysconf, "%s/sysconf",
+                 exepath);
+        if (portable_sysconf[0] && file_exists(portable_sysconf)) {
+#ifdef SYSCF
+#ifdef SYSCF_FILE
+            allopt_array_init();
+            disregard_all_options();
+            disregard_all_config_statements();
+            heed_this_config_statement(statementid);
+            set_ignore_errors_on_unmatched();
+            ignore_statement_errors = TRUE;
+
+            config_error_init(TRUE, portable_sysconf, FALSE);
+            go.opt_phase = syscf_opt;
+            (void) read_config_file(portable_sysconf, set_in_sysconf);
+            config_error_done();
+            heed_all_config_statements();
+            heed_all_options();
+            clear_ignore_errors_on_unmatched();
+            ignore_statement_errors = FALSE;
+            if (sysopt.portable_device_paths) {
+                Snprintf(portable_device_path, sizeof portable_device_path,
+                         "%s\\", exepath);
+                return TRUE;
+            }
+#endif
+#endif /* SYSCF */
+        }
+    }
+    return FALSE;
+}
+
+boolean
+check_for_portable_config(void)
+{
+    int i, target_index = -1;
+
+    for (i = 0; i < SIZE(config_line_stmt); i++) {
+        if (!strcmp(config_line_stmt[i].name, "PORTABLE_DEVICE_PATHS")) {
+            target_index = i;
+            break;
+        }
+    }
+    if (target_index >= 0) {
+        return portable_sysconf_only_this_statement(target_index);
+    }
+    return FALSE;
+}
+#endif
 
 #ifdef MSWIN_GRAPHICS
 void
