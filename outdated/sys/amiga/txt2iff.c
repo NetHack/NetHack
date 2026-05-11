@@ -154,7 +154,11 @@ main(int argc, char **argv)
         i >>= 1;
     }
 
-    planes = malloc(nplanes * sizeof(char *));
+    if (nplanes <= 0 || nplanes > 32) {
+        error("invalid number of planes");
+        exit(1);
+    }
+    planes = calloc(nplanes, sizeof(char *));
     if (planes == 0) {
         error("can not allocate planes pointer");
         exit(1);
@@ -227,7 +231,16 @@ main(int argc, char **argv)
      */
     map_colors();
 
-    cmap = malloc((colors = (1L << nplanes)) * sizeof(AmiColorMap));
+    if (nplanes <= 0 || nplanes >= (int)(sizeof(long) * 8)) {
+        error("invalid number of planes for colormap");
+        exit(1);
+    }
+    colors = 1L << nplanes;
+    cmap = calloc(colors, sizeof(AmiColorMap));
+    if (cmap == 0) {
+        error("can not allocate colormap");
+        exit(1);
+    }
     for (i = 0; i < colors; ++i) {
         cmap[colrmap[i]].r = ColorMap[CM_RED][i];
         cmap[colrmap[i]].g = ColorMap[CM_GREEN][i];
