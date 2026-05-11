@@ -38,6 +38,9 @@ Amiga: stop rendering CLR_BLACK and CLR_WHITE as inverse video
 Amiga: default number_pad:1 in shipped nethack.cnf
 Amiga: promote AMIGA_INTUITION to supported so it shows up in version info
 Amiga: wire altmeta option to sysflags.altmeta
+Amiga: restore glyph icons in menus
+Amiga: sys/amiga/README.amiga stated "Extract NH50AMI.ZIP" but it could
+	be named something else; added a note about the potential suffix
 libnh: update get_nhuuid() for libnhmain
 libnh: sys/libnh/libnhmain.c: drop `static` on `whoami()`
 libnh: rewrote sys/unix/hints/macOS.500: rewrote the libnh.a rule. The
@@ -55,11 +58,15 @@ libnh: sys/unix/hints/macOS.500 in the WANT_LIBNH block, add an explicit
 	`recover: lua_support` dependency (gated by MAKEFILE_TOP).  When 
 	$(GAME) is overridden to empty, the regular `recover: $(GAME)` chain
 	no longer triggers `lua_support`, so include/nhlua.h never gets
-	generated and recover.c's transitive #include of hack.h fails.
+	generated and recover.c's transitive #include of hack.h fails
 macOS: fix ncurses build with Homebrew
 WASM: resolve some build failures in 'make CROSS_TO_WASM=1'
 WASM: hints file cross-pre2.500 update to CFLAGS to include -DNHUUID
-
+Windows: don't demand keypress on intentional exit
+Windows: correct a NetHack 5.0.0 packaging error if visual studio was
+	used; a remnant hard-coded 370 was in package.nmake
+Windows: setting any map_mode option in the config file could trigger
+	cause app failure on launch by dereferencing a null pointer
 
 
 General New Features
@@ -72,6 +79,8 @@ Platform- and/or Interface-Specific New Features
 
 NetHack Community Patches (or Variation) Included
 -------------------------------------------------
+NCURSES_CFLAGS was being ignored when using hints/linux.500 with only
+	WANT_WIN_TTY=1 and not WANT_WIN_CURSES=1  (pr #1522 by torakoya)
 
 
 Code Cleanup and Reorganization
