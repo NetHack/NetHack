@@ -135,7 +135,7 @@ mactty.h      macwin.h      mttypriv.h
 outdated/sys/amiga:
 (files for Amiga versions - untested for 5.0)
 Build.ami     Install.ami   Makefile.agc  Makefile.ami  NetHack.cnf
-ifchange      mkdmake       txt2iff.c     xpm2iff.c
+ifchange      mkdmake       xpm2iff.c
 
 outdated/sys/atari:
 (files for Atari version - untested for 5.0)
