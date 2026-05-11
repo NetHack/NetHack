@@ -511,9 +511,9 @@ endif
 override TARGET_LFLAGS= $(TOOLARCH) -noixemul -Wl,--allow-multiple-definition
 override TARGET_LIBS += $(LIBLM)
 VARDATND += nhtiles.bmp
-override SYSSRC = ../sys/amiga/amidos.c ../sys/amiga/amigst.c \
+override SYSSRC = ../sys/amiga/amidos.c \
 		../sys/amiga/amimenu.c ../sys/amiga/amirip.c \
-		../sys/amiga/amistack.c ../sys/amiga/amitty.c \
+		../sys/amiga/amistack.c \
 		../sys/amiga/amiwind.c ../sys/amiga/clipwin.c \
 		../sys/amiga/colorwin.c \
 		../sys/amiga/winami.c ../sys/amiga/winchar.c \
@@ -522,9 +522,9 @@ override SYSSRC = ../sys/amiga/amidos.c ../sys/amiga/amigst.c \
 		../sys/amiga/winstr.c ../sys/share/pcmain.c \
 		../win/share/bmptiles.c ../win/share/giftiles.c \
 		../win/share/tileset.c
-override SYSOBJ = $(TARGETPFX)amidos.o $(TARGETPFX)amigst.o \
+override SYSOBJ = $(TARGETPFX)amidos.o \
 		$(TARGETPFX)amirip.o $(TARGETPFX)amistack.o \
-		$(TARGETPFX)amitty.o $(TARGETPFX)amiwind.o \
+		$(TARGETPFX)amiwind.o \
 		$(TARGETPFX)winami.o $(TARGETPFX)winchar.o \
 		$(TARGETPFX)winfuncs.o $(TARGETPFX)winkey.o \
 		$(TARGETPFX)winamenu.o $(TARGETPFX)winreq.o \

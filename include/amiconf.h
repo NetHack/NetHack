@@ -180,8 +180,6 @@ typedef unsigned short AMII_COLOR_TYPE;
 #define ANSI_DEFAULT
 #endif
 
-extern int amibbs; /* BBS mode? */
-
 #ifdef AMII_GRAPHICS
 extern int amii_numcolors;
 void amii_setpens(int);

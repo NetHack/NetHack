@@ -59,9 +59,6 @@ extern struct IOStdReq ConsoleIO;
 extern struct MsgPort *HackPort;
 
 extern int txwidth, txheight, txbaseline;
-#ifdef SUPERBITMAP_MAP
-extern struct BitMap amii_vbm;
-#endif
 
 /* This gadget data is replicated for menu/text windows... */
 extern struct PropInfo PropScroll;

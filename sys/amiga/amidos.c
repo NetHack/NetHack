@@ -123,27 +123,6 @@ getlogin(void)
 
 /* abs() provided by libnix/stdlib */
 
-#ifdef SHELL
-int
-dosh(void)
-{
-    int i = 0;
-    char buf[BUFSZ];
-    extern struct ExecBase *SysBase;
-
-    /* Only under 2.0 and later ROMs do we have System() */
-    if (SysBase->LibNode.lib_Version >= 37 && !amibbs) {
-        getlin("Enter CLI Command...", buf);
-        if (buf[0] != '\033')
-            i = System(buf, NULL);
-    } else {
-        i = 0;
-        pline("No mysterious force prevented you from using multitasking.");
-    }
-    return i;
-}
-#endif /* SHELL */
-
 #ifdef MFLOPPY
 #include <ctype.h>
 

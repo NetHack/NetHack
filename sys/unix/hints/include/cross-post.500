@@ -232,10 +232,8 @@ endif  # CROSS_TO_MIPS
 
 ifdef CROSS_TO_AMIGA
 $(TARGETPFX)amidos.o : ../sys/amiga/amidos.c $(HACK_H)
-$(TARGETPFX)amigst.o : ../sys/amiga/amigst.c $(HACK_H)
 $(TARGETPFX)amirip.o : ../sys/amiga/amirip.c $(HACK_H)
 $(TARGETPFX)amistack.o : ../sys/amiga/amistack.c $(HACK_H)
-$(TARGETPFX)amitty.o : ../sys/amiga/amitty.c $(HACK_H)
 $(TARGETPFX)amiwind.o : ../sys/amiga/amiwind.c \
 		../sys/amiga/amimenu.c $(HACK_H)
 $(TARGETPFX)winami.o : ../sys/amiga/winami.c $(HACK_H)

@@ -422,11 +422,6 @@ amii_get_ext_cmd(void)
     menu_item *mip;
     anything id;
     struct amii_WinDesc *cw;
-#ifdef EXTMENU
-    winid win;
-    int i;
-    char buf[256];
-#endif
     int colx;
     int bottom = 0;
 
@@ -443,47 +438,6 @@ amii_get_ext_cmd(void)
     w = cw->win;
     bottom = amii_msgborder(w);
     colx = 3;
-
-#ifdef EXTMENU
-    if (iflags.extmenu) {
-        win = amii_create_nhwindow(NHW_MENU);
-        amii_start_menu(win, MENU_BEHAVE_STANDARD);
-        pline("#");
-        amii_putstr(WIN_MESSAGE, -1, " ");
-
-        for (i = 0; extcmdlist[i].ef_txt != NULL; ++i) {
-            id.a_char = *extcmdlist[i].ef_txt;
-            sprintf(buf, "%-10s - %s ", extcmdlist[i].ef_txt,
-                    extcmdlist[i].ef_desc);
-            amii_add_menu(win, (const glyph_info *) 0, &id,
-                          extcmdlist[i].ef_txt[0], 0, 0, NO_COLOR,
-                          buf, MENU_ITEMFLAGS_NONE);
-        }
-
-        amii_end_menu(win, (char *) 0);
-        sel = amii_select_menu(win, PICK_ONE, &mip);
-        amii_destroy_nhwindow(win);
-
-        if (sel == 1) {
-            sel = mip->item.a_char;
-            for (i = 0; extcmdlist[i].ef_txt != NULL; ++i) {
-                if (sel == extcmdlist[i].ef_txt[0])
-                    break;
-            }
-
-            /* copy in the text */
-            if (extcmdlist[i].ef_txt != NULL) {
-                amii_clear_nhwindow(WIN_MESSAGE);
-                (void) put_ext_cmd((char *) extcmdlist[i].ef_txt, 0, cw,
-                                   bottom);
-                return (i);
-            } else
-                DisplayBeep(NULL);
-        }
-
-        return (-1);
-    }
-#endif
 
     amii_clear_nhwindow(WIN_MESSAGE); /* Was NHW_MESSAGE */
     if (scrollmsg) {
