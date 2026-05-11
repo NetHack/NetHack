@@ -538,29 +538,26 @@ amii_create_nhwindow(int type)
     wd = (struct amii_WinDesc *) alloc(sizeof(struct amii_WinDesc));
     memset(wd, 0, sizeof(struct amii_WinDesc));
 
-    /* Both, since user may have changed the pen settings so respect those */
-    if (WINVERS_AMII || WINVERS_AMIV) {
-        /* Special backfill for these types of layers */
-        switch (type) {
-        case NHW_MESSAGE:
-        case NHW_STATUS:
-        case NHW_TEXT:
-        case NHW_MENU:
-        case NHW_BASE:
-        case NHW_OVER:
-        case NHW_MAP:
-            if (wd) {
-                fillhook.h_Entry = (void *) &LayerFillHook;
-                fillhook.h_Data = (void *) type;
-                fillhook.h_SubEntry = 0;
-                wd->hook = alloc(sizeof(fillhook));
-                memcpy(wd->hook, &fillhook, sizeof(fillhook));
-                memcpy(wd->wintags, wintags, sizeof(wd->wintags));
-                wd->wintags[0].ti_Data = (long) wd->hook;
-                nw->Extension = (void *) wd->wintags;
-            }
-            break;
+    /* Special backfill for these types of layers */
+    switch (type) {
+    case NHW_MESSAGE:
+    case NHW_STATUS:
+    case NHW_TEXT:
+    case NHW_MENU:
+    case NHW_BASE:
+    case NHW_OVER:
+    case NHW_MAP:
+        if (wd) {
+            fillhook.h_Entry = (void *) &LayerFillHook;
+            fillhook.h_Data = (void *) type;
+            fillhook.h_SubEntry = 0;
+            wd->hook = alloc(sizeof(fillhook));
+            memcpy(wd->hook, &fillhook, sizeof(fillhook));
+            memcpy(wd->wintags, wintags, sizeof(wd->wintags));
+            wd->wintags[0].ti_Data = (long) wd->hook;
+            nw->Extension = (void *) wd->wintags;
         }
+        break;
     }
 
     /* Don't open MENU or TEXT windows yet */

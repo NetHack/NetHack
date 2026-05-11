@@ -360,10 +360,8 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
         }
         nw->Height = min(ysize, amiIDisplay->ypix - nw->TopEdge);
 
-        if (WINVERS_AMIV || WINVERS_AMII) {
-            /* Make sure we are using the correct hook structure */
-            nw->Extension = cw->wintags;
-        }
+        /* Make sure we are using the correct hook structure */
+        nw->Extension = cw->wintags;
 
         /* Now, open the window */
         w = cw->win = OpenShWindow((void *) nw);
@@ -535,21 +533,19 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                  * amii_cl_end if window shrinks and columns decrease.
                  */
 
-                if (WINVERS_AMII || WINVERS_AMIV) {
-                    amii_setfillpens(w, cw->type);
-                    SetDrMd(w->RPort, JAM2);
-                    x2 = w->Width - w->BorderRight;
-                    y2 = w->Height - w->BorderBottom;
-                    x1 = x2 - w->IFont->tf_XSize - w->IFont->tf_XSize;
-                    y1 = w->BorderTop;
-                    if (x1 < w->BorderLeft)
-                        x1 = w->BorderLeft;
-                    RectFill(w->RPort, x1, y1, x2, y2);
+                amii_setfillpens(w, cw->type);
+                SetDrMd(w->RPort, JAM2);
+                x2 = w->Width - w->BorderRight;
+                y2 = w->Height - w->BorderBottom;
+                x1 = x2 - w->IFont->tf_XSize - w->IFont->tf_XSize;
+                y1 = w->BorderTop;
+                if (x1 < w->BorderLeft)
                     x1 = w->BorderLeft;
-                    y1 = y1 - w->IFont->tf_YSize;
-                    RectFill(w->RPort, x1, y1, x2, y2);
-                    RefreshWindowFrame(w);
-                }
+                RectFill(w->RPort, x1, y1, x2, y2);
+                x1 = w->BorderLeft;
+                y1 = y1 - w->IFont->tf_YSize;
+                RectFill(w->RPort, x1, y1, x2, y2);
+                RefreshWindowFrame(w);
 
                 /* Make the prop gadget the right size and place */
 

@@ -108,13 +108,11 @@ EditColor(void)
         ((struct PropInfo *) Col_RedPen.SpecialInfo)->Flags |= PROPNEWLOOK;
         ((struct PropInfo *) Col_GreenPen.SpecialInfo)->Flags |= PROPNEWLOOK;
     }
-    if (WINVERS_AMIV || WINVERS_AMII) {
-        Col_NewWindowStructure1.Extension = wintags;
-        Col_NewWindowStructure1.Flags |= WFLG_NW_EXTENDED;
-        fillhook.h_Entry = (void *) &LayerFillHook;
-        fillhook.h_Data = (void *) -2;
-        fillhook.h_SubEntry = 0;
-    }
+    Col_NewWindowStructure1.Extension = wintags;
+    Col_NewWindowStructure1.Flags |= WFLG_NW_EXTENDED;
+    fillhook.h_Entry = (void *) &LayerFillHook;
+    fillhook.h_Data = (void *) -2;
+    fillhook.h_SubEntry = 0;
 
     nw = OpenWindow((void *) &Col_NewWindowStructure1);
 
@@ -360,13 +358,11 @@ EditClipping(void)
         ((struct PropInfo *) ClipXCLIP.SpecialInfo)->Flags |= PROPNEWLOOK;
         ((struct PropInfo *) ClipYCLIP.SpecialInfo)->Flags |= PROPNEWLOOK;
     }
-    if (WINVERS_AMIV || WINVERS_AMII) {
-        ClipNewWindowStructure1.Extension = wintags;
-        ClipNewWindowStructure1.Flags |= WFLG_NW_EXTENDED;
-        fillhook.h_Entry = (void *) &LayerFillHook;
-        fillhook.h_Data = (void *) -2;
-        fillhook.h_SubEntry = 0;
-    }
+    ClipNewWindowStructure1.Extension = wintags;
+    ClipNewWindowStructure1.Flags |= WFLG_NW_EXTENDED;
+    fillhook.h_Entry = (void *) &LayerFillHook;
+    fillhook.h_Data = (void *) -2;
+    fillhook.h_SubEntry = 0;
 
     nw = OpenWindow((void *) &ClipNewWindowStructure1);
 
@@ -807,13 +803,11 @@ getlind(const char *prompt, char *bufp, const char *dflt)
         once = 1;
     }
 
-    if (WINVERS_AMIV || WINVERS_AMII) {
-        StrWindow.Extension = wintags;
-        StrWindow.Flags |= WFLG_NW_EXTENDED;
-        fillhook.h_Entry = (void *) &LayerFillHook;
-        fillhook.h_Data = (void *) -2;
-        fillhook.h_SubEntry = 0;
-    }
+    StrWindow.Extension = wintags;
+    StrWindow.Flags |= WFLG_NW_EXTENDED;
+    fillhook.h_Entry = (void *) &LayerFillHook;
+    fillhook.h_Data = (void *) -2;
+    fillhook.h_SubEntry = 0;
 
     if ((cwin = OpenWindow((void *) &StrWindow)) == NULL) {
         return;
