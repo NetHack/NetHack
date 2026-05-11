@@ -94,6 +94,7 @@ ifeq "$(GCCGTEQ9)" "1"
 # flags present in gcc version greater than or equal to 9 can go here
 CFLAGS+=-Wformat-overflow
 CFLAGS+=-Wmissing-parameter-type
+NO_WARN_DISCARDED_QUALIFIERS=-Wno-discarded-qualifiers
 endif   # GCC greater than or equal to 9
 #ifeq "$(GCCGTEQ11)" "1"
 CFLAGS+=-Wimplicit-fallthrough
