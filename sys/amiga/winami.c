@@ -340,6 +340,11 @@ struct win_setup new_wins[] = {
       22,
       78 },
 
+    /* NHW_PERMINVENT — placeholder; port does not implement persistent
+       inventory yet, but the slot must exist because new_wins[] is
+       indexed by NHW_* type. */
+    { { 0 } },
+
     /* NHW_BASE */
     { { 0, 0, WIDTH, WINDOWHEIGHT, 0xff, 0xff,
         RAWKEY | MENUPICK | MOUSEBUTTONS,

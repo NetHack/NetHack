@@ -805,7 +805,7 @@ GlyphToIcon(int glyph)
     glyph_info gi;
 
     map_glyphinfo(0, 0, glyph, 0, &gi);
-    if (glyph > 10000)
+    if (glyph >= 10000)
         return glyph;
     return (gi.gm.tileidx);
 }

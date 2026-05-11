@@ -47,30 +47,19 @@ amiga_self_assign(void)
         UnLock(dup);
 }
 
-/* Generate an RFC 4122 v4 UUID for this game.  Entropy comes from
-   DateStamp + the running task's address mixed through a small LCG. */
+/* Generate an RFC 4122 v4 UUID for this game.  Draw bytes from the
+   core's ISAAC64 RNG, which init_random() seeded before we get here. */
 void
 get_nhuuid(void)
 {
     uchar bytes[16];
-    struct DateStamp ds;
-    unsigned long x;
     int i;
 
     if (svn.nhuuid[0])
         return;
 
-    DateStamp(&ds);
-    x = (unsigned long) ds.ds_Days
-      ^ ((unsigned long) ds.ds_Minute << 16)
-      ^ ((unsigned long) ds.ds_Tick << 8)
-      ^ (unsigned long) FindTask(NULL);
-    /* Classic glibc/POSIX rand() LCG (Knuth, C99 7.22.2.1).  Full period
-       2^32; we read bits 16-23 to skip the LCG's bad low bits. */
-    for (i = 0; i < 16; i++) {
-        x = x * 1103515245u + 12345u;
-        bytes[i] = (uchar) (x >> 16);
-    }
+    for (i = 0; i < 16; i++)
+        bytes[i] = (uchar) rn2(256);
     /* RFC 4122: version=4 (random), variant=10. */
     bytes[6] = (bytes[6] & 0x0F) | 0x40;
     bytes[8] = (bytes[8] & 0x3F) | 0x80;
@@ -481,7 +470,7 @@ fopenp(const char *name, const char *mode)
     while (pp && *pp) {
         bp = buf;
         while (*pp && *pp != PATHSEP) {
-            if (bp > buf + BUFSIZ - 1)
+            if (bp >= buf + BUFSIZ - 1)
                 return (NULL);
             lastch = *bp++ = *pp++;
         }

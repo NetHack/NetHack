@@ -215,7 +215,7 @@ make_menu_items(struct amii_WinDesc *cw, menu_item **rmip)
     }
 
     if (idx) {
-        mmip = *rmip = (menu_item *) alloc(idx * sizeof(*mip));
+        mmip = *rmip = (menu_item *) alloc(idx * sizeof(menu_item));
         for (mip = cw->menu.items; mip; mip = mip->next) {
             if (mip->selected) {
                 mmip->item = mip->identifier;
@@ -982,8 +982,8 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                                     amip->str[SOFF + 2] = '-';
                             }
                         }
-                        if (counting && amip->selected && amip->canselect
-                            && amip->selector) {
+                        if (amip && counting && amip->selected
+                            && amip->canselect && amip->selector) {
                             amip->count = count;
                             reset_counting = TRUE;
                             amip->str[SOFF + 2] = '#';
