@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.3 $ $NHDT-Date: 1778533634 2026/05/11 21:07:14 $
+NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.4 $ $NHDT-Date: 1778535379 2026/05/11 21:36:19 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -41,11 +41,24 @@ Amiga: wire altmeta option to sysflags.altmeta
 Amiga: restore glyph icons in menus
 Amiga: sys/amiga/README.amiga stated "Extract NH50AMI.ZIP" but it could
 	be named something else; added a note about the potential suffix
+Amiga: `amiv_lprint_glyph` used an uninitialized `base` in tile-offset math
+Amiga: `amii_clear_nhwindow` overview window never got cleared with the map
+Amiga: `amii_sethipens` fell through from `NHW_TEXT` into `case -2`, clobbering
+	text-window pens
+Amiga: `NHW_BASE`/`NHW_OVER` collided with `NHW_PERMINVENT=6`; renumbered
+	off `NHW_LAST_TYPE`, matching the `wintty.h` convention
+Amiga: `make_menu_items` sized its output array by
+	`sizeof(amii_menu_item)` instead of `sizeof(menu_item)`
+Amiga: `DoMenuScroll` could deref a NULL `amip` on the `SELECTUP` path
+Amiga: `GlyphToIcon`&#39;s ASCII passthrough used `> 10000` instead of `>=`
+Amiga: `fopenp`'s buffer-bound check fired one byte too late
 Amiga: fix port_help double-prefix path
-Amiga: route non-menu messages from DoMenuScroll to ProcessMessage
-Amiga: deduplicate amii_procs and amiv_procs
 Amiga: replace WINVERS_AMI* strcmp with WINDOWPORT() id compare
 Amiga: route port paths through fqname()
+Amiga: drop redundant 'either windowtype' guards
+Amiga: deduplicate amii_procs and amiv_procs
+Amiga: route non-menu messages from DoMenuScroll to ProcessMessage
+Amiga: delete outdated/sys/amiga/
 gcc-16: tiletext.c [-Wdiscarded-qualifiers] warning suppression
 libnh: update get_nhuuid() for libnhmain
 libnh: sys/libnh/libnhmain.c: drop `static` on `whoami()`
@@ -104,5 +117,13 @@ Amiga: clean up amiconf.h
 Amiga: drop OPT_DISPMAP / display_map / fast_map machinery
 Amiga: correct command-line flag doc in amii.hlp
 Amiga: delete outdated/sys/amiga/ source folder tree
-Amiga: drop redundant 'either windowtype' guards
+Amiga: drop legacy non-gcc compiler guards
+Amiga: remove remnants of support for compiling on Amiga (the old
+	compilers couldn't cope with such a large codebase anymore)
+Amiga: remove old conditionals for running on OS 1.3
+Amiga: remove miscellaneous unused code like TTY/BBS support, commented
+	out test code etc
+Amiga: make INTUI_NEW_LOOK unconditional
+Amiga: drop SHAREDLIB dead build flavor
+
 
