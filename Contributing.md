@@ -9,7 +9,7 @@ and the body. This helps Git tools correctly parse the message.
 
 
 
-# NetHack 3.7  Contributing.txt       $NHDT-Date: 1596498265 2020/08/03 23:44:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.19 $
+# NetHack 5.0  Contributing.txt       $NHDT-Date: 1778531111 2026/05/11 20:25:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.3 $
 # NetHack may be freely redistributed.  See license for details.
 
 
