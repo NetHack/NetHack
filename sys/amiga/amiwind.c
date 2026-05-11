@@ -711,7 +711,6 @@ amii_cleanup(void)
 void
 Abort(long rc)
 {
-    int fault = 1;
 #ifdef CHDIR
     extern char orgdir[];
     chdir(orgdir);
@@ -724,38 +723,11 @@ Abort(long rc)
     } else
 #endif
         printf("\n\nAbort with alert code %08lx...\n", rc);
-/* Alert(rc);              this is too severe */
-#ifdef __SASC
-#ifdef INTUI_NEW_LOOK
-    if (IntuitionBase->LibNode.lib_Version >= 37) {
-        struct EasyStruct es = {
-            sizeof(struct EasyStruct), 0, "NetHack Panic Request",
-            "NetHack is Aborting with code == 0x%08lx",
-            "Continue Abort|Return to Program|Clean up and exit",
-        };
-        fault = EasyRequest(NULL, &es, NULL, (long) rc);
-        if (fault == 2)
-            return;
-    }
-#endif
-    if (fault == 1) {
-        /*  __emit(0x4afc); */ /* illegal instruction */
-        __emit(0x40fc);        /* divide by */
-        __emit(0x0000);        /*  #0  */
-        /* NOTE: don't move amii_cleanup() above here - */
-        /* it is too likely to kill the system     */
-        /* before it can get the SnapShot out, if  */
-        /* there is something really wrong.    */
-    }
-#endif
 #ifdef AMII_GRAPHICS
     if (windowprocs.win_init_nhwindows == amii_procs.win_init_nhwindows)
         amii_cleanup();
 #endif
 #undef exit
-#ifdef AZTEC_C
-    _abort();
-#endif
     exit((int) rc);
 }
 

@@ -4,28 +4,13 @@
 
 /*
  * Increase stack size to allow deep recursions.
- *
- * Note: This is SAS/C specific, using other compiler probably
- * requires another method for increasing stack.
- *
- */
-
-#ifdef __SASC_60
-#include <dos.h>
-#endif
-
-/*
- * Increase stack size to allow deep recursions.
  * NetHack 5.0 with Lua needs significantly more stack than 3.6.
+ *
+ * libnix needs __stkinit referenced to pull swapstack.o from libnix.a.
  */
 
-#ifdef __SASC_60
-long __stack = 256 * 1024;
-#else
-/* libnix needs __stkinit referenced to pull swapstack.o from libnix.a */
 unsigned long __stack = 256 * 1024;
 #ifdef CROSS_TO_AMIGA
 extern void __stkinit(void);
 void *__nh_force_stkinit = __stkinit;
-#endif
 #endif

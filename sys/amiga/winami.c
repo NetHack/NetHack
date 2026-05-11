@@ -1161,17 +1161,7 @@ amii_display_file(const char *fn, boolean complain)
 
     if ((fp = dlb_fopen(fn, RDTMODE)) == (dlb *) NULL) {
         if (complain) {
-            sprintf(buf, "Can't display %s: %s", fn,
-#if defined(_DCC) || defined(__GNUC__)
-                    strerror(errno)
-#else
-#ifdef __SASC_60
-                    __sys_errlist[errno]
-#else
-                    sys_errlist[errno]
-#endif
-#endif
-                    );
+            sprintf(buf, "Can't display %s: %s", fn, strerror(errno));
             amii_addtopl(buf);
         }
         return;

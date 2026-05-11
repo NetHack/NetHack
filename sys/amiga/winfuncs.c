@@ -252,7 +252,6 @@ struct FillParams {
     WORD offsety;
 };
 
-#ifdef __GNUC__
 #ifdef __PPC__
 void PPC_LayerFillHook(void);
 struct EmulLibEntry LayerFillHook = { TRAP_LIB, 0,
@@ -280,16 +279,6 @@ __asm(
 void
 LayerFillHook_impl(struct Hook *hk, struct RastPort *rp,
                     struct FillParams *fp)
-{
-#endif
-#else
-void
-#ifndef _DCC
-    __interrupt
-#endif
-        __saveds __asm LayerFillHook(__a0 struct Hook *hk,
-                                     __a2 struct RastPort *rp,
-                                     __a1 struct FillParams *fp)
 {
 #endif
 
@@ -828,7 +817,6 @@ amii_create_nhwindow(int type)
     return (newid);
 }
 
-#ifdef __GNUC__
 #ifdef __PPC__
 int PPC_SM_Filter(void);
 struct EmulLibEntry SM_Filter = { TRAP_LIB, 0,
@@ -856,16 +844,6 @@ __asm(
 int
 SM_Filter_impl(struct Hook *hk, ULONG modeID,
                struct ScreenModeRequester *smr)
-{
-#endif
-#else
-int
-#ifndef _DCC
-    __interrupt
-#endif
-        __saveds __asm SM_Filter(
-            __a0 struct Hook *hk, __a1 ULONG modeID,
-            __a2 struct ScreenModeRequester *smr)
 {
 #endif
     struct DimensionInfo dims;

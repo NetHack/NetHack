@@ -5,9 +5,6 @@
 #include <exec/types.h>
 #include <exec/memory.h>
 #include <exec/io.h>
-#if !defined(_DCC) && !defined(__GNUC__)
-#include <dos.h>
-#endif
 #include <exec/alerts.h>
 #include <exec/devices.h>
 #include <exec/execbase.h>
@@ -19,25 +16,10 @@
 #include <libraries/gadtools.h>
 #include <libraries/dosextens.h>
 #include <libraries/asl.h>
-/* stddef.h is included in the precompiled version of hack.h .  If we include
- * it here normally (through string.h) we'll get an "illegal typedef" later
- * on.  This is the easiest way I can think of to fix it without messing
- * around with the rest of the #includes.  --AMC
- */
-#if defined(_DCC) && !defined(HACK_H)
-#define ptrdiff_t ptrdiff_t_
-#define size_t size_t_
-#define wchar_t wchar_t_
-#endif
 #include <ctype.h>
 #undef strcmpi
 #include <string.h>
 #include <errno.h>
-#if defined(_DCC) && !defined(HACK_H)
-#undef ptrdiff_t
-#undef size_t
-#undef wchar_T
-#endif
 
 #ifdef IDCMP_CLOSEWINDOW
 #ifndef INTUI_NEW_LOOK
@@ -62,17 +44,6 @@ CLIPPING must be defined for the AMIGA version
 /*#define   TOPL_GETLINE	/* Don't use a window for getlin() */
 /*#define   WINDOW_YN		/* Use a window for y/n questions */
 
-#ifdef AZTEC_C
-#include <functions.h>
-#else
-#ifdef _DCC
-#include <clib/dos_protos.h>
-#include <clib/exec_protos.h>
-#include <clib/console_protos.h>
-#include <clib/layers_protos.h>
-#include <clib/diskfont_protos.h>
-#include <clib/gadtools_protos.h>
-#else
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/console.h>
@@ -80,28 +51,13 @@ CLIPPING must be defined for the AMIGA version
 #include <proto/diskfont.h>
 #include <proto/gadtools.h>
 #include <proto/asl.h>
-#endif
 
 /* kludge - see amirip for why */
 #undef red
 #undef green
 #undef blue
-#ifdef _DCC
-#include <clib/graphics_protos.h>
-#else
 #include <proto/graphics.h>
-#endif
-
-#ifdef _DCC
-#define __asm /* DICE doesn't like __asm */
-#endif
-
-#ifdef _DCC
-#include <clib/intuition_protos.h>
-#else
 #include <proto/intuition.h>
-#endif
-#endif
 
 #ifdef SHAREDLIB
 #include "NH:sys/amiga/lib/libmacs.h"

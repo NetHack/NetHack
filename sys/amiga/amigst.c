@@ -17,24 +17,9 @@
 #include <string.h>
 #include <errno.h>
 
-#ifdef __SASC
-#include <dos.h> /* for __emit */
-#include <string.h>
-#include <proto/dos.h>
-#include <proto/exec.h>
-#include <proto/graphics.h>
-#include <proto/intuition.h>
-#include <proto/diskfont.h>
-#include <proto/console.h>
-#endif
-
 #include "hack.h"
 #include "winprocs.h"
 #include "winami.h"
-
-#ifdef AZTEC
-#include <functions.h>
-#endif
 
 #ifndef CROSS_TO_AMIGA
 #include "NH:sys/amiga/winami.p"

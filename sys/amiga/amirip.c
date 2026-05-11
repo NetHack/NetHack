@@ -28,20 +28,10 @@ static struct RastPort *rp;
 #undef NULL
 #define NULL 0
 
-#ifdef AZTEC_C
-#include <functions.h>
-#else
-#ifdef _DCC
-#include <clib/dos_protos.h>
-#include <clib/exec_protos.h>
-#include <clib/console_protos.h>
-#include <clib/diskfont_protos.h>
-#else
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/console.h>
 #include <proto/diskfont.h>
-#endif
 
 static BitMapHeader tomb_bmhd;
 static struct BitMap *tombimg = NULL;
@@ -58,14 +48,8 @@ static int xoff, yoff; /* image centering */
 #undef red
 #undef green
 #undef blue
-#ifdef _DCC
-#include <clib/graphics_protos.h>
-#include <clib/intuition_protos.h>
-#else
 #include <proto/graphics.h>
 #include <proto/intuition.h>
-#endif
-#endif /* AZTEC_C */
 
 static struct Window *ripwin = 0;
 static void tomb_text(char *);

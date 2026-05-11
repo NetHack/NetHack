@@ -13,13 +13,6 @@
 #include <stdio.h>
 #include <proto/dos.h>
 
-#ifdef _DCC
-#define getch() getchar()
-#endif
-#ifdef __SASC_60
-#include <clib/dos_protos.h>
-#endif
-
 void tty_change_color(void);
 char *tty_get_color_string(void);
 

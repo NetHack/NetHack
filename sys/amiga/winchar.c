@@ -7,9 +7,7 @@
 #include <exec/types.h>
 #include <libraries/iffparse.h>
 #include <graphics/scale.h>
-#ifndef _DCC
 #include <proto/iffparse.h>
-#endif
 
 #ifdef TESTING
 #include "hack.h"

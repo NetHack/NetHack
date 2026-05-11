@@ -20,10 +20,8 @@
 
 #undef COUNT
 
-#if defined(__SASC_60) || defined(__GNUC__)
 #include <proto/exec.h>
 #include <proto/dos.h>
-#endif
 
 /* POSIX stubs needed by libnix (-noixemul) */
 #ifdef __noixemul__
@@ -85,11 +83,6 @@ free_nhuuid(void)
     }
 }
 
-#ifdef AZTEC_50
-#include <functions.h>
-#undef strcmpi
-#endif
-
 /* Prototypes */
 #ifndef CROSS_TO_AMIGA
 #include "NH:sys/amiga/amiwind.p"
@@ -107,9 +100,7 @@ extern struct window_procs amii_procs;
 struct ami_sysflags sysflags = {0};
 FILE *fopenp(const char *, const char *);
 
-#ifndef __SASC_60
 int Enable_Abort = 0; /* for stdio package */
-#endif
 
 /* Initial path, so we can find NetHack.cnf */
 char PATH[PATHLEN] = "NetHack:";
