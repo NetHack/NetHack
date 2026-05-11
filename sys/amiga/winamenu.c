@@ -463,11 +463,13 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
             mx = imsg->MouseX;
             my = imsg->MouseY;
 
-            /* Only do our window or VANILLAKEY from other windows */
-
+            /* Only do our window or VANILLAKEY from other windows.
+             * Background events (NEWSIZE on inventory, CLOSEWINDOW
+             * on overview, etc.) get routed to the main dispatcher
+             * so the game stays in sync.  ProcessMessage ReplyMsgs. */
             if (imsg->IDCMPWindow != w && class != VANILLAKEY
                 && class != RAWKEY) {
-                ReplyMsg((struct Message *) imsg);
+                ProcessMessage(imsg);
                 continue;
             }
 

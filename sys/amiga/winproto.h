@@ -53,6 +53,7 @@ void SetPropInfo(struct Window *win, struct Gadget *gad, long vis, long total,
 struct Window *OpenShWindow(struct NewWindow *nw);
 void CloseShWindow(struct Window *win);
 int ConvertKey(struct IntuiMessage *message);
+void ProcessMessage(struct IntuiMessage *message);
 int kbhit(void);
 int amikbhit(void);
 int WindowGetchar(void);

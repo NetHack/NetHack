@@ -17,7 +17,7 @@ static struct Message *GetFMsg(struct MsgPort *);
 #endif
 
 static int BufferGetchar(void);
-static void ProcessMessage(struct IntuiMessage *message);
+void ProcessMessage(struct IntuiMessage *message);
 
 #define BufferQueueChar(ch) (KbdBuffer[KbdBuffered++] = (ch))
 
@@ -354,7 +354,7 @@ ConvertKey(struct IntuiMessage *message)
  *  ahead of input demands, when the user types ahead.
  */
 
-static void
+void
 ProcessMessage(struct IntuiMessage *message)
 {
     int c;
