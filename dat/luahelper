@@ -1,4 +1,4 @@
-# NetHack 5.0  luahelper    $NHDT-Date: $  $NHDT-Branch: NetHack-3.7 $
+# NetHack 5.0  luahelper    $NHDT-Date: 1777237994 2026/04/26 16:13:14 $  $NHDT-Branch: NetHack-5.0 $
 #
 #  Makefile to assist developers in adding lines to various build
 #  Makefiles, or project files, as lua files are added or removed.
