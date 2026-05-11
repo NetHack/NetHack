@@ -1966,7 +1966,9 @@ removetopl(int cnt)
 void
 port_help(void)
 {
-    display_file(fqname(PORT_HELP, DATAPREFIX, 0), 1);
+    /* display_file -> dlb_fopen -> fopen_datafile already routes through
+       DATAPREFIX; pass the bare filename. */
+    display_file(PORT_HELP, 1);
 }
 #endif
 
