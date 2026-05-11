@@ -21,12 +21,6 @@
 #include <string.h>
 #include <errno.h>
 
-#ifdef IDCMP_CLOSEWINDOW
-#ifndef INTUI_NEW_LOOK
-#define INTUI_NEW_LOOK
-#endif
-#endif
-
 #ifndef HACK_H
 #include "hack.h"
 #endif
@@ -63,9 +57,7 @@ CLIPPING must be defined for the AMIGA version
 #include "NH:sys/amiga/lib/libmacs.h"
 #endif
 
-#ifdef INTUI_NEW_LOOK
 #include <utility/tagitem.h>
-#endif
 
 #define WINVERS_AMII (strcmp("amii", windowprocs.name) == 0)
 #define WINVERS_AMIV (strcmp("amiv", windowprocs.name) == 0)
@@ -109,11 +101,9 @@ CLIPPING must be defined for the AMIGA version
 #define MAPFTHEIGHT 8
 #define MAPFTBASELN 6
 
-/* If Compiling with the "New Look", redefine these now */
-#ifdef INTUI_NEW_LOOK
+/* Use the OS 2.0+ "new look" Intuition structs unconditionally. */
 #define NewWindow ExtNewWindow
 #define NewScreen ExtNewScreen
-#endif
 
 #define SIZEOF_DISKNAME 8
 

@@ -207,14 +207,12 @@ int wincnt = 0; /* # of nh windows opened */
  * while they are playing...  like compiling...
  */
 
-#ifdef INTUI_NEW_LOOK
 extern struct Hook fillhook;
 struct TagItem tags[] = {
     { WA_BackFill, (ULONG) &fillhook },
     { WA_PubScreenName, (ULONG) "NetHack" },
     { TAG_DONE, 0 },
 };
-#endif
 
 /*
  * The default dimensions and status values for each window type.  The
@@ -230,16 +228,10 @@ struct win_setup new_wins[] = {
     { { 0, 1, 640, 11, 0xff, 0xff,
         NEWSIZE | GADGETUP | GADGETDOWN | MOUSEMOVE | MOUSEBUTTONS | RAWKEY,
         BORDERLESS | ACTIVATE | SMART_REFRESH
-#ifdef INTUI_NEW_LOOK
             | WFLG_NW_EXTENDED
-#endif
         ,
         NULL, NULL, (UBYTE *) "Messages", NULL, NULL, 320, 40, 0xffff, 0xffff,
-#ifdef INTUI_NEW_LOOK
         PUBLICSCREEN, tags
-#else
-        CUSTOMSCREEN
-#endif
       },
       0,
       0,
@@ -251,16 +243,10 @@ struct win_setup new_wins[] = {
     /* NHW_STATUS */
     { { 0, 181, 640, 24, 0xff, 0xff, RAWKEY | MENUPICK | DISKINSERTED,
         BORDERLESS | ACTIVATE | SMART_REFRESH | BACKDROP
-#ifdef INTUI_NEW_LOOK
             | WFLG_NW_EXTENDED
-#endif
         ,
         NULL, NULL, (UBYTE *) "Game Status", NULL, NULL, 0, 0, 0xffff, 0xffff,
-#ifdef INTUI_NEW_LOOK
         PUBLICSCREEN, tags
-#else
-        CUSTOMSCREEN
-#endif
       },
       0,
       0,
@@ -273,17 +259,11 @@ struct win_setup new_wins[] = {
     { { 0, 0, WIDTH, WINDOWHEIGHT, 0xff, 0xff,
         RAWKEY | MENUPICK | MOUSEBUTTONS | ACTIVEWINDOW | MOUSEMOVE,
         BORDERLESS | ACTIVATE | SMART_REFRESH | BACKDROP
-#ifdef INTUI_NEW_LOOK
             | WFLG_NW_EXTENDED
-#endif
         ,
         NULL, NULL, (UBYTE *) "Dungeon Map", NULL, NULL, 64, 64, 0xffff,
         0xffff,
-#ifdef INTUI_NEW_LOOK
         PUBLICSCREEN, tags
-#else
-        CUSTOMSCREEN
-#endif
       },
       0,
       0,
@@ -298,16 +278,10 @@ struct win_setup new_wins[] = {
             | GADGETDOWN | CLOSEWINDOW | VANILLAKEY | NEWSIZE
             | INACTIVEWINDOW,
         WINDOWSIZING | WINDOWCLOSE | WINDOWDRAG | ACTIVATE | SMART_REFRESH
-#ifdef INTUI_NEW_LOOK
             | WFLG_NW_EXTENDED
-#endif
         ,
         &MenuScroll, NULL, NULL, NULL, NULL, 64, 32, 0xffff, 0xffff,
-#ifdef INTUI_NEW_LOOK
         PUBLICSCREEN, tags
-#else
-        CUSTOMSCREEN
-#endif
       },
       0,
       0,
@@ -321,17 +295,11 @@ struct win_setup new_wins[] = {
         RAWKEY | MENUPICK | DISKINSERTED | MOUSEMOVE | GADGETUP | CLOSEWINDOW
             | VANILLAKEY | NEWSIZE,
         WINDOWSIZING | WINDOWCLOSE | WINDOWDRAG | ACTIVATE | SMART_REFRESH
-#ifdef INTUI_NEW_LOOK
             | WFLG_NW_EXTENDED
-#endif
         ,
         &MenuScroll, NULL, (UBYTE *) NULL, NULL, NULL, 100, 32, 0xffff,
         0xffff,
-#ifdef INTUI_NEW_LOOK
         PUBLICSCREEN, tags
-#else
-        CUSTOMSCREEN
-#endif
       },
       0,
       0,
@@ -349,16 +317,10 @@ struct win_setup new_wins[] = {
     { { 0, 0, WIDTH, WINDOWHEIGHT, 0xff, 0xff,
         RAWKEY | MENUPICK | MOUSEBUTTONS,
         BORDERLESS | ACTIVATE | SMART_REFRESH | BACKDROP
-#ifdef INTUI_NEW_LOOK
             | WFLG_NW_EXTENDED
-#endif
         ,
         NULL, NULL, (UBYTE *) NULL, NULL, NULL, -1, -1, 0xffff, 0xffff,
-#ifdef INTUI_NEW_LOOK
         PUBLICSCREEN, tags
-#else
-        CUSTOMSCREEN
-#endif
       },
       0,
       0,
@@ -370,16 +332,10 @@ struct win_setup new_wins[] = {
     /* NHW_OVER */
     { { 320, 20, 319, 179, 0xff, 0xff, RAWKEY | MENUPICK | MOUSEBUTTONS,
         BORDERLESS | ACTIVATE | SMART_REFRESH | BACKDROP
-#ifdef INTUI_NEW_LOOK
             | WFLG_NW_EXTENDED
-#endif
         ,
         NULL, NULL, (UBYTE *) NULL, NULL, NULL, 64, 32, 0xffff, 0xffff,
-#ifdef INTUI_NEW_LOOK
         PUBLICSCREEN, tags
-#else
-        CUSTOMSCREEN
-#endif
       },
       0,
       0,
@@ -394,7 +350,6 @@ const char winpanicstr[] = "Bad winid %d in %s()";
 /* The opened windows information */
 struct amii_WinDesc *amii_wins[MAXWIN + 1];
 
-#ifdef INTUI_NEW_LOOK
 /*
  * NUMDRIPENS varies based on headers, so don't use it
  * here, its value is used elsewhere.
@@ -413,23 +368,14 @@ struct TagItem scrntags[] = {
     { TAG_DONE, 0 },
 };
 
-#endif
-
 struct NewScreen NewHackScreen = { 0, 0, WIDTH, SCREENHEIGHT, 3, 0,
                                    1, /* DetailPen, BlockPen */
-                                   HIRES, CUSTOMSCREEN
-#ifdef INTUI_NEW_LOOK
-                                              | NS_EXTENDED
-#endif
-                                   ,
+                                   HIRES, CUSTOMSCREEN | NS_EXTENDED,
                                    &Hack80, /* Font */
                                    NULL,    /*(UBYTE *)" NetHack X.Y.Z" */
                                    NULL,    /* Gadgets */
                                    NULL,    /* CustomBitmap */
-#ifdef INTUI_NEW_LOOK
-                                   scrntags
-#endif
-};
+                                   scrntags };
 
 /*
  * plname is filled either by an option (-u Player  or  -uPlayer) or
@@ -507,13 +453,11 @@ amii_player_selection(void)
 
     if( WINVERS_AMIV )
     {
-#ifdef INTUI_NEW_LOOK
 	Type_NewWindowStructure1.Extension = wintags;
 	Type_NewWindowStructure1.Flags |= WFLG_NW_EXTENDED;
 	fillhook.h_Entry = (void *) &LayerFillHook;
 	fillhook.h_Data = (void *)-2;
 	fillhook.h_SubEntry = 0;
-#endif
     }
 
     Type_NewWindowStructure1.Screen = HackScreen;
@@ -679,13 +623,11 @@ allocerr:
 
     if( WINVERS_AMIV )
     {
-#ifdef INTUI_NEW_LOOK
 	Rnd_NewWindowStructure1.Extension = wintags;
 	Rnd_NewWindowStructure1.Flags |= WFLG_NW_EXTENDED;
 	fillhook.h_Entry = (void *) &LayerFillHook;
 	fillhook.h_Data = (void *)-2;
 	fillhook.h_SubEntry = 0;
-#endif
     }
 
     Rnd_NewWindowStructure1.Screen = HackScreen;
@@ -1200,11 +1142,8 @@ SetBorder(struct Gadget *gd)
     int borders = 6;
     int hipen = sysflags.amii_dripens[SHINEPEN],
         shadowpen = sysflags.amii_dripens[SHADOWPEN];
-#ifdef INTUI_NEW_LOOK
     struct DrawInfo *dip;
-#endif
 
-#ifdef INTUI_NEW_LOOK
     if (IntuitionBase->LibNode.lib_Version >= 37) {
         if ((dip = GetScreenDrawInfo(HackScreen)) != 0) {
             hipen = dip->dri_Pens[SHINEPEN];
@@ -1212,7 +1151,6 @@ SetBorder(struct Gadget *gd)
             FreeScreenDrawInfo(HackScreen, dip);
         }
     }
-#endif
     /* Allocate two border structures one for up image and one for down
      * image, plus vector arrays for the border lines.
      */

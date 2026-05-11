@@ -59,16 +59,8 @@ struct amii_WinDesc {
     char *morestr;      /* string to display instead of default */
                         /* amiga stuff */
     struct Window *win; /* Intuition window pointer */
-#ifdef INTUI_NEW_LOOK
-    struct ExtNewWindow *newwin; /* NewWindow alloc'd */
-#else
-    struct NewWindow *newwin; /* ExtNewWindow alloc'd */
-#endif
-#ifdef INTUI_NEW_LOOK
+    struct ExtNewWindow *newwin;        /* NewWindow alloc'd */
     struct TagItem wintags[MAXWINTAGS]; /* Tag items for this window */
-#else
-    long wintags[MAXWINTAGS * 2];
-#endif
     void *hook;         /* Hook structure pointer for tiles version */
 #define FLMAP_INGLYPH 1 /* An NHW_MAP window is in glyph mode */
 #define FLMAP_CURSUP 2  /* An NHW_MAP window has the cursor displayed */

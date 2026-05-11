@@ -143,7 +143,6 @@ ami_wininit_data(int dir)
            sizeof(sysflags.amii_dripens));
 }
 
-#ifdef INTUI_NEW_LOOK
 struct Hook SM_FilterHook;
 struct Hook fillhook;
 struct TagItem wintags[] = {
@@ -151,7 +150,6 @@ struct TagItem wintags[] = {
     { WA_PubScreenName, (ULONG) "NetHack" },
     { TAG_END, 0 },
 };
-#endif
 
 void
 amii_destroy_nhwindow(winid win) /* just hide */
@@ -244,7 +242,6 @@ amii_destroy_nhwindow(winid win) /* just hide */
         WIN_INVEN = WIN_ERR;
 }
 
-#ifdef INTUI_NEW_LOOK
 struct FillParams {
     struct Layer *layer;
     struct Rectangle bounds;
@@ -323,7 +320,6 @@ LayerFillHook_impl(struct Hook *hk, struct RastPort *rp,
     SetDrMd(&rptmp, JAM2);
     RectFill(&rptmp, x, y, xmax, ymax);
 }
-#endif
 
 winid
 amii_create_nhwindow(int type)
@@ -508,12 +504,10 @@ amii_create_nhwindow(int type)
         if (nw->Height + stath + maph < HackScreen->Height - nw->TopEdge)
             nw->Height = HackScreen->Height - nw->TopEdge - 1 - maph - stath;
 
-#ifdef INTUI_NEW_LOOK
         if (IntuitionBase->LibNode.lib_Version >= 37) {
             MsgPropScroll.Flags |= PROPNEWLOOK;
             PropScroll.Flags |= PROPNEWLOOK;
         }
-#endif
     }
 
     nw->IDCMPFlags |= MENUPICK;
@@ -980,7 +974,6 @@ amii_init_nhwindows(int *argcp, char **argv)
     /* Use Intuition sizes for overscan screens... */
 
     amiIDisplay->xpix = 0;
-#ifdef INTUI_NEW_LOOK
     if (IntuitionBase->LibNode.lib_Version >= 37) {
         if (wbscr = LockPubScreen("Workbench")) {
             amiIDisplay->xpix = wbscr->Width;
@@ -988,7 +981,6 @@ amii_init_nhwindows(int *argcp, char **argv)
             UnlockPubScreen(NULL, wbscr);
         }
     }
-#endif
     if (amiIDisplay->xpix == 0) {
         amiIDisplay->ypix = GfxBase->NormalDisplayRows;
         amiIDisplay->xpix = GfxBase->NormalDisplayColumns;
@@ -1118,7 +1110,6 @@ amii_init_nhwindows(int *argcp, char **argv)
     NewHackScreen.BlockPen = C_BLACK;
     NewHackScreen.DetailPen = C_WHITE;
 #endif
-#ifdef INTUI_NEW_LOOK
     if (IntuitionBase->LibNode.lib_Version >= 37) {
         int i;
         struct DimensionInfo dims;
@@ -1137,11 +1128,7 @@ amii_init_nhwindows(int *argcp, char **argv)
 
         if (amii_scrnmode == 0xffffffff) {
             struct ScreenModeRequester *SMR;
-#ifdef __GNUC__
             SM_FilterHook.h_Entry = (void *) &SM_Filter;
-#else
-            SM_FilterHook.h_Entry = (ULONG (*) ()) SM_Filter;
-#endif
             SM_FilterHook.h_Data = 0;
             SM_FilterHook.h_SubEntry = 0;
             SMR = AllocAslRequest(ASL_ScreenModeRequest, NULL);
@@ -1231,7 +1218,6 @@ amii_init_nhwindows(int *argcp, char **argv)
             }
         }
     }
-#endif
 
     if (WINVERS_AMIV) {
         extern char *tilefile;
@@ -1278,10 +1264,8 @@ amii_init_nhwindows(int *argcp, char **argv)
     else
         bigscreen = 0;
 
-#ifdef INTUI_NEW_LOOK
     if (IntuitionBase->LibNode.lib_Version >= 37)
         PubScreenStatus(HackScreen, 0);
-#endif
 
     amiIDisplay->ypix = HackScreen->Height;
     amiIDisplay->xpix = HackScreen->Width;

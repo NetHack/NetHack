@@ -117,21 +117,17 @@ EditColor(void)
         svcolors[i] = colors[i] = GetRGB4(scrn->ViewPort.ColorMap, i);
 
     Col_NewWindowStructure1.Screen = scrn;
-#ifdef INTUI_NEW_LOOK
     if (IntuitionBase->LibNode.lib_Version >= 37) {
         ((struct PropInfo *) Col_BluePen.SpecialInfo)->Flags |= PROPNEWLOOK;
         ((struct PropInfo *) Col_RedPen.SpecialInfo)->Flags |= PROPNEWLOOK;
         ((struct PropInfo *) Col_GreenPen.SpecialInfo)->Flags |= PROPNEWLOOK;
     }
-#endif
     if (WINVERS_AMIV || WINVERS_AMII) {
-#ifdef INTUI_NEW_LOOK
         Col_NewWindowStructure1.Extension = wintags;
         Col_NewWindowStructure1.Flags |= WFLG_NW_EXTENDED;
         fillhook.h_Entry = (void *) &LayerFillHook;
         fillhook.h_Data = (void *) -2;
         fillhook.h_SubEntry = 0;
-#endif
     }
 
     nw = OpenWindow((void *) &Col_NewWindowStructure1);
@@ -372,22 +368,18 @@ EditClipping(void)
         once = 1;
     }
     ClipNewWindowStructure1.Screen = scrn;
-#ifdef INTUI_NEW_LOOK
     if (IntuitionBase->LibNode.lib_Version >= 37) {
         ((struct PropInfo *) ClipXSIZE.SpecialInfo)->Flags |= PROPNEWLOOK;
         ((struct PropInfo *) ClipYSIZE.SpecialInfo)->Flags |= PROPNEWLOOK;
         ((struct PropInfo *) ClipXCLIP.SpecialInfo)->Flags |= PROPNEWLOOK;
         ((struct PropInfo *) ClipYCLIP.SpecialInfo)->Flags |= PROPNEWLOOK;
     }
-#endif
     if (WINVERS_AMIV || WINVERS_AMII) {
-#ifdef INTUI_NEW_LOOK
         ClipNewWindowStructure1.Extension = wintags;
         ClipNewWindowStructure1.Flags |= WFLG_NW_EXTENDED;
         fillhook.h_Entry = (void *) &LayerFillHook;
         fillhook.h_Data = (void *) -2;
         fillhook.h_SubEntry = 0;
-#endif
     }
 
     nw = OpenWindow((void *) &ClipNewWindowStructure1);
@@ -399,11 +391,9 @@ EditClipping(void)
 
     ShowClipValues(nw);
     mflags = AUTOKNOB | FREEHORIZ;
-#ifdef INTUI_NEW_LOOK
     if (IntuitionBase->LibNode.lib_Version >= 37) {
         mflags |= PROPNEWLOOK;
     }
-#endif
 
     for (i = 0; i < 7; ++i) {
         if (mxsize <= sizes[i])
@@ -582,12 +572,9 @@ filecopy(char *from, char *to)
     if (buf) {
         sprintf(buf, "c:copy \"%s\" \"%s\" clone", from, to);
 
-/* Check SysBase instead?  Shouldn't matter  */
-#ifdef INTUI_NEW_LOOK
         if (IntuitionBase->LibNode.lib_Version >= 37)
             i = System(buf, NULL);
         else
-#endif
             Execute(buf, NULL, NULL);
         free(buf);
     } else {
@@ -716,11 +703,9 @@ DrawCol(struct Window *w, int idx, UWORD *colors)
     b = colors[idx] & 0x00f;
 
     mflags = AUTOKNOB | FREEHORIZ;
-#ifdef INTUI_NEW_LOOK
     if (IntuitionBase->LibNode.lib_Version >= 37) {
         mflags |= PROPNEWLOOK;
     }
-#endif
     NewModifyProp(&Col_RedPen, w, NULL, mflags, (r * MAXPOT) / 15, 0,
                   MAXPOT / 15, 0, 1);
     NewModifyProp(&Col_GreenPen, w, NULL, mflags, (g * MAXPOT) / 15, 0,
@@ -759,7 +744,6 @@ DispCol(struct Window *w, int idx, UWORD *colors)
 void
 amii_setpens(int count)
 {
-#ifdef INTUI_NEW_LOOK
     struct EasyStruct ea = { sizeof(struct EasyStruct), 0l, "NetHack Request",
                              "Number of pens requested(%ld) not correct",
                              "Use default pens|Use requested pens" };
@@ -768,12 +752,9 @@ amii_setpens(int count)
                               "Number of pens requested(%ld) not\ncompatible "
                               "with game configuration(%ld)",
                               "Use default pens|Use requested pens" };
-#endif
-/* If the pens in amii_curmap are
- * more pens than in amii_numcolors, then we choose to ignore
- * those pens.
- */
-#ifdef INTUI_NEW_LOOK
+
+    /* If the pens in amii_curmap are more than in amii_numcolors, ignore
+     * the extras. */
     if (IntuitionBase && IntuitionBase->LibNode.lib_Version >= 39) {
         if (count != amii_numcolors) {
             long args[2];
@@ -791,9 +772,7 @@ amii_setpens(int count)
                        amii_numcolors * sizeof(amii_initmap[0]));
             }
         }
-    } else
-#endif
-        if (count != amii_numcolors) {
+    } else if (count != amii_numcolors) {
         memcpy(sysflags.amii_curmap, amii_initmap,
                amii_numcolors * sizeof(amii_initmap[0]));
     }
@@ -849,13 +828,11 @@ getlind(const char *prompt, char *bufp, const char *dflt)
     }
 
     if (WINVERS_AMIV || WINVERS_AMII) {
-#ifdef INTUI_NEW_LOOK
         StrWindow.Extension = wintags;
         StrWindow.Flags |= WFLG_NW_EXTENDED;
         fillhook.h_Entry = (void *) &LayerFillHook;
         fillhook.h_Data = (void *) -2;
         fillhook.h_SubEntry = 0;
-#endif
     }
 
     if ((cwin = OpenWindow((void *) &StrWindow)) == NULL) {

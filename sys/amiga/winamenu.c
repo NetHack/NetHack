@@ -271,11 +271,9 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
     topidx = 0;
 
     if (w == NULL) {
-#ifdef INTUI_NEW_LOOK
         if (IntuitionBase->LibNode.lib_Version >= 37) {
             PropScroll.Flags |= PROPNEWLOOK;
         }
-#endif
         nw = (void *) DupNewWindow((void *) (&new_wins[cw->type].newwin));
         if (!alwaysinvent || win != WIN_INVEN) {
             xsize = scrn->WBorLeft + scrn->WBorRight + MenuScroll.Width + 1
@@ -1415,11 +1413,9 @@ SetPropInfo(struct Window *win, struct Gadget *gad, long vis, long total, long t
         pot = 0;
 
     mflags = AUTOKNOB | FREEVERT;
-#ifdef INTUI_NEW_LOOK
     if (IntuitionBase->LibNode.lib_Version >= 37) {
         mflags |= PROPNEWLOOK;
     }
-#endif
 
     NewModifyProp(gad, win, NULL, mflags, 0, pot, MAXBODY, body, 1);
 }

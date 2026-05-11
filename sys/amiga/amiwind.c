@@ -630,7 +630,6 @@ amii_cleanup(void)
      * be visitors, so check close status and wait till everyone is gone.
      */
     if (HackScreen) {
-#ifdef INTUI_NEW_LOOK
         if (IntuitionBase->LibNode.lib_Version >= 37) {
             if (MenuStrip)
                 FreeMenus(MenuStrip);
@@ -643,9 +642,7 @@ amii_cleanup(void)
                 };
                 EasyRequest(NULL, &easy, NULL, NULL);
             }
-        } else
-#endif
-        {
+        } else {
             CloseScreen(HackScreen);
         }
         HackScreen = NULL;
