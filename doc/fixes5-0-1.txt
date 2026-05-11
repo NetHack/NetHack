@@ -66,7 +66,7 @@ Windows: don't demand keypress on intentional exit
 Windows: correct a NetHack 5.0.0 packaging error if visual studio was
 	used; a remnant hard-coded 370 was in package.nmake
 Windows: setting any map_mode option in the config file could trigger
-	cause app failure on launch by dereferencing a null pointer
+	an app failure on launch by dereferencing a null pointer
 
 
 General New Features
