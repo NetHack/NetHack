@@ -89,19 +89,19 @@ CXX=g++ -std=gnu++11
 GCCGTEQ9 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 9)
 GCCGTEQ11 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 11)
 GCCGTEQ12 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 12)
-GCCGTEQ14 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 14)
+GCCGTEQ16 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 16)
 ifeq "$(GCCGTEQ9)" "1"
 # flags present in gcc version greater than or equal to 9 can go here
 CFLAGS+=-Wformat-overflow
 CFLAGS+=-Wmissing-parameter-type
-NO_WARN_DISCARDED_QUALIFIERS=-Wno-discarded-qualifiers
 endif   # GCC greater than or equal to 9
 #ifeq "$(GCCGTEQ11)" "1"
 CFLAGS+=-Wimplicit-fallthrough
 #endif
 #ifeq "$(GCCGTEQ12)" "1"
 #endif
-#ifeq "$(GCCGTEQ14)" "1"
+#ifeq "$(GCCGTEQ16)" "1"
+NO_WARN_DISCARDED_QUALIFIERS=-Wno-discarded-qualifiers
 #endif
 # end of gcc-specific
 else   # gcc or clang?
