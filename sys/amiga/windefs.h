@@ -55,8 +55,8 @@ CLIPPING must be defined for the AMIGA version
 
 #include <utility/tagitem.h>
 
-#define WINVERS_AMII (strcmp("amii", windowprocs.name) == 0)
-#define WINVERS_AMIV (strcmp("amiv", windowprocs.name) == 0)
+#define WINVERS_AMII WINDOWPORT(amii)
+#define WINVERS_AMIV WINDOWPORT(amiv)
 
 /* cw->data[x] contains 2 characters worth of special information.  These
  * characters are stored at the offsets as described here.
