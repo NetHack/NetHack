@@ -12,8 +12,12 @@ Command-line flags
 ------------------
     -L              Force interlaced (tall) screen.
     -l              Force non-interlaced screen.
+    -uNAME          Play as NAME (e.g. -uwizard for wizard mode).
+    -pCLASS         Pick a profession (e.g. -pvalkyrie).
+    -rRACE          Pick a race.
 
-The usual core flags (-D, -X, -u, -p, -r, -@) apply too.
+Wizard/debug mode is gated on the player name matching WIZARD_NAME
+("wizard" by default), so the simplest way in is -uwizard.
 
 
 Configuration (nethack.cnf in the NetHack: drawer)
