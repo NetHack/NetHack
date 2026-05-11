@@ -677,7 +677,7 @@ BOOL winos_font_support_cp437(HFONT hFont)
 
     DWORD size = (size_t) GetFontUnicodeRanges(hdc, NULL);
     if (size) {
-        GLYPHSET *glyphSet = (GLYPHSET *) malloc((size_t) size);
+        GLYPHSET *glyphSet = (GLYPHSET *) alloc((size_t) size);
         if (glyphSet != NULL) {
 #ifdef _MSC_VER
 #pragma warning( push )

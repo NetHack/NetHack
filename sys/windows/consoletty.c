@@ -2513,10 +2513,10 @@ void nethack_enter_consoletty(void)
     /* setup front and back buffers */
     int buffer_size_bytes = sizeof(cell_t) * console.buffer_size;
 
-    console.front_buffer = (cell_t *)malloc(buffer_size_bytes);
+    console.front_buffer = (cell_t *)alloc(buffer_size_bytes);
     buffer_fill_to_end(console.front_buffer, &undefined_cell, 0, 0);
 
-    console.back_buffer = (cell_t *)malloc(buffer_size_bytes);
+    console.back_buffer = (cell_t *)alloc(buffer_size_bytes);
     buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
 
     /* determine whether OS version has unicode support */
