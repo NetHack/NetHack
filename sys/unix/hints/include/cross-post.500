@@ -321,6 +321,7 @@ amigapkg: $(AMITILES) ../util/uudecode
 	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/amifont.uu )
 	cp $(AMISRC)/nethack.cnf $(TARGETPFX)pkg/NetHack/nethack.cnf
 	cp $(AMISRC)/README.amiga $(TARGETPFX)pkg/NetHack/README.amiga
+	cp $(AMISRC)/amii.hlp $(TARGETPFX)pkg/NetHack/amii.hlp
 	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/NHinfo.uu )
 	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/cnf-info.uu )
 	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/license-info.uu )

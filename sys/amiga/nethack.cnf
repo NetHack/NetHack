@@ -47,3 +47,17 @@ MENUCOLOR="gray dragon scale"=cyan
 MENUCOLOR="speed boots"=magenta
 MENUCOLOR="luckstone"=green
 MENUCOLOR="unicorn horn"=green
+
+# *** FILE LOCATIONS ***
+# NetHack: is auto-assigned to the directory the binary was launched
+# from, so all game files default there.  Uncomment any of these to
+# relocate part of the game state to a different volume or subdir.
+#
+#HACKDIR=NetHack:
+#LEVELDIR=NetHack:
+#SAVEDIR=NetHack:save/
+#BONESDIR=NetHack:bones/
+#DATADIR=NetHack:
+#SCOREDIR=NetHack:
+#LOCKDIR=NetHack:
+#CONFIGDIR=NetHack:

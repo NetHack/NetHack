@@ -1012,9 +1012,11 @@ amii_init_nhwindows(int *argcp, char **argv)
      */
 
     if (DiskfontBase = OpenLibrary("diskfont.library", amii_libvers)) {
-        Hack80.ta_Name -= SIZEOF_DISKNAME;
+        extern UBYTE HackFontName[], HackFontPath[];
+
+        Hack80.ta_Name = HackFontPath;
         HackFont = OpenDiskFont(&Hack80);
-        Hack80.ta_Name += SIZEOF_DISKNAME;
+        Hack80.ta_Name = HackFontName;
 
         /* Textsfont13 is filled in with "FONT=" settings. The default is
          * courier/13.
@@ -1025,9 +1027,9 @@ amii_init_nhwindows(int *argcp, char **argv)
 
         /* Try hack/8 for texts if no user specified font */
         if (TextsFont == NULL) {
-            Hack80.ta_Name -= SIZEOF_DISKNAME;
+            Hack80.ta_Name = HackFontPath;
             TextsFont = OpenDiskFont(&Hack80);
-            Hack80.ta_Name += SIZEOF_DISKNAME;
+            Hack80.ta_Name = HackFontName;
         }
 
         /* If no fonts, make everything topaz 8 for non-view windows.
@@ -1205,10 +1207,10 @@ amii_init_nhwindows(int *argcp, char **argv)
     if (WINVERS_AMIV) {
         extern char *tilefile;
         if (amii_numcolors >= 32) {
-            tilefile = "NetHack:tiles/tiles32.iff";
+            tilefile = (char *) fqname("tiles/tiles32.iff", DATAPREFIX, 0);
             amii_numcolors = 32;
         } else {
-            tilefile = "NetHack:tiles/tiles16.iff";
+            tilefile = (char *) fqname("tiles/tiles16.iff", DATAPREFIX, 0);
         }
         amii_bmhd = ReadTileImageFiles();
     } else
@@ -1967,7 +1969,7 @@ removetopl(int cnt)
 void
 port_help(void)
 {
-    display_file(PORT_HELP, 1);
+    display_file(fqname(PORT_HELP, DATAPREFIX, 0), 1);
 }
 #endif
 

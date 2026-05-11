@@ -86,7 +86,7 @@ extern void ami_wininit_data(int);
 #define AMII_MAXCOLORS (1L << DEPTH)
 typedef unsigned short AMII_COLOR_TYPE;
 
-#define PORT_HELP "nethack:amii.hlp"
+#define PORT_HELP "amii.hlp"
 
 #undef TERMLIB
 

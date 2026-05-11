@@ -1,31 +1,63 @@
-            Amiga-specific help file for NetHack 3.6
+                Amiga-specific help for NetHack 5.0
 
-The Amiga port of NetHack supports a number of additional commands
-and facilities specific to the Amiga.  Listed below are the things
-which are either specific to the Amiga port or might not appear
-in other ports.
 
-While playing NetHack you can press:
+Special key combinations
+------------------------
+    ALT-HELP        Edit the screen colour palette.
+    CTL-HELP        Set tile scaling and clipping (amiv only).
+    SHIFT-HELP      Toggle the dungeon overview window (amiv only).
 
-        ALT-HELP                Color requestor.
-        CTL-HELP                Scale display (amitile only).
-        SHIFT-HELP              Overview window (amitile only).
 
-Amiga-specific run-time options:
-        altmeta                 use the alt keys as meta keys
-        flush                   throw away keyboard type-ahead
+Command-line flags
+------------------
+    -L              Force interlaced (tall) screen.
+    -l              Force non-interlaced screen.
 
-Command line options recognized are
+The usual core flags (-D, -X, -u, -p, -r, -@) apply too.
 
-        -n                      No News at game startup.
-        -X                      Play in discovery mode.
-        -D                      Play in debug mode.
-        -L                      Interlaced screen.
-        -l                      Never Interlaced screen.
-        -u                      Play as player given as
-                                an argument.
-        -r                      Pick a race given as an
-                                argument.
-        -p                      Pick a profession given
-                                as an argument
-        -?                      Gives command line usage.
+
+Configuration (nethack.cnf in the NetHack: drawer)
+--------------------------------------------------
+Window backend selection:
+
+    OPTIONS=windowtype:amiv     tile graphics (default)
+    OPTIONS=windowtype:amii     text/character mode
+
+Amiga-specific runtime options:
+
+    OPTIONS=altmeta             ALT+letter sends META+letter (default on).
+                                Disable with !altmeta if your keymap needs
+                                ALT for typing accented characters.
+    OPTIONS=flush               drop any keys queued during long operations
+    OPTIONS=asksavedisk         prompt for a save-disk before saving
+                                (MFLOPPY only)
+
+
+File-location overrides
+-----------------------
+NetHack: is automatically assigned to the directory the executable was
+launched from.  All game files default to that volume.  Override any of
+these in nethack.cnf to relocate parts of the game state:
+
+    HACKDIR=NetHack:            program / shared data
+    LEVELDIR=NetHack:           per-level files during play
+    SAVEDIR=NetHack:save/       save files
+    BONESDIR=NetHack:bones/     bones files (shared between games)
+    DATADIR=NetHack:            nhdat and other data files
+    SCOREDIR=NetHack:           record / logfile
+    LOCKDIR=NetHack:            lock files
+    CONFIGDIR=NetHack:          per-user config
+
+You can also override the install path entirely without editing the cnf
+by setting the NETHACKDIR or HACKDIR shell environment variable before
+launching:
+
+    setenv NETHACKDIR Work:games/nethack-dev/
+    Work:games/nethack-dev/nethack
+
+
+Display fallback
+----------------
+Tile mode (amiv) requires at least 16 colours and ~384 KB free chip
+RAM.  If neither is available the game falls back to text mode (amii)
+at startup with a one-line note.

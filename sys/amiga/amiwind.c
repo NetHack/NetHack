@@ -59,15 +59,17 @@ struct TextFont *TextsFont = NULL;
 struct TextFont *HackFont = NULL;
 struct TextFont *RogueFont = NULL;
 
-UBYTE FontName[] = "NetHack:hack.font";
-/* # chars in "NetHack:": */
-#define SIZEOF_DISKNAME 8
+/* hack.font is registered via NetHack:hack.font (which references
+ * NetHack:hack/8).  OpenFont()/SetFont() take the bare name; only
+ * OpenDiskFont() needs the full path. */
+UBYTE HackFontName[] = "hack.font";
+UBYTE HackFontPath[] = "NetHack:hack.font";
 
 #endif
 
 struct TextAttr Hack80 = {
 #ifdef HACKFONT
-    &FontName[SIZEOF_DISKNAME],
+    HackFontName,
 #else
     (UBYTE *) "topaz.font",
 #endif

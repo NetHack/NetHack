@@ -100,7 +100,6 @@ CLIPPING must be defined for the AMIGA version
 #define NewWindow ExtNewWindow
 #define NewScreen ExtNewScreen
 
-#define SIZEOF_DISKNAME 8
 
 #define CSI '\x9b'
 #define NO_CHAR -1
