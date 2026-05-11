@@ -2,6 +2,7 @@
 *.cpp NHSUBST
 *.sh NHSUBST
 *.pl NHSUBST
+*.md NHSUBST
 Porting NHSUBST
 README NHSUBST
 * text=auto
