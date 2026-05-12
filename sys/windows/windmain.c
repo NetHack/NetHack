@@ -209,9 +209,9 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     set_default_prefix_locations(
         argv[0]); /* must be re-done again after initoptions_init()
                    * because that function clears out gp.fqn_prefix[] */
-#ifdef MSWIN_GRAPHICS
-    disregard_some_mswin_options();
-#endif
+    allopt_array_init();  /* we do this here, so allopt doesn't get cleared
+                             after we disregard some */
+
     copy_sysconf_content();
     copy_symbols_content();
     /* Now that sysconf has had a chance to set the TROUBLEPREFIX, don't
@@ -254,6 +254,9 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         error("NetHack: current directory path too long");
 #endif
     getreturn_enabled = TRUE;
+#ifdef MSWIN_GRAPHICS
+    disregard_some_mswin_options();
+#endif
     initoptions_init(); // This allows OPTIONS in syscf on Windows.
     set_default_prefix_locations(
         argv[0]); /* must be re-done after initoptions_init()
