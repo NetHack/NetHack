@@ -1194,7 +1194,9 @@ mswin_select_map_mode(int mode)
         (PNHMainWindow) GetWindowLongPtr(GetNHApp()->hMainWnd, GWLP_USERDATA);
 
     if (!data) {
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED && NH_DEVEL_STATUS != NH_STATUS_POSTRELEASE)
         impossible("data is null in %s:%d", __func__, __LINE__);
+#endif
         return;
     }
 
