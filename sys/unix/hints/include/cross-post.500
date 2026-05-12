@@ -307,7 +307,7 @@ UUDECODE = ../util/uudecode
 ../util/uudecode: ../sys/share/uudecode.c
 	$(CC) $(CFLAGS) -o $@ $<
 
-amigapkg: $(AMITILES) ../util/uudecode
+amigapkg: $(GAMEBIN) $(AMITILES) ../util/uudecode
 	mkdir -p $(TARGETPFX)pkg/NetHack/tiles $(TARGETPFX)pkg/NetHack/hack
 	cp $(GAMEBIN) $(TARGETPFX)pkg/NetHack/nethack
 	cp ../dat/nhdat $(TARGETPFX)pkg/NetHack/nhdat

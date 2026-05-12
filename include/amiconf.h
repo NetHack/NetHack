@@ -48,9 +48,8 @@ extern void nethack_exit(int);
 extern void amii_setpens(int);
 
 extern void getlind(const char *, char *, const char *);
-extern void exit(int);
 extern void CleanUp(void);
-extern void Abort(long);
+extern void Abort(long) NORETURN;
 extern int getpid(void);
 extern int kbhit(void);
 extern int WindowGetchar(void);
@@ -84,6 +83,10 @@ extern void ami_wininit_data(int);
 #define CHANGE_COLOR 1
 #define DEPTH 6 /* Maximum depth of the screen allowed */
 #define AMII_MAXCOLORS (1L << DEPTH)
+/* Number of palette entries actually populated in amii_init_map[] (AMII text
+ * mode) and amiv_init_map[] (AMIV tile mode).  Indices beyond these read 0. */
+#define AMII_PALETTE_SIZE 8
+#define AMIV_PALETTE_SIZE 32
 typedef unsigned short AMII_COLOR_TYPE;
 
 #define PORT_HELP "amii.hlp"

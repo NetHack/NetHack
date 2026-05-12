@@ -66,6 +66,41 @@ static const RGB amiv_pal[16] = {
 };
 
 /* --------------------------------------------------------- */
+/*  Little-endian readers (BMP is LE regardless of host)     */
+/* --------------------------------------------------------- */
+
+static int
+read_u16le(FILE *fp, uint16_t *out)
+{
+    int lo = fgetc(fp), hi = fgetc(fp);
+    if (hi == EOF) return 0;
+    *out = (uint16_t)(((unsigned) hi << 8) | (unsigned) lo);
+    return 1;
+}
+
+static int
+read_u32le(FILE *fp, uint32_t *out)
+{
+    int b0 = fgetc(fp), b1 = fgetc(fp);
+    int b2 = fgetc(fp), b3 = fgetc(fp);
+    if (b3 == EOF) return 0;
+    *out = ((uint32_t)(unsigned) b3 << 24)
+         | ((uint32_t)(unsigned) b2 << 16)
+         | ((uint32_t)(unsigned) b1 << 8)
+         |  (uint32_t)(unsigned) b0;
+    return 1;
+}
+
+static int
+read_i32le(FILE *fp, int32_t *out)
+{
+    uint32_t v;
+    if (!read_u32le(fp, &v)) return 0;
+    *out = (int32_t) v;
+    return 1;
+}
+
+/* --------------------------------------------------------- */
 /*  Colour helpers                                           */
 /* --------------------------------------------------------- */
 
@@ -345,7 +380,7 @@ main(int argc, char **argv)
     int nplanes, maxcol;
     int i, y;
     RGB outpal[256];
-    int remap[256];
+    int remap[256] = {0};
     uint8_t *remapped;
     uint8_t *plane_data[8];
     uint8_t cmap_rgb[256 * 3];
@@ -370,8 +405,22 @@ main(int argc, char **argv)
     bmpfp = fopen(argv[3], "rb");
     if (!bmpfp) { perror(argv[3]); return 1; }
 
-    if (fread(&fhdr, sizeof(fhdr), 1, bmpfp) != 1
-        || fread(&ihdr, sizeof(ihdr), 1, bmpfp) != 1) {
+    if (!read_u16le(bmpfp, &fhdr.bfType)
+        || !read_u32le(bmpfp, &fhdr.bfSize)
+        || !read_u16le(bmpfp, &fhdr.bfReserved1)
+        || !read_u16le(bmpfp, &fhdr.bfReserved2)
+        || !read_u32le(bmpfp, &fhdr.bfOffBits)
+        || !read_u32le(bmpfp, &ihdr.biSize)
+        || !read_i32le(bmpfp, &ihdr.biWidth)
+        || !read_i32le(bmpfp, &ihdr.biHeight)
+        || !read_u16le(bmpfp, &ihdr.biPlanes)
+        || !read_u16le(bmpfp, &ihdr.biBitCount)
+        || !read_u32le(bmpfp, &ihdr.biCompression)
+        || !read_u32le(bmpfp, &ihdr.biSizeImage)
+        || !read_i32le(bmpfp, &ihdr.biXPelsPerMeter)
+        || !read_i32le(bmpfp, &ihdr.biYPelsPerMeter)
+        || !read_u32le(bmpfp, &ihdr.biClrUsed)
+        || !read_u32le(bmpfp, &ihdr.biClrImportant)) {
         fprintf(stderr, "Failed to read BMP header\n");
         return 1;
     }
@@ -388,6 +437,11 @@ main(int argc, char **argv)
 
     img_w = ihdr.biWidth;
     img_h = abs(ihdr.biHeight);
+    if (img_w <= 0 || img_w > 16384 || img_h <= 0 || img_h > 16384) {
+        fprintf(stderr, "BMP dimensions out of range: %dx%d\n",
+                img_w, img_h);
+        return 1;
+    }
     ncolors = ihdr.biClrUsed ? ihdr.biClrUsed : 256;
     if (ncolors > 256) ncolors = 256;
 
@@ -410,13 +464,15 @@ main(int argc, char **argv)
     rowstride = (img_w + 3) & ~3;
     bmpdata = malloc(rowstride * img_h);
     if (!bmpdata) {
-       printf("%s\n", "malloc failure on bmpdata");
+       fprintf(stderr, "malloc failure on bmpdata\n");
        return 1;
     }
     fseek(bmpfp, fhdr.bfOffBits, SEEK_SET);
     if (fread(bmpdata, 1, rowstride * img_h, bmpfp)
         != (size_t)(rowstride * img_h)) {
         fprintf(stderr, "Failed to read pixel data\n");
+        free(bmpdata);
+        fclose(bmpfp);
         return 1;
     }
     fclose(bmpfp);
@@ -424,7 +480,8 @@ main(int argc, char **argv)
     /* flip bottom-up to top-down */
     pixels = malloc(img_w * img_h);
     if (!pixels) {
-       printf("%s\n", "malloc failure on pixels");
+       fprintf(stderr, "malloc failure on pixels\n");
+       free(bmpdata);
        return 1;
     }
     if (ihdr.biHeight > 0) {
@@ -450,7 +507,7 @@ main(int argc, char **argv)
 
     remapped = malloc(img_w * img_h);
     if (!remapped) {
-       printf("%s\n", "malloc failure on remapped");
+       fprintf(stderr, "malloc failure on remapped\n");
        return 1;
     }
     for (i = 0; i < img_w * img_h; i++)
@@ -458,8 +515,13 @@ main(int argc, char **argv)
 
     /* convert to bitplanes */
     planesize = (img_w / 8) * img_h;
-    for (i = 0; i < nplanes; i++)
+    for (i = 0; i < nplanes; i++) {
         plane_data[i] = calloc(1, planesize);
+        if (!plane_data[i]) {
+            fprintf(stderr, "calloc failure for plane %d\n", i);
+            return 1;
+        }
+    }
 
     to_planes(remapped, img_w, img_h,
               nplanes, plane_data);

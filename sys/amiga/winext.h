@@ -23,6 +23,17 @@ extern struct amii_DisplayDesc
     *amiIDisplay; /* the Amiga Intuition descriptor */
 extern struct window_procs amii_procs;
 extern struct window_procs amiv_procs;
+/* Three similarly-named palette arrays.  Note the position of the
+ * second underscore distinguishes them:
+ *   amii_initmap  = working/runtime palette (mutated by tile/tomb load
+ *                   and the in-game color editor).
+ *   amii_init_map = AMII (text-mode) compile-time defaults, 8 entries.
+ *   amiv_init_map = AMIV (tile-mode) compile-time defaults, 32 entries
+ *                   (mutated by ReadImageFile when a tile/tomb IFF
+ *                   carries its own CMAP).
+ * The naming is historical; sysflags.amii_curmap is yet another related
+ * array holding the user's saved color choices.
+ */
 extern unsigned short amii_initmap[AMII_MAXCOLORS];
 extern unsigned short amiv_init_map[AMII_MAXCOLORS];
 extern unsigned short amii_init_map[AMII_MAXCOLORS];
@@ -52,7 +63,7 @@ extern struct Menu HackMenu[];
 extern struct Menu *MenuStrip;
 extern struct NewMenu GTHackMenu[];
 extern APTR *VisualInfo;
-extern unsigned char KbdBuffered;
+extern int KbdBuffered;
 extern struct TextFont *TextsFont;
 extern struct TextFont *HackFont;
 extern struct IOStdReq ConsoleIO;

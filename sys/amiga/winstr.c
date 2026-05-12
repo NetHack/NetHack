@@ -125,8 +125,25 @@ amii_putstr(winid window, int attr, const char *str)
                     p = (char *) str;
 
                 if (p == str) {
-                    /*    p = (char *)&str[ cw->cols ]; */
-                    outmore(cw);
+                    /* No whitespace within visible width. */
+                    if (cw->curx > 0) {
+                        /* Mid-line: clear it and retry at column 0. */
+                        outmore(cw);
+                        continue;
+                    }
+                    /* Already at line start: word is longer than one
+                     * line, so force-break it at the column boundary. */
+                    i = cw->cols - 1 - fudge;
+                    if (i <= 0)
+                        i = 1;
+                    if ((size_t) i > strlen(str))
+                        i = strlen(str);
+                    outsubstr(cw, (char *) str, i, fudge);
+                    cw->curx += i;
+                    str += i;
+                    if (*str)
+                        amii_scrollmsg(w, cw);
+                    amii_cl_end(cw, cw->curx);
                     continue;
                 }
 
@@ -205,6 +222,7 @@ amii_putstr(winid window, int attr, const char *str)
                 TextSpaces(w->RPort, cw->cols);
                 cw->cury--;
             }
+            wrapping = 0;
         }
         amii_curs(window, cw->curx + 1, cw->cury);
         Text(w->RPort, (char *) str, strlen((char *) str));

@@ -164,23 +164,23 @@ amii_destroy_nhwindow(winid win) /* just hide */
                 WIN_OVER = WIN_ERR;
             }
         } else if (cw->type == NHW_OVER) {
-            struct Window *w = amii_wins[WIN_OVER]->win;
-            amii_oldover.MinX = w->LeftEdge;
-            amii_oldover.MinY = w->TopEdge;
-            amii_oldover.MaxX = w->Width;
-            amii_oldover.MaxY = w->Height;
+            struct Window *w = cw->win;
+            if (w) {
+                amii_oldover.MinX = w->LeftEdge;
+                amii_oldover.MinY = w->TopEdge;
+                amii_oldover.MaxX = w->Width;
+                amii_oldover.MaxY = w->Height;
 
-            if (WIN_MESSAGE != WIN_ERR && amii_wins[WIN_MESSAGE]) {
-                w = amii_wins[WIN_MESSAGE]->win;
-                amii_oldmsg.MinX = w->LeftEdge;
-                amii_oldmsg.MinY = w->TopEdge;
-                amii_oldmsg.MaxX = w->Width;
-                amii_oldmsg.MaxY = w->Height;
-                SizeWindow(amii_wins[WIN_MESSAGE]->win,
-                           (amiIDisplay->xpix
-                            - amii_wins[WIN_MESSAGE]->win->LeftEdge)
-                               - amii_wins[WIN_MESSAGE]->win->Width,
-                           0);
+                if (WIN_MESSAGE != WIN_ERR && amii_wins[WIN_MESSAGE]
+                    && (w = amii_wins[WIN_MESSAGE]->win) != NULL) {
+                    amii_oldmsg.MinX = w->LeftEdge;
+                    amii_oldmsg.MinY = w->TopEdge;
+                    amii_oldmsg.MaxX = w->Width;
+                    amii_oldmsg.MaxY = w->Height;
+                    SizeWindow(w,
+                               (amiIDisplay->xpix - w->LeftEdge) - w->Width,
+                               0);
+                }
             }
         }
     }
@@ -227,6 +227,10 @@ amii_destroy_nhwindow(winid win) /* just hide */
         WIN_MESSAGE = WIN_ERR;
     else if (win == WIN_INVEN)
         WIN_INVEN = WIN_ERR;
+    else if (win == WIN_OVER)
+        WIN_OVER = WIN_ERR;
+    else if (win == WIN_BASE)
+        WIN_BASE = WIN_ERR;
 }
 
 struct FillParams {
@@ -355,6 +359,9 @@ amii_create_nhwindow(int type)
             panic("no memory for msg port");
     }
 
+    if (type < 0 || type > NHW_OVER)
+        panic("bad type %d in create_nhwindow", type);
+
     nw = &new_wins[type].newwin;
     nw->Width = amiIDisplay->xpix;
     nw->Screen = HackScreen;
@@ -416,8 +423,13 @@ amii_create_nhwindow(int type)
         if (nw->Width >= amiIDisplay->xpix - nw->LeftEdge)
             nw->Width = amiIDisplay->xpix - nw->LeftEdge;
     } else if (WINVERS_AMIV && type == NHW_OVER) {
-        nw->Flags |= WINDOWSIZING | WINDOWDRAG | WINDOWCLOSE;
-        nw->IDCMPFlags |= CLOSEWINDOW;
+        /* No window-system gadgets: BORDERLESS means there is no border
+         * to attach close/size/drag gadgets to.  On some Kickstarts the
+         * phantom gadgets hit-test against unrelated input (selecting
+         * the overview and pressing ESC has been observed to destroy
+         * the window and crash the game).  SHIFT-HELP toggles the
+         * overview cleanly via delayed_key_action; that is the
+         * supported close path. */
         /* Bring up window as half the width of the message window, and make
          * the message window change to one half the width...
          */
@@ -906,7 +918,7 @@ amii_init_nhwindows(int *argcp, char **argv)
 
         for (t = 1; t <= lclargc; t++) {
             if (!strcmp("-L", *argv_in) || !strcmp("-l", *argv_in)) {
-                bigscreen = (*argv_in[1] == 'l') ? -1 : 1;
+                bigscreen = ((*argv_in)[1] == 'l') ? -1 : 1;
                 /* and eat the flag */
                 (*argcp)--;
             } else {
@@ -1087,9 +1099,9 @@ amii_init_nhwindows(int *argcp, char **argv)
     NewHackScreen.Width = max(WIDTH, amiIDisplay->xpix);
     NewHackScreen.Height = max(SCREENHEIGHT, amiIDisplay->ypix);
     {
-        static char fname[18];
-        sprintf(fname, "NetHack %d.%d.%d", VERSION_MAJOR, VERSION_MINOR,
-                PATCHLEVEL);
+        static char fname[32];
+        snprintf(fname, sizeof fname, "NetHack %d.%d.%d",
+                 VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
         NewHackScreen.DefaultTitle = fname;
     }
     if (IntuitionBase->LibNode.lib_Version >= 37) {
@@ -1114,12 +1126,16 @@ amii_init_nhwindows(int *argcp, char **argv)
             SM_FilterHook.h_Data = 0;
             SM_FilterHook.h_SubEntry = 0;
             SMR = AllocAslRequest(ASL_ScreenModeRequest, NULL);
-            if (AslRequestTags(SMR, ASLSM_FilterFunc, (ULONG) &SM_FilterHook,
-                               TAG_END))
-                amii_scrnmode = SMR->sm_DisplayID;
-            else
+            if (SMR) {
+                if (AslRequestTags(SMR, ASLSM_FilterFunc,
+                                   (ULONG) &SM_FilterHook, TAG_END))
+                    amii_scrnmode = SMR->sm_DisplayID;
+                else
+                    amii_scrnmode = 0;
+                FreeAslRequest(SMR);
+            } else {
                 amii_scrnmode = 0;
-            FreeAslRequest(SMR);
+            }
         }
 
         if (forcenobig == 0) {
@@ -1203,9 +1219,9 @@ amii_init_nhwindows(int *argcp, char **argv)
 
     if (WINVERS_AMIV) {
         extern char *tilefile;
-        if (amii_numcolors >= 32) {
+        if (amii_numcolors >= AMIV_PALETTE_SIZE) {
             tilefile = (char *) fqname("tiles/tiles32.iff", DATAPREFIX, 0);
-            amii_numcolors = 32;
+            amii_numcolors = AMIV_PALETTE_SIZE;
         } else {
             tilefile = (char *) fqname("tiles/tiles16.iff", DATAPREFIX, 0);
         }
@@ -1216,7 +1232,7 @@ amii_init_nhwindows(int *argcp, char **argv)
 
     /* Find out how deep the screen needs to be, 32 planes is enough! */
     for (i = 0; i < 32; ++i) {
-        if ((1L << i) >= amii_numcolors)
+        if ((1UL << i) >= (unsigned long) amii_numcolors)
             break;
     }
 
@@ -1240,7 +1256,12 @@ amii_init_nhwindows(int *argcp, char **argv)
         if (--NewHackScreen.Depth < 3)
             Abort(AN_OpenScreen & ~AT_DeadEnd);
     }
-    amii_numcolors = 1L << NewHackScreen.Depth;
+    amii_numcolors = 1UL << NewHackScreen.Depth;
+    {
+        int palmax = WINVERS_AMIV ? AMIV_PALETTE_SIZE : AMII_PALETTE_SIZE;
+        if (amii_numcolors > palmax)
+            amii_numcolors = palmax;
+    }
     if (HackScreen->Height > 300 && forcenobig == 0)
         bigscreen = 1;
     else
@@ -1526,7 +1547,6 @@ void
 amii_display_nhwindow(winid win, boolean blocking)
 {
     menu_item *mip;
-    int cnt;
     static int lastwin = -1;
     struct amii_WinDesc *cw;
 
@@ -1549,7 +1569,7 @@ amii_display_nhwindow(winid win, boolean blocking)
     }
 
     if (cw->type == NHW_MENU || cw->type == NHW_TEXT) {
-        cnt = DoMenuScroll(win, blocking, PICK_ONE, &mip);
+        (void) DoMenuScroll(win, blocking, PICK_ONE, &mip);
     } else if (cw->type == NHW_MAP) {
         amii_end_glyphout(win);
         /* Do more if it is time... */
@@ -1724,7 +1744,7 @@ amii_set_text_font(char *name, int size)
 
     /* Look for windows to set, and change them */
 
-    if (DiskfontBase = OpenLibrary("diskfont.library", amii_libvers)) {
+    if ((DiskfontBase = OpenLibrary("diskfont.library", amii_libvers))) {
         TextsFont = OpenDiskFont(&TextsFont13);
         for (i = 0; TextsFont && i < MAXWIN; ++i) {
             if ((cw = amii_wins[i]) && cw->win != NULL) {
@@ -1743,9 +1763,9 @@ amii_set_text_font(char *name, int size)
                 }
             }
         }
+        CloseLibrary(DiskfontBase);
+        DiskfontBase = NULL;
     }
-    CloseLibrary(DiskfontBase);
-    DiskfontBase = NULL;
 }
 
 void

@@ -29,7 +29,7 @@
 #include "func_tab.h"
 
 #ifndef CLIPPING
-CLIPPING must be defined for the AMIGA version
+#error "CLIPPING must be defined for the AMIGA version"
 #endif
 
 #undef LI

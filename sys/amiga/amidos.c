@@ -142,15 +142,7 @@ getlogin(void)
 long
 freediskspace(char *path)
 {
-#ifdef UNTESTED
-    /* these changes from Patric Mueller <bhaak@gmx.net> for AROS to
-     * handle larger disks.  Also needs limits.h and aros/oldprograms.h
-     * for AROS.  (keni)
-     */
-    unsigned long long freeBytes = 0;
-#else
     long freeBytes = 0;
-#endif
     struct InfoData *infoData; /* Remember... longword aligned */
     char fileName[32];
 
@@ -192,11 +184,6 @@ freediskspace(char *path)
                         infoData->id_NumBlocks - infoData->id_NumBlocksUsed;
                     freeBytes -= (freeBytes + EXTENSION) / (EXTENSION + 1);
                     freeBytes *= infoData->id_BytesPerBlock;
-#ifdef UNTESTED
-                    if (freeBytes > LONG_MAX) {
-                        freeBytes = LONG_MAX;
-                    }
-#endif
                 }
                 if (freeBytes < 0)
                     freeBytes = 0;
@@ -368,8 +355,11 @@ fopenp(const char *name, const char *mode)
                 return (NULL);
             lastch = *bp++ = *pp++;
         }
-        if (lastch != ':' && lastch != '/' && bp != buf)
+        if (lastch != ':' && lastch != '/' && bp != buf) {
+            if (bp >= buf + BUFSIZ - 2)
+                return (NULL);
             *bp++ = '/';
+        }
         if (bp + strlen(name) > buf + BUFSIZ - 1)
             return (NULL);
         strcpy(bp, name);

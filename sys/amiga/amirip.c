@@ -81,7 +81,7 @@ static struct NewWindow newwin = { 0, 0, 640, 200, 1, 0,
 
 int wh; /* was local in outrip, but needed for SCALE macro */
 
-int cmap_white, cmap_black;
+int cmap_outline, cmap_fill;
 
 void
 amii_outrip(winid tmpwin, int how, time_t when)
@@ -97,6 +97,16 @@ amii_outrip(winid tmpwin, int how, time_t when)
     long year;
 
     if (!WINVERS_AMIV || HackScreen->RastPort.BitMap->Depth < 4)
+        goto cleanup;
+
+    /* The graphical tombstone uses raw chipset-style palette twiddling
+     * (LoadRGB4, transpalette fade) and BltBitMap to a SMART_REFRESH
+     * window.  That works on the native chipset and AGA, but on RTG
+     * setups (Picasso96, CyberGraphX) the visible display is decoupled
+     * from the chipset registers and the tombstone never appears.
+     * Detect RTG by screen size beyond what chipset modes can reach
+     * and fall through to the plain ASCII tombstone instead. */
+    if (HackScreen->Width > 800 || HackScreen->Height > 600)
         goto cleanup;
 
     /* Use the users display size */
@@ -132,11 +142,11 @@ amii_outrip(winid tmpwin, int how, time_t when)
     for (i = 0; i < SIZE(cols); i++)
         cols[i] = cols_base[i] + xoff;
 
-    cmap_white = search_cmap(0, 0, 0);
-    cmap_black = search_cmap(15, 15, 15);
+    cmap_outline = search_cmap(0, 0, 0);
+    cmap_fill = search_cmap(15, 15, 15);
 
-    BltBitMap(tombimg, 0, 0, rp->BitMap, xoff, yoff, tomb_bmhd.w, tomb_bmhd.h,
-              0xc0, 0xff, NULL);
+    BltBitMapRastPort(tombimg, 0, 0, rp, xoff, yoff,
+                      tomb_bmhd.w, tomb_bmhd.h, 0xc0);
 
     /* Put together death description */
     formatkiller(buf, sizeof buf, how, FALSE);
@@ -254,8 +264,8 @@ cleanup:
         Forbid();
         while (imsg = (struct IntuiMessage *) GetMsg(ripwin->UserPort))
             ReplyMsg((struct Message *) imsg);
-        CloseWindow(ripwin);
         Permit();
+        CloseWindow(ripwin);
     }
     LoadRGB4(&HackScreen->ViewPort, sysflags.amii_curmap, amii_numcolors);
 
@@ -279,23 +289,23 @@ tomb_text(char *p)
     sprintf(buf, " %s ", p);
     l = TextLength(rp, buf, strlen(buf));
 
-    SetAPen(rp, cmap_white);
+    SetAPen(rp, cmap_outline);
     Move(rp, cols[cno] - (l / 2) - 1, tomb_line);
     Text(rp, buf, strlen(buf));
 
-    SetAPen(rp, cmap_white);
+    SetAPen(rp, cmap_outline);
     Move(rp, cols[cno] - (l / 2) + 1, tomb_line);
     Text(rp, buf, strlen(buf));
 
-    SetAPen(rp, cmap_white);
+    SetAPen(rp, cmap_outline);
     Move(rp, cols[cno] - (l / 2), tomb_line - 1);
     Text(rp, buf, strlen(buf));
 
-    SetAPen(rp, cmap_white);
+    SetAPen(rp, cmap_outline);
     Move(rp, cols[cno] - (l / 2), tomb_line + 1);
     Text(rp, buf, strlen(buf));
 
-    SetAPen(rp, cmap_black);
+    SetAPen(rp, cmap_fill);
     Move(rp, cols[cno] - (l / 2), tomb_line);
     Text(rp, buf, strlen(buf));
 }

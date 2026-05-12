@@ -21,8 +21,8 @@ struct IntuiText IText1 = { 3, 0, JAM1, 4, 1, NULL, (UBYTE *) "Cancel",
 struct Gadget Gadget2 = { NULL, 9, 15, 56, 10, NULL, RELVERIFY, BOOLGADGET,
                           (APTR) &Border1, NULL, &IText1, NULL, NULL, 1,
                           NULL };
-UBYTE StrStringSIBuff[300];
-struct StringInfo StrStringSInfo = { StrStringSIBuff, UNDOBUFFER, 0, 300, 0,
+UBYTE StrStringSIBuff[BUFSZ];
+struct StringInfo StrStringSInfo = { StrStringSIBuff, UNDOBUFFER, 0, BUFSZ, 0,
                                      0, 0, 0, 0, 0, 0, 0, NULL };
 SHORT BorderVectors2[] = { 0, 0, 439, 0, 439, 11, 0, 11, 0, 0 };
 struct Border Border2 = { -1, -1, 3, 0, JAM1, 5, BorderVectors2, NULL };
@@ -187,14 +187,23 @@ EditColor(void)
                         break;
                     }
 
-                    strcpy(oname, dirname((char *) configfile));
-                    if (oname[strlen(oname) - 1] != ':') {
-                        sprintf(nname, "%s/New_NetHack.cnf", oname);
-                        strcat(oname, "/");
-                        strcat(oname, "Old_NetHack.cnf");
-                    } else {
-                        sprintf(nname, "%sNew_NetHack.cnf", oname);
-                        strcat(oname, "Old_NetHack.cnf");
+                    {
+                        size_t olen;
+                        strncpy(oname, dirname((char *) configfile),
+                                sizeof(oname) - 1);
+                        oname[sizeof(oname) - 1] = '\0';
+                        olen = strlen(oname);
+                        if (olen > 0 && oname[olen - 1] != ':') {
+                            Snprintf(nname, sizeof nname,
+                                     "%s/New_NetHack.cnf", oname);
+                            Snprintf(oname + olen, sizeof(oname) - olen,
+                                     "/Old_NetHack.cnf");
+                        } else {
+                            Snprintf(nname, sizeof nname,
+                                     "%sNew_NetHack.cnf", oname);
+                            Snprintf(oname + olen, sizeof(oname) - olen,
+                                     "Old_NetHack.cnf");
+                        }
                     }
 
                     nfp = fopen(nname, "w");
@@ -506,20 +515,19 @@ EditClipping(void)
 char *
 dirname(char *str)
 {
-    char *t, c;
     static char dir[300];
+    char *t;
 
-    t = strrchr(str, '/');
+    strncpy(dir, str, sizeof(dir) - 1);
+    dir[sizeof(dir) - 1] = '\0';
+
+    t = strrchr(dir, '/');
     if (!t)
-        t = strrchr(str, ':');
-    if (!t) {
+        t = strrchr(dir, ':');
+    if (!t)
         dir[0] = '\0';
-    } else {
-        c = *t;
-        *t = 0;
-        strcpy(dir, str);
-        *t = c;
-    }
+    else
+        *t = '\0';
     return (dir);
 }
 
@@ -695,6 +703,9 @@ DispCol(struct Window *w, int idx, UWORD *colors)
 {
     char buf[50];
     char *colname, *defval;
+
+    if (idx < 0 || idx >= amii_numcolors)
+        return;
 
     if (WINVERS_AMIV) {
         colname = amiv_colnames[idx].name;

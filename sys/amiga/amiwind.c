@@ -19,7 +19,8 @@ static struct Message *GetFMsg(struct MsgPort *);
 static int BufferGetchar(void);
 void ProcessMessage(struct IntuiMessage *message);
 
-#define BufferQueueChar(ch) (KbdBuffer[KbdBuffered++] = (ch))
+#define BufferQueueChar(ch) \
+    do { if (KbdBuffered < KBDBUFFER) KbdBuffer[KbdBuffered++] = (ch); } while (0)
 
 struct Device *ConsoleDevice = NULL;
 
@@ -51,7 +52,7 @@ struct Library *DiskfontBase;
 
 #define KBDBUFFER 10
 static unsigned char KbdBuffer[KBDBUFFER];
-unsigned char KbdBuffered;
+int KbdBuffered;
 
 #ifdef HACKFONT
 
@@ -609,10 +610,10 @@ amii_cleanup(void)
         Forbid();
         while (msg = (struct IntuiMessage *) GetMsg(HackPort))
             ReplyMsg((struct Message *) msg);
+        Permit();
         kill_nhwindows(1);
         DeleteMsgPort(HackPort);
         HackPort = NULL;
-        Permit();
     }
 
     /* Close the screen, under v37 or greater it is a pub screen and there may

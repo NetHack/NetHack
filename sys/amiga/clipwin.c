@@ -197,7 +197,7 @@ static struct Gadget ClipXSIZE = {
 
 static struct PropInfo ClipClipYSIZESInfo = {
     AUTOKNOB + FREEHORIZ, /* PropInfo flags */
-    -25937, -1,           /* horizontal and vertical pot values */
+    39599, -1,            /* horizontal and vertical pot values */
     10922, -1,            /* horizontal and vertical body values */
 };
 

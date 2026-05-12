@@ -59,7 +59,7 @@ int amikbhit(void);
 int WindowGetchar(void);
 WETYPE WindowGetevent(void);
 void amii_cleanup(void);
-void Abort(long rc);
+void Abort(long rc) NORETURN;
 void CleanUp(void);
 void flush_glyph_buffer(struct Window *w);
 void amiga_print_glyph(winid window, int color_index, int glyph);
@@ -119,8 +119,6 @@ char amii_yn_function(const char *query, const char *resp, char def);
 void amii_display_file(const char *fn, boolean complain);
 void SetBorder(struct Gadget *gd);
 /* malloc/free provided by stdlib.h */
-
-void Abort(long rc);
 
 win_request_info *amii_ctrl_nhwindow(winid, int, win_request_info *);
 

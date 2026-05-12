@@ -62,12 +62,13 @@ xpmgetline(void)
     /* strip trailing <",> and whitespace */
     for (bp = xbuf; *bp; bp++)
         ;
-    bp--;
-    while (isspace((unsigned char)*bp))
+    if (bp > xbuf)
         bp--;
-    if (*bp == ',')
+    while (bp > xbuf && isspace((unsigned char)*bp))
         bp--;
-    if (*bp == '"')
+    if (bp > xbuf && *bp == ',')
+        bp--;
+    if (bp > xbuf && *bp == '"')
         bp--;
     bp++;
     *bp = '\0';
@@ -209,10 +210,19 @@ main(int argc, char **argv)
         return 1;
     }
 
+    if (XpmScreen.Colors < 1 || XpmScreen.Colors > 256) {
+        fprintf(stderr,
+                "xpm2iff_host: unsupported color count %d\n",
+                XpmScreen.Colors);
+        return 1;
+    }
+
     /* nplanes = ceil(log2(Colors)) */
     nplanes = 0;
     i = XpmScreen.Colors - 1;
     while (i > 0) { nplanes++; i >>= 1; }
+    if (nplanes == 0)
+        nplanes = 1;
 
     colors = 1 << nplanes;
 

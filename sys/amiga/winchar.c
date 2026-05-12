@@ -79,44 +79,68 @@ struct BitMap *tileimg, *tile;
 BitMapHeader
 ReadImageFile(const char *filename, struct BitMap **bmp)
 {
-    BitMapHeader *bmhd, bmhds;
+    BitMapHeader *bmhd, bmhds = { 0 };
     int j, np;
-    struct IFFHandle *iff;
+    long err;
+    struct IFFHandle *iff = NULL;
     struct StoredProperty *prop;
+    int iff_opened = 0;
+    const char *errfmt = NULL;
+    long errcode = 0;
 
     IFFParseBase = OpenLibrary("iffparse.library", 0L);
     if (!IFFParseBase)
         panic("No iffparse.library");
 
     iff = AllocIFF();
-    if (!iff)
-        panic("can't start IFF processing");
+    if (!iff) {
+        errfmt = "can't start IFF processing";
+        goto cleanup;
+    }
 
     iff->iff_Stream = Open(filename, MODE_OLDFILE);
-    if (iff->iff_Stream == 0)
-        panic("Can't open %s", filename);
+    if (iff->iff_Stream == 0) {
+        errfmt = "Can't open %s";
+        goto cleanup;
+    }
 
     InitIFFasDOS(iff);
-    OpenIFF(iff, IFFF_READ);
+    if ((err = OpenIFF(iff, IFFF_READ)) != 0) {
+        errfmt = "OpenIFF failed on %s, code %ld";
+        errcode = err;
+        goto cleanup;
+    }
+    iff_opened = 1;
+
     PropChunk(iff, ID_BMAP, ID_BMHD);
     PropChunk(iff, ID_BMAP, ID_CMAP);
     PropChunk(iff, ID_BMAP, ID_PDAT);
     StopChunk(iff, ID_BMAP, ID_PLNE);
-    if ((j = ParseIFF(iff, IFFPARSE_SCAN)) != 0)
-        panic("ParseIFF failed on %s, code %d",
-              filename, j);
+    if ((err = ParseIFF(iff, IFFPARSE_SCAN)) != 0) {
+        errfmt = "ParseIFF failed on %s, code %ld";
+        errcode = err;
+        goto cleanup;
+    }
 
     prop = FindProp(iff, ID_BMAP, ID_BMHD);
-    if (!prop)
-        panic("No BMHD chunk in %s", filename);
+    if (!prop) {
+        errfmt = "No BMHD chunk in %s";
+        goto cleanup;
+    }
     bmhd = (BitMapHeader *) prop->sp_Data;
     np = bmhd->nPlanes;
+
+    if (np > DEPTH) {
+        errfmt = "%s: too many bitplanes (code %ld)";
+        errcode = np;
+        goto cleanup;
+    }
 
     /* Load CMAP into palette arrays if present */
     prop = FindProp(iff, ID_BMAP, ID_CMAP);
     if (prop) {
         unsigned char *cmap = prop->sp_Data;
-        for (j = 0; j < (1L << np) * 3; j += 3) {
+        for (j = 0; j < (1UL << np) * 3; j += 3) {
             amii_initmap[j / 3] =
                 amiv_init_map[j / 3] =
                     ((cmap[j+0] >> 4) << 8)
@@ -132,18 +156,29 @@ ReadImageFile(const char *filename, struct BitMap **bmp)
 
     *bmp = MyAllocBitMap(bmhd->w, bmhd->h,
                 np, MEMF_CHIP | MEMF_CLEAR);
-    if (!*bmp)
-        panic("Can't allocate bitmap for %s", filename);
+    if (!*bmp) {
+        errfmt = "Can't allocate bitmap for %s";
+        goto cleanup;
+    }
 
     for (j = 0; j < np; j++)
         ReadChunkBytes(iff, (*bmp)->Planes[j],
                        RASSIZE(bmhd->w, bmhd->h));
 
     bmhds = *bmhd;
-    CloseIFF(iff);
-    Close(iff->iff_Stream);
-    FreeIFF(iff);
+
+cleanup:
+    if (iff_opened)
+        CloseIFF(iff);
+    if (iff && iff->iff_Stream)
+        Close(iff->iff_Stream);
+    if (iff)
+        FreeIFF(iff);
     CloseLibrary(IFFParseBase);
+    IFFParseBase = NULL;
+
+    if (errfmt)
+        panic(errfmt, filename, errcode);
 
     return bmhds;
 }
@@ -189,9 +224,15 @@ MyAllocBitMap(int xsize, int ysize, int depth, long mflags)
     if (!bm)
         return (NULL);
 
+    bm->mflags = mflags;
     bm->xsize = xsize;
     bm->ysize = ysize;
     InitBitMap(&bm->bm, depth, xsize, ysize);
+    /* InitBitMap does not zero Planes[]; if a later AllocRaster fails
+     * and MyFreeBitMap unwinds, the uninitialized entries above the
+     * failure would be passed to FreeRaster as garbage pointers. */
+    for (j = 0; j < (int) (sizeof bm->bm.Planes / sizeof bm->bm.Planes[0]); ++j)
+        bm->bm.Planes[j] = NULL;
     for (j = 0; j < depth; ++j) {
         if (mflags & MEMF_CHIP)
             bm->bm.Planes[j] = AllocRaster(xsize, ysize);
@@ -784,7 +825,7 @@ amii_lprint_glyph(winid window, int color_index, int glyph)
         /*
          * Add it to the end of the buffer
          */
-        amii_glyph_buffer[glyph_buffer_index++] = glyph;
+        amii_glyph_buffer[glyph_buffer_index++] = (char) glyph;
         amii_g_nodes[glyph_node_index - 1].len++;
     } else {
         /* See if we're out of glyph nodes */

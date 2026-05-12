@@ -32,8 +32,7 @@ amii_start_menu(winid window, unsigned long mbehavior UNUSED)
         cw->data = NULL;
     }
 
-    for (mip = cw->menu.items, i = 0;
-         (mip = cw->menu.items) && i < cw->menu.count; ++i) {
+    while ((mip = cw->menu.items) != NULL) {
         cw->menu.items = mip->next;
         free(mip);
     }
@@ -149,11 +148,13 @@ amii_end_menu(winid window, const char *morestr)
         cw->menu.last->next = cw->menu.items;
         cw->menu.items = cw->menu.last;
         cw->menu.last = mip;
-        t = cw->data[cw->cury - 1];
-        for (i = cw->cury - 1; i > 0; i--) {
-            cw->data[i] = cw->data[i - 1];
+        if (cw->cury > 0) {
+            t = cw->data[cw->cury - 1];
+            for (i = cw->cury - 1; i > 0; i--) {
+                cw->data[i] = cw->data[i - 1];
+            }
+            cw->data[0] = t;
         }
-        cw->data[0] = t;
 #endif
     }
 
@@ -190,6 +191,8 @@ amii_menu_item *
 find_menu_item(struct amii_WinDesc *cw, int idx)
 {
     amii_menu_item *mip;
+    if (idx < 0)
+        return NULL;
     for (mip = cw->menu.items; idx > 0 && mip; mip = mip->next)
         --idx;
 
@@ -336,7 +339,8 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
         nw->Screen = HackScreen;
 
         if (win == WIN_INVEN) {
-            sprintf(title, "%s the %s's Inventory", svp.plname, svp.pl_character);
+            Snprintf(title, sizeof title, "%s the %s's Inventory",
+                     svp.plname, svp.pl_character);
             nw->Title = title;
             if (lastinvent.MaxX != 0) {
                 nw->LeftEdge = lastinvent.MinX;
@@ -606,7 +610,8 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                     if (how == PICK_ANY) {
                         amip = cw->menu.items;
                         while (amip) {
-                            if (amip->selected) {
+                            if (amip->canselect && amip->selector
+                                && amip->selected) {
                                 amip->selected = FALSE;
                                 amip->count = -1;
                                 amip->str[SOFF + 2] = '-';
@@ -738,8 +743,9 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                         } else {
                             reset_counting = TRUE;
                         }
-                        sprintf(countString, "Count: %d", count);
-                        pline(countString);
+                        Snprintf(countString, sizeof countString,
+                                 "Count: %ld", count);
+                        pline("%s", countString);
                     }
                 } else if (code == CTRL('D') || code == CTRL('U')
                            || code == MENU_NEXT_PAGE
@@ -761,7 +767,7 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                     if (code == MENU_FIRST_PAGE) {
                         topidx = 0;
                     } else if (code == MENU_LAST_PAGE) {
-                        topidx = cw->maxrow - wheight;
+                        topidx = max(0, cw->maxrow - wheight);
                     } else
                         for (i = 0; i < endcnt; ++i) {
                             if (code == CTRL('D') || code == MENU_NEXT_PAGE) {
@@ -851,6 +857,8 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                 } else {
                     int selected = FALSE;
                     for (amip = cw->menu.items; amip; amip = amip->next) {
+                        if (!amip->canselect)
+                            continue;
                         if (amip->selector == code) {
                             if (how == PICK_ONE)
                                 aredone = 1;
@@ -905,6 +913,8 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                     aredone = 1;
                 for (gd = w->FirstGadget; gd && gd->GadgetID != 1;)
                     gd = gd->NextGadget;
+                if (!gd)
+                    break;
 
                 pip = (struct PropInfo *) gd->SpecialInfo;
                 totalvis = CountLines(win);
@@ -917,6 +927,8 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
             case MOUSEMOVE:
                 for (gd = w->FirstGadget; gd && gd->GadgetID != 1;)
                     gd = gd->NextGadget;
+                if (!gd)
+                    break;
 
                 pip = (struct PropInfo *) gd->SpecialInfo;
                 totalvis = CountLines(win);
