@@ -1,0 +1,31 @@
+# NetHack 5.0 - Atari ST/TT/Falcon Configuration
+#
+# Directory paths (relative to the game directory)
+HACKDIR=.
+LEVELDIR=levels
+SAVEDIR=save
+
+# Tile mode.  Use ascii_map for the character map instead (F2 toggles
+# between tiles and ASCII at runtime).
+OPTIONS=!ascii_map
+
+# General options
+OPTIONS=color,hilite_pet,number_pad
+OPTIONS=!tutorial
+
+# Autopickup: gold, scrolls, potions, wands, rings, amulets, spellbooks.
+OPTIONS=autopickup,pickup_thrown
+OPTIONS=pickup_types:$?!/="+
+
+# Menu colors: highlight blessed/cursed status in inventory listings.
+# Anchored with leading spaces so 'uncursed' doesn't match 'cursed'.
+OPTIONS=menucolors
+MENUCOLOR=" cursed "=red&bold
+MENUCOLOR=" blessed "=cyan
+MENUCOLOR=" uncursed "=black
+MENUCOLOR=" holy water"=cyan
+MENUCOLOR=" unholy water"=red&bold
+# Worn / wielded gear stands out in the inventory list.
+MENUCOLOR=" \\(being worn\\)$"=green
+MENUCOLOR=" \\(weapon in hand\\)$"=green
+MENUCOLOR=" \\(wielded\\)$"=green

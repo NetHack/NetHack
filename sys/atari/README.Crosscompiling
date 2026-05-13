@@ -1,0 +1,121 @@
+              Cross-compiling NetHack 5.0 for Atari ST/TT/Falcon
+              ===================================================
+
+This document covers the Atari-specific bits of cross-compiling
+NetHack 5.0 from a Linux host.  See the top-level Cross-compiling
+document for the general theory of NetHack's cross-build (HOST
+vs TARGET, the five-step build, etc.).
+
+Cross-compiler used:     Thorsten Otto's m68k-atari-mint-gcc
+Cross-compiler url:      https://tho-otto.de/crossmint.php
+Author of 5.0 support:   Ingo Paschke
+
+
+Toolchain
+---------
+
+The cross-compiler and its supporting libraries are distributed
+as binary tarballs from tho-otto.de.  There are no apt/yum
+packages -- you download the .tar.xz / .tar.bz2 archives and
+extract them at the host root '/'.  Files land under
+/usr/m68k-atari-mint and /usr/lib/gcc/m68k-atari-mint and can
+be uninstalled by removing those directories.
+
+Toolchain components (gcc 14.x or newer recommended; versions
+4.6 through 15.2 are available):
+
+    gcc-<version>-mint-bin-linux64.tar.xz
+    binutils-<version>-mint-bin-linux64.tar.xz
+    mintlib-<version>-mint-bin-linux64.tar.xz
+
+Install at the host root:
+
+    cd /
+    sudo tar xJf gcc-<version>-mint-bin-linux64.tar.xz
+    sudo tar xJf binutils-<version>-mint-bin-linux64.tar.xz
+    sudo tar xJf mintlib-<version>-mint-bin-linux64.tar.xz
+
+
+Additional libraries
+--------------------
+
+The Atari build requires three additional libraries on top of
+the toolchain.  Each is distributed as a tarball that extracts
+into the cross-mint sysroot.
+
+  Math: fdlibm
+    https://tho-otto.de/snapshots/fdlibm/
+    Replaces MiNTLib's libm.a, which has a multiple-definition
+    flaw in 'xcpt' that would otherwise require
+    -Wl,--allow-multiple-definition at link time.
+
+  GEM AES/VDI bindings: gemlib
+    https://tho-otto.de/snapshots/gemlib/
+    Provides libgem.a and gem.h.
+
+Install both at the cross-mint sysroot:
+
+    cd /usr/m68k-atari-mint/sys-root
+    sudo tar xjf <path>/fdlibm-<version>-mint.tar.bz2
+    sudo tar xjf <path>/gemlib-<version>-mint.tar.bz2
+
+  GEM UI toolkit: E_GEM 2.2
+    https://github.com/ingpaschke/EGEM_220
+    Provides libe_gem.a and e_gem.h -- windows, dialogs,
+    popups, sliders, drag-and-drop, XAcc/AV protocols.  The
+    makefile has no install target; build and copy by hand:
+
+        git clone https://github.com/ingpaschke/EGEM_220.git
+        cd EGEM_220/source
+        make -f makefile.gcc
+        sudo cp libe_gem.a /usr/m68k-atari-mint/sys-root/usr/lib/
+        sudo cp e_gem.h    /usr/m68k-atari-mint/sys-root/usr/include/
+
+
+Host build prerequisites
+------------------------
+
+    sudo apt install make perl zip
+
+
+Building
+--------
+
+On your Linux host, from the top of the NetHack source tree:
+
+    sys/unix/setup.sh sys/unix/hints/linux.500
+    make fetch-lua
+    make CROSS_TO_ATARI=1 all
+    make CROSS_TO_ATARI=1 package
+
+The 'CROSS_TO_ATARI=1' flag activates the Atari hints under
+sys/unix/hints/include/cross-*.500, which override TARGET_CC,
+TARGET_AR, TARGET_LINK, TARGET_CFLAGS, TARGET_LFLAGS, and the
+source/object lists.  The build produces:
+
+    targets/atari/nethack.prg       Atari 68000 m68k-atari-mint
+                                    GEM application
+    targets/atari/NH500ST.ZIP       Packaged self-contained game
+                                    directory (~3 MB) ready to
+                                    unzip on the Atari side.
+
+ZIP contents are documented in sys/atari/README.tos.
+
+
+Notes
+-----
+
+  - The cross-build only touches sys/atari/ and win/gem/ plus a
+    handful of small #ifdef-guarded additions in the shared core
+    (include/extern.h, include/global.h, include/winprocs.h,
+    src/{files,mdlib,save,windows}.c, sys/share/pcmain.c).  The
+    cross-build hints live in sys/unix/hints/include/cross-pre1.500,
+    cross-pre2.500, and cross-post.500.
+
+  - The host-side tools bmp2img_host and img2mono_host are built
+    with the host's native compiler and run on the host to convert
+    nhtiles.bmp into the three IMG tile sheets (NH16.IMG, NH32.IMG,
+    NH2.IMG) that ship in the package.
+
+  - For playing the game and end-user configuration, see
+    sys/atari/README.tos.
