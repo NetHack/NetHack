@@ -172,6 +172,10 @@ typedef uchar nhsym;
 #include "windconf.h"
 #endif
 
+#ifdef TOS
+#include "tosconf.h"
+#endif
+
 #include "warnings.h"
 
 /* amiconf.h needs to be the last nested #include of config.h because

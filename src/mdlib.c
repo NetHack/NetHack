@@ -146,6 +146,9 @@ static struct win_information window_opts[] = {
     { "amii", "Amiga Intuition (text)", TRUE },
     { "amiv", "Amiga Intuition (tiles)", TRUE },
 #endif
+#ifdef GEM_GRAPHICS
+    { "Gem", "Atari ST GEM", TRUE },
+#endif
 
 #if 0  /* remainder have been retired */
 #ifdef GNOME_GRAPHICS /* unmaintained/defunct */
@@ -153,9 +156,6 @@ static struct win_information window_opts[] = {
 #endif
 #ifdef MACOS9 /* defunct OS 9 interface */
     { "mac", "Mac", TRUE },
-#endif
-#ifdef GEM_GRAPHICS /* defunct Atari interface */
-    { "Gem", "Gem", TRUE },
 #endif
 #ifdef BEOS_GRAPHICS /* unmaintained/defunct */
     { "BeOS", "BeOS InterfaceKit", TRUE },
