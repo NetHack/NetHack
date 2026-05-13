@@ -412,6 +412,9 @@ short Inv_how;
 char **text_lines;
 short *text_line_glyph;     /* parallel array: tile-idx per line, or no_glyph */
 short num_text_lines = 0, text_width;
+/* scratch output buffer for v_set_text; NVDI/EmuTOS dereferences this,
+   stock TOS tolerates NULL but other VDI implementations bus-error. */
+static short vst_out[4];
 NHGEM_FONT text_font;
 short use_rip = FALSE;
 extern char **rip_line;
@@ -826,7 +829,7 @@ win_draw_map(short msg, WIN *win, GRECT *area)
                      - win->work.g_y) / map_font.ch
                     + scroll_map.vpos,
                     ROWNO);
-        v_set_text(map_font.id, map_font.size, WHITE, 0, 0, NULL);
+        v_set_text(map_font.id, map_font.size, WHITE, 0, 0, vst_out);
         v_set_mode(MD_TRANS);
 
         x = win->work.g_x - scroll_map.px_hpos + start * map_font.cw;
@@ -927,7 +930,7 @@ draw_lines(PARMBLK *pb)
                                                                   : MD_TRANS);
 
         /* void v_set_text(short font,short height,short color,short effect,short mode,short out[4]) */
-        v_set_text(text_font.id, text_font.size, BLACK, 0, 0, NULL);
+        v_set_text(text_font.id, text_font.size, BLACK, 0, 0, vst_out);
         start_line /= text_font.ch;
         y += start_line * text_font.ch;
         x -= (short) scroll_menu.px_hpos;
@@ -961,9 +964,9 @@ draw_lines(PARMBLK *pb)
                 }
             }
             if (**ptr - 1) {
-                v_set_text(FAIL, 0, BLUE, 0, 0, NULL);
+                v_set_text(FAIL, 0, BLUE, 0, 0, vst_out);
                 (*v_mtext)(x_handle, x + text_x_off, y, (*ptr++) + 1);
-                v_set_text(FAIL, 0, BLACK, 0, 0, NULL);
+                v_set_text(FAIL, 0, BLACK, 0, 0, vst_out);
             } else
                 (*v_mtext)(x_handle, x + text_x_off, y, (*ptr++) + 1);
         }
@@ -997,9 +1000,9 @@ draw_rip(PARMBLK *pb)
             area.g_y = y;
             my_clear_area(&area);
             if (**ptr - 1) {
-                v_set_text(FAIL, 0, BLUE, 0, 0, NULL);
+                v_set_text(FAIL, 0, BLUE, 0, 0, vst_out);
                 (*v_mtext)(x_handle, x, y, (*ptr++) + 1);
-                v_set_text(FAIL, 0, BLACK, 0, 0, NULL);
+                v_set_text(FAIL, 0, BLACK, 0, 0, vst_out);
             } else
                 (*v_mtext)(x_handle, x, y, (*ptr++) + 1);
         }
@@ -1050,7 +1053,7 @@ draw_msgline(PARMBLK *pb)
         v_set_mode(MD_REPLACE);
 
         /* void v_set_text(short font,short height,short color,short effect,short mode,short out[4]) */
-        v_set_text(msg_font.id, msg_font.size, FAIL, 0, 0, NULL);
+        v_set_text(msg_font.id, msg_font.size, FAIL, 0, 0, vst_out);
         vst_alignment(x_handle, 0, 5, &sa_foo, &sa_foo);
         stopy = min(msg_pos, msg_vis);
         /*		Vsync();*/
@@ -1063,9 +1066,9 @@ draw_msgline(PARMBLK *pb)
         x += startx * msg_font.cw;
         for (i = 0; i < stopy; i++, y -= msg_font.ch, ptr--) {
             if (message_age[msg_pos - i])
-                v_set_text(FAIL, 0, pen_black, 0, 0, NULL);
+                v_set_text(FAIL, 0, pen_black, 0, 0, vst_out);
             else
-                v_set_text(FAIL, 0, pen_darkgray, 0, 0, NULL);
+                v_set_text(FAIL, 0, pen_darkgray, 0, 0, vst_out);
             tmp = (*ptr)[stopx];
             (*ptr)[stopx] = 0;
             (*v_mtext)(x_handle, x, y, &(*ptr)[startx]);
@@ -1088,7 +1091,7 @@ draw_status(PARMBLK *pb)
 
         /* void v_set_text(short font,short height,short color,short effect,short mode,short out[4]) */
         v_set_mode(MD_REPLACE);
-        v_set_text(status_font.id, status_font.size, BLACK, 0, 0, NULL);
+        v_set_text(status_font.id, status_font.size, BLACK, 0, 0, vst_out);
         x = (x + 2 * status_font.cw + 6) & ~7;
 
         startx = (area.g_x - x) / status_font.cw;
@@ -1126,7 +1129,7 @@ draw_inventory(PARMBLK *pb)
         Gem_menu_item *it;
 
         v_set_mode(MD_REPLACE);
-        v_set_text(menu_font.id, menu_font.size, BLACK, 0, 0, NULL);
+        v_set_text(menu_font.id, menu_font.size, BLACK, 0, 0, vst_out);
 
         start_line /= menu_font.ch;
         y += start_line * menu_font.ch;
@@ -1155,7 +1158,7 @@ draw_inventory(PARMBLK *pb)
                 pen = BLUE;
             else
                 pen = BLACK;
-            v_set_text(FAIL, FALSE, pen, 0, 0, NULL);
+            v_set_text(FAIL, FALSE, pen, 0, 0, vst_out);
 
             area.g_y = y;
             my_clear_area(&area);
@@ -1784,7 +1787,7 @@ mar_set_accelerators()
 
     for (curr = invent_list; curr; curr = curr->Gmi_next) {
         short extent[8];
-        v_set_text(menu_font.id, menu_font.size, BLACK, 0, 0, NULL);
+        v_set_text(menu_font.id, menu_font.size, BLACK, 0, 0, vst_out);
         vqt_extent(x_handle, curr->Gmi_str, extent);
         Max(&Inv_width, extent[4] + Tile_width + menu_font.cw);
         if (ch && curr->Gmi_accelerator == 0 && curr->Gmi_identifier) {
@@ -2555,7 +2558,7 @@ mar_display_nhwindow(winid wind)
             ub_lines.ub_code = draw_lines;
         z_ob[LINESLIST].ob_spec.userblk = &ub_lines;
         width = 16;
-        v_set_text(text_font.id, text_font.size, BLACK, 0, 0, NULL);
+        v_set_text(text_font.id, text_font.size, BLACK, 0, 0, vst_out);
         for (i = 0; i < num_text_lines; i++) {
             short eout[8];
             vqt_extent(x_handle, text_lines[i], eout);
