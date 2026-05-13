@@ -1,5 +1,4 @@
-/* NetHack 3.6	gr_rect.c	$NHDT-Date: 1432512810 2015/05/25 00:13:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
- */
+/* NetHack 5.0	gr_rect.c	$NHDT-Date: 1432512810 2015/05/25 00:13:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
 /* Copyright (c) Christian Bressler, 2001 */
 /* NetHack may be freely redistributed.  See license for details. */
 /* This is an almost exact copy of qt_clust.cpp */
@@ -26,17 +25,17 @@ new_dirty_rect(int size)
     return (new);
 }
 void
-delete_dirty_rect(dirty_rect *this)
+delete_dirty_rect(dirty_rect *dr)
 {
-    if (this == NULL)
+    if (dr == NULL)
         return;
-    if (this->rects)
-        free(this->rects);
+    if (dr->rects)
+        free(dr->rects);
     /* In case the Pointer is reused wrongly */
-    this->rects = NULL;
-    this->max = 0;
-    this->used = 0;
-    free(this);
+    dr->rects = NULL;
+    dr->max = 0;
+    dr->used = 0;
+    free(dr);
 }
 static int gc_inside(GRECT *frame, GRECT *test);
 static int gc_touch(GRECT *frame, GRECT *test);
@@ -84,9 +83,9 @@ add_dirty_rect(dirty_rect *dr, GRECT *area)
         dr->rects[dr->used++] = *area;
         return (TRUE);
     }
-    // Do cheapest of:
-    // 	add to closest cluster
-    // 	do cheapest cluster merge, add to new cluster
+    /* Do cheapest of:
+       add to closest cluster
+       do cheapest cluster merge, add to new cluster */
     lowestcost = 9999999L;
     cheapest = -1;
     for (cursor = 0; cursor < dr->used; cursor++) {
@@ -105,8 +104,8 @@ add_dirty_rect(dirty_rect *dr, GRECT *area)
             }
         }
     }
-    // XXX could make an heuristic guess as to whether we
-    // XXX need to bother looking for a cheap merge.
+    /* could make a heuristic guess as to whether we
+       need to bother looking for a cheap merge */
     for (merge1 = 0; merge1 < dr->used; merge1++) {
         for (merge2 = 0; merge2 < dr->used; merge2++) {
             if (merge1 != merge2) {
@@ -118,7 +117,8 @@ add_dirty_rect(dirty_rect *dr, GRECT *area)
                 if (cost < lowestcost) {
                     int bad = FALSE, c;
                     for (c = 0; c < dr->used && !bad; c++) {
-                        bad = gc_touch(&dr->rects[c], &larger) && c != cursor;
+                        bad = gc_touch(&dr->rects[c], &larger)
+                              && c != merge1 && c != merge2;
                     }
                     if (!bad) {
                         cheapestmerge1 = merge1;
@@ -136,10 +136,10 @@ add_dirty_rect(dirty_rect *dr, GRECT *area)
     } else {
         gc_combine(&dr->rects[cheapest], area);
     }
-    // NB: clusters do not intersect (or intersection will
-    //	 overwrite).  This is a result of the above algorithm,
-    //	 given the assumption that (x,y) are ordered topleft
-    //	 to bottomright.
+    /* NB: clusters do not intersect (or intersection will
+       overwrite).  This is a result of the above algorithm,
+       given the assumption that (x,y) are ordered topleft
+       to bottomright. */
     return (TRUE);
 }
 int
@@ -157,11 +157,6 @@ clear_dirty_rect(dirty_rect *dr)
     if (dr)
         dr->used = 0;
     return (TRUE);
-}
-int
-resize_dirty_rect(dirty_rect *dr, int new_size)
-{
-    return (FALSE);
 }
 static int
 gc_inside(GRECT *frame, GRECT *test)

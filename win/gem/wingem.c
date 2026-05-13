@@ -1,4 +1,4 @@
-/* NetHack 3.6	wingem.c	$NHDT-Date: 1450453304 2015/12/18 15:41:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.26 $ */
+/* NetHack 5.0	wingem.c	$NHDT-Date: 1450453304 2015/12/18 15:41:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) Christian Bressler, 1999 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,33 +16,33 @@
 #include "wingem.h"
 
 static char nullstr[] = "", winpanicstr[] = "Bad window id %d";
-static int curr_status_line;
+static short curr_status_line;
 
 static char *copy_of(const char *);
 static void bail(const char *); /* __attribute__((noreturn)) */
 
-extern int mar_set_tile_mode(int);
-extern void mar_set_font(int, const char *, int);
-extern void mar_set_margin(int);
-extern void mar_set_msg_visible(int);
-extern void mar_set_status_align(int);
-extern void mar_set_msg_align(int);
+extern short mar_set_tile_mode(short);
+extern void mar_set_font(short, const char *, short);
+extern void mar_set_margin(short);
+extern void mar_set_msg_visible(short);
+extern void mar_set_status_align(short);
+extern void mar_set_msg_align(short);
 extern void mar_set_tilefile(char *);
-extern void mar_set_tilex(int);
-extern void mar_set_tiley(int);
-extern short glyph2tile[MAX_GLYPH];      /* from tile.c */
+extern void mar_set_tilex(short);
+extern void mar_set_tiley(short);
 extern void mar_display_nhwindow(winid); /* from wingem1.c */
 
 void Gem_outrip(winid, int, time_t);
 void Gem_preference_update(const char *);
 /* Interface definition, for windows.c */
 struct window_procs Gem_procs = {
-    "Gem",
+    WPID(Gem),
     WC_COLOR | WC_HILITE_PET | WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_INVERSE
         | WC_SCROLL_MARGIN | WC_FONT_MESSAGE | WC_FONT_STATUS | WC_FONT_MENU
         | WC_FONT_TEXT | WC_FONT_MAP | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_STATUS
         | WC_FONTSIZ_MENU | WC_FONTSIZ_TEXT | WC_FONTSIZ_MAP | WC_TILE_WIDTH
-        | WC_TILE_HEIGHT | WC_TILE_FILE | WC_VARY_MSGCOUNT | WC_ASCII_MAP,
+        | WC_TILE_HEIGHT | WC_TILE_FILE | WC_VARY_MSGCOUNT
+        | WC_ASCII_MAP | WC_TILED_MAP,
     0L,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
     Gem_init_nhwindows, Gem_player_selection, Gem_askname,
@@ -50,8 +50,8 @@ struct window_procs Gem_procs = {
     Gem_resume_nhwindows, Gem_create_nhwindow, Gem_clear_nhwindow,
     Gem_display_nhwindow, Gem_destroy_nhwindow, Gem_curs, Gem_putstr,
     genl_putmixed, Gem_display_file, Gem_start_menu, Gem_add_menu,
-    Gem_end_menu, Gem_select_menu, genl_message_menu, Gem_update_inventory,
-    Gem_mark_synch, Gem_wait_synch,
+    Gem_end_menu, Gem_select_menu, genl_message_menu, Gem_mark_synch,
+    Gem_wait_synch,
 #ifdef CLIPPING
     Gem_cliparound,
 #endif
@@ -63,37 +63,25 @@ struct window_procs Gem_procs = {
     Gem_getlin, Gem_get_ext_cmd, Gem_number_pad, Gem_delay_output,
 #ifdef CHANGE_COLOR /* the Mac uses a palette device */
     Gem_change_color,
-#ifdef MACOS9
+#ifdef MAC
     Gem_change_background, Gem_set_font_name,
 #endif
     Gem_get_color_string,
 #endif
 
     Gem_outrip, Gem_preference_update,
-    genl_getmsghistory, genl_putmsghistory
-                            genl_status_init,
+    genl_getmsghistory, genl_putmsghistory,
+    genl_status_init,
     genl_status_finish, genl_status_enablefield, genl_status_update,
     genl_can_suspend_no,
+    Gem_update_inventory,
+    Gem_ctrl_nhwindow,
 };
 
-#ifdef MACOS9
-void *
-Gem_change_background(dummy)
-int dummy;
-{
-}
 
-short *
-Gem_set_font_name(foo, bar)
-winid foo;
-char *bar;
-{
-}
-#endif
+/*************************** Procedures *************************************/
 
-/*************************** Proceduren *************************************/
-
-int
+short
 mar_hp_query(void)
 {
     if (Upolyd)
@@ -101,27 +89,26 @@ mar_hp_query(void)
     return (u.uhp ? u.uhpmax / u.uhp : -1);
 }
 
-int
-mar_iflags_numpad()
+short
+mar_iflags_numpad(void)
 {
     return (iflags.num_pad ? 1 : 0);
 }
 
-int
-mar_get_msg_history()
+short
+mar_get_msg_history(void)
 {
     return (iflags.msg_history);
 }
 
-int
-mar_get_msg_visible()
+short
+mar_get_msg_visible(void)
 {
     return (iflags.wc_vary_msgcount);
 }
 /* clean up and quit */
 static void
-bail(mesg)
-const char *mesg;
+bail(const char *mesg)
 {
     clearlocks();
     Gem_exit_nhwindows(mesg);
@@ -129,7 +116,6 @@ const char *mesg;
     /*NOTREACHED*/
 }
 
-/*$$$*/
 #define DEF_CLIPAROUND_MARGIN -1
 #ifndef TILE_X
 #define TILE_X 16
@@ -139,14 +125,12 @@ const char *mesg;
 #define NHFONT_DEFAULT_SIZE 10
 #define NHFONT_SIZE_MIN 3
 #define NHFONT_SIZE_MAX 20
-/*$$$*/
 /*ARGSUSED*/
 void
-Gem_init_nhwindows(argcp, argv)
-int *argcp;
-char **argv;
+Gem_init_nhwindows(int *argcp, char **argv)
 {
-    argv = argv, argcp = argcp;
+    nhUse(argcp);
+    nhUse(argv);
     colors_changed = TRUE;
 
     set_wc_option_mod_status(WC_ALIGN_MESSAGE | WC_ALIGN_STATUS
@@ -174,7 +158,7 @@ char **argv;
     if (iflags.wc_vary_msgcount == 0)
         iflags.wc_vary_msgcount = 3;
     mar_set_tile_mode(
-        !iflags.wc_ascii_map); /* MAR -- 17.Mar 2002 True is tiles */
+        !iflags.wc_ascii_map); /* True is tiles */
     mar_set_tilex(iflags.wc_tile_width);
     mar_set_tiley(iflags.wc_tile_height);
     mar_set_msg_align(iflags.wc_align_message - ALIGN_BOTTOM);
@@ -185,7 +169,7 @@ char **argv;
     }
     iflags.window_inited = TRUE;
 
-    CO = 80; /* MAR -- whatsoever */
+    CO = 80;
     LI = 25;
 
     add_menu_cmd_alias(' ', MENU_NEXT_PAGE);
@@ -193,9 +177,9 @@ char **argv;
 }
 
 void
-Gem_player_selection()
+Gem_player_selection(void)
 {
-    int i, k, n;
+    short i, k, n;
     char pick4u = 'n', pbuf[QBUFSZ], lastch = 0, currch;
     winid win;
     anything any;
@@ -208,12 +192,10 @@ Gem_player_selection()
     if (!flags.randomall
         && (flags.initrole == ROLE_NONE || flags.initrace == ROLE_NONE
             || flags.initgend == ROLE_NONE || flags.initalign == ROLE_NONE)) {
-        /*		pick4u = yn_function("Shall I pick a character for you?
-         * [ynq]",ynqchars,'n');*/
         pick4u = yn_function(build_plselection_prompt(
                                  pbuf, QBUFSZ, flags.initrole, flags.initrace,
                                  flags.initgend, flags.initalign),
-                             ynqchars, 'n');
+                             ynqchars, 'n', TRUE);
         if (pick4u == 'q') {
         give_up: /* Just quit */
             if (selected)
@@ -245,12 +227,15 @@ Gem_player_selection()
             for (i = 0; roles[i].name.m; i++) {
                 if (ok_role(i, flags.initrace, flags.initgend,
                             flags.initalign)) {
+                    glyph_info gi;
+                    int glyph = monnum_to_glyph(roles[i].mnum, MALE);
+                    map_glyphinfo(0, 0, glyph, 0, &gi);
                     any.a_int = i + 1; /* must be non-zero */
                     currch = lowc(roles[i].name.m[0]);
                     if (currch == lastch)
                         currch = highc(currch);
-                    add_menu(win, roles[i].mnum, &any, currch, 0, ATR_NONE,
-                             an(roles[i].name.m), MENU_ITEMFLAGS_NONE);
+                    add_menu(win, &gi, &any, currch, 0, ATR_NONE,
+                             NO_COLOR, an(roles[i].name.m), MENU_ITEMFLAGS_NONE);
                     lastch = currch;
                 }
             }
@@ -258,11 +243,11 @@ Gem_player_selection()
                                   flags.initalign, PICK_RANDOM) + 1;
             if (any.a_int == 0) /* must be non-zero */
                 any.a_int = randrole(FALSE) + 1;
-            add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR,
+                     "Random", MENU_ITEMFLAGS_NONE);
             any.a_int = i + 1; /* must be non-zero */
-            add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(win, &nul_glyphinfo, &any, 'q', 0, ATR_NONE, NO_COLOR,
+                     "Quit", MENU_ITEMFLAGS_NONE);
             end_menu(win, "Pick a role");
             n = select_menu(win, PICK_ONE, &selected);
             destroy_nhwindow(win);
@@ -317,19 +302,22 @@ Gem_player_selection()
                 for (i = 0; races[i].noun; i++)
                     if (ok_race(flags.initrole, i, flags.initgend,
                                 flags.initalign)) {
+                        glyph_info gi;
+                        int glyph = monnum_to_glyph(races[i].mnum, MALE);
+                        map_glyphinfo(0, 0, glyph, 0, &gi);
                         any.a_int = i + 1; /* must be non-zero */
-                        add_menu(win, NO_GLYPH, &any, races[i].noun[0], 0,
-                                 ATR_NONE, races[i].noun, MENU_ITEMFLAGS_NONE);
+                        add_menu(win, &gi, &any, races[i].noun[0], 0,
+                                 ATR_NONE, NO_COLOR, races[i].noun, MENU_ITEMFLAGS_NONE);
                     }
                 any.a_int = pick_race(flags.initrole, flags.initgend,
                                       flags.initalign, PICK_RANDOM) + 1;
                 if (any.a_int == 0) /* must be non-zero */
                     any.a_int = randrace(flags.initrole) + 1;
-                add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR,
+                         "Random", MENU_ITEMFLAGS_NONE);
                 any.a_int = i + 1; /* must be non-zero */
-                add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, 'q', 0, ATR_NONE, NO_COLOR,
+                         "Quit", MENU_ITEMFLAGS_NONE);
                 Sprintf(pbuf, "Pick the race of your %s",
                         roles[flags.initrole].name.m);
                 end_menu(win, pbuf);
@@ -386,19 +374,24 @@ Gem_player_selection()
                 for (i = 0; i < ROLE_GENDERS; i++)
                     if (ok_gend(flags.initrole, flags.initrace, i,
                                 flags.initalign)) {
+                        glyph_info gi;
+                        int glyph = monnum_to_glyph(
+                            roles[flags.initrole].mnum,
+                            i == 0 ? MALE : FEMALE);
+                        map_glyphinfo(0, 0, glyph, 0, &gi);
                         any.a_int = i + 1;
-                        add_menu(win, NO_GLYPH, &any, genders[i].adj[0], 0,
-                                 ATR_NONE, genders[i].adj, MENU_ITEMFLAGS_NONE);
+                        add_menu(win, &gi, &any, genders[i].adj[0], 0,
+                                 ATR_NONE, NO_COLOR, genders[i].adj, MENU_ITEMFLAGS_NONE);
                     }
                 any.a_int = pick_gend(flags.initrole, flags.initrace,
                                       flags.initalign, PICK_RANDOM) + 1;
                 if (any.a_int == 0) /* must be non-zero */
                     any.a_int = randgend(flags.initrole, flags.initrace) + 1;
-                add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR,
+                         "Random", MENU_ITEMFLAGS_NONE);
                 any.a_int = i + 1; /* must be non-zero */
-                add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, 'q', 0, ATR_NONE, NO_COLOR,
+                         "Quit", MENU_ITEMFLAGS_NONE);
                 Sprintf(pbuf, "Pick the gender of your %s %s",
                         races[flags.initrace].adj,
                         roles[flags.initrole].name.m);
@@ -455,19 +448,24 @@ Gem_player_selection()
                 for (i = 0; i < ROLE_ALIGNS; i++)
                     if (ok_align(flags.initrole, flags.initrace,
                                  flags.initgend, i)) {
+                        glyph_info gi;
+                        int glyph = monnum_to_glyph(
+                            roles[flags.initrole].mnum,
+                            flags.initgend > 0 ? FEMALE : MALE);
+                        map_glyphinfo(0, 0, glyph, 0, &gi);
                         any.a_int = i + 1;
-                        add_menu(win, NO_GLYPH, &any, aligns[i].adj[0], 0,
-                                 ATR_NONE, aligns[i].adj, MENU_ITEMFLAGS_NONE);
+                        add_menu(win, &gi, &any, aligns[i].adj[0], 0,
+                                 ATR_NONE, NO_COLOR, aligns[i].adj, MENU_ITEMFLAGS_NONE);
                     }
                 any.a_int = pick_align(flags.initrole, flags.initrace,
                                        flags.initgend, PICK_RANDOM) + 1;
                 if (any.a_int == 0) /* must be non-zero */
                     any.a_int = randalign(flags.initrole, flags.initrace) + 1;
-                add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, NO_COLOR,
+                         "Random", MENU_ITEMFLAGS_NONE);
                 any.a_int = i + 1; /* must be non-zero */
-                add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, 'q', 0, ATR_NONE, NO_COLOR,
+                         "Quit", MENU_ITEMFLAGS_NONE);
                 Sprintf(pbuf, "Pick the alignment of your %s %s %s",
                         genders[flags.initgend].adj,
                         races[flags.initrace].adj,
@@ -494,40 +492,38 @@ Gem_player_selection()
  * plname is filled either by an option (-u Player  or  -uPlayer) or
  * explicitly (by being the wizard) or by askname.
  * It may still contain a suffix denoting pl_character.
- * Always called after init_nhwindows() and before init_sound_disp_gamewindows().
+ * Always called after init_nhwindows() and before display_gamewindows().
  */
 
 void
-Gem_askname()
+Gem_askname(void)
 {
     strncpy(svp.plname, mar_ask_name(), PL_NSIZ);
+    svp.plname[PL_NSIZ - 1] = '\0';
 }
 
 void
-Gem_get_nh_event()
+Gem_get_nh_event(void)
 {
 }
 
 void
-Gem_suspend_nhwindows(str)
-const char *str;
+Gem_suspend_nhwindows(const char *str)
 {
-    const char *foo;
-
-    foo = str; /* MAR -- And the compiler whines no more ... */
+    nhUse(str);
 }
 
 void
-Gem_resume_nhwindows()
+Gem_resume_nhwindows(void)
 {
 }
+
 
 extern void mar_exit_nhwindows(void);
 extern boolean run_from_desktop;
 
 void
-Gem_exit_nhwindows(str)
-const char *str;
+Gem_exit_nhwindows(const char *str)
 {
     if (str)
         Gem_raw_print(str);
@@ -538,8 +534,7 @@ const char *str;
 }
 
 winid
-Gem_create_nhwindow(type)
-int type;
+Gem_create_nhwindow(int type)
 {
     winid newid;
 
@@ -556,7 +551,7 @@ int type;
     case NHW_TEXT:
         break;
     default:
-        panic("Tried to create window type %d\n", (int) type);
+        panic("Tried to create window type %d\n", (short) type);
         return WIN_ERR;
     }
 
@@ -571,7 +566,7 @@ int type;
 }
 
 void
-Gem_nhbell()
+Gem_nhbell(void)
 {
     if (flags.silent)
         return;
@@ -582,8 +577,7 @@ Gem_nhbell()
 extern void mar_clear_map(void);
 
 void
-Gem_clear_nhwindow(window)
-winid window;
+Gem_clear_nhwindow(winid window)
 {
     if (window == WIN_ERR)
         panic(winpanicstr, window);
@@ -606,9 +600,7 @@ extern void mar_more(void);
 
 /*ARGSUSED*/
 void
-Gem_display_nhwindow(window, blocking)
-winid window;
-boolean blocking;
+Gem_display_nhwindow(winid window, boolean blocking)
 {
     if (window == WIN_ERR)
         panic(winpanicstr, window);
@@ -633,41 +625,35 @@ boolean blocking;
 }
 
 void
-Gem_destroy_nhwindow(window)
-winid window;
+Gem_destroy_nhwindow(winid window)
 {
-    if (window == WIN_ERR) /* MAR -- test existence */
+    if (window == WIN_ERR) /* test existence */
         panic(winpanicstr, window);
 
     mar_destroy_nhwindow(window);
 }
 
-extern void mar_curs(int, int); /* mar_curs is only for map */
+extern void mar_curs(short, short); /* mar_curs is only for map */
 
 void
-Gem_curs(window, x, y)
-winid window;
-register int x, y;
+Gem_curs(winid window, int x, int y)
 {
-    if (window == WIN_ERR) /* MAR -- test existence */
+    if (window == WIN_ERR) /* test existence */
         panic(winpanicstr, window);
 
     if (window == WIN_MAP)
-        mar_curs(x - 1, y); /*$$$*/
+        mar_curs(x - 1, y);
     else if (window == WIN_STATUS)
         curr_status_line = y;
 }
 
-extern void mar_add_status_str(const char *, int);
-extern void mar_putstr_text(winid, int, const char *);
+extern void mar_add_status_str(const char *, short);
+extern void mar_putstr_text(winid, short, const char *, short);
 
 void
-Gem_putstr(window, attr, str)
-winid window;
-int attr;
-const char *str;
+Gem_putstr(winid window, int attr, const char *str)
 {
-    int win_type;
+    short win_type;
 
     if (window == WIN_ERR) {
         Gem_raw_print(str);
@@ -701,16 +687,28 @@ const char *str;
     case NHW_MENU:
         mar_change_menu_2_text(window);
     /* Fallthru */
-    case NHW_TEXT:
-        mar_putstr_text(window, attr, str);
+    case NHW_TEXT: {
+        /* If the line begins with a <x,y> map coordinate (used by
+           upstream look_all() for "nearby monsters/objects"), grab
+           the glyph at that position so mar_putstr_text can render
+           a tile next to the text. */
+        short tile = (short) NO_GLYPH;
+        int xc, yc;
+        if (sscanf(str, " <%d,%d>", &xc, &yc) == 2
+            && xc >= 1 && xc < COLNO && yc >= 0 && yc < ROWNO) {
+            int glyph = glyph_at((coordxy) xc, (coordxy) yc);
+            glyph_info gi;
+            map_glyphinfo((coordxy) xc, (coordxy) yc, glyph, 0, &gi);
+            tile = (short) gi.gm.tileidx;
+        }
+        mar_putstr_text(window, attr, str, tile);
         break;
+    }
     } /* endswitch win_type */
 }
 
 void
-Gem_display_file(fname, complain)
-const char *fname;
-boolean complain;
+Gem_display_file(const char *fname, boolean complain)
 {
     dlb *f;
     char buf[BUFSZ];
@@ -743,17 +741,11 @@ boolean complain;
  * later.
  */
 void
-Gem_add_menu(window, glyph, identifier, ch, gch, attr, str, itemflags)
-winid window;               /* window to use, must be of type NHW_MENU */
-int glyph;                  /* glyph to display with item (unused) */
-const anything *identifier; /* what to return if selected */
-char ch;                    /* keyboard accelerator (0 = pick our own) */
-char gch;                   /* group accelerator (0 = no group) */
-int attr;                   /* attribute for string (like Gem_putstr()) */
-const char *str;            /* menu string */
-unsigned int itemflags;     /* itemflags such as marked as selected */
+Gem_add_menu(winid window, const glyph_info *glyphinfo,
+             const ANY_P *identifier, char ch, char gch,
+             int attr, int clr, const char *str, unsigned int itemflags)
 {
-    boolean preselected = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
+    int glyph = glyphinfo ? glyphinfo->glyph : NO_GLYPH;
     Gem_menu_item *G_item;
     const char *newstr;
     char buf[QBUFSZ];
@@ -761,7 +753,7 @@ unsigned int itemflags;     /* itemflags such as marked as selected */
     if (str == (const char *) 0)
         return;
 
-    if (window == WIN_ERR) /* MAR -- test existence */
+    if (window == WIN_ERR) /* test existence */
         panic(winpanicstr, window);
 
     if (identifier->a_void)
@@ -772,13 +764,15 @@ unsigned int itemflags;     /* itemflags such as marked as selected */
 
     G_item = (Gem_menu_item *) alloc(sizeof(Gem_menu_item));
     G_item->Gmi_identifier = (long) identifier->a_void;
-    G_item->Gmi_glyph = glyph != NO_GLYPH ? glyph2tile[glyph] : NO_GLYPH;
+    G_item->Gmi_glyph = glyphinfo ? glyphinfo->gm.tileidx : NO_GLYPH;
     G_item->Gmi_count = -1L;
-    G_item->Gmi_selected = preselected ? 1 : 0;
+    G_item->Gmi_selected = (itemflags & MENU_ITEMFLAGS_SELECTED) ? 1 : 0;
     G_item->Gmi_accelerator = ch;
     G_item->Gmi_groupacc = gch;
-    G_item->Gmi_itemflags = itemflags;
     G_item->Gmi_attr = attr;
+    G_item->Gmi_color = clr;
+    G_item->Gmi_itemflags =
+        (unsigned short) (itemflags & ~MENU_ITEMFLAGS_SELECTED);
     G_item->Gmi_str = copy_of(newstr);
     mar_add_menu(window, G_item);
 }
@@ -788,9 +782,7 @@ unsigned int itemflags;     /* itemflags such as marked as selected */
  * We assign the keyboard accelerators as needed.
  */
 void
-Gem_end_menu(window, prompt)
-winid window;       /* menu to use */
-const char *prompt; /* prompt to for menu */
+Gem_end_menu(winid window, const char *prompt)
 {
     if (window == WIN_ERR || mar_hol_win_type(window) != NHW_MENU)
         panic(winpanicstr, window);
@@ -805,14 +797,11 @@ const char *prompt; /* prompt to for menu */
 }
 
 int
-Gem_select_menu(window, how, menu_list)
-winid window;
-int how;
-menu_item **menu_list;
+Gem_select_menu(winid window, int how, menu_item **menu_list)
 {
     Gem_menu_item *Gmit;
     menu_item *mi;
-    int n;
+    short n;
 
     if (window == WIN_ERR || mar_hol_win_type(window) != NHW_MENU)
         panic(winpanicstr, window);
@@ -840,12 +829,12 @@ menu_item **menu_list;
 }
 
 void
-Gem_update_inventory()
+Gem_update_inventory(int arg)
 {
 }
 
 void
-Gem_mark_synch()
+Gem_mark_synch(void)
 {
     mar_display_nhwindow(WIN_MESSAGE);
     mar_display_nhwindow(WIN_MAP);
@@ -853,7 +842,7 @@ Gem_mark_synch()
 }
 
 void
-Gem_wait_synch()
+Gem_wait_synch(void)
 {
     mar_display_nhwindow(WIN_MESSAGE);
     mar_display_nhwindow(WIN_MAP);
@@ -863,8 +852,7 @@ Gem_wait_synch()
 #ifdef CLIPPING
 extern void mar_cliparound(void);
 void
-Gem_cliparound(x, y)
-int x, y;
+Gem_cliparound(int x, int y)
 {
     mar_curs(x - 1, y);
     mar_cliparound();
@@ -880,52 +868,48 @@ int x, y;
  *  position and glyph are always correct (checked there)!
  */
 
-void mar_print_gl_char(winid, coordxy, coordxy, int);
+void mar_print_gl_char(winid, coordxy, coordxy, int, int);
 
-extern int mar_set_rogue(int);
+extern short mar_set_rogue(short);
 
-extern void mar_add_pet_sign(winid, int, int);
+extern void mar_add_pet_sign(winid, short, short);
 
 void
-Gem_print_glyph(window, x, y, glyph, bkglyph)
-winid window;
-coordxy x, y;
-int glyph, bkglyph;
+Gem_print_glyph(winid window, coordxy x, coordxy y,
+                const glyph_info *glyphinfo, const glyph_info *bkglyphinfo)
 {
+    int glyph = glyphinfo->glyph;
+
     /* Move the cursor. */
     Gem_curs(window, x, y);
 
     mar_set_rogue(Is_rogue_level(&u.uz) ? TRUE : FALSE);
 
-    x--; /* MAR -- because x ranges from 1 to COLNO */
+    x--; /* x ranges from 1 to COLNO */
     if (mar_set_tile_mode(-1)) {
-        mar_print_glyph(window, x, y, glyph2tile[glyph], glyph2tile[bkglyph]);
+        mar_print_glyph(window, x, y, glyphinfo->gm.tileidx,
+                         bkglyphinfo->gm.tileidx);
         if (
+#ifdef TEXTCOLOR
             iflags.hilite_pet &&
+#endif
             glyph_is_pet(glyph))
             mar_add_pet_sign(window, x, y);
     } else
-        mar_print_gl_char(window, x, y, glyph);
+        mar_print_gl_char(window, x, y, glyphinfo->ttychar,
+                           glyphinfo->gm.sym.color);
 }
 
-void mar_print_char(winid, coordxy, coordxy, char, int);
+void mar_print_char(winid, coordxy, coordxy, char, short);
 
 void
-mar_print_gl_char(window, x, y, glyph)
-winid window;
-coordxy x, y;
-int glyph;
+mar_print_gl_char(winid window, coordxy x, coordxy y, int ch, int color)
 {
-    int ch;
-    int color;
-    unsigned special;
-
-    /* map glyph to character and color */
-    (void) mapglyph(glyph, &ch, &color, &special, x, y, 0);
-
+#ifdef TEXTCOLOR
     /* Turn off color if rogue level. */
     if (Is_rogue_level(&u.uz))
         color = NO_COLOR;
+#endif /* TEXTCOLOR */
 
     mar_print_char(window, x, y, ch, color);
 }
@@ -934,8 +918,7 @@ extern void mar_raw_print(const char *);
 extern void mar_raw_print_bold(const char *);
 
 void
-Gem_raw_print(str)
-const char *str;
+Gem_raw_print(const char *str)
 {
     if (str && *str) {
         if (iflags.window_inited)
@@ -946,8 +929,7 @@ const char *str;
 }
 
 void
-Gem_raw_print_bold(str)
-const char *str;
+Gem_raw_print_bold(const char *str)
 {
     if (str && *str) {
         if (iflags.window_inited)
@@ -962,7 +944,7 @@ extern void mar_update_value(void); /* wingem1.c */
 int
 Gem_nhgetch()
 {
-    int i;
+    short i;
 
     mar_update_value();
     i = tgetch();
@@ -972,62 +954,160 @@ Gem_nhgetch()
     return i;
 }
 
-/* Get a extended command in windowport specific way.
-        returns index of the ext_cmd or -1.
-        called after '#'.
-        It's a menu with all the possibilities. */
+/* Curated set of extended commands shown in the GEM "#" menu, in
+   alphabetical order with single-letter accelerators (case-sensitive).
+   Based on NetHack 3.4.3, with new 3.7 commands added.  Each entry is
+   resolved to its current extcmdlist index at runtime; commands that
+   no longer exist (or that are gated off by build flags) are simply
+   skipped. */
+static const struct {
+    const char *name;
+    char accelerator;
+} gem_ext_menu[] = {
+    { "adjust",     'a' },
+    { "annotate",   'A' },
+    { "chat",       'c' },
+    { "chronicle",  'h' },
+    { "conduct",    'C' },
+    { "dip",        'd' },
+    { "enhance",    'e' },
+    { "force",      'f' },
+    { "genocided",  'g' },
+    { "invoke",     'i' },
+    { "jump",       'j' },
+    { "loot",       'l' },
+    { "monster",    'm' },
+    { "name",       'n' },
+    { "offer",      'o' },
+    { "overview",   'O' },
+    { "pray",       'p' },
+    { "quit",       'q' },
+    { "ride",       'r' },
+    { "rub",        'R' },
+    { "sit",        's' },
+    { "terrain",    'L' },
+    { "tip",        'P' },
+    { "turn",       't' },
+    { "twoweapon",  'T' },
+    { "untrap",     'u' },
+    { "vanquished", 'V' },
+    { "version",    'v' },
+    { "wipe",       'w' },
+    { "?",          '?' },
+};
+
+/* Get an extended command in windowport-specific way.  Returns the
+   extcmdlist index of the chosen command or -1.  Called after '#'.
+   The curated `?` entry opens a second menu listing every available
+   command in extcmdlist as a selectable item. */
 int
 Gem_get_ext_cmd()
 {
     winid wind;
-    int i, count, what, too_much = FALSE;
+    int i, idx, count, what = -1;
     menu_item *selected = NULL;
     anything any;
-    char accelerator = 0, tmp_acc = 0;
-    const char *ptr;
+    boolean show_all = FALSE;
 
     wind = Gem_create_nhwindow(NHW_MENU);
     Gem_start_menu(wind, MENU_BEHAVE_STANDARD);
-    for (i = 0; (ptr = extcmdlist[i].ef_txt); i++) {
-        any.a_int = i;
-        accelerator = *ptr;
-        if (tmp_acc == accelerator) {
-            if (too_much)
-                accelerator = '&'; /* MAR -- poor choice, anyone? */
-            else
-                accelerator += 'A' - 'a';
-            too_much = TRUE;
-        } else
-            too_much = FALSE;
-        tmp_acc = *ptr;
-        Gem_add_menu(wind, NO_GLYPH, &any, accelerator, 0, ATR_NONE, ptr,
-                     MENU_ITEMFLAGS_NONE);
+    for (i = 0; i < (int) (sizeof gem_ext_menu / sizeof gem_ext_menu[0]);
+         i++) {
+        if (gem_ext_menu[i].name[0] == '?' && !gem_ext_menu[i].name[1]) {
+            /* Sentinel: select to open the rest of extcmdlist as a
+               selectable menu (commands not already shown above). */
+            any.a_int = -1;
+            Gem_add_menu(wind, &nul_glyphinfo, &any, '?', 0, ATR_NONE,
+                         NO_COLOR, "(more commands...)",
+                         MENU_ITEMFLAGS_NONE);
+            continue;
+        }
+        for (idx = 0; extcmdlist[idx].ef_txt; idx++)
+            if (!strcmp(extcmdlist[idx].ef_txt, gem_ext_menu[i].name))
+                break;
+        if (!extcmdlist[idx].ef_txt)
+            continue; /* command not present in this build */
+        any.a_int = idx + 1; /* +1 so identifier is non-zero */
+        Gem_add_menu(wind, &nul_glyphinfo, &any,
+                     gem_ext_menu[i].accelerator, 0, ATR_NONE, NO_COLOR,
+                     extcmdlist[idx].ef_txt, MENU_ITEMFLAGS_NONE);
     }
     Gem_end_menu(wind, "What extended command?");
     count = Gem_select_menu(wind, PICK_ONE, &selected);
-    what = count ? selected->item.a_int : -1;
-    if (selected)
-        free(selected);
+    if (count) {
+        if (selected->item.a_int == -1)
+            show_all = TRUE;
+        else
+            what = selected->item.a_int - 1;
+        free((genericptr_t) selected);
+        selected = NULL;
+    }
     Gem_destroy_nhwindow(wind);
-    return (what);
+
+    if (show_all) {
+        wind = Gem_create_nhwindow(NHW_MENU);
+        Gem_start_menu(wind, MENU_BEHAVE_STANDARD);
+        for (idx = 0; extcmdlist[idx].ef_txt; idx++) {
+            boolean curated = FALSE;
+
+            if ((extcmdlist[idx].flags
+                 & (CMD_NOT_AVAILABLE | INTERNALCMD)) != 0)
+                continue;
+            if (!wizard && (extcmdlist[idx].flags & WIZMODECMD) != 0)
+                continue;
+            /* Skip anything that's already on the curated menu. */
+            for (i = 0;
+                 i < (int)(sizeof gem_ext_menu / sizeof gem_ext_menu[0]);
+                 i++) {
+                if (!strcmp(extcmdlist[idx].ef_txt, gem_ext_menu[i].name)) {
+                    curated = TRUE;
+                    break;
+                }
+            }
+            if (curated)
+                continue;
+            /* Pass 0 as the accelerator and let mar_set_accelerators()
+               auto-assign unique a-z,A-Z keys.  Passing extcmdlist[idx].key
+               directly would either inject garbage (M(x), C(x)) or collide
+               with the auto-assigned letters and cause the dialog handler
+               to close itself on freed state. */
+            any.a_int = idx + 1;
+            Gem_add_menu(wind, &nul_glyphinfo, &any,
+                         0, 0, ATR_NONE, NO_COLOR,
+                         extcmdlist[idx].ef_txt, MENU_ITEMFLAGS_NONE);
+        }
+        Gem_end_menu(wind, "Pick a command:");
+        count = Gem_select_menu(wind, PICK_ONE, &selected);
+        if (count) {
+            what = selected->item.a_int - 1;
+            free((genericptr_t) selected);
+        }
+        Gem_destroy_nhwindow(wind);
+    }
+
+    return what;
 }
 
 void
-Gem_number_pad(state)
-int state;
+Gem_number_pad(int state)
 {
-    state = state;
+    (void)state;
 }
 
 void
-win_Gem_init()
+win_Gem_init(int dir)
 {
+}
+
+win_request_info *
+Gem_ctrl_nhwindow(winid window, int request, win_request_info *wri)
+{
+    return (win_request_info *) 0;
 }
 
 #ifdef POSITIONBAR
 void
-Gem_update_positionbar(posbar)
-char *posbar;
+Gem_update_positionbar(char *posbar)
 {
 }
 #endif
@@ -1037,10 +1117,7 @@ void mar_set_text_to_rip(winid);
 char **rip_line = 0;
 
 void
-Gem_outrip(w, how, when)
-winid w;
-int how;
-time_t when;
+Gem_outrip(winid w, int how, time_t when)
 {
 /* Code from X11 windowport */
 #define STONE_LINE_LEN 15 /* # chars that fit on one line */
@@ -1050,11 +1127,11 @@ time_t when;
 #define YEAR_LINE 6       /* line # for year */
     char buf[BUFSZ];
     char *dpx;
-    int line;
+    short line;
     long year;
 
     if (!rip_line) {
-        int i;
+        short i;
         rip_line = (char **) malloc((YEAR_LINE + 1) * sizeof(char *));
         for (i = 0; i < YEAR_LINE + 1; i++) {
             rip_line[i] =
@@ -1065,13 +1142,13 @@ time_t when;
     /* Put name on stone */
     Sprintf(rip_line[NAME_LINE], "%s", svp.plname);
     /* Put $ on stone */
-    Sprintf(rip_line[GOLD_LINE], "%ld Au", done_money);
+    Sprintf(rip_line[GOLD_LINE], "%ld Au", gd.done_money);
     /* Put together death description */
     formatkiller(buf, sizeof buf, how, FALSE);
 
     /* Put death type on stone */
     for (line = DEATH_LINE, dpx = buf; line < YEAR_LINE; line++) {
-        register int i, i0;
+        register short i, i0;
         char tmpchar;
         if ((i0 = strlen(dpx)) > STONE_LINE_LEN) {
             for (i = STONE_LINE_LEN; ((i0 > STONE_LINE_LEN) && i); i--)
@@ -1098,10 +1175,7 @@ time_t when;
         putstr(w, 0, "");
 }
 void
-mar_get_font(type, p_fname, psize)
-int type;
-char **p_fname;
-int *psize;
+mar_get_font(short type, char **p_fname, short *psize)
 {
     switch (type) {
     case NHW_MESSAGE:
@@ -1129,8 +1203,7 @@ int *psize;
     }
 }
 void
-Gem_preference_update(pref)
-const char *pref;
+Gem_preference_update(const char *pref)
 {
     if (stricmp(pref, "font_message") == 0
         || stricmp(pref, "font_size_message") == 0) {
@@ -1185,7 +1258,6 @@ const char *pref;
         return;
     }
     if (stricmp(pref, "hilite_pet") == 0) {
-        /* MAR -- works without doing something here. */
         return;
     }
     if (stricmp(pref, "align_message") == 0) {
@@ -1208,14 +1280,13 @@ const char *pref;
  * This is an exact duplicate of copy_of() in X11/winmenu.c.
  */
 static char *
-copy_of(s)
-const char *s;
+copy_of(const char *s)
 {
     if (!s)
         s = nullstr;
     return strcpy((char *) alloc((unsigned) (strlen(s) + 1)), s);
 }
 
-#endif /* GEM_GRAPHICS \
-                       \
+#endif /* GEM_GRAPHICS */
+
 /*wingem.c*/

@@ -5,10 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <osbind.h>
-#include <memory.h>
-#include <aesbind.h>
-#include <vdibind.h>
-#include <gemfast.h>
+#include <string.h>
+#include <gem.h>
 #include <e_gem.h>
 #include "load_img.h"
 
@@ -47,19 +45,20 @@ get_colors(int handle, short *palette, int col)
             else
                 idx = i == 255 ? 1 : i;
         }
-        vq_color(handle, i, 0, (int *) palette + idx * 3);
+        vq_color(handle, i, 0, palette + idx * 3);
     }
 }
 
 void
-img_set_colors(int handle, short *palette, int col)
+img_set_colors_ex(int handle, short *palette, int col, int preserve_sys)
 {
     int i, idx, end;
 
-    /* set color palette */
     end = min(1 << col, 1 << planes);
-    for (i = 0; i < end; i++) {
-        switch (planes) { /* MAR -- war col 10.01.2001 */
+    /* preserve system colours (0-15) for tile palette on 256-colour displays,
+       but allow full palette override for images like RIP.IMG */
+    for (i = (preserve_sys && planes >= 8 && end > 16) ? 16 : 0; i < end; i++) {
+        switch (planes) {
         case 1:
             idx = i;
             break;
@@ -75,8 +74,14 @@ img_set_colors(int handle, short *palette, int col)
             else
                 idx = i == 255 ? 1 : i;
         }
-        vs_color(handle, i, (int *) palette + idx * 3);
+        vs_color(handle, i, palette + idx * 3);
     }
+}
+
+void
+img_set_colors(int handle, short *palette, int col)
+{
+    img_set_colors_ex(handle, palette, col, 1); /* preserve system by default */
 }
 
 int
@@ -126,9 +131,12 @@ convert(MFDB *image, long size)
         }
     }
     free(image->fd_addr);
+    image->fd_addr = NULL;
     /* convert image line in temp into current device raster format */
-    if ((new1_addr = (char *) calloc(1, new_size)) == NULL)
+    if ((new1_addr = (char *) calloc(1, new_size)) == NULL) {
+        free(new_addr);
         return (FALSE);
+    }
     dev_form.fd_addr = new1_addr;
     vr_trnfm(x_handle, &tmp, &dev_form);
     free(new_addr);
@@ -172,10 +180,13 @@ depack_img(char *name, IMG_header *pic)
     if ((fp = fopen(name, "rb")) == NULL)
         return (ERR_FILE);
 
-    setvbuf(fp, NULL, _IOLBF, BUFSIZ);
+    setvbuf(fp, NULL, _IOFBF, BUFSIZ);
 
     /* read header info (bw & ximg) into image structure */
-    fread((char *) &(pic->version), 2, 8 + 3, fp);
+    if (fread((char *) &(pic->version), 2, 8 + 3, fp) != 8 + 3) {
+        error = ERR_HEADER;
+        goto end_depack;
+    }
 
     /* only 2-256 color imgs */
     if (pic->planes < 1 || pic->planes > 8) {
@@ -184,13 +195,16 @@ depack_img(char *name, IMG_header *pic)
     }
 
     /* if XIMG, read info */
+    pic->palette = NULL;
     if (pic->magic == XIMG && pic->paltype == 0) {
         pal_size = (1 << pic->planes) * 3 * 2;
         if ((pic->palette = (short *) calloc(1, pal_size))) {
-            fread((char *) pic->palette, 1, pal_size, fp);
+            if (fread((char *) pic->palette, 1, pal_size, fp)
+                != (size_t) pal_size) {
+                error = ERR_FILE;
+                goto end_depack;
+            }
         }
-    } else {
-        pic->palette = NULL;
     }
 
     /* width in bytes word aliged */
@@ -202,6 +216,7 @@ depack_img(char *name, IMG_header *pic)
 
     /* allocate memory for the picture */
     free(pic->addr);
+    pic->addr = NULL;
     size = (long) ((long) word_aligned * (long) pic->img_h
                    * (long) pic->planes); /*MAR*/
 
@@ -231,10 +246,24 @@ depack_img(char *name, IMG_header *pic)
                 + (long) (line + plane * pic->img_h) * (long) word_aligned;
             endline = puffer + width;
             do { /* depack one line in one bitplane */
-                switch ((opcode = fgetc(fp))) {
+                opcode = fgetc(fp);
+                if (opcode == EOF) {
+                    error = ERR_DEPACK;
+                    goto end_depack;
+                }
+                switch (opcode) {
                 case 0: /* pattern or scan repeat */
-                    if ((patt_repeat = fgetc(fp))) { /* repeat a pattern */
-                        fread(to, patt_len, 1, fp);
+                    patt_repeat = fgetc(fp);
+                    if (patt_repeat == EOF) {
+                        error = ERR_DEPACK;
+                        goto end_depack;
+                    }
+                    if (patt_repeat) { /* repeat a pattern */
+                        if (to + (long) patt_len * patt_repeat > endline
+                            || fread(to, patt_len, 1, fp) != 1) {
+                            error = ERR_DEPACK;
+                            goto end_depack;
+                        }
                         pattern = to;
                         to += patt_len;
                         while (--patt_repeat) { /* copy pattern */
@@ -242,9 +271,12 @@ depack_img(char *name, IMG_header *pic)
                             to += patt_len;
                         }
                     } else { /* repeat a line */
-                        if (fgetc(fp) == 0xFF)
-                            scan_repeat = fgetc(fp);
-                        else {
+                        if (fgetc(fp) != 0xFF) {
+                            error = ERR_DEPACK;
+                            goto end_depack;
+                        }
+                        scan_repeat = fgetc(fp);
+                        if (scan_repeat == EOF) {
                             error = ERR_DEPACK;
                             goto end_depack;
                         }
@@ -252,11 +284,20 @@ depack_img(char *name, IMG_header *pic)
                     break;
                 case 0x80: /* Literal */
                     byte_repeat = fgetc(fp);
-                    fread(to, byte_repeat, 1, fp);
+                    if (byte_repeat == EOF
+                        || to + byte_repeat > endline
+                        || fread(to, byte_repeat, 1, fp) != 1) {
+                        error = ERR_DEPACK;
+                        goto end_depack;
+                    }
                     to += byte_repeat;
                     break;
                 default: /* Solid run */
                     byte_repeat = opcode & 0x7F;
+                    if (to + byte_repeat > endline) {
+                        error = ERR_DEPACK;
+                        goto end_depack;
+                    }
                     sol_pat = opcode & 0x80 ? 0xFF : 0x00;
                     while (byte_repeat--)
                         *to++ = sol_pat;
@@ -286,6 +327,12 @@ depack_img(char *name, IMG_header *pic)
     }
 
 end_depack:
+    if (error) {
+        free(pic->palette);
+        pic->palette = NULL;
+        free(pic->addr);
+        pic->addr = NULL;
+    }
     fclose(fp);
     return (error);
 }
@@ -293,7 +340,8 @@ end_depack:
 int
 half_img(MFDB *s, MFDB *d)
 {
-    int pxy[8], i, j;
+    short pxy[8];
+    int i, j;
     MFDB tmp;
 
     mfdb(&tmp, NULL, s->fd_w / 2, s->fd_h, s->fd_stand, s->fd_nplanes);
