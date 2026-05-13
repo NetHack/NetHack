@@ -77,7 +77,7 @@ const
 #endif
 
 #if defined(MSDOS) || defined(OS2) || defined(TOS) || defined(WIN32)
-#ifndef __DJGPP__
+#if !defined(__DJGPP__) && !defined(__MINT__)
 #include <sys\stat.h>
 #else
 #include <sys/stat.h>
