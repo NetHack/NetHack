@@ -15,8 +15,12 @@ Requirements
       - MagiC under magic-on-linux
         (https://gitlab.com/AndreasK/magiclinux).
 
-    Currently known not to work (to be investigated):
-      - EmuTOS.
+    Stock EmuTOS (tested: 1.4, Hatari) bus-errors when the
+    character-selection dialog opens -- a regression vs the 3.4.3
+    Atari port, which runs on the same EmuTOS config.  Cause not
+    yet isolated.  One third-party report of 5.0 running on a
+    Vampire V4SA + FreeMiNT + XaAES + NVDI + Olivier Landemarre's
+    EmuTOS variant.
 
 Supported display modes:
     - 640x480 with 16 colours (VGA minimum)
