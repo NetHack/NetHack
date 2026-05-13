@@ -560,6 +560,85 @@ $(TARGETPFX)%.o : ../sys/amiga/regex/%.c
 endif  # CROSS_TO_AMIGA
 #=================================================================
 
+ifdef CROSS_TO_ATARI
+#===============-=================================================
+# Atari ST/TT/Falcon cross-compile recipe
+#===============-=================================================
+# Uses the m68k-atari-mint cross-compiler on Linux or macOS.
+#
+# Toolchain: https://tho-otto.de/crossmint.php
+# Once installed (typically under /usr/m68k-atari-mint), run:
+#     sys/unix/setup.sh sys/unix/hints/linux.500
+#     make fetch-lua
+#     make CROSS_TO_ATARI=1 all
+#     make CROSS_TO_ATARI=1 package
+#=================================================================
+
+CFLAGS += -DCROSSCOMPILE
+
+#
+# Override the build tools and some obj files to
+# reflect the m68k-atari-mint cross-compiler.
+#
+# TOOLTOP is the directory holding m68k-atari-mint-{gcc,c++,ar}.  The
+# pre-built tho-otto.de packages install into /usr/bin; the typical
+# hand-built crossmint installs into /opt/cross-mint/bin or
+# /usr/local/cross-mint/bin.  Override on the make command line if
+# your toolchain lives elsewhere.
+TOOLTOP = /usr/bin
+TOOLARCH = -m68000
+EGEMDIR ?= ../lib/e_gem
+EGEMINCL = -I$(EGEMDIR)
+override TARGET_CC = $(TOOLTOP)/m68k-atari-mint-gcc
+override TARGET_CXX = $(TOOLTOP)/m68k-atari-mint-c++
+override TARGET_AR = $(TOOLTOP)/m68k-atari-mint-ar
+override TARGET_STUBEDIT=
+override TARGET_CFLAGS = -c -O2 $(TOOLARCH) \
+	-I../include \
+	-I../sys/atari -I../win/gem -I../win/share \
+	$(EGEMINCL) \
+	$(LUAINCL) -DNOTTYGRAPHICS -DNO_TERMS -USYSCF -USYSCF_FILE -USECURE \
+	-DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_ATARI
+override TARGET_CXXFLAGS = $(TARGET_CFLAGS)
+LUA_TARGET_CFLAGS = $(TARGET_CFLAGS)
+override TARGET_LINK = $(TARGET_CC)
+override TARGET_LFLAGS= $(TOOLARCH)
+override TARGET_LIBS += $(LIBLM) -le_gem -lgem
+VARDATND += nhtiles.bmp
+override SYSSRC = ../sys/atari/tos.c ../sys/share/pcmain.c \
+		../sys/share/pcsys.c ../sys/share/pcunix.c \
+		../win/gem/wingem.c ../win/gem/wingem1.c \
+		../win/gem/bitmfile.c ../win/gem/gr_rect.c \
+		../win/gem/load_img.c \
+		../win/share/bmptiles.c ../win/share/giftiles.c \
+		../win/share/tileset.c
+override SYSOBJ = $(TARGETPFX)tos.o $(TARGETPFX)pcmain.o \
+		$(TARGETPFX)pcsys.o $(TARGETPFX)pcunix.o \
+		$(TARGETPFX)wingem.o $(TARGETPFX)wingem1.o \
+		$(TARGETPFX)bitmfile.o $(TARGETPFX)gr_rect.o \
+		$(TARGETPFX)load_img.o \
+		$(TARGETPFX)bmptiles.o $(TARGETPFX)giftiles.o \
+		$(TARGETPFX)tileset.o
+override WINLIB=
+override LUALIB=
+override LUALIBS=
+override TOPLUALIB=
+override DLLIB=
+override WINOBJ= $(TARGETPFX)tile.o
+override GAMEBIN = $(TARGETPFX)nethack.prg
+override PACKAGE = ataripkg
+override PREGAME += mkdir -p $(TARGETDIR) ;
+override CLEANMORE += rm -r $(TARGETDIR) ;
+#
+# Rule for files in sys/atari
+$(TARGETPFX)%.o : ../sys/atari/%.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
+# Rule for files in win/gem
+$(TARGETPFX)%.o : ../win/gem/%.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
+endif  # CROSS_TO_ATARI
+#=================================================================
+
 ifdef WANT_WIN_CURSES
 ifdef BUILD_PDCURSES
 # Rules for PDCurses files

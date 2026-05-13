@@ -304,11 +304,6 @@ fetch-regex:
 	fi
 amitiles: $(AMITILES)
 
-UUDECODE = ../util/uudecode
-
-../util/uudecode: ../sys/share/uudecode.c
-	$(CC) $(CFLAGS) -o $@ $<
-
 amigapkg: $(GAMEBIN) $(AMITILES) ../util/uudecode
 	mkdir -p $(TARGETPFX)pkg/NetHack/tiles $(TARGETPFX)pkg/NetHack/hack
 	cp $(GAMEBIN) $(TARGETPFX)pkg/NetHack/nethack
@@ -334,6 +329,46 @@ amigapkg: $(GAMEBIN) $(AMITILES) ../util/uudecode
 	( cd $(TARGETPFX)pkg && zip -9r ../NH$(NHV)AMI$(AMIPKGSEQ).ZIP NetHack NetHack.info )
 	@echo amiga package zip file $(TARGETPFX)NH$(NHV)AMI$(AMIPKGSEQ).ZIP
 endif  # CROSS_TO_AMIGA
+
+UUDECODE = ../util/uudecode
+
+../util/uudecode: ../sys/share/uudecode.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+ifdef CROSS_TO_ATARI
+$(TARGETPFX)tos.o : ../sys/atari/tos.c $(HACK_H)
+$(TARGETPFX)wingem.o : ../win/gem/wingem.c $(HACK_H)
+$(TARGETPFX)wingem1.o : ../win/gem/wingem1.c $(HACK_H)
+$(TARGETPFX)bitmfile.o : ../win/gem/bitmfile.c $(HACK_H)
+$(TARGETPFX)gr_rect.o : ../win/gem/gr_rect.c $(HACK_H)
+$(TARGETPFX)load_img.o : ../win/gem/load_img.c $(HACK_H)
+$(GAMEBIN) : $(HOBJ) $(LUACROSSLIB)
+	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
+	$(HOBJ) $(WINLIB) $(TARGET_LIBS)
+
+.PHONY: ataripkg
+
+ataripkg: $(GAMEBIN) ../util/uudecode
+	mkdir -p $(TARGETPFX)pkg
+	cp $(GAMEBIN) $(TARGETPFX)pkg/nethack.prg
+	cp ../dat/nhdat $(TARGETPFX)pkg/nhdat
+	cp ../dat/license $(TARGETPFX)pkg/license
+	cp ../dat/symbols $(TARGETPFX)pkg/symbols
+	cp ../doc/nethack.txt $(TARGETPFX)pkg/nethack.txt
+	cp ../sys/atari/README.tos $(TARGETPFX)pkg/README.txt
+	cp ../sys/atari/nethack.cnf $(TARGETPFX)pkg/nethack.cnf
+	cp ../dat/NH2.IMG $(TARGETPFX)pkg/NH2.IMG
+	cp ../dat/NH16.IMG $(TARGETPFX)pkg/NH16.IMG
+	cp ../dat/NH32.IMG $(TARGETPFX)pkg/NH32.IMG
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/gem_rsc.uu )
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/title.uu )
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/title2.uu )
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/rip.uu )
+	touch $(TARGETPFX)pkg/record
+	mkdir -p $(TARGETPFX)pkg/levels $(TARGETPFX)pkg/save
+	( cd $(TARGETPFX)pkg && zip -9r ../NH500ST.ZIP * )
+	@echo atari package zip file $(TARGETPFX)NH500ST.ZIP
+endif  # CROSS_TO_ATARI
 
 ifdef CROSS_SHARED
 # shared file dependencies
