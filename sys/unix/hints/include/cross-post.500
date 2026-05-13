@@ -346,9 +346,26 @@ $(GAMEBIN) : $(HOBJ) $(LUACROSSLIB)
 	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
 	$(HOBJ) $(WINLIB) $(TARGET_LIBS)
 
+#
+# Host-side BMP-to-XIMG converter (runs on Linux, produces Atari .IMG)
+#
+ATARISRC = ../sys/atari
+
+$(TARGETPFX)bmp2img_host: $(ATARISRC)/bmp2img_host.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+$(TARGETPFX)NH16.IMG: ../dat/nhtiles.bmp $(TARGETPFX)bmp2img_host
+	$(TARGETPFX)bmp2img_host -planes 4 ../dat/nhtiles.bmp $@
+$(TARGETPFX)NH32.IMG: ../dat/nhtiles.bmp $(TARGETPFX)bmp2img_host
+	$(TARGETPFX)bmp2img_host -planes 5 ../dat/nhtiles.bmp $@
+$(TARGETPFX)NH2.IMG:  ../dat/nhtiles.bmp $(TARGETPFX)bmp2img_host
+	$(TARGETPFX)bmp2img_host -atkinson -planes 1 ../dat/nhtiles.bmp $@
+
+ATARITILES = $(TARGETPFX)NH2.IMG $(TARGETPFX)NH16.IMG $(TARGETPFX)NH32.IMG
+
 .PHONY: ataripkg
 
-ataripkg: $(GAMEBIN) ../util/uudecode
+ataripkg: $(GAMEBIN) ../util/uudecode $(ATARITILES)
 	mkdir -p $(TARGETPFX)pkg
 	cp $(GAMEBIN) $(TARGETPFX)pkg/nethack.prg
 	cp ../dat/nhdat $(TARGETPFX)pkg/nhdat
@@ -357,9 +374,9 @@ ataripkg: $(GAMEBIN) ../util/uudecode
 	cp ../doc/nethack.txt $(TARGETPFX)pkg/nethack.txt
 	cp ../sys/atari/README.tos $(TARGETPFX)pkg/README.txt
 	cp ../sys/atari/nethack.cnf $(TARGETPFX)pkg/nethack.cnf
-	cp ../dat/NH2.IMG $(TARGETPFX)pkg/NH2.IMG
-	cp ../dat/NH16.IMG $(TARGETPFX)pkg/NH16.IMG
-	cp ../dat/NH32.IMG $(TARGETPFX)pkg/NH32.IMG
+	cp $(TARGETPFX)NH2.IMG  $(TARGETPFX)pkg/NH2.IMG
+	cp $(TARGETPFX)NH16.IMG $(TARGETPFX)pkg/NH16.IMG
+	cp $(TARGETPFX)NH32.IMG $(TARGETPFX)pkg/NH32.IMG
 	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/gem_rsc.uu )
 	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/title.uu )
 	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/title2.uu )
