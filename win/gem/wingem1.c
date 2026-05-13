@@ -1350,7 +1350,7 @@ mar_gem_init()
         mar_set_fontbyid(NHW_STATUS, small_font_id, -small_font);
     status_w = min(max_w / status_font.cw - 3, MSGLEN);
 
-    if (planes > 0 && planes < 9) {
+    if (planes > 0 && colors > 0 && colors <= 256) {
         normal_palette = (short *) m_alloc(3 * colors * sizeof(short));
         get_colors(x_handle, normal_palette, colors);
     }
@@ -1485,14 +1485,17 @@ mar_exit_nhwindows()
 {
     short i;
 
-    for (i = MAXWIN; --i >= 0;)
-        if (Gem_nhwindow[i].gw_type)
-            mar_destroy_nhwindow(i);
-
+    /* Restore the original VDI palette before tearing anything down, so a
+       GEM desktop survives even if a later step bails out. */
     if (normal_palette) {
         img_set_colors(x_handle, normal_palette, planes);
         null_free(normal_palette);
     }
+
+    for (i = MAXWIN; --i >= 0;)
+        if (Gem_nhwindow[i].gw_type)
+            mar_destroy_nhwindow(i);
+
     test_free(tile_image.palette);
     test_free(tile_image.addr);
     test_free(titel_image.palette);
