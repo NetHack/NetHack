@@ -45,41 +45,6 @@ typedef struct {
 } RGB;
 
 /* --------------------------------------------------------- */
-/*  Default Atari ST VDI palette (16 entries, VDI order)     */
-/*  Used to assign tile colours to the correct VDI pens.     */
-/* --------------------------------------------------------- */
-
-static const RGB default_vdi_pal[16] = {
-    {0xFF,0xFF,0xFF}, /* VDI  0: white    */
-    {0x00,0x00,0x00}, /* VDI  1: black    */
-    {0xFF,0x00,0x00}, /* VDI  2: red      */
-    {0x00,0xFF,0x00}, /* VDI  3: green    */
-    {0x00,0x00,0xFF}, /* VDI  4: blue     */
-    {0x00,0xFF,0xFF}, /* VDI  5: cyan     */
-    {0xFF,0xFF,0x00}, /* VDI  6: yellow   */
-    {0xFF,0x00,0xFF}, /* VDI  7: magenta  */
-    {0xBB,0xBB,0xBB}, /* VDI  8: lt grey  */
-    {0x88,0x88,0x88}, /* VDI  9: dk grey  */
-    {0xBB,0x00,0x00}, /* VDI 10: dk red   */
-    {0x00,0xBB,0x00}, /* VDI 11: dk green */
-    {0x00,0x00,0xBB}, /* VDI 12: dk blue  */
-    {0x00,0xBB,0xBB}, /* VDI 13: dk cyan  */
-    {0xBB,0xBB,0x00}, /* VDI 14: dk yel   */
-    {0xBB,0x00,0xBB}, /* VDI 15: dk mag   */
-};
-
-/* VDI pen <-> hardware device index mappings (4-plane ST) */
-static const int vdi2dev4[16] = {
-    0, 15, 1, 2, 4, 6, 3, 5, 7, 8, 9, 10, 12, 14, 11, 13
-};
-static const int dev2vdi4[16] = {
-    0, 2, 3, 6, 4, 7, 5, 8, 9, 10, 11, 14, 12, 15, 13, 1
-};
-/* 2-plane ST */
-static const int vdi2dev2[4] = { 0, 3, 1, 2 };
-static const int dev2vdi2[4] = { 0, 2, 3, 1 };
-
-/* --------------------------------------------------------- */
 /*  Colour helpers (same as Amiga bmp2iff_host.c)            */
 /* --------------------------------------------------------- */
 
@@ -225,7 +190,6 @@ build_palette(const RGB *src, int nsrc,
     int freq[256] = {0};
     int order[256];
     int i, j;
-    int nbase = maxcol < 16 ? maxcol : 16;
 
     /* count pixel frequency per BMP palette entry */
     for (i = 0; i < npix; i++)
