@@ -1,9 +1,13 @@
-/* NetHack 3.6	tos.c	$NHDT-Date: 1501979358 2017/08/06 00:29:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.8 $ */
+/* NetHack 5.0	tos.c	$NHDT-Date: 1501979358 2017/08/06 00:29:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.8 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
  *  TOS system functions.
  */
+
+/* NetHack 5.0 with Lua needs significantly more stack than the
+   default.  For GCC with mintlib, _stksize controls this. */
+long _stksize = 256 * 1024L;
 
 #define NEED_VARARGS
 #include "hack.h"
@@ -11,13 +15,17 @@
 #ifdef TTY_GRAPHICS
 #include "tcap.h"
 #else
-/* To avoid error for tos.c; will be removed later */
+/* Referenced by terminal-mode helpers compiled into the GEM-only
+   build; the value is unused but the symbol has to resolve. */
 static char *nh_HE = "\033q";
 #endif
 
 #ifdef TOS
 
 #include <osbind.h>
+#ifdef MINT
+#include <sys/ioctl.h>
+#endif
 #ifndef WORD
 #define WORD short /* 16 bits -- redefine if necessary */
 #endif
@@ -168,8 +176,7 @@ DOSgetch()
 }
 
 long
-freediskspace(path)
-char *path;
+freediskspace(char *path)
 {
     int drive = 0;
     struct {
@@ -189,8 +196,7 @@ char *path;
  * Functions to get filenames using wildcards
  */
 int
-findfirst(path)
-char *path;
+findfirst(char *path)
 {
     return (Fsfirst(path, 0) == 0);
 }
@@ -208,21 +214,23 @@ foundfile_buffer()
 }
 
 long
-filesize(file)
-char *file;
+filesize(char *file)
 {
-    if (findfirst(file))
-        return (*(long *) ((char *) Fgetdta() + 26));
-    else
+    long sz;
+
+    if (!findfirst(file))
         return -1L;
+    /* The DTA d_length field at offset 26 is not guaranteed to be
+       4-byte aligned; a direct long dereference faults on 68000. */
+    memcpy(&sz, (char *) Fgetdta() + 26, sizeof sz);
+    return sz;
 }
 
 /*
  * Chdrive() changes the default drive.
  */
 void
-chdrive(str)
-char *str;
+chdrive(const char *str)
 {
     char *ptr;
     char drive;
@@ -238,7 +246,6 @@ void
 get_scr_size()
 {
 #ifdef MINT
-#include <ioctl.h>
     struct winsize win;
     char *tmp;
 
@@ -248,15 +255,24 @@ get_scr_size()
         LI = atoi(tmp);
     if (tmp && (tmp = nh_getenv("COLUMNS")))
         CO = atoi(tmp);
-    else {
-        ioctl(0, TIOCGWINSZ, &win);
+    else if (ioctl(0, TIOCGWINSZ, &win) == 0) {
         LI = win.ws_row;
         CO = win.ws_col;
+    } else {
+        LI = 25;
+        CO = 80;
     }
 #else
+    WORD rows, cols;
+
     init_aline();
-    LI = (*((WORD *) (_a_line + -42L))) + 1;
-    CO = (*((WORD *) (_a_line + -44L))) + 1;
+    /* Line-A variables live at fixed offsets below _a_line; the base
+       isn't guaranteed to be word-aligned, so copy out instead of
+       casting through a (WORD *) which faults on 68000. */
+    memcpy(&rows, _a_line - 42, sizeof rows);
+    memcpy(&cols, _a_line - 44, sizeof cols);
+    LI = rows + 1;
+    CO = cols + 1;
 #endif
 }
 
@@ -371,5 +387,30 @@ dosuspend()
     return (0);
 }
 #endif /* SUSPEND */
+
+#ifdef NOTTYGRAPHICS
+/* stub for pcsys.c when building without TTY */
+void
+term_curs_set(int visibility UNUSED)
+{
+}
+#endif
+
+/* NetHack's error() must be provided here because unixtty.c is not
+   compiled for TOS, and MiNT libc has a weak error() symbol with an
+   incompatible signature (GNU error()) that would be used otherwise. */
+void
+error(const char *s, ...)
+{
+    va_list the_args;
+
+    va_start(the_args, s);
+    if (iflags.window_inited)
+        exit_nhwindows((char *) 0);
+    vprintf(s, the_args);
+    (void) putchar('\n');
+    va_end(the_args);
+    nethack_exit(EXIT_FAILURE);
+}
 
 #endif /* TOS */
