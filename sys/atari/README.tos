@@ -23,8 +23,10 @@ Supported display modes:
         - Atari TT  "TT-Mid"
         - Atari Falcon  "VGA 4-plane"
         - or any graphics-card setup providing equivalent output
-    - 640x480 with 256 colours (best tile rendering)
+    - 640x480 with 256 colours
         - Atari Falcon  "VGA 8-plane"
+        - NetHack uses the 32-colour NH32.IMG tile sheet here;
+          the extra display pens are left alone for GEM.
     - ST High (640x400 monochrome) -- experimental, ASCII map
       only.  The monochrome tile sheet ships in the package but
       the small screen and lack of colour make ASCII the
@@ -46,8 +48,10 @@ The archive expands into a self-contained game directory:
     gem_rsc.rsc         GEM dialog resources
     NH2.IMG             monochrome tile sheet (Atkinson dithered)
     NH16.IMG            16-colour tile sheet
-    NH32.IMG            256-colour tile sheet
-    TITLE.IMG, RIP.IMG  splash and tombstone images
+    NH32.IMG            32-colour tile sheet
+    TITLE.IMG           splash image (colour)
+    TITLE2.IMG          splash image (monochrome)
+    RIP.IMG             tombstone image
     README.txt          this file
     license, symbols, nethack.txt
     levels/, save/      empty, written to during play
@@ -62,11 +66,12 @@ during play to toggle between tiles and ASCII.
 
 In 4-plane (16-colour) video modes the VDI palette is rewritten
 at startup to match the tile palette baked into NH16.IMG.  In
-8-plane (256-colour) modes the system pens 0..15 are preserved
-and the tile palette occupies pens 16..255.  In ST High
-(monochrome) NetHack runs in ASCII mode; a monochrome tile
-sheet using Atkinson dithering is included but the small screen
-and lack of colour make it impractical.
+8-plane (256-colour) modes pens 0..15 are left alone and the
+32-colour NH32.IMG palette is loaded into pens 16..47, so GEM
+keeps its standard system colours.  In ST High (monochrome)
+NetHack runs in ASCII mode; the Atkinson-dithered NH2.IMG ships
+in the package but the small screen makes ASCII the practical
+choice there.
 
 To force ASCII text mode by default, edit nethack.cnf:
 
