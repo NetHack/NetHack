@@ -279,8 +279,7 @@ get_scr_size()
 #define BIGBUF 8192
 
 int
-_copyfile(from, to)
-char *from, *to;
+_copyfile(char *from, char *to)
 {
     int fromfd, tofd, r;
     char *buf;
@@ -366,10 +365,9 @@ extern int __mint;
 #endif
 
 int
-dosuspend()
+dosuspend(void)
 {
 #ifdef MINT
-    extern int kill();
     if (__mint == 0) {
 #endif
         pline("Sorry, it seems we have no SIGTSTP here.  Try ! or S.");
