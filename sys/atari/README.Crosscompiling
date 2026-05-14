@@ -21,27 +21,30 @@ extract them at the host root '/'.  Files land under
 /usr/m68k-atari-mint and /usr/lib/gcc/m68k-atari-mint and can
 be uninstalled by removing those directories.
 
-Toolchain components (gcc 14.x or newer recommended; versions
-4.6 through 15.2 are available):
+Host tools (run on Linux; verified with gcc 15.2.0, builds also
+on gcc 14.x).  Download from https://tho-otto.de/crossmint.php:
 
-    gcc-<version>-mint-bin-linux64.tar.xz
-    binutils-<version>-mint-bin-linux64.tar.xz
-    mintlib-<version>-mint-bin-linux64.tar.xz
+    gcc-<version>-mint-<date>-bin-linux64.tar.xz
+    binutils-<version>-mint-<date>-bin-linux64.tar.xz
 
-Install at the host root:
+Install at /:
 
     cd /
-    sudo tar xJf gcc-<version>-mint-bin-linux64.tar.xz
-    sudo tar xJf binutils-<version>-mint-bin-linux64.tar.xz
-    sudo tar xJf mintlib-<version>-mint-bin-linux64.tar.xz
+    sudo tar xJf gcc-<version>-mint-<date>-bin-linux64.tar.xz
+    sudo tar xJf binutils-<version>-mint-<date>-bin-linux64.tar.xz
 
 
-Additional libraries
---------------------
+Target libraries
+----------------
 
-The Atari build requires three additional libraries on top of
-the toolchain.  Each is distributed as a tarball that extracts
-into the cross-mint sysroot.
+The Atari build needs three libraries linked into the binary at
+build time.  These are TARGET binaries (m68k a.out objects),
+distributed as tarballs whose contents go into the cross-mint
+sysroot at /usr/m68k-atari-mint/sys-root/.
+
+  C library + headers: mintlib
+    https://tho-otto.de/snapshots/mintlib/
+    Without this, nothing C-related will link.
 
   Math: fdlibm
     https://tho-otto.de/snapshots/fdlibm/
@@ -53,11 +56,19 @@ into the cross-mint sysroot.
     https://tho-otto.de/snapshots/gemlib/
     Provides libgem.a and gem.h.
 
-Install both at the cross-mint sysroot:
+Install all three INTO the sysroot directory (NOT at /).  The
+tarballs include a usr/ prefix that becomes
+/usr/m68k-atari-mint/sys-root/usr/...:
 
+    sudo mkdir -p /usr/m68k-atari-mint/sys-root
     cd /usr/m68k-atari-mint/sys-root
+    sudo tar xjf <path>/mintlib-<version>-mint.tar.bz2
     sudo tar xjf <path>/fdlibm-<version>-mint.tar.bz2
     sudo tar xjf <path>/gemlib-<version>-mint.tar.bz2
+
+Do NOT extract these tarballs at /: their internal layout uses
+usr/include and usr/lib, which would conflict with the host's
+Linux libc headers.
 
   GEM UI toolkit: E_GEM 2.2
     https://github.com/ingpaschke/EGEM_220
