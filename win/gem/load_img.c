@@ -17,9 +17,9 @@
 
 /* VDI <-> Device palette order conversion matrixes: */
 /* Four-plane vdi-device */
-int vdi2dev4[] = { 0, 15, 1, 2, 4, 6, 3, 5, 7, 8, 9, 10, 12, 14, 11, 13 };
+short vdi2dev4[] = { 0, 15, 1, 2, 4, 6, 3, 5, 7, 8, 9, 10, 12, 14, 11, 13 };
 /* Two-plane vdi-device */
-int vdi2dev2[] = { 0, 3, 1, 2 };
+short vdi2dev2[] = { 0, 3, 1, 2 };
 
 void
 get_colors(int handle, short *palette, int col)
