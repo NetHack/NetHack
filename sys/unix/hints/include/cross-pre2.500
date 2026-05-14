@@ -567,7 +567,9 @@ ifdef CROSS_TO_ATARI
 # Uses the m68k-atari-mint cross-compiler on Linux or macOS.
 #
 # Toolchain: https://tho-otto.de/crossmint.php
-# Once installed (typically under /usr/m68k-atari-mint), run:
+# The companion script sys/atari/install-toolchain.sh installs the
+# full toolchain (gcc, binutils, mintlib, fdlibm, gemlib, E_GEM) under
+# /opt/cross-mint by default.  Once installed, run:
 #     sys/unix/setup.sh sys/unix/hints/linux.500
 #     make fetch-lua
 #     make CROSS_TO_ATARI=1 all
@@ -580,12 +582,12 @@ CFLAGS += -DCROSSCOMPILE
 # Override the build tools and some obj files to
 # reflect the m68k-atari-mint cross-compiler.
 #
-# TOOLTOP is the directory holding m68k-atari-mint-{gcc,c++,ar}.  The
-# pre-built tho-otto.de packages install into /usr/bin; the typical
-# hand-built crossmint installs into /opt/cross-mint/bin or
-# /usr/local/cross-mint/bin.  Override on the make command line if
-# your toolchain lives elsewhere.
-TOOLTOP = /usr/bin
+# TOOLTOP is the directory holding m68k-atari-mint-{gcc,c++,ar}.
+# Default matches sys/atari/install-toolchain.sh.  Override on the
+# make command line if your toolchain lives elsewhere, e.g.
+#     make CROSS_TO_ATARI=1 TOOLTOP=/usr/bin package      # raw tho-otto tarballs at /
+#     make CROSS_TO_ATARI=1 TOOLTOP=$HOME/cross-mint/bin  # unprivileged install
+TOOLTOP = /opt/cross-mint/bin
 TOOLARCH = -m68000
 EGEMDIR ?= ../lib/e_gem
 EGEMINCL = -I$(EGEMDIR)
