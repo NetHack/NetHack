@@ -458,7 +458,11 @@ static char *mar_copy_of(const char *);
 
 extern void panic(const char *, ...);
 extern int done2(void);
-extern boolean menuitem_invert_test(int, unsigned, boolean);
+/* NetHack core defines boolean as schar (signed char, 1 byte); E_GEM's
+   boolean is enum int (4 bytes).  Declare with signed char so the d0
+   return value is read as the 1 byte the callee actually wrote, not
+   with garbage in the upper bytes. */
+extern signed char menuitem_invert_test(int, unsigned, signed char);
 void *
 m_alloc(size_t amt)
 {
@@ -1789,10 +1793,13 @@ mar_set_accelerators()
         short extent[8];
         v_set_text(menu_font.id, menu_font.size, BLACK, 0, 0, vst_out);
         vqt_extent(x_handle, curr->Gmi_str, extent);
-        Max(&Inv_width, extent[4] + Tile_width + menu_font.cw);
+        Max(&Inv_width, (short) (extent[4] + Tile_width + menu_font.cw));
         if (ch && curr->Gmi_accelerator == 0 && curr->Gmi_identifier) {
             curr->Gmi_accelerator = ch;
-            curr->Gmi_str[0] = ch;
+            /* Gem_add_menu writes a '?' placeholder at str[0] for items
+               with no pre-assigned accelerator; only overwrite that. */
+            if (curr->Gmi_str[0] == '?')
+                curr->Gmi_str[0] = ch;
             if (ch == 'z')
                 ch = 'A';
             else if (ch == 'Z')
@@ -2105,7 +2112,8 @@ invert_all_on_page(short start, short page, char acc)
         ;
     for (; page-- && curr; curr = curr->Gmi_next)
         if (curr->Gmi_identifier && (acc == 0 || curr->Gmi_groupacc == acc)) {
-            if (!menuitem_invert_test(0, curr->Gmi_itemflags, curr->Gmi_selected))
+            if (!menuitem_invert_test(0, curr->Gmi_itemflags,
+                                      (signed char) curr->Gmi_selected))
                 continue;
             if (curr->Gmi_selected) {
                 curr->Gmi_selected = FALSE;
@@ -2602,7 +2610,7 @@ mar_display_nhwindow(winid wind)
         z_ob[LINESLIST].ob_spec.userblk = &ub_inventory;
         if ((Menu_title)
             && (wind != WIN_INVEN)) /* because I sets no Menu_title */
-            Max(&Inv_width, gr_cw * strlen(Menu_title) + 16);
+            Max(&Inv_width, (short) (gr_cw * strlen(Menu_title) + 16));
         scroll_menu.px_vline = menu_font.ch;
         scroll_menu.px_hline = menu_font.cw;
         mar_di_mode = mar_set_inv_win(num_inv_lines, Inv_width);
@@ -2994,6 +3002,7 @@ mar_nh_poskey(short *x, short *y, short *mod)
     static XEVENT xev;
     short retval, ev;
 
+    do {
     xev.ev_mflags = Main_Init(&xev, 0xFFFF);
     ev = Event_Multi(&xev);
 
@@ -3159,8 +3168,7 @@ mar_nh_poskey(short *x, short *y, short *mod)
         }
     } /* MU_MESAG */
 
-    if (retval == FAIL)
-        retval = mar_nh_poskey(x, y, mod);
+    } while (retval == FAIL);
 
     return (retval);
 }

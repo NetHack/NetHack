@@ -769,8 +769,8 @@ Gem_add_menu(winid window, const glyph_info *glyphinfo,
     G_item->Gmi_selected = (itemflags & MENU_ITEMFLAGS_SELECTED) ? 1 : 0;
     G_item->Gmi_accelerator = ch;
     G_item->Gmi_groupacc = gch;
-    G_item->Gmi_attr = attr;
-    G_item->Gmi_color = clr;
+    G_item->Gmi_attr = (short) attr;
+    G_item->Gmi_color = (short) clr;
     G_item->Gmi_itemflags =
         (unsigned short) (itemflags & ~MENU_ITEMFLAGS_SELECTED);
     G_item->Gmi_str = copy_of(newstr);
