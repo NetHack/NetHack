@@ -338,7 +338,7 @@
 #endif
 
 #if defined(BSD) || defined(ULTRIX)
-#if !defined(DGUX) && !defined(SUNOS4) && !defined(__NetBSD__)
+#if !defined(DGUX) && !defined(SUNOS4) && !defined(__NetBSD__) && !defined(__FreeBSD__)
 #define memcpy(d, s, n) bcopy(s, d, n)
 #define memcmp(s1, s2, n) bcmp(s2, s1, n)
 #endif

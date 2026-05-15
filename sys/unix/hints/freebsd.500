@@ -1,0 +1,73 @@
+#
+# NetHack 5.0 unix $NHDT-Date: 1778708083 2026/05/13 21:34:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.0 $
+# Copyright 2026 by Anthony C Howe.
+# NetHack may be freely redistributed.  See license for details.
+#
+# This is a contributed file.  The NetHack Development Team makes this
+# file available so that others may benefit, but may not be able to
+# support or maintain it. Use at your own risk.
+#
+#-PRE
+# unix hints file
+# This hints file provides the legacy configuration that NetHack has shipped
+# with historically - this means you will most likely need to hand edit .h
+# and Makefiles.
+
+PREFIX=/usr/local
+
+# Binaries and supporting data.
+HACKDIR=$(PREFIX)/libexec/nethackdir
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Careful, this directory is deleted on install.
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+INSTDIR=$(HACKDIR)
+
+# Save games
+VARDIR=/var/games/nethackdir
+
+# Home for nethask.sh wrapper.  If undefined, no wrapper installed.
+# Suggest leaving /usr/games as-is from bsdgames.tgz.
+SHELLDIR=$(PREFIX)/bin
+
+CFLAGS=-O -I../include -USYSV -DBSD -DHACKDIR='"$(HACKDIR)"' -DVAR_PLAYGROUND='"$(VARDIR)"'
+LINK=$(CC)
+
+WINSRC = $(WINTTYSRC)
+WINOBJ = $(WINTTYOBJ)
+WINLIB = $(WINTTYLIB)
+
+WINTTYLIB=-ltermcap
+
+CHOWN=chown
+CHGRP=chgrp
+
+GAMEUID  = games
+GAMEGRP  = games
+
+GAMEPERM = 04755
+VARFILEPERM = 0644
+VARDIRPERM = 0755
+
+.ifdef MAKEFILE_DOC
+MAKEDEFS = ../util/makedefs
+NEEDMAKEDEFS = $(MAKEDEFS)
+NROFF = groff
+# NROFF_FLAGS comes from a hints file
+GUIDEBOOK = Guidebook           # regular ASCII file
+COLCMD = col -bx
+PSCMD = $(NROFF)
+NHGREP = $(MAKEDEFS) --grep --input - --output -
+GUIDEBOOK_MN_SRC = Guidebook.mn
+GUIDEBOOK_MN = $(GUIDEBOOK_MN_SRC)
+GUIDE_PREFORMAT = cat $(GUIDEBOOK_MN) | $(NHGREP) | tbl tmac.n -
+ONEPAGE_PREFORMAT = cat Gbk-1pg-pfx.mn $(GUIDEBOOK_MN) Gbk-1pg-sfx.mn \
+	| $(NHGREP) | tbl tmac.n -
+ONEPAGECMD = $(ONEPAGE_PREFORMAT) | $(NROFF) -c -Tascii $(NROFF_FLAGS) \
+	| $(COLCMD)
+GUIDECMD = export GROFF_NO_SGR=1; \
+	$(GUIDE_PREFORMAT) | $(NROFF) -c -Tascii $(NROFF_FLAGS) \
+	| $(COLCMD)
+GUIDEBOOK_TEX_SRC = Guidebook.tex
+GUIDEBOOK_TEX = $(GUIDEBOOK_TEX_SRC)
+.endif  # MAKEFILE_DOC
