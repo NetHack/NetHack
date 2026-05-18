@@ -133,9 +133,12 @@ extern short mar_get_msg_visible(void);          /* from wingem.c */
 extern void mar_get_font(short, char **, short *); /* from wingem.c */
 
 /* Find the VDI pen whose current color is closest to the given RGB (0-1000).
-   Useful because the tile palette remaps standard VDI color indices. */
+   Useful because the tile palette remaps standard VDI color indices.
+   When skip_black is set, pens that are too close to pure black are
+   excluded -- prevents NetHack text colors that don't have a close
+   palette match from rendering as black-on-black on the map. */
 static short
-nearest_pen(short want_r, short want_g, short want_b)
+nearest_pen_ex(short want_r, short want_g, short want_b, short skip_black)
 {
     short i, best = 1;
     long best_dist = 0x7FFFFFFFL, d;
@@ -143,6 +146,9 @@ nearest_pen(short want_r, short want_g, short want_b)
 
     for (i = 0; i < colors && i < 16; i++) {
         vq_color(x_handle, i, 0, rgb);
+        /* Exclude pure-black-ish pens from the candidate set. */
+        if (skip_black && rgb[0] + rgb[1] + rgb[2] < 300)
+            continue;
         d = (long)(rgb[0]-want_r)*(rgb[0]-want_r)
           + (long)(rgb[1]-want_g)*(rgb[1]-want_g)
           + (long)(rgb[2]-want_b)*(rgb[2]-want_b);
@@ -154,16 +160,61 @@ nearest_pen(short want_r, short want_g, short want_b)
     return best;
 }
 
+static short
+nearest_pen(short want_r, short want_g, short want_b)
+{
+    return nearest_pen_ex(want_r, want_g, want_b, 0);
+}
+
 /* Cached pen lookups - recomputed after tile palette is set.
    Defaults match standard VDI palette (before tile remap). */
 static short pen_black = 1, pen_white = 0, pen_darkgray = 1;
 
+/* Per-NetHack-CLR_* VDI pen, computed at runtime via nearest_pen
+   against the currently-installed workstation palette.  Replaces the
+   fixed nhclr_to_vdi[] table -- the tile palette install in
+   palettized modes can remap pens 0..15 away from the standard ST
+   palette, so a fixed lookup misses the closest available colour. */
+static short nhclr_to_pen[16] = {
+    /* sensible defaults until cache_nhclr_pens() runs */
+    1, 2, 3, 6, 4, 7, 5, 9, 1, 10, 11, 14, 12, 15, 13, 0
+};
+
 static void
 cache_pens(void)
 {
+    /* Target RGB (VDI 0..1000) for each NetHack CLR_*.  CLR_BLACK
+       and CLR_WHITE keep the corners of the cube; the rest use the
+       standard 8-colour wheel with a darkened "bright" variant. */
+    static const short nhclr_rgb[16][3] = {
+        {   0,   0,   0}, /* CLR_BLACK         */
+        {1000,   0,   0}, /* CLR_RED           */
+        {   0, 800,   0}, /* CLR_GREEN         */
+        { 700, 400,   0}, /* CLR_BROWN         */
+        {   0,   0,1000}, /* CLR_BLUE          */
+        {1000,   0,1000}, /* CLR_MAGENTA       */
+        {   0, 800,1000}, /* CLR_CYAN          */
+        { 733, 733, 733}, /* CLR_GRAY          */
+        { 500, 500, 500}, /* NO_COLOR (unused) */
+        {1000, 600,   0}, /* CLR_ORANGE        */
+        { 400,1000, 400}, /* CLR_BRIGHT_GREEN  */
+        {1000,1000,   0}, /* CLR_YELLOW        */
+        { 533, 533,1000}, /* CLR_BRIGHT_BLUE   */
+        {1000, 533,1000}, /* CLR_BRIGHT_MAGENTA*/
+        { 533,1000,1000}, /* CLR_BRIGHT_CYAN   */
+        {1000,1000,1000}, /* CLR_WHITE         */
+    };
+    short i;
     pen_black    = nearest_pen(0, 0, 0);
     pen_white    = nearest_pen(1000, 1000, 1000);
     pen_darkgray = nearest_pen(400, 400, 400);
+    /* Skip pure-black-ish pens for NetHack text colours so map glyphs
+       always render visibly on the black map background, even when
+       the palette has no close match for a particular CLR_*. */
+    for (i = 0; i < 16; i++)
+        nhclr_to_pen[i] = nearest_pen_ex(nhclr_rgb[i][0],
+                                         nhclr_rgb[i][1],
+                                         nhclr_rgb[i][2], 1);
 }
 
 /* Set window scrollbar elements to dark grey */
@@ -544,12 +595,36 @@ static short pet_mark_data[] = { 0x0000, 0x3600, 0x7F00, 0x7F00,
 static short *normal_palette = NULL;
 static void restore_normal_palette(void);
 
-/* NetHack CLR_* (0..15) -> VDI pen.  NO_COLOR (NetHack code 8) means
-   "no menu colour set"; callers fall back to a context-appropriate
-   default.  hack.h is not included here, so the literal 8 is used. */
+/* NetHack CLR_* (0..15) -> VDI pen.  Mapped against default_st_vdi
+   so each NetHack colour lands on the closest ST-palette pen.  Dark
+   variants (black/red/green/blue/magenta/cyan/yellow) take the
+   primary pens 1..7; "bright" variants take the corresponding
+   pens 9..15.  NO_COLOR (NetHack code 8) is special-cased by
+   callers and never actually indexes here.  CLR_WHITE maps to
+   black so it's visible on light dialog backgrounds (pen 0 = white
+   would be invisible). */
 static const short nhclr_to_vdi[16] = {
-    9, 2, 11, 10, 4, 7, 8, 15,
-    0, 14, 3,  6,  5, 13, 15, 0
+    1,  /* CLR_BLACK        -> pen 1  (black)          */
+    2,  /* CLR_RED          -> pen 2  (red)            */
+    3,  /* CLR_GREEN        -> pen 3  (green)          */
+    6,  /* CLR_BROWN        -> pen 6  (yellow, closest to brown in
+                                       ST default palette) */
+    4,  /* CLR_BLUE         -> pen 4  (blue)           */
+    7,  /* CLR_MAGENTA      -> pen 7  (magenta)        */
+    5,  /* CLR_CYAN         -> pen 5  (cyan)           */
+    9,  /* CLR_GRAY         -> pen 9  (dk grey)        */
+    1,  /* NO_COLOR         -> black (special-cased upstream) */
+    10, /* CLR_ORANGE       -> pen 10 (lt red, closest to orange) */
+    11, /* CLR_BRIGHT_GREEN -> pen 11 (lt green)       */
+    14, /* CLR_YELLOW       -> pen 14 (lt yellow)      */
+    12, /* CLR_BRIGHT_BLUE  -> pen 12 (lt blue)        */
+    15, /* CLR_BRIGHT_MAGENTA -> pen 15 (lt magenta)   */
+    13, /* CLR_BRIGHT_CYAN  -> pen 13 (lt cyan)        */
+    0   /* CLR_WHITE        -> pen 0 (white) for visibility on the
+                                black map background.  draw_inventory
+                                special-cases CLR_WHITE to pen 1 so
+                                it stays visible on dialog backgrounds
+                                too. */
 };
 
 static struct gw {
@@ -576,6 +651,12 @@ SCROLL scroll_map;
    back to calc_std_winplace. */
 static short map_user_placed = FALSE;
 char **map_glyphs = NULL;
+/* Per-cell VDI pen for ASCII map rendering.  Populated by
+   mar_print_char; consumed by win_draw_map's ASCII branch which
+   draws each same-colour run as one v_mtext call.  Replaces the
+   old "white text + OR colored cells" trick that only worked on
+   ST 4-plane palette ordering and breaks in truecolor. */
+short **map_colors = NULL;
 dirty_rect *dr_map;
 
 char **status_line;
@@ -1071,30 +1152,37 @@ win_draw_map(short msg, WIN *win, GRECT *area)
                      - win->work.g_y) / map_font.ch
                     + scroll_map.vpos,
                     ROWNO);
-        v_set_text(map_font.id, map_font.size, WHITE, 0, 0, vst_out);
         v_set_mode(MD_TRANS);
 
         x = win->work.g_x - scroll_map.px_hpos + start * map_font.cw;
         y = win->work.g_y - scroll_map.px_vpos + starty * map_font.ch;
-        pla[2] = pla[0] = scroll_map.px_hpos + area->g_x - win->work.g_x;
-        pla[3] = pla[1] = starty * map_font.ch;
-        pla[2] += w;
-        pla[3] += map_font.ch - 1;
-        pla[6] = pla[4] = area->g_x; /* x_wert to */
-        pla[7] = pla[5] = y;         /* y_wert to */
-        pla[6] += w;
-        pla[7] += map_font.ch - 1;
         back.g_h = map_font.ch;
-        for (i = starty; i < stopy; i++, y += map_font.ch,
-            pla[1] += map_font.ch, pla[3] += map_font.ch,
-            pla[5] += map_font.ch, pla[7] += map_font.ch) {
+        /* Render each row as a sequence of same-colour runs, drawing
+           each run as one v_mtext.  Replaces the old "white text +
+           OR colored cells" trick (which only worked on the ST
+           4-plane palette by accident, and gives white text on
+           colored backgrounds in truecolor). */
+        for (i = starty; i < stopy; i++, y += map_font.ch) {
+            short j = start;
             back.g_y = y;
             my_color_area(&back, BLACK);
-            tmp = map_glyphs[i][stop];
-            map_glyphs[i][stop] = 0;
-            (*v_mtext)(x_handle, x, y, &map_glyphs[i][start]);
-            map_glyphs[i][stop] = tmp;
-            vro_cpyfm(x_handle, S_OR_D, pla, &FontCol_Bild, screen);
+            while (j < stop) {
+                short run_color =
+                    map_colors ? map_colors[i][j] : WHITE;
+                short k = j + 1;
+                while (k < stop && map_colors
+                       && map_colors[i][k] == run_color)
+                    k++;
+                v_set_text(map_font.id, map_font.size, run_color,
+                           0, 0, vst_out);
+                tmp = map_glyphs[i][k];
+                map_glyphs[i][k] = 0;
+                (*v_mtext)(x_handle,
+                           x + (short) (j - start) * map_font.cw, y,
+                           &map_glyphs[i][j]);
+                map_glyphs[i][k] = tmp;
+                j = k;
+            }
         }
     } else {
         v_set_mode(MD_REPLACE);
@@ -1185,6 +1273,7 @@ draw_lines(PARMBLK *pb)
         Vsync();
         for (; --start_line >= 0; y += text_font.ch) {
             short gl = *gptr++;
+            short line_off = (use_tiles && gl != no_glyph) ? text_x_off : 0;
             area.g_y = y;
             my_clear_area(&area);
             if (use_tiles && gl != no_glyph) {
@@ -1207,10 +1296,10 @@ draw_lines(PARMBLK *pb)
             }
             if (**ptr - 1) {
                 v_set_text(FAIL, 0, BLUE, 0, 0, vst_out);
-                (*v_mtext)(x_handle, x + text_x_off, y, (*ptr++) + 1);
+                (*v_mtext)(x_handle, x + line_off, y, (*ptr++) + 1);
                 v_set_text(FAIL, 0, BLACK, 0, 0, vst_out);
             } else
-                (*v_mtext)(x_handle, x + text_x_off, y, (*ptr++) + 1);
+                (*v_mtext)(x_handle, x + line_off, y, (*ptr++) + 1);
         }
     }
     return (0);
@@ -1392,10 +1481,13 @@ draw_inventory(PARMBLK *pb)
             short pen;
 
             /* Gmi_color == 8 is NO_COLOR -- fall back to attr-based
-               BLUE/BLACK so uncoloured items keep the historical look. */
+               BLUE/BLACK so uncoloured items keep the historical look.
+               CLR_WHITE on the white dialog background would be
+               invisible; substitute BLACK so it stays readable. */
             if (it->Gmi_color >= 0 && it->Gmi_color < 16
                 && it->Gmi_color != 8)
-                pen = nhclr_to_vdi[it->Gmi_color];
+                pen = (it->Gmi_color == 15)
+                    ? BLACK : nhclr_to_pen[it->Gmi_color];
             else if (it->Gmi_attr)
                 pen = BLUE;
             else
@@ -1564,8 +1656,15 @@ mar_gem_init()
             "[3][ Color-depth | not supported. | Try 2-256 colors | or 16/24-bit. ][ Ok ]");
         return (0);
     }
-    if (planes >= 16)
+    if (planes >= 16) {
+        short i;
         probe_truecolor_format();
+        /* Install the standard ST palette at pens 0..15 so text and
+           chrome rendering (which uses pen indices via nhclr_to_vdi
+           and vst_color) gets the expected colors. */
+        for (i = 0; i < 16; i++)
+            vs_color(x_handle, i, (short *) default_st_vdi[i]);
+    }
     MouseBee();
 
     /* NVDI 3.0 or better used v_ftext; not available in modern gemlib,
@@ -3127,9 +3226,16 @@ mar_create_window(short type)
         break;
     case NHW_MAP:
         map_glyphs = (char **) m_alloc((long) ROWNO * sizeof(char *));
+        map_colors = (short **) m_alloc((long) ROWNO * sizeof(short *));
         for (i = 0; i < ROWNO; i++) {
             map_glyphs[i] = (char *) m_alloc((long) COLNO * sizeof(char));
+            map_colors[i] = (short *) m_alloc((long) COLNO * sizeof(short));
             *map_glyphs[i] = map_glyphs[i][COLNO - 1] = 0;
+            {
+                int xc;
+                for (xc = 0; xc < COLNO; xc++)
+                    map_colors[i][xc] = WHITE; /* default: visible on black */
+            }
         }
         dr_map = new_dirty_rect(10);
         if (!dr_map)
@@ -3212,8 +3318,10 @@ mar_destroy_nhwindow(int window)
     if (window == WIN_MAP) {
         for (i = 0; i < ROWNO; i++) {
             free(map_glyphs[i]);
+            if (map_colors) free(map_colors[i]);
         }
         null_free(map_glyphs);
+        if (map_colors) null_free(map_colors);
         WIN_MAP = WIN_ERR;
     }
     if (window == WIN_STATUS) {
@@ -3673,21 +3781,10 @@ void
 mar_print_char(winid window, coordxy x, coordxy y, char ch, short col)
 {
     if (window != WIN_ERR && window == WIN_MAP) {
-        short pla[8], colindex[2];
-
         map_glyphs[y][x] = ch;
-
-        pla[0] = pla[1] = 0;
-        pla[2] = map_font.cw - 1;
-        pla[3] = map_font.ch - 1;
-        pla[6] = pla[4] = map_font.cw * x;
-        pla[7] = pla[5] = map_font.ch * y;
-        pla[6] += map_font.cw - 1;
-        pla[7] += map_font.ch - 1;
-        colindex[0] = (col >= 0 && col < 16) ? nhclr_to_vdi[col] : pen_black;
-        colindex[1] = pen_white;
-        vrt_cpyfm(x_handle, MD_REPLACE, pla, &Black_bild, &FontCol_Bild,
-                  colindex);
+        if (map_colors)
+            map_colors[y][x] = (col >= 0 && col < 16)
+                ? nhclr_to_pen[col] : pen_white;
     }
 }
 

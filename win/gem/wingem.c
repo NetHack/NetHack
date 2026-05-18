@@ -911,7 +911,16 @@ mar_print_gl_char(winid window, coordxy x, coordxy y, int ch, int color)
         color = NO_COLOR;
 #endif /* TEXTCOLOR */
 
-    mar_print_char(window, x, y, ch, color);
+    /* NetHack 5.0 may set NH_BASIC_COLOR (0x1000000) or NH_ALTPALETTE
+       (0x2000000) flags on the colour value, with the basic CLR_* index
+       or a 24-bit RGB in the low bits.  We only handle the basic-colour
+       form here: strip flags, keep the low 8 bits.  Out-of-range values
+       become NO_COLOR and fall through to the default pen. */
+    color = color & 0xFF;
+    if (color >= 16)
+        color = NO_COLOR;
+
+    mar_print_char(window, x, y, ch, (short) color);
 }
 
 extern void mar_raw_print(const char *);
