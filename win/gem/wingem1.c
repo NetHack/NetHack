@@ -395,6 +395,11 @@ short map_cursx = 0, map_cursy = 0, curs_col = WHITE;
 short draw_cursor = TRUE, scroll_margin = -1;
 NHGEM_FONT map_font;
 SCROLL scroll_map;
+/* Set when the user has dragged the map window via MOVER, resized
+   via SIZER, or toggled FULLER.  Rearrange_windows then keeps the
+   user's geometry across font/tile-mode changes instead of snapping
+   back to calc_std_winplace. */
+static short map_user_placed = FALSE;
 char **map_glyphs = NULL;
 dirty_rect *dr_map;
 
@@ -757,12 +762,28 @@ mar_set_font(short type, const char *font_name, short size)
     }
     mar_set_fontbyid(type, id, size);
 }
+/* Apply a user-driven move/resize/full to the map window: commit the
+   new geometry via window_size (which clamps to max/min, rebuilds the
+   SCROLL state, calls wind_set WF_CURRXYWH, and triggers a redraw),
+   then remember that the user owns the placement. */
+static void
+mar_map_resized(GRECT *new_curr)
+{
+    WIN *w;
+    if (WIN_MAP == WIN_ERR || (w = Gem_nhwindow[WIN_MAP].gw_window) == NULL)
+        return;
+    window_size(w, new_curr);
+    Gem_nhwindow[WIN_MAP].gw_place = w->curr;
+    map_user_placed = TRUE;
+}
+
 void
 rearrange_windows(void)
 {
     GRECT area;
     short todo = TRUE;
     if (WIN_MAP != WIN_ERR && Gem_nhwindow[WIN_MAP].gw_window) {
+        WIN *map_win = Gem_nhwindow[WIN_MAP].gw_window;
         scroll_map.px_hline =
             mar_set_tile_mode(FAIL) ? Tile_width : map_font.cw;
         scroll_map.px_vline =
@@ -772,9 +793,15 @@ rearrange_windows(void)
             todo = FALSE;
         }
         calc_std_winplace(NHW_MAP, &area);
-        Gem_nhwindow[WIN_MAP].gw_window->max.g_w = area.g_w;
-        Gem_nhwindow[WIN_MAP].gw_window->max.g_h = area.g_h;
-        window_reinit(Gem_nhwindow[WIN_MAP].gw_window, md, md, NULL, FALSE, 0);
+        map_win->max.g_w = area.g_w;
+        map_win->max.g_h = area.g_h;
+        if (map_user_placed)
+            /* User has moved/resized the window; preserve the geometry
+               but rerun window_size so SCROLL hpage/vpage/hmax/vmax
+               reflect the new line size from the font/tile change. */
+            window_size(map_win, &map_win->curr);
+        else
+            window_reinit(map_win, md, md, NULL, FALSE, 0);
         {
             short buf[8];
             buf[3] = K_CTRL;
@@ -3078,11 +3105,12 @@ mar_nh_poskey(short *x, short *y, short *mod)
         if (WIN_MAP != WIN_ERR
             && akt_win == Gem_nhwindow[WIN_MAP].gw_window
             && rc_inside(ex, ey, &akt_win->work)) {
-            /* rc_inside guard: window_find can return the map window
-               for clicks just outside its current work rect (title
-               bar, scroll bars).  Without the guard, the clamp below
-               maps those clicks to map cell (0,0) and the player
-               walks toward the top-left corner. */
+            /* rc_inside guard: window_find/wind_find can return the
+               map window for clicks just outside its current work
+               rect (title bar, scroll bars, or stale post-move
+               hit-test).  Without the guard, the clamp below maps
+               those clicks to map cell (0,0) and the player walks
+               toward the top-left corner. */
             *x = max(min((ex - akt_win->work.g_x) / scroll_map.px_hline
                              + scroll_map.hpos,
                          COLNO - 1),
@@ -3151,6 +3179,44 @@ mar_nh_poskey(short *x, short *y, short *mod)
             break; /* MN_SELECTED */
         case WM_CLOSED:
             WindowHandler(W_ICONIFYALL, NULL, NULL);
+            break;
+        case WM_MOVED:
+            /* Route the move through window_size so EGEM also
+               recalculates win->work (the inner work-area rect that
+               win_draw_map uses to place tiles on screen).  Updating
+               win->curr alone leaves win->work stale and the map
+               keeps drawing to the previous screen position. */
+            if (WIN_MAP != WIN_ERR
+                && Gem_nhwindow[WIN_MAP].gw_window
+                && buf[3] == Gem_nhwindow[WIN_MAP].gw_window->handle) {
+                WIN *w = Gem_nhwindow[WIN_MAP].gw_window;
+                GRECT nc;
+                nc.g_x = buf[4]; nc.g_y = buf[5];
+                nc.g_w = w->curr.g_w; nc.g_h = w->curr.g_h;
+                mar_map_resized(&nc);
+            }
+            break;
+        case WM_SIZED:
+            if (WIN_MAP != WIN_ERR
+                && Gem_nhwindow[WIN_MAP].gw_window
+                && buf[3] == Gem_nhwindow[WIN_MAP].gw_window->handle) {
+                GRECT nc;
+                nc.g_x = buf[4]; nc.g_y = buf[5];
+                nc.g_w = buf[6]; nc.g_h = buf[7];
+                mar_map_resized(&nc);
+            }
+            break;
+        case WM_FULLED:
+            /* Toggle between max and the previous user size.  EGEM
+               tracks win->prev (set by window_size on every resize). */
+            if (WIN_MAP != WIN_ERR
+                && Gem_nhwindow[WIN_MAP].gw_window
+                && buf[3] == Gem_nhwindow[WIN_MAP].gw_window->handle) {
+                WIN *w = Gem_nhwindow[WIN_MAP].gw_window;
+                GRECT nc =
+                    rc_equal(&w->curr, &w->max) ? w->prev : w->max;
+                mar_map_resized(&nc);
+            }
             break;
         case AP_TERM:
             retval = 'S';
