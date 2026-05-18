@@ -368,6 +368,7 @@ char *Tilefile = NULL;
 static short pet_mark_data[] = { 0x0000, 0x3600, 0x7F00, 0x7F00,
                                0x3E00, 0x1C00, 0x0800 };
 static short *normal_palette = NULL;
+static void restore_normal_palette(void);
 
 /* NetHack CLR_* (0..15) -> VDI pen.  NO_COLOR (NetHack code 8) means
    "no menu colour set"; callers fall back to a context-appropriate
@@ -1397,6 +1398,7 @@ mar_gem_init()
     if (planes > 0 && colors > 0 && colors <= 256) {
         normal_palette = (short *) m_alloc(3 * colors * sizeof(short));
         get_colors(x_handle, normal_palette, colors);
+        atexit(restore_normal_palette);
     }
 
     if (mar_set_tile_mode(FAIL)) {
@@ -1522,6 +1524,25 @@ loadimg:
     return (1);
 }
 
+/* Restore the original VDI palette and forget our saved copy.
+   Idempotent: subsequent calls are no-ops because null_free clears
+   normal_palette.  Registered with atexit() at startup so even
+   non-windowport exit paths (panic via nh_terminate, dialog quit)
+   leave the GEM desktop in a sane state.
+
+   Uses preserve_sys=0 (unlike img_set_colors which defaults to 1):
+   the title-image setup overwrites pens 0-15 directly with vs_color,
+   so a preserve_sys=1 restore would leave the desktop stuck with
+   title-image colors after quitting. */
+static void
+restore_normal_palette(void)
+{
+    if (normal_palette) {
+        img_set_colors_ex(x_handle, normal_palette, planes, 0);
+        null_free(normal_palette);
+    }
+}
+
 /************************* mar_exit_nhwindows *******************************/
 
 void
@@ -1531,10 +1552,7 @@ mar_exit_nhwindows()
 
     /* Restore the original VDI palette before tearing anything down, so a
        GEM desktop survives even if a later step bails out. */
-    if (normal_palette) {
-        img_set_colors(x_handle, normal_palette, planes);
-        null_free(normal_palette);
-    }
+    restore_normal_palette();
 
     for (i = MAXWIN; --i >= 0;)
         if (Gem_nhwindow[i].gw_type)
