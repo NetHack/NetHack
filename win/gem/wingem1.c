@@ -952,6 +952,32 @@ mar_map_resized(GRECT *new_curr)
     map_user_placed = TRUE;
 }
 
+/* Translate WIN_MESSAGE and WIN_STATUS by (dx, dy) pixels so they
+   track a map move.  GEM has no parent/child window relationship,
+   this is a manual lockstep.  Called from the WM_MOVED handler with
+   the actual delta map->curr changed by (post-window_size, so any
+   clamping the map underwent is reflected here). */
+static void
+mar_shift_chrome_windows(short dx, short dy)
+{
+    short which;
+    if (dx == 0 && dy == 0)
+        return;
+    for (which = 0; which < 2; which++) {
+        winid w_id = (which == 0) ? WIN_MESSAGE : WIN_STATUS;
+        WIN *w;
+        GRECT nc;
+        if (w_id == WIN_ERR) continue;
+        w = Gem_nhwindow[w_id].gw_window;
+        if (!w) continue;
+        nc = w->curr;
+        nc.g_x = (short) (nc.g_x + dx);
+        nc.g_y = (short) (nc.g_y + dy);
+        window_size(w, &nc);
+        Gem_nhwindow[w_id].gw_place = w->curr;
+    }
+}
+
 void
 rearrange_windows(void)
 {
@@ -3426,15 +3452,41 @@ mar_nh_poskey(short *x, short *y, short *mod)
                recalculates win->work (the inner work-area rect that
                win_draw_map uses to place tiles on screen).  Updating
                win->curr alone leaves win->work stale and the map
-               keeps drawing to the previous screen position. */
+               keeps drawing to the previous screen position.
+
+               Pre-clamp the requested delta so the message/status
+               chrome stays on screen; the map then stops at the same
+               boundary instead of sliding under the chrome.  After
+               committing, translate the chrome by the actual (post-
+               clamp) delta -- GEM has no parent/child windows; this
+               is manual lockstep. */
             if (WIN_MAP != WIN_ERR
                 && Gem_nhwindow[WIN_MAP].gw_window
                 && buf[3] == Gem_nhwindow[WIN_MAP].gw_window->handle) {
                 WIN *w = Gem_nhwindow[WIN_MAP].gw_window;
+                short old_x = w->curr.g_x, old_y = w->curr.g_y;
+                short dx = (short) (buf[4] - w->curr.g_x);
+                short dy = (short) (buf[5] - w->curr.g_y);
                 GRECT nc;
-                nc.g_x = buf[4]; nc.g_y = buf[5];
+                if (WIN_MESSAGE != WIN_ERR
+                    && Gem_nhwindow[WIN_MESSAGE].gw_window) {
+                    WIN *mw = Gem_nhwindow[WIN_MESSAGE].gw_window;
+                    short min_dy = (short) (desk.g_y - mw->curr.g_y);
+                    if (dy < min_dy) dy = min_dy;
+                }
+                if (WIN_STATUS != WIN_ERR
+                    && Gem_nhwindow[WIN_STATUS].gw_window) {
+                    WIN *sw = Gem_nhwindow[WIN_STATUS].gw_window;
+                    short max_dy = (short) (desk.g_y + desk.g_h
+                                            - sw->curr.g_y - sw->curr.g_h);
+                    if (dy > max_dy) dy = max_dy;
+                }
+                nc.g_x = (short) (w->curr.g_x + dx);
+                nc.g_y = (short) (w->curr.g_y + dy);
                 nc.g_w = w->curr.g_w; nc.g_h = w->curr.g_h;
                 mar_map_resized(&nc);
+                mar_shift_chrome_windows((short) (w->curr.g_x - old_x),
+                                         (short) (w->curr.g_y - old_y));
             }
             break;
         case WM_SIZED:
