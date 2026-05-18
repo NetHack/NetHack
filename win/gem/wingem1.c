@@ -4,6 +4,16 @@
 
 #define __TCC_COMPAT__
 
+/* USERDEF callbacks (draw_status, draw_msgline, draw_titel, ...) run on
+   the AES per-process supervisor stack u_super[], which is ~1.9KB on
+   stock EmuTOS 1.4.  gemlib's regular v_gtext allocates a 2104-byte
+   scratch frame (intin[1024] etc.) -- larger than the entire supervisor
+   stack -- and overflows into adjacent BSS (corrupting gl_rfull and
+   EmuTOS's contrl[]).  FORCE_GEMLIB_UDEF routes v_gtext to
+   udef_v_gtext, which uses a 20-byte stack frame plus a static global
+   intin buffer. */
+#define FORCE_GEMLIB_UDEF
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
