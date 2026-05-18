@@ -5,36 +5,22 @@ Requirements
 ------------
     - Atari ST-class machine (ST, STE, Mega ST/STE, TT, or Falcon)
       with at least 6 MB of RAM.
-    - GEM AES (TOS, MagiC, or FreeMiNT/XaAES).
+    - GEM AES (TOS, MagiC, EmuTOS, or FreeMiNT/XaAES).
     - At least VGA-class video: 640x480 with 16 colours.
 
     Known to work:
-      - Hatari (https://hatari.tuxfamily.org/) with TOS 2.06 (ST)
-        and TOS 3.06 (TT).
+      - Hatari (https://hatari.tuxfamily.org/) with TOS 2.06 (ST),
+        TOS 3.06 (TT), TOS 4.04 (Falcon), and stock EmuTOS 1.4.
       - MagiC 6.2 under MagiCMac on macOS.
       - MagiC under magic-on-linux
-        (https://gitlab.com/AndreasK/magiclinux).
-
-    Stock EmuTOS (tested: 1.4, Hatari) bus-errors when the
-    character-selection dialog opens -- a regression vs the 3.4.3
-    Atari port, which runs on the same EmuTOS config.  Cause not
-    yet isolated.  One third-party report of 5.0 running on a
-    Vampire V4SA + FreeMiNT + XaAES + NVDI + Olivier Landemarre's
-    EmuTOS variant.
+        (https://gitlab.com/AndreasK/magiclinux) in 8/16/24/32-bit
+        colour modes.
+      - Vampire V4SA + FreeMiNT + XaAES + NVDI + Olivier
+        Landemarre's EmuTOS variant.
 
 Supported display modes:
-    - 640x480 with 16 colours (VGA minimum)
-        - Atari TT  "TT-Mid"
-        - Atari Falcon  "VGA 4-plane"
-        - or any graphics-card setup providing equivalent output
-    - 640x480 with 256 colours
-        - Atari Falcon  "VGA 8-plane"
-        - NetHack uses the 32-colour NH32.IMG tile sheet here;
-          the extra display pens are left alone for GEM.
-    - ST High (640x400 monochrome) -- experimental, ASCII map
-      only.  The monochrome tile sheet ships in the package but
-      the small screen and lack of colour make ASCII the
-      practical choice on this video mode.
+    - 4, 8, 16, 24 and 32-bit colour
+    - 1-bit monochrome (experimental)
     - ASCII text in any of the above via the F2 toggle.
 
 
@@ -68,14 +54,9 @@ Display Modes
 By default the game starts in tile mode.  Press F2 at any point
 during play to toggle between tiles and ASCII.
 
-In 4-plane (16-colour) video modes the VDI palette is rewritten
-at startup to match the tile palette baked into NH16.IMG.  In
-8-plane (256-colour) modes pens 0..15 are left alone and the
-32-colour NH32.IMG palette is loaded into pens 16..47, so GEM
-keeps its standard system colours.  In ST High (monochrome)
-NetHack runs in ASCII mode; the Atkinson-dithered NH2.IMG ships
-in the package but the small screen makes ASCII the practical
-choice there.
+In ST High (monochrome) NetHack runs in ASCII mode; the
+Atkinson-dithered NH2.IMG ships in the package but the small
+screen makes ASCII the practical choice there.
 
 To force ASCII text mode by default, edit nethack.cnf:
 
