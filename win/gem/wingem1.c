@@ -334,6 +334,72 @@ reorder_tile_palette(short *palette, char *addr, int nplanes,
     }
 }
 
+/* In 8-plane (256-color) mode, shift every pixel value in a 5-plane
+   standard-format tile bitmap up by +16, growing the bitmap to 6
+   planes.  After the shift+install pair, tile pixel value V (0-31)
+   displays tile color V on screen pen 16+V, leaving pens 0-15 (the
+   GEM system palette) untouched.
+
+   Works on the in-memory standard format (plane-major bitplane), which
+   on Falcon 8-plane VDI is also the device format (vr_trnfm is a no-op
+   for this workstation, so the same layout reaches the screen). */
+static int
+shift_tile_pixels_to_pen16(IMG_header *img)
+{
+    long word_aligned, plane_size, new_size;
+    int wdwidth, y, x, bit, p, old_v, new_v;
+    unsigned char *new_addr, *src;
+
+    if (img->planes != 5 || !img->addr)
+        return FALSE;
+
+    word_aligned = ((long) ((img->img_w + 15) / 16)) * 2;
+    wdwidth = (int) (word_aligned / 2);
+    plane_size = word_aligned * (long) img->img_h;
+    new_size = plane_size * 6;
+    new_addr = (unsigned char *) calloc(1, new_size);
+    if (!new_addr)
+        return FALSE;
+    src = (unsigned char *) img->addr;
+
+    for (y = 0; y < img->img_h; y++) {
+        for (x = 0; x < wdwidth; x++) {
+            unsigned short src_w[5], dst_w[6];
+            unsigned short *sp, *dp;
+
+            for (p = 0; p < 5; p++) {
+                sp = (unsigned short *)
+                    (src + p * plane_size + (long) y * word_aligned);
+                src_w[p] = sp[x];
+            }
+            for (p = 0; p < 6; p++)
+                dst_w[p] = 0;
+
+            for (bit = 15; bit >= 0; bit--) {
+                old_v = 0;
+                for (p = 0; p < 5; p++)
+                    old_v |= ((src_w[p] >> bit) & 1) << p;
+                new_v = old_v + 16;
+                for (p = 0; p < 6; p++)
+                    dst_w[p] |= ((new_v >> p) & 1) << bit;
+            }
+
+            for (p = 0; p < 6; p++) {
+                dp = (unsigned short *)
+                    (new_addr + p * plane_size + (long) y * word_aligned);
+                dp[x] = dst_w[p];
+            }
+        }
+    }
+
+    free(img->addr);
+    img->addr = (char *) new_addr;
+    img->planes = 6;
+    return TRUE;
+}
+
+static short tile_pixels_shifted = FALSE;
+
 void recalc_msg_win(GRECT *);
 void recalc_status_win(GRECT *);
 void calc_std_winplace(short, GRECT *);
@@ -1442,14 +1508,29 @@ loadimg:
                              tile_image.planes,
                              tile_image.img_w, tile_image.img_h);
 
+    /* In 8-plane mode with a 5-plane tile image, shift the tile
+       pixels into the 16-47 range so screen pens 0-15 remain the
+       GEM system palette.  Done in standard format before
+       transform_img. */
+    if (planes >= 8 && tile_image.planes == 5
+        && shift_tile_pixels_to_pen16(&tile_image))
+        tile_pixels_shifted = TRUE;
+
     mfdb(&Tile_bilder, (short *) tile_image.addr, tile_image.img_w,
          tile_image.img_h, 1, tile_image.planes);
     transform_img(&Tile_bilder);
 
     /* Set tile palette and cache pen lookups early so colours are
        correct even if the name dialog is skipped (OPTIONS=name:X). */
-    if (tile_image.planes > 1 && tile_image.palette)
-        img_set_colors(x_handle, tile_image.palette, tile_image.planes);
+    if (tile_image.palette) {
+        if (tile_pixels_shifted) {
+            short i;
+            for (i = 0; i < 32; i++)
+                vs_color(x_handle, 16 + i, tile_image.palette + i * 3);
+        } else if (tile_image.planes > 1) {
+            img_set_colors(x_handle, tile_image.palette, tile_image.planes);
+        }
+    }
     cache_pens();
 
     mfdb(&Map_bild, NULL, (COLNO - 1) * Tile_width, ROWNO * Tile_height, 0,
@@ -1669,9 +1750,11 @@ mar_ask_name()
     }
     xdialog(z_ob, who_are_you, NULL, NULL, DIA_CENTERED, FALSE, DIALOG_MODE);
     Event_Timer(0, 0, TRUE);
-    /* Restore system palette after the title dialog closes */
+    /* Restore the 16 system pens (0-15) that the title image
+       overwrote via direct vs_color.  col=4 caps end at 16 so the
+       tile palette installed at pens 16-47 is left intact. */
     if (normal_palette)
-        img_set_colors(x_handle, normal_palette, planes);
+        img_set_colors_ex(x_handle, normal_palette, 4, 0);
 
     test_free(titel_image.palette);
     test_free(titel_image.addr);
@@ -2651,9 +2734,10 @@ mar_display_nhwindow(winid wind)
         }
         Event_Handler(NULL, NULL);
         /* RIP.IMG installed a custom palette via preserve_sys=0; restore
-           the system palette so any follow-up dialog renders normally. */
+           the 16 system pens.  col=4 caps end at 16 so the tile palette
+           at pens 16-47 stays intact for any post-RIP gameplay. */
         if (use_rip && normal_palette)
-            img_set_colors(x_handle, normal_palette, planes);
+            img_set_colors_ex(x_handle, normal_palette, 4, 0);
         ob_set_text(z_ob, QLINE, tmp_button);
         break;
     case NHW_MENU:
