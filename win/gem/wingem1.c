@@ -3076,7 +3076,13 @@ mar_nh_poskey(short *x, short *y, short *mod)
         WIN *akt_win = window_find(ex, ey);
 
         if (WIN_MAP != WIN_ERR
-            && akt_win == Gem_nhwindow[WIN_MAP].gw_window) {
+            && akt_win == Gem_nhwindow[WIN_MAP].gw_window
+            && rc_inside(ex, ey, &akt_win->work)) {
+            /* rc_inside guard: window_find can return the map window
+               for clicks just outside its current work rect (title
+               bar, scroll bars).  Without the guard, the clamp below
+               maps those clicks to map cell (0,0) and the player
+               walks toward the top-left corner. */
             *x = max(min((ex - akt_win->work.g_x) / scroll_map.px_hline
                              + scroll_map.hpos,
                          COLNO - 1),
