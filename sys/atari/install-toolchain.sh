@@ -25,7 +25,7 @@
 : "${MINTLIB_VER:=0.60.1-9d6-mint}"
 : "${FDLIBM_VER:=5.3-46a-mint}"
 : "${GEMLIB_VER:=0.44.0-44d-mint}"
-: "${EGEM_VER:=2.2}"
+: "${EGEM_VER:=2.2.1}"
 
 set -eu
 
@@ -83,7 +83,7 @@ BINUTILS_URL=https://tho-otto.de/download/mint/$BINUTILS_TAR
 MINTLIB_URL=https://tho-otto.de/snapshots/mintlib/$MINTLIB_TAR
 FDLIBM_URL=https://tho-otto.de/snapshots/fdlibm/$FDLIBM_TAR
 GEMLIB_URL=https://tho-otto.de/snapshots/gemlib/$GEMLIB_TAR
-EGEM_URL=https://github.com/ingpaschke/EGEM_220/releases/download/v$EGEM_VER.0/$EGEM_ZIP
+EGEM_URL=https://github.com/ingpaschke/EGEM_220/releases/download/v$EGEM_VER/$EGEM_ZIP
 
 echo "Installing m68k-atari-mint cross-toolchain"
 echo "  PREFIX   = $PREFIX"

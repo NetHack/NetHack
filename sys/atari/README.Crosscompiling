@@ -77,7 +77,7 @@ leading component on extract.
 
     # E_GEM binary release from
     # https://github.com/ingpaschke/EGEM_220/releases :
-    sudo unzip <path>/lib_e_gem_2.2.zip -d usr
+    sudo unzip <path>/lib_e_gem_2.2.1.zip -d usr
 
 
 Host build prerequisites
