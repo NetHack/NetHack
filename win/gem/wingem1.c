@@ -334,6 +334,180 @@ reorder_tile_palette(short *palette, char *addr, int nplanes,
     }
 }
 
+/* Read a pixel value from an N-plane standard-format (plane-major)
+   bitmap.  Each plane contributes one bit; LSB = plane 0. */
+static unsigned int
+get_pixel_n(const unsigned char *raw, int x, int y, int w, int h, int planes)
+{
+    int lw = (w + 15) >> 4;
+    int word = x >> 4;
+    int bit_pos = 15 - (x & 15);
+    long offset = (long) y * lw * 2 + word * 2;
+    long plane_size = (long) lw * 2 * h;
+    unsigned int pixel = 0;
+    int p;
+    for (p = 0; p < planes; p++) {
+        const unsigned short *pl = (const unsigned short *)
+            (raw + p * plane_size + offset);
+        if (*pl & (1 << bit_pos))
+            pixel |= (1U << p);
+    }
+    return pixel;
+}
+
+/* Truecolor pixel-format state, populated by probe_truecolor_format()
+   from vq_scrninfo.  Defaults work for 24/32bpp Motorola-order
+   workstations (Falcon native, MagiC on m68k, MagiCOnLinux 24bpp). */
+static struct {
+    short have_probe;     /* nonzero once probed successfully */
+    short swap_bytes;     /* 1 = Intel byte order within pixel words */
+    short r_bits, g_bits, b_bits;
+    short r_pos[16], g_pos[16], b_pos[16]; /* bit positions LSB->MSB */
+} tc_fmt;
+
+/* Encode an 8-bit-per-channel RGB triple into a packed pixel using
+   either the layout-agnostic bit-position tables from vq_scrninfo
+   (preferred) or hardcoded fallbacks (24/32-plane Motorola RGB, or
+   16-plane standard RGB565).  Writes 'bytes_per_pixel' bytes to *p,
+   in big-endian unless swap_bytes is set. */
+static void
+encode_truecolor_pixel(unsigned char *p, int r, int g, int b, int planes)
+{
+    unsigned long val = 0;
+    int bytes = (planes + 7) >> 3;
+    int i;
+
+    if (tc_fmt.have_probe) {
+        int rs = r >> (8 - tc_fmt.r_bits);
+        int gs = g >> (8 - tc_fmt.g_bits);
+        int bs = b >> (8 - tc_fmt.b_bits);
+        for (i = 0; i < tc_fmt.r_bits; i++)
+            if (rs & (1 << i)) val |= 1UL << tc_fmt.r_pos[i];
+        for (i = 0; i < tc_fmt.g_bits; i++)
+            if (gs & (1 << i)) val |= 1UL << tc_fmt.g_pos[i];
+        for (i = 0; i < tc_fmt.b_bits; i++)
+            if (bs & (1 << i)) val |= 1UL << tc_fmt.b_pos[i];
+    } else if (planes == 16) {
+        val = ((unsigned long) ((r >> 3) & 0x1F) << 11)
+            | ((unsigned long) ((g >> 2) & 0x3F) << 5)
+            |  (unsigned long) ((b >> 3) & 0x1F);
+    } else {
+        val = ((unsigned long) (r & 0xFF) << 16)
+            | ((unsigned long) (g & 0xFF) << 8)
+            |  (unsigned long) (b & 0xFF);
+    }
+
+    if (tc_fmt.swap_bytes) {
+        for (i = 0; i < bytes; i++)
+            p[i] = (unsigned char) (val >> (i * 8));
+    } else {
+        for (i = 0; i < bytes; i++)
+            p[i] = (unsigned char) (val >> ((bytes - 1 - i) * 8));
+    }
+}
+
+/* Build a truecolor device-format MFDB from a palettized standard-
+   format source image (1..8 planes).  Output plane count matches the
+   screen (16, 24, or 32); bytes per pixel = (planes+7)/8.  fd_stand=0,
+   fd_wdwidth = rounded_w * bytes_per_pixel / 2 / planes.
+
+   This is the canonical NVDI / MagiC / fVDI pattern from Behne's
+   PRINT_TC.C reference: vro_cpyfm in mode S_ONLY copies these
+   device-format pixels straight to the screen with no palette
+   involvement.  Works on any direct-color workstation. */
+static int
+build_truecolor_mfdb(IMG_header *img, MFDB *out, int scr_planes)
+{
+    int w = img->img_w;
+    int h = img->img_h;
+    int src_planes = img->planes;
+    int rounded_w = (w + 15) & ~15;
+    int bytes_per_pixel = (scr_planes + 7) >> 3;
+    long bytes_per_line = (long) rounded_w * bytes_per_pixel;
+    long total = bytes_per_line * (long) h;
+    unsigned char *buf;
+    int x, y;
+
+    if (src_planes < 1 || src_planes > 8 || !img->addr || !img->palette)
+        return FALSE;
+    if (scr_planes != 16 && scr_planes != 24 && scr_planes != 32)
+        return FALSE;
+    buf = (unsigned char *) calloc(1, (size_t) total);
+    if (!buf) return FALSE;
+
+    for (y = 0; y < h; y++) {
+        unsigned char *row = buf + (long) y * bytes_per_line;
+        for (x = 0; x < w; x++) {
+            unsigned int idx = get_pixel_n((unsigned char *) img->addr,
+                                           x, y, w, h, src_planes);
+            int r = (img->palette[idx * 3 + 0] * 255) / 1000;
+            int g = (img->palette[idx * 3 + 1] * 255) / 1000;
+            int b = (img->palette[idx * 3 + 2] * 255) / 1000;
+            encode_truecolor_pixel(row + x * bytes_per_pixel,
+                                   r, g, b, scr_planes);
+        }
+    }
+
+    out->fd_addr = (short *) buf;
+    out->fd_w = rounded_w;
+    out->fd_h = h;
+    out->fd_wdwidth = (short) ((bytes_per_line / 2) / scr_planes);
+    out->fd_stand = 0;
+    out->fd_nplanes = scr_planes;
+    out->fd_r1 = out->fd_r2 = out->fd_r3 = 0;
+    return TRUE;
+}
+
+/* Query screen workstation pixel format via vq_scrninfo (NVDI EdDI
+   1.0+, opcode 102, subfunction 1).  Populates tc_fmt with bytes-
+   per-pixel, byte-order, and per-channel bit-position tables so
+   encode_truecolor_pixel can use the workstation's exact pixel
+   layout (Falcon RGB555+overlay, RGB565, packed RGB, xRGB, etc.).
+   Silently leaves have_probe=0 if vq_scrninfo isn't supported --
+   encode_truecolor_pixel then falls back to hardcoded layouts. */
+static void
+probe_truecolor_format(void)
+{
+    short contrl[15], intin[2], ptsin[2];
+    short intout[273], ptsout[2];
+    VDIPB pb;
+    int i;
+
+    for (i = 0; i < 15; i++) contrl[i] = 0;
+    for (i = 0; i < 273; i++) intout[i] = 0;
+    contrl[0] = 102;
+    contrl[1] = 0;
+    contrl[3] = 1;
+    contrl[5] = 1;
+    contrl[6] = x_handle;
+    intin[0] = 2;
+
+    pb.control = contrl;
+    pb.intin = intin;
+    pb.ptsin = ptsin;
+    pb.intout = intout;
+    pb.ptsout = ptsout;
+    vdi(&pb);
+
+    /* contrl[4] = number of shorts written to intout.  Need at
+       least 64 shorts for the full bit-position tables to be
+       populated. */
+    if (contrl[4] < 64)
+        return;
+    tc_fmt.swap_bytes = (intout[14] & 0x80) ? TRUE : FALSE;
+    tc_fmt.r_bits = intout[8];
+    tc_fmt.g_bits = intout[9];
+    tc_fmt.b_bits = intout[10];
+    if (tc_fmt.r_bits <= 0 || tc_fmt.r_bits > 16
+        || tc_fmt.g_bits <= 0 || tc_fmt.g_bits > 16
+        || tc_fmt.b_bits <= 0 || tc_fmt.b_bits > 16)
+        return;
+    for (i = 0; i < tc_fmt.r_bits; i++) tc_fmt.r_pos[i] = intout[16 + i];
+    for (i = 0; i < tc_fmt.g_bits; i++) tc_fmt.g_pos[i] = intout[32 + i];
+    for (i = 0; i < tc_fmt.b_bits; i++) tc_fmt.b_pos[i] = intout[48 + i];
+    tc_fmt.have_probe = TRUE;
+}
+
 void recalc_msg_win(GRECT *);
 void recalc_status_win(GRECT *);
 void calc_std_winplace(short, GRECT *);
@@ -1357,12 +1531,15 @@ mar_gem_init()
                       "found or | GEM init failed. ][ grumble ]");
         return (0);
     }
-    if (planes < 1 || planes > 8) {
+    if (planes < 1
+        || (planes > 8 && planes != 16 && planes != 24 && planes != 32)) {
         form_alert(
             1,
-            "[3][ Color-depth | not supported, | try 2-256 colors. ][ Ok ]");
+            "[3][ Color-depth | not supported. | Try 2-256 colors | or 16/24-bit. ][ Ok ]");
         return (0);
     }
+    if (planes >= 16)
+        probe_truecolor_format();
     MouseBee();
 
     /* NVDI 3.0 or better used v_ftext; not available in modern gemlib,
@@ -1436,20 +1613,37 @@ loadimg:
     } /* tile_mode */
 
     /* Reorder tile palette to match default ST VDI palette ordering.
-       Must happen before transform_img (which converts to device format). */
-    if (tile_image.planes >= 4 && tile_image.palette)
+       Must happen before transform_img (which converts to device format).
+       Skipped in truecolor mode -- there's no workstation palette to
+       align with. */
+    if (planes <= 8 && tile_image.planes >= 4 && tile_image.palette)
         reorder_tile_palette(tile_image.palette, tile_image.addr,
                              tile_image.planes,
                              tile_image.img_w, tile_image.img_h);
 
-    mfdb(&Tile_bilder, (short *) tile_image.addr, tile_image.img_w,
-         tile_image.img_h, 1, tile_image.planes);
-    transform_img(&Tile_bilder);
-
-    /* Set tile palette and cache pen lookups early so colours are
-       correct even if the name dialog is skipped (OPTIONS=name:X). */
-    if (tile_image.planes > 1 && tile_image.palette)
-        img_set_colors(x_handle, tile_image.palette, tile_image.planes);
+    if (planes >= 16 && tile_image.palette) {
+        /* Truecolor path (Behne PRINT_TC.C convention): pre-render
+           the palettized tile sheet into a chunky device-format
+           buffer at the screen's native depth.  vro_cpyfm then
+           copies device-format pixels straight to screen with no
+           palette involvement. */
+        MFDB new_mfdb;
+        if (build_truecolor_mfdb(&tile_image, &new_mfdb, planes)) {
+            free(tile_image.addr);
+            tile_image.addr = (char *) new_mfdb.fd_addr;
+            tile_image.planes = planes;
+            Tile_bilder = new_mfdb;
+        }
+    } else {
+        mfdb(&Tile_bilder, (short *) tile_image.addr, tile_image.img_w,
+             tile_image.img_h, 1, tile_image.planes);
+        transform_img(&Tile_bilder);
+        /* Set workstation palette so vro_cpyfm of palettized device
+           data displays the right colors.  Only meaningful at <=8
+           planes; on truecolor we've already baked RGB into pixels. */
+        if (tile_image.planes > 1 && tile_image.palette)
+            img_set_colors(x_handle, tile_image.palette, tile_image.planes);
+    }
     cache_pens();
 
     mfdb(&Map_bild, NULL, (COLNO - 1) * Tile_width, ROWNO * Tile_height, 0,
@@ -1626,6 +1820,21 @@ mar_ask_name()
         depack_img(planes < 4 ? "TITLE2.IMG" : "TITLE.IMG", &titel_image);
     if (img_err) { /* not fatal */
         ob_set_text(z_ob, NETHACKPICTURE, "missing title.img.");
+    } else if (planes >= 16 && titel_image.palette) {
+        /* Truecolor: pre-render via the same chunky-buffer pattern
+           we use for tiles.  transform_img would zero the buffer on
+           a >8-plane workstation. */
+        MFDB new_mfdb;
+        if (build_truecolor_mfdb(&titel_image, &new_mfdb, planes)) {
+            free(titel_image.addr);
+            titel_image.addr = NULL;
+            Titel_bild = new_mfdb;
+            z_ob[NETHACKPICTURE].ob_type = G_USERDEF;
+            z_ob[NETHACKPICTURE].ob_spec.userblk = &ub_titel;
+        } else {
+            ob_set_text(z_ob, NETHACKPICTURE, "transform failed.");
+            img_err = 1;
+        }
     } else {
         mfdb(&Titel_bild, (short *) titel_image.addr, titel_image.img_w,
              titel_image.img_h, 1, titel_image.planes);
@@ -1652,11 +1861,12 @@ mar_ask_name()
     }
 
     ob_clear_edit(z_ob);
-    /* Set title image palette.  The XIMG palette is indexed by hardware
-       register number.  vs_color() takes VDI pen indices which map to
-       hw registers via MAP_COL internally.  Use the reverse mapping
-       (dev2vdi) to find the VDI pen for each hw register. */
-    if (!img_err && titel_image.palette && titel_image.planes > 1) {
+    /* In palettized modes, install the title-image palette via
+       vs_color so the title MFDB's device-format pixel indices render
+       with the right colors.  Skipped in truecolor mode -- the title
+       chunky buffer already encodes RGB directly. */
+    if (planes <= 8 && !img_err && titel_image.palette
+        && titel_image.planes > 1) {
         static const short dev2vdi[] =
             { 0, 2, 3, 6, 4, 7, 5, 8, 9, 10, 11, 14, 12, 15, 13, 1 };
         short i, nimg = min(1 << titel_image.planes, 16);
@@ -1669,18 +1879,19 @@ mar_ask_name()
     }
     xdialog(z_ob, who_are_you, NULL, NULL, DIA_CENTERED, FALSE, DIALOG_MODE);
     Event_Timer(0, 0, TRUE);
-    /* Restore system palette after the title dialog closes */
-    if (normal_palette)
+    /* Restore system palette after the title dialog closes (no-op
+       in truecolor: title left the workstation palette alone). */
+    if (planes <= 8 && normal_palette)
         img_set_colors(x_handle, normal_palette, planes);
 
     test_free(titel_image.palette);
     test_free(titel_image.addr);
     test_free(Titel_bild.fd_addr);
 
-    /* Set the tile palette. The XIMG palette is in device order
-       (matching the pixel indices in the bitplanes). Use img_set_colors
-       which applies the VDI-to-device remapping. */
-    if (tile_image.planes > 1 && tile_image.palette)
+    /* Re-install the tile palette after the title-restore step
+       above clobbered it (palettized only; tiles in truecolor mode
+       have their colors baked into the pixel data). */
+    if (planes <= 8 && tile_image.planes > 1 && tile_image.palette)
         img_set_colors(x_handle, tile_image.palette, tile_image.planes);
 
     /* Cache nearest-pen lookups now that the tile palette is active */
@@ -2609,12 +2820,22 @@ mar_display_nhwindow(winid wind)
         if (use_rip) {
             if (!depack_img(planes < 4 ? "RIP2.IMG" : "RIP.IMG",
                             &rip_image)) {
-                mfdb(&Rip_bild, (short *) rip_image.addr, rip_image.img_w,
-                     rip_image.img_h, 1, rip_image.planes);
-                transform_img(&Rip_bild);
-                if (rip_image.planes > 1 && rip_image.palette)
-                    img_set_colors_ex(x_handle, rip_image.palette,
-                                      rip_image.planes, 0);
+                if (planes >= 16 && rip_image.palette) {
+                    MFDB new_mfdb;
+                    if (build_truecolor_mfdb(&rip_image, &new_mfdb, planes)) {
+                        free(rip_image.addr);
+                        rip_image.addr = NULL;
+                        Rip_bild = new_mfdb;
+                    }
+                } else {
+                    mfdb(&Rip_bild, (short *) rip_image.addr,
+                         rip_image.img_w, rip_image.img_h, 1,
+                         rip_image.planes);
+                    transform_img(&Rip_bild);
+                    if (rip_image.planes > 1 && rip_image.palette)
+                        img_set_colors_ex(x_handle, rip_image.palette,
+                                          rip_image.planes, 0);
+                }
             }
             ub_lines.ub_code = draw_rip;
         } else
@@ -2651,8 +2872,10 @@ mar_display_nhwindow(winid wind)
         }
         Event_Handler(NULL, NULL);
         /* RIP.IMG installed a custom palette via preserve_sys=0; restore
-           the system palette so any follow-up dialog renders normally. */
-        if (use_rip && normal_palette)
+           the system palette so any follow-up dialog renders normally.
+           No-op in truecolor mode -- RIP didn't touch the workstation
+           palette there. */
+        if (planes <= 8 && use_rip && normal_palette)
             img_set_colors(x_handle, normal_palette, planes);
         ob_set_text(z_ob, QLINE, tmp_button);
         break;
