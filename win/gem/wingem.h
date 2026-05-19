@@ -27,12 +27,8 @@ extern struct window_procs Gem_procs;
 #ifdef CLIPPING
 extern void setclipped(void);
 #endif
-extern void docorner(int, int);
-extern void end_glyphout(void);
-extern void g_putch(int);
 extern void win_Gem_init(int);
 extern int mar_gem_init(void);
-extern char mar_ask_class(void);
 extern char *mar_ask_name(void);
 extern int mar_create_window(short);
 extern void mar_destroy_nhwindow(int);
@@ -64,7 +60,6 @@ extern void Gem_resume_nhwindows(void);
 extern winid Gem_create_nhwindow(int);
 extern void Gem_clear_nhwindow(winid);
 extern void Gem_display_nhwindow(winid, boolean);
-extern void Gem_dismiss_nhwindow(winid);
 extern void Gem_destroy_nhwindow(winid);
 extern void Gem_curs(winid, int, int);
 extern void Gem_putstr(winid, int, const char *);
@@ -74,7 +69,6 @@ extern void Gem_add_menu(winid, const glyph_info *, const ANY_P *, char, char,
                     int, int, const char *, unsigned int);
 extern void Gem_end_menu(winid, const char *);
 extern int Gem_select_menu(winid, int, MENU_ITEM_P **);
-extern char Gem_message_menu(char, int, const char *);
 extern void Gem_update_inventory(int);
 extern win_request_info *Gem_ctrl_nhwindow(winid, int, win_request_info *);
 extern void Gem_mark_synch(void);

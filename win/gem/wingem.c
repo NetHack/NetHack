@@ -120,8 +120,9 @@ bail(const char *mesg)
 #ifndef TILE_X
 #define TILE_X 16
 #endif
+#ifndef TILE_Y
 #define TILE_Y 16
-#define TILES_PER_LINE 20
+#endif
 #define NHFONT_DEFAULT_SIZE 10
 #define NHFONT_SIZE_MIN 3
 #define NHFONT_SIZE_MAX 20
@@ -831,6 +832,7 @@ Gem_select_menu(winid window, int how, menu_item **menu_list)
 void
 Gem_update_inventory(int arg)
 {
+    nhUse(arg);
 }
 
 void
@@ -1106,6 +1108,7 @@ Gem_number_pad(int state)
 void
 win_Gem_init(int dir)
 {
+    nhUse(dir);
 }
 
 win_request_info *
@@ -1141,15 +1144,15 @@ Gem_outrip(winid w, int how, time_t when)
 
     if (!rip_line) {
         short i;
-        rip_line = (char **) malloc((YEAR_LINE + 1) * sizeof(char *));
+        rip_line = (char **) alloc((YEAR_LINE + 1) * sizeof(char *));
         for (i = 0; i < YEAR_LINE + 1; i++) {
             rip_line[i] =
-                (char *) malloc((STONE_LINE_LEN + 1) * sizeof(char));
+                (char *) alloc((STONE_LINE_LEN + 1) * sizeof(char));
         }
     }
     /* Follows same algorithm as genl_outrip() */
     /* Put name on stone */
-    Sprintf(rip_line[NAME_LINE], "%s", svp.plname);
+    Sprintf(rip_line[NAME_LINE], "%.*s", STONE_LINE_LEN, svp.plname);
     /* Put $ on stone */
     Sprintf(rip_line[GOLD_LINE], "%ld Au", gd.done_money);
     /* Put together death description */
