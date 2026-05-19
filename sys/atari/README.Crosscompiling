@@ -64,8 +64,8 @@ leading component on extract.
     cd /opt/cross-mint
 
     # Host tools (gcc + binutils) from https://tho-otto.de/crossmint.php :
-    sudo tar xJf gcc-<ver>-mint-<date>-bin-linux64.tar.xz      --strip-components=1
-    sudo tar xJf binutils-<ver>-mint-<date>-bin-linux64.tar.xz --strip-components=1
+    sudo tar xJf gcc-<ver>-bin-linux64.tar.xz      --strip-components=1
+    sudo tar xJf binutils-<ver>-bin-linux64.tar.xz --strip-components=1
 
     # Target libs from https://tho-otto.de/snapshots/{mintlib,fdlibm,gemlib}/
     # -- extract INTO the sysroot subdir, NOT at /:
@@ -120,10 +120,10 @@ ZIP contents are documented in sys/atari/README.tos.
 Notes
 -----
 
-  - The host-side tools bmp2img_host and img2mono_host are built
-    with the host's native compiler and run on the host to convert
-    nhtiles.bmp into the three IMG tile sheets (NH16.IMG, NH32.IMG,
-    NH2.IMG) that ship in the package.
+  - The host-side tool bmp2img_host is built with the host's native
+    compiler and run on the host to convert nhtiles.bmp into the
+    three IMG tile sheets (NH16.IMG, NH32.IMG, NH2.IMG) that ship in
+    the package.
 
   - For playing the game and end-user configuration, see
     sys/atari/README.tos.

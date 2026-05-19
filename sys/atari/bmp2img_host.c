@@ -80,6 +80,27 @@ wr16(FILE *f, uint16_t v)
     fwrite(b, 1, 2, f);
 }
 
+/* Read little-endian 16-bit word (BMP byte order) */
+static unsigned short
+rd_le16(FILE *fp)
+{
+    int b0 = fgetc(fp);
+    int b1 = fgetc(fp);
+    return (unsigned short) ((b1 << 8) | b0);
+}
+
+/* Read little-endian 32-bit word (BMP byte order) */
+static unsigned int
+rd_le32(FILE *fp)
+{
+    int b0 = fgetc(fp);
+    int b1 = fgetc(fp);
+    int b2 = fgetc(fp);
+    int b3 = fgetc(fp);
+    return ((unsigned int) b3 << 24) | ((unsigned int) b2 << 16)
+         | ((unsigned int) b1 <<  8) |  (unsigned int) b0;
+}
+
 /*
  * Write an XIMG file.
  * Pixel data is stored uncompressed (literal byte strings per plane per line).
@@ -495,8 +516,24 @@ main(int argc, char **argv)
     bmpfp = fopen(argv[argi + 2], "rb");
     if (!bmpfp) { perror(argv[argi + 2]); return 1; }
 
-    if (fread(&fhdr, sizeof(fhdr), 1, bmpfp) != 1
-        || fread(&ihdr, sizeof(ihdr), 1, bmpfp) != 1) {
+    /* BMP files are little-endian; read field-by-field for portability. */
+    fhdr.bfType      = rd_le16(bmpfp);
+    fhdr.bfSize      = rd_le32(bmpfp);
+    fhdr.bfReserved1 = rd_le16(bmpfp);
+    fhdr.bfReserved2 = rd_le16(bmpfp);
+    fhdr.bfOffBits   = rd_le32(bmpfp);
+    ihdr.biSize          = rd_le32(bmpfp);
+    ihdr.biWidth         = (int32_t) rd_le32(bmpfp);
+    ihdr.biHeight        = (int32_t) rd_le32(bmpfp);
+    ihdr.biPlanes        = rd_le16(bmpfp);
+    ihdr.biBitCount      = rd_le16(bmpfp);
+    ihdr.biCompression   = rd_le32(bmpfp);
+    ihdr.biSizeImage     = rd_le32(bmpfp);
+    ihdr.biXPelsPerMeter = (int32_t) rd_le32(bmpfp);
+    ihdr.biYPelsPerMeter = (int32_t) rd_le32(bmpfp);
+    ihdr.biClrUsed       = rd_le32(bmpfp);
+    ihdr.biClrImportant  = rd_le32(bmpfp);
+    if (feof(bmpfp) || ferror(bmpfp)) {
         fprintf(stderr, "Failed to read BMP header\n");
         return 1;
     }
