@@ -107,8 +107,6 @@ get_pixel(int x, int y, unsigned int *colind)
     *colind = image_data[y][x];
 }
 FILE *xpmfh = 0;
-char initbuf[200];
-char *xpmbuf = initbuf;
 /* version 1.  Reads the raw xpm file, NOT the compiled version.  This is
  * not a particularly good idea but I don't have time to do the right thing
  * at this point, even if I was absolutely sure what that was. */
@@ -130,15 +128,6 @@ fopen_xpm_file(const char *fn, const char *mode)
         return FALSE;
     if (4 != sscanf(xb, "%d %d %d %d", &width, &height, &num_colors, &temp))
         return FALSE; /* bad header */
-                      /* replace the original buffer with one big enough for
-                       * the real data
-                       */
-    /* XXX */
-    xpmbuf = malloc(width * 2);
-    if (!xpmbuf) {
-        fprintf(stderr, "ERROR: Can't allocate line buffer\n");
-        exit(1);
-    }
     if (temp != 1)
         return FALSE; /* limitation of this code */
     {
