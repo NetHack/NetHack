@@ -15,8 +15,8 @@ long _stksize = 256 * 1024L;
 #ifdef TTY_GRAPHICS
 #include "tcap.h"
 #else
-/* Referenced by terminal-mode helpers compiled into the GEM-only
-   build; the value is unused but the symbol has to resolve. */
+/* Used by set_colors / restore_colors below when this TU is built
+   without tcap.h. */
 static char *nh_HE = "\033q";
 #endif
 
@@ -39,7 +39,7 @@ char *_a_line; /* for Line A variables */
 boolean colors_changed = FALSE;
 
 int
-tgetch()
+tgetch(void)
 {
     char ch;
 
@@ -134,7 +134,7 @@ static const char scanmap[] = {
 #define ALT 0x8
 
 static char
-BIOSgetch()
+BIOSgetch(void)
 {
     unsigned char scan, shift, ch;
     const struct pad *kpad;
@@ -170,7 +170,7 @@ BIOSgetch()
 }
 
 static char
-DOSgetch()
+DOSgetch(void)
 {
     return (Crawcin() & 0x007f);
 }
@@ -202,13 +202,13 @@ findfirst(char *path)
 }
 
 int
-findnext()
+findnext(void)
 {
     return (Fsnext() == 0);
 }
 
 char *
-foundfile_buffer()
+foundfile_buffer(void)
 {
     return (char *) Fgetdta() + 30;
 }
@@ -235,7 +235,7 @@ chdrive(const char *str)
     char *ptr;
     char drive;
 
-    if ((ptr = strchr(str, ':')) != (char *) 0) {
+    if ((ptr = strchr(str, ':')) != (char *) 0 && ptr > str) {
         drive = toupper(*(ptr - 1));
         (void) Dsetdrv(drive - 'A');
     }
@@ -243,25 +243,25 @@ chdrive(const char *str)
 }
 
 void
-get_scr_size()
+get_scr_size(void)
 {
 #ifdef MINT
     struct winsize win;
     char *tmp;
 
-    if ((tmp = nh_getenv("LINES")))
+    LI = CO = 0;
+    if ((tmp = nh_getenv("LINES")) || (tmp = nh_getenv("ROWS")))
         LI = atoi(tmp);
-    else if ((tmp = nh_getenv("ROWS")))
-        LI = atoi(tmp);
-    if (tmp && (tmp = nh_getenv("COLUMNS")))
+    if ((tmp = nh_getenv("COLUMNS")))
         CO = atoi(tmp);
-    else if (ioctl(0, TIOCGWINSZ, &win) == 0) {
-        LI = win.ws_row;
-        CO = win.ws_col;
-    } else {
-        LI = 25;
-        CO = 80;
+    if (!LI || !CO) {
+        if (ioctl(0, TIOCGWINSZ, &win) == 0) {
+            if (!LI) LI = win.ws_row;
+            if (!CO) CO = win.ws_col;
+        }
     }
+    if (!LI) LI = 25;
+    if (!CO) CO = 80;
 #else
     WORD rows, cols;
 
@@ -293,22 +293,28 @@ _copyfile(char *from, char *to)
         return -1;
     }
     buf = (char *) alloc((unsigned) BIGBUF);
-    while ((r = read(fromfd, buf, BIGBUF)) > 0)
-        write(tofd, buf, r);
+    while ((r = read(fromfd, buf, BIGBUF)) > 0) {
+        if (write(tofd, buf, r) != r) {
+            close(fromfd);
+            close(tofd);
+            free((genericptr_t) buf);
+            return -1;
+        }
+    }
     close(fromfd);
     close(tofd);
     free((genericptr_t) buf);
-    return 0; /* successful */
+    return (r < 0) ? -1 : 0;
 }
 
 int
-kbhit()
+kbhit(void)
 {
     return Cconis();
 }
 
 static void
-init_aline()
+init_aline(void)
 {
 #ifdef __GNUC__
     /* line A calls nuke registers d0-d2,a0-a2; not all compilers regard these
@@ -329,7 +335,7 @@ init_aline()
 unsigned long tos_numcolors = 2;
 
 void
-set_colors()
+set_colors(void)
 {
     static char colorHE[] = "\033q\033b0";
 
@@ -347,7 +353,7 @@ set_colors()
 }
 
 void
-restore_colors()
+restore_colors(void)
 {
     static char plainHE[] = "\033q";
 

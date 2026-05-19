@@ -31,10 +31,6 @@
 #define O_BINARY 0
 #endif
 
-#ifdef UNIXDEBUG
-#define remove(x) unlink(x)
-#endif
-
 /* configurable options */
 #define MFLOPPY   /* floppy support		*/
 #define RANDOM    /* improved random numbers	*/
@@ -52,14 +48,8 @@
 #endif
 
 #if defined(__GNUC__) || defined(__MINT__)
-/* actually, only more recent GNU C libraries have strcmpi
- * on the other hand, they're free -- if yours is out of
- * date, grab the most recent from atari.archive.umich.edu
- */
 #define STRNCMPI
 #undef strcmpi
-extern int strcmpi(const char *, const char *);
-extern int strncmpi(const char *, const char *, size_t);
 #endif
 
 #ifdef TERMLIB

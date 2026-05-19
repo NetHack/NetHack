@@ -20,7 +20,7 @@ Edit
 	"Set Font..."	%F
 Inventory
 	"Show Inventory"	"i"
-	--
+	---
 	"Put on jewelry" "P"
 	"Remove jewelry" "R"
 	"Wear armor"	"W"

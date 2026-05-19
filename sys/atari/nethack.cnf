@@ -22,7 +22,7 @@ OPTIONS=pickup_types:$?!/="+
 OPTIONS=menucolors
 MENUCOLOR=" cursed "=red&bold
 MENUCOLOR=" blessed "=cyan
-MENUCOLOR=" uncursed "=black
+MENUCOLOR=" uncursed "=cyan
 MENUCOLOR=" holy water"=cyan
 MENUCOLOR=" unholy water"=red&bold
 # Worn / wielded gear stands out in the inventory list.
