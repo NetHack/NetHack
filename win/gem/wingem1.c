@@ -460,7 +460,7 @@ encode_truecolor_pixel(unsigned char *p, int r, int g, int b, int planes)
 /* Build a truecolor device-format MFDB from a palettized standard-
    format source image (1..8 planes).  Output plane count matches the
    screen (16, 24, or 32); bytes per pixel = (planes+7)/8.  fd_stand=0,
-   fd_wdwidth = rounded_w * bytes_per_pixel / 2 / planes.
+   fd_wdwidth = rounded_w * bytes_per_pixel / 2 (words per scanline).
 
    This is the canonical NVDI / MagiC / fVDI pattern from Behne's
    PRINT_TC.C reference: vro_cpyfm in mode S_ONLY copies these
@@ -502,7 +502,7 @@ build_truecolor_mfdb(IMG_header *img, MFDB *out, int scr_planes)
     out->fd_addr = (short *) buf;
     out->fd_w = rounded_w;
     out->fd_h = h;
-    out->fd_wdwidth = (short) ((bytes_per_line / 2) / scr_planes);
+    out->fd_wdwidth = (short) (bytes_per_line / 2);
     out->fd_stand = 0;
     out->fd_nplanes = scr_planes;
     out->fd_r1 = out->fd_r2 = out->fd_r3 = 0;
@@ -1085,7 +1085,7 @@ rearrange_windows(void)
         else
             window_reinit(map_win, md, md, NULL, FALSE, 0);
         {
-            short buf[8];
+            short buf[8] = {0};
             buf[3] = K_CTRL;
             buf[4] = C('L');
             AvSendMsg(ap_id, AV_SENDKEY, buf);
@@ -1507,7 +1507,7 @@ draw_inventory(PARMBLK *pb)
                 pla[5] = pla[7] = y;                     /* y_wert to */
                 pla[2] += Tile_width - 1;
                 pla[3] += h;
-                pla[6] += Tile_height - 1;
+                pla[6] += Tile_width - 1;
                 pla[7] += h;
 
                 if (planes == 1) {
@@ -1615,7 +1615,7 @@ mar_change_button_char(OBJECT *z_ob, short nr, char ch)
 }
 
 void
-mar_set_dir_keys()
+mar_set_dir_keys(void)
 {
     static short mi_numpad = FAIL;
     char mcmd[] = "bjnh.lyku", npcmd[] = "123456789", *p_cmd;
@@ -1635,7 +1635,7 @@ mar_set_dir_keys()
 extern int total_tiles_used; /* tile.c */
 
 int
-mar_gem_init()
+mar_gem_init(void)
 {
     short i, img_err = FALSE, fsize;
     char *fname;
@@ -1670,7 +1670,7 @@ mar_gem_init()
     /* NVDI 3.0 or better used v_ftext; not available in modern gemlib,
        so always wrap v_gtext through a const-correct shim. */
     v_mtext = vgtext_wrapper;
-    for (i = 0; i < NHICON; i++)
+    for (i = 0; i <= NHICON; i++)
         mar_get_rsc_tree(i, &zz_oblist[i]);
 
     z_ob = zz_oblist[ABOUT];
@@ -1865,7 +1865,7 @@ restore_normal_palette(void)
 /************************* mar_exit_nhwindows *******************************/
 
 void
-mar_exit_nhwindows()
+mar_exit_nhwindows(void)
 {
     short i;
 
@@ -1914,8 +1914,10 @@ mar_map_curs_weiter(void)
     static short once = TRUE;
 
     if (once) {
-        redraw_window(Gem_nhwindow[WIN_STATUS].gw_window, NULL);
-        redraw_window(Gem_nhwindow[WIN_MESSAGE].gw_window, NULL);
+        if (WIN_STATUS != WIN_ERR && Gem_nhwindow[WIN_STATUS].gw_window)
+            redraw_window(Gem_nhwindow[WIN_STATUS].gw_window, NULL);
+        if (WIN_MESSAGE != WIN_ERR && Gem_nhwindow[WIN_MESSAGE].gw_window)
+            redraw_window(Gem_nhwindow[WIN_MESSAGE].gw_window, NULL);
         once = FALSE;
     }
     mar_curs(map_cursx + 1, map_cursy);
@@ -1925,7 +1927,7 @@ mar_map_curs_weiter(void)
 /************************* about *******************************/
 
 void
-mar_about()
+mar_about(void)
 {
     xdialog(zz_oblist[ABOUT], md, NULL, NULL, DIA_CENTERED, FALSE,
             DIALOG_MODE);
@@ -1935,7 +1937,7 @@ mar_about()
 /************************* ask_name *******************************/
 
 char *
-mar_ask_name()
+mar_ask_name(void)
 {
     OBJECT *z_ob = zz_oblist[NAMEGET];
     short img_err;
@@ -2030,7 +2032,7 @@ mar_ask_name()
 void
 send_key(short key)
 {
-    short buf[8];
+    short buf[8] = {0};
 
     buf[3] = 0; /* No Shift/Ctrl/Alt */
     buf[4] = key;
@@ -2038,7 +2040,7 @@ send_key(short key)
 }
 
 void
-send_return()
+send_return(void)
 {
     send_key(key(SCANRET, 0));
 }
@@ -2108,7 +2110,7 @@ More_Handler(XEVENT *xev)
 }
 
 void
-mar_more()
+mar_more(void)
 {
     if (!mar_esc_pressed) {
         OBJECT *z_ob = zz_oblist[PAGER];
@@ -2161,7 +2163,7 @@ mar_add_menu(winid win, Gem_menu_item *item)
 }
 
 void
-mar_reverse_menu()
+mar_reverse_menu(void)
 {
     Gem_menu_item *next, *head = 0, *curr = invent_list;
 
@@ -2175,7 +2177,7 @@ mar_reverse_menu()
 }
 
 void
-mar_set_accelerators()
+mar_set_accelerators(void)
 {
     char ch = 'a';
     Gem_menu_item *curr;
@@ -2202,7 +2204,7 @@ mar_set_accelerators()
 }
 
 Gem_menu_item *
-mar_hol_inv()
+mar_hol_inv(void)
 {
     return (invent_list);
 }
@@ -2323,7 +2325,7 @@ mar_set_inv_win(short Anzahl, short Breite)
 /************************* mar_status_dirty *******************************/
 
 void
-mar_status_dirty()
+mar_status_dirty(void)
 {
     short ccol;
 
@@ -2370,7 +2372,8 @@ mar_add_message(const char *str)
         }
         message_line[mesg_hist - 1] = tmp;
     }
-    strcpy(toplines, str);
+    strncpy(toplines, str, TBUFSZ - 1);
+    toplines[TBUFSZ - 1] = '\0';
     messages_per_move++;
     msg_max++;
     if (msg_max >= msg_anz)
@@ -3002,6 +3005,17 @@ mar_display_nhwindow(winid wind)
            palette there. */
         if (planes <= 8 && use_rip && normal_palette)
             img_set_colors(x_handle, normal_palette, planes);
+        if (use_rip) {
+            if (Rip_bild.fd_addr
+                && Rip_bild.fd_addr != (short *) rip_image.addr) {
+                free(Rip_bild.fd_addr);
+                Rip_bild.fd_addr = NULL;
+            }
+            test_free(rip_image.palette);
+            rip_image.palette = NULL;
+            test_free(rip_image.addr);
+            rip_image.addr = NULL;
+        }
         ob_set_text(z_ob, QLINE, tmp_button);
         break;
     case NHW_MENU:
@@ -3267,7 +3281,7 @@ mar_change_menu_2_text(winid win)
 /************************* mar_clear_map *******************************/
 
 void
-mar_clear_map()
+mar_clear_map(void)
 {
     short pla[8];
     short x, y;
@@ -3352,7 +3366,7 @@ mar_set_margin(short m)
     scroll_margin = m;
 }
 void
-mar_cliparound()
+mar_cliparound(void)
 {
     if (WIN_MAP != WIN_ERR && Gem_nhwindow[WIN_MAP].gw_window) {
         short width = scroll_margin > 0 ? scroll_margin
@@ -3377,7 +3391,7 @@ mar_cliparound()
 }
 
 void
-mar_update_value()
+mar_update_value(void)
 {
     if (WIN_MESSAGE != WIN_ERR) {
         mar_message_pause = FALSE;
@@ -3670,13 +3684,13 @@ Gem_nh_poskey(coordxy *x, coordxy *y, int *mod)
 }
 
 void
-Gem_delay_output()
+Gem_delay_output(void)
 {
     Event_Timer(50, 0, TRUE); /* wait 50ms */
 }
 
 int
-Gem_doprev_message()
+Gem_doprev_message(void)
 {
     if (msg_pos > 2) {
         msg_pos--;
@@ -3875,7 +3889,7 @@ Dia_Handler(XEVENT *xev)
 }
 
 short
-mar_ask_direction()
+mar_ask_direction(void)
 {
     short d_exit;
     OBJECT *z_ob = zz_oblist[DIRECTION];
@@ -3942,7 +3956,7 @@ single_handler(XEVENT *xev)
     short ev = xev->ev_mwich;
 
     if (ev & MU_KEYBD) {
-        char ch = (char) xev->ev_mkreturn & 0x00FF;
+        char ch = (char) (xev->ev_mkreturn & 0x00FF);
         WIN *w;
         DIAINFO *dinf;
 
@@ -4008,10 +4022,12 @@ Gem_yn_function(const char *query, const char *resp, char def)
             ob_hide(z_ob, COUNT, TRUE);
         }
 
-        if ((anzahl = (long) strchr(resp, '\033'))) {
-            anzahl -= (long) resp;
-        } else {
-            anzahl = strlen(resp);
+        {
+            const char *esc = strchr(resp, '\033');
+            if (esc)
+                anzahl = esc - resp;
+            else
+                anzahl = strlen(resp);
         }
         for (i = 0, ptr = resp; i < 2 * anzahl; i += 2, ptr++) {
             ob_hide(z_ob, YN1 + i, FALSE);
@@ -4023,8 +4039,11 @@ Gem_yn_function(const char *query, const char *resp, char def)
 
         z_ob[SOMECHARS].ob_width = z_ob[YN1 + i].ob_x + 8;
         z_ob[SOMECHARS].ob_height = z_ob[YN1 + i].ob_y + gr_ch + gr_ch / 2;
-        Max((short *) &z_ob[ROOT].ob_width,
-            z_ob[SOMECHARS].ob_width + 4 * gr_cw);
+        {
+            int proposed = z_ob[SOMECHARS].ob_width + 4 * gr_cw;
+            if (proposed > z_ob[ROOT].ob_width)
+                z_ob[ROOT].ob_width = proposed;
+        }
         z_ob[ROOT].ob_height = z_ob[SOMECHARS].ob_height + 4 * gr_ch;
         if (strchr(resp, '#'))
             z_ob[ROOT].ob_height = z_ob[YNOK].ob_y + 2 * gr_ch;
@@ -4058,7 +4077,7 @@ Gem_yn_function(const char *query, const char *resp, char def)
     free(ob_get_text(z_ob, YNPROMPT, 0));
     ob_set_text(z_ob, YNPROMPT, tmp);
 
-    if (resp && (d_exit == W_CLOSED || d_exit == W_ABANDON))
+    if (d_exit == W_CLOSED || d_exit == W_ABANDON)
         return ('\033');
     if ((d_exit & NO_CLICK) == YNOK) {
         yn_number = atol(ob_get_text(z_ob, COUNT, 0));
