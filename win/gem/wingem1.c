@@ -1676,7 +1676,7 @@ mar_gem_init(void)
     /* NVDI 3.0 or better used v_ftext; not available in modern gemlib,
        so always wrap v_gtext through a const-correct shim. */
     v_mtext = vgtext_wrapper;
-    for (i = 0; i <= NHICON; i++)
+    for (i = 0; i < NHICON; i++)
         mar_get_rsc_tree(i, &zz_oblist[i]);
 
     z_ob = zz_oblist[ABOUT];
