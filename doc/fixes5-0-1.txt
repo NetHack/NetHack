@@ -118,6 +118,10 @@ libnh: sys/unix/hints/macOS.500 in the WANT_LIBNH block, add an explicit
 	$(GAME) is overridden to empty, the regular `recover: $(GAME)` chain
 	no longer triggers `lua_support`, so include/nhlua.h never gets
 	generated and recover.c's transitive #include of hack.h fails
+Linux: add WANT_SYSTEM_LUA=1 support to the linux.500 hints files and
+	its included files, making it possible to avoid the 'fetch-lua'
+	step and the subsequent compiling of Lua; it tries to use use
+	the Lua5.4 package that is already installed on the system
 macOS: fix ncurses build with Homebrew
 musl: musl libc does not have __sighandler_t so don't use it in the
 	macro definition for SIG_RET_TYPE with musl
