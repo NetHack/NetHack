@@ -97,6 +97,9 @@ dosave0(void)
        when punished, make sure ball and chain are placed too */
     done_object_cleanup(); /* maybe force some items onto map */
 
+    /* ensure SAVEF is set; pcmain sets it at startup but the player
+       name may have changed since then (strstrplay, strstrstrplay) */
+    set_savefile_name(TRUE);
     if (!program_state.something_worth_saving || !gs.SAVEF[0])
         goto done;
 

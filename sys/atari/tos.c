@@ -1,9 +1,13 @@
-/* NetHack 3.6	tos.c	$NHDT-Date: 1501979358 2017/08/06 00:29:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.8 $ */
+/* NetHack 5.0	tos.c	$NHDT-Date: 1501979358 2017/08/06 00:29:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.8 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
  *  TOS system functions.
  */
+
+/* NetHack 5.0 with Lua needs significantly more stack than the
+   default.  For GCC with mintlib, _stksize controls this. */
+long _stksize = 256 * 1024L;
 
 #define NEED_VARARGS
 #include "hack.h"
@@ -11,13 +15,17 @@
 #ifdef TTY_GRAPHICS
 #include "tcap.h"
 #else
-/* To avoid error for tos.c; will be removed later */
+/* Used by set_colors / restore_colors below when this TU is built
+   without tcap.h. */
 static char *nh_HE = "\033q";
 #endif
 
 #ifdef TOS
 
 #include <osbind.h>
+#ifdef MINT
+#include <sys/ioctl.h>
+#endif
 #ifndef WORD
 #define WORD short /* 16 bits -- redefine if necessary */
 #endif
@@ -31,7 +39,7 @@ char *_a_line; /* for Line A variables */
 boolean colors_changed = FALSE;
 
 int
-tgetch()
+tgetch(void)
 {
     char ch;
 
@@ -126,7 +134,7 @@ static const char scanmap[] = {
 #define ALT 0x8
 
 static char
-BIOSgetch()
+BIOSgetch(void)
 {
     unsigned char scan, shift, ch;
     const struct pad *kpad;
@@ -162,14 +170,13 @@ BIOSgetch()
 }
 
 static char
-DOSgetch()
+DOSgetch(void)
 {
     return (Crawcin() & 0x007f);
 }
 
 long
-freediskspace(path)
-char *path;
+freediskspace(char *path)
 {
     int drive = 0;
     struct {
@@ -189,45 +196,46 @@ char *path;
  * Functions to get filenames using wildcards
  */
 int
-findfirst(path)
-char *path;
+findfirst(char *path)
 {
     return (Fsfirst(path, 0) == 0);
 }
 
 int
-findnext()
+findnext(void)
 {
     return (Fsnext() == 0);
 }
 
 char *
-foundfile_buffer()
+foundfile_buffer(void)
 {
     return (char *) Fgetdta() + 30;
 }
 
 long
-filesize(file)
-char *file;
+filesize(char *file)
 {
-    if (findfirst(file))
-        return (*(long *) ((char *) Fgetdta() + 26));
-    else
+    long sz;
+
+    if (!findfirst(file))
         return -1L;
+    /* The DTA d_length field at offset 26 is not guaranteed to be
+       4-byte aligned; a direct long dereference faults on 68000. */
+    memcpy(&sz, (char *) Fgetdta() + 26, sizeof sz);
+    return sz;
 }
 
 /*
  * Chdrive() changes the default drive.
  */
 void
-chdrive(str)
-char *str;
+chdrive(const char *str)
 {
     char *ptr;
     char drive;
 
-    if ((ptr = strchr(str, ':')) != (char *) 0) {
+    if ((ptr = strchr(str, ':')) != (char *) 0 && ptr > str) {
         drive = toupper(*(ptr - 1));
         (void) Dsetdrv(drive - 'A');
     }
@@ -235,36 +243,43 @@ char *str;
 }
 
 void
-get_scr_size()
+get_scr_size(void)
 {
 #ifdef MINT
-#include <ioctl.h>
     struct winsize win;
     char *tmp;
 
-    if ((tmp = nh_getenv("LINES")))
+    LI = CO = 0;
+    if ((tmp = nh_getenv("LINES")) || (tmp = nh_getenv("ROWS")))
         LI = atoi(tmp);
-    else if ((tmp = nh_getenv("ROWS")))
-        LI = atoi(tmp);
-    if (tmp && (tmp = nh_getenv("COLUMNS")))
+    if ((tmp = nh_getenv("COLUMNS")))
         CO = atoi(tmp);
-    else {
-        ioctl(0, TIOCGWINSZ, &win);
-        LI = win.ws_row;
-        CO = win.ws_col;
+    if (!LI || !CO) {
+        if (ioctl(0, TIOCGWINSZ, &win) == 0) {
+            if (!LI) LI = win.ws_row;
+            if (!CO) CO = win.ws_col;
+        }
     }
+    if (!LI) LI = 25;
+    if (!CO) CO = 80;
 #else
+    WORD rows, cols;
+
     init_aline();
-    LI = (*((WORD *) (_a_line + -42L))) + 1;
-    CO = (*((WORD *) (_a_line + -44L))) + 1;
+    /* Line-A variables live at fixed offsets below _a_line; the base
+       isn't guaranteed to be word-aligned, so copy out instead of
+       casting through a (WORD *) which faults on 68000. */
+    memcpy(&rows, _a_line - 42, sizeof rows);
+    memcpy(&cols, _a_line - 44, sizeof cols);
+    LI = rows + 1;
+    CO = cols + 1;
 #endif
 }
 
 #define BIGBUF 8192
 
 int
-_copyfile(from, to)
-char *from, *to;
+_copyfile(char *from, char *to)
 {
     int fromfd, tofd, r;
     char *buf;
@@ -278,22 +293,28 @@ char *from, *to;
         return -1;
     }
     buf = (char *) alloc((unsigned) BIGBUF);
-    while ((r = read(fromfd, buf, BIGBUF)) > 0)
-        write(tofd, buf, r);
+    while ((r = read(fromfd, buf, BIGBUF)) > 0) {
+        if (write(tofd, buf, r) != r) {
+            close(fromfd);
+            close(tofd);
+            free((genericptr_t) buf);
+            return -1;
+        }
+    }
     close(fromfd);
     close(tofd);
     free((genericptr_t) buf);
-    return 0; /* successful */
+    return (r < 0) ? -1 : 0;
 }
 
 int
-kbhit()
+kbhit(void)
 {
     return Cconis();
 }
 
 static void
-init_aline()
+init_aline(void)
 {
 #ifdef __GNUC__
     /* line A calls nuke registers d0-d2,a0-a2; not all compilers regard these
@@ -314,7 +335,7 @@ init_aline()
 unsigned long tos_numcolors = 2;
 
 void
-set_colors()
+set_colors(void)
 {
     static char colorHE[] = "\033q\033b0";
 
@@ -332,7 +353,7 @@ set_colors()
 }
 
 void
-restore_colors()
+restore_colors(void)
 {
     static char plainHE[] = "\033q";
 
@@ -350,10 +371,9 @@ extern int __mint;
 #endif
 
 int
-dosuspend()
+dosuspend(void)
 {
 #ifdef MINT
-    extern int kill();
     if (__mint == 0) {
 #endif
         pline("Sorry, it seems we have no SIGTSTP here.  Try ! or S.");
@@ -371,5 +391,30 @@ dosuspend()
     return (0);
 }
 #endif /* SUSPEND */
+
+#ifdef NOTTYGRAPHICS
+/* stub for pcsys.c when building without TTY */
+void
+term_curs_set(int visibility UNUSED)
+{
+}
+#endif
+
+/* NetHack's error() must be provided here because unixtty.c is not
+   compiled for TOS, and MiNT libc has a weak error() symbol with an
+   incompatible signature (GNU error()) that would be used otherwise. */
+void
+error(const char *s, ...)
+{
+    va_list the_args;
+
+    va_start(the_args, s);
+    if (iflags.window_inited)
+        exit_nhwindows((char *) 0);
+    vprintf(s, the_args);
+    (void) putchar('\n');
+    va_end(the_args);
+    nethack_exit(EXIT_FAILURE);
+}
 
 #endif /* TOS */

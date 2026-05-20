@@ -1,4 +1,11 @@
-/* resource set indices for GEM_RSC */
+/* gem_rsc.h -- object/tree indices for win/gem/gem_rsc.rsc
+ * Hand-maintained alongside the RSC binary. Both must be kept in sync:
+ * when editing gem_rsc.rsc with an RCS editor, regenerate the indices
+ * here. The .rsc binary is shipped from win/gem/ into the package by
+ * the ataripkg recipe. */
+
+#ifndef GEM_RSC_H
+#define GEM_RSC_H
 
 #define MENU 0     /* menu */
 #define DOABOUT 12 /* STRING in tree MENU */
@@ -62,3 +69,5 @@
 #define QPAGER 1   /* BUTTON in tree PAGER */
 
 #define NHICON 11 /* form/dialog */
+
+#endif /* GEM_RSC_H */

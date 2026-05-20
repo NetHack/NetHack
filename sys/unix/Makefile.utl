@@ -541,12 +541,12 @@ tile2x11.o: ../win/X11/tile2x11.c $(HACK_H) ../win/share/tile.h \
 	$(CC) $(CFLAGS) $(CSTD) -I../win/share -c ../win/X11/tile2x11.c -o $@
 
 tile2img.o: ../win/gem/tile2img.c $(HACK_H) ../win/share/tile.h \
-						../include/bitmfile.h
-	$(CC) $(CFLAGS) $(CSTD) -I../win/share -c ../win/gem/tile2img.c -o $@
-xpm2img.o: ../win/gem/xpm2img.c $(HACK_H) ../include/bitmfile.h
-	$(CC) $(CFLAGS) $(CSTD) -c ../win/gem/xpm2img.c -o $@
-bitmfile.o: ../win/gem/bitmfile.c ../include/bitmfile.h
-	$(CC) $(CFLAGS) $(CSTD) -c ../win/gem/bitmfile.c -o $@
+						../win/gem/bitmfile.h
+	$(CC) $(CFLAGS) $(CSTD) -I../win/gem -I../win/share -c ../win/gem/tile2img.c -o $@
+xpm2img.o: ../win/gem/xpm2img.c $(HACK_H) ../win/gem/bitmfile.h
+	$(CC) $(CFLAGS) $(CSTD) -I../win/gem -c ../win/gem/xpm2img.c -o $@
+bitmfile.o: ../win/gem/bitmfile.c ../win/gem/bitmfile.h
+	$(CC) $(CFLAGS) $(CSTD) -I../win/gem -c ../win/gem/bitmfile.c -o $@
 
 tile2beos.o: ../win/BeOS/tile2beos.cpp $(HACK_H) ../win/share/tile.h
 	$(CXX) $(CFLAGS) $(CSTD) -I../win/share -c ../win/BeOS/tile2beos.cpp -o $@

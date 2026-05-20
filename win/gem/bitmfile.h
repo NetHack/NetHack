@@ -6,13 +6,13 @@
 * -> Header-Datei						 *
 \****************************/
 
-#ifndef H_TO_FILE
-#define H_TO_FILE
+#ifndef BITMFILE_H
+#define BITMFILE_H
 
-/*	#include <portab.h>	*/
-#define UWORD unsigned short
-#define ULONG unsigned long
-#define UBYTE unsigned char
+#include <stdint.h>
+typedef uint16_t UWORD;
+typedef uint32_t ULONG;
+typedef uint8_t UBYTE;
 
 #define XIMG_MAGIC 0x58494D47
 
@@ -30,4 +30,4 @@ int bitmap_to_file(FILE_TYP typ, int ww, int wh, unsigned int pwx,
                    void (*get_color)(unsigned int colind, struct RGB *rgb),
                    void (*get_pixel)(int x, int y, unsigned int *colind));
 
-#endif
+#endif /* BITMFILE_H */

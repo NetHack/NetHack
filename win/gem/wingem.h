@@ -1,4 +1,4 @@
-/* NetHack 3.6	wingem.h	$NHDT-Date: 1596498570 2020/08/03 23:49:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
+/* NetHack 5.0	wingem.h	$NHDT-Date: 1596498570 2020/08/03 23:49:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) Christian Bressler, 1999				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,13 +8,15 @@
 /* menu structure */
 typedef struct Gmi {
     struct Gmi *Gmi_next;
-    int Gmi_glyph;
+    short Gmi_glyph;
     long Gmi_identifier;
     char Gmi_accelerator, Gmi_groupacc;
-    int Gmi_attr;
+    short Gmi_attr;
+    short Gmi_color; /* NetHack CLR_* index, NO_COLOR if uncoloured */
     char *Gmi_str;
     long Gmi_count;
-    int Gmi_selected;
+    short Gmi_selected;
+    unsigned short Gmi_itemflags;
 } Gem_menu_item;
 
 #define MAXWIN 20 /* maximum number of windows, cop-out */
@@ -25,21 +27,16 @@ extern struct window_procs Gem_procs;
 #ifdef CLIPPING
 extern void setclipped(void);
 #endif
-extern void docorner(int, int);
-extern void end_glyphout(void);
-extern void g_putch(int);
 extern void win_Gem_init(int);
 extern int mar_gem_init(void);
-extern char mar_ask_class(void);
 extern char *mar_ask_name(void);
-extern int mar_create_window(int);
+extern int mar_create_window(short);
 extern void mar_destroy_nhwindow(int);
-extern void mar_print_glyph(int, int, int, const glyph_info *,
-                       const glyph_info *);
+extern void mar_print_glyph(winid, short, short, short, short);
 extern void mar_print_line(int, int, int, char *);
 extern void mar_set_message(char *, char *, char *);
 extern Gem_menu_item *mar_hol_inv(void);
-extern void mar_set_menu_type(int);
+extern void mar_set_menu_type(short);
 extern void mar_reverse_menu(void);
 extern void mar_set_menu_title(const char *);
 extern void mar_set_accelerators(void);
@@ -49,7 +46,7 @@ extern void mar_add_message(const char *);
 extern void mar_status_dirty(void);
 extern int mar_hol_win_type(int);
 extern void mar_clear_messagewin(void);
-extern void mar_set_no_glyph(int);
+extern void mar_set_no_glyph(short);
 extern void mar_map_curs_weiter(void);
 
 /* external declarations */
@@ -63,18 +60,17 @@ extern void Gem_resume_nhwindows(void);
 extern winid Gem_create_nhwindow(int);
 extern void Gem_clear_nhwindow(winid);
 extern void Gem_display_nhwindow(winid, boolean);
-extern void Gem_dismiss_nhwindow(winid);
 extern void Gem_destroy_nhwindow(winid);
 extern void Gem_curs(winid, int, int);
 extern void Gem_putstr(winid, int, const char *);
 extern void Gem_display_file(const char *, boolean);
 extern void Gem_start_menu(winid, unsigned long);
 extern void Gem_add_menu(winid, const glyph_info *, const ANY_P *, char, char,
-                    int, const char *, unsigned int);
+                    int, int, const char *, unsigned int);
 extern void Gem_end_menu(winid, const char *);
 extern int Gem_select_menu(winid, int, MENU_ITEM_P **);
-extern char Gem_message_menu(char, int, const char *);
-extern void Gem_update_inventory(void);
+extern void Gem_update_inventory(int);
+extern win_request_info *Gem_ctrl_nhwindow(winid, int, win_request_info *);
 extern void Gem_mark_synch(void);
 extern void Gem_wait_synch(void);
 #ifdef CLIPPING
@@ -88,7 +84,7 @@ extern void Gem_print_glyph(winid, coordxy, coordxy, const glyph_info *,
 extern void Gem_raw_print(const char *);
 extern void Gem_raw_print_bold(const char *);
 extern int Gem_nhgetch(void);
-extern int Gem_nh_poskey(int *, int *, int *);
+extern int Gem_nh_poskey(coordxy *, coordxy *, int *);
 extern void Gem_nhbell(void);
 extern int Gem_doprev_message(void);
 extern char Gem_yn_function(const char *, const char *, char);
@@ -100,8 +96,6 @@ extern void Gem_delay_output(void);
 extern void Gem_change_color(int color, long rgb, int reverse);
 extern char *Gem_get_color_string(void);
 #endif
-
-extern void genl_outrip(winid, int, time_t);
 
 
 #endif /* WINGEM_H */

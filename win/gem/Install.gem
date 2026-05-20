@@ -1,5 +1,15 @@
 $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
 
+This GEM windowport was originally written by Marvin Bressler for
+NetHack 3.5 and rebased onto 3.7 / 5.0 in 2026, cross-compiled from
+Linux with m68k-atari-mint and tested on TT/Falcon and MagiC.  See
+sys/atari/Install.tos for the current build instructions and the
+authoritative requirements -- NetHack 5.0 with Lua needs considerably
+more RAM than the 2 MB figure quoted in the historical text below.
+The historical notes below are preserved as written.
+
+-----
+
 Hi,
 
 This is nethack3.5.0 for Atari Gem and tty

@@ -1,0 +1,95 @@
+                        NetHack 5.0 for Atari ST/TT/Falcon
+                        ===================================
+
+Requirements
+------------
+    - Atari ST-class machine (ST, STE, Mega ST/STE, TT, or Falcon)
+      with at least 6 MB of RAM.
+    - GEM AES (TOS, MagiC, EmuTOS, or FreeMiNT/XaAES).
+    - At least VGA-class video: 640x480 with 16 colours.
+
+    Known to work:
+      - Hatari (https://hatari.tuxfamily.org/) with TOS 2.06 (ST),
+        TOS 3.06 (TT), TOS 4.04 (Falcon), and stock EmuTOS 1.4.
+      - MagiC 6.2 under MagiCMac on macOS.
+      - MagiC under magic-on-linux
+        (https://gitlab.com/AndreasK/magiclinux) in 8/16/24/32-bit
+        colour modes.
+      - Vampire V4SA + FreeMiNT + XaAES + NVDI + Olivier
+        Landemarre's EmuTOS variant.
+
+Supported display modes:
+    - 4, 8, 16, 24 and 32-bit colour
+    - 1-bit monochrome (experimental)
+    - ASCII text in any of the above via the F2 toggle.
+
+
+Installation
+------------
+Unzip NH500ST.ZIP on the Atari side -- not on the Linux/Windows
+host -- because some unzippers translate line endings inside the
+archive and corrupt nhdat.
+
+The archive expands into a self-contained game directory:
+
+    nethack.prg         GEM application
+    nhdat               packed game data (Lua scripts + tile mapping)
+    nethack.cnf         default configuration
+    gem_rsc.rsc         GEM dialog resources
+    NH2.IMG             monochrome tile sheet (Atkinson dithered)
+    NH16.IMG            16-colour tile sheet
+    NH32.IMG            32-colour tile sheet
+    TITLE.IMG           splash image (colour)
+    TITLE2.IMG          splash image (monochrome)
+    RIP.IMG             tombstone image
+    README.txt          this file
+    license, symbols, nethack.txt
+    levels/, save/      empty, written to during play
+
+Double-click nethack.prg to start.
+
+
+Display Modes
+-------------
+By default the game starts in tile mode.  Press F2 at any point
+during play to toggle between tiles and ASCII.
+
+In ST High (monochrome) NetHack runs in ASCII mode; the
+Atkinson-dithered NH2.IMG ships in the package but the small
+screen makes ASCII the practical choice there.
+
+To force ASCII text mode by default, edit nethack.cnf:
+
+    #OPTIONS=!ascii_map
+    OPTIONS=ascii_map
+
+
+Configuration
+-------------
+See the comments in nethack.cnf.  Key options:
+
+    HACKDIR     game directory (default: nethack.prg's location)
+    LEVELDIR    where to write level files (default: levels)
+    SAVEDIR     where to write save files  (default: save)
+
+Useful gameplay options:
+
+    OPTIONS=color,hilite_pet,number_pad
+    OPTIONS=autopickup,pickup_thrown
+    OPTIONS=pickup_types:$?!/="+
+    OPTIONS=menucolors          - colored inventory items
+
+Menu colour examples (after OPTIONS=menucolors):
+
+    MENUCOLOR=" cursed "=red&bold
+    MENUCOLOR=" blessed "=cyan
+    MENUCOLOR=" uncursed "=black
+
+
+Notes
+-----
+Save files and bones files from earlier NetHack versions will
+not work with 5.0.
+
+If you want to build NetHack for Atari from source, see
+sys/atari/README.Crosscompiling.

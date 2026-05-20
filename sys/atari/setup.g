@@ -13,5 +13,6 @@ sed -f unx2atar.sed < ..\unix\Makefile.doc > ..\..\doc\Makefile
 sed -f unx2atar.sed < ..\unix\Makefile.src > ..\..\src\Makefile
 sed -f unx2atar.sed < ..\unix\Makefile.utl > ..\..\util\Makefile
 
-# KLUDGE to fix a Makefile problem
+# Create an empty win32api.h so that the WIN32-only #include in
+# sys/share/lev_main.c (and similar) does not break the Atari build.
 echo > ..\..\include\win32api.h
