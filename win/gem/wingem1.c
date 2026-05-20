@@ -4077,7 +4077,7 @@ Gem_yn_function(const char *query, const char *resp, char def)
     free(ob_get_text(z_ob, YNPROMPT, 0));
     ob_set_text(z_ob, YNPROMPT, tmp);
 
-    if (d_exit == W_CLOSED || d_exit == W_ABANDON)
+    if (resp && (d_exit == W_CLOSED || d_exit == W_ABANDON))
         return ('\033');
     if ((d_exit & NO_CLICK) == YNOK) {
         yn_number = atol(ob_get_text(z_ob, COUNT, 0));
