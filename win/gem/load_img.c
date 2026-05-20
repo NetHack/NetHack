@@ -313,7 +313,9 @@ depack_img(char *name, IMG_header *pic)
                     scan_repeat = pic->img_h - line;
                 /* copy line to image buffer */
                 if (scan_repeat > 1) {
-                    to = puffer + word_aligned;
+                    /* calculate address of a current line in a current
+                     * bitplane */
+                    /*					to=pic->addr+(long)(line+1+plane*pic->img_h)*(long)word_aligned;*/
                     for (b = scan_repeat - 1; b; --b) {
                         memcpy(to, puffer, width);
                         to += word_aligned;
