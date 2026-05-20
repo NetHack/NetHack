@@ -460,12 +460,18 @@ encode_truecolor_pixel(unsigned char *p, int r, int g, int b, int planes)
 /* Build a truecolor device-format MFDB from a palettized standard-
    format source image (1..8 planes).  Output plane count matches the
    screen (16, 24, or 32); bytes per pixel = (planes+7)/8.  fd_stand=0,
-   fd_wdwidth = rounded_w * bytes_per_pixel / 2 (words per scanline).
+   fd_wdwidth = rounded_w * bytes_per_pixel / 2 / planes.
 
    This is the canonical NVDI / MagiC / fVDI pattern from Behne's
    PRINT_TC.C reference: vro_cpyfm in mode S_ONLY copies these
    device-format pixels straight to the screen with no palette
-   involvement.  Works on any direct-color workstation. */
+   involvement.  Works on any direct-color workstation.
+
+   Note on fd_wdwidth: this code uses (bytes_per_line / 2 / scr_planes),
+   not the VDI-spec "total 16-bit words per scanline".  The non-standard
+   form is what NVDI/MagiC/fVDI actually expect for chunky direct-color
+   MFDBs in this port; "fixing" it to match the spec produces scrambled
+   16/24/32 bpp output. */
 static int
 build_truecolor_mfdb(IMG_header *img, MFDB *out, int scr_planes)
 {
@@ -502,7 +508,7 @@ build_truecolor_mfdb(IMG_header *img, MFDB *out, int scr_planes)
     out->fd_addr = (short *) buf;
     out->fd_w = rounded_w;
     out->fd_h = h;
-    out->fd_wdwidth = (short) (bytes_per_line / 2);
+    out->fd_wdwidth = (short) ((bytes_per_line / 2) / scr_planes);
     out->fd_stand = 0;
     out->fd_nplanes = scr_planes;
     out->fd_r1 = out->fd_r2 = out->fd_r3 = 0;
