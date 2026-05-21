@@ -745,34 +745,8 @@ exepath(char *str)
 }
 #endif /* EXEPATH */
 
-#if defined(CROSS_TO_MSDOS)
-
-void
-get_nhuuid(void)
-{
-    unsigned char stmp[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
-    if (svn.nhuuid[0])
-        return;
-
-    /* FIXME: fill in a useful valid UUID somehow */
-    Snprintf(svn.nhuuid, sizeof svn.nhuuid, "%s", (char *) stmp);
-}
-
-void
-free_nhuuid(void)
-{
-    int i;
-
-    for (i = 0; i < SIZE(svn.nhuuid); i++) {
-        svn.nhuuid[i] = 0;
-    }
-}
-#endif
-
-#if defined(CROSS_TO_ATARI) || defined(CROSS_TO_AMIGA)
+#if defined(CROSS_TO_ATARI) || defined(CROSS_TO_AMIGA) \
+    || defined(CROSS_TO_MSDOS)
 /* Generate an RFC 4122 v4 UUID for this game.  Draw bytes from the
    core's ISAAC64 RNG, which init_random() seeded before we get here. */
 void
