@@ -26,6 +26,7 @@ staticfn int ckvalidcat(struct obj *);
 staticfn int ckunpaid(struct obj *);
 staticfn char *safeq_xprname(struct obj *);
 staticfn char *safeq_shortxprname(struct obj *);
+staticfn boolean hit_reroll_limit(int);
 staticfn char display_pickinv(const char *, const char *, const char *,
                             boolean, boolean, long *);
 staticfn char display_used_invlets(char);
@@ -2540,6 +2541,15 @@ askchain(
     return cnt;
 }
 
+staticfn boolean
+hit_reroll_limit(int curr)
+{
+#ifdef SYSCF
+    if (sysopt.maxrerolls && curr >= (sysopt.maxrerolls-1))
+        return TRUE;
+#endif /*SYSCF*/
+    return FALSE;
+}
 
 /* The menu for rerolling attributes and inventory.
 
@@ -2557,7 +2567,7 @@ reroll_menu(void)
     struct obj *otmp;
     int tmpglyph;
     glyph_info tmpglyphinfo;
-    char option;
+    char option = 'n';
     char buf[BUFSZ];
 
     win = create_nhwindow(NHW_MENU);
@@ -2569,9 +2579,17 @@ reroll_menu(void)
              ATR_NONE, NO_COLOR, "start the game with this character",
              MENU_ITEMFLAGS_NONE);
     any.a_char = 'y';
+    Strcpy(buf, "reroll another character");
+#ifdef SYSCF
+    if (sysopt.maxrerolls > 0) {
+        char *bp = eos(buf);
+
+        Sprintf(bp, " (%li/%i)",
+                u.uroleplay.numrerolls+1, sysopt.maxrerolls);
+    }
+#endif /*SYSCF*/
     add_menu(win, &nul_glyphinfo, &any, flags.lootabc ? 0 : 'r', 0,
-             ATR_NONE, NO_COLOR, "reroll another character",
-             MENU_ITEMFLAGS_NONE);
+             ATR_NONE, NO_COLOR, buf, MENU_ITEMFLAGS_NONE);
     any.a_char = 0;
     add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR, "",
              MENU_ITEMFLAGS_NONE);
@@ -2600,7 +2618,7 @@ reroll_menu(void)
     if (select_menu(win, PICK_ONE, &pick_list) > 0) {
         option = pick_list[0].item.a_char;
         free((genericptr_t) pick_list);
-    } else {
+    } else if (!hit_reroll_limit(u.uroleplay.numrerolls)) {
         /* user closed the menu without selecting; unclear what their choice
            is here so ask again; but (e.g. for hangup handling) stop asking if
            the user cancels out again */
@@ -2610,7 +2628,8 @@ reroll_menu(void)
 
     if (option == 'y') {
         ++u.uroleplay.numrerolls;
-        return TRUE;
+        if (!hit_reroll_limit(u.uroleplay.numrerolls))
+            return TRUE;
     }
     return FALSE;
 }

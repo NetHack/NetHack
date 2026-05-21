@@ -55,6 +55,10 @@ GENERICUSERS=play player game games nethack nethacker ec2-user
 # letter and "lock" (eg. alock, block, ...)
 MAXPLAYERS=10
 
+# Limit the number of rerolls
+# Default is 0 (meaning infinite), valid values are 0-255
+MAX_REROLLS=0
+
 # If not null, added to string "To get local support, " in the support
 # information help.
 #SUPPORT=call Izchak at extension 42.
