@@ -2236,7 +2236,8 @@ doloot_core(void)
 
         if (num_conts > 1) {
             /* use a menu to loot many containers */
-            int n, i;
+            int n, i, tmpglyph;
+            glyph_info tmpglyphinfo;
             winid win;
             anything any;
             menu_item *pick_list = (menu_item *) 0;
@@ -2249,7 +2250,9 @@ doloot_core(void)
                  cobj = cobj->nexthere)
                 if (Is_container(cobj)) {
                     any.a_obj = cobj;
-                    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
+                    tmpglyph = obj_to_glyph(cobj, rn2_on_display_rng);
+                    map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);
+                    add_menu(win, &tmpglyphinfo, &any, 0, 0, ATR_NONE, clr,
                              doname(cobj), MENU_ITEMFLAGS_NONE);
                 }
             end_menu(win, "Loot which containers?");
@@ -3504,7 +3507,8 @@ tip_ok(struct obj *obj)
 staticfn int
 choose_tip_container_menu(void)
 {
-    int n, i;
+    int n, i, tmpglyph;
+    glyph_info tmpglyphinfo;
     winid win;
     anything any;
     menu_item *pick_list = (menu_item *) 0;
@@ -3520,7 +3524,9 @@ choose_tip_container_menu(void)
         if (Is_container(otmp)) {
             ++i;
             any.a_obj = otmp;
-            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+            tmpglyph = obj_to_glyph(otmp, rn2_on_display_rng);
+            map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);
+            add_menu(win, &tmpglyphinfo, &any, 0, 0, ATR_NONE,
                      clr, doname(otmp), MENU_ITEMFLAGS_NONE);
         }
     if (gi.invent) {
@@ -3872,7 +3878,8 @@ tipcontainer_gettarget(
     struct obj *box,
     boolean *cancelled)
 {
-    int n, n_conts;
+    int n, n_conts, tmpglyph;
+    glyph_info tmpglyphinfo;
     winid win;
     anything any;
     char buf[BUFSZ];
@@ -3923,7 +3930,9 @@ tipcontainer_gettarget(
         any = cg.zeroany;
         any.a_obj = !exclude_it ? otmp : 0;
         Sprintf(buf, "%s%s", !exclude_it ? "" : "    ", doname(otmp));
-        add_menu(win, &nul_glyphinfo, &any, !exclude_it ? otmp->invlet : 0, 0,
+        tmpglyph = obj_to_glyph(otmp, rn2_on_display_rng);
+        map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);
+        add_menu(win, &tmpglyphinfo, &any, !exclude_it ? otmp->invlet : 0, 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     }
 
