@@ -45,44 +45,6 @@ amiga_self_assign(void)
         UnLock(dup);
 }
 
-/* Generate an RFC 4122 v4 UUID for this game.  Draw bytes from the
-   core's ISAAC64 RNG, which init_random() seeded before we get here. */
-void
-get_nhuuid(void)
-{
-    uchar bytes[16];
-    int i;
-
-    if (svn.nhuuid[0])
-        return;
-
-    for (i = 0; i < 16; i++)
-        bytes[i] = (uchar) rn2(256);
-    /* RFC 4122: version=4 (random), variant=10. */
-    bytes[6] = (bytes[6] & 0x0F) | 0x40;
-    bytes[8] = (bytes[8] & 0x3F) | 0x80;
-
-    Snprintf(svn.nhuuid, sizeof svn.nhuuid,
-             "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-"
-             "%02x%02x%02x%02x%02x%02x",
-             bytes[0], bytes[1], bytes[2], bytes[3],
-             bytes[4], bytes[5],
-             bytes[6], bytes[7],
-             bytes[8], bytes[9],
-             bytes[10], bytes[11], bytes[12], bytes[13],
-             bytes[14], bytes[15]);
-}
-
-void
-free_nhuuid(void)
-{
-    int i;
-
-    for (i = 0; i < SIZE(svn.nhuuid); i++) {
-        svn.nhuuid[i] = 0;
-    }
-}
-
 #include "winext.h"
 #include "winproto.h"
 

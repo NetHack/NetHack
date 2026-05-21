@@ -772,7 +772,7 @@ free_nhuuid(void)
 }
 #endif
 
-#if defined(CROSS_TO_ATARI)
+#if defined(CROSS_TO_ATARI) || defined(CROSS_TO_AMIGA)
 /* Generate an RFC 4122 v4 UUID for this game.  Draw bytes from the
    core's ISAAC64 RNG, which init_random() seeded before we get here. */
 void
