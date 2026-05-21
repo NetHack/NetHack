@@ -2438,7 +2438,7 @@ void nethack_enter_consoletty(void)
          */
         width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 #ifdef DEBUG
-        if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+        if (wizard && NH_DEVEL_STATUS != NH_STATUS_RELEASED)
             fprintf(stdout, "width = %d\n", width);
 #endif
     }
