@@ -237,6 +237,8 @@ endif  # CROSS_TO_MIPS
 
 
 ifdef CROSS_TO_AMIGA
+$(TARGETPFX)tile.o : $(SRCDIR)/tile.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ $(SRCDIR)/tile.c
 $(TARGETPFX)amidos.o : ../sys/amiga/amidos.c $(HACK_H)
 $(TARGETPFX)amirip.o : ../sys/amiga/amirip.c $(HACK_H)
 $(TARGETPFX)amistack.o : ../sys/amiga/amistack.c $(HACK_H)

@@ -183,7 +183,7 @@ ConvertKey(struct IntuiMessage *message)
     ULONG qualifier;
     char numeric_pad, shift, control, alt;
 
-    if (amii_wins[WIN_MAP])
+    if (WIN_MAP != WIN_ERR && amii_wins[WIN_MAP])
         w = amii_wins[WIN_MAP]->win;
     qualifier = message->Qualifier;
 
@@ -376,7 +376,8 @@ ProcessMessage(struct IntuiMessage *message)
             break;
         }
 
-        if (!amii_wins[WIN_MAP] || w != amii_wins[WIN_MAP]->win)
+        if (WIN_MAP == WIN_ERR
+            || !amii_wins[WIN_MAP] || w != amii_wins[WIN_MAP]->win)
             break;
 
         if (message->Code == SELECTDOWN) {
