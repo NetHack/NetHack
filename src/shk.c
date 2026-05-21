@@ -1675,7 +1675,8 @@ menu_pick_pay_items(
     menu_item *pick_list = (menu_item *) 0;
     char *p, buf[BUFSZ];
     long amt, largest_amt, save_quan;
-    int i, j, n, amt_width;
+    int i, j, n, amt_width, tmpglyph;
+    glyph_info tmpglyphinfo;
 
     any = cg.zeroany;
     win = create_nhwindow(NHW_MENU);
@@ -1716,7 +1717,9 @@ menu_pick_pay_items(
            isn't hallucinating; also, that would mess up the alignment */
         Snprintf(buf, sizeof buf, "%*ld Zm, %s", amt_width, amt, p);
         any.a_int = i + 1; /* +1: avoid 0 */
-        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR, buf,
+        tmpglyph = obj_to_glyph(otmp, rn2_on_display_rng);
+        map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);
+        add_menu(win, &tmpglyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR, buf,
                  MENU_ITEMFLAGS_NONE);
     }
 
