@@ -765,7 +765,11 @@ Gem_add_menu(winid window, const glyph_info *glyphinfo,
 
     G_item = (Gem_menu_item *) alloc(sizeof(Gem_menu_item));
     G_item->Gmi_identifier = (long) identifier->a_void;
-    G_item->Gmi_glyph = glyphinfo ? glyphinfo->gm.tileidx : NO_GLYPH;
+    /* nul_glyphinfo has glyph == NO_GLYPH but tileidx == 0; without this
+       guard those header / separator rows would blit tile 0 in the tile
+       column. */
+    G_item->Gmi_glyph = (glyphinfo && glyphinfo->glyph != NO_GLYPH)
+                            ? glyphinfo->gm.tileidx : NO_GLYPH;
     G_item->Gmi_count = -1L;
     G_item->Gmi_selected = (itemflags & MENU_ITEMFLAGS_SELECTED) ? 1 : 0;
     G_item->Gmi_accelerator = ch;
