@@ -55,9 +55,9 @@ GENERICUSERS=play player game games nethack nethacker ec2-user
 # letter and "lock" (eg. alock, block, ...)
 MAXPLAYERS=10
 
-# Limit the number of rerolls
-# Default is 0 (meaning infinite), valid values are 0-255
-MAX_REROLLS=0
+# Limit the number of rerolls per second when using the reroll option.
+# 0 means that there is no limit on how quickly the user can reroll.
+MAX_REROLL_RATE=0
 
 # If not null, added to string "To get local support, " in the support
 # information help.

@@ -26,6 +26,9 @@ fix buffer overflow in update_topl when handling multiple items in a
 	container
 fix random attended shrines in irregular rooms
 fix experience-level up/down hilighting
+cherry-pick a pair of core fixes from the m68k-wip branch to add menu
+	glyphs to shop bills and container tip/loot menus (pr #1539
+	by ingpaschke)
 
 
 Platform- and/or Interface-Specific Fixes
@@ -138,7 +141,7 @@ tty: allow custom glyph colors if they're basic 16 nethack colors
 
 General New Features
 --------------------
-sysconf option MAX_REROLLS to limit number of rerolls
+sysconf option MAX_REROLL_RATE to limit rate at which rerolls are performed
 
 
 Platform- and/or Interface-Specific New Features

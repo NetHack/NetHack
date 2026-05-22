@@ -769,6 +769,17 @@ newgame(void)
 {
     int i;
 
+#ifdef SYSCF
+    time_t last_reroll_time;
+    time_t cur_reroll_time;
+    int rerolls_this_second = 0;
+# if defined(BSD) && !defined(POSIX_TYPES)
+#  define GET_REROLL_TIME(t) (void) time((long *) t);
+# else
+#  define GET_REROLL_TIME(t) (void) time(t);
+# endif
+#endif /* defined(SYSCF) */
+
     /* make sure welcome messages are given before noticing monsters */
     notice_mon_off();
     disp.botlx = TRUE;
@@ -819,7 +830,32 @@ newgame(void)
     docrt();
     flush_screen(1);
     bot();
+
+#ifdef SYSCF
+    GET_REROLL_TIME(&last_reroll_time);
+#endif
+
     while (u.uroleplay.reroll && reroll_menu()) {
+#ifdef SYSCF
+        if (sysopt.maxrerollrate > 0) {
+        check_reroll_time:
+            GET_REROLL_TIME(&cur_reroll_time);
+
+            if (last_reroll_time != cur_reroll_time) {
+                last_reroll_time = cur_reroll_time;
+                rerolls_this_second = 1;
+            } else {
+                if (rerolls_this_second >= sysopt.maxrerollrate) {
+                    if (!paranoid_query(TRUE, "Continue rerolling?"))
+                        break;
+                    goto check_reroll_time;
+                }
+                ++rerolls_this_second;
+            }
+        }
+#endif
+
+        ++u.uroleplay.numrerolls;
         u_init_inventory_attrs();
         bot();
     }

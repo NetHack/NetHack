@@ -1004,7 +1004,7 @@ curses_print_glyph(
 #ifdef ENHANCED_SYMBOLS
                  (SYMHANDLING(H_UTF8)
                   && glyphinfo->gm.u && glyphinfo->gm.u->utf8str)
-                      ? glyphinfo->gm.u : NULL, 
+                      ? glyphinfo->gm.u : NULL,
 #endif
                  (nhcolor != 0) ? nhcolor : color,
                  bkglyphinfo->framecolor, attr);

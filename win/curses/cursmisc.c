@@ -34,16 +34,40 @@ int
 curses_getch(void)
 {
     int ch;
+    boolean timeoutset = FALSE;
 
-    if (iflags.debug_fuzzer)
+    if (iflags.debug_fuzzer) {
         ch = randomkey();
-    else
+    } else if (iflags.idlecheckpoint) {
+        boolean done_a_checkpoint = FALSE;
+
+        timeout(IDLECHECKPOINT_WAIT_TIME * 1000);
+        timeoutset = TRUE;
+
+        while (1) {
+            ch = getch();
+            if (ch == ERR && !done_a_checkpoint) {
+#ifdef INSURANCE
+                save_currentstate();
+#endif /* INSURANCE */
+                done_a_checkpoint = TRUE;
+                timeout(-1);
+                timeoutset = FALSE;
+            } else {
+                if (timeoutset) {
+                    timeout(-1);
+                    timeoutset = FALSE;
+                }
+                break;
+            }
+        }
+    } else {
         ch = getch();
+    }
     return ch;
 }
 
 /* Read a character of input from the user */
-
 int
 curses_read_char(void)
 {

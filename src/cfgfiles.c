@@ -74,7 +74,7 @@ staticfn boolean cnf_line_CHECK_PLNAME(char *);
 staticfn boolean cnf_line_SEDUCE(char *);
 staticfn boolean cnf_line_HIDEUSAGE(char *);
 staticfn boolean cnf_line_MAXPLAYERS(char *);
-staticfn boolean cnf_line_MAX_REROLLS(char *);
+staticfn boolean cnf_line_MAX_REROLL_RATE(char *);
 staticfn boolean cnf_line_PERSMAX(char *);
 staticfn boolean cnf_line_PERS_IS_UID(char *);
 staticfn boolean cnf_line_ENTRYMAX(char *);
@@ -970,15 +970,15 @@ cnf_line_MAXPLAYERS(char *bufp)
 }
 
 staticfn boolean
-cnf_line_MAX_REROLLS(char *bufp)
+cnf_line_MAX_REROLL_RATE(char *bufp)
 {
     int n = atoi(bufp);
 
     if (n < 0 || n > 255) {
-        config_error_add("Illegal value in MAX_REROLLS (maximum is 255)");
+        config_error_add("Illegal value in MAX_REROLL_RATE (maximum is 255)");
         n = 10;
     }
-    sysopt.maxrerolls = n;
+    sysopt.maxrerollrate = n;
     return TRUE;
 }
 
@@ -1363,7 +1363,7 @@ static const struct match_config_line_stmt {
     CNFL_S(SEDUCE, 6),
     CNFL_S(HIDEUSAGE, 9),
     CNFL_S(MAXPLAYERS, 10),
-    CNFL_S(MAX_REROLLS, 10),
+    CNFL_S(MAX_REROLL_RATE, 10),
     CNFL_S(PERSMAX, 7),
     CNFL_S(PERS_IS_UID, 11),
     CNFL_S(ENTRYMAX, 8),

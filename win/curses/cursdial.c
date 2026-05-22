@@ -205,10 +205,8 @@ curses_line_input_dialog(
 /* Get a single character response from the player, such as a y/n prompt */
 
 int
-curses_character_input_dialog(
-    const char *prompt,
-    const char *choices,
-    char def)
+curses_character_input_dialog(const char *prompt, const char *choices,
+                              char def)
 {
     WINDOW *askwin = NULL;
 #ifdef PDCURSES
@@ -222,12 +220,15 @@ curses_character_input_dialog(
     int prompt_height = 1;
     boolean any_choice = FALSE;
     boolean accept_count = FALSE;
+#ifdef PDCURSES
+    int x, y;
+#endif
 
     /* if messages were being suppressed for the remainder of the turn,
        re-activate them now that input is being requested */
     curses_got_input();
 
-    if (svm.moves > 0) {
+    if (svm.moves > 0 || !program_state.beyond_savefile_load) {
         curses_get_window_size(MAP_WIN, &map_height, &map_width);
     } else {
         map_height = term_rows;
@@ -260,10 +261,10 @@ curses_character_input_dialog(
             choicestr[count + 5] = def;
             choicestr[count + 6] = ')';
             choicestr[count + 7] = '\0';
-        } else {                /* No usable default choice */
+        } else { /* No usable default choice */
 
             choicestr[count + 3] = '\0';
-            def = '\0';         /* Mark as no default */
+            def = '\0'; /* Mark as no default */
         }
         strcpy(askstr, prompt);
         strcat(askstr, choicestr);
@@ -281,7 +282,8 @@ curses_character_input_dialog(
     }
 
     if (iflags.wc_popup_dialog /*|| curses_stupid_hack*/) {
-        askwin = curses_create_window(TEXT_WIN, prompt_width, prompt_height, UP);
+        askwin =
+            curses_create_window(TEXT_WIN, prompt_width, prompt_height, UP);
         activemenu = askwin;
 
         for (count = 0; count < prompt_height; count++) {
@@ -291,6 +293,11 @@ curses_character_input_dialog(
         }
 
         curses_set_wid_colors(TEXT_WIN, askwin);
+#ifdef PDCURSES
+        getyx(askwin, y, x);
+        wmove(askwin, y, x);
+        curs_set(1);
+#endif
         wrefresh(askwin);
     } else {
         /* TODO: add SUPPRESS_HISTORY flag, then after getting a response,
@@ -299,11 +306,15 @@ curses_character_input_dialog(
     }
 
     /*curses_stupid_hack = 0; */
-
+#ifndef PDCURSES
     curs_set(1);
+#endif
     while (1) {
 #ifdef PDCURSES
-        answer = wgetch(message_window);
+        if (WIN_MESSAGE != WIN_ERR)
+            answer = wgetch(message_window);
+        else
+            answer = wgetch(askwin);
 #else
         answer = curses_read_char();
 #endif
@@ -321,7 +332,7 @@ curses_character_input_dialog(
             }
             answer = def;
             for (count = 0; choices[count] != '\0'; count++) {
-                if (choices[count] == 'q') {    /* q is preferred over n */
+                if (choices[count] == 'q') { /* q is preferred over n */
                     answer = 'q';
                 } else if ((choices[count] == 'n') && answer != 'q') {
                     answer = 'n';
