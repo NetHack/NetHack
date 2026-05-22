@@ -1679,6 +1679,16 @@ mar_gem_init(void)
     for (i = 0; i < NHICON; i++)
         mar_get_rsc_tree(i, &zz_oblist[i]);
 
+    /* Force the YN prompt to render in black; the RSC ships a textc that
+       maps to a grey shade in MagiC's truecolor AES rendering, which is
+       hard to read on the dialog body.  Color word layout: bits 11-8 hold
+       text color, with G_BLACK == 1. */
+    if (zz_oblist[YNCHOICE]) {
+        TEDINFO *te = zz_oblist[YNCHOICE][YNPROMPT].ob_spec.tedinfo;
+        if (te)
+            te->te_color = (te->te_color & ~0x0F00) | 0x0100;
+    }
+
     z_ob = zz_oblist[ABOUT];
     ob_hide(z_ob, OKABOUT, TRUE);
     beg_update(FALSE, FALSE);
