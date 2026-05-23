@@ -15,7 +15,7 @@
                        Original version - Eric S. Raymond
      (Edited and expanded for NetHack 5.0.0 by Mike Stephenson and others)
 
-                                  May 6, 2026
+                                  May 11, 2026
 
 
 
@@ -126,7 +126,7 @@
      employ to great advantage.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -192,7 +192,7 @@
      NetHack continues this fine tradition.  Unlike  text  adventure  games
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -390,7 +390,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -456,7 +456,7 @@
           The number of turns elapsed so far, displayed  if  you  have  the
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -522,7 +522,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -588,7 +588,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -720,7 +720,7 @@
           instead.   Only  these  one-step  movement  commands cause you to
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -786,7 +786,7 @@
           ing <Control>. ^<key> is  used  as  shorthand  elsewhere  in  the
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -852,7 +852,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -984,7 +984,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -1050,7 +1050,7 @@
           at an adjacent "remembered, unseen monster" marker.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -1116,7 +1116,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -1182,7 +1182,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -1248,7 +1248,7 @@
      (R)UNIX is a registered trademark of The Open Group.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -1314,7 +1314,7 @@
           inventory slot.  If it has a name assigned, other stacks with the
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -1446,7 +1446,7 @@
           fight there.  Default key is `F', or `-' with number_pad
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -1512,7 +1512,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -1578,7 +1578,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -1644,7 +1644,7 @@
           Pick up things at the current location.  Default key is `,'.  The
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -1710,7 +1710,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -1776,7 +1776,7 @@
           worn.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -1842,7 +1842,7 @@
           Suspend  the  game, switching from NetHack to the terminal it was
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -1908,7 +1908,7 @@
           pick  one  from  inventory,  except  for  the  special  case   of
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -1974,7 +1974,7 @@
           menu of sorting orders available (provided  that  the  vanquished
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -2040,7 +2040,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -2106,7 +2106,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -2172,7 +2172,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -2238,7 +2238,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -2304,7 +2304,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -2370,7 +2370,7 @@
      them).  Some monsters who can open doors can also use unlocking tools.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -2436,7 +2436,7 @@
      been  nullified,  giving  access  to  whatever is beyond them.  In the
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -2502,7 +2502,7 @@
      play.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -2568,7 +2568,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -2634,7 +2634,7 @@
      attack, when guessing where an unseen monster is or when  deliberately
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -2700,7 +2700,7 @@
      noid_confirmation:attack  option  to  require  a  response  of   "yes"
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -2766,7 +2766,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -2832,7 +2832,7 @@
      are  encumbered,  one  of the conditions Burdened, Stressed, Strained,
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -2898,7 +2898,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -2964,7 +2964,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -3030,7 +3030,7 @@
      aklys, lucern hammer, and bec-de-corbin) are defined in an appendix to
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -3096,7 +3096,7 @@
      shots  by  using  a numeric prefix before the `t' or `f' command.  For
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -3162,7 +3162,7 @@
      first  you  need  to  have a weapon in each hand.  (Note that your two
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -3228,7 +3228,7 @@
      even further.  Most of these provide a one or two point improvement to
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -3294,7 +3294,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -3360,7 +3360,7 @@
      yourself (just give a `.' or `s' for the direction).  Be warned,  how-
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -3426,7 +3426,7 @@
      your ken can be harmful to your health!
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -3492,7 +3492,7 @@
      play  the  entire game without being able to see (a self-imposed chal-
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -3558,7 +3558,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -3624,7 +3624,7 @@
      set the goldX option if you prefer to have gold pieces be  treated  as
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -3690,7 +3690,7 @@
      eating such items still counts against foodless conduct.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -3756,7 +3756,7 @@
      monster  (i.e.  if you would get experience for the death).  This is a
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -3822,7 +3822,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -3888,7 +3888,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -3954,7 +3954,7 @@
      ning NetHack for the first time, you should find  a  default  template
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -4020,7 +4020,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -4086,7 +4086,7 @@
        begins;  whatever follows will be common to all sections.  Otherwise
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -4152,7 +4152,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -4218,7 +4218,7 @@
      sign) to let NetHack know that the rest is intended as  a  file  name.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -4284,7 +4284,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -4350,7 +4350,7 @@
        weapon or both.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -4416,7 +4416,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -4482,7 +4482,7 @@
        extended command, it controls whether the menu shows  all  available
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -4548,7 +4548,7 @@
        might miss some interesting and/or important  information.   Persis-
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -4614,7 +4614,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -4680,7 +4680,7 @@
        class(es).  Combination starts with a prompt for object class(es) of
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -4746,7 +4746,7 @@
        5 - One-or-other - show  symbols  on  headers,  or  on entries if no
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -4812,7 +4812,7 @@
        port is the same as specifying 0.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -4878,7 +4878,7 @@
        ing 1 and negating number_pad is the same as  specifying  0.   (Set-
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -4944,7 +4944,7 @@
                      `y', set Confirm too);
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -5010,7 +5010,7 @@
        ing pets on the map.  Effectively a superset of the hilite_pet bool-
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -5076,7 +5076,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -5142,7 +5142,7 @@
        game).   This  option  exists partly as an acknowledgement that some
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -5208,7 +5208,7 @@
        sistent.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -5274,7 +5274,7 @@
        Controls the sorting behavior for the output of the `\' and ``' com-
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -5340,7 +5340,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -5406,7 +5406,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -5472,7 +5472,7 @@
        targets.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -5538,7 +5538,7 @@
      currently using by checking to see if it shows up in the Options list.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -5604,7 +5604,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -5670,7 +5670,7 @@
        this option.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -5736,7 +5736,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -5802,7 +5802,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -5868,7 +5868,7 @@
        hang if this is turned on.  Cannot be set with the `O' command.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -5934,7 +5934,7 @@
      you can define patterns to be  checked  when  the  game  is  about  to
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6000,7 +6000,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6066,7 +6066,7 @@
        When  asked  for  a  location, the key to go to next closest door or
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6132,7 +6132,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6198,7 +6198,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6264,7 +6264,7 @@
        ple MENUCOLOR entries in your configuration file, and the last MENU-
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6330,7 +6330,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6396,7 +6396,7 @@
        depending upon your other option settings.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6462,7 +6462,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6528,7 +6528,7 @@
      value,  and  the ^ prefix causes the following character to be treated
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6594,7 +6594,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6660,7 +6660,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6726,7 +6726,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6792,7 +6792,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6858,7 +6858,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6924,7 +6924,7 @@
        seen via the "#attributes" command.
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -6990,7 +6990,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -7056,7 +7056,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -7122,7 +7122,7 @@
      connection between "wizard mode" and the Wizard role).  Attempting  to
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -7188,7 +7188,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -7254,7 +7254,7 @@
      were distinct for specific types of monsters and objects  rather  than
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -7320,7 +7320,7 @@
      file layout which prevented score entries from being read back in cor-
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -7386,7 +7386,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -7452,7 +7452,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -7518,7 +7518,7 @@
      changes  and  new features almost immediately, and they often did. The
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -7584,7 +7584,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -7650,7 +7650,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -7716,7 +7716,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -7782,7 +7782,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
@@ -7848,7 +7848,7 @@
 
 
 
-     NetHack 5.0.0                                              May 6, 2026
+     NetHack 5.0.0                                             May 11, 2026
 
 
 
