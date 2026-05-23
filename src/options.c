@@ -7152,8 +7152,13 @@ initoptions_init(void)
     }
 
     /* make any symbol parsing quicker */
+#ifndef CROSS_TO_ATARI
+    /* Skip the ~9600-entry glyph-id prefill on slow m68k Atari hosts;
+       the shipped nethack.cnf doesn't reference any G_glyph names, so
+       a lazy lookup on first use is cheaper than the up-front fill. */
     if (!glyphid_cache_status())
         fill_glyphid_cache();
+#endif
 
     /* set up the command parsing */
     reset_commands(TRUE); /* init */
