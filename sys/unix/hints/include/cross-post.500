@@ -380,6 +380,8 @@ ataripkg: $(GAMEBIN) ../util/uudecode $(ATARITILES)
 	cp ../doc/nethack.txt $(TARGETPFX)pkg/nethack.txt
 	cp ../sys/atari/README.tos $(TARGETPFX)pkg/README.txt
 	cp ../sys/atari/nethack.cnf $(TARGETPFX)pkg/nethack.cnf
+	cp ../sys/atari/run-hatari.sh $(TARGETPFX)pkg/run-hatari.sh
+	chmod +x $(TARGETPFX)pkg/run-hatari.sh
 	cp $(TARGETPFX)NH2.IMG  $(TARGETPFX)pkg/NH2.IMG
 	cp $(TARGETPFX)NH16.IMG $(TARGETPFX)pkg/NH16.IMG
 	cp $(TARGETPFX)NH32.IMG $(TARGETPFX)pkg/NH32.IMG
