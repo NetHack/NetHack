@@ -11,7 +11,12 @@ OPTIONS=!ascii_map
 
 # General options
 OPTIONS=color,hilite_pet,number_pad
-OPTIONS=!tutorial
+
+# Tutorial: with neither line set, NetHack asks at startup whether to
+# play the tutorial.  Uncomment 'tutorial' to force-start it; uncomment
+# '!tutorial' to skip the prompt entirely.
+#OPTIONS=tutorial
+#OPTIONS=!tutorial
 
 # Autopickup: gold, scrolls, potions, wands, rings, amulets, spellbooks.
 OPTIONS=autopickup,pickup_thrown
@@ -19,9 +24,18 @@ OPTIONS=pickup_types:$?!/="+
 
 # Menu colors: highlight blessed/cursed status in inventory listings.
 # Anchored with leading spaces so 'uncursed' doesn't match 'cursed'.
+#
+# Color names (16):
+#   black  red  green  brown  blue  magenta  cyan  gray
+#   orange  light green  yellow  light blue  light magenta
+#   light cyan  white  no color
+#   aliases: grey, purple, bright red/green/blue/magenta/cyan, transparent
+#
+# Optional attributes (combine via '&'):
+#   none  bold  dim  italic  underline  blink  inverse
 OPTIONS=menucolors
 MENUCOLOR=" cursed "=red&bold
-MENUCOLOR=" blessed "=cyan
+MENUCOLOR=" blessed "=green
 MENUCOLOR=" uncursed "=cyan
 MENUCOLOR=" holy water"=cyan
 MENUCOLOR=" unholy water"=red&bold
