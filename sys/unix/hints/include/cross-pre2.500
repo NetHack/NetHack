@@ -612,7 +612,10 @@ override TARGET_CFLAGS = -c -O2 $(TOOLARCH) \
 override TARGET_CXXFLAGS = $(TARGET_CFLAGS)
 LUA_TARGET_CFLAGS = $(TARGET_CFLAGS)
 override TARGET_LINK = $(TARGET_CC)
-override TARGET_LFLAGS= $(TOOLARCH)
+# Set PRG header flags: bit 0 fastload (skip TPA clear), bit 1 load
+# text/data into TT-RAM, bit 2 malloc()/Malloc() prefers TT-RAM.  On
+# ST/STE without TT-RAM the loader falls back to ST-RAM transparently.
+override TARGET_LFLAGS= $(TOOLARCH) -Wl,--mprg-flags=0x07
 override TARGET_LIBS += $(LIBLM) -le_gem -lgem
 VARDATND += nhtiles.bmp
 override SYSSRC = ../sys/atari/tos.c ../sys/share/pcmain.c \
