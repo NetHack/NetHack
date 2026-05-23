@@ -44,9 +44,13 @@ The archive expands into a self-contained game directory:
     RIP.IMG             tombstone image
     README.txt          this file
     license, symbols, nethack.txt
+    run-hatari.sh       Linux/macOS launcher (Hatari + auto EmuTOS 1.4)
     levels/, save/      empty, written to during play
 
-Double-click nethack.prg to start.
+Double-click nethack.prg to start (on Atari hardware or under an
+emulator with a TOS image already configured).  On Linux/macOS with
+Hatari installed, ./run-hatari.sh launches the game directly --
+EmuTOS 1.4 will be downloaded into ~/.cache/emutos on first run.
 
 
 Display Modes
