@@ -628,6 +628,7 @@ override LUALIBS=
 override TOPLUALIB=
 override DLLIB=
 override WINOBJ=
+override GENTILEOFILE = $(TARGETPFX)tile.o
 override GAMEBIN = $(TARGETPFX)nethack.prg
 override PACKAGE = ataripkg
 override PREGAME += mkdir -p $(TARGETDIR) ;
@@ -638,6 +639,12 @@ $(TARGETPFX)%.o : ../sys/atari/%.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
 # Rule for files in win/gem
 $(TARGETPFX)%.o : ../win/gem/%.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
+# Explicit rule for the generated tile.c -> tile.o.  Without this the
+# pattern rule $(TARGETPFX)%.o : %.c picks the wrong source path when
+# tile.c doesn't yet exist on first invocation, breaking -j N builds.
+# SRCDIR isn't defined this early in cross-pre2; spell the path out.
+$(TARGETPFX)tile.o : ../src/tile.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
 endif  # CROSS_TO_ATARI
 #=================================================================
