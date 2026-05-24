@@ -313,6 +313,7 @@ static const struct instance_globals_d g_init_d = {
     FALSE, /* decor_levitate_override */
     FALSE, /* deferred_showpaths */
     NULL,  /* deferred_showpaths_dir  */
+    FALSE, /* disable_glyphid_cache_prefill */
     TRUE, /* havestate*/
 };
 
@@ -1184,6 +1185,9 @@ decl_globals_init(void)
 
     gu.urole = urole_init_data;
     gu.urace = urace_init_data;
+#ifdef DISABLE_GLYPHID_CACHE_PREFILL
+    gd.disable_glyphid_cache_prefill = TRUE;
+#endif
 }
 
 /* fields in 'hands_obj' don't matter, just its distinct address */

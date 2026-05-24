@@ -43,6 +43,12 @@
 #endif
 #define MAIL      /* enable the fake maildemon */
 
+/* Skip the ~9600-entry glyph-id prefill on slow m68k Atari hosts;
+   the shipped nethack.cnf doesn't reference any G_glyph names, so
+   a lazy lookup on first use is cheaper than the up-front fill.
+*/
+#define DISABLE_GLYPHID_CACHE_PREFILL
+
 #ifndef TERMLIB
 #define ANSI_DEFAULT /* use vt52 by default		*/
 #endif
