@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <e_gem.h>
+#include <mint/osbind.h>
 #include <string.h>
 
 #include "gem_rsc.h"
@@ -489,7 +490,16 @@ build_truecolor_mfdb(IMG_header *img, MFDB *out, int scr_planes)
         return FALSE;
     if (scr_planes != 16 && scr_planes != 24 && scr_planes != 32)
         return FALSE;
+    /* PF_TTRAMMEM steers malloc to TT-RAM by default.  If MagiC's
+       configured TT-RAM is too small for this multi-MB pixel buffer
+       and Mxalloc's mode-3 (prefer-alt) didn't transparently fall back
+       to ST-RAM, retry explicitly with Mxalloc mode 0 (ST-RAM). */
     buf = (unsigned char *) calloc(1, (size_t) total);
+    if (!buf) {
+        buf = (unsigned char *) Mxalloc(total, 0);
+        if (buf)
+            memset(buf, 0, (size_t) total);
+    }
     if (!buf) return FALSE;
 
     for (y = 0; y < h; y++) {
@@ -1769,12 +1779,15 @@ loadimg:
            copies device-format pixels straight to screen with no
            palette involvement. */
         MFDB new_mfdb;
-        if (build_truecolor_mfdb(&tile_image, &new_mfdb, planes)) {
-            free(tile_image.addr);
-            tile_image.addr = (char *) new_mfdb.fd_addr;
-            tile_image.planes = planes;
-            Tile_bilder = new_mfdb;
-        }
+        if (!build_truecolor_mfdb(&tile_image, &new_mfdb, planes))
+            panic("Out of memory building tile image (need %ld bytes); "
+                  "increase TT-RAM or run at 4/8 planes.",
+                  (long) tile_image.img_w * (long) tile_image.img_h
+                  * (long) ((planes + 7) >> 3));
+        free(tile_image.addr);
+        tile_image.addr = (char *) new_mfdb.fd_addr;
+        tile_image.planes = planes;
+        Tile_bilder = new_mfdb;
     } else {
         mfdb(&Tile_bilder, (short *) tile_image.addr, tile_image.img_w,
              tile_image.img_h, 1, tile_image.planes);
