@@ -3616,7 +3616,7 @@ dotip(void)
                         continue;
                     /*
                      * Calling tipcontainer_gettarget with a non-zero int ptr
-                     * as the 3rd argument just obtains the count of elligible
+                     * as the 3rd argument just obtains the count of eligible
                      * tip targets. No menu is displayed and no tip-target pick
                      * is carried out.
                      */
