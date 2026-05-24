@@ -384,7 +384,7 @@ ifdef WANT_WIN_X11
 USE_XPM=1
 WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 VARDATND0 += x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
-GENTILEOFILE = $(SRCDIR)/tile.o
+GENTILEOFILE = $(TARGETPFX)tile.o
 # -x: if built without dlb, some versions of mkfontdir think *.lev are fonts
 POSTINSTALL += bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; ( cd $(HACKDIR); mkfontdir -x .lev );
 # separate from CFLAGS so that we don't pass it to every file
