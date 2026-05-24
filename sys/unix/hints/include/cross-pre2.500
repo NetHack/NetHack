@@ -123,8 +123,6 @@ ifdef CROSS_TO_MSDOS
 #=================================================================
 
 CFLAGS += -DCROSSCOMPILE
-#also set a make variable flagging this as a crosscompile
-CROSSCOMPILE=1
 
 #
 # Override the build tools and some obj files to
@@ -277,7 +275,6 @@ ifdef CROSS_TO_WASM
 # originally from https://github.com/NetHack/NetHack/pull/385
 #===============-=================================================
 #also set a make variable flagging this as a crosscompile
-CROSSCOMPILE=1
 #
 #WASM_DEBUG = 1
 WASM_DATA_DIR = $(TARGETPFX)wasm-data
@@ -414,8 +411,6 @@ ifdef CROSS_TO_MIPS
 #=================================================================
 
 CFLAGS += -DCROSSCOMPILE
-#also set a make variable flagging this as a crosscompile
-CROSSCOMPILE=1
 
 #
 # Override the build tools and some obj files to
@@ -492,8 +487,6 @@ ifdef CROSS_TO_AMIGA
 #=================================================================
 
 CFLAGS += -DCROSSCOMPILE
-#also set a make variable flagging this as a crosscompile
-CROSSCOMPILE=1
 
 #
 # Override the build tools and some obj files to
