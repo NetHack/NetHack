@@ -1954,6 +1954,10 @@ nhl_push_anything(lua_State *L, int anytype, void *src)
         any.a_schar = *(schar *) src;
         lua_pushinteger(L, any.a_schar);
         break;
+    case ANY_INT16:
+        any.a_int = *(xint16 *) src;
+        lua_pushinteger(L, any.a_int);
+        break;
     }
     return 1;
 }
@@ -1968,13 +1972,13 @@ nhl_meta_u_index(lua_State *L)
         void *ptr;
         int type;
     } ustruct[] = {
-        { "ux", &(u.ux), ANY_UCHAR },
-        { "uy", &(u.uy), ANY_UCHAR },
+        { "ux", &(u.ux), ANY_INT16 },
+        { "uy", &(u.uy), ANY_INT16 },
         { "dx", &(u.dx), ANY_SCHAR },
         { "dy", &(u.dy), ANY_SCHAR },
         { "dz", &(u.dz), ANY_SCHAR },
-        { "tx", &(u.tx), ANY_UCHAR },
-        { "ty", &(u.ty), ANY_UCHAR },
+        { "tx", &(u.tx), ANY_INT16 },
+        { "ty", &(u.ty), ANY_INT16 },
         { "ulevel", &(u.ulevel), ANY_INT },
         { "ulevelmax", &(u.ulevelmax), ANY_INT },
         { "uhunger", &(u.uhunger), ANY_INT },
@@ -1985,8 +1989,8 @@ nhl_meta_u_index(lua_State *L)
         { "mh", &(u.mh), ANY_INT },
         { "mhmax", &(u.mhmax), ANY_INT },
         { "mtimedone", &(u.mtimedone), ANY_INT },
-        { "dlevel", &(u.uz.dlevel), ANY_SCHAR }, /* actually coordxy */
-        { "dnum", &(u.uz.dnum), ANY_SCHAR },     /* actually coordxy */
+        { "dlevel", &(u.uz.dlevel), ANY_INT16 },
+        { "dnum", &(u.uz.dnum), ANY_INT16 },
         { "uluck", &(u.uluck), ANY_SCHAR },
         { "uhp", &(u.uhp), ANY_INT },
         { "uhpmax", &(u.uhpmax), ANY_INT },

@@ -1,5 +1,5 @@
-NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $ $NHDT-Date: 1778535648 2026/05/11 21:40:48 $
-
+NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.20 $ $NHDT-Date: 1779581008 2026/05/24 00:03:28 $
+	
 General Fixes and Modified Features
 -----------------------------------
 fix some cross-compile package filenames that still referenced 370 instead
@@ -29,6 +29,17 @@ fix experience-level up/down hilighting
 cherry-pick a pair of core fixes from the m68k-wip branch to add menu
 	glyphs to shop bills and container tip/loot menus (pr #1539
 	by ingpaschke)
+tiles: make the tile for magic flute and mundane flute be exactly the
+	same; do the same thing for drum of earthquake and leather drum
+fix a buffer overflow in reroll processing that was introduced in a
+	post-release 5.0.0 commit
+ensure a checkpoint, aka a save_currentstate() call, isn't done before
+	the game is ready
+add ANY_INT16 to any_types and use it for u.ux/uy/tx/ty and uz dlevel/dnum;
+	those are coordxy (int16_t) but the Lua bindings were treating them
+	as 1-byte fields, so on big-endian m68k Lua read the high byte (0)
+	instead of the actual value. Symptom: place_object off map <0,0>
+	in the tutorial.
 
 
 Platform- and/or Interface-Specific Fixes
@@ -102,6 +113,9 @@ curses on Windows: some early data is alloc'd for the windows console
 	settings in both tty and curses (pdcursesmod) prior to the
 	window port initialization, but only tty was freeing it; call
 	console_exit() in nethack_exit if window port is curses
+curses on Windows: dialogs pertaining to the need for self-recover
+	were not visible and therefore the player had no idea that
+	answers were expected or why
 gcc-16: tiletext.c [-Wdiscarded-qualifiers] warning suppression
 libnh: update get_nhuuid() for libnhmain
 libnh: sys/libnh/libnhmain.c: drop `static` on `whoami()`
@@ -135,6 +149,9 @@ Windows: correct a NetHack 5.0.0 packaging error if visual studio was
 	used; a remnant hard-coded 370 was in package.nmake
 Windows: setting any map_mode option in the config file could trigger
 	an app failure on launch by dereferencing a null pointer
+Windows: a Windows console debug line began showing up after the sources
+	switched patchlevel.h NH_DEVEL_STATUS from NH_STATUS_RELEASED to 
+	NH_STATUS_POSTRELEASE; make it only ever show if (wizard) is true
 tty: allow custom glyph colors if they're basic 16 nethack colors
 	on terminals with less than 256 colors
 
@@ -142,6 +159,11 @@ tty: allow custom glyph colors if they're basic 16 nethack colors
 General New Features
 --------------------
 sysconf option MAX_REROLL_RATE to limit rate at which rerolls are performed
+idlecheckpoint config file option to update checkpoint files whenever an
+	input request isn't responded to within IDLECHECKPOINT_WAIT_TIME
+	seconds; helps ensure that a recover operation, if it turns out
+	to be needed, is much more current than the last level change;
+	support added for Windows console, Qt, and curses
 
 
 Platform- and/or Interface-Specific New Features
@@ -183,3 +205,12 @@ unix hints: consolidate all the bsd flavours into a single sys/unix/bsd.500
 	hints file to ease maintenance going forward; use bsd make
 	conditional logic to carry out steps unique to NetBSD, OpenBSD,
 	FreeBSD, GhostBSD
+unix hints: the Makefiles distributed by sys/unix/setup.sh will now check
+	for the presence of a make.prefs at the top of the NetHack tree,
+	and will include it if it exists; make.prefs must contain valid 
+	Makefile syntax and can be used to set preferences instead of
+	placing them on the make command line; Use GNU make syntax for GNU
+	make, and use bsd make syntax for bsd make
+share a single copy of nhuuid generation code between Amiga, Atari, and msdos
+	by way of sys/share/pcmain.c (cherry-pick from pr #1541 by ingpaschke)
+
