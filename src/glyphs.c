@@ -291,7 +291,8 @@ compose_glyph_name(int glyph, char *buf, size_t bufsz)
                      ? obj_descr[i].oc_name
                      : obj_descr[i].oc_descr;
         Strcpy(buf, "G_");
-        if (glyph_is_normal_piletop_obj(glyph))
+        if (glyph_is_normal_piletop_obj(glyph)
+            || glyph_is_piletop_generic_obj(glyph))
             Strcat(buf, "piletop_");
         Strcat(buf, buf2);
         Strcat(buf, buf3);
@@ -1054,8 +1055,6 @@ parse_id(
                 findwhat->val = val;
                 findwhat->loadsyms_offset = 0;
                 return 1;
-                        if (glyph_is_normal_piletop_obj(glyph)
-                            || glyph_is_piletop_generic_obj(glyph))
             }
         }
         return 0;
