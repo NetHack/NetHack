@@ -626,7 +626,7 @@ glyph_hash(const char *id)
         if ('A' <= ch && ch <= 'Z') {
             ch += 'a' - 'A';
         }
-        hash = (hash << 1) | (hash >> 31);
+        hash = (hash << 5) | (hash >> 27);
         hash ^= ch;
     }
     return hash;
