@@ -1945,8 +1945,8 @@ wiz_custom(void)
 #endif
         menu_item *pick_list = (menu_item *) 0;
 
-        if (!glyphid_cache_status())
-            fill_glyphid_cache();
+        if (!glyphname_hashtable_loaded())
+            populate_glyphname_hashtable();
 
         win = create_nhwindow(NHW_MENU);
         start_menu(win, MENU_BEHAVE_STANDARD);
@@ -1964,7 +1964,7 @@ wiz_custom(void)
                     known_handling[gs.symset[PRIMARYSET].handling]);
         }
         Sprintf(buf, "%s", bufa);
-        wizcustom_glyphids(win);
+        wizcustom_glyphnames(win);
         end_menu(win, bufa);
         n = select_menu(win, PICK_NONE, &pick_list);
         destroy_nhwindow(win);
@@ -1975,8 +1975,8 @@ wiz_custom(void)
 #endif
         if (n >= 1)
             free((genericptr_t) pick_list);
-        if (glyphid_cache_status())
-            free_glyphid_cache();
+        if (glyphname_hashtable_loaded())
+            empty_glyphname_hashtable();
         docrt();
     } else
         pline(unavailcmd, ecname_from_fn(wiz_custom));

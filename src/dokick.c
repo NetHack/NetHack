@@ -1137,7 +1137,9 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
 
         /* nothing, fruit or trouble? 75:23.5:1.5% */
         if (rn2(3)) {
-            if (!rn2(6) && !(svm.mvitals[PM_KILLER_BEE].mvflags & G_GONE))
+            if (!rn2(6)
+                && !(svm.mvitals[PM_KILLER_BEE].mvflags & G_GONE)
+                && !(gm.maploc->looted & TREE_SWARM))
                 You_hear("a low buzzing."); /* a warning */
             kick_ouch(x, y, "");
             return ECMD_TIME;

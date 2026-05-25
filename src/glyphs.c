@@ -11,7 +11,7 @@ extern struct enum_dump objdump[];
 
 #define Fprintf (void) fprintf
 
-enum reserved_activities { res_nothing, res_dump_glyphids, res_fill_cache };
+enum reserved_activities { res_nothing, res_dump_glyphnames, res_fill_hashtable };
 enum things_to_find { find_nothing, find_pm, find_oc, find_cmap, find_glyph };
 struct find_struct {
     enum things_to_find findtype;
@@ -26,20 +26,20 @@ struct find_struct {
     genericptr_t reserved;
 };
 static const struct find_struct zero_find = { 0 };
-struct glyphid_cache_t {
+struct glyphname_hashtable_entry_t {
     int glyphnum;
     char *id;
 };
-static struct glyphid_cache_t *glyphid_cache;
-static unsigned glyphid_cache_lsize;
-static size_t glyphid_cache_size;
-static struct find_struct glyphcache_find, to_custom_symbol_find;
+static struct glyphname_hashtable_entry_t *glyphname_hashtable_ptr;
+static unsigned glyphname_hashtable_lsize;
+static size_t glyphname_hashtable_size;
+static struct find_struct glyphname_hashtable_find, to_custom_symbol_find;
 static const long nonzero_black = CLR_BLACK | NH_BASIC_COLOR;
 
-staticfn void init_glyph_cache(void);
-staticfn void add_glyph_to_cache(int glyphnum, const char *id);
+staticfn void init_glyphname_hashtable(void);
+staticfn void add_glyph_to_glyphname_hashtable(int glyphnum, const char *id);
 staticfn int find_glyph_in_cache(const char *id);
-staticfn char *find_glyphid_in_cache_by_glyphnum(int glyphnum);
+staticfn char *find_glyphname_in_hashtable_by_glyphnum(int glyphnum);
 staticfn uint32 glyph_hash(const char *id);
 staticfn void to_custom_symset_entry_callback(int glyph,
                                             struct find_struct *findwhat);
@@ -114,18 +114,18 @@ glyphrep_to_custom_map_entries(
     int *glyphptr)
 {
     to_custom_symbol_find = zero_find;
-    char buf[BUFSZ], *c_glyphid, *c_unicode, *c_colorval, *cp;
+    char buf[BUFSZ], *c_glyphname, *c_unicode, *c_colorval, *cp;
     int reslt = 0;
     long rgb = 0L;
     boolean slash = FALSE, colon = FALSE;
 
-    if (!glyphid_cache)
+    if (!glyphname_hashtable_ptr)
         reslt = 1; /* for debugger use only; no cache available */
     nhUse(reslt);
 
     Snprintf(buf, sizeof buf, "%s", op);
     c_unicode = c_colorval = (char *) 0;
-    c_glyphid = cp = buf;
+    c_glyphname = cp = buf;
     while (*cp) {
         if (*cp == ':' || *cp == '/') {
             if (*cp == ':') {
@@ -148,8 +148,8 @@ glyphrep_to_custom_map_entries(
         }
     }
     /* some sanity checks */
-    if (c_glyphid && *c_glyphid == ' ')
-        c_glyphid++;
+    if (c_glyphname && *c_glyphname == ' ')
+        c_glyphname++;
     if (c_colorval && *c_colorval == ' ')
         c_colorval++;
     if (c_unicode && *c_unicode == ' ') {
@@ -176,7 +176,7 @@ glyphrep_to_custom_map_entries(
         to_custom_symbol_find.unicode_val = c_unicode;
     to_custom_symbol_find.extraval = glyphptr;
     to_custom_symbol_find.callback = to_custom_symset_entry_callback;
-    reslt = glyph_find_core(c_glyphid, &to_custom_symbol_find);
+    reslt = glyph_find_core(c_glyphname, &to_custom_symbol_find);
     return reslt;
 }
 
@@ -300,22 +300,22 @@ glyph_find_core(
 
 
 void
-fill_glyphid_cache(void)
+populate_glyphname_hashtable(void)
 {
     int reslt = 0;
 
-    if (!glyphid_cache) {
-        init_glyph_cache();
+    if (!glyphname_hashtable_ptr) {
+        init_glyphname_hashtable();
     }
-    if (glyphid_cache) {
-        glyphcache_find = zero_find;
-        glyphcache_find.findtype = find_nothing;
-        glyphcache_find.reserved = (genericptr_t) glyphid_cache;
-        glyphcache_find.restype = res_fill_cache;
-        reslt = parse_id((char *) 0, &glyphcache_find);
+    if (glyphname_hashtable_ptr) {
+        glyphname_hashtable_find = zero_find;
+        glyphname_hashtable_find.findtype = find_nothing;
+        glyphname_hashtable_find.reserved = (genericptr_t) glyphname_hashtable_ptr;
+        glyphname_hashtable_find.restype = res_fill_hashtable;
+        reslt = parse_id((char *) 0, &glyphname_hashtable_find);
         if (!reslt) {
-            free_glyphid_cache();
-            glyphid_cache = (struct glyphid_cache_t *) 0;
+            empty_glyphname_hashtable();
+            glyphname_hashtable_ptr = (struct glyphname_hashtable_entry_t *) 0;
         }
     }
 }
@@ -331,101 +331,101 @@ fill_glyphid_cache(void)
  */
 
 staticfn void
-init_glyph_cache(void)
+init_glyphname_hashtable(void)
 {
     size_t glyph;
 
     /* Cache size of power of 2 not less than 2*MAX_GLYPH */
-    glyphid_cache_lsize = 0;
-    glyphid_cache_size = 1;
-    while (glyphid_cache_size < 2*MAX_GLYPH) {
-        ++glyphid_cache_lsize;
-        glyphid_cache_size <<= 1;
+    glyphname_hashtable_lsize = 0;
+    glyphname_hashtable_size = 1;
+    while (glyphname_hashtable_size < 2*MAX_GLYPH) {
+        ++glyphname_hashtable_lsize;
+        glyphname_hashtable_size <<= 1;
     }
 
-    glyphid_cache = (struct glyphid_cache_t *) alloc(
-                        glyphid_cache_size * sizeof (struct glyphid_cache_t));
-    for (glyph = 0; glyph < glyphid_cache_size; ++glyph) {
-        glyphid_cache[glyph].glyphnum = 0;
-        glyphid_cache[glyph].id = (char *) 0;
+    glyphname_hashtable_ptr = (struct glyphname_hashtable_entry_t *) alloc(
+                        glyphname_hashtable_size * sizeof (struct glyphname_hashtable_entry_t));
+    for (glyph = 0; glyph < glyphname_hashtable_size; ++glyph) {
+        glyphname_hashtable_ptr[glyph].glyphnum = 0;
+        glyphname_hashtable_ptr[glyph].id = (char *) 0;
     }
 }
 
 void
-free_glyphid_cache(void)
+empty_glyphname_hashtable(void)
 {
     size_t idx;
 
-    if (!glyphid_cache)
+    if (!glyphname_hashtable_ptr)
         return;
-    for (idx = 0; idx < glyphid_cache_size; ++idx) {
-        if (glyphid_cache[idx].id) {
-            free(glyphid_cache[idx].id);
-            glyphid_cache[idx].id = (char *) 0;
+    for (idx = 0; idx < glyphname_hashtable_size; ++idx) {
+        if (glyphname_hashtable_ptr[idx].id) {
+            free(glyphname_hashtable_ptr[idx].id);
+            glyphname_hashtable_ptr[idx].id = (char *) 0;
         }
     }
-    free(glyphid_cache);
-    glyphid_cache = (struct glyphid_cache_t *) 0;
+    free(glyphname_hashtable_ptr);
+    glyphname_hashtable_ptr = (struct glyphname_hashtable_entry_t *) 0;
 }
 
 staticfn void
-add_glyph_to_cache(int glyphnum, const char *id)
+add_glyph_to_glyphname_hashtable(int glyphnum, const char *id)
 {
     uint32 hash = glyph_hash(id);
-    size_t hash1 = (size_t) (hash & (glyphid_cache_size - 1));
+    size_t hash1 = (size_t) (hash & (glyphname_hashtable_size - 1));
     size_t hash2 = (size_t)
-            (((hash >> glyphid_cache_lsize) & (glyphid_cache_size - 1)) | 1);
+            (((hash >> glyphname_hashtable_lsize) & (glyphname_hashtable_size - 1)) | 1);
     size_t i = hash1;
 
     do {
-        if (glyphid_cache[i].id == NULL) {
+        if (glyphname_hashtable_ptr[i].id == NULL) {
             /* Empty bucket found */
-            glyphid_cache[i].id = dupstr(id);
-            glyphid_cache[i].glyphnum = glyphnum;
+            glyphname_hashtable_ptr[i].id = dupstr(id);
+            glyphname_hashtable_ptr[i].glyphnum = glyphnum;
             return;
         }
         /* For speed, assume that no ID occurs twice */
-        i = (i + hash2) & (glyphid_cache_size - 1);
+        i = (i + hash2) & (glyphname_hashtable_size - 1);
     } while (i != hash1);
     /* This should never happen */
-    panic("glyphid_cache full");
+    panic("glyphname_hashtable_ptr full");
 }
 
 staticfn int
 find_glyph_in_cache(const char *id)
 {
     uint32 hash = glyph_hash(id);
-    size_t hash1 = (size_t) (hash & (glyphid_cache_size - 1));
+    size_t hash1 = (size_t) (hash & (glyphname_hashtable_size - 1));
     size_t hash2 = (size_t)
-            (((hash >> glyphid_cache_lsize) & (glyphid_cache_size - 1)) | 1);
+            (((hash >> glyphname_hashtable_lsize) & (glyphname_hashtable_size - 1)) | 1);
     size_t i = hash1;
 
     do {
-        if (glyphid_cache[i].id == NULL) {
+        if (glyphname_hashtable_ptr[i].id == NULL) {
             /* Empty bucket found */
             return -1;
         }
-        if (strcmpi(id, glyphid_cache[i].id) == 0) {
+        if (strcmpi(id, glyphname_hashtable_ptr[i].id) == 0) {
             /* Match found */
-            return glyphid_cache[i].glyphnum;
+            return glyphname_hashtable_ptr[i].glyphnum;
         }
-        i = (i + hash2) & (glyphid_cache_size - 1);
+        i = (i + hash2) & (glyphname_hashtable_size - 1);
     } while (i != hash1);
     return -1;
 }
 
 staticfn char *
-find_glyphid_in_cache_by_glyphnum(int glyphnum)
+find_glyphname_in_hashtable_by_glyphnum(int glyphnum)
 {
     size_t idx;
 
-    if (!glyphid_cache)
+    if (!glyphname_hashtable_ptr)
         return (char *) 0;
-    for (idx = 0; idx < glyphid_cache_size; ++idx) {
-        if (glyphid_cache[idx].glyphnum == glyphnum
-            && glyphid_cache[idx].id != 0) {
+    for (idx = 0; idx < glyphname_hashtable_size; ++idx) {
+        if (glyphname_hashtable_ptr[idx].glyphnum == glyphnum
+            && glyphname_hashtable_ptr[idx].id != 0) {
             /* Match found */
-            return glyphid_cache[idx].id;
+            return glyphname_hashtable_ptr[idx].id;
         }
     }
     return (char *) 0;
@@ -449,9 +449,9 @@ glyph_hash(const char *id)
 }
 
 boolean
-glyphid_cache_status(void)
+glyphname_hashtable_loaded(void)
 {
-    return (glyphid_cache != 0);
+    return (glyphname_hashtable_ptr != 0);
 }
 
 int
@@ -471,7 +471,7 @@ glyphrep(const char *op)
 {
     int reslt = 0, glyph = NO_GLYPH;
 
-    if (!glyphid_cache)
+    if (!glyphname_hashtable_ptr)
         reslt = 1;      /* for debugger use only; no cache available */
     nhUse(reslt);
     reslt = glyphrep_to_custom_map_entries(op, &glyph);
@@ -794,26 +794,26 @@ purge_custom_entries(enum graphics_sets which_set)
 }
 
 void
-dump_all_glyphids(FILE *fp)
+dump_all_glyphnames(FILE *fp)
 {
-    struct find_struct dump_glyphid_find = zero_find;
+    struct find_struct dump_glyphname_find = zero_find;
 
-    dump_glyphid_find.findtype = find_nothing;
-    dump_glyphid_find.reserved = (genericptr_t) fp;
-    dump_glyphid_find.restype = res_dump_glyphids;
-    (void) parse_id((char *) 0, &dump_glyphid_find);
+    dump_glyphname_find.findtype = find_nothing;
+    dump_glyphname_find.reserved = (genericptr_t) fp;
+    dump_glyphname_find.restype = res_dump_glyphnames;
+    (void) parse_id((char *) 0, &dump_glyphname_find);
 }
 
 void
-wizcustom_glyphids(winid win)
+wizcustom_glyphnames(winid win)
 {
     int glyphnum;
     char *id;
 
-    if (!glyphid_cache)
+    if (!glyphname_hashtable_ptr)
         return;
     for (glyphnum = 0; glyphnum < MAX_GLYPH; ++glyphnum) {
-        id = find_glyphid_in_cache_by_glyphnum(glyphnum);
+        id = find_glyphname_in_hashtable_by_glyphnum(glyphnum);
         if (id) {
             wizcustom_callback(win, glyphnum, id);
         }
@@ -834,7 +834,7 @@ parse_id(
     char buf[4][QBUFSZ];
 
     if (findwhat->findtype == find_nothing && findwhat->restype) {
-        if (findwhat->restype == res_dump_glyphids) {
+        if (findwhat->restype == res_dump_glyphnames) {
             if (findwhat->reserved) {
                 fp = (FILE *) findwhat->reserved;
                 dump_ids = TRUE;
@@ -842,9 +842,9 @@ parse_id(
                 return 0;
             }
         }
-        if (findwhat->restype == res_fill_cache) {
+        if (findwhat->restype == res_fill_hashtable) {
             if (findwhat->reserved
-                && findwhat->reserved == (genericptr_t) glyphid_cache) {
+                && findwhat->reserved == (genericptr_t) glyphname_hashtable_ptr) {
                 filling_cache = TRUE;
             } else {
                 return 0;
@@ -855,7 +855,7 @@ parse_id(
     is_G = (id && id[0] == 'G' && id[1] == '_');
     is_S = (id && id[0] == 'S' && id[1] == '_');
 
-    if ((is_G && !glyphid_cache) || filling_cache || dump_ids || is_S) {
+    if ((is_G && !glyphname_hashtable_ptr) || filling_cache || dump_ids || is_S) {
         while (loadsyms[i].range) {
             if (!pm_offset && loadsyms[i].range == SYM_MON)
                 pm_offset = i;
@@ -873,7 +873,7 @@ parse_id(
         }
     }
     if (is_G || filling_cache || dump_ids) {
-        if (!filling_cache && id && glyphid_cache) {
+        if (!filling_cache && id && glyphname_hashtable_ptr) {
             int val = find_glyph_in_cache(id);
             if (val >= 0) {
                 findwhat->findtype = find_glyph;
@@ -1112,7 +1112,7 @@ parse_id(
                     if (dump_ids) {
                         Fprintf(fp, "(%04d) %s\n", glyph, buf[0]);
                     } else if (filling_cache) {
-                        add_glyph_to_cache(glyph, buf[0]);
+                        add_glyph_to_glyphname_hashtable(glyph, buf[0]);
                     } else if (id) {
                         if (!strcmpi(id, buf[0])) {
                             findwhat->findtype = find_glyph;
@@ -1123,7 +1123,7 @@ parse_id(
                     }
                 }
             }
-        } /* not glyphid_cache */
+        } /* not glyphname_hashtable_ptr */
     } else if (is_S) {
         /* cmap entries */
         for (i = 0; i < cmap_count; ++i) {

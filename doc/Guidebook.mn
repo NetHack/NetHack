@@ -6170,10 +6170,10 @@ U+224B and the color represented by R-G-B value 0-0-160:
 OPTIONS=glyph:G_pool/U+224B/0-0-160
 .ft
 .ED
-The list of acceptable glyphid's can be produced by
-\fBnethack \-\-dumpglyphids\fP.
+The list of acceptable glyphnames can be produced by
+\fBnethack \-\-dumpglyphnames\fP.
 Individual NetHack glyphs can be specified using the G_ prefix,
-or you can use an S_ symbol for a glyphid and store the custom
+or you can use an S_ symbol for a glyphname and store the custom
 representation for all NetHack glyphs that would map to that
 particular symbol.
 .pg
