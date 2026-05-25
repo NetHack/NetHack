@@ -1054,6 +1054,8 @@ parse_id(
                 findwhat->val = val;
                 findwhat->loadsyms_offset = 0;
                 return 1;
+                        if (glyph_is_normal_piletop_obj(glyph)
+                            || glyph_is_piletop_generic_obj(glyph))
             }
         }
         return 0;
