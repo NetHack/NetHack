@@ -60,7 +60,7 @@
 .ds f0 \*(vr
 .ds f1 \" empty
 .\"DO NOT REMOVE NH_DATESUB .ds f2 Date(%B %-d, %Y)
-.ds f2 May 11, 2026
+.ds f2 May 25, 2026
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -6155,7 +6155,7 @@ individually within your nethack.rc file.
 The format for defining a glyph representation is:
 .SD n
 .ft CR
-OPTIONS=glyph:\fIglyphid\fP/\fIU+nnnn\fP/\fIR-G-B\fP
+OPTIONS=glyph:\fIglyphname\fP/\fIU+nnnn\fP/\fIR-G-B\fP
 .ft
 .ED
 .pg
@@ -6163,7 +6163,7 @@ The window port that is active needs to provide support for displaying
 UTF-8 character sequences and explicit red-green-blue colors in order
 for the glyph representation to be visible.
 For example, the following line in your configuration file will cause
-the glyph representation for glyphid G_pool to use Unicode codepoint
+the glyph representation for glyphname G_pool to use Unicode codepoint
 U+224B and the color represented by R-G-B value 0-0-160:
 .SD n
 .ft CR

@@ -1178,8 +1178,8 @@ freedynamicdata(void)
     if (options_set_window_colors_flag)
         options_free_window_colors();
 
-    if (glyphname_hashtable_loaded())
-        empty_glyphname_hashtable();
+    if (glyphname_hash_indices_loaded())
+        empty_glyphname_hash_indices();
 
     if (tnhfp) {
         close_nhfile(tnhfp);

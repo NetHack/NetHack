@@ -4224,11 +4224,11 @@ optfn_symset(
     if (req == do_handler) {
         int reslt;
 
-        if (!glyphname_hashtable_loaded())
-            populate_glyphname_hashtable();
+        if (!glyphname_hash_indices_loaded())
+            populate_glyphname_hash_indices();
         reslt = handler_symset(optidx);
-        if (glyphname_hashtable_loaded())
-            empty_glyphname_hashtable();
+        if (glyphname_hash_indices_loaded())
+            empty_glyphname_hash_indices();
         /* apply_customizations(gc.currentgraphics,
                         (do_custom_colors | do_custom_symbols)); */
         return reslt;
@@ -7152,9 +7152,9 @@ initoptions_init(void)
     }
 
     /* make any symbol parsing quicker, but only if
-     * gd.disable_glyphname_hashtable_prefill is not set to TRUE */
-    if (!glyphname_hashtable_loaded() && !gd.disable_glyphname_hashtable_prefill)
-        populate_glyphname_hashtable();
+     * gd.disable_glyphname_hash_indices_prefill is not set to TRUE */
+    if (!glyphname_hash_indices_loaded() && !gd.disable_glyphname_hash_indices_prefill)
+        populate_glyphname_hash_indices();
 
     /* set up the command parsing */
     reset_commands(TRUE); /* init */
@@ -7377,8 +7377,8 @@ initoptions_finish(void)
         iflags.wc_ascii_map = FALSE, iflags.wc_tiled_map = TRUE;
 
 #ifdef ENHANCED_SYMBOLS
-    if (glyphname_hashtable_loaded())
-        empty_glyphname_hashtable();
+    if (glyphname_hash_indices_loaded())
+        empty_glyphname_hash_indices();
     apply_customizations(gc.currentgraphics,
                          do_custom_symbols | do_custom_colors);
 #endif

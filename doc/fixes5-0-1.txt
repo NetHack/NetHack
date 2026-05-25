@@ -39,7 +39,11 @@ add ANY_INT16 to any_types and use it for u.ux/uy/tx/ty and uz dlevel/dnum;
 	those are coordxy (int16_t) but the Lua bindings were treating them
 	as 1-byte fields, so on big-endian m68k Lua read the high byte (0)
 	instead of the actual value. Symptom: place_object off map <0,0>
-	in the tutorial.
+	win the tutorial.
+fix an off-by-one in glyph_is_normal_piletop_obj (pr #1547 by ingpaschke)
+replace the hashtable used for parsing glyphnames with sorted indices and
+	reduce the string allocation load during that processing (cherry-pick
+	of pr #1548 by ingpaschke)
 
 
 Platform- and/or Interface-Specific Fixes

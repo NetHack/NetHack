@@ -846,7 +846,7 @@ enum glyph_offsets {
      || glyph_is_piletop_generic_obj(glyph))
 #define glyph_is_normal_piletop_obj(glyph) \
     ((glyph) == GLYPH_OBJ_PILETOP_OFF                           \
-     || ((glyph) > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1     \
+     || ((glyph) >= GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1    \
          && (glyph) < (GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS)))
 #define glyph_is_normal_object(glyph) \
     ((glyph) == GLYPH_OBJ_OFF                                   \

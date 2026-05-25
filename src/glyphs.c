@@ -26,12 +26,12 @@ struct find_struct {
     genericptr_t reserved;
 };
 static const struct find_struct zero_find = { 0 };
-struct glyphname_hashtable_entry_t {
+struct glyphname_hash_index_entry_t {
     uint32 hash;
     int glyphnum;       /* NO_GLYPH (==MAX_GLYPH) marks an empty bucket */
 };
-static struct glyphname_hashtable_entry_t *glyphname_hashtable_ptr;
-static size_t glyphname_hashtable_count;
+static struct glyphname_hash_index_entry_t *glyphname_hash_indices_ptr;
+static size_t glyphname_hash_indices_count;
 static struct find_struct to_custom_symbol_find;
 static const long nonzero_black = CLR_BLACK | NH_BASIC_COLOR;
 
@@ -117,7 +117,7 @@ glyphrep_to_custom_map_entries(
     long rgb = 0L;
     boolean slash = FALSE, colon = FALSE;
 
-    if (!glyphname_hashtable_ptr)
+    if (!glyphname_hash_indices_ptr)
         reslt = 1; /* for debugger use only; no cache available */
     nhUse(reslt);
 
@@ -198,7 +198,7 @@ fix_glyphname(char *str)
  * Returns 1 if a name was produced, 0 if this glyph has no canonical name
  * (a few unused object indices); buf[0] is set to '\0' in that case.
  * Used by parse_id's bulk-iteration paths, by find_glyph_in_hashtable to
- * verify hash matches, by populate_glyphname_hashtable to fill the table,
+ * verify hash matches, by populate_glyphname_hash_indices to fill the table,
  * and by wizcustom_glyphnames. */
 staticfn int
 compose_glyph_name(int glyph, char *buf, size_t bufsz)
@@ -514,8 +514,8 @@ glyph_find_core(
 }
 
 /*
- * glyphname_hashtable is a sorted (hash, glyph) index of canonical
- * "G_xxx" identifiers.  populate_glyphname_hashtable() allocates one
+ * glyphname_hash_indices is a sorted (hash, glyph) index of canonical
+ * "G_xxx" identifiers.  populate_glyphname_hash_indices() allocates one
  * block of MAX_GLYPH * sizeof(entry) (some entries go unused for the
  * scroll/gem appearance gaps), fills it via compose_glyph_name(), and
  * sorts ascending by hash.  Lookup is bsearch on the hash with
@@ -534,8 +534,8 @@ glyph_find_core(
 staticfn int
 cmp_glyphname_entry(const void *a, const void *b)
 {
-    uint32 ha = ((const struct glyphname_hashtable_entry_t *) a)->hash;
-    uint32 hb = ((const struct glyphname_hashtable_entry_t *) b)->hash;
+    uint32 ha = ((const struct glyphname_hash_index_entry_t *) a)->hash;
+    uint32 hb = ((const struct glyphname_hash_index_entry_t *) b)->hash;
 
     if (ha < hb)
         return -1;
@@ -545,59 +545,67 @@ cmp_glyphname_entry(const void *a, const void *b)
 }
 
 void
-populate_glyphname_hashtable(void)
+populate_glyphname_hash_indices(void)
 {
     int glyph;
     size_t n = 0;
     char buf[BUFSZ];
 
-    if (glyphname_hashtable_ptr)
+    if (glyphname_hash_indices_ptr)
         return;
-    glyphname_hashtable_ptr = (struct glyphname_hashtable_entry_t *) alloc(
-        MAX_GLYPH * sizeof (struct glyphname_hashtable_entry_t));
+    glyphname_hash_indices_ptr = (struct glyphname_hash_index_entry_t *) alloc(
+        MAX_GLYPH * sizeof (struct glyphname_hash_index_entry_t));
 
     for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
         if (compose_glyph_name(glyph, buf, sizeof buf)) {
-            glyphname_hashtable_ptr[n].hash = glyph_hash(buf);
-            glyphname_hashtable_ptr[n].glyphnum = glyph;
+            glyphname_hash_indices_ptr[n].hash = glyph_hash(buf);
+            glyphname_hash_indices_ptr[n].glyphnum = glyph;
             ++n;
         }
     }
-    qsort(glyphname_hashtable_ptr, n,
-          sizeof glyphname_hashtable_ptr[0], cmp_glyphname_entry);
-    glyphname_hashtable_count = n;
+    qsort(glyphname_hash_indices_ptr, n,
+          sizeof glyphname_hash_indices_ptr[0], cmp_glyphname_entry);
+    glyphname_hash_indices_count = n;
 }
 
 void
-empty_glyphname_hashtable(void)
+empty_glyphname_hash_indices(void)
 {
-    if (!glyphname_hashtable_ptr)
+    if (!glyphname_hash_indices_ptr)
         return;
-    free(glyphname_hashtable_ptr);
-    glyphname_hashtable_ptr = (struct glyphname_hashtable_entry_t *) 0;
-    glyphname_hashtable_count = 0;
+    free(glyphname_hash_indices_ptr);
+    glyphname_hash_indices_ptr = (struct glyphname_hash_index_entry_t *) 0;
+    glyphname_hash_indices_count = 0;
 }
+
+
+
+
+
+
+
+
 
 staticfn int
 find_glyph_in_hashtable(const char *id)
 {
     uint32 want = glyph_hash(id);
-    size_t lo = 0, hi = glyphname_hashtable_count, mid;
+    size_t lo = 0, hi = glyphname_hash_indices_count, mid;
     char buf[BUFSZ];
 
     /* Binary-search the sorted array for the first entry whose hash >= want. */
     while (lo < hi) {
         mid = (lo + hi) >> 1;
-        if (glyphname_hashtable_ptr[mid].hash < want)
+        if (glyphname_hash_indices_ptr[mid].hash < want)
             lo = mid + 1;
         else
             hi = mid;
     }
     /* Walk forward across any equal-hash neighbours, verifying each by
        reconstructing the canonical name and strcmpi'ing it back. */
-    while (lo < glyphname_hashtable_count
-           && glyphname_hashtable_ptr[lo].hash == want) {
-        int g = glyphname_hashtable_ptr[lo].glyphnum;
+    while (lo < glyphname_hash_indices_count
+           && glyphname_hash_indices_ptr[lo].hash == want) {
+        int g = glyphname_hash_indices_ptr[lo].glyphnum;
 
         if (compose_glyph_name(g, buf, sizeof buf) && !strcmpi(id, buf))
             return g;
@@ -624,9 +632,9 @@ glyph_hash(const char *id)
 }
 
 boolean
-glyphname_hashtable_loaded(void)
+glyphname_hash_indices_loaded(void)
 {
-    return (glyphname_hashtable_ptr != 0);
+    return (glyphname_hash_indices_ptr != 0);
 }
 
 int
@@ -646,7 +654,7 @@ glyphrep(const char *op)
 {
     int reslt = 0, glyph = NO_GLYPH;
 
-    if (!glyphname_hashtable_ptr)
+    if (!glyphname_hash_indices_ptr)
         reslt = 1;      /* for debugger use only; no cache available */
     nhUse(reslt);
     reslt = glyphrep_to_custom_map_entries(op, &glyph);
@@ -1036,9 +1044,9 @@ parse_id(
     }
     if (is_G && id) {
         /* Populate the hash table lazily, on first G_xxx lookup. */
-        if (!glyphname_hashtable_ptr)
-            populate_glyphname_hashtable();
-        if (glyphname_hashtable_ptr) {
+        if (!glyphname_hash_indices_ptr)
+            populate_glyphname_hash_indices();
+        if (glyphname_hash_indices_ptr) {
             int val = find_glyph_in_hashtable(id);
 
             if (val >= 0) {

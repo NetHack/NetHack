@@ -1945,8 +1945,8 @@ wiz_custom(void)
 #endif
         menu_item *pick_list = (menu_item *) 0;
 
-        if (!glyphname_hashtable_loaded())
-            populate_glyphname_hashtable();
+        if (!glyphname_hash_indices_loaded())
+            populate_glyphname_hash_indices();
 
         win = create_nhwindow(NHW_MENU);
         start_menu(win, MENU_BEHAVE_STANDARD);
@@ -1975,8 +1975,8 @@ wiz_custom(void)
 #endif
         if (n >= 1)
             free((genericptr_t) pick_list);
-        if (glyphname_hashtable_loaded())
-            empty_glyphname_hashtable();
+        if (glyphname_hash_indices_loaded())
+            empty_glyphname_hash_indices();
         docrt();
     } else
         pline(unavailcmd, ecname_from_fn(wiz_custom));

@@ -313,7 +313,7 @@ static const struct instance_globals_d g_init_d = {
     FALSE, /* decor_levitate_override */
     FALSE, /* deferred_showpaths */
     NULL,  /* deferred_showpaths_dir  */
-    FALSE, /* disable_glyphname_hashtable_prefill */
+    FALSE, /* disable_glyphname_hash_indices_prefill */
     TRUE, /* havestate*/
 };
 
@@ -1186,7 +1186,7 @@ decl_globals_init(void)
     gu.urole = urole_init_data;
     gu.urace = urace_init_data;
 #ifdef DISABLE_GLYPHID_CACHE_PREFILL
-    gd.disable_glyphname_hashtable_prefill = TRUE;
+    gd.disable_glyphname_hash_indices_prefill = TRUE;
 #endif
 }
 

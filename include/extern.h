@@ -1185,9 +1185,9 @@ extern int glyphrep(const char *) NONNULLARG1;
 extern int match_glyph(char *) NONNULLARG1;
 extern void dump_all_glyphnames(FILE *fp) NONNULLARG1;
 extern void wizcustom_glyphnames(winid win);
-extern void populate_glyphname_hashtable(void);
-extern void empty_glyphname_hashtable(void);
-extern boolean glyphname_hashtable_loaded(void);
+extern void populate_glyphname_hash_indices(void);
+extern void empty_glyphname_hash_indices(void);
+extern boolean glyphname_hash_indices_loaded(void);
 extern void apply_customizations(enum graphics_sets which_set,
                                  enum do_customizations docustomize);
 extern void purge_custom_entries(enum graphics_sets which_set);

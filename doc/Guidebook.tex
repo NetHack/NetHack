@@ -25,7 +25,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 5.0.0 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{Date(%B %-d, %Y)}
-\date{May 11, 2026}
+\date{May 25, 2026}
 
 \maketitle
 
@@ -6755,7 +6755,7 @@ individually within your own nethack.rc file.
 
 The format for defining a glyph representation is:\\
 \begin{verbatim}
-OPTIONS=glyph:glyphid/U+nnnn/R-G-B
+OPTIONS=glyph:glyphname/U+nnnn/R-G-B
 \end{verbatim}
 
 The window port that is active needs to provide support for displaying UTF-8
@@ -6763,7 +6763,7 @@ character sequences and explicit 24-bit red-green-blue colors in order for the g
 representation to be visible as specified.
 
 For example, the following line in your configuration file will cause
-the glyph representation for glyphid G\textunderscore pool to use Unicode codepoint
+the glyph representation for glyphname G\textunderscore pool to use Unicode codepoint
 U+224B and the color represented by R-G-B value 0-0-160:\\
 \begin{verbatim}
 OPTIONS=glyph:G_pool/U+224B/0-0-160
