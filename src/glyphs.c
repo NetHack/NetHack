@@ -28,7 +28,7 @@ struct find_struct {
 static const struct find_struct zero_find = { 0 };
 struct glyphname_hash_index_entry_t {
     uint32 hash;
-    int glyphnum;       /* NO_GLYPH (==MAX_GLYPH) marks an empty bucket */
+    int glyphnum;
 };
 static struct glyphname_hash_index_entry_t *glyphname_hash_indices_ptr;
 static size_t glyphname_hash_indices_count;
@@ -39,6 +39,7 @@ staticfn int find_glyph_in_hashtable(const char *id);
 staticfn int cmp_glyphname_entry(const void *a, const void *b);
 staticfn uint32 glyph_hash(const char *id);
 staticfn int compose_glyph_name(int glyph, char *buf, size_t bufsz);
+staticfn int get_cmap_offset(void);
 staticfn void to_custom_symset_entry_callback(int glyph,
                                             struct find_struct *findwhat);
 staticfn int parse_id(const char *id, struct find_struct *findwhat);
@@ -194,32 +195,47 @@ fix_glyphname(char *str)
     return str;
 }
 
+/* Index into loadsyms[] of the first SYM_PCHAR entry.  Cached lazily;
+   loadsyms[] is static read-only data so a one-time scan suffices. */
+static int cached_cmap_offset = -1;
+
+staticfn int
+get_cmap_offset(void)
+{
+    if (cached_cmap_offset < 0) {
+        int i;
+
+        for (i = 0; loadsyms[i].range; i++) {
+            if (loadsyms[i].range == SYM_PCHAR) {
+                cached_cmap_offset = i;
+                return i;
+            }
+        }
+        cached_cmap_offset = 0; /* no SYM_PCHAR found; shouldn't happen */
+    }
+    return cached_cmap_offset;
+}
+
 /* Build the canonical "G_xxx" identifier for the given glyph into buf.
  * Returns 1 if a name was produced, 0 if this glyph has no canonical name
  * (a few unused object indices); buf[0] is set to '\0' in that case.
- * Used by parse_id's bulk-iteration paths, by find_glyph_in_hashtable to
- * verify hash matches, by populate_glyphname_hash_indices to fill the table,
- * and by wizcustom_glyphnames. */
+ * Callers must pass a BUFSZ-sized buffer.
+ * Used by find_glyph_in_hashtable to verify hash matches, by the
+ * --dumpglyphnames path, by populate_glyphname_hash_indices to fill the
+ * table, and by wizcustom_glyphnames. */
 staticfn int
 compose_glyph_name(int glyph, char *buf, size_t bufsz)
 {
-    int i, j, mnum, cmap_offset = 0;
+    int i, j, mnum, cmap_offset;
     boolean skip_base = FALSE;
     const char *buf2, *buf3, *buf4;
     char tmpbuf[4][QBUFSZ];
 
-    if (bufsz < 2)
+    if (bufsz < BUFSZ)
         return 0;
     buf[0] = '\0';
     tmpbuf[0][0] = tmpbuf[1][0] = tmpbuf[2][0] = tmpbuf[3][0] = '\0';
-
-    /* compute cmap_offset (the start of SYM_PCHAR entries in loadsyms[]) */
-    i = 0;
-    while (loadsyms[i].range) {
-        if (!cmap_offset && loadsyms[i].range == SYM_PCHAR)
-            cmap_offset = i;
-        i++;
-    }
+    cmap_offset = get_cmap_offset();
 
     if (glyph_is_monster(glyph)) {
         buf2 = "";
@@ -418,11 +434,6 @@ compose_glyph_name(int glyph, char *buf, size_t bufsz)
 
     if (buf[0] == '\0')
         return 0;
-    if (memchr(buf, '\0', bufsz) == NULL) {
-        /* defensive: caller passed an undersized buffer */
-        buf[bufsz - 1] = '\0';
-        return 0;
-    }
     fix_glyphname(buf + 2);
     nhUse(mnum);
     return 1;
@@ -1036,10 +1047,8 @@ parse_id(
         }
     }
     if (is_G && id) {
-        /* Populate the hash table lazily, on first G_xxx lookup. */
-        if (!glyphname_hash_indices_ptr)
-            populate_glyphname_hash_indices();
         if (glyphname_hash_indices_ptr) {
+            /* Fast path: bsearch the populated index. */
             int val = find_glyph_in_hashtable(id);
 
             if (val >= 0) {
@@ -1047,6 +1056,21 @@ parse_id(
                 findwhat->val = val;
                 findwhat->loadsyms_offset = 0;
                 return 1;
+            }
+        } else {
+            /* Slow path: caller didn't run populate_glyphname_hash_indices
+               first.  Linear-scan every glyph reconstructing its
+               canonical name -- matches upstream's fallback behaviour
+               and keeps debugger / wizard-mode lookups working without
+               surprising the populate/empty cycle. */
+            for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
+                if (compose_glyph_name(glyph, buf, sizeof buf)
+                    && !strcmpi(id, buf)) {
+                    findwhat->findtype = find_glyph;
+                    findwhat->val = glyph;
+                    findwhat->loadsyms_offset = 0;
+                    return 1;
+                }
             }
         }
         return 0;
