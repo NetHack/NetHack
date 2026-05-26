@@ -307,10 +307,16 @@ _copyfile(char *from, char *to)
     return (r < 0) ? -1 : 0;
 }
 
+extern short mar_kbhit(void); /* win/gem/wingem1.c */
+
 int
 kbhit(void)
 {
-    return Cconis();
+    /* Use the AES event multiplexer instead of the BIOS console:
+       under MiNT, Cconis() bounces through the kernel console device
+       and the AES console host per call, which is hot during long
+       occupations (eat / dig / travel / run, see src/allmain.c). */
+    return mar_kbhit();
 }
 
 static void

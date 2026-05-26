@@ -3373,6 +3373,41 @@ mar_destroy_nhwindow(int window)
 
 /************************* nh_poskey *******************************/
 
+/* Non-blocking key probe.  AES events don't peek; once an event is
+   returned by evnt_multi it is dequeued.  So mar_kbhit() consumes any
+   pending key event into mar_kbhit_buf_*, and mar_nh_poskey() replays
+   that buffered key on its next call instead of polling the AES queue.
+   This lets src/allmain.c kbhit()-then-pgetchar() interrupt long
+   occupations (eat / dig / travel) without the BIOS Cconis() syscall
+   round-trip per turn under MiNT. */
+static short mar_kbhit_buf_kreturn = 0;
+static short mar_kbhit_buf_kstate = 0;
+static short mar_kbhit_buf_valid = 0;
+
+short
+mar_kbhit(void)
+{
+    XEVENT probe;
+    short ev;
+
+    if (mar_kbhit_buf_valid)
+        return 1;
+
+    memset(&probe, 0, sizeof(probe));
+    probe.ev_mflags = MU_TIMER | MU_KEYBD;
+    probe.ev_mt1locount = 0;
+    probe.ev_mt1hicount = 0;
+    ev = Event_Multi(&probe);
+
+    if (ev & MU_KEYBD) {
+        mar_kbhit_buf_kreturn = probe.ev_mkreturn;
+        mar_kbhit_buf_kstate = probe.ev_mmokstate;
+        mar_kbhit_buf_valid = 1;
+        return 1;
+    }
+    return 0;
+}
+
 void
 mar_set_margin(short m)
 {
@@ -3445,8 +3480,16 @@ mar_nh_poskey(short *x, short *y, short *mod)
     short retval, ev;
 
     do {
-    xev.ev_mflags = Main_Init(&xev, 0xFFFF);
-    ev = Event_Multi(&xev);
+    if (mar_kbhit_buf_valid) {
+        /* Replay key consumed by a prior mar_kbhit() probe. */
+        xev.ev_mkreturn = mar_kbhit_buf_kreturn;
+        xev.ev_mmokstate = mar_kbhit_buf_kstate;
+        mar_kbhit_buf_valid = 0;
+        ev = MU_KEYBD;
+    } else {
+        xev.ev_mflags = Main_Init(&xev, 0xFFFF);
+        ev = Event_Multi(&xev);
+    }
 
     retval = FAIL;
 

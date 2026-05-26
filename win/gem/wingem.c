@@ -164,11 +164,15 @@ Gem_init_nhwindows(int *argcp, char **argv)
     mar_set_tiley(iflags.wc_tile_height);
     mar_set_msg_align(iflags.wc_align_message - ALIGN_BOTTOM);
     mar_set_status_align(iflags.wc_align_status - ALIGN_BOTTOM);
-    if (mar_gem_init() == 0) {
-        bail((char *) 0);
-        /*NOTREACHED*/
+    {
+        extern void Gem_flush_preinit_raw(void);
+        if (mar_gem_init() == 0) {
+            bail((char *) 0);
+            /*NOTREACHED*/
+        }
+        iflags.window_inited = TRUE;
+        Gem_flush_preinit_raw();
     }
-    iflags.window_inited = TRUE;
 
     CO = 80;
     LI = 25;
@@ -932,6 +936,38 @@ mar_print_gl_char(winid window, coordxy x, coordxy y, int ch, int color)
 extern void mar_raw_print(const char *);
 extern void mar_raw_print_bold(const char *);
 
+/* Pre-init raw_print buffer.  Before iflags.window_inited becomes TRUE
+   the only output channel is stdout, which under MiNT bounces through
+   the kernel console device and the AES console host (TosWin2 /
+   N.AES console) per character -- noticeably slow on startup.  Stash
+   such messages here and surface them via xalert() once the AES is
+   up; cap the buffer so a runaway pre-init raw_print storm can't pin
+   the process. */
+#define PREINIT_BUF_SIZE 1024
+static char preinit_raw_buf[PREINIT_BUF_SIZE];
+static int preinit_raw_len = 0;
+static int preinit_raw_overflow = 0;
+
+static void
+preinit_raw_append(const char *str)
+{
+    int n, room;
+    if (!str)
+        return;
+    n = (int) strlen(str);
+    room = PREINIT_BUF_SIZE - 1 - preinit_raw_len;
+    if (n + 1 > room) {
+        preinit_raw_overflow = 1;
+        if (room <= 1)
+            return;
+        n = room - 1;
+    }
+    memcpy(preinit_raw_buf + preinit_raw_len, str, n);
+    preinit_raw_len += n;
+    preinit_raw_buf[preinit_raw_len++] = '\n';
+    preinit_raw_buf[preinit_raw_len] = '\0';
+}
+
 void
 Gem_raw_print(const char *str)
 {
@@ -939,7 +975,7 @@ Gem_raw_print(const char *str)
         if (iflags.window_inited)
             mar_raw_print(str);
         else
-            printf("%s\n", str);
+            preinit_raw_append(str);
     }
 }
 
@@ -950,8 +986,42 @@ Gem_raw_print_bold(const char *str)
         if (iflags.window_inited)
             mar_raw_print_bold(str);
         else
-            printf("%s\n", str);
+            preinit_raw_append(str);
     }
+}
+
+/* Called from Gem_init_nhwindows right after iflags.window_inited
+   becomes TRUE: drop the collected lines into the message window
+   instead of a modal raw_print alert. */
+extern void mar_add_message(const char *); /* wingem1.c */
+extern void mar_display_nhwindow(winid);   /* wingem1.c */
+void
+Gem_flush_preinit_raw(void)
+{
+    char *p, *eol;
+
+    if (preinit_raw_len <= 0)
+        return;
+
+    p = preinit_raw_buf;
+    while (p < preinit_raw_buf + preinit_raw_len) {
+        eol = strchr(p, '\n');
+        if (eol)
+            *eol = '\0';
+        if (*p)
+            mar_add_message(p);
+        if (!eol)
+            break;
+        p = eol + 1;
+    }
+    if (preinit_raw_overflow)
+        mar_add_message("[startup messages truncated]");
+    if (WIN_MESSAGE != WIN_ERR)
+        mar_display_nhwindow(WIN_MESSAGE);
+
+    preinit_raw_len = 0;
+    preinit_raw_overflow = 0;
+    preinit_raw_buf[0] = '\0';
 }
 
 extern void mar_update_value(void); /* wingem1.c */
