@@ -955,16 +955,17 @@ Gem_raw_print_bold(const char *str)
 }
 
 extern void mar_update_value(void); /* wingem1.c */
+extern short mar_nh_poskey(short *x, short *y, short *mod); /* wingem1.c */
 
 int
 Gem_nhgetch()
 {
-    short i;
+    short i, x, y, mod;
 
     mar_update_value();
-    i = tgetch();
+    i = mar_nh_poskey(&x, &y, &mod);
     if (!i)
-        i = '\033'; /* map NUL to ESC since nethack doesn't expect NUL */
+        i = '\033'; /* mouse click during a getch prompt -> ESC */
 
     return i;
 }
