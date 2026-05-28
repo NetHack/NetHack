@@ -1,0 +1,39 @@
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS 
+  "None;Debug;RelWithDebInfo;MinSizeRel;Release"
+)
+
+set(HACKDIR
+    "$ENV{HOME}/.config/nethack500"
+    CACHE STRING "Configuration files for nethack")
+
+set(LUA_SUPPORT "Auto" CACHE STRING 
+  "Enable lua support. Auto acts like Yes if lua is installed and No otherwise")
+set_property(CACHE LUA_SUPPORT PROPERTY STRINGS "Auto;Yes;No")
+
+option(WANT_WIN_TTY "Include support for the TTY interface" ON)
+option(WANT_WIN_CURSES "Include support for the curses interface" OFF)
+option(WANT_WIN_X11 "Include support for the X11 interface" OFF)
+
+set(WANT_WIN_QT "none" CACHE STRING 
+  "Include support for the qt5 or qt6 interface")
+set_property(CACHE WANT_WIN_QT PROPERTY STRINGS "none;Qt5;Qt6")
+
+# TODO winchain
+
+# TODO libnh
+
+set(WANT_DEFAULT "tty" CACHE STRING 
+  "Default interface if multiple were suplied")
+set_property(CACHE WANT_DEFAULT PROPERTY STRINGS "tty;curses;X11;Qt")
+
+# musl will be auto-detected
+
+option(WANT_ASAN "Include support for the address sanitizer in the build" OFF)
+option(WANT_UBSAN
+  "Include support for the undefined behavior sanitizer in the build" OFF)
+
+option(WANT_NHUUHID 
+  "Include support for a unique game identifier. requires libuuid" ON)
+
+
+# vim:ft=cmake
