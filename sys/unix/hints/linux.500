@@ -12,14 +12,9 @@
 # And let us know about it.
 #
 
-#-PRE
-# linux.500 hints file provides a single-user build for Linux (such
-# as Ubuntu focal).
+#-PRE xxxx
 
-# note: '#-INCLUDE' is not just a comment
-#        multiw-1.500 contains sections 1 to 2
-#-INCLUDE multiw-1.500
-
+WHICH_OS=Linux
 HINTSVERSION := 500
 
 ifdef MAKEFILE_TOP
@@ -28,16 +23,29 @@ ifeq ($(MAKELEVEL),0)
 PRECHECK+=checkmakefiles
 # all files included from this hints file get listed
 # in HINTSINCLNAMES (without suffix and without a path)
-HINTSINCLNAMES := compiler cross-pre1 cross-pre2 cross-post \
+HINTSINCLNAMES := dirs-perms \
+		compiler cross-pre1 cross-pre2 cross-post \
 		gbdates-pre gbdates-post \
+		linuxdistro \
 		multiw-1 multiw-2 misc \
-		multisnd1-pre multisnd2-pre multisnd-post
+		multisnd1-pre multisnd2-pre multisnd-post \
+		response
 HINTSINCLFILES := $(addsuffix .$(HINTSVERSION), $(HINTSINCLNAMES))
 endif
 endif
 
-#-INCLUDE linuxdistro.500
+# linux.500 hints file provides a single-user build for Linux (such
+# as Ubuntu focal).
 
+# note: '#-INCLUDE' is not just a comment
+#        multiw-1.500 contains sections 1 to 2
+#-INCLUDE multiw-1.500
+
+# note: '#-INCLUDE' is not just a comment
+#        it pulls in the contents of dirs-perms.500
+#-INCLUDE dirs-perms.500
+
+#-INCLUDE linuxdistro.500
 
 ifndef LIBXPM
 LIBXPM= -L/opt/X11/lib -lXpm
@@ -523,26 +531,9 @@ SYSCONFENSURE = (if ! test -f $(INSTDIR)/sysconf ; then \
 	 chmod $(VARFILEPERM) $(INSTDIR)/sysconf; fi );
 
 ifdef WANT_SOURCE_INSTALL
-PREFIX=$(abspath $(NHSROOT))
-#SHELLDIR=
-HACKDIR=$(PREFIX)/playground
-GAMEPERM = 0700
-VARFILEPERM = 0600
-VARDIRPERM = 0700
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 MOREALL=$(MAKE) install
-else #!WANT_SOURCE_INSTALL
-#PREFIX=/usr
-PREFIX=$(wildcard ~)/nh/install
-HACKDIR=$(PREFIX)/games/lib/nethackdir
-SHELLDIR = $(PREFIX)/games
-VARDIRPERM = 0755
-VARFILEPERM = 0600
-GAMEPERM = 0755
 endif #?WANT_SOURCE_INSTALL
-
-INSTDIR=$(HACKDIR)
-VARDIR = $(HACKDIR)
 
 ifdef MAKEFILE_TOP
 TESTGDBPATH=/usr/bin/gdb

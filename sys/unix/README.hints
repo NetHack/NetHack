@@ -73,13 +73,15 @@ make WANT_ASAN=1              Include support for the address sanitizer in the
 make WANT_UBSAN=1             Include support for the undefined behaviour
                               sanitizer in the build.
 
-make WANT_SHARE_INSTALL=1     Place the results of the install/update portion
+make WANT_SHARED_INSTALL=1    Place the results of the install/update portion
                               of the build into a shared area on a multiuser
                               system.
 
 make WANT_SOURCE_INSTALL=1    Place the results of the install/update portion
                               of the build into a subfolder of the source
                               tree, rather than in a system-wide shared area.
+                              (This is now the default if WANT_SHARED_INSTALL=1
+                              wasn't specified)  
 
 make WANT_NHUUID=1            Include support for a unique game identifier.
                               On Linux, libuuid and its headers must be installed

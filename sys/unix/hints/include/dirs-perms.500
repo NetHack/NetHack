@@ -1,0 +1,123 @@
+#------------------------------------------------------------------------------
+# NetHack 5.0  directories.500 $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-5.0 $
+
+ifndef WANT_SHARED_INSTALL
+PREFIX=$(abspath $(NHSROOT))
+SOURCEINSTALL=1
+
+# -----------------------------------------
+# This is for the Linux source tree install
+# -----------------------------------------
+ifeq "$(WHICH_OS)" "Linux"
+
+HACKDIR ?=$(PREFIX)/playground
+INSTDIR ?=$(HACKDIR)
+VARDIR ?=$(HACKDIR)
+
+GAMEPERM ?= 0700
+VARFILEPERM ?= 0600
+VARDIRPERM ?= 0700
+
+else   # macOS
+#
+# -----------------------------------------
+# This is for the macOS source tree install
+# -----------------------------------------
+#
+# The macOS setup sets things up two different
+# ways, depending on whether an explicit
+# WANT_SOURCE_INSTALL=1 was given, or not.
+ifdef WANT_SOURCE_INSTALL
+
+HACKDIR ?=$(PREFIX)/playground
+CHOWN ?=/usr/bin/true
+CHGRP ?=/usr/bin/true
+
+GAMEPERM ?= 0700
+VARFILEPERM ?= 0600
+VARDIRPERM ?= 0700
+else   # WANT_SOURCE_INSTALL not expressed
+PREFIX:=$(wildcard ~)
+SHELLDIR ?=$(PREFIX)/bin
+HACKDIR ?=$(PREFIX)/nethackdir
+CHOWN ?=/usr/bin/true
+CHGRP ?=/usr/bin/true
+GAMEPERM ?= 0700
+VARFILEPERM ?= 0600
+VARDIRPERM ?= 0700
+
+endif  # WANT_SOURCE_INSTALL
+
+INSTDIR ?=$(HACKDIR)
+VARDIR ?=$(HACKDIR)
+
+endif  # macOS
+endif  # not WANT_SHARED_INSTALL
+
+ifneq "$(SOURCEINSTALL)" "1"
+ifdef WANT_SHARED_INSTALL
+ifeq "$(WHICH_OS)" "Linux"
+# -----------------------------------------
+# This is for the Linux system-wide install
+# -----------------------------------------
+
+PREFIX ?=$(wildcard ~)/nh/install
+HACKDIR ?=$(PREFIX)/games/lib/nethackdir
+SHELLDIR ?= $(PREFIX)/games
+INSTDIR ?=$(HACKDIR)
+VARDIR ?=$(HACKDIR)
+MANDIR ?=/usr/share/man/man6
+
+VARDIRPERM ?= 0755
+VARFILEPERM ?= 0600
+GAMEPERM ?= 0755
+
+# ----------------------------------
+# End of Linux system-wide install
+# ----------------------------------
+
+else  # macOS
+# ------------------------------------------------
+# This is for the macOS system-wide shared install
+# ------------------------------------------------
+
+# if $GAMEUID is root, we install into roughly
+# proper Mac locations, otherwise we install
+# into ~/nethackdir
+
+ifeq ($(GAMEUID),root)
+PREFIX:=/Library/NetHack
+SHELLDIR ?=/usr/local/bin
+HACKDIR ?=$(PREFIX)/nethackdir
+MANDIR ?=/usr/local/share/man/man6
+CHOWN ?=chown
+CHGRP ?=chgrp
+# We run sgid so the game has access to both HACKDIR
+# and user preferences
+GAMEPERM ?=02755
+
+else    # ! root
+PREFIX:=/Users/$(GAMEUID)
+SHELLDIR ?=$(PREFIX)/bin
+HACKDIR ?=$(PREFIX)/Library/NetHack/nethackdir
+CHOWN ?=/usr/bin/true
+CHGRP ?=/usr/bin/true
+GAMEPERM ?= 0500
+endif   # ! root
+
+INSTDIR ?=$(HACKDIR)
+VARDIR ?=$(HACKDIR)
+
+VARFILEPERM ?= 0664
+VARDIRPERM ?= 0775
+
+# ---------------------------------------
+# End of macOS system-wide shared install
+# --------------------------------------
+endif  # WHICH_OS?
+endif  # WANT_SHARED_INSTALL
+endif  # SOURCEINSTALL != 1
+
+#end of dirs-perms.500
+#--------------------------------------
+
