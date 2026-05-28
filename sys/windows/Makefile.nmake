@@ -671,17 +671,17 @@ HACKCSRC = \
 	$(SRC)objnam.c   $(SRC)options.c  $(SRC)pager.c    $(SRC)pickup.c \
 	$(SRC)pline.c    $(SRC)polyself.c $(SRC)potion.c   $(SRC)pray.c \
 	$(SRC)priest.c   $(SRC)quest.c    $(SRC)questpgr.c $(SRC)read.c \
-	$(SRC)rect.c     $(SRC)region.c   $(SRC)restore.c  $(SRC)rip.c \
-	$(SRC)rnd.c      $(SRC)role.c     $(SRC)rumors.c   $(SRC)save.c \
-	$(SRC)selvar.c   $(SRC)sfbase.c   $(SRC)sfstruct.c $(SRC)shk.c \
-	$(SRC)shknam.c   $(SRC)sit.c      $(SRC)sounds.c   $(SRC)sp_lev.c \
-	$(SRC)spell.c    $(SRC)stairs.c   $(SRC)steal.c    $(SRC)steed.c \
-	$(SRC)symbols.c  $(SRC)sys.c      $(SRC)teleport.c $(SRC)timeout.c \
-	$(SRC)topten.c   $(SRC)track.c    $(SRC)trap.c     $(SRC)u_init.c \
-	$(SRC)uhitm.c    $(SRC)utf8map.c  $(SRC)vault.c    $(SRC)version.c \
-	$(SRC)vision.c   $(SRC)weapon.c   $(SRC)were.c     $(SRC)wield.c \
-	$(SRC)windows.c  $(SRC)wizard.c   $(SRC)worm.c     $(SRC)worn.c \
-	$(SRC)write.c    $(SRC)zap.c
+	$(SRC)rect.c     $(SRC)region.c   $(SRC)restore.c  $(SRC)revision.c \
+	$(SRC)rip.c      $(SRC)rnd.c      $(SRC)role.c     $(SRC)rumors.c \
+	$(SRC)save.c     $(SRC)selvar.c   $(SRC)sfbase.c   $(SRC)sfstruct.c \
+	$(SRC)shk.c      $(SRC)shknam.c   $(SRC)sit.c      $(SRC)sounds.c \
+	$(SRC)sp_lev.c   $(SRC)spell.c    $(SRC)stairs.c   $(SRC)steal.c \
+	$(SRC)steed.c    $(SRC)symbols.c  $(SRC)sys.c      $(SRC)teleport.c \
+	$(SRC)timeout.c  $(SRC)topten.c   $(SRC)track.c    $(SRC)trap.c \
+	$(SRC)u_init.c   $(SRC)uhitm.c    $(SRC)utf8map.c  $(SRC)vault.c \
+	$(SRC)version.c  $(SRC)vision.c   $(SRC)weapon.c   $(SRC)were.c \
+	$(SRC)wield.c    $(SRC)windows.c  $(SRC)wizard.c   $(SRC)worm.c \
+	$(SRC)worn.c     $(SRC)write.c    $(SRC)zap.c
 
 # all .h files except date.h
 HACKINCL = \
@@ -700,15 +700,16 @@ HACKINCL = \
 	$(INCL)obj.h      $(INCL)objects.h    $(INCL)objclass.h \
 	$(INCL)optlist.h  $(INCL)patchlevel.h $(INCL)pcconf.h \
 	$(INCL)permonst.h $(INCL)prop.h       $(INCL)rect.h \
-	$(INCL)region.h   $(INCL)savefile.h   $(INCL)selvar.h \
-	$(INCL)sfprocs.h  $(INCL)sym.h        $(INCL)rm.h \
-	$(INCL)sp_lev.h   $(INCL)spell.h      $(INCL)sndprocs.h \
-	$(INCL)seffects.h $(INCL)stairs.h     $(INCL)sys.h \
-	$(INCL)tcap.h     $(INCL)timeout.h    $(INCL)tradstdc.h \
-	$(INCL)trap.h     $(INCL)unixconf.h   $(INCL)vision.h \
-	$(INCL)vmsconf.h  $(INCL)wintty.h     $(INCL)wincurs.h \
-	$(INCL)winX.h     $(INCL)winprocs.h   $(INCL)wintype.h \
-	$(INCL)you.h      $(INCL)youprop.h  $(INCL)weight.h
+	$(INCL)region.h   $(INCL)revision.h   $(INCL)savefile.h \
+	$(INCL)selvar.h   $(INCL)sfprocs.h    $(INCL)sym.h \
+	$(INCL)rm.h       $(INCL)sp_lev.h     $(INCL)spell.h \
+	$(INCL)sndprocs.h $(INCL)seffects.h   $(INCL)stairs.h \
+	$(INCL)sys.h      $(INCL)tcap.h       $(INCL)timeout.h \
+	$(INCL)tradstdc.h $(INCL)trap.h       $(INCL)unixconf.h \
+	$(INCL)vision.h   $(INCL)vmsconf.h    $(INCL)wintty.h \
+	$(INCL)wincurs.h  $(INCL)winX.h       $(INCL)winprocs.h \
+	$(INCL)wintype.h  $(INCL)you.h        $(INCL)youprop.h \
+	$(INCL)weight.h
 
 LUA_FILES = $(DAT)asmodeus.lua $(DAT)baalz.lua $(DAT)bigrm-1.lua \
 	$(DAT)bigrm-10.lua $(DAT)bigrm-11.lua $(DAT)bigrm-12.lua \
@@ -873,17 +874,17 @@ COREOBJTTY = \
 	$(OTTY)pickup.o   $(OTTY)pline.o    $(OTTY)polyself.o $(OTTY)potion.o \
 	$(OTTY)pray.o     $(OTTY)priest.o   $(OTTY)quest.o    $(OTTY)questpgr.o \
 	$(OTTY)read.o     $(OTTY)rect.o     $(OTTY)region.o   $(OTTY)report.o \
-	$(OTTY)restore.o  $(OTTY)rip.o      $(OTTY)rnd.o      $(OTTY)role.o \
-	$(OTTY)rumors.o   $(OTTY)save.o     $(OTTY)selvar.o   $(OTTY)sfbase.o \
-	$(OTTY)sfstruct.o $(OTTY)shk.o      $(OTTY)shknam.o   $(OTTY)sit.o \
-	$(OTTY)sounds.o   $(OTTY)sp_lev.o   $(OTTY)spell.o    $(OTTY)stairs.o \
-	$(OTTY)steal.o    $(OTTY)steed.o    $(OTTY)strutil.o  $(OTTY)symbols.o \
-	$(OTTY)sys.o      $(OTTY)teleport.o $(OTTY)timeout.o  $(OTTY)topten.o \
-	$(OTTY)track.o    $(OTTY)trap.o     $(OTTY)u_init.o   $(OTTY)uhitm.o \
-	$(OTTY)utf8map.o  $(OTTY)vault.o    $(OTTY)vision.o   $(OTTY)weapon.o \
-	$(OTTY)were.o     $(OTTY)wield.o    $(OTTY)windows.o  $(OTTY)wizard.o \
-	$(OTTY)wizcmds.o  $(OTTY)worm.o     $(OTTY)worn.o     $(OTTY)write.o \
-	$(OTTY)zap.o
+	$(OTTY)restore.o  $(OTTY)revision.o $(OTTY)rip.o      $(OTTY)rnd.o \
+	$(OTTY)role.o     $(OTTY)rumors.o   $(OTTY)save.o     $(OTTY)selvar.o \
+	$(OTTY)sfbase.o   $(OTTY)sfstruct.o $(OTTY)shk.o      $(OTTY)shknam.o \
+	$(OTTY)sit.o      $(OTTY)sounds.o   $(OTTY)sp_lev.o   $(OTTY)spell.o \
+	$(OTTY)stairs.o   $(OTTY)steal.o    $(OTTY)steed.o    $(OTTY)strutil.o \
+	$(OTTY)symbols.o  $(OTTY)sys.o      $(OTTY)teleport.o $(OTTY)timeout.o \
+	$(OTTY)topten.o   $(OTTY)track.o    $(OTTY)trap.o     $(OTTY)u_init.o \
+	$(OTTY)uhitm.o    $(OTTY)utf8map.o  $(OTTY)vault.o    $(OTTY)vision.o \
+	$(OTTY)weapon.o   $(OTTY)were.o     $(OTTY)wield.o    $(OTTY)windows.o \
+	$(OTTY)wizard.o   $(OTTY)wizcmds.o  $(OTTY)worm.o     $(OTTY)worn.o \
+	$(OTTY)write.o    $(OTTY)zap.o
 
 OBJSTTY = $(MDLIBTTY) $(COREOBJTTY) $(REGEXTTY) $(RANDOMTTY)
 
@@ -936,17 +937,17 @@ COREOBJGUI = \
 	$(OGUI)pickup.o   $(OGUI)pline.o    $(OGUI)polyself.o $(OGUI)potion.o \
 	$(OGUI)pray.o     $(OGUI)priest.o   $(OGUI)quest.o    $(OGUI)questpgr.o \
 	$(OGUI)read.o     $(OGUI)rect.o     $(OGUI)region.o   $(OGUI)report.o \
-	$(OGUI)restore.o  $(OGUI)rip.o      $(OGUI)rnd.o      $(OGUI)role.o \
-	$(OGUI)rumors.o   $(OGUI)save.o     $(OGUI)selvar.o   $(OGUI)sfbase.o \
-	$(OGUI)sfstruct.o $(OGUI)shk.o      $(OGUI)shknam.o   $(OGUI)sit.o \
-	$(OGUI)sounds.o   $(OGUI)sp_lev.o   $(OGUI)spell.o    $(OGUI)stairs.o \
-	$(OGUI)steal.o    $(OGUI)steed.o    $(OGUI)strutil.o  $(OGUI)symbols.o \
-	$(OGUI)sys.o      $(OGUI)teleport.o $(OGUI)timeout.o  $(OGUI)topten.o \
-	$(OGUI)track.o    $(OGUI)trap.o     $(OGUI)u_init.o   $(OGUI)uhitm.o \
-	$(OGUI)utf8map.o  $(OGUI)vault.o    $(OGUI)vision.o   $(OGUI)weapon.o \
-	$(OGUI)were.o     $(OGUI)wield.o    $(OGUI)windows.o  $(OGUI)wizard.o \
-	$(OGUI)wizcmds.o  $(OGUI)worm.o     $(OGUI)worn.o     $(OGUI)write.o \
-	$(OGUI)zap.o
+	$(OGUI)restore.o  $(OGUI)revision.o $(OGUI)rip.o      $(OGUI)rnd.o \
+	$(OGUI)role.o     $(OGUI)rumors.o   $(OGUI)save.o     $(OGUI)selvar.o \
+	$(OGUI)sfbase.o   $(OGUI)sfstruct.o $(OGUI)shk.o      $(OGUI)shknam.o \
+	$(OGUI)sit.o      $(OGUI)sounds.o   $(OGUI)sp_lev.o   $(OGUI)spell.o \
+	$(OGUI)stairs.o   $(OGUI)steal.o    $(OGUI)steed.o    $(OGUI)strutil.o \
+	$(OGUI)symbols.o  $(OGUI)sys.o      $(OGUI)teleport.o $(OGUI)timeout.o \
+	$(OGUI)topten.o   $(OGUI)track.o    $(OGUI)trap.o     $(OGUI)u_init.o \
+	$(OGUI)uhitm.o    $(OGUI)utf8map.o  $(OGUI)vault.o    $(OGUI)vision.o \
+	$(OGUI)weapon.o   $(OGUI)were.o     $(OGUI)wield.o    $(OGUI)windows.o \
+	$(OGUI)wizard.o   $(OGUI)wizcmds.o  $(OGUI)worm.o     $(OGUI)worn.o \
+	$(OGUI)write.o    $(OGUI)zap.o
 
 OBJSGUI   = $(MDLIBGUI) $(COREOBJGUI) $(REGEXGUI) $(RANDOMGUI)
 
@@ -3328,6 +3329,7 @@ $(OTTY)rect.o: rect.c $(HACK_H)
 $(OTTY)region.o: region.c $(HACK_H)
 $(OTTY)report.o: report.c $(HACK_H) $(INCL)dlb.h $(INCL)nhmd4.h
 $(OTTY)restore.o: restore.c $(HACK_H) $(INCL)tcap.h
+$(OTTY)revision.o: revision.c $(HACK_H)
 $(OTTY)rip.o: rip.c $(HACK_H)
 $(OTTY)rnd.o: rnd.c $(HACK_H) $(INCL)isaac64.h
 $(OTTY)role.o: role.c $(HACK_H)
@@ -3708,6 +3710,7 @@ $(OGUI)rect.o: rect.c $(HACK_H)
 $(OGUI)region.o: region.c $(HACK_H)
 $(OGUI)report.o: report.c $(HACK_H) $(INCL)dlb.h $(INCL)nhmd4.h
 $(OGUI)restore.o: restore.c $(HACK_H) $(INCL)tcap.h
+$(OGUI)revision.o: revision.c $(HACK_H)
 $(OGUI)rip.o: rip.c $(HACK_H)
 $(OGUI)rnd.o: rnd.c $(HACK_H) $(INCL)isaac64.h
 $(OGUI)role.o: role.c $(HACK_H)

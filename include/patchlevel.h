@@ -44,6 +44,14 @@
 #define COPYRIGHT_BANNER_D "         See license for details."
 
 /*
+ * SAVEFILE_REVISION_LEVEL
+ * Increment this if there has been a change to a data structure
+ * that the source code is prepared to handle and convert properly.
+ * The SAVEFILE_REVISION_LEVEL value needs to fit into an unsigned byte.
+ */
+#define SAVEFILE_REVISION_LEVEL 0x00
+
+/*
  * If two or more successive releases have compatible data files, define
  * this with the version number of the oldest such release so that the
  * new release will accept old save and bones files.  The format is

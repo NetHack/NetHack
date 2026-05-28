@@ -743,6 +743,10 @@ void norm_ptrs_version_info(struct version_info *d_version_info);
 void norm_ptrs_vlaunchinfo(union vlaunchinfo *d_vlaunchinfo);
 void norm_ptrs_vptrs(union vptrs *d_vptrs);
 void norm_ptrs_you(struct you *d_you);
+#ifdef DEMO_UPLIFTS
+void norm_ptrs_mystruct(struct mystruct *d_mystruct);
+void norm_ptrs_mystruct_rev0(struct mystruct_rev0 *d_mystruct_rev0);
+#endif
 
 void
 norm_ptrs_any(union any *d_any UNUSED)
@@ -1037,6 +1041,17 @@ void
 norm_ptrs_rm(struct rm *d_rm UNUSED)
 {
 }
+
+#ifdef DEMO_UPLIFTS
+void
+norm_ptrs_mystruct(struct mystruct *d_mystruct UNUSED)
+{
+}
+void
+norm_ptrs_mystruct_rev0(struct mystruct_rev0 *d_mystruct_rev0 UNUSED)
+{
+}
+#endif
 
 void
 norm_ptrs_s_level(struct s_level *d_s_level UNUSED)

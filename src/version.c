@@ -607,7 +607,7 @@ struct critical_sizes_with_names critical_sizes[] = {
     { (uchar) sizeof(struct objclass), "struct objclass" },
     { (uchar) sizeof(struct oextra), "struct oextra" },
     { (uchar) sizeof(struct q_score), "struct q_score" },
-    { (uchar) sizeof(struct rm), "struct rm" },
+    { (uchar) sizeof(struct rm), "struct rm" },               /* [61] */
     { (uchar) sizeof(struct spell), "struct spell" },
     { (uchar) sizeof(struct stairway), "struct stairway" },
     { (uchar) sizeof(struct s_level), "struct s_level" },
@@ -660,7 +660,7 @@ struct critical_sizes_with_names critical_sizes[] = {
     { 0, "" },
     { 0, "" },
     { 0, "" },
-    { 0, "" },
+    { (uchar) SAVEFILE_REVISION_LEVEL, "savefile_revision_level" },
 };
 
 uchar cscbuf[SIZE(critical_sizes)];
@@ -780,6 +780,15 @@ compare_critical_bytes(NHFILE *nhfp, int *idx_1st_mismatch, unsigned long utdfla
         Sfi_uchar(nhfp, &cscbuf[i], "critical_sizes");
     }
     for (i = 1; i < cnt; ++i) {
+        if (cscbuf[i] != critical_sizes[i].ucsize && i == cnt - 1) {
+            /* SAVEFILE_REVISION_LEVEL mismatch; attempt to deal with it */
+            int file_rev_level = cscbuf[i];
+
+            if (revision_increment(file_rev_level,
+                                                   file_csc_count,
+                                                   cscbuf))
+                continue;
+        }
         if (cscbuf[i] != critical_sizes[i].ucsize) {
             const char *dm = datamodel(0), *dmfile;
 

@@ -102,7 +102,7 @@ CONFIGBASEH := color config config1 patchlevel tradstdc hacklib integer \
 HACKBASEH := hack lint align dungeon wintype sym defsym \
 		mkroom artilist objclass objects youprop \
 		prop permonst monattk monflag monsters \
-		mondata context rm botl rect region trap \
+		mondata context rm botl rect region revision trap \
 		display vision seffects selvar sndprocs stairs decl \
 		quest spell obj engrave you attrib monst \
 		mextra skills timeout flag winprocs sys
@@ -800,6 +800,7 @@ $(TARGETPFX)rect.obj: rect.c $(HACK_H)
 $(TARGETPFX)region.obj: region.c $(HACK_H)
 $(TARGETPFX)report.obj: report.c $(HACK_H)
 $(TARGETPFX)restore.obj: restore.c $(HACK_H) $(INCL)tcap.h
+$(TARGETPFX)revision.obj: revision.c $(HACK_H)
 $(TARGETPFX)rip.obj: rip.c $(HACK_H)
 $(TARGETPFX)rnd.obj: rnd.c $(HACK_H) $(INCL)isaac64.h
 $(TARGETPFX)role.obj: role.c $(HACK_H)

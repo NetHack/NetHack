@@ -184,6 +184,10 @@ extern void sfi_int(NHFILE *, int *, const char *);
 extern void sfi_unsigned(NHFILE *, unsigned *, const char *);
 extern void sfi_long(NHFILE *, long *, const char *);
 extern void sfi_ulong(NHFILE *, ulong *, const char *);
+#ifdef DEMO_UPLIFTS
+extern void sfi_mystruct(NHFILE *, struct mystruct *, const char *);
+extern void sfi_mystruct_rev0(NHFILE *, struct mystruct_rev0 *, const char *);
+#endif
 #if NH_C < 202300L
 #define Sfo_aligntyp(a,b,c) sfo_aligntyp(a, b, c)
 #define Sfo_any(a,b,c) sfo_any(a, b, c)
@@ -315,6 +319,10 @@ extern void sfi_ulong(NHFILE *, ulong *, const char *);
 #define Sfi_unsigned(a, b, c) sfi_unsigned(a, b, c);
 #define Sfi_xint8(a, b, c) sfi_xint8(a, b, c);
 #define Sfi_xint16(a, b, c) sfi_xint16(a, b, c);
+#ifdef DEMO_UPLIFTS
+#define Sfi_mystruct(a, b, c) sfi_mystruct(a, b, c)
+#define Sfi_mystruct_rev0(a, b, c) sfi_mystruct_rev0(a, b, c)
+#endif
 #else
 
 #define sfo(nhfp, dt, tag)                     \
@@ -553,7 +561,7 @@ extern void sfi_ulong(NHFILE *, ulong *, const char *);
 #define Sfi_dest_area(a,b,c) sfi(a, b, c)
 #define Sfi_levelflags(a,b,c) sfi(a, b, c)
 #define Sfi_rm(a,b,c) sfi(a, b, c)
-#define Sfi_cemetery(a,b,c) sfi(a, b, c)
+#define Sfi_cemetery(a,b,c) sfi_cemetery(a, b, c)
 #define Sfi_damage(a,b,c) sfi(a, b, c)
 #define Sfi_stairway(a,b,c) sfi(a, b, c)
 #define Sfi_obj(a,b,c) sfi(a, b, c)
@@ -575,6 +583,10 @@ extern void sfi_ulong(NHFILE *, ulong *, const char *);
 #define Sfi_unsigned(a, b, c) sfi(a, b, c)
 #define Sfi_xint8(a, b, c) sfi(a, b, c)
 #define Sfi_xint16(a, b, c) sfi(a, b, c)
+#ifdef DEMO_UPLIFTS
+#define Sfi_mystruct(a, b, c) sfi(a, b, c)
+#define Sfi_mystruct_rev0(a, b, c) sfi(a, b, c)
+#endif
 #endif
 
 /* not in _Generic */

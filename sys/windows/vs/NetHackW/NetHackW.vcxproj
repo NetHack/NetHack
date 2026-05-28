@@ -281,6 +281,7 @@
     <ClCompile Include="$(WinWin32Dir)mswproc.c" />
     <ClCompile Include="$(WinWin32Dir)NetHackW.c" />
     <ClCompile Include="$(SrcDir)sfbase.c" />
+    <ClCompile Include="$(SrcDir)revision.c" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$(WinWin32Dir)NetHackW.rc" />
@@ -386,6 +387,7 @@
     <ClInclude Include="$(IncDir)sfprocs.h" />
     <ClInclude Include="$(IncDir)savefile.h" />
     <ClInclude Include="$(IncDir)sfmacros.h" />
+    <ClInclude Include="$(IncDir)revision.h" />
     <ClInclude Include="..\resource.h" />
   </ItemGroup>
   <ItemGroup>

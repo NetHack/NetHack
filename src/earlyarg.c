@@ -791,6 +791,7 @@ static const struct enum_dump glyph_offsets_dump[] = {
         dump_om(NUM_REAL_GEMS),
         dump_om(NUM_GLASS_GEMS),
         dump_om(MAXEXPCHARS),
+        dump_om(MAXTCHARS),
         dump_om(WARNCOUNT),
     };
 #undef dump_om

@@ -288,18 +288,18 @@ VOBJ14 = $(O)muse.o     $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.
 VOBJ15 = $(O)options.o  $(O)pickup.o   $(O)pline.o    $(O)polyself.o $(O)potion.o
 VOBJ16 = $(O)quest.o    $(O)questpgr.o $(O)pager.o    $(O)pray.o     $(O)priest.o
 VOBJ17 = $(O)read.o     $(O)rect.o     $(O)region.o   $(O)report.o   $(O)restore.o
-VOBJ18 = $(O)rip.o      $(O)rnd.o      $(O)role.o     $(O)rumors.o   $(O)save.o
-VOBJ19 = $(O)selvar.o   $(O)sfstruct.o $(O)shk.o      $(O)shknam.o   $(O)sit.o
-VOBJ20 = $(O)sounds.o   $(O)sp_lev.o   $(O)spell.o    $(O)stairs.o   $(O)steal.o
-VOBJ21 = $(O)steed.o    $(O)symbols.o  $(O)sys.o      $(O)teleport.o $(O)strutil.o
-VOBJ22 = $(O)termcap.o  $(O)timeout.o  $(O)topl.o     $(O)topten.o   $(O)trap.o
-VOBJ23 = $(O)u_init.o   $(O)uhitm.o    $(O)utf8map.o  $(O)vault.o    $(O)track.o
-VOBJ24 = $(O)vision.o   $(O)weapon.o   $(O)were.o     $(O)wield.o    $(O)windows.o
-VOBJ25 = $(O)wintty.o   $(O)wizard.o   $(O)wizcmds.o  $(O)worm.o     $(O)worn.o
-VOBJ26 = $(O)write.o    $(O)zap.o      $(O)light.o    $(O)dlb.o      $(REGEX)
+VOBJ18 = $(O)revision.o $(O)rip.o      $(O)rnd.o      $(O)role.o     $(O)rumors.o
+VOBJ19 = $(O)save.o     $(O)selvar.o   $(O)sfstruct.o $(O)shk.o      $(O)shknam.o
+VOBJ20 = $(O)sit.o      $(O)sounds.o   $(O)sp_lev.o   $(O)spell.o    $(O)stairs.o
+VOBJ21 = $(O)steal.o    $(O)steed.o    $(O)symbols.o  $(O)sys.o      $(O)teleport.o
+VOBJ22 = $(O)strutil.o  $(O)termcap.o  $(O)timeout.o  $(O)topl.o     $(O)topten.o
+VOBJ23 = $(O)trap.o     $(O)u_init.o   $(O)uhitm.o    $(O)utf8map.o  $(O)vault.o
+VOBJ24 = $(O)track.o    $(O)vision.o   $(O)weapon.o   $(O)were.o     $(O)wield.o
+VOBJ25 = $(O)windows.o  $(O)wintty.o   $(O)wizard.o   $(O)wizcmds.o  $(O)worm.o
+VOBJ26 = $(O)worn.o     $(O)write.o    $(O)zap.o      $(O)light.o    $(O)dlb.o $(REGEX)
 
-SOBJ   = $(O)msdos.o    $(O)pcsys.o    $(O)tty.o	    $(O)unix.o \
-	 $(O)video.o    $(O)vidtxt.o  $(O)pckeys.o
+SOBJ   = $(O)msdos.o    $(O)pcsys.o    $(O)tty.o      $(O)unix.o \
+	 $(O)video.o    $(O)vidtxt.o   $(O)pckeys.o
 
 VVOBJ  = $(O)version.o
 

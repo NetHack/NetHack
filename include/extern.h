@@ -2754,6 +2754,15 @@ void restore_msghistory(NHFILE *);
 extern void rest_adjust_levelflags(void);
 extern void moves_to_relative_time(long *);
 extern void relative_time_to_moves(long *);
+extern boolean revision_increment(int, int, uchar *);
+
+/* ### revision.c ### */
+
+extern boolean revision_increment(int, int, uchar *);
+#ifdef DEMO_UPLIFTS
+void uplift_mystruct_rev0_to_mystruct(struct mystruct_rev0 *rev0,
+                                      struct mystruct *rev1);
+#endif /* DEMO_UPLIFTS */
 
 /* ### rip.c ### */
 

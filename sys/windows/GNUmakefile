@@ -800,8 +800,8 @@ HACK_H = $(CONFIG_H) ../include/align.h ../include/artilist.h \
 	../include/nhlua.h ../include/obj.h ../include/objclass.h \
 	../include/objects.h ../include/permonst.h ../include/prop.h \
 	../include/quest.h ../include/rect.h ../include/region.h \
-	../include/rm.h ../include/savefile.h ../include/sfprocs.h \
-	../include/seffects.h ../include/selvar.h \
+	../include/revision.h ../include/rm.h ../include/savefile.h \
+	../include/sfprocs.h ../include/seffects.h ../include/selvar.h \
 	../include/skills.h ../include/sndprocs.h ../include/spell.h \
 	../include/stairs.h ../include/sym.h ../include/sys.h \
 	../include/timeout.h ../include/trap.h ../include/vision.h \
@@ -1238,7 +1238,7 @@ COREOBJS = $(addsuffix .o, allmain alloc apply artifact attrib ball bones botl \
 	   mon mondata monmove monst mplayer mthrowu muse music \
 	   nhlobj nhlsel nhlua windsound o_init objects objnam options \
 	   pager pickup pline polyself potion pray priest quest questpgr \
-	   random read rect region report restore rip rnd role rumors \
+	   random read rect region report restore revision rip rnd role rumors \
 	   save sfbase sfstruct shk shknam sit selvar sounds sp_lev \
 	   spell stairs steal steed strutil \
 	   symbols sys teleport timeout topten track trap u_init uhitm utf8map \

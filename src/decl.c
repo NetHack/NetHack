@@ -770,6 +770,8 @@ static const struct instance_globals_u g_init_u = {
     FALSE, /* update_all */
     /* decl.c */
     FALSE, /* unweapon */
+    /* revision.c */
+    0, /* uplift_needed_rev0_to_rev1 */
     /* role.c */
     UNDEFINED_ROLE, /* urole */
     UNDEFINED_RACE, /* urace */

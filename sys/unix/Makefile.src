@@ -514,21 +514,21 @@ HACK_H	= ../src/hack.h-t
 # all .c that are part of the main NetHack program and are not operating- or
 # windowing-system specific. Do not include date.c in this list.
 HACKCSRC ?= allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
-	   botl.c calendar.c cmd.c coloratt.c dbridge.c decl.c detect.c dig.c display.c \
-	   dlb.c do.c do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c \
-	   drawing.c dungeon.c earlyarg.c eat.c end.c engrave.c exper.c explode.c \
-	   extralev.c files.c fountain.c hack.c hacklib.c \
+	   botl.c calendar.c cmd.c coloratt.c dbridge.c decl.c detect.c dig.c \
+	   display.c dlb.c do.c do_name.c do_wear.c dog.c dogmove.c dokick.c \
+	   dothrow.c drawing.c dungeon.c earlyarg.c eat.c end.c engrave.c \
+	   exper.c explode.c extralev.c files.c fountain.c hack.c hacklib.c \
 	   getpos.c glyphs.c iactions.c insight.c invent.c isaac64.c light.c \
 	   lock.c mail.c makemon.c mcastu.c mdlib.c mhitm.c \
 	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
 	   mondata.c monmove.c monst.c mplayer.c mthrowu.c muse.c music.c \
 	   nhlua.c nhlsel.c nhlobj.c nhmd4.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
-	   priest.c quest.c questpgr.c read.c rect.c region.c report.c restore.c \
-	   rip.c rnd.c role.c rumors.c save.c selvar.c sfbase.c sfstruct.c \
-	   shk.c shknam.c sit.c sounds.c sp_lev.c spell.c stairs.c steal.c steed.c \
-	   strutil.c symbols.c sys.c teleport.c \
-	   timeout.c topten.c track.c trap.c u_init.c utf8map.c \
+	   priest.c quest.c questpgr.c read.c rect.c region.c report.c \
+	   restore.c revision.c  rip.c rnd.c role.c rumors.c save.c selvar.c \
+	   sfbase.c sfstruct.c shk.c shknam.c sit.c sounds.c sp_lev.c \
+	   spell.c stairs.c steal.c steed.c strutil.c symbols.c sys.c \
+	   teleport.c timeout.c topten.c track.c trap.c u_init.c utf8map.c \
 	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
 	   windows.c wizard.c wizcmds.c worm.c worn.c write.c zap.c
 
@@ -567,14 +567,13 @@ HACKINCL ?= align.h artifact.h artilist.h attrib.h botl.h \
 	color.h config.h config1.h context.h coord.h cstd.h decl.h \
 	defsym.h display.h dlb.h dungeon.h engrave.h extern.h flag.h \
 	fnamesiz.h func_tab.h global.h warnings.h hack.h lint.h mextra.h \
-	mcastu.h \
-	micro.h mfndpos.h mkroom.h monattk.h mondata.h monflag.h monst.h \
-	monsters.h nhmd4.h obj.h objects.h objclass.h optlist.h patchlevel.h \
-	pcconf.h permonst.h prop.h rect.h region.h savefile.h selvar.h sym.h \
-	rm.h sp_lev.h spell.h sndprocs.h seffects.h stairs.h sys.h \
-	tcap.h timeout.h tradstdc.h trap.h unixconf.h vision.h vmsconf.h \
-	wintty.h wincurs.h winX.h winprocs.h wintype.h you.h youprop.h \
-	weight.h
+	mcastu.h micro.h mfndpos.h mkroom.h monattk.h mondata.h monflag.h \
+	monst.h monsters.h nhmd4.h obj.h objects.h objclass.h optlist.h \
+	patchlevel.h pcconf.h permonst.h prop.h rect.h region.h revision.h \
+	savefile.h selvar.h sym.h rm.h sp_lev.h spell.h sndprocs.h \
+	seffects.h stairs.h sys.h tcap.h timeout.h tradstdc.h trap.h \
+	unixconf.h vision.h vmsconf.h wintty.h wincurs.h winX.h winprocs.h \
+	wintype.h you.h youprop.h weight.h
 
 HSOURCES ?= $(HACKINCL) dgn_file.h
 
@@ -617,20 +616,20 @@ HOBJ ?= $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)potion.o $(TARGETPFX)pray.o $(TARGETPFX)priest.o \
 	$(TARGETPFX)quest.o $(TARGETPFX)questpgr.o $(TARGETPFX)read.o \
 	$(TARGETPFX)rect.o $(TARGETPFX)region.o $(TARGETPFX)report.o \
-	$(TARGETPFX)restore.o $(TARGETPFX)rip.o $(TARGETPFX)rnd.o \
-	$(TARGETPFX)role.o $(TARGETPFX)rumors.o $(TARGETPFX)save.o \
-	$(TARGETPFX)selvar.o $(TARGETPFX)sfbase.o $(TARGETPFX)sfstruct.o \
-	$(TARGETPFX)shk.o $(TARGETPFX)shknam.o $(TARGETPFX)sit.o \
-	$(TARGETPFX)sounds.o $(TARGETPFX)sp_lev.o $(TARGETPFX)spell.o \
-	$(TARGETPFX)stairs.o $(TARGETPFX)symbols.o $(TARGETPFX)sys.o \
-	$(TARGETPFX)steal.o $(TARGETPFX)steed.o $(TARGETPFX)strutil.o \
-	$(TARGETPFX)teleport.o $(TARGETPFX)timeout.o $(TARGETPFX)topten.o \
-	$(TARGETPFX)track.o $(TARGETPFX)trap.o $(TARGETPFX)u_init.o \
-	$(TARGETPFX)uhitm.o $(TARGETPFX)utf8map.o $(TARGETPFX)vault.o \
-	$(TARGETPFX)vision.o $(TARGETPFX)weapon.o $(TARGETPFX)were.o \
-	$(TARGETPFX)wield.o $(TARGETPFX)windows.o $(TARGETPFX)wizard.o \
-	$(TARGETPFX)wizcmds.o $(TARGETPFX)worm.o $(TARGETPFX)worn.o \
-	$(TARGETPFX)write.o $(TARGETPFX)zap.o \
+	$(TARGETPFX)restore.o $(TARGETPFX)revision.o $(TARGETPFX)rip.o \
+	$(TARGETPFX)rnd.o $(TARGETPFX)role.o $(TARGETPFX)rumors.o \
+	$(TARGETPFX)save.o $(TARGETPFX)selvar.o $(TARGETPFX)sfbase.o \
+	$(TARGETPFX)sfstruct.o $(TARGETPFX)shk.o $(TARGETPFX)shknam.o \
+	$(TARGETPFX)sit.o $(TARGETPFX)sounds.o $(TARGETPFX)sp_lev.o \
+	$(TARGETPFX)spell.o $(TARGETPFX)stairs.o $(TARGETPFX)symbols.o \
+	$(TARGETPFX)sys.o $(TARGETPFX)steal.o $(TARGETPFX)steed.o \
+	$(TARGETPFX)strutil.o $(TARGETPFX)teleport.o $(TARGETPFX)timeout.o \
+	$(TARGETPFX)topten.o $(TARGETPFX)track.o $(TARGETPFX)trap.o \
+	$(TARGETPFX)u_init.o $(TARGETPFX)uhitm.o $(TARGETPFX)utf8map.o \
+	$(TARGETPFX)vault.o $(TARGETPFX)vision.o $(TARGETPFX)weapon.o \
+	$(TARGETPFX)were.o $(TARGETPFX)wield.o $(TARGETPFX)windows.o \
+	$(TARGETPFX)wizard.o $(TARGETPFX)wizcmds.o $(TARGETPFX)worm.o \
+	$(TARGETPFX)worn.o $(TARGETPFX)write.o $(TARGETPFX)zap.o \
 	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) \
 	$(HINTOBJ) $(SNDLIBOBJ) $(UUIDOBJ) \
 	$(TARGETPFX)version.o 
@@ -907,19 +906,19 @@ $(HACK_H): $(CONFIG_H) ../include/align.h ../include/artilist.h \
 		../include/decl.h ../include/defsym.h ../include/display.h \
 		../include/dungeon.h ../include/engrave.h ../include/flag.h \
 		../include/hack.h ../include/lint.h ../include/mextra.h \
-		../include/mcastu.h \
-		../include/mkroom.h ../include/monattk.h ../include/mondata.h \
-		../include/monflag.h ../include/monst.h ../include/monsters.h \
-		../include/nhlua.h ../include/obj.h ../include/objclass.h \
-		../include/objects.h ../include/permonst.h ../include/prop.h \
-		../include/quest.h ../include/rect.h ../include/region.h \
+		../include/mcastu.h ../include/mkroom.h ../include/monattk.h \
+		../include/mondata.h ../include/monflag.h ../include/monst.h \
+		../include/monsters.h ../include/nhlua.h ../include/obj.h \
+		../include/objclass.h ../include/objects.h \
+		../include/permonst.h ../include/prop.h ../include/quest.h \
+		../include/rect.h ../include/region.h ../include/revision.h \
 		../include/rm.h ../include/savefile.h ../include/sfprocs.h \
-		../include/seffects.h ../include/selvar.h \
-		../include/skills.h ../include/sndprocs.h ../include/spell.h \
-		../include/stairs.h ../include/sym.h ../include/sys.h \
-		../include/timeout.h ../include/trap.h ../include/vision.h \
-		../include/weight.h ../include/winprocs.h \
-		../include/wintype.h ../include/you.h ../include/youprop.h
+		../include/seffects.h ../include/selvar.h ../include/skills.h \
+		../include/sndprocs.h ../include/spell.h ../include/stairs.h \
+		../include/sym.h ../include/sys.h ../include/timeout.h \
+		../include/trap.h ../include/vision.h ../include/weight.h \
+		../include/winprocs.h ../include/wintype.h ../include/you.h \
+		../include/youprop.h
 	touch $(HACK_H)
 #
 $(TARGETPFX)cppregex.o: ../sys/share/cppregex.cpp $(CONFIG_H)
@@ -1256,6 +1255,7 @@ $(TARGETPFX)rect.o: rect.c $(HACK_H)
 $(TARGETPFX)region.o: region.c $(HACK_H)
 $(TARGETPFX)report.o: report.c $(HACK_H) ../include/dlb.h ../include/nhmd4.h
 $(TARGETPFX)restore.o: restore.c $(HACK_H) ../include/tcap.h
+$(TARGETPFX)revision.o: revision.c $(HACK_H)
 $(TARGETPFX)rip.o: rip.c $(HACK_H)
 $(TARGETPFX)rnd.o: rnd.c $(HACK_H) ../include/isaac64.h
 $(TARGETPFX)role.o: role.c $(HACK_H)

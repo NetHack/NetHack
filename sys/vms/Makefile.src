@@ -157,12 +157,12 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   monmove.c monst.c mplayer.c mthrowu.c muse.c music.c o_init.c \
 	   objects.c objnam.c options.c pager.c pickup.c pline.c polyself.c \
 	   potion.c pray.c priest.c quest.c questpgr.c read.c rect.c \
-	   region.c report.c restore.c rip.c rnd.c role.c rumors.c save.c \
-	   selvar.c sfstruct.c shk.c shknam.c sit.c sounds.c sp_lev.c \
-	   spell.c stairs.c steal.c steed.c strutil.c sys.c teleport.c \
-	   timeout.c topten.c track.c trap.c u_init.c uhitm.c vault.c \
-	   version.c vision.c weapon.c were.c wield.c windows.c wizard.c \
-	   wizcmds.c worm.c worn.c write.c zap.c
+	   region.c report.c restore.c revision.c rip.c rnd.c role.c \
+	   rumors.c save.c selvar.c sfstruct.c shk.c shknam.c sit.c sounds.c \
+	   sp_lev.c spell.c stairs.c steal.c steed.c strutil.c sys.c \
+	   teleport.c timeout.c topten.c track.c trap.c u_init.c uhitm.c \
+	   vault.c version.c vision.c weapon.c were.c wield.c windows.c \
+	   wizard.c wizcmds.c worm.c worn.c write.c zap.c
 
 #-# generated source files (vis_tab.c is gone; tile.c is handled separately
 #-# via WINxxxSRC)
@@ -180,11 +180,11 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	fnamesiz.h func_tab.h global.h warnings.h hack.h lint.h mextra.h \
 	micro.h mkroom.h monattk.h mondata.h monflag.h monst.h monsters.h \
 	mfndpos.h nhmd4.h obj.h objects.h objclass.h optlist.h patchlevel.h \
-	pcconf.h permonst.h prop.h rect.h region.h savefile.h selvar.h sym.h \
-	rm.h sp_lev.h spell.h sndprocs.h seffects.h stairs.h sys.h \
-	tcap.h timeout.h tradstdc.h trap.h unixconf.h vision.h vmsconf.h \
-	wintty.h wincurs.h winX.h winprocs.h wintype.h you.h youprop.h \
-	weight.h
+	pcconf.h permonst.h prop.h rect.h region.h revision.h savefile.h \
+	selvar.h sym.h rm.h sp_lev.h spell.h sndprocs.h seffects.h \
+	stairs.h sys.h tcap.h timeout.h tradstdc.h trap.h unixconf.h \
+	vision.h vmsconf.h wintty.h wincurs.h winX.h winprocs.h wintype.h \
+	you.h youprop.h weight.h
 
 
 #HSOURCES = $(HACKINCL) date.h onames.h pm.h
@@ -575,6 +575,7 @@ read.obj :	read.c $(HACK_H)
 rect.obj :	rect.c $(HACK_H)
 region.obj :	region.c $(HACK_H)
 restore.obj :	restore.c $(HACK_H) $(INC)tcap.h
+revision.obj :	revision.c $(HACK_H)
 rip.obj :	rip.c $(HACK_H)
 rnd.obj :	rnd.c $(HACK_H)
 role.obj :	role.c $(HACK_H)
