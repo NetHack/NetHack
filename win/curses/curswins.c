@@ -769,7 +769,11 @@ static int
 get_framecolor(int nhcolor, int framecolor)
 {
     /* curses_toggle_color_attr() adds the +1 and takes care of COLORS < 16 */
-    return (16 * (framecolor % 8)) + (nhcolor % 16);
+    if (curses_has_256color()) {
+        return (256 * (framecolor % 8)) + (nhcolor % 256);
+    } else
+        return (16 * (framecolor % 8)) + (nhcolor % 16);
+
 }
 
 static void
