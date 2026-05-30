@@ -1052,21 +1052,6 @@ parse_id(
                 return 1;
             }
         } else {
-            /* Slow path: caller didn't run populate_glyphname_hash_indices
-               first.  Linear-scan every glyph reconstructing its
-               canonical name -- matches upstream's fallback behaviour
-               and keeps debugger / wizard-mode lookups working without
-               surprising the populate/empty cycle. */
-            for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
-                if (compose_glyph_name(glyph, buf, sizeof buf)
-                    && !strcmpi(id, buf)) {
-                    findwhat->findtype = find_glyph;
-                    findwhat->val = glyph;
-                    findwhat->loadsyms_offset = 0;
-                    return 1;
-                }
-            }
-        } else {
             /* Unpopulated: linear scan, no alloc. */
             for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
                 if (compose_glyph_name(glyph, buf, sizeof buf)
