@@ -532,7 +532,7 @@ curses_putch(winid wid, int x, int y, int ch,
 #ifdef ENHANCED_SYMBOLS
              struct unicode_representation *unicode_representation,
 #endif
-             int color, int framecolor, int attr)
+             const struct glyph_attributes *attr)
 {
     static boolean map_initted = FALSE;
     int sx, sy, ex, ey;
@@ -554,9 +554,9 @@ curses_putch(winid wid, int x, int y, int ch,
 
     --x; /* map column [0] is not used; draw column [1] in first screen col */
     map[y][x].ch = ch;
-    map[y][x].color = color;
-    map[y][x].framecolor = framecolor;
-    map[y][x].attr = attr;
+    map[y][x].color = attr->color;
+    map[y][x].framecolor = attr->framecolor;
+    map[y][x].attr = attr->attribute_flags;
 #ifdef ENHANCED_SYMBOLS
     map[y][x].unicode_representation = unicode_representation;
 #endif
