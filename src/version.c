@@ -779,7 +779,9 @@ compare_critical_bytes(NHFILE *nhfp, int *idx_1st_mismatch, unsigned long utdfla
     for (i = 0; i < (int) file_csc_count; ++i) {
         Sfi_uchar(nhfp, &cscbuf[i], "critical_sizes");
     }
+
     for (i = 1; i < cnt; ++i) {
+#ifndef SFCTOOL
         if (cscbuf[i] != critical_sizes[i].ucsize && i == cnt - 1) {
             /* SAVEFILE_REVISION_LEVEL mismatch; attempt to deal with it */
             int file_rev_level = cscbuf[i];
@@ -789,6 +791,7 @@ compare_critical_bytes(NHFILE *nhfp, int *idx_1st_mismatch, unsigned long utdfla
                                                    cscbuf))
                 continue;
         }
+#endif
         if (cscbuf[i] != critical_sizes[i].ucsize) {
             const char *dm = datamodel(0), *dmfile;
 

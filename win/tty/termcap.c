@@ -31,6 +31,7 @@ static void analyze_seq(char *, int *, int *);
 #if (defined(TERMLIB) || defined(ANSI_DEFAULT))
 static void init_hilite(void);
 static void kill_hilite(void);
+static int indexed_color_count(void);
 #endif
 
 /* (see tcap.h) -- nh_CM, nh_ND, nh_CD, nh_HI,nh_HE, nh_US,nh_UE, ul_hack */
@@ -947,6 +948,15 @@ init_hilite(void)
 
     colors = tgetnum(nhStr("Co"));
     iflags.colorcount = colors;
+#ifdef NCURSES_VERSION
+    /* The standard ncurses terminfo entries that support 24-bit colors
+       (*-direct) map the standard 8/16/256 colors onto the beginning
+       of the 24-bit color range. For example, rgb(0,0,1) appears as red
+       instead of nearly black. iflags.colorcount should retain the actual
+       supported color count, while for default color initialization we
+       take the available indexed colors into consieration. */
+    colors = indexed_color_count();
+#endif
     int md_len = 0;
 
     if (colors < 8 || !MD || !*MD
@@ -1054,7 +1064,7 @@ kill_hilite(void)
         if (hilites[CLR_BLACK] != hilites[CLR_BLUE])
             free(hilites[CLR_BLACK]), hilites[CLR_BLACK] = NULL;
     }
-    if (tgetnum(nhStr("Co")) >= 16) {
+    if (indexed_color_count() >= 16) {
         if (hilites[CLR_BLUE])
             free(hilites[CLR_BLUE]);
         if (hilites[CLR_GREEN])
@@ -1094,6 +1104,21 @@ kill_hilite(void)
 
     for (c = 0; c < CLR_MAX; c++)
         hilites[c] = NULL;
+}
+
+static int
+indexed_color_count(void)
+{
+#ifdef NCURSES_VERSION
+    /* ncurses adds the non-standard attribute CO for "number of indexed
+       colors overlaying RGB space". */
+    int idx_colors = tgetnum(nhStr("CO"));
+    if (idx_colors > 0) {
+        return idx_colors;
+    }
+#endif
+
+    return tgetnum(nhStr("Co"));
 }
 
 #else /* UNIX && TERMINFO */

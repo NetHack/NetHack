@@ -1,9 +1,9 @@
-/* NetHack 5.0	revision.h	$NHDT-Date: 1706213796 2024/01/25 20:16:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ */
+/* NetHack 5.0	revision.h	$NHDT-Date: 1779927286 2026/05/28 00:14:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.2 $ */
 /* Copyright (c) Michael Allison, 2026. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
- * Supporting revisions to NetHack structs via incemental
+ * Supporting revisions to NetHack structs via incremental
  * uplifts, rather than incrementing EDITLEVEL and breaking
  * savefile compatibility.
  *
@@ -77,7 +77,7 @@
  *       struct mystruct_rev0 * : sfi_mysruct_rev0,     \
  *
  *  7. Also in include/savefile.h, a little further down in the
- *     'Sfi_' macro defininitions, add one below the existing
+ *     'Sfi_' macro definitions, add one below the existing
  *     one for the struct without the '_rev0' suffix:
  *
  *       #define Sfi_mystruct(a,b,c) sfi(a, b, c)
@@ -158,7 +158,7 @@
  * 15. Shortly after the reading of the struct by the 'Sfi_' function,
  *     if the newer revision of the struct added some new fields, new code
  *     will be needed to initialize the new fields to sane values.
- *     There is no data for the new fields in the exising savefile.
+ *     There is no data for the new fields in the existing savefile.
  *
  *        if (gu.uplift_needed_rev0_to_rev1 == 1) {
  *            svl.mystruct.newfielda = sanevalue1;

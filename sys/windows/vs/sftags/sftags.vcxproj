@@ -35,6 +35,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(UtilDir)sftags.c" />
+    <ClCompile Include="$(SrcDir)alloc.c" />
+    <ClCompile Include="$(SrcDir)strutil.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

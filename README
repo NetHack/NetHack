@@ -142,13 +142,13 @@ If a feature is not accepted you are free, of course, to post the patches
 to the net yourself and let the marketplace decide their worth.
 
 All of this amounts to the following:  If you decide to apply a free-lanced
-patch to your 3.6 code, you are welcome to do so, of course, but we won't
-be able to provide support or receive bug reports for it.
+patch to your NetHack 5.0 code, you are welcome to do so, of course, but we
+won't be able to provide support or receive bug reports for it.
 
 In our own patches, we will assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --
 
-# $NHDT-Date: 1652133501 2022/05/09 21:58:21 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $
+# $NHDT-Date: 1779926755 2026/05/28 00:05:55 $ $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.113 $
 # Copyright (c) 2012 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.

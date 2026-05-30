@@ -408,9 +408,9 @@ solaris-playground  unix
 sys/unix/hints/include:
 (files for configuring UNIX NetHack versions)
 compiler.500       cross-post.500     cross-pre1.500     cross-pre2.500
-gbdates-post.500   gbdates-pre.500    linuxdistro.500    misc.500
-multisnd-post.500  multisnd1-pre.500  multisnd2-pre.500  multiw-1.500
-multiw-2.500       response.500       whichbsd.500
+dirs-perms.500     gbdates-post.500   gbdates-pre.500    linuxdistro.500
+misc.500           multisnd-post.500  multisnd1-pre.500  multisnd2-pre.500
+multiw-1.500       multiw-2.500       response.500       whichbsd.500
 
 sys/vms:
 (files for VMS version)

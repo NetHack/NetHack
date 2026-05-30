@@ -60,7 +60,7 @@
 .ds f0 \*(vr
 .ds f1 \" empty
 .\"DO NOT REMOVE NH_DATESUB .ds f2 Date(%B %-d, %Y)
-.ds f2 May 25, 2026
+.ds f2 May 29, 2026
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -3678,22 +3678,34 @@ OPTIONS=!legacy,autopickup,pickup_types:$\(dq=/!?+
 .ft
 .ed
 .lp HACKDIR
+[not available on Unix]
+.br
 Default location of files NetHack needs. On Windows HACKDIR
 defaults to the location of the NetHack.exe or NetHackw.exe file
 so setting HACKDIR to override that is not usually necessary or recommended.
 .lp LEVELDIR
+[not available on Unix]
+.br
 The location that in-progress level files are stored. Defaults to HACKDIR,
 must be writable.
 .lp SAVEDIR
+[not available on Unix]
+.br
 The location where saved games are kept. Defaults to HACKDIR, must be
 writable.
 .lp BONESDIR
+[not available on Unix]
+.br
 The location that bones files are kept. Defaults to HACKDIR, must be
 writable.
 .lp LOCKDIR
+[not available on Unix]
+.br
 The location that file synchronization locks are stored. Defaults to
 HACKDIR, must be writable.
 .lp TROUBLEDIR
+[not available on Unix]
+.br
 The location that a record of game aborts and self-diagnosed game problems
 is kept. Defaults to HACKDIR, must be writable.
 .\"
@@ -6549,7 +6561,7 @@ developed NetHack 3.1 for the Amiga.
 \fBCarl Schelin\fP, \fBStephen Spackman\fP, \fBSteve VanDevender\fP,
 and \fBPaul Winner\fP, ported NetHack 3.1 to the PC.
 .pg
-\fBJon W{tte\fP and \fBHao-yang Wang\fP, with help from \fBRoss Brown\fP,
+\fB\*(JW\fP and \fBHao-yang Wang\fP, with help from \fBRoss Brown\fP,
 \fBMike Engber\fP, \fBDavid Hairston\fP, \fBMichael Hamel\fP,
 \fBJonathan Handler\fP, \fBJohnny Lee\fP, \fBTim Lennan\fP, \fBRob Menke\fP,
 and \fBAndy Swanson\fP, developed NetHack 3.1 for the Macintosh,
@@ -6907,7 +6919,7 @@ Bart House	John Kallen	Pat Rankin
 Benson I. Margulies	John Rupley	Patric Mueller
 Bill Dyer	John S. Bien	Paul Winner
 Boudewijn Waijers	Johnny Lee	Pierre Martineau
-Bruce Cox	Jon W{tte	Ralf Brown
+Bruce Cox	\*(JW	Ralf Brown
 Bruce Holloway	Jonathan Handler	Ray Chason
 Bruce Mewborne	Joshua Delahunty	Richard Addison
 Cameron Root	Karl Garrison	Richard Beigel

@@ -195,23 +195,22 @@ fix_glyphname(char *str)
     return str;
 }
 
-/* Index into loadsyms[] of the first SYM_PCHAR entry.  Cached lazily;
-   loadsyms[] is static read-only data so a one-time scan suffices. */
-static int cached_cmap_offset = -1;
+/* First SYM_PCHAR index in loadsyms[], cached (0 = not computed yet;
+   SYM_PCHAR is never at index 0). */
+static int cached_cmap_offset = 0;
 
 staticfn int
 get_cmap_offset(void)
 {
-    if (cached_cmap_offset < 0) {
+    if (!cached_cmap_offset) {
         int i;
 
         for (i = 0; loadsyms[i].range; i++) {
             if (loadsyms[i].range == SYM_PCHAR) {
                 cached_cmap_offset = i;
-                return i;
+                break;
             }
         }
-        cached_cmap_offset = 0; /* no SYM_PCHAR found; shouldn't happen */
     }
     return cached_cmap_offset;
 }
@@ -257,15 +256,11 @@ compose_glyph_name(int glyph, char *buf, size_t bufsz)
         } else if (glyph_is_female_pet(glyph)) {
             buf2 = "pet_female_";
         }
-        Strcpy(buf, "G_");
-        Strcat(buf, buf2);
-        Strcat(buf, buf3);
+        Snprintf(buf, bufsz, "G_%s%s", buf2, buf3);
     } else if (glyph_is_body(glyph)) {
         buf2 = glyph_is_body_piletop(glyph) ? "piletop_body_" : "body_";
         buf3 = monsdump[glyph_to_body_corpsenm(glyph)].nm;
-        Strcpy(buf, "G_");
-        Strcat(buf, buf2);
-        Strcat(buf, buf3);
+        Snprintf(buf, bufsz, "G_%s%s", buf2, buf3);
     } else if (glyph_is_statue(glyph)) {
         buf2 = glyph_is_fem_statue_piletop(glyph)
                ? "piletop_statue_of_female_"
@@ -277,9 +272,7 @@ compose_glyph_name(int glyph, char *buf, size_t bufsz)
                      ? "statue_of_male_"
                      : "";
         buf3 = monsdump[glyph_to_statue_corpsenm(glyph)].nm;
-        Strcpy(buf, "G_");
-        Strcat(buf, buf2);
-        Strcat(buf, buf3);
+        Snprintf(buf, bufsz, "G_%s%s", buf2, buf3);
     } else if (glyph_is_object(glyph)) {
         i = glyph_to_obj(glyph);
         if (((i > SCR_STINKING_CLOUD) && (i < SCR_MAIL))
@@ -306,12 +299,10 @@ compose_glyph_name(int glyph, char *buf, size_t bufsz)
                    : obj_descr[i].oc_name
                      ? obj_descr[i].oc_name
                      : obj_descr[i].oc_descr;
-        Strcpy(buf, "G_");
-        if (glyph_is_normal_piletop_obj(glyph)
-            || glyph_is_piletop_generic_obj(glyph))
-            Strcat(buf, "piletop_");
-        Strcat(buf, buf2);
-        Strcat(buf, buf3);
+        Snprintf(buf, bufsz, "G_%s%s%s",
+                 (glyph_is_normal_piletop_obj(glyph)
+                  || glyph_is_piletop_generic_obj(glyph)) ? "piletop_" : "",
+                 buf2, buf3);
     } else if (glyph_is_cmap(glyph) || glyph_is_cmap_zap(glyph)
                || glyph_is_swallow(glyph) || glyph_is_explosion(glyph)) {
         int cmap = -1;
@@ -384,10 +375,8 @@ compose_glyph_name(int glyph, char *buf, size_t bufsz)
             j = glyph - GLYPH_SWALLOW_OFF;
             cmap = glyph_to_swallow(glyph);
             mnum = j / ((S_sw_br - S_sw_tl) + 1);
-            Strcpy(tmpbuf[3], "swallow ");
-            Strcat(tmpbuf[3], monsdump[mnum].nm);
-            Strcat(tmpbuf[3], " ");
-            Strcat(tmpbuf[3], swallow_texts[cmap]);
+            Snprintf(tmpbuf[3], sizeof tmpbuf[3], "swallow %s %s",
+                     monsdump[mnum].nm, swallow_texts[cmap]);
             buf3 = tmpbuf[3];
             skip_base = TRUE;
         } else if (glyph_is_explosion(glyph)) {
@@ -417,16 +406,13 @@ compose_glyph_name(int glyph, char *buf, size_t bufsz)
             if (cmap >= 0 && cmap < MAXPCHARS)
                 buf3 = loadsyms[cmap + cmap_offset].name + 2;
         }
-        Strcpy(buf, "G_");
-        Strcat(buf, buf2);
-        Strcat(buf, buf3);
-        Strcat(buf, buf4);
+        Snprintf(buf, bufsz, "G_%s%s%s", buf2, buf3, buf4);
     } else if (glyph_is_invisible(glyph)) {
-        Strcpy(buf, "G_invisible");
+        Snprintf(buf, bufsz, "G_invisible");
     } else if (glyph_is_nothing(glyph)) {
-        Strcpy(buf, "G_nothing");
+        Snprintf(buf, bufsz, "G_nothing");
     } else if (glyph_is_unexplored(glyph)) {
-        Strcpy(buf, "G_unexplored");
+        Snprintf(buf, bufsz, "G_unexplored");
     } else if (glyph_is_warning(glyph)) {
         j = glyph - GLYPH_WARNING_OFF;
         Snprintf(buf, bufsz, "G_%s%d", "warning", j);
@@ -1080,6 +1066,17 @@ parse_id(
                     return 1;
                 }
             }
+        } else {
+            /* Unpopulated: linear scan, no alloc. */
+            for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
+                if (compose_glyph_name(glyph, buf, sizeof buf)
+                    && !strcmpi(id, buf)) {
+                    findwhat->findtype = find_glyph;
+                    findwhat->val = glyph;
+                    findwhat->loadsyms_offset = 0;
+                    return 1;
+                }
+            }
         }
         return 0;
     }
@@ -1111,7 +1108,7 @@ parse_id(
             }
         }
         /* permonst entries */
-        for (i = 0; i <= pm_count; ++i) {
+        for (i = 0; i < pm_count; ++i) {
             if (!strcmpi(loadsyms[i + pm_offset].name + 2, id + 2)) {
                 findwhat->findtype = find_pm;
                 findwhat->val = i + 1; /* starts at 1 */
