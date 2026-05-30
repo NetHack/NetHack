@@ -766,25 +766,26 @@ coordinates without a refresh.  Currently only used for the map. */
 
 /* convert nhcolor (fg) and framecolor (bg) to curses colorpair */
 static int
-get_framecolor(int nhcolor, int framecolor)
+get_framecolor(const nethack_char *nch)
 {
+    int bgcolor = (nch->framecolor != NO_COLOR) ? nch->framecolor : 0;
     /* curses_toggle_color_attr() adds the +1 and takes care of COLORS < 16 */
     if (curses_has_256color()) {
-        return (256 * (framecolor % 8)) + (nhcolor % 256);
+        int color = nch->color256 ? nch->color256 : nch->color;
+        return (256 * (bgcolor % CURSES_NUM_BACKGROUND_COLORS)) + (color % 256);
     } else
-        return (16 * (framecolor % 8)) + (nhcolor % 16);
-
+        return (16 * (bgcolor % CURSES_NUM_BACKGROUND_COLORS)) + (nch->color % 16);
 }
 
 static void
 write_char(WINDOW * win, int x, int y, nethack_char nch)
 {
-    int curscolor = nch.color, cursattr = nch.attr;
+    int curscolor;
+    int cursattr = nch.attr;
 
-    if (nch.framecolor != NO_COLOR) {
-        curscolor = get_framecolor(nch.color, nch.framecolor);
-        if (nch.attr == A_REVERSE)
-            cursattr = A_NORMAL; /* hilited pet looks odd otherwise */
+    curscolor = get_framecolor(&nch);
+    if ((nch.framecolor != NO_COLOR) && (nch.attr == A_REVERSE)) {
+        cursattr = A_NORMAL; /* hilited pet looks odd otherwise */
     }
     curses_toggle_color_attr(win, curscolor, cursattr, ON);
 #if defined(CURSES_UNICODE) && defined(ENHANCED_SYMBOLS)
