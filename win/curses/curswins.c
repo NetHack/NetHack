@@ -763,7 +763,7 @@ is_main_window(winid wid)
 coordinates without a refresh.  Currently only used for the map. */
 
 /* convert nhcolor (fg) and framecolor (bg) to curses colorpair */
-int
+static int
 get_framecolor(int nhcolor, int framecolor)
 {
     /* curses_toggle_color_attr() adds the +1 and takes care of COLORS < 16 */

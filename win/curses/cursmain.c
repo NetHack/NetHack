@@ -940,6 +940,7 @@ curses_print_glyph(
     int glyph;
     int ch;
     int color;
+    int framecolor;
     int nhcolor = 0;
     unsigned int special;
     int attr = -1;
@@ -948,6 +949,7 @@ curses_print_glyph(
     special = glyphinfo->gm.glyphflags;
     ch = glyphinfo->ttychar;
     color = glyphinfo->gm.sym.color;
+    framecolor = bkglyphinfo->framecolor;
     /*  Extra color handling
      *  FIQ: The curses library does not support truecolor, only the more limited 256
      *  color mode. On top of this, the windowport only supports 16 color mode.
@@ -981,7 +983,7 @@ curses_print_glyph(
 */
         if ((special & MG_OBJPILE) && iflags.hilite_pile) {
             if (iflags.wc_color)
-                color = get_framecolor(color, CLR_BLUE);
+                framecolor = CLR_BLUE;
             else /* if (iflags.use_inverse) */
                 attr = A_REVERSE;
         }
@@ -1007,7 +1009,7 @@ curses_print_glyph(
                       ? glyphinfo->gm.u : NULL,
 #endif
                  (nhcolor != 0) ? nhcolor : color,
-                 bkglyphinfo->framecolor, attr);
+                 framecolor, attr);
 
 }
 
