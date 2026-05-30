@@ -7,7 +7,8 @@
 # define CURSWIN_H
 
 struct glyph_attributes {
-    int color;
+    int basic_color; // basic color
+    int color256;    // extended color (0 if not defined), used when supported
     int framecolor;
     int attribute_flags;
 };

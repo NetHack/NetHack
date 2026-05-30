@@ -40,7 +40,8 @@ typedef struct nhwd {
 
 typedef struct nhchar {
     int ch;                     /* character */
-    int color;                  /* color info for character */
+    int color;                  /* basic color info for character */
+    int color256;               /* extended color for the character, 0 if none */
     int framecolor;                /* background color info for character */
     int attr;                   /* attributes of character */
     struct unicode_representation *unicode_representation;
@@ -554,7 +555,8 @@ curses_putch(winid wid, int x, int y, int ch,
 
     --x; /* map column [0] is not used; draw column [1] in first screen col */
     map[y][x].ch = ch;
-    map[y][x].color = attr->color;
+    map[y][x].color = attr->basic_color;
+    map[y][x].color256 = attr->color256;
     map[y][x].framecolor = attr->framecolor;
     map[y][x].attr = attr->attribute_flags;
 #ifdef ENHANCED_SYMBOLS

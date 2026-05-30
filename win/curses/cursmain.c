@@ -941,14 +941,14 @@ curses_print_glyph(
     int glyph;
     int ch;
     struct glyph_attributes attr;
-    int nhcolor = 0;
     unsigned int special;
 
     attr.attribute_flags = -1;
     glyph = glyphinfo->glyph;
     special = glyphinfo->gm.glyphflags;
     ch = glyphinfo->ttychar;
-    attr.color = glyphinfo->gm.sym.color;
+    attr.basic_color = glyphinfo->gm.sym.color;
+    attr.color256 = 0;
     attr.framecolor = bkglyphinfo->framecolor;
     /*  Extra color handling
      *  FIQ: The curses library does not support truecolor, only the more limited 256
@@ -958,12 +958,10 @@ curses_print_glyph(
     if (glyphinfo->gm.customcolor != 0
         && (curses_procs.wincap2 & WC2_EXTRACOLORS) != 0) {
         if ((glyphinfo->gm.customcolor & NH_BASIC_COLOR) != 0) {
-            attr.color = COLORVAL(glyphinfo->gm.customcolor);
-#if 0
+            attr.basic_color = COLORVAL(glyphinfo->gm.customcolor);
         } else {
             /* 24-bit color, NH_BASIC_COLOR == 0 */
-            nhcolor = COLORVAL(glyphinfo->gm.customcolor);
-#endif
+            attr.color256 = glyphinfo->gm.color256idx;
         }
     }
     if ((special & MG_PET) && iflags.hilite_pet) {
