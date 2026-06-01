@@ -1,0 +1,6 @@
+if(${WANT_WIN_TTY})
+  add_subdirectory(tty)
+endif()
+if(${WANT_WIN_CURSES})
+  add_subdirectory(curses)
+endif()

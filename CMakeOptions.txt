@@ -29,11 +29,19 @@ set_property(CACHE WANT_DEFAULT PROPERTY STRINGS "tty;curses;X11;Qt")
 # musl will be auto-detected
 
 option(WANT_ASAN "Include support for the address sanitizer in the build" OFF)
+mark_as_advanced(WANT_ASAN)
 option(WANT_UBSAN
   "Include support for the undefined behavior sanitizer in the build" OFF)
+mark_as_advanced(WANT_UBSAN)
 
 option(WANT_NHUUHID 
   "Include support for a unique game identifier. requires libuuid" ON)
+
+set(REGEX_BACKEND "posix" CACHE STRING 
+  "Sets the regex implementation to use. Available options are 'posix',
+  'pmatch', and 'cpp'")
+mark_as_advanced(REGEX_BACKEND)
+
 
 
 # vim:ft=cmake

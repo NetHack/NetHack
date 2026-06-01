@@ -348,11 +348,14 @@ submit_web_report(int cos, const char *msg, const char *why)
 
     int count = 0;
     if (cos == 1) {
-# ifdef WIN32
+# ifdef NO_BACKTRACE 
+	SWR_ADD_URIcoded("Backtrace disabled\n");
+# else
+#  ifdef WIN32
         count = win32_cr_gettrace(SWR_FRAMES, uend, MAX_URL - (uend - url));
         uend = eos(url);
-# else
-        void *bt[SWR_FRAMES];
+#  else
+	void *bt[SWR_FRAMES];
         int x;
         char **info;
 
@@ -364,17 +367,18 @@ submit_web_report(int cos, const char *msg, const char *why)
             (void) strsubst(temp, "        ", "");
             (void) strsubst(temp, "        ", "");
             (void) strncat(temp, "\n", sizeof temp - 1);
-#  if 0 // __linux__
+#   if 0 // __linux__
 // not needed for MacOS
 // XXX is it actually needed for linux?  TBD
             Sprintf(temp2, "[%02lu]\n", (unsigned long) x);
             uend--;    // remove the \n we added above
             SWR_ADD_URIcoded(temp2);
-#  endif // linux
+#   endif // linux
             SWR_ADD_URIcoded(temp);
             mark = uend;
         }
-# endif  // !WIN32
+#  endif  // !WIN32 
+# endif // !NO_BACKTRACE
     }
 
 # ifdef DUMPLOG_CORE

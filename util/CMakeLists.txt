@@ -1,8 +1,16 @@
+# TODO remove all these make-isms 
+
+set(NH_SRC ../src/)
+set(NH_INC_GEN ${CMAKE_BINARY_DIR}/include/)
+set(NH_DOC ../doc/)
+set(NH_UTIL_GEN ${CMAKE_BINARY_DIR}/util)
+
+
 set(MAKEDEFS_SRC makedefs.c ${NH_SRC}/monst.c ${NH_SRC}/objects.c
                  ${NH_SRC}/alloc.c ${NH_SRC}/date.c panic.c)
 
 # TODO: Re-add onames.h once "prob error for class 4 (28%)" error is fixed.
-set(MAKEDEFS_HEADERS ${NH_INC_GEN}/date.h # ${NH_INC_GEN}/onames.h
+set(MAKEDEFS_HEADERS ${NH_INC_GEN}/date.h  ${NH_INC_GEN}/onames.h
                      ${NH_INC_GEN}/pm.h)
 
 set(DLB_SRC dlb_main.c ${NH_SRC}/dlb.c panic.c ${NH_SRC}/alloc.c)
@@ -10,6 +18,7 @@ set(DLB_SRC dlb_main.c ${NH_SRC}/dlb.c panic.c ${NH_SRC}/alloc.c)
 file(MAKE_DIRECTORY ${NH_INC_GEN})
 
 add_executable(makedefs ${MAKEDEFS_SRC})
+target_link_libraries(makedefs hacklib)
 target_include_directories(makedefs PRIVATE ${NH_INC} ${NH_INC_GEN}
                                             ${NH_UTIL_GEN} ${LUA_INCLUDE})
 
@@ -17,7 +26,9 @@ add_executable(dlb ${DLB_SRC})
 target_include_directories(dlb PRIVATE ${NH_INC} ${NH_INC_GEN} ${NH_UTIL_GEN}
                                        ${LUA_INCLUDE})
 
-add_executable(recover recover.c)
+add_executable(recover recover.c ../src/version.c)
+target_compile_definitions(recover PUBLIC MINIMAL_FOR_RECOVER)
+target_link_libraries(recover hacklib)
 target_include_directories(recover PRIVATE ${NH_INC} ${NH_INC_GEN}
                                            ${NH_UTIL_GEN} ${LUA_INCLUDE})
 
@@ -47,3 +58,7 @@ set(TXT_DOCS ${NH_DOC}/makedefs.txt ${NH_DOC}/dlb.txt ${NH_DOC}/recover.txt
 install(TARGETS makedefs recover DESTINATION ${INSTDIR})
 install(FILES ${MAN_PAGES} DESTINATION ${INSTDIR}/man)
 install(FILES ${TXT_DOCS} DESTINATION ${INSTDIR}/doc)
+
+add_dependencies(NetHack util)
+
+

@@ -1,0 +1,6 @@
+find_package(Curses)
+if(Curses_FOUND)
+  include_directories(${CURSES_INCLUDE_DIRS})
+  target_link_libraries(NetHack ${CURSES_LIBRARIES})
+  target_sources(NetHack PUBLIC getline.c termcap.c topl.c wintty.c)
+endif()
