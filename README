@@ -79,6 +79,9 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     configuring the program for particular windowing environments.
     Reading them, and the man pages, should answer most of your questions.
 
+    You can also try and build with CMake. The CMake build (at the time of
+    writing this) only supports linux. View CMakeOptions.txt or use ccmake 
+    for configuration.
 
     At the time of the most recent official release, NetHack 5.0, it had
     been tested to run and/or compile on:
