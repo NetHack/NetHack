@@ -1,0 +1,7 @@
+if(REGEX_BACKEND STREQUAL "posix")
+  target_sources(NetHack PUBLIC posixregex.c)
+elseif(REGEX_BACKEND STREQUAL "pmatch")
+  target_sources(NetHack PUBLIC pmatchregex.c)
+elseif(REGEX_BACKEND STREQUAL "cpp")
+  target_sources(NetHack PUBLIC cppregex.cpp)
+endif()

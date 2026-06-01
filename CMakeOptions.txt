@@ -40,6 +40,7 @@ option(WANT_NHUUHID
 set(REGEX_BACKEND "posix" CACHE STRING 
   "Sets the regex implementation to use. Available options are 'posix',
   'pmatch', and 'cpp'")
+set_property(CACHE REGEX_BACKEND PROPERTY STRINGS "posix;pmatch;cpp")
 mark_as_advanced(REGEX_BACKEND)
 
 

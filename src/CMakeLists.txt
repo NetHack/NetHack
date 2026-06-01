@@ -1,9 +1,8 @@
 add_library(hacklib hacklib.c)
 
-
+# TODO cfgfiles.c
 target_sources(NetHack PUBLIC allmain.c alloc.c apply.c artifact.c attrib.c
-  ball.c bones.c botl.c calendar.c cmd.c cfgfiles.c ../sys/share/posixregex.c
-  coloratt.c dbridge.c
+  ball.c bones.c botl.c calendar.c cmd.c cfgfiles.c coloratt.c dbridge.c
   decl.c detect.c dig.c display.c dlb.c do.c do_name.c do_wear.c dog.c
   dogmove.c dokick.c dothrow.c drawing.c dungeon.c earlyarg.c eat.c end.c
   engrave.c exper.c explode.c extralev.c files.c fountain.c getpos.c glyphs.c
@@ -18,5 +17,6 @@ target_sources(NetHack PUBLIC allmain.c alloc.c apply.c artifact.c attrib.c
   strutil.c symbols.c sys.c teleport.c timeout.c topten.c track.c trap.c
   u_init.c uhitm.c utf8map.c vault.c version.c vision.c weapon.c were.c wield.c
   windows.c wizard.c wizcmds.c worm.c worn.c write.c zap.c date.c)
+
 
 target_link_libraries(NetHack hacklib)
