@@ -661,7 +661,7 @@ getbones(void)
     }
 
     program_state.reading_bonesfile = 1;
-    if (validate(nhfp, gb.bones, FALSE) != SF_UPTODATE) {
+    if (validate(nhfp, gb.bones, FALSE, 0) != SF_UPTODATE) {
         if (!wizard)
             pline("Discarding unusable bones; no need to panic...");
         ok = FALSE;

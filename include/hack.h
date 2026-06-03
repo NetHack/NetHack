@@ -821,6 +821,14 @@ struct sinfo {
 #endif
 };
 
+/* structure for current 'level_status'; not saved and restored */
+struct levelstatus {
+    int making;                 /* makelevel has begun */
+    int loading;                /* level loading has begun */
+    int shkready;               /* shops ready */
+    int ready;                  /* level is ready */
+};
+
 /* value of program_state.input_state, significant during readchar();
    get_count() expects digits then a command so sets it to commandInp */
 enum InputState {

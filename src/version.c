@@ -849,11 +849,14 @@ compare_critical_bytes(NHFILE *nhfp, int *idx_1st_mismatch, unsigned long utdfla
  *   SF_DM_MISMATCH                  (9) some other mismatch
  */
 int
-validate(NHFILE *nhfp, const char *name, boolean without_waitsynch_perfile)
+validate(NHFILE *nhfp, const char *name, boolean without_waitsynch_perfile,
+         int additional_utd_flags)
 {
     unsigned long utdflags = 0L;
     int validsf = 0;
 
+if (additional_utd_flags)
+        utdflags |= additional_utd_flags;
 #ifdef SFCTOOL
     utdflags |= UTD_QUIETLY;
 #endif

@@ -412,6 +412,9 @@ endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
 LINK = $(CXX)
+ifndef CROSSCOMPILE
+GENTILEOFILE = $(SRCDIR)/tile.o
+endif
 ifdef WANT_WIN_QT4
 QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config QtGui --cflags)) -DQT_NO_SOUND=1
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config QtGui --libs)

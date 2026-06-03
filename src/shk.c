@@ -1075,6 +1075,18 @@ shop_keeper(char rmno)
                correct the underlying svr.rooms[].resident issue but... */
             return (struct monst *) 0;
         }
+    } else {
+        if (!level_status.shkready) {
+            int hmm UNUSED = 1;
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED \
+     && NH_DEVEL_STATUS != NH_STATUS_POSTRELEASE)
+            impossible("untrustworthy null shkp; level_status.shkready"
+                        " is FALSE (%d, %d, %d, &d)",
+                        level_status.making, level_status.loading,
+                        level_status.shkready, level_status.ready);
+#endif
+            nhUse(hmm);
+        }
     }
     return shkp;
 }

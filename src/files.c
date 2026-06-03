@@ -1269,7 +1269,7 @@ restore_saved_game(void)
 
     nh_uncompress(fq_save);
     if ((nhfp = open_savefile()) != 0) {
-        if ((sfstatus = validate(nhfp, fq_save, FALSE)) != SF_UPTODATE) {
+        if ((sfstatus = validate(nhfp, fq_save, FALSE, 0)) != SF_UPTODATE) {
             close_nhfile(nhfp);
             nhfp = problematic_savefile(sfstatus, fq_save);
         }
@@ -1347,7 +1347,7 @@ check_panic_save(void)
 char *
 plname_from_file(
     const char *filename,
-    boolean without_wait_synch_per_file)
+    boolean without_wait_synch_per_file, int additional_utd_flags)
 {
     NHFILE *nhfp;
     unsigned ln;
@@ -1368,7 +1368,8 @@ plname_from_file(
     nh_uncompress(gs.SAVEF);
     if ((nhfp = open_savefile()) != 0) {
         if ((sfstatus = validate(nhfp, filename,
-                                without_wait_synch_per_file)) == SF_UPTODATE) {
+                                without_wait_synch_per_file,
+                                additional_utd_flags)) == SF_UPTODATE) {
             /* room for "name+role+race+gend+algn X" where the space before
                X is actually NUL and X is playmode: one of '-', 'X', or 'D' */
             ln = (unsigned) PL_NSIZ_PLUS;
@@ -1405,7 +1406,7 @@ get_saved_games(void)
         const char *fq_old_save;
 #endif
         char **files = 0;
-        int i, count_failures = 0;
+        int i, count_failures = 0, utd_flags_to_pass_downstream = 0;
 
         Strcpy(svp.plname, "*");
         set_savefile_name(FALSE);
@@ -1438,7 +1439,11 @@ get_saved_games(void)
             (void) memset((genericptr_t) result, 0, (n + 1) * sizeof (char *));
             for(i = 0; i < n; i++) {
                 char *r;
-                r = plname_from_file(files[i], SUPPRESS_WAITSYNCH_PERFILE);
+                if (!wizard)
+                    utd_flags_to_pass_downstream = UTD_QUIETLY;
+                r = plname_from_file(files[i],
+                                     SUPPRESS_WAITSYNCH_PERFILE,
+                                     utd_flags_to_pass_downstream);
 
                 if (r) {
                     /* this renaming of the savefile is not compatible
@@ -1465,7 +1470,7 @@ get_saved_games(void)
         }
 
         free_saved_games(files);
-        if (count_failures)
+        if (count_failures && !(utd_flags_to_pass_downstream & UTD_QUIETLY))
             wait_synch();
     }
 #endif /* WIN32 */
@@ -1499,7 +1504,7 @@ get_saved_games(void)
 
                         Sprintf(filename, "save/%d%s", uid, name);
                         r = plname_from_file(filename,
-                                             ALLOW_WAITSYNCH_PERFILE);
+                                             ALLOW_WAITSYNCH_PERFILE, 0);
                         if (r)
                             result[j++] = r;
                     }

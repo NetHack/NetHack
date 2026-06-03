@@ -44,6 +44,15 @@ fix an off-by-one in glyph_is_normal_piletop_obj (pr #1547 by ingpaschke)
 replace the hashtable used for parsing glyphnames with sorted indices and
 	reduce the string allocation load during that processing (cherry-pick
 	of pr #1548 by ingpaschke)
+for SELECTSAVE, allow utd flags for uptodate() to be passed down through
+	the small set of callers that eventually call uptodate()
+avoid calling costly_spot(), costly_adjacent(), find_byowner(), which
+	all rely on shop_keeper() under the hood, in the midst of the level
+	loading process before all the required data structures have
+	been finalized
+if the hero has already been told that an engraving vanished, ensure that
+	the engraving marker isn't still showing when prompted for a
+	new engraving
 
 
 Platform- and/or Interface-Specific Fixes
@@ -156,6 +165,11 @@ Windows: setting any map_mode option in the config file could trigger
 Windows: a Windows console debug line began showing up after the sources
 	switched patchlevel.h NH_DEVEL_STATUS from NH_STATUS_RELEASED to 
 	NH_STATUS_POSTRELEASE; make it only ever show if (wizard) is true
+Windows: with SELECTSAVE don't display error messages to a regular player
+	about out-of-date save files encountered while building the
+	saved-game list to select from; the game doesn't offer any
+	action to assist with them presently, and they would have to be
+	dealt with external to the game, so try not to annoy
 tty: allow custom glyph colors if they're basic 16 nethack colors
 	on terminals with less than 256 colors
 

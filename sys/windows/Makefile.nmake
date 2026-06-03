@@ -54,27 +54,30 @@ SOUND_LIBRARIES = windsound
 #------------------------------------------------------------------------------
 # Curses options.
 #
+
+WANT_CURSES=Y
+
 # Do you want console curses included?
 
-CURSES_CONSOLE = Y
+CURSES_CONSOLE=Y
 
 # Do you want graphical curses included?
 
-CURSES_GRAPHICAL = Y
+CURSES_GRAPHICAL=Y
 
 #
 #------------------------------------------------------------------------------
 # Do you want debug information available to the executable?
 #
 
-DEBUGINFO = Y
+DEBUGINFO=Y
 
 #
 #------------------------------------------------------------------------------
 # Do you want to include the address sanitizer?
 #
 
-#WANT_ASAN = Y
+#WANT_ASAN=Y
 
 #------------------------------------------------------------------------------
 # Do you have a connection to the internet available that you want
@@ -82,13 +85,13 @@ DEBUGINFO = Y
 # pdcursesmod source code?
 # Default is now Y. Set it to N if that won't work for you.
 
-INTERNET_AVAILABLE = Y
+INTERNET_AVAILABLE=1
 
 #------------------------------------------------------------------------------
 #
 # Do you have git commands available and NetHack in a git repository?
 
-GIT_AVAILABLE = N
+GIT_AVAILABLE=1
 
 # If not, because you obtained the NetHack sources in a zip file download,
 # set GIT_AVAILABLE = N
@@ -147,12 +150,24 @@ LUAVER=$(LUA_VERSION)
 
 # if GIT=1 is passed on the make command, allow use of git and internet
 !IF "$(GIT)" == "1"
-INTERNET_AVAILABLE=Y
-GIT_AVAILABLE=Y
+INTERNET_AVAILABLE=1
+GIT_AVAILABLE=1
 !ENDIF
 !IF "$(git)" == "1"
-INTERNET_AVAILABLE=Y
-GIT_AVAILABLE=Y
+INTERNET_AVAILABLE=1
+GIT_AVAILABLE=1
+!ENDIF
+!IF "$(GIT)" == "Y"
+INTERNET_AVAILABLE=1
+GIT_AVAILABLE=1
+!ENDIF
+!IF "$(git)" == "y"
+INTERNET_AVAILABLE=1
+GIT_AVAILABLE=1
+!ENDIF
+!IF "$(git)" == "Y"
+INTERNET_AVAILABLE=1
+GIT_AVAILABLE=1
 !ENDIF
 
 #==============================================================================
@@ -252,8 +267,8 @@ LUA_MAY_PROCEED=N
 ADD_CURSES=N
 
 # First, Lua
-!IF "$(INTERNET_AVAILABLE)" == "Y"
-!IF "$(GIT_AVAILABLE)" == "Y"
+!IF "$(INTERNET_AVAILABLE)" == "1"
+!IF "$(GIT_AVAILABLE)" == "1"
 R_LUATOP=$(SUBM)lua
 LUATOP=$(SUBM)lua$(BACKSLASH)
 R_LUASRC=$(R_LUATOP)
@@ -302,15 +317,15 @@ LUA_MAY_PROCEED=Y
 #!MESSAGE LUASRC=$(LUASRC)
 
 !IF "$(LUA_MAY_PROCEED)" != "Y"
-!IF "$(INTERNET_AVAILABLE)" != "Y"
+!IF "$(INTERNET_AVAILABLE)" != "1"
 !MESSAGE Your Makefile settings do not allow use of the internet to obtain Lua
 !ENDIF  # INTERNET_AVAILABLE
 !MESSAGE and no copy of Lua was found in either $(SUBM)lua or $(LIBDIR)lua-$(LUAVER).
 !MESSAGE Change your nmake command line to include:
 !MESSAGE     GIT=1
 !MESSAGE or modify your Makefile to set the following:
-!MESSAGE     INTERNET_AVAILABLE=Y
-!MESSAGE     GIT_AVAILABLE=Y
+!MESSAGE     INTERNET_AVAILABLE=1
+!MESSAGE     GIT_AVAILABLE=1
 !ERROR Stopping because NetHack 5.0 requires Lua for its build.
 !ENDIF  # LUA_MAY_PROCEED
 
@@ -334,8 +349,8 @@ ADD_CURSES=N
 R_PDCDIST=pdcursesmod
 PDCDIST=$(R_PDCDIST)$(BACKSLASH)
 #U_PDCDIST=$(PDCDIST:\=/)
-! IF "$(INTERNET_AVAILABLE)" == "Y"
-!  IF "$(GIT_AVAILABLE)" == "Y"
+! IF "$(INTERNET_AVAILABLE)" == "1"
+!  IF "$(GIT_AVAILABLE)" == "1"
 #!MESSAGE debug spot1
 R_PDCURSES_TOP=$(SUBM)$(R_PDCDIST)
 PDCURSES_TOP=$(R_PDCURSES_TOP)$(BACKSLASH)
@@ -349,7 +364,7 @@ PDCURSES_TOP=$(R_PDCURSES_TOP)$(BACKSLASH)
 ADD_CURSES=Y
 !  ENDIF # GIT_AVAILABLE
 ! ELSE  # NO internet available
-# Your Makefile settings do not allow $(PDCDIST) to be obtained by
+# Your Makefile settings do not allow $(R_PDCDIST) to be obtained by
 # git or by download. Check to see if it is available at one of
 # the expected locations already, with precedence given to ../submodules,
 # then ../lib.
@@ -1593,8 +1608,8 @@ DLB =
 
 all :	package
 
-!IF "$(INTERNET_AVAILABLE)" == "Y"
-!IF "$(GIT_AVAILABLE)" == "Y"
+!IF "$(INTERNET_AVAILABLE)" == "1"
+!IF "$(GIT_AVAILABLE)" == "1"
 $(LUASRC)lua.h:
 	git submodule init $(SUBM)lua
 	git submodule update $(SUBM)lua
@@ -1829,7 +1844,7 @@ $(OUTL)makedefs.o: $(U)makedefs.c $(SRC)mdlib.c $(CONFIG_H) $(INCL)permonst.h \
 
 #
 # This is awful, but it allows the GITHASH, GITBRANCH and GITPREFIX macros to be
-# defined and utilized, using only build-in Windows and nmake commands,
+# defined and utilized, using only built-in Windows and nmake commands,
 # as well as the necessary git commands.
 #
 # We build a temporary Makefile on-the-fly for compiling date.c and
@@ -1839,44 +1854,42 @@ $(OTTY)date.o: $(HACKINCL) $(HACKSRC) $(HACKOBJ) $(ALLOBJTTY) $(CURSESOBJ)
 !IF "$(GIT_AVAILABLE)" == "1"
 	@git rev-parse --verify HEAD 2>&1 >$(OTTY)date1.tmp
 	@git rev-parse --abbrev-ref HEAD 2>&1 >$(OTTY)date2.tmp
-	@git config nethack.substprefix 2>&1 >$(OTTY)date3.tmp
-	@echo.>date.nmk
-	@echo OBJ = $(OBJTTY)>>date.nmk
-	@echo O = ^$(OBJTTY)^^^\>>date.nmk
-	@echo cc = $(cc)>>date.nmk
-	@echo CFLAGS = $(CFLAGS) ^\>>date.nmk
-	@for /F "usebackq" %%A IN ("$(OTTY)date1.tmp") DO @echo.	-DNETHACK_GIT_SHA=\"%%A\" ^\>>date.nmk
-	@for /F "usebackq" %%A IN ("$(OTTY)date2.tmp") DO @echo.	-DNETHACK_GIT_BRANCH=\"%%A\">>date.nmk
-	@for /F "usebackq" %%A IN ("$(OTTY)date3.tmp") DO @echo.	-DNETHACK_GIT_PREFIX=\"%%A\">>date.nmk
-	@echo.>>date.nmk
-	@echo default: ^$(OTTY)date.o>>date.nmk
-	@echo.>>date.nmk
-	@echo ^$(OTTY)date.o: >>date.nmk
-	@echo. 	^$(cc) ^$(CFLAGS) -Fo^$@ date.c>>date.nmk
-	@echo.>>date.nmk
-	@$(MAKE) /NOLOGO /A -f date.nmk
+#	@git config nethack.substprefix 2>&1 >$(OTTY)date3.tmp
+	@echo.>date-tty.nmk
+	@echo cc = $(cc)>>date-tty.nmk
+	@echo CFLAGS = $(CFLAGS) ^\>>date-tty.nmk
+	@for /F "usebackq" %%A IN ("$(OTTY)date1.tmp") DO @echo.	-DNETHACK_GIT_SHA=\"%%A\" ^\>>date-tty.nmk
+	@for /F "usebackq" %%A IN ("$(OTTY)date2.tmp") DO @echo.	-DNETHACK_GIT_BRANCH=\"%%A\">>date-tty.nmk
+#	@for /F "usebackq" %%A IN ("$(OTTY)date2.tmp") DO @echo.	-DNETHACK_GIT_BRANCH=\"%%A\" ^\>>date-tty.nmk
+#	@for /F "usebackq" %%A IN ("$(OTTY)date3.tmp") DO @echo.	-DNETHACK_GIT_PREFIX=\"%%A\">>date-tty.nmk
+	@echo.>>date-tty.nmk
+	@echo default: ^$(OTTY)date.o>>date-tty.nmk
+	@echo.>>date-tty.nmk
+	@echo ^$(OTTY)date.o: >>date-tty.nmk
+	@echo. 	^$(cc) ^$(CFLAGS) -Fo^$@ date.c>>date-tty.nmk
+	@echo.>>date-tty.nmk
+        @$(MAKE) /NOLOGO /A OTTY=objtty\x64\ -f date-tty.nmk
 !ENDIF
 
 $(OGUI)date.o: $(HACKINCL) $(HACKSRC) $(HACKOBJ) $(ALLOBJGUI)
 !IF "$(GIT_AVAILABLE)" == "1"
 	@git rev-parse --verify HEAD 2>&1 >$(OGUI)date1.tmp
 	@git rev-parse --abbrev-ref HEAD 2>&1 >$(OGUI)date2.tmp
-	@git config nethack.substprefix 2>&1 >$(OTTY)date3.tmp
-	@echo.>date.nmk
-	@echo OBJ = $(OBJGUI)>>date.nmk
-	@echo O = ^$(OBJGUI)^^^\>>date.nmk
-	@echo cc = $(cc)>>date.nmk
-	@echo CFLAGS = $(CFLAGS) ^\>>date.nmk
-	@for /F "usebackq" %%A IN ("$(OGUI)date1.tmp") DO @echo.	-DNETHACK_GIT_SHA=\"%%A\" ^\>>date.nmk
-	@for /F "usebackq" %%A IN ("$(OGUI)date2.tmp") DO @echo.	-DNETHACK_GIT_BRANCH=\"%%A\">>date.nmk
-	@for /F "usebackq" %%A IN ("$(OTTY)date3.tmp") DO @echo.	-DNETHACK_GIT_PREFIX=\"%%A\">>date.nmk
-	@echo.>>date.nmk
-	@echo default: ^$(OGUI)date.o>>date.nmk
-	@echo.>>date.nmk
-	@echo ^$(OGUI)date.o: >>date.nmk
-	@echo. 	^$(cc) ^$(CFLAGS) -Fo^$@ date.c>>date.nmk
-	@echo.>>date.nmk
-	@$(MAKE) /NOLOGO /A -f date.nmk
+#	@git config nethack.substprefix 2>&1 >$(OGUI)date3.tmp
+	@echo.>date-gui.nmk
+	@echo cc = $(cc)>>date-gui.nmk
+	@echo CFLAGS = $(CFLAGS) ^\>>date-gui.nmk
+	@for /F "usebackq" %%A IN ("$(OGUI)date1.tmp") DO @echo.	-DNETHACK_GIT_SHA=\"%%A\" ^\>>date-gui.nmk
+	@for /F "usebackq" %%A IN ("$(OGUI)date2.tmp") DO @echo.	-DNETHACK_GIT_BRANCH=\"%%A\">>date-gui.nmk
+#	@for /F "usebackq" %%A IN ("$(OGUI)date2.tmp") DO @echo.	-DNETHACK_GIT_BRANCH=\"%%A\" ^\>>date-gui.nmk
+#	@for /F "usebackq" %%A IN ("$(OGUI)date3.tmp") DO @echo.	-DNETHACK_GIT_PREFIX=\"%%A\">>date-gui.nmk
+	@echo.>>date-gui.nmk
+	@echo default: ^$(OGUI)date.o>>date-gui.nmk
+	@echo.>>date-gui.nmk
+	@echo ^$(OGUI)date.o: >>date-gui.nmk
+	@echo. 	^$(cc) ^$(CFLAGS) -Fo^$@ date.c>>date-gui.nmk
+	@echo.>>date-gui.nmk
+        @$(MAKE) /NOLOGO /A OGUI=$(OGUI) -f date-gui.nmk
 !ENDIF
 
 $(OGUI)sfbase.o: sfbase.c $(HACK_H) $(INCL)sfmacros.h

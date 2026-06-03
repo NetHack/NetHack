@@ -1261,6 +1261,9 @@ makelevel(void)
         impossible("makelevel() called when dungeon not yet initialized.");
         init_dungeons();
     }
+    level_status_init();
+    level_status.making = 1;
+
     oinit(); /* assign level dependent obj probabilities */
     clear_level_structures();
 
@@ -1416,7 +1419,7 @@ makelevel(void)
     for (i = 0; i < svn.nroom; ++i) {
         fill_special_room(&svr.rooms[i]);
     }
-
+    level_status.shkready = 1;
     themerooms_post_level_generate();
 
     if (gl.luacore && nhcb_counts[NHCB_LVL_ENTER]) {
@@ -1425,6 +1428,7 @@ makelevel(void)
         nhl_pcall_handle(gl.luacore, 1, 0, "makelevel", NHLpa_panic);
         lua_settop(gl.luacore, 0);
     }
+    level_status.making = 0, level_status.ready = 1;
 }
 
 /* return TRUE if water location at (x,y) should have kelp. */

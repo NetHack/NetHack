@@ -2354,7 +2354,7 @@ place_object(struct obj *otmp, coordxy x, coordxy y)
     otmp->where = OBJ_FLOOR;
 
     /* if placed outside of shop, no_charge is no longer applicable */
-    if (otmp->no_charge && !costly_spot(x, y)
+    if (level_status.shkready && otmp->no_charge && !costly_spot(x, y)
         && !costly_adjacent(find_objowner(otmp, x, y), x, y))
         otmp->no_charge = 0;
 

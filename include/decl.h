@@ -1288,6 +1288,11 @@ extern struct instance_globals_saved_w svw;
 extern struct instance_globals_saved_x svx;
 extern struct instance_globals_saved_y svy;
 extern struct sinfo program_state; /* flags describing game's current state */
+/* flags describing current level's loading/making/readiness status;
+ * restlevelstate() already associated term 'levelstate' for a different
+ * purpose, so attempt to avoid confusion
+ */
+extern struct levelstatus level_status;
 
 struct const_globals {
     const struct obj zeroobj;      /* used to zero out a struct obj */

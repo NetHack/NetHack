@@ -890,7 +890,7 @@ dorecover(NHFILE *nhfp)
     restoreinfo.mread_flags = 0;
 
     rewind_nhfile(nhfp);        /* return to beginning of file */
-    (void) validate(nhfp, (char *) 0, FALSE);
+    (void) validate(nhfp, (char *) 0, FALSE, 0);
     get_plname_from_file(nhfp, svp.plname, TRUE);
 
     /* not 0 nor REST_GSTATE nor REST_LEVELS */
@@ -1068,6 +1068,8 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
 #endif
 
     program_state.in_getlev = TRUE;
+    level_status_init();
+    level_status.loading = 1;
 #ifndef SFCTOOL
 
     if (ghostly)
@@ -1170,9 +1172,11 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
     dealloc_trap(trap);
 
     fobj = restobjchn(nhfp, FALSE);
-#ifndef SFCTOOL
-    find_lev_obj();
-#endif  /* !SFCTOOL */
+    /* more work needs to be done on fobj in find_lev_obj() further down,
+     * but that needs to happen after set_residency() so that shop_keeper()
+     * will return correct results during the processing.
+     */
+
     /* restobjchn()'s `frozen' argument probably ought to be a callback
        routine so that we can check for objects being buried under ice */
     svl.level.buriedobjlist = restobjchn(nhfp, FALSE);
@@ -1202,7 +1206,6 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
             if (hides_under(mtmp->data) && mtmp->mundetected)
                 (void) hideunder(mtmp);
         }
-
         /* regenerate monsters while on another level */
         if (!u.uz.dlevel || program_state.restoring == REST_LEVELS)
             continue;
@@ -1225,6 +1228,11 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
         if (ghostly || (elapsed > 0L && elapsed > (long) rnd(10)))
             hide_monst(mtmp);
     }
+    level_status.shkready = 1;
+    /* post-5.0.0: this is now postponed until here so that it takes place
+       after set_residency() has been called */
+    find_lev_obj();
+
 #endif /* !SFCTOOL */
 
     restdamage(nhfp);
@@ -1308,12 +1316,13 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
 
     if (ghostly)
         clear_id_mapping();
+#endif
+    level_status.loading = 0, level_status.ready = 1;
     program_state.in_getlev = FALSE;
-#else
+#ifdef SFCTOOL
     nhUse(pid);
     nhUse(lev);
 #endif /* !SFCTOOL */
-    program_state.in_getlev = FALSE;
 }
 
 void
