@@ -51,6 +51,8 @@ add_dirty_rect(dirty_rect *dr, GRECT *area)
     int cheapestmerge2 = -1;
     int merge1;
     int merge2;
+    if (dr == NULL || dr->rects == NULL)
+        return (FALSE);
     for (cursor = 0; cursor < dr->used; cursor++) {
         if (gc_inside(&dr->rects[cursor], area)) {
             /* Wholly contained already. */
