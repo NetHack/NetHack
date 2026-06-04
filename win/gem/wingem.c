@@ -749,7 +749,7 @@ Gem_add_menu(winid window, const glyph_info *glyphinfo,
     int glyph = glyphinfo ? glyphinfo->glyph : NO_GLYPH;
     Gem_menu_item *G_item;
     const char *newstr;
-    char buf[QBUFSZ];
+    char buf[4 + BUFSZ];
 
     if (str == (const char *) 0)
         return;
