@@ -138,7 +138,7 @@ fopen_xpm_file(const char *fn, const char *mode)
         if (!ColorMap)
             return FALSE;
         while (ccount++ < (num_colors - 1)) {
-            char index;
+            unsigned char index;
             int r, g, b;
             xb = xpmgetline();
             if (xb == 0)
