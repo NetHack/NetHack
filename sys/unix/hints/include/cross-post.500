@@ -407,6 +407,10 @@ $(TARGETPFX)giftiles.o : ../win/share/giftiles.c
 endif  # CROSS_SHARED
 #
 ifdef CROSS
+ifdef MAKEFILE_TOP
+# top-level liblua.a is a host-side build; keep TARGET_CC out of it
+LUAMAKEFLAGS = CC='$(CC)' SYSCFLAGS='$(SYSCFLAGS)'
+endif  # MAKEFILE_TOP
 $(TARGETPFX)hacklib.a: $(TARGETPFX)hacklib.o
 	$(TARGET_AR) $(TARGET_ARFLAGS) $@ $(TARGETPFX)hacklib.o
 ifdef MAKEFILE_UTL
