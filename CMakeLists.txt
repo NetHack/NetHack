@@ -38,7 +38,7 @@ if(NOT HAVE_BACKTRACE)
 endif()
 
 add_compile_definitions(NetHack PUBLIC SYSCF
-  HACKDIR="/home/mark/source/NetHack/install/lib/nethackdir")
+  HACKDIR=\"${HACKDIR}\")
 
 add_subdirectory(win)
 add_subdirectory(src)
