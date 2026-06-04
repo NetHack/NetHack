@@ -16,12 +16,15 @@ include_directories(include)
 
 add_executable(NetHack)
 
+if(WANT_WIN_CURSES)
+  add_compile_definitions(CURSES_GRAPHICS)
+endif()
 
 if(NOT LUA_SUPPORT EQUAL No)
   find_package(Lua 5.4)
   if(Lua_FOUND)
     include_directories(SYSTEM ${LUA_INCLUDE_DIR})
-    add_compile_definitions(NetHack PUBLIC NETHACK_LUA_SUPPORT)
+    add_compile_definitions(NETHACK_LUA_SUPPORT)
     target_link_libraries(NetHack ${LUA_LIBRARIES})
   elseif(LUA_SUPPORT EQUAL Yes)
     message(FATAL "LUA_SUPPORT was set to 'Yes' but Lua 5.4 was not found")

@@ -13,6 +13,8 @@ set_property(CACHE LUA_SUPPORT PROPERTY STRINGS "Auto;Yes;No")
 option(WANT_WIN_TTY "Include support for the TTY interface" ON)
 option(WANT_WIN_CURSES "Include support for the curses interface" OFF)
 option(WANT_WIN_X11 "Include support for the X11 interface" OFF)
+option(SHIM_GRAPHICS "" OFF)
+mark_as_advanced(SHIM_GRAPHICS)
 
 set(WANT_WIN_QT "none" CACHE STRING 
   "Include support for the qt5 or qt6 interface")
@@ -42,6 +44,13 @@ set(REGEX_BACKEND "posix" CACHE STRING
   'pmatch', and 'cpp'")
 set_property(CACHE REGEX_BACKEND PROPERTY STRINGS "posix;pmatch;cpp")
 mark_as_advanced(REGEX_BACKEND)
+
+option(STUPID "Avoid some complicated expressions if your C compiler chokes on
+them")
+option(MINIMAL_TERM "If a terminal handles highlighting or tabs poorly try 
+turning this option on")
+option(ULTRIX_CC20 "define only if using cc v2.0 on a DECstation")
+option(ULTRIX_PROTO "define for Ultrix 4.0 (or higher) on a DECstation")
 
 
 
