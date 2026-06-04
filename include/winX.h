@@ -287,6 +287,8 @@ struct xwindow {
                           * and dumplog message history */
 #define YN_NO_DEFAULT 2U /* don't convert quitchars to 0 or ESC to q/n/def */
 
+#define DELAY_EVENT_ID 66 /* arbitrary byte value */
+
 /* Window variables (winX.c). */
 extern struct xwindow window_list[MAX_WINDOWS];
 extern XtAppContext app_context; /* context of application */
