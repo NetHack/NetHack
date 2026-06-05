@@ -53,6 +53,8 @@ avoid calling costly_spot(), costly_adjacent(), find_byowner(), which
 if the hero has already been told that an engraving vanished, ensure that
 	the engraving marker isn't still showing when prompted for a
 	new engraving
+aklys path shouldn't be shown for locations that the hero cannot see
+keep the player better-informed about status of the tether on their weapon
 
 
 Platform- and/or Interface-Specific Fixes

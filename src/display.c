@@ -1164,6 +1164,7 @@ tether_glyph(coordxy x, coordxy y)
 
 static struct tmp_glyph {
     coord saved[TMP_AT_MAX_GLYPHS]; /* previously updated positions */
+    boolean shown_on_map[TMP_AT_MAX_GLYPHS];
     int sidx;                       /* index of next unused slot in saved[] */
     int style; /* either DISP_BEAM or DISP_FLASH or DISP_ALWAYS */
     int glyph; /* glyph to use when printing */
@@ -1175,6 +1176,7 @@ tmp_at(coordxy x, coordxy y)
 {
     static struct tmp_glyph *tglyph = (struct tmp_glyph *) 0;
     struct tmp_glyph *tmp;
+    boolean suppress_show = FALSE;
 
     switch (x) {
     case DISP_BEAM:
@@ -1220,27 +1222,42 @@ tmp_at(coordxy x, coordxy y)
                 int i;
 
                 /* Erase (reset) from source to end */
-                for (i = 0; i < tglyph->sidx; i++)
+                for (i = 0; i < tglyph->sidx; i++) {
                     newsym(tglyph->saved[i].x, tglyph->saved[i].y);
+                    tglyph->shown_on_map[i] = FALSE;
+                }
             } else if (tglyph->style == DISP_TETHER) {
                 int i;
 
                 if (y == BACKTRACK && tglyph->sidx > 1) {
                     /* backtrack */
                     for (i = tglyph->sidx - 1; i > 0; i--) {
-                        newsym(tglyph->saved[i].x, tglyph->saved[i].y);
-                        show_glyph(tglyph->saved[i - 1].x,
-                                   tglyph->saved[i - 1].y, tglyph->glyph);
-                        flush_screen(0); /* make sure it shows up */
-                        nh_delay_output();
+                        if (tglyph->shown_on_map[i]) {
+                            newsym(tglyph->saved[i].x, tglyph->saved[i].y);
+                            tglyph->shown_on_map[i] = FALSE;
+                        }
+                        if (cansee(tglyph->saved[i - 1].x,
+                                   tglyph->saved[i - 1].y)) {
+                            tglyph->shown_on_map[i - 1] = TRUE;
+                            show_glyph(tglyph->saved[i - 1].x,
+                                       tglyph->saved[i - 1].y, tglyph->glyph);
+                            flush_screen(0); /* make sure it shows up */
+                            nh_delay_output();
+                        }
                     }
                     tglyph->sidx = 1;
                 }
-                for (i = 0; i < tglyph->sidx; i++)
-                    newsym(tglyph->saved[i].x, tglyph->saved[i].y);
+                for (i = 0; i < tglyph->sidx; i++) {
+                    if (tglyph->shown_on_map[i])
+                        newsym(tglyph->saved[i].x, tglyph->saved[i].y);
+                }
             } else {              /* DISP_FLASH or DISP_ALWAYS */
-                if (tglyph->sidx) /* been called at least once */
-                    newsym(tglyph->saved[0].x, tglyph->saved[0].y);
+                if (tglyph->sidx) { /* been called at least once */
+                    if (tglyph->shown_on_map[0]) {
+                        newsym(tglyph->saved[0].x, tglyph->saved[0].y);
+                        tglyph->shown_on_map[0] = FALSE;
+                    }
+                }
             }
             /* tglyph->sidx = 0; -- about to be freed, so not necessary */
             tmp = tglyph->prev;
@@ -1253,10 +1270,13 @@ tmp_at(coordxy x, coordxy y)
             if (!isok(x, y))
                 break;
             if (tglyph->style == DISP_BEAM || tglyph->style == DISP_ALL) {
-                if (tglyph->style != DISP_ALL && !cansee(x, y))
-                    break;
                 if (tglyph->sidx >= TMP_AT_MAX_GLYPHS)
                     break; /* too many locations */
+                if (tglyph->style != DISP_ALL && !cansee(x, y)) {
+                    tglyph->shown_on_map[tglyph->sidx] = FALSE;
+                    suppress_show = TRUE;
+                    break;
+                }
                 /* save pos for later erasing */
                 tglyph->saved[tglyph->sidx].x = x;
                 tglyph->saved[tglyph->sidx].y = y;
@@ -1269,26 +1289,47 @@ tmp_at(coordxy x, coordxy y)
 
                     px = tglyph->saved[tglyph->sidx - 1].x;
                     py = tglyph->saved[tglyph->sidx - 1].y;
-                    show_glyph(px, py, tether_glyph(px, py));
+                    if (cansee(px, py)) {
+                        tglyph->shown_on_map[tglyph->sidx - 1] = TRUE;
+                        show_glyph(px, py, tether_glyph(px, py));
+                    } else {
+                        tglyph->shown_on_map[tglyph->sidx - 1] = FALSE;
+                        suppress_show = TRUE;
+                    }
                 }
                 /* save pos for later use or erasure */
                 tglyph->saved[tglyph->sidx].x = x;
                 tglyph->saved[tglyph->sidx].y = y;
+                if (!cansee(x, y)) {
+                    tglyph->shown_on_map[tglyph->sidx] = FALSE;
+                    suppress_show = TRUE;
+                } else {
+                    /* happens at end of this default case */
+                    tglyph->shown_on_map[tglyph->sidx] = TRUE;
+                }
                 tglyph->sidx += 1;
             } else { /* DISP_FLASH/ALWAYS */
-                if (tglyph
-                        ->sidx) { /* not first call, so reset previous pos */
+                if (tglyph->sidx) { /* not first call, so reset previous pos */
                     newsym(tglyph->saved[0].x, tglyph->saved[0].y);
+                    tglyph->shown_on_map[0] = FALSE;
                     tglyph->sidx = 0; /* display is presently up to date */
                 }
-                if (!cansee(x, y) && tglyph->style != DISP_ALWAYS)
+                if (!cansee(x, y) && tglyph->style != DISP_ALWAYS) {
+                    suppress_show = TRUE;
+                    tglyph->shown_on_map[0] = FALSE;
                     break;
+                } else {
+                    /* happens at end of this default case */
+                    tglyph->shown_on_map[0] = TRUE;
+                }
                 tglyph->saved[0].x = x;
                 tglyph->saved[0].y = y;
                 tglyph->sidx = 1;
             }
 
-            show_glyph(x, y, tglyph->glyph); /* show it */
+            if (!suppress_show)
+                show_glyph(x, y, tglyph->glyph); /* show it */
+
             flush_screen(0);                 /* make sure it shows up */
             break;
         } /* end switch */

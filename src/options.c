@@ -7426,9 +7426,11 @@ allopt_array_init(void)
                                    allopt[i].opt_in_out ? "on" : "off", "initval",
                                    allopt[i].initval ? "on" : "off");
 #endif
-                if (allopt[i].opttyp == BoolOpt)
+#if 0
+                if (allopt[i].opttyp == BoolOpt && i != opt_ascii_map)
                     allopt[i].initval = allopt[i].opt_in_out;
-                *(allopt[i].addr) = allopt[i].initval;
+#endif
+		*(allopt[i].addr) = allopt[i].initval;
             }
         }
         heed_all_options();
