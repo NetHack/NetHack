@@ -1,4 +1,4 @@
-/* NetHack 3.6	macwin.c	$NHDT-Date: 1432512796 2015/05/25 00:13:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
+/* NetHack 5.0	macwin.c	$NHDT-Date: 1432512796 2015/05/25 00:13:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) Jon W{tte, Hao-Yang Wang, Jonathan Handler 1992. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,73 +11,20 @@
 #include "macwin.h"
 #include "mactty.h"
 #include "wintty.h"
+#include "mactile.h"
+#include "macmap.h"
 
-#if 1 /*!TARGET_API_MAC_CARBON*/
+extern short gTileMenuNeedsUpdate;
+
 #include <LowMem.h>
 #include <AppleEvents.h>
 #include <Gestalt.h>
 #include <TextUtils.h>
 #include <DiskInit.h>
-#include <ControlDefinitions.h>
-#endif
 
 /**********************************************************************
  *	Local variables and functions
  */
-
-#if 0 // TARGET_API_MAC_CARBON
-static EventTypeSpec baseevents[] = {
-	{ kEventClassKeyboard, kEventRawKeyDown },
-	{ kEventClassKeyboard, kEventRawKeyRepeat },
-	{ kEventClassMouse, kEventMouseMoved },
-	{ kEventClassWindow, kEventWindowDrawContent },
-	{ kEventClassWindow, kEventWindowHandleContentClick },
-	{ kEventClassWindow, kEventWindowClose }
-};
-
-static EventTypeSpec msgevents[] = {
-	{ kEventClassControl, kEventControlHit },
-	{ kEventClassKeyboard, kEventRawKeyDown },
-	{ kEventClassKeyboard, kEventRawKeyRepeat },
-	{ kEventClassWindow, kEventWindowDrawContent },
-	{ kEventClassWindow, kEventWindowHandleContentClick },
-	{ kEventClassWindow, kEventWindowClose }
-};
-
-static EventTypeSpec menwevents[] = {
-	{ kEventClassControl, kEventControlHit },
-	{ kEventClassKeyboard, kEventRawKeyDown },
-	{ kEventClassKeyboard, kEventRawKeyRepeat },
-	{ kEventClassWindow, kEventWindowDrawContent },
-	{ kEventClassWindow, kEventWindowHandleContentClick },
-	{ kEventClassWindow, kEventWindowClose }
-};
-
-static EventTypeSpec textevents[] = {
-	{ kEventClassControl, kEventControlHit },
-	{ kEventClassKeyboard, kEventRawKeyDown },
-	{ kEventClassKeyboard, kEventRawKeyRepeat },
-	{ kEventClassWindow, kEventWindowDrawContent },
-	{ kEventClassWindow, kEventWindowClose }
-};
-
-static EventTypeSpec globalevents[] = {
-	{ kEventClassCommand, kEventCommandProcess }
-};
-
-EventTargetRef dispatcher;
-EventHandlerUPP baseupp, msgupp, menwupp, textupp;
-
-static pascal OSStatus BaseEvent(EventHandlerCallRef, EventRef, void *);
-static void            MsgUpdate(NhWindow *wind);
-static pascal OSStatus MsgEvent(EventHandlerCallRef, EventRef, void *);
-static void            MenwUpdate(NhWindow *wind);
-static pascal OSStatus MenwEvent(EventHandlerCallRef, EventRef, void *);
-static void            TextUpdate(NhWindow *wind);
-static pascal OSStatus TextEvent(EventHandlerCallRef, EventRef, void *);
-static pascal OSStatus GlobalEvent(EventHandlerCallRef, EventRef, void *);
-
-#else
 
 static void GeneralKey(EventRecord *, WindowPtr);
 static void macKeyMenu(EventRecord *, WindowPtr);
@@ -95,9 +42,10 @@ static short GeneralUpdate(EventRecord *, WindowPtr);
 
 static void macCursorTerm(EventRecord *, WindowPtr, RgnHandle);
 static void GeneralCursor(EventRecord *, WindowPtr, RgnHandle);
-#endif
 
 static void TextUpdate(NhWindow *wind);
+static void MenwUpdate(NhWindow *wind);
+static void record_menu_line_style(NhWindow *, short, short, int, int);
 
 NhWindow *theWindows = (NhWindow *) 0;
 Cursor qdarrow;
@@ -105,7 +53,6 @@ Cursor qdarrow;
 /* Borrowed from the Mac tty port */
 extern WindowPtr _mt_window;
 
-/* Some useful #defines for the scroll bar width and height */
 #define SBARWIDTH 15
 #define SBARHEIGHT 15
 
@@ -120,7 +67,10 @@ extern WindowPtr _mt_window;
 static TEHandle top_line = (TEHandle) nil;
 static int topl_query_len;
 static int topl_def_idx = -1;
-static char topl_resp[10] = "";
+static char topl_resp[BUFSZ] = "";
+/* previous WIN_MESSAGE line was transient (ATR_NOHISTORY), so the next
+   transient line replaces it in place; mac_clear_nhwindow resets it */
+static char gLastMsgTransient = 0;
 
 #define CHAR_ANY '\n'
 
@@ -150,6 +100,8 @@ static Boolean cursor_locked = false;
 static ControlActionUPP
     MoveScrollUPP; /* scrolling callback, init'ed in InitMac */
 
+/* called from getpos.c during farlook; the flag is recorded but nothing
+   reads it yet (cursor shaping during farlook is on the UI punch list) */
 void
 lock_mouse_cursor(Boolean new_cursor_locked)
 {
@@ -217,12 +169,9 @@ Boolean small_screen = 0;
 
 static int filter_scroll_key(const int, NhWindow *);
 
-#if 1 //!TARGET_API_MAC_CARBON
 static void DoScrollBar(Point, short, ControlHandle, NhWindow *);
-#endif
 static pascal void MoveScrollBar(ControlHandle, short);
 
-#if 1 //!TARGET_API_MAC_CARBON
 typedef void (*CbFunc)(EventRecord *, WindowPtr);
 typedef short (*CbUpFunc)(EventRecord *, WindowPtr);
 typedef void (*CbCursFunc)(EventRecord *, WindowPtr, RgnHandle);
@@ -246,15 +195,17 @@ static const CbCursFunc winCursorFuncs[NUM_FUNCS] = {
     (CbCursFunc) macDoNull, GeneralCursor, macCursorTerm,
     macCursorTerm,          GeneralCursor, GeneralCursor
 };
-#endif
 
 static NhWindow *
 GetNhWin(WindowPtr mac_win)
 {
-    if (mac_win == _mt_window) /* term window is still maintained by both
-                                  systems, and */
-        return theWindows; /* WRefCon still refers to tty struct, so we have
-                              to map it */
+    if (mac_win == _mt_window) /* WRefCon points at the tty struct, not us */
+        return theWindows;
+    /* Map window uses MACMAP_REFCON, not an NhWindow pointer. */
+    if (mac_win && GetWRefCon(mac_win) == MACMAP_REFCON
+        && WIN_MAP != WIN_ERR) {
+        return &theWindows[WIN_MAP];
+    }
     else {
         NhWindow *aWin = (NhWindow *) GetWRefCon(mac_win);
         if (aWin >= theWindows && aWin < &theWindows[NUM_MACWINDOWS])
@@ -273,15 +224,11 @@ static pascal OSErr
 AppleEventHandler(const AppleEvent *inAppleEvent, AppleEvent *outAEReply,
                   long inRefCon)
 {
-#if defined(__SC__) || defined(__MRC__)
-#pragma unused(outAEReply, inRefCon)
-#endif
     Size actualSize;
     DescType typeCode;
     AEEventID EventID;
     OSErr err;
 
-    /* Get Event ID */
     err = AEGetAttributePtr(inAppleEvent, keyEventIDAttr, typeType, &typeCode,
                             &EventID, sizeof(EventID), &actualSize);
     if (err == noErr) {
@@ -338,8 +285,7 @@ AppleEventHandler(const AppleEvent *inAppleEvent, AppleEvent *outAEReply,
         }
     }
 
-    /* Check to see if all required parameters for this type of event are
-     * present */
+    /* Verify all required parameters for this event type are present */
     if (err == noErr) {
         err =
             AEGetAttributePtr(inAppleEvent, keyMissedKeywordAttr,
@@ -355,6 +301,7 @@ AppleEventHandler(const AppleEvent *inAppleEvent, AppleEvent *outAEReply,
 
 short win_fonts[NHW_TEXT + 1];
 
+
 void
 InitMac(void)
 {
@@ -362,65 +309,50 @@ InitMac(void)
     long l;
     Str255 volName;
 
-#if !TARGET_API_MAC_CARBON
-    if (LMGetDefltStack() < 50 * 1024L) {
-        SetApplLimit((void *) ((long) LMGetCurStackBase() - (50 * 1024L)));
+    if (LMGetDefltStack() < 256 * 1024L) {
+        SetApplLimit((void *) ((long) LMGetCurStackBase() - (256 * 1024L)));
     }
     MaxApplZone();
     for (i = 0; i < 5; i++)
         MoreMasters();
 
+    /* Zero the A5-relative QD globals (A5-4..A5-206): the Segment Loader
+       doesn't, and ROM Color QD reads them, so stale values crash relaunch */
+    {
+        char *a5 = (char *) SetCurrentA5();
+        memset(a5 - 206, 0, 206);
+    }
     InitGraf(&qd.thePort);
     InitFonts();
     InitWindows();
     InitMenus();
     InitDialogs(0L);
     TEInit();
-#endif
 
     memset(&macFlags, 0, sizeof(macFlags));
-    if (!Gestalt(gestaltOSAttr, &l)) {
-        macFlags.processes = (l & (1 << gestaltLaunchControl)) ? 1 : 0;
-        macFlags.tempMem = (l & (1 << gestaltRealTempMemory)) ? 1 : 0;
+    if (!Gestalt(gestaltOSAttr, &l))
         macFlags.hasDebugger = (l & (1 << gestaltSysDebuggerSupport)) ? 1 : 0;
-    }
     if (!Gestalt(gestaltQuickdrawVersion, &l))
         macFlags.color = (l >= gestalt8BitQD) ? 1 : 0;
 
-    if (!Gestalt(gestaltFindFolderAttr, &l))
-        macFlags.folders = (l & (1 << gestaltFindFolderPresent)) ? 1 : 0;
-
-    if (!Gestalt(gestaltHelpMgrAttr, &l))
-        macFlags.help = (l & (1 << gestaltHelpMgrPresent)) ? 1 : 0;
-
-    if (!Gestalt(gestaltFSAttr, &l))
-        macFlags.fsSpec = (l & (1 << gestaltHasFSSpecCalls)) ? 1 : 0;
-
-    if (!Gestalt(gestaltFontMgrAttr, &l))
-        macFlags.trueType = (l & (1 << gestaltOutlineFonts)) ? 1 : 0;
-
-    if (!Gestalt(gestaltAUXVersion, &l))
-        macFlags.aux = (l >= 0x200) ? 1 : 0;
-
-    if (!Gestalt(gestaltAliasMgrAttr, &l))
-        macFlags.alias = (l & (1 << gestaltAliasMgrPresent)) ? 1 : 0;
-
-    if (!Gestalt(gestaltStandardFileAttr, &l))
-        macFlags.standardFile = (l & (1 << gestaltStandardFile58)) ? 1 : 0;
-
     gMouseRgn = NewRgn();
+    if (!gMouseRgn)
+        error("InitMac: NewRgn (mouse region) failed");
     InitCursor();
-    GetQDGlobalsArrow(&qdarrow);
+    qdarrow = qd.arrow;
     ObscureCursor();
 
     MoveScrollUPP = NewControlActionUPP(MoveScrollBar);
+    if (!MoveScrollUPP)
+        error("InitMac: NewControlActionUPP failed");
 
     /* Set up base fonts for all window types */
-    GetFNum("\pHackFont", &i);
+    GetFNum(P_STRING_CONV("HackFont"), &i);
     if (i == 0)
         i = kFontIDMonaco;
     win_fonts[NHW_BASE] = win_fonts[NHW_MAP] = win_fonts[NHW_STATUS] = i;
-    GetFNum("\pPSHackFont", &i);
+    win_fonts[NHW_MENU] = i;   /* fixed-width so menu columns line up */
+    GetFNum(P_STRING_CONV("PSHackFont"), &i);
     if (i == 0)
         i = kFontIDGeneva;
     win_fonts[NHW_MESSAGE] = i;
@@ -435,18 +367,10 @@ InitMac(void)
             macFlags.hasAE = 1;
     }
 
-#if TARGET_API_MAC_CARBON
-    HGetVol(volName, &theDirs.dataRefNum, &theDirs.dataDirID);
-#else
-    /*
-     * We should try to get this data from a rsrc, in the profile file
-     * the user double-clicked...  This data should be saved with the
-     * save file in the resource fork, AND be saveable in "stationary"
-     */
     GetVol(volName, &theDirs.dataRefNum);
     GetWDInfo(theDirs.dataRefNum, &theDirs.dataRefNum, &theDirs.dataDirID,
               &l);
-#endif
+    /* truncate at the first ':' (and to Str32) to get the bare volume name */
     if (volName[0] > 31)
         volName[0] = 31;
     for (l = 1; l <= volName[0]; l++) {
@@ -456,31 +380,27 @@ InitMac(void)
             break;
         }
     }
-    BlockMove(volName, theDirs.dataName, l);
-    BlockMove(volName, theDirs.saveName, l);
-    BlockMove(volName, theDirs.levelName, l);
+    BlockMove(volName, theDirs.dataName, volName[0] + 1);
+    BlockMove(volName, theDirs.saveName, volName[0] + 1);
+    BlockMove(volName, theDirs.levelName, volName[0] + 1);
     theDirs.saveRefNum = theDirs.levelRefNum = theDirs.dataRefNum;
     theDirs.saveDirID = theDirs.levelDirID = theDirs.dataDirID;
 
     /* Create the "record" file, if necessary */
     check_recordfile("");
 
-#if 0 // TARGET_API_MAC_CARBON
-	/* Create event handler universal procedure pointers */
-	dispatcher = GetEventDispatcherTarget();
-	baseupp = NewEventHandlerUPP(BaseEvent);
-	msgupp = NewEventHandlerUPP(MsgEvent);
-	menwupp = NewEventHandlerUPP(MenwEvent);
-	textupp = NewEventHandlerUPP(TextEvent);
-	InstallApplicationEventHandler(NewEventHandlerUPP(GlobalEvent),
-		sizeof(globalevents)/sizeof(EventTypeSpec), globalevents, NULL, NULL);
-#endif
     return;
 }
 
-/*
- * Change default window fonts.
- */
+/* options.c (pfxfn_font, under #ifdef MACOS9) calls this by name when the
+   winprocs set_font_name macro is inactive (NO_CHANGE_COLOR builds). */
+short
+set_font_name(int window_type, char *font_name)
+{
+    return set_tty_font_name(window_type, font_name);
+}
+
+/* Change default window fonts. */
 short
 set_tty_font_name(int window_type, char *font_name)
 {
@@ -508,8 +428,8 @@ DrawScrollbar(NhWindow *aWin)
 
     if (!aWin->scrollBar)
         return;
-    GetControlBounds(aWin->scrollBar, &crect);
-    GetWindowBounds(aWin->its_window, kWindowContentRgn, &wrect);
+    crect = (**aWin->scrollBar).contrlRect;
+    GetWindowPortBounds(aWin->its_window, &wrect);
     OffsetRect(&wrect, -wrect.left, -wrect.top);
     win_height = wrect.bottom - wrect.top;
 
@@ -522,29 +442,26 @@ DrawScrollbar(NhWindow *aWin)
                     win_height - SBARHEIGHT + 2);
     }
     vis = (win_height > (50 + SBARHEIGHT));
-    if (vis != IsControlVisible(aWin->scrollBar)) {
-        /* current status != control */
-        if (vis) /* if visible, show */
+    if (vis != ((** aWin->scrollBar).contrlVis != 0)) {
+        if (vis)
             ShowControl(aWin->scrollBar);
-        else /* else hide */
+        else
             HideControl(aWin->scrollBar);
     }
     lin = aWin->y_size;
     if (aWin == theWindows + WIN_MESSAGE) {
-        /* calculate how big scroll bar is for message window */
         lin -= (win_height - SBARHEIGHT) / aWin->row_height;
         if (lin < 0)
             lin = 0;
         val = 0; /* always have message scrollbar active */
     } else {
-        /* calculate how big scroll bar is for other windows */
         lin -= win_height / aWin->row_height;
         if (lin < 0)
             lin = 0;
         if (lin)
-            val = 0; /* if there are 1+ screen lines, activate scrollbar */
+            val = 0;   /* off-screen lines exist: activate */
         else
-            val = 255; /* else grey it out */
+            val = 255; /* none: grey out */
     }
     SetControlMaximum(aWin->scrollBar, lin);
     HiliteControl(aWin->scrollBar, val);
@@ -555,105 +472,101 @@ DrawScrollbar(NhWindow *aWin)
     }
 }
 
-#define MAX_HEIGHT 100
 #define MIN_HEIGHT 50
-#define MIN_WIDTH 300
 
-/*
- * This function could be overloaded with any amount of intelligence...
- */
 int
 SanePositions(void)
 {
-#if TARGET_API_MAC_CARBON
-    Rect rbase, rmsg;
-    SInt16 i, width, height;
-
-    ConstrainWindowToScreen(_mt_window, kWindowContentRgn,
-                            kWindowConstrainMoveRegardlessOfFit, NULL, NULL);
-    GetWindowBounds(_mt_window, kWindowContentRgn, &rbase);
-    if (RetrievePosition(kMapWindow, &rbase.top, &rbase.left))
-        MoveWindow(_mt_window, rbase.left, rbase.top, TRUE);
-
-    GetWindowBounds(theWindows[NHW_MESSAGE].its_window, kWindowContentRgn,
-                    &rmsg);
-    height = rmsg.bottom - rmsg.top;
-    rmsg.top = rbase.bottom + 2;
-    rmsg.bottom = rmsg.top + height;
-    rmsg.left = rbase.left;
-    rmsgr.right = rbase.right;
-    RetrievePosition(kMessageWindow, &rmsg.top, &rmsg.left);
-    if (RetrieveSize(kMessageWindow, rmsg.top, rmsg.left, &height, &width)) {
-        rmsgr.right = rmsg.left + width;
-        rmsg.bottom = rmsg.top + height;
-    }
-    SetWindowBounds(theWindows[NHW_MESSAGE].its_window, kWindowContentRgn,
-                    &rmsg);
-    ConstrainWindowToScreen(theWindows[NHW_MESSAGE].its_window,
-                            kWindowContentRgn,
-                            kWindowConstrainMoveRegardlessOfFit, NULL, NULL);
-    DrawScrollbar(&theWindows[NHW_MESSAGE]);
-
-    for (i = 0; i < NUM_MACWINDOWS; i++)
-        if (i != WIN_STATUS && i != WIN_MESSAGE && i != WIN_MAP
-            && i != BASE_WINDOW && theWindows[i].its_window) {
-            /* FIXME */
-            ConstrainWindowToScreen(
-                theWindows[i].its_window, kWindowContentRgn,
-                kWindowConstrainMoveRegardlessOfFit, NULL, NULL);
-        }
-#else
-    short left, top, width, height;
+    WindowPtr mapw = (WIN_MAP != WIN_ERR && theWindows[WIN_MAP].its_window)
+                     ? theWindows[WIN_MAP].its_window : _mt_window;
+    short left, top;
     int ix, numText = 0, numMenu = 0;
     int mbar_height = GetMBarHeight();
     BitMap qbitmap;
     Rect screenArea;
     WindowPtr theWindow;
-    NhWindow *nhWin;
+    WindowPtr msgw   = theWindows[WIN_MESSAGE].its_window;
+    WindowPtr statw  = _mt_window;
+    Rect mr, statr;
+    short msg_h, map_h, stat_h, content_left, content_w;
 
-    screenArea = GetQDGlobalsScreenBits(&qbitmap)->bounds;
+    screenArea = qd.screenBits.bounds;
     OffsetRect(&screenArea, -screenArea.left, -screenArea.top);
 
-    /* Map Window */
-    height = _mt_window->portRect.bottom - _mt_window->portRect.top;
-    width = _mt_window->portRect.right - _mt_window->portRect.left;
+    /* status window was shrunk to its status rows at creation; read that height */
+    GetWindowPortBounds(statw, &statr);
+    stat_h = statr.bottom - statr.top;
 
-    if (!RetrievePosition(kMapWindow, &top, &left)) {
-        top = mbar_height + (small_screen ? 2 : 20);
-        left = (screenArea.right - width) / 2;
-    }
-    MoveWindow(_mt_window, left, top, 1);
+    {
+        short title_h = small_screen ? 0 : 20;   /* title bar + small gap */
+        short y = mbar_height + (small_screen ? 2 : 4);
+        short msg_top, map_top, stat_top, avail_map_h, avail_map_w;
+        /* Honor saved window positions only on large screens, where windows
+           are movable. Small (borderless) screens always get the clean stack
+           since the windows can't be dragged/saved anyway. */
+        Boolean honor = !small_screen;
 
-    /* Message Window */
-    if (!RetrievePosition(kMessageWindow, &top, &left)) {
-        top += height;
-        if (!small_screen)
-            top += 20;
-    }
+        msg_h = 4 * theWindows[WIN_MESSAGE].row_height + 4;   /* ~4 lines */
+        /* DrawScrollbar hides the message scrollbar at <=50+SBARHEIGHT tall;
+           if it has a scrollbar, clear that threshold so it stays visible */
+        if (theWindows[WIN_MESSAGE].scrollBar && msg_h <= 50 + SBARHEIGHT)
+            msg_h = 50 + SBARHEIGHT + 2;
 
-    if (!RetrieveSize(kMessageWindow, top, left, &height, &width)) {
-        height =
-            screenArea.bottom - top - (small_screen ? 2 - SBARHEIGHT : 2);
-        if (height > MAX_HEIGHT) {
-            height = MAX_HEIGHT;
-        } else if (height < MIN_HEIGHT) {
-            height = MIN_HEIGHT;
-            width = MIN_WIDTH;
-            left = screenArea.right - width;
-            top = screenArea.bottom - MIN_HEIGHT;
+        /* Fit the map into the space left by menu bar, message+status windows,
+           and title bars; macmap_fit resizes the map window + viewport/backing */
+        msg_top = y + title_h;
+        map_top = msg_top + msg_h + 2 + title_h;
+        avail_map_h = screenArea.bottom - map_top - (title_h + stat_h + 2);
+        avail_map_w = screenArea.right - 4;
+        macmap_fit(avail_map_w, avail_map_h);
+
+        /* Re-read the fitted map size; center the stack on its width. */
+        GetWindowPortBounds(mapw, &mr);
+        map_h = mr.bottom - mr.top;
+        content_w = mr.right - mr.left;
+        content_left = (screenArea.right - content_w) / 2;
+        if (content_left < 0) content_left = 0;
+
+        /* Messages on top (honor a saved position on large screens). */
+        if (!(honor && RetrievePosition(kMessageWindow, &top, &left))) {
+            top = msg_top; left = content_left;
+        }
+        MoveWindow(msgw, left, top, 1);
+        SizeWindow(msgw, content_w, msg_h, 1);
+        if (theWindows[WIN_MESSAGE].scrollBar)
+            DrawScrollbar(&theWindows[WIN_MESSAGE]);
+
+        /* Map in the middle. */
+        if (!(honor && RetrievePosition(kMapWindow, &top, &left))) {
+            top = map_top; left = content_left;
+        }
+        MoveWindow(mapw, left, top, 1);
+
+        /* Status on the bottom; keep it on-screen. */
+        stat_top = map_top + map_h + 2 + title_h;
+        if (stat_top + stat_h > screenArea.bottom)
+            stat_top = screenArea.bottom - stat_h - 2;
+        if (stat_top < mbar_height + 2)
+            stat_top = mbar_height + 2;
+        if (!(honor && RetrievePosition(kStatusWindow, &top, &left))) {
+            top = stat_top; left = content_left;
+        }
+        MoveWindow(statw, left, top, 1);
+        /* match map width so the status' right edge aligns; stat_h already
+           carries the +2 frame allowance from creation */
+        SizeWindow(statw, content_w, stat_h, 1);
+        /* MoveWindow reset the port origin; restore the 1px frame inset and
+           repaint so the status rows stay visible */
+        SetPortWindowPort(statw);
+        SetOrigin(-1, -1);
+        {
+            Rect sfull;
+            GetWindowPortBounds(statw, &sfull);
+            InvalWindowRect(statw, &sfull);
         }
     }
 
-    /* Move these windows */
-    nhWin = theWindows + WIN_MESSAGE;
-    theWindow = nhWin->its_window;
-
-    MoveWindow(theWindow, left, top, 1);
-    SizeWindow(theWindow, width, height, 1);
-    if (nhWin->scrollBar)
-        DrawScrollbar(nhWin);
-
-    /* Handle other windows */
+    /* Handle other windows (NHW_MENU / NHW_TEXT) */
     for (ix = 0; ix < NUM_MACWINDOWS; ix++) {
         if (ix != WIN_STATUS && ix != WIN_MESSAGE && ix != WIN_MAP
             && ix != BASE_WINDOW) {
@@ -688,7 +601,7 @@ SanePositions(void)
             }
         }
     }
-#endif
+    SelectWindow(mapw);
     return (0);
 }
 
@@ -696,11 +609,12 @@ void
 mac_init_nhwindows(int *argcp, char **argv)
 {
     Rect r;
-#if !TARGET_API_MAC_CARBON
-    Rect scr = (*GetGrayRgn())->rgnBBox;
-    small_screen =
-        scr.bottom - scr.top <= (iflags.large_font ? 12 * 40 : 9 * 40);
-#endif
+
+    {
+        Rect scr = (*GetGrayRgn())->rgnBBox;
+        small_screen =
+            scr.bottom - scr.top <= (iflags.large_font ? 12 * 40 : 9 * 40);
+    }
 
     InitMenuRes();
 
@@ -713,27 +627,25 @@ mac_init_nhwindows(int *argcp, char **argv)
     tty_init_nhwindows(argcp, argv);
     iflags.window_inited = TRUE;
 
-    /* Some ugly hacks to make both interfaces happy:
-     * Mac port uses both tty interface (for main map) and extra windows.  The
-     * winids need to
-     * be kept in synch for both interfaces to map.  Also, the "blocked"
-     * display_nhwindow case
-     * for the map automatically calls the tty interface for the message box,
-     * so some version
-     * of the message box has to exist in the tty world to prevent a meltdown,
-     * even though most
-     * messages are handled in mac window.
-     */
+    /* Enable color if the display supports it.
+       _mt_in_color is set by tty_init_nhwindows via Gestalt check. */
+    if (has_color(CLR_RED)) {
+        iflags.use_color = TRUE;
+        iflags.wc_color = TRUE;
+    }
+
     mac_create_nhwindow(NHW_BASE);
     tty_create_nhwindow(NHW_MESSAGE);
 
-#if 1 //!TARGET_API_MAC_CARBON
-    /* Resize and reposition the message window */
-    RetrievePosition(kMessageWindow, &r.top, &r.left);
-    RetrieveSize(kMessageWindow, r.top, r.left, &r.bottom, &r.right);
-    MoveWindow(theWindows[NHW_MESSAGE].its_window, r.left, r.top, false);
-    SizeWindow(theWindows[NHW_MESSAGE].its_window, r.right, r.bottom, true);
-#endif
+    /* Only move/size if a SAVED position exists: Retrieve* leave outputs
+       untouched on a miss, so acting unconditionally would use garbage */
+    if (theWindows[NHW_MESSAGE].its_window
+        && RetrievePosition(kMessageWindow, &r.top, &r.left)) {
+        MoveWindow(theWindows[NHW_MESSAGE].its_window, r.left, r.top, false);
+        if (RetrieveSize(kMessageWindow, r.top, r.left, &r.bottom, &r.right))
+            SizeWindow(theWindows[NHW_MESSAGE].its_window, r.right, r.bottom,
+                       true);
+    }
     return;
 }
 
@@ -756,11 +668,12 @@ mac_create_nhwindow(int kind)
     if (i >= NUM_MACWINDOWS) {
         error("cre_win: Win full; freeing extras");
         for (i = 0; i < NUM_MACWINDOWS; i++) {
+            /* only sacrifice hidden menu/text windows (and never WIN_INVEN) */
             if (IsWindowVisible(theWindows[i].its_window) || i == WIN_INVEN
-                || GetWindowKind(theWindows[i].its_window)
-                           != WIN_BASE_KIND + NHW_MENU
-                       && GetWindowKind(theWindows[i].its_window)
-                              != WIN_BASE_KIND + NHW_TEXT)
+                || (GetWindowKind(theWindows[i].its_window)
+                        != WIN_BASE_KIND + NHW_MENU
+                    && GetWindowKind(theWindows[i].its_window)
+                           != WIN_BASE_KIND + NHW_TEXT))
                 continue;
             mac_destroy_nhwindow(i);
             goto got1;
@@ -775,37 +688,86 @@ got1:
     aWin->scrollBar = (ControlHandle) 0;
     aWin->menuInfo = 0;
     aWin->menuSelected = 0;
+    aWin->menuStyle = 0;
     aWin->miLen = 0;
     aWin->miSize = 0;
     aWin->menuChar = 'a';
 
-    dprintf("cre_win: New kind %d", kind);
-
-    if (kind == NHW_BASE || kind == NHW_MAP || kind == NHW_STATUS) {
+    if (kind == NHW_MAP) {
+        /* Map gets its own window, but still populate wintty's wins[i] slot so
+           tty internals (e.g. docorner's wins[WIN_MAP] deref) stay safe. */
+        if (i != tty_create_nhwindow(kind)) {
+            mac_dprintf("cre_win: error creating kind %d", kind);
+        }
+        wins[i]->offy = 0; /* message box is in a separate window */
+        if (!macmap_create(aWin)) {
+            mac_dprintf("cre_win: macmap_create failed for NHW_MAP\n");
+            /* Fall back to legacy _mt_window sharing for safety. */
+            aWin->its_window = _mt_window;
+        }
+        {
+            short x_sz, x_sz_p, y_sz, y_sz_p;
+            get_tty_metrics(_mt_window, &x_sz, &y_sz, &x_sz_p, &y_sz_p,
+                            &aWin->font_number, &aWin->font_size,
+                            &aWin->char_width, &aWin->row_height);
+        }
+        /* Now that font + cell metrics are populated, do the deferred
+           backing/tile-mode initialization with correct values. */
+        if (aWin->its_window != _mt_window)
+            macmap_finalize(aWin);
+        return i;
+    } else if (kind == NHW_BASE || kind == NHW_STATUS) {
         short x_sz, x_sz_p, y_sz, y_sz_p;
         if (kind != NHW_BASE) {
             if (i != tty_create_nhwindow(kind)) {
-                dprintf("cre_win: error creating kind %d", kind);
-            }
-            if (kind == NHW_MAP) {
-                wins[i]->offy =
-                    0; /* the message box is in a separate window */
+                mac_dprintf("cre_win: error creating kind %d", kind);
             }
         }
         aWin->its_window = _mt_window;
         get_tty_metrics(aWin->its_window, &x_sz, &y_sz, &x_sz_p, &y_sz_p,
                         &aWin->font_number, &aWin->font_size,
                         &aWin->char_width, &aWin->row_height);
-#if 0 // TARGET_API_MAC_CARBON
-		InstallWindowEventHandler(aWin->its_window, baseupp,
-			sizeof(baseevents)/sizeof(EventTypeSpec), baseevents,
-			(void *)aWin, NULL);
-#endif
+        /* This window now shows ONLY the status lines; draw them at the top of
+           the offscreen (offy = 0) so a plain origin shows them. */
+        if (kind == NHW_STATUS && wins[i]) {
+            short row_h = aWin->row_height;
+            short rows  = (short) wins[i]->rows;       /* 2 or 3 */
+            short content_h;
+            short content_w = x_sz_p;
+            if (rows < 1) rows = 2;                    /* defensive */
+            content_h = rows * row_h;
+            wins[i]->offy = 0;     /* status renders at offscreen rows 0..rows-1 */
+            SetPortWindowPort(_mt_window);
+            SizeWindow(_mt_window, content_w + 2, content_h + 2, 1);
+            SetOrigin(-1, -1);     /* 1px frame inset only (no off_y slice) */
+            Rect full;
+            GetWindowPortBounds(_mt_window, &full);
+            InvalWindowRect(_mt_window, &full);
+            /* _mt_window is the status window now; retitle it */
+            SetWTitle(_mt_window, P_STRING_CONV("Status"));
+        }
         return i;
     }
 
-    aWin->its_window =
-        GetNewWindow(WIN_BASE_RES + kind, (WindowPtr) 0L, (WindowPtr) -1L);
+    {
+        short res_id = (kind == NHW_MESSAGE && small_screen)
+                           ? kWindMsgBorderless
+                           : (WIN_BASE_RES + kind);
+        /* Menus need a color (CGrafPort) window so menucolors render; a plain
+           GetNewWindow makes a 1-bit GrafPort where RGBForeColor is a no-op
+           (TextFace still works, which is why headings were bold but color
+           never showed). On a B&W screen a color window just draws B&W. */
+        if (kind == NHW_MENU)
+            aWin->its_window =
+                (WindowPtr) GetNewCWindow(res_id, (WindowPtr) 0L, (WindowPtr) -1L);
+        else
+            aWin->its_window =
+                GetNewWindow(res_id, (WindowPtr) 0L, (WindowPtr) -1L);
+        if (!aWin->its_window) {
+            error("cre_win: GetNewWindow %d failed", res_id);
+            return WIN_ERR;
+        }
+    }
     SetWindowKind(aWin->its_window, WIN_BASE_KIND + kind);
     SetWRefCon(aWin->its_window, (long) aWin);
     if (!(aWin->windowText = NewHandle(TEXT_BLOCK))) {
@@ -818,25 +780,6 @@ got1:
     aWin->x_curs = aWin->y_curs = 0;
     aWin->drawn = TRUE;
     mac_clear_nhwindow(i);
-#if 0 // TARGET_API_MAC_CARBON
-	switch (kind) {
-	case NHW_MESSAGE:
-		InstallWindowEventHandler(aWin->its_window, msgupp,
-			sizeof(msgevents)/sizeof(EventTypeSpec), msgevents,
-			(void *)aWin, NULL);
-		break;
-	case NHW_MENU:
-		InstallWindowEventHandler(aWin->its_window, menwupp,
-			sizeof(menwevents)/sizeof(EventTypeSpec), menwevents,
-			(void *)aWin, NULL);
-		break;
-	case NHW_TEXT:
-		InstallWindowEventHandler(aWin->its_window, textupp,
-			sizeof(textevents)/sizeof(EventTypeSpec), textevents,
-			(void *)aWin, NULL);
-		break;
-	}
-#endif
 
     SetPortWindowPort(aWin->its_window);
 
@@ -851,9 +794,15 @@ got1:
             TextSize(aWin->font_size);
             TextFace(bold);
             top_line = TENew(&out_of_scr, &out_of_scr);
+            if (!top_line)
+                error("cre_win: TENew (top_line) failed");
             TEActivate(top_line);
             TextFace(normal);
         }
+    } else if (kind == NHW_MENU) {
+        aWin->font_number = win_fonts[NHW_MENU];   /* fixed-width for alignment */
+        aWin->font_size = iflags.wc_fontsiz_menu ? iflags.wc_fontsiz_menu
+                          : iflags.wc_fontsiz_text ? iflags.wc_fontsiz_text : 9;
     } else {
         aWin->font_number = win_fonts[NHW_TEXT];
         aWin->font_size = iflags.wc_fontsiz_text ? iflags.wc_fontsiz_text : 9;
@@ -867,17 +816,18 @@ got1:
     aWin->row_height = aWin->ascent_height + fi.descent;
     aWin->char_width = fi.widMax;
 
-    if (kind == NHW_MENU || kind == NHW_TEXT || kind == NHW_MESSAGE) {
+    if ((kind == NHW_MENU || kind == NHW_TEXT || kind == NHW_MESSAGE)
+        && !(kind == NHW_MESSAGE && small_screen)) {
         Rect r;
 
-        GetWindowBounds(aWin->its_window, kWindowContentRgn, &r);
+        GetWindowPortBounds(aWin->its_window, &r);
         r.right -= (r.left - 1);
         r.left = r.right - SBARWIDTH;
         r.bottom -= (r.top + SBARHEIGHT);
         r.top = -1;
         aWin->scrollBar =
-            NewControl(aWin->its_window, &r, "\p", (r.bottom > r.top + 50), 0,
-                       0, 0, 16, 0L);
+            NewControl(aWin->its_window, &r, P_EMPTY_STRING,
+                       (r.bottom > r.top + 50), 0, 0, 0, 16, 0L);
         aWin->scrollPos = 0;
     }
     return i;
@@ -895,6 +845,10 @@ mac_clear_nhwindow(winid win)
         error("clr_win: Invalid win %d.", win);
         return;
     }
+    if (win == WIN_MAP) {
+        macmap_clear(aWin);
+        return;
+    }
     if (theWindow == _mt_window) {
         tty_clear_nhwindow(win);
         return;
@@ -903,26 +857,42 @@ mac_clear_nhwindow(winid win)
         return;
 
     SetPortWindowPort(theWindow);
-    GetWindowBounds(theWindow, kWindowContentRgn, &r);
+    GetWindowPortBounds(theWindow, &r);
     OffsetRect(&r, -r.left, -r.top);
     if (aWin->scrollBar)
         r.right -= SBARWIDTH;
 
     switch (GetWindowKind(theWindow) - WIN_BASE_KIND) {
     case NHW_MESSAGE:
-        if (aWin->scrollPos
-            == aWin->y_size - 1) /* if no change since last clear */
-            return;              /* don't bother with redraw */
-        r.bottom -= SBARHEIGHT;
-        for (l = 0; aWin->y_size > iflags.msg_history;) {
-            const char cr = CHAR_CR;
-            l = Munger(aWin->windowText, l, &cr, 1, nil, 0) + 1;
-            --aWin->y_size;
-        }
-        if (l) {
-            aWin->windowTextLen -= l;
-            BlockMove(*aWin->windowText + l, *aWin->windowText,
-                      aWin->windowTextLen);
+        gLastMsgTransient = 0;   /* a clear invalidates the transient-line state */
+        if (aWin->scrollPos == aWin->y_size - 1)
+            return;
+        if (aWin->scrollBar)
+            r.bottom -= SBARHEIGHT;
+        /* Trim old messages to msg_history limit: find the offset past the Nth
+           CR, then discard everything before it with one BlockMove */
+        {
+            long off = 0;
+            int lines_to_trim = aWin->y_size - iflags.msg_history;
+            if (lines_to_trim > 0) {
+                long tlen = aWin->windowTextLen;
+                int trimmed = 0;
+                HLock(aWin->windowText);
+                {
+                    char *p = *aWin->windowText;
+                    while (trimmed < lines_to_trim && off < tlen) {
+                        if (p[off] == CHAR_CR)
+                            trimmed++;
+                        off++;
+                    }
+                    if (off > 0 && off <= tlen) {
+                        aWin->windowTextLen -= off;
+                        BlockMove(p + off, p, aWin->windowTextLen);
+                    }
+                }
+                HUnlock(aWin->windowText);
+                aWin->y_size -= trimmed;
+            }
         }
         aWin->last_more_lin = aWin->y_size;
         aWin->save_lin = aWin->y_size;
@@ -936,6 +906,10 @@ mac_clear_nhwindow(winid win)
         if (aWin->menuSelected) {
             DisposeHandle((Handle) aWin->menuSelected);
             aWin->menuSelected = NULL;
+        }
+        if (aWin->menuStyle) {
+            DisposeHandle(aWin->menuStyle);
+            aWin->menuStyle = NULL;
         }
         aWin->menuChar = 'a';
         aWin->miSelLen = 0;
@@ -970,12 +944,20 @@ static Boolean
 in_topl_mode(void)
 {
     Rect rect;
+    WindowPtr w;
 
-    GetWindowBounds(theWindows[WIN_MESSAGE].its_window, kWindowContentRgn,
-                    &rect);
+    /* Validate BEFORE dereferencing: on exit mac_destroy_nhwindow sets
+       WIN_MESSAGE = WIN_ERR (-1), and this is still reached from the event
+       loop; theWindows[-1].its_window then reads garbage and GetWindowPortBounds
+       faults (bus error in in_topl_mode). */
+    if (WIN_MESSAGE == WIN_ERR || !top_line)
+        return FALSE;
+    w = theWindows[WIN_MESSAGE].its_window;
+    if (!w)
+        return FALSE;
+    GetWindowPortBounds(w, &rect);
     OffsetRect(&rect, -rect.left, -rect.top);
-    return (WIN_MESSAGE != WIN_ERR && top_line
-            && (*top_line)->viewRect.left < rect.right);
+    return ((*top_line)->viewRect.left < rect.right);
 }
 
 #define BTN_IND 2
@@ -987,8 +969,7 @@ topl_resp_rect(int resp_idx, Rect *r)
 {
     Rect rect;
 
-    GetWindowBounds(theWindows[WIN_MESSAGE].its_window, kWindowContentRgn,
-                    &rect);
+    GetWindowPortBounds(theWindows[WIN_MESSAGE].its_window, &rect);
     OffsetRect(&rect, -rect.left, -rect.top);
     r->left = (BTN_IND + BTN_W) * resp_idx + BTN_IND;
     r->right = r->left + BTN_W;
@@ -1002,6 +983,17 @@ enter_topl_mode(char *query)
 {
     if (in_topl_mode())
         return;
+
+    /* Clear any leftover button state from a previous prompt */
+    if (topl_resp[0]) {
+        Rect frame;
+        int r_len = strlen(topl_resp);
+        topl_resp_rect(0, &frame);
+        frame.right = (BTN_IND + BTN_W) * r_len + BTN_IND;
+        InvalWindowRect(theWindows[WIN_MESSAGE].its_window, &frame);
+        memset(topl_resp, 0, sizeof topl_resp);
+        topl_def_idx = -1;
+    }
 
     putstr(WIN_MESSAGE, ATR_BOLD, query);
 
@@ -1017,7 +1009,7 @@ enter_topl_mode(char *query)
 }
 
 void
-leave_topl_mode(char *answer)
+leave_topl_mode(char *answer) /* answer must have room for BUFSZ bytes */
 {
     /*unsigned*/ char *ap, *bp;
 
@@ -1032,6 +1024,7 @@ leave_topl_mode(char *answer)
         ans_len = BUFSZ - 1;
 
     /* remove unprintables from the answer */
+    HLock((*top_line)->hText);
     for (ap = *(*top_line)->hText + topl_query_len, bp = answer; ans_len > 0;
          ans_len--, ap++) {
         if (*ap >= ' ' && *ap < 128) {
@@ -1039,6 +1032,7 @@ leave_topl_mode(char *answer)
         }
     }
     *bp = 0;
+    HUnlock((*top_line)->hText);
 
     if (aWin->windowTextLen
         && (*aWin->windowText)[aWin->windowTextLen - 1] == CHAR_CR) {
@@ -1047,13 +1041,21 @@ leave_topl_mode(char *answer)
     }
     putstr(WIN_MESSAGE, ATR_BOLD, answer);
 
+    /* Invalidate the button area so stale buttons get erased */
+    if (topl_resp[0]) {
+        Rect frame;
+        int r_len = strlen(topl_resp);
+        topl_resp_rect(0, &frame);
+        frame.right = (BTN_IND + BTN_W) * r_len + BTN_IND;
+        InvalWindowRect(aWin->its_window, &frame);
+        memset(topl_resp, 0, sizeof topl_resp);
+    }
+
     (*top_line)->viewRect.left += 10000;
     UndimMenuBar();
 }
 
-/*
- * TESetSelect flushes out all the pending key strokes.  I hate it.
- */
+/* set selection by hand, not TESetSelect: the latter flushes pending keys */
 static void
 topl_set_select(short selStart, short selEnd)
 {
@@ -1076,7 +1078,8 @@ topl_key(unsigned char ch, Boolean ext)
 {
     switch (ch) {
     case CHAR_ESC:
-        topl_replace("\x1b");
+        topl_replace("\x1b"); /* leave ESC as the answer text */
+        /* FALLTHROUGH -- like enter, ESC ends top-line input */
     case CHAR_ENTER:
     case CHAR_CR:
     case CHAR_LF:
@@ -1104,9 +1107,9 @@ topl_key(unsigned char ch, Boolean ext)
                 if (!strncmpi(*(*top_line)->hText + topl_query_len,
                               extcmdlist[oindex].ef_txt,
                               (*top_line)->teLength - topl_query_len)) {
-                    if (com_index == -1) /* No matches yet*/
+                    if (com_index == -1)
                         com_index = oindex;
-                    else /* More than 1 match */ {
+                    else {
                         com_index = -2;
                         break;
                     }
@@ -1164,12 +1167,13 @@ topl_set_resp(char *resp, char def)
     if (r_len < r_len1)
         r_len = r_len1;
     topl_resp_rect(0, &frame);
-    frame.right = (BTN_IND + BTN_W) * r_len;
+    frame.right = (BTN_IND + BTN_W) * r_len + BTN_IND;
     InvalWindowRect(theWindows[WIN_MESSAGE].its_window, &frame);
 
-    strcpy(topl_resp, resp);
-    loc = strchr(resp, def);
-    topl_def_idx = loc ? loc - resp : -1;
+    memset(topl_resp, 0, sizeof topl_resp);
+    strncpy(topl_resp, resp, sizeof topl_resp - 1);
+    loc = strchr(topl_resp, def);
+    topl_def_idx = loc ? loc - topl_resp : -1;
 }
 
 static char
@@ -1212,9 +1216,10 @@ topl_resp_key(char ch)
                         } else if (ch == '\x1d'    /* right arrow */
                                    || ch == '\x1f' /* down arrow */
                                    || ch == CHAR_BS
-                                   || ch == '\x1c' /* left arrow */
-                                          && (*top_line)->selEnd
-                                                 > topl_query_len) {
+                                   || (ch == '\x1c' /* left arrow, but not
+                                                       into the prompt */
+                                       && (*top_line)->selEnd
+                                              > topl_query_len)) {
                             TEKey(ch, top_line);
                             ch = '\0';
                         }
@@ -1238,18 +1243,6 @@ static void
 adjust_window_pos(NhWindow *aWin, short width, short height)
 {
     WindowRef theWindow = aWin->its_window;
-#if TARGET_API_MAC_CARBON
-    Rect r;
-
-    GetWindowBounds(theWindow, kWindowContentRgn, &r);
-    RetrieveWinPos(theWindow, &r.top, &r.left);
-    MoveWindow(theWindow, r.left, r.top, false);
-    SizeWindow(theWindow, width, height, true);
-    ConstrainWindowToScreen(theWindow, kWindowStructureRgn,
-                            kWindowConstrainMayResize
-                                | kWindowConstrainMoveRegardlessOfFit,
-                            NULL, NULL);
-#else
     Rect scr_r = (*GetGrayRgn())->rgnBBox;
     const Rect win_ind = { 2, 2, 3, 3 };
     const short min_w = theWindow->portRect.right - theWindow->portRect.left,
@@ -1281,7 +1274,6 @@ adjust_window_pos(NhWindow *aWin, short width, short height)
     if (pos.h + width + win_ind.right > scr_r.right)
         pos.h = scr_r.right - width - win_ind.right;
     MoveWindow(theWindow, pos.h, pos.v, false);
-#endif
     if (aWin->scrollBar)
         DrawScrollbar(aWin);
     return;
@@ -1293,7 +1285,7 @@ adjust_window_pos(NhWindow *aWin, short width, short height)
  * until presumed seen.
  */
 void
-mac_display_nhwindow(winid win, BOOLEAN_P f)
+mac_display_nhwindow(winid win, boolean f)
 {
     NhWindow *aWin = &theWindows[win];
     WindowPtr theWindow = aWin->its_window;
@@ -1305,6 +1297,16 @@ mac_display_nhwindow(winid win, BOOLEAN_P f)
 
     if (theWindow == _mt_window) {
         tty_display_nhwindow(win, f);
+        return;
+    }
+
+    /* the map window owns its own size/position; skip adjust_window_pos */
+    if (win == WIN_MAP) {
+        if (!IsWindowVisible(theWindow)) {
+            SelectWindow(theWindow);
+            ShowWindow(theWindow);
+        }
+        macmap_flush();   /* per-frame flush: blit the batched cell draws once */
         return;
     }
 
@@ -1363,18 +1365,19 @@ mac_destroy_nhwindow(winid win)
         return;
     }
 
-    /*
-     * Check special windows.  The base window should never go away.
-     * Other "standard" windows should not go away unless we've exitted
-     * nhwindows.
-     */
+    /* The base window never goes away; standard windows stay until exit. */
     if (theWindow == _mt_window) {
+        return;
+    }
+    /* map window has its own GWorld/palette/owner state; macmap_destroy frees it */
+    if (win == WIN_MAP) {
+        macmap_destroy(aWin);
         return;
     }
     if (win == WIN_INVEN || win == WIN_MESSAGE) {
         if (iflags.window_inited) {
-            if (flags.tombstone && killer[0]) {
-                /* Prepare for the coming of the tombstone window. */
+            if (flags.tombstone && svk.killer.name[0]) {
+                /* tombstone window wants a monospaced font */
                 win_fonts[NHW_TEXT] = kFontIDMonaco;
             }
             return;
@@ -1391,6 +1394,10 @@ mac_destroy_nhwindow(winid win)
         if (aWin->windowText) {
             DisposeHandle(aWin->windowText);
         }
+        if (aWin->menuStyle) {
+            DisposeHandle(aWin->menuStyle);
+            aWin->menuStyle = (Handle) 0;
+        }
         aWin->its_window = (WindowPtr) 0;
         aWin->windowText = (Handle) 0;
     }
@@ -1399,52 +1406,16 @@ mac_destroy_nhwindow(winid win)
 void
 mac_number_pad(int pad)
 { /* no effect */
-#if defined(__SC__) || defined(__MRC__)
-#pragma unused(pad)
-#endif
     return;
 }
 
-void
-trans_num_keys(EventRecord *theEvent)
-{
-#if defined(__SC__) || defined(__MRC__)
-#pragma unused(theEvent)
-#endif
-/* KMH -- Removed this translation.
- * Number pad keys should always emit digit characters.
- * That's consistent with the default MacOS behavior.
- * The number_pad option controls how digits are interpreted.
- */
-#if 0
-	if (Cmd.num_pad) {
-		Handle h = GetResource('Nump', theEvent->modifiers & shiftKey ? 129 : 128);
-		if (h) {
-			short inkey = (theEvent->message & keyCodeMask), *ab = (short *)*h;
-			int i = ab[0];
-			for (; i; i--) {
-				if (inkey == (ab[i] & keyCodeMask)) {
-					theEvent->message = ab[i];
-					break;
-				}
-			}
-		}
-	}
-#endif
-}
-
-/*
- * Routine used to select and de-select elements in a menu window, used by
- * KeyMenu,
- * ClickMenu, and UpdateMenu.  Takes the NhWindow and a line ref relative to
- * the scrollbar.
- */
+/* Toggle hilite of a menu line (line is relative to the scrollbar). */
 static void
 ToggleMenuSelect(NhWindow *aWin, int line)
 {
     Rect r;
 
-    GetWindowBounds(aWin->its_window, kWindowContentRgn, &r);
+    GetWindowPortBounds(aWin->its_window, &r);
     OffsetRect(&r, -r.left, -r.top);
     if (aWin->scrollBar)
         r.right -= SBARWIDTH;
@@ -1464,7 +1435,6 @@ ListItemSelected(NhWindow *aWin, int item)
     int i;
 
     HLock((char **) aWin->menuSelected);
-    /* Find item in selection list */
     for (i = aWin->miSelLen - 1; i >= 0; i--) {
         if ((*aWin->menuSelected)[i] == item)
             break;
@@ -1483,10 +1453,10 @@ ToggleMenuListItemSelected(NhWindow *aWin, short item)
     int i = ListItemSelected(aWin, item);
 
     HLock((char **) aWin->menuSelected);
-    if (i < 0) { /* not there, so add */
+    if (i < 0) { /* add */
         (*aWin->menuSelected)[aWin->miSelLen] = item;
         aWin->miSelLen++;
-    } else { /* there, so remove */
+    } else { /* remove */
         short *mi = &(*aWin->menuSelected)[i];
         aWin->miSelLen--;
         memcpy(mi, mi + 1, (aWin->miSelLen - i) * sizeof(short));
@@ -1517,9 +1487,7 @@ ListCoordinateToItem(NhWindow *aWin, short Row)
 static pascal void
 MoveScrollBar(ControlHandle theBar, short part)
 {
-#if 1 //!TARGET_API_MAC_CARBON
-    EventRecord fake;
-#endif
+    EventRecord fake = {0};
     Rect r;
     RgnHandle rgn;
     int now, amtToScroll;
@@ -1529,8 +1497,8 @@ MoveScrollBar(ControlHandle theBar, short part)
     if (!part)
         return;
 
-    theWin = GetControlOwner(theBar);
-    GetWindowBounds(theWin, kWindowContentRgn, &r);
+    theWin = (**theBar).contrlOwner;
+    GetWindowPortBounds(theWin, &r);
     OffsetRect(&r, -r.left, -r.top);
     winToScroll = (NhWindow *) (GetWRefCon(theWin));
     now = GetControlValue(theBar);
@@ -1560,33 +1528,22 @@ MoveScrollBar(ControlHandle theBar, short part)
     if (winToScroll == theWindows + WIN_MESSAGE)
         r.bottom -= SBARHEIGHT;
     rgn = NewRgn();
+    if (!rgn)
+        return;
     ScrollRect(&r, 0, -amtToScroll * winToScroll->row_height, rgn);
-    if (rgn) {
+    {
         InvalWindowRgn(theWin, rgn);
         BeginUpdate(theWin);
     }
-#if 0 // TARGET_API_MAC_CARBON
-	switch (GetWindowKind(theWin) - WIN_BASE_KIND) {
-	case NHW_MESSAGE:
-		MsgUpdate(GetNhWin(theWin));
-		break;
-	case NHW_MENU:
-		MenwUpdate(GetNhWin(theWin));
-		break;
-	case NHW_TEXT:
-		TextUpdate(GetNhWin(theWin));
-		break;
-	}
-#else
-    winUpdateFuncs[GetWindowKind(theWin) - WIN_BASE_KIND](&fake, theWin);
-#endif
-    if (rgn) {
-        EndUpdate(theWin);
-        DisposeRgn(rgn);
+    {
+        int kind = GetWindowKind(theWin) - WIN_BASE_KIND;
+        if (kind >= 0 && kind < NUM_FUNCS)
+            winUpdateFuncs[kind](&fake, theWin);
     }
+    EndUpdate(theWin);
+    DisposeRgn(rgn);
 }
 
-#if 1 //!TARGET_API_MAC_CARBON
 static void
 DoScrollBar(Point p, short code, ControlHandle theBar, NhWindow *aWin)
 {
@@ -1600,13 +1557,12 @@ DoScrollBar(Point p, short code, ControlHandle theBar, NhWindow *aWin)
     if (!func) {
         if (aWin->scrollPos != GetControlValue(theBar)) {
             aWin->scrollPos = GetControlValue(theBar);
-            GetWindowBounds(aWin->its_window, kWindowContentRgn, &rect);
+            GetWindowPortBounds(aWin->its_window, &rect);
             OffsetRect(&rect, -rect.left, -rect.top);
             InvalWindowRect(aWin->its_window, &rect);
         }
     }
 }
-#endif
 
 static int
 filter_scroll_key(const int ch, NhWindow *aWin)
@@ -1632,11 +1588,13 @@ filter_scroll_key(const int ch, NhWindow *aWin)
 int
 mac_doprev_message(void)
 {
-    if (WIN_MESSAGE) {
+    if (WIN_MESSAGE != WIN_ERR) {
         NhWindow *winToScroll = &theWindows[WIN_MESSAGE];
         mac_display_nhwindow(WIN_MESSAGE, FALSE);
-        SetPortWindowPort(winToScroll->its_window);
-        MoveScrollBar(winToScroll->scrollBar, kControlUpButtonPart);
+        if (winToScroll->scrollBar) {
+            SetPortWindowPort(winToScroll->its_window);
+            MoveScrollBar(winToScroll->scrollBar, kControlUpButtonPart);
+        }
     }
     return 0;
 }
@@ -1651,7 +1609,7 @@ draw_growicon_vert_only(WindowPtr wind)
     GetPort(&org_port);
     SetPortWindowPort(wind);
     GetClip(org_clip);
-    GetWindowBounds(wind, kWindowContentRgn, &r);
+    GetWindowPortBounds(wind, &r);
     OffsetRect(&r, -r.left, -r.top);
     r.left = r.right - SBARWIDTH;
     ClipRect(&r);
@@ -1661,7 +1619,6 @@ draw_growicon_vert_only(WindowPtr wind)
     SetPort(org_port);
 }
 
-/* NOT_IN_CARBON */
 static void
 WindowGoAway(EventRecord *theEvent, WindowPtr theWindow)
 {
@@ -1686,13 +1643,13 @@ mac_get_nh_event(void)
 {
     EventRecord anEvent;
 
-    /* KMH -- Don't proceed if the window system isn't set up */
     if (!iflags.window_inited)
         return;
 
-#if TARGET_API_MAC_CARBON
-    QDFlushPortBuffer(GetWindowPort(_mt_window), NULL);
-#endif
+    /* Also wired to win_wait_synch: setftty() clears TA_ALWAYS_REFRESH during
+       play, so flush the offscreen here or buffered status never reaches screen */
+    if (_mt_window) update_tty(_mt_window);
+
     (void) WaitNextEvent(everyEvent, &anEvent, 1, gMouseRgn);
     HandleEvent(&anEvent);
     return;
@@ -1705,10 +1662,7 @@ mac_nhgetch(void)
     long doDawdle = 1L;
     EventRecord anEvent;
 
-#if 1 //!TARGET_API_MAC_CARBON
-      /* We want to take care of keys in the buffer as fast as
-       * possible
-       */
+      /* don't dawdle while keys are buffered */
     if (keyQueueCount)
         doDawdle = 0L;
     else {
@@ -1727,23 +1681,10 @@ mac_nhgetch(void)
             warn = 0;
         }
     }
-#endif
 
     do {
-#if TARGET_API_MAC_CARBON
-        QDFlushPortBuffer(GetWindowPort(_mt_window), NULL);
-#endif
-#if 0 // TARGET_API_MAC_CARBON
-		EventRef event;
-
-		if (ReceiveNextEvent(0, NULL, kEventDurationForever, TRUE, &event) == noErr) {
-			SendEventToEventTarget(event, dispatcher);
-			ReleaseEvent(event);
-		}
-#else
         (void) WaitNextEvent(everyEvent, &anEvent, doDawdle, gMouseRgn);
         HandleEvent(&anEvent);
-#endif
         ch = GetFromKeyQueue();
     } while (!ch && !gClickedToMove);
 
@@ -1751,11 +1692,6 @@ mac_nhgetch(void)
         ObscureCursor();
     else
         gClickedToMove = 0;
-
-#ifdef THINK_C
-    if (ch == '\r')
-        ch = '\n';
-#endif
 
     return (ch);
 }
@@ -1771,13 +1707,12 @@ mac_delay_output(void)
 }
 
 #ifdef CLIPPING
-static void
+void
 mac_cliparound(int x, int y)
 {
-#if defined(__SC__) || defined(__MRC__)
-#pragma unused(x, y)
-#endif
-    /* TODO */
+    if (WIN_MAP != WIN_ERR) {
+        macmap_cliparound(&theWindows[WIN_MAP], x, y);
+    }
 }
 #endif
 
@@ -1804,7 +1739,12 @@ mac_putstr(winid win, int attr, const char *str)
     char *src, *sline, *dst, ch;
 
     if (win < 0 || win >= NUM_MACWINDOWS || !aWin->its_window) {
-        error("putstr: Invalid win %d (Max %d).", win, NUM_MACWINDOWS, attr);
+        /* During early init, WIN_MESSAGE is -1; use raw_print instead */
+        if (win < 0 && str) {
+            raw_print(str);
+            return;
+        }
+        error("putstr: Invalid win %d (Max %d).", win, NUM_MACWINDOWS);
         return;
     }
 
@@ -1820,12 +1760,14 @@ mac_putstr(winid win, int attr, const char *str)
     slen = strlen(str);
 
     SetPortWindowPort(aWin->its_window);
-    GetWindowBounds(aWin->its_window, kWindowContentRgn, &r);
+    GetWindowPortBounds(aWin->its_window, &r);
     OffsetRect(&r, -r.left, -r.top);
     if (win == WIN_MESSAGE) {
-        r.right -= SBARWIDTH;
-        r.bottom -= SBARHEIGHT;
-        if (flags.page_wait
+        if (aWin->scrollBar) {
+            r.right -= SBARWIDTH;
+            r.bottom -= SBARHEIGHT;
+        }
+        if (flags.safe_wait
             && aWin->last_more_lin
                    <= aWin->y_size - (r.bottom - r.top) / aWin->row_height) {
             aWin->last_more_lin = aWin->y_size;
@@ -1833,10 +1775,7 @@ mac_putstr(winid win, int attr, const char *str)
         }
     }
 
-    /*
-     * A "default" text window - uses TETextBox
-     * We just add the text, without attributes for now
-     */
+    /* append the text to windowText; attributes are not retained */
     len = GetHandleSize(aWin->windowText);
     while (aWin->windowTextLen + slen + 1 > len) {
         len = (len > 2048) ? (len + 2048) : (len * 2);
@@ -1847,10 +1786,30 @@ mac_putstr(winid win, int attr, const char *str)
             aWin->save_lin = 0;
             aWin->y_curs = 0;
             aWin->y_size = 0;
+            in_putstr--;
+            return;
         }
     }
 
+    /* Transient (ATR_NOHISTORY) message after another transient one: drop the
+       prior line so this replaces it in place rather than piling up. */
+    if (win == WIN_MESSAGE && (attr & ATR_NOHISTORY) && gLastMsgTransient
+        && aWin->windowTextLen > 0) {
+        long n = aWin->windowTextLen;
+        HLock(aWin->windowText);
+        {
+            char *p = *aWin->windowText;
+            if (n > 0 && p[n - 1] == CHAR_CR) n--;       /* trailing CR */
+            while (n > 0 && p[n - 1] != CHAR_CR) n--;     /* back to line start */
+        }
+        HUnlock(aWin->windowText);
+        if (aWin->y_size > 0) aWin->y_size--;
+        if (aWin->y_curs > 0) aWin->y_curs--;
+        aWin->windowTextLen = n;
+    }
+
     len = aWin->windowTextLen;
+    HLock(aWin->windowText);
     dst = *(aWin->windowText) + len;
     sline = src = (char *) str;
     maxWidth = newWidth = 0;
@@ -1866,7 +1825,7 @@ mac_putstr(winid win, int attr, const char *str)
             if (newWidth > maxWidth) {
                 maxWidth = newWidth;
             }
-            sline = src + 1; /* keep track of where new line begins */
+            sline = src + 1;
         } else
             aWin->x_curs++;
         src++;
@@ -1886,13 +1845,17 @@ mac_putstr(winid win, int attr, const char *str)
         aWin->y_size++;
         aWin->x_curs = 0;
     }
+    HUnlock(aWin->windowText);
 
     if (win == WIN_MESSAGE) {
+        gLastMsgTransient = (attr & ATR_NOHISTORY) != 0;
         short min = aWin->y_size - (r.bottom - r.top) / aWin->row_height;
         if (aWin->scrollPos < min) {
             aWin->scrollPos = min;
-            SetControlMaximum(aWin->scrollBar, aWin->y_size);
-            SetControlValue(aWin->scrollBar, min);
+            if (aWin->scrollBar) {
+                SetControlMaximum(aWin->scrollBar, aWin->y_size);
+                SetControlValue(aWin->scrollBar, min);
+            }
         }
         InvalWindowRect(aWin->its_window, &r);
     } else /* Message has a fixed width, other windows base on content */
@@ -1911,6 +1874,13 @@ mac_curs(winid win, int x, int y)
         return;
     }
 
+    /* Macmap window: software cursor for getpos/farlook. */
+    if (WIN_MAP != WIN_ERR && win == WIN_MAP
+        && GetWRefCon(aWin->its_window) == MACMAP_REFCON) {
+        macmap_curs(aWin, x, y);
+        return;
+    }
+
     SetPortWindowPort(aWin->its_window);
     MoveTo(x * aWin->char_width,
            (y * aWin->row_height) + aWin->ascent_height);
@@ -1919,7 +1889,7 @@ mac_curs(winid win, int x, int y)
 }
 
 int
-mac_nh_poskey(int *a, int *b, int *c)
+mac_nh_poskey(coordxy *a, coordxy *b, int *c)
 {
     int ch = mac_nhgetch();
     *a = clicked_pos.h;
@@ -1936,13 +1906,13 @@ mac_start_menu(winid win, unsigned long mbehavior)
 }
 
 void
-mac_add_menu(winid win, int glyph, const anything *any, CHAR_P menuChar,
-             CHAR_P groupAcc, int attr, const char *inStr, unsigned int itemflags)
+mac_add_menu(winid win, const glyph_info *glyphinfo UNUSED,
+             const anything *any, char menuChar,
+             char groupAcc, int attr, int clr,
+             const char *inStr, unsigned int itemflags)
 {
-#if defined(__SC__) || defined(__MRC__)
-#pragma unused(glyph)
-#endif
     NhWindow *aWin = &theWindows[win];
+    short line0;
     const char *str;
     char locStr[4 + BUFSZ];
     MacMHMenuItem *item;
@@ -1963,6 +1933,8 @@ mac_add_menu(winid win, int glyph, const anything *any, CHAR_P menuChar,
             aWin->menuSelected =
                 (short **) NewHandle(sizeof(short) * kMenuSizeBump);
             if (!aWin->menuSelected) {
+                DisposeHandle((Handle) aWin->menuInfo);
+                aWin->menuInfo = NULL;
                 error("Can't alloc menu select handle");
                 return;
             }
@@ -2011,15 +1983,14 @@ mac_add_menu(winid win, int glyph, const anything *any, CHAR_P menuChar,
     } else
         str = inStr;
 
+    line0 = aWin->y_size;
     putstr(win, attr, str);
+    /* record the style for the line(s) putstr just appended so the menu
+       renderer can draw headings bold and apply menucolors */
+    record_menu_line_style(aWin, line0, aWin->y_size, attr, clr);
 }
 
-/*
- * End a menu in this window, window must a type NHW_MENU.
- * str is a list of cancel characters (values that may be input)
- * morestr is a prompt to display, rather than the default.
- * str and morestr might be ignored by some ports.
- */
+/* End an NHW_MENU window; morestr is an optional prompt (window title). */
 void
 mac_end_menu(winid win, const char *morestr)
 {
@@ -2049,7 +2020,10 @@ mac_select_menu(winid win, int how, menu_item **selected_list)
         if (c == CHAR_ESC) {
             /* deselect everything */
             aWin->miSelLen = 0;
-            break;
+            HideWindow(theWin);
+            *selected_list = 0;
+            inSelect = WIN_ERR;
+            return -1; /* cancelled */
         } else if (ClosingWindowChar(c)) {
             break;
         } else {
@@ -2085,17 +2059,17 @@ mac_select_menu(winid win, int how, menu_item **selected_list)
 #include "dlb.h"
 
 static void
-mac_display_file(name, complain)
-const char *name; /* not ANSI prototype because of boolean parameter */
-boolean complain;
+mac_display_file(const char *name, boolean complain)
 {
     Ptr buf;
     int win;
     dlb *fp = dlb_fopen(name, "r");
 
     if (fp) {
-        long l = dlb_fseek(fp, 0, SEEK_END);
-        (void) dlb_fseek(fp, 0, 0L);
+        long l;
+        (void) dlb_fseek(fp, 0, SEEK_END);
+        l = dlb_ftell(fp);
+        (void) dlb_fseek(fp, 0, SEEK_SET);
         buf = NewPtr(l + 1);
         if (buf) {
             l = dlb_fread(buf, 1, l, fp);
@@ -2107,7 +2081,8 @@ boolean complain;
                         error("Cannot make window.");
                 } else {
                     putstr(win, 0, buf);
-                    display_nhwindow(win, FALSE);
+                    display_nhwindow(win, TRUE);
+                    destroy_nhwindow(win);
                 }
             }
             DisposePtr(buf);
@@ -2123,32 +2098,118 @@ port_help()
     display_file(PORT_HELP, TRUE);
 }
 
-static void
-mac_unimplemented(void)
+/* optfn_hicolor: Mac-specific option handler for "hicolor"
+ * (same as palette but reversed). Referenced from optlist.h NHOPTC. */
+int
+optfn_hicolor(int optidx UNUSED, int req UNUSED, boolean negated UNUSED,
+              char *opts UNUSED, char *op UNUSED)
 {
+    return 1; /* optn_ok; stub */
+}
+
+static void
+mac_player_selection(void)
+{
+    /* Player selection handled via mac_askname / macmenu.c */
+}
+
+static void
+mac_resume_nhwindows(void)
+{
+    /* noop on classic Mac OS */
+}
+
+static void
+mac_mark_synch(void)
+{
+    /* Flush buffered tty writes to screen: setftty() clears TA_ALWAYS_REFRESH
+       during play, so the offscreen is correct but the window shows stale text
+       until this runs (core calls mark_synch after each status_update). */
+    if (_mt_window && iflags.window_inited)
+        update_tty(_mt_window);
+}
+
+static void
+mac_raw_print(const char *str)
+{
+    if (str && *str && _mt_window && iflags.window_inited) {
+        add_tty_string(_mt_window, str);
+        add_tty_char(_mt_window, CHAR_CR);
+        update_tty(_mt_window);
+    }
+}
+
+static void
+mac_raw_print_bold(const char *str)
+{
+    if (str && *str && _mt_window && iflags.window_inited) {
+        term_start_raw_bold();
+        add_tty_string(_mt_window, str);
+        add_tty_char(_mt_window, CHAR_CR);
+        term_end_raw_bold();
+        update_tty(_mt_window);
+    }
+}
+
+static void
+mac_print_glyph(winid win, coordxy x, coordxy y,
+                const glyph_info *glyphinfo,
+                const glyph_info *bkglyphinfo UNUSED)
+{
+    if (win == WIN_MAP && win >= 0 && win < NUM_MACWINDOWS) {
+        macmap_print_glyph(&theWindows[win], (int) x, (int) y, glyphinfo);
+        return;
+    }
+
+    /* tty path for non-map windows */
+    int ch;
+    tty_curs(win, x, y);
+    ch = (glyphinfo && glyphinfo->ttychar) ? glyphinfo->ttychar : ' ';
+    term_start_color(glyphinfo ? glyphinfo->gm.sym.color : NO_COLOR);
+    add_tty_char(_mt_window, (short) ch);
+    term_end_color();
+    wins[win]->curx++;
+    ttyDisplay->curx++;
+    update_tty(_mt_window);
+}
+
+static void
+mac_update_inventory(int arg UNUSED)
+{
+    /* stub - could trigger inventory window redraw */
+}
+
+static win_request_info *
+mac_ctrl_nhwindow(winid win UNUSED, int request UNUSED,
+                  win_request_info *wri UNUSED)
+{
+    return (win_request_info *) 0;
 }
 
 static void
 mac_suspend_nhwindows(const char *foo)
 {
-#if defined(__SC__) || defined(__MRC__)
-#pragma unused(foo)
-#endif
     /*	Can't really do that :-)		*/
 }
 
+/* Drain the queued keys (through the first CR/LF) into bufp as a C string.
+   bufp must have room for at least QUEUE_LEN + 1 bytes.  Returns 1 if any
+   keys were queued, 0 otherwise. */
 int
 try_key_queue(char *bufp)
 {
     if (keyQueueCount) {
         char ch;
+        int i = 0;
         for (ch = GetFromKeyQueue();; ch = GetFromKeyQueue()) {
             if (ch == CHAR_LF || ch == CHAR_CR)
                 ch = 0;
-            *bufp++ = ch;
+            if (i < QUEUE_LEN)
+                bufp[i++] = ch;
             if (ch == 0)
                 break;
         }
+        bufp[QUEUE_LEN] = 0;
         return 1;
     }
     return 0;
@@ -2161,40 +2222,31 @@ try_key_queue(char *bufp)
 static void
 BaseClick(NhWindow *wind, Point pt, UInt32 modifiers)
 {
-    pt.h = pt.h / wind->char_width + 1;
-    pt.v = pt.v / wind->row_height;
-    clicked_mod = (modifiers & shiftKey) ? CLICK_2 : CLICK_1;
-
-    if (strchr(topl_resp, *click_to_cmd(pt.h, pt.v, clicked_mod)))
-        nhbell();
-    else {
-#if 1 //!TARGET_API_MAC_CARBON
-        if (cursor_locked)
-            while (WaitMouseUp())
-                /*SystemTask()*/;
-#endif
-
-        gClickedToMove = TRUE;
-        clicked_pos = pt;
+    int col, row;
+    if (wind == &theWindows[WIN_MAP]) {
+        if (macmap_click(wind, pt, modifiers))
+            return;   /* click handled by the scrollbars/grow box */
+        macmap_pixel_to_cell(wind, pt, &col, &row);
+    } else {
+        col = pt.h / wind->char_width + 1;
+        row = pt.v / wind->row_height;
     }
-    return;
+    clicked_mod = (modifiers & shiftKey) ? CLICK_2 : CLICK_1;
+    clicked_pos.h = (short) col;
+    clicked_pos.v = (short) row;
+    /* mac_nhgetch checks gClickedToMove to exit its loop and return 0;
+       the core then reads the position via mac_nh_poskey() */
+    gClickedToMove = 1;
 }
 
 static void
 BaseCursor(NhWindow *wind, Point pt)
 {
-    char *dir_bas, *dir;
     CursHandle ch;
 
-    if (cursor_locked)
-        dir = (char *) 0;
-    else {
-        dir_bas = (char *) Cmd.dirchars;
-        dir =
-            strchr(dir_bas, *click_to_cmd(pt.h / wind->char_width + 1,
-                                          pt.v / wind->row_height, CLICK_1));
-    }
-    ch = GetCursor(dir ? dir - dir_bas + 513 : 512);
+    /* direction-based cursors (CURS 513-520) exist in the rsrc fork but are
+       not currently used */
+    ch = GetCursor(512);
     if (ch) {
         HLock((Handle) ch);
         SetCursor(*ch);
@@ -2204,84 +2256,6 @@ BaseCursor(NhWindow *wind, Point pt)
     }
     return;
 }
-
-#if 0 // TARGET_API_MAC_CARBON
-static pascal OSStatus
-BaseEvent(EventHandlerCallRef nexthandler, EventRef event, void *userdata)
-{
-	NhWindow *wind = (NhWindow *) userdata;
-
-
-	switch (GetEventClass(event)) {
-	case kEventClassKeyboard: {
-		char ch;
-		UInt32 modifiers;
-
-
-		GetEventParameter(event, kEventParamKeyMacCharCodes, typeChar, NULL,
-			sizeof(char), NULL, &ch);
-		GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL,
-			sizeof(UInt32), NULL, &modifiers);
-		if (modifiers & cmdKey)
-			return (eventNotHandledErr);
-		AddToKeyQueue(topl_resp_key(ch), TRUE);
-		return (noErr);
-	}
-
-	case kEventClassMouse: {
-		CGrafPtr saveport;
-		GDHandle savedev;
-		Point pt;
-
-		switch (GetEventKind(event)) {
-		case kEventMouseMoved:
-			GetEventParameter(event, kEventParamMouseLocation, typeQDPoint,
-				NULL, sizeof(Point), NULL, &pt);
-			GetGWorld(&saveport, &savedev);
-			SetPortWindowPort(wind->its_window);
-			GlobalToLocal(&pt);
-			SetGWorld(saveport, savedev);
-			BaseCursor(wind, pt);
-			return (eventNotHandledErr);
-		}
-		break;
-	}
-
-	case kEventClassWindow:
-		switch (GetEventKind(event)) {
-		case kEventWindowDrawContent: 
-			CallNextEventHandler(nexthandler, event);
-			image_tty(NULL, wind->its_window);
-			return (noErr);
-
-		case kEventWindowHandleContentClick: {
-			CGrafPtr saveport;
-			GDHandle savedev;
-			Point pt;
-			UInt32 modifiers;
-
-			GetEventParameter(event, kEventParamMouseLocation, typeQDPoint,
-				NULL, sizeof(Point), NULL, &pt);
-			GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL,
-				sizeof(UInt32), NULL, &modifiers);
-			GetGWorld(&saveport, &savedev);
-			SetPortWindowPort(wind->its_window);
-			GlobalToLocal(&pt);
-			SetGWorld(saveport, savedev);
-			BaseClick(wind, pt, modifiers);
-			return (noErr);
-		}
-
-		case kEventWindowClose:
-			/* TODO... */
-			break;
-		}
-		break;
-	}
-	return (eventNotHandledErr);
-}
-
-#else
 
 static void
 macClickTerm(EventRecord *theEvent, WindowPtr theWindow)
@@ -2310,8 +2284,6 @@ macCursorTerm(EventRecord *theEvent, WindowPtr theWindow, RgnHandle mouseRgn)
     return;
 }
 
-#endif /* !TARGET_API_MAC_CARBON */
-
 /**********************************************************************
  *	Status subwindow
  */
@@ -2329,7 +2301,7 @@ MsgClick(NhWindow *wind, Point pt)
 {
     int r_idx = 0;
 
-    while (topl_resp[r_idx]) {
+    while (topl_resp[r_idx] && topl_resp[r_idx] != '\033' && r_idx < 10) {
         Rect frame;
         topl_resp_rect(r_idx, &frame);
         InsetRect(&frame, 1, 1);
@@ -2338,9 +2310,7 @@ MsgClick(NhWindow *wind, Point pt)
 
             InvertRect(&frame);
             while (WaitMouseUp()) {
-#if !TARGET_API_MAC_CARBON
                 SystemTask();
-#endif
                 GetMouse(&pt);
                 if (PtInRect(pt, &frame) != in_btn) {
                     in_btn = !in_btn;
@@ -2358,6 +2328,27 @@ MsgClick(NhWindow *wind, Point pt)
     return;
 }
 
+/* Draw one yn-prompt button: centered label + rounded frame (heavier for
+   the default). Takes a C string and converts it to Pascal here. */
+static void
+draw_topl_button(const Rect *frame, const char *label, Boolean is_default)
+{
+    Str255 name;
+    FontInfo font;
+    C2P(label, name);
+    TextFont(kFontIDGeneva);
+    TextSize(9);
+    GetFontInfo(&font);
+    MoveTo((frame->left + frame->right - StringWidth(name)) / 2,
+           (frame->top + frame->bottom + font.ascent - font.descent
+            - font.leading - 1) / 2);
+    DrawString(name);
+    PenNormal();
+    if (is_default)
+        PenSize(2, 2);
+    FrameRoundRect(frame, 4, 4);
+}
+
 static void
 MsgUpdate(NhWindow *wind)
 {
@@ -2365,84 +2356,34 @@ MsgUpdate(NhWindow *wind)
     Rect r;
     int l;
 
+    if (!org_clip || !clip) {
+        if (org_clip) DisposeRgn(org_clip);
+        if (clip) DisposeRgn(clip);
+        return;
+    }
     GetClip(org_clip);
-    GetWindowBounds(wind->its_window, kWindowContentRgn, &r);
+    GetWindowPortBounds(wind->its_window, &r);
     OffsetRect(&r, -r.left, -r.top);
 
     DrawControls(wind->its_window);
-    DrawGrowIcon(wind->its_window);
+    if (wind->scrollBar)
+        DrawGrowIcon(wind->its_window);
 
-    for (l = 0; topl_resp[l]; l++) {
-        StringPtr name;
-        unsigned char tmp[2];
-        FontInfo font;
-        Rect frame;
-        topl_resp_rect(l, &frame);
-        switch (topl_resp[l]) {
-        case 'y':
-            name = "\pyes";
-            break;
-        case 'n':
-            name = "\pno";
-            break;
-        case 'N':
-            name = "\pNone";
-            break;
-        case 'a':
-            name = "\pall";
-            break;
-        case 'q':
-            name = "\pquit";
-            break;
-        case CHAR_ANY:
-            name = "\pany key";
-            break;
-        default:
-            tmp[0] = 1;
-            tmp[1] = topl_resp[l];
-            name = tmp;
-            break;
-        }
-        TextFont(kFontIDGeneva);
-        TextSize(9);
-        GetFontInfo(&font);
-        MoveTo((frame.left + frame.right - StringWidth(name)) / 2,
-               (frame.top + frame.bottom + font.ascent - font.descent
-                - font.leading - 1) / 2);
-        DrawString(name);
-        PenNormal();
-        if (l == topl_def_idx)
-            PenSize(2, 2);
-        FrameRoundRect(&frame, 4, 4);
+    if (wind->scrollBar) {
+        r.right -= SBARWIDTH;
+        r.bottom -= SBARHEIGHT;
     }
-
-    r.right -= SBARWIDTH;
-    r.bottom -= SBARHEIGHT;
-    /* Clip to the portrect - scrollbar/growicon *before* adjusting the rect
-            to be larger than the size of the window (!) */
+    /* clip to portrect minus scrollbar/growicon BEFORE growing r past the window */
     RectRgn(clip, &r);
     SectRgn(clip, org_clip, clip);
     if (r.right < MIN_RIGHT)
         r.right = MIN_RIGHT;
     r.top -= wind->scrollPos * wind->row_height;
 
-#if 0
-	/* If you enable this band of code (and disable the next band), you will get
-	   fewer flickers but a slower performance while drawing the dot line. */
-	{	RgnHandle dotl_rgn = NewRgn();
-		Rect dotl;
-		dotl.left	= r.left;
-		dotl.right	= r.right;
-		dotl.bottom = r.top + aWin->save_lin * aWin->row_height;
-		dotl.top	= dotl.bottom - 1;
-		FillRect(&dotl, &qd.gray);
-		RectRgn(dotl_rgn, &dotl);
-		DiffRgn(clip, dotl_rgn, clip);
-		DisposeRgn(dotl_rgn);
-		SetClip(clip);
-	}
-#endif
+    /* The dotted divider line is drawn after the text (below). Clipping it out
+       of the region here instead would flicker less but draw slower. */
 
+    SetClip(clip); /* install clip BEFORE any text drawing */
     if (in_topl_mode()) {
         RgnHandle topl_rgn = NewRgn();
         Rect topl_r = r;
@@ -2456,98 +2397,57 @@ MsgUpdate(NhWindow *wind)
         RectRgn(topl_rgn, &topl_r);
         DiffRgn(clip, topl_rgn, clip);
         DisposeRgn(topl_rgn);
-        SetClip(clip);
+        SetClip(clip); /* update clip to exclude topl area from TETextBox */
     }
-
     DisposeRgn(clip);
 
     TextFont(wind->font_number);
     TextSize(wind->font_size);
     HLock(wind->windowText);
-    TETextBox(*wind->windowText, wind->windowTextLen, &r, teJustLeft);
+    {
+        long hsize = GetHandleSize(wind->windowText);
+        long tlen = wind->windowTextLen;
+        if (tlen > hsize)
+            tlen = hsize;
+        TETextBox(*wind->windowText, tlen, &r, teJustLeft);
+    }
     HUnlock(wind->windowText);
 
-#if !TARGET_API_MAC_CARBON
-    r.bottom = r.top + aWin->save_lin * aWin->row_height;
+    r.bottom = r.top + wind->save_lin * wind->row_height;
     r.top = r.bottom - 1;
     FillRect(&r, (void *) &qd.gray);
-#endif
+
+    /* Draw buttons LAST so TETextBox can't overwrite them */
+    if (in_topl_mode() && topl_resp[0]) {
+        SetClip(org_clip); /* restore full clip for button area */
+        for (l = 0; topl_resp[l] && topl_resp[l] != '\033' && l < 10; l++) {
+            Boolean is_def = (l == topl_def_idx);
+            Rect frame;
+            topl_resp_rect(l, &frame);
+            switch (topl_resp[l]) {
+            case 'y':  draw_topl_button(&frame, "yes", is_def); break;
+            case 'n':  draw_topl_button(&frame, "no", is_def); break;
+            case 'N':  draw_topl_button(&frame, "None", is_def); break;
+            case 'a':  draw_topl_button(&frame, "all", is_def); break;
+            case 'q':  draw_topl_button(&frame, "quit", is_def); break;
+            case CHAR_ANY:
+                draw_topl_button(&frame, "any key", is_def);
+                break;
+            default: {
+                char one[2];
+                one[0] = (char) topl_resp[l];
+                one[1] = '\0';
+                draw_topl_button(&frame, one, is_def);
+                break;
+            }
+            }
+        }
+    }
 
     SetClip(org_clip);
     DisposeRgn(org_clip);
     return;
 }
-
-#if 0 // TARGET_API_MAC_CARBON
-static pascal OSStatus
-MsgEvent(EventHandlerCallRef nexthandler, EventRef event, void *userdata)
-{
-	NhWindow *wind = (NhWindow *) userdata;
-
-
-	switch (GetEventClass(event)) {
-	case kEventClassControl: {
-		ControlRef control;
-		ControlID id;
-
-		switch (GetEventKind(event)) {
-		case kEventControlHit:
-			GetEventParameter(event, kEventParamDirectObject,
-				typeControlRef, NULL, sizeof(ControlRef), NULL, &control);
-			GetControlID(control, &id);
-			/* TODO... */
-			return (noErr);
-		}
-		break;
-	}
-
-	case kEventClassKeyboard: {
-		char ch;
-		UInt32 modifiers;
-
-
-		GetEventParameter(event, kEventParamKeyMacCharCodes, typeChar, NULL,
-			sizeof(char), NULL, &ch);
-		GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL,
-			sizeof(UInt32), NULL, &modifiers);
-		if (modifiers & cmdKey)
-			return (eventNotHandledErr);
-		AddToKeyQueue(topl_resp_key(ch), TRUE);
-		return (noErr);
-	}
-
-	case kEventClassWindow:
-		switch (GetEventKind(event)) {
-		case kEventWindowDrawContent: 
-			CallNextEventHandler(nexthandler, event);
-			MsgUpdate(wind);
-			return (noErr);
-
-		case kEventWindowHandleContentClick: {
-			CGrafPtr saveport;
-			GDHandle savedev;
-			Point pt;
-
-			GetEventParameter(event, kEventParamMouseLocation, typeQDPoint,
-				NULL, sizeof(Point), NULL, &pt);
-			GetGWorld(&saveport, &savedev);
-			SetPortWindowPort(wind->its_window);
-			GlobalToLocal(&pt);
-			SetGWorld(saveport, savedev);
-			MsgClick(wind, pt);
-			return (noErr);
-		}
-
-		case kEventWindowClose:
-			/* TODO... */
-			break;
-		}
-		break;
-	}
-	return (eventNotHandledErr);
-}
-
-#else
 
 static void
 macClickMessage(EventRecord *theEvent, WindowPtr theWindow)
@@ -2568,11 +2468,59 @@ macUpdateMessage(EventRecord *theEvent, WindowPtr theWindow)
     return 0;
 }
 
-#endif /* !TARGET_API_MAC_CARBON */
-
 /**********************************************************************
  *	Menu windows
  */
+
+/* Bulk selection commands for a PICK_ANY menu, mirroring the tty/Amiga menu
+   keys (standard defaults): '.' select all, '-' deselect all, '@' invert all;
+   ',' '\' '~' do the same for just the visible page. Updates the selection data
+   for the affected items, then repaints via MenwUpdate. Returns true if ch was a
+   selection command (handled), false to let normal accelerator handling run. */
+static Boolean
+MenwSelectCmd(NhWindow *wind, char ch)
+{
+    int act;          /* +1 = select, 0 = deselect, -1 = invert */
+    Boolean page;     /* limit to the currently visible page */
+    int i, vis_rows = 0;
+
+    if (!wind || wind->how != PICK_ANY || !wind->menuInfo)
+        return false;
+    switch (ch) {
+    case '.':  act = +1; page = false; break;
+    case '-':  act =  0; page = false; break;
+    case '@':  act = -1; page = false; break;
+    case ',':  act = +1; page = true;  break;
+    case '\\': act =  0; page = true;  break;
+    case '~':  act = -1; page = true;  break;
+    default:   return false;
+    }
+
+    if (page && wind->its_window) {
+        Rect cr;
+        GetWindowPortBounds(wind->its_window, &cr);
+        vis_rows = (cr.bottom - cr.top) / wind->row_height;
+    }
+
+    HLock((char **) wind->menuInfo);
+    for (i = 0; i < wind->miLen; i++) {
+        int cur, want;
+        if (page) {
+            int row = (*wind->menuInfo)[i].line - wind->scrollPos;
+            if (row <= 0 || row > vis_rows)
+                continue;   /* not on the visible page */
+        }
+        cur  = (ListItemSelected(wind, i) >= 0);
+        want = (act < 0) ? !cur : act;
+        if (want != cur)
+            ToggleMenuListItemSelected(wind, i);
+    }
+    HUnlock((char **) wind->menuInfo);
+
+    SetPortWindowPort(wind->its_window);
+    MenwUpdate(wind);   /* repaint text + re-hilite from the updated selection */
+    return true;
+}
 
 static void
 MenwKey(NhWindow *wind, char ch)
@@ -2590,6 +2538,8 @@ MenwKey(NhWindow *wind, char ch)
 
     if (!wind || !wind->menuInfo)
         return;
+    if (MenwSelectCmd(wind, ch))
+        return;
     HLock((char **) wind->menuInfo);
     for (i = 0, mi = *wind->menuInfo; i < wind->miLen; i++, mi++) {
         if (mi->accelerator == ch) {
@@ -2605,7 +2555,6 @@ MenwKey(NhWindow *wind, char ch)
         }
     }
     HUnlock((char **) wind->menuInfo);
-    /* add key if didn't find it in menu and not filtered */
     return;
 }
 
@@ -2614,7 +2563,7 @@ MenwClick(NhWindow *wind, Point pt)
 {
     Rect wrect;
 
-    GetWindowBounds(wind->its_window, kWindowContentRgn, &wrect);
+    GetWindowPortBounds(wind->its_window, &wrect);
     OffsetRect(&wrect, -wrect.left, -wrect.top);
     if (inSelect != WIN_ERR && wind->how != PICK_NONE) {
         short currentRow = -1, previousRow = -1;
@@ -2622,9 +2571,7 @@ MenwClick(NhWindow *wind, Point pt)
         Boolean majorSelectState, firstRow = TRUE;
 
         do {
-#if !TARGET_API_MAC_CARBON
             SystemTask();
-#endif
             GetMouse(&pt);
             currentRow = pt.v / wind->row_height;
             if (pt.h < wrect.left || pt.h > wrect.right || pt.v < 0
@@ -2635,23 +2582,17 @@ MenwClick(NhWindow *wind, Point pt)
             item = ListCoordinateToItem(wind, currentRow);
 
             if (item != previousItem) {
-                /* Implement typical Mac multiple-selection behavior
-                 * (ie, not the UI implemented by the Finder)
-                 */
+                /* typical Mac multiple-selection drag behavior */
                 Boolean itemIsSelected = (ListItemSelected(wind, item) >= 0);
 
                 if (firstRow) {
-                    /* this is first valid row, so major state is opposite of
-                     * what this row is */
+                    /* drag toggles toward the opposite of the first row's state */
                     majorSelectState = !itemIsSelected;
                     firstRow = FALSE;
                 }
 
                 if (wind->how == PICK_ONE && previousItem != -1) {
-                    /* if previous row was selected and we're only selecting
-                     * one object,
-                     * deselect previous row!
-                     */
+                    /* PICK_ONE: deselect the previous row first */
                     ToggleMenuListItemSelected(wind, previousItem);
                     ToggleMenuSelect(wind, previousRow);
                     previousItem = -1;
@@ -2677,13 +2618,185 @@ MenwClick(NhWindow *wind, Point pt)
     return;
 }
 
+/* NetHack color index -> RGB for menu text on the WHITE menu background.
+   (Same values as the map's table; the white-bg adjustments are in
+   set_menu_text_color, not here.) */
+static const RGBColor menuColorRGB[16] = {
+    {0x0000, 0x0000, 0x0000},   /* 0  black   */
+    {0xC0C0, 0x0000, 0x0000},   /* 1  red     */
+    {0x0000, 0x8080, 0x0000},   /* 2  green   */
+    {0x8080, 0x8080, 0x0000},   /* 3  brown   */
+    {0x0000, 0x0000, 0xC0C0},   /* 4  blue    */
+    {0x8080, 0x0000, 0x8080},   /* 5  magenta */
+    {0x0000, 0x8080, 0x8080},   /* 6  cyan    */
+    {0x8080, 0x8080, 0x8080},   /* 7  gray    */
+    {0x0000, 0x0000, 0x0000},   /* 8  no color (unused; -> black) */
+    {0xFFFF, 0x8080, 0x0000},   /* 9  orange  */
+    {0x0000, 0xC0C0, 0x0000},   /* 10 bright green (darkened for white bg) */
+    {0x8080, 0x8080, 0x0000},   /* 11 yellow (darkened for white bg) */
+    {0x0000, 0x0000, 0xFFFF},   /* 12 bright blue */
+    {0xC0C0, 0x0000, 0xC0C0},   /* 13 bright magenta */
+    {0x0000, 0x8080, 0x8080},   /* 14 bright cyan (darkened for white bg) */
+    {0x0000, 0x0000, 0x0000}    /* 15 white (-> black on white bg) */
+};
+
+/* Map a NetHack menu attribute to a QuickDraw text face. Headings come through
+   as ATR_BOLD or (the default) ATR_INVERSE; both render bold here. */
+static short
+menu_attr_face(int attr)
+{
+    switch (attr) {
+    case ATR_BOLD:
+    case ATR_INVERSE: return bold;
+    case ATR_ULINE:   return underline;
+    default:          return normal;
+    }
+}
+
+/* Set the pen color for a menu line. The menu background is white, so NO_COLOR
+   and white become black, and on sub-4-bit screens colors are skipped. */
+static void
+set_menu_text_color(int color)
+{
+    RGBColor black = { 0, 0, 0 };
+    GDHandle gd = GetMainDevice();
+    short depth = gd ? (*(*gd)->gdPMap)->pixelSize : 1;
+
+    if (depth < 4 || color == NO_COLOR || color == CLR_WHITE
+        || color < 0 || color >= CLR_MAX)
+        RGBForeColor(&black);
+    else
+        RGBForeColor(&menuColorRGB[color]);
+}
+
+/* Store {attr,color} for menu lines [from,to). Grows the per-line style handle. */
+static void
+record_menu_line_style(NhWindow *aWin, short from, short to, int attr, int color)
+{
+    long need = (long) to * 2;
+    short l;
+    unsigned char *b;
+
+    if (to <= from)
+        return;
+    if (!aWin->menuStyle) {
+        aWin->menuStyle = NewHandle(need > 128 ? need : 128);
+        if (!aWin->menuStyle)
+            return;
+    } else if (GetHandleSize(aWin->menuStyle) < need) {
+        SetHandleSize(aWin->menuStyle, need + 128);
+        if (MemError())
+            return;
+    }
+    HLock(aWin->menuStyle);
+    b = (unsigned char *) *aWin->menuStyle;
+    for (l = from; l < to; l++) {
+        b[l * 2]     = (unsigned char) attr;
+        b[l * 2 + 1] = (unsigned char) color;
+    }
+    HUnlock(aWin->menuStyle);
+}
+
+/* Draw a menu's text line-by-line with per-line face (bold headings) and color
+   (menucolors), replacing TETextBox so each line can have its own style. */
+static void
+MenwDrawStyled(NhWindow *wind)
+{
+    Rect r, r2;
+    RgnHandle h = (RgnHandle) 0;
+    Boolean vis;
+    char *base;
+    long tlen, i, lineStart;
+    short lineIdx, row, vis_rows;
+
+    GetWindowPortBounds(wind->its_window, &r);
+    OffsetRect(&r, -r.left, -r.top);
+    r2 = r;
+    r2.left = r2.right - SBARWIDTH;
+    r2.right += 1;
+    r2.top -= 1;
+    vis = (r2.bottom > r2.top + 50);
+
+    EraseRect(&r);   /* clear old text/hilites (white background) */
+    draw_growicon_vert_only(wind->its_window);
+    DrawControls(wind->its_window);
+
+    /* clip text to exclude the scrollbar strip, preserving any update clip */
+    if (vis && (h = NewRgn())) {
+        RgnHandle tmp = NewRgn();
+        if (!tmp) {
+            DisposeRgn(h);
+            h = (RgnHandle) 0;
+        } else {
+            GetClip(h);
+            RectRgn(tmp, &r2);
+            DiffRgn(h, tmp, tmp);
+            SetClip(tmp);
+            DisposeRgn(tmp);
+        }
+    }
+
+    vis_rows = (r.bottom - r.top) / wind->row_height + 1;
+    TextMode(srcOr);
+
+    HLock(wind->windowText);
+    if (wind->menuStyle)
+        HLock(wind->menuStyle);
+    base = *wind->windowText;
+    tlen = wind->windowTextLen;
+    lineStart = 0;
+    lineIdx = 0;
+    for (i = 0; i <= tlen; i++) {
+        if (i == tlen || base[i] == CHAR_CR) {
+            long llen = i - lineStart;
+            row = lineIdx - wind->scrollPos;
+            if (row >= 0 && row <= vis_rows && llen > 0) {
+                int attr = ATR_NONE, color = NO_COLOR;
+                if (wind->menuStyle
+                    && (long) (lineIdx + 1) * 2 <= GetHandleSize(wind->menuStyle)) {
+                    unsigned char *sb = (unsigned char *) *wind->menuStyle;
+                    attr  = sb[lineIdx * 2];
+                    color = sb[lineIdx * 2 + 1];
+                }
+                TextFace(menu_attr_face(attr));
+                set_menu_text_color(color);
+                MoveTo(r.left, row * wind->row_height + wind->ascent_height);
+                /* pass the line via the pointer: lineStart can exceed
+                   DrawText's 16-bit byte offset in a >32KB text window */
+                if (llen > 0x7FFF)
+                    llen = 0x7FFF; /* DrawText byteCount is a short */
+                DrawText(base + lineStart, 0, (short) llen);
+            }
+            lineStart = i + 1;
+            lineIdx++;
+            if (i == tlen)
+                break;
+        }
+    }
+    {
+        RGBColor black = { 0, 0, 0 };
+        TextFace(normal);
+        RGBForeColor(&black);
+    }
+    if (wind->menuStyle)
+        HUnlock(wind->menuStyle);
+    HUnlock(wind->windowText);
+
+    if (h) {
+        SetClip(h);
+        DisposeRgn(h);
+    }
+}
+
 static void
 MenwUpdate(NhWindow *wind)
 {
     int i, line;
     MacMHMenuItem *mi;
 
-    TextUpdate(wind);
+    MenwDrawStyled(wind);
+    if (!wind->menuInfo || !wind->menuSelected || wind->miSelLen <= 0)
+        return;
     HLock((Handle) wind->menuInfo);
     HLock((Handle) wind->menuSelected);
     for (i = 0; i < wind->miSelLen; i++) {
@@ -2696,77 +2809,6 @@ MenwUpdate(NhWindow *wind)
     HUnlock((Handle) wind->menuSelected);
     return;
 }
-
-#if 0 // TARGET_API_MAC_CARBON
-static pascal OSStatus
-MenwEvent(EventHandlerCallRef nexthandler, EventRef event, void *userdata)
-{
-	NhWindow *wind = (NhWindow *) userdata;
-
-
-	switch (GetEventClass(event)) {
-	case kEventClassControl: {
-		ControlRef control;
-		ControlID id;
-
-		switch (GetEventKind(event)) {
-		case kEventControlHit:
-			GetEventParameter(event, kEventParamDirectObject,
-				typeControlRef, NULL, sizeof(ControlRef), NULL, &control);
-			GetControlID(control, &id);
-			/* TODO... */
-			return (noErr);
-		}
-		break;
-	}
-
-	case kEventClassKeyboard: {
-		char ch;
-		UInt32 modifiers;
-
-
-		GetEventParameter(event, kEventParamKeyMacCharCodes, typeChar, NULL,
-			sizeof(char), NULL, &ch);
-		GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL,
-			sizeof(UInt32), NULL, &modifiers);
-		if (modifiers & cmdKey)
-			return (eventNotHandledErr);
-		MenwKey(wind, ch);
-		return (noErr);
-	}
-
-	case kEventClassWindow:
-		switch (GetEventKind(event)) {
-		case kEventWindowDrawContent: 
-			CallNextEventHandler(nexthandler, event);
-			MenwUpdate(wind);
-			return (noErr);
-
-		case kEventWindowHandleContentClick: {
-			CGrafPtr saveport;
-			GDHandle savedev;
-			Point pt;
-
-			GetEventParameter(event, kEventParamMouseLocation, typeQDPoint,
-				NULL, sizeof(Point), NULL, &pt);
-			GetGWorld(&saveport, &savedev);
-			SetPortWindowPort(wind->its_window);
-			GlobalToLocal(&pt);
-			SetGWorld(saveport, savedev);
-			MenwClick(wind, pt);
-			return (noErr);
-		}
-
-		case kEventWindowClose:
-			/* TODO... */
-			break;
-		}
-		break;
-	}
-	return (eventNotHandledErr);
-}
-
-#else
 
 static void
 macKeyMenu(EventRecord *theEvent, WindowPtr theWindow)
@@ -2781,7 +2823,7 @@ macClickMenu(EventRecord *theEvent, WindowRef theWindow)
     Point p;
     NhWindow *aWin = GetNhWin(theWindow);
 
-    if (aWin->scrollBar && IsControlVisible(aWin->scrollBar)) {
+    if (aWin->scrollBar && ((** aWin->scrollBar).contrlVis != 0)) {
         short code;
         ControlHandle theBar;
 
@@ -2802,8 +2844,6 @@ macUpdateMenu(EventRecord *theEvent, WindowPtr theWindow)
     MenwUpdate(GetNhWin(theWindow));
     return 0;
 }
-
-#endif /* !TARGET_API_MAC_CARBON */
 
 /**********************************************************************
  *	Text windows
@@ -2830,7 +2870,7 @@ TextUpdate(NhWindow *wind)
     RgnHandle h;
     Boolean vis;
 
-    GetWindowBounds(wind->its_window, kWindowContentRgn, &r);
+    GetWindowPortBounds(wind->its_window, &r);
     OffsetRect(&r, -r.left, -r.top);
     r2 = r;
     r2.left = r2.right - SBARWIDTH;
@@ -2860,7 +2900,13 @@ TextUpdate(NhWindow *wind)
     r.top -= wind->scrollPos * wind->row_height;
     r.right -= SBARWIDTH;
     HLock(wind->windowText);
-    TETextBox(*wind->windowText, wind->windowTextLen, &r, teJustLeft);
+    {
+        long hsize = GetHandleSize(wind->windowText);
+        long tlen = wind->windowTextLen;
+        if (tlen > hsize)
+            tlen = hsize;
+        TETextBox(*wind->windowText, tlen, &r, teJustLeft);
+    }
     HUnlock(wind->windowText);
     if (h) {
         SetClip(h);
@@ -2868,62 +2914,6 @@ TextUpdate(NhWindow *wind)
     }
     return;
 }
-
-#if 0 // TARGET_API_MAC_CARBON
-static pascal OSStatus
-TextEvent(EventHandlerCallRef nexthandler, EventRef event, void *userdata)
-{
-	NhWindow *wind = (NhWindow *) userdata;
-
-
-	switch (GetEventClass(event)) {
-	case kEventClassControl: {
-		ControlRef control;
-		ControlID id;
-
-		switch (GetEventKind(event)) {
-		case kEventControlHit:
-			GetEventParameter(event, kEventParamDirectObject,
-				typeControlRef, NULL, sizeof(ControlRef), NULL, &control);
-			GetControlID(control, &id);
-			/* TODO... */
-			return (noErr);
-		}
-		break;
-	}
-
-	case kEventClassKeyboard: {
-		char ch;
-		UInt32 modifiers;
-
-
-		GetEventParameter(event, kEventParamKeyMacCharCodes, typeChar, NULL,
-			sizeof(char), NULL, &ch);
-		GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL,
-			sizeof(UInt32), NULL, &modifiers);
-		if (modifiers & cmdKey)
-			return (eventNotHandledErr);
-		TextKey(wind, ch);
-		return (noErr);
-	}
-
-	case kEventClassWindow:
-		switch (GetEventKind(event)) {
-		case kEventWindowDrawContent: 
-			CallNextEventHandler(nexthandler, event);
-			TextUpdate(wind);
-			return (noErr);
-
-		case kEventWindowClose:
-			/* TODO... */
-			break;
-		}
-		break;
-	}
-	return (eventNotHandledErr);
-}
-
-#else
 
 static void
 macKeyText(EventRecord *theEvent, WindowPtr theWindow)
@@ -2937,7 +2927,7 @@ macClickText(EventRecord *theEvent, WindowPtr theWindow)
 {
     NhWindow *aWin = GetNhWin(theWindow);
 
-    if (aWin->scrollBar && IsControlVisible(aWin->scrollBar)) {
+    if (aWin->scrollBar && ((** aWin->scrollBar).contrlVis != 0)) {
         short code;
         Point p = theEvent->where;
         ControlHandle theBar;
@@ -2950,24 +2940,9 @@ macClickText(EventRecord *theEvent, WindowPtr theWindow)
     }
 }
 
-#endif /* !TARGET_API_MAC_CARBON */
-
 /**********************************************************************
  *	Global events
  */
-
-#if 0 // TARGET_API_MAC_CARBON
-static pascal OSStatus
-GlobalEvent(EventHandlerCallRef nexthandler, EventRef event, void *userdata)
-{
-	switch (GetEventClass(event)) {
-	case kEventClassCommand:
-		return (eventNotHandledErr);
-	}
-	return (eventNotHandledErr);
-}
-
-#else
 
 static short
 macDoNull(EventRecord *theEvent, WindowPtr theWindow)
@@ -2975,21 +2950,32 @@ macDoNull(EventRecord *theEvent, WindowPtr theWindow)
     return 0;
 }
 
-/*
- * Note; theWindow may very well be null here, since keyDown may call
- * it when theres no window !!!
- */
-/* NOT_IN_CARBON */
+/* theWindow may be null here: keyDown can dispatch with no front window */
 static void
 GeneralKey(EventRecord *theEvent, WindowPtr theWindow)
 {
-#if defined(__SC__) || defined(__MRC__)
-#pragma unused(theWindow)
-#endif
-#if 0
-	trans_num_keys (theEvent);
-#endif
-    AddToKeyQueue(topl_resp_key(theEvent->message & 0xff), TRUE);
+    unsigned char ch;
+
+    if (theEvent->modifiers & optionKey) {
+        /* Option = Meta: re-translate without Option to get the base char,
+           then set the high bit so the core sees M-<key> */
+        unsigned short keyCode = (theEvent->message >> 8) & 0xff;
+        unsigned long state = 0;
+        Handle kchr = GetResource('KCHR', 0);
+        if (kchr) {
+            unsigned long result = KeyTranslate(*kchr, keyCode, &state);
+            ch = (result & 0xff);
+            if (ch)
+                ch |= 0x80;
+            else
+                ch = theEvent->message & 0xff;
+        } else {
+            ch = theEvent->message & 0xff;
+        }
+    } else {
+        ch = theEvent->message & 0xff;
+    }
+    AddToKeyQueue(topl_resp_key(ch), TRUE);
 }
 
 static void
@@ -2998,7 +2984,7 @@ HandleKey(EventRecord *theEvent)
     WindowPtr theWindow = FrontWindow();
 
     if (theEvent->modifiers & cmdKey) {
-        if (theEvent->message & 0xff == '.') {
+        if ((theEvent->message & 0xff) == '.') {
             /* Flush key queue */
             keyQueueCount = keyQueueWrite = keyQueueRead = 0;
             theEvent->message = '\033';
@@ -3011,14 +2997,13 @@ HandleKey(EventRecord *theEvent)
     dispatchKey:
         if (theWindow) {
             int kind = GetWindowKind(theWindow) - WIN_BASE_KIND;
-            winKeyFuncs[kind](theEvent, theWindow);
+            if (kind >= 0 && kind < NUM_FUNCS)
+                winKeyFuncs[kind](theEvent, theWindow);
         } else {
             GeneralKey(theEvent, (WindowPtr) 0);
         }
     }
 }
-
-#endif /* !TARGET_API_MAC_CARBON */
 
 static void
 HandleClick(EventRecord *theEvent)
@@ -3030,7 +3015,8 @@ HandleClick(EventRecord *theEvent)
     Rect r;
     Boolean not_inSelect;
 
-    InsetRect(GetRegionBounds(GetGrayRgn(), &r), 4, 4);
+    r = (*GetGrayRgn())->rgnBBox;
+    InsetRect(&r, 4, 4);
 
     code = FindWindow(theEvent->where, &theWindow);
     aWin = GetNhWin(theWindow);
@@ -3038,24 +3024,24 @@ HandleClick(EventRecord *theEvent)
 
     switch (code) {
     case inContent:
-#if 1 //!TARGET_API_MAC_CARBON
         if (not_inSelect) {
             int kind = GetWindowKind(theWindow) - WIN_BASE_KIND;
-            winCursorFuncs[kind](theEvent, theWindow, gMouseRgn);
-            SelectWindow(theWindow);
-            SetPortWindowPort(theWindow);
-            winClickFuncs[kind](theEvent, theWindow);
+            if (kind >= 0 && kind < NUM_FUNCS) {
+                winCursorFuncs[kind](theEvent, theWindow, gMouseRgn);
+                SelectWindow(theWindow);
+                SetPortWindowPort(theWindow);
+                winClickFuncs[kind](theEvent, theWindow);
+            }
         } else {
             nhbell();
         }
-#endif
         break;
 
     case inDrag:
         if (not_inSelect) {
             SetCursor(&qdarrow);
             DragWindow(theWindow, theEvent->where, &r);
-            SaveWindowPos(theWindow);
+            SaveWindowPos(theWindow); /* into the prefs file */
         } else {
             nhbell();
         }
@@ -3064,18 +3050,26 @@ HandleClick(EventRecord *theEvent)
     case inGrow:
         if (not_inSelect) {
             SetCursor(&qdarrow);
-            SetRect(&r, 80, 2 * aWin->row_height + 1, r.right, r.bottom);
-            if (aWin == theWindows + WIN_MESSAGE)
-                r.top += SBARHEIGHT;
-            l = GrowWindow(theWindow, theEvent->where, &r);
-            SizeWindow(theWindow, l & 0xffff, l >> 16, FALSE);
-            SaveWindowSize(theWindow);
-            SetPortWindowPort(theWindow);
-            GetWindowBounds(theWindow, kWindowContentRgn, &r);
-            OffsetRect(&r, -r.left, -r.top);
-            InvalWindowRect(theWindow, &r);
-            if (aWin->scrollBar) {
-                DrawScrollbar(aWin);
+            if (GetWRefCon(theWindow) == MACMAP_REFCON) {
+                Rect growLimits;   /* (minW, minH, maxW, maxH) */
+                SetRect(&growLimits, 200, 80, 2048, 1536);
+                l = GrowWindow(theWindow, theEvent->where, &growLimits);
+                if (l)
+                    macmap_grow_event(&theWindows[WIN_MAP], l);
+            } else {
+                SetRect(&r, 80, 2 * aWin->row_height + 1, r.right, r.bottom);
+                if (aWin == theWindows + WIN_MESSAGE)
+                    r.top += SBARHEIGHT;
+                l = GrowWindow(theWindow, theEvent->where, &r);
+                SizeWindow(theWindow, l & 0xffff, l >> 16, FALSE);
+                SaveWindowSize(theWindow);
+                SetPortWindowPort(theWindow);
+                GetWindowPortBounds(theWindow, &r);
+                OffsetRect(&r, -r.left, -r.top);
+                InvalWindowRect(theWindow, &r);
+                if (aWin->scrollBar) {
+                    DrawScrollbar(aWin);
+                }
             }
         } else {
             nhbell();
@@ -3090,16 +3084,12 @@ HandleClick(EventRecord *theEvent)
         DoMenuEvt(MenuSelect(theEvent->where));
         break;
 
-#if !TARGET_API_MAC_CARBON
     case inSysWindow:
         SystemClick(theEvent, theWindow);
-#endif
     default:
         break;
     }
 }
-
-#if 1 //!TARGET_API_MAC_CARBON
 
 static short
 GeneralUpdate(EventRecord *theEvent, WindowPtr theWindow)
@@ -3110,20 +3100,29 @@ GeneralUpdate(EventRecord *theEvent, WindowPtr theWindow)
     return 0;
 }
 
-#endif
-
 static void
 HandleUpdate(EventRecord *theEvent)
 {
     WindowPtr theWindow = (WindowPtr) theEvent->message;
     NhWindow *aWin = GetNhWin(theWindow);
     Rect r;
-#if 1 //!TARGET_API_MAC_CARBON
-    EventRecord fake;
-#endif
+    EventRecord fake = {0};
 
     char existing_update_region = FALSE;
     Rect rect;
+
+    if (!aWin && theWindow != _mt_window) {
+        /* Check if this is the dedicated map window. */
+        if (WIN_MAP != WIN_ERR && theWindows[WIN_MAP].its_window == theWindow) {
+            BeginUpdate(theWindow);
+            macmap_update_event(&theWindows[WIN_MAP]);
+            EndUpdate(theWindow);
+            return;
+        }
+        BeginUpdate(theWindow);
+        EndUpdate(theWindow);
+        return;
+    }
 
     if (theWindow == _mt_window) {
         existing_update_region =
@@ -3131,46 +3130,31 @@ HandleUpdate(EventRecord *theEvent)
     }
     BeginUpdate(theWindow);
     SetPortWindowPort(theWindow);
-    GetWindowBounds(theWindow, kWindowContentRgn, &r);
+    GetWindowPortBounds(theWindow, &r);
     OffsetRect(&r, -r.left, -r.top);
     EraseRect(&r);
-#if 0 // TARGET_API_MAC_CARBON
-	switch (GetWindowKind(theWindow) - WIN_BASE_KIND) {
-	case NHW_BASE:
-	case NHW_MAP:
-	case NHW_STATUS:
-		image_tty(NULL, theWindow);
-		break;
-	case NHW_MESSAGE:
-		MsgUpdate(GetNhWin(theWindow));
-		break;
-	case NHW_MENU:
-		MenwUpdate(GetNhWin(theWindow));
-		break;
-	case NHW_TEXT:
-		TextUpdate(GetNhWin(theWindow));
-		break;
-	}
-#else
-    winUpdateFuncs[GetWindowKind(theWindow) - WIN_BASE_KIND](&fake,
-                                                             theWindow);
-#endif
+    {
+        int kind = GetWindowKind(theWindow) - WIN_BASE_KIND;
+        /* Distinguish the macmap window (its own Mac WindowPtr) from
+           _mt_window — both share kind=NHW_MAP for legacy reasons. */
+        if (GetWRefCon(theWindow) == MACMAP_REFCON && WIN_MAP != WIN_ERR) {
+            macmap_update_event(&theWindows[WIN_MAP]);
+        } else if (kind >= 0 && kind < NUM_FUNCS) {
+            winUpdateFuncs[kind](&fake, theWindow);
+        }
+    }
 
     if (theWindow == _mt_window && existing_update_region) {
         set_invalid_region(theWindow, &rect);
     }
-    aWin->drawn = TRUE;
+    if (aWin)
+        aWin->drawn = TRUE;
     EndUpdate(theWindow);
 }
-
-#if 1 //!TARGET_API_MAC_CARBON
 
 static void
 GeneralCursor(EventRecord *theEvent, WindowPtr theWindow, RgnHandle mouseRgn)
 {
-#if defined(__SC__) || defined(__MRC__)
-#pragma unused(theWindow)
-#endif
     Rect r = { -1, -1, 2, 2 };
 
     SetCursor(&qdarrow);
@@ -3183,8 +3167,9 @@ DoOsEvt(EventRecord *theEvent)
 {
     WindowRef win;
     short code;
+    unsigned long msgClass = (theEvent->message >> 24) & 0xFF;
 
-    if ((theEvent->message & 0xff000000) == 0xfa000000) {
+    if (msgClass == 0xFA) {
         /* Mouse Moved */
 
         code = FindWindow(theEvent->where, &win);
@@ -3195,50 +3180,56 @@ DoOsEvt(EventRecord *theEvent)
             OffsetRect(&r, theEvent->where.h, theEvent->where.v);
             RectRgn(gMouseRgn, &r);
         } else {
-#if 1 //!TARGET_API_MAC_CARBON
             int kind = GetWindowKind(win) - WIN_BASE_KIND;
             if (kind >= 0 && kind <= NHW_TEXT) {
                 winCursorFuncs[kind](theEvent, win, gMouseRgn);
             }
-#endif
+        }
+    } else if (msgClass == suspendResumeMessage) {
+        /* Suspend / Resume */
+        if (theEvent->message & resumeFlag) {
+            /* Resuming: re-check if tile mode is still available */
+            NhWindow *map = (WIN_MAP != WIN_ERR) ? &theWindows[WIN_MAP] : NULL;
+            if (map && map->tile_mode && !mactile_available()) {
+                /* Route through macmap_set_mode so palette cleanup runs. */
+                macmap_set_mode(map, false);
+                iflags.wc_tiled_map = FALSE;          /* keep NHDeflts in sync */
+                InvalWindowRect(map->its_window, &map->its_window->portRect);
+                gTileMenuNeedsUpdate = 1;
+            }
         }
     }
 }
-
-#endif /* !TARGET_API_MAC_CARBON */
 
 void
 HandleEvent(EventRecord *theEvent)
 {
     switch (theEvent->what) {
-#if 1 //!TARGET_API_MAC_CARBON
     case autoKey:
     case keyDown:
         HandleKey(theEvent);
         break;
-#endif
     case updateEvt:
         HandleUpdate(theEvent);
         break;
     case mouseDown:
         HandleClick(theEvent);
         break;
-#if !TARGET_API_MAC_CARBON
     case diskEvt:
         if ((theEvent->message & 0xffff0000) != 0) {
             Point p = { 150, 150 };
             (void) DIBadMount(p, theEvent->message);
         }
         break;
-#endif
-#if !TARGET_API_MAC_CARBON
     case osEvt:
         DoOsEvt(theEvent);
         break;
-#endif
     case kHighLevelEvent:
         AEProcessAppleEvent(theEvent);
+        break;
     default:
+        /* Idle: refresh menu state if mactile signals an update. */
+        mactile_menu_refresh();
         break;
     }
 }
@@ -3247,35 +3238,52 @@ HandleEvent(EventRecord *theEvent)
  *	Interface definition, for windows.c
  */
 
+/* mttymain.c: Mac-specific color functions (renamed to avoid conflict
+   with wintty.c's versions when both are linked) */
+extern void mac_change_color(int, long, int);
+extern void mac_change_background(int);
+extern char *mac_get_color_string(void);
+
 struct window_procs mac_procs = {
-    "mac",
+    WPID(mac),
     WC_COLOR | WC_HILITE_PET | WC_FONT_MAP | WC_FONT_MENU | WC_FONT_MESSAGE
         | WC_FONT_STATUS | WC_FONT_TEXT | WC_FONTSIZ_MAP | WC_FONTSIZ_MENU
-        | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_STATUS | WC_FONTSIZ_TEXT,
-    0L,
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+        | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_STATUS | WC_FONTSIZ_TEXT
+        | WC_TILED_MAP,
+    WC2_SUPPRESS_HIST,   /* honor ATR_NOHISTORY: transient msgs (e.g. farlook
+                            descriptions) replace the line instead of logging */
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
     mac_init_nhwindows,
-    mac_unimplemented, /* see macmenu.c:mac_askname() for player selection */
+    mac_player_selection,
     mac_askname, mac_get_nh_event, mac_exit_nhwindows, mac_suspend_nhwindows,
-    mac_unimplemented, mac_create_nhwindow, mac_clear_nhwindow,
+    mac_resume_nhwindows, mac_create_nhwindow, mac_clear_nhwindow,
     mac_display_nhwindow, mac_destroy_nhwindow, mac_curs, mac_putstr,
     genl_putmixed, mac_display_file, mac_start_menu, mac_add_menu,
-    mac_end_menu, mac_select_menu, genl_message_menu, mac_unimplemented,
-    mac_get_nh_event, mac_get_nh_event,
+    mac_end_menu, mac_select_menu, genl_message_menu,
+    mac_mark_synch, mac_get_nh_event, /* wait_synch */
 #ifdef CLIPPING
     mac_cliparound,
 #endif
 #ifdef POSITIONBAR
     donull,
 #endif
-    tty_print_glyph, tty_raw_print, tty_raw_print_bold, mac_nhgetch,
+    mac_print_glyph, mac_raw_print, mac_raw_print_bold, mac_nhgetch,
     mac_nh_poskey, tty_nhbell, mac_doprev_message, mac_yn_function,
     mac_getlin, mac_get_ext_cmd, mac_number_pad, mac_delay_output,
 #ifdef CHANGE_COLOR
-    tty_change_color, tty_change_background, set_tty_font_name,
-    tty_get_color_string,
+    mac_change_color,
+#ifdef MACOS9
+    mac_change_background, set_tty_font_name,
 #endif
-    genl_outrip, genl_preference_update, genl_can_suspend_no,
+    mac_get_color_string,
+#endif
+    genl_outrip, genl_preference_update,
+    genl_getmsghistory, genl_putmsghistory,
+    genl_status_init, genl_status_finish, genl_status_enablefield,
+    genl_status_update,
+    genl_can_suspend_no,
+    mac_update_inventory,
+    mac_ctrl_nhwindow,
 };
 
 /*macwin.c*/

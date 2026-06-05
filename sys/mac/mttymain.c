@@ -1,28 +1,33 @@
-/* NetHack 3.6	mttymain.c	$NHDT-Date: 1554215928 2019/04/02 14:38:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.13 $ */
+/* NetHack 5.0	mttymain.c	$NHDT-Date: 1554215928 2019/04/02 14:38:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Jon W{tte, 1993					*/
 /* NetHack may be freely redistributed.  See license for details.	*/
 
 #include "hack.h"
 #include "macwin.h"
+#include "macmap.h"
 #include "mttypriv.h"
 #include "mactty.h"
 #include "wintty.h"
 
-#if !TARGET_API_MAC_CARBON
 #include <Palettes.h>
-#endif
 #include <Gestalt.h>
 
 #define MT_WINDOW 135
 #define MT_WIDTH 80
 #define MT_HEIGHT 24
 
-/*
- * Names:
- *
- * Statics are prefixed _
- * Mac-tty becomes mt_
- */
+/* The Mac port uses its own tty emulation layer (mactty.c) but
+ * still references ttyDisplay/wins/BASE_WINDOW from wintty.h.
+ * Provide the storage here since win/tty/wintty.c is not linked. */
+#ifndef TTY_GRAPHICS
+struct DisplayDesc *ttyDisplay = (struct DisplayDesc *) 0;
+struct WinDesc *wins[MAXWIN];
+winid BASE_WINDOW;
+#endif
+
+/* naming: statics are prefixed _, mac-tty becomes mt_ */
+
+void msmsg(const char *, ...); /* shared with wintty.c (see winprocs/MICRO decls) */
 
 static long _mt_attrs[5][2] = {
     { 0x000000, 0xffffff }, /* Normal */
@@ -69,7 +74,7 @@ static char _colors_inverse[CLR_MAX] = {
 #define SECONDARY_CHANNEL_LIMIT 12
 
 void
-tty_change_color(int color, long rgb, int reverse)
+mac_change_color(int color, long rgb, int reverse)
 {
     long inverse, working_rgb = rgb;
     int total_power = 0, max_channel = 0;
@@ -113,7 +118,7 @@ tty_change_color(int color, long rgb, int reverse)
 }
 
 void
-tty_change_background(int white_or_black)
+mac_change_background(int white_or_black)
 {
     register int i;
 
@@ -148,7 +153,7 @@ tty_change_background(int white_or_black)
 }
 
 char *
-tty_get_color_string(void)
+mac_get_color_string(void)
 {
     char *ptr;
     int count;
@@ -185,7 +190,7 @@ extern struct DisplayDesc *ttyDisplay; /* the tty display descriptor */
 char kill_char = CHAR_ESC;
 char erase_char = CHAR_BS;
 
-WindowRef _mt_window = (WindowRef) 0;
+WindowPtr _mt_window = (WindowPtr) 0;  /* WindowPtr: matches all extern decls */
 static Boolean _mt_in_color = 0;
 extern short win_fonts[NHW_TEXT + 1];
 
@@ -201,17 +206,11 @@ _mt_init_stuff(void)
     CO = MT_WIDTH;
 
     if (!strcmp(windowprocs.name, "mac")) {
-        dprintf("Mac Windows");
         LI -= 1;
-    } else {
-        dprintf("TTY Windows");
     }
 
-    /*
-     * If there is at least one screen CAPABLE of color, and if
-     * 32-bit QD is there, we use color. 32-bit QD is needed for the
-     * offscreen GWorld
-     */
+    /* use color if a color-capable screen exists and 32-bit QD is present
+     * (32-bit QD is required for the offscreen GWorld) */
     if (!Gestalt(gestaltQuickdrawVersion, &resp) && resp > 0x1ff) {
         GDHandle gdh = GetDeviceList();
         while (gdh) {
@@ -226,29 +225,45 @@ _mt_init_stuff(void)
         }
     }
 
-    if (create_tty(&_mt_window, WIN_BASE_KIND + NHW_MAP, _mt_in_color)
-        != noErr)
-        error("_mt_init_stuff: Couldn't create tty.");
+    {
+        short statw_id = small_screen ? kWindStatusBorderless
+                                      : (WIN_BASE_KIND + NHW_MAP);
+        short err = create_tty(&_mt_window, statw_id, _mt_in_color);
+        if (err != noErr) {
+            /* Try again in B&W if color failed */
+            _mt_in_color = 0;
+            err = create_tty(&_mt_window, statw_id, 0);
+            if (err != noErr)
+                error("_mt_init_stuff: Couldn't create tty (err=%d).", (int)err);
+        }
+    }
     SetWindowKind(_mt_window, WIN_BASE_KIND + NHW_MAP);
     SelectWindow(_mt_window);
     SetPortWindowPort(_mt_window);
+    /* shift the origin so local (0,0) lands one pixel inside the window;
+       paired with the +2 in SizeWindow below this leaves a one-pixel
+       margin around the tty bitmap on all sides */
     SetOrigin(-1, -1);
 
     font_size = iflags.wc_fontsiz_map
                     ? iflags.wc_fontsiz_map
                     : (iflags.large_font && !small_screen) ? 12 : 9;
-    if (init_tty_number(_mt_window, win_fonts[NHW_MAP], font_size, CO, LI)
-        != noErr)
-        error("_mt_init_stuff: Couldn't init tty.");
+    {
+        short fnum = win_fonts[NHW_MAP] ? win_fonts[NHW_MAP] : kFontIDMonaco;
+        short err = init_tty_number(_mt_window, fnum, font_size, CO, LI);
+        if (err != noErr)
+            error("_mt_init_stuff: init tty err=%d font=%d sz=%d",
+                  (int)err, (int)fnum, (int)font_size);
+    }
 
     if (get_tty_metrics(_mt_window, &num_cols, &num_rows, &win_width,
                         &win_height, &font_num, &font_size, &char_width,
                         &row_height))
         error("_mt_init_stuff: Couldn't get tty metrics.");
 
+    /* +2: one-pixel margin on each side, matching SetOrigin(-1, -1) above */
     SizeWindow(_mt_window, win_width + 2, win_height + 2, 1);
-    if (RetrievePosition(kMapWindow, &vert, &hor)) {
-        dprintf("Moving window to (%d,%d)", hor, vert);
+    if (RetrievePosition(kStatusWindow, &vert, &hor)) {
         MoveWindow(_mt_window, hor, vert, 1);
     }
     ShowWindow(_mt_window);
@@ -274,17 +289,12 @@ _mt_init_stuff(void)
         /* update the window proc has_color table */
         int i, setting = 0;
         Rect r;
-//	Point p = {0, 0};
         GDHandle gh = (GDHandle) 0;
 
         if (_mt_in_color) {
-            GetWindowBounds(_mt_window, kWindowContentRgn, &r);
-//          SetPortWindowPort(_mt_window);
-//          LocalToGlobal (&p);
-//          OffsetRect (&r, p.h, p.v);
+            GetWindowPortBounds(_mt_window, &r);
             gh = GetMaxDevice(&r);
-            /* > 4 bpp */
-            setting = ((*((*gh)->gdPMap))->pixelSize > 4) ? 1 : 0;
+            setting = ((*((*gh)->gdPMap))->pixelSize > 4) ? 1 : 0; /* > 4 bpp */
     	}
 
         for (i = 0; i < CLR_MAX ; ++i) {
@@ -329,35 +339,6 @@ getreturn(char *str)
     (void) tgetch();
 }
 
-#if 0       /* this function is commented out */
-/* the tty has_color[] table is filled in during init above */
-int
-has_color(int color)
-{
-#if defined(__SC__) || defined(__MRC__)
-#pragma unused(color)
-#endif
-    Rect r;
-    //	Point p = {0, 0};
-    GDHandle gh;
-
-    if (!_mt_in_color)
-        return 0;
-
-    GetWindowBounds(_mt_window, kWindowContentRgn, &r);
-    //	SetPortWindowPort(_mt_window);
-    //	LocalToGlobal (&p);
-    //	OffsetRect (&r, p.h, p.v);
-
-    gh = GetMaxDevice(&r);
-    if (!gh) {
-        return 0;
-    }
-
-    return (*((*gh)->gdPMap))->pixelSize > 4; /* > 4 bpp */
-}
-#endif
-
 void
 tty_delay_output(void)
 {
@@ -390,13 +371,12 @@ nocmov(int x, int y)
 static void
 _mt_set_colors(long *colors)
 {
-    short err;
-
     if (!_mt_in_color) {
         return;
     }
-    err = set_tty_attrib(_mt_window, TTY_ATTRIB_FOREGROUND, colors[0]);
-    err = set_tty_attrib(_mt_window, TTY_ATTRIB_BACKGROUND, colors[1]);
+    /* can only fail for a null window or bad attrib index; neither here */
+    (void) set_tty_attrib(_mt_window, TTY_ATTRIB_FOREGROUND, colors[0]);
+    (void) set_tty_attrib(_mt_window, TTY_ATTRIB_BACKGROUND, colors[1]);
 }
 
 int
@@ -409,9 +389,6 @@ term_attr_fixup(int attrmask)
 void
 term_end_attr(int attr)
 {
-#if defined(__SC__) || defined(__MRC__)
-#pragma unused(attr)
-#endif
     _mt_set_colors(_mt_attrs[0]);
 }
 
@@ -488,20 +465,19 @@ void
 backsp(void)
 {
     char eraser[] = { CHAR_BS, CHAR_BLANK, CHAR_BS, 0 };
-    short err;
 
-    err = add_tty_string(_mt_window, eraser);
-    err = update_tty(_mt_window);
+    (void) add_tty_string(_mt_window, eraser);
+    (void) update_tty(_mt_window);
 }
 
 void
 msmsg(const char *str, ...)
 {
     va_list args;
-    char buf[1000];
+    char buf[BUFSZ];
 
     va_start(args, str);
-    vsprintf(buf, str, args);
+    vsnprintf(buf, sizeof buf, str, args);
     va_end(args);
 
     xputs(buf);
@@ -575,9 +551,6 @@ settty(const char *str)
 void
 tty_number_pad(int arg)
 {
-#if defined(__SC__) || defined(__MRC__)
-#pragma unused(arg)
-#endif
 }
 
 void
@@ -602,6 +575,45 @@ term_puts(const char *str)
 {
     xputs(str);
     return strlen(str);
+}
+
+#ifdef CHANGE_COLOR
+/* Wrappers with tty_ names so wintty.c's tty_procs struct can resolve */
+void tty_change_color(int c, long r, int v) { mac_change_color(c, r, v); }
+void tty_change_background(int w) { mac_change_background(w); }
+char *tty_get_color_string(void) { return mac_get_color_string(); }
+#endif
+
+/* term_* stubs for 3.7 wintty.c compatibility */
+void
+term_clear_screen(void)
+{
+    clear_tty(_mt_window);
+    update_tty(_mt_window);
+}
+
+void
+term_shutdown(void)
+{
+    /* noop - cleanup done elsewhere */
+}
+
+void
+term_start_extracolor(uint32 customcolor UNUSED, uint16 color256idx UNUSED)
+{
+    /* no extended color support on classic Mac */
+}
+
+void
+term_end_extracolor(void)
+{
+    /* no extended color support on classic Mac */
+}
+
+void
+g_pututf8(uint32 c UNUSED)
+{
+    /* UTF-8 output not supported on classic Mac */
 }
 
 int

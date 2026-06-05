@@ -1,4 +1,4 @@
-/* NetHack 3.6	macconf.h	$NHDT-Date: 1432512782 2015/05/25 00:13:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* NetHack 5.0	macconf.h	$NHDT-Date: 1432512782 2015/05/25 00:13:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kevin Hugo, 2004. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -7,36 +7,35 @@
 #ifndef MACCONF_H
 #define MACCONF_H
 
-/*
- * Compiler selection is based on the following symbols:
- *
- *  __SC__			sc, a MPW 68k compiler
- *  __MRC__			mrc, a MPW PowerPC compiler
- *	THINK_C			Think C compiler
- *	__MWERKS__		Metrowerks' Codewarrior compiler
- *
- * We use these early in config.h to define some needed symbols,
- * including MACOS9.
- #
- # The Metrowerks compiler defines __STDC__ (which sets NHSTC) and uses
- # WIDENED_PROTOTYPES (defined if UNWIDENED_PROTOTYPES is undefined and
- # NHSTDC is defined).
- */
+/* Built with the Retro68 GCC cross-toolchain (see sys/mac/BUILD.md).
+ * The MPW/Think C/CodeWarrior compilers of the original port are no
+ * longer supported. */
 
-#ifndef __powerc
-#define MAC68K /* 68K mac (non-powerpc) */
+/* No system-wide config file on classic Mac OS */
+#undef STATUS_HILITES  /* Mac port doesn't support terminal-based hilites;
+                          with it defined, WIN_STATUS is never displayed */
+
+/* Lua: use 32-bit integers and 32-bit floats.
+   Default 64-bit types are emulated in software on 68k and extremely slow. */
+#define LUA_32BITS
+#ifndef TARGET_API_MAC_OS8
+#define TARGET_API_MAC_OS8 1
 #endif
-#ifndef TARGET_API_MAC_CARBON
-#define TARGET_API_MAC_CARBON 0
+/* Use classic (non-opaque) toolbox structs and direct field access */
+#ifndef OPAQUE_TOOLBOX_STRUCTS
+#define OPAQUE_TOOLBOX_STRUCTS 0
+#endif
+#ifndef ACCESSOR_CALLS_ARE_FUNCTIONS
+#define ACCESSOR_CALLS_ARE_FUNCTIONS 0
 #endif
 
-#ifndef __MACH__
-#define RANDOM
-#endif
+/* newlib provides random(); RANDOM (sys/share/random.c) not needed */
 #define NO_SIGNAL /* You wouldn't believe our signals ... */
 #define FILENAME 256
 #define NO_TERMS /* For tty port (see wintty.h) */
+#ifndef NO_CHANGE_COLOR
 #define CHANGE_COLOR
+#endif
 
 /* Use these two includes instead of system.h. */
 #include <string.h>
@@ -50,20 +49,7 @@
  * Try and keep the number of files here to an ABSOLUTE minimum !
  * include the relevant files in the relevant .c files instead !
  */
-#if TARGET_API_MAC_CARBON
-#ifdef GNUC
-/* Avoid including <CarbonCore/fp.h> -- it has a conflicting expl() */
-#define __FP__
-#include <Carbon/Carbon.h>
-#else
-/* Avoid including <fenv.h> -- it uses GENERATINGPOWERPC */
-#define __FENV__
-#include <machine/types.h>
-#include <Carbon.h>
-#endif
-#else
 #include <MacTypes.h>
-#endif
 
 /*
  * We could use the PSN under sys 7 here ...
@@ -76,34 +62,37 @@
 
 #define Rand random
 extern void error(const char *, ...);
+/* macwin.c; called from options.c under #ifdef MACOS9 */
+extern short set_font_name(int, char *);
+/* macmain.c; called from options.c (other ports declare these in their
+   *conf.h as well) */
+extern boolean authorize_wizard_mode(void);
+extern boolean authorize_explore_mode(void);
 
-#if !defined(O_WRONLY)
-#if defined(__MWERKS__) && !TARGET_API_MAC_CARBON
-#include <unix.h>
-#endif
 #include <fcntl.h>
-#endif
 
-/*
- * Don't redefine these Unix IO functions when making LevComp or DgnComp for
- * MPW.  With MPW, we make them into MPW tools, which use unix IO.  SPEC_LEV
- * and DGN_COMP are defined when compiling for LevComp and DgnComp
- * respectively.
- */
-#if !((defined(__SC__) || defined(__MRC__) || defined(__MACH__)) \
-      && (defined(SPEC_LEV) || defined(DGN_COMP)))
+/* Route the Unix I/O calls through their HFS implementations. */
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+/* implemented in sys/mac/macunix.c */
+extern void regularize(char *);
+extern void getlock(void);
+
+/* implemented in sys/mac/macfile.c */
+extern int maccreat(const char *, long);
+extern int macopen(const char *, int, long);
+extern int macclose(int);
+extern int macread(int, void *, unsigned);
+extern int macwrite(int, void *, unsigned);
+extern long macseek(int, long, short);
+extern int macunlink(const char *);
 #define creat maccreat
 #define open macopen
 #define close macclose
 #define read macread
 #define write macwrite
 #define lseek macseek
-#ifdef __MWERKS__
-#define unlink _unlink
-#endif
-#endif
-
-#define YY_NEVER_INTERACTIVE 1
 
 #define TEXT_TYPE 'TEXT'
 #define LEVL_TYPE 'LEVL'
@@ -111,7 +100,9 @@ extern void error(const char *, ...);
 #define SAVE_TYPE 'SAVE'
 #define PREF_TYPE 'PREF'
 #define DATA_TYPE 'DATA'
-#define MAC_CREATOR 'nh31'  /* Registered with DTS ! */
+#define MAC_CREATOR 'nh50'  /* this port's creator code (files from older
+                               builds keep working; only their Finder icon
+                               binding goes stale) */
 #define TEXT_CREATOR 'ttxt' /* Something the user can actually edit */
 
 /*
@@ -123,4 +114,4 @@ extern void error(const char *, ...);
 #define MAC_GRAPHICS_ENV
 
 #endif /* ! MACCONF_H */
-#endif /* MACOS9 */
+#endif /* MAC */

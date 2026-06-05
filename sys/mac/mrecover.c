@@ -1,4 +1,4 @@
-/* NetHack 3.6	mrecover.c	$NHDT-Date: 1432512798 2015/05/25 00:13:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
+/* NetHack 5.0	mrecover.c	$NHDT-Date: 1432512798 2015/05/25 00:13:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /*      Copyright (c) David Hairston, 1993.                       */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -17,22 +17,10 @@
  * SIZE (-1) info: flags: 0x5880, size: 65536L/65536L (64k/64k)
  * libraries: MacTraps [yes], MacTraps2 (HFileStuff) [yes], ANSI [no]
  * compatibility: system 6 and system 7
- * misc: sizeof(int): 2, "\p": unsigned char, enum size varies,
+ * misc: sizeof(int): 2, "\x00": unsigned char, enum size varies,
  *   prototypes required, type checking enforced, no optimizers,
  *   FAR CODE [no], FAR DATA [no], SEPARATE STRS [no], single segment,
  *   short macsbug symbols
- */
-
-/*
- * To do (maybe, just maybe):
- * - Merge with the code in util/recover.c.
- * - Document launch (e.g. GUI equivalent of 'recover basename').
- * - Drag and drop.
- * - Internal memory tweaks (stack and heap usage).
- * - Use status file to allow resuming aborted recoveries.
- * - Bundle 'LEVL' files with recover (easier document launch).
- * - Prohibit recovering games "in progress".
- * - Share AppleEvents with NetHack to auto-recover crashed games.
  */
 
 #include "config.h"
@@ -44,9 +32,6 @@
 #include <OSUtils.h>
 #include <Resources.h>
 #include <Files.h>
-#ifdef applec
-#include <SysEqu.h>
-#endif
 #include <Menus.h>
 #include <Devices.h>
 #include <Events.h>
@@ -60,11 +45,7 @@
 #include <Fonts.h>
 #include <TextUtils.h>
 
-#ifdef THINK /* glue for System 7 Icon Family call (needed by Think C 5.0.4) \
-                */
-pascal OSErr GetIconSuite(Handle *theIconSuite, short theResID,
-                          long selector) = { 0x303C, 0x0501, 0xABC9 };
-#endif
+#include "maccompat.h" /* P_STRING_CONV */
 
 /**** Application defines ****/
 
@@ -245,7 +226,8 @@ static void unlink_file(unsigned char *);
 
 /**** Routines ****/
 
-main()
+int
+main(void)
 {
     /* heap adjust */
     MaxApplZone();
@@ -267,7 +249,8 @@ main()
     /* get system environment, notification requires 6.0 or better */
     (void) SysEnvirons(curSysEnvVers, &sysEnv);
     if (sysEnv.systemVersion < 0x0600) {
-        ParamText("\pAbort: System 6.0 is required", "\p", "\p", "\p");
+        ParamText(P_STRING_CONV("Abort: System 6.0 is required"), P_EMPTY_STRING, P_EMPTY_STRING,
+                  P_EMPTY_STRING);
         (void) Alert(alidNote, (ModalFilterUPP) 0L);
         ExitToShell();
     }
@@ -294,17 +277,6 @@ warmup()
                 in.Front = (wnEvt.message & resumeFlag);
     }
 
-#if 0 // ???
-	/* clear out the Finder info */
-	{
-		short	message, count;
-
-		CountAppFiles(&message, &count);
-		while(count)
-			ClrAppFiles(count--);
-	}
-#endif
-
     /* fill out the notification template */
     nmt.nmr.qType = nmType;
     nmt.nmr.nmMark = 1;
@@ -313,7 +285,6 @@ warmup()
     nmt.nmr.nmResp = nmCompletionUPP;
     nmt.nmr.nmPending = (long) &in.Notify;
 
-#if 1
     {
         /* get the app name */
         ProcessInfoRec info;
@@ -325,15 +296,6 @@ warmup()
         GetCurrentProcess(&psn);
         GetProcessInformation(&psn, &info);
     }
-#else
-    /* prepend app name (31 chars or less) to notification buffer */
-    {
-        short apRefNum;
-        Handle apParams;
-
-        GetAppParms(*(Str255 *) &nmt.nmBuf, &apRefNum, &apParams);
-    }
-#endif
 
     /* add formatting (two line returns) */
     nmt.nmBuf[++(nmt.nmBuf[0])] = '\r';
@@ -344,10 +306,10 @@ warmup()
     /* get notification icon */
     if (sysEnv.systemVersion < 0x0700) {
         if (!(nmt.nmr.nmIcon = GetResource('SICN', iconNotifyID)))
-            note(nilHandleErr, 0, "\pNil SICN Handle");
+            note(nilHandleErr, 0, P_STRING_CONV("Nil SICN Handle"));
     } else {
         if (GetIconSuite(&nmt.nmr.nmIcon, iconNotifyID, ics_1_and_4))
-            note(nilHandleErr, 0, "\pBad Icon Family");
+            note(nilHandleErr, 0, P_STRING_CONV("Bad Icon Family"));
     }
 
     /* load and align various dialog/alert templates */
@@ -364,7 +326,7 @@ warmup()
         CursHandle cHnd;
 
         if (!(cHnd = GetCursor(i + cursorOffset)))
-            note(nilHandleErr, 0, "\pNil CURS Handle");
+            note(nilHandleErr, 0, P_STRING_CONV("Nil CURS Handle"));
 
         cPtr[i] = *cHnd;
     }
@@ -374,7 +336,7 @@ warmup()
         versXHandle vHnd;
 
         if (!(vHnd = (versXHandle) GetResource('vers', 1)))
-            note(nilHandleErr, 0, "\pNil vers Handle");
+            note(nilHandleErr, 0, P_STRING_CONV("Nil vers Handle"));
 
         i = (**vHnd).versStr[0] + 1; /* offset to Get Info pascal string */
 
@@ -392,11 +354,11 @@ warmup()
     /* form the menubar */
     for (i = 0; i < menu_Total; i++) {
         if (!(mHnd[i] = GetMenu(i + muidApple)))
-            note(nilHandleErr, 0, "\pNil MENU Handle");
+            note(nilHandleErr, 0, P_STRING_CONV("Nil MENU Handle"));
 
         /* expand the apple menu */
         if (i == menuApple)
-            AddResMenu(mHnd[menuApple], 'DRVR');
+            AppendResMenu(mHnd[menuApple], 'DRVR');
 
         InsertMenu(mHnd[i], 0);
     }
@@ -407,19 +369,19 @@ warmup()
         Size grow;
 
         if (!(hBytes = (memBytesHandle) GetResource('memB', membID)))
-            note(nilHandleErr, 0, "\pNil Memory Handle");
+            note(nilHandleErr, 0, P_STRING_CONV("Nil Memory Handle"));
 
         pBytes = *hBytes;
 
         if (MaxMem(&grow) < pBytes->memPreempt)
-            note(memFullErr, 0, "\pMore Memory Required\rTry adding 16k");
+            note(memFullErr, 0, P_STRING_CONV("More Memory Required\rTry adding 16k"));
 
         memActivity = pBytes->memCleanup; /* force initial cleanup */
     }
 
     /* get the I/O buffer */
     if (!(pIOBuf = NewPtr(pBytes->memIOBuf)))
-        note(memFullErr, 0, "\pNil I/O Pointer");
+        note(memFullErr, 0, P_STRING_CONV("Nil I/O Pointer"));
 }
 
 /* align a window-related template to the main screen */
@@ -433,7 +395,7 @@ alignTemplate(ResType rezType, short rezID, short vOff, short vDenom,
     vOff += GetMBarHeight();
 
     if (!(rtnHnd = GetResource(rezType, rezID)))
-        note(nilHandleErr, 0, "\pNil Template Handle");
+        note(nilHandleErr, 0, P_STRING_CONV("Nil Template Handle"));
 
     pRct = (Rect *) *rtnHnd;
 
@@ -459,7 +421,7 @@ nmCompletion(NMRec *pNMR)
     (void) NMRemove(pNMR);
 
     (*(short *) (pNMR->nmPending))--; /* decrement pending note level */
-    ((notifPtr) pNMR)->nmDispose = 1; /* allow DisposPtr() */
+    ((notifPtr) pNMR)->nmDispose = 1; /* allow DisposePtr() */
 }
 
 /*
@@ -490,7 +452,7 @@ note(short errorSignal, short alertID, unsigned char *msg)
         Size grow;
 
         if (MaxMem(&grow) < pBytes->memAbort)
-            noteErrorMessage(msg, "\pOut of Memory");
+            noteErrorMessage(msg, P_STRING_CONV("Out of Memory"));
     }
 
     if (errorSignal || !in.Front) {
@@ -508,7 +470,7 @@ note(short errorSignal, short alertID, unsigned char *msg)
         } else /* allocate a notification record */
         {
             if (!(pNMR = (notifPtr) NewPtr(sizeof(notifRec))))
-                noteErrorMessage(msg, "\pNil New Pointer");
+                noteErrorMessage(msg, P_STRING_CONV("Nil New Pointer"));
 
             /* initialize it */
             *pNMR = nmt;
@@ -543,9 +505,9 @@ note(short errorSignal, short alertID, unsigned char *msg)
     }
 
     /* in front and no error so use an alert */
-    ParamText(msg, "\p", "\p", "\p");
+    ParamText(msg, P_EMPTY_STRING, P_EMPTY_STRING, P_EMPTY_STRING);
     (void) Alert(alertID, (ModalFilterUPP) 0L);
-    ResetAlrtStage();
+    ResetAlertStage();
 
     memActivity++;
 }
@@ -566,7 +528,7 @@ adjustGUI()
     newMenubar = in.Recover ? mbarRecover : mbarAppl;
 
     /* desk accessories take precedence */
-    if (frontWindow = (WindowPeek) FrontWindow())
+    if ((frontWindow = (WindowPeek) FrontWindow()) != 0L)
         if (frontWindow->windowKind < 0)
             newMenubar = mbarDA;
 
@@ -598,7 +560,7 @@ adjustGUI()
     }
 
     /* now adjust the cursor */
-    if (useArrow = (!in.Recover || (newMenubar == mbarDA)))
+    if ((useArrow = (!in.Recover || (newMenubar == mbarDA))) != 0)
         newCursor = curs_Init;
     else if ((timeNow = TickCount()) >= timeCursor) /* spin cursor */
     {
@@ -622,16 +584,17 @@ adjustMemory()
     memActivity = 0;
 
     if (MaxMem(&grow) < pBytes->memWarning)
-        note(noErr, alidNote, "\pWarning: Memory is running low");
+        note(noErr, alidNote, P_STRING_CONV("Warning: Memory is running low"));
 
-    (void) ResrvMem((Size) FreeMem()); /* move all handles high */
+    (void) ReserveMem((Size) FreeMem()); /* move all handles high */
 }
 
 /* show memory stats: FreeMem, MaxBlock, PurgeSpace, and StackSpace */
 static void
 optionMemStats()
 {
-    unsigned char *pFormat = "\pFree:#k  Max:#k  Purge:#k  Stack:#k";
+    unsigned char *pFormat =
+        (unsigned char *) P_STRING_CONV("Free:#k  Max:#k  Purge:#k  Stack:#k");
     char *pSub = "#"; /* not a pascal string */
     unsigned char nBuf[16];
     long nStat, contig;
@@ -643,7 +606,7 @@ optionMemStats()
         adjustMemory();
 
     if (!(strHnd = NewHandle((Size) 128))) {
-        note(noErr, alidNote, "\pOops: Memory stats unavailable!");
+        note(noErr, alidNote, P_STRING_CONV("Oops: Memory stats unavailable!"));
         return;
     }
 
@@ -677,7 +640,7 @@ optionMemStats()
     MoveHHi(strHnd);
     HLock(strHnd);
     note(noErr, alidNote, (unsigned char *) *strHnd);
-    DisposHandle(strHnd);
+    DisposeHandle(strHnd);
 }
 
 static void
@@ -699,9 +662,9 @@ RecoverMenuEvent(long menuEntry)
 
         default: /* DA's or apple menu items */
         {
-            unsigned char daName[32];
+            Str255 daName; /* GetMenuItemText may write up to 256 bytes */
 
-            GetItem(mHnd[menuApple], menuItem, *(Str255 *) &daName);
+            GetMenuItemText(mHnd[menuApple], menuItem, daName);
             (void) OpenDeskAcc(daName);
 
             memActivity++;
@@ -719,7 +682,7 @@ RecoverMenuEvent(long menuEntry)
             WindowPeek frontWindow;
             short refNum;
 
-            if (frontWindow = (WindowPeek) FrontWindow())
+            if ((frontWindow = (WindowPeek) FrontWindow()) != 0L)
                 if ((refNum = frontWindow->windowKind) < 0)
                     CloseDeskAcc(refNum);
 
@@ -773,7 +736,7 @@ eventLoop()
             if (pNMQ && pNMQ->nmDispose) {
                 notifPtr pNMX = pNMQ->nmNext;
 
-                DisposPtr((Ptr) pNMQ);
+                DisposePtr((Ptr) pNMQ);
                 pNMQ = pNMX;
 
                 memActivity++;
@@ -806,10 +769,13 @@ eventLoop()
                            &boundsRect);
 
                 boundsRect = whichWindow->portRect;
-                offsetPt = *(Point *) &(whichWindow->portBits.bounds);
+                offsetPt.v = whichWindow->portBits.bounds.top;
+                offsetPt.h = whichWindow->portBits.bounds.left;
                 OffsetRect(&boundsRect, -offsetPt.h, -offsetPt.v);
 
-                *(Rect *) *thermoTHnd = boundsRect;
+                /* remember the new position in the dialog template so a
+                   re-opened thermometer appears where the user left it */
+                (**thermoTHnd).boundsRect = boundsRect;
             } break;
             }
         } break;
@@ -821,7 +787,7 @@ eventLoop()
                 if (key == '.') {
                     if (in.Recover) {
                         endRecover();
-                        note(noErr, alidNote, "\pSorry: Recovery aborted");
+                        note(noErr, alidNote, P_STRING_CONV("Sorry: Recovery aborted"));
                     }
                 } else
                     RecoverMenuEvent(MenuKey(key));
@@ -835,7 +801,7 @@ eventLoop()
             short itemHit;
 
             (void) DialogSelect(&wnEvt, &dPtr, &itemHit);
-        }
+        } break;
 
         case diskEvt:
             if (HiWord(wnEvt.message)) {
@@ -879,11 +845,11 @@ itemizeThermo(short itemMode)
     Handle iHnd;
     Rect iRct;
 
-    GetDItem(DLGTHM, uitmThermo, &iTyp, &iHnd, &iRct);
+    GetDialogItem(DLGTHM, uitmThermo, &iTyp, &iHnd, &iRct);
 
     switch (itemMode) {
     case initItem:
-        SetDItem(DLGTHM, uitmThermo, iTyp, (Handle) drawThermoUPP, &iRct);
+        SetDialogItem(DLGTHM, uitmThermo, iTyp, (Handle) drawThermoUPP, &iRct);
         break;
 
     case invalItem: {
@@ -937,7 +903,7 @@ beginRecover()
     SFTypeList levlType = { 'LEVL' };
     SFReply sfGetReply;
 
-    SFGetFile(sfGetWhere, "\p", basenameFileFilterUPP, 1, levlType,
+    SFGetFile(sfGetWhere, P_EMPTY_STRING, basenameFileFilterUPP, 1, levlType,
               (DlgHookUPP) 0L, &sfGetReply);
 
     memActivity++;
@@ -956,7 +922,7 @@ beginRecover()
         catInfo.hFileInfo.ioDirID = 0L;
 
         if (PBGetCatInfoSync(&catInfo)) {
-            note(noErr, alidNote, "\pSorry: Bad File Info");
+            note(noErr, alidNote, P_STRING_CONV("Sorry: Bad File Info"));
             return;
         }
 
@@ -966,7 +932,7 @@ beginRecover()
     /* open the progress thermometer dialog */
     (void) GetNewDialog(dlogProgress, (Ptr) &dlgThermo, (WindowPtr) -1L);
     if (ResError() || MemError())
-        note(noErr, alidNote, "\pOops: Progress thermometer unavailable");
+        note(noErr, alidNote, P_STRING_CONV("Oops: Progress thermometer unavailable"));
     else {
         in.Dialog = 1;
         memActivity++;
@@ -998,7 +964,7 @@ continueRecover()
     if (saveRezStrings())
         return;
 
-    note(noErr, alidNote, "\pOK: Recovery succeeded");
+    note(noErr, alidNote, P_STRING_CONV("OK: Recovery succeeded"));
 }
 
 /* no messages from here (since we might be quitting) */
@@ -1029,7 +995,7 @@ endRecover()
     /* close the progress thermometer dialog */
     in.Dialog = 0;
     CloseDialog(DLGTHM);
-    DisposHandle(dlgThermo.items);
+    DisposeHandle(dlgThermo.items);
     memActivity++;
 }
 
@@ -1040,25 +1006,28 @@ saveRezStrings()
     short sRefNum;
     StringHandle strHnd;
     short i, rezID;
-    unsigned char *plName;
+    unsigned char plName[256];
+    short skip;
+    int pid = hpid;
 
     HCreateResFile(vRefNum, dirID, savename);
 
     sRefNum = HOpenResFile(vRefNum, dirID, savename, fsRdWrPerm);
-    if (sRefNum <= 0) {
-        note(noErr, alidNote, "\pOK: Minor resource map error");
+    if (sRefNum == -1) {
+        note(noErr, alidNote, P_STRING_CONV("OK: Minor resource map error"));
         return 1;
     }
 
-    /* savename and hpid get mutilated here... */
-    plName = savename + 5; /* save/ */
-    *savename -= 5;
+    /* savename is "save/<pid><plname>" (pascal); skip "save/" and the pid
+       digits to isolate the player name.  Work on a copy: savename is still
+       needed intact by endRecover should a later recovery fail. */
+    skip = 5; /* "save/" */
     do {
-        plName++;
-        (*savename)--;
-        hpid /= 10;
-    } while (hpid);
-    *plName = *savename;
+        skip++;
+        pid /= 10;
+    } while (pid);
+    plName[0] = (*savename > skip) ? (unsigned char) (*savename - skip) : 0;
+    BlockMove(savename + 1 + skip, plName + 1, plName[0]);
 
     for (i = 1; i <= 2; i++) {
         switch (i) {
@@ -1069,18 +1038,18 @@ saveRezStrings()
 
         case 2:
             rezID = APP_NAME_RES_ID;
-            strHnd = NewString(*(Str255 *) "\pNetHack");
+            strHnd = NewString(*(Str255 *) P_STRING_CONV("NetHack"));
             break;
         }
 
         if (!strHnd) {
-            note(noErr, alidNote, "\pOK: Minor \'STR \' resource error");
+            note(noErr, alidNote, P_STRING_CONV("OK: Minor 'STR ' resource error"));
             CloseResFile(sRefNum);
             return 1;
         }
 
         /* should check for errors... */
-        AddResource((Handle) strHnd, 'STR ', rezID, *(Str255 *) "\p");
+        AddResource((Handle) strHnd, 'STR ', rezID, *(Str255 *) P_EMPTY_STRING);
     }
 
     memActivity++;
@@ -1095,20 +1064,22 @@ set_levelfile_name(long lev)
 {
     unsigned char *tf;
 
-    /* find the dot.  this is guaranteed to happen. */
-    for (tf = (lock + *lock); *tf != '.'; tf--, lock[0]--)
+    /* find the dot, scanning backward; bounded so that a dotless name
+       (which basenameFileFilter should have rejected) cannot walk off the
+       front of lock[] */
+    for (tf = (lock + *lock); tf > lock && *tf != '.'; tf--)
         ;
-
-    /* append the level number string (pascal) */
-    if (tf > lock) {
-        NumToString(lev, *(Str255 *) tf);
-        lock[0] += *tf;
-        *tf = '.';
-    } else /* huh??? */
-    {
+    if (tf == lock) {
         endRecover();
-        note(noErr, alidNote, "\pSorry: File Name Error");
+        note(noErr, alidNote, P_STRING_CONV("Sorry: File Name Error"));
+        return;
     }
+
+    /* replace everything after the dot with the level number (pascal) */
+    lock[0] = (unsigned char) (tf - lock); /* length through the dot */
+    NumToString(lev, *(Str255 *) tf);
+    lock[0] += *tf;
+    *tf = '.';
 }
 
 static short
@@ -1124,7 +1095,7 @@ open_levelfile(long lev)
     if ((openErr = HOpen(vRefNum, dirID, lock, fsRdWrPerm, &fRefNum))
         && (openErr != fnfErr)) {
         endRecover();
-        note(noErr, alidNote, "\pSorry: File Open Error");
+        note(noErr, alidNote, P_STRING_CONV("Sorry: File Open Error"));
         return (-1);
     }
 
@@ -1155,7 +1126,7 @@ create_savefile(unsigned char *savename)
     if (HCreate(vRefNum, dirID, savename, MAC_CREATOR, SAVE_TYPE)
         || HOpen(vRefNum, dirID, savename, fsRdWrPerm, &fRefNum)) {
         endRecover();
-        note(noErr, alidNote, "\pSorry: File Create Error");
+        note(noErr, alidNote, P_STRING_CONV("Sorry: File Create Error"));
         return (-1);
     }
 
@@ -1181,12 +1152,28 @@ copy_bytes(short inRefNum, short outRefNum)
 
         if (nto != nfrom) {
             endRecover();
-            note(noErr, alidNote, "\pSorry: File Copy Error");
+            note(noErr, alidNote, P_STRING_CONV("Sorry: File Copy Error"));
             return;
         }
     } while (nfrom == bufSiz);
 }
 
+/* One step of the recovery state machine.
+ *
+ * Called once per null event from eventLoop -> continueRecover, so the GUI
+ * (thermometer, menus, DAs) stays responsive during a long recovery.
+ * in.Recover is a 1-based step counter, not just an "active" flag:
+ *   step 1            read the level-0 header (hpid, savelev, savename,
+ *                     version), create the save file, copy the current
+ *                     level (savelev) and game state into it;
+ *   steps 2..n        copy one numbered level file per call (savelev is
+ *                     skipped -- already copied; missing levels are fine);
+ *   last step         close the save file (continueRecover then calls
+ *                     endRecover and saveRezStrings).
+ * Any error calls endRecover(), which clears in.Recover and deletes the
+ * partial save file.  savelev is static: it carries the current-level
+ * number, read in step 1, across subsequent calls.
+ */
 static void
 restore_savefile()
 {
@@ -1215,7 +1202,8 @@ restore_savefile()
 
         if (in.Recover && (saveTemp != sizeof(savelev))) {
             endRecover();
-            note(noErr, alidNote, "\pSorry: \"checkpoint\" was not enabled");
+            note(noErr, alidNote,
+                 P_STRING_CONV("Sorry: \"checkpoint\" was not enabled"));
             return;
         }
 
@@ -1294,7 +1282,7 @@ read_levelfile(short rdRefNum, Ptr bufPtr, long count)
 
     if ((rdErr = FSRead(rdRefNum, &rdCount, bufPtr)) && (rdErr != eofErr)) {
         endRecover();
-        note(noErr, alidNote, "\pSorry: File Read Error");
+        note(noErr, alidNote, P_STRING_CONV("Sorry: File Read Error"));
         return (-1L);
     }
 
@@ -1308,7 +1296,7 @@ write_savefile(short wrRefNum, Ptr bufPtr, long count)
 
     if (FSWrite(wrRefNum, &wrCount, bufPtr)) {
         endRecover();
-        note(noErr, alidNote, "\pSorry: File Write Error");
+        note(noErr, alidNote, P_STRING_CONV("Sorry: File Write Error"));
         return (-1L);
     }
 
@@ -1320,7 +1308,7 @@ close_file(short *pFRefNum)
 {
     if (FSClose(*pFRefNum) || FlushVol((StringPtr) 0L, vRefNum)) {
         endRecover();
-        note(noErr, alidNote, "\pSorry: File Close Error");
+        note(noErr, alidNote, P_STRING_CONV("Sorry: File Close Error"));
         return;
     }
 
@@ -1332,7 +1320,7 @@ unlink_file(unsigned char *filename)
 {
     if (HDelete(vRefNum, dirID, filename)) {
         endRecover();
-        note(noErr, alidNote, "\pSorry: File Delete Error");
+        note(noErr, alidNote, P_STRING_CONV("Sorry: File Delete Error"));
         return;
     }
 }

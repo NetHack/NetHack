@@ -1,4 +1,4 @@
-/* NetHack 3.6	macmain.c	$NHDT-Date: 1432512796 2015/05/25 00:13:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.21 $ */
+/* NetHack 5.0	macmain.c	$NHDT-Date: 1432512796 2015/05/25 00:13:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -9,17 +9,16 @@
 #include "dlb.h"
 #include "macwin.h"
 #include "mactty.h"
+#include "maccompat.h"
 
-#if 1 /*!TARGET_API_MAC_CARBON*/
 #include <OSUtils.h>
-#include <files.h>
+#include <Files.h>
 #include <Types.h>
 #include <Dialogs.h>
 #include <Packages.h>
 #include <ToolUtils.h>
 #include <Resources.h>
 #include <Errors.h>
-#endif
 
 #ifndef O_RDONLY
 #include <fcntl.h>
@@ -27,64 +26,47 @@
 
 static void finder_file_request(void);
 int main(void);
+extern void macalloc_stats(const char *tag); /* profiling hook; no-op unless NHMAC_ALLOC_STATS */
 
-#if __SC__ || __MRC__
-QDGlobals qd;
-#endif
 
 int
 main(void)
 {
-    register int fd = -1;
+    NHFILE *nhfp;
     int argc = 1;
     boolean resuming = FALSE; /* assume new game */
 
-    early_init();
-    windowprocs = mac_procs;
+    early_init(argc, (char **) 0);
+    choose_windows("mac");
     InitMac();
+    macalloc_stats("boot");   /* baseline; ignore its dt */
 
     gh.hname = "Mac Hack";
-    hackpid = getpid();
-
-    setrandom();
-    initoptions();
+    svh.hackpid = getpid();
     init_nhwindows(&argc, (char **) &gh.hname);
 
-    /*
-     * It seems you really want to play.
-     */
-    u.uhp = 1; /* prevent RIP on early quits */
+    initoptions();
+    macalloc_stats("initoptions");
+    iflags.bgcolors = TRUE;
+    iflags.use_background_glyph = TRUE;
 
+    u.uhp = 1;
     finder_file_request();
 
-    dlb_init(); /* must be before newgame() */
+    dlb_init();
 
-    /*
-     *  Initialize the vision system.  This must be before mklev() on a
-     *  new game or before a level restore on a saved game.
-     */
     vision_init();
-
     init_sound_disp_gamewindows();
-
-    set_playmode(); /* sets plname to "wizard" for wizard mode */
-    /* strip role,race,&c suffix; calls askname() if plname[] is empty
-       or holds a generic user name like "player" or "games" */
+    macalloc_stats("gamewindows");   /* map window + tile-sheet load (if any) */
+    set_playmode();
     plnamesuffix();
-    /* unlike Unix where the game might be invoked with a script
-       which forces a particular character name for each player
-       using a shared account, we always allow player to rename
-       the character during role/race/&c selection */
     iflags.renameallowed = TRUE;
 
     getlock();
 
-/*
- * First, try to find and restore a save file for specified character.
- * We'll return here if new game player_selection() renames the hero.
- */
+/* try to restore a save file; re-entered if player_selection() renames the hero */
 attempt_restore:
-    if ((fd = restore_saved_game()) >= 0) {
+    if (*svp.plname && (nhfp = restore_saved_game()) != 0) {
 #ifdef NEWS
         if (iflags.news) {
             display_file(NEWS, FALSE);
@@ -93,9 +75,8 @@ attempt_restore:
 #endif
         pline("Restoring save file...");
         mark_synch(); /* flush output */
-        game_active = 1;
-        if (dorecover(fd)) {
-            resuming = TRUE; /* not starting new game */
+        if (dorecover(nhfp)) {
+            resuming = TRUE;
             if (discover)
                 You("are in non-scoring discovery mode.");
             if (discover || wizard) {
@@ -109,29 +90,28 @@ attempt_restore:
     }
 
     if (!resuming) {
-        /* new game:  start by choosing role, race, etc;
-           player might change the hero's name while doing that,
-           in which case we try to restore under the new name
-           and skip selection this time if that didn't succeed */
+        /* new game: a rename during role selection re-attempts restore under
+           the new name */
         if (!iflags.renameinprogress) {
             player_selection();
             if (iflags.renameinprogress) {
-                /* player has renamed the hero while selecting role;
-                   discard current lock file and create another for
-                   the new character name */
-                delete_levelfile(0); /* remove empty lock file */
+                /* renamed during selection: drop lock file, relock under new name */
+                delete_levelfile(0);
                 getlock();
                 goto attempt_restore;
             }
         }
-        game_active = 1; /* done with selection, draw active game window */
+        macalloc_stats("selection");   /* dt incl. user think-time; resets base */
         newgame();
+        macalloc_stats("NEWGAME");     /* <-- the post-selection pause */
         if (discover)
             You("are in non-scoring discovery mode.");
     }
 
-    UndimMenuBar(); /* Yes, this is the place for it (!) */
+    set_savefile_name(TRUE); /* ensure SAVEF is set for dosave */
+    UndimMenuBar();
 
+    macalloc_stats("premoveloop");
     moveloop(resuming);
 
     exit(EXIT_SUCCESS);
@@ -152,7 +132,11 @@ copy_file(short src_vol, long src_dir, short dst_vol, long dst_dir,
         err = (*opener)(dst_vol, dst_dir, fName, fsWrPerm, &dst_ref);
         if (err == noErr) {
             long file_len;
-            err = GetEOF(src_ref, &file_len);
+            /* truncate: the destination may exist from an earlier failed
+               copy, and a shorter source must not leave stale bytes */
+            err = SetEOF(dst_ref, 0L);
+            if (err == noErr)
+                err = GetEOF(src_ref, &file_len);
             if (err == noErr) {
                 Handle buf;
                 long count = MaxBlock();
@@ -162,16 +146,25 @@ copy_file(short src_vol, long src_dir, short dst_vol, long dst_dir,
                 buf = NewHandle(count);
                 err = MemError();
                 if (err == noErr) {
-                    while (count > 0) {
+                    long buf_size = count;
+                    HLock(buf);
+                    while (file_len > 0) {
+                        count = (file_len > buf_size) ? buf_size : file_len;
                         OSErr rd_err = FSRead(src_ref, &count, *buf);
+                        if (count <= 0) {
+                            err = rd_err ? rd_err : ioErr;
+                            break;
+                        }
                         err = FSWrite(dst_ref, &count, *buf);
-                        if (err == noErr)
+                        if (err != noErr)
+                            break;
+                        if (rd_err != noErr && rd_err != eofErr) {
                             err = rd_err;
+                            break;
+                        }
                         file_len -= count;
                     }
-                    if (file_len == 0)
-                        err = noErr;
-
+                    HUnlock(buf);
                     DisposeHandle(buf);
                 }
             }
@@ -198,9 +191,9 @@ process_openfile(short src_vol, long src_dir, Str255 fName, OSType ftype)
     if (ftype != SAVE_TYPE)
         return; /* only deal with save files */
 
-    if (src_vol != theDirs.dataRefNum
-        || src_dir != theDirs.dataDirID
-               && CatMove(src_vol, src_dir, fName, theDirs.dataDirID, "\p:")
+    if ((src_vol != theDirs.dataRefNum
+         || src_dir != theDirs.dataDirID)
+               && CatMove(src_vol, src_dir, fName, theDirs.dataDirID, P_STRING_CONV(":"))
                       != noErr) {
         HCreate(theDirs.dataRefNum, theDirs.dataDirID, fName, MAC_CREATOR,
                 SAVE_TYPE);
@@ -244,11 +237,8 @@ static void
 finder_file_request(void)
 {
     if (macFlags.hasAE) {
-        /* we're capable of handling Apple Events, so let's see if we have any
-         */
         EventRecord event;
-        long toWhen = TickCount()
-                      + 20; /* wait a third of a second for all initial AE */
+        long toWhen = TickCount() + 20; /* ~1/3 sec to collect initial Apple Events */
 
         while (TickCount() < toWhen) {
             if (WaitNextEvent(highLevelEventMask, &event, 3L, 0)) {
@@ -258,35 +248,34 @@ finder_file_request(void)
             }
         }
     }
-#if 0
-#ifdef MAC68K
-	else {
-		short finder_msg, file_count;
-		CountAppFiles(&finder_msg, &file_count);
-		if (finder_msg == appOpen && file_count == 1) {
-			OSErr	err;
-			AppFile src;
-			FSSpec filespec;
-
-			GetAppFiles(1, &src);
-			err = FSMakeFSSpec(src.vRefNum, 0, src.fName, &filespec);
-			if (err == noErr && src.fType == SAVE_TYPE) {
-				process_openfile (filespec.vRefNum, filespec.parID, filespec.name, src.fType);
-				if (macFlags.gotOpen)
-					ClrAppFiles(1);
-			}
-		}
-	}
-#endif /* MAC68K */
-#endif /* 0 */
 }
 
 /* validate wizard mode if player has requested access to it */
 boolean
-authorize_wizard_mode()
+authorize_wizard_mode(void)
 {
-    /* other ports validate user name or character name here */
     return TRUE;
+}
+
+boolean
+authorize_explore_mode(void)
+{
+    return TRUE;
+}
+
+void
+get_nhuuid(void)
+{
+    /* classic Mac OS 68k has no native UUID source; leave empty */
+}
+
+void
+free_nhuuid(void)
+{
+    int i;
+
+    for (i = 0; i < SIZE(svn.nhuuid); i++)
+        svn.nhuuid[i] = 0;
 }
 
 /*macmain.c*/

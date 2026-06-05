@@ -1,4 +1,4 @@
-/* NetHack 3.6	mactty.h	$NHDT-Date: 1596498543 2020/08/03 23:49:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
+/* NetHack 5.0	mactty.h	$NHDT-Date: 1596498543 2020/08/03 23:49:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) Jon W{tte 1993.                                        */
 /* NetHack may be freely redistributed.  See license for details.       */
 
@@ -41,11 +41,10 @@
 
 #ifndef _H_tty_public
 #define _H_tty_public
-#undef red /* undef internal color const strings from decl */
-#undef green
-#undef blue
-#if 1 /*!TARGET_API_MAC_CARBON*/
-#include <windows.h>
+#include <Windows.h>
+
+#ifdef CROSS_TO_MAC68K
+#include "maccompat.h"
 #endif
 
 /*
@@ -70,23 +69,6 @@
 #define CHAR_CR ((char) 13)
 #define CHAR_ESC ((char) 27)
 #define CHAR_BLANK ((char) 32)
-#define CHAR_DELETE ((char) 127)
-
-extern char game_active; /* flag to window rendering routines
-                            not to use ppat */
-/*
- * If you want some fancy operations that not a normal TTY device normally
- * supports, use EXTENDED_SUPPORT. For frames, area erases and area scrolls,
- * plus bitmap graphics - RESOLUTION DEPENDENT, be sure to call
- * get_tty_metrics and use those limits.
- */
-#define EXTENDED_SUPPORT 0
-/*
- * if you print a lot of single characters, accumulating each one in a
- * clipping region will take too much time. Instead, define this, which
- * will clip in rects.
- */
-#define CLIP_RECT_ONLY 1
 
 typedef enum tty_attrib {
 
@@ -96,12 +78,6 @@ typedef enum tty_attrib {
      * later will clear the screen.
      */
     TTY_ATTRIB_FLAGS,
-/*
- * When using proportional fonts, this will place each character
- * separately, ensuring aligned columns (but looking ugly and taking
- * time)
- */
-#define TA_MOVE_EACH_CHAR 1L
 /*
  * This means draw each change as it occurs instead of collecting the area
  * and draw it all at once at update_tty() - slower, but more reliable.
@@ -131,11 +107,6 @@ typedef enum tty_attrib {
      */
     TTY_ATTRIB_FOREGROUND,
     TTY_ATTRIB_BACKGROUND,
-#define TA_RGB_TO_TTY(r)                       \
-    ((((long) ((r).red >> 8) & 0xff) << 16)    \
-     + (((long) ((r).green >> 8) & 0xff) << 8) \
-     + ((long) ((r).blue >> 8) & 0xff))
-
     /*
      * Attributes relating to the cursor, and character set mappings
      */
@@ -144,16 +115,6 @@ typedef enum tty_attrib {
  * Blinking cursor is more noticeable when it's idle
  */
 #define TA_BLINKING_CURSOR 1L
-/*
- * When handling input, do we echo characters as they are typed?
- */
-#define TA_ECHO_INPUT 2L
-/*
- * Do we return each character code separately, or map delete etc? Note
- * that non-raw input means getchar won't return anything until the user
- * has typed a return.
- */
-#define TA_RAW_INPUT 4L
 /*
  * Do we print every character as it is (including BS, NL and CR!) or do
  * do we interpret characters such as NL, BS and CR?
@@ -167,28 +128,12 @@ typedef enum tty_attrib {
  * When getting a CR, do we also move down?
  */
 #define TA_CR_ADD_NL 32L
-/*
- * Wait for input or return what we've got?
- */
-#define TA_NONBLOCKING_IO 64L
-
-/*
- * Use this macro to cast a function pointer to a tty attribute; this will
- * help portability to systems where a function pointer doesn't fit in a long
- */
-#define TA_ATTRIB_FUNC(x) ((long) (x))
-
     /*
      * This symbolic constant is used to check the number of attributes
      */
     TTY_NUMBER_ATTRIBUTES
 
 } tty_attrib;
-
-/*
- * Character returned by end-of-file condition
- */
-#define TTY_EOF -1
 
 /*
  * Create the window according to a resource WIND template.
@@ -213,18 +158,10 @@ extern short init_tty_number(WindowPtr window, short font_number,
                              short font_size, short x_size, short y_size);
 
 /*
- * Close and deallocate a window and its data
- */
-extern short destroy_tty(WindowPtr window);
-
-/*
- * Change the font and font size used in the window for drawing after
- * the calls are made. To change the coordinate system, be sure to call
- * force_tty_coordinate_system_recalc() - else it may look strange if
- * the new font doesn't match the old one.
+ * Change the default font for new tty windows (the engine recalculates
+ * its coordinate system internally when attributes change).
  */
 extern short set_tty_font_name(winid window_type, char *name);
-extern short force_tty_coordinate_system_recalc(WindowPtr window);
 
 /*
  * Getting some metrics about the tty and its drawing.
@@ -264,14 +201,6 @@ extern short get_tty_attrib(WindowPtr window, tty_attrib attrib, long *value);
 extern short set_tty_attrib(WindowPtr window, tty_attrib attrib, long value);
 
 /*
- * Scroll the actual TTY image, in characters, positive means up/left
- * scroll_tty ( my_tty , 0 , 1 ) means a linefeed. Is always carried out
- * directly, regardless of the wait-update setting. Does updates before
- * scrolling.
- */
-extern short scroll_tty(WindowPtr window, short delta_x, short delta_y);
-
-/*
  * Erase the offscreen bitmap and move the cursor to 0,0. Re-init some window
  * values (font etc) Is always carried out directly on-screen, regardless of
  * the wait-for-update setting. Clears update area.
@@ -303,43 +232,5 @@ extern short clear_tty_window(WindowPtr window, short from_row,
  */
 extern short get_invalid_region(WindowPtr window, Rect *inval_rect);
 extern short set_invalid_region(WindowPtr window, Rect *inval_rect);
-
-
-#if EXTENDED_SUPPORT
-
-/*
- * Various versions of delete character/s, insert line/s etc can be handled by
- * this general-purpose function. Negative num_ means delete, positive means
- * insert, and you can never be sure which of row and col operations come
- * first
- * if you specify both...
- */
-extern short mangle_tty_rows_columns(WindowPtr window, short from_row,
-                                     short num_rows, short from_col,
-                                     short num_cols);
-
-/*
- * For framing an area without using grahpics characters.
- * Note that the given limits are those used for framing, you should not
- * draw in them. frame_fatness should typically be 1-5, and may be clipped
- * if it is too large.
- */
-extern short frame_tty_window(WindowPtr window, short from_row,
-                              short from_col, short to_row, short to_col,
-                              short frame_fatness);
-
-/*
- * For inverting specific characters after the fact. May look funny in color.
- */
-extern short invert_tty_window(WindowPtr window, short from_row,
-                               short from_col, short to_row, short to_col);
-
-/*
- * For drawing lines on the tty - VERY DEVICE DEPENDENT. Use get_tty_metrics.
- */
-extern short draw_tty_line(WindowPtr window, short from_x, short from_y,
-                           short to_x, short to_y);
-
-#endif /* EXTENDED_SUPPORT */
 
 #endif /* _H_tty_public */

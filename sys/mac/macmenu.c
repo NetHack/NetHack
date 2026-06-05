@@ -1,4 +1,4 @@
-/* NetHack 3.6	macmenu.c	$NHDT-Date: 1432512797 2015/05/25 00:13:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
+/* NetHack 5.0	macmenu.c	$NHDT-Date: 1432512797 2015/05/25 00:13:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
 /*      Copyright (c) Macintosh NetHack Port Team, 1993.          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -24,18 +24,21 @@
 #include "hack.h"
 #include "mactty.h"
 #include "macwin.h"
-#include "macpopup.h"
 #include "patchlevel.h"
+#include "mactile.h"
+#include "macmap.h"
+
+/* Set to 1 by macwin's resume handler when tile-mode availability changes;
+   cleared by mactile_menu_refresh() on the next idle pass. */
+short gTileMenuNeedsUpdate = 0;
 
 /******** Toolbox Defines ********/
-#if !TARGET_API_MAC_CARBON
 #include <Menus.h>
 #include <Devices.h>
 #include <Resources.h>
 #include <TextUtils.h>
 #include <ToolUtils.h>
 #include <Sound.h>
-#endif
 
 /* Borrowed from the Mac tty port */
 extern WindowPtr _mt_window;
@@ -91,6 +94,8 @@ enum {
     menuFileSave,
     ____File___3,
     menuFileQuit,
+    /* appended dynamically by InitMenuRes: */
+    menuFileTileMode,   /* item 11 — "Tile Mode" toggle */
 
     /* standard minimum Edit menu items */
 
@@ -99,31 +104,14 @@ enum {
 };
 
 /*
- * menuListRec data (preloaded and locked) specifies the number of menus in
- * the menu bar, the number of hierarchal or submenus and the menu IDs of
- * all of those menus.  menus that go into in the menu bar are specified by
- * 'MNU#' 128 and submenus are specified by 'MNU#' 129.  the fields of the
- * menuListRec are:
- * firstMenuID - the menu ID (not resource ID) of the 1st menu.  subsequent
- *     menus in the list are _forced_ to have consecutively incremented IDs.
- * numMenus - the total count of menus in a given list (and the extent of
- *     valid menu IDs).
- * mref[] - initially the MENU resource ID is stored in the placeholder for
- *     the resource handle.  after loading (GetResource), the menu handle
- *     is stored and the menu ID, in memory, is set as noted above.
+ * menuListRec fields (preloaded and locked from 'MNU#' 128 menubar / 129 submenus):
+ * firstMenuID - menu ID of the 1st menu; subsequent menus are _forced_ to
+ *     consecutively incremented IDs.
+ * numMenus - count of menus in the list.
+ * mref[] - holds the MENU resource ID until GetResource, then the menu handle.
  *
- * NOTE: a ResEdit template editor is supplied to edit the 'MNU#' resources.
- *
- * NOTE: the resource IDs do not need to match the menu IDs in a menu list
- * record although they have been originally set that way.
- *
- * NOTE: the menu ID's of menus in the submenu list record may be reset, as
- * noted above.  it is the programmers responsibility to make sure that
- * submenu references/IDs are valid.
- *
- * WARNING: the existence of the submenu list record is assumed even if the
- * number of submenus is zero.  also, no error checking is done on the
- * extents of the menu IDs.  this must be correctly setup by the programmer.
+ * WARNING: the submenu list record must exist even with zero submenus, and no
+ * bounds checking is done on menu IDs.
  */
 
 #define ID1_MBAR pMenuList[listMenubar]->firstMenuID
@@ -179,21 +167,19 @@ enum { bttnMenuAlertNo = 1, bttnMenuAlertYes };
 
 /******** Globals ********/
 static unsigned char *menuErrStr[err_Menu_total] = {
-    "\pAbort: Bad \'MNU#\' resource!", /* errGetMenuList */
-    "\pAbort: Bad \'MENU\' resource!", /* errGetMenu */
-    "\pAbort: Bad \'DLOG\' resource!", /* errGetANDlogTemplate */
-    "\pAbort: Bad \'DITL\' resource!", /* errGetANDlogItems */
-    "\pAbort: Bad Dialog Allocation!", /* errGetANDialog */
-    "\pAbort: Bad Menu Allocation!",   /* errANNewMenu */
+    P_STRING_CONV("Abort: Bad 'MNU#' resource!"), /* errGetMenuList */
+    P_STRING_CONV("Abort: Bad 'MENU' resource!"), /* errGetMenu */
+    P_STRING_CONV("Abort: Bad 'DLOG' resource!"), /* errGetANDlogTemplate */
+    P_STRING_CONV("Abort: Bad 'DITL' resource!"), /* errGetANDlogItems */
+    P_STRING_CONV("Abort: Bad Dialog Allocation!"), /* errGetANDialog */
+    P_STRING_CONV("Abort: Bad Menu Allocation!"),   /* errANNewMenu */
 };
 static menuListPtr pMenuList[2];
 static short theMenubar = mbarDA; /* force initial update */
 static short kAdjustWizardMenu = 1;
 
 /******** Prototypes ********/
-#if !TARGET_API_MAC_CARBON
 static void alignAD(Rect *, short);
-#endif
 static void mustGetMenuAlerts(void);
 static void menuError(short);
 static void aboutNetHack(void);
@@ -247,8 +233,11 @@ static int askselect[RSRC_ASK_MAX];
 #define curralign askselect[RSRC_ASK_ALIGN]
 #define currmode askselect[RSRC_ASK_MODE]
 
+/* Dialog chrome colors for ask_redraw's RGBForeColor calls.  Safe from the
+   8bpp CLUT-rewrite hazard only because the askname dialog runs before the
+   tile palette is loaded; if this dialog is ever shown mid-game, switch to
+   palette-safe drawing (PmForeColor, see mactile_cursor_clut_index). */
 static RGBColor blackcolor = { 0x0000, 0x0000, 0x0000 },
-                //	indentcolor = {0x4000, 0x4000, 0x4000},
     darkcolor = { 0x8000, 0x8000, 0x8000 },
                 backcolor = { 0xdddd, 0xdddd, 0xdddd },
                 lightcolor = { 0xffff, 0xffff, 0xffff },
@@ -276,7 +265,6 @@ ask_enable(DialogRef wind, short item, int enable)
     Handle handle;
     Rect rect;
 
-    /* Enable or disable the appropriate item */
     GetDialogItem(wind, item, &type, &handle, &rect);
     if (enable)
         type &= ~itemDisable;
@@ -295,7 +283,6 @@ ask_redraw(DialogRef wind, DialogItemIndex item)
     Rect rect;
     static char *modechar = "NED";
 
-    /* Which item shall we redraw? */
     GetDialogItem(wind, item, &type, &handle, &rect);
     switch (item) {
     case RSRC_ASK_DEFAULT:
@@ -316,7 +303,7 @@ ask_redraw(DialogRef wind, DialogItemIndex item)
         TextMode(srcOr);
         EraseRect(&rect);
 
-        /* Draw the frame and drop shadow */
+        /* frame and drop shadow */
         rect.right--;
         rect.bottom--;
         FrameRect(&rect);
@@ -324,7 +311,7 @@ ask_redraw(DialogRef wind, DialogItemIndex item)
         LineTo(rect.right, rect.bottom);
         LineTo(rect.left + 1, rect.bottom);
 
-        /* Draw the menu character */
+        /* menu character */
         MoveTo(rect.left + 4, rect.top + 12);
         switch (item) {
         case RSRC_ASK_ROLE:
@@ -344,7 +331,7 @@ ask_redraw(DialogRef wind, DialogItemIndex item)
             break;
         }
 
-        /* Draw the popup symbol */
+        /* popup symbol */
         MoveTo(rect.right - 16, rect.top + 5);
         LineTo(rect.right - 6, rect.top + 5);
         LineTo(rect.right - 11, rect.top + 10);
@@ -355,27 +342,25 @@ ask_redraw(DialogRef wind, DialogItemIndex item)
         LineTo(rect.right - 10, rect.top + 7);
         LineTo(rect.right - 11, rect.top + 8);
 
-        /* Draw the shadow */
+        /* shadow */
         InsetRect(&rect, 1, 1);
         if (macFlags.color) {
             RGBColor color;
 
-            /* Save the foreground color */
             GetForeColor(&color);
 
-            /* Draw the top and left */
+            /* top and left */
             RGBForeColor(&lightcolor);
             MoveTo(rect.left, rect.bottom - 1);
             LineTo(rect.left, rect.top);
             LineTo(rect.right - 1, rect.top);
 
-            /* Draw the bottom and right */
+            /* bottom and right */
             RGBForeColor(&darkcolor);
             MoveTo(rect.right - 1, rect.top + 1);
             LineTo(rect.right - 1, rect.bottom - 1);
             LineTo(rect.left + 1, rect.bottom - 1);
 
-            /* Restore the foreground color */
             RGBForeColor(&color);
         }
         break;
@@ -396,19 +381,18 @@ ask_redraw(DialogRef wind, DialogItemIndex item)
         FrameRect(&rect);
         InsetRect(&rect, -2, -2);
         if (macFlags.color) {
-            /* Draw the top and left */
+            /* top and left */
             RGBForeColor(&darkcolor);
             MoveTo(rect.left, rect.bottom - 1);
             LineTo(rect.left, rect.top);
             LineTo(rect.right - 1, rect.top);
 
-            /* Draw the bottom and right */
+            /* bottom and right */
             RGBForeColor(&lightcolor);
             MoveTo(rect.right - 1, rect.top + 1);
             LineTo(rect.right - 1, rect.bottom - 1);
             LineTo(rect.left + 1, rect.bottom - 1);
 
-            /* Restore the colors */
             RGBForeColor(&blackcolor);
             RGBBackColor(&backcolor);
         }
@@ -486,60 +470,21 @@ mac_askname()
     UserItemUPP redraw = NewUserItemUPP(ask_redraw);
     ModalFilterUPP filter = NewModalFilterUPP(ask_filter);
 
-    /* Create the dialog */
     if (!(askdialog = GetNewDialog(RSRC_ASK, NULL, (WindowRef) -1)))
         noresource('DLOG', RSRC_ASK);
     GetPort(&oldport);
     SetPortDialogPort(askdialog);
 
-    /* Initialize the name text item */
     ask_restring(svp.plname, str);
     if (svp.plname[0]) {
         GetDialogItem(askdialog, RSRC_ASK_NAME, &type, &handle, &rect);
         SetDialogItemText(handle, str);
     }
-#if 0
-	{
-	Str32 pName;
-		pName [0] = 0;
-		if (svp.plname && svp.plname [0]) {
-			strcpy ((char *) pName, svp.plname);
-			c2pstr ((char *) pName);
-		} else {
-			Handle h;
-			h = GetResource ('STR ', -16096);
-			if (((Handle) 0 != h) && (GetHandleSize (h) > 0)) {
-				DetachResource (h);
-				HLock (h);
-				if (**h > 31) {
-					**h = 31;
-				}
-				BlockMove (*h, pName, **h + 1);
-				DisposeHandle (h);
-			}
-		}
-		if (pName [0]) {
-			GetDialogItem(askdialog, RSRC_ASK_NAME, &type, &handle, &rect);
-			SetDialogItemText(handle, pName);
-			if (pName [0] > 2 && pName [pName [0] - 1] == '-') {
-			    short role = (*pANR).anMenu[anRole];
-			    char suffix = (char) pName[pName[0]],
-				*sfxindx = strchr(pl_classes, suffix);
-
-			    if (sfxindx)
-				role = (short) (sfxindx - pl_classes);
-			    else if (suffix == '@')
-				role = (short) rn2((int) strlen(pl_classes));
-			    (*pANR).anMenu[anRole] = role;
-			}
-		}
-	}
-#endif
     SelectDialogItemText(askdialog, RSRC_ASK_NAME, 0, 32767);
 
     /* Initialize the role popup menu */
-    if (!(askmenu[RSRC_ASK_ROLE] = NewMenu(RSRC_ASK_ROLE, "\p")))
-        fatal("\pCannot create role menu");
+    if (!(askmenu[RSRC_ASK_ROLE] = NewMenu(RSRC_ASK_ROLE, P_EMPTY_STRING)))
+        fatal("Cannot create role menu");
     for (i = 0; roles[i].name.m; i++) {
         ask_restring(roles[i].name.m, str);
         AppendMenu(askmenu[RSRC_ASK_ROLE], str);
@@ -552,8 +497,8 @@ mac_askname()
         currrole = randrole(FALSE);
 
     /* Initialize the race popup menu */
-    if (!(askmenu[RSRC_ASK_RACE] = NewMenu(RSRC_ASK_RACE, "\p")))
-        fatal("\pCannot create race menu");
+    if (!(askmenu[RSRC_ASK_RACE] = NewMenu(RSRC_ASK_RACE, P_EMPTY_STRING)))
+        fatal("Cannot create race menu");
     for (i = 0; races[i].noun; i++) {
         ask_restring(races[i].noun, str);
         AppendMenu(askmenu[RSRC_ASK_RACE], str);
@@ -565,8 +510,8 @@ mac_askname()
         currrace = randrace(currrole);
 
     /* Initialize the gender popup menu */
-    if (!(askmenu[RSRC_ASK_GEND] = NewMenu(RSRC_ASK_GEND, "\p")))
-        fatal("\pCannot create gender menu");
+    if (!(askmenu[RSRC_ASK_GEND] = NewMenu(RSRC_ASK_GEND, P_EMPTY_STRING)))
+        fatal("Cannot create gender menu");
     for (i = 0; i < ROLE_GENDERS; i++) {
         ask_restring(genders[i].adj, str);
         AppendMenu(askmenu[RSRC_ASK_GEND], str);
@@ -580,8 +525,8 @@ mac_askname()
         currgend = randgend(currrole, currrace);
 
     /* Initialize the alignment popup menu */
-    if (!(askmenu[RSRC_ASK_ALIGN] = NewMenu(RSRC_ASK_ALIGN, "\p")))
-        fatal("\pCannot create alignment menu");
+    if (!(askmenu[RSRC_ASK_ALIGN] = NewMenu(RSRC_ASK_ALIGN, P_EMPTY_STRING)))
+        fatal("Cannot create alignment menu");
     for (i = 0; i < ROLE_ALIGNS; i++) {
         ask_restring(aligns[i].adj, str);
         AppendMenu(askmenu[RSRC_ASK_ALIGN], str);
@@ -593,21 +538,20 @@ mac_askname()
         curralign = randalign(currrole, currrace);
 
     /* Initialize the mode popup menu */
-    if (!(askmenu[RSRC_ASK_MODE] = NewMenu(RSRC_ASK_MODE, "\p")))
-        fatal("\pCannot create mode menu");
-    AppendMenu(askmenu[RSRC_ASK_MODE], "\pNormal");
-    AppendMenu(askmenu[RSRC_ASK_MODE], "\pExplore");
-    AppendMenu(askmenu[RSRC_ASK_MODE], "\pDebug");
+    if (!(askmenu[RSRC_ASK_MODE] = NewMenu(RSRC_ASK_MODE, P_EMPTY_STRING)))
+        fatal("Cannot create mode menu");
+    AppendMenu(askmenu[RSRC_ASK_MODE], P_STRING_CONV("Normal"));
+    AppendMenu(askmenu[RSRC_ASK_MODE], P_STRING_CONV("Explore"));
+    AppendMenu(askmenu[RSRC_ASK_MODE], P_STRING_CONV("Debug"));
     InsertMenu(askmenu[RSRC_ASK_MODE], hierMenu);
     currmode = 0;
 
-    /* Set the redraw procedures */
+    /* install per-item redraw procs */
     for (item = RSRC_ASK_DEFAULT; item <= RSRC_ASK_MODE; item++) {
         GetDialogItem(askdialog, item, &type, &handle, &rect);
         SetDialogItem(askdialog, item, type, (Handle) redraw, &rect);
     }
 
-    /* Handle dialog events */
     do {
         /* Adjust the Play button */
         ask_enable(askdialog, RSRC_ASK_PLAY,
@@ -617,10 +561,10 @@ mac_askname()
         i = j = currrace;
         do {
             if (validrace(currrole, j)) {
-                EnableMenuItem(askmenu[RSRC_ASK_RACE], j + 1);
+                EnableItem(askmenu[RSRC_ASK_RACE], j + 1);
                 CheckMenuItem(askmenu[RSRC_ASK_RACE], j + 1, currrace == j);
             } else {
-                DisableMenuItem(askmenu[RSRC_ASK_RACE], j + 1);
+                DisableItem(askmenu[RSRC_ASK_RACE], j + 1);
                 CheckMenuItem(askmenu[RSRC_ASK_RACE], j + 1, FALSE);
                 if ((currrace == j) && !races[++currrace].noun)
                     currrace = 0;
@@ -637,10 +581,10 @@ mac_askname()
         i = j = currgend;
         do {
             if (validgend(currrole, currrace, j)) {
-                EnableMenuItem(askmenu[RSRC_ASK_GEND], j + 1);
+                EnableItem(askmenu[RSRC_ASK_GEND], j + 1);
                 CheckMenuItem(askmenu[RSRC_ASK_GEND], j + 1, currgend == j);
             } else {
-                DisableMenuItem(askmenu[RSRC_ASK_GEND], j + 1);
+                DisableItem(askmenu[RSRC_ASK_GEND], j + 1);
                 CheckMenuItem(askmenu[RSRC_ASK_GEND], j + 1, FALSE);
                 if ((currgend == j) && (++currgend >= ROLE_GENDERS))
                     currgend = 0;
@@ -657,10 +601,10 @@ mac_askname()
         i = j = curralign;
         do {
             if (validalign(currrole, currrace, j)) {
-                EnableMenuItem(askmenu[RSRC_ASK_ALIGN], j + 1);
+                EnableItem(askmenu[RSRC_ASK_ALIGN], j + 1);
                 CheckMenuItem(askmenu[RSRC_ASK_ALIGN], j + 1, curralign == j);
             } else {
-                DisableMenuItem(askmenu[RSRC_ASK_ALIGN], j + 1);
+                DisableItem(askmenu[RSRC_ASK_ALIGN], j + 1);
                 CheckMenuItem(askmenu[RSRC_ASK_ALIGN], j + 1, FALSE);
                 if ((curralign == j) && (++curralign >= ROLE_ALIGNS))
                     curralign = 0;
@@ -709,28 +653,10 @@ mac_askname()
             InvalWindowRect(GetDialogWindow(askdialog), &rect);
             break;
         case RSRC_ASK_NAME:
-#if 0
-	    /* limit the data here to 25 chars */
-	    {
-	    	short beepTEDelete = 1;
-
-	    	while ((**dRec.textH).teLength > 25)
-	    	{
-	    		if (beepTEDelete++ <= 3)
-	    			SysBeep(3);
-	    		TEKey('\b', dRec.textH);
-	    	}
-	    }
-
-	    /* special case filter (that doesn't plug all the holes!) */
-	    if (((**dRec.textH).teLength == 1) && (**((**dRec.textH).hText) < 32))
-	    	TEKey('\b', dRec.textH);
-#endif
             break;
         }
     } while ((item != RSRC_ASK_PLAY) && (item != RSRC_ASK_QUIT));
 
-    /* Process the name */
     GetDialogItem(askdialog, RSRC_ASK_NAME, &type, &handle, &rect);
     GetDialogItemText(handle, str);
     if (str[0] > PL_NSIZ - 1)
@@ -738,7 +664,6 @@ mac_askname()
     BlockMove(&str[1], svp.plname, str[0]);
     svp.plname[str[0]] = '\0';
 
-    /* Destroy the dialog */
     for (i = RSRC_ASK_ROLE; i <= RSRC_ASK_MODE; i++) {
         DeleteMenu(i);
         DisposeMenu(askmenu[i]);
@@ -748,7 +673,6 @@ mac_askname()
     DisposeModalFilterUPP(filter);
     DisposeUserItemUPP(redraw);
 
-    /* Process the mode */
     wizard = discover = 0;
     switch (currmode) {
     case 0: /* Normal */
@@ -764,17 +688,10 @@ mac_askname()
         ExitToShell();
     }
 
-    /* Process the role */
     strcpy(svp.pl_character, roles[currrole].name.m);
     flags.initrole = currrole;
-
-    /* Process the race */
     flags.initrace = currrace;
-
-    /* Process the gender */
     flags.female = flags.initgend = currgend;
-
-    /* Process the alignment */
     flags.initalign = curralign;
 
     return;
@@ -782,22 +699,18 @@ mac_askname()
 
 /*** Menu bar routines ***/
 
-#if !TARGET_API_MAC_CARBON
 static void
 alignAD(Rect *pRct, short vExempt)
 {
-    BitMap qbitmap;
-
-    GetQDGlobalsScreenBits(&qbitmap);
+    /* center on the main screen (qd.screenBits, valid after InitGraf) */
     (*pRct).right -= (*pRct).left; /* width */
     (*pRct).bottom -= (*pRct).top; /* height */
-    (*pRct).left = (qbitmap.bounds.right - (*pRct).right) / 2;
-    (*pRct).top = (qbitmap.bounds.bottom - (*pRct).bottom - vExempt) / 2;
+    (*pRct).left = (qd.screenBits.bounds.right - (*pRct).right) / 2;
+    (*pRct).top = (qd.screenBits.bounds.bottom - (*pRct).bottom - vExempt) / 2;
     (*pRct).top += vExempt;
     (*pRct).right += (*pRct).left;
     (*pRct).bottom += (*pRct).top;
 }
-#endif
 
 static void
 mustGetMenuAlerts()
@@ -813,9 +726,7 @@ mustGetMenuAlerts()
             ExitToShell();
         }
 
-#if !TARGET_API_MAC_CARBON
         alignAD(*hRct, GetMBarHeight());
-#endif
     }
 }
 
@@ -827,7 +738,7 @@ menuError(short menuErr)
     for (i = 0; i < beepMenuAlertErr; i++)
         SysBeep(3);
 
-    ParamText(menuErrStr[menuErr], "\p", "\p", "\p");
+    ParamText(menuErrStr[menuErr], P_EMPTY_STRING, P_EMPTY_STRING, P_EMPTY_STRING);
     (void) Alert(alrtMenuNote, (ModalFilterUPP) 0L);
 
     ExitToShell();
@@ -863,7 +774,7 @@ InitMenuRes()
             }
 
             pMenuList[i]->mref[j].mhnd = menu;
-            SetMenuID(menu, j + (**mlHnd).firstMenuID); /* consecutive IDs */
+            (**menu).menuID = j + (**mlHnd).firstMenuID; /* consecutive IDs */
 
             /* expand apple menu */
             if ((i == listMenubar) && (j == menuApple)) {
@@ -873,6 +784,13 @@ InitMenuRes()
             InsertMenu(menu, ((i == listSubmenu) ? hierMenu : 0));
         }
     }
+
+    /* Append the "Tile Mode" toggle to the File menu (item menuFileTileMode).
+       The MENU resource only has items 1-10; this adds item 11 at runtime. */
+    AppendMenu(MHND_FILE, P_STRING_CONV("Tile Mode"));
+    /* Start disabled; mactile_menu_refresh() will enable when available. */
+    DisableItem(MHND_FILE, menuFileTileMode);
+
     DrawMenuBar();
     return;
 }
@@ -884,11 +802,6 @@ AdjustMenus(short dimMenubar)
     WindowRef win = FrontWindow();
     short i;
 
-    /*
-     *	if (windowprocs != mac_procs) {
-     *		return;
-     *	}
-     */
     /* determine the new menubar state */
     if (dimMenubar)
         newMenubar = mbarDim;
@@ -896,7 +809,9 @@ AdjustMenus(short dimMenubar)
         newMenubar = mbarNoWindows;
     else if (GetWindowKind(win) < 0)
         newMenubar = mbarDA;
-    else if (!IsWindowVisible(_mt_window))
+    else if (WIN_MAP == WIN_ERR
+             || !theWindows[WIN_MAP].its_window
+             || !IsWindowVisible(theWindows[WIN_MAP].its_window))
         newMenubar = mbarNoMap;
 
     if (newMenubar != mbarRegular)
@@ -907,7 +822,7 @@ AdjustMenus(short dimMenubar)
         if (kAdjustWizardMenu) {
             kAdjustWizardMenu = 0;
 
-            SetMenuItemText(MHND_FILE, menuFilePlayMode, "\pDebug");
+            SetMenuItemText(MHND_FILE, menuFilePlayMode, P_STRING_CONV("Debug"));
         }
     }
 
@@ -917,7 +832,7 @@ AdjustMenus(short dimMenubar)
         if (kAdjustWizardMenu) {
             kAdjustWizardMenu = 0;
 
-            SetMenuItemText(MHND_FILE, menuFilePlayMode, "\pExplore");
+            SetMenuItemText(MHND_FILE, menuFilePlayMode, P_STRING_CONV("Explore"));
 
             for (i = CountMenuItems(MHND_WIZ); i > menuWizardAttributes; i--)
                 DeleteMenuItem(MHND_WIZ, i);
@@ -930,25 +845,28 @@ AdjustMenus(short dimMenubar)
         case mbarDim:
             /* disable all menus (except the apple menu) */
             for (i = menuFile; i < NUM_MBAR; i++)
-                DisableMenuItem(MBARHND(i), 0);
+                DisableItem(MBARHND(i), 0);
             break;
 
         case mbarNoWindows:
         case mbarDA:
         case mbarNoMap:
             /* enable the file menu, but ... */
-            EnableMenuItem(MHND_FILE, 0);
+            EnableItem(MHND_FILE, 0);
 
             /* ... disable the window commands! */
             for (i = menuFileRedraw; i <= menuFileEnterExplore; i++)
-                DisableMenuItem(MHND_FILE, i);
+                DisableItem(MHND_FILE, i);
+
+            /* ... also disable Tile Mode (no map window yet) */
+            DisableItem(MHND_FILE, menuFileTileMode);
 
             /* ... and disable the rest of the menus */
             for (i = menuEdit; i < NUM_MBAR; i++)
-                DisableMenuItem(MBARHND(i), 0);
+                DisableItem(MBARHND(i), 0);
 
             if (theMenubar == mbarDA)
-                EnableMenuItem(MHND_EDIT, 0);
+                EnableItem(MHND_EDIT, 0);
 
             break;
 
@@ -956,19 +874,32 @@ AdjustMenus(short dimMenubar)
         case mbarSpecial:
             /* enable all menus ... */
             for (i = menuFile; i < NUM_MBAR; i++)
-                EnableMenuItem(MBARHND(i), 0);
+                EnableItem(MBARHND(i), 0);
 
             /* ... except the unused Edit menu */
-            DisableMenuItem(MHND_EDIT, 0);
+            DisableItem(MHND_EDIT, 0);
 
             /* ... enable the window commands */
             for (i = menuFileRedraw; i <= menuFileEnterExplore; i++)
-                EnableMenuItem(MHND_FILE, i);
+                EnableItem(MHND_FILE, i);
 
             if (theMenubar == mbarRegular)
-                DisableMenuItem(MHND_FILE, menuFilePlayMode);
+                DisableItem(MHND_FILE, menuFilePlayMode);
             else
-                DisableMenuItem(MHND_FILE, menuFileEnterExplore);
+                DisableItem(MHND_FILE, menuFileEnterExplore);
+
+            /* Enable Tile Mode iff tiles available; sync check mark to live
+               state here since AdjustMenus runs before menu pulldown. */
+            if (mactile_available())
+                EnableItem(MHND_FILE, menuFileTileMode);
+            else
+                DisableItem(MHND_FILE, menuFileTileMode);
+            {
+                NhWindow *_am_map = (WIN_MAP != WIN_ERR)
+                                    ? &theWindows[WIN_MAP] : NULL;
+                SetItemMark(MHND_FILE, menuFileTileMode,
+                            macmap_get_mode(_am_map) ? checkMark : noMark);
+            }
 
             break;
         }
@@ -988,21 +919,14 @@ DoMenuEvt(long menuEntry)
     case menuApple:
         if (menuItem == menuAppleAboutBox)
             aboutNetHack();
-#if !TARGET_API_MAC_CARBON
         else {
-            unsigned char daName[32];
+            Str255 daName; /* GetMenuItemText may write up to 256 bytes */
 
-            GetMenuItemText(MHND_APPLE, menuItem, *(Str255 *) daName);
+            GetMenuItemText(MHND_APPLE, menuItem, daName);
             (void) OpenDeskAcc(daName);
         }
-#endif
         break;
 
-    /*
-     * Those direct calls are ugly: they should be installed into cmd.c .
-     * Those AddToKeyQueue() calls are also ugly: they should be put into
-     * the 'STR#' resource.
-     */
     case menuFile:
         switch (menuItem) {
         case menuFileRedraw:
@@ -1015,6 +939,9 @@ DoMenuEvt(long menuEntry)
 
         case menuFileCleanup:
             (void) SanePositions();
+            /* queue ^R: synchronous redraw from menu-handler context doesn't
+               take (window port unsettled), so redraw in the command loop */
+            AddToKeyQueue('R' & 0x1f, 1);
             break;
 
         case menuFileEnterExplore:
@@ -1028,13 +955,30 @@ DoMenuEvt(long menuEntry)
         case menuFileQuit:
             askQuit();
             break;
+
+        case menuFileTileMode: {
+            NhWindow *map = (WIN_MAP != WIN_ERR) ? &theWindows[WIN_MAP] : NULL;
+            if (!map) break;
+            Boolean newOn = !macmap_get_mode(map);
+            if (newOn && !macmap_set_mode(map, true)) {
+                SysBeep(1);
+                break;
+            } else if (!newOn) {
+                macmap_set_mode(map, false);
+            }
+            SetItemMark(MHND_FILE, menuFileTileMode,
+                        newOn ? checkMark : noMark);
+            iflags.wc_tiled_map = newOn;
+            /* queue ^R: synchronous redraw from menu-handler context doesn't
+               take; command-loop redraw re-emits print_glyph for the new mode */
+            AddToKeyQueue('R' & 0x1f, 1);
+            break;
+        }
         }
         break;
 
     case menuEdit:
-#if !TARGET_API_MAC_CARBON
         (void) SystemEdit(menuItem - 1);
-#endif
         break;
 
     default: /* get associated string and add to key queue */
@@ -1058,17 +1002,22 @@ static void
 aboutNetHack()
 {
     if (theMenubar >= mbarRegular) {
-        (void) doversion(); /* is this necessary? */
+        (void) doversion();
     } else {
-        unsigned char aboutStr[32] = "\pNetHack 3.4.";
+        unsigned char aboutStr[32];
+        char tmp[32];
+        int slen;
 
-        if (PATCHLEVEL > 10) {
-            aboutStr[++aboutStr[0]] = '0' + PATCHLEVEL / 10;
-        }
+        slen = snprintf(tmp, sizeof tmp, "NetHack %d.%d.%d",
+                        VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+        /* snprintf returns the untruncated length; clamp to what tmp
+           actually holds (and what fits aboutStr's Pascal body) */
+        if (slen > (int) sizeof(aboutStr) - 1)
+            slen = (int) sizeof(aboutStr) - 1;
+        aboutStr[0] = (unsigned char) slen;
+        memcpy(&aboutStr[1], tmp, slen);
 
-        aboutStr[++aboutStr[0]] = '0' + (PATCHLEVEL % 10);
-
-        ParamText(aboutStr, "\p\rdevteam@www.nethack.org", "\p", "\p");
+        ParamText(aboutStr, P_STRING_CONV("\rdevteam@www.nethack.org"), P_EMPTY_STRING, P_EMPTY_STRING);
         (void) Alert(alrtMenuNote, (ModalFilterUPP) 0L);
         ResetAlertStage();
     }
@@ -1083,7 +1032,7 @@ askSave()
     if (theMenubar < mbarRegular) {
         short itemHit;
 
-        ParamText("\pReally Save?", "\p", "\p", "\p");
+        ParamText(P_STRING_CONV("Really Save?"), P_EMPTY_STRING, P_EMPTY_STRING, P_EMPTY_STRING);
         itemHit = Alert(alrtMenu_NY, (ModalFilterUPP) 0L);
         ResetAlertStage();
 
@@ -1117,7 +1066,7 @@ askQuit()
     if (theMenubar < mbarRegular) {
         short itemHit;
 
-        ParamText("\pReally Quit?", "\p", "\p", "\p");
+        ParamText(P_STRING_CONV("Really Quit?"), P_EMPTY_STRING, P_EMPTY_STRING, P_EMPTY_STRING);
         itemHit = Alert(alrtMenu_NY, (ModalFilterUPP) 0L);
         ResetAlertStage();
 
@@ -1128,16 +1077,12 @@ askQuit()
         }
     }
     if (doQuit) {
-        /* MWM -- forgive me lord, an even uglier kludge to deal with
-           differences
-                in command input handling
-         */
+        /* command input handling differs between the mac and tty window ports */
         if (winMac)
             quitinput = "#quit\r";
         else
             quitinput = "#q\r";
 
-        /* KMH -- Ugly kludge */
         while (*quitinput)
             AddToKeyQueue(*quitinput++, 1);
         if (doYes) {
@@ -1149,4 +1094,24 @@ askQuit()
                 AddToKeyQueue(*quitinput++, 1);
         }
     }
+}
+
+/*
+ * Called from the idle path (HandleEvent default / mac_get_nh_event) to
+ * keep the Tile Mode item's enable/check state in sync with the current
+ * tile-mode availability and window state.
+ */
+void
+mactile_menu_refresh(void)
+{
+    if (!gTileMenuNeedsUpdate) return;
+    gTileMenuNeedsUpdate = 0;
+    NhWindow *map = (WIN_MAP != WIN_ERR) ? &theWindows[WIN_MAP] : NULL;
+    if (!map) return;
+    if (mactile_available())
+        EnableItem(MHND_FILE, menuFileTileMode);
+    else
+        DisableItem(MHND_FILE, menuFileTileMode);
+    SetItemMark(MHND_FILE, menuFileTileMode,
+                macmap_get_mode(map) ? checkMark : noMark);
 }

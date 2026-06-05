@@ -1,19 +1,18 @@
-/* NetHack 3.6	maccurs.c	$NHDT-Date: 1432512797 2015/05/25 00:13:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
+/* NetHack 5.0	maccurs.c	$NHDT-Date: 1432512797 2015/05/25 00:13:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
 /* Copyright (c) Jon W{tte, 1992.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "mactty.h"
 #include "macwin.h"
+#include "macmap.h"
 
-#if 1 /*!TARGET_API_MAC_CARBON*/
 #include <Folders.h>
 #include <TextUtils.h>
 #include <Resources.h>
-#endif
 
 static Boolean winFileInit = 0;
-static unsigned char winFileName[32] = "\pNetHack Preferences";
+static unsigned char winFileName[32]; /* Pascal string; set in InitWinFile */
 static long winFileDir;
 static short winFileVol;
 
@@ -44,18 +43,23 @@ InitWinFile(void)
         winFileVol = 0;
         winFileDir = 0;
     }
+    C2P("NetHack Preferences", winFileName); /* default; STR 128 overrides */
     sh = GetString(128);
-    if (sh && *sh) {
-        BlockMove(*sh, winFileName, **sh + 1);
+    if (sh) {
+        if (*sh && **sh < sizeof(winFileName))
+            BlockMove(*sh, winFileName, **sh + 1);
         ReleaseResource((Handle) sh);
     }
     if (HOpen(winFileVol, winFileDir, winFileName, fsRdPerm, &ref)) {
         return;
     }
     len = sizeof(savePos);
-    if (!FSRead(ref, &len, savePos)) {
-        winFileInit = 1;
+    if (FSRead(ref, &len, savePos) != noErr || len < (long) sizeof(savePos)) {
+        /* error or short read (e.g. prefs from an older layout):
+           don't trust partial data */
+        memset(savePos, 0, sizeof savePos);
     }
+    winFileInit = 1; /* don't retry on every call */
     FSClose(ref);
 }
 
@@ -66,11 +70,11 @@ FlushWinFile(void)
     long len;
 
     if (!winFileInit) {
+        InitWinFile();
         if (!winFileName[0]) {
             return;
         }
         HCreate(winFileVol, winFileDir, winFileName, MAC_CREATOR, PREF_TYPE);
-        HCreateResFile(winFileVol, winFileDir, winFileName);
     }
     if (HOpen(winFileVol, winFileDir, winFileName, fsWrPerm, &ref)) {
         return;
@@ -87,19 +91,18 @@ RetrievePosition(short kind, short *top, short *left)
     Point p;
 
     if (kind < 0 || kind > kLastWindowKind) {
-        dprintf("Retrieve Bad kind %d", kind);
+        mac_dprintf("Retrieve Bad kind %d", kind);
         return 0;
     }
     InitWinFile();
     if (!savePos[kind].validPos) {
-        dprintf("Retrieve Not stored kind %d", kind);
+        mac_dprintf("Retrieve Not stored kind %d", kind);
         return 0;
     }
     p.v = savePos[kind].top;
     p.h = savePos[kind].left;
     *left = p.h;
     *top = p.v;
-    dprintf("Retrieve Kind %d Pt (%d,%d)", kind, p.h, p.v);
     return (PtInRgn(p, GetGrayRgn()));
 }
 
@@ -126,14 +129,13 @@ static void
 SavePosition(short kind, short top, short left)
 {
     if (kind < 0 || kind > kLastWindowKind) {
-        dprintf("Save bad kind %d", kind);
+        mac_dprintf("Save bad kind %d", kind);
         return;
     }
     InitWinFile();
     savePos[kind].validPos = 1;
     savePos[kind].top = top;
     savePos[kind].left = left;
-    dprintf("Save kind %d pt (%d,%d)", kind, left, top);
     FlushWinFile();
 }
 
@@ -141,7 +143,7 @@ static void
 SaveSize(short kind, short height, short width)
 {
     if (kind < 0 || kind > kLastWindowKind) {
-        dprintf("Save bad kind %d", kind);
+        mac_dprintf("Save bad kind %d", kind);
         return;
     }
     InitWinFile();
@@ -155,15 +157,19 @@ static short
 GetWinKind(WindowPtr win)
 {
     short kind;
+    extern WindowPtr _mt_window;
 
     if (!CheckNhWin(win)) {
         return -1;
     }
+    if (GetWRefCon(win) == MACMAP_REFCON)   /* dedicated map window */
+        return kMapWindow;
+    if (win == _mt_window)                  /* shared base/status tty window */
+        return kStatusWindow;
     kind = GetWindowKind(win) - WIN_BASE_KIND;
     if (kind < 0 || kind > NHW_TEXT) {
         return -1;
     }
-    dprintf("In win kind %d (%lx)", kind, win);
     switch (kind) {
     case NHW_MAP:
     case NHW_STATUS:
@@ -180,7 +186,6 @@ GetWinKind(WindowPtr win)
         kind = kTextWindow;
         break;
     }
-    dprintf("Out kind %d", kind);
     return kind;
 }
 
@@ -195,8 +200,17 @@ SaveWindowPos(WindowPtr win)
 {
     Rect r;
 
-    GetWindowBounds(win, kWindowContentRgn, &r);
+    GetWindowPortBounds(win, &r);
     SavePosition(GetWinKind(win), r.top, r.left);
+}
+
+/* For windows whose saved size depends on more than the window identity:
+   the map window keeps one size per display mode (kMapWindow for text,
+   kMapTileWindow for tiles), chosen by macmap.c. */
+void
+SaveSizeForKind(short kind, short height, short width)
+{
+    SaveSize(kind, height, width);
 }
 
 void
@@ -205,7 +219,7 @@ SaveWindowSize(WindowPtr win)
     short width, height;
     Rect r;
 
-    GetWindowBounds(win, kWindowContentRgn, &r);
+    GetWindowPortBounds(win, &r);
     width = r.right - r.left;
     height = r.bottom - r.top;
     SaveSize(GetWinKind(win), height, width);

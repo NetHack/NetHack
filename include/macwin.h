@@ -1,46 +1,20 @@
-/* NetHack 3.6	macwin.h	$NHDT-Date: 1596498543 2020/08/03 23:49:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
+/* NetHack 5.0	macwin.h	$NHDT-Date: 1596498543 2020/08/03 23:49:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kevin Hugo, 2003. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef MACWIN_H
 #define MACWIN_H
-#undef red /* undef internal color const strings from decl */
-#undef green
-#undef blue
 
-#ifndef __MACH__
-#include <windows.h>
-#include <dialogs.h>
-#endif
+#include <Windows.h>
+#include <Dialogs.h>
 
-/* more headers */
-#ifdef THINK_C
-#include <pascal.h> /* for CtoPStr and PtoCStr */
+#ifdef CROSS_TO_MAC68K
+#include "maccompat.h"
 #endif
 
 /* resources */
 #define PLAYER_NAME_RES_ID 1001
-
-/* fake some things if we don't have universal headers.. */
-#if 0 /*ndef NewUserItemProc*/
-typedef pascal void (*UserItemProcPtr)(WindowPtr theWindow, short itemNo);
-typedef UserItemProcPtr UserItemUPP;
-#define NewUserItemProc(p) (UserItemUPP)(p)
-
-typedef pascal void (*ControlActionProcPtr)(ControlHandle theControl,
-                                            short partCode);
-typedef ControlActionProcPtr ControlActionUPP;
-#define NewControlActionProc(p) (ControlActionUPP)(p)
-
-typedef ModalFilterProcPtr ModalFilterUPP;
-#define DisposeRoutineDescriptor(p)
-#endif
-
-/* misc */
-#ifdef __MWERKS__
-#define ResumeProcPtr long /* for call to InitDialogs */
-#endif
 
 /* working dirs structure */
 typedef struct macdirs {
@@ -58,19 +32,10 @@ typedef struct macdirs {
 } MacDirs;
 
 typedef struct macflags {
-    Bitfield(processes, 1);
-    Bitfield(color, 1);
-    Bitfield(folders, 1);
-    Bitfield(tempMem, 1);
-    Bitfield(help, 1);
-    Bitfield(fsSpec, 1);
-    Bitfield(trueType, 1);
-    Bitfield(aux, 1);
-    Bitfield(alias, 1);
-    Bitfield(standardFile, 1);
-    Bitfield(hasDebugger, 1);
-    Bitfield(hasAE, 1);
-    Bitfield(gotOpen, 1);
+    Bitfield(color, 1);       /* Color QuickDraw (8-bit or better) present */
+    Bitfield(hasDebugger, 1); /* MacsBug etc. installed (see mac_dprintf) */
+    Bitfield(hasAE, 1);       /* Apple Events available */
+    Bitfield(gotOpen, 1);     /* launched by opening a save file */
 } MacFlags;
 
 extern MacDirs theDirs; /* used in macfile.c */
@@ -82,13 +47,23 @@ extern MacFlags macFlags;
 #define NUM_MACWINDOWS 15
 #define TEXT_BLOCK 512L
 
-/* Window constants */
+/* Window constants.  These index the position/size records in the
+   "NetHack Preferences" file (maccurs.c).  kMapTileWindow is a pseudo-kind:
+   the map window saves a separate SIZE per display mode (text vs tile),
+   while its POSITION always lives in the kMapWindow record. */
 #define kMapWindow 0
 #define kStatusWindow 1
 #define kMessageWindow 2
 #define kTextWindow 3
 #define kMenuWindow 4
-#define kLastWindowKind kMenuWindow
+#define kMapTileWindow 5
+#define kLastWindowKind kMapTileWindow
+
+/* WIND resource IDs (templates in sys/mac/nhmapwind.r) */
+#define kWindMapDocument      200 /* map, decorated (scrollbars + grow box) */
+#define kWindMapBorderless    201 /* map, compact screens */
+#define kWindStatusBorderless 210 /* status/base tty window */
+#define kWindMsgBorderless    211 /* message window */
 
 /*
  * This determines the minimum logical line length in text windows
@@ -129,19 +104,19 @@ typedef struct NhWindow {
     short **menuSelected;     /* list of selected elements from list */
     short miSelLen;           /* number of items selected */
     short how;                /* menu mode */
+    Handle menuStyle;         /* per-line {attr,color} bytes for styled menu draw */
 
     char drawn;
     Handle windowText;
     long windowTextLen;
     short scrollPos;
     ControlHandle scrollBar;
+
+    Boolean tile_mode;        /* tile rendering enabled (map window only) */
 } NhWindow;
 
 extern Boolean CheckNhWin(WindowPtr mac_win);
 
-#define NUM_STAT_ROWS 2
-#define NUM_ROWS 22
-#define NUM_COLS 80 /* We shouldn't use column 0 */
 #define QUEUE_LEN 24
 
 extern NhWindow *theWindows;
@@ -159,7 +134,7 @@ extern winid BASE_WINDOW, WIN_MAP, WIN_MESSAGE, WIN_INVEN, WIN_STATUS;
 
 /* ### dprintf.c ### */
 
-extern void dprintf(char *, ...);
+extern void mac_dprintf(char *, ...);
 
 /* ### maccurs.c ### */
 
@@ -167,24 +142,23 @@ extern Boolean RetrievePosition(short, short *, short *);
 extern Boolean RetrieveSize(short, short, short, short *, short *);
 extern void SaveWindowPos(WindowPtr);
 extern void SaveWindowSize(WindowPtr);
+extern void SaveSizeForKind(short kind, short height, short width);
 extern Boolean RetrieveWinPos(WindowPtr, short *, short *);
 
 /* ### macerrs.c ### */
-
-extern void showerror(char *, const char *);
-extern Boolean itworked(short);
-extern void mustwork(short);
-extern void attemptingto(char *);
-/* appear to be unused
-extern void comment(char *,long);
-extern void pushattemptingto(char *);
-extern void popattempt(void);
-*/
+/* error() is declared in hack.h */
 /* ### macfile.c ### */
 
-/* extern char *macgets(int fd, char *ptr, unsigned len); unused */
 extern void C2P(const char *c, unsigned char *p);
 extern void P2C(const unsigned char *p, char *c);
+
+/* P_STRING_CONV (compile-time Pascal string from a C literal) lives in
+   maccompat.h, included above, so standalone tools (mrecover.c) and
+   light-include files (mactty.c) can use it without pulling in macwin.h. */
+
+/* ### mmodal.c ### */
+
+extern void FlashButton(DialogRef, short);
 
 /* ### macmenu.c ### */
 
@@ -193,17 +167,21 @@ extern void InitMenuRes(void);
 extern void AdjustMenus(short);
 #define DimMenuBar() AdjustMenus(1)
 #define UndimMenuBar() AdjustMenus(0)
+extern void mactile_menu_refresh(void);
 
 /* ### macmain.c ### */
 
 extern void process_openfile(short s_vol, long s_dir, Str255 fNm,
                              OSType ft);
 
+/* ### mttymain.c ### */
+
+extern void clear_screen(void);
+
 /* ### macwin.c ### */
 
 extern void AddToKeyQueue(unsigned char, Boolean);
 extern unsigned char GetFromKeyQueue(void);
-void trans_num_keys(EventRecord *);
 extern void InitMac(void);
 int try_key_queue(char *);
 void enter_topl_mode(char *);
@@ -212,6 +190,7 @@ void topl_set_resp(char *, char);
 Boolean topl_key(unsigned char, Boolean);
 E void HandleEvent(EventRecord *); /* used in mmodal.c */
 extern void port_help(void);
+extern int SanePositions(void);
 
 extern Boolean small_screen;
 
@@ -221,22 +200,22 @@ E void mac_get_nh_event(void);
 E void mac_exit_nhwindows(const char *);
 E winid mac_create_nhwindow(int);
 E void mac_clear_nhwindow(winid);
-E void mac_display_nhwindow(winid, BOOLEAN_P);
+E void mac_display_nhwindow(winid, boolean);
 E void mac_destroy_nhwindow(winid);
 E void mac_curs(winid, int, int);
 E void mac_putstr(winid, int, const char *);
-E void mac_start_menu(winid, unsigned long mbehavior);
-E void mac_add_menu(winid, int, const anything *, CHAR_P, CHAR_P, int,
-                    const char *, unsigned int);
+E void mac_start_menu(winid, unsigned long);
+E void mac_add_menu(winid, const glyph_info *, const anything *, char, char,
+                    int, int, const char *, unsigned int);
 E void mac_end_menu(winid, const char *);
 E int mac_select_menu(winid, int, menu_item **);
 #ifdef CLIPPING
 E void mac_cliparound(int, int);
 #endif
 E int mac_nhgetch(void);
-E int mac_nh_poskey(int *, int *, int *);
+E int mac_nh_poskey(coordxy *, coordxy *, int *);
 E int mac_doprev_message(void);
-E char mac_yn_function(const char *, const char *, CHAR_P);
+E char mac_yn_function(const char *, const char *, char);
 E void mac_getlin(const char *, char *);
 E int mac_get_ext_cmd(void);
 E void mac_number_pad(int);
