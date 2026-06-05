@@ -1,25 +1,20 @@
-# NetHack 3.6	NHDeflts	$NHDT-Date: 1432512798 2015/05/25 00:13:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $
-# Copyright (c) 2002 by Dean Luick, Mark Modrall, and Kevin Hugo
-# NetHack may be freely redistributed.  See license for details.
-#
-# Default settings for the Macintosh port of NetHack.
-# Lines beginning with a `#' character are "comments" and are
-# ignored all the way to the end of the line.  Using this
-# method, some of the lines below have been disabled so you
-# can see an example without having those options actually
-# set.  Remove the `#' character to "uncomment" the line and
-# allow those options to take effect.
+# NetHack 5.0 - Default settings for the Macintosh port.
+# Lines beginning with '#' are comments. Remove the '#' to
+# enable an option. See the Guidebook for full documentation.
 
 
 ### Display ###
-# Uncomment for the traditional single-window tty interface
-#OPTIONS=win:tty
-
 # Boulder symbol
 #OPTIONS=boulder:0
 
 # Color
 OPTIONS=color
+
+# Map display: graphical tiles (the default) or ASCII text. You can switch any
+# time in-game with the Tile Mode menu item; this only sets the startup default.
+# Tiles need a color-capable screen (>=4-bit); B&W screens always use ASCII.
+# Uncomment for ASCII by default even on large color screens:
+#OPTIONS=!tiled_map
 
 # Fonts
 #OPTIONS=font_map:NewHackFont,font_size_map:9
@@ -31,8 +26,8 @@ OPTIONS=color
 # Don't make dark corridors look like lit corridors
 OPTIONS=!lit_corridor
 
-# Enable sound and beeps
-OPTIONS=sound,!silent
+# Sound (handled separately in 3.7)
+#OPTIONS=soundlib:macsound
 
 
 ### Start-up and ending ###
@@ -67,10 +62,10 @@ OPTIONS=menustyle:full
 OPTIONS=number_pad
 
 # Pause for --more-- and make it boldface
-OPTIONS=page_wait,standout
+OPTIONS=standout
 
-# Ask for confirmation with the #pray command
-OPTIONS=prayconfirm
+# Paranoid confirmation for dangerous actions
+OPTIONS=paranoid_confirmation:pray quit die attack
 
 # Allow spacebar as rest command
 #OPTIONS=rest_on_space
@@ -106,14 +101,14 @@ OPTIONS=verbose
 # Automatically dig if wielding a pick
 #OPTIONS=autodig
 
-# Disable autopickup (toggle it with the `@' command)
-#OPTIONS=!autopickup,pickup_types:$*
+# Autopickup useful items (toggle it with the `@' command)
+OPTIONS=autopickup,pickup_types:$!?+/="
 
 # Automatically fill the quiver
 #OPTIONS=autoquiver
 
 # Don't use fixed inventory letters
-OPTIONS=!fixinv,perm_invent,sortpack
+OPTIONS=!fixinv,sortpack
 
 # What you want to call slime molds
 #OPTIONS=fruit:grape
@@ -128,9 +123,30 @@ OPTIONS=!fixinv,perm_invent,sortpack
 #OPTIONS=pushweapon
 
 
+### Menu colors ###
+# Color menu lines (e.g. inventory) by content. NOTE: this build matches with
+# pmatch (shell-style globs), not regular expressions, and against the whole
+# line -- so patterns need '*' wildcards (use *blessed*, not blessed) and are
+# case-insensitive. When several rules match one line, the LAST listed wins.
+OPTIONS=menucolors
+
+# Erosion/curse protection
+MENUCOLOR="*greased*"=cyan
+MENUCOLOR="*oilskin*"=cyan
+
+# Holy / unholy water
+MENUCOLOR="*holy water*"=cyan&bold
+MENUCOLOR="*unholy water*"=orange&bold
+
+# Beatitude (listed last so BUC status wins over the above)
+MENUCOLOR="*cursed*"=red
+MENUCOLOR="*uncursed*"=gray
+MENUCOLOR="*blessed*"=green
+
+
 ### Pets ###
 # What to call your starting pet, and its type
-#OPTIONS=dogname:Quinn,catname:Vladimir,horsename:Silver,pettype:dog
+OPTIONS=catname:Kaori,dogname:Hachi
 
 # Don't intentionally attack your pets
 OPTIONS=confirm,!hilite_pet,safe_pet

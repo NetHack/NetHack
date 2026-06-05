@@ -49,6 +49,16 @@ override TARGETPFX = $(TARGETDIR)/
 override TARGET_LIBS=
 endif
 
+ifdef CROSS_TO_MAC68K
+CROSS=1
+BUILD_TARGET_LUA=1
+CROSS_SHARED=1
+override TARGET = mac68k
+override TARGETDIR=../targets/$(TARGET)
+override TARGETPFX = $(TARGETDIR)/
+override TARGET_LIBS=
+endif
+
 ifdef CROSS
 CROSSCOMPILE=1
 override PREGAME=
