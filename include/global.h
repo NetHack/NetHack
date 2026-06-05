@@ -172,6 +172,10 @@ typedef uchar nhsym;
 #include "windconf.h"
 #endif
 
+#ifdef TOS
+#include "tosconf.h"
+#endif
+
 #include "warnings.h"
 
 #ifdef MACOS9

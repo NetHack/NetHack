@@ -103,7 +103,7 @@ bitmap_to_img(FILE_TYP typ, int ww, int wh, unsigned int pixw,
 
     /* open file */
 
-    file = open(filename, O_WRONLY | O_CREAT | O_TRUNC);
+    file = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (file < 0) {
         error = errno;
         free(line_buf);

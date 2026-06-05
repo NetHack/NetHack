@@ -1,4 +1,4 @@
-/* NetHack 3.6	xpm2img.c	$NHDT-Date: 1432512809 2015/05/25 00:13:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
+/* NetHack 5.0	xpm2img.c	$NHDT-Date: 1432512809 2015/05/25 00:13:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
 /*   Copyright (c) Christian Bressler 2002                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /* This is mainly a reworked tile2bmp.c + xpm2iff.c -- Marvin */
@@ -10,8 +10,9 @@
 #define FALSE 0
 void get_color(unsigned int colind, struct RGB *rgb);
 void get_pixel(int x, int y, unsigned int *colind);
-char *xpmgetline();
-unsigned int **Bild_daten;
+char *xpmgetline(void);
+static int fopen_xpm_file(const char *fn, const char *mode);
+unsigned int **image_data;
 /* translation table from xpm characters to RGB and colormap slots */
 struct Ttable {
     char flag;
@@ -46,11 +47,20 @@ char *argv[];
         printf("Error reading xpm-file %s, aborting.\n", argv[1]);
         exit(EXIT_FAILURE);
     }
-    Bild_daten =
+    image_data =
         (unsigned int **) malloc((long) height * sizeof(unsigned int *));
-    for (i = 0; i < height; i++)
-        Bild_daten[i] =
+    if (!image_data) {
+        fprintf(stderr, "Out of memory\n");
+        exit(EXIT_FAILURE);
+    }
+    for (i = 0; i < height; i++) {
+        image_data[i] =
             (unsigned int *) malloc((long) width * sizeof(unsigned int));
+        if (!image_data[i]) {
+            fprintf(stderr, "Out of memory\n");
+            exit(EXIT_FAILURE);
+        }
+    }
     for (row = 0; row < height; row++) {
         char *xb = xpmgetline();
         int plane_offset;
@@ -59,14 +69,14 @@ char *argv[];
             exit(EXIT_FAILURE);
         }
         for (col = 0; col < width; col++) {
-            int color = xb[col];
+            int color = (unsigned char) xb[col];
             if (!ttable[color].flag)
                 fprintf(stderr, "Bad image data\n");
-            Bild_daten[row][col] = ttable[color].slot;
+            image_data[row][col] = ttable[color].slot;
         }
     }
     if (num_colors > 256) {
-        fprintf(stderr, "ERROR: zuviele Farben\n");
+        fprintf(stderr, "ERROR: too many colors\n");
         exit(EXIT_FAILURE);
     } else if (num_colors > 16) {
         farben = 256;
@@ -94,14 +104,13 @@ get_color(unsigned int colind, struct RGB *rgb)
 void
 get_pixel(int x, int y, unsigned int *colind)
 {
-    *colind = Bild_daten[y][x];
+    *colind = image_data[y][x];
 }
 FILE *xpmfh = 0;
-char initbuf[200];
-char *xpmbuf = initbuf;
 /* version 1.  Reads the raw xpm file, NOT the compiled version.  This is
  * not a particularly good idea but I don't have time to do the right thing
  * at this point, even if I was absolutely sure what that was. */
+static int
 fopen_xpm_file(const char *fn, const char *mode)
 {
     int temp;
@@ -119,15 +128,6 @@ fopen_xpm_file(const char *fn, const char *mode)
         return FALSE;
     if (4 != sscanf(xb, "%d %d %d %d", &width, &height, &num_colors, &temp))
         return FALSE; /* bad header */
-                      /* replace the original buffer with one big enough for
-                       * the real data
-                       */
-    /* XXX */
-    xpmbuf = malloc(width * 2);
-    if (!xpmbuf) {
-        fprintf(stderr, "ERROR: Can't allocate line buffer\n");
-        exit(1);
-    }
     if (temp != 1)
         return FALSE; /* limitation of this code */
     {
@@ -135,8 +135,10 @@ fopen_xpm_file(const char *fn, const char *mode)
         int ccount = -1;
         ColorMap =
             (struct RGB *) malloc((long) num_colors * sizeof(struct RGB));
+        if (!ColorMap)
+            return FALSE;
         while (ccount++ < (num_colors - 1)) {
-            char index;
+            unsigned char index;
             int r, g, b;
             xb = xpmgetline();
             if (xb == 0)

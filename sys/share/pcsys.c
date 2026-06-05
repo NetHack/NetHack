@@ -160,6 +160,7 @@ getreturn(const char *str)
     return;
 }
 
+#ifndef CROSS_TO_ATARI /* sys/share/pcmain.c provides its own */
 void msmsg
 VA_DECL(const char *, fmt)
 {
@@ -174,6 +175,7 @@ VA_DECL(const char *, fmt)
     VA_END();
     return;
 }
+#endif
 
 /*
  * Follow the PATH, trying to fopen the file.

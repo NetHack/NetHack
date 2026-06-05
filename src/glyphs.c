@@ -576,6 +576,14 @@ empty_glyphname_hash_indices(void)
     glyphname_hash_indices_count = 0;
 }
 
+
+
+
+
+
+
+
+
 staticfn int
 find_glyph_in_hashtable(const char *id)
 {

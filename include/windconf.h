@@ -39,6 +39,8 @@
 #define IDLECHECKPOINT
 #endif
 
+#define TIMED_DELAY
+
 /*
  * -----------------------------------------------------------------
  *  The remaining code shouldn't need modification.

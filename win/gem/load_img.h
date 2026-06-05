@@ -1,8 +1,14 @@
+#ifndef LOAD_IMG_H
+#define LOAD_IMG_H
 
 /* ------------------------------------------- */
 #define XIMG 0x58494D47
 
-/* Header of GEM Image Files   */
+/* Header of GEM Image Files.  Members through `paltype' (22 bytes) form
+   the on-disk binary layout and are read with a single fread() in
+   load_img.c.  `palette' and `addr' are in-memory only and must not be
+   read from disk; they live past byte 22 and are kept here for caller
+   convenience. */
 typedef struct IMG_HEADER {
     short version;  /* Img file format version (1) */
     short length;   /* Header length in words  (8) */
@@ -29,8 +35,10 @@ typedef struct IMG_HEADER {
 /* saves the current colorpalette with col colors in palette */
 void get_colors(int handle, short *palette, int col);
 
-/* sets col colors from palette */
+/* sets col colors from palette (preserves system colours on 256-colour) */
 void img_set_colors(int handle, short *palette, int col);
+/* sets col colors; preserve_sys=0 overrides all slots incl. system */
+void img_set_colors_ex(int handle, short *palette, int col, int preserve_sys);
 
 /* converts MFDB  of size from standard to deviceformat (0 if succeded, else
  * error). */
@@ -45,3 +53,5 @@ int depack_img(char *, IMG_header *);
 
 /* Halves IMG in Device-format, dest memory has to be allocated*/
 int half_img(MFDB *, MFDB *);
+
+#endif /* LOAD_IMG_H */

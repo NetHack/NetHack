@@ -1969,9 +1969,9 @@ x_event(int exit_condition)
  try_test:
         switch (exit_condition) {
         case EXIT_ON_SENT_EVENT: {
-            XAnyEvent *any = (XAnyEvent *) &event;
+            XClientMessageEvent *cle = (XClientMessageEvent *) &event;
 
-            if (any->send_event) {
+            if (cle->send_event && cle->data.b[0] == DELAY_EVENT_ID) {
                 retval = 0;
                 keep_going = FALSE;
             }
