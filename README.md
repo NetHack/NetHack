@@ -25,38 +25,31 @@ direct-color graphics at 16/24/32 bpp, resizable map window with tracking
 status/message panes. See [`sys/atari/README.tos`](sys/atari/README.tos) and
 [`sys/atari/README.Crosscompiling`](sys/atari/README.Crosscompiling).
 
-### 68k Macintosh (Classic Mac OS) (planned, currently not in this repo)
-I currently have a working version of the legacy 3.1.3 Macintosh build brought
-up to 3.7. Targets the classic Toolbox windowport on System 7 / Mac OS 8 across
-Macintosh SE/30 through Quadra. 
-
-I will shift my focus to getting the Macintosh port ready once the Atari port is stable.
-I aim for feature parity with the other 68k ports meaning tiles and support
-for high resolutions and color. 
+### 68k Macintosh (Classic Mac OS)
+**Feature complete** — the legacy Macintosh port revived against NetHack 5.0,
+cross-compiled from Linux with [Retro68](https://github.com/autc04/Retro68).
+Targets the classic Toolbox windowport on System 7 and should run on any
+68020-or-later Macintosh with at least 8 MB of RAM -- ASCII on black & white
+screens, tile mode in 256/16 colors on color-capable machines.  Resizable map
+window with in-game tile/ASCII switching, MENUCOLOR, and a bundled
+crash-recovery application.  See
+[`sys/mac/ReadMe.txt`](sys/mac/ReadMe.txt) for players and
+[`sys/mac/BUILD.md`](sys/mac/BUILD.md) for building.
 
 ## Try it now
 
 Pre-built binaries for the Atari port can be found in my fork:
 
 - **Atari (5.0 WIP)**: <https://github.com/ingpaschke/NetHack/releases/tag/v5.0-atari-wip>
-- **68k Mac (3.7 reference)**: <https://github.com/ingpaschke/NetHack/releases/tag/v3.7.0-mac68k>
+- **68k Mac (5.0)**: <https://github.com/ingpaschke/NetHack/releases/tag/v5.0.0-mac68k>
 
 Builds are tagged WIP and refreshed when fixes land.
 
 ## Building from source
 
-See [`sys/atari/README.Crosscompiling`](sys/atari/README.Crosscompiling) for instructions on how to build the Atari ST port.
-
-## Hardware / emulator support
-
-| Target | Status |
-|---|---|
-| Atari TT, Falcon, Mega ST/STE with ≥8 MB RAM | supported, but I don't have real hardware to test on, feedback appreciated |
-| Hatari (TOS 2.06 / 3.06 / 4.04, EmuTOS 1.3.x / 1.4) | regularly tested |
-| ARAnyM 1.1+ (FreeMiNT / XaAES) | testers wanted |
-| MagiC 6.2 under MagicMac / magic-on-linux | regularly tested |
-| Plain ST/STE (4 MB) | won't fit — needs RAM expansion to ≥8 MB |
-| 68k Macintosh (System 7 / 8 / 9, Quadra-class for tile mode goal) | basic port working, modernization in progress |
+See [`sys/atari/README.Crosscompiling`](sys/atari/README.Crosscompiling) for
+the Atari ST port and [`sys/mac/BUILD.md`](sys/mac/BUILD.md) for the 68k
+Macintosh port.
 
 ## Help wanted
 
@@ -69,11 +62,12 @@ If you have time and m68k hardware (or a configured emulator):
   on Macintosh myself. Feedback from running on FreeMint would be welcome.
 - **Alternate VDI drivers** — NVDI, fVDI, and unusual direct-color screens are
   supported, but of course I couldn't test all combinations out there. 
+- **Mac testers**
 
 Open issues on [My NetHack fork](https://github.com/ingpaschke/NetHack/issues)
 or send patches against this branch.
 
 ## Maintainer
 
-Ingo Paschke ([@ingpaschke](https://github.com/ingpaschke)) — Atari, Amiga,
-and 68k Macintosh ports.
+Ingo Paschke ([@ingpaschke](https://github.com/ingpaschke),
+<ipaschke@lpclabs.de>) — Atari, Amiga, and 68k Macintosh ports.
