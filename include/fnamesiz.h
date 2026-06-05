@@ -63,6 +63,14 @@
 #endif
 #endif /* !SAVE_EXTENSION */
 #endif /* WIN32 || MICRO */
+#ifdef MACOS9
+#ifndef SAVEX
+#define SAVEX ""
+#endif
+#ifndef SAVE_EXTENSION
+#define SAVE_EXTENSION ""
+#endif
+#endif /* MAC */
 #endif /* else !VMS */
 #endif /* else !(UNIX || __BEOS__) */
 
