@@ -1058,7 +1058,7 @@ set_savefile_name(boolean regularize_it)
     if (strlen(gs.SAVEF) < (SAVESIZE - 1))
         (void) strncat(gs.SAVEF, svp.plname, (SAVESIZE - strlen(gs.SAVEF)));
 #endif
-#if defined(MACOS9)
+#if defined(MAC68K)
     /* Mac: save file is just the player name in the app directory */
     Strcpy(gs.SAVEF, svp.plname);
 #elif defined(MICRO) && !defined(WIN32) && !defined(MSDOS)

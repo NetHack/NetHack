@@ -146,7 +146,7 @@ static struct win_information window_opts[] = {
     { "amii", "Amiga Intuition (text)", TRUE },
     { "amiv", "Amiga Intuition (tiles)", TRUE },
 #endif
-#ifdef MACOS9 /* classic Mac 68k windowport (revived) */
+#ifdef MAC68K /* classic Mac 68k windowport (revived) */
     { "mac", "Macintosh", TRUE },
 #endif
 #ifdef GEM_GRAPHICS

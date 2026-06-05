@@ -78,7 +78,7 @@ Save files and bones files from earlier NetHack versions do not
 work with 5.0.
 
 Source code and build instructions (Retro68 cross-compile):
-    https://github.com/ingpaschke/NetHack -- see sys/mac/BUILD.md
+    https://github.com/ingpaschke/NetHack -- see sys/mac68k/BUILD.md
 
 Based on the classic Macintosh port by Dean Luick, Kevin Hugo,
 Mark Modrall, Jon W{tte, David Hairston, and Michael Hamel.

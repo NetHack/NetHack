@@ -33,8 +33,8 @@ Targets the classic Toolbox windowport on System 7 and should run on any
 screens, tile mode in 256/16 colors on color-capable machines.  Resizable map
 window with in-game tile/ASCII switching, MENUCOLOR, and a bundled
 crash-recovery application.  See
-[`sys/mac/ReadMe.txt`](sys/mac/ReadMe.txt) for players and
-[`sys/mac/BUILD.md`](sys/mac/BUILD.md) for building.
+[`sys/mac68k/ReadMe.txt`](sys/mac68k/ReadMe.txt) for players and
+[`sys/mac68k/BUILD.md`](sys/mac68k/BUILD.md) for building.
 
 ## Try it now
 
@@ -48,7 +48,7 @@ Builds are tagged WIP and refreshed when fixes land.
 ## Building from source
 
 See [`sys/atari/README.Crosscompiling`](sys/atari/README.Crosscompiling) for
-the Atari ST port and [`sys/mac/BUILD.md`](sys/mac/BUILD.md) for the 68k
+the Atari ST port and [`sys/mac68k/BUILD.md`](sys/mac68k/BUILD.md) for the 68k
 Macintosh port.
 
 ## Help wanted

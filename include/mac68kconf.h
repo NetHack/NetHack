@@ -1,13 +1,13 @@
-/* NetHack 5.0	macconf.h	$NHDT-Date: 1432512782 2015/05/25 00:13:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* NetHack 5.0	mac68kconf.h	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kevin Hugo, 2004. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifdef MACOS9
+#ifdef MAC68K
 #ifndef MACCONF_H
 #define MACCONF_H
 
-/* Built with the Retro68 GCC cross-toolchain (see sys/mac/BUILD.md).
+/* Built with the Retro68 GCC cross-toolchain (see sys/mac68k/BUILD.md).
  * The MPW/Think C/CodeWarrior compilers of the original port are no
  * longer supported. */
 
@@ -62,7 +62,7 @@
 
 #define Rand random
 extern void error(const char *, ...);
-/* macwin.c; called from options.c under #ifdef MACOS9 */
+/* macwin.c; called from options.c under #ifdef MAC68K */
 extern short set_font_name(int, char *);
 /* macmain.c; called from options.c (other ports declare these in their
    *conf.h as well) */
@@ -75,12 +75,12 @@ extern boolean authorize_explore_mode(void);
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
-/* implemented in sys/mac/macunix.c */
+/* implemented in sys/mac68k/macunix.c */
 extern void regularize(char *);
 extern void getlock(void);
 
-/* implemented in sys/mac/mttymain.c; called from the shared tty code
-   (win/tty/wintty.c) and core (allmain.c) under MACOS9/NO_TERMS */
+/* implemented in sys/mac68k/mttymain.c; called from the shared tty code
+   (win/tty/wintty.c) and core (allmain.c) under MAC68K/NO_TERMS */
 extern int tgetch(void);
 extern void getreturn(char *);
 extern void msmsg(const char *, ...);
@@ -88,11 +88,11 @@ extern void gettty(void);
 extern void settty(const char *);
 extern void setftty(void);
 
-/* implemented in sys/mac/macwin.c; called from allmain.c / getpos.c */
+/* implemented in sys/mac68k/macwin.c; called from allmain.c / getpos.c */
 extern int SanePositions(void);
 extern void lock_mouse_cursor(Boolean);
 
-/* implemented in sys/mac/macfile.c */
+/* implemented in sys/mac68k/macfile.c */
 extern int maccreat(const char *, long);
 extern int macopen(const char *, int, long);
 extern int macclose(int);

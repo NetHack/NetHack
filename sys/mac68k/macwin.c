@@ -392,7 +392,7 @@ InitMac(void)
     return;
 }
 
-/* options.c (pfxfn_font, under #ifdef MACOS9) calls this by name when the
+/* options.c (pfxfn_font, under #ifdef MAC68K) calls this by name when the
    winprocs set_font_name macro is inactive (NO_CHANGE_COLOR builds). */
 short
 set_font_name(int window_type, char *font_name)
@@ -3272,7 +3272,7 @@ struct window_procs mac_procs = {
     mac_getlin, mac_get_ext_cmd, mac_number_pad, mac_delay_output,
 #ifdef CHANGE_COLOR
     mac_change_color,
-#ifdef MACOS9
+#ifdef MAC68K
     mac_change_background, set_tty_font_name,
 #endif
     mac_get_color_string,

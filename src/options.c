@@ -7153,7 +7153,7 @@ initoptions_init(void)
 
     /* make any symbol parsing quicker, but only if
      * gd.disable_glyphname_hash_indices_prefill is not set to TRUE */
-#ifndef MACOS9
+#ifndef MAC68K
     /* Skip on classic Mac OS — the prefill iterates thousands of glyphs
        (Sprintf + hash insertions), taking ~2 minutes on a 68030.  Lazy
        lookup on first use is cheaper; the cache is only needed for glyph

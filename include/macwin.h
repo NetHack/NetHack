@@ -59,7 +59,7 @@ extern MacFlags macFlags;
 #define kMapTileWindow 5
 #define kLastWindowKind kMapTileWindow
 
-/* WIND resource IDs (templates in sys/mac/nhmapwind.r) */
+/* WIND resource IDs (templates in sys/mac68k/nhmapwind.r) */
 #define kWindMapDocument      200 /* map, decorated (scrollbars + grow box) */
 #define kWindMapBorderless    201 /* map, compact screens */
 #define kWindStatusBorderless 210 /* status/base tty window */

@@ -579,9 +579,9 @@ override TARGET_CXX = $(RETRO68)/bin/m68k-apple-macos-g++
 override TARGET_AR = $(RETRO68)/bin/m68k-apple-macos-ar
 override TARGET_LINK = $(TARGET_CC)
 MAC68K_COMMON_FLAGS = -m68020 -msoft-float \
-	-I../include -I../sys/mac \
+	-I../include -I../sys/mac68k \
 	$(LUAINCL) \
-	-DMAC_CROSS -DMACOS9_CROSS -DNO_TERMS -DNO_SIGNAL -DNO_CHANGE_COLOR \
+	-DMAC_CROSS -DMAC68K_CROSS -DNO_TERMS -DNO_SIGNAL -DNO_CHANGE_COLOR \
 	-DTILES_IN_GLYPHMAP -DCLIPPING \
 	-DTARGET_OS_MAC=1 -DTARGET_CPU_68K=1 -DTARGET_RT_MAC_CFM=0 \
 	-DOPAQUE_TOOLBOX_STRUCTS=0 -DACCESSOR_CALLS_ARE_FUNCTIONS=0 \
@@ -595,16 +595,16 @@ override TARGET_LFLAGS = -Wl,--gc-sections \
 	-Wl,--wrap=malloc -Wl,--wrap=free -Wl,--wrap=realloc   # macalloc.c pool
 override TARGET_LIBS += -lm -lInterface
 
-override SYSSRC = ../sys/mac/macmain.c ../sys/mac/macwin.c \
-		../sys/mac/mactty.c ../sys/mac/macmenu.c \
-		../sys/mac/mttymain.c ../sys/mac/macfile.c \
-		../sys/mac/maccurs.c ../sys/mac/macerrs.c \
-		../sys/mac/mactopl.c ../sys/mac/macunix.c \
-		../sys/mac/mgetline.c ../sys/mac/mmodal.c \
-		../sys/mac/dprintf.c \
-		../sys/mac/mactile.c \
-		../sys/mac/macmap.c \
-		../sys/mac/macalloc.c \
+override SYSSRC = ../sys/mac68k/macmain.c ../sys/mac68k/macwin.c \
+		../sys/mac68k/mactty.c ../sys/mac68k/macmenu.c \
+		../sys/mac68k/mttymain.c ../sys/mac68k/macfile.c \
+		../sys/mac68k/maccurs.c ../sys/mac68k/macerrs.c \
+		../sys/mac68k/mactopl.c ../sys/mac68k/macunix.c \
+		../sys/mac68k/mgetline.c ../sys/mac68k/mmodal.c \
+		../sys/mac68k/dprintf.c \
+		../sys/mac68k/mactile.c \
+		../sys/mac68k/macmap.c \
+		../sys/mac68k/macalloc.c \
 		../win/tty/wintty.c ../win/tty/topl.c \
 		../win/tty/getline.c
 override SYSOBJ = $(TARGETPFX)macmain.o $(TARGETPFX)macwin.o \
@@ -632,8 +632,8 @@ override PACKAGE = mac68kpkg
 override PREGAME += mkdir -p $(TARGETDIR) ;
 override CLEANMORE += rm -rf $(TARGETDIR) ;
 
-# Rule for files in sys/mac
-$(TARGETPFX)%.o : ../sys/mac/%.c
+# Rule for files in sys/mac68k
+$(TARGETPFX)%.o : ../sys/mac68k/%.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
 endif  # CROSS_TO_MAC68K
 

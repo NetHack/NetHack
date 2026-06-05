@@ -1867,7 +1867,7 @@ parse_conf_file(FILE *fp, boolean (*proc)(char *arg))
     free_config_sections();
 
     while (fgets(parser.inbuf, parser.inbufsz, fp)) {
-#ifdef MACOS9
+#ifdef MAC68K
         /* Classic Mac text files use CR line endings; fgets() only
            stops at LF, so a CR-only file is read as one long line.
            Convert the first bare CR to LF so parse_conf_buf sees it

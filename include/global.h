@@ -178,8 +178,8 @@ typedef uchar nhsym;
 
 #include "warnings.h"
 
-#ifdef MACOS9
-#include "macconf.h"
+#ifdef MAC68K
+#include "mac68kconf.h"
 #endif
 
 /* amiconf.h needs to be the last nested #include of config.h because

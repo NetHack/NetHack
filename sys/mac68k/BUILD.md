@@ -9,7 +9,7 @@ toolchain targeting Motorola 68k Macs in 32-bit addressing mode.
 
 Install Retro68 to `/opt/retro68` (or set `RETRO68=` to your path).
 
-One patch is required: apply `sys/mac/tools/retro68_elf2mac.patch` to
+One patch is required: apply `sys/mac68k/tools/retro68_elf2mac.patch` to
 the Retro68 source tree and rebuild Elf2Mac.  It lets the linker accept
 NetHack's function-pointer tables in `.data` (cross-section jump-table
 references), which upstream Elf2Mac rejects with an assert.  Nothing
@@ -117,7 +117,7 @@ does.
 
 ---
 
-## Tools (sys/mac/tools/)
+## Tools (sys/mac68k/tools/)
 
 | Script | Purpose |
 |--------|---------|
@@ -128,6 +128,6 @@ does.
 
 ## Historical files
 
-`sys/mac/README`, `Install.mw`, and `NHrsrc.hqx`/`NHsound.hqx` date from the
+`sys/mac68k/README`, `Install.mw`, and `NHrsrc.hqx`/`NHsound.hqx` date from the
 original 1990s Macintosh port (Metrowerks/MPW).  They are retained for
 reference; only this file describes the Retro68 cross-compile.

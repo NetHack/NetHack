@@ -229,7 +229,7 @@
 #define WIZARD_NAME "wizard" /* value is ignored if SYSCF is enabled */
 #endif
 
-#if !defined(SYSCF) && !defined(MACOS9)
+#if !defined(SYSCF) && !defined(MAC68K)
 #define SYSCF                /* use a global configuration */
 #define SYSCF_FILE "sysconf" /* global configuration is in a file */
 #endif

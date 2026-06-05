@@ -45,7 +45,7 @@ read 'File' (1001,"help") ":dat:help";
 read 'File' (1002,"hh") ":dat:hh";
 read 'File' (1003,"history") ":dat:history";
 read 'File' (1004,"license") ":dat:license";
-read 'File' (1005,"MacHelp") ":sys:mac:MacHelp";
+read 'File' (1005,"MacHelp") ":sys:mac68k:MacHelp";
 read 'File' (1007,"opthelp") ":dat:opthelp";
 read 'File' (1008,"wizhelp") ":dat:wizhelp";
 read 'File' (1009,"air.lev") ":lib:air.lev";
