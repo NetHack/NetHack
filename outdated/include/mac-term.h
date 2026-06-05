@@ -23,7 +23,7 @@
 
 /* Stuff needed for the core of NetHack */
 #undef MAC
-#undef MACOS9
+#undef MAC68K
 #define UNIX
 #define BSD
 #define __FreeBSD__ /* Darwin is based on FreeBSD */

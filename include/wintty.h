@@ -280,7 +280,7 @@ extern void tty_number_pad(int);
 extern void tty_delay_output(void);
 #ifdef CHANGE_COLOR
 extern void tty_change_color(int color, long rgb, int reverse);
-#ifdef MACOS9
+#ifdef MAC68K
 extern void tty_change_background(int white_or_black);
 extern short set_tty_font_name(winid, char *);
 #endif
@@ -331,7 +331,7 @@ extern char *tgetstr(const char *, char **);
 extern char *tgoto(const char *, int, int);
 #endif /* NO_TERMCAP_HEADERS */
 #else  /* ?NO_TERMS */
-#ifdef MACOS9
+#ifdef MAC68K
 #ifdef putchar
 #undef putchar
 #undef putc
@@ -342,7 +342,7 @@ extern char *tgoto(const char *, int, int);
 extern int term_putc(int c);
 extern int term_flush(void *desc);
 extern int term_puts(const char *str);
-#endif /* MACOS9 */
+#endif /* MAC68K */
 #if defined(MSDOS) || defined(WIN32)
 #if defined(SCREEN_BIOS) || defined(SCREEN_DJGPPFAST) || defined(WIN32)
 #undef putchar

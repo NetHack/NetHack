@@ -157,7 +157,7 @@ static struct win_information window_opts[] = {
 #ifdef GNOME_GRAPHICS /* unmaintained/defunct */
     { "Gnome", "Gnome", TRUE },
 #endif
-#ifdef MACOS9 /* defunct OS 9 interface */
+#ifdef MAC68K /* defunct OS 9 interface */
     { "mac", "Mac", TRUE },
 #endif
 #ifdef BEOS_GRAPHICS /* unmaintained/defunct */
@@ -539,7 +539,7 @@ static const char *const build_opts[] = {
     "screen clipping",
 #endif
 #ifdef NO_TERMS
-#ifdef MACOS9
+#ifdef MAC68K
     "screen control via mactty",
 #endif
 #ifdef SCREEN_BIOS

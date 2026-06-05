@@ -739,7 +739,7 @@ init_sound_disp_gamewindows(void)
        ever having been used, use it here to pacify the Qt interface */
     start_menu(WIN_INVEN, menu_behavior), end_menu(WIN_INVEN, (char *) 0);
 
-#ifdef MACOS9
+#ifdef MAC68K
     /* This _is_ the right place for this - maybe we will
      * have to split init_sound_disp_gamewindows into
      * create_gamewindows and show_gamewindows to get rid of this ifdef...

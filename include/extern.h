@@ -1461,7 +1461,7 @@ extern boolean stumble_on_door_mimic(coordxy, coordxy);
 extern int doopen_indir(coordxy, coordxy);
 extern int doclose(void);
 
-#ifdef MACOS9
+#ifdef MAC68K
 /* outdated functions removed */
 /* ### macfile.c ### */
 /* ### macmain.c ### */

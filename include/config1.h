@@ -45,23 +45,23 @@
 #endif
 
 #ifdef macintosh /* Auto-defined symbol for MPW compilers (sc and mrc) */
-#define MACOS9
+#define MAC68K
 #endif
 
 #ifdef THINK_C /* Think C auto-defined symbol */
-#define MACOS9
+#define MAC68K
 #define NEED_VARARGS
 #endif
 
 #ifdef __MWERKS__ /* defined by Metrowerks' Codewarrior compiler */
 #ifndef __BEOS__  /* BeOS */
-#define MACOS9
+#define MAC68K
 #endif
 #define NEED_VARARGS
 #define USE_STDARG
 #endif
 
-#if defined(MACOS9) || defined(__BEOS__)
+#if defined(MAC68K) || defined(__BEOS__)
 #define DLB
 #undef UNIX
 #endif

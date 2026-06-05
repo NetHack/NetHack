@@ -510,7 +510,7 @@ struct instance_flags {
 #ifdef MAC_GRAPHICS_ENV
 #define large_font obsolete
 #endif
-#ifdef MACOS9
+#ifdef MAC68K
 #define popup_dialog wc_popup_dialog
 #endif
 #define preload_tiles wc_preload_tiles

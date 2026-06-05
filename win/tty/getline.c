@@ -7,7 +7,7 @@
 
 #ifdef TTY_GRAPHICS
 
-#if !defined(MACOS9)
+#if !defined(MAC68K)
 #define NEWAUTOCOMP
 #endif
 

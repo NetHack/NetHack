@@ -82,7 +82,7 @@ struct window_procs {
     void (*win_delay_output)(void);
 #ifdef CHANGE_COLOR
     void (*win_change_color)(int, long, int);
-#ifdef MACOS9
+#ifdef MAC68K
     void (*win_change_background)(int);
     short (*win_set_font_name)(winid, char *);
 #endif
@@ -168,7 +168,7 @@ extern
 #define nh_delay_output (*windowprocs.win_delay_output)
 #ifdef CHANGE_COLOR
 #define change_color (*windowprocs.win_change_color)
-#ifdef MACOS9
+#ifdef MAC68K
 #define change_background (*windowprocs.win_change_background)
 #define set_font_name (*windowprocs.win_set_font_name)
 #endif
@@ -400,7 +400,7 @@ struct chain_procs {
     void (*win_delay_output)(CARGS);
 #ifdef CHANGE_COLOR
     void (*win_change_color)(CARGS, int, long, int);
-#ifdef MACOS9
+#ifdef MAC68K
     void (*win_change_background)(CARGS, int);
     short (*win_set_font_name)(CARGS, winid, char *);
 #endif

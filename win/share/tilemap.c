@@ -541,7 +541,7 @@ tilename(int set, const int file_entry, int gend UNUSED)
 #define SOURCE_TEMPLATE "NH:src/%s"
 #define INCLUDE_TEMPLATE "NH:include/t.%s"
 #else
-#ifdef MACOS9
+#ifdef MAC68K
 #define SOURCE_TEMPLATE ":src:%s"
 #define INCLUDE_TEMPLATE ":include:%s"
 #else

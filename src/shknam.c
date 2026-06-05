@@ -128,7 +128,7 @@ static const char *const shktools[] = {
 #ifdef WIN32
     "Lexa", "Niod",
 #endif
-#ifdef MACOS9
+#ifdef MAC68K
     "Nhoj-lee", "Evad\'kh", "Ettaw-noj", "Tsew-mot", "Ydna-s", "Yao-hang",
     "Tonbar", "Kivenhoug", "Llardom",
 #endif

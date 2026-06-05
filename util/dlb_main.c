@@ -9,7 +9,7 @@
 #include "dlb.h"
 #include "hacklib.h"
 
-#if !defined(O_WRONLY) && !defined(MACOS9) && !defined(AZTEC_C)
+#if !defined(O_WRONLY) && !defined(MAC68K) && !defined(AZTEC_C)
 #include <fcntl.h>
 #endif
 #if defined(__DJGPP__)

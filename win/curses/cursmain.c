@@ -122,7 +122,7 @@ struct window_procs curses_procs = {
     curses_delay_output,
 #ifdef CHANGE_COLOR
     curses_change_color,
-#ifdef MACOS9 /* old OS 9, not OSX */
+#ifdef MAC68K /* old OS 9, not OSX */
     (void (*)(int)) 0,
     (short (*)(winid, char *)) 0,
 #endif

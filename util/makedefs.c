@@ -23,15 +23,15 @@
 #include "dlb.h"
 #include "hacklib.h"
 
-#ifdef MACOS9
+#ifdef MAC68K
 #if defined(__SC__) || defined(__MRC__) /* MPW compilers */
 #define MPWTOOL
 #include <CursorCtl.h>
 #include <string.h>
-#else /* MACOS9 without MPWTOOL */
+#else /* MAC68K without MPWTOOL */
 #define MACsansMPWTOOL
 #endif
-#endif /* MACOS9 */
+#endif /* MAC68K */
 
 #ifndef MPWTOOL
 #define SpinCursor(x)
@@ -78,7 +78,7 @@
 #define DGN_TEMPLATE "NH:dat/%s" /* where dungeon.pdf file goes */
 #endif /* OLD_MAKEDEFS_OPTIONS */
 #else /* not AMIGA */
-#if defined(MACOS9) && !defined(__MACH__)
+#if defined(MAC68K) && !defined(__MACH__)
 /* MacOS 9 or earlier */
 #define SOURCE_TEMPLATE ":src:%s"
 #if __SC__ || __MRC__
@@ -91,7 +91,7 @@
 #define INCLUDE_TEMPLATE ":include:%s"
 #define DGN_TEMPLATE ":dat:%s" /* where dungeon.pdf file goes */
 #endif /* OLD_MAKEDEFS_OPTIONS */
-#else /* neither AMIGA nor MACOS9 */
+#else /* neither AMIGA nor MAC68K */
 #ifdef OS2
 #define SOURCE_TEMPLATE "..\\src\\%s"
 #define DATA_TEMPLATE "..\\dat\\%s"
@@ -100,7 +100,7 @@
 #define INCLUDE_TEMPLATE "..\\include\\%s"
 #define DGN_TEMPLATE "..\\dat\\%s" /* where dungeon.pdf file goes */
 #endif /* OLD_MAKEDEFS_OPTIONS */
-#else /* not AMIGA, MACOS9, or OS2 */
+#else /* not AMIGA, MAC68K, or OS2 */
 #define SOURCE_TEMPLATE "../src/%s"
 #define DATA_TEMPLATE "../dat/%s"
 #define DATA_IN_TEMPLATE "../dat/%s"
@@ -109,7 +109,7 @@
 #define DGN_TEMPLATE "../dat/%s" /* where dungeon.pdf file goes */
 #endif /* OLD_MAKEDEFS_OPTIONS */
 #endif /* else !OS2 */
-#endif /* else !MACOS9 */
+#endif /* else !MAC68K */
 #endif /* else !AMIGA */
 
 static const char
@@ -257,7 +257,7 @@ main(void)
     return 0;
 }
 
-#else /* ! MACOS9 */
+#else /* ! MAC68K */
 
 DISABLE_WARNING_UNREACHABLE_CODE
 
@@ -1551,7 +1551,7 @@ do_oracles(void)
                 break;
             if (!(ok = (fscanf(ofp, "%5lx", &offset) == 1)))
                 break;
-#ifdef MACOS9
+#ifdef MAC68K
 #ifdef __MWERKS__
             /*
             MetroWerks CodeWarrior Pro 1's (AKA CW12) version of MSL
