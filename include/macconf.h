@@ -79,6 +79,19 @@ extern boolean authorize_explore_mode(void);
 extern void regularize(char *);
 extern void getlock(void);
 
+/* implemented in sys/mac/mttymain.c; called from the shared tty code
+   (win/tty/wintty.c) and core (allmain.c) under MACOS9/NO_TERMS */
+extern int tgetch(void);
+extern void getreturn(char *);
+extern void msmsg(const char *, ...);
+extern void gettty(void);
+extern void settty(const char *);
+extern void setftty(void);
+
+/* implemented in sys/mac/macwin.c; called from allmain.c / getpos.c */
+extern int SanePositions(void);
+extern void lock_mouse_cursor(Boolean);
+
 /* implemented in sys/mac/macfile.c */
 extern int maccreat(const char *, long);
 extern int macopen(const char *, int, long);
