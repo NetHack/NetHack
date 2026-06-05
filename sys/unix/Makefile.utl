@@ -501,6 +501,9 @@ tile2img.ttp: tile2img.o bitmfile.o $(TEXT_IO)
 tile2bmp: tile2bmp.o $(TEXT_IO) $(HACKLIB)
 	$(CLINK) $(LFLAGS) -o tile2bmp tile2bmp.o $(TEXT_IO) $(HACKLIB)
 
+tile2pict: tile2pict.o $(TEXT_IO) $(HACKLIB)
+	$(CLINK) $(LFLAGS) -o tile2pict tile2pict.o $(TEXT_IO) $(HACKLIB)
+
 xpm2img.ttp: xpm2img.o bitmfile.o
 	$(CLINK) $(LFLAGS) -o xpm2img.ttp xpm2img.o bitmfile.o $(LIBS)
 
@@ -535,6 +538,9 @@ ppmwrite.o: ../win/share/ppmwrite.c $(CONFIG_H) ../win/share/tile.h
 
 tile2bmp.o: ../win/share/tile2bmp.c $(HACK_H) ../win/share/tile.h
 	$(CC) $(CFLAGS) $(CSTD) -I../win/share -c ../win/share/tile2bmp.c -o $@
+
+tile2pict.o: ../util/tile2pict.c $(HACK_H) ../win/share/tile.h
+	$(CC) $(CFLAGS) $(CSTD) -I../win/share -c ../util/tile2pict.c -o $@
 
 tile2x11.o: ../win/X11/tile2x11.c $(HACK_H) ../win/share/tile.h \
 						../include/tile2x11.h
@@ -628,6 +634,6 @@ clean: clean-fixup
 spotless: clean
 	-rm -f makedefs recover dlb $(HACKLIB)
 	-rm -f gif2txt txt2ppm tile2x11 tile2img.ttp xpm2img.ttp \
-		tilemap tileedit tile2bmp uudecode
+		tilemap tileedit tile2bmp tile2pict uudecode
 	-rm -f dgn_comp* dgn_lex.c dgn_yacc.c ../include/dgn_comp.h \
 		lev_comp* lev_lex.c lev_yacc.c ../include/lev_comp.h

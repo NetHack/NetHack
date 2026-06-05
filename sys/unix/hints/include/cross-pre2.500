@@ -561,6 +561,82 @@ $(TARGETPFX)%.o : ../sys/amiga/regex/%.c
 endif  # CROSS_TO_AMIGA
 #=================================================================
 
+ifdef CROSS_TO_MAC68K
+#=================================================================
+# Classic Mac OS (System 7) m68k cross-compile via Retro68
+#=================================================================
+# Cross-compiler: https://github.com/autc04/Retro68
+# Install Retro68, then set RETRO68 to the toolchain prefix, e.g.:
+#     make CROSS_TO_MAC68K=1 RETRO68=/opt/retro68 all
+#=================================================================
+
+RETRO68 ?= /opt/retro68
+
+CFLAGS += -DCROSSCOMPILE
+
+override TARGET_CC = $(RETRO68)/bin/m68k-apple-macos-gcc
+override TARGET_CXX = $(RETRO68)/bin/m68k-apple-macos-g++
+override TARGET_AR = $(RETRO68)/bin/m68k-apple-macos-ar
+override TARGET_LINK = $(TARGET_CC)
+MAC68K_COMMON_FLAGS = -m68020 -msoft-float \
+	-I../include -I../sys/mac \
+	$(LUAINCL) \
+	-DMAC_CROSS -DMACOS9_CROSS -DNO_TERMS -DNO_SIGNAL -DNO_CHANGE_COLOR \
+	-DTILES_IN_GLYPHMAP -DCLIPPING \
+	-DTARGET_OS_MAC=1 -DTARGET_CPU_68K=1 -DTARGET_RT_MAC_CFM=0 \
+	-DOPAQUE_TOOLBOX_STRUCTS=0 -DACCESSOR_CALLS_ARE_FUNCTIONS=0 \
+	-DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_MAC68K \
+	-Wall -Wno-missing-field-initializers \
+	-Wno-unused-parameter -Wno-unused-variable -Wno-four-char-constants \
+	-ffunction-sections -fdata-sections
+override TARGET_CFLAGS = -c -O2 $(MAC68K_COMMON_FLAGS)
+LUA_TARGET_CFLAGS = -c -O2 -DLUA_32BITS $(MAC68K_COMMON_FLAGS)
+override TARGET_LFLAGS = -Wl,--gc-sections \
+	-Wl,--wrap=malloc -Wl,--wrap=free -Wl,--wrap=realloc   # macalloc.c pool
+override TARGET_LIBS += -lm -lInterface
+
+override SYSSRC = ../sys/mac/macmain.c ../sys/mac/macwin.c \
+		../sys/mac/mactty.c ../sys/mac/macmenu.c \
+		../sys/mac/mttymain.c ../sys/mac/macfile.c \
+		../sys/mac/maccurs.c ../sys/mac/macerrs.c \
+		../sys/mac/mactopl.c ../sys/mac/macunix.c \
+		../sys/mac/mgetline.c ../sys/mac/mmodal.c \
+		../sys/mac/dprintf.c \
+		../sys/mac/mactile.c \
+		../sys/mac/macmap.c \
+		../sys/mac/macalloc.c \
+		../win/tty/wintty.c ../win/tty/topl.c \
+		../win/tty/getline.c
+override SYSOBJ = $(TARGETPFX)macmain.o $(TARGETPFX)macwin.o \
+		$(TARGETPFX)mactty.o $(TARGETPFX)macmenu.o \
+		$(TARGETPFX)mttymain.o $(TARGETPFX)macfile.o \
+		$(TARGETPFX)maccurs.o $(TARGETPFX)macerrs.o \
+		$(TARGETPFX)mactopl.o $(TARGETPFX)macunix.o \
+		$(TARGETPFX)mgetline.o $(TARGETPFX)mmodal.o \
+		$(TARGETPFX)dprintf.o \
+		$(TARGETPFX)mactile.o \
+		$(TARGETPFX)macmap.o \
+		$(TARGETPFX)macalloc.o \
+		$(TARGETPFX)tile.o \
+		$(TARGETPFX)wintty.o $(TARGETPFX)topl.o \
+		$(TARGETPFX)getline.o
+override WINLIB =
+override LUALIB =
+override LUALIBS =
+override TOPLUALIB =
+override DLLIB =
+override WINOBJ =
+override REGEXOBJ = $(TARGETPFX)pmatchregex.o
+override GAMEBIN = $(TARGETPFX)NetHack
+override PACKAGE = mac68kpkg
+override PREGAME += mkdir -p $(TARGETDIR) ;
+override CLEANMORE += rm -rf $(TARGETDIR) ;
+
+# Rule for files in sys/mac
+$(TARGETPFX)%.o : ../sys/mac/%.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
+endif  # CROSS_TO_MAC68K
+
 ifdef CROSS_TO_ATARI
 #===============-=================================================
 # Atari ST/TT/Falcon cross-compile recipe
