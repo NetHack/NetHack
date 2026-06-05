@@ -61,14 +61,8 @@ struct window_procs Gem_procs = {
     Gem_print_glyph, Gem_raw_print, Gem_raw_print_bold, Gem_nhgetch,
     Gem_nh_poskey, Gem_nhbell, Gem_doprev_message, Gem_yn_function,
     Gem_getlin, Gem_get_ext_cmd, Gem_number_pad, Gem_delay_output,
-#ifdef CHANGE_COLOR /* the Mac uses a palette device */
-    Gem_change_color,
-#ifdef MAC68K
-    Gem_change_background, Gem_set_font_name,
-#endif
-    Gem_get_color_string,
-#endif
-
+    /* no CHANGE_COLOR entries: never defined for GEM, so struct
+       window_procs has no such fields here */
     Gem_outrip, Gem_preference_update,
     genl_getmsghistory, genl_putmsghistory,
     genl_status_init,

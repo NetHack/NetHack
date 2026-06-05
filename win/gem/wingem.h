@@ -92,10 +92,6 @@ extern void Gem_getlin(const char *, char *);
 extern int Gem_get_ext_cmd(void);
 extern void Gem_number_pad(int);
 extern void Gem_delay_output(void);
-#ifdef CHANGE_COLOR
-extern void Gem_change_color(int color, long rgb, int reverse);
-extern char *Gem_get_color_string(void);
-#endif
 
 
 #endif /* WINGEM_H */
