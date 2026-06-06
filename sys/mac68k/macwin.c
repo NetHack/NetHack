@@ -1684,6 +1684,12 @@ mac_nhgetch(void)
         }
     }
 
+    /* flush buffered tty (status) output before blocking for input;
+       mac_get_nh_event does the same, but the core only calls that at the
+       top of the next turn, which made status updates appear a turn late */
+    if (_mt_window)
+        update_tty(_mt_window);
+
     do {
         (void) WaitNextEvent(everyEvent, &anEvent, doDawdle, gMouseRgn);
         HandleEvent(&anEvent);
