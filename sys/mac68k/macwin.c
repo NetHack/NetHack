@@ -784,6 +784,8 @@ got1:
     SetPortWindowPort(aWin->its_window);
 
     if (kind == NHW_MESSAGE) {
+        /* override the WIND's "Message" title */
+        SetWTitle(aWin->its_window, P_STRING_CONV("Messages"));
         aWin->font_number = win_fonts[NHW_MESSAGE];
         aWin->font_size = iflags.wc_fontsiz_message
                               ? iflags.wc_fontsiz_message
