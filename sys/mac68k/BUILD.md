@@ -57,6 +57,15 @@ This produces:
 - `targets/mac68k/.rsrc/NetHack` — resource fork (CODE/DATA/RELA segments)
 - `targets/mac68k/NetHack.gdb` — ELF with debug symbols
 
+## Mounting the image in emulators
+
+Classic Mac OS loads the driver that mounts a SCSI disk from the disk
+itself; the packaged `NetHack.img` ships without one (BlueSCSI and
+real disks don't need it).  For an image QEMU auto-mounts, point
+`NHMAC_DRIVER_DONOR` at any formatted Mac disk image (your boot disk
+works) and packaging clones its driver in.  The driver is Apple/LaCie
+licensed code -- it stays on your machine and is never checked in.
+
 ## Packaging
 
     make -C src CROSS_TO_MAC68K=1 mac68kpkg
@@ -121,7 +130,7 @@ does.
 
 | Script | Purpose |
 |--------|---------|
-| `make_scsi_image2.py` | Wrap an HFS image with Apple Partition Map for SCSI |
+| `make_scsi_image2.py` | Wrap an HFS image with Apple Partition Map for SCSI; `--driver-from <donor>` clones a SCSI driver so emulators auto-mount it |
 | `decode_hqx.py` | Decode BinHex 4.0 (.hqx) files to data + resource forks; `--creator-fixup` renames the legacy signature/BNDL creator |
 | `dump_rsrc.py` | Dump resource fork contents (types, IDs, sizes) |
 | `make_info.py` | Write a macutils `.info` sidecar (name/type/creator + build-time dates) for the StuffIt staging |

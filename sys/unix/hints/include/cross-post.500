@@ -469,7 +469,8 @@ mac68kpkg: $(GAMEBIN) $(TARGETPFX)Recover
 	humount
 	python3 ../sys/mac68k/tools/make_scsi_image2.py \
 		$(TARGETPFX)nethack_hfs.img \
-		$(TARGETPFX)NetHack.img
+		$(TARGETPFX)NetHack.img \
+		$(if $(NHMAC_DRIVER_DONOR),--driver-from "$(NHMAC_DRIVER_DONOR)")
 	rm $(TARGETPFX)nethack_hfs.img
 	@echo "=== Creating StuffIt archive (distribution) ==="
 	@rm -f $(TARGETPFX)NetHack.sit
