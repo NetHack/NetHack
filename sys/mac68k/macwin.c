@@ -886,18 +886,14 @@ mac_clear_nhwindow(winid win)
     switch (GetWindowKind(theWindow) - WIN_BASE_KIND) {
     case NHW_MESSAGE:
         gLastMsgTransient = 0;   /* a clear invalidates the transient-line state */
-        if (aWin->scrollPos == aWin->y_size - 1)
-            return;
-        if (aWin->scrollBar)
-            r.bottom -= SBARHEIGHT;
         /* Trim old messages to msg_history limit: find the offset past the Nth
            CR, then discard everything before it with one BlockMove */
         {
             long off = 0;
+            int trimmed = 0;
             int lines_to_trim = aWin->y_size - iflags.msg_history;
             if (lines_to_trim > 0) {
                 long tlen = aWin->windowTextLen;
-                int trimmed = 0;
                 HLock(aWin->windowText);
                 {
                     char *p = *aWin->windowText;
@@ -914,10 +910,25 @@ mac_clear_nhwindow(winid win)
                 HUnlock(aWin->windowText);
                 aWin->y_size -= trimmed;
             }
+            aWin->last_more_lin = aWin->y_size;
+            aWin->save_lin = aWin->y_size;
+            /* continuous log: trim history, keep the view on the newest
+               lines (jumping the last line to the top left a stale row) */
+            {
+                /* row_height is 0 during cre_win's initial clear */
+                short visible =
+                    (aWin->row_height > 0)
+                        ? (r.bottom - r.top - msg_bottom_inset())
+                              / aWin->row_height
+                        : 0;
+                short floor_pos = visible ? aWin->y_size - visible : 0;
+                if (floor_pos < 0)
+                    floor_pos = 0;
+                if (!trimmed && aWin->scrollPos == floor_pos)
+                    return;   /* nothing moved, nothing to redraw */
+                aWin->scrollPos = floor_pos;
+            }
         }
-        aWin->last_more_lin = aWin->y_size;
-        aWin->save_lin = aWin->y_size;
-        aWin->scrollPos = aWin->y_size ? aWin->y_size - 1 : 0;
         break;
     case NHW_MENU:
         if (aWin->menuInfo) {
