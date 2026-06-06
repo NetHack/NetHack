@@ -38,7 +38,7 @@ crash-recovery application.  See
 
 ## Try it now
 
-Pre-built binaries for the Atari port can be found in my fork:
+Pre-built binaries can be found in my fork:
 
 - **Atari (5.0 WIP)**: <https://github.com/ingpaschke/NetHack/releases/tag/v5.0-atari-wip>
 - **68k Mac (5.0)**: <https://github.com/ingpaschke/NetHack/releases/tag/v5.0.0-mac68k>
