@@ -1684,6 +1684,10 @@ mac_nhgetch(void)
         }
     }
 
+    /* flush buffered status output before blocking, else it lags a turn */
+    if (_mt_window)
+        update_tty(_mt_window);
+
     do {
         (void) WaitNextEvent(everyEvent, &anEvent, doDawdle, gMouseRgn);
         HandleEvent(&anEvent);
