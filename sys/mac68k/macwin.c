@@ -418,6 +418,17 @@ set_tty_font_name(int window_type, char *font_name)
     return noErr;
 }
 
+static Boolean in_topl_mode(void);
+
+/* Height of the prompt-button strip; on small screens reserved only while
+   buttons are drawn (--More-- queues a response without drawing one). */
+static short
+msg_bottom_inset(void)
+{
+    return (!small_screen || (in_topl_mode() && topl_resp[0])) ? SBARHEIGHT
+                                                               : 0;
+}
+
 static void
 DrawScrollbar(NhWindow *aWin)
 {
@@ -436,12 +447,19 @@ DrawScrollbar(NhWindow *aWin)
     if (crect.top != wrect.top - 1 || crect.left != wrect.right - SBARWIDTH) {
         MoveControl(aWin->scrollBar, wrect.right - SBARWIDTH, wrect.top - 1);
     }
-    if (crect.bottom != wrect.bottom - SBARHEIGHT
-        || crect.right != wrect.right + 1) {
-        SizeControl(aWin->scrollBar, SBARWIDTH + 1,
-                    win_height - SBARHEIGHT + 2);
+    {
+        /* small-screen bar spans the full edge and never auto-hides */
+        Boolean msg_small =
+            small_screen && (aWin == theWindows + WIN_MESSAGE);
+        short sb_bottom =
+            msg_small ? (wrect.bottom + 1) : (wrect.bottom - SBARHEIGHT);
+
+        if (crect.bottom != sb_bottom || crect.right != wrect.right + 1) {
+            SizeControl(aWin->scrollBar, SBARWIDTH + 1,
+                        sb_bottom - (wrect.top - 1));
+        }
+        vis = msg_small || (win_height > (50 + SBARHEIGHT));
     }
-    vis = (win_height > (50 + SBARHEIGHT));
     if (vis != ((** aWin->scrollBar).contrlVis != 0)) {
         if (vis)
             ShowControl(aWin->scrollBar);
@@ -450,7 +468,7 @@ DrawScrollbar(NhWindow *aWin)
     }
     lin = aWin->y_size;
     if (aWin == theWindows + WIN_MESSAGE) {
-        lin -= (win_height - SBARHEIGHT) / aWin->row_height;
+        lin -= (win_height - msg_bottom_inset()) / aWin->row_height;
         if (lin < 0)
             lin = 0;
         val = 0; /* always have message scrollbar active */
@@ -507,9 +525,9 @@ SanePositions(void)
         Boolean honor = !small_screen;
 
         msg_h = 4 * theWindows[WIN_MESSAGE].row_height + 4;   /* ~4 lines */
-        /* DrawScrollbar hides the message scrollbar at <=50+SBARHEIGHT tall;
-           if it has a scrollbar, clear that threshold so it stays visible */
-        if (theWindows[WIN_MESSAGE].scrollBar && msg_h <= 50 + SBARHEIGHT)
+        /* keep the big-screen bar past DrawScrollbar's auto-hide threshold */
+        if (!small_screen
+            && theWindows[WIN_MESSAGE].scrollBar && msg_h <= 50 + SBARHEIGHT)
             msg_h = 50 + SBARHEIGHT + 2;
 
         /* Fit the map into the space left by menu bar, message+status windows,
@@ -818,14 +836,15 @@ got1:
     aWin->row_height = aWin->ascent_height + fi.descent;
     aWin->char_width = fi.widMax;
 
-    if ((kind == NHW_MENU || kind == NHW_TEXT || kind == NHW_MESSAGE)
-        && !(kind == NHW_MESSAGE && small_screen)) {
+    if (kind == NHW_MENU || kind == NHW_TEXT || kind == NHW_MESSAGE) {
         Rect r;
 
         GetWindowPortBounds(aWin->its_window, &r);
         r.right -= (r.left - 1);
         r.left = r.right - SBARWIDTH;
-        r.bottom -= (r.top + SBARHEIGHT);
+        r.bottom -= (r.top
+                     + ((kind == NHW_MESSAGE && small_screen) ? -1
+                                                              : SBARHEIGHT));
         r.top = -1;
         aWin->scrollBar =
             NewControl(aWin->its_window, &r, P_EMPTY_STRING,
@@ -1176,6 +1195,24 @@ topl_set_resp(char *resp, char def)
     strncpy(topl_resp, resp, sizeof topl_resp - 1);
     loc = strchr(topl_resp, def);
     topl_def_idx = loc ? loc - topl_resp : -1;
+
+    /* strip appears with the buttons; re-pin so the last line clears it */
+    if (small_screen && topl_resp[0] && in_topl_mode()) {
+        NhWindow *aWin = &theWindows[WIN_MESSAGE];
+        Rect r;
+        short min;
+
+        GetWindowPortBounds(aWin->its_window, &r);
+        OffsetRect(&r, -r.left, -r.top);
+        min = aWin->y_size
+              - (r.bottom - r.top - SBARHEIGHT) / aWin->row_height;
+        if (aWin->scrollPos < min) {
+            aWin->scrollPos = min;
+            if (aWin->scrollBar)
+                SetControlValue(aWin->scrollBar, min);
+            InvalWindowRect(aWin->its_window, &r);
+        }
+    }
 }
 
 static char
@@ -1528,7 +1565,7 @@ MoveScrollBar(ControlHandle theBar, short part)
     winToScroll->scrollPos = now + amtToScroll;
     r.right -= SBARWIDTH;
     if (winToScroll == theWindows + WIN_MESSAGE)
-        r.bottom -= SBARHEIGHT;
+        r.bottom -= msg_bottom_inset();
     rgn = NewRgn();
     if (!rgn)
         return;
@@ -1769,10 +1806,9 @@ mac_putstr(winid win, int attr, const char *str)
     GetWindowPortBounds(aWin->its_window, &r);
     OffsetRect(&r, -r.left, -r.top);
     if (win == WIN_MESSAGE) {
-        if (aWin->scrollBar) {
+        if (aWin->scrollBar)
             r.right -= SBARWIDTH;
-            r.bottom -= SBARHEIGHT;
-        }
+        r.bottom -= msg_bottom_inset();
         if (flags.safe_wait
             && aWin->last_more_lin
                    <= aWin->y_size - (r.bottom - r.top) / aWin->row_height) {
@@ -2372,13 +2408,12 @@ MsgUpdate(NhWindow *wind)
     OffsetRect(&r, -r.left, -r.top);
 
     DrawControls(wind->its_window);
-    if (wind->scrollBar)
-        DrawGrowIcon(wind->its_window);
+    if (wind->scrollBar && !small_screen)
+        DrawGrowIcon(wind->its_window); /* borderless windows aren't growable */
 
-    if (wind->scrollBar) {
+    if (wind->scrollBar)
         r.right -= SBARWIDTH;
-        r.bottom -= SBARHEIGHT;
-    }
+    r.bottom -= msg_bottom_inset();
     /* clip to portrect minus scrollbar/growicon BEFORE growing r past the window */
     RectRgn(clip, &r);
     SectRgn(clip, org_clip, clip);
