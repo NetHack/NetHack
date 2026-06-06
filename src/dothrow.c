@@ -1749,7 +1749,7 @@ throwit(
                         if (tethered_weapon) {
                             pline(Blind ? "%s%s back and is left"
                                           " dangling from your %s."
-                                        : "%s is left dangling from your %s.",
+                                        : "%s%s and is left dangling from your %s.",
                                   Blind ? "Your tethered weapon" : Tobjnam(obj, "return"),
                                   Blind ? " snaps" : "",
                                   body_part(ARM));
