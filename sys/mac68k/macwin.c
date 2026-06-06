@@ -893,18 +893,14 @@ mac_clear_nhwindow(winid win)
     switch (GetWindowKind(theWindow) - WIN_BASE_KIND) {
     case NHW_MESSAGE:
         gLastMsgTransient = 0;   /* a clear invalidates the transient-line state */
-        if (aWin->scrollPos == aWin->y_size - 1)
-            return;
-        if (aWin->scrollBar)
-            r.bottom -= SBARHEIGHT;
         /* Trim old messages to msg_history limit: find the offset past the Nth
            CR, then discard everything before it with one BlockMove */
         {
             long off = 0;
+            int trimmed = 0;
             int lines_to_trim = aWin->y_size - iflags.msg_history;
             if (lines_to_trim > 0) {
                 long tlen = aWin->windowTextLen;
-                int trimmed = 0;
                 HLock(aWin->windowText);
                 {
                     char *p = *aWin->windowText;
@@ -921,10 +917,29 @@ mac_clear_nhwindow(winid win)
                 HUnlock(aWin->windowText);
                 aWin->y_size -= trimmed;
             }
+            aWin->last_more_lin = aWin->y_size;
+            aWin->save_lin = aWin->y_size;
+            /* The window is a continuous log: a clear only trims history and
+               keeps the view pinned to the newest lines.  (It used to jump
+               the last message to the top of the window, which read as a
+               botched scroll and left a stale bottom row on small screens,
+               where the unreserved strip is part of the text area.) */
+            {
+                /* row_height is still 0 when cre_win clears the freshly
+                   created window (font metrics come later) */
+                short visible =
+                    (aWin->row_height > 0)
+                        ? (r.bottom - r.top - msg_bottom_inset())
+                              / aWin->row_height
+                        : 0;
+                short floor_pos = visible ? aWin->y_size - visible : 0;
+                if (floor_pos < 0)
+                    floor_pos = 0;
+                if (!trimmed && aWin->scrollPos == floor_pos)
+                    return;   /* nothing moved, nothing to redraw */
+                aWin->scrollPos = floor_pos;
+            }
         }
-        aWin->last_more_lin = aWin->y_size;
-        aWin->save_lin = aWin->y_size;
-        aWin->scrollPos = aWin->y_size ? aWin->y_size - 1 : 0;
         break;
     case NHW_MENU:
         if (aWin->menuInfo) {
