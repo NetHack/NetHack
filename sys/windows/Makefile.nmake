@@ -1868,7 +1868,7 @@ $(OTTY)date.o: $(HACKINCL) $(HACKSRC) $(HACKOBJ) $(ALLOBJTTY) $(CURSESOBJ)
 	@echo ^$(OTTY)date.o: >>date-tty.nmk
 	@echo. 	^$(cc) ^$(CFLAGS) -Fo^$@ date.c>>date-tty.nmk
 	@echo.>>date-tty.nmk
-        @$(MAKE) /NOLOGO /A OTTY=objtty\x64\ -f date-tty.nmk
+        @$(MAKE) /NOLOGO /A OTTY=$(OTTY) -f date-tty.nmk
 !ENDIF
 
 $(OGUI)date.o: $(HACKINCL) $(HACKSRC) $(HACKOBJ) $(ALLOBJGUI)
