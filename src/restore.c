@@ -713,6 +713,14 @@ restgamestate(NHFILE *nhfp)
     restore_oracles(nhfp);
     Sfi_char(nhfp, svp.pl_character,
              "gamestate-pl_character", sizeof svp.pl_character);
+    /* Previous versions had a bug that clobbered pl_character on restore.
+       Fill it in if it was clobbered. */
+    if (svp.pl_character[0] == '\0') {
+        if ((Upolyd ? u.mfemale : flags.female) && gu.urole.name.f)
+            Strcpy(svp.pl_character, gu.urole.name.f);
+        else
+            Strcpy(svp.pl_character, gu.urole.name.m);
+    }
     Sfi_char(nhfp, svp.pl_fruit, "gamestate-pl_fruit", sizeof svp.pl_fruit);
     freefruitchn(gf.ffruit); /* clean up fruit(s) made by initoptions() */
     gf.ffruit = loadfruitchn(nhfp);
@@ -791,11 +799,13 @@ dorecover(NHFILE *nhfp)
 {
     xint8 ltmp = 0;
     int rtmp;
+    char plname[PL_NSIZ_PLUS];
 
     /* suppress map display if some part of the code tries to update that */
     program_state.restoring = REST_GSTATE;
 
-    get_plname_from_file(nhfp, svp.plname, TRUE);
+    get_plname_from_file(nhfp, plname, TRUE);
+    Snprintf(svp.plname, sizeof(svp.plname), "%s", plname);
     /*
      * The position in the save file is now here:
      *
@@ -891,7 +901,8 @@ dorecover(NHFILE *nhfp)
 
     rewind_nhfile(nhfp);        /* return to beginning of file */
     (void) validate(nhfp, (char *) 0, FALSE, 0);
-    get_plname_from_file(nhfp, svp.plname, TRUE);
+    get_plname_from_file(nhfp, plname, TRUE);
+    Snprintf(svp.plname, sizeof(svp.plname), "%s", plname);
 
     /* not 0 nor REST_GSTATE nor REST_LEVELS */
     program_state.restoring = REST_CURRENT_LEVEL;

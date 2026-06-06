@@ -55,6 +55,7 @@ if the hero has already been told that an engraving vanished, ensure that
 	new engraving
 aklys path shouldn't be shown for locations that the hero cannot see
 keep the player better-informed about status of the tether on their weapon
+don't overflow svp.plname on restore (pr #1570 by chasonr)
 
 
 Platform- and/or Interface-Specific Fixes
