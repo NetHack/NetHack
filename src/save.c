@@ -287,6 +287,13 @@ savegamestate(NHFILE *nhfp)
                                       urealtime.start_timing);
     Sfo_long(nhfp, &svw.wreserve, "wreserve");
     Sfo_int32(nhfp, &svw.wtreserved, "wtreserved");
+    /*
+     * It is critical to ensure that u.ustuck_mid and u.usteed_mid
+     * hold current and correct data, in case this is needed by
+     * recover.
+     */
+    u.ustuck_mid = (u.ustuck) ? u.ustuck->m_id : 0;
+    u.usteed_mid = (u.usteed) ? u.usteed->m_id : 0;
     Sfo_you(nhfp, &u, "gamestate-you");
     Sfo_char(nhfp, yyyymmddhhmmss(ubirthday), "gamestate-ubirthday", 14);
     Sfo_long(nhfp, &urealtime.realtime, "gamestate-realtime");
@@ -356,6 +363,9 @@ savestateinlock(void)
     int hpid = 0;
     char whynot[BUFSZ];
     NHFILE *nhfp;
+
+    if (!program_state.something_worth_saving || program_state.in_self_recover)
+        return;
 
     program_state.saving++; /* inhibit status and perm_invent updates */
     /* When checkpointing is on, the full state needs to be written

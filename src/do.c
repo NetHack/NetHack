@@ -1376,7 +1376,9 @@ save_currentstate(void)
 {
     NHFILE *nhfp;
 
-    if (!program_state.something_worth_saving)
+    if (!program_state.something_worth_saving
+        || program_state.in_self_recover
+        || program_state.in_checkpoint)
         return;
 
     program_state.in_checkpoint++;
