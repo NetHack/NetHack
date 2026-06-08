@@ -1236,14 +1236,19 @@ movemon_singlemon(struct monst *mtmp)
             (void) gd_move(mtmp);
             mtmp->mlstmv = svm.moves;
         }
+        mtmp->movement = 0;
         return FALSE;
     }
-    if (DEADMONSTER(mtmp))
+    if (DEADMONSTER(mtmp)) {
+        mtmp->movement = 0;
         return FALSE;
+    }
 
     /* monster isn't on this map anymore */
-    if (mon_offmap(mtmp))
+    if (mon_offmap(mtmp)) {
+        mtmp->movement = 0;
         return FALSE;
+    }
 
     m_everyturn_effect(mtmp);
 

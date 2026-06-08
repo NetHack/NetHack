@@ -1202,6 +1202,10 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (mtmp->isshk)
             set_residency(mtmp, FALSE);
+        /* set some monst fields to sane values when coming from a bones file */
+        if (ghostly) {
+            mtmp->movement = 0;
+        }
         if (mtmp->m_id == u.usteed_mid) {
             /* steed is kept on fmon list but off the map */
             u.usteed = mtmp;

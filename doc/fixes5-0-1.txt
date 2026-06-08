@@ -56,6 +56,9 @@ if the hero has already been told that an engraving vanished, ensure that
 aklys path shouldn't be shown for locations that the hero cannot see
 keep the player better-informed about status of the tether on their weapon
 don't overflow svp.plname on restore (pr #1570 by chasonr)
+monsters (including pets) aren't scared of the Sokoban rolling boulder traps
+fix a bug in which steeds would continuously gain movement points while
+        being ridden
 
 
 Platform- and/or Interface-Specific Fixes

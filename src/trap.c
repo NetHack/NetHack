@@ -1129,6 +1129,9 @@ m_harmless_trap(struct monst *mtmp, struct trap *ttmp)
     case LANDMINE:
         break;
     case ROLLING_BOULDER_TRAP:
+        /* the Sokoban rolling boulder traps are not dangerous */
+        if (In_sokoban(&u.uz))
+            return TRUE;
         break;
     case SLP_GAS_TRAP:
         if (resists_sleep(mtmp) || defended(mtmp, AD_SLEE))

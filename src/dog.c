@@ -463,8 +463,10 @@ mon_arrive(struct monst *mtmp, int when)
        here for monsters migrating to a newly created level */
     restore_cham(mtmp);
 
-    if (mtmp == u.usteed)
+    if (mtmp == u.usteed) {
+        mtmp->mstate &= ~MON_STILL_ARRIVING;
         return; /* don't place steed on the map */
+    }
     if (when == With_you) {
         /* When a monster accompanies you, sometimes it will arrive
            at your intended destination and you'll end up next to
