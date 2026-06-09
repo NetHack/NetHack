@@ -33,3 +33,7 @@ GNUmakefile
 GNUmakefile.depend
 .*.c
 .depend
+date-gui.nmk
+date-tty.nmk
+
+
