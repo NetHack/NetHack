@@ -59,9 +59,11 @@ Edit nethack.cnf for game options.  Defaults shipped:
     OPTIONS=lit_corridor        - show lit corridors
     OPTIONS=menucolors          - colored inventory items
 
-ALT+letter shortcuts to extended commands (ALT+L for #loot, ALT+F for
-#force, etc.) are enabled by default.  On keymaps that need ALT for
-typing characters (Scandinavian, German, French, ...) disable with:
+ALT+letter shortcuts to extended commands (ALT+L #loot, ALT+F #force,
+etc.) are on by default ('altmeta'); leaving it on is recommended.
+Disable it only if your keymap needs ALT to type characters -- and note
+that the symbol commands also have names (@ = #autopickup, \ = #known,
+| = #perminv):
 
     OPTIONS=!altmeta
 
