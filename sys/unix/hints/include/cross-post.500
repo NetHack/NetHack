@@ -402,6 +402,10 @@ mac68kpkg: $(GAMEBIN) $(TARGETPFX)Recover
 	$(RETRO68)/bin/Rez ../sys/mac68k/nhmapwind.r \
 		-I $(RETRO68)/multiversal/RIncludes \
 		-o $(TARGETPFX)nhmapwind.rsrc
+	@echo "=== Compiling menu resources ==="
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhmenus.r \
+		-I $(RETRO68)/multiversal/RIncludes \
+		-o $(TARGETPFX)nhmenus.rsrc
 	@echo "=== Generating tile PICT resources ==="
 	cd ../util && ./tile2pict $(abspath $(TARGETPFX)nhtiles_data.r)
 	@echo "=== Compiling tile resource ==="
@@ -417,6 +421,7 @@ mac68kpkg: $(GAMEBIN) $(TARGETPFX)Recover
 	$(RETRO68)/bin/Rez \
 		--copy $(TARGETPFX)NetHack \
 		--copy $(TARGETPFX)nhmapwind.rsrc \
+		--copy $(TARGETPFX)nhmenus.rsrc \
 		--copy $(TARGETPFX)nhtiles.rsrc \
 		--copy $(TARGETPFX)nhsize.rsrc \
 		--copy $(TARGETPFX)resources/NHrsrc \
