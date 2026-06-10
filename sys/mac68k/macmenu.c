@@ -72,9 +72,13 @@ enum {
     menuApple,
     menuFile,
     menuEdit,
+    menuGame,
 
     /* submenu */
-    menuWizard = 0
+    menuWizard = 0,
+    menuPlayModeSub = 10 /* mref[10] = MENU 210 (Play Mode); 1-9 are the
+                            Kbd palettes + current -- see MNU# 129 in
+                            nhmenus.r */
 };
 
 /* the following menu items are reserved */
@@ -84,20 +88,24 @@ enum {
     ____Apple__1,
 
     /* File */
-    menuFileRedraw = 1,
-    menuFilePrevMsg,
-    menuFileCleanup,
+    menuFileSave = 1,
     ____File___1,
-    menuFilePlayMode,
-    menuFileEnterExplore,
-    ____File___2,
-    menuFileSave,
-    ____File___3,
     menuFileQuit,
-    /* appended dynamically by InitMenuRes: */
-    menuFileTileMode,   /* item 11 — "Tile Mode" toggle */
 
     /* standard minimum Edit menu items */
+
+    /* Game */
+    menuGameRedraw = 1,
+    menuGamePrevMsg,
+    menuGameReposition,
+    menuGameTileMode,
+    ____Game___1,
+    menuGamePlayMode,
+
+    /* Play Mode submenu */
+    playModeRegular = 1,
+    playModeExplore,
+    playModeDebug,
 
     /* Wizard */
     menuWizardAttributes = 1
@@ -126,7 +134,10 @@ enum {
 
 #define MBARHND(x) pMenuList[listMenubar]->mref[(x)].mhnd
 
+#define MHND_GAME MBARHND(menuGame)
+
 #define MHND_WIZ pMenuList[listSubmenu]->mref[menuWizard].mhnd
+#define MHND_PLAYMODE pMenuList[listSubmenu]->mref[menuPlayModeSub].mhnd
 
 /* mutually exclusive (and prioritized) menu bar states */
 enum {
@@ -137,8 +148,6 @@ enum {
     mbarRegular,
     mbarSpecial /* explore or debug mode */
 };
-
-#define WKND_MAP (WIN_BASE_KIND + NHW_MAP)
 
 /* menu routine error numbers */
 enum {
@@ -176,7 +185,7 @@ static unsigned char *menuErrStr[err_Menu_total] = {
 };
 static menuListPtr pMenuList[2];
 static short theMenubar = mbarDA; /* force initial update */
-static short kAdjustWizardMenu = 1;
+static short kWizMenuPruneNeeded = 1; /* one-shot: explore-mode pruning */
 
 /******** Prototypes ********/
 static void alignAD(Rect *, short);
@@ -785,12 +794,6 @@ InitMenuRes()
         }
     }
 
-    /* Append the "Tile Mode" toggle to the File menu (item menuFileTileMode).
-       The MENU resource only has items 1-10; this adds item 11 at runtime. */
-    AppendMenu(MHND_FILE, P_STRING_CONV("Tile Mode"));
-    /* Start disabled; mactile_menu_refresh() will enable when available. */
-    DisableItem(MHND_FILE, menuFileTileMode);
-
     DrawMenuBar();
     return;
 }
@@ -818,21 +821,15 @@ AdjustMenus(short dimMenubar)
         ; /* we've already found its state */
     else if (wizard) {
         newMenubar = mbarSpecial;
-
-        if (kAdjustWizardMenu) {
-            kAdjustWizardMenu = 0;
-
-            SetMenuItemText(MHND_FILE, menuFilePlayMode, P_STRING_CONV("Debug"));
-        }
     }
 
     else if (discover) {
         newMenubar = mbarSpecial;
 
-        if (kAdjustWizardMenu) {
-            kAdjustWizardMenu = 0;
-
-            SetMenuItemText(MHND_FILE, menuFilePlayMode, P_STRING_CONV("Explore"));
+        /* one-shot: prune the wizard menu down to Attributes for explore
+           mode (full menu stays in wizard mode) */
+        if (kWizMenuPruneNeeded) {
+            kWizMenuPruneNeeded = 0;
 
             for (i = CountMenuItems(MHND_WIZ); i > menuWizardAttributes; i--)
                 DeleteMenuItem(MHND_WIZ, i);
@@ -851,17 +848,10 @@ AdjustMenus(short dimMenubar)
         case mbarNoWindows:
         case mbarDA:
         case mbarNoMap:
-            /* enable the file menu, but ... */
+            /* enable the file menu (Save/Quit stay available), but ... */
             EnableItem(MHND_FILE, 0);
 
-            /* ... disable the window commands! */
-            for (i = menuFileRedraw; i <= menuFileEnterExplore; i++)
-                DisableItem(MHND_FILE, i);
-
-            /* ... also disable Tile Mode (no map window yet) */
-            DisableItem(MHND_FILE, menuFileTileMode);
-
-            /* ... and disable the rest of the menus */
+            /* ... disable the rest of the menus (Game included) */
             for (i = menuEdit; i < NUM_MBAR; i++)
                 DisableItem(MBARHND(i), 0);
 
@@ -879,27 +869,34 @@ AdjustMenus(short dimMenubar)
             /* ... except the unused Edit menu */
             DisableItem(MHND_EDIT, 0);
 
-            /* ... enable the window commands */
-            for (i = menuFileRedraw; i <= menuFileEnterExplore; i++)
-                EnableItem(MHND_FILE, i);
-
-            if (theMenubar == mbarRegular)
-                DisableItem(MHND_FILE, menuFilePlayMode);
-            else
-                DisableItem(MHND_FILE, menuFileEnterExplore);
-
-            /* Enable Tile Mode iff tiles available; sync check mark to live
-               state here since AdjustMenus runs before menu pulldown. */
+            /* Game menu: Tile Mode enabled iff tiles available; checkmark
+               tracks live state (AdjustMenus(0) runs before MenuSelect, so
+               a pending transition lands before the menus pull down) */
             if (mactile_available())
-                EnableItem(MHND_FILE, menuFileTileMode);
+                EnableItem(MHND_GAME, menuGameTileMode);
             else
-                DisableItem(MHND_FILE, menuFileTileMode);
+                DisableItem(MHND_GAME, menuGameTileMode);
             {
                 NhWindow *_am_map = (WIN_MAP != WIN_ERR)
                                     ? &theWindows[WIN_MAP] : NULL;
-                SetItemMark(MHND_FILE, menuFileTileMode,
+                SetItemMark(MHND_GAME, menuGameTileMode,
                             macmap_get_mode(_am_map) ? checkMark : noMark);
             }
+
+            /* Play Mode submenu: checkmark on the current mode; Explore is
+               the only actionable item (one-way, regular mode only) */
+            SetItemMark(MHND_PLAYMODE, playModeRegular,
+                        (!wizard && !discover) ? checkMark : noMark);
+            SetItemMark(MHND_PLAYMODE, playModeExplore,
+                        discover ? checkMark : noMark);
+            SetItemMark(MHND_PLAYMODE, playModeDebug,
+                        wizard ? checkMark : noMark);
+            DisableItem(MHND_PLAYMODE, playModeRegular);
+            DisableItem(MHND_PLAYMODE, playModeDebug);
+            if (theMenubar == mbarRegular)
+                EnableItem(MHND_PLAYMODE, playModeExplore);
+            else
+                DisableItem(MHND_PLAYMODE, playModeExplore);
 
             break;
         }
@@ -929,25 +926,6 @@ DoMenuEvt(long menuEntry)
 
     case menuFile:
         switch (menuItem) {
-        case menuFileRedraw:
-            AddToKeyQueue('R' & 0x1f, 1);
-            break;
-
-        case menuFilePrevMsg:
-            AddToKeyQueue('P' & 0x1f, 1);
-            break;
-
-        case menuFileCleanup:
-            (void) SanePositions();
-            /* queue ^R: synchronous redraw from menu-handler context doesn't
-               take (window port unsettled), so redraw in the command loop */
-            AddToKeyQueue('R' & 0x1f, 1);
-            break;
-
-        case menuFileEnterExplore:
-            AddToKeyQueue('X', 1);
-            break;
-
         case menuFileSave:
             askSave();
             break;
@@ -955,8 +933,31 @@ DoMenuEvt(long menuEntry)
         case menuFileQuit:
             askQuit();
             break;
+        }
+        break;
 
-        case menuFileTileMode: {
+    case menuEdit:
+        (void) SystemEdit(menuItem - 1);
+        break;
+
+    case menuGame:
+        switch (menuItem) {
+        case menuGameRedraw:
+            AddToKeyQueue('R' & 0x1f, 1);
+            break;
+
+        case menuGamePrevMsg:
+            AddToKeyQueue('P' & 0x1f, 1);
+            break;
+
+        case menuGameReposition:
+            (void) SanePositions();
+            /* queue ^R: synchronous redraw from menu-handler context doesn't
+               take (window port unsettled), so redraw in the command loop */
+            AddToKeyQueue('R' & 0x1f, 1);
+            break;
+
+        case menuGameTileMode: {
             NhWindow *map = (WIN_MAP != WIN_ERR) ? &theWindows[WIN_MAP] : NULL;
             if (!map) break;
             Boolean newOn = !macmap_get_mode(map);
@@ -966,7 +967,7 @@ DoMenuEvt(long menuEntry)
             } else if (!newOn) {
                 macmap_set_mode(map, false);
             }
-            SetItemMark(MHND_FILE, menuFileTileMode,
+            SetItemMark(MHND_GAME, menuGameTileMode,
                         newOn ? checkMark : noMark);
             iflags.wc_tiled_map = newOn;
             /* queue ^R: synchronous redraw from menu-handler context doesn't
@@ -977,11 +978,15 @@ DoMenuEvt(long menuEntry)
         }
         break;
 
-    case menuEdit:
-        (void) SystemEdit(menuItem - 1);
-        break;
+    default: /* submenus and STR#-dispatched command menus */
+        if (menuID == ID1_SUBM + menuPlayModeSub) {
+            if (menuItem == playModeExplore)
+                AddToKeyQueue('X', 1); /* one-way switch; confirm handled by core */
+            break; /* exits the outer switch; Regular/Debug are status
+                      indicators, never enabled as actions */
+        }
 
-    default: /* get associated string and add to key queue */
+    /* get associated string and add to key queue */
     {
         Str255 mstr;
         short i;
@@ -1109,9 +1114,9 @@ mactile_menu_refresh(void)
     NhWindow *map = (WIN_MAP != WIN_ERR) ? &theWindows[WIN_MAP] : NULL;
     if (!map) return;
     if (mactile_available())
-        EnableItem(MHND_FILE, menuFileTileMode);
+        EnableItem(MHND_GAME, menuGameTileMode);
     else
-        DisableItem(MHND_FILE, menuFileTileMode);
-    SetItemMark(MHND_FILE, menuFileTileMode,
+        DisableItem(MHND_GAME, menuGameTileMode);
+    SetItemMark(MHND_GAME, menuGameTileMode,
                 macmap_get_mode(map) ? checkMark : noMark);
 }
