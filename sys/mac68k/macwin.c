@@ -2453,7 +2453,7 @@ macCursorTerm(EventRecord *theEvent, WindowPtr theWindow, RgnHandle mouseRgn)
 }
 
 /**********************************************************************
- *	Status subwindow
+ *	Status subwindow: native renderer lives in sys/mac68k/macstat.c
  */
 
 /**********************************************************************

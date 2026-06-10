@@ -88,6 +88,9 @@ mac_status_update(
     char *text = (char *) ptr;
 
     if (idx == BL_FLUSH || idx == BL_RESET) {
+        /* BL_RESET is treated like BL_FLUSH: repaint caches as-is; the
+           core follows with per-field updates, so staleness lasts one
+           frame */
         macstat_redraw();
         return;
     }
