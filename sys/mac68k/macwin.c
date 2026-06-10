@@ -1128,9 +1128,15 @@ topl_key(unsigned char ch, Boolean ext)
 {
     GrafPtr savePort;
     Boolean ret;
+    WindowPtr msg_win;
+
+    /* guard the theWindows[-1] read; same crash class as in_topl_mode's */
+    if (WIN_MESSAGE == WIN_ERR
+        || !(msg_win = theWindows[WIN_MESSAGE].its_window))
+        return topl_key_body(ch, ext);
 
     GetPort(&savePort);
-    SetPortWindowPort(theWindows[WIN_MESSAGE].its_window);
+    SetPortWindowPort(msg_win);
     ret = topl_key_body(ch, ext);
     SetPort(savePort);
     return ret;
@@ -1192,11 +1198,15 @@ topl_key_body(unsigned char ch, Boolean ext)
             }
             if (com_index >= 0) {
                 /* unique match: append the suggested suffix as plain text.
-                   TEInsert leaves the caret between the typed prefix and
-                   the suggestion (never SELECT the suffix: TE extends a
+                   Classic TE's TEInsert does NOT advance the caret past
+                   the inserted text: selStart/selEnd stay at the pre-insert
+                   position, i.e. between the typed prefix and the suffix.
+                   That is load-bearing: selEnd < teLength is how the
+                   BS-peel and pre-drop cases above detect a pending
+                   suggestion. And never SELECT the suffix: TE extends a
                    drawn hilite that ends at teLength out to the view edge,
-                   inverting the rest of the line). Return accepts the
-                   whole line; backspace dismisses the suffix. */
+                   inverting the rest of the line. Return accepts the whole
+                   line; backspace dismisses the suffix. */
                 const char *txt = extcmdlist[com_index].ef_txt;
                 int txt_len = (int) strlen(txt);
 
@@ -1280,10 +1290,33 @@ topl_set_resp(char *resp, char def)
     }
 }
 
+static char topl_resp_key_body(char);
+
 static char
 topl_resp_key(char ch)
 {
     if (strlen(topl_resp) > 0) {
+        /* same port hazard as topl_key: this runs from GeneralKey during
+           HandleEvent, where update handling can leave any port current,
+           and the TEKey calls below draw into the prompt TE */
+        GrafPtr savePort;
+        WindowPtr msg_win = (WIN_MESSAGE != WIN_ERR)
+                                ? theWindows[WIN_MESSAGE].its_window
+                                : (WindowPtr) 0;
+
+        GetPort(&savePort);
+        if (msg_win)
+            SetPortWindowPort(msg_win);
+        ch = topl_resp_key_body(ch);
+        SetPort(savePort);
+    }
+    return ch;
+}
+
+static char
+topl_resp_key_body(char ch)
+{
+    {
         char *loc = strchr(topl_resp, ch);
 
         if (!loc) {
