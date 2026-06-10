@@ -222,6 +222,7 @@ E void mac_number_pad(int);
 E void mac_delay_output(void);
 
 /* macstat.c — native status renderer */
+extern void mac_set_text_color(int); /* macwin.c; shared menu/status */
 extern void mac_status_init(void);
 extern void mac_status_finish(void);
 extern void mac_status_enablefield(int, const char *, const char *, boolean);

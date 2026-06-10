@@ -2672,7 +2672,7 @@ MenwClick(NhWindow *wind, Point pt)
 
 /* NetHack color index -> RGB for menu text on the WHITE menu background.
    (Same values as the map's table; the white-bg adjustments are in
-   set_menu_text_color, not here.) */
+   mac_set_text_color, not here.) */
 static const RGBColor menuColorRGB[16] = {
     {0x0000, 0x0000, 0x0000},   /* 0  black   */
     {0xC0C0, 0x0000, 0x0000},   /* 1  red     */
@@ -2705,10 +2705,11 @@ menu_attr_face(int attr)
     }
 }
 
-/* Set the pen color for a menu line. The menu background is white, so NO_COLOR
-   and white become black, and on sub-4-bit screens colors are skipped. */
-static void
-set_menu_text_color(int color)
+/* Set the pen color for styled text on a white background: NO_COLOR and
+   white become black, and on sub-4-bit screens colors are skipped.
+   Palette-safe (shared by menu windows and the status renderer). */
+void
+mac_set_text_color(int color)
 {
     RGBColor black = { 0, 0, 0 };
     GDHandle gd = GetMainDevice();
@@ -2811,7 +2812,7 @@ MenwDrawStyled(NhWindow *wind)
                     color = sb[lineIdx * 2 + 1];
                 }
                 TextFace(menu_attr_face(attr));
-                set_menu_text_color(color);
+                mac_set_text_color(color);
                 MoveTo(r.left, row * wind->row_height + wind->ascent_height);
                 /* pass the line via the pointer: lineStart can exceed
                    DrawText's 16-bit byte offset in a >32KB text window */
