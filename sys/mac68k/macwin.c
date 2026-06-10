@@ -1105,8 +1105,26 @@ topl_replace(char *new_ans)
     TEInsert(new_ans, strlen(new_ans), top_line);
 }
 
+static Boolean topl_key_body(unsigned char ch, Boolean ext);
+
+/* TE draws into the current GrafPort; the events processed while waiting
+   for this key (HandleUpdate etc.) can leave any window's port current,
+   so anchor all of topl_key's TE calls to the message window */
 Boolean
 topl_key(unsigned char ch, Boolean ext)
+{
+    GrafPtr savePort;
+    Boolean ret;
+
+    GetPort(&savePort);
+    SetPortWindowPort(theWindows[WIN_MESSAGE].its_window);
+    ret = topl_key_body(ch, ext);
+    SetPort(savePort);
+    return ret;
+}
+
+static Boolean
+topl_key_body(unsigned char ch, Boolean ext)
 {
     switch (ch) {
     case CHAR_ESC:
@@ -1127,9 +1145,15 @@ topl_key(unsigned char ch, Boolean ext)
     case '\x1c' /* left arrow */:
         if ((*top_line)->selEnd <= topl_query_len)
             return true;
-        /* FALLTHROUGH: TEKey deletes the selected completion suffix (or
-           one typed char); re-completion below is skipped for deletions
-           so they stick instead of instantly re-expanding */
+        if ((*top_line)->selStart < (*top_line)->selEnd) {
+            /* a completion suffix is selected: delete just it (TEDelete,
+               the same call topl_replace uses, unhighlights cleanly) */
+            TEDelete(top_line);
+            return true;
+        }
+        /* FALLTHROUGH: TEKey deletes one typed char; re-completion below
+           is skipped for deletions so they stick instead of instantly
+           re-expanding */
     default:
         TEKey(ch, top_line);
         if (ext && ch != CHAR_BS && ch != '\x1c') {
