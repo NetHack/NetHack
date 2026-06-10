@@ -871,6 +871,10 @@ mac_clear_nhwindow(winid win)
         return;
     }
     if (theWindow == _mt_window) {
+        if (win == WIN_STATUS && macstat_active()) {
+            macstat_redraw(); /* native clear+repaint, not a tty clear */
+            return;
+        }
         tty_clear_nhwindow(win);
         return;
     }
@@ -1697,8 +1701,10 @@ mac_get_nh_event(void)
         return;
 
     /* Also wired to win_wait_synch: setftty() clears TA_ALWAYS_REFRESH during
-       play, so flush the offscreen here or buffered status never reaches screen */
-    if (_mt_window) update_tty(_mt_window);
+       play, so flush the offscreen here or buffered status never reaches
+       screen. Pre-status-takeover only: once macstat owns _mt_window the tty
+       offscreen is stale by design and must not be blitted over the status. */
+    if (_mt_window && !macstat_active()) update_tty(_mt_window);
 
     (void) WaitNextEvent(everyEvent, &anEvent, 1, gMouseRgn);
     HandleEvent(&anEvent);
@@ -1732,8 +1738,9 @@ mac_nhgetch(void)
         }
     }
 
-    /* flush buffered status output before blocking, else it lags a turn */
-    if (_mt_window)
+    /* flush buffered status output before blocking, else it lags a turn
+       (pre-status-takeover only; see mac_get_nh_event) */
+    if (_mt_window && !macstat_active())
         update_tty(_mt_window);
 
     do {
@@ -2175,10 +2182,10 @@ mac_resume_nhwindows(void)
 static void
 mac_mark_synch(void)
 {
-    /* Flush buffered tty writes to screen: setftty() clears TA_ALWAYS_REFRESH
-       during play, so the offscreen is correct but the window shows stale text
-       until this runs (core calls mark_synch after each status_update). */
-    if (_mt_window && iflags.window_inited)
+    /* Pre-status-takeover only: flush buffered tty writes (NHW_BASE raw
+       prints) to screen. Once macstat owns _mt_window, status draws are
+       immediate and the tty offscreen is stale by design. */
+    if (_mt_window && iflags.window_inited && !macstat_active())
         update_tty(_mt_window);
 }
 
@@ -2214,7 +2221,13 @@ mac_print_glyph(winid win, coordxy x, coordxy y,
         return;
     }
 
-    /* tty path for non-map windows */
+    /* tty path for non-map windows; once macstat owns _mt_window, tty
+       writes would corrupt the shared offscreen (and the blit would paint
+       stale content over the native status rows), so skip entirely —
+       nothing legitimately glyph-prints to a _mt_window-backed window
+       after status takeover */
+    if (macstat_active())
+        return;
     int ch;
     tty_curs(win, x, y);
     ch = (glyphinfo && glyphinfo->ttychar) ? glyphinfo->ttychar : ' ';
@@ -3192,12 +3205,20 @@ HandleUpdate(EventRecord *theEvent)
            _mt_window — both share kind=NHW_MAP for legacy reasons. */
         if (GetWRefCon(theWindow) == MACMAP_REFCON && WIN_MAP != WIN_ERR) {
             macmap_update_event(&theWindows[WIN_MAP]);
+        } else if (theWindow == _mt_window && macstat_active()) {
+            /* status owns _mt_window now; image_tty would blit the stale
+               tty offscreen over the natively drawn fields */
+            macstat_redraw();
         } else if (kind >= 0 && kind < NUM_FUNCS) {
             winUpdateFuncs[kind](&fake, theWindow);
         }
     }
 
-    if (theWindow == _mt_window && existing_update_region) {
+    if (theWindow == _mt_window && existing_update_region
+        && !macstat_active()) {
+        /* with macstat active, image_tty never runs here, so a restored
+           invalid_rect would only accumulate and flash stale tty content
+           at game end; drop it instead */
         set_invalid_region(theWindow, &rect);
     }
     if (aWin)
