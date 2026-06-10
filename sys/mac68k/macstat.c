@@ -111,6 +111,11 @@ mac_status_update(
     if (idx == BL_CONDITION) {
         stat_cond_bits = ptr ? *(unsigned long *) ptr : 0UL;
         stat_colormasks = colormasks;
+    } else if (idx == BL_GOLD) {
+        /* gold arrives glyph-encoded ("\GXXXXNNNN:nnn"); decode to the
+           symset's gold symbol once, like the curses port does */
+        status_vals[BL_GOLD][0] = ' ';
+        (void) decode_mixed(&status_vals[BL_GOLD][1], text ? text : "");
     } else {
         Snprintf(status_vals[idx], MAXCO,
                  status_fieldfmt[idx] ? status_fieldfmt[idx] : "%s",
