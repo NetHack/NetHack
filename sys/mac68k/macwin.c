@@ -3331,8 +3331,8 @@ struct window_procs mac_procs = {
 #endif
     genl_outrip, genl_preference_update,
     genl_getmsghistory, genl_putmsghistory,
-    genl_status_init, genl_status_finish, genl_status_enablefield,
-    genl_status_update,
+    mac_status_init, mac_status_finish, mac_status_enablefield,
+    mac_status_update,
     genl_can_suspend_no,
     mac_update_inventory,
     mac_ctrl_nhwindow,
