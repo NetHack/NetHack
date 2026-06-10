@@ -980,8 +980,18 @@ DoMenuEvt(long menuEntry)
 
     default: /* submenus and STR#-dispatched command menus */
         if (menuID == ID1_SUBM + menuPlayModeSub) {
-            if (menuItem == playModeExplore)
-                AddToKeyQueue('X', 1); /* one-way switch; confirm handled by core */
+            if (menuItem == playModeExplore) {
+                /* queue "#exploremode" like the STR# command menus: '#'
+                   opens the extended-command prompt and mac_get_ext_cmd
+                   consumes the queued remainder as the answer.  (The old
+                   File item queued 'X', which has meant #twoweapon since
+                   3.6 -- a latent bug faithfully migrated, fixed here.) */
+                const char *cmd = "#exploremode";
+                short ci;
+
+                for (ci = 0; cmd[ci]; ci++)
+                    AddToKeyQueue(cmd[ci], false);
+            }
             break; /* exits the outer switch; Regular/Debug are status
                       indicators, never enabled as actions */
         }
