@@ -31,17 +31,10 @@ resource 'MENU' (128) {
 resource 'MENU' (129) {
     129,
     textMenuProc,
-    0x7FFFFEA7,
+    0x7FFFFFFD,
     enabled,
     "File",
     {
-        "Redraw Map", noIcon, "R", "\0x11", plain,
-        "Previous Msg", noIcon, "P", "\0x11", plain,
-        "Reposition", noIcon, "N", noMark, plain,
-        "-", noIcon, noKey, noMark, plain,
-        "Regular", noIcon, "\0x1B" /* hierarchicalMenu */, "\0xC8", plain,
-        "Enter Explore", noIcon, noKey, "X", plain,
-        "-", noIcon, noKey, noMark, plain,
         "Save", noIcon, "S", "S", plain,
         "-", noIcon, noKey, noMark, plain,
         "Quit", noIcon, "Q", "Q", plain
@@ -94,10 +87,10 @@ resource 'MENU' (132) {
     enabled,
     "Help",
     {
-        "Options", noIcon, noKey, "O", plain,
+        "Options\0xC9", noIcon, noKey, "O", plain,
         "-", noIcon, noKey, noMark, plain,
         "Help", noIcon, noKey, "?", plain,
-        "Describe Key", noIcon, noKey, "&", plain,
+        "Describe Key\0xC9", noIcon, noKey, "&", plain,
         "-", noIcon, noKey, noMark, plain,
         "Version", noIcon, noKey, "v", plain,
         "History", noIcon, noKey, "V", plain,
@@ -108,22 +101,26 @@ resource 'MENU' (132) {
 resource 'MENU' (133) {
     133,
     textMenuProc,
-    0x7FFFFEF7,
+    0x7FFFEEF7,
     enabled,
     "Info",
     {
         "Inventory All", noIcon, noKey, "i", plain,
         "Inventory Select", noIcon, noKey, "I", plain,
-        "Adjust", noIcon, noKey, "#", plain,
+        "Adjust\0xC9", noIcon, noKey, "#", plain,
         "-", noIcon, noKey, noMark, plain,
         "Look Down", noIcon, noKey, ":", plain,
-        "Describe One", noIcon, noKey, ";", plain,
-        "Describe Many", noIcon, noKey, "/", plain,
-        "Describe Trap", noIcon, noKey, "^", plain,
+        "Describe One\0xC9", noIcon, noKey, ";", plain,
+        "Describe Many\0xC9", noIcon, noKey, "/", plain,
+        "Describe Trap\0xC9", noIcon, noKey, "^", plain,
         "-", noIcon, noKey, noMark, plain,
-        "Call Monster", noIcon, noKey, "C", plain,
-        "Name Object", noIcon, noKey, "#", plain,
-        "Discoveries", noIcon, noKey, "\0x5C", plain
+        "Call Monster\0xC9", noIcon, noKey, "C", plain,
+        "Name Object\0xC9", noIcon, noKey, "#", plain,
+        "Discoveries", noIcon, noKey, "\0x5C", plain,
+        "-", noIcon, noKey, noMark, plain,
+        "Overview", noIcon, noKey, noMark, plain,
+        "Annotate\0xC9", noIcon, noKey, "#", plain,
+        "Show Terrain", noIcon, noKey, "#", plain
     }
 };
 
@@ -157,25 +154,39 @@ resource 'MENU' (134) {
 resource 'MENU' (135) {
     135,
     textMenuProc,
-    0x7FFFFFBD,
+    0x7FBBB7BB,
     enabled,
     "Act",
     {
         "Wait", noIcon, noKey, ".", plain,
+        "Search", noIcon, noKey, "s", plain,
         "-", noIcon, noKey, noMark, plain,
-        "Teleport", noIcon, "T", "\0x11", plain,
+        "Open Door", noIcon, noKey, "o", plain,
+        "Close Door", noIcon, noKey, "c", plain,
+        "Kick", noIcon, noKey, noMark, plain,
+        "-", noIcon, noKey, noMark, plain,
+        "Force Lock", noIcon, noKey, "#", plain,
+        "Loot", noIcon, noKey, "#", plain,
+        "Tip Container", noIcon, noKey, "#", plain,
+        "Untrap", noIcon, noKey, "#", plain,
+        "-", noIcon, noKey, noMark, plain,
+        "Engrave", noIcon, noKey, "E", plain,
+        "Sit", noIcon, noKey, "#", plain,
+        "-", noIcon, noKey, noMark, plain,
+        "Climb Up", noIcon, noKey, "<", plain,
+        "Climb Down", noIcon, noKey, ">", plain,
+        "Travel", noIcon, noKey, "_", plain,
+        "-", noIcon, noKey, noMark, plain,
         "Jump", noIcon, noKey, "#", plain,
-        "Monster", noIcon, noKey, "#", plain,
-        "Wipe", noIcon, noKey, "#", plain,
+        "Monster Ability", noIcon, noKey, "#", plain,
+        "Wipe Face", noIcon, noKey, "#", plain,
         "-", noIcon, noKey, noMark, plain,
-        "Apply", noIcon, noKey, "a", plain,
-        "Pay", noIcon, noKey, "p", plain,
-        "Kick", noIcon, "D", "\0x11", plain,
+        "Pay Bill", noIcon, noKey, "p", plain,
         "Chat", noIcon, noKey, "#", plain,
-        "Offer", noIcon, noKey, "#", plain,
         "Pray", noIcon, noKey, "#", plain,
+        "Offer Sacrifice", noIcon, noKey, "#", plain,
         "Ride", noIcon, noKey, "#", plain,
-        "Turn", noIcon, noKey, "#", plain
+        "Turn Undead", noIcon, noKey, "#", plain
     }
 };
 
@@ -187,9 +198,9 @@ resource 'MENU' (136) {
     "Magic",
     {
         "Drop Item", noIcon, noKey, "d", plain,
-        "Drop Select", noIcon, noKey, "D", plain,
+        "Drop Multiple\0xC9", noIcon, noKey, "D", plain,
         "Pickup", noIcon, noKey, ",", plain,
-        "Toggle pickup", noIcon, noKey, "@", plain,
+        "Toggle Autopickup", noIcon, noKey, "@", plain,
         "-", noIcon, noKey, noMark, plain,
         "Eat", noIcon, noKey, "e", plain,
         "Read", noIcon, noKey, "r", plain,
@@ -204,29 +215,19 @@ resource 'MENU' (136) {
     }
 };
 
-resource 'MENU' (137) {
-    137,
+resource 'MENU' (138) {
+    138,
     textMenuProc,
-    0x7FFFDDDF,
+    0x7FFFFFEF,
     enabled,
-    "Bits",
+    "Game",
     {
-        "Search", noIcon, noKey, "s", plain,
-        "Close Door", noIcon, noKey, "c", plain,
-        "Open Door", noIcon, noKey, "o", plain,
-        "Apply", noIcon, noKey, "a", plain,
-        "Kick", noIcon, "D", "\0x11", plain,
+        "Redraw", noIcon, "R", "\0x11", plain,
+        "Previous Message", noIcon, "P", "\0x11", plain,
+        "Reposition Windows", noIcon, "N", noMark, plain,
+        "Tile Mode", noIcon, "T", noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Untrap", noIcon, noKey, "#", plain,
-        "Force", noIcon, noKey, "#", plain,
-        "Loot", noIcon, noKey, "#", plain,
-        "-", noIcon, noKey, noMark, plain,
-        "Engrave", noIcon, noKey, "E", plain,
-        "Dip", noIcon, noKey, "#", plain,
-        "Sit", noIcon, noKey, "#", plain,
-        "-", noIcon, noKey, "#", 2,
-        "Climp Up", noIcon, noKey, "<", plain,
-        "Climb Down", noIcon, noKey, ">", plain
+        "Play Mode", noIcon, "\0x1B" /* hierarchicalMenu */, "\0xD2", plain
     }
 };
 
@@ -452,16 +453,29 @@ resource 'MENU' (209) {
     }
 };
 
+resource 'MENU' (210) {
+    210,
+    textMenuProc,
+    allEnabled,
+    enabled,
+    "Play Mode",
+    {
+        "Regular", noIcon, noKey, noMark, plain,
+        "Explore", noIcon, noKey, noMark, plain,
+        "Debug", noIcon, noKey, noMark, plain
+    }
+};
+
 data 'MNU#' (128, "menubar", locked, preload) {  /* short firstMenuID; short count; { short mresID; short 0; } [count] */
     $"0080 000A 0080 0000 0081 0000 0082 0000"
-    $"0083 0000 0084 0000 0085 0000 0086 0000"
-    $"0087 0000 0088 0000 0089 0000"
+    $"008A 0000 0085 0000 0086 0000 0087 0000"
+    $"0088 0000 0083 0000 0084 0000"
 };
 
 data 'MNU#' (129, "submenu", locked, preload) {  /* short firstMenuID; short count; { short mresID; short 0; } [count] */
-    $"00C8 000A 00C8 0000 00C9 0000 00CA 0000"
+    $"00C8 000B 00C8 0000 00C9 0000 00CA 0000"
     $"00CB 0000 00CC 0000 00CD 0000 00CE 0000"
-    $"00CF 0000 00D0 0000 00D1 0000"
+    $"00CF 0000 00D0 0000 00D1 0000 00D2 0000"
 };
 
 resource 'STR#' (128, "Misc. Strings", purgeable) {
@@ -470,38 +484,7 @@ resource 'STR#' (128, "Misc. Strings", purgeable) {
     }
 };
 
-resource 'STR#' (131, "Kbd") {
-    {
-        "\0xA5201 Control Keys",
-        "\0xA5202 Punctuation",
-        "\0xA5203 Brackets",
-        "\0xA5204 a - m",
-        "\0xA5205 n - z",
-        "\0xA5206 A - M",
-        "\0xA5207 N - Z",
-        "\0xA5208 0 - 9",
-        "\0xA5-",
-        "\0x1B\0xA5escape",
-        " \0xA5space",
-        "\0x08\0xA5delete",
-        "\0x0D\0xA5return"
-    }
-};
-
-resource 'STR#' (132, "Help") {
-    {
-        "O",
-        "\0xA5-",
-        "?",
-        "&",
-        "\0xA5-",
-        "v",
-        "V",
-        "#version"
-    }
-};
-
-resource 'STR#' (133, "Info") {
+resource 'STR#' (132, "Info") {
     {
         "i",
         "I",
@@ -514,11 +497,15 @@ resource 'STR#' (133, "Info") {
         "\0xA5-",
         "C",
         "#name",
-        "\0x5C"
+        "\0x5C",
+        "\0xA5-",
+        "\0x0F\0xA5ctl-o",
+        "#annotate",
+        "#terrain"
     }
 };
 
-resource 'STR#' (134, "Equip") {
+resource 'STR#' (133, "Equip") {
     {
         "\0xA5209 Current",
         "\0xA5-",
@@ -540,27 +527,41 @@ resource 'STR#' (134, "Equip") {
     }
 };
 
-resource 'STR#' (135, "Act") {
+resource 'STR#' (134, "Act") {
     {
         ".",
+        "s",
         "\0xA5-",
-        "\0x14\0xA5 ctl-t",
+        "o",
+        "c",
+        "\0x04\0xA5ctl-d",
+        "\0xA5-",
+        "#force",
+        "#loot",
+        "#tip",
+        "#untrap",
+        "\0xA5-",
+        "E",
+        "#sit",
+        "\0xA5-",
+        "<",
+        ">",
+        "_",
+        "\0xA5-",
         "#jump",
         "#monster",
         "#wipe",
         "\0xA5-",
-        "a",
         "p",
-        "\0x04\0xA5ctl-d",
         "#chat",
-        "#offer",
         "#pray",
+        "#offer",
         "#ride",
         "#turn"
     }
 };
 
-resource 'STR#' (136, "Magic") {
+resource 'STR#' (135, "Magic") {
     {
         "d",
         "D",
@@ -580,24 +581,34 @@ resource 'STR#' (136, "Magic") {
     }
 };
 
-resource 'STR#' (137, "Bits") {
+resource 'STR#' (136, "Kbd") {
     {
-        "s",
-        "c",
-        "o",
-        "a",
-        "\0x04\0xA5ctl-d",
+        "\0xA5201 Control Keys",
+        "\0xA5202 Punctuation",
+        "\0xA5203 Brackets",
+        "\0xA5204 a - m",
+        "\0xA5205 n - z",
+        "\0xA5206 A - M",
+        "\0xA5207 N - Z",
+        "\0xA5208 0 - 9",
         "\0xA5-",
-        "#untrap",
-        "#force",
-        "#loot",
+        "\0x1B\0xA5escape",
+        " \0xA5space",
+        "\0x08\0xA5delete",
+        "\0x0D\0xA5return"
+    }
+};
+
+resource 'STR#' (137, "Help") {
+    {
+        "O",
         "\0xA5-",
-        "E",
-        "#dip",
-        "#sit",
+        "?",
+        "&",
         "\0xA5-",
-        "<",
-        ">"
+        "v",
+        "V",
+        "#version"
     }
 };
 
