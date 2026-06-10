@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.20 $ $NHDT-Date: 1779581008 2026/05/24 00:03:28 $
+NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.36 $ $NHDT-Date: 1781062909 2026/06/09 19:41:49 $
 	
 General Fixes and Modified Features
 -----------------------------------
@@ -59,6 +59,7 @@ don't overflow svp.plname on restore (pr #1570 by chasonr)
 monsters (including pets) aren't scared of the Sokoban rolling boulder traps
 fix a bug in which steeds would continuously gain movement points while
         being ridden
+when hero's behavior makes erinyes stronger, cap level at 49 rather than 50
 
 
 Platform- and/or Interface-Specific Fixes
@@ -160,6 +161,15 @@ Linux: add WANT_SYSTEM_LUA=1 support to the linux.500 hints files and
 	step and the subsequent compiling of Lua; it tries to use use
 	the Lua5.4 package that is already installed on the system
 macOS: fix ncurses build with Homebrew
+MS-DOS: Fix custom colors in VESA BIOS mode (pr #1577 by chasonr)
+MS-DOS: VESA mode: set the viewport size correctly so the position bar
+	does not overlap the map; correctly set the size to which tiles are
+	stretched when overview mode (F4) is selected (pr #1579 by chasonr)
+MS-DOS: VESA and 16 color modes: Pass correct parameters to vga_userpan
+	and vesa_userpan, so the pan keys (CTRL+arrow) work correctly. Some
+	emulations don't report CTRL with up or down arrows, so accept
+	CTRL-home, CTRL-page up, CTRL page down and CTRL-end
+	(pr #1579 by chasonr)
 musl: musl libc does not have __sighandler_t so don't use it in the
 	macro definition for SIG_RET_TYPE with musl
 WASM: resolve some build failures in 'make CROSS_TO_WASM=1'

@@ -1128,17 +1128,6 @@ vesa_Init(void)
     clipy = 0;
     clipymax = clipy + (viewport_rows - 1);
 
-    /* Set the size of the tiles for the overview mode */
-    vesa_oview_width = vesa_x_res / COLNO;
-    if (vesa_oview_width > (unsigned) iflags.wc_tile_width) {
-        vesa_oview_width = (unsigned) iflags.wc_tile_width;
-    }
-    vesa_oview_height = (vesa_y_res - (TOP_MAP_ROW + 4) * vesa_char_height)
-                      / ROWNO;
-    if (vesa_oview_height > (unsigned) iflags.wc_tile_height) {
-        vesa_oview_height = (unsigned) iflags.wc_tile_height;
-    }
-
     /* Load a font of size appropriate to the screen size */
     if (vesa_x_res >= 1280 && vesa_y_res >= 960)
         font_name = "ter-u32b.psf";
@@ -1180,6 +1169,19 @@ vesa_Init(void)
             vesa_char_height = 64;
         }
         vesa_char_width = vesa_char_height / 2;
+    }
+
+    vesa_SetViewPort();
+
+    /* Set the size of the tiles for the overview mode */
+    vesa_oview_width = vesa_x_res / COLNO;
+    if (vesa_oview_width > (unsigned) iflags.wc_tile_width) {
+        vesa_oview_width = (unsigned) iflags.wc_tile_width;
+    }
+    vesa_oview_height = (vesa_y_res - (TOP_MAP_ROW + 5) * vesa_char_height)
+                      / ROWNO;
+    if (vesa_oview_height > (unsigned) iflags.wc_tile_height) {
+        vesa_oview_height = (unsigned) iflags.wc_tile_height;
     }
 
     /* Process tiles for the current video mode */

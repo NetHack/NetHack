@@ -348,8 +348,12 @@ LUA_URL_list:=$(LUA_URL) $(LUA_URL_MIRROR) $(LUA_URL_NHD)
 #
 #CURL := curl
 #ask curl to return a failure code if error 404 is encountered
-CURL := curl --fail
+CURL := curl -q --fail  --no-progress-meter
 
+# Set this to 1 to bypass checksum verification.  _Highly_ discouraged.
+#NOCHKSUM=1
+
+#debugging targets
 fetch-lua-mirror: LUA_URL_list:=$(LUA_URL_MIRROR)
 fetch-lua-mirror: fetch-Lua
 	@true
@@ -358,50 +362,86 @@ fetch-lua-nhd: LUA_URL_list:=$(LUA_URL_NHD)
 fetch-lua-nhd: fetch-Lua
 	@true
 
+# normal entry point
 fetch-lua: fetch-Lua
 	@true
 
 fetch-Lua:
 	@( \
-	  shac1=`command -v shasum`; \
-	  shac2=`command -v sha256sum`; \
-	  if [ ! -z $$shac1 ]; then \
-	    shac="$$shac1 -a 256"; elif [ ! -z $$shac2 ]; then \
-	    shac=$$shac2; else echo "CAUTION: no way to check integrity"; \
-	  fi; \
-	  set -- DUMMY $(LUA_URL_list); \
-	  luafile=lua-$(LUA_VERSION).tar.gz; \
-	  export curlstatus=1; \
-	  mkdir -p lib && cd lib && \
-	  while [ $$# -gt 0 ]; do \
+	`: $1 = file to check`; \
+	chksum_or_fail(){ \
+	    local shac shac1 shac2; \
+	    shac1=`command -v shasum`; \
+	    shac2=`command -v sha256sum`; \
+	    if [ ! -z $$shac1 ]; then \
+		shac="$$shac1 -a 256"; \
+	    elif [ ! -z $$shac2 ]; then \
+		shac=$$shac2; \
+	    else \
+		echo "CAUTION: no way to check integrity"; \
+		echo "Rerun with 'NOCHKSUM=1' to skip this check"; \
+		exit 1; \
+	    fi; \
+	    echo "Checking integrity of $$1 with $$shac"; \
+	    $$shac -w --ignore-missing -c $$CHKSUMSTMP < $$1; \
+	    if [ $$? -ne 0 ]; then \
+		echo "Integrity check FAILED - STOPPING"; \
+		exit 1; \
+	    fi; \
+	    echo "Integrity check passed"; \
+	}; \
+	`: $1 = name of tarfile`; \
+	untar_and_cleanup(){ \
+	    echo "Unpacking $$1"; \
+	    tar zxf $$1; \
+	    if [ $$? -eq '0' ]; then \
+		rm -f $$1; \
+		echo "Unpacked successfully into `pwd`"; \
+		return 0; \
+	    else \
+		echo "tar failed to extract $$1 - trying next source"; \
+		return 1; \
+	    fi; \
+	}; \
+	`: main`; \
+	set -- $(LUA_URL_list); \
+	luafile=lua-$(LUA_VERSION).tar.gz; \
+	mkdir -p lib; \
+	cd lib || { \
+	    echo "Unable to find lib directory"; \
+	    exit 1; \
+	}; \
+	while [ $$# -gt 0 ]; do \
+	    iter=$$1; \
 	    shift; \
-	    if [ $$curlstatus -ne 0 ]; then \
-	      luaurl=https://$$1/$$luafile; \
-	      echo Trying $$luaurl; \
-	      $(CURL) -R -O $$luaurl; \
-	      curlstatus=$$?; \
-	      if [ $$curlstatus -eq 0 ]; then \
-	        if [ ! -z "$$shac" ]; then \
+	    luaurl=https://$$iter/$$luafile; \
+	    echo "Fetching $$luaurl"; \
+	    if $(CURL) -R -O $$luaurl ; then \
+		if [ -z $(NOCHKSUM) ]; then \
+		    echo "Searching for known checksum"; \
 		    CHKSUMS=../submodules/CHKSUMS; \
 		    CHKSUMSTMP=../submodules/CHKSUMS.tmp; \
 		    fgrep $$luafile < $$CHKSUMS > $$CHKSUMSTMP; \
 		    if [ -z $$CHKSUMSTMP ]; then \
-		      echo "Cannot check $$luafile - no checksum known"; \
+			echo "Cannot check $$luafile - no checksum known"; \
+			echo "Rerun with 'NOCHKSUM=1' to skip this check"; \
+			exit 1; \
 		    else \
-		      echo Checking integrity of $$luafile with $$shac; \
-		      $$shac -w --ignore-missing -c $$CHKSUMSTMP < $$luafile; \
+			echo "Checksum found"; \
+			chksum_or_fail $$luafile; \
 		    fi; \
-	        fi; \
-	        tar zxf $$luafile && \
-	        rm -f $$luafile; \
-	      fi; \
+		fi; \
+                    `: If we can unpack it, we are done.`; \
+		untar_and_cleanup $$luafile && exit 0; \
+		`: fallthrough to next source `; \
 	    fi; \
-	  done; \
-	  true )
-
+	done; \
+	echo "Unable to find a valid source - STOPPING" \
+	exit 1; \
+	)
 # remove include/nhlua.h in case it was created for some other Lua version
 	@( if test -f include/nhlua.h ; then \
-	     rm -f include/nhlua.h && echo 'rm include/nhlua.h' ; fi )
+	    rm -f include/nhlua.h && echo 'rm include/nhlua.h' ; fi )
 
 fetch-lua-http:
 	( mkdir -p lib && cd lib && \

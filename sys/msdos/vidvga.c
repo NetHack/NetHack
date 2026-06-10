@@ -533,9 +533,9 @@ vga_userpan(enum vga_pan_direction pan)
     /* pline("Into userpan"); */
     if (iflags.over_view || iflags.traditional_view)
         return;
-    if (pan == pan_left)
+    if (pan == pan_right)
         x = min(COLNO - 1, clipxmax + 10);
-    else if (pan == pan_right)
+    else if (pan == pan_left)
         x = max(0, clipx - 10);
     else
         return;
