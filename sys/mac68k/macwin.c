@@ -1127,18 +1127,18 @@ topl_key(unsigned char ch, Boolean ext)
     case '\x1c' /* left arrow */:
         if ((*top_line)->selEnd <= topl_query_len)
             return true;
-        else if (ext) {
-            topl_replace("");
-            return true;
-        }
+        /* FALLTHROUGH: TEKey deletes the selected completion suffix (or
+           one typed char); re-completion below is skipped for deletions
+           so they stick instead of instantly re-expanding */
     default:
         TEKey(ch, top_line);
-        if (ext) {
+        if (ext && ch != CHAR_BS && ch != '\x1c') {
             int com_index = -1, oindex = 0;
+            int typed = (*top_line)->teLength - topl_query_len;
+
             while (extcmdlist[oindex].ef_txt != (char *) 0) {
                 if (!strncmpi(*(*top_line)->hText + topl_query_len,
-                              extcmdlist[oindex].ef_txt,
-                              (*top_line)->teLength - topl_query_len)) {
+                              extcmdlist[oindex].ef_txt, typed)) {
                     if (com_index == -1)
                         com_index = oindex;
                     else {
@@ -1148,8 +1148,20 @@ topl_key(unsigned char ch, Boolean ext)
                 }
                 oindex++;
             }
-            if (com_index >= 0)
-                topl_replace((char *) extcmdlist[com_index].ef_txt);
+            if (com_index >= 0) {
+                /* unique match: append the suggested suffix and leave it
+                   selected, so the next typed char replaces it, backspace
+                   deletes it, and enter accepts the whole command */
+                const char *txt = extcmdlist[com_index].ef_txt;
+                int txt_len = (int) strlen(txt);
+
+                if (txt_len > typed) {
+                    TEInsert((const void *) (txt + typed),
+                             (long) (txt_len - typed), top_line);
+                    topl_set_select(topl_query_len + typed,
+                                    (*top_line)->teLength);
+                }
+            }
         }
         return true;
     }
@@ -1739,6 +1751,16 @@ mac_nhgetch(void)
     do {
         (void) WaitNextEvent(everyEvent, &anEvent, doDawdle, gMouseRgn);
         HandleEvent(&anEvent);
+        if (in_topl_mode()) {
+            /* blink the TE caret in the prompt; doDawdle is GetCaretTime
+               in topl mode so we wake often enough */
+            GrafPtr savePort;
+
+            GetPort(&savePort);
+            SetPortWindowPort(theWindows[WIN_MESSAGE].its_window);
+            TEIdle(top_line);
+            SetPort(savePort);
+        }
         ch = GetFromKeyQueue();
     } while (!ch && !gClickedToMove);
 
