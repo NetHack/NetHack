@@ -3302,8 +3302,9 @@ struct window_procs mac_procs = {
         | WC_FONT_STATUS | WC_FONT_TEXT | WC_FONTSIZ_MAP | WC_FONTSIZ_MENU
         | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_STATUS | WC_FONTSIZ_TEXT
         | WC_TILED_MAP,
-    WC2_SUPPRESS_HIST,   /* honor ATR_NOHISTORY: transient msgs (e.g. farlook
+    WC2_SUPPRESS_HIST    /* honor ATR_NOHISTORY: transient msgs (e.g. farlook
                             descriptions) replace the line instead of logging */
+        | WC2_HILITE_STATUS | WC2_FLUSH_STATUS,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
     mac_init_nhwindows,
     mac_player_selection,
