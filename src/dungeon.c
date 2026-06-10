@@ -1058,11 +1058,22 @@ init_dungeon_dungeons(
     pd->tmpdungeon[dngidx].chance = dgn_chance;
     pd->tmpdungeon[dngidx].entry_lev = dgn_entry;
 
-    /* FIXME: these should have length checks */
+    if (Strlen(dgn_fill) >= sizeof svd.dungeons[dngidx].fill_lvl)
+        panic("fill_lvl too long for dungeon %d", dngidx);
     Strcpy(svd.dungeons[dngidx].fill_lvl, dgn_fill);
+
+    if (Strlen(dgn_name) >= sizeof svd.dungeons[dngidx].dname)
+        panic("dname too long for dungeon %d", dngidx);
     Strcpy(svd.dungeons[dngidx].dname, dgn_name);
+
+    if (Strlen(dgn_protoname) >= sizeof svd.dungeons[dngidx].proto)
+        panic("proto too long for dungeon %d", dngidx);
     Strcpy(svd.dungeons[dngidx].proto, dgn_protoname);
+
+    if (Strlen(dgn_themerms) >= sizeof svd.dungeons[dngidx].themerms)
+        panic("themerms too long for dungeon %d", dngidx);
     Strcpy(svd.dungeons[dngidx].themerms, dgn_themerms);
+
     /* FIXME: accept "none", convert that to '\0' */
     svd.dungeons[dngidx].boneid = *dgn_bonetag ? *dgn_bonetag : 0;
     free((genericptr) dgn_fill);

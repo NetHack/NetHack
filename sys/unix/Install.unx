@@ -246,10 +246,10 @@ Notes:
 
 13. If you get a compiler warning about 'get_colors()' being implicitly
     declared, try uncommenting NEED_GET_COLORS_DECL in unixconf.h.
-    If you get a compiler complaint about tparmdecl() having conflicting
-    declarations, add '#define NOTPARMDECL' to unixconf.h or '-DNOTPARMDECL'
-    to CFLAGS in src/Makefile.  (The hints files for Mac OSX already do the
-    latter.)
+    If you get a compiler warning about tparm() being implicitly
+    declared, add '#define TPARM_WORKAROUND' to unixconf.h or
+    '-DTPARM_WORKAROUND' to CFLAGS.  (This should not be needed
+    on any modern system.)
 
 # NetHack 5.0  Install.unx       $NHDT-Date: 1577568915 2019/12/28 21:35:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.14 $
 # Copyright (c) 2012 by Kenneth Lorber, Kensington, Maryland
