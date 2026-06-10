@@ -1097,11 +1097,24 @@ topl_set_select(short selStart, short selEnd)
     TEActivate(top_line);
 }
 
+/* Delete [from, to) without ever drawing a selection: classic TE extends
+   a range hilite to the view's right edge when it ends at teLength (always,
+   on a one-line TE), inverting the prompt. Deactivated, TEDelete paints no
+   hilite. */
+static void
+topl_delete_silent(short from, short to)
+{
+    TEDeactivate(top_line);
+    (*top_line)->selStart = from;
+    (*top_line)->selEnd = to;
+    TEDelete(top_line);
+    TEActivate(top_line); /* selection is now an insertion point at 'from' */
+}
+
 static void
 topl_replace(char *new_ans)
 {
-    topl_set_select(topl_query_len, (*top_line)->teLength);
-    TEDelete(top_line);
+    topl_delete_silent(topl_query_len, (*top_line)->teLength);
     TEInsert(new_ans, strlen(new_ans), top_line);
 }
 
@@ -1145,16 +1158,21 @@ topl_key_body(unsigned char ch, Boolean ext)
     case '\x1c' /* left arrow */:
         if ((*top_line)->selEnd <= topl_query_len)
             return true;
-        if ((*top_line)->selStart < (*top_line)->selEnd) {
-            /* a completion suffix is selected: delete just it (TEDelete,
-               the same call topl_replace uses, unhighlights cleanly) */
-            TEDelete(top_line);
+        if (ext && (*top_line)->selEnd < (*top_line)->teLength) {
+            /* a completion suffix trails the caret: dismiss just it */
+            topl_delete_silent((*top_line)->selEnd, (*top_line)->teLength);
             return true;
         }
-        /* FALLTHROUGH: TEKey deletes one typed char; re-completion below
-           is skipped for deletions so they stick instead of instantly
-           re-expanding */
+        /* FALLTHROUGH: TEKey deletes one typed char (BS) or moves the
+           caret (left arrow); re-completion below is skipped for both so
+           deletions stick instead of instantly re-expanding */
     default:
+        if (ext && (*top_line)->selStart == (*top_line)->selEnd
+            && (*top_line)->selEnd < (*top_line)->teLength) {
+            /* typing over a pending suggestion: drop it first, then let
+               the re-completion below propose a new one */
+            topl_delete_silent((*top_line)->selEnd, (*top_line)->teLength);
+        }
         TEKey(ch, top_line);
         if (ext && ch != CHAR_BS && ch != '\x1c') {
             int com_index = -1, oindex = 0;
@@ -1173,18 +1191,18 @@ topl_key_body(unsigned char ch, Boolean ext)
                 oindex++;
             }
             if (com_index >= 0) {
-                /* unique match: append the suggested suffix and leave it
-                   selected, so the next typed char replaces it, backspace
-                   deletes it, and enter accepts the whole command */
+                /* unique match: append the suggested suffix as plain text.
+                   TEInsert leaves the caret between the typed prefix and
+                   the suggestion (never SELECT the suffix: TE extends a
+                   drawn hilite that ends at teLength out to the view edge,
+                   inverting the rest of the line). Return accepts the
+                   whole line; backspace dismisses the suffix. */
                 const char *txt = extcmdlist[com_index].ef_txt;
                 int txt_len = (int) strlen(txt);
 
-                if (txt_len > typed) {
+                if (txt_len > typed)
                     TEInsert((const void *) (txt + typed),
                              (long) (txt_len - typed), top_line);
-                    topl_set_select(topl_query_len + typed,
-                                    (*top_line)->teLength);
-                }
             }
         }
         return true;
