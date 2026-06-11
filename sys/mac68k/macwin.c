@@ -129,6 +129,14 @@ AddToKeyQueue(unsigned char ch, Boolean force)
         keyQueueWrite = 0;
 }
 
+/* Free slots in the input queue; menu macros check this before queuing
+ * (AddToKeyQueue(ch, false) silently drops keys when full). */
+short
+KeyQueueFree(void)
+{
+    return QUEUE_LEN - keyQueueCount;
+}
+
 /*
  * Get key from queue
  */

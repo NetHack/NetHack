@@ -185,6 +185,7 @@ extern void clear_screen(void);
 /* ### macwin.c ### */
 
 extern void AddToKeyQueue(unsigned char, Boolean);
+extern short KeyQueueFree(void);
 extern unsigned char GetFromKeyQueue(void);
 extern void InitMac(void);
 int try_key_queue(char *);
