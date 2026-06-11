@@ -2797,11 +2797,16 @@ MenwKey(NhWindow *wind, char ch)
                 any = true;
             }
         }
+        /* done with mi; unlock BEFORE MenwUpdate (classic HUnlock is not
+           ref-counted -- MenwUpdate's internal unlock would silently vacate
+           an outer lock, same pattern as MenwSelectCmd) */
+        HUnlock((char **) wind->menuInfo);
         if (any) {
             menw_clear_pending(wind);
             SetPortWindowPort(wind->its_window);
             MenwUpdate(wind);
         }
+        return;
     }
     HUnlock((char **) wind->menuInfo);
     return;
@@ -2902,6 +2907,15 @@ menu_attr_face(int attr)
     }
 }
 
+/* Main-device pixel depth (1 on B&W compacts like the SE/30). */
+short
+mac_main_depth(void)
+{
+    GDHandle gd = GetMainDevice();
+
+    return gd ? (*(*gd)->gdPMap)->pixelSize : 1;
+}
+
 /* Set the pen color for styled text on a white background: NO_COLOR and
    white become black, and on sub-4-bit screens colors are skipped.
    Palette-safe (shared by menu windows and the status renderer). */
@@ -2909,10 +2923,8 @@ void
 mac_set_text_color(int color)
 {
     RGBColor black = { 0, 0, 0 };
-    GDHandle gd = GetMainDevice();
-    short depth = gd ? (*(*gd)->gdPMap)->pixelSize : 1;
 
-    if (depth < 4 || color == NO_COLOR || color == CLR_WHITE
+    if (mac_main_depth() < 4 || color == NO_COLOR || color == CLR_WHITE
         || color < 0 || color >= CLR_MAX)
         RGBForeColor(&black);
     else
@@ -2987,6 +2999,8 @@ MenwDrawStyled(NhWindow *wind)
     }
 
     vis_rows = (r.bottom - r.top) / wind->row_height + 1;
+    /* srcOr for the whole draw (erase happened up front) and deliberately
+       NOT restored on return: MenwUpdate's count overlay relies on it */
     TextMode(srcOr);
 
     HLock(wind->windowText);
@@ -3026,6 +3040,11 @@ MenwDrawStyled(NhWindow *wind)
                     mac_set_text_color(color);
                     PaintRect(&lr);
                     ForeColor(whiteColor);
+                    /* on 1-bit screens white-via-srcOr is a no-op (OR can
+                       only set bits); srcBic CUTS the glyphs out of the
+                       black box instead (same trick as the yn buttons) */
+                    if (mac_main_depth() < 2)
+                        TextMode(srcBic);
                 } else {
                     mac_set_text_color(color);
                 }
@@ -3035,8 +3054,11 @@ MenwDrawStyled(NhWindow *wind)
                 if (llen > 0x7FFF)
                     llen = 0x7FFF; /* DrawText byteCount is a short */
                 DrawText(base + lineStart, 0, (short) llen);
-                if (attr == ATR_INVERSE)
+                if (attr == ATR_INVERSE) {
                     ForeColor(blackColor);
+                    if (mac_main_depth() < 2)
+                        TextMode(srcOr);
+                }
             }
             lineStart = i + 1;
             lineIdx++;

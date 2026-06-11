@@ -212,8 +212,14 @@ stat_draw_str(const char *str, int packed, short top, short ascent)
         mac_set_text_color(color); /* NO_COLOR -> black */
         PaintRect(&box);
         ForeColor(whiteColor);
+        /* on 1-bit screens white-via-srcOr is a no-op (OR can only set
+           bits); srcBic cuts the glyphs out of the black box instead */
+        if (mac_main_depth() < 2)
+            TextMode(srcBic);
         MoveTo(pen.h, top + ascent);
         DrawText(str, 0, len);
+        if (mac_main_depth() < 2)
+            TextMode(srcOr);
         ForeColor(blackColor);
     } else {
         mac_set_text_color(color);
