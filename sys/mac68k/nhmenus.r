@@ -35,9 +35,9 @@ resource 'MENU' (129) {
     enabled,
     "File",
     {
-        "Save", noIcon, "S", "S", plain,
+        "Save", noIcon, "S", noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Quit", noIcon, "Q", "Q", plain
+        "Quit", noIcon, "Q", noMark, plain
     }
 };
 
@@ -87,14 +87,14 @@ resource 'MENU' (132) {
     enabled,
     "Help",
     {
-        "Options\0xC9", noIcon, noKey, "O", plain,
+        "Options\0xC9", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Help", noIcon, noKey, "?", plain,
-        "Describe Key\0xC9", noIcon, noKey, "&", plain,
+        "Help", noIcon, noKey, noMark, plain,
+        "Describe Key\0xC9", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Version", noIcon, noKey, "v", plain,
-        "History", noIcon, noKey, "V", plain,
-        "Version Features", noIcon, noKey, "#", plain
+        "Version", noIcon, noKey, noMark, plain,
+        "History", noIcon, noKey, noMark, plain,
+        "Version Features", noIcon, noKey, noMark, plain
     }
 };
 
@@ -105,22 +105,22 @@ resource 'MENU' (133) {
     enabled,
     "Info",
     {
-        "Inventory All", noIcon, noKey, "i", plain,
-        "Inventory Select", noIcon, noKey, "I", plain,
-        "Adjust\0xC9", noIcon, noKey, "#", plain,
+        "Inventory All", noIcon, noKey, noMark, plain,
+        "Inventory Select", noIcon, noKey, noMark, plain,
+        "Adjust\0xC9", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Look Down", noIcon, noKey, ":", plain,
-        "Describe One\0xC9", noIcon, noKey, ";", plain,
-        "Describe Many\0xC9", noIcon, noKey, "/", plain,
-        "Describe Trap\0xC9", noIcon, noKey, "^", plain,
+        "Look Down", noIcon, noKey, noMark, plain,
+        "Describe One\0xC9", noIcon, noKey, noMark, plain,
+        "Describe Many\0xC9", noIcon, noKey, noMark, plain,
+        "Describe Trap\0xC9", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Call Monster\0xC9", noIcon, noKey, "C", plain,
-        "Name Object\0xC9", noIcon, noKey, "#", plain,
-        "Discoveries", noIcon, noKey, "\0x5C", plain,
+        "Call Monster\0xC9", noIcon, noKey, noMark, plain,
+        "Name Object\0xC9", noIcon, noKey, noMark, plain,
+        "Discoveries", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
         "Overview", noIcon, noKey, noMark, plain,
-        "Annotate\0xC9", noIcon, noKey, "#", plain,
-        "Show Terrain", noIcon, noKey, "#", plain
+        "Annotate\0xC9", noIcon, noKey, noMark, plain,
+        "Show Terrain", noIcon, noKey, noMark, plain
     }
 };
 
@@ -133,21 +133,21 @@ resource 'MENU' (134) {
     {
         "Current", noIcon, "\0x1B" /* hierarchicalMenu */, "\0xD1", plain,
         "-", noIcon, noKey, noMark, plain,
-        "Wield Weapon", noIcon, noKey, "w", plain,
-        "Exchange Weapon", noIcon, noKey, "x", plain,
-        "Select Quiver", noIcon, noKey, "Q", plain,
-        "Fire Quiver", noIcon, noKey, "f", plain,
-        "Throw", noIcon, noKey, "t", plain,
-        "Apply", noIcon, noKey, "a", plain,
-        "Enhance", noIcon, noKey, "#", plain,
-        "Two Weapon Combat", noIcon, noKey, "#", plain,
+        "Wield Weapon", noIcon, noKey, noMark, plain,
+        "Exchange Weapon", noIcon, noKey, noMark, plain,
+        "Select Quiver", noIcon, noKey, noMark, plain,
+        "Fire Quiver", noIcon, noKey, noMark, plain,
+        "Throw", noIcon, noKey, noMark, plain,
+        "Apply", noIcon, noKey, noMark, plain,
+        "Enhance", noIcon, noKey, noMark, plain,
+        "Two Weapon Combat", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Wear Armor", noIcon, noKey, "W", plain,
-        "Take Off", noIcon, noKey, "T", plain,
-        "Ask Remove", noIcon, noKey, "A", plain,
+        "Wear Armor", noIcon, noKey, noMark, plain,
+        "Take Off", noIcon, noKey, noMark, plain,
+        "Ask Remove", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Put On", noIcon, noKey, "P", plain,
-        "Remove", noIcon, noKey, "R", plain
+        "Put On", noIcon, noKey, noMark, plain,
+        "Remove", noIcon, noKey, noMark, plain
     }
 };
 
@@ -158,35 +158,35 @@ resource 'MENU' (135) {
     enabled,
     "Act",
     {
-        "Wait", noIcon, noKey, ".", plain,
-        "Search", noIcon, noKey, "s", plain,
+        "Wait", noIcon, noKey, noMark, plain,
+        "Search", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Open Door", noIcon, noKey, "o", plain,
-        "Close Door", noIcon, noKey, "c", plain,
+        "Open Door", noIcon, noKey, noMark, plain,
+        "Close Door", noIcon, noKey, noMark, plain,
         "Kick", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Force Lock", noIcon, noKey, "#", plain,
-        "Loot", noIcon, noKey, "#", plain,
-        "Tip Container", noIcon, noKey, "#", plain,
-        "Untrap", noIcon, noKey, "#", plain,
+        "Force Lock", noIcon, noKey, noMark, plain,
+        "Loot", noIcon, noKey, noMark, plain,
+        "Tip Container", noIcon, noKey, noMark, plain,
+        "Untrap", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Engrave", noIcon, noKey, "E", plain,
-        "Sit", noIcon, noKey, "#", plain,
+        "Engrave", noIcon, noKey, noMark, plain,
+        "Sit", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Climb Up", noIcon, noKey, "<", plain,
-        "Climb Down", noIcon, noKey, ">", plain,
-        "Travel", noIcon, noKey, "_", plain,
+        "Climb Up", noIcon, noKey, noMark, plain,
+        "Climb Down", noIcon, noKey, noMark, plain,
+        "Travel", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Jump", noIcon, noKey, "#", plain,
-        "Monster Ability", noIcon, noKey, "#", plain,
-        "Wipe Face", noIcon, noKey, "#", plain,
+        "Jump", noIcon, noKey, noMark, plain,
+        "Monster Ability", noIcon, noKey, noMark, plain,
+        "Wipe Face", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Pay Bill", noIcon, noKey, "p", plain,
-        "Chat", noIcon, noKey, "#", plain,
-        "Pray", noIcon, noKey, "#", plain,
-        "Offer Sacrifice", noIcon, noKey, "#", plain,
-        "Ride", noIcon, noKey, "#", plain,
-        "Turn Undead", noIcon, noKey, "#", plain
+        "Pay Bill", noIcon, noKey, noMark, plain,
+        "Chat", noIcon, noKey, noMark, plain,
+        "Pray", noIcon, noKey, noMark, plain,
+        "Offer Sacrifice", noIcon, noKey, noMark, plain,
+        "Ride", noIcon, noKey, noMark, plain,
+        "Turn Undead", noIcon, noKey, noMark, plain
     }
 };
 
@@ -197,21 +197,21 @@ resource 'MENU' (136) {
     enabled,
     "Magic",
     {
-        "Drop Item", noIcon, noKey, "d", plain,
-        "Drop Multiple\0xC9", noIcon, noKey, "D", plain,
-        "Pickup", noIcon, noKey, ",", plain,
-        "Toggle Autopickup", noIcon, noKey, "@", plain,
+        "Drop Item", noIcon, noKey, noMark, plain,
+        "Drop Multiple\0xC9", noIcon, noKey, noMark, plain,
+        "Pickup", noIcon, noKey, noMark, plain,
+        "Toggle Autopickup", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Eat", noIcon, noKey, "e", plain,
-        "Read", noIcon, noKey, "r", plain,
-        "Quaff", noIcon, noKey, "q", plain,
-        "Dip", noIcon, noKey, "#", plain,
+        "Eat", noIcon, noKey, noMark, plain,
+        "Read", noIcon, noKey, noMark, plain,
+        "Quaff", noIcon, noKey, noMark, plain,
+        "Dip", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "List Spells", noIcon, noKey, "+", plain,
-        "Cast Spell", noIcon, noKey, "Z", plain,
-        "Zap", noIcon, noKey, "z", plain,
-        "Invoke", noIcon, noKey, "#", plain,
-        "Rub", noIcon, noKey, "#", plain
+        "List Spells", noIcon, noKey, noMark, plain,
+        "Cast Spell", noIcon, noKey, noMark, plain,
+        "Zap", noIcon, noKey, noMark, plain,
+        "Invoke", noIcon, noKey, noMark, plain,
+        "Rub", noIcon, noKey, noMark, plain
     }
 };
 
@@ -222,8 +222,8 @@ resource 'MENU' (138) {
     enabled,
     "Game",
     {
-        "Redraw", noIcon, "R", "\0x11", plain,
-        "Previous Message", noIcon, "P", "\0x11", plain,
+        "Redraw", noIcon, "R", noMark, plain,
+        "Previous Message", noIcon, "P", noMark, plain,
         "Reposition Windows", noIcon, "N", noMark, plain,
         "Tile Mode", noIcon, "T", noMark, plain,
         "-", noIcon, noKey, noMark, plain,
@@ -238,14 +238,14 @@ resource 'MENU' (200) {
     enabled,
     "wizard",
     {
-        "Attributes", noIcon, noKey, "x", plain,
-        "Detect Unseen", noIcon, noKey, "e", plain,
-        "Floor Map", noIcon, noKey, "f", plain,
-        "Generate Monster", noIcon, noKey, "g", plain,
-        "Identify", noIcon, noKey, "i", plain,
-        "Locations", noIcon, noKey, "o", plain,
-        "Level Teleport", noIcon, noKey, "v", plain,
-        "Wish", noIcon, noKey, "w", plain
+        "Attributes", noIcon, noKey, noMark, plain,
+        "Detect Unseen", noIcon, noKey, noMark, plain,
+        "Floor Map", noIcon, noKey, noMark, plain,
+        "Generate Monster", noIcon, noKey, noMark, plain,
+        "Identify", noIcon, noKey, noMark, plain,
+        "Locations", noIcon, noKey, noMark, plain,
+        "Level Teleport", noIcon, noKey, noMark, plain,
+        "Wish", noIcon, noKey, noMark, plain
     }
 };
 
@@ -443,13 +443,13 @@ resource 'MENU' (209) {
     enabled,
     "current",
     {
-        "Weapon", noIcon, noKey, ")", plain,
-        "Armor", noIcon, noKey, "[", plain,
-        "Rings", noIcon, noKey, "=", plain,
-        "Amulet", noIcon, noKey, "\"", plain,
-        "Tools", noIcon, noKey, "(", plain,
-        "Gold", noIcon, noKey, "$", plain,
-        "Spells", noIcon, noKey, "+", plain
+        "Weapon", noIcon, noKey, noMark, plain,
+        "Armor", noIcon, noKey, noMark, plain,
+        "Rings", noIcon, noKey, noMark, plain,
+        "Amulet", noIcon, noKey, noMark, plain,
+        "Tools", noIcon, noKey, noMark, plain,
+        "Gold", noIcon, noKey, noMark, plain,
+        "Spells", noIcon, noKey, noMark, plain
     }
 };
 
