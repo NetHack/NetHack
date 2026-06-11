@@ -937,14 +937,15 @@ macmap_grow_event(NhWindow *map, long newSize)
     if (!allocate_backing()) {
         mac_dprintf("macmap: backing realloc failed on grow\n");
     }
-    /* recenter on the hero, then repaint from cache */
+    /* recenter on the hero, then repaint from cache; allocate_backing
+       just wiped the backing, so the repaint must be full and
+       unconditional (cliparound/scroll_viewport_to skip an unchanged
+       scroll) */
     if (u.ux > 0 || u.uy > 0) {
-        gMap.scroll_col = 1;     /* col 0 unused */
-        gMap.scroll_row = 0;
-        macmap_cliparound(map, (int) u.ux, (int) u.uy);
-    } else {
-        repaint_full_viewport();
+        recompute_scroll_for_center((int) u.ux, (int) u.uy,
+                                    &gMap.scroll_col, &gMap.scroll_row);
     }
+    repaint_full_viewport();
     update_scroll_controls();
     macmap_flush();   /* a grow isn't followed by a core frame flush */
 }
