@@ -32,6 +32,12 @@ extern void    mactile_blit_to(GWorldPtr dst,
                                 int tile_idx,
                                 short dst_x, short dst_y);
 
+/* Batch variant: blit into the CURRENT GWorld, already locked by the
+   caller (macmap's cell batch). No SetGWorld/LockPixels -- a nested
+   unlock would clear the caller's lock. */
+extern void    mactile_blit_in_place(int tile_idx,
+                                      short dst_x, short dst_y);
+
 /* Blit a single tile into a destination Window at (dst_x, dst_y).
    The function manages SetPort save/restore internally. */
 extern void    mactile_blit_to_window(WindowPtr dst,
