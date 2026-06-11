@@ -3115,14 +3115,16 @@ HandleClick(EventRecord *theEvent)
                 if (aWin == theWindows + WIN_MESSAGE)
                     r.top += SBARHEIGHT;
                 l = GrowWindow(theWindow, theEvent->where, &r);
-                SizeWindow(theWindow, l & 0xffff, l >> 16, FALSE);
-                SaveWindowSize(theWindow);
-                SetPortWindowPort(theWindow);
-                GetWindowPortBounds(theWindow, &r);
-                OffsetRect(&r, -r.left, -r.top);
-                InvalWindowRect(theWindow, &r);
-                if (aWin->scrollBar) {
-                    DrawScrollbar(aWin);
+                if (l) { /* 0 = no size change; don't collapse to 0x0 */
+                    SizeWindow(theWindow, l & 0xffff, l >> 16, FALSE);
+                    SaveWindowSize(theWindow);
+                    SetPortWindowPort(theWindow);
+                    GetWindowPortBounds(theWindow, &r);
+                    OffsetRect(&r, -r.left, -r.top);
+                    InvalWindowRect(theWindow, &r);
+                    if (aWin->scrollBar) {
+                        DrawScrollbar(aWin);
+                    }
                 }
             }
         } else {

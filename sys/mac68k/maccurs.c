@@ -118,6 +118,11 @@ RetrieveSize(short kind, short top, short left, short *height, short *width)
     if (!savePos[kind].validSize) {
         return 0;
     }
+    /* reject degenerate sizes (e.g. from prefs written by builds that
+       saved GrowWindow's 0-on-no-change result) */
+    if (savePos[kind].width <= 0 || savePos[kind].height <= 0) {
+        return 0;
+    }
     *width = savePos[kind].width;
     *height = savePos[kind].height;
     p.h = left + *width;
