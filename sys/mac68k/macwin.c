@@ -2686,7 +2686,9 @@ MenwSelectCmd(NhWindow *wind, char ch)
         int cur, want;
         if (page) {
             int row = (*wind->menuInfo)[i].line - wind->scrollPos;
-            if (row <= 0 || row > vis_rows)
+            /* fully visible rows are 0 .. vis_rows-1; row 0 is the top
+               line on screen, row == vis_rows at best a partial row */
+            if (row < 0 || row >= vis_rows)
                 continue;   /* not on the visible page */
         }
         cur  = (ListItemSelected(wind, i) >= 0);
@@ -3116,7 +3118,9 @@ MenwUpdate(NhWindow *wind)
             if (cnt < 0L)
                 continue; /* no typed count: whole stack, nothing shown */
             line = (*wind->menuInfo)[itm].line;
-            if (line <= wind->scrollPos || line > wind->y_size)
+            /* top visible row is line == scrollPos (row 0), as in
+               MenwDrawStyled/MenwKey/ListCoordinateToItem */
+            if (line < wind->scrollPos || line > wind->y_size)
                 continue; /* same visibility window as the inversion loop */
             Sprintf(cbuf, "x %ld", cnt);
             clen = (short) strlen(cbuf);
@@ -3130,7 +3134,7 @@ MenwUpdate(NhWindow *wind)
     for (i = 0; i < wind->miSelLen; i++) {
         mi = &(*wind->menuInfo)[(*wind->menuSelected)[i]];
         line = mi->line;
-        if (line > wind->scrollPos && line <= wind->y_size)
+        if (line >= wind->scrollPos && line <= wind->y_size)
             ToggleMenuSelect(wind, line - wind->scrollPos);
     }
     HUnlock((Handle) wind->menuInfo);
