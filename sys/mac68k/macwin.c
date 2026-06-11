@@ -2281,8 +2281,10 @@ BaseClick(NhWindow *wind, Point pt, UInt32 modifiers)
             return;   /* click handled by the scrollbars/grow box */
         macmap_pixel_to_cell(wind, pt, &col, &row);
     } else {
-        col = pt.h / wind->char_width + 1;
-        row = pt.v / wind->row_height;
+        /* only the map window can translate a click into a dungeon
+           position; the other window reaching here is the status
+           window, whose rows 0-2 must not become move commands */
+        return;
     }
     clicked_mod = (modifiers & shiftKey) ? CLICK_2 : CLICK_1;
     clicked_pos.h = (short) col;
