@@ -143,6 +143,11 @@ pool_free(void *p)
         return;
     }
     c = (int) (h->tag & 0xFFUL);
+    if (c >= NCLASSES) {             /* magic collision on a foreign block:
+                                        never index g_free[] out of range */
+        __real_free(p);
+        return;
+    }
     *(void **) p = g_free[c];        /* push back */
     g_free[c] = p;
 }
@@ -183,6 +188,9 @@ __wrap_realloc(void *p, size_t n)
         return __real_realloc(p, n);
 
     oc = (int) (h->tag & 0xFFUL);
+    if (oc != (int) HDR_BIG && oc >= NCLASSES) /* magic collision: foreign
+                                                  block, h->size is garbage */
+        return __real_realloc(p, n);
     nc = class_for(n);
     if (oc != (int) HDR_BIG && nc == oc) {  /* same class: grow/shrink in place */
         h->size = n;
