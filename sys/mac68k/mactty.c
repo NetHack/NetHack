@@ -188,6 +188,10 @@ create_tty(WindowRef *window, short resource_id, Boolean in_color)
             CloseWindow(*window);
         } else {
             DisposeWindow(*window);
+            /* don't leave *window dangling: the caller's B&W retry
+               would treat it as pre-allocated window storage and
+               build a WindowRecord inside the freed block */
+            *window = (WindowRef) 0;
         }
         return mem_err();
     }
