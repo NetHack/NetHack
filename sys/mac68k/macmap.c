@@ -38,6 +38,7 @@ typedef struct {
     short          tile_cache[ROWNO][COLNO];
     unsigned char  text_cache[ROWNO][COLNO];
     unsigned char  text_color[ROWNO][COLNO];
+    unsigned char  pet_cache[ROWNO][COLNO];   /* MG_PET, for hilite_pet */
     /* software cursor for getpos/farlook: track the framed cell to un-frame it */
     Boolean        cursor_on;
     short          cursor_x, cursor_y;
@@ -497,6 +498,10 @@ draw_cell_text(int col, int row, char ch, int color)
         set_nh_color(color);
         MoveTo(dx, dy + fi.ascent);    /* baseline = top + ascent (no top clip) */
         DrawChar(ch);
+        if (iflags.hilite_pet && gMap.pet_cache[row][col]) {
+            RGBForeColor(&white);      /* pet ring; map bg is black */
+            FrameRect(&cell);
+        }
         RGBForeColor(&black);          /* restore fg=black/bg=white so a */
         RGBBackColor(&white);          /* later tile blit isn't tinted */
 
@@ -514,10 +519,69 @@ draw_cell_text(int col, int row, char ch, int color)
         set_nh_color(color);
         MoveTo(dx, dy + fi.ascent);
         DrawChar(ch);
+        if (iflags.hilite_pet && gMap.pet_cache[row][col]) {
+            RGBForeColor(&white);      /* pet ring; map bg is black */
+            FrameRect(&cell);
+        }
         RGBForeColor(&black);
         RGBBackColor(&white);
         SetPort(saveP);
     }
+}
+
+/* Pet highlight ring for tile mode (hilite_pet), like the farlook cursor.
+   Backing variant: bright sheet color via RGBForeColor (safe offscreen);
+   window variant: PmForeColor by index, like draw_cursor_border. */
+static void
+draw_pet_ring_backing(const Rect *cell)
+{
+    PixMapHandle pm = GetGWorldPixMap(gMap.backing);
+    RGBColor ring = { 0xFFFF, 0xFFFF, 0xFFFF };
+    RGBColor black = { 0, 0, 0 };
+    short ci = mactile_cursor_clut_index();
+    CTabHandle ct = mactile_sheet_ctable();
+
+    if (!LockPixels(pm))
+        return;
+    if (ci >= 0 && ct && *ct)
+        ring = (**ct).ctTable[ci].rgb;
+    GWorldPtr saveW; GDHandle saveD;
+    GetGWorld(&saveW, &saveD);
+    SetGWorld(gMap.backing, NULL);
+    PenState savePen; GetPenState(&savePen);
+    PenSize(1, 1);
+    PenMode(srcCopy);
+    RGBForeColor(&ring);
+    FrameRect(cell);
+    RGBForeColor(&black);
+    SetPenState(&savePen);
+    SetGWorld(saveW, saveD);
+    UnlockPixels(pm);
+}
+
+static void
+draw_pet_ring_window(const Rect *cell)
+{
+    RGBColor black = { 0, 0, 0 };
+    GrafPtr saveP; GetPort(&saveP);
+    SetPortWindowPort(gMap.owner->its_window);
+    PenState savePen; GetPenState(&savePen);
+    PenSize(1, 1);
+    PenMode(srcCopy);
+    if (gMap.palette) {
+        short ci = mactile_cursor_clut_index();
+        if (ci >= 0) {
+            PmForeColor(ci);
+            FrameRect(cell);
+        }
+    } else {
+        RGBColor white = { 0xFFFF, 0xFFFF, 0xFFFF };
+        RGBForeColor(&white);
+        FrameRect(cell);
+    }
+    RGBForeColor(&black);
+    SetPenState(&savePen);
+    SetPort(saveP);
 }
 
 static void
@@ -534,12 +598,16 @@ draw_cell_tile(int col, int row, int tile_idx)
         return;   /* off-viewport, cached only */
     }
 
+    Rect cell = { dy, dx, dy + gMap.cell_h, dx + gMap.cell_w };
     if (gMap.backing) {
         mactile_blit_to(gMap.backing, tile_idx, dx, dy);
-        Rect cell = { dy, dx, dy + gMap.cell_h, dx + gMap.cell_w };
+        if (iflags.hilite_pet && gMap.pet_cache[row][col])
+            draw_pet_ring_backing(&cell);
         mark_dirty(&cell);
     } else {
         mactile_blit_to_window(gMap.owner->its_window, tile_idx, dx, dy);
+        if (iflags.hilite_pet && gMap.pet_cache[row][col])
+            draw_pet_ring_window(&cell);
     }
 }
 
@@ -663,6 +731,7 @@ macmap_print_glyph(NhWindow *map, int x, int y,
     gMap.text_cache[y][x] = (unsigned char) ch;
     gMap.text_color[y][x] = (unsigned char) color;
     gMap.tile_cache[y][x] = (short) idx;
+    gMap.pet_cache[y][x] = (gi->gm.glyphflags & MG_PET) ? 1 : 0;
 
     if (gMap.tile_mode)
         draw_cell_tile(x, y, idx);
@@ -726,6 +795,7 @@ macmap_clear(NhWindow *map)
             gMap.text_cache[r][c] = ' ';
             gMap.text_color[r][c] = 8; /* NO_COLOR */
             gMap.tile_cache[r][c] = -1;  /* -1 = no glyph (tile 0 is the ant) */
+            gMap.pet_cache[r][c] = 0;
         }
     /* reset scroll so the next hero print_glyph recenters (col 0 unused) */
     gMap.scroll_col = 1;
