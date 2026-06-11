@@ -14,6 +14,11 @@
    util/tile2pict (TILE_X/TILE_Y in win/share/tile.h, currently 16). */
 #define MACTILE_DIM 16
 
+/* Size of the pmTolerant palette macmap attaches to the map window at
+   8bpp. NewPalette copies the first n sheet-CLUT entries, so anything
+   handed to PmForeColor must stay below this. */
+#define TILE_PALETTE_ENTRIES 32
+
 extern Boolean mactile_available(void);    /* depth >= 4bpp */
 extern Boolean mactile_init(void);         /* load PICT 1000/1001 into GWorld */
 

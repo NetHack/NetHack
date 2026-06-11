@@ -115,6 +115,11 @@ mactile_cursor_clut_index(void)
             short n = (**ct).ctSize;      /* ctSize is (count - 1) */
             long  bestscore = -0x7FFFFFFFL;
             short i;
+            /* the result feeds PmForeColor against the map window's
+               TILE_PALETTE_ENTRIES-entry palette; an index beyond it
+               would read past the palette's pmInfo array */
+            if (n > TILE_PALETTE_ENTRIES - 1)
+                n = TILE_PALETTE_ENTRIES - 1;
             for (i = 0; i <= n; i++) {
                 RGBColor c = (**ct).ctTable[i].rgb;
                 if (c.red > 0xC000 && c.green > 0xC000 && c.blue > 0xC000)

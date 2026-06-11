@@ -401,8 +401,7 @@ macmap_set_mode(NhWindow *map, Boolean tile_mode)
            (tolerance 0x1000 of 0xFFFF, ~6%); colors beyond the first entries
            map to their nearest match in the default CLUT.  32 entries -- not
            256 -- so reserved system slots and other windows' colors survive. */
-#define TILE_PALETTE_ENTRIES 32
-#define TILE_PALETTE_TOLERANCE 0x1000
+#define TILE_PALETTE_TOLERANCE 0x1000   /* TILE_PALETTE_ENTRIES: mactile.h */
         if (mactile_sheet_depth() == 8) {
             if (!gMap.palette) {
                 CTabHandle ct = mactile_sheet_ctable();
