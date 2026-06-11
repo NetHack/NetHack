@@ -2755,6 +2755,39 @@ record_menu_line_style(NhWindow *aWin, short from, short to, int attr, int color
     HUnlock(aWin->menuStyle);
 }
 
+/* Exclude the scrollbar strip from the current clip while drawing
+   window text, preserving any update clip.  Returns the saved clip
+   (hand it to restore_clip), or nil when memory is too tight -- the
+   caller then simply draws unclipped. */
+static RgnHandle
+clip_exclude_scrollbar(const Rect *strip)
+{
+    RgnHandle h, tmp;
+
+    if (!(h = NewRgn()))
+        return (RgnHandle) 0;
+    tmp = NewRgn();
+    if (!tmp) {
+        DisposeRgn(h);
+        return (RgnHandle) 0;
+    }
+    GetClip(h);
+    RectRgn(tmp, strip);
+    DiffRgn(h, tmp, tmp);
+    SetClip(tmp);
+    DisposeRgn(tmp);
+    return h;
+}
+
+static void
+restore_clip(RgnHandle saved)
+{
+    if (saved) {
+        SetClip(saved);
+        DisposeRgn(saved);
+    }
+}
+
 /* Draw a menu's text line-by-line with per-line face (bold headings) and color
    (menucolors), replacing TETextBox so each line can have its own style. */
 static void
@@ -2779,20 +2812,8 @@ MenwDrawStyled(NhWindow *wind)
     draw_growicon_vert_only(wind->its_window);
     DrawControls(wind->its_window);
 
-    /* clip text to exclude the scrollbar strip, preserving any update clip */
-    if (vis && (h = NewRgn())) {
-        RgnHandle tmp = NewRgn();
-        if (!tmp) {
-            DisposeRgn(h);
-            h = (RgnHandle) 0;
-        } else {
-            GetClip(h);
-            RectRgn(tmp, &r2);
-            DiffRgn(h, tmp, tmp);
-            SetClip(tmp);
-            DisposeRgn(tmp);
-        }
-    }
+    if (vis)
+        h = clip_exclude_scrollbar(&r2);
 
     vis_rows = (r.bottom - r.top) / wind->row_height + 1;
     TextMode(srcOr);
@@ -2840,10 +2861,7 @@ MenwDrawStyled(NhWindow *wind)
         HUnlock(wind->menuStyle);
     HUnlock(wind->windowText);
 
-    if (h) {
-        SetClip(h);
-        DisposeRgn(h);
-    }
+    restore_clip(h);
 }
 
 static void
@@ -2950,19 +2968,8 @@ TextUpdate(NhWindow *wind)
     DrawControls(wind->its_window);
 
     h = (RgnHandle) 0;
-    if (vis && (h = NewRgn())) {
-        RgnHandle tmp = NewRgn();
-        if (!tmp) {
-            DisposeRgn(h);
-            h = (RgnHandle) 0;
-        } else {
-            GetClip(h);
-            RectRgn(tmp, &r2);
-            DiffRgn(h, tmp, tmp);
-            SetClip(tmp);
-            DisposeRgn(tmp);
-        }
-    }
+    if (vis)
+        h = clip_exclude_scrollbar(&r2);
     if (r.right < MIN_RIGHT)
         r.right = MIN_RIGHT;
     r.top -= wind->scrollPos * wind->row_height;
@@ -2976,10 +2983,7 @@ TextUpdate(NhWindow *wind)
         TETextBox(*wind->windowText, tlen, &r, teJustLeft);
     }
     HUnlock(wind->windowText);
-    if (h) {
-        SetClip(h);
-        DisposeRgn(h);
-    }
+    restore_clip(h);
     return;
 }
 
