@@ -817,6 +817,30 @@ macmap_update_event(NhWindow *map)
     GrafPtr saveP; GetPort(&saveP);
     SetPort(map->its_window);
 
+    /* erase only the margins the repaint won't cover; HandleUpdate no
+       longer pre-erases the whole map window (a white flash the blit
+       immediately overwrote) */
+    {
+        Rect wr, covered, m;
+        GetWindowPortBounds(map->its_window, &wr);
+        OffsetRect(&wr, -wr.left, -wr.top);
+        if (gMap.backing)
+            covered = ((CGrafPtr) gMap.backing)->portRect;
+        else
+            map_content_bounds(&covered);
+        if (wr.right > covered.right) {
+            m = wr;
+            m.left = covered.right;
+            EraseRect(&m);
+        }
+        if (wr.bottom > covered.bottom) {
+            m = wr;
+            m.top = covered.bottom;
+            m.right = covered.right;
+            EraseRect(&m);
+        }
+    }
+
     if (gMap.backing) {
         Rect bbox; bbox = ((CGrafPtr) gMap.backing)->portRect;
         Rect dst = bbox;
