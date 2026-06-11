@@ -45,6 +45,7 @@ static void GeneralCursor(EventRecord *, WindowPtr, RgnHandle);
 
 static void TextUpdate(NhWindow *wind);
 static void MenwUpdate(NhWindow *wind);
+static void menw_clear_pending(NhWindow *wind);
 static void record_menu_line_style(NhWindow *, short, short, int, int);
 
 NhWindow *theWindows = (NhWindow *) 0;
@@ -706,6 +707,9 @@ got1:
     aWin->scrollBar = (ControlHandle) 0;
     aWin->menuInfo = 0;
     aWin->menuSelected = 0;
+    aWin->menuCounts = 0;
+    aWin->pendingCount = 0L;
+    aWin->hasPending = 0;
     aWin->menuStyle = 0;
     aWin->miLen = 0;
     aWin->miSize = 0;
@@ -943,10 +947,15 @@ mac_clear_nhwindow(winid win)
             DisposeHandle((Handle) aWin->menuSelected);
             aWin->menuSelected = NULL;
         }
+        if (aWin->menuCounts) {
+            DisposeHandle((Handle) aWin->menuCounts);
+            aWin->menuCounts = NULL;
+        }
         if (aWin->menuStyle) {
             DisposeHandle(aWin->menuStyle);
             aWin->menuStyle = NULL;
         }
+        menw_clear_pending(aWin);
         aWin->menuChar = 'a';
         aWin->miSelLen = 0;
         aWin->miLen = 0;
@@ -1452,6 +1461,22 @@ mac_destroy_nhwindow(winid win)
             DisposeHandle(aWin->menuStyle);
             aWin->menuStyle = (Handle) 0;
         }
+        /* keep the menu-handle lifecycle symmetric with mac_clear_nhwindow;
+           without this, a menu window destroyed without being recycled
+           leaked menuInfo/menuSelected (and now menuCounts) */
+        if (aWin->menuInfo) {
+            DisposeHandle((Handle) aWin->menuInfo);
+            aWin->menuInfo = NULL;
+        }
+        if (aWin->menuSelected) {
+            DisposeHandle((Handle) aWin->menuSelected);
+            aWin->menuSelected = NULL;
+        }
+        if (aWin->menuCounts) {
+            DisposeHandle((Handle) aWin->menuCounts);
+            aWin->menuCounts = NULL;
+        }
+        aWin->miSize = aWin->miLen = aWin->miSelLen = 0;
         aWin->its_window = (WindowPtr) 0;
         aWin->windowText = (Handle) 0;
     }
@@ -1514,6 +1539,12 @@ ToggleMenuListItemSelected(NhWindow *aWin, short item)
         short *mi = &(*aWin->menuSelected)[i];
         aWin->miSelLen--;
         memcpy(mi, mi + 1, (aWin->miSelLen - i) * sizeof(short));
+        if (aWin->menuCounts) {
+            /* deselecting an item forgets its typed count */
+            HLock((char **) aWin->menuCounts);
+            (*aWin->menuCounts)[item] = -1L;
+            HUnlock((char **) aWin->menuCounts);
+        }
     }
     HUnlock((char **) aWin->menuSelected);
 }
@@ -1998,6 +2029,16 @@ mac_add_menu(winid win, const glyph_info *glyphinfo UNUSED,
                 error("Can't alloc menu select handle");
                 return;
             }
+            aWin->menuCounts =
+                (long **) NewHandle(sizeof(long) * kMenuSizeBump);
+            if (!aWin->menuCounts) {
+                DisposeHandle((Handle) aWin->menuInfo);
+                aWin->menuInfo = NULL;
+                DisposeHandle((Handle) aWin->menuSelected);
+                aWin->menuSelected = NULL;
+                error("Can't alloc menu count handle");
+                return;
+            }
             aWin->miSize = kMenuSizeBump;
         }
 
@@ -2015,6 +2056,15 @@ mac_add_menu(winid win, const glyph_info *glyphinfo UNUSED,
                 error("Can't resize menu select handle");
                 return;
             }
+            SetHandleSize((Handle) aWin->menuCounts,
+                          sizeof(long) * (aWin->miLen + kMenuSizeBump));
+            if (MemError()) {
+                error("Can't resize menu count handle");
+                return;
+            }
+            /* on any MemError return above, miSize is deliberately NOT
+               bumped: the handles keep their old size and miLen < miSize
+               stays valid, so a later mac_add_menu retries the grow */
             aWin->miSize += kMenuSizeBump;
         }
 
@@ -2031,7 +2081,20 @@ mac_add_menu(winid win, const glyph_info *glyphinfo UNUSED,
         str = locStr;
         HLock((char **) aWin->menuInfo);
         HLock((char **) aWin->menuSelected);
+        HLock((char **) aWin->menuCounts);
+        /* NB dual use of menuSelected: during menu build the write below
+           treats it as per-ITEM preselect flags, but at selection time
+           ToggleMenuListItemSelected reuses the same array as the packed
+           list of selected item INDICES (read back by mac_select_menu).
+           No code ever converts the flag form into the list form --
+           mac_start_menu's mac_clear_nhwindow resets miSelLen to 0, so
+           selection always starts from an empty list and this flag write
+           is simply overwritten as items get selected (i.e. preselected
+           entries are not honored; behavior inherited from the original
+           Mac port).  menuCounts is keyed by item index in BOTH phases
+           and is therefore immune to that reinterpretation. */
         (*aWin->menuSelected)[aWin->miLen] = preselected;
+        (*aWin->menuCounts)[aWin->miLen] = -1L;
         item = &(*aWin->menuInfo)[aWin->miLen];
         aWin->miLen++;
         item->id = *any;
@@ -2040,6 +2103,7 @@ mac_add_menu(winid win, const glyph_info *glyphinfo UNUSED,
         item->line = aWin->y_size;
         HUnlock((char **) aWin->menuInfo);
         HUnlock((char **) aWin->menuSelected);
+        HUnlock((char **) aWin->menuCounts);
     } else
         str = inStr;
 
@@ -2080,6 +2144,7 @@ mac_select_menu(winid win, int how, menu_item **selected_list)
         if (c == CHAR_ESC) {
             /* deselect everything */
             aWin->miSelLen = 0;
+            menw_clear_pending(aWin);
             HideWindow(theWin);
             *selected_list = 0;
             inSelect = WIN_ERR;
@@ -2091,6 +2156,7 @@ mac_select_menu(winid win, int how, menu_item **selected_list)
         }
     }
 
+    menw_clear_pending(aWin);
     HideWindow(theWin);
 
     if (aWin->miSelLen) {
@@ -2100,14 +2166,20 @@ mac_select_menu(winid win, int how, menu_item **selected_list)
             (menu_item *) alloc(aWin->miSelLen * sizeof(menu_item));
         HLock((char **) aWin->menuInfo);
         HLock((char **) aWin->menuSelected);
+        if (aWin->menuCounts)
+            HLock((char **) aWin->menuCounts);
         for (c = 0; c < aWin->miSelLen; c++) {
-            mi = &(*aWin->menuInfo)[(*aWin->menuSelected)[c]];
+            short itm = (*aWin->menuSelected)[c];
+
+            mi = &(*aWin->menuInfo)[itm];
             mp->item = mi->id;
-            mp->count = -1L;
+            mp->count = aWin->menuCounts ? (*aWin->menuCounts)[itm] : -1L;
             mp++;
         }
         HUnlock((char **) aWin->menuInfo);
         HUnlock((char **) aWin->menuSelected);
+        if (aWin->menuCounts)
+            HUnlock((char **) aWin->menuCounts);
     } else
         *selected_list = 0;
 
@@ -2537,6 +2609,48 @@ macUpdateMessage(EventRecord *theEvent, WindowPtr theWindow)
  *	Menu windows
  */
 
+/* Typed-count pending display: the title becomes "<original> - count: N".
+   mac_select_menu is modal (one menu inSelect at a time), so one static
+   saved title plus its owner suffices. */
+static Str255 menwSavedTitle;
+static NhWindow *menwTitleOwner = (NhWindow *) 0;
+
+/* Reflect wind's pending count in the window title; restore the original
+   title when the pending count is gone. */
+static void
+menw_show_pending(NhWindow *wind)
+{
+    if (!wind->its_window)
+        return;
+    if (wind->hasPending) {
+        char cbuf[256 + 32];
+        Str255 pbuf;
+        int len;
+
+        if (menwTitleOwner != wind) {
+            GetWTitle(wind->its_window, menwSavedTitle);
+            menwTitleOwner = wind;
+        }
+        len = menwSavedTitle[0];
+        memcpy(cbuf, (char *) &menwSavedTitle[1], len);
+        Sprintf(&cbuf[len], " - count: %ld", wind->pendingCount);
+        C2P(cbuf, pbuf); /* truncates to 255 */
+        SetWTitle(wind->its_window, pbuf);
+    } else if (menwTitleOwner == wind) {
+        SetWTitle(wind->its_window, menwSavedTitle);
+        menwTitleOwner = (NhWindow *) 0;
+    }
+}
+
+/* Drop any pending typed count and restore the window title. */
+static void
+menw_clear_pending(NhWindow *wind)
+{
+    wind->pendingCount = 0L;
+    wind->hasPending = 0;
+    menw_show_pending(wind);
+}
+
 /* Bulk selection commands for a PICK_ANY menu, mirroring the tty/Amiga menu
    keys (standard defaults): '.' select all, '-' deselect all, '@' invert all;
    ',' '\' '~' do the same for just the visible page. Updates the selection data
@@ -2597,19 +2711,66 @@ MenwKey(NhWindow *wind, char ch)
     if (!ch)
         return;
     if (ClosingWindowChar(ch)) {
+        if (wind)
+            menw_clear_pending(wind);
         AddToKeyQueue(CHAR_CR, 1);
         return;
     }
 
     if (!wind || !wind->menuInfo)
         return;
-    if (MenwSelectCmd(wind, ch))
+    if (MenwSelectCmd(wind, ch)) {
+        menw_clear_pending(wind);
         return;
+    }
+
+    /* typed count: digits accumulate, backspace edits (tty parity --
+       tty also allows a count on PICK_ONE menus) */
+    if (wind->how != PICK_NONE && ch >= '0' && ch <= '9') {
+        wind->pendingCount = wind->pendingCount * 10 + (ch - '0');
+        if (wind->pendingCount > 999999L)
+            wind->pendingCount = 999999L;
+        wind->hasPending = 1;
+        menw_show_pending(wind);
+        return;
+    }
+    if (ch == CHAR_BS && wind->hasPending) {
+        wind->pendingCount /= 10;
+        if (!wind->pendingCount)
+            wind->hasPending = 0;
+        menw_show_pending(wind);
+        return;
+    }
+
     HLock((char **) wind->menuInfo);
     for (i = 0, mi = *wind->menuInfo; i < wind->miLen; i++, mi++) {
         if (mi->accelerator == ch) {
-            ToggleMenuListItemSelected(wind, i);
-            if (mi->line >= wind->scrollPos && mi->line <= wind->y_size) {
+            /* count semantics follow tty's toggle_menu_curr: count > 0
+               (re)selects with that count (re-press replaces it, keeps the
+               selection); count 0 deselects */
+            Boolean wasSelected = (ListItemSelected(wind, i) >= 0);
+            Boolean toggled = true;
+
+            if (wind->hasPending && wind->pendingCount > 0L
+                && wind->menuCounts) {
+                if (!wasSelected)
+                    ToggleMenuListItemSelected(wind, i);
+                else
+                    toggled = false; /* already hilited; count update only */
+                HLock((char **) wind->menuCounts);
+                (*wind->menuCounts)[i] = wind->pendingCount;
+                HUnlock((char **) wind->menuCounts);
+            } else if (wind->hasPending && !wind->pendingCount) {
+                if (wasSelected)
+                    ToggleMenuListItemSelected(wind, i); /* count 0: off */
+                else
+                    toggled = false; /* count 0 on unselected: no-op */
+            } else {
+                ToggleMenuListItemSelected(wind, i);
+            }
+            menw_clear_pending(wind);
+            if (toggled && mi->line >= wind->scrollPos
+                && mi->line <= wind->y_size) {
                 SetPortWindowPort(wind->its_window);
                 ToggleMenuSelect(wind, mi->line - wind->scrollPos);
             }

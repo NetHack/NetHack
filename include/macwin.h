@@ -102,6 +102,10 @@ typedef struct NhWindow {
     MacMHMenuItem **menuInfo; /* Used by menus (array handle) */
     char menuChar;            /* next menu accelerator to use */
     short **menuSelected;     /* list of selected elements from list */
+    long **menuCounts;        /* per-ITEM typed counts (-1 = whole stack);
+                                 lifecycle mirrors menuSelected */
+    long pendingCount;        /* typed count being accumulated in MenwKey */
+    char hasPending;          /* nonzero while pendingCount is live */
     short miSelLen;           /* number of items selected */
     short how;                /* menu mode */
     Handle menuStyle;         /* per-line {attr,color} bytes for styled menu draw */
