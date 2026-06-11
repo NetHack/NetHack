@@ -1988,7 +1988,10 @@ mac_putstr(winid win, int attr, const char *str)
 
     aWin->windowTextLen += slen;
 
-    if (ch != CHAR_CR) {
+    /* terminate the line unless the text already ended with CR/LF (the
+       loop above exits with ch == 0, so test the last STORED byte; an
+       empty string still gets a CR -- a deliberate blank line) */
+    if (slen == 0 || (*(aWin->windowText))[len + slen - 1] != CHAR_CR) {
         (*(aWin->windowText))[len + slen] = CHAR_CR;
         aWin->windowTextLen++;
         aWin->y_curs++;
