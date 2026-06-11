@@ -37,19 +37,6 @@ static const enum statusfields fieldorder[2][15] = {
       BL_FLUSH },
 };
 
-/* same conditions, same order, as genl_status_update */
-static const struct {
-    unsigned long mask;
-    const char *text;
-} cond_list[] = {
-    { BL_MASK_STONE,    " Stone" },     { BL_MASK_SLIME,    " Slime" },
-    { BL_MASK_STRNGL,   " Strngl" },    { BL_MASK_FOODPOIS, " FoodPois" },
-    { BL_MASK_TERMILL,  " TermIll" },   { BL_MASK_BLIND,    " Blind" },
-    { BL_MASK_DEAF,     " Deaf" },      { BL_MASK_STUN,     " Stun" },
-    { BL_MASK_CONF,     " Conf" },      { BL_MASK_HALLU,    " Hallu" },
-    { BL_MASK_LEV,      " Lev" },       { BL_MASK_FLY,      " Fly" },
-    { BL_MASK_RIDE,     " Ride" },
-};
 
 /* TRUE once mac_status_init has run and WIN_STATUS is bound to _mt_window;
    gates the update-event/flush rerouting in macwin.c */
@@ -229,19 +216,26 @@ stat_draw_str(const char *str, int packed, short top, short ascent)
     TextFace(normal);
 }
 
-/* conditions get per-condition color/attr from the colormasks array */
+/* per-condition color/attr from colormasks; iterate the core conditions[]
+   via cond_idx[] (severity order) rather than a private copy that drifts
+   from botl.c */
 static void
 stat_draw_conds(short top, short ascent)
 {
-    int i, color, attr, packed;
+    int i, k, color, attr, packed;
+    char buf[32];
 
-    for (i = 0; i < (int) SIZE(cond_list); i++) {
-        if (!(stat_cond_bits & cond_list[i].mask))
+    for (k = 0; k < CONDITION_COUNT; k++) {
+        i = cond_idx[k];
+        if (!(stat_cond_bits & (unsigned long) conditions[i].mask))
             continue;
-        color = stat_condcolor(cond_list[i].mask, stat_colormasks);
-        attr = stat_condattr(cond_list[i].mask, stat_colormasks);
+        color = stat_condcolor((unsigned long) conditions[i].mask,
+                               stat_colormasks);
+        attr = stat_condattr((unsigned long) conditions[i].mask,
+                             stat_colormasks);
         packed = (color & 0x00FF) | (attr << 8);
-        stat_draw_str(cond_list[i].text, packed, top, ascent);
+        Sprintf(buf, " %s", conditions[i].text[0]);
+        stat_draw_str(buf, packed, top, ascent);
     }
 }
 
