@@ -1010,6 +1010,21 @@ topl_resp_rect(int resp_idx, Rect *r)
     return;
 }
 
+/* Invalidate the yn-button strip (len button slots) and clear the
+   stored responses + default index; callers set new ones afterwards
+   if they need any. */
+static void
+invalidate_topl_buttons(int len)
+{
+    Rect frame;
+
+    topl_resp_rect(0, &frame);
+    frame.right = (BTN_IND + BTN_W) * len + BTN_IND;
+    InvalWindowRect(theWindows[WIN_MESSAGE].its_window, &frame);
+    memset(topl_resp, 0, sizeof topl_resp);
+    topl_def_idx = -1;
+}
+
 void
 enter_topl_mode(char *query)
 {
@@ -1017,15 +1032,8 @@ enter_topl_mode(char *query)
         return;
 
     /* Clear any leftover button state from a previous prompt */
-    if (topl_resp[0]) {
-        Rect frame;
-        int r_len = strlen(topl_resp);
-        topl_resp_rect(0, &frame);
-        frame.right = (BTN_IND + BTN_W) * r_len + BTN_IND;
-        InvalWindowRect(theWindows[WIN_MESSAGE].its_window, &frame);
-        memset(topl_resp, 0, sizeof topl_resp);
-        topl_def_idx = -1;
-    }
+    if (topl_resp[0])
+        invalidate_topl_buttons(strlen(topl_resp));
 
     putstr(WIN_MESSAGE, ATR_BOLD, query);
 
@@ -1074,14 +1082,8 @@ leave_topl_mode(char *answer) /* answer must have room for BUFSZ bytes */
     putstr(WIN_MESSAGE, ATR_BOLD, answer);
 
     /* Invalidate the button area so stale buttons get erased */
-    if (topl_resp[0]) {
-        Rect frame;
-        int r_len = strlen(topl_resp);
-        topl_resp_rect(0, &frame);
-        frame.right = (BTN_IND + BTN_W) * r_len + BTN_IND;
-        InvalWindowRect(aWin->its_window, &frame);
-        memset(topl_resp, 0, sizeof topl_resp);
-    }
+    if (topl_resp[0])
+        invalidate_topl_buttons(strlen(topl_resp));
 
     (*top_line)->viewRect.left += 10000;
     UndimMenuBar();
@@ -1248,7 +1250,6 @@ void
 topl_set_resp(char *resp, char def)
 {
     char *loc;
-    Rect frame;
     int r_len, r_len1;
 
     if (!resp) {
@@ -1261,12 +1262,8 @@ topl_set_resp(char *resp, char def)
     r_len1 = strlen(resp);
     r_len = strlen(topl_resp);
     if (r_len < r_len1)
-        r_len = r_len1;
-    topl_resp_rect(0, &frame);
-    frame.right = (BTN_IND + BTN_W) * r_len + BTN_IND;
-    InvalWindowRect(theWindows[WIN_MESSAGE].its_window, &frame);
-
-    memset(topl_resp, 0, sizeof topl_resp);
+        r_len = r_len1; /* cover both the old and the new strip */
+    invalidate_topl_buttons(r_len);
     strncpy(topl_resp, resp, sizeof topl_resp - 1);
     loc = strchr(topl_resp, def);
     topl_def_idx = loc ? loc - topl_resp : -1;
