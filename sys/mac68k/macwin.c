@@ -2875,24 +2875,34 @@ macKeyMenu(EventRecord *theEvent, WindowPtr theWindow)
     return;
 }
 
+/* Common scrollbar hit-test for menu/text window clicks.  Returns true
+   if the click landed in the visible scrollbar and was dispatched. */
+static Boolean
+click_in_scrollbar(EventRecord *theEvent, WindowPtr theWindow,
+                   NhWindow *aWin)
+{
+    short code;
+    Point p;
+    ControlHandle theBar;
+
+    if (!aWin->scrollBar || (**aWin->scrollBar).contrlVis == 0)
+        return false;
+    p = theEvent->where;
+    GlobalToLocal(&p);
+    code = FindControl(p, theWindow, &theBar);
+    if (!code)
+        return false;
+    DoScrollBar(p, code, theBar, aWin);
+    return true;
+}
+
 static void
 macClickMenu(EventRecord *theEvent, WindowRef theWindow)
 {
-    Point p;
     NhWindow *aWin = GetNhWin(theWindow);
 
-    if (aWin->scrollBar && ((** aWin->scrollBar).contrlVis != 0)) {
-        short code;
-        ControlHandle theBar;
-
-        p = theEvent->where;
-        GlobalToLocal(&p);
-        code = FindControl(p, theWindow, &theBar);
-        if (code) {
-            DoScrollBar(p, code, theBar, aWin);
-            return;
-        }
-    }
+    if (click_in_scrollbar(theEvent, theWindow, aWin))
+        return;
     MenwClick(aWin, theEvent->where);
 }
 
@@ -2983,19 +2993,7 @@ macKeyText(EventRecord *theEvent, WindowPtr theWindow)
 static void
 macClickText(EventRecord *theEvent, WindowPtr theWindow)
 {
-    NhWindow *aWin = GetNhWin(theWindow);
-
-    if (aWin->scrollBar && ((** aWin->scrollBar).contrlVis != 0)) {
-        short code;
-        Point p = theEvent->where;
-        ControlHandle theBar;
-
-        GlobalToLocal(&p);
-        code = FindControl(p, theWindow, &theBar);
-        if (code) {
-            DoScrollBar(p, code, theBar, aWin);
-        }
-    }
+    (void) click_in_scrollbar(theEvent, theWindow, GetNhWin(theWindow));
 }
 
 /**********************************************************************
