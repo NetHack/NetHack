@@ -859,10 +859,18 @@ mac_clear_nhwindow(winid win)
 {
     long l;
     Rect r;
-    NhWindow *aWin = &theWindows[win];
-    WindowPtr theWindow = aWin->its_window;
+    NhWindow *aWin;
+    WindowPtr theWindow;
 
-    if (win < 0 || win >= NUM_MACWINDOWS || !theWindow) {
+    /* bounds check BEFORE indexing: win can be WIN_ERR (-1) late in the
+       done() sequence (cf. the in_topl_mode comment) */
+    if (win < 0 || win >= NUM_MACWINDOWS) {
+        error("clr_win: Invalid win %d.", win);
+        return;
+    }
+    aWin = &theWindows[win];
+    theWindow = aWin->its_window;
+    if (!theWindow) {
         error("clr_win: Invalid win %d.", win);
         return;
     }
@@ -1337,10 +1345,18 @@ adjust_window_pos(NhWindow *aWin, short width, short height)
 void
 mac_display_nhwindow(winid win, boolean f)
 {
-    NhWindow *aWin = &theWindows[win];
-    WindowPtr theWindow = aWin->its_window;
+    NhWindow *aWin;
+    WindowPtr theWindow;
 
-    if (win < 0 || win >= NUM_MACWINDOWS || !theWindow) {
+    /* bounds check BEFORE indexing: win can be WIN_ERR (-1) late in the
+       done() sequence (cf. the in_topl_mode comment) */
+    if (win < 0 || win >= NUM_MACWINDOWS) {
+        error("disp_win: Invalid window %d.", win);
+        return;
+    }
+    aWin = &theWindows[win];
+    theWindow = aWin->its_window;
+    if (!theWindow) {
         error("disp_win: Invalid window %d.", win);
         return;
     }
@@ -1920,7 +1936,11 @@ mac_putstr(winid win, int attr, const char *str)
 void
 mac_curs(winid win, int x, int y)
 {
-    NhWindow *aWin = &theWindows[win];
+    NhWindow *aWin;
+
+    if (win < 0 || win >= NUM_MACWINDOWS)
+        return;
+    aWin = &theWindows[win];
 
     if (aWin->its_window == _mt_window) {
         tty_curs(win, x, y);
