@@ -2866,14 +2866,14 @@ static const RGBColor menuColorRGB[16] = {
     {0x0000, 0x0000, 0x0000}    /* 15 white (-> black on white bg) */
 };
 
-/* Map a NetHack menu attribute to a QuickDraw text face. Headings come through
-   as ATR_BOLD or (the default) ATR_INVERSE; both render bold here. */
+/* Map a NetHack menu attribute to a QuickDraw text face. ATR_INVERSE is not
+   a face: MenwDrawStyled renders it as a real inverse row (painted box with
+   white text), so only ATR_BOLD maps to bold here. */
 static short
 menu_attr_face(int attr)
 {
     switch (attr) {
-    case ATR_BOLD:
-    case ATR_INVERSE: return bold;
+    case ATR_BOLD:    return bold;
     case ATR_ULINE:   return underline;
     default:          return normal;
     }
@@ -2986,13 +2986,34 @@ MenwDrawStyled(NhWindow *wind)
                     color = sb[lineIdx * 2 + 1];
                 }
                 TextFace(menu_attr_face(attr));
-                mac_set_text_color(color);
+                if (attr == ATR_INVERSE) {
+                    /* real inverse, macstat's stat_draw_str pattern: paint
+                       the full row rect (same rect ToggleMenuSelect XORs,
+                       so selection inversion composes exactly) in the line
+                       color (NO_COLOR -> black), then white text -- the
+                       srcOr TextMode set above ORs the glyphs over the box.
+                       Classic ForeColor only: black/white never disturb the
+                       tile CLUT. */
+                    Rect lr = r;
+
+                    if (wind->scrollBar)
+                        lr.right -= SBARWIDTH;
+                    lr.top = row * wind->row_height;
+                    lr.bottom = lr.top + wind->row_height;
+                    mac_set_text_color(color);
+                    PaintRect(&lr);
+                    ForeColor(whiteColor);
+                } else {
+                    mac_set_text_color(color);
+                }
                 MoveTo(r.left, row * wind->row_height + wind->ascent_height);
                 /* pass the line via the pointer: lineStart can exceed
                    DrawText's 16-bit byte offset in a >32KB text window */
                 if (llen > 0x7FFF)
                     llen = 0x7FFF; /* DrawText byteCount is a short */
                 DrawText(base + lineStart, 0, (short) llen);
+                if (attr == ATR_INVERSE)
+                    ForeColor(blackColor);
             }
             lineStart = i + 1;
             lineIdx++;
@@ -3026,6 +3047,41 @@ MenwUpdate(NhWindow *wind)
         return;
     HLock((Handle) wind->menuInfo);
     HLock((Handle) wind->menuSelected);
+    /* typed-count display: "x N" right-aligned in each selected row that
+       has one, drawn BEFORE the selection inversion below so the XOR
+       includes it (count renders inverted with its row).  Font/size are
+       port state from window creation, same as MenwDrawStyled's text;
+       TextMode is still srcOr from MenwDrawStyled (black on white row). */
+    if (wind->menuCounts) {
+        Rect cr;
+        short right;
+
+        GetWindowPortBounds(wind->its_window, &cr);
+        OffsetRect(&cr, -cr.left, -cr.top);
+        right = cr.right - (wind->scrollBar ? SBARWIDTH : 0) - 4;
+        HLock((Handle) wind->menuCounts);
+        TextFace(normal);
+        mac_set_text_color(NO_COLOR); /* black */
+        for (i = 0; i < wind->miSelLen; i++) {
+            short itm = (*wind->menuSelected)[i];
+            long cnt = (*wind->menuCounts)[itm];
+            char cbuf[24];
+            short clen;
+
+            if (cnt < 0L)
+                continue; /* no typed count: whole stack, nothing shown */
+            line = (*wind->menuInfo)[itm].line;
+            if (line <= wind->scrollPos || line > wind->y_size)
+                continue; /* same visibility window as the inversion loop */
+            Sprintf(cbuf, "x %ld", cnt);
+            clen = (short) strlen(cbuf);
+            MoveTo(right - TextWidth(cbuf, 0, clen),
+                   (line - wind->scrollPos) * wind->row_height
+                       + wind->ascent_height);
+            DrawText(cbuf, 0, clen);
+        }
+        HUnlock((Handle) wind->menuCounts);
+    }
     for (i = 0; i < wind->miSelLen; i++) {
         mi = &(*wind->menuInfo)[(*wind->menuSelected)[i]];
         line = mi->line;
