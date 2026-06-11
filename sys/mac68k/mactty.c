@@ -37,8 +37,7 @@ static void select_offscreen_port(tty_record *record);
 
 /* control-char bitmask; bit 0 (NUL) must be set so it terminates strings */
 #define COOKED_CONTROLS 0X00002581
-#define RAW_CONTROLS 1
-static unsigned long s_control = COOKED_CONTROLS;
+static const unsigned long s_control = COOKED_CONTROLS;
 
 static short
 mem_err(void)
@@ -237,11 +236,7 @@ do_set_port_font(tty_record *record)
     PenNormal();
     TextFont(record->font_number);
     TextSize(record->font_size);
-    if (0L != (record->attribute[TTY_ATTRIB_FLAGS] & TA_OVERSTRIKE)) {
-        TextMode(srcOr);
-    } else {
-        TextMode(srcCopy);
-    }
+    TextMode(srcCopy);
 }
 
 void
@@ -618,43 +613,28 @@ do_add_cursor(tty_record *record, short x_pos)
 static void
 do_control(tty_record *record, short character)
 {
-    int recurse = 0;
-
-    /* recurse guard: nl_add_cr and cr_add_nl may both be set and invoke each other */
-    do {
-        switch (character) {
-        case CHAR_CR:
-            record->x_curs = 0;
-            if (!recurse
-                && (record->attribute[TTY_ATTRIB_CURSOR] & TA_CR_ADD_NL)) {
-                recurse = 1;
-            } else {
-                recurse = 0;
-                break;
-            } /* else FALL-THROUGH into LF for CR-add-NL */
-        case CHAR_LF:
-            record->y_curs++;
-            if (record->y_curs >= record->y_size) {
-                scroll_tty(record->its_window, 0,
-                           1 + record->y_curs - record->y_size);
-            }
-            if (!recurse
-                && (record->attribute[TTY_ATTRIB_CURSOR] & TA_NL_ADD_CR)) {
-                character = CHAR_CR;
-                recurse = 1;
-            } else
-                recurse = 0;
-            break;
-        case CHAR_BELL:
-            tty_nhbell();
-            break;
-        case CHAR_BS:
-            if (record->x_curs > 0)
-                record->x_curs--;
-        default:
-            break;
+    switch (character) {
+    case CHAR_LF:
+        record->y_curs++;
+        if (record->y_curs >= record->y_size) {
+            scroll_tty(record->its_window, 0,
+                       1 + record->y_curs - record->y_size);
         }
-    } while (recurse);
+        if (!(record->attribute[TTY_ATTRIB_CURSOR] & TA_NL_ADD_CR))
+            break;
+        /* FALL-THROUGH: NL-add-CR returns the cursor to column 0 */
+    case CHAR_CR:
+        record->x_curs = 0;
+        break;
+    case CHAR_BELL:
+        tty_nhbell();
+        break;
+    case CHAR_BS:
+        if (record->x_curs > 0)
+            record->x_curs--;
+    default:
+        break;
+    }
 }
 
 /* add a single character; drawn directly or deferred per DRAW_DIRECT */
@@ -755,14 +735,6 @@ set_tty_attrib(WindowPtr window, tty_attrib attrib, long value)
     }
     record->attribute[attrib] = value;
     switch (attrib) {
-    case TTY_ATTRIB_CURSOR:
-        /* pick raw vs cooked control-char table */
-        if (0L != (value & TA_RAW_OUTPUT)) {
-            s_control = RAW_CONTROLS;
-        } else {
-            s_control = COOKED_CONTROLS;
-        }
-        break;
     case TTY_ATTRIB_FLAGS:
         /* flush pending output when switching to draw-direct */
         if (0L != (value & TA_ALWAYS_REFRESH)) {

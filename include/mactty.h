@@ -88,11 +88,7 @@ typedef enum tty_attrib {
  * next line.
  */
 #define TA_WRAP_AROUND 4L
-/*
- * Overstrike means that characters are added on top of each other; i e don't
- * clear the letter beneath. This is faster, using srcOr under QuickDraw
- */
-#define TA_OVERSTRIKE 8L
+/* 8L was TA_OVERSTRIKE (srcOr drawing); never set by any caller, removed */
 /*
  * We may want the window not to scroll when we reach the end line,
  * but stop drawing instead.
@@ -115,19 +111,12 @@ typedef enum tty_attrib {
  * Blinking cursor is more noticeable when it's idle
  */
 #define TA_BLINKING_CURSOR 1L
-/*
- * Do we print every character as it is (including BS, NL and CR!) or do
- * do we interpret characters such as NL, BS and CR?
- */
-#define TA_RAW_OUTPUT 8L
+/* 8L was TA_RAW_OUTPUT and 32L TA_CR_ADD_NL; never set by any caller,
+   removed along with the raw control table and CR->NL recursion */
 /*
  * When getting a NL, do we also move to the left?
  */
 #define TA_NL_ADD_CR 16L
-/*
- * When getting a CR, do we also move down?
- */
-#define TA_CR_ADD_NL 32L
     /*
      * This symbolic constant is used to check the number of attributes
      */
