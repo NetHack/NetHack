@@ -1737,6 +1737,19 @@ WindowGoAway(EventRecord *theEvent, WindowPtr theWindow)
     }
 }
 
+/* Flush pending buffered tty output to _mt_window.  Once macstat owns
+   the window the tty offscreen is stale by design and blitting it
+   would paint over the natively drawn status rows -- every flush site
+   must share this guard, so they all call this wrapper.  (The
+   raw_print functions bypass it deliberately: they just wrote the
+   text they need shown, even after status takeover.) */
+static void
+flush_tty_window(void)
+{
+    if (_mt_window && !macstat_active())
+        update_tty(_mt_window);
+}
+
 void
 mac_get_nh_event(void)
 {
@@ -1747,9 +1760,8 @@ mac_get_nh_event(void)
 
     /* Also wired to win_wait_synch: setftty() clears TA_ALWAYS_REFRESH during
        play, so flush the offscreen here or buffered status never reaches
-       screen. Pre-status-takeover only: once macstat owns _mt_window the tty
-       offscreen is stale by design and must not be blitted over the status. */
-    if (_mt_window && !macstat_active()) update_tty(_mt_window);
+       screen. */
+    flush_tty_window();
 
     (void) WaitNextEvent(everyEvent, &anEvent, 1, gMouseRgn);
     HandleEvent(&anEvent);
@@ -1783,10 +1795,8 @@ mac_nhgetch(void)
         }
     }
 
-    /* flush buffered status output before blocking, else it lags a turn
-       (pre-status-takeover only; see mac_get_nh_event) */
-    if (_mt_window && !macstat_active())
-        update_tty(_mt_window);
+    /* flush buffered status output before blocking, else it lags a turn */
+    flush_tty_window();
 
     do {
         (void) WaitNextEvent(everyEvent, &anEvent, doDawdle, gMouseRgn);
@@ -2277,11 +2287,8 @@ mac_resume_nhwindows(void)
 static void
 mac_mark_synch(void)
 {
-    /* Pre-status-takeover only: flush buffered tty writes (NHW_BASE raw
-       prints) to screen. Once macstat owns _mt_window, status draws are
-       immediate and the tty offscreen is stale by design. */
-    if (_mt_window && iflags.window_inited && !macstat_active())
-        update_tty(_mt_window);
+    /* flush buffered tty writes (NHW_BASE raw prints) to screen */
+    flush_tty_window();
 }
 
 static void
