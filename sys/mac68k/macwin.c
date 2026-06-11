@@ -2706,6 +2706,7 @@ MenwKey(NhWindow *wind, char ch)
 {
     MacMHMenuItem *mi;
     int i;
+    Boolean found = false;
 
     ch = filter_scroll_key(ch, wind);
     if (!ch)
@@ -2745,6 +2746,7 @@ MenwKey(NhWindow *wind, char ch)
     HLock((char **) wind->menuInfo);
     for (i = 0, mi = *wind->menuInfo; i < wind->miLen; i++, mi++) {
         if (mi->accelerator == ch) {
+            found = true;
             /* count semantics follow tty's toggle_menu_curr: count > 0
                (re)selects with that count (re-press replaces it, keeps the
                selection); count 0 deselects */
@@ -2778,6 +2780,27 @@ MenwKey(NhWindow *wind, char ch)
             if (wind->how != PICK_ANY)
                 AddToKeyQueue(CHAR_CR, 1);
             break;
+        }
+    }
+    if (!found && wind->how == PICK_ANY) {
+        /* group accelerator: toggle every real item (accelerator != 0;
+           headers have none) whose object class char matches.  Selection
+           commands and digits returned above, so they can't land here.
+           A pending count does NOT apply to group toggles (tty parity);
+           it's just dropped.  Multiple rows change, so do a full repaint
+           like MenwSelectCmd rather than per-row XOR toggles. */
+        Boolean any = false;
+
+        for (i = 0, mi = *wind->menuInfo; i < wind->miLen; i++, mi++) {
+            if (mi->groupAcc == ch && mi->accelerator) {
+                ToggleMenuListItemSelected(wind, i);
+                any = true;
+            }
+        }
+        if (any) {
+            menw_clear_pending(wind);
+            SetPortWindowPort(wind->its_window);
+            MenwUpdate(wind);
         }
     }
     HUnlock((char **) wind->menuInfo);
