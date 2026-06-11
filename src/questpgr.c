@@ -27,6 +27,8 @@ staticfn void deliver_by_window(const char *, int);
 staticfn boolean skip_pager(boolean);
 staticfn boolean com_pager_core(const char *, const char *, boolean, char **);
 
+static lua_State *questlua; /* cached interpreter for quest/cuss text */
+
 short
 quest_info(int typ)
 {
@@ -484,18 +486,23 @@ com_pager_core(
     if (skip_pager(TRUE))
         return FALSE;
 
-    L = nhl_init(&sbi);
-    if (!L) {
-        if (showerror)
-            impossible("com_pager: nhl_init() failed");
-        goto compagerdone;
+    /* lazily create a private cached interpreter; quest.lua parses once */
+    if (!questlua) {
+        questlua = nhl_init(&sbi);
+        if (!questlua) {
+            if (showerror)
+                impossible("com_pager: nhl_init() failed");
+            goto compagerdone;
+        }
+        if (!nhl_loadlua(questlua, QTEXT_FILE)) {
+            if (showerror)
+                impossible("com_pager: %s not found.", QTEXT_FILE);
+            nhl_done(questlua);
+            questlua = NULL;
+            goto compagerdone;
+        }
     }
-
-    if (!nhl_loadlua(L, QTEXT_FILE)) {
-        if (showerror)
-            impossible("com_pager: %s not found.", QTEXT_FILE);
-        goto compagerdone;
-    }
+    L = questlua;
 
     lua_settop(L, 0);
     lua_getglobal(L, "questtext");
@@ -616,8 +623,17 @@ com_pager_core(
         free((genericptr_t) synopsis);
     if (fallback_msgid)
         free((genericptr_t) fallback_msgid);
-    nhl_done(L);
     return res;
+}
+
+/* free the cached quest/cuss interpreter at game end */
+void
+free_questpager(void)
+{
+    if (questlua) {
+        nhl_done(questlua);
+        questlua = NULL;
+    }
 }
 
 void
