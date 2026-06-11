@@ -5,9 +5,7 @@
 /****************************************\
  * Extended Macintosh menu support
  *
- * provides access to all keyboard commands from cmd.c
- * provides control key functionality for classic keyboards
- * provides key equivalent references and logical menu groups
+ * provides access to keyboard commands from cmd.c via logical menu groups
  * supports various menu highlighting modes
 \****************************************/
 
@@ -76,9 +74,8 @@ enum {
 
     /* submenu */
     menuWizard = 0,
-    menuPlayModeSub = 10 /* mref[10] = MENU 210 (Play Mode); 1-9 are the
-                            Kbd palettes + current -- see MNU# 129 in
-                            nhmenus.r */
+    menuPlayModeSub = 2 /* submenu list is wizard(0), current(1),
+                           Play Mode(2) -- see MNU# 129 in nhmenus.r */
 };
 
 /* the following menu items are reserved */
