@@ -45,23 +45,31 @@ mac_getlin(const char *query, char *bufp)
     topl_getlin(query, bufp, false);
 }
 
-/* Read an extended command: getlin followed by lookup in extcmdlist. */
+/* Read an extended command: getlin followed by lookup in extcmdlist.
+   Matching goes through the core's extcmds_match (as win/tty does) so
+   wizard-only / CMD_NOT_AVAILABLE / INTERNALCMD entries are filtered
+   by the same rules as every other port. */
 int
 mac_get_ext_cmd()
 {
     char bufp[BUFSZ];
-    int i;
+    int nmatches;
+    int *ecmatches;
 
     if (iflags.extmenu)
         return extcmd_via_menu();
     topl_getlin("# ", bufp, true);
-    for (i = 0; extcmdlist[i].ef_txt != (char *) 0; i++)
-        if (!strcmp(bufp, extcmdlist[i].ef_txt))
-            break;
-    if (extcmdlist[i].ef_txt == (char *) 0)
-        i = -1; /* not found */
-
-    return i;
+    (void) mungspaces(bufp);
+    nmatches = (bufp[0] == '\0' || bufp[0] == '\033')
+                   ? -1
+                   : extcmds_match(bufp, ECM_IGNOREAC | ECM_EXACTMATCH,
+                                   &ecmatches);
+    if (nmatches != 1) {
+        if (nmatches != -1)
+            pline("%.60s: unknown extended command.", bufp);
+        return -1;
+    }
+    return ecmatches[0];
 }
 
 /* macgetline.c */
