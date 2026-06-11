@@ -974,7 +974,7 @@ static struct datamodel_information dm[] = {
       "", "" },
     { { 2, 4, 4, 8, 4 }, "ILP32LL64", "x86 32-bit" }, /* Windows or Unix */
     { { 2, 4, 4, 8, 8 }, "IL32LLP64", "Windows x64 64-bit" },
-    { { 2, 4, 8, 8, 8 }, "I32LP64", "Unix 64-bit"}, 
+    { { 2, 4, 8, 8, 8 }, "I32LP64", "Unix 64-bit"},
     { { 2, 8, 8, 8, 8 }, "ILP64", "Unix ILP64"},      /* HAL, SPARC64 */
 };
 

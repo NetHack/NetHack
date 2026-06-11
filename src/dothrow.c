@@ -1757,11 +1757,11 @@ throwit(
                     }
                     if (!dmg) {
                         if (tethered_weapon) {
-				  /* Blind mods unnecessary; you know what you threw,
-				   * and it is tethered to your arm */
-                                  pline("Your tethered %s snaps back but the tether slips from your %s.",
-                                        simpleonames(obj), body_part(ARM));
-				  tether_released_msg = TRUE;
+                            /* Blind mods unnecessary; you know what you threw,
+                             * and it is tethered to your arm */
+                            pline("Your tethered %s snaps back but the tether slips from your %s.",
+                                  simpleonames(obj), body_part(ARM));
+                            tether_released_msg = TRUE;
                         } else {
                             pline(Blind
                                       ? "%s lands %s your %s."

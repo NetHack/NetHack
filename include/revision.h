@@ -171,7 +171,7 @@
  *       extern void uplift_mystruct_rev0_to_mystruct(struct mystruct_rev0 *,
  *                                                    struct mystruct *);
  *
- * 17. Add the uplift function to src/revision.c.  It needs to do 
+ * 17. Add the uplift function to src/revision.c.  It needs to do
  *     field-by-field copies of the fields that exist in the old
  *     revision and the new revision. For now, it likely needs to
  *     be handcrafted using your knowledge of the struct's old

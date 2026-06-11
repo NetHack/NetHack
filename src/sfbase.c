@@ -106,7 +106,7 @@ void sf_log(NHFILE *, const char *, size_t, int, char *);
 #define Sfvalue_xint16(a) sfvalue(a)
 #endif
 
-/* not in _Generic */ 
+/* not in _Generic */
 #define Sfvalue_long(a) sfvalue_long(a)
 #define Sfvalue_ulong(a) sfvalue_ulong(a)
 #define Sfvalue_char(a, d) sfvalue_char(a, d)
@@ -195,7 +195,7 @@ void sfi_##dtyp(NHFILE *nhfp, keyw dtyp *d_##dtyp, const char *myname)          
                        complex_dump((uchar *) d_##dtyp));                       \
     }                                                                           \
 }
-  
+
 #define SF_X(xxx, dtyp) \
 void sfo_##dtyp(NHFILE *nhfp, xxx *d_##dtyp, const char *myname, int bfsz)      \
 {                                                                               \
@@ -461,7 +461,7 @@ sfvalue_genericptr(genericptr a)
 {
     static char buf[20];
 
-    Snprintf(buf, sizeof buf, "%s", 
+    Snprintf(buf, sizeof buf, "%s",
              (a == 0) ? "0" : "glorkum");
     return buf;
 }
@@ -632,7 +632,8 @@ complex_dump(uchar *a)
     for (i = 0; i < SIZE(x); ++i) {
         x[i] = *uc++;
     }
-    Snprintf(buf, sizeof buf, "%03x %03x %03x %03x %03x %03x %03x %03x %03x %03x", 
+    Snprintf(buf, sizeof buf,
+             "%03x %03x %03x %03x %03x %03x %03x %03x %03x %03x",
              x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9]);
     buf[40] = '\0';
     return buf;

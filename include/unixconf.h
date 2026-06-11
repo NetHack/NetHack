@@ -332,15 +332,15 @@
 #endif
 
 #if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
-#define tparm2(s, x)	tparm(s,x,0,0,0,0,0,0,0,0)
+#define tparm2(s, x) tparm(s,x,0,0,0,0,0,0,0,0)
 #else
-#define tparm2(s, x)	tparm(s,x)
+#define tparm2(s, x) tparm(s,x)
 #endif
 
 #if defined(BSD) || defined(ULTRIX)
 #if !defined(DGUX) && !defined(SUNOS4) \
-	&& !defined(__NetBSD__) && !defined(__FreeBSD__) \
-	&& !defined(__OpenBSD__)
+    && !defined(__NetBSD__) && !defined(__FreeBSD__) \
+    && !defined(__OpenBSD__)
 #define memcpy(d, s, n) bcopy(s, d, n)
 #define memcmp(s1, s2, n) bcmp(s2, s1, n)
 #endif

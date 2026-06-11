@@ -5314,7 +5314,7 @@ optfn_boolean(
 #ifndef IDLECHECKPOINT
         case opt_idlecheckpoint:
             pline("There is no underlying support for 'idlecheckpoint'"
-                  " compiled in."); 
+                  " compiled in.");
             iflags.idlecheckpoint = FALSE;
             give_opt_msg = FALSE;
             break;
@@ -7436,7 +7436,7 @@ allopt_array_init(void)
                 if (allopt[i].opttyp == BoolOpt && i != opt_ascii_map)
                     allopt[i].initval = allopt[i].opt_in_out;
 #endif
-		*(allopt[i].addr) = allopt[i].initval;
+                *(allopt[i].addr) = allopt[i].initval;
             }
         }
         heed_all_options();
