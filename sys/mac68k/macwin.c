@@ -2655,15 +2655,13 @@ menw_show_pending(NhWindow *wind)
     if (wind->hasPending) {
         char cbuf[256 + 32];
         Str255 pbuf;
-        int len;
 
         if (menwTitleOwner != wind) {
             GetWTitle(wind->its_window, menwSavedTitle);
             menwTitleOwner = wind;
         }
-        len = menwSavedTitle[0];
-        memcpy(cbuf, (char *) &menwSavedTitle[1], len);
-        Sprintf(&cbuf[len], " - count: %ld", wind->pendingCount);
+        P2C(menwSavedTitle, cbuf);
+        Sprintf(eos(cbuf), " - count: %ld", wind->pendingCount);
         C2P(cbuf, pbuf); /* truncates to 255 */
         SetWTitle(wind->its_window, pbuf);
     } else if (menwTitleOwner == wind) {
