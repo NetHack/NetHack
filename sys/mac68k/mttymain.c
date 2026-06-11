@@ -292,9 +292,24 @@ _mt_init_stuff(void)
         GDHandle gh = (GDHandle) 0;
 
         if (_mt_in_color) {
+            /* GetMaxDevice takes GLOBAL coordinates; the port bounds are
+               local (cf. allocate_offscreen_world in mactty.c), so a
+               local rect would probe the device at the main screen's
+               origin, not the one the window is on */
+            GrafPtr save_port;
+            Point p;
+
+            GetPort(&save_port);
+            SetPortWindowPort(_mt_window);
             GetWindowPortBounds(_mt_window, &r);
+            p.h = r.left;
+            p.v = r.top;
+            LocalToGlobal(&p);
+            OffsetRect(&r, p.h - r.left, p.v - r.top);
+            SetPort(save_port);
             gh = GetMaxDevice(&r);
-            setting = ((*((*gh)->gdPMap))->pixelSize > 4) ? 1 : 0; /* > 4 bpp */
+            if (gh)
+                setting = ((*((*gh)->gdPMap))->pixelSize > 4) ? 1 : 0; /* > 4 bpp */
     	}
 
         for (i = 0; i < CLR_MAX ; ++i) {
