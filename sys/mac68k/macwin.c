@@ -3507,18 +3507,24 @@ HandleUpdate(EventRecord *theEvent)
     SetPortWindowPort(theWindow);
     GetWindowPortBounds(theWindow, &r);
     OffsetRect(&r, -r.left, -r.top);
-    EraseRect(&r);
     {
         int kind = GetWindowKind(theWindow) - WIN_BASE_KIND;
         /* Distinguish the macmap window (its own Mac WindowPtr) from
            _mt_window — both share kind=NHW_MAP for legacy reasons. */
         if (GetWRefCon(theWindow) == MACMAP_REFCON && WIN_MAP != WIN_ERR) {
+            /* no erase: the backing blit covers the content (a full
+               erase here was a visible white flash the blit then
+               overwrote) and macmap_update_event whitens the margins
+               the blit leaves out */
             macmap_update_event(&theWindows[WIN_MAP]);
         } else if (theWindow == _mt_window && macstat_active()) {
             /* status owns _mt_window now; image_tty would blit the stale
                tty offscreen over the natively drawn fields */
+            EraseRect(&r);
             macstat_redraw();
         } else if (kind >= 0 && kind < NUM_FUNCS) {
+            if (kind != NHW_MENU)   /* MenwDrawStyled erases itself */
+                EraseRect(&r);
             winUpdateFuncs[kind](&fake, theWindow);
         }
     }
