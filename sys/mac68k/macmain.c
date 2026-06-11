@@ -218,6 +218,10 @@ process_openfile(short src_vol, long src_dir, Str255 fName, OSType ftype)
             Handle name = Get1Resource('STR ', PLAYER_NAME_RES_ID);
             if (name) {
                 Str255 save_f_p;
+                /* the resource comes from the save file; clamp it so a
+                   corrupt/foreign string can't overflow plname[PL_NSIZ] */
+                if ((*(StringHandle) name)[0] > PL_NSIZ - 1)
+                    (*(StringHandle) name)[0] = PL_NSIZ - 1;
                 P2C(*(StringHandle) name, svp.plname);
                 set_savefile_name(TRUE);
                 C2P(fqname(gs.SAVEF, SAVEPREFIX, 0), save_f_p);
