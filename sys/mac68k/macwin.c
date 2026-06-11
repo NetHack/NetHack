@@ -866,6 +866,29 @@ got1:
     return i;
 }
 
+/* Dispose the per-menu data handles, in ONE place for both the clear
+   (recycle) and destroy paths -- menuCounts was once leaked from one. */
+static void
+dispose_menu_handles(NhWindow *aWin)
+{
+    if (aWin->menuInfo) {
+        DisposeHandle((Handle) aWin->menuInfo);
+        aWin->menuInfo = NULL;
+    }
+    if (aWin->menuSelected) {
+        DisposeHandle((Handle) aWin->menuSelected);
+        aWin->menuSelected = NULL;
+    }
+    if (aWin->menuCounts) {
+        DisposeHandle((Handle) aWin->menuCounts);
+        aWin->menuCounts = NULL;
+    }
+    if (aWin->menuStyle) {
+        DisposeHandle(aWin->menuStyle);
+        aWin->menuStyle = NULL;
+    }
+}
+
 void
 mac_clear_nhwindow(winid win)
 {
@@ -947,22 +970,7 @@ mac_clear_nhwindow(winid win)
         }
         break;
     case NHW_MENU:
-        if (aWin->menuInfo) {
-            DisposeHandle((Handle) aWin->menuInfo);
-            aWin->menuInfo = NULL;
-        }
-        if (aWin->menuSelected) {
-            DisposeHandle((Handle) aWin->menuSelected);
-            aWin->menuSelected = NULL;
-        }
-        if (aWin->menuCounts) {
-            DisposeHandle((Handle) aWin->menuCounts);
-            aWin->menuCounts = NULL;
-        }
-        if (aWin->menuStyle) {
-            DisposeHandle(aWin->menuStyle);
-            aWin->menuStyle = NULL;
-        }
+        dispose_menu_handles(aWin);
         menw_clear_pending(aWin);
         aWin->menuChar = 'a';
         aWin->miSelLen = 0;
@@ -1465,25 +1473,7 @@ mac_destroy_nhwindow(winid win)
         if (aWin->windowText) {
             DisposeHandle(aWin->windowText);
         }
-        if (aWin->menuStyle) {
-            DisposeHandle(aWin->menuStyle);
-            aWin->menuStyle = (Handle) 0;
-        }
-        /* keep the menu-handle lifecycle symmetric with mac_clear_nhwindow;
-           without this, a menu window destroyed without being recycled
-           leaked menuInfo/menuSelected (and now menuCounts) */
-        if (aWin->menuInfo) {
-            DisposeHandle((Handle) aWin->menuInfo);
-            aWin->menuInfo = NULL;
-        }
-        if (aWin->menuSelected) {
-            DisposeHandle((Handle) aWin->menuSelected);
-            aWin->menuSelected = NULL;
-        }
-        if (aWin->menuCounts) {
-            DisposeHandle((Handle) aWin->menuCounts);
-            aWin->menuCounts = NULL;
-        }
+        dispose_menu_handles(aWin);
         aWin->miSize = aWin->miLen = aWin->miSelLen = 0;
         aWin->its_window = (WindowPtr) 0;
         aWin->windowText = (Handle) 0;
