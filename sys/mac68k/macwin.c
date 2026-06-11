@@ -1656,6 +1656,8 @@ draw_growicon_vert_only(WindowPtr wind)
     RgnHandle org_clip = NewRgn();
     Rect r;
 
+    if (!org_clip) /* NewRgn can fail; we keep playing in low memory */
+        return;
     GetPort(&org_port);
     SetPortWindowPort(wind);
     GetClip(org_clip);
@@ -2448,10 +2450,12 @@ MsgUpdate(NhWindow *wind)
         if (l != topl_r.right - topl_r.left)
             TECalText(top_line);
         TEUpdate(&topl_r, top_line);
-        RectRgn(topl_rgn, &topl_r);
-        DiffRgn(clip, topl_rgn, clip);
-        DisposeRgn(topl_rgn);
-        SetClip(clip); /* update clip to exclude topl area from TETextBox */
+        if (topl_rgn) { /* NewRgn can fail; we keep playing in low memory */
+            RectRgn(topl_rgn, &topl_r);
+            DiffRgn(clip, topl_rgn, clip);
+            DisposeRgn(topl_rgn);
+            SetClip(clip); /* update clip to exclude topl area from TETextBox */
+        }
     }
     DisposeRgn(clip);
 
