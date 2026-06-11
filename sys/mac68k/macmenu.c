@@ -661,8 +661,7 @@ mac_askname()
     GetDialogItemText(handle, str);
     if (str[0] > PL_NSIZ - 1)
         str[0] = PL_NSIZ - 1;
-    BlockMove(&str[1], svp.plname, str[0]);
-    svp.plname[str[0]] = '\0';
+    P2C(str, svp.plname);
 
     for (i = RSRC_ASK_ROLE; i <= RSRC_ASK_MODE; i++) {
         DeleteMenu(i);
@@ -1006,16 +1005,12 @@ aboutNetHack()
     } else {
         unsigned char aboutStr[32];
         char tmp[32];
-        int slen;
 
-        slen = snprintf(tmp, sizeof tmp, "NetHack %d.%d.%d",
-                        VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
-        /* snprintf returns the untruncated length; clamp to what tmp
-           actually holds (and what fits aboutStr's Pascal body) */
-        if (slen > (int) sizeof(aboutStr) - 1)
-            slen = (int) sizeof(aboutStr) - 1;
-        aboutStr[0] = (unsigned char) slen;
-        memcpy(&aboutStr[1], tmp, slen);
+        /* snprintf truncates to 31 chars + NUL, so C2P's 1 + strlen(tmp)
+           bytes always fit aboutStr */
+        snprintf(tmp, sizeof tmp, "NetHack %d.%d.%d",
+                 VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+        C2P(tmp, aboutStr);
 
         ParamText(aboutStr, P_STRING_CONV("\rdevteam@www.nethack.org"), P_EMPTY_STRING, P_EMPTY_STRING);
         (void) Alert(alrtMenuNote, (ModalFilterUPP) 0L);
