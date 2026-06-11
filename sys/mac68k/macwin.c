@@ -1968,9 +1968,14 @@ mac_putstr(winid win, int attr, const char *str)
             aWin->y_curs++;
             aWin->y_size++;
             aWin->x_curs = 0;
-            newWidth = TextWidth(sline, 0, src - sline);
-            if (newWidth > maxWidth) {
-                maxWidth = newWidth;
+            /* the message window has a fixed width; only the other
+               window kinds use maxWidth (x_size below), so skip the
+               per-line TextWidth traps on the hottest putstr path */
+            if (win != WIN_MESSAGE) {
+                newWidth = TextWidth(sline, 0, src - sline);
+                if (newWidth > maxWidth) {
+                    maxWidth = newWidth;
+                }
             }
             sline = src + 1;
         } else
@@ -1978,9 +1983,11 @@ mac_putstr(winid win, int attr, const char *str)
         src++;
     }
 
-    newWidth = TextWidth(sline, 0, src - sline);
-    if (newWidth > maxWidth) {
-        maxWidth = newWidth;
+    if (win != WIN_MESSAGE) {
+        newWidth = TextWidth(sline, 0, src - sline);
+        if (newWidth > maxWidth) {
+            maxWidth = newWidth;
+        }
     }
 
     aWin->windowTextLen += slen;
@@ -2558,7 +2565,35 @@ MsgUpdate(NhWindow *wind)
         long tlen = wind->windowTextLen;
         if (tlen > hsize)
             tlen = hsize;
-        TETextBox(*wind->windowText, tlen, &r, teJustLeft);
+        /* Bound TE work to the visible lines: TETextBox wraps and draws a
+           throwaway record over all it is given, so the whole history made
+           each message O(history). Slice lines [first, last) (1:1 with
+           CHAR_CR) and draw at their offset; the box still spans r.bottom,
+           so its implicit erase covers the same area. */
+        char *base = *wind->windowText;
+        long first = wind->scrollPos;
+        long last, line, i;
+        long startOff = 0, endOff = tlen;
+        Rect box = r;
+
+        if (first < 0)
+            first = 0;
+        /* r.top is already offset by -scrollPos rows, so the view top
+           sits at r.top + first * row_height */
+        box.top = r.top + (short) first * wind->row_height;
+        last = first + (r.bottom - box.top) / wind->row_height + 1;
+        for (i = 0, line = 0; i < tlen && line < last; i++) {
+            if (base[i] == CHAR_CR) {
+                line++;
+                if (line == first)
+                    startOff = i + 1;
+            }
+        }
+        if (line >= last)
+            endOff = i;       /* just past the last visible line's CR */
+        if (line < first)
+            startOff = tlen;  /* scrolled past the end: erase only */
+        TETextBox(base + startOff, endOff - startOff, &box, teJustLeft);
     }
     HUnlock(wind->windowText);
 
