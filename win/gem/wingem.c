@@ -89,9 +89,14 @@ mar_iflags_numpad(void)
     return (iflags.num_pad ? 1 : 0);
 }
 
+/* clamped here so msg_anz is sized consistently at init */
 short
 mar_get_msg_history(void)
 {
+    if (iflags.msg_history < 20)
+        iflags.msg_history = 20;
+    else if (iflags.msg_history > 60)
+        iflags.msg_history = 60;
     return (iflags.msg_history);
 }
 
@@ -543,11 +548,6 @@ Gem_create_nhwindow(int type)
 
     switch (type) {
     case NHW_MESSAGE:
-        if (iflags.msg_history < 20)
-            iflags.msg_history = 20;
-        else if (iflags.msg_history > 60)
-            iflags.msg_history = 60;
-        break;
     case NHW_STATUS:
     case NHW_MAP:
     case NHW_MENU:
