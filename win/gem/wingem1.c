@@ -3263,8 +3263,11 @@ mar_create_window(short type)
     short i;
     struct gw *p_Gw = &Gem_nhwindow[0];
 
-    for (newid = 0; p_Gw->gw_type && newid < MAXWIN; newid++, p_Gw++)
+    for (newid = 0; newid < MAXWIN && p_Gw->gw_type; newid++, p_Gw++)
         ;
+
+    if (newid == MAXWIN) /* table full; let the caller panic */
+        return (newid);
 
     switch (type) {
     case NHW_MESSAGE:
