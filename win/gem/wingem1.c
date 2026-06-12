@@ -171,10 +171,10 @@ nearest_pen(short want_r, short want_g, short want_b)
 static short pen_black = 1, pen_white = 0, pen_darkgray = 1;
 
 /* Per-NetHack-CLR_* VDI pen, computed at runtime via nearest_pen
-   against the currently-installed workstation palette.  Replaces the
-   fixed nhclr_to_vdi[] table -- the tile palette install in
-   palettized modes can remap pens 0..15 away from the standard ST
-   palette, so a fixed lookup misses the closest available colour. */
+   against the currently-installed workstation palette.  Computed
+   rather than fixed because the tile palette install in palettized
+   modes can remap pens 0..15 away from the standard ST palette, so a
+   fixed lookup would miss the closest available colour. */
 static short nhclr_to_pen[16] = {
     /* sensible defaults until cache_nhclr_pens() runs */
     1, 2, 3, 6, 4, 7, 5, 9, 1, 10, 11, 14, 12, 15, 13, 0
@@ -599,38 +599,6 @@ static short pet_mark_data[] = { 0x0000, 0x3600, 0x7F00, 0x7F00,
                                0x3E00, 0x1C00, 0x0800 };
 static short *normal_palette = NULL;
 static void restore_normal_palette(void);
-
-/* NetHack CLR_* (0..15) -> VDI pen.  Mapped against default_st_vdi
-   so each NetHack colour lands on the closest ST-palette pen.  Dark
-   variants (black/red/green/blue/magenta/cyan/yellow) take the
-   primary pens 1..7; "bright" variants take the corresponding
-   pens 9..15.  NO_COLOR (NetHack code 8) is special-cased by
-   callers and never actually indexes here.  CLR_WHITE maps to
-   black so it's visible on light dialog backgrounds (pen 0 = white
-   would be invisible). */
-static const short nhclr_to_vdi[16] = {
-    1,  /* CLR_BLACK        -> pen 1  (black)          */
-    2,  /* CLR_RED          -> pen 2  (red)            */
-    3,  /* CLR_GREEN        -> pen 3  (green)          */
-    6,  /* CLR_BROWN        -> pen 6  (yellow, closest to brown in
-                                       ST default palette) */
-    4,  /* CLR_BLUE         -> pen 4  (blue)           */
-    7,  /* CLR_MAGENTA      -> pen 7  (magenta)        */
-    5,  /* CLR_CYAN         -> pen 5  (cyan)           */
-    9,  /* CLR_GRAY         -> pen 9  (dk grey)        */
-    1,  /* NO_COLOR         -> black (special-cased upstream) */
-    10, /* CLR_ORANGE       -> pen 10 (lt red, closest to orange) */
-    11, /* CLR_BRIGHT_GREEN -> pen 11 (lt green)       */
-    14, /* CLR_YELLOW       -> pen 14 (lt yellow)      */
-    12, /* CLR_BRIGHT_BLUE  -> pen 12 (lt blue)        */
-    15, /* CLR_BRIGHT_MAGENTA -> pen 15 (lt magenta)   */
-    13, /* CLR_BRIGHT_CYAN  -> pen 13 (lt cyan)        */
-    0   /* CLR_WHITE        -> pen 0 (white) for visibility on the
-                                black map background.  draw_inventory
-                                special-cases CLR_WHITE to pen 1 so
-                                it stays visible on dialog backgrounds
-                                too. */
-};
 
 static struct gw {
     WIN *gw_window;
@@ -1732,7 +1700,7 @@ mar_gem_init(void)
         short i;
         probe_truecolor_format();
         /* Install the standard ST palette at pens 0..15 so text and
-           chrome rendering (which uses pen indices via nhclr_to_vdi
+           chrome rendering (which uses pen indices via nhclr_to_pen
            and vst_color) gets the expected colors. */
         for (i = 0; i < 16; i++)
             vs_color(x_handle, i, (short *) default_st_vdi[i]);
