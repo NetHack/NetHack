@@ -976,6 +976,7 @@ mac_clear_nhwindow(winid win)
         aWin->miSelLen = 0;
         aWin->miLen = 0;
         aWin->miSize = 0;
+        aWin->how = PICK_NONE;  /* not selectable until select_menu sets it */
     /* Fall-Through */
     default:
         SetHandleSize(aWin->windowText, TEXT_BLOCK);
@@ -2078,29 +2079,20 @@ mac_add_menu(winid win, const glyph_info *glyphinfo UNUSED,
         Sprintf(locStr, "%c - %s", (menuChar ? menuChar : ' '), inStr);
         str = locStr;
         HLock((char **) aWin->menuInfo);
-        HLock((char **) aWin->menuSelected);
         HLock((char **) aWin->menuCounts);
-        /* NB dual use of menuSelected: during menu build the write below
-           treats it as per-ITEM preselect flags, but at selection time
-           ToggleMenuListItemSelected reuses the same array as the packed
-           list of selected item INDICES (read back by mac_select_menu).
-           No code ever converts the flag form into the list form --
-           mac_start_menu's mac_clear_nhwindow resets miSelLen to 0, so
-           selection always starts from an empty list and this flag write
-           is simply overwritten as items get selected (i.e. preselected
-           entries are not honored; behavior inherited from the original
-           Mac port).  menuCounts is keyed by item index in BOTH phases
-           and is therefore immune to that reinterpretation. */
-        (*aWin->menuSelected)[aWin->miLen] = preselected;
+        /* preselect is stored per-item (item->preselected); mac_select_menu
+           seeds the PICK_ANY selection list from it. menuSelected is just
+           the packed list of selected indices (built from empty); menuCounts
+           is keyed by item index. */
         (*aWin->menuCounts)[aWin->miLen] = -1L;
         item = &(*aWin->menuInfo)[aWin->miLen];
         aWin->miLen++;
         item->id = *any;
         item->accelerator = menuChar;
         item->groupAcc = groupAcc;
+        item->preselected = (Boolean) preselected;
         item->line = aWin->y_size;
         HUnlock((char **) aWin->menuInfo);
-        HUnlock((char **) aWin->menuSelected);
         HUnlock((char **) aWin->menuCounts);
     } else
         str = inStr;
@@ -2133,10 +2125,28 @@ mac_select_menu(winid win, int how, menu_item **selected_list)
     WindowPtr theWin = aWin->its_window;
 
     inSelect = win;
+    aWin->how = (short) how;
+
+    /* Seed the PICK_ANY selection list from preselected items
+       (MENU_ITEMFLAGS_SELECTED) before showing the menu, so a default like
+       query_attr()'s "None" counts on a no-pick confirm -- a 0-count there
+       reads as cancel and loops the hilite add-rule flow. PICK_ONE is left
+       alone: its callers already default on 0, and seeding would yield an
+       unexpected 2-count. */
+    if (how == PICK_ANY && aWin->menuInfo) {
+        short k;
+
+        HLock((char **) aWin->menuInfo);
+        for (k = 0; k < aWin->miLen; k++) {
+            if ((*aWin->menuInfo)[k].preselected
+                && ListItemSelected(aWin, k) < 0)
+                ToggleMenuListItemSelected(aWin, k);
+        }
+        HUnlock((char **) aWin->menuInfo);
+    }
 
     mac_display_nhwindow(win, FALSE);
 
-    aWin->how = (short) how;
     for (;;) {
         c = map_menu_cmd(mac_nhgetch());
         if (c == CHAR_ESC) {
@@ -2896,7 +2906,8 @@ static const RGBColor menuColorRGB[16] = {
 
 /* Map a NetHack menu attribute to a QuickDraw text face. ATR_INVERSE is not
    a face: MenwDrawStyled renders it as a real inverse row (painted box with
-   white text), so only ATR_BOLD maps to bold here. */
+   white text) on non-selectable windows, or as plain text on selectable
+   menus (where the box would collide with the selection hilite). */
 static short
 menu_attr_face(int attr)
 {
@@ -3016,14 +3027,25 @@ MenwDrawStyled(NhWindow *wind)
             row = lineIdx - wind->scrollPos;
             if (row >= 0 && row <= vis_rows && llen > 0) {
                 int attr = ATR_NONE, color = NO_COLOR;
+                Boolean realInverse;
+
                 if (wind->menuStyle
                     && (long) (lineIdx + 1) * 2 <= GetHandleSize(wind->menuStyle)) {
                     unsigned char *sb = (unsigned char *) *wind->menuStyle;
                     attr  = sb[lineIdx * 2];
                     color = sb[lineIdx * 2 + 1];
                 }
+                /* On a SELECTABLE menu the full-row inverse box is identical
+                   to the selection hilite (ToggleMenuSelect inverts the same
+                   rect), so an unselected inverse row would look selected and
+                   a selected one would look unselected.  Only draw the real
+                   inverse box for non-selectable (PICK_NONE) windows; on
+                   selectable menus fall back to plain text so the selection
+                   hilite stays unambiguous. */
+                realInverse = (attr == ATR_INVERSE && wind->how == PICK_NONE);
+
                 TextFace(menu_attr_face(attr));
-                if (attr == ATR_INVERSE) {
+                if (realInverse) {
                     /* real inverse, macstat's stat_draw_str pattern: paint
                        the full row rect (same rect ToggleMenuSelect XORs,
                        so selection inversion composes exactly) in the line
@@ -3054,7 +3076,7 @@ MenwDrawStyled(NhWindow *wind)
                 if (llen > 0x7FFF)
                     llen = 0x7FFF; /* DrawText byteCount is a short */
                 DrawText(base + lineStart, 0, (short) llen);
-                if (attr == ATR_INVERSE) {
+                if (realInverse) {
                     ForeColor(blackColor);
                     if (mac_main_depth() < 2)
                         TextMode(srcOr);

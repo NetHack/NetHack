@@ -77,6 +77,7 @@ typedef struct {
     anything id;
     char accelerator;
     char groupAcc;
+    Boolean preselected;      /* MENU_ITEMFLAGS_SELECTED at build time */
     short line;
 } MacMHMenuItem;
 
