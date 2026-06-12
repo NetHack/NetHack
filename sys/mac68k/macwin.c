@@ -776,8 +776,22 @@ got1:
         }
         /* Now that font + cell metrics are populated, do the deferred
            backing/tile-mode initialization with correct values. */
-        if (aWin->its_window != _mt_window)
+        if (aWin->its_window != _mt_window) {
+            /* honor font_map / font_size_map: get_tty_metrics copied the
+               shared _mt_window's pre-config font. Override and recompute
+               the cell metrics so macmap_finalize derives cell_w/cell_h. */
+            if (win_fonts[NHW_MAP])
+                aWin->font_number = win_fonts[NHW_MAP];
+            if (iflags.wc_fontsiz_map)
+                aWin->font_size = iflags.wc_fontsiz_map;
+            SetPortWindowPort(aWin->its_window);
+            TextFont(aWin->font_number);
+            TextSize(aWin->font_size);
+            GetFontInfo(&fi);
+            aWin->char_width = fi.widMax;
+            aWin->row_height = fi.ascent + fi.leading + fi.descent;
             macmap_finalize(aWin);
+        }
         return i;
     } else if (kind == NHW_BASE || kind == NHW_STATUS) {
         short x_sz, x_sz_p, y_sz, y_sz_p;
