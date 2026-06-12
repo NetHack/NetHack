@@ -497,7 +497,6 @@ ifdef CROSS_TO_ATARI
 $(TARGETPFX)tos.o : ../sys/atari/tos.c $(HACK_H)
 $(TARGETPFX)wingem.o : ../win/gem/wingem.c $(HACK_H)
 $(TARGETPFX)wingem1.o : ../win/gem/wingem1.c $(HACK_H)
-$(TARGETPFX)bitmfile.o : ../win/gem/bitmfile.c $(HACK_H)
 $(TARGETPFX)gr_rect.o : ../win/gem/gr_rect.c $(HACK_H)
 $(TARGETPFX)load_img.o : ../win/gem/load_img.c $(HACK_H)
 $(GAMEBIN) : $(HOBJ) $(LUACROSSLIB)

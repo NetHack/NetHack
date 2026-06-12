@@ -494,18 +494,11 @@ tile2x11: tile2x11.o $(TEXT_IO) $(HACKLIB)
 	$(CLINK) $(LFLAGS) -o tile2x11 tile2x11.o $(TEXT_IO) \
 		$(HACKLIB) $(LIBS)
 
-tile2img.ttp: tile2img.o bitmfile.o $(TEXT_IO)
-	$(CLINK) $(LFLAGS) -o tile2img.ttp tile2img.o bitmfile.o \
-		$(TEXT_IO) $(LIBS)
-
 tile2bmp: tile2bmp.o $(TEXT_IO) $(HACKLIB)
 	$(CLINK) $(LFLAGS) -o tile2bmp tile2bmp.o $(TEXT_IO) $(HACKLIB)
 
 tile2pict: tile2pict.o $(TEXT_IO) $(HACKLIB)
 	$(CLINK) $(LFLAGS) -o tile2pict tile2pict.o $(TEXT_IO) $(HACKLIB)
-
-xpm2img.ttp: xpm2img.o bitmfile.o
-	$(CLINK) $(LFLAGS) -o xpm2img.ttp xpm2img.o bitmfile.o $(LIBS)
 
 tile2beos: tile2beos.o $(TEXT_IO) $(HACKLIB)
 	$(CXXLINK) $(LFLAGS) -o tile2beos tile2beos.o \
@@ -545,14 +538,6 @@ tile2pict.o: ../util/tile2pict.c $(HACK_H) ../win/share/tile.h
 tile2x11.o: ../win/X11/tile2x11.c $(HACK_H) ../win/share/tile.h \
 						../include/tile2x11.h
 	$(CC) $(CFLAGS) $(CSTD) -I../win/share -c ../win/X11/tile2x11.c -o $@
-
-tile2img.o: ../win/gem/tile2img.c $(HACK_H) ../win/share/tile.h \
-						../win/gem/bitmfile.h
-	$(CC) $(CFLAGS) $(CSTD) -I../win/gem -I../win/share -c ../win/gem/tile2img.c -o $@
-xpm2img.o: ../win/gem/xpm2img.c $(HACK_H) ../win/gem/bitmfile.h
-	$(CC) $(CFLAGS) $(CSTD) -I../win/gem -c ../win/gem/xpm2img.c -o $@
-bitmfile.o: ../win/gem/bitmfile.c ../win/gem/bitmfile.h
-	$(CC) $(CFLAGS) $(CSTD) -I../win/gem -c ../win/gem/bitmfile.c -o $@
 
 tile2beos.o: ../win/BeOS/tile2beos.cpp $(HACK_H) ../win/share/tile.h
 	$(CXX) $(CFLAGS) $(CSTD) -I../win/share -c ../win/BeOS/tile2beos.cpp -o $@
@@ -633,7 +618,7 @@ clean: clean-fixup
 # obsolete dgn_comp and lev_comp could be left around from 3.6.x
 spotless: clean
 	-rm -f makedefs recover dlb $(HACKLIB)
-	-rm -f gif2txt txt2ppm tile2x11 tile2img.ttp xpm2img.ttp \
+	-rm -f gif2txt txt2ppm tile2x11 \
 		tilemap tileedit tile2bmp tile2pict uudecode
 	-rm -f dgn_comp* dgn_lex.c dgn_yacc.c ../include/dgn_comp.h \
 		lev_comp* lev_lex.c lev_yacc.c ../include/lev_comp.h
