@@ -51,7 +51,4 @@ int transform_img(MFDB *);
 /* Bitplanes are one after another in address IMG_HEADER.addr. */
 int depack_img(char *, IMG_header *);
 
-/* Halves IMG in Device-format, dest memory has to be allocated*/
-int half_img(MFDB *, MFDB *);
-
 #endif /* LOAD_IMG_H */
