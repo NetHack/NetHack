@@ -136,7 +136,9 @@ add_dirty_rect(dirty_rect *dr, GRECT *area)
         dr->rects[cheapestmerge2] = dr->rects[dr->used - 1];
         dr->rects[dr->used - 1] = *area;
     } else {
-        gc_combine(&dr->rects[cheapest], area);
+        /* every candidate was rejected; merge into the first cluster
+           rather than index rects[-1] */
+        gc_combine(&dr->rects[cheapest < 0 ? 0 : cheapest], area);
     }
     /* NB: clusters do not intersect (or intersection will
        overwrite).  This is a result of the above algorithm,
