@@ -220,6 +220,9 @@ end
 for i = 1, next_pos-1 do
     glyph = font[i]
     for j = 1, #glyph.code do
+        if j ~= 1 then
+            outfile:write("\xFE")
+        end
         outfile:write(utf8.char(glyph.code[j]))
     end
     outfile:write("\xFF")

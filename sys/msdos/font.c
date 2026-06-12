@@ -112,11 +112,27 @@ load_font(const char *filename)
                 bufsize -= strsize;
                 memmove(buf, buf + strsize, bufsize);
             }
-            codepoints = uni_8to32(buf2);
-            for (j = 0; codepoints[j] != 0; ++j) {
-                add_unicode_index(font, codepoints[j], i);
+            /* Split the individual mappings and use only single character
+               mappings */
+            char *start = buf2;
+            while (*start != '\0') {
+                /* Mapping ends with a 0xFE byte */
+                char *end = strchr(start, 0xFE);
+                if (end == NULL) {
+                    end = start + strlen(start);
+                } else {
+                    *end = '\0';
+                    ++end;
+                }
+                /* Convert this mapping */
+                codepoints = uni_8to32(start);
+                /* Accept it if it is a single character */
+                if (codepoints[0] != 0 && codepoints[1] == 0) {
+                    add_unicode_index(font, codepoints[0], i);
+                }
+                free(codepoints);
+                start = end;
             }
-            free(codepoints);
             if (p != NULL)
                 ++i;
         }
