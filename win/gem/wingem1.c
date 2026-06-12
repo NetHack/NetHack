@@ -1640,6 +1640,76 @@ mar_set_dir_keys(void)
 
 extern int total_tiles_used; /* tile.c */
 
+/* load and prepare the tile sheet; 0 on success, IMG error code else */
+static short
+load_tile_image(void)
+{
+    short img_err, tried_default = FALSE;
+
+    if (tile_image.addr)
+        return (0);
+
+loadimg:
+    img_err = depack_img(Tilefile ? Tilefile : (planes >= 5) ? "NH32.IMG"
+                                                  : (planes >= 4) ? "NH16.IMG"
+                                                                   : "NH2.IMG",
+                             &tile_image);
+    if (img_err)
+        return (img_err);
+    if ((tile_image.img_w % Tile_width || tile_image.img_h % Tile_height)
+        && !tried_default) {
+        Tilefile = NULL;
+        Tile_width = Tile_height = 16;
+        tried_default = TRUE;
+        img_error(ERR_HEADER);
+        goto loadimg;
+    }
+    if ((tile_image.img_w / Tile_width) * (tile_image.img_h / Tile_height)
+            < total_tiles_used
+        && !tried_default) {
+        Tilefile = NULL;
+        Tile_width = Tile_height = 16;
+        tried_default = TRUE;
+        img_error(ERR_HEADER);
+        goto loadimg;
+    }
+    Tiles_per_line = tile_image.img_w / Tile_width;
+
+    /* Reorder tile palette to match default ST VDI palette ordering.
+       Must happen before transform_img (which converts to device format).
+       Skipped in truecolor mode -- there's no workstation palette to
+       align with. */
+    if (planes <= 8 && tile_image.planes >= 4 && tile_image.palette)
+        reorder_tile_palette(tile_image.palette, tile_image.addr,
+                             tile_image.planes,
+                             tile_image.img_w, tile_image.img_h);
+
+    if (planes >= 16 && tile_image.palette) {
+        /* Truecolor path (Behne PRINT_TC.C convention): pre-render
+           the palettized tile sheet into a chunky device-format
+           buffer at the screen's native depth.  vro_cpyfm then
+           copies device-format pixels straight to screen with no
+           palette involvement. */
+        MFDB new_mfdb;
+        if (build_truecolor_mfdb(&tile_image, &new_mfdb, planes)) {
+            free(tile_image.addr);
+            tile_image.addr = (char *) new_mfdb.fd_addr;
+            tile_image.planes = planes;
+            Tile_bilder = new_mfdb;
+        }
+    } else {
+        mfdb(&Tile_bilder, (short *) tile_image.addr, tile_image.img_w,
+             tile_image.img_h, 1, tile_image.planes);
+        transform_img(&Tile_bilder);
+        /* Set workstation palette so vro_cpyfm of palettized device
+           data displays the right colors.  Only meaningful at <=8
+           planes; on truecolor we've already baked RGB into pixels. */
+        if (tile_image.planes > 1 && tile_image.palette)
+            img_set_colors(x_handle, tile_image.palette, tile_image.planes);
+    }
+    return (0);
+}
+
 int
 mar_gem_init(void)
 {
@@ -1720,70 +1790,14 @@ mar_gem_init(void)
     }
 
     if (mar_set_tile_mode(FAIL)) {
-    short tried_default = FALSE;
-loadimg:
-    img_err = depack_img(Tilefile ? Tilefile : (planes >= 5) ? "NH32.IMG"
-                                                  : (planes >= 4) ? "NH16.IMG"
-                                                                   : "NH2.IMG",
-                             &tile_image);
-    if (img_err) {
-        z_ob = zz_oblist[ABOUT];
-        ob_undraw_dialog(z_ob, 0, 0, 0, 0);
-        ob_hide(z_ob, OKABOUT, FALSE);
-        img_error(img_err);
-        return (0);
-    }
-    if ((tile_image.img_w % Tile_width || tile_image.img_h % Tile_height)
-        && !tried_default) {
-        Tilefile = NULL;
-        Tile_width = Tile_height = 16;
-        tried_default = TRUE;
-        img_error(ERR_HEADER);
-        goto loadimg;
-    }
-    if ((tile_image.img_w / Tile_width) * (tile_image.img_h / Tile_height)
-            < total_tiles_used
-        && !tried_default) {
-        Tilefile = NULL;
-        Tile_width = Tile_height = 16;
-        tried_default = TRUE;
-        img_error(ERR_HEADER);
-        goto loadimg;
-    }
-    Tiles_per_line = tile_image.img_w / Tile_width;
-    } /* tile_mode */
-
-    /* Reorder tile palette to match default ST VDI palette ordering.
-       Must happen before transform_img (which converts to device format).
-       Skipped in truecolor mode -- there's no workstation palette to
-       align with. */
-    if (planes <= 8 && tile_image.planes >= 4 && tile_image.palette)
-        reorder_tile_palette(tile_image.palette, tile_image.addr,
-                             tile_image.planes,
-                             tile_image.img_w, tile_image.img_h);
-
-    if (planes >= 16 && tile_image.palette) {
-        /* Truecolor path (Behne PRINT_TC.C convention): pre-render
-           the palettized tile sheet into a chunky device-format
-           buffer at the screen's native depth.  vro_cpyfm then
-           copies device-format pixels straight to screen with no
-           palette involvement. */
-        MFDB new_mfdb;
-        if (build_truecolor_mfdb(&tile_image, &new_mfdb, planes)) {
-            free(tile_image.addr);
-            tile_image.addr = (char *) new_mfdb.fd_addr;
-            tile_image.planes = planes;
-            Tile_bilder = new_mfdb;
+        img_err = load_tile_image();
+        if (img_err) {
+            z_ob = zz_oblist[ABOUT];
+            ob_undraw_dialog(z_ob, 0, 0, 0, 0);
+            ob_hide(z_ob, OKABOUT, FALSE);
+            img_error(img_err);
+            return (0);
         }
-    } else {
-        mfdb(&Tile_bilder, (short *) tile_image.addr, tile_image.img_w,
-             tile_image.img_h, 1, tile_image.planes);
-        transform_img(&Tile_bilder);
-        /* Set workstation palette so vro_cpyfm of palettized device
-           data displays the right colors.  Only meaningful at <=8
-           planes; on truecolor we've already baked RGB into pixels. */
-        if (tile_image.planes > 1 && tile_image.palette)
-            img_set_colors(x_handle, tile_image.palette, tile_image.planes);
     }
     cache_pens();
 
@@ -3791,6 +3805,7 @@ mar_set_tile_mode(short tiles)
 {
     static short tile_mode = TRUE;
     static GRECT prev;
+    short err;
     WIN *z_w = WIN_MAP != WIN_ERR ? Gem_nhwindow[WIN_MAP].gw_window : NULL;
 
     if (tiles < 0)
@@ -3799,7 +3814,11 @@ mar_set_tile_mode(short tiles)
         tile_mode = tiles;
     else if (tile_mode == tiles || (mar_set_rogue(FAIL) && tiles))
         return (FAIL);
-    else {
+    else if (tiles && (err = load_tile_image()) != 0) {
+        /* keep the ascii map if the tile sheet will not load */
+        img_error(err);
+        return (FAIL);
+    } else {
         GRECT tmp;
 
         tile_mode = tiles;
