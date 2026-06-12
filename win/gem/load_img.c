@@ -224,7 +224,7 @@ depack_img(char *name, IMG_header *pic)
 
     /* check for header validity & malloc long... */
     if (pic->length > 7 && pic->planes < 33 && pic->img_w > 0
-        && pic->img_h > 0) {
+        && pic->img_h > 0 && pic->pat_len > 0) {
         if (!(pic->addr = (char *) calloc(1, size))) {
             error = ERR_ALLOC;
             goto end_depack;
