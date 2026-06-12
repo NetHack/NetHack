@@ -830,6 +830,8 @@ Gem_select_menu(winid window, int how, menu_item **menu_list)
                 mi->count = Gmit->Gmi_count;
                 mi++;
             }
+    } else if (mar_menu_cancelled()) {
+        return -1;
     }
 
     return n;

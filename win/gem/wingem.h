@@ -37,6 +37,7 @@ extern void mar_print_line(int, int, int, char *);
 extern void mar_set_message(char *, char *, char *);
 extern Gem_menu_item *mar_hol_inv(void);
 extern void mar_set_menu_type(short);
+extern short mar_menu_cancelled(void);
 extern void mar_reverse_menu(void);
 extern void mar_set_menu_title(const char *);
 extern void mar_set_accelerators(void);

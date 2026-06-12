@@ -2470,10 +2470,19 @@ mar_set_menu_title(const char *str)
 
 /************************* mar_set_menu_type *******************************/
 
+static short menu_cancelled = FALSE;
+
 void
 mar_set_menu_type(short how)
 {
     Inv_how = how;
+    menu_cancelled = FALSE;
+}
+
+short
+mar_menu_cancelled(void)
+{
+    return menu_cancelled;
 }
 
 /************************* Inventory Utils *******************************/
@@ -2680,6 +2689,7 @@ Inv_Handler(XEVENT *xev)
                     count = 0L;
                 else {
                     unset_all_on_page(0, (short) scroll_menu.vsize);
+                    menu_cancelled = TRUE;
                     my_close_dialog(Inv_dialog, TRUE);
                     return (ev);
                 }
