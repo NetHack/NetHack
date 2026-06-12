@@ -520,6 +520,8 @@ Gem_resume_nhwindows(void)
 
 extern void mar_exit_nhwindows(void);
 extern boolean run_from_desktop;
+static boolean gem_windows_exited = FALSE;
+static void preinit_raw_dump_console(void);
 
 void
 Gem_exit_nhwindows(const char *str)
@@ -530,6 +532,8 @@ Gem_exit_nhwindows(const char *str)
     if (iflags.toptenwin)
         run_from_desktop = FALSE;
     iflags.window_inited = 0;
+    gem_windows_exited = TRUE;
+    preinit_raw_dump_console();
 }
 
 winid
@@ -962,12 +966,16 @@ preinit_raw_append(const char *str)
     preinit_raw_buf[preinit_raw_len] = '\0';
 }
 
+/* after the windows are gone (top-ten list, panic text) fall back to
+   stdout; msexit()'s desktop pause keeps it readable */
 void
 Gem_raw_print(const char *str)
 {
     if (str && *str) {
         if (iflags.window_inited)
             mar_raw_print(str);
+        else if (gem_windows_exited)
+            printf("%s\n", str);
         else
             preinit_raw_append(str);
     }
@@ -979,9 +987,22 @@ Gem_raw_print_bold(const char *str)
     if (str && *str) {
         if (iflags.window_inited)
             mar_raw_print_bold(str);
+        else if (gem_windows_exited)
+            printf("%s\n", str);
         else
             preinit_raw_append(str);
     }
+}
+
+/* surface pre-init lines that never reached the message window */
+static void
+preinit_raw_dump_console(void)
+{
+    if (preinit_raw_len > 0)
+        fputs(preinit_raw_buf, stdout);
+    preinit_raw_len = 0;
+    preinit_raw_overflow = 0;
+    preinit_raw_buf[0] = '\0';
 }
 
 /* Called from Gem_init_nhwindows right after iflags.window_inited
