@@ -630,7 +630,6 @@ char **map_glyphs = NULL;
    old "white text + OR colored cells" trick that only worked on
    ST 4-plane palette ordering and breaks in truecolor. */
 short **map_colors = NULL;
-dirty_rect *dr_map;
 
 char **status_line;
 short num_status_lines, status_w, status_align = FALSE;
@@ -645,7 +644,6 @@ short *message_age;
 short msg_pos = 0, msg_max = 0, msg_anz = 0, msg_width = 0, msg_vis = 3,
     msg_align = TRUE;
 NHGEM_FONT msg_font;
-dirty_rect *dr_msg;
 
 SCROLL scroll_menu;
 Gem_menu_item *invent_list;
@@ -3221,9 +3219,6 @@ mar_create_window(short type)
             message_line[i] = (char *) m_alloc((MSGLEN + 1) * sizeof(char));
             *message_line[i] = 0;
         }
-        dr_msg = new_dirty_rect(10);
-        if (!dr_msg)
-            panic("Memory allocation failure (dr_msg)");
         break;
     case NHW_STATUS:
         status_line = (char **) m_alloc(2 * sizeof(char *));
@@ -3248,10 +3243,6 @@ mar_create_window(short type)
                     map_colors[i][xc] = WHITE; /* default: visible on black */
             }
         }
-        dr_map = new_dirty_rect(10);
-        if (!dr_map)
-            panic("Memory allocation failure (dr_map)");
-
         mar_clear_map();
         break;
     case NHW_MENU:
