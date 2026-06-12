@@ -144,6 +144,68 @@ MENUCOLOR="*uncursed*"=gray
 MENUCOLOR="*blessed*"=green
 
 
+### Status hilites ###
+# Recolor status-line fields by threshold, by change, or by matching text.
+# Syntax (see the Guidebook, "Configuring Status Hilites"):
+#   OPTIONS=hilite_status:field-name/behavior/color&attributes
+# The status line is drawn on a WHITE background, so light colors (plain
+# yellow, gray, light-*) are darkened toward olive/gray and read faintly.
+# Strong colors (green, brown, orange, red, blue) carry the gradient; bold and
+# inverse mark the states that need attention -- and are also what shows on a
+# 1-bit (monochrome) screen, where color can't render at all.
+
+# How long (in turns) an up/down/changed hilite stays lit; default is 3.
+# Set to 0 to turn the whole feature off:
+#OPTIONS=statushilites:10
+
+# Hit points: plain green/brown gradient while healthy, bold once below 50%,
+# red inverse below 20%.
+OPTIONS=hilite_status:hitpoints/100%/green&normal
+OPTIONS=hilite_status:hitpoints/<100%/green
+OPTIONS=hilite_status:hitpoints/<66%/brown
+OPTIONS=hilite_status:hitpoints/<50%/orange&bold
+OPTIONS=hilite_status:hitpoints/<33%/red&bold
+OPTIONS=hilite_status:hitpoints/<20%/red&inverse
+
+# Spell power: warn as it runs low.
+OPTIONS=hilite_status:power/<50%/brown
+OPTIONS=hilite_status:power/<25%/red&bold
+
+# Encumbrance: escalate as you slow down (text must match enc_stat names).
+OPTIONS=hilite_status:carrying-capacity/Burdened/brown
+OPTIONS=hilite_status:carrying-capacity/Stressed/orange
+OPTIONS=hilite_status:carrying-capacity/Strained/red&bold
+OPTIONS=hilite_status:carrying-capacity/Overtaxed/red&inverse
+OPTIONS=hilite_status:carrying-capacity/Overloaded/red&inverse
+
+# Hunger: flag both dangerous ends.
+OPTIONS=hilite_status:hunger/Satiated/brown
+OPTIONS=hilite_status:hunger/Hungry/orange
+OPTIONS=hilite_status:hunger/Weak/red&bold
+OPTIONS=hilite_status:hunger/Fainting/red&inverse
+
+# --- Changes flash in inverse video (a colored box with white text) so a
+#     rising or falling value is unmistakable; each flash clears after
+#     'statushilites' turns. ---
+
+# Characteristics (Str/Dex/Con/Int/Wis/Cha): green up, red down.
+OPTIONS=hilite_status:characteristics/up/green&inverse/down/red&inverse
+
+# Gold: gains green, losses red.
+OPTIONS=hilite_status:gold/up/green&inverse/down/red&inverse
+
+# Experience level: level up green, level drain red.
+OPTIONS=hilite_status:experience-level/up/green&inverse/down/red&inverse
+
+# Armor class (lower is better): improvements green, worsening red.
+OPTIONS=hilite_status:armor-class/down/green&inverse/up/red&inverse
+
+# Conditions: major troubles (stoning, slime, ...) are impossible to miss.
+OPTIONS=hilite_status:condition/major_troubles/red&inverse
+OPTIONS=hilite_status:condition/minor_troubles/orange
+OPTIONS=hilite_status:condition/movement/blue
+
+
 ### Pets ###
 # What to call your starting pet, and its type
 OPTIONS=catname:Kaori,dogname:Hachi
