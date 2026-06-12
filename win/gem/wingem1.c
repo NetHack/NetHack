@@ -3960,8 +3960,10 @@ Gem_getlin(const char *ques, char *input)
         || (d_exit & NO_CLICK) == QLG) {
         *input = '\033';
         input[1] = 0;
-    } else
-        strncpy(input, ob_get_text(z_ob, LGREPLY, 0), length);
+    } else {
+        strncpy(input, ob_get_text(z_ob, LGREPLY, 0), BUFSZ - 1);
+        input[BUFSZ - 1] = '\0';
+    }
 }
 
 /************************* ask_direction *******************************/
