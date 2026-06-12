@@ -3037,12 +3037,20 @@ MenwDrawStyled(NhWindow *wind)
                 }
                 /* On a SELECTABLE menu the full-row inverse box is identical
                    to the selection hilite (ToggleMenuSelect inverts the same
-                   rect), so an unselected inverse row would look selected and
-                   a selected one would look unselected.  Only draw the real
-                   inverse box for non-selectable (PICK_NONE) windows; on
-                   selectable menus fall back to plain text so the selection
-                   hilite stays unambiguous. */
-                realInverse = (attr == ATR_INVERSE && wind->how == PICK_NONE);
+                   rect), so a *selectable* inverse row would look selected
+                   and a selected one would look unselected.  Suppress the box
+                   only for selectable rows: draw it on non-selectable windows
+                   (PICK_NONE) and, on selectable menus, on header/separator
+                   rows -- those are never in menuInfo (ListCoordinateToItem
+                   returns -1) and ToggleMenuSelect never hilites them, so the
+                   box can't be confused with a selection.  This keeps the
+                   menu_headings reverse video on grouped menus (inventory,
+                   multidrop, ...) while the selection hilite stays
+                   unambiguous on the pickable rows. */
+                realInverse = (attr == ATR_INVERSE
+                               && (wind->how == PICK_NONE
+                                   || !wind->menuInfo
+                                   || ListCoordinateToItem(wind, row) < 0));
 
                 TextFace(menu_attr_face(attr));
                 if (realInverse) {
