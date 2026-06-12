@@ -3080,6 +3080,7 @@ mar_display_nhwindow(winid wind)
         tmp_button = ob_get_text(z_ob, QLINE, 0);
         ob_set_text(z_ob, QLINE, Inv_how != PICK_NONE ? strCancel : strOk);
         ob_doflag(z_ob, LINESLIST, TOUCHEXIT);
+        count = 0L; /* no count prefix carried over from an earlier menu */
         Event_Handler(Inv_Init, Inv_Handler);
         if ((Inv_dialog = open_dialog(z_ob,
                         (wind == WIN_INVEN)
