@@ -1407,14 +1407,18 @@ draw_msgline(PARMBLK *pb)
         Min(&stopx, MSGLEN);
         x += startx * msg_font.cw;
         for (i = 0; i < stopy; i++, y -= msg_font.ch, ptr--) {
+            short len = (short) strlen(*ptr), ex;
             if (message_age[msg_pos - i])
                 v_set_text(FAIL, 0, pen_black, 0, 0, vst_out);
             else
                 v_set_text(FAIL, 0, pen_darkgray, 0, 0, vst_out);
-            tmp = (*ptr)[stopx];
-            (*ptr)[stopx] = 0;
+            if (startx >= len) /* nothing of this line is exposed */
+                continue;
+            ex = min(stopx, len); /* don't read past the message text */
+            tmp = (*ptr)[ex];
+            (*ptr)[ex] = 0;
             (*v_mtext)(x_handle, x, y, &(*ptr)[startx]);
-            (*ptr)[stopx] = tmp;
+            (*ptr)[ex] = tmp;
         }
     }
     return (0);
