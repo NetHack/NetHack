@@ -1343,33 +1343,38 @@ draw_rip(PARMBLK *pb)
             } else
                 (*v_mtext)(x_handle, x, y, (*ptr++) + 1);
         }
-        pla[0] = pla[1] = 0;
-        pla[2] = min(pb->pb_w - 1, Rip_bild.fd_w - 1);
-        pla[3] = min(pb->pb_h - 1, Rip_bild.fd_h - 1);
-        pla[6] = pla[4] =
-            pb->pb_x + (pb->pb_w - Rip_bild.fd_w) / 2; /* x_wert to */
-        pla[7] = pla[5] = pb->pb_y;                    /* y_wert to */
-        pla[6] += pla[2];
-        pla[7] += pla[3];
-        if (planes == 1) {
-            short colindex[2] = { 1, 0 };
-            vrt_cpyfm(x_handle, MD_REPLACE, pla, &Rip_bild, screen,
-                      colindex);
-        } else {
-            vro_cpyfm(x_handle, S_ONLY, pla, &Rip_bild, screen);
+        /* no tombstone image loaded: keep the plain text screen */
+        if (Rip_bild.fd_addr) {
+            pla[0] = pla[1] = 0;
+            pla[2] = min(pb->pb_w - 1, Rip_bild.fd_w - 1);
+            pla[3] = min(pb->pb_h - 1, Rip_bild.fd_h - 1);
+            pla[6] = pla[4] =
+                pb->pb_x + (pb->pb_w - Rip_bild.fd_w) / 2; /* x_wert to */
+            pla[7] = pla[5] = pb->pb_y;                    /* y_wert to */
+            pla[6] += pla[2];
+            pla[7] += pla[3];
+            if (planes == 1) {
+                short colindex[2] = { 1, 0 };
+                vrt_cpyfm(x_handle, MD_REPLACE, pla, &Rip_bild, screen,
+                          colindex);
+            } else {
+                vro_cpyfm(x_handle, S_ONLY, pla, &Rip_bild, screen);
+            }
+            v_set_mode(MD_TRANS);
+            vst_alignment(x_handle, 1, 5, &sa_dummy, &sa_dummy);
+            pla[5] += 64;
+            for (i = 0; i < 7; i++, pla[5] += chardim[3]) {
+                v_set_text(text_font.id,
+                           (i == 0 || i == 6) ? text_font.size : 12,
+                           pen_white, 0, 0, chardim);
+                (*v_mtext)(x_handle, pla[4] + 157, pla[5], rip_line[i]);
+                v_set_text(text_font.id,
+                           (i == 0 || i == 6) ? text_font.size : 12,
+                           pen_black, 0, 0, chardim);
+                (*v_mtext)(x_handle, pla[4] + 157, pla[5], rip_line[i]);
+            }
+            vst_alignment(x_handle, 0, 5, &sa_dummy, &sa_dummy);
         }
-        v_set_mode(MD_TRANS);
-        vst_alignment(x_handle, 1, 5, &sa_dummy, &sa_dummy);
-        pla[5] += 64;
-        for (i = 0; i < 7; i++, pla[5] += chardim[3]) {
-            v_set_text(text_font.id, (i == 0 || i == 6) ? text_font.size : 12,
-                       pen_white, 0, 0, chardim);
-            (*v_mtext)(x_handle, pla[4] + 157, pla[5], rip_line[i]);
-            v_set_text(text_font.id, (i == 0 || i == 6) ? text_font.size : 12,
-                       pen_black, 0, 0, chardim);
-            (*v_mtext)(x_handle, pla[4] + 157, pla[5], rip_line[i]);
-        }
-        vst_alignment(x_handle, 0, 5, &sa_dummy, &sa_dummy);
     }
     return (0);
 }
@@ -3049,10 +3054,9 @@ mar_display_nhwindow(winid wind)
             img_set_colors(x_handle, normal_palette, planes);
         if (use_rip) {
             if (Rip_bild.fd_addr
-                && Rip_bild.fd_addr != (short *) rip_image.addr) {
+                && Rip_bild.fd_addr != (short *) rip_image.addr)
                 free(Rip_bild.fd_addr);
-                Rip_bild.fd_addr = NULL;
-            }
+            Rip_bild.fd_addr = NULL;
             test_free(rip_image.palette);
             rip_image.palette = NULL;
             test_free(rip_image.addr);
