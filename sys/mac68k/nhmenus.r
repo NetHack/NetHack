@@ -97,7 +97,8 @@ resource 'MENU' (133) {
         "-", noIcon, noKey, noMark, plain,
         "Overview", noIcon, noKey, noMark, plain,
         "Annotate\0xC9", noIcon, noKey, noMark, plain,
-        "Show Terrain", noIcon, noKey, noMark, plain
+        "Show Terrain", noIcon, noKey, noMark, plain,
+        "Chronicle", noIcon, noKey, noMark, plain
     }
 };
 
@@ -170,16 +171,10 @@ resource 'MENU' (135) {
 resource 'MENU' (136) {
     136,
     textMenuProc,
-    0x7FFFFDEF,
+    0x7FFFFFF7,
     enabled,
     "Magic",
     {
-        "Drop Item", noIcon, noKey, noMark, plain,
-        "Drop Multiple\0xC9", noIcon, noKey, noMark, plain,
-        "Pickup", noIcon, noKey, noMark, plain,
-        "Toggle Autopickup", noIcon, noKey, noMark, plain,
-        "-", noIcon, noKey, noMark, plain,
-        "Eat", noIcon, noKey, noMark, plain,
         "Read", noIcon, noKey, noMark, plain,
         "Quaff", noIcon, noKey, noMark, plain,
         "Dip", noIcon, noKey, noMark, plain,
@@ -189,6 +184,22 @@ resource 'MENU' (136) {
         "Zap", noIcon, noKey, noMark, plain,
         "Invoke", noIcon, noKey, noMark, plain,
         "Rub", noIcon, noKey, noMark, plain
+    }
+};
+
+resource 'MENU' (137) {
+    137,
+    textMenuProc,
+    0x7FFFFFEF,
+    enabled,
+    "Item",
+    {
+        "Drop Item", noIcon, noKey, noMark, plain,
+        "Drop Multiple\0xC9", noIcon, noKey, noMark, plain,
+        "Pickup", noIcon, noKey, noMark, plain,
+        "Toggle Autopickup", noIcon, noKey, noMark, plain,
+        "-", noIcon, noKey, noMark, plain,
+        "Eat", noIcon, noKey, noMark, plain
     }
 };
 
@@ -257,9 +268,9 @@ resource 'MENU' (210) {
 };
 
 data 'MNU#' (128, "menubar", locked, preload) {  /* short firstMenuID; short count; { short mresID; short 0; } [count] */
-    $"0080 0009 0080 0000 0081 0000 0082 0000"
+    $"0080 000A 0080 0000 0081 0000 0082 0000"
     $"008A 0000 0085 0000 0086 0000 0087 0000"
-    $"0088 0000 0084 0000"
+    $"0089 0000 0088 0000 0084 0000"
 };
 
 data 'MNU#' (129, "submenu", locked, preload) {  /* short firstMenuID; short count; { short mresID; short 0; } [count] */
@@ -289,7 +300,8 @@ resource 'STR#' (132, "Info") {
         "\0xA5-",
         "\0x0F\0xA5ctl-o",
         "#annotate",
-        "#terrain"
+        "#terrain",
+        "#chronicle"
     }
 };
 
@@ -349,14 +361,19 @@ resource 'STR#' (134, "Act") {
     }
 };
 
-resource 'STR#' (135, "Magic") {
+resource 'STR#' (135, "Item") {
     {
         "d",
         "D",
         ",",
         "@",
         "\0xA5-",
-        "e",
+        "e"
+    }
+};
+
+resource 'STR#' (136, "Magic") {
+    {
         "r",
         "q",
         "#dip",
@@ -369,15 +386,18 @@ resource 'STR#' (135, "Magic") {
     }
 };
 
-resource 'STR#' (136, "Help") {
+/* NetHack 5.0 rebound 'v' to #chronicle and 'V' to #versionshort, so
+   the version/history items use explicit extended names (rebinding-
+   proof, same lesson as the Explore/'X' fix) */
+resource 'STR#' (137, "Help") {
     {
         "O",
         "\0xA5-",
         "?",
         "&",
         "\0xA5-",
-        "v",
-        "V",
+        "#versionshort",
+        "#history",
         "#version"
     }
 };
