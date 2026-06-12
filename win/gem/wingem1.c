@@ -591,8 +591,7 @@ set_normal_dial_colors(void)
 
 static short no_glyph; /* the short indicating there is no glyph */
 IMG_header tile_image, titel_image, rip_image;
-MFDB Tile_bilder, Map_bild, Titel_bild, Rip_bild, Black_bild, Pet_Mark,
-    FontCol_Bild;
+MFDB Tile_bilder, Map_bild, Titel_bild, Rip_bild, Pet_Mark;
 static short Tile_width = 16, Tile_height = 16, Tiles_per_line = 20;
 char *Tilefile = NULL;
 /* pet_mark Design by Warwick Allison warwick@troll.no */
@@ -947,24 +946,12 @@ mar_set_fontbyid(short type, short id, short size)
         break;
     case NHW_MAP:
         if (map_font.size != -size || map_font.id != id) {
-            MFDB mtmp;
             map_font.size = -size;
             map_font.id = id;
             map_font.prop = FontInfo(id)->type & (FNT_PROP | FNT_ASCII);
             v_set_text(map_font.id, map_font.size, BLACK, 0, 0, chardim);
             map_font.ch = chardim[3] ? chardim[3] : 1;
             map_font.cw = chardim[2] ? chardim[2] : 1;
-            mfdb(&mtmp, NULL, (COLNO - 1) * map_font.cw, ROWNO * map_font.ch,
-                 0, planes);
-            if (mfdb_size(&mtmp) > mfdb_size(&FontCol_Bild)
-                && mfdb_size(&mtmp) > mfdb_size(&Map_bild)) {
-                FontCol_Bild.fd_addr = Map_bild.fd_addr =
-                    (short *) realloc(Map_bild.fd_addr, mfdb_size(&mtmp));
-                if (!Map_bild.fd_addr)
-                    panic("Not enough Space for the map.");
-            }
-            mfdb(&FontCol_Bild, FontCol_Bild.fd_addr,
-                 (COLNO - 1) * map_font.cw, ROWNO * map_font.ch, 0, planes);
             rearrange_windows();
         }
         break;
@@ -1812,22 +1799,10 @@ mar_gem_init(void)
 
     mfdb(&Map_bild, NULL, (COLNO - 1) * Tile_width, ROWNO * Tile_height, 0,
          planes);
-    mfdb(&FontCol_Bild, NULL, (COLNO - 1) * map_font.cw, ROWNO * map_font.ch,
-         0, planes);
-    Map_bild.fd_addr =
-        (short *) m_alloc(mfdb_size(&Map_bild) > mfdb_size(&FontCol_Bild)
-                            ? mfdb_size(&Map_bild)
-                            : mfdb_size(&FontCol_Bild));
-    FontCol_Bild.fd_addr = Map_bild.fd_addr;
+    Map_bild.fd_addr = (short *) m_alloc(mfdb_size(&Map_bild));
 
     mfdb(&Pet_Mark, pet_mark_data, 8, 7, 1, 1);
     vr_trnfm(x_handle, &Pet_Mark, &Pet_Mark);
-
-    mfdb(&Black_bild, NULL, 16, 32, 1,
-         1); /* should cover the biggest map-font */
-    Black_bild.fd_addr = (short *) m_alloc(mfdb_size(&Black_bild));
-    memset(Black_bild.fd_addr, 255, mfdb_size(&Black_bild));
-    vr_trnfm(x_handle, &Black_bild, &Black_bild);
 
     for (i = 0; i < MAXWIN; i++) {
         Gem_nhwindow[i].gw_window = NULL;
@@ -3346,9 +3321,7 @@ mar_clear_map(void)
     for (y = 0; y < ROWNO; y++)
         for (x = 0; x < COLNO - 1; x++)
             map_glyphs[y][x] = ' ';
-    vro_cpyfm(x_handle, ALL_BLACK, pla, &Tile_bilder,
-              &Map_bild); /* what if FontCol_Bild is
-                             bigger? */
+    vro_cpyfm(x_handle, ALL_BLACK, pla, &Tile_bilder, &Map_bild);
     if (WIN_MAP != WIN_ERR && Gem_nhwindow[WIN_MAP].gw_window)
         redraw_window(Gem_nhwindow[WIN_MAP].gw_window, NULL);
 }
