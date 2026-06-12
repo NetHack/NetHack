@@ -539,11 +539,25 @@ SanePositions(void)
            (borderless) screens that can't drag/save. */
         Boolean honor = !small_screen && !gResetToDefault;
 
+        short msg_w = 0; /* 0 => use content_w (default stack width) */
         msg_h = 4 * theWindows[WIN_MESSAGE].row_height + 4;   /* ~4 lines */
         /* keep the big-screen bar past DrawScrollbar's auto-hide threshold */
         if (!small_screen
             && theWindows[WIN_MESSAGE].scrollBar && msg_h <= 50 + SBARHEIGHT)
             msg_h = 50 + SBARHEIGHT + 2;
+
+        /* honor a saved message size so a grown message window survives a
+           restore (its height feeds map_top so the map stacks under it) */
+        if (honor) {
+            short mt, ml, sh, sw;
+            if (RetrievePosition(kMessageWindow, &mt, &ml)
+                && RetrieveSize(kMessageWindow, mt, ml, &sh, &sw)) {
+                if (sh > 0)
+                    msg_h = sh;
+                if (sw > 0)
+                    msg_w = sw;
+            }
+        }
 
         /* Fit the map into the space left by menu bar, message+status windows,
            and title bars; macmap_fit resizes the map window + viewport/backing */
@@ -565,7 +579,7 @@ SanePositions(void)
             top = msg_top; left = content_left;
         }
         MoveWindow(msgw, left, top, 1);
-        SizeWindow(msgw, content_w, msg_h, 1);
+        SizeWindow(msgw, msg_w ? msg_w : content_w, msg_h, 1);
         if (theWindows[WIN_MESSAGE].scrollBar)
             DrawScrollbar(&theWindows[WIN_MESSAGE]);
 
@@ -646,6 +660,9 @@ SanePositions(void)
         SaveWindowPos(msgw);
         SaveWindowPos(mapw);
         SaveWindowPos(statw);
+        /* also persist the default message size, else the restored-size path
+           above would bring a pre-reset grown window back next launch */
+        SaveWindowSize(msgw);
     }
     gResetToDefault = FALSE; /* consume the one-shot */
     return (0);
