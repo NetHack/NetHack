@@ -2421,7 +2421,7 @@ mar_add_message(const char *str)
     if ((short) strlen(toplines) >= msg_width) {
         short pos = msg_width;
         tmp = toplines + msg_width;
-        while (*tmp != ' ' && pos >= 0) {
+        while (pos >= 0 && *tmp != ' ') {
             tmp--;
             pos--;
         }
@@ -3934,7 +3934,7 @@ Gem_getlin(const char *ques, char *input)
     length = z_ob[LGPROMPT].ob_width / gr_cw;
     if ((short) strlen(ques_buf) > length) {
         tmp = ques_buf + length;
-        while (*tmp != ' ' && tmp >= ques_buf) {
+        while (tmp >= ques_buf && *tmp != ' ') {
             tmp--;
         }
         if (tmp <= ques_buf)
