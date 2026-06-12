@@ -1012,8 +1012,8 @@ mar_set_font(short type, const char *font_name, short size)
         id = atoi(font_name);
         if (id <= 0) {
             short i, tid;
-            char name[32];
-            for (i = fonts_loaded; --i >= 0;) {
+            char name[33]; /* vqt_name stores 32 chars plus NUL */
+            for (i = fonts_loaded; i >= 1; i--) {
                 tid = vqt_name(x_handle, i, name);
                 if (!stricmp(name, font_name)) {
                     id = tid;
