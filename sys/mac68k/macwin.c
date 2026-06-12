@@ -757,6 +757,21 @@ got1:
         get_tty_metrics(aWin->its_window, &x_sz, &y_sz, &x_sz_p, &y_sz_p,
                         &aWin->font_number, &aWin->font_size,
                         &aWin->char_width, &aWin->row_height);
+        /* _mt_init_stuff fonted _mt_window before the config was read;
+           macstat draws in WIN_STATUS's own font, so honor font_status /
+           font_size_status here and recompute the row height. */
+        if (kind == NHW_STATUS) {
+            if (win_fonts[NHW_STATUS])
+                aWin->font_number = win_fonts[NHW_STATUS];
+            if (iflags.wc_fontsiz_status)
+                aWin->font_size = iflags.wc_fontsiz_status;
+            SetPortWindowPort(_mt_window);
+            TextFont(aWin->font_number);
+            TextSize(aWin->font_size);
+            GetFontInfo(&fi);
+            aWin->row_height = fi.ascent + fi.descent + fi.leading;
+            aWin->char_width = fi.widMax;
+        }
         /* This window now shows ONLY the status lines; draw them at the top of
            the offscreen (offy = 0) so a plain origin shows them. */
         if (kind == NHW_STATUS && wins[i]) {
