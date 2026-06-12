@@ -75,12 +75,14 @@ struct window_procs Gem_procs = {
 
 /*************************** Procedures *************************************/
 
+/* hpmax/hp ratio for the map cursor colour; 10 = the critical band */
 short
 mar_hp_query(void)
 {
-    if (Upolyd)
-        return (u.mh ? u.mhmax / u.mh : -1);
-    return (u.uhp ? u.uhpmax / u.uhp : -1);
+    int hp = Upolyd ? u.mh : u.uhp;
+    int hpmax = Upolyd ? u.mhmax : u.uhpmax;
+
+    return (hp <= 0) ? 10 : (short) (hpmax / hp);
 }
 
 short
