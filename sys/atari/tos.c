@@ -175,23 +175,6 @@ DOSgetch(void)
     return (Crawcin() & 0x007f);
 }
 
-long
-freediskspace(char *path)
-{
-    int drive = 0;
-    struct {
-        long freal; /*free allocation units*/
-        long total; /*total number of allocation units*/
-        long bps;   /*bytes per sector*/
-        long pspal; /*physical sectors per allocation unit*/
-    } freespace;
-    if (path[0] && path[1] == ':')
-        drive = (toupper(path[0]) - 'A') + 1;
-    if (Dfree(&freespace, drive) < 0)
-        return -1;
-    return freespace.freal * freespace.bps * freespace.pspal;
-}
-
 /*
  * Functions to get filenames using wildcards
  */
