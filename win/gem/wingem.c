@@ -15,10 +15,9 @@
 #ifdef GEM_GRAPHICS
 #include "wingem.h"
 
-static char nullstr[] = "", winpanicstr[] = "Bad window id %d";
+static char winpanicstr[] = "Bad window id %d";
 static short curr_status_line;
 
-static char *copy_of(const char *);
 static void bail(const char *); /* __attribute__((noreturn)) */
 
 extern short mar_set_tile_mode(short);
@@ -782,7 +781,7 @@ Gem_add_menu(winid window, const glyph_info *glyphinfo,
     G_item->Gmi_color = (short) clr;
     G_item->Gmi_itemflags =
         (unsigned short) (itemflags & ~MENU_ITEMFLAGS_SELECTED);
-    G_item->Gmi_str = copy_of(newstr);
+    G_item->Gmi_str = dupstr(newstr);
     mar_add_menu(window, G_item);
 }
 
@@ -1378,19 +1377,6 @@ Gem_preference_update(const char *pref)
         mar_set_msg_visible(iflags.wc_vary_msgcount);
         return;
     }
-}
-/*
- * Allocate a copy of the given string.  If null, return a string of
- * zero length.
- *
- * This is an exact duplicate of copy_of() in X11/winmenu.c.
- */
-static char *
-copy_of(const char *s)
-{
-    if (!s)
-        s = nullstr;
-    return strcpy((char *) alloc((unsigned) (strlen(s) + 1)), s);
 }
 
 #endif /* GEM_GRAPHICS */
