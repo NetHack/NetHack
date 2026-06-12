@@ -71,6 +71,7 @@ static char topl_resp[BUFSZ] = "";
 /* previous WIN_MESSAGE line was transient (ATR_NOHISTORY), so the next
    transient line replaces it in place; mac_clear_nhwindow resets it */
 static char gLastMsgTransient = 0;
+static short gLastTransientLines = 0; /* rows the last transient stored */
 
 #define CHAR_ANY '\n'
 
@@ -1873,6 +1874,59 @@ mac_exit_nhwindows(const char *s)
     mac_destroy_nhwindow(WIN_INVEN);
 }
 
+/* Word-wrap a message into CHAR_CR rows that each fit availw pixels (port
+   font must be the message window's). startw is the width already on the
+   current row (a topl answer continues the query line). Returns the
+   wrapped length; dst is NUL-terminated, truncating overlong input. */
+static long
+wrap_message(const char *src, char *dst, long dstsz, short availw,
+             short startw)
+{
+    long di = 0, lineStart = 0, lastSpace = -1;
+    long linew = startw;
+
+    while (*src && di < dstsz - 2) {
+        unsigned char uch = (unsigned char) *src++;
+        short cw;
+
+        if (uch == CHAR_LF || uch == CHAR_CR) {
+            dst[di++] = CHAR_CR;
+            lineStart = di;
+            lastSpace = -1;
+            linew = 0;
+            continue;
+        }
+        cw = CharWidth((short) uch);
+        if (linew + cw > availw && (di > lineStart || linew > 0)) {
+            if (lastSpace >= lineStart) {
+                /* break at the last space: it becomes the CR */
+                dst[lastSpace] = CHAR_CR;
+                lineStart = lastSpace + 1;
+                lastSpace = -1;
+                linew = (di > lineStart)
+                            ? TextWidth(dst + lineStart, 0,
+                                        (short) (di - lineStart))
+                            : 0;
+                if (linew + cw > availw && di > lineStart) {
+                    dst[di++] = CHAR_CR; /* still too wide: hard break */
+                    lineStart = di;
+                    linew = 0;
+                }
+            } else {
+                dst[di++] = CHAR_CR;     /* no space on row: hard break */
+                lineStart = di;
+                linew = 0;
+            }
+        }
+        if (uch == ' ')
+            lastSpace = di;
+        dst[di++] = (char) uch;
+        linew += cw;
+    }
+    dst[di] = 0;
+    return di;
+}
+
 /*
  * Don't forget to decrease in_putstr before returning...
  */
@@ -1882,9 +1936,10 @@ mac_putstr(winid win, int attr, const char *str)
     long len, slen;
     NhWindow *aWin = &theWindows[win];
     static char in_putstr = 0;
-    short newWidth, maxWidth;
+    short newWidth, maxWidth, y_before;
     Rect r;
     char *src, *sline, *dst, ch;
+    char wrapped[BUFSZ * 4];
 
     if (win < 0 || win >= NUM_MACWINDOWS || !aWin->its_window) {
         /* During early init, WIN_MESSAGE is -1; use raw_print instead */
@@ -1905,11 +1960,43 @@ mac_putstr(winid win, int attr, const char *str)
         return;
 
     in_putstr++;
-    slen = strlen(str);
 
     SetPortWindowPort(aWin->its_window);
     GetWindowPortBounds(aWin->its_window, &r);
     OffsetRect(&r, -r.left, -r.top);
+
+    /* Wrap to the window width before storing: the scroll math counts
+       CHAR_CR lines, so a row TETextBox wraps on its own adds a display
+       row it never sees, pushing everything below out of view. A topl
+       answer continues the query line, hence the startw measurement. */
+    if (win == WIN_MESSAGE) {
+        short availw = r.right - r.left
+                       - (aWin->scrollBar ? SBARWIDTH : 0) - 3;
+        if (availw > 50) {
+            short startw = 0;
+            TextFont(aWin->font_number);
+            TextSize(aWin->font_size);
+            TextFace(normal);
+            if (aWin->windowTextLen > 0) {
+                long n = aWin->windowTextLen, ls;
+                HLock(aWin->windowText);
+                {
+                    char *p = *aWin->windowText;
+                    ls = n;
+                    while (ls > 0 && p[ls - 1] != CHAR_CR)
+                        ls--;
+                    if (n > ls && n - ls < 0x7FFF)
+                        startw = TextWidth(p + ls, 0, (short) (n - ls));
+                }
+                HUnlock(aWin->windowText);
+            }
+            (void) wrap_message(str, wrapped, (long) sizeof wrapped,
+                                availw, startw);
+            str = wrapped;
+        }
+    }
+    slen = strlen(str);
+
     if (win == WIN_MESSAGE) {
         if (aWin->scrollBar)
             r.right -= SBARWIDTH;
@@ -1939,22 +2026,29 @@ mac_putstr(winid win, int attr, const char *str)
     }
 
     /* Transient (ATR_NOHISTORY) message after another transient one: drop the
-       prior line so this replaces it in place rather than piling up. */
+       prior one so this replaces it in place rather than piling up.  A
+       wrapped transient stored several rows, so back out as many rows
+       as it added. */
     if (win == WIN_MESSAGE && (attr & ATR_NOHISTORY) && gLastMsgTransient
         && aWin->windowTextLen > 0) {
         long n = aWin->windowTextLen;
+        short k = (gLastTransientLines > 0) ? gLastTransientLines : 1;
         HLock(aWin->windowText);
         {
             char *p = *aWin->windowText;
-            if (n > 0 && p[n - 1] == CHAR_CR) n--;       /* trailing CR */
-            while (n > 0 && p[n - 1] != CHAR_CR) n--;     /* back to line start */
+            while (k-- > 0 && n > 0) {
+                if (p[n - 1] == CHAR_CR) n--;          /* trailing CR */
+                while (n > 0 && p[n - 1] != CHAR_CR)
+                    n--;                               /* back to line start */
+                if (aWin->y_size > 0) aWin->y_size--;
+                if (aWin->y_curs > 0) aWin->y_curs--;
+            }
         }
         HUnlock(aWin->windowText);
-        if (aWin->y_size > 0) aWin->y_size--;
-        if (aWin->y_curs > 0) aWin->y_curs--;
         aWin->windowTextLen = n;
     }
 
+    y_before = aWin->y_size;
     len = aWin->windowTextLen;
     HLock(aWin->windowText);
     dst = *(aWin->windowText) + len;
@@ -2006,6 +2100,8 @@ mac_putstr(winid win, int attr, const char *str)
 
     if (win == WIN_MESSAGE) {
         gLastMsgTransient = (attr & ATR_NOHISTORY) != 0;
+        if (gLastMsgTransient)
+            gLastTransientLines = aWin->y_size - y_before;
         short min = aWin->y_size - (r.bottom - r.top) / aWin->row_height;
         if (aWin->scrollPos < min) {
             aWin->scrollPos = min;
