@@ -2753,8 +2753,10 @@ Inv_Handler(XEVENT *xev)
                             it->Gmi_selected = !it->Gmi_selected;
                             it->Gmi_count = count == 0L ? -1L : count;
                             count = 0L;
-                            if (Inv_how != PICK_ANY)
+                            if (Inv_how != PICK_ANY) {
                                 my_close_dialog(Inv_dialog, TRUE);
+                                break;
+                            }
                         }
                     }
                 break;
