@@ -3199,9 +3199,9 @@ mar_display_nhwindow(winid wind)
 
         if (p_Gw->gw_dirty) {
             ob_pos(zz_oblist[MSGWIN], MSGLINES, &area);
-            while (messages_per_move > 3) {
-                messages_per_move -= 3;
-                msg_pos += 3;
+            while (messages_per_move > msg_vis) {
+                messages_per_move -= msg_vis;
+                msg_pos += msg_vis;
                 redraw_window(p_Gw->gw_window, &area);
                 mar_more();
             }
