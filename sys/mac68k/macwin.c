@@ -492,6 +492,21 @@ DrawScrollbar(NhWindow *aWin)
 
 #define MIN_HEIGHT 50
 
+/* One-shot: when set, the next SanePositions() ignores saved positions and
+   lays out the default stack.  SanePositions is dual-use -- allmain.c calls
+   it at startup to RESTORE saved positions, the "Reposition Windows" menu
+   command (via ResetWindowPositions) calls it to RESET to defaults. */
+static Boolean gResetToDefault = FALSE;
+
+/* "Reposition Windows" menu command: lay out the default stack regardless of
+   any saved positions. */
+void
+ResetWindowPositions(void)
+{
+    gResetToDefault = TRUE;
+    (void) SanePositions();
+}
+
 int
 SanePositions(void)
 {
@@ -519,10 +534,10 @@ SanePositions(void)
         short title_h = small_screen ? 0 : 20;   /* title bar + small gap */
         short y = mbar_height + (small_screen ? 2 : 4);
         short msg_top, map_top, stat_top, avail_map_h, avail_map_w;
-        /* Honor saved window positions only on large screens, where windows
-           are movable. Small (borderless) screens always get the clean stack
-           since the windows can't be dragged/saved anyway. */
-        Boolean honor = !small_screen;
+        /* Large screens restore saved positions; "Reposition Windows" sets
+           gResetToDefault to force the clean default stack, as do small
+           (borderless) screens that can't drag/save. */
+        Boolean honor = !small_screen && !gResetToDefault;
 
         msg_h = 4 * theWindows[WIN_MESSAGE].row_height + 4;   /* ~4 lines */
         /* keep the big-screen bar past DrawScrollbar's auto-hide threshold */
@@ -593,7 +608,8 @@ SanePositions(void)
                 int shift;
                 if (((WindowPeek) theWindow)->windowKind
                     == WIN_BASE_KIND + NHW_MENU) {
-                    if (!RetrievePosition(kMenuWindow, &top, &left)) {
+                    if (gResetToDefault
+                        || !RetrievePosition(kMenuWindow, &top, &left)) {
                         top = mbar_height * 2;
                         left = 2;
                     }
@@ -601,7 +617,8 @@ SanePositions(void)
                     numMenu++;
                     shift = 20;
                 } else {
-                    if (!RetrievePosition(kTextWindow, &top, &left)) {
+                    if (gResetToDefault
+                        || !RetrievePosition(kTextWindow, &top, &left)) {
                         top = mbar_height * 2;
                         left = screenArea.right - 3
                                - (theWindow->portRect.right
@@ -616,10 +633,21 @@ SanePositions(void)
                     left += shift;
                 }
                 MoveWindow(theWindow, left, top, 1);
+                if (gResetToDefault)
+                    SaveWindowPos(theWindow);
             }
         }
     }
     SelectWindow(mapw);
+    if (gResetToDefault) {
+        /* persist the default stack so it survives a relaunch -- otherwise the
+           next startup would restore the pre-reset (dragged) saved positions
+           and undo the reset */
+        SaveWindowPos(msgw);
+        SaveWindowPos(mapw);
+        SaveWindowPos(statw);
+    }
+    gResetToDefault = FALSE; /* consume the one-shot */
     return (0);
 }
 

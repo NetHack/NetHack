@@ -292,7 +292,7 @@ macmap_create(NhWindow *map)
     }
 
     /* apply the saved text-mode size from the prefs file; position is
-       deferred to SanePositions() */
+       deferred to SanePositions() (called at startup from allmain.c) */
     {
         Rect b; short sw, sh;
         GetWindowPortBounds(w, &b);

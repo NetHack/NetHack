@@ -191,6 +191,7 @@ Boolean topl_key(unsigned char, Boolean);
 E void HandleEvent(EventRecord *); /* used in mmodal.c */
 extern void port_help(void);
 extern int SanePositions(void);
+extern void ResetWindowPositions(void); /* "Reposition Windows": reset stack */
 
 extern Boolean small_screen;
 
