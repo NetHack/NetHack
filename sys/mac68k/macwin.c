@@ -15,6 +15,7 @@
 #include "macmap.h"
 
 extern short gTileMenuNeedsUpdate;
+extern int extcmd_via_menu(void); /* cmd.c */
 
 #include <LowMem.h>
 #include <AppleEvents.h>
@@ -68,6 +69,11 @@ static TEHandle top_line = (TEHandle) nil;
 static int topl_query_len;
 static int topl_def_idx = -1;
 static char topl_resp[BUFSZ] = "";
+/* extended-command TAB completion: the prefix typed before the first TAB
+   and a counter that cycles through the matches; reset by enter_topl_mode
+   and by any non-TAB key (see topl_key_body) */
+static int topl_extcmd_tabi = 0;
+static char topl_extcmd_prefix[BUFSZ];
 /* previous WIN_MESSAGE line was transient (ATR_NOHISTORY), so the next
    transient line replaces it in place; mac_clear_nhwindow resets it */
 static char gLastMsgTransient = 0;
@@ -1038,6 +1044,7 @@ enter_topl_mode(char *query)
 
     putstr(WIN_MESSAGE, ATR_BOLD, query);
 
+    topl_extcmd_tabi = 0;
     topl_query_len = strlen(query);
     (*top_line)->selStart = topl_query_len;
     (*top_line)->selEnd = topl_query_len;
@@ -1148,6 +1155,11 @@ topl_key(unsigned char ch, Boolean ext)
 static Boolean
 topl_key_body(unsigned char ch, Boolean ext)
 {
+    /* any key other than TAB restarts the extended-command completion
+       cycle (see the '\t' case below) */
+    if (ext && ch != '\t')
+        topl_extcmd_tabi = 0;
+
     switch (ch) {
     case CHAR_ESC:
         topl_replace("\x1b"); /* leave ESC as the answer text */
@@ -1163,61 +1175,89 @@ topl_key_body(unsigned char ch, Boolean ext)
     case '\x1e' /* up arrow */:
         topl_replace("");
         return true;
+
+    case '\t':
+        /* Extended-command completion (as on the Amiga): each TAB replaces
+           the line with the next extcmds_match candidate for the prefix
+           typed before the first TAB, autocomplete-flagged first. Typing or
+           backspace resets the cycle. */
+        if (!ext) {
+            TEKey(ch, top_line); /* getlin: TAB is just another character */
+            return true;
+        } else {
+            int typed, n_all, n_ac, k, j, i, eidx = -1;
+            int *m;
+
+            if (topl_extcmd_tabi == 0) {
+                typed = (*top_line)->teLength - topl_query_len;
+                if (typed < 0)
+                    typed = 0;
+                if (typed > (int) sizeof topl_extcmd_prefix - 1)
+                    typed = (int) sizeof topl_extcmd_prefix - 1;
+                memcpy(topl_extcmd_prefix,
+                       *(*top_line)->hText + topl_query_len, typed);
+                topl_extcmd_prefix[typed] = '\0';
+            }
+            n_all = extcmds_match(topl_extcmd_prefix, ECM_IGNOREAC, &m);
+            if (n_all == 0) {
+                nhbell(); /* no match for the typed prefix */
+                return true;
+            }
+            /* extcmds_match hands back one shared static list, so re-fetch
+               each variant immediately before reading it */
+            n_ac = extcmds_match(topl_extcmd_prefix, ECM_NOFLAGS, &m);
+            k = topl_extcmd_tabi++ % n_all;
+            if (k < n_ac) {
+                eidx = m[k]; /* m == the autocomplete-only matches */
+            } else {
+                n_all = extcmds_match(topl_extcmd_prefix, ECM_IGNOREAC, &m);
+                j = k - n_ac;
+                for (i = 0; i < n_all; i++) {
+                    if (extcmds_getentry(m[i])->flags & AUTOCOMPLETE)
+                        continue;
+                    if (j-- == 0) {
+                        eidx = m[i];
+                        break;
+                    }
+                }
+            }
+            if (eidx >= 0) {
+                topl_replace((char *) extcmds_getentry(eidx)->ef_txt);
+                /* caret to end so the name can be edited further; an empty
+                   selection at teLength is a caret, not a drawn hilite */
+                topl_set_select((*top_line)->teLength,
+                                (*top_line)->teLength);
+            }
+            return true;
+        }
+
+    case '?':
+        /* '?' opens the extended-command menu (as on the Amiga).  The menu
+           resolves to a command index; stuff its name into the line and end
+           input so mac_get_ext_cmd's normal lookup returns the same index. */
+        if (ext) {
+            int sel = extcmd_via_menu();
+
+            SetPortWindowPort(theWindows[WIN_MESSAGE].its_window);
+            if (sel >= 0)
+                topl_replace((char *) extcmds_getentry(sel)->ef_txt);
+            else
+                topl_replace("\x1b"); /* cancelled: answer ESC */
+            return false;
+        }
+        TEKey(ch, top_line); /* getlin: '?' is an ordinary character */
+        return true;
+
     case CHAR_BS:
     case '\x1c' /* left arrow */:
         if ((*top_line)->selEnd <= topl_query_len)
             return true;
-        if (ext && (*top_line)->selEnd < (*top_line)->teLength) {
-            /* a completion suffix trails the caret: dismiss just it */
-            topl_delete_silent((*top_line)->selEnd, (*top_line)->teLength);
-            return true;
-        }
-        /* FALLTHROUGH: TEKey deletes one typed char (BS) or moves the
-           caret (left arrow); re-completion below is skipped for both so
-           deletions stick instead of instantly re-expanding */
-    default:
-        if (ext && (*top_line)->selStart == (*top_line)->selEnd
-            && (*top_line)->selEnd < (*top_line)->teLength) {
-            /* typing over a pending suggestion: drop it first, then let
-               the re-completion below propose a new one */
-            topl_delete_silent((*top_line)->selEnd, (*top_line)->teLength);
-        }
+        /* TEKey deletes one typed char (BS) or moves the caret left */
         TEKey(ch, top_line);
-        if (ext && ch != CHAR_BS && ch != '\x1c') {
-            int com_index = -1, oindex = 0;
-            int typed = (*top_line)->teLength - topl_query_len;
+        return true;
 
-            while (extcmdlist[oindex].ef_txt != (char *) 0) {
-                if (!strncmpi(*(*top_line)->hText + topl_query_len,
-                              extcmdlist[oindex].ef_txt, typed)) {
-                    if (com_index == -1)
-                        com_index = oindex;
-                    else {
-                        com_index = -2;
-                        break;
-                    }
-                }
-                oindex++;
-            }
-            if (com_index >= 0) {
-                /* unique match: append the suggested suffix as plain text.
-                   Classic TE's TEInsert does NOT advance the caret past
-                   the inserted text: selStart/selEnd stay at the pre-insert
-                   position, i.e. between the typed prefix and the suffix.
-                   That is load-bearing: selEnd < teLength is how the
-                   BS-peel and pre-drop cases above detect a pending
-                   suggestion. And never SELECT the suffix: TE extends a
-                   drawn hilite that ends at teLength out to the view edge,
-                   inverting the rest of the line. Return accepts the whole
-                   line; backspace dismisses the suffix. */
-                const char *txt = extcmdlist[com_index].ef_txt;
-                int txt_len = (int) strlen(txt);
-
-                if (txt_len > typed)
-                    TEInsert((const void *) (txt + typed),
-                             (long) (txt_len - typed), top_line);
-            }
-        }
+    default:
+        TEKey(ch, top_line);
         return true;
     }
 }
