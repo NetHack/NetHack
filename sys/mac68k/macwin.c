@@ -15,6 +15,7 @@
 #include "macmap.h"
 
 extern short gTileMenuNeedsUpdate;
+extern int extcmd_via_menu(void); /* cmd.c */
 
 #include <LowMem.h>
 #include <AppleEvents.h>
@@ -68,9 +69,15 @@ static TEHandle top_line = (TEHandle) nil;
 static int topl_query_len;
 static int topl_def_idx = -1;
 static char topl_resp[BUFSZ] = "";
+/* extended-command TAB completion: the prefix typed before the first TAB
+   and a counter that cycles through the matches; reset by enter_topl_mode
+   and by any non-TAB key (see topl_key_body) */
+static int topl_extcmd_tabi = 0;
+static char topl_extcmd_prefix[BUFSZ];
 /* previous WIN_MESSAGE line was transient (ATR_NOHISTORY), so the next
    transient line replaces it in place; mac_clear_nhwindow resets it */
 static char gLastMsgTransient = 0;
+static short gLastTransientLines = 0; /* rows the last transient stored */
 
 #define CHAR_ANY '\n'
 
@@ -1010,6 +1017,21 @@ topl_resp_rect(int resp_idx, Rect *r)
     return;
 }
 
+/* Invalidate the yn-button strip (len button slots) and clear the
+   stored responses + default index; callers set new ones afterwards
+   if they need any. */
+static void
+invalidate_topl_buttons(int len)
+{
+    Rect frame;
+
+    topl_resp_rect(0, &frame);
+    frame.right = (BTN_IND + BTN_W) * len + BTN_IND;
+    InvalWindowRect(theWindows[WIN_MESSAGE].its_window, &frame);
+    memset(topl_resp, 0, sizeof topl_resp);
+    topl_def_idx = -1;
+}
+
 void
 enter_topl_mode(char *query)
 {
@@ -1017,18 +1039,12 @@ enter_topl_mode(char *query)
         return;
 
     /* Clear any leftover button state from a previous prompt */
-    if (topl_resp[0]) {
-        Rect frame;
-        int r_len = strlen(topl_resp);
-        topl_resp_rect(0, &frame);
-        frame.right = (BTN_IND + BTN_W) * r_len + BTN_IND;
-        InvalWindowRect(theWindows[WIN_MESSAGE].its_window, &frame);
-        memset(topl_resp, 0, sizeof topl_resp);
-        topl_def_idx = -1;
-    }
+    if (topl_resp[0])
+        invalidate_topl_buttons(strlen(topl_resp));
 
     putstr(WIN_MESSAGE, ATR_BOLD, query);
 
+    topl_extcmd_tabi = 0;
     topl_query_len = strlen(query);
     (*top_line)->selStart = topl_query_len;
     (*top_line)->selEnd = topl_query_len;
@@ -1074,14 +1090,8 @@ leave_topl_mode(char *answer) /* answer must have room for BUFSZ bytes */
     putstr(WIN_MESSAGE, ATR_BOLD, answer);
 
     /* Invalidate the button area so stale buttons get erased */
-    if (topl_resp[0]) {
-        Rect frame;
-        int r_len = strlen(topl_resp);
-        topl_resp_rect(0, &frame);
-        frame.right = (BTN_IND + BTN_W) * r_len + BTN_IND;
-        InvalWindowRect(aWin->its_window, &frame);
-        memset(topl_resp, 0, sizeof topl_resp);
-    }
+    if (topl_resp[0])
+        invalidate_topl_buttons(strlen(topl_resp));
 
     (*top_line)->viewRect.left += 10000;
     UndimMenuBar();
@@ -1097,17 +1107,59 @@ topl_set_select(short selStart, short selEnd)
     TEActivate(top_line);
 }
 
+/* Delete [from, to) without ever drawing a selection: classic TE extends
+   a range hilite to the view's right edge when it ends at teLength (always,
+   on a one-line TE), inverting the prompt. Deactivated, TEDelete paints no
+   hilite. */
+static void
+topl_delete_silent(short from, short to)
+{
+    TEDeactivate(top_line);
+    (*top_line)->selStart = from;
+    (*top_line)->selEnd = to;
+    TEDelete(top_line);
+    TEActivate(top_line); /* selection is now an insertion point at 'from' */
+}
+
 static void
 topl_replace(char *new_ans)
 {
-    topl_set_select(topl_query_len, (*top_line)->teLength);
-    TEDelete(top_line);
+    topl_delete_silent(topl_query_len, (*top_line)->teLength);
     TEInsert(new_ans, strlen(new_ans), top_line);
 }
 
+static Boolean topl_key_body(unsigned char ch, Boolean ext);
+
+/* TE draws into the current GrafPort; the events processed while waiting
+   for this key (HandleUpdate etc.) can leave any window's port current,
+   so anchor all of topl_key's TE calls to the message window */
 Boolean
 topl_key(unsigned char ch, Boolean ext)
 {
+    GrafPtr savePort;
+    Boolean ret;
+    WindowPtr msg_win;
+
+    /* guard the theWindows[-1] read; same crash class as in_topl_mode's */
+    if (WIN_MESSAGE == WIN_ERR
+        || !(msg_win = theWindows[WIN_MESSAGE].its_window))
+        return topl_key_body(ch, ext);
+
+    GetPort(&savePort);
+    SetPortWindowPort(msg_win);
+    ret = topl_key_body(ch, ext);
+    SetPort(savePort);
+    return ret;
+}
+
+static Boolean
+topl_key_body(unsigned char ch, Boolean ext)
+{
+    /* any key other than TAB restarts the extended-command completion
+       cycle (see the '\t' case below) */
+    if (ext && ch != '\t')
+        topl_extcmd_tabi = 0;
+
     switch (ch) {
     case CHAR_ESC:
         topl_replace("\x1b"); /* leave ESC as the answer text */
@@ -1123,34 +1175,89 @@ topl_key(unsigned char ch, Boolean ext)
     case '\x1e' /* up arrow */:
         topl_replace("");
         return true;
+
+    case '\t':
+        /* Extended-command completion (as on the Amiga): each TAB replaces
+           the line with the next extcmds_match candidate for the prefix
+           typed before the first TAB, autocomplete-flagged first. Typing or
+           backspace resets the cycle. */
+        if (!ext) {
+            TEKey(ch, top_line); /* getlin: TAB is just another character */
+            return true;
+        } else {
+            int typed, n_all, n_ac, k, j, i, eidx = -1;
+            int *m;
+
+            if (topl_extcmd_tabi == 0) {
+                typed = (*top_line)->teLength - topl_query_len;
+                if (typed < 0)
+                    typed = 0;
+                if (typed > (int) sizeof topl_extcmd_prefix - 1)
+                    typed = (int) sizeof topl_extcmd_prefix - 1;
+                memcpy(topl_extcmd_prefix,
+                       *(*top_line)->hText + topl_query_len, typed);
+                topl_extcmd_prefix[typed] = '\0';
+            }
+            n_all = extcmds_match(topl_extcmd_prefix, ECM_IGNOREAC, &m);
+            if (n_all == 0) {
+                nhbell(); /* no match for the typed prefix */
+                return true;
+            }
+            /* extcmds_match hands back one shared static list, so re-fetch
+               each variant immediately before reading it */
+            n_ac = extcmds_match(topl_extcmd_prefix, ECM_NOFLAGS, &m);
+            k = topl_extcmd_tabi++ % n_all;
+            if (k < n_ac) {
+                eidx = m[k]; /* m == the autocomplete-only matches */
+            } else {
+                n_all = extcmds_match(topl_extcmd_prefix, ECM_IGNOREAC, &m);
+                j = k - n_ac;
+                for (i = 0; i < n_all; i++) {
+                    if (extcmds_getentry(m[i])->flags & AUTOCOMPLETE)
+                        continue;
+                    if (j-- == 0) {
+                        eidx = m[i];
+                        break;
+                    }
+                }
+            }
+            if (eidx >= 0) {
+                topl_replace((char *) extcmds_getentry(eidx)->ef_txt);
+                /* caret to end so the name can be edited further; an empty
+                   selection at teLength is a caret, not a drawn hilite */
+                topl_set_select((*top_line)->teLength,
+                                (*top_line)->teLength);
+            }
+            return true;
+        }
+
+    case '?':
+        /* '?' opens the extended-command menu (as on the Amiga).  The menu
+           resolves to a command index; stuff its name into the line and end
+           input so mac_get_ext_cmd's normal lookup returns the same index. */
+        if (ext) {
+            int sel = extcmd_via_menu();
+
+            SetPortWindowPort(theWindows[WIN_MESSAGE].its_window);
+            if (sel >= 0)
+                topl_replace((char *) extcmds_getentry(sel)->ef_txt);
+            else
+                topl_replace("\x1b"); /* cancelled: answer ESC */
+            return false;
+        }
+        TEKey(ch, top_line); /* getlin: '?' is an ordinary character */
+        return true;
+
     case CHAR_BS:
     case '\x1c' /* left arrow */:
         if ((*top_line)->selEnd <= topl_query_len)
             return true;
-        else if (ext) {
-            topl_replace("");
-            return true;
-        }
+        /* TEKey deletes one typed char (BS) or moves the caret left */
+        TEKey(ch, top_line);
+        return true;
+
     default:
         TEKey(ch, top_line);
-        if (ext) {
-            int com_index = -1, oindex = 0;
-            while (extcmdlist[oindex].ef_txt != (char *) 0) {
-                if (!strncmpi(*(*top_line)->hText + topl_query_len,
-                              extcmdlist[oindex].ef_txt,
-                              (*top_line)->teLength - topl_query_len)) {
-                    if (com_index == -1)
-                        com_index = oindex;
-                    else {
-                        com_index = -2;
-                        break;
-                    }
-                }
-                oindex++;
-            }
-            if (com_index >= 0)
-                topl_replace((char *) extcmdlist[com_index].ef_txt);
-        }
         return true;
     }
 }
@@ -1184,7 +1291,6 @@ void
 topl_set_resp(char *resp, char def)
 {
     char *loc;
-    Rect frame;
     int r_len, r_len1;
 
     if (!resp) {
@@ -1197,12 +1303,8 @@ topl_set_resp(char *resp, char def)
     r_len1 = strlen(resp);
     r_len = strlen(topl_resp);
     if (r_len < r_len1)
-        r_len = r_len1;
-    topl_resp_rect(0, &frame);
-    frame.right = (BTN_IND + BTN_W) * r_len + BTN_IND;
-    InvalWindowRect(theWindows[WIN_MESSAGE].its_window, &frame);
-
-    memset(topl_resp, 0, sizeof topl_resp);
+        r_len = r_len1; /* cover both the old and the new strip */
+    invalidate_topl_buttons(r_len);
     strncpy(topl_resp, resp, sizeof topl_resp - 1);
     loc = strchr(topl_resp, def);
     topl_def_idx = loc ? loc - topl_resp : -1;
@@ -1226,10 +1328,33 @@ topl_set_resp(char *resp, char def)
     }
 }
 
+static char topl_resp_key_body(char);
+
 static char
 topl_resp_key(char ch)
 {
     if (strlen(topl_resp) > 0) {
+        /* same port hazard as topl_key: this runs from GeneralKey during
+           HandleEvent, where update handling can leave any port current,
+           and the TEKey calls below draw into the prompt TE */
+        GrafPtr savePort;
+        WindowPtr msg_win = (WIN_MESSAGE != WIN_ERR)
+                                ? theWindows[WIN_MESSAGE].its_window
+                                : (WindowPtr) 0;
+
+        GetPort(&savePort);
+        if (msg_win)
+            SetPortWindowPort(msg_win);
+        ch = topl_resp_key_body(ch);
+        SetPort(savePort);
+    }
+    return ch;
+}
+
+static char
+topl_resp_key_body(char ch)
+{
+    {
         char *loc = strchr(topl_resp, ch);
 
         if (!loc) {
@@ -1739,6 +1864,16 @@ mac_nhgetch(void)
     do {
         (void) WaitNextEvent(everyEvent, &anEvent, doDawdle, gMouseRgn);
         HandleEvent(&anEvent);
+        if (in_topl_mode()) {
+            /* blink the TE caret in the prompt; doDawdle is GetCaretTime
+               in topl mode so we wake often enough */
+            GrafPtr savePort;
+
+            GetPort(&savePort);
+            SetPortWindowPort(theWindows[WIN_MESSAGE].its_window);
+            TEIdle(top_line);
+            SetPort(savePort);
+        }
         ch = GetFromKeyQueue();
     } while (!ch && !gClickedToMove);
 
@@ -1779,6 +1914,59 @@ mac_exit_nhwindows(const char *s)
     mac_destroy_nhwindow(WIN_INVEN);
 }
 
+/* Word-wrap a message into CHAR_CR rows that each fit availw pixels (port
+   font must be the message window's). startw is the width already on the
+   current row (a topl answer continues the query line). Returns the
+   wrapped length; dst is NUL-terminated, truncating overlong input. */
+static long
+wrap_message(const char *src, char *dst, long dstsz, short availw,
+             short startw)
+{
+    long di = 0, lineStart = 0, lastSpace = -1;
+    long linew = startw;
+
+    while (*src && di < dstsz - 2) {
+        unsigned char uch = (unsigned char) *src++;
+        short cw;
+
+        if (uch == CHAR_LF || uch == CHAR_CR) {
+            dst[di++] = CHAR_CR;
+            lineStart = di;
+            lastSpace = -1;
+            linew = 0;
+            continue;
+        }
+        cw = CharWidth((short) uch);
+        if (linew + cw > availw && (di > lineStart || linew > 0)) {
+            if (lastSpace >= lineStart) {
+                /* break at the last space: it becomes the CR */
+                dst[lastSpace] = CHAR_CR;
+                lineStart = lastSpace + 1;
+                lastSpace = -1;
+                linew = (di > lineStart)
+                            ? TextWidth(dst + lineStart, 0,
+                                        (short) (di - lineStart))
+                            : 0;
+                if (linew + cw > availw && di > lineStart) {
+                    dst[di++] = CHAR_CR; /* still too wide: hard break */
+                    lineStart = di;
+                    linew = 0;
+                }
+            } else {
+                dst[di++] = CHAR_CR;     /* no space on row: hard break */
+                lineStart = di;
+                linew = 0;
+            }
+        }
+        if (uch == ' ')
+            lastSpace = di;
+        dst[di++] = (char) uch;
+        linew += cw;
+    }
+    dst[di] = 0;
+    return di;
+}
+
 /*
  * Don't forget to decrease in_putstr before returning...
  */
@@ -1788,9 +1976,10 @@ mac_putstr(winid win, int attr, const char *str)
     long len, slen;
     NhWindow *aWin = &theWindows[win];
     static char in_putstr = 0;
-    short newWidth, maxWidth;
+    short newWidth, maxWidth, y_before;
     Rect r;
     char *src, *sline, *dst, ch;
+    char wrapped[BUFSZ * 4];
 
     if (win < 0 || win >= NUM_MACWINDOWS || !aWin->its_window) {
         /* During early init, WIN_MESSAGE is -1; use raw_print instead */
@@ -1811,11 +2000,43 @@ mac_putstr(winid win, int attr, const char *str)
         return;
 
     in_putstr++;
-    slen = strlen(str);
 
     SetPortWindowPort(aWin->its_window);
     GetWindowPortBounds(aWin->its_window, &r);
     OffsetRect(&r, -r.left, -r.top);
+
+    /* Wrap to the window width before storing: the scroll math counts
+       CHAR_CR lines, so a row TETextBox wraps on its own adds a display
+       row it never sees, pushing everything below out of view. A topl
+       answer continues the query line, hence the startw measurement. */
+    if (win == WIN_MESSAGE) {
+        short availw = r.right - r.left
+                       - (aWin->scrollBar ? SBARWIDTH : 0) - 3;
+        if (availw > 50) {
+            short startw = 0;
+            TextFont(aWin->font_number);
+            TextSize(aWin->font_size);
+            TextFace(normal);
+            if (aWin->windowTextLen > 0) {
+                long n = aWin->windowTextLen, ls;
+                HLock(aWin->windowText);
+                {
+                    char *p = *aWin->windowText;
+                    ls = n;
+                    while (ls > 0 && p[ls - 1] != CHAR_CR)
+                        ls--;
+                    if (n > ls && n - ls < 0x7FFF)
+                        startw = TextWidth(p + ls, 0, (short) (n - ls));
+                }
+                HUnlock(aWin->windowText);
+            }
+            (void) wrap_message(str, wrapped, (long) sizeof wrapped,
+                                availw, startw);
+            str = wrapped;
+        }
+    }
+    slen = strlen(str);
+
     if (win == WIN_MESSAGE) {
         if (aWin->scrollBar)
             r.right -= SBARWIDTH;
@@ -1845,22 +2066,29 @@ mac_putstr(winid win, int attr, const char *str)
     }
 
     /* Transient (ATR_NOHISTORY) message after another transient one: drop the
-       prior line so this replaces it in place rather than piling up. */
+       prior one so this replaces it in place rather than piling up.  A
+       wrapped transient stored several rows, so back out as many rows
+       as it added. */
     if (win == WIN_MESSAGE && (attr & ATR_NOHISTORY) && gLastMsgTransient
         && aWin->windowTextLen > 0) {
         long n = aWin->windowTextLen;
+        short k = (gLastTransientLines > 0) ? gLastTransientLines : 1;
         HLock(aWin->windowText);
         {
             char *p = *aWin->windowText;
-            if (n > 0 && p[n - 1] == CHAR_CR) n--;       /* trailing CR */
-            while (n > 0 && p[n - 1] != CHAR_CR) n--;     /* back to line start */
+            while (k-- > 0 && n > 0) {
+                if (p[n - 1] == CHAR_CR) n--;          /* trailing CR */
+                while (n > 0 && p[n - 1] != CHAR_CR)
+                    n--;                               /* back to line start */
+                if (aWin->y_size > 0) aWin->y_size--;
+                if (aWin->y_curs > 0) aWin->y_curs--;
+            }
         }
         HUnlock(aWin->windowText);
-        if (aWin->y_size > 0) aWin->y_size--;
-        if (aWin->y_curs > 0) aWin->y_curs--;
         aWin->windowTextLen = n;
     }
 
+    y_before = aWin->y_size;
     len = aWin->windowTextLen;
     HLock(aWin->windowText);
     dst = *(aWin->windowText) + len;
@@ -1874,9 +2102,14 @@ mac_putstr(winid win, int attr, const char *str)
             aWin->y_curs++;
             aWin->y_size++;
             aWin->x_curs = 0;
-            newWidth = TextWidth(sline, 0, src - sline);
-            if (newWidth > maxWidth) {
-                maxWidth = newWidth;
+            /* the message window has a fixed width; only the other
+               window kinds use maxWidth (x_size below), so skip the
+               per-line TextWidth traps on the hottest putstr path */
+            if (win != WIN_MESSAGE) {
+                newWidth = TextWidth(sline, 0, src - sline);
+                if (newWidth > maxWidth) {
+                    maxWidth = newWidth;
+                }
             }
             sline = src + 1;
         } else
@@ -1884,14 +2117,19 @@ mac_putstr(winid win, int attr, const char *str)
         src++;
     }
 
-    newWidth = TextWidth(sline, 0, src - sline);
-    if (newWidth > maxWidth) {
-        maxWidth = newWidth;
+    if (win != WIN_MESSAGE) {
+        newWidth = TextWidth(sline, 0, src - sline);
+        if (newWidth > maxWidth) {
+            maxWidth = newWidth;
+        }
     }
 
     aWin->windowTextLen += slen;
 
-    if (ch != CHAR_CR) {
+    /* terminate the line unless the text already ended with CR/LF (the
+       loop above exits with ch == 0, so test the last STORED byte; an
+       empty string still gets a CR -- a deliberate blank line) */
+    if (slen == 0 || (*(aWin->windowText))[len + slen - 1] != CHAR_CR) {
         (*(aWin->windowText))[len + slen] = CHAR_CR;
         aWin->windowTextLen++;
         aWin->y_curs++;
@@ -1902,6 +2140,8 @@ mac_putstr(winid win, int attr, const char *str)
 
     if (win == WIN_MESSAGE) {
         gLastMsgTransient = (attr & ATR_NOHISTORY) != 0;
+        if (gLastMsgTransient)
+            gLastTransientLines = aWin->y_size - y_before;
         short min = aWin->y_size - (r.bottom - r.top) / aWin->row_height;
         if (aWin->scrollPos < min) {
             aWin->scrollPos = min;
@@ -2461,7 +2701,35 @@ MsgUpdate(NhWindow *wind)
         long tlen = wind->windowTextLen;
         if (tlen > hsize)
             tlen = hsize;
-        TETextBox(*wind->windowText, tlen, &r, teJustLeft);
+        /* Bound TE work to the visible lines: TETextBox wraps and draws a
+           throwaway record over all it is given, so the whole history made
+           each message O(history). Slice lines [first, last) (1:1 with
+           CHAR_CR) and draw at their offset; the box still spans r.bottom,
+           so its implicit erase covers the same area. */
+        char *base = *wind->windowText;
+        long first = wind->scrollPos;
+        long last, line, i;
+        long startOff = 0, endOff = tlen;
+        Rect box = r;
+
+        if (first < 0)
+            first = 0;
+        /* r.top is already offset by -scrollPos rows, so the view top
+           sits at r.top + first * row_height */
+        box.top = r.top + (short) first * wind->row_height;
+        last = first + (r.bottom - box.top) / wind->row_height + 1;
+        for (i = 0, line = 0; i < tlen && line < last; i++) {
+            if (base[i] == CHAR_CR) {
+                line++;
+                if (line == first)
+                    startOff = i + 1;
+            }
+        }
+        if (line >= last)
+            endOff = i;       /* just past the last visible line's CR */
+        if (line < first)
+            startOff = tlen;  /* scrolled past the end: erase only */
+        TETextBox(base + startOff, endOff - startOff, &box, teJustLeft);
     }
     HUnlock(wind->windowText);
 
