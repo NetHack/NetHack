@@ -3798,6 +3798,9 @@ HandleClick(EventRecord *theEvent)
         break;
 
     case inMenuBar:
+        UndimMenuBar(); /* AdjustMenus(0): refresh enables and checkmarks
+                           (tile mode, play mode) before the Toolbox pulls
+                           the menus down */
         DoMenuEvt(MenuSelect(theEvent->where));
         break;
 

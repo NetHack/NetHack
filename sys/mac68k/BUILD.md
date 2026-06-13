@@ -70,7 +70,18 @@ This runs the full packaging pipeline:
 3. Emit the MacBinary directly from the same Rez call
 4. Build HFS disk image with all data files, `save/` and `levels/`
    directories, and `nethack.cnf`
-5. Wrap with Apple Partition Map for SCSI emulators
+5. Wrap with Apple Partition Map for SCSI emulators, embedding the
+   port's own SCSI disk driver (`sys/mac68k/scsidriver.bin`) in an
+   `Apple_Driver43` partition so the image auto-mounts from the ROM —
+   on real hardware and in QEMU alike, with nothing proprietary inside
+
+### The embedded SCSI driver
+
+`sys/mac68k/scsidriver.bin` is a vendored build of the MIT-licensed
+minimal Mac SCSI disk driver developed alongside this port (the
+`mac-scsi-driver` project, same author; driver name `.NHsd`, ~1.8 KB).
+To update it, build `driver.bin` there and copy it over — packaging
+computes the boot checksum and partition fields automatically.
 
 Output:
 - `targets/mac68k/NetHack.img` — ready for QEMU or BlueSCSI
@@ -121,7 +132,7 @@ does.
 
 | Script | Purpose |
 |--------|---------|
-| `make_scsi_image2.py` | Wrap an HFS image with Apple Partition Map for SCSI |
+| `make_scsi_image2.py` | Wrap an HFS image with Apple Partition Map for SCSI; `--driver <bin>` embeds the port's SCSI driver so the image auto-mounts |
 | `decode_hqx.py` | Decode BinHex 4.0 (.hqx) files to data + resource forks; `--creator-fixup` renames the legacy signature/BNDL creator |
 | `dump_rsrc.py` | Dump resource fork contents (types, IDs, sizes) |
 | `make_info.py` | Write a macutils `.info` sidecar (name/type/creator + build-time dates) for the StuffIt staging |
