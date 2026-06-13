@@ -163,6 +163,7 @@ l_nhcore_done(void)
         gl.luacore = 0;
     }
     end_luapat();
+    free_questpager();
 }
 
 void

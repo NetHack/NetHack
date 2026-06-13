@@ -2641,6 +2641,7 @@ extern void com_pager(const char *);
 extern void qt_pager(const char *);
 extern struct permonst *qt_montype(void);
 extern void deliver_splev_message(void);
+extern void free_questpager(void);
 
 /* ### random.c ### */
 
