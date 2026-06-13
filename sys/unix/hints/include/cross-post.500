@@ -338,6 +338,11 @@ endif  # CROSS_TO_AMIGA
 
 ifdef CROSS_TO_MAC68K
 # Mac 68k file dependencies
+# mac68kconf.h is pulled in via config.h on MAC68K but the generic
+# $(CONFIG_H) timestamp rule only lists pcconf/unixconf/vmsconf/windconf;
+# without this extra prerequisite, editing it leaves every core object
+# stale (mixed-ABI binary: struct iflags layouts disagree between objects)
+$(CONFIG_H): ../include/mac68kconf.h
 MAC_H = $(HACK_H) ../sys/mac68k/maccompat.h ../include/macwin.h \
 	../include/mactty.h ../include/mttypriv.h
 $(TARGETPFX)macmain.o : ../sys/mac68k/macmain.c $(MAC_H)
