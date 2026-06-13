@@ -525,6 +525,12 @@ $(TARGETPFX)wingem1.o : ../win/gem/wingem1.c $(HACK_H)
 $(TARGETPFX)bitmfile.o : ../win/gem/bitmfile.c $(HACK_H)
 $(TARGETPFX)gr_rect.o : ../win/gem/gr_rect.c $(HACK_H)
 $(TARGETPFX)load_img.o : ../win/gem/load_img.c $(HACK_H)
+# Explicit rule for the generated tile.c -> tile.o so make's pattern rule
+# $(TARGETPFX)%.o : %.c doesn't pick the wrong path before tile.c exists
+# (breaks -j N builds).  Kept here in cross-post -- after 'all' -- so it
+# never becomes the default goal, matching the amiga/msdos placement.
+$(TARGETPFX)tile.o : $(SRCDIR)/tile.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
 $(GAMEBIN) : $(HOBJ) $(LUACROSSLIB)
 	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
 	$(HOBJ) $(WINLIB) $(TARGET_LIBS)
