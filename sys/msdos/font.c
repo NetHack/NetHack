@@ -86,7 +86,7 @@ load_font(const char *filename)
         bufsize = 0;
         i = 0;
         while (i < length) {
-            unsigned j;
+            /* unsigned j; */
 
             size = fread(buf + bufsize, 1, sizeof(buf) - bufsize, fp);
             if (ferror(fp)) goto error;

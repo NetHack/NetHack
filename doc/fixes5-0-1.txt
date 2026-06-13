@@ -60,6 +60,7 @@ monsters (including pets) aren't scared of the Sokoban rolling boulder traps
 fix a bug in which steeds would continuously gain movement points while
         being ridden
 when hero's behavior makes erinyes stronger, cap level at 49 rather than 50
+with inventory item action for leash, distingluish leash-in-use from empty one
 
 
 Platform- and/or Interface-Specific Fixes
