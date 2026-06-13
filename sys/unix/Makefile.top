@@ -139,6 +139,12 @@ all:    $(ALLDEP)
 	true; $(MOREALL)
 	@echo "Done."
 
+# Several top-level targets reach the host 'makedefs' tool through their own
+# recursive sub-make, so under -jN they would build (and race on) it at the
+# same time.  Serialize the top level so makedefs is built once; the sub-makes
+# (src/ &c) still run in parallel.  Works on both GNU and BSD make.
+.NOTPARALLEL:
+
 $(GAME): lua_support
 	( cd src ; $(MAKE) LUA_VERSION=$(LUA_VERSION) $(GAME) )
 
