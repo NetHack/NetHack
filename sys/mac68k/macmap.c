@@ -38,6 +38,7 @@ typedef struct {
     short          tile_cache[ROWNO][COLNO];
     unsigned char  text_cache[ROWNO][COLNO];
     unsigned char  text_color[ROWNO][COLNO];
+    unsigned char  pet_cache[ROWNO][COLNO];   /* MG_PET, for hilite_pet */
     /* software cursor for getpos/farlook: track the framed cell to un-frame it */
     Boolean        cursor_on;
     short          cursor_x, cursor_y;
@@ -291,7 +292,7 @@ macmap_create(NhWindow *map)
     }
 
     /* apply the saved text-mode size from the prefs file; position is
-       deferred to SanePositions() */
+       deferred to SanePositions() (called at startup from allmain.c) */
     {
         Rect b; short sw, sh;
         GetWindowPortBounds(w, &b);
@@ -401,8 +402,7 @@ macmap_set_mode(NhWindow *map, Boolean tile_mode)
            (tolerance 0x1000 of 0xFFFF, ~6%); colors beyond the first entries
            map to their nearest match in the default CLUT.  32 entries -- not
            256 -- so reserved system slots and other windows' colors survive. */
-#define TILE_PALETTE_ENTRIES 32
-#define TILE_PALETTE_TOLERANCE 0x1000
+#define TILE_PALETTE_TOLERANCE 0x1000   /* TILE_PALETTE_ENTRIES: mactile.h */
         if (mactile_sheet_depth() == 8) {
             if (!gMap.palette) {
                 CTabHandle ct = mactile_sheet_ctable();
@@ -463,6 +463,55 @@ macmap_get_mode(NhWindow *map)
     return (map && gMap.owner == map) ? gMap.tile_mode : false;
 }
 
+/* Cell-draw batch: one LockPixels + SetGWorld around the repaint loops
+   instead of per cell (an 80x21 repaint otherwise pays thousands of traps
+   on a 16 MHz 030). During a batch the cell painters draw in place;
+   LockPixels is a flag, not a count, so nested pairs would clear the
+   batch's lock. */
+static struct {
+    Boolean   active;
+    GWorldPtr saveW;
+    GDHandle  saveD;
+    short     ascent;     /* text mode: cached GetFontInfo */
+} gBatch;
+
+static Boolean
+begin_cell_batch(void)
+{
+    if (gBatch.active || !gMap.backing)
+        return false;
+    PixMapHandle pm = GetGWorldPixMap(gMap.backing);
+    if (!LockPixels(pm))
+        return false;
+    GetGWorld(&gBatch.saveW, &gBatch.saveD);
+    SetGWorld(gMap.backing, NULL);
+    if (!gMap.tile_mode) {
+        FontInfo fi;
+        GetFontInfo(&fi);
+        gBatch.ascent = fi.ascent;
+    }
+    gBatch.active = true;
+    return true;
+}
+
+static void
+end_cell_batch(void)
+{
+    if (!gBatch.active)
+        return;
+    {
+        /* restore fg=black/bg=white so a later tile blit isn't tinted
+           (in a batch the colors stay dirty until here) */
+        RGBColor black = { 0, 0, 0 };
+        RGBColor white = { 0xFFFF, 0xFFFF, 0xFFFF };
+        RGBForeColor(&black);
+        RGBBackColor(&white);
+    }
+    SetGWorld(gBatch.saveW, gBatch.saveD);
+    UnlockPixels(GetGWorldPixMap(gMap.backing));
+    gBatch.active = false;
+}
+
 static void
 draw_cell_text(int col, int row, char ch, int color)
 {
@@ -482,27 +531,40 @@ draw_cell_text(int col, int row, char ch, int color)
 
     if (gMap.backing) {
         /* paint into backing; macmap_flush blits the dirty region once */
+        Boolean own = !gBatch.active;
         PixMapHandle pm = GetGWorldPixMap(gMap.backing);
-        if (!LockPixels(pm)) {
-            mac_dprintf("macmap: draw_cell_text: LockPixels failed\n");
-            return;
-        }
         GWorldPtr saveW; GDHandle saveD;
-        GetGWorld(&saveW, &saveD);
-        SetGWorld(gMap.backing, NULL);
+        short ascent;
 
-        FontInfo fi; GetFontInfo(&fi);
+        if (own) {
+            if (!LockPixels(pm)) {
+                mac_dprintf("macmap: draw_cell_text: LockPixels failed\n");
+                return;
+            }
+            GetGWorld(&saveW, &saveD);
+            SetGWorld(gMap.backing, NULL);
+            FontInfo fi; GetFontInfo(&fi);
+            ascent = fi.ascent;
+        } else {
+            ascent = gBatch.ascent;
+        }
+
         Rect cell = { dy, dx, dy + gMap.cell_h, dx + gMap.cell_w };
         RGBBackColor(&black);          /* NetHack's colors want a dark bg */
         EraseRect(&cell);
         set_nh_color(color);
-        MoveTo(dx, dy + fi.ascent);    /* baseline = top + ascent (no top clip) */
+        MoveTo(dx, dy + ascent);       /* baseline = top + ascent (no top clip) */
         DrawChar(ch);
-        RGBForeColor(&black);          /* restore fg=black/bg=white so a */
-        RGBBackColor(&white);          /* later tile blit isn't tinted */
-
-        SetGWorld(saveW, saveD);
-        UnlockPixels(pm);
+        if (iflags.hilite_pet && gMap.pet_cache[row][col]) {
+            RGBForeColor(&white);      /* pet ring; map bg is black */
+            FrameRect(&cell);
+        }
+        if (own) {
+            RGBForeColor(&black);      /* restore fg=black/bg=white so a */
+            RGBBackColor(&white);      /* later tile blit isn't tinted */
+            SetGWorld(saveW, saveD);
+            UnlockPixels(pm);
+        } /* in a batch, end_cell_batch restores the colors once */
         mark_dirty(&cell);
     } else {
         /* fallback: direct to window */
@@ -515,10 +577,74 @@ draw_cell_text(int col, int row, char ch, int color)
         set_nh_color(color);
         MoveTo(dx, dy + fi.ascent);
         DrawChar(ch);
+        if (iflags.hilite_pet && gMap.pet_cache[row][col]) {
+            RGBForeColor(&white);      /* pet ring; map bg is black */
+            FrameRect(&cell);
+        }
         RGBForeColor(&black);
         RGBBackColor(&white);
         SetPort(saveP);
     }
+}
+
+/* Pet highlight ring for tile mode (hilite_pet), like the farlook cursor.
+   Backing variant: bright sheet color via RGBForeColor (safe offscreen);
+   window variant: PmForeColor by index, like draw_cursor_border. */
+static void
+draw_pet_ring_backing(const Rect *cell)
+{
+    Boolean own = !gBatch.active;
+    PixMapHandle pm = GetGWorldPixMap(gMap.backing);
+    GWorldPtr saveW; GDHandle saveD;
+    RGBColor ring = { 0xFFFF, 0xFFFF, 0xFFFF };
+    RGBColor black = { 0, 0, 0 };
+    short ci = mactile_cursor_clut_index();
+    CTabHandle ct = mactile_sheet_ctable();
+
+    if (own) {
+        if (!LockPixels(pm))
+            return;
+        GetGWorld(&saveW, &saveD);
+        SetGWorld(gMap.backing, NULL);
+    } /* in a batch the backing is already current and locked */
+    if (ci >= 0 && ct && *ct)
+        ring = (**ct).ctTable[ci].rgb;
+    PenState savePen; GetPenState(&savePen);
+    PenSize(1, 1);
+    PenMode(srcCopy);
+    RGBForeColor(&ring);
+    FrameRect(cell);
+    RGBForeColor(&black);
+    SetPenState(&savePen);
+    if (own) {
+        SetGWorld(saveW, saveD);
+        UnlockPixels(pm);
+    }
+}
+
+static void
+draw_pet_ring_window(const Rect *cell)
+{
+    RGBColor black = { 0, 0, 0 };
+    GrafPtr saveP; GetPort(&saveP);
+    SetPortWindowPort(gMap.owner->its_window);
+    PenState savePen; GetPenState(&savePen);
+    PenSize(1, 1);
+    PenMode(srcCopy);
+    if (gMap.palette) {
+        short ci = mactile_cursor_clut_index();
+        if (ci >= 0) {
+            PmForeColor(ci);
+            FrameRect(cell);
+        }
+    } else {
+        RGBColor white = { 0xFFFF, 0xFFFF, 0xFFFF };
+        RGBForeColor(&white);
+        FrameRect(cell);
+    }
+    RGBForeColor(&black);
+    SetPenState(&savePen);
+    SetPort(saveP);
 }
 
 static void
@@ -535,12 +661,19 @@ draw_cell_tile(int col, int row, int tile_idx)
         return;   /* off-viewport, cached only */
     }
 
+    Rect cell = { dy, dx, dy + gMap.cell_h, dx + gMap.cell_w };
     if (gMap.backing) {
-        mactile_blit_to(gMap.backing, tile_idx, dx, dy);
-        Rect cell = { dy, dx, dy + gMap.cell_h, dx + gMap.cell_w };
+        if (gBatch.active)
+            mactile_blit_in_place(tile_idx, dx, dy);
+        else
+            mactile_blit_to(gMap.backing, tile_idx, dx, dy);
+        if (iflags.hilite_pet && gMap.pet_cache[row][col])
+            draw_pet_ring_backing(&cell);
         mark_dirty(&cell);
     } else {
         mactile_blit_to_window(gMap.owner->its_window, tile_idx, dx, dy);
+        if (iflags.hilite_pet && gMap.pet_cache[row][col])
+            draw_pet_ring_window(&cell);
     }
 }
 
@@ -664,6 +797,7 @@ macmap_print_glyph(NhWindow *map, int x, int y,
     gMap.text_cache[y][x] = (unsigned char) ch;
     gMap.text_color[y][x] = (unsigned char) color;
     gMap.tile_cache[y][x] = (short) idx;
+    gMap.pet_cache[y][x] = (gi->gm.glyphflags & MG_PET) ? 1 : 0;
 
     if (gMap.tile_mode)
         draw_cell_tile(x, y, idx);
@@ -682,6 +816,30 @@ macmap_update_event(NhWindow *map)
 
     GrafPtr saveP; GetPort(&saveP);
     SetPort(map->its_window);
+
+    /* erase only the margins the repaint won't cover; HandleUpdate no
+       longer pre-erases the whole map window (a white flash the blit
+       immediately overwrote) */
+    {
+        Rect wr, covered, m;
+        GetWindowPortBounds(map->its_window, &wr);
+        OffsetRect(&wr, -wr.left, -wr.top);
+        if (gMap.backing)
+            covered = ((CGrafPtr) gMap.backing)->portRect;
+        else
+            map_content_bounds(&covered);
+        if (wr.right > covered.right) {
+            m = wr;
+            m.left = covered.right;
+            EraseRect(&m);
+        }
+        if (wr.bottom > covered.bottom) {
+            m = wr;
+            m.top = covered.bottom;
+            m.right = covered.right;
+            EraseRect(&m);
+        }
+    }
 
     if (gMap.backing) {
         Rect bbox; bbox = ((CGrafPtr) gMap.backing)->portRect;
@@ -727,6 +885,7 @@ macmap_clear(NhWindow *map)
             gMap.text_cache[r][c] = ' ';
             gMap.text_color[r][c] = 8; /* NO_COLOR */
             gMap.tile_cache[r][c] = -1;  /* -1 = no glyph (tile 0 is the ant) */
+            gMap.pet_cache[r][c] = 0;
         }
     /* reset scroll so the next hero print_glyph recenters (col 0 unused) */
     gMap.scroll_col = 1;
@@ -780,16 +939,24 @@ repaint_full_viewport(void)
 {
     if (!gMap.owner) return;
     gMap.cursor_on = false;   /* full repaint wipes the inverted-cell cursor */
+    Boolean batched = begin_cell_batch();
     if (gMap.backing) {
-        PixMapHandle pm = GetGWorldPixMap(gMap.backing);
-        if (LockPixels(pm)) {
+        /* erase happens while bg is still white (the cells set a black
+           bg later); covers the area outside the level */
+        if (batched) {
             Rect bbox; bbox = ((CGrafPtr) gMap.backing)->portRect;
-            GWorldPtr saveW; GDHandle saveD;
-            GetGWorld(&saveW, &saveD);
-            SetGWorld(gMap.backing, NULL);
             EraseRect(&bbox);
-            SetGWorld(saveW, saveD);
-            UnlockPixels(pm);
+        } else {
+            PixMapHandle pm = GetGWorldPixMap(gMap.backing);
+            if (LockPixels(pm)) {
+                Rect bbox; bbox = ((CGrafPtr) gMap.backing)->portRect;
+                GWorldPtr saveW; GDHandle saveD;
+                GetGWorld(&saveW, &saveD);
+                SetGWorld(gMap.backing, NULL);
+                EraseRect(&bbox);
+                SetGWorld(saveW, saveD);
+                UnlockPixels(pm);
+            }
         }
     }
     int r, c;
@@ -800,6 +967,8 @@ repaint_full_viewport(void)
     for (r = gMap.scroll_row; r < gMap.scroll_row + gMap.vis_rows && r < ROWNO; ++r)
         for (c = c_first; c < c_last; ++c)
             redraw_cell_from_cache(c, r);
+    if (batched)
+        end_cell_batch();
     /* Mark the whole viewport dirty (incl. erased empty cells); macmap_flush
        blits it. Callers not followed by a core flush call macmap_flush themselves. */
     if (gMap.backing)
@@ -838,9 +1007,12 @@ repaint_strip(int col_start, int row_start, int col_end, int row_end)
     if (col_end > COLNO) col_end = COLNO;
     if (row_end > ROWNO) row_end = ROWNO;
     if (col_start < 1) col_start = 1;   /* col 0 unused */
+    Boolean batched = begin_cell_batch();
     for (r = row_start; r < row_end; ++r)
         for (c = col_start; c < col_end; ++c)
             redraw_cell_from_cache(c, r);
+    if (batched) /* close only a batch this scope opened */
+        end_cell_batch();
 }
 
 /* Move the viewport to (new_col,new_row), clamped, repainting via soft-scroll
@@ -937,14 +1109,15 @@ macmap_grow_event(NhWindow *map, long newSize)
     if (!allocate_backing()) {
         mac_dprintf("macmap: backing realloc failed on grow\n");
     }
-    /* recenter on the hero, then repaint from cache */
+    /* recenter on the hero, then repaint from cache; allocate_backing
+       just wiped the backing, so the repaint must be full and
+       unconditional (cliparound/scroll_viewport_to skip an unchanged
+       scroll) */
     if (u.ux > 0 || u.uy > 0) {
-        gMap.scroll_col = 1;     /* col 0 unused */
-        gMap.scroll_row = 0;
-        macmap_cliparound(map, (int) u.ux, (int) u.uy);
-    } else {
-        repaint_full_viewport();
+        recompute_scroll_for_center((int) u.ux, (int) u.uy,
+                                    &gMap.scroll_col, &gMap.scroll_row);
     }
+    repaint_full_viewport();
     update_scroll_controls();
     macmap_flush();   /* a grow isn't followed by a core frame flush */
 }

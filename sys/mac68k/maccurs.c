@@ -118,6 +118,11 @@ RetrieveSize(short kind, short top, short left, short *height, short *width)
     if (!savePos[kind].validSize) {
         return 0;
     }
+    /* reject degenerate sizes (e.g. from prefs written by builds that
+       saved GrowWindow's 0-on-no-change result) */
+    if (savePos[kind].width <= 0 || savePos[kind].height <= 0) {
+        return 0;
+    }
     *width = savePos[kind].width;
     *height = savePos[kind].height;
     p.h = left + *width;
@@ -198,10 +203,21 @@ RetrieveWinPos(WindowPtr win, short *top, short *left)
 void
 SaveWindowPos(WindowPtr win)
 {
+    GrafPtr org_port;
+    Point p;
     Rect r;
 
+    /* consumers (adjust_window_pos/MoveWindow) treat the saved value as
+       a GLOBAL screen position; portRect's top/left are port-local
+       (always 0,0, or the SetOrigin offset), so convert first */
+    GetPort(&org_port);
+    SetPortWindowPort(win);
     GetWindowPortBounds(win, &r);
-    SavePosition(GetWinKind(win), r.top, r.left);
+    p.h = r.left;
+    p.v = r.top;
+    LocalToGlobal(&p);
+    SetPort(org_port);
+    SavePosition(GetWinKind(win), p.v, p.h);
 }
 
 /* For windows whose saved size depends on more than the window identity:

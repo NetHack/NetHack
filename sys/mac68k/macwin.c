@@ -508,6 +508,21 @@ DrawScrollbar(NhWindow *aWin)
 
 #define MIN_HEIGHT 50
 
+/* One-shot: when set, the next SanePositions() ignores saved positions and
+   lays out the default stack.  SanePositions is dual-use -- allmain.c calls
+   it at startup to RESTORE saved positions, the "Reposition Windows" menu
+   command (via ResetWindowPositions) calls it to RESET to defaults. */
+static Boolean gResetToDefault = FALSE;
+
+/* "Reposition Windows" menu command: lay out the default stack regardless of
+   any saved positions. */
+void
+ResetWindowPositions(void)
+{
+    gResetToDefault = TRUE;
+    (void) SanePositions();
+}
+
 int
 SanePositions(void)
 {
@@ -535,16 +550,30 @@ SanePositions(void)
         short title_h = small_screen ? 0 : 20;   /* title bar + small gap */
         short y = mbar_height + (small_screen ? 2 : 4);
         short msg_top, map_top, stat_top, avail_map_h, avail_map_w;
-        /* Honor saved window positions only on large screens, where windows
-           are movable. Small (borderless) screens always get the clean stack
-           since the windows can't be dragged/saved anyway. */
-        Boolean honor = !small_screen;
+        /* Large screens restore saved positions; "Reposition Windows" sets
+           gResetToDefault to force the clean default stack, as do small
+           (borderless) screens that can't drag/save. */
+        Boolean honor = !small_screen && !gResetToDefault;
 
+        short msg_w = 0; /* 0 => use content_w (default stack width) */
         msg_h = 4 * theWindows[WIN_MESSAGE].row_height + 4;   /* ~4 lines */
         /* keep the big-screen bar past DrawScrollbar's auto-hide threshold */
         if (!small_screen
             && theWindows[WIN_MESSAGE].scrollBar && msg_h <= 50 + SBARHEIGHT)
             msg_h = 50 + SBARHEIGHT + 2;
+
+        /* honor a saved message size so a grown message window survives a
+           restore (its height feeds map_top so the map stacks under it) */
+        if (honor) {
+            short mt, ml, sh, sw;
+            if (RetrievePosition(kMessageWindow, &mt, &ml)
+                && RetrieveSize(kMessageWindow, mt, ml, &sh, &sw)) {
+                if (sh > 0)
+                    msg_h = sh;
+                if (sw > 0)
+                    msg_w = sw;
+            }
+        }
 
         /* Fit the map into the space left by menu bar, message+status windows,
            and title bars; macmap_fit resizes the map window + viewport/backing */
@@ -566,7 +595,7 @@ SanePositions(void)
             top = msg_top; left = content_left;
         }
         MoveWindow(msgw, left, top, 1);
-        SizeWindow(msgw, content_w, msg_h, 1);
+        SizeWindow(msgw, msg_w ? msg_w : content_w, msg_h, 1);
         if (theWindows[WIN_MESSAGE].scrollBar)
             DrawScrollbar(&theWindows[WIN_MESSAGE]);
 
@@ -609,7 +638,8 @@ SanePositions(void)
                 int shift;
                 if (((WindowPeek) theWindow)->windowKind
                     == WIN_BASE_KIND + NHW_MENU) {
-                    if (!RetrievePosition(kMenuWindow, &top, &left)) {
+                    if (gResetToDefault
+                        || !RetrievePosition(kMenuWindow, &top, &left)) {
                         top = mbar_height * 2;
                         left = 2;
                     }
@@ -617,7 +647,8 @@ SanePositions(void)
                     numMenu++;
                     shift = 20;
                 } else {
-                    if (!RetrievePosition(kTextWindow, &top, &left)) {
+                    if (gResetToDefault
+                        || !RetrievePosition(kTextWindow, &top, &left)) {
                         top = mbar_height * 2;
                         left = screenArea.right - 3
                                - (theWindow->portRect.right
@@ -632,10 +663,24 @@ SanePositions(void)
                     left += shift;
                 }
                 MoveWindow(theWindow, left, top, 1);
+                if (gResetToDefault)
+                    SaveWindowPos(theWindow);
             }
         }
     }
     SelectWindow(mapw);
+    if (gResetToDefault) {
+        /* persist the default stack so it survives a relaunch -- otherwise the
+           next startup would restore the pre-reset (dragged) saved positions
+           and undo the reset */
+        SaveWindowPos(msgw);
+        SaveWindowPos(mapw);
+        SaveWindowPos(statw);
+        /* also persist the default message size, else the restored-size path
+           above would bring a pre-reset grown window back next launch */
+        SaveWindowSize(msgw);
+    }
+    gResetToDefault = FALSE; /* consume the one-shot */
     return (0);
 }
 
@@ -750,8 +795,22 @@ got1:
         }
         /* Now that font + cell metrics are populated, do the deferred
            backing/tile-mode initialization with correct values. */
-        if (aWin->its_window != _mt_window)
+        if (aWin->its_window != _mt_window) {
+            /* honor font_map / font_size_map: get_tty_metrics copied the
+               shared _mt_window's pre-config font. Override and recompute
+               the cell metrics so macmap_finalize derives cell_w/cell_h. */
+            if (win_fonts[NHW_MAP])
+                aWin->font_number = win_fonts[NHW_MAP];
+            if (iflags.wc_fontsiz_map)
+                aWin->font_size = iflags.wc_fontsiz_map;
+            SetPortWindowPort(aWin->its_window);
+            TextFont(aWin->font_number);
+            TextSize(aWin->font_size);
+            GetFontInfo(&fi);
+            aWin->char_width = fi.widMax;
+            aWin->row_height = fi.ascent + fi.leading + fi.descent;
             macmap_finalize(aWin);
+        }
         return i;
     } else if (kind == NHW_BASE || kind == NHW_STATUS) {
         short x_sz, x_sz_p, y_sz, y_sz_p;
@@ -1830,6 +1889,8 @@ draw_growicon_vert_only(WindowPtr wind)
     RgnHandle org_clip = NewRgn();
     Rect r;
 
+    if (!org_clip) /* NewRgn can fail; we keep playing in low memory */
+        return;
     GetPort(&org_port);
     SetPortWindowPort(wind);
     GetClip(org_clip);
@@ -2636,8 +2697,10 @@ BaseClick(NhWindow *wind, Point pt, UInt32 modifiers)
             return;   /* click handled by the scrollbars/grow box */
         macmap_pixel_to_cell(wind, pt, &col, &row);
     } else {
-        col = pt.h / wind->char_width + 1;
-        row = pt.v / wind->row_height;
+        /* only the map window can translate a click into a dungeon
+           position; the other window reaching here is the status
+           window, whose rows 0-2 must not become move commands */
+        return;
     }
     clicked_mod = (modifiers & shiftKey) ? CLICK_2 : CLICK_1;
     clicked_pos.h = (short) col;
@@ -2801,10 +2864,12 @@ MsgUpdate(NhWindow *wind)
         if (l != topl_r.right - topl_r.left)
             TECalText(top_line);
         TEUpdate(&topl_r, top_line);
-        RectRgn(topl_rgn, &topl_r);
-        DiffRgn(clip, topl_rgn, clip);
-        DisposeRgn(topl_rgn);
-        SetClip(clip); /* update clip to exclude topl area from TETextBox */
+        if (topl_rgn) { /* NewRgn can fail; we keep playing in low memory */
+            RectRgn(topl_rgn, &topl_r);
+            DiffRgn(clip, topl_rgn, clip);
+            DisposeRgn(topl_rgn);
+            SetClip(clip); /* update clip to exclude topl area from TETextBox */
+        }
     }
     DisposeRgn(clip);
 
@@ -3258,6 +3323,39 @@ record_menu_line_style(NhWindow *aWin, short from, short to, int attr, int color
     HUnlock(aWin->menuStyle);
 }
 
+/* Exclude the scrollbar strip from the current clip while drawing
+   window text, preserving any update clip.  Returns the saved clip
+   (hand it to restore_clip), or nil when memory is too tight -- the
+   caller then simply draws unclipped. */
+static RgnHandle
+clip_exclude_scrollbar(const Rect *strip)
+{
+    RgnHandle h, tmp;
+
+    if (!(h = NewRgn()))
+        return (RgnHandle) 0;
+    tmp = NewRgn();
+    if (!tmp) {
+        DisposeRgn(h);
+        return (RgnHandle) 0;
+    }
+    GetClip(h);
+    RectRgn(tmp, strip);
+    DiffRgn(h, tmp, tmp);
+    SetClip(tmp);
+    DisposeRgn(tmp);
+    return h;
+}
+
+static void
+restore_clip(RgnHandle saved)
+{
+    if (saved) {
+        SetClip(saved);
+        DisposeRgn(saved);
+    }
+}
+
 /* Draw a menu's text line-by-line with per-line face (bold headings) and color
    (menucolors), replacing TETextBox so each line can have its own style. */
 static void
@@ -3282,20 +3380,8 @@ MenwDrawStyled(NhWindow *wind)
     draw_growicon_vert_only(wind->its_window);
     DrawControls(wind->its_window);
 
-    /* clip text to exclude the scrollbar strip, preserving any update clip */
-    if (vis && (h = NewRgn())) {
-        RgnHandle tmp = NewRgn();
-        if (!tmp) {
-            DisposeRgn(h);
-            h = (RgnHandle) 0;
-        } else {
-            GetClip(h);
-            RectRgn(tmp, &r2);
-            DiffRgn(h, tmp, tmp);
-            SetClip(tmp);
-            DisposeRgn(tmp);
-        }
-    }
+    if (vis)
+        h = clip_exclude_scrollbar(&r2);
 
     vis_rows = (r.bottom - r.top) / wind->row_height + 1;
     /* srcOr for the whole draw (erase happened up front) and deliberately
@@ -3393,10 +3479,7 @@ MenwDrawStyled(NhWindow *wind)
         HUnlock(wind->menuStyle);
     HUnlock(wind->windowText);
 
-    if (h) {
-        SetClip(h);
-        DisposeRgn(h);
-    }
+    restore_clip(h);
 }
 
 static void
@@ -3465,24 +3548,34 @@ macKeyMenu(EventRecord *theEvent, WindowPtr theWindow)
     return;
 }
 
+/* Common scrollbar hit-test for menu/text window clicks.  Returns true
+   if the click landed in the visible scrollbar and was dispatched. */
+static Boolean
+click_in_scrollbar(EventRecord *theEvent, WindowPtr theWindow,
+                   NhWindow *aWin)
+{
+    short code;
+    Point p;
+    ControlHandle theBar;
+
+    if (!aWin->scrollBar || (**aWin->scrollBar).contrlVis == 0)
+        return false;
+    p = theEvent->where;
+    GlobalToLocal(&p);
+    code = FindControl(p, theWindow, &theBar);
+    if (!code)
+        return false;
+    DoScrollBar(p, code, theBar, aWin);
+    return true;
+}
+
 static void
 macClickMenu(EventRecord *theEvent, WindowRef theWindow)
 {
-    Point p;
     NhWindow *aWin = GetNhWin(theWindow);
 
-    if (aWin->scrollBar && ((** aWin->scrollBar).contrlVis != 0)) {
-        short code;
-        ControlHandle theBar;
-
-        p = theEvent->where;
-        GlobalToLocal(&p);
-        code = FindControl(p, theWindow, &theBar);
-        if (code) {
-            DoScrollBar(p, code, theBar, aWin);
-            return;
-        }
-    }
+    if (click_in_scrollbar(theEvent, theWindow, aWin))
+        return;
     MenwClick(aWin, theEvent->where);
 }
 
@@ -3530,19 +3623,8 @@ TextUpdate(NhWindow *wind)
     DrawControls(wind->its_window);
 
     h = (RgnHandle) 0;
-    if (vis && (h = NewRgn())) {
-        RgnHandle tmp = NewRgn();
-        if (!tmp) {
-            DisposeRgn(h);
-            h = (RgnHandle) 0;
-        } else {
-            GetClip(h);
-            RectRgn(tmp, &r2);
-            DiffRgn(h, tmp, tmp);
-            SetClip(tmp);
-            DisposeRgn(tmp);
-        }
-    }
+    if (vis)
+        h = clip_exclude_scrollbar(&r2);
     if (r.right < MIN_RIGHT)
         r.right = MIN_RIGHT;
     r.top -= wind->scrollPos * wind->row_height;
@@ -3556,10 +3638,7 @@ TextUpdate(NhWindow *wind)
         TETextBox(*wind->windowText, tlen, &r, teJustLeft);
     }
     HUnlock(wind->windowText);
-    if (h) {
-        SetClip(h);
-        DisposeRgn(h);
-    }
+    restore_clip(h);
     return;
 }
 
@@ -3573,19 +3652,7 @@ macKeyText(EventRecord *theEvent, WindowPtr theWindow)
 static void
 macClickText(EventRecord *theEvent, WindowPtr theWindow)
 {
-    NhWindow *aWin = GetNhWin(theWindow);
-
-    if (aWin->scrollBar && ((** aWin->scrollBar).contrlVis != 0)) {
-        short code;
-        Point p = theEvent->where;
-        ControlHandle theBar;
-
-        GlobalToLocal(&p);
-        code = FindControl(p, theWindow, &theBar);
-        if (code) {
-            DoScrollBar(p, code, theBar, aWin);
-        }
-    }
+    (void) click_in_scrollbar(theEvent, theWindow, GetNhWin(theWindow));
 }
 
 /**********************************************************************
@@ -3709,14 +3776,16 @@ HandleClick(EventRecord *theEvent)
                 if (aWin == theWindows + WIN_MESSAGE)
                     r.top += SBARHEIGHT;
                 l = GrowWindow(theWindow, theEvent->where, &r);
-                SizeWindow(theWindow, l & 0xffff, l >> 16, FALSE);
-                SaveWindowSize(theWindow);
-                SetPortWindowPort(theWindow);
-                GetWindowPortBounds(theWindow, &r);
-                OffsetRect(&r, -r.left, -r.top);
-                InvalWindowRect(theWindow, &r);
-                if (aWin->scrollBar) {
-                    DrawScrollbar(aWin);
+                if (l) { /* 0 = no size change; don't collapse to 0x0 */
+                    SizeWindow(theWindow, l & 0xffff, l >> 16, FALSE);
+                    SaveWindowSize(theWindow);
+                    SetPortWindowPort(theWindow);
+                    GetWindowPortBounds(theWindow, &r);
+                    OffsetRect(&r, -r.left, -r.top);
+                    InvalWindowRect(theWindow, &r);
+                    if (aWin->scrollBar) {
+                        DrawScrollbar(aWin);
+                    }
                 }
             }
         } else {

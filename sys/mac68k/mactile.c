@@ -115,6 +115,11 @@ mactile_cursor_clut_index(void)
             short n = (**ct).ctSize;      /* ctSize is (count - 1) */
             long  bestscore = -0x7FFFFFFFL;
             short i;
+            /* the result feeds PmForeColor against the map window's
+               TILE_PALETTE_ENTRIES-entry palette; an index beyond it
+               would read past the palette's pmInfo array */
+            if (n > TILE_PALETTE_ENTRIES - 1)
+                n = TILE_PALETTE_ENTRIES - 1;
             for (i = 0; i <= n; i++) {
                 RGBColor c = (**ct).ctTable[i].rgb;
                 if (c.red > 0xC000 && c.green > 0xC000 && c.blue > 0xC000)
@@ -127,21 +132,34 @@ mactile_cursor_clut_index(void)
     return gCursorClutIdx;
 }
 
-void
-mactile_blit_to(GWorldPtr dst, int tile_idx, short dst_x, short dst_y)
+/* Shared by the three blitters: bounds-check tile_idx (an out-of-sheet
+   source rect would read stray PixMap memory) and compute the src/dst
+   rects.  Returns false when there is no sheet or the index is bad. */
+static Boolean
+tile_blit_rects(int tile_idx, short dst_x, short dst_y, Rect *src, Rect *dr)
 {
-    if (!gTileSheet || !dst) return;
-    /* Bounds-check tile_idx: an out-of-sheet source rect would read stray
-       PixMap memory. */
+    short sx, sy;
+
+    if (!gTileSheet) return false;
     if (tile_idx < 0 || tile_idx >= (int) gSheetCols * (int) gSheetRows) {
         mac_dprintf("mactile: tile_idx %d out of sheet (max %d)\n",
                     tile_idx, (int) gSheetCols * (int) gSheetRows - 1);
-        return;
+        return false;
     }
-    short sx = (tile_idx % gSheetCols) * MACTILE_DIM;
-    short sy = (tile_idx / gSheetCols) * MACTILE_DIM;
-    Rect src = { sy, sx, sy + MACTILE_DIM, sx + MACTILE_DIM };
-    Rect dr  = { dst_y, dst_x, dst_y + MACTILE_DIM, dst_x + MACTILE_DIM };
+    sx = (tile_idx % gSheetCols) * MACTILE_DIM;
+    sy = (tile_idx / gSheetCols) * MACTILE_DIM;
+    SetRect(src, sx, sy, sx + MACTILE_DIM, sy + MACTILE_DIM);
+    SetRect(dr, dst_x, dst_y, dst_x + MACTILE_DIM, dst_y + MACTILE_DIM);
+    return true;
+}
+
+void
+mactile_blit_to(GWorldPtr dst, int tile_idx, short dst_x, short dst_y)
+{
+    Rect src, dr;
+
+    if (!dst || !tile_blit_rects(tile_idx, dst_x, dst_y, &src, &dr))
+        return;
 
     PixMapHandle spm = GetGWorldPixMap(gTileSheet);   /* sheet stays locked */
     PixMapHandle dpm = GetGWorldPixMap(dst);
@@ -159,18 +177,32 @@ mactile_blit_to(GWorldPtr dst, int tile_idx, short dst_x, short dst_y)
 }
 
 void
+mactile_blit_in_place(int tile_idx, short dst_x, short dst_y)
+{
+    Rect src, dr;
+    CGrafPtr dst;
+    GDHandle dev;
+
+    if (!tile_blit_rects(tile_idx, dst_x, dst_y, &src, &dr))
+        return;
+
+    /* the caller (macmap's cell batch) has already made the destination
+       GWorld current and locked its pixels; LockPixels is a flag, not a
+       count, so a nested lock/unlock pair here would clear that lock */
+    PixMapHandle spm = GetGWorldPixMap(gTileSheet);   /* sheet stays locked */
+    GetGWorld((GWorldPtr *) &dst, &dev);
+    CopyBits((BitMap *) *spm,
+             (BitMap *) *GetGWorldPixMap((GWorldPtr) dst),
+             &src, &dr, srcCopy, NULL);
+}
+
+void
 mactile_blit_to_window(WindowPtr dst, int tile_idx, short dst_x, short dst_y)
 {
-    if (!gTileSheet || !dst) return;
-    if (tile_idx < 0 || tile_idx >= (int) gSheetCols * (int) gSheetRows) {
-        mac_dprintf("mactile: tile_idx %d out of sheet (max %d)\n",
-                    tile_idx, (int) gSheetCols * (int) gSheetRows - 1);
+    Rect src, dr;
+
+    if (!dst || !tile_blit_rects(tile_idx, dst_x, dst_y, &src, &dr))
         return;
-    }
-    short sx = (tile_idx % gSheetCols) * MACTILE_DIM;
-    short sy = (tile_idx / gSheetCols) * MACTILE_DIM;
-    Rect src = { sy, sx, sy + MACTILE_DIM, sx + MACTILE_DIM };
-    Rect dr  = { dst_y, dst_x, dst_y + MACTILE_DIM, dst_x + MACTILE_DIM };
 
     PixMapHandle spm = GetGWorldPixMap(gTileSheet);   /* sheet stays locked */
     GrafPtr saveP; GetPort(&saveP);

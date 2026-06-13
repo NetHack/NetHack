@@ -14,6 +14,11 @@
    util/tile2pict (TILE_X/TILE_Y in win/share/tile.h, currently 16). */
 #define MACTILE_DIM 16
 
+/* Size of the pmTolerant palette macmap attaches to the map window at
+   8bpp. NewPalette copies the first n sheet-CLUT entries, so anything
+   handed to PmForeColor must stay below this. */
+#define TILE_PALETTE_ENTRIES 32
+
 extern Boolean mactile_available(void);    /* depth >= 4bpp */
 extern Boolean mactile_init(void);         /* load PICT 1000/1001 into GWorld */
 
@@ -26,6 +31,12 @@ extern CTabHandle mactile_sheet_ctable(void);
 extern void    mactile_blit_to(GWorldPtr dst,
                                 int tile_idx,
                                 short dst_x, short dst_y);
+
+/* Batch variant: blit into the CURRENT GWorld, already locked by the
+   caller (macmap's cell batch). No SetGWorld/LockPixels -- a nested
+   unlock would clear the caller's lock. */
+extern void    mactile_blit_in_place(int tile_idx,
+                                      short dst_x, short dst_y);
 
 /* Blit a single tile into a destination Window at (dst_x, dst_y).
    The function manages SetPort save/restore internally. */
