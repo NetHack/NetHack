@@ -987,6 +987,12 @@ DoMenuEvt(long menuEntry)
                 const char *cmd = "#exploremode";
                 short ci;
 
+                /* all or nothing: a partial queue would run as something
+                   else */
+                if ((short) strlen(cmd) > KeyQueueFree()) {
+                    nhbell();
+                    break;
+                }
                 for (ci = 0; cmd[ci]; ci++)
                     AddToKeyQueue(cmd[ci], false);
             }
@@ -1003,6 +1009,12 @@ DoMenuEvt(long menuEntry)
         if (mstr[0] > QUEUE_LEN)
             mstr[0] = QUEUE_LEN;
 
+        /* all or nothing: a partial queue would run as something else
+           (mstrEndChar may stop earlier, in which case it certainly fits) */
+        if ((short) mstr[0] > KeyQueueFree()) {
+            nhbell();
+            break;
+        }
         for (i = 1; ((i <= mstr[0]) && (mstr[i] != mstrEndChar)); i++)
             AddToKeyQueue(mstr[i], false);
     } break;
