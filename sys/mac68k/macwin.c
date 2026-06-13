@@ -46,6 +46,7 @@ static void GeneralCursor(EventRecord *, WindowPtr, RgnHandle);
 
 static void TextUpdate(NhWindow *wind);
 static void MenwUpdate(NhWindow *wind);
+static void menw_clear_pending(NhWindow *wind);
 static void record_menu_line_style(NhWindow *, short, short, int, int);
 
 NhWindow *theWindows = (NhWindow *) 0;
@@ -133,6 +134,14 @@ AddToKeyQueue(unsigned char ch, Boolean force)
     }
     if (keyQueueWrite >= QUEUE_LEN)
         keyQueueWrite = 0;
+}
+
+/* Free slots in the input queue; menu macros check this before queuing
+ * (AddToKeyQueue(ch, false) silently drops keys when full). */
+short
+KeyQueueFree(void)
+{
+    return QUEUE_LEN - keyQueueCount;
 }
 
 /*
@@ -713,6 +722,9 @@ got1:
     aWin->scrollBar = (ControlHandle) 0;
     aWin->menuInfo = 0;
     aWin->menuSelected = 0;
+    aWin->menuCounts = 0;
+    aWin->pendingCount = 0L;
+    aWin->hasPending = 0;
     aWin->menuStyle = 0;
     aWin->miLen = 0;
     aWin->miSize = 0;
@@ -752,6 +764,21 @@ got1:
         get_tty_metrics(aWin->its_window, &x_sz, &y_sz, &x_sz_p, &y_sz_p,
                         &aWin->font_number, &aWin->font_size,
                         &aWin->char_width, &aWin->row_height);
+        /* _mt_init_stuff fonted _mt_window before the config was read;
+           macstat draws in WIN_STATUS's own font, so honor font_status /
+           font_size_status here and recompute the row height. */
+        if (kind == NHW_STATUS) {
+            if (win_fonts[NHW_STATUS])
+                aWin->font_number = win_fonts[NHW_STATUS];
+            if (iflags.wc_fontsiz_status)
+                aWin->font_size = iflags.wc_fontsiz_status;
+            SetPortWindowPort(_mt_window);
+            TextFont(aWin->font_number);
+            TextSize(aWin->font_size);
+            GetFontInfo(&fi);
+            aWin->row_height = fi.ascent + fi.descent + fi.leading;
+            aWin->char_width = fi.widMax;
+        }
         /* This window now shows ONLY the status lines; draw them at the top of
            the offscreen (offy = 0) so a plain origin shows them. */
         if (kind == NHW_STATUS && wins[i]) {
@@ -861,6 +888,29 @@ got1:
     return i;
 }
 
+/* Dispose the per-menu data handles, in ONE place for both the clear
+   (recycle) and destroy paths -- menuCounts was once leaked from one. */
+static void
+dispose_menu_handles(NhWindow *aWin)
+{
+    if (aWin->menuInfo) {
+        DisposeHandle((Handle) aWin->menuInfo);
+        aWin->menuInfo = NULL;
+    }
+    if (aWin->menuSelected) {
+        DisposeHandle((Handle) aWin->menuSelected);
+        aWin->menuSelected = NULL;
+    }
+    if (aWin->menuCounts) {
+        DisposeHandle((Handle) aWin->menuCounts);
+        aWin->menuCounts = NULL;
+    }
+    if (aWin->menuStyle) {
+        DisposeHandle(aWin->menuStyle);
+        aWin->menuStyle = NULL;
+    }
+}
+
 void
 mac_clear_nhwindow(winid win)
 {
@@ -878,6 +928,10 @@ mac_clear_nhwindow(winid win)
         return;
     }
     if (theWindow == _mt_window) {
+        if (win == WIN_STATUS && macstat_active()) {
+            macstat_redraw(); /* native clear+repaint, not a tty clear */
+            return;
+        }
         tty_clear_nhwindow(win);
         return;
     }
@@ -938,22 +992,13 @@ mac_clear_nhwindow(winid win)
         }
         break;
     case NHW_MENU:
-        if (aWin->menuInfo) {
-            DisposeHandle((Handle) aWin->menuInfo);
-            aWin->menuInfo = NULL;
-        }
-        if (aWin->menuSelected) {
-            DisposeHandle((Handle) aWin->menuSelected);
-            aWin->menuSelected = NULL;
-        }
-        if (aWin->menuStyle) {
-            DisposeHandle(aWin->menuStyle);
-            aWin->menuStyle = NULL;
-        }
+        dispose_menu_handles(aWin);
+        menw_clear_pending(aWin);
         aWin->menuChar = 'a';
         aWin->miSelLen = 0;
         aWin->miLen = 0;
         aWin->miSize = 0;
+        aWin->how = PICK_NONE;  /* not selectable until select_menu sets it */
     /* Fall-Through */
     default:
         SetHandleSize(aWin->windowText, TEXT_BLOCK);
@@ -1569,10 +1614,8 @@ mac_destroy_nhwindow(winid win)
         if (aWin->windowText) {
             DisposeHandle(aWin->windowText);
         }
-        if (aWin->menuStyle) {
-            DisposeHandle(aWin->menuStyle);
-            aWin->menuStyle = (Handle) 0;
-        }
+        dispose_menu_handles(aWin);
+        aWin->miSize = aWin->miLen = aWin->miSelLen = 0;
         aWin->its_window = (WindowPtr) 0;
         aWin->windowText = (Handle) 0;
     }
@@ -1635,6 +1678,12 @@ ToggleMenuListItemSelected(NhWindow *aWin, short item)
         short *mi = &(*aWin->menuSelected)[i];
         aWin->miSelLen--;
         memcpy(mi, mi + 1, (aWin->miSelLen - i) * sizeof(short));
+        if (aWin->menuCounts) {
+            /* deselecting an item forgets its typed count */
+            HLock((char **) aWin->menuCounts);
+            (*aWin->menuCounts)[item] = -1L;
+            HUnlock((char **) aWin->menuCounts);
+        }
     }
     HUnlock((char **) aWin->menuSelected);
 }
@@ -1813,6 +1862,19 @@ WindowGoAway(EventRecord *theEvent, WindowPtr theWindow)
     }
 }
 
+/* Flush pending buffered tty output to _mt_window.  Once macstat owns
+   the window the tty offscreen is stale by design and blitting it
+   would paint over the natively drawn status rows -- every flush site
+   must share this guard, so they all call this wrapper.  (The
+   raw_print functions bypass it deliberately: they just wrote the
+   text they need shown, even after status takeover.) */
+static void
+flush_tty_window(void)
+{
+    if (_mt_window && !macstat_active())
+        update_tty(_mt_window);
+}
+
 void
 mac_get_nh_event(void)
 {
@@ -1822,8 +1884,9 @@ mac_get_nh_event(void)
         return;
 
     /* Also wired to win_wait_synch: setftty() clears TA_ALWAYS_REFRESH during
-       play, so flush the offscreen here or buffered status never reaches screen */
-    if (_mt_window) update_tty(_mt_window);
+       play, so flush the offscreen here or buffered status never reaches
+       screen. */
+    flush_tty_window();
 
     (void) WaitNextEvent(everyEvent, &anEvent, 1, gMouseRgn);
     HandleEvent(&anEvent);
@@ -1858,8 +1921,7 @@ mac_nhgetch(void)
     }
 
     /* flush buffered status output before blocking, else it lags a turn */
-    if (_mt_window)
-        update_tty(_mt_window);
+    flush_tty_window();
 
     do {
         (void) WaitNextEvent(everyEvent, &anEvent, doDawdle, gMouseRgn);
@@ -2231,6 +2293,16 @@ mac_add_menu(winid win, const glyph_info *glyphinfo UNUSED,
                 error("Can't alloc menu select handle");
                 return;
             }
+            aWin->menuCounts =
+                (long **) NewHandle(sizeof(long) * kMenuSizeBump);
+            if (!aWin->menuCounts) {
+                DisposeHandle((Handle) aWin->menuInfo);
+                aWin->menuInfo = NULL;
+                DisposeHandle((Handle) aWin->menuSelected);
+                aWin->menuSelected = NULL;
+                error("Can't alloc menu count handle");
+                return;
+            }
             aWin->miSize = kMenuSizeBump;
         }
 
@@ -2248,6 +2320,15 @@ mac_add_menu(winid win, const glyph_info *glyphinfo UNUSED,
                 error("Can't resize menu select handle");
                 return;
             }
+            SetHandleSize((Handle) aWin->menuCounts,
+                          sizeof(long) * (aWin->miLen + kMenuSizeBump));
+            if (MemError()) {
+                error("Can't resize menu count handle");
+                return;
+            }
+            /* on any MemError return above, miSize is deliberately NOT
+               bumped: the handles keep their old size and miLen < miSize
+               stays valid, so a later mac_add_menu retries the grow */
             aWin->miSize += kMenuSizeBump;
         }
 
@@ -2263,16 +2344,21 @@ mac_add_menu(winid win, const glyph_info *glyphinfo UNUSED,
         Sprintf(locStr, "%c - %s", (menuChar ? menuChar : ' '), inStr);
         str = locStr;
         HLock((char **) aWin->menuInfo);
-        HLock((char **) aWin->menuSelected);
-        (*aWin->menuSelected)[aWin->miLen] = preselected;
+        HLock((char **) aWin->menuCounts);
+        /* preselect is stored per-item (item->preselected); mac_select_menu
+           seeds the PICK_ANY selection list from it. menuSelected is just
+           the packed list of selected indices (built from empty); menuCounts
+           is keyed by item index. */
+        (*aWin->menuCounts)[aWin->miLen] = -1L;
         item = &(*aWin->menuInfo)[aWin->miLen];
         aWin->miLen++;
         item->id = *any;
         item->accelerator = menuChar;
         item->groupAcc = groupAcc;
+        item->preselected = (Boolean) preselected;
         item->line = aWin->y_size;
         HUnlock((char **) aWin->menuInfo);
-        HUnlock((char **) aWin->menuSelected);
+        HUnlock((char **) aWin->menuCounts);
     } else
         str = inStr;
 
@@ -2304,15 +2390,34 @@ mac_select_menu(winid win, int how, menu_item **selected_list)
     WindowPtr theWin = aWin->its_window;
 
     inSelect = win;
+    aWin->how = (short) how;
+
+    /* Seed the PICK_ANY selection list from preselected items
+       (MENU_ITEMFLAGS_SELECTED) before showing the menu, so a default like
+       query_attr()'s "None" counts on a no-pick confirm -- a 0-count there
+       reads as cancel and loops the hilite add-rule flow. PICK_ONE is left
+       alone: its callers already default on 0, and seeding would yield an
+       unexpected 2-count. */
+    if (how == PICK_ANY && aWin->menuInfo) {
+        short k;
+
+        HLock((char **) aWin->menuInfo);
+        for (k = 0; k < aWin->miLen; k++) {
+            if ((*aWin->menuInfo)[k].preselected
+                && ListItemSelected(aWin, k) < 0)
+                ToggleMenuListItemSelected(aWin, k);
+        }
+        HUnlock((char **) aWin->menuInfo);
+    }
 
     mac_display_nhwindow(win, FALSE);
 
-    aWin->how = (short) how;
     for (;;) {
         c = map_menu_cmd(mac_nhgetch());
         if (c == CHAR_ESC) {
             /* deselect everything */
             aWin->miSelLen = 0;
+            menw_clear_pending(aWin);
             HideWindow(theWin);
             *selected_list = 0;
             inSelect = WIN_ERR;
@@ -2324,6 +2429,7 @@ mac_select_menu(winid win, int how, menu_item **selected_list)
         }
     }
 
+    menw_clear_pending(aWin);
     HideWindow(theWin);
 
     if (aWin->miSelLen) {
@@ -2333,14 +2439,20 @@ mac_select_menu(winid win, int how, menu_item **selected_list)
             (menu_item *) alloc(aWin->miSelLen * sizeof(menu_item));
         HLock((char **) aWin->menuInfo);
         HLock((char **) aWin->menuSelected);
+        if (aWin->menuCounts)
+            HLock((char **) aWin->menuCounts);
         for (c = 0; c < aWin->miSelLen; c++) {
-            mi = &(*aWin->menuInfo)[(*aWin->menuSelected)[c]];
+            short itm = (*aWin->menuSelected)[c];
+
+            mi = &(*aWin->menuInfo)[itm];
             mp->item = mi->id;
-            mp->count = -1L;
+            mp->count = aWin->menuCounts ? (*aWin->menuCounts)[itm] : -1L;
             mp++;
         }
         HUnlock((char **) aWin->menuInfo);
         HUnlock((char **) aWin->menuSelected);
+        if (aWin->menuCounts)
+            HUnlock((char **) aWin->menuCounts);
     } else
         *selected_list = 0;
 
@@ -2415,11 +2527,8 @@ mac_resume_nhwindows(void)
 static void
 mac_mark_synch(void)
 {
-    /* Flush buffered tty writes to screen: setftty() clears TA_ALWAYS_REFRESH
-       during play, so the offscreen is correct but the window shows stale text
-       until this runs (core calls mark_synch after each status_update). */
-    if (_mt_window && iflags.window_inited)
-        update_tty(_mt_window);
+    /* flush buffered tty writes (NHW_BASE raw prints) to screen */
+    flush_tty_window();
 }
 
 static void
@@ -2454,7 +2563,13 @@ mac_print_glyph(winid win, coordxy x, coordxy y,
         return;
     }
 
-    /* tty path for non-map windows */
+    /* tty path for non-map windows; once macstat owns _mt_window, tty
+       writes would corrupt the shared offscreen (and the blit would paint
+       stale content over the native status rows), so skip entirely —
+       nothing legitimately glyph-prints to a _mt_window-backed window
+       after status takeover */
+    if (macstat_active())
+        return;
     int ch;
     tty_curs(win, x, y);
     ch = (glyphinfo && glyphinfo->ttychar) ? glyphinfo->ttychar : ' ';
@@ -2578,7 +2693,7 @@ macCursorTerm(EventRecord *theEvent, WindowPtr theWindow, RgnHandle mouseRgn)
 }
 
 /**********************************************************************
- *	Status subwindow
+ *	Status subwindow: native renderer lives in sys/mac68k/macstat.c
  */
 
 /**********************************************************************
@@ -2792,6 +2907,46 @@ macUpdateMessage(EventRecord *theEvent, WindowPtr theWindow)
  *	Menu windows
  */
 
+/* Typed-count pending display: the title becomes "<original> - count: N".
+   mac_select_menu is modal (one menu inSelect at a time), so one static
+   saved title plus its owner suffices. */
+static Str255 menwSavedTitle;
+static NhWindow *menwTitleOwner = (NhWindow *) 0;
+
+/* Reflect wind's pending count in the window title; restore the original
+   title when the pending count is gone. */
+static void
+menw_show_pending(NhWindow *wind)
+{
+    if (!wind->its_window)
+        return;
+    if (wind->hasPending) {
+        char cbuf[256 + 32];
+        Str255 pbuf;
+
+        if (menwTitleOwner != wind) {
+            GetWTitle(wind->its_window, menwSavedTitle);
+            menwTitleOwner = wind;
+        }
+        P2C(menwSavedTitle, cbuf);
+        Sprintf(eos(cbuf), " - count: %ld", wind->pendingCount);
+        C2P(cbuf, pbuf); /* truncates to 255 */
+        SetWTitle(wind->its_window, pbuf);
+    } else if (menwTitleOwner == wind) {
+        SetWTitle(wind->its_window, menwSavedTitle);
+        menwTitleOwner = (NhWindow *) 0;
+    }
+}
+
+/* Drop any pending typed count and restore the window title. */
+static void
+menw_clear_pending(NhWindow *wind)
+{
+    wind->pendingCount = 0L;
+    wind->hasPending = 0;
+    menw_show_pending(wind);
+}
+
 /* Bulk selection commands for a PICK_ANY menu, mirroring the tty/Amiga menu
    keys (standard defaults): '.' select all, '-' deselect all, '@' invert all;
    ',' '\' '~' do the same for just the visible page. Updates the selection data
@@ -2827,7 +2982,9 @@ MenwSelectCmd(NhWindow *wind, char ch)
         int cur, want;
         if (page) {
             int row = (*wind->menuInfo)[i].line - wind->scrollPos;
-            if (row <= 0 || row > vis_rows)
+            /* fully visible rows are 0 .. vis_rows-1; row 0 is the top
+               line on screen, row == vis_rows at best a partial row */
+            if (row < 0 || row >= vis_rows)
                 continue;   /* not on the visible page */
         }
         cur  = (ListItemSelected(wind, i) >= 0);
@@ -2847,24 +3004,73 @@ MenwKey(NhWindow *wind, char ch)
 {
     MacMHMenuItem *mi;
     int i;
+    Boolean found = false;
 
     ch = filter_scroll_key(ch, wind);
     if (!ch)
         return;
     if (ClosingWindowChar(ch)) {
+        if (wind)
+            menw_clear_pending(wind);
         AddToKeyQueue(CHAR_CR, 1);
         return;
     }
 
     if (!wind || !wind->menuInfo)
         return;
-    if (MenwSelectCmd(wind, ch))
+    if (MenwSelectCmd(wind, ch)) {
+        menw_clear_pending(wind);
         return;
+    }
+
+    /* typed count: digits accumulate, backspace edits (tty parity --
+       tty also allows a count on PICK_ONE menus) */
+    if (wind->how != PICK_NONE && ch >= '0' && ch <= '9') {
+        wind->pendingCount = wind->pendingCount * 10 + (ch - '0');
+        if (wind->pendingCount > 999999L)
+            wind->pendingCount = 999999L;
+        wind->hasPending = 1;
+        menw_show_pending(wind);
+        return;
+    }
+    if (ch == CHAR_BS && wind->hasPending) {
+        wind->pendingCount /= 10;
+        if (!wind->pendingCount)
+            wind->hasPending = 0;
+        menw_show_pending(wind);
+        return;
+    }
+
     HLock((char **) wind->menuInfo);
     for (i = 0, mi = *wind->menuInfo; i < wind->miLen; i++, mi++) {
         if (mi->accelerator == ch) {
-            ToggleMenuListItemSelected(wind, i);
-            if (mi->line >= wind->scrollPos && mi->line <= wind->y_size) {
+            found = true;
+            /* count semantics follow tty's toggle_menu_curr: count > 0
+               (re)selects with that count (re-press replaces it, keeps the
+               selection); count 0 deselects */
+            Boolean wasSelected = (ListItemSelected(wind, i) >= 0);
+            Boolean toggled = true;
+
+            if (wind->hasPending && wind->pendingCount > 0L
+                && wind->menuCounts) {
+                if (!wasSelected)
+                    ToggleMenuListItemSelected(wind, i);
+                else
+                    toggled = false; /* already hilited; count update only */
+                HLock((char **) wind->menuCounts);
+                (*wind->menuCounts)[i] = wind->pendingCount;
+                HUnlock((char **) wind->menuCounts);
+            } else if (wind->hasPending && !wind->pendingCount) {
+                if (wasSelected)
+                    ToggleMenuListItemSelected(wind, i); /* count 0: off */
+                else
+                    toggled = false; /* count 0 on unselected: no-op */
+            } else {
+                ToggleMenuListItemSelected(wind, i);
+            }
+            menw_clear_pending(wind);
+            if (toggled && mi->line >= wind->scrollPos
+                && mi->line <= wind->y_size) {
                 SetPortWindowPort(wind->its_window);
                 ToggleMenuSelect(wind, mi->line - wind->scrollPos);
             }
@@ -2873,6 +3079,32 @@ MenwKey(NhWindow *wind, char ch)
                 AddToKeyQueue(CHAR_CR, 1);
             break;
         }
+    }
+    if (!found && wind->how == PICK_ANY) {
+        /* group accelerator: toggle every real item (accelerator != 0;
+           headers have none) whose object class char matches.  Selection
+           commands and digits returned above, so they can't land here.
+           A pending count does NOT apply to group toggles (tty parity);
+           it's just dropped.  Multiple rows change, so do a full repaint
+           like MenwSelectCmd rather than per-row XOR toggles. */
+        Boolean any = false;
+
+        for (i = 0, mi = *wind->menuInfo; i < wind->miLen; i++, mi++) {
+            if (mi->groupAcc == ch && mi->accelerator) {
+                ToggleMenuListItemSelected(wind, i);
+                any = true;
+            }
+        }
+        /* done with mi; unlock BEFORE MenwUpdate (classic HUnlock is not
+           ref-counted -- MenwUpdate's internal unlock would silently vacate
+           an outer lock, same pattern as MenwSelectCmd) */
+        HUnlock((char **) wind->menuInfo);
+        if (any) {
+            menw_clear_pending(wind);
+            SetPortWindowPort(wind->its_window);
+            MenwUpdate(wind);
+        }
+        return;
     }
     HUnlock((char **) wind->menuInfo);
     return;
@@ -2940,7 +3172,7 @@ MenwClick(NhWindow *wind, Point pt)
 
 /* NetHack color index -> RGB for menu text on the WHITE menu background.
    (Same values as the map's table; the white-bg adjustments are in
-   set_menu_text_color, not here.) */
+   mac_set_text_color, not here.) */
 static const RGBColor menuColorRGB[16] = {
     {0x0000, 0x0000, 0x0000},   /* 0  black   */
     {0xC0C0, 0x0000, 0x0000},   /* 1  red     */
@@ -2960,29 +3192,38 @@ static const RGBColor menuColorRGB[16] = {
     {0x0000, 0x0000, 0x0000}    /* 15 white (-> black on white bg) */
 };
 
-/* Map a NetHack menu attribute to a QuickDraw text face. Headings come through
-   as ATR_BOLD or (the default) ATR_INVERSE; both render bold here. */
+/* Map a NetHack menu attribute to a QuickDraw text face. ATR_INVERSE is not
+   a face: MenwDrawStyled renders it as a real inverse row (painted box with
+   white text) on non-selectable windows, or as plain text on selectable
+   menus (where the box would collide with the selection hilite). */
 static short
 menu_attr_face(int attr)
 {
     switch (attr) {
-    case ATR_BOLD:
-    case ATR_INVERSE: return bold;
+    case ATR_BOLD:    return bold;
     case ATR_ULINE:   return underline;
     default:          return normal;
     }
 }
 
-/* Set the pen color for a menu line. The menu background is white, so NO_COLOR
-   and white become black, and on sub-4-bit screens colors are skipped. */
-static void
-set_menu_text_color(int color)
+/* Main-device pixel depth (1 on B&W compacts like the SE/30). */
+short
+mac_main_depth(void)
+{
+    GDHandle gd = GetMainDevice();
+
+    return gd ? (*(*gd)->gdPMap)->pixelSize : 1;
+}
+
+/* Set the pen color for styled text on a white background: NO_COLOR and
+   white become black, and on sub-4-bit screens colors are skipped.
+   Palette-safe (shared by menu windows and the status renderer). */
+void
+mac_set_text_color(int color)
 {
     RGBColor black = { 0, 0, 0 };
-    GDHandle gd = GetMainDevice();
-    short depth = gd ? (*(*gd)->gdPMap)->pixelSize : 1;
 
-    if (depth < 4 || color == NO_COLOR || color == CLR_WHITE
+    if (mac_main_depth() < 4 || color == NO_COLOR || color == CLR_WHITE
         || color < 0 || color >= CLR_MAX)
         RGBForeColor(&black);
     else
@@ -3057,6 +3298,8 @@ MenwDrawStyled(NhWindow *wind)
     }
 
     vis_rows = (r.bottom - r.top) / wind->row_height + 1;
+    /* srcOr for the whole draw (erase happened up front) and deliberately
+       NOT restored on return: MenwUpdate's count overlay relies on it */
     TextMode(srcOr);
 
     HLock(wind->windowText);
@@ -3072,20 +3315,68 @@ MenwDrawStyled(NhWindow *wind)
             row = lineIdx - wind->scrollPos;
             if (row >= 0 && row <= vis_rows && llen > 0) {
                 int attr = ATR_NONE, color = NO_COLOR;
+                Boolean realInverse;
+
                 if (wind->menuStyle
                     && (long) (lineIdx + 1) * 2 <= GetHandleSize(wind->menuStyle)) {
                     unsigned char *sb = (unsigned char *) *wind->menuStyle;
                     attr  = sb[lineIdx * 2];
                     color = sb[lineIdx * 2 + 1];
                 }
+                /* On a SELECTABLE menu the full-row inverse box is identical
+                   to the selection hilite (ToggleMenuSelect inverts the same
+                   rect), so a *selectable* inverse row would look selected
+                   and a selected one would look unselected.  Suppress the box
+                   only for selectable rows: draw it on non-selectable windows
+                   (PICK_NONE) and, on selectable menus, on header/separator
+                   rows -- those are never in menuInfo (ListCoordinateToItem
+                   returns -1) and ToggleMenuSelect never hilites them, so the
+                   box can't be confused with a selection.  This keeps the
+                   menu_headings reverse video on grouped menus (inventory,
+                   multidrop, ...) while the selection hilite stays
+                   unambiguous on the pickable rows. */
+                realInverse = (attr == ATR_INVERSE
+                               && (wind->how == PICK_NONE
+                                   || !wind->menuInfo
+                                   || ListCoordinateToItem(wind, row) < 0));
+
                 TextFace(menu_attr_face(attr));
-                set_menu_text_color(color);
+                if (realInverse) {
+                    /* real inverse, macstat's stat_draw_str pattern: paint
+                       the full row rect (same rect ToggleMenuSelect XORs,
+                       so selection inversion composes exactly) in the line
+                       color (NO_COLOR -> black), then white text -- the
+                       srcOr TextMode set above ORs the glyphs over the box.
+                       Classic ForeColor only: black/white never disturb the
+                       tile CLUT. */
+                    Rect lr = r;
+
+                    if (wind->scrollBar)
+                        lr.right -= SBARWIDTH;
+                    lr.top = row * wind->row_height;
+                    lr.bottom = lr.top + wind->row_height;
+                    mac_set_text_color(color);
+                    PaintRect(&lr);
+                    ForeColor(whiteColor);
+                    /* on 1-bit screens white-via-srcOr is a no-op (OR can
+                       only set bits); srcBic CUTS the glyphs out of the
+                       black box instead (same trick as the yn buttons) */
+                    if (mac_main_depth() < 2)
+                        TextMode(srcBic);
+                } else {
+                    mac_set_text_color(color);
+                }
                 MoveTo(r.left, row * wind->row_height + wind->ascent_height);
                 /* pass the line via the pointer: lineStart can exceed
                    DrawText's 16-bit byte offset in a >32KB text window */
                 if (llen > 0x7FFF)
                     llen = 0x7FFF; /* DrawText byteCount is a short */
                 DrawText(base + lineStart, 0, (short) llen);
+                if (realInverse) {
+                    ForeColor(blackColor);
+                    if (mac_main_depth() < 2)
+                        TextMode(srcOr);
+                }
             }
             lineStart = i + 1;
             lineIdx++;
@@ -3119,10 +3410,47 @@ MenwUpdate(NhWindow *wind)
         return;
     HLock((Handle) wind->menuInfo);
     HLock((Handle) wind->menuSelected);
+    /* typed-count display: "x N" right-aligned in each selected row that
+       has one, drawn BEFORE the selection inversion below so the XOR
+       includes it (count renders inverted with its row).  Font/size are
+       port state from window creation, same as MenwDrawStyled's text;
+       TextMode is still srcOr from MenwDrawStyled (black on white row). */
+    if (wind->menuCounts) {
+        Rect cr;
+        short right;
+
+        GetWindowPortBounds(wind->its_window, &cr);
+        OffsetRect(&cr, -cr.left, -cr.top);
+        right = cr.right - (wind->scrollBar ? SBARWIDTH : 0) - 4;
+        HLock((Handle) wind->menuCounts);
+        TextFace(normal);
+        mac_set_text_color(NO_COLOR); /* black */
+        for (i = 0; i < wind->miSelLen; i++) {
+            short itm = (*wind->menuSelected)[i];
+            long cnt = (*wind->menuCounts)[itm];
+            char cbuf[24];
+            short clen;
+
+            if (cnt < 0L)
+                continue; /* no typed count: whole stack, nothing shown */
+            line = (*wind->menuInfo)[itm].line;
+            /* top visible row is line == scrollPos (row 0), as in
+               MenwDrawStyled/MenwKey/ListCoordinateToItem */
+            if (line < wind->scrollPos || line > wind->y_size)
+                continue; /* same visibility window as the inversion loop */
+            Sprintf(cbuf, "x %ld", cnt);
+            clen = (short) strlen(cbuf);
+            MoveTo(right - TextWidth(cbuf, 0, clen),
+                   (line - wind->scrollPos) * wind->row_height
+                       + wind->ascent_height);
+            DrawText(cbuf, 0, clen);
+        }
+        HUnlock((Handle) wind->menuCounts);
+    }
     for (i = 0; i < wind->miSelLen; i++) {
         mi = &(*wind->menuInfo)[(*wind->menuSelected)[i]];
         line = mi->line;
-        if (line > wind->scrollPos && line <= wind->y_size)
+        if (line >= wind->scrollPos && line <= wind->y_size)
             ToggleMenuSelect(wind, line - wind->scrollPos);
     }
     HUnlock((Handle) wind->menuInfo);
@@ -3452,19 +3780,33 @@ HandleUpdate(EventRecord *theEvent)
     SetPortWindowPort(theWindow);
     GetWindowPortBounds(theWindow, &r);
     OffsetRect(&r, -r.left, -r.top);
-    EraseRect(&r);
     {
         int kind = GetWindowKind(theWindow) - WIN_BASE_KIND;
         /* Distinguish the macmap window (its own Mac WindowPtr) from
            _mt_window — both share kind=NHW_MAP for legacy reasons. */
         if (GetWRefCon(theWindow) == MACMAP_REFCON && WIN_MAP != WIN_ERR) {
+            /* no erase: the backing blit covers the content (a full
+               erase here was a visible white flash the blit then
+               overwrote) and macmap_update_event whitens the margins
+               the blit leaves out */
             macmap_update_event(&theWindows[WIN_MAP]);
+        } else if (theWindow == _mt_window && macstat_active()) {
+            /* status owns _mt_window now; image_tty would blit the stale
+               tty offscreen over the natively drawn fields */
+            EraseRect(&r);
+            macstat_redraw();
         } else if (kind >= 0 && kind < NUM_FUNCS) {
+            if (kind != NHW_MENU)   /* MenwDrawStyled erases itself */
+                EraseRect(&r);
             winUpdateFuncs[kind](&fake, theWindow);
         }
     }
 
-    if (theWindow == _mt_window && existing_update_region) {
+    if (theWindow == _mt_window && existing_update_region
+        && !macstat_active()) {
+        /* with macstat active, image_tty never runs here, so a restored
+           invalid_rect would only accumulate and flash stale tty content
+           at game end; drop it instead */
         set_invalid_region(theWindow, &rect);
     }
     if (aWin)
@@ -3570,8 +3912,9 @@ struct window_procs mac_procs = {
         | WC_FONT_STATUS | WC_FONT_TEXT | WC_FONTSIZ_MAP | WC_FONTSIZ_MENU
         | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_STATUS | WC_FONTSIZ_TEXT
         | WC_TILED_MAP,
-    WC2_SUPPRESS_HIST,   /* honor ATR_NOHISTORY: transient msgs (e.g. farlook
+    WC2_SUPPRESS_HIST    /* honor ATR_NOHISTORY: transient msgs (e.g. farlook
                             descriptions) replace the line instead of logging */
+        | WC2_HILITE_STATUS | WC2_FLUSH_STATUS,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
     mac_init_nhwindows,
     mac_player_selection,
@@ -3599,8 +3942,8 @@ struct window_procs mac_procs = {
 #endif
     genl_outrip, genl_preference_update,
     genl_getmsghistory, genl_putmsghistory,
-    genl_status_init, genl_status_finish, genl_status_enablefield,
-    genl_status_update,
+    mac_status_init, mac_status_finish, mac_status_enablefield,
+    mac_status_update,
     genl_can_suspend_no,
     mac_update_inventory,
     mac_ctrl_nhwindow,

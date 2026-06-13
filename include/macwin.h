@@ -77,6 +77,7 @@ typedef struct {
     anything id;
     char accelerator;
     char groupAcc;
+    Boolean preselected;      /* MENU_ITEMFLAGS_SELECTED at build time */
     short line;
 } MacMHMenuItem;
 
@@ -102,6 +103,10 @@ typedef struct NhWindow {
     MacMHMenuItem **menuInfo; /* Used by menus (array handle) */
     char menuChar;            /* next menu accelerator to use */
     short **menuSelected;     /* list of selected elements from list */
+    long **menuCounts;        /* per-ITEM typed counts (-1 = whole stack);
+                                 lifecycle mirrors menuSelected */
+    long pendingCount;        /* typed count being accumulated in MenwKey */
+    char hasPending;          /* nonzero while pendingCount is live */
     short miSelLen;           /* number of items selected */
     short how;                /* menu mode */
     Handle menuStyle;         /* per-line {attr,color} bytes for styled menu draw */
@@ -181,6 +186,7 @@ extern void clear_screen(void);
 /* ### macwin.c ### */
 
 extern void AddToKeyQueue(unsigned char, Boolean);
+extern short KeyQueueFree(void);
 extern unsigned char GetFromKeyQueue(void);
 extern void InitMac(void);
 int try_key_queue(char *);
@@ -220,6 +226,19 @@ E void mac_getlin(const char *, char *);
 E int mac_get_ext_cmd(void);
 E void mac_number_pad(int);
 E void mac_delay_output(void);
+
+/* macwin.c — palette-safe text color, shared by menus and status */
+extern void mac_set_text_color(int);
+extern short mac_main_depth(void); /* main-device pixel depth (1 = B&W) */
+
+/* macstat.c — native status renderer */
+extern void mac_status_init(void);
+extern void mac_status_finish(void);
+extern void mac_status_enablefield(int, const char *, const char *, boolean);
+extern void mac_status_update(int, genericptr_t, int, int, int,
+                              unsigned long *);
+extern void macstat_redraw(void);
+extern Boolean macstat_active(void);
 
 #undef E
 

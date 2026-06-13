@@ -764,6 +764,8 @@ InitMenuRes()
             menuError(errGetMenuList);
 
         pMenuList[i] = (menuListPtr) NewPtr(GetHandleSize((Handle) mlHnd));
+        if (!pMenuList[i])
+            menuError(errANNewMenu);
         *pMenuList[i] = **mlHnd;
 
         for (j = 0; j < pMenuList[i]->numMenus; j++) {
