@@ -949,7 +949,7 @@ DoMenuEvt(long menuEntry)
             break;
 
         case menuGameReposition:
-            (void) SanePositions();
+            ResetWindowPositions();
             /* queue ^R: synchronous redraw from menu-handler context doesn't
                take (window port unsettled), so redraw in the command loop */
             AddToKeyQueue('R' & 0x1f, 1);
