@@ -98,6 +98,7 @@ makemap_unmakemon(struct monst *mtmp, boolean migratory)
            mongone() -> m_detach() -> mon_leaving_level() copes with that */
         mtmp->mstate |= MON_OFFMAP;
         mtmp->mstate &= ~(MON_MIGRATING | MON_LIMBO | MON_ENDGAME_MIGR);
+        /* FIXME: will post-5.0.0 MON_PARKED need to be dealt with here? */
         mtmp->nmon = fmon;
         fmon = mtmp;
     }

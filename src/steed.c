@@ -903,8 +903,10 @@ place_monster(struct monst *mon, coordxy x, coordxy y)
 
     buf[0] = '\0';
     /* normal map bounds are <1..COLNO-1,0..ROWNO-1> but sometimes
-       vault guards (either living or dead) are parked at <0,0> */
-    if (!isok(x, y) && (x != 0 || y != 0 || !mon->isgd)) {
+       vault guards (either living or dead) are parked at <0,0>;
+       their mstate should have the MON_PARKED bit set (post-5.0.0) */
+    if (!isok(x, y)
+        && !(((mon->mstate & MON_PARKED) != 0) || PARKEDMONSTER(mon))) {
         describe_level(buf, 0);
         impossible("trying to place %s at <%d,%d> mstate:%lx on %s",
                    minimal_monnam(mon, TRUE), x, y, mon->mstate, buf);
@@ -912,7 +914,7 @@ place_monster(struct monst *mon, coordxy x, coordxy y)
     }
     if ((mon == u.usteed && !gi.in_steed_dismounting)
         /* special case is for convoluted vault guard handling */
-        || (DEADMONSTER(mon) && !(mon->isgd && x == 0 && y == 0))) {
+        || (DEADMONSTER(mon) && !PARKEDMONSTER(mon))) {
         describe_level(buf, 0);
         impossible("placing %s onto map, mstate:%lx, on %s?",
                    (mon == u.usteed) ? "steed" : "defunct monster",
@@ -928,7 +930,17 @@ place_monster(struct monst *mon, coordxy x, coordxy y)
     }
     mon->mx = x, mon->my = y;
     svl.level.monsters[x][y] = mon;
-    mon->mstate = MON_FLOOR;
+    /* even though MON_FLOOR is not actually a bit currently
+       (MON_FLOOR == 0) we want to preserve some of the other
+       bits that may be set. We'll probably make MON_FLOOR an
+       actual bit one day */
+
+    mon->mstate &= ~(MON_OFFMAP | MON_DETACH | MON_LIMBO | MON_MIGRATING);
+
+    /* We don't mess with these bits above:
+       MON_BUBBLEMOVE | MON_ENDGAME_FREE | MON_ENDGAME_MIGR
+       | MON_OBLITERATE | MON_STILL_ARRIVING | MON_PARKED
+     */
 }
 
 /*steed.c*/

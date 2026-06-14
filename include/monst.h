@@ -55,16 +55,17 @@ enum m_ap_types {
     M_AP_MONSTER   = 3  /* a monster; mostly used for cloned Wizard */
 };
 
-#define MON_FLOOR        0x00
-#define MON_OFFMAP       0x01
-#define MON_DETACH       0x02
-#define MON_MIGRATING    0x04
-#define MON_LIMBO        0x08
-#define MON_BUBBLEMOVE   0x10
-#define MON_ENDGAME_FREE 0x20
-#define MON_ENDGAME_MIGR 0x40
-#define MON_OBLITERATE   0x80
-#define MON_STILL_ARRIVING 0x100
+#define MON_FLOOR          0x0000
+#define MON_OFFMAP         0x0001
+#define MON_DETACH         0x0002
+#define MON_MIGRATING      0x0004
+#define MON_LIMBO          0x0008
+#define MON_BUBBLEMOVE     0x0010
+#define MON_ENDGAME_FREE   0x0020
+#define MON_ENDGAME_MIGR   0x0040
+#define MON_OBLITERATE     0x0080
+#define MON_STILL_ARRIVING 0x0100
+#define MON_PARKED         0x0200
 
 #define M_AP_TYPMASK  0x7
 #define M_AP_F_DKNOWN 0x8
@@ -212,6 +213,10 @@ struct monst {
 
 /* dead monsters stay on the fmon list until dmonsfree() at end of turn */
 #define DEADMONSTER(mon) ((mon)->mhp < 1)
+/* vault guards intentionally remain on the fmon list at 0,0 until
+   the temporary corridor is dealt with */
+#define PARKEDMONSTER(mon) ((mon)->isgd && (mon)->mx == 0)
+/* eventually, we'll be able to use (((mon)->mstate & MON_PARKED) != 0) */
 
 #define is_starting_pet(mon) ((mon)->m_id == svc.context.startingpet_mid)
 #define is_vampshifter(mon) \

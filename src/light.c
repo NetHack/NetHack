@@ -303,7 +303,7 @@ show_transient_light(struct obj *obj, coordxy x, coordxy y)
 
     radius_squared = ls->range * ls->range;
     for (mon = fmon; mon; mon = mon->nmon) {
-        if (DEADMONSTER(mon) || (mon->isgd && !mon->mx))
+        if (DEADMONSTER(mon) || PARKEDMONSTER(mon))
             continue;
         /* light range is the radius of a circle and we're limiting
            canseemon() to a square enclosing that circle, but setting
@@ -343,7 +343,7 @@ transient_light_cleanup(void)
        so need to be replaced by "remembered, unseen monster" glyph */
     mtempcount = 0;
     for (mon = fmon; mon; mon = mon->nmon) {
-        if (DEADMONSTER(mon))
+        if (DEADMONSTER(mon) || PARKEDMONSTER(mon))
             continue;
         if (mon->mtemplit) {
             mon->mtemplit = 0;

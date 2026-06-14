@@ -1230,7 +1230,7 @@ movemon_singlemon(struct monst *mtmp)
        off the map too; gd_move() decides whether the temporary
        corridor can be removed and guard discarded (via clearing
        mon->isgd flag so that dmonsfree() will get rid of mon) */
-    if (mtmp->isgd && !mtmp->mx && !(mtmp->mstate & MON_MIGRATING)) {
+    if (PARKEDMONSTER(mtmp) && !(mtmp->mstate & MON_MIGRATING)) {
         /* parked at <0,0>; eventually isgd should get set to false */
         if (svm.moves > mtmp->mlstmv) {
             (void) gd_move(mtmp);

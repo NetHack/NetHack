@@ -1544,7 +1544,7 @@ see_monsters(void)
 
     /* loop through level.monsters (aka fmon) */
     for (mon = fmon; mon; mon = mon->nmon) {
-        if (DEADMONSTER(mon))
+        if (DEADMONSTER(mon) || PARKEDMONSTER(mon))
             continue;
         if ((mon->mstate & MON_STILL_ARRIVING) != 0)
             continue;

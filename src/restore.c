@@ -448,6 +448,13 @@ restmonchn(NHFILE *nhfp)
             restshk(mtmp, ghostly);
         if (mtmp->ispriest)
             restpriest(mtmp, ghostly);
+        if (mtmp->isgd) {
+            /* fixup for new bit MON_PARKED added post 5.0.0 */
+            if (!mtmp->mx
+                && (mtmp->mstate & MON_PARKED) == 0L
+                && (mtmp->mstate & MON_MIGRATING) == 0L)
+                mtmp->mstate |= MON_PARKED;
+        }
 
         if (!ghostly) {
             if (mtmp->m_id == svc.context.polearm.m_id)

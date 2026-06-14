@@ -146,6 +146,7 @@ restfakecorr(struct monst *grd)
     /* it seems you left the corridor - let the guard disappear */
     if (clear_fcorr(grd, FALSE)) {
         grd->isgd = 0; /* dmonsfree() should delete this mon */
+        grd->mstate &= ~MON_PARKED;
         mongone(grd);
     }
 }
@@ -162,8 +163,10 @@ parkguard(struct monst *grd)
         remove_monster(grd->mx, grd->my);
         newsym(grd->mx, grd->my);
     }
-    if (m_at(0, 0) != grd)
+    if (m_at(0, 0) != grd) {
+        grd->mstate |= MON_PARKED;
         place_monster(grd, 0, 0);
+    }
     /* [grd->mx,my just got set to 0,0 by place_monster(), so this
        just sets EGD(grd)->ogx,ogy to 0,0 too; is that what we want?] */
     EGD(grd)->ogx = grd->mx;

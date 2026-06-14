@@ -922,7 +922,7 @@ dochug(struct monst *mtmp)
             /*FALLTHRU*/
         case MMOVE_NOTHING: /* no movement, but it can still attack you */
         case MMOVE_DONE: /* absolutely no movement */
-            /* vault guard might have vanished */
+            /* vault guard might have vanished; PARKEDMONSTER(mtmp) */
             if (mtmp->isgd && (DEADMONSTER(mtmp) || mtmp->mx == 0))
                 return 1; /* behave as if it died */
             /* During hallucination, monster appearance should
