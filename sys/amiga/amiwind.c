@@ -141,6 +141,23 @@ CloseShWindow(struct Window *win)
     CloseWindow(win);
 }
 
+void
+CloseShWindowKeepKbd(struct Window *win)
+{
+    unsigned char savebuf[KBDBUFFER];
+    int saved;
+
+    (void) amikbhit();
+    saved = KbdBuffered;
+    if (saved > 0)
+        memcpy(savebuf, KbdBuffer, saved);
+    CloseShWindow(win);
+    if (saved > 0) {
+        memcpy(KbdBuffer, savebuf, saved);
+        KbdBuffered = saved;
+    }
+}
+
 static int
 BufferGetchar(void)
 {

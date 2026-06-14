@@ -9,13 +9,9 @@
 
 #include "dlb.h"
 
-#ifdef CROSS_TO_AMIGA
-#define strnicmp strncmpi
-#endif
-
 #ifdef AMIGA_INTUITION
 
-static int put_ext_cmd(char *, int, struct amii_WinDesc *, int);
+static int draw_ext_cmd(struct Window *, char *, int, int);
 
 struct amii_DisplayDesc *amiIDisplay; /* the Amiga Intuition descriptor */
 struct Rectangle lastinvent, lastmsg;
@@ -365,195 +361,145 @@ flush_output(){} */
 /* Read in an extended command - doing command line completion for
  * when enough characters have been entered to make a unique command.
  */
+static struct NewWindow ExtWindow = {
+    0, 0, 100, 30, 0, 1, RAWKEY,
+    WINDOWDRAG + ACTIVATE + NOCAREREFRESH,
+    NULL, NULL, (UBYTE *) "Extended Command",
+    NULL, NULL, 5, 5, 0xffff, 0xffff, CUSTOMSCREEN
+};
+
 int
 amii_get_ext_cmd(void)
 {
-    menu_item *mip;
-    anything id;
-    struct amii_WinDesc *cw;
-    int colx;
-    int bottom = 0;
-
     struct Window *w;
-    char obufp[BUFSZ];
+    char obufp[BUFSZ], prefix[BUFSZ];
     char *bufp = obufp;
     int c;
-    int com_index, oindex;
-    int did_comp = 0; /* did successful completion? */
-    int sel = -1;
+    int lastlen = 0;
+    int tabi = 0;
+    int maxcols;
+    int n_ac, n_all, i, j, k, eidx;
+    int *ecmatches;
 
-    if (WIN_MESSAGE == WIN_ERR || (cw = amii_wins[WIN_MESSAGE]) == NULL)
-        panic(winpanicstr, WIN_MESSAGE, "get_ext_cmd");
-    w = cw->win;
-    bottom = amii_msgborder(w);
-    colx = 3;
+    ExtWindow.Screen = HackScreen;
+    ExtWindow.Width = 40 * HackScreen->RastPort.TxWidth + 16;
+    if (ExtWindow.Width > HackScreen->Width)
+        ExtWindow.Width = HackScreen->Width;
+    ExtWindow.Height = HackScreen->BarHeight
+                       + HackScreen->RastPort.TxHeight + 8;
+    ExtWindow.LeftEdge = (HackScreen->Width - ExtWindow.Width) / 2;
+    ExtWindow.TopEdge = (HackScreen->Height - ExtWindow.Height) / 2;
+    if ((w = OpenShWindow(&ExtWindow)) == NULL)
+        return -1;
+    maxcols = (w->Width - w->BorderLeft - w->BorderRight - 8)
+                  / w->RPort->TxWidth - 3;
 
-    amii_clear_nhwindow(WIN_MESSAGE); /* Was NHW_MESSAGE */
-    if (scrollmsg) {
-        pline("#");
-        amii_addtopl(" ");
-    } else {
-        pline("# ");
-    }
+    obufp[0] = '\0';
+    lastlen = draw_ext_cmd(w, obufp, 0, lastlen);
 
-    sel = -1;
     while ((c = WindowGetchar()) != EOF) {
-        amii_curs(WIN_MESSAGE, colx, bottom);
         if (c == '?') {
-            int win, i;
-            char buf[100];
-
-            if (did_comp) {
-                while (bufp != obufp) {
-                    bufp--;
-                    amii_curs(WIN_MESSAGE, --colx, bottom);
-                    Text(w->RPort, spaces, 1);
-                    amii_curs(WIN_MESSAGE, colx, bottom);
-                    did_comp = 0;
-                }
-            }
-
-            win = amii_create_nhwindow(NHW_MENU);
-            amii_start_menu(win, MENU_BEHAVE_STANDARD);
-
-            for (i = 0; extcmdlist[i].ef_txt != NULL; ++i) {
-                id.a_int = i;
-                sprintf(buf, "%-10s - %s ", extcmdlist[i].ef_txt,
-                        extcmdlist[i].ef_desc);
-                amii_add_menu(win, (const glyph_info *) 0, &id,
-                              extcmdlist[i].ef_txt[0], 0, 0, NO_COLOR,
-                              buf, MENU_ITEMFLAGS_NONE);
-            }
-
-            amii_end_menu(win, (char *) 0);
-            sel = amii_select_menu(win, PICK_ONE, &mip);
-            amii_destroy_nhwindow(win);
-
-            if (sel == 0) {
-                return (-1);
-            } else {
-                i = mip->item.a_int;
-
-                /* copy in the text */
-                if (extcmdlist[i].ef_txt != NULL) {
-                    amii_clear_nhwindow(WIN_MESSAGE);
-                    strncpy(obufp, extcmdlist[i].ef_txt, sizeof(obufp) - 1);
-                    obufp[sizeof(obufp) - 1] = '\0';
-                    bufp = obufp;
-                    (void) put_ext_cmd(obufp, colx, cw, bottom);
-                    return (i);
-                } else
-                    DisplayBeep(NULL);
-            }
+            CloseShWindowKeepKbd(w);
+            return extcmd_via_menu();
         } else if (c == '\033') {
-            return (-1);
+            CloseShWindowKeepKbd(w);
+            return -1;
         } else if (c == '\b') {
-            if (did_comp) {
-                while (bufp != obufp) {
-                    bufp--;
-                    amii_curs(WIN_MESSAGE, --colx, bottom);
-                    Text(w->RPort, spaces, 1);
-                    amii_curs(WIN_MESSAGE, colx, bottom);
-                    did_comp = 0;
-                    sel = -1;
-                }
-            } else if (bufp != obufp) {
-                sel = -1;
+            if (bufp != obufp) {
                 bufp--;
-                amii_curs(WIN_MESSAGE, --colx, bottom);
-                Text(w->RPort, spaces, 1);
-                amii_curs(WIN_MESSAGE, colx, bottom);
+                *bufp = '\0';
+                tabi = 0;
+                lastlen = draw_ext_cmd(w, obufp, (int) (bufp - obufp),
+                                       lastlen);
             } else
                 DisplayBeep(NULL);
         } else if (c == '\n' || c == '\r') {
-            return (sel);
-        } else if (c >= ' ' && c < '\177') {
+            break;
+        } else if (c == '\t') {
+            k = (int) (bufp - obufp);
+            memcpy(prefix, obufp, k);
+            prefix[k] = '\0';
+            n_all = extcmds_match(prefix, ECM_IGNOREAC, &ecmatches);
+            if (n_all == 0) {
+                DisplayBeep(NULL);
+            } else {
+                eidx = -1;
+                n_ac = extcmds_match(prefix, ECM_NOFLAGS, &ecmatches);
+                k = tabi++ % n_all;
+                if (k < n_ac) {
+                    eidx = ecmatches[k];
+                } else {
+                    n_all = extcmds_match(prefix, ECM_IGNOREAC, &ecmatches);
+                    j = k - n_ac;
+                    for (i = 0; i < n_all; i++) {
+                        if (extcmds_getentry(ecmatches[i])->flags
+                            & AUTOCOMPLETE)
+                            continue;
+                        if (j-- == 0) {
+                            eidx = ecmatches[i];
+                            break;
+                        }
+                    }
+                }
+                if (eidx >= 0) {
+                    Strcpy(obufp, extcmds_getentry(eidx)->ef_txt);
+                    lastlen = draw_ext_cmd(w, obufp, (int) (bufp - obufp),
+                                           lastlen);
+                }
+            }
+        } else if (c >= ' ' && c < '\177'
+                   && bufp - obufp < (int) sizeof obufp - 1
+                   && bufp - obufp < maxcols) {
             /* avoid isprint() - some people don't have it
                ' ' is not always a printing char */
             *bufp = c;
-            bufp[1] = 0;
-            oindex = 0;
-            com_index = -1;
-
-            while (extcmdlist[oindex].ef_txt != NULL) {
-                if (!strnicmp(obufp, (char *) extcmdlist[oindex].ef_txt,
-                              strlen(obufp))) {
-                    if (com_index == -1) /* No matches yet*/
-                        com_index = oindex;
-                    else /* More than 1 match */
-                        com_index = -2;
-                }
-                oindex++;
-            }
-
-            if (com_index >= 0 && *obufp) {
-                Strcpy(obufp, extcmdlist[com_index].ef_txt);
-                /* finish printing our string */
-                colx = put_ext_cmd(obufp, colx, cw, bottom);
-                bufp = obufp; /* reset it */
-                if (strlen(obufp) < BUFSZ - 1 && strlen(obufp) < COLNO)
-                    bufp += strlen(obufp);
-                did_comp = 1;
-                sel = com_index;
-            } else {
-                colx = put_ext_cmd(obufp, colx, cw, bottom);
-                if (bufp - obufp < (int) sizeof obufp - 1
-                    && bufp - obufp < COLNO)
-                    bufp++;
-            }
+            bufp[1] = '\0';
+            bufp++;
+            tabi = 0;
+            lastlen = draw_ext_cmd(w, obufp, (int) (bufp - obufp), lastlen);
         } else if (c == ('X' - 64) || c == '\177') {
-            colx = 0;
-            amii_clear_nhwindow(WIN_MESSAGE);
-            pline("# ");
             bufp = obufp;
+            *bufp = '\0';
+            tabi = 0;
+            lastlen = draw_ext_cmd(w, obufp, 0, lastlen);
         } else
             DisplayBeep(NULL);
     }
-    return (-1);
+    CloseShWindowKeepKbd(w);
+
+    (void) mungspaces(obufp);
+    if (c == EOF || obufp[0] == '\0')
+        return -1;
+    if (extcmds_match(obufp, ECM_IGNOREAC | ECM_EXACTMATCH, &ecmatches) == 1)
+        return ecmatches[0];
+    if (extcmds_match(obufp, ECM_NOFLAGS, &ecmatches) == 1)
+        return ecmatches[0];
+    pline("#%.60s: unknown extended command.", obufp);
+    return -1;
 }
 
 static int
-put_ext_cmd(char *obufp, int colx, struct amii_WinDesc *cw, int bottom)
+draw_ext_cmd(struct Window *w, char *obufp, int typed, int lastlen)
 {
-    struct Window *w = cw->win;
-    char *t;
+    struct RastPort *rp = w->RPort;
+    int len = strlen(obufp);
+    int x0 = w->BorderLeft + 4;
+    int y = w->BorderTop + 2 + rp->TxBaseline;
+    char curschar;
 
-    t = (char *) alloc(strlen(obufp) + 7);
-    if (t != NULL) {
-        if (scrollmsg) {
-            sprintf(t, "xxx%s", obufp);
-            t[0] = 1;
-            t[1] = 1;
-            t[2] = '#';
-            amii_curs(WIN_MESSAGE, 0, bottom);
-            SetAPen(w->RPort, C_WHITE);
-            Text(w->RPort, "># ", 3);
-            /* SetAPen( w->RPort, C_BLACK ); */ /* Black text on black
-                                                 * screen doesn't look
-                                                 * too well ... -jhsa */
-            Text(w->RPort, t + 3, strlen(t) - 3);
-        } else {
-            sprintf(t, "# %s", obufp);
-            amii_curs(WIN_MESSAGE, 0, bottom);
-            SetAPen(w->RPort, C_WHITE);
-            Text(w->RPort, t, strlen(t));
-        }
-        if (scrollmsg)
-            SetAPen(w->RPort, C_WHITE);
-        if (cw->data[cw->maxrow - 1])
-            free(cw->data[cw->maxrow - 1]);
-        cw->data[cw->maxrow - 1] = t;
-    } else {
-        amii_curs(WIN_MESSAGE, 0, bottom);
-        SetAPen(w->RPort, C_WHITE);
-        Text(w->RPort, "# ", 2);
-        /* SetAPen( w->RPort, C_BLACK ); */ /* Black on black ... -jhsa */
-        Text(w->RPort, obufp, strlen(obufp));
-        SetAPen(w->RPort, C_WHITE);
-    }
-    amii_curs(WIN_MESSAGE, colx = strlen(obufp) + 3 + (scrollmsg != 0),
-              bottom);
-    return colx;
+    SetAPen(rp, C_WHITE);
+    SetDrMd(rp, JAM2);
+    Move(rp, x0, y);
+    Text(rp, "# ", 2);
+    if (len)
+        Text(rp, obufp, len);
+    TextSpaces(rp, lastlen - len + 1);
+    Move(rp, x0 + (typed + 2) * rp->TxWidth, y);
+    curschar = obufp[typed] ? obufp[typed] : ' ';
+    SetDrMd(rp, JAM2 | INVERSVID);
+    Text(rp, &curschar, 1);
+    SetDrMd(rp, JAM2);
+    return len;
 }
 
 /* Ask a question and get a response */

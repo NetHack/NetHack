@@ -856,6 +856,13 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                     }
                 } else {
                     int selected = FALSE;
+                    int gmatches = 0;
+
+                    if (how == PICK_ONE) {
+                        for (amip = cw->menu.items; amip; amip = amip->next)
+                            if (amip->canselect && amip->gselector == code)
+                                gmatches++;
+                    }
                     for (amip = cw->menu.items; amip; amip = amip->next) {
                         if (!amip->canselect)
                             continue;
@@ -873,7 +880,11 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                                 amip->str[SOFF + 2] = '-';
                             }
                             selected = TRUE;
+                            if (how == PICK_ONE)
+                                break;
                         } else if (amip->gselector == code) {
+                            if (how == PICK_ONE && gmatches != 1)
+                                continue;
                             amip->selected = !amip->selected;
                             if (counting) {
                                 amip->count = count;
@@ -885,6 +896,10 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                                 amip->str[SOFF + 2] = '-';
                             }
                             selected = TRUE;
+                            if (how == PICK_ONE) {
+                                aredone = 1;
+                                break;
+                            }
                         }
                     }
                     if (selected)
@@ -989,8 +1004,7 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                         /* Remove old highlighting if visible */
 
                         amip = find_menu_item(cw, oidx);
-                        if (amip && oidx != aidx
-                            && (oidx > topidx && oidx - topidx < wheight)) {
+                        if (amip && oidx != aidx) {
                             if (how != PICK_ANY) {
                                 amip->selected = 0;
                                 amip->count = -1;
