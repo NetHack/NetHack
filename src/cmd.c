@@ -733,7 +733,8 @@ doextlist(void)
     return ECMD_OK;
 }
 
-#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS) \
+    || defined(AMIGA_INTUITION)
 #define MAX_EXT_CMD 200 /* Change if we ever have more ext cmds */
 
 DISABLE_WARNING_FORMAT_NONLITERAL

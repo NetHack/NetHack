@@ -52,6 +52,7 @@ void SetPropInfo(struct Window *win, struct Gadget *gad, long vis, long total,
 /* amiwind.c */
 struct Window *OpenShWindow(struct NewWindow *nw);
 void CloseShWindow(struct Window *win);
+void CloseShWindowKeepKbd(struct Window *win);
 int ConvertKey(struct IntuiMessage *message);
 void ProcessMessage(struct IntuiMessage *message);
 int kbhit(void);
