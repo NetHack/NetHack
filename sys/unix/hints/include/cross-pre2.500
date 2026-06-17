@@ -135,6 +135,7 @@ override TARGET_CXX = $(TOOLTOP1)/i586-pc-msdosdjgpp-g++
 override TARGET_AR = $(TOOLTOP1)/i586-pc-msdosdjgpp-gcc-ar
 override TARGET_STUBEDIT = ../lib/djgpp/i586-pc-msdosdjgpp/bin/stubedit
 override GENTILEOFILE = $(TARGETPFX)tile.o
+override UUIDOBJ =
 ifdef MAKEFILE_SRC
 FLDR=../
 endif
