@@ -74,17 +74,6 @@ nethack.icns: ../win/share/nhicns.uu
 Info.plist: ../win/Qt/Info.pli
 	cp ../win/Qt/Info.pli Info.plist
 
-../util/tile2img.ttp:
-	(cd ../util ; $(MAKE) tile2img.ttp)
-
-../util/xpm2img.ttp:
-	(cd ../util ; $(MAKE) xpm2img.ttp)
-nh16.img: ../util/tile2img.ttp ../win/share/monsters.txt \
-				../win/share/objects.txt ../win/share/other.txt
-	../util/tile2img.ttp nh16.img
-
-rip.img: ../util/xpm2img.ttp
-	../util/xpm2img.ttp ../win/X11/rip.xpm rip.img
 title.img:
 	# cp ../win/gem/title.img title.img
 	$(UUDECODE) ../win/gem/title.uu
@@ -129,7 +118,7 @@ clean:
 spotless: clean
 	-rm -f nhdat $(VARDAT) \
 		x11tiles pet_mark.xbm pilemark.xbm rip.xpm mapbg.xpm \
-		rip.img GEM_RSC.RSC title.img nh16.img NetHack.ad \
+		GEM_RSC.RSC title.img NetHack.ad \
 		nhsplash.xpm nhtiles.bmp beostiles
 
 #eof#

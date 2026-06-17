@@ -62,63 +62,9 @@ extern winid WIN_MESSAGE, WIN_MAP, WIN_STATUS, WIN_INVEN;
 #define DIALOG_MODE AUTO_DIAL | MODAL | NO_ICONIFY
 
 /*
- *  Keyboard translation tables.
+ *  Keyboard translation tables (and the C()/M() helpers they use).
  */
-#define C(c) (0x1f & (c))
-#define M(c) (0x80 | (c))
-
-#define KEYPADLO 0x61
-#define KEYPADHI 0x71
-
-#define PADKEYS (KEYPADHI - KEYPADLO + 1)
-#define iskeypad(x) (KEYPADLO <= (x) && (x) <= KEYPADHI)
-
-/*
- * Keypad keys are translated to the normal values below.
- * When iflags.BIOS is active, shifted keypad keys are translated to the
- *    shift values below.
- */
-static const struct pad {
-    char normal, shift, cntrl;
-} keypad[PADKEYS] =
-    {
-      { C('['), 'Q', C('[') }, /* UNDO */
-      { '?', '/', '?' },       /* HELP */
-      { '(', 'a', '(' },       /* ( */
-      { ')', 'w', ')' },       /* ) */
-      { '/', '/', '/' },       /* / */
-      { C('p'), '$', C('p') }, /* * */
-      { 'y', 'Y', C('y') },    /* 7 */
-      { 'k', 'K', C('k') },    /* 8 */
-      { 'u', 'U', C('u') },    /* 9 */
-      { 'h', 'H', C('h') },    /* 4 */
-      { '.', '.', '.' },
-      { 'l', 'L', C('l') }, /* 6 */
-      { 'b', 'B', C('b') }, /* 1 */
-      { 'j', 'J', C('j') }, /* 2 */
-      { 'n', 'N', C('n') }, /* 3 */
-      { 'i', 'I', C('i') }, /* Ins */
-      { '.', ':', ':' }     /* Del */
-    },
-  numpad[PADKEYS] = {
-      { C('['), 'Q', C('[') }, /* UNDO */
-      { '?', '/', '?' },       /* HELP */
-      { '(', 'a', '(' },       /* ( */
-      { ')', 'w', ')' },       /* ) */
-      { '/', '/', '/' },       /* / */
-      { C('p'), '$', C('p') }, /* * */
-      { '7', M('7'), '7' },    /* 7 */
-      { '8', M('8'), '8' },    /* 8 */
-      { '9', M('9'), '9' },    /* 9 */
-      { '4', M('4'), '4' },    /* 4 */
-      { '.', '.', '.' },       /* 5 */
-      { '6', M('6'), '6' },    /* 6 */
-      { '1', M('1'), '1' },    /* 1 */
-      { '2', M('2'), '2' },    /* 2 */
-      { '3', M('3'), '3' },    /* 3 */
-      { 'i', 'I', C('i') },    /* Ins */
-      { '.', ':', ':' }        /* Del */
-  };
+#include "keytrans.h"
 
 #define TBUFSZ 300
 #define BUFSZ 256
@@ -171,10 +117,10 @@ nearest_pen(short want_r, short want_g, short want_b)
 static short pen_black = 1, pen_white = 0, pen_darkgray = 1;
 
 /* Per-NetHack-CLR_* VDI pen, computed at runtime via nearest_pen
-   against the currently-installed workstation palette.  Replaces the
-   fixed nhclr_to_vdi[] table -- the tile palette install in
-   palettized modes can remap pens 0..15 away from the standard ST
-   palette, so a fixed lookup misses the closest available colour. */
+   against the currently-installed workstation palette.  Computed
+   rather than fixed because the tile palette install in palettized
+   modes can remap pens 0..15 away from the standard ST palette, so a
+   fixed lookup would miss the closest available colour. */
 static short nhclr_to_pen[16] = {
     /* sensible defaults until cache_nhclr_pens() runs */
     1, 2, 3, 6, 4, 7, 5, 9, 1, 10, 11, 14, 12, 15, 13, 0
@@ -591,8 +537,7 @@ set_normal_dial_colors(void)
 
 static short no_glyph; /* the short indicating there is no glyph */
 IMG_header tile_image, titel_image, rip_image;
-MFDB Tile_bilder, Map_bild, Titel_bild, Rip_bild, Black_bild, Pet_Mark,
-    FontCol_Bild;
+MFDB Tile_bilder, Map_bild, Titel_bild, Rip_bild, Pet_Mark;
 static short Tile_width = 16, Tile_height = 16, Tiles_per_line = 20;
 char *Tilefile = NULL;
 /* pet_mark Design by Warwick Allison warwick@troll.no */
@@ -600,38 +545,6 @@ static short pet_mark_data[] = { 0x0000, 0x3600, 0x7F00, 0x7F00,
                                0x3E00, 0x1C00, 0x0800 };
 static short *normal_palette = NULL;
 static void restore_normal_palette(void);
-
-/* NetHack CLR_* (0..15) -> VDI pen.  Mapped against default_st_vdi
-   so each NetHack colour lands on the closest ST-palette pen.  Dark
-   variants (black/red/green/blue/magenta/cyan/yellow) take the
-   primary pens 1..7; "bright" variants take the corresponding
-   pens 9..15.  NO_COLOR (NetHack code 8) is special-cased by
-   callers and never actually indexes here.  CLR_WHITE maps to
-   black so it's visible on light dialog backgrounds (pen 0 = white
-   would be invisible). */
-static const short nhclr_to_vdi[16] = {
-    1,  /* CLR_BLACK        -> pen 1  (black)          */
-    2,  /* CLR_RED          -> pen 2  (red)            */
-    3,  /* CLR_GREEN        -> pen 3  (green)          */
-    6,  /* CLR_BROWN        -> pen 6  (yellow, closest to brown in
-                                       ST default palette) */
-    4,  /* CLR_BLUE         -> pen 4  (blue)           */
-    7,  /* CLR_MAGENTA      -> pen 7  (magenta)        */
-    5,  /* CLR_CYAN         -> pen 5  (cyan)           */
-    9,  /* CLR_GRAY         -> pen 9  (dk grey)        */
-    1,  /* NO_COLOR         -> black (special-cased upstream) */
-    10, /* CLR_ORANGE       -> pen 10 (lt red, closest to orange) */
-    11, /* CLR_BRIGHT_GREEN -> pen 11 (lt green)       */
-    14, /* CLR_YELLOW       -> pen 14 (lt yellow)      */
-    12, /* CLR_BRIGHT_BLUE  -> pen 12 (lt blue)        */
-    15, /* CLR_BRIGHT_MAGENTA -> pen 15 (lt magenta)   */
-    13, /* CLR_BRIGHT_CYAN  -> pen 13 (lt cyan)        */
-    0   /* CLR_WHITE        -> pen 0 (white) for visibility on the
-                                black map background.  draw_inventory
-                                special-cases CLR_WHITE to pen 1 so
-                                it stays visible on dialog backgrounds
-                                too. */
-};
 
 static struct gw {
     WIN *gw_window;
@@ -663,7 +576,6 @@ char **map_glyphs = NULL;
    old "white text + OR colored cells" trick that only worked on
    ST 4-plane palette ordering and breaks in truecolor. */
 short **map_colors = NULL;
-dirty_rect *dr_map;
 
 char **status_line;
 short num_status_lines, status_w, status_align = FALSE;
@@ -678,7 +590,6 @@ short *message_age;
 short msg_pos = 0, msg_max = 0, msg_anz = 0, msg_width = 0, msg_vis = 3,
     msg_align = TRUE;
 NHGEM_FONT msg_font;
-dirty_rect *dr_msg;
 
 SCROLL scroll_menu;
 Gem_menu_item *invent_list;
@@ -947,24 +858,12 @@ mar_set_fontbyid(short type, short id, short size)
         break;
     case NHW_MAP:
         if (map_font.size != -size || map_font.id != id) {
-            MFDB mtmp;
             map_font.size = -size;
             map_font.id = id;
             map_font.prop = FontInfo(id)->type & (FNT_PROP | FNT_ASCII);
             v_set_text(map_font.id, map_font.size, BLACK, 0, 0, chardim);
             map_font.ch = chardim[3] ? chardim[3] : 1;
             map_font.cw = chardim[2] ? chardim[2] : 1;
-            mfdb(&mtmp, NULL, (COLNO - 1) * map_font.cw, ROWNO * map_font.ch,
-                 0, planes);
-            if (mfdb_size(&mtmp) > mfdb_size(&FontCol_Bild)
-                && mfdb_size(&mtmp) > mfdb_size(&Map_bild)) {
-                FontCol_Bild.fd_addr = Map_bild.fd_addr =
-                    (short *) realloc(Map_bild.fd_addr, mfdb_size(&mtmp));
-                if (!Map_bild.fd_addr)
-                    panic("Not enough Space for the map.");
-            }
-            mfdb(&FontCol_Bild, FontCol_Bild.fd_addr,
-                 (COLNO - 1) * map_font.cw, ROWNO * map_font.ch, 0, planes);
             rearrange_windows();
         }
         break;
@@ -1012,8 +911,8 @@ mar_set_font(short type, const char *font_name, short size)
         id = atoi(font_name);
         if (id <= 0) {
             short i, tid;
-            char name[32];
-            for (i = fonts_loaded; --i >= 0;) {
+            char name[33]; /* vqt_name stores 32 chars plus NUL */
+            for (i = fonts_loaded; i >= 1; i--) {
                 tid = vqt_name(x_handle, i, name);
                 if (!stricmp(name, font_name)) {
                     id = tid;
@@ -1343,33 +1242,38 @@ draw_rip(PARMBLK *pb)
             } else
                 (*v_mtext)(x_handle, x, y, (*ptr++) + 1);
         }
-        pla[0] = pla[1] = 0;
-        pla[2] = min(pb->pb_w - 1, Rip_bild.fd_w - 1);
-        pla[3] = min(pb->pb_h - 1, Rip_bild.fd_h - 1);
-        pla[6] = pla[4] =
-            pb->pb_x + (pb->pb_w - Rip_bild.fd_w) / 2; /* x_wert to */
-        pla[7] = pla[5] = pb->pb_y;                    /* y_wert to */
-        pla[6] += pla[2];
-        pla[7] += pla[3];
-        if (planes == 1) {
-            short colindex[2] = { 1, 0 };
-            vrt_cpyfm(x_handle, MD_REPLACE, pla, &Rip_bild, screen,
-                      colindex);
-        } else {
-            vro_cpyfm(x_handle, S_ONLY, pla, &Rip_bild, screen);
+        /* no tombstone image loaded: keep the plain text screen */
+        if (Rip_bild.fd_addr) {
+            pla[0] = pla[1] = 0;
+            pla[2] = min(pb->pb_w - 1, Rip_bild.fd_w - 1);
+            pla[3] = min(pb->pb_h - 1, Rip_bild.fd_h - 1);
+            pla[6] = pla[4] =
+                pb->pb_x + (pb->pb_w - Rip_bild.fd_w) / 2; /* x_wert to */
+            pla[7] = pla[5] = pb->pb_y;                    /* y_wert to */
+            pla[6] += pla[2];
+            pla[7] += pla[3];
+            if (planes == 1) {
+                short colindex[2] = { 1, 0 };
+                vrt_cpyfm(x_handle, MD_REPLACE, pla, &Rip_bild, screen,
+                          colindex);
+            } else {
+                vro_cpyfm(x_handle, S_ONLY, pla, &Rip_bild, screen);
+            }
+            v_set_mode(MD_TRANS);
+            vst_alignment(x_handle, 1, 5, &sa_dummy, &sa_dummy);
+            pla[5] += 64;
+            for (i = 0; i < 7; i++, pla[5] += chardim[3]) {
+                v_set_text(text_font.id,
+                           (i == 0 || i == 6) ? text_font.size : 12,
+                           pen_white, 0, 0, chardim);
+                (*v_mtext)(x_handle, pla[4] + 157, pla[5], rip_line[i]);
+                v_set_text(text_font.id,
+                           (i == 0 || i == 6) ? text_font.size : 12,
+                           pen_black, 0, 0, chardim);
+                (*v_mtext)(x_handle, pla[4] + 157, pla[5], rip_line[i]);
+            }
+            vst_alignment(x_handle, 0, 5, &sa_dummy, &sa_dummy);
         }
-        v_set_mode(MD_TRANS);
-        vst_alignment(x_handle, 1, 5, &sa_dummy, &sa_dummy);
-        pla[5] += 64;
-        for (i = 0; i < 7; i++, pla[5] += chardim[3]) {
-            v_set_text(text_font.id, (i == 0 || i == 6) ? text_font.size : 12,
-                       pen_white, 0, 0, chardim);
-            (*v_mtext)(x_handle, pla[4] + 157, pla[5], rip_line[i]);
-            v_set_text(text_font.id, (i == 0 || i == 6) ? text_font.size : 12,
-                       pen_black, 0, 0, chardim);
-            (*v_mtext)(x_handle, pla[4] + 157, pla[5], rip_line[i]);
-        }
-        vst_alignment(x_handle, 0, 5, &sa_dummy, &sa_dummy);
     }
     return (0);
 }
@@ -1402,14 +1306,18 @@ draw_msgline(PARMBLK *pb)
         Min(&stopx, MSGLEN);
         x += startx * msg_font.cw;
         for (i = 0; i < stopy; i++, y -= msg_font.ch, ptr--) {
+            short len = (short) strlen(*ptr), ex;
             if (message_age[msg_pos - i])
                 v_set_text(FAIL, 0, pen_black, 0, 0, vst_out);
             else
                 v_set_text(FAIL, 0, pen_darkgray, 0, 0, vst_out);
-            tmp = (*ptr)[stopx];
-            (*ptr)[stopx] = 0;
+            if (startx >= len) /* nothing of this line is exposed */
+                continue;
+            ex = min(stopx, len); /* don't read past the message text */
+            tmp = (*ptr)[ex];
+            (*ptr)[ex] = 0;
             (*v_mtext)(x_handle, x, y, &(*ptr)[startx]);
-            (*ptr)[stopx] = tmp;
+            (*ptr)[ex] = tmp;
         }
     }
     return (0);
@@ -1640,6 +1548,76 @@ mar_set_dir_keys(void)
 
 extern int total_tiles_used; /* tile.c */
 
+/* load and prepare the tile sheet; 0 on success, IMG error code else */
+static short
+load_tile_image(void)
+{
+    short img_err, tried_default = FALSE;
+
+    if (tile_image.addr)
+        return (0);
+
+loadimg:
+    img_err = depack_img(Tilefile ? Tilefile : (planes >= 5) ? "NH32.IMG"
+                                                  : (planes >= 4) ? "NH16.IMG"
+                                                                   : "NH2.IMG",
+                             &tile_image);
+    if (img_err)
+        return (img_err);
+    if ((tile_image.img_w % Tile_width || tile_image.img_h % Tile_height)
+        && !tried_default) {
+        Tilefile = NULL;
+        Tile_width = Tile_height = 16;
+        tried_default = TRUE;
+        img_error(ERR_HEADER);
+        goto loadimg;
+    }
+    if ((tile_image.img_w / Tile_width) * (tile_image.img_h / Tile_height)
+            < total_tiles_used
+        && !tried_default) {
+        Tilefile = NULL;
+        Tile_width = Tile_height = 16;
+        tried_default = TRUE;
+        img_error(ERR_HEADER);
+        goto loadimg;
+    }
+    Tiles_per_line = tile_image.img_w / Tile_width;
+
+    /* Reorder tile palette to match default ST VDI palette ordering.
+       Must happen before transform_img (which converts to device format).
+       Skipped in truecolor mode -- there's no workstation palette to
+       align with. */
+    if (planes <= 8 && tile_image.planes >= 4 && tile_image.palette)
+        reorder_tile_palette(tile_image.palette, tile_image.addr,
+                             tile_image.planes,
+                             tile_image.img_w, tile_image.img_h);
+
+    if (planes >= 16 && tile_image.palette) {
+        /* Truecolor path (Behne PRINT_TC.C convention): pre-render
+           the palettized tile sheet into a chunky device-format
+           buffer at the screen's native depth.  vro_cpyfm then
+           copies device-format pixels straight to screen with no
+           palette involvement. */
+        MFDB new_mfdb;
+        if (build_truecolor_mfdb(&tile_image, &new_mfdb, planes)) {
+            free(tile_image.addr);
+            tile_image.addr = (char *) new_mfdb.fd_addr;
+            tile_image.planes = planes;
+            Tile_bilder = new_mfdb;
+        }
+    } else {
+        mfdb(&Tile_bilder, (short *) tile_image.addr, tile_image.img_w,
+             tile_image.img_h, 1, tile_image.planes);
+        transform_img(&Tile_bilder);
+        /* Set workstation palette so vro_cpyfm of palettized device
+           data displays the right colors.  Only meaningful at <=8
+           planes; on truecolor we've already baked RGB into pixels. */
+        if (tile_image.planes > 1 && tile_image.palette)
+            img_set_colors(x_handle, tile_image.palette, tile_image.planes);
+    }
+    return (0);
+}
+
 int
 mar_gem_init(void)
 {
@@ -1666,7 +1644,7 @@ mar_gem_init(void)
         short i;
         probe_truecolor_format();
         /* Install the standard ST palette at pens 0..15 so text and
-           chrome rendering (which uses pen indices via nhclr_to_vdi
+           chrome rendering (which uses pen indices via nhclr_to_pen
            and vst_color) gets the expected colors. */
         for (i = 0; i < 16; i++)
             vs_color(x_handle, i, (short *) default_st_vdi[i]);
@@ -1720,91 +1698,23 @@ mar_gem_init(void)
     }
 
     if (mar_set_tile_mode(FAIL)) {
-    short tried_default = FALSE;
-loadimg:
-    img_err = depack_img(Tilefile ? Tilefile : (planes >= 5) ? "NH32.IMG"
-                                                  : (planes >= 4) ? "NH16.IMG"
-                                                                   : "NH2.IMG",
-                             &tile_image);
-    if (img_err) {
-        z_ob = zz_oblist[ABOUT];
-        ob_undraw_dialog(z_ob, 0, 0, 0, 0);
-        ob_hide(z_ob, OKABOUT, FALSE);
-        img_error(img_err);
-        return (0);
-    }
-    if ((tile_image.img_w % Tile_width || tile_image.img_h % Tile_height)
-        && !tried_default) {
-        Tilefile = NULL;
-        Tile_width = Tile_height = 16;
-        tried_default = TRUE;
-        img_error(ERR_HEADER);
-        goto loadimg;
-    }
-    if ((tile_image.img_w / Tile_width) * (tile_image.img_h / Tile_height)
-            < total_tiles_used
-        && !tried_default) {
-        Tilefile = NULL;
-        Tile_width = Tile_height = 16;
-        tried_default = TRUE;
-        img_error(ERR_HEADER);
-        goto loadimg;
-    }
-    Tiles_per_line = tile_image.img_w / Tile_width;
-    } /* tile_mode */
-
-    /* Reorder tile palette to match default ST VDI palette ordering.
-       Must happen before transform_img (which converts to device format).
-       Skipped in truecolor mode -- there's no workstation palette to
-       align with. */
-    if (planes <= 8 && tile_image.planes >= 4 && tile_image.palette)
-        reorder_tile_palette(tile_image.palette, tile_image.addr,
-                             tile_image.planes,
-                             tile_image.img_w, tile_image.img_h);
-
-    if (planes >= 16 && tile_image.palette) {
-        /* Truecolor path (Behne PRINT_TC.C convention): pre-render
-           the palettized tile sheet into a chunky device-format
-           buffer at the screen's native depth.  vro_cpyfm then
-           copies device-format pixels straight to screen with no
-           palette involvement. */
-        MFDB new_mfdb;
-        if (build_truecolor_mfdb(&tile_image, &new_mfdb, planes)) {
-            free(tile_image.addr);
-            tile_image.addr = (char *) new_mfdb.fd_addr;
-            tile_image.planes = planes;
-            Tile_bilder = new_mfdb;
+        img_err = load_tile_image();
+        if (img_err) {
+            z_ob = zz_oblist[ABOUT];
+            ob_undraw_dialog(z_ob, 0, 0, 0, 0);
+            ob_hide(z_ob, OKABOUT, FALSE);
+            img_error(img_err);
+            return (0);
         }
-    } else {
-        mfdb(&Tile_bilder, (short *) tile_image.addr, tile_image.img_w,
-             tile_image.img_h, 1, tile_image.planes);
-        transform_img(&Tile_bilder);
-        /* Set workstation palette so vro_cpyfm of palettized device
-           data displays the right colors.  Only meaningful at <=8
-           planes; on truecolor we've already baked RGB into pixels. */
-        if (tile_image.planes > 1 && tile_image.palette)
-            img_set_colors(x_handle, tile_image.palette, tile_image.planes);
     }
     cache_pens();
 
     mfdb(&Map_bild, NULL, (COLNO - 1) * Tile_width, ROWNO * Tile_height, 0,
          planes);
-    mfdb(&FontCol_Bild, NULL, (COLNO - 1) * map_font.cw, ROWNO * map_font.ch,
-         0, planes);
-    Map_bild.fd_addr =
-        (short *) m_alloc(mfdb_size(&Map_bild) > mfdb_size(&FontCol_Bild)
-                            ? mfdb_size(&Map_bild)
-                            : mfdb_size(&FontCol_Bild));
-    FontCol_Bild.fd_addr = Map_bild.fd_addr;
+    Map_bild.fd_addr = (short *) m_alloc(mfdb_size(&Map_bild));
 
     mfdb(&Pet_Mark, pet_mark_data, 8, 7, 1, 1);
     vr_trnfm(x_handle, &Pet_Mark, &Pet_Mark);
-
-    mfdb(&Black_bild, NULL, 16, 32, 1,
-         1); /* should cover the biggest map-font */
-    Black_bild.fd_addr = (short *) m_alloc(mfdb_size(&Black_bild));
-    memset(Black_bild.fd_addr, 255, mfdb_size(&Black_bild));
-    vr_trnfm(x_handle, &Black_bild, &Black_bild);
 
     for (i = 0; i < MAXWIN; i++) {
         Gem_nhwindow[i].gw_window = NULL;
@@ -2398,7 +2308,7 @@ mar_add_message(const char *str)
     if ((short) strlen(toplines) >= msg_width) {
         short pos = msg_width;
         tmp = toplines + msg_width;
-        while (*tmp != ' ' && pos >= 0) {
+        while (pos >= 0 && *tmp != ' ') {
             tmp--;
             pos--;
         }
@@ -2470,10 +2380,19 @@ mar_set_menu_title(const char *str)
 
 /************************* mar_set_menu_type *******************************/
 
+static short menu_cancelled = FALSE;
+
 void
 mar_set_menu_type(short how)
 {
     Inv_how = how;
+    menu_cancelled = FALSE;
+}
+
+short
+mar_menu_cancelled(void)
+{
+    return menu_cancelled;
 }
 
 /************************* Inventory Utils *******************************/
@@ -2680,6 +2599,7 @@ Inv_Handler(XEVENT *xev)
                     count = 0L;
                 else {
                     unset_all_on_page(0, (short) scroll_menu.vsize);
+                    menu_cancelled = TRUE;
                     my_close_dialog(Inv_dialog, TRUE);
                     return (ev);
                 }
@@ -2753,8 +2673,10 @@ Inv_Handler(XEVENT *xev)
                             it->Gmi_selected = !it->Gmi_selected;
                             it->Gmi_count = count == 0L ? -1L : count;
                             count = 0L;
-                            if (Inv_how != PICK_ANY)
+                            if (Inv_how != PICK_ANY) {
                                 my_close_dialog(Inv_dialog, TRUE);
+                                break;
+                            }
                         }
                     }
                 break;
@@ -3023,10 +2945,9 @@ mar_display_nhwindow(winid wind)
             img_set_colors(x_handle, normal_palette, planes);
         if (use_rip) {
             if (Rip_bild.fd_addr
-                && Rip_bild.fd_addr != (short *) rip_image.addr) {
+                && Rip_bild.fd_addr != (short *) rip_image.addr)
                 free(Rip_bild.fd_addr);
-                Rip_bild.fd_addr = NULL;
-            }
+            Rip_bild.fd_addr = NULL;
             test_free(rip_image.palette);
             rip_image.palette = NULL;
             test_free(rip_image.addr);
@@ -3050,6 +2971,7 @@ mar_display_nhwindow(winid wind)
         tmp_button = ob_get_text(z_ob, QLINE, 0);
         ob_set_text(z_ob, QLINE, Inv_how != PICK_NONE ? strCancel : strOk);
         ob_doflag(z_ob, LINESLIST, TOUCHEXIT);
+        count = 0L; /* no count prefix carried over from an earlier menu */
         Event_Handler(Inv_Init, Inv_Handler);
         if ((Inv_dialog = open_dialog(z_ob,
                         (wind == WIN_INVEN)
@@ -3168,9 +3090,9 @@ mar_display_nhwindow(winid wind)
 
         if (p_Gw->gw_dirty) {
             ob_pos(zz_oblist[MSGWIN], MSGLINES, &area);
-            while (messages_per_move > 3) {
-                messages_per_move -= 3;
-                msg_pos += 3;
+            while (messages_per_move > msg_vis) {
+                messages_per_move -= msg_vis;
+                msg_pos += msg_vis;
                 redraw_window(p_Gw->gw_window, &area);
                 mar_more();
             }
@@ -3228,8 +3150,11 @@ mar_create_window(short type)
     short i;
     struct gw *p_Gw = &Gem_nhwindow[0];
 
-    for (newid = 0; p_Gw->gw_type && newid < MAXWIN; newid++, p_Gw++)
+    for (newid = 0; newid < MAXWIN && p_Gw->gw_type; newid++, p_Gw++)
         ;
+
+    if (newid == MAXWIN) /* table full; let the caller panic */
+        return (newid);
 
     switch (type) {
     case NHW_MESSAGE:
@@ -3240,9 +3165,6 @@ mar_create_window(short type)
             message_line[i] = (char *) m_alloc((MSGLEN + 1) * sizeof(char));
             *message_line[i] = 0;
         }
-        dr_msg = new_dirty_rect(10);
-        if (!dr_msg)
-            panic("Memory allocation failure (dr_msg)");
         break;
     case NHW_STATUS:
         status_line = (char **) m_alloc(2 * sizeof(char *));
@@ -3267,10 +3189,6 @@ mar_create_window(short type)
                     map_colors[i][xc] = WHITE; /* default: visible on black */
             }
         }
-        dr_map = new_dirty_rect(10);
-        if (!dr_map)
-            panic("Memory allocation failure (dr_map)");
-
         mar_clear_map();
         break;
     case NHW_MENU:
@@ -3308,9 +3226,7 @@ mar_clear_map(void)
     for (y = 0; y < ROWNO; y++)
         for (x = 0; x < COLNO - 1; x++)
             map_glyphs[y][x] = ' ';
-    vro_cpyfm(x_handle, ALL_BLACK, pla, &Tile_bilder,
-              &Map_bild); /* what if FontCol_Bild is
-                             bigger? */
+    vro_cpyfm(x_handle, ALL_BLACK, pla, &Tile_bilder, &Map_bild);
     if (WIN_MAP != WIN_ERR && Gem_nhwindow[WIN_MAP].gw_window)
         redraw_window(Gem_nhwindow[WIN_MAP].gw_window, NULL);
 }
@@ -3779,6 +3695,7 @@ mar_set_tile_mode(short tiles)
 {
     static short tile_mode = TRUE;
     static GRECT prev;
+    short err;
     WIN *z_w = WIN_MAP != WIN_ERR ? Gem_nhwindow[WIN_MAP].gw_window : NULL;
 
     if (tiles < 0)
@@ -3787,7 +3704,11 @@ mar_set_tile_mode(short tiles)
         tile_mode = tiles;
     else if (tile_mode == tiles || (mar_set_rogue(FAIL) && tiles))
         return (FAIL);
-    else {
+    else if (tiles && (err = load_tile_image()) != 0) {
+        /* keep the ascii map if the tile sheet will not load */
+        img_error(err);
+        return (FAIL);
+    } else {
         GRECT tmp;
 
         tile_mode = tiles;
@@ -3894,7 +3815,7 @@ Gem_getlin(const char *ques, char *input)
     length = z_ob[LGPROMPT].ob_width / gr_cw;
     if ((short) strlen(ques_buf) > length) {
         tmp = ques_buf + length;
-        while (*tmp != ' ' && tmp >= ques_buf) {
+        while (tmp >= ques_buf && *tmp != ' ') {
             tmp--;
         }
         if (tmp <= ques_buf)
@@ -3917,8 +3838,10 @@ Gem_getlin(const char *ques, char *input)
         || (d_exit & NO_CLICK) == QLG) {
         *input = '\033';
         input[1] = 0;
-    } else
-        strncpy(input, ob_get_text(z_ob, LGREPLY, 0), length);
+    } else {
+        strncpy(input, ob_get_text(z_ob, LGREPLY, 0), BUFSZ - 1);
+        input[BUFSZ - 1] = '\0';
+    }
 }
 
 /************************* ask_direction *******************************/

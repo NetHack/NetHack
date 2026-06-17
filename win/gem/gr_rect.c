@@ -24,19 +24,6 @@ new_dirty_rect(int size)
     }
     return (new);
 }
-void
-delete_dirty_rect(dirty_rect *dr)
-{
-    if (dr == NULL)
-        return;
-    if (dr->rects)
-        free(dr->rects);
-    /* In case the Pointer is reused wrongly */
-    dr->rects = NULL;
-    dr->max = 0;
-    dr->used = 0;
-    free(dr);
-}
 static int gc_inside(GRECT *frame, GRECT *test);
 static int gc_touch(GRECT *frame, GRECT *test);
 static void gc_combine(GRECT *frame, GRECT *test);
@@ -136,7 +123,9 @@ add_dirty_rect(dirty_rect *dr, GRECT *area)
         dr->rects[cheapestmerge2] = dr->rects[dr->used - 1];
         dr->rects[dr->used - 1] = *area;
     } else {
-        gc_combine(&dr->rects[cheapest], area);
+        /* every candidate was rejected; merge into the first cluster
+           rather than index rects[-1] */
+        gc_combine(&dr->rects[cheapest < 0 ? 0 : cheapest], area);
     }
     /* NB: clusters do not intersect (or intersection will
        overwrite).  This is a result of the above algorithm,
@@ -151,13 +140,6 @@ get_dirty_rect(dirty_rect *dr, GRECT *area)
         || dr->max <= 0)
         return (FALSE);
     *area = dr->rects[--dr->used];
-    return (TRUE);
-}
-int
-clear_dirty_rect(dirty_rect *dr)
-{
-    if (dr)
-        dr->used = 0;
     return (TRUE);
 }
 static int

@@ -15,10 +15,9 @@
 #ifdef GEM_GRAPHICS
 #include "wingem.h"
 
-static char nullstr[] = "", winpanicstr[] = "Bad window id %d";
+static char winpanicstr[] = "Bad window id %d";
 static short curr_status_line;
 
-static char *copy_of(const char *);
 static void bail(const char *); /* __attribute__((noreturn)) */
 
 extern short mar_set_tile_mode(short);
@@ -75,12 +74,14 @@ struct window_procs Gem_procs = {
 
 /*************************** Procedures *************************************/
 
+/* hpmax/hp ratio for the map cursor colour; 10 = the critical band */
 short
 mar_hp_query(void)
 {
-    if (Upolyd)
-        return (u.mh ? u.mhmax / u.mh : -1);
-    return (u.uhp ? u.uhpmax / u.uhp : -1);
+    int hp = Upolyd ? u.mh : u.uhp;
+    int hpmax = Upolyd ? u.mhmax : u.uhpmax;
+
+    return (hp <= 0) ? 10 : (short) (hpmax / hp);
 }
 
 short
@@ -89,9 +90,14 @@ mar_iflags_numpad(void)
     return (iflags.num_pad ? 1 : 0);
 }
 
+/* clamped here so msg_anz is sized consistently at init */
 short
 mar_get_msg_history(void)
 {
+    if (iflags.msg_history < 20)
+        iflags.msg_history = 20;
+    else if (iflags.msg_history > 60)
+        iflags.msg_history = 60;
     return (iflags.msg_history);
 }
 
@@ -520,6 +526,8 @@ Gem_resume_nhwindows(void)
 
 extern void mar_exit_nhwindows(void);
 extern boolean run_from_desktop;
+static boolean gem_windows_exited = FALSE;
+static void preinit_raw_dump_console(void);
 
 void
 Gem_exit_nhwindows(const char *str)
@@ -530,6 +538,8 @@ Gem_exit_nhwindows(const char *str)
     if (iflags.toptenwin)
         run_from_desktop = FALSE;
     iflags.window_inited = 0;
+    gem_windows_exited = TRUE;
+    preinit_raw_dump_console();
 }
 
 winid
@@ -539,11 +549,6 @@ Gem_create_nhwindow(int type)
 
     switch (type) {
     case NHW_MESSAGE:
-        if (iflags.msg_history < 20)
-            iflags.msg_history = 20;
-        else if (iflags.msg_history > 60)
-            iflags.msg_history = 60;
-        break;
     case NHW_STATUS:
     case NHW_MAP:
     case NHW_MENU:
@@ -776,7 +781,7 @@ Gem_add_menu(winid window, const glyph_info *glyphinfo,
     G_item->Gmi_color = (short) clr;
     G_item->Gmi_itemflags =
         (unsigned short) (itemflags & ~MENU_ITEMFLAGS_SELECTED);
-    G_item->Gmi_str = copy_of(newstr);
+    G_item->Gmi_str = dupstr(newstr);
     mar_add_menu(window, G_item);
 }
 
@@ -826,6 +831,8 @@ Gem_select_menu(winid window, int how, menu_item **menu_list)
                 mi->count = Gmit->Gmi_count;
                 mi++;
             }
+    } else if (mar_menu_cancelled()) {
+        return -1;
     }
 
     return n;
@@ -962,12 +969,16 @@ preinit_raw_append(const char *str)
     preinit_raw_buf[preinit_raw_len] = '\0';
 }
 
+/* after the windows are gone (top-ten list, panic text) fall back to
+   stdout; msexit()'s desktop pause keeps it readable */
 void
 Gem_raw_print(const char *str)
 {
     if (str && *str) {
         if (iflags.window_inited)
             mar_raw_print(str);
+        else if (gem_windows_exited)
+            printf("%s\n", str);
         else
             preinit_raw_append(str);
     }
@@ -979,9 +990,22 @@ Gem_raw_print_bold(const char *str)
     if (str && *str) {
         if (iflags.window_inited)
             mar_raw_print_bold(str);
+        else if (gem_windows_exited)
+            printf("%s\n", str);
         else
             preinit_raw_append(str);
     }
+}
+
+/* surface pre-init lines that never reached the message window */
+static void
+preinit_raw_dump_console(void)
+{
+    if (preinit_raw_len > 0)
+        fputs(preinit_raw_buf, stdout);
+    preinit_raw_len = 0;
+    preinit_raw_overflow = 0;
+    preinit_raw_buf[0] = '\0';
 }
 
 /* Called from Gem_init_nhwindows right after iflags.window_inited
@@ -1353,19 +1377,6 @@ Gem_preference_update(const char *pref)
         mar_set_msg_visible(iflags.wc_vary_msgcount);
         return;
     }
-}
-/*
- * Allocate a copy of the given string.  If null, return a string of
- * zero length.
- *
- * This is an exact duplicate of copy_of() in X11/winmenu.c.
- */
-static char *
-copy_of(const char *s)
-{
-    if (!s)
-        s = nullstr;
-    return strcpy((char *) alloc((unsigned) (strlen(s) + 1)), s);
 }
 
 #endif /* GEM_GRAPHICS */

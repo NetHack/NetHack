@@ -224,7 +224,7 @@ depack_img(char *name, IMG_header *pic)
 
     /* check for header validity & malloc long... */
     if (pic->length > 7 && pic->planes < 33 && pic->img_w > 0
-        && pic->img_h > 0) {
+        && pic->img_h > 0 && pic->pat_len > 0) {
         if (!(pic->addr = (char *) calloc(1, size))) {
             error = ERR_ALLOC;
             goto end_depack;
@@ -337,35 +337,4 @@ end_depack:
     }
     fclose(fp);
     return (error);
-}
-
-int
-half_img(MFDB *s, MFDB *d)
-{
-    short pxy[8];
-    int i, j;
-    MFDB tmp;
-
-    mfdb(&tmp, NULL, s->fd_w / 2, s->fd_h, s->fd_stand, s->fd_nplanes);
-    tmp.fd_w = s->fd_w / 2;
-    tmp.fd_addr = calloc(1, mfdb_size(&tmp));
-    if (!tmp.fd_addr)
-        return (FALSE);
-
-    pxy[1] = pxy[5] = 0;
-    pxy[3] = pxy[7] = s->fd_h - 1;
-    for (i = 0; i < s->fd_w / 2; i++) {
-        pxy[0] = pxy[2] = 2 * i;
-        pxy[4] = pxy[6] = i;
-        vro_cpyfm(x_handle, S_ONLY, pxy, s, &tmp);
-    }
-    pxy[0] = pxy[4] = 0;
-    pxy[2] = pxy[6] = s->fd_w / 2 - 1;
-    for (j = 0; j < s->fd_h / 2; j++) {
-        pxy[1] = pxy[3] = 2 * j;
-        pxy[5] = pxy[7] = j;
-        vro_cpyfm(x_handle, S_ONLY, pxy, &tmp, d);
-    }
-    free(tmp.fd_addr);
-    return (TRUE);
 }
