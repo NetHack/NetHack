@@ -2596,7 +2596,7 @@ everywhere, and %ns henchlings creep along the alleyways.]],
          text = [["So, %p, %l thinks you're gonna take
 %o from me.  How cute is that?
 
-"He sends a %ra to defeat me.  Me!  When this is over, I'll send you on a
+"He sends %ra to defeat me.  Me!  When this is over, I'll send you on a
 vacation you won't forget... to the bottom of the river, with complementary
 cement shoes!"]],
       },
