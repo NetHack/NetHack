@@ -2431,92 +2431,97 @@ the kami of %H before you return again.]],
       assignquest = {
          synopsis = "[Enter %i and recover %o from %n.]",
          output = "text",
-         text = [["You have indeed proven yourself a worthy %c, %p.
+         text = [["Wow, %p! You've become a heck of a great %r since I last saw you.
+		 
+"So... things haven't been going so well here in %H since you left. The City Aldermen
+chose a new Patrician, %n. Unfortunately, in a shocking twist of fate that none of us
+could have seen coming, %n turned out to be a criminal!
 
-"But now your kinfolk and I must ask you to put aside your travels and
-help us in our time of need.  After you left us we elected a new mayor,
-%n.  He proved to be a most heinous and vile creature.
+"He called a policy meeting with all of us Guild leaders, and on the way in, he offered
+to look after my wallet for me.  Now I know what you're thinking:  how kind!  But
+it turns out that there are some people in this world you just shouldn't trust.  I
+got the wallet back, but the next morning, when I went to pay for my breakfast,
+%o was missing. So was %n.
 
-"Soon after taking office he absconded with %o
-and fled town, leaving behind his henchmen to rule over us.  In order
-for us to regain control of our town, you must enter %i
-and recover %o.
+"We're pretty sure he's holed himself up in %i.  So we need somebody to find their
+way in there and take %o back before he runs up a bill!
 
-"Do not be distracted on your quest.  If you do not return quickly I fear
-that all will be lost.  Let us both pray now that %d will guide you
-and keep you safe."]],
+"I hear %i has some beautiful Century of the Prawn architecture!  So,
+%p...  are you ready for a little Detour?"]],
       },
       badalign = {
          synopsis = "[You are not sufficiently %a.  Return when you are.]",
          output = "text",
-         text = [["It would be an affront to %d to have one not true to the
-%a path undertake her bidding.
+         text = [["Ah heck, %p, you haven't stayed true to the %a path.  You
+know %d doesn't like it when you stray.  You can't possibly go after
+%n like this!
 
-"You must not return to us until you have purified yourself of these
-bad influences on your actions.  Remember, only by following the %a
-path can you hope to overcome the obstacles you will face."]],
+"Get back to the Dungeon.  Purify yourself or whatever.  Come back when
+you're truly %a, and we'll talk."]],
       },
       badlevel = {
          synopsis = "[Return when you are %Ra.]",
          output = "text",
-         text = [["There is still too much that you have to learn before you can undertake
-the next step.  Return to us as a proven %R, and perhaps then
-you will be ready.
+         text = [["Ah %p, you're still just a %r.  I don't think you're prepared
+to take on %n yet.
 
-"Go back now, and may the teachings of %d serve you well."]],
+"Carry on with your Tour.  Explore.  Take photos.  Learn stuff.  Enjoy yourself!  
+Come back when you're a %R, and you might stand a chance.  %nC will still be here
+when you're ready for him."]],
       },
       discourage = {
-         "\"I defeated %l and I will defeat you, %p.\"",
-         "\"Where is %d now!  You must realize no one can help you here.\"",
-         "\"Beg for mercy now and I may be lenient on you.\"",
-         "\"If you were not so %a, you might have stood a chance.\"",
-         "\"Vengeance is mine at last, %p.\"",
-         "\"I only wish that %l had a more worthy %r to send against me.\"",
-         "\"With %o in my possession you cannot hope to defeat me.\"",
-         "\"%nC has never been defeated, NEVER!\"",
-         "\"Are you truly the best %H has to send against me?  I pity %l.\"",
-         "\"How do you spell %p?  I want to ensure the marker on your grave is correct as a warning to your %sp.\"",
+         "\"I beat %l real bad and I'll beat you even worse, %p.\"",
+         "\"Not even %d can help you here.\"",
+         "\"Beg for mercy, and maybe I'll consider thinking about going easy on you.\"",
+         "\"You coulda made a good Thief if you weren't so damn %a.\"",
+         "\"Write your postcards, %p.  Your Tour ends here.\"",
+         "\"Couldn't %l send me a better %r to beat up?\"",
+         "\"With %o, I'm gonna run up a bill that'll bankrupt %H.\"",
+         "\"Nobody defeats %n.  NOBODY!\"",
+         "\"Poor, naive %l.  Did he send you to ask me nicely to give %o back?\"",
+         "\"How do you spell %p?  I want to make sure your grave is spelled right.\"",
       },
       encourage = {
-         "\"Do not be fooled by the false promises of %n.\"",
-         "\"To enter %i you must pass many traps.\"",
-         "\"If you do not return with %o, your quest will be in vain.\"",
-         "\"Do not be afraid to call upon %d if you truly need help.\"",
-         "\"If you do not destroy %n, he will follow you back here!\"",
-         "\"Take %o from %n and you may be able to defeat him.\"",
-         "\"You must hurry, %p!\"",
-         "\"You are like %Sa to me, %p.  Do not let me down.\"",
-         "\"If you are %a at all times you may succeed, %p.\"",
-         "\"Let all who meet you on your journey know that you are on a quest for %l and grant safe passage.\"",
+         "\"Don't listen to %n.  He's a bad guy!\"",
+         "\"Look out for the traps on the way to %i.  Some date back to the Mage Wars!\"",
+         "\"Get %o back, and hopefully I can cancel %ns transactions.\"",
+         "\"If you're stuck, try praying to %d.  She's whimsical, but she somtimes helps %rp out.\"",
+         "\"You have to defeat %n, or he'll follow you back here!\"",
+         "\"If you can grab %o from %n, it might help you beat him.\"",
+         "\"Hurry, %p!\"",
+         "\"I know you won't let me down, %p!",
+         "\"Stay %a at all times.  %rp don't take sides, we take photos.\"",
+         "\"If anybody gives you trouble, tell them %l sent you.\"",
       },
       firsttime = {
-         synopsis = "[You find yourself back at %H, but the quiet is ominous.]",
+         synopsis = "[You find yourself back at %H, but it's still ominously quiet.]",
          output = "text",
-         text = [[You breathe a sigh of relief as you find yourself back in the familiar
-surroundings of %H.
+         text = [[You come round to find yourself looking at the familiar sights of %H.
+You breathe a sigh of relief, taking in the polluted air.
 
-You quickly notice that things do not appear the way they did when you
-left.  The town is dark and quiet.  There are no sounds coming from
-behind the town walls, and no campfires burning in the fields.  As a
-matter of fact, you do not %x any movement in the fields at all, and
-the crops seem as though they have been untended for many weeks.]],
+But this isn't %H as you remember it. Town is peaceful and quiet -- all
+wrong!  You can't hear the hawkers selling their ropy mince pies, or see the cargo
+barges ploughing their way up and down the river. And the cabbage fields outside
+of the city look (and smell) like they haven't been tended for weeks.
+
+Something isn't right.  It's probably all some sort of misunderstanding.  %lC will sort
+it out, when you find him.]],
       },
       goal_alt = {
-         text = "You have returned to %ns lair.",
+         text = "You're back at %ns lair.",
       },
       goal_first = {
-         text = "You sense the presence of %o.",
+         text = "You feel the comforting presence of %o nearby.",
       },
       goal_next = {
-         text = [[You gain confidence, knowing that you may soon be united with
-%o.]],
+         text = [[You gain confidence, knowing you may soon find %o.  This
+time, for sure!]],
       },
       gotit = {
-         synopsis = "[You pick up %o and feel relief.  Return it to %l.]",
+         synopsis = "[You feel contented as you pick up %o.  Now to return it to %l.]",
          output = "text",
-         text = [[As you pick up %o, you feel a great
-weight has been lifted from your shoulders.  Your only thoughts are
-to quickly return to %H and find %l.]],
+         text = [[You feel a rich contentment as you pick up %o.  That'll do nicely!  You'd
+better get it back to %l as soon as possible.]],
       },
       guardtalk_after = {
          "\"Gehennom on 5 zorkmids a day -- more like 500 a day if you ask me.\"",
@@ -2535,86 +2540,87 @@ to quickly return to %H and find %l.]],
       hasamulet = {
          synopsis = "[You have the Amulet.  Take it to the Astral Plane to finish your task.]",
          output = "text",
-         text = [["Stand back and let me look at you, %p.
-Now that you have recovered the Amulet of Yendor, I'm afraid living
-out your days in %H would seem pretty tame.
+         text = [["%p!  Wait, you have the Amulet of Yendor?  That's
+amazing!
 
-"You have come too far to stop now, for there are still more tasks that
-our oral history foretells for you.  Forever more, though, your name shall
-be spoken by the %gP with awe.  You are truly an inspiration to your
-%sp!"]],
+"But you can't keep that thing here in %H.  It won't be safe!
+
+"Besides, the Amulet isn't for us %rp -- it's for %d.  I've heard she has a temple on
+the Astral Plane, which incidentally is a gorgeous place to visit this time of year.  Get
+yourself up there, then offer it to %d on her high altar.  Boy, won't she be
+jazzed to get her hands on it!
+
+Safe journey, %p!"]],
       },
       killed_nemesis = {
          synopsis = "[%nC curses at you as %nh dies.]",
          output = "text",
-         text = [[You turn in the direction of %n.  As his earthly body begins
-to vanish before your eyes, you hear him curse:
+         text = [[%nC looks beat.  His body starts crumbling into dust, a sure
+sign of a bad guy defeated. As he vanishes, you hear him curse:
 
-    "You shall never be rid of me, %p!
-    I will find you where ever you go and regain what is rightly mine."]],
+    "You won't get away with this, %p!  My guys will come after you wherever you go,
+and take %o back for the Thieves."]],
       },
       leader_first = {
-         synopsis = "[Someone must defeat %n.  Are your ready?]",
+         synopsis = "[Someone must defeat %n.  Are you ready?]",
          output = "text",
-         text = [["Is it really you, %p!  I had given up hope for your return.
-As you can %x, we are desperately in need of your talents.  Someone must
-defeat %n if our town is to become what it once was.
+         text = [["Aloha %p, it's so good to see you!  How goes your Tour?
 
-"Let me see if you are ready to be that someone."]],
+Listen, I'm so sorry to cut your vacation short, but we've got a bit of a situation here.  Someone
+has to do something about %n!  Could that someone be you?  Let's take a look at you..."]],
       },
       leader_last = {
          synopsis = "[Leave %H and never return.]",
          output = "text",
-         text = [["It is too late, %p.  You are not even worthy to die amongst us.
-Leave %H and never return."]],
+         text = [["Ah shoot, %p.  You're no %r.  Leave %H, and don't show your
+face here again.  All of your air miles are canceled.  Aloha."]],
       },
       leader_next = {
-         text = "\"Things are getting worse, %p.  I hope that this time you are ready.\"",
+         text = "\"Aloha again, %p.  Feeling ready this time?\"",
       },
       leader_other = {
-         text = "\"I hope that for the sake of %H you have prepared yourself this time.\"",
+         text = "\"I hope you've prepared yourself this time.\"",
       },
       locate_first = {
          synopsis = "[You %x the handiwork of %ns henchlings.]",
          output = "text",
-         text = [[Only your faith in %d keeps you from trembling.  You %x
-the handiwork of %ns henchlings everywhere.]],
+         text = [[This isn't the friendliest part of town.  There are Thieves' marks
+everywhere, and %ns henchlings creep along the alleyways.]],
       },
       locate_next = {
-         text = "You know that this time you must find and destroy %n.",
+         text = "You know that this time you'll have to destroy %n.",
       },
       nemesis_first = {
          synopsis = "[%rA will not defeat me.]",
          output = "text",
-         text = [["So, %p, %l thinks that you can wrest
-%o from me!
+         text = [["So, %p, %l thinks you're gonna take
+%o from me.  How cute is that?
 
-"It only proves how desperate he has become that he sends %ra to
-try to defeat me.  When this day is over, I will have you enslaved
-in the mines where you will rue the day that you ever entered
-%i."]],
+"He sends a %ra to defeat me.  Me!  When this is over, I'll send you on a
+vacation you won't forget... to the bottom of the river, with complementary
+cement shoes!"]],
       },
       nemesis_next = {
-         text = [["I let you live the last time because it gave me pleasure.
-This time I will destroy you, %p."]],
+         text = [["I let you get away the last time, %p.  This
+time, I'll destroy you."]],
       },
       nemesis_other = {
          synopsis = "[Run away or you will suffer severely.]",
          output = "text",
-         text = [["These meetings come to bore me.  You disturb my workings with
-%o.
+         text = [["These meetings are starting to bore me.  You're eating into
+my precious evil scheming time.
 
-"If you do not run away now, I will inflict so much suffering on you that
-%l will feel guilty for ever having sent his %S to me!"]],
+"If you don't run away now, I'm gonna make you suffer so bad that
+%l will feel guilty for sending you here."]],
       },
       nemesis_wantsit = {
          synopsis = "[\"Return %o to me and we will rule %H.\"]",
          output = "text",
-         text = [["You fool.  You do not know how to call upon the powers of
-%o.
+         text = [["You putz.  You don't even know how to use %o.  Give it back
+to me and I'll teach you.  Together, we can rule %H.  And we really can!  I'm
+not just saying that so you'll give me %o back, I promise.  Thief's honor!
 
-"Return it to me and I will teach you how to use it, and together we
-will rule %H.  But do so now, as my patience grows thin."]],
+"But do it now, 'cause I'm running out of patience."]],	
       },
       nexttime = {
          text = "Once again, you are back at %H.",
@@ -2622,30 +2628,27 @@ will rule %H.  But do so now, as my patience grows thin."]],
       offeredit = {
          synopsis = "[Take %o and with %ds guidance, recover the Amulet.]",
          output = "text",
-         text = [[As %l detects the presence of %o,
-he almost smiles for the first time in many a full moon.
+         text = [[%lC takes %o and flexes it in his hands, then looks up and smiles.
 
-As he looks up from %o he says:
+"I'm transferring %o account into your name, %p.  Don't leave %H without it.  Keep it
+with you, and you'll travel in good company.
 
-    "You have recovered %o.  You are its
-    owner now, but not its master.  Let it work with you as you continue
-    your journey.  With its help, and %d to guide you on the
-    %a path, you may yet recover the Amulet of Yendor."]],
+"And remember -- there are some things gold can buy.  For everything else, there's %o."]],
       },
       offeredit2 = {
          synopsis = "[Keep %o and return to %Z through the portal.]",
          output = "text",
          text = [["%oC is yours now.  %Z
-await your return through the magic portal that brought you here."]],
+are waiting for you, right on the other side of the magic portal you used to get here."]],
       },
       othertime = {
          text = [[You are back at %H.
-Things appear to have become so bad that you fear that soon
-%H will not be here to return to.]],
+Things are looking so dire that you're afraid there may soon be no
+%H to return to.]],
       },
       posthanks = {
-         text = [["I could not be more proud than if you were my own %S, %p!
-Tell me of your adventures in quest of the Amulet of Yendor."]],
+         text = [["Well, just look at you, %p!  Tell me all about your Tour.  Did
+you find the Amulet of Yendor yet?"]],
       },
    },
    Val = {
