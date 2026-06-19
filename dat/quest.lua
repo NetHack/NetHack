@@ -2431,17 +2431,17 @@ the kami of %H before you return again.]],
       assignquest = {
          synopsis = "[Enter %i and recover %o from %n.]",
          output = "text",
-         text = [["Wow, %p! You've become a heck of a great %r since I last saw you.
+         text = [["Wow, %p!  You've become a heck of a great %r since I last saw you.
 		 
-"So... things haven't been going so well here in %H since you left. The City Aldermen
-chose a new Patrician, %n. Unfortunately, in a shocking twist of fate that none of us
+"So... things haven't been going so well here in %H since you left.  The City Aldermen
+chose a new Patrician, %n.  Unfortunately, in a shocking twist of fate that none of us
 could have seen coming, %n turned out to be a criminal!
 
 "He called a policy meeting with all of us Guild leaders, and on the way in, he offered
 to look after my wallet for me.  Now I know what you're thinking:  how kind!  But
 it turns out that there are some people in this world you just shouldn't trust.  I
 got the wallet back, but the next morning, when I went to pay for my breakfast,
-%o was missing. So was %n.
+%o was missing.  So was %n.
 
 "We're pretty sure he's holed himself up in %i.  So we need somebody to find their
 way in there and take %o back before he runs up a bill!
@@ -2499,9 +2499,9 @@ when you're ready for him."]],
          text = [[You come round to find yourself looking at the familiar sights of %H.
 You breathe a sigh of relief, taking in the polluted air.
 
-But this isn't %H as you remember it. Town is peaceful and quiet -- all
+But this isn't %H as you remember it.  Town is peaceful and quiet -- all
 wrong!  You can't hear the hawkers selling their ropy mince pies, or see the cargo
-barges ploughing their way up and down the river. And the cabbage fields outside
+barges ploughing their way up and down the river.  And the cabbage fields outside
 of the city look (and smell) like they haven't been tended for weeks.
 
 Something isn't right.  It's probably all some sort of misunderstanding.  %lC will sort
@@ -2556,7 +2556,7 @@ Safe journey, %p!"]],
          synopsis = "[%nC curses at you as %nh dies.]",
          output = "text",
          text = [[%nC looks beat.  His body starts crumbling into dust, a sure
-sign of a bad guy defeated. As he vanishes, you hear him curse:
+sign of a bad guy defeated.  As he vanishes, you hear him curse:
 
     "You won't get away with this, %p!  My guys will come after you wherever you go,
 and take %o back for the Thieves."]],
