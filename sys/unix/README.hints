@@ -12,7 +12,7 @@ There are two .500 series hints files provided with NetHack:
     linux.500    for use on Linux
     macOS.500    for use on macOS
 
-Those will also pull in content from sys/unix/hints/include/*.370,
+Those will also pull in content from sys/unix/hints/include/*.500,
 that is shared between the linux.500 and macOS.500 hints files.
 
 

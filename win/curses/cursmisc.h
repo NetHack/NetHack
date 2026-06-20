@@ -8,8 +8,11 @@
 
 /* Global declarations */
 
+#define CURSES_NUM_BACKGROUND_COLORS 8
+
 int curses_getch(void);
 int curses_read_char(void);
+boolean curses_has_256color(void);
 void curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff);
 void curses_menu_color_attr(WINDOW *win, int color, int attr, int onoff);
 void curses_bail(const char *mesg);

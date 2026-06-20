@@ -128,14 +128,6 @@ extern void curses_refresh_nethack_windows(void);
 extern void curses_del_nhwin(winid wid);
 extern void curses_del_wid(winid wid);
 extern void curs_destroy_all_wins(void);
-#ifdef ENHANCED_SYMBOLS
-extern void curses_putch(winid wid, int x, int y, int ch,
-                         struct unicode_representation *u, int color,
-                         int framecolor, int attrs);
-#else
-extern void curses_putch(winid wid, int x, int y, int ch, int color,
-                         int framecolor, int attrs);
-#endif
 extern void curses_get_window_size(winid wid, int *height, int *width);
 extern boolean curses_window_has_border(winid wid);
 extern boolean curses_window_exists(winid wid);
@@ -145,7 +137,6 @@ extern void curses_puts(winid wid, int attr, const char *text);
 extern void curses_clear_nhwin(winid wid);
 extern void curses_alert_win_border(winid wid, boolean onoff);
 extern void curses_alert_main_borders(boolean onoff);
-extern int get_framecolor(int nhcolor, int framecolor);
 extern void curses_draw_map(int sx, int sy, int ex, int ey);
 extern boolean curses_map_borders(int *sx, int *sy, int *ex, int *ey,
                                   int ux, int uy);

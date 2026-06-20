@@ -91,6 +91,12 @@ curses_read_char(void)
     return ch;
 }
 
+boolean
+curses_has_256color(void)
+{
+    return (COLORS >= 256) && (COLOR_PAIRS >= 256 * CURSES_NUM_BACKGROUND_COLORS);
+}
+
 /* Turn on or off the specified color and / or attribute */
 
 void
@@ -147,7 +153,7 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
             if (use_bold) {
                 wattron(win, A_BOLD);
             }
-            wattron(win, COLOR_PAIR(curses_color));
+            wcolor_set(win, curses_color, &curses_color);
         }
 
         if (attr != NONE) {

@@ -2049,6 +2049,12 @@ dopay(void)
     return paid ? ECMD_TIME : ECMD_OK;
 }
 
+const char *
+says(void)
+{
+    return Deaf ? "signs" : "says";
+}
+
 /* for menustyle=Traditional, choose between paying for everything (by
    declining to itemize), asking item-by-item (by accepting itemization),
    or switch to selecting via menu (special 'm' answer at "Itemize? [ynq m]"

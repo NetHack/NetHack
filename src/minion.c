@@ -299,7 +299,8 @@ demon_talk(struct monst *mtmp)
             pline("%s says, \"Good hunting, %s.\"", Amonnam(mtmp),
                   flags.female ? "Sister" : "Brother");
         else if (canseemon(mtmp))
-            pline("%s says something.", Amonnam(mtmp));
+            pline("%s %s something.", Amonnam(mtmp),
+                  says());
         if (!tele_restrict(mtmp))
             (void) rloc(mtmp, RLOC_MSG);
         return 1;

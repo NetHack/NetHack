@@ -554,10 +554,11 @@ outrumor(
     switch (mechanism) {
     case BY_ORACLE:
         /* Oracle delivers the rumor */
-        pline("True to her word, the Oracle %ssays: ",
+        pline("True to her word, the Oracle %s%s: ",
               (!rn2(4) ? "offhandedly "
                        : (!rn2(3) ? "casually "
-                                  : (rn2(2) ? "nonchalantly " : ""))));
+                                  : (rn2(2) ? "nonchalantly " : ""))),
+              says());
         SetVoice((struct monst *) 0, 0, 80, voice_oracle);
         verbalize1(line);
         /* [WIS exercised by getrumor()] */
