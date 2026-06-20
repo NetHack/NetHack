@@ -2440,19 +2440,20 @@ leaders.  At the door, one of his henchmen offered to look after my wallet.
 Now I know what you're thinking:  'How kind!'  But it turns out that even in
 the Thieves' Guild, there are people you can't trust.  My wallet contained --
 you know those credit cards the Royal Mint has been trialing, so you don't
-have to carry around huge bags of gold?  Most of the prototypes haven't
-worked, and are only good for picking locks.  This one,
+have to carry bags of gold around?  Most of the prototypes haven't worked,
+and are only good for picking locks.  This one,
 %o, is one of a kind.  As the highest
-spending and most often mugged resident of %H, it was entrusted to me.  But
-when I got my wallet back, %o was missing.
+spending and most often mugged resident of %H, it was entrusted to
+me.  But when I got my wallet back, %o was missing.  I appealed to the
+Patrician, and he said the matter fell under the doctrine of _detectores
+custodes_.
 
-"We're pretty sure %n has it, and that he's holed himself
+"We believe %n has the card, and that he's holed himself
 up in %i.  So we need somebody to find their way in
 there and take %o back before he runs up a
 huge bill!
 
-"I hear %i has some beautiful Century of the Prawn
-architecture!  So, %p, are you ready for a little Detour?"]],
+"So, %p, are you ready for a little Detour?"]],
       },
       badalign = {
          synopsis = "[You are not sufficiently %a.  Return when you are.]",
@@ -2467,7 +2468,7 @@ architecture!  So, %p, are you ready for a little Detour?"]],
       badlevel = {
          synopsis = "[Return when you are %Ra.]",
          output = "text",
-         text = [["%pC, you're still just a %r.  I don't think you're prepared
+         text = [["%pC, you're still only a %r.  I don't think you're prepared
 to take on %n yet.
 
 "Carry on with your Tour.  Explore.  Take photos.  Learn things.  Come back 
@@ -2504,10 +2505,10 @@ when you're a %R, and you might stand a chance.
          text = [[You come round to find yourself looking at the familiar sights of %H.
 You breathe a sigh of relief, taking in the polluted air.
 
-But this isn't %H as you remember it.  The streets are... quiet?  Doors
-slam, curtains twitch, and a few residents scurry about nervously, but you
-can't hear the hawkers selling their ropy meat pies, or the cargo barges
-grinding their way along the river.  A whiff of rotten cabbages suggests
+But this isn't %H as you remember it.  The streets are... quiet?
+Doors close, curtains twitch, and a few residents scurry about nervously, but
+you can't hear the hawkers selling their ropy meat pies, or the cargo barges
+bulldozing their way along the river.  A whiff of rotten cabbages suggests
 that the fields outside the city haven't been tended for weeks.
 
 Something isn't right.  Hopefully, it's all some sort of misunderstanding.
@@ -2603,9 +2604,8 @@ everywhere, and %ns henchlings creep along the alleyways.]],
          text = [["So, %p, %l thinks you're gonna take
 %o from me.  How cute is that?
 
-"He sends %ra to defeat me.  Me!  When this is over, I'll send you on a
-vacation you won't forget... to the bottom of the river, with complimentary
-cement shoes!"]],
+"He sends %ra to defeat me.  Me!  When this is over, I'll put you in cement
+shoes and throw you onto the river!"]],
       },
       nemesis_next = {
          text = [["I let you get away the last time, %p.  This
