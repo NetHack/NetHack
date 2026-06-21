@@ -18,7 +18,10 @@ when a vault guard was moved off the map, an impossible about trying to update
 	map location <0,0> was issued
 doc: use full URL for nethack.org in Guidebook.mn
 doc: fix a paste error in Guidebook.tex
-doc: fix spelling correction in nethack.6
+doc: bring man pages up to date with *nix documentary conventions and ensure
+	their portable rendering among GNU, Heirloom Doctools, DWB 3.3,
+	Solaris 10, and Plan 9 troffs, and mandoc(1)
+doc: fix spelling error in nethack.6
 spelling: "Flanian Pobble Bead" to "Flainian Pobble Bead"
 obey statue type gender (gnome king statue in minetn-5)
 fix statue and figurine genders in special levels in general
