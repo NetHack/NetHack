@@ -1,4 +1,4 @@
-/* NetHack 5.0  mdlib.c  $NHDT-Date: 1701499945 2023/12/02 06:52:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $ */
+/* NetHack 5.0  mdlib.c  $NHDT-Date: 1781973053 2026/06/20 16:30:53 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */

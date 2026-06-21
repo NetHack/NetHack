@@ -1,4 +1,4 @@
-/* NetHack 5.0	monflag.h	$NHDT-Date: 1596498549 2020/08/03 23:49:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 5.0	monflag.h	$NHDT-Date: 1781973083 2026/06/20 16:31:23 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) 1989 Mike Threepoint                             */
 /* NetHack may be freely redistributed.  See license for details. */
 

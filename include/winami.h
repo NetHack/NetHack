@@ -1,4 +1,4 @@
-/* NetHack 5.0	winami.h	$NHDT-Date: 1596498569 2020/08/03 23:49:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $ */
+/* NetHack 5.0	winami.h	$NHDT-Date: 1781973091 2026/06/20 16:31:31 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1991. */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois, 1992, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */

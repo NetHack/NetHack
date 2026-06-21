@@ -1,4 +1,4 @@
-/* NetHack 5.0	track.c	$NHDT-Date: 1596498219 2020/08/03 23:43:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 5.0	track.c	$NHDT-Date: 1781973070 2026/06/20 16:31:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */

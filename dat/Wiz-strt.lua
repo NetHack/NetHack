@@ -1,4 +1,4 @@
--- NetHack Wizard Wiz-strt.lua	$NHDT-Date: 1652196019 2022/05/10 15:20:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $
+-- NetHack Wizard Wiz-strt.lua	$NHDT-Date: 1781994877 2026/06/20 22:34:37 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.4 $
 --	Copyright (c) 1992 by David Cohrs
 -- NetHack may be freely redistributed.  See license for details.
 --

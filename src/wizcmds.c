@@ -1,4 +1,4 @@
-/* NetHack 5.0	wizcmds.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 5.0	wizcmds.c	$NHDT-Date: 1781973074 2026/06/20 16:31:14 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.36 $ */
 /*-Copyright (c) Robert Patrick Rankin, 2024. */
 /* NetHack may be freely redistributed.  See license for details. */
 

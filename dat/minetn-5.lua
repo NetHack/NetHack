@@ -1,4 +1,4 @@
--- NetHack mines minetn-5.lua	$NHDT-Date: 1652196031 2022/05/10 15:20:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.5 $
+-- NetHack mines minetn-5.lua	$NHDT-Date: 1781994885 2026/06/20 22:34:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.6 $
 --	Copyright (c) 1989-95 by Jean-Christophe Collet
 --	Copyright (c) 1991-95 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.

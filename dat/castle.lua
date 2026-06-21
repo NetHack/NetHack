@@ -1,4 +1,4 @@
--- NetHack castle castle.lua	$NHDT-Date: 1652196024 2022/05/10 15:20:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $
+-- NetHack castle castle.lua	$NHDT-Date: 1781994880 2026/06/20 22:34:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.9 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 -- NetHack may be freely redistributed.  See license for details.
 --

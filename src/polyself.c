@@ -1,4 +1,4 @@
-/* NetHack 5.0	polyself.c	$NHDT-Date: 1772101811 2026/02/26 02:30:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.227 $ */
+/* NetHack 5.0	polyself.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.233 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 

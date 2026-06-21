@@ -93,6 +93,16 @@ if($version_old > 0){
 	if(length $message_new){
 	    print STDERR "Additional information:\n$message_new\n";
 	}
+# This list and the code below will need to be updated if other changes occur
+# before this progression is finished.
+# 6 announce eventual deprecation of PRE and POST hooks
+#  6->7 unset nethack.NoDepWarn, change message, docs in NHgithook.pm
+# 7 deprecation of PRE and POST hooks
+#  7->8 unset nethack.NoDepWarn, change message, docs in NHgithook.pm and make fail
+# 8 PRE and POST throw errors
+#  8->9 unset nethack.NoDepWarn, remove code, docs
+# 9 removal of PRE and POST code
+	system('git','config','--unset','nethack.NoDepWarn') unless($opt_n);
     }
 }
 
@@ -358,7 +368,7 @@ sub do_file_nhgitset {
     open IN, "<", $infile or die "Can't open $infile:$!";
     open OUT, ">", $outfile or die "Can't open $outfile:$!";
     my $started;
-    print IN "die \"DO NOT RUN THIS FILE\n\"";
+    print OUT "=pod\n";
     while(<IN>){
 	m/^__END__/ && do {$started =1; next};
 	print OUT if($started);

@@ -1,4 +1,4 @@
-/* NetHack 5.0	sfstruct.c	$NHDT-Date: 1606765215 2020/11/30 19:40:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
+/* NetHack 5.0	sfstruct.c	$NHDT-Date: 1781973066 2026/06/20 16:31:06 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.28 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2025. */
 /* NetHack may be freely redistributed.  See license for details. */

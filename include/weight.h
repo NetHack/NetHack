@@ -1,4 +1,4 @@
-/* NetHack 5.0	weight.h	$NHDT-Date: 1742427965 2025/03/19 23:46:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1 $ */
+/* NetHack 5.0	weight.h	$NHDT-Date: 1781973091 2026/06/20 16:31:31 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.4 $ */
 /* Copyright (c) Michael Allison, 2025. */
 /* NetHack may be freely redistributed.  See license for details. */
 

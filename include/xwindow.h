@@ -1,4 +1,4 @@
-/* NetHack 5.0	xwindow.h	$NHDT-Date: 1596498574 2020/08/03 23:49:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $ */
+/* NetHack 5.0	xwindow.h	$NHDT-Date: 1781973092 2026/06/20 16:31:32 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

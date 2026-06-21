@@ -1,4 +1,4 @@
-/* NetHack 5.0	mhmenu.h	$NHDT-Date: 1596498355 2020/08/03 23:45:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $ */
+/* NetHack 5.0	mhmenu.h	$NHDT-Date: 1781973104 2026/06/20 16:31:44 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.12 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

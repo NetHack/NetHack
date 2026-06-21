@@ -1,4 +1,4 @@
--- NetHack Samurai Sam-goal.lua	$NHDT-Date: 1652196013 2022/05/10 15:20:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1 $
+-- NetHack Samurai Sam-goal.lua	$NHDT-Date: 1781994873 2026/06/20 22:34:33 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.2 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991-92 by M. Stephenson, P. Winner
 -- NetHack may be freely redistributed.  See license for details.

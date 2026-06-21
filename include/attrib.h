@@ -1,4 +1,4 @@
-/* NetHack 5.0	attrib.h	$NHDT-Date: 1596498527 2020/08/03 23:48:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 5.0	attrib.h	$NHDT-Date: 1781973077 2026/06/20 16:31:17 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.18 $ */
 /* Copyright 1988, Mike Stephenson                                */
 /* NetHack may be freely redistributed.  See license for details. */
 

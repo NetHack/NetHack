@@ -1,4 +1,4 @@
--- NetHack Ranger Ran-filb.lua	$NHDT-Date: 1652196010 2022/05/10 15:20:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.2 $
+-- NetHack Ranger Ran-filb.lua	$NHDT-Date: 1781994871 2026/06/20 22:34:31 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.3 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.

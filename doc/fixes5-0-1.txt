@@ -66,6 +66,7 @@ when hero's behavior makes erinyes stronger, cap level at 49 rather than 50
 with inventory item action for leash, distingluish leash-in-use from empty one
 deafness check was missing from a shopkeeper message in ready_weapon()
 thrown ball travel did not check for regions (pr #1595 by copperwater)
+remove deprecated option --version:paste
 
 
 Platform- and/or Interface-Specific Fixes
@@ -261,4 +262,4 @@ unix hints: the Makefiles distributed by sys/unix/setup.sh will now check
 	make, and use bsd make syntax for bsd make
 share a single copy of nhuuid generation code between Amiga, Atari, and msdos
 	by way of sys/share/pcmain.c (cherry-pick from pr #1541 by ingpaschke)
-
+nhgitset.pl: Set up future deprecation of PRE and POST hooks.

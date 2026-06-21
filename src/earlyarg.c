@@ -1,4 +1,4 @@
-/* NetHack 5.0	earlyarg.c	$NHDT-Date: 1771213100 2026/02/15 19:38:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.286 $ */
+/* NetHack 5.0	earlyarg.c	$NHDT-Date: 1782016695 2026/06/20 23:38:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -498,11 +498,7 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
 
             if (extended_opt) {
                 extended_opt++;
-                    /* Deprecated in favor of "copy" - remove no later
-                       than  next major version */
-                if (match_optname(extended_opt, "paste", 5, FALSE)) {
-                    insert_into_pastebuf = TRUE;
-                } else if (match_optname(extended_opt, "copy", 4, FALSE)) {
+		if (match_optname(extended_opt, "copy", 4, FALSE)) {
                     insert_into_pastebuf = TRUE;
                 } else if (match_optname(extended_opt, "dump", 4, FALSE)) {
                     /* version number plus enabled features and sanity

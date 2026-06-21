@@ -1,4 +1,4 @@
--- NetHack Knight Kni-loca.lua	$NHDT-Date: 1652196005 2022/05/10 15:20:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.2 $
+-- NetHack Knight Kni-loca.lua	$NHDT-Date: 1781994868 2026/06/20 22:34:28 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.3 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991,92 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.

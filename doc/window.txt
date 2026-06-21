@@ -1,4 +1,4 @@
-NetHack 5.0  window.txt	$NHDT-Date: 1666390558 2022/10/21 22:15:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $
+NetHack 5.0  window.txt	$NHDT-Date: 1666390558 2022/10/21 22:15:58 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.70 $
 
 Introduction
 

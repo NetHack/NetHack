@@ -109,7 +109,7 @@ sub version_in_devel {
 
     my $version;
     my $verfile = "$path${PDS}DEVEL${PDS}VERSION";
-    open VERFH,"<",$verfile or die "xCan't open $verfile: $!";
+    open VERFH,"<",$verfile or die "Can't open $verfile: $!";
     $version = 0+<VERFH>;
     my $message = join('',<VERFH>);
     close VERFH;
@@ -250,7 +250,17 @@ sub do_hook {
     my($p) = @_;
     my $hname = $0;
     $hname =~ s!^((.*$DS)|())(.*)!$1$p-$4!;
+    my $vig = version_in_git;
     if(-x $hname){
+	if(`git config --bool nethack.NoDepWarn` ne "true\n"){
+	    print STDERR <<~E_O_M;
+                WARNING: $p hooks will be going away.  See
+                         https://www.nethack.org/devel/deprecation.html
+                To stop seeing this message, run
+                    git config --bool nethack.NoDepWarn true
+                E_O_M
+	}
+
 	print TRACE "START $p: $hname\n" if($trace);
 
 	open TOHOOK, "|-", $hname or die "open $hname: $!";
@@ -369,6 +379,17 @@ Perl module for infrastructure of NetHack Git hooks.
 
 Buffers call information so multiple independent actions may be coded for
 Git hooks and similar Git callouts.
+
+=over 4
+
+=item ==>
+
+As of Git 2.54, multiple actions may be specified for each hook
+event - that makes this redundant for hooks and will be removed at
+some future time when Git 2.54 (or later) is better distributed.
+This should speed up hook processing.
+
+=back 4
 
 Maintains C<dat/gitinfo.txt>.
 

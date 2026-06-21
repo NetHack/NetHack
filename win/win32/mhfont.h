@@ -1,4 +1,4 @@
-/* NetHack 5.0	mhfont.h	$NHDT-Date: 1596498350 2020/08/03 23:45:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.17 $ */
+/* NetHack 5.0	mhfont.h	$NHDT-Date: 1781973102 2026/06/20 16:31:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.19 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

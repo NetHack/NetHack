@@ -1,4 +1,4 @@
-/* NetHack 5.0	winMS.h	$NHDT-Date: 1596498367 2020/08/03 23:46:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.53 $ */
+/* NetHack 5.0	winMS.h	$NHDT-Date: 1781973108 2026/06/20 16:31:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 

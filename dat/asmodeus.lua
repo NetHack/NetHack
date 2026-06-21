@@ -1,4 +1,4 @@
--- NetHack gehennom asmodeus.lua	$NHDT-Date: 1652196020 2022/05/10 15:20:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.2 $
+-- NetHack gehennom asmodeus.lua	$NHDT-Date: 1781994877 2026/06/20 22:34:37 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.4 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 -- NetHack may be freely redistributed.  See license for details.

@@ -1,4 +1,4 @@
-/* NetHack 5.0	dgn_file.h	$NHDT-Date: 1596498533 2020/08/03 23:48:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $ */
+/* NetHack 5.0	dgn_file.h	$NHDT-Date: 1781973079 2026/06/20 16:31:19 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) 1989 by M. Stephenson                            */
 /* NetHack may be freely redistributed.  See license for details. */
 

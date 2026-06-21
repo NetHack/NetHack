@@ -1,4 +1,4 @@
-/* NetHack 5.0	color.h	$NHDT-Date: 1682205020 2023/04/22 23:10:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.18 $ */
+/* NetHack 5.0	color.h	$NHDT-Date: 1781973077 2026/06/20 16:31:17 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Steve Linhart, Eric Raymond, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 

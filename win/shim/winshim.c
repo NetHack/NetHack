@@ -1,4 +1,4 @@
-/* NetHack 5.0 winshim.c    $NHDT-Date: 1596498345 2020/08/03 23:45:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.259 $ */
+/* NetHack 5.0 winshim.c    $NHDT-Date: 1781973099 2026/06/20 16:31:39 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.34 $ */
 /* Copyright (c) Adam Powers, 2020                                */
 /* NetHack may be freely redistributed.  See license for details. */
 

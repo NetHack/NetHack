@@ -1,4 +1,4 @@
--- NetHack yendor wizard3.lua	$NHDT-Date: 1652196040 2022/05/10 15:20:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $
+-- NetHack yendor wizard3.lua	$NHDT-Date: 1781994891 2026/06/20 22:34:51 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.6 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 -- NetHack may be freely redistributed.  See license for details.

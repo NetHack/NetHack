@@ -1,4 +1,4 @@
-/* NetHack 5.0	seffects.h	$NHDT-Date: 1693253118 2023/08/28 20:05:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $ */
+/* NetHack 5.0	seffects.h	$NHDT-Date: 1781973087 2026/06/20 16:31:27 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.7 $ */
 /* Copyright (c) Michael Allison, 2023                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
