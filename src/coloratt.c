@@ -1,4 +1,4 @@
-/* NetHack 5.0	coloratt.c	$NHDT-Date: 1737286550 2025/01/19 03:35:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
+/* NetHack 5.0	coloratt.c	$NHDT-Date: 1781973043 2026/06/20 16:30:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Pasi Kallinen, 2024 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -886,7 +886,8 @@ static struct {
     int index;
     uint32 value;
 } color_256_definitions[] = {
-    /* color values are from unnethack */
+    /* from unnethack - these are the colors used by xterm
+       when $TERM is set to xterm-256color */
     {  16, 0x000000 }, {  17, 0x00005f }, {  18, 0x000087 },
     {  19, 0x0000af }, {  20, 0x0000d7 }, {  21, 0x0000ff },
     {  22, 0x005f00 }, {  23, 0x005f5f }, {  24, 0x005f87 },

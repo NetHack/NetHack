@@ -1,4 +1,4 @@
--- NetHack Rogue Rog-filb.lua	$NHDT-Date: 1652196011 2022/05/10 15:20:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1 $
+-- NetHack Rogue Rog-filb.lua	$NHDT-Date: 1781994872 2026/06/20 22:34:32 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.2 $
 --	Copyright (c) 1992 by Dean Luick
 -- NetHack may be freely redistributed.  See license for details.
 --

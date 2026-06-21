@@ -1,4 +1,4 @@
-/* NetHack 5.0	wield.c	$NHDT-Date: 1707525193 2024/02/10 00:33:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.110 $ */
+/* NetHack 5.0	wield.c	$NHDT-Date: 1781973073 2026/06/20 16:31:13 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -262,8 +262,13 @@ ready_weapon(struct obj *wep)
 
             if ((this_shkp = shop_keeper(inside_shop(u.ux, u.uy)))
                 != (struct monst *) 0) {
-                pline("%s says \"You be careful with my %s!\"",
-                      shkname(this_shkp), xname(wep));
+                /* check msound because we don't have access to muteshk() */
+                if (!Deaf && this_shkp->data->msound > MS_ANIMAL)
+                    pline("%s %s \"You be careful with my %s!\"",
+                          shkname(this_shkp), says(), xname(wep));
+                else
+                    pline("%s looks apprehensive about your wielding %s %s.",
+                          shkname(this_shkp), mhis(this_shkp), xname(wep));
             }
         }
     }

@@ -18,7 +18,10 @@ when a vault guard was moved off the map, an impossible about trying to update
 	map location <0,0> was issued
 doc: use full URL for nethack.org in Guidebook.mn
 doc: fix a paste error in Guidebook.tex
-doc: fix spelling correction in nethack.6
+doc: bring man pages up to date with *nix documentary conventions and ensure
+	their portable rendering among GNU, Heirloom Doctools, DWB 3.3,
+	Solaris 10, and Plan 9 troffs, and mandoc(1)
+doc: fix spelling error in nethack.6
 spelling: "Flanian Pobble Bead" to "Flainian Pobble Bead"
 obey statue type gender (gnome king statue in minetn-5)
 fix statue and figurine genders in special levels in general
@@ -61,6 +64,9 @@ fix a bug in which steeds would continuously gain movement points while
         being ridden
 when hero's behavior makes erinyes stronger, cap level at 49 rather than 50
 with inventory item action for leash, distingluish leash-in-use from empty one
+deafness check was missing from a shopkeeper message in ready_weapon()
+thrown ball travel did not check for regions (pr #1595 by copperwater)
+remove deprecated option --version:paste
 
 
 Platform- and/or Interface-Specific Fixes
@@ -256,4 +262,4 @@ unix hints: the Makefiles distributed by sys/unix/setup.sh will now check
 	make, and use bsd make syntax for bsd make
 share a single copy of nhuuid generation code between Amiga, Atari, and msdos
 	by way of sys/share/pcmain.c (cherry-pick from pr #1541 by ingpaschke)
-
+nhgitset.pl: Set up future deprecation of PRE and POST hooks.

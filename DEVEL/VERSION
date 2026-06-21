@@ -1,4 +1,5 @@
-5
-Please see "git log DEVEL" for previous changes.
-Make documentation of nhgitset.pl easier to find and
-find out about.
+6
+PRE and POST hooks will be dropped at some future date -
+see https://www.nethack.org/devel/deprecation.html for details.
+
+See "git log DEVEL" for previous changes.

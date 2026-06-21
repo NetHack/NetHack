@@ -7,6 +7,7 @@
 #include "hack.h"
 #include "color.h"
 #include "wincurs.h"
+#include "curswins.h"
 #ifdef CURSES_UNICODE
 #include <locale.h>
 #endif
@@ -939,15 +940,16 @@ curses_print_glyph(
 {
     int glyph;
     int ch;
-    int color;
-    int nhcolor = 0;
+    struct glyph_attributes attr;
     unsigned int special;
-    int attr = -1;
 
+    attr.attribute_flags = -1;
     glyph = glyphinfo->glyph;
     special = glyphinfo->gm.glyphflags;
     ch = glyphinfo->ttychar;
-    color = glyphinfo->gm.sym.color;
+    attr.basic_color = glyphinfo->gm.sym.color;
+    attr.color256 = 0;
+    attr.framecolor = bkglyphinfo->framecolor;
     /*  Extra color handling
      *  FIQ: The curses library does not support truecolor, only the more limited 256
      *  color mode. On top of this, the windowport only supports 16 color mode.
@@ -956,19 +958,17 @@ curses_print_glyph(
     if (glyphinfo->gm.customcolor != 0
         && (curses_procs.wincap2 & WC2_EXTRACOLORS) != 0) {
         if ((glyphinfo->gm.customcolor & NH_BASIC_COLOR) != 0) {
-            color = COLORVAL(glyphinfo->gm.customcolor);
-#if 0
+            attr.basic_color = COLORVAL(glyphinfo->gm.customcolor);
         } else {
             /* 24-bit color, NH_BASIC_COLOR == 0 */
-            nhcolor = COLORVAL(glyphinfo->gm.customcolor);
-#endif
+            attr.color256 = glyphinfo->gm.color256idx;
         }
     }
     if ((special & MG_PET) && iflags.hilite_pet) {
-        attr = curses_convert_attr(iflags.wc2_petattr);
+        attr.attribute_flags = curses_convert_attr(iflags.wc2_petattr);
     }
     if ((special & MG_DETECT) && iflags.use_inverse) {
-        attr = A_REVERSE;
+        attr.attribute_flags = A_REVERSE;
     }
     if (SYMHANDLING(H_DEC))
         ch = curses_convert_glyph(ch, glyph);
@@ -981,9 +981,9 @@ curses_print_glyph(
 */
         if ((special & MG_OBJPILE) && iflags.hilite_pile) {
             if (iflags.wc_color)
-                color = get_framecolor(color, CLR_BLUE);
+                attr.framecolor = CLR_BLUE;
             else /* if (iflags.use_inverse) */
-                attr = A_REVERSE;
+                attr.attribute_flags = A_REVERSE;
         }
         /* water and lava look the same except for color; when color is off
            (checked by core), render lava in inverse video so that it looks
@@ -992,11 +992,11 @@ curses_print_glyph(
         if ((special & (MG_BW_LAVA | MG_BW_ICE | MG_BW_SINK | MG_BW_ENGR))
             != 0 && iflags.use_inverse) {
             /* reset_glyphmap() only sets MG_BW_foo if color is off */
-            attr = A_REVERSE;
+            attr.attribute_flags = A_REVERSE;
         }
         /* highlight female monsters (wizard mode option) */
         if ((special & MG_FEMALE) && wizard && iflags.wizmgender) {
-            attr = A_REVERSE;
+            attr.attribute_flags = A_REVERSE;
         }
     }
 
@@ -1006,8 +1006,7 @@ curses_print_glyph(
                   && glyphinfo->gm.u && glyphinfo->gm.u->utf8str)
                       ? glyphinfo->gm.u : NULL,
 #endif
-                 (nhcolor != 0) ? nhcolor : color,
-                 bkglyphinfo->framecolor, attr);
+                 &attr);
 
 }
 

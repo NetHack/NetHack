@@ -1,4 +1,4 @@
-/* NetHack 5.0	cstd.h	$NHDT-Date: 1725652996 2024/09/06 20:03:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.6 $ */
+/* NetHack 5.0	cstd.h	$NHDT-Date: 1781973078 2026/06/20 16:31:18 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.10 $ */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
 
