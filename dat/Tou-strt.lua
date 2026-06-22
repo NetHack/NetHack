@@ -123,8 +123,8 @@ des.monster("piranha", 29, 11)
 des.monster("kraken", 34, 09)
 des.monster("kraken", 37, 09)
 -- a few more Discworld NPCs for flavour
-des.monster("barbarian", peaceful=1, name="Bravd", male=1)
-des.monster("rogue", peaceful=1, name="the Weasel", male=1)
+des.monster("barbarian", peaceful=1, name="Bravd", male=1, keep_default_invent=false)
+des.monster("rogue", peaceful=1, name="the Weasel", male=1, keep_default_invent=false)
 des.monster("werewolf", peaceful=1, name="Angua", female=1)
 des.monster("rock troll", peaceful=1, name="Detritus", male=1)
 -- the Brass Bridge is lined with statues of 'hippos'
