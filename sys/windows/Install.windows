@@ -4,7 +4,7 @@ NetHack may be freely redistributed.  See license for details.
   Instructions for compiling NetHack 5.0 on a Windows system
       (only tested on Windows 10/11 or later)
 ==============================================================
-Last revision: $NHDT-Date: 1594155895 2020/07/07 21:04:55 $
+Last revision: $NHDT-Date: 1782065703 2026/06/21 18:15:03 $
 
 See file dat\History for credits and history of NetHack for Windows.
 
@@ -12,8 +12,9 @@ See file dat\History for credits and history of NetHack for Windows.
 | Download a prebuilt package of NetHack for Windows from NetHack.org   |
 \----------------------------------------------------------- -----------/
 
-  FIXME:
-
+  In your web browser, navigate to
+      https://www.nethack.org/v500/ports/download-win.html
+  and follow the instructions there.
 
 /-----------------------------------------------------------------------\
 | Build and package NetHack for Windows yourself                        |

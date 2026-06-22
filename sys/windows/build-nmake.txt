@@ -6,23 +6,7 @@ Prerequisite Requirements:
         A copy of Microsoft Visual Studio Community needs to
         be installed on your machine. See:
         https://visualstudio.microsoft.com/vs/community/
-  o Lua
-        NetHack 5.0 for Windows requires 3rd party Lua source that is not part
-        of the NetHack distribution or repository.
 
-        A windows cmd command procedure for fetching prerequisite sources
-        is available, and can be run as follows from the top of the
-        NetHack source tree to obtain lua:
-            sys\windows\fetch.cmd lua
-  o pdcursesmod (Only required if curses interface support is desired)
-        If you want to include curses interface support in NetHack 5.0 for
-        3rd part pdcursesmod source code is required and is not part of the
-        NetHack distribution or repository.
-
-        A windows cmd command procedure for fetching prerequisite
-        sources is available, and can be run as follows from the top of
-        the NetHack source tree to obtain pdcursesmod:
-            sys\windows\fetch.cmd pdcursesmod
 
 The build Makefiles and procedures produce two executables:
     a. A TTY and curses version of NetHack in nethack.exe
@@ -44,9 +28,9 @@ You can use one of the following build environments:
                |          |          |      |      |    |     |    |
                |          |          |      |      |    |     |    |
            lua-5.4.8  pdcursesmod  share windows  tty  win32 lua pdcursesmod
-                                                  |
-                                                  vs
-                                                  |
+                                            |
+                                            vs
+                                            |
     +----------+-------+--------+--------+-----------+-------+-----+------+
     |          |       |        |        |           |       |     |      |
  makedefs NetHack NetHackW PDCurses PDCursesGui tile2bmp tilemap tiles uudecode
@@ -99,19 +83,32 @@ Setting Up
     source tree, if you are at the top of the NetHack source tree.
         cd sys\windows.
 
-2.  Execute .\nhsetup.bat to place copies of the Makefiles in
+2.  Execute
+        .\nhsetup.bat
+    to place copies of the Makefiles in
     the src subfolder. The file sys\windows\Makefile.nmake will copied
     to a file src\Makefile.
         .\nhsetup.bat
+3.  Execute
+        .\fetch.bat lua
+    to place a copy of Lua into the lib subfolder of the NetHack source
+    tree. NetHack 5.0 for Windows requires 3rd party Lua source that is not part
+    of the NetHack distribution or repository.
 
-3.  Change your current directory to the src subfolder of the nethack
+4.  If you want to include support of the optional curses interface in your
+    build, execute
+        .\fetch.cmd pdcursesmod
+    to place a copy pdcursesmod into the lib subfolder of the NetHack
+    tree.
+
+5.  Change your current directory to the src subfolder of the nethack
     source tree. The following command assumes you are still in the
     sys\windows folder from steps #1 and #2 above:
         cd ..\..\src
 
 Compiling
 
-4.  Now that everything is set up, you should be ready to start the
+6.  Now that everything is set up, you should be ready to start the
     process.
 
     Your current directory should be the NetHack src directory.
@@ -125,13 +122,13 @@ Compiling
 
 Notes:
 
-1.  To rebuild NetHack after changing something, change your current directory
+N1. To rebuild NetHack after changing something, change your current directory
     to src and issue the appropriate command for your compiler:
 
     For Microsoft compiler:
         nmake package
 
-2.  Depending on the build and compiler and tools used above, the
+N2. Depending on the build and compiler and tools used above, the
     package produced by the build will be either contain:
       - a 32-bit (x86) .exe file,
         which should run on any recent Win32 environment.
