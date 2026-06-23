@@ -38,7 +38,6 @@
 #include "sys.h"
 #include "timeout.h"
 #include "winprocs.h"
-#include "wintype.h"
 #include "vision.h"
 #include "you.h"
 
