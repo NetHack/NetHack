@@ -654,6 +654,67 @@ macppcpkg: $(GAMEBIN) $(TARGETPFX)Recover.xcoff \
 	@rm -rf $(TARGETPFX)pkg
 	@echo "=== Done ==="
 	@echo "StuffIt: $(TARGETPFX)NetHack.sit"
+
+# --- Fat (68k + PowerPC) binary -----------------------------------------
+# One app whose resource fork holds the 68k CODE/DATA/RELA + a cfrg + the
+# shared UI resources, and whose data fork holds the PPC PEF.  68k Macs run
+# the CODE resources; PowerPC Macs see the cfrg and run the PEF natively.
+# Build the 68k half first (it provides the CODE resource fork):
+#     make CROSS_TO_MAC68K=1 mac68kpkg
+#     make CROSS_TO_MACPPC=1 macfatpkg
+# macfatpkg builds the PPC half itself (via macppcpkg) and merges both.
+.PHONY: macfatpkg
+macfatpkg: macppcpkg
+	@test -s ../targets/mac68k/.rsrc/NetHackRsrc || { echo "*** macfatpkg: run 'make CROSS_TO_MAC68K=1 mac68kpkg' first (need the 68k resource fork)"; exit 1; }
+	@echo "=== Merging fat NetHack (68k CODE resources + PPC PEF) ==="
+	@mkdir -p ../targets/macfat
+	rm -f ../targets/macfat/NetHack.bin ../targets/macfat/NetHackFatRsrc ../targets/macfat/.rsrc/NetHackFatRsrc
+	$(RETRO68)/bin/Rez \
+		--copy ../targets/mac68k/NetHackRsrc \
+		--copy $(TARGETPFX)nhcfrg.rsrc \
+		--data $(TARGETPFX)NetHack.pef \
+		-t APPL -c nh50 \
+		-o ../targets/macfat/NetHack.bin \
+		--cc ../targets/macfat/NetHackFatRsrc
+	@echo "=== Merging fat Recover ==="
+	rm -f ../targets/macfat/Recover.bin ../targets/macfat/RecoverFatRsrc ../targets/macfat/.rsrc/RecoverFatRsrc
+	$(RETRO68)/bin/Rez \
+		--copy ../targets/mac68k/RecoverRsrc \
+		--copy $(TARGETPFX)nhcfrg.rsrc \
+		--data $(TARGETPFX)Recover.pef \
+		-t APPL -c nhRc \
+		-o ../targets/macfat/Recover.bin \
+		--cc ../targets/macfat/RecoverFatRsrc
+	@echo "=== Staging fat package files ==="
+	@rm -rf ../targets/macfat/pkg
+	@mkdir -p ../targets/macfat/pkg
+	cp $(TARGETPFX)NetHack.pef ../targets/macfat/pkg/NetHack
+	cp ../targets/macfat/.rsrc/NetHackFatRsrc ../targets/macfat/pkg/NetHack.rsrc
+	python3 ../sys/mac68k/tools/make_info.py NetHack APPL nh50 ../targets/macfat/pkg/NetHack.info
+	cp $(TARGETPFX)Recover.pef ../targets/macfat/pkg/Recover
+	cp ../targets/macfat/.rsrc/RecoverFatRsrc ../targets/macfat/pkg/Recover.rsrc
+	python3 ../sys/mac68k/tools/make_info.py Recover APPL nhRc ../targets/macfat/pkg/Recover.info
+	cp ../dat/nhdat ../targets/macfat/pkg/nhdat
+	tr '\n' '\r' < ../sys/mac68k/ReadMe.txt > "../targets/macfat/pkg/Read Me"
+	tr '\n' '\r' < ../dat/license > ../targets/macfat/pkg/license
+	tr '\n' '\r' < ../dat/symbols > ../targets/macfat/pkg/symbols
+	tr '\n' '\r' < ../doc/Guidebook.txt > ../targets/macfat/pkg/Guidebook
+	tr '\n' '\r' < ../sys/mac68k/NHDeflts > "../targets/macfat/pkg/NetHack Defaults"
+	@echo "=== Creating fat StuffIt archive ==="
+	@rm -f ../targets/macfat/NetHack.sit
+	sit -T TEXT -C ttxt -o ../targets/macfat/NetHack.sit \
+		../targets/macfat/pkg/NetHack \
+		../targets/macfat/pkg/Recover \
+		../targets/macfat/pkg/nhdat \
+		../targets/macfat/pkg/Guidebook \
+		"../targets/macfat/pkg/NetHack Defaults" \
+		../targets/macfat/pkg/license \
+		../targets/macfat/pkg/symbols \
+		"../targets/macfat/pkg/Read Me"
+	@rm -rf ../targets/macfat/pkg
+	@echo "=== Done ==="
+	@echo "Fat (68k+PPC) StuffIt: ../targets/macfat/NetHack.sit"
+
 endif  # CROSS_TO_MACPPC
 
 UUDECODE = ../util/uudecode
