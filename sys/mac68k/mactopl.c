@@ -30,7 +30,10 @@ topl_yn_function(const char *query, const char *resp, char def)
     char c = queued_resp((char *) resp);
     if (!c) {
         enter_topl_mode((char *) query);
-        topl_set_resp((char *) resp, def);
+        /* A NULL resp means "any key" (getobj/getlin-style prompts validate
+           the key themselves); don't draw a yn-button strip for those -- only
+           genuine yes/no-style prompts (non-NULL resp) get buttons. */
+        topl_set_resp(resp ? (char *) resp : "", def);
 
         do {
             c = readchar();

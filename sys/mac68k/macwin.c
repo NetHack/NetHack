@@ -1406,7 +1406,7 @@ topl_set_resp(char *resp, char def)
     int r_len, r_len1;
 
     if (!resp) {
-        const char any_str[2] = { CHAR_ANY, '\0' };
+        static const char any_str[2] = { CHAR_ANY, '\0' };
         resp = (char *) any_str;
         def = CHAR_ANY;
     }
