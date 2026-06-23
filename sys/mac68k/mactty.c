@@ -246,7 +246,7 @@ tty_nhbell(void)
 
     if (h) {
         HLock(h);
-        SndPlay((SndChannelPtr) 0, (Handle) h, 0); /* async=0: synchronous */
+        SndPlay((SndChannelPtr) 0, (SndListHandle) h, 0); /* async=0: synchronous */
         HUnlock(h);
         ReleaseResource(h);
     } else

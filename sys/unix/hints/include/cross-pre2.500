@@ -579,7 +579,9 @@ override TARGET_CC = $(RETRO68)/bin/m68k-apple-macos-gcc
 override TARGET_CXX = $(RETRO68)/bin/m68k-apple-macos-g++
 override TARGET_AR = $(RETRO68)/bin/m68k-apple-macos-ar
 override TARGET_LINK = $(TARGET_CC)
-MAC68K_COMMON_FLAGS = -m68020 -msoft-float \
+# -std=gnu17: gcc 15+ defaults to C23, which breaks savefile.h's _Generic save
+# dispatch here (no plain int* case; int32_t==long).
+MAC68K_COMMON_FLAGS = -std=gnu17 -m68020 -msoft-float \
 	-I../include -I../sys/mac68k \
 	$(LUAINCL) \
 	-DMAC_CROSS -DMAC68K_CROSS -DNO_TERMS -DNO_SIGNAL -DNO_CHANGE_COLOR \
@@ -656,7 +658,9 @@ override TARGET_CC = $(RETRO68)/bin/powerpc-apple-macos-gcc
 override TARGET_CXX = $(RETRO68)/bin/powerpc-apple-macos-g++
 override TARGET_AR = $(RETRO68)/bin/powerpc-apple-macos-ar
 override TARGET_LINK = $(TARGET_CC)
-MACPPC_COMMON_FLAGS = \
+# -std=gnu17: gcc 15+ defaults to C23, which breaks savefile.h's _Generic save
+# dispatch here (no plain int* case; int32_t==long).
+MACPPC_COMMON_FLAGS = -std=gnu17 \
 	-I../include -I../sys/mac68k \
 	$(LUAINCL) \
 	-DMAC_CROSS -DMAC68K_CROSS -DMACPPC -DNO_TERMS -DNO_SIGNAL -DNO_CHANGE_COLOR \
