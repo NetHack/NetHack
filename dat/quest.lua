@@ -2437,21 +2437,21 @@ the kami of %H before you return again.]],
 %nt was appointed, and he hosted a dinner to meet other civic
 leaders.  At the door, one of his henchmen offered to look after my wallet.
 
-"Now I know what you're thinking:  'How kind!'  But it turns out that even in
-the Thieves' Guild, there are people you can't trust.  My wallet contained --
-you know those credit cards the Royal Mint has been trialing, so you don't
-have to carry bags of gold around?  Most of the prototypes haven't worked,
-and are only good for picking locks.  This one,
-%o, is one of a kind.  As the highest
-spending and most often mugged resident of %H, it was entrusted to
-me.  But when I got my wallet back, %o was
+"I know what you're thinking:  'How kind!'  But it turns out that even in the
+Thieves' Guild, there are people you can't trust.  My wallet contained -- you
+know the Royal Mint has been trialing credit cards, so we won't have to carry
+bags of gold around?  Most of the prototypes haven't worked, and are only
+good for picking locks.  This one, %o, is
+one of a kind.  As the highest spending and most often mugged resident of
+%H, it was entrusted to me.  But when I got my wallet back, the Card was
 missing.  I appealed to the Patrician, and he said the matter fell under the
 doctrine of _detectores custodes_.
 
 "We believe %n has the Card, and that he's holed himself
-up in %i.  So we need somebody to find their way in
-there and take %o back before he runs up a
-huge bill!
+up in %i.  With the power of %o, the
+Thieves are bolder than ever.  Citizens are frightened, and tourism is
+down. We need somebody to find their way into %i and
+recover the Card before there are no %cp left!
 
 "So, %p, are you ready for a little Detour?"]],
       },
@@ -2491,7 +2491,7 @@ when you're a %R, and you might stand a chance.
          "\"Who'd have thought %n would be such a criminal!\"",
          "\"Look out for the traps on the way to %i.  Some date back to the Mage Wars!\"",
          "\"Get %o back, and hopefully I can cancel %ns transactions.\"",
-         "\"If you're stuck, try praying to %d -- %dh's whimsical, but %dh sometimes helps %cp out.\"",
+         "\"If you're stuck, try praying to %d. %dH's whimsical, but %dh sometimes helps %cp out.\"",
          "\"You have to defeat %n, or %nh'll follow you back here!\"",
          "\"If you can grab %o from %n, it might help you beat %ni.\"",
          "\"Hurry, %p!  We're all depending on you."",
@@ -2509,7 +2509,7 @@ But this isn't %H as you remember it.  The streets are... quiet?
 Doors close, curtains twitch, and a few residents scurry about nervously, but
 you can't hear the hawkers selling their ropy meat pies, or the cargo barges
 bulldozing their way along the river.  A whiff of rotten cabbages suggests
-that the fields outside the city haven't been tended for weeks.
+that the fields outside the city aren't being tended properly.
 
 Something isn't right.  Hopefully, it's all some sort of misunderstanding.
 %lC will sort it out, when you find him.]],
@@ -2553,9 +2553,9 @@ That'll do nicely!  You'd better return it to %l as soon as possible.]],
 "Besides, the Amulet isn't for us %cp, it's for %d.  I've heard
 %dh has a temple on the Astral Plane, which incidentally is a gorgeous place
 to visit this time of year.  Find your way there, then offer it to %d
-on %dj high altar.
+on %dj high altar.  %dH'll be delighted to have it to %dIself at last!
 
-Safe journey, %p!"]],
+Safe journey, %p."]],
       },
       killed_nemesis = {
          synopsis = "[%nC curses at you as %nh dies.]",
@@ -2644,7 +2644,7 @@ swear.  Thief's honor!
 flexes it in his hand, then looks up and smiles.
 
 "%pC, while you were away, %d appeared to me, and suggested I
-transfer %oe platinum yendorian express card to you.  Carry it with you on
+transfer %o to you.  Carry it with you on
 your quest for the Amulet of Yendor, and you'll travel in good company.
 
 "Remember -- there are some things gold can buy.  For everything else,
@@ -2658,8 +2658,8 @@ there's %o."]],
 to get here."]],
       },
       othertime = {
-         text = [[You are back at %H.  Things are looking so dire, you're afraid that
-there may soon be no %H to return to.]],
+         text = [[You are back at %H.  Things are looking so dead,
+you feel there may soon be no %cs here at all.]],
       },
       posthanks = {
          text = [["Just look at you, %p!  Tell me all about your Tour.  Did you

@@ -168,9 +168,6 @@ if percent(10) then
 	des.monster({id="wizard", name="the Bursar", male=1, peaceful=1, keep_default_invent=false})
 end
 if percent(10) then
-	des.monster({id="wizard", name="Granny Weatherwax", female=1, peaceful=1, keep_default_invent=false})
-end
-if percent(10) then
 	des.monster({id="priest", name="Mightily Oats", male=1, peaceful=1, keep_default_invent=false})
 end
 if percent(10) then
@@ -178,6 +175,9 @@ if percent(10) then
 end
 if percent(10) then
 	des.monster({id="dwarf", name="Cheery", female=1, peaceful=1, keep_default_invent=false}) -- no pick-axe
+end
+if percent(10) then
+	des.monster({id="clay golem", name="Dorfl", male=1, peaceful=1, keep_default_invent=false})
 end
 if percent(10) then
 	des.monster({id="clay golem", name="Gladys", female=1, peaceful=1, keep_default_invent=false})
