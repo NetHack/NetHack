@@ -16,21 +16,17 @@ references), which upstream Elf2Mac rejects with an assert.  Nothing
 else in the toolchain needs patching: the stock `libretrocrt` runtime
 works as-is in 32-bit addressing mode.
 
-### Apple Universal Interfaces 3.4
+### Apple Universal Interfaces 3.x
 
-Retro68's bundled "Multiversal" headers are incomplete. Install Apple's
-original headers from the MPW-GM (Macintosh Programmer's Workshop Golden
-Master) disk image:
+Retro68's bundled "Multiversal" headers are incomplete, so the build needs
+Apple's original Universal Interfaces (version 3.x; 3.4 is the most tested),
+extracted from the MPW-GM (Macintosh Programmer's Workshop Golden Master) disk
+image and installed into `$RETRO68/universal`.
 
-    # Mount the MPW-GM image and copy CIncludes
-    mkdir -p /opt/retro68/universal/CIncludes
-    cp -r <mpw-gm>/Interfaces/CIncludes/* /opt/retro68/universal/CIncludes/
-
-    # Wrap the Interface library (Pascal-calling-convention Toolbox glue)
-    # in a proper ar archive so -lInterface resolves it
-    /opt/retro68/bin/m68k-apple-macos-ar rcs \
-       /opt/retro68/m68k-apple-macos/lib/libInterface.a \
-       <mpw-gm>/Libraries/Libraries/Interface.o
+See [Installing Apple Universal Interfaces on a multiversal Retro68](BUILD-ppc.md#installing-apple-universal-interfaces-on-a-multiversal-retro68)
+in `BUILD-ppc.md` for the complete procedure — it sets up both the 68k and PPC
+libraries via Retro68's own `install-universal-interfaces.sh` and
+`interfaces-and-libraries.sh`, so the same steps serve both builds.
 
 ### Host Tools
 
