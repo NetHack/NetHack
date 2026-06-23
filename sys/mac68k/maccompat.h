@@ -17,7 +17,7 @@
 #ifndef MACCOMPAT_H
 #define MACCOMPAT_H
 
-#ifdef CROSS_TO_MAC68K
+#if defined(CROSS_TO_MAC68K) || defined(CROSS_TO_MACPPC)
 
 /* InvalWindowRect/InvalWindowRgn are Window Manager 2.0 (Mac OS 8.5);
  * the System 7 equivalent is InvalRect/InvalRgn on the window's port. */
@@ -39,7 +39,7 @@
  * inUpButton aliases). */
 #include <ControlDefinitions.h>
 
-#endif /* CROSS_TO_MAC68K */
+#endif /* CROSS_TO_MAC68K || CROSS_TO_MACPPC */
 
 /* Build a Pascal string from a C-string LITERAL at the call site, with the
    length byte computed by sizeof() at compile time.  Constraints: (1)

@@ -43,7 +43,7 @@
 #define _H_tty_public
 #include <Windows.h>
 
-#ifdef CROSS_TO_MAC68K
+#if defined(CROSS_TO_MAC68K) || defined(CROSS_TO_MACPPC)
 #include "maccompat.h"
 #endif
 

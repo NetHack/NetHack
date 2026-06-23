@@ -59,6 +59,16 @@ override TARGETPFX = $(TARGETDIR)/
 override TARGET_LIBS=
 endif
 
+ifdef CROSS_TO_MACPPC
+CROSS=1
+BUILD_TARGET_LUA=1
+CROSS_SHARED=1
+override TARGET = macppc
+override TARGETDIR=../targets/$(TARGET)
+override TARGETPFX = $(TARGETDIR)/
+override TARGET_LIBS=
+endif
+
 ifdef CROSS_TO_ATARI
 CROSS=1
 BUILD_TARGET_LUA=1
