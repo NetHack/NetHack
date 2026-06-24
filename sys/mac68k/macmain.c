@@ -184,7 +184,7 @@ force_hdelete(short vol, long dir, Str255 fName)
 }
 
 void
-process_openfile(short src_vol, long src_dir, Str255 fName, OSType ftype)
+process_openfile(short src_vol, long src_dir, StringPtr fName, OSType ftype)
 {
     OSErr err = noErr;
 

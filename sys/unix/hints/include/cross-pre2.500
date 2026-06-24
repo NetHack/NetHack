@@ -584,7 +584,7 @@ override TARGET_LINK = $(TARGET_CC)
 MAC68K_COMMON_FLAGS = -std=gnu17 -m68020 -msoft-float \
 	-I../include -I../sys/mac68k \
 	$(LUAINCL) \
-	-DMAC_CROSS -DMAC68K_CROSS -DNO_TERMS -DNO_SIGNAL -DNO_CHANGE_COLOR \
+	-DMAC_CROSS -DMAC68K_CROSS -DNO_CHANGE_COLOR \
 	-DTILES_IN_GLYPHMAP -DCLIPPING \
 	-DTARGET_OS_MAC=1 -DTARGET_CPU_68K=1 -DTARGET_RT_MAC_CFM=0 \
 	-DOPAQUE_TOOLBOX_STRUCTS=0 -DACCESSOR_CALLS_ARE_FUNCTIONS=0 \
@@ -593,7 +593,7 @@ MAC68K_COMMON_FLAGS = -std=gnu17 -m68020 -msoft-float \
 	-Wno-unused-parameter -Wno-unused-variable -Wno-four-char-constants \
 	-ffunction-sections -fdata-sections
 override TARGET_CFLAGS = -c -O2 $(MAC68K_COMMON_FLAGS)
-LUA_TARGET_CFLAGS = -c -O2 -DLUA_32BITS $(MAC68K_COMMON_FLAGS)
+LUA_TARGET_CFLAGS = -c -O2 $(MAC68K_COMMON_FLAGS)
 override TARGET_LFLAGS = -Wl,--gc-sections \
 	-Wl,--wrap=malloc -Wl,--wrap=free -Wl,--wrap=realloc   # macalloc.c pool
 override TARGET_LIBS += -lm -lInterface
@@ -663,7 +663,7 @@ override TARGET_LINK = $(TARGET_CC)
 MACPPC_COMMON_FLAGS = -std=gnu17 \
 	-I../include -I../sys/mac68k \
 	$(LUAINCL) \
-	-DMAC_CROSS -DMAC68K_CROSS -DMACPPC -DNO_TERMS -DNO_SIGNAL -DNO_CHANGE_COLOR \
+	-DMAC_CROSS -DMAC68K_CROSS -DMACPPC -DNO_CHANGE_COLOR \
 	-DTILES_IN_GLYPHMAP -DCLIPPING \
 	-DTARGET_OS_MAC=1 -DTARGET_CPU_PPC=1 -DTARGET_CPU_68K=0 \
 	-DTARGET_RT_MAC_CFM=1 \
@@ -674,7 +674,7 @@ MACPPC_COMMON_FLAGS = -std=gnu17 \
 	-fsigned-char \
 	-ffunction-sections -fdata-sections
 override TARGET_CFLAGS = -c -O2 $(MACPPC_COMMON_FLAGS)
-LUA_TARGET_CFLAGS = -c -O2 -DLUA_32BITS $(MACPPC_COMMON_FLAGS)
+LUA_TARGET_CFLAGS = -c -O2 $(MACPPC_COMMON_FLAGS)
 override TARGET_LFLAGS = -Wl,--gc-sections \
 	-Wl,--wrap=malloc -Wl,--wrap=free -Wl,--wrap=realloc   # macalloc.c pool
 override TARGET_LIBS += -lInterfaceLib -lm

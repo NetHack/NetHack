@@ -366,7 +366,7 @@ static void
 copy_bits(tty_record *record, Rect *bounds, short xfer_mode,
           RgnHandle mask_rgn)
 {
-    GWorldFlags pix_state;
+    GWorldFlags pix_state = 0; /* set+used only under uses_gworld; init quiets gcc */
     BitMap *source;
 
     if (record->uses_gworld) {

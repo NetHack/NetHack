@@ -651,7 +651,8 @@ mac_askname()
         case RSRC_ASK_GEND:
         case RSRC_ASK_MODE:
             GetDialogItem(askdialog, item, &type, &handle, &rect);
-            pt = *(Point *) &rect;
+            pt.v = rect.top;   /* topLeft of rect, without type-punning */
+            pt.h = rect.left;
             LocalToGlobal(&pt);
             if (!!(i = PopUpMenuSelect(askmenu[item], pt.v, pt.h,
                                        askselect[item] + 1)))
@@ -775,7 +776,7 @@ InitMenuRes()
 
         for (j = 0; j < pMenuList[i]->numMenus; j++) {
             if (!(menu = (MenuHandle) GetMenu((**mlHnd).mref[j].mresID))) {
-                Str31 d;
+                Str255 d; /* NumToString's output param is Str255 */
                 NumToString((**mlHnd).mref[j].mresID, d);
                 menuError(errGetMenu);
             }

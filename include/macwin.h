@@ -176,7 +176,7 @@ extern void mactile_menu_refresh(void);
 
 /* ### macmain.c ### */
 
-extern void process_openfile(short s_vol, long s_dir, Str255 fNm,
+extern void process_openfile(short s_vol, long s_dir, StringPtr fNm,
                              OSType ft);
 
 /* ### mttymain.c ### */
