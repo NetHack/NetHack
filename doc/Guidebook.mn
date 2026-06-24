@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.614 $ $NHDT-Date: 1770881338 2026/02/11 23:28:58 $
+.\" $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.652 $ $NHDT-Date: 1782274458 2026/06/23 23:14:18 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\"+--
@@ -60,7 +60,7 @@
 .ds f0 \*(vr
 .ds f1 \" empty
 .\"DO NOT REMOVE NH_DATESUB .ds f2 Date(%B %-d, %Y)
-.ds f2 May 29, 2026
+.ds f2 June 23, 2026
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -6387,7 +6387,7 @@ large unless it is actively maintained.
 .
 .lp
 CRASHREPORTURL\ =\ If set to
-\f(CRhttps://www.nethack.org/links/cr-37BETA.html\fP
+\f(CRhttps://www.nethack.org/links/cr-5.0.0.html\fP
 and support is compiled in, brings up a browser window pre-populated with
 the information needed to report a problem if the game panics or ends
 up in an internally inconsistent state, or if the #bugreport command is
