@@ -1,140 +1,116 @@
-# Building NetHack for Classic Mac OS (System 7, 68k)
+# Building NetHack for Classic Mac OS (68k / PowerPC)
 
-Cross-compilation using [Retro68](https://github.com/autc04/Retro68) GCC
-toolchain targeting Motorola 68k Macs in 32-bit addressing mode.
+Cross-compiled with the [Retro68](https://github.com/autc04/Retro68) GCC
+toolchain. Three targets:
 
-## Prerequisites
+- **68k** — System 7+ on 68020+ in 32-bit addressing mode
+- **PowerPC** — System 7.x through Mac OS 9 (CFM/PEF, no Carbon)
+- **Fat** — one app that runs native on both
 
-### Retro68 Toolchain
+## What you need
 
-Install Retro68 to `/opt/retro68` (or set `RETRO68=` to your path).
+- Retro68 toolchain at `/opt/retro68` (or set `RETRO68=`). Verified with its
+  default GCC 12 through GCC 16; the build pins `-std=gnu17` automatically.
+- Apple Universal Interfaces 3.x in `/opt/retro68/universal` (Retro68's bundled
+  Multiversal headers are incomplete). Install steps below.
+- Host tools: `hfsutils`, `sit` (StuffIt), `python3`, and optionally
+  `qemu-system-m68k` (8.0+) for testing.
 
-One patch is required: apply `sys/mac68k/tools/retro68_elf2mac.patch` to
-the Retro68 source tree and rebuild Elf2Mac.  It lets the linker accept
-NetHack's function-pointer tables in `.data` (cross-section jump-table
-references), which upstream Elf2Mac rejects with an assert.  Nothing
-else in the toolchain needs patching: the stock `libretrocrt` runtime
-works as-is in 32-bit addressing mode.
+## Get the prerequisites
 
-### Apple Universal Interfaces 3.x
+### Install Retro68 and the Universal Interfaces
 
-Retro68's bundled "Multiversal" headers are incomplete, so the build needs
-Apple's original Universal Interfaces (version 3.x; 3.4 is the most tested),
-extracted from the MPW-GM (Macintosh Programmer's Workshop Golden Master) disk
-image and installed into `$RETRO68/universal`.
+Host packages (Debian/Ubuntu):
 
-See [Installing Apple Universal Interfaces on a multiversal Retro68](BUILD-ppc.md#installing-apple-universal-interfaces-on-a-multiversal-retro68)
-in `BUILD-ppc.md` for the complete procedure — it sets up both the 68k and PPC
-libraries via Retro68's own `install-universal-interfaces.sh` and
-`interfaces-and-libraries.sh`, so the same steps serve both builds.
+    sudo apt install build-essential cmake bison flex texinfo ruby hfsutils \
+        libgmp-dev libmpfr-dev libmpc-dev libboost-all-dev
 
-### Host Tools
+Clone with submodules (GCC and binutils are submodules):
 
-- `hfsutils` — `hformat`, `hmount`, `hcopy`, `hattrib`, `humount`, `hmkdir`
-- Python 3 — for resource fork and disk image tools
-- `qemu-system-m68k` (QEMU 8.0+) — optional, for testing
+    git clone --recursive https://github.com/autc04/Retro68.git
+    cd Retro68
 
----
+Build the toolchain — binutils + GCC for 68k and PowerPC plus the host tools
+(Rez, MakePEF, Elf2Mac, ...) — from a separate build dir into an empty, writable
+`/opt/retro68`. This takes a while:
 
-## Building
+    sudo mkdir -p /opt/retro68 && sudo chown $USER /opt/retro68
+    mkdir ../Retro68-build && cd ../Retro68-build
+    ../Retro68/build-toolchain.bash --prefix=/opt/retro68 --no-carbon
+    cd ../Retro68
 
-From a fresh checkout, generate the Makefiles and fetch Lua first:
+> On a modern host (GCC 15+) the 68k GCC build can fail in libbacktrace with
+> *"NM has changed"*; add `--disable-lto` to the 68k `gcc/configure` line in
+> `build-toolchain.bash` (the PowerPC one already has it) and rerun.
+
+Put the toolchain on `PATH` for the remaining steps:
+
+    export PATH=/opt/retro68/bin:$PATH
+
+Retro68's bundled "Multiversal" headers are incomplete, so install Apple's
+Universal Interfaces 3.x over them. Download the **MPW 3.5 Golden Master** disk
+image (MacBinary DiskCopy, ~25 MB, served as `mpw-gm.img__0.bin`) from
+<http://macintoshgarden.org/apps/macintosh-programmers-workshop> into the current
+(Retro68 source) directory, then — args to the second script are build-68k,
+build-PPC, skip-Carbon:
+
+    ./install-universal-interfaces.sh . mpw-gm.img__0.bin
+    ./interfaces-and-libraries.sh /opt/retro68 ./InterfacesAndLibraries true true false
+
+`/opt/retro68/universal/CIncludes` now holds the ~390 Apple headers.
+
+## Configure (once)
 
     cd NetHack
     sys/unix/setup.sh sys/unix/hints/linux.500
     make fetch-lua
 
-Then build:
+## Build and package
+
+Run the `*pkg` targets from `src/` (`make -C src`) — the top-level Makefile's
+generated Lua paths break them when invoked from the repository root.
+
+### 68k
 
     make CROSS_TO_MAC68K=1 all
-
-This produces:
-- `targets/mac68k/NetHack` — data fork (tiny text stub)
-- `targets/mac68k/.rsrc/NetHack` — resource fork (CODE/DATA/RELA segments)
-- `targets/mac68k/NetHack.gdb` — ELF with debug symbols
-
-## Packaging
-
     make -C src CROSS_TO_MAC68K=1 mac68kpkg
 
-(Run from `src/`; the top-level Makefile's generated Lua paths break this
-target when invoked from the repository root.)
+`targets/mac68k/`: `NetHack.img` (self-mounting SCSI disk, embeds the port's
+`.NHsd` driver), `NetHack.sit` (StuffIt), `NetHack.bin` (MacBinary).
 
-This runs the full packaging pipeline:
-1. Compile SIZE resource with Rez
-2. Merge SIZE + NHrsrc UI resources into the resource fork
-3. Emit the MacBinary directly from the same Rez call
-4. Build HFS disk image with all data files, `save/` and `levels/`
-   directories, and `nethack.cnf`
-5. Wrap with Apple Partition Map for SCSI emulators, embedding the
-   port's own SCSI disk driver (`sys/mac68k/scsidriver.bin`) in an
-   `Apple_Driver43` partition so the image auto-mounts from the ROM —
-   on real hardware and in QEMU alike, with nothing proprietary inside
+### PowerPC
 
-### The embedded SCSI driver
+    make CROSS_TO_MACPPC=1 all
+    make -C src CROSS_TO_MACPPC=1 macppcpkg
 
-`sys/mac68k/scsidriver.bin` is a vendored build of the MIT-licensed
-minimal Mac SCSI disk driver developed alongside this port (the
-`mac-scsi-driver` project, same author; driver name `.NHsd`, ~1.8 KB).
-To update it, build `driver.bin` there and copy it over — packaging
-computes the boot checksum and partition fields automatically.
+`targets/macppc/`: `NetHack.sit`, `NetHack.bin`.
 
-Output:
-- `targets/mac68k/NetHack.img` — ready for QEMU or BlueSCSI
-- `targets/mac68k/NetHack.sit` — StuffIt archive for distribution
+### Fat (68k + PowerPC)
 
-(`targets/mac68k/NetHack.bin`, the MacBinary the image is built from,
-also remains available for `hcopy -m` in-place updates of existing
-disks.)
+    make CROSS_TO_MAC68K=1 all
+    make -C src CROSS_TO_MAC68K=1 mac68kpkg
+    make CROSS_TO_MACPPC=1 all
+    make -C src CROSS_TO_MACPPC=1 macfatpkg
 
-### Updating an existing disk (e.g. BlueSCSI)
+`targets/macfat/`: `NetHack.sit`, `NetHack.bin` (+ `Recover.bin`).
 
-    hmount /path/to/disk.hda
-    hdel NetHack
-    hcopy -m targets/mac68k/NetHack.bin :
-    humount
-
-**Never recreate a BlueSCSI disk image from scratch** if it has a working
-SilverLining driver — use `hmount`/`hcopy`/`humount` to update files in place.
-
-### Resource merging note
-
-Resources are merged into the application fork with a single `Rez --copy`
-pass.  Gotcha: on a non-Mac host, Rez locates a file's resource fork via
-its sidecar conventions (`file` plus `.rsrc/file`); pass it a bare fork
-image and it silently reads an EMPTY fork and emits an app with no CODE
-resources, which crashes at launch.  Always hand `--copy` the data-fork
-path of a file whose fork lives in the `.rsrc/` sidecar, as the pipeline
-does.
-
----
-
-## Testing with QEMU
+## Test with QEMU (68k)
 
     qemu-system-m68k -M q800 -m 128 \
-        -bios "<path-to-quadra-800-rom>" \
+        -bios <quadra-800-rom> \
         -drive file=pram.img,format=raw,if=mtd \
         -drive file=boot.hda,format=raw,media=disk \
-        -drive file=NetHack.img,format=raw,media=disk \
+        -drive file=targets/mac68k/NetHack.img,format=raw,media=disk \
         -g 800x600x8
 
-- `pram.img` with `if=mtd` persists PRAM settings (32-bit mode, etc.)
-- The boot disk must have System 7.x installed with 32-bit mode enabled
-  (Memory control panel → 32-Bit Addressing: On)
+`pram.img` (`if=mtd`) persists PRAM. The boot disk needs System 7.x with 32-bit
+addressing enabled (Memory control panel).
 
----
-
-## Tools (sys/mac68k/tools/)
+## Tools (`sys/mac68k/tools/`)
 
 | Script | Purpose |
 |--------|---------|
-| `make_scsi_image2.py` | Wrap an HFS image with Apple Partition Map for SCSI; `--driver <bin>` embeds the port's SCSI driver so the image auto-mounts |
-| `decode_hqx.py` | Decode BinHex 4.0 (.hqx) files to data + resource forks; `--creator-fixup` renames the legacy signature/BNDL creator |
+| `make_scsi_image2.py` | Wrap an HFS image with Apple Partition Map for SCSI; `--driver <bin>` embeds the auto-mount driver |
+| `decode_hqx.py` | Decode BinHex 4.0 (`.hqx`) to data + resource forks |
 | `dump_rsrc.py` | Dump resource fork contents (types, IDs, sizes) |
-| `make_info.py` | Write a macutils `.info` sidecar (name/type/creator + build-time dates) for the StuffIt staging |
-
-## Historical files
-
-`sys/mac68k/README`, `Install.mw`, and `NHrsrc.hqx`/`NHsound.hqx` date from the
-original 1990s Macintosh port (Metrowerks/MPW).  They are retained for
-reference; only this file describes the Retro68 cross-compile.
+| `make_info.py` | Write a macutils `.info` sidecar for StuffIt staging |
