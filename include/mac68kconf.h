@@ -14,9 +14,6 @@
 /* No system-wide config file on classic Mac OS */
 /* STATUS_HILITES supported via the native renderer in sys/mac68k/macstat.c */
 
-/* NB: Lua's default 64-bit integers/floats are software-emulated and slow on
-   68k.  Lua's LUA_32BITS would help, but lua-5.4 luaconf.h hardcodes it to 0,
-   so it cannot be enabled by -D/#define without patching luaconf.h itself. */
 #ifndef TARGET_API_MAC_OS8
 #define TARGET_API_MAC_OS8 1
 #endif

@@ -592,7 +592,8 @@ MAC68K_COMMON_FLAGS = -std=gnu17 -m68020 -msoft-float \
 	-Wall -Wno-missing-field-initializers \
 	-Wno-unused-parameter -Wno-unused-variable -Wno-four-char-constants \
 	-ffunction-sections -fdata-sections
-override TARGET_CFLAGS = -c -O2 $(MAC68K_COMMON_FLAGS)
+# -Os for size on RAM-tight 68k; the Lua interpreter stays at -O2.
+override TARGET_CFLAGS = -c -Os $(MAC68K_COMMON_FLAGS)
 LUA_TARGET_CFLAGS = -c -O2 $(MAC68K_COMMON_FLAGS)
 override TARGET_LFLAGS = -Wl,--gc-sections \
 	-Wl,--wrap=malloc -Wl,--wrap=free -Wl,--wrap=realloc   # macalloc.c pool
