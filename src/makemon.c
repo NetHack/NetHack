@@ -1681,7 +1681,7 @@ rndmonst_adj(int minadj, int maxadj)
 
         if (montooweak(mndx, minmlev) || montoostrong(mndx, maxmlev))
             continue;
-        if (upper && !isupper(monsym(ptr)))
+        if (upper && !isupper((int) monsym(ptr)))
             continue;
         if (elemlevel && wrong_elem_type(ptr))
             continue;

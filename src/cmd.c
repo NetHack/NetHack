@@ -2494,7 +2494,8 @@ handler_change_autocompletions(void)
             if (strlen(ec->ef_txt) < 2)
                 continue;
 
-            Sprintf(buf, "%s", ec->ef_txt);
+            /* switched to Snprintf to eliminate -Wformat-overflow warning */
+            Snprintf(buf, sizeof buf, "%s", ec->ef_txt);
 
             for (j = 0; j < n; ++j) {
                 if (ec == &extcmdlist[(picks[j].item.a_int - 1)]) {

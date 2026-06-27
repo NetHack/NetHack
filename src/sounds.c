@@ -814,8 +814,10 @@ domonnoise(struct monst *mtmp)
                                                flags.female ? FEMALE : MALE))
                                    : an(racenoun));
                     verbl_msg = verbuf;
-                } else
-                    verbl_msg = vampmsg[vampindex];
+                } else if (vampindex > 1) {
+                    if (vampindex >= 0 && vampindex < SIZE(vampmsg))
+                        verbl_msg = vampmsg[vampindex];
+                }
             }
         }
         break;

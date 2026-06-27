@@ -4868,7 +4868,7 @@ pick_animal(void)
     /* rogue level should use monsters represented by uppercase letters
        only, but since chameleons aren't generated there (not uppercase!)
        we don't perform a lot of retries */
-    if (Is_rogue_level(&u.uz) && !isupper(monsym(&mons[res])))
+    if (Is_rogue_level(&u.uz) && !isupper((int) monsym(&mons[res])))
         res = ga.animal_list[rn2(ga.animal_list_count)];
     return res;
 }
@@ -5224,7 +5224,7 @@ select_newcham_form(struct monst *mon)
         } while (--tryct > 0 && !validspecmon(mon, mndx)
                  /* try harder to select uppercase monster on rogue level */
                  && (tryct > 40 && Is_rogue_level(&u.uz)
-                     && !isupper(monsym(&mons[mndx]))));
+                     && !isupper((int) monsym(&mons[mndx]))));
     }
     return mndx;
 }
@@ -5334,7 +5334,7 @@ newcham(
             /* for the first several tries we require upper-case on
                the rogue level (after that, we take whatever we get) */
             if (tryct > 15 && Is_rogue_level(&u.uz)
-                && mdat && !isupper(monsym(mdat)))
+                && mdat && !isupper((int) monsym(mdat)))
                 mdat = 0;
             if (mdat)
                 break;
