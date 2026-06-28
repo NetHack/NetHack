@@ -803,6 +803,9 @@ struct instance_globals_p {
     int  poly_zapped;
 
     /* new stuff */
+    int puzzling_criteria;
+    char puzzling_ilets[invlet_basic + 1];
+
     boolean havestate;
 };
 

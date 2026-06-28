@@ -1404,6 +1404,7 @@ extern void perm_invent_toggled(boolean negated);
 extern void prepare_perminvent(winid window);
 extern struct obj *carrying_stoning_corpse(void);
 extern void repopulate_perminvent(void);
+extern int check_for_puzzling_nonmerge(struct obj *);
 
 /* ### ioctl.c ### */
 
@@ -2236,6 +2237,8 @@ extern boolean the_unique_pm(struct permonst *) NONNULLARG1;
 extern boolean erosion_matters(struct obj *) NONNULLARG1;
 extern char *doname(struct obj *) NONNULLARG1;
 extern char *doname_with_price(struct obj *) NONNULLARG1;
+extern char *doname_with_cgender(struct obj *) NONNULLARG1;
+extern char *doname_with_price_and_cgender(struct obj *) NONNULLARG1;
 extern char *doname_vague_quan(struct obj *) NONNULLARG1;
 extern boolean not_fully_identified(struct obj *) NONNULLARG1;
 extern char *corpse_xname(struct obj *, const char *, unsigned) NONNULLARG1;

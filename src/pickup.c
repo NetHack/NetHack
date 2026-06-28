@@ -1041,7 +1041,7 @@ query_objlist(const char *qstr,        /* query string */
     unsigned sortflags;
     glyph_info tmpglyphinfo = nul_glyphinfo;
     Loot *sortedolist, *srtoli;
-    int clr = NO_COLOR;
+    int clr = NO_COLOR, puzzling_count = 0;
 
     *pick_list = (menu_item *) 0;
     if (!olist && !engulfer)
@@ -1075,6 +1075,8 @@ query_objlist(const char *qstr,        /* query string */
         (*pick_list)->count = last->quan;
         return 1;
     }
+
+    puzzling_count = check_for_puzzling_nonmerge(olist);
 
     sortflags = (((flags.sortloot == 'f'
                    || (flags.sortloot == 'l' && !(qflags & USE_INVLET)))
@@ -1134,7 +1136,9 @@ query_objlist(const char *qstr,        /* query string */
                          (qflags & USE_INVLET) ? curr->invlet
                            : (first && curr->oclass == COIN_CLASS) ? '$' : 0,
                          def_oc_syms[(int) objects[curr->otyp].oc_class].sym,
-                         ATR_NONE, clr, doname_with_price(curr),
+                         ATR_NONE, clr,
+                         (puzzling_count) ? doname_with_price_and_cgender(curr)
+                                          : doname_with_price(curr),
                          MENU_ITEMFLAGS_NONE);
                 first = FALSE;
             }

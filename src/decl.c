@@ -648,6 +648,13 @@ static const struct instance_globals_p g_init_p = {
     UNDEFINED_PTR, /* propellor */
     /* zap.c */
     UNDEFINED_VALUE, /* poly_zap */
+    0,               /*  puzzling_criteria */
+    {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    },  /* puzzling_ilets[] */
+
     TRUE, /* havestate*/
 };
 

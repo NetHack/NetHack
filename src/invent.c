@@ -2701,6 +2701,52 @@ count_unidentified(struct obj *objchn)
     return unid_cnt;
 }
 
+/* mark the puzzling items */
+int
+check_for_puzzling_nonmerge(struct obj *objchn)
+{
+    int i, k, idx, puzzling_cnt = 0, ilet, mnums[invlet_basic + 1],
+                gndr[invlet_basic + 1];
+    struct obj *obj;
+    boolean at_least_one = FALSE;
+
+    gp.puzzling_criteria = 0;
+    for (i = 0; i < invlet_basic + 1; ++i)
+        gp.puzzling_ilets[i] = mnums[i] = gndr[i] = 0;
+
+
+    for (obj = objchn; obj; obj = obj->nobj) {
+        if (obj->otyp == CORPSE
+            && obj->corpsenm >= 0 && obj->corpsenm < NUMMONS) {
+            ilet = obj->invlet;
+            idx = (ilet >= 'A' && ilet <= 'Z')   ? ilet - 'A'
+                  : (ilet >= 'a' && ilet <= 'z') ? ilet - 'a' + 26
+                                                 : 53;
+            if (idx < 53) {
+                mnums[idx] = obj->corpsenm;
+                gndr[idx] = (obj->spe & CORPSTAT_MALE) ? CORPSTAT_MALE
+                                                       : CORPSTAT_FEMALE;
+                at_least_one = TRUE;
+            }
+        }
+    }
+    if (at_least_one) {
+        for (i = 0; i < invlet_basic; ++i) {
+            for (k = i + 1; k < invlet_basic; ++k) {
+                if (k == i)
+                    continue;
+                if (mnums[k] == mnums[i] && gndr[k] != gndr[i]) {
+                    ++puzzling_cnt;
+                    gp.puzzling_ilets[i] = gp.puzzling_ilets[k] = 1;
+                }
+            }
+        }
+        if (puzzling_cnt)
+            gp.puzzling_criteria = 411;
+    }
+    return puzzling_cnt;
+}
+
 /* dialog with user to identify a given number of items; 0 means all */
 void
 identify_pack(
@@ -3064,7 +3110,7 @@ display_pickinv(
     struct obj *otmp, wizid_fakeobj, inuse_fakeobj;
     char ilet, ret, *formattedobj;
     const char *invlet = flags.inv_order;
-    int n, classcount, inusecount = 0;
+    int n, classcount, inusecount = 0, puzzling_count = 0;
     winid win; /* windows being used */
     anything any;
     menu_item *selected;
@@ -3212,6 +3258,9 @@ display_pickinv(
             sortedinvent[0].obj = (struct obj *) 0;
     }
 
+
+    puzzling_count = check_for_puzzling_nonmerge(gi.invent);
+
     start_menu(win, menu_behavior);
     any = cg.zeroany;
     if (wizid) {
@@ -3314,7 +3363,9 @@ display_pickinv(
                 /* normal inventory item */
                 tmpglyph = obj_to_glyph(otmp, rn2_on_display_rng);
                 map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);
-                formattedobj = doname(otmp);
+                formattedobj = !puzzling_count
+                                   ? doname(otmp)
+                                   : doname_with_cgender(otmp);
                 add_menu(win, &tmpglyphinfo, &any, ilet,
                          wizid ? def_oc_syms[(int) otmp->oclass].sym : 0,
                          ATR_NONE, clr, formattedobj, MENU_ITEMFLAGS_NONE);
@@ -4110,6 +4161,7 @@ look_here(
             picked_some = (lookhere_flags & LOOKHERE_PICKED_SOME) != 0,
             /* skip 'dfeature' if caller used describe_decor() to show it */
             skip_dfeature = (lookhere_flags & LOOKHERE_SKIP_DFEATURE) != 0;
+    int puzzling_count = 0;
 
     /* default pile_limit is 5; a value of 0 means "never skip"
        (and 1 effectively forces "always skip") */
@@ -4173,6 +4225,7 @@ look_here(
     }
 
     otmp = svl.level.objects[u.ux][u.uy];
+    puzzling_count = check_for_puzzling_nonmerge(otmp);
     dfeature = dfeature_at(u.ux, u.uy, fbuf2);
     if (dfeature && !strcmp(dfeature, "pool of water") && Underwater)
         dfeature = 0;
@@ -4294,11 +4347,15 @@ look_here(
         for (; otmp; otmp = otmp->nexthere) {
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
                 felt_cockatrice = TRUE;
-                Sprintf(buf, "%s...", doname(otmp));
+                Sprintf(buf, "%s...",
+                        (puzzling_count) ? doname_with_cgender(otmp)
+                                         : doname(otmp));
                 putstr(tmpwin, 0, buf);
                 break;
             }
-            putstr(tmpwin, 0, doname_with_price(otmp));
+            putstr(tmpwin, 0,
+                   (puzzling_count) ? doname_with_price_and_cgender(otmp)
+                                    : doname_with_price(otmp));
         }
         display_nhwindow(tmpwin, TRUE);
         destroy_nhwindow(tmpwin);
