@@ -532,7 +532,7 @@ savelev_core(NHFILE *nhfp, xint8 lev)
     Sfo_dest_area(nhfp, &svd.dndest, "lev-dndest");
     save_adjust_levelflags();
     Sfo_levelflags(nhfp, &svl.level.flags, "lev-level_flags");
-    rest_adjust_levelflags();
+    rest_adjust_levelflags(0L);
 
     Sfo_int(nhfp, &svd.doors_alloc, "lev-doors_alloc");
     /* don't rely on underlying write() behavior to write

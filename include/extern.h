@@ -2756,7 +2756,7 @@ void restore_gamelog(NHFILE *);
 boolean restgamestate(NHFILE *);
 void restore_msghistory(NHFILE *);
 #endif
-extern void rest_adjust_levelflags(void);
+extern void rest_adjust_levelflags(long);
 extern void moves_to_relative_time(long *);
 extern void relative_time_to_moves(long *);
 extern boolean revision_increment(int, int, uchar *);

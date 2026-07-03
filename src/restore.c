@@ -1140,7 +1140,7 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
     Sfi_dest_area(nhfp, &svu.updest, "lev-updest");
     Sfi_dest_area(nhfp, &svd.dndest, "lev-dndest");
     Sfi_levelflags(nhfp, &svl.level.flags, "lev-level_flags");
-    rest_adjust_levelflags();
+    rest_adjust_levelflags(elapsed);
     if (svd.doors) {
         free(svd.doors);
         svd.doors = 0;
@@ -1348,11 +1348,13 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
 }
 
 void
-rest_adjust_levelflags(void)
+rest_adjust_levelflags(long elapsed)
 {
     /* adjust timestamps */
     relative_time_to_moves(&svl.level.flags.stasis_until);
+    svl.level.flags.stasis_until -= elapsed;
 }
+
 void
 moves_to_relative_time(long *timestamp)
 {
