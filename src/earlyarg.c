@@ -498,7 +498,7 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
 
             if (extended_opt) {
                 extended_opt++;
-		if (match_optname(extended_opt, "copy", 4, FALSE)) {
+                if (match_optname(extended_opt, "copy", 4, FALSE)) {
                     insert_into_pastebuf = TRUE;
                 } else if (match_optname(extended_opt, "dump", 4, FALSE)) {
                     /* version number plus enabled features and sanity
