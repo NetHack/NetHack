@@ -61,12 +61,19 @@ keep the player better-informed about status of the tether on their weapon
 don't overflow svp.plname on restore (pr #1570 by chasonr)
 monsters (including pets) aren't scared of the Sokoban rolling boulder traps
 fix a bug in which steeds would continuously gain movement points while
-        being ridden
+	being ridden
 when hero's behavior makes erinyes stronger, cap level at 49 rather than 50
 with inventory item action for leash, distingluish leash-in-use from empty one
 deafness check was missing from a shopkeeper message in ready_weapon()
 thrown ball travel did not check for regions (pr #1595 by copperwater)
 remove deprecated option --version:paste
+the timeout for stasis wasn't decrementing while off-level; ensure the elapsed
+	 time is taken into consideration upon return to the level
+Some optimizations of the glyph lookup - don't produce names for swallow
+	glyphs that can never appear to speed up the building of the
+	glyph index in populate_glyphname_hash_indices; build a sorted
+	index for loadsyms so that it can be searched with bsearch
+	(pr #1612 by chasonr)
 
 
 Platform- and/or Interface-Specific Fixes
@@ -156,7 +163,7 @@ libnh: rewrote sys/unix/hints/macOS.500: rewrote the libnh.a rule. The
 	(the tty windowport), which duplicated symbols from libnhmain.o /
 	winshim.o.
 libnh: sys/libnh/libnhmain.c: gate the emscripten-only code in get_nhuuid
-       with `#ifdef __EMSCRIPTEN__` instead of `#ifdef NHUUID`
+	with `#ifdef __EMSCRIPTEN__` instead of `#ifdef NHUUID`
 libnh: sys/unix/hints/macOS.500 in the WANT_LIBNH block, add an explicit
 	`recover: lua_support` dependency (gated by MAKEFILE_TOP).  When 
 	$(GAME) is overridden to empty, the regular `recover: $(GAME)` chain
@@ -182,7 +189,15 @@ MS-DOS: 16 color mode: Set the panning direction so CTRL-left and CTRL-right
 MS-DOS: makefont.lua was generating incorrect PSF fonts; there can be
 	multiple characters mapped to a single glyph, but the mappings
 	should be separated by FE bytes (pr #1581 by chasonr)
-MS-DOS: accept only single character font mappings (pr #1581 by chasonr) 
+MS-DOS: accept only single character font mappings (pr #1581 by chasonr)
+MS-DOS: add U+2299, U+2601 and U+2980 to the bundled fonts, so that all
+	symbols specified in the Extended2 symbol set are available;
+	also,a few more directives are added to the files, so that
+	FontForge can load them and display their contents
+	(pr #1610 by chasonr)
+MS-DOS: The 16 color mode loads the font specified in font_map, and accepts
+	it only if its size is 8 by 16 pixels; avoid a null dereference
+	if the font is not found (pr #1611 by chasonr)
 musl: musl libc does not have __sighandler_t so don't use it in the
 	macro definition for SIG_RET_TYPE with musl
 WASM: resolve some build failures in 'make CROSS_TO_WASM=1'

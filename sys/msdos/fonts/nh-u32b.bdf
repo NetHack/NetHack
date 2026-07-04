@@ -1,12 +1,21 @@
 STARTFONT 2.1
 FONTBOUNDINGBOX 16 32
-STARTPROPERTIES 3
+STARTPROPERTIES 8
 NOTICE "Additional characters to use with ter-u32b.bdf"
-COPYRIGHT "Copyright 2022 Ray Chason."
+COPYRIGHT "Copyright 2022, 2026 Ray Chason."
+NOTICE "Cloud glyph adapted from the uw-ptty0 font at"
+NOTICE "https://people.mpi-inf.mpg.de/~uwe/misc/uw-ttyp0/"
 NOTICE "NetHack may be freely redistributed.  See license for details."
+PIXEL_SIZE 32
+CHARSET_REGISTRY "ISO10646"
+CHARSET_ENCODING "1"
 ENDPROPERTIES
+CHARS 6
 STARTCHAR tripletilde
 ENCODING 8779
+SWIDTH 500 0
+DWIDTH 16 0
+BBX 16 32 0 -6
 BITMAP
 0000
 0000
@@ -41,8 +50,50 @@ BITMAP
 0000
 0000
 ENDCHAR
+STARTCHAR uni2299
+ENCODING 8857
+SWIDTH 500 0
+DWIDTH 16 0
+BBX 16 32 0 -6
+BITMAP
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+07E0
+1FF8
+381C
+6006
+6006
+C003
+C183
+C3C3
+C3C3
+C183
+C003
+6006
+6006
+381C
+1FF8
+07E0
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+ENDCHAR
 STARTCHAR uppereighth
 ENCODING 9620
+SWIDTH 500 0
+DWIDTH 16 0
+BBX 16 32 0 -6
 BITMAP
 FFFF
 FFFF
@@ -79,6 +130,9 @@ FFFF
 ENDCHAR
 STARTCHAR righteighth
 ENCODING 9621
+SWIDTH 500 0
+DWIDTH 16 0
+BBX 16 32 0 -6
 BITMAP
 0002
 0002
@@ -112,5 +166,83 @@ BITMAP
 0002
 0002
 0002
+ENDCHAR
+STARTCHAR uni2601
+ENCODING 9729
+SWIDTH 500 0
+DWIDTH 16 0
+BBX 16 32 0 -6
+BITMAP
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+00F0
+01FC                                                                                                                                                      
+03FC                                                                                                                                                      
+1F8E                                                                                                                                                      
+3F06                                                                                                                                                      
+7806                                                                                                                                                      
+6006                                                                                                                                                      
+6006                                                                                                                                                      
+600E                                                                                                                                                      
+7FFC                                                                                                                                                      
+3FFC                                                                                                                                                      
+1FF0 
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+ENDCHAR
+STARTCHAR uni2980
+ENCODING 10624
+SWIDTH 500 0
+DWIDTH 16 0
+BBX 16 32 0 -6
+BITMAP
+0000
+0000
+0000
+0000
+0000
+0000
+6318
+6318
+6318
+6318
+6318
+6318
+6318
+6318
+6318
+6318
+6318
+6318
+6318
+6318
+6318
+6318
+6318
+6318
+6318
+6318
+0000
+0000
+0000
+0000
+0000
+0000
 ENDCHAR
 ENDFONT

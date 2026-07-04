@@ -811,7 +811,7 @@ vga_Init(void)
     }
     free_font(psf_font);
     psf_font = load_font(font_name);
-    if (psf_font->width != 8 || psf_font->height != 16) {
+    if (psf_font != NULL && (psf_font->width != 8 || psf_font->height != 16)) {
         raw_printf("VGA mode only supports 8x16 fonts");
         free_font(psf_font);
         psf_font = NULL;
