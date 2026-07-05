@@ -4426,8 +4426,9 @@ is used for the role, then a random one will be automatically chosen.
 .lp ""
 On some systems, the default is the player's user name;
 on others, there is no default and the player will be prompted.
-The former can made to behave like the latter by specifying a generic name
-such as ``player''.  The GENERICUSERS= setting in sysconf controls wich
+The former can be made to behave like the latter by specifying a generic name
+such as ``player''.
+The GENERICUSERS= setting in sysconf controls which
 names are considered generic.
 Cannot be set with the \(oq\f(CRO\fP\(cq command.
 .lp "news    "
@@ -6296,6 +6297,9 @@ escape command (!).  The syntax is the same as WIZARDS.
 .lp
 EXPLORERS\ =\ A list of users who are allowed to use the explore mode.
 The syntax is the same as WIZARDS.
+.lp
+GENERICUSERS\ =\ A list of user names that should prompt ``Who are you?''
+rather than become a character's name.
 .lp
 MSGHANDLER\ =\ A path and filename of executable.  Whenever a message-window
 message is shown, NetHack runs this program.  The program will get
