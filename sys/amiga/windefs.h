@@ -65,9 +65,6 @@
 #define SEL_ITEM 1 /* If this is a select item, slot is 1 else 0 */
 #define SOFF 2     /* The string starts here.  */
 
-#undef NULL
-#define NULL 0L
-
 /*
  * Versions we need of various libraries.  We can't use LIBRARY_VERSION
  * as defined in <exec/types.h> because some of the libraries we need

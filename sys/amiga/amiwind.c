@@ -416,7 +416,7 @@ ProcessMessage(struct IntuiMessage *message)
         while (thismenu != MENUNULL) {
             item = ItemAddress(MenuStrip, (ULONG) thismenu);
             if (KbdBuffered < KBDBUFFER)
-                BufferQueueChar((char) (GTMENUITEM_USERDATA(item)));
+                BufferQueueChar((char) (ULONG) GTMENUITEM_USERDATA(item));
             thismenu = item->NextSelect;
         }
     } break;
@@ -648,7 +648,7 @@ amii_cleanup(void)
                     sizeof(struct EasyStruct), 0, "Nethack Problem",
                     "Can't Close Screen, Close Visiting Windows", "Okay"
                 };
-                EasyRequest(NULL, &easy, NULL, NULL);
+                EasyRequestArgs(NULL, &easy, NULL, NULL);
             }
         } else {
             CloseScreen(HackScreen);

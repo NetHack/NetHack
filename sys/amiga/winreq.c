@@ -18,17 +18,17 @@ SHORT BorderVectors1[] = { 0, 0, 57, 0, 57, 11, 0, 11, 0, 0 };
 struct Border Border1 = { -1, -1, 3, 0, JAM1, 5, BorderVectors1, NULL };
 struct IntuiText IText1 = { 3, 0, JAM1, 4, 1, NULL, (UBYTE *) "Cancel",
                             NULL };
-struct Gadget Gadget2 = { NULL, 9, 15, 56, 10, NULL, RELVERIFY, BOOLGADGET,
-                          (APTR) &Border1, NULL, &IText1, NULL, NULL, 1,
+struct Gadget Gadget2 = { NULL, 9, 15, 56, 10, 0, RELVERIFY, BOOLGADGET,
+                          (APTR) &Border1, NULL, &IText1, 0, NULL, 1,
                           NULL };
 UBYTE StrStringSIBuff[BUFSZ];
 struct StringInfo StrStringSInfo = { StrStringSIBuff, UNDOBUFFER, 0, BUFSZ, 0,
                                      0, 0, 0, 0, 0, 0, 0, NULL };
 SHORT BorderVectors2[] = { 0, 0, 439, 0, 439, 11, 0, 11, 0, 0 };
 struct Border Border2 = { -1, -1, 3, 0, JAM1, 5, BorderVectors2, NULL };
-struct Gadget String = { &Gadget2, 77, 15, 438, 10, NULL,
+struct Gadget String = { &Gadget2, 77, 15, 438, 10, 0,
                          RELVERIFY + STRINGCENTER, STRGADGET, (APTR) &Border2,
-                         NULL, NULL, NULL, (APTR) &StrStringSInfo, 2, NULL };
+                         NULL, NULL, 0, (APTR) &StrStringSInfo, 2, NULL };
 
 #define StrString \
     ((char *) (((struct StringInfo *) (String.SpecialInfo))->Buffer))
@@ -540,7 +540,7 @@ filecopy(char *from, char *to)
         if (IntuitionBase->LibNode.lib_Version >= 37)
             i = System(buf, NULL);
         else
-            Execute(buf, NULL, NULL);
+            Execute(buf, 0, 0);
         free(buf);
     } else {
         return (-1);
@@ -728,14 +728,14 @@ amii_setpens(int count)
             long args[2];
             args[0] = count;
             args[1] = amii_numcolors;
-            if (EasyRequest(NULL, &ea2, NULL, args) == 1) {
+            if (EasyRequestArgs(NULL, &ea2, NULL, (APTR) args) == 1) {
                 memcpy(sysflags.amii_curmap, amii_initmap,
                        amii_numcolors * sizeof(amii_initmap[0]));
             }
         }
     } else if (IntuitionBase && IntuitionBase->LibNode.lib_Version >= 37) {
         if (count != amii_numcolors) {
-            if (EasyRequest(NULL, &ea, NULL, NULL) == 1) {
+            if (EasyRequestArgs(NULL, &ea, NULL, NULL) == 1) {
                 memcpy(sysflags.amii_curmap, amii_initmap,
                        amii_numcolors * sizeof(amii_initmap[0]));
             }

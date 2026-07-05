@@ -135,7 +135,7 @@ struct Image Image1 = { 0, 0, 7, 102, 0, NULL, 0x0000, 0x0000, NULL };
 struct Gadget MenuScroll = { NULL, -15, 10, 15, -19, GRELRIGHT | GRELHEIGHT,
                              RELVERIFY | FOLLOWMOUSE | RIGHTBORDER
                                  | GADGIMMEDIATE | RELVERIFY,
-                             PROPGADGET, (APTR) &Image1, NULL, NULL, NULL,
+                             PROPGADGET, (APTR) &Image1, NULL, NULL, 0,
                              (APTR) &PropScroll, 1, NULL };
 
 /* This gadget is for the message window... */
@@ -146,7 +146,7 @@ struct Image MsgImage1 = { 0, 0, 7, 102, 0, NULL, 0x0000, 0x0000, NULL };
 struct Gadget MsgScroll = { NULL, -15, 10, 14, -19, GRELRIGHT | GRELHEIGHT,
                             RELVERIFY | FOLLOWMOUSE | RIGHTBORDER
                                 | GADGIMMEDIATE | RELVERIFY,
-                            PROPGADGET, (APTR) &MsgImage1, NULL, NULL, NULL,
+                            PROPGADGET, (APTR) &MsgImage1, NULL, NULL, 0,
                             (APTR) &MsgPropScroll, 1, NULL };
 
 int wincnt = 0; /* # of nh windows opened */
