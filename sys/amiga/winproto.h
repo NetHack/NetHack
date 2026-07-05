@@ -105,7 +105,7 @@ void amii_wait_synch(void);
 void amii_setclipped(void);
 void amii_cliparound(int x, int y);
 void amii_set_text_font(char *font, int size);
-BitMapHeader ReadImageFile(const char *, struct BitMap **);
+boolean ReadImageFile(const char *, struct BitMap **, BitMapHeader *);
 void FreeImageFile(struct BitMap **);
 BitMapHeader ReadTileImageFiles(void);
 void FreeTileImageFiles(void);

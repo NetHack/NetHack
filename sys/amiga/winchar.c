@@ -20,7 +20,7 @@
 int main(int, char **);
 struct BitMap *MyAllocBitMap(int, int, int, long);
 void MyFreeBitMap(struct BitMap *);
-BitMapHeader ReadImageFile(const char *, struct BitMap **);
+boolean ReadImageFile(const char *, struct BitMap **, BitMapHeader *);
 void FreeImageFile(struct BitMap **);
 void amiv_flush_glyph_buffer(struct Window *);
 void amiv_lprint_glyph(winid, int, int);
@@ -71,15 +71,17 @@ struct PDAT pictdata;
 char *tilefile;
 struct BitMap *tileimg, *tile;
 
+static char image_error[BUFSZ];
+
 /*
  * Read a single BMAP IFF file into a BitMap.
- * Returns the BitMapHeader; *bmp receives the bitmap.
+ * Returns TRUE on success; *bmp receives the bitmap, *bmhdp the header.
  * Caller frees via FreeImageFile().
  */
-BitMapHeader
-ReadImageFile(const char *filename, struct BitMap **bmp)
+boolean
+ReadImageFile(const char *filename, struct BitMap **bmp, BitMapHeader *bmhdp)
 {
-    BitMapHeader *bmhd, bmhds = { 0 };
+    BitMapHeader *bmhd;
     int j, np;
     long err;
     struct IFFHandle *iff = NULL;
@@ -89,8 +91,10 @@ ReadImageFile(const char *filename, struct BitMap **bmp)
     long errcode = 0;
 
     IFFParseBase = OpenLibrary("iffparse.library", 0L);
-    if (!IFFParseBase)
-        panic("No iffparse.library");
+    if (!IFFParseBase) {
+        Strcpy(image_error, "No iffparse.library");
+        return FALSE;
+    }
 
     iff = AllocIFF();
     if (!iff) {
@@ -165,7 +169,7 @@ ReadImageFile(const char *filename, struct BitMap **bmp)
         ReadChunkBytes(iff, (*bmp)->Planes[j],
                        RASSIZE(bmhd->w, bmhd->h));
 
-    bmhds = *bmhd;
+    *bmhdp = *bmhd;
 
 cleanup:
     if (iff_opened)
@@ -177,10 +181,13 @@ cleanup:
     CloseLibrary(IFFParseBase);
     IFFParseBase = NULL;
 
-    if (errfmt)
-        panic(errfmt, filename, errcode);
+    if (errfmt) {
+        Snprintf(image_error, sizeof image_error, errfmt, filename,
+                 errcode);
+        return FALSE;
+    }
 
-    return bmhds;
+    return TRUE;
 }
 
 void
@@ -197,7 +204,8 @@ ReadTileImageFiles(void)
 {
     BitMapHeader bmhds;
 
-    bmhds = ReadImageFile(tilefile, &tileimg);
+    if (!ReadImageFile(tilefile, &tileimg, &bmhds))
+        panic("%s", image_error);
 
     tile = MyAllocBitMap(pictdata.xsize, pictdata.ysize,
                 pictdata.nplanes + amii_extraplanes,
