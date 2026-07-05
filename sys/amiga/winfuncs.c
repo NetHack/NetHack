@@ -1573,7 +1573,8 @@ amii_display_nhwindow(winid win, boolean blocking)
     } else if (cw->type == NHW_MAP) {
         amii_end_glyphout(win);
         /* Do more if it is time... */
-        if (blocking == TRUE && amii_wins[WIN_MESSAGE]->curx) {
+        if (blocking == TRUE && WIN_MESSAGE != WIN_ERR
+            && amii_wins[WIN_MESSAGE] && amii_wins[WIN_MESSAGE]->curx) {
             outmore(amii_wins[WIN_MESSAGE]);
         }
     }
@@ -1968,7 +1969,10 @@ amii_bell(void)
 void
 removetopl(int cnt)
 {
-    struct amii_WinDesc *cw = amii_wins[WIN_MESSAGE];
+    struct amii_WinDesc *cw;
+
+    if (WIN_MESSAGE == WIN_ERR || (cw = amii_wins[WIN_MESSAGE]) == NULL)
+        return;
     /* NB - this is sufficient for
      * yn_function, but that's it
      */
@@ -2228,6 +2232,10 @@ amii_cliparound(int x, int y)
     if (!clipping) { /* And 1 in anycase, cleaner, simpler, quicker */
         return;
     }
+
+    if (WIN_MAP == WIN_ERR || !amii_wins[WIN_MAP]
+        || !amii_wins[WIN_MAP]->win)
+        return;
 
     if (Is_rogue_level(&u.uz)) {
         struct Window *w = amii_wins[WIN_MAP]->win;
