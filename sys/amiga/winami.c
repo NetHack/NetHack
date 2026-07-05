@@ -58,7 +58,7 @@ long amii_scrnmode;
 struct window_procs amii_procs = { WPID(amii), AMI_WIN_PROCS_BODY };
 struct window_procs amiv_procs = { WPID(amiv), AMI_WIN_PROCS_BODY };
 
-unsigned short amii_initmap[AMII_MAXCOLORS];
+unsigned short amii_workmap[AMII_MAXCOLORS];
 /* Default pens used unless user overides in nethack.cnf. */
 unsigned short amii_init_map[AMII_MAXCOLORS] = {
     0x0000, /* color #0  C_BLACK    */

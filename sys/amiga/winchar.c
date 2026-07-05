@@ -145,7 +145,7 @@ ReadImageFile(const char *filename, struct BitMap **bmp, BitMapHeader *bmhdp)
     if (prop) {
         unsigned char *cmap = prop->sp_Data;
         for (j = 0; j < (1UL << np) * 3; j += 3) {
-            amii_initmap[j / 3] =
+            amii_workmap[j / 3] =
                 amiv_init_map[j / 3] =
                     ((cmap[j+0] >> 4) << 8)
                   | ((cmap[j+1] >> 4) << 4)

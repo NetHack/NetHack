@@ -729,20 +729,20 @@ amii_setpens(int count)
             args[0] = count;
             args[1] = amii_numcolors;
             if (EasyRequestArgs(NULL, &ea2, NULL, (APTR) args) == 1) {
-                memcpy(sysflags.amii_curmap, amii_initmap,
-                       amii_numcolors * sizeof(amii_initmap[0]));
+                memcpy(sysflags.amii_curmap, amii_workmap,
+                       amii_numcolors * sizeof(amii_workmap[0]));
             }
         }
     } else if (IntuitionBase && IntuitionBase->LibNode.lib_Version >= 37) {
         if (count != amii_numcolors) {
             if (EasyRequestArgs(NULL, &ea, NULL, NULL) == 1) {
-                memcpy(sysflags.amii_curmap, amii_initmap,
-                       amii_numcolors * sizeof(amii_initmap[0]));
+                memcpy(sysflags.amii_curmap, amii_workmap,
+                       amii_numcolors * sizeof(amii_workmap[0]));
             }
         }
     } else if (count != amii_numcolors) {
-        memcpy(sysflags.amii_curmap, amii_initmap,
-               amii_numcolors * sizeof(amii_initmap[0]));
+        memcpy(sysflags.amii_curmap, amii_workmap,
+               amii_numcolors * sizeof(amii_workmap[0]));
     }
 
     /* If the pens are set in NetHack.cnf, we can get called before

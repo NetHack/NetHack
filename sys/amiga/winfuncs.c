@@ -91,7 +91,7 @@ ami_wininit_data(int dir)
         mysize = 8;
 
         amii_libvers = LIBRARY_FONT_VERSION;
-        memcpy(amii_initmap, amii_init_map, sizeof(amii_initmap));
+        memcpy(amii_workmap, amii_init_map, sizeof(amii_workmap));
     } else {
         mxsize = 16;
         mysize = 16;
@@ -124,7 +124,7 @@ ami_wininit_data(int dir)
         amii_otherBPen = C_BLACK;
         amii_libvers = LIBRARY_TILE_VERSION;
 
-        memcpy(amii_initmap, amiv_init_map, sizeof(amii_initmap));
+        memcpy(amii_workmap, amiv_init_map, sizeof(amii_workmap));
     }
     memcpy(sysflags.amii_dripens, amii_defpens,
            sizeof(sysflags.amii_dripens));
@@ -1227,8 +1227,8 @@ amii_init_nhwindows(int *argcp, char **argv)
         }
         amii_bmhd = ReadTileImageFiles();
     } else
-        memcpy(amii_initmap, amii_init_map, sizeof(amii_initmap));
-    memcpy(sysflags.amii_curmap, amii_initmap, sizeof(sysflags.amii_curmap));
+        memcpy(amii_workmap, amii_init_map, sizeof(amii_workmap));
+    memcpy(sysflags.amii_curmap, amii_workmap, sizeof(sysflags.amii_curmap));
 
     /* Find out how deep the screen needs to be, 32 planes is enough! */
     for (i = 0; i < 32; ++i) {
