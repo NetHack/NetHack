@@ -12,8 +12,7 @@ char *amii_get_color_string(void);
 void amii_getlin(const char *prompt, char *bufp);
 void getlind(const char *prompt, char *bufp, const char *dflt);
 int filecopy(char *from, char *to);
-char *basename(char *str);
-char *dirname(char *str);
+void nh_dirname(const char *str, char *dir, size_t dirsize);
 
 /* winstr.c */
 void amii_putstr(winid window, int attr, const char *str);

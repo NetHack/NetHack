@@ -189,9 +189,7 @@ EditColor(void)
 
                     {
                         size_t olen;
-                        strncpy(oname, dirname((char *) configfile),
-                                sizeof(oname) - 1);
-                        oname[sizeof(oname) - 1] = '\0';
+                        nh_dirname(configfile, oname, sizeof oname);
                         olen = strlen(oname);
                         if (olen > 0 && oname[olen - 1] != ':') {
                             Snprintf(nname, sizeof nname,
@@ -512,38 +510,21 @@ EditClipping(void)
     }
 }
 
-char *
-dirname(char *str)
+void
+nh_dirname(const char *str, char *dir, size_t dirsize)
 {
-    static char dir[300];
     char *t;
 
-    strncpy(dir, str, sizeof(dir) - 1);
-    dir[sizeof(dir) - 1] = '\0';
+    strncpy(dir, str, dirsize - 1);
+    dir[dirsize - 1] = '\0';
 
     t = strrchr(dir, '/');
-    if (!t)
-        t = strrchr(dir, ':');
-    if (!t)
-        dir[0] = '\0';
-    else
+    if (t)
         *t = '\0';
-    return (dir);
-}
-
-char *
-basename(char *str)
-{
-    char *t;
-
-    t = strrchr(str, '/');
-    if (!t)
-        t = strrchr(str, ':');
-    if (!t)
-        t = str;
+    else if ((t = strrchr(dir, ':')) != 0)
+        t[1] = '\0';
     else
-        ++t;
-    return (t);
+        dir[0] = '\0';
 }
 
 int
