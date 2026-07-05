@@ -458,7 +458,7 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
         /* Process window messages */
 
         WaitPort(w->UserPort);
-        while (imsg = (struct IntuiMessage *) GetMsg(w->UserPort)) {
+        while ((imsg = (struct IntuiMessage *) GetMsg(w->UserPort)) != NULL) {
             class = imsg->Class;
             code = imsg->Code;
             mics = imsg->Micros;

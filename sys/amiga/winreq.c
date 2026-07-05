@@ -128,7 +128,8 @@ EditColor(void)
     while (!done) {
         WaitPort(nw->UserPort);
 
-        while (imsg = (struct IntuiMessage *) GetMsg(nw->UserPort)) {
+        while ((imsg = (struct IntuiMessage *) GetMsg(nw->UserPort))
+               != NULL) {
             gd = (struct Gadget *) imsg->IAddress;
             code = imsg->Code;
             class = imsg->Class;
@@ -405,7 +406,8 @@ EditClipping(void)
     while (!done) {
         WaitPort(nw->UserPort);
 
-        while (imsg = (struct IntuiMessage *) GetMsg(nw->UserPort)) {
+        while ((imsg = (struct IntuiMessage *) GetMsg(nw->UserPort))
+               != NULL) {
             gd = (struct Gadget *) imsg->IAddress;
             code = imsg->Code;
             class = imsg->Class;

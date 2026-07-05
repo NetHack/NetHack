@@ -132,7 +132,7 @@ CloseShWindow(struct Window *win)
     /* Flush all messages for all windows to avoid typeahead and other
      * similar problems...
      */
-    while (msg = (struct IntuiMessage *) GetMsg(win->UserPort))
+    while ((msg = (struct IntuiMessage *) GetMsg(win->UserPort)) != NULL)
         ReplyMsg((struct Message *) msg);
     KbdBuffered = 0;
     win->UserPort = (struct MsgPort *) 0;
@@ -626,7 +626,7 @@ amii_cleanup(void)
     /* Strip messages before deleting the port */
     if (HackPort) {
         Forbid();
-        while (msg = (struct IntuiMessage *) GetMsg(HackPort))
+        while ((msg = (struct IntuiMessage *) GetMsg(HackPort)) != NULL)
             ReplyMsg((struct Message *) msg);
         Permit();
         kill_nhwindows(1);
@@ -743,14 +743,15 @@ GetFMsg(struct MsgPort *port)
 {
     struct IntuiMessage *msg, *succ, *succ1;
 
-    if (msg = (struct IntuiMessage *) GetMsg(port)) {
+    if ((msg = (struct IntuiMessage *) GetMsg(port)) != NULL) {
         if (!sysflags.amiflush)
             return ((struct Message *) msg);
         if (msg->Class == RAWKEY) {
             Forbid();
             succ = (struct IntuiMessage *) (port->mp_MsgList.lh_Head);
-            while (succ1 = (struct IntuiMessage *) (succ->ExecMessage.mn_Node
-                                                        .ln_Succ)) {
+            while ((succ1 = (struct IntuiMessage *) (succ->ExecMessage
+                                                         .mn_Node.ln_Succ))
+                   != NULL) {
                 if (succ->Class == RAWKEY) {
                     Remove((struct Node *) succ);
                     ReplyMsg((struct Message *) succ);

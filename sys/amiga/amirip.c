@@ -241,12 +241,13 @@ amii_outrip(winid tmpwin, int how, time_t when)
     dofade(0, 16, 1);
 
     /* Flush all messages to avoid typeahead */
-    while (imsg = (struct IntuiMessage *) GetMsg(ripwin->UserPort))
+    while ((imsg = (struct IntuiMessage *) GetMsg(ripwin->UserPort)) != NULL)
         ReplyMsg((struct Message *) imsg);
     done = 0;
     while (!done) {
         WaitPort(ripwin->UserPort);
-        while (imsg = (struct IntuiMessage *) GetMsg(ripwin->UserPort)) {
+        while ((imsg = (struct IntuiMessage *) GetMsg(ripwin->UserPort))
+               != NULL) {
             switch (imsg->Class) {
             case MOUSEBUTTONS:
             case VANILLAKEY:
@@ -265,7 +266,8 @@ cleanup:
     /* free everything */
     if (ripwin) {
         Forbid();
-        while (imsg = (struct IntuiMessage *) GetMsg(ripwin->UserPort))
+        while ((imsg = (struct IntuiMessage *) GetMsg(ripwin->UserPort))
+               != NULL)
             ReplyMsg((struct Message *) imsg);
         Permit();
         CloseWindow(ripwin);

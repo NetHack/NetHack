@@ -524,7 +524,7 @@ amii_yn_function(const char *query, const char *resp, char def)
     char prompt[BUFSZ + QBUFSZ + 16];
     struct amii_WinDesc *cw;
 
-    if (cw = amii_wins[WIN_MESSAGE])
+    if ((cw = amii_wins[WIN_MESSAGE]) != NULL)
         cw->disprows = 0;
     if (resp) {
         char *rb, respbuf[QBUFSZ];
@@ -660,11 +660,11 @@ amii_display_file(const char *fn, boolean complain)
     win = amii_create_nhwindow(NHW_TEXT);
 
     /* Set window title to file name */
-    if (cw = amii_wins[win])
+    if ((cw = amii_wins[win]) != NULL)
         cw->morestr = (char *) fn;
 
     while (dlb_fgets(buf, sizeof(buf), fp) != NULL) {
-        if (t = strchr(buf, '\n'))
+        if ((t = strchr(buf, '\n')) != NULL)
             *t = 0;
         amii_putstr(win, 0, buf);
     }

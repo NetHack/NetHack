@@ -971,7 +971,7 @@ amii_init_nhwindows(int *argcp, char **argv)
 
     amiIDisplay->xpix = 0;
     if (IntuitionBase->LibNode.lib_Version >= 37) {
-        if (wbscr = LockPubScreen("Workbench")) {
+        if ((wbscr = LockPubScreen("Workbench")) != NULL) {
             amiIDisplay->xpix = wbscr->Width;
             amiIDisplay->ypix = wbscr->Height;
             UnlockPubScreen(NULL, wbscr);
@@ -1020,7 +1020,8 @@ amii_init_nhwindows(int *argcp, char **argv)
      *  Load the fonts that we need.
      */
 
-    if (DiskfontBase = OpenLibrary("diskfont.library", amii_libvers)) {
+    if ((DiskfontBase = OpenLibrary("diskfont.library", amii_libvers))
+        != NULL) {
         extern UBYTE HackFontName[], HackFontPath[];
 
         Hack80.ta_Name = HackFontPath;
@@ -1415,7 +1416,7 @@ amii_clear_nhwindow(winid win)
         amii_clear_nhwindow(WIN_OVER);
     }
 
-    if (w = cw->win)
+    if ((w = cw->win) != NULL)
         SetDrMd(w->RPort, JAM2);
     else
         return;
@@ -2363,6 +2364,6 @@ void
 flushIDCMP(struct MsgPort *port)
 {
     struct Message *msg;
-    while (msg = GetMsg(port))
+    while ((msg = GetMsg(port)) != NULL)
         ReplyMsg(msg);
 }
