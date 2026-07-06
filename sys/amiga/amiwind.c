@@ -50,7 +50,7 @@ WEVENT lastevent;
 struct Library *DiskfontBase;
 #endif
 
-#define KBDBUFFER 10
+#define KBDBUFFER 32
 static unsigned char KbdBuffer[KBDBUFFER];
 int KbdBuffered;
 
