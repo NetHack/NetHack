@@ -31,6 +31,7 @@ OPTIONS=hilite_status: hitpoints/100%/gray/<100%/green/<66%/yellow
 OPTIONS=hilite_status: hitpoints/<50%/orange/<33%/red&bold/<15%/red&inverse
 OPTIONS=hilite_status: power/<50%/orange/<25%/red&bold
 OPTIONS=hilite_status: characteristics/up/green/down/red
+OPTIONS=hilite_status: armor-class/down/green/up/red
 OPTIONS=hilite_status: condition/major/orange&inverse
 
 # Menu colors: highlight blessed/cursed status in inventory listings.
