@@ -60,6 +60,8 @@ static unsigned long vesa_DoublePixels(unsigned long);
 static unsigned long vesa_TriplePixels(unsigned long);
 static void vesa_WriteStr(const char *, int, int, int, int);
 static unsigned char __far *vesa_FontPtrs(void);
+static unsigned char *vesa_tile(unsigned);
+static unsigned char *vesa_oview_tile(unsigned);
 /* static void vesa_process_tile(struct TileImage *tile); */
 
 #ifdef POSITIONBAR
@@ -849,7 +851,7 @@ vesa_redrawmap(void)
         for (cy = 0; cy < ROWNO; ++cy) {
             for (py = 0; py < vesa_oview_height; ++py) {
                 for (cx = 0; cx < COLNO; ++cx) {
-                    tile = vesa_oview_tiles[map[cy][cx].tileidx];
+                    tile = vesa_oview_tile(map[cy][cx].tileidx);
                     vesa_WritePixelRow(offset + p_row_width * cx, tile + p_row_width * py, p_row_width);
                 }
                 x = COLNO * vesa_oview_width;
@@ -869,7 +871,7 @@ vesa_redrawmap(void)
         for (cy = clipy; cy <= (unsigned) clipymax && cy < ROWNO; ++cy) {
             for (py = 0; py < (unsigned) iflags.wc_tile_height; ++py) {
                 for (cx = clipx; cx <= (unsigned) clipxmax && cx < COLNO; ++cx) {
-                    tile = vesa_tiles[map[cy][cx].tileidx];
+                    tile = vesa_tile(map[cy][cx].tileidx);
                     vesa_WritePixelRow(offset + p_row_width * (cx - clipx), tile + p_row_width * py, p_row_width);
                 }
                 x = (cx - clipx) * iflags.wc_tile_width;
@@ -1053,8 +1055,6 @@ vesa_Init(void)
 {
     static boolean inited = FALSE;
     const struct Pixel *paletteptr;
-    unsigned i;
-    unsigned num_pixels, num_oview_pixels;
     const char *tile_file;
     const char *font_name;
     int tilefailure = 0;
@@ -1186,30 +1186,32 @@ vesa_Init(void)
 
     /* Process tiles for the current video mode */
     vesa_tiles = (unsigned char **) alloc(total_tiles_used * sizeof(void *));
+    memset(vesa_tiles, 0, total_tiles_used * sizeof(void *));
     vesa_oview_tiles = (unsigned char **) alloc(total_tiles_used * sizeof(void *));
-    num_pixels = iflags.wc_tile_width * iflags.wc_tile_height;
-    num_oview_pixels = vesa_oview_width * vesa_oview_height;
+    memset(vesa_oview_tiles, 0, total_tiles_used * sizeof(void *));
     set_tile_type(vesa_pixel_size > 8);
-    for (i = 0; i < (unsigned) total_tiles_used; ++i) {
-        const struct TileImage *tile = get_tile(i);
-        struct TileImage *ov_tile = stretch_tile(tile, vesa_oview_width, vesa_oview_height);
+}
+
+RESTORE_WARNING_FORMAT_NONLITERAL
+
+/* Return processed pixels for a normal tile */
+static unsigned char *
+vesa_tile(unsigned index)
+{
+    if (vesa_tiles[index] == NULL) {
+        unsigned num_pixels = iflags.wc_tile_width * iflags.wc_tile_height;
+        const struct TileImage *tile = get_tile(index);
         unsigned j;
         unsigned char *t_img = (unsigned char *) alloc(num_pixels * vesa_pixel_bytes);
-        unsigned char *ot_img = (unsigned char *) alloc(num_oview_pixels * vesa_pixel_bytes);
-        vesa_tiles[i] = t_img;
-        vesa_oview_tiles[i] = ot_img;
+        vesa_tiles[index] = t_img;
         switch (vesa_pixel_bytes) {
         case 1:
             memcpy(t_img, tile->indexes, num_pixels);
-            memcpy(ot_img, ov_tile->indexes, num_oview_pixels);
             break;
 
         case 2:
             for (j = 0; j < num_pixels; ++j) {
                 ((uint16_t *)t_img)[j] = vesa_MakeColor(tile->pixels[j]);
-            }
-            for (j = 0; j < num_oview_pixels; ++j) {
-                ((uint16_t *)ot_img)[j] = vesa_MakeColor(ov_tile->pixels[j]);
             }
             break;
 
@@ -1220,6 +1222,42 @@ vesa_Init(void)
                 t_img[3*j + 1] = (color >>  8) & 0xFF;
                 t_img[3*j + 2] = (color >> 16) & 0xFF;
             }
+            break;
+
+        case 4:
+            for (j = 0; j < num_pixels; ++j) {
+                ((uint32_t *)t_img)[j] = vesa_MakeColor(tile->pixels[j]);
+            }
+            break;
+        }
+    }
+
+    return vesa_tiles[index];
+}
+
+/* Return processed pixels for an overview tile */
+static unsigned char *
+vesa_oview_tile(unsigned index)
+{
+    if (vesa_oview_tiles[index] == NULL) {
+        unsigned num_oview_pixels = vesa_oview_width * vesa_oview_height;
+        const struct TileImage *tile = get_tile(index);
+        struct TileImage *ov_tile = stretch_tile(tile, vesa_oview_width, vesa_oview_height);
+        unsigned j;
+        unsigned char *ot_img = (unsigned char *) alloc(num_oview_pixels * vesa_pixel_bytes);
+        vesa_oview_tiles[index] = ot_img;
+        switch (vesa_pixel_bytes) {
+        case 1:
+            memcpy(ot_img, ov_tile->indexes, num_oview_pixels);
+            break;
+
+        case 2:
+            for (j = 0; j < num_oview_pixels; ++j) {
+                ((uint16_t *)ot_img)[j] = vesa_MakeColor(ov_tile->pixels[j]);
+            }
+            break;
+
+        case 3:
             for (j = 0; j < num_oview_pixels; ++j) {
                 unsigned long color = vesa_MakeColor(ov_tile->pixels[j]);
                 ot_img[3*j + 0] =  color        & 0xFF;
@@ -1229,9 +1267,6 @@ vesa_Init(void)
             break;
 
         case 4:
-            for (j = 0; j < num_pixels; ++j) {
-                ((uint32_t *)t_img)[j] = vesa_MakeColor(tile->pixels[j]);
-            }
             for (j = 0; j < num_oview_pixels; ++j) {
                 ((uint32_t *)ot_img)[j] = vesa_MakeColor(ov_tile->pixels[j]);
             }
@@ -1239,10 +1274,9 @@ vesa_Init(void)
         }
         free_tile(ov_tile);
     }
-    free_tiles();
-}
 
-RESTORE_WARNING_FORMAT_NONLITERAL
+    return vesa_oview_tiles[index];
+}
 
 /* Set the size of the map viewport */
 static void
@@ -1314,6 +1348,7 @@ vesa_Finish(void)
     }
     free(vesa_tiles);
     free(vesa_oview_tiles);
+    free_tiles();
     vesa_SwitchMode(MODETEXT);
     windowprocs.win_cliparound = tty_cliparound;
     g_attribute = attrib_text_normal;
@@ -1873,11 +1908,11 @@ vesa_DisplayCell(int tilenum, int col, int row)
     unsigned p_row_width;
 
     if (iflags.over_view) {
-        tile = vesa_oview_tiles[tilenum];
+        tile = vesa_oview_tile(tilenum);
         t_width = vesa_oview_width;
         t_height = vesa_oview_height;
     } else {
-        tile = vesa_tiles[tilenum];
+        tile = vesa_tile(tilenum);
         t_width = iflags.wc_tile_width;
         t_height = iflags.wc_tile_height;
     }

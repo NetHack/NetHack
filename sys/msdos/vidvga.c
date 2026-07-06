@@ -213,8 +213,8 @@ int vp[SCREENPLANES] = { 8, 4, 2, 1 };
 #endif
 int vp2[SCREENPLANES] = { 1, 2, 4, 8 };
 
-static struct planar_cell_struct planecell;
-static struct overview_planar_cell_struct planecell_O;
+static struct planar_cell_struct **cell_cache;
+static struct overview_planar_cell_struct **cell_cache_O;
 
 /* static int  g_attribute; */ /* Current attribute to use */
 
@@ -410,6 +410,7 @@ vga_xputg(const glyph_info *glyphinfo,
         vga_WriteChar(ch, col, row, attr);
     } else if (!iflags.over_view) {
         if ((col >= clipx) && (col <= clipxmax)) {
+            struct planar_cell_struct planecell;
             read_planar_tile(glyphnum, &planecell);
             if (map[ry][col].special)
                 decal_planar(&planecell, special);
@@ -426,6 +427,7 @@ vga_xputg(const glyph_info *glyphinfo,
             }
         }
     } else {
+        struct overview_planar_cell_struct planecell_O;
         read_planar_tile_O(glyphnum, &planecell_O);
         vga_DisplayCell_O(&planecell_O, col, row);
     }
@@ -512,11 +514,13 @@ vga_redrawmap(boolean clearfirst)
             } else {
                 t = map[y][x].glyph;
                 if (!iflags.over_view) {
+                    struct planar_cell_struct planecell;
                     read_planar_tile(t, &planecell);
                     if (map[y][x].special)
                         decal_planar(&planecell, map[y][x].special);
                     vga_DisplayCell(&planecell, x - clipx, y + TOP_MAP_ROW);
                 } else {
+                    struct overview_planar_cell_struct planecell_O;
                     read_planar_tile_O(t, &planecell_O);
                     vga_DisplayCell_O(&planecell_O, x, y + TOP_MAP_ROW);
                 }
@@ -643,6 +647,7 @@ boolean left;
     }
     for (y = 0; y < ROWNO; ++y) {
         for (x = i; x < j; x += 2) {
+            struct planar_cell_struct planecell;
             t = map[y][x].glyph;
             read_planar_tile(t, &planecell);
             if (map[y][x].special)
@@ -656,47 +661,69 @@ boolean left;
 static void
 read_planar_tile(unsigned glyph, struct planar_cell_struct *cell)
 {
+    struct planar_cell_struct *pcell;
     unsigned char indexes[TILE_Y][TILE_X];
     unsigned plane, y, byte, bit;
+    int tilenum = glyphmap[glyph].tileidx;
 
-    read_tile_indexes(glyph, indexes);
-    /* cell->plane[0..3].image[0..15][0..1] */
-    for (plane = 0; plane < SCREENPLANES; ++plane) {
-        for (y = 0; y < TILE_Y; ++y) {
-            for (byte = 0; byte < MAX_BYTES_PER_CELL; ++byte) {
-                unsigned char b = 0;
-                for (bit = 0; bit < 8; ++bit) {
-                    unsigned char x = byte * 8 + bit;
-                    unsigned char i = indexes[y][x];
-                    b <<= 1;
-                    if (i & (0x8 >> plane)) b |= 1;
+    /* Get the processed tile from the cache if we can */
+    pcell = cell_cache[tilenum];
+    if (pcell == NULL) {
+        /* Process the tile */
+        pcell = (struct planar_cell_struct *) alloc(sizeof(*pcell));
+        cell_cache[tilenum] = pcell;
+        read_tile_indexes(glyph, indexes);
+        /* pcell->plane[0..3].image[0..15][0..1] */
+        for (plane = 0; plane < SCREENPLANES; ++plane) {
+            for (y = 0; y < TILE_Y; ++y) {
+                for (byte = 0; byte < MAX_BYTES_PER_CELL; ++byte) {
+                    unsigned char b = 0;
+                    for (bit = 0; bit < 8; ++bit) {
+                        unsigned char x = byte * 8 + bit;
+                        unsigned char i = indexes[y][x];
+                        b <<= 1;
+                        if (i & (0x8 >> plane)) b |= 1;
+                    }
+                    pcell->plane[plane].image[y][byte] = b;
                 }
-                cell->plane[plane].image[y][byte] = b;
             }
         }
     }
+
+    *cell = *pcell;
 }
 
 static void
 read_planar_tile_O(unsigned glyph, struct overview_planar_cell_struct *cell)
 {
+    struct overview_planar_cell_struct *pcell;
     unsigned char indexes[TILE_Y][TILE_X];
     unsigned plane, y, bit;
+    int tilenum = glyphmap[glyph].tileidx;
 
-    read_tile_indexes(glyph, indexes);
-    /* cell->plane[0..3].image[0..15][0..0] */
-    for (plane = 0; plane < SCREENPLANES; ++plane) {
-        for (y = 0; y < TILE_Y; ++y) {
-            unsigned char b = 0;
-            for (bit = 0; bit < 8; ++bit) {
-                unsigned char x = bit * 2;
-                unsigned char i = indexes[y][x];
-                b <<= 1;
-                if (i & (0x8 >> plane)) b |= 1;
+    /* Get the processed tile from the cache if we can */
+    pcell = cell_cache_O[tilenum];
+    if (pcell == NULL) {
+        /* Process the tile */
+        pcell = (struct overview_planar_cell_struct *) alloc(sizeof(*pcell));
+        cell_cache_O[tilenum] = pcell;
+        read_tile_indexes(glyph, indexes);
+        /* pcell->plane[0..3].image[0..15][0..0] */
+        for (plane = 0; plane < SCREENPLANES; ++plane) {
+            for (y = 0; y < TILE_Y; ++y) {
+                unsigned char b = 0;
+                for (bit = 0; bit < 8; ++bit) {
+                    unsigned char x = bit * 2;
+                    unsigned char i = indexes[y][x];
+                    b <<= 1;
+                    if (i & (0x8 >> plane)) b |= 1;
+                }
+                pcell->plane[plane].image[y][0] = b;
             }
-            cell->plane[plane].image[y][0] = b;
         }
     }
+
+    *cell = *pcell;
 }
 
 static void
@@ -782,6 +809,15 @@ vga_Init(void)
         /* term_clear_screen() */ /* not vga_clear_screen() */
         return;
     }
+
+    if (cell_cache == NULL) {
+        cell_cache = (struct planar_cell_struct **) alloc(
+                total_tiles_used * sizeof(cell_cache[0]));
+        memset(cell_cache, 0, total_tiles_used * sizeof(cell_cache[0]));
+        cell_cache_O = (struct overview_planar_cell_struct **) alloc(
+                total_tiles_used * sizeof(cell_cache_O[0]));
+        memset(cell_cache_O, 0, total_tiles_used * sizeof(cell_cache_O[0]));
+    }
 #endif
 
     if (iflags.usevga) {
@@ -860,7 +896,17 @@ vga_SwitchMode(unsigned int mode)
 void
 vga_Finish(void)
 {
+    int i;
+
     free_tiles();
+    for (i = 0; i < total_tiles_used; ++i) {
+        free(cell_cache[i]);
+        free(cell_cache_O[i]);
+    }
+    free(cell_cache);
+    cell_cache = NULL;
+    free(cell_cache_O);
+    cell_cache_O = NULL;
     vga_SwitchMode(MODETEXT);
     windowprocs.win_cliparound = tty_cliparound;
     g_attribute = attrib_text_normal;

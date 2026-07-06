@@ -198,6 +198,10 @@ MS-DOS: add U+2299, U+2601 and U+2980 to the bundled fonts, so that all
 MS-DOS: The 16 color mode loads the font specified in font_map, and accepts
 	it only if its size is 8 by 16 pixels; avoid a null dereference
 	if the font is not found (pr #1611 by chasonr)
+MS-DOS: some optimizations for tile handling; change 16-color mode and
+	VESA mode so that the tile is processed once, when it is first
+	displayed, with the result cached; Use memcpy when splitting the
+	image into tiles; only load the tileset once (pr #1617 by chasonr)
 musl: musl libc does not have __sighandler_t so don't use it in the
 	macro definition for SIG_RET_TYPE with musl
 WASM: resolve some build failures in 'make CROSS_TO_WASM=1'
