@@ -25,6 +25,8 @@ void amii_remember_topl(void);
 long CountLines(winid);
 long FindLine(winid, int);
 int amii_doprev_message(void);
+extern int amii_msgscroll_dirty;
+void amii_flush_msgscroll(void);
 void flushIDCMP(struct MsgPort *);
 int amii_msgborder(struct Window *);
 void amii_pens_for_color(int, int *, int *);

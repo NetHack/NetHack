@@ -15,7 +15,7 @@ amii_putstr(winid window, int attr, const char *str)
     struct Window *w;
     register struct amii_WinDesc *cw;
     char *ob;
-    int i, j, n0, bottom, totalvis, wheight;
+    int i, j, n0, bottom, wheight;
     static int wrapping = 0;
 
 
@@ -178,13 +178,8 @@ amii_putstr(winid window, int attr, const char *str)
         }
         cw->wflags &= ~FLMSG_FIRST;
         len = 0;
-        if (scrollmsg) {
-            totalvis = CountLines(window);
-            SetPropInfo(w, &MsgScroll,
-                        (w->Height - w->BorderTop - w->BorderBottom)
-                            / w->RPort->TxHeight,
-                        totalvis, totalvis);
-        }
+        if (scrollmsg)
+            amii_msgscroll_dirty = 1;
         i = strlen(gt.toplines + SOFF);
         cw->maxcol = max(cw->maxcol, i);
         cw->vwy = cw->maxrow;
@@ -290,6 +285,31 @@ amii_putstr(winid window, int attr, const char *str)
     default:
         panic("Invalid or unset window type in putstr()");
     }
+}
+
+/* The message scroll gadget is not refreshed per putstr; the dirty
+ * flag defers the CountLines/SetPropInfo work to the next input wait.
+ */
+int amii_msgscroll_dirty = 0;
+
+void
+amii_flush_msgscroll(void)
+{
+    struct amii_WinDesc *cw;
+    struct Window *w;
+    int totalvis;
+
+    if (!amii_msgscroll_dirty)
+        return;
+    amii_msgscroll_dirty = 0;
+    if (!scrollmsg || WIN_MESSAGE == WIN_ERR
+        || (cw = amii_wins[WIN_MESSAGE]) == NULL || (w = cw->win) == NULL)
+        return;
+    totalvis = CountLines(WIN_MESSAGE);
+    SetPropInfo(w, &MsgScroll,
+                (w->Height - w->BorderTop - w->BorderBottom)
+                    / w->RPort->TxHeight,
+                totalvis, totalvis);
 }
 
 void
@@ -441,6 +461,8 @@ amii_doprev_message(void)
         || (w = cw->win) == NULL) {
         panic(winpanicstr, WIN_MESSAGE, "doprev_message");
     }
+
+    amii_flush_msgscroll();
 
     /* When an interlaced/tall screen is in use, the scroll bar will be there
      */

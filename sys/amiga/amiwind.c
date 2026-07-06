@@ -578,6 +578,7 @@ amikbhit(void)
 int
 WindowGetchar(void)
 {
+    amii_flush_msgscroll();
     while ((lastevent.type = WEUNK), amikbhit() <= 0) {
         WaitPort(HackPort);
     }
@@ -587,6 +588,7 @@ WindowGetchar(void)
 WETYPE
 WindowGetevent(void)
 {
+    amii_flush_msgscroll();
     lastevent.type = WEUNK;
     while (amikbhit() == 0) {
         WaitPort(HackPort);
