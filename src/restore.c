@@ -1219,8 +1219,7 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
             u.usteed_mid = 0;
         } else {
             if (mtmp->m_id == u.ustuck_mid) {
-                set_ustuck(mtmp);
-                u.ustuck_mid = 0;
+                set_ustuck(mtmp); /* set_ustuck clears u.ustuck_mid */
             }
             place_monster(mtmp, mtmp->mx, mtmp->my);
             if (mtmp->wormno)
