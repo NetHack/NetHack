@@ -2787,20 +2787,17 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
     boolean has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS,
             has_rogue_color = (has_rogue_ibm_graphics
                                && gs.symset[gc.currentgraphics].nocolor == 0);
-    if (trigger == gm_levelchange)
-        gg.glyphmap_perlevel_flags = 0;
+    /*
+     *    GMAP_SET                0x00000001
+     *    GMAP_ROGUELEVEL         0x00000002
+     */
+    unsigned newflags = GMAP_SET
+                        | (Is_rogue_level(&u.uz) ? GMAP_ROGUELEVEL : 0);
 
-    if (!gg.glyphmap_perlevel_flags) {
-        /*
-         *    GMAP_SET                0x00000001
-         *    GMAP_ROGUELEVEL         0x00000002
-         */
-        gg.glyphmap_perlevel_flags |= GMAP_SET;
-
-        if (Is_rogue_level(&u.uz)) {
-            gg.glyphmap_perlevel_flags |= GMAP_ROGUELEVEL;
-        }
-    }
+    if (trigger == gm_levelchange
+        && gg.glyphmap_perlevel_flags == newflags)
+        return;
+    gg.glyphmap_perlevel_flags = newflags;
 
     for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
         glyph_map *gmap = &glyphmap[glyph];
