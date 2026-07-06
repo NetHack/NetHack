@@ -522,7 +522,7 @@ static const enum statusfields stat_fieldorder[2][15] = {
 };
 
 /* NetHack CLR_* to AMIV pen (amiv_init_map order in winami.c) */
-static const int amiv_stat_pen[CLR_MAX] = {
+static const int amiv_color_pen[CLR_MAX] = {
     C_BLACK,    /* CLR_BLACK */
     7,          /* CLR_RED */
     5,          /* CLR_GREEN */
@@ -540,6 +540,22 @@ static const int amiv_stat_pen[CLR_MAX] = {
     2,          /* CLR_BRIGHT_CYAN */
     1,          /* CLR_WHITE */
 };
+
+/* map a NetHack color to fg/bg pens; leaves *fgp/*bgp (the caller's
+   defaults) alone for NO_COLOR or out-of-range */
+void
+amii_pens_for_color(int color, int *fgp, int *bgp)
+{
+    if (color < 0 || color >= CLR_MAX || color == NO_COLOR)
+        return;
+    if (WINVERS_AMIV) {
+        *fgp = amiv_color_pen[color];
+    } else {
+        /* 16 colors into 8 pens via the map display's fg/bg trick */
+        *fgp = foreg[color];
+        *bgp = backg[color];
+    }
+}
 
 void
 amii_status_init(void)
@@ -643,15 +659,7 @@ stat_draw_str(struct RastPort *rp, const char *str, int packed)
     int fg = amii_statAPen, bg = amii_statBPen, t;
     ULONG style = FS_NORMAL;
 
-    if (color >= 0 && color < CLR_MAX && color != NO_COLOR) {
-        if (WINVERS_AMIV) {
-            fg = amiv_stat_pen[color];
-        } else {
-            /* 16 colors into 8 pens via the map display's fg/bg trick */
-            fg = foreg[color];
-            bg = backg[color];
-        }
-    }
+    amii_pens_for_color(color, &fg, &bg);
     if (attr & HL_INVERSE) {
         t = fg;
         fg = bg;

@@ -1328,8 +1328,18 @@ DisplayData(winid win, int start)
 
         /* Apply menucolor if set for this item */
         if (mip && mip->color != NO_COLOR && !(mip->selected)) {
-            extern const int foreg[];
-            SetAPen(rp, foreg[mip->color]);
+            int fg, bg;
+
+            if (cw->type == NHW_TEXT) {
+                fg = amii_textAPen;
+                bg = amii_textBPen;
+            } else {
+                fg = amii_menuAPen;
+                bg = amii_menuBPen;
+            }
+            amii_pens_for_color(mip->color, &fg, &bg);
+            SetAPen(rp, fg);
+            SetBPen(rp, bg);
             whichcolor = 0; /* force re-evaluation next item */
         }
 
