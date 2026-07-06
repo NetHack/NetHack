@@ -26,6 +26,7 @@ OPTIONS=number_pad:1
 # *** STATUS HILITES ***
 # Colour-code status fields; see the Guidebook for the full rule syntax.
 OPTIONS=statushilites:10
+OPTIONS=hitpointbar
 OPTIONS=hilite_status:hitpoints/100%/gray/<100%/green/<66%/yellow/<50%/orange/<33%/red&bold
 OPTIONS=hilite_status:power/100%/gray/<100%/green/<50%/yellow/<33%/red
 OPTIONS=hilite_status:gold/up/yellow/down/brown

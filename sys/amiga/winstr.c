@@ -504,9 +504,11 @@ static int stat_inited = 0;
 static int stat_colors[MAXBLSTATS];
 static unsigned long stat_cond_bits = 0UL;
 static unsigned long *stat_colormasks = (unsigned long *) 0;
+static int stat_hpbar_percent = 0, stat_hpbar_crit = 0;
 
 static void amii_status_redraw(void);
 static void stat_draw_str(struct RastPort *, const char *, int);
+static void stat_draw_hpbar(struct RastPort *);
 static void stat_draw_conds(struct RastPort *);
 static int stat_condcolor(unsigned long, unsigned long *);
 static int stat_condattr(unsigned long, unsigned long *);
@@ -586,7 +588,7 @@ amii_status_enablefield(
 
 void
 amii_status_update(
-    int idx, genericptr_t ptr, int chg UNUSED, int percent UNUSED,
+    int idx, genericptr_t ptr, int chg UNUSED, int percent,
     int color, unsigned long *colormasks)
 {
     char *text = (char *) ptr;
@@ -599,6 +601,14 @@ amii_status_update(
         || !status_vals[idx])
         return;
     stat_colors[idx] = color;
+    if (idx == BL_HP && iflags.wc2_hitpointbar) {
+        stat_hpbar_percent = percent;
+        stat_hpbar_crit = critically_low_hp(TRUE) ? 1 : 0;
+        stat_colors[BL_TITLE] = (color & 0x00ff)
+                                | ((HL_INVERSE
+                                    | (stat_hpbar_crit ? HL_BLINK : 0))
+                                   << 8);
+    }
     if (idx == BL_CONDITION) {
         stat_cond_bits = ptr ? *(unsigned long *) ptr : 0UL;
         stat_colormasks = colormasks;
@@ -640,6 +650,8 @@ amii_status_redraw(void)
                 continue;
             if (f == BL_CONDITION)
                 stat_draw_conds(rp);
+            else if (f == BL_TITLE && iflags.wc2_hitpointbar)
+                stat_draw_hpbar(rp);
             else if (status_vals[f] && *status_vals[f])
                 stat_draw_str(rp, status_vals[f], stat_colors[f]);
         }
@@ -648,6 +660,39 @@ amii_status_redraw(void)
         if (rp->cp_x < right)
             TextSpaces(rp, (right - rp->cp_x) / rp->TxWidth + 1);
     }
+}
+
+/* "[title]" with the leading hpbar_percent portion of title drawn in
+   BL_TITLE's packed color/HL_INVERSE, per the tty hitpointbar layout */
+static void
+stat_draw_hpbar(struct RastPort *rp)
+{
+    char bar[30 + 1], *bar2 = (char *) 0, savedch = '\0';
+    int bar_pos, bar_len;
+
+    Sprintf(bar, "%-30.30s",
+            status_vals[BL_TITLE] ? status_vals[BL_TITLE] : "");
+    if (stat_hpbar_crit)
+        repad_with_dashes(bar);
+    bar_len = (int) strlen(bar);
+    if (stat_hpbar_percent < 100) {
+        bar_pos = (bar_len * stat_hpbar_percent) / 100;
+        if (bar_pos < 1 && stat_hpbar_percent > 0)
+            bar_pos = 1;
+        if (bar_pos >= bar_len)
+            bar_pos = bar_len - 1;
+        bar2 = &bar[bar_pos];
+        savedch = *bar2;
+        *bar2 = '\0';
+    }
+    stat_draw_str(rp, "[", NO_COLOR);
+    if (*bar)
+        stat_draw_str(rp, bar, stat_colors[BL_TITLE]);
+    if (bar2) {
+        *bar2 = savedch;
+        stat_draw_str(rp, bar2, NO_COLOR);
+    }
+    stat_draw_str(rp, "]", NO_COLOR);
 }
 
 /* draw one field at the pen, styled from the packed CLR_|(HL_<<8) */
