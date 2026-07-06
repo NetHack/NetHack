@@ -42,6 +42,7 @@
 #ifdef MINT
 #define SUSPEND /* allow suspending the game	*/
 #endif
+#define SFSTRUCT_BUFFERING /* buffered stdio writes for structlevel files */
 
 #ifndef TERMLIB
 #define ANSI_DEFAULT /* use vt52 by default		*/
