@@ -489,3 +489,249 @@ amii_doprev_message(void)
 
     return (0);
 }
+
+/* Native status renderer: per-field color/attrs from the core's
+ * STATUS_HILITES rules, modeled on sys/mac68k/macstat.c.
+ */
+
+extern const char *status_fieldfmt[MAXBLSTATS];
+extern const char *status_fieldnm[MAXBLSTATS];
+extern char *status_vals[MAXBLSTATS];
+extern boolean status_activefields[MAXBLSTATS];
+extern int foreg[AMII_MAXCOLORS], backg[AMII_MAXCOLORS];
+
+static int stat_inited = 0;
+static int stat_colors[MAXBLSTATS];
+static unsigned long stat_cond_bits = 0UL;
+static unsigned long *stat_colormasks = (unsigned long *) 0;
+
+static void amii_status_redraw(void);
+static void stat_draw_str(struct RastPort *, const char *, int);
+static void stat_draw_conds(struct RastPort *);
+static int stat_condcolor(unsigned long, unsigned long *);
+static int stat_condattr(unsigned long, unsigned long *);
+
+/* same two-line layout as genl_status_update's default fieldorder */
+static const enum statusfields stat_fieldorder[2][15] = {
+    { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
+      BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
+      BL_FLUSH },
+    { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC,
+      BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER, BL_CAP, BL_CONDITION,
+      BL_FLUSH },
+};
+
+/* NetHack CLR_* to AMIV pen (amiv_init_map order in winami.c) */
+static const int amiv_stat_pen[CLR_MAX] = {
+    C_BLACK,    /* CLR_BLACK */
+    7,          /* CLR_RED */
+    5,          /* CLR_GREEN */
+    11,         /* CLR_BROWN */
+    4,          /* CLR_BLUE */
+    10,         /* CLR_MAGENTA */
+    2,          /* CLR_CYAN */
+    6,          /* CLR_GRAY */
+    1,          /* NO_COLOR */
+    3,          /* CLR_ORANGE */
+    8,          /* CLR_BRIGHT_GREEN */
+    9,          /* CLR_YELLOW */
+    4,          /* CLR_BRIGHT_BLUE */
+    10,         /* CLR_BRIGHT_MAGENTA */
+    2,          /* CLR_BRIGHT_CYAN */
+    1,          /* CLR_WHITE */
+};
+
+void
+amii_status_init(void)
+{
+    int i;
+
+    for (i = 0; i < MAXBLSTATS; ++i)
+        stat_colors[i] = NO_COLOR;
+    stat_cond_bits = 0UL;
+    stat_colormasks = (unsigned long *) 0;
+    genl_status_init();
+    stat_inited = 1;
+}
+
+void
+amii_status_finish(void)
+{
+    stat_inited = 0;
+    genl_status_finish();
+}
+
+void
+amii_status_enablefield(
+    int fieldidx, const char *nm, const char *fmt, boolean enable)
+{
+    genl_status_enablefield(fieldidx, nm, fmt, enable);
+}
+
+void
+amii_status_update(
+    int idx, genericptr_t ptr, int chg UNUSED, int percent UNUSED,
+    int color, unsigned long *colormasks)
+{
+    char *text = (char *) ptr;
+
+    if (idx == BL_FLUSH || idx == BL_RESET) {
+        amii_status_redraw();
+        return;
+    }
+    if (idx < 0 || idx >= MAXBLSTATS || !status_activefields[idx]
+        || !status_vals[idx])
+        return;
+    stat_colors[idx] = color;
+    if (idx == BL_CONDITION) {
+        stat_cond_bits = ptr ? *(unsigned long *) ptr : 0UL;
+        stat_colormasks = colormasks;
+    } else if (idx == BL_GOLD) {
+        /* gold arrives glyph-encoded; decode to the symset's symbol */
+        status_vals[BL_GOLD][0] = ' ';
+        (void) decode_mixed(&status_vals[BL_GOLD][1], text ? text : "");
+    } else {
+        Snprintf(status_vals[idx], MAXCO,
+                 status_fieldfmt[idx] ? status_fieldfmt[idx] : "%s",
+                 text ? text : "");
+    }
+}
+
+static void
+amii_status_redraw(void)
+{
+    struct amii_WinDesc *cw;
+    struct Window *w;
+    struct RastPort *rp;
+    int line, i, right;
+
+    if (!stat_inited || WIN_STATUS == WIN_ERR
+        || (cw = amii_wins[WIN_STATUS]) == NULL || (w = cw->win) == NULL)
+        return;
+
+    rp = w->RPort;
+    right = w->Width - w->BorderRight;
+    WaitTOF();
+    SetDrMd(rp, JAM2);
+    for (line = 0; line < 2; line++) {
+        Move(rp, w->BorderLeft + 2,
+             (line * (rp->TxHeight + 1)) + w->BorderTop + rp->TxBaseline
+                 + 1);
+        for (i = 0; stat_fieldorder[line][i] != BL_FLUSH; i++) {
+            enum statusfields f = stat_fieldorder[line][i];
+
+            if (!status_activefields[f])
+                continue;
+            if (f == BL_CONDITION)
+                stat_draw_conds(rp);
+            else if (status_vals[f] && *status_vals[f])
+                stat_draw_str(rp, status_vals[f], stat_colors[f]);
+        }
+        SetAPen(rp, amii_statAPen);
+        SetBPen(rp, amii_statBPen);
+        if (rp->cp_x < right)
+            TextSpaces(rp, (right - rp->cp_x) / rp->TxWidth + 1);
+    }
+}
+
+/* draw one field at the pen, styled from the packed CLR_|(HL_<<8) */
+static void
+stat_draw_str(struct RastPort *rp, const char *str, int packed)
+{
+    int color = packed & 0x00ff;
+    int attr = (packed >> 8) & 0x00ff;
+    int fg = amii_statAPen, bg = amii_statBPen, t;
+    ULONG style = FS_NORMAL;
+
+    if (color >= 0 && color < CLR_MAX && color != NO_COLOR) {
+        if (WINVERS_AMIV) {
+            fg = amiv_stat_pen[color];
+        } else {
+            /* 16 colors into 8 pens via the map display's fg/bg trick */
+            fg = foreg[color];
+            bg = backg[color];
+        }
+    }
+    if (attr & HL_INVERSE) {
+        t = fg;
+        fg = bg;
+        bg = t;
+    }
+    if (attr & HL_BOLD)
+        style |= FSF_BOLD;
+    if (attr & HL_ULINE)
+        style |= FSF_UNDERLINED;
+    if (attr & HL_ITALIC)
+        style |= FSF_ITALIC;
+
+    SetAPen(rp, fg);
+    SetBPen(rp, bg);
+    if (style != FS_NORMAL)
+        SetSoftStyle(rp, style, AskSoftStyle(rp));
+    Text(rp, (char *) str, strlen(str));
+    if (style != FS_NORMAL)
+        SetSoftStyle(rp, FS_NORMAL, AskSoftStyle(rp));
+}
+
+static void
+stat_draw_conds(struct RastPort *rp)
+{
+    int i, k, color, attr, packed;
+    char buf[32];
+
+    for (k = 0; k < CONDITION_COUNT; k++) {
+        i = cond_idx[k];
+        if (!(stat_cond_bits & (unsigned long) conditions[i].mask))
+            continue;
+        color = stat_condcolor((unsigned long) conditions[i].mask,
+                               stat_colormasks);
+        attr = stat_condattr((unsigned long) conditions[i].mask,
+                             stat_colormasks);
+        packed = (color & 0x00ff) | (attr << 8);
+        Sprintf(buf, " %s", conditions[i].text[0]);
+        stat_draw_str(rp, buf, packed);
+    }
+}
+
+static int
+stat_condcolor(unsigned long bm, unsigned long *bmarray)
+{
+    int i;
+
+    if (bm && bmarray)
+        for (i = 0; i < CLR_MAX; ++i)
+            if ((bmarray[i] & bm) != 0)
+                return i;
+    return NO_COLOR;
+}
+
+static int
+stat_condattr(unsigned long bm, unsigned long *bmarray)
+{
+    int i, attr = 0;
+
+    if (bm && bmarray)
+        for (i = HL_ATTCLR_BOLD; i < BL_ATTCLR_MAX; ++i)
+            if ((bmarray[i] & bm) != 0)
+                switch (i) {
+                case HL_ATTCLR_BOLD:
+                    attr |= HL_BOLD;
+                    break;
+                case HL_ATTCLR_DIM:
+                    attr |= HL_DIM;
+                    break;
+                case HL_ATTCLR_ITALIC:
+                    attr |= HL_ITALIC;
+                    break;
+                case HL_ATTCLR_ULINE:
+                    attr |= HL_ULINE;
+                    break;
+                case HL_ATTCLR_BLINK:
+                    attr |= HL_BLINK;
+                    break;
+                case HL_ATTCLR_INVERSE:
+                    attr |= HL_INVERSE;
+                    break;
+                }
+    return attr;
+}

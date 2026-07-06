@@ -27,6 +27,10 @@ long FindLine(winid, int);
 int amii_doprev_message(void);
 void flushIDCMP(struct MsgPort *);
 int amii_msgborder(struct Window *);
+void amii_status_init(void);
+void amii_status_finish(void);
+void amii_status_enablefield(int, const char *, const char *, boolean);
+void amii_status_update(int, genericptr_t, int, int, int, unsigned long *);
 void amii_scrollmsg(register struct Window *w,
                     register struct amii_WinDesc *cw);
 
