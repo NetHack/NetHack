@@ -846,7 +846,7 @@ amii_lprint_glyph(winid window, int color_index, int glyph)
         amii_g_nodes[glyph_node_index].bg_color = bg_color;
         amii_g_nodes[glyph_node_index].buffer =
             &amii_glyph_buffer[glyph_buffer_index];
-        amii_glyph_buffer[glyph_buffer_index] = glyph;
+        amii_glyph_buffer[glyph_buffer_index] = (char) glyph;
         ++glyph_buffer_index;
         ++glyph_node_index;
     }

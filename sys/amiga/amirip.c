@@ -21,12 +21,9 @@
 #include "winext.h"
 #include "winproto.h"
 
-static struct RastPort *rp;
-
 #ifdef AMII_GRAPHICS
 
-#undef NULL
-#define NULL 0
+static struct RastPort *rp;
 
 #include <proto/dos.h>
 #include <proto/exec.h>
