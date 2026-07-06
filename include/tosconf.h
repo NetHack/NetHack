@@ -88,16 +88,6 @@
 #undef SYSCF_FILE
 #endif
 
-/* The GEM windowport uses the generic genl_status_* fallbacks and
-   doesn't implement field-level hilites.  Under STATUS_HILITES,
-   init_sound_disp_gamewindows() skips the early
-   display_nhwindow(WIN_STATUS); on TOS 4.04 that late open leaves
-   title-bar / tile-column draw glitches behind the role-picker
-   dialog.  Undef'ing restores the pre-3.5 ordering. */
-#ifdef STATUS_HILITES
-#undef STATUS_HILITES
-#endif
-
 extern boolean colors_changed; /* in tos.c */
 
 #endif /* TOSCONF_H */
