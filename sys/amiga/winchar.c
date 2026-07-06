@@ -401,34 +401,45 @@ amiv_flush_glyph_buffer(struct Window *vw)
         /* Go ahead and start dumping the stuff */
         for (i = 0; i < glyph_node_index; ++i) {
             /* Do it */
-            int offx, offy, j;
+            int offx, offy, j, visible;
             struct BitMap *nodebm = amiv_g_nodes[i].bitmap;
 
             /* Get the unclipped coordinates */
             x = amiv_g_nodes[i].odstx;
             y = amiv_g_nodes[i].odsty;
 
+            visible = (!clipping || (x >= clipx && y >= clipy && x < clipxmax
+                                     && y < clipymax));
+            if (!visible && !(bm && w && reclip != 2))
+                continue;
+
             /* If image is not in CHIP. copy each plane into tile line by line
              */
 
             offx = amiv_g_nodes[i].srcx / 8; /* 8 is bits per byte */
             offy = amiv_g_nodes[i].srcy * nodebm->BytesPerRow;
-            for (j = 0; j < pictdata.nplanes + amii_extraplanes; ++j) {
-                for (k = 0; k < pictdata.ysize; ++k) {
-                    /* For a 16x16 tile, this could just be short assignments,
-                     * but
-                     * this code is generalized to handle any size tile
-                     * image...
-                     */
-                    memcpy(tile->Planes[j] + k * tile->BytesPerRow,
-                           nodebm->Planes[j] + offx + offy
-                               + (nodebm->BytesPerRow * k),
-                           pictdata.xsize / 8);
+            if (pictdata.xsize == 16 && tile->BytesPerRow == 2) {
+                for (j = 0; j < pictdata.nplanes + amii_extraplanes; ++j) {
+                    short *dp = (short *) tile->Planes[j];
+                    char *sp = (char *) nodebm->Planes[j] + offx + offy;
+
+                    for (k = 0; k < pictdata.ysize; ++k) {
+                        *dp++ = *(short *) sp;
+                        sp += nodebm->BytesPerRow;
+                    }
+                }
+            } else {
+                for (j = 0; j < pictdata.nplanes + amii_extraplanes; ++j) {
+                    for (k = 0; k < pictdata.ysize; ++k) {
+                        memcpy(tile->Planes[j] + k * tile->BytesPerRow,
+                               nodebm->Planes[j] + offx + offy
+                                   + (nodebm->BytesPerRow * k),
+                               pictdata.xsize / 8);
+                    }
                 }
             }
 
-            if (!clipping || (x >= clipx && y >= clipy && x < clipxmax
-                              && y < clipymax)) {
+            if (visible) {
                 /* scaling is needed, do it */
                 if (scaling_needed) {
                     BitMapScale(&bsm);
@@ -521,6 +532,10 @@ amiv_lprint_glyph(winid window, int color_index, int glyph)
     }
 
     if (cw->type == NHW_MAP) {
+        if (clipping && (WIN_OVER == WIN_ERR || !amii_wins[WIN_OVER])
+            && (cw->curx < clipx || cw->cury < clipy
+                || cw->curx >= clipxmax || cw->cury >= clipymax))
+            return;
         curx = cw->curx - clipx;
         cury = cw->cury - clipy;
 
