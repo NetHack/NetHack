@@ -2049,8 +2049,16 @@ amii_print_glyph(winid win, coordxy x, coordxy y,
             amii_curs(win, x, y);
             amiga_print_glyph(win, NO_COLOR, ch + 10000);
         } else {
-            /* Move the cursor. */
-            amii_curs(win, x, y + 2);
+            int cx = x, cy = y + 2;
+
+#ifdef CLIPPING
+            if (clipping) {
+                cx -= clipx;
+                cy -= clipy;
+            }
+#endif
+            cw->curx = (cx > 0) ? cx - 1 : 0;
+            cw->cury = cy;
 
             /* Turn off color if rogue level. */
             if (Is_rogue_level(&u.uz))
