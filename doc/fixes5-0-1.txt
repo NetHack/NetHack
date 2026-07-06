@@ -219,6 +219,9 @@ Windows: with SELECTSAVE don't display error messages to a regular player
 	saved-game list to select from; the game doesn't offer any
 	action to assist with them presently, and they would have to be
 	dealt with external to the game, so try not to annoy
+Windows: fix startup of GUI NetHackW.exe if there was an explicit
+	OPTIONS=windowtype:tty in the config file
+Windows: fix hilite_pet on the GUI NetHackW.exe when ascii map was selected
 tty: allow custom glyph colors if they're basic 16 nethack colors
 	on terminals with less than 256 colors
 X11: obey timed_delay

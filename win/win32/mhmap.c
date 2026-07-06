@@ -989,7 +989,8 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
                 rgbcolor = nhcolor_to_RGB(color);
             }
         }
-        if (((data->map[i][j].gm.glyphflags & MG_PET) && iflags.hilite_pet)
+        if ((((data->map[i][j].gm.glyphflags & MG_PET) && iflags.hilite_pet)
+             || ((data->map[i][j].gm.glyphflags & MG_OBJPILE) && iflags.hilite_pile))
             || ((data->map[i][j].gm.glyphflags & (MG_DETECT | MG_BW_LAVA
                                                   | MG_BW_ICE | MG_BW_SINK
                                                   | MG_BW_ENGR)) != 0)) {

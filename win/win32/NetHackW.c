@@ -216,6 +216,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     windowprocs.win_raw_print_bold = mswin_raw_print_bold;
     windowprocs.win_nhgetch = mswin_nhgetch;
     windowprocs.win_wait_synch = mswin_wait_synch;
+    windowprocs.win_number_pad = mswin_number_pad;
 
     /* let nethackw_main do the argument processing */
     nethackw_main(argc, argv);

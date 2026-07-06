@@ -2072,6 +2072,11 @@ mswin_preference_update(const char *pref)
         return;
     }
 
+    if (stricmp(pref, "hilite_pile") == 0) {
+        InvalidateRect(mswin_hwnd_from_winid(WIN_MAP), NULL, TRUE);
+        return;
+    }
+
     if (stricmp(pref, "align_message") == 0
         || stricmp(pref, "align_status") == 0) {
         mswin_layout_main_window(NULL);
