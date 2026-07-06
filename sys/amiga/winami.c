@@ -378,7 +378,7 @@ amii_get_ext_cmd(void)
     int lastlen = 0;
     int tabi = 0;
     int maxcols;
-    int n_ac, n_all, i, j, k, eidx;
+    int n_all, i, j, k, eidx;
     int *ecmatches;
 
     ExtWindow.Screen = HackScreen;
@@ -423,17 +423,15 @@ amii_get_ext_cmd(void)
             if (n_all == 0) {
                 DisplayBeep(NULL);
             } else {
+                int pass, ac;
+
                 eidx = -1;
-                n_ac = extcmds_match(prefix, ECM_NOFLAGS, &ecmatches);
-                k = tabi++ % n_all;
-                if (k < n_ac) {
-                    eidx = ecmatches[k];
-                } else {
-                    n_all = extcmds_match(prefix, ECM_IGNOREAC, &ecmatches);
-                    j = k - n_ac;
+                j = tabi++ % n_all;
+                for (pass = 0; pass < 2 && eidx < 0; pass++) {
                     for (i = 0; i < n_all; i++) {
-                        if (extcmds_getentry(ecmatches[i])->flags
-                            & AUTOCOMPLETE)
+                        ac = (extcmds_getentry(ecmatches[i])->flags
+                              & AUTOCOMPLETE) != 0;
+                        if (ac != (pass == 0))
                             continue;
                         if (j-- == 0) {
                             eidx = ecmatches[i];
