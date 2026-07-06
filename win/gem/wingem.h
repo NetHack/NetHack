@@ -93,6 +93,8 @@ extern void Gem_getlin(const char *, char *);
 extern int Gem_get_ext_cmd(void);
 extern void Gem_number_pad(int);
 extern void Gem_delay_output(void);
+extern void Gem_status_init(void);
+extern void Gem_status_update(int, void *, int, int, int, unsigned long *);
 
 
 #endif /* WINGEM_H */

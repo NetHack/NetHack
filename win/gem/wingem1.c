@@ -578,6 +578,7 @@ char **map_glyphs = NULL;
 short **map_colors = NULL;
 
 char **status_line;
+char **status_color, **status_attr; /* NetHack CLR_* / HL_* per cell */
 short num_status_lines, status_w, status_align = FALSE;
 NHGEM_FONT status_font;
 dirty_rect *dr_stat;
@@ -1335,8 +1336,7 @@ draw_status(PARMBLK *pb)
         char tmp;
 
         /* void v_set_text(short font,short height,short color,short effect,short mode,short out[4]) */
-        v_set_mode(MD_REPLACE);
-        v_set_text(status_font.id, status_font.size, BLACK, 0, 0, vst_out);
+        v_set_mode(MD_TRANS);
         x = (x + 2 * status_font.cw + 6) & ~7;
 
         startx = (area.g_x - x) / status_font.cw;
@@ -1354,11 +1354,41 @@ draw_status(PARMBLK *pb)
         area.g_h = status_font.ch;
         for (i = starty; i < min(2, stopy);
              i++, area.g_y += status_font.ch, y += status_font.ch) {
+            short j = startx, k, pen, effect;
+            char col, att;
+
             my_clear_area(&area);
-            tmp = status_line[i][stopx];
-            status_line[i][stopx] = 0;
-            (*v_mtext)(x_handle, x, y, &status_line[i][startx]);
-            status_line[i][stopx] = tmp;
+            while (j < stopx && status_line[i][j]) {
+                col = status_color[i][j];
+                att = status_attr[i][j];
+                for (k = j + 1; k < stopx && status_line[i][k]
+                                && status_color[i][k] == col
+                                && status_attr[i][k] == att; k++)
+                    ;
+                /* 8 == NO_COLOR; CLR_WHITE (15) would vanish on the white
+                   background, substitute BLACK like the menu draw */
+                pen = (col >= 0 && col < 16 && col != 8)
+                          ? ((col == 15) ? BLACK : nhclr_to_pen[col])
+                          : BLACK;
+                effect = ((att & 0x02) ? 1 : 0)    /* HL_BOLD: thickened */
+                         | ((att & 0x04) ? 2 : 0)  /* HL_DIM: lightened */
+                         | ((att & 0x08) ? 4 : 0)  /* HL_ITALIC: skewed */
+                         | ((att & 0x10) ? 8 : 0); /* HL_ULINE: underline */
+                if (att & 0x40) { /* HL_INVERSE: bar in the pen colour */
+                    GRECT bar = { x + (j - startx) * status_font.cw, y,
+                                  (k - j) * status_font.cw, status_font.ch };
+                    my_color_area(&bar, pen);
+                    pen = pen_white;
+                }
+                v_set_text(status_font.id, status_font.size, pen, effect, 0,
+                           vst_out);
+                tmp = status_line[i][k];
+                status_line[i][k] = 0;
+                (*v_mtext)(x_handle, x + (j - startx) * status_font.cw, y,
+                           &status_line[i][j]);
+                status_line[i][k] = tmp;
+                j = k;
+            }
         }
     }
     return (0);
@@ -2338,23 +2368,31 @@ mar_add_message(const char *str)
 /************************* mar_add_status_str *******************************/
 
 void
-mar_add_status_str(const char *str, short line)
+mar_add_status_line(const char *str, const char *color, const char *attr,
+                    short line)
 {
     short i, last_diff = -1;
+    char c, a;
     GRECT area = { 0, line * status_font.ch, status_font.cw, status_font.ch };
-    for (i = 0; (i < status_w - 2) && str[i]; i++)
-        if (str[i] != status_line[line][i]) {
+    for (i = 0; (i < status_w - 2) && str[i]; i++) {
+        c = color ? color[i] : 8; /* 8 == NO_COLOR */
+        a = attr ? attr[i] : 0;
+        if (str[i] != status_line[line][i] || c != status_color[line][i]
+            || a != status_attr[line][i]) {
             if (last_diff == -1)
                 area.g_x = i * status_font.cw;
             else
                 area.g_w += status_font.cw;
             last_diff = i;
             status_line[line][i] = str[i];
+            status_color[line][i] = c;
+            status_attr[line][i] = a;
         } else if (last_diff >= 0) {
             add_dirty_rect(dr_stat, &area);
             last_diff = -1;
             area.g_w = status_font.cw;
         }
+    }
     for (; i < status_w - 1; i++) {
         if (status_line[line][i]) {
             if (last_diff == -1)
@@ -2364,9 +2402,17 @@ mar_add_status_str(const char *str, short line)
             last_diff = i;
         }
         status_line[line][i] = 0;
+        status_color[line][i] = 8;
+        status_attr[line][i] = 0;
     }
     if (last_diff >= 0)
         add_dirty_rect(dr_stat, &area);
+}
+
+void
+mar_add_status_str(const char *str, short line)
+{
+    mar_add_status_line(str, (char *) 0, (char *) 0, line);
 }
 
 /************************* mar_set_menu_title *******************************/
@@ -3168,9 +3214,15 @@ mar_create_window(short type)
         break;
     case NHW_STATUS:
         status_line = (char **) m_alloc(2 * sizeof(char *));
+        status_color = (char **) m_alloc(2 * sizeof(char *));
+        status_attr = (char **) m_alloc(2 * sizeof(char *));
         for (i = 0; i < 2; i++) {
             status_line[i] = (char *) m_alloc(status_w * sizeof(char));
             memset(status_line[i], 0, status_w);
+            status_color[i] = (char *) m_alloc(status_w * sizeof(char));
+            memset(status_color[i], 8, status_w); /* 8 == NO_COLOR */
+            status_attr[i] = (char *) m_alloc(status_w * sizeof(char));
+            memset(status_attr[i], 0, status_w);
         }
         dr_stat = new_dirty_rect(10);
         if (!dr_stat)
@@ -3271,9 +3323,14 @@ mar_destroy_nhwindow(int window)
         WIN_MAP = WIN_ERR;
     }
     if (window == WIN_STATUS) {
-        for (i = 0; i < 2; i++)
+        for (i = 0; i < 2; i++) {
             free(status_line[i]);
+            free(status_color[i]);
+            free(status_attr[i]);
+        }
         null_free(status_line);
+        null_free(status_color);
+        null_free(status_attr);
         WIN_STATUS = WIN_ERR;
     }
     if (window == WIN_MESSAGE) {
