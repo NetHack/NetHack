@@ -22,6 +22,17 @@ OPTIONS=color,hilite_pet,number_pad
 OPTIONS=autopickup,pickup_thrown
 OPTIONS=pickup_types:$?!/="+
 
+# Status line: hit point bar behind name/title, plus field highlighting.
+# The number after statushilites is how many turns up/down change
+# hilites stay visible.  Same color/attribute names as MENUCOLOR below.
+OPTIONS=hitpointbar
+OPTIONS=statushilites:10
+OPTIONS=hilite_status: hitpoints/100%/gray/<100%/green/<66%/yellow
+OPTIONS=hilite_status: hitpoints/<50%/orange/<33%/red&bold/<15%/red&inverse
+OPTIONS=hilite_status: power/<50%/orange/<25%/red&bold
+OPTIONS=hilite_status: characteristics/up/green/down/red
+OPTIONS=hilite_status: condition/major/orange&inverse
+
 # Menu colors: highlight blessed/cursed status in inventory listings.
 # Anchored with leading spaces so 'uncursed' doesn't match 'cursed'.
 #
