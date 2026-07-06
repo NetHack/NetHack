@@ -42,6 +42,7 @@
 #define TERMLIB   /* use termcap			*/
 #endif
 #define MAIL      /* enable the fake maildemon */
+#define SFSTRUCT_BUFFERING /* buffered stdio writes for structlevel files */
 
 /* Skip the ~9600-entry glyph-id prefill on slow m68k Atari hosts;
    the shipped nethack.cnf doesn't reference any G_glyph names, so
