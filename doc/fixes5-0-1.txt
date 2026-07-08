@@ -202,7 +202,8 @@ MS-DOS: some optimizations for tile handling; change 16-color mode and
 	VESA mode so that the tile is processed once, when it is first
 	displayed, with the result cached; Use memcpy when splitting the
 	image into tiles; only load the tileset once (pr #1617 by chasonr)
-musl: musl libc does not have __sighandler_t so don't use it in the
+MS-DOS: Define a separate palette for VGA text (pr #1620 by chasonr)
+#1620musl: musl libc does not have __sighandler_t so don't use it in the
 	macro definition for SIG_RET_TYPE with musl
 WASM: resolve some build failures in 'make CROSS_TO_WASM=1'
 WASM: hints file cross-pre2.500 update to CFLAGS to include -DNHUUID

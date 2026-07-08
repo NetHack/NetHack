@@ -182,31 +182,36 @@ extern int total_tiles_used, Tile_corr, Tile_unexplored;  /* from tile.c */
     }
 #define TOP_MAP_ROW 1
 
-static int vgacmap[CLR_MAX] = {  1, 4, 6, 10, 5, 9, 0, 15,
-                                    12, 3, 7,  8, 2, 9, 0, 14 };
+static const int vgacmap[CLR_MAX] = {
+    1, 4, 6, 10, 5, 9, 0, 15,
+    12, 3, 7, 8, 2, 9, 0, 14 };
+static const int textcmap[CLR_MAX] = {
+    1, 4, 6, 10, 5, 9, 0, 15,
+    12, 3, 7, 8, 2, 11, 13, 14 };
 static int viewport_size = 40;
 /* static char masktable[8]={0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01}; */
 /* static char bittable[8]= {0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80}; */
-#if 0
-static char defpalette[] = { /* Default VGA palette         */
-        0x00, 0x00, 0x00,
-        0x00, 0x00, 0xaa,
-        0x00, 0xaa, 0x00,
-        0x00, 0xaa, 0xaa,
-        0xaa, 0x00, 0x00,
-        0xaa, 0x00, 0xaa,
-        0xaa, 0xaa, 0x00,
-        0xaa, 0xaa, 0xaa,
-        0x55, 0x55, 0x55,
-        0xcc, 0xcc, 0xcc,
-        0x00, 0x00, 0xff,
-        0x00, 0xff, 0x00,
-        0xff, 0x00, 0x00,
-        0xff, 0xff, 0x00,
-        0xff, 0x00, 0xff,
-        0xff, 0xff, 0xff
+/* When showing the text view, use this palette */
+static const struct Pixel text_palette[] = {
+        /* Permuted to mostly match the tileset */
+        { 0x00, 0xaa, 0xaa, 0xff }, /* CLR_CYAN */
+        { 0x00, 0x00, 0x00, 0xff }, /* CLR_BLACK */
+        { 0x44, 0x44, 0xff, 0xff }, /* CLR_BRIGHT_BLUE */
+        { 0xff, 0x90, 0x00, 0xff }, /* CLR_ORANGE */
+        { 0xaa, 0x00, 0x00, 0xff }, /* CLR_RED */
+        { 0x22, 0x22, 0xff, 0xff }, /* CLR_BLUE */
+        { 0x00, 0xaa, 0x00, 0xff }, /* CLR_GREEN */
+        { 0x00, 0xff, 0x00, 0xff }, /* CLR_BRIGHT_GREEN */
+        { 0xff, 0xff, 0x00, 0xff }, /* CLR_YELLOW */
+        { 0xaa, 0x00, 0xaa, 0xff }, /* CLR_MAGENTA */
+        { 0x99, 0x40, 0x00, 0xff }, /* CLR_BROWN */
+        { 0xff, 0x00, 0xff, 0xff }, /* CLR_BRIGHT_MAGENTA */
+        { 0x55, 0x55, 0x55, 0xff }, /* NO_COLOR */
+        { 0x00, 0xff, 0xff, 0xff }, /* CLR_BRIGHT_CYAN */
+        { 0xff, 0xff, 0xff, 0xff }, /* CLR_WHITE */
+        { 0xaa, 0xaa, 0xaa, 0xff }, /* CLR_GRAY */
+        { 0x00, 0xff, 0xff, 0xff }  /* CLR_BRIGHT_CYAN repeated */
         };
-#endif
 
 #ifndef ALTERNATE_VIDEO_METHOD
 int vp[SCREENPLANES] = { 8, 4, 2, 1 };
@@ -552,6 +557,7 @@ void
 vga_overview(boolean on)
 {
     /* vga_HideCursor(); */
+    vga_SetPalette(paletteptr);
     if (on) {
         iflags.over_view = TRUE;
         clipx = 0;
@@ -572,10 +578,12 @@ vga_traditional(boolean on)
     if (on) {
         /* switch_symbols(FALSE); */
         iflags.traditional_view = TRUE;
+        vga_SetPalette(text_palette);
         clipx = 0;
         clipxmax = CO - 1;
     } else {
         iflags.traditional_view = FALSE;
+        vga_SetPalette(paletteptr);
         if (!iflags.over_view) {
             clipx = max(0, (curcol - viewport_size / 2));
             if (clipx > ((CO - 1) - viewport_size))
@@ -834,7 +842,7 @@ vga_Init(void)
     iflags.tile_view = TRUE;
     iflags.over_view = FALSE;
 #else
-    paletteptr = defpalette;
+    paletteptr = text_palette;
 #endif
     vga_SetPalette(paletteptr);
     g_attribute = attrib_gr_normal;
@@ -1008,7 +1016,7 @@ vga_WriteChar(uint32 chr, int col, int row, int colour)
 
     char __far *cp;
     unsigned char fnt;
-    int actual_colour = vgacmap[colour];
+    int actual_colour = colour;
     int bgcolor;
     int vplane;
     unsigned char bitmap[ROWS_PER_CELL];
@@ -1017,15 +1025,28 @@ vga_WriteChar(uint32 chr, int col, int row, int colour)
     vga_GetBitmap(chr, bitmap);
 
     if (curframecolor != NO_COLOR)
-        bgcolor = vgacmap[curframecolor];
+        bgcolor = curframecolor;
     else
-        bgcolor = BACKGROUND_VGA_COLOR;
+        bgcolor = CLR_BLACK;
 
     if (inversed) {
         int tmpc = actual_colour;
         actual_colour = bgcolor;
         bgcolor = tmpc;
     }
+
+#ifdef TILES_IN_GLYPHMAP
+    if (iflags.traditional_view) {
+#endif
+        /* A one-to-one remapping to keep black at the same index either way */
+        actual_colour = textcmap[actual_colour];
+        bgcolor = textcmap[bgcolor];
+#ifdef TILES_IN_GLYPHMAP
+    } else {
+        actual_colour = vgacmap[actual_colour];
+        bgcolor = vgacmap[bgcolor];
+    }
+#endif
 
     x = min(col, (CO - 1));         /* min() used protection from callers */
     pixy = min(row, (LI - 1)) * 16; /* assumes 8 x 16 char set */
