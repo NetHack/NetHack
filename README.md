@@ -4,7 +4,7 @@ This is a feature branch of [NetHack 5.0](https://www.nethack.org) collecting
 revival work for the classic m68k ports (Amiga, Atari ST/TT/Falcon (GEM) and 68k
 Macintosh) against the current NetHack-5.0 codebase. The Amiga and Atari ports
 were retired in 3.6 and have been catching up to the windowport, save-file, and
-Lua level changes that landed since. 
+Lua level changes that landed since.
 
 This is where new commits land before being proposed for merge into
 `NetHack-5.0`. If you're a player or porter with m68k hardware: I need your
@@ -61,7 +61,7 @@ If you have time and m68k hardware (or a configured emulator):
 - **MagiC and FreeMiNT users** I regularly test on MagiC on Linux and Magic 6.2
   on Macintosh myself. Feedback from running on FreeMint would be welcome.
 - **Alternate VDI drivers** — NVDI, fVDI, and unusual direct-color screens are
-  supported, but of course I couldn't test all combinations out there. 
+  supported, but of course I couldn't test all combinations out there.
 - **Mac testers**
 
 Open issues on [My NetHack fork](https://github.com/ingpaschke/NetHack/issues)
