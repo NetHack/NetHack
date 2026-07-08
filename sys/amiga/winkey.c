@@ -15,7 +15,7 @@ amii_nh_poskey(coordxy *x, coordxy *y, int *mod)
     struct Window *w;
     /* No entry log for nh_poskey -- too noisy (called constantly) */
 
-    if (cw = amii_wins[WIN_MESSAGE]) {
+    if ((cw = amii_wins[WIN_MESSAGE]) != NULL) {
         cw->wflags &= ~FLMAP_SKIP;
         if (scrollmsg)
             cw->wflags |= FLMSG_FIRST;

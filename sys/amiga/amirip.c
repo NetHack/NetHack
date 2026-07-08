@@ -21,12 +21,9 @@
 #include "winext.h"
 #include "winproto.h"
 
-static struct RastPort *rp;
-
 #ifdef AMII_GRAPHICS
 
-#undef NULL
-#define NULL 0
+static struct RastPort *rp;
 
 #include <proto/dos.h>
 #include <proto/exec.h>
@@ -87,6 +84,7 @@ void
 amii_outrip(winid tmpwin, int how, time_t when)
 {
     int just_return = 0;
+    int palette_saved = 0;
     int done, rtxth;
 
     struct IntuiMessage *imsg;
@@ -116,6 +114,7 @@ amii_outrip(winid tmpwin, int how, time_t when)
 
     for (i = 0; i < amii_numcolors; ++i)
         sysflags.amii_curmap[i] = GetRGB4(HackScreen->ViewPort.ColorMap, i);
+    palette_saved = 1;
 
     ripwin = OpenWindow((void *) &newwin);
     if (!ripwin)
@@ -132,7 +131,8 @@ amii_outrip(winid tmpwin, int how, time_t when)
         SetFont(rp, HackFont);
 #endif
 
-    tomb_bmhd = ReadImageFile("tomb.iff", &tombimg);
+    if (!ReadImageFile("tomb.iff", &tombimg, &tomb_bmhd))
+        goto cleanup;
     if (tomb_bmhd.w > ww || tomb_bmhd.h > wh)
         goto cleanup;
 
@@ -238,12 +238,13 @@ amii_outrip(winid tmpwin, int how, time_t when)
     dofade(0, 16, 1);
 
     /* Flush all messages to avoid typeahead */
-    while (imsg = (struct IntuiMessage *) GetMsg(ripwin->UserPort))
+    while ((imsg = (struct IntuiMessage *) GetMsg(ripwin->UserPort)) != NULL)
         ReplyMsg((struct Message *) imsg);
     done = 0;
     while (!done) {
         WaitPort(ripwin->UserPort);
-        while (imsg = (struct IntuiMessage *) GetMsg(ripwin->UserPort)) {
+        while ((imsg = (struct IntuiMessage *) GetMsg(ripwin->UserPort))
+               != NULL) {
             switch (imsg->Class) {
             case MOUSEBUTTONS:
             case VANILLAKEY:
@@ -262,12 +263,15 @@ cleanup:
     /* free everything */
     if (ripwin) {
         Forbid();
-        while (imsg = (struct IntuiMessage *) GetMsg(ripwin->UserPort))
+        while ((imsg = (struct IntuiMessage *) GetMsg(ripwin->UserPort))
+               != NULL)
             ReplyMsg((struct Message *) imsg);
         Permit();
         CloseWindow(ripwin);
     }
-    LoadRGB4(&HackScreen->ViewPort, sysflags.amii_curmap, amii_numcolors);
+    if (palette_saved)
+        LoadRGB4(&HackScreen->ViewPort, sysflags.amii_curmap,
+                 amii_numcolors);
 
     FreeImageFile(&tombimg);
     if (just_return)
@@ -357,5 +361,4 @@ dofade(int start, int stop, int inc)
 /*
 TODO:
         memory leaks
-        fix ReadImageFiles to return error instead of panic on error
 */

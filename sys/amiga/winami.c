@@ -58,7 +58,7 @@ long amii_scrnmode;
 struct window_procs amii_procs = { WPID(amii), AMI_WIN_PROCS_BODY };
 struct window_procs amiv_procs = { WPID(amiv), AMI_WIN_PROCS_BODY };
 
-unsigned short amii_initmap[AMII_MAXCOLORS];
+unsigned short amii_workmap[AMII_MAXCOLORS];
 /* Default pens used unless user overides in nethack.cnf. */
 unsigned short amii_init_map[AMII_MAXCOLORS] = {
     0x0000, /* color #0  C_BLACK    */
@@ -135,7 +135,7 @@ struct Image Image1 = { 0, 0, 7, 102, 0, NULL, 0x0000, 0x0000, NULL };
 struct Gadget MenuScroll = { NULL, -15, 10, 15, -19, GRELRIGHT | GRELHEIGHT,
                              RELVERIFY | FOLLOWMOUSE | RIGHTBORDER
                                  | GADGIMMEDIATE | RELVERIFY,
-                             PROPGADGET, (APTR) &Image1, NULL, NULL, NULL,
+                             PROPGADGET, (APTR) &Image1, NULL, NULL, 0,
                              (APTR) &PropScroll, 1, NULL };
 
 /* This gadget is for the message window... */
@@ -146,7 +146,7 @@ struct Image MsgImage1 = { 0, 0, 7, 102, 0, NULL, 0x0000, 0x0000, NULL };
 struct Gadget MsgScroll = { NULL, -15, 10, 14, -19, GRELRIGHT | GRELHEIGHT,
                             RELVERIFY | FOLLOWMOUSE | RIGHTBORDER
                                 | GADGIMMEDIATE | RELVERIFY,
-                            PROPGADGET, (APTR) &MsgImage1, NULL, NULL, NULL,
+                            PROPGADGET, (APTR) &MsgImage1, NULL, NULL, 0,
                             (APTR) &MsgPropScroll, 1, NULL };
 
 int wincnt = 0; /* # of nh windows opened */
@@ -524,7 +524,7 @@ amii_yn_function(const char *query, const char *resp, char def)
     char prompt[BUFSZ + QBUFSZ + 16];
     struct amii_WinDesc *cw;
 
-    if (cw = amii_wins[WIN_MESSAGE])
+    if ((cw = amii_wins[WIN_MESSAGE]) != NULL)
         cw->disprows = 0;
     if (resp) {
         char *rb, respbuf[QBUFSZ];
@@ -660,11 +660,11 @@ amii_display_file(const char *fn, boolean complain)
     win = amii_create_nhwindow(NHW_TEXT);
 
     /* Set window title to file name */
-    if (cw = amii_wins[win])
+    if ((cw = amii_wins[win]) != NULL)
         cw->morestr = (char *) fn;
 
     while (dlb_fgets(buf, sizeof(buf), fp) != NULL) {
-        if (t = strchr(buf, '\n'))
+        if ((t = strchr(buf, '\n')) != NULL)
             *t = 0;
         amii_putstr(win, 0, buf);
     }

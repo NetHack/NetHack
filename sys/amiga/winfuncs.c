@@ -91,7 +91,7 @@ ami_wininit_data(int dir)
         mysize = 8;
 
         amii_libvers = LIBRARY_FONT_VERSION;
-        memcpy(amii_initmap, amii_init_map, sizeof(amii_initmap));
+        memcpy(amii_workmap, amii_init_map, sizeof(amii_workmap));
     } else {
         mxsize = 16;
         mysize = 16;
@@ -124,7 +124,7 @@ ami_wininit_data(int dir)
         amii_otherBPen = C_BLACK;
         amii_libvers = LIBRARY_TILE_VERSION;
 
-        memcpy(amii_initmap, amiv_init_map, sizeof(amii_initmap));
+        memcpy(amii_workmap, amiv_init_map, sizeof(amii_workmap));
     }
     memcpy(sysflags.amii_dripens, amii_defpens,
            sizeof(sysflags.amii_dripens));
@@ -971,7 +971,7 @@ amii_init_nhwindows(int *argcp, char **argv)
 
     amiIDisplay->xpix = 0;
     if (IntuitionBase->LibNode.lib_Version >= 37) {
-        if (wbscr = LockPubScreen("Workbench")) {
+        if ((wbscr = LockPubScreen("Workbench")) != NULL) {
             amiIDisplay->xpix = wbscr->Width;
             amiIDisplay->ypix = wbscr->Height;
             UnlockPubScreen(NULL, wbscr);
@@ -1020,7 +1020,8 @@ amii_init_nhwindows(int *argcp, char **argv)
      *  Load the fonts that we need.
      */
 
-    if (DiskfontBase = OpenLibrary("diskfont.library", amii_libvers)) {
+    if ((DiskfontBase = OpenLibrary("diskfont.library", amii_libvers))
+        != NULL) {
         extern UBYTE HackFontName[], HackFontPath[];
 
         Hack80.ta_Name = HackFontPath;
@@ -1227,8 +1228,8 @@ amii_init_nhwindows(int *argcp, char **argv)
         }
         amii_bmhd = ReadTileImageFiles();
     } else
-        memcpy(amii_initmap, amii_init_map, sizeof(amii_initmap));
-    memcpy(sysflags.amii_curmap, amii_initmap, sizeof(sysflags.amii_curmap));
+        memcpy(amii_workmap, amii_init_map, sizeof(amii_workmap));
+    memcpy(sysflags.amii_curmap, amii_workmap, sizeof(sysflags.amii_curmap));
 
     /* Find out how deep the screen needs to be, 32 planes is enough! */
     for (i = 0; i < 32; ++i) {
@@ -1415,7 +1416,7 @@ amii_clear_nhwindow(winid win)
         amii_clear_nhwindow(WIN_OVER);
     }
 
-    if (w = cw->win)
+    if ((w = cw->win) != NULL)
         SetDrMd(w->RPort, JAM2);
     else
         return;
@@ -1573,7 +1574,8 @@ amii_display_nhwindow(winid win, boolean blocking)
     } else if (cw->type == NHW_MAP) {
         amii_end_glyphout(win);
         /* Do more if it is time... */
-        if (blocking == TRUE && amii_wins[WIN_MESSAGE]->curx) {
+        if (blocking == TRUE && WIN_MESSAGE != WIN_ERR
+            && amii_wins[WIN_MESSAGE] && amii_wins[WIN_MESSAGE]->curx) {
             outmore(amii_wins[WIN_MESSAGE]);
         }
     }
@@ -1968,7 +1970,10 @@ amii_bell(void)
 void
 removetopl(int cnt)
 {
-    struct amii_WinDesc *cw = amii_wins[WIN_MESSAGE];
+    struct amii_WinDesc *cw;
+
+    if (WIN_MESSAGE == WIN_ERR || (cw = amii_wins[WIN_MESSAGE]) == NULL)
+        return;
     /* NB - this is sufficient for
      * yn_function, but that's it
      */
@@ -2229,6 +2234,10 @@ amii_cliparound(int x, int y)
         return;
     }
 
+    if (WIN_MAP == WIN_ERR || !amii_wins[WIN_MAP]
+        || !amii_wins[WIN_MAP]->win)
+        return;
+
     if (Is_rogue_level(&u.uz)) {
         struct Window *w = amii_wins[WIN_MAP]->win;
         struct RastPort *rp = w->RPort;
@@ -2355,6 +2364,6 @@ void
 flushIDCMP(struct MsgPort *port)
 {
     struct Message *msg;
-    while (msg = GetMsg(port))
+    while ((msg = GetMsg(port)) != NULL)
         ReplyMsg(msg);
 }

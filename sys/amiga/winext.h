@@ -25,7 +25,7 @@ extern struct window_procs amii_procs;
 extern struct window_procs amiv_procs;
 /* Three similarly-named palette arrays.  Note the position of the
  * second underscore distinguishes them:
- *   amii_initmap  = working/runtime palette (mutated by tile/tomb load
+ *   amii_workmap  = working/runtime palette (mutated by tile/tomb load
  *                   and the in-game color editor).
  *   amii_init_map = AMII (text-mode) compile-time defaults, 8 entries.
  *   amiv_init_map = AMIV (tile-mode) compile-time defaults, 32 entries
@@ -34,7 +34,7 @@ extern struct window_procs amiv_procs;
  * The naming is historical; sysflags.amii_curmap is yet another related
  * array holding the user's saved color choices.
  */
-extern unsigned short amii_initmap[AMII_MAXCOLORS];
+extern unsigned short amii_workmap[AMII_MAXCOLORS];
 extern unsigned short amiv_init_map[AMII_MAXCOLORS];
 extern unsigned short amii_init_map[AMII_MAXCOLORS];
 extern int bigscreen;

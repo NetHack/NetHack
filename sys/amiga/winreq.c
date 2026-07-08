@@ -18,17 +18,17 @@ SHORT BorderVectors1[] = { 0, 0, 57, 0, 57, 11, 0, 11, 0, 0 };
 struct Border Border1 = { -1, -1, 3, 0, JAM1, 5, BorderVectors1, NULL };
 struct IntuiText IText1 = { 3, 0, JAM1, 4, 1, NULL, (UBYTE *) "Cancel",
                             NULL };
-struct Gadget Gadget2 = { NULL, 9, 15, 56, 10, NULL, RELVERIFY, BOOLGADGET,
-                          (APTR) &Border1, NULL, &IText1, NULL, NULL, 1,
+struct Gadget Gadget2 = { NULL, 9, 15, 56, 10, 0, RELVERIFY, BOOLGADGET,
+                          (APTR) &Border1, NULL, &IText1, 0, NULL, 1,
                           NULL };
 UBYTE StrStringSIBuff[BUFSZ];
 struct StringInfo StrStringSInfo = { StrStringSIBuff, UNDOBUFFER, 0, BUFSZ, 0,
                                      0, 0, 0, 0, 0, 0, 0, NULL };
 SHORT BorderVectors2[] = { 0, 0, 439, 0, 439, 11, 0, 11, 0, 0 };
 struct Border Border2 = { -1, -1, 3, 0, JAM1, 5, BorderVectors2, NULL };
-struct Gadget String = { &Gadget2, 77, 15, 438, 10, NULL,
+struct Gadget String = { &Gadget2, 77, 15, 438, 10, 0,
                          RELVERIFY + STRINGCENTER, STRGADGET, (APTR) &Border2,
-                         NULL, NULL, NULL, (APTR) &StrStringSInfo, 2, NULL };
+                         NULL, NULL, 0, (APTR) &StrStringSInfo, 2, NULL };
 
 #define StrString \
     ((char *) (((struct StringInfo *) (String.SpecialInfo))->Buffer))
@@ -128,7 +128,8 @@ EditColor(void)
     while (!done) {
         WaitPort(nw->UserPort);
 
-        while (imsg = (struct IntuiMessage *) GetMsg(nw->UserPort)) {
+        while ((imsg = (struct IntuiMessage *) GetMsg(nw->UserPort))
+               != NULL) {
             gd = (struct Gadget *) imsg->IAddress;
             code = imsg->Code;
             class = imsg->Class;
@@ -189,9 +190,7 @@ EditColor(void)
 
                     {
                         size_t olen;
-                        strncpy(oname, dirname((char *) configfile),
-                                sizeof(oname) - 1);
-                        oname[sizeof(oname) - 1] = '\0';
+                        nh_dirname(configfile, oname, sizeof oname);
                         olen = strlen(oname);
                         if (olen > 0 && oname[olen - 1] != ':') {
                             Snprintf(nname, sizeof nname,
@@ -407,7 +406,8 @@ EditClipping(void)
     while (!done) {
         WaitPort(nw->UserPort);
 
-        while (imsg = (struct IntuiMessage *) GetMsg(nw->UserPort)) {
+        while ((imsg = (struct IntuiMessage *) GetMsg(nw->UserPort))
+               != NULL) {
             gd = (struct Gadget *) imsg->IAddress;
             code = imsg->Code;
             class = imsg->Class;
@@ -512,38 +512,21 @@ EditClipping(void)
     }
 }
 
-char *
-dirname(char *str)
+void
+nh_dirname(const char *str, char *dir, size_t dirsize)
 {
-    static char dir[300];
     char *t;
 
-    strncpy(dir, str, sizeof(dir) - 1);
-    dir[sizeof(dir) - 1] = '\0';
+    strncpy(dir, str, dirsize - 1);
+    dir[dirsize - 1] = '\0';
 
     t = strrchr(dir, '/');
-    if (!t)
-        t = strrchr(dir, ':');
-    if (!t)
-        dir[0] = '\0';
-    else
+    if (t)
         *t = '\0';
-    return (dir);
-}
-
-char *
-basename(char *str)
-{
-    char *t;
-
-    t = strrchr(str, '/');
-    if (!t)
-        t = strrchr(str, ':');
-    if (!t)
-        t = str;
+    else if ((t = strrchr(dir, ':')) != 0)
+        t[1] = '\0';
     else
-        ++t;
-    return (t);
+        dir[0] = '\0';
 }
 
 int
@@ -559,7 +542,7 @@ filecopy(char *from, char *to)
         if (IntuitionBase->LibNode.lib_Version >= 37)
             i = System(buf, NULL);
         else
-            Execute(buf, NULL, NULL);
+            Execute(buf, 0, 0);
         free(buf);
     } else {
         return (-1);
@@ -747,21 +730,21 @@ amii_setpens(int count)
             long args[2];
             args[0] = count;
             args[1] = amii_numcolors;
-            if (EasyRequest(NULL, &ea2, NULL, args) == 1) {
-                memcpy(sysflags.amii_curmap, amii_initmap,
-                       amii_numcolors * sizeof(amii_initmap[0]));
+            if (EasyRequestArgs(NULL, &ea2, NULL, (APTR) args) == 1) {
+                memcpy(sysflags.amii_curmap, amii_workmap,
+                       amii_numcolors * sizeof(amii_workmap[0]));
             }
         }
     } else if (IntuitionBase && IntuitionBase->LibNode.lib_Version >= 37) {
         if (count != amii_numcolors) {
-            if (EasyRequest(NULL, &ea, NULL, NULL) == 1) {
-                memcpy(sysflags.amii_curmap, amii_initmap,
-                       amii_numcolors * sizeof(amii_initmap[0]));
+            if (EasyRequestArgs(NULL, &ea, NULL, NULL) == 1) {
+                memcpy(sysflags.amii_curmap, amii_workmap,
+                       amii_numcolors * sizeof(amii_workmap[0]));
             }
         }
     } else if (count != amii_numcolors) {
-        memcpy(sysflags.amii_curmap, amii_initmap,
-               amii_numcolors * sizeof(amii_initmap[0]));
+        memcpy(sysflags.amii_curmap, amii_workmap,
+               amii_numcolors * sizeof(amii_workmap[0]));
     }
 
     /* If the pens are set in NetHack.cnf, we can get called before
