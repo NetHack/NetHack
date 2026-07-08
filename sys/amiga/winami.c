@@ -32,7 +32,7 @@ long amii_scrnmode;
  * AMIV (tile) split happens at runtime based on WINVERS_AMIV checks. */
 #define AMI_WIN_PROCS_BODY                                              \
     WC_COLOR | WC_HILITE_PET | WC_INVERSE,                              \
-    0L,                                                                 \
+    WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_HITPOINTBAR,             \
     { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, /* has_color */ \
     amii_init_nhwindows,                                                \
     amii_player_selection, amii_askname, amii_get_nh_event,             \
@@ -49,8 +49,8 @@ long amii_scrnmode;
     amii_change_color, amii_get_color_string,                           \
     amii_outrip, genl_preference_update,                                \
     genl_getmsghistory, genl_putmsghistory,                             \
-    genl_status_init, genl_status_finish, genl_status_enablefield,      \
-    genl_status_update,                                                 \
+    amii_status_init, amii_status_finish, amii_status_enablefield,      \
+    amii_status_update,                                                 \
     genl_can_suspend_yes,                                               \
     amii_update_inventory,                                              \
     amii_ctrl_nhwindow
