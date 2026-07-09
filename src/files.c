@@ -1365,7 +1365,7 @@ plname_from_file(
             gs.SAVEF[sln - xln] = '\0';
     }
 #endif
-    nh_uncompress(gs.SAVEF);
+    nh_uncompress(fqname(gs.SAVEF, SAVEPREFIX, 0));
     if ((nhfp = open_savefile()) != 0) {
         if ((sfstatus = validate(nhfp, filename,
                                 without_wait_synch_per_file,
@@ -1378,7 +1378,7 @@ plname_from_file(
         }
         close_nhfile(nhfp);
     }
-    nh_compress(gs.SAVEF);
+    nh_compress(fqname(gs.SAVEF, SAVEPREFIX, 0));
     return result; /* file's plname[]+playmode value */
 }
 #endif /* defined(SELECTSAVED) */
