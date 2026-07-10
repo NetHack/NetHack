@@ -89,7 +89,7 @@ get_scr_size(void)
         txt_get_scr_size();
 }
 
-#ifdef ENHANCED_SYMBOLS
+#if defined(TTY_GRAPHICS) && defined(ENHANCED_SYMBOLS)
 void g_pututf8(uint8 *utf8str)
 {
     /* not implemented for msdos (yet) */

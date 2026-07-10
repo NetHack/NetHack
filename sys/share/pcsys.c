@@ -271,7 +271,9 @@ msexit(void)
         restore_colors();
 #endif
     wait_synch();
+#if !(defined(MSDOS) && !defined(TTY_GRAPHICS))
     term_curs_set(1);
+#endif
     return;
 }
 #endif /* MICRO || OS2 */

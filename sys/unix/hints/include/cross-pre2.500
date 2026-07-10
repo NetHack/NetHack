@@ -177,7 +177,15 @@ MSDOS_GPP_CFLAGS = -Wall -Wextra -Wno-missing-field-initializers -Wreturn-type \
 	-Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings -pedantic \
 	-Wmissing-declarations -Wformat-nonliteral -Wunreachable-code \
 	-Wno-maybe-uninitialized
-ifdef NO_GRAPHICS
+ifndef WANT_WIN_TTY
+    # A Curses-only configuration
+    MSDOS_GRAPH_CONFIG = -DNOTTYGRAPHICS
+    SKIP_TILES = 1
+    ifndef WANT_DOSVGA
+        SKIP_FONTS = 1
+    endif
+    SKIP_FONT_C = 1
+else ifdef NO_GRAPHICS
     MSDOS_GRAPH_CONFIG = -DSUPPRESS_GRAPHICS
     # Curses will need the fonts, but not font.c
     ifndef WANT_DOSVGA

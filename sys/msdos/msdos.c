@@ -61,6 +61,7 @@ static unsigned int dos_ioctl(int, int, unsigned);
 extern boolean pckeys(unsigned char, unsigned char); /* pckeys.c */
 #endif
 
+#ifdef TTY_GRAPHICS
 int
 tgetch(void)
 {
@@ -86,6 +87,7 @@ tgetch(void)
 #endif
     return ((ch == '\r') ? '\n' : ch);
 }
+#endif /* TTY_GRAPHICS */
 
 /*
  *  Keyboard translation tables.

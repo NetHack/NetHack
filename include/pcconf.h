@@ -73,7 +73,7 @@
  * You may uncomment any/all of the options below.
  *
  */
-#ifndef SUPPRESS_GRAPHICS
+#if defined(TTY_GRAPHICS) && !defined(SUPPRESS_GRAPHICS)
 #if (defined(SCREEN_BIOS) || defined(SCREEN_DJGPPFAST)) && !defined(PC9800)
 #if defined(TILES_IN_GLYPHMAP) || defined(ENHANCED_SYMBOLS)
 #define SCREEN_VGA /* Include VGA graphics routines in the build */
