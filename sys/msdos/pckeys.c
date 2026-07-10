@@ -8,16 +8,17 @@
 
 #include "hack.h"
 
-#ifdef MSDOS
-#ifdef TILES_IN_GLYPHMAP
+#if defined(MSDOS) && defined(NO_TERMS)
 #include "wintty.h"
 #include "pcvideo.h"
 
 boolean pckeys(unsigned char, unsigned char);
+#ifdef TILES_IN_GLYPHMAP
 static void userpan(enum vga_pan_direction pan);
 static void overview(boolean);
 static void traditional(boolean);
 static void refresh(void);
+#endif
 
 extern struct WinDesc *wins[MAXWIN]; /* from wintty.c */
 extern boolean inmap;                /* from video.c */
@@ -34,9 +35,15 @@ extern boolean inmap;                /* from video.c */
 boolean
 pckeys(unsigned char scancode, unsigned char shift)
 {
+#ifdef TILES_IN_GLYPHMAP
     boolean opening_dialog;
 
     opening_dialog = svp.pl_character[0] ? FALSE : TRUE;
+#endif
+
+#ifndef TILES_IN_GLYPHMAP
+    nhUse(shift);
+#endif
     switch (scancode) {
 #ifdef SIMULATE_CURSOR
     case 0x3d: /* F3 = toggle cursor type */
@@ -47,6 +54,7 @@ pckeys(unsigned char scancode, unsigned char shift)
         DrawCursor();
         break;
 #endif
+#ifdef TILES_IN_GLYPHMAP
     case 0x74: /* Control-right_arrow = scroll horizontal to right */
         if ((shift & CTRL) && iflags.tile_view && !opening_dialog)
             userpan(pan_right);
@@ -83,12 +91,14 @@ pckeys(unsigned char scancode, unsigned char shift)
             refresh();
         }
         break;
+#endif /* TILES_IN_GLYPHMAP */
     default:
         return FALSE;
     }
     return TRUE;
 }
 
+#ifdef TILES_IN_GLYPHMAP
 static void
 userpan(enum vga_pan_direction pan)
 {
@@ -141,6 +151,6 @@ refresh(void)
 #endif
 }
 #endif /* TILES_IN_GLYPHMAP */
-#endif /* MSDOS */
+#endif /* MSDOS && NO_TERMS */
 
 /*pckeys.c*/

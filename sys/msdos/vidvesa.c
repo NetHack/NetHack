@@ -15,12 +15,22 @@
 #include "pctiles.h"
 #include "vesa.h"
 #include "wintty.h"
-#include "tileset.h"
 #include "font.h"
+
+#ifdef TILES_IN_GLYPHMAP
+#include "tileset.h"
+#else
+/* For the palette */
+struct Pixel {
+    unsigned char r, g, b, a;
+};
+#endif
 
 #define FIRST_TEXT_COLOR 240
 
+#ifdef TILES_IN_GLYPHMAP
 extern int total_tiles_used, Tile_corr, Tile_unexplored;  /* from tile.c */
+#endif
 struct VesaCharacter {
     uint32 colour, bgcolour;
     uint32 chr;
@@ -37,8 +47,10 @@ static unsigned long vesa_MakeColor(struct Pixel);
 static void vesa_FillRect(unsigned left, unsigned top, unsigned width,
                           unsigned height, unsigned color);
 
+#ifdef TILES_IN_GLYPHMAP
 static void vesa_redrawmap(void);
 static void vesa_cliparound(int, int);
+#endif
 #if 0
 static void decal_packed(const struct TileImage *tile, unsigned special);
 #endif
@@ -47,7 +59,9 @@ static void vesa_SetViewPort(void);
 static boolean vesa_SetPalette(const struct Pixel *);
 static boolean vesa_SetHardPalette(const struct Pixel *);
 static boolean vesa_SetSoftPalette(const struct Pixel *);
+#ifdef TILES_IN_GLYPHMAP
 static void vesa_DisplayCell(int, int, int);
+#endif
 static unsigned vesa_FindMode(unsigned long mode_addr, unsigned bits);
 static void vesa_WriteChar(uint32, int, int, uint32);
 static void vesa_WriteCharXY(uint32, int, int, uint32);
@@ -60,8 +74,10 @@ static unsigned long vesa_DoublePixels(unsigned long);
 static unsigned long vesa_TriplePixels(unsigned long);
 static void vesa_WriteStr(const char *, int, int, int, int);
 static unsigned char __far *vesa_FontPtrs(void);
+#ifdef TILES_IN_GLYPHMAP
 static unsigned char *vesa_tile(unsigned);
 static unsigned char *vesa_oview_tile(unsigned);
+#endif
 /* static void vesa_process_tile(struct TileImage *tile); */
 
 #ifdef POSITIONBAR
@@ -84,6 +100,7 @@ extern boolean inmap;           /* in the map window */
 
 static unsigned char __far *font;
 
+#ifdef TILES_IN_GLYPHMAP
 static struct map_struct {
     int glyph;
     uint32 ch;
@@ -108,10 +125,13 @@ static struct map_struct {
                 map[y][x].inverse = 0;                          \
             }                                                   \
     }
+#endif /* TILES_IN_GLYPHMAP */
 #define TOP_MAP_ROW 1
 
+#ifdef TILES_IN_GLYPHMAP
 static int viewport_cols = 40;
 static int viewport_rows = ROWNO;
+#endif
 
 static const struct Pixel defpalette[] = {    /* Colors for text and the position bar */
         { 0x00, 0x00, 0x00, 0xff }, /* CLR_BLACK */
@@ -158,8 +178,10 @@ static unsigned char vesa_blue_shift;
 static unsigned long vesa_palette[256];
 static unsigned vesa_char_width = 8, vesa_char_height = 16;
 static unsigned vesa_oview_width, vesa_oview_height;
+#ifdef TILES_IN_GLYPHMAP
 static unsigned char **vesa_tiles;
 static unsigned char **vesa_oview_tiles;
+#endif
 static struct BitmapFont *vesa_font;
 
 #ifdef SIMULATE_CURSOR
@@ -564,8 +586,10 @@ void
 vesa_clear_screen(int colour)
 {
     vesa_FillRect(0, 0, vesa_x_res, vesa_y_res, colour);
+#ifdef TILES_IN_GLYPHMAP
     if (iflags.tile_view)
         vesa_clearmap();
+#endif
     vesa_gotoloc(0, 0); /* is this needed? */
 }
 
@@ -893,6 +917,7 @@ vesa_redrawmap(void)
 #endif /* TILES_IN_GLYPHMAP && CLIPPING */
 
 
+#ifdef TILES_IN_GLYPHMAP
 void
 vesa_userpan(enum vga_pan_direction pan)
 {
@@ -1040,6 +1065,7 @@ decal_packed(const struct TileImage *gp, unsigned special)
     }
 }
 #endif
+#endif /* TILES_IN_GLYPHMAP */
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
@@ -1055,7 +1081,9 @@ vesa_Init(void)
 {
     static boolean inited = FALSE;
     const struct Pixel *paletteptr;
+#ifdef TILES_IN_GLYPHMAP
     const char *tile_file;
+#endif
     const char *font_name;
     int tilefailure = 0;
 
@@ -1089,11 +1117,16 @@ vesa_Init(void)
         /* term_clear_screen() */ /* not vesa_clear_screen() */
         return;
     }
+    paletteptr = get_palette();
+#else
+    /* This isn't actually used; it just keeps paletteptr from being NULL,
+     * so an 8 bit color mode will work */
+    paletteptr = defpalette;
 #endif
 
     vesa_mode = 0xFFFF; /* might want an 8 bit mode after loading tiles */
     vesa_detect();
-    if (vesa_mode == 0xFFFF || (vesa_pixel_size == 8 && get_palette() == NULL)) {
+    if (vesa_mode == 0xFFFF || (vesa_pixel_size == 8 && paletteptr == NULL)) {
         raw_printf("%s (%d)", "Reverting to TTY mode, no VESA mode available.",
                    tilefailure);
         wait_synch();
@@ -1108,25 +1141,26 @@ vesa_Init(void)
 
     vesa_SwitchMode(vesa_mode);
     vesa_SetViewPort();
+#ifdef TILES_IN_GLYPHMAP
     windowprocs.win_cliparound = vesa_cliparound;
+#endif
     if (vesa_pixel_size > 8) {
         windowprocs.wincap2 |= WC2_EXTRACOLORS;
     }
 #ifdef TILES_IN_GLYPHMAP
-    paletteptr = get_palette();
     iflags.tile_view = TRUE;
     iflags.over_view = FALSE;
-#else
-    paletteptr = defpalette;
 #endif
     vesa_SetPalette(paletteptr);
     g_attribute = attrib_gr_normal;
     font = vesa_FontPtrs();
     term_clear_screen();
+#ifdef TILES_IN_GLYPHMAP
     clipx = 0;
     clipxmax = clipx + (viewport_cols - 1);
     clipy = 0;
     clipymax = clipy + (viewport_rows - 1);
+#endif
 
     /* Load a font of size appropriate to the screen size */
     if (vesa_x_res >= 1280 && vesa_y_res >= 960)
@@ -1185,15 +1219,18 @@ vesa_Init(void)
     }
 
     /* Process tiles for the current video mode */
+#ifdef TILES_IN_GLYPHMAP
     vesa_tiles = (unsigned char **) alloc(total_tiles_used * sizeof(void *));
     memset(vesa_tiles, 0, total_tiles_used * sizeof(void *));
     vesa_oview_tiles = (unsigned char **) alloc(total_tiles_used * sizeof(void *));
     memset(vesa_oview_tiles, 0, total_tiles_used * sizeof(void *));
     set_tile_type(vesa_pixel_size > 8);
+#endif
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
+#ifdef TILES_IN_GLYPHMAP
 /* Return processed pixels for a normal tile */
 static unsigned char *
 vesa_tile(unsigned index)
@@ -1277,11 +1314,13 @@ vesa_oview_tile(unsigned index)
 
     return vesa_oview_tiles[index];
 }
+#endif /* TILES_IN_GLYPHMAP */
 
 /* Set the size of the map viewport */
 static void
 vesa_SetViewPort(void)
 {
+#ifdef TILES_IN_GLYPHMAP
     unsigned y_reserved = (TOP_MAP_ROW + 5) * vesa_char_height;
     unsigned y_map = vesa_y_res - y_reserved;
 
@@ -1289,6 +1328,7 @@ vesa_SetViewPort(void)
     viewport_rows = y_map / iflags.wc_tile_height;
     if (viewport_cols > COLNO) viewport_cols = COLNO;
     if (viewport_rows > ROWNO) viewport_rows = ROWNO;
+#endif
 }
 
 /*
@@ -1340,6 +1380,7 @@ vesa_SwitchMode(unsigned mode)
 void
 vesa_Finish(void)
 {
+#ifdef TILES_IN_GLYPHMAP
     int i;
 
     for (i = 0; i < total_tiles_used; ++i) {
@@ -1349,6 +1390,7 @@ vesa_Finish(void)
     free(vesa_tiles);
     free(vesa_oview_tiles);
     free_tiles();
+#endif
     vesa_SwitchMode(MODETEXT);
     windowprocs.win_cliparound = tty_cliparound;
     g_attribute = attrib_text_normal;
@@ -1897,6 +1939,7 @@ vesa_TriplePixels(unsigned long fnt)
  * not the x,y pixel location.
  *
  */
+#ifdef TILES_IN_GLYPHMAP
 static void
 vesa_DisplayCell(int tilenum, int col, int row)
 {
@@ -1932,6 +1975,7 @@ vesa_DisplayCell(int tilenum, int col, int row)
         tptr += p_row_width;
     }
 }
+#endif /* TILES_IN_GLYPHMAP */
 
 /*
  * Write the character string pointed to by 's', whose maximum length
@@ -2009,6 +2053,8 @@ vesa_SetHardPalette(const struct Pixel *palette)
         p2[i*4 + 1] = palette[i].g >> shift;
         p2[i*4 + 2] = palette[i].r >> shift;
     }
+#else
+    nhUse(palette);
 #endif
     for (i = FIRST_TEXT_COLOR; i < 256; ++i) {
         p2[i*4 + 0] = defpalette[i-FIRST_TEXT_COLOR].b >> shift;
@@ -2077,6 +2123,8 @@ vesa_SetSoftPalette(const struct Pixel *palette)
             ++p;
         }
     }
+#else
+    nhUse(palette);
 #endif
     p = defpalette;
     for (i = FIRST_TEXT_COLOR; i < 256; ++i) {
@@ -2199,17 +2247,25 @@ positionbar(void)
 void
 vesa_DrawCursor(void)
 {
+#ifdef TILES_IN_GLYPHMAP
     static boolean last_inmap = FALSE;
+#endif
     unsigned x, y, left, top, right, bottom, width, height;
+#ifdef TILES_IN_GLYPHMAP
     boolean isrogue = Is_rogue_level(&u.uz);
     boolean halfwidth =
         (isrogue || iflags.over_view || iflags.traditional_view || !inmap);
+#else
+    const boolean halfwidth = TRUE;
+#endif
     int curtyp;
 
+#ifdef TILES_IN_GLYPHMAP
     if (inmap && !last_inmap) {
         vesa_redrawmap();
     }
     last_inmap = inmap;
+#endif
 
     if (!cursor_type && inmap)
         return; /* CURSOR_INVIS - nothing to do */
@@ -2232,9 +2288,12 @@ vesa_DrawCursor(void)
         y -= clipy;
     }
     /* convert to pixels */
+#ifdef TILES_IN_GLYPHMAP
     if (!inmap || iflags.traditional_view) {
+#endif
         width = vesa_char_width;
         height = vesa_char_height;
+#ifdef TILES_IN_GLYPHMAP
     } else if (iflags.over_view) {
         width = vesa_oview_width;
         height = vesa_oview_height;
@@ -2242,6 +2301,7 @@ vesa_DrawCursor(void)
         width = iflags.wc_tile_width;
         height = iflags.wc_tile_height;
     }
+#endif
     left = x * width  + vesa_x_center;
     top  = y * height + vesa_y_center;
     if (y >= TOP_MAP_ROW) {
@@ -2315,9 +2375,13 @@ void
 vesa_HideCursor(void)
 {
     unsigned x, y, left, top, width, height;
+#ifdef TILES_IN_GLYPHMAP
     boolean isrogue = Is_rogue_level(&u.uz);
     boolean halfwidth =
         (isrogue || iflags.over_view || iflags.traditional_view || !inmap);
+#else
+    const boolean halfwidth = TRUE;
+#endif
 
     if (!cursor_type && inmap)
         return; /* CURSOR_INVIS - nothing to do */
@@ -2336,9 +2400,12 @@ vesa_HideCursor(void)
         y -= clipy;
     }
     /* convert to pixels */
+#ifdef TILES_IN_GLYPHMAP
     if (!inmap || iflags.traditional_view) {
+#endif
         width = vesa_char_width;
         height = vesa_char_height;
+#ifdef TILES_IN_GLYPHMAP
     } else if (iflags.over_view) {
         width = vesa_oview_width;
         height = vesa_oview_height;
@@ -2346,6 +2413,7 @@ vesa_HideCursor(void)
         width = iflags.wc_tile_width;
         height = iflags.wc_tile_height;
     }
+#endif
     left = x * width  + vesa_x_center;
     top  = y * height + vesa_y_center;
     if (y >= TOP_MAP_ROW) {

@@ -3,6 +3,9 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"
+
+#ifdef TILES_IN_GLYPHMAP
+
 #include "tileset.h"
 
 /* First BMP file header */
@@ -592,3 +595,5 @@ pixel_element(uint32 mask, uint32 color)
     color &= mask;
     return color * 255 / mask;
 }
+
+#endif /* TILES_IN_GLYPHMAP */

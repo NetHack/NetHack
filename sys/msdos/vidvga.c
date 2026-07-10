@@ -10,8 +10,16 @@
 #ifdef SCREEN_VGA /* this file is for SCREEN_VGA only    */
 #include "pcvideo.h"
 #include "tile.h"
-#include "tileset.h"
 #include "font.h"
+
+#ifdef TILES_IN_GLYPHMAP
+#include "tileset.h"
+#else
+/* For the palette */
+struct Pixel {
+    unsigned char r, g, b, a;
+};
+#endif
 
 #include <dos.h>
 #include "wintty.h"
@@ -109,28 +117,35 @@ void vga_backsp(void);
 #ifdef SCROLLMAP
 static void vga_scrollmap(boolean);
 #endif
+#ifdef TILES_IN_GLYPHMAP
 static void vga_redrawmap(boolean);
 static void vga_cliparound(int, int);
 static void decal_planar(struct planar_cell_struct *, unsigned);
+#endif
 
 #ifdef POSITIONBAR
 static void positionbar(void);
 static void vga_special(int, int, int);
 #endif
 
+#ifdef TILES_IN_GLYPHMAP
 static void vga_DisplayCell(struct planar_cell_struct *, int, int);
 static void vga_DisplayCell_O(struct overview_planar_cell_struct *, int,
                               int);
+#endif
 static void vga_SwitchMode(unsigned int);
 static void vga_SetPalette(const struct Pixel *);
 static void vga_WriteChar(uint32, int, int, int);
 static void vga_GetBitmap(uint32, unsigned char *);
 static void vga_WriteStr(char *, int, int, int, int);
+static char __far *vga_FontPtrs(void);
 
+#ifdef TILES_IN_GLYPHMAP
 static void read_planar_tile(unsigned, struct planar_cell_struct *);
 static void read_planar_tile_O(unsigned,
                                struct overview_planar_cell_struct *);
 static void read_tile_indexes(unsigned, unsigned char (*)[TILE_X]);
+#endif
 
 extern int clipx, clipxmax; /* current clipping column from wintty.c */
 extern boolean clipping;    /* clipping on? from wintty.c */
@@ -156,6 +171,7 @@ static struct BitmapFont *psf_font;
 static char *screentable[SCREENHEIGHT];
 
 static const struct Pixel *paletteptr;
+#ifdef TILES_IN_GLYPHMAP
 static struct map_struct {
     int glyph;
     uint32 ch;
@@ -180,11 +196,14 @@ extern int total_tiles_used, Tile_corr, Tile_unexplored;  /* from tile.c */
                 map[y][x].tileidx = Tile_unexplored;            \
             }                                                   \
     }
+#endif /* TILES_IN_GLYPHMAP */
 #define TOP_MAP_ROW 1
 
+#ifdef TILES_IN_GLYPHMAP
 static const int vgacmap[CLR_MAX] = {
     1, 4, 6, 10, 5, 9, 0, 15,
     12, 3, 7, 8, 2, 9, 0, 14 };
+#endif
 static const int textcmap[CLR_MAX] = {
     1, 4, 6, 10, 5, 9, 0, 15,
     12, 3, 7, 8, 2, 11, 13, 14 };
@@ -214,12 +233,13 @@ static const struct Pixel text_palette[] = {
         };
 
 #ifndef ALTERNATE_VIDEO_METHOD
-int vp[SCREENPLANES] = { 8, 4, 2, 1 };
+static int vp[SCREENPLANES] = { 8, 4, 2, 1 };
 #endif
-int vp2[SCREENPLANES] = { 1, 2, 4, 8 };
 
+#ifdef TILES_IN_GLYPHMAP
 static struct planar_cell_struct **cell_cache;
 static struct overview_planar_cell_struct **cell_cache_O;
+#endif
 
 /* static int  g_attribute; */ /* Current attribute to use */
 
@@ -260,8 +280,10 @@ vga_clear_screen(int colour)
         WRITE_ABSOLUTE_DWORD(&pch[j], 0x00000000);
     }
     egawriteplane(15);
+#ifdef TILES_IN_GLYPHMAP
     if (iflags.tile_view)
         vga_clearmap();
+#endif
     vga_gotoloc(0, 0); /* is this needed? */
 }
 
@@ -534,6 +556,7 @@ vga_redrawmap(boolean clearfirst)
 }
 #endif /* TILES_IN_GLYPHMAP && CLIPPING */
 
+#ifdef TILES_IN_GLYPHMAP
 void
 vga_userpan(enum vga_pan_direction pan)
 {
@@ -774,6 +797,7 @@ decal_planar(struct planar_cell_struct *gpcs UNUSED, unsigned special)
     } else if (special & MG_RIDDEN) {
     }
 }
+#endif /* TILES_IN_GLYPHMAP */
 
 /*
  * Open tile files,
@@ -834,7 +858,9 @@ vga_Init(void)
         }
     }
     vga_SwitchMode(MODE640x480);
+#ifdef TILES_IN_GLYPHMAP
     windowprocs.win_cliparound = vga_cliparound;
+#endif
     /*     vga_NoBorder(BACKGROUND_VGA_COLOR); */ /* Not needed after palette
                                                      mod */
 #ifdef TILES_IN_GLYPHMAP
@@ -904,6 +930,7 @@ vga_SwitchMode(unsigned int mode)
 void
 vga_Finish(void)
 {
+#ifdef TILES_IN_GLYPHMAP
     int i;
 
     free_tiles();
@@ -915,6 +942,7 @@ vga_Finish(void)
     cell_cache = NULL;
     free(cell_cache_O);
     cell_cache_O = NULL;
+#endif
     vga_SwitchMode(MODETEXT);
     windowprocs.win_cliparound = tty_cliparound;
     g_attribute = attrib_text_normal;
@@ -954,7 +982,7 @@ vga_NoBorder(int bc)
  * address of the appropriate character definition table for
  * the current graphics mode into interrupt vector 0x43 (0000:010C).
  */
-char __far *
+static char __far *
 vga_FontPtrs(void)
 {
     USHORT __far *tmp;
@@ -1109,6 +1137,7 @@ vga_GetBitmap(uint32 chr, unsigned char *bitmap)
     }
 }
 
+#ifdef TILES_IN_GLYPHMAP
 /*
  * This is the routine that displays a high-res "cell" pointed to by 'gp'
  * at the desired location (col,row).
@@ -1172,6 +1201,7 @@ vga_DisplayCell_O(struct overview_planar_cell_struct *gpcs, int col, int row)
     }
     egawriteplane(15);
 }
+#endif /* TILES_IN_GLYPHMAP */
 
 /*
  * Write the character string pointed to by 's', whose maximum length
@@ -1421,9 +1451,13 @@ vga_DrawCursor(void)
     unsigned char first, second;
     /* char on[2] =  {0xFF,0xFF}; */
     /* char off[2] = {0x00,0x00}; */
+#ifdef TILES_IN_GLYPHMAP
     boolean isrogue = Is_rogue_level(&u.uz);
     boolean singlebyte =
         (isrogue || iflags.over_view || iflags.traditional_view || !inmap);
+#else
+    const boolean singlebyte = TRUE;
+#endif
     int curtyp;
 
     if (!cursor_type && inmap)
@@ -1633,9 +1667,13 @@ vga_HideCursor(void)
     int i, pixx, pixy, x, y;
     char __far *tmp1;
     char __far *tmp2;
+#ifdef TILES_IN_GLYPHMAP
     boolean isrogue = Is_rogue_level(&u.uz);
     boolean singlebyte =
         (isrogue || iflags.over_view || iflags.traditional_view || !inmap);
+#else
+    const boolean singlebyte = TRUE;
+#endif
     int curtyp;
 
     if (inmap && !cursor_type)

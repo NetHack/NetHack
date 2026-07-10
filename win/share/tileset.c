@@ -3,6 +3,9 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"
+
+#ifdef TILES_IN_GLYPHMAP
+
 #include "objclass.h"
 #include "flag.h"
 #include "tileset.h"
@@ -348,3 +351,5 @@ read_png_tiles(const char *filename UNUSED, struct TileSetImage *image UNUSED)
     /* stub */
     return FALSE;
 }
+
+#endif /* TILES_IN_GLYPHMAP */

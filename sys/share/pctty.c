@@ -53,6 +53,13 @@ setftty(void)
     term_start_screen();
 }
 
+#ifdef ENHANCED_SYMBOLS
+void
+tty_utf8graphics_fixup(void)
+{
+}
+#endif
+
 #if defined(TIMED_DELAY) && defined(_MSC_VER)
 void
 msleep(unsigned mseconds)

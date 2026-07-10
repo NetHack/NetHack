@@ -50,7 +50,7 @@ $(DOSFONT)/ter-u32b.psf: $(FONTTOP)/ter-u32b.bdf $(DOSFONT)/nh-u32b.bdf $(DOSFON
 #
 .PHONY: dodata dospkg dosfonts
 dosfonts: $(FONTTARGETS)
-dospkg: dodata dosfonts $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
+dospkg: dodata dosfonts $(GAMEBIN) $(TARGETPFX)recover.exe $(NHTILES)
 	$(TARGET_STUBEDIT) $(GAMEBIN) minstack=2048K
 	mkdir -p $(TARGETPFX)pkg
 	cp $(GAMEBIN) $(TARGETPFX)pkg/NETHACK.EXE
@@ -58,7 +58,7 @@ dospkg: dodata dosfonts $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
 	-cp $(SFCTOOLBIN) $(TARGETPFX)pkg/SFCTOOL.EXE
 	cp ../dat/nhdat $(TARGETPFX)pkg/NHDAT
 	cp ../dat/license $(TARGETPFX)pkg/LICENSE
-	cp ../dat/nhtiles.bmp $(TARGETPFX)pkg/NHTILES.BMP
+	-cp ../dat/nhtiles.bmp $(TARGETPFX)pkg/NHTILES.BMP
 	cp ../dat/symbols $(TARGETPFX)pkg/SYMBOLS
 	cp ../sys/share/NetHack.cnf $(TARGETPFX)pkg/NETHACK.CNF
 	cp ../sys/msdos/sysconf $(TARGETPFX)pkg/SYSCONF
