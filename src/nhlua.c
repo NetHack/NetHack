@@ -5,6 +5,14 @@
 #include "hack.h"
 #include "dlb.h"
 
+/* minimum and maximum LUA_VERSION_NUM expected by this version of NetHack */                                                                        \
+#ifndef NHL_MIN_VERSION_NUM_EXPECTED
+#define NHL_MIN_VERSION_NUM_EXPECTED 504
+#endif
+#ifndef NHL_MAX_VERSION_NUM_EXPECTED
+#define NHL_MAX_VERSION_NUM_EXPECTED 505
+#endif
+
 #ifndef LUA_VERSION_RELEASE_NUM
 #ifdef NHL_SANDBOX
 #undef NHL_SANDBOX
@@ -2298,22 +2306,20 @@ DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 lua_State *
 nhl_init(nhl_sandbox_info *sbi)
 {
-    /* It would be nice to import EXPECTED from each build system. XXX */
-    /* And it would be nice to do it only once, but it's cheap. */
-#ifndef NHL_VERSION_EXPECTED
-#if LUA_VERSION_NUM >= 505
-#define NHL_VERSION_EXPECTED 50500
-#else
-#define NHL_VERSION_EXPECTED 50408
-#endif
-#endif
-
 #ifdef NHL_SANDBOX
-    if (NHL_VERSION_EXPECTED != LUA_VERSION_RELEASE_NUM) {
-        panic(
-            "sandbox doesn't know this Lua version: this=%d != expected=%d ",
-            LUA_VERSION_RELEASE_NUM, NHL_VERSION_EXPECTED);
-    }
+#define SANDBOX_DOESNT_KNOW "sandbox doesn't know this Lua version: "
+if (LUA_VERSION_NUM < NHL_MIN_VERSION_NUM_EXPECTED
+    || LUA_VERSION_NUM > NHL_MAX_VERSION_NUM_EXPECTED) {
+        if (NHL_MIN_VERSION_NUM_EXPECTED == NHL_MAX_VERSION_NUM_EXPECTED)
+            panic("%sthis=%d != expected=%d", SANDBOX_DOESNT_KNOW,
+                  LUA_VERSION_NUM, NHL_MIN_VERSION_NUM_EXPECTED);
+        else
+            panic("%sthis=%d, but expected %d to %d", SANDBOX_DOESNT_KNOW,
+                  LUA_VERSION_NUM,
+                  NHL_MIN_VERSION_NUM_EXPECTED,
+                  NHL_MAX_VERSION_NUM_EXPECTED);
+}
+#undef SANDBOX_DOESNT_KNOW
 #endif
 
     lua_State *L = nhlL_newstate(sbi, "nhl_init");
