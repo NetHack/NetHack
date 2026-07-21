@@ -5,7 +5,7 @@
 #include "hack.h"
 #include "dlb.h"
 
-/* minimum and maximum LUA_VERSION_NUM expected by this version of NetHack */                                                                        \
+/* minimum and maximum LUA_VERSION_NUM expected by this version of NetHack */
 #ifndef NHL_MIN_VERSION_NUM_EXPECTED
 #define NHL_MIN_VERSION_NUM_EXPECTED 504
 #endif
