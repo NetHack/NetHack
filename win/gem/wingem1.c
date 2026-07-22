@@ -163,24 +163,6 @@ cache_pens(void)
                                          nhclr_rgb[i][2], 1);
 }
 
-/* Set window scrollbar elements to dark grey */
-static void
-set_slider_colors(short whandle)
-{
-    /* Color word (AES OBJECT format):
-       bits 11-8 = border color, bits 6-4 = fill pattern (0=hollow,7=solid),
-       bits 3-0 = fill color */
-    short col = (pen_black << 8) | (7 << 4) | pen_darkgray;
-    wind_set6(whandle, WF_COLOR, W_VBAR, col, col, 0);
-    wind_set6(whandle, WF_COLOR, W_VSLIDE, col, col, 0);
-    wind_set6(whandle, WF_COLOR, W_VELEV, col, col, 0);
-    wind_set6(whandle, WF_COLOR, W_HBAR, col, col, 0);
-    wind_set6(whandle, WF_COLOR, W_HSLIDE, col, col, 0);
-    wind_set6(whandle, WF_COLOR, W_HELEV, col, col, 0);
-    wind_set6(whandle, WF_COLOR, W_UPARROW, col, col, 0);
-    wind_set6(whandle, WF_COLOR, W_DNARROW, col, col, 0);
-}
-
 /* Default STE VDI palette (VDI 0-1000 scale).
    Used to reorder the tile palette so GEM UI elements look correct. */
 static const short default_st_vdi[16][3] = {
@@ -2927,7 +2909,6 @@ mar_display_nhwindow(winid wind)
             WIN *ptr_win = dlg_info->di_win;
 
             ptr_win->scroll = &scroll_menu;
-            set_slider_colors(ptr_win->handle);
             mar_menu_set_slider(ptr_win);
             WindowItems(ptr_win, SCROLL_KEYS, scroll_keys);
             if ((d_exit = X_Form_Do(NULL)) != W_ABANDON) {
@@ -2982,7 +2963,6 @@ mar_display_nhwindow(winid wind)
             WIN *ptr_win = Inv_dialog->di_win;
 
             ptr_win->scroll = &scroll_menu;
-            set_slider_colors(ptr_win->handle);
             mar_menu_set_slider(ptr_win);
             WindowItems(ptr_win, SCROLL_KEYS, scroll_keys);
             do {
@@ -3051,7 +3031,6 @@ mar_display_nhwindow(winid wind)
                 NULL, 0);
             if (p_Gw->gw_window == NULL)
                 break;
-            set_slider_colors(p_Gw->gw_window->handle);
             WindowItems(p_Gw->gw_window, SCROLL_KEYS - 1,
                         scroll_keys); /* ClrHome centers on u */
             mar_clear_map();
