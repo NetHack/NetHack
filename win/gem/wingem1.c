@@ -3894,6 +3894,163 @@ Gem_getlin(const char *ques, char *input)
 
 #define Dia_Init K_Init
 
+/* state shared between gem_ext_cmd_getlin() and gem_ext_handler() for one
+   invocation of the extended-command prompt */
+static char gem_ext_base[BUFSZ];  /* prefix currently being cycled */
+static char gem_ext_last[BUFSZ];  /* last completion we wrote to the field */
+static int gem_ext_tabi;          /* index of the last completion shown */
+static boolean gem_ext_started;   /* a cycle is in progress for gem_ext_base */
+static boolean gem_ext_want_menu; /* set when '?' is typed on an empty field */
+
+/* step the TAB cycle (dir +1 forward, -1 backward) and rewrite the LGREPLY
+   edit field */
+static void
+gem_ext_complete(DIAINFO *dinf, int dir)
+{
+    OBJECT *tree = dinf->di_tree;
+    char *field = ob_get_text(tree, LGREPLY, 0);
+    short txtlen = tree[LGREPLY].ob_spec.tedinfo->te_txtlen;
+    char snap[BUFSZ];
+
+    if (!field)
+        return;
+
+    /* snapshot the live field text (its own te_ptext buffer, distinct from
+       gem_ext_last); if it differs from the last completion we offered, the
+       player typed something since the last TAB, so start a new cycle */
+    (void) strncpy(snap, field, sizeof snap - 1);
+    snap[sizeof snap - 1] = '\0';
+    if (!gem_ext_started || strcmp(snap, gem_ext_last) != 0) {
+        (void) strncpy(gem_ext_base, snap, sizeof gem_ext_base - 1);
+        gem_ext_base[sizeof gem_ext_base - 1] = '\0';
+        gem_ext_tabi = (dir < 0) ? -1 : 0;
+        gem_ext_started = TRUE;
+    } else {
+        gem_ext_tabi += dir;
+    }
+
+    if (gem_ext_complete_next(gem_ext_base, gem_ext_tabi, gem_ext_last,
+                              sizeof gem_ext_last) < 0) {
+        Gem_nhbell();
+        return;
+    }
+
+    /* copy the completion INTO the field's edit buffer.  ob_set_text would
+       only repoint te_ptext at gem_ext_last (E_GEM assigns the pointer),
+       aliasing our state and breaking further editing. */
+    if (txtlen > 0) {
+        (void) strncpy(field, gem_ext_last, txtlen - 1);
+        field[txtlen - 1] = '\0';
+    }
+    ob_draw(dinf, LGREPLY);
+    ob_set_cursor(dinf, LGREPLY, 0x1000, FAIL); /* 0x1000 = end of text */
+}
+
+/* keyboard handler installed around the extended-command prompt dialog.
+   TAB cycles completions; '?' on an empty field opens the menu; every other
+   key passes through to the AES edit field (clear MU_KEYBD to pass through,
+   leave it set to consume -- same convention as Dia_Handler). */
+static short
+gem_ext_handler(XEVENT *xev)
+{
+    short ev = xev->ev_mwich;
+
+    if (ev & MU_KEYBD) {
+        char ch = (char) (xev->ev_mkreturn & 0x00FF);
+        short scan = (short) (((unsigned short) xev->ev_mkreturn) >> 8);
+        WIN *w = get_top_window();
+        DIAINFO *dinf = w ? (DIAINFO *) w->dialog : 0;
+
+        /* match TAB by scancode; AES doesn't deliver a reliable ascii byte
+           for it the way E_GEM's own key handling assumes.  Shift reverses
+           the cycle direction. */
+        if (dinf && scan == SCANTAB) {
+            gem_ext_complete(dinf,
+                             (xev->ev_mmokstate & K_SHIFT) ? -1 : 1);
+            return ev; /* consume */
+        }
+        if (dinf && ch == '?') {
+            char *cur = ob_get_text(dinf->di_tree, LGREPLY, 0);
+
+            if (!cur || !cur[0]) {
+                gem_ext_want_menu = TRUE;
+                my_close_dialog(dinf, FALSE);
+                return ev; /* consume */
+            }
+        }
+        ev &= ~MU_KEYBD; /* pass through to the edit field */
+    }
+    return ev;
+}
+
+/* extended-command text prompt with TAB completion.  Mirrors Gem_getlin's
+   dialog setup but installs gem_ext_handler for TAB/'?' interception. */
+int
+gem_ext_cmd_getlin(char *buf)
+{
+    OBJECT *z_ob = zz_oblist[LINEGET];
+    short d_exit, length;
+    char *pr[2], *tmp;
+    char ques_buf[128];
+    static const char ques[] = "Enter extended command (TAB=autocomplete, ?=list)";
+
+    if (WIN_MESSAGE != WIN_ERR && Gem_nhwindow[WIN_MESSAGE].gw_window)
+        mar_display_nhwindow(WIN_MESSAGE);
+
+    gem_ext_base[0] = '\0';
+    gem_ext_last[0] = '\0';
+    gem_ext_tabi = 0;
+    gem_ext_started = FALSE;
+    gem_ext_want_menu = FALSE;
+
+    z_ob[LGPROMPT].ob_type = G_USERDEF;
+    z_ob[LGPROMPT].ob_spec.userblk = &ub_prompt;
+    z_ob[LGPROMPT].ob_height = 2 * gr_ch;
+
+    (void) strncpy(ques_buf, ques, sizeof(ques_buf) - 1);
+    ques_buf[sizeof(ques_buf) - 1] = '\0';
+
+    length = z_ob[LGPROMPT].ob_width / gr_cw;
+    if ((short) strlen(ques_buf) > length) {
+        tmp = ques_buf + length;
+        while (tmp >= ques_buf && *tmp != ' ')
+            tmp--;
+        if (tmp <= ques_buf)
+            tmp = ques_buf + length;
+        pr[0] = ques_buf;
+        *tmp = 0;
+        pr[1] = ++tmp;
+    } else {
+        pr[0] = ques_buf;
+        pr[1] = NULL;
+    }
+    ub_prompt.ub_parm = (long) pr;
+
+    ob_clear_edit(z_ob);
+    Event_Handler(Dia_Init, gem_ext_handler);
+    /* give our handler first crack at keys so it sees TAB/'?'; the editable
+       field otherwise consumes them (port default keys arg is TRUE, see the
+       dial_options call in mar_gem_init).  restore it afterwards. */
+    dial_options(TRUE, TRUE, FALSE, TRUE, TRUE, TRUE,
+                 KEY_FIRST, FALSE, TRUE, 0);
+    d_exit = xdialog(z_ob, nullstr, NULL, NULL, mar_ob_mapcenter(z_ob), FALSE,
+                     DIALOG_MODE);
+    dial_options(TRUE, TRUE, FALSE, TRUE, TRUE, TRUE,
+                 TRUE, FALSE, TRUE, 0);
+    Event_Timer(0, 0, TRUE);
+    Event_Handler(NULL, NULL);
+
+    if (gem_ext_want_menu)
+        return 1;
+    if (d_exit == W_CLOSED || d_exit == W_ABANDON
+        || (d_exit & NO_CLICK) == QLG) {
+        return -1;
+    }
+    strncpy(buf, ob_get_text(z_ob, LGREPLY, 0), BUFSZ - 1);
+    buf[BUFSZ - 1] = '\0';
+    return 0;
+}
+
 short
 Dia_Handler(XEVENT *xev)
 {

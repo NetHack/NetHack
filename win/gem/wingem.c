@@ -1291,12 +1291,54 @@ static const struct {
     { "?",          '?' },
 };
 
-/* Get an extended command in windowport-specific way.  Returns the
-   extcmdlist index of the chosen command or -1.  Called after '#'.
-   The curated `?` entry opens a second menu listing every available
-   command in extcmdlist as a selectable item. */
+/* extcmdlist index of the which-th prefix match, ordering AUTOCOMPLETE
+   commands before the rest and wrapping modulo the match count (so a
+   negative which cycles backward).  -1 if there is no match. */
+static int
+extcmds_match_cycle(const char *prefix, int which)
+{
+    int *all;
+    int i, o, k, n_ac = 0;
+    int n_all = extcmds_match(prefix, ECM_IGNOREAC, &all);
+
+    if (n_all <= 0)
+        return -1;
+    for (i = 0; i < n_all; i++)
+        if (extcmdlist[all[i]].flags & AUTOCOMPLETE)
+            n_ac++;
+    o = ((which % n_all) + n_all) % n_all;
+    if (o < n_ac) {
+        for (i = 0, k = 0; i < n_all; i++)
+            if ((extcmdlist[all[i]].flags & AUTOCOMPLETE) && k++ == o)
+                return all[i];
+    } else {
+        o -= n_ac;
+        for (i = 0, k = 0; i < n_all; i++)
+            if (!(extcmdlist[all[i]].flags & AUTOCOMPLETE) && k++ == o)
+                return all[i];
+    }
+    return -1; /* not reached */
+}
+
+/* fill out[] with the which-th tab-completion of prefix (AUTOCOMPLETE
+   commands first, wrapping); returns 0 on success, -1 if no match.
+   bridges extcmd data to the GEM-side prompt in wingem1.c. */
 int
-Gem_get_ext_cmd()
+gem_ext_complete_next(const char *prefix, int which, char *out, int outsz)
+{
+    int idx = extcmds_match_cycle(prefix, which);
+
+    if (idx < 0)
+        return -1;
+    (void) strncpy(out, extcmdlist[idx].ef_txt, outsz - 1);
+    out[outsz - 1] = '\0';
+    return 0;
+}
+
+/* the curated menu picker, reached from Gem_get_ext_cmd when the player
+   types '?' at the text prompt */
+static int
+gem_ext_cmd_menu(void)
 {
     winid wind;
     int i, idx, count, what = -1;
@@ -1317,11 +1359,14 @@ Gem_get_ext_cmd()
                          MENU_ITEMFLAGS_NONE);
             continue;
         }
-        for (idx = 0; extcmdlist[idx].ef_txt; idx++)
-            if (!strcmp(extcmdlist[idx].ef_txt, gem_ext_menu[i].name))
-                break;
-        if (!extcmdlist[idx].ef_txt)
-            continue; /* command not present in this build */
+        {
+            int *m;
+
+            if (extcmds_match(gem_ext_menu[i].name,
+                              ECM_IGNOREAC | ECM_EXACTMATCH, &m) != 1)
+                continue; /* not present / not available in this build */
+            idx = m[0];
+        }
         any.a_int = idx + 1; /* +1 so identifier is non-zero */
         Gem_add_menu(wind, &nul_glyphinfo, &any,
                      gem_ext_menu[i].accelerator, 0, ATR_NONE, NO_COLOR,
@@ -1329,7 +1374,7 @@ Gem_get_ext_cmd()
     }
     Gem_end_menu(wind, "What extended command?");
     count = Gem_select_menu(wind, PICK_ONE, &selected);
-    if (count) {
+    if (count > 0) { /* -1 means cancelled, selected stays NULL */
         if (selected->item.a_int == -1)
             show_all = TRUE;
         else
@@ -1373,7 +1418,7 @@ Gem_get_ext_cmd()
         }
         Gem_end_menu(wind, "Pick a command:");
         count = Gem_select_menu(wind, PICK_ONE, &selected);
-        if (count) {
+        if (count > 0) {
             what = selected->item.a_int - 1;
             free((genericptr_t) selected);
         }
@@ -1381,6 +1426,34 @@ Gem_get_ext_cmd()
     }
 
     return what;
+}
+
+/* Get an extended command.  Runs a text prompt with TAB completion; the
+   player can type '?' to fall back to the curated menu. */
+int
+Gem_get_ext_cmd(void)
+{
+    char buf[BUFSZ];
+    int *m;
+
+    switch (gem_ext_cmd_getlin(buf)) {
+    case 1:
+        return gem_ext_cmd_menu();
+    case -1:
+        return -1;
+    default:
+        break;
+    }
+
+    (void) mungspaces(buf);
+    if (buf[0] == '\0')
+        return -1;
+    if (extcmds_match(buf, ECM_IGNOREAC | ECM_EXACTMATCH, &m) == 1)
+        return m[0];
+    if (extcmds_match(buf, ECM_NOFLAGS, &m) == 1)
+        return m[0];
+    pline("#%.60s: unknown extended command.", buf);
+    return -1;
 }
 
 void
