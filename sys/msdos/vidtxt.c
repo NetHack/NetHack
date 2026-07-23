@@ -109,7 +109,7 @@ txt_get_scr_size(void)
 void txt_gotoxy(int, int);
 
 #if defined(SCREEN_BIOS) && !defined(PC9800)
-void txt_get_cursor(int *, int *);
+static void txt_get_cursor(int *, int *);
 #endif
 
 #ifdef SCREEN_DJGPPFAST
@@ -401,7 +401,7 @@ void txt_xputc(char ch, int attr)
  *
  * This is implemented as a macro under DJGPPFAST.
  */
-void txt_get_cursor(int *x, int *y)
+static void txt_get_cursor(int *x, int *y)
 {
     union REGS regs;
 

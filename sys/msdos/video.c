@@ -89,7 +89,7 @@ get_scr_size(void)
         txt_get_scr_size();
 }
 
-#ifdef ENHANCED_SYMBOLS
+#if defined(TTY_GRAPHICS) && defined(ENHANCED_SYMBOLS)
 void g_pututf8(uint8 *utf8str)
 {
     /* not implemented for msdos (yet) */
@@ -132,17 +132,17 @@ void cmov(int, int);
 void nocmov(int, int);
 static void init_ttycolor(void);
 
-int savevmode;               /* store the original video mode in here */
+#if defined(SCREEN_VGA) || defined(SCREEN_VESA)
 int curcol, currow;          /* graphics mode current cursor locations */
+#endif
 int g_attribute;             /* Current attribute to use */
-int monoflag;                /* 0 = not monochrome, else monochrome */
+static int monoflag;         /* 0 = not monochrome, else monochrome */
 int inversed;
 int attrib_text_normal;      /* text mode normal attribute */
 int attrib_gr_normal;        /* graphics mode normal attribute */
 int attrib_text_intense;     /* text mode intense attribute */
 int attrib_gr_intense;       /* graphics mode intense attribute */
 uint32 curframecolor = NO_COLOR;   /* current background text color */
-boolean traditional = FALSE; /* traditional TTY character mode */
 boolean inmap = FALSE;       /* in the map window */
 char ttycolors[CLR_MAX]; /* also used/set in options.c */
 
@@ -183,8 +183,8 @@ term_curs_set(int visibility)
 #ifdef SCREEN_VESA
         } else if (iflags.usevesa) {
             vesa_hide_cursor();
-        }
 #endif
+        }
     } else if (visibility) {
         if (!iflags.grmode) {
             txt_show_cursor();
@@ -195,8 +195,8 @@ term_curs_set(int visibility)
 #ifdef SCREEN_VESA
         } else if (iflags.usevesa) {
             vesa_show_cursor();
-        }
 #endif
+        }
     }
     vis = visibility;
 }
@@ -255,16 +255,16 @@ void cl_end(void) /* clear to end of line */
 
 void cl_eos(void) /* clear to end of screen */
 {
-    int cy = (int) ttyDisplay->cury + 1;
-
     if (!iflags.grmode) {
         txt_cl_eos();
 #ifdef SCREEN_VGA
     } else if (iflags.usevga) {
+        int cy = (int) ttyDisplay->cury + 1;
         vga_cl_eos(cy);
 #endif
 #ifdef SCREEN_VESA
     } else if (iflags.usevesa) {
+        int cy = (int) ttyDisplay->cury + 1;
         vesa_cl_eos(cy);
 #endif
     }
@@ -683,6 +683,7 @@ xputc(int ch) /* write out character (and attribute) */
 }
 
 /* write out a glyph picture at current location */
+#ifdef TILES_IN_GLYPHMAP
 void xputg(const glyph_info *glyphinfo, const glyph_info *bkglyphinfo)
 {
     if (!iflags.grmode || !iflags.tile_view) {
@@ -697,6 +698,7 @@ void xputg(const glyph_info *glyphinfo, const glyph_info *bkglyphinfo)
 #endif
     }
 }
+#endif /* TILES_IN_GLYPHMAP */
 
 #ifdef POSITIONBAR
 void
@@ -731,6 +733,8 @@ adjust_cursor_flags(struct WinDesc *cw)
         cursor_flag = 1;
     }
 #endif /* 0 */
+#else
+    nhUse(cw);
 #endif /* SIMULATE_CURSOR */
 }
 
@@ -796,9 +800,9 @@ HideCursor(void)
 /* assign_videocolors() is prototyped in extern.h */
 /* assign_video()       is prototyped in extern.h */
 
-int shadeflag; /* shades are initialized */
-int colorflag; /* colors are initialized */
-const char *schoice[3] = { "dark", "normal", "light" };
+static int shadeflag; /* shades are initialized */
+static int colorflag; /* colors are initialized */
+static const char *schoice[3] = { "dark", "normal", "light" };
 const char *shade[3];
 #endif /* VIDEOSHADES */
 
@@ -1068,6 +1072,7 @@ assign_video(char *sopt)
     return 1;
 }
 
+#ifdef TILES_IN_GLYPHMAP
 void
 tileview(boolean enable)
 {
@@ -1080,6 +1085,7 @@ tileview(boolean enable)
         vesa_traditional(enable ? FALSE : TRUE);
 #endif
 }
+#endif /* TILES_IN_GLYPHMAP */
 #endif /* NO_TERMS  */
 
 #else  /* STUBVIDEO */

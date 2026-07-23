@@ -711,8 +711,10 @@ apply_customizations(
     struct customization_detail *details;
     struct symset_customization *sc;
     boolean at_least_one = FALSE,
-            do_colors = ((docustomize & do_custom_colors) != 0),
-            do_symbols = ((docustomize & do_custom_symbols) != 0);
+            do_colors = ((docustomize & do_custom_colors) != 0);
+#ifdef ENHANCED_SYMBOLS
+    boolean do_symbols = ((docustomize & do_custom_symbols) != 0);
+#endif
     int custs;
 
     for (custs = 0; custs < (int) custom_count; ++custs) {

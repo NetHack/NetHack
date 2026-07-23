@@ -96,11 +96,22 @@ II. There once was a time when people built NetHack right on their DOS machine.
 
         make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 WANT_DOSVGA=1 package
 
+    For the TTY interface, use NO_TILES=1 to drop support for tiles. The
+    resulting TTY interface can still support Unicode if that is enabled
+    in include/config.h.
+
+    For the TTY interface, use NO_GRAPHICS=1 to drop all graphics support, and
+    build a NetHack that outputs through the standard output channel.  This
+    configuration requires ANSI.SYS, or an equivalent driver such as NANSI.SYS.
+    The curses interface will still use graphics if WANT_DOSVGA=1 is set.
+
+    NO_GRAPHICS=1 takes priority of NO_TILES=1.
+
     Result: The "make package" target will bundle all of the necessary
             components to run NetHack on msdos into a folder:
                 targets/msdos/pkg
             and then it zips the contents of that folder into:
-                targets/msdos/nh370dos.zip
+                targets/msdos/NH500DOS.ZIP
 
     Also note that building the msdos targets using the make command
     above, does not preclude you from building local linux or macOS

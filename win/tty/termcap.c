@@ -27,11 +27,13 @@ void term_end_extracolor(void);
 #if (!defined(UNIX) || !defined(TERMINFO)) && !defined(TOS)
 static void analyze_seq(char *, int *, int *);
 #endif
+#if defined(UNIX) && defined(TERMINFO)
+static int indexed_color_count(void);
+#endif
 #endif
 #if (defined(TERMLIB) || defined(ANSI_DEFAULT))
 static void init_hilite(void);
 static void kill_hilite(void);
-static int indexed_color_count(void);
 #endif
 
 /* (see tcap.h) -- nh_CM, nh_ND, nh_CD, nh_HI,nh_HE, nh_US,nh_UE, ul_hack */
@@ -40,11 +42,15 @@ struct tc_lcl_data tc_lcl_data = { 0, 0, 0, 0, 0, 0, 0, FALSE };
 static char *nh_VI = (char *) 0; /* cursor_invisible */
 static char *nh_VE = (char *) 0; /* cursor_normal */
 /*static char *nh_VS = (char *) 0;*/ /* cursor_visible (highlighted cursor) */
+#if defined(TERMLIB) || defined(CHANGE_COLOR)
 static char *nh_Ic = (char *) 0; /* initialize_color */
+#endif
 
 #if !defined(__NetBSD__)
 static char *UP, *BC;
+#ifdef TERMLIB
 static char PC = '\0';
+#endif
 #endif
 
 static char *HO, *CL, *CE, *XD, *SO, *SE, *TI, *TE;
@@ -1580,13 +1586,7 @@ tty_change_color(int color, long rgb, int reverse UNUSED)
 
 #ifndef SEP2
 #define tcfmtstr "\033[38;2;%ld;%ld;%ldm"
-#ifdef UNIX
-#define tcfmtstr24bit "\033[38;2;%u;%u;%um"
 #define tcfmtstr256 "\033[38;5;%dm"
-#else
-#define tcfmtstr24bit "\033[38;2;%lu;%lu;%lum"
-#define tcfmtstr256 "\033[38:5:%lum"
-#endif
 #endif
 
 static void emit24bit(long mcolor);
