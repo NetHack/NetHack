@@ -42,7 +42,7 @@ struct window_procs Gem_procs = {
         | WC_FONTSIZ_MENU | WC_FONTSIZ_TEXT | WC_FONTSIZ_MAP | WC_TILE_WIDTH
         | WC_TILE_HEIGHT | WC_TILE_FILE | WC_VARY_MSGCOUNT
         | WC_ASCII_MAP | WC_TILED_MAP,
-    0L,
+    WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_HITPOINTBAR,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
     Gem_init_nhwindows, Gem_player_selection, Gem_askname,
     Gem_get_nh_event, Gem_exit_nhwindows, Gem_suspend_nhwindows,
@@ -64,8 +64,8 @@ struct window_procs Gem_procs = {
        window_procs has no such fields here */
     Gem_outrip, Gem_preference_update,
     genl_getmsghistory, genl_putmsghistory,
-    genl_status_init,
-    genl_status_finish, genl_status_enablefield, genl_status_update,
+    Gem_status_init,
+    genl_status_finish, genl_status_enablefield, Gem_status_update,
     genl_can_suspend_no,
     Gem_update_inventory,
     Gem_ctrl_nhwindow,
@@ -841,6 +841,192 @@ Gem_select_menu(winid window, int how, menu_item **menu_list)
     }
 
     return n;
+}
+
+/* native status handler: per-field colors/attributes and the hitpointbar;
+   text buffers stay owned by genl_status_init/enablefield/finish */
+extern char *status_vals[MAXBLSTATS]; /* from src/windows.c */
+extern boolean status_activefields[MAXBLSTATS];
+extern const char *status_fieldfmt[MAXBLSTATS];
+extern void mar_add_status_line(const char *, const char *, const char *,
+                                short);
+
+static short gem_field_colors[MAXBLSTATS];
+static unsigned long gem_cond_bits = 0L;
+static unsigned long *gem_cond_colormasks = (unsigned long *) 0;
+static int gem_hpbar_percent = 0, gem_hpbar_color = NO_COLOR;
+
+static const enum statusfields gem_fieldorder[2][15] = {
+    { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
+      BL_SCORE, BL_FLUSH },
+    { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC,
+      BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER, BL_CAP, BL_CONDITION,
+      BL_FLUSH },
+};
+
+static const struct {
+    unsigned long mask;
+    const char *text;
+} gem_conds[] = {
+    { BL_MASK_STONE, "Stone" },     { BL_MASK_SLIME, "Slime" },
+    { BL_MASK_STRNGL, "Strngl" },   { BL_MASK_FOODPOIS, "FoodPois" },
+    { BL_MASK_TERMILL, "TermIll" }, { BL_MASK_BLIND, "Blind" },
+    { BL_MASK_DEAF, "Deaf" },       { BL_MASK_STUN, "Stun" },
+    { BL_MASK_CONF, "Conf" },       { BL_MASK_HALLU, "Hallu" },
+    { BL_MASK_LEV, "Lev" },         { BL_MASK_FLY, "Fly" },
+    { BL_MASK_RIDE, "Ride" },
+};
+
+void
+Gem_status_init(void)
+{
+    int i;
+
+    for (i = 0; i < MAXBLSTATS; i++)
+        gem_field_colors[i] = NO_COLOR;
+    gem_cond_bits = 0L;
+    gem_cond_colormasks = (unsigned long *) 0;
+    gem_hpbar_percent = 0;
+    gem_hpbar_color = NO_COLOR;
+    genl_status_init();
+}
+
+static int
+gem_condcolor(unsigned long bm, unsigned long *bmarray)
+{
+    int i;
+
+    if (bm && bmarray)
+        for (i = 0; i < CLR_MAX; i++)
+            if (bmarray[i] & bm)
+                return i;
+    return NO_COLOR;
+}
+
+static int
+gem_condattr(unsigned long bm, unsigned long *bmarray)
+{
+    static const int attrmap[] = { 0,       HL_BOLD,  HL_DIM,    HL_ITALIC,
+                                   HL_ULINE, HL_BLINK, HL_INVERSE };
+    int i, attr = 0;
+
+    if (bm && bmarray)
+        for (i = HL_ATTCLR_NONE; i < BL_ATTCLR_MAX; i++)
+            if (bmarray[i] & bm)
+                attr |= attrmap[i - HL_ATTCLR_NONE];
+    return attr;
+}
+
+static void
+gem_status_put(char *line, char *colors, char *attrs, int *n,
+               const char *val, int color)
+{
+    int i;
+
+    for (i = 0; val[i] && *n < MAXCO - 1; i++, (*n)++) {
+        line[*n] = val[i];
+        colors[*n] = (char) (color & 0x00ff);
+        attrs[*n] = (char) ((color >> 8) & 0x00ff);
+    }
+}
+
+static void
+gem_status_lineout(int lineno)
+{
+    char line[MAXCO], colors[MAXCO], attrs[MAXCO];
+    const char *val;
+    int i, k, fld, n = 0;
+
+    for (i = 0; (fld = gem_fieldorder[lineno][i]) != BL_FLUSH; i++) {
+        if (!status_activefields[fld])
+            continue;
+        if (fld == BL_CONDITION) {
+            for (k = 0; k < SIZE(gem_conds); k++)
+                if (gem_cond_bits & gem_conds[k].mask) {
+                    int cc =
+                        gem_condcolor(gem_conds[k].mask, gem_cond_colormasks)
+                        | (gem_condattr(gem_conds[k].mask,
+                                        gem_cond_colormasks) << 8);
+
+                    gem_status_put(line, colors, attrs, &n, " ", NO_COLOR);
+                    gem_status_put(line, colors, attrs, &n,
+                                   gem_conds[k].text, cc);
+                }
+            continue;
+        }
+        val = status_vals[fld];
+        switch (fld) {
+        case BL_HP:
+        case BL_XP:
+        case BL_HD:
+        case BL_TIME:
+            gem_status_put(line, colors, attrs, &n, " ", NO_COLOR);
+            break;
+        case BL_HUNGER:
+            if (strcmp(val, " "))
+                gem_status_put(line, colors, attrs, &n, " ", NO_COLOR);
+            break;
+        case BL_CAP:
+            if (!strcmp(val, " "))
+                ++val;
+            break;
+        default:
+            break;
+        }
+        if (fld == BL_TITLE && iflags.wc2_hitpointbar) {
+            int start = n, len, bar_pos;
+
+            gem_status_put(line, colors, attrs, &n, val,
+                           gem_field_colors[fld]);
+            len = n - start;
+            bar_pos = (len * gem_hpbar_percent) / 100;
+            if (bar_pos < 1 && gem_hpbar_percent > 0)
+                bar_pos = 1;
+            if (bar_pos >= len && gem_hpbar_percent < 100)
+                bar_pos = len - 1;
+            for (k = 0; k < bar_pos; k++) {
+                colors[start + k] = (char) gem_hpbar_color;
+                attrs[start + k] |= HL_INVERSE;
+            }
+        } else {
+            gem_status_put(line, colors, attrs, &n, val,
+                           gem_field_colors[fld]);
+        }
+    }
+    line[n] = '\0';
+    mar_add_status_line(line, colors, attrs, (short) lineno);
+}
+
+void
+Gem_status_update(int fldidx, genericptr_t ptr, int chg UNUSED, int percent,
+                  int color, unsigned long *colormasks)
+{
+    char goldbuf[BUFSZ], *text = (char *) ptr;
+
+    if (fldidx >= 0 && fldidx < MAXBLSTATS) {
+        if (!status_activefields[fldidx])
+            return;
+        if (fldidx == BL_CONDITION) {
+            gem_cond_bits = ptr ? (unsigned long) *(long *) ptr : 0L;
+            gem_cond_colormasks = colormasks;
+            return;
+        }
+        if (fldidx == BL_GOLD && text)
+            text = decode_mixed(goldbuf, text);
+        Sprintf(status_vals[fldidx],
+                status_fieldfmt[fldidx] ? status_fieldfmt[fldidx] : "%s",
+                text ? text : "");
+        gem_field_colors[fldidx] = (short) color;
+        if (fldidx == BL_HP && iflags.wc2_hitpointbar) {
+            gem_hpbar_percent = percent;
+            gem_hpbar_color = color & 0x00ff;
+        }
+    } else if (fldidx == BL_FLUSH || fldidx == BL_RESET) {
+        mar_status_dirty();
+        gem_status_lineout(0);
+        gem_status_lineout(1);
+        mar_display_nhwindow(WIN_STATUS);
+    }
 }
 
 void
