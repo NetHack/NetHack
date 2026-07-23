@@ -91,6 +91,11 @@ extern int Gem_doprev_message(void);
 extern char Gem_yn_function(const char *, const char *, char);
 extern void Gem_getlin(const char *, char *);
 extern int Gem_get_ext_cmd(void);
+/* returns 0 = buf holds the typed reply, 1 = user requested the menu,
+   -1 = cancelled */
+extern int gem_ext_cmd_getlin(char *buf);
+extern int gem_ext_complete_next(const char *prefix, int which, char *out,
+                                 int outsz);
 extern void Gem_number_pad(int);
 extern void Gem_delay_output(void);
 
