@@ -949,6 +949,7 @@ extern void early_options(int *argc_p, char ***argv_p, char **hackdir_p);
 #ifdef WIN32
 int windows_early_options(const char *);
 #endif
+extern void genl_prag(int, char **); /* profession, race, align, gender */
 
 /* ### eat.c ### */
 

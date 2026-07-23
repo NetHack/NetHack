@@ -38,6 +38,7 @@
 #define SHELL   /* allow spawning of shell (requires system(3))	*/
 #define SUSPEND /* allow suspending the game	*/
 #endif
+#define SFSTRUCT_BUFFERING /* buffered stdio writes for structlevel files */
 #ifndef NO_TERMS
 #define TERMLIB   /* use termcap			*/
 #endif
