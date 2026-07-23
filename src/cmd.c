@@ -2957,7 +2957,7 @@ dokeylist(void)
     Sprintf(buf, "%-7s", key2txt(key, buf2));
 #else
     /* first of the keyless commands */
-    Sprintf(buf2, "[%s]", key2txt(key, buf));
+    Snprintf(buf2, sizeof buf2, "[%s]", key2txt(key, buf));
     Sprintf(buf, "%-21s", buf2);
 #endif
     Strcat(buf, " interrupt: break out of NetHack (SIGINT)");
