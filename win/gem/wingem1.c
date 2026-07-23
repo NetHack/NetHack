@@ -25,6 +25,7 @@
 #include "gem_rsc.h"
 #include "load_img.h"
 #include "gr_rect.h"
+#include "crashlog.h"
 
 /* Provide types needed by wintype.h without pulling in all of hack.h,
    which would conflict with e_gem.h definitions. */
@@ -1627,6 +1628,7 @@ mar_gem_init(void)
                                      FAIL };
     OBJECT *z_ob;
 
+    crash_checkpoint("gemini");
     if (!open_rsc("gem_rsc.rsc", md, md, md, md, 0, 0, 0)) {
         graf_mouse(M_OFF, NULL);
         form_alert(1, "[3][| Fatal Error | File: GEM_RSC.RSC | not "
@@ -1654,8 +1656,10 @@ mar_gem_init(void)
     /* NVDI 3.0 or better used v_ftext; not available in modern gemlib,
        so always wrap v_gtext through a const-correct shim. */
     v_mtext = vgtext_wrapper;
+    crash_checkpoint("rsc");
     for (i = 0; i < NHICON; i++)
         mar_get_rsc_tree(i, &zz_oblist[i]);
+    crash_checkpoint("trees");
 
     /* Force the YN prompt to render in black; the RSC ships a textc that
        maps to a grey shade in MagiC's truecolor AES rendering, which is
@@ -1672,6 +1676,7 @@ mar_gem_init(void)
     beg_update(FALSE, FALSE);
     ob_draw_dialog(z_ob, 0, 0, 0, 0);
     end_update(FALSE);
+    crash_checkpoint("splash");
 
     mar_get_font(NHW_MESSAGE, &fname, &fsize);
     mar_set_font(NHW_MESSAGE, fname, fsize);
@@ -1708,6 +1713,7 @@ mar_gem_init(void)
         }
     }
     cache_pens();
+    crash_checkpoint("tiles");
 
     mfdb(&Map_bild, NULL, (COLNO - 1) * Tile_width, ROWNO * Tile_height, 0,
          planes);
@@ -1761,6 +1767,7 @@ mar_gem_init(void)
               NULL, NULL, 0);
 
     menu_install(zz_oblist[MENU], TRUE);
+    crash_checkpoint("menu");
 
     z_ob = zz_oblist[ABOUT];
     ob_undraw_dialog(z_ob, 0, 0, 0, 0);
@@ -1869,6 +1876,7 @@ mar_ask_name(void)
     short img_err;
     char who_are_you[] = "Who are you? ";
 
+    crash_checkpoint("askname");
     img_err =
         depack_img(planes < 4 ? "TITLE2.IMG" : "TITLE.IMG", &titel_image);
     if (img_err) { /* not fatal */
@@ -1930,8 +1938,10 @@ mar_ask_name(void)
             vs_color(x_handle, vdi_pen, titel_image.palette + i * 3);
         }
     }
+    crash_checkpoint("timg");
     xdialog(z_ob, who_are_you, NULL, NULL, DIA_CENTERED, FALSE, DIALOG_MODE);
     Event_Timer(0, 0, TRUE);
+    crash_checkpoint("named");
     /* Restore system palette after the title dialog closes (no-op
        in truecolor: title left the workstation palette alone). */
     if (planes <= 8 && normal_palette)

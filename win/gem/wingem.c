@@ -126,12 +126,14 @@ bail(const char *mesg)
 #define NHFONT_DEFAULT_SIZE 10
 #define NHFONT_SIZE_MIN 3
 #define NHFONT_SIZE_MAX 20
+#include "crashlog.h"
 /*ARGSUSED*/
 void
 Gem_init_nhwindows(int *argcp, char **argv)
 {
     nhUse(argcp);
     nhUse(argv);
+    crash_checkpoint("gemwin");
     colors_changed = TRUE;
 
     set_wc_option_mod_status(WC_ALIGN_MESSAGE | WC_ALIGN_STATUS
@@ -173,6 +175,8 @@ Gem_init_nhwindows(int *argcp, char **argv)
         iflags.window_inited = TRUE;
         Gem_flush_preinit_raw();
     }
+    crash_checkpoint("gemok");
+    crash_selftest();
 
     CO = 80;
     LI = 25;
@@ -190,6 +194,7 @@ Gem_player_selection(void)
     anything any;
     menu_item *selected = NULL;
 
+    crash_checkpoint("plsel");
     /* avoid unnecessary prompts further down */
     rigid_role_checks();
 
