@@ -320,7 +320,7 @@ static long floc = 0L;
 
 staticfn int getidx(int, int);
 
-#if defined(UNIX) || defined(WIN32)
+#if defined(UNIX) || defined(WIN32) || defined(SFSTRUCT_BUFFERING)
 #define USE_BUFFERING
 #endif
 
@@ -329,6 +329,9 @@ struct restore_info restoreinfo = {
 };
 
 #define MAXFD 5
+#ifdef SFSTRUCT_BUFFERING
+#define BWBUFSZ 16384
+#endif
 enum {NOFLG = 0, NOSLOT = 1};
 static int bw_sticky[MAXFD] = {-1,-1,-1,-1,-1};
 static int bw_buffered[MAXFD] = {0,0,0,0,0};
@@ -431,6 +434,10 @@ bufon(int fd)
         if (!bw_FILE[idx]) {
             if ((bw_FILE[idx] = fdopen(fd, "w")) == 0)
                 panic("buffering of file %d failed", fd);
+#ifdef SFSTRUCT_BUFFERING
+            (void) setvbuf(bw_FILE[idx], (char *) 0, _IOFBF,
+                           (size_t) BWBUFSZ);
+#endif
         }
         bw_buffered[idx] = (bw_FILE[idx] != 0);
 #else

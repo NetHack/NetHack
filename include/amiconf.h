@@ -73,6 +73,7 @@ extern void ami_wininit_data(int);
 #define HACKFONT  /* Use special hack.font */
 #define MAIL      /* Get mail at unexpected occasions */
 #define AMIFLUSH /* toss typeahead (select flush in .cnf) */
+#define SFSTRUCT_BUFFERING /* buffered stdio writes for structlevel files */
 
 /* new window system options */
 /* WRONG - AMIGA_INTUITION should go away */
