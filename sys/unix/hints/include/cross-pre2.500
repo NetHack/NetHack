@@ -765,13 +765,8 @@ override TARGET_CFLAGS = -c -O2 $(TOOLARCH) \
 override TARGET_CXXFLAGS = $(TARGET_CFLAGS)
 LUA_TARGET_CFLAGS = $(TARGET_CFLAGS)
 override TARGET_LINK = $(TARGET_CC)
-# Set PRG header flags: bit 0 fastload (skip TPA clear), bit 1 load
-# text/data into TT-RAM.  Bit 2 (Malloc prefers TT-RAM) is intentionally
-# unset — the __sbrk override in sys/atari/sbrk.c steers the libc heap
-# via Mxalloc(_, MX_PREFTTRAM | MX_GLOBAL), so bit 2 has no effect.
-# On ST/STE without TT-RAM the loader still falls back to ST-RAM
-# transparently for bit 1.
-override TARGET_LFLAGS= $(TOOLARCH) -Wl,--mprg-flags=0x03
+# PRG header flags: fastload, load into TT-RAM, Malloc from TT-RAM.
+override TARGET_LFLAGS= $(TOOLARCH) -Wl,--mprg-flags=0x07
 override TARGET_LIBS += $(LIBLM) -le_gem -lgem
 VARDATND += nhtiles.bmp
 override SYSSRC = ../sys/atari/tos.c ../sys/atari/sbrk.c \
