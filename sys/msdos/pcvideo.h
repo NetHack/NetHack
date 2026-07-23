@@ -237,12 +237,12 @@ extern void HideCursor(void);
 
 /* ### vidtxt.c ### */
 
+extern void txt_get_scr_size(void);
 #ifdef NO_TERMS
 extern void txt_backsp(void);
 extern void txt_clear_screen(void);
 extern void txt_cl_end(int, int);
 extern void txt_cl_eos(void);
-extern void txt_get_scr_size(void);
 extern void txt_gotoxy(int, int);
 extern int txt_monoadapt_check(void);
 extern void txt_nhbell(void);
@@ -267,7 +267,6 @@ extern void vga_show_cursor(void);
 extern void vga_DrawCursor(void);
 #endif
 extern void vga_Finish(void);
-extern char __far *vga_FontPtrs(void);
 extern void vga_get_scr_size(void);
 extern void vga_gotoloc(int, int);
 #ifdef POSITIONBAR

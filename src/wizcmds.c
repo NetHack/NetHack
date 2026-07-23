@@ -1990,10 +1990,8 @@ wizcustom_callback(winid win, int glyphnum, char *id)
     extern glyph_map glyphmap[MAX_GLYPH];
     glyph_map *cgm;
     int clr = NO_COLOR;
-    char buf[BUFSZ], bufa[BUFSZ], bufb[BUFSZ], bufc[BUFSZ], bufd[BUFSZ],
-        bufu[BUFSZ];
+    char buf[BUFSZ], bufa[BUFSZ], bufb[BUFSZ], bufc[BUFSZ], bufu[BUFSZ];
     anything any;
-    uint8 *cp;
 
     if (win && id) {
         cgm = &glyphmap[glyphnum];
@@ -2009,9 +2007,11 @@ wizcustom_callback(winid win, int glyphnum, char *id)
             bufu[0] = '\0';
 #ifdef ENHANCED_SYMBOLS
             if (cgm->u && cgm->u->utf8str) {
+                uint8 *cp;
                 Sprintf(bufu, "U+%04lx", (unsigned long) cgm->u->utf32ch);
                 cp = cgm->u->utf8str;
                 while (*cp) {
+                    char bufd[BUFSZ];
                     Sprintf(bufd, " <%d>", (int) *cp);
                     Strcat(bufu, bufd);
                     cp++;

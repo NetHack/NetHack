@@ -825,7 +825,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
            (char *)0)
     NHOPTC(versinfo, Advanced, 80, opt_out, set_in_game,
            No, Yes, No, Yes, NoAlias, "extra information for 'showvers'")
-#ifdef MSDOS
+#if defined(MSDOS) && defined(NO_TERMS)
     NHOPTC(video, Advanced, 20, opt_in, set_in_config,
                 No, Yes, No, No, NoAlias, "method of video updating")
 #endif

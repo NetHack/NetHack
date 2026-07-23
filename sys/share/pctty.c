@@ -38,7 +38,9 @@ settty(const char *s)
 #if defined(MSDOS) && defined(NO_TERMS)
     gr_finish();
 #endif
+#if !(defined(MSDOS) && !defined(TTY_GRAPHICS))
     term_end_screen();
+#endif
     if (s)
         raw_print(s);
 #if !defined(TOS)
@@ -50,8 +52,17 @@ settty(const char *s)
 void
 setftty(void)
 {
+#if !(defined(MSDOS) && !defined(TTY_GRAPHICS))
     term_start_screen();
+#endif
 }
+
+#ifdef ENHANCED_SYMBOLS
+void
+tty_utf8graphics_fixup(void)
+{
+}
+#endif
 
 #if defined(TIMED_DELAY) && defined(_MSC_VER)
 void
@@ -76,8 +87,10 @@ VA_DECL(const char *, s)
     VA_START(s);
     VA_INIT(s, const char *);
     /* error() may get called before tty is initialized */
+#if !(defined(MSDOS) && !defined(TTY_GRAPHICS))
     if (iflags.window_inited)
         term_end_screen();
+#endif
     putchar('\n');
     Vprintf(s, VA_ARGS);
     putchar('\n');

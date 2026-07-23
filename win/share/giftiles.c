@@ -7,6 +7,9 @@
  * http://www.w3.org/Graphics/GIF/spec-gif89a.txt */
 
 #include "config.h"
+
+#ifdef TILES_IN_GLYPHMAP
+
 #include "tileset.h"
 
 #define MIN_LZW_BITS 3
@@ -497,3 +500,5 @@ free_data_block(struct DataBlock *block)
     block->size = 0;
     block->data = NULL;
 }
+
+#endif /* TILES_IN_GLYPHMAP */

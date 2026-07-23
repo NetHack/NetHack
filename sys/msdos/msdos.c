@@ -57,10 +57,11 @@ unsigned long sys_random_seed(void);
 static char *getdta(void);
 #endif
 static unsigned int dos_ioctl(int, int, unsigned);
-#ifdef TILES_IN_GLYPHMAP
+#ifdef NO_TERMS
 extern boolean pckeys(unsigned char, unsigned char); /* pckeys.c */
 #endif
 
+#ifdef TTY_GRAPHICS
 int
 tgetch(void)
 {
@@ -86,6 +87,7 @@ tgetch(void)
 #endif
     return ((ch == '\r') ? '\n' : ch);
 }
+#endif /* TTY_GRAPHICS */
 
 /*
  *  Keyboard translation tables.
@@ -280,7 +282,7 @@ BIOSgetch(void)
             else
                 ch = kpad[scan - KEYPADLO].normal;
         }
-#ifdef TILES_IN_GLYPHMAP
+#ifdef NO_TERMS
         /* Check for special interface manipulation keys */
         if (pckeys(scan, shift)) {
             ch = 0xFF;
@@ -347,16 +349,6 @@ DOSgetch(void)
     }
 #endif
     return (ch);
-}
-
-char
-switchar(void)
-{
-    union REGS regs;
-
-    regs.x.ax = GETSWITCHAR;
-    intdos(&regs, &regs);
-    return regs.h.dl;
 }
 
 #if 0
