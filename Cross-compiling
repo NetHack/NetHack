@@ -18,7 +18,7 @@ Part B Contents:
     B2. What needs to be built and executed on the HOST?
     B3. What needs to be built for the TARGET?
     B4. Case sample: msdos
-    B5. Case sample: amiga (started but incomplete)
+    B5. Case sample: amiga
     B6. Case sample: Web Assembly, libnh
     B7. Case sample: mips
 
