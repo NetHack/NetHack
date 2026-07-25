@@ -74,6 +74,9 @@ Some optimizations of the glyph lookup - don't produce names for swallow
 	glyph index in populate_glyphname_hash_indices; build a sorted
 	index for loadsyms so that it can be searched with bsearch
 	(pr #1612 by chasonr)
+stethoscope applied to one monster disguised as another (double-trouble Wizard)
+	mis-described undisguised form (unintended side-effect of 5.0 commit
+	064523e162f8e30bdb76186a854b9d8958f3b340)
 
 
 Platform- and/or Interface-Specific Fixes
