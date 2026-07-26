@@ -158,7 +158,7 @@ extern void SaveSizeForKind(short kind, short height, short width);
    and applied at startup AFTER initoptions(), so they override the
    NetHack Defaults file.  valid==0 (never saved / "Forget Settings")
    leaves the config-file values alone. */
-#define UIPREFS_VERSION 1
+#define UIPREFS_VERSION 2 /* v2: added menutiles */
 enum uiprefs_fonts {
     uiFontMap = 0, uiFontStatus, uiFontMessage, uiFontMenu, uiFontText,
     UIPREFS_NFONTS
@@ -169,6 +169,8 @@ typedef struct UiPrefs {
     char tiled_map;              /* startup map display mode */
     char hitpointbar;
     char statuslines;            /* 2 or 3 */
+    char menutiles;              /* item tiles in menu rows */
+    char pad_;                   /* keep the shorts word-aligned */
     Str31 fonts[UIPREFS_NFONTS]; /* fonts[i][0]==0 => port default */
     short sizes[UIPREFS_NFONTS]; /* 0 => port default */
 } UiPrefs;

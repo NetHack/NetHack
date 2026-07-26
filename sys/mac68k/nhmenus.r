@@ -37,8 +37,6 @@ resource 'MENU' (129) {
     {
         "Save", noIcon, "S", noMark, plain,
         "-", noIcon, noKey, noMark, plain,
-        "Preferences\0xC9", noIcon, noKey, noMark, plain,
-        "-", noIcon, noKey, noMark, plain,
         "Quit", noIcon, "Q", noMark, plain
     }
 };
@@ -55,7 +53,9 @@ resource 'MENU' (130) {
         "Cut", noIcon, "X", noMark, plain,
         "Copy", noIcon, "C", noMark, plain,
         "Paste", noIcon, "V", noMark, plain,
-        "Clear", noIcon, noKey, noMark, plain
+        "Clear", noIcon, noKey, noMark, plain,
+        "-", noIcon, noKey, noMark, plain,
+        "Preferences\0xC9", noIcon, noKey, noMark, plain
     }
 };
 
@@ -435,7 +435,8 @@ resource 'STR#' (201, "current") {
  * uiprefs_fonts order (map, status, message, menu, text). */
 resource 'DLOG' (6100, "Preferences") {
     {24, 56, 320, 456},
-    dBoxProc,
+    movableDBoxProc, /* System 7 movable modal (titled; drag handled in
+                        pref_filter -- ModalDialog won't track it) */
     visible,
     noGoAway,
     0x0,
@@ -469,6 +470,9 @@ resource 'DITL' (6100) {
         {164, 16, 180, 96},   StaticText { disabled, "Menu:" },    /* 21 */
         {192, 16, 208, 96},   StaticText { disabled, "Text:" },    /* 22 */
         {222, 16, 254, 384},  StaticText { disabled,
-            "Changes take effect at the next launch." }            /* 23 */
+            "Changes take effect at the next launch." },           /* 23 */
+        {56, 210, 74, 384},   CheckBox { enabled, "Tiles in menus" }, /* 24 */
+        {260, 306, 288, 388}, UserItem { disabled },  /* 25 default ring */
+        {257, 16, 258, 388},  UserItem { disabled }   /* 26 separator */
     }
 };

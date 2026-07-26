@@ -87,11 +87,18 @@ enum {
     /* File */
     menuFileSave = 1,
     ____File___1,
-    menuFilePrefs,
-    ____File___2,
     menuFileQuit,
 
-    /* standard minimum Edit menu items */
+    /* Edit: the standard items are for desk accessories only;
+       Preferences... is ours (HIG home for it) */
+    menuEditUndo = 1,
+    ____Edit___1,
+    menuEditCut,
+    menuEditCopy,
+    menuEditPaste,
+    menuEditClear,
+    ____Edit___2,
+    menuEditPrefs,
 
     /* Game */
     menuGameRedraw = 1,
@@ -856,8 +863,16 @@ AdjustMenus(short dimMenubar)
             for (i = menuEdit; i < NUM_MBAR; i++)
                 DisableItem(MBARHND(i), 0);
 
-            if (theMenubar == mbarDA)
-                EnableItem(MHND_EDIT, 0);
+            /* Edit stays up for Preferences...; the standard items only
+               work while a desk accessory is in front */
+            EnableItem(MHND_EDIT, 0);
+            for (i = menuEditUndo; i <= menuEditClear; i++) {
+                if (theMenubar == mbarDA)
+                    EnableItem(MHND_EDIT, i);
+                else
+                    DisableItem(MHND_EDIT, i);
+            }
+            EnableItem(MHND_EDIT, menuEditPrefs);
 
             break;
 
@@ -867,8 +882,11 @@ AdjustMenus(short dimMenubar)
             for (i = menuFile; i < NUM_MBAR; i++)
                 EnableItem(MBARHND(i), 0);
 
-            /* ... except the unused Edit menu */
-            DisableItem(MHND_EDIT, 0);
+            /* ... Edit included, for Preferences...; its standard items
+               stay dim outside desk accessories */
+            for (i = menuEditUndo; i <= menuEditClear; i++)
+                DisableItem(MHND_EDIT, i);
+            EnableItem(MHND_EDIT, menuEditPrefs);
 
             /* Game menu: Tile Mode enabled iff tiles available; checkmark
                tracks live state (AdjustMenus(0) runs before MenuSelect, so
@@ -931,10 +949,6 @@ DoMenuEvt(long menuEntry)
             askSave();
             break;
 
-        case menuFilePrefs:
-            macprefs_dialog();
-            break;
-
         case menuFileQuit:
             askQuit();
             break;
@@ -942,7 +956,10 @@ DoMenuEvt(long menuEntry)
         break;
 
     case menuEdit:
-        (void) SystemEdit(menuItem - 1);
+        if (menuItem == menuEditPrefs)
+            macprefs_dialog();
+        else
+            (void) SystemEdit(menuItem - 1);
         break;
 
     case menuGame:

@@ -33,7 +33,11 @@ enum {
     prefFontFirst, /* 8..12: font popup user items */
     prefFontLast = prefFontFirst + UIPREFS_NFONTS - 1,
     prefSizeFirst, /* 13..17: size edit fields */
-    prefSizeLast = prefSizeFirst + UIPREFS_NFONTS - 1
+    prefSizeLast = prefSizeFirst + UIPREFS_NFONTS - 1,
+    /* 18..22 labels, 23 note */
+    prefMenuTiles = 24,
+    prefDefaultRing = 25, /* bold outline around the Save button */
+    prefSeparator = 26    /* gray rule above the button row */
 };
 
 #define PREFS_SIZE_MENU 6101 /* transient size popup, built per click */
@@ -109,15 +113,31 @@ row_font_number(short row)
     return fnum;
 }
 
-/* draw a font/size popup user item: framed box + drop shadow + selection */
+/* user items: font/size popups (framed box, drop shadow, down arrow,
+   selection text), the default-button ring, and the separator rule */
 static pascal void
 pref_redraw(DialogRef dlog, DialogItemIndex item)
 {
-    short type;
+    short type, j;
     Handle h;
     Rect r;
     Str255 s;
 
+    if (item == prefDefaultRing) {
+        GetDialogItem(dlog, item, &type, &h, &r);
+        PenSize(3, 3);
+        FrameRoundRect(&r, 16, 16);
+        PenSize(1, 1);
+        return;
+    }
+    if (item == prefSeparator) {
+        GetDialogItem(dlog, item, &type, &h, &r);
+        PenPat(&qd.gray);
+        MoveTo(r.left, r.top);
+        LineTo(r.right - 1, r.top);
+        PenNormal();
+        return;
+    }
     if (item >= prefFontFirst && item <= prefFontLast) {
         GetMenuItemText(fontMenu, fontSel[item - prefFontFirst], s);
     } else if (item >= prefSizeFirst && item <= prefSizeLast) {
@@ -137,6 +157,13 @@ pref_redraw(DialogRef dlog, DialogItemIndex item)
     LineTo(r.right, r.top + 3);
     MoveTo(r.left + 6, r.bottom - 6);
     DrawString(s);
+    /* System 7 popup cue: down arrow at the right edge */
+    for (j = 0; j < 5; j++) {
+        MoveTo((short) (r.right - 15 + j),
+               (short) ((r.top + r.bottom) / 2 - 3 + j));
+        LineTo((short) (r.right - 7 - j),
+               (short) ((r.top + r.bottom) / 2 - 3 + j));
+    }
 }
 
 /* size popup: "(default)" + the standard sizes, bitmap-available sizes
@@ -186,6 +213,20 @@ pref_filter(DialogRef wind, EventRecord *event, DialogItemIndex *item)
 {
     char ch;
 
+    /* movable modal: ModalDialog doesn't track the title bar itself */
+    if (event->what == mouseDown) {
+        WindowPtr w;
+        short part = FindWindow(event->where, &w);
+
+        if (part == inDrag && w == GetDialogWindow(wind)) {
+            Rect limits = qd.screenBits.bounds;
+
+            InsetRect(&limits, 4, 4);
+            DragWindow(w, event->where, &limits);
+            *item = 0;
+            return TRUE;
+        }
+    }
     if (event->what == keyDown || event->what == autoKey) {
         ch = (char) (event->message & 0xFF);
         if (ch == 0x0D || ch == 0x03) { /* return / enter */
@@ -223,6 +264,7 @@ macprefs_dialog(void)
         up.tiled_map = iflags.wc_tiled_map ? 1 : 0;
         up.hitpointbar = iflags.wc2_hitpointbar ? 1 : 0;
         up.statuslines = (iflags.wc2_statuslines == 3) ? 3 : 2;
+        up.menutiles = iflags.use_menu_glyphs ? 1 : 0;
         up.sizes[uiFontMap] = iflags.wc_fontsiz_map;
         up.sizes[uiFontStatus] = iflags.wc_fontsiz_status;
         up.sizes[uiFontMessage] = iflags.wc_fontsiz_message;
@@ -256,6 +298,7 @@ macprefs_dialog(void)
 
     set_check(dlog, prefTiles, up.tiled_map);
     set_check(dlog, prefHPbar, up.hitpointbar);
+    set_check(dlog, prefMenuTiles, up.menutiles);
     set_check(dlog, prefLines2, up.statuslines != 3);
     set_check(dlog, prefLines3, up.statuslines == 3);
     for (i = 0; i < UIPREFS_NFONTS; i++) {
@@ -275,6 +318,10 @@ macprefs_dialog(void)
         GetDialogItem(dlog, prefSizeFirst + i, &type, &h, &r);
         SetDialogItem(dlog, prefSizeFirst + i, type, (Handle) redraw, &r);
     }
+    GetDialogItem(dlog, prefDefaultRing, &type, &h, &r);
+    SetDialogItem(dlog, prefDefaultRing, type, (Handle) redraw, &r);
+    GetDialogItem(dlog, prefSeparator, &type, &h, &r);
+    SetDialogItem(dlog, prefSeparator, type, (Handle) redraw, &r);
     /* the initial GetNewDialog draw ran before the user-item procs were
        installed; repaint so the font popups aren't blank */
     GetWindowPortBounds(GetDialogWindow(dlog), &r);
@@ -282,7 +329,8 @@ macprefs_dialog(void)
 
     do {
         ModalDialog(filter, &item);
-        if (item == prefTiles || item == prefHPbar) {
+        if (item == prefTiles || item == prefHPbar
+            || item == prefMenuTiles) {
             set_check(dlog, item, !get_check(dlog, item));
         } else if (item == prefLines2 || item == prefLines3) {
             set_check(dlog, prefLines2, item == prefLines2);
@@ -312,6 +360,7 @@ macprefs_dialog(void)
         up.valid = 1;
         up.tiled_map = get_check(dlog, prefTiles) ? 1 : 0;
         up.hitpointbar = get_check(dlog, prefHPbar) ? 1 : 0;
+        up.menutiles = get_check(dlog, prefMenuTiles) ? 1 : 0;
         up.statuslines = get_check(dlog, prefLines3) ? 3 : 2;
         for (i = 0; i < UIPREFS_NFONTS; i++) {
             if (fontSel[i] > 1) {
@@ -354,6 +403,7 @@ macprefs_apply_startup(void)
     iflags.wc_tiled_map = up.tiled_map ? TRUE : FALSE;
     iflags.wc2_hitpointbar = up.hitpointbar ? TRUE : FALSE;
     iflags.wc2_statuslines = (up.statuslines == 3) ? 3 : 2;
+    iflags.use_menu_glyphs = up.menutiles ? TRUE : FALSE;
     for (i = 0; i < UIPREFS_NFONTS; i++) {
         if (up.fonts[i][0]) {
             fnum = 0;
