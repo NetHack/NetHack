@@ -118,6 +118,8 @@ static Boolean cursor_locked = false;
 
 static ControlActionUPP
     MoveScrollUPP; /* scrolling callback, init'ed in InitMac */
+static ControlActionUPP
+    MoveHScrollUPP; /* horizontal (perm-invent) variant */
 
 /* called from getpos.c during farlook; the flag is recorded but nothing
    reads it yet (cursor shaping during farlook is on the UI punch list) */
@@ -198,6 +200,8 @@ static int filter_scroll_key(const int, NhWindow *);
 
 static void DoScrollBar(Point, short, ControlHandle, NhWindow *);
 static pascal void MoveScrollBar(ControlHandle, short);
+static pascal void MoveHScrollBar(ControlHandle, short);
+static void DrawHScrollbar(NhWindow *);
 
 typedef void (*CbFunc)(EventRecord *, WindowPtr);
 typedef short (*CbUpFunc)(EventRecord *, WindowPtr);
@@ -371,6 +375,9 @@ InitMac(void)
     MoveScrollUPP = NewControlActionUPP(MoveScrollBar);
     if (!MoveScrollUPP)
         error("InitMac: NewControlActionUPP failed");
+    MoveHScrollUPP = NewControlActionUPP(MoveHScrollBar);
+    if (!MoveHScrollUPP)
+        error("InitMac: NewControlActionUPP failed");
 
     /* Set up base fonts for all window types */
     GetFNum(P_STRING_CONV("HackFont"), &i);
@@ -516,6 +523,72 @@ DrawScrollbar(NhWindow *aWin)
     }
 }
 
+/* pixel width of the widest menu line, incl. tile indent and margins */
+static short
+menw_content_width(NhWindow *aWin)
+{
+    return aWin->x_size + (aWin->menuTiles ? MACTILE_DIM + 2 : 0) + 8;
+}
+
+/* Horizontal scrollbar for the perm-invent windoid: its column is
+   narrow (overview width), so long item lines clip on the right.
+   Created lazily -- WIN_INVEN isn't known yet at cre_win time. */
+static void
+DrawHScrollbar(NhWindow *aWin)
+{
+    Rect wrect;
+    short viewW, maxpix;
+
+    if (WIN_INVEN == WIN_ERR || aWin != theWindows + WIN_INVEN
+        || !aWin->its_window)
+        return;
+    GetWindowPortBounds(aWin->its_window, &wrect);
+    OffsetRect(&wrect, -wrect.left, -wrect.top);
+    if (!aWin->hScrollBar) {
+        Rect r = wrect;
+
+        r.top = r.bottom - SBARHEIGHT;
+        r.bottom += 1;
+        r.left = -1;
+        r.right -= SBARWIDTH - 1; /* leave the grow corner */
+        aWin->hScrollBar = NewControl(aWin->its_window, &r, P_EMPTY_STRING,
+                                      true, 0, 0, 0, 16, 0L);
+        aWin->hScrollPos = 0;
+        if (!aWin->hScrollBar)
+            return;
+    }
+    /* Compare before every control call: MoveControl and friends
+       hide+show the control, which invalidates it, and an invalidate
+       from inside an update handler spawns another update event. */
+    {
+        Rect crect = (**aWin->hScrollBar).contrlRect;
+
+        if (crect.left != -1 || crect.top != wrect.bottom - SBARHEIGHT)
+            MoveControl(aWin->hScrollBar, -1, wrect.bottom - SBARHEIGHT);
+        crect = (**aWin->hScrollBar).contrlRect;
+        if (crect.right != wrect.right - SBARWIDTH + 1
+            || crect.bottom != wrect.bottom + 1)
+            SizeControl(aWin->hScrollBar, wrect.right - SBARWIDTH + 2,
+                        SBARHEIGHT + 1);
+    }
+    viewW = wrect.right - SBARWIDTH;
+    maxpix = menw_content_width(aWin) - viewW;
+    if (maxpix < 0)
+        maxpix = 0;
+    if (aWin->hScrollPos > maxpix)
+        aWin->hScrollPos = maxpix;
+    if (GetControlMaximum(aWin->hScrollBar) != maxpix)
+        SetControlMaximum(aWin->hScrollBar, maxpix);
+    if (GetControlValue(aWin->hScrollBar) != aWin->hScrollPos)
+        SetControlValue(aWin->hScrollBar, aWin->hScrollPos);
+    {
+        short want = maxpix ? 0 : 255;
+
+        if ((**aWin->hScrollBar).contrlHilite != want)
+            HiliteControl(aWin->hScrollBar, want);
+    }
+}
+
 #define MIN_HEIGHT 50
 
 /* One-shot: when set, the next SanePositions() ignores saved positions and
@@ -523,6 +596,33 @@ DrawScrollbar(NhWindow *aWin)
    it at startup to RESTORE saved positions, the "Reposition Windows" menu
    command (via ResetWindowPositions) calls it to RESET to defaults. */
 static Boolean gResetToDefault = FALSE;
+
+/* Real window-decoration metrics, measured from the visible window's
+   structure vs content regions (borderless windows yield 0); fall back
+   to the classic guesses while the window is hidden (regions unset). */
+static short
+win_title_height(WindowPtr w, short fallback)
+{
+    WindowPeek p = (WindowPeek) w;
+
+    if (p && p->visible && p->strucRgn && p->contRgn
+        && !EmptyRgn(p->strucRgn))
+        return (short) ((**p->contRgn).rgnBBox.top
+                        - (**p->strucRgn).rgnBBox.top);
+    return fallback;
+}
+
+static short
+win_bottom_extra(WindowPtr w, short fallback)
+{
+    WindowPeek p = (WindowPeek) w;
+
+    if (p && p->visible && p->strucRgn && p->contRgn
+        && !EmptyRgn(p->strucRgn))
+        return (short) ((**p->strucRgn).rgnBBox.bottom
+                        - (**p->contRgn).rgnBBox.bottom);
+    return fallback;
+}
 
 /* "Reposition Windows" menu command: lay out the default stack regardless of
    any saved positions. */
@@ -557,7 +657,9 @@ SanePositions(void)
     stat_h = statr.bottom - statr.top;
 
     {
-        short title_h = small_screen ? 0 : 20;   /* title bar + small gap */
+        /* measured title bar; falls back to 19 while the message
+           window is still hidden */
+        short title_h = small_screen ? 0 : win_title_height(msgw, 19);
         short y = mbar_height + (small_screen ? 2 : 4);
         short msg_top, map_top, stat_top, avail_map_h, avail_map_w;
         /* Large screens restore saved positions; "Reposition Windows" sets
@@ -566,6 +668,9 @@ SanePositions(void)
         Boolean honor = !small_screen && !gResetToDefault;
 
         short msg_w = 0; /* 0 => use content_w (default stack width) */
+        Boolean msg_saved = FALSE;
+        /* minimal message height; the default layout grows it to
+           swallow whatever the map and status don't need */
         msg_h = 4 * theWindows[WIN_MESSAGE].row_height + 4;   /* ~4 lines */
         /* keep the big-screen bar past DrawScrollbar's auto-hide threshold */
         if (!small_screen
@@ -579,14 +684,27 @@ SanePositions(void)
             if (RetrievePosition(kMessageWindow, &mt, &ml)
                 && RetrieveSize(kMessageWindow, mt, ml, &sh, &sw)) {
                 if (sh > 0)
-                    msg_h = sh;
+                    msg_h = sh, msg_saved = TRUE;
                 if (sw > 0)
                     msg_w = sw;
             }
         }
 
-        /* Persistent inventory open (or due to reopen at launch):
-           reserve a right-hand strip for it, stack the rest on the left */
+        /* overview windoid open, or due to reopen at the first map flush */
+        Boolean ov_open = macmap_overview_visible();
+        if (!ov_open) {
+            UiPrefs up;
+
+            if (RetrieveUiPrefs(&up) && up.overview_open)
+                ov_open = TRUE;
+        }
+
+        /* Right column: reserved only while the persistent inventory is
+           open (or due to reopen at launch).  The column is exactly as
+           wide as the overview windoid and the inventory fills it
+           vertically (overview above it when open).  A lone overview
+           doesn't reserve map width -- it sits beside the message
+           window instead. */
         short inv_w = 0;
         WindowPtr invw = (WIN_INVEN != WIN_ERR)
                              ? theWindows[WIN_INVEN].its_window
@@ -601,34 +719,55 @@ SanePositions(void)
                     inv_open = TRUE; /* reopens at the first update */
             }
             if (inv_open) {
-                short it2, il2, ih2, iw2;
+                short colw = macmap_overview_width();
 
-                if (IsWindowVisible(invw)) {
-                    Rect ir;
+                /* restoring a saved arrangement: the inventory keeps its
+                   saved (possibly wider) size, so the reserved column
+                   must match it or the stack runs underneath */
+                if (honor) {
+                    short it2, il2, ih2, iw2;
 
-                    GetWindowPortBounds(invw, &ir);
-                    inv_w = ir.right - ir.left;
-                } else if (RetrievePosition(kInvenWindow, &it2, &il2)
-                           && RetrieveSize(kInvenWindow, it2, il2, &ih2,
-                                           &iw2)) {
-                    inv_w = iw2;
-                } else {
-                    inv_w = 200;
+                    if (IsWindowVisible(invw)) {
+                        Rect ir;
+
+                        GetWindowPortBounds(invw, &ir);
+                        if (ir.right - ir.left > colw)
+                            colw = ir.right - ir.left;
+                    } else if (RetrievePosition(kInvenWindow, &it2, &il2)
+                               && RetrieveSize(kInvenWindow, it2, il2,
+                                               &ih2, &iw2)
+                               && iw2 > colw) {
+                        colw = iw2;
+                    }
                 }
-                inv_w += 6; /* gap to the stack */
+                inv_w = colw + 6; /* gap to the stack */
                 if (inv_w > screenArea.right / 2)
                     inv_w = screenArea.right / 2; /* don't starve the map */
             }
         }
 
-        /* Vertical gap between stacked windows: the frame line plus the
-           1px drop shadow extend 2px below the content, and the next
-           title bar needs its full title_h above -- 2px used to leave
-           the shadow lying ON the title (1px overlap) */
-        short vgap = small_screen ? 2 : 6;
+        /* Vertical gap between stacked windows: the measured frame +
+           drop shadow below the content, minus one: the shadow's last
+           pixel lies on the next title bar, so the frames abut and no
+           desktop shows through the seams */
+        short vgap = small_screen ? 2 : (win_bottom_extra(msgw, 2) - 1);
 
-        /* Fit the map into the space left by menu bar, message+status windows,
-           and title bars; macmap_fit resizes the map window + viewport/backing */
+        if (vgap < 1)
+            vgap = 1;
+
+        /* the overview sits beside the message window when there's no
+           inventory column: never let the message row be shorter than
+           the overview windoid, or it overlaps the map's title bar */
+        if (!inv_w && ov_open && !msg_saved) {
+            short need = macmap_overview_height() + 2;
+
+            if (msg_h < need)
+                msg_h = need;
+        }
+
+        /* Fit the map into the space left by menu bar, the (minimal)
+           message window and status; macmap_fit resizes the map window +
+           viewport/backing */
         msg_top = y + title_h;
         map_top = msg_top + msg_h + vgap + title_h;
         avail_map_h = screenArea.bottom - map_top - (title_h + stat_h + vgap);
@@ -640,6 +779,18 @@ SanePositions(void)
         GetWindowPortBounds(mapw, &mr);
         map_h = mr.bottom - mr.top;
         content_w = mr.right - mr.left;
+        /* the map took what it needed: grow the message window by the
+           leftover so the stack fills the whole screen (unless the user
+           saved an explicit message size) */
+        if (!msg_saved) {
+            short spare = screenArea.bottom
+                          - (msg_top + msg_h + vgap + title_h + map_h
+                             + vgap + title_h + stat_h + 2);
+
+            if (spare > 0)
+                msg_h += spare;
+        }
+        map_top = msg_top + msg_h + vgap + title_h;
         content_left = (screenArea.right - inv_w - content_w) / 2;
         if (content_left < 0) content_left = 0;
 
@@ -648,7 +799,21 @@ SanePositions(void)
             top = msg_top; left = content_left;
         }
         MoveWindow(msgw, left, top, 1);
-        SizeWindow(msgw, msg_w ? msg_w : content_w, msg_h, 1);
+        {
+            short mw = msg_w ? msg_w : content_w;
+
+            /* no inventory column: the overview sits beside the message
+               in the top-right corner; shrink the default width so they
+               don't overlap (the map below keeps the full width) */
+            if (!msg_w && !inv_w && ov_open) {
+                short avail = screenArea.right - 4
+                              - (macmap_overview_width() + 6) - left;
+
+                if (avail > 100 && mw > avail)
+                    mw = avail;
+            }
+            SizeWindow(msgw, mw, msg_h, 1);
+        }
         if (theWindows[WIN_MESSAGE].scrollBar)
             DrawScrollbar(&theWindows[WIN_MESSAGE]);
 
@@ -713,17 +878,54 @@ SanePositions(void)
             InvalWindowRect(statw, &sfull);
         }
 
-        /* inventory windoid in the reserved right-hand strip */
+        /* overview windoid: pin to the screen's top-right corner; the
+           inventory windoid (below) starts under it */
+        short ov_gap = 0;
+        {
+            WindowPtr ovw = macmap_overview_window();
+
+            if (ovw && IsWindowVisible(ovw)
+                && !(honor && RetrievePosition(kOverviewWindow, &top,
+                                               &left))) {
+                Rect ovr;
+
+                GetWindowPortBounds(ovw, &ovr);
+                top = msg_top;
+                left = screenArea.right - (ovr.right - ovr.left) - 4;
+                if (left < 0)
+                    left = 0;
+                MoveWindow(ovw, left, top, 0);
+                /* content height + its shadow + the inventory windoid's
+                   title bar, shadow overlapping the title by 1px so the
+                   windoids abut seamlessly, same as the main stack */
+                ov_gap = (ovr.bottom - ovr.top) + win_bottom_extra(ovw, 2)
+                         + win_title_height(invw, 19) - 1;
+            }
+        }
+
+        /* inventory windoid: the right column -- overview width, filling
+           the screen below the overview (or from the top when the
+           overview is closed) */
         if (inv_w && invw && IsWindowVisible(invw)
             && !(honor && RetrievePosition(kInvenWindow, &top, &left))) {
-            Rect ir;
+            short cw = macmap_overview_width();
 
-            GetWindowPortBounds(invw, &ir);
-            top = msg_top;
-            left = screenArea.right - (ir.right - ir.left) - 4;
+            top = msg_top + ov_gap;
+            left = screenArea.right - cw - 4;
             if (left < 0)
                 left = 0;
             MoveWindow(invw, left, top, 0);
+            SizeWindow(invw, cw, screenArea.bottom - top - 2, 1);
+            SetPortWindowPort(invw);
+            {
+                Rect ifull;
+
+                GetWindowPortBounds(invw, &ifull);
+                InvalWindowRect(invw, &ifull);
+            }
+            if (theWindows[WIN_INVEN].scrollBar)
+                DrawScrollbar(&theWindows[WIN_INVEN]);
+            DrawHScrollbar(&theWindows[WIN_INVEN]);
         }
     }
 
@@ -864,6 +1066,8 @@ got1:
     aWin = &theWindows[i];
     aWin->windowTextLen = 0L;
     aWin->scrollBar = (ControlHandle) 0;
+    aWin->hScrollBar = (ControlHandle) 0;
+    aWin->hScrollPos = 0;
     aWin->menuInfo = 0;
     aWin->menuSelected = 0;
     aWin->menuCounts = 0;
@@ -1161,6 +1365,9 @@ mac_clear_nhwindow(winid win)
     case NHW_MENU:
         dispose_menu_handles(aWin);
         menw_clear_pending(aWin);
+        aWin->hScrollPos = 0; /* fresh content: back to the left edge */
+        if (aWin->hScrollBar)
+            SetControlValue(aWin->hScrollBar, 0);
         aWin->menuChar = 'a';
         aWin->miSelLen = 0;
         aWin->miLen = 0;
@@ -1817,8 +2024,13 @@ ToggleMenuSelect(NhWindow *aWin, int line)
 {
     Rect r;
 
+    /* absolute origin, so this is right both from MenwUpdate (already
+       shifted) and from direct selection clicks (unshifted) */
+    if (aWin->hScrollPos)
+        SetOrigin(aWin->hScrollPos, 0);
     GetWindowPortBounds(aWin->its_window, &r);
-    OffsetRect(&r, -r.left, -r.top);
+    r.left = 0; /* content x; right edge stays the visible window edge */
+    r.top = 0;
     if (aWin->scrollBar)
         r.right -= SBARWIDTH;
     r.top = line * aWin->row_height;
@@ -1826,6 +2038,8 @@ ToggleMenuSelect(NhWindow *aWin, int line)
 
     LMSetHiliteMode((UInt8)(LMGetHiliteMode() & 0x7F));
     InvertRect(&r);
+    if (aWin->hScrollPos)
+        SetOrigin(0, 0);
 }
 
 /*
@@ -1952,6 +2166,62 @@ MoveScrollBar(ControlHandle theBar, short part)
     DisposeRgn(rgn);
 }
 
+/* horizontal (perm-invent) scroll action: pixel units, arrows 16px,
+   pages a view width; redraw is a full menu repaint (small window) */
+static pascal void
+MoveHScrollBar(ControlHandle theBar, short part)
+{
+    WindowPtr theWin;
+    NhWindow *w;
+    Rect r;
+    int now, amt, bound;
+
+    if (!part)
+        return;
+    theWin = (**theBar).contrlOwner;
+    w = (NhWindow *) GetWRefCon(theWin);
+    if (!w || w < theWindows || w >= &theWindows[NUM_MACWINDOWS])
+        return;
+    GetWindowPortBounds(theWin, &r);
+    OffsetRect(&r, -r.left, -r.top);
+    now = GetControlValue(theBar);
+    if (part == kControlPageUpPart || part == kControlPageDownPart) {
+        amt = (r.right - r.left) - SBARWIDTH - 16;
+        if (amt < 1) /* window narrower than one page */
+            amt = 1;
+    } else {
+        amt = 16;
+    }
+    if (part == kControlPageUpPart || part == kControlUpButtonPart) {
+        bound = GetControlMinimum(theBar);
+        if (now - bound < amt)
+            amt = now - bound;
+        amt = -amt;
+    } else {
+        bound = GetControlMaximum(theBar);
+        if (bound - now < amt)
+            amt = bound - now;
+    }
+    if (!amt)
+        return;
+    SetControlValue(theBar, (short) (now + amt));
+    w->hScrollPos = (short) (now + amt);
+    /* same shape as MoveScrollBar: shift the pixels, invalidate only
+       the exposed strip -- a full MenwUpdate here would redraw the
+       controls mid-TrackControl (violent flicker) */
+    r.right -= SBARWIDTH;
+    r.bottom -= SBARHEIGHT; /* keep the h-bar itself out of the shift */
+    {
+        RgnHandle rgn = NewRgn();
+
+        if (!rgn)
+            return;
+        ScrollRect(&r, -amt, 0, rgn);
+        InvalWindowRgn(theWin, rgn);
+        DisposeRgn(rgn);
+    }
+}
+
 static void
 DoScrollBar(Point p, short code, ControlHandle theBar, NhWindow *aWin)
 {
@@ -2032,7 +2302,19 @@ draw_growicon_vert_only(WindowPtr wind)
 static void
 WindowGoAway(EventRecord *theEvent, WindowPtr theWindow)
 {
-    NhWindow *aWin = GetNhWin(theWindow);
+    NhWindow *aWin;
+
+    if (GetWRefCon(theWindow) == MACOVERVIEW_REFCON) {
+        /* overview windoid (not an NhWindow): hide and remember */
+        if (!theEvent || TrackGoAway(theWindow, theEvent->where)) {
+            macmap_overview_hide();
+            macprefs_note_overview(FALSE);
+            gTileMenuNeedsUpdate = 1; /* re-sync the Game menu checkmark
+                                         on the next idle pass */
+        }
+        return;
+    }
+    aWin = GetNhWin(theWindow);
 
     if (!theEvent || TrackGoAway(theWindow, theEvent->where)) {
         if (aWin - theWindows == BASE_WINDOW && !iflags.window_inited) {
@@ -2470,6 +2752,8 @@ mac_save_window_positions(void)
         SaveWindowPos(w);
         SaveWindowSize(w);
     }
+    if ((w = macmap_overview_window()) != 0 && IsWindowVisible(w))
+        SaveWindowPos(w); /* fixed size; position only */
 }
 
 /* One-shot at the first input wait inside the moveloop: reopen the
@@ -3702,6 +3986,22 @@ MenwDrawStyled(NhWindow *wind)
     draw_growicon_vert_only(wind->its_window);
     DrawControls(wind->its_window);
 
+    /* Horizontal scroll (perm-invent): shift the port origin so the text
+       below renders scrolled left.  The controls above already drew
+       unshifted.  r2 (the scrollbar clip) follows into shifted coords,
+       but r.left stays 0 because the text and tile x anchor is a content
+       coordinate; its right edge still tracks the visible edge so the
+       inverse row boxes end at the window edge.  MenwUpdate restores the
+       origin. */
+    if (wind->hScrollPos) {
+        SetOrigin(wind->hScrollPos, 0);
+        GetWindowPortBounds(wind->its_window, &r);
+        r2 = r;
+        r2.left = r2.right - SBARWIDTH;
+        r2.right += 1;
+        r2.top -= 1;
+        r.left = 0;
+    }
     if (vis)
         h = clip_exclude_scrollbar(&r2);
 
@@ -3827,9 +4127,14 @@ MenwUpdate(NhWindow *wind)
     int i, line;
     MacMHMenuItem *mi;
 
-    MenwDrawStyled(wind);
-    if (!wind->menuInfo || !wind->menuSelected || wind->miSelLen <= 0)
+    DrawHScrollbar(wind); /* no-op except for WIN_INVEN: keep the range
+                             in sync with the current content width */
+    MenwDrawStyled(wind); /* leaves the origin h-shifted (perm-invent) */
+    if (!wind->menuInfo || !wind->menuSelected || wind->miSelLen <= 0) {
+        if (wind->hScrollPos)
+            SetOrigin(0, 0);
         return;
+    }
     HLock((Handle) wind->menuInfo);
     HLock((Handle) wind->menuSelected);
     /* typed-count display: "x N" right-aligned in each selected row that
@@ -3877,6 +4182,8 @@ MenwUpdate(NhWindow *wind)
     }
     HUnlock((Handle) wind->menuInfo);
     HUnlock((Handle) wind->menuSelected);
+    if (wind->hScrollPos)
+        SetOrigin(0, 0);
     return;
 }
 
@@ -3897,13 +4204,30 @@ click_in_scrollbar(EventRecord *theEvent, WindowPtr theWindow,
     Point p;
     ControlHandle theBar;
 
-    if (!aWin->scrollBar || (**aWin->scrollBar).contrlVis == 0)
+    if ((!aWin->scrollBar || (**aWin->scrollBar).contrlVis == 0)
+        && !aWin->hScrollBar)
         return false;
     p = theEvent->where;
     GlobalToLocal(&p);
     code = FindControl(p, theWindow, &theBar);
     if (!code)
         return false;
+    if (aWin->hScrollBar && theBar == aWin->hScrollBar) {
+        if (code == kControlIndicatorPart) {
+            (void) TrackControl(theBar, p, (ControlActionUPP) 0);
+            if (aWin->hScrollPos != GetControlValue(theBar)) {
+                Rect r;
+
+                aWin->hScrollPos = GetControlValue(theBar);
+                GetWindowPortBounds(theWindow, &r);
+                OffsetRect(&r, -r.left, -r.top);
+                InvalWindowRect(theWindow, &r);
+            }
+        } else {
+            (void) TrackControl(theBar, p, MoveHScrollUPP);
+        }
+        return true;
+    }
     DoScrollBar(p, code, theBar, aWin);
     return true;
 }
@@ -4032,10 +4356,28 @@ GeneralKey(EventRecord *theEvent, WindowPtr theWindow)
     AddToKeyQueue(topl_resp_key(ch), TRUE);
 }
 
+/* Frontmost window for input/menubar purposes: the overview windoid
+   floats above everything but must never own the keyboard or drive
+   the menubar state -- skip it. */
+WindowPtr
+FrontGameWindow(void)
+{
+    WindowPtr w = FrontWindow();
+
+    if (w && GetWRefCon(w) == MACOVERVIEW_REFCON) {
+        WindowPeek p = ((WindowPeek) w)->nextWindow;
+
+        while (p && !p->visible)
+            p = p->nextWindow;
+        w = (WindowPtr) p;
+    }
+    return w;
+}
+
 static void
 HandleKey(EventRecord *theEvent)
 {
-    WindowPtr theWindow = FrontWindow();
+    WindowPtr theWindow = FrontGameWindow();
 
     if (theEvent->modifiers & cmdKey) {
         if ((theEvent->message & 0xff) == '.') {
@@ -4080,7 +4422,10 @@ HandleClick(EventRecord *theEvent)
     case inContent:
         if (not_inSelect) {
             int kind = GetWindowKind(theWindow) - WIN_BASE_KIND;
-            if (kind >= 0 && kind < NUM_FUNCS) {
+            /* the overview floats on top already; SelectWindow would
+               only deactivate the game window */
+            if (GetWRefCon(theWindow) != MACOVERVIEW_REFCON
+                && kind >= 0 && kind < NUM_FUNCS) {
                 winCursorFuncs[kind](theEvent, theWindow, gMouseRgn);
                 SelectWindow(theWindow);
                 SetPortWindowPort(theWindow);
@@ -4125,6 +4470,7 @@ HandleClick(EventRecord *theEvent)
                     if (aWin->scrollBar) {
                         DrawScrollbar(aWin);
                     }
+                    DrawHScrollbar(aWin); /* no-op except WIN_INVEN */
                 }
             }
         } else {
@@ -4175,6 +4521,12 @@ HandleUpdate(EventRecord *theEvent)
         if (WIN_MAP != WIN_ERR && theWindows[WIN_MAP].its_window == theWindow) {
             BeginUpdate(theWindow);
             macmap_update_event(&theWindows[WIN_MAP]);
+            EndUpdate(theWindow);
+            return;
+        }
+        if (GetWRefCon(theWindow) == MACOVERVIEW_REFCON) {
+            BeginUpdate(theWindow);
+            macmap_overview_update_event(theWindow);
             EndUpdate(theWindow);
             return;
         }
@@ -4329,6 +4681,9 @@ HandleEvent(EventRecord *theEvent)
         mactile_menu_refresh();
         break;
     }
+    /* the overview windoid floats: put it back on top if any of the
+       above (SelectWindow, new window) got in front of it */
+    macmap_overview_float();
 }
 
 /**********************************************************************

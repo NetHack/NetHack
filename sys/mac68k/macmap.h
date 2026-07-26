@@ -40,7 +40,21 @@ extern Boolean macmap_click(NhWindow *map, Point pt, UInt32 modifiers);
 extern void    macmap_pixel_to_cell(NhWindow *map, Point pt,
                                     int *col, int *row);
 
-/* WRefCon sentinel for identifying the map window in event dispatch. */
+/* Overview windoid: the whole level, a few pixels per cell.
+   Show/hide are pure UI; persisting UiPrefs.overview_open is the
+   caller's job (Game menu toggle / close box). */
+extern void    macmap_overview_show(void);
+extern void    macmap_overview_hide(void);
+extern Boolean macmap_overview_visible(void);
+extern WindowPtr macmap_overview_window(void); /* NULL until first shown */
+/* content size in pixels; both are valid before the first show */
+extern short   macmap_overview_width(void);
+extern short   macmap_overview_height(void);
+extern void    macmap_overview_update_event(WindowPtr w);
+extern void    macmap_overview_float(void); /* keep it the frontmost window */
+
+/* WRefCon sentinels for identifying our windows in event dispatch. */
 #define MACMAP_REFCON  ((long) 0x4E486D70)  /* 'NHmp' */
+#define MACOVERVIEW_REFCON ((long) 0x4E486F76)  /* 'NHov' */
 
 #endif /* MACMAP_H */

@@ -205,6 +205,8 @@ GetWinKind(WindowPtr win)
     short kind;
     extern WindowPtr _mt_window;
 
+    if (win && GetWRefCon(win) == MACOVERVIEW_REFCON)
+        return kOverviewWindow;             /* not an NhWindow; check first */
     if (!CheckNhWin(win)) {
         return -1;
     }

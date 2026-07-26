@@ -106,6 +106,7 @@ enum {
     menuGameReposition,
     menuGameSavePositions,
     menuGameTileMode,
+    menuGameOverview,
     ____Game___1,
     menuGamePlayMode,
 
@@ -811,7 +812,7 @@ void
 AdjustMenus(short dimMenubar)
 {
     short newMenubar = mbarRegular;
-    WindowRef win = FrontWindow();
+    WindowRef win = FrontGameWindow(); /* skip the floating overview */
     short i;
 
     /* determine the new menubar state */
@@ -902,6 +903,8 @@ AdjustMenus(short dimMenubar)
                 SetItemMark(MHND_GAME, menuGameTileMode,
                             macmap_get_mode(_am_map) ? checkMark : noMark);
             }
+            SetItemMark(MHND_GAME, menuGameOverview,
+                        macmap_overview_visible() ? checkMark : noMark);
 
             /* Play Mode submenu: checkmark on the current mode; Explore is
                the only actionable item (one-way, regular mode only) */
@@ -982,6 +985,18 @@ DoMenuEvt(long menuEntry)
 
         case menuGameSavePositions:
             mac_save_window_positions();
+            break;
+
+        case menuGameOverview:
+            if (macmap_overview_visible()) {
+                macmap_overview_hide();
+                macprefs_note_overview(FALSE);
+            } else {
+                macmap_overview_show();
+                macprefs_note_overview(TRUE);
+            }
+            SetItemMark(MHND_GAME, menuGameOverview,
+                        macmap_overview_visible() ? checkMark : noMark);
             break;
 
         case menuGameTileMode: {
@@ -1333,4 +1348,8 @@ mactile_menu_refresh(void)
         DisableItem(MHND_GAME, menuGameTileMode);
     SetItemMark(MHND_GAME, menuGameTileMode,
                 macmap_get_mode(map) ? checkMark : noMark);
+    /* same deferred-sync path re-syncs the Overview mark when the
+       windoid is dismissed via its close box */
+    SetItemMark(MHND_GAME, menuGameOverview,
+                macmap_overview_visible() ? checkMark : noMark);
 }

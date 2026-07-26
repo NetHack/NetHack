@@ -217,6 +217,7 @@ resource 'MENU' (138) {
         "Reposition Windows", noIcon, "N", noMark, plain,
         "Save Window Positions", noIcon, noKey, noMark, plain,
         "Tile Mode", noIcon, "T", noMark, plain,
+        "Overview Window", noIcon, noKey, noMark, plain,
         "-", noIcon, noKey, noMark, plain,
         "Play Mode", noIcon, "\0x1B" /* hierarchicalMenu */, "\0xCA", plain
     }
@@ -435,7 +436,7 @@ resource 'STR#' (201, "current") {
  * font popups (8-12) and size popups (13-17) are contiguous runs in
  * uiprefs_fonts order (map, status, message, menu, text). */
 resource 'DLOG' (6100, "Preferences") {
-    {24, 56, 320, 456},
+    {24, 56, 312, 456},
     movableDBoxProc, /* System 7 movable modal (titled; drag handled in
                         pref_filter -- ModalDialog won't track it) */
     visible,
@@ -448,33 +449,36 @@ resource 'DLOG' (6100, "Preferences") {
 
 resource 'DITL' (6100) {
     {
-        {264, 310, 284, 384}, Button { enabled, "Save" },          /* 1 */
-        {264, 228, 284, 292}, Button { enabled, "Cancel" },        /* 2 */
-        {264, 16, 284, 140},  Button { enabled, "Forget Settings" }, /* 3 */
-        {12, 16, 30, 190},    CheckBox { enabled, "Tiled map" },   /* 4 */
-        {36, 16, 54, 190},    CheckBox { enabled, "Hit-point bar" }, /* 5 */
-        {12, 210, 30, 384},   RadioButton { enabled, "2 status lines" }, /* 6 */
-        {36, 210, 54, 384},   RadioButton { enabled, "3 status lines" }, /* 7 */
-        {78, 100, 98, 300},   UserItem { enabled },                /* 8 map font */
-        {106, 100, 126, 300}, UserItem { enabled },                /* 9 status */
+        {258, 310, 278, 384}, Button { enabled, "Save" },          /* 1 */
+        {258, 228, 278, 292}, Button { enabled, "Cancel" },        /* 2 */
+        {258, 16, 278, 140},  Button { enabled, "Forget Settings" }, /* 3 */
+        {8, 16, 26, 190},     CheckBox { enabled, "Tiled map" },   /* 4 */
+        {30, 16, 48, 190},    CheckBox { enabled, "Hit-point bar" }, /* 5 */
+        {52, 116, 70, 154},   RadioButton { enabled, "2" }, /* 6 */
+        {52, 158, 70, 196},   RadioButton { enabled, "3" }, /* 7 */
+        {82, 100, 102, 300},  UserItem { enabled },                /* 8 map font */
+        {108, 100, 128, 300}, UserItem { enabled },                /* 9 status */
         {134, 100, 154, 300}, UserItem { enabled },                /* 10 message */
-        {162, 100, 182, 300}, UserItem { enabled },                /* 11 menu */
-        {190, 100, 210, 300}, UserItem { enabled },                /* 12 text */
-        {78, 312, 98, 388},   UserItem { enabled },                /* 13 map size */
-        {106, 312, 126, 388}, UserItem { enabled },                /* 14 status */
+        {160, 100, 180, 300}, UserItem { enabled },                /* 11 menu */
+        {186, 100, 206, 300}, UserItem { enabled },                /* 12 text */
+        {82, 312, 102, 388},  UserItem { enabled },                /* 13 map size */
+        {108, 312, 128, 388}, UserItem { enabled },                /* 14 status */
         {134, 312, 154, 388}, UserItem { enabled },                /* 15 message */
-        {162, 312, 182, 388}, UserItem { enabled },                /* 16 menu */
-        {190, 312, 210, 388}, UserItem { enabled },                /* 17 text */
-        {80, 16, 96, 96},     StaticText { disabled, "Map:" },     /* 18 */
-        {108, 16, 124, 96},   StaticText { disabled, "Status:" },  /* 19 */
+        {160, 312, 180, 388}, UserItem { enabled },                /* 16 menu */
+        {186, 312, 206, 388}, UserItem { enabled },                /* 17 text */
+        {84, 16, 100, 96},    StaticText { disabled, "Map:" },     /* 18 */
+        {110, 16, 126, 96},   StaticText { disabled, "Status:" },  /* 19 */
         {136, 16, 152, 96},   StaticText { disabled, "Message:" }, /* 20 */
-        {164, 16, 180, 96},   StaticText { disabled, "Menu:" },    /* 21 */
-        {192, 16, 208, 96},   StaticText { disabled, "Text:" },    /* 22 */
-        {222, 16, 254, 384},  StaticText { disabled,
+        {162, 16, 178, 96},   StaticText { disabled, "Menu:" },    /* 21 */
+        {188, 16, 204, 96},   StaticText { disabled, "Text:" },    /* 22 */
+        {214, 16, 246, 384},  StaticText { disabled,
             "Changes take effect at the next launch." },           /* 23 */
-        {56, 210, 74, 384},   CheckBox { enabled, "Tiles in menus" }, /* 24 */
-        {260, 306, 288, 388}, UserItem { disabled },  /* 25 default ring */
-        {257, 16, 258, 388},  UserItem { disabled }   /* 26 separator */
+        {8, 210, 26, 384},    CheckBox { enabled, "Tiles in menus" }, /* 24 */
+        {254, 306, 282, 388}, UserItem { disabled },  /* 25 default ring */
+        {251, 16, 252, 388},  UserItem { disabled },  /* 26 separator */
+        {55, 16, 71, 112},    StaticText { disabled, "Status lines:" }, /* 27 */
+        {30, 210, 48, 384},   CheckBox { enabled, "Sound" }, /* 28 */
+        {76, 16, 77, 388},    UserItem { disabled }   /* 29 rule above fonts */
     }
 };
 
@@ -491,6 +495,18 @@ resource 'DLOG' (6200, "About NetHack") {
     6200,
     "About NetHack",
     centerMainScreen
+};
+
+/* Dialog color table: content background = the title PICT's teal
+ * (RGB 71,108,108), so the artwork blends into the whole dialog.
+ * Raw data (no dctb Rez template in the Retro68 RIncludes):
+ * ctSeed, ctFlags, ctSize=0 (one entry), part 0 = wContentColor, RGB.
+ * GetNewDialog picks it up by matching resource ID; ignored on 1-bit
+ * screens, where the dialog stays white (the PICT isn't drawn there
+ * either). */
+data 'dctb' (6200, "About NetHack", purgeable) {
+    $"00000000 0000 0000"
+    $"0000 4747 6C6C 6C6C"
 };
 
 resource 'DITL' (6200) {

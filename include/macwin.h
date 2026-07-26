@@ -59,7 +59,8 @@ extern MacFlags macFlags;
 #define kMapTileWindow 5
 #define kInvenWindow 6 /* perm-invent windoid; separate from kMenuWindow
                           so dragging it doesn't move future menus */
-#define kLastWindowKind kInvenWindow
+#define kOverviewWindow 7 /* map overview windoid (macmap.c) */
+#define kLastWindowKind kOverviewWindow
 
 /* WIND resource IDs (templates in sys/mac68k/nhmapwind.r) */
 #define kWindMapDocument      200 /* map, decorated (scrollbars + grow box) */
@@ -122,6 +123,8 @@ typedef struct NhWindow {
     long windowTextLen;
     short scrollPos;
     ControlHandle scrollBar;
+    ControlHandle hScrollBar; /* perm-invent windoid only: horizontal */
+    short hScrollPos;         /* pixels scrolled left */
 
     Boolean tile_mode;        /* tile rendering enabled (map window only) */
 } NhWindow;
@@ -160,8 +163,10 @@ extern void SaveSizeForKind(short kind, short height, short width);
    and applied at startup AFTER initoptions(), so they override the
    NetHack Defaults file.  valid==0 (never saved / "Forget Settings")
    leaves the config-file values alone. */
-#define UIPREFS_VERSION 3 /* v2: menutiles; v3: perminv_open + the
-                             kInvenWindow position slot */
+/* Bumped whenever UiPrefs or the savePos[] layout changes; a stored
+   record with any other version is discarded (maccurs.c InitWinFile),
+   so there is no migration path. */
+#define UIPREFS_VERSION 4
 enum uiprefs_fonts {
     uiFontMap = 0, uiFontStatus, uiFontMessage, uiFontMenu, uiFontText,
     UIPREFS_NFONTS
@@ -174,6 +179,8 @@ typedef struct UiPrefs {
     char statuslines;            /* 2 or 3 */
     char menutiles;              /* item tiles in menu rows */
     char perminv_open;           /* windoid was open at last save */
+    char sounds;                 /* soundlib on/off (iflags.sounds) */
+    char overview_open;          /* map overview windoid open at last save */
     Str31 fonts[UIPREFS_NFONTS]; /* fonts[i][0]==0 => port default */
     short sizes[UIPREFS_NFONTS]; /* 0 => port default */
 } UiPrefs;
@@ -185,6 +192,7 @@ extern void StoreUiPrefs(const UiPrefs *);
 extern void macprefs_dialog(void);
 extern void macprefs_apply_startup(void);
 extern void macprefs_note_perminv(Boolean); /* persist windoid open/closed */
+extern void macprefs_note_overview(Boolean); /* ditto, overview windoid */
 
 /* macwin.c: update-event dispatch for movable-modal dialog filters */
 extern void mac_handle_update_event(EventRecord *);
@@ -275,6 +283,8 @@ E void mac_delay_output(void);
 /* macwin.c: palette-safe text color, shared by menus and status */
 extern void mac_set_text_color(int);
 extern short mac_main_depth(void); /* main-device pixel depth (1 = B&W) */
+extern WindowPtr FrontGameWindow(void); /* FrontWindow() minus the
+                                           floating overview windoid */
 
 /* macstat.c: native status renderer */
 extern void mac_status_init(void);

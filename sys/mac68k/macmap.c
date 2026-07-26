@@ -11,6 +11,7 @@
 #include <QDOffscreen.h>
 #include <Palettes.h>
 #include <Controls.h>
+#include <Menus.h> /* GetMBarHeight, for the overview default spot */
 
 /* src/tile.c reserves a tile slot per statue-monster, but our PICT sheet has
    only the one generic statue tile; remap any out-of-sheet index to it. */
@@ -76,6 +77,15 @@ static void scroll_viewport_to(short new_col, short new_row);
 static void draw_cursor_border(int col, int row);
 static void queue_cell(int x, int y);
 static void flush_pending_cells(void);
+
+/* Overview windoid; see the block above its implementation below. */
+#define OV_SCALE 3
+#define OV_COLS (COLNO - 1) /* col 0 is unused, so it gets no pixels */
+static WindowPtr gOvWindow = NULL;
+static void ov_draw_cell(short x, short y);
+static void ov_repaint_range(short c0, short r0, short c1, short r1);
+static void ov_repaint_all(void);
+static void ov_mirror_pending(void);
 
 /* Union a backing-local cell rect into the pending dirty region. */
 static void
@@ -370,6 +380,11 @@ void
 macmap_destroy(NhWindow *map)
 {
     if (!map || gMap.owner != map) return;
+    if (gOvWindow) { /* before the shared palette goes away */
+        SetPalette(gOvWindow, (PaletteHandle) 0, false);
+        DisposeWindow(gOvWindow);
+        gOvWindow = NULL;
+    }
     if (gMap.backing) { DisposeGWorld(gMap.backing); gMap.backing = NULL; }
     if (gMap.palette) { DisposePalette(gMap.palette); gMap.palette = NULL; }
     if (map->its_window) {
@@ -773,6 +788,19 @@ void
 macmap_flush(void)
 {
     if (!gMap.owner || !gMap.owner->its_window) return;
+    {
+        /* reopen the overview at the first frame if it was open last
+           launch (game windows don't exist yet at prefs-apply time) */
+        static Boolean ov_startup_checked = false;
+
+        if (!ov_startup_checked) {
+            UiPrefs up;
+
+            ov_startup_checked = true;
+            if (RetrieveUiPrefs(&up) && up.overview_open)
+                macmap_overview_show();
+        }
+    }
     flush_pending_cells(); /* paint queued print_glyph cells (batched) */
     if (gMap.has_dirty && gMap.backing) {
         Rect r = gMap.dirty, b;
@@ -1101,6 +1129,7 @@ flush_pending_cells(void)
         if (batched)
             end_cell_batch();
     }
+    ov_mirror_pending(); /* pend fields are still intact here */
 }
 
 /* Move the viewport to (new_col,new_row), clamped, repainting via soft-scroll
@@ -1328,4 +1357,195 @@ macmap_pixel_to_cell(NhWindow *map, Point pt, int *col, int *row)
     if (col) *col = (pt.h / gMap.cell_w) + gMap.scroll_col;
     if (row) *row = (pt.v / gMap.cell_h) + gMap.scroll_row;
     (void) map;
+}
+
+/**********************************************************************
+ * Overview windoid: the whole level at OV_SCALE px per cell.
+ * Rendered from the text_cache/text_color caches (mode-independent),
+ * so it works in both text and tile map display.  Toggled from the
+ * Game menu; the close box hides it (both persist through
+ * UiPrefs.overview_open); position persists as kOverviewWindow.
+ */
+
+/* Color scheme depends on the live screen depth, not macFlags.color:
+   Color QD stays present when the monitor is switched to B&W, but the
+   black-background scheme would paint black on black there.  Refreshed
+   at the start of every repaint pass. */
+static Boolean gOvUseColor = false;
+
+/* caller has set the port to gOvWindow */
+static void
+ov_draw_cell(short x, short y)
+{
+    Rect r;
+    unsigned char ch = gMap.text_cache[y][x];
+    Boolean is_hero = ((int) x == (int) u.ux && (int) y == (int) u.uy);
+
+    SetRect(&r, (x - 1) * OV_SCALE, y * OV_SCALE,
+            x * OV_SCALE, (y + 1) * OV_SCALE);
+    if (gOvUseColor) {
+        if (ch == ' ' || ch == '\0') {
+            ForeColor(blackColor); /* unexplored: matches the map bg */
+        } else if (is_hero) {
+            ForeColor(whiteColor);
+        } else {
+            set_nh_color(gMap.text_color[y][x]);
+        }
+        PaintRect(&r);
+        ForeColor(blackColor);
+    } else {
+        /* B&W / low depth: white background, explored cells black */
+        if (ch == ' ' || ch == '\0')
+            EraseRect(&r);
+        else
+            PaintRect(&r);
+    }
+}
+
+/* end-exclusive cell range */
+static void
+ov_repaint_range(short c0, short r0, short c1, short r1)
+{
+    short x, y;
+
+    gOvUseColor = macFlags.color && mac_main_depth() >= 4;
+    if (c0 < 1) c0 = 1; /* col 0 unused, and not part of the content */
+    if (r0 < 0) r0 = 0;
+    if (c1 > COLNO) c1 = COLNO;
+    if (r1 > ROWNO) r1 = ROWNO;
+    for (y = r0; y < r1; y++)
+        for (x = c0; x < c1; x++)
+            ov_draw_cell(x, y);
+}
+
+static void
+ov_repaint_all(void)
+{
+    ov_repaint_range(0, 0, COLNO, ROWNO);
+}
+
+/* mirror the cells flush_pending_cells just repainted; called at the
+   per-frame flush boundary, so it's one port switch per frame */
+static void
+ov_mirror_pending(void)
+{
+    GrafPtr saveP;
+
+    if (!gOvWindow || !IsWindowVisible(gOvWindow))
+        return;
+    GetPort(&saveP);
+    SetPortWindowPort(gOvWindow);
+    if (gMap.pend_overflow) {
+        ov_repaint_range(gMap.pend_c0, gMap.pend_r0,
+                         gMap.pend_c1, gMap.pend_r1);
+    } else {
+        short i;
+
+        gOvUseColor = macFlags.color && mac_main_depth() >= 4;
+        for (i = 0; i < gMap.pend_n; i++)
+            ov_draw_cell(gMap.pend_x[i], gMap.pend_y[i]);
+    }
+    SetPort(saveP);
+}
+
+void
+macmap_overview_show(void)
+{
+    if (!gOvWindow) {
+        Rect b;
+        Str255 title;
+        short top = 0, left = 0;
+
+        if (!RetrievePosition(kOverviewWindow, &top, &left)) {
+            /* default: the screen's top-right corner (same spot the
+               Reposition Windows layout uses) */
+            left = qd.screenBits.bounds.right - OV_COLS * OV_SCALE - 4;
+            if (left < 0)
+                left = 0;
+            top = GetMBarHeight() + 24; /* menu bar + our title bar */
+        }
+        SetRect(&b, left, top,
+                left + OV_COLS * OV_SCALE, top + ROWNO * OV_SCALE);
+        C2P("Overview", title);
+        gOvWindow = macFlags.color
+            ? (WindowPtr) NewCWindow(0L, &b, title, false, noGrowDocProc,
+                                     (WindowPtr) -1L, true,
+                                     MACOVERVIEW_REFCON)
+            : NewWindow(0L, &b, title, false, noGrowDocProc,
+                        (WindowPtr) -1L, true, MACOVERVIEW_REFCON);
+        if (!gOvWindow)
+            return;
+        if (macFlags.color && gMap.palette)
+            NSetPalette(gOvWindow, gMap.palette, pmNoUpdates);
+    }
+    ShowWindow(gOvWindow);
+    {
+        GrafPtr saveP;
+
+        GetPort(&saveP);
+        SetPortWindowPort(gOvWindow);
+        ov_repaint_all();
+        SetPort(saveP);
+    }
+}
+
+void
+macmap_overview_hide(void)
+{
+    if (gOvWindow)
+        HideWindow(gOvWindow);
+}
+
+Boolean
+macmap_overview_visible(void)
+{
+    return gOvWindow && IsWindowVisible(gOvWindow);
+}
+
+WindowPtr
+macmap_overview_window(void)
+{
+    return gOvWindow;
+}
+
+/* content size, valid whether or not the window exists yet; the
+   default window layout reserves the right column from it */
+short
+macmap_overview_width(void)
+{
+    return OV_COLS * OV_SCALE;
+}
+
+short
+macmap_overview_height(void)
+{
+    return ROWNO * OV_SCALE;
+}
+
+/* Floating layer, which System 7 does not provide: whenever another
+   window got in front of the overview, put it back on top, hilited
+   active.  Called after every event (macwin.c HandleEvent), so a
+   SelectWindow elsewhere is undone on the next tick. */
+void
+macmap_overview_float(void)
+{
+    if (gOvWindow && IsWindowVisible(gOvWindow)
+        && FrontWindow() != gOvWindow) {
+        BringToFront(gOvWindow);
+        HiliteWindow(gOvWindow, true);
+    }
+}
+
+/* called from HandleUpdate inside BeginUpdate/EndUpdate */
+void
+macmap_overview_update_event(WindowPtr w)
+{
+    GrafPtr saveP;
+
+    if (!gOvWindow || w != gOvWindow)
+        return;
+    GetPort(&saveP);
+    SetPortWindowPort(gOvWindow);
+    ov_repaint_all();
+    SetPort(saveP);
 }

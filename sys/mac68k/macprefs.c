@@ -2,7 +2,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* Preferences dialog: UI settings (map mode, hitpointbar, statuslines,
- * per-window fonts/sizes) persisted in the "NetHack Preferences" file
+ * sound, per-window fonts/sizes) persisted in the "NetHack Preferences" file
  * alongside the window positions (maccurs.c).  Applied at startup after
  * initoptions(), so a saved record overrides the NetHack Defaults file;
  * "Forget Settings" clears the record and the config file rules again.
@@ -11,6 +11,7 @@
 
 #include "hack.h"
 #include "macwin.h"
+#include "macmap.h" /* overview windoid show/hide */
 
 #include <Dialogs.h>
 #include <Menus.h>
@@ -37,7 +38,10 @@ enum {
     /* 18..22 labels, 23 note */
     prefMenuTiles = 24,
     prefDefaultRing = 25, /* bold outline around the Save button */
-    prefSeparator = 26    /* gray rule above the button row */
+    prefSeparator = 26,   /* gray rule above the button row */
+    /* 27: "Status lines:" label */
+    prefSound = 28,
+    prefRule2 = 29 /* gray rule between the checkbox group and fonts */
 };
 
 #define PREFS_SIZE_MENU 6101 /* transient size popup, built per click */
@@ -107,6 +111,8 @@ seed_current(UiPrefs *up)
     up->hitpointbar = iflags.wc2_hitpointbar ? 1 : 0;
     up->statuslines = (iflags.wc2_statuslines == 3) ? 3 : 2;
     up->menutiles = iflags.use_menu_glyphs ? 1 : 0;
+    up->sounds = iflags.sounds ? 1 : 0;
+    up->overview_open = macmap_overview_visible() ? 1 : 0;
     up->sizes[uiFontMap] = iflags.wc_fontsiz_map;
     up->sizes[uiFontStatus] = iflags.wc_fontsiz_status;
     up->sizes[uiFontMessage] = iflags.wc_fontsiz_message;
@@ -129,6 +135,22 @@ macprefs_note_perminv(Boolean open)
     if (up.perminv_open == (open ? 1 : 0))
         return; /* unchanged; skip the file write */
     up.perminv_open = open ? 1 : 0;
+    StoreUiPrefs(&up);
+}
+
+/* same, for the map overview windoid's open/closed state */
+void
+macprefs_note_overview(Boolean open)
+{
+    UiPrefs up;
+
+    if (!RetrieveUiPrefs(&up)) {
+        seed_current(&up);
+        up.valid = 1;
+    }
+    if (up.overview_open == (open ? 1 : 0))
+        return; /* unchanged; skip the file write */
+    up.overview_open = open ? 1 : 0;
     StoreUiPrefs(&up);
 }
 
@@ -203,7 +225,7 @@ pref_redraw(DialogRef dlog, DialogItemIndex item)
         PenSize(1, 1);
         return;
     }
-    if (item == prefSeparator) {
+    if (item == prefSeparator || item == prefRule2) {
         GetDialogItem(dlog, item, &type, &h, &r);
         PenPat(&qd.gray);
         MoveTo(r.left, r.top);
@@ -369,6 +391,7 @@ macprefs_dialog(void)
     set_check(dlog, prefTiles, up.tiled_map);
     set_check(dlog, prefHPbar, up.hitpointbar);
     set_check(dlog, prefMenuTiles, up.menutiles);
+    set_check(dlog, prefSound, up.sounds);
     set_check(dlog, prefLines2, up.statuslines != 3);
     set_check(dlog, prefLines3, up.statuslines == 3);
     for (i = 0; i < UIPREFS_NFONTS; i++) {
@@ -394,6 +417,8 @@ macprefs_dialog(void)
     SetDialogItem(dlog, prefDefaultRing, type, (Handle) redraw, &r);
     GetDialogItem(dlog, prefSeparator, &type, &h, &r);
     SetDialogItem(dlog, prefSeparator, type, (Handle) redraw, &r);
+    GetDialogItem(dlog, prefRule2, &type, &h, &r);
+    SetDialogItem(dlog, prefRule2, type, (Handle) redraw, &r);
     /* the initial GetNewDialog draw ran before the user-item procs were
        installed; repaint so the font popups aren't blank */
     GetWindowPortBounds(GetDialogWindow(dlog), &r);
@@ -402,7 +427,7 @@ macprefs_dialog(void)
     do {
         ModalDialog(filter, &item);
         if (item == prefTiles || item == prefHPbar
-            || item == prefMenuTiles) {
+            || item == prefMenuTiles || item == prefSound) {
             set_check(dlog, item, !get_check(dlog, item));
         } else if (item == prefLines2 || item == prefLines3) {
             set_check(dlog, prefLines2, item == prefLines2);
@@ -433,6 +458,10 @@ macprefs_dialog(void)
         up.tiled_map = get_check(dlog, prefTiles) ? 1 : 0;
         up.hitpointbar = get_check(dlog, prefHPbar) ? 1 : 0;
         up.menutiles = get_check(dlog, prefMenuTiles) ? 1 : 0;
+        up.sounds = get_check(dlog, prefSound) ? 1 : 0;
+        /* not a dialog item: the Game menu toggles it live; carry the
+           live state so Save doesn't clobber it */
+        up.overview_open = macmap_overview_visible() ? 1 : 0;
         up.statuslines = get_check(dlog, prefLines3) ? 3 : 2;
         for (i = 0; i < UIPREFS_NFONTS; i++) {
             if (fontSel[i] > 1) {
@@ -476,6 +505,7 @@ macprefs_apply_startup(void)
     iflags.wc2_hitpointbar = up.hitpointbar ? TRUE : FALSE;
     iflags.wc2_statuslines = (up.statuslines == 3) ? 3 : 2;
     iflags.use_menu_glyphs = up.menutiles ? TRUE : FALSE;
+    iflags.sounds = up.sounds ? TRUE : FALSE;
     for (i = 0; i < UIPREFS_NFONTS; i++) {
         if (up.fonts[i][0]) {
             fnum = 0;
