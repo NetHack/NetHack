@@ -621,11 +621,17 @@ SanePositions(void)
             }
         }
 
+        /* Vertical gap between stacked windows: the frame line plus the
+           1px drop shadow extend 2px below the content, and the next
+           title bar needs its full title_h above -- 2px used to leave
+           the shadow lying ON the title (1px overlap) */
+        short vgap = small_screen ? 2 : 6;
+
         /* Fit the map into the space left by menu bar, message+status windows,
            and title bars; macmap_fit resizes the map window + viewport/backing */
         msg_top = y + title_h;
-        map_top = msg_top + msg_h + 2 + title_h;
-        avail_map_h = screenArea.bottom - map_top - (title_h + stat_h + 2);
+        map_top = msg_top + msg_h + vgap + title_h;
+        avail_map_h = screenArea.bottom - map_top - (title_h + stat_h + vgap);
         avail_map_w = screenArea.right - 4 - inv_w;
         macmap_fit(avail_map_w, avail_map_h, honor);
 
@@ -683,7 +689,7 @@ SanePositions(void)
                     stat_w = screenArea.right - 4;
             }
         }
-        stat_top = map_top + map_h + 2 + title_h;
+        stat_top = map_top + map_h + vgap + title_h;
         if (stat_top + stat_h > screenArea.bottom)
             stat_top = screenArea.bottom - stat_h - 2;
         if (stat_top < mbar_height + 2)
@@ -721,10 +727,11 @@ SanePositions(void)
         }
     }
 
-    /* Handle other windows (NHW_MENU / NHW_TEXT) */
+    /* Handle other windows (NHW_MENU / NHW_TEXT); the inventory windoid
+       is not a stray menu -- the strip placement above owns it */
     for (ix = 0; ix < NUM_MACWINDOWS; ix++) {
         if (ix != WIN_STATUS && ix != WIN_MESSAGE && ix != WIN_MAP
-            && ix != BASE_WINDOW) {
+            && ix != BASE_WINDOW && ix != WIN_INVEN) {
             theWindow = theWindows[ix].its_window;
             if (theWindow && ((WindowPeek) theWindow)->visible) {
                 int shift;
@@ -2430,10 +2437,35 @@ mac_curs(winid win, int x, int y)
     aWin->y_curs = y;
 }
 
+/* One-shot at the first input wait inside the moveloop: reopen the
+   inventory windoid if the preferences file says it was open when the
+   last session ended.  Shown via the select_menu intercept, so no
+   SelectWindow -- the map keeps the focus. */
+static void
+perminv_restore_check(void)
+{
+    static Boolean checked = false;
+    UiPrefs up;
+
+    if (checked || !program_state.in_moveloop)
+        return;
+    checked = true;
+    if (WIN_INVEN == WIN_ERR || !theWindows[WIN_INVEN].its_window
+        || IsWindowVisible(theWindows[WIN_INVEN].its_window))
+        return;
+    if (RetrieveUiPrefs(&up) && up.perminv_open)
+        repopulate_perminvent();
+}
+
 int
 mac_nh_poskey(coordxy *a, coordxy *b, int *c)
 {
-    int ch = mac_nhgetch();
+    int ch;
+
+    perminv_restore_check(); /* one-shot: reopen the inventory windoid
+        if it was open last session; here rather than update_inventory
+        because a quiet game start never triggers an inventory update */
+    ch = mac_nhgetch();
     *a = clicked_pos.h;
     *b = clicked_pos.v;
     *c = clicked_mod;
@@ -2640,18 +2672,36 @@ mac_select_menu(winid win, int how, menu_item **selected_list)
 
             if (!IsWindowVisible(theWin)) {
                 short top, left, sh, sw;
+                Boolean have_pos, have_size;
 
+                have_pos = RetrievePosition(kInvenWindow, &top, &left);
+                have_size = have_pos
+                            && RetrieveSize(kInvenWindow, top, left,
+                                            &sh, &sw);
                 adjust_window_pos(aWin, aWin->x_size + SBARWIDTH + 1,
                                   aWin->y_size * aWin->row_height);
-                /* adjust_window_pos treats the current width as a
-                   MINIMUM and sizes from the content; a size the user
-                   gave the windoid must win over that */
-                if (RetrievePosition(kInvenWindow, &top, &left)
-                    && RetrieveSize(kInvenWindow, top, left, &sh, &sw)) {
+                /* adjust_window_pos sizes from the content (current
+                   width as minimum) and clamps the position against
+                   that width -- restore the user's size, then re-apply
+                   the saved position the clamp may have shifted */
+                if (have_size)
                     SizeWindow(theWin, sw, sh, 1);
-                    if (aWin->scrollBar)
-                        DrawScrollbar(aWin); /* follow the new right edge */
+                if (have_pos) {
+                    MoveWindow(theWin, left, top, 0);
+                } else {
+                    /* never dragged: default to the right-hand strip
+                       that Reposition uses, not the creation spot */
+                    Rect scr = qd.screenBits.bounds, ir;
+
+                    OffsetRect(&scr, -scr.left, -scr.top);
+                    GetWindowPortBounds(theWin, &ir);
+                    left = scr.right - (ir.right - ir.left) - 4;
+                    if (left < 0)
+                        left = 0;
+                    MoveWindow(theWin, left, GetMBarHeight() + 24, 0);
                 }
+                if (have_size && aWin->scrollBar)
+                    DrawScrollbar(aWin); /* follow the new right edge */
             }
             ShowWindow(theWin);
             SetPortWindowPort(theWin);
@@ -2871,23 +2921,11 @@ mac_update_inventory(int arg)
         return;
     /* arg != 0: explicit #perminv ('|') -- open the windoid; arg == 0:
        inventory changed -- refresh only while it's visible (closed
-       window = no updates, that's the toggle) */
-    if (!arg && !IsWindowVisible(theWindows[WIN_INVEN].its_window)) {
-        /* one-shot: reopen at launch if it was open last session (the
-           first update fires right after the game enters the moveloop);
-           shown without SelectWindow so the map keeps the focus */
-        static Boolean perminv_restored = false;
-        UiPrefs up;
-
-        if (!perminv_restored) {
-            perminv_restored = true;
-            if (RetrieveUiPrefs(&up) && up.perminv_open) {
-                repopulate_perminvent();
-                return;
-            }
-        }
+       window = no updates, that's the toggle; the reopen-at-launch
+       one-shot lives in perminv_restore_check, called from the input
+       wait -- update_inventory may not fire at all on a quiet start) */
+    if (!arg && !IsWindowVisible(theWindows[WIN_INVEN].its_window))
         return;
-    }
     repopulate_perminvent();
     if (arg && IsWindowVisible(theWindows[WIN_INVEN].its_window)) {
         SelectWindow(theWindows[WIN_INVEN].its_window); /* an explicit
