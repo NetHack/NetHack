@@ -2579,7 +2579,7 @@ mac_display_file(const char *name, boolean complain)
 }
 
 void
-port_help()
+port_help(void)
 {
     display_file(PORT_HELP, TRUE);
 }

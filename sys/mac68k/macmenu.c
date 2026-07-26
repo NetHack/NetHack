@@ -464,7 +464,7 @@ ask_filter(DialogRef wind, EventRecord *event, DialogItemIndex *item)
 }
 
 void
-mac_askname()
+mac_askname(void)
 {
     GrafPtr oldport;
     DialogRef askdialog;
@@ -719,7 +719,7 @@ alignAD(Rect *pRct, short vExempt)
 }
 
 static void
-mustGetMenuAlerts()
+mustGetMenuAlerts(void)
 {
     short i;
     Rect **hRct;
@@ -751,7 +751,7 @@ menuError(short menuErr)
 }
 
 void
-InitMenuRes()
+InitMenuRes(void)
 {
     static Boolean was_inited = 0;
     short i, j;
@@ -1025,7 +1025,7 @@ DoMenuEvt(long menuEntry)
 }
 
 static void
-aboutNetHack()
+aboutNetHack(void)
 {
     if (theMenubar >= mbarRegular) {
         (void) doversion();
@@ -1046,7 +1046,7 @@ aboutNetHack()
 }
 
 static void
-askSave()
+askSave(void)
 {
     Boolean doSave = 1;
     Boolean doYes = 0;
@@ -1073,7 +1073,7 @@ askSave()
 }
 
 static void
-askQuit()
+askQuit(void)
 {
     Boolean doQuit = 1;
     Boolean doYes = 0;

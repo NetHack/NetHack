@@ -265,7 +265,7 @@ main(void)
 }
 
 static void
-warmup()
+warmup(void)
 {
     short i;
 
@@ -513,7 +513,7 @@ note(short errorSignal, short alertID, unsigned char *msg)
 }
 
 static void
-adjustGUI()
+adjustGUI(void)
 {
     static short oldMenubar = mbar_Init; /* force initial update */
     short newMenubar;
@@ -577,7 +577,7 @@ adjustGUI()
 }
 
 static void
-adjustMemory()
+adjustMemory(void)
 {
     Size grow;
 
@@ -591,7 +591,7 @@ adjustMemory()
 
 /* show memory stats: FreeMem, MaxBlock, PurgeSpace, and StackSpace */
 static void
-optionMemStats()
+optionMemStats(void)
 {
     unsigned char *pFormat =
         (unsigned char *) P_STRING_CONV("Free:#k  Max:#k  Purge:#k  Stack:#k");
@@ -704,7 +704,7 @@ RecoverMenuEvent(long menuEntry)
 }
 
 static void
-eventLoop()
+eventLoop(void)
 {
     short wneMask = (in.Front ? everyEvent : (osMask + updateMask));
     long wneSleep = (in.Front ? 0L : 3L);
@@ -818,7 +818,7 @@ eventLoop()
 }
 
 static void
-cooldown()
+cooldown(void)
 {
     if (in.Recover)
         endRecover();
@@ -898,7 +898,7 @@ basenameFileFilter(ParmBlkPtr pPB)
 }
 
 static void
-beginRecover()
+beginRecover(void)
 {
     SFTypeList levlType = { 'LEVL' };
     SFReply sfGetReply;
@@ -948,7 +948,7 @@ beginRecover()
 }
 
 static void
-continueRecover()
+continueRecover(void)
 {
     restore_savefile();
 
@@ -969,7 +969,7 @@ continueRecover()
 
 /* no messages from here (since we might be quitting) */
 static void
-endRecover()
+endRecover(void)
 {
     in.Recover = 0;
 
@@ -1001,7 +1001,7 @@ endRecover()
 
 /* add friendly, non-essential resource strings to save file */
 static short
-saveRezStrings()
+saveRezStrings(void)
 {
     short sRefNum;
     StringHandle strHnd;
@@ -1175,7 +1175,7 @@ copy_bytes(short inRefNum, short outRefNum)
  * number, read in step 1, across subsequent calls.
  */
 static void
-restore_savefile()
+restore_savefile(void)
 {
     static int savelev;
     long saveTemp, lev;
