@@ -1181,11 +1181,24 @@ restore_savefile(void)
     long saveTemp, lev;
     xint8 levc;
     struct version_info version_data;
+    char indicator, cscsize;
+    /* cscsize is a single byte, so 256 always holds the list; Recover
+       does not link version.c, so it cannot share its cscbuf */
+    unsigned char cscbuf[256];
+    int pltmpsiz;
+    char plbuf[PL_NSIZ_PLUS];
 
-    /* level 0 file contains:
+    /* level 0 file contains, in order (keep in step with util/recover.c
+     * and the writer in src/files.c):
      *	pid of creating process (ignored here)
      *	level number for current level of save file
      *	name of save file nethack would have created
+     *	format indicator (1 byte)
+     *	count of the critical size list (1 byte)
+     *	that many critical sizes
+     *	version info
+     *	player name size (int)
+     *	player name
      *	and game state
      */
 
@@ -1211,10 +1224,35 @@ restore_savefile(void)
             (void) read_levelfile(gameRefNum, (Ptr) savename,
                                   sizeof(savename));
         if (in.Recover)
+            (void) read_levelfile(gameRefNum, (Ptr) &indicator,
+                                  sizeof indicator);
+        if (in.Recover)
+            (void) read_levelfile(gameRefNum, (Ptr) &cscsize,
+                                  sizeof cscsize);
+        if (in.Recover && cscsize > 0)
+            (void) read_levelfile(gameRefNum, (Ptr) cscbuf, (long) cscsize);
+        if (in.Recover)
             (void) read_levelfile(gameRefNum, (Ptr) &version_data,
                                   sizeof version_data);
+        if (in.Recover)
+            (void) read_levelfile(gameRefNum, (Ptr) &pltmpsiz,
+                                  sizeof pltmpsiz);
+        if (in.Recover && (pltmpsiz < 0 || pltmpsiz > PL_NSIZ_PLUS)) {
+            endRecover();
+            note(noErr, alidNote,
+                 P_STRING_CONV("Sorry: bad player name in checkpoint"));
+            return;
+        }
+        if (in.Recover && pltmpsiz > 0)
+            (void) read_levelfile(gameRefNum, (Ptr) plbuf, (long) pltmpsiz);
 
         /* save file should contain:
+         *	format indicator (1 byte)
+         *	count of the critical size list (1 byte)
+         *	that many critical sizes
+         *	version info
+         *	player name size (int)
+         *	player name
          *	current level (including pets)
          *	(non-level-based) game state
          *	other levels
@@ -1226,8 +1264,21 @@ restore_savefile(void)
             levRefNum = open_levelfile(savelev);
 
         if (in.Recover)
+            (void) write_savefile(saveRefNum, (Ptr) &indicator,
+                                  sizeof indicator);
+        if (in.Recover)
+            (void) write_savefile(saveRefNum, (Ptr) &cscsize,
+                                  sizeof cscsize);
+        if (in.Recover && cscsize > 0)
+            (void) write_savefile(saveRefNum, (Ptr) cscbuf, (long) cscsize);
+        if (in.Recover)
             (void) write_savefile(saveRefNum, (Ptr) &version_data,
                                   sizeof version_data);
+        if (in.Recover)
+            (void) write_savefile(saveRefNum, (Ptr) &pltmpsiz,
+                                  sizeof pltmpsiz);
+        if (in.Recover && pltmpsiz > 0)
+            (void) write_savefile(saveRefNum, (Ptr) plbuf, (long) pltmpsiz);
         if (in.Recover)
             copy_bytes(levRefNum, saveRefNum);
 
